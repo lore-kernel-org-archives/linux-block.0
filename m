@@ -1,36 +1,45 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B98D367
-	for <linux-block@vger.kernel.org>; Wed, 25 Jun 2025 06:07:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E04751EB5C2;
+	Wed, 25 Jun 2025 06:12:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750831633; cv=none; b=cSQGDkxI9juG2WGTfPF5k2D17wI0Gkhp23tx1htCP/uN04HSKukO3kI1vWAdf8pahUcMGY7a9htqZ3yWUYcY88I6f9EAf+7jxLUsOB6q2C7sxYqDaEgQ8h0YqbZnd0AD0M0KQSdSMM0v1+tdnbqO8l1pPiwedQHdMpuImi3zOK4=
+	t=1750831974; cv=none; b=nxP+GzIXMn8g9TpJ271OkJV/IXikk8pL9vZpJviN79HRULqcC5GtxXBOps6oD/osyQh8US7pCQYmehN9EI7wd79B6+4SVstTzRRsnTWQmMZ/mYkpdmeZ8Q3S+siGs3JFQ/MMnEoyHnXGyq3F87hF+GA4ASpm1zuHfkOjyU+kIms=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750831633; c=relaxed/simple;
-	bh=3xxGFe43jbz/8eazAD9uDxafkIfe3SwoU7bMbDxPHE8=;
+	s=arc-20240116; t=1750831974; c=relaxed/simple;
+	bh=/ZE7O5iYYHD2cWHUQMttWl4oBO/D0q77IXmtN84PVhw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MIVRZhKHmxYIteR/L46zOF/HvGnV2MBqsh1w/vgpWd8JX6PDiortEmi2lTdhss4x9XVNXgYoloo356CLbO32vuLM+KdGxueGZc085I8XMN0FAwxY9W1HULDJgyf1fDkb4n6JUDDu2HkJfBpdLE2Hs2eY1sq7cj4Afz4vMfbXgB0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 13747227AAC; Wed, 25 Jun 2025 08:07:02 +0200 (CEST)
-Date: Wed, 25 Jun 2025 08:07:01 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Chaitanya Kulkarni <chaitanyak@nvidia.com>
-Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Kanchan Joshi <joshi.k@samsung.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	Nitesh Shetty <nj.shetty@samsung.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	Keith Busch <kbusch@kernel.org>,
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-Subject: Re: [PATCH 3/8] nvme-pci: refactor nvme_pci_use_sgls
-Message-ID: <20250625060701.GA9391@lst.de>
-References: <20250623141259.76767-1-hch@lst.de> <20250623141259.76767-4-hch@lst.de> <aFlyYjALviyhQ-IE@kbusch-mbp> <20250624124625.GA19239@lst.de> <01319f89-2244-476a-be0f-ab0dd74169d3@nvidia.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=XDpZVSC4Zwjcb6dPmzcTfTtYYZJDu82SWYZJF3deJH+tEJYoilYyMSCdPIlJRzx2doqj1tFF1RM4o/LrKYSI5pQd4RNqfFrXIrUdaI4/10GafA4vyVIolwbrv1K84LsSBGqbYY3lrtvcnDqe1ekzh5/DpuX3/Wm/Vjm8YYPpNdo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=zzuUmYvW; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="zzuUmYvW"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=/ZE7O5iYYHD2cWHUQMttWl4oBO/D0q77IXmtN84PVhw=; b=zzuUmYvWQV6Amparz4D6gMfpLZ
+	cZWKBtm3Wta1WwFAtBBSJL/mgp26d4G+nZpgd5ddZ9m/uLHENYKzm3+XV2kPp6fgomx0IGJZWe5B3
+	XDAOMdrJ4EHOkL6GstcPyYOhQzg7KzHbXwl+vnGhtcC35oDVX3YMDSm7l5f/wuxeteCNqHm4/Mx8r
+	9fadMjZ/Hs1H9yTk68fHuHN8Rc1nW+cKRzRRhbINavMEFw5Wz18kS+l4lz0EfV4USuFaaVz89DLrm
+	MVd2ADXAeV/VwHeCfcPOw7/skGItx7LDsiZOqu55N6ABMfG0QvNRA+igQkvCOEVXGZpAAo3NuLB/4
+	d1ohMtLg==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1uUJNL-00000007dNn-1uNQ;
+	Wed, 25 Jun 2025 06:12:51 +0000
+Date: Tue, 24 Jun 2025 23:12:51 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Damien Le Moal <dlemoal@kernel.org>
+Cc: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+	dm-devel@lists.linux.dev, Mike Snitzer <snitzer@kernel.org>,
+	Mikulas Patocka <mpatocka@redhat.com>,
+	Bart Van Assche <bvanassche@acm.org>
+Subject: Re: [PATCH v2 1/4] block: Introduce bio_needs_zone_write_plugging()
+Message-ID: <aFuTYxdeAzG1iSl9@infradead.org>
+References: <20250625055908.456235-1-dlemoal@kernel.org>
+ <20250625055908.456235-2-dlemoal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -39,11 +48,15 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <01319f89-2244-476a-be0f-ab0dd74169d3@nvidia.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20250625055908.456235-2-dlemoal@kernel.org>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Wed, Jun 25, 2025 at 04:28:09AM +0000, Chaitanya Kulkarni wrote:
-> Are you planning to send a V3 with a fix sg_threshold parameter ?
+On Wed, Jun 25, 2025 at 02:59:05PM +0900, Damien Le Moal wrote:
+> +bool bio_needs_zone_write_plugging(struct bio *bio)
 
-I'll send out a new version in a bit.
+Can you use this in blk_zone_plug_bio instead of duplicating the logic?
+
+I also wonder if we should only it it, as despite looking quite complex
+it should compile down to just a few instructions and is used in the
+I/O fast path.
 
