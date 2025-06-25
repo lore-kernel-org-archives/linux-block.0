@@ -1,122 +1,76 @@
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 004.mia.mailroute.net (004.mia.mailroute.net [199.89.3.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FE6E2D320B
-	for <linux-block@vger.kernel.org>; Wed, 25 Jun 2025 16:38:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BE5A2D5436
+	for <linux-block@vger.kernel.org>; Wed, 25 Jun 2025 16:42:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750869530; cv=none; b=Zy0XorjPpeVrlSDghRYsaUDjy8F39LwNGIbqzZYd48d0c2Wn4Ljza6deXyc4FpPNnh/PmQag6BLNmhgauneNPtDQTpumf2K0GU3PgsmI4NAtdhyDmQy2v7luDZxKm+5UZ1P7ZCPy9lXRvS9qhGUD3FlT6CS1li/RILSJQB+r1LI=
+	t=1750869748; cv=none; b=tFt86ZDPLXWniBdMv6XVoSuGVNOmzLX6oKOEGIocJFK8pu3H5yykHS8+C4ZRRndvN77MBw5aDqcdUmEF8ZIL9g4W9VkpQjA9Q6xMaHA2hHp10DBJjX3l0D0EycbH8CBL7xTwUv9Ote7bQV59uglhmy+8V0z5rFPqkMEwsutNNbQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750869530; c=relaxed/simple;
-	bh=9bZm6fW/G9/Udcgue+uPgj81Ppf4wMkV4IELCGYoXKI=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=DgH3pH+JWLHiANu01kQ+h++lL5hIdlarWpggZpe9986r5acvIBVXiXOoFiN1KKRE7MqXC0KBa5fETlTvPjkdJqMVWGFgg7A6LJ2T+7Fg/zXZgyJYABkogwsnEGWIZDmVp+Yve0vsCP8VK8Bp7rYdnzK2TtwGHMO1FsSrUe1A8RI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Pz2CEDxe; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1750869748; c=relaxed/simple;
+	bh=Vs+aa4gJBkLb003tTeHsMHpeR6ie6rbTwrPUl+a/bDM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=kNzBBIN1CBfNRipYyWKIb+3PZNaHQWrmeDguET7Ck9+KaMzPP1UohKVb+JQ7/iPDgXaTayJZU3kbretAmtfe+vlExSFKA4W3/tA75seL5H3MqNUYRbaCsdMssKn4txLJUJ3O7c2SE1cKYAS0JQaZFCwsh/9Bsag0L/btQpCdQqY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=phNmOFzd; arc=none smtp.client-ip=199.89.3.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Pz2CEDxe"
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-235f9e87f78so1154515ad.2
-        for <linux-block@vger.kernel.org>; Wed, 25 Jun 2025 09:38:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1750869528; x=1751474328; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aJD7oYsuXClF0OaOzgGxIKveGu4NfGDAhJ8FOTY5Umk=;
-        b=Pz2CEDxeqtSHJiEDuigYR5q61xrg9iET6drGC6zBSHDnNFsaF3mApRMQ/TCihsTeH2
-         yJljY6x2Hwb5YHrBNjc3N6iHvfNNzKblzXw+wW9DngH96TcmsnH3Qwul3OyBgnszss+p
-         eATFJOglQXVGY0tHffIUTvTLdsYh0qtxCT3TpHe46GkoYt4nJhF0kYB6wyYi1uiVxWf2
-         LO26MV6Nv391jMo24mBA9j9vJfbetYOnMtGtpE+v0Fh/PWbp0G0Mpp3w6EUe3Cnmq+VQ
-         INFc1c7krzubpUi4NHa6AIzP1RRXiIrRWIyD9qaXnY5wROhsWCUehic9iuOKmVnK4cWt
-         7s3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750869528; x=1751474328;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=aJD7oYsuXClF0OaOzgGxIKveGu4NfGDAhJ8FOTY5Umk=;
-        b=UlTb/xnXL+/kClJ5EkiNPD98UP2cY+pZOkAIM3flg6bG1cIfLUq9SvaQY6bEZFZiPP
-         1JUGPDMNAMH6n8tJxtR2SKEwEVvInehXkVdI+SFlN1Es6rnzEBr7YpBcqPzG3Xo4OMSa
-         jYmLTFttlrbue0leLNLHXNk+qhj4K3REXB3hHMFoHZqQgSOpRlIriZHgJzNYlJhs1Nj6
-         IWyfGiBpvUabWH4Sfofy4z92GEDJf6SWiJkV10K0lD61zcjUbxfLHrK/n73djnffxW8v
-         w0sVyhGQsTZGAEzRrnYDNXbXpcG13nkBCaHqnPxtSyCVZpbM6gUMSuzdTcdV33NtAofI
-         L7KQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUjXFeo/3QnXu+grJxbp8k4tcANtcCVz7dJYqQoZDFv0SmNyfFaFuLezZ86wWyEt2+n7NOS6FcyfD6rRA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzsVkp4J6rWCuAXo2LKtaC1Ve/EoafYh+Z66EK7EUdRT+WNqIiB
-	4+6LrOfd5ojX8OfQ2tODvzeAi5ItnANP/LeAcizXDLIIPLtt8BVjnwXGOTNjIPz0S+U=
-X-Gm-Gg: ASbGncvxS3/gwjwWEjmBrnLOj+cvX0lpPwwDBV5z6x+woo7i0/RFKLgPOWTZmCJM60E
-	YycyDXRqdaZ/m4cruvzF7dE+M+O+oOnai1GhsUypMrXAu2YTvB6nClNypIAC5EUgNOnenLyru0l
-	b4yedms5M7WtheR9wrY34RM4OAOZZI108C/GNOcQZFWf+iMrqomZq4yOWBXTxncjLLjcH2E7jh6
-	A6iBhYxmc/6Drt2hpCtStVyXQVC0KXMy347YgW5jHRRuprrF8m+fw3Mo5uHSZVpyTPDpq/s3Hrp
-	4RohbscWOqlanzZXKXpsN8trcrFnuTPOtXjIOUxK5F+yLgsP20wihA==
-X-Google-Smtp-Source: AGHT+IGDhM9kiTgBHa5GA1KZysJZpg4uphx08kK+xQdK6jAIhu2+Nfg5iHkJwNuyHtRWpoMjNzaLjQ==
-X-Received: by 2002:a17:903:1a67:b0:234:f200:51a1 with SMTP id d9443c01a7336-23823f94c1fmr57933555ad.9.1750869527845;
-        Wed, 25 Jun 2025 09:38:47 -0700 (PDT)
-Received: from [127.0.0.1] ([12.48.65.201])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-237d8673e1dsm140580495ad.163.2025.06.25.09.38.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Jun 2025 09:38:47 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>, 
- Chaitanya Kulkarni <kch@nvidia.com>, Kanchan Joshi <joshi.k@samsung.com>, 
- Leon Romanovsky <leon@kernel.org>, Nitesh Shetty <nj.shetty@samsung.com>, 
- Logan Gunthorpe <logang@deltatee.com>, linux-block@vger.kernel.org, 
- linux-nvme@lists.infradead.org
-In-Reply-To: <20250625113531.522027-1-hch@lst.de>
-References: <20250625113531.522027-1-hch@lst.de>
-Subject: Re: new DMA API conversion for nvme-pci v3
-Message-Id: <175086952686.169509.6467735913091492336.b4-ty@kernel.dk>
-Date: Wed, 25 Jun 2025 10:38:46 -0600
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="phNmOFzd"
+Received: from localhost (localhost [127.0.0.1])
+	by 004.mia.mailroute.net (Postfix) with ESMTP id 4bS7012PLqzm0pK4;
+	Wed, 25 Jun 2025 16:42:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1750869743; x=1753461744; bh=UDD0vMX18jwFgJtkFla1A7Lk
+	hKWY1E4DqsARkQZpma0=; b=phNmOFzdLYmEz2qImXmfH3DEpYui3Rj6/9SdKAIf
+	D98kZLL1sIae3iZG5+tTe9WETfD2eEEpEriJHiB+2fPm1NgEgQuaMHU0UWG/Ngyo
+	hLhFxyNGpy2iLV1gY6ZoHxvDbgp9xA/7O/FSElNzDE+myAli6OAOUFS1T47xM8rU
+	yfpTBEtPLTuI19HaEuqx3Ps9hPG97r+Mi2P0KqXHSuuLbuJ180MHEmRsPRE+JaRb
+	NN40on4oTzvPNBzLw1bZFFa6z4Nf8Z20G5ulncnaYuoVxa6/YgPTCrtVR73EtRUz
+	zWyArfAO12pXRwWoE2TfJebMkZ88auoqTNcQZ8H2S1Dybw==
+X-Virus-Scanned: by MailRoute
+Received: from 004.mia.mailroute.net ([127.0.0.1])
+ by localhost (004.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id VntgxNwd3UIN; Wed, 25 Jun 2025 16:42:23 +0000 (UTC)
+Received: from [100.66.154.22] (unknown [104.135.204.82])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 004.mia.mailroute.net (Postfix) with ESMTPSA id 4bS6zv5XtKzm0jwB;
+	Wed, 25 Jun 2025 16:42:18 +0000 (UTC)
+Message-ID: <e9a291a0-a8d5-4358-a28b-4c8f91d45942@acm.org>
+Date: Wed, 25 Jun 2025 09:42:17 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 4/5] dm: dm-crypt: Do not partially accept write BIOs
+ with zoned targets
+To: Damien Le Moal <dlemoal@kernel.org>, linux-block@vger.kernel.org,
+ Jens Axboe <axboe@kernel.dk>, dm-devel@lists.linux.dev,
+ Mike Snitzer <snitzer@kernel.org>, Mikulas Patocka <mpatocka@redhat.com>
+References: <20250625093327.548866-1-dlemoal@kernel.org>
+ <20250625093327.548866-5-dlemoal@kernel.org>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20250625093327.548866-5-dlemoal@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-d7477
 
+On 6/25/25 2:33 AM, Damien Le Moal wrote:
+> Fix this by modifying get_max_request_size() to always return the size
+> of the BIO to avoid it being split with dm_accpet_partial_bio() in
+                                           ^^^^^^^^^^^^^^^^^^^^^^^
+Two letters got swapped in this function name ...
 
-On Wed, 25 Jun 2025 13:34:57 +0200, Christoph Hellwig wrote:
-> this series converts the nvme-pci driver to the new IOVA-based DMA API
-> for the data path.
-> 
-> Chances since v2:
->  - fix handling of sgl_threshold=0
-> 
-> Chances since v1:
->  - minor cleanups to the block dma mapping helpers
->  - fix the metadata SGL supported check for bisectability
->  - fix SGL threshold check
->  - fix/simplify metadata SGL force checks
-> 
-> [...]
+Otherwise this patch looks good to me.
 
-Applied, thanks!
+Thanks,
 
-[1/8] block: don't merge different kinds of P2P transfers in a single bio
-      commit: 226d6099402d8de166af60b2794fc198360d98fb
-[2/8] block: add scatterlist-less DMA mapping helpers
-      commit: d6c12c69ef4fa33e32ceda4a53991ace01401cd9
-[3/8] nvme-pci: refactor nvme_pci_use_sgls
-      commit: 07c81cbf438b769e0d673be3b5c021a424a4dc6f
-[4/8] nvme-pci: merge the simple PRP and SGL setup into a common helper
-      commit: 06cae0e3f61c4c1ef18726b817bbb88c29f81e57
-[5/8] nvme-pci: remove superfluous arguments
-      commit: 07de960ac7577662c68f1d21bd4907b8dfc790c4
-[6/8] nvme-pci: convert the data mapping to blk_rq_dma_map
-      commit: 235118de382d6545d3822ead0571a05e017ed8f1
-[7/8] nvme-pci: replace NVME_MAX_KB_SZ with NVME_MAX_BYTE
-      commit: d1df6bd4c551110e0d1b06ee85c7bca057439d28
-[8/8] nvme-pci: rework the build time assert for NVME_MAX_NR_DESCRIPTORS
-      commit: 0c34198a16a88878aba455bebe157037c9ab52c5
-
-Best regards,
--- 
-Jens Axboe
-
-
-
+Bart.
