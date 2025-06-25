@@ -1,107 +1,114 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3728262FF6
-	for <linux-block@vger.kernel.org>; Wed, 25 Jun 2025 14:03:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0C8B25BF0F;
+	Wed, 25 Jun 2025 14:18:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750860203; cv=none; b=n7l/vzM7gNbE1GdPYFoOmoZTSrDF+jCycDBDYoaBMtsfG65GOi6Dwm/HS20GVAhp+fKMuPRqApN8FIMI6Ik2zbGqoUywOYwFtT2ZyQdn0dNf/vCpBQhSRu0fKY9qRkiikwVpCPTNdnfIhkf4TpVU9uQ8TNy0LKqVZOAXwffWKIA=
+	t=1750861085; cv=none; b=L5su9v8dPmjAirra4XOIlweKiuWl4j3K7TCDOnRl4dZo/EyDVUr1z0MCJgQ8uiLbYRdihBP4Y56WF1KjT6MNkQ3P9oeo++GQy1BybYpfUBiCVn9wAbsXnWEo3hZfK+g4wHFrp9Srur20sHMMpayHmMF26+tLtyHjIrmDIKcj13E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750860203; c=relaxed/simple;
-	bh=EaFhp6R32Jc8lRhiKE1xYpI6RCk3iahyylmWstMF/jI=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=dyle27vU75r+LYVkIOQyMWWSav90sFxKHi7SEvfQ4Rdu3Id0QuDRU1COhMrxjKWkBvHP1RCf8s38vV6NFv0Mvjf3CfTVGmgr3fT3GieS5jPE2mrPPNIEvVqBWOrChCmbkHeM3s3n+RKl1jHD/rhF4D2roeIrgOFWxe/NVTy3Udw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FkiHx1qr; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1750861085; c=relaxed/simple;
+	bh=M4G5XDxRuWGuM0Ue4i3Qt7POHiiyrCSIdxYPmlP+Yhk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BPthsI44xvMrx0J9ZfS/p4grIyC370lMOtmS5//SOgmTxbXcXRQCem3BDQTTKC5OAa6yN4e/rGL7owypkkD1Iefe1yK3Z5nciT4o+ymrbka/gAoyJCinbYZbKjUHMAwnhQ8X7xJ4YEOdBEV8vkfztpOGYJ9zyz76hka1/ukAC8g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ow4JylV7; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FkiHx1qr"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750860201;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2od9y3CugzjAAC7eCYpJrhMDJ9juTnwbD/Om22GZ6Ik=;
-	b=FkiHx1qrmXW0yh1u+jHXOObEa3ZHmCKi9GcOupQZGQtNDx4K2dwHcOINOyECFsKdOniyLR
-	tmGKRw/OPrc4h2aBzGZn3oLcn2iSkSJxReA6nWWrNSoemBOgBRxGVMEvUi0KzG7rEn+hcE
-	G2zw8gD6y0BnODlIwo3jv6Xtj2JtNBs=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-145-v0qaJX-ENq2oEn-3YNKcwQ-1; Wed,
- 25 Jun 2025 10:03:17 -0400
-X-MC-Unique: v0qaJX-ENq2oEn-3YNKcwQ-1
-X-Mimecast-MFC-AGG-ID: v0qaJX-ENq2oEn-3YNKcwQ_1750860194
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0029D1955F56;
-	Wed, 25 Jun 2025 14:03:14 +0000 (UTC)
-Received: from [10.22.80.93] (unknown [10.22.80.93])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 98AEA18003FC;
-	Wed, 25 Jun 2025 14:03:11 +0000 (UTC)
-Date: Wed, 25 Jun 2025 16:03:08 +0200 (CEST)
-From: Mikulas Patocka <mpatocka@redhat.com>
-To: Damien Le Moal <dlemoal@kernel.org>
-cc: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>, 
-    dm-devel@lists.linux.dev, Mike Snitzer <snitzer@kernel.org>, 
-    Bart Van Assche <bvanassche@acm.org>
-Subject: Re: [PATCH v2 3/4] dm: dm-crypt: Do not split write operations with
- zoned targets
-In-Reply-To: <07d71ad1-a6de-474b-bee4-a64180284802@kernel.org>
-Message-ID: <5c9898e1-3fae-d271-b0b8-a23371d22cb0@redhat.com>
-References: <20250625055908.456235-1-dlemoal@kernel.org> <20250625055908.456235-4-dlemoal@kernel.org> <96831fd8-da1e-771f-7d19-8087d29f2af1@redhat.com> <07d71ad1-a6de-474b-bee4-a64180284802@kernel.org>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ow4JylV7"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1750861084; x=1782397084;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=M4G5XDxRuWGuM0Ue4i3Qt7POHiiyrCSIdxYPmlP+Yhk=;
+  b=Ow4JylV7E/MiEsVaJA4CZtIC/X3Kg6IjI49v+50CFJq4+WDhnzr5+Kpx
+   u+Ktp0o6iNCRttnc+HwYSxaZ0ynmEsBT/F7nM86/Qk/IoMjnq7U0X03hM
+   U+NlNhSNGq37YT5jAVJc+tFSnrJy6hTZuWdrANgJuLhvsODwbqm0zcYSk
+   Wv3mokhHxcwvt3qbekvs72Rrc6WNWhXe/GiZ74WwcSpKlkjW/nk9hmmzF
+   S34/XDAxoXsmZgRTprLVMxyDwifyCTV6BHHoRTu2OwnQsqSdYHnxjSCbI
+   Ojd8TWKBFygK+J9sYHq8uUmIK988RP7twpDKyXHa9fcePnh3ERFxAnD9u
+   A==;
+X-CSE-ConnectionGUID: vT2SbaOHQZOATg9jOfYC7w==
+X-CSE-MsgGUID: 0EQGdEoXQRKqBkYMBqDQXg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11475"; a="53197826"
+X-IronPort-AV: E=Sophos;i="6.16,264,1744095600"; 
+   d="scan'208";a="53197826"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2025 07:17:49 -0700
+X-CSE-ConnectionGUID: kltvbGmNTs2VqFyO5g4Z5w==
+X-CSE-MsgGUID: gGNfuW1XSeS7l+BDROKwjA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,264,1744095600"; 
+   d="scan'208";a="151658653"
+Received: from lkp-server01.sh.intel.com (HELO e8142ee1dce2) ([10.239.97.150])
+  by orviesa010.jf.intel.com with ESMTP; 25 Jun 2025 07:17:45 -0700
+Received: from kbuild by e8142ee1dce2 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uUQwZ-000TB8-1Q;
+	Wed, 25 Jun 2025 14:17:43 +0000
+Date: Wed, 25 Jun 2025 22:17:42 +0800
+From: kernel test robot <lkp@intel.com>
+To: Joanne Koong <joannelkoong@gmail.com>, linux-fsdevel@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, hch@lst.de, miklos@szeredi.hu,
+	brauner@kernel.org, djwong@kernel.org, anuj20.g@samsung.com,
+	linux-xfs@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-block@vger.kernel.org, gfs2@lists.linux.dev,
+	kernel-team@meta.com
+Subject: Re: [PATCH v3 13/16] fuse: use iomap for writeback
+Message-ID: <202506252117.9V3HTO0i-lkp@intel.com>
+References: <20250624022135.832899-14-joannelkoong@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250624022135.832899-14-joannelkoong@gmail.com>
 
+Hi Joanne,
 
+kernel test robot noticed the following build errors:
 
-On Wed, 25 Jun 2025, Damien Le Moal wrote:
+[auto build test ERROR on brauner-vfs/vfs.all]
+[also build test ERROR on xfs-linux/for-next linus/master v6.16-rc3 next-20250625]
+[cannot apply to gfs2/for-next mszeredi-fuse/for-next]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-> On 6/25/25 19:19, Mikulas Patocka wrote:
-> > 
-> > 
-> > On Wed, 25 Jun 2025, Damien Le Moal wrote:
-> > 
-> >> +	bool wrt = op_is_write(bio_op(bio));
-> >> +
-> >> +	if (wrt) {
-> >> +		/*
-> >> +		 * For zoned devices, splitting write operations creates the
-> >> +		 * risk of deadlocking queue freeze operations with zone write
-> >> +		 * plugging BIO work when the reminder of a split BIO is
-> >> +		 * issued. So always allow the entire BIO to proceed.
-> >> +		 */
-> >> +		if (ti->emulate_zone_append)
-> >> +			return bio_sectors(bio);
-> > 
-> > The overrun may still happen (if the user changes the dm table while some 
-> > bio is in progress) and if it happens, you should terminate the bio with 
-> > DM_MAPIO_KILL (like it was in my original patch).
-> 
-> I am confused... Overrun against what ? We are now completely ignoring the
-> max_write_size limit so even if the user changes it, that will not affect the
-> BIO processing. If you are referring to an overrun against the zoned device
-> max_hw_sectors limit, it is not possible since changing limits is done with the
-> DM device queue frozen, so we are guaranteed that there will be no BIO in-flight.
-> 
-> I am not sure about what kind of table change you are thinking of, but at the
-> very least,  dm_table_supports_size_change() ensure that there cannot be any
-> device size change for a zoned DM device. And given the above point about limits
-> changes, I do not see how a table change can affect the BIO execution.
-> 
-> Do you have a specific example in mind ?
+url:    https://github.com/intel-lab-lkp/linux/commits/Joanne-Koong/iomap-pass-more-arguments-using-struct-iomap_writepage_ctx/20250624-102709
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git vfs.all
+patch link:    https://lore.kernel.org/r/20250624022135.832899-14-joannelkoong%40gmail.com
+patch subject: [PATCH v3 13/16] fuse: use iomap for writeback
+config: arm64-randconfig-003-20250625 (https://download.01.org/0day-ci/archive/20250625/202506252117.9V3HTO0i-lkp@intel.com/config)
+compiler: aarch64-linux-gcc (GCC) 12.3.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250625/202506252117.9V3HTO0i-lkp@intel.com/reproduce)
 
-What happens if a bio that is larger than "BIO_MAX_VECS << PAGE_SHIFT" 
-enters dm_split_and_process_bio? Where will the bio be split? I don't see 
-it, but maybe I'm missing something.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202506252117.9V3HTO0i-lkp@intel.com/
 
-Mikulas
+All errors (new ones prefixed by >>):
 
+   aarch64-linux-ld: fs/fuse/file.o: in function `fuse_writepages':
+>> file.c:(.text+0xa30): undefined reference to `iomap_writepages'
+>> file.c:(.text+0xa30): relocation truncated to fit: R_AARCH64_CALL26 against undefined symbol `iomap_writepages'
+   aarch64-linux-ld: fs/fuse/file.o: in function `fuse_writepage_finish':
+>> file.c:(.text+0x1fd8): undefined reference to `iomap_finish_folio_write'
+>> file.c:(.text+0x1fd8): relocation truncated to fit: R_AARCH64_CALL26 against undefined symbol `iomap_finish_folio_write'
+   aarch64-linux-ld: fs/fuse/file.o: in function `fuse_cache_write_iter':
+   file.c:(.text+0x888c): undefined reference to `iomap_file_buffered_write'
+   file.c:(.text+0x888c): relocation truncated to fit: R_AARCH64_CALL26 against undefined symbol `iomap_file_buffered_write'
+   aarch64-linux-ld: fs/fuse/file.o: in function `fuse_iomap_writeback_range':
+>> file.c:(.text+0x9258): undefined reference to `iomap_start_folio_write'
+>> file.c:(.text+0x9258): relocation truncated to fit: R_AARCH64_CALL26 against undefined symbol `iomap_start_folio_write'
+>> aarch64-linux-ld: fs/fuse/file.o:(.rodata+0x370): undefined reference to `iomap_dirty_folio'
+   aarch64-linux-ld: fs/fuse/file.o:(.rodata+0x3a0): undefined reference to `iomap_release_folio'
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
