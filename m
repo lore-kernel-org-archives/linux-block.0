@@ -1,85 +1,61 @@
-Received: from 004.mia.mailroute.net (004.mia.mailroute.net [199.89.3.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA62C28689C
-	for <linux-block@vger.kernel.org>; Wed, 25 Jun 2025 15:48:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8C382652A6
+	for <linux-block@vger.kernel.org>; Wed, 25 Jun 2025 16:03:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750866495; cv=none; b=frMjJWoYirWqJotQn2m+1/PHvSsvqzZQbNLZbuRfFbg8xY1QqWziEAS5MRc/eIbLkkP8p0O04xSLaO+TbyDGs7r7lqBY6Oh0J/HobuieMH5t21wB9xvuXYbXotpjsdA5cd3WhF6/Y8hUO83P2qFmE7MWLfjaQXHai5wRySH5EB4=
+	t=1750867397; cv=none; b=SF64+394MQelVMukesKvxD4KKAf/Gn8L/lMXZDlZIGDLoD63nLy6ak5NwfLel8rs/7FQnjjIzKCKKZpL8yIcS2r4U1g/CIsRTNTm0FOKk0Vh55nAkj1mw0Cz9Xx6FDtA2coRRHN8IiekN7loKvgaD/2zuK9ic3LvkbjnXyEYX5c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750866495; c=relaxed/simple;
-	bh=7o5VkU9SFyMDyvjbu2OHkFkxCR5C30AGDl+xnpCJSqU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=kYQEY0he6MWKeidvNNu2++tMyraX9Is6KpGwDd8uUKx5ThxCOcbiRREZfmi/yHRGGmkU5Z+3tj9MIAY1IErrpKnnSifdHjHGGBkAWkEMV7CR+TIeZRx7nWB/EDH3xqwwhu4Vo+fG8E/CLuY+ReFziSCIh6YZKiYvx/1HjFoA8mY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=uegHB6vE; arc=none smtp.client-ip=199.89.3.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1750867397; c=relaxed/simple;
+	bh=DB+eC0c3o2pnETrjNuTskHB3LeYZnQynixMCUoGGhxs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OC6PiezCsC1W3ZJpyUGhUJ6drXjatrZ7S2NJGf7BuDMHaux4YCI2FFIL0q3YlsI8XFnyxz9Jnavc69XSIABDiI2guXjcd5KV/on3fIT+P5qnyvQFL4MJtvFRK/w6eQHfjpRBF4COp0zdEsLgOxLkffsxlOd+dAXCjyHGYMAcXoM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gQytwcdC; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="uegHB6vE"
-Received: from localhost (localhost [127.0.0.1])
-	by 004.mia.mailroute.net (Postfix) with ESMTP id 4bS5nS6T8rzm0gbh;
-	Wed, 25 Jun 2025 15:48:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1750866491; x=1753458492; bh=viFYFSnZ8bLGCWdK4nSwTORc
-	z+rOkp8LJ9hrkreHbRo=; b=uegHB6vEPDOVku84f8+ng9lXN8y4iFSYIz6of/hF
-	lruDbsO+vnD63G5YH+XrDYvwmZDU+OaJImLz/aBAX8FaWHeW07fDUwVGg/7TRcpr
-	TgPuhY2OhX5L/slAzU+aoaNZELKW+49eKuEEbOe3YCWiC6jWrz2N/kzfzm+Hze15
-	V6rWREny3Mc/uHDIUoUOj5Eo/dMegu2at4RSUwfhzXtsixpeZVRMABxZ4/tXTbnv
-	8+MzuKw0RPscHLoUQCxuL0JHErjMhhyTW75VkvgcbIHWTfbdZ0kJzs8ur+g00/9J
-	3t+bvTTF3KYuliuTvO/3CGZWH+LVVsxU4Sy+PYKikDymCg==
-X-Virus-Scanned: by MailRoute
-Received: from 004.mia.mailroute.net ([127.0.0.1])
- by localhost (004.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id TDSp8Z-4t6Zo; Wed, 25 Jun 2025 15:48:11 +0000 (UTC)
-Received: from [100.66.154.22] (unknown [104.135.204.82])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 004.mia.mailroute.net (Postfix) with ESMTPSA id 4bS5nL5htFzm0pKW;
-	Wed, 25 Jun 2025 15:48:05 +0000 (UTC)
-Message-ID: <38ddf5f9-80e4-4909-b5cc-cef0ffce19dd@acm.org>
-Date: Wed, 25 Jun 2025 08:48:04 -0700
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gQytwcdC"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E44F0C4CEEB;
+	Wed, 25 Jun 2025 16:03:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750867395;
+	bh=DB+eC0c3o2pnETrjNuTskHB3LeYZnQynixMCUoGGhxs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=gQytwcdCVx19NT/KhwTZvD+/xzS0fsE/dOAekhrVpx5Lo0XX80oUDaB+mvAchxJnZ
+	 8j/vgqi631Q0GVo4YsX18SE5I3Nol3M1bRD4ZLjZWLfeCUIoLnuSxeM3jN+qy4MFEM
+	 bFGLocuPIfmysKMeZqpIjUeVYlM2J3YtilWFHY9omxPW4K+O6t929c9zlVycbVDJbo
+	 /jk/S7p3u1F29/j88wRJK7hzFmXm9H5Gzxbaelbh6nBIrU6rrqwBsDyA5MGp68pvUT
+	 MJGJ9fvCKgxF5w+JZPKS9Fp3rcUKqHlavMKct01rFOuHPLZ0ZFI8240EpG6BF8mM4B
+	 3SxySj7OxPOTA==
+Date: Wed, 25 Jun 2025 10:03:13 -0600
+From: Keith Busch <kbusch@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Sagi Grimberg <sagi@grimberg.me>,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	Kanchan Joshi <joshi.k@samsung.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Nitesh Shetty <nj.shetty@samsung.com>,
+	Logan Gunthorpe <logang@deltatee.com>, linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org
+Subject: Re: [PATCH 3/8] nvme-pci: refactor nvme_pci_use_sgls
+Message-ID: <aFwdwa4-36u0w8Cx@kbusch-mbp>
+References: <20250625113531.522027-1-hch@lst.de>
+ <20250625113531.522027-4-hch@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 2/5] block: Introduce bio_needs_zone_write_plugging()
-To: Damien Le Moal <dlemoal@kernel.org>, linux-block@vger.kernel.org,
- Jens Axboe <axboe@kernel.dk>, dm-devel@lists.linux.dev,
- Mike Snitzer <snitzer@kernel.org>, Mikulas Patocka <mpatocka@redhat.com>
-References: <20250625093327.548866-1-dlemoal@kernel.org>
- <20250625093327.548866-3-dlemoal@kernel.org>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20250625093327.548866-3-dlemoal@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250625113531.522027-4-hch@lst.de>
 
-On 6/25/25 2:33 AM, Damien Le Moal wrote:
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 4806b867e37d..0c61492724d2 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -3169,8 +3169,10 @@ void blk_mq_submit_bio(struct bio *bio)
->   	if (blk_mq_attempt_bio_merge(q, bio, nr_segs))
->   		goto queue_exit;
->   
-> -	if (blk_queue_is_zoned(q) && blk_zone_plug_bio(bio, nr_segs))
-> -		goto queue_exit;
-> +	if (bio_needs_zone_write_plugging(bio)) {
-> +		if (blk_zone_plug_bio(bio, nr_segs))
-> +			goto queue_exit;
-> +	}
+On Wed, Jun 25, 2025 at 01:35:00PM +0200, Christoph Hellwig wrote:
+> Move the average segment size into a separate helper, and return a
+> tristate to distinguish the case where can use SGL vs where we have to
+> use SGLs.  This will allow the simplify the code and make more efficient
+> decisions in follow on changes.
 
-Why nested if-statements instead of keeping "&&"? I prefer "&&".
+Looks good.
 
-Thanks,
-
-Bart.
+Reviewed-by: Keith Busch <kbusch@kernel.org>
