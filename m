@@ -1,112 +1,65 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB60ABA53
-	for <linux-block@vger.kernel.org>; Thu, 26 Jun 2025 13:18:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC79928C009;
+	Thu, 26 Jun 2025 13:33:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750943901; cv=none; b=q2mocnnaScXxGKxRIoAVziQZfjB9qpxeHfBnWfQiLafKmDYxwa79YUxUzGDUPuiQAkIXxoLcrKtWXYf/WVq3T+i0CG9MXpau9YpKls2BImDjAT4aApYUyZXxSsGI65s87ZxlzT0cgrsAHdqG3+Xt1G/oiBBRPaLtB5ZKQcbkRrM=
+	t=1750944830; cv=none; b=p77XJub6DEksU4TibJqwqnRZpPQzV1cRGuHHqoMCzW2s/aLd4RHF0XQUzMG2OFJD9AzdmaCt6aBTQ6FJKVCoiF+4p3hYZ36yXA+BHi+iiAjT5jGDU5t9FTfkoo+cc4HB8pQh5s6+iwiyT5wrtQQcpA1Au+e9rX95sZO9+gxnBnY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750943901; c=relaxed/simple;
-	bh=E150dTFBbcgaTD2RdsdSlPVSto2kCQ8bxGxjKxBdS6E=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LCnFQsRtKMLExd5tzjcIHp37q08Xw6Pl2IdbER+JxwAYqKWvUGpu3MBXXFlvUSZuEiR/MwGred+k20EpyZUJB3l2HtjqldLgzZz1pvkUgUY9MMQhZpkrY4H+kuzmVWvn1gPC9JrsSOR55EHcZNgKHKDa2r4z1lg8PHFDrgfN0dE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KUO0B670; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1750944830; c=relaxed/simple;
+	bh=d/60YnmlyVjCgsaESfsTR5bhN8Cd5tY+YhEX/ZBs7Hc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=btUl2MWdLpq2FSdgHNbeJPa4DNs8EqDG15UHHUMs0J/ALi4QokwUKdCZbi7+5Sv/55sae4VTRr0a8FIfANnh808Uq0QIikXBQzLI54UYg0iyFnDE7HjZKMxZGSEUSa0iKKM/HmhPYlxLaIbHqo3aYQrWufw8kGgFnr75j8E+VPc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=sqNElX7f; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KUO0B670"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750943899;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KvkTm4jKfboZf4Sh6JozVJmLtXbYCDph+ghmY8E0mGM=;
-	b=KUO0B670qqm4tR9V3rz/rlbafCtePEnpOioYKO1PuwMQ0uEmhxqnHvRIq4d5saBPUdAuTD
-	pkirs/VCVxApFxETm02tJeq/vhrYkEEotUS7AvIErG+NQGjBhPw+j2/YShREn1nsnLAJv2
-	phQwEyCinBs/HND1Y2s/bB6VfV/Hs20=
-Received: from mail-vk1-f198.google.com (mail-vk1-f198.google.com
- [209.85.221.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-38-lISy8zQwMpGNjzdpdFkuxA-1; Thu, 26 Jun 2025 09:18:17 -0400
-X-MC-Unique: lISy8zQwMpGNjzdpdFkuxA-1
-X-Mimecast-MFC-AGG-ID: lISy8zQwMpGNjzdpdFkuxA_1750943896
-Received: by mail-vk1-f198.google.com with SMTP id 71dfb90a1353d-532d32147ffso307907e0c.0
-        for <linux-block@vger.kernel.org>; Thu, 26 Jun 2025 06:18:16 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750943896; x=1751548696;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KvkTm4jKfboZf4Sh6JozVJmLtXbYCDph+ghmY8E0mGM=;
-        b=Pek9z/Rt18LVex2FzfSjtgmxJvU7dsofhz3tTx8SNH2b/BgrE/EoPhrNk6z9McBvDL
-         GUbn40vGeZ8tHiOwNQPh/JMtdJ87LjjkaNBqU3YyQYXQgpkbpyKxSlBc2Xrk2ccrYP0p
-         fjVJACdmeJSgyjaWrzLUQtEE7g1+ZADfH5CL1+0i22b+p1JOsb47iK5yTC8ymb0nXP2Y
-         rZwmVeIunhAGc279NhWZxNWsq65FYpbi7yuA2JkBcABnHNlOCJz8GZ771FrachvDu2ns
-         rYuAncpnrnTBytXPknBTmF7z69hD4f5QvaQ/LRSpMYta0Nu6v3AaBzYcFri4ADRiY71A
-         SGYw==
-X-Gm-Message-State: AOJu0Ywdm7tI9RZXsEfku2qefQW+MVErUJz0EWBEeF8IqeLY4w8l4rk+
-	ytawgTfhnx/npIWilfGspocCn8lllNSJ9dflAfpJBTXDGPb4ZW70TLBpKpU9huAVK4rKEIA4e3/
-	XXoRXUxHM3W+v5rdtktdUu708a8yk4fqsfmGQHVD8hZAiTp8kFaYkovu3tEtCTjiUDCWSR2gzYV
-	DYzpW9U2221m/4f7Z3bXGyLuO7WqSqCRxR8gGnkPsUSLwLQwyjwA==
-X-Gm-Gg: ASbGnctmT4aHxRaXEdOPY37EDg0+JB0qefCwqFu0943lYVN5jdYu52whzk8l14kSQvp
-	ifYzr5nxBzjIVXyXkbGOUPzm6JLqJKFXSlHFsoJvFTF0Y7xVGlPSVwdZZzYrbRb14M2ruc1sUKV
-	epdso=
-X-Received: by 2002:a05:6122:2a43:b0:530:5996:63a2 with SMTP id 71dfb90a1353d-532ef476490mr5614850e0c.7.1750943896360;
-        Thu, 26 Jun 2025 06:18:16 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGb4v0lFUp3iZ4ZNiVTo8o8cPg/rdQTbBmt7LglwdMJdO/fGag9D9pITC8slS4nQjkO/s5GFjf8yrTAMDnfErE=
-X-Received: by 2002:a05:6122:2a43:b0:530:5996:63a2 with SMTP id
- 71dfb90a1353d-532ef476490mr5614781e0c.7.1750943895952; Thu, 26 Jun 2025
- 06:18:15 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="sqNElX7f"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=iN5oa8WFpQH679cSz3xeEssUmCfX9gDZTweFMclKHvM=; b=sqNElX7fXBTXxTkWkPhQ+KaumA
+	fDUmRX8e6QwcX0uyQ+xhXeuuANxa5nHXYWK4Y3AhGyr/XSoUDZ1DZt324kNl/JLJ5ViNHv/F4rbpC
+	8YGnryXiMtabm+nc/A3Ixg3XFYYUWEtKm6sdkaRfjMtg+sK4+rCTI9RWsgRut2am5QF8u9SpTQNDK
+	U94j9Hd1lxj3rJa6wRM9IwTh6WOUdKDYSZsuqRyb650mBPll21XSTL1mVV56V7Hf2W84j15YbGvSW
+	EqjIEFHdMDeAN7Srkz01bPW89lfXX6BTTDxgGiWRPXJZB6fiwmDihdVri8WPFKHnrFcvp9MSGSP8P
+	3UPZlBQg==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1uUmjb-0000000BgSF-0uhn;
+	Thu, 26 Jun 2025 13:33:47 +0000
+Date: Thu, 26 Jun 2025 06:33:47 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Yu Kuai <yukuai3@huawei.com>
+Cc: axboe@kernel.dk, hare@suse.de, hch@infradead.org,
+	john.g.garry@oracle.com, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, yi.zhang@redhat.com,
+	calvin@wbinvd.org, david@fromorbit.com, yukuai1@huaweicloud.com,
+	yi.zhang@huawei.com, yangerkun@huawei.com, johnny.chenyi@huawei.com
+Subject: Re: [PATCH v2] block: fix false warning in bdev_count_inflight_rw()
+Message-ID: <aF1MOxsOm2tcc0Ct@infradead.org>
+References: <20250626115743.1641443-1-yukuai3@huawei.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250626022046.235018-1-ronniesahlberg@gmail.com>
-In-Reply-To: <20250626022046.235018-1-ronniesahlberg@gmail.com>
-From: Ming Lei <ming.lei@redhat.com>
-Date: Thu, 26 Jun 2025 21:18:02 +0800
-X-Gm-Features: Ac12FXz5cS85gMnSjV0ojJS24y4yUePFMvsy3Z_bh6tbQWYDTDUNF0qkyDQLLtI
-Message-ID: <CAFj5m9KWcCbP_dzfUOpH5ciRtxnc6Zrbp7JuOHS7orViWK-tjA@mail.gmail.com>
-Subject: Re: [PATCH] ublk: sanity check add_dev input for underflow
-To: Ronnie Sahlberg <ronniesahlberg@gmail.com>
-Cc: linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250626115743.1641443-1-yukuai3@huawei.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Thu, Jun 26, 2025 at 10:21=E2=80=AFAM Ronnie Sahlberg
-<ronniesahlberg@gmail.com> wrote:
->
-> From: Ronnie Sahlberg <rsahlberg@whamcloud.com>
->
-> Add additional checks that queue depth and number of queues are
-> non-zero.
->
-> Signed-off-by: Ronnie Sahlberg <rsahlberg@whamcloud.com>
-> ---
->  drivers/block/ublk_drv.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> index d36f44f5ee80..471ea0c66dff 100644
-> --- a/drivers/block/ublk_drv.c
-> +++ b/drivers/block/ublk_drv.c
-> @@ -2825,7 +2825,8 @@ static int ublk_ctrl_add_dev(const struct ublksrv_c=
-trl_cmd *header)
->         if (copy_from_user(&info, argp, sizeof(info)))
->                 return -EFAULT;
->
-> -       if (info.queue_depth > UBLK_MAX_QUEUE_DEPTH || info.nr_hw_queues =
-> UBLK_MAX_NR_QUEUES)
-> +       if (info.queue_depth > UBLK_MAX_QUEUE_DEPTH || !info.queue_depth =
-||
-> +           info.nr_hw_queues > UBLK_MAX_NR_QUEUES || !info.nr_hw_queues)
->                 return -EINVAL;
+On Thu, Jun 26, 2025 at 07:57:43PM +0800, Yu Kuai wrote:
+>  static void bdev_count_inflight_rw(struct block_device *part,
+>  		unsigned int inflight[2], bool mq_driver)
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Why not pass the inflight arguments as signed? (and split it for
+reads and writes as you did below)
 
-Thanks,
+Anyway, I think this is good enough to get a fix queued up ASAP,
+but we can probably clean it up incrementally:
+
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 
