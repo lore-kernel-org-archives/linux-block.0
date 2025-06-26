@@ -1,83 +1,139 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CD7517BA5;
-	Thu, 26 Jun 2025 11:37:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E37BD1AAE28;
+	Thu, 26 Jun 2025 12:04:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750937829; cv=none; b=UXP7bOlUT7AKzfwoA+sEqDt420aGLV9CD3NhYlOq76pkp0wlApH/5X6OpP7ogPF+1CoEO4/Xhb2y1lcpc+JlYe3MzJn04F7QUdwlAcmwiSJwPmYJCD7vY92kX9UcCdj7wAflrn1q9LLa8g1k9c6bS5SpfzYG0YZANHPVTdVmFDE=
+	t=1750939485; cv=none; b=hgaue+tzJGSAwJ2mAP/P/HBlktUTl9AgNWudvEYzqDcREgDbwyvDQfjuxKAULM1BedgQo0081mTU/q5TIVbCOcM0cHYXCKXB8p5LYPWIFqJ07Au67KruZRywpRqPlJQ9wf9Vrf+FTXqY2qpWsEmxwlal5+jgpRw9RKvj+u11K0Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750937829; c=relaxed/simple;
-	bh=mtyK/NOV28AKjGqGVdbBweKlopSsf/40dE/zw8jYnf0=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=XPY2LjBty7FxRk5rPGlSF9IHRVNh79eo88LBu5nfp+XyrFA3qNth6nluM9KNwcMdMyfPwjy3929XdCa//hItXYwsDOZm47oI+Vhq9eH8+6osjZJqgsBkMBTae8lvAHOUqqpoNBq9HjwpTWU8/QPacZtAW0xv9njLUTeHcrCw2XI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4bSc9G3xzRzKHLv5;
-	Thu, 26 Jun 2025 19:37:06 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id E44F71A12EF;
-	Thu, 26 Jun 2025 19:37:04 +0800 (CST)
-Received: from [10.174.179.143] (unknown [10.174.179.143])
-	by APP4 (Coremail) with SMTP id gCh0CgA3m1_fMF1oAe_ZQg--.50734S3;
-	Thu, 26 Jun 2025 19:37:04 +0800 (CST)
-Subject: Re: [PATCH] block: fix false warning in bdev_count_inflight_rw()
-To: John Garry <john.g.garry@oracle.com>, Yu Kuai <yukuai1@huaweicloud.com>,
- axboe@kernel.dk, hare@suse.de, hch@infradead.org
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- yi.zhang@redhat.com, calvin@wbinvd.org, david@fromorbit.com,
- yi.zhang@huawei.com, yangerkun@huawei.com, johnny.chenyi@huawei.com,
- "yukuai (C)" <yukuai3@huawei.com>
-References: <20250626083927.576207-1-yukuai1@huaweicloud.com>
- <27e4f72f-3b6e-4dc8-a722-0ace9aa8c066@oracle.com>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <bca70ea3-8f9c-b69e-0a39-0a0d91e7e353@huaweicloud.com>
-Date: Thu, 26 Jun 2025 19:37:03 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.1
+	s=arc-20240116; t=1750939485; c=relaxed/simple;
+	bh=NX5QkGsObuNd/W50D8W9CoOzLMwdieS+6zPOd+QbUdI=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=AL0LHtbw5Llu6KByibUlheGY6k2fPF+9qN66b7qOGRqi8YZIdrPvDgeLuHu1zxaO2s175uI+ws88nL8A7ekvLVQAT/avKjlnUt5m/ElC4Dq7p972ra+GQe2aDF9m1JYznn3nbTqnqoWDRTo3mkbjMNF3Gx4hHuCspHRUNfn69NQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.194])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4bScgZ3q7lz10XTj;
+	Thu, 26 Jun 2025 19:59:54 +0800 (CST)
+Received: from kwepemk500007.china.huawei.com (unknown [7.202.194.92])
+	by mail.maildlp.com (Postfix) with ESMTPS id 561F51401F4;
+	Thu, 26 Jun 2025 20:04:32 +0800 (CST)
+Received: from huawei.com (10.175.104.67) by kwepemk500007.china.huawei.com
+ (7.202.194.92) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Thu, 26 Jun
+ 2025 20:04:31 +0800
+From: Yu Kuai <yukuai3@huawei.com>
+To: <axboe@kernel.dk>, <hare@suse.de>, <hch@infradead.org>,
+	<john.g.garry@oracle.com>, <yukuai3@huawei.com>
+CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<yi.zhang@redhat.com>, <calvin@wbinvd.org>, <david@fromorbit.com>,
+	<yukuai1@huaweicloud.com>, <yi.zhang@huawei.com>, <yangerkun@huawei.com>,
+	<johnny.chenyi@huawei.com>
+Subject: [PATCH v2] block: fix false warning in bdev_count_inflight_rw()
+Date: Thu, 26 Jun 2025 19:57:43 +0800
+Message-ID: <20250626115743.1641443-1-yukuai3@huawei.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <27e4f72f-3b6e-4dc8-a722-0ace9aa8c066@oracle.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgA3m1_fMF1oAe_ZQg--.50734S3
-X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
-	VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUYK7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E
-	6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28Cjx
-	kF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8I
-	cVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87
-	Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE
-	6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r106r15McIj6I8E87Iv67AKxVWUJVW8JwAm72
-	CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4II
-	rI8v6xkF7I0E8cxan2IY04v7Mxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij64vIr4
-	1l4c8EcI0Ec7CjxVAaw2AFwI0_Jw0_GFyl4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAq
-	x4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r
-	43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF
-	7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxV
-	WUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfU
-	F9a9DUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+Content-Type: text/plain
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ kwepemk500007.china.huawei.com (7.202.194.92)
 
-Hi,
+While bdev_count_inflight is interating all cpus, if some IOs are issued
+from traversed cpu and then completed from the cpu that is not traversed
+yet:
 
-在 2025/06/26 17:34, John Garry 写道:
-> Is it even safe to even use this function when not used for just 
-> informative purposes? I mean, for example, it is used by md code to 
-> check for idle state - could that check return an invalid result (and 
-> cause harm)?
+cpu0
+		cpu1
+		bdev_count_inflight
+		 //for_each_possible_cpu
+		 // cpu0 is 0
+		 infliht += 0
+// issue a io
+blk_account_io_start
+// cpu0 inflight ++
 
-For md code, I think it's ok, md still use completed IO for idle state.
+				cpu2
+				// the io is done
+				blk_account_io_done
+				// cpu2 inflight --
+		 // cpu 1 is 0
+		 inflight += 0
+		 // cpu2 is -1
+		 inflight += -1
+		 ...
 
-More importantly, the io_ticks can be wrong due to inflight to be zero,
-however, it's inaccurate for a long time and there is no much we can do
-:(
+In this case, the total inflight will be -1, causing lots of false
+warning. Fix the problem by removing the warning.
 
-Thanks,
-Kuai
+Noted there is still a valid warning for nvme-mpath(From Yi) that is not
+fixed yet.
+
+Fixes: f5482ee5edb9 ("block: WARN if bdev inflight counter is negative")
+Reported-by: Yi Zhang <yi.zhang@redhat.com>
+Closes: https://lore.kernel.org/linux-block/aFtUXy-lct0WxY2w@mozart.vkv.me/T/#mae89155a5006463d0a21a4a2c35ae0034b26a339
+Reported-and-tested-by: Calvin Owens <calvin@wbinvd.org>
+Closes: https://lore.kernel.org/linux-block/aFtUXy-lct0WxY2w@mozart.vkv.me/T/#m1d935a00070bf95055d0ac84e6075158b08acaef
+Reported-by: Dave Chinner <david@fromorbit.com>
+Closes: https://lore.kernel.org/linux-block/aFuypjqCXo9-5_En@dread.disaster.area/
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+---
+Changes in v2:
+ - fix comments grammar;
+ - add signed int for percpu summation to prevent overflow;
+
+ block/genhd.c | 26 +++++++++++++++-----------
+ 1 file changed, 15 insertions(+), 11 deletions(-)
+
+diff --git a/block/genhd.c b/block/genhd.c
+index 8171a6bc3210..c26733f6324b 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -128,23 +128,27 @@ static void part_stat_read_all(struct block_device *part,
+ static void bdev_count_inflight_rw(struct block_device *part,
+ 		unsigned int inflight[2], bool mq_driver)
+ {
++	int write = 0;
++	int read = 0;
+ 	int cpu;
+ 
+ 	if (mq_driver) {
+ 		blk_mq_in_driver_rw(part, inflight);
+-	} else {
+-		for_each_possible_cpu(cpu) {
+-			inflight[READ] += part_stat_local_read_cpu(
+-						part, in_flight[READ], cpu);
+-			inflight[WRITE] += part_stat_local_read_cpu(
+-						part, in_flight[WRITE], cpu);
+-		}
++		return;
++	}
++
++	for_each_possible_cpu(cpu) {
++		read += part_stat_local_read_cpu(part, in_flight[READ], cpu);
++		write += part_stat_local_read_cpu(part, in_flight[WRITE], cpu);
+ 	}
+ 
+-	if (WARN_ON_ONCE((int)inflight[READ] < 0))
+-		inflight[READ] = 0;
+-	if (WARN_ON_ONCE((int)inflight[WRITE] < 0))
+-		inflight[WRITE] = 0;
++	/*
++	 * While iterating all CPUs, some IOs may be issued from a CPU already
++	 * traversed and complete on a CPU that has not yet been traversed,
++	 * causing the inflight number to be negative.
++	 */
++	inflight[READ] = read > 0 ? read : 0;
++	inflight[WRITE] = write > 0 ? write : 0;
+ }
+ 
+ /**
+-- 
+2.39.2
 
