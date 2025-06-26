@@ -1,139 +1,137 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46BF026FA70
-	for <linux-block@vger.kernel.org>; Thu, 26 Jun 2025 08:25:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EE732D3EC2;
+	Thu, 26 Jun 2025 08:46:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750926349; cv=none; b=WNjsuX0RlFbAbBbPZooxWN0+PIqmwtTRkcPhX7dvJ8c/eYAOl6JZuYRKDy3ssb3pVoYbaa0lWXWQEwKE+Onv9GQOAFb9xFtjYjPbVxC3/H2ZicSHAerhajj/c6AaqXRT9ePXu1mn09MNoR1U/6AxxuaP6gL6dIjArIFXlbf8I4Y=
+	t=1750927583; cv=none; b=qiXCmojySQgcilso6kVa0dVx830ev17Pf2Hxj7+MCAPh8G0k4QYYKJ5yMhsikDamjZxM2I3XXjOoZ7prPnvh108UVQK1GrKhGFXdCAhjBFifBcF+6O/wlvmiemNHOPOl525wqEOVirtJhnJWkFoynp6J6cfbMlgMmaKgX0dQeqk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750926349; c=relaxed/simple;
-	bh=S/0um3zobysnFrXVN7sPC54VEK4scMlIkxNsi7DP794=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=DdPg8tAYaZ9jVaLFmFhZCTVl0nKok7ojFVWJfducjc3ckfi1DastnbT9m7XCQgL0Qkk3r4Q9u3H4ymtRPzZ0yO/wtYw5E2rOjWMEppnTgGBxBBu6b53lT8pBdn3TCvt9YwsMwVU/1wkDIcRTzu9BfEKSHgxtcMILGgGaysT2zb0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+	s=arc-20240116; t=1750927583; c=relaxed/simple;
+	bh=EBIMriXYLknyxbuxf7NSXkhKwNDOPZ5by7UkqYR9Al4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=sDkz3QwKRRK3vKUuVP6Z1XT0deFO7x09GF1DMKIneriaW3wNoztSC0PU25YRY/Ae32k/wDqxQoxwAdhkKf3aYKutVbRTfEMtDelUBQEqXhrpzA169Fqjap2D/yVA3VfBEmj4dwdI9n5a6fTSiH4jqgpEq4U6/imqDeoqHf5RygE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4bSWwT1JQkzKHMsR
-	for <linux-block@vger.kernel.org>; Thu, 26 Jun 2025 16:25:45 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4bSXNB4JLyzYQvMC;
+	Thu, 26 Jun 2025 16:46:18 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 8A4E71A1D1A
-	for <linux-block@vger.kernel.org>; Thu, 26 Jun 2025 16:25:43 +0800 (CST)
-Received: from [10.174.179.143] (unknown [10.174.179.143])
-	by APP4 (Coremail) with SMTP id gCh0CgBXul4FBF1ophvMQg--.26528S3;
-	Thu, 26 Jun 2025 16:25:43 +0800 (CST)
-Subject: Re: [bug report] WARNING: CPU: 3 PID: 522 at block/genhd.c:144
- bdev_count_inflight_rw+0x26e/0x410
-To: Yi Zhang <yi.zhang@redhat.com>, Yu Kuai <yukuai1@huaweicloud.com>
-Cc: Calvin Owens <calvin@wbinvd.org>, Breno Leitao <leitao@debian.org>,
- linux-block <linux-block@vger.kernel.org>,
- "open list:NVM EXPRESS DRIVER" <linux-nvme@lists.infradead.org>,
- axboe@kernel.dk, Christoph Hellwig <hch@infradead.org>,
- "yukuai (C)" <yukuai3@huawei.com>
-References: <CAHj4cs-uWZcgHLLkE8JeDpkd-ddkWiZCQC_HWObS5D3TAKE9ng@mail.gmail.com>
- <aEal7hIpLpQSMn8+@gmail.com>
- <738f680c-d0e8-b6c0-cfaa-5f420a592c4f@huaweicloud.com>
- <aFTfQpsUiD1Hw3zU@mozart.vkv.me>
- <f320c94e-3a94-d645-8f7b-80f958c50fbe@huaweicloud.com>
- <CAHj4cs_+dauobyYyP805t33WMJVzOWj=7+51p4_j9rA63D9sog@mail.gmail.com>
+	by mail.maildlp.com (Postfix) with ESMTP id 7AAF71A0A0F;
+	Thu, 26 Jun 2025 16:46:17 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+	by APP4 (Coremail) with SMTP id gCh0CgD3Wl_WCF1oD6HNQg--.23903S4;
+	Thu, 26 Jun 2025 16:46:16 +0800 (CST)
 From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <33fe77eb-ebf5-5cd4-d477-967ba4129be8@huaweicloud.com>
-Date: Thu, 26 Jun 2025 16:25:41 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.1
+To: axboe@kernel.dk,
+	hare@suse.de,
+	hch@infradead.org,
+	yukuai3@huawei.com,
+	john.g.garry@oracle.com
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	yi.zhang@redhat.com,
+	calvin@wbinvd.org,
+	david@fromorbit.com,
+	yukuai1@huaweicloud.com,
+	yi.zhang@huawei.com,
+	yangerkun@huawei.com,
+	johnny.chenyi@huawei.com
+Subject: [PATCH] block: fix false warning in bdev_count_inflight_rw()
+Date: Thu, 26 Jun 2025 16:39:27 +0800
+Message-Id: <20250626083927.576207-1-yukuai1@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAHj4cs_+dauobyYyP805t33WMJVzOWj=7+51p4_j9rA63D9sog@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgBXul4FBF1ophvMQg--.26528S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxCw45uF48AF1kWFW8Gw17ZFb_yoW5AFyfpF
-	15XF4Ykr4Igr17trWUtr4UJr15G3ZrZFyxJrWIgryDtF1UG345Z34UGF40qr98Jw4Du3y7
-	Jw4DJwn7tr1rXaUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvK14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+X-CM-TRANSID:gCh0CgD3Wl_WCF1oD6HNQg--.23903S4
+X-Coremail-Antispam: 1UD129KBjvJXoW7Cw4rJFWUAFWrXFykWFyUZFb_yoW8ZFWfpF
+	4UGws8JFyUWr93ta1jgwn7XFy3ta1kJryxur17Zw13AFWkAr1Uu34vvr4Dtr9Fq393Gry0
+	9F1akFyxKa4v937anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9Y14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
 	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
 	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
 	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
 	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
 	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7I2V7IY0VAS07AlzVAY
-	IcxG8wCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbV
-	WUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF
-	67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42
-	IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF
-	0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxh
-	VjvjDU0xZFpf9x0JUd-B_UUUUU=
+	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
+	Y2ka0xkIwI1lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x
+	0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2
+	zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF
+	4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWU
+	CwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCT
+	nIWIevJa73UjIFyTuYvjfUonmRUUUUU
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-Hi, Christoph
+From: Yu Kuai <yukuai3@huawei.com>
 
-在 2025/06/26 12:41, Yi Zhang 写道:
-> [ 1022.225513] ---[ end trace 0000000000000000 ]---
-> [ 1022.263295] CPU: 12 UID: 0 PID: 466 Comm: kworker/12:1H Tainted: G
->        W           6.16.0-rc3.yu+ #2 PREEMPT(voluntary)
-> [ 1022.291560] nvme nvme0: NVME-FC{0}: controller connect complete
-> [ 1022.356344] Tainted: [W]=WARN
-> [ 1022.356348] Hardware name: Dell Inc. PowerEdge R640/08HT8T, BIOS
-> 2.22.2 09/12/2024
-> [ 1022.356352] Workqueue: kblockd blk_mq_run_work_fn
-> [ 1022.744652] RIP: 0010:bdev_end_io_acct+0x494/0x5c0
-> [ 1022.749466] Code: 22 fd ff ff 48 c7 44 24 08 10 00 00 00 41 be 30
-> 00 00 00 48 c7 04 24 50 00 00 00 e9 c3 fb ff ff 0f 1f 44 00 00 e9 f5
-> fd ff ff <0f> 0b 48 83 c4 28 5b 5d 41 5c 41 5d 41 5e 41 5f c3 cc cc cc
-> cc 48
-> [ 1022.768235] RSP: 0018:ffffc9000f9f78e8 EFLAGS: 00010297
-> [ 1022.773484] RAX: 00000000ffffffff RBX: ffff88a922776e64 RCX: ffffffffb003853f
-> [ 1022.780632] RDX: ffffed15244eedcd RSI: 0000000000000004 RDI: ffff88a922776e64
-> [ 1022.787784] RBP: ffffe8d448a4e440 R08: 0000000000000001 R09: ffffed15244eedcc
-> [ 1022.794934] R10: ffff88a922776e67 R11: 0000000000000000 R12: ffff88a922776e68
-> [ 1022.802101] R13: 0000000000000001 R14: 0000000000000028 R15: 0000000000007e42
-> [ 1022.809251] FS:  0000000000000000(0000) GS:ffff889c3c5a7000(0000)
-> knlGS:0000000000000000
-> [ 1022.817352] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [ 1022.823114] CR2: 0000562e119bd048 CR3: 0000003661478001 CR4: 00000000007726f0
-> [ 1022.830265] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> [ 1022.837418] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> [ 1022.844561] PKRU: 55555554
-> [ 1022.847293] Call Trace:
-> [ 1022.849762]  <TASK>
-> [ 1022.851898]  nvme_end_req+0x4d/0x70 [nvme_core]
-> [ 1022.856494]  nvme_failover_req+0x3bd/0x530 [nvme_core]
-> [ 1022.861692]  nvme_fail_nonready_command+0x12c/0x170 [nvme_core]
-> [ 1022.867666]  nvme_fc_queue_rq+0x463/0x720 [nvme_fc]
+While bdev_count_inflight is interating all cpus, if some IOs are issued
+from traversed cpu and then completed from the cpu that is not traversed
+yet:
 
-Just a quick look, look like this stack has a problem that the request
-nevert started, however it still goes to the bdev_end_io_acct().
+cpu0
+		cpu1
+		bdev_count_inflight
+		 //for_each_possible_cpu
+		 // cpu0 is 0
+		 infliht += 0
+// issue a io
+blk_account_io_start
+// cpu0 inflight ++
 
-nvme_fc_queue_rq
-  if (...)
-   // nvme_start_request never called.
-   return nvme_fail_nonready_command
+				cpu2
+				// the io is done
+				blk_account_io_done
+				// cpu2 inflight --
+		 // cpu 1 is 0
+		 inflight += 0
+		 // cpu2 is -1
+		 inflight += -1
+		 ...
 
-I'm not that familiar with nvme-fc, does the following fix make sense to
-you?
+In this case, the total inflight will be -1, causing lots of false
+warning. Fix the problem by removing the warning.
 
-Thanks,
-Kuai
+Noted there is still a valid warning for nvme-mpath(From Yi) that is not
+fixed yet.
 
-diff --git a/drivers/nvme/host/fc.c b/drivers/nvme/host/fc.c
-index 014b387f1e8b..4b8f08be24a7 100644
---- a/drivers/nvme/host/fc.c
-+++ b/drivers/nvme/host/fc.c
-@@ -2765,8 +2765,10 @@ nvme_fc_queue_rq(struct blk_mq_hw_ctx *hctx,
-         blk_status_t ret;
+Fixes: f5482ee5edb9 ("block: WARN if bdev inflight counter is negative")
+Reported-by: Yi Zhang <yi.zhang@redhat.com>
+Closes: https://lore.kernel.org/linux-block/aFtUXy-lct0WxY2w@mozart.vkv.me/T/#mae89155a5006463d0a21a4a2c35ae0034b26a339
+Reported-and-tested-by: Calvin Owens <calvin@wbinvd.org>
+Closes: https://lore.kernel.org/linux-block/aFtUXy-lct0WxY2w@mozart.vkv.me/T/#m1d935a00070bf95055d0ac84e6075158b08acaef
+Reported-by: Dave Chinner <david@fromorbit.com>
+Closes: https://lore.kernel.org/linux-block/aFuypjqCXo9-5_En@dread.disaster.area/
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+---
+ block/genhd.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-         if (ctrl->rport->remoteport.port_state != FC_OBJSTATE_ONLINE ||
--           !nvme_check_ready(&queue->ctrl->ctrl, rq, queue_ready))
-+           !nvme_check_ready(&queue->ctrl->ctrl, rq, queue_ready)) {
-+               nvme_clear_nvme_request(rq);
-                 return nvme_fail_nonready_command(&queue->ctrl->ctrl, rq);
-+       }
-
-         ret = nvme_setup_cmd(ns, rq);
-         if (ret)
+diff --git a/block/genhd.c b/block/genhd.c
+index 8171a6bc3210..680fa717082f 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -141,9 +141,14 @@ static void bdev_count_inflight_rw(struct block_device *part,
+ 		}
+ 	}
+ 
+-	if (WARN_ON_ONCE((int)inflight[READ] < 0))
++	/*
++	 * While iterating all cpus, some IOs might issued from traversed cpu
++	 * and then completed from the cpu that is not traversed yet, causing
++	 * the inflight number to be negative.
++	 */
++	if ((int)inflight[READ] < 0)
+ 		inflight[READ] = 0;
+-	if (WARN_ON_ONCE((int)inflight[WRITE] < 0))
++	if ((int)inflight[WRITE] < 0)
+ 		inflight[WRITE] = 0;
+ }
+ 
+-- 
+2.39.2
 
