@@ -1,48 +1,48 @@
-Received: from 004.mia.mailroute.net (004.mia.mailroute.net [199.89.3.7])
+Received: from 003.mia.mailroute.net (003.mia.mailroute.net [199.89.3.6])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE74A2EFDB1;
-	Thu, 26 Jun 2025 19:42:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13A5C2628C
+	for <linux-block@vger.kernel.org>; Thu, 26 Jun 2025 20:29:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.6
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750966948; cv=none; b=uzlpZ5HI7+q+6sGznaBD+NlLFPMhegmYV6qiC7UzD2qJ8Hb6NLa7IvJRXm68fyNxVlimyRsn15uCXcuq/+DvqUfDImd1/Zz2tZgOfQ8RL9WNYoib12qx1eNHS/Xyjw6kZZecVl1ukfyUQy8grcji3uAhDSdlSR6Gwd5P7uDPSUY=
+	t=1750969752; cv=none; b=KyLnlocz6HBJ/sHBO/OeLdvNJN/Zhn4lP6eb6va6iXRq2bo+pzMxYWuR+vxt3uPPRwlrE3KCQ+obXcJUFIcbIlaXHXj+S+jJikARN/hoUNd8aGulE0yYHgIWwQJPWlohP4IeRkQ3g2ZrT4FgnXEewXzgemr8h0ux0EKFhTAWrLA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750966948; c=relaxed/simple;
-	bh=UhtTgxYsewfDZ1sVGQQs/yjCE8lzSPT1bdNzk+qtaWI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=s898vSq3sG4aSdNxOxoKoWMvs5vKHaoTzY1UkDarbWGXc0KTh2LLHLND7tnjag8GivrDmWCU+Z+x+tsiXgmSv1SxsVs463TokO9hHpIGNH71tQkAS604KgXiTGfWLqI3pu7FpGC1ELUIByRGueJqtRjPjBV13BGE4MH+QKYt9eY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=BmGmllty; arc=none smtp.client-ip=199.89.3.7
+	s=arc-20240116; t=1750969752; c=relaxed/simple;
+	bh=M7WOoqABsJjCmonIKo8o9tzHeN9ZcawXP7RUwaYwzyI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=RmXXC6Qbssykg5Yeql/REgqPLU2y613Hwh9NgnIoFTs0ZdrPTnQtqQzqHiwKkmvOMu4AJ6I6dMnZW9kAjD/dfgDv2n2rvrzbWGruikaQsFkmYF+AiNIp83z74UyRYvIrmSngwSasTiVIWMRgdZTFt53Q5wDEeSiKW/svTSVG7/k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=KNxh0IaZ; arc=none smtp.client-ip=199.89.3.6
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="BmGmllty"
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="KNxh0IaZ"
 Received: from localhost (localhost [127.0.0.1])
-	by 004.mia.mailroute.net (Postfix) with ESMTP id 4bSpxF4nwrzm0yQd;
-	Thu, 26 Jun 2025 19:42:25 +0000 (UTC)
+	by 003.mia.mailroute.net (Postfix) with ESMTP id 4bSqzB0w72zlvNR9;
+	Thu, 26 Jun 2025 20:29:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
 	content-transfer-encoding:content-type:content-type:in-reply-to
 	:from:from:content-language:references:subject:subject
 	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1750966944; x=1753558945; bh=DO4Ajm5yJAUZQO1VLeK2cYaD
-	j7dY+GIVytxqX/PfGq0=; b=BmGmlltyEgl4uodyIQrjcGCrwEw6C7kkCr490U4g
-	eCuBsiqAsqNmCzIslgtxDY98fP6+tfWpWz1Q3ZlQLvSQMLvi97z5FbuWzjGGNqA4
-	zZ2rnmAQuJ1YhY1whRjER/XkHMYVX1OBhqie8RcmAQI7A3Cx1ujtwhKsTFIvHAf5
-	oYFk94txNtTqbNFEA8OjqJ6U5FBMdraiETCK4sRKP3IpMGT5h+kX3FQKqIg99jyR
-	GHXoA6alWfnOEDBeQrzhAuwvAEJHow6ONVIlfJ/EvFShkD5gk2WrtbFgmZ7S9Gzv
-	liNTY2v3LG5j9PY1a7UDtvMaSA+m0WCzuGTu8fE1lORv6g==
+	 s=mr01; t=1750969748; x=1753561749; bh=mKl6bjLFD1ziHolgR/Gbf63I
+	+xPGVnzd+9bDu31GOPg=; b=KNxh0IaZvM0MkNhC7yRFmZ90xEM7CWPGZMiT5j3Q
+	mW0UYDE0h1xyUx3AEd2D6Hvz0kG9JdxjaZEk7NBp3W7lEjvetzNmI+7iFS8uPeXD
+	VIdolbb/jG1Z1EBDcIIwaAwCpAS9wL2AcIs5Htc1FQj/pjSmy1aCXOCMxDeNaOC1
+	J+ydHzbbIw8scrM72sxtTBdmC4y6bj58A1Pt4NjJQn9wueZyePPpugMcPIR9Bpxw
+	bekFJJXU166x/dIsj5vjMILBhHuNcB249tL8peLejbVidcWdnNgEyZFHGJS9cFsr
+	AYgdTQPYJp1QBDKO9vRbQ0HF46hwSOVoGUxx/LYq80/+kA==
 X-Virus-Scanned: by MailRoute
-Received: from 004.mia.mailroute.net ([127.0.0.1])
- by localhost (004.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id j5M4bBBsZHjL; Thu, 26 Jun 2025 19:42:24 +0000 (UTC)
+Received: from 003.mia.mailroute.net ([127.0.0.1])
+ by localhost (003.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id Ne2VQpVv0-Rq; Thu, 26 Jun 2025 20:29:08 +0000 (UTC)
 Received: from [100.66.154.22] (unknown [104.135.204.82])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: bvanassche@acm.org)
-	by 004.mia.mailroute.net (Postfix) with ESMTPSA id 4bSpx82K4Dzm0ySQ;
-	Thu, 26 Jun 2025 19:42:19 +0000 (UTC)
-Message-ID: <fdcdb18c-91b1-4c31-b24c-5837a8a08ac7@acm.org>
-Date: Thu, 26 Jun 2025 12:42:18 -0700
+	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4bSqz45GBFzlgqyl;
+	Thu, 26 Jun 2025 20:29:03 +0000 (UTC)
+Message-ID: <62ecf314-40a8-4bf7-975b-f6aac450aafa@acm.org>
+Date: Thu, 26 Jun 2025 13:29:02 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -50,65 +50,64 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v18 04/12] blk-mq: Restore the zoned write order when
- requeuing
-To: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
- Christoph Hellwig <hch@lst.de>, Yu Kuai <yukuai3@huawei.com>
-References: <20250616223312.1607638-1-bvanassche@acm.org>
- <20250616223312.1607638-5-bvanassche@acm.org>
- <8df3d726-2ad1-4592-aa1f-f3d5eeb17014@kernel.org>
+Subject: Re: [PATCH v3 1/5] block: Make REQ_OP_ZONE_FINISH a write operation
+To: Damien Le Moal <dlemoal@kernel.org>, linux-block@vger.kernel.org,
+ Jens Axboe <axboe@kernel.dk>, dm-devel@lists.linux.dev,
+ Mike Snitzer <snitzer@kernel.org>, Mikulas Patocka <mpatocka@redhat.com>
+References: <20250625093327.548866-1-dlemoal@kernel.org>
+ <20250625093327.548866-2-dlemoal@kernel.org>
+ <3f292307-30ac-442c-a694-5fc3560036a4@acm.org>
+ <d0ae85c4-8fd7-49e2-96b1-a08f01154cf2@kernel.org>
 Content-Language: en-US
 From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <8df3d726-2ad1-4592-aa1f-f3d5eeb17014@kernel.org>
+In-Reply-To: <d0ae85c4-8fd7-49e2-96b1-a08f01154cf2@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 6/25/25 5:11 PM, Damien Le Moal wrote:
-> On 6/17/25 07:33, Bart Van Assche wrote:
->> Zoned writes may be requeued. This happens if a block driver returns
->> BLK_STS_RESOURCE, to handle SCSI unit attentions or by the SCSI error
->> handler after error handling has finished. Requests may be requeued in
->> another order than submitted. Restore the request order if requests are
->> requeued. Add RQF_DONTPREP to RQF_NOMERGE_FLAGS because this patch may
->> cause RQF_DONTPREP requests to be sent to the code that checks whether
->> a request can be merged and RQF_DONTPREP requests must not be merged.
+On 6/25/25 4:36 PM, Damien Le Moal wrote:
+> On 6/26/25 01:29, Bart Van Assche wrote:
+>> On 6/25/25 2:33 AM, Damien Le Moal wrote:
+>>> diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+>>> index 3d1577f07c1c..930daff207df 100644
+>>> --- a/include/linux/blk_types.h
+>>> +++ b/include/linux/blk_types.h
+>>> @@ -350,11 +350,11 @@ enum req_op {
+>>>    	/* Close a zone */
+>>>    	REQ_OP_ZONE_CLOSE	= (__force blk_opf_t)11,
+>>>    	/* Transition a zone to full */
+>>> -	REQ_OP_ZONE_FINISH	= (__force blk_opf_t)12,
+>>> +	REQ_OP_ZONE_FINISH	= (__force blk_opf_t)13,
+>>>    	/* reset a zone write pointer */
+>>> -	REQ_OP_ZONE_RESET	= (__force blk_opf_t)13,
+>>> +	REQ_OP_ZONE_RESET	= (__force blk_opf_t)15,
+>>>    	/* reset all the zone present on the device */
+>>> -	REQ_OP_ZONE_RESET_ALL	= (__force blk_opf_t)15,
+>>> +	REQ_OP_ZONE_RESET_ALL	= (__force blk_opf_t)17,
+>>>    
+>>>    	/* Driver private requests */
+>>>    	REQ_OP_DRV_IN		= (__force blk_opf_t)34,
+>>
+>> Since we are renumbering operation types, how about also
+>> renumbering REQ_OP_ZONE_OPEN and/or REQ_OP_ZONE_CLOSE? Neither operation
+>> modifies data on the storage medium nor any write pointers so these
+>> operations shouldn't be considered as write operations, isn't it?
 > 
-> Shouldn't this last part be a different prep patch ?
+> Open and close change the zone condition and act on the drive count of
+> explicitly open zone resources which impacts the ability to write to zones. So I
+> would rather consider these also write operations given the changes they imply.
 
-No. Without the RQF_NOMERGE_FLAGS change, this patch would introduce a
-bug. The bug that would be introduced without the RQF_NOMERGE_FLAGS
-change is that merging might happen of RQF_DONTPREP patches. As you know
-patch series must be bisectable.
-
-> But overall, the commit message is inadequate because you have not yet enabled
-> pipelining, so this patch will only see one write request per zone at most. And
-> in that case, we do not care about ordering. We only care about the order of
-> requests per zone.
-
-I will add in the patch description that this patch prepares for
-enabling write pipelining.
-
->>   static void blk_mq_insert_request(struct request *rq, blk_insert_t flags)
->>   {
->>   	struct request_queue *q = rq->q;
->> @@ -2649,6 +2665,8 @@ static void blk_mq_insert_request(struct request *rq, blk_insert_t flags)
->>   		spin_lock(&ctx->lock);
->>   		if (flags & BLK_MQ_INSERT_AT_HEAD)
->>   			list_add(&rq->queuelist, &ctx->rq_lists[hctx->type]);
->> +		else if (flags & BLK_MQ_INSERT_ORDERED)
->> +			blk_mq_insert_ordered(rq, &ctx->rq_lists[hctx->type]);
->>   		else
->>   			list_add_tail(&rq->queuelist,
->>   				      &ctx->rq_lists[hctx->type]);
-> 
-> This pattern is repeated multiple times. Make it a helper ?
-
-The repeated code is too short to make it a helper function. Common
-feedback on block layer and NVMe kernel patches is that very short
-helper functions reduce code readability and hence that typically
-it's better to expand code inline rather than to introduce a very
-short helper function.
+It's probably a good idea to document above the op_is_write() function
+that this function is used for multiple purposes:
+- Whether it is allowed to submit an operation to a read-only device.
+   bio_check_ro() and the loop driver uses op_is_write() for this
+   purpose.
+- Whether or not lim->zone_write_granularity applies. See also
+   bio_split_rw_at().
+- Whether or not to throttle the queue depth. See also various I/O
+   schedulers.
+- To determine the DMA data transfer direction.
+- By the block layer I/O statistics code.
+- By the blkio cgroup controller statistics code.
 
 Thanks,
 
