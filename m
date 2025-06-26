@@ -1,28 +1,28 @@
 Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 329481B043C
-	for <linux-block@vger.kernel.org>; Thu, 26 Jun 2025 07:42:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46BF026FA70
+	for <linux-block@vger.kernel.org>; Thu, 26 Jun 2025 08:25:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750923739; cv=none; b=iObJ9pk2RG2/30Nq8qQtRBO8GxF+maEqybpWZCSkVZ8f068xH1U0xMYXof7c0OKDYak7Ge393oIyiCVWC/CFBlha/vvDxGhHYr/am9rLPPIrLNnBrdLAwwKenKEVTZ7ReYNfBsA3y/WUqXt3bEY1nCtFgp/QAakmud77t+J9nJA=
+	t=1750926349; cv=none; b=WNjsuX0RlFbAbBbPZooxWN0+PIqmwtTRkcPhX7dvJ8c/eYAOl6JZuYRKDy3ssb3pVoYbaa0lWXWQEwKE+Onv9GQOAFb9xFtjYjPbVxC3/H2ZicSHAerhajj/c6AaqXRT9ePXu1mn09MNoR1U/6AxxuaP6gL6dIjArIFXlbf8I4Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750923739; c=relaxed/simple;
-	bh=AVkCsjSDa3bry7V5bBTWoZti3N6B4uxlnWVB8MJrmdA=;
+	s=arc-20240116; t=1750926349; c=relaxed/simple;
+	bh=S/0um3zobysnFrXVN7sPC54VEK4scMlIkxNsi7DP794=;
 	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=K5PwaiaErVSd2i6rrBIHiB13HmwDi0qVWhw9em9G0Jg8ObdPV4eYhPNpmWhsG2ziv1h8DHfrsPA6jRTbJCetFJGTMump6hZrUYFa1cQDynnReaxLQd6hyQUuHoqQ0XyRFAj+XzLCGQE3tK/tdEslPiPpwiEbHdxmZ2OyyyIoli4=
+	 In-Reply-To:Content-Type; b=DdPg8tAYaZ9jVaLFmFhZCTVl0nKok7ojFVWJfducjc3ckfi1DastnbT9m7XCQgL0Qkk3r4Q9u3H4ymtRPzZ0yO/wtYw5E2rOjWMEppnTgGBxBBu6b53lT8pBdn3TCvt9YwsMwVU/1wkDIcRTzu9BfEKSHgxtcMILGgGaysT2zb0=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4bSVy948X8zKHMrK
-	for <linux-block@vger.kernel.org>; Thu, 26 Jun 2025 15:42:09 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4bSWwT1JQkzKHMsR
+	for <linux-block@vger.kernel.org>; Thu, 26 Jun 2025 16:25:45 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id ED3ED1A0AD3
-	for <linux-block@vger.kernel.org>; Thu, 26 Jun 2025 15:42:07 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTP id 8A4E71A1D1A
+	for <linux-block@vger.kernel.org>; Thu, 26 Jun 2025 16:25:43 +0800 (CST)
 Received: from [10.174.179.143] (unknown [10.174.179.143])
-	by APP4 (Coremail) with SMTP id gCh0CgDHKl_P+VxofPHIQg--.28917S3;
-	Thu, 26 Jun 2025 15:42:07 +0800 (CST)
+	by APP4 (Coremail) with SMTP id gCh0CgBXul4FBF1ophvMQg--.26528S3;
+	Thu, 26 Jun 2025 16:25:43 +0800 (CST)
 Subject: Re: [bug report] WARNING: CPU: 3 PID: 522 at block/genhd.c:144
  bdev_count_inflight_rw+0x26e/0x410
 To: Yi Zhang <yi.zhang@redhat.com>, Yu Kuai <yukuai1@huaweicloud.com>
@@ -38,8 +38,8 @@ References: <CAHj4cs-uWZcgHLLkE8JeDpkd-ddkWiZCQC_HWObS5D3TAKE9ng@mail.gmail.com>
  <f320c94e-3a94-d645-8f7b-80f958c50fbe@huaweicloud.com>
  <CAHj4cs_+dauobyYyP805t33WMJVzOWj=7+51p4_j9rA63D9sog@mail.gmail.com>
 From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <a499af9e-6ba2-a81d-20b3-bb4dc5d6adca@huaweicloud.com>
-Date: Thu, 26 Jun 2025 15:42:06 +0800
+Message-ID: <33fe77eb-ebf5-5cd4-d477-967ba4129be8@huaweicloud.com>
+Date: Thu, 26 Jun 2025 16:25:41 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.1
 Precedence: bulk
@@ -51,32 +51,29 @@ MIME-Version: 1.0
 In-Reply-To: <CAHj4cs_+dauobyYyP805t33WMJVzOWj=7+51p4_j9rA63D9sog@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgDHKl_P+VxofPHIQg--.28917S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7Zw4xJFyfWrW8XF1fAFWxXrb_yoW8trWDpF
-	13Jr4Ykr40qr17tr4UJr1UtF1UGasrua4xJw42qryUJ3WUW3WUA34UJr40qr98twn09rW7
-	Jw1DJw1xtrn5XaUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+X-CM-TRANSID:gCh0CgBXul4FBF1ophvMQg--.26528S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxCw45uF48AF1kWFW8Gw17ZFb_yoW5AFyfpF
+	15XF4Ykr4Igr17trWUtr4UJr15G3ZrZFyxJrWIgryDtF1UG345Z34UGF40qr98Jw4Du3y7
+	Jw4DJwn7tr1rXaUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
 	9KBjDU0xBIdaVrnRJUUUvK14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
 	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
 	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
 	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
 	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
 	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7I2V7IY0VAS07AlzVAY
 	IcxG8wCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbV
 	WUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF
 	67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42
-	IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF
+	IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF
 	0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxh
-	VjvjDU0xZFpf9x0JUZYFZUUUUU=
+	VjvjDU0xZFpf9x0JUd-B_UUUUU=
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-Hi,
+Hi, Christoph
 
 在 2025/06/26 12:41, Yi Zhang 写道:
-> Seems both the original and new warning are triggered, here is the full log:
-> 
-[...]
-
+> [ 1022.225513] ---[ end trace 0000000000000000 ]---
 > [ 1022.263295] CPU: 12 UID: 0 PID: 466 Comm: kworker/12:1H Tainted: G
 >        W           6.16.0-rc3.yu+ #2 PREEMPT(voluntary)
 > [ 1022.291560] nvme nvme0: NVME-FC{0}: controller connect complete
@@ -109,9 +106,34 @@ Hi,
 > [ 1022.861692]  nvme_fail_nonready_command+0x12c/0x170 [nvme_core]
 > [ 1022.867666]  nvme_fc_queue_rq+0x463/0x720 [nvme_fc]
 
-Thanks for the test, so nvme-mpath do have real problems. However, it's
-still not clear to me and I'll send the revert first, because lots of
-false warning are reported.
+Just a quick look, look like this stack has a problem that the request
+nevert started, however it still goes to the bdev_end_io_acct().
 
+nvme_fc_queue_rq
+  if (...)
+   // nvme_start_request never called.
+   return nvme_fail_nonready_command
+
+I'm not that familiar with nvme-fc, does the following fix make sense to
+you?
+
+Thanks,
 Kuai
+
+diff --git a/drivers/nvme/host/fc.c b/drivers/nvme/host/fc.c
+index 014b387f1e8b..4b8f08be24a7 100644
+--- a/drivers/nvme/host/fc.c
++++ b/drivers/nvme/host/fc.c
+@@ -2765,8 +2765,10 @@ nvme_fc_queue_rq(struct blk_mq_hw_ctx *hctx,
+         blk_status_t ret;
+
+         if (ctrl->rport->remoteport.port_state != FC_OBJSTATE_ONLINE ||
+-           !nvme_check_ready(&queue->ctrl->ctrl, rq, queue_ready))
++           !nvme_check_ready(&queue->ctrl->ctrl, rq, queue_ready)) {
++               nvme_clear_nvme_request(rq);
+                 return nvme_fail_nonready_command(&queue->ctrl->ctrl, rq);
++       }
+
+         ret = nvme_setup_cmd(ns, rq);
+         if (ret)
 
