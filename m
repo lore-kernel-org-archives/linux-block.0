@@ -1,226 +1,179 @@
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2051.outbound.protection.outlook.com [40.107.101.51])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C17A03594E;
-	Thu, 26 Jun 2025 09:19:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.101.51
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750929595; cv=fail; b=XoPCREp48TVLNnztfRvuJNgpmDErkgRSxE8JF39GTUIZZMzIVqghTxEBzR02RsBYsjO/FQxWyRFCM9PkQVOfa3w5hncQojomlWZymZdVxRdsUt1npquX/iEtWndxu5BuZ4bQmLbL9TMD+ADPIvJbuyp8ZDdC+XS4VKESop2Q2nI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750929595; c=relaxed/simple;
-	bh=7QKDFwLW+NEAx/OBH6vcD7ly/1fYmDJYRIKXnT8SSgA=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=jMY2Wk5a28i+oc5gPFzftTf9Lh1Dqu8CtDuwb7mTQOo5oVtlQt1upIGRbZRncAFrAsgFsRV/6FcQ5VC347A/2dgwuF0EWbJXDqJmR5/XTRBeuv3zne3vBF1Xop3m7qZ2qMDaOU8KVuiIzI5nlFmrB9R+ZEDqiJprNAC23fTLvYo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=XCrbZ9s7; arc=fail smtp.client-ip=40.107.101.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD6B5295D87
+	for <linux-block@vger.kernel.org>; Thu, 26 Jun 2025 09:22:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1750929767; cv=none; b=F7SLhvdkGn7JVlmteYcW2zlPpqz6U6t7TptnwjXxg09DG5353mU+JJTx7F6Dxu9DrG/3YllQ6h1YmGLWFPOX7p6NSul6qIYzIaB41R2AbJgaZOa0DB9pofR534GqmdQHSyXuUBTYaF6hoHBZqVCm33OofYMV8T+g0iUDbI3aVEw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1750929767; c=relaxed/simple;
+	bh=lX0Y6RU19QHoODfn0hrMLp9oWB23xCsfkb6vrnCcaDM=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=gPp0MxF9DdcueUvB/HcD1UnxtSPJz3fp24DVZjcNEv3Vaws6fhNoLFv+3k6/nVYgc66D9d72lHEt0MiuQiVs2/zhRZGBGPXAIAnTQMxK1u8AhipkVRTluyeCOHu3nQJf/0X0MxBQ7S3Q2Ls2vPntcm1/miC/+KItcc2FQKuz0A8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Eu0O6PzP; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="XCrbZ9s7"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=k5+1yMLhCxR3UiO/J6HPAAsI9jGS5bscpMrXJa8QWfBC+v9v5wK2BTDPCFqmZVoZXbB+/PiO8opKaqbaxT3WTGalVUVeVrRez4ZLTGgXZSwqnwYKswHPZGx0h8oEJ2ro6w6eCUa5qkmg63+X/HEIFoGxqrFMbhweTChGXpPlqwGcDkZAPs7pUOoU0pXFmUxccpusxYbMB9+LaqNC11VGvddAilNXYSQvCgq0HEDooEW9GhP+3FJ575gb1ehA9QI9NxtAvtjp14EUvnyhN2qn4oc3MmGhQjEbZXN1Oh2AZYxnVYJFKbXRP4yr8OQ9C8KYSktO8L89eaD5Iikl6140Qg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=7QKDFwLW+NEAx/OBH6vcD7ly/1fYmDJYRIKXnT8SSgA=;
- b=UnxIjRHu76KJ85/esi5N5yD4OPxFtOV51q6dRXxAMd34EMIAnmVkAcI1UV8UCwB5HYz5oEkZZDhVberEgzpkCw+n1AYRja/gKqYodMB1w5/4gWhGbgB4puziAUsFSK7AeFV86Ar34+mRVNPT6Cfvj208gp32aaC9VCpcHltlh14OI5Ov3NZdV/rceq4eYCoySRWGImQ4g0ave6jieGApQzW25St6kcymH1WMDPgnFlKZlreJnQCgDGaFzjVOS/Wa268FevCs1s7VzAF+BZieT/U5Dlpbu512X+/8ovk/7P9jzu/ygoOM7VZjmc/UukgMCP3sGnDYiFQ6aYnQ0w6kXA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=7QKDFwLW+NEAx/OBH6vcD7ly/1fYmDJYRIKXnT8SSgA=;
- b=XCrbZ9s7q9FxWpgACXAv+ZSMrdrrqxZDTJKb3YGuk7qwy/uJs7PjLnGtf3X6BTgrZ/8kazPLb3LRJpx+6esnUNDDuWXNb+4mKBQteeNvNGc7+LjrER9dCw+PXskErVFZCTgDZlCARnsf8ysYdNndOLKuiaxqRYLzCARtCLRe8UHjnZ8RfZBOC/GjOStnRIBnLOKFs9ICYpzctTbx2mvd6i2Qs3k3Z/fjdi7eC76q00fFIsF+qY9pLEEcq3/uqwpkpxj+1jyGX6FI5LfjUURFjLdX13hNOr0Jbn9Ics02uwnL8oKelN0jkm1LrzNEo1KD6NsHw04YUXZ34624SrLKtQ==
-Received: from CY8PR12MB7195.namprd12.prod.outlook.com (2603:10b6:930:59::11)
- by CH2PR12MB4261.namprd12.prod.outlook.com (2603:10b6:610:a9::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8880.17; Thu, 26 Jun
- 2025 09:19:50 +0000
-Received: from CY8PR12MB7195.namprd12.prod.outlook.com
- ([fe80::e571:5f76:2b46:e0f8]) by CY8PR12MB7195.namprd12.prod.outlook.com
- ([fe80::e571:5f76:2b46:e0f8%4]) with mapi id 15.20.8857.022; Thu, 26 Jun 2025
- 09:19:50 +0000
-From: Parav Pandit <parav@nvidia.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-CC: Stefan Hajnoczi <stefanha@redhat.com>, "axboe@kernel.dk"
-	<axboe@kernel.dk>, "virtualization@lists.linux.dev"
-	<virtualization@lists.linux.dev>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "stable@vger.kernel.org"
-	<stable@vger.kernel.org>, "NBU-Contact-Li Rongqing (EXTERNAL)"
-	<lirongqing@baidu.com>, Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-	"xuanzhuo@linux.alibaba.com" <xuanzhuo@linux.alibaba.com>,
-	"pbonzini@redhat.com" <pbonzini@redhat.com>, "jasowang@redhat.com"
-	<jasowang@redhat.com>, "alok.a.tiwari@oracle.com" <alok.a.tiwari@oracle.com>,
-	Max Gurtovoy <mgurtovoy@nvidia.com>, Israel Rukshin <israelr@nvidia.com>
-Subject: RE: [PATCH v5] virtio_blk: Fix disk deletion hang on device surprise
- removal
-Thread-Topic: [PATCH v5] virtio_blk: Fix disk deletion hang on device surprise
- removal
-Thread-Index:
- AQHb02hI8rTGAA49eUeotBFzOHU9FbQSzIkAgAAAcqCAAAJ6gIAAARbQgAAMIgCAAHNgsIAAitiAgAAAT1CAAAsNAIAAeh/AgAAFwYCAAIZBkIAALRYAgAAGIWCAAAIjgIAAAHrw
-Date: Thu, 26 Jun 2025 09:19:49 +0000
-Message-ID:
- <CY8PR12MB71958505493CE570B5C519A0DC7AA@CY8PR12MB7195.namprd12.prod.outlook.com>
-References: <20250624155157-mutt-send-email-mst@kernel.org>
- <CY8PR12MB71953EFA4BD60651BFD66BD7DC7BA@CY8PR12MB7195.namprd12.prod.outlook.com>
- <20250625070228-mutt-send-email-mst@kernel.org>
- <CY8PR12MB7195AF9E34DF2A4821F590A8DC7BA@CY8PR12MB7195.namprd12.prod.outlook.com>
- <20250625074112-mutt-send-email-mst@kernel.org>
- <CY8PR12MB719531F26136254CC4764CD4DC7BA@CY8PR12MB7195.namprd12.prod.outlook.com>
- <20250625151732-mutt-send-email-mst@kernel.org>
- <CY8PR12MB7195D92360146FFE1A59941CDC7AA@CY8PR12MB7195.namprd12.prod.outlook.com>
- <20250626020230-mutt-send-email-mst@kernel.org>
- <CY8PR12MB7195435970A9B3F64E45825ADC7AA@CY8PR12MB7195.namprd12.prod.outlook.com>
- <20250626023324-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20250626023324-mutt-send-email-mst@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: CY8PR12MB7195:EE_|CH2PR12MB4261:EE_
-x-ms-office365-filtering-correlation-id: 55982f96-2f95-46cf-d096-08ddb4929a1f
-x-ld-processed: 43083d15-7273-40c1-b7db-39efd9ccc17a,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|1800799024|376014|7416014|366016|38070700018;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?5qXmkbuXuTatG8ayf9643bdw7pEW0pKnHo5Pgbe+dqszayeF9TuUKuJp1vut?=
- =?us-ascii?Q?ay68rgzV2ZYZJb3IY7dL26BSxc8lRKbLn+BN+OaVXRPcye4XG2GSeJvIZznL?=
- =?us-ascii?Q?cQLjl4QWHXX07eJBi115CS4fBx54fz9sz1etZW+yJRlT+7/I81/vwaS5kRqE?=
- =?us-ascii?Q?QUtKhAnySjMaAOBolLL4W5gVRywrr5gcwN/yQzg2BxEgPf30mCyPCDw3xwrq?=
- =?us-ascii?Q?tO14RbQBXrhgVEI324ArIimP6oz1gVr3D+ZYKPDm3dDsr2p0iFMSdPzmWDC1?=
- =?us-ascii?Q?KTw1QzM0BiCSlxEuRkk5faKZEnrZrbej6HvJdy0z3tbxOWpH9I4tf11RUymz?=
- =?us-ascii?Q?6Kb9q3811rEwaExq7NKrJmv9h6QLP6Tlv++fHut+1EebcexnX9d8YGP/LbFW?=
- =?us-ascii?Q?RxAvA0p6oRt2jRcv6pPkdlu3tu/be/2UFjSnkA5YWoEO/umQDszTxwdnbBfw?=
- =?us-ascii?Q?8vUvnJrSC7D5E8MlI9flQokQWO7Z1geiaDlcrC1h0K4H/mZ9TOmCow5Fzuet?=
- =?us-ascii?Q?U+mRv2DDyjsjQZemPnGkZGgsngy1OCgg8MIIHATgW9uRrhZLEjIHRoooNzf4?=
- =?us-ascii?Q?x2MHeP8pLmPDusmIpzrzmQD4gYAAQ9+CZkyJDCkTCR9wopgN3+HMFqC5f/Q5?=
- =?us-ascii?Q?9Q5zGKN1y4V9VoqDsOBD1oP4bUKYashaYEtWVjdlikRJy6IjHVkHAU9DjzwT?=
- =?us-ascii?Q?qfQ4GgKcZ875KA0dLcAEDrih63fxAslQVBsP1sn8p4AakbCE8kMaRV7fxfB6?=
- =?us-ascii?Q?BXLQqWcs923Df6PV5JCg35gSmG8HdpGyEMDUNtLMCC+oKObta3yo7Zc1A9no?=
- =?us-ascii?Q?jp73NSFWFHR010Ucdc8WOTQ4xuI/3xTbrbDArG09C7z1rYjtZ8ucF5WT9li9?=
- =?us-ascii?Q?zHzSZv6AVvhyCsesGCmCQ83CL57OeV35gmCVixIWgMM1t1FOYXm61DgKT1bJ?=
- =?us-ascii?Q?o2GB4MHqRlYT6e6VX/tCob6HbGn71+TN1S/P+l6Cgt9BCmBfHdQUWyKRJjEC?=
- =?us-ascii?Q?iNLrVvHNCyMuKz+hJq99NhxasFJWh2O5Fc2/KuuZgnXVOzAQzgizJ4EaXu7h?=
- =?us-ascii?Q?uH3Fr9wOAMHHwsnRXv6xZne4rCSQ77pe2vUm9tcHq1wGAMLddxFLUlxcfVX0?=
- =?us-ascii?Q?A0839C/iUmixG34Cki1YGCSNkTUN7HCefBkw+T991mN2yV1tfpNO77IsMYAQ?=
- =?us-ascii?Q?d9ppE8r1bVKHeMIYXDykrr43VigSbI/px2uJaVq2jj1YVPm+8tfkOJMlL8pG?=
- =?us-ascii?Q?s7lA3rRDpi9jA7d65z4swSSOE+vXpxbcxaXrPsiZuNBJVAOcY+UCKoFRr/Uv?=
- =?us-ascii?Q?BYUo7OLzIObJ0lXs6gEvSkgqwZoHQr4r4BUBnAmURya/+LrdmMidVm6o2W0o?=
- =?us-ascii?Q?5fW3JCOskmdn7aUVAx0sgdPMA63pg1Xd+EL7NY7V9U1lg5OvHUjhKxWBJmKx?=
- =?us-ascii?Q?9bxPye7Ur88RVQTxLAVPkrxYWYdh+Xz75x+mw7NlUlunQkCEOayFQfz/BlGm?=
- =?us-ascii?Q?RFcFL9sFMZtfM6A=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY8PR12MB7195.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?Doc9DIO01guO8HgYvMS+AmCHSQ/1cRi1CkrUA1vtf7iBZIDh5jpsE2GABkfr?=
- =?us-ascii?Q?H4AedJlerIZN+bJbgMab7Orx1baA18fpOtsMOb59nWAtjiIoGam9gkJVoA6B?=
- =?us-ascii?Q?56cQIGLuw1fcWoz45OtPbGL61Gjncgq3RYeqKKK07kuKD81MYHwt0i/eTdvB?=
- =?us-ascii?Q?G4hWkhFUN+p/avzDcnGESiPbmilXNCRPAwdqyiS/WL7qTuFLFR8G6XdsUn5A?=
- =?us-ascii?Q?nQpoUBs6/M4/jzSfCVMJmR0IrAeGiWn5nlhHaoLA61O9743PaR8ez1VnqiaR?=
- =?us-ascii?Q?caOIvUpqsRo6Wwr8PD3xwnsVWDtcaE9rxxdqh5crCyhqEscwHU3QQSN9c1hM?=
- =?us-ascii?Q?xRwxqjvU+fk3uosEh68y2XkubgWCav0W9d0ouLFEF6E7WvU33eYPxbnd+DLb?=
- =?us-ascii?Q?3dY/zmfR4EPe6kE4E+O/OC33IUaZBgQirGge8MqPvM92g/KodCS6WH00IK97?=
- =?us-ascii?Q?tvpUImsF31DLTykWYEM5EQ1kSADJYvOT3yoDrUjoa0sv00Q7QBQTVLylHuEp?=
- =?us-ascii?Q?K5WoRSe6VvayMZJLTvMV/djCIJJ8J0xF9pOuvWwiAJSQDhEp/NV0W5ZA39cS?=
- =?us-ascii?Q?YEmY5/cEFyQt709PoYwOTtjqbJPmlxeBIBs86SoU+4YKd5j6Sgzrd3s4Oonf?=
- =?us-ascii?Q?yLnBE1FbAm/+VBujWXX97vmZDaqogrywHE8h//XHnCbDjJyLJgxVCIIpSVNt?=
- =?us-ascii?Q?VFFizQ/MJaPEAGjbRnzAOg8ybIQCxTvgrv+PzeKewUHZMSjxsvaEpznAVbJr?=
- =?us-ascii?Q?WWjIkZrL7iV3C0TpG929qJZYFCsFjSFvGvJjUPuERApkXyjhndbht5l0F3qG?=
- =?us-ascii?Q?OK8gcDpaoRWodvS/ggLqa4MhivH8Qq2Qa/yCj+nbvNPDRWjupXbhHVg/0fXk?=
- =?us-ascii?Q?jeXMafcwVietZGVT9kBm5MlEpng/7yDN6ZdTFMcEb3vQ8VcUff1L6bJ3Fz4n?=
- =?us-ascii?Q?MINIiSoHmor3RnkU4wBSaaikIwGO7pxCHNQMc+sC637aw9LM/5LixAf1CJGe?=
- =?us-ascii?Q?mT0y5HrAkTFQbS68/wYNrz/2MxH+Dv2J8h4xBi0/M6ClqwbdommM4ni/9S3Z?=
- =?us-ascii?Q?uSqakG85saUu2eV/Up3jBZXGcpM+gJfRpNLBnTj0khc4dz7JyjOc6RxWW32m?=
- =?us-ascii?Q?EPPyPOg/+gqDaMWBX2tQtXK0AGMFJ1o7Uh2NIvbUOds5vMGTazuBIrDgL5nL?=
- =?us-ascii?Q?Fuemj25yn3krjd7b264b72Ww81TEuBAWphutC0MOw8moPtAtNooPnMeV77og?=
- =?us-ascii?Q?wEXXkohfaiuHKfiB5nW+lT45xcBPu+tIJdjussnu5Eu2q3FLyZRy48w3yKWt?=
- =?us-ascii?Q?gwigdL21ZPz70iqhcaArIncguHdnYEi87rHKv7xhSmp+0W3YqHotHFZq52ff?=
- =?us-ascii?Q?wuP0ZRVALAeUWlz0AduND+6N6cchBZ+jklIkLvm6ZPLH2BVk+o+48ntLctyl?=
- =?us-ascii?Q?cA9xdqSZVNq5uoaPpMB5Ood0kG8sw3MsCcfe3F02eXtOSoWRY+vMK9d+cmhn?=
- =?us-ascii?Q?u60EPBSyigiXywE3DLQ53EpYmncVM0yYFQ6IcNs3aJ+tXKKIAdyxYTVlr3bX?=
- =?us-ascii?Q?2gGXZoGy3TO9SBRlk9I=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Eu0O6PzP"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1750929764;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type;
+	bh=qfGttJZdgUcck+fXfK85zIliPH+l/j6ygcjkW8H8D0U=;
+	b=Eu0O6PzPBO2CM6njRa8D07M75mN9WuO+D0Yigz6yQWor3wMuYQQDSpAeUrSVEcQq12/2sY
+	1clF/VxLP/ASnzAdnQjnWzPzgkA41Yo+H3EDNYKa4f5dMXUYiNysqmfSan7gyv7vAT/3f/
+	zRehTD0x/LItv+iAQKDYa/polx8fI48=
+Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
+ [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-26-rZxFFW9QON-CtXJKzNV3bQ-1; Thu, 26 Jun 2025 05:22:41 -0400
+X-MC-Unique: rZxFFW9QON-CtXJKzNV3bQ-1
+X-Mimecast-MFC-AGG-ID: rZxFFW9QON-CtXJKzNV3bQ_1750929760
+Received: by mail-lf1-f72.google.com with SMTP id 2adb3069b0e04-553addbf0beso431487e87.2
+        for <linux-block@vger.kernel.org>; Thu, 26 Jun 2025 02:22:41 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750929759; x=1751534559;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=qfGttJZdgUcck+fXfK85zIliPH+l/j6ygcjkW8H8D0U=;
+        b=VP5rFymerpNRIl24/JFenNeDdFEqTrd/pl1xqH0XeALl8qL1xJ6s4o1n7ua+mQqGUZ
+         +uAk7AAgipW1eg+N81NshI4T2VVKZcklQs0lNR1XwqUZ2P74vp6MKAXooWtvurjwgWX1
+         eha+jXCO1Pbmx5vagElifB449EDNvepWxuKdMzKGGLb5dg2aDdTefjSecpByb7DnHISG
+         HOzT8nFXt0XLxH5I9M9c9/zh/VviBBNPYzY4h7UXn1V514ts/0UyEG0S6iOLgqkJhbtz
+         vYFfWTQ93+/mlm2sii9opIUiLfyB5ln6nKLjikeKgAEBkhWxUOO6lpU8R2V1sY3NriKm
+         Ag3w==
+X-Gm-Message-State: AOJu0YxeV6McycSTGQo+3sYeW4SyKjIcfzCFdfaL4uUM+wc4z/so6mmD
+	TliJiVnm/HoZ5kT5hcnjyYRXM1umEWDVe04SC/EGAMN9bqe0BTZnYLbc12MMkc40kuuL60Q4A14
+	s19VdX2WHQFK6n6vsTzGUVOU803ML0PINsMzUCMoLcfUGtw/m0cWULuwKLHTjMo/C6VzBuipoU5
+	Z3YYk2YhtA7G7tgEuP8iyHzHpXtrmuYrXKqI7cNbNV32oWsiI0WJ+i
+X-Gm-Gg: ASbGncuMsaxBb77577rSG2nRImuXPCrk1xVkoGe3a3YGXf1S0IjGnKDP6Y7ELBa+pkC
+	koidDESDkMktaFemZ6KSUwHDm8+/1qsW/ifjFGQZMwaHzRdakPU9zAJN9xc8BAr4z5PFIrtecq4
+	5AYrYA
+X-Received: by 2002:a05:6512:2209:b0:553:2bf2:e303 with SMTP id 2adb3069b0e04-554fde579b0mr1993962e87.30.1750929759189;
+        Thu, 26 Jun 2025 02:22:39 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEJCv7PxAk1OxTCzrJjOCJj547K3qlhVVKjaIvpswLQXMaA0wAQTdQPtoCYH36SJKmw3/Tl9FtOfB25qsjB2D8=
+X-Received: by 2002:a05:6512:2209:b0:553:2bf2:e303 with SMTP id
+ 2adb3069b0e04-554fde579b0mr1993948e87.30.1750929758578; Thu, 26 Jun 2025
+ 02:22:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CY8PR12MB7195.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 55982f96-2f95-46cf-d096-08ddb4929a1f
-X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Jun 2025 09:19:49.9577
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: H7Phmgv0uRS2GbMaOraRez4ELdG8jhytHtoTyIDnj5OPx2JMtq/lOFt7IAZcOUUH18//HXeN2rQTOcQPOlQing==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4261
+From: Yi Zhang <yi.zhang@redhat.com>
+Date: Thu, 26 Jun 2025 17:22:26 +0800
+X-Gm-Features: Ac12FXyZY6PWoJ469n-rRorQweZ37YuubtX1XQlAXOwJ1un6yDnDyU1xf_rE56c
+Message-ID: <CAHj4cs8ejtqzdP=wC6Kjh9SA8q_NpG2sF_Mo1oprLP5U7Y-xeQ@mail.gmail.com>
+Subject: [bug report] watchdog: BUG: soft lockup - CPU#47 stuck for 26s!
+ [find:48492] triggered by blktests throtl/006
+To: linux-block <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+
+Hello
+
+The issue below was triggered by blktests throtl/006 on the latest
+linux-block/for-next, please help check it and let me know if you need
+any test/info, thanks.
+
+commit: 9b3f9dc4b07e (HEAD -> for-next, origin/for-next) Merge branch
+'for-6.17/block' into for-next
+
+[ 8725.795546] run blktests throtl/006 at 2025-06-26 05:08:28
+[ 8726.092039] null_blk: disk dev_nullb created
+[ 8789.211527] EXT4-fs (dev_nullb): mounted filesystem
+d4000821-4311-4fd7-b872-35e68c3efb74 r/w with ordered data mode. Quota
+mode: none.
+[ 8794.584324] EXT4-fs (dev_nullb): unmounting filesystem
+d4000821-4311-4fd7-b872-35e68c3efb74.
+[ 8821.751593] watchdog: BUG: soft lockup - CPU#47 stuck for 26s! [find:48492]
+[ 8821.751602] Modules linked in: null_blk nbd ext4 crc16 mbcache jbd2
+loop tls rpcsec_gss_krb5 auth_rpcgss nfsv4 dns_resolver nfs lockd
+grace netfs rfkill sunrpc dm_multipath intel_rapl_msr
+intel_rapl_common intel_uncore_frequency intel_uncore_frequency_common
+skx_edac skx_edac_common x86_pkg_temp_thermal intel_powerclamp
+coretemp kvm_intel kvm mgag200 irqbypass i2c_algo_bit iTCO_wdt
+cdc_ether rapl drm_client_lib iTCO_vendor_support usbnet ipmi_ssif
+mei_me drm_shmem_helper intel_cstate dell_smbios platform_profile
+dcdbas intel_uncore wmi_bmof dell_wmi_descriptor pcspkr mii
+drm_kms_helper i2c_i801 mei i2c_smbus lpc_ich intel_pch_thermal
+acpi_power_meter ipmi_si acpi_ipmi dax_pmem ipmi_devintf
+ipmi_msghandler drm fuse xfs sd_mod sg nd_pmem nd_btt ahci
+ghash_clmulni_intel libahci bnxt_en megaraid_sas tg3 libata wmi nfit
+libnvdimm dm_mirror dm_region_hash dm_log dm_mod [last unloaded:
+scsi_debug]
+[ 8821.751702] irq event stamp: 16082150
+[ 8821.751704] hardirqs last  enabled at (16082149):
+[<ffffffffb085ff69>] _raw_spin_unlock_irqrestore+0x59/0x70
+[ 8821.751714] hardirqs last disabled at (16082150):
+[<ffffffffb08391db>] sysvec_apic_timer_interrupt+0xb/0xd0
+[ 8821.751720] softirqs last  enabled at (16081878):
+[<ffffffffae01f7c8>] handle_softirqs+0x5f8/0x920
+[ 8821.751727] softirqs last disabled at (16081637):
+[<ffffffffae01fc9b>] __irq_exit_rcu+0x11b/0x270
+[ 8821.751733] CPU: 47 UID: 0 PID: 48492 Comm: find Tainted: G
+    L      6.16.0-rc3+ #4 PREEMPT(voluntary)
+[ 8821.751740] Tainted: [L]=SOFTLOCKUP
+[ 8821.751742] Hardware name: Dell Inc. PowerEdge R640/08HT8T, BIOS
+2.22.2 09/12/2024
+[ 8821.751744] RIP: 0010:_raw_spin_unlock_irqrestore+0x3d/0x70
+[ 8821.751748] Code: 74 24 10 e8 25 da 96 fd 48 89 ef e8 7d 48 97 fd
+81 e3 00 02 00 00 75 29 9c 58 f6 c4 02 75 35 48 85 db 74 01 fb bf 01
+00 00 00 <e8> 6e 3e 86 fd 65 8b 05 d7 10 e2 02 85 c0 74 0e 5b 5d c3 cc
+cc cc
+[ 8821.751751] RSP: 0018:ffffc900215bf998 EFLAGS: 00000206
+[ 8821.751755] RAX: 0000000000000002 RBX: 0000000000000200 RCX: 0000000000000006
+[ 8821.751757] RDX: 0000000000000000 RSI: ffffffffb1606f3d RDI: 0000000000000001
+[ 8821.751759] RBP: ffffffffb6105538 R08: 0000000000000001 R09: 0000000000000001
+[ 8821.751761] R10: ffffffffb2688aa7 R11: 0000000000000000 R12: ffff88ac203ba000
+[ 8821.751763] R13: dffffc0000000000 R14: 000000000000001c R15: ffff88ac203bb000
+[ 8821.751766] FS:  00007fec1d2ac800(0000) GS:ffff88c7f45a7000(0000)
+knlGS:0000000000000000
+[ 8821.751769] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[ 8821.751771] CR2: 00007fec1d2a6000 CR3: 0000002b71442003 CR4: 00000000007726f0
+[ 8821.751773] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+[ 8821.751775] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+[ 8821.751777] PKRU: 55555554
+[ 8821.751778] Call Trace:
+[ 8821.751780]  <TASK>
+[ 8821.751783]  __debug_check_no_obj_freed+0x252/0x510
+[ 8821.751801]  ? __pfx___debug_check_no_obj_freed+0x10/0x10
+[ 8821.751809]  ? __radix_tree_delete+0xa8/0x2e0
+[ 8821.751821]  ? rcu_is_watching+0x11/0xb0
+[ 8821.751832]  __free_frozen_pages+0x3c0/0x12d0
+[ 8821.751849]  null_free_page+0x79/0xa0 [null_blk]
+[ 8821.751863]  null_free_device_storage+0x129/0x230 [null_blk]
+[ 8821.751881]  ? __pfx_null_free_device_storage+0x10/0x10 [null_blk]
+[ 8821.751908]  ? null_del_dev.part.0+0x2a6/0x480 [null_blk]
+[ 8821.751928]  nullb_device_release+0x1d/0x50 [null_blk]
+[ 8821.751939]  config_item_cleanup+0xe7/0x210
+[ 8821.751948]  configfs_rmdir+0x616/0x9e0
+[ 8821.751955]  ? __pfx_may_link+0x10/0x10
+[ 8821.751966]  ? __pfx_configfs_rmdir+0x10/0x10
+[ 8821.751968]  ? __pfx_down_write+0x10/0x10
+[ 8821.751984]  vfs_rmdir+0x1a1/0x590
+[ 8821.751994]  do_rmdir+0x240/0x2d0
+[ 8821.752001]  ? __pfx_do_rmdir+0x10/0x10
+[ 8821.752018]  ? getname_flags.part.0+0xfd/0x490
+[ 8821.752029]  __x64_sys_unlinkat+0xb5/0xf0
+[ 8821.752036]  do_syscall_64+0x8c/0x3d0
+[ 8821.752048]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+[ 8821.752052] RIP: 0033:0x7fec1d0ffbcb
+[ 8821.752057] Code: 73 01 c3 48 8b 0d 4d 92 0f 00 f7 d8 64 89 01 48
+83 c8 ff c3 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa b8 07 01 00
+00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d 1d 92 0f 00 f7 d8 64 89
+01 48
+[ 8821.752059] RSP: 002b:00007ffe6f4cac58 EFLAGS: 00000206 ORIG_RAX:
+0000000000000107
+[ 8821.752062] RAX: ffffffffffffffda RBX: 0000000000000200 RCX: 00007fec1d0ffbcb
+[ 8821.752065] RDX: 0000000000000200 RSI: 0000562dcf4945a0 RDI: 0000000000000005
+[ 8821.752067] RBP: 0000562dcf4945a0 R08: 0000000000000001 R09: 0000000000000000
+[ 8821.752069] R10: 00000000ffffffff R11: 0000000000000206 R12: 0000562dcf48a920
+[ 8821.752071] R13: 0000000000000000 R14: 0000000000000005 R15: 0000562dcf4944a0
+[ 8821.752092]  </TASK>
 
 
-> From: Michael S. Tsirkin <mst@redhat.com>
-> Sent: 26 June 2025 12:04 PM
-> To: Parav Pandit <parav@nvidia.com>
-> Cc: Stefan Hajnoczi <stefanha@redhat.com>; axboe@kernel.dk;
-> virtualization@lists.linux.dev; linux-block@vger.kernel.org;
-> stable@vger.kernel.org; NBU-Contact-Li Rongqing (EXTERNAL)
-> <lirongqing@baidu.com>; Chaitanya Kulkarni <chaitanyak@nvidia.com>;
-> xuanzhuo@linux.alibaba.com; pbonzini@redhat.com;
-> jasowang@redhat.com; alok.a.tiwari@oracle.com; Max Gurtovoy
-> <mgurtovoy@nvidia.com>; Israel Rukshin <israelr@nvidia.com>
-> Subject: Re: [PATCH v5] virtio_blk: Fix disk deletion hang on device surp=
-rise
-> removal
->=20
-> On Thu, Jun 26, 2025 at 06:29:09AM +0000, Parav Pandit wrote:
-> > > > > yes however this is not at all different that hotunplug right aft=
-er reset.
-> > > > >
-> > > > For hotunplug after reset, we likely need a timeout handler.
-> > > > Because block driver running inside the remove() callback waiting
-> > > > for the IO,
-> > > may not get notified from driver core to synchronize ongoing remove()=
-.
-> > >
-> > >
-> > > Notified of what?
-> > Notification that surprise-removal occurred.
-> >
-> > > So is the scenario that graceful remove starts, and meanwhile a
-> > > surprise removal happens?
-> > >
-> > Right.
->=20
->=20
-> where is it stuck then? can you explain?
+-- 
+Best Regards,
+  Yi Zhang
 
-I am not sure I understood the question.
-
-Let me try:
-Following scenario will hang even with the current fix:
-
-Say,=20
-1. the graceful removal is ongoing in the remove() callback, where disk del=
-etion del_gendisk() is ongoing, which waits for the requests to complete,
-
-2. Now few requests are yet to complete, and surprise removal started.
-
-At this point, virtio block driver will not get notified by the driver core=
- layer, because it is likely serializing remove() happening by user/driver =
-unload and PCI hotplug driver-initiated device removal.
-So vblk driver doesn't know that device is removed, block layer is waiting =
-for requests completions to arrive which it never gets.
-So del_gendisk() gets stuck.
-
-This needs some kind of timeout handling to improve the situation to make r=
-emoval more robust.
-
-Did I answer or I didn't understand the question?
