@@ -1,589 +1,882 @@
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2045.outbound.protection.outlook.com [40.107.100.45])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C1F519047F;
-	Thu, 26 Jun 2025 03:26:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.100.45
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750908380; cv=fail; b=k6bIC9wKIufCmlNtOok6L/Jj4YAwbsFpnFKe70yVneZnr2joXZR5Qfpq+USGmRITc/+3ZKg6cMDRfY5WAID0cqAM4S5kSo8AzuX3lI6qYwE2C8VgfYHH6Lo1bV9OJl0eXkUJlwnC/q6ScJ5Unvqc28NTwu4LjZX2T260H78oGBI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750908380; c=relaxed/simple;
-	bh=kmgeTJHlwabUZmCwRvuQULYi9Coektn4a9WwTEzbeLU=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=X0gIfmGL8UrEpKs9+Z7TyBgyKG4Te8hD6o3+IAreoiibyOlUIEJAwSZV+UeQUY5IfsMsOkTrS85uqk9atozaV19SNEY5LuSrA/M+Brh9O0JzB/86I0Mch+gY2esiVAKYGYPO9tPZybXY3mdrNHdY/jv7XyowHRqkPhf2DsPBY0g=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Un97zclr; arc=fail smtp.client-ip=40.107.100.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5124A1B6D08
+	for <linux-block@vger.kernel.org>; Thu, 26 Jun 2025 04:41:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1750912907; cv=none; b=Ck0AN7eRmJZo0YrLp4Eynjw8MZJc2Ts8HQy7JPlR2KDua6jKRxoqpwOtTQNl8A9EfEdcAMVsPxg9S25zhen5qt3o7X7Jah51ouAwHb+MwKIUrN5Y9wo2suWTtLMYWF/kK93y4U/twzo7kbSQi5Zv+8hxPWRxNEq+r3vOZh0Z5kI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1750912907; c=relaxed/simple;
+	bh=KMmyiwNs0dvt+nGviNpO2LbvUlgFTZSb0ldlsEpUmgg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ZbFJ0JmxPPgfdkbxaGqCsdbXOUF4LQUES6gkgvP5nuPIZjy/lTMjp4lkiL50If4EcB9RKQxo4/BWq4/uE46yPSXzrNYY2YZnEQ+V9Y6kSgWzpih6jSNvpM1cXosAU5iy+Ap1nKERDb7ZacLTWo6uEt6uxQtPNiHo7xiUHtFk9Rg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GfkOXyGP; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Un97zclr"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=fL0718KSyPoZM5RdMw6qDMcTPPVADt/S+vQeu3uWlDSEPAwbBbotkmXWJ8UpwfamJoK154yu2AFblQ1KR34l2iQKF35UaRKpSwOokVbU4cT4Mf4aZ3xQNBPcA65ak7uikC2HrknR2O6wKtdxlx7eNFM3Q9I8LTkOq8DYTpbGcaFRpzZ8JIJfc0x0IzpCDyT1XhsyMi1gdtifMZZfvjuw9W7CtD/hwDNKUsBJHWWH1JlJyn9KOk7VPUjfMDJl8nzbwbVt2TNMKRQp0fvr2B6P4Sfe1XZ7K2DMX/JYvlj0/w5KXjw0Tm9qsOWyINCKBg7K2/uYGSL7OL8/adQVWxO3WA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=uZpXeUSfb5hdEr25vG1WAdCwBW8Hj12sU43N0rKHtDc=;
- b=FafmOmzASlAkt+6ZtiMYZy0XnWfYQhqL2uSJQ6jLZzatg0NzhujTgHPJEpNvnW59cGO58G2pQ0DG/hrt95pWgIMee7OUc4+pvj/KyXWNxGxll1KCDmeUbKXYFZt8lnAdZEEquPTc/GPwqRwyyorX3xLK7R7WKrQ6UQvLlBjp83ooN/CCq2uCMMPbHNT+KJgNdtOxV/zrJMNjL6PR1IoXFK+olc+7GdZvE2EQYSh++pw5QyIpBQVjdTncF9VeucPbrPtD+JYW5azAALC6dhyajFnv5MFQ8q7Xj6A8qjNFNS/8FlkfeiExGIQ5oAxpwe7Gd6Grsl4fLK09n7v0Wb6u8Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uZpXeUSfb5hdEr25vG1WAdCwBW8Hj12sU43N0rKHtDc=;
- b=Un97zclrEEa77w4crBD7OhetoScrTxw/TVUxTWR/xaNQLcn+7+FPOXRWS/L93AoE3PaDm522rNeZH8YhlnkWBS9RYSEBA2m2KlIdTV1ipiRaaoW8pxI8ZiyorMZsDeSMgTZ3gks+Htj/zI/5O1QHPi1Kd2v7RcMpeJQemALrdVtA8waRTZC/HIG5ezw8OBqtg7btuWMM1K8kGJcWgcUWk6JKPVQxTKc7QJpgqYIb4fQUQ7m2bds6iiesEEV3vwsuu+3gfsgTEOytpGD/oVbvMadFIgGmPbsG16FxGfwC6lyGdOrnVJqyE1FV1tehkBFQNn5N+L2k8hhthmo2ANzsKg==
-Received: from CY8PR12MB7195.namprd12.prod.outlook.com (2603:10b6:930:59::11)
- by CH3PR12MB8726.namprd12.prod.outlook.com (2603:10b6:610:17b::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8857.23; Thu, 26 Jun
- 2025 03:26:12 +0000
-Received: from CY8PR12MB7195.namprd12.prod.outlook.com
- ([fe80::e571:5f76:2b46:e0f8]) by CY8PR12MB7195.namprd12.prod.outlook.com
- ([fe80::e571:5f76:2b46:e0f8%4]) with mapi id 15.20.8857.022; Thu, 26 Jun 2025
- 03:26:12 +0000
-From: Parav Pandit <parav@nvidia.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-CC: Stefan Hajnoczi <stefanha@redhat.com>, "axboe@kernel.dk"
-	<axboe@kernel.dk>, "virtualization@lists.linux.dev"
-	<virtualization@lists.linux.dev>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "stable@vger.kernel.org"
-	<stable@vger.kernel.org>, "NBU-Contact-Li Rongqing (EXTERNAL)"
-	<lirongqing@baidu.com>, Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-	"xuanzhuo@linux.alibaba.com" <xuanzhuo@linux.alibaba.com>,
-	"pbonzini@redhat.com" <pbonzini@redhat.com>, "jasowang@redhat.com"
-	<jasowang@redhat.com>, "alok.a.tiwari@oracle.com" <alok.a.tiwari@oracle.com>,
-	Max Gurtovoy <mgurtovoy@nvidia.com>, Israel Rukshin <israelr@nvidia.com>
-Subject: RE: [PATCH v5] virtio_blk: Fix disk deletion hang on device surprise
- removal
-Thread-Topic: [PATCH v5] virtio_blk: Fix disk deletion hang on device surprise
- removal
-Thread-Index:
- AQHb02hI8rTGAA49eUeotBFzOHU9FbQSzIkAgAAAcqCAAAJ6gIAAARbQgAAMIgCAAHNgsIAAitiAgAAAT1CAAAsNAIAAeh/AgAAFwYCAAIZBkA==
-Date: Thu, 26 Jun 2025 03:26:12 +0000
-Message-ID:
- <CY8PR12MB7195D92360146FFE1A59941CDC7AA@CY8PR12MB7195.namprd12.prod.outlook.com>
-References: <20250624185622.GB5519@fedora>
- <CY8PR12MB719579F7DAD8B0C0A98CBC7FDC78A@CY8PR12MB7195.namprd12.prod.outlook.com>
- <20250624150635-mutt-send-email-mst@kernel.org>
- <CY8PR12MB71953552AE196A592A1892DDDC78A@CY8PR12MB7195.namprd12.prod.outlook.com>
- <20250624155157-mutt-send-email-mst@kernel.org>
- <CY8PR12MB71953EFA4BD60651BFD66BD7DC7BA@CY8PR12MB7195.namprd12.prod.outlook.com>
- <20250625070228-mutt-send-email-mst@kernel.org>
- <CY8PR12MB7195AF9E34DF2A4821F590A8DC7BA@CY8PR12MB7195.namprd12.prod.outlook.com>
- <20250625074112-mutt-send-email-mst@kernel.org>
- <CY8PR12MB719531F26136254CC4764CD4DC7BA@CY8PR12MB7195.namprd12.prod.outlook.com>
- <20250625151732-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20250625151732-mutt-send-email-mst@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: CY8PR12MB7195:EE_|CH3PR12MB8726:EE_
-x-ms-office365-filtering-correlation-id: bb75099a-69c7-4fa7-97fd-08ddb461339c
-x-ld-processed: 43083d15-7273-40c1-b7db-39efd9ccc17a,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|366016|7416014|1800799024|376014|38070700018;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?ed5deVvvlDKlQSkZQHdbciyjuVxvJEgbDF4XW+wIPiny8Hz6ouq7Cg3dss2K?=
- =?us-ascii?Q?JyRBG8ICBY1ELeBsVSDl1aKukaCDekmx5t+XDLpV9s+z9XKQlnaDJdJcJrrK?=
- =?us-ascii?Q?lnyvuP45W5VhNAWSGJ7OdNl0E+ZV6y5+KcQNq+qb06BmQ+s04SiRF4NqC+Pg?=
- =?us-ascii?Q?p9D/DaSjHHnC/8MmynTmupY3P9yOQYZA9BmVA2bES8fSXQf0B3gyoTKCuX81?=
- =?us-ascii?Q?cijhECotosa5e7MKsP2Vgz61vkdW7xxjnozG4PHlBr1YUZPnSsxs/F0+jdtm?=
- =?us-ascii?Q?htKJQNO9buqKX1jlC6c+dL2U/+S8HZpVpDZEFERQyNBigbAZcggs35C5iAtF?=
- =?us-ascii?Q?2j81npcGpHrS4rZZFl/q6PG3qlcBdIuw/gMf5E+nEzvgL1fPQ9rUIBIUD43l?=
- =?us-ascii?Q?F0cOMDMGswVlMsAcn4NAxc+pwO2xSgu5MJ9DYNEue8oFOWjZK2eFbLEhPloN?=
- =?us-ascii?Q?kkuvpLkOYJhdmgd33XL8Wa8L99cQyeCN6G8LfzNF9nCF1OOn1xKp/du/KETy?=
- =?us-ascii?Q?cjAjxYeM7zlm99i0IoTQuxPutl7YbK1uEnQxrI/N+BkhmRVA/l1boFRZmNJn?=
- =?us-ascii?Q?nn7uvojyg4oPycTJ1JPiGgdO58OOkUJFCXsoSEptBtHmeqAU05uiiFTHos/H?=
- =?us-ascii?Q?fsOVUKgVYuXjgu44HclhX0bCWvuPuHSZrCrqd/SBScqIiZiFy/MR7p9QovQV?=
- =?us-ascii?Q?O0BDEi/sYk+aaxrd+OB1XWM8tdMzQ4bbcEItmnROzS7THbQLqGShmPnkAKyM?=
- =?us-ascii?Q?e73baO7/O1GznUMrr6FjzcGa6DligS7vBUbe6sfBUrstiEHIUlpKRkMOQxfF?=
- =?us-ascii?Q?u/IBw1wg0o08RTCWSs0vj2TVwHrJpNFQm3aV4ML/Ec7dIRp99zLGi33/z+jD?=
- =?us-ascii?Q?lXEFZt9sPltwWsEjbqPLVCRPcc2S4qJrnUN55GdILavwwYqtwBVLqCRJ63wP?=
- =?us-ascii?Q?Pp1fqNoMxtMlAVL2koDPyuo6yJismfUPoIC4gEauduOR63lwIMmdTGm8Hmkp?=
- =?us-ascii?Q?uZHCPh/Cad7R5vDBvO37JjzCEYJj9lS/E0fTALxILaYbfdMF3TlMAMC3cqE/?=
- =?us-ascii?Q?bER5MU6YpVvKY09IWgLwc8VI8pA+8VGU8x6R9n9ksaUR5vI/k8tdV0itkBpt?=
- =?us-ascii?Q?DVK2+gPPDgCXZ/zxPwcl+IWDxKjiRJ7k8x1+A/G8w2CWWh+7FJs1M1dFBY5G?=
- =?us-ascii?Q?OrXTgfZnrM9b6aYqodmmNz6+nTAUgABL34kbha2JV8YAH+C5uvTuf3rlTnlr?=
- =?us-ascii?Q?NW/+Vdxdd7ScPwKHiWqamVUDnl8EDyJGAK+b6zQQNDmnoUAM8XaKSEI2du6p?=
- =?us-ascii?Q?sKibOFlv+ETszI4yTY9YEOFrCYNZy4pO1bg27SLd5/bR/TUapvWCdvUN+mef?=
- =?us-ascii?Q?L8sjEMEobRZY15CyulzUwLXLpx4ANRqhnr8rAh+N01R4ZWQrtV465JUxuqa2?=
- =?us-ascii?Q?VtZ6eHqoQkyXV8dBlluepYVraU510Yg6QtkhfSFl97Uu+//nubIPJMpVoJNT?=
- =?us-ascii?Q?zWS6iuGW9JPa4UQ=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY8PR12MB7195.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(1800799024)(376014)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?xxg1yHAW3iIeQ9qYsu3pkXX3XAVRJIb48oc57Ux4JaRFDvBaKUVj1iNJFh0U?=
- =?us-ascii?Q?ZVbq3bf/iDzGM+QzugqVSvR1uRs5UjRaiLN604ZBOzJFeFQI+ocW71Zv5wbR?=
- =?us-ascii?Q?HCfA2yQpIraN1WRktITBPtQls9x+NvKUzHeJkHib4izxWBXWfVXxDc+gW98m?=
- =?us-ascii?Q?+x+cb73zizo0cNOf2YF5duQe/17RMGF32Fomh0WTWNAUljPofnnOcKfx4slB?=
- =?us-ascii?Q?JKnzzUlYbbre49Tc9/tGvnA+ZK/aLOpE1ElrondZi+bFwxgaGD06PDIovx1v?=
- =?us-ascii?Q?QAAhj/xOF7vbBTcZMmClY7layKnaCS32cFxcsASQNTUDYX4Cp8h1jg/3m8DC?=
- =?us-ascii?Q?gR0Tw5GYJRvgAlv0O1AuMUzJpYYXvo7/ddZYA8HVV4119B6chjLw3imV9QDW?=
- =?us-ascii?Q?ksJHz82KG9MJopfyZxQvJro9koEHWR5WiQSm86rJBZ2EJ7ZIbwAO6DaYDC08?=
- =?us-ascii?Q?53aaiQwjsuadHMjhHXN5kcTfE57LoStQhWyBux8UKz4TLF/LiLLl+5/72JsY?=
- =?us-ascii?Q?Hc77cva0vAHncj+i+9E0PCoJVByAIjx4/9w3SbWwZl5OYRZEjZv7ECvkDVOU?=
- =?us-ascii?Q?BA91rW9d7A8DageaB6tLX1S+XQiHCh4ecCoBPVlkApLDziF5Dg32M2r6uubZ?=
- =?us-ascii?Q?ynQ5BPw9UPaPGyb5nhv6upseRyNdjYdtRmL8Q+PoFBN//ASsb+NcZvJeFaTh?=
- =?us-ascii?Q?k/20b1khm4k9JwpGwj9xxuqBmPpNze5XPQ/4blzxo4Nkis09DDvYY6b/yq6L?=
- =?us-ascii?Q?w5BWHAMkO4auCLxgbd6Maq2w2kTw+/pOdvyF7hBXMXodhK+zFvraffeVEkhq?=
- =?us-ascii?Q?Vbv6AXTm+Imt8vDPoeg1ztGIyjDLUfLCzzzPWGJTL9jey4LMxdjj+Hse1YOM?=
- =?us-ascii?Q?02IE8RvZvPbY5PmhJjaRSjJJAibNm9FLll79zGN5ER65ClLxEqklfAz6lHD3?=
- =?us-ascii?Q?iCcTkjzLNkMW3oowP/ZIKFh8ElmHkYQhx4g9UlXX8QfmmFXu33ejsnt4Qx0v?=
- =?us-ascii?Q?X9jrcrYe6tGiRcIDqNgxeugGXq867k/ysQR9VD7ybCxTMQOFbQHw6VZO8Y8w?=
- =?us-ascii?Q?sM4/9q9PZTVm6V6zBvAnShP1Cd2UP37ikXd7jBAKj1XDExSbHjyqSNIndJ18?=
- =?us-ascii?Q?+hN7jKLuzPRAIqflniim/Vugq+KKK0wh0ksUf4WXTfx+IQBPGiBZi50hEvWD?=
- =?us-ascii?Q?Qt3Se9QLfmyYV/kRnqfSafTpRqARofF24upgwxH9/7JswXsHWoi/Q71pNNwo?=
- =?us-ascii?Q?JNRv8LtWQYsN3nKufP2LA2IuYgoKOMPjXuTWMQ1nYxoizkptkYNxB9qw/GTo?=
- =?us-ascii?Q?7uw5WEdOKO5aXkxbzJrffnmrvnylKohdSMXnsFYeVdmG2Zc3vzs+orCBXWri?=
- =?us-ascii?Q?hpOLhN1/qE9/Hbt1XQUsgVHZi22nSnZF5/crZI0ocZD5F62ghXSfRbRIuicB?=
- =?us-ascii?Q?BcpvtxOF/kmBH3ub8wFN49XWstCxSLYsShUPUIZB4O0H4Yu0QLnmX26FE6Wp?=
- =?us-ascii?Q?ThJcI9pvIWZc0GdQSl5emLOcFpNOxT0TBEZFpVnNVs/k5Rk4IoCfBMXbWfN5?=
- =?us-ascii?Q?qsVLpNGUXG88EVUEMxM=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GfkOXyGP"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1750912902;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=USCOXCoyizmVMS1nEox+nQnEJllbvckzTYHVUQ8KwYw=;
+	b=GfkOXyGPLuZjLhtUC/Sct5cTsi5apoSGYjRT4VyIho07qerQbq0ja2VYze7e4sDAv/hj1E
+	DKdVwF5nQlYatj4DPxD4tWZSSQy9nNDvUw9Ia9fw3WDe8/F8LckJziKzXCTyluJaKmrBB/
+	DIlOXX4+pxkkpMiHet1G23nihq1BSkw=
+Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
+ [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-378-pDI8dNNtP022d4e18CRqfw-1; Thu, 26 Jun 2025 00:41:40 -0400
+X-MC-Unique: pDI8dNNtP022d4e18CRqfw-1
+X-Mimecast-MFC-AGG-ID: pDI8dNNtP022d4e18CRqfw_1750912899
+Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-32cbc4a763eso1582731fa.3
+        for <linux-block@vger.kernel.org>; Wed, 25 Jun 2025 21:41:39 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750912898; x=1751517698;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=USCOXCoyizmVMS1nEox+nQnEJllbvckzTYHVUQ8KwYw=;
+        b=qH6dqQofqPdUMCctDXXTJ9tZab5qqleY2XqRWnb1thGKkmAaDJw8+SEDVon1YzZSE9
+         mPFveFJOFNSDbC8DsNRNwvqA2r6CN1FFSVLQxuhUcnocfvsXSr44FVFiZnjT1HpDYWWS
+         pEQoXoWaO0G79lwr10qgbQ07qbgzjFdaBQmMqwO1dJcylvRcbPlH1j0g/Wu+0dIG46+x
+         E7KB9MIYT5CCD7clnQbBFJkiz5Cp+2gNouxrxspyCPDidf6DMsgHHAcpW/6k6wRF9flk
+         jRA35lJh7/Q2xTV6Qu0MIxsrd6QrEkumXpR/DgQrMdhKI2BDt7CRkk/b/05qJzxeJFHq
+         A10A==
+X-Forwarded-Encrypted: i=1; AJvYcCVAb1otyh2KQurzEZWVke8W1LQlpspavwrvoBiXuaoo5o29Ul4jK0TrWswD8kCIfWOoGsqy0waGdEnG/w==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyjpwU0cWY7UpLsxSkXcnc3lBScMpDE5kWUIEg17lf+hbypIu9W
+	zzwSaGtncj/2sLVUCwK+QaHg+Nggy2yfXBQNHJyjBEsSfvR+thdnnV09NoTYE272mPM+R3J0gNf
+	e5aNTW5w3zyCp8fs9j1vEIenzywE0OkEVL4AFD36vfHASjymAn04S1iVylWpWRBy0YP/HQhBMtN
+	68BryX8W9pNQnAP81xyx5lRo3r17jSmDKfW3GfNDc=
+X-Gm-Gg: ASbGncsP7m7Uv5roVktlbaUySpsJLxtU4O5t1Sn3eLCsTcGaZdB42H/X3lenS69JVCJ
+	7y87wT3E9dm8RBDqYpidlx+SXbDYmBZUnWYfcblx3JuDP04iVaY6SPwGs81ACtzFZWfvOV6g1+R
+	q7qpEO
+X-Received: by 2002:a05:651c:f0b:b0:32b:7284:88 with SMTP id 38308e7fff4ca-32cc6497155mr9481531fa.7.1750912897682;
+        Wed, 25 Jun 2025 21:41:37 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGtsbqMmhUQDt3g/lzDAdNNkxTBoru/S0YT53I4ao37Pj6PTGdEtaqF1QaveXbM6nUgWJ79NXRNI5pAmP+QcLM=
+X-Received: by 2002:a05:651c:f0b:b0:32b:7284:88 with SMTP id
+ 38308e7fff4ca-32cc6497155mr9481451fa.7.1750912897010; Wed, 25 Jun 2025
+ 21:41:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CY8PR12MB7195.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bb75099a-69c7-4fa7-97fd-08ddb461339c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Jun 2025 03:26:12.6795
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: +ISTcSAFJQWY3+7nOl6k+5r1UhTUVJcp7i0i7hiobJkkgCepuCkM8zyWBT4iSG0TUM01RM4k6m4YB3Lc7ZObRQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8726
+References: <CAHj4cs-uWZcgHLLkE8JeDpkd-ddkWiZCQC_HWObS5D3TAKE9ng@mail.gmail.com>
+ <aEal7hIpLpQSMn8+@gmail.com> <738f680c-d0e8-b6c0-cfaa-5f420a592c4f@huaweicloud.com>
+ <aFTfQpsUiD1Hw3zU@mozart.vkv.me> <f320c94e-3a94-d645-8f7b-80f958c50fbe@huaweicloud.com>
+In-Reply-To: <f320c94e-3a94-d645-8f7b-80f958c50fbe@huaweicloud.com>
+From: Yi Zhang <yi.zhang@redhat.com>
+Date: Thu, 26 Jun 2025 12:41:24 +0800
+X-Gm-Features: Ac12FXwVhrQSkzcoVpHc2oLKhn6ivN0RCkYzP7E6RYXdDw0kLKji6YD38t9jrMg
+Message-ID: <CAHj4cs_+dauobyYyP805t33WMJVzOWj=7+51p4_j9rA63D9sog@mail.gmail.com>
+Subject: Re: [bug report] WARNING: CPU: 3 PID: 522 at block/genhd.c:144 bdev_count_inflight_rw+0x26e/0x410
+To: Yu Kuai <yukuai1@huaweicloud.com>
+Cc: Calvin Owens <calvin@wbinvd.org>, Breno Leitao <leitao@debian.org>, 
+	linux-block <linux-block@vger.kernel.org>, 
+	"open list:NVM EXPRESS DRIVER" <linux-nvme@lists.infradead.org>, axboe@kernel.dk, 
+	Christoph Hellwig <hch@infradead.org>, "yukuai (C)" <yukuai3@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+Hi Yu
 
+Seems both the original and new warning are triggered, here is the full log=
+:
 
-> From: Michael S. Tsirkin <mst@redhat.com>
-> Sent: 26 June 2025 12:52 AM
->=20
-> On Wed, Jun 25, 2025 at 07:08:54PM +0000, Parav Pandit wrote:
-> >
-> > > From: Michael S. Tsirkin <mst@redhat.com>
-> > > Sent: 25 June 2025 05:15 PM
-> > >
-> > > On Wed, Jun 25, 2025 at 11:08:42AM +0000, Parav Pandit wrote:
-> > > >
-> > > > > From: Michael S. Tsirkin <mst@redhat.com>
-> > > > > Sent: 25 June 2025 04:34 PM
-> > > > >
-> > > > > On Wed, Jun 25, 2025 at 02:55:27AM +0000, Parav Pandit wrote:
-> > > > > >
-> > > > > > > From: Michael S. Tsirkin <mst@redhat.com>
-> > > > > > > Sent: 25 June 2025 01:24 AM
-> > > > > > >
-> > > > > > > On Tue, Jun 24, 2025 at 07:11:29PM +0000, Parav Pandit wrote:
-> > > > > > > >
-> > > > > > > >
-> > > > > > > > > From: Michael S. Tsirkin <mst@redhat.com>
-> > > > > > > > > Sent: 25 June 2025 12:37 AM
-> > > > > > > > >
-> > > > > > > > > On Tue, Jun 24, 2025 at 07:01:44PM +0000, Parav Pandit wr=
-ote:
-> > > > > > > > > >
-> > > > > > > > > >
-> > > > > > > > > > > From: Stefan Hajnoczi <stefanha@redhat.com>
-> > > > > > > > > > > Sent: 25 June 2025 12:26 AM
-> > > > > > > > > > >
-> > > > > > > > > > > On Mon, Jun 02, 2025 at 02:44:33AM +0000, Parav
-> > > > > > > > > > > Pandit
-> > > wrote:
-> > > > > > > > > > > > When the PCI device is surprise removed, requests
-> > > > > > > > > > > > may not complete the device as the VQ is marked as
-> broken.
-> > > > > > > > > > > > Due to this, the disk deletion hangs.
-> > > > > > > > > > >
-> > > > > > > > > > > There are loops in the core virtio driver code that
-> > > > > > > > > > > expect device register reads to eventually return 0:
-> > > > > > > > > > > drivers/virtio/virtio_pci_modern.c:vp_reset()
-> > > > > > > > > > > drivers/virtio/virtio_pci_modern_dev.c:vp_modern_set
-> > > > > > > > > > > _que
-> > > > > > > > > > > ue_r
-> > > > > > > > > > > eset
-> > > > > > > > > > > ()
-> > > > > > > > > > >
-> > > > > > > > > > > Is there a hang if these loops are hit when a device
-> > > > > > > > > > > has been surprise removed? I'm trying to understand
-> > > > > > > > > > > whether surprise removal is fully supported or
-> > > > > > > > > > > whether this patch is one step in that
-> > > > > > > direction.
-> > > > > > > > > > >
-> > > > > > > > > > In one of the previous replies I answered to Michael,
-> > > > > > > > > > but don't have the link
-> > > > > > > > > handy.
-> > > > > > > > > > It is not fully supported by this patch. It will hang.
-> > > > > > > > > >
-> > > > > > > > > > This patch restores driver back to the same state what
-> > > > > > > > > > it was before the fixes
-> > > > > > > > > tag patch.
-> > > > > > > > > > The virtio stack level work is needed to support
-> > > > > > > > > > surprise removal, including
-> > > > > > > > > the reset flow you rightly pointed.
-> > > > > > > > >
-> > > > > > > > > Have plans to do that?
-> > > > > > > > >
-> > > > > > > > Didn't give enough thoughts on it yet.
-> > > > > > >
-> > > > > > > This one is kind of pointless then? It just fixes the
-> > > > > > > specific race window that your test harness happens to hit?
-> > > > > > >
-> > > > > > It was reported by Li from Baidu, whose tests failed.
-> > > > > > I missed to tag "reported-by" in v5. I had it until v4. :(
-> > > > > >
-> > > > > > > Maybe it's better to wait until someone does a comprehensive =
-fix..
-> > > > > > >
-> > > > > > >
-> > > > > > Oh, I was under impression is that you wanted to step forward
-> > > > > > in discussion
-> > > > > of v4.
-> > > > > > If you prefer a comprehensive support across layers of virtio,
-> > > > > > I suggest you
-> > > > > should revert the cited patch in fixes tag.
-> > > > > >
-> > > > > > Otherwise, it is in degraded state as virtio never supported
-> > > > > > surprise
-> > > removal.
-> > > > > > By reverting the cited patch (or with this fix), the requests
-> > > > > > and disk deletion
-> > > > > will not hang.
-> > > > >
-> > > > > But they will hung in virtio core on reset, will they not? The
-> > > > > tests just do not happen to trigger this?
-> > > > >
-> > > > It will hang if it a true surprise removal which no device did so
-> > > > far because it
-> > > never worked.
-> > > > (or did, but always hung that no one reported yet)
-> > > >
-> > > > I am familiar with 2 or more PCI devices who reports surprise
-> > > > removal,
-> > > which do not complete the requests but yet allows device reset flow.
-> > > > This is because device is still there on the PCI bus. Only via
-> > > > side band signals
-> > > device removal was reported.
-> > >
-> > > So why do we care about it so much? I think it's great this patch
-> > > exists, for example it makes it easier to test surprise removal and
-> > > find more bugs. But is it better to just have it hang
-> > > unconditionally? Are we now making a commitment that it's working -
-> one we don't seem to intend to implement?
-> > >
-> > The patch improves the situation from its current state.
-> > But as you posted, more changes in pci layer are needed.
-> > I didn't audit where else it may be needed.
-> >
-> > vp_reset() may need to return the status back of successful/failure res=
-et.
-> > Otherwise during probe(), vp_reset() aborts the reset and attempts to l=
-oad
-> the driver for removed device.
->=20
-> yes however this is not at all different that hotunplug right after reset=
-.
+[  957.877438] run blktests nvme/012 at 2025-06-25 23:58:12
+[  958.533643] loop0: detected capacity change from 0 to 2097152
+[  958.642850] nvmet: adding nsid 1 to subsystem blktests-subsystem-1
+[  959.512306] nvme nvme0: NVME-FC{0}: create association : host wwpn
+0x20001100aa000001  rport wwpn 0x20001100ab000001: NQN
+"blktests-subsystem-1"
+[  959.519831] (NULL device *): {0:0} Association created
+[  959.523618] nvmet: Created nvm controller 1 for subsystem
+blktests-subsystem-1 for NQN
+nqn.2014-08.org.nvmexpress:uuid:0f01fb42-9f7f-4856-b0b3-51e60b8de349.
+[  959.582072] nvme nvme0: NVME-FC{0}: controller connect complete
+[  959.582621] nvme nvme0: NVME-FC{0}: new ctrl: NQN
+"blktests-subsystem-1", hostnqn:
+nqn.2014-08.org.nvmexpress:uuid:0f01fb42-9f7f-4856-b0b3-51e60b8de349
+[  960.197452] nvme nvme1: NVME-FC{1}: create association : host wwpn
+0x20001100aa000001  rport wwpn 0x20001100ab000001: NQN
+"nqn.2014-08.org.nvmexpress.discovery"
+[  960.204257] (NULL device *): {0:1} Association created
+[  960.205846] nvmet: Created discovery controller 2 for subsystem
+nqn.2014-08.org.nvmexpress.discovery for NQN
+nqn.2014-08.org.nvmexpress:uuid:0f01fb42-9f7f-4856-b0b3-51e60b8de349.
+[  960.218038] nvme nvme1: NVME-FC{1}: controller connect complete
+[  960.218468] nvme nvme1: NVME-FC{1}: new ctrl: NQN
+"nqn.2014-08.org.nvmexpress.discovery", hostnqn:
+nqn.2014-08.org.nvmexpress:uuid:0f01fb42-9f7f-4856-b0b3-51e60b8de349
+[  960.249003] nvme nvme1: Removing ctrl: NQN
+"nqn.2014-08.org.nvmexpress.discovery"
+[  960.672600] (NULL device *): {0:1} Association deleted
+[  960.690869] XFS (nvme0n1): Mounting V5 Filesystem
+4cf8fd97-5f8e-48ea-b8d3-450aac8dc021
+[  960.755721] XFS (nvme0n1): Ending clean mount
+[  960.893903] (NULL device *): {0:1} Association freed
+[  960.894140] (NULL device *): Disconnect LS failed: No Association
+[ 1021.580164] nvme nvme0: NVME-FC{0.3}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x000d60a0/x00000000
+[ 1021.580790] nvme nvme0: NVME-FC{0.3}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x001bcae8/x00000000
+[ 1021.580868] nvme nvme0: NVME-FC{0.3}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x0001af68/x00000000
+[ 1021.580941] nvme nvme0: NVME-FC{0.3}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x000c2200/x00000000
+[ 1021.581011] nvme nvme0: NVME-FC{0.3}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x00005838/x00000000
+[ 1021.581163] nvme nvme0: NVME-FC{0.3}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x00131fa0/x00000000
+[ 1021.581260] nvme nvme0: NVME-FC{0.3}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x00144de0/x00000000
+[ 1021.581327] nvme nvme0: NVME-FC{0.3}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x001f8408/x00000000
+[ 1021.581343] nvme nvme0: NVME-FC{0}: transport association event:
+transport detected io error
+[ 1021.581393] nvme nvme0: NVME-FC{0.3}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x00076308/x00000000
+[ 1021.590801] nvme nvme0: NVME-FC{0}: resetting controller
+[ 1021.590861] nvme nvme0: NVME-FC{0.3}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x0003be10/x00000000
+[ 1021.596242] nvme nvme0: NVME-FC{0.3}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x001cbf78/x00000000
+[ 1021.596427] nvme nvme0: NVME-FC{0.3}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x0004d428/x00000000
+[ 1021.596472] nvme nvme0: NVME-FC{0.3}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x001d1700/x00000000
+[ 1021.596506] nvme nvme0: NVME-FC{0.3}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x0015de58/x00000000
+[ 1021.596536] nvme nvme0: NVME-FC{0.3}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x000008c0/x00000000
+[ 1021.596567] nvme nvme0: NVME-FC{0.3}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x001f22a0/x00000000
+[ 1021.596615] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x00100072/x00000000
+[ 1021.596672] block nvme0n1: no usable path - requeuing I/O
+[ 1021.596674] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x001000b2/x00000000
+[ 1021.602131] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x001000f2/x00000000
+[ 1021.602141] block nvme0n1: no usable path - requeuing I/O
+[ 1021.602157] block nvme0n1: no usable path - requeuing I/O
+[ 1021.607588] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x00100132/x00000000
+[ 1021.613050] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x00100172/x00000000
+[ 1021.613084] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x001001b2/x00000000
+[ 1021.613119] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x001001f2/x00000000
+[ 1021.613151] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 0 fctype 1
+(Flush) w10/11: x00000000/x00000000
+[ 1021.613198] block nvme0n1: no usable path - requeuing I/O
+[ 1021.618681] block nvme0n1: no usable path - requeuing I/O
+[ 1021.624099] block nvme0n1: no usable path - requeuing I/O
+[ 1021.629514] block nvme0n1: no usable path - requeuing I/O
+[ 1021.634935] block nvme0n1: no usable path - requeuing I/O
+[ 1021.640351] block nvme0n1: no usable path - requeuing I/O
+[ 1021.645775] block nvme0n1: no usable path - requeuing I/O
+[ 1022.169519] nvme nvme0: NVME-FC{0}: create association : host wwpn
+0x20001100aa000001  rport wwpn 0x20001100ab000001: NQN
+"blktests-subsystem-1"
+[ 1022.169566] ------------[ cut here ]------------
+[ 1022.174594] WARNING: CPU: 12 PID: 466 at block/blk-core.c:1071
+bdev_end_io_acct+0x494/0x5c0
+[ 1022.176221] (NULL device *): {0:1} Association created
+[ 1022.183010] Modules linked in: loop nvme_fcloop nvmet_fc nvmet
+nvme_fc nvme_fabrics nvme_core nvme_keyring nvme_auth rpcsec_gss_krb5
+auth_rpcgss nfsv4 dns_resolver nfs lockd grace netfs rfkill sunrpc
+dm_multipath intel_rapl_msr intel_rapl_common intel_uncore_frequency
+intel_uncore_frequency_common skx_edac skx_edac_common
+x86_pkg_temp_thermal intel_powerclamp coretemp kvm_intel kvm mgag200
+irqbypass iTCO_wdt i2c_algo_bit rapl cdc_ether iTCO_vendor_support
+drm_client_lib mei_me drm_shmem_helper dell_smbios usbnet intel_cstate
+platform_profile dcdbas intel_uncore dell_wmi_descriptor wmi_bmof
+pcspkr mii ipmi_ssif drm_kms_helper i2c_i801 mei lpc_ich i2c_smbus
+intel_pch_thermal ipmi_si acpi_power_meter acpi_ipmi dax_pmem
+ipmi_devintf ipmi_msghandler drm fuse xfs sd_mod sg nd_pmem nd_btt
+ahci libahci ghash_clmulni_intel bnxt_en libata tg3 megaraid_sas wmi
+nfit libnvdimm dm_mirror dm_region_hash dm_log dm_mod
+[ 1022.183834] nvmet: Created nvm controller 2 for subsystem
+blktests-subsystem-1 for NQN
+nqn.2014-08.org.nvmexpress:uuid:0f01fb42-9f7f-4856-b0b3-51e60b8de349.
+[ 1022.223500] ------------[ cut here ]------------
+[ 1022.223572] WARNING: CPU: 42 PID: 2014 at block/genhd.c:146
+bdev_count_inflight_rw+0x2a6/0x410
+[ 1022.223596] Modules linked in: loop nvme_fcloop nvmet_fc nvmet
+nvme_fc nvme_fabrics nvme_core nvme_keyring nvme_auth rpcsec_gss_krb5
+auth_rpcgss nfsv4 dns_resolver nfs lockd grace netfs rfkill sunrpc
+dm_multipath intel_rapl_msr intel_rapl_common intel_uncore_frequency
+intel_uncore_frequency_common skx_edac skx_edac_common
+x86_pkg_temp_thermal intel_powerclamp coretemp kvm_intel kvm mgag200
+irqbypass iTCO_wdt i2c_algo_bit rapl cdc_ether iTCO_vendor_support
+drm_client_lib mei_me drm_shmem_helper dell_smbios usbnet intel_cstate
+platform_profile dcdbas intel_uncore dell_wmi_descriptor wmi_bmof
+pcspkr mii ipmi_ssif drm_kms_helper i2c_i801 mei lpc_ich i2c_smbus
+intel_pch_thermal ipmi_si acpi_power_meter acpi_ipmi dax_pmem
+ipmi_devintf ipmi_msghandler drm fuse xfs sd_mod sg nd_pmem nd_btt
+ahci libahci ghash_clmulni_intel bnxt_en libata tg3 megaraid_sas wmi
+nfit libnvdimm dm_mirror dm_region_hash dm_log dm_mod
+[ 1022.224168] CPU: 42 UID: 0 PID: 2014 Comm: fio Not tainted
+6.16.0-rc3.yu+ #2 PREEMPT(voluntary)
+[ 1022.224185] Hardware name: Dell Inc. PowerEdge R640/08HT8T, BIOS
+2.22.2 09/12/2024
+[ 1022.224194] RIP: 0010:bdev_count_inflight_rw+0x2a6/0x410
+[ 1022.224207] Code: fa 48 c1 ea 03 0f b6 14 02 4c 89 f8 83 e0 07 83
+c0 03 38 d0 7c 08 84 d2 0f 85 59 01 00 00 41 c7 07 00 00 00 00 e9 75
+ff ff ff <0f> 0b 48 b8 00 00 00 00 00 fc ff df 4c 89 f2 48 c1 ea 03 0f
+b6 14
+[ 1022.224219] RSP: 0018:ffffc9000e2578c8 EFLAGS: 00010286
+[ 1022.224234] RAX: 00000000ffffffff RBX: 0000000000000030 RCX: ffffffffb00=
+90a46
+[ 1022.224243] RDX: 0000000000000000 RSI: 0000000000000030 RDI: ffffffffb26=
+e42c0
+[ 1022.224252] RBP: ffffe8ffffa4e440 R08: 0000000000000000 R09: fffff91ffff=
+49c9a
+[ 1022.224262] R10: ffffe8ffffa4e4d7 R11: 0000000000000000 R12: ffff88a9227=
+76e40
+[ 1022.224270] R13: dffffc0000000000 R14: ffffc9000e257984 R15: ffffc9000e2=
+57980
+[ 1022.224280] FS:  00007feaa0b15640(0000) GS:ffff889c401a7000(0000)
+knlGS:0000000000000000
+[ 1022.224291] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[ 1022.224300] CR2: 0000562e119e6018 CR3: 00000005a21ca003 CR4: 00000000007=
+726f0
+[ 1022.224309] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 00000000000=
+00000
+[ 1022.224318] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 00000000000=
+00400
+[ 1022.224326] PKRU: 55555554
+[ 1022.224333] Call Trace:
+[ 1022.224342]  <TASK>
+[ 1022.224383]  part_stat_show+0x9e/0x290
+[ 1022.224401]  ? rcu_is_watching+0x11/0xb0
+[ 1022.224422]  ? trace_contention_end+0x150/0x1c0
+[ 1022.224447]  ? __pfx_part_stat_show+0x10/0x10
+[ 1022.224478]  ? __lock_acquire+0x6f1/0xc00
+[ 1022.224528]  ? find_held_lock+0x32/0x90
+[ 1022.224541]  ? local_clock_noinstr+0x9/0xc0
+[ 1022.224565]  ? __lock_release+0x1a2/0x2c0
+[ 1022.224619]  dev_attr_show+0x3f/0xc0
+[ 1022.224636]  ? __asan_memset+0x20/0x50
+[ 1022.224656]  sysfs_kf_seq_show+0x1a4/0x3b0
+[ 1022.224693]  seq_read_iter+0x40b/0x1090
+[ 1022.224747]  ? rw_verify_area+0x2fd/0x520
+[ 1022.224777]  vfs_read+0x74e/0xc30
+[ 1022.224798]  ? __pfx___mutex_lock+0x10/0x10
+[ 1022.224816]  ? find_held_lock+0x32/0x90
+[ 1022.224838]  ? __pfx_vfs_read+0x10/0x10
+[ 1022.224866]  ? __fget_files+0x195/0x2e0
+[ 1022.224885]  ? __fget_files+0x195/0x2e0
+[ 1022.224954]  ksys_read+0xf3/0x1d0
+[ 1022.224975]  ? __pfx_ksys_read+0x10/0x10
+[ 1022.225064]  do_syscall_64+0x8c/0x3d0
+[ 1022.225108]  ? __x64_sys_openat+0x11e/0x1e0
+[ 1022.225134]  ? __pfx___x64_sys_openat+0x10/0x10
+[ 1022.225178]  ? entry_SYSCALL_64_after_hwframe+0x76/0x7e
+[ 1022.225193]  ? lockdep_hardirqs_on+0x78/0x100
+[ 1022.225211]  ? do_syscall_64+0x16e/0x3d0
+[ 1022.225223]  ? lockdep_hardirqs_on+0x78/0x100
+[ 1022.225241]  ? do_syscall_64+0x16e/0x3d0
+[ 1022.225256]  ? do_syscall_64+0x16e/0x3d0
+[ 1022.225285]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+[ 1022.225297] RIP: 0033:0x7feac08fe30c
+[ 1022.225312] Code: ec 28 48 89 54 24 18 48 89 74 24 10 89 7c 24 08
+e8 19 8b f8 ff 48 8b 54 24 18 48 8b 74 24 10 41 89 c0 8b 7c 24 08 31
+c0 0f 05 <48> 3d 00 f0 ff ff 77 34 44 89 c7 48 89 44 24 08 e8 6f 8b f8
+ff 48
+[ 1022.225322] RSP: 002b:00007feaa0b148a0 EFLAGS: 00000246 ORIG_RAX:
+0000000000000000
+[ 1022.225338] RAX: ffffffffffffffda RBX: 00007feab4000b60 RCX: 00007feac08=
+fe30c
+[ 1022.225347] RDX: 0000000000001000 RSI: 00007feab4001280 RDI: 00000000000=
+00007
+[ 1022.225356] RBP: 00007feac09f65e0 R08: 0000000000000000 R09: 00000000000=
+00077
+[ 1022.225364] R10: 0000000000000063 R11: 0000000000000246 R12: 00007feab40=
+00b60
+[ 1022.225373] R13: 0000000000000d68 R14: 00007feac09f59e0 R15: 00000000000=
+00d68
+[ 1022.225441]  </TASK>
+[ 1022.225449] irq event stamp: 64865
+[ 1022.225456] hardirqs last  enabled at (64871): [<ffffffffaf1f6ee1>]
+console_trylock_spinning+0x221/0x260
+[ 1022.225473] hardirqs last disabled at (64876): [<ffffffffaf1f6e91>]
+console_trylock_spinning+0x1d1/0x260
+[ 1022.225486] softirqs last  enabled at (63932): [<ffffffffaf01f7c8>]
+handle_softirqs+0x5f8/0x920
+[ 1022.225502] softirqs last disabled at (63923): [<ffffffffaf01fc9b>]
+__irq_exit_rcu+0x11b/0x270
+[ 1022.225513] ---[ end trace 0000000000000000 ]---
+[ 1022.263295] CPU: 12 UID: 0 PID: 466 Comm: kworker/12:1H Tainted: G
+      W           6.16.0-rc3.yu+ #2 PREEMPT(voluntary)
+[ 1022.291560] nvme nvme0: NVME-FC{0}: controller connect complete
+[ 1022.356344] Tainted: [W]=3DWARN
+[ 1022.356348] Hardware name: Dell Inc. PowerEdge R640/08HT8T, BIOS
+2.22.2 09/12/2024
+[ 1022.356352] Workqueue: kblockd blk_mq_run_work_fn
+[ 1022.744652] RIP: 0010:bdev_end_io_acct+0x494/0x5c0
+[ 1022.749466] Code: 22 fd ff ff 48 c7 44 24 08 10 00 00 00 41 be 30
+00 00 00 48 c7 04 24 50 00 00 00 e9 c3 fb ff ff 0f 1f 44 00 00 e9 f5
+fd ff ff <0f> 0b 48 83 c4 28 5b 5d 41 5c 41 5d 41 5e 41 5f c3 cc cc cc
+cc 48
+[ 1022.768235] RSP: 0018:ffffc9000f9f78e8 EFLAGS: 00010297
+[ 1022.773484] RAX: 00000000ffffffff RBX: ffff88a922776e64 RCX: ffffffffb00=
+3853f
+[ 1022.780632] RDX: ffffed15244eedcd RSI: 0000000000000004 RDI: ffff88a9227=
+76e64
+[ 1022.787784] RBP: ffffe8d448a4e440 R08: 0000000000000001 R09: ffffed15244=
+eedcc
+[ 1022.794934] R10: ffff88a922776e67 R11: 0000000000000000 R12: ffff88a9227=
+76e68
+[ 1022.802101] R13: 0000000000000001 R14: 0000000000000028 R15: 00000000000=
+07e42
+[ 1022.809251] FS:  0000000000000000(0000) GS:ffff889c3c5a7000(0000)
+knlGS:0000000000000000
+[ 1022.817352] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[ 1022.823114] CR2: 0000562e119bd048 CR3: 0000003661478001 CR4: 00000000007=
+726f0
+[ 1022.830265] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 00000000000=
+00000
+[ 1022.837418] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 00000000000=
+00400
+[ 1022.844561] PKRU: 55555554
+[ 1022.847293] Call Trace:
+[ 1022.849762]  <TASK>
+[ 1022.851898]  nvme_end_req+0x4d/0x70 [nvme_core]
+[ 1022.856494]  nvme_failover_req+0x3bd/0x530 [nvme_core]
+[ 1022.861692]  nvme_fail_nonready_command+0x12c/0x170 [nvme_core]
+[ 1022.867666]  nvme_fc_queue_rq+0x463/0x720 [nvme_fc]
+[ 1022.872573]  ? flush_busy_ctx+0x2bd/0x410
+[ 1022.876612]  ? __pfx_nvme_fc_queue_rq+0x10/0x10 [nvme_fc]
+[ 1022.882040]  ? _raw_spin_unlock+0x29/0x50
+[ 1022.886075]  ? flush_busy_ctx+0x2bd/0x410
+[ 1022.890112]  blk_mq_dispatch_rq_list+0x358/0x1260
+[ 1022.894846]  ? __pfx_blk_mq_flush_busy_ctxs+0x10/0x10
+[ 1022.899914]  ? __pfx_blk_mq_dispatch_rq_list+0x10/0x10
+[ 1022.905077]  ? __lock_acquire+0x6f1/0xc00
+[ 1022.909119]  __blk_mq_sched_dispatch_requests+0x2dd/0x480
+[ 1022.914543]  ? __pfx___blk_mq_sched_dispatch_requests+0x10/0x10
+[ 1022.920484]  ? rcu_is_watching+0x11/0xb0
+[ 1022.924437]  blk_mq_sched_dispatch_requests+0xa6/0x140
+[ 1022.929597]  blk_mq_run_work_fn+0x1bb/0x2a0
+[ 1022.933803]  process_one_work+0x8ca/0x1950
+[ 1022.937956]  ? __pfx_process_one_work+0x10/0x10
+[ 1022.942517]  ? assign_work+0x16c/0x240
+[ 1022.946292]  worker_thread+0x58d/0xcf0
+[ 1022.950080]  ? __pfx_worker_thread+0x10/0x10
+[ 1022.954376]  kthread+0x3d5/0x7a0
+[ 1022.957632]  ? __pfx_kthread+0x10/0x10
+[ 1022.961411]  ? rcu_is_watching+0x11/0xb0
+[ 1022.965362]  ? __pfx_kthread+0x10/0x10
+[ 1022.969144]  ret_from_fork+0x403/0x510
+[ 1022.972932]  ? __pfx_kthread+0x10/0x10
+[ 1022.976701]  ret_from_fork_asm+0x1a/0x30
+[ 1022.980671]  </TASK>
+[ 1022.982879] irq event stamp: 4185
+[ 1022.986216] hardirqs last  enabled at (4195): [<ffffffffaf1f438b>]
+__up_console_sem+0x6b/0x80
+[ 1022.994753] hardirqs last disabled at (4204): [<ffffffffaf1f4370>]
+__up_console_sem+0x50/0x80
+[ 1023.003288] softirqs last  enabled at (4140): [<ffffffffaf01f7c8>]
+handle_softirqs+0x5f8/0x920
+[ 1023.011932] softirqs last disabled at (4135): [<ffffffffaf01fc9b>]
+__irq_exit_rcu+0x11b/0x270
+[ 1023.020463] ---[ end trace 0000000000000000 ]---
+[ 1023.042643] (NULL device *): {0:0} Association deleted
+[ 1031.553369] nvmet: ctrl 1 keep-alive timer (5 seconds) expired!
+[ 1031.560460] nvmet: ctrl 1 fatal error occurred!
+[ 1032.690809] (NULL device *): {0:0} Association freed
+[ 1032.690915] (NULL device *): Disconnect LS failed: No Association
+[ 1092.492635] nvme nvme0: NVME-FC{0.3}: io timeout: opcode 0 fctype 1
+(Flush) w10/11: x00000000/x00000000
+[ 1092.492757] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x001615e0/x00000000
+[ 1092.492833] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x001ee528/x00000000
+[ 1092.492903] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x000d9608/x00000000
+[ 1092.492971] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x001e6fc0/x00000000
+[ 1092.493078] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x001ce330/x00000000
+[ 1092.493113] nvme nvme0: NVME-FC{0}: transport association event:
+transport detected io error
+[ 1092.493278] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x00194c58/x00000000
+[ 1092.501618] nvme nvme0: NVME-FC{0}: resetting controller
+[ 1092.501646] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x00036808/x00000000
+[ 1092.507031] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x00098858/x00000000
+[ 1092.507083] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x001d6af0/x00000000
+[ 1092.507143] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x00037110/x00000000
+[ 1092.507211] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x00028738/x00000000
+[ 1092.507256] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x000cb2f8/x00000000
+[ 1092.507294] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x001db548/x00000000
+[ 1092.507294] nvme_ns_head_submit_bio: 53 callbacks suppressed
+[ 1092.507319] block nvme0n1: no usable path - requeuing I/O
+[ 1092.507332] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x00164e88/x00000000
+[ 1092.507370] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x000c6a58/x00000000
+[ 1092.513146] block nvme0n1: no usable path - requeuing I/O
+[ 1092.518453] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x00063908/x00000000
+[ 1092.518473] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x00101de4/x00000000
+[ 1092.523917] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x00101e24/x00000000
+[ 1092.523927] block nvme0n1: no usable path - requeuing I/O
+[ 1092.523939] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x00101e64/x00000000
+[ 1092.529353] block nvme0n1: no usable path - requeuing I/O
+[ 1092.529362] block nvme0n1: no usable path - requeuing I/O
+[ 1092.529370] block nvme0n1: no usable path - requeuing I/O
+[ 1092.529379] block nvme0n1: no usable path - requeuing I/O
+[ 1092.529387] block nvme0n1: no usable path - requeuing I/O
+[ 1092.529395] block nvme0n1: no usable path - requeuing I/O
+[ 1092.529407] block nvme0n1: no usable path - requeuing I/O
+[ 1092.567521] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x00101ea4/x00000000
+[ 1092.567544] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x00101ee4/x00000000
+[ 1092.567565] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x00101f24/x00000000
+[ 1092.567586] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x00101f64/x00000000
+[ 1092.586616] nvme nvme0: NVME-FC{0}: create association : host wwpn
+0x20001100aa000001  rport wwpn 0x20001100ab000001: NQN
+"blktests-subsystem-1"
+[ 1092.589236] (NULL device *): {0:0} Association created
+[ 1092.590346] nvmet: Created nvm controller 1 for subsystem
+blktests-subsystem-1 for NQN
+nqn.2014-08.org.nvmexpress:uuid:0f01fb42-9f7f-4856-b0b3-51e60b8de349.
+[ 1092.617739] (NULL device *): {0:1} Association deleted
+[ 1092.618501] nvme nvme0: NVME-FC{0}: controller connect complete
+[ 1101.692537] nvmet: ctrl 2 keep-alive timer (5 seconds) expired!
+[ 1101.698582] nvmet: ctrl 2 fatal error occurred!
+[ 1108.581555] (NULL device *): {0:1} Association freed
+[ 1108.581673] (NULL device *): Disconnect LS failed: No Association
+[ 1169.292656] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x000ac410/x00000000
+[ 1169.292773] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x00022280/x00000000
+[ 1169.292902] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x00165558/x00000000
+[ 1169.292975] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x001e6be8/x00000000
+[ 1169.293045] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x00075aa0/x00000000
+[ 1169.293121] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x00096d28/x00000000
+[ 1169.293190] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x0016a1c8/x00000000
+[ 1169.293210] nvme nvme0: NVME-FC{0}: transport association event:
+transport detected io error
+[ 1169.293285] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x0018cc08/x00000000
+[ 1169.301731] nvme nvme0: NVME-FC{0}: resetting controller
+[ 1169.301750] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x000e80b0/x00000000
+[ 1169.307114] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x001f0150/x00000000
+[ 1169.307162] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x0013c950/x00000000
+[ 1169.307201] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x001bcb50/x00000000
+[ 1169.307245] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x000ab668/x00000000
+[ 1169.307290] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x000f07f8/x00000000
+[ 1169.307332] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x00158748/x00000000
+[ 1169.307371] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x0002aea8/x00000000
+[ 1169.307413] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 0 fctype 1
+(Flush) w10/11: x00000000/x00000000
+[ 1169.307479] nvme_ns_head_submit_bio: 73 callbacks suppressed
+[ 1169.307498] block nvme0n1: no usable path - requeuing I/O
+[ 1169.318700] block nvme0n1: no usable path - requeuing I/O
+[ 1169.324148] block nvme0n1: no usable path - requeuing I/O
+[ 1169.329577] block nvme0n1: no usable path - requeuing I/O
+[ 1169.335085] block nvme0n1: no usable path - requeuing I/O
+[ 1169.340499] block nvme0n1: no usable path - requeuing I/O
+[ 1169.345913] block nvme0n1: no usable path - requeuing I/O
+[ 1169.351327] block nvme0n1: no usable path - requeuing I/O
+[ 1169.356747] block nvme0n1: no usable path - requeuing I/O
+[ 1169.362161] block nvme0n1: no usable path - requeuing I/O
+[ 1169.388582] nvme nvme0: NVME-FC{0}: create association : host wwpn
+0x20001100aa000001  rport wwpn 0x20001100ab000001: NQN
+"blktests-subsystem-1"
+[ 1169.395335] (NULL device *): {0:1} Association created
+[ 1169.396654] nvmet: Created nvm controller 2 for subsystem
+blktests-subsystem-1 for NQN
+nqn.2014-08.org.nvmexpress:uuid:0f01fb42-9f7f-4856-b0b3-51e60b8de349.
+[ 1169.404023] (NULL device *): {0:0} Association deleted
+[ 1169.424767] nvme nvme0: NVME-FC{0}: controller connect complete
+[ 1178.485216] nvmet: ctrl 1 keep-alive timer (5 seconds) expired!
+[ 1178.491269] nvmet: ctrl 1 fatal error occurred!
+[ 1199.495733] nvme nvme0: NVME-FC{0.2}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x00165558/x00000000
+[ 1199.495846] nvme nvme0: NVME-FC{0.2}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x00022280/x00000000
+[ 1199.495921] nvme nvme0: NVME-FC{0.2}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x001e6be8/x00000000
+[ 1199.495992] nvme nvme0: NVME-FC{0.2}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x00075aa0/x00000000
+[ 1199.496059] nvme nvme0: NVME-FC{0.2}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x00096d28/x00000000
+[ 1199.496141] nvme nvme0: NVME-FC{0.2}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x0016a1c8/x00000000
+[ 1199.496217] nvme nvme0: NVME-FC{0.2}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x0018cc08/x00000000
+[ 1199.496229] nvme nvme0: NVME-FC{0}: transport association event:
+transport detected io error
+[ 1199.496285] nvme nvme0: NVME-FC{0.2}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x001bcb50/x00000000
+[ 1199.504778] nvme nvme0: NVME-FC{0}: resetting controller
+[ 1199.505035] nvme nvme0: NVME-FC{0.2}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x000ab668/x00000000
+[ 1199.510168] nvme nvme0: NVME-FC{0.2}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x000f07f8/x00000000
+[ 1199.510209] nvme nvme0: NVME-FC{0.2}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x00158748/x00000000
+[ 1199.510245] nvme nvme0: NVME-FC{0.2}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x0002aea8/x00000000
+[ 1199.510287] nvme nvme0: NVME-FC{0.2}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x000e80b0/x00000000
+[ 1199.510341] nvme nvme0: NVME-FC{0.2}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x001f0150/x00000000
+[ 1199.510378] nvme nvme0: NVME-FC{0.2}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x0013c950/x00000000
+[ 1199.510416] nvme nvme0: NVME-FC{0.2}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x000ac410/x00000000
+[ 1199.510453] nvme nvme0: NVME-FC{0.2}: io timeout: opcode 0 fctype 1
+(Flush) w10/11: x00000000/x00000000
+[ 1199.548601] nvme nvme0: NVME-FC{0}: create association : host wwpn
+0x20001100aa000001  rport wwpn 0x20001100ab000001: NQN
+"blktests-subsystem-1"
+[ 1199.550025] nvme_ns_head_submit_bio: 31 callbacks suppressed
+[ 1199.550033] block nvme0n1: no usable path - requeuing I/O
+[ 1199.555063] (NULL device *): {0:2} Association created
+[ 1199.562849] nvmet: Created nvm controller 3 for subsystem
+blktests-subsystem-1 for NQN
+nqn.2014-08.org.nvmexpress:uuid:0f01fb42-9f7f-4856-b0b3-51e60b8de349.
+[ 1199.568924] block nvme0n1: no usable path - requeuing I/O
+[ 1199.570148] (NULL device *): {0:1} Association deleted
+[ 1199.574360] block nvme0n1: no usable path - requeuing I/O
+[ 1199.574369] block nvme0n1: no usable path - requeuing I/O
+[ 1199.574376] block nvme0n1: no usable path - requeuing I/O
+[ 1199.574383] block nvme0n1: no usable path - requeuing I/O
+[ 1199.574393] block nvme0n1: no usable path - requeuing I/O
+[ 1199.574402] block nvme0n1: no usable path - requeuing I/O
+[ 1199.574412] block nvme0n1: no usable path - requeuing I/O
+[ 1199.574422] block nvme0n1: no usable path - requeuing I/O
+[ 1199.606289] nvme nvme0: NVME-FC{0}: controller connect complete
+[ 1199.851981] (NULL device *): {0:1} Association freed
+[ 1199.852095] (NULL device *): Disconnect LS failed: No Association
+[ 1199.865367] (NULL device *): {0:0} Association freed
+[ 1199.865419] (NULL device *): Disconnect LS failed: No Association
+[ 1260.424514] nvme nvme0: NVME-FC{0.3}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x001b5a00/x00000000
+[ 1260.424632] nvme nvme0: NVME-FC{0.3}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x0014b5c0/x00000000
+[ 1260.424708] nvme nvme0: NVME-FC{0.3}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x00122cf8/x00000000
+[ 1260.424778] nvme nvme0: NVME-FC{0.3}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x000ac538/x00000000
+[ 1260.424846] nvme nvme0: NVME-FC{0.3}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x000b6890/x00000000
+[ 1260.424933] nvme nvme0: NVME-FC{0.3}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x001ddb68/x00000000
+[ 1260.425009] nvme nvme0: NVME-FC{0.3}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x0006e720/x00000000
+[ 1260.425021] nvme nvme0: NVME-FC{0}: transport association event:
+transport detected io error
+[ 1260.425076] nvme nvme0: NVME-FC{0.3}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x000c8948/x00000000
+[ 1260.433557] nvme nvme0: NVME-FC{0}: resetting controller
+[ 1260.438935] nvme nvme0: NVME-FC{0.3}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x00038560/x00000000
+[ 1260.438966] nvme nvme0: NVME-FC{0.3}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x000c0480/x00000000
+[ 1260.438995] nvme nvme0: NVME-FC{0.3}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x000e2948/x00000000
+[ 1260.439025] nvme nvme0: NVME-FC{0.3}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x001ceff8/x00000000
+[ 1260.439061] nvme nvme0: NVME-FC{0.3}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x0000de28/x00000000
+[ 1260.439091] nvme nvme0: NVME-FC{0.3}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x000a3530/x00000000
+[ 1260.439120] nvme nvme0: NVME-FC{0.3}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x000a9450/x00000000
+[ 1260.439149] nvme nvme0: NVME-FC{0.3}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x0019be38/x00000000
+[ 1260.439168] nvme_ns_head_submit_bio: 25 callbacks suppressed
+[ 1260.439185] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 0 fctype 1
+(Flush) w10/11: x00000000/x00000000
+[ 1260.439185] block nvme0n1: no usable path - requeuing I/O
+[ 1260.444904] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x00103fb5/x00000000
+[ 1260.444933] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x00103ff5/x00000000
+[ 1260.450361] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x00104035/x00000000
+[ 1260.450382] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x00103eb5/x00000000
+[ 1260.450403] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x00103ef5/x00000000
+[ 1260.450423] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x00103f35/x00000000
+[ 1260.450445] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x00103f75/x00000000
+[ 1260.450515] block nvme0n1: no usable path - requeuing I/O
+[ 1260.456040] block nvme0n1: no usable path - requeuing I/O
+[ 1260.461481] block nvme0n1: no usable path - requeuing I/O
+[ 1260.466899] block nvme0n1: no usable path - requeuing I/O
+[ 1260.472327] block nvme0n1: no usable path - requeuing I/O
+[ 1260.477737] block nvme0n1: no usable path - requeuing I/O
+[ 1260.483157] block nvme0n1: no usable path - requeuing I/O
+[ 1260.488570] block nvme0n1: no usable path - requeuing I/O
+[ 1260.493987] block nvme0n1: no usable path - requeuing I/O
+[ 1260.502057] nvme nvme0: NVME-FC{0}: create association : host wwpn
+0x20001100aa000001  rport wwpn 0x20001100ab000001: NQN
+"blktests-subsystem-1"
+[ 1260.509561] (NULL device *): {0:0} Association created
+[ 1260.511108] nvmet: Created nvm controller 1 for subsystem
+blktests-subsystem-1 for NQN
+nqn.2014-08.org.nvmexpress:uuid:0f01fb42-9f7f-4856-b0b3-51e60b8de349.
+[ 1260.516897] (NULL device *): {0:2} Association deleted
+[ 1260.552786] nvme nvme0: NVME-FC{0}: controller connect complete
+[ 1270.637574] nvmet: ctrl 3 keep-alive timer (5 seconds) expired!
+[ 1270.643622] nvmet: ctrl 3 fatal error occurred!
+[ 1286.221388] (NULL device *): {0:2} Association freed
+[ 1286.221515] (NULL device *): Disconnect LS failed: No Association
+[ 1346.424230] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 0 fctype 1
+(Flush) w10/11: x00000000/x00000000
+[ 1346.424294] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x001d1d40/x00000000
+[ 1346.424344] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x001868b0/x00000000
+[ 1346.424377] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x001c6038/x00000000
+[ 1346.424409] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x000e5e20/x00000000
+[ 1346.424441] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x001df538/x00000000
+[ 1346.424483] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x000103b8/x00000000
+[ 1346.424516] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x0018bb20/x00000000
+[ 1346.424547] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x0002de48/x00000000
+[ 1346.424597] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x000759d0/x00000000
+[ 1346.424652] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x0012e340/x00000000
+[ 1346.424685] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x00055a20/x00000000
+[ 1346.424719] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x00074eb8/x00000000
+[ 1346.424753] nvme nvme0: NVME-FC{0}: transport association event:
+transport detected io error
+[ 1346.424764] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x00168cb0/x00000000
+[ 1346.424867] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x00045f98/x00000000
+[ 1346.433288] nvme nvme0: NVME-FC{0}: resetting controller
+[ 1346.433319] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x000fe478/x00000000
+[ 1346.438737] nvme nvme0: NVME-FC{0.4}: io timeout: opcode 1 fctype 1
+(Write) w10/11: x00153c98/x00000000
+[ 1346.438905] nvme_ns_head_submit_bio: 49 callbacks suppressed
+[ 1346.438922] block nvme0n1: no usable path - requeuing I/O
+[ 1346.450290] block nvme0n1: no usable path - requeuing I/O
+[ 1346.455823] block nvme0n1: no usable path - requeuing I/O
+[ 1346.461263] block nvme0n1: no usable path - requeuing I/O
+[ 1346.466683] block nvme0n1: no usable path - requeuing I/O
+[ 1346.472095] block nvme0n1: no usable path - requeuing I/O
+[ 1346.477510] block nvme0n1: no usable path - requeuing I/O
+[ 1346.482926] block nvme0n1: no usable path - requeuing I/O
+[ 1346.488343] block nvme0n1: no usable path - requeuing I/O
+[ 1346.493759] block nvme0n1: no usable path - requeuing I/O
+[ 1346.512987] nvme nvme0: NVME-FC{0}: create association : host wwpn
+0x20001100aa000001  rport wwpn 0x20001100ab000001: NQN
+"blktests-subsystem-1"
+[ 1346.519457] (NULL device *): {0:1} Association created
+[ 1346.520786] nvmet: Created nvm controller 2 for subsystem
+blktests-subsystem-1 for NQN
+nqn.2014-08.org.nvmexpress:uuid:0f01fb42-9f7f-4856-b0b3-51e60b8de349.
+[ 1346.534750] (NULL device *): {0:0} Association deleted
+[ 1346.550214] nvme nvme0: NVME-FC{0}: controller connect complete
+[ 1356.646385] nvmet: ctrl 1 keep-alive timer (5 seconds) expired!
+[ 1356.652430] nvmet: ctrl 1 fatal error occurred!
+[ 1359.532517] (NULL device *): {0:0} Association freed
+[ 1359.532642] (NULL device *): Disconnect LS failed: No Association
+[ 1419.047820] XFS (nvme0n1): Unmounting Filesystem
+4cf8fd97-5f8e-48ea-b8d3-450aac8dc021
+[ 1419.259166] nvme nvme0: Removing ctrl: NQN "blktests-subsystem-1"
+[ 1419.452477] (NULL device *): {0:1} Association deleted
+[ 1419.608635] (NULL device *): {0:1} Association freed
+[ 1419.608751] (NULL device *): Disconnect LS failed: No Association
+[ 1420.231038] nvme_fc: nvme_fc_create_ctrl:
+nn-0x10001100ab000001:pn-0x20001100ab000001 -
+nn-0x10001100aa000001:pn-0x20001100aa000001 combination not found
+[ 1426.441719] Key type psk unregistered
+[ 1429.557488] Key type psk registered
+
+On Fri, Jun 20, 2025 at 2:47=E2=80=AFPM Yu Kuai <yukuai1@huaweicloud.com> w=
+rote:
 >
-For hotunplug after reset, we likely need a timeout handler.
-Because block driver running inside the remove() callback waiting for the I=
-O, may not get notified from driver core to synchronize ongoing remove().
-
-=20
-> > I guess suspend() callback also infinitely waits during freezing the qu=
-eue
-> also needs adaptation.
->=20
-> Which callback is that I don't understand.
-virtblk_freeze() at [1].
-
-[1] https://elixir.bootlin.com/linux/v6.15.3/source/drivers/block/virtio_bl=
-k.c#L1622
-
->=20
->=20
-> > > > But I agree that for full support, virtio all layer changes would
-> > > > be needed as
-> > > new functionality (without fixes tag  :) ).
-> > >
-> > >
-> > > Or with a fixes tag - lots of people just use it as a signal to mean
-> > > "where can this be reasonably backported to".
-> > >
-> > Yes, I think the fix for the older kernels is needed, hence I cced stab=
-le too.
+> Hi,
+>
+> =E5=9C=A8 2025/06/20 12:10, Calvin Owens =E5=86=99=E9=81=93:
+> > I dumped all the similar WARNs I've seen here (blk-warn-%d.txt):
 > >
-> > >
-> > > > > > Please let me know if I should re-send to revert the patch
-> > > > > > listed in fixes
-> > > tag.
-> > > > > >
-> > > > > > > > > > > Apart from that, I'm happy with the virtio_blk.c
-> > > > > > > > > > > aspects of the
-> > > > > patch:
-> > > > > > > > > > > Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-> > > > > > > > > > >
-> > > > > > > > > > Thanks.
-> > > > > > > > > >
-> > > > > > > > > > > >
-> > > > > > > > > > > > Fix it by aborting the requests when the VQ is brok=
-en.
-> > > > > > > > > > > >
-> > > > > > > > > > > > With this fix now fio completes swiftly.
-> > > > > > > > > > > > An alternative of IO timeout has been considered,
-> > > > > > > > > > > > however when the driver knows about unresponsive
-> > > > > > > > > > > > block device, swiftly clearing them enables users
-> > > > > > > > > > > > and upper layers to react
-> > > > > quickly.
-> > > > > > > > > > > >
-> > > > > > > > > > > > Verified with multiple device unplug iterations
-> > > > > > > > > > > > with pending requests in virtio used ring and some
-> > > > > > > > > > > > pending with the
-> > > > > device.
-> > > > > > > > > > > >
-> > > > > > > > > > > > Fixes: 43bb40c5b926 ("virtio_pci: Support surprise
-> > > > > > > > > > > > removal of virtio pci device")
-> > > > > > > > > > > > Cc: stable@vger.kernel.org
-> > > > > > > > > > > > Reported-by: Li RongQing <lirongqing@baidu.com>
-> > > > > > > > > > > > Closes:
-> > > > > > > > > > > > https://lore.kernel.org/virtualization/c45dd68698c
-> > > > > > > > > > > > d472
-> > > > > > > > > > > > 38c5
-> > > > > > > > > > > > 5fb7
-> > > > > > > > > > > > 3ca9
-> > > > > > > > > > > > b474
-> > > > > > > > > > > > 1@baidu.com/
-> > > > > > > > > > > > Reviewed-by: Max Gurtovoy <mgurtovoy@nvidia.com>
-> > > > > > > > > > > > Reviewed-by: Israel Rukshin <israelr@nvidia.com>
-> > > > > > > > > > > > Signed-off-by: Parav Pandit <parav@nvidia.com>
-> > > > > > > > > > > >
-> > > > > > > > > > > > ---
-> > > > > > > > > > > > v4->v5:
-> > > > > > > > > > > > - fixed comment style where comment to start with
-> > > > > > > > > > > > one empty line at start
-> > > > > > > > > > > > - Addressed comments from Alok
-> > > > > > > > > > > > - fixed typo in broken vq check
-> > > > > > > > > > > > v3->v4:
-> > > > > > > > > > > > - Addressed comments from Michael
-> > > > > > > > > > > > - renamed virtblk_request_cancel() to
-> > > > > > > > > > > >   virtblk_complete_request_with_ioerr()
-> > > > > > > > > > > > - Added comments for
-> > > > > > > > > > > > virtblk_complete_request_with_ioerr()
-> > > > > > > > > > > > - Renamed virtblk_broken_device_cleanup() to
-> > > > > > > > > > > >   virtblk_cleanup_broken_device()
-> > > > > > > > > > > > - Added comments for
-> > > > > > > > > > > > virtblk_cleanup_broken_device()
-> > > > > > > > > > > > - Moved the broken vq check in virtblk_remove()
-> > > > > > > > > > > > - Fixed comment style to have first empty line
-> > > > > > > > > > > > - replaced freezed to frozen
-> > > > > > > > > > > > - Fixed comments rephrased
-> > > > > > > > > > > >
-> > > > > > > > > > > > v2->v3:
-> > > > > > > > > > > > - Addressed comments from Michael
-> > > > > > > > > > > > - updated comment for synchronizing with callbacks
-> > > > > > > > > > > >
-> > > > > > > > > > > > v1->v2:
-> > > > > > > > > > > > - Addressed comments from Stephan
-> > > > > > > > > > > > - fixed spelling to 'waiting'
-> > > > > > > > > > > > - Addressed comments from Michael
-> > > > > > > > > > > > - Dropped checking broken vq from queue_rq() and
-> > > queue_rqs()
-> > > > > > > > > > > >   because it is checked in lower layer routines in
-> > > > > > > > > > > > virtio core
-> > > > > > > > > > > >
-> > > > > > > > > > > > v0->v1:
-> > > > > > > > > > > > - Fixed comments from Stefan to rename a cleanup
-> > > > > > > > > > > > function
-> > > > > > > > > > > > - Improved logic for handling any outstanding reque=
-sts
-> > > > > > > > > > > >   in bio layer
-> > > > > > > > > > > > - improved cancel callback to sync with ongoing
-> > > > > > > > > > > > done()
-> > > > > > > > > > > > ---
-> > > > > > > > > > > >  drivers/block/virtio_blk.c | 95
-> > > > > > > > > > > > ++++++++++++++++++++++++++++++++++++++
-> > > > > > > > > > > >  1 file changed, 95 insertions(+)
-> > > > > > > > > > > >
-> > > > > > > > > > > > diff --git a/drivers/block/virtio_blk.c
-> > > > > > > > > > > > b/drivers/block/virtio_blk.c index
-> > > > > > > > > > > > 7cffea01d868..c5e383c0ac48
-> > > > > > > > > > > > 100644
-> > > > > > > > > > > > --- a/drivers/block/virtio_blk.c
-> > > > > > > > > > > > +++ b/drivers/block/virtio_blk.c
-> > > > > > > > > > > > @@ -1554,6 +1554,98 @@ static int
-> > > > > > > > > > > > virtblk_probe(struct virtio_device
-> > > > > > > > > > > *vdev)
-> > > > > > > > > > > >  	return err;
-> > > > > > > > > > > >  }
-> > > > > > > > > > > >
-> > > > > > > > > > > > +/*
-> > > > > > > > > > > > + * If the vq is broken, device will not complete r=
-equests.
-> > > > > > > > > > > > + * So we do it for the device.
-> > > > > > > > > > > > + */
-> > > > > > > > > > > > +static bool
-> > > > > > > > > > > > +virtblk_complete_request_with_ioerr(struct
-> > > > > > > > > > > > +request *rq, void *data) {
-> > > > > > > > > > > > +	struct virtblk_req *vbr =3D blk_mq_rq_to_pdu(rq);
-> > > > > > > > > > > > +	struct virtio_blk *vblk =3D data;
-> > > > > > > > > > > > +	struct virtio_blk_vq *vq;
-> > > > > > > > > > > > +	unsigned long flags;
-> > > > > > > > > > > > +
-> > > > > > > > > > > > +	vq =3D &vblk->vqs[rq->mq_hctx->queue_num];
-> > > > > > > > > > > > +
-> > > > > > > > > > > > +	spin_lock_irqsave(&vq->lock, flags);
-> > > > > > > > > > > > +
-> > > > > > > > > > > > +	vbr->in_hdr.status =3D VIRTIO_BLK_S_IOERR;
-> > > > > > > > > > > > +	if (blk_mq_request_started(rq) &&
-> > > > > > > !blk_mq_request_completed(rq))
-> > > > > > > > > > > > +		blk_mq_complete_request(rq);
-> > > > > > > > > > > > +
-> > > > > > > > > > > > +	spin_unlock_irqrestore(&vq->lock, flags);
-> > > > > > > > > > > > +	return true;
-> > > > > > > > > > > > +}
-> > > > > > > > > > > > +
-> > > > > > > > > > > > +/*
-> > > > > > > > > > > > + * If the device is broken, it will not use any
-> > > > > > > > > > > > +buffers and waiting
-> > > > > > > > > > > > + * for that to happen is pointless. We'll do the
-> > > > > > > > > > > > +cleanup in the driver,
-> > > > > > > > > > > > + * completing all requests for the device.
-> > > > > > > > > > > > + */
-> > > > > > > > > > > > +static void virtblk_cleanup_broken_device(struct
-> > > > > > > > > > > > +virtio_blk *vblk)
-> > > > > {
-> > > > > > > > > > > > +	struct request_queue *q =3D vblk->disk->queue;
-> > > > > > > > > > > > +
-> > > > > > > > > > > > +	/*
-> > > > > > > > > > > > +	 * Start freezing the queue, so that new
-> > > > > > > > > > > > +requests keeps
-> > > > > > > waiting at the
-> > > > > > > > > > > > +	 * door of bio_queue_enter(). We cannot fully
-> > > > > > > > > > > > +freeze the queue
-> > > > > > > > > > > because
-> > > > > > > > > > > > +	 * frozen queue is an empty queue and there are
-> > > > > > > > > > > > +pending
-> > > > > > > requests, so
-> > > > > > > > > > > > +	 * only start freezing it.
-> > > > > > > > > > > > +	 */
-> > > > > > > > > > > > +	blk_freeze_queue_start(q);
-> > > > > > > > > > > > +
-> > > > > > > > > > > > +	/*
-> > > > > > > > > > > > +	 * When quiescing completes, all ongoing
-> > > > > > > > > > > > +dispatches have
-> > > > > > > completed
-> > > > > > > > > > > > +	 * and no new dispatch will happen towards the
-> > > driver.
-> > > > > > > > > > > > +	 */
-> > > > > > > > > > > > +	blk_mq_quiesce_queue(q);
-> > > > > > > > > > > > +
-> > > > > > > > > > > > +	/*
-> > > > > > > > > > > > +	 * Synchronize with any ongoing VQ callbacks
-> > > > > > > > > > > > +that may have
-> > > > > > > started
-> > > > > > > > > > > > +	 * before the VQs were marked as broken. Any
-> > > > > > > > > > > > +outstanding
-> > > > > > > requests
-> > > > > > > > > > > > +	 * will be completed by
-> > > > > > > virtblk_complete_request_with_ioerr().
-> > > > > > > > > > > > +	 */
-> > > > > > > > > > > > +	virtio_synchronize_cbs(vblk->vdev);
-> > > > > > > > > > > > +
-> > > > > > > > > > > > +	/*
-> > > > > > > > > > > > +	 * At this point, no new requests can enter the
-> > > > > > > > > > > > +queue_rq()
-> > > > > > > and
-> > > > > > > > > > > > +	 * completion routine will not complete any new
-> > > > > > > > > > > > +requests either for
-> > > > > > > > > > > the
-> > > > > > > > > > > > +	 * broken vq. Hence, it is safe to cancel all
-> > > > > > > > > > > > +requests
-> > > which are
-> > > > > > > > > > > > +	 * started.
-> > > > > > > > > > > > +	 */
-> > > > > > > > > > > > +	blk_mq_tagset_busy_iter(&vblk->tag_set,
-> > > > > > > > > > > > +
-> > > 	virtblk_complete_request_with_ioerr,
-> > > > > > > vblk);
-> > > > > > > > > > > > +
-> > > > > > > > > > > > +blk_mq_tagset_wait_completed_request(&vblk->tag_s
-> > > > > > > > > > > > +et);
-> > > > > > > > > > > > +
-> > > > > > > > > > > > +	/*
-> > > > > > > > > > > > +	 * All pending requests are cleaned up. Time to
-> > > > > > > > > > > > +resume so
-> > > > > > > that disk
-> > > > > > > > > > > > +	 * deletion can be smooth. Start the HW queues
-> > > > > > > > > > > > +so that when queue
-> > > > > > > > > > > is
-> > > > > > > > > > > > +	 * unquiesced requests can again enter the driver=
-.
-> > > > > > > > > > > > +	 */
-> > > > > > > > > > > > +	blk_mq_start_stopped_hw_queues(q, true);
-> > > > > > > > > > > > +
-> > > > > > > > > > > > +	/*
-> > > > > > > > > > > > +	 * Unquiescing will trigger dispatching any
-> > > > > > > > > > > > +pending requests
-> > > > > > > to the
-> > > > > > > > > > > > +	 * driver which has crossed bio_queue_enter() to
-> > > > > > > > > > > > +the
-> > > driver.
-> > > > > > > > > > > > +	 */
-> > > > > > > > > > > > +	blk_mq_unquiesce_queue(q);
-> > > > > > > > > > > > +
-> > > > > > > > > > > > +	/*
-> > > > > > > > > > > > +	 * Wait for all pending dispatches to terminate
-> > > > > > > > > > > > +which may
-> > > > > > > have been
-> > > > > > > > > > > > +	 * initiated after unquiescing.
-> > > > > > > > > > > > +	 */
-> > > > > > > > > > > > +	blk_mq_freeze_queue_wait(q);
-> > > > > > > > > > > > +
-> > > > > > > > > > > > +	/*
-> > > > > > > > > > > > +	 * Mark the disk dead so that once we unfreeze
-> > > > > > > > > > > > +the queue,
-> > > > > > > requests
-> > > > > > > > > > > > +	 * waiting at the door of bio_queue_enter() can
-> > > > > > > > > > > > +be aborted right
-> > > > > > > > > > > away.
-> > > > > > > > > > > > +	 */
-> > > > > > > > > > > > +	blk_mark_disk_dead(vblk->disk);
-> > > > > > > > > > > > +
-> > > > > > > > > > > > +	/* Unfreeze the queue so that any waiting
-> > > > > > > > > > > > +requests will be
-> > > > > > > aborted. */
-> > > > > > > > > > > > +	blk_mq_unfreeze_queue_nomemrestore(q);
-> > > > > > > > > > > > +}
-> > > > > > > > > > > > +
-> > > > > > > > > > > >  static void virtblk_remove(struct virtio_device *v=
-dev)  {
-> > > > > > > > > > > >  	struct virtio_blk *vblk =3D vdev->priv; @@ -1561,=
-6
-> > > > > > > > > > > > +1653,9 @@ static void virtblk_remove(struct
-> > > > > > > > > > > > +virtio_device
-> > > *vdev)
-> > > > > > > > > > > >  	/* Make sure no work handler is accessing the dev=
-ice.
-> > > */
-> > > > > > > > > > > >  	flush_work(&vblk->config_work);
-> > > > > > > > > > > >
-> > > > > > > > > > > > +	if (virtqueue_is_broken(vblk->vqs[0].vq))
-> > > > > > > > > > > > +		virtblk_cleanup_broken_device(vblk);
-> > > > > > > > > > > > +
-> > > > > > > > > > > >  	del_gendisk(vblk->disk);
-> > > > > > > > > > > >  	blk_mq_free_tag_set(&vblk->tag_set);
-> > > > > > > > > > > >
-> > > > > > > > > > > > --
-> > > > > > > > > > > > 2.34.1
-> > > > > > > > > > > >
+> >      https://github.com/jcalvinowens/lkml-debug-616/tree/master
+>
+> These reports also contain both request-based and bio-based disk, I
+> think perhaps following concurrent scenario is possible:
+>
+> While bdev_count_inflight is interating all cpu, some IOs are issued
+> from traversed cpu and then completed from the cpu that is not traversed
+> yet.
+>
+> cpu0
+>                 cpu1
+>                 bdev_count_inflight
+>                  //for_each_possible_cpu
+>                  // cpu0 is 0
+>                  infliht +=3D 0
+> // issue a io
+> blk_account_io_start
+> // cpu0 inflight ++
+>
+>                                 cpu2
+>                                 // the io is done
+>                                 blk_account_io_done
+>                                 // cpu2 inflight --
+>                  // cpu 1 is 0
+>                  inflight +=3D 0
+>                  // cpu2 is -1
+>                  inflight +=3D -1
+>                  ...
+>
+> In this case, the total inflight will be -1.
+>
+> Yi and Calvin,
+>
+> Can you please help testing the following patch, it add a WARN_ON_ONCE()
+> using atomic operations, if the new warning is not reporduced while
+> the old warning is reporduced, I think it can be confirmed the above
+> analyze is correct, and I will send a revert for the WARN_ON_ONCE()
+> change in bdev_count_inflight().
+>
+> Thanks,
+> Kuai
+>
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index b862c66018f2..2b033caa74e8 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -1035,6 +1035,8 @@ unsigned long bdev_start_io_acct(struct
+> block_device *bdev, enum req_op op,
+>          part_stat_local_inc(bdev, in_flight[op_is_write(op)]);
+>          part_stat_unlock();
+>
+> +       atomic_inc(&bdev->inflight[op_is_write(op)]);
+> +
+>          return start_time;
+>   }
+>   EXPORT_SYMBOL(bdev_start_io_acct);
+> @@ -1065,6 +1067,8 @@ void bdev_end_io_acct(struct block_device *bdev,
+> enum req_op op,
+>          part_stat_add(bdev, nsecs[sgrp], jiffies_to_nsecs(duration));
+>          part_stat_local_dec(bdev, in_flight[op_is_write(op)]);
+>          part_stat_unlock();
+> +
+> +       WARN_ON_ONCE(atomic_dec_return(&bdev->inflight[op_is_write(op)])
+> < 0);
+>   }
+>   EXPORT_SYMBOL(bdev_end_io_acct);
+>
+> diff --git a/block/blk-merge.c b/block/blk-merge.c
+> index 70d704615be5..ff15276d277f 100644
+> --- a/block/blk-merge.c
+> +++ b/block/blk-merge.c
+> @@ -658,6 +658,8 @@ static void blk_account_io_merge_request(struct
+> request *req)
+>                  part_stat_local_dec(req->part,
+>                                      in_flight[op_is_write(req_op(req))])=
+;
+>                  part_stat_unlock();
+> +
+> +
+> WARN_ON_ONCE(atomic_dec_return(&req->part->inflight[op_is_write(req_op(re=
+q))])
+> < 0);
+>          }
+>   }
+>
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 4806b867e37d..94e728ff8bb6 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -1056,6 +1056,8 @@ static inline void blk_account_io_done(struct
+> request *req, u64 now)
+>                  part_stat_local_dec(req->part,
+>                                      in_flight[op_is_write(req_op(req))])=
+;
+>                  part_stat_unlock();
+> +
+> +
+> WARN_ON_ONCE(atomic_dec_return(&req->part->inflight[op_is_write(req_op(re=
+q))])
+> < 0);
+>          }
+>   }
+>
+> @@ -1116,6 +1118,8 @@ static inline void blk_account_io_start(struct
+> request *req)
+>          update_io_ticks(req->part, jiffies, false);
+>          part_stat_local_inc(req->part,
+> in_flight[op_is_write(req_op(req))]);
+>          part_stat_unlock();
+> +
+> +       atomic_inc(&req->part->inflight[op_is_write(req_op(req))]);
+>   }
+>
+>   static inline void __blk_mq_end_request_acct(struct request *rq, u64 no=
+w)
+> diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+> index 3d1577f07c1c..a81110c07426 100644
+> --- a/include/linux/blk_types.h
+> +++ b/include/linux/blk_types.h
+> @@ -43,6 +43,7 @@ struct block_device {
+>          sector_t                bd_nr_sectors;
+>          struct gendisk *        bd_disk;
+>          struct request_queue *  bd_queue;
+> +       atomic_t                inflight[2];
+>          struct disk_stats __percpu *bd_stats;
+>          unsigned long           bd_stamp;
+>          atomic_t                __bd_flags;     // partition number + fl=
+ags
+>
+
+
+--=20
+Best Regards,
+  Yi Zhang
 
