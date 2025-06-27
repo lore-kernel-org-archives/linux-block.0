@@ -1,162 +1,131 @@
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42FFE2E719E
-	for <linux-block@vger.kernel.org>; Fri, 27 Jun 2025 14:43:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95B2A29B232
+	for <linux-block@vger.kernel.org>; Fri, 27 Jun 2025 14:56:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751035422; cv=none; b=sTAV6U4B00YMFnScI4DJXROKxGwBxher2NV24CDj0kVhamHPUg8pj6vg5udLNmPCYXSb+npZiFqjgR6heAOmmYfyqiL8vk5STmtU98iZGFWgYz0E2TuMI65GM+wOWX0w/7NOo1VzEzCJqki+261LEz3QDiEpq5QAbovmuq7UhZ0=
+	t=1751036197; cv=none; b=Xt9J8ZB4mOvJ8sPnLYNHP4RgfL83+UeLjNb2nlGSvAxKVyVeQr48vhzPFRoZazd+JiO8lGeupgNVyM6px9eXhx3G14TlNDQHHxsLW0sYi7EC1gDCuPo73QoAX2hslR2fZqWy1evuLE3G449owI8QSFCLIB+LjDukwjmKHfIGO+U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751035422; c=relaxed/simple;
-	bh=x0agrIragENYnRbwrVAK5jTCjlEOUfEYM572KKplvTA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tTqeYa5cY5PXnkW1o0s2xwWv31R1Gd++xJQR9Zy3InJfcX3pGVXuU5xvYpx9S4Kdulw5rUNRMJ5ZtUhikorLvm7xVlpC1Iu+345Q2Iz/TxgIK4t4RMqQtvNNlZe2rqGhjIT2pU3fQfE+fh/IpgYqzuqGoA5S0SUHOwyiPY5IOz8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=XSYy968+; arc=none smtp.client-ip=209.85.208.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
+	s=arc-20240116; t=1751036197; c=relaxed/simple;
+	bh=avzu/cRfB+U0zfnxwviee8buyXHorrc9Dgv/kzca4Dc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Cncc42dWNDUu7EpyUuLoOQDeb+ZvDcFbYU6uF/golFun8gKDBYsL9arcx+Czck83zAjGFQfeZVLQyXaGKXIGefLlSn3l3nD/G6OrEpW0DvVzLIqVMlV/2V5Ic8kqxP9fy6UH8qypw5dd1zy5e7TKEW92vm031wpBBVCQCoTt94U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=nvuA0B3u; arc=none smtp.client-ip=209.85.210.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="XSYy968+"
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-607cc1a2bd8so3656401a12.2
-        for <linux-block@vger.kernel.org>; Fri, 27 Jun 2025 07:43:37 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="nvuA0B3u"
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-748ece799bdso1694746b3a.1
+        for <linux-block@vger.kernel.org>; Fri, 27 Jun 2025 07:56:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1751035416; x=1751640216; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1ZMsAp2kvkJnGU0nt7c/nGvhJjPhsYSyspcKkOMt09c=;
-        b=XSYy968+wQJhjQEQjQwXTwmQTwGkOb54UG9cJlae56QxZmEosNK97o/UhKjLxjIXOX
-         DrbdNr2JUtCx+XiC02kLQIBiNZmlc7Qpr8Qq9Y5hZuDachchii1pI2kJtbpOZLyrGD4C
-         eWDqW7emc1XnwBphW5XaTl3EiwZKq4ZglEc7K5Bi6sXfO8+Oez8I9OEddQvzMoB2v8aP
-         k2lW+OJkZUbqnPKRh7k1WVsx2NpiySWF6Mlmt/veYnJ3WeNvLkyq4AGwPlTC919iA6kX
-         i8eOaPdxTjASkjUfa0UZJJ+9Pr6KPKT1stLhh7wkhaHBdbmotoqpdaXW1DY7Z/9HF6XI
-         ihWQ==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1751036195; x=1751640995; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=7ClQUO/3whpnhDQ2xXD+ZbYMmVy5dR5s+G/B6dkc9Qc=;
+        b=nvuA0B3uOfVqIpnGuuPf+gXhcqTXGOwD/NizHUxNE8CfV7ELt0JXObdfvhmm/1QSjC
+         exvhTIzMhOBZiYRuWYhqLoGUcLX8pHm+NIVaGJTbfMhv11Ynz2LAjy9ddZ/1ZO/ofrKz
+         KaXuerT+PjI4YkwM0QPlcseRLmH5pDXSUVqY5DBCyRh7OforImuP09ko/1xW0A5IEJY8
+         rApvcj9YK4gjYl3Tw2HNIiuaTIAmH5AdX6sYzC7tOa3juDc9jk11GNTbvNup4xjMQiV7
+         OUAyvzM0L8RBOUqcK2bU/wkukNqz9MBUBdsw053nYE5sBeaJGKgNmmBIeE7qiAqS6z4X
+         cp3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751035416; x=1751640216;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1ZMsAp2kvkJnGU0nt7c/nGvhJjPhsYSyspcKkOMt09c=;
-        b=ruhzpNa2jPtiw7st7+3ecUlUvc7Vc5zpTWnVeg/7WMDHoXJJRY9uvEDoLS88mrGG+D
-         p23HSy6hhlp20s+CzMtlLN2R/hYB9Q4lPORTw+5pMx8PCJGq3SWYeaS/zo50W6mRUUAQ
-         FYK+ZOsEjEmYld1AbJQUiTQ+pbLRgIAhMyh0buGeXoZfRlNA9/41o3IMvCdosfWJzv3w
-         w7iRlRvcvwVjOmwMcxjr4ol3Rd9NSkUduT1ynJcL8Mk6xpojDjGSLSddfyjKzcxqn+l5
-         /hrbMv7WtBOfkLPLysDfcehe9hH0N5E5y8xZ7Uh4OPhItdY+By6UOiL3t7STm5BfklS7
-         UjiA==
-X-Forwarded-Encrypted: i=1; AJvYcCUDgn703wH/GxqFc5kjtG2nbtU7L6Z4Da2kVfC/2C9AvmAS9kM4T+6fJmlAjmZKiKqK2Nhmly84NDJZ+g==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyaXqGHqXDJncg0aJWbUzd3fQ20H6c59FmiT3EljCWdrEb84yWi
-	I2vknELBlP0Jj0B3ioTV+t6cIaywXw9lLpw8OTGl4JT/g8p70GF+MW2aWw84zKdqQ5s=
-X-Gm-Gg: ASbGncslyiWbXEmNsIbvwix8obJT3HTnpCUaILrkRKIsp5pq1ikKVqbr1+eCel2gRuM
-	R+nxK6Y8M/ngO8Ad3/HAFITtq/HxbXtSqQt8/m4zywecYyP7HQeUMvt24Mp6ZrpSZ7qDAKIR7kW
-	bi3d6mNI89n/3mlIiccNIY7lU6g1OWEeis8sICwywzcYq14ynWZhfd9JzzpmRb5L8wxnW/lnhvq
-	Ldj6rsVQmb544DhpD1QK2i5Lz0MOXexogGhdHuvbcypZJTu8AcCSdLF5sgONJM6zFGbeRuLrjc7
-	B7ftUaMBiyMmfHnJ53QCTPdFTEZC1pElUzqb6rxiPRBFaugH4e6Arxf+PUxnMpIqlz8=
-X-Google-Smtp-Source: AGHT+IFp/KuOyeE5Ufq0so/blExd6IFaN01P9tvzAEoTf7fWiGBRkJlreJTyEePkQBnFRa5jnm3v6g==
-X-Received: by 2002:a05:6402:50cf:b0:607:2d8a:9b2a with SMTP id 4fb4d7f45d1cf-60c88ed9d2bmr3033453a12.31.1751035416149;
-        Fri, 27 Jun 2025 07:43:36 -0700 (PDT)
-Received: from localhost ([2a02:8071:b783:6940:36f3:9aff:fec2:7e46])
-        by smtp.gmail.com with UTF8SMTPSA id 4fb4d7f45d1cf-60c8290eaefsm1547978a12.34.2025.06.27.07.43.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Jun 2025 07:43:35 -0700 (PDT)
-Date: Fri, 27 Jun 2025 16:43:34 +0200
-From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>
-To: Roland Sommer <r.sommer@gmx.de>
-Cc: "1107479@bugs.debian.org Salvatore Bonaccorso" <carnil@debian.org>, 
-	Chris Hofstaedtler <zeha@debian.org>, linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: Re: Bug#1107479: util-linux: blkid hangs forever after inserting a
- DVD-RAM
-Message-ID: <iry3mdm2bpp2mvteytiiq3umfwfdaoph5oe345yxjx4lujym2f@2p4raxmq2f4i>
-References: <1M9Wyy-1uRqo614XE-00Glyf@mail.gmx.net>
- <gbw7aejkbspiltkswpdtjimuzaujmzhdqpjir2t4rbvft5o777@faodorf33bev>
- <174936596275.4210.3207965727369251912.reportbug@pc14.home.lan>
- <1MmlXK-1v85592aXe-00ciKz@mail.gmx.net>
- <zdclth6piuowqyvx4bn6es5s3zzcwbs6h2hheuswosbn4wty5a@blhozid4bx6q>
- <1MGQnP-1uY1yz0lQr-00EvjN@mail.gmx.net>
- <174936596275.4210.3207965727369251912.reportbug@pc14.home.lan>
- <fxg6dksau4jsk3u5xldlyo2m7qgiux6vtdrz5rywseotsouqdv@urcrwz6qtd3r>
- <whjbzs4o3zjgnvbr2p6wkafrqllgfmyrd63xlanhodhtklrejk@pnuxnfxvlwz5>
- <1N4hzj-1uuA3Z1OEh-00rhJD@mail.gmx.net>
+        d=1e100.net; s=20230601; t=1751036195; x=1751640995;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7ClQUO/3whpnhDQ2xXD+ZbYMmVy5dR5s+G/B6dkc9Qc=;
+        b=uQj+Xq/kj6Q+NWEG19PQlP+hlFJM49jPRd6eLiTyRPSmGbOUR/YUAieCDsyXQ/D8dr
+         u0cSTcCqhiBdtwTfPcerH6y61H+0Rp5ItV0ZDliPNciRGRv5vM4hjq1HbsQEd2h6wv7E
+         zaC4bxL544WEKLQISB+pB7ASDdDpBqqWxIwiPRNrJ6Eu1oza5aA4sAYmRmI9xRNPqIEo
+         xNNPD6HP1Ukpp7vvhqMux8KvkjP2/qfmQ29dVgXvLbjyuspdL+g/RvMY63bWB/Yqdz8N
+         RKZsvZ/jPXlOIpAGPYVAj/4QNMcWv8aygCEcT4+jhowGIkf9OV04zVE1At8+WlgQn6p9
+         jBbQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW+7NygSjj/MaaM7RbIVzY3uuvS6JVDQtwMzGmQa7euWKzyckZdwKmkj6qbLDEOqzsr1BU5zIQgEhY8YA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzyQRLA/acR36AQPeEdW3BjixoOkquIol80+hKbg2dsI2dxp8mt
+	dE+FlTcqx4jZJtFoxIckVZx7Vaj+HXtGDB3HmQB9Jga4uwRkXNwNnjKVXzkDWfnXimw=
+X-Gm-Gg: ASbGncvjgJQqSJaXfGvFvWtbMeHe8fKcKx61inDPERcmm4v1VFEF5rRCIMgbVDE/Irb
+	wcBa90i2YgoygN8TiRROpb0iDWQTESQZ3VZ7/uYKVuKV52pjbf2/M7ufkYPbSyjjIKo2Xo5CqKu
+	+e+Yf/jJyq7mZJuID+QJUMqDpamG3bGqfrHPjl9My5INjYaLzoWbQN2VAKqG/El79ZHpNxiLQB6
+	4ENUcWt0SnARvSrrhZ6EMBbdz7RC4XAzyfLvEQBzLfWtAu3+uXAMyXwH+3b5w2zT+I9veHxnM7X
+	3mzQv6cCpqMhG+CXwMA5WLJ/m+qjl432MPgBuU2uY/ZZNxQz16nfrQOJQw==
+X-Google-Smtp-Source: AGHT+IENYqjOMvnWJfrPfV9o3wXHwLOcA7uYdHN41zZNj32DgqZLSIlL3LVi2mMEJdiUibUomTRfbg==
+X-Received: by 2002:a17:902:ce8d:b0:235:e1d6:f98b with SMTP id d9443c01a7336-23ac40f5e37mr65803145ad.22.1751036194749;
+        Fri, 27 Jun 2025 07:56:34 -0700 (PDT)
+Received: from [172.20.0.228] ([12.48.65.201])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23acb39b9f2sm19417835ad.99.2025.06.27.07.56.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 27 Jun 2025 07:56:34 -0700 (PDT)
+Message-ID: <42d8df98-65c7-4a4f-b931-ea32fe357fbf@kernel.dk>
+Date: Fri, 27 Jun 2025 08:56:32 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="5fwcv5ywwk254lye"
-Content-Disposition: inline
-In-Reply-To: <1N4hzj-1uuA3Z1OEh-00rhJD@mail.gmx.net>
+User-Agent: Mozilla Thunderbird
+Subject: Re: new DMA API conversion for nvme-pci v3
+To: Daniel Gomez <da.gomez@kernel.org>, Christoph Hellwig <hch@lst.de>
+Cc: Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+ Chaitanya Kulkarni <kch@nvidia.com>, Kanchan Joshi <joshi.k@samsung.com>,
+ Leon Romanovsky <leon@kernel.org>, Nitesh Shetty <nj.shetty@samsung.com>,
+ Logan Gunthorpe <logang@deltatee.com>, linux-block@vger.kernel.org,
+ linux-nvme@lists.infradead.org
+References: <20250625113531.522027-1-hch@lst.de>
+ <175086952686.169509.6467735913091492336.b4-ty@kernel.dk>
+ <cddf9f29-c2e1-4b9c-b3b7-c64e3a513bf4@kernel.org>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <cddf9f29-c2e1-4b9c-b3b7-c64e3a513bf4@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
+On 6/27/25 1:37 AM, Daniel Gomez wrote:
+> On 25/06/2025 18.38, Jens Axboe wrote:
+>>
+>> On Wed, 25 Jun 2025 13:34:57 +0200, Christoph Hellwig wrote:
+>>> this series converts the nvme-pci driver to the new IOVA-based DMA API
+>>> for the data path.
+>>>
+>>> Chances since v2:
+>>>  - fix handling of sgl_threshold=0
+>>>
+>>> Chances since v1:
+>>>  - minor cleanups to the block dma mapping helpers
+>>>  - fix the metadata SGL supported check for bisectability
+>>>  - fix SGL threshold check
+>>>  - fix/simplify metadata SGL force checks
+>>>
+>>> [...]
+>>
+>> Applied, thanks!
+>>
+>> [1/8] block: don't merge different kinds of P2P transfers in a single bio
+>>       commit: 226d6099402d8de166af60b2794fc198360d98fb
+>> [2/8] block: add scatterlist-less DMA mapping helpers
+>>       commit: d6c12c69ef4fa33e32ceda4a53991ace01401cd9
+>> [3/8] nvme-pci: refactor nvme_pci_use_sgls
+>>       commit: 07c81cbf438b769e0d673be3b5c021a424a4dc6f
+>> [4/8] nvme-pci: merge the simple PRP and SGL setup into a common helper
+>>       commit: 06cae0e3f61c4c1ef18726b817bbb88c29f81e57
+>> [5/8] nvme-pci: remove superfluous arguments
+>>       commit: 07de960ac7577662c68f1d21bd4907b8dfc790c4
+>> [6/8] nvme-pci: convert the data mapping to blk_rq_dma_map
+>>       commit: 235118de382d6545d3822ead0571a05e017ed8f1
+>> [7/8] nvme-pci: replace NVME_MAX_KB_SZ with NVME_MAX_BYTE
+>>       commit: d1df6bd4c551110e0d1b06ee85c7bca057439d28
+>> [8/8] nvme-pci: rework the build time assert for NVME_MAX_NR_DESCRIPTORS
+>>       commit: 0c34198a16a88878aba455bebe157037c9ab52c5
+>>
+>> Best regards,
+> 
+> Do you still accept new tags/trailers?
 
---5fwcv5ywwk254lye
-Content-Type: text/plain; protected-headers=v1; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: Bug#1107479: util-linux: blkid hangs forever after inserting a
- DVD-RAM
-MIME-Version: 1.0
+Even if they don't always end up in the git tree, please do provide
+them. This thread is linked from there anyway, so it still provides
+value.
 
-Hello Roland,
-
-On Fri, Jun 27, 2025 at 12:32:33PM +0200, Roland Sommer wrote:
-> > The pktcdvd driver is essentially unmaintained and there is a chance
-> > that you don't need it.=20
-> >=20
-> > Can you please try:
-> >=20
-> > 	echo > /etc/modprobe.d/debian-bug1107479.conf blacklist
-> > pktcdvd
-> >=20
-> > reboot and then test again? Please report back if any functionallity
-> > related to the DVD-RAM is missing without that module.
->=20
-> With that blacklist entry everthing works as expected, even blkid.
->=20
-> > My guess is that it's fine and the resolution is to stop building that
-> > module for Debian.
->=20
-> Hmm, it's still loaded
-
-That is surprising. I would have expected that the only effect of that
-blacklist entry is that the module is not loaded. I don't understand how
-that entry makes a difference if it doesn't prevent the module being
-loaded.
-
-You can try
-
-	update-initramfs -u -k all
-
-maybe then the module isn't loaded any more on the next boot.
-
-> and I'd assume DVD-RAM will not be accessible
-> without it:
->=20
-> [  168.063968] pktcdvd: pktcdvd0: writer mapped to sr0
-> [  168.091270] sr0: detected capacity change from 8946816 to 8946812
-
-The sr module might be enough to handle a DVD-RAM.
-=20
-> lsmod | grep pkt
-> pktcdvd                49152  1
-> cdrom                  81920  3 udf,pktcdvd,sr_mod
-> scsi_mod              286720  5 sd_mod,pktcdvd,libata,sg,sr_mod
-> scsi_common            16384  5 scsi_mod,pktcdvd,libata,sg,sr_mod
-
-Puzzled!
-Uwe
-
---5fwcv5ywwk254lye
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmherhMACgkQj4D7WH0S
-/k6thAgAm448WVdaIfzgvQi5K9wrdFZUGLA3eNMBCJJZODVHWtel4uGDx0Z2by0l
-RK0/6uictJTxsRuuAJDowqbIPlqFZpTDSRwxFwq1sHxNSe2Vb7XK+UWFcozOwWVy
-iO36g7bYvNOrI1R8pkKhlo8pegPqmdgVYAybfv6/6IAQfi1KmV/HrD4HnR2BUPXr
-ydDiPGYVsXqIG5sG9OFlR8h7FzYEMtDfxNz23hpc+QslfafjVUL4423T88PoDfLe
-Au8BzH/8lQm22IAVeq56L1BbZ4AUxu54ydGoRPeN9xNgF5FhNgpUlxcH9J5Q4fe5
-Svjjj4QeypFmxxPQqG0pYO59GJ8dDQ==
-=jbAk
------END PGP SIGNATURE-----
-
---5fwcv5ywwk254lye--
+-- 
+Jens Axboe
