@@ -1,147 +1,190 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 032C28BEC;
-	Fri, 27 Jun 2025 03:15:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1149199FD0;
+	Fri, 27 Jun 2025 03:53:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750994139; cv=none; b=s4HsqlwcFT+QpeooNHb4CURQtQW75ixm2kadqAVbK55Q7fQxJtQ4JrlwlJ0U+CejnxrevBKPsFtabsHtVrNACIybyqc6u3yp/pelCPU6qoICAoKgBqwUmbq2zvizKOuIopVweOvDTh0/XkqWvmH+3ZYdbMQ0266+6UlyCpp2+qo=
+	t=1750996407; cv=none; b=AVppFf8q53rE9MNOZdlCzR/E7x2SnX9RHOVcqVF+qa9gE/blSDLRzMsRmrn9J/FFwcPxzqIwKoDzIx92cVvMLC1PmGj33GUssq4Q14yPShROOVf8Bn507BId1Q8YTDMMoLufllqPeNo4xwjhSO7db0nidhBePizC06lT7krT9ec=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750994139; c=relaxed/simple;
-	bh=a0CGExzVudbjEs/7OpmdV+QtDD9QXm5eiAJ65IEE+zE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=t8sqTD0DWh5J2klEWV6PvPVPDFJa4Kz0L8mzlHPJdQYiY/Bx0zoFetEBoifOuukRHePxSV3sV55TYa1XFMCZb48b6qGqJzRdT8CKLHaXBhvPZxsZLHu1C8svJLDqjF4kLFj9QwyR4aRxhkl31aE329cXx0tXwZp47XHlTDLmOys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4bT1062dPSzYQtr2;
-	Fri, 27 Jun 2025 11:15:34 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.252])
-	by mail.maildlp.com (Postfix) with ESMTP id 4348A1A1342;
-	Fri, 27 Jun 2025 11:15:33 +0800 (CST)
-Received: from [10.174.178.72] (unknown [10.174.178.72])
-	by APP3 (Coremail) with SMTP id _Ch0CgB3F8LRDF5oYa0bQg--.13049S3;
-	Fri, 27 Jun 2025 11:15:31 +0800 (CST)
-Message-ID: <ad6d0fd9-1260-4c55-a440-472d6a228536@huaweicloud.com>
-Date: Fri, 27 Jun 2025 11:15:29 +0800
+	s=arc-20240116; t=1750996407; c=relaxed/simple;
+	bh=Gk7kFiL+rrU52+4FUyQNDVBOPxsbEg3rY7ghxnKefLY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=k+7nDTUVTDQqD379Tvrh6E73kVS3bO8BQRdeOH+697w059UttyUyiPJz+AJu61LM5fO32JLe7D41MUojPgoXb4yRcD/I6LGF7HasRlqf9t6INzto3bG3ax1aRxztl5C4Z8EoRgiPymsB5UBNCoczVgZiqd7e3BB1GMB4C7blwSM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gg88jAFv; arc=none smtp.client-ip=209.85.210.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gg88jAFv"
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-7390d21bb1cso1588094b3a.2;
+        Thu, 26 Jun 2025 20:53:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750996405; x=1751601205; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=K87WAvZZg6aBFOTATYCqslzfrGhe3K40+/UhVUBzSYs=;
+        b=gg88jAFv9goRjpnWPAwym77hSQ+xzSnrMu/b9F9vEcT1c0OK0e3rIxFYvI/Yj9StaK
+         9S0oUH/Vef031ZdED0lO9zMtb4uYKEqierit2MABZ+WMX2JdbewjcuJaaKnjxnpwkppf
+         Y8er6Ay1g5JU7F5QqV9E7wV7q+b34mjPIJtA/nO340Vib8vxeb39SFPR2MkvUd7wZNO7
+         VENkFrPakrxGdbYBnicPEpMydCIiKU4j9uHSxDRfryX4PIMOp93YQMrKyu5Gu7Zw6/O9
+         ry52PbwF9zRfPHT4xXjrlVQqhl8ud43M9ySB1KEDxmfE6a7JHID0MIgtCr1JqeQva6un
+         bsBQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750996405; x=1751601205;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=K87WAvZZg6aBFOTATYCqslzfrGhe3K40+/UhVUBzSYs=;
+        b=dtzfn4rF6ca2NCZtMoEr3FtwiRl9X9tfzSDLpaBZzSa6D/gRTR6SvIyBLKUf11kozr
+         +x0TrgyozfawnvwLGWqgkUf6bkY7ix4R3sTJA7e2l+FHAqJfV9Ilv98vo8mP1+7XTk+J
+         vaMl57meN2q07tTjWcKM1a3JN4f202nEMVIES9qBjOOa1T2jfiSbVEnhp/bznU0IaTf4
+         nGmJQ8egSmVUxLkGm1AOp0EwrTUIiIJTGtM0dSb4vmekSOX8Oqoja8T3PHHwCi0pRQLR
+         5KH5fI3m63keqGkqEl8QN2twMXmPqjM0qLf5UMBUZ88hZI9g7lJygtpUa8r2PRYWhwWu
+         WuJg==
+X-Forwarded-Encrypted: i=1; AJvYcCVM2NLepRqd7C2T1hNEC1vPkeSaW/ECvI6m0UK2bEJ36hgq7iSClMABE0l8cNxUGi/gAIGecVs0+D59tic=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyK/WYXTNFB1Qb50Scrs9uNI3iGHVAmXehJ4AORktK2DGLr2llT
+	v6HiUz+H+DjLKBdT6NYW6QBbjsEszmAQ1zBE0dCPhu/SlRh4APT1vEdB
+X-Gm-Gg: ASbGnctXkmLiWeESA3SpKJrUcmeVrbeTK2FxR++dg5Zw1r9GKJVq0Rlx0bgSEihGQO3
+	SmOpPLHi+GUKxXzXV18uaclCysXdHR8+lfd1bMQ7OIGXhfWdP9Bi0gXl1ALr+Beb/pdDJ4wvorE
+	9jjUDpztq4YkPiMzgD+KeeWrSqHjgwXhbVTHkt6Ww5tgnISKhB57BdO3VbgxJvmTQARJ5lwc9o4
+	Jtt3BxE8FKcFQUgW0rBwqkqEArIkjh5XjXGyFt2muVhKVSdJTB4y2c9TgR3T1lZsws0mZhVe3UT
+	D2+U/xxKG424iMNur1oZENl5CoWCvLjxLKqfvZH6dt0UKWjPHgSfyDmMwOxKGMbmG1nYBzdIAyh
+	6
+X-Google-Smtp-Source: AGHT+IF7R5hjRTDRDCQN9AaGEHThNKiPKHDQS9ya7XZS3RcjsRj8yG10vQFi6xfY9LoKiuNBh6EX2w==
+X-Received: by 2002:aa7:88c9:0:b0:736:33fd:f57d with SMTP id d2e1a72fcca58-74af6f7e449mr2262434b3a.17.1750996404849;
+        Thu, 26 Jun 2025 20:53:24 -0700 (PDT)
+Received: from rahul-mintos.ban-spse ([165.204.156.251])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74af557b3bcsm1110713b3a.101.2025.06.26.20.53.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 26 Jun 2025 20:53:24 -0700 (PDT)
+From: Rahul Kumar <rk0006818@gmail.com>
+To: minchan@kernel.org,
+	senozhatsky@chromium.org,
+	axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-kernel-mentees@lists.linux.dev,
+	skhan@linuxfoundation.org,
+	rk0006818@gmail.com
+Subject: [PATCH] block: zram: replace scnprintf() with sysfs_emit() in *_show() functions
+Date: Fri, 27 Jun 2025 09:22:56 +0530
+Message-ID: <20250627035256.1120740-1-rk0006818@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] nbd: fix uaf in nbd_genl_connect() error path
-To: Zheng Qixing <zhengqixing@huaweicloud.com>, josef@toxicpanda.com,
- axboe@kernel.dk, xiubli@redhat.com, prasanna.kalever@redhat.com,
- ming.lei@redhat.com
-Cc: linux-block@vger.kernel.org, nbd@other.debian.org,
- linux-kernel@vger.kernel.org, yukuai3@huawei.com, yi.zhang@huawei.com,
- yangerkun@huawei.com, zhengqixing@huawei.com
-References: <20250612132405.364904-1-zhengqixing@huaweicloud.com>
-From: Zheng Qixing <zhengqixing@huaweicloud.com>
-In-Reply-To: <20250612132405.364904-1-zhengqixing@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_Ch0CgB3F8LRDF5oYa0bQg--.13049S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxCw43XF4rXw43urWUCrW3KFg_yoW5uFyxpF
-	sxGFZ7CrW8ua40gaykCw1UuF15t3W7Xry3KryxJw15ZF9xAr4j9F9Y9a45XF4UKry8uFy7
-	AFnFqrWxK3WUKrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvE14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
-	0xkIwI1lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7
-	v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF
-	1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIx
-	AIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI
-	42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWI
-	evJa73UjIFyTuYvjfUonmRUUUUU
-X-CM-SenderInfo: x2kh0wptl0x03j6k3tpzhluzxrxghudrp/
 
-Gentle ping.
+Replace scnprintf() with sysfs_emit() or sysfs_emit_at() in sysfs
+*_show() functions in zram_drv.c to follow the kernel's guidelines
+from Documentation/filesystems/sysfs.rst.
 
+This improves consistency, safety, and makes the code easier to
+maintain and update in the future.
 
-Thanks,
+Signed-off-by: Rahul Kumar <rk0006818@gmail.com>
+---
+ drivers/block/zram/zram_drv.c | 22 +++++++++++-----------
+ 1 file changed, 11 insertions(+), 11 deletions(-)
 
-Qixing
-
-
-在 2025/6/12 21:24, Zheng Qixing 写道:
-> From: Zheng Qixing <zhengqixing@huawei.com>
->
-> There is a use-after-free issue in nbd:
->
-> block nbd6: Receive control failed (result -104)
-> block nbd6: shutting down sockets
-> ==================================================================
-> BUG: KASAN: slab-use-after-free in recv_work+0x694/0xa80 drivers/block/nbd.c:1022
-> Write of size 4 at addr ffff8880295de478 by task kworker/u33:0/67
->
-> CPU: 2 UID: 0 PID: 67 Comm: kworker/u33:0 Not tainted 6.15.0-rc5-syzkaller-00123-g2c89c1b655c0 #0 PREEMPT(full)
-> Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-> Workqueue: nbd6-recv recv_work
-> Call Trace:
->   <TASK>
->   __dump_stack lib/dump_stack.c:94 [inline]
->   dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:120
->   print_address_description mm/kasan/report.c:408 [inline]
->   print_report+0xc3/0x670 mm/kasan/report.c:521
->   kasan_report+0xe0/0x110 mm/kasan/report.c:634
->   check_region_inline mm/kasan/generic.c:183 [inline]
->   kasan_check_range+0xef/0x1a0 mm/kasan/generic.c:189
->   instrument_atomic_read_write include/linux/instrumented.h:96 [inline]
->   atomic_dec include/linux/atomic/atomic-instrumented.h:592 [inline]
->   recv_work+0x694/0xa80 drivers/block/nbd.c:1022
->   process_one_work+0x9cc/0x1b70 kernel/workqueue.c:3238
->   process_scheduled_works kernel/workqueue.c:3319 [inline]
->   worker_thread+0x6c8/0xf10 kernel/workqueue.c:3400
->   kthread+0x3c2/0x780 kernel/kthread.c:464
->   ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:153
->   ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
->   </TASK>
->
-> nbd_genl_connect() does not properly stop the device on certain
-> error paths after nbd_start_device() has been called. This causes
-> the error path to put nbd->config while recv_work continue to use
-> the config after putting it, leading to use-after-free in recv_work.
->
-> This patch moves nbd_start_device() after the backend file creation.
->
-> Reported-by: syzbot+48240bab47e705c53126@syzkaller.appspotmail.com
-> Closes: https://lore.kernel.org/all/68227a04.050a0220.f2294.00b5.GAE@google.com/T/
-> Fixes: 6497ef8df568 ("nbd: provide a way for userspace processes to identify device backends")
-> Signed-off-by: Zheng Qixing <zhengqixing@huawei.com>
-> ---
->   drivers/block/nbd.c | 6 +++---
->   1 file changed, 3 insertions(+), 3 deletions(-)
->
-> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-> index 7bdc7eb808ea..2592bd19ebc1 100644
-> --- a/drivers/block/nbd.c
-> +++ b/drivers/block/nbd.c
-> @@ -2198,9 +2198,7 @@ static int nbd_genl_connect(struct sk_buff *skb, struct genl_info *info)
->   				goto out;
->   		}
->   	}
-> -	ret = nbd_start_device(nbd);
-> -	if (ret)
-> -		goto out;
-> +
->   	if (info->attrs[NBD_ATTR_BACKEND_IDENTIFIER]) {
->   		nbd->backend = nla_strdup(info->attrs[NBD_ATTR_BACKEND_IDENTIFIER],
->   					  GFP_KERNEL);
-> @@ -2216,6 +2214,8 @@ static int nbd_genl_connect(struct sk_buff *skb, struct genl_info *info)
->   		goto out;
->   	}
->   	set_bit(NBD_RT_HAS_BACKEND_FILE, &config->runtime_flags);
-> +
-> +	ret = nbd_start_device(nbd);
->   out:
->   	mutex_unlock(&nbd->config_lock);
->   	if (!ret) {
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index fda7d8624889..a1f2f45d4b99 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -373,7 +373,7 @@ static ssize_t initstate_show(struct device *dev,
+ 	val = init_done(zram);
+ 	up_read(&zram->init_lock);
+ 
+-	return scnprintf(buf, PAGE_SIZE, "%u\n", val);
++	return sysfs_emit(buf, "%u\n", val);
+ }
+ 
+ static ssize_t disksize_show(struct device *dev,
+@@ -381,7 +381,7 @@ static ssize_t disksize_show(struct device *dev,
+ {
+ 	struct zram *zram = dev_to_zram(dev);
+ 
+-	return scnprintf(buf, PAGE_SIZE, "%llu\n", zram->disksize);
++	return sysfs_emit(buf, "%llu\n", zram->disksize);
+ }
+ 
+ static ssize_t mem_limit_store(struct device *dev,
+@@ -532,7 +532,7 @@ static ssize_t writeback_limit_enable_show(struct device *dev,
+ 	spin_unlock(&zram->wb_limit_lock);
+ 	up_read(&zram->init_lock);
+ 
+-	return scnprintf(buf, PAGE_SIZE, "%d\n", val);
++	return sysfs_emit(buf, "%d\n", val);
+ }
+ 
+ static ssize_t writeback_limit_store(struct device *dev,
+@@ -567,7 +567,7 @@ static ssize_t writeback_limit_show(struct device *dev,
+ 	spin_unlock(&zram->wb_limit_lock);
+ 	up_read(&zram->init_lock);
+ 
+-	return scnprintf(buf, PAGE_SIZE, "%llu\n", val);
++	return sysfs_emit(buf, "%llu\n", val);
+ }
+ 
+ static void reset_bdev(struct zram *zram)
+@@ -1292,7 +1292,7 @@ static ssize_t recomp_algorithm_show(struct device *dev,
+ 		if (!zram->comp_algs[prio])
+ 			continue;
+ 
+-		sz += scnprintf(buf + sz, PAGE_SIZE - sz - 2, "#%d: ", prio);
++		sz += sysfs_emit_at(buf, sz, "#%d: ", prio);
+ 		sz += __comp_algorithm_show(zram, prio, buf + sz);
+ 	}
+ 
+@@ -1365,7 +1365,7 @@ static ssize_t io_stat_show(struct device *dev,
+ 	ssize_t ret;
+ 
+ 	down_read(&zram->init_lock);
+-	ret = scnprintf(buf, PAGE_SIZE,
++	ret = sysfs_emit(buf,
+ 			"%8llu %8llu 0 %8llu\n",
+ 			(u64)atomic64_read(&zram->stats.failed_reads),
+ 			(u64)atomic64_read(&zram->stats.failed_writes),
+@@ -1395,7 +1395,7 @@ static ssize_t mm_stat_show(struct device *dev,
+ 	orig_size = atomic64_read(&zram->stats.pages_stored);
+ 	max_used = atomic_long_read(&zram->stats.max_used_pages);
+ 
+-	ret = scnprintf(buf, PAGE_SIZE,
++	ret = sysfs_emit(buf,
+ 			"%8llu %8llu %8llu %8lu %8ld %8llu %8lu %8llu %8llu\n",
+ 			orig_size << PAGE_SHIFT,
+ 			(u64)atomic64_read(&zram->stats.compr_data_size),
+@@ -1420,8 +1420,8 @@ static ssize_t bd_stat_show(struct device *dev,
+ 	ssize_t ret;
+ 
+ 	down_read(&zram->init_lock);
+-	ret = scnprintf(buf, PAGE_SIZE,
+-		"%8llu %8llu %8llu\n",
++	ret = sysfs_emit(buf,
++			"%8llu %8llu %8llu\n",
+ 			FOUR_K((u64)atomic64_read(&zram->stats.bd_count)),
+ 			FOUR_K((u64)atomic64_read(&zram->stats.bd_reads)),
+ 			FOUR_K((u64)atomic64_read(&zram->stats.bd_writes)));
+@@ -1439,7 +1439,7 @@ static ssize_t debug_stat_show(struct device *dev,
+ 	ssize_t ret;
+ 
+ 	down_read(&zram->init_lock);
+-	ret = scnprintf(buf, PAGE_SIZE,
++	ret = sysfs_emit(buf,
+ 			"version: %d\n0 %8llu\n",
+ 			version,
+ 			(u64)atomic64_read(&zram->stats.miss_free));
+@@ -2682,7 +2682,7 @@ static ssize_t hot_add_show(const struct class *class,
+ 
+ 	if (ret < 0)
+ 		return ret;
+-	return scnprintf(buf, PAGE_SIZE, "%d\n", ret);
++	return sysfs_emit(buf, "%d\n", ret);
+ }
+ /* This attribute must be set to 0400, so CLASS_ATTR_RO() can not be used */
+ static struct class_attribute class_attr_hot_add =
+-- 
+2.43.0
 
