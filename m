@@ -1,63 +1,141 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4538D2EA724
-	for <linux-block@vger.kernel.org>; Fri, 27 Jun 2025 16:28:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF8FE213245
+	for <linux-block@vger.kernel.org>; Fri, 27 Jun 2025 16:34:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751041735; cv=none; b=EiwgN6cMXvA7eyN8gWuEPLryvAIrNuQH/ZR52m+UVOpxQTSuoN9G7MLhe6Qo3/Xa7Ef24zwAnSzBkQ9jKH+9HaVsJrtUtFp8sSUqFFQ3jhMiPZLftc3dZ6qrRGhzD5TR94VR6AVfBHFiHlOD1UP1ZoZDfwlNJGbZl+J0lHZn7zU=
+	t=1751042097; cv=none; b=ue5Hp2HuYfNorvcilVOu+JauM5Osoi6V0KLDzFjM4t28neF0DdZ1+pURaMztAhRhzJo8mAB44JLYAVyxaH7TUIsQwCKU0PszWSfTiEmoThuCI4oqi2CQiC8jZYLfIzUW4PmRN0PRci16Lwn7MnXFVmlCZiXaC1TP9AtRsdbkYvk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751041735; c=relaxed/simple;
-	bh=R5+EcAQlyoKsJlkNfgBDUQDLRM4ujNvxpvp8/GT+GDI=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=e9tu0CIi7stt3ViD31m0kXDcz5AkmRIXrCPsDQLy5aeOYpJOi/zlfwrVIt050F/T2SJ0jQtstcNtmFCPxJprrxjvEY91jtYos16xYA2w+N+6+9KvCTjuInEHrszRcoov0q1dJkbT+fJpI/+U3KLvBrwXpx7QQvszPTlAKhF1bgs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RXS2seDH; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1751042097; c=relaxed/simple;
+	bh=rHkOemDdCFfylqTQV5hBs6gNxOJZzjk85RHJW/FVCoI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fJBshLr8lqrioGQKc6169M7AjUyh3Sr0BCsfeEZWwiz5qdCpZ5OxkrZEE0sua+AzJRoErynOXniab4HiIMB4+qKFyHezeLY8lUaWnkg1oyKD4v+T3oOxzbHH0nbVHxSyp6JsajJfI3ASZTkWItBcDsE/6BB2sANDWRgPX5J+rBc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LvptpFvR; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RXS2seDH"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28371C4CEED;
-	Fri, 27 Jun 2025 16:28:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751041735;
-	bh=R5+EcAQlyoKsJlkNfgBDUQDLRM4ujNvxpvp8/GT+GDI=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=RXS2seDH3Xe/K2KLrp1dp2ZN0kpQQE7xvin6QG2t0SyGiiFwrFWzWXV3qmO6dLKJR
-	 cgLb+8fmz7kKWCWzv9EXMTTwYRDGkBh8mw7ovZ/1KFA96ia2TlWOwp6AKhpCoCgz5D
-	 pJzQWffBdNm1zkNewPNcpuLXrG1F9MTam54ITTwmBkzbtzKHYYQXFvzojvJuClKKFj
-	 2bjJKUBCU74HEsW9Tm+FftFmhLYSs4Z/UeKuhTwYdv6Y9QnOVFeBjNUpIrBuIndW4t
-	 slSIoZM5cjlIDTckeHKFvD00rQTak82KbvCkMUCPa6tNUgjT1JGyZCLZdcLHxS7BOj
-	 QPW+vpa0qjB3g==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70D32380DBEE;
-	Fri, 27 Jun 2025 16:29:22 +0000 (UTC)
-Subject: Re: [GIT PULL] Block fixes for 6.16-rc4
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <63eaea99-fa38-4aef-8254-934ec0504067@kernel.dk>
-References: <63eaea99-fa38-4aef-8254-934ec0504067@kernel.dk>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <63eaea99-fa38-4aef-8254-934ec0504067@kernel.dk>
-X-PR-Tracked-Remote: git://git.kernel.dk/linux.git tags/block-6.16-20250626
-X-PR-Tracked-Commit-Id: c007062188d8e402c294117db53a24b2bed2b83f
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: e540341508ce2f6e27810106253d5de194b66750
-Message-Id: <175104176106.1986529.18349578049673949363.pr-tracker-bot@kernel.org>
-Date: Fri, 27 Jun 2025 16:29:21 +0000
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LvptpFvR"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1751042094;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=spbMVZZxbYkDM6CEf0Wf+Dn5JHCUiY4z7C7IPr5gz2s=;
+	b=LvptpFvRECU8TOmQgVGt8faEetL8tACGWsyyreIuJXFxi53YGc3Mov3FECjptbiGZ9sIFh
+	jdLaIvf3IPBWR5Z4FMfdokT7Hm8Df6RM2dk7YAywZf7FwhGyTuHZP9aWNlzrr00qe31yIU
+	6eTL67083hXJr5z1EfxCU0laMhEhwxs=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-103-e1K8rw1jNh2htVdesIEhCA-1; Fri,
+ 27 Jun 2025 12:34:49 -0400
+X-MC-Unique: e1K8rw1jNh2htVdesIEhCA-1
+X-Mimecast-MFC-AGG-ID: e1K8rw1jNh2htVdesIEhCA_1751042087
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8740C19560AD;
+	Fri, 27 Jun 2025 16:34:47 +0000 (UTC)
+Received: from bfoster (unknown [10.22.64.142])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AE817180045C;
+	Fri, 27 Jun 2025 16:34:45 +0000 (UTC)
+Date: Fri, 27 Jun 2025 12:38:22 -0400
+From: Brian Foster <bfoster@redhat.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Christian Brauner <brauner@kernel.org>,
+	"Darrick J. Wong" <djwong@kernel.org>,
+	Joanne Koong <joannelkoong@gmail.com>, linux-xfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-block@vger.kernel.org, gfs2@lists.linux.dev
+Subject: Re: [PATCH 07/12] iomap: rename iomap_writepage_map to
+ iomap_writeback_folio
+Message-ID: <aF7I_hTYx8yr0lRa@bfoster>
+References: <20250627070328.975394-1-hch@lst.de>
+ <20250627070328.975394-8-hch@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250627070328.975394-8-hch@lst.de>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-The pull request you sent on Fri, 27 Jun 2025 08:25:32 -0600:
+On Fri, Jun 27, 2025 at 09:02:40AM +0200, Christoph Hellwig wrote:
+> ->writepage is gone, and our naming wasn't always that great to start
+> with.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
 
-> git://git.kernel.dk/linux.git tags/block-6.16-20250626
+Reviewed-by: Brian Foster <bfoster@redhat.com>
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/e540341508ce2f6e27810106253d5de194b66750
+>  fs/iomap/buffered-io.c | 10 +++++-----
+>  fs/iomap/trace.h       |  2 +-
+>  2 files changed, 6 insertions(+), 6 deletions(-)
+> 
+> diff --git a/fs/iomap/buffered-io.c b/fs/iomap/buffered-io.c
+> index 3e0ce6f42df5..c28eb6a6eee4 100644
+> --- a/fs/iomap/buffered-io.c
+> +++ b/fs/iomap/buffered-io.c
+> @@ -1586,7 +1586,7 @@ static int iomap_writeback_range(struct iomap_writeback_ctx *wpc,
+>   * If the folio is entirely beyond i_size, return false.  If it straddles
+>   * i_size, adjust end_pos and zero all data beyond i_size.
+>   */
+> -static bool iomap_writepage_handle_eof(struct folio *folio, struct inode *inode,
+> +static bool iomap_writeback_handle_eof(struct folio *folio, struct inode *inode,
+>  		u64 *end_pos)
+>  {
+>  	u64 isize = i_size_read(inode);
+> @@ -1638,7 +1638,7 @@ static bool iomap_writepage_handle_eof(struct folio *folio, struct inode *inode,
+>  	return true;
+>  }
+>  
+> -static int iomap_writepage_map(struct iomap_writeback_ctx *wpc,
+> +static int iomap_writeback_folio(struct iomap_writeback_ctx *wpc,
+>  		struct folio *folio)
+>  {
+>  	struct iomap_folio_state *ifs = folio->private;
+> @@ -1654,9 +1654,9 @@ static int iomap_writepage_map(struct iomap_writeback_ctx *wpc,
+>  	WARN_ON_ONCE(folio_test_dirty(folio));
+>  	WARN_ON_ONCE(folio_test_writeback(folio));
+>  
+> -	trace_iomap_writepage(inode, pos, folio_size(folio));
+> +	trace_iomap_writeback_folio(inode, pos, folio_size(folio));
+>  
+> -	if (!iomap_writepage_handle_eof(folio, inode, &end_pos)) {
+> +	if (!iomap_writeback_handle_eof(folio, inode, &end_pos)) {
+>  		folio_unlock(folio);
+>  		return 0;
+>  	}
+> @@ -1741,7 +1741,7 @@ iomap_writepages(struct iomap_writeback_ctx *wpc)
+>  		return -EIO;
+>  
+>  	while ((folio = writeback_iter(mapping, wpc->wbc, folio, &error)))
+> -		error = iomap_writepage_map(wpc, folio);
+> +		error = iomap_writeback_folio(wpc, folio);
+>  
+>  	/*
+>  	 * If @error is non-zero, it means that we have a situation where some
+> diff --git a/fs/iomap/trace.h b/fs/iomap/trace.h
+> index aaea02c9560a..6ad66e6ba653 100644
+> --- a/fs/iomap/trace.h
+> +++ b/fs/iomap/trace.h
+> @@ -79,7 +79,7 @@ DECLARE_EVENT_CLASS(iomap_range_class,
+>  DEFINE_EVENT(iomap_range_class, name,	\
+>  	TP_PROTO(struct inode *inode, loff_t off, u64 len),\
+>  	TP_ARGS(inode, off, len))
+> -DEFINE_RANGE_EVENT(iomap_writepage);
+> +DEFINE_RANGE_EVENT(iomap_writeback_folio);
+>  DEFINE_RANGE_EVENT(iomap_release_folio);
+>  DEFINE_RANGE_EVENT(iomap_invalidate_folio);
+>  DEFINE_RANGE_EVENT(iomap_dio_invalidate_fail);
+> -- 
+> 2.47.2
+> 
+> 
 
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
