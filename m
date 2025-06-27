@@ -1,152 +1,162 @@
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2EFB2E266E
-	for <linux-block@vger.kernel.org>; Fri, 27 Jun 2025 14:25:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42FFE2E719E
+	for <linux-block@vger.kernel.org>; Fri, 27 Jun 2025 14:43:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751034339; cv=none; b=djwr4mNP84B1EUUA7GfVe9HMp86NLxfB+RnniQJuxBbGITI4eYsoOGmm/rejTaMojmF8gAWnk+8maftrJdBs7Brniyu+nk0RC6XwQ4HNl9Tn8UukLBqOxD5vM/E33QzzeCN8dHhaQgyrbkcsUwjMIukz2FDNAU0ub4Y2XsOWfYM=
+	t=1751035422; cv=none; b=sTAV6U4B00YMFnScI4DJXROKxGwBxher2NV24CDj0kVhamHPUg8pj6vg5udLNmPCYXSb+npZiFqjgR6heAOmmYfyqiL8vk5STmtU98iZGFWgYz0E2TuMI65GM+wOWX0w/7NOo1VzEzCJqki+261LEz3QDiEpq5QAbovmuq7UhZ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751034339; c=relaxed/simple;
-	bh=RGhUT7bDXhDas356sizXw+qOMGeZAQh2f9FaHHGncmY=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=XdfPGm47ZGaEFR4J/HXw9tkr1GDYi71og+6QxUDtJyCuKae7dnxVANt28nYfPjDqFdz2CsrcdLfNBVk05g6N4WcIuT6GtQ26GlVQ8QjbVZOq0NmIxCVz3tDi/X06NwJvWiTf7VmOdAOZiZAMp634DPSFaNIcovdCSfB6GkO38Lc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=iPZAUTEJ; arc=none smtp.client-ip=209.85.210.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1751035422; c=relaxed/simple;
+	bh=x0agrIragENYnRbwrVAK5jTCjlEOUfEYM572KKplvTA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tTqeYa5cY5PXnkW1o0s2xwWv31R1Gd++xJQR9Zy3InJfcX3pGVXuU5xvYpx9S4Kdulw5rUNRMJ5ZtUhikorLvm7xVlpC1Iu+345Q2Iz/TxgIK4t4RMqQtvNNlZe2rqGhjIT2pU3fQfE+fh/IpgYqzuqGoA5S0SUHOwyiPY5IOz8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=XSYy968+; arc=none smtp.client-ip=209.85.208.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="iPZAUTEJ"
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-74801bc6dc5so2068021b3a.1
-        for <linux-block@vger.kernel.org>; Fri, 27 Jun 2025 07:25:34 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="XSYy968+"
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-607cc1a2bd8so3656401a12.2
+        for <linux-block@vger.kernel.org>; Fri, 27 Jun 2025 07:43:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1751034334; x=1751639134; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-language:cc:to:subject:from
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eyJj9qrK/OQrgQwB+r94MAcUkW6fA988OlwYIGZtZCA=;
-        b=iPZAUTEJCF1CxiLD89W38R+IWy77jKdPyKMDZa6SfGm5TcZR6uaFAcVw0uTHYYD6iy
-         jCItW5yozV3wlV9K9asbKdLBXNAl4/RHHZgf6fW0ePQfS9npEK0Ps5qFCVfoBBUoCmrq
-         JbaViGO6KV/nh+pSuDE/V6TkdTVdhmTsRfTX2fL72eih5SeLudUUenEg0iT6GPOjQ96/
-         cEDreTyU2DllpHf5X5LcdwNt17Yg/ziQmPqVlki5urTx7SqXuyub4eDgDGpSxYT3Oc1Q
-         fg5zDOgeEzE67ZTNmCpiIWu/BwxPy6BImMQHWmQrJDLVznLr31v4F2ZHTFKcrunLNUf5
-         r6EA==
+        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1751035416; x=1751640216; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=1ZMsAp2kvkJnGU0nt7c/nGvhJjPhsYSyspcKkOMt09c=;
+        b=XSYy968+wQJhjQEQjQwXTwmQTwGkOb54UG9cJlae56QxZmEosNK97o/UhKjLxjIXOX
+         DrbdNr2JUtCx+XiC02kLQIBiNZmlc7Qpr8Qq9Y5hZuDachchii1pI2kJtbpOZLyrGD4C
+         eWDqW7emc1XnwBphW5XaTl3EiwZKq4ZglEc7K5Bi6sXfO8+Oez8I9OEddQvzMoB2v8aP
+         k2lW+OJkZUbqnPKRh7k1WVsx2NpiySWF6Mlmt/veYnJ3WeNvLkyq4AGwPlTC919iA6kX
+         i8eOaPdxTjASkjUfa0UZJJ+9Pr6KPKT1stLhh7wkhaHBdbmotoqpdaXW1DY7Z/9HF6XI
+         ihWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751034334; x=1751639134;
-        h=content-transfer-encoding:content-language:cc:to:subject:from
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=eyJj9qrK/OQrgQwB+r94MAcUkW6fA988OlwYIGZtZCA=;
-        b=G9lZZjL/vSQEyezIoCDTUWM5zm/XYCK/aS7qenGd6XrMpmFcmbZ8NAu2zKioVgsyfj
-         OAgJTrIXIjkvmlgzlJd7QIv9ufGIm/A+fxbl4fkLJf2lDVRMzeJrJciifuW7FksywAax
-         Mu0HYF8obOKmZxf3zoDUN6DsANq4dTUKZnfeaRIGO/7+OEtHLF8ExYOrFulDjBzXrFYE
-         iPeeYH8XnVXRaMs1ZXJYSvHc1ZEUGDFGnB23gMBqd8tHsi46ggeUnKHUUUx0DEah9Ve6
-         qK5nWV2xlhgaOjG1TXKrya2mFE6mtEzp1pmc3nfKZ6cUGHYxnZr3NRlBA0KJioiRPimn
-         vycw==
-X-Gm-Message-State: AOJu0Yz5JgBOvGOO4Hjh7e1WJDoWgv64nSO6XH79UAqU6Cs1jJ8dBc2g
-	e7rJ4H31iXfwZxdB5MjYwxj8g0QwhTW668eTF7YROrCU3pDseIuy7EjyRRI+7stYM2kTcg9QxIG
-	vKmIC
-X-Gm-Gg: ASbGnctJ0ofhdS1ULDwAE5KqXQF6pWHdUYmU19ZyIcNufm3jRzdl57j5yXvP6I7TzE/
-	oxDASILOELVZ766guwe6AZLaibBAaL5beKmbgSHy9ZGTp/HQa6J1vGIXuYhrrEfWHSdTBp3C5wX
-	bX6eRcL8GJof09NSDQQctehXHcMU8ROazrzlgArShDXo8cG5RxfrOQVQcOfRctPCXNdX89+evpp
-	yMVtH0JRowyy7rLq8eWrlTHpSKKUnWVTkmthmUAa87ntsE7foy1ErRK4qwYX7z0bz9syifvMgsP
-	bTnpmit3kzRVDJx2yTLIPCgRsDfCWMdM0pN10L8S2cUKtHw3NxtBv45oQg==
-X-Google-Smtp-Source: AGHT+IFmZFfKdTFjEEjnB65+1L91IowJw+MB9b4DoEK2jyJbysGKV++GieLQW8YdtVKDX2sR2qUfYw==
-X-Received: by 2002:a05:6a00:9195:b0:736:4c3d:2cba with SMTP id d2e1a72fcca58-74ae40c2799mr9642518b3a.9.1751034333767;
-        Fri, 27 Jun 2025 07:25:33 -0700 (PDT)
-Received: from [172.20.0.228] ([12.48.65.201])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74af5409a41sm2293256b3a.29.2025.06.27.07.25.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 27 Jun 2025 07:25:33 -0700 (PDT)
-Message-ID: <63eaea99-fa38-4aef-8254-934ec0504067@kernel.dk>
-Date: Fri, 27 Jun 2025 08:25:32 -0600
+        d=1e100.net; s=20230601; t=1751035416; x=1751640216;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1ZMsAp2kvkJnGU0nt7c/nGvhJjPhsYSyspcKkOMt09c=;
+        b=ruhzpNa2jPtiw7st7+3ecUlUvc7Vc5zpTWnVeg/7WMDHoXJJRY9uvEDoLS88mrGG+D
+         p23HSy6hhlp20s+CzMtlLN2R/hYB9Q4lPORTw+5pMx8PCJGq3SWYeaS/zo50W6mRUUAQ
+         FYK+ZOsEjEmYld1AbJQUiTQ+pbLRgIAhMyh0buGeXoZfRlNA9/41o3IMvCdosfWJzv3w
+         w7iRlRvcvwVjOmwMcxjr4ol3Rd9NSkUduT1ynJcL8Mk6xpojDjGSLSddfyjKzcxqn+l5
+         /hrbMv7WtBOfkLPLysDfcehe9hH0N5E5y8xZ7Uh4OPhItdY+By6UOiL3t7STm5BfklS7
+         UjiA==
+X-Forwarded-Encrypted: i=1; AJvYcCUDgn703wH/GxqFc5kjtG2nbtU7L6Z4Da2kVfC/2C9AvmAS9kM4T+6fJmlAjmZKiKqK2Nhmly84NDJZ+g==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyaXqGHqXDJncg0aJWbUzd3fQ20H6c59FmiT3EljCWdrEb84yWi
+	I2vknELBlP0Jj0B3ioTV+t6cIaywXw9lLpw8OTGl4JT/g8p70GF+MW2aWw84zKdqQ5s=
+X-Gm-Gg: ASbGncslyiWbXEmNsIbvwix8obJT3HTnpCUaILrkRKIsp5pq1ikKVqbr1+eCel2gRuM
+	R+nxK6Y8M/ngO8Ad3/HAFITtq/HxbXtSqQt8/m4zywecYyP7HQeUMvt24Mp6ZrpSZ7qDAKIR7kW
+	bi3d6mNI89n/3mlIiccNIY7lU6g1OWEeis8sICwywzcYq14ynWZhfd9JzzpmRb5L8wxnW/lnhvq
+	Ldj6rsVQmb544DhpD1QK2i5Lz0MOXexogGhdHuvbcypZJTu8AcCSdLF5sgONJM6zFGbeRuLrjc7
+	B7ftUaMBiyMmfHnJ53QCTPdFTEZC1pElUzqb6rxiPRBFaugH4e6Arxf+PUxnMpIqlz8=
+X-Google-Smtp-Source: AGHT+IFp/KuOyeE5Ufq0so/blExd6IFaN01P9tvzAEoTf7fWiGBRkJlreJTyEePkQBnFRa5jnm3v6g==
+X-Received: by 2002:a05:6402:50cf:b0:607:2d8a:9b2a with SMTP id 4fb4d7f45d1cf-60c88ed9d2bmr3033453a12.31.1751035416149;
+        Fri, 27 Jun 2025 07:43:36 -0700 (PDT)
+Received: from localhost ([2a02:8071:b783:6940:36f3:9aff:fec2:7e46])
+        by smtp.gmail.com with UTF8SMTPSA id 4fb4d7f45d1cf-60c8290eaefsm1547978a12.34.2025.06.27.07.43.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 27 Jun 2025 07:43:35 -0700 (PDT)
+Date: Fri, 27 Jun 2025 16:43:34 +0200
+From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>
+To: Roland Sommer <r.sommer@gmx.de>
+Cc: "1107479@bugs.debian.org Salvatore Bonaccorso" <carnil@debian.org>, 
+	Chris Hofstaedtler <zeha@debian.org>, linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: Re: Bug#1107479: util-linux: blkid hangs forever after inserting a
+ DVD-RAM
+Message-ID: <iry3mdm2bpp2mvteytiiq3umfwfdaoph5oe345yxjx4lujym2f@2p4raxmq2f4i>
+References: <1M9Wyy-1uRqo614XE-00Glyf@mail.gmx.net>
+ <gbw7aejkbspiltkswpdtjimuzaujmzhdqpjir2t4rbvft5o777@faodorf33bev>
+ <174936596275.4210.3207965727369251912.reportbug@pc14.home.lan>
+ <1MmlXK-1v85592aXe-00ciKz@mail.gmx.net>
+ <zdclth6piuowqyvx4bn6es5s3zzcwbs6h2hheuswosbn4wty5a@blhozid4bx6q>
+ <1MGQnP-1uY1yz0lQr-00EvjN@mail.gmx.net>
+ <174936596275.4210.3207965727369251912.reportbug@pc14.home.lan>
+ <fxg6dksau4jsk3u5xldlyo2m7qgiux6vtdrz5rywseotsouqdv@urcrwz6qtd3r>
+ <whjbzs4o3zjgnvbr2p6wkafrqllgfmyrd63xlanhodhtklrejk@pnuxnfxvlwz5>
+ <1N4hzj-1uuA3Z1OEh-00rhJD@mail.gmx.net>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 6.16-rc4
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-
-Hi Linus,
-
-Here are a set of block fixes that should go into the 6.16 kernel
-release. This pull request contains:
-
-- Fixes for ublk
-	- Fix C++ narrowing warnings in the uapi header
-	- Update/improve UBLK_F_SUPPORT_ZERO_COPY comment in uapi header
-	- Fix for the ublk ->queue_rqs() implementation, limiting a
-	  batch to just the specific task AND ring
-	- ublk_get_data() error handling fix
-	- Sanity check more arguments in ublk_ctrl_add_dev()
-	- selftest addition
-
-- NVMe pull request via Christoph
-	- reset delayed remove_work after reconnect
-	- fix atomic write size validation
-
-- Fix for a warning introduced in bdev_count_inflight_rw() in this merge
-  window
-
-Please pull!
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="5fwcv5ywwk254lye"
+Content-Disposition: inline
+In-Reply-To: <1N4hzj-1uuA3Z1OEh-00rhJD@mail.gmx.net>
 
 
-The following changes since commit 8c8472855884355caf3d8e0c50adf825f83454b2:
+--5fwcv5ywwk254lye
+Content-Type: text/plain; protected-headers=v1; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: Bug#1107479: util-linux: blkid hangs forever after inserting a
+ DVD-RAM
+MIME-Version: 1.0
 
-  ublk: santizize the arguments from userspace when adding a device (2025-06-19 07:53:24 -0600)
+Hello Roland,
 
-are available in the Git repository at:
+On Fri, Jun 27, 2025 at 12:32:33PM +0200, Roland Sommer wrote:
+> > The pktcdvd driver is essentially unmaintained and there is a chance
+> > that you don't need it.=20
+> >=20
+> > Can you please try:
+> >=20
+> > 	echo > /etc/modprobe.d/debian-bug1107479.conf blacklist
+> > pktcdvd
+> >=20
+> > reboot and then test again? Please report back if any functionallity
+> > related to the DVD-RAM is missing without that module.
+>=20
+> With that blacklist entry everthing works as expected, even blkid.
+>=20
+> > My guess is that it's fine and the resolution is to stop building that
+> > module for Debian.
+>=20
+> Hmm, it's still loaded
 
-  git://git.kernel.dk/linux.git tags/block-6.16-20250626
+That is surprising. I would have expected that the only effect of that
+blacklist entry is that the module is not loaded. I don't understand how
+that entry makes a difference if it doesn't prevent the module being
+loaded.
 
-for you to fetch changes up to c007062188d8e402c294117db53a24b2bed2b83f:
+You can try
 
-  block: fix false warning in bdev_count_inflight_rw() (2025-06-26 07:34:11 -0600)
+	update-initramfs -u -k all
 
-----------------------------------------------------------------
-block-6.16-20250626
+maybe then the module isn't loaded any more on the next boot.
 
-----------------------------------------------------------------
-Caleb Sander Mateos (2):
-      ublk: fix narrowing warnings in UAPI header
-      ublk: update UBLK_F_SUPPORT_ZERO_COPY comment in UAPI header
+> and I'd assume DVD-RAM will not be accessible
+> without it:
+>=20
+> [  168.063968] pktcdvd: pktcdvd0: writer mapped to sr0
+> [  168.091270] sr0: detected capacity change from 8946816 to 8946812
 
-Christoph Hellwig (2):
-      nvme: refactor the atomic write unit detection
-      nvme: fix atomic write size validation
+The sr module might be enough to handle a DVD-RAM.
+=20
+> lsmod | grep pkt
+> pktcdvd                49152  1
+> cdrom                  81920  3 udf,pktcdvd,sr_mod
+> scsi_mod              286720  5 sd_mod,pktcdvd,libata,sg,sr_mod
+> scsi_common            16384  5 scsi_mod,pktcdvd,libata,sg,sr_mod
 
-Jens Axboe (1):
-      Merge tag 'nvme-6.16-2025-06-26' of git://git.infradead.org/nvme into block-6.16
+Puzzled!
+Uwe
 
-Keith Busch (1):
-      nvme: reset delayed remove_work after reconnect
+--5fwcv5ywwk254lye
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Ming Lei (3):
-      ublk: build batch from IOs in same io_ring_ctx and io task
-      selftests: ublk: don't take same backing file for more than one ublk devices
-      ublk: setup ublk_io correctly in case of ublk_get_data() failure
+-----BEGIN PGP SIGNATURE-----
 
-Ronnie Sahlberg (1):
-      ublk: sanity check add_dev input for underflow
+iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmherhMACgkQj4D7WH0S
+/k6thAgAm448WVdaIfzgvQi5K9wrdFZUGLA3eNMBCJJZODVHWtel4uGDx0Z2by0l
+RK0/6uictJTxsRuuAJDowqbIPlqFZpTDSRwxFwq1sHxNSe2Vb7XK+UWFcozOwWVy
+iO36g7bYvNOrI1R8pkKhlo8pegPqmdgVYAybfv6/6IAQfi1KmV/HrD4HnR2BUPXr
+ydDiPGYVsXqIG5sG9OFlR8h7FzYEMtDfxNz23hpc+QslfafjVUL4423T88PoDfLe
+Au8BzH/8lQm22IAVeq56L1BbZ4AUxu54ydGoRPeN9xNgF5FhNgpUlxcH9J5Q4fe5
+Svjjj4QeypFmxxPQqG0pYO59GJ8dDQ==
+=jbAk
+-----END PGP SIGNATURE-----
 
-Yu Kuai (1):
-      block: fix false warning in bdev_count_inflight_rw()
-
- block/genhd.c                                  | 26 ++++----
- drivers/block/ublk_drv.c                       | 49 +++++++++++----
- drivers/nvme/host/core.c                       | 87 +++++++++++++-------------
- drivers/nvme/host/multipath.c                  |  2 +-
- drivers/nvme/host/nvme.h                       |  3 +-
- include/uapi/linux/ublk_cmd.h                  | 32 ++++++++--
- tools/testing/selftests/ublk/test_stress_03.sh |  5 +-
- 7 files changed, 125 insertions(+), 79 deletions(-)
-
--- 
-Jens Axboe
-
+--5fwcv5ywwk254lye--
