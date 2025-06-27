@@ -1,147 +1,156 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A6392E88A7
-	for <linux-block@vger.kernel.org>; Fri, 27 Jun 2025 15:09:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 330ED2E92D5;
+	Fri, 27 Jun 2025 15:09:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751036945; cv=none; b=ZbX5XSh0xmK5RdrMxGCjRMXwr7MerHDXt3CbZhL+5IGhHJkoDHx8DmwvTe/CN6oeseQ8x4Yf8CaXn0DrF3smMj2dcdqUe7ejvcNM7xrdNKdb7A6B9N7p5V/+pmPonu0zpB/4F5zHHYkV03R4l0W6AoW4Sy7W8JZjK8JEjwLtnDM=
+	t=1751036962; cv=none; b=qJdvdzek/N8SBVXxGQ2TnGkvEFY2MWgvtYbcRQbsrTHCPA4gHpR5UjzKBXqsIOIx8gq5wTdVe8CFy9vZABwAxOQQ+YW6XYW2TS9zPO7rDXh4q98RVWa09KoMkFxioj9upFErcFWfRRvGDmucRI1aFefTE0hmjOv3oXQGUK1WP1I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751036945; c=relaxed/simple;
-	bh=j2Kp4ByTynxMxZFAECpHzhDq6OgU/84lOPY3VD4IkHQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QNMmB4jaD9HqUuYnA/2B8N2nk4EJoyxStSvE9+R0H5AK1uf4xI9Rnb/aEXdIc1TnmnciIT2tYuFtcq1IUXrwg+XeXBGg3hD/mYgpnhm71D9+dNU+ikayAhDgqcXdYqf8Sj8M0G3UIgUBho6kteTfux6QPIG6JlXQmXoHYOgWi0A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SEALMhGq; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1751036962; c=relaxed/simple;
+	bh=9JzwW3ptl69sT0tSXPYVpaHvb7h2Lc+pp8IUI3kUFpI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aAKQ0xS6BUdXD1td9XYVKjkoUP2Tf2OeV7P9Fc9JVmUVeBXHXx3Jb1Yl9F9+CMh4YeLL+XJ0BTffOGjFIqhvhaDRcdDCK/0RT8R2wnMEPi+Yx6p21KxebHeJ++NK7hiUEt2zVlUjXeg95+u+w/1ZpveVPhHEb9XDqn6LlUOw0AM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jiOG5irf; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SEALMhGq"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1751036943;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=p08g1TteKuU6lqS39A8I2g1O1d0/ryJS74NUU/1Ttl0=;
-	b=SEALMhGqrYgso2YdQhm9B9qUMGQMrNJ5qlxhu1shhwv2PyYjDzzakUBpQsXz0zNfsDq2pN
-	MqMlZoe0dlMQM7YOhHA3orNow+o7zEBoGqkJ80yhurytm4VIPcH0i141PgMeYQzNhuxiCD
-	/lrQLaf1eIYEVpf1lpq62xY8z1OEwdM=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-660-m3yqy2mQNpau2TytoNj6IQ-1; Fri,
- 27 Jun 2025 11:08:58 -0400
-X-MC-Unique: m3yqy2mQNpau2TytoNj6IQ-1
-X-Mimecast-MFC-AGG-ID: m3yqy2mQNpau2TytoNj6IQ_1751036936
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 46612195F170;
-	Fri, 27 Jun 2025 15:08:56 +0000 (UTC)
-Received: from bfoster (unknown [10.22.64.142])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 50DE7180035E;
-	Fri, 27 Jun 2025 15:08:53 +0000 (UTC)
-Date: Fri, 27 Jun 2025 11:12:31 -0400
-From: Brian Foster <bfoster@redhat.com>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Christian Brauner <brauner@kernel.org>,
-	"Darrick J. Wong" <djwong@kernel.org>,
-	Joanne Koong <joannelkoong@gmail.com>, linux-xfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-block@vger.kernel.org, gfs2@lists.linux.dev,
-	Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Subject: Re: [PATCH 02/12] iomap: cleanup the pending writeback tracking in
- iomap_writepage_map_blocks
-Message-ID: <aF6035WlvIRoPDSh@bfoster>
-References: <20250627070328.975394-1-hch@lst.de>
- <20250627070328.975394-3-hch@lst.de>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jiOG5irf"
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-60c63a9bbabso3926182a12.0;
+        Fri, 27 Jun 2025 08:09:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1751036958; x=1751641758; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=buVTdRxQKVlm30639PRVwQxRD/mm++iXvgZHcq077TM=;
+        b=jiOG5irfcKyCh0jy7uP1efUMECUEi/lsr8LUlRIXGJddZcdmJy6nbiPVVeS/nTl6LY
+         eoXMN32O7XtpmKdDq8fo+tdOjV+nkBYjhwDMc0o/qB7l2Pd6xcS7Fk2vHC5jhWaD7KP8
+         +zISW6fD52NXRYnvXGm/EDIypIrBM802QgPmCuDy/h9SODhVpBT+nwqJEAm7BHC/r720
+         bWf0IhTas4r+/xiRFSUl/qEyOPBWtF3J4QTRbI/D2ImHuEo21jWFNXqVkSMteluYjLkN
+         xOeUGe9SgHsq+ptaibfZBH/5Ggiwg9ZWn7uckziwIkp0fiquli9c+gaUt+R/xvKoMOYl
+         NCfg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751036958; x=1751641758;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=buVTdRxQKVlm30639PRVwQxRD/mm++iXvgZHcq077TM=;
+        b=avr0V2Cm0sSpRgEZIScCEyLFfp2E41B0Yp6Dayoh6jVWO0uO54ZeYCNlg2tv7dn4yq
+         1YEgVZV0kbBCXKMNimxkdua0imQDqvupZUHW/6jCvfibkL8QvnJWh4CJBLKb1sMclOPU
+         OfDR7JcyiK8clssvCj2UrLDL7fe2LI6g+QGuHScph3cOy75y16+FFXcYuI/2eMDRP2yF
+         Fjla59fLVveMh+Z6L01ovoifh6oTCksYDsM7tm505awa6LbgfouDtRr/sX6ejDcjkHnd
+         f9UGOoATYpZSKrM0TTUwO3Hc4paEBqnTbd4fCsqhV2tCRpfHOoTHcCn9haaKl3Bd/5ym
+         KO/w==
+X-Forwarded-Encrypted: i=1; AJvYcCWek5im/d7oryqZ11MR8TaRxRpTvUagtnU25UckOEQEAMknApvF5yb44+My8LiY76if6koHoAYtwZpUNA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzkR/gy/nC/nD1W/UhbWX78d9eGVnYvpXo3ZPCPB0+jGMCT4WVy
+	TrawKBHiLEpGDfVaZ+jW9nDEDrNtRNqiZkglmoI2RwM1M8+lRwn5gERqL3W3vw==
+X-Gm-Gg: ASbGncuxr3KQeguCjCgpcG849j+XbIjcEfxyHGB8xfTHZBxijxrVKITUQnrpCh8v9PE
+	EbSQvOHRaAwKf1Igb2oGmET/OSpOsXgzExD8J24D0a/cGMPYBr9Czh97wmfubnlurS0bmA7sMPF
+	UNCwvm83dJLbOMcnOseUqvbYKqVzIOWRva0PV39wusl5p4ScjuH2Ud1TD7MeNLj7cWtkfczYTxl
+	PCd/HfWF4LtwVdNYBal54A1yU2M2EUwe4z7r8XVlS1KwCqMFyGMR77gK0V7MvE80VI84HIE0RyC
+	I+tYiF7wb+tsMg872kDsJskron11oHNYz2+RxeGpGWLUYI12ekOensiVaufQFuKmU1ovWLhBKXZ
+	+
+X-Google-Smtp-Source: AGHT+IGGVGhe3vS2MX4Bny8mW3sSHejhy+WJ+hlE6Qb2Yw/TDLjhQuciR1Hl9hydhejbDjoGD4VBxg==
+X-Received: by 2002:a17:906:794e:b0:acb:37ae:619c with SMTP id a640c23a62f3a-ae350363ad6mr366449166b.15.1751036957556;
+        Fri, 27 Jun 2025 08:09:17 -0700 (PDT)
+Received: from 127.0.0.1localhost ([148.252.147.145])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae353c014fbsm135802866b.86.2025.06.27.08.09.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 27 Jun 2025 08:09:16 -0700 (PDT)
+From: Pavel Begunkov <asml.silence@gmail.com>
+To: io-uring@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org
+Cc: linux-fsdevel@vger.kernel.org,
+	Keith Busch <kbusch@kernel.org>,
+	David Wei <dw@davidwei.uk>,
+	Vishal Verma <vishal1.verma@intel.com>,
+	asml.silence@gmail.com
+Subject: [RFC 00/12] io_uring dmabuf read/write support
+Date: Fri, 27 Jun 2025 16:10:27 +0100
+Message-ID: <cover.1751035820.git.asml.silence@gmail.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250627070328.975394-3-hch@lst.de>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+Content-Transfer-Encoding: 8bit
 
-On Fri, Jun 27, 2025 at 09:02:35AM +0200, Christoph Hellwig wrote:
-> From: Joanne Koong <joannelkoong@gmail.com>
-> 
-> We don't care about the count of outstanding ioends, just if there is one.
-> Replace the count variable passed to iomap_writepage_map_blocks with a
-> boolean to make that more clear.
-> 
-> Signed-off-by: Joanne Koong <joannelkoong@gmail.com>
-> [hch: rename the variable, update the commit message]
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-> ---
+Disclaimer: haven't been tested well enough yet and needs more beating
 
-Reviewed-by: Brian Foster <bfoster@redhat.com>
+For past couple of months David Wei, Vishal Verma and other folks
+have been mentioning that it'd be great to have dmabuf support for
+read/write and other operations in io_uring. The topic is not new,
+it has been discussed many times in different contexts including
+networking. The last relevant attempt was premapped dma tags by
+Keith [1], and this patch set took a lot from it.
 
->  fs/iomap/buffered-io.c | 12 ++++++------
->  1 file changed, 6 insertions(+), 6 deletions(-)
-> 
-> diff --git a/fs/iomap/buffered-io.c b/fs/iomap/buffered-io.c
-> index b5162e0323d0..ec2f70c6ec33 100644
-> --- a/fs/iomap/buffered-io.c
-> +++ b/fs/iomap/buffered-io.c
-> @@ -1758,7 +1758,7 @@ static int iomap_add_to_ioend(struct iomap_writeback_ctx *wpc,
->  
->  static int iomap_writepage_map_blocks(struct iomap_writeback_ctx *wpc,
->  		struct folio *folio, u64 pos, u64 end_pos, unsigned dirty_len,
-> -		unsigned *count)
-> +		bool *wb_pending)
->  {
->  	int error;
->  
-> @@ -1786,7 +1786,7 @@ static int iomap_writepage_map_blocks(struct iomap_writeback_ctx *wpc,
->  			error = iomap_add_to_ioend(wpc, folio, pos, end_pos,
->  					map_len);
->  			if (!error)
-> -				(*count)++;
-> +				*wb_pending = true;
->  			break;
->  		}
->  		dirty_len -= map_len;
-> @@ -1873,7 +1873,7 @@ static int iomap_writepage_map(struct iomap_writeback_ctx *wpc,
->  	u64 pos = folio_pos(folio);
->  	u64 end_pos = pos + folio_size(folio);
->  	u64 end_aligned = 0;
-> -	unsigned count = 0;
-> +	bool wb_pending = false;
->  	int error = 0;
->  	u32 rlen;
->  
-> @@ -1917,13 +1917,13 @@ static int iomap_writepage_map(struct iomap_writeback_ctx *wpc,
->  	end_aligned = round_up(end_pos, i_blocksize(inode));
->  	while ((rlen = iomap_find_dirty_range(folio, &pos, end_aligned))) {
->  		error = iomap_writepage_map_blocks(wpc, folio, pos, end_pos,
-> -				rlen, &count);
-> +				rlen, &wb_pending);
->  		if (error)
->  			break;
->  		pos += rlen;
->  	}
->  
-> -	if (count)
-> +	if (wb_pending)
->  		wpc->nr_folios++;
->  
->  	/*
-> @@ -1945,7 +1945,7 @@ static int iomap_writepage_map(struct iomap_writeback_ctx *wpc,
->  		if (atomic_dec_and_test(&ifs->write_bytes_pending))
->  			folio_end_writeback(folio);
->  	} else {
-> -		if (!count)
-> +		if (!wb_pending)
->  			folio_end_writeback(folio);
->  	}
->  	mapping_set_error(inode->i_mapping, error);
-> -- 
-> 2.47.2
-> 
-> 
+This series implements it for read/write io_uring requests. The uAPI
+looks similar to normal registered buffers, the user will need to
+register a dmabuf in io_uring first and then use it as any other
+registered buffer. On registration the user also specifies a file
+to map the dmabuf for.
+
+// register
+io_uring_update_buffers(ring, { dma_buf_fd, target_file_fd });
+// use
+reg_buf_idx = 0;
+io_uring_prep_read_fixed(sqe, target_file_fd, buffer_offset,
+                         buffer_size, file_offset, reg_buf_idx);
+
+It's an RFC to discuss the overall direction. The series misses
+parts like bio splitting and nvme sgl support, and otherwise
+there are some rough edges and probably problems, which will
+need more testing and attention.
+
+[1] https://lore.kernel.org/io-uring/20220805162444.3985535-1-kbusch@fb.com/
+
+simple liburing based example:
+git: https://github.com/isilence/liburing.git dmabuf-rw
+link: https://github.com/isilence/liburing/tree/dmabuf-rw
+
+kernel branch:
+git: https://github.com/isilence/linux.git dmabuf-rw-v1
+
+Pavel Begunkov (12):
+  file: add callback returning dev for dma operations
+  iov_iter: introduce iter type for pre-registered dma
+  block: move around bio flagging helpers
+  block: introduce dmavec bio type
+  block: implement ->get_dma_device callback
+  nvme-pci: add support for user passed dma vectors
+  io_uring/rsrc: extended reg buffer registration
+  io_uring: add basic dmabuf helpers
+  io_uring/rsrc: add imu flags
+  io_uring/rsrc: add dmabuf-backed buffer registeration
+  io_uring/rsrc: implement dmabuf regbuf import
+  io_uring/rw: enable dma registered buffers
+
+ block/bdev.c                  |  11 ++
+ block/bio.c                   |  21 ++++
+ block/blk-merge.c             |  32 +++++
+ block/blk.h                   |   2 +-
+ block/fops.c                  |   3 +
+ drivers/nvme/host/pci.c       | 158 +++++++++++++++++++++++
+ include/linux/bio.h           |  59 ++++++---
+ include/linux/blk-mq.h        |   2 +
+ include/linux/blk_types.h     |   6 +-
+ include/linux/blkdev.h        |   2 +
+ include/linux/fs.h            |   2 +
+ include/linux/uio.h           |  14 +++
+ include/uapi/linux/io_uring.h |  13 +-
+ io_uring/Makefile             |   1 +
+ io_uring/dmabuf.c             |  60 +++++++++
+ io_uring/dmabuf.h             |  34 +++++
+ io_uring/rsrc.c               | 230 ++++++++++++++++++++++++++++++----
+ io_uring/rsrc.h               |  23 +++-
+ io_uring/rw.c                 |   7 +-
+ lib/iov_iter.c                |  70 ++++++++++-
+ 20 files changed, 701 insertions(+), 49 deletions(-)
+ create mode 100644 io_uring/dmabuf.c
+ create mode 100644 io_uring/dmabuf.h
+
+-- 
+2.49.0
 
