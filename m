@@ -1,49 +1,30 @@
-Received: from xmbghk7.mail.qq.com (xmbghk7.mail.qq.com [43.163.128.48])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 518FE26281;
-	Fri, 27 Jun 2025 02:47:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=43.163.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 032C28BEC;
+	Fri, 27 Jun 2025 03:15:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750992428; cv=none; b=fwGXHUBxAIa6zT7i8WS1k5s/lxeus97Pj/4tPa8Stm9YTGl+i1sPDOM7YbkyA0G8RRXBUMwx1dSFVCiMDdgJAHbVVPlEZzr8c9Dcpja3csP5rK17UjxrTyQRwpZ5Qvzfr9RNbr87OjJ3JpEwJ5OgKhBVsadXzsRh8eT1Plqs7rA=
+	t=1750994139; cv=none; b=s4HsqlwcFT+QpeooNHb4CURQtQW75ixm2kadqAVbK55Q7fQxJtQ4JrlwlJ0U+CejnxrevBKPsFtabsHtVrNACIybyqc6u3yp/pelCPU6qoICAoKgBqwUmbq2zvizKOuIopVweOvDTh0/XkqWvmH+3ZYdbMQ0266+6UlyCpp2+qo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750992428; c=relaxed/simple;
-	bh=WQLNRAGTO03Ea/3tQ6gRyiAtgMsPG1wwx2zGsAwYKSk=;
+	s=arc-20240116; t=1750994139; c=relaxed/simple;
+	bh=a0CGExzVudbjEs/7OpmdV+QtDD9QXm5eiAJ65IEE+zE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XoLUQd0apEEbdsJvtanJlioVR1EK4gewUnB+TlXjl1s5i1g+uaQmL99cQYVyBKzx4Cz7ptUSXK/uM0kQQqKQr/LaIiGxnbgJgmAg42/SCeiAdF88jnFM6JkPpNfOMogoYB7KDOtGq1Ao8nXrV1J+OJ22TktujW65dn4r3LQoFYA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=lQSdPlm5; arc=none smtp.client-ip=43.163.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="lQSdPlm5"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1750992414; bh=Pu0jA1GVRoKDx2l6du1YCcmFc4TR2c85F/Sld/qZPu4=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=lQSdPlm5fiG5AxnyTsXZTrkD9Sw3jm7nCDQH75MdVkvw8U0VpZBv7lbPAQiIyKQBy
-	 4YnBLnkK8uA8+uLkqmK+9cJ+ovmtKTQFclaYvNpcAPFIg+pktnqZJkAdUGyFh1VtJ/
-	 ZDZH+OXVQpLcUYJZJXeTl/ptCiLYEeRVHXLK7sGc=
-Received: from [172.25.20.158] ([111.202.154.66])
-	by newxmesmtplogicsvrszb20-0.qq.com (NewEsmtp) with SMTP
-	id A2A3B4EF; Fri, 27 Jun 2025 10:40:42 +0800
-X-QQ-mid: xmsmtpt1750992042t5ouc00kx
-Message-ID: <tencent_5B902C24516F8FB647C156B41596BF68E70A@qq.com>
-X-QQ-XMAILINFO: OIJV+wUmQOUAf2UFzEHsFZTqx+Kq6+t/DjOoALtts+bmxTDYe0aOhXVnuSwlBh
-	 IKwrkPpmAPshTmKQvzmwkCKcnTChguPERIY3OFEg0UHXTqoUrZRp2DDlAO+zFQL43ghY2PXedN0N
-	 v8yTrkQcBKQXpry/j0lTZgxTRyMAJ4il5YSrVQ49OOvk7MOOXLV05fMdiFvaAzTH/AyBkC/8onJx
-	 fGCrWZ6Kc1086A9ImQRn8VYJhRsJ2A0ajoWlmFyH/RMMrgB+du2d3S5ta6e1sIqRWANj6DaSBB/Z
-	 0H9/sugRPpHBgWCYNx0zR4SZV+D9aVueby9w0rHO8uiZchZTQ55JEiGAU+zYCwUEnpO/WrQquPrS
-	 xNORxDZhqJvu3bpgFlZuUB2or5Lb138OPPBVk7ISqU7M9BBuVNhOAABrKgy88NMMi3v7RE5NmASd
-	 bsqw5KWSGbMh07yPp6WqG7AbWmS6f+8NMhKaGFBrzr8G31elIiLR0nBUI5Hq+4hzlmKOb4pJPYl4
-	 K7dCql/f4y0YBj9NR4/zukyH8EbMDdqBMv5KWHeqTg0br5FOrW3Vf2cgQnlbgpeADTVolKDZCQXU
-	 YvFE7JYMY6cWF5Lbz2XGMTgX/PuvSTc7+VlaJ0KCKC36LdQIub3IYqgAYHlqka42BjVm+2rQnIcW
-	 drCOo/tZbyhVd3A9q9ehEgnJ7LRGMQngSn1TiWgra5iFlb6L2UAknqV687ygfwTjMMM6SFmyGzKf
-	 TJj38y0CFzTSxkhVcKswqdpAyGx5Iyv4ZIue+K43wEjB8Opss/jsbBlrwBU40X9Znabyx/nUnLfy
-	 6cr3oIyu9m1nQZpc9UuJMwfrSU/V51GolaiyJW1CvRALeD6jxrTKx2ZYlVX/+QW67bN3K7D9FJCx
-	 Wdpk5o2c9KC/id7uBgDRKQXndyxAXpa2USSSOtHHe1iTSMZvWKw+fPK30Lh5vaJqcMkhQnSUsOFx
-	 rlUJPhp6v1cO2wygZAmvfIo/alad3u5jx2A2RXxVFTLQaz9X0RlA==
-X-QQ-XMRINFO: MSVp+SPm3vtS1Vd6Y4Mggwc=
-X-OQ-MSGID: <3753a0b7-fed3-4391-9fc4-fade83c89a34@qq.com>
-Date: Fri, 27 Jun 2025 10:40:41 +0800
+	 In-Reply-To:Content-Type; b=t8sqTD0DWh5J2klEWV6PvPVPDFJa4Kz0L8mzlHPJdQYiY/Bx0zoFetEBoifOuukRHePxSV3sV55TYa1XFMCZb48b6qGqJzRdT8CKLHaXBhvPZxsZLHu1C8svJLDqjF4kLFj9QwyR4aRxhkl31aE329cXx0tXwZp47XHlTDLmOys=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4bT1062dPSzYQtr2;
+	Fri, 27 Jun 2025 11:15:34 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.252])
+	by mail.maildlp.com (Postfix) with ESMTP id 4348A1A1342;
+	Fri, 27 Jun 2025 11:15:33 +0800 (CST)
+Received: from [10.174.178.72] (unknown [10.174.178.72])
+	by APP3 (Coremail) with SMTP id _Ch0CgB3F8LRDF5oYa0bQg--.13049S3;
+	Fri, 27 Jun 2025 11:15:31 +0800 (CST)
+Message-ID: <ad6d0fd9-1260-4c55-a440-472d6a228536@huaweicloud.com>
+Date: Fri, 27 Jun 2025 11:15:29 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -51,73 +32,116 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 3/5] fs: change write_begin/write_end interface to take
- struct kiocb *
-To: Christian Brauner <brauner@kernel.org>,
- Matthew Wilcox <willy@infradead.org>
-Cc: =?UTF-8?B?6ZmI5rab5rabIFRhb3RhbyBDaGVu?= <chentaotao@didiglobal.com>,
- "tytso@mit.edu" <tytso@mit.edu>, "hch@infradead.org" <hch@infradead.org>,
- "adilger.kernel@dilger.ca" <adilger.kernel@dilger.ca>,
- "jani.nikula@linux.intel.com" <jani.nikula@linux.intel.com>,
- "rodrigo.vivi@intel.com" <rodrigo.vivi@intel.com>,
- "tursulin@ursulin.net" <tursulin@ursulin.net>,
- "airlied@gmail.com" <airlied@gmail.com>,
- "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
- "linux-ext4@vger.kernel.org" <linux-ext4@vger.kernel.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
- "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
- "linux-mm@kvack.org" <linux-mm@kvack.org>,
- "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <20250624121149.2927-1-chentaotao@didiglobal.com>
- <20250624121149.2927-4-chentaotao@didiglobal.com>
- <aFqfZ9hiiW4qnYtO@casper.infradead.org>
- <20250625-erstklassig-stilvoll-273282f0dd1b@brauner>
-From: Chen Taotao <chentao325@qq.com>
-In-Reply-To: <20250625-erstklassig-stilvoll-273282f0dd1b@brauner>
+Subject: Re: [PATCH] nbd: fix uaf in nbd_genl_connect() error path
+To: Zheng Qixing <zhengqixing@huaweicloud.com>, josef@toxicpanda.com,
+ axboe@kernel.dk, xiubli@redhat.com, prasanna.kalever@redhat.com,
+ ming.lei@redhat.com
+Cc: linux-block@vger.kernel.org, nbd@other.debian.org,
+ linux-kernel@vger.kernel.org, yukuai3@huawei.com, yi.zhang@huawei.com,
+ yangerkun@huawei.com, zhengqixing@huawei.com
+References: <20250612132405.364904-1-zhengqixing@huaweicloud.com>
+From: Zheng Qixing <zhengqixing@huaweicloud.com>
+In-Reply-To: <20250612132405.364904-1-zhengqixing@huaweicloud.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_Ch0CgB3F8LRDF5oYa0bQg--.13049S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxCw43XF4rXw43urWUCrW3KFg_yoW5uFyxpF
+	sxGFZ7CrW8ua40gaykCw1UuF15t3W7Xry3KryxJw15ZF9xAr4j9F9Y9a45XF4UKry8uFy7
+	AFnFqrWxK3WUKrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvE14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
+	0xkIwI1lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7
+	v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF
+	1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIx
+	AIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI
+	42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWI
+	evJa73UjIFyTuYvjfUonmRUUUUU
+X-CM-SenderInfo: x2kh0wptl0x03j6k3tpzhluzxrxghudrp/
+
+Gentle ping.
 
 
-在 2025/6/25 16:04, Christian Brauner 写道:
-> On Tue, Jun 24, 2025 at 01:51:51PM +0100, Matthew Wilcox wrote:
->> On Tue, Jun 24, 2025 at 12:12:08PM +0000, 陈涛涛 Taotao Chen wrote:
->>> -static int blkdev_write_end(struct file *file, struct address_space *mapping,
->>> +static int blkdev_write_end(struct kiocb *iocb, struct address_space *mapping,
->>>   		loff_t pos, unsigned len, unsigned copied, struct folio *folio,
->>>   		void *fsdata)
->>>   {
->>>   	int ret;
->>> -	ret = block_write_end(file, mapping, pos, len, copied, folio, fsdata);
->>> +	ret = block_write_end(iocb->ki_filp, mapping, pos, len, copied, folio, fsdata);
->> ... huh.  I thought block_write_end() had to have the same prototype as
->> ->write_end because it was used by some filesystems as the ->write_end.
->> I see that's not true (any more?).  Maybe I was confused with
->> generic_write_end().  Anyway, block_write_end() doesn't use it's file
->> argument, and never will, so we can just remove it.
->>
->>> +++ b/include/linux/fs.h
->>> @@ -446,10 +446,10 @@ struct address_space_operations {
->>>   
->>>   	void (*readahead)(struct readahead_control *);
->>>   
->>> -	int (*write_begin)(struct file *, struct address_space *mapping,
->>> +	int (*write_begin)(struct kiocb *, struct address_space *mapping,
->>>   				loff_t pos, unsigned len,
->>>   				struct folio **foliop, void **fsdata);
->>> -	int (*write_end)(struct file *, struct address_space *mapping,
->>> +	int (*write_end)(struct kiocb *, struct address_space *mapping,
->>>   				loff_t pos, unsigned len, unsigned copied,
->>>   				struct folio *folio, void *fsdata);
->> Should we make this a 'const struct kiocb *'?  I don't see a need for
->> filesystems to be allowed to modify the kiocb in future, but perhaps
->> other people have different opinions.
-> Given I picked up Willy's change I'll wait for a resubmit of this series
-> on top of vfs-6.17.misc unless I hear otherwise?
-Sure, I’ll update the series on top of vfs-6.17.misc and resend it as 
-soon as possible.
+Thanks,
 
-Best regards,
-Taotao Chen
+Qixing
+
+
+在 2025/6/12 21:24, Zheng Qixing 写道:
+> From: Zheng Qixing <zhengqixing@huawei.com>
+>
+> There is a use-after-free issue in nbd:
+>
+> block nbd6: Receive control failed (result -104)
+> block nbd6: shutting down sockets
+> ==================================================================
+> BUG: KASAN: slab-use-after-free in recv_work+0x694/0xa80 drivers/block/nbd.c:1022
+> Write of size 4 at addr ffff8880295de478 by task kworker/u33:0/67
+>
+> CPU: 2 UID: 0 PID: 67 Comm: kworker/u33:0 Not tainted 6.15.0-rc5-syzkaller-00123-g2c89c1b655c0 #0 PREEMPT(full)
+> Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+> Workqueue: nbd6-recv recv_work
+> Call Trace:
+>   <TASK>
+>   __dump_stack lib/dump_stack.c:94 [inline]
+>   dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:120
+>   print_address_description mm/kasan/report.c:408 [inline]
+>   print_report+0xc3/0x670 mm/kasan/report.c:521
+>   kasan_report+0xe0/0x110 mm/kasan/report.c:634
+>   check_region_inline mm/kasan/generic.c:183 [inline]
+>   kasan_check_range+0xef/0x1a0 mm/kasan/generic.c:189
+>   instrument_atomic_read_write include/linux/instrumented.h:96 [inline]
+>   atomic_dec include/linux/atomic/atomic-instrumented.h:592 [inline]
+>   recv_work+0x694/0xa80 drivers/block/nbd.c:1022
+>   process_one_work+0x9cc/0x1b70 kernel/workqueue.c:3238
+>   process_scheduled_works kernel/workqueue.c:3319 [inline]
+>   worker_thread+0x6c8/0xf10 kernel/workqueue.c:3400
+>   kthread+0x3c2/0x780 kernel/kthread.c:464
+>   ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:153
+>   ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+>   </TASK>
+>
+> nbd_genl_connect() does not properly stop the device on certain
+> error paths after nbd_start_device() has been called. This causes
+> the error path to put nbd->config while recv_work continue to use
+> the config after putting it, leading to use-after-free in recv_work.
+>
+> This patch moves nbd_start_device() after the backend file creation.
+>
+> Reported-by: syzbot+48240bab47e705c53126@syzkaller.appspotmail.com
+> Closes: https://lore.kernel.org/all/68227a04.050a0220.f2294.00b5.GAE@google.com/T/
+> Fixes: 6497ef8df568 ("nbd: provide a way for userspace processes to identify device backends")
+> Signed-off-by: Zheng Qixing <zhengqixing@huawei.com>
+> ---
+>   drivers/block/nbd.c | 6 +++---
+>   1 file changed, 3 insertions(+), 3 deletions(-)
+>
+> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+> index 7bdc7eb808ea..2592bd19ebc1 100644
+> --- a/drivers/block/nbd.c
+> +++ b/drivers/block/nbd.c
+> @@ -2198,9 +2198,7 @@ static int nbd_genl_connect(struct sk_buff *skb, struct genl_info *info)
+>   				goto out;
+>   		}
+>   	}
+> -	ret = nbd_start_device(nbd);
+> -	if (ret)
+> -		goto out;
+> +
+>   	if (info->attrs[NBD_ATTR_BACKEND_IDENTIFIER]) {
+>   		nbd->backend = nla_strdup(info->attrs[NBD_ATTR_BACKEND_IDENTIFIER],
+>   					  GFP_KERNEL);
+> @@ -2216,6 +2214,8 @@ static int nbd_genl_connect(struct sk_buff *skb, struct genl_info *info)
+>   		goto out;
+>   	}
+>   	set_bit(NBD_RT_HAS_BACKEND_FILE, &config->runtime_flags);
+> +
+> +	ret = nbd_start_device(nbd);
+>   out:
+>   	mutex_unlock(&nbd->config_lock);
+>   	if (!ret) {
 
