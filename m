@@ -1,162 +1,87 @@
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 003.mia.mailroute.net (003.mia.mailroute.net [199.89.3.6])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECF721A704B
-	for <linux-block@vger.kernel.org>; Sat, 28 Jun 2025 19:22:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4C1C13DDAE;
+	Sat, 28 Jun 2025 22:59:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.6
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751138571; cv=none; b=us9pIvXiT61EvcVSyEERlhXC68grLEOn1q8RZ3a3MWnBILYUHL539si9cB1SccCbQXXLWETWvnpFERem9NFN7Uzq//wFDkFK6GG/n7LDE6wY2ncuCj9o7KV/2Uf0QQ/ipTUox1b2ASJUU3rR727L2RZj87C5LMv6wkT8jgq1z2Y=
+	t=1751151542; cv=none; b=GCzzRQAPno4zjAFfSX4U7i5FZSPSzUmQLRC3cKZz8mH1ak0ai0wQFq01wsYcIjwf+v14y1H6CZsTP+5czd/aeX2hB5UK3a6PFuHoksJan6cXT3qAXyJAKJYgUpH0b4lPt3HiY+j5ur6dA8O5B6pk7R8n258Ufo7A6ZIlbgEXkCA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751138571; c=relaxed/simple;
-	bh=jRFzdWxrI+05iC3UOH3tctviU4ldQIzSuC0+TAMEBXc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LFXg2UruEcfbz0a9dzLkadp2dTrCSEZl27MKOi0NiwuJs9xjdDkQqYXldvRlkrBqBYASgHRMW1URYBy2bW4cqoGYApF/nuy7zGSeTbU1k0cXIkSyIyjkGtL7NSHBb4yr3UNGxW3kS6aAk82BkFIgK0KL9OVgYw7h8SUDSj82I/w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=EXAM1tLd; arc=none smtp.client-ip=209.85.218.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
+	s=arc-20240116; t=1751151542; c=relaxed/simple;
+	bh=+jzkSM2A9zgoV3VybZGZYGv8wbcXdSGxPnbEMCyOZc4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=To4hxMeBG875geZw9c0qyAnQZ74VBBOFjXlzxZtyWioUJzzUvd6+rFl8EwdwPFK9QNMIJAne01tkrdyrrCeGLSumgSq+Usaxqm5whi5z/EGM3UFztuBDZQq+TAQRWZIyo60nob1CYm59BThUQxHmTyAf33iKGg6zne5ET6oeiss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=aVUFYSU+; arc=none smtp.client-ip=199.89.3.6
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="EXAM1tLd"
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-ae04d3d63e6so142681466b.2
-        for <linux-block@vger.kernel.org>; Sat, 28 Jun 2025 12:22:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1751138566; x=1751743366; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=/9Bim0YMZNZkU3LIU7oAVRjKnGb3ndRrw15USIBTsIc=;
-        b=EXAM1tLd97INoBkl3vRfVfAiWueZb1UjzlYRZSyroZM8wKgylpcMG1NXxVzVS2hTI3
-         SX6S1PINghr+NA4q1YOw8JLLGj0J+rUz+A5AFnWwTWbJ9+WaIJ5G1cGHXw0ZC0OhVVZJ
-         cMqmwOz5az0HDnoumHvznUf+bsun4D6qgTGUX9y7uJr+kgy21pZYAxbYK54H8AsMMpEJ
-         WQMJPKQTULbeWmVgq/Fbc7+akssYb/9Q0FGZkuja04BK0OCyIamASlcikGEpjvcfwbOB
-         dH3aR5Dp0Ou/yl49m/v9UX47lm5dj1U28285BohLUGRo6WWxALE17NMCZiBegn6sgJxc
-         omYw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751138566; x=1751743366;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/9Bim0YMZNZkU3LIU7oAVRjKnGb3ndRrw15USIBTsIc=;
-        b=rySoxunK/ARO7INeGPEpMdXcY6xXknbvrdZ9+DTqghlL0GosG5Boa/vzAix3ZhIvcL
-         mgyn9lMyE+y2MyYU9f0xjRzbb6QS7qQU51kNjVTYVq0Ne+M7og1g3lg1ttBlmLAdiggd
-         uZGbUa3APCSN9Syn9E7aJFvLpoS5sDimgLPVRQAZxErasPeForFRh9zF2fwlrR0XQPxi
-         AdrociBiQERodcRWRli8PWqn7F5yQtyETaQ/6pZS6Jr2NI20qrSa91PZxx1809n8GpXa
-         Agu7tTtPzJ8IYuZbKBiPAA6ATP3Ju92QjFwzEWVCTC1TzUOr1HHaRAdGzoNIsSD393/r
-         mQFw==
-X-Forwarded-Encrypted: i=1; AJvYcCWkR/BhJMbDzFCp6ia2aiG/NZhwsv8zTo4zuafohmO1DFhMXn8T02pvefXoVEIq3tOp8eTTjbsXQAyzZA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YynCVpg0g1xcCHaxA5ooCW9t58GeW09r9czhF7IquQHiU686ljU
-	r5ouh3dh4g9wti1bsAM4FZMfikb0dId0wH2/ex4vXWevMVKdwJIIEfhn5GrhNCUrHRU=
-X-Gm-Gg: ASbGncvopnaD041XKRw2W8YdUf5E9HW0k/KqO9igNMu0ox3Sh2BRUF6ZeWDEjhmBze5
-	qAGSMRMBn4b4gKSr2O3qvXZsfu1Ig78tejlQyfuDEMqgC6plpBIovJwV+8C7CG1SeRCoQnh7+k0
-	KH5e+DqwOj3vU3Yr7Jlnl8rvlPNAn9krRqUR8cJC2dYCVkBaa6DFLZBAPW/Kjbazny0hbeMgqW1
-	zpLe1E2MeUVfBvtKGjr0rZ5bxV8Y8U7MUq1F1oooUA37wT63ZTq+3UbjeEwuiFExx9B697Fm1L8
-	oykcZEI8j0tk6o7/PWfAPT9czmOi042QTIaBi41vE/vxLoY2zaX96W54aSnF2aLXN9o=
-X-Google-Smtp-Source: AGHT+IG4p6IOQJNUu4XGm5k/7fPnSyhBhCRmCN9z+y75GlbfLh4HYm5CfIY9WkwLizRmBXYiXvHCig==
-X-Received: by 2002:a17:907:6d28:b0:ad8:8621:924f with SMTP id a640c23a62f3a-ae350172c45mr724302166b.56.1751138565980;
-        Sat, 28 Jun 2025 12:22:45 -0700 (PDT)
-Received: from localhost ([2a02:8071:b783:6940:36f3:9aff:fec2:7e46])
-        by smtp.gmail.com with UTF8SMTPSA id a640c23a62f3a-ae353c013cdsm364209466b.93.2025.06.28.12.22.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 28 Jun 2025 12:22:45 -0700 (PDT)
-Date: Sat, 28 Jun 2025 21:22:42 +0200
-From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>
-To: Roland Sommer <r.sommer@gmx.de>
-Cc: "1107479@bugs.debian.org Salvatore Bonaccorso" <carnil@debian.org>, 
-	Chris Hofstaedtler <zeha@debian.org>, linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: Re: Bug#1107479: util-linux: blkid hangs forever after inserting a
- DVD-RAM
-Message-ID: <aif2stfl4o6unvjn7rqwbqam2v2ntr35ik5e24jdkwvixm3hj4@d3equy4z4xjk>
-References: <174936596275.4210.3207965727369251912.reportbug@pc14.home.lan>
- <1MmlXK-1v85592aXe-00ciKz@mail.gmx.net>
- <zdclth6piuowqyvx4bn6es5s3zzcwbs6h2hheuswosbn4wty5a@blhozid4bx6q>
- <1MGQnP-1uY1yz0lQr-00EvjN@mail.gmx.net>
- <174936596275.4210.3207965727369251912.reportbug@pc14.home.lan>
- <fxg6dksau4jsk3u5xldlyo2m7qgiux6vtdrz5rywseotsouqdv@urcrwz6qtd3r>
- <whjbzs4o3zjgnvbr2p6wkafrqllgfmyrd63xlanhodhtklrejk@pnuxnfxvlwz5>
- <1N4hzj-1uuA3Z1OEh-00rhJD@mail.gmx.net>
- <iry3mdm2bpp2mvteytiiq3umfwfdaoph5oe345yxjx4lujym2f@2p4raxmq2f4i>
- <1MSc1L-1uKBoQ15kv-00Qx9T@mail.gmx.net>
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="aVUFYSU+"
+Received: from localhost (localhost [127.0.0.1])
+	by 003.mia.mailroute.net (Postfix) with ESMTP id 4bV7C24GRSzlgqV0;
+	Sat, 28 Jun 2025 22:58:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1751151533; x=1753743534; bh=Y/jSSs6jyPDYUAf6whi66yCP
+	J+ejH/UOR/g6IA5dr+U=; b=aVUFYSU+vQeuukVKNj70aXs6du4zcx6NxUaGuxPh
+	HIHxj9wAxxS2oVb6VyV1xX6mOLZm+8k1+pF9G1h5iebDgoSf3McE1AAyto/O/STJ
+	gKguHq2/23quVzkm5Rn3+3nlLZpI4DiSaTlO4ZqRLeB7zqHavu/06tb1YKzHpCG/
+	p9hd2ASPS/xplE+0Xsv2EVWrU04tKdB68f6LUO+ub8RQaxsmz2AB8W3lsH9A4hWd
+	Mm6rfDeuAozY2B0L65C1wV/STaKqQoPTRrUSSgiRz5ybSfWU3Y8/kP71fRt64g5J
+	qIYDPd9Ujb1RNLQAAUXAQbrk3I7e5RpYaxx9zQEuEkBZXw==
+X-Virus-Scanned: by MailRoute
+Received: from 003.mia.mailroute.net ([127.0.0.1])
+ by localhost (003.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id V9wAqjNWhz3R; Sat, 28 Jun 2025 22:58:53 +0000 (UTC)
+Received: from [192.168.51.14] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4bV7Bx2g9yzlgqTr;
+	Sat, 28 Jun 2025 22:58:47 +0000 (UTC)
+Message-ID: <bb5df3e6-ba72-47c1-846d-b6e7f2d5a5c1@acm.org>
+Date: Sat, 28 Jun 2025 15:58:46 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="v5bqsnr3nvejil33"
-Content-Disposition: inline
-In-Reply-To: <1MSc1L-1uKBoQ15kv-00Qx9T@mail.gmx.net>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] block: Fix a deadlock related to modifying the
+ readahead attribute
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+ Nilay Shroff <nilay@linux.ibm.com>, stable@vger.kernel.org
+References: <20250626203713.2258558-1-bvanassche@acm.org>
+ <20250627071702.GA992@lst.de>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20250627071702.GA992@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
+On 6/27/25 12:17 AM, Christoph Hellwig wrote:
+> On Thu, Jun 26, 2025 at 01:37:13PM -0700, Bart Van Assche wrote:
+>> This deadlock happens because blk_mq_freeze_queue_nomemsave() waits for
+>> pending requests to finish. The pending requests do never complete because
+>> the dm-multipath queue_if_no_path option is enabled and the only path in
+>> the dm-multipath configuration is being removed.
+> 
+> Well, if there are queued never completed bios the freeze will obviously
+> fail.  I don't see how this freeze is special vs other freezes or other
+> attributes that freeze.
 
---v5bqsnr3nvejil33
-Content-Type: text/plain; protected-headers=v1; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: Bug#1107479: util-linux: blkid hangs forever after inserting a
- DVD-RAM
-MIME-Version: 1.0
+Hi Christoph,
 
-On Sat, Jun 28, 2025 at 10:52:26AM +0200, Roland Sommer wrote:
-> Hello Uwe,
->=20
-> > That is surprising. I would have expected that the only effect of that
-> > blacklist entry is that the module is not loaded. I don't understand
-> > how that entry makes a difference if it doesn't prevent the module
-> > being loaded.
-> >=20
-> > You can try
-> >=20
-> > 	update-initramfs -u -k all
-> >=20
-> > maybe then the module isn't loaded any more on the next boot.
->=20
-> I'm sorry, it is.
->=20
-> > The sr module might be enough to handle a DVD-RAM.
->=20
-> Ok, then lets try it the hard way: rename
-> /usr/lib/modules/6.1.0-37-amd64/kernel/drivers/block/pktcdvd.ko and
-> reboot.
->=20
-> -> dmesg reports
->=20
-> Jun 28 10:38:06 nb06 (udev-worker)[2081]: sr0: Process '/usr/sbin/pktsetu=
-p -i 11:0' failed with exit code 1.
+There is a difference: there are Linux distros, e.g. openSUSE, that set 
+the read_ahead_kb attribute from a udev rule. I'm not aware of any Linux
+distros that set any of the other attributes from a udev rule for which
+the queue gets frozen from the .store callback (nr_requests, nomerges,
+rq_affinity, io_poll, io_timeout and wbt_lat_usec).
 
-Ahh, now that makes sense. pktsetup calls `/sbin/modprobe pktcdvd`
-explicitly, the blacklist entry doesn't help for that. Without the
-kernel module renamed, does the 2nd DVD-RAM result in the blocking
-behaviour?
+Thanks,
 
-> -> lsmod reports pktcdvd not loaded
->=20
-> -> And most important: DVD-RAM fully operational
->=20
-> > Puzzled!
->=20
-> And now? ;-)
-
-It's a tad better now :-)
-
-Given the lack of upstream response, the driver being orphaned, a
-working setup even without the module I think we'll go with disabling
-that module.
-
-Thanks for your report and helpful testing,
-Uwe
-
---v5bqsnr3nvejil33
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmhgQP8ACgkQj4D7WH0S
-/k6Slwf/W6KYOvZCJ5oBHU7Y+T3YweCIM9CUB3/abxKsixCqSjZfRu9IFJEItXof
-iguQPRBPDsPRGTGYz8Xh1i6v4kbBQJqHrkCkp8vIW1wZcC+I2PmXQ4JfBD6sMFf7
-MlXB6RuJJ/PTqNEO9vFVaQKwzLa2QEF3baZ67o9dAXdaaWDsXUpXBYVHrwZCC07P
-NORy2Iqo3n03cp9R2uaaOnidiNcLzRkEfe+cNAy5aodia7Nrnk0BpquEXnqnE0on
-RVOHtVpn7t40cLrW5mqtWeTY94p7CqE4rYDVAxGTvOImU5vK6JAUdrMK0A8/wYlo
-mmXeR8qhsEJlA2Zb89YM4JKZ/zj0kg==
-=saz3
------END PGP SIGNATURE-----
-
---v5bqsnr3nvejil33--
+Bart.
