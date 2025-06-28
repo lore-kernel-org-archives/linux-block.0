@@ -1,157 +1,153 @@
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B81B221571
-	for <linux-block@vger.kernel.org>; Sat, 28 Jun 2025 08:52:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E41F13BAE3
+	for <linux-block@vger.kernel.org>; Sat, 28 Jun 2025 10:24:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751100756; cv=none; b=Ns7/wLlwFwdWH2gjWyQCirZz08GiOC11X1fcCIJe6WPOrUsZvH7HlTpg9GXuZC/VNzxOzFC2/WhJH31n9Ty+ZgNSDM0+krzrEh+Oiq3w0nkIIUhXaDUB3cZLzDJo+CGr95UR4HEsbedWf9BYBCMOfuWwBqtBZposs7CQTn5EHaw=
+	t=1751106250; cv=none; b=SYz72ayTskupTQIRdKe1mGno/rX0grKs8TrktKqKzFQAZKE0gtlXeAQAA+GuFcFwO7Iy8Pbx+BIPG7t/mvKapyO8HCxvantCZgNv/zPFi6llv43Vuy1hBLJdic4TB6/J9ZprqI+fP6SuQVz2+BJmblZfmZVYoe1mPWFh0khDI98=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751100756; c=relaxed/simple;
-	bh=BUQMioHeGdXZNtH47YBZfYs6CeT4m8a1aYzLaWeEh64=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:MIME-Version:
-	 Content-Type:Message-ID; b=RZujPaXFXYoibyUWDmpgQYNFaXvFI7531EN/kGP6Oa+7YW3agCVXQjb0b3Oa2RIyFb2OaD/E4Mzjjw4Z46th3zFydDa30u34gcn39Ks2iZEyoezAHjcrDUxR9vUZr+CJuqP6wTBnbYodg+u7tGuFJ5GeYq8C5Wo7S19cHIzNsGg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de; spf=pass smtp.mailfrom=gmx.de; dkim=pass (2048-bit key) header.d=gmx.de header.i=r.sommer@gmx.de header.b=hJNGReoq; arc=none smtp.client-ip=212.227.15.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.de
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.de header.i=r.sommer@gmx.de header.b="hJNGReoq"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.de;
-	s=s31663417; t=1751100747; x=1751705547; i=r.sommer@gmx.de;
-	bh=ludqfOCokOGviYg+sO1Hn2e0LZ82GFMSvJxZJP2MgLg=;
-	h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type:Content-Transfer-Encoding:Message-ID:cc:
-	 content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=hJNGReoqf5aMP35qhGcI7UE/enczAFR0GjR195Acm484izoi2iPAUERFBNYRN393
-	 dtT2eI3f1V/zjo5uJU4Yn6BzYPiogSw2vTQiraUwyqQ4VxADrp6Do3OScJVC0niwm
-	 gbhM2iM7yI1fO+ZLKmaOWG7dILPhKqcLQ0i52AYzOoeEOGZ7NrH6TB3oSKAqrhclK
-	 8k261GK0Iv7fZxZhfq3/rRScD2SfniXanauDuK5gV6UbiJMzvwlc8lo8+3O0t3Azs
-	 s2Gtw7HjJg3B26MWsWFx/OpzG8P7I4/toSRYfPM4q+1/0FHIbgmHeW8srR2OI1aHa
-	 /cBTChc1JESqKGBpGg==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from pc14.home.lan ([185.17.207.23]) by mail.gmx.net (mrgmx004
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1Mv2xO-1umyBH0vmy-00u0R4; Sat, 28
- Jun 2025 10:52:27 +0200
-Date: Sat, 28 Jun 2025 10:52:26 +0200
-From: Roland Sommer <r.sommer@gmx.de>
-To: Uwe =?UTF-8?B?S2xlaW5lLUvDtm5pZw==?= <u.kleine-koenig@baylibre.com>
-Cc: "1107479@bugs.debian.org Salvatore Bonaccorso" <carnil@debian.org>,
- Chris Hofstaedtler <zeha@debian.org>, linux-block@vger.kernel.org, Jens
- Axboe <axboe@kernel.dk>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: Re: Bug#1107479: util-linux: blkid hangs forever after inserting a
- DVD-RAM
-In-Reply-To: <iry3mdm2bpp2mvteytiiq3umfwfdaoph5oe345yxjx4lujym2f@2p4raxmq2f4i>
-References: <1M9Wyy-1uRqo614XE-00Glyf@mail.gmx.net>
-	<gbw7aejkbspiltkswpdtjimuzaujmzhdqpjir2t4rbvft5o777@faodorf33bev>
-	<174936596275.4210.3207965727369251912.reportbug@pc14.home.lan>
-	<1MmlXK-1v85592aXe-00ciKz@mail.gmx.net>
-	<zdclth6piuowqyvx4bn6es5s3zzcwbs6h2hheuswosbn4wty5a@blhozid4bx6q>
-	<1MGQnP-1uY1yz0lQr-00EvjN@mail.gmx.net>
-	<174936596275.4210.3207965727369251912.reportbug@pc14.home.lan>
-	<fxg6dksau4jsk3u5xldlyo2m7qgiux6vtdrz5rywseotsouqdv@urcrwz6qtd3r>
-	<whjbzs4o3zjgnvbr2p6wkafrqllgfmyrd63xlanhodhtklrejk@pnuxnfxvlwz5>
-	<1N4hzj-1uuA3Z1OEh-00rhJD@mail.gmx.net>
-	<iry3mdm2bpp2mvteytiiq3umfwfdaoph5oe345yxjx4lujym2f@2p4raxmq2f4i>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1751106250; c=relaxed/simple;
+	bh=v3M/3XOFU2arxveYDUYQIJGCF0sz0482anXNEE6frTo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ioKhtFcuIr9MT2FN3Do1G2z3/tUyjVy4ZIJqiH1JRZxSyd0ZYGkGa7Tm9a7ghaqnTf40IH7M0GD9f76dIPpGWKUKTYsc1wqzSQpBk42c6uR3c/lPYiLhAwAmjBOFL4trDpn0aqXQdl5p7Uh1C6VPxdqvcVF+S/7fEhB/rQgZe8E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-3a528243636so1788851f8f.3
+        for <linux-block@vger.kernel.org>; Sat, 28 Jun 2025 03:24:09 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751106247; x=1751711047;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LClUed192tILHo+/vwfpU9tbOrExqi15ULo3AzIBDm4=;
+        b=eUhlnsSdzp3ZAwuFtatGGMlBNN9EUcgHDOI5JeMp9xkW4QYvMl/A4ZX2YLkxSEcpU2
+         cjoVC45/4YyR2goP/zfzPevnb8L71xzGQbgmWkz6TIfnnNYYlcizGzDXlzuqXiRsLhZF
+         W4CMgrQCwalhNUoSPpoN5B4bjEWkryTttNZLr1nCycRzKMNYahv7CixzEh2dvCsu8VPC
+         94nhoEa7sdsK6l0/HGvg3QHcvjMcC/ZWSJU6QEbOO0BGwWp5sAncf0yWdf9180v3fh+X
+         0kd76y9J4Os9Ep5uA+U2GVwq1tcH90/QflgxnUG0I1A4V0DRXd3M5bwGYNQLahNkulsn
+         zDGA==
+X-Forwarded-Encrypted: i=1; AJvYcCVmny1o7znb6NvrC0XVnKIHYZ2AhFLpqJ07Wu0fdOob+Eo0k5jHMQRavm43TjuwmWGB9Dh5k/hBeg6I2w==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx/KhKgPHB2aebePZDhodDQN1QGowDfFOYhH8fXvrQ4jOrhtvHf
+	JaR7rijwo4d9CJDib9eiuTmmguD05l0BQyUTxurAwon3HXVwTWNZHhHc
+X-Gm-Gg: ASbGncvS94BIh7pTnefQFSSq1ekc9gN7qqr+KfcrzZ6KSIPqY8kpi9A4DfEoHtO8ngg
+	56rPttDitcuoGr0vuxI1f1S4SonCTM7bWz567eGjqUdh9bEFhXUoTwek+zCRNAFhxtBfIuMqoiu
+	IZfwybMtIMdPsRT0om8qSjjvMhwrFqyUR5tDnqTs01+jVYrBy7vNv0WON6dRPpcBwSjYDmy/nPB
+	7nIf7ko6H1r6VG4BOBjeiOgUwMKoP56KeJn4PbqYzz/t8tob7xQqkLqYPQmrKBvAy3EHhwNu0jp
+	FkT8TnGfvnySR3mHS5GwkUoAf2e9nmLFCGMF/WUR1wPghVIscQeI/ksWy6QcJUoroXdfPvc4YMH
+	fuvgrcNAPFXQobdqBVSiCB6PZL8ng3uz0
+X-Google-Smtp-Source: AGHT+IF5bL19Bz2cqkIHP5r+d05dZkzyqX/hGKmsQU7T9lSjmrQTh5HCl5FyPu4JrS/fhx3Ws33kjA==
+X-Received: by 2002:adf:ca92:0:b0:3a4:f722:f98d with SMTP id ffacd0b85a97d-3a9008557admr4519014f8f.51.1751106247302;
+        Sat, 28 Jun 2025 03:24:07 -0700 (PDT)
+Received: from [10.100.102.74] (89-138-75-164.bb.netvision.net.il. [89.138.75.164])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a88c7e71dfsm4901565f8f.7.2025.06.28.03.24.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 28 Jun 2025 03:24:07 -0700 (PDT)
+Message-ID: <c66548d0-1211-4176-b698-05a36320cf94@grimberg.me>
+Date: Sat, 28 Jun 2025 13:24:05 +0300
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-Message-ID: <1MSc1L-1uKBoQ15kv-00Qx9T@mail.gmx.net>
-X-Provags-ID: V03:K1:AQk/5puEnPuyf+Qii36U+R5QsuILxuHqs273d3jrLykJlyGsKw1
- uPIWTyT4vYSXgsbvkzLEkgjf4gjhaz+8Y9OdLwrSRZwWNDkVAHIZUuSfjn+cABdu2OwJ+LJ
- W1Rle7XYgr9uzqJpBc9IXNOS2Iyd6b2yF1vitTCUHGSeAkXADRO20j5IPa4qhXq3T8mwWC0
- 0zvPiJnASd0GvgriVSfgQ==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:rEvNZthyjDM=;alljeksRQy8OXtMN8AHJWeZR2hN
- j5hvLb0peJy5qJqlytZXNcFrnCO2MAsFnb2C3KowaZLm5ObTcxsLHvNOL3Y5rjekkw7fhR2kc
- H7ZX6vhpEQx2EaAau7FV8laXKCKr9vJ548COquM3T1oJcziIq5xlfD5qrOVIyGU8r9Jh0r1+k
- 3K2c0fookRqADHkGFBp25e//6StX3jVZuHPkaGmx2mykrnv2eLw5Xudlk/e9gdWF8yCcO0yA+
- /+I+LlyRHD4L0RSWr8xrllf5HESugSf16BwG9nQPopll9TxrUdywUV/fH0op9ImIKQvF2faSk
- GhWHAkdCEuV9ufGLcUJHzrdlbAFXvoawDaPhO1PATQSDBrHrzXdfntjVT7BXvrbvXkabySraf
- QTtLIWYczvtssq+XyQSxGgB70c2NlYU6v9WwgKXRzJ9dAyfEXn0g/V4VNvWRR6hxJeQ4qog+v
- 4wtMm8EwdLUjaHi5L2xaLv4gGUj5oOTv6C0xpncjJpLmr6pzPwUlGW36GNX+WQrYmyByUld0b
- vJBA8AC72hRWFzIPlYOy0DOyJ3bODHqJCTO/UcU2lOsLUB0KuSqmcJpS5fiSZyOhXd1NCKkJ3
- kvNifgCYL5gm9bx2pSnXa64W4Bmu+6FMjCcqIsHVHXj6cj0xxsZwjKu+VMveNICeLwCRCziNg
- 4lpjexpmIxcFgYCVHH/1A8+49SwEVC99mnV/8iu3QZCaAyKPpMPmKuawaOSNH0M//PvMtil4s
- mRaTrhP3zGvOTnlQ1kpW2yXXHN+PpH7rtBhNFOlHvMwITRm0esiHRreEPkJQ7iD+54DLI9ZtX
- 2ncqu8BiWxkHdM1Ine0UwcDAHyrLOLjk/EuPSTgv/VuYJh5ZN8Quh4tu8mUyO+hrTxLH+9pin
- r6jylmISmmJsl62ES16MJToCpGhaBpy8QxS6BqviYE7pskPRpJNMzYClU5NXIXCYdrX2qgENw
- SYkLIK+c1ktP03fB7dAN3N6xD76mESmBTU0p5Zy2n/LmkQbuMzux5g0lc4pH7CzTDoWbInnL5
- lsxhEs3VdUqn22Qq7eAMHSdNvjz+OzY41OCr2+9BpdDsNGjXlWwUyDFSfoDr3G3SWLQWPHtKn
- +uI8aAg9n/dHxgSalryngzqMAl6RrEe1+pOkCNrsNZliRWeJ/3+jBOnBV2XEYbqxBdpcSS4Q4
- Q7Inh1O0GmNhD/xI5oBddFhtgutV1mhNuHZg/+CoRRKJw7kOwwMabQwJx3+8Ddb2xabMg4aN+
- FNp6LGTP+4/1WoNIZFImZ14t0vsifOMLnolsQH69nBoN0nO80ppwmLTa36Xb9uCJQjxKi95mO
- 6/rJ70P2Mq1dvieBuBKtDVJmnekCrvSQ06AFOcnX6r7VGX8fO1D2Dh3O54G6ypCJH2MH0GcMB
- QlcbeYqvfL9eiv4nuJdIRfit3rFjsZYXy3O7RjB15RI6sWLb99EnMMNDjNtHeuBz9tVx5rRYf
- Dx0BpKom0xBE0qyXaF7qvqiUvAxNSPJL/DF5v46uAVLfWl5Zq2+7RKzZK8+15j9C7jp/L+gdQ
- JA2x0BrV6OwDBNzpwBbxb0FREsOOx+7E6wFNgqY+x6qu6rH3sUz2/NXMRnqQghBm+xElGYRqt
- /EGp586r7ZpKwBFTfMJEzDGoJem8dTwSuZouqnuswPRGsybn58OZNVnLzacl+cYhhul6I+msN
- uAqFc/hepwOxj/UeGIP5Ubl2dJA8JvwqdrIN4xEnzVR2Yl9RH6yLsLy7SWVTNFDG8iQyb+sjB
- 5zm6Is9ff646YiVhVr1p3V1ppCKh3JyORtvlddr3GkB2lHUYebFpxFHFEHwkrLzDVdcUd7olW
- aTTrsI4miacMD0N7T/F/JFPj5D99wotbCz3H0feRkzTZgWDdZ1R49JX94heD+/9+ilrnqlMWu
- cVS2SW/KWZnJPnLMGxT2xDqMjVBTht7WZVjfSoea+IJrrr+GxQTc/ihWFauU9DDjP8G/LKinq
- YhvjOnB3Rvn1SwqHvxmOTlvZXZXkt3bnb0KW5fkHyeZz0bE3EVGlgi8v3nFggS9OJcBb7Z/uH
- GgZ/oLpTrvnGmDFU8heiYYWe2QNzD4pA76NTQdaDhg2HZRZa098RFCl4Tx4KePoQr+Lk3Wzgl
- 1DQmxEs/p/ZIQ123B9VISS3TaU0qMsE//nFt2m0XEYQZeGdvQYRBOE8GfNvHBitqnbcRMMpmh
- vy//LD9mwSBVhYOqi1ZCiRXU4eDItjqAfte50UK7SggFlGW6fuzm3pDx/ma2M56vmJUD9x8MR
- 5/Y0buRgI48g8hYyTqFBSw8Q1Ww0jg0U3Wt2SpMSYs5n0lYnL8Hrt8OT/aQYIlQUh4IZd8lXt
- myNU+1B3q+Ju4hjZFwTKt9ok3GymhvO0YJ1//1aNMvWkcaPrGFwfwkg5nmMYv1G/GaXg3wCF0
- 5xL0ZYD1SS5fhTaR0y5JRdp8DOgC6RAOPKyyJTm4xXaF2tMWCgwZhAhNOqtH5u6VS7hn2r69N
- mFnBjlRdZVv0DhcCd4eR5T4Qu9LYKGezEA8Wka/H2KtjWw26vmnh/Ajm1oIhlUCvk4Gjzk3pd
- yyxtIRvfoBoygNfWKo0sRwiwncWHJ8mn1+NDXgW6rRLBICX1Fgl25+fxF0h08GZBmWJV+84sD
- fEGL1JjQXKtf+9p37ASfLQQoqMoHjQr+M8cnvhpeFsSeCd4JwXssA4OTUV3TLyEMutVigeRWa
- UBHRJseGmIRgrrzvU0/ds6RJkL9owhxXOIxkdYRjdBuXkyaOoX8LHSkcd1jaEZqxmgwz5At3j
- BXJu7vRx8G6EmLbwaT1/eo78EYLu9dOCZO5pYAawuaXTcMbqxTaz16r8r3vJzHHH8sIesNYvh
- oQoaZg5rKlOeORpIcXuPtWOkFGuO0YH+Q6kYoUdmbh9OOCCa3LFaM+bS2di+P6lhQq7Lg/7pj
- bam9ApQ7iI6nCs/wOmnucaiA57QGfl2hrxrqOqVVHLTWKtQ5T0eJQAo7uR4O32l8ERmpVi6M2
- Kf24zhjYoul35opZSYmLNZ5w0BSL53xfc5PxWRMrtG4FabXslLeUIxFqlat/FzJtaALkOAXYa
- W9DPp2Pcq/vcJoloKS+icNh2I8Z5+E7wOMwSRXGGdDDym2PZa7NEirjHWDWyQX9RKW/6QdtR9
- hqZRQYT29MP7D03odGueG5zLrf8qMKMHtWWiKfSOMupQJdLOjlaVkg/MClwgEIV17bTcyG7cU
- EEMit9X6oyNHGTPdcDpKTnwVbqvLjmnO3a920Dcvbeq/UFAum1kWx1zEI6JA0zc6to/FWIhWP
- kCEOL44+swiSJBpGjoJ+N0MiYgnE2sck4Lx7SKFMcnSOoxjfx/2N3+9e+ZhpKawglsnRSrYK/
- exc8y6p7Zbq6mbpRapPpfhEruwY6QXn4dH4N/8ZTiz5IPb2mBMBKVojLgvW4voJvvpXbBcx8o
- ev40N4aS/vqDctaoFH4fzva+ZcNcxelY7gl0rAb8syazWfVm9hX1R2qLodv0BBBwxTIfIpCYC
- JbVgETsYqQyqtaSqlJJKNM31rSfW8UOIvvtE++52WEFrIuWmAsOmE
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] nvme-tcp: avoid race between nvme scan and reset
+To: Ming Lei <ming.lei@redhat.com>,
+ Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc: "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+ linux-block <linux-block@vger.kernel.org>, Hannes Reinecke
+ <hare@kernel.org>, Keith Busch <kbusch@kernel.org>,
+ Jens Axboe <axboe@kernel.dk>, "hch@infradead.org" <hch@infradead.org>
+References: <20250602043522.55787-1-shinichiro.kawasaki@wdc.com>
+ <20250602043522.55787-2-shinichiro.kawasaki@wdc.com>
+ <910b31ba-1982-4365-961e-435f5e7611b2@grimberg.me>
+ <86e241dd-9065-4cf0-9c35-8b7502ab2d8a@grimberg.me>
+ <6pt5u3fg3qts4jekun5ory5lr2jtfbibd76phqviheulpjqjtq@m3arkh44nrs2>
+ <aEuviL5O2kD70Sij@fedora>
+Content-Language: en-US
+From: Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <aEuviL5O2kD70Sij@fedora>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Hello Uwe,
 
-> That is surprising. I would have expected that the only effect of that
-> blacklist entry is that the module is not loaded. I don't understand
-> how that entry makes a difference if it doesn't prevent the module
-> being loaded.
->=20
-> You can try
->=20
-> 	update-initramfs -u -k all
->=20
-> maybe then the module isn't loaded any more on the next boot.
 
-I'm sorry, it is.
+On 13/06/2025 7:56, Ming Lei wrote:
+> On Wed, Jun 04, 2025 at 11:17:05AM +0000, Shinichiro Kawasaki wrote:
+>> Cc+: Ming,
+>>
+>> Hi Sagi, thanks for the background explanation and the suggestion.
+>>
+>> On Jun 04, 2025 / 10:10, Sagi Grimberg wrote:
+>> ...
+>>>> This is a problem. We are flushing a work that is IO bound, which can
+>>>> take a long time to complete.
+>>>> Up until now, we have deliberately avoided introducing dependency
+>>>> between reset forward progress
+>>>> and scan work IO to completely finish.
+>>>>
+>>>> I would like to keep it this way.
+>>>>
+>>>> BTW, this is not TCP specific.
+>> I see. The blktests test case nvme/063 is dedicated to tcp transport, so that's
+>> why it was reported for the TCP transport.
+>>
+>>> blk_mq_unquiesce_queue is still very much safe to call as many times as we
+>>> want.
+>>> The only thing that comes in the way is this pesky WARN. How about we make
+>>> it go away and have
+>>> a debug print instead?
+>>>
+>>> My preference would be to allow nvme to unquiesce queues that were not
+>>> previously quiesced (just
+>>> like it historically was) instead of having to block a controller reset
+>>> until the scan_work is completed (which
+>>> is admin I/O dependent, and may get stuck until admin timeout, which can be
+>>> changed by the user for 60
+>>> minutes or something arbitrarily long btw).
+>>>
+>>> How about something like this patch instead:
+>>> --
+>>> diff --git a/block/blk-mq.c b/block/blk-mq.c
+>>> index c2697db59109..74f3ad16e812 100644
+>>> --- a/block/blk-mq.c
+>>> +++ b/block/blk-mq.c
+>>> @@ -327,8 +327,10 @@ void blk_mq_unquiesce_queue(struct request_queue *q)
+>>>          bool run_queue = false;
+>>>
+>>>          spin_lock_irqsave(&q->queue_lock, flags);
+>>> -       if (WARN_ON_ONCE(q->quiesce_depth <= 0)) {
+>>> -               ;
+>>> +       if (q->quiesce_depth <= 0) {
+>>> +               printk(KERN_DEBUG
+>>> +                       "dev %s: unquiescing a non-quiesced queue,
+>>> expected?\n",
+>>> +                       q->disk ? q->disk->disk_name : "?", );
+>>>          } else if (!--q->quiesce_depth) {
+>>>                  blk_queue_flag_clear(QUEUE_FLAG_QUIESCED, q);
+>>>                  run_queue = true;
+>>> --
+>> The WARN was introduced with the commit e70feb8b3e68 ("blk-mq: support
+>> concurrent queue quiesce/unquiesce") that Ming authored. Ming, may I
+>> ask your comment on the suggestion by Sagi?
+> I think it is bad to use one standard block layer API in this unbalanced way,
+> that is why WARN_ON_ONCE() is added. We shouldn't encourage driver to use
+> APIs in this way.
+>
+> Question is why nvme have to unquiesce one non-quiesced queue?
 
-> The sr module might be enough to handle a DVD-RAM.
+It started before quiesce/unquiesce became an API that had to be balanced.
 
-Ok, then lets try it the hard way: rename
-/usr/lib/modules/6.1.0-37-amd64/kernel/drivers/block/pktcdvd.ko and
-reboot.
+In this case, we are using the tagset quiesce/unquiesce interface. Which 
+iterates
+over the request queues from the tagset. The problem is that due to 
+namespace
+scanning, we may add new namespaces (and their request queues) after we
+quiesced the tagset. Then when we call tagset unquiesce, we have a new 
+request
+queue that wasn't quiesced (added after the quiesce).
 
--> dmesg reports
-
-Jun 28 10:38:06 nb06 (udev-worker)[2081]: sr0: Process '/usr/sbin/pktsetup=
- -i 11:0' failed with exit code 1.
-
--> lsmod reports pktcdvd not loaded
-
--> And most important: DVD-RAM fully operational
-
-> Puzzled!
-
-And now? ;-)
-
-Best regards,
-Roland
+I don't mind having a BLK_FEAT_ALLOW_UNBALANCED_QUIESCE for the nvme request
+queues if you don't want to blindly remove the WARN_ON.
