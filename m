@@ -1,131 +1,112 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3EDC1F8691;
-	Mon, 30 Jun 2025 10:41:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2373B25D21A;
+	Mon, 30 Jun 2025 11:35:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751280087; cv=none; b=hvoubW01ZucnTMeeIv4HrY/N+r9+gZmi+pE9auvAe5irSA9g0v18+RSC7WwvkoeG2oYU5p8THogxTN+I+/HT0mQKpeBvyOJPSvENLVLijaM7EBOMyhA0Ota+ibwmg0b0P+J2AsMMgTYitKvBjhEuIR4QUvPYSHNu+3KmWYB/m0A=
+	t=1751283339; cv=none; b=boxu4FlYDTb4CvFMsLtRD57btB1BSiZinRL/7R1R640OWWvhmdW4jWlZDmBKB6pADMeAKziVQa8liL81+RENCtRQ75BO8s4mHRlMebZCy1yMKNvyNX5qwsFNVgWwANr4jq+zwS8mJFM6O9kOL0+54yEiZoE/WKxQKAhyXhMxNyo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751280087; c=relaxed/simple;
-	bh=Aaihtn+lbGVZl/8yJbeLECyjWVpfc4LymOW18ipEcIU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=h+6N/OQ1pLqaY/O3vQE3lMMh+VWx2/D5kR21wJZ3NCxtuaIzmwTxX5HExJQOyd1q2qt1xtbE7dPOMOe6G8vi75oQbOrvICo1ZEdmelLmJlbryMmPT2X7mfPa55addmf8DNuifEOQkzNg2/edwPeZ+8VGW0vmVnALLbL4jtvcpiY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=AJfoRn8O; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="AJfoRn8O"
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55U4muw7025176;
-	Mon, 30 Jun 2025 10:41:07 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=P8X+64
-	+7LUiKdRgKSuWacnq6CITlx8G1mp1YsoR5fZ0=; b=AJfoRn8O1SdGFxwJZfu7ga
-	TWTM3VpkSkkVLoIdLYSQYwIZqauHiW10RlBiuFNCGyqnUTIsQS0w+CHmvK0HWtD1
-	gCAGoXeXr2SXwPddh9g/Q53zqRqhFrmuaaZtCp8f/XOHb1e/W7TurKQeOS6QmjBK
-	XdUBPfyLLq7LKmaAekRBWPNp5XrFWQHuPVCPh1j7j84xFgh/bQV5x9kT9OoUOIpP
-	BtcxYSWiX/kB1PH08flX6YSPKrWwN0vbnH0XC9bnvK7xHOBTM2zatDWFuoTbxDR6
-	D/xX/BIQB7bJo9gcdr0ULQ/lLQkLcwMwt+sjdGtV+iqmgWI3ExRgjbyEbzdXebzQ
-	==
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 47j6u1gu5m-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 30 Jun 2025 10:41:07 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 55U9gGbs021934;
-	Mon, 30 Jun 2025 10:41:06 GMT
-Received: from smtprelay04.wdc07v.mail.ibm.com ([172.16.1.71])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 47juqpdea7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 30 Jun 2025 10:41:06 +0000
-Received: from smtpav04.dal12v.mail.ibm.com (smtpav04.dal12v.mail.ibm.com [10.241.53.103])
-	by smtprelay04.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 55UAf6IH19530454
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 30 Jun 2025 10:41:06 GMT
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1352158056;
-	Mon, 30 Jun 2025 10:41:06 +0000 (GMT)
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E86F558052;
-	Mon, 30 Jun 2025 10:41:03 +0000 (GMT)
-Received: from [9.43.10.179] (unknown [9.43.10.179])
-	by smtpav04.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 30 Jun 2025 10:41:03 +0000 (GMT)
-Message-ID: <6a9bf05f-f315-417a-b328-6a243de3568e@linux.ibm.com>
-Date: Mon, 30 Jun 2025 16:11:02 +0530
+	s=arc-20240116; t=1751283339; c=relaxed/simple;
+	bh=j8vjuXopMOzgU6kVsIB49GXlMX2NKPWeeErZMdyvwJM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=K8Te/yFUI95U5gLZ0rj5n9PWA+eAhffFd3yog5RGn8KZsEysfKYvMUa+FAFnWiKmodTULvbyyL0hGjsHJR2PTMDPLkfJ1AMVzoEd/AORkup9F7o4yipjKMNyWTmjqD+7ImJnbPmk24Pz1TSOX+F2Kd1n9cF3yLv22BiRC7cohDg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4bW3xg3sxFzYQvwn;
+	Mon, 30 Jun 2025 19:35:35 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.252])
+	by mail.maildlp.com (Postfix) with ESMTP id 68F031A1741;
+	Mon, 30 Jun 2025 19:35:34 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+	by APP3 (Coremail) with SMTP id _Ch0CgBnxySCdmJomWTTAA--.54607S4;
+	Mon, 30 Jun 2025 19:35:32 +0800 (CST)
+From: Yu Kuai <yukuai1@huaweicloud.com>
+To: hch@lst.de,
+	axboe@kernel.dk,
+	yukuai3@huawei.com
+Cc: penguin-kernel@I-love.SAKURA.ne.jp,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	yukuai1@huaweicloud.com,
+	yi.zhang@huawei.com,
+	yangerkun@huawei.com,
+	johnny.chenyi@huawei.com
+Subject: [PATCH v2] brd: fix sleeping function called from invalid context in brd_insert_page()
+Date: Mon, 30 Jun 2025 19:28:28 +0800
+Message-Id: <20250630112828.421219-1-yukuai1@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block: Fix a deadlock related to modifying the readahead
- attribute
-To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        stable@vger.kernel.org
-References: <20250625195450.1172740-1-bvanassche@acm.org>
- <1816437d-240a-4834-bef9-c9c4a66bee0a@linux.ibm.com>
- <ca4c60c9-c5df-4a82-8045-54ed9c0ba9be@acm.org>
- <7e4ff7e0-b2e0-4e2d-92a4-65b3d695c5e1@linux.ibm.com>
- <344a0eef-6942-455a-9fb2-f80fd72d4668@acm.org>
-Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <344a0eef-6942-455a-9fb2-f80fd72d4668@acm.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: UctT0kDWsL7sF0AsxcvPKI3p62yvSlJ6
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjMwMDA4NSBTYWx0ZWRfX/er402KbNDZd pbDWmyW9JMu5rpqA55qZvmSXaMtYfbJH+xjpT6c5E+ciCA3rCCDJD/r9UteSSlkKrqV5lF15AdW f5qJvIy14Ori01DJJABY0aaSq2LKcZXhn7BtdFeJm9NB8m/L1js5iI5zr40PUaylfH/bsiaLXKA
- XBh2FvuxDPAhCRWfnwnflV2maaIjdbUYgqxWx+U8pPCEpvsqEiEGlpRMPmWuaOBlxGDzan4CLkS sc4/BXxbU/NRi4/kx13wKPgD1iRXNK/Lw5XLLjYR39+Lrgg0xvNXB7kPnZuS6gv6AiUiW0iWzem kfh+4bz5ZhlLpsgbswpi8ZvuzyV6UgD9RhUINlhpV6T1Dk7EKt16Cjgqsjrj7uNSPXHeC6NnitJ
- LSgueWtrg61AhtTGLYK7DJTcDRQJQHAMW7CDux6Iz9lES0DZtnUuE4Bk0memh8fQVvgVmzJH
-X-Proofpoint-GUID: UctT0kDWsL7sF0AsxcvPKI3p62yvSlJ6
-X-Authority-Analysis: v=2.4 cv=GrRC+l1C c=1 sm=1 tr=0 ts=686269c3 cx=c_pps a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17 a=IkcTkHD0fZMA:10 a=6IFa9wvqVegA:10 a=ukeuSQTfHjOFx7Hybm4A:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
- definitions=2025-06-30_02,2025-06-27_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
- priorityscore=1501 adultscore=0 mlxlogscore=999 mlxscore=0 impostorscore=0
- phishscore=0 spamscore=0 suspectscore=0 bulkscore=0 malwarescore=0
- lowpriorityscore=0 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
- definitions=main-2506300085
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_Ch0CgBnxySCdmJomWTTAA--.54607S4
+X-Coremail-Antispam: 1UD129KBjvJXoW7tFW5XFW7JFyUGr17WryfZwb_yoW8Xr1xpF
+	ZIvFy7Cry5CF42v3W7Z3ZrCF1rGa93WayIkFyYqw1F9rW3Jry2934Ik34Yq3W5GrWxAFs8
+	ZFs0ywn5AFWDA37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9Y14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
+	Y2ka0xkIwI1lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x
+	0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2
+	zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF
+	4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWU
+	CwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCT
+	nIWIevJa73UjIFyTuYvjfUonmRUUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
+From: Yu Kuai <yukuai3@huawei.com>
 
+__xa_cmpxchg() is called with rcu_read_lock(), and it will allocate
+memory if necessary.
 
-On 6/27/25 8:40 PM, Bart Van Assche wrote:
-> On 6/26/25 11:16 PM, Nilay Shroff wrote:
->> Thanks! this makes sense now. But then we do have few other limits
->> (e.g. iostats_passthrough, iostats, write_cache etc.) which are accessed
->> during IO hotpath. So if we were to update those limits then we acquire
->> ->limits_lock and also freezes the queue. So I wonder how could those be
->> addressed?
-> 
-> Is there any Linux distro that sets these sysfs attributes from a udev
-> rule? If not, I don't think that we have to worry about these sysfs
-> attributes.
-> 
+Fix the problem by moving rcu_read_lock() after __xa_cmpxchg(), meanwhile,
+it still should be held before xa_unlock(), prevent returned page to be
+freed by concurrent discard.
 
-I think that's not only about distro udev rules setting queue limits.
-It's quite possible that some user applications may programmatically update
-these queue limits during runtime. In such cases, the application would need
-to freeze the queue before making changes. So even if no current distro sets
-these attributes via udev, that could change in the future, and we don't have
-control over that.
+Fixes: bbcacab2e8ee ("brd: avoid extra xarray lookups on first write")
+Reported-by: syzbot+ea4c8fd177a47338881a@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/all/685ec4c9.a00a0220.129264.000c.GAE@google.com/
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+---
+Changes in v2:
+ - fix typo in the subject
+ - add review tag.
 
-Looking at your earlier dmsetup command:
-# dmsetup table mpatha
-0 65536 multipath 1 queue_if_no_path 1 alua 1 1 service-time 0 1 2 8:32 1 1 
+ drivers/block/brd.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-In the above rule, the option queue_if_no_path seems bit odd (unless used 
-with timeout). Can't we add module param queue_if_no_path_timeout_secs=<N>
-while loading dm-multipath and thus avoid hanging the queue I/O indefinitely 
-when all paths of a multipath device is lost? IMO, queue_if_no_path without
-timeout may make sense when we know that the paths will eventually recover 
-and that applications should simply wait.
+diff --git a/drivers/block/brd.c b/drivers/block/brd.c
+index b1be6c510372..0c2eabe14af3 100644
+--- a/drivers/block/brd.c
++++ b/drivers/block/brd.c
+@@ -64,13 +64,15 @@ static struct page *brd_insert_page(struct brd_device *brd, sector_t sector,
+ 
+ 	rcu_read_unlock();
+ 	page = alloc_page(gfp | __GFP_ZERO | __GFP_HIGHMEM);
+-	rcu_read_lock();
+-	if (!page)
++	if (!page) {
++		rcu_read_lock();
+ 		return ERR_PTR(-ENOMEM);
++	}
+ 
+ 	xa_lock(&brd->brd_pages);
+ 	ret = __xa_cmpxchg(&brd->brd_pages, sector >> PAGE_SECTORS_SHIFT, NULL,
+ 			page, gfp);
++	rcu_read_lock();
+ 	if (ret) {
+ 		xa_unlock(&brd->brd_pages);
+ 		__free_page(page);
+-- 
+2.39.2
 
-Thanks,
---Nilay
