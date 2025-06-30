@@ -1,64 +1,48 @@
-Received: from mail-io1-f41.google.com (mail-io1-f41.google.com [209.85.166.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 003.mia.mailroute.net (003.mia.mailroute.net [199.89.3.6])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 011A328EC1C
-	for <linux-block@vger.kernel.org>; Mon, 30 Jun 2025 15:24:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5442642AA4;
+	Mon, 30 Jun 2025 15:28:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.6
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751297079; cv=none; b=tkf+X5cZQI28B1KWI6ATIjjmkHPK+xUoZ0t4Ig5oYGnR66sofhjjauOK2jvOq1VCF3V/hvTPMxfMWeci+kcScDCNlLUO0Ujrm7+kXo36TS6qTYqh1nUPzxzrHi/D2gTNLv4uAbysLEXm2Uq+2zS6urDYbrSO3kY5/ONl1h7vl2E=
+	t=1751297304; cv=none; b=nUH1cFRIZ0OCjdFOLN0uNQWIdUKHPrPgnbtX1DIGChQmJQ9R87WmVXYH6cjx7C3EPk5CA6b55Vrhiy1gBf9fta2o9Hi1tKPeExn7HurXbRFzQYCuAdhgsKqkDrfLFMn3wXvUJAEsqFqMo98sg1V7uhq2pbP1DnVnClNaKomqirs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751297079; c=relaxed/simple;
-	bh=lbuI0MNBw9Awg9+tIphhpvGMwxZYpAzxVyJDZbeQoXg=;
+	s=arc-20240116; t=1751297304; c=relaxed/simple;
+	bh=0Xv1vjv4futKXHAjk048e6r8kxFRcCkSa5gCzJl2f5Y=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KRGMlTrnEU1euEIGm4Iqv9TaU2vLI01w9bRGXjLqDXi49MONMEerQUTWqy7GJiS23Wf18frRjjHi8nM27WVvMsZbXjQ0awi+CGZtMMlX5WbswmPRmMplx5gzdfGed067CsK52I28wrGpsEqqI0Ccnr6IR4fZr+5hHhhUV2ve9Gc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=YgZtOR+l; arc=none smtp.client-ip=209.85.166.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	 In-Reply-To:Content-Type; b=cJm2PJ/JsFPqPPTkeoLRRDk+qU8vZ4dFYn6OjUlsmcady8y+bNMZqCe8xt19a0OD5ctpFeeG168HU4lN2XoUkO2ollwbycm/emSF8B/UiEtmAwDOPpuUbSaTWnrQJ/suAMViIiXtNjQnfKgsKVcSakmdSiaook4dxRPjIrjfIhQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=0q3lwp0A; arc=none smtp.client-ip=199.89.3.6
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="YgZtOR+l"
-Received: by mail-io1-f41.google.com with SMTP id ca18e2360f4ac-86d013c5e79so197833939f.0
-        for <linux-block@vger.kernel.org>; Mon, 30 Jun 2025 08:24:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1751297076; x=1751901876; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=lPRvs6BnIIzqyFHxoXRAic5qy59WOr/RY4rg93qhMko=;
-        b=YgZtOR+lzDrA0XeRuEuV+6gUmMd6oTRPydFPobFR7XFAvun1yx+JsW60dsamtlF0Us
-         CkpwDU9ZGwaR1y567KMuM4hfxMb0BE4ycg+RC+HkAeAY5QgW0x6QgjnH/WjL/OhaiYPt
-         7GS5+8ysXcH7IJFa8h/fQ2Nxqwbn90vnmOJ7idRY+KwmXc/yfycFYuv1VqDOfrSKRYOC
-         rGsF29dskgMB6GspeaYq3DaH5L36crorhdbMeUEwkDSgB+n/B2QO0MnLEx8zL7hXetcs
-         uIXcXqCD+dm9Sz5kGlqoM+WaV2gtFMHKfAvKSTViSBtZy2uuu2hLueGck6nAon+Hsimd
-         Kftg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751297076; x=1751901876;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lPRvs6BnIIzqyFHxoXRAic5qy59WOr/RY4rg93qhMko=;
-        b=YIOLQ8vo1BKbQB9RbD2wkOJKiqNtLAh46gnYgozwh/AeT91JJj5YZXd4cHYlxRQVLE
-         sUVUR81qOZjNKWXrg8gX67Z5wUJw4HG+PYBWrWdI7bwC3JgCSr+gTfpIQuK4FbvzxAZk
-         oy2qroK5uaMyw8bzI84oq3JlGedqObtz8Y+1rhC//W6fl9zg42km7eD7MAikmpx40BaP
-         /6kqaSkHwEniHVJJPOw34+kOif5P/+JEpSkC3C2zi54dHTjbS3qRM3wJjM6QEG6Vb+jx
-         DQgAH7sIuJLWbKCyYQcKM4L3I3hPGI5gS6GvsOGJ3Jf0QpYvEeQjA4BXaT1B8E0CiMkN
-         ea4A==
-X-Forwarded-Encrypted: i=1; AJvYcCXTuCpECbHySr68qxTgIvAT77MOvkKvE/iZ+qJhaoUbjzYGiZoPPL4MmIsmDoGotxznOcHorPOwXlLQhQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzgMAYUhI7n1GXNIfUy47vJd51GlGS2vjEXQxEuVN7V1anH/DhT
-	46mXh7DJnOTchSkMUFi2bqosVWR+s1BmB5ObvPaV8t/TG9ZeIjmR9Tun21zsL9/gAi4=
-X-Gm-Gg: ASbGncuGy5cklD7hbphR9S3zPnCrV8LzvKq2OoF4ak77hS2Sz5boQScYClZKtFP5GrP
-	6sAITgeuXMrY9r4QoAcda64Jc6lD9ojYErOTOGtUIuK7Wyt5744ACdH91CywFfenwLKoLZhepvL
-	Z5VVHDH3AlGVTAUMWURE6nbzKbX6t+mfh9iD5sXkfyVkYElNvwAWN9PPJTbjXP1IbN2ofpi6X9h
-	916aqgwMg6ylb0AspYbP96J22vyIoXH6aQiDuf+5jKLpdmldBbgywYidAHdeQYwQQzJriv4o1He
-	PK9qLOvSOS78jDDdY6V2pAJi0sRD80Npqr0IwdTJFq0ulsb6ekZr4tjz5wCuRO//RUZs8Q==
-X-Google-Smtp-Source: AGHT+IHd3tofctj6pJYpvoUcM5ehbdOu4b/Eo1F55IUk0N41h4uwH/j6fT8O4lxLh16JrhUtLfM4AQ==
-X-Received: by 2002:a05:6602:1483:b0:876:7555:9cb4 with SMTP id ca18e2360f4ac-87688258c05mr1468322139f.1.1751297075914;
-        Mon, 30 Jun 2025 08:24:35 -0700 (PDT)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-87687a18d95sm198418939f.16.2025.06.30.08.24.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 30 Jun 2025 08:24:34 -0700 (PDT)
-Message-ID: <eb41cab3-5946-4fe3-a1be-843dd6fca159@kernel.dk>
-Date: Mon, 30 Jun 2025 09:24:34 -0600
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="0q3lwp0A"
+Received: from localhost (localhost [127.0.0.1])
+	by 003.mia.mailroute.net (Postfix) with ESMTP id 4bW9673HqczlgqTv;
+	Mon, 30 Jun 2025 15:28:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1751297294; x=1753889295; bh=kcvb8zxH7vcjJft1XzxKvvp+
+	hx51blQwxPAmz93DPXM=; b=0q3lwp0At5jDlMDjg7FPpSxdDdqE6VvelbSGRQh0
+	ZvSvh5yGPfgthKz8KKYH+xP3wv4LM9blAFywW0+5si0UN+YPOU5zx1BPW7Zgmjdz
+	FbcA92f6ymGid5/Z+9MU0hxhRz4BwVvcR+bl5zau5TW0O5huuqUSTu7q/bz6LZ5l
+	9O5wAe1RwVvR8mr7UT40AQuxxImRB4w9r+RZKdcY2wFdQEyYXyY4+UgWdbgCKQDa
+	evgz7Pb3tugltBoij/++G1Ca5iquzQ2yKjcShEZMe8ebko8C0Lt/xJRYLNmEToCy
+	oKbS/+z1ZrLGDsoD2qt+/ny+X0unthK51v5mqJ4kHrGB3g==
+X-Virus-Scanned: by MailRoute
+Received: from 003.mia.mailroute.net ([127.0.0.1])
+ by localhost (003.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id jeG2RULudk8w; Mon, 30 Jun 2025 15:28:14 +0000 (UTC)
+Received: from [100.66.154.22] (unknown [104.135.204.82])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4bW9626wqBzlgqTr;
+	Mon, 30 Jun 2025 15:28:09 +0000 (UTC)
+Message-ID: <765d62a8-bb5d-4f1d-8996-afc005bc2d1d@acm.org>
+Date: Mon, 30 Jun 2025 08:28:08 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -66,34 +50,50 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] brd: fix sleeping function called from invalid context
- in brd_insert_page()
-To: Yu Kuai <yukuai1@huaweicloud.com>, hch@lst.de, yukuai3@huawei.com
-Cc: penguin-kernel@I-love.SAKURA.ne.jp, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, yi.zhang@huawei.com, yangerkun@huawei.com,
- johnny.chenyi@huawei.com
-References: <20250630112828.421219-1-yukuai1@huaweicloud.com>
+Subject: Re: [PATCH] block: Fix a deadlock related to modifying the readahead
+ attribute
+To: Nilay Shroff <nilay@linux.ibm.com>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+ stable@vger.kernel.org
+References: <20250625195450.1172740-1-bvanassche@acm.org>
+ <1816437d-240a-4834-bef9-c9c4a66bee0a@linux.ibm.com>
+ <ca4c60c9-c5df-4a82-8045-54ed9c0ba9be@acm.org>
+ <7e4ff7e0-b2e0-4e2d-92a4-65b3d695c5e1@linux.ibm.com>
+ <344a0eef-6942-455a-9fb2-f80fd72d4668@acm.org>
+ <6a9bf05f-f315-417a-b328-6a243de3568e@linux.ibm.com>
 Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20250630112828.421219-1-yukuai1@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <6a9bf05f-f315-417a-b328-6a243de3568e@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 6/30/25 5:28 AM, Yu Kuai wrote:
-> From: Yu Kuai <yukuai3@huawei.com>
+On 6/30/25 3:41 AM, Nilay Shroff wrote:
+> Looking at your earlier dmsetup command:
+> # dmsetup table mpatha
+> 0 65536 multipath 1 queue_if_no_path 1 alua 1 1 service-time 0 1 2 8:32 1 1
 > 
-> __xa_cmpxchg() is called with rcu_read_lock(), and it will allocate
-> memory if necessary.
-> 
-> Fix the problem by moving rcu_read_lock() after __xa_cmpxchg(), meanwhile,
-> it still should be held before xa_unlock(), prevent returned page to be
-> freed by concurrent discard.
+> In the above rule, the option queue_if_no_path seems bit odd (unless used
+> with timeout). Can't we add module param queue_if_no_path_timeout_secs=<N>
+> while loading dm-multipath and thus avoid hanging the queue I/O indefinitely
+> when all paths of a multipath device is lost? IMO, queue_if_no_path without
+> timeout may make sense when we know that the paths will eventually recover
+> and that applications should simply wait.
 
-The rcu locking in there is a bit of a mess, imho. What _exactly_ is the
-rcu read side locking protecting? Is it only needed around the lookup
-and insert? We even hold it over the kmap and copy, which seems very
-heavy handed.
+I refuse to modify the tests that trigger the deadlock because:
+1. The deadlock is a REGRESSION. Regressions are not tolerated in the
+    Linux kernel and should be fixed instead of arguing about whether or
+    not the use case should be modified.
+2. The test that triggers the deadlock is not new. It is almost ten
+    years old and the deadlock reported at the start of this email thread
+    is the first deadlock in the block layer triggered by that test.
+3. queue_if_no_path is widely used to avoid I/O errors if all paths are
+    temporarily unavailable and if it is not known how long it will take
+    to restore a path. queue_if_no_path can e.g. be used to prevent I/O
+    errors if a technician mistakenly pulls the wrong cable(s) in a data
+    center.
+4. Unnecessary blk_mq_freeze_queue()/blk_mq_unfreeze_queue() pairs slow
+    down the workflows that trigger these kernel function calls. Hence,
+    if blk_mq_freeze_queue() and blk_mq_unfreeze_queue() are called
+    unnecessarily, the calls to these functions should be removed.
 
--- 
-Jens Axboe
-
+Bart.
