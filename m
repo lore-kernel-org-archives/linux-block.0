@@ -1,80 +1,81 @@
 Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F0381AA1DB
-	for <linux-block@vger.kernel.org>; Mon, 30 Jun 2025 06:20:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 959DB125D6
+	for <linux-block@vger.kernel.org>; Mon, 30 Jun 2025 06:24:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751264438; cv=none; b=a9YFmPUV/d+qRjS6td5/q/R563OOs0gyGHWS9yUE8yoUt+XpcliTtAZMbQUxDteZgw2QjojquXKIFgnoMtkop9O+H7tBSBrV6hnzIMLcTsg/RK/muXtoEnuYH1PVn/gXo1H/NeLcvJwlTmxEqR8GZcaA+K+XF1KZbPThalzJkNs=
+	t=1751264659; cv=none; b=KLzgdjG2LSKMpPyzp1tqmkBcrik09XOfDUy80N7xm+HtidCPvkPI7/8yDeWsSHNahq8bf6eOavl38Op9ESaIId9GJSxRuEXON6Uv+WrRo60L2qQJsz+um7tFE+7F3RhVqokUKbA3frbf7UaTAeNXVD6SkCTNYh1bg3gSeYdfYd8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751264438; c=relaxed/simple;
-	bh=s0xyioboGWDchSPtEJk3/FOrELXBC7ur4e7YZtdTxFE=;
+	s=arc-20240116; t=1751264659; c=relaxed/simple;
+	bh=fynkFCbTyhp+lP2+wQiko2FnkMARYFUhSXftkbijdpE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qrhoJZE1XwpnO2qxsXfb9F1YJT6rfyReu6+zuRJ9/9kwpFw0LMvQOdo7kGwvaWWlt9bHzNT+X6UuuoKzPuPeh9W6OYACUWd9yPAlhUYVfXBtvhokVGYMjPXaBOGrr2dvOUZhqzYOYQVj9dA1n3/cNZWyS6Dj3YmBXzTYMQlqm9E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=HCLsJgnL; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=BDnuQsZX; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=HCLsJgnL; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=BDnuQsZX; arc=none smtp.client-ip=195.135.223.131
+	 In-Reply-To:Content-Type; b=VH/MGWSDKYq6WzJnyw0JL9z2JZDUdELu0apYKnIqLrwvF1f3JIlJP8f/G16g9cKQcInIPHNjM1G0WK+nZ7ynw3y8rMimwAEOhkpEB1/a28PdLJNYt3RS4mWpAGBkUVmrxPPZ2Q+9Bsa8mnK77bBlCH5SdZQ3AB498vKu3323/98=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Eq23olir; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=UhW4OSsP; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Eq23olir; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=UhW4OSsP; arc=none smtp.client-ip=195.135.223.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="HCLsJgnL";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="BDnuQsZX";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="HCLsJgnL";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="BDnuQsZX"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Eq23olir";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="UhW4OSsP";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Eq23olir";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="UhW4OSsP"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 5DD551F397;
-	Mon, 30 Jun 2025 06:20:34 +0000 (UTC)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 9E33E1F38C;
+	Mon, 30 Jun 2025 06:24:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1751264434; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1751264654; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=fOZjhNtMGjK4zLwl58+nJ1+oKAZ8Fmo+SqkFQTBAdRI=;
-	b=HCLsJgnLr5yTlfO9Z9V1IdOp0z3/Rx0WAgHD4GQAl4slAJzs8Sydu4Iqy8XCmZaZGm6ZBY
-	v2aklFxAnP6hClsyMWLVecOaFKkdCk6/3C4k2j1QjH0+y/Cbkx9ZC+f2tYWiGOr/K1QjZv
-	p8hDwpbeVWWj1kDe3AQhWDtWCxsATSs=
+	bh=F21BaYNzY9dHjXTi1V+jan0WC/eOZUKoUd5jhdBGaug=;
+	b=Eq23olirpL/FqBnHKwhFRI1Yf/Fgl2wIwBU2y4G/YgcUZuObe1fbu1u8oATNqCZOGASYyW
+	vSoGsKplwvNOad/Qu9x3jDjCTWpdCnTxzk1sdmeorIwHA8ntWyTreD4LUGoehqErlnmF5H
+	uk9zo/9xfKAMis9fmW9ufSpKsDiooBo=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1751264434;
+	s=susede2_ed25519; t=1751264654;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=fOZjhNtMGjK4zLwl58+nJ1+oKAZ8Fmo+SqkFQTBAdRI=;
-	b=BDnuQsZXMjhPLA0+lxif5Tsfdhm7tQEKRTNmwhcAxzevA4zScIvBkGTW7VCyG9kLWZPEYw
-	gZFvnEJ9SMQxYhDA==
+	bh=F21BaYNzY9dHjXTi1V+jan0WC/eOZUKoUd5jhdBGaug=;
+	b=UhW4OSsPdGY0jkLblRYJQLsT9NmZ/vCHWgeKLUtifCdix+o+xo5WB5wFKMDW8yfznmqjnD
+	c9ml6gmITCwlxnDg==
 Authentication-Results: smtp-out2.suse.de;
-	none
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=Eq23olir;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=UhW4OSsP
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1751264434; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1751264654; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=fOZjhNtMGjK4zLwl58+nJ1+oKAZ8Fmo+SqkFQTBAdRI=;
-	b=HCLsJgnLr5yTlfO9Z9V1IdOp0z3/Rx0WAgHD4GQAl4slAJzs8Sydu4Iqy8XCmZaZGm6ZBY
-	v2aklFxAnP6hClsyMWLVecOaFKkdCk6/3C4k2j1QjH0+y/Cbkx9ZC+f2tYWiGOr/K1QjZv
-	p8hDwpbeVWWj1kDe3AQhWDtWCxsATSs=
+	bh=F21BaYNzY9dHjXTi1V+jan0WC/eOZUKoUd5jhdBGaug=;
+	b=Eq23olirpL/FqBnHKwhFRI1Yf/Fgl2wIwBU2y4G/YgcUZuObe1fbu1u8oATNqCZOGASYyW
+	vSoGsKplwvNOad/Qu9x3jDjCTWpdCnTxzk1sdmeorIwHA8ntWyTreD4LUGoehqErlnmF5H
+	uk9zo/9xfKAMis9fmW9ufSpKsDiooBo=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1751264434;
+	s=susede2_ed25519; t=1751264654;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=fOZjhNtMGjK4zLwl58+nJ1+oKAZ8Fmo+SqkFQTBAdRI=;
-	b=BDnuQsZXMjhPLA0+lxif5Tsfdhm7tQEKRTNmwhcAxzevA4zScIvBkGTW7VCyG9kLWZPEYw
-	gZFvnEJ9SMQxYhDA==
+	bh=F21BaYNzY9dHjXTi1V+jan0WC/eOZUKoUd5jhdBGaug=;
+	b=UhW4OSsPdGY0jkLblRYJQLsT9NmZ/vCHWgeKLUtifCdix+o+xo5WB5wFKMDW8yfznmqjnD
+	c9ml6gmITCwlxnDg==
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 08DF913983;
-	Mon, 30 Jun 2025 06:20:34 +0000 (UTC)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 473CB13983;
+	Mon, 30 Jun 2025 06:24:14 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id AviAALIsYmifVQAAD6G6ig
-	(envelope-from <hare@suse.de>); Mon, 30 Jun 2025 06:20:34 +0000
-Message-ID: <d8e6702d-8787-4e85-9770-e415f975e266@suse.de>
-Date: Mon, 30 Jun 2025 08:20:28 +0200
+	id 05BVD44tYmh4VgAAD6G6ig
+	(envelope-from <hare@suse.de>); Mon, 30 Jun 2025 06:24:14 +0000
+Message-ID: <07d77cbb-f2fe-4193-b027-039166f5540f@suse.de>
+Date: Mon, 30 Jun 2025 08:24:13 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -82,68 +83,63 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv6 2/3] block: fix lockdep warning caused by lock
- dependency in elv_iosched_store
+Subject: Re: [PATCHv6 3/3] block: fix potential deadlock while running
+ nr_hw_queue update
 To: Nilay Shroff <nilay@linux.ibm.com>, linux-block@vger.kernel.org
 Cc: hch@lst.de, ming.lei@redhat.com, axboe@kernel.dk, sth@linux.ibm.com,
  lkp@intel.com, gjoyce@ibm.com
 References: <20250630054756.54532-1-nilay@linux.ibm.com>
- <20250630054756.54532-3-nilay@linux.ibm.com>
+ <20250630054756.54532-4-nilay@linux.ibm.com>
 Content-Language: en-US
 From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20250630054756.54532-3-nilay@linux.ibm.com>
+In-Reply-To: <20250630054756.54532-4-nilay@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Rspamd-Queue-Id: 9E33E1F38C
+X-Rspamd-Action: no action
 X-Spam-Flag: NO
-X-Spam-Score: -4.30
-X-Spamd-Result: default: False [-4.30 / 50.00];
+X-Spamd-Result: default: False [-4.51 / 50.00];
 	BAYES_HAM(-3.00)[100.00%];
 	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
 	NEURAL_HAM_SHORT(-0.20)[-1.000];
 	MIME_GOOD(-0.10)[text/plain];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	MX_GOOD(-0.01)[];
 	ARC_NA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	MID_RHS_MATCH_FROM(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	RCVD_TLS_ALL(0.00)[];
 	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
+	FROM_EQ_ENVFROM(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
 	RCVD_COUNT_TWO(0.00)[2];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo]
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo];
+	DNSWL_BLOCKED(0.00)[2a07:de40:b281:106:10:150:64:167:received,2a07:de40:b281:104:10:150:64:97:from];
+	DKIM_TRACE(0.00)[suse.de:+]
+X-Spam-Score: -4.51
 X-Spam-Level: 
 
 On 6/30/25 07:21, Nilay Shroff wrote:
-> Recent lockdep reports [1] have revealed a potential deadlock caused by a
-> lock dependency between the percpu allocator lock and the elevator lock.
-> This issue can be avoided by ensuring that the allocation and release of
-> scheduler tags (sched_tags) are performed outside the elevator lock.
-> Furthermore, the queue does not need to be remain frozen during these
-> operations.
+> Move scheduler tags (sched_tags) allocation and deallocation outside
+> both the ->elevator_lock and ->freeze_lock when updating nr_hw_queues.
+> This change breaks the dependency chain from the percpu allocator lock
+> to the elevator lock, helping to prevent potential deadlocks, as
+> observed in the reported lockdep splat[1].
 > 
-> To address this, move all sched_tags allocations and deallocations outside
-> of both the ->elevator_lock and the ->freeze_lock. Since the lifetime of
-> the elevator queue and its associated sched_tags is closely tied, the
-> allocated sched_tags are now stored in the elevator queue structure. Then,
-> during the actual elevator switch (which runs under ->freeze_lock and
-> ->elevator_lock), the pre-allocated sched_tags are assigned to the
-> appropriate q->hctx. Once the elevator switch is complete and the locks
-> are released, the old elevator queue and its associated sched_tags are
-> freed.
+> This commit introduces batch allocation and deallocation helpers for
+> sched_tags, which are now used from within __blk_mq_update_nr_hw_queues
+> routine while iterating through the tagset.
 > 
-> This commit specifically addresses the allocation/deallocation of sched_
-> tags during elevator switching. Note that sched_tags may also be allocated
-> in other contexts, such as during nr_hw_queues updates. Supporting that
-> use case will require batch allocation/deallocation, which will be handled
-> in a follow-up patch.
-> 
-> This restructuring ensures that sched_tags memory management occurs
-> entirely outside of the ->elevator_lock and ->freeze_lock context,
-> eliminating the lock dependency problem seen during scheduler updates.
+> With this change, all sched_tags memory management is handled entirely
+> outside the ->elevator_lock and the ->freeze_lock context, thereby
+> eliminating the lock dependency that could otherwise manifest during
+> nr_hw_queues updates.
 > 
 > [1] https://lore.kernel.org/all/0659ea8d-a463-47c8-9180-43c719e106eb@linux.ibm.com/
 > 
@@ -151,162 +147,47 @@ On 6/30/25 07:21, Nilay Shroff wrote:
 > Closes: https://lore.kernel.org/all/0659ea8d-a463-47c8-9180-43c719e106eb@linux.ibm.com/
 > Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
 > ---
->   block/blk-mq-sched.c | 155 +++++++++++++++++++++++--------------------
->   block/blk-mq-sched.h |   8 ++-
->   block/elevator.c     |  47 +++++++++++--
->   block/elevator.h     |  14 +++-
->   4 files changed, 144 insertions(+), 80 deletions(-)
+>   block/blk-mq-sched.c | 63 ++++++++++++++++++++++++++++++++++++++++++++
+>   block/blk-mq-sched.h |  4 +++
+>   block/blk-mq.c       | 11 +++++++-
+>   block/blk.h          |  2 +-
+>   block/elevator.c     |  4 +--
+>   5 files changed, 80 insertions(+), 4 deletions(-)
 > 
 > diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-> index 359e0704e09b..2d6d1ebdd8fb 100644
+> index 2d6d1ebdd8fb..da802df34a8c 100644
 > --- a/block/blk-mq-sched.c
 > +++ b/block/blk-mq-sched.c
-> @@ -374,64 +374,17 @@ bool blk_mq_sched_try_insert_merge(struct request_queue *q, struct request *rq,
->   }
->   EXPORT_SYMBOL_GPL(blk_mq_sched_try_insert_merge);
->   
-> -static int blk_mq_sched_alloc_map_and_rqs(struct request_queue *q,
-> -					  struct blk_mq_hw_ctx *hctx,
-> -					  unsigned int hctx_idx)
-> -{
-> -	if (blk_mq_is_shared_tags(q->tag_set->flags)) {
-> -		hctx->sched_tags = q->sched_shared_tags;
-> -		return 0;
-> -	}
-> -
-> -	hctx->sched_tags = blk_mq_alloc_map_and_rqs(q->tag_set, hctx_idx,
-> -						    q->nr_requests);
-> -
-> -	if (!hctx->sched_tags)
-> -		return -ENOMEM;
-> -	return 0;
-> -}
-> -
-> -static void blk_mq_exit_sched_shared_tags(struct request_queue *queue)
-> -{
-> -	blk_mq_free_rq_map(queue->sched_shared_tags);
-> -	queue->sched_shared_tags = NULL;
-> -}
-> -
->   /* called in queue's release handler, tagset has gone away */
->   static void blk_mq_sched_tags_teardown(struct request_queue *q, unsigned int flags)
->   {
->   	struct blk_mq_hw_ctx *hctx;
->   	unsigned long i;
->   
-> -	queue_for_each_hw_ctx(q, hctx, i) {
-> -		if (hctx->sched_tags) {
-> -			if (!blk_mq_is_shared_tags(flags))
-> -				blk_mq_free_rq_map(hctx->sched_tags);
-> -			hctx->sched_tags = NULL;
-> -		}
-> -	}
-> +	queue_for_each_hw_ctx(q, hctx, i)
-> +		hctx->sched_tags = NULL;
->   
->   	if (blk_mq_is_shared_tags(flags))
-> -		blk_mq_exit_sched_shared_tags(q);
-> -}
-> -
-> -static int blk_mq_init_sched_shared_tags(struct request_queue *queue)
-> -{
-> -	struct blk_mq_tag_set *set = queue->tag_set;
-> -
-> -	/*
-> -	 * Set initial depth at max so that we don't need to reallocate for
-> -	 * updating nr_requests.
-> -	 */
-> -	queue->sched_shared_tags = blk_mq_alloc_map_and_rqs(set,
-> -						BLK_MQ_NO_HCTX_IDX,
-> -						MAX_SCHED_RQ);
-> -	if (!queue->sched_shared_tags)
-> -		return -ENOMEM;
-> -
-> -	blk_mq_tag_update_sched_shared_tags(queue);
-> -
-> -	return 0;
-> +		q->sched_shared_tags = NULL;
+> @@ -427,6 +427,30 @@ void blk_mq_free_sched_tags(struct elevator_tags *et,
+>   	kfree(et);
 >   }
 >   
->   void blk_mq_sched_reg_debugfs(struct request_queue *q)
-> @@ -458,8 +411,75 @@ void blk_mq_sched_unreg_debugfs(struct request_queue *q)
->   	mutex_unlock(&q->debugfs_mutex);
->   }
->   
-> +void blk_mq_free_sched_tags(struct elevator_tags *et,
+> +void blk_mq_free_sched_tags_batch(struct xarray *et_table,
 > +		struct blk_mq_tag_set *set)
 > +{
-> +	unsigned long i;
-> +
-> +	/* Shared tags are stored at index 0 in @tags. */
-> +	if (blk_mq_is_shared_tags(set->flags))
-> +		blk_mq_free_map_and_rqs(set, et->tags[0], BLK_MQ_NO_HCTX_IDX);
-> +	else {
-> +		for (i = 0; i < et->nr_hw_queues; i++)
-> +			blk_mq_free_map_and_rqs(set, et->tags[i], i);
-> +	}
-> +
-> +	kfree(et);
-> +}
-> +
-> +struct elevator_tags *blk_mq_alloc_sched_tags(struct blk_mq_tag_set *set,
-> +		unsigned int nr_hw_queues)
-> +{
-> +	unsigned int nr_tags;
-> +	int i;
+> +	struct request_queue *q;
 > +	struct elevator_tags *et;
-> +	gfp_t gfp = GFP_NOIO | __GFP_ZERO | __GFP_NOWARN | __GFP_NORETRY;
 > +
-> +	if (blk_mq_is_shared_tags(set->flags))
-> +		nr_tags = 1;
-> +	else
-> +		nr_tags = nr_hw_queues;
+> +	lockdep_assert_held_write(&set->update_nr_hwq_lock);
 > +
-> +	et = kmalloc(sizeof(struct elevator_tags) +
-> +			nr_tags * sizeof(struct blk_mq_tags *), gfp);
-> +	if (!et)
-> +		return NULL;
-> +	/*
-> +	 * Default to double of smaller one between hw queue_depth and
-> +	 * 128, since we don't split into sync/async like the old code
-> +	 * did. Additionally, this is a per-hw queue depth.
-> +	 */
-> +	et->nr_requests = 2 * min_t(unsigned int, set->queue_depth,
-> +			BLKDEV_DEFAULT_RQ);
-> +	et->nr_hw_queues = nr_hw_queues;
-> +
-> +	if (blk_mq_is_shared_tags(set->flags)) {
-> +		/* Shared tags are stored at index 0 in @tags. */
-> +		et->tags[0] = blk_mq_alloc_map_and_rqs(set, BLK_MQ_NO_HCTX_IDX,
-> +					MAX_SCHED_RQ);
-> +		if (!et->tags[0])
-> +			goto out;
-> +	} else {
-> +		for (i = 0; i < et->nr_hw_queues; i++) {
-> +			et->tags[i] = blk_mq_alloc_map_and_rqs(set, i,
-> +					et->nr_requests);
-> +			if (!et->tags[i])
-> +				goto out_unwind;
+> +	list_for_each_entry(q, &set->tag_list, tag_set_list) {
+> +		/*
+> +		 * Accessing q->elevator without holding q->elevator_lock is
+> +		 * safe because we're holding here set->update_nr_hwq_lock in
+> +		 * the writer context. So, scheduler update/switch code (which
+> +		 * acquires the same lock but in the reader context) can't run
+> +		 * concurrently.
+> +		 */
+> +		if (q->elevator) {
+> +			et = xa_load(et_table, q->id);
+> +			if (et)
+> +				blk_mq_free_sched_tags(et, set);
 > +		}
 > +	}
-> +
-> +	return et;
-> +out_unwind:
-> +	while (--i >= 0)
-> +		blk_mq_free_map_and_rqs(set, et->tags[i], i);
-> +out:
-> +	kfree(et);
-> +	return NULL;
 > +}
 > +
-
-As smatch stated, the unwind pattern is a bit odd.
-Maybe move the unwind into the 'else' branch, and us a conditional
-to invoke it:
-
-if (i < et->nr_hw_queues)
-   while (--i >= 0)
-     blk_mq_free_map_and_request()
+Odd. Do we allow empty sched_tags?
+Why isn't this an error (or at least a warning)?
 
 Cheers,
 
