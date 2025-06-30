@@ -1,31 +1,32 @@
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A59719F11F;
-	Mon, 30 Jun 2025 05:35:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26B8D5227;
+	Mon, 30 Jun 2025 05:42:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751261728; cv=none; b=AGk07aOF8gyYIBu8ECbstbVXaM0BogVMbJ0VWbdlK1dvMIXplZdpQmiiGJ9Ko9f9faY2oCB1Qla50te5HFFssR7nevyX4W2njre8qrziXJDumXjGPXBsm3iXxzkME7sAXjVSR4XpjsG8es92RJNhYVoGlpz9Ph4cUWN7GF6pyqs=
+	t=1751262162; cv=none; b=LiYDvvR6qssdbjBMRicNhCT5je0KXecVcwVlpsmhHUneh5Mpr86z/U4KzVIpu5rjVAnjCsO/MEtZh7pPYgzl2z1TCR3UWEGzzshXcuF+NZfst0mTBjp/TcHtkXXW3M03nUjfncsMB1NozzyH8dtlsYQ44pHM5/gcLl2o10wXkPY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751261728; c=relaxed/simple;
-	bh=jK7mgvIiXgSWDulrRrTEgyqtYM5DjFefRalwbMaxvFg=;
+	s=arc-20240116; t=1751262162; c=relaxed/simple;
+	bh=GIWsfrtYwse+E8YsX2pJzplYbDDPWA/UFNRpnR2b96Q=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=I5ENNL0DcumWFqz6XuNjeorbQkeD2dOPRDaG3QEUXxDMoTcez+Hgeyd8z2tknPK6uOluP4WTZnESj7d6FB5m0EilM68o1xOH+KM3plVUZB1WRtJBLzmNkJyU9pOAHp8KnT5HC+PWMU9L2l6AgJRs4QEvy328v5VkRkm3rLz1nnc=
+	 Content-Type:Content-Disposition:In-Reply-To; b=oPvaCkrrqlOKkAo1M6FOaKcvfsoBA0BM5JDOiipEKHlUrc06rcCFpNNMpJ6fZaOaVqz+ePTtnrjqOdLtJhWth2x2355kayB/zXAAID54brJr98WKN/HTaYZj7ffa+SHpMGNL1/9aFBpRlatjDe+XLkGtzzDQlFa61CzDRiyFX80=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
 Received: by verein.lst.de (Postfix, from userid 2407)
-	id 4BF4768AA6; Mon, 30 Jun 2025 07:35:12 +0200 (CEST)
-Date: Mon, 30 Jun 2025 07:35:12 +0200
+	id 9C87468AA6; Mon, 30 Jun 2025 07:42:33 +0200 (CEST)
+Date: Mon, 30 Jun 2025 07:42:33 +0200
 From: Christoph Hellwig <hch@lst.de>
-To: Yu Kuai <yukuai1@huaweicloud.com>
-Cc: axboe@kernel.dk, hch@lst.de, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, yukuai3@huawei.com,
-	yi.zhang@huawei.com, yangerkun@huawei.com, johnny.chenyi@huawei.com
-Subject: Re: [PATCH] brd: fix leeping function called from invalid context
- in brd_insert_page()
-Message-ID: <20250630053512.GA28428@lst.de>
-References: <20250628011459.832760-1-yukuai1@huaweicloud.com>
+To: Brian Foster <bfoster@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>, Christian Brauner <brauner@kernel.org>,
+	"Darrick J. Wong" <djwong@kernel.org>,
+	Joanne Koong <joannelkoong@gmail.com>, linux-xfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-block@vger.kernel.org, gfs2@lists.linux.dev
+Subject: Re: [PATCH 03/12] iomap: refactor the writeback interface
+Message-ID: <20250630054233.GA28532@lst.de>
+References: <20250627070328.975394-1-hch@lst.de> <20250627070328.975394-4-hch@lst.de> <aF61PZEb5ndROI6z@bfoster>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -34,11 +35,24 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250628011459.832760-1-yukuai1@huaweicloud.com>
+In-Reply-To: <aF61PZEb5ndROI6z@bfoster>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 
-s/leeping/sleeping/ in the subject.
+On Fri, Jun 27, 2025 at 11:14:05AM -0400, Brian Foster wrote:
+> >   struct iomap_writeback_ops {
+> > -     int (*map_blocks)(struct iomap_writeback_ctx *wpc, struct inode *inode,
+> > -                       loff_t offset, unsigned len);
+> > -     int (*submit_ioend)(struct iomap_writeback_ctx *wpc, int status);
+> > -     void (*discard_folio)(struct folio *folio, loff_t pos);
+> > +    int (*writeback_range)(struct iomap_writeback_ctx *wpc,
+> > +    		struct folio *folio, u64 pos, unsigned int len, u64 end_pos);
+> 
+> Whitespace damage on the above line.
 
-Otherwise looks good:
+Without this the vim syntax highlighting is confused for the rest of the
+file unfortunately.  Not sure how to deal with it, the RST formatting
+keeps driving me crazy.  As does this document, which really should
+not duplicate the type information, but folks really wanted this
+annoyingly redundant information that is a huge pain to maintain for no
+gain at all :(
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
