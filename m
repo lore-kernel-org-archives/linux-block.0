@@ -1,61 +1,119 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4D1C285CBA;
-	Mon, 30 Jun 2025 13:30:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63C4B28B7C7
+	for <linux-block@vger.kernel.org>; Mon, 30 Jun 2025 13:31:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751290229; cv=none; b=lnOrOxc5Pt6GKGKomcAkap0n84jHvQgk0nE1pBvO+CZ7G+kEw7S7tT26hKWv8gTLX9YhnagTW8dvRgOijWe1mqWpKEUonspqi8Bs9ZTRXr4vyGyZ3LMq3S3PMnAlsTy58c5lA90P0mvnddFquNE69UZRc1Ze+ohLh1GgGMGkgFQ=
+	t=1751290269; cv=none; b=Oer4sSGqbItilHFnjbTxyAZfEy3Ca00WkXi17kd7Au1wtBfM1WEbKA3OdF2XlI3yvsPazEhinDmOD/DTmqZi/E4ujS1f7SD5VwmwW2uec3QqPYPsxqm02Z9FmS2psu54DpDaTzOWChx2rYklHHVIn0H6CVB+1cZBAY1ieo4ZSaY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751290229; c=relaxed/simple;
-	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VfhPkT9ksNKQU6n/O5QuORHNfHT3rrX5wSmL4zvrCY502OSwOmHcGBu++91ti21+FvSQ2KWRoAHbgfctYfmxcRpHmdl6bWmIKCQ2PeFaRj4uDq0bcjdCrqBTaxQtO/D78p+VUYx8GWwwktWE7Zra2F+v9FQTvny21ZyOMz1RAK8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=rDfeXfa6; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1751290269; c=relaxed/simple;
+	bh=0/FZCiLaRndiTPePRIo/GUOxbR20fxMdpfov79uN7uQ=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=uNtSXaefBrjVb2W9622LTlcdNgW0boM3n9Kq74MNHeDwMdX5XWYtg68uM6nJunAn0733Rb0Xqe0q80FhkCjYc5LPjMX9CU1y6mbNDvFL87s789T/t1b7VWIhfZucKDSTxyo1aq7yYsWvDIrGOoRH7RwA9IJN71lwHiYQTVcDBuk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UPLEN4tn; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="rDfeXfa6"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=; b=rDfeXfa6PsMSTgYU/J/uk+swep
-	uJRA7/CLW6oUUynWA+xK8mBGAwq7ZEnfbZyVe68kiWG/ClwyLoPncgV6C5r5XXTvdtR7GIK2JIlEG
-	W29u+f1SMJ4NUpEcoW6p2qzOFWRSJKOD9JtFVAkMjiYqN7yqGAyGZE80NqGjI1EOf2tWv1YugdWba
-	fDgYLjIf+e+zt0gJcQcfAODc9507phEbPYDgLijdlHXxMsUOtFfJH99OV2RPBopTBGLjtvl5PJcca
-	Yvv61M7fzreDsN51x4k18gs16i8gFcU4FiMkNl4v88sRz38KSOcbMKhuF5Is/1wSCHTvaFHnjzAS0
-	WApSRqkw==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1uWEaU-00000002Nik-1YOv;
-	Mon, 30 Jun 2025 13:30:22 +0000
-Date: Mon, 30 Jun 2025 06:30:22 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Anuj Gupta <anuj20.g@samsung.com>
-Cc: vincent.fu@samsung.com, jack@suse.cz, anuj1072538@gmail.com,
-	axboe@kernel.dk, viro@zeniv.linux.org.uk, brauner@kernel.org,
-	hch@infradead.org, martin.petersen@oracle.com, ebiggers@kernel.org,
-	adilger@dilger.ca, linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, joshi.k@samsung.com,
-	linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
-	gost.dev@samsung.com
-Subject: Re: [PATCH for-next v5 4/4] fs: add ioctl to query metadata and
- protection info capabilities
-Message-ID: <aGKRbqS7eD43DEqu@infradead.org>
-References: <20250630090548.3317-1-anuj20.g@samsung.com>
- <CGME20250630090616epcas5p2a9ca118ca83586172d69213e22b635a1@epcas5p2.samsung.com>
- <20250630090548.3317-5-anuj20.g@samsung.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UPLEN4tn"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1751290267;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Jz9RQCLVSvMznWWKk2eRSrkkyI7/meflTI0QApH5lD4=;
+	b=UPLEN4tnn7Xy1I3K2btRG/vdnhA1GBZ3al88kQlOW0CDaloOZ9YIsmH8Jttezfuq1BtMKG
+	THb/vCicLbntEUQjAB8kYZCjpamDBGhV1uzs/0KwpNO0pjdN+1qsIc10oNSD4NF5kP2M5D
+	ST5JchhNqeAL0RJjcDivsoTLHbXEtbg=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-130-VVFOYvEXNZqE0X_VvTDHeQ-1; Mon,
+ 30 Jun 2025 09:31:00 -0400
+X-MC-Unique: VVFOYvEXNZqE0X_VvTDHeQ-1
+X-Mimecast-MFC-AGG-ID: VVFOYvEXNZqE0X_VvTDHeQ_1751290255
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B148B190FBC6;
+	Mon, 30 Jun 2025 13:30:54 +0000 (UTC)
+Received: from [10.22.80.10] (unknown [10.22.80.10])
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 20F3E195609D;
+	Mon, 30 Jun 2025 13:30:50 +0000 (UTC)
+Date: Mon, 30 Jun 2025 15:30:48 +0200 (CEST)
+From: Mikulas Patocka <mpatocka@redhat.com>
+To: Dongsheng Yang <dongsheng.yang@linux.dev>
+cc: agk@redhat.com, snitzer@kernel.org, axboe@kernel.dk, hch@lst.de, 
+    dan.j.williams@intel.com, Jonathan.Cameron@Huawei.com, 
+    linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+    linux-cxl@vger.kernel.org, nvdimm@lists.linux.dev, 
+    dm-devel@lists.linux.dev
+Subject: =?UTF-8?Q?Re=3A_=5BPATCH_v1_00=2F11=5D_dm-pcache_=E2=80=93_pe?=
+ =?UTF-8?Q?rsistent-memory_cache_for_block_devices?=
+In-Reply-To: <20250624073359.2041340-1-dongsheng.yang@linux.dev>
+Message-ID: <8d383dc6-819b-2c7f-bab5-2cd113ed9ece@redhat.com>
+References: <20250624073359.2041340-1-dongsheng.yang@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250630090548.3317-5-anuj20.g@samsung.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=US-ASCII
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-Looks good:
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+
+On Tue, 24 Jun 2025, Dongsheng Yang wrote:
+
+> Hi Mikulas,
+> 	This is V1 for dm-pcache, please take a look.
+> 
+> Code:
+>     https://github.com/DataTravelGuide/linux tags/pcache_v1
+> 
+> Changelogs from RFC-V2:
+> 	- use crc32c to replace crc32
+> 	- only retry pcache_req when cache full, add pcache_req into defer_list,
+> 	  and wait cache invalidation happen.
+> 	- new format for pcache table, it is more easily extended with
+> 	  new parameters later.
+> 	- remove __packed.
+> 	- use spin_lock_irq in req_complete_fn to replace
+> 	  spin_lock_irqsave.
+> 	- fix bug in backing_dev_bio_end with spin_lock_irqsave.
+> 	- queue_work() inside spinlock.
+> 	- introduce inline_bvecs in backing_dev_req.
+> 	- use kmalloc_array for bvecs allocation.
+> 	- calculate ->off with dm_target_offset() before use it.
+
+Hi
+
+The out-of-memory handling still doesn't seem right.
+
+If the GFP_NOWAIT allocation doesn't succeed (which may happen anytime, 
+for example it happens when the machine is receiving network packets 
+faster than the swapper is able to swap out data), create_cache_miss_req 
+returns NULL, the caller changes it to -ENOMEM, cache_read returns 
+-ENOMEM, -ENOMEM is propagated up to end_req and end_req will set the 
+status to BLK_STS_RESOURCE. So, it may randomly fail I/Os with an error.
+
+Properly, you should use mempools. The mempool allocation will wait until 
+some other process frees data into the mempool.
+
+If you need to allocate memory inside a spinlock, you can't do it reliably 
+(because you can't sleep inside a spinlock and non-sleepng memory 
+allocation may fail anytime). So, in this case, you should drop the 
+spinlock, allocate the memory from a mempool with GFP_NOIO and jump back 
+to grab the spinlock - and now you holding the allocated object, so you 
+can use it while you hold the spinlock.
+
+
+Another comment:
+set_bit/clear_bit use atomic instructions which are slow. As you already 
+hold a spinlock when calling them, you don't need the atomicity, so you 
+can replace them with __set_bit and __clear_bit.
+
+Mikulas
+
