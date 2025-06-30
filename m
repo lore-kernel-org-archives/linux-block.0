@@ -1,30 +1,30 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1FEF156678;
-	Mon, 30 Jun 2025 20:58:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 748C523497B;
+	Mon, 30 Jun 2025 20:59:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751317108; cv=none; b=bkp0+OkoyfL0LWS4BcXAP6rid/t6AcwtdVSDaphlteUCwz2Cpg96utfVw+RwftqaCKk2Q+HP7TVQD7tWnxnO47HwKRwngV8Xe0o6oKJ+R8vODnkM59AmYClqSDTIjHBTI0LUNPft35PWgWGFn3e3AECVxKdZzzcU3l7vDNJfiHk=
+	t=1751317175; cv=none; b=caVX06AUzU7T3gF8X/Ft4WBDvpr5tI/ZgUWoJNQDmi9kjSz9nF1MrFdowk3oHkcW8E8fjfTycfYw8OD1x6+JCDa1jdRp/dM9SIjAWwFFg6viWrgDmZKVd8mNGE2fNjVBoPs3c5kjIQkKCaELLi+tgPT/i0KNEjqJ6wms0wbl+xc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751317108; c=relaxed/simple;
-	bh=RPA3lRTTTzfMKowNsLUdPzNocMZmusWArGMhJzbJccU=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Qcnn4OkXbV0ZSTFq67viu8Epz40G0tfw52jamzRM8y0vy1J2lwr+LfL2Ak6zsann6zSvBvjrfjuUksrLX7op41fJISEb19MoopntFg7rv/rP7PRixByJ8uG3ntpXyjCMIGWUNxR5l9UcqTY1kO1pKO5Dcpu355jplI7tSD3dyU4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EJ46re3n; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1751317175; c=relaxed/simple;
+	bh=VcXM6MWhX67m9iQoxsLoEBnOs9uQDNeogGuIMdObaJ8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Row/Jg2Mb0jm7Uqt0eYEZAG6BL9FrxBcGwwIKIRLBvbE5mAZaM+JKVCVkrQrEiVE9Vn1f4l2HbSb2LPCvlM76Sxk8BsDSUInA3c6+co1szdQEH3crkOB5IKMLRVMSBvYoy3aD9A4doHcyc3sx+cSuDvqJGPfY5kQIIYPCTe1DKg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pQ3m7ASc; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EJ46re3n"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E972C4CEE3;
-	Mon, 30 Jun 2025 20:58:27 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pQ3m7ASc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6FE0EC4CEE3;
+	Mon, 30 Jun 2025 20:59:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751317108;
-	bh=RPA3lRTTTzfMKowNsLUdPzNocMZmusWArGMhJzbJccU=;
+	s=k20201202; t=1751317175;
+	bh=VcXM6MWhX67m9iQoxsLoEBnOs9uQDNeogGuIMdObaJ8=;
 	h=From:To:Cc:Subject:Date:From;
-	b=EJ46re3nkkzm/4uyk7S8qmR82pMVFSx/zIpgTkpd6j/3mSHbECIV+U7en5G8Uwfxa
-	 AUj6/yJXmIbYLmOS67PIT/ByvwbovKZfeRDifMSd1cdY8LXdfZV1jgkHaBl/KmQMTU
-	 CuR4A+4RPaeTW5QjKCIwN36ogBUBiaO0OKgqe+8WtjREw3mXOsE1TzC6YqA+aRle3h
-	 hRC1xRc25SEZaEEr1mtCiUftWZ/uQWdSaee39LRpiiVeDMJhGUhcWithqcwlTMOURM
-	 Ar5QEnRhvkIA/M6jYz1y29/4DCxwy8estt0MoorWOcYK16o4lDWf7TgyyjDUkTBkqw
-	 Q/qv7ItE/4wQw==
+	b=pQ3m7ASc1qxIXjaIZYk2+AnHO7oVbOFRJVLRyjlzeMvoyJnog2wz3253a4ofhK8R5
+	 LQ1eTpYex11nPvetiY/G5LACCZBerwoeYTsf8shu1uAtcqgjparLlJdzmEoQDdU/xk
+	 aWhxHDcRQV7Tuqfr51P4XaireLbENd8l03kznke54i81bdlvApQjVxDQjAmi0dv7ge
+	 GRFZA8E2Tpo109r3SCvnT8vla4vHIuiuqwijqfOOgu6JTkrqrPpn1CHVbzymBFx1SI
+	 y2vhgkchMI99Gorlf2/HefBTcQje8igBkfMXA+dyaJiOG91M0Ze2gWVwEHm2OH6AoH
+	 WAiwuz5qwBxdA==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
@@ -33,9 +33,9 @@ Cc: Ronnie Sahlberg <rsahlberg@whamcloud.com>,
 	Jens Axboe <axboe@kernel.dk>,
 	Sasha Levin <sashal@kernel.org>,
 	linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.15 01/23] ublk: sanity check add_dev input for underflow
-Date: Mon, 30 Jun 2025 16:44:06 -0400
-Message-Id: <20250630204429.1357695-1-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.12 01/21] ublk: sanity check add_dev input for underflow
+Date: Mon, 30 Jun 2025 16:45:16 -0400
+Message-Id: <20250630204536.1358327-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -45,7 +45,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.15.4
+X-stable-base: Linux 6.12.35
 Content-Transfer-Encoding: 8bit
 
 From: Ronnie Sahlberg <rsahlberg@whamcloud.com>
@@ -115,10 +115,10 @@ fix that belongs in stable kernels.
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 8a482853a75ed..0e017eae97fb1 100644
+index 746ef36e58df2..3b1a5cdd63116 100644
 --- a/drivers/block/ublk_drv.c
 +++ b/drivers/block/ublk_drv.c
-@@ -2710,7 +2710,8 @@ static int ublk_ctrl_add_dev(const struct ublksrv_ctrl_cmd *header)
+@@ -2457,7 +2457,8 @@ static int ublk_ctrl_add_dev(struct io_uring_cmd *cmd)
  	if (copy_from_user(&info, argp, sizeof(info)))
  		return -EFAULT;
  
