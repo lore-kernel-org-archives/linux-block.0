@@ -1,156 +1,99 @@
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f41.google.com (mail-io1-f41.google.com [209.85.166.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C90F9D515;
-	Mon, 30 Jun 2025 14:16:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 011A328EC1C
+	for <linux-block@vger.kernel.org>; Mon, 30 Jun 2025 15:24:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751293011; cv=none; b=pqAtykh+iBykFdd75ICPiun+l5IpgwtbRTll00HyFNYHcj80uW9FtPjO/9/1Z0t0azx469RXeexaVo7wrpyzeZgiAm9DN2CoYFQtZj4I6XtFDX6h8LbRwj6uY+StRzn6pC+5WQeh50yiAxi4h4paeOrTgX1cPwuNt3IiYGZEak0=
+	t=1751297079; cv=none; b=tkf+X5cZQI28B1KWI6ATIjjmkHPK+xUoZ0t4Ig5oYGnR66sofhjjauOK2jvOq1VCF3V/hvTPMxfMWeci+kcScDCNlLUO0Ujrm7+kXo36TS6qTYqh1nUPzxzrHi/D2gTNLv4uAbysLEXm2Uq+2zS6urDYbrSO3kY5/ONl1h7vl2E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751293011; c=relaxed/simple;
-	bh=DsBq9tZtAD9KPVGyGRX1S8v30OuJNyMeLdB8EVJnnqs=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=g80fAY1HbjBq6oXdEBT7cMzO2oJt7y+3H+saNZYLfxOBHJMjvHLlDdXDvag9yFZADRjpMkh91bzOawnJIxh5D6tmPxXy/u5xL8PGOW9CddgCdpyzYRiin9AmFLVBS+vdTP54Gv5L9x3ddO7qtjnhNR9urYyod76W7IiAGeMTIOk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=HVAwiJv4; arc=none smtp.client-ip=91.218.175.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1751297079; c=relaxed/simple;
+	bh=lbuI0MNBw9Awg9+tIphhpvGMwxZYpAzxVyJDZbeQoXg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KRGMlTrnEU1euEIGm4Iqv9TaU2vLI01w9bRGXjLqDXi49MONMEerQUTWqy7GJiS23Wf18frRjjHi8nM27WVvMsZbXjQ0awi+CGZtMMlX5WbswmPRmMplx5gzdfGed067CsK52I28wrGpsEqqI0Ccnr6IR4fZr+5hHhhUV2ve9Gc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=YgZtOR+l; arc=none smtp.client-ip=209.85.166.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="HVAwiJv4"
-Message-ID: <43e84a3e-f574-4c97-9f33-35fcb3751e01@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1751293005;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0iYONongsRME1HKcKR/MgEpiRBLSAhkg/xqodBzNJUQ=;
-	b=HVAwiJv4C5Quke8pQpYZkngirfjh+NUNubClehgrHz7VhHs2nETxN1/2UCX/GNPx762l6v
-	IV1tzGyIq3q3UFiR3YzNKvdo4fOm84j5fcn9pO3V2SulMaP1LBp1tHxsB6y6n+b5kRa71y
-	hSS310Ju4kB3jtFDvh0smpd5TFUgf+w=
-Date: Mon, 30 Jun 2025 22:16:37 +0800
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="YgZtOR+l"
+Received: by mail-io1-f41.google.com with SMTP id ca18e2360f4ac-86d013c5e79so197833939f.0
+        for <linux-block@vger.kernel.org>; Mon, 30 Jun 2025 08:24:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1751297076; x=1751901876; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=lPRvs6BnIIzqyFHxoXRAic5qy59WOr/RY4rg93qhMko=;
+        b=YgZtOR+lzDrA0XeRuEuV+6gUmMd6oTRPydFPobFR7XFAvun1yx+JsW60dsamtlF0Us
+         CkpwDU9ZGwaR1y567KMuM4hfxMb0BE4ycg+RC+HkAeAY5QgW0x6QgjnH/WjL/OhaiYPt
+         7GS5+8ysXcH7IJFa8h/fQ2Nxqwbn90vnmOJ7idRY+KwmXc/yfycFYuv1VqDOfrSKRYOC
+         rGsF29dskgMB6GspeaYq3DaH5L36crorhdbMeUEwkDSgB+n/B2QO0MnLEx8zL7hXetcs
+         uIXcXqCD+dm9Sz5kGlqoM+WaV2gtFMHKfAvKSTViSBtZy2uuu2hLueGck6nAon+Hsimd
+         Kftg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751297076; x=1751901876;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=lPRvs6BnIIzqyFHxoXRAic5qy59WOr/RY4rg93qhMko=;
+        b=YIOLQ8vo1BKbQB9RbD2wkOJKiqNtLAh46gnYgozwh/AeT91JJj5YZXd4cHYlxRQVLE
+         sUVUR81qOZjNKWXrg8gX67Z5wUJw4HG+PYBWrWdI7bwC3JgCSr+gTfpIQuK4FbvzxAZk
+         oy2qroK5uaMyw8bzI84oq3JlGedqObtz8Y+1rhC//W6fl9zg42km7eD7MAikmpx40BaP
+         /6kqaSkHwEniHVJJPOw34+kOif5P/+JEpSkC3C2zi54dHTjbS3qRM3wJjM6QEG6Vb+jx
+         DQgAH7sIuJLWbKCyYQcKM4L3I3hPGI5gS6GvsOGJ3Jf0QpYvEeQjA4BXaT1B8E0CiMkN
+         ea4A==
+X-Forwarded-Encrypted: i=1; AJvYcCXTuCpECbHySr68qxTgIvAT77MOvkKvE/iZ+qJhaoUbjzYGiZoPPL4MmIsmDoGotxznOcHorPOwXlLQhQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzgMAYUhI7n1GXNIfUy47vJd51GlGS2vjEXQxEuVN7V1anH/DhT
+	46mXh7DJnOTchSkMUFi2bqosVWR+s1BmB5ObvPaV8t/TG9ZeIjmR9Tun21zsL9/gAi4=
+X-Gm-Gg: ASbGncuGy5cklD7hbphR9S3zPnCrV8LzvKq2OoF4ak77hS2Sz5boQScYClZKtFP5GrP
+	6sAITgeuXMrY9r4QoAcda64Jc6lD9ojYErOTOGtUIuK7Wyt5744ACdH91CywFfenwLKoLZhepvL
+	Z5VVHDH3AlGVTAUMWURE6nbzKbX6t+mfh9iD5sXkfyVkYElNvwAWN9PPJTbjXP1IbN2ofpi6X9h
+	916aqgwMg6ylb0AspYbP96J22vyIoXH6aQiDuf+5jKLpdmldBbgywYidAHdeQYwQQzJriv4o1He
+	PK9qLOvSOS78jDDdY6V2pAJi0sRD80Npqr0IwdTJFq0ulsb6ekZr4tjz5wCuRO//RUZs8Q==
+X-Google-Smtp-Source: AGHT+IHd3tofctj6pJYpvoUcM5ehbdOu4b/Eo1F55IUk0N41h4uwH/j6fT8O4lxLh16JrhUtLfM4AQ==
+X-Received: by 2002:a05:6602:1483:b0:876:7555:9cb4 with SMTP id ca18e2360f4ac-87688258c05mr1468322139f.1.1751297075914;
+        Mon, 30 Jun 2025 08:24:35 -0700 (PDT)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-87687a18d95sm198418939f.16.2025.06.30.08.24.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 30 Jun 2025 08:24:34 -0700 (PDT)
+Message-ID: <eb41cab3-5946-4fe3-a1be-843dd6fca159@kernel.dk>
+Date: Mon, 30 Jun 2025 09:24:34 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: =?UTF-8?Q?Re=3A_=5BPATCH_v1_00/11=5D_dm-pcache_=E2=80=93_persistent?=
- =?UTF-8?Q?-memory_cache_for_block_devices?=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Dongsheng Yang <dongsheng.yang@linux.dev>
-To: Mikulas Patocka <mpatocka@redhat.com>
-Cc: agk@redhat.com, snitzer@kernel.org, axboe@kernel.dk, hch@lst.de,
- dan.j.williams@intel.com, Jonathan.Cameron@Huawei.com,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-cxl@vger.kernel.org, nvdimm@lists.linux.dev, dm-devel@lists.linux.dev
-References: <20250624073359.2041340-1-dongsheng.yang@linux.dev>
- <8d383dc6-819b-2c7f-bab5-2cd113ed9ece@redhat.com>
- <7ff7c4fc-d830-41c9-ab94-a198d3d9a3b5@linux.dev>
-In-Reply-To: <7ff7c4fc-d830-41c9-ab94-a198d3d9a3b5@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] brd: fix sleeping function called from invalid context
+ in brd_insert_page()
+To: Yu Kuai <yukuai1@huaweicloud.com>, hch@lst.de, yukuai3@huawei.com
+Cc: penguin-kernel@I-love.SAKURA.ne.jp, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, yi.zhang@huawei.com, yangerkun@huawei.com,
+ johnny.chenyi@huawei.com
+References: <20250630112828.421219-1-yukuai1@huaweicloud.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20250630112828.421219-1-yukuai1@huaweicloud.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
+On 6/30/25 5:28 AM, Yu Kuai wrote:
+> From: Yu Kuai <yukuai3@huawei.com>
+> 
+> __xa_cmpxchg() is called with rcu_read_lock(), and it will allocate
+> memory if necessary.
+> 
+> Fix the problem by moving rcu_read_lock() after __xa_cmpxchg(), meanwhile,
+> it still should be held before xa_unlock(), prevent returned page to be
+> freed by concurrent discard.
 
-在 6/30/2025 9:40 PM, Dongsheng Yang 写道:
->
-> 在 6/30/2025 9:30 PM, Mikulas Patocka 写道:
->>
->> On Tue, 24 Jun 2025, Dongsheng Yang wrote:
->>
->>> Hi Mikulas,
->>>     This is V1 for dm-pcache, please take a look.
->>>
->>> Code:
->>>      https://github.com/DataTravelGuide/linux tags/pcache_v1
->>>
->>> Changelogs from RFC-V2:
->>>     - use crc32c to replace crc32
->>>     - only retry pcache_req when cache full, add pcache_req into 
->>> defer_list,
->>>       and wait cache invalidation happen.
->>>     - new format for pcache table, it is more easily extended with
->>>       new parameters later.
->>>     - remove __packed.
->>>     - use spin_lock_irq in req_complete_fn to replace
->>>       spin_lock_irqsave.
->>>     - fix bug in backing_dev_bio_end with spin_lock_irqsave.
->>>     - queue_work() inside spinlock.
->>>     - introduce inline_bvecs in backing_dev_req.
->>>     - use kmalloc_array for bvecs allocation.
->>>     - calculate ->off with dm_target_offset() before use it.
->> Hi
->>
->> The out-of-memory handling still doesn't seem right.
->>
->> If the GFP_NOWAIT allocation doesn't succeed (which may happen anytime,
->> for example it happens when the machine is receiving network packets
->> faster than the swapper is able to swap out data), create_cache_miss_req
->> returns NULL, the caller changes it to -ENOMEM, cache_read returns
->> -ENOMEM, -ENOMEM is propagated up to end_req and end_req will set the
->> status to BLK_STS_RESOURCE. So, it may randomly fail I/Os with an error.
->>
->> Properly, you should use mempools. The mempool allocation will wait 
->> until
->> some other process frees data into the mempool.
->>
->> If you need to allocate memory inside a spinlock, you can't do it 
->> reliably
->> (because you can't sleep inside a spinlock and non-sleepng memory
->> allocation may fail anytime). So, in this case, you should drop the
->> spinlock, allocate the memory from a mempool with GFP_NOIO and jump back
->> to grab the spinlock - and now you holding the allocated object, so you
->> can use it while you hold the spinlock.
->
->
-> Hi Mikulas,
->
->     Thanx for your suggestion, I will cook a GFP_NOIO version for the 
-> memory allocation for pcache data path.
+The rcu locking in there is a bit of a mess, imho. What _exactly_ is the
+rcu read side locking protecting? Is it only needed around the lookup
+and insert? We even hold it over the kmap and copy, which seems very
+heavy handed.
 
-Hi Mikulas,
+-- 
+Jens Axboe
 
-     The reason why we don’t release the spinlock here is that if we do, 
-the subtree could change.
-
-For example, in the `fixup_overlap_contained()` function, we may need to 
-split a certain `cache_key`, and that requires allocating a new 
-`cache_key`.
-
-If we drop the spinlock at this point and then re-acquire it after the 
-allocation, the subtree might already have been modified, and we cannot 
-safely continue with the split operation.
-
-     In this case, we would have to restart the entire subtree search 
-and walk. But the new walk might require more memory—or less,
-
-so it's very difficult to know in advance how much memory will be needed 
-before acquiring the spinlock.
-
-     So allocating memory inside a spinlock is actually a more direct 
-and feasible approach. `GFP_NOWAIT` fails too easily, maybe `GFP_ATOMIC` 
-is more appropriate.
-
-
-What do you think?
-
->
->>
->>
->> Another comment:
->> set_bit/clear_bit use atomic instructions which are slow. As you already
->> hold a spinlock when calling them, you don't need the atomicity, so you
->> can replace them with __set_bit and __clear_bit.
->
->
-> Good idea.
->
->
-> Thanx
->
-> Dongsheng
->
->>
->> Mikulas
->>
->
