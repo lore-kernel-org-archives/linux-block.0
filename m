@@ -1,138 +1,109 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F160D1F4CBD
-	for <linux-block@vger.kernel.org>; Mon, 30 Jun 2025 06:29:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F55C1D79A5;
+	Mon, 30 Jun 2025 06:41:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751264999; cv=none; b=eKR6Ei73ZpWEpiRbMihTEauz91kv/96HMhcHZ9um4yoEYQkuaflyTjXX+f+t2WLiVjtIk3dDM3A4M5sgoXE4nCnoNkVDoHkpBFXPu9HMzFuJVwUzhLxvmWNPNXvVwh/HxWxfFx4B5O/otjwYC3U5cghtGZckD1PYvePU2AgDtbw=
+	t=1751265678; cv=none; b=dWP4UlfIrkP1IOBdTHtJApq2Vr3JmF+1dLDPy248+F5uyqmaYE57ZdnMSO51BXsVbM7+h9xzrUQHotzD83UqpXr4pnlXV/6SXx8wN9hDkYUu5gSSB+ABTmKycAsIGfbpZ/1wlfHupXI57M25N4co5diuqMNJgAXWeWUAkg8tJvY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751264999; c=relaxed/simple;
-	bh=Ne94kVTsvLLZTJtik7jY1bcgtT6q57FsE7blIMe63gE=;
+	s=arc-20240116; t=1751265678; c=relaxed/simple;
+	bh=/p835mRdk+vulunfvCv3tNpVgYqkgcusJR9pB6KII+k=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=P3dfJRupSQ5yTfBzFR2TCzH1STGy7Y6Kz6hdcWaA76HXHOdP3Gbhu4PvFXBz7jOdoBLvH+Bu87456Ak7kKph02UaxAi83yGEZPIxCYDBc8emyDVf+I2ghW5wW9uuXr0dEeV5B+jyGUH+bIIbLi4Vc2zOVN/5F+ukn/0HMNozg88=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=gnlWZzxR; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=luRU9Bn8; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=gnlWZzxR; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=luRU9Bn8; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	 Content-Type:Content-Disposition:In-Reply-To; b=BKnFyK6qqg+MsrOimbIgcWGhx/DS1dlUEseUZeh8GcZxfSaPbJjpGT+j+bZfMTbi+pOJ7ypTBp9Pf+4N6kfM4v9ITTns6DKN2HwUqBcu5NkcaWUMB+3M8gv0z0KMtmQdwwRkBiJ6ZpAV+FcivXF7eJ+kRxGWRtEzuu0lo/LYV/Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=ZejtL3sm; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="gnlWZzxR";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="luRU9Bn8";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="gnlWZzxR";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="luRU9Bn8"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 2386E2115F;
-	Mon, 30 Jun 2025 06:29:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1751264996; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=O4a8monR3tF8KOIGOp3AbckiUTMIFvbQ7an8p9i9+Zs=;
-	b=gnlWZzxRYsR9snuPxctWbr4YxmPgmEHuiFM7oI2VvnZYQ2NDI8leSkqPR+O/VNhaC43iTL
-	uZLbXaHvhxJOAaAK/Hvo8zTSrNypTJq53WbOPN6EOiLmYnkuAZJTGNjNBZftvZByYKHUG4
-	W7v28N0T2tx/5YqdNoqSDIBovRo9xSg=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1751264996;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=O4a8monR3tF8KOIGOp3AbckiUTMIFvbQ7an8p9i9+Zs=;
-	b=luRU9Bn8IXGPA2rgPefjUqeEkRRlTkBo8DkYqMIVOXJbPMKyFkCvE/t2ZvUHKguJiZUWG0
-	lIpUEZ9B4M3BEZDQ==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1751264996; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=O4a8monR3tF8KOIGOp3AbckiUTMIFvbQ7an8p9i9+Zs=;
-	b=gnlWZzxRYsR9snuPxctWbr4YxmPgmEHuiFM7oI2VvnZYQ2NDI8leSkqPR+O/VNhaC43iTL
-	uZLbXaHvhxJOAaAK/Hvo8zTSrNypTJq53WbOPN6EOiLmYnkuAZJTGNjNBZftvZByYKHUG4
-	W7v28N0T2tx/5YqdNoqSDIBovRo9xSg=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1751264996;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=O4a8monR3tF8KOIGOp3AbckiUTMIFvbQ7an8p9i9+Zs=;
-	b=luRU9Bn8IXGPA2rgPefjUqeEkRRlTkBo8DkYqMIVOXJbPMKyFkCvE/t2ZvUHKguJiZUWG0
-	lIpUEZ9B4M3BEZDQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id F14F213A6E;
-	Mon, 30 Jun 2025 06:29:55 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id FeVQOOMuYmj4VwAAD6G6ig
-	(envelope-from <dwagner@suse.de>); Mon, 30 Jun 2025 06:29:55 +0000
-Date: Mon, 30 Jun 2025 08:29:55 +0200
-From: Daniel Wagner <dwagner@suse.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>, 
-	Sagi Grimberg <sagi@grimberg.me>, "Michael S. Tsirkin" <mst@redhat.com>, 
-	"Martin K. Petersen" <martin.petersen@oracle.com>, Thomas Gleixner <tglx@linutronix.de>, 
-	Costa Shulyupin <costa.shul@redhat.com>, Juri Lelli <juri.lelli@redhat.com>, 
-	Valentin Schneider <vschneid@redhat.com>, Waiman Long <llong@redhat.com>, Ming Lei <ming.lei@redhat.com>, 
-	Frederic Weisbecker <frederic@kernel.org>, Hannes Reinecke <hare@suse.de>, linux-kernel@vger.kernel.org, 
-	linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, megaraidlinux.pdl@broadcom.com, 
-	linux-scsi@vger.kernel.org, storagedev@microchip.com, virtualization@lists.linux.dev, 
-	GR-QLogic-Storage-Upstream@marvell.com
-Subject: Re: [PATCH 0/5] blk: introduce block layer helpers to calculate num
- of queues
-Message-ID: <38e19482-e07d-4130-88d2-fc0a4aa5ddc8@flourine.local>
-References: <20250617-isolcpus-queue-counters-v1-0-13923686b54b@kernel.org>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ZejtL3sm"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Transfer-Encoding
+	:Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
+	Sender:Reply-To:Content-ID:Content-Description;
+	bh=EGTTLrFnUeqEt2LkPOIc08Ji7tLkFOls0h+QkE/PVjc=; b=ZejtL3sm8QRhn8xcCFFNMRUL5+
+	0p7qJLSYpjYurp0fqdmTke9LZp+wa5u/DPr2M2a4rWyOnqixEjMud8JtVP9k/ud3+EzI567qwEmKl
+	2mNIqLQPd4psFOKCKguyQ/Em0h9PQKYZNBoWsnq7ml1C9HrGmd8yap79ONNpYS5/CxtR90oliYys5
+	S0NpLfICJfIyRoYslKnSAh47MCq1iELTLHWXmbbfwyfLY/UyKQiB2AReAz55sg3bfb0JTKFF7mU6Y
+	LhVeWFX7hDzkKSoHGg2nslJ9BLS5KGSoJWZdNRQka+3RT+Y//LfBZlQzUxjZ1EDkVNgRUv4GWaBPM
+	bptOJZKg==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1uW8CX-00000001MDX-03Ey;
+	Mon, 30 Jun 2025 06:41:13 +0000
+Date: Sun, 29 Jun 2025 23:41:12 -0700
+From: "hch@infradead.org" <hch@infradead.org>
+To: Matthew Wilcox <willy@infradead.org>
+Cc: =?utf-8?B?6ZmI5rab5rab?= Taotao Chen <chentaotao@didiglobal.com>,
+	"tytso@mit.edu" <tytso@mit.edu>,
+	"hch@infradead.org" <hch@infradead.org>,
+	"adilger.kernel@dilger.ca" <adilger.kernel@dilger.ca>,
+	"brauner@kernel.org" <brauner@kernel.org>,
+	"jani.nikula@linux.intel.com" <jani.nikula@linux.intel.com>,
+	"rodrigo.vivi@intel.com" <rodrigo.vivi@intel.com>,
+	"tursulin@ursulin.net" <tursulin@ursulin.net>,
+	"airlied@gmail.com" <airlied@gmail.com>,
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+	"linux-ext4@vger.kernel.org" <linux-ext4@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+	"dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
+	"linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"chentao325@qq.com" <chentao325@qq.com>,
+	"frank.li@vivo.com" <frank.li@vivo.com>
+Subject: Re: [PATCH v3 4/4] ext4: support uncached buffered I/O
+Message-ID: <aGIxiOeJ_-lmRmiT@infradead.org>
+References: <20250627110257.1870826-1-chentaotao@didiglobal.com>
+ <20250627110257.1870826-5-chentaotao@didiglobal.com>
+ <aF7OzbVwXqbJaLQA@casper.infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250617-isolcpus-queue-counters-v1-0-13923686b54b@kernel.org>
-X-Spamd-Result: default: False [-4.30 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	RCVD_COUNT_TWO(0.00)[2];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[]
-X-Spam-Level: 
-X-Spam-Flag: NO
-X-Spam-Score: -4.30
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <aF7OzbVwXqbJaLQA@casper.infradead.org>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-Hi Jens,
-
-On Tue, Jun 17, 2025 at 03:43:22PM +0200, Daniel Wagner wrote:
-> I am still working on the change request for the "blk: honor isolcpus
-> configuration" series [1]. Teaching group_cpus_evenly to use the
-> housekeeping mask depending on the context is not a trivial change.
+On Fri, Jun 27, 2025 at 06:03:09PM +0100, Matthew Wilcox wrote:
+> On Fri, Jun 27, 2025 at 11:03:13AM +0000, 陈涛涛 Taotao Chen wrote:
+> > +++ b/fs/ext4/inode.c
+> > @@ -1270,6 +1270,9 @@ static int ext4_write_begin(const struct kiocb *iocb,
+> >  	if (unlikely(ret))
+> >  		return ret;
+> >  
+> > +	if (iocb->ki_flags & IOCB_DONTCACHE)
+> > +		fgp |= FGP_DONTCACHE;
 > 
-> The first part of the series has already been reviewed and doesn't
-> contain any controversial changes, so let's get them processed
-> independely.
+> I think this needs to be:
 > 
-> [1] https://patch.msgid.link/20250424-isolcpus-io-queues-v6-0-9a53a870ca1f@kernel.org
+> 	if (iocb && iocb->ki_flags & IOCB_DONTCACHE)
+> 
+> because it's legit to call write_begin with a NULL argument.  The
+> 'file' was always an optional argument, and we should preserve that
+> optionality with this transformation.
 
-Would you mind to route this series via your tree? There are changes in
-several different trees though all the patches have been acked/reviewed
-by the corresponding maintainers. Would be great to get some weeks in
-'next' so that this series gets some more testing.
+write_begin and write_end are only callbacks through helpers called
+by the file system.  So if the file system never passes a NULL
+file/kiocb it doesn't need to check for it.
 
-Thanks a lot,
-Daniel
+> I wonder if it's worth abstracting some of this boilerplate.  Something
+> like:
+> 
+> struct folio *write_begin_get_folio(iocb, mapping, index, len)
+> {
+> 	fgf_t fgflags = FGP_WRITEBEGIN;
+> 
+> 	if (iocb && iocb->ki_flags & IOCB_DONTCACHE)
+> 		fgflags |= FGP_DONTCACHE;
+> 	fgflags |= fgf_set_order(len);
+> 
+> 	return __filemap_get_folio(mapping, index, fgflags,
+> 			mapping_gfp_mask(mapping));
+> }
+
+But this helper still seems useful.
+
