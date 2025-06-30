@@ -1,62 +1,50 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F308289E2E
-	for <linux-block@vger.kernel.org>; Mon, 30 Jun 2025 12:37:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4D1C285CBA;
+	Mon, 30 Jun 2025 13:30:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751287068; cv=none; b=QoFcpdXzHLRjk6PE3QkRmyAHTdpw3+Eei97g94D6w4fcdIvq9mx26SRujHng8Tzdc4mPP0bBxE5zknU6kFI9liUCk9PgsM6Wv1RCNHOfi33+lSNDIeTSW4RmU541MwD36syXrfY3UZKHc3o7AR8l20awjkqV/yL+nmQKhKsHiCI=
+	t=1751290229; cv=none; b=lnOrOxc5Pt6GKGKomcAkap0n84jHvQgk0nE1pBvO+CZ7G+kEw7S7tT26hKWv8gTLX9YhnagTW8dvRgOijWe1mqWpKEUonspqi8Bs9ZTRXr4vyGyZ3LMq3S3PMnAlsTy58c5lA90P0mvnddFquNE69UZRc1Ze+ohLh1GgGMGkgFQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751287068; c=relaxed/simple;
-	bh=y7K25BVp8J7PZgB9DNoW9Axq4HVd5q5SbvdBpqqvwns=;
+	s=arc-20240116; t=1751290229; c=relaxed/simple;
+	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CXr0wTQkw5wIFAYsuHdfkARxcKfMduYUclT51lKdnEGQFuUQtsvVlogBVWmNloA+2uz/FAtfZlwn5Y+wOCTzpcP2sdxBq7ptnK5d7b3/6uijRqd90tfiIV1+4rAWZXdgFiV03iZ1XQxaDUcGRS3SIzBTWwWK6VMNWh24104sOHo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=E8fEs2A0; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=VfhPkT9ksNKQU6n/O5QuORHNfHT3rrX5wSmL4zvrCY502OSwOmHcGBu++91ti21+FvSQ2KWRoAHbgfctYfmxcRpHmdl6bWmIKCQ2PeFaRj4uDq0bcjdCrqBTaxQtO/D78p+VUYx8GWwwktWE7Zra2F+v9FQTvny21ZyOMz1RAK8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=rDfeXfa6; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E8fEs2A0"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1751287065;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Lif262s6lJxXAyUAPG/wOgmzfNhGrKy2Fgpgmtk9rAU=;
-	b=E8fEs2A0gmB3XPTlJUYHyrT4v7NzPcbyJl1zw5E4FxmIT5niJdzP1wCgyK+kBKPOpOl/VT
-	ZFgUF5R9qWAxdRqzW5TArYbXaAkhSmT2xp5zbQo4QyMT9sqjSNL0hH72y9Om/Sqdx6eQ/H
-	lIk+F4gULX9wHuN0eZYb3+Gu1jlNVWU=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-558-2IT8sbofOgOldCdVq896fg-1; Mon,
- 30 Jun 2025 08:37:41 -0400
-X-MC-Unique: 2IT8sbofOgOldCdVq896fg-1
-X-Mimecast-MFC-AGG-ID: 2IT8sbofOgOldCdVq896fg_1751287058
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3A8571800287;
-	Mon, 30 Jun 2025 12:37:38 +0000 (UTC)
-Received: from bfoster (unknown [10.22.64.142])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 668A219560AB;
-	Mon, 30 Jun 2025 12:37:35 +0000 (UTC)
-Date: Mon, 30 Jun 2025 08:41:13 -0400
-From: Brian Foster <bfoster@redhat.com>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Christian Brauner <brauner@kernel.org>,
-	"Darrick J. Wong" <djwong@kernel.org>,
-	Joanne Koong <joannelkoong@gmail.com>, linux-xfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-block@vger.kernel.org, gfs2@lists.linux.dev,
-	Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Subject: Re: [PATCH 01/12] iomap: pass more arguments using the iomap
- writeback context
-Message-ID: <aGKF6Tfg4M94U3iA@bfoster>
-References: <20250627070328.975394-1-hch@lst.de>
- <20250627070328.975394-2-hch@lst.de>
- <aF601H1HVkw-g_Gk@bfoster>
- <20250630054407.GC28532@lst.de>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="rDfeXfa6"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=; b=rDfeXfa6PsMSTgYU/J/uk+swep
+	uJRA7/CLW6oUUynWA+xK8mBGAwq7ZEnfbZyVe68kiWG/ClwyLoPncgV6C5r5XXTvdtR7GIK2JIlEG
+	W29u+f1SMJ4NUpEcoW6p2qzOFWRSJKOD9JtFVAkMjiYqN7yqGAyGZE80NqGjI1EOf2tWv1YugdWba
+	fDgYLjIf+e+zt0gJcQcfAODc9507phEbPYDgLijdlHXxMsUOtFfJH99OV2RPBopTBGLjtvl5PJcca
+	Yvv61M7fzreDsN51x4k18gs16i8gFcU4FiMkNl4v88sRz38KSOcbMKhuF5Is/1wSCHTvaFHnjzAS0
+	WApSRqkw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1uWEaU-00000002Nik-1YOv;
+	Mon, 30 Jun 2025 13:30:22 +0000
+Date: Mon, 30 Jun 2025 06:30:22 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Anuj Gupta <anuj20.g@samsung.com>
+Cc: vincent.fu@samsung.com, jack@suse.cz, anuj1072538@gmail.com,
+	axboe@kernel.dk, viro@zeniv.linux.org.uk, brauner@kernel.org,
+	hch@infradead.org, martin.petersen@oracle.com, ebiggers@kernel.org,
+	adilger@dilger.ca, linux-block@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, joshi.k@samsung.com,
+	linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
+	gost.dev@samsung.com
+Subject: Re: [PATCH for-next v5 4/4] fs: add ioctl to query metadata and
+ protection info capabilities
+Message-ID: <aGKRbqS7eD43DEqu@infradead.org>
+References: <20250630090548.3317-1-anuj20.g@samsung.com>
+ <CGME20250630090616epcas5p2a9ca118ca83586172d69213e22b635a1@epcas5p2.samsung.com>
+ <20250630090548.3317-5-anuj20.g@samsung.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -65,30 +53,9 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250630054407.GC28532@lst.de>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+In-Reply-To: <20250630090548.3317-5-anuj20.g@samsung.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Mon, Jun 30, 2025 at 07:44:07AM +0200, Christoph Hellwig wrote:
-> On Fri, Jun 27, 2025 at 11:12:20AM -0400, Brian Foster wrote:
-> > I find it slightly annoying that the struct name now implies 'wbc,'
-> > which is obviously used by the writeback_control inside it. It would be
-> > nice to eventually rename wpc to something more useful, but that's for
-> > another patch:
-> 
-> True, but wbc is already taken by the writeback_control structure.
-> Maybe I should just drop the renaming for now?
-> 
+Looks good:
 
-Yeah, that's what makes it confusing IMO. writeback_ctx looks like it
-would be wbc, but it's actually wpc and wbc is something internal. But I
-dunno.. it's not like the original struct name is great either.
-
-I was thinking maybe rename the wpc variable name to something like
-wbctx (or maybe wbctx and wbctl? *shrug*). Not to say that is elegant by
-any stretch, but just to better differentiate from wbc/wpc and make the
-code a little easier to read going forward. I don't really have a strong
-opinion wrt this series so I don't want to bikeshed too much. Whatever
-you want to go with is fine by me.
-
-Brian
-
+Reviewed-by: Christoph Hellwig <hch@lst.de>
