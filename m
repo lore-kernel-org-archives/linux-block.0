@@ -1,251 +1,102 @@
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f169.google.com (mail-il1-f169.google.com [209.85.166.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48C1726E6F1;
-	Tue,  1 Jul 2025 14:07:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E237526B755
+	for <linux-block@vger.kernel.org>; Tue,  1 Jul 2025 14:14:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751378848; cv=none; b=Br9RMxcqWxN0gNllgtfoSiE/+bLMAsv50x3X880i1uoCt2IqWjNzqCUJh5qkZ+fWAtnLaDiPN3TaNuxgRAMyGC2+Un6zfluFgKW2wh1hAysAOfOmzl7GEMSkREssc1htgufd6O7JRGaG/4UiOWsT5L/WMzdh6O3Hm+REt+PvUuk=
+	t=1751379263; cv=none; b=Ej7+V215EQwZqQgBl4912u0LM2GcyA9LWwkWun/EMxY2aEtte2dcxiUrv9L6x9BUu/UUcenuCC4GDsZeH8PgsFKZTwO0hEJRuiQG0bQ71h3N3rFjD22YsqUc4kuXIuQyrXpb1ZzA8jFQ/bO0C51ItLtflWrrENtQXQg/CMwd3M8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751378848; c=relaxed/simple;
-	bh=UPnoahqZpQxa6C4f25PSY/O5uLDsByabLi7HuBuSwEY=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TEOPpKXa+R0NWHzc4bQoo3xcYvZ51aiTHydytUoi+VOLQDGLJKlmyOupf4y1OY9PoTprdt18+OevDav87DBynfQFrGhdKkPuVkqyAuwZFoXctoZFpedhsVOJEsJOFlmTi1tVkFMhJIr740pvPyD79V/eAwKFBS+24lKnvY4jWkQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4bWlFJ6Bylz6M4jF;
-	Tue,  1 Jul 2025 22:06:28 +0800 (CST)
-Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
-	by mail.maildlp.com (Postfix) with ESMTPS id 13A511402EA;
-	Tue,  1 Jul 2025 22:07:23 +0800 (CST)
-Received: from localhost (10.203.177.66) by frapeml500008.china.huawei.com
- (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Tue, 1 Jul
- 2025 16:07:22 +0200
-Date: Tue, 1 Jul 2025 15:07:21 +0100
-From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-To: Dongsheng Yang <dongsheng.yang@linux.dev>
-CC: <mpatocka@redhat.com>, <agk@redhat.com>, <snitzer@kernel.org>,
-	<axboe@kernel.dk>, <hch@lst.de>, <dan.j.williams@intel.com>,
-	<linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-cxl@vger.kernel.org>, <nvdimm@lists.linux.dev>,
-	<dm-devel@lists.linux.dev>
-Subject: Re: [PATCH v1 03/11] dm-pcache: add cache device
-Message-ID: <20250701150721.00003e67@huawei.com>
-In-Reply-To: <20250624073359.2041340-4-dongsheng.yang@linux.dev>
-References: <20250624073359.2041340-1-dongsheng.yang@linux.dev>
-	<20250624073359.2041340-4-dongsheng.yang@linux.dev>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	s=arc-20240116; t=1751379263; c=relaxed/simple;
+	bh=5OuLPJkS7/FW06Kbx8KtlQhZFZ40qlvkY0aEbvH701c=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=JylDdH0VbMjBlx+QVzwPii+iZWu/c4vUgkXuJduGAsy98T/nkNFKTk5vEOClnD6VBHzOJQ2RJslWq2HBRrp5iERkvScA2EUuNrAl6ZDtLRWJdzr50D2QfnbsnkzSKe749GqyXumV3bc/tLq2X17KCSzpOTFGguenEFiv+Ys1F58=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=OzhsDA3C; arc=none smtp.client-ip=209.85.166.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="OzhsDA3C"
+Received: by mail-il1-f169.google.com with SMTP id e9e14a558f8ab-3dddc17e4e4so10862575ab.0
+        for <linux-block@vger.kernel.org>; Tue, 01 Jul 2025 07:14:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1751379260; x=1751984060; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZmzCkliGIgc/w9CprIKleCb6nmEfP7kYHQXw+v1QCyA=;
+        b=OzhsDA3CRP9ZuwaW//WaVIxPQZDj+5RgvrGHpwMDmdUHIIjZgl9x2CmUfQfHyg2jHp
+         MVajJFbbNa31aSf1zolxcR8T7zUnso3B59vWdYlygpnieVyAP5j4oas/F2fmcZpnb6cH
+         xdG4VaCz1y0fsYonpuzyqaewkg7dypI0iXjlpy1046uhC6TyfplXvBrv8VzfrI5saTj4
+         saj/WyPRxKDKbRix0vmYMmIkNnP+33XWZGsoMFNDuq2wMo/xxBKNVJFlbg88kePkHpFS
+         oRkKss9SMir+kWdCvddwMG0ic0po4nuGhPXgZvOqtmCh9TQaakgo52D1gU/M7Gzk/tzd
+         i5QA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751379260; x=1751984060;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ZmzCkliGIgc/w9CprIKleCb6nmEfP7kYHQXw+v1QCyA=;
+        b=dog2/nur2TbJJdlUC9fQqefA/PBV4zKVDuhhoCRGnJJ7sJK75my2yR89tB2kgpTa1G
+         GRSHf5/AMidzX/+Rknd8fntYkdPagFSuB7xZWI69J+v3bQW8Hv+WRJGlZe6LNfF/JVup
+         1eogwIPSG8utyk9HCK0VAtAHkhfFoUvPEpCSSqCqCraNVwl/EshsQwfH7WfF9oldA5Zv
+         ndc3EjQQ6+mJf1XzhtTM0l2cUilL1b4KxoFBan7ZO8ek0unwcjmCl9i8I3fmHExvbABT
+         697aef7++/k4FmscbiNKvYaKd+0gnQBd5BJf8NcYFmg2ovIXTQqmVueEOQjBcTzKIjjL
+         J5zg==
+X-Forwarded-Encrypted: i=1; AJvYcCXRqAJJBvdqVy6tvujhIF107KCSZB6PMQQ9m9cw/vr2l/NN+cDK8fie7dwdhtNGjTCrWFaM70fBjIsHvQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzevbRyUpt5XOdbKepBb4PhJ513ZbzgoTnZIyS3Ii0FQ1NpFBPZ
+	wRxjRfRDdihYIFqiv6uhCWQ9yXEfHiqVh/Xijo0MsP/aJPWp1R5qn4Cgj3NsTOIJdYc=
+X-Gm-Gg: ASbGncsB4L18FcT5pIFPT0jMc/LIBkvW5Vp59vcfme6/M/KARhPawwmSF1dgApl+ACd
+	Re9+RDGaLQrSptyoQF2Su6r+p/erlDTo492qw1I5Sx61n2woC6dZdjW2sIwZM39YjGyliL84Egf
+	tFiPyX38mIglJrM6Dny2IUp2gFOP8YWRaoqibTFHVN/tHZyoI22OShlYGr83Cm47wufYPrvoDXE
+	pchj3lJyioxm4rzluMas9wj/ARWt3kibQMOSUeU+HrJ1+YfqOtp3AH+zKsvs32wSgrOYx0Gs4EZ
+	JgrisyVmR1wkHzWho2eKy1wFgf5KyA/16U0ybJuYbeCwIWFif0/4nUHgRQB2QI81
+X-Google-Smtp-Source: AGHT+IHB54piwldk5JvCGymkNdiDgT55hx3SHr7B9jacyIo19MjXnu+NW0AhuMQH0JmTjiSmrjmDSw==
+X-Received: by 2002:a05:6e02:19cf:b0:3df:3afa:28d6 with SMTP id e9e14a558f8ab-3df4ab56adfmr188248595ab.2.1751379257608;
+        Tue, 01 Jul 2025 07:14:17 -0700 (PDT)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-502048c49b1sm2489377173.49.2025.07.01.07.14.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 01 Jul 2025 07:14:17 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: hch@lst.de, yukuai3@huawei.com, Yu Kuai <yukuai1@huaweicloud.com>
+Cc: penguin-kernel@I-love.SAKURA.ne.jp, linux-block@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, yi.zhang@huawei.com, yangerkun@huawei.com, 
+ johnny.chenyi@huawei.com
+In-Reply-To: <20250630112828.421219-1-yukuai1@huaweicloud.com>
+References: <20250630112828.421219-1-yukuai1@huaweicloud.com>
+Subject: Re: [PATCH v2] brd: fix sleeping function called from invalid
+ context in brd_insert_page()
+Message-Id: <175137925672.318770.9783780559206172712.b4-ty@kernel.dk>
+Date: Tue, 01 Jul 2025 08:14:16 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-ClientProxiedBy: lhrpeml500004.china.huawei.com (7.191.163.9) To
- frapeml500008.china.huawei.com (7.182.85.71)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3-dev-d7477
 
-On Tue, 24 Jun 2025 07:33:50 +0000
-Dongsheng Yang <dongsheng.yang@linux.dev> wrote:
 
-> Add cache_dev.{c,h} to manage the persistent-memory device that stores
-> all pcache metadata and data segments.  Splitting this logic out keeps
-> the main dm-pcache code focused on policy while cache_dev handles the
-> low-level interaction with the DAX block device.
->=20
-> * DAX mapping
->   - Opens the underlying device via dm_get_device().
->   - Uses dax_direct_access() to obtain a direct linear mapping; falls
->     back to vmap() when the range is fragmented.
->=20
-> * On-disk layout
->   =E2=94=8C=E2=94=80 4 KB =E2=94=80=E2=94=90  super-block (SB)
->   =E2=94=9C=E2=94=80 4 KB =E2=94=80=E2=94=A4  cache_info[0]
->   =E2=94=9C=E2=94=80 4 KB =E2=94=80=E2=94=A4  cache_info[1]
->   =E2=94=9C=E2=94=80 4 KB =E2=94=80=E2=94=A4  cache_ctrl
->   =E2=94=94=E2=94=80 ...  =E2=94=80=E2=94=98  segments
->   Constants and macros in the header expose offsets and sizes.
->=20
-> * Super-block handling
->   - sb_read(), sb_validate(), sb_init() verify magic, CRC32 and host
->     endianness (flag *PCACHE_SB_F_BIGENDIAN*).
->   - Formatting zeroes the metadata replicas and initialises the segment
->     bitmap when the SB is blank.
->=20
-> * Segment allocator
->   - Bitmap protected by seg_lock; find_next_zero_bit() yields the next
->     free 16 MB segment.
->=20
-> * Lifecycle helpers
->   - cache_dev_start()/stop() encapsulate init/exit and are invoked by
->     dm-pcache core.
->   - Gracefully handles errors: CRC mismatch, wrong endianness, device
->     too small (< 512 MB), or failed DAX mapping.
->=20
-> Signed-off-by: Dongsheng Yang <dongsheng.yang@linux.dev>
-> ---
->  drivers/md/dm-pcache/cache_dev.c | 299 +++++++++++++++++++++++++++++++
->  drivers/md/dm-pcache/cache_dev.h |  70 ++++++++
->  2 files changed, 369 insertions(+)
->  create mode 100644 drivers/md/dm-pcache/cache_dev.c
->  create mode 100644 drivers/md/dm-pcache/cache_dev.h
->=20
-> diff --git a/drivers/md/dm-pcache/cache_dev.c b/drivers/md/dm-pcache/cach=
-e_dev.c
-> new file mode 100644
-> index 000000000000..4dcebc9c167e
-> --- /dev/null
-> +++ b/drivers/md/dm-pcache/cache_dev.c
-> @@ -0,0 +1,299 @@
+On Mon, 30 Jun 2025 19:28:28 +0800, Yu Kuai wrote:
+> __xa_cmpxchg() is called with rcu_read_lock(), and it will allocate
+> memory if necessary.
+> 
+> Fix the problem by moving rcu_read_lock() after __xa_cmpxchg(), meanwhile,
+> it still should be held before xa_unlock(), prevent returned page to be
+> freed by concurrent discard.
+> 
+> [...]
 
-> +static int build_vmap(struct dax_device *dax_dev, long total_pages, void=
- **vaddr)
-> +{
-> +	struct page **pages;
-> +	long i =3D 0, chunk;
-> +	pfn_t pfn;
-> +	int ret;
-> +
-> +	pages =3D vmalloc_array(total_pages, sizeof(struct page *));
+Applied, thanks!
 
-Perhaps if DM allows it, use __free() here to avoid need to manually clean =
-it up and
-allow early returns on errors.
+[1/1] brd: fix sleeping function called from invalid context in brd_insert_page()
+      commit: 0d519bb0de3bf0ac9e6f401d4910fc119062d7be
 
-> +	if (!pages)
-> +		return -ENOMEM;
-> +
-> +	do {
-> +		chunk =3D dax_direct_access(dax_dev, i, total_pages - i,
-> +					  DAX_ACCESS, NULL, &pfn);
-> +		if (chunk <=3D 0) {
-> +			ret =3D chunk ? chunk : -EINVAL;
-> +			goto out_free;
-> +		}
-> +
-> +		if (!pfn_t_has_page(pfn)) {
-> +			ret =3D -EOPNOTSUPP;
-> +			goto out_free;
-> +		}
-> +
-> +		while (chunk-- && i < total_pages) {
-> +			pages[i++] =3D pfn_t_to_page(pfn);
-> +			pfn.val++;
-> +			if (!(i & 15))
-> +				cond_resched();
-> +		}
-> +	} while (i < total_pages);
-> +
-> +	*vaddr =3D vmap(pages, total_pages, VM_MAP, PAGE_KERNEL);
-> +	if (!*vaddr)
-> +		ret =3D -ENOMEM;
-> +out_free:
-> +	vfree(pages);
-> +	return ret;
-> +}
-> +
-> +static int cache_dev_dax_init(struct pcache_cache_dev *cache_dev)
-> +{
-> +	struct dm_pcache	*pcache =3D CACHE_DEV_TO_PCACHE(cache_dev);
-> +	struct dax_device	*dax_dev;
-> +	long			total_pages, mapped_pages;
-> +	u64			bdev_size;
-> +	void			*vaddr;
-> +	int			ret;
-> +	int			id;
-
-combine ret and id on one line.
-
-> +	pfn_t			pfn;
-> +
-> +	dax_dev	=3D cache_dev->dm_dev->dax_dev;
-> +	/* total size check */
-> +	bdev_size =3D bdev_nr_bytes(cache_dev->dm_dev->bdev);
-> +	if (bdev_size < PCACHE_CACHE_DEV_SIZE_MIN) {
-> +		pcache_dev_err(pcache, "dax device is too small, required at least %ll=
-u",
-> +				PCACHE_CACHE_DEV_SIZE_MIN);
-> +		ret =3D -ENOSPC;
-> +		goto out;
-		return -ENOSPC;
+Best regards,
+-- 
+Jens Axboe
 
 
 
-
-> +int cache_dev_start(struct dm_pcache *pcache)
-> +{
-> +	struct pcache_cache_dev *cache_dev =3D &pcache->cache_dev;
-> +	struct pcache_sb sb;
-> +	bool format =3D false;
-> +	int ret;
-> +
-> +	mutex_init(&cache_dev->seg_lock);
-> +
-> +	ret =3D cache_dev_dax_init(cache_dev);
-> +	if (ret) {
-> +		pcache_dev_err(pcache, "failed to init cache_dev %s via dax way: %d.",
-> +			       cache_dev->dm_dev->name, ret);
-> +		goto err;
-> +	}
-> +
-> +	ret =3D sb_read(cache_dev, &sb);
-> +	if (ret)
-> +		goto dax_release;
-> +
-> +	if (le64_to_cpu(sb.magic) =3D=3D 0) {
-> +		format =3D true;
-> +		ret =3D sb_init(cache_dev, &sb);
-> +		if (ret < 0)
-> +			goto dax_release;
-> +	}
-> +
-> +	ret =3D sb_validate(cache_dev, &sb);
-> +	if (ret)
-> +		goto dax_release;
-> +
-> +	cache_dev->sb_flags =3D le32_to_cpu(sb.flags);
-> +	ret =3D cache_dev_init(cache_dev, sb.seg_num);
-> +	if (ret)
-> +		goto dax_release;
-> +
-> +	if (format)
-> +		sb_write(cache_dev, &sb);
-> +
-> +	return 0;
-> +
-> +dax_release:
-> +	cache_dev_dax_exit(cache_dev);
-> +err:
-
-In these cases just return instead of going to the label. It gives
-generally more readable code.
-
-> +	return ret;
-> +}
-> +
-> +int cache_dev_get_empty_segment_id(struct pcache_cache_dev *cache_dev, u=
-32 *seg_id)
-> +{
-> +	int ret;
-> +
-> +	mutex_lock(&cache_dev->seg_lock);
-
-If DM is fine with guard() use it here.
-
-> +	*seg_id =3D find_next_zero_bit(cache_dev->seg_bitmap, cache_dev->seg_nu=
-m, 0);
-> +	if (*seg_id =3D=3D cache_dev->seg_num) {
-> +		ret =3D -ENOSPC;
-> +		goto unlock;
-> +	}
-> +
-> +	set_bit(*seg_id, cache_dev->seg_bitmap);
-> +	ret =3D 0;
-> +unlock:
-> +	mutex_unlock(&cache_dev->seg_lock);
-> +	return ret;
-> +}
