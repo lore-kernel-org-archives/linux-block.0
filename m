@@ -1,170 +1,175 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 982AE26A0ED
-	for <linux-block@vger.kernel.org>; Tue,  1 Jul 2025 08:06:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7913B26B0B2
+	for <linux-block@vger.kernel.org>; Tue,  1 Jul 2025 08:20:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751357170; cv=none; b=sYm9zLqtoi+iG0rLfjrpdHlwvI1xnIf6rlBbVhSslZZZLJdgjvmbuRmd+f5p8TbosaoSTxUfuVV4DEmQYXeQJUDkdKfvqGhf6i7eaH++VuEK1ejfefDJQlQ5ti89nILrDD9OkoBFZSu+b3JcteeEWCwRU8sj3aW6T4eHZMs/0+A=
+	t=1751358011; cv=none; b=Z9KV+SURGA8XgjgjC40o3tyzs9BzinGKZlsBF5AC1JIDS8mDJakMkorVIpJvfBlynQff/4mN4eKzMqMafenUvEl+S4lSkV24m5gbUv+UiFsvvGsb3CqmVy51Wo8/gHELS0zulutnd6qVa4zouqjTb75O10q6TLjXdkOF0VFTSOQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751357170; c=relaxed/simple;
-	bh=eP3FP/+t1auRhlAMxVQxgE8U6beXCfkcei1lgZdlmVA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nIDO8RJzvqOFCJAj3WLPpQpAIh2ba/wHBsusfxZB4Svd0Z3ZTvY4poyYjOjL+6+jmOePsjqXz1Kd5Xu1Zwgib7+/UgM+lc7vVMOL3MvIw608uCWP7aL7IuT7NnMzxmGW2V36IpG2Xg1NpNEDbGmmPSRSu+Drec5aO4nCFFq70es=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Wp+AWbCI; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1751358011; c=relaxed/simple;
+	bh=2MWlZ+rnnQySfjO31dgt1/gTxqK3JLD4TRNwUu/yqn8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=GkzXMD8w5r91E+YaeN79W7OIXSnwNht5vyi7rxi+8P5VeDuPY1j2s1vc0ADsAjbazjFzxTnhijHMB8R0XaMhOKsmCkF5cQ7yoWE3FyLtAwbqPHYTmrNdtOy9KqjFcdW9cc7lY/4fPMRaZptePDIaDqnivy8T1EwVyNPtR9B6V5Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=hSM2cWAm; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Wp+AWbCI"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1751357166;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5w/4T1qH3qTvqbjmkb3jwOmOH+DLa0AYagvRLvaEmeo=;
-	b=Wp+AWbCIVATTlPI8d4u5kmJxfAUoqOyZ2PyHG6FOYYYuq1u45Ld7yjHYVWKSIGTRplhgG2
-	OeCF9p8xUuxEU4SOCvRWIW3WOFUIZ6RYG1rj194CxnTYZcE4xZHM5h/66Y5ZucdMy48LrT
-	dluV7hCpD3QD+Qk0Vq6cTJn/zkCRj+U=
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
- [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-327-WqyAZYTmPGiH_zMA7Z4j0Q-1; Tue, 01 Jul 2025 04:06:05 -0400
-X-MC-Unique: WqyAZYTmPGiH_zMA7Z4j0Q-1
-X-Mimecast-MFC-AGG-ID: WqyAZYTmPGiH_zMA7Z4j0Q_1751357165
-Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-31202bbaafaso3178231a91.1
-        for <linux-block@vger.kernel.org>; Tue, 01 Jul 2025 01:06:05 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751357164; x=1751961964;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5w/4T1qH3qTvqbjmkb3jwOmOH+DLa0AYagvRLvaEmeo=;
-        b=BC/5ypip0+f1NmNO2kZ2+CtF2ki+msQ8FqllehA0YhP/R+IsjILU6Y7daD+HmDfdh+
-         xbKeKD/kPPBJCS72nNX8tiJOihaDHo+XT3fWn5u0LxTa/KM7SuxGG9SunEluE41tVGyz
-         iIUKqHrJw2XVLkga8K6Sp9Gp98xAxaqV/cQM9mFbUffAOE8M4fMZI0kwqWakIcb7gSFo
-         KfQeWBdZvfJ1aQgfY7JpnYrsoY2z5eD2iyUc2gwU1J883fj35p5Myol8dT7baRoCKkYA
-         nZ+iCZ7Yq60FEB/K6rRWx/wr5vOKPPAMiJv5nRfDPWIX52l4Gi81mhKDcWblOQwyI830
-         be9g==
-X-Gm-Message-State: AOJu0YwOq5Wlyc6XbTSGLGLv/8ms6DUabd7IE8M1wb7/WzZdVMdlgSi8
-	ea+HzUgwKM5kQOQcGI7AaLLXyWskVzKftBffi4TlYMTbhgFE7YPHxWAk/59lIjjnbEcZlJd865w
-	bB1Jogc38SRhzBitvxJtvodU0K0QKztooX/ycOWcOcMeqiF47xuIg95JLSRt42rYXs5NtoLPHnx
-	pICzXr0GhR+GApAiW7+k9rFHn0AHm8iJzsyL5j5HW6OX1L0+EFFg==
-X-Gm-Gg: ASbGncvttQrtA4ezlJ4KdRsyNLXPoA14OAEdZjAujIqjaQCdqi9dsg+qWqAyixyTGHY
-	moZ+oPaAvnixfyD53Xy/ztn18i1KgrsyR+giX7s686EHre8WpcTfJ++gz34EaG1LqRFEK6fBXBI
-	p+jy5a
-X-Received: by 2002:a17:90b:4c04:b0:312:1143:cf8c with SMTP id 98e67ed59e1d1-318c923bac6mr26229410a91.16.1751357164046;
-        Tue, 01 Jul 2025 01:06:04 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEflJwMRD5RPN4KIbXVgqQfMqe5bQEb7SytU1VL3LfIGOKYDVeTOhUOnXWCS4oPhDXbzvs+LkepeWWvial0hKk=
-X-Received: by 2002:a17:90b:4c04:b0:312:1143:cf8c with SMTP id
- 98e67ed59e1d1-318c923bac6mr26229370a91.16.1751357163510; Tue, 01 Jul 2025
- 01:06:03 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="hSM2cWAm"
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5614Pci1012358;
+	Tue, 1 Jul 2025 08:20:00 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pp1; bh=psW02rwFdUiMYOQ1yMOrqwR5Y63E
+	BoI6xKHAEzTYldI=; b=hSM2cWAmijDd8v2f4vM6OQA8np//2TLg/6qYd4zRWkHa
+	xFLQCjsjZd3VFf0na56zL+XDpH3Pk5njOxUZvpuxdkqQTUx53SVl+/4IVtoQGImk
+	QS+gEbliKJUU7fWaaxLvavAoEHwtov3DF/EnrrqkWvsVVY1Td9nc3P6kBS4U2sT+
+	dNmhgPCadEXm5HHyJrD9yoXhxZh+Wh4a3KvlxTZuQ+1PBU7791tiFb5vhLJEccT+
+	9nL3Awvc4w9jL6sLbajnzc7c20VhtKH8hQIfu5cIx3z706pGOwp/hQo/OcCqvKkp
+	4NUKqLDX/4zn2TThFUizj0YDZGfg8wsEm2wJHT3JGA==
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 47j830p3yj-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 01 Jul 2025 08:19:59 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5614w0e7021407;
+	Tue, 1 Jul 2025 08:19:59 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 47jwe39ept-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 01 Jul 2025 08:19:58 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5618Jvo652167108
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 1 Jul 2025 08:19:57 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 34B3C2006A;
+	Tue,  1 Jul 2025 08:19:57 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 7EF9D2005A;
+	Tue,  1 Jul 2025 08:19:55 +0000 (GMT)
+Received: from li-c9696b4c-3419-11b2-a85c-f9edc3bf8a84.in.ibm.com (unknown [9.109.198.197])
+	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Tue,  1 Jul 2025 08:19:55 +0000 (GMT)
+From: Nilay Shroff <nilay@linux.ibm.com>
+To: linux-block@vger.kernel.org
+Cc: hch@lst.de, ming.lei@redhat.com, hare@suse.de, axboe@kernel.dk,
+        sth@linux.ibm.com, gjoyce@ibm.com
+Subject: [PATCHv7 0/3] block: move sched_tags allocation/de-allocation outside of locking context
+Date: Tue,  1 Jul 2025 13:48:57 +0530
+Message-ID: <20250701081954.57381-1-nilay@linux.ibm.com>
+X-Mailer: git-send-email 2.50.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAGVVp+UZ5VUYvW4ZktoF055Wg=PXO5vico76O3f_iwnfcLb-HA@mail.gmail.com>
- <aGNRFXWX3JS6GAAy@fedora>
-In-Reply-To: <aGNRFXWX3JS6GAAy@fedora>
-From: Changhui Zhong <czhong@redhat.com>
-Date: Tue, 1 Jul 2025 16:05:52 +0800
-X-Gm-Features: Ac12FXw5MmevJRDJl3rjGt78QQm9sE6CaBMjQ4-xgm3IelyGOfdYQFdDx2Ci-ts
-Message-ID: <CAGVVp+XnKFQCZO_AgB1raFAvVLB-Ph35YJeqBTPuOAjwJ56hqg@mail.gmail.com>
-Subject: Re: [bug report] BUG: kernel NULL pointer dereference, address: 0000000000000060
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Linux Block Devices <linux-block@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: LyKDroHTQoFRojdpiFGv5aYy-6F7Aanj
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzAxMDA0NyBTYWx0ZWRfX/g3NUhK9nDpd nVe/XfS9tqtV1bwVASswO/UOSE2Kkma5bMEfr0m5zPWhDsXquehU8Wzc8EpMbNdbN16IFjWiMuF IFjzDfHgxtehbc3Kh/+eJ2/Mw8/n6PnfExoq62C68/n583F3zYGVWW1W3b70UsVIIspYnVngslg
+ YLJpPVFnrH3mlTCnVhyvqQHzolDbkJVOK9NYYLLq5c6N7uO8T1HSmsVAYBNB4dNj+W/YgjQ0Hbn HfhngxloQTqqXWad5wGNmt4YDlDKRUDoZeu65MBy+MLLTTxrMMkV1P0p7EiGbW4n9hqERoHmgZI aTNdUyEBThzT6lVsp9Lp8HFEiRMj+mwGjBwfeZggpz18ZId+K3fwCw5Bd2bLUSWt7HL4QyEW87w
+ zJhSGeAchMcJx4xHvXMCioP4YRX5VMIq94sk2BYFDEH359ITnCyr+U4FHGjdVae04vshmIdy
+X-Authority-Analysis: v=2.4 cv=MOlgmNZl c=1 sm=1 tr=0 ts=68639a30 cx=c_pps a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17 a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=VwQbUJbxAAAA:8 a=VnNF1IyMAAAA:8 a=QyXUC8HyAAAA:8 a=tONhe7rmRp15F2rhOksA:9
+ a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+X-Proofpoint-GUID: LyKDroHTQoFRojdpiFGv5aYy-6F7Aanj
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
+ definitions=2025-07-01_01,2025-06-27_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxscore=0
+ adultscore=0 suspectscore=0 bulkscore=0 clxscore=1015 impostorscore=0
+ priorityscore=1501 mlxlogscore=891 spamscore=0 malwarescore=0
+ lowpriorityscore=0 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
+ definitions=main-2507010047
 
-On Tue, Jul 1, 2025 at 11:08=E2=80=AFAM Ming Lei <ming.lei@redhat.com> wrot=
-e:
->
-> Hi Changhui,
->
-> Thanks for the report!
->
-> On Tue, Jul 01, 2025 at 09:55:23AM +0800, Changhui Zhong wrote:
-> > Hello,
-> >
-> > the following kernel panic was triggered by 'ubdsrv  make test T=3Dgene=
-ric' tests,
-> > please help check and let me know if you need any info/test, thanks.
-> >
-> > repo: https://github.com/torvalds/linux.git
-> > branch: master
-> > INFO: HEAD of cloned kernel:
-> > commit d0b3b7b22dfa1f4b515fd3a295b3fd958f9e81af
-> > Author: Linus Torvalds <torvalds@linux-foundation.org>
-> > Date:   Sun Jun 29 13:09:04 2025 -0700
-> >
-> >     Linux 6.16-rc4
-> >
-> > dmesg log:
-> > [ 3431.347957] BUG: kernel NULL pointer dereference, address: 000000000=
-0000060
-> > [ 3431.355744] #PF: supervisor read access in kernel mode
-> > [ 3431.361484] #PF: error_code(0x0000) - not-present page
-> > [ 3431.367224] PGD 119ffa067 P4D 0
-> > [ 3431.370830] Oops: Oops: 0000 [#1] SMP NOPTI
-> > [ 3431.375503] CPU: 22 UID: 0 PID: 397273 Comm: fio Tainted: G S
-> >            6.16.0-rc4 #1 PREEMPT(voluntary)
-> > [ 3431.386864] Tainted: [S]=3DCPU_OUT_OF_SPEC
-> > [ 3431.391243] Hardware name: Lenovo ThinkSystem SR650 V2/7Z73CTO1WW,
-> > BIOS AFE118M-1.32 06/29/2022
-> > [ 3431.400954] RIP: 0010:ublk_queue_rqs+0x7d/0x1c0 [ublk_drv]
->
-> It is one regression of commit 524346e9d79f ("ublk: build batch from IOs =
-in same io_ring_ctx and io task").
->
-> io->cmd can't be derefered unless the uring cmd is live, and the followin=
-g patch
-> should fix the oops:
->
-> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> index c3e3c3b65a6d..99894d712c1f 100644
-> --- a/drivers/block/ublk_drv.c
-> +++ b/drivers/block/ublk_drv.c
-> @@ -1442,15 +1442,14 @@ static void ublk_queue_rqs(struct rq_list *rqlist=
-)
->                 struct ublk_queue *this_q =3D req->mq_hctx->driver_data;
->                 struct ublk_io *this_io =3D &this_q->ios[req->tag];
->
-> -               if (io && !ublk_belong_to_same_batch(io, this_io) &&
-> -                               !rq_list_empty(&submit_list))
-> -                       ublk_queue_cmd_list(io, &submit_list);
-> -               io =3D this_io;
-> -
-> -               if (ublk_prep_req(this_q, req, true) =3D=3D BLK_STS_OK)
-> +               if (ublk_prep_req(this_q, req, true) =3D=3D BLK_STS_OK) {
-> +                       if (io && !ublk_belong_to_same_batch(io, this_io)=
- &&
-> +                                       !rq_list_empty(&submit_list))
-> +                               ublk_queue_cmd_list(io, &submit_list);
->                         rq_list_add_tail(&submit_list, req);
-> -               else
-> +               } else
->                         rq_list_add_tail(&requeue_list, req);
-> +               io =3D this_io;
->         }
->
->         if (!rq_list_empty(&submit_list))
->
->
-> Thanks,
-> Ming
->
+Hi,
 
-Hi=EF=BC=8CMing
+There have been a few reports[1] indicating potential lockdep warnings due
+to a lock dependency from the percpu allocator to the elevator lock. This
+patch series aims to eliminate that dependency.
 
-thanks for fix patch=EF=BC=8CI ran the test 30 times with your patch and di=
-d
-not hit this issue again.
-I saw you sent a new patch
-https://lore.kernel.org/linux-block/20250701072325.1458109-1-ming.lei@redha=
-t.com/T/#u
-will re-run the tests for the new patch=EF=BC=8C
+The series consists of three patches:
+The first patch is preparatory patch and just move elevator queue
+allocation logic from ->init_sched into blk_mq_init_sched.
 
-Thanks=EF=BC=8C
+The second patch in the series restructures sched_tags allocation and
+deallocation during elevator update/switch operations to ensure these
+actions are performed entirely outside the ->freeze_lock and ->elevator_
+lock. This eliminates the percpu allocator’s lock dependency on the
+elevator and freeze lock during scheduler transitions.
+
+The third patch introduces batch allocation and deallocation helpers for
+sched_tags. These helpers are used during __blk_mq_update_nr_hw_queues()
+to decouple sched_tags memory management from both the elevator and freeze
+locks, addressing the lockdep concerns in the nr_hw_queues update path.
+
+[1] https://lore.kernel.org/all/0659ea8d-a463-47c8-9180-43c719e106eb@linux.ibm.com/
+
+Changes since v6:
+    - Add warning when loading elevator tags from an xarray yields nothing 
+      (Hannes Reinecke)
+    - Use elevator tags instead of xarray table as a function argument to 
+      elv_update_nr_hw_queues (Ming Lei)
+Link to v6: https://lore.kernel.org/all/20250630054756.54532-1-nilay@linux.ibm.com/
+
+Changes since v5:
+    - Fixed smatch warning reported by kernel test robot here:
+      https://lore.kernel.org/all/202506300509.2S1tygch-lkp@intel.com/
+Link to v5: https://lore.kernel.org/all/20250627175544.1063910-1-nilay@linux.ibm.com/
+
+Changes since v4:
+    - Define a local Xarray variable in __blk_mq_update_nr_hw_queues to store
+      sched_tags, instead of storing it in an Xarray defined in 'struct elevator_tags'
+      (Ming Lei)
+Link to v4: https://lore.kernel.org/all/20250624131716.630465-1-nilay@linux.ibm.com/
+
+Changes since v3:
+    - Further split the patchset into three patch series so that we can
+      have a separate patch for sched_tags batch allocation/deallocation
+      (Ming Lei)
+    - Use Xarray to store and load the sched_tags (Ming Lei)
+    - Unexport elevator_alloc() as we no longer need to use it outside
+      of block layer core (hch)
+    - unwind the sched_tags allocation and free tags when we it fails in
+      the middle of allocation (hch)
+    - Move struct elevator_queue header from commin header to elevator.c
+      as there's no user of it outside elevator.c (Ming Lei, hch)
+Link to v3: https://lore.kernel.org/all/20250616173233.3803824-1-nilay@linux.ibm.com/
+
+Change since v2:
+    - Split the patch into a two patch series. The first patch updates
+      ->init_sched elevator API change and second patch handles the sched
+      tags allocation/de-allocation logic (Ming Lei)
+    - Address sched tags allocation/deallocation logic while running in the
+      context of nr_hw_queue update so that we can handle all possible
+      scenarios in a single patchest (Ming Lei)
+Link to v2: https://lore.kernel.org/all/20250528123638.1029700-1-nilay@linux.ibm.com/
+
+Changes since v1:
+    - As the lifetime of elevator queue and sched tags are same, allocate
+      and move sched tags under struct elevator_queue (Ming Lei)
+Link to v1: https://lore.kernel.org/all/20250520103425.1259712-1-nilay@linux.ibm.com/
+
+Nilay Shroff (3):
+  block: move elevator queue allocation logic into blk_mq_init_sched
+  block: fix lockdep warning caused by lock dependency in
+    elv_iosched_store
+  block: fix potential deadlock while running nr_hw_queue update
+
+ block/bfq-iosched.c   |  13 +--
+ block/blk-mq-sched.c  | 223 ++++++++++++++++++++++++++++--------------
+ block/blk-mq-sched.h  |  12 ++-
+ block/blk-mq.c        |  16 ++-
+ block/blk.h           |   2 +-
+ block/elevator.c      |  50 ++++++++--
+ block/elevator.h      |  16 ++-
+ block/kyber-iosched.c |  11 +--
+ block/mq-deadline.c   |  14 +--
+ 9 files changed, 241 insertions(+), 116 deletions(-)
+
+-- 
+2.50.0
 
