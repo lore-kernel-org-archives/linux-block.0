@@ -1,60 +1,60 @@
 Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CBBE1F239B;
-	Tue,  1 Jul 2025 04:56:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75B581FAC54;
+	Tue,  1 Jul 2025 05:09:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751345820; cv=none; b=oS2XdBXN4wOrLMcg5KXsuv+ScTQnMToHk3Q43ONeAnj8ZLB76dBcqCrT9t9DmwlncKgyIk3RqB1Lw0erWs4VTcrjVnZbcakOliEHQ3vqO4V/CD1tmagKZWQ3vYy2QSpoyk1tYDYjBA35Lc5lgjCOX7J5qrx67PNQ6BK2N/PIHjk=
+	t=1751346560; cv=none; b=PUPY0HTN/K86EbrTuZaeBAHBRzdpoEXzK6nquoILe8H2t89e7bBZOrnSt5EEBy5jaeFm8iiT1OKKVYXQc932vSvZDB9pULe5Si2Hw4aRI2GY1BqrM4Adns6OYq24riJdJqIYO/gXPrSynvEOPx9OOUM2OmVXZBm9klbradSUxbM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751345820; c=relaxed/simple;
-	bh=CyTTALPDGzJEGx5kejZTHaonS/g8TKbNMC/M4WYeEqk=;
+	s=arc-20240116; t=1751346560; c=relaxed/simple;
+	bh=n8ySfclbH8ync3F2tgFntxjXRLB4qls3IIpnZJcGy7U=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=E3tMPjeV5lq1MjVubftH4g91LGyASYqBP+28mqFaDXNukdmtTuQnjcz1qY54juPGkLajeX+JWViUPRNNlPHh7Fei2s9806/73aBkaGXXf6jOL3L5VgylDecJ2i3taT9cAfgErvB6a9Axe4NZ+nAWPbiox1j72hQ2ZW91u9t65ww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=tE6q0Y9V; arc=none smtp.client-ip=148.163.158.5
+	 In-Reply-To:Content-Type; b=LpJUlxv6PHREaSnh+YeJeFiE1NQA6qjLokfdUWXiWjCPXRHmJzsYir1/C0fygYIRkxSLVdioMO7BkqsSC+CoFomyAYhWNzBqwcR+4+G+3/Vjc3MzDovWhNB7gQccVutMC7gmmfVzy4jgqOcgS8QAGOopexo5M4Ho4QTYjcb6ykM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Lfr7962J; arc=none smtp.client-ip=148.163.158.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="tE6q0Y9V"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Lfr7962J"
 Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55UIJWoN032170;
-	Tue, 1 Jul 2025 04:56:40 GMT
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55UJ6fvj029135;
+	Tue, 1 Jul 2025 05:08:53 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=Kn1okj
-	zMk2tUg9ap6GcxCIUXgyEWvR3Gb8Bma63x9OM=; b=tE6q0Y9VGQnQHTUwT+eN/Y
-	DEZLu9RPoAx5ZkvB892uaS2nH+P1XPQQJhEyBoK9fho/2IPm04VsRUbMcnqKw+i6
-	pmnosSfY0JtVdOPCjgxqItWMCXEZ04uvUtWrKeknazdU0pKxTXMuHYUNQYXWfs2V
-	O5NwEZfTQwFKh8gWmmAZWQCVWtJGqKrxL2qhfEZOzAazg11dR3Vfz5NbRLUqh0cI
-	XOIMHNGl5pqb5JkvhYTls4gjy5QZSnUueW+qfLQ1sGShK5u0mzQ5MUvTIvOWpZY3
-	YGL2t5xuG20cmjZmKjse/jYkDm+GUgCHrZ5WThuMx8lQXQKYtrKhrDYHrTCrMz6Q
+	:message-id:mime-version:references:subject:to; s=pp1; bh=ORFclw
+	7yoo3+evDcrhbwPDW5tcq2blDEX2FQZsE7inw=; b=Lfr7962JrZ9xBHVrn6Yxzc
+	3F3lEwj+FZxr1L2YhNFcp6orowtYZiJ3HAmm/XE38fXgEIyKEZ4GnZRHFZbHxvJO
+	V5t6YhJ1xnYxk/p66qVvsWJD2YXE9pOV3OOHJdMucPWnKDb0j3s0mvfIupPftnnI
+	j+HxkaAAfXU9CiB1jwRS3hpCyUczmDBhhYwamC5X+FeqNNEYzQcl40DZ3zyXDIH6
+	t6ld/H/gFnXXkwVgpCBSUydhVbAe8mjAVIQ/ctrWXmWhM8eBOaqEimU22f8PNfD1
+	q7CibmbI5Crz740QURN31tB79kyGUt0hdaG1yMSZss32f94NgFFj0gRnh+4mAhjw
 	==
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 47j82fn1fn-1
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 47j82fn2q9-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 01 Jul 2025 04:56:40 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5613dEG8011840;
-	Tue, 1 Jul 2025 04:56:39 GMT
-Received: from smtprelay03.wdc07v.mail.ibm.com ([172.16.1.70])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 47jv7ms0hk-1
+	Tue, 01 Jul 2025 05:08:53 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5614au2p021385;
+	Tue, 1 Jul 2025 05:08:52 GMT
+Received: from smtprelay07.wdc07v.mail.ibm.com ([172.16.1.74])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 47jwe38u87-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 01 Jul 2025 04:56:39 +0000
+	Tue, 01 Jul 2025 05:08:52 +0000
 Received: from smtpav04.wdc07v.mail.ibm.com (smtpav04.wdc07v.mail.ibm.com [10.39.53.231])
-	by smtprelay03.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5614uYhC30737016
+	by smtprelay07.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 56158pqv26739330
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 1 Jul 2025 04:56:34 GMT
+	Tue, 1 Jul 2025 05:08:51 GMT
 Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 9847C5805E;
-	Tue,  1 Jul 2025 04:56:39 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id AA78658052;
+	Tue,  1 Jul 2025 05:08:51 +0000 (GMT)
 Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D310358050;
-	Tue,  1 Jul 2025 04:56:37 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 67C3858045;
+	Tue,  1 Jul 2025 05:08:49 +0000 (GMT)
 Received: from [9.109.198.197] (unknown [9.109.198.197])
 	by smtpav04.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Tue,  1 Jul 2025 04:56:37 +0000 (GMT)
-Message-ID: <a1f5b332-d3c5-4a38-b450-014b14f99ef1@linux.ibm.com>
-Date: Tue, 1 Jul 2025 10:26:35 +0530
+	Tue,  1 Jul 2025 05:08:49 +0000 (GMT)
+Message-ID: <2160a03f-4d4b-4b38-be26-49b2946e1ae5@linux.ibm.com>
+Date: Tue, 1 Jul 2025 10:38:46 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -62,30 +62,26 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block: Fix a deadlock related to modifying the readahead
- attribute
-To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        stable@vger.kernel.org
-References: <20250625195450.1172740-1-bvanassche@acm.org>
- <1816437d-240a-4834-bef9-c9c4a66bee0a@linux.ibm.com>
- <ca4c60c9-c5df-4a82-8045-54ed9c0ba9be@acm.org>
- <7e4ff7e0-b2e0-4e2d-92a4-65b3d695c5e1@linux.ibm.com>
- <344a0eef-6942-455a-9fb2-f80fd72d4668@acm.org>
- <6a9bf05f-f315-417a-b328-6a243de3568e@linux.ibm.com>
- <765d62a8-bb5d-4f1d-8996-afc005bc2d1d@acm.org>
+Subject: Re: [PATCH v2] block: Fix a deadlock related to modifying the
+ readahead attribute
+To: Bart Van Assche <bvanassche@acm.org>, Keith Busch <kbusch@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, stable@vger.kernel.org
+References: <20250626203713.2258558-1-bvanassche@acm.org>
+ <20250627071702.GA992@lst.de> <d03ccb5c-f44c-40e7-9964-2e9ec67bb96f@acm.org>
+ <aGMvCXklxJ_rlZOM@kbusch-mbp> <ef79ab48-f047-4f7d-a6f9-25dcc275126b@acm.org>
 Content-Language: en-US
 From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <765d62a8-bb5d-4f1d-8996-afc005bc2d1d@acm.org>
+In-Reply-To: <ef79ab48-f047-4f7d-a6f9-25dcc275126b@acm.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: pVddDtzalOO302lR97EAfuVgCOOubmyK
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzAxMDAyMSBTYWx0ZWRfX/OmAX9StZZ1O vkIeDheibgdbmukOAWP+HneOTkwY3SvUhPkcGgR27xJ4Dby8X5aVAjytnF7XrOmCehFzgyB+v7A uZpGDZQWnMO1ETUOYDu3HWtli9bV2msSkHsLd7oKjgB2/BMSw3e+LDIOwgpjMdBb9+2y6zOBFkY
- X+cAQFCmXI8lz/JN33MI/Is9DgjOgX613Xdxnb4Ja1+N2V2RF6nOkR+DvRKvN3XS7Qu6jTXByyS PMmMjXevZhHOU8DT0lzHORPYEDNkz49D36vnysLe/PXaHs+9XSWLKNYvlLIZShyFj7qWsiC81Tr ud1cXrBTmyKVw3MrsIDXvKTb3Dm0LSnqP9pemnAxkp72DsGceGGXVvxBRHGq9ysPcDWGYDZIZLa
- nprKU4xuEfBJcTC3+cvq/96opYlhBWV+wkkGBiHDw5FhtykFIahRNV+UOgKemoEoqlogDn9T
-X-Authority-Analysis: v=2.4 cv=LpeSymdc c=1 sm=1 tr=0 ts=68636a88 cx=c_pps a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17 a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=lWPI-tUN4iWXceEnCj0A:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
-X-Proofpoint-GUID: pVddDtzalOO302lR97EAfuVgCOOubmyK
+X-Proofpoint-ORIG-GUID: 26ugk3mPdOMEo-tUgMUx1nV6swmknHJR
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzAxMDAyMSBTYWx0ZWRfX6RhMN5PHE1PA W2b9Ny7sW13P0KwSjRzzxCI4lBPJ1xDrgeNK/JxFVdzpeGhBGsNgMfD3TgHurc23S/TkEH5URb/ COCMGBVReZp+vnFbAO5YDohbrTUd4U7mreHlsZxPCGHD+O1jPdwXCuwV4dajq7nDVgSABDgAdVK
+ 9b4gZ0zt6sT8HpdGIvW5JznkiE4duV51cr5pNi9nehEr64uJN19UPqXenY/rdAzQcJ5vEU8258R e9Ds3IPlo0MXwfxsnhUMHPdaQBgM8BBOJwegYGYRDxHzfa6+a4Oo6ajzw738SK2Q4c6XJUpkRN/ 7SpnZ1nV8qUWU0Q4jNcLGKD5DjhIdNj91WqQPTsHJ54HWEcpzhiDMyhB9BQGq6AqEP1C5/PBxyj
+ 4Cw7kHueQsp0kypaWdtP1YbDip9mTGOaTg3QTg/9qUyyBDXIS6VNSsnZbQfFEBwD/GraFQuc
+X-Authority-Analysis: v=2.4 cv=LpeSymdc c=1 sm=1 tr=0 ts=68636d65 cx=c_pps a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17 a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=awnCJFwb0uc6ziIXhYEA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+X-Proofpoint-GUID: 26ugk3mPdOMEo-tUgMUx1nV6swmknHJR
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
  definitions=2025-07-01_01,2025-06-27_01,2025-03-28_01
@@ -98,47 +94,35 @@ X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorit
 
 
 
-On 6/30/25 8:58 PM, Bart Van Assche wrote:
-> On 6/30/25 3:41 AM, Nilay Shroff wrote:
->> Looking at your earlier dmsetup command:
->> # dmsetup table mpatha
->> 0 65536 multipath 1 queue_if_no_path 1 alua 1 1 service-time 0 1 2 8:32 1 1
+On 7/1/25 7:20 AM, Bart Van Assche wrote:
+> On 6/30/25 5:42 PM, Keith Busch wrote:
+>> On Mon, Jun 30, 2025 at 03:39:18PM -0700, Bart Van Assche wrote:
+>>> On 6/27/25 12:17 AM, Christoph Hellwig wrote:
+>>>> Well, if there are queued never completed bios the freeze will obviously
+>>>> fail.  I don't see how this freeze is special vs other freezes or other
+>>>> attributes that freeze.
+>>>
+>>> Hi Christoph,
+>>>
+>>> Do you perhaps want me to remove the freeze/unfreeze calls from all
+>>> sysfs store callbacks from which it is safe to remove these callbacks?
 >>
->> In the above rule, the option queue_if_no_path seems bit odd (unless used
->> with timeout). Can't we add module param queue_if_no_path_timeout_secs=<N>
->> while loading dm-multipath and thus avoid hanging the queue I/O indefinitely
->> when all paths of a multipath device is lost? IMO, queue_if_no_path without
->> timeout may make sense when we know that the paths will eventually recover
->> and that applications should simply wait.
+>> But don't the remaining attributes that are not safe remain susceptible
+>> to this deadlock?
 > 
-> I refuse to modify the tests that trigger the deadlock because:
-> 1. The deadlock is a REGRESSION. Regressions are not tolerated in the
->    Linux kernel and should be fixed instead of arguing about whether or
->    not the use case should be modified.
-> 2. The test that triggers the deadlock is not new. It is almost ten
->    years old and the deadlock reported at the start of this email thread
->    is the first deadlock in the block layer triggered by that test.
-> 3. queue_if_no_path is widely used to avoid I/O errors if all paths are
->    temporarily unavailable and if it is not known how long it will take
->    to restore a path. queue_if_no_path can e.g. be used to prevent I/O
->    errors if a technician mistakenly pulls the wrong cable(s) in a data
->    center.
-> 4. Unnecessary blk_mq_freeze_queue()/blk_mq_unfreeze_queue() pairs slow
->    down the workflows that trigger these kernel function calls. Hence,
->    if blk_mq_freeze_queue() and blk_mq_unfreeze_queue() are called
->    unnecessarily, the calls to these functions should be removed.
-
-Yes agreed.. Your above points makes sense. As this is REGRESSION we
-must fix this. I am convinced that the readahead attribute is not used
-in IO hotpath so in that sense your patch is valid, no issues with that.
-However my only concern was about other sysfs attributes which needs 
-queue freeze and that's legitimate as those attributes are used in IO 
-hotpath. But I just saw that you proposed some idea about addressing 
-those other sysfs attributes, so lets discuss this on that thread.
-
-Meanwhile, I'd review your patch.
+> For the remaining sysfs attributes the deadlock can be solved by
+> letting the blk_mq_freeze_queue() call by the sysfs store methods time
+> out if that call takes too long or by making that call interruptible by
+> signals like Ctrl-C. I think its better to let functions like
+> queue_requests_store() fail if an attempt to freeze a request
+> queue takes longer than it should rather than to trigger a kernel
+> deadlock.
+> 
+I think you're proposing to use blk_mq_freeze_queue_wait_timeout()
+here (which puts the caller into uninterruptible sleep) and that might
+be okay. However, IMO, using TASK_INTERRUPTIBLE may not be worth in
+case those sysfs store methods are invoked from udev rules or 
+application. But lets wait for others to chime in and suggest.
 
 Thanks,
 --Nilay
-
-
