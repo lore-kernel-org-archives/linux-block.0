@@ -1,248 +1,103 @@
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f47.google.com (mail-io1-f47.google.com [209.85.166.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B18511F2361;
-	Tue,  1 Jul 2025 13:44:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58F0E269AFB
+	for <linux-block@vger.kernel.org>; Tue,  1 Jul 2025 13:55:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751377445; cv=none; b=euF07cj0+YGJDe0QN3TgsFvhM9WmPRjfJoRNGZQgtecyf93LxyijjfkjKt3DrLoZBEI0/3Rsyas4//MlTZXu9al1TR5PxbWS0pVYx+K706HD6DiZ1HrE4liVsRMyEFlTKXNkrMifSREJRV6MHEYrtoHI+mvWtSFrDiUtt+UJOQE=
+	t=1751378117; cv=none; b=nfBXwKvE+Jo5vaV+GaqQN+FzJlBtGQphcsZeYtNP2KV1tMxe3WoT7WEtNxRPiExhQiyPrCiVxHbb98iDumlv58th6mMXGiKn2kSVnTB4alcPTBjiotmL1WW+nrJ1EWIExxZ0TAYtolGxeBr/PVgojjsb33Dfd6RkSbsHg2JjOiY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751377445; c=relaxed/simple;
-	bh=VjAD8KdF7m2BlM+Sf9sezN5FLxjUffGtPGY5q9p3ZXM=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tcxaUVMHxP65JsYtGHwbUj4JPL3NKV7Sd7Vw+eDuMX158OY2GUTaXvr1i9R7CwctYxMT4iNP2gBd/1kbokoJuezHZ8PRO5oYw+y9F03yHFNMwmI1Jw86hTOfueAD4+Zp+85N6BedNM+n8+sB3lIL/8aIm7+j0HCiXtjG4+yNTDs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4bWkkL22CXz6M4sF;
-	Tue,  1 Jul 2025 21:43:06 +0800 (CST)
-Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
-	by mail.maildlp.com (Postfix) with ESMTPS id 72B481402F8;
-	Tue,  1 Jul 2025 21:44:00 +0800 (CST)
-Received: from localhost (10.203.177.66) by frapeml500008.china.huawei.com
- (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Tue, 1 Jul
- 2025 15:43:59 +0200
-Date: Tue, 1 Jul 2025 14:43:58 +0100
-From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-To: Dongsheng Yang <dongsheng.yang@linux.dev>
-CC: <mpatocka@redhat.com>, <agk@redhat.com>, <snitzer@kernel.org>,
-	<axboe@kernel.dk>, <hch@lst.de>, <dan.j.williams@intel.com>,
-	<linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-cxl@vger.kernel.org>, <nvdimm@lists.linux.dev>,
-	<dm-devel@lists.linux.dev>
-Subject: Re: [PATCH v1 01/11] dm-pcache: add pcache_internal.h
-Message-ID: <20250701144358.000061a5@huawei.com>
-In-Reply-To: <20250624073359.2041340-2-dongsheng.yang@linux.dev>
-References: <20250624073359.2041340-1-dongsheng.yang@linux.dev>
-	<20250624073359.2041340-2-dongsheng.yang@linux.dev>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	s=arc-20240116; t=1751378117; c=relaxed/simple;
+	bh=6F3b4MZoG7mZ54cDsjb+4J1391oqB0RJ7h/kq5eAK6g=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=tOxjGMkFfVOw2C50/xZJc5H/xhD7hAwckUwQYPZVpczZ5umeXoJOk56ANj9tlq5+3HFuVQlHfKN4gSPXZCjc1NL5DzTU0o5LHVvjel48d8qzTpKLTNo9NwBRNkRagscagfzcpEWVPrrsUA/jhPwPLxNSCvEblHwU0741CXsO49c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=KRNUAWJJ; arc=none smtp.client-ip=209.85.166.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="KRNUAWJJ"
+Received: by mail-io1-f47.google.com with SMTP id ca18e2360f4ac-875dd57d63bso237037439f.0
+        for <linux-block@vger.kernel.org>; Tue, 01 Jul 2025 06:55:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1751378113; x=1751982913; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fV7FRyn/qDKhPYxjQjJlV2OtqwnrY631kCHwF3JNpwQ=;
+        b=KRNUAWJJufecQ+jfrcNTYc8LazX1wAmM0eURR6Mxohkn8YqZsGrzUgJgcxLkEq04SO
+         1P/92MMK/VzBXd/xlPTuCaCcXkpFNB+Y4ajRQCVCoxc7O4ZNVHE0xcTJP3383KZtNJuv
+         8Nq7Ald5IQ35Qh3IseZfNeUt/pE9JPGE3QhyuqG/dnreQ3UQ9LTerAnnVPyI/F5+VPIV
+         wzT3QGbsSnEt8oZqDdvlNEokux7VWzRXrUu30BnvKjQct01RkbO8dEYkgKwy6MC/5jHV
+         uZdQ5Km4w1e1T28Y/r8+gMpbYaOcCB9Hsb2U4Bkxr+LbK4oiTDIalXrREifDEPfSa9Wj
+         xPzQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751378113; x=1751982913;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fV7FRyn/qDKhPYxjQjJlV2OtqwnrY631kCHwF3JNpwQ=;
+        b=L03h7TQupJYVilLhQkzA+85A5MldgoKElbiHvhJATKl13N+VPLGYC09fJO/bPflDWw
+         3imHbaJBOaqnqko4OA8OF3vkcQNG5gEtA0Cnc8IUYyBQBcS/CAt4lMFfcJaZd5FNjPM3
+         TpY8+HOLZsC/gUOYuiCP2fApjdrgiTyCFrZ3LGkPNn3zvMHvjYbvrIt03sgGKLldELEa
+         7LBpz7EikDrjZevPsoi8ud0JSR5Zdl8AP1RQv1dS74lKany+zKGhrDdn/k+FQ9ratAcX
+         gReQlXe3wLtR+E/We9fa61B+YQFTOGW4YWdXlc5zhoUZDSnXQMcE+P4YQR+cSD1AvzKf
+         7ctA==
+X-Gm-Message-State: AOJu0Yym6eOzzeQZsENj0WT8ze9/R9V4nSMydhheDwe2mLcMaHlyVV5e
+	mctpubZErfPUAPOk0m8avfDyYq0Tbour9zuwwznqJ1TrPTY6KnHIMJi+hExbsrH6tnSJDgktpiB
+	TprYG
+X-Gm-Gg: ASbGncuE4reQNflxnHb5LBW/2vu+/KtIJ8Zz+upJQR2N48AGvwy5FnxsiQ0gUG5+ePw
+	guJoamUmZWkQa+5bcVCyIn9vd1UWokWnOtA7amkCscgqchXLcvwXcK3zhwYtBT0xlZ9xjv2nXHi
+	yh+AK67kNfxsYTiwqv0hFdV7Vx+Su8TvSV9waSF9wHffrmCv/4SAo658CUqPQxa+5mX5cTYiaJh
+	P+08y1OLsdGqXP+23VVKP4hpalFapXH12ZxV49kx8w1ZG5aQgOGe+hG5h1sJsJhRaWrHDtL7OpZ
+	7UDPABzfV0htEpnfHiVAnzxFwLR+prUxTLVfvWRN4REfFHSbsY+1GA==
+X-Google-Smtp-Source: AGHT+IE6cpin2Ae+2K+3M2sqGu6WAjtlrFz5JoixHbBqKe9psLgVjm3KcJs4qPogHMhWRJC5Ww4Gpw==
+X-Received: by 2002:a5d:8608:0:b0:867:16f4:5254 with SMTP id ca18e2360f4ac-876b90eb847mr363403039f.6.1751378113268;
+        Tue, 01 Jul 2025 06:55:13 -0700 (PDT)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-87687b3ee95sm229373239f.47.2025.07.01.06.55.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 01 Jul 2025 06:55:12 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
+Cc: Uday Shankar <ushankar@purestorage.com>, 
+ Caleb Sander Mateos <csander@purestorage.com>, 
+ Changhui Zhong <czhong@redhat.com>
+In-Reply-To: <20250701072325.1458109-1-ming.lei@redhat.com>
+References: <20250701072325.1458109-1-ming.lei@redhat.com>
+Subject: Re: [PATCH] ublk: don't queue request if the associated uring_cmd
+ is canceled
+Message-Id: <175137811230.315700.17821411323538524577.b4-ty@kernel.dk>
+Date: Tue, 01 Jul 2025 07:55:12 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml500010.china.huawei.com (7.191.174.240) To
- frapeml500008.china.huawei.com (7.182.85.71)
+X-Mailer: b4 0.14.3-dev-d7477
 
-On Tue, 24 Jun 2025 07:33:48 +0000
-Dongsheng Yang <dongsheng.yang@linux.dev> wrote:
 
-> Consolidate common PCACHE helpers into a new header so that subsequent
-> patches can include them without repeating boiler-plate.
+On Tue, 01 Jul 2025 15:23:25 +0800, Ming Lei wrote:
+> Commit 524346e9d79f ("ublk: build batch from IOs in same io_ring_ctx and io task")
+> need to dereference `io->cmd` for checking if the IO can be added to current
+> batch, see ublk_belong_to_same_batch() and io_uring_cmd_ctx_handle(). However,
+> `io->cmd` may become invalid after the uring_cmd is canceled.
 > 
-> - Logging macros with unified prefix and location info.
-> - Common constants (KB/MB helpers, metadata replica count, CRC seed).
-> - On-disk metadata header definition and CRC helper.
-> - Sequence-number comparison that handles wrap-around.
-> - pcache_meta_find_latest() to pick the newest valid metadata copy.
+> Fixes it by only allowing to queue this IO in case that ublk_prep_req()
+> returns `BLK_STS_OK`, when 'io->cmd' is guaranteed to be valid.
 > 
-> Signed-off-by: Dongsheng Yang <dongsheng.yang@linux.dev>
-Hi,
+> [...]
 
-I'm taking a look out of curiosity only as this is far from an area I'm
-confident in.  So comments will be mostly superficial.
+Applied, thanks!
+
+[1/1] ublk: don't queue request if the associated uring_cmd is canceled
+      commit: 01ed88aea527e19def9070349399684522c66c72
+
+Best regards,
+-- 
+Jens Axboe
 
 
-> ---
->  drivers/md/dm-pcache/pcache_internal.h | 116 +++++++++++++++++++++++++
-
-As a general rule I'd much rather see a header built up alongside the
-code that uses it rather than as a separate patch at the start.
-
->  1 file changed, 116 insertions(+)
->  create mode 100644 drivers/md/dm-pcache/pcache_internal.h
-> 
-> diff --git a/drivers/md/dm-pcache/pcache_internal.h b/drivers/md/dm-pcache/pcache_internal.h
-> new file mode 100644
-> index 000000000000..4d3b55a22638
-> --- /dev/null
-> +++ b/drivers/md/dm-pcache/pcache_internal.h
-> @@ -0,0 +1,116 @@
-> +/* SPDX-License-Identifier: GPL-2.0-or-later */
-> +#ifndef _PCACHE_INTERNAL_H
-> +#define _PCACHE_INTERNAL_H
-> +
-> +#include <linux/delay.h>
-> +#include <linux/crc32c.h>
-> +
-> +#define pcache_err(fmt, ...)							\
-> +	pr_err("dm-pcache: %s:%u " fmt, __func__, __LINE__, ##__VA_ARGS__)
-> +#define pcache_info(fmt, ...)							\
-> +	pr_info("dm-pcache: %s:%u " fmt, __func__, __LINE__, ##__VA_ARGS__)
-> +#define pcache_debug(fmt, ...)							\
-> +	pr_debug("dm-pcache: %s:%u " fmt, __func__, __LINE__, ##__VA_ARGS__)
-
-Use pr_fmt() in appropriate files and drop these.
-
-> +
-> +#define PCACHE_KB			(1024ULL)
-> +#define PCACHE_MB			(1024 * PCACHE_KB)
-
-Generally avoid defines where they just match the numbers.  1024 * 1024 is
-commonly used directly in kernel code as everyone can see it's a MiB.
-
-> +
-> +/* Maximum number of metadata indices */
-> +#define PCACHE_META_INDEX_MAX		2
-> +
-> +#define PCACHE_CRC_SEED			0x3B15A
-> +/*
-> + * struct pcache_meta_header - PCACHE metadata header structure
-> + * @crc: CRC checksum for validating metadata integrity.
-> + * @seq: Sequence number to track metadata updates.
-> + * @version: Metadata version.
-> + * @res: Reserved space for future use.
-> + */
-> +struct pcache_meta_header {
-> +	__u32 crc;
-> +	__u8  seq;
-> +	__u8  version;
-> +	__u16 res;
-
-Why not u32 and friends given this seems to be internal to the kernel?
-
-> +};
-> +
-> +/*
-
-You've formatted most of this stuff as kernel-doc so for all of them use
-
-/**
-
-And check for any warnings or errors using scripts/kernel-doc
-
-It's a good way to pick up on subtle typos etc in docs that a reviewr
-might miss.
-
-> + * pcache_meta_crc - Calculate CRC for the given metadata header.
-> + * @header: Pointer to the metadata header.
-> + * @meta_size: Size of the metadata structure.
-> + *
-> + * Returns the CRC checksum calculated by excluding the CRC field itself.
-> + */
-> +static inline u32 pcache_meta_crc(struct pcache_meta_header *header, u32 meta_size)
-> +{
-> +	return crc32c(PCACHE_CRC_SEED, (void *)header + 4, meta_size - 4);
-> +}
-> +
-> +/*
-> + * pcache_meta_seq_after - Check if a sequence number is more recent, accounting for overflow.
-> + * @seq1: First sequence number.
-> + * @seq2: Second sequence number.
-> + *
-> + * Determines if @seq1 is more recent than @seq2 by calculating the signed
-> + * difference between them. This approach allows handling sequence number
-> + * overflow correctly because the difference wraps naturally, and any value
-> + * greater than zero indicates that @seq1 is "after" @seq2. This method
-> + * assumes 8-bit unsigned sequence numbers, where the difference wraps
-> + * around if seq1 overflows past seq2.
-
-I'd state the assumption behind this which think is that we will never
-have a sequence number getting ahead by more than 128 values.
-
-> + *
-> + * Returns:
-> + *   - true if @seq1 is more recent than @seq2, indicating it comes "after"
-> + *   - false otherwise.
-> + */
-> +static inline bool pcache_meta_seq_after(u8 seq1, u8 seq2)
-> +{
-> +	return (s8)(seq1 - seq2) > 0;
-> +}
-> +
-> +/*
-> + * pcache_meta_find_latest - Find the latest valid metadata.
-> + * @header: Pointer to the metadata header.
-> + * @meta_size: Size of each metadata block.
-> + *
-> + * Finds the latest valid metadata by checking sequence numbers. If a
-> + * valid entry with the highest sequence number is found, its pointer
-> + * is returned. Returns NULL if no valid metadata is found.
-> + */
-> +static inline void __must_check *pcache_meta_find_latest(struct pcache_meta_header *header,
-> +					u32 meta_size, u32 meta_max_size,
-> +					void *meta_ret)
-
-Not sure why you can't type this as pcache_meta_header.  Maybe that will
-become obvious later int he series.
-
-> +{
-> +	struct pcache_meta_header *meta, *latest = NULL;
-
-Combining declarations that assign and those that don't is not greate
-for readability.  Also why not set meta where you declare it?
-
-> +	u32 i, seq_latest = 0;
-> +	void *meta_addr;
-> +
-> +	meta = meta_ret;
-> +
-> +	for (i = 0; i < PCACHE_META_INDEX_MAX; i++) {
-> +		meta_addr = (void *)header + (i * meta_max_size);
-
-Brackets around i * meta_max_size not needed.   Whilst we can't all remember
-precedence of all operators, + and * are reasonable to assume.
-
-> +		if (copy_mc_to_kernel(meta, meta_addr, meta_size)) {
-> +			pcache_err("hardware memory error when copy meta");
-> +			return ERR_PTR(-EIO);
-> +		}
-> +
-> +		/* Skip if CRC check fails */
-
-Good to say why skipping is the right choice perhaps.
-
-> +		if (meta->crc != pcache_meta_crc(meta, meta_size))
-> +			continue;
-> +
-> +		/* Update latest if a more recent sequence is found */
-> +		if (!latest || pcache_meta_seq_after(meta->seq, seq_latest)) {
-> +			seq_latest = meta->seq;
-> +			latest = (void *)header + (i * meta_max_size);
-> +		}
-> +	}
-> +
-> +	if (latest) {
-I'd flip
-
-	if (!latest)
-		return 0;
-
-	if (copy...)
-
-> +		if (copy_mc_to_kernel(meta_ret, latest, meta_size)) {
-> +			pcache_err("hardware memory error");
-> +			return ERR_PTR(-EIO);
-> +		}
-> +	}
-> +
-> +	return latest;
-> +}
-> +
-> +#endif /* _PCACHE_INTERNAL_H */
 
