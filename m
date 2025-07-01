@@ -1,64 +1,64 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E074C26A1CC
-	for <linux-block@vger.kernel.org>; Tue,  1 Jul 2025 08:20:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F95226A0F3
+	for <linux-block@vger.kernel.org>; Tue,  1 Jul 2025 08:20:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751358012; cv=none; b=BX6WaQMLWnxyodiT10l1xGjBy+LGnaKIlk9PVBoOBkWL3nRS1C60ezvfFWMwu+6ViT5pI6aiHJWYx/qnUDdP6zay1NpcUu+Xh2qNyWLD10GJ9YWWaB97PSclPcTQ2Q0nlGsNmWk+E/oEf2C5I0NU2OZZTFRJG0PjlSEQo5Casws=
+	t=1751358016; cv=none; b=EcVn7rPI6JCNsrSHP4Rj6Vk6zgczEPeZaoN+cR+QaWQT7mskkArA5KqKhNrJRmikHXEkD0OtMC26ywappIhN/U9duZYaa5L5VR/DAgNGW0DfiPj64m9OKSXL3W9ky44oR/c7NXhpqbq1JCGim1fS1zgfMucYnGInwohVFlhBLy8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751358012; c=relaxed/simple;
-	bh=D0TBS9VV+EmeQekCaS4KMWD+C4FI7h3+JOgDO1nNeFU=;
+	s=arc-20240116; t=1751358016; c=relaxed/simple;
+	bh=ns7z4oaZ+GX+aWAqD5VG0Ard63gKtdDFCihxj47FBOU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZaqQPsYB0ksUnzXcBVt6iAYfbOiefqJodTGe0Yl5BEBK8diZGR6KTvjrBbF9v232yzg6T15PSSMO573jHBpnQ1Z0JDRDDuacZW19GdKROFlbfSr0ynifgxwPUcETj7xoPF6lXmBKQi1sIa3WV5v9TmLOLZtWdJNhp/A2ggjWwDI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=UT87aP19; arc=none smtp.client-ip=148.163.158.5
+	 MIME-Version; b=ZhA6CYuBMz2fxxfQJNaq+2qMRBCMOYzuBU042QsmQvUmRlfLgc80rWClz7XAVBztph9t8ItagxGmD8hC56xXema91I+he+kGUqUGUm7AIWDcGzSJJTAFpog1lD94u0/3ke2Rt9/a4oRthdyIE+0CnLX0RmE0XgPqB5eoOD08TaA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=HvzrJuiB; arc=none smtp.client-ip=148.163.156.1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="UT87aP19"
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56120JEI006100;
-	Tue, 1 Jul 2025 08:20:02 GMT
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="HvzrJuiB"
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56189Cqr024499;
+	Tue, 1 Jul 2025 08:20:07 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=+Ed1aoxibwUh2yTGE
-	c4pLAslssLcXNhXf+flYfDV3yM=; b=UT87aP192BK50qoOc1M/5THQvu1f+O1cX
-	jOUFD+Bgqw6g0NvRNA+E5rcuWl8QCx4F8gbOcYwB+ivmCPXuoCNqsjwZw72f5mTC
-	JZNNrI7EaxCzZme7py8ycWm2AU8lgvIbvKiZKH7MFDHFNo8j6Ri3Kjya/felSEoK
-	Spz2uoOhpLPc2rECB5yIJz8g8bj3v8gmaruudT2MDB5KIIrgl8QJ3gHcF4yKlDat
-	tLG3uo5xMhKikLjdbA4uDffGk7u+4Ii53ISmlgffixY2fNHsa+zWe3Iwe7iEFN15
-	PDFa+SjDeEthDpPQnwKjzDO5pTuev4tz82rQ2WfIHsgGFz1gdQ6nQ==
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 47j82fnutg-1
+	:mime-version:references:subject:to; s=pp1; bh=GC9rRH/fmFdizSCj3
+	I/TRlMZs64OkBNP3crMdzKzyZM=; b=HvzrJuiBIxCIKjcBUqvy31wqEmA4mP/9G
+	lHqaPUI33z8TH3l+ykDBxTkGfeAZP0IF0F7vggv2vYHYJSek0NXaCC+Fu+Cm0LRN
+	JuTPpY/WPWUoJGcTUuxZgzfqQF1k3OYVXZo4sw6DOEok48hPkeZdMIFUs/gsgjPI
+	Qce0n4uhNsgRowXNA0XBJ3Hmbv34RYlijZwlVH5UqqrZy4mQHYjml9w/UkPlqnKt
+	c5E5GsR7mRR1uDbE5OpSRVeRAK5wGbnbOgAz4HaCT9kmC2vTdZMfWCnbwWd74iFE
+	IleT6bM15Uds1PegFnulg9BY0BQIUEuLDoYs/zOmEA1kOBcXRCYJA==
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 47j830p40b-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 01 Jul 2025 08:20:01 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5618Cn1n011840;
-	Tue, 1 Jul 2025 08:20:01 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 47jv7msne2-1
+	Tue, 01 Jul 2025 08:20:06 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 56140jRU006911;
+	Tue, 1 Jul 2025 08:20:05 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 47jvxm9j91-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 01 Jul 2025 08:20:01 +0000
+	Tue, 01 Jul 2025 08:20:05 +0000
 Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5618Jxjv50987332
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5618K4QQ51053036
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 1 Jul 2025 08:19:59 GMT
+	Tue, 1 Jul 2025 08:20:04 GMT
 Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 58C382006A;
-	Tue,  1 Jul 2025 08:19:59 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id ED6522006A;
+	Tue,  1 Jul 2025 08:20:03 +0000 (GMT)
 Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 971C32005A;
-	Tue,  1 Jul 2025 08:19:57 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 1E3022005A;
+	Tue,  1 Jul 2025 08:20:02 +0000 (GMT)
 Received: from li-c9696b4c-3419-11b2-a85c-f9edc3bf8a84.in.ibm.com (unknown [9.109.198.197])
 	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue,  1 Jul 2025 08:19:57 +0000 (GMT)
+	Tue,  1 Jul 2025 08:20:01 +0000 (GMT)
 From: Nilay Shroff <nilay@linux.ibm.com>
 To: linux-block@vger.kernel.org
 Cc: hch@lst.de, ming.lei@redhat.com, hare@suse.de, axboe@kernel.dk,
         sth@linux.ibm.com, gjoyce@ibm.com
-Subject: [PATCHv7 1/3] block: move elevator queue allocation logic into blk_mq_init_sched
-Date: Tue,  1 Jul 2025 13:48:58 +0530
-Message-ID: <20250701081954.57381-2-nilay@linux.ibm.com>
+Subject: [PATCHv7 3/3] block: fix potential deadlock while running nr_hw_queue update
+Date: Tue,  1 Jul 2025 13:49:00 +0530
+Message-ID: <20250701081954.57381-4-nilay@linux.ibm.com>
 X-Mailer: git-send-email 2.50.0
 In-Reply-To: <20250701081954.57381-1-nilay@linux.ibm.com>
 References: <20250701081954.57381-1-nilay@linux.ibm.com>
@@ -70,212 +70,256 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: VbrS92AuifCYmbkODwhI8pYG5JXMyN2k
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzAxMDA0NyBTYWx0ZWRfX7cao4k/yLqdA zU6XKxY3Mg1FH2YkA7gY3fQuSFu1PpAOGq9Zwg3Mv4EwoQM/wnzrjRJZuyzi2sWSJ55VUJRYyTz w7W908UcYXpv+SeZ4L71fVAElsESr5GRc1FdZHVx8IdnWYjHDu7jPw7ZZQFSHQKVR3gcDEwkZ+A
- CfBvmkWS9d+xnWsK2/oYDrRQs5IDI43GFaVTDDwqBVrar6kzio1PydMj54Fcghb3xqisZjtERz9 zHB3vGgcsvnDPQkZOQZr9Tof4QyiYd5lkJ1sw3/qO9823FodbycznXqJWa/wua0pB1im30BbS7R osmuRT3L+xIJ50XJi74HCSn6sSlmkbpzb4JpQ5irAb4OdHqlwed7aTb3jaWDCFh9HVU2a+r/j5d
- TmmkiHLaROwLm5R6UNLExC+SOKy2Nq1ADYXG8RZlsjHnirZBM9mMGfXpJJlJr+/v2rdPd+/a
-X-Authority-Analysis: v=2.4 cv=LpeSymdc c=1 sm=1 tr=0 ts=68639a32 cx=c_pps a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17 a=Wb1JkmetP80A:10 a=20KFwNOVAAAA:8 a=VnNF1IyMAAAA:8 a=eVjI13sIsFB_z2tHqD4A:9
-X-Proofpoint-GUID: VbrS92AuifCYmbkODwhI8pYG5JXMyN2k
+X-Proofpoint-ORIG-GUID: gMXm-MB-3mXWYbvtcOoICK-A2wB4WaRj
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzAxMDA0NyBTYWx0ZWRfXy84Af4BKB/Ta DRzb02/wBMq5LEXynQYRWbZEl1l015XUd2WOYRh2S3MMoHV0SQy62M6nFSYme45l1VlUUtTbQq9 2VTEfJ1Rt3PdyiXiBFgPEgM5y2XmsaUJNxo/+09iYl5MR5u8XoEE4qBNMinQ7e1Q5b4lAiRIIkQ
+ uOIlIIjNkqhtEiKH/IJP4fnL/0vp9WIqqSSzKT3czIHDMzyWZCXe29GskhOQRVW5WBROlZdFFpq H9caeymhFB46rWuRulUZQpC7gD9HD0DDrL9VAZ47IwdhjlqiYRNXO3SWbP+1bxgKQWduEwgylx9 DYcUBIvUMdqBBl2k6r0rE88HGo0wPsHSHGlOFNELoFUCzSUPyZNMGwTum46EzObKAo6TjPd2m6g
+ tX6SzsISSZW0hDqt36RS9RxrsQVdDgV37DnviH9hv2AHXLpWUxj57WZAEcc9fq/aZu5Y2skt
+X-Authority-Analysis: v=2.4 cv=MOlgmNZl c=1 sm=1 tr=0 ts=68639a36 cx=c_pps a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17 a=Wb1JkmetP80A:10 a=VwQbUJbxAAAA:8 a=VnNF1IyMAAAA:8 a=20KFwNOVAAAA:8 a=L_SnxBb1UgEGMhxGnJwA:9
+X-Proofpoint-GUID: gMXm-MB-3mXWYbvtcOoICK-A2wB4WaRj
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
  definitions=2025-07-01_01,2025-06-27_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- spamscore=0 bulkscore=0 lowpriorityscore=0 adultscore=0 clxscore=1015
- impostorscore=0 mlxscore=0 mlxlogscore=999 phishscore=0 suspectscore=0
- malwarescore=0 classifier=spam authscore=0 authtc=n/a authcc=
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxscore=0
+ adultscore=0 suspectscore=0 bulkscore=0 clxscore=1015 impostorscore=0
+ priorityscore=1501 mlxlogscore=999 spamscore=0 malwarescore=0
+ lowpriorityscore=0 classifier=spam authscore=0 authtc=n/a authcc=
  route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
  definitions=main-2507010047
 
-In preparation for allocating sched_tags before freezing the request
-queue and acquiring ->elevator_lock, move the elevator queue allocation
-logic from the elevator ops ->init_sched callback into blk_mq_init_sched.
-As elevator_alloc is now only invoked from block layer core, we don't
-need to export it, so unexport elevator_alloc function.
+Move scheduler tags (sched_tags) allocation and deallocation outside
+both the ->elevator_lock and ->freeze_lock when updating nr_hw_queues.
+This change breaks the dependency chain from the percpu allocator lock
+to the elevator lock, helping to prevent potential deadlocks, as
+observed in the reported lockdep splat[1].
 
-This refactoring provides a centralized location for elevator queue
-initialization, which makes it easier to store pre-allocated sched_tags
-in the struct elevator_queue during later changes.
+This commit introduces batch allocation and deallocation helpers for
+sched_tags, which are now used from within __blk_mq_update_nr_hw_queues
+routine while iterating through the tagset.
 
+With this change, all sched_tags memory management is handled entirely
+outside the ->elevator_lock and the ->freeze_lock context, thereby
+eliminating the lock dependency that could otherwise manifest during
+nr_hw_queues updates.
+
+[1] https://lore.kernel.org/all/0659ea8d-a463-47c8-9180-43c719e106eb@linux.ibm.com/
+
+Reported-by: Stefan Haberland <sth@linux.ibm.com>
+Closes: https://lore.kernel.org/all/0659ea8d-a463-47c8-9180-43c719e106eb@linux.ibm.com/
 Reviewed-by: Ming Lei <ming.lei@redhat.com>
-Reviewed-by: Hannes Reinecke <hare@suse.de>
 Reviewed-by: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
 ---
- block/bfq-iosched.c   | 13 +++----------
- block/blk-mq-sched.c  | 11 ++++++++---
- block/elevator.c      |  1 -
- block/elevator.h      |  2 +-
- block/kyber-iosched.c | 11 ++---------
- block/mq-deadline.c   | 14 ++------------
- 6 files changed, 16 insertions(+), 36 deletions(-)
+ block/blk-mq-sched.c | 65 ++++++++++++++++++++++++++++++++++++++++++++
+ block/blk-mq-sched.h |  4 +++
+ block/blk-mq.c       | 16 +++++++++--
+ block/blk.h          |  3 +-
+ block/elevator.c     |  6 ++--
+ 5 files changed, 88 insertions(+), 6 deletions(-)
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 0cb1e9873aab..fd26dc1901b0 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -7232,22 +7232,16 @@ static void bfq_init_root_group(struct bfq_group *root_group,
- 	root_group->sched_data.bfq_class_idle_last_service = jiffies;
- }
- 
--static int bfq_init_queue(struct request_queue *q, struct elevator_type *e)
-+static int bfq_init_queue(struct request_queue *q, struct elevator_queue *eq)
- {
- 	struct bfq_data *bfqd;
--	struct elevator_queue *eq;
- 	unsigned int i;
- 	struct blk_independent_access_ranges *ia_ranges = q->disk->ia_ranges;
- 
--	eq = elevator_alloc(q, e);
--	if (!eq)
--		return -ENOMEM;
--
- 	bfqd = kzalloc_node(sizeof(*bfqd), GFP_KERNEL, q->node);
--	if (!bfqd) {
--		kobject_put(&eq->kobj);
-+	if (!bfqd)
- 		return -ENOMEM;
--	}
-+
- 	eq->elevator_data = bfqd;
- 
- 	spin_lock_irq(&q->queue_lock);
-@@ -7405,7 +7399,6 @@ static int bfq_init_queue(struct request_queue *q, struct elevator_type *e)
- 
- out_free:
- 	kfree(bfqd);
--	kobject_put(&eq->kobj);
- 	return -ENOMEM;
- }
- 
 diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index 55a0fd105147..359e0704e09b 100644
+index 2d6d1ebdd8fb..e2ce4a28e6c9 100644
 --- a/block/blk-mq-sched.c
 +++ b/block/blk-mq-sched.c
-@@ -475,10 +475,14 @@ int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e)
- 	q->nr_requests = 2 * min_t(unsigned int, q->tag_set->queue_depth,
- 				   BLKDEV_DEFAULT_RQ);
- 
-+	eq = elevator_alloc(q, e);
-+	if (!eq)
-+		return -ENOMEM;
-+
- 	if (blk_mq_is_shared_tags(flags)) {
- 		ret = blk_mq_init_sched_shared_tags(q);
- 		if (ret)
--			return ret;
-+			goto err_put_elevator;
- 	}
- 
- 	queue_for_each_hw_ctx(q, hctx, i) {
-@@ -487,7 +491,7 @@ int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e)
- 			goto err_free_map_and_rqs;
- 	}
- 
--	ret = e->ops.init_sched(q, e);
-+	ret = e->ops.init_sched(q, eq);
- 	if (ret)
- 		goto err_free_map_and_rqs;
- 
-@@ -508,7 +512,8 @@ int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e)
- err_free_map_and_rqs:
- 	blk_mq_sched_free_rqs(q);
- 	blk_mq_sched_tags_teardown(q, flags);
--
-+err_put_elevator:
-+	kobject_put(&eq->kobj);
- 	q->elevator = NULL;
- 	return ret;
+@@ -427,6 +427,32 @@ void blk_mq_free_sched_tags(struct elevator_tags *et,
+ 	kfree(et);
  }
+ 
++void blk_mq_free_sched_tags_batch(struct xarray *et_table,
++		struct blk_mq_tag_set *set)
++{
++	struct request_queue *q;
++	struct elevator_tags *et;
++
++	lockdep_assert_held_write(&set->update_nr_hwq_lock);
++
++	list_for_each_entry(q, &set->tag_list, tag_set_list) {
++		/*
++		 * Accessing q->elevator without holding q->elevator_lock is
++		 * safe because we're holding here set->update_nr_hwq_lock in
++		 * the writer context. So, scheduler update/switch code (which
++		 * acquires the same lock but in the reader context) can't run
++		 * concurrently.
++		 */
++		if (q->elevator) {
++			et = xa_load(et_table, q->id);
++			if (unlikely(!et))
++				WARN_ON_ONCE(1);
++			else
++				blk_mq_free_sched_tags(et, set);
++		}
++	}
++}
++
+ struct elevator_tags *blk_mq_alloc_sched_tags(struct blk_mq_tag_set *set,
+ 		unsigned int nr_hw_queues)
+ {
+@@ -477,6 +503,45 @@ struct elevator_tags *blk_mq_alloc_sched_tags(struct blk_mq_tag_set *set,
+ 	return NULL;
+ }
+ 
++int blk_mq_alloc_sched_tags_batch(struct xarray *et_table,
++		struct blk_mq_tag_set *set, unsigned int nr_hw_queues)
++{
++	struct request_queue *q;
++	struct elevator_tags *et;
++	gfp_t gfp = GFP_NOIO | __GFP_ZERO | __GFP_NOWARN | __GFP_NORETRY;
++
++	lockdep_assert_held_write(&set->update_nr_hwq_lock);
++
++	list_for_each_entry(q, &set->tag_list, tag_set_list) {
++		/*
++		 * Accessing q->elevator without holding q->elevator_lock is
++		 * safe because we're holding here set->update_nr_hwq_lock in
++		 * the writer context. So, scheduler update/switch code (which
++		 * acquires the same lock but in the reader context) can't run
++		 * concurrently.
++		 */
++		if (q->elevator) {
++			et = blk_mq_alloc_sched_tags(set, nr_hw_queues);
++			if (!et)
++				goto out_unwind;
++			if (xa_insert(et_table, q->id, et, gfp))
++				goto out_free_tags;
++		}
++	}
++	return 0;
++out_free_tags:
++	blk_mq_free_sched_tags(et, set);
++out_unwind:
++	list_for_each_entry_continue_reverse(q, &set->tag_list, tag_set_list) {
++		if (q->elevator) {
++			et = xa_load(et_table, q->id);
++			if (et)
++				blk_mq_free_sched_tags(et, set);
++		}
++	}
++	return -ENOMEM;
++}
++
+ /* caller must have a reference to @e, will grab another one if successful */
+ int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e,
+ 		struct elevator_tags *et)
+diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
+index 0cde00cd1c47..b554e1d55950 100644
+--- a/block/blk-mq-sched.h
++++ b/block/blk-mq-sched.h
+@@ -25,8 +25,12 @@ void blk_mq_sched_free_rqs(struct request_queue *q);
+ 
+ struct elevator_tags *blk_mq_alloc_sched_tags(struct blk_mq_tag_set *set,
+ 		unsigned int nr_hw_queues);
++int blk_mq_alloc_sched_tags_batch(struct xarray *et_table,
++		struct blk_mq_tag_set *set, unsigned int nr_hw_queues);
+ void blk_mq_free_sched_tags(struct elevator_tags *et,
+ 		struct blk_mq_tag_set *set);
++void blk_mq_free_sched_tags_batch(struct xarray *et_table,
++		struct blk_mq_tag_set *set);
+ 
+ static inline void blk_mq_sched_restart(struct blk_mq_hw_ctx *hctx)
+ {
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 4806b867e37d..af7aae699ede 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -4972,6 +4972,8 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
+ 	struct request_queue *q;
+ 	int prev_nr_hw_queues = set->nr_hw_queues;
+ 	unsigned int memflags;
++	struct xarray et_table;
++	struct elevator_tags *et;
+ 	int i;
+ 
+ 	lockdep_assert_held(&set->tag_list_lock);
+@@ -4984,6 +4986,11 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
+ 		return;
+ 
+ 	memflags = memalloc_noio_save();
++
++	xa_init(&et_table);
++	if (blk_mq_alloc_sched_tags_batch(&et_table, set, nr_hw_queues) < 0)
++		goto out_memalloc_restore;
++
+ 	list_for_each_entry(q, &set->tag_list, tag_set_list) {
+ 		blk_mq_debugfs_unregister_hctxs(q);
+ 		blk_mq_sysfs_unregister_hctxs(q);
+@@ -4995,6 +5002,7 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
+ 	if (blk_mq_realloc_tag_set_tags(set, nr_hw_queues) < 0) {
+ 		list_for_each_entry(q, &set->tag_list, tag_set_list)
+ 			blk_mq_unfreeze_queue_nomemrestore(q);
++		blk_mq_free_sched_tags_batch(&et_table, set);
+ 		goto reregister;
+ 	}
+ 
+@@ -5018,8 +5026,10 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
+ 	}
+ 
+ 	/* elv_update_nr_hw_queues() unfreeze queue for us */
+-	list_for_each_entry(q, &set->tag_list, tag_set_list)
+-		elv_update_nr_hw_queues(q);
++	list_for_each_entry(q, &set->tag_list, tag_set_list) {
++		et = xa_load(&et_table, q->id);
++		elv_update_nr_hw_queues(q, et);
++	}
+ 
+ reregister:
+ 	list_for_each_entry(q, &set->tag_list, tag_set_list) {
+@@ -5029,7 +5039,9 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
+ 		blk_mq_remove_hw_queues_cpuhp(q);
+ 		blk_mq_add_hw_queues_cpuhp(q);
+ 	}
++out_memalloc_restore:
+ 	memalloc_noio_restore(memflags);
++	xa_destroy(&et_table);
+ 
+ 	/* Free the excess tags when nr_hw_queues shrink. */
+ 	for (i = set->nr_hw_queues; i < prev_nr_hw_queues; i++)
+diff --git a/block/blk.h b/block/blk.h
+index 37ec459fe656..a312518fb8f3 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -12,6 +12,7 @@
+ #include "blk-crypto-internal.h"
+ 
+ struct elevator_type;
++struct elevator_tags;
+ 
+ #define	BLK_DEV_MAX_SECTORS	(LLONG_MAX >> 9)
+ #define	BLK_MIN_SEGMENT_SIZE	4096
+@@ -321,7 +322,7 @@ bool blk_bio_list_merge(struct request_queue *q, struct list_head *list,
+ 
+ bool blk_insert_flush(struct request *rq);
+ 
+-void elv_update_nr_hw_queues(struct request_queue *q);
++void elv_update_nr_hw_queues(struct request_queue *q, struct elevator_tags *et);
+ void elevator_set_default(struct request_queue *q);
+ void elevator_set_none(struct request_queue *q);
+ 
 diff --git a/block/elevator.c b/block/elevator.c
-index ab22542e6cf0..770874040f79 100644
+index 50f4b78efe66..92a0a4851583 100644
 --- a/block/elevator.c
 +++ b/block/elevator.c
-@@ -148,7 +148,6 @@ struct elevator_queue *elevator_alloc(struct request_queue *q,
- 
- 	return eq;
- }
--EXPORT_SYMBOL(elevator_alloc);
- 
- static void elevator_release(struct kobject *kobj)
- {
-diff --git a/block/elevator.h b/block/elevator.h
-index a07ce773a38f..a4de5f9ad790 100644
---- a/block/elevator.h
-+++ b/block/elevator.h
-@@ -24,7 +24,7 @@ struct blk_mq_alloc_data;
- struct blk_mq_hw_ctx;
- 
- struct elevator_mq_ops {
--	int (*init_sched)(struct request_queue *, struct elevator_type *);
-+	int (*init_sched)(struct request_queue *, struct elevator_queue *);
- 	void (*exit_sched)(struct elevator_queue *);
- 	int (*init_hctx)(struct blk_mq_hw_ctx *, unsigned int);
- 	void (*exit_hctx)(struct blk_mq_hw_ctx *, unsigned int);
-diff --git a/block/kyber-iosched.c b/block/kyber-iosched.c
-index 4dba8405bd01..7b6832cb3a8d 100644
---- a/block/kyber-iosched.c
-+++ b/block/kyber-iosched.c
-@@ -402,20 +402,13 @@ static struct kyber_queue_data *kyber_queue_data_alloc(struct request_queue *q)
- 	return ERR_PTR(ret);
- }
- 
--static int kyber_init_sched(struct request_queue *q, struct elevator_type *e)
-+static int kyber_init_sched(struct request_queue *q, struct elevator_queue *eq)
- {
- 	struct kyber_queue_data *kqd;
--	struct elevator_queue *eq;
--
--	eq = elevator_alloc(q, e);
--	if (!eq)
--		return -ENOMEM;
- 
- 	kqd = kyber_queue_data_alloc(q);
--	if (IS_ERR(kqd)) {
--		kobject_put(&eq->kobj);
-+	if (IS_ERR(kqd))
- 		return PTR_ERR(kqd);
--	}
- 
- 	blk_stat_enable_accounting(q);
- 
-diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-index 2edf1cac06d5..7b6caf30e00a 100644
---- a/block/mq-deadline.c
-+++ b/block/mq-deadline.c
-@@ -568,20 +568,14 @@ static void dd_exit_sched(struct elevator_queue *e)
- /*
-  * initialize elevator private data (deadline_data).
+@@ -705,7 +705,7 @@ static int elevator_change(struct request_queue *q, struct elv_change_ctx *ctx)
+  * The I/O scheduler depends on the number of hardware queues, this forces a
+  * reattachment when nr_hw_queues changes.
   */
--static int dd_init_sched(struct request_queue *q, struct elevator_type *e)
-+static int dd_init_sched(struct request_queue *q, struct elevator_queue *eq)
+-void elv_update_nr_hw_queues(struct request_queue *q)
++void elv_update_nr_hw_queues(struct request_queue *q, struct elevator_tags *et)
  {
- 	struct deadline_data *dd;
--	struct elevator_queue *eq;
- 	enum dd_prio prio;
--	int ret = -ENOMEM;
--
--	eq = elevator_alloc(q, e);
--	if (!eq)
--		return ret;
+ 	struct blk_mq_tag_set *set = q->tag_set;
+ 	struct elv_change_ctx ctx = {};
+@@ -720,11 +720,11 @@ void elv_update_nr_hw_queues(struct request_queue *q)
+ 	 * acquires same lock in the reader context) can't run concurrently.
+ 	 */
+ 	if (q->elevator) {
+-		ctx.et = blk_mq_alloc_sched_tags(set, set->nr_hw_queues);
+-		if (!ctx.et) {
++		if (!et) {
+ 			WARN_ON_ONCE(1);
+ 			return;
+ 		}
++		ctx.et = et;
+ 	}
  
- 	dd = kzalloc_node(sizeof(*dd), GFP_KERNEL, q->node);
- 	if (!dd)
--		goto put_eq;
-+		return -ENOMEM;
- 
- 	eq->elevator_data = dd;
- 
-@@ -608,10 +602,6 @@ static int dd_init_sched(struct request_queue *q, struct elevator_type *e)
- 
- 	q->elevator = eq;
- 	return 0;
--
--put_eq:
--	kobject_put(&eq->kobj);
--	return ret;
- }
- 
- /*
+ 	mutex_lock(&q->elevator_lock);
 -- 
 2.50.0
 
