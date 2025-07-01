@@ -1,56 +1,55 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D2221CAB3
-	for <linux-block@vger.kernel.org>; Tue,  1 Jul 2025 03:24:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DEC470805
+	for <linux-block@vger.kernel.org>; Tue,  1 Jul 2025 03:48:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751340274; cv=none; b=FXe1oaZEphlKVCbKqsd81tXwatocyYnPPIrMPJbodaaWL0mhutj5X5wGM8KbYanrchSBGXwxV0ma7d/u1fhL69eHlITZHaD1ZYSq/HVntqxjCh8su1H2BepYiG6dycTMdu4Vl9IUGYqfpqtkVi1+NATcUHLKs3KJGz91UPM/oIA=
+	t=1751341704; cv=none; b=Gq9hXdQ1YfIJJCX5U+ZNLsQeRr/5g+vegayjh8Jqq9uKHUjtFcI9lmVk2ZwlvvNRETsgutCRDtn3yweaW64KGzMw7fIGy4PxRiOBlXtnUuz1WhqTPq7Lu/TUEzUPZUiRVdDf1NmCqE5Ax9mZIe+rpUdqquUmxZvzS9R49OFLVBY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751340274; c=relaxed/simple;
-	bh=J55E3qHCzIJyOV187Z7dEumoPh9PbxBvvwNKqOcnVkM=;
+	s=arc-20240116; t=1751341704; c=relaxed/simple;
+	bh=7oc0ul6OkDOpQV0Bs8bUVaWQqTS4yp6EzXhwc10Y6cQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PYa4DeXwnktUhndQb8puzjDTx+omFBQ8qE5r70UkU4a9wNVDUYs2uyzwkNxRW092zSljG/QcKZNIsyq68Icib/mI+q2kKF1sNp2dGSfs3p/S/YL7XxKYEEy17kxhMQ8paFb7mPiJS24vZvGRi5NiCC/XJVr0+JeWBGdPwyehKBU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RvowBMqC; arc=none smtp.client-ip=170.10.129.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=aWM2Xbmi9C1JhzY0ToalQKjyijggt5L/SbRt1QkRLouPzmH8UVzEeoWyqa0wZp1ycOvu3iSFelpkFJ5fv5FncwNr3VcegzV40r4nXFPn1M31dqRLEZPuhduv4xktVJF0U0LadQ7p1Yw7OjAgsuRbINHgZ3XtMMvZ5QzRTfX3p5Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LyGXdalw; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RvowBMqC"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LyGXdalw"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1751340271;
+	s=mimecast20190719; t=1751341700;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=IkGFd1iDN6CZs42CezrRFYwP8w5mCi/jqbMMxt1IXjo=;
-	b=RvowBMqCN5TL9iVsvMzax1ycZh9YTQ2JDj1f8CVEqsgdElULmphyCVijKBle+pDC2Ncz+G
-	xky4Ub6TnPdHyfDrumfFxgSyArQ58WSxQvtnlYv5KEmvV9Wh/0WLptQWRlKcXENzvmJ7ql
-	yC4NbeUXSnHIaFBx3GO32eprVBlE2P4=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+	bh=PMnjM6IVFPiEaVZ2k5ueKyaDHn04XUZYGSThMgESO4Y=;
+	b=LyGXdalwFVPFpbH5puM/C99IpvQJyre7uzbNUEwuN3W9ZcoUTRXhq61qsI1pZy3BNLqcPa
+	73vOBGNZlga7sAhX5jRsLD9LV/kQVzqn4Yi27WygPVecwAN1c3FvuZkV8JCxCiKc0ETXar
+	LQvwzvIbP5dJkDJgBF6nygiWhtjde50=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-189-QKVNClUtPASiJTKvMBVSGw-1; Mon,
- 30 Jun 2025 23:24:25 -0400
-X-MC-Unique: QKVNClUtPASiJTKvMBVSGw-1
-X-Mimecast-MFC-AGG-ID: QKVNClUtPASiJTKvMBVSGw_1751340263
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-393-d_xHjPJ8PZ-sfBBRO2D6aA-1; Mon,
+ 30 Jun 2025 23:48:17 -0400
+X-MC-Unique: d_xHjPJ8PZ-sfBBRO2D6aA-1
+X-Mimecast-MFC-AGG-ID: d_xHjPJ8PZ-sfBBRO2D6aA_1751341696
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4E4CC1944A8C;
-	Tue,  1 Jul 2025 03:24:23 +0000 (UTC)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 46EB2180028D;
+	Tue,  1 Jul 2025 03:48:16 +0000 (UTC)
 Received: from fedora (unknown [10.72.116.88])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E3DB4195608F;
-	Tue,  1 Jul 2025 03:24:17 +0000 (UTC)
-Date: Tue, 1 Jul 2025 11:24:12 +0800
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 64612180045B;
+	Tue,  1 Jul 2025 03:48:11 +0000 (UTC)
+Date: Tue, 1 Jul 2025 11:48:07 +0800
 From: Ming Lei <ming.lei@redhat.com>
-To: Nilay Shroff <nilay@linux.ibm.com>
-Cc: linux-block@vger.kernel.org, hch@lst.de, axboe@kernel.dk,
-	sth@linux.ibm.com, lkp@intel.com, gjoyce@ibm.com
-Subject: Re: [PATCHv6 3/3] block: fix potential deadlock while running
- nr_hw_queue update
-Message-ID: <aGNU3PPJ1wU--x-O@fedora>
-References: <20250630054756.54532-1-nilay@linux.ibm.com>
- <20250630054756.54532-4-nilay@linux.ibm.com>
+To: Uday Shankar <ushankar@purestorage.com>
+Cc: Jens Axboe <axboe@kernel.dk>,
+	Caleb Sander Mateos <csander@purestorage.com>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] ublk: speed up ublk server exit handling
+Message-ID: <aGNady-IPjtpuaT5@fedora>
+References: <20250627-ublk_too_many_quiesce-v1-1-55ef9d80a6af@purestorage.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -59,219 +58,171 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250630054756.54532-4-nilay@linux.ibm.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+In-Reply-To: <20250627-ublk_too_many_quiesce-v1-1-55ef9d80a6af@purestorage.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On Mon, Jun 30, 2025 at 10:51:56AM +0530, Nilay Shroff wrote:
-> Move scheduler tags (sched_tags) allocation and deallocation outside
-> both the ->elevator_lock and ->freeze_lock when updating nr_hw_queues.
-> This change breaks the dependency chain from the percpu allocator lock
-> to the elevator lock, helping to prevent potential deadlocks, as
-> observed in the reported lockdep splat[1].
+On Fri, Jun 27, 2025 at 12:59:47AM -0600, Uday Shankar wrote:
+> Recently, we've observed a few cases where a ublk server is able to
+> complete restart more quickly than the driver can process the exit of
+> the previous ublk server. The new ublk server comes up, attempts
+> recovery of the preexisting ublk devices, and observes them still in
+> state UBLK_S_DEV_LIVE. While this is possible due to the asynchronous
+> nature of io_uring cleanup and should therefore be handled properly in
+> the ublk server, it is still preferable to make ublk server exit
+> handling faster if possible, as we should strive for it to not be a
+> limiting factor in how fast a ublk server can restart and provide
+> service again.
 > 
-> This commit introduces batch allocation and deallocation helpers for
-> sched_tags, which are now used from within __blk_mq_update_nr_hw_queues
-> routine while iterating through the tagset.
+> Analysis of the issue showed that the vast majority of the time spent in
+> handling the ublk server exit was in calls to blk_mq_quiesce_queue,
+> which is essentially just a (relatively expensive) call to
+> synchronize_rcu.
+
+Yeah, it is true.
+
+> The ublk server exit path currently issues an
+> unnecessarily large number of calls to blk_mq_quiesce_queue, for two
+> reasons:
 > 
-> With this change, all sched_tags memory management is handled entirely
-> outside the ->elevator_lock and the ->freeze_lock context, thereby
-> eliminating the lock dependency that could otherwise manifest during
-> nr_hw_queues updates.
+> 1. It tries to call blk_mq_quiesce_queue once per ublk_queue. However,
+>    blk_mq_quiesce_queue targets the request_queue of the underlying ublk
+>    device, of which there is only one. So the number of calls is larger
+>    than necessary by a factor of nr_hw_queues.
+> 2. In practice, it calls blk_mq_quiesce_queue _more_ than once per
+>    ublk_queue. This is because of a data race where we read
+>    ubq->canceling without any locking when deciding if we should call
+>    ublk_start_cancel. It is thus possible for two calls to
+>    ublk_uring_cmd_cancel_fn against the same ublk_queue to both call
+>    ublk_start_cancel against the same ublk_queue.
 > 
-> [1] https://lore.kernel.org/all/0659ea8d-a463-47c8-9180-43c719e106eb@linux.ibm.com/
+> Fix this by making the "canceling" flag a per-device state. This
+> actually matches the existing code better, as there are several places
+> where the flag is set or cleared for all queues simultaneously, and
+> there is the general expectation that cancellation corresponds with ublk
+> server exit. This also has negligible performance impact since the flag
+> is readonly and always false in the hot path. This per-device canceling
+> flag is then checked under a (new) lock (addressing the data race (2)
+> above), and the queue is only quiesced if it is cleared (addressing (1)
+> above). The result is just one call to blk_mq_quiesce_queue per ublk
+> device.
 > 
-> Reported-by: Stefan Haberland <sth@linux.ibm.com>
-> Closes: https://lore.kernel.org/all/0659ea8d-a463-47c8-9180-43c719e106eb@linux.ibm.com/
-> Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
+> In our setup, where one ublk server handles I/O for 128 ublk devices,
+> each having 24 hardware queues of depth 4096, here are the results
+> before and after this patch, where teardown time is measured from the
+> first call to io_ring_ctx_wait_and_kill to the return from the last
+> ublk_ch_release:
+> 
+> 						before		after
+> number of calls to blk_mq_quiesce_queue:	6469		256
+> teardown time:					11.14s		2.44s
+> 
+> There are still some potential optimizations here, but this takes care
+> of a big chunk of the ublk server exit handling delay.
+> 
+> Signed-off-by: Uday Shankar <ushankar@purestorage.com>
 > ---
->  block/blk-mq-sched.c | 63 ++++++++++++++++++++++++++++++++++++++++++++
->  block/blk-mq-sched.h |  4 +++
->  block/blk-mq.c       | 11 +++++++-
->  block/blk.h          |  2 +-
->  block/elevator.c     |  4 +--
->  5 files changed, 80 insertions(+), 4 deletions(-)
+>  drivers/block/ublk_drv.c | 54 +++++++++++++++++++++---------------------------
+>  1 file changed, 23 insertions(+), 31 deletions(-)
 > 
-> diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-> index 2d6d1ebdd8fb..da802df34a8c 100644
-> --- a/block/blk-mq-sched.c
-> +++ b/block/blk-mq-sched.c
-> @@ -427,6 +427,30 @@ void blk_mq_free_sched_tags(struct elevator_tags *et,
->  	kfree(et);
+> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> index 740141c63a93797c45ee8514ef779ab3ff06939f..f6635553d9a3fb309f4c1fb64503736c292f2f3e 100644
+> --- a/drivers/block/ublk_drv.c
+> +++ b/drivers/block/ublk_drv.c
+> @@ -198,7 +198,6 @@ struct ublk_queue {
+>  	struct ublksrv_io_desc *io_cmd_buf;
+>  
+>  	bool force_abort;
+> -	bool canceling;
+>  	bool fail_io; /* copy of dev->state == UBLK_S_DEV_FAIL_IO */
+>  	unsigned short nr_io_ready;	/* how many ios setup */
+>  	spinlock_t		cancel_lock;
+> @@ -235,6 +234,8 @@ struct ublk_device {
+>  	struct completion	completion;
+>  	unsigned int		nr_queues_ready;
+>  	unsigned int		nr_privileged_daemon;
+> +	struct mutex cancel_mutex;
+> +	bool canceling;
+>  };
+>  
+>  /* header of ublk_params */
+> @@ -1388,7 +1389,7 @@ static blk_status_t ublk_prep_req(struct ublk_queue *ubq, struct request *rq,
+>  	if (ublk_nosrv_should_queue_io(ubq) && unlikely(ubq->force_abort))
+>  		return BLK_STS_IOERR;
+>  
+> -	if (check_cancel && unlikely(ubq->canceling))
+> +	if (check_cancel && unlikely(ubq->dev->canceling))
+>  		return BLK_STS_IOERR;
+>  
+>  	/* fill iod to slot in io cmd buffer */
+> @@ -1416,7 +1417,7 @@ static blk_status_t ublk_queue_rq(struct blk_mq_hw_ctx *hctx,
+>  	 * is dealt with, otherwise this request may not be failed in case
+>  	 * of recovery, and cause hang when deleting disk
+>  	 */
+> -	if (unlikely(ubq->canceling)) {
+> +	if (unlikely(ubq->dev->canceling)) {
+>  		__ublk_abort_rq(ubq, rq);
+>  		return BLK_STS_OK;
+
+I'd suggest to keep the per-queue flags if possible for avoiding to fetch one
+extra cache line in fast ublk client io code path.
+
+>  	}
+> @@ -1573,12 +1574,9 @@ static int ublk_ch_release(struct inode *inode, struct file *filp)
+>  	 * All requests may be inflight, so ->canceling may not be set, set
+>  	 * it now.
+>  	 */
+> -	for (i = 0; i < ub->dev_info.nr_hw_queues; i++) {
+> -		struct ublk_queue *ubq = ublk_get_queue(ub, i);
+> -
+> -		ubq->canceling = true;
+> -		ublk_abort_queue(ub, ubq);
+> -	}
+> +	ub->canceling = true;
+> +	for (i = 0; i < ub->dev_info.nr_hw_queues; i++)
+> +		ublk_abort_queue(ub, ublk_get_queue(ub, i));
+>  	blk_mq_kick_requeue_list(disk->queue);
+>  
+>  	/*
+> @@ -1701,23 +1699,17 @@ static void ublk_abort_queue(struct ublk_device *ub, struct ublk_queue *ubq)
+>  	}
 >  }
 >  
-> +void blk_mq_free_sched_tags_batch(struct xarray *et_table,
-> +		struct blk_mq_tag_set *set)
-> +{
-> +	struct request_queue *q;
-> +	struct elevator_tags *et;
-> +
-> +	lockdep_assert_held_write(&set->update_nr_hwq_lock);
-> +
-> +	list_for_each_entry(q, &set->tag_list, tag_set_list) {
-> +		/*
-> +		 * Accessing q->elevator without holding q->elevator_lock is
-> +		 * safe because we're holding here set->update_nr_hwq_lock in
-> +		 * the writer context. So, scheduler update/switch code (which
-> +		 * acquires the same lock but in the reader context) can't run
-> +		 * concurrently.
-> +		 */
-> +		if (q->elevator) {
-> +			et = xa_load(et_table, q->id);
-> +			if (et)
-> +				blk_mq_free_sched_tags(et, set);
-> +		}
-> +	}
-> +}
-> +
->  struct elevator_tags *blk_mq_alloc_sched_tags(struct blk_mq_tag_set *set,
->  		unsigned int nr_hw_queues)
+> -/* Must be called when queue is frozen */
+> -static void ublk_mark_queue_canceling(struct ublk_queue *ubq)
+> -{
+> -	spin_lock(&ubq->cancel_lock);
+> -	if (!ubq->canceling)
+> -		ubq->canceling = true;
+> -	spin_unlock(&ubq->cancel_lock);
+> -}
+> -
+> -static void ublk_start_cancel(struct ublk_queue *ubq)
+> +static void ublk_start_cancel(struct ublk_device *ub)
 >  {
-> @@ -477,6 +501,45 @@ struct elevator_tags *blk_mq_alloc_sched_tags(struct blk_mq_tag_set *set,
->  	return NULL;
->  }
+> -	struct ublk_device *ub = ubq->dev;
+>  	struct gendisk *disk = ublk_get_disk(ub);
 >  
-> +int blk_mq_alloc_sched_tags_batch(struct xarray *et_table,
-> +		struct blk_mq_tag_set *set, unsigned int nr_hw_queues)
-> +{
-> +	struct request_queue *q;
-> +	struct elevator_tags *et;
-> +	gfp_t gfp = GFP_NOIO | __GFP_ZERO | __GFP_NOWARN | __GFP_NORETRY;
-> +
-> +	lockdep_assert_held_write(&set->update_nr_hwq_lock);
-> +
-> +	list_for_each_entry(q, &set->tag_list, tag_set_list) {
-> +		/*
-> +		 * Accessing q->elevator without holding q->elevator_lock is
-> +		 * safe because we're holding here set->update_nr_hwq_lock in
-> +		 * the writer context. So, scheduler update/switch code (which
-> +		 * acquires the same lock but in the reader context) can't run
-> +		 * concurrently.
-> +		 */
-> +		if (q->elevator) {
-> +			et = blk_mq_alloc_sched_tags(set, nr_hw_queues);
-> +			if (!et)
-> +				goto out_unwind;
-> +			if (xa_insert(et_table, q->id, et, gfp))
-> +				goto out_free_tags;
-> +		}
-> +	}
-> +	return 0;
-> +out_free_tags:
-> +	blk_mq_free_sched_tags(et, set);
-> +out_unwind:
-> +	list_for_each_entry_continue_reverse(q, &set->tag_list, tag_set_list) {
-> +		if (q->elevator) {
-> +			et = xa_load(et_table, q->id);
-> +			if (et)
-> +				blk_mq_free_sched_tags(et, set);
-> +		}
-> +	}
-> +	return -ENOMEM;
-> +}
-> +
->  /* caller must have a reference to @e, will grab another one if successful */
->  int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e,
->  		struct elevator_tags *et)
-> diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
-> index 0cde00cd1c47..b554e1d55950 100644
-> --- a/block/blk-mq-sched.h
-> +++ b/block/blk-mq-sched.h
-> @@ -25,8 +25,12 @@ void blk_mq_sched_free_rqs(struct request_queue *q);
->  
->  struct elevator_tags *blk_mq_alloc_sched_tags(struct blk_mq_tag_set *set,
->  		unsigned int nr_hw_queues);
-> +int blk_mq_alloc_sched_tags_batch(struct xarray *et_table,
-> +		struct blk_mq_tag_set *set, unsigned int nr_hw_queues);
->  void blk_mq_free_sched_tags(struct elevator_tags *et,
->  		struct blk_mq_tag_set *set);
-> +void blk_mq_free_sched_tags_batch(struct xarray *et_table,
-> +		struct blk_mq_tag_set *set);
->  
->  static inline void blk_mq_sched_restart(struct blk_mq_hw_ctx *hctx)
->  {
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 4806b867e37d..a68b658ce07b 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -4972,6 +4972,7 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
->  	struct request_queue *q;
->  	int prev_nr_hw_queues = set->nr_hw_queues;
->  	unsigned int memflags;
-> +	struct xarray et_table;
->  	int i;
->  
->  	lockdep_assert_held(&set->tag_list_lock);
-> @@ -4984,6 +4985,11 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
+>  	/* Our disk has been dead */
+>  	if (!disk)
 >  		return;
->  
->  	memflags = memalloc_noio_save();
 > +
-> +	xa_init(&et_table);
-> +	if (blk_mq_alloc_sched_tags_batch(&et_table, set, nr_hw_queues) < 0)
-> +		goto out_memalloc_restore;
-> +
->  	list_for_each_entry(q, &set->tag_list, tag_set_list) {
->  		blk_mq_debugfs_unregister_hctxs(q);
->  		blk_mq_sysfs_unregister_hctxs(q);
-> @@ -4995,6 +5001,7 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
->  	if (blk_mq_realloc_tag_set_tags(set, nr_hw_queues) < 0) {
->  		list_for_each_entry(q, &set->tag_list, tag_set_list)
->  			blk_mq_unfreeze_queue_nomemrestore(q);
-> +		blk_mq_free_sched_tags_batch(&et_table, set);
->  		goto reregister;
->  	}
->  
-> @@ -5019,7 +5026,7 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
->  
->  	/* elv_update_nr_hw_queues() unfreeze queue for us */
->  	list_for_each_entry(q, &set->tag_list, tag_set_list)
-> -		elv_update_nr_hw_queues(q);
-> +		elv_update_nr_hw_queues(q, &et_table);
->  
->  reregister:
->  	list_for_each_entry(q, &set->tag_list, tag_set_list) {
-> @@ -5029,7 +5036,9 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
->  		blk_mq_remove_hw_queues_cpuhp(q);
->  		blk_mq_add_hw_queues_cpuhp(q);
->  	}
-> +out_memalloc_restore:
->  	memalloc_noio_restore(memflags);
-> +	xa_destroy(&et_table);
->  
->  	/* Free the excess tags when nr_hw_queues shrink. */
->  	for (i = set->nr_hw_queues; i < prev_nr_hw_queues; i++)
-> diff --git a/block/blk.h b/block/blk.h
-> index 37ec459fe656..c6d1d1458388 100644
-> --- a/block/blk.h
-> +++ b/block/blk.h
-> @@ -321,7 +321,7 @@ bool blk_bio_list_merge(struct request_queue *q, struct list_head *list,
->  
->  bool blk_insert_flush(struct request *rq);
->  
-> -void elv_update_nr_hw_queues(struct request_queue *q);
-> +void elv_update_nr_hw_queues(struct request_queue *q, struct xarray *et_table);
->  void elevator_set_default(struct request_queue *q);
->  void elevator_set_none(struct request_queue *q);
->  
-> diff --git a/block/elevator.c b/block/elevator.c
-> index 50f4b78efe66..8ba8b869d5a4 100644
-> --- a/block/elevator.c
-> +++ b/block/elevator.c
-> @@ -705,7 +705,7 @@ static int elevator_change(struct request_queue *q, struct elv_change_ctx *ctx)
->   * The I/O scheduler depends on the number of hardware queues, this forces a
->   * reattachment when nr_hw_queues changes.
->   */
-> -void elv_update_nr_hw_queues(struct request_queue *q)
-> +void elv_update_nr_hw_queues(struct request_queue *q, struct xarray *et_table)
+> +	mutex_lock(&ub->cancel_mutex);
+> +	if (ub->canceling)
+> +		goto out;
+>  	/*
+>  	 * Now we are serialized with ublk_queue_rq()
+>  	 *
+> @@ -1726,8 +1718,10 @@ static void ublk_start_cancel(struct ublk_queue *ubq)
+>  	 * touch completed uring_cmd
+>  	 */
+>  	blk_mq_quiesce_queue(disk->queue);
+> -	ublk_mark_queue_canceling(ubq);
+> +	ub->canceling = true;
 
-et_table isn't necessary to expose to elv_update_nr_hw_queues(), and it is
-less readable than passing 'struct elevator_tags *' directly, but it can be
-one followup improvement.
+Here each ubq's ->canceling can be set for getting similar result.
 
-Anyway:
-
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-
+The main improvement should be from the above command cancel code path
+change, right?
 
 
 Thanks, 
