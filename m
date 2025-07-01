@@ -1,98 +1,141 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20B7725D1EE;
-	Tue,  1 Jul 2025 12:01:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D46F276021;
+	Tue,  1 Jul 2025 13:29:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751371295; cv=none; b=CoJsZxmoPGwGKntqLwDvD8iOVzuWouQZlBTN0MD4ww5yQwEA9+g9PmQyfqrB7r9JpFy/6AFxobtt7sDT5KwRzj2dUsLdpD+K8tRqOEgLfwcQcFdF70HD2Pel8Yscwc9W6SMVG2vqIvh5eFAeh0JQSTC07IaNNpH1eqOSjrNDxWM=
+	t=1751376584; cv=none; b=HT6RVZKsAR7CfOzv1rGSFN30X2eGkb9/PGXvuHeEDKACQg2DWXuoUhlaYw247CPGAI4Muvxy4k3DZQCwlOLz6Bn8WBg6zPsGH9fldOq6l/TCArwuUVXaj8o9mO9Mt0LXTRPoX0r7uwJCoeWUO0xL+G2eWXr5MFDKfESDf6x26Sg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751371295; c=relaxed/simple;
-	bh=Ve2jWkUY7Kco8qr8eXLeveQqpfYfuVWQzfdfLKDRfSM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qgh8PhwRaTv5Rgq8FvL4knbMF65tYvdksVOdneE6g5d8g9YWFpVcZCGXe5DCOSeU//nTI2pE3ZT/dbXSg6TEP8PTC0ZSJ7aCGR61ZXYHeRAJ44Tgr58LxZ5zjELeSDK8nymWDcIb9fZWCYD/xYMG9nCJbRnWVARYSe3WpXyvWH8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rEeP5CN4; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1751376584; c=relaxed/simple;
+	bh=vJk1JrC/Vz4Po81eB9y+D5BpdHtZM+xHMx0EZ9Z8xbs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Fe8C+LNEQDeecoDE9R3pestMTB42Sa6LpD+LfoZTkS/BXtXniQ51uEuDZP67ScJDTDxvUc9S7V11dlVVsbvgtNfhKYGG0F1AkEc76t3jQWUnlxAd0otyIHymvfZUng4WRTLiyVxP6o4lUGHYxaLp3gKq9FcJWQGl/HG3bzgGKDw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=phtXADyM; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rEeP5CN4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4647C4CEEB;
-	Tue,  1 Jul 2025 12:01:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751371294;
-	bh=Ve2jWkUY7Kco8qr8eXLeveQqpfYfuVWQzfdfLKDRfSM=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=rEeP5CN4D96Xof3lUeWOZq5kQVZ7As6qgXQJ+ZVOWulMkKg1SsV7pEcbmA40Q+3Cf
-	 0kM710txoJdS2GTbF+7CWVJOzBREkzgDya6XBMBUQ5Sd2wcowJtnGQJcB42WwFgYc2
-	 9OnkmabB6qG7uKK/PG3jU0ecNGZh6KSAQMa6/hWoiJnYrVXLZAOiX05cJSJBAzEJSQ
-	 gRG9W3sdo/A7Z1TRijbJ49SJk6U9SGZz1sNAIakruHpAbHjzCKJrgFNsr1aWKa0z9H
-	 xoODuRK3rSU+3W7fF5pnIuwZwyHu4qVVmDClkSXfnC6fRlP/Iup5YOBkz2dVpS4F1c
-	 cyvilMj4huWcQ==
-From: Christian Brauner <brauner@kernel.org>
-To: Anuj Gupta <anuj20.g@samsung.com>
-Cc: Christian Brauner <brauner@kernel.org>,
-	linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	joshi.k@samsung.com,
-	linux-nvme@lists.infradead.org,
-	linux-scsi@vger.kernel.org,
-	gost.dev@samsung.com,
-	vincent.fu@samsung.com,
-	jack@suse.cz,
-	anuj1072538@gmail.com,
-	axboe@kernel.dk,
-	viro@zeniv.linux.org.uk,
-	hch@infradead.org,
-	martin.petersen@oracle.com,
-	ebiggers@kernel.org,
-	adilger@dilger.ca
-Subject: Re: [PATCH for-next v5 0/4] add ioctl to query metadata and protection info capabilities
-Date: Tue,  1 Jul 2025 14:01:17 +0200
-Message-ID: <20250701-abreden-rohkost-a0c293481b42@brauner>
-X-Mailer: git-send-email 2.47.2
-In-Reply-To: <20250630090548.3317-1-anuj20.g@samsung.com>
-References: <20250630090548.3317-1-anuj20.g@samsung.com>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="phtXADyM"
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5617SAS9015530;
+	Tue, 1 Jul 2025 13:29:05 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=R2LPfz
+	ZAhQe7cHlRN4Vh8kEZO2c2/KR4YiDcTRwdZUc=; b=phtXADyMYOB8MP3XxHilai
+	ksftbRLlNU4f0nUI2CRYTYVM4qt5a+BeWTSZwxzJwbL6axIfrg8HjwK6mTcdmAwW
+	PGQ2exB6gMS4EPGZ3YfgsmIiZeYw1auHVQ01mcskFWIQemP/JUv7MHc6JR7KM1Vp
+	bxjeqVcVwLYQX5c5WAZb1Tvb98ku5uU/nsYff9+HfxYhVwDWEtW1J62iYIF2+t6m
+	TNAsT/DjXKsK906HvyI59j212s6BMRgJf1muEoH0xhFNq/Ftnr36X07vkvGjpkJX
+	DG9nP0xvjT3STtlQwq6X9RUb0zh8C0tiLgUWmgzAA/cRW0EarXfh96IguD96ufNg
+	==
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 47j82fq9ee-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 01 Jul 2025 13:29:05 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5619GLLp021354;
+	Tue, 1 Jul 2025 13:29:04 GMT
+Received: from smtprelay02.wdc07v.mail.ibm.com ([172.16.1.69])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 47jwe3ag45-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 01 Jul 2025 13:29:04 +0000
+Received: from smtpav05.wdc07v.mail.ibm.com (smtpav05.wdc07v.mail.ibm.com [10.39.53.232])
+	by smtprelay02.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 561DT3xS47251836
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 1 Jul 2025 13:29:04 GMT
+Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D90A058053;
+	Tue,  1 Jul 2025 13:29:03 +0000 (GMT)
+Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 7560458043;
+	Tue,  1 Jul 2025 13:28:59 +0000 (GMT)
+Received: from [9.109.198.197] (unknown [9.109.198.197])
+	by smtpav05.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Tue,  1 Jul 2025 13:28:59 +0000 (GMT)
+Message-ID: <197b6dca-56be-438d-a60f-21011367c5ed@linux.ibm.com>
+Date: Tue, 1 Jul 2025 18:58:57 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1633; i=brauner@kernel.org; h=from:subject:message-id; bh=Ve2jWkUY7Kco8qr8eXLeveQqpfYfuVWQzfdfLKDRfSM=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWQknxN75MRyd/PiQ5JXj/wQbuLSu2fukbHgvmHLC/8Fx w+t3D2/rKOUhUGMi0FWTJHFod0kXG45T8Vmo0wNmDmsTCBDGLg4BWAid48xMqyzkzDW3sER9D89 SPm21bwpawozbEPuMy969V6FLSlrITsjw2ot+bUZNcv9avvZ703+8bGnrjlII9OyWpBl6wIR/uT fHAA=
-X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] nbd: fix false lockdep deadlock warning
+To: Yu Kuai <yukuai1@huaweicloud.com>, Ming Lei <ming.lei@redhat.com>
+Cc: josef@toxicpanda.com, axboe@kernel.dk, hch@infradead.org, hare@suse.de,
+        linux-block@vger.kernel.org, nbd@other.debian.org,
+        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
+        yangerkun@huawei.com, johnny.chenyi@huawei.com,
+        "yukuai (C)" <yukuai3@huawei.com>
+References: <20250627092348.1527323-1-yukuai1@huaweicloud.com>
+ <aF56oVEzTygIOUTN@fedora>
+ <c2fbaacc-62a1-4a98-4157-2637b7f242b7@huaweicloud.com>
+Content-Language: en-US
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <c2fbaacc-62a1-4a98-4157-2637b7f242b7@huaweicloud.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 3za37TQSPbaaUSTfUtjGnyRhsq__BLbX
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzAxMDA4NSBTYWx0ZWRfX14L1sdyPs4d4 CCRPJ8ybBPD9qm0yx6zbRHSoDlY4ChNEdVZtxH74YFPdFOBnxiWXbVE5LtQLSEn7SvcqlFdeAmB yCsVNcKd+rtyQKc17m8/0NCkf+ifbxyFL07rpo2daQ9+Ij+y3rZjyZLvdDKHn0zubeURMIi5PQ1
+ sjsV3talSyqjadgCCec+G+YGdCvfO4d9XxRmzdEkLnEpfM7jS4JDAq6pdoRpRyy7Vdecxo6HtJa h5Wbuus2OmCnnWt8vpqmwuDsOa2C4AaBWSO4jSTyLyY88ABpxQqgQZ6ZwajKhmeOx8O/8ffKlbr OxslmHDt00qkxqaBSVp+QPERINjLbo36r3nP06zjlzU1uAwDp/3S9Avd4SX3suRBTjXHYF/QEVy
+ +mwpD6pebM1+xSZFO/izk3kRT+48c2S/30/tulfCBM2Q2CoKgE1cswdgRdtK3pb4Rdft/hRn
+X-Authority-Analysis: v=2.4 cv=LpeSymdc c=1 sm=1 tr=0 ts=6863e2a1 cx=c_pps a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17 a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=VwQbUJbxAAAA:8 a=VxcEa7Whk2O1MWBbjpkA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+X-Proofpoint-GUID: 3za37TQSPbaaUSTfUtjGnyRhsq__BLbX
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
+ definitions=2025-07-01_02,2025-06-27_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ spamscore=0 bulkscore=0 lowpriorityscore=0 adultscore=0 clxscore=1011
+ impostorscore=0 mlxscore=0 mlxlogscore=999 phishscore=0 suspectscore=0
+ malwarescore=0 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
+ definitions=main-2507010085
 
-On Mon, 30 Jun 2025 14:35:44 +0530, Anuj Gupta wrote:
-> This patch series adds a new ioctl to query metadata and integrity
-> capability.
+
+
+On 6/28/25 6:18 AM, Yu Kuai wrote:
+> Hi,
 > 
-> Patch 1 renames tuple_size field to metadata_size
-> Patch 2 adds a pi_tuple_size field in blk_integrity struct which is later
-> used to export this value to the user as well.
-> Patch 3 allows computing right pi_offset value.
-> Patch 4 introduces a new ioctl to query integrity capability.
+> 在 2025/06/27 19:04, Ming Lei 写道:
+>> I guess the patch in the following link may be simper, both two take
+>> similar approach:
+>>
+>> https://lore.kernel.org/linux-block/aFjbavzLAFO0Q7n1@fedora/
 > 
-> [...]
+> I this the above approach has concurrent problems if nbd_start_device
+> concurrent with nbd_start_device:
+> 
+> t1:
+> nbd_start_device
+> lock
+> num_connections = 1
+> unlock
+>     t2:
+>     nbd_add_socket
+>     lock
+>     config->num_connections++
+>     unlock
+>         t3:
+>         nbd_start_device
+>         lock
+>         num_connections = 2
+>         unlock
+>         blk_mq_update_nr_hw_queues
+> 
+> blk_mq_update_nr_hw_queues
+> //nr_hw_queues updated to 1 before failure
+> return -EINVAL
+> 
 
-Applied to the vfs-6.17.integrity branch of the vfs/vfs.git tree.
-Patches in the vfs-6.17.integrity branch should appear in linux-next soon.
+In the above case, yes I see that t1 would return -EINVAL (as 
+config->num_connections doesn't match with num_connections)
+but then t3 would succeed to update nr_hw_queue (as both 
+config->num_connections and num_connections set to 2 this 
+time). Isn't it? If yes, then the above patch (from Ming)
+seems good. 
 
-Please report any outstanding bugs that were missed during review in a
-new review to the original patch series allowing us to drop it.
-
-It's encouraged to provide Acked-bys and Reviewed-bys even though the
-patch has now been applied. If possible patch trailers will be updated.
-
-Note that commit hashes shown below are subject to change due to rebase,
-trailer updates or similar. If in doubt, please check the listed branch.
-
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
-branch: vfs-6.17.integrity
-
-[1/4] block: rename tuple_size field in blk_integrity to metadata_size
-      https://git.kernel.org/vfs/vfs/c/c6603b1d6556
-[2/4] block: introduce pi_tuple_size field in blk_integrity
-      https://git.kernel.org/vfs/vfs/c/76e45252a4ce
-[3/4] nvme: set pi_offset only when checksum type is not BLK_INTEGRITY_CSUM_NONE
-      https://git.kernel.org/vfs/vfs/c/f3ee50659148
-[4/4] fs: add ioctl to query metadata and protection info capabilities
-      https://git.kernel.org/vfs/vfs/c/9eb22f7fedfc
+Thanks,
+--Nilay
