@@ -1,113 +1,98 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B50AD8821;
-	Tue,  1 Jul 2025 11:34:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20B7725D1EE;
+	Tue,  1 Jul 2025 12:01:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751369694; cv=none; b=JDcX40NMtMHPgFgT7cvukmiGznVQzHWX8PlEDPTCqHM7OQysqfql/z+uNKSnieIGiOwWbmptTX76FRKcdwJtBlS/JOtf6jmy6YT9hwcCctNYrQq983RisfAz3T7eaz0e80fT2Nuv8QiotM5zhPtGa+iDjKoAXNfBUoRjPrdPA9Q=
+	t=1751371295; cv=none; b=CoJsZxmoPGwGKntqLwDvD8iOVzuWouQZlBTN0MD4ww5yQwEA9+g9PmQyfqrB7r9JpFy/6AFxobtt7sDT5KwRzj2dUsLdpD+K8tRqOEgLfwcQcFdF70HD2Pel8Yscwc9W6SMVG2vqIvh5eFAeh0JQSTC07IaNNpH1eqOSjrNDxWM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751369694; c=relaxed/simple;
-	bh=ivvvymmSfinokPA9qi1LGV8jWib2h8DV4cJuLS0xY2E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=f6poiBbmtdfzI0Hfb2P89bH+e94a6Ccts5EYpD4MpDUPfsCEz+urJQUVjo7I1DRLcOfegHt9pbq7N9XAuzSSecB0sOXLz2+O1VT3XgK5Wu0rb2zIUdOPrLsORvVOcvaIqb+uGLqrB25QRdq+RqeXkfl/hutwCAwUANtYnlwwUq0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=on5fa/N7; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1751371295; c=relaxed/simple;
+	bh=Ve2jWkUY7Kco8qr8eXLeveQqpfYfuVWQzfdfLKDRfSM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=qgh8PhwRaTv5Rgq8FvL4knbMF65tYvdksVOdneE6g5d8g9YWFpVcZCGXe5DCOSeU//nTI2pE3ZT/dbXSg6TEP8PTC0ZSJ7aCGR61ZXYHeRAJ44Tgr58LxZ5zjELeSDK8nymWDcIb9fZWCYD/xYMG9nCJbRnWVARYSe3WpXyvWH8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rEeP5CN4; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="on5fa/N7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25244C4CEEB;
-	Tue,  1 Jul 2025 11:34:49 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rEeP5CN4"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4647C4CEEB;
+	Tue,  1 Jul 2025 12:01:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751369693;
-	bh=ivvvymmSfinokPA9qi1LGV8jWib2h8DV4cJuLS0xY2E=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=on5fa/N7993Xiu8R8CmxLBfvJ25rLsGHcos0mtPx5h7O+Uf8PnRwRziavn1ZNk3qD
-	 dTlslotJxMgwQgJdXVemlWpk547OoKF09nmdwOK8mjg9Dw3s1arKSEV7tTpFEdh6CL
-	 NPKTxPzuKGG96E1Io5mCVhQJcuVdbIQr7g2WAtZWHqBLqFkVGUgpLGBnnyKZqHp0Vb
-	 SyfLuqjRiNIcavAZo9eM7r4tSbw+tiGx6AdcIMvQ+ypA9/f+T8O/0PhvLXdKbUnh9n
-	 wRC++Hv0QndQB4NIsjh8/mPRVtWo7RD9dV/TsgFK2FYIkOWjAQtc3iDsqfTq8TepTW
-	 55NYlUn9KniJQ==
-Date: Tue, 1 Jul 2025 13:34:47 +0200
+	s=k20201202; t=1751371294;
+	bh=Ve2jWkUY7Kco8qr8eXLeveQqpfYfuVWQzfdfLKDRfSM=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=rEeP5CN4D96Xof3lUeWOZq5kQVZ7As6qgXQJ+ZVOWulMkKg1SsV7pEcbmA40Q+3Cf
+	 0kM710txoJdS2GTbF+7CWVJOzBREkzgDya6XBMBUQ5Sd2wcowJtnGQJcB42WwFgYc2
+	 9OnkmabB6qG7uKK/PG3jU0ecNGZh6KSAQMa6/hWoiJnYrVXLZAOiX05cJSJBAzEJSQ
+	 gRG9W3sdo/A7Z1TRijbJ49SJk6U9SGZz1sNAIakruHpAbHjzCKJrgFNsr1aWKa0z9H
+	 xoODuRK3rSU+3W7fF5pnIuwZwyHu4qVVmDClkSXfnC6fRlP/Iup5YOBkz2dVpS4F1c
+	 cyvilMj4huWcQ==
 From: Christian Brauner <brauner@kernel.org>
-To: Joanne Koong <joannelkoong@gmail.com>
-Cc: kernel test robot <lkp@intel.com>, linux-fsdevel@vger.kernel.org, 
-	oe-kbuild-all@lists.linux.dev, hch@lst.de, miklos@szeredi.hu, djwong@kernel.org, 
-	anuj20.g@samsung.com, linux-xfs@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-block@vger.kernel.org, gfs2@lists.linux.dev, kernel-team@meta.com
-Subject: Re: [PATCH v3 13/16] fuse: use iomap for writeback
-Message-ID: <20250701-duktus-weitverbreitet-fb6b177ba0d8@brauner>
-References: <20250624022135.832899-14-joannelkoong@gmail.com>
- <202506252117.9V3HTO0i-lkp@intel.com>
- <CAJnrk1Z5NZ0_f=OMMam9hf0xJwM=SsmgFpyfbnKE7MT_i_kZMQ@mail.gmail.com>
+To: Anuj Gupta <anuj20.g@samsung.com>
+Cc: Christian Brauner <brauner@kernel.org>,
+	linux-block@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	joshi.k@samsung.com,
+	linux-nvme@lists.infradead.org,
+	linux-scsi@vger.kernel.org,
+	gost.dev@samsung.com,
+	vincent.fu@samsung.com,
+	jack@suse.cz,
+	anuj1072538@gmail.com,
+	axboe@kernel.dk,
+	viro@zeniv.linux.org.uk,
+	hch@infradead.org,
+	martin.petersen@oracle.com,
+	ebiggers@kernel.org,
+	adilger@dilger.ca
+Subject: Re: [PATCH for-next v5 0/4] add ioctl to query metadata and protection info capabilities
+Date: Tue,  1 Jul 2025 14:01:17 +0200
+Message-ID: <20250701-abreden-rohkost-a0c293481b42@brauner>
+X-Mailer: git-send-email 2.47.2
+In-Reply-To: <20250630090548.3317-1-anuj20.g@samsung.com>
+References: <20250630090548.3317-1-anuj20.g@samsung.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Type: text/plain; charset="utf-8"
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1633; i=brauner@kernel.org; h=from:subject:message-id; bh=Ve2jWkUY7Kco8qr8eXLeveQqpfYfuVWQzfdfLKDRfSM=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWQknxN75MRyd/PiQ5JXj/wQbuLSu2fukbHgvmHLC/8Fx w+t3D2/rKOUhUGMi0FWTJHFod0kXG45T8Vmo0wNmDmsTCBDGLg4BWAid48xMqyzkzDW3sER9D89 SPm21bwpawozbEPuMy969V6FLSlrITsjw2ot+bUZNcv9avvZ703+8bGnrjlII9OyWpBl6wIR/uT fHAA=
+X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAJnrk1Z5NZ0_f=OMMam9hf0xJwM=SsmgFpyfbnKE7MT_i_kZMQ@mail.gmail.com>
 
-On Wed, Jun 25, 2025 at 09:48:15AM -0700, Joanne Koong wrote:
-> On Wed, Jun 25, 2025 at 7:18 AM kernel test robot <lkp@intel.com> wrote:
-> >
-> > Hi Joanne,
-> >
-> > kernel test robot noticed the following build errors:
-> >
-> > [auto build test ERROR on brauner-vfs/vfs.all]
-> > [also build test ERROR on xfs-linux/for-next linus/master v6.16-rc3 next-20250625]
-> > [cannot apply to gfs2/for-next mszeredi-fuse/for-next]
-> > [If your patch is applied to the wrong git tree, kindly drop us a note.
-> > And when submitting patch, we suggest to use '--base' as documented in
-> > https://git-scm.com/docs/git-format-patch#_base_tree_information]
-> >
-> > url:    https://github.com/intel-lab-lkp/linux/commits/Joanne-Koong/iomap-pass-more-arguments-using-struct-iomap_writepage_ctx/20250624-102709
-> > base:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git vfs.all
-> > patch link:    https://lore.kernel.org/r/20250624022135.832899-14-joannelkoong%40gmail.com
-> > patch subject: [PATCH v3 13/16] fuse: use iomap for writeback
-> > config: arm64-randconfig-003-20250625 (https://download.01.org/0day-ci/archive/20250625/202506252117.9V3HTO0i-lkp@intel.com/config)
-> > compiler: aarch64-linux-gcc (GCC) 12.3.0
-> > reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250625/202506252117.9V3HTO0i-lkp@intel.com/reproduce)
-> >
-> > If you fix the issue in a separate patch/commit (i.e. not just a new version of
-> > the same patch/commit), kindly add following tags
-> > | Reported-by: kernel test robot <lkp@intel.com>
-> > | Closes: https://lore.kernel.org/oe-kbuild-all/202506252117.9V3HTO0i-lkp@intel.com/
-> >
-> > All errors (new ones prefixed by >>):
-> >
-> >    aarch64-linux-ld: fs/fuse/file.o: in function `fuse_writepages':
-> > >> file.c:(.text+0xa30): undefined reference to `iomap_writepages'
-> > >> file.c:(.text+0xa30): relocation truncated to fit: R_AARCH64_CALL26 against undefined symbol `iomap_writepages'
-> >    aarch64-linux-ld: fs/fuse/file.o: in function `fuse_writepage_finish':
-> > >> file.c:(.text+0x1fd8): undefined reference to `iomap_finish_folio_write'
-> > >> file.c:(.text+0x1fd8): relocation truncated to fit: R_AARCH64_CALL26 against undefined symbol `iomap_finish_folio_write'
-> >    aarch64-linux-ld: fs/fuse/file.o: in function `fuse_cache_write_iter':
-> >    file.c:(.text+0x888c): undefined reference to `iomap_file_buffered_write'
-> >    file.c:(.text+0x888c): relocation truncated to fit: R_AARCH64_CALL26 against undefined symbol `iomap_file_buffered_write'
-> >    aarch64-linux-ld: fs/fuse/file.o: in function `fuse_iomap_writeback_range':
-> > >> file.c:(.text+0x9258): undefined reference to `iomap_start_folio_write'
-> > >> file.c:(.text+0x9258): relocation truncated to fit: R_AARCH64_CALL26 against undefined symbol `iomap_start_folio_write'
-> > >> aarch64-linux-ld: fs/fuse/file.o:(.rodata+0x370): undefined reference to `iomap_dirty_folio'
-> >    aarch64-linux-ld: fs/fuse/file.o:(.rodata+0x3a0): undefined reference to `iomap_release_folio'
-> >
-> > --
-> > 0-DAY CI Kernel Test Service
-> > https://github.com/intel/lkp-tests/wiki
+On Mon, 30 Jun 2025 14:35:44 +0530, Anuj Gupta wrote:
+> This patch series adds a new ioctl to query metadata and integrity
+> capability.
 > 
-> As noted in the cover letter [1]
+> Patch 1 renames tuple_size field to metadata_size
+> Patch 2 adds a pi_tuple_size field in blk_integrity struct which is later
+> used to export this value to the user as well.
+> Patch 3 allows computing right pi_offset value.
+> Patch 4 introduces a new ioctl to query integrity capability.
 > 
->    Please note the following:
->    * this patchset version temporarily drops the CONFIG_BLOCK iomap refactoring
->      patches that will be needed to merge in the series. As of now, this breaks
->      compilation for environments where CONFIG_BLOCK is not set, but the
->      CONFIG_BLOCK iomap changes will be re-added back in once the core changes
->      in this patchset are ready to go.
-> 
-> 
-> These errors will be fixed in later versions when the CONFIG_BLOCK
-> patches get added in.
+> [...]
 
-Ok, sounds good. Main thing is I can merge it all in one go.
+Applied to the vfs-6.17.integrity branch of the vfs/vfs.git tree.
+Patches in the vfs-6.17.integrity branch should appear in linux-next soon.
+
+Please report any outstanding bugs that were missed during review in a
+new review to the original patch series allowing us to drop it.
+
+It's encouraged to provide Acked-bys and Reviewed-bys even though the
+patch has now been applied. If possible patch trailers will be updated.
+
+Note that commit hashes shown below are subject to change due to rebase,
+trailer updates or similar. If in doubt, please check the listed branch.
+
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
+branch: vfs-6.17.integrity
+
+[1/4] block: rename tuple_size field in blk_integrity to metadata_size
+      https://git.kernel.org/vfs/vfs/c/c6603b1d6556
+[2/4] block: introduce pi_tuple_size field in blk_integrity
+      https://git.kernel.org/vfs/vfs/c/76e45252a4ce
+[3/4] nvme: set pi_offset only when checksum type is not BLK_INTEGRITY_CSUM_NONE
+      https://git.kernel.org/vfs/vfs/c/f3ee50659148
+[4/4] fs: add ioctl to query metadata and protection info capabilities
+      https://git.kernel.org/vfs/vfs/c/9eb22f7fedfc
