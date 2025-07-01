@@ -1,141 +1,248 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D46F276021;
-	Tue,  1 Jul 2025 13:29:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B18511F2361;
+	Tue,  1 Jul 2025 13:44:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751376584; cv=none; b=HT6RVZKsAR7CfOzv1rGSFN30X2eGkb9/PGXvuHeEDKACQg2DWXuoUhlaYw247CPGAI4Muvxy4k3DZQCwlOLz6Bn8WBg6zPsGH9fldOq6l/TCArwuUVXaj8o9mO9Mt0LXTRPoX0r7uwJCoeWUO0xL+G2eWXr5MFDKfESDf6x26Sg=
+	t=1751377445; cv=none; b=euF07cj0+YGJDe0QN3TgsFvhM9WmPRjfJoRNGZQgtecyf93LxyijjfkjKt3DrLoZBEI0/3Rsyas4//MlTZXu9al1TR5PxbWS0pVYx+K706HD6DiZ1HrE4liVsRMyEFlTKXNkrMifSREJRV6MHEYrtoHI+mvWtSFrDiUtt+UJOQE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751376584; c=relaxed/simple;
-	bh=vJk1JrC/Vz4Po81eB9y+D5BpdHtZM+xHMx0EZ9Z8xbs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Fe8C+LNEQDeecoDE9R3pestMTB42Sa6LpD+LfoZTkS/BXtXniQ51uEuDZP67ScJDTDxvUc9S7V11dlVVsbvgtNfhKYGG0F1AkEc76t3jQWUnlxAd0otyIHymvfZUng4WRTLiyVxP6o4lUGHYxaLp3gKq9FcJWQGl/HG3bzgGKDw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=phtXADyM; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="phtXADyM"
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5617SAS9015530;
-	Tue, 1 Jul 2025 13:29:05 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=R2LPfz
-	ZAhQe7cHlRN4Vh8kEZO2c2/KR4YiDcTRwdZUc=; b=phtXADyMYOB8MP3XxHilai
-	ksftbRLlNU4f0nUI2CRYTYVM4qt5a+BeWTSZwxzJwbL6axIfrg8HjwK6mTcdmAwW
-	PGQ2exB6gMS4EPGZ3YfgsmIiZeYw1auHVQ01mcskFWIQemP/JUv7MHc6JR7KM1Vp
-	bxjeqVcVwLYQX5c5WAZb1Tvb98ku5uU/nsYff9+HfxYhVwDWEtW1J62iYIF2+t6m
-	TNAsT/DjXKsK906HvyI59j212s6BMRgJf1muEoH0xhFNq/Ftnr36X07vkvGjpkJX
-	DG9nP0xvjT3STtlQwq6X9RUb0zh8C0tiLgUWmgzAA/cRW0EarXfh96IguD96ufNg
-	==
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 47j82fq9ee-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 01 Jul 2025 13:29:05 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5619GLLp021354;
-	Tue, 1 Jul 2025 13:29:04 GMT
-Received: from smtprelay02.wdc07v.mail.ibm.com ([172.16.1.69])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 47jwe3ag45-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 01 Jul 2025 13:29:04 +0000
-Received: from smtpav05.wdc07v.mail.ibm.com (smtpav05.wdc07v.mail.ibm.com [10.39.53.232])
-	by smtprelay02.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 561DT3xS47251836
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 1 Jul 2025 13:29:04 GMT
-Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D90A058053;
-	Tue,  1 Jul 2025 13:29:03 +0000 (GMT)
-Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7560458043;
-	Tue,  1 Jul 2025 13:28:59 +0000 (GMT)
-Received: from [9.109.198.197] (unknown [9.109.198.197])
-	by smtpav05.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Tue,  1 Jul 2025 13:28:59 +0000 (GMT)
-Message-ID: <197b6dca-56be-438d-a60f-21011367c5ed@linux.ibm.com>
-Date: Tue, 1 Jul 2025 18:58:57 +0530
+	s=arc-20240116; t=1751377445; c=relaxed/simple;
+	bh=VjAD8KdF7m2BlM+Sf9sezN5FLxjUffGtPGY5q9p3ZXM=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=tcxaUVMHxP65JsYtGHwbUj4JPL3NKV7Sd7Vw+eDuMX158OY2GUTaXvr1i9R7CwctYxMT4iNP2gBd/1kbokoJuezHZ8PRO5oYw+y9F03yHFNMwmI1Jw86hTOfueAD4+Zp+85N6BedNM+n8+sB3lIL/8aIm7+j0HCiXtjG4+yNTDs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.231])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4bWkkL22CXz6M4sF;
+	Tue,  1 Jul 2025 21:43:06 +0800 (CST)
+Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
+	by mail.maildlp.com (Postfix) with ESMTPS id 72B481402F8;
+	Tue,  1 Jul 2025 21:44:00 +0800 (CST)
+Received: from localhost (10.203.177.66) by frapeml500008.china.huawei.com
+ (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Tue, 1 Jul
+ 2025 15:43:59 +0200
+Date: Tue, 1 Jul 2025 14:43:58 +0100
+From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+To: Dongsheng Yang <dongsheng.yang@linux.dev>
+CC: <mpatocka@redhat.com>, <agk@redhat.com>, <snitzer@kernel.org>,
+	<axboe@kernel.dk>, <hch@lst.de>, <dan.j.williams@intel.com>,
+	<linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-cxl@vger.kernel.org>, <nvdimm@lists.linux.dev>,
+	<dm-devel@lists.linux.dev>
+Subject: Re: [PATCH v1 01/11] dm-pcache: add pcache_internal.h
+Message-ID: <20250701144358.000061a5@huawei.com>
+In-Reply-To: <20250624073359.2041340-2-dongsheng.yang@linux.dev>
+References: <20250624073359.2041340-1-dongsheng.yang@linux.dev>
+	<20250624073359.2041340-2-dongsheng.yang@linux.dev>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] nbd: fix false lockdep deadlock warning
-To: Yu Kuai <yukuai1@huaweicloud.com>, Ming Lei <ming.lei@redhat.com>
-Cc: josef@toxicpanda.com, axboe@kernel.dk, hch@infradead.org, hare@suse.de,
-        linux-block@vger.kernel.org, nbd@other.debian.org,
-        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
-        yangerkun@huawei.com, johnny.chenyi@huawei.com,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <20250627092348.1527323-1-yukuai1@huaweicloud.com>
- <aF56oVEzTygIOUTN@fedora>
- <c2fbaacc-62a1-4a98-4157-2637b7f242b7@huaweicloud.com>
-Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <c2fbaacc-62a1-4a98-4157-2637b7f242b7@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 3za37TQSPbaaUSTfUtjGnyRhsq__BLbX
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzAxMDA4NSBTYWx0ZWRfX14L1sdyPs4d4 CCRPJ8ybBPD9qm0yx6zbRHSoDlY4ChNEdVZtxH74YFPdFOBnxiWXbVE5LtQLSEn7SvcqlFdeAmB yCsVNcKd+rtyQKc17m8/0NCkf+ifbxyFL07rpo2daQ9+Ij+y3rZjyZLvdDKHn0zubeURMIi5PQ1
- sjsV3talSyqjadgCCec+G+YGdCvfO4d9XxRmzdEkLnEpfM7jS4JDAq6pdoRpRyy7Vdecxo6HtJa h5Wbuus2OmCnnWt8vpqmwuDsOa2C4AaBWSO4jSTyLyY88ABpxQqgQZ6ZwajKhmeOx8O/8ffKlbr OxslmHDt00qkxqaBSVp+QPERINjLbo36r3nP06zjlzU1uAwDp/3S9Avd4SX3suRBTjXHYF/QEVy
- +mwpD6pebM1+xSZFO/izk3kRT+48c2S/30/tulfCBM2Q2CoKgE1cswdgRdtK3pb4Rdft/hRn
-X-Authority-Analysis: v=2.4 cv=LpeSymdc c=1 sm=1 tr=0 ts=6863e2a1 cx=c_pps a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17 a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=VwQbUJbxAAAA:8 a=VxcEa7Whk2O1MWBbjpkA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
-X-Proofpoint-GUID: 3za37TQSPbaaUSTfUtjGnyRhsq__BLbX
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
- definitions=2025-07-01_02,2025-06-27_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- spamscore=0 bulkscore=0 lowpriorityscore=0 adultscore=0 clxscore=1011
- impostorscore=0 mlxscore=0 mlxlogscore=999 phishscore=0 suspectscore=0
- malwarescore=0 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
- definitions=main-2507010085
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml500010.china.huawei.com (7.191.174.240) To
+ frapeml500008.china.huawei.com (7.182.85.71)
+
+On Tue, 24 Jun 2025 07:33:48 +0000
+Dongsheng Yang <dongsheng.yang@linux.dev> wrote:
+
+> Consolidate common PCACHE helpers into a new header so that subsequent
+> patches can include them without repeating boiler-plate.
+> 
+> - Logging macros with unified prefix and location info.
+> - Common constants (KB/MB helpers, metadata replica count, CRC seed).
+> - On-disk metadata header definition and CRC helper.
+> - Sequence-number comparison that handles wrap-around.
+> - pcache_meta_find_latest() to pick the newest valid metadata copy.
+> 
+> Signed-off-by: Dongsheng Yang <dongsheng.yang@linux.dev>
+Hi,
+
+I'm taking a look out of curiosity only as this is far from an area I'm
+confident in.  So comments will be mostly superficial.
 
 
+> ---
+>  drivers/md/dm-pcache/pcache_internal.h | 116 +++++++++++++++++++++++++
 
-On 6/28/25 6:18 AM, Yu Kuai wrote:
-> Hi,
-> 
-> 在 2025/06/27 19:04, Ming Lei 写道:
->> I guess the patch in the following link may be simper, both two take
->> similar approach:
->>
->> https://lore.kernel.org/linux-block/aFjbavzLAFO0Q7n1@fedora/
-> 
-> I this the above approach has concurrent problems if nbd_start_device
-> concurrent with nbd_start_device:
-> 
-> t1:
-> nbd_start_device
-> lock
-> num_connections = 1
-> unlock
->     t2:
->     nbd_add_socket
->     lock
->     config->num_connections++
->     unlock
->         t3:
->         nbd_start_device
->         lock
->         num_connections = 2
->         unlock
->         blk_mq_update_nr_hw_queues
-> 
-> blk_mq_update_nr_hw_queues
-> //nr_hw_queues updated to 1 before failure
-> return -EINVAL
-> 
+As a general rule I'd much rather see a header built up alongside the
+code that uses it rather than as a separate patch at the start.
 
-In the above case, yes I see that t1 would return -EINVAL (as 
-config->num_connections doesn't match with num_connections)
-but then t3 would succeed to update nr_hw_queue (as both 
-config->num_connections and num_connections set to 2 this 
-time). Isn't it? If yes, then the above patch (from Ming)
-seems good. 
+>  1 file changed, 116 insertions(+)
+>  create mode 100644 drivers/md/dm-pcache/pcache_internal.h
+> 
+> diff --git a/drivers/md/dm-pcache/pcache_internal.h b/drivers/md/dm-pcache/pcache_internal.h
+> new file mode 100644
+> index 000000000000..4d3b55a22638
+> --- /dev/null
+> +++ b/drivers/md/dm-pcache/pcache_internal.h
+> @@ -0,0 +1,116 @@
+> +/* SPDX-License-Identifier: GPL-2.0-or-later */
+> +#ifndef _PCACHE_INTERNAL_H
+> +#define _PCACHE_INTERNAL_H
+> +
+> +#include <linux/delay.h>
+> +#include <linux/crc32c.h>
+> +
+> +#define pcache_err(fmt, ...)							\
+> +	pr_err("dm-pcache: %s:%u " fmt, __func__, __LINE__, ##__VA_ARGS__)
+> +#define pcache_info(fmt, ...)							\
+> +	pr_info("dm-pcache: %s:%u " fmt, __func__, __LINE__, ##__VA_ARGS__)
+> +#define pcache_debug(fmt, ...)							\
+> +	pr_debug("dm-pcache: %s:%u " fmt, __func__, __LINE__, ##__VA_ARGS__)
 
-Thanks,
---Nilay
+Use pr_fmt() in appropriate files and drop these.
+
+> +
+> +#define PCACHE_KB			(1024ULL)
+> +#define PCACHE_MB			(1024 * PCACHE_KB)
+
+Generally avoid defines where they just match the numbers.  1024 * 1024 is
+commonly used directly in kernel code as everyone can see it's a MiB.
+
+> +
+> +/* Maximum number of metadata indices */
+> +#define PCACHE_META_INDEX_MAX		2
+> +
+> +#define PCACHE_CRC_SEED			0x3B15A
+> +/*
+> + * struct pcache_meta_header - PCACHE metadata header structure
+> + * @crc: CRC checksum for validating metadata integrity.
+> + * @seq: Sequence number to track metadata updates.
+> + * @version: Metadata version.
+> + * @res: Reserved space for future use.
+> + */
+> +struct pcache_meta_header {
+> +	__u32 crc;
+> +	__u8  seq;
+> +	__u8  version;
+> +	__u16 res;
+
+Why not u32 and friends given this seems to be internal to the kernel?
+
+> +};
+> +
+> +/*
+
+You've formatted most of this stuff as kernel-doc so for all of them use
+
+/**
+
+And check for any warnings or errors using scripts/kernel-doc
+
+It's a good way to pick up on subtle typos etc in docs that a reviewr
+might miss.
+
+> + * pcache_meta_crc - Calculate CRC for the given metadata header.
+> + * @header: Pointer to the metadata header.
+> + * @meta_size: Size of the metadata structure.
+> + *
+> + * Returns the CRC checksum calculated by excluding the CRC field itself.
+> + */
+> +static inline u32 pcache_meta_crc(struct pcache_meta_header *header, u32 meta_size)
+> +{
+> +	return crc32c(PCACHE_CRC_SEED, (void *)header + 4, meta_size - 4);
+> +}
+> +
+> +/*
+> + * pcache_meta_seq_after - Check if a sequence number is more recent, accounting for overflow.
+> + * @seq1: First sequence number.
+> + * @seq2: Second sequence number.
+> + *
+> + * Determines if @seq1 is more recent than @seq2 by calculating the signed
+> + * difference between them. This approach allows handling sequence number
+> + * overflow correctly because the difference wraps naturally, and any value
+> + * greater than zero indicates that @seq1 is "after" @seq2. This method
+> + * assumes 8-bit unsigned sequence numbers, where the difference wraps
+> + * around if seq1 overflows past seq2.
+
+I'd state the assumption behind this which think is that we will never
+have a sequence number getting ahead by more than 128 values.
+
+> + *
+> + * Returns:
+> + *   - true if @seq1 is more recent than @seq2, indicating it comes "after"
+> + *   - false otherwise.
+> + */
+> +static inline bool pcache_meta_seq_after(u8 seq1, u8 seq2)
+> +{
+> +	return (s8)(seq1 - seq2) > 0;
+> +}
+> +
+> +/*
+> + * pcache_meta_find_latest - Find the latest valid metadata.
+> + * @header: Pointer to the metadata header.
+> + * @meta_size: Size of each metadata block.
+> + *
+> + * Finds the latest valid metadata by checking sequence numbers. If a
+> + * valid entry with the highest sequence number is found, its pointer
+> + * is returned. Returns NULL if no valid metadata is found.
+> + */
+> +static inline void __must_check *pcache_meta_find_latest(struct pcache_meta_header *header,
+> +					u32 meta_size, u32 meta_max_size,
+> +					void *meta_ret)
+
+Not sure why you can't type this as pcache_meta_header.  Maybe that will
+become obvious later int he series.
+
+> +{
+> +	struct pcache_meta_header *meta, *latest = NULL;
+
+Combining declarations that assign and those that don't is not greate
+for readability.  Also why not set meta where you declare it?
+
+> +	u32 i, seq_latest = 0;
+> +	void *meta_addr;
+> +
+> +	meta = meta_ret;
+> +
+> +	for (i = 0; i < PCACHE_META_INDEX_MAX; i++) {
+> +		meta_addr = (void *)header + (i * meta_max_size);
+
+Brackets around i * meta_max_size not needed.   Whilst we can't all remember
+precedence of all operators, + and * are reasonable to assume.
+
+> +		if (copy_mc_to_kernel(meta, meta_addr, meta_size)) {
+> +			pcache_err("hardware memory error when copy meta");
+> +			return ERR_PTR(-EIO);
+> +		}
+> +
+> +		/* Skip if CRC check fails */
+
+Good to say why skipping is the right choice perhaps.
+
+> +		if (meta->crc != pcache_meta_crc(meta, meta_size))
+> +			continue;
+> +
+> +		/* Update latest if a more recent sequence is found */
+> +		if (!latest || pcache_meta_seq_after(meta->seq, seq_latest)) {
+> +			seq_latest = meta->seq;
+> +			latest = (void *)header + (i * meta_max_size);
+> +		}
+> +	}
+> +
+> +	if (latest) {
+I'd flip
+
+	if (!latest)
+		return 0;
+
+	if (copy...)
+
+> +		if (copy_mc_to_kernel(meta_ret, latest, meta_size)) {
+> +			pcache_err("hardware memory error");
+> +			return ERR_PTR(-EIO);
+> +		}
+> +	}
+> +
+> +	return latest;
+> +}
+> +
+> +#endif /* _PCACHE_INTERNAL_H */
+
