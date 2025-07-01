@@ -1,116 +1,137 @@
-Received: from mail-oa1-f48.google.com (mail-oa1-f48.google.com [209.85.160.48])
+Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DBA42BAF4
-	for <linux-block@vger.kernel.org>; Tue,  1 Jul 2025 16:30:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64F0D2798FA;
+	Tue,  1 Jul 2025 16:47:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751387460; cv=none; b=TH8DoPVi5MiA2Fw7JOgPNuQEtm6jBcPdKE2LNYKyHbmWrYtb/3LX5jKXK7ZQc3x8eBzGjYSkefVhgBTpqk0ESV3HpCBOuY5s0y7X45og09K2E1eyBQDtOQrcbXm2IMUDdRni4BU0A1P8iSMSr8N4vm6XBKuxxo7zrwO6SYe00eo=
+	t=1751388438; cv=none; b=fpYzDT7R+Ymw6OrGv05jqTohCIePFrepWX02h6uadsNyIRmgBHcO6ncIJU6MESHQNpln5GHo2WdeIMF24r7WEQp7Q6cGX6ebraDD3NwatLc3Wei8H/ZIhLMs3Sx5P135sFwYUsc2SbwEL+40F2Lqf6IjsQsIe4CbAHDhaaB5z4I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751387460; c=relaxed/simple;
-	bh=ccu6doF606i3anOKp0WzDRUWJMLOrwaZM1RVrtVnpd8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=KtPZSik0wWhmUFVy2YwrzQNjT3s3dH3TzQ8lssEHtrS4Zbs1IlG6w+ZUtQ/qYvgqIgb2pza/nIML9r0L0ULyjVrHQYec7K+n51N+okfYqDIXxJbskjtWK1k+/WUgl89ZbEKArEYerO/dhHbxz0b696GSF0qXVKUblePbqJ1o418=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Zlcos8GL; arc=none smtp.client-ip=209.85.160.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1751388438; c=relaxed/simple;
+	bh=ymyz98G6WAIWhgot7OyS3l+nPaHFTvJsU8EnPPnV3hw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jmYlgSW7XfGHmNWqBy6Tl0YPHjO6d4MlhSz9MDHSRtTmq2tZZ6YMhiqHIxYNIlOt80Tv6T02gBxmNxwgSDGhlFePvajGANFpaxPmJpLDbgfVAk3EcJPRIrxkEGYcpB/JhfwHTIwxm8+eYwG96hkhYsMcwZFM0FecioILuuMZBxk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RZFC/jGu; arc=none smtp.client-ip=209.85.208.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Zlcos8GL"
-Received: by mail-oa1-f48.google.com with SMTP id 586e51a60fabf-2eaf96c7579so2319285fac.3
-        for <linux-block@vger.kernel.org>; Tue, 01 Jul 2025 09:30:58 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RZFC/jGu"
+Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-32cdc9544ceso30043591fa.0;
+        Tue, 01 Jul 2025 09:47:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1751387458; x=1751992258; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=M+2FNWnu3aI1hBbZInqVaj9v9ytsHBTZW74r6v2b6BM=;
-        b=Zlcos8GLVNTnx4j4NTQGjLQCCy25FLNv3qZ51Blkgf2mcPXDOqVEdCy+wk0iuv0jg4
-         3+JyRIy9MicuitQ/0fJ9m0/i7K4yj4NHsEc2E5qWUMYBwF2DwV/Nm5SxDNVZQVPia/sU
-         jtPOw6Qb37ugE5lNjCiHt+FsDTVuyYkjLFcePoB/Ycg8EwVFjIsqCZDdRncoDVLzw1M8
-         osOM62dZYxtGKeDDX1Y7R9+sG54+3QT/GVGshP6IlR33e0payMLWIdahzFM3dxajGBYz
-         0R95u7LH11hvTW/L2Jh254AUWABDKbim+yEX8zkskzO2MsjsJoXMWYvnyv2Qmyr8Q0HM
-         KdUQ==
+        d=gmail.com; s=20230601; t=1751388434; x=1751993234; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ymyz98G6WAIWhgot7OyS3l+nPaHFTvJsU8EnPPnV3hw=;
+        b=RZFC/jGuvOhElYbJdSKVKR+vOQ4+ZCR5TVwAlqWpR2svkdoOXBQ9obkYcTh6Drma3q
+         qLSzWR+QgCL6X4MWR1DN9tEqLnHXcxUTYcilIKS/atsW/RvgLB+upBteOGFIl9fTbF1l
+         4xE41/q1EtjI88Xt+knbYXFoZQvkX0TfO5HWKJbTbO/tsj0HSJFFddPM0xDtEMvmHftH
+         ReNeMxfA9FV0sNqcwUY1qjSEvKibnZn7G/3SNk+bUp160VwTk10+1Zk7WRplNsYWrxm0
+         KGpjqcsiMGd7kkJ2RBrAAWPPqrZTxwD080I+AfFINLots+G9BGUVVu9JQzuXwAapYdFW
+         uzlg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751387458; x=1751992258;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=M+2FNWnu3aI1hBbZInqVaj9v9ytsHBTZW74r6v2b6BM=;
-        b=CSv2XA2EHparvBowmDSgCaSce8jJFNf+lVjP+I98oNp5DuTlOp+1th/d7jL0J1p5X+
-         A0CgBaBqogqOu1JaPX7VaXovKROd7dqbSUypOAW0ByHjA0c4tCkKqF9p2Odv5+OvdJGh
-         cNdA5qzB4QhKSTF7WUMsAKqz+g2mL7iw4I7OYJAeDeehEWyIeSQnctk310QPCZ+C+nON
-         iQ3OCnaQSc0oE6EfEeBqrkVkJoMRUWaIpR3/Sv46rW1FdH/QGxbBxY7vDPGkDntaUywb
-         a/bv9draVq0VjU0e8H1noRaEm7MuzZqNUHadzYUvc/0FDtPGqXMhIDwWCVhh6/rxmur9
-         ncsQ==
-X-Forwarded-Encrypted: i=1; AJvYcCURcJXLXrkspiT9ztcWkHK/B6CriMBOzncvo8+VsmqKTLVALWNFvyMQ8zIh0zC1BCF8ilH1mLs+BZAxZQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YytLZaJ4ZLs+ZH3ol4pwBW39A13e8fZcWFAQejtb/lgv2XQq5uJ
-	eSZ0vC5uqNl9oj1uNNEfUD2wke8VRzI3eHI8SVZI8B072HrkV++lKgVmwspo3VvK0J02uEyL08O
-	rqRr0
-X-Gm-Gg: ASbGncvkBC1r8INNIQhTIOFCx06ymLhXw5Wv42+XFPLxw0hwfK3rIZJutBljBSeHjh0
-	e4TuLLmpFg4b4sjcpCUtHy+TnILMw8jfiD9hk4TGBnYMi2SW8ZAo6er75+ndoEACe1tbAGePvUF
-	a8fj+gNRdGgHWL2rsKnD3atD9Cao6bZt9gHibLjmZ03JPqsw1ixslg3SSsqh9CQvNQ1MpUEGMC0
-	HxqWzSDfvAWurR4buYOOhMQ2xPkayctHtlwi6WZcMeFxTDqNTazHsORp5Q5QdKWYLgwiMmqny2X
-	Eqv68Yv7NGhLuvNdB9B+iIXgXMrDosWxbqk1TbM+3rgOv11ochPAoS+Srg==
-X-Google-Smtp-Source: AGHT+IGpJPyYM9iqExtSNLl1uBdGovogEv7fqGqaODKiiDJ0yDkdIcICzEP0BIRa0y/5LYk6VTWJoA==
-X-Received: by 2002:a05:6870:3116:b0:2c2:3ae9:5b9c with SMTP id 586e51a60fabf-2efed453acamr14111876fac.2.1751387457693;
-        Tue, 01 Jul 2025 09:30:57 -0700 (PDT)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-50204a8b6aasm2515673173.92.2025.07.01.09.30.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 01 Jul 2025 09:30:56 -0700 (PDT)
-Message-ID: <20f07b3b-194a-4dfe-936e-0f159bf44485@kernel.dk>
-Date: Tue, 1 Jul 2025 10:30:56 -0600
+        d=1e100.net; s=20230601; t=1751388434; x=1751993234;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ymyz98G6WAIWhgot7OyS3l+nPaHFTvJsU8EnPPnV3hw=;
+        b=UL5BwIdbe57vfJQs9UWHMO1QN/CxnfkmdxDXtLijDyBsFi2K9eWXEmM9PS65Y1mmlr
+         an+yC6PGZ5xKy3ulYXRv4x7uYwQe46tw1G8UBTgm9bdB2WdN6qnDipmJMkBSM+b+Xp7f
+         7cNrA/0d220r0dC/Kt8rqnubn78ayw6CdqzFt7YSHgTbbHmNt0sIhmOcxrxwp2dueWLw
+         Imlr4puauuiwmlGfvvSJhTl0ZW1Tt83AWfQJWmZ4XExb1/Zjlicc5bOuTGJWxb1y4s00
+         r9qlq7aeJ0LKbRM7AKZchFyjQC/ngRTZmEQFV9lMuIt+fPxGJsLNT6FTIFlPZ+H4bXiZ
+         7FyA==
+X-Forwarded-Encrypted: i=1; AJvYcCUCOQd8i4kOBLmqHPjJ7RU9Xt7JcxESpHk2lH73uHcfRsh3aQzMrCTqB8rDkCiidHcKxbCLwSqUP65qKBD6xVk=@vger.kernel.org, AJvYcCUaCbzxPxuDts8/ImtrFbDERuCI+i3tuGeCIVG05mUba4eNYZuKGmS3U8MGPs67eCCfMw7TCB4lirM=@vger.kernel.org, AJvYcCUwcQi0sai9VUZeb3fDcwuxtPuj2Tnk8L5rdHz+TI84/qQcMEIndGEq5aR+5EUTvvwNIiPfdLaBpHTrYF1XBAk8@vger.kernel.org, AJvYcCW9EaHS62g1Hp0LNcXCoJgABJKv99UbzF1FM9DKFTy6EDjWNJw1dHEd9+/BlNcz+6AKs3DejxIbCtT1@vger.kernel.org, AJvYcCWZilvt5uJ0QLlxhaZqtU75xC85cG5kQULsrJ1JwBA9DXIGEnR/sBTTnq34vUlQnJBfRkuH7zS2@vger.kernel.org, AJvYcCWk/npMOtG8kAP4cMk/j2zje4SoYmXE9n+f3VsCFVa+Yq+RSx260W8YdLx+kf4n/XZXGpSu79mTBerPvpM=@vger.kernel.org, AJvYcCXVWhtUytKw40WInDMflfrQNGrugDPSDo08xE0uCjY/5eXSsWmuvnTLA8PfYtzvRpxkraUCuPD3Ap2GtN2U@vger.kernel.org, AJvYcCXZ1FkRVTHPbHwRvUt1GSQkOGOy51TsZaVZEtGpR/7xn/kzXxi+RipI7GbV8TUNc2sl53VfhURzM2UX@vger.kernel.org, AJvYcCXegcSZlhgS2mPJoagurMt9GAlI+I7x37E1NDSxFSJy78Dp/DFiq2c2q6AabknG5QDfubkySY0uT2An@vger.kernel.org
+X-Gm-Message-State: AOJu0YwP+mYa/dIb+AvWsYjOwL4xbmeQ/6zqedOf3Th66C1KGDCWjonT
+	uiqwwOt/OJsDmT99Nkk/gp9mbSxxyukREEeEIA0qKtFPe4QrP+h27ogMBQP7uPCAyK3aPda6MEm
+	CX2yLE5sLGK/Xe3t1F9ZWl1Ipbs8/Hd0=
+X-Gm-Gg: ASbGncvIdJreVaPaH7bakggtW/bhmClPzk720Z47WTO5BhHBaqdQjD2wUYCIURKr/5f
+	VFY4OFPTjy7fCVC/qTMTp5L/4MS9MzeDK2leoId1Y2xmkCmtzqwRkjo9ujlBMNx1a6VCpBSx+Py
+	T2z0H6CYwj5yp5huePfRMX1dv8uZyTlofJ3Kj9HSMF1bvtR4uTTLr038I1epeayeKDSF+zJwVnz
+	Fu21g==
+X-Google-Smtp-Source: AGHT+IFASHXyh6nKAuBWNflJbwzC1dxAvHKvYXKVWM4leUPhMKpN6FRK5U0/hoCDkOtFemkDVZIaXGSG2DOrBLCq8Rk=
+X-Received: by 2002:a2e:7c08:0:b0:32c:a907:491f with SMTP id
+ 38308e7fff4ca-32cdc464463mr36198291fa.15.1751388434129; Tue, 01 Jul 2025
+ 09:47:14 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Weird delay introduced in v6.16-rc only, possible regression
-To: Qu Wenruo <quwenruo.btrfs@gmx.com>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- LKML <linux-kernel@vger.kernel.org>
-References: <e597d8c6-ed77-47ae-b030-1016727d6abe@gmx.com>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <e597d8c6-ed77-47ae-b030-1016727d6abe@gmx.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20250619-cstr-core-v12-0-80c9c7b45900@gmail.com> <aGO7-SQUUgg6kSVU@google.com>
+In-Reply-To: <aGO7-SQUUgg6kSVU@google.com>
+From: Tamir Duberstein <tamird@gmail.com>
+Date: Tue, 1 Jul 2025 12:46:37 -0400
+X-Gm-Features: Ac12FXw8AGP83JXgR8yzKwPiapZfBBkrNyDazktnve1kCOVkl79eviuMomA9o84
+Message-ID: <CAJ-ks9kbsTRrRN4yP7GmphozPyZHgbaAGJmLXR42NVgJ1ie_SQ@mail.gmail.com>
+Subject: Re: [PATCH v12 0/5] rust: replace kernel::str::CStr w/ core::ffi::CStr
+To: Alice Ryhl <aliceryhl@google.com>
+Cc: Michal Rostecki <vadorovsky@protonmail.com>, Miguel Ojeda <ojeda@kernel.org>, 
+	Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, 
+	Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Andreas Hindborg <a.hindborg@kernel.org>, Trevor Gross <tmgross@umich.edu>, 
+	Brendan Higgins <brendan.higgins@linux.dev>, David Gow <davidgow@google.com>, 
+	Rae Moar <rmoar@google.com>, Danilo Krummrich <dakr@kernel.org>, 
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
+	Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
+	Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, 
+	FUJITA Tomonori <fujita.tomonori@gmail.com>, Rob Herring <robh@kernel.org>, 
+	Saravana Kannan <saravanak@google.com>, Peter Zijlstra <peterz@infradead.org>, 
+	Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>, Waiman Long <longman@redhat.com>, 
+	Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, 
+	Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, Andrew Lunn <andrew@lunn.ch>, 
+	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Bjorn Helgaas <bhelgaas@google.com>, 
+	Arnd Bergmann <arnd@arndb.de>, Jens Axboe <axboe@kernel.dk>, Benno Lossin <lossin@kernel.org>, 
+	=?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, 
+	Dave Ertman <david.m.ertman@intel.com>, Ira Weiny <ira.weiny@intel.com>, 
+	Leon Romanovsky <leon@kernel.org>, Breno Leitao <leitao@debian.org>, 
+	Viresh Kumar <viresh.kumar@linaro.org>, Michael Turquette <mturquette@baylibre.com>, 
+	Stephen Boyd <sboyd@kernel.org>, rust-for-linux@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	kunit-dev@googlegroups.com, dri-devel@lists.freedesktop.org, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, llvm@lists.linux.dev, 
+	linux-pci@vger.kernel.org, nouveau@lists.freedesktop.org, 
+	linux-block@vger.kernel.org, linux-pm@vger.kernel.org, 
+	linux-clk@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 6/29/25 3:45 PM, Qu Wenruo wrote:
-> Hi,
-> 
-> Recently I'm hitting a very weird delay when doing development inside a x86_64 VM.
-> 
-> The dmesg shows the delay (10+ sec) between virtio blk and device-mapper:
-> 
-> [    3.651377] virtio_blk virtio4: 10/0/0 default/read/poll queues
-> [    3.653075] virtio_scsi virtio2: 10/0/0 default/read/poll queues
-> [    3.670269] virtio_blk virtio4: [vda] 83886080 512-byte logical blocks (42.9 GB/40.0 GiB)
-> [    3.672096] scsi host6: Virtio SCSI HBA
-> [    3.708452]  vda: vda1 vda2
-> [    3.711073] virtio_blk virtio5: 10/0/0 default/read/poll queues
-> [    3.729879] virtio_blk virtio5: [vdb] 167772160 512-byte logical blocks (85.9 GB/80.0 GiB)
-> [    3.737535] virtio_blk virtio8: 10/0/0 default/read/poll queues
-> [    3.747045] virtio_blk virtio8: [vdc] 83886080 512-byte logical blocks (42.9 GB/40.0 GiB)
-> [   17.453833] device-mapper: uevent: version 1.0.3
-> [   17.455689] device-mapper: ioctl: 4.50.0-ioctl (2025-04-28) initialised: dm-devel@lists.linux.dev
-> :: performing fsck on '/dev/os/root'
-> /dev/mapper/os-root: clean, 240299/1048576 files, 3372218/4194304 blocks
-> :: mounting '/dev/os/root' on real root
-> [   17.871671] EXT4-fs (dm-0): mounted filesystem 00a85626-d289-4817-8183-ee828e221f76 r/w with ordered data mode. Quota mode: none.
-> 
-> The VM is running kernel based on upstream commit 78f4e737a53e ("Merge tag 'for-6.16/dm-fixes' of git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm"), with a lot of extra btrfs patches.
-> 
-> 
-> The v6.15 kernel from Archlinux is totally fine without any delay.
-> 
-> The v6.16-rc kernel may have some different configs, but the config is used for a long long time, way before v6.15, so it looks like it's something in the v6.16 cycle causing problems.
-> 
-> I can definitely do a bisection, but any clue would be appreciated.
+On Tue, Jul 1, 2025 at 6:44=E2=80=AFAM Alice Ryhl <aliceryhl@google.com> wr=
+ote:
+>
+> On Thu, Jun 19, 2025 at 11:06:24AM -0400, Tamir Duberstein wrote:
+> > This picks up from Michal Rostecki's work[0]. Per Michal's guidance I
+> > have omitted Co-authored tags, as the end result is quite different.
+> >
+> > Link: https://lore.kernel.org/rust-for-linux/20240819153656.28807-2-vad=
+orovsky@protonmail.com/t/#u [0]
+> > Closes: https://github.com/Rust-for-Linux/linux/issues/1075
+> >
+> > Signed-off-by: Tamir Duberstein <tamird@gmail.com>
+>
+> Overall LGTM. Only question is whether we should re-export
+> core::ffi::CStr from kernel::ffi. Reason being that right now we are
+> telling people to never use core::ffi as the integer types are wrong,
+> and I think it would be nice if we can continue to tell people "never
+> use core::ffi".
 
-Probably a good idea to go ahead with a bisect to help pin it down.
+I agree that'd be nice. There are existing references to items in
+`core::ffi` scattered around (e.g. in rust/kernel/drm/file.rs); it
+would be good to clean all those up together with CStr provided we
+have some ability to lint against new occurrences.
 
--- 
-Jens Axboe
+I'll leave this as-is for now since this series has already churned
+quite a lot, and the cleanup can be a reasonable first task for
+someone.
+
+>
+> Either way, for the whole series:
+> Reviewed-by: Alice Ryhl <aliceryhl@google.com>
+
+Thanks! I'll send the rebase on rc3 momentarily.
+Tamir
