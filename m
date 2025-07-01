@@ -1,120 +1,116 @@
-Received: from mail-io1-f43.google.com (mail-io1-f43.google.com [209.85.166.43])
+Received: from mail-oa1-f48.google.com (mail-oa1-f48.google.com [209.85.160.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ED3F2BAF4
-	for <linux-block@vger.kernel.org>; Tue,  1 Jul 2025 16:30:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DBA42BAF4
+	for <linux-block@vger.kernel.org>; Tue,  1 Jul 2025 16:30:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751387404; cv=none; b=PwDs74zexCYt2taFcAeP6WuYvYiSJRtxLX6jRSmO55g1EUuhlnrxFQZURjXZiyPoQ+GsWBZigdwEd6solcSYpQftNYBGT7pJmGYcGFYGAqFBZUBtdl7g0/n5Ui1m+aD7xzBMMAJbKtkhwGKkKUWXTLjsJ3qIj8sLm4WNmdqCtZQ=
+	t=1751387460; cv=none; b=TH8DoPVi5MiA2Fw7JOgPNuQEtm6jBcPdKE2LNYKyHbmWrYtb/3LX5jKXK7ZQc3x8eBzGjYSkefVhgBTpqk0ESV3HpCBOuY5s0y7X45og09K2E1eyBQDtOQrcbXm2IMUDdRni4BU0A1P8iSMSr8N4vm6XBKuxxo7zrwO6SYe00eo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751387404; c=relaxed/simple;
-	bh=wFrxDDlw3PMnJ84pTpU3+oamjHqaLYc4WDE2gz4FccE=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=en8ewC8ixdMvR7Kak1Rq4/VggANOYlthNsaEjQhRE8E3HLPbuttq0u6vQ69tpo2j+Cr9jy6/Laa+MrZ9AlZ7WD49FGJepCvVNADAGurk2pstCm2w3dbnYNYAsFU1nwqppTSMETpCvrsEZ3Bec5CEaw4ONHfB9MJ1oSg2NVFmL7c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=09fs6eb5; arc=none smtp.client-ip=209.85.166.43
+	s=arc-20240116; t=1751387460; c=relaxed/simple;
+	bh=ccu6doF606i3anOKp0WzDRUWJMLOrwaZM1RVrtVnpd8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=KtPZSik0wWhmUFVy2YwrzQNjT3s3dH3TzQ8lssEHtrS4Zbs1IlG6w+ZUtQ/qYvgqIgb2pza/nIML9r0L0ULyjVrHQYec7K+n51N+okfYqDIXxJbskjtWK1k+/WUgl89ZbEKArEYerO/dhHbxz0b696GSF0qXVKUblePbqJ1o418=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Zlcos8GL; arc=none smtp.client-ip=209.85.160.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="09fs6eb5"
-Received: by mail-io1-f43.google.com with SMTP id ca18e2360f4ac-8731c4ba046so319684239f.3
-        for <linux-block@vger.kernel.org>; Tue, 01 Jul 2025 09:30:02 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Zlcos8GL"
+Received: by mail-oa1-f48.google.com with SMTP id 586e51a60fabf-2eaf96c7579so2319285fac.3
+        for <linux-block@vger.kernel.org>; Tue, 01 Jul 2025 09:30:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1751387401; x=1751992201; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=crWwaD/7GgCUUFcWT/Llkm7dN9wwCuiLb/qh9BwJGxc=;
-        b=09fs6eb5exlgCRMXs4yv7qhEYiWG/hZ5FcH/x0fmWbkI8uuqVC0MbFRBqfJwLxpRh4
-         hvhQUw9cMVFTY6ocKF5kXNp9HmbCp+f4MU4QRW1ql8X1ppZVntgtBpVZrlB4oWKkUdxp
-         Ze4b/LURH6iRi/eXuK7FgsVm+Xja4ONJaLnontXBtmmRp1yn1coXOHmEU71tKLw5C/jU
-         8TkGU4HWKoIbkrXBuVtEhZksV21wbDiw89Y0tfPK7cOc1D50aDnAyMkEVwVapzIvw7Ra
-         vetnL5bDRNo8eCl2eP/Zs5AnTlWIn1hSsnWJbWnq8ZMdra1vyD7HsmIy12PTtO8LbPR/
-         VOyw==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1751387458; x=1751992258; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=M+2FNWnu3aI1hBbZInqVaj9v9ytsHBTZW74r6v2b6BM=;
+        b=Zlcos8GLVNTnx4j4NTQGjLQCCy25FLNv3qZ51Blkgf2mcPXDOqVEdCy+wk0iuv0jg4
+         3+JyRIy9MicuitQ/0fJ9m0/i7K4yj4NHsEc2E5qWUMYBwF2DwV/Nm5SxDNVZQVPia/sU
+         jtPOw6Qb37ugE5lNjCiHt+FsDTVuyYkjLFcePoB/Ycg8EwVFjIsqCZDdRncoDVLzw1M8
+         osOM62dZYxtGKeDDX1Y7R9+sG54+3QT/GVGshP6IlR33e0payMLWIdahzFM3dxajGBYz
+         0R95u7LH11hvTW/L2Jh254AUWABDKbim+yEX8zkskzO2MsjsJoXMWYvnyv2Qmyr8Q0HM
+         KdUQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751387401; x=1751992201;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=crWwaD/7GgCUUFcWT/Llkm7dN9wwCuiLb/qh9BwJGxc=;
-        b=IP30hEAQuH/T0mXDtS6NhxZnAwq/hVMJ56hqcRPgr8HFEIps0NebLBEs5XubAi/hg3
-         FpKTj7PlKa4k/zNhakBYijJ4KBX/e86QIW/DPU2zXhEc2cx4GIarmxnubJmrPPhdHzAz
-         oGKWk91IxI/pnn4VqNIFAigkI+fNmHhSi5j3oaAMnfZHIEi8Bv5suZ2j2E/NDQdq0wjW
-         v0u5smmn7ltEKZp5nb3Ne1XwReRcR/JAXtwgn+p7dSiaVbcrdWiWtkZefN+69GJXmyIX
-         AdBBPR7m0EEU1s1GYWci6KlALnjq+zpXsaq/AZGvZRWV/Sy8mBwYYEwqnDUmrph657nC
-         RfJg==
-X-Forwarded-Encrypted: i=1; AJvYcCWV7BtS5N323I+cjN3rGTgN3TfTlyzzR2MQWkR97Yh+LVsZ83RqWgF9SsI2ZzF1t+CpKwvwf58qYRFmdg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzEuhjPFjM53thl43ykyyNR7clmg2SxycTnFp5ljvxdfGiiELLR
-	5edGfvJUf1yiWGCjkxlg8QyKLwVDwbYk9D7lV6SFEbqMIjPKGE5IdqOtc8GYSi+ZuqU=
-X-Gm-Gg: ASbGncuwsHl5+2Iy+qE9oiD6ci4QP4T831OdEqXxdbqOklTzFFrdUdj0t831ht1JS6r
-	1KDdmSNnuBP1ZKHOTUcbtHXP8It+tA3IrKjR0aCNbFIQg17h4ZXJhv/8NA6BUhYFlWRgqJVh7s8
-	a8BHyFgYYPK2XMv8JrK0qncxAb1eQ4QH/ewSE0WRIFtnAaJA28hr/er7YE3ieKDiYe6SrCoxJYe
-	ghga3jkv3iWJ+lE8t5vgWipUe9hY5J/4IxZ+itbD5iwYYCqvan71W9plDJEgDGG7b3g6odn49aJ
-	MLIl1BujbZklWYSd5FP1wSmI5ynVvJzyk6Y0dMpBTEtSqggdFCbqXn2aBqTiZko=
-X-Google-Smtp-Source: AGHT+IGmszV/ckQKjI/KgjT/UrAo+IhSsGcXQNmla80uKgIibrMYCCf4LgGCWJe7gTvyQW/Kg7z8dQ==
-X-Received: by 2002:a05:6602:2b8c:b0:864:4aa2:d796 with SMTP id ca18e2360f4ac-876882fbadcmr2169640839f.8.1751387401311;
-        Tue, 01 Jul 2025 09:30:01 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-87687b0d3fbsm236096439f.39.2025.07.01.09.29.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Jul 2025 09:30:00 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: Christoph Hellwig <hch@lst.de>, Daniel Wagner <wagi@kernel.org>
-Cc: Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>, 
- "Michael S. Tsirkin" <mst@redhat.com>, 
- "Martin K. Petersen" <martin.petersen@oracle.com>, 
- Thomas Gleixner <tglx@linutronix.de>, 
- Costa Shulyupin <costa.shul@redhat.com>, Juri Lelli <juri.lelli@redhat.com>, 
- Valentin Schneider <vschneid@redhat.com>, Waiman Long <llong@redhat.com>, 
- Ming Lei <ming.lei@redhat.com>, Frederic Weisbecker <frederic@kernel.org>, 
- Hannes Reinecke <hare@suse.de>, linux-kernel@vger.kernel.org, 
- linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, 
- megaraidlinux.pdl@broadcom.com, linux-scsi@vger.kernel.org, 
- storagedev@microchip.com, virtualization@lists.linux.dev, 
- GR-QLogic-Storage-Upstream@marvell.com
-In-Reply-To: <20250617-isolcpus-queue-counters-v1-0-13923686b54b@kernel.org>
-References: <20250617-isolcpus-queue-counters-v1-0-13923686b54b@kernel.org>
-Subject: Re: [PATCH 0/5] blk: introduce block layer helpers to calculate
- num of queues
-Message-Id: <175138739958.350817.18365520328662376034.b4-ty@kernel.dk>
-Date: Tue, 01 Jul 2025 10:29:59 -0600
+        d=1e100.net; s=20230601; t=1751387458; x=1751992258;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=M+2FNWnu3aI1hBbZInqVaj9v9ytsHBTZW74r6v2b6BM=;
+        b=CSv2XA2EHparvBowmDSgCaSce8jJFNf+lVjP+I98oNp5DuTlOp+1th/d7jL0J1p5X+
+         A0CgBaBqogqOu1JaPX7VaXovKROd7dqbSUypOAW0ByHjA0c4tCkKqF9p2Odv5+OvdJGh
+         cNdA5qzB4QhKSTF7WUMsAKqz+g2mL7iw4I7OYJAeDeehEWyIeSQnctk310QPCZ+C+nON
+         iQ3OCnaQSc0oE6EfEeBqrkVkJoMRUWaIpR3/Sv46rW1FdH/QGxbBxY7vDPGkDntaUywb
+         a/bv9draVq0VjU0e8H1noRaEm7MuzZqNUHadzYUvc/0FDtPGqXMhIDwWCVhh6/rxmur9
+         ncsQ==
+X-Forwarded-Encrypted: i=1; AJvYcCURcJXLXrkspiT9ztcWkHK/B6CriMBOzncvo8+VsmqKTLVALWNFvyMQ8zIh0zC1BCF8ilH1mLs+BZAxZQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YytLZaJ4ZLs+ZH3ol4pwBW39A13e8fZcWFAQejtb/lgv2XQq5uJ
+	eSZ0vC5uqNl9oj1uNNEfUD2wke8VRzI3eHI8SVZI8B072HrkV++lKgVmwspo3VvK0J02uEyL08O
+	rqRr0
+X-Gm-Gg: ASbGncvkBC1r8INNIQhTIOFCx06ymLhXw5Wv42+XFPLxw0hwfK3rIZJutBljBSeHjh0
+	e4TuLLmpFg4b4sjcpCUtHy+TnILMw8jfiD9hk4TGBnYMi2SW8ZAo6er75+ndoEACe1tbAGePvUF
+	a8fj+gNRdGgHWL2rsKnD3atD9Cao6bZt9gHibLjmZ03JPqsw1ixslg3SSsqh9CQvNQ1MpUEGMC0
+	HxqWzSDfvAWurR4buYOOhMQ2xPkayctHtlwi6WZcMeFxTDqNTazHsORp5Q5QdKWYLgwiMmqny2X
+	Eqv68Yv7NGhLuvNdB9B+iIXgXMrDosWxbqk1TbM+3rgOv11ochPAoS+Srg==
+X-Google-Smtp-Source: AGHT+IGpJPyYM9iqExtSNLl1uBdGovogEv7fqGqaODKiiDJ0yDkdIcICzEP0BIRa0y/5LYk6VTWJoA==
+X-Received: by 2002:a05:6870:3116:b0:2c2:3ae9:5b9c with SMTP id 586e51a60fabf-2efed453acamr14111876fac.2.1751387457693;
+        Tue, 01 Jul 2025 09:30:57 -0700 (PDT)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-50204a8b6aasm2515673173.92.2025.07.01.09.30.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 01 Jul 2025 09:30:56 -0700 (PDT)
+Message-ID: <20f07b3b-194a-4dfe-936e-0f159bf44485@kernel.dk>
+Date: Tue, 1 Jul 2025 10:30:56 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: Weird delay introduced in v6.16-rc only, possible regression
+To: Qu Wenruo <quwenruo.btrfs@gmx.com>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ LKML <linux-kernel@vger.kernel.org>
+References: <e597d8c6-ed77-47ae-b030-1016727d6abe@gmx.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <e597d8c6-ed77-47ae-b030-1016727d6abe@gmx.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-d7477
 
-
-On Tue, 17 Jun 2025 15:43:22 +0200, Daniel Wagner wrote:
-> I am still working on the change request for the "blk: honor isolcpus
-> configuration" series [1]. Teaching group_cpus_evenly to use the
-> housekeeping mask depending on the context is not a trivial change.
+On 6/29/25 3:45 PM, Qu Wenruo wrote:
+> Hi,
 > 
-> The first part of the series has already been reviewed and doesn't
-> contain any controversial changes, so let's get them processed
-> independely.
+> Recently I'm hitting a very weird delay when doing development inside a x86_64 VM.
 > 
-> [...]
+> The dmesg shows the delay (10+ sec) between virtio blk and device-mapper:
+> 
+> [    3.651377] virtio_blk virtio4: 10/0/0 default/read/poll queues
+> [    3.653075] virtio_scsi virtio2: 10/0/0 default/read/poll queues
+> [    3.670269] virtio_blk virtio4: [vda] 83886080 512-byte logical blocks (42.9 GB/40.0 GiB)
+> [    3.672096] scsi host6: Virtio SCSI HBA
+> [    3.708452]  vda: vda1 vda2
+> [    3.711073] virtio_blk virtio5: 10/0/0 default/read/poll queues
+> [    3.729879] virtio_blk virtio5: [vdb] 167772160 512-byte logical blocks (85.9 GB/80.0 GiB)
+> [    3.737535] virtio_blk virtio8: 10/0/0 default/read/poll queues
+> [    3.747045] virtio_blk virtio8: [vdc] 83886080 512-byte logical blocks (42.9 GB/40.0 GiB)
+> [   17.453833] device-mapper: uevent: version 1.0.3
+> [   17.455689] device-mapper: ioctl: 4.50.0-ioctl (2025-04-28) initialised: dm-devel@lists.linux.dev
+> :: performing fsck on '/dev/os/root'
+> /dev/mapper/os-root: clean, 240299/1048576 files, 3372218/4194304 blocks
+> :: mounting '/dev/os/root' on real root
+> [   17.871671] EXT4-fs (dm-0): mounted filesystem 00a85626-d289-4817-8183-ee828e221f76 r/w with ordered data mode. Quota mode: none.
+> 
+> The VM is running kernel based on upstream commit 78f4e737a53e ("Merge tag 'for-6.16/dm-fixes' of git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm"), with a lot of extra btrfs patches.
+> 
+> 
+> The v6.15 kernel from Archlinux is totally fine without any delay.
+> 
+> The v6.16-rc kernel may have some different configs, but the config is used for a long long time, way before v6.15, so it looks like it's something in the v6.16 cycle causing problems.
+> 
+> I can definitely do a bisection, but any clue would be appreciated.
 
-Applied, thanks!
+Probably a good idea to go ahead with a bisect to help pin it down.
 
-[1/5] lib/group_cpus: Let group_cpu_evenly() return the number of initialized masks
-      commit: b6139a6abf673029008f80d42abd3848d80a9108
-[2/5] blk-mq: add number of queue calc helper
-      commit: 3f27c1de5df265f9d8edf0cc5d75dc92e328484a
-[3/5] nvme-pci: use block layer helpers to calculate num of queues
-      commit: 4082c98c1fefd276b34ba411ac59c50b336dfbb1
-[4/5] scsi: use block layer helpers to calculate num of queues
-      commit: 94970cfb5f10ea381df8c402d36c5023765599da
-[5/5] virtio: blk/scsi: use block layer helpers to calculate num of queues
-      commit: 0a50ed0574ffe853f15c3430794b5439b2e6150a
-
-Best regards,
 -- 
 Jens Axboe
-
-
-
