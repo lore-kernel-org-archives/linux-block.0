@@ -1,124 +1,130 @@
-Received: from mail-io1-f46.google.com (mail-io1-f46.google.com [209.85.166.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 081894502F
-	for <linux-block@vger.kernel.org>; Tue,  1 Jul 2025 03:01:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6CEF1E871
+	for <linux-block@vger.kernel.org>; Tue,  1 Jul 2025 03:08:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751338867; cv=none; b=BCBg6F8rj0viLPy2t0iiUKrd/uT0drP6ra6R6ATlokC+/GHcksAECFp/SIjwU6XrlenTWueTDEhxb7e1Q8iYIDqJkkjU0W5ZPpMqGYVSzDEOySlVkPaWTst3WTGxNsQLIl5h5752EQ/A2ctiNMvJUZdFw+FgK+/Na7mEwCUJvk8=
+	t=1751339302; cv=none; b=KQn/L6u4jC8RVuB4n4V/2AdwrRLF8pUmvG/95Xv1XioWm7j20egqb/OsrhHQzVCMIdSt/B7ee8Ds9K5gfw1yJW3dW7s9/t7+W7pLxiyZYfVjW0py88gPc3kulR6nrOUIDtbCaooGZlL44oCDpEv17usJd9pN6axCAacMRvtnEO8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751338867; c=relaxed/simple;
-	bh=lrh6GydZHS2KelZDBisrC75MBOjmu9SiEIrty6g5yW8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nHTpv4ylS7VjTeklZ0u4lHgxgLy2CR2whlp7H7DBz3hSldLReSlR70hW7aljhO+AkTw1YmARzsxxTXn47qWNFu/t5wSo/+odn6brNGjQC2WJXmAZFddVITv8z3ttiNL+SDeFd0hc8n7BJe2A85zwLtmRsKsmaKoHQxIGUR0nPG0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=lvmVJ6yv; arc=none smtp.client-ip=209.85.166.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1751339302; c=relaxed/simple;
+	bh=TG919W3WLbrNAfldQXs79Vi/l7ajdooSPNiPLBL7f1M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CsmzCVsaLR+Kjqn4P/4nLor3psWSYvbu3VU5AMfDZ2RP6OEFrXTpNFb47HCOEJmtlyNjBElS9iQAwMxPEq/lS7fGQkTazKPspOJgnRVKbUUIazptEBiSLxYcwbp8c8waQWd6kzEniXa+0XxXBxJzeHIJiUTtKbywqt6vlKBQMs0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KABhFlTk; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="lvmVJ6yv"
-Received: by mail-io1-f46.google.com with SMTP id ca18e2360f4ac-86d0c598433so77317039f.3
-        for <linux-block@vger.kernel.org>; Mon, 30 Jun 2025 20:01:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1751338860; x=1751943660; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=n5BV5J90GBuq79fEtEaJ4Lc8GonetLryBRSTpf1en0o=;
-        b=lvmVJ6yvslYyCL54XZ6BMRgr+SKjcMoUuWi0kib/s3jaVZqXVf1y2xBdf5yFUxROiq
-         AYSLodibNTyWtJAsMCeENaoDFIaMtHhJzBOXDbwXwe14aJP+mZ2c5qBpLdNgnnlKbMLb
-         7Ni6rlqtjAfzRTw7yh7w3RXZb3mDRQv/azZce46NSkYPRGIkTAbjsviQrPYILPkTyFPp
-         mp39NWtIdACwjcXJ3XtPrW+VWK28KLOT1FZRGXULZwZZnTynIeKXTdheBqjSr0VnZxp4
-         /5GxZCePDO6B5tCUcY1s1XPtq22RG9UClvv1yGmj6a6w16r1OdIfKqXaja8aL9mvd3a0
-         nm4g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751338860; x=1751943660;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=n5BV5J90GBuq79fEtEaJ4Lc8GonetLryBRSTpf1en0o=;
-        b=xKVSD3HUB+2LRxhjSzWW55U6X2iQHBOtk2/Q1dQF8Vwg0kix/hIBx72WizLJ+TaHRc
-         FtNEmDi/wwsWdEvnUAKueleMLUB7whcAmqSEBSIdZh1J2jJeb9y8Hveq+/m6o5Izyw4l
-         lyhfUBCtAyBu6mInbINhQy9KD/1qt5FBlENhOh/eODTI5/7VBxr7nVa4tTXfyg3PUEu9
-         H7JkkIsGLkbb9UxX6sQ4yIRD0C+vawA44qQXC3KgBTHXDewhKxyHraiAGExemjFo2cH8
-         LG/j9nbb1vsKA1iS4YHGU6Mw59wvyc8tjqvyZ+i9T0/HCucUHejUS8KYA15IC/bel4HH
-         8fZw==
-X-Forwarded-Encrypted: i=1; AJvYcCVZXX6gfzBepxRO3TKmcfCVb0JhbmE3Cj0LJBch9/qGVma5O/F1qQ9s3mCQJMLUQORX0SyZoCDCK6etHA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwNh5NnNwHJdLRX69U0RRzaSz5fwgrrFDWCe7lr0VaDRtUNXSAo
-	dtBIBVmsS0/p5CSkidWZxJYnStPs3OgGuxHrri0EnlGBKyou1GjF8zdCXqONEZeQSKQ=
-X-Gm-Gg: ASbGncvMo+co/J9qhc+V8J9CmvEPLtTDoVmk7sKFmLQePavGdN1geCjBT1DLfJuc9Jh
-	nPXQwEeHZVblomrMixLAfXa3UhZWN7hMljnIR5aoy8Rrjt0BY4RuB/Sj+oJkHzWJN2yyywxTuoA
-	e060zXD2Q9guzq6JYaEh0xLGNnT3stsyNkUC2Xbr4ajqJhTGC7KTBGXFjlyJlWn7+K9EG3oPTng
-	XVPu0rZSVhDMbW0cNCt5Il2VZrs+uVSuIN3JI8ib8QVBu2tCHEBJ5iNnCg9cLfklbcwBPLvu4va
-	QDK0gS9qAHeA+iPp9L39i9q8nJPIBxujd/n0TUIV4LVz+xBHAI5FXl7CXlE=
-X-Google-Smtp-Source: AGHT+IECMoVni9yu+MrxxjMKqo4MuNDTM8fwrQriJ/C0gHDwrb4/VZzzTlf4RbL98n8J27on+QBTzQ==
-X-Received: by 2002:a05:6e02:1a46:b0:3df:3154:2e90 with SMTP id e9e14a558f8ab-3df4abb9898mr192181025ab.19.1751338859860;
-        Mon, 30 Jun 2025 20:00:59 -0700 (PDT)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-50204ab5dcfsm2269225173.123.2025.06.30.20.00.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 30 Jun 2025 20:00:59 -0700 (PDT)
-Message-ID: <c28dd90a-3777-49fa-a662-32c61da22860@kernel.dk>
-Date: Mon, 30 Jun 2025 21:00:58 -0600
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KABhFlTk"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1751339299;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gFXBlEVxwZaLC+Deuza/d3yQuAe202fXVNYdYSEYk4g=;
+	b=KABhFlTkQtOHZDLekGGeZJjPt+tCFwpxVYXl+TxhS6f6I8me18ixJXYM1TVJFoK2+0CsG4
+	j87Nx59hISKI4uYWHkwbZkX9VlQ509Yd0iyX3pdDOtMAAy+GTUTOP59OCo7JToVwkJakL4
+	DLbSRvnaO7FK1MAcf4+U/hdT9ZIPS/A=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-294-oxPAm6lmPNeOghFl-Mz2gw-1; Mon,
+ 30 Jun 2025 23:08:16 -0400
+X-MC-Unique: oxPAm6lmPNeOghFl-Mz2gw-1
+X-Mimecast-MFC-AGG-ID: oxPAm6lmPNeOghFl-Mz2gw_1751339295
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 606741800287
+	for <linux-block@vger.kernel.org>; Tue,  1 Jul 2025 03:08:15 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.88])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0D0C019560AB;
+	Tue,  1 Jul 2025 03:08:10 +0000 (UTC)
+Date: Tue, 1 Jul 2025 11:08:05 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Changhui Zhong <czhong@redhat.com>
+Cc: Linux Block Devices <linux-block@vger.kernel.org>
+Subject: Re: [bug report] BUG: kernel NULL pointer dereference, address:
+ 0000000000000060
+Message-ID: <aGNRFXWX3JS6GAAy@fedora>
+References: <CAGVVp+UZ5VUYvW4ZktoF055Wg=PXO5vico76O3f_iwnfcLb-HA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] brd: fix sleeping function called from invalid context
- in brd_insert_page()
-To: Yu Kuai <yukuai1@huaweicloud.com>, hch@lst.de
-Cc: penguin-kernel@I-love.SAKURA.ne.jp, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, yi.zhang@huawei.com, yangerkun@huawei.com,
- johnny.chenyi@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
-References: <20250630112828.421219-1-yukuai1@huaweicloud.com>
- <eb41cab3-5946-4fe3-a1be-843dd6fca159@kernel.dk>
- <a2dc2566-44e1-4460-bbff-bb813f4655d9@kernel.dk>
- <773a49cf-3908-85d2-5693-5cbd6530a933@huaweicloud.com>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <773a49cf-3908-85d2-5693-5cbd6530a933@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAGVVp+UZ5VUYvW4ZktoF055Wg=PXO5vico76O3f_iwnfcLb-HA@mail.gmail.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-On 6/30/25 7:28 PM, Yu Kuai wrote:
-> Hi,
+Hi Changhui,
+
+Thanks for the report!
+
+On Tue, Jul 01, 2025 at 09:55:23AM +0800, Changhui Zhong wrote:
+> Hello,
 > 
-> ? 2025/06/30 23:28, Jens Axboe ??:
->> On 6/30/25 9:24 AM, Jens Axboe wrote:
->>> On 6/30/25 5:28 AM, Yu Kuai wrote:
->>>> From: Yu Kuai <yukuai3@huawei.com>
->>>>
->>>> __xa_cmpxchg() is called with rcu_read_lock(), and it will allocate
->>>> memory if necessary.
->>>>
->>>> Fix the problem by moving rcu_read_lock() after __xa_cmpxchg(), meanwhile,
->>>> it still should be held before xa_unlock(), prevent returned page to be
->>>> freed by concurrent discard.
->>>
->>> The rcu locking in there is a bit of a mess, imho. What _exactly_ is the
->>> rcu read side locking protecting? Is it only needed around the lookup
->>> and insert? We even hold it over the kmap and copy, which seems very
->>> heavy handed.
->>
->> Gah it's holding the page alive too. Can't we just grab a ref to the
->> page when inserting it, and drop that at free time? It would be a lot
->> better to have only the lookup be RCU protected, having the full
->> copies under it seems kind of crazy.
+> the following kernel panic was triggered by 'ubdsrv  make test T=generic' tests,
+> please help check and let me know if you need any info/test, thanks.
 > 
-> In this case, we must grab a ref to the page for each read/write as
-> well, I choose RCU because I think it has less performance overhead than
-> page ref, which is atomic. BTW, I thought copy at most one page is
-> lightweight, if this is not true, I agree page ref is better.
+> repo: https://github.com/torvalds/linux.git
+> branch: master
+> INFO: HEAD of cloned kernel:
+> commit d0b3b7b22dfa1f4b515fd3a295b3fd958f9e81af
+> Author: Linus Torvalds <torvalds@linux-foundation.org>
+> Date:   Sun Jun 29 13:09:04 2025 -0700
+> 
+>     Linux 6.16-rc4
+> 
+> dmesg log:
+> [ 3431.347957] BUG: kernel NULL pointer dereference, address: 0000000000000060
+> [ 3431.355744] #PF: supervisor read access in kernel mode
+> [ 3431.361484] #PF: error_code(0x0000) - not-present page
+> [ 3431.367224] PGD 119ffa067 P4D 0
+> [ 3431.370830] Oops: Oops: 0000 [#1] SMP NOPTI
+> [ 3431.375503] CPU: 22 UID: 0 PID: 397273 Comm: fio Tainted: G S
+>            6.16.0-rc4 #1 PREEMPT(voluntary)
+> [ 3431.386864] Tainted: [S]=CPU_OUT_OF_SPEC
+> [ 3431.391243] Hardware name: Lenovo ThinkSystem SR650 V2/7Z73CTO1WW,
+> BIOS AFE118M-1.32 06/29/2022
+> [ 3431.400954] RIP: 0010:ublk_queue_rqs+0x7d/0x1c0 [ublk_drv]
 
-Right, you'd need to grab a ref. I do think that is (by far) the better
-solution. Yes if you microbenchmark I'm sure the current approach will
-look fine, but it's a heavy section inside an rcu read lock and will
-hold off the grace period.
+It is one regression of commit 524346e9d79f ("ublk: build batch from IOs in same io_ring_ctx and io task").
 
-So yeah, I do think it'd be a lot better to do proper page references on
-lookup+free, and have just the lookup be behind rcu.
+io->cmd can't be derefered unless the uring cmd is live, and the following patch
+should fix the oops:
 
--- 
-Jens Axboe
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index c3e3c3b65a6d..99894d712c1f 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -1442,15 +1442,14 @@ static void ublk_queue_rqs(struct rq_list *rqlist)
+ 		struct ublk_queue *this_q = req->mq_hctx->driver_data;
+ 		struct ublk_io *this_io = &this_q->ios[req->tag];
+ 
+-		if (io && !ublk_belong_to_same_batch(io, this_io) &&
+-				!rq_list_empty(&submit_list))
+-			ublk_queue_cmd_list(io, &submit_list);
+-		io = this_io;
+-
+-		if (ublk_prep_req(this_q, req, true) == BLK_STS_OK)
++		if (ublk_prep_req(this_q, req, true) == BLK_STS_OK) {
++			if (io && !ublk_belong_to_same_batch(io, this_io) &&
++					!rq_list_empty(&submit_list))
++				ublk_queue_cmd_list(io, &submit_list);
+ 			rq_list_add_tail(&submit_list, req);
+-		else
++		} else
+ 			rq_list_add_tail(&requeue_list, req);
++		io = this_io;
+ 	}
+ 
+ 	if (!rq_list_empty(&submit_list))
+
+
+Thanks,
+Ming
+
