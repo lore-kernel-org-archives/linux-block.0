@@ -1,117 +1,105 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E726A47
-	for <linux-block@vger.kernel.org>; Tue,  1 Jul 2025 05:20:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BAF41EA6F
+	for <linux-block@vger.kernel.org>; Tue,  1 Jul 2025 07:23:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751347252; cv=none; b=M4W0D189OqEfht9jTejj6POUlZmdPafhVYGQC5kiXGNV2XAXVn6xFOxBdDgxx2bPYIUZI5wd8Ea2ESg5EAP5fg9Y646ZxmkotOODRCJRaXHqR3FRrrT3OAjb76DaqyBNyLQAfQ4tEypl+M2+3vcyRifCZ5dwfJiWfsCnSFZ6sF0=
+	t=1751354623; cv=none; b=Do/RqYZh/BntmN+AUpHm0bhlkQW4S88pYvBNZ5vNPzuPX8hvqnPwZxMKyX/PD7XaLWW+1Nnkc75SfD8lBiANvovwffNiklMGK7R0ba9ppCsn8g+9Yauxe10yUWBUjGLqZr8c1vAtEg0Sc1CdR2eWISK9nQoWbp1XMPHxTmt1nk8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751347252; c=relaxed/simple;
-	bh=RCqCGSpti0cW3sguUKzWnM5VbafNVBq7pNQ8481zl6A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ucg9qQHiXuxxHMow9xofiT/zMr9bLKC10K202jrlO4CA7S567K8avVNvH3245MqEzcj7Vpb1jyF/VLGfL5wFjskneyecgNeG+8FUWYbdzvrZjjZ5PA+pV0HXgy/u9RwPFODvl0u5qAiLfp4a+pCkQn2m5LBRikXaaT2XirOgWYA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=QzZJ6nPm; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1751354623; c=relaxed/simple;
+	bh=VBUNOGATFpGI9P5FZ4pQ1k9I4aqPI7c0FZAkj60+wPs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AbyAgWyPhort+zfAkLQw+allShasSO99ofWPDmIvwmhdXlSRgg/jvXXbpFeGDmjsnp1WtPzJlO9yxrzmW9k+RK1b3Fn6rMwSvrGuXJ9CHlCWcYCuJMGcC9YvXUdzWg3s/pv/iE/i+9uUJ/6yNqC7fJn5r7ZCPjwUdtqxY9EL5b0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Vuo7hAXS; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="QzZJ6nPm"
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55UKcRHN023854;
-	Tue, 1 Jul 2025 05:20:44 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=2CbltS
-	csmR1vHSSnlOiv2uAvrOFzf6o6ASJUoXxF/3k=; b=QzZJ6nPmO50wOtgRhFnq8d
-	pSCDQdZe5KFQuEhBFGXK6+akvyblMCFQUGbfraHQcCYTehWtLO+ZHjLGJg9er9aO
-	lfMX3N5UnrDVIuifnqGiFta61Ptv2Qu7T+dJBeP46veUKAAoMgOhF6PLn6QXdKrZ
-	GtKllgqB0l+wxCAHAozANMCjXs+ut4/mYYw9mRHcIepepGadaEPrIIMZ3NHUf8Ou
-	W1/UzbnKr3NYgBX80HXgPhyQMD1csdvaH4IdxG6KFPUdHb8d4IQib2VJCNSk/qMT
-	eIQydDj7JfVeqv+Y8Iw0gjNCaCNsJtIUSR5BW1zYPfurFZWwWmiLTczdTk9yZRrA
-	==
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 47j6u1nbp2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 01 Jul 2025 05:20:43 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 56136dWI021946;
-	Tue, 1 Jul 2025 05:20:43 GMT
-Received: from smtprelay03.wdc07v.mail.ibm.com ([172.16.1.70])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 47juqph5nm-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 01 Jul 2025 05:20:43 +0000
-Received: from smtpav04.wdc07v.mail.ibm.com (smtpav04.wdc07v.mail.ibm.com [10.39.53.231])
-	by smtprelay03.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5615KaAu7275142
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 1 Jul 2025 05:20:36 GMT
-Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1DDE258050;
-	Tue,  1 Jul 2025 05:20:42 +0000 (GMT)
-Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A9BFF58052;
-	Tue,  1 Jul 2025 05:20:39 +0000 (GMT)
-Received: from [9.109.198.197] (unknown [9.109.198.197])
-	by smtpav04.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Tue,  1 Jul 2025 05:20:39 +0000 (GMT)
-Message-ID: <05207abc-7787-4fe4-913f-c04775a7862d@linux.ibm.com>
-Date: Tue, 1 Jul 2025 10:50:38 +0530
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vuo7hAXS"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1751354616;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=oXUQsEF3ubaPAB0Pf1RYwqgNynT7RM+QZeChQyxPzK0=;
+	b=Vuo7hAXSzym88kgFSyWVdot82z/kxnu8fUQsrPWKPQvmZvcG0h4aDgtTdyU9EY9Orrha0z
+	gxSnDOoZcSWKz93JaSsxVuM1FphWIysO7QmzCQAiX5xhSJrP4X3UbVQNJC2aSGkvBP1AqK
+	SvqX11nwNCY5mzBysMUMCugvFs/wdiQ=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-265-1BxhevM5Pd6fxv6_q8i6Og-1; Tue,
+ 01 Jul 2025 03:23:33 -0400
+X-MC-Unique: 1BxhevM5Pd6fxv6_q8i6Og-1
+X-Mimecast-MFC-AGG-ID: 1BxhevM5Pd6fxv6_q8i6Og_1751354612
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2828C180047F;
+	Tue,  1 Jul 2025 07:23:31 +0000 (UTC)
+Received: from localhost (unknown [10.72.116.120])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1302718003FC;
+	Tue,  1 Jul 2025 07:23:29 +0000 (UTC)
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: Uday Shankar <ushankar@purestorage.com>,
+	Caleb Sander Mateos <csander@purestorage.com>,
+	Ming Lei <ming.lei@redhat.com>,
+	Changhui Zhong <czhong@redhat.com>
+Subject: [PATCH] ublk: don't queue request if the associated uring_cmd is canceled
+Date: Tue,  1 Jul 2025 15:23:25 +0800
+Message-ID: <20250701072325.1458109-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv6 3/3] block: fix potential deadlock while running
- nr_hw_queue update
-To: Ming Lei <ming.lei@redhat.com>
-Cc: linux-block@vger.kernel.org, hch@lst.de, axboe@kernel.dk,
-        sth@linux.ibm.com, lkp@intel.com, gjoyce@ibm.com
-References: <20250630054756.54532-1-nilay@linux.ibm.com>
- <20250630054756.54532-4-nilay@linux.ibm.com> <aGNU3PPJ1wU--x-O@fedora>
-Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <aGNU3PPJ1wU--x-O@fedora>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: c08fxcEwUVn_1EPdWm6Vld4a5o4YaRAj
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzAxMDAyNSBTYWx0ZWRfX9mVZk9lKmqFH jlw7p+1xW87x2DMZ6GPQmHO4JD6/QDGIjUfQ94M79mgkRHsJX+5+ofaqf3MA/AF3J+MfMaSbLlK opvzSxONNk2BiOTocnLI92Vt5gOfpQvYloA615kk0ZGRgwlBJ3tTE7wlC5Yr4ZV0MY7DLiG9BUO
- X8Fgb53l4fc336KwInRK9kUBMMpKbqyF6sTB0bStNB6+/U4I6SyETipMXkkfH2DZnpZyyspf68/ vENAJpcDvtc0Tz/9e2lUnWg4KRmIYZtTKjRxraK6knK5xxYcj7vt4ogmBT7rt+Gx+ohwNDWCoIS HfR2i44gqdNeAZp+/wjCxNn6BgTTcnpsBphCuqJbpj197Ymh8426BIRrclGXxRwEbbKg+8sMaYZ
- vGARpsobdn2CGCZlQz4zuE8893UCDU/oH67dXn9+cQCY/oXmcD2oG7l5OaXORWJyBI30cayn
-X-Proofpoint-GUID: c08fxcEwUVn_1EPdWm6Vld4a5o4YaRAj
-X-Authority-Analysis: v=2.4 cv=GrRC+l1C c=1 sm=1 tr=0 ts=6863702b cx=c_pps a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17 a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=y0u-dav7CRZbYzo4eMEA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
- definitions=2025-07-01_01,2025-06-27_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
- priorityscore=1501 adultscore=0 mlxlogscore=999 mlxscore=0 impostorscore=0
- phishscore=0 spamscore=0 suspectscore=0 bulkscore=0 malwarescore=0
- lowpriorityscore=0 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
- definitions=main-2507010025
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
+Commit 524346e9d79f ("ublk: build batch from IOs in same io_ring_ctx and io task")
+need to dereference `io->cmd` for checking if the IO can be added to current
+batch, see ublk_belong_to_same_batch() and io_uring_cmd_ctx_handle(). However,
+`io->cmd` may become invalid after the uring_cmd is canceled.
 
+Fixes it by only allowing to queue this IO in case that ublk_prep_req()
+returns `BLK_STS_OK`, when 'io->cmd' is guaranteed to be valid.
 
-On 7/1/25 8:54 AM, Ming Lei wrote:
+Reported-by: Changhui Zhong <czhong@redhat.com>
+Fixes: 524346e9d79f ("ublk: build batch from IOs in same io_ring_ctx and io task")
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ drivers/block/ublk_drv.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
->> diff --git a/block/elevator.c b/block/elevator.c
->> index 50f4b78efe66..8ba8b869d5a4 100644
->> --- a/block/elevator.c
->> +++ b/block/elevator.c
->> @@ -705,7 +705,7 @@ static int elevator_change(struct request_queue *q, struct elv_change_ctx *ctx)
->>   * The I/O scheduler depends on the number of hardware queues, this forces a
->>   * reattachment when nr_hw_queues changes.
->>   */
->> -void elv_update_nr_hw_queues(struct request_queue *q)
->> +void elv_update_nr_hw_queues(struct request_queue *q, struct xarray *et_table)
-> 
-> et_table isn't necessary to expose to elv_update_nr_hw_queues(), and it is
-> less readable than passing 'struct elevator_tags *' directly, but it can be
-> one followup improvement.
-> 
-Yeah, makes sense... I will update this in the subsequent patchset.
-
-Thanks,
---Nilay
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index c3e3c3b65a6d..9fd284fa76dc 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -1442,15 +1442,16 @@ static void ublk_queue_rqs(struct rq_list *rqlist)
+ 		struct ublk_queue *this_q = req->mq_hctx->driver_data;
+ 		struct ublk_io *this_io = &this_q->ios[req->tag];
+ 
++		if (ublk_prep_req(this_q, req, true) != BLK_STS_OK) {
++			rq_list_add_tail(&requeue_list, req);
++			continue;
++		}
++
+ 		if (io && !ublk_belong_to_same_batch(io, this_io) &&
+ 				!rq_list_empty(&submit_list))
+ 			ublk_queue_cmd_list(io, &submit_list);
+ 		io = this_io;
+-
+-		if (ublk_prep_req(this_q, req, true) == BLK_STS_OK)
+-			rq_list_add_tail(&submit_list, req);
+-		else
+-			rq_list_add_tail(&requeue_list, req);
++		rq_list_add_tail(&submit_list, req);
+ 	}
+ 
+ 	if (!rq_list_empty(&submit_list))
+-- 
+2.47.1
 
