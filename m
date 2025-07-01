@@ -1,104 +1,91 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+Received: from 004.mia.mailroute.net (004.mia.mailroute.net [199.89.3.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B98194C97;
-	Tue,  1 Jul 2025 01:29:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7DAF288CC;
+	Tue,  1 Jul 2025 01:50:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751333346; cv=none; b=iUN9qX+g8x+e4x4D1ujdMxLKiP1ZddZJibNT0euntgquRu+lRlouDxg1qGQjAGECnKmr/YOQT9Be0UgcSa8AMaphuSvOEUudIAKTrNei9aUZKfpNnYlP+v68xj8TvadCfauk6PRdZ0sME60ZiZJgxg/AOTE3lSBmwRQuPUNmPp0=
+	t=1751334649; cv=none; b=GQ83pmyK37rz2SUtQJZNQhK71ET/E/hU8xVGyW4xe7S+f4Fhl2Y1EQXgNHXI9tRYFY1xFHLefBjCl5Jg77mwL7o3rhnChYHjHbCzhARosk7rqvIk8l8eYvckgcoFckzHL8QsgXQe4DrRUHUEkUB/B28FNvBwGr6d2IrhIgxN4/U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751333346; c=relaxed/simple;
-	bh=D8UqOOsEY/NopVE3CbDsVtjbT/fYg5AELD/acega2Mw=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=G7/texkIUQMfLa8uHFIr+ZwGw5qWzouoiwLfcsPW4vSqretil4c8xvY+DaJU/SAZpnfGo0dsINpW7FAizVwRoPxcLnc5JdQ0S9ikiPZ3Rg/yEzeFSAF1GpIZ3HBCkuFX6wz/XIedjjUFZjhwLxvEn4Bx56r3Dx2O66m9sSGKYOo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4bWQRL6R3YzKHMxk;
-	Tue,  1 Jul 2025 09:29:02 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.75])
-	by mail.maildlp.com (Postfix) with ESMTP id 49FA21A0D86;
-	Tue,  1 Jul 2025 09:29:01 +0800 (CST)
-Received: from [10.174.179.143] (unknown [10.174.179.143])
-	by APP2 (Coremail) with SMTP id Syh0CgAX_wzbOWNoPK4SAQ--.17602S3;
-	Tue, 01 Jul 2025 09:29:01 +0800 (CST)
-Subject: Re: [PATCH v2] brd: fix sleeping function called from invalid context
- in brd_insert_page()
-To: Jens Axboe <axboe@kernel.dk>, Yu Kuai <yukuai1@huaweicloud.com>,
- hch@lst.de
-Cc: penguin-kernel@I-love.SAKURA.ne.jp, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, yi.zhang@huawei.com, yangerkun@huawei.com,
- johnny.chenyi@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
-References: <20250630112828.421219-1-yukuai1@huaweicloud.com>
- <eb41cab3-5946-4fe3-a1be-843dd6fca159@kernel.dk>
- <a2dc2566-44e1-4460-bbff-bb813f4655d9@kernel.dk>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <773a49cf-3908-85d2-5693-5cbd6530a933@huaweicloud.com>
-Date: Tue, 1 Jul 2025 09:28:59 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.1
+	s=arc-20240116; t=1751334649; c=relaxed/simple;
+	bh=uOn/E/NMWNFcIAAoPEqqSMz59V68QnU2eWW+KmUzTBw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fBa9NjkZICTS8fE3f1CRtWRh+PH9/uUlKF/GWW8UO/zs/4xFpMnplHYjynOXm6P9gPBBRTi+GxbhxbBCkpOxlv9DsmV69xAol9dOo5FVFL5KDHk0hEyJSRBq26MoKcxBkCtF2qzwpA1gpRXtP/tuU+l4g0f92l2dhsUj0Nax558=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=TgBw6gR3; arc=none smtp.client-ip=199.89.3.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="TgBw6gR3"
+Received: from localhost (localhost [127.0.0.1])
+	by 004.mia.mailroute.net (Postfix) with ESMTP id 4bWQwP4HDhzm0yVH;
+	Tue,  1 Jul 2025 01:50:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1751334644; x=1753926645; bh=7W+SjNuCJvOiuB21TNN2tfZs
+	8/SeweAQf/piHsn0V3s=; b=TgBw6gR3bLH2BnnJ5r9uzcycaPGVhXHLhPpuNLqe
+	KHpLMVEt+TzlQkvmXlBqHhj0JIK5PAN8/ctxlRNvDQSCMfElCcKWokFfTlLcENFv
+	xOjBPI9DBOqvSGqjOZQM+s9QtItLUsIvA+9e3yaxpBSXK+QY8BS5HLL0KzoeJr9P
+	N/XeVuvLXiSswhDMKWsaa4thmJxc7058L3RmVYVuFvm19gYJfBcM8Nh1CGdIa5EO
+	qhmY+n0ElARe3VJJM1d527PBfLS8GNXoPkFizMvovRXMR7xiQoGjJw62HvpOfvbF
+	3hbPb+winTcOKy1+G1gtGSXUwQl+f+GCI2u42OxDvQwngw==
+X-Virus-Scanned: by MailRoute
+Received: from 004.mia.mailroute.net ([127.0.0.1])
+ by localhost (004.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id rYuGXe6yn3M7; Tue,  1 Jul 2025 01:50:44 +0000 (UTC)
+Received: from [192.168.51.14] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 004.mia.mailroute.net (Postfix) with ESMTPSA id 4bWQwH0QNwzm0yTL;
+	Tue,  1 Jul 2025 01:50:38 +0000 (UTC)
+Message-ID: <ef79ab48-f047-4f7d-a6f9-25dcc275126b@acm.org>
+Date: Mon, 30 Jun 2025 18:50:37 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <a2dc2566-44e1-4460-bbff-bb813f4655d9@kernel.dk>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:Syh0CgAX_wzbOWNoPK4SAQ--.17602S3
-X-Coremail-Antispam: 1UD129KBjvJXoWruw1fGw1fGFy7Xr13Zr1fWFg_yoW8JF1fpF
-	Wjga4Yyr4ku3sFya17u3WDJFyrtw4kKr4UC3WrKFyUZFZIgF93XrW7A3y5Wr9Iqrn2qw1Y
-	qa1j93s3uFZ3AaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBY14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
-	0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x
-	0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E
-	7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcV
-	C0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF
-	04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7
-	CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7VUbGQ6JUUUUU==
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] block: Fix a deadlock related to modifying the
+ readahead attribute
+To: Keith Busch <kbusch@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org, Nilay Shroff <nilay@linux.ibm.com>,
+ stable@vger.kernel.org
+References: <20250626203713.2258558-1-bvanassche@acm.org>
+ <20250627071702.GA992@lst.de> <d03ccb5c-f44c-40e7-9964-2e9ec67bb96f@acm.org>
+ <aGMvCXklxJ_rlZOM@kbusch-mbp>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <aGMvCXklxJ_rlZOM@kbusch-mbp>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi,
-
-在 2025/06/30 23:28, Jens Axboe 写道:
-> On 6/30/25 9:24 AM, Jens Axboe wrote:
->> On 6/30/25 5:28 AM, Yu Kuai wrote:
->>> From: Yu Kuai <yukuai3@huawei.com>
->>>
->>> __xa_cmpxchg() is called with rcu_read_lock(), and it will allocate
->>> memory if necessary.
->>>
->>> Fix the problem by moving rcu_read_lock() after __xa_cmpxchg(), meanwhile,
->>> it still should be held before xa_unlock(), prevent returned page to be
->>> freed by concurrent discard.
+On 6/30/25 5:42 PM, Keith Busch wrote:
+> On Mon, Jun 30, 2025 at 03:39:18PM -0700, Bart Van Assche wrote:
+>> On 6/27/25 12:17 AM, Christoph Hellwig wrote:
+>>> Well, if there are queued never completed bios the freeze will obviously
+>>> fail.  I don't see how this freeze is special vs other freezes or other
+>>> attributes that freeze.
 >>
->> The rcu locking in there is a bit of a mess, imho. What _exactly_ is the
->> rcu read side locking protecting? Is it only needed around the lookup
->> and insert? We even hold it over the kmap and copy, which seems very
->> heavy handed.
+>> Hi Christoph,
+>>
+>> Do you perhaps want me to remove the freeze/unfreeze calls from all
+>> sysfs store callbacks from which it is safe to remove these callbacks?
 > 
-> Gah it's holding the page alive too. Can't we just grab a ref to the
-> page when inserting it, and drop that at free time? It would be a lot
-> better to have only the lookup be RCU protected, having the full
-> copies under it seems kind of crazy.
+> But don't the remaining attributes that are not safe remain susceptible
+> to this deadlock?
 
-In this case, we must grab a ref to the page for each read/write as
-well, I choose RCU because I think it has less performance overhead than
-page ref, which is atomic. BTW, I thought copy at most one page is
-lightweight, if this is not true, I agree page ref is better.
+For the remaining sysfs attributes the deadlock can be solved by
+letting the blk_mq_freeze_queue() call by the sysfs store methods time
+out if that call takes too long or by making that call interruptible by
+signals like Ctrl-C. I think its better to let functions like
+queue_requests_store() fail if an attempt to freeze a request
+queue takes longer than it should rather than to trigger a kernel
+deadlock.
 
-Thanks,
-Kuai
-
-> 
-> IOW, I think there's room for some good cleanups here.
-> 
-
+Bart.
