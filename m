@@ -1,60 +1,60 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9FD5218ADC;
-	Tue,  1 Jul 2025 05:13:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E726A47
+	for <linux-block@vger.kernel.org>; Tue,  1 Jul 2025 05:20:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751346803; cv=none; b=owZrOsCfdUNuNE6YEPWzAumwjfMpGyzt3uch5cyadjlN2Xuz2Zg/6cCiQpUI41i0SryCa1PUOYyLXzeOHa+Ri+VTtW6zCxWpmDgvG/rsEtXsPR57lozyeDXSrYJWBlUOaR2hjl+iRxHDOcKtWHZ8UQQ0w5KUnDe7RjOEFbdtsyU=
+	t=1751347252; cv=none; b=M4W0D189OqEfht9jTejj6POUlZmdPafhVYGQC5kiXGNV2XAXVn6xFOxBdDgxx2bPYIUZI5wd8Ea2ESg5EAP5fg9Y646ZxmkotOODRCJRaXHqR3FRrrT3OAjb76DaqyBNyLQAfQ4tEypl+M2+3vcyRifCZ5dwfJiWfsCnSFZ6sF0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751346803; c=relaxed/simple;
-	bh=XV03swUuxNU+I7PC4PoXIuOb+XDnLGJjpePjbo2H7M0=;
+	s=arc-20240116; t=1751347252; c=relaxed/simple;
+	bh=RCqCGSpti0cW3sguUKzWnM5VbafNVBq7pNQ8481zl6A=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KiFa7exHFN+vrFr8RIa+/pRXsumYdt7whPRz4Bh6dxeh5S0OrF8/D7DbYvKzP+MZ96ZseRJ8Gmf+An/lSDNxXz8F9MDh42SY25SxUws1yoJnQOg53GXQU6V2dYRFgkUF1aac5aCdiJNjQ/UGMI2f/PQcfnCRmsc8vCVGPVexFqo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=S0YrzViy; arc=none smtp.client-ip=148.163.156.1
+	 In-Reply-To:Content-Type; b=ucg9qQHiXuxxHMow9xofiT/zMr9bLKC10K202jrlO4CA7S567K8avVNvH3245MqEzcj7Vpb1jyF/VLGfL5wFjskneyecgNeG+8FUWYbdzvrZjjZ5PA+pV0HXgy/u9RwPFODvl0u5qAiLfp4a+pCkQn2m5LBRikXaaT2XirOgWYA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=QzZJ6nPm; arc=none smtp.client-ip=148.163.158.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="S0YrzViy"
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5612sdch003793;
-	Tue, 1 Jul 2025 05:13:05 GMT
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="QzZJ6nPm"
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55UKcRHN023854;
+	Tue, 1 Jul 2025 05:20:44 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=VNJ6ud
-	eGAYz1ol/IGC4dxgmwoyOxvNXq1BigLmffIvA=; b=S0YrzViy7C1dbRQXirhQHV
-	2cZdo++VzUcrZu2JzSDKf8FHfnFBzkoVp8HWTXseSL/YHX28Kk9UURtgoC1Slg2a
-	l51+xmIWEXM7/qoB8XoFYMgZB9VUj4IgZcteGBiUqmL/VZRueP4mn68CSAKpMpas
-	DjUpszKHijoIkkvMhPmluT/0Yhwl7t/MX+NzAAz2N0pPefRoOhQ6WaG7NuDNKcCm
-	xwDDVW0ToLTXOkbW8k9BM6Rj5/pxMwlLa+reISpnPJ4ASelqDZGLsEEUtrA+p17p
-	uTYzzxQZ/UB4AaY3T9JU62FolJSvTeQAVJpUImdxYH13nYvuXO2LNHQ+lKBP+7Ow
+	:message-id:mime-version:references:subject:to; s=pp1; bh=2CbltS
+	csmR1vHSSnlOiv2uAvrOFzf6o6ASJUoXxF/3k=; b=QzZJ6nPmO50wOtgRhFnq8d
+	pSCDQdZe5KFQuEhBFGXK6+akvyblMCFQUGbfraHQcCYTehWtLO+ZHjLGJg9er9aO
+	lfMX3N5UnrDVIuifnqGiFta61Ptv2Qu7T+dJBeP46veUKAAoMgOhF6PLn6QXdKrZ
+	GtKllgqB0l+wxCAHAozANMCjXs+ut4/mYYw9mRHcIepepGadaEPrIIMZ3NHUf8Ou
+	W1/UzbnKr3NYgBX80HXgPhyQMD1csdvaH4IdxG6KFPUdHb8d4IQib2VJCNSk/qMT
+	eIQydDj7JfVeqv+Y8Iw0gjNCaCNsJtIUSR5BW1zYPfurFZWwWmiLTczdTk9yZRrA
 	==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 47j84d5dbc-1
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 47j6u1nbp2-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 01 Jul 2025 05:13:05 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5614U2lT006841;
-	Tue, 1 Jul 2025 05:13:03 GMT
-Received: from smtprelay06.dal12v.mail.ibm.com ([172.16.1.8])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 47jvxm8y3x-1
+	Tue, 01 Jul 2025 05:20:43 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 56136dWI021946;
+	Tue, 1 Jul 2025 05:20:43 GMT
+Received: from smtprelay03.wdc07v.mail.ibm.com ([172.16.1.70])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 47juqph5nm-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 01 Jul 2025 05:13:03 +0000
+	Tue, 01 Jul 2025 05:20:43 +0000
 Received: from smtpav04.wdc07v.mail.ibm.com (smtpav04.wdc07v.mail.ibm.com [10.39.53.231])
-	by smtprelay06.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5615D3GZ17760912
+	by smtprelay03.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5615KaAu7275142
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 1 Jul 2025 05:13:03 GMT
+	Tue, 1 Jul 2025 05:20:36 GMT
 Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 23ADA58045;
-	Tue,  1 Jul 2025 05:13:03 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 1DDE258050;
+	Tue,  1 Jul 2025 05:20:42 +0000 (GMT)
 Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 9789658054;
-	Tue,  1 Jul 2025 05:12:50 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id A9BFF58052;
+	Tue,  1 Jul 2025 05:20:39 +0000 (GMT)
 Received: from [9.109.198.197] (unknown [9.109.198.197])
 	by smtpav04.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Tue,  1 Jul 2025 05:12:48 +0000 (GMT)
-Message-ID: <86eee32c-f83e-4af2-849a-34beb82be5ce@linux.ibm.com>
-Date: Tue, 1 Jul 2025 10:42:41 +0530
+	Tue,  1 Jul 2025 05:20:39 +0000 (GMT)
+Message-ID: <05207abc-7787-4fe4-913f-c04775a7862d@linux.ibm.com>
+Date: Tue, 1 Jul 2025 10:50:38 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -62,102 +62,56 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] block: Fix a deadlock related to modifying the
- readahead attribute
-To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        stable@vger.kernel.org
-References: <20250626203713.2258558-1-bvanassche@acm.org>
+Subject: Re: [PATCHv6 3/3] block: fix potential deadlock while running
+ nr_hw_queue update
+To: Ming Lei <ming.lei@redhat.com>
+Cc: linux-block@vger.kernel.org, hch@lst.de, axboe@kernel.dk,
+        sth@linux.ibm.com, lkp@intel.com, gjoyce@ibm.com
+References: <20250630054756.54532-1-nilay@linux.ibm.com>
+ <20250630054756.54532-4-nilay@linux.ibm.com> <aGNU3PPJ1wU--x-O@fedora>
 Content-Language: en-US
 From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <20250626203713.2258558-1-bvanassche@acm.org>
+In-Reply-To: <aGNU3PPJ1wU--x-O@fedora>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: Sl5GLMJyhFKhFm9adhc1SMxoikWHncSj
-X-Proofpoint-GUID: Sl5GLMJyhFKhFm9adhc1SMxoikWHncSj
-X-Authority-Analysis: v=2.4 cv=Ib6HWXqa c=1 sm=1 tr=0 ts=68636e61 cx=c_pps a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17 a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=VnNF1IyMAAAA:8 a=VwQbUJbxAAAA:8 a=N54-gffFAAAA:8 a=BzWE9k2HBGNmBK6PzhQA:9
- a=QEXdDO2ut3YA:10
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzAxMDAyMSBTYWx0ZWRfXz1NgCzKKRhMy eMRTrp5kJkkdmrsBJleFTrxLf2gm/+LNE1yfqcOrYo2akxkNz1Nwk63YFlsDLoMwJLF3NLg6HG7 GlSvh2sO9DOxUWXvC/s1zr2yzBSVdscS/gvsXfiSWR5P95GkHMzSvmv7x1vWvx52giK4OxlrWZk
- mIsCvT2bAr+8ARUkv/x8b4KRLGVUjkiCagn4PQHCqTIXLqG4mGLrPORjtoLfmQ+CTS7ls3yA9Qc t3LvSR1Dg05DPt5msKQv8n3xY3PP3PrBbYkK/SG9VEdepvK2vEQOyOQDAY32lZvhW7b5OGPCSFx OFNMAY4BfCVpzRIyWVI5+ypTr9FiYJNMs9xWjiBNW0Yo1aBTaqpGZ5fY02u5j64YXWFYM4WTQEK
- cOf0Vk9L28jhzalj+C3Pdv8/FG70SgcL/29Wqpk7A/hDY1lnHe5NEbnntu9NezxOGvfG6tqM
+X-Proofpoint-ORIG-GUID: c08fxcEwUVn_1EPdWm6Vld4a5o4YaRAj
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzAxMDAyNSBTYWx0ZWRfX9mVZk9lKmqFH jlw7p+1xW87x2DMZ6GPQmHO4JD6/QDGIjUfQ94M79mgkRHsJX+5+ofaqf3MA/AF3J+MfMaSbLlK opvzSxONNk2BiOTocnLI92Vt5gOfpQvYloA615kk0ZGRgwlBJ3tTE7wlC5Yr4ZV0MY7DLiG9BUO
+ X8Fgb53l4fc336KwInRK9kUBMMpKbqyF6sTB0bStNB6+/U4I6SyETipMXkkfH2DZnpZyyspf68/ vENAJpcDvtc0Tz/9e2lUnWg4KRmIYZtTKjRxraK6knK5xxYcj7vt4ogmBT7rt+Gx+ohwNDWCoIS HfR2i44gqdNeAZp+/wjCxNn6BgTTcnpsBphCuqJbpj197Ymh8426BIRrclGXxRwEbbKg+8sMaYZ
+ vGARpsobdn2CGCZlQz4zuE8893UCDU/oH67dXn9+cQCY/oXmcD2oG7l5OaXORWJyBI30cayn
+X-Proofpoint-GUID: c08fxcEwUVn_1EPdWm6Vld4a5o4YaRAj
+X-Authority-Analysis: v=2.4 cv=GrRC+l1C c=1 sm=1 tr=0 ts=6863702b cx=c_pps a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17 a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=y0u-dav7CRZbYzo4eMEA:9 a=QEXdDO2ut3YA:10
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
  definitions=2025-07-01_01,2025-06-27_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 suspectscore=0
- clxscore=1015 mlxlogscore=999 lowpriorityscore=0 impostorscore=0
- mlxscore=0 malwarescore=0 spamscore=0 priorityscore=1501 adultscore=0
- bulkscore=0 classifier=spam authscore=0 authtc=n/a authcc= route=outbound
- adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
- definitions=main-2507010021
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
+ priorityscore=1501 adultscore=0 mlxlogscore=999 mlxscore=0 impostorscore=0
+ phishscore=0 spamscore=0 suspectscore=0 bulkscore=0 malwarescore=0
+ lowpriorityscore=0 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
+ definitions=main-2507010025
 
 
 
-On 6/27/25 2:07 AM, Bart Van Assche wrote:
-> Every time I run test srp/002 the following deadlock is triggered:
-> 
-> task:multipathd
-> Call Trace:
->  <TASK>
->  __schedule+0x8c1/0x1bf0
->  schedule+0xdd/0x270
->  schedule_preempt_disabled+0x1c/0x30
->  __mutex_lock+0xb89/0x1650
->  mutex_lock_nested+0x1f/0x30
->  dm_table_set_restrictions+0x823/0xdf0
->  __bind+0x166/0x590
->  dm_swap_table+0x2a7/0x490
->  do_resume+0x1b1/0x610
->  dev_suspend+0x55/0x1a0
->  ctl_ioctl+0x3a5/0x7e0
->  dm_ctl_ioctl+0x12/0x20
->  __x64_sys_ioctl+0x127/0x1a0
->  x64_sys_call+0xe2b/0x17d0
->  do_syscall_64+0x96/0x3a0
->  entry_SYSCALL_64_after_hwframe+0x4b/0x53
->  </TASK>
-> task:(udev-worker)
-> Call Trace:
->  <TASK>
->  __schedule+0x8c1/0x1bf0
->  schedule+0xdd/0x270
->  blk_mq_freeze_queue_wait+0xf2/0x140
->  blk_mq_freeze_queue_nomemsave+0x23/0x30
->  queue_ra_store+0x14e/0x290
->  queue_attr_store+0x23e/0x2c0
->  sysfs_kf_write+0xde/0x140
->  kernfs_fop_write_iter+0x3b2/0x630
->  vfs_write+0x4fd/0x1390
->  ksys_write+0xfd/0x230
->  __x64_sys_write+0x76/0xc0
->  x64_sys_call+0x276/0x17d0
->  do_syscall_64+0x96/0x3a0
->  entry_SYSCALL_64_after_hwframe+0x4b/0x53
->  </TASK>
-> 
-> This deadlock happens because blk_mq_freeze_queue_nomemsave() waits for
-> pending requests to finish. The pending requests do never complete because
-> the dm-multipath queue_if_no_path option is enabled and the only path in
-> the dm-multipath configuration is being removed.
-> 
-> Fix this deadlock by removing the queue freezing/unfreezing code from
-> queue_ra_store().
-> 
-> Freezing the request queue from inside a block layer sysfs store callback
-> function is essential when modifying parameters that affect how bios or
-> requests are processed, e.g. parameters that affect bio_split_to_limit().
-> Freezing the request queue when modifying parameters that do not affect bio
-> nor request processing is not necessary.
-> 
-> Cc: Nilay Shroff <nilay@linux.ibm.com>
-> Cc: stable@vger.kernel.org
-> Fixes: b07a889e8335 ("block: move q->sysfs_lock and queue-freeze under show/store method")
-> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-> ---
-I hope we'd address other sysfs store attributes requiring queue-freeze
-in another patch. So with that,
+On 7/1/25 8:54 AM, Ming Lei wrote:
 
-Looks good to me:
-Reviewed-by: Nilay Shroff <nilay@linux.ibm.com>
+>> diff --git a/block/elevator.c b/block/elevator.c
+>> index 50f4b78efe66..8ba8b869d5a4 100644
+>> --- a/block/elevator.c
+>> +++ b/block/elevator.c
+>> @@ -705,7 +705,7 @@ static int elevator_change(struct request_queue *q, struct elv_change_ctx *ctx)
+>>   * The I/O scheduler depends on the number of hardware queues, this forces a
+>>   * reattachment when nr_hw_queues changes.
+>>   */
+>> -void elv_update_nr_hw_queues(struct request_queue *q)
+>> +void elv_update_nr_hw_queues(struct request_queue *q, struct xarray *et_table)
+> 
+> et_table isn't necessary to expose to elv_update_nr_hw_queues(), and it is
+> less readable than passing 'struct elevator_tags *' directly, but it can be
+> one followup improvement.
+> 
+Yeah, makes sense... I will update this in the subsequent patchset.
 
+Thanks,
+--Nilay
 
