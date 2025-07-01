@@ -1,171 +1,113 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC4B7271479
-	for <linux-block@vger.kernel.org>; Tue,  1 Jul 2025 11:00:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B50AD8821;
+	Tue,  1 Jul 2025 11:34:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751367612; cv=none; b=QiLOwRGhoBTUpRLPpv5ayOUlPZn2ulEKPvKXmxSwNHXOEFKbwL8sS//fN8KE29TH+8wzqTulhWH7seuhAmH7K3EyBCadOoGCGkMwa7JUPVbwgIloXlw9VlICpyYV0PXZYjwSdzNIJL5M7p/Vz53kdVeEvgU/Bxz4k9bwDyDAzTA=
+	t=1751369694; cv=none; b=JDcX40NMtMHPgFgT7cvukmiGznVQzHWX8PlEDPTCqHM7OQysqfql/z+uNKSnieIGiOwWbmptTX76FRKcdwJtBlS/JOtf6jmy6YT9hwcCctNYrQq983RisfAz3T7eaz0e80fT2Nuv8QiotM5zhPtGa+iDjKoAXNfBUoRjPrdPA9Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751367612; c=relaxed/simple;
-	bh=Dshf5p3XcW//mcUzDmTffF/gY5pMmPmlA7gsjjaMyug=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bDPZ3EpKwNpqv6/vhWb5MQAtud0+VufiGPEhVPEzkxGQ10ytGGdfjJjDd5Bei0X9SHmzilQvetr+BptNBCgQmwB8TI9BWvCtBTCkk19jLGPJsMKKADwCUvEwEVNCo9Sg8mexyuk6WmetWgVbsfjwsQx+pQDISb8K0X9nbUhNbSg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=tvaE9a+B; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=etiAnCtp; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=uexkloDZ; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=MwGOdLBY; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1751369694; c=relaxed/simple;
+	bh=ivvvymmSfinokPA9qi1LGV8jWib2h8DV4cJuLS0xY2E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=f6poiBbmtdfzI0Hfb2P89bH+e94a6Ccts5EYpD4MpDUPfsCEz+urJQUVjo7I1DRLcOfegHt9pbq7N9XAuzSSecB0sOXLz2+O1VT3XgK5Wu0rb2zIUdOPrLsORvVOcvaIqb+uGLqrB25QRdq+RqeXkfl/hutwCAwUANtYnlwwUq0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=on5fa/N7; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="tvaE9a+B";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="etiAnCtp";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="uexkloDZ";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="MwGOdLBY"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id E487E21199;
-	Tue,  1 Jul 2025 11:00:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1751367608; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7lnziZN4HaVPwYCs99ZQBQ0q1fMeCxubi23tdvggBPE=;
-	b=tvaE9a+BuaP2nlRHCbqlaNw2/loKBF8M9VvFHCZrLPf0pMNFUrqFRuTH4jPUjb5NUcUfBC
-	d2+wu0kVm0bfuAuLBu5UdVPU+1HjjuM3eZMl5IwstekpSrgnjSp1UVuJ4NAjXbe4ZAgHtF
-	vhWA/VCAG7wsfKqjzpqranJ/Trx5QDQ=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1751367608;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7lnziZN4HaVPwYCs99ZQBQ0q1fMeCxubi23tdvggBPE=;
-	b=etiAnCtpTNceoHFU2wxyTgogh35L9w60iZ41uVCfUyj3yGRMgQI5Ag47NFsHCLcf+bbPXq
-	32tdEftS5GO2hHAw==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=uexkloDZ;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=MwGOdLBY
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1751367607; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7lnziZN4HaVPwYCs99ZQBQ0q1fMeCxubi23tdvggBPE=;
-	b=uexkloDZ2KcqNcMo2fTSwTc2f5rPwvcve90EpSyJx/r3FYYDJIFYPREeBBIW37SK2Zv7d4
-	fxBJCFm9r9DoiJ4gd6jtPI96G3jTLfbkCqmciqJ9nrfu1A9m4ikJPSJHXOnE9CedJTg2+1
-	IY1QCVhgi9ADMR+6jwxxjIW2V4n95LE=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1751367607;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7lnziZN4HaVPwYCs99ZQBQ0q1fMeCxubi23tdvggBPE=;
-	b=MwGOdLBY2JPVshZ1z7ohRJS1hOS4JWXCY0XY061/JOsBiQ6RDTBMptT4k7khNVE0wiFOzd
-	AlysRUgLA2Wcb9Dg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id A505813890;
-	Tue,  1 Jul 2025 11:00:07 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id jiGxJre/Y2gWSwAAD6G6ig
-	(envelope-from <hare@suse.de>); Tue, 01 Jul 2025 11:00:07 +0000
-Message-ID: <b05b2c0e-a5f1-403c-978a-2fb39837d052@suse.de>
-Date: Tue, 1 Jul 2025 13:00:03 +0200
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="on5fa/N7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25244C4CEEB;
+	Tue,  1 Jul 2025 11:34:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751369693;
+	bh=ivvvymmSfinokPA9qi1LGV8jWib2h8DV4cJuLS0xY2E=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=on5fa/N7993Xiu8R8CmxLBfvJ25rLsGHcos0mtPx5h7O+Uf8PnRwRziavn1ZNk3qD
+	 dTlslotJxMgwQgJdXVemlWpk547OoKF09nmdwOK8mjg9Dw3s1arKSEV7tTpFEdh6CL
+	 NPKTxPzuKGG96E1Io5mCVhQJcuVdbIQr7g2WAtZWHqBLqFkVGUgpLGBnnyKZqHp0Vb
+	 SyfLuqjRiNIcavAZo9eM7r4tSbw+tiGx6AdcIMvQ+ypA9/f+T8O/0PhvLXdKbUnh9n
+	 wRC++Hv0QndQB4NIsjh8/mPRVtWo7RD9dV/TsgFK2FYIkOWjAQtc3iDsqfTq8TepTW
+	 55NYlUn9KniJQ==
+Date: Tue, 1 Jul 2025 13:34:47 +0200
+From: Christian Brauner <brauner@kernel.org>
+To: Joanne Koong <joannelkoong@gmail.com>
+Cc: kernel test robot <lkp@intel.com>, linux-fsdevel@vger.kernel.org, 
+	oe-kbuild-all@lists.linux.dev, hch@lst.de, miklos@szeredi.hu, djwong@kernel.org, 
+	anuj20.g@samsung.com, linux-xfs@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-block@vger.kernel.org, gfs2@lists.linux.dev, kernel-team@meta.com
+Subject: Re: [PATCH v3 13/16] fuse: use iomap for writeback
+Message-ID: <20250701-duktus-weitverbreitet-fb6b177ba0d8@brauner>
+References: <20250624022135.832899-14-joannelkoong@gmail.com>
+ <202506252117.9V3HTO0i-lkp@intel.com>
+ <CAJnrk1Z5NZ0_f=OMMam9hf0xJwM=SsmgFpyfbnKE7MT_i_kZMQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv7 3/3] block: fix potential deadlock while running
- nr_hw_queue update
-To: Nilay Shroff <nilay@linux.ibm.com>, linux-block@vger.kernel.org
-Cc: hch@lst.de, ming.lei@redhat.com, axboe@kernel.dk, sth@linux.ibm.com,
- gjoyce@ibm.com
-References: <20250701081954.57381-1-nilay@linux.ibm.com>
- <20250701081954.57381-4-nilay@linux.ibm.com>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20250701081954.57381-4-nilay@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-4.51 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	RCVD_TLS_ALL(0.00)[];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	MID_RHS_MATCH_FROM(0.00)[];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	RCVD_COUNT_TWO(0.00)[2];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lst.de:email,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.de:dkim,suse.de:mid,suse.de:email];
-	DNSWL_BLOCKED(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	DKIM_TRACE(0.00)[suse.de:+]
-X-Spam-Level: 
-X-Spam-Flag: NO
-X-Rspamd-Queue-Id: E487E21199
-X-Rspamd-Action: no action
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Spam-Score: -4.51
+In-Reply-To: <CAJnrk1Z5NZ0_f=OMMam9hf0xJwM=SsmgFpyfbnKE7MT_i_kZMQ@mail.gmail.com>
 
-On 7/1/25 10:19, Nilay Shroff wrote:
-> Move scheduler tags (sched_tags) allocation and deallocation outside
-> both the ->elevator_lock and ->freeze_lock when updating nr_hw_queues.
-> This change breaks the dependency chain from the percpu allocator lock
-> to the elevator lock, helping to prevent potential deadlocks, as
-> observed in the reported lockdep splat[1].
+On Wed, Jun 25, 2025 at 09:48:15AM -0700, Joanne Koong wrote:
+> On Wed, Jun 25, 2025 at 7:18 AM kernel test robot <lkp@intel.com> wrote:
+> >
+> > Hi Joanne,
+> >
+> > kernel test robot noticed the following build errors:
+> >
+> > [auto build test ERROR on brauner-vfs/vfs.all]
+> > [also build test ERROR on xfs-linux/for-next linus/master v6.16-rc3 next-20250625]
+> > [cannot apply to gfs2/for-next mszeredi-fuse/for-next]
+> > [If your patch is applied to the wrong git tree, kindly drop us a note.
+> > And when submitting patch, we suggest to use '--base' as documented in
+> > https://git-scm.com/docs/git-format-patch#_base_tree_information]
+> >
+> > url:    https://github.com/intel-lab-lkp/linux/commits/Joanne-Koong/iomap-pass-more-arguments-using-struct-iomap_writepage_ctx/20250624-102709
+> > base:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git vfs.all
+> > patch link:    https://lore.kernel.org/r/20250624022135.832899-14-joannelkoong%40gmail.com
+> > patch subject: [PATCH v3 13/16] fuse: use iomap for writeback
+> > config: arm64-randconfig-003-20250625 (https://download.01.org/0day-ci/archive/20250625/202506252117.9V3HTO0i-lkp@intel.com/config)
+> > compiler: aarch64-linux-gcc (GCC) 12.3.0
+> > reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250625/202506252117.9V3HTO0i-lkp@intel.com/reproduce)
+> >
+> > If you fix the issue in a separate patch/commit (i.e. not just a new version of
+> > the same patch/commit), kindly add following tags
+> > | Reported-by: kernel test robot <lkp@intel.com>
+> > | Closes: https://lore.kernel.org/oe-kbuild-all/202506252117.9V3HTO0i-lkp@intel.com/
+> >
+> > All errors (new ones prefixed by >>):
+> >
+> >    aarch64-linux-ld: fs/fuse/file.o: in function `fuse_writepages':
+> > >> file.c:(.text+0xa30): undefined reference to `iomap_writepages'
+> > >> file.c:(.text+0xa30): relocation truncated to fit: R_AARCH64_CALL26 against undefined symbol `iomap_writepages'
+> >    aarch64-linux-ld: fs/fuse/file.o: in function `fuse_writepage_finish':
+> > >> file.c:(.text+0x1fd8): undefined reference to `iomap_finish_folio_write'
+> > >> file.c:(.text+0x1fd8): relocation truncated to fit: R_AARCH64_CALL26 against undefined symbol `iomap_finish_folio_write'
+> >    aarch64-linux-ld: fs/fuse/file.o: in function `fuse_cache_write_iter':
+> >    file.c:(.text+0x888c): undefined reference to `iomap_file_buffered_write'
+> >    file.c:(.text+0x888c): relocation truncated to fit: R_AARCH64_CALL26 against undefined symbol `iomap_file_buffered_write'
+> >    aarch64-linux-ld: fs/fuse/file.o: in function `fuse_iomap_writeback_range':
+> > >> file.c:(.text+0x9258): undefined reference to `iomap_start_folio_write'
+> > >> file.c:(.text+0x9258): relocation truncated to fit: R_AARCH64_CALL26 against undefined symbol `iomap_start_folio_write'
+> > >> aarch64-linux-ld: fs/fuse/file.o:(.rodata+0x370): undefined reference to `iomap_dirty_folio'
+> >    aarch64-linux-ld: fs/fuse/file.o:(.rodata+0x3a0): undefined reference to `iomap_release_folio'
+> >
+> > --
+> > 0-DAY CI Kernel Test Service
+> > https://github.com/intel/lkp-tests/wiki
 > 
-> This commit introduces batch allocation and deallocation helpers for
-> sched_tags, which are now used from within __blk_mq_update_nr_hw_queues
-> routine while iterating through the tagset.
+> As noted in the cover letter [1]
 > 
-> With this change, all sched_tags memory management is handled entirely
-> outside the ->elevator_lock and the ->freeze_lock context, thereby
-> eliminating the lock dependency that could otherwise manifest during
-> nr_hw_queues updates.
+>    Please note the following:
+>    * this patchset version temporarily drops the CONFIG_BLOCK iomap refactoring
+>      patches that will be needed to merge in the series. As of now, this breaks
+>      compilation for environments where CONFIG_BLOCK is not set, but the
+>      CONFIG_BLOCK iomap changes will be re-added back in once the core changes
+>      in this patchset are ready to go.
 > 
-> [1] https://lore.kernel.org/all/0659ea8d-a463-47c8-9180-43c719e106eb@linux.ibm.com/
 > 
-> Reported-by: Stefan Haberland <sth@linux.ibm.com>
-> Closes: https://lore.kernel.org/all/0659ea8d-a463-47c8-9180-43c719e106eb@linux.ibm.com/
-> Reviewed-by: Ming Lei <ming.lei@redhat.com>
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
-> ---
->   block/blk-mq-sched.c | 65 ++++++++++++++++++++++++++++++++++++++++++++
->   block/blk-mq-sched.h |  4 +++
->   block/blk-mq.c       | 16 +++++++++--
->   block/blk.h          |  3 +-
->   block/elevator.c     |  6 ++--
->   5 files changed, 88 insertions(+), 6 deletions(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+> These errors will be fixed in later versions when the CONFIG_BLOCK
+> patches get added in.
 
-Cheers,
-
-Hannes
--- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+Ok, sounds good. Main thing is I can merge it all in one go.
