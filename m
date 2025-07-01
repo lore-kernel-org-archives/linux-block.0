@@ -1,103 +1,323 @@
-Received: from mail-io1-f47.google.com (mail-io1-f47.google.com [209.85.166.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58F0E269AFB
-	for <linux-block@vger.kernel.org>; Tue,  1 Jul 2025 13:55:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0700027A127;
+	Tue,  1 Jul 2025 13:56:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751378117; cv=none; b=nfBXwKvE+Jo5vaV+GaqQN+FzJlBtGQphcsZeYtNP2KV1tMxe3WoT7WEtNxRPiExhQiyPrCiVxHbb98iDumlv58th6mMXGiKn2kSVnTB4alcPTBjiotmL1WW+nrJ1EWIExxZ0TAYtolGxeBr/PVgojjsb33Dfd6RkSbsHg2JjOiY=
+	t=1751378218; cv=none; b=EpzVgiqfe1/zcIOuIgRnxlK7dgExPeAq4uWQmyyV3xrVytB/3M4dbSNjKYrElrHz7bZZtrOph3FLAcyhuaPicLoBzZ2eSDZcXu4PkR7Q4i3lCn4xXa0pBqeGsebA8kbUm846IzDqkLk/2y95MWryVCsdEgT7rlYk4s7ghuD2OTk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751378117; c=relaxed/simple;
-	bh=6F3b4MZoG7mZ54cDsjb+4J1391oqB0RJ7h/kq5eAK6g=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=tOxjGMkFfVOw2C50/xZJc5H/xhD7hAwckUwQYPZVpczZ5umeXoJOk56ANj9tlq5+3HFuVQlHfKN4gSPXZCjc1NL5DzTU0o5LHVvjel48d8qzTpKLTNo9NwBRNkRagscagfzcpEWVPrrsUA/jhPwPLxNSCvEblHwU0741CXsO49c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=KRNUAWJJ; arc=none smtp.client-ip=209.85.166.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="KRNUAWJJ"
-Received: by mail-io1-f47.google.com with SMTP id ca18e2360f4ac-875dd57d63bso237037439f.0
-        for <linux-block@vger.kernel.org>; Tue, 01 Jul 2025 06:55:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1751378113; x=1751982913; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fV7FRyn/qDKhPYxjQjJlV2OtqwnrY631kCHwF3JNpwQ=;
-        b=KRNUAWJJufecQ+jfrcNTYc8LazX1wAmM0eURR6Mxohkn8YqZsGrzUgJgcxLkEq04SO
-         1P/92MMK/VzBXd/xlPTuCaCcXkpFNB+Y4ajRQCVCoxc7O4ZNVHE0xcTJP3383KZtNJuv
-         8Nq7Ald5IQ35Qh3IseZfNeUt/pE9JPGE3QhyuqG/dnreQ3UQ9LTerAnnVPyI/F5+VPIV
-         wzT3QGbsSnEt8oZqDdvlNEokux7VWzRXrUu30BnvKjQct01RkbO8dEYkgKwy6MC/5jHV
-         uZdQ5Km4w1e1T28Y/r8+gMpbYaOcCB9Hsb2U4Bkxr+LbK4oiTDIalXrREifDEPfSa9Wj
-         xPzQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751378113; x=1751982913;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fV7FRyn/qDKhPYxjQjJlV2OtqwnrY631kCHwF3JNpwQ=;
-        b=L03h7TQupJYVilLhQkzA+85A5MldgoKElbiHvhJATKl13N+VPLGYC09fJO/bPflDWw
-         3imHbaJBOaqnqko4OA8OF3vkcQNG5gEtA0Cnc8IUYyBQBcS/CAt4lMFfcJaZd5FNjPM3
-         TpY8+HOLZsC/gUOYuiCP2fApjdrgiTyCFrZ3LGkPNn3zvMHvjYbvrIt03sgGKLldELEa
-         7LBpz7EikDrjZevPsoi8ud0JSR5Zdl8AP1RQv1dS74lKany+zKGhrDdn/k+FQ9ratAcX
-         gReQlXe3wLtR+E/We9fa61B+YQFTOGW4YWdXlc5zhoUZDSnXQMcE+P4YQR+cSD1AvzKf
-         7ctA==
-X-Gm-Message-State: AOJu0Yym6eOzzeQZsENj0WT8ze9/R9V4nSMydhheDwe2mLcMaHlyVV5e
-	mctpubZErfPUAPOk0m8avfDyYq0Tbour9zuwwznqJ1TrPTY6KnHIMJi+hExbsrH6tnSJDgktpiB
-	TprYG
-X-Gm-Gg: ASbGncuE4reQNflxnHb5LBW/2vu+/KtIJ8Zz+upJQR2N48AGvwy5FnxsiQ0gUG5+ePw
-	guJoamUmZWkQa+5bcVCyIn9vd1UWokWnOtA7amkCscgqchXLcvwXcK3zhwYtBT0xlZ9xjv2nXHi
-	yh+AK67kNfxsYTiwqv0hFdV7Vx+Su8TvSV9waSF9wHffrmCv/4SAo658CUqPQxa+5mX5cTYiaJh
-	P+08y1OLsdGqXP+23VVKP4hpalFapXH12ZxV49kx8w1ZG5aQgOGe+hG5h1sJsJhRaWrHDtL7OpZ
-	7UDPABzfV0htEpnfHiVAnzxFwLR+prUxTLVfvWRN4REfFHSbsY+1GA==
-X-Google-Smtp-Source: AGHT+IE6cpin2Ae+2K+3M2sqGu6WAjtlrFz5JoixHbBqKe9psLgVjm3KcJs4qPogHMhWRJC5Ww4Gpw==
-X-Received: by 2002:a5d:8608:0:b0:867:16f4:5254 with SMTP id ca18e2360f4ac-876b90eb847mr363403039f.6.1751378113268;
-        Tue, 01 Jul 2025 06:55:13 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-87687b3ee95sm229373239f.47.2025.07.01.06.55.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Jul 2025 06:55:12 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
-Cc: Uday Shankar <ushankar@purestorage.com>, 
- Caleb Sander Mateos <csander@purestorage.com>, 
- Changhui Zhong <czhong@redhat.com>
-In-Reply-To: <20250701072325.1458109-1-ming.lei@redhat.com>
-References: <20250701072325.1458109-1-ming.lei@redhat.com>
-Subject: Re: [PATCH] ublk: don't queue request if the associated uring_cmd
- is canceled
-Message-Id: <175137811230.315700.17821411323538524577.b4-ty@kernel.dk>
-Date: Tue, 01 Jul 2025 07:55:12 -0600
+	s=arc-20240116; t=1751378218; c=relaxed/simple;
+	bh=Z1BzRknngBIxH7d9GNoJJiTwd8p6a5uKI4XIyALfOTc=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=k4leOOVDDrMeSRH3tbOHQMcJ/ObkMl9c4xnp1YWo49RZtbbD5ulfQimVlpbCHX+o05h8H7lgokHqX0vu5ygUwIkByPHtEexKvJ4hzU3JWu7mNSuEATlkg2b8MYTC/6sAMKsmT6ZG7aqXU1RF63nIND3x0oAWjO7anFVkSK4bxZI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.31])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4bWl1B487yz6M4jF;
+	Tue,  1 Jul 2025 21:55:58 +0800 (CST)
+Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
+	by mail.maildlp.com (Postfix) with ESMTPS id BBC9C1402F4;
+	Tue,  1 Jul 2025 21:56:52 +0800 (CST)
+Received: from localhost (10.203.177.66) by frapeml500008.china.huawei.com
+ (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Tue, 1 Jul
+ 2025 15:56:52 +0200
+Date: Tue, 1 Jul 2025 14:56:50 +0100
+From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+To: Dongsheng Yang <dongsheng.yang@linux.dev>
+CC: <mpatocka@redhat.com>, <agk@redhat.com>, <snitzer@kernel.org>,
+	<axboe@kernel.dk>, <hch@lst.de>, <dan.j.williams@intel.com>,
+	<linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-cxl@vger.kernel.org>, <nvdimm@lists.linux.dev>,
+	<dm-devel@lists.linux.dev>
+Subject: Re: [PATCH v1 02/11] dm-pcache: add backing device management
+Message-ID: <20250701145650.00004e72@huawei.com>
+In-Reply-To: <20250624073359.2041340-3-dongsheng.yang@linux.dev>
+References: <20250624073359.2041340-1-dongsheng.yang@linux.dev>
+	<20250624073359.2041340-3-dongsheng.yang@linux.dev>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-d7477
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-ClientProxiedBy: lhrpeml500004.china.huawei.com (7.191.163.9) To
+ frapeml500008.china.huawei.com (7.182.85.71)
+
+On Tue, 24 Jun 2025 07:33:49 +0000
+Dongsheng Yang <dongsheng.yang@linux.dev> wrote:
+
+> This patch introduces *backing_dev.{c,h}*, a self-contained layer that
+> handles all interaction with the *backing block device* where cache
+> write-back and cache-miss reads are serviced.  Isolating this logic
+> keeps the core dm-pcache code free of low-level bio plumbing.
+>=20
+> * Device setup / teardown
+>   - Opens the target with `dm_get_device()`, stores `bdev`, file and
+>     size, and initialises a dedicated `bioset`.
+>   - Gracefully releases resources via `backing_dev_stop()`.
+>=20
+> * Request object (`struct pcache_backing_dev_req`)
+>   - Two request flavours:
+>     - REQ-type =E2=80=93 cloned from an upper `struct bio` issued to
+>       dm-pcache; trimmed and re-targeted to the backing LBA.
+>     - KMEM-type =E2=80=93 maps an arbitrary kernel memory buffer
+>       into a freshly built.
+>   - Private completion callback (`end_req`) propagates status to the
+>     upper layer and handles resource recycling.
+>=20
+> * Submission & completion path
+>   - Lock-protected submit queue + worker (`req_submit_work`) let pcache
+>     push many requests asynchronously, at the same time, allow caller
+>     to submit backing_dev_req in atomic context.
+>   - End-io handler moves finished requests to a completion list processed
+>     by `req_complete_work`, ensuring callbacks run in process context.
+>   - Direct-submit option for non-atomic context.
+>=20
+> * Flush
+>   - `backing_dev_flush()` issues a flush to persist backing-device data.
+>=20
+> Signed-off-by: Dongsheng Yang <dongsheng.yang@linux.dev>
+> ---
+>  drivers/md/dm-pcache/backing_dev.c | 292 +++++++++++++++++++++++++++++
+>  drivers/md/dm-pcache/backing_dev.h |  88 +++++++++
+>  2 files changed, 380 insertions(+)
+>  create mode 100644 drivers/md/dm-pcache/backing_dev.c
+>  create mode 100644 drivers/md/dm-pcache/backing_dev.h
+>=20
+> diff --git a/drivers/md/dm-pcache/backing_dev.c b/drivers/md/dm-pcache/ba=
+cking_dev.c
+> new file mode 100644
+> index 000000000000..590c6415319d
+> --- /dev/null
+> +++ b/drivers/md/dm-pcache/backing_dev.c
+> @@ -0,0 +1,292 @@
+> +// SPDX-License-Identifier: GPL-2.0-or-later
+> +#include <linux/blkdev.h>
+> +
+> +#include "../dm-core.h"
+> +#include "pcache_internal.h"
+> +#include "cache_dev.h"
+> +#include "backing_dev.h"
+> +#include "cache.h"
+> +#include "dm_pcache.h"
+> +
+> +static void backing_dev_exit(struct pcache_backing_dev *backing_dev)
+> +{
+> +	kmem_cache_destroy(backing_dev->backing_req_cache);
+> +}
+> +
+> +static void req_submit_fn(struct work_struct *work);
+> +static void req_complete_fn(struct work_struct *work);
+> +static int backing_dev_init(struct dm_pcache *pcache)
+> +{
+> +	struct pcache_backing_dev *backing_dev =3D &pcache->backing_dev;
+> +	int ret;
+> +
+> +	backing_dev->backing_req_cache =3D KMEM_CACHE(pcache_backing_dev_req, 0=
+);
+> +	if (!backing_dev->backing_req_cache) {
+> +		ret =3D -ENOMEM;
+
+return -ENOMEM;=20
+
+and drop the err label.
+
+> +		goto err;
+> +	}
+> +
+> +	INIT_LIST_HEAD(&backing_dev->submit_list);
+> +	INIT_LIST_HEAD(&backing_dev->complete_list);
+> +	spin_lock_init(&backing_dev->submit_lock);
+> +	spin_lock_init(&backing_dev->complete_lock);
+> +	INIT_WORK(&backing_dev->req_submit_work, req_submit_fn);
+> +	INIT_WORK(&backing_dev->req_complete_work, req_complete_fn);
+> +
+> +	return 0;
+> +err:
+> +	return ret;
+> +}
+
+> +static void req_complete_fn(struct work_struct *work)
+> +{
+> +	struct pcache_backing_dev *backing_dev =3D container_of(work, struct pc=
+ache_backing_dev, req_complete_work);
+
+Very long line.  Wrap it somewhere.
+
+> +	struct pcache_backing_dev_req *backing_req;
+> +	LIST_HEAD(tmp_list);
+> +
+> +	spin_lock_irq(&backing_dev->complete_lock);
+> +	list_splice_init(&backing_dev->complete_list, &tmp_list);
+> +	spin_unlock_irq(&backing_dev->complete_lock);
+> +
+> +	while (!list_empty(&tmp_list)) {
+> +		backing_req =3D list_first_entry(&tmp_list,
+> +					    struct pcache_backing_dev_req, node);
+> +		list_del_init(&backing_req->node);
+> +		backing_dev_req_end(backing_req);
+> +	}
+> +}
+> +
+> +static void backing_dev_bio_end(struct bio *bio)
+> +{
+> +	struct pcache_backing_dev_req *backing_req =3D bio->bi_private;
+> +	struct pcache_backing_dev *backing_dev =3D backing_req->backing_dev;
+> +	unsigned long flags;
+> +
+> +	backing_req->ret =3D bio->bi_status;
+> +
+> +	spin_lock_irqsave(&backing_dev->complete_lock, flags);
+> +	list_move_tail(&backing_req->node, &backing_dev->complete_list);
+> +	queue_work(BACKING_DEV_TO_PCACHE(backing_dev)->task_wq, &backing_dev->r=
+eq_complete_work);
+> +	spin_unlock_irqrestore(&backing_dev->complete_lock, flags);
+> +}
+> +
+> +static void req_submit_fn(struct work_struct *work)
+> +{
+> +	struct pcache_backing_dev *backing_dev =3D container_of(work, struct pc=
+ache_backing_dev, req_submit_work);
+
+Very long line.  Wrap after =3D
 
 
-On Tue, 01 Jul 2025 15:23:25 +0800, Ming Lei wrote:
-> Commit 524346e9d79f ("ublk: build batch from IOs in same io_ring_ctx and io task")
-> need to dereference `io->cmd` for checking if the IO can be added to current
-> batch, see ublk_belong_to_same_batch() and io_uring_cmd_ctx_handle(). However,
-> `io->cmd` may become invalid after the uring_cmd is canceled.
-> 
-> Fixes it by only allowing to queue this IO in case that ublk_prep_req()
-> returns `BLK_STS_OK`, when 'io->cmd' is guaranteed to be valid.
-> 
-> [...]
+> +	struct pcache_backing_dev_req *backing_req;
+> +	LIST_HEAD(tmp_list);
+> +
+> +	spin_lock(&backing_dev->submit_lock);
+> +	list_splice_init(&backing_dev->submit_list, &tmp_list);
+> +	spin_unlock(&backing_dev->submit_lock);
+> +
+> +	while (!list_empty(&tmp_list)) {
+> +		backing_req =3D list_first_entry(&tmp_list,
+> +					    struct pcache_backing_dev_req, node);
+> +		list_del_init(&backing_req->node);
+> +		submit_bio_noacct(&backing_req->bio);
+> +	}
+> +}
 
-Applied, thanks!
+> +
+> +static void bio_map(struct bio *bio, void *base, size_t size)
+> +{
+> +	struct page *page;
+> +	unsigned int offset;
+> +	unsigned int len;
+> +
+> +	if (!is_vmalloc_addr(base)) {
+> +		page =3D virt_to_page(base);
+> +		offset =3D offset_in_page(base);
+> +
+> +		BUG_ON(!bio_add_page(bio, page, size, offset));
 
-[1/1] ublk: don't queue request if the associated uring_cmd is canceled
-      commit: 01ed88aea527e19def9070349399684522c66c72
+		BUG_ON(!bio_add_page(bio, virt_to_page(base), size
+				     offset_in_page(base));
 
-Best regards,
--- 
-Jens Axboe
+Seems readable enough. Obviously that depends on whether those
+local variables get more useage in later patches.
 
+> +		return;
+> +	}
+> +
+> +	flush_kernel_vmap_range(base, size);
+> +	while (size) {
+> +		page =3D vmalloc_to_page(base);
+> +		offset =3D offset_in_page(base);
+> +		len =3D min_t(size_t, PAGE_SIZE - offset, size);
+> +
+> +		BUG_ON(!bio_add_page(bio, page, len, offset));
+> +		size -=3D len;
+> +		base +=3D len;
+> +	}
+> +}
+
+> +
+> +static struct pcache_backing_dev_req *kmem_type_req_create(struct pcache=
+_backing_dev *backing_dev,
+> +						struct pcache_backing_dev_req_opts *opts)
+> +{
+> +	struct pcache_backing_dev_req *backing_req;
+> +	struct bio *backing_bio;
+> +	u32 n_vecs =3D get_n_vecs(opts->kmem.data, opts->kmem.len);
+> +
+> +	backing_req =3D kmem_cache_zalloc(backing_dev->backing_req_cache, opts-=
+>gfp_mask);
+> +	if (!backing_req)
+> +		return NULL;
+> +
+> +	if (n_vecs > BACKING_DEV_REQ_INLINE_BVECS) {
+> +		backing_req->kmem.bvecs =3D kmalloc_array(n_vecs, sizeof(struct bio_ve=
+c), opts->gfp_mask);
+> +		if (!backing_req->kmem.bvecs)
+> +			goto err_free_req;
+> +	} else {
+> +		backing_req->kmem.bvecs =3D backing_req->kmem.inline_bvecs;
+> +	}
+> +
+> +	backing_req->type =3D BACKING_DEV_REQ_TYPE_KMEM;
+> +
+> +	bio_init(&backing_req->bio, backing_dev->dm_dev->bdev, backing_req->kme=
+m.bvecs,
+> +			n_vecs, opts->kmem.opf);
+
+Odd alignment.  Align second line under &
+
+> +
+> +	backing_bio =3D &backing_req->bio;
+> +	bio_map(backing_bio, opts->kmem.data, opts->kmem.len);
+> +
+> +	backing_bio->bi_iter.bi_sector =3D (opts->kmem.backing_off) >> SECTOR_S=
+HIFT;
+> +	backing_bio->bi_private =3D backing_req;
+> +	backing_bio->bi_end_io =3D backing_dev_bio_end;
+> +
+> +	backing_req->backing_dev =3D backing_dev;
+> +	INIT_LIST_HEAD(&backing_req->node);
+> +	backing_req->end_req	=3D opts->end_fn;
+> +	backing_req->priv_data	=3D opts->priv_data;
+
+Bit of a mixture of formatting between aligned =3D and not.  Pick one style.
+I prefer never forcing alignment but others do like it.  I'm fine with that
+too, just not a mix.
+
+
+> +
+> +	return backing_req;
+> +
+> +err_free_req:
+> +	kmem_cache_free(backing_dev->backing_req_cache, backing_req);
+> +	return NULL;
+> +}
+> +
+> +struct pcache_backing_dev_req *backing_dev_req_create(struct pcache_back=
+ing_dev *backing_dev,
+> +						struct pcache_backing_dev_req_opts *opts)
+> +{
+> +	if (opts->type =3D=3D BACKING_DEV_REQ_TYPE_REQ)
+> +		return req_type_req_create(backing_dev, opts);
+> +	else if (opts->type =3D=3D BACKING_DEV_REQ_TYPE_KMEM)
+
+returned in earlier branch so go with simpler
+
+	if (opts->type..)
+
+Or use a switch statement if you expect to get more entries in this over ti=
+me.
+
+> +		return kmem_type_req_create(backing_dev, opts);
+> +
+> +	return NULL;
+> +}
+> +
+> +void backing_dev_flush(struct pcache_backing_dev *backing_dev)
+> +{
+> +	blkdev_issue_flush(backing_dev->dm_dev->bdev);
+> +}
 
 
