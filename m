@@ -1,95 +1,130 @@
-Received: from 004.mia.mailroute.net (004.mia.mailroute.net [199.89.3.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AC9E3196A5;
-	Wed,  2 Jul 2025 15:57:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C52B3196AD;
+	Wed,  2 Jul 2025 15:59:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751471878; cv=none; b=VNDBBGyPNGEZxZVeeFZBI1GMszTytzy3xnYWodcdJ9MJCWsfRkRHYZbJ5kYwZPyGyhitJY0bPbov0psS1BILRaAK0cxjOWJAuELbJf/PI4T+r8BHk6OgLkBvKZHTp261yRPgtiYZCf06KahVJ+ZMg/x3oXZnWNBTtg8/oLW2is8=
+	t=1751471970; cv=none; b=PnrFWOhJxtf7Mdo6ciXl93THkT+useSMOw70q1NkDfvA+kLp4CMVcJiMx1e/WryD1I4+9GvRtIndfdjSVwgSnhw2n0pX1kAld4d3aPPBDu8meLEayP7ERjOhKi7KHTaQgXqycGDUeYBr5TTDbLv8BbrFThtXE/BL27xpx4Q1was=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751471878; c=relaxed/simple;
-	bh=gwye1teiaps5as9heCm9q+Sa7m2k7Xz9P8EnQdc1TTM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iGbuzZ3l1NrF0cekZv7PQOr0ffMUIxqimNSDd7NLfH6QIEeitSOGUXoo5xVxgSQinmD7eSn/vQ+X/SkZBT3/GXzrrzhf+9pRRYspCEjxa93psIWzorxQM+zFBQUGgAHKNv6H7yqP2as2JCq8B9JxtzXYa7tZAaLMWIvCDlmVTpE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=ZB3nXkxz; arc=none smtp.client-ip=199.89.3.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1751471970; c=relaxed/simple;
+	bh=4I/F+PLDspmS8iOW/s/m6osb0Un9n8GXw4cf8sc32Mw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lbqOaEiaIWrWkrwtwmRDOrM2Eog4JqfKuj2IhZ3Y9suw65bntQgU6eLFL5q/NN8uvqL1JXXsoC4EjYOdVYNPJQMVIP3LTRXexAo09yo7KHTD8jnRL+YPCTld6md0cRO6ez9JlBjxPbxegQMdDyqu4LdDDjp5vmK7Pa7I+yOuPMM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GqlbQRnw; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="ZB3nXkxz"
-Received: from localhost (localhost [127.0.0.1])
-	by 004.mia.mailroute.net (Postfix) with ESMTP id 4bXPgS0Vngzm0bfy;
-	Wed,  2 Jul 2025 15:57:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1751471874; x=1754063875; bh=UV4hVlihWLKsw5JkHc7nVsGt
-	SEDaoosSukurztYHhLM=; b=ZB3nXkxz8jUckSLVm69C+t/XQdVqK/27qQ3JN4HU
-	0bHNq3Cgp+agA8SaMVRPaU73HPHCsbIk9OZ67y70A84V/K8ddWxtm4AMMDZfXHPX
-	MLD598mRrSPPXJ7cMyzmNMCBB+s9KP2qaqXs3hhVSYmnagGpSce/1icdi7lzrJUO
-	zksejbxP96eTblklCnXVYmHtHP88RhoYhHnWBK7hSGi/1EM5/zZjQs26LQtBfFDV
-	CI+wzqwCSrtTXBiJn4eESOAfGvXlL5S4X+e6YkD+8+t3Ht8llOGiX5zFlulMmWa8
-	vKwUidPUePP81XyDCiYcyIH2Cc2cHDzm/jkSVkJNtTQ7jQ==
-X-Virus-Scanned: by MailRoute
-Received: from 004.mia.mailroute.net ([127.0.0.1])
- by localhost (004.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id 8la--Wg9Dwew; Wed,  2 Jul 2025 15:57:54 +0000 (UTC)
-Received: from [100.66.154.22] (unknown [104.135.204.82])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 004.mia.mailroute.net (Postfix) with ESMTPSA id 4bXPgG6Ypczm0XC0;
-	Wed,  2 Jul 2025 15:57:45 +0000 (UTC)
-Message-ID: <a7b5b394-ed7d-4f57-96ba-ff14375b2e7b@acm.org>
-Date: Wed, 2 Jul 2025 08:57:44 -0700
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GqlbQRnw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 468CEC4CEE7;
+	Wed,  2 Jul 2025 15:59:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751471970;
+	bh=4I/F+PLDspmS8iOW/s/m6osb0Un9n8GXw4cf8sc32Mw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=GqlbQRnw01AXL+uf4DFd3xpF89F7pe4/78JpH3loY+fOQ7qnWAUZlgodu/b5PsAXu
+	 YcwqodFiXy7l9KrZPH9O28pY0lPK3sBxC+enZNItvTVXUz2v4Ijt0b727mggQYhJaN
+	 oie8Sg0XfR7hR5ZyXcgnGihYPMwUYbQqtL2lwSlgid6LV885CUSTG+LfeFArUYRFGE
+	 RHMqWqVACkhhOVhXmo7AxThvCYOsel1CdaNIDQVmr7+kmUGT5OVltUb2gVm0tnVjHA
+	 NZaBwgt4t4cPBvtBFyWl/CMWuEHOO7RO9V46QWATl10Qtv9rZ1/7ZzogMDwiRikCwm
+	 asoJPq8/7/row==
+Date: Wed, 2 Jul 2025 08:59:29 -0700
+From: "Darrick J. Wong" <djwong@kernel.org>
+To: Joanne Koong <joannelkoong@gmail.com>
+Cc: linux-fsdevel@vger.kernel.org, hch@lst.de, miklos@szeredi.hu,
+	brauner@kernel.org, anuj20.g@samsung.com, linux-xfs@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-block@vger.kernel.org,
+	gfs2@lists.linux.dev, kernel-team@meta.com
+Subject: Re: [PATCH v3 02/16] iomap: cleanup the pending writeback tracking
+ in iomap_writepage_map_blocks
+Message-ID: <20250702155929.GV10009@frogsfrogsfrogs>
+References: <20250624022135.832899-1-joannelkoong@gmail.com>
+ <20250624022135.832899-3-joannelkoong@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v19 01/11] block: Support block drivers that preserve the
- order of write requests
-To: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
- Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
- Nitesh Shetty <nj.shetty@samsung.com>, Ming Lei <ming.lei@redhat.com>
-References: <20250630223003.2642594-1-bvanassche@acm.org>
- <20250630223003.2642594-2-bvanassche@acm.org>
- <0f9f5900-b7d0-4df2-8c05-fc147c991534@kernel.org>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <0f9f5900-b7d0-4df2-8c05-fc147c991534@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250624022135.832899-3-joannelkoong@gmail.com>
 
-On 7/2/25 3:57 AM, Damien Le Moal wrote:
-> On 7/1/25 07:29, Bart Van Assche wrote:
->> diff --git a/block/blk-settings.c b/block/blk-settings.c
->> index a000daafbfb4..bceb9a9cb5ba 100644
->> --- a/block/blk-settings.c
->> +++ b/block/blk-settings.c
->> @@ -814,6 +814,8 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
->>   	}
->>   	t->max_secure_erase_sectors = min_not_zero(t->max_secure_erase_sectors,
->>   						   b->max_secure_erase_sectors);
->> +	t->driver_preserves_write_order = t->driver_preserves_write_order &&
->> +		b->driver_preserves_write_order;
+On Mon, Jun 23, 2025 at 07:21:21PM -0700, Joanne Koong wrote:
+> We don't care about the count of outstanding ioends, just if there is one.
+> Replace the count variable passed to iomap_writepage_map_blocks with a
+> boolean to make that more clear.
 > 
-> Why not use a feature instead ? Stacking of the features does exactly this, no ?
-> That would be less code and one less limit.
+> Signed-off-by: Joanne Koong <joannelkoong@gmail.com>
+> [hch: rename the variable, update the commit message]
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-Hi Damien,
+/methinks this also fixes a theoretical logic bug if *count should
+ever overflow back to zero so
 
-Thanks for the feedback. I will look into making this change.
+Reviewed-by: "Darrick J. Wong" <djwong@kernel.org>
 
-Please also help with reviewing the other patches in this series.
-Progress on this patch series has been slow so far because every time I
-post this patch series reviewer feedback is provided on less than 10% of
-the code in this patch series.
+--D
 
-Thanks,
-
-Bart.
+> ---
+>  fs/iomap/buffered-io.c | 12 ++++++------
+>  1 file changed, 6 insertions(+), 6 deletions(-)
+> 
+> diff --git a/fs/iomap/buffered-io.c b/fs/iomap/buffered-io.c
+> index 71ad17bf827f..11a55da26a6f 100644
+> --- a/fs/iomap/buffered-io.c
+> +++ b/fs/iomap/buffered-io.c
+> @@ -1758,7 +1758,7 @@ static int iomap_add_to_ioend(struct iomap_writepage_ctx *wpc,
+>  
+>  static int iomap_writepage_map_blocks(struct iomap_writepage_ctx *wpc,
+>  		struct folio *folio, u64 pos, u64 end_pos, unsigned dirty_len,
+> -		unsigned *count)
+> +		bool *wb_pending)
+>  {
+>  	int error;
+>  
+> @@ -1786,7 +1786,7 @@ static int iomap_writepage_map_blocks(struct iomap_writepage_ctx *wpc,
+>  			error = iomap_add_to_ioend(wpc, folio, pos, end_pos,
+>  					map_len);
+>  			if (!error)
+> -				(*count)++;
+> +				*wb_pending = true;
+>  			break;
+>  		}
+>  		dirty_len -= map_len;
+> @@ -1873,7 +1873,7 @@ static int iomap_writepage_map(struct iomap_writepage_ctx *wpc,
+>  	u64 pos = folio_pos(folio);
+>  	u64 end_pos = pos + folio_size(folio);
+>  	u64 end_aligned = 0;
+> -	unsigned count = 0;
+> +	bool wb_pending = false;
+>  	int error = 0;
+>  	u32 rlen;
+>  
+> @@ -1917,13 +1917,13 @@ static int iomap_writepage_map(struct iomap_writepage_ctx *wpc,
+>  	end_aligned = round_up(end_pos, i_blocksize(inode));
+>  	while ((rlen = iomap_find_dirty_range(folio, &pos, end_aligned))) {
+>  		error = iomap_writepage_map_blocks(wpc, folio, pos, end_pos,
+> -				rlen, &count);
+> +				rlen, &wb_pending);
+>  		if (error)
+>  			break;
+>  		pos += rlen;
+>  	}
+>  
+> -	if (count)
+> +	if (wb_pending)
+>  		wpc->nr_folios++;
+>  
+>  	/*
+> @@ -1945,7 +1945,7 @@ static int iomap_writepage_map(struct iomap_writepage_ctx *wpc,
+>  		if (atomic_dec_and_test(&ifs->write_bytes_pending))
+>  			folio_end_writeback(folio);
+>  	} else {
+> -		if (!count)
+> +		if (!wb_pending)
+>  			folio_end_writeback(folio);
+>  	}
+>  	mapping_set_error(inode->i_mapping, error);
+> -- 
+> 2.47.1
+> 
+> 
