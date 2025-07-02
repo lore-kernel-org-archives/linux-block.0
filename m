@@ -1,109 +1,97 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A29C23956E;
-	Wed,  2 Jul 2025 10:57:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 348EE25D214
+	for <linux-block@vger.kernel.org>; Wed,  2 Jul 2025 11:13:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751453875; cv=none; b=Ge1W+nC0gBOA44TV2oXUKvcK2b8D2DgLAWlWDpZlI613l0Yq0ntpvtP1oH/+8pOm3TKjA4RQkpy14u5V4ReM4nAZGLX+7xuFa4gNB3SmhpoRi05qIWbGroHv1dPItGIQFQAR29ifUjCpsHmrejs6SAHUXl0rJDAeQTl2sQjJbo0=
+	t=1751454823; cv=none; b=Qa6nmfP/Bwx6ABxObR01rd2fI1liiGaxzkaGwjiTzvtbB/kKG+YNHIf5/7qT/feahJOMaEi5A9uXUDCFcaO4Gm2yr7zpCMd9MDRi6AooQrfMz40Zpf4zv2jnqRXC2mBR8/FRazOU3Dl373KkHH/luLDp/t4F9bAbEaVXpGXv67c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751453875; c=relaxed/simple;
-	bh=0NhWpmAF5oIbUp7Q5luzWCHiyeWmqI4TcBVmANGR5Lk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CH71Iw9I1Ky7jeylnU5r8024Gff0DwcHVMEC3yZ/eSxHp4imgHOvISeqEYcQ138nRXMBBuyerRJlz6MfCE4PTS4J9fNz1fA3eAMFgYqjwheGDtHrTVGDr7t9YhgwDpoURtwHqZtBHkeTxW3u/EpcBLrEnRKLiEZXv2syYFYOkww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T+QrHvoS; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1751454823; c=relaxed/simple;
+	bh=ECQIgKQgmLkAZS4N9Ti4FHy94Ri32AkLWlYW2nfxpHw=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=bTWJSSdOZZykcQh6imRmeuEs9dtukssibiz4E2L+nT/+R/B4qWOF4cdSBngY6lgULqD+6sMr9Iuz9UUaE6AhxlPJgPdZmSbE7eSGDB87ABiWmeaXsavh4JDvUTwh4+8+h68VhbHJUcCDTaOuUzfz5ivPtPjgwax5YqX0x/AkSW0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dd1rkXpV; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T+QrHvoS"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89E47C4CEED;
-	Wed,  2 Jul 2025 10:57:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751453874;
-	bh=0NhWpmAF5oIbUp7Q5luzWCHiyeWmqI4TcBVmANGR5Lk=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=T+QrHvoSyHMnlxCnUhdbb8pmG3SDf8+ItkXXVJXs5/dJ0u2BbNThk8mcuA9NiHgoh
-	 YEabfGNiurN6CV7/lqD3WAhAKDxVA1ZifjPjQS3Sv6ByW0eZxkfAcCi6ZmDft6TQ6R
-	 eYRLPhCkbH8QCf3PsCywum5JZQnUyR+k1h8J5s0AtXQN7x55FhcK5kYKtmMd+HUIIo
-	 dNOCXsaNCPLDSdZoXM28GX4XuYqJxZpD6J7jKEeT46JlPR+zJiOymyQ7oo0BVsEu+X
-	 2eX32hE9qKPk66ecMYQEmHVKtFab+TPjTsTKVNdoPGbW960R/ib/ew+h5jpJZLP8/Z
-	 QtXVfF6H1GXqw==
-Message-ID: <0f9f5900-b7d0-4df2-8c05-fc147c991534@kernel.org>
-Date: Wed, 2 Jul 2025 19:57:52 +0900
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dd1rkXpV"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1751454821;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=MZkZRlr25YbPqB2HwXUZRwm4fw7iqNH9MdAMyL+S4cg=;
+	b=dd1rkXpVtwbnlQr+iEoUh3a5vEkZnMDQzdrOuwkl1aHRrUox8uKT9dGT4ZXzjViiIB2IyF
+	zKbu8qQ6T4LqyMXEDYZ/TPbwb8jxFHXfN+UDo1is+I7MZwdYFS+Tb0uJTAmeAy8eZVTA2r
+	oQs0E2DKEkLizf8SsSC+t9RMTlHZSxc=
+Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
+ [209.85.167.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-75-dj-UEGktNMeRy6rDSzMHKg-1; Wed, 02 Jul 2025 07:13:40 -0400
+X-MC-Unique: dj-UEGktNMeRy6rDSzMHKg-1
+X-Mimecast-MFC-AGG-ID: dj-UEGktNMeRy6rDSzMHKg_1751454818
+Received: by mail-lf1-f71.google.com with SMTP id 2adb3069b0e04-5550e237ad0so2370924e87.0
+        for <linux-block@vger.kernel.org>; Wed, 02 Jul 2025 04:13:39 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751454817; x=1752059617;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=MZkZRlr25YbPqB2HwXUZRwm4fw7iqNH9MdAMyL+S4cg=;
+        b=NlJoHeS+38QWUd9eTafak1xg4VcT25AtbP75MIdSEHThv2tXpCeu4qZsyPpx3/EcUb
+         UBx7VNx4HCIsSXOVndQTN7aT9OMhFkTbPnKlQkqD2jbOG2WWh5g+HxDrL+8mDWtIoiAB
+         mlL7PBw3Dfe+ojvOfrsxdgeHzDcJ/r66sGQRpu+zShgj6fkAbcYio6uhmFCplcNCP0t1
+         67dNDcGA50qD8AfYRNpfnQQ788X+K5A6gLs5TUhk6ejFO4m1ZAWAQCtqGPTgUh32SILb
+         JHMrWsP0CKlUYMF/dNCpWuPOAaL4J6JyVayr8aFcSXqnwm8KfRhpZ6BdpvqDluakt3iJ
+         AkgA==
+X-Gm-Message-State: AOJu0YxOpBe3a/BmJQezV6I0gnLJAO+98VnczBpM5ZxbKqa2EFEPq+rn
+	TScdx5/E1Niem0J/0NP3LFlRDI/elDm0+eudkq4UhqA5FOBT+FM97qu8m+TV09Ym2y2MTxyNgUf
+	cRRPVlIkZcdeAn+LdA3NCzDq1QeOSRejgYQC+81r601klJr9gAk1bI5rLdMX9/ot3MKP8QZq5zz
+	nm6sHvUsE1fbEpDIGaGXqXZ0zW2KMvDLKqy6tvOvigPBBY14xIxDlj
+X-Gm-Gg: ASbGncumgTcwPB2Je6BtaoziRrejzeixKqxeI5Y6SqqCE8pksRjH5XcnZb8hznx1GUx
+	yM71UpGCLVZXrdyAfeff9PLKpc2XBm1n0c/GHLqe01WSyJy4Hmp+WnFAZB3X0er/eKtz5uNRyGn
+	Ekufop
+X-Received: by 2002:a2e:300b:0:b0:329:39cd:8d25 with SMTP id 38308e7fff4ca-32e0009b9cemr7172021fa.33.1751454816758;
+        Wed, 02 Jul 2025 04:13:36 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEGLgCNulf2JBPoF6IitYZrvd3Dqb+lhUMrHqbfYNPMJuW71OuJ6YxnkSlKEdWOuwrXbgMPj8GOIkJ+9uW0u9Y=
+X-Received: by 2002:a2e:300b:0:b0:329:39cd:8d25 with SMTP id
+ 38308e7fff4ca-32e0009b9cemr7171881fa.33.1751454816291; Wed, 02 Jul 2025
+ 04:13:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v19 01/11] block: Support block drivers that preserve the
- order of write requests
-To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
- Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
- Nitesh Shetty <nj.shetty@samsung.com>, Ming Lei <ming.lei@redhat.com>
-References: <20250630223003.2642594-1-bvanassche@acm.org>
- <20250630223003.2642594-2-bvanassche@acm.org>
-Content-Language: en-US
-From: Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <20250630223003.2642594-2-bvanassche@acm.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+From: Yi Zhang <yi.zhang@redhat.com>
+Date: Wed, 2 Jul 2025 19:13:24 +0800
+X-Gm-Features: Ac12FXzxl_rJVCxsjww60zBQtZjiqEECF25ia06iPv4bvMa4hbQaNxYHeS7V0Bk
+Message-ID: <CAHj4cs_Ckhz4sL5k5ug_Dc5XfjSo9QDRSrHMfBj2XYGm_gb2+g@mail.gmail.com>
+Subject: [bug report] nvme4: inconsistent AWUPF, controller not added (0/7).
+To: linux-block <linux-block@vger.kernel.org>, 
+	"open list:NVM EXPRESS DRIVER" <linux-nvme@lists.infradead.org>
+Cc: Christoph Hellwig <hch@lst.de>, John Garry <john.g.garry@oracle.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On 7/1/25 07:29, Bart Van Assche wrote:
-> Some storage controllers preserve the request order per hardware queue.
-> Introduce the request queue limit member variable
-> 'driver_preserves_write_order' to allow block drivers to indicate that
-> the order of write commands is preserved per hardware queue and hence
-> that serialization of writes per zone is not required if all pending
-> writes are submitted to the same hardware queue.
-> 
-> Cc: Damien Le Moal <dlemoal@kernel.org>
-> Cc: Hannes Reinecke <hare@suse.de>
-> Cc: Nitesh Shetty <nj.shetty@samsung.com>
-> Cc: Christoph Hellwig <hch@lst.de>
-> Cc: Ming Lei <ming.lei@redhat.com>
-> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-> ---
->  block/blk-settings.c   | 2 ++
->  include/linux/blkdev.h | 5 +++++
->  2 files changed, 7 insertions(+)
-> 
-> diff --git a/block/blk-settings.c b/block/blk-settings.c
-> index a000daafbfb4..bceb9a9cb5ba 100644
-> --- a/block/blk-settings.c
-> +++ b/block/blk-settings.c
-> @@ -814,6 +814,8 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
->  	}
->  	t->max_secure_erase_sectors = min_not_zero(t->max_secure_erase_sectors,
->  						   b->max_secure_erase_sectors);
-> +	t->driver_preserves_write_order = t->driver_preserves_write_order &&
-> +		b->driver_preserves_write_order;
+Hi Christoph
 
-Why not use a feature instead ? Stacking of the features does exactly this, no ?
-That would be less code and one less limit.
+I found this failure on one Samsung NVMe disk[1] with the latest
+linux-block/for-next. Here is the reproducer and dmesg log.
+Please help check it and let me know if you need any info/test. Thanks.
 
->  	t->zone_write_granularity = max(t->zone_write_granularity,
->  					b->zone_write_granularity);
->  	if (!(t->features & BLK_FEAT_ZONED)) {
-> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-> index a51f92b6c340..aa1990d94130 100644
-> --- a/include/linux/blkdev.h
-> +++ b/include/linux/blkdev.h
-> @@ -408,6 +408,11 @@ struct queue_limits {
->  
->  	unsigned int		max_open_zones;
->  	unsigned int		max_active_zones;
-> +	/*
-> +	 * Whether or not the block driver preserves the order of write
-> +	 * requests per hardware queue. Set by the block driver.
-> +	 */
-> +	bool			driver_preserves_write_order;
->  
->  	/*
->  	 * Drivers that set dma_alignment to less than 511 must be prepared to
+[1]
+SAMSUNG MZQL2960HCJR-00A07 (PM9A3)
+[2]
++ nvme format -l1 -f /dev/nvme4n1
+Success formatting namespace:1
++ nvme reset /dev/nvme4
+Reset: Network dropped connection on reset
 
+dmesg:
+[  751.872864] nvme nvme4: rescanning namespaces.
+[  752.177475] nvme nvme4: resetting controller
+[  752.221030] nvme nvme4: inconsistent AWUPF, controller not added (0/7).
+[  752.227653] nvme nvme4: Disabling device after reset failure: -22
 
 -- 
-Damien Le Moal
-Western Digital Research
+Best Regards,
+  Yi Zhang
+
