@@ -1,94 +1,107 @@
-Received: from 004.mia.mailroute.net (004.mia.mailroute.net [199.89.3.7])
+Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BE292DE71B
-	for <linux-block@vger.kernel.org>; Wed,  2 Jul 2025 20:39:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7F812DE6E2;
+	Wed,  2 Jul 2025 21:28:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.89.141.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751488785; cv=none; b=VOmygVhdJzUVUqepATgBVhqfBJw2h6AAhIvM2TxIhkBPuiCtHZuvoDxggab9FfTlJ8D/6JEi09ZHWGMC8Y2ilItCP4zqa13pfw3pJMtXy/QwBpCfkqCOLIasaHmJVlQ84DxZI0D4g6gCdkDj9UdECzRC68qUivR40f0Bu0dpoco=
+	t=1751491702; cv=none; b=GeG5DzKuATl00uUM932k8FgR40BHAF6IqATwXefDEHBiGG3mv/K17qmgEXCk93V3ZNkC53JyKOx4etTPecPS8jQPArC3KUAZb5psWQ4lBGL1B/rBai5m43SAa/o4UOcYNtQRRYF0/5VqchQg0cTDo8rdDyVTCErxKDr3NrvEmCQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751488785; c=relaxed/simple;
-	bh=3/QtZaqlm+b9XqM4dcw07iaESV2sz02sPt1V3UWwgWE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=R7W8Co4WVlm9v16Fln7wUJom+5IjGxMU5DIBpGsYzKbY439OwippSgg616WF1Tzqu+1kKTwYiEMfGz/BYCp+ISvfFU0Nj9vEjJ49zfsjSBbnmkJWcmocRXOOMdD/j9O1QYFp9cIFWNxXisB7hrLLtEHVNYjn+fAvRJ0dqXNxXcY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=py3t0GVB; arc=none smtp.client-ip=199.89.3.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1751491702; c=relaxed/simple;
+	bh=rC/hi9QSQXWt5NH9NFWDg11yN3sHPqubrqAi8bKjntQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VV10t0kmj8yQZZf2fth5PuQJDMqEr7VJnASzSLUklMsNFVe5CFl7TU4c+KZUFOcBnp5FFXyQesDSpt7HOvExdNZavqrrwGlflV3UpDFTykc0nniMeKuX+fiJm9lBhFCwI94JQrztbZvY9fxMTbTJ1R42cUnFcqKRpNwkQ2VAw0o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=HcOE4+/P; arc=none smtp.client-ip=62.89.141.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="py3t0GVB"
-Received: from localhost (localhost [127.0.0.1])
-	by 004.mia.mailroute.net (Postfix) with ESMTP id 4bXWwb2yNnzm0Hr0;
-	Wed,  2 Jul 2025 20:39:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:mime-version:references:in-reply-to
-	:x-mailer:message-id:date:date:subject:subject:from:from
-	:received:received; s=mr01; t=1751488781; x=1754080782; bh=QwhJB
-	9DQ0c+LjT6k4HULKM1qnKhxWUTpD7VviwzrjKQ=; b=py3t0GVBToAdO/CVxWxWO
-	SycBYiy0mYmiKnnjR+qaaYE8qsK6Hq5m7mt7VFm/kdemGajafbkQXEvZUneCGSY+
-	ty3Z70arPRCmZFamugt6rkNmO+LIU2iJ+Gze5oo4xjmIBd5aL0+MTXO3MO2ojGfC
-	pjx02Q1zwXR2f51C2NIndKZTB/bhVb2cN7Fl5dTnshh3ZDsB4kSJfiAqf4rAaSwO
-	pfKhIQZ/xb90lr+NWC/MDP/KS+qNzzxJYQ4ygQ6vmWABsCHd8ahGwszceATcthhx
-	1ZyjRClteo5nHr8aI4g3tfHCZdEzqmx83jXQqR/0df8VA5uBrIaBEYYRXMUJuXMW
-	Q==
-X-Virus-Scanned: by MailRoute
-Received: from 004.mia.mailroute.net ([127.0.0.1])
- by localhost (004.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id 45DQ5_bO0-Yu; Wed,  2 Jul 2025 20:39:41 +0000 (UTC)
-Received: from bvanassche.mtv.corp.google.com (unknown [104.135.204.82])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 004.mia.mailroute.net (Postfix) with ESMTPSA id 4bXWwS0dCrzm0Hqv;
-	Wed,  2 Jul 2025 20:39:35 +0000 (UTC)
-From: Bart Van Assche <bvanassche@acm.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Ming Lei <ming.lei@redhat.com>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	Richard Weinberger <richard@nod.at>,
-	Vignesh Raghavendra <vigneshr@ti.com>
-Subject: [PATCH 8/8] mtd_blkdevs: Remove the quiesce/unquiesce calls on frozen queues
-Date: Wed,  2 Jul 2025 13:38:43 -0700
-Message-ID: <20250702203845.3844510-9-bvanassche@acm.org>
-X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
-In-Reply-To: <20250702203845.3844510-1-bvanassche@acm.org>
-References: <20250702203845.3844510-1-bvanassche@acm.org>
+	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="HcOE4+/P"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=3IWpTfuI42fP5pvclqV13nLmz5nNh5owCAXqwQb77zA=; b=HcOE4+/PvsKQ9VXbXwQLRPZJ1R
+	RJjlNy1wsrhhDQ89QILGCPMFJ+FPG8BSuuSPdR9oyrRFoJE+n6mwu+0TaNq7rY4TXn+MdCz+lR4gg
+	Nj9QwzYEdqaRn+9fyjfDP7rnNydIWimt4UNQvwXuRXTEliJZ3QS5SjLsEgXAdNoayCDYM/NzNOYK1
+	v1wFWlBfD+QVotQBWfJWOZKCO5X4UmsR5M0O6NjJOt3Py4MpndtNoZI/OC1iHRdu00whe28R8V2bk
+	vsXZamlaMRIqMLEpsDvb3QWO4XugEDGpte0l1RwXA48s04REAQ1N1gFALpIMFG7tUduK+QaL1pvkz
+	6RVDdtAA==;
+Received: from viro by zeniv.linux.org.uk with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1uX506-0000000EPG8-3ntL;
+	Wed, 02 Jul 2025 21:28:19 +0000
+Date: Wed, 2 Jul 2025 22:28:18 +0100
+From: Al Viro <viro@zeniv.linux.org.uk>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: [PATCH 10/11] blk-mq-debugfs: use debugfs_get_aux()
+Message-ID: <20250702212818.GJ3406663@ZenIV>
+References: <20250702211305.GE1880847@ZenIV>
+ <20250702211408.GA3406663@ZenIV>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250702211408.GA3406663@ZenIV>
+Sender: Al Viro <viro@ftp.linux.org.uk>
 
-Because blk_mq_hw_queue_need_run() now returns false if a queue is frozen=
-,
-protecting request queue changes with blk_mq_quiesce_queue() and
-blk_mq_unquiesce_queue() while a queue is frozen is no longer necessary.
-Hence this patch that removes quiesce/unquiesce calls on frozen queues.
+instead of manually stashing the data pointer into parent directory inode's
+->i_private, just pass it to debugfs_create_file_aux() so that it can
+be extracted without that insane chasing through ->d_parent.
 
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
 ---
- drivers/mtd/mtd_blkdevs.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ block/blk-mq-debugfs.c | 12 +++++-------
+ 1 file changed, 5 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/mtd/mtd_blkdevs.c b/drivers/mtd/mtd_blkdevs.c
-index 847c11542f02..8131b17a980e 100644
---- a/drivers/mtd/mtd_blkdevs.c
-+++ b/drivers/mtd/mtd_blkdevs.c
-@@ -420,10 +420,8 @@ int del_mtd_blktrans_dev(struct mtd_blktrans_dev *ol=
-d)
- 	old->rq->queuedata =3D NULL;
- 	spin_unlock_irqrestore(&old->queue_lock, flags);
-=20
--	/* freeze+quiesce queue to ensure all requests are flushed */
-+	/* freeze the request queue to ensure all requests are flushed */
- 	memflags =3D blk_mq_freeze_queue(old->rq);
--	blk_mq_quiesce_queue(old->rq);
--	blk_mq_unquiesce_queue(old->rq);
- 	blk_mq_unfreeze_queue(old->rq, memflags);
-=20
- 	/* If the device is currently open, tell trans driver to close it,
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index 29b3540dd180..7ed3e71f2fc0 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -521,7 +521,7 @@ CTX_RQ_SEQ_OPS(poll, HCTX_TYPE_POLL);
+ static int blk_mq_debugfs_show(struct seq_file *m, void *v)
+ {
+ 	const struct blk_mq_debugfs_attr *attr = m->private;
+-	void *data = d_inode(m->file->f_path.dentry->d_parent)->i_private;
++	void *data = debugfs_get_aux(m->file);
+ 
+ 	return attr->show(data, m);
+ }
+@@ -531,7 +531,7 @@ static ssize_t blk_mq_debugfs_write(struct file *file, const char __user *buf,
+ {
+ 	struct seq_file *m = file->private_data;
+ 	const struct blk_mq_debugfs_attr *attr = m->private;
+-	void *data = d_inode(file->f_path.dentry->d_parent)->i_private;
++	void *data = debugfs_get_aux(file);
+ 
+ 	/*
+ 	 * Attributes that only implement .seq_ops are read-only and 'attr' is
+@@ -546,7 +546,7 @@ static ssize_t blk_mq_debugfs_write(struct file *file, const char __user *buf,
+ static int blk_mq_debugfs_open(struct inode *inode, struct file *file)
+ {
+ 	const struct blk_mq_debugfs_attr *attr = inode->i_private;
+-	void *data = d_inode(file->f_path.dentry->d_parent)->i_private;
++	void *data = debugfs_get_aux(file);
+ 	struct seq_file *m;
+ 	int ret;
+ 
+@@ -612,11 +612,9 @@ static void debugfs_create_files(struct dentry *parent, void *data,
+ 	if (IS_ERR_OR_NULL(parent))
+ 		return;
+ 
+-	d_inode(parent)->i_private = data;
+-
+ 	for (; attr->name; attr++)
+-		debugfs_create_file(attr->name, attr->mode, parent,
+-				    (void *)attr, &blk_mq_debugfs_fops);
++		debugfs_create_file_aux(attr->name, attr->mode, parent,
++				    (void *)attr, data, &blk_mq_debugfs_fops);
+ }
+ 
+ void blk_mq_debugfs_register(struct request_queue *q)
+-- 
+2.39.5
+
