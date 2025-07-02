@@ -1,56 +1,56 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76B5C1B0413
-	for <linux-block@vger.kernel.org>; Wed,  2 Jul 2025 04:04:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68739184
+	for <linux-block@vger.kernel.org>; Wed,  2 Jul 2025 04:04:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751429049; cv=none; b=lSVT8xj8knC9u/I4/mGPuXjiEU9iAhtdh0TbRvOSi53er8TFK9/8ju0Wy/zXqERfb9QUWHMZ9Zabf6uo0YASL3pW5/kLCnRKK0ki8Z8T+/dcVqUgBUvfnT+NXs7kxhFEeqALMO9vFhWPkchRQayR7T8yUwIDhKLKtK9UXnHoE9s=
+	t=1751429056; cv=none; b=MeQjc5MDliQ9SJIff1Mh6eNwVyKHm6nBA1OV0pQM1qTkmPQ2ClzyXA4j2lRsSmsGe91iNKEg+tOATQy6tDxNPBx3bLpfwOJv9zXwuiOiXgBzTMYHm7CAmscanQHIhYiXydMnI74hGx4ZiZebXEMIBVHbXvCXXGjQ2TE7EgDg+zs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751429049; c=relaxed/simple;
-	bh=BksNqdos3bmvCkDMDU3UcLJeHKIYQSH7EF7tP7erBpw=;
+	s=arc-20240116; t=1751429056; c=relaxed/simple;
+	bh=mHTDVJ6TrAexg2SS+q8gDZIG1q9R/RJk0LaEcT1rmV8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HzZaMFKzFoxcGmXberSIxTOw3T+0WFitVR8fFkXekba8ymD3VU4xbXb+m2DhtHhCXhTs2E7VxFPfRmzmDqsP2suofOordZzG9CqEiPvF8HTH8ksdILlvNLfQ8Sqzg/6Dl/ZLhIe/mMkNvPF6g9uVsZZgvgcMYMVDv4+TuaTqgJQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=X+1sIeWq; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=Eh98jEb2oxJb47GC3zSd0LXPjHbhchqJTRuWNqBS/tjjvDrcCtd23I1FTeRfAHGbFf8EL+kVlftbugsuc/IzlnTT1XFDH7J+xPAdDjwPJ0Q/mK75dH9UF7IE1nbKS/Pz+d13ryBrNVVCX0oFr9bQzvnN2XPAg0lkhusqksxX8Jc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CQR508Gf; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X+1sIeWq"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CQR508Gf"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1751429046;
+	s=mimecast20190719; t=1751429052;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=pJZtS3eX+oz7Y3eW41yRszDYLsT7r39VErJ2zgHzSe0=;
-	b=X+1sIeWqtg/whjtHk+yrcsbf/PjJlNqDqbAfWQw1RHCpW1vTKuS6Y7rf1l8fMbqhmQXNDM
-	LVYrsRL50dk3B8KaUW+PkoQ0Xoxm/XA54D3k9iZU4Mvc09SoVAqk/oAGq8wQ2s2YNskOxO
-	SfQ+Fq8dusfoBlz9H4gcLDrRUnxljeQ=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+	bh=pdzGyencAbtyvvOV4UlG/Na5Qeh5MXSMZ62tWj8MM6I=;
+	b=CQR508GfRoddhuptJdPMNV+iEx1Zg0XGvoPjkKPVpuUotSQ1TKSy20bwhtWO07HMJuDdGn
+	1mkHNfPS1l9nxccxxqnsQEcTTSc+yFPceWg5gCXftHqYoSon8I2FT4s4ix6yCR6Dx9JLP2
+	InusZ5/DNER87yPoNCPXe+geRc8ZEXA=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-527-l-Qqtp1sOwq9htpGt8B3Fg-1; Wed,
- 02 Jul 2025 00:04:03 -0400
-X-MC-Unique: l-Qqtp1sOwq9htpGt8B3Fg-1
-X-Mimecast-MFC-AGG-ID: l-Qqtp1sOwq9htpGt8B3Fg_1751429041
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-245-tzvXRsGVODm4VAeSG4unAA-1; Wed,
+ 02 Jul 2025 00:04:07 -0400
+X-MC-Unique: tzvXRsGVODm4VAeSG4unAA-1
+X-Mimecast-MFC-AGG-ID: tzvXRsGVODm4VAeSG4unAA_1751429046
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C52B21955D4E;
-	Wed,  2 Jul 2025 04:04:01 +0000 (UTC)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DD9CB180028B;
+	Wed,  2 Jul 2025 04:04:05 +0000 (UTC)
 Received: from localhost (unknown [10.72.116.27])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 8383718003FC;
-	Wed,  2 Jul 2025 04:03:59 +0000 (UTC)
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id BCCD1195608F;
+	Wed,  2 Jul 2025 04:04:04 +0000 (UTC)
 From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org
 Cc: Uday Shankar <ushankar@purestorage.com>,
 	Caleb Sander Mateos <csander@purestorage.com>,
 	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 01/16] ublk: move fake timeout logic into __ublk_complete_rq()
-Date: Wed,  2 Jul 2025 12:03:25 +0800
-Message-ID: <20250702040344.1544077-2-ming.lei@redhat.com>
+Subject: [PATCH 02/16] ublk: look up ublk task via its pid in timeout handler
+Date: Wed,  2 Jul 2025 12:03:26 +0800
+Message-ID: <20250702040344.1544077-3-ming.lei@redhat.com>
 In-Reply-To: <20250702040344.1544077-1-ming.lei@redhat.com>
 References: <20250702040344.1544077-1-ming.lei@redhat.com>
 Precedence: bulk
@@ -60,43 +60,50 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-Almost every block driver deals with fake timeout logic around real
-request completion code.
+Look up ublk process via its pid in timeout handler, so we can avoid to
+touch io->task, because it is fragile to touch task structure.
 
-Also the existing way may cause request reference count leak, so move the
-logic into __ublk_complete_rq(), then we can skip the completion in the
-last step like other drivers.
+It is fine to kill ublk server process and this way is simpler.
 
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/block/ublk_drv.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+ drivers/block/ublk_drv.c | 21 +++++++++++++--------
+ 1 file changed, 13 insertions(+), 8 deletions(-)
 
 diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index e52c2d1cb838..e2de76d78a08 100644
+index e2de76d78a08..834d4db3b07e 100644
 --- a/drivers/block/ublk_drv.c
 +++ b/drivers/block/ublk_drv.c
-@@ -1152,7 +1152,7 @@ static inline void __ublk_complete_rq(struct request *req)
- 
- 	if (blk_update_request(req, BLK_STS_OK, io->res))
- 		blk_mq_requeue_request(req, true);
--	else
-+	else if (likely(!blk_should_fake_timeout(req->q)))
- 		__blk_mq_end_request(req, BLK_STS_OK);
- 
- 	return;
-@@ -2206,9 +2206,6 @@ static int ublk_commit_and_fetch(const struct ublk_queue *ubq,
- 	if (req_op(req) == REQ_OP_ZONE_APPEND)
- 		req->__sector = ub_cmd->zone_append_lba;
- 
--	if (unlikely(blk_should_fake_timeout(req->q)))
--		return 0;
+@@ -1365,14 +1365,19 @@ static void ublk_queue_cmd_list(struct ublk_io *io, struct rq_list *l)
+ static enum blk_eh_timer_return ublk_timeout(struct request *rq)
+ {
+ 	struct ublk_queue *ubq = rq->mq_hctx->driver_data;
+-	struct ublk_io *io = &ubq->ios[rq->tag];
 -
- 	if (ublk_need_req_ref(ubq))
- 		ublk_sub_req_ref(io, req);
- 	else
+-	if (ubq->flags & UBLK_F_UNPRIVILEGED_DEV) {
+-		send_sig(SIGKILL, io->task, 0);
+-		return BLK_EH_DONE;
+-	}
+-
+-	return BLK_EH_RESET_TIMER;
++	struct task_struct *p;
++	struct pid *pid;
++
++	if (!(ubq->flags & UBLK_F_UNPRIVILEGED_DEV))
++		return BLK_EH_RESET_TIMER;
++
++	rcu_read_lock();
++	pid = find_vpid(ubq->dev->dev_info.ublksrv_pid);
++	p = pid_task(pid, PIDTYPE_PID);
++	if (p)
++		send_sig(SIGKILL, p, 0);
++	rcu_read_unlock();
++	return BLK_EH_DONE;
+ }
+ 
+ static blk_status_t ublk_prep_req(struct ublk_queue *ubq, struct request *rq,
 -- 
 2.47.0
 
