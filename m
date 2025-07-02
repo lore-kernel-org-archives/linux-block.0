@@ -1,129 +1,132 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDFE2746E
-	for <linux-block@vger.kernel.org>; Wed,  2 Jul 2025 02:33:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C8C38F77;
+	Wed,  2 Jul 2025 02:48:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751423599; cv=none; b=RE8hBWzdEqzqCchdWv5IO6sF3NX4ORMt/y28zdkIyP5Iot/cLyNFJXUk0oDx47Oadaxy+U6R23dCrljxuThwzKSuApLyHz8asTqPhXqeka9DDmg/Oo+gWuDgyGp9A2jtQ6pSiloU7nD6OWca+Pox36RcDdhMk2lj4RaMkj8v6AQ=
+	t=1751424535; cv=none; b=fIeEr8xGcQKqgu+ap3bMka6/bmHpSesa1t6SnNICCNwHhnMhxVOfp3mimzqs7YSMh7OMkmjZB8KOmNNwDwRQb0FhRz3VR+LOaHxZqPOzCKbvObGAAJ7gm7r9RVCvbPTA0jmOpolrjl0GqT23Sb+2JcOTm49kcCNpvX0W7rXmzww=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751423599; c=relaxed/simple;
-	bh=kYJRSf3Gn5sMpfF/6A1FwMCKjt3zxN26Pr+Lm2aRllY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=d/781QfuQFoA0C+LKffMprfTclvWs2DeoINhyWkIm5L+9KO3EitY6yBaFdInY+C3jfAhSXNbSah3xADSotAsrMPUxDtCrWCPYt0XCAMBC4YZKP1GiMRGPAJGKi859t4i1DtBoSCId17NhYjw8EJVc/NKXRE3QTt/kXnjQWTKQgw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PXWcSy/D; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1751424535; c=relaxed/simple;
+	bh=JAAbqWGv4REQ2vnlHSGHaQ26VgMhGov5LdNX9WqxvLc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=IZ7tJ941Wx7zUMxOfZv3NkDL5U4JCZFm2Jad82OGTMj9vX39VgRu8u5dVj2iUCFtDz5HoAUWqVVkVLJiuDG/bxGihMdBPelJ+GQRoDnfMmIISAh0b3gMzrGg5VceDgWK/LlOtGlk14dG5Q8QvyOHSLpvdVfeYRSMVHrncAPYFUI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GPOjd2e7; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PXWcSy/D"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1751423595;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jbPIEReb3xkWAZWAXZfMhbsS92bXSTORD10Gzf+15sA=;
-	b=PXWcSy/DKfrn9HiJH1Dk1lTvAaSNEtYvHx1lzbNcBLUe0OX8M+K5OCyUOu3xHU9x09WTkX
-	CfR7R48SIlf3o2kHAtpW4ZLlD5iiiLOcRhuC76oI+cvZn6VMV4nvyhV4iDtCe1p4pRp5vY
-	Lr+sOHe3l3a3AUXLuy+a4o0JeRgzTFs=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-626-gfpB-GDIMGK_xLIBuMXB0w-1; Tue,
- 01 Jul 2025 22:33:12 -0400
-X-MC-Unique: gfpB-GDIMGK_xLIBuMXB0w-1
-X-Mimecast-MFC-AGG-ID: gfpB-GDIMGK_xLIBuMXB0w_1751423590
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 993F31944A83;
-	Wed,  2 Jul 2025 02:33:09 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.27])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D7137195608F;
-	Wed,  2 Jul 2025 02:33:00 +0000 (UTC)
-Date: Wed, 2 Jul 2025 10:32:54 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Yu Kuai <yukuai1@huaweicloud.com>
-Cc: Nilay Shroff <nilay@linux.ibm.com>, josef@toxicpanda.com,
-	axboe@kernel.dk, hch@infradead.org, hare@suse.de,
-	linux-block@vger.kernel.org, nbd@other.debian.org,
-	linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
-	yangerkun@huawei.com, johnny.chenyi@huawei.com,
-	"yukuai (C)" <yukuai3@huawei.com>
-Subject: Re: [PATCH] nbd: fix false lockdep deadlock warning
-Message-ID: <aGSaVhiH2DeTvtdr@fedora>
-References: <20250627092348.1527323-1-yukuai1@huaweicloud.com>
- <aF56oVEzTygIOUTN@fedora>
- <c2fbaacc-62a1-4a98-4157-2637b7f242b7@huaweicloud.com>
- <197b6dca-56be-438d-a60f-21011367c5ed@linux.ibm.com>
- <99b4afce-de05-ddcb-2634-b19214cf4534@huaweicloud.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GPOjd2e7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59C90C4CEEB;
+	Wed,  2 Jul 2025 02:48:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751424534;
+	bh=JAAbqWGv4REQ2vnlHSGHaQ26VgMhGov5LdNX9WqxvLc=;
+	h=From:To:Cc:Subject:Date:From;
+	b=GPOjd2e7nUjWJRay1KXvbqTy4EMUZwOLlztOE7NpMBaUMmyE5oDBXLsO6DDf8TjKA
+	 Hj5YLl59pnO6LCQf9HI8538A+YFToy+bF6LJg6E1wGNIVj/5TO+OfArTxShGAAs80S
+	 EyoNc5YeUVxd/YsG9rLq8wooGzA9LZmRTG8tfauI/98x+x2x5fxNlIyC98XBQWm0nb
+	 MBIh8CoFS97ZXnqptV78BDtWdE7SKIv4RnAWA49a0U4NhTIqtFnFtWNFV1iUv9pUOj
+	 X0seTxwoaW7wPike5pWFiLaMJX71ocpbSUhrGyH1mmaAuTK0Y4gBZ6+tKvbs24dvap
+	 AC6aZsJ02QKAA==
+From: colyli@kernel.org
+To: axboe@kernel.org
+Cc: linux-block@vger.kernel.org,
+	linux-bcache@vger.kernel.org,
+	Matthew Wilcox <willy@infradead.org>,
+	Coly Li <colyli@kernel.org>
+Subject: [PATCH] bcache: Use a folio
+Date: Wed,  2 Jul 2025 10:48:48 +0800
+Message-Id: <20250702024848.343370-1-colyli@kernel.org>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <99b4afce-de05-ddcb-2634-b19214cf4534@huaweicloud.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On Wed, Jul 02, 2025 at 09:12:09AM +0800, Yu Kuai wrote:
-> Hi,
-> 
-> 在 2025/07/01 21:28, Nilay Shroff 写道:
-> > 
-> > 
-> > On 6/28/25 6:18 AM, Yu Kuai wrote:
-> > > Hi,
-> > > 
-> > > 在 2025/06/27 19:04, Ming Lei 写道:
-> > > > I guess the patch in the following link may be simper, both two take
-> > > > similar approach:
-> > > > 
-> > > > https://lore.kernel.org/linux-block/aFjbavzLAFO0Q7n1@fedora/
-> > > 
-> > > I this the above approach has concurrent problems if nbd_start_device
-> > > concurrent with nbd_start_device:
-> > > 
-> > > t1:
-> > > nbd_start_device
-> > > lock
-> > > num_connections = 1
-> > > unlock
-> > >      t2:
-> > >      nbd_add_socket
-> > >      lock
-> > >      config->num_connections++
-> > >      unlock
-> > >          t3:
-> > >          nbd_start_device
-> > >          lock
-> > >          num_connections = 2
-> > >          unlock
-> > >          blk_mq_update_nr_hw_queues
-> > > 
-> > > blk_mq_update_nr_hw_queues
-> > > //nr_hw_queues updated to 1 before failure
-> > > return -EINVAL
-> > > 
-> > 
-> > In the above case, yes I see that t1 would return -EINVAL (as
-> > config->num_connections doesn't match with num_connections)
-> > but then t3 would succeed to update nr_hw_queue (as both
-> > config->num_connections and num_connections set to 2 this
-> > time). Isn't it? If yes, then the above patch (from Ming)
-> > seems good.
-> 
-> Emm, I'm confused, If you agree with the concurrent process, then
-> t3 update nr_hw_queues to 2 first and return sucess, later t1 update
-> nr_hw_queues back to 1 and return failure.
+From: Matthew Wilcox (Oracle) <willy@infradead.org>
 
-It should be easy to avoid failure by simple retrying.
+Retrieve a folio from the page cache instead of a page.  Removes a
+hidden call to compound_head().  Then be sure to call folio_put()
+instead of put_page() to release it.  That doesn't save any calls
+to compound_head(), just moves them around.
 
+Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
+Signed-off-by: Coly Li <colyli@kernel.org>
+---
+ drivers/md/bcache/super.c | 22 +++++++++++-----------
+ 1 file changed, 11 insertions(+), 11 deletions(-)
 
-Thanks,
-Ming
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index 2ea490b9d370..1492c8552255 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -168,14 +168,14 @@ static const char *read_super(struct cache_sb *sb, struct block_device *bdev,
+ {
+ 	const char *err;
+ 	struct cache_sb_disk *s;
+-	struct page *page;
++	struct folio *folio;
+ 	unsigned int i;
+ 
+-	page = read_cache_page_gfp(bdev->bd_mapping,
+-				   SB_OFFSET >> PAGE_SHIFT, GFP_KERNEL);
+-	if (IS_ERR(page))
++	folio = mapping_read_folio_gfp(bdev->bd_mapping,
++			SB_OFFSET >> PAGE_SHIFT, GFP_KERNEL);
++	if (IS_ERR(folio))
+ 		return "IO error";
+-	s = page_address(page) + offset_in_page(SB_OFFSET);
++	s = folio_address(folio) + offset_in_folio(folio, SB_OFFSET);
+ 
+ 	sb->offset		= le64_to_cpu(s->offset);
+ 	sb->version		= le64_to_cpu(s->version);
+@@ -272,7 +272,7 @@ static const char *read_super(struct cache_sb *sb, struct block_device *bdev,
+ 	*res = s;
+ 	return NULL;
+ err:
+-	put_page(page);
++	folio_put(folio);
+ 	return err;
+ }
+ 
+@@ -1366,7 +1366,7 @@ static CLOSURE_CALLBACK(cached_dev_free)
+ 	mutex_unlock(&bch_register_lock);
+ 
+ 	if (dc->sb_disk)
+-		put_page(virt_to_page(dc->sb_disk));
++		folio_put(virt_to_folio(dc->sb_disk));
+ 
+ 	if (dc->bdev_file)
+ 		fput(dc->bdev_file);
+@@ -2216,7 +2216,7 @@ void bch_cache_release(struct kobject *kobj)
+ 		free_fifo(&ca->free[i]);
+ 
+ 	if (ca->sb_disk)
+-		put_page(virt_to_page(ca->sb_disk));
++		folio_put(virt_to_folio(ca->sb_disk));
+ 
+ 	if (ca->bdev_file)
+ 		fput(ca->bdev_file);
+@@ -2593,7 +2593,7 @@ static ssize_t register_bcache(struct kobject *k, struct kobj_attribute *attr,
+ 	if (!holder) {
+ 		ret = -ENOMEM;
+ 		err = "cannot allocate memory";
+-		goto out_put_sb_page;
++		goto out_put_sb_folio;
+ 	}
+ 
+ 	/* Now reopen in exclusive mode with proper holder */
+@@ -2667,8 +2667,8 @@ static ssize_t register_bcache(struct kobject *k, struct kobj_attribute *attr,
+ 
+ out_free_holder:
+ 	kfree(holder);
+-out_put_sb_page:
+-	put_page(virt_to_page(sb_disk));
++out_put_sb_folio:
++	folio_put(virt_to_folio(sb_disk));
+ out_blkdev_put:
+ 	if (bdev_file)
+ 		fput(bdev_file);
+-- 
+2.39.5
 
