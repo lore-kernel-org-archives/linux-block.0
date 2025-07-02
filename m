@@ -1,97 +1,86 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 348EE25D214
-	for <linux-block@vger.kernel.org>; Wed,  2 Jul 2025 11:13:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B195A275AFF
+	for <linux-block@vger.kernel.org>; Wed,  2 Jul 2025 13:32:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751454823; cv=none; b=Qa6nmfP/Bwx6ABxObR01rd2fI1liiGaxzkaGwjiTzvtbB/kKG+YNHIf5/7qT/feahJOMaEi5A9uXUDCFcaO4Gm2yr7zpCMd9MDRi6AooQrfMz40Zpf4zv2jnqRXC2mBR8/FRazOU3Dl373KkHH/luLDp/t4F9bAbEaVXpGXv67c=
+	t=1751463153; cv=none; b=k4oV29abHi7bw+4/7c8fNLki96gLRyhLRP4fEkzA15wZlnoPe6UYEFwXN7Ujn6p53jrW2uiIrUrfAyJ96dxknEthyXuXyw4mZJSxy4mZTpielxq+JxW+DOdPhhpXbrY7tGGPKDSoM2Z1b4fq905M1i484w6qLKhcRNPvzoITyFU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751454823; c=relaxed/simple;
-	bh=ECQIgKQgmLkAZS4N9Ti4FHy94Ri32AkLWlYW2nfxpHw=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=bTWJSSdOZZykcQh6imRmeuEs9dtukssibiz4E2L+nT/+R/B4qWOF4cdSBngY6lgULqD+6sMr9Iuz9UUaE6AhxlPJgPdZmSbE7eSGDB87ABiWmeaXsavh4JDvUTwh4+8+h68VhbHJUcCDTaOuUzfz5ivPtPjgwax5YqX0x/AkSW0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dd1rkXpV; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dd1rkXpV"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1751454821;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=MZkZRlr25YbPqB2HwXUZRwm4fw7iqNH9MdAMyL+S4cg=;
-	b=dd1rkXpVtwbnlQr+iEoUh3a5vEkZnMDQzdrOuwkl1aHRrUox8uKT9dGT4ZXzjViiIB2IyF
-	zKbu8qQ6T4LqyMXEDYZ/TPbwb8jxFHXfN+UDo1is+I7MZwdYFS+Tb0uJTAmeAy8eZVTA2r
-	oQs0E2DKEkLizf8SsSC+t9RMTlHZSxc=
-Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
- [209.85.167.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-75-dj-UEGktNMeRy6rDSzMHKg-1; Wed, 02 Jul 2025 07:13:40 -0400
-X-MC-Unique: dj-UEGktNMeRy6rDSzMHKg-1
-X-Mimecast-MFC-AGG-ID: dj-UEGktNMeRy6rDSzMHKg_1751454818
-Received: by mail-lf1-f71.google.com with SMTP id 2adb3069b0e04-5550e237ad0so2370924e87.0
-        for <linux-block@vger.kernel.org>; Wed, 02 Jul 2025 04:13:39 -0700 (PDT)
+	s=arc-20240116; t=1751463153; c=relaxed/simple;
+	bh=0UysnKiHVvlQW4D9CjU0APKZI+eBDzvzOKsOIq/LkuA=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=J6SwUxb1wPgQVGcDL8n/aZs2WcDXyZTDf3FGvDWaOBM5PjoxxxVk80UF7u5JaiKIa340cV0kJqKawUoL3uqOCR5SVIY5smWe3tZQtcWbvvXMJWg/3AZ8S63uRbFpzawjJIC1I/vbIMnZCBYi++kPJ6NmI2PHPADObZQ6mVrElmo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3df3b71b987so39198755ab.0
+        for <linux-block@vger.kernel.org>; Wed, 02 Jul 2025 06:32:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751454817; x=1752059617;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+        d=1e100.net; s=20230601; t=1751463151; x=1752067951;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=MZkZRlr25YbPqB2HwXUZRwm4fw7iqNH9MdAMyL+S4cg=;
-        b=NlJoHeS+38QWUd9eTafak1xg4VcT25AtbP75MIdSEHThv2tXpCeu4qZsyPpx3/EcUb
-         UBx7VNx4HCIsSXOVndQTN7aT9OMhFkTbPnKlQkqD2jbOG2WWh5g+HxDrL+8mDWtIoiAB
-         mlL7PBw3Dfe+ojvOfrsxdgeHzDcJ/r66sGQRpu+zShgj6fkAbcYio6uhmFCplcNCP0t1
-         67dNDcGA50qD8AfYRNpfnQQ788X+K5A6gLs5TUhk6ejFO4m1ZAWAQCtqGPTgUh32SILb
-         JHMrWsP0CKlUYMF/dNCpWuPOAaL4J6JyVayr8aFcSXqnwm8KfRhpZ6BdpvqDluakt3iJ
-         AkgA==
-X-Gm-Message-State: AOJu0YxOpBe3a/BmJQezV6I0gnLJAO+98VnczBpM5ZxbKqa2EFEPq+rn
-	TScdx5/E1Niem0J/0NP3LFlRDI/elDm0+eudkq4UhqA5FOBT+FM97qu8m+TV09Ym2y2MTxyNgUf
-	cRRPVlIkZcdeAn+LdA3NCzDq1QeOSRejgYQC+81r601klJr9gAk1bI5rLdMX9/ot3MKP8QZq5zz
-	nm6sHvUsE1fbEpDIGaGXqXZ0zW2KMvDLKqy6tvOvigPBBY14xIxDlj
-X-Gm-Gg: ASbGncumgTcwPB2Je6BtaoziRrejzeixKqxeI5Y6SqqCE8pksRjH5XcnZb8hznx1GUx
-	yM71UpGCLVZXrdyAfeff9PLKpc2XBm1n0c/GHLqe01WSyJy4Hmp+WnFAZB3X0er/eKtz5uNRyGn
-	Ekufop
-X-Received: by 2002:a2e:300b:0:b0:329:39cd:8d25 with SMTP id 38308e7fff4ca-32e0009b9cemr7172021fa.33.1751454816758;
-        Wed, 02 Jul 2025 04:13:36 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEGLgCNulf2JBPoF6IitYZrvd3Dqb+lhUMrHqbfYNPMJuW71OuJ6YxnkSlKEdWOuwrXbgMPj8GOIkJ+9uW0u9Y=
-X-Received: by 2002:a2e:300b:0:b0:329:39cd:8d25 with SMTP id
- 38308e7fff4ca-32e0009b9cemr7171881fa.33.1751454816291; Wed, 02 Jul 2025
- 04:13:36 -0700 (PDT)
+        bh=BubBoaagMLzEv8l+ERjtuMPNq+Ob+FgzeUx4GVvJZL4=;
+        b=WQxHFVdq/a1mVqfAMkWK8lp6Ao/Il7vov+auwZPl9mGbz/sNKZeYa8hNwcpvrBEBgk
+         rtPbUNIftB2DUr3Ux5oZKCEourarQBMWjzxEDEK1qTTIqcSwCnZD+sSNOUtX5ETCP51p
+         Cczu8LYXLHE0BJOZRwbVUmcWE4yUUDCJoV9UGSoWxbXu6l7tQMwmPu8HiOIfco/3A/Qx
+         PvxB9pWNom3x/iJPve/gsL+5OeANq000vwAPop8u5xp/T1rLIyjRq3nVRkwFx6hE45jF
+         M2+miPP/IlGLS5gOAYwCE5WDRoZog2NFRApJcXNzlEbdKqSp8VJm8qgZrvILJ9dPCqOQ
+         Y4tQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUupNEu0g/tTeaklBnJlwB0amlgvmvQ667ogjVBaY/Vl0DRDE8e8t8WtcJrrYDbWVimaSeBRMm7IIck/Q==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yytrb1q++MFssds4I/8YF6t8VfSkzOHhZSPaHGSOA7H+NfIbnZ8
+	keB41W/Gr4S/NUiid4rdvaWIp2BI0X3LSn9vOelp7gZ6+7YdTM7aZSej/mlGTtBjF/mMRQFnfny
+	CSYEEVbmghZXRvC5e1UHyJ7wfd3Yo2K+PSQB7QEwCyJhc1PmQnR6ViYiFlUw=
+X-Google-Smtp-Source: AGHT+IHrimW8AKa/QhbwsVFAuzkmWEJwu5jAAhd5cDMyuxLiN0due4eoa8Liqe22LG8AEgSEqp6N1ctGEi1FXIX6eNNGIE53a9al
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Yi Zhang <yi.zhang@redhat.com>
-Date: Wed, 2 Jul 2025 19:13:24 +0800
-X-Gm-Features: Ac12FXzxl_rJVCxsjww60zBQtZjiqEECF25ia06iPv4bvMa4hbQaNxYHeS7V0Bk
-Message-ID: <CAHj4cs_Ckhz4sL5k5ug_Dc5XfjSo9QDRSrHMfBj2XYGm_gb2+g@mail.gmail.com>
-Subject: [bug report] nvme4: inconsistent AWUPF, controller not added (0/7).
-To: linux-block <linux-block@vger.kernel.org>, 
-	"open list:NVM EXPRESS DRIVER" <linux-nvme@lists.infradead.org>
-Cc: Christoph Hellwig <hch@lst.de>, John Garry <john.g.garry@oracle.com>
+X-Received: by 2002:a05:6e02:214f:b0:3dc:8b29:3092 with SMTP id
+ e9e14a558f8ab-3e054935199mr29220845ab.5.1751463150832; Wed, 02 Jul 2025
+ 06:32:30 -0700 (PDT)
+Date: Wed, 02 Jul 2025 06:32:30 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <686534ee.a70a0220.3b7e22.245a.GAE@google.com>
+Subject: [syzbot] Monthly nbd report (Jul 2025)
+From: syzbot <syzbot+list09715b34c25b498d986f@syzkaller.appspotmail.com>
+To: josef@toxicpanda.com, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, nbd@other.debian.org, 
+	syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
 
-Hi Christoph
+Hello nbd maintainers/developers,
 
-I found this failure on one Samsung NVMe disk[1] with the latest
-linux-block/for-next. Here is the reproducer and dmesg log.
-Please help check it and let me know if you need any info/test. Thanks.
+This is a 31-day syzbot report for the nbd subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/nbd
 
-[1]
-SAMSUNG MZQL2960HCJR-00A07 (PM9A3)
-[2]
-+ nvme format -l1 -f /dev/nvme4n1
-Success formatting namespace:1
-+ nvme reset /dev/nvme4
-Reset: Network dropped connection on reset
+During the period, 1 new issues were detected and 0 were fixed.
+In total, 6 issues are still open and 7 have already been fixed.
 
-dmesg:
-[  751.872864] nvme nvme4: rescanning namespaces.
-[  752.177475] nvme nvme4: resetting controller
-[  752.221030] nvme nvme4: inconsistent AWUPF, controller not added (0/7).
-[  752.227653] nvme nvme4: Disabling device after reset failure: -22
+Some of the still happening issues:
 
--- 
-Best Regards,
-  Yi Zhang
+Ref Crashes Repro Title
+<1> 288     Yes   INFO: task hung in nbd_queue_rq
+                  https://syzkaller.appspot.com/bug?extid=30c16035531e3248dcbc
+<2> 141     Yes   INFO: task hung in nbd_ioctl (3)
+                  https://syzkaller.appspot.com/bug?extid=fe03c50d25c0188f7487
+<3> 12      No    possible deadlock in nbd_open
+                  https://syzkaller.appspot.com/bug?extid=ea702c2366971b7fc6e4
+<4> 7       Yes   INFO: task can't die in nbd_ioctl
+                  https://syzkaller.appspot.com/bug?extid=69a90a5e8f6b59086b2a
 
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
+
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
