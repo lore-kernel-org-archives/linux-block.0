@@ -1,94 +1,175 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AAF824466C;
-	Wed,  2 Jul 2025 09:33:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9187424EF7F
+	for <linux-block@vger.kernel.org>; Wed,  2 Jul 2025 10:09:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.71.153.141
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751448824; cv=none; b=fGdn67jXXkZQ6/SvedL/OQ/vynX2lZgYDAoCNCgAnt56SEppxcsqKJru+fjwomuaA9ck50Pyw14HiTSucKp5d8FVmh1Cwd9ttb6iIWj2i3+dkAsU8O3byFJciPGje0EMBxUOVkSeNrjLfAI93fNVFMMmQRGp+2eLCgPkd91H/nw=
+	t=1751450982; cv=none; b=ZGq5peKpXbKLE6bBDUpAUdjqb2Aq1Ll8IL6AWu0IJs0Cr7QQfr+Ntvk4+Ap1hIfRVV3PHX8bOfYt7ufr1gBAHNMnwkNhmOSAInVT08rEg3A2vODKE6vwniyE5baethzfLyoc2EMBtFmxTjLmqW3WaGUMirSI14RCKj8HN9t+cJE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751448824; c=relaxed/simple;
-	bh=b9CRuRPjH8bn+fiDF02AF7R2oNXbNMiUBSe4EfhH6DA=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=QwW+lZV8JBjLXmoaMM5DBZg7fP+RbeTNPLVLPzJcMTvXEyx1A5t0YyZ5uyvjfBr96SKSW6MQlNgsGa39rYAHPdvxKuKn64+sfFrglwePdsCZprDre78cAJL3r6fzqt0NwS4JqjJjXYbhTKGI9xR1bY4ETrhJhQnq6ysIdXYAyO0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4bXF8675DMzKHMx3;
-	Wed,  2 Jul 2025 17:33:42 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.252])
-	by mail.maildlp.com (Postfix) with ESMTP id 63E8F1A083E;
-	Wed,  2 Jul 2025 17:33:41 +0800 (CST)
-Received: from [10.174.179.143] (unknown [10.174.179.143])
-	by APP3 (Coremail) with SMTP id _Ch0CgBnxyT0_GRoOT2hAQ--.44744S3;
-	Wed, 02 Jul 2025 17:33:41 +0800 (CST)
-Subject: Re: [PATCH v2 3/5] md/raid10: set chunk_sectors limit
-To: John Garry <john.g.garry@oracle.com>, agk@redhat.com, snitzer@kernel.org,
- mpatocka@redhat.com, song@kernel.org, hch@lst.de, nilay@linux.ibm.com,
- axboe@kernel.dk
-Cc: dm-devel@lists.linux.dev, linux-kernel@vger.kernel.org,
- linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
- ojaswin@linux.ibm.com, martin.petersen@oracle.com,
- "yukuai (C)" <yukuai3@huawei.com>
-References: <20250618083737.4084373-1-john.g.garry@oracle.com>
- <20250618083737.4084373-4-john.g.garry@oracle.com>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <13b0be8a-298d-e2eb-aae4-f37273ab2ee2@huaweicloud.com>
-Date: Wed, 2 Jul 2025 17:33:40 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.1
+	s=arc-20240116; t=1751450982; c=relaxed/simple;
+	bh=eCffJVRAobOuZBcjrH9bwiDLqn3v3rqZ4hifQuwBfgQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FadZ7laNB0VjlvzwshrB2Q6FqGN+EV2j6GkYy5jpXMy/EzoFrzQmemP57a6UyBYzviR81dD5I0REZ4LkXORmQ8L9VJzSVshvzbvWNNh24dbmYk5RMnLehyIH9WSkBKgzZK3DsUew0zTQr4t55+xsxk4z/mv9j6Y4YciblbNIoPI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=Wr89g30T; arc=none smtp.client-ip=216.71.153.141
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Wr89g30T"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1751450981; x=1782986981;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=eCffJVRAobOuZBcjrH9bwiDLqn3v3rqZ4hifQuwBfgQ=;
+  b=Wr89g30Tljx7cXFyX3XvXmzUzTQRPToYkCobZwpiybAmKf9pR1my+G0n
+   Eh1h5u2B9VbMEhxYLLlPeBFDThh/fUgVszr5fYGOKpSjruE5Ca5m4Ea2W
+   R027FxAymKy8zjiP5cgVKEUIRP9ZRZqPLitVjaM/UWwsq0pn/gFZFHpd/
+   Ds8g6TV63Ud/7clySyL4Ba0jXoFPf0nwuPJGwTMphSsJy2DxMN47ap2K2
+   vPGh0pK73+oX4g+Hk3R3Z1uUYXSg53TGqggv9PUHVSu3I5U1PKgetqLM/
+   zC5UBTERvn0h60O0NV7Iq+3Lwa0hOK866XVXS8YqG9kTG/xksCt+6Ah5E
+   A==;
+X-CSE-ConnectionGUID: sV1E7ZTdTJ+CCIi38wwDAQ==
+X-CSE-MsgGUID: e53QyBiLQv6yKxUTQE05/Q==
+X-IronPort-AV: E=Sophos;i="6.16,281,1744041600"; 
+   d="scan'208";a="86384535"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 02 Jul 2025 18:09:35 +0800
+IronPort-SDR: 6864f6d3_uK6lyEtoR/9xtawt7bLhJYoF8R/xgC5+9OBMiMm+j8SeQ5L
+ 92HmYHlOx6AYNs+9TM/Wi4nwBJWku0E9EOvLdbw==
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 02 Jul 2025 02:07:31 -0700
+WDCIronportException: Internal
+Received: from 5cg0390ply.ad.shared (HELO shinmob.wdc.com) ([10.224.173.22])
+  by uls-op-cesaip02.wdc.com with ESMTP; 02 Jul 2025 03:09:34 -0700
+From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To: linux-block@vger.kernel.org
+Cc: Ming Lei <ming.lei@redhat.com>,
+	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Subject: [PATCH blktests v2] block: add block/040 for test updating nr_hw_queues vs switching elevator
+Date: Wed,  2 Jul 2025 19:09:32 +0900
+Message-ID: <20250702100932.647761-1-shinichiro.kawasaki@wdc.com>
+X-Mailer: git-send-email 2.50.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20250618083737.4084373-4-john.g.garry@oracle.com>
-Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_Ch0CgBnxyT0_GRoOT2hAQ--.44744S3
-X-Coremail-Antispam: 1UD129KBjvdXoWruFy8WFWxKr1rAFWUGr4rXwb_yoWfZrcEga
-	4fZF13Xr1I9r1I9w1jkF1SkrW5X348WFn7ZFy3Kr45X3WrWF18CFyj934rCa1YyFy2qF1q
-	yrs7ua1FyF1kZjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUbaxYFVCjjxCrM7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E6xAIw20E
-	Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwV
-	A0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x02
-	67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
-	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
-	x7xfMcIj6xIIjxv20xvE14v26r106r15McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
-	0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7I2V7IY0VAS
-	07AlzVAYIcxG8wCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4
-	IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1r
-	MI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJV
-	WUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j
-	6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYx
-	BIdaVFxhVjvjDU0xZFpf9x07UQ6p9UUUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-ÔÚ 2025/06/18 16:37, John Garry Ð´µÀ:
-> Same as done for raid0, set chunk_sectors limit to appropriately set the
-> atomic write size limit.
-> 
-> Signed-off-by: John Garry <john.g.garry@oracle.com>
-> ---
->   drivers/md/raid10.c | 1 +
->   1 file changed, 1 insertion(+)
-> 
+From: Ming Lei <ming.lei@redhat.com>
 
-Reviewed-by: Yu Kuai <yukuai3@huawei.com>
+Add block/040 for covering updating nr_hw_queues and switching elevator.
 
-> diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
-> index b74780af4c22..97065bb26f43 100644
-> --- a/drivers/md/raid10.c
-> +++ b/drivers/md/raid10.c
-> @@ -4004,6 +4004,7 @@ static int raid10_set_queue_limits(struct mddev *mddev)
->   	md_init_stacking_limits(&lim);
->   	lim.max_write_zeroes_sectors = 0;
->   	lim.io_min = mddev->chunk_sectors << 9;
-> +	lim.chunk_sectors = mddev->chunk_sectors;
->   	lim.io_opt = lim.io_min * raid10_nr_stripes(conf);
->   	lim.features |= BLK_FEAT_ATOMIC_WRITES;
->   	err = mddev_stack_rdev_limits(mddev, &lim, MDDEV_STACK_INTEGRITY);
-> 
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+[Shin'ichiro: fixed redirection to scheduler file and skip reason check]
+[Shin'ichiro: renumbered test case]
+Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+---
+I take the liberty to modify the original patch by Ming [1] to reflect my
+review comments. The new test case had caused hang with the v6.15-rcX
+kernel. Now it works good with the v6.16-rcX kernel. Thank you for the
+fix work.
+
+[1] https://lore.kernel.org/linux-block/20250402041429.942623-1-ming.lei@redhat.com/
+
+Changes from v1:
+* Renumbered the test case from block/039 to block/040
+* Fixed redirection to queue/scheduler
+* Fixed skip reason reporting
+* Removed && in requires()
+* Renamed fio output file
+
+ tests/block/040     | 71 +++++++++++++++++++++++++++++++++++++++++++++
+ tests/block/040.out |  1 +
+ 2 files changed, 72 insertions(+)
+ create mode 100755 tests/block/040
+ create mode 100644 tests/block/040.out
+
+diff --git a/tests/block/040 b/tests/block/040
+new file mode 100755
+index 0000000..fbc433a
+--- /dev/null
++++ b/tests/block/040
+@@ -0,0 +1,71 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0
++# Copyright 2025 Ming Lei <ming.lei@redhat.com>
++#
++# Most of code is copied from block/029
++#
++# Trigger blk_mq_update_nr_hw_queues() & elevator switch
++
++. tests/block/rc
++. common/null_blk
++
++DESCRIPTION="test blk_mq_update_nr_hw_queues() vs switch elevator"
++QUICK=1
++
++requires() {
++	_have_fio
++	_have_null_blk
++}
++
++
++modify_io_sched() {
++	local deadline
++	local dev=$1
++
++	deadline=$(($(_uptime_s) + TIMEOUT))
++	while [ "$(_uptime_s)" -lt "$deadline" ]; do
++		for sched in $(_io_schedulers "$dev"); do
++			{ echo "$sched" > /sys/block/"$dev"/queue/scheduler ;} \
++				&> /dev/null
++			sleep .5
++		done
++	done
++}
++
++modify_nr_hw_queues() {
++	local deadline num_cpus
++
++	deadline=$(($(_uptime_s) + TIMEOUT))
++	num_cpus=$(nproc)
++	while [ "$(_uptime_s)" -lt "$deadline" ]; do
++		sleep .1
++		echo 1 > /sys/kernel/config/nullb/nullb1/submit_queues
++		sleep .1
++		echo "$num_cpus" > /sys/kernel/config/nullb/nullb1/submit_queues
++	done
++}
++
++test() {
++	local sq=/sys/kernel/config/nullb/nullb1/submit_queues
++
++	: "${TIMEOUT:=30}"
++	_configure_null_blk nullb1 completion_nsec=0 blocksize=512 \
++			    size=16 memory_backed=1 power=1 &&
++	if { echo 1 >$sq; } 2>/dev/null; then
++		modify_nr_hw_queues &
++		modify_io_sched nullb1 &
++		fio --rw=randwrite --bs=4K --loops=$((10**6)) \
++		    --iodepth=64 --group_reporting --sync=1 --direct=1 \
++		    --ioengine=libaio --filename="/dev/nullb1" \
++		    --runtime="${TIMEOUT}" --name=nullb1 \
++		    --output="${RESULTS_DIR}/block/fio-output-040.txt" \
++		    >>"$FULL"
++		wait
++	else
++		SKIP_REASONS+=("$sq cannot be modified")
++		_exit_null_blk
++		return
++	fi
++	_exit_null_blk
++	echo Passed
++}
+diff --git a/tests/block/040.out b/tests/block/040.out
+new file mode 100644
+index 0000000..863339f
+--- /dev/null
++++ b/tests/block/040.out
+@@ -0,0 +1 @@
++Passed
+-- 
+2.50.0
 
