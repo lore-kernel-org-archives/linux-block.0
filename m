@@ -1,133 +1,134 @@
-Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B21592DE710;
-	Wed,  2 Jul 2025 22:57:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A71EB30B9BE
+	for <linux-block@vger.kernel.org>; Wed,  2 Jul 2025 23:08:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751497045; cv=none; b=enzGUcKIh4fvWAOFYGPDrKskITCI3h69DIg069/cUxFlR/5CgV6eC2czusdQPS1N0xG3HPUFG0dTIUoB9TnDh6Yq2irfkxUrAa7jWGd3gp0J1Ov/V+ylb3YEZU3uLonPoPh91AzTy5zyhZHUT9zZfeTgszZv0jl7uHk6Zoovj/A=
+	t=1751497720; cv=none; b=Rn/6RWksftqV+xO14mgGjPMbSBaGRDBSGhK2phjkEmZzlP1vmH2gkPgETlYsx3/Dew1tNqQHr4iN0EhiULaRCW4EFN/4ZCcZTQdD2ZlSwdtsJ5E/pVLjKRoeaPWfJAPuWM25yzvVD3felyg88ungTVio7oJ+iDk748TZkQD6uYY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751497045; c=relaxed/simple;
-	bh=8EW0hGGxBNPaepJB/kat+o+7PivqzOmIdnFN/RapTEk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JfP4E/p12yiZmKk2+exAAsF8bHjID6xv/NDe9qcxesZWmqaJ72sFnmmVi9F8GS6iApVLuXavt2rabACqVEVGoplPdepk3hRe1SK48WFsx+FvXp3+5FnKxLtaUjKl/fHYbYNPN/d9oYH7QfrcZjAWEdoXYj9/DpnFfuWKS8ItytY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y47i09IZ; arc=none smtp.client-ip=209.85.160.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1751497720; c=relaxed/simple;
+	bh=E2gedXa8RPvDIuGgbAJ2AbBt8r9o7NHF1gJHowLsZT4=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=BriomAmx5t1o7hnZGdzeJZBuSWIuy2hCh5f0Am34FflEzLNUxAm5bjbrK7sLf5gvVMAhGx1+OTk6UM1hk0/oErDMBhPag0nUEo8nrWGRxsFjCCE/xd86ogNvmm/lZhCLgz5u7//nje1YO4hjycg9Ef3KJ2Jr1LMmdx7/oatzEG4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=bbq7oeee; arc=none smtp.client-ip=82.195.75.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y47i09IZ"
-Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-4a5840ec53dso89973261cf.0;
-        Wed, 02 Jul 2025 15:57:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751497043; x=1752101843; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=L+sj4DzOPih53SQUVn5/WouvC+G14JrQj6it97lI9Kg=;
-        b=Y47i09IZk5Et4ftvV1FxOZmTsZ4EWF/yIKUxArsHWI8s9/7v3cPW2VHOxJIUZNZydx
-         HybZ9We+llzhu6swD1Wk6yf6WDOEVdPUMjKSdvTI7UTHkb5N4QPSqDCZFR5TDDIVrcob
-         IF6N6da3AsvPLkSJpTNsCSznssP2bMKAS9FOAXPnh2P4HSsdD6helG1QFPXWbNBzTSs4
-         /XTjZYec4Ip3phcorCNliRRSSKyZubVJTQc/NzvU8GhzrsLMzexaJYAT9caD1NGzzQx7
-         wKA8+oivWFUKAY4wj/Q8E2hS8QVleUxoJ91ptjblZeQaQu3n3+wp2aWQYNMAk63XWz9H
-         TPFw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751497043; x=1752101843;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=L+sj4DzOPih53SQUVn5/WouvC+G14JrQj6it97lI9Kg=;
-        b=da9yHRZ16laDkJkaxmizfbcVNlKIs0Uog6HbrLYMXrOa8iq5H+FLmOlWq2Q99RdHaK
-         ZPA6JerCgP7j5I09fYJL/fmWFs90zKLNmxL07i8UBXMOKI5N//Sj9PTYhIPH0rZM6H5g
-         tKG7cDGIUhALFpSS48cs43wwwAdL8DX0xM3JpLxUW4tmIDQWQDiQi6cIjghOGiit2FIq
-         AS3MkNVO7GynAvqKZh5eqjs3TFdmxZQi9KVc+hf8FkplQuNxvu2607XTkyox6mFuL/yC
-         H6YomETs+F1LZYOAw7I/0J5cVhDNv6M8Izu3+/r5YSyihfAOWUs/5562efQAMsuJxuq2
-         ZPIw==
-X-Forwarded-Encrypted: i=1; AJvYcCU+XLmNaCzygWE0qQ3mpN+OP6YFD2m/dgZJ1YuDVNjhZMKn/MSa1UPTPpvuVAaDGA1EvBD2A7Y5QM7v@vger.kernel.org, AJvYcCUr3nPNIPEcNAZ+tO9tBmR3MX9WI6NqJaG3L+LUAU7S1fxJUS92gI1FMQXwRQbGjBCvMx13AFZO69kSVg==@vger.kernel.org, AJvYcCXuVWmhuvWHED6uDRXwiP4HY7Mt36HfavKqa3sWv7ITrWRw21t2qSDl2QbHdKzG5SVDtTMzmDrDNWRI@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxtk5rNqDDAFC+QCrKsrESUv6MDF9H3yLtvVhpMnayhMylW+vDv
-	aM01pxSFQysowEkB2hA+JdB5bJ6bhLKGzwQTT10MIpU3mptopJuUCdw3INU0FTtrU0Oze/aJp7A
-	bpVfJV2O+7Ei8iObCTHSoyw904dLr3+k=
-X-Gm-Gg: ASbGncvrEzdPb8KL7crHyAS8Swy5R1btdo+HHJZ43ghJY0umYV32mlWjW1IUzKB+ZIH
-	vXVtWxoArXxqMpRo1tYTxjCRIeZjQ/Xd0aAwWspWpB+ttni541cAUYKLox9rEGX5fh2UBebWqAq
-	FmDlKbhqZUPF1XarnxQlbD5Xk7ue/Bv1QaMGNQ5TaeSdxXBwI2f2TfbNl9UZo=
-X-Google-Smtp-Source: AGHT+IGh+uw6/WknPh/VOBOhELlnb2ckIXgQMw+Dl8Agj8uw+6O+8N23tvom7rsshXm0+/bXl2b6LhX8aRmfe9JENnM=
-X-Received: by 2002:a05:622a:1343:b0:494:9455:5731 with SMTP id
- d75a77b69052e-4a9768dc925mr69623251cf.7.1751497042623; Wed, 02 Jul 2025
- 15:57:22 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="bbq7oeee"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
+	s=smtpauto.stravinsky; h=X-Debian-User:MIME-Version:Content-Type:References:
+	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=yq5T9jvrMp0bUSghu5umc9pYCIOmRrDKOTdNpR9Lqn4=; b=bbq7oeeeYLbJ//R8MlPrhaSMWA
+	FN2LyZNdSI844grc5WWMC9OHEIy+yS0wheJg8ydJj+yHteNtaZVaRYhJ/+u/2zIAHGgd+fGGqcQjb
+	vtfn5hKTI2vky5Ec5CI8r5/co+UMAEle0duSCGDUermLX5pQBsPtME2iQlsC4yKCULxrJVu5bGte0
+	r2DFYkoaeK233YtVxKrEUmxFGjJDY5hOXFSeybDHnHqw2exIcGMn5RZFB3Fey+24ONRqmz9d8Driz
+	AAoUPt+6xomoxl/oNxX+mdDcJwJx2ZjAWIiwq06GWO+enxFxqRTfagnipxFPgXzFRKXsI2nXAR1eU
+	ExphoJ+A==;
+Received: from authenticated user
+	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.94.2)
+	(envelope-from <benh@debian.org>)
+	id 1uX6Z2-009A7H-51; Wed, 02 Jul 2025 23:08:28 +0000
+Message-ID: <e45a49a4e9656cf892e81cc12328b0983b4ef1da.camel@debian.org>
+Subject: Re: Bug#1107479: util-linux: blkid hangs forever after inserting a
+ DVD-RAM
+From: Ben Hutchings <benh@debian.org>
+To: Uwe =?ISO-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@baylibre.com>, 
+	1107479@bugs.debian.org, Roland Sommer <r.sommer@gmx.de>
+Cc: Chris Hofstaedtler <zeha@debian.org>, linux-block@vger.kernel.org, Jens
+ Axboe <axboe@kernel.dk>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Salvatore Bonaccorso <carnil@debian.org>
+Date: Thu, 03 Jul 2025 01:08:20 +0200
+In-Reply-To: <r253lpckktygniuxobkvgozgoslccov6i5slr5lxa7oev6gtgy@ygqjea7c6xlm>
+References: 
+	<zdclth6piuowqyvx4bn6es5s3zzcwbs6h2hheuswosbn4wty5a@blhozid4bx6q>
+	 <1MGQnP-1uY1yz0lQr-00EvjN@mail.gmx.net>
+	 <174936596275.4210.3207965727369251912.reportbug@pc14.home.lan>
+	 <fxg6dksau4jsk3u5xldlyo2m7qgiux6vtdrz5rywseotsouqdv@urcrwz6qtd3r>
+	 <whjbzs4o3zjgnvbr2p6wkafrqllgfmyrd63xlanhodhtklrejk@pnuxnfxvlwz5>
+	 <1N4hzj-1uuA3Z1OEh-00rhJD@mail.gmx.net>
+	 <iry3mdm2bpp2mvteytiiq3umfwfdaoph5oe345yxjx4lujym2f@2p4raxmq2f4i>
+	 <1MSc1L-1uKBoQ15kv-00Qx9T@mail.gmx.net>
+	 <aif2stfl4o6unvjn7rqwbqam2v2ntr35ik5e24jdkwvixm3hj4@d3equy4z4xjk>
+	 <1ML9yc-1uEpgp2oMs-00Se3k@mail.gmx.net>
+	 <174936596275.4210.3207965727369251912.reportbug@pc14.home.lan>
+	 <r253lpckktygniuxobkvgozgoslccov6i5slr5lxa7oev6gtgy@ygqjea7c6xlm>
+Organization: Debian
+Content-Type: multipart/signed; micalg="pgp-sha512";
+	protocol="application/pgp-signature"; boundary="=-fZQJ67eJRUEZGuzERXWr"
+User-Agent: Evolution 3.56.1-1 
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250624022135.832899-1-joannelkoong@gmail.com>
- <20250624022135.832899-13-joannelkoong@gmail.com> <20250702175509.GF10009@frogsfrogsfrogs>
- <20250702175743.GG10009@frogsfrogsfrogs>
-In-Reply-To: <20250702175743.GG10009@frogsfrogsfrogs>
-From: Joanne Koong <joannelkoong@gmail.com>
-Date: Wed, 2 Jul 2025 15:57:10 -0700
-X-Gm-Features: Ac12FXz7lG-Jak0UpEVy1wDinr93eTqUtI8IoSMS4xFeGJDW7InC6JSRScIU8tA
-Message-ID: <CAJnrk1ZhFropUE-qoXcfa4VB740quF7nkQ3cs+NNbwPTFgpLsw@mail.gmail.com>
-Subject: Re: [PATCH v3 12/16] fuse: use iomap for buffered writes
-To: "Darrick J. Wong" <djwong@kernel.org>
-Cc: linux-fsdevel@vger.kernel.org, hch@lst.de, miklos@szeredi.hu, 
-	brauner@kernel.org, anuj20.g@samsung.com, linux-xfs@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-block@vger.kernel.org, gfs2@lists.linux.dev, 
-	kernel-team@meta.com
+X-Debian-User: benh
+
+
+--=-fZQJ67eJRUEZGuzERXWr
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jul 2, 2025 at 10:57=E2=80=AFAM Darrick J. Wong <djwong@kernel.org>=
- wrote:
->
-> On Wed, Jul 02, 2025 at 10:55:09AM -0700, Darrick J. Wong wrote:
-> > On Mon, Jun 23, 2025 at 07:21:31PM -0700, Joanne Koong wrote:
-> > > Have buffered writes go through iomap. This has two advantages:
-> > > * granular large folio synchronous reads
-> > > * granular large folio dirty tracking
-> > >
-> > > If for example there is a 1 MB large folio and a write issued at pos =
-1
-> > > to pos 1 MB - 2, only the head and tail pages will need to be read in
-> > > and marked uptodate instead of the entire folio needing to be read in=
-.
-> > > Non-relevant trailing pages are also skipped (eg if for a 1 MB large
-> > > folio a write is issued at pos 1 to 4099, only the first two pages ar=
-e
-> > > read in and the ones after that are skipped).
-> > >
-> > > iomap also has granular dirty tracking. This is useful in that when i=
-t
-> > > comes to writeback time, only the dirty portions of the large folio w=
-ill
-> > > be written instead of having to write out the entire folio. For examp=
-le
-> > > if there is a 1 MB large folio and only 2 bytes in it are dirty, only
-> > > the page for those dirty bytes get written out. Please note that
-> > > granular writeback is only done once fuse also uses iomap in writebac=
-k
-> > > (separate commit).
-> > >
-> > > .release_folio needs to be set to iomap_release_folio so that any
-> > > allocated iomap ifs structs get freed.
-> >
-> > What happens in the !iomap case, which can still happen for
-> > !writeback_cache filesystems?  I don't think you can call
-> > iomap_release_folio, because iomap doesn't own folio->private in that
-> > case.
+On Sun, 2025-06-29 at 12:26 +0200, Uwe Kleine-K=C3=B6nig wrote:
+> Hello Roland,
+>=20
+> On Sun, Jun 29, 2025 at 11:46:00AM +0200, Roland Sommer wrote:
+> > [correcting CC recipients]
+>=20
+> Huh, how did I manage that (rhetorical question)? Thanks
+>=20
+> > > Ahh, now that makes sense. pktsetup calls `/sbin/modprobe pktcdvd`
+> > > explicitly, the blacklist entry doesn't help for that. Without the
+> > > kernel module renamed, does the 2nd DVD-RAM result in the blocking
+> > > behaviour?
+> >=20
+> > Yes.
+>=20
+> OK, that makes sense. So udev does in this order:
+>=20
+>  - auto-load the module (which is suppressed with the backlist entry)
+>  - call blkid (which blocks if the module is loaded)
+>  - call pktsetup (which loads the module even in presence of the
+>    blacklist entry).
+[...]
 
-AFAICS, there's otherwise no private data attached to the folio for
-fuse for the non-writeback paths, so I don't think this is an issue.
-ifs_free() would be a no-op.
+I tested with a CD-RW, and the behaviour was slightly different:
 
->
-> ...and I think the answer to that is that the !writeback_cache case
-> passes all file IO directly to the fuse server and never touches the
-> page cache at all?
+- Nothing automtically created a pktcdvd device, so blkid initially
+worked with a CD-RW inserted and the pktcdvd modules loaded.
+- After running pktsetup to create the block device /dev/pktcdvd/0,
+blkid and any other program attempting to open that device hung.
 
-There's two !writeback_cache cases, direct io and writethrough.
-For writethrough, the file IO gets passed to the fuse server and it
-also gets written to the page cache.
+My conslusion is that pktcdvd is eqaully broken for CD-RWs.
 
->
-> --D
->
+Ben.
+
+--=20
+Ben Hutchings - Debian developer, member of kernel, installer and LTS
+teams
+
+--=-fZQJ67eJRUEZGuzERXWr
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEErCspvTSmr92z9o8157/I7JWGEQkFAmhlu+QACgkQ57/I7JWG
+EQmdDxAAxClLvO+E6qzWX746m4KYoYekREscmqWHjN9h+5Qk4AU4XOao/DcpTwFe
+MFW6nIlmr+Yhzbnw4HDTYUMI8Okz8OHWr8wYPpDfPYiCOncX14NhBmM4orn7Css+
++Di0U8uIHsbI86gOwt05Bv1+0ZcS5tbCyUaaapdtg47HsfFzCGFpkXDjMiDebuT5
+Tvg6BoeeW4vqvPuxWPB7J7WRrbI9m6TDe0w4Cjv7j1WdZyMLGRFVMwbjBdATMTr7
+j4iArWgJVeZ7N0a4Jw6v1TQJe5eneQIdGNsgDAtIp9N3ETDWN9zZWsVHxAy9pkRz
+g3OAnuxKvZ05tArADHHdW9yh37U1QBlUEEsUfnNbTDETsOUt4OpGNSf1sRiuCV1J
+d0+IxvAmzkkhUlthKQ8OtTwHlyUl5heM9AQ2ZtAh6TyR/5iVk9RgHXpkdw9eQ5WB
+LRpNqz998MazUTTfw7pXfVjYjMvItEsQPD+jPMwn2p7A9wxDe1JfrF2FjPRTGhqw
+EqKaWhSpylc2gCXSh5cCfU3c7AluPK4nq41iYmqHHaER2G/apLU1hqBOL1AOKz+W
+4o4VBj+d7lbvtnGbNp4gBS5ZGdSUmAk1al+chs86RDBD5lRpXlZ2pWamhhxd9Avi
+Jic9wDwWM7loC1zzNdxVjTVwbxskxW+ZxiD7Q+LbaTVv0Z8kyJA=
+=R8ni
+-----END PGP SIGNATURE-----
+
+--=-fZQJ67eJRUEZGuzERXWr--
