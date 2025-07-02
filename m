@@ -1,130 +1,107 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C52B3196AD;
-	Wed,  2 Jul 2025 15:59:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCDE9272E60;
+	Wed,  2 Jul 2025 16:19:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751471970; cv=none; b=PnrFWOhJxtf7Mdo6ciXl93THkT+useSMOw70q1NkDfvA+kLp4CMVcJiMx1e/WryD1I4+9GvRtIndfdjSVwgSnhw2n0pX1kAld4d3aPPBDu8meLEayP7ERjOhKi7KHTaQgXqycGDUeYBr5TTDbLv8BbrFThtXE/BL27xpx4Q1was=
+	t=1751473185; cv=none; b=niKY0f0DuqQd3LIyLxVGi7CMNo0lL6lOv5kzbopsvw73PHaEG0+AXRlDe5olAhdDYpepEIGml3QAFjHOLH9LLeUCCqkovB4o+XiEL+FF06G9rnBVyV2I8urfeb9xYnQNORtAdjbiMCgocSIQJVCSQ4vgIE9lxlbhatB6NSvqWG4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751471970; c=relaxed/simple;
-	bh=4I/F+PLDspmS8iOW/s/m6osb0Un9n8GXw4cf8sc32Mw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lbqOaEiaIWrWkrwtwmRDOrM2Eog4JqfKuj2IhZ3Y9suw65bntQgU6eLFL5q/NN8uvqL1JXXsoC4EjYOdVYNPJQMVIP3LTRXexAo09yo7KHTD8jnRL+YPCTld6md0cRO6ez9JlBjxPbxegQMdDyqu4LdDDjp5vmK7Pa7I+yOuPMM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GqlbQRnw; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1751473185; c=relaxed/simple;
+	bh=eJHOQtqA3xF7mK33ylDHVOemht94RK//ALIurEx23uY=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=VCes2aBYbUcpUWsFduv9Tnn2A4xu6a8TUa3VZ1v0wP4p3uQbb9QShhiNOTRuSbFitjCQ6VK8+2rQyLTDgBgUKqaoY6yoNWhX2WlERaKdh3uMhe2zojfn237zM+GslcXMA6JcuEYb0Wbco9hm3y/nXYvZ1kLUk8QaTEDvHALRbVU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MQzdi4h9; arc=none smtp.client-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GqlbQRnw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 468CEC4CEE7;
-	Wed,  2 Jul 2025 15:59:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751471970;
-	bh=4I/F+PLDspmS8iOW/s/m6osb0Un9n8GXw4cf8sc32Mw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=GqlbQRnw01AXL+uf4DFd3xpF89F7pe4/78JpH3loY+fOQ7qnWAUZlgodu/b5PsAXu
-	 YcwqodFiXy7l9KrZPH9O28pY0lPK3sBxC+enZNItvTVXUz2v4Ijt0b727mggQYhJaN
-	 oie8Sg0XfR7hR5ZyXcgnGihYPMwUYbQqtL2lwSlgid6LV885CUSTG+LfeFArUYRFGE
-	 RHMqWqVACkhhOVhXmo7AxThvCYOsel1CdaNIDQVmr7+kmUGT5OVltUb2gVm0tnVjHA
-	 NZaBwgt4t4cPBvtBFyWl/CMWuEHOO7RO9V46QWATl10Qtv9rZ1/7ZzogMDwiRikCwm
-	 asoJPq8/7/row==
-Date: Wed, 2 Jul 2025 08:59:29 -0700
-From: "Darrick J. Wong" <djwong@kernel.org>
-To: Joanne Koong <joannelkoong@gmail.com>
-Cc: linux-fsdevel@vger.kernel.org, hch@lst.de, miklos@szeredi.hu,
-	brauner@kernel.org, anuj20.g@samsung.com, linux-xfs@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-block@vger.kernel.org,
-	gfs2@lists.linux.dev, kernel-team@meta.com
-Subject: Re: [PATCH v3 02/16] iomap: cleanup the pending writeback tracking
- in iomap_writepage_map_blocks
-Message-ID: <20250702155929.GV10009@frogsfrogsfrogs>
-References: <20250624022135.832899-1-joannelkoong@gmail.com>
- <20250624022135.832899-3-joannelkoong@gmail.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MQzdi4h9"
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-236470b2dceso40329085ad.0;
+        Wed, 02 Jul 2025 09:19:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1751473183; x=1752077983; darn=vger.kernel.org;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UvuwG1BeX3SmP91n5grjnwtkYnE0lIY3xyC/GFoKlQU=;
+        b=MQzdi4h9Sty2K3fxtd2fOmFgSizS4WYruof66bpOp9nJ6nb5sxra15trxKaY4wfD++
+         G4TRnUvc83cm41s71RAYRxC6YWGK6NPVAA/WASIIIRZljcMGP/8XhJ1iPRoVufIUp/Hz
+         pCLvIQWlZaO/8Z375Yit7Z9WKzTEjYSvoAlUEyiW8Y9ofAbSTMBRpaUzA9muIfmxetre
+         JWDmNc/02IM5v7e9Wu0vcnsSZJ0pvv1nOzxV7VapqapDitt0O0ZI0fXefZnHAcXFLtEe
+         dFNgyUZW8l0Lj5sctlfeR6Gx1alSzbUT8jZ+SbufFrpIPxpqkixNAM8221EbEJB4mN6b
+         0F7Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751473183; x=1752077983;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=UvuwG1BeX3SmP91n5grjnwtkYnE0lIY3xyC/GFoKlQU=;
+        b=irr0oEDgQKiYiLjAXi2CHQ51k7w6gF9m6M4baBO5LtXm4UpMYpzq3niRPU5o7FqikD
+         5ur8/UX0tC+fQewiH0iObYnviv3iSdtr86O08JrVcBXGLJp4x5W3uz9Xn//+D0CyYXwu
+         1HsYXYjyI75NQpwKjExyXVwAGQ6pAXzXOR3Vj7Fr8As/L3npFlWgatUuq98KN0cEWOqS
+         Dn93YVTYP31DhFdqg4FNxiwnmoWP+GcIxtbCDmTiOFi+X4sZ0bkujHqzvQlYhzAE3cr8
+         OMkzbg+gqqQjQ9wFYD94pqTT663IOXyiN+yrVNneNxzX8nmA+6OBNzoZFhjQR25FZbB+
+         7XvQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW6GlkCjg8pW5GgmYBlDUiNAbr1N10AojahPuIeli+RvaF8MAOkvi70T/mGbj/02QTPb1+at/Cw7wLplhY=@vger.kernel.org, AJvYcCWfeqlay0S9l8vh/Tw+jw6hVqxAI8xZeJvl7OX3ZB6KNWL7JxfHILlh1yTa5WqqyLPWjX7jCf9CoWVt7fE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxY1twGUk+n1nGaDLU82JE+KrVwmzGJayuTDE3ScEjHJP1g6ZDV
+	vL16G0kbk6ZumXoFMF8oyU4XQ7RelrdRPBkgeoy2S2iiEMl3ha9vnaTl6A2tP9kb
+X-Gm-Gg: ASbGncvwqNd08jgwLt14z4Me48REKwKUbP4QuZqJANVYrBaZ8LzL+iM7VyImQCz5I1a
+	uSVaTUWNtPKVQPS/pJxJIgrCwjj4utk+W3yao0bkswcVyELCWWBN5+iKacOChpQJirxzMo1k2UM
+	T8eKndcARAGtBTvVSOPOsY10WgoCL5Kacx4HIppnR8vj6ZND5ALpPFHiFP4wdFgFP59ujgitwt6
+	dnnKvnJIhj/pwEY5s9oWJZJ0aUN7KA3Ia9pqlAGBDXp4e+wOE7n1nVzEd6ZosipciuUObYyHg5A
+	zUuV87WMTdyo3nBj2xnh4L1S6p8AONo3d2LwMWX1lGJaecqGIg0gVQRiEJ/2+kt8a9VzpZRd90V
+	aqEo7fT9e4fHKCbPG
+X-Google-Smtp-Source: AGHT+IEVAZYCl6bKVOdoOvyjbF2Fqsrp72OI8nq/SHLXyB6iz0D6CrSxMKthrj96isA6mCbUNOGG/A==
+X-Received: by 2002:a17:902:d487:b0:234:ef42:5d69 with SMTP id d9443c01a7336-23c6e5007ecmr51878625ad.13.1751473182906;
+        Wed, 02 Jul 2025 09:19:42 -0700 (PDT)
+Received: from smtpclient.apple (n218103205009.netvigator.com. [218.103.205.9])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23acb2e39besm141816475ad.13.2025.07.02.09.19.41
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 02 Jul 2025 09:19:42 -0700 (PDT)
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250624022135.832899-3-joannelkoong@gmail.com>
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.600.51.1.1\))
+Subject: Re: [PATCH] bcache: Use a folio
+From: Coly Li <colyli@gmail.com>
+In-Reply-To: <a741131f-b06c-4565-974a-f2c1a45d44c6@kernel.dk>
+Date: Thu, 3 Jul 2025 00:19:27 +0800
+Cc: colyli@kernel.org,
+ axboe@kernel.org,
+ linux-block@vger.kernel.org,
+ linux-bcache@vger.kernel.org,
+ Matthew Wilcox <willy@infradead.org>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <DFCB60F9-C0A5-4E89-A0F1-8B48575CDED3@gmail.com>
+References: <20250702024848.343370-1-colyli@kernel.org>
+ <a741131f-b06c-4565-974a-f2c1a45d44c6@kernel.dk>
+To: Jens Axboe <axboe@kernel.dk>
+X-Mailer: Apple Mail (2.3826.600.51.1.1)
 
-On Mon, Jun 23, 2025 at 07:21:21PM -0700, Joanne Koong wrote:
-> We don't care about the count of outstanding ioends, just if there is one.
-> Replace the count variable passed to iomap_writepage_map_blocks with a
-> boolean to make that more clear.
-> 
-> Signed-off-by: Joanne Koong <joannelkoong@gmail.com>
-> [hch: rename the variable, update the commit message]
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-/methinks this also fixes a theoretical logic bug if *count should
-ever overflow back to zero so
 
-Reviewed-by: "Darrick J. Wong" <djwong@kernel.org>
+> 2025=E5=B9=B47=E6=9C=882=E6=97=A5 21:49=EF=BC=8CJens Axboe =
+<axboe@kernel.dk> =E5=86=99=E9=81=93=EF=BC=9A
+>=20
+> On 7/1/25 8:48 PM, colyli@kernel.org wrote:
+>> From: Matthew Wilcox (Oracle) <willy@infradead.org>
+>>=20
+>> Retrieve a folio from the page cache instead of a page.  Removes a
+>> hidden call to compound_head().  Then be sure to call folio_put()
+>> instead of put_page() to release it.  That doesn't save any calls
+>> to compound_head(), just moves them around.
+>=20
+> Really needs a better subject line... I can do that while applying,
+> however. How about:
+>=20
+> bcache: switch from pages to folios in read_super()
 
---D
+Yeah, this subject is good IMHO.
 
-> ---
->  fs/iomap/buffered-io.c | 12 ++++++------
->  1 file changed, 6 insertions(+), 6 deletions(-)
-> 
-> diff --git a/fs/iomap/buffered-io.c b/fs/iomap/buffered-io.c
-> index 71ad17bf827f..11a55da26a6f 100644
-> --- a/fs/iomap/buffered-io.c
-> +++ b/fs/iomap/buffered-io.c
-> @@ -1758,7 +1758,7 @@ static int iomap_add_to_ioend(struct iomap_writepage_ctx *wpc,
->  
->  static int iomap_writepage_map_blocks(struct iomap_writepage_ctx *wpc,
->  		struct folio *folio, u64 pos, u64 end_pos, unsigned dirty_len,
-> -		unsigned *count)
-> +		bool *wb_pending)
->  {
->  	int error;
->  
-> @@ -1786,7 +1786,7 @@ static int iomap_writepage_map_blocks(struct iomap_writepage_ctx *wpc,
->  			error = iomap_add_to_ioend(wpc, folio, pos, end_pos,
->  					map_len);
->  			if (!error)
-> -				(*count)++;
-> +				*wb_pending = true;
->  			break;
->  		}
->  		dirty_len -= map_len;
-> @@ -1873,7 +1873,7 @@ static int iomap_writepage_map(struct iomap_writepage_ctx *wpc,
->  	u64 pos = folio_pos(folio);
->  	u64 end_pos = pos + folio_size(folio);
->  	u64 end_aligned = 0;
-> -	unsigned count = 0;
-> +	bool wb_pending = false;
->  	int error = 0;
->  	u32 rlen;
->  
-> @@ -1917,13 +1917,13 @@ static int iomap_writepage_map(struct iomap_writepage_ctx *wpc,
->  	end_aligned = round_up(end_pos, i_blocksize(inode));
->  	while ((rlen = iomap_find_dirty_range(folio, &pos, end_aligned))) {
->  		error = iomap_writepage_map_blocks(wpc, folio, pos, end_pos,
-> -				rlen, &count);
-> +				rlen, &wb_pending);
->  		if (error)
->  			break;
->  		pos += rlen;
->  	}
->  
-> -	if (count)
-> +	if (wb_pending)
->  		wpc->nr_folios++;
->  
->  	/*
-> @@ -1945,7 +1945,7 @@ static int iomap_writepage_map(struct iomap_writepage_ctx *wpc,
->  		if (atomic_dec_and_test(&ifs->write_bytes_pending))
->  			folio_end_writeback(folio);
->  	} else {
-> -		if (!count)
-> +		if (!wb_pending)
->  			folio_end_writeback(folio);
->  	}
->  	mapping_set_error(inode->i_mapping, error);
-> -- 
-> 2.47.1
-> 
-> 
+Thanks.
+
+Coly Li=
