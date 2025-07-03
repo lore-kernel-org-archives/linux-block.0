@@ -1,30 +1,30 @@
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3574A2C327C
-	for <linux-block@vger.kernel.org>; Thu,  3 Jul 2025 09:07:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E03813C82E
+	for <linux-block@vger.kernel.org>; Thu,  3 Jul 2025 09:09:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751533657; cv=none; b=CrVIFo1kk/sGiBelkOv7sR6JvreaqsVpNSNOL4FDuS8xd8VS0CfVXXg0nnwiBR+TvevGARxzu3B/rFtXIwjVi7nBNm0adpzv++Dp6K2DEUXPCedGB8VTtOU0GCgc9x0K2b48vYWsbp8vyxJzHUBmkimRiPpPMOhv6954q5Aw9aA=
+	t=1751533751; cv=none; b=K9N8Z7r+aXiVsQlj637GqhcH+JAowO7kPZ9dMG5Es0XVd7PPYU8keg3TKSLZt9zJFcPMWDOAYWiXWWYLTjOBMEs3XLZ4Sy8ViT+2M716V4uypkM7qGvGEWB0rgVbcEr/73O9Gwj18tHIc892yhs9KOLhL/dkhyawWihQmHTP3Ns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751533657; c=relaxed/simple;
-	bh=U3EQwThgYA9v2eHarmdstc3+HludTk2+jYR8f/NXDn0=;
+	s=arc-20240116; t=1751533751; c=relaxed/simple;
+	bh=L3OqQp+TqpqWebCRXu/q5UG3tlU0zH3uyyd0hyMA1lM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Dc+Qdj8dg7bg7IrMLrrnzJOn9a9UGZ+Zk1RcbQAxJ/Qn4GT7xevYq5xLTrfAelQbDoEZmIxaLwl3frkYdv1sMeXarWzDj98/0mYr64Kkb5uwNjD/5cd5A+fhsPkfrc1xorGSxLHK5ojxI++zxC7O6t3CZ+dKuy5mMLoL+QRB8SY=
+	 Content-Type:Content-Disposition:In-Reply-To; b=Oi6sKUzwnGkDiC5EWIhzuxZXR1yiSg0Uqv9TNSCtGH29CD/GM+hsEJ7CHDHZqDihLvOJham1fuOxIAc3Lj2fO/77eWtICHyp205yZmHcyyphztDzu1yn74d8I+I+Xk/e5ubOSPuHSPBa9dmJf+w/1g2QgKrTlKyTsfQK3Y1jR78=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
 Received: by verein.lst.de (Postfix, from userid 2407)
-	id 8643C68B05; Thu,  3 Jul 2025 11:07:32 +0200 (CEST)
-Date: Thu, 3 Jul 2025 11:07:32 +0200
+	id 7560E68B05; Thu,  3 Jul 2025 11:09:06 +0200 (CEST)
+Date: Thu, 3 Jul 2025 11:09:06 +0200
 From: Christoph Hellwig <hch@lst.de>
 To: Bart Van Assche <bvanassche@acm.org>
 Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>, Nilay Shroff <nilay@linux.ibm.com>
-Subject: Re: [PATCH 2/3] block: Restrict the duration of sysfs attribute
- changes
-Message-ID: <20250703090732.GF4757@lst.de>
-References: <20250702182430.3764163-1-bvanassche@acm.org> <20250702182430.3764163-3-bvanassche@acm.org>
+	Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH 0/3] Fix a deadlock related to modifying queue
+ attributes
+Message-ID: <20250703090906.GG4757@lst.de>
+References: <20250702182430.3764163-1-bvanassche@acm.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -33,9 +33,14 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250702182430.3764163-3-bvanassche@acm.org>
+In-Reply-To: <20250702182430.3764163-1-bvanassche@acm.org>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 
-You are not limiting the duration of attribute change, your are
-letting the freeze time out.
+I'm still very doubtful on this whole approach, and I think you are
+ignoring the root cause, which is dm-multipath keeping a q_usage_count
+reference for an unbounded time.  It is only supposed to be held over
+I/O, and I/O is expected to time out.
+
+You'll probably get much farther by changing dm-multipath to not hold
+a q_usage_count reference for something not actually under I/O.
 
