@@ -1,81 +1,81 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 139E9293C4F
-	for <linux-block@vger.kernel.org>; Thu,  3 Jul 2025 06:58:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D218F29AAF0
+	for <linux-block@vger.kernel.org>; Thu,  3 Jul 2025 06:59:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751525938; cv=none; b=PQlTnycadJ1w4G49u0nJ5+9zMPuBNTUfcSlhB+Lw4br8kNB90qVdoy/LVGlUTzsVvfA3tmj1/yb4fFn1DeSMY0VcXDFv1qlj+4MFv8Y7dMbMuCuqaj1m7iSigAFzVIC7D5/XymB+tjTTMWbFSh/f0FWJgUXO9QWy94aSVtMiijo=
+	t=1751525963; cv=none; b=Lw8XrWdPlSCjRAmElcQRCENrIH7Trvvlq1SoDTuh7HAyjhqT+si6QMR/5wQtdesoaNQOO6++qHDlUGfUppwRgRbIuPVyOCRRlIMIk78w1KzetbM6naZ+1mlKjx5fEssxc5Ifa1P4OZx1Hr6V/qnCREh+Tq6E89we5I8yjQFlFc0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751525938; c=relaxed/simple;
-	bh=ORFK95pdE/a/p9yk/QkXLJouhq8Tba2lRrvY2NUCr5g=;
+	s=arc-20240116; t=1751525963; c=relaxed/simple;
+	bh=HpO9GBcjZkV7Xi7e1U2fle/IMcSg5+uPPNVRuVDcUrI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cO0Bcz2pQOM8Wxp2tx9cDbE28HeUfcQ1NgRUNKoTF+CBO0sIrY8xiWGwdb0t2oeXx+WUAhkbAtysWd4ctwMEciAStr0DS/ONuUQLwyGSnd5NCptbwicJKNSeDtdywwifbVBHbYF75qmgLBNjuQyRE/kUwP4P9+PwLrHAZzdBENs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=EAYHu3n9; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=bW2LB+Tw; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=EAYHu3n9; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=bW2LB+Tw; arc=none smtp.client-ip=195.135.223.131
+	 In-Reply-To:Content-Type; b=LNERCIJP8gMCUxp85EmbD/tZnLWR7547FcKwkNKPUvbRwXsCZNv26A4+UwkDnjpa8b/ADYm1gJTK6Ka8885Jntxp/VdB+U7h7Nod4a5E0CGR50wXOBo0L4GAoSxf1vCKesw1q3APPUpBJt0FcgjaSf46750z2no714hfDFc0Qyw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=lD4m3Ia2; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=DFJYZxpG; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=lD4m3Ia2; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=DFJYZxpG; arc=none smtp.client-ip=195.135.223.130
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="EAYHu3n9";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="bW2LB+Tw";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="EAYHu3n9";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="bW2LB+Tw"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="lD4m3Ia2";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="DFJYZxpG";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="lD4m3Ia2";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="DFJYZxpG"
 Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 2F4131F38D;
-	Thu,  3 Jul 2025 06:58:55 +0000 (UTC)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 00E7A21185;
+	Thu,  3 Jul 2025 06:59:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1751525935; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1751525960; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=feKfxtThbjBgMaSjHhS09nw5zr3XwlSISa7X5gVk0+0=;
-	b=EAYHu3n9YzKxuyVeU1KdYrVv4/IUwCAiNfG14WQsYl897617M5VXptV5S6ni8i5oBxqn7d
-	VzEG6q2C5IYNunQoBFmYmb+PYtS7/HGiYWZ21p3VBxWxjDtDO5NsH2Ik4TVw3VhiAYvw5A
-	h/XKUcEWslsg4xFJTd35jDoEGTMDUQI=
+	bh=5Fsiib8zdgWaCro2EGpljFQE5UhciRXKPNK4B5GKkU8=;
+	b=lD4m3Ia2bzln4Oczmb9c4Vf4N0xymKDAI+Tf03At9ibhppL78aaGByRkbDb99HWx2ELTis
+	0hOdo0dfrReXXYne+Y+6DJ3VXEgac7e/AaS5B0VlWxsfphPjaqohfRb7u6BoahqGxNwWOr
+	exgDCSz6ymKA2fzfkvfZyVgEKxLNmi8=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1751525935;
+	s=susede2_ed25519; t=1751525960;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=feKfxtThbjBgMaSjHhS09nw5zr3XwlSISa7X5gVk0+0=;
-	b=bW2LB+Tw7wBg50rxBT+vff05vehnW0/CYhOQ9U6UKnMkMQj7utbqGfnvZ3X7UwbvN/LoHC
-	Hagf9GaSqU/gcFDg==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=EAYHu3n9;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=bW2LB+Tw
+	bh=5Fsiib8zdgWaCro2EGpljFQE5UhciRXKPNK4B5GKkU8=;
+	b=DFJYZxpG5gFrtWxpzRxIxg7Ez/VzxX0vzPYdi56Bs2Q74M8b3cP9CUkycv7CwlSgLo7woc
+	4lsPG1AAgcE+q4AA==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=lD4m3Ia2;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=DFJYZxpG
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1751525935; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1751525960; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=feKfxtThbjBgMaSjHhS09nw5zr3XwlSISa7X5gVk0+0=;
-	b=EAYHu3n9YzKxuyVeU1KdYrVv4/IUwCAiNfG14WQsYl897617M5VXptV5S6ni8i5oBxqn7d
-	VzEG6q2C5IYNunQoBFmYmb+PYtS7/HGiYWZ21p3VBxWxjDtDO5NsH2Ik4TVw3VhiAYvw5A
-	h/XKUcEWslsg4xFJTd35jDoEGTMDUQI=
+	bh=5Fsiib8zdgWaCro2EGpljFQE5UhciRXKPNK4B5GKkU8=;
+	b=lD4m3Ia2bzln4Oczmb9c4Vf4N0xymKDAI+Tf03At9ibhppL78aaGByRkbDb99HWx2ELTis
+	0hOdo0dfrReXXYne+Y+6DJ3VXEgac7e/AaS5B0VlWxsfphPjaqohfRb7u6BoahqGxNwWOr
+	exgDCSz6ymKA2fzfkvfZyVgEKxLNmi8=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1751525935;
+	s=susede2_ed25519; t=1751525960;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=feKfxtThbjBgMaSjHhS09nw5zr3XwlSISa7X5gVk0+0=;
-	b=bW2LB+Tw7wBg50rxBT+vff05vehnW0/CYhOQ9U6UKnMkMQj7utbqGfnvZ3X7UwbvN/LoHC
-	Hagf9GaSqU/gcFDg==
+	bh=5Fsiib8zdgWaCro2EGpljFQE5UhciRXKPNK4B5GKkU8=;
+	b=DFJYZxpG5gFrtWxpzRxIxg7Ez/VzxX0vzPYdi56Bs2Q74M8b3cP9CUkycv7CwlSgLo7woc
+	4lsPG1AAgcE+q4AA==
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 2B83413721;
-	Thu,  3 Jul 2025 06:58:54 +0000 (UTC)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 3175E13721;
+	Thu,  3 Jul 2025 06:59:19 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 10nXCC4qZmhyUQAAD6G6ig
-	(envelope-from <hare@suse.de>); Thu, 03 Jul 2025 06:58:54 +0000
-Message-ID: <66bfaac0-03aa-4957-80a7-0f004bb2dc58@suse.de>
-Date: Thu, 3 Jul 2025 08:58:45 +0200
+	id VIEVCUcqZmiXUQAAD6G6ig
+	(envelope-from <hare@suse.de>); Thu, 03 Jul 2025 06:59:19 +0000
+Message-ID: <c98a6d1e-d3df-4865-9ef7-89ba485cf827@suse.de>
+Date: Thu, 3 Jul 2025 08:59:14 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -83,8 +83,7 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 09/10] blk-mq: prevent offlining hk CPUs with
- associated online isolated CPUs
+Subject: Re: [PATCH v7 10/10] docs: add io_queue flag to isolcpus
 To: Daniel Wagner <wagi@kernel.org>, Jens Axboe <axboe@kernel.dk>,
  Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>,
  Sagi Grimberg <sagi@grimberg.me>, "Michael S. Tsirkin" <mst@redhat.com>
@@ -101,10 +100,10 @@ Cc: Aaron Tomlin <atomlin@atomlin.com>,
  linux-scsi@vger.kernel.org, storagedev@microchip.com,
  virtualization@lists.linux.dev, GR-QLogic-Storage-Upstream@marvell.com
 References: <20250702-isolcpus-io-queues-v7-0-557aa7eacce4@kernel.org>
- <20250702-isolcpus-io-queues-v7-9-557aa7eacce4@kernel.org>
+ <20250702-isolcpus-io-queues-v7-10-557aa7eacce4@kernel.org>
 Content-Language: en-US
 From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20250702-isolcpus-io-queues-v7-9-557aa7eacce4@kernel.org>
+In-Reply-To: <20250702-isolcpus-io-queues-v7-10-557aa7eacce4@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [-4.51 / 50.00];
@@ -127,32 +126,26 @@ X-Spamd-Result: default: False [-4.51 / 50.00];
 	FROM_HAS_DN(0.00)[];
 	R_RATELIMIT(0.00)[to_ip_from(RLdd7zpc331qgmz6gw8s9zsqsb)];
 	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.de:dkim,suse.de:mid,suse.de:email];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,suse.de:mid,suse.de:email,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns];
 	RCVD_COUNT_TWO(0.00)[2];
 	TO_MATCH_ENVRCPT_ALL(0.00)[];
 	DKIM_TRACE(0.00)[suse.de:+]
 X-Spam-Level: 
 X-Spam-Flag: NO
-X-Rspamd-Queue-Id: 2F4131F38D
+X-Rspamd-Queue-Id: 00E7A21185
 X-Rspamd-Action: no action
 X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
 X-Spam-Score: -4.51
 
-On 7/2/25 18:33, Daniel Wagner wrote:
-> When isolcpus=io_queue is enabled, and the last housekeeping CPU for a
-> given hctx goes offline, there would be no CPU left to handle I/O. To
-> prevent I/O stalls, prevent offlining housekeeping CPUs that are still
-> serving isolated CPUs.
-> 
-> When isolcpus=io_queue is enabled and the last housekeeping CPU
-> for a given hctx goes offline, no CPU would be left to handle I/O.
-> To prevent I/O stalls, disallow offlining housekeeping CPUs that are
-> still serving isolated CPUs.
+On 7/2/25 18:34, Daniel Wagner wrote:
+> The io_queue flag informs multiqueue device drivers where to place
+> hardware queues. Document this new flag in the isolcpus
+> command-line argument description.
 > 
 > Signed-off-by: Daniel Wagner <wagi@kernel.org>
 > ---
->   block/blk-mq.c | 42 ++++++++++++++++++++++++++++++++++++++++++
->   1 file changed, 42 insertions(+)
+>   Documentation/admin-guide/kernel-parameters.txt | 19 ++++++++++++++++++-
+>   1 file changed, 18 insertions(+), 1 deletion(-)
 > 
 Reviewed-by: Hannes Reinecke <hare@suse.de>
 
