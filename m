@@ -1,79 +1,39 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2594E101DE;
-	Thu,  3 Jul 2025 14:47:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48D3A2E7F0B
+	for <linux-block@vger.kernel.org>; Thu,  3 Jul 2025 14:47:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751554052; cv=none; b=X/7J6MS8ExTJ6lCJ9WcgF/AmawFtmcsSSbSFKeCJ7FcZFU6UxIUa9FBOm9cEHzzeJBII0NaeDcfBs6EXSxubhzBslABP0dbGBgO91HrdOApXYxltKlCkFr0eyYXqguIwFhrJ9jhQBl/gUfimgUYIcbmyE4xKDojtoMCL6t1zjIM=
+	t=1751554065; cv=none; b=CBFRuiL56gAph2j2N4eIGBwgYxlyuffMrDuuXBp7KwKAcql3feDaLysMt8GrE+0bYsztDSvMwAkkHKouidkSV1WMj4Jh8igIyWE0/+2I8blg9aIV67WBoZv/VJC6wSK4IN8g6BKB/UDCZC7mU4zrwQxdWP3vhMu3mM3dKWUrfS8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751554052; c=relaxed/simple;
-	bh=rK9CghBMfaxHWwZL0Y+AWxw/v++vtFMy/hmsv9qL7LI=;
+	s=arc-20240116; t=1751554065; c=relaxed/simple;
+	bh=+41I3uZo55oA1LXa7CCXtgoAnRr9kzXPuFUuywHZE1E=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UQSmkXWxJqz9QTRGOQVCIof5I2Gow3IfmwHk9vmdau3GQ1V1IuRtxwy1LrGGohjBV16tu4XcJ4rN5AL0BQTm0P/P8bhV/09yFsbLQtzVLnASAsGk6Zl2jq23P1sbafUTuHqmannABzcAfEN43zIc0V9qKq07Z8qNyfKajNTMbVA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HEz4ViML; arc=none smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=cHpT1kKNU2GiuMul0acwBDNnMCv6af2xWH1UZd9nPLaMpM1Mck1xLzeF8rrN/0l17/p0A1IsGv4t5vC1vmQjMNfxzQrwgML1h2WxXVjc98KeIHmRvACWLgvagEFMmCy8InbNcZpXQe8PgCy7ZBRdsBEb1UMtC7jxS3VuzkP8G9I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sgfzM3xC; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HEz4ViML"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1751554051; x=1783090051;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=rK9CghBMfaxHWwZL0Y+AWxw/v++vtFMy/hmsv9qL7LI=;
-  b=HEz4ViMLBiqoSTDC795T47fsWI6TvyR+WK9zHfJmv72RlwtTLd9BtLr7
-   JfTpCh7WKc4aNEv8UxqCwrFtyVD324xF1GZ5/iLsTT5etfZ5xYhKxyYkV
-   RLIfLbM9rHMUUFccrZpNMtJRh3RGfTN9BZJ4Wi3bhGGM1gbd7YOHbfVzc
-   JdTQH2874m1b+rkRdOSajrgCbCuoukuEYoechnDeHwkp14Ee0dJ97rQIT
-   JogKfIkBh4MR353/GVfeJMU5wbUJ0KC97wLqwAzdu61NFDu220nVHALOv
-   O2bs9NGWFGRx/bH5ptiNI/GMOpH6XkifEDmKFDoPa3rhhPEwxMAB3dllO
-   w==;
-X-CSE-ConnectionGUID: cwHYTKGiRl6yQ9NqFIPErg==
-X-CSE-MsgGUID: WeuJJv2sRHCqWd8i5iv3PQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11483"; a="53851715"
-X-IronPort-AV: E=Sophos;i="6.16,284,1744095600"; 
-   d="scan'208";a="53851715"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2025 07:47:30 -0700
-X-CSE-ConnectionGUID: do+iUI8IT32SBrmjq0xoyg==
-X-CSE-MsgGUID: kIJe5JEsQwmuIcgjNo0AQA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,284,1744095600"; 
-   d="scan'208";a="153800515"
-Received: from lkp-server01.sh.intel.com (HELO 0b2900756c14) ([10.239.97.150])
-  by orviesa010.jf.intel.com with ESMTP; 03 Jul 2025 07:47:17 -0700
-Received: from kbuild by 0b2900756c14 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uXLDT-0001vf-31;
-	Thu, 03 Jul 2025 14:47:11 +0000
-Date: Thu, 3 Jul 2025 22:47:01 +0800
-From: kernel test robot <lkp@intel.com>
-To: Daniel Wagner <wagi@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	"Michael S. Tsirkin" <mst@redhat.com>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	Aaron Tomlin <atomlin@atomlin.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Costa Shulyupin <costa.shul@redhat.com>,
-	Juri Lelli <juri.lelli@redhat.com>,
-	Valentin Schneider <vschneid@redhat.com>,
-	Waiman Long <llong@redhat.com>, Ming Lei <ming.lei@redhat.com>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Mel Gorman <mgorman@suse.de>, Hannes Reinecke <hare@suse.de>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org, megaraidlinux.pdl@broadcom.com,
-	linux-scsi@vger.kernel.org, storagedev@microchip.com,
-	virtualization@lists.linux.dev,
-	GR-QLogic-Storage-Upstream@marvell.com,
-	Daniel Wagner <wagi@kernel.org>
-Subject: Re: [PATCH v7 08/10] blk-mq: use hk cpus only when isolcpus=io_queue
- is enabled
-Message-ID: <202507032238.AoTmQnGP-lkp@intel.com>
-References: <20250702-isolcpus-io-queues-v7-8-557aa7eacce4@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sgfzM3xC"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06CC8C4CEE3;
+	Thu,  3 Jul 2025 14:47:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751554065;
+	bh=+41I3uZo55oA1LXa7CCXtgoAnRr9kzXPuFUuywHZE1E=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=sgfzM3xCqpFu8U2ri+U/qERj1bC9iGpSCQ9hL0jc2z2zzYV6Y9c2waSSOxEO2nau7
+	 4bnvKLPSvY397sUXiFci4VOTzCAsn6/0cfYrJXRSkhBJ8+jpGxNca27BoNKipJv0zo
+	 /QHAprZnoTF8a4PhdRyt8oS/OyiBn2rPrw0oXoa/vykH6JW9kskRTlBTdy7fv4Jc1t
+	 tGrBaELr4R91GCO5fAK2I9+U57dyrjC94e1a/BoDGSmKBe0I6GUkuxyOBzZ6Uj64MV
+	 8X6DP6Y19azp+xJEeE5Xn+80HA9WlL/hQ3Z3s4DT5DLOkoq8DrjcmJfgY2bNZuItgs
+	 yCvl+h9n/2fQg==
+Date: Thu, 3 Jul 2025 16:47:41 +0200
+From: Niklas Cassel <cassel@kernel.org>
+To: Keith Busch <kbusch@meta.com>
+Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+	Keith Busch <kbusch@kernel.org>
+Subject: Re: [PATCH 0/5] block: another block copy offload
+Message-ID: <aGaYDa6K1jiYUtjY@ryzen>
+References: <20250521223107.709131-1-kbusch@meta.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -82,105 +42,78 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250702-isolcpus-io-queues-v7-8-557aa7eacce4@kernel.org>
+In-Reply-To: <20250521223107.709131-1-kbusch@meta.com>
 
-Hi Daniel,
+Hello Keith,
 
-kernel test robot noticed the following build errors:
+On Wed, May 21, 2025 at 03:31:02PM -0700, Keith Busch wrote:
+> From: Keith Busch <kbusch@kernel.org>
+> 
+> I was never happy with previous block copy offload attempts, so I had to
+> take a stab at it. And I was recently asked to take a look at this, so
+> here goes.
+> 
+> Some key implementation differences from previous approaches:
+> 
+>   1. Only one bio is needed to describe a copy request, so no plugging
+>      or dispatch tricks required. Like read and write requests, these
+>      can be artbitrarily large and will be split as needed based on the
+>      request_queue's limits. The bio's are mergeable with other copy
+>      commands on adjacent destination sectors.
+> 
+>   2. You can describe as many source sectors as you want in a vector in
+>      a single bio. This aligns with the nvme protocol's Copy implementation,
+>      which can be used to efficiently defragment scattered blocks into a
+>      contiguous destination with a single command.
+> 
+> Oh, and the nvme-target support was included with this patchset too, so
+> there's a purely in-kernel way to test out the code paths if you don't
+> have otherwise capable hardware. I also used qemu since that nvme device
+> supports copy offload too.
 
-[auto build test ERROR on 32f85e8468ce081d8e73ca3f0d588f1004013037]
+In order to test this series, I wrote a simple user space program to test
+that does:
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Daniel-Wagner/lib-group_cpus-Add-group_masks_cpus_evenly/20250703-003811
-base:   32f85e8468ce081d8e73ca3f0d588f1004013037
-patch link:    https://lore.kernel.org/r/20250702-isolcpus-io-queues-v7-8-557aa7eacce4%40kernel.org
-patch subject: [PATCH v7 08/10] blk-mq: use hk cpus only when isolcpus=io_queue is enabled
-config: arm-allnoconfig (https://download.01.org/0day-ci/archive/20250703/202507032238.AoTmQnGP-lkp@intel.com/config)
-compiler: clang version 21.0.0git (https://github.com/llvm/llvm-project f1a4bb62452d88a0edd9340b3ca7c9b11ad9193f)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250703/202507032238.AoTmQnGP-lkp@intel.com/reproduce)
+1) open() on the raw block device, without O_DIRECT.
+2) pwrite() to a few sectors with some non-zero data.
+3) pread() to those sectors, to make sure that the data was written, it was.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202507032238.AoTmQnGP-lkp@intel.com/
+Since I haven't done any fsync(), both the read and the write will from/to
+the page cache.
 
-All errors (new ones prefixed by >>):
+4) ioctl(.., BLKCPY_VEC, ..)
 
->> block/blk-mq-cpumap.c:155:16: error: array initializer must be an initializer list
-     155 |         cpumask_var_t active_hctx __free(free_cpumask_var) = NULL;
-         |                       ^
-   block/blk-mq-cpumap.c:219:16: error: array initializer must be an initializer list
-     219 |         cpumask_var_t active_hctx __free(free_cpumask_var) = NULL;
-         |                       ^
-   block/blk-mq-cpumap.c:220:16: error: array initializer must be an initializer list
-     220 |         cpumask_var_t mask __free(free_cpumask_var) = NULL;
-         |                       ^
-   3 errors generated.
+5) pread() on destination sector.
 
 
-vim +155 block/blk-mq-cpumap.c
+In step 5, I will read zero data.
+I understand that BLKCPY_VEC is a copy offload command.
 
-   144	
-   145	/*
-   146	 * blk_mq_map_hk_queues - Create housekeeping CPU to
-   147	 *                        hardware queue mapping
-   148	 * @qmap:	CPU to hardware queue map
-   149	 *
-   150	 * Create a housekeeping CPU to hardware queue mapping in @qmap. @qmap
-   151	 * contains a valid configuration honoring the isolcpus configuration.
-   152	 */
-   153	static void blk_mq_map_hk_queues(struct blk_mq_queue_map *qmap)
-   154	{
- > 155		cpumask_var_t active_hctx __free(free_cpumask_var) = NULL;
-   156		struct cpumask *hk_masks __free(kfree) = NULL;
-   157		const struct cpumask *mask;
-   158		unsigned int queue, cpu, nr_masks;
-   159	
-   160		if (housekeeping_enabled(HK_TYPE_IO_QUEUE))
-   161			mask = housekeeping_cpumask(HK_TYPE_IO_QUEUE);
-   162		else
-   163			goto fallback;
-   164	
-   165		if (!zalloc_cpumask_var(&active_hctx, GFP_KERNEL))
-   166			goto fallback;
-   167	
-   168		/* Map housekeeping CPUs to a hctx */
-   169		hk_masks = group_mask_cpus_evenly(qmap->nr_queues, mask, &nr_masks);
-   170		if (!hk_masks)
-   171			goto fallback;
-   172	
-   173		for (queue = 0; queue < qmap->nr_queues; queue++) {
-   174			unsigned int idx = (qmap->queue_offset + queue) % nr_masks;
-   175	
-   176			for_each_cpu(cpu, &hk_masks[idx]) {
-   177				qmap->mq_map[cpu] = idx;
-   178	
-   179				if (cpu_online(cpu))
-   180					cpumask_set_cpu(qmap->mq_map[cpu], active_hctx);
-   181			}
-   182		}
-   183	
-   184		/* Map isolcpus to hardware context */
-   185		queue = cpumask_first(active_hctx);
-   186		for_each_cpu_andnot(cpu, cpu_possible_mask, mask) {
-   187			qmap->mq_map[cpu] = (qmap->queue_offset + queue) % nr_masks;
-   188			queue = cpumask_next_wrap(queue, active_hctx);
-   189		}
-   190	
-   191		if (!blk_mq_hk_validate(qmap, active_hctx))
-   192			goto fallback;
-   193	
-   194		return;
-   195	
-   196	fallback:
-   197		/*
-   198		 * Map all CPUs to the first hctx to ensure at least one online
-   199		 * housekeeping CPU is serving it.
-   200		 */
-   201		for_each_possible_cpu(cpu)
-   202			qmap->mq_map[cpu] = 0;
-   203	}
-   204	
+However, if I simply add an fsync() after the pwrite()s, then I will read
+non-zero data in step 5, as expecting.
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+My question: is it expected that ioctl(.., BLKCPY_VEC, ..) will bypass/ignore
+the page cache?
+
+Because, as far as I understand, the most common thing for BLK* operations
+is to do take the page cache into account, e.g. while BLKRESETZONE sends
+down a command to the device, it also invalidates the corresponding pages
+from the page cache.
+
+With that logic, should ioctl(.., BLKCPY_VEC, ..) make sure that the src
+pages are flushed down to the devices, before sending down the actual
+copy command to the device?
+
+I think that it is fine that the command ignores the data in the page cache,
+since I guess in most cases, you will have a file system that is responsible
+for the sectors being in sync, but perhaps we should document BLKCPY_VEC and
+BLKCPY to more clearly highlight that they will bypass the page cache?
+
+Which also makes me think, for storage devices that do not have a copy
+command, blkdev_copy_range() will fall back to __blkdev_copy().
+So in that case, I assume that the copy ioctl actually will take the page
+cache into account?
+
+
+Kind regards,
+Niklas
