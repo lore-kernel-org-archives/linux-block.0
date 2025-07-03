@@ -1,98 +1,100 @@
-Received: from mail-io1-f41.google.com (mail-io1-f41.google.com [209.85.166.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63C7F242D64
-	for <linux-block@vger.kernel.org>; Wed,  2 Jul 2025 23:20:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37078A2D;
+	Thu,  3 Jul 2025 00:11:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751498444; cv=none; b=OkKeaJMyMutKqyG46oRbEBPaqTFYeYsVu+xSxJBUL2qAFy5pz4FmlUEr8OjC6Cnm10axswtGo1X9eOzGWHVRVia0NPdvDY365AabvaOZV0RUsScV2hanYHQa8bMBCPfOiXLcwgLmrYlnzf22aGDfRdta3HyxCPn2ZkuDBznnvMg=
+	t=1751501503; cv=none; b=We3r0kMmsZ6SQIY0eXLCmGpL629qXtlGtI0C5vvwC4a86fzFZRQiYIAbP3eYQ/pnnvpWEkEfUK9vkIy1w8jw9vRC0jC6Gjgt1lMjWhslUIEKnZaHJoIAug1UOjdzdWNrnsP7qZ6hi0umb4zYIRK/Yowu2Efiw9LyVrgCzS+vwWM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751498444; c=relaxed/simple;
-	bh=q3ofX0T5a7aC+Sxdb7tFd/olIE4sjwbtwq6Y+ktwBIo=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=Fj5uQ0oC58JJKPtdVVB8+iBwwlYa5sWuCLWoc4WAcpfx5Xb91jAuUaYUo7jkb1dCOfglIp07iDBf4Eg17iweQWXnyv2eE2BkZJ3i4P6O8yU2DV2g+384fMyC7TGQrsIH0QA9gtpxV9Gl0wnFwxUR2VRobSgMrWKPEZGIIjDiRCA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=aP1+7Cv6; arc=none smtp.client-ip=209.85.166.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1751501503; c=relaxed/simple;
+	bh=ciRbywmskNGjVRIsc57wU0k8B3zJqHAdyjP9LPSBKVM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RIB8GWXE5Apvwu9uEjZAsOX+pI69retc1DqIqqwWgo7tWEfyX74AJgdDzqK4KI0EfHkGAvdClYaJ9ozI6p7KoZp72taBpKzfPazAmRwSNFqDX26Em53JYXwTbqp/EhXhqh21SMkGmzykyRiuABj1dSiIDZcrknlANOO/lCAoDdc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gAV0j/Ih; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="aP1+7Cv6"
-Received: by mail-io1-f41.google.com with SMTP id ca18e2360f4ac-8731c4ba046so451539839f.3
-        for <linux-block@vger.kernel.org>; Wed, 02 Jul 2025 16:20:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1751498442; x=1752103242; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lhaVNTqKFBo7V81f6Yv1iIxQt+Ef23n06JZqgPmk2Dc=;
-        b=aP1+7Cv6tUDK44r5eumil1x3bKPOaNI3s9spHmMqIG0SiaWEAggSXcSyBd2NYPIyFX
-         +oCnsLTxxiPquirA9QqY0zHR/FA9EwxCb9Aqop8Ccw5hOCp2zqBMdavRwnvmUEzDFutg
-         OUOE+OFFah/+sLwUaMJ3ig4KmUoWZQE60Z0rSCIjlOcP6iEPFRvEnLoLWHu7LbC9Fqd4
-         Gi/13kImiDCNGQRnoJmOi9s6bZif6fK8i4XMAlsuMwsm4q38BN/UAkhSfePBXIdAZx1i
-         0NcfkSoRiWTxSIy96bKr4qb+Mj0xzP9Yz9BIysV9zSfPKYmsbQ4TkQSwPYP77d6pnm5Y
-         lkkg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751498442; x=1752103242;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lhaVNTqKFBo7V81f6Yv1iIxQt+Ef23n06JZqgPmk2Dc=;
-        b=F8mRLNhZ4ox/+ZgVxhVAfkDqlrb607mKQa78dXesjHN6T0WdZYtFk5bJiFoGxqj/uX
-         ACBKXad5tgV9OnCbCcddVBfMXXuDnRWpd76ykpK/TCeJX+LoNC4ZGkJw+KPiDhH/mi44
-         jeR/4P687CGN+LsLSlSiuzn+0H90cX8TCwgufxd1BH5ZfZmo7w7reECR3MBsH4COUbtX
-         Ua8Oxp4Dg5C2wfR/HvofXOVJDUerj1hN21Ks9Y5FDs4N0CUPuQ7rJu2dFSmxRe1vrNfJ
-         BsH1tiwlKwueN+Rv4kDgdDNs37jkRVGqmbexA7myOqT7oiqxOIQcIeyp1tpz6ypBsXnt
-         yboQ==
-X-Gm-Message-State: AOJu0YyDBiE7opeimViOWi/kjfhrR0PnDWTH8cQY64G0a2AjPj9GgTki
-	TJ43Adu5z53+FVESP7JjeWGXffm90ohzyU5Vl/KVL1VF7a+w/x7Ccnu9DEUfGPbA/g7v3F1nMkK
-	oIHWi
-X-Gm-Gg: ASbGncu7kAX33tUmhamw1FGfgGQrK8BDwguBkTaib+iGuOVOUukTo7ej9I5fTcauWKX
-	1j+Kz8mBMKkmH4mUewtK9QmkC9MFMtHyprAIm/pao/ML+mTKpAOhM3ZLfDNSZm6/oe/7clskrEf
-	2CaL1c9CHKUejWJ0dTuEPFVUr6AbwAAz1CFoYZSXkDcJwHPiCBrxFZhYBCyEjsrVlP/lvjaOoQG
-	hNWciuYXFZeJskmCcbQqetoXSjMimoV8X3crEGEIDdTCTkmHCz5ImJ3no8VKli6L6WDb3fNRAfE
-	TKx9s4HXrUXKblSHjmzMdFLSFoeMNTrZQLlQ3oaBshIwgsLd+qzRyg==
-X-Google-Smtp-Source: AGHT+IEby1ioQvw12GtPt/ocg6xPvPzaqg55+xdZ8hB8KnbDdnv7Wv2+8Tq0O9OKzEA3E3Emy/GHyQ==
-X-Received: by 2002:a05:6602:750d:b0:85b:3c49:8811 with SMTP id ca18e2360f4ac-876c6a098f1mr818720039f.4.1751498441970;
-        Wed, 02 Jul 2025 16:20:41 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-502048d2af9sm3209457173.56.2025.07.02.16.20.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Jul 2025 16:20:41 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: axboe@kernel.org, colyli@kernel.org
-Cc: linux-block@vger.kernel.org, linux-bcache@vger.kernel.org, 
- Matthew Wilcox <willy@infradead.org>
-In-Reply-To: <20250702024848.343370-1-colyli@kernel.org>
-References: <20250702024848.343370-1-colyli@kernel.org>
-Subject: Re: [PATCH] bcache: Use a folio
-Message-Id: <175149844110.467787.16486778272474982430.b4-ty@kernel.dk>
-Date: Wed, 02 Jul 2025 17:20:41 -0600
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gAV0j/Ih"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 265A2C4CEE7;
+	Thu,  3 Jul 2025 00:11:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751501501;
+	bh=ciRbywmskNGjVRIsc57wU0k8B3zJqHAdyjP9LPSBKVM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=gAV0j/IhDSYsXVOss49cftKkAzDiN2Ggao3lTtG6oklxXd4Dfrz0nX8zfSDiwxm5r
+	 qX45g3ZjXl2PBcg0AiMlnHqoyuWZip82qlalSc1AWgNf2CQhouuUnNwyaMaNRPolZt
+	 txgkpNh/xpbqm6A8yOhjZ1mfoOyXO47U3eWmua8j71BGYEuSKIs1rVyA819YG/83ZZ
+	 iQeZK8DHXDyjhgso2fTcOYzZlq5tvFwOCcJy4TN6F+emR2Y4wpeda3D5CGZEgLoecC
+	 jMysoOatGSlYTqnck8736XnE8yEXUM8MWE/g+wQd6kEh9+9AC65M0TsawKp1qCCtVS
+	 2eF+n9oQ5T2cQ==
+Message-ID: <a97a31b0-bb6c-4c7a-8d51-d2f723a2b650@kernel.org>
+Date: Thu, 3 Jul 2025 09:09:30 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-d7477
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v19 01/11] block: Support block drivers that preserve the
+ order of write requests
+To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+ Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
+ Nitesh Shetty <nj.shetty@samsung.com>, Ming Lei <ming.lei@redhat.com>
+References: <20250630223003.2642594-1-bvanassche@acm.org>
+ <20250630223003.2642594-2-bvanassche@acm.org>
+ <0f9f5900-b7d0-4df2-8c05-fc147c991534@kernel.org>
+ <a7b5b394-ed7d-4f57-96ba-ff14375b2e7b@acm.org>
+From: Damien Le Moal <dlemoal@kernel.org>
+Content-Language: en-US
+Organization: Western Digital Research
+In-Reply-To: <a7b5b394-ed7d-4f57-96ba-ff14375b2e7b@acm.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-
-On Wed, 02 Jul 2025 10:48:48 +0800, colyli@kernel.org wrote:
-> Retrieve a folio from the page cache instead of a page.  Removes a
-> hidden call to compound_head().  Then be sure to call folio_put()
-> instead of put_page() to release it.  That doesn't save any calls
-> to compound_head(), just moves them around.
+On 7/3/25 12:57 AM, Bart Van Assche wrote:
+> On 7/2/25 3:57 AM, Damien Le Moal wrote:
+>> On 7/1/25 07:29, Bart Van Assche wrote:
+>>> diff --git a/block/blk-settings.c b/block/blk-settings.c
+>>> index a000daafbfb4..bceb9a9cb5ba 100644
+>>> --- a/block/blk-settings.c
+>>> +++ b/block/blk-settings.c
+>>> @@ -814,6 +814,8 @@ int blk_stack_limits(struct queue_limits *t, struct
+>>> queue_limits *b,
+>>>       }
+>>>       t->max_secure_erase_sectors = min_not_zero(t->max_secure_erase_sectors,
+>>>                              b->max_secure_erase_sectors);
+>>> +    t->driver_preserves_write_order = t->driver_preserves_write_order &&
+>>> +        b->driver_preserves_write_order;
+>>
+>> Why not use a feature instead ? Stacking of the features does exactly this, no ?
+>> That would be less code and one less limit.
 > 
+> Hi Damien,
 > 
+> Thanks for the feedback. I will look into making this change.
+> 
+> Please also help with reviewing the other patches in this series.
+> Progress on this patch series has been slow so far because every time I
+> post this patch series reviewer feedback is provided on less than 10% of
+> the code in this patch series.
 
-Applied, thanks!
+I am still trying to wrap my head around what you are doing with these patches,
+which is to allocate and submit a BIO from one CPU using the ctx (soft queue)
+of another CPU, if I understood things correctly (your commit messages are
+still a little too dry and do not explain a lot, especially the why...).
 
-[1/1] bcache: Use a folio
-      commit: 88b4b873551f0901dd0314d37ca2a420ec6c2686
+So far, I am not liking what I am seeing because I think it is dangerous given
+all the per_cpu things around. I do not see how it can be safe to play with one
+BIO from one CPU to be issued on another.
 
-Best regards,
+I did suggest that you simply should plug all BIOs, always, and have them
+submitted by the BIO work for a zone by scheduling that work on a single CPU,
+always the same CPU. Doing so, you can distribute writes to different zones to
+different CPUs. And if the submitter process is not bouncing all over the place
+(being rescheduled constantly on different CPUs), there will be no overhead
+because you can simply run the BIO work on the current CPU.
+
 -- 
-Jens Axboe
-
-
-
+Damien Le Moal
+Western Digital Research
