@@ -1,235 +1,354 @@
-Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4DB8298CA3;
-	Thu,  3 Jul 2025 19:17:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6A0027876A
+	for <linux-block@vger.kernel.org>; Thu,  3 Jul 2025 20:20:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751570243; cv=none; b=e4hpULlTv8t7bcb5izd1Oz44z2U0S6n7WBYTRqj0xyzfO7hwjWEXbHdd1gLgt3PtfKvenhbJEaZSg6/HuykP2x6I4aXXeFawQbI+cO+Tt5vZ4sAzqcu+cNnFhwXuJzKfXy5N03+K6BqLe/9NzmQhqiqHaK4gGs4GprZWyVeU8E8=
+	t=1751574004; cv=none; b=agaVClGOMxmeoN+1qDFU16NE9xhXgJZq86ifXnL02PwPAfmRKbleTxwajrI+14OZAGCHzMs6Cqfj2Y49DnfwQTUONrBJdoibpS6FT7CldGSq7K8tbiyWKsYnsUO7nvZC3gWL95QL8fS5Fy96cGjBW7oDQnL8T5pP9y8YF5YzK7M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751570243; c=relaxed/simple;
-	bh=8e3W8v7w5bcyQIgewGyA9kt9oSM7xIJIbCEFgUMyAAE=;
+	s=arc-20240116; t=1751574004; c=relaxed/simple;
+	bh=ZL3LSoWex+N1sha1HHZurFmS7U8ra6AwBkqYvZSeRLk=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kY17xv5a+RGTC34ItuF4Zv/9IefofXjcM7XLZGIh2WYuU2R/xf/IWd+p4cSWXYTRDSxYpB4bOaOwAOQAMuYqQEpe0PIrZE/n5Gm2+mEq5rAiUaEihf1wZaWAGYoA6tEE0KrClBiJOcYL6NIZ/0UBjNPJQUGrNZqya9YEJabRa9w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XHYN9jhC; arc=none smtp.client-ip=209.85.208.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 To:Cc:Content-Type; b=onQ1arPq7sg1SZT7FHhb/bbC9VXqj6UzlNNyv/hiMmVrLoYFgB0BTiXObFJxjMT+HF9zWzMXD49DKZ7NqiLGp7pnzqJpOQAtiq3LA9pE/EBbUSxoN9xIC95el39eE53IQagMB/I9Vbq35UP83/kZZphAehEd6ozfElImAGwMzUU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=DKdVpz7d; arc=none smtp.client-ip=209.85.216.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XHYN9jhC"
-Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-32cd0dfbd66so1943161fa.3;
-        Thu, 03 Jul 2025 12:17:20 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="DKdVpz7d"
+Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-312efc384fcso53723a91.3
+        for <linux-block@vger.kernel.org>; Thu, 03 Jul 2025 13:20:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751570239; x=1752175039; darn=vger.kernel.org;
+        d=purestorage.com; s=google2022; t=1751574002; x=1752178802; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=R3Barr3IhXzrNTPGC2RTs5bswjpJKBTkkOzXAPniR4c=;
-        b=XHYN9jhC0PZ64ASbC6MVF6NWEpjDLlqnSZcdhSmT/MYnclnSalVM02TEqQD+LackTU
-         xf9vqY5/HLBUBCjGWwvWUSBP6FFyw4dWBHw5fMEuf8YSNYI0a16sSjgRCTDLldMZg7t1
-         DXXNRCTu3J09Q9W70UcQ5ISFZQcnB+POq+0QwsMMeCLxlTB1Jn1UJZWZZZN2cNEscqGD
-         /Pry5/Qzs/EQgG4693kddfOrBCKRYh1+kDorUaQrPAieks4IRtZu5Xt/HTJlzgt2eFZl
-         bvhR2avzKXIcPTv9oVzuAlOIEV3udetfxpdy7DHKZhL/2B9GTwnZSwM+5OwiVG+lFHPn
-         L28A==
+        bh=Y+sz/GvnopVAnCpdS9DfAZX6gS6QkI2dpT4hh/H/foc=;
+        b=DKdVpz7dzbXIPgqPKhrdDI0tg209L6x7lUZRMNwreE3iS9nTsPEsdCj9p2UABOPJod
+         wrWDzeFu0OhsCuYXNJ0QpheYjc7OyfnErBM0/gqNHbVeUDnnk42OKwiWg4RAcQ7F8YqF
+         L5ncP55B/Ns++14f53b/KxXgJaoAymlpdHUjXAdNaGx68qRDnlzUUwuZPJuS2LSvoSca
+         BbssjNNXw+MkOKROYFnXuBYVRq3+lYl7rCV7yANNAomX83kwK0G0CDBmml0lVbnBuhFx
+         /zSQWdR5X1voiQqjGiKVvZc6UcOzil3D3iPJQTHj2yZ7SpxavsK/PbojfMEqz57cc4gB
+         +AEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751570239; x=1752175039;
+        d=1e100.net; s=20230601; t=1751574002; x=1752178802;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=R3Barr3IhXzrNTPGC2RTs5bswjpJKBTkkOzXAPniR4c=;
-        b=BKpTY2KjJVOWQiXriis4qJ0dyxkmE780Mz+n1Pdmt2PJKsyhAFneilkmZe7OP9fewU
-         XQqPYEhMniDigAVFO1wwXISv/up80QCxW51dPYKSvIg4BkO2Ja3472/CZ5XgaQZD1+QF
-         kMNqN68WnCag5hBZtqgdN7O6JszbzaQAy19TJEmYxn+KRQ40kz1roxf+odM1qrCk5M6k
-         Bu1FEjUVglkCQLnHpxLNV0ytV9MhC+ETjdQmb+j/JwirA4bQyPdvb93kvccmaN3Lbc9H
-         E7dK6Z9pwDc8JP/YUfMDfXC0g7c9UGaIvDCYlw8WCGXjudXADxQWsMh1SnFzkqgMYooK
-         g0sg==
-X-Forwarded-Encrypted: i=1; AJvYcCV0x1prkS9Opk/WN2MBLJh7F65VUMIIlB6VgPwT7Rqh/smAanb7pGUqAeiqBrHC2D7MYybicrSUobtqS8M=@vger.kernel.org, AJvYcCV6JMO3qtQwPDMk4zcmAJ9WEuqieKKX/1QsIYYMBjkb29duPbfufwwupKIn9hHFRtqNGLsxqgl3ek9t@vger.kernel.org, AJvYcCVKvbkl0UkzHXGMwGQtFn6qFuAlvpphN45VHO0ujEI+rm9dKcdk1PnLNXs77zIlXCDPy0F6zp0H@vger.kernel.org, AJvYcCWXjm0Z8X3X/SbxUoIXAnN2JG2nMQoZ+iKaZUXQUnXeHkTi2XZRsn85/VMB2Kyu9xIfT8Bk8ZO1Y4ciNzGX@vger.kernel.org, AJvYcCWYqOBU/tN9EnPpoc9hxnO/xeOhzrM0mAdHUPrBqZf5jEi4xrqbvodUCKF8c3ZLNnPx1lEVt8YoaLBmzKoMsRc=@vger.kernel.org, AJvYcCX8MvpA5ZcXrustMrBULAJQwMtNQfj4IXXdEJe8QGny7si0t0ZwYRNDMqDh7KcfCcRESLbxjhdTGuX9@vger.kernel.org, AJvYcCXDuNADXeCALEcj31q5XyazECv/9UG1MxKUYazfeQVnSr7NQ1OEdPU4kzLi8A/D2rajf2E42MTw7ADj0+BEB9LP@vger.kernel.org, AJvYcCXFDUQ6zmK6wMMuweaBgSNFfHkEsZGrcqtD9VWrM0QOlhtKVF093oASgq2kWT1pBXjgHxVrY1ABckc=@vger.kernel.org, AJvYcCXcqXVhntPjs453kfnuO/Bno79rixzJtG1J3qQAuFFgOBXJXYWyeLckkQMKWLLldmaTHJo8rfdP75yJ@vger.kernel.org
-X-Gm-Message-State: AOJu0YyRX0JkJwNF1MSdUMP8JTwneFdTf2W0To9LngexUnCRHxyKaQOK
-	hpA+GYXwjGfjd+Z66Xm4QodQtDxjlbHFcqQ6UCzStvqIERsqG8oBIdrN2IA59RjQ1fsT2Zke/CT
-	m8DynGvGj7WCGbUu5I1VQCRwi8N2nYe0=
-X-Gm-Gg: ASbGncvE/17EmCkJpr+D89P468ZRQho8gGUlYT9LXEp5nOy4cyTwEbeA4wVvN1m5NkE
-	Jc4WZcPQPIYqOWeen+HfoXnOSjQI6YL7/ibvOYwb2r5A4vxNDK6UlDVKxI2fPBi9UxnyaHuEqom
-	KGMpxDc2JDhkh8+YITxGL8NHn8m3rn9Fe96nFl8iNtUrgMzQ==
-X-Google-Smtp-Source: AGHT+IGjC0TGXLvqJzlq7AH9t/Q8+27F2aQQEGTeZqTm6S+IuruBMFgglwnG67+02iIc84HBQzCfPbXa93QdJ3TTD74=
-X-Received: by 2002:a05:651c:3c2:b0:327:fec0:b85d with SMTP id
- 38308e7fff4ca-32e00049994mr27628221fa.21.1751570238849; Thu, 03 Jul 2025
- 12:17:18 -0700 (PDT)
+        bh=Y+sz/GvnopVAnCpdS9DfAZX6gS6QkI2dpT4hh/H/foc=;
+        b=k3HeUTtU2KcPAukgE937vTFl0Zt4ycI0738npg422dymcBKPS1EzLsYeLcTb6DbXwd
+         WydbcqmjpXwMId0gjrzED/S5Xyvagi1TDSZPbD4tsU/WSCK+H/pozOu40zBrH8qD80en
+         H/TObMBfcKYYbZgLilAeohbL06UCjuI5I0rzG/JkC0Oxjf53L4WiHqhBAouBjn6oP8VD
+         IP2MJJy1/sVdfxyjcyAZy+7R6geUEJDxp7uW0BiN8hAqIEEAr/ti5msfUmOUaTrG3cyH
+         TNq2vVmwJa6satflgCzb6uswmHGIsa1kOhFHjEmidvUHO3gRXCXjA1ViLtck5aPUE2wF
+         gWtw==
+X-Forwarded-Encrypted: i=1; AJvYcCUxVmRBfGtPwSndSDSTFk50BwJ7TODGFgqK687SJkgvQqDp7yh5GkAOZxaQ3glMDtKkT89X+gi4+0/HqQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxZkZHwGOnDrHOzcUvtXt0m+1Nplg5hFqYfo1Q54QF70dk+ZZaX
+	+PlCXjhFoYzOf519VFbJ18XQnKQPzlz099Xnm9jh+0MuAciuisPehXRbweckqD/E6Ry0Ip/6O1y
+	9ruo09ZNhhJ2+Qa7jZvpi8y92uAKki7VgasA3RuJDzw==
+X-Gm-Gg: ASbGncuHmZ5sI+Dy2m4a033TZLTzPLtoU5PyBka8iqz/4TbHuFRFRJ/+LRKRhTDX4TT
+	5D69WfhypVF0zXXtiSzieelicz+RV1dFaHVqdIWYXOa8+7p73geC3TLmpc7CyBdMW6P7jhwj4Q6
+	WYucMlDBIFZ7noOotmZcrsCevs60PONFOwi/z8FRgDHw==
+X-Google-Smtp-Source: AGHT+IEvLhfBLH7mNQ/MDcDv4nv6XZ+MLwUU1g48DUjWOBBZzh7jLmEsA7joR7pyXqrdYoD3p6FRVfkeLSrr0xvxBq8=
+X-Received: by 2002:a17:90b:1b42:b0:310:8d79:dfe4 with SMTP id
+ 98e67ed59e1d1-31a90bdc205mr3976961a91.4.1751574002077; Thu, 03 Jul 2025
+ 13:20:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250701-cstr-core-v13-0-29f7d3eb97a6@gmail.com>
- <20250701-cstr-core-v13-2-29f7d3eb97a6@gmail.com> <DB2BDSN1JH51.14ZZPETJORBC6@kernel.org>
- <CAJ-ks9nC=AyBPXRY3nJ0NuZvjFskzMcOkVNrBEfXD2hZ5uRntQ@mail.gmail.com>
- <DB2IJ9HBIM0W.3N0JVGKX558QI@kernel.org> <CAJ-ks9nF5+m+_bn0Pzi9yU0pw0TyN7Fs4x--mQ4ygyHz4A6hzg@mail.gmail.com>
-In-Reply-To: <CAJ-ks9nF5+m+_bn0Pzi9yU0pw0TyN7Fs4x--mQ4ygyHz4A6hzg@mail.gmail.com>
-From: Tamir Duberstein <tamird@gmail.com>
-Date: Thu, 3 Jul 2025 15:16:42 -0400
-X-Gm-Features: Ac12FXxZ9om-DmQ4Jtb_QO5Js54rwUi8z1hnIkmX71Lj1sGPMSjTGrGnMcngSCg
-Message-ID: <CAJ-ks9nCHCBqfM5nG3XpBBsWSqGpJLexV53UGL2i3KTdRiWRXQ@mail.gmail.com>
-Subject: Re: [PATCH v13 2/5] rust: support formatting of foreign types
-To: Benno Lossin <lossin@kernel.org>
-Cc: Michal Rostecki <vadorovsky@protonmail.com>, Miguel Ojeda <ojeda@kernel.org>, 
-	Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, 
-	Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
-	Trevor Gross <tmgross@umich.edu>, Brendan Higgins <brendan.higgins@linux.dev>, 
-	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, 
-	Danilo Krummrich <dakr@kernel.org>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
-	Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, 
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
-	Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, 
-	FUJITA Tomonori <fujita.tomonori@gmail.com>, Rob Herring <robh@kernel.org>, 
-	Saravana Kannan <saravanak@google.com>, Peter Zijlstra <peterz@infradead.org>, 
-	Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>, Waiman Long <longman@redhat.com>, 
-	Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, 
-	Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, Andrew Lunn <andrew@lunn.ch>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Bjorn Helgaas <bhelgaas@google.com>, 
-	Arnd Bergmann <arnd@arndb.de>, Jens Axboe <axboe@kernel.dk>, 
-	=?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, 
-	Dave Ertman <david.m.ertman@intel.com>, Ira Weiny <ira.weiny@intel.com>, 
-	Leon Romanovsky <leon@kernel.org>, Breno Leitao <leitao@debian.org>, 
-	Viresh Kumar <viresh.kumar@linaro.org>, Michael Turquette <mturquette@baylibre.com>, 
-	Stephen Boyd <sboyd@kernel.org>, rust-for-linux@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	kunit-dev@googlegroups.com, dri-devel@lists.freedesktop.org, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, llvm@lists.linux.dev, 
-	linux-pci@vger.kernel.org, nouveau@lists.freedesktop.org, 
-	linux-block@vger.kernel.org, linux-pm@vger.kernel.org, 
-	linux-clk@vger.kernel.org
+References: <20250702040344.1544077-1-ming.lei@redhat.com> <20250702040344.1544077-6-ming.lei@redhat.com>
+In-Reply-To: <20250702040344.1544077-6-ming.lei@redhat.com>
+From: Caleb Sander Mateos <csander@purestorage.com>
+Date: Thu, 3 Jul 2025 16:19:50 -0400
+X-Gm-Features: Ac12FXxrQUSRMgsDt9oGExRYs96kmed-BBPQpeW-06ousvQ-K9B4jltkK03mdbc
+Message-ID: <CADUfDZpaNOqvqwMNUi_YavV9nHc8tkmPhZHKkx7UVk3W=Pbn6w@mail.gmail.com>
+Subject: Re: [PATCH 05/16] ublk: move auto buffer register handling into one
+ dedicated helper
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
+	Uday Shankar <ushankar@purestorage.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jul 3, 2025 at 2:55=E2=80=AFPM Tamir Duberstein <tamird@gmail.com> =
-wrote:
+On Wed, Jul 2, 2025 at 12:04=E2=80=AFAM Ming Lei <ming.lei@redhat.com> wrot=
+e:
 >
-> On Thu, Jul 3, 2025 at 11:08=E2=80=AFAM Benno Lossin <lossin@kernel.org> =
-wrote:
-> >
-> > On Thu Jul 3, 2025 at 3:55 PM CEST, Tamir Duberstein wrote:
-> > > On Thu, Jul 3, 2025 at 5:32=E2=80=AFAM Benno Lossin <lossin@kernel.or=
-g> wrote:
-> > >> On Tue Jul 1, 2025 at 6:49 PM CEST, Tamir Duberstein wrote:
-> > >> > Introduce a `fmt!` macro which wraps all arguments in
-> > >> > `kernel::fmt::Adapter` and a `kernel::fmt::Display` trait. This en=
-ables
-> > >> > formatting of foreign types (like `core::ffi::CStr`) that do not
-> > >> > implement `core::fmt::Display` due to concerns around lossy conver=
-sions which
-> > >> > do not apply in the kernel.
-> > >> >
-> > >> > Replace all direct calls to `format_args!` with `fmt!`.
-> > >> >
-> > >> > Replace all implementations of `core::fmt::Display` with implement=
-ations
-> > >> > of `kernel::fmt::Display`.
-> > >> >
-> > >> > Suggested-by: Alice Ryhl <aliceryhl@google.com>
-> > >> > Link: https://rust-for-linux.zulipchat.com/#narrow/channel/288089-=
-General/topic/Custom.20formatting/with/516476467
-> > >> > Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> > >> > Reviewed-by: Alice Ryhl <aliceryhl@google.com>
-> > >> > Signed-off-by: Tamir Duberstein <tamird@gmail.com>
-> > >> > ---
-> > >> >  drivers/block/rnull.rs       |  2 +-
-> > >> >  drivers/gpu/nova-core/gpu.rs |  4 +-
-> > >> >  rust/kernel/block/mq.rs      |  2 +-
-> > >> >  rust/kernel/device.rs        |  2 +-
-> > >> >  rust/kernel/fmt.rs           | 89 +++++++++++++++++++++++++++++++=
-++++++++
-> > >> >  rust/kernel/kunit.rs         |  6 +--
-> > >> >  rust/kernel/lib.rs           |  1 +
-> > >> >  rust/kernel/prelude.rs       |  3 +-
-> > >> >  rust/kernel/print.rs         |  4 +-
-> > >> >  rust/kernel/seq_file.rs      |  2 +-
-> > >> >  rust/kernel/str.rs           | 22 ++++------
-> > >> >  rust/macros/fmt.rs           | 99 +++++++++++++++++++++++++++++++=
-+++++++++++++
-> > >> >  rust/macros/lib.rs           | 19 +++++++++
-> > >> >  rust/macros/quote.rs         |  7 ++++
-> > >> >  scripts/rustdoc_test_gen.rs  |  2 +-
-> > >> >  15 files changed, 236 insertions(+), 28 deletions(-)
-> > >>
-> > >> This would be a lot easier to review if he proc-macro and the call
-> > >> replacement were different patches.
-> > >>
-> > >> Also the `kernel/fmt.rs` file should be a different commit.
-> > >
-> > > Can you help me understand why? The changes you ask to be separated
-> > > would all be in different files, so why would separate commits make i=
-t
-> > > easier to review?
-> >
-> > It takes less time to go through the entire patch and give a RB. I can
-> > take smaller time chunks and don't have to get back into the entire
-> > context of the patch when I don't have 30-60min available.
+> Move check & clearing UBLK_IO_FLAG_AUTO_BUF_REG to
+> ublk_handle_auto_buf_reg(), also return buffer index from this helper.
 >
-> Ah, I see what you mean. Yeah, the requirement to RB the entire patch
-> does mean there's a benefit to smaller patches.
+> Also move ublk_set_auto_buf_reg() to this single helper too.
 >
-> > In this patch the biggest problem is the rename & addition of new
-> > things, maybe just adding 200 lines in those files could be okay to go
-> > together, see below for more.
+> Add ublk_config_io_buf() for setting up ublk io buffer, covers both
+> ublk buffer copy or auto buffer register.
 >
-> After implementing your suggestion of re-exporting things from
-> `kernel::fmt` the diffstat is
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>  drivers/block/ublk_drv.c | 132 ++++++++++++++++++++++-----------------
+>  1 file changed, 76 insertions(+), 56 deletions(-)
 >
-> 26 files changed, 253 insertions(+), 51 deletions(-)
+> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> index 1780f9ce3a24..ba1b2672e7a8 100644
+> --- a/drivers/block/ublk_drv.c
+> +++ b/drivers/block/ublk_drv.c
+> @@ -48,6 +48,8 @@
 >
-> so I guess I could do all the additions in one patch, but then
-> *everything* else has to go in a single patch together because the
-> formatting macros either want core::fmt::Display or
-> kernel::fmt::Display; they can't work in a halfway state.
+>  #define UBLK_MINORS            (1U << MINORBITS)
 >
-> >
-> > > I prefer to keep things in one commit because the changes are highly
-> > > interdependent. The proc macro doesn't make sense without
-> > > kernel/fmt.rs and kernel/fmt.rs is useless without the proc macro.
-> >
-> > I think that `Adapter`, the custom `Display` and their impl blocks
-> > don't need to be in the same commit as the proc-macro. They are related=
-,
-> > but maybe someone is not well-versed in proc-macros and thus doesn't
-> > want to review that part.
->
-> Sure, I guess I will split them. But as noted above: changing the
-> formatting macros and all the types' trait implementations has to be a
-> "flag day" change.
->
-> >
-> > >> > diff --git a/rust/kernel/fmt.rs b/rust/kernel/fmt.rs
-> > >> > new file mode 100644
-> > >> > index 000000000000..348d16987de6
-> > >> > --- /dev/null
-> > >> > +++ b/rust/kernel/fmt.rs
-> > >> > @@ -0,0 +1,89 @@
-> > >> > +// SPDX-License-Identifier: GPL-2.0
-> > >> > +
-> > >> > +//! Formatting utilities.
-> > >> > +
-> > >> > +use core::fmt;
-> > >>
-> > >> I think we should pub export all types that we are still using from
-> > >> `core::fmt`. For example `Result`, `Formatter`, `Debug` etc.
-> > >>
-> > >> That way I can still use the same pattern of importing `fmt` and the=
-n
-> > >> writing
-> > >>
-> > >>     impl fmt::Display for MyType {
-> > >>         fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {}
-> > >>     }
-> > >
-> > > Great idea, done for the next spin. It would be nice to be able to
-> > > lint against references to `core::fmt` outside of kernel/fmt.rs.
-> >
-> > I think there was something in clippy that can do that globally and we
-> > could allow that in this file?
->
-> I didn't find anything suitable. Do you have one in mind?
+> +#define UBLK_INVALID_BUF_IDX   ((unsigned short)-1)
 
-I think we want https://github.com/rust-lang/rust-clippy/issues/14807.
+u16?
+
+> +
+>  /* private ioctl command mirror */
+>  #define UBLK_CMD_DEL_DEV_ASYNC _IOC_NR(UBLK_U_CMD_DEL_DEV_ASYNC)
+>  #define UBLK_CMD_UPDATE_SIZE   _IOC_NR(UBLK_U_CMD_UPDATE_SIZE)
+> @@ -1983,16 +1985,53 @@ static inline int ublk_check_cmd_op(u32 cmd_op)
+>         return 0;
+>  }
+>
+> +static inline int ublk_set_auto_buf_reg(struct io_uring_cmd *cmd)
+> +{
+> +       struct ublk_uring_cmd_pdu *pdu =3D ublk_get_uring_cmd_pdu(cmd);
+> +
+> +       pdu->buf =3D ublk_sqe_addr_to_auto_buf_reg(READ_ONCE(cmd->sqe->ad=
+dr));
+> +
+> +       if (pdu->buf.reserved0 || pdu->buf.reserved1)
+> +               return -EINVAL;
+> +
+> +       if (pdu->buf.flags & ~UBLK_AUTO_BUF_REG_F_MASK)
+> +               return -EINVAL;
+> +       return 0;
+> +}
+> +
+> +static int ublk_handle_auto_buf_reg(struct ublk_io *io,
+> +                                   struct io_uring_cmd *cmd,
+> +                                   u16 *buf_idx)
+> +{
+> +       if (io->flags & UBLK_IO_FLAG_AUTO_BUF_REG) {
+> +               io->flags &=3D ~UBLK_IO_FLAG_AUTO_BUF_REG;
+> +
+> +               /*
+> +                * `UBLK_F_AUTO_BUF_REG` only works iff `UBLK_IO_FETCH_RE=
+Q`
+> +                * and `UBLK_IO_COMMIT_AND_FETCH_REQ` are issued from sam=
+e
+> +                * `io_ring_ctx`.
+> +                *
+> +                * If this uring_cmd's io_ring_ctx isn't same with the
+> +                * one for registering the buffer, it is ublk server's
+> +                * responsibility for unregistering the buffer, otherwise
+> +                * this ublk request gets stuck.
+> +                */
+> +               if (io->buf_ctx_handle =3D=3D io_uring_cmd_ctx_handle(cmd=
+) &&
+> +                               buf_idx)
+
+Not sure the buf_idx check here is necessary. This io->flags &
+UBLK_IO_FLAG_AUTO_BUF_REG path should only be reachable from
+ublk_commit_and_fetch(), not ublk_fetch() or UBLK_IO_NEED_GET_DATA.
+
+> +                       *buf_idx =3D io->buf_index;
+> +       }
+> +
+> +       return ublk_set_auto_buf_reg(cmd);
+> +}
+> +
+>  /* Once we return, `io->req` can't be used any more */
+>  static inline struct request *
+> -ublk_fill_io_cmd(struct ublk_io *io, struct io_uring_cmd *cmd,
+> -                unsigned long buf_addr, int result)
+> +ublk_fill_io_cmd(struct ublk_io *io, struct io_uring_cmd *cmd, int resul=
+t)
+>  {
+>         struct request *req =3D io->req;
+>
+>         io->cmd =3D cmd;
+>         io->flags |=3D UBLK_IO_FLAG_ACTIVE;
+> -       io->addr =3D buf_addr;
+>         io->res =3D result;
+>
+>         /* now this cmd slot is owned by ublk driver */
+> @@ -2001,6 +2040,22 @@ ublk_fill_io_cmd(struct ublk_io *io, struct io_uri=
+ng_cmd *cmd,
+>         return req;
+>  }
+>
+> +static inline int
+> +ublk_config_io_buf(const struct ublk_queue *ubq, struct ublk_io *io,
+> +                  struct io_uring_cmd *cmd, unsigned long buf_addr,
+> +                  u16 *buf_idx)
+> +{
+> +       if (ublk_support_auto_buf_reg(ubq)) {
+> +               int ret =3D ublk_handle_auto_buf_reg(io, cmd, buf_idx);
+> +
+> +               if (ret)
+> +                       return ret;
+
+Just return ublk_handle_auto_buf_reg(io, cmd, buf_idx)?
+
+Other than that,
+
+Reviewed-by: Caleb Sander Mateos <csander@purestorage.com>
+
+> +       } else {
+> +               io->addr =3D buf_addr;
+> +       }
+> +       return 0;
+> +}
+> +
+>  static inline void ublk_prep_cancel(struct io_uring_cmd *cmd,
+>                                     unsigned int issue_flags,
+>                                     struct ublk_queue *ubq, unsigned int =
+tag)
+> @@ -2016,20 +2071,6 @@ static inline void ublk_prep_cancel(struct io_urin=
+g_cmd *cmd,
+>         io_uring_cmd_mark_cancelable(cmd, issue_flags);
+>  }
+>
+> -static inline int ublk_set_auto_buf_reg(struct io_uring_cmd *cmd)
+> -{
+> -       struct ublk_uring_cmd_pdu *pdu =3D ublk_get_uring_cmd_pdu(cmd);
+> -
+> -       pdu->buf =3D ublk_sqe_addr_to_auto_buf_reg(READ_ONCE(cmd->sqe->ad=
+dr));
+> -
+> -       if (pdu->buf.reserved0 || pdu->buf.reserved1)
+> -               return -EINVAL;
+> -
+> -       if (pdu->buf.flags & ~UBLK_AUTO_BUF_REG_F_MASK)
+> -               return -EINVAL;
+> -       return 0;
+> -}
+> -
+>  static void ublk_io_release(void *priv)
+>  {
+>         struct request *rq =3D priv;
+> @@ -2150,13 +2191,11 @@ static int ublk_fetch(struct io_uring_cmd *cmd, s=
+truct ublk_queue *ubq,
+>                 goto out;
+>         }
+>
+> -       if (ublk_support_auto_buf_reg(ubq)) {
+> -               ret =3D ublk_set_auto_buf_reg(cmd);
+> -               if (ret)
+> -                       goto out;
+> -       }
+> +       ublk_fill_io_cmd(io, cmd, 0);
+> +       ret =3D ublk_config_io_buf(ubq, io, cmd, buf_addr, NULL);
+> +       if (ret)
+> +               goto out;
+>
+> -       ublk_fill_io_cmd(io, cmd, buf_addr, 0);
+>         WRITE_ONCE(io->task, get_task_struct(current));
+>         ublk_mark_io_ready(ub, ubq);
+>  out:
+> @@ -2188,35 +2227,13 @@ static int ublk_check_commit_and_fetch(const stru=
+ct ublk_queue *ubq,
+>         return 0;
+>  }
+>
+> -static int ublk_commit_and_fetch(const struct ublk_queue *ubq,
+> -                                struct ublk_io *io, struct io_uring_cmd =
+*cmd,
+> -                                struct request *req, unsigned int issue_=
+flags,
+> -                                __u64 zone_append_lba)
+> +static void ublk_commit_and_fetch(const struct ublk_queue *ubq,
+> +                                 struct ublk_io *io, struct io_uring_cmd=
+ *cmd,
+> +                                 struct request *req, unsigned int issue=
+_flags,
+> +                                 __u64 zone_append_lba, u16 buf_idx)
+>  {
+> -       if (ublk_support_auto_buf_reg(ubq)) {
+> -               int ret;
+> -
+> -               /*
+> -                * `UBLK_F_AUTO_BUF_REG` only works iff `UBLK_IO_FETCH_RE=
+Q`
+> -                * and `UBLK_IO_COMMIT_AND_FETCH_REQ` are issued from sam=
+e
+> -                * `io_ring_ctx`.
+> -                *
+> -                * If this uring_cmd's io_ring_ctx isn't same with the
+> -                * one for registering the buffer, it is ublk server's
+> -                * responsibility for unregistering the buffer, otherwise
+> -                * this ublk request gets stuck.
+> -                */
+> -               if (io->flags & UBLK_IO_FLAG_AUTO_BUF_REG) {
+> -                       if (io->buf_ctx_handle =3D=3D io_uring_cmd_ctx_ha=
+ndle(cmd))
+> -                               io_buffer_unregister_bvec(cmd, io->buf_in=
+dex,
+> -                                               issue_flags);
+> -                       io->flags &=3D ~UBLK_IO_FLAG_AUTO_BUF_REG;
+> -               }
+> -
+> -               ret =3D ublk_set_auto_buf_reg(cmd);
+> -               if (ret)
+> -                       return ret;
+> -       }
+> +       if (buf_idx !=3D UBLK_INVALID_BUF_IDX)
+> +               io_buffer_unregister_bvec(cmd, buf_idx, issue_flags);
+>
+>         if (req_op(req) =3D=3D REQ_OP_ZONE_APPEND)
+>                 req->__sector =3D zone_append_lba;
+> @@ -2225,7 +2242,6 @@ static int ublk_commit_and_fetch(const struct ublk_=
+queue *ubq,
+>                 ublk_sub_req_ref(io, req);
+>         else
+>                 __ublk_complete_rq(req);
+> -       return 0;
+>  }
+>
+>  static bool ublk_get_data(const struct ublk_queue *ubq, struct ublk_io *=
+io,
+> @@ -2250,6 +2266,7 @@ static int __ublk_ch_uring_cmd(struct io_uring_cmd =
+*cmd,
+>                                unsigned int issue_flags,
+>                                const struct ublksrv_io_cmd *ub_cmd)
+>  {
+> +       u16 buf_idx =3D UBLK_INVALID_BUF_IDX;
+>         struct ublk_device *ub =3D cmd->file->private_data;
+>         struct ublk_queue *ubq;
+>         struct ublk_io *io;
+> @@ -2328,9 +2345,10 @@ static int __ublk_ch_uring_cmd(struct io_uring_cmd=
+ *cmd,
+>                 ret =3D ublk_check_commit_and_fetch(ubq, io, ub_cmd->addr=
+);
+>                 if (ret)
+>                         goto out;
+> -               req =3D ublk_fill_io_cmd(io, cmd, ub_cmd->addr, ub_cmd->r=
+esult);
+> -               ret =3D ublk_commit_and_fetch(ubq, io, cmd, req, issue_fl=
+ags,
+> -                                           ub_cmd->zone_append_lba);
+> +               req =3D ublk_fill_io_cmd(io, cmd, ub_cmd->result);
+> +               ret =3D ublk_config_io_buf(ubq, io, cmd, ub_cmd->addr, &b=
+uf_idx);
+> +               ublk_commit_and_fetch(ubq, io, cmd, req, issue_flags,
+> +                                     ub_cmd->zone_append_lba, buf_idx);
+>                 if (ret)
+>                         goto out;
+>                 break;
+> @@ -2340,7 +2358,9 @@ static int __ublk_ch_uring_cmd(struct io_uring_cmd =
+*cmd,
+>                  * uring_cmd active first and prepare for handling new re=
+queued
+>                  * request
+>                  */
+> -               req =3D ublk_fill_io_cmd(io, cmd, ub_cmd->addr, 0);
+> +               req =3D ublk_fill_io_cmd(io, cmd, 0);
+> +               ret =3D ublk_config_io_buf(ubq, io, cmd, ub_cmd->addr, NU=
+LL);
+> +               WARN_ON_ONCE(ret);
+>                 if (likely(ublk_get_data(ubq, io, req))) {
+>                         __ublk_prep_compl_io_cmd(io, req);
+>                         return UBLK_IO_RES_OK;
+> --
+> 2.47.0
+>
