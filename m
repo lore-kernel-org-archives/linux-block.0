@@ -1,130 +1,268 @@
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ABF67462
-	for <linux-block@vger.kernel.org>; Thu,  3 Jul 2025 05:31:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7945727A904
+	for <linux-block@vger.kernel.org>; Thu,  3 Jul 2025 06:18:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751520713; cv=none; b=AkAZm7mwuMNnoupqvaAKkcOwrZarVwqro0LvShQeQFkMuJcflNYlEuNZqnif+yOnOZhVDBsgYUmUgna+jshx2D+3YDmKacizszfyKT5mqgJUf+2Y0+9XH7feOrURLT23ur0nqipHaQXgOrBv1jD8OVmq2wFIiS5RBIxOnU8RYLA=
+	t=1751523542; cv=none; b=CdMsScvcgCQDvq7wAF4dVPRqLL/6E4nzxg/PLxdmAoaHqQKsdkYOjV+TgumFF54Ym5buW28e89Bm3gM3hVWLP9NHRfmveY0mRtZ39BMq65NYMjbOeg+Fd5KvyaqD5gWdpSG/nfYf9LkRaI1j3coq+Qa/uYLjXJawzo7vLHqFjbo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751520713; c=relaxed/simple;
-	bh=DMoo2R0vrU64cwjgXLHGYPnRYzFErXqCaBvzTsgusA0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pZRadN9XDU756t0F0BPdyN51tGnI8VExbJcH/x4RPLzmEUI60DsXJ+JipNVzwIbEnxrQqpUlT3Mq0giJtENoqdRHYI2IspAA/+hfzHatlmY23bntNldgg4TYZV0zLX24z5vREC65Q/tssixbfkQ2bbdIlj0RZlV5ydNvA4lP7nY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=eyxcnUGX; arc=none smtp.client-ip=209.85.208.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
+	s=arc-20240116; t=1751523542; c=relaxed/simple;
+	bh=IuSe0+IF6k6hjIa925nr5aocivWfI9xJ/qQAJST0PBI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=dk7gYDBMtuTmX6wVe3toV3e1fN2Xpi761CLavq0FIyHrWXFMTliAx4giHYUuFJUgJBCy+l1sp0iCT54x8BxWpmmfirkzML8GJbvSX4J5KZ+JMBd9p+jS7w6kI5s6L0dbU+08VgOeA4mjE9CTs1V/7kqU79oSFPqi8V7K2IIPZrc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Ngz79uYZ; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=rQpKV1LN; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Ngz79uYZ; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=rQpKV1LN; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="eyxcnUGX"
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-60768f080d8so10922660a12.1
-        for <linux-block@vger.kernel.org>; Wed, 02 Jul 2025 22:31:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1751520708; x=1752125508; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=DMoo2R0vrU64cwjgXLHGYPnRYzFErXqCaBvzTsgusA0=;
-        b=eyxcnUGXHuk3ptN5EYpgzwQbx3J4GGBo4xECziB9FrHs0LRcvJhcapFTjvBR1gjRvd
-         QozCgHBhxcmNF9TbcoWIOTJR9WmeHvO0q6+3mkSM3nIJs5gtS5projoTRioN8Nml+t1p
-         dXYgEWIgFoEnYfUicUMIVpqk9EJgzKgVR8+Fd7fsD9CbDvXutBlyHAIxo8STsg+1AXt6
-         5bfs+cERZHwVQC2ijz1kSWeM2H6wNwWEiwnaeyVT4/+1WueS58/rxQXKXG0YdB21ZJaf
-         RWQlsEAeQ505ghzRHDJppjudG9iPc8cCU2e+9HRqLw26o0DU/Ef6oDH2pHPdW6oOECKK
-         PCMA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751520708; x=1752125508;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DMoo2R0vrU64cwjgXLHGYPnRYzFErXqCaBvzTsgusA0=;
-        b=fvDSmdBKiIa2UY+YL1a0KBb7UQS0wKh0pc62xzssh4zYxVVTrwoQMXdrWyCnYWwiqJ
-         py4d5c7qOEDuCxI8DOpDVrKNhxll7xFCKJAi0soinqYbOdWi3YkqDTP+6bA+M/feBvsk
-         6wN5YDG2c1S3tcge9MkDoGze0bGSn7CJ1ZXdDp2OQA+B6LsEMCuLtgEt2O136d3o8sjz
-         gDXkGbuj/qm1DhaigDEdCoMjPkTves175ecrykNZCdHQ/O3Bd4BgRiEmL+HRJFQ5/kUV
-         XlR0sVUAGTlAb9xKIik+tmhwBsjT49N1ghjecv4TV8d9+neB0gzkuUYQTNUj8GOmYvZW
-         atCg==
-X-Forwarded-Encrypted: i=1; AJvYcCXg/oWuXKA7cecYKC2Kzp4BhW7rQehHdbLk8qSCzAh31w4Ew+GjEsIcTx1zoYoxQF+isV9V0jM5gOYt2w==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxLwFRGv8M1MYElQ9ClUVjTaouLF3td9oUKXSz5LAKR51TmiYqj
-	4YOt1sVlmt1UbG9k+aX+OJDT+ZtarXx5tzU9AkmmhaT4yAqoa0D/g3VBKuaLSB5M5QU=
-X-Gm-Gg: ASbGncv3zM+HZAALZpgrSW7Jus/pOrP0Htm7YaxVvZPZBYVUZNiOSkyC5q9nePLZGJi
-	SWC8MO+58oFI3VJppiKq5Z5IaKjUQ6mUiE1fVIw8dNFUVqZIqr7hugUNKZEK+EMEnWjib6m+33j
-	JHfBeGpmJ02BlrivrQ+6/Eo9eLtmz1cLmZsP03i3CNsj0LILIqcx1dsQvp6KRLkM+00cuWmQ9Iz
-	2S9JMO4UhGtz254RfDrY4ItP9f+w1m1quANmxfJQKzo58lL1s8cZrK6V5jk/tKv1SILAAhSn8OR
-	4NGhQQcop7+7DsfdR6Se7PxvP7z1K8ppHqcib7fh2lDBwUNFB4LP/PTdy1fRCmAlxjwbPPjdX2v
-	vnw==
-X-Google-Smtp-Source: AGHT+IEOjmqy0fY94Em0odsZyBPcQiHwkH/miqzLmABl6CrUTUeJ+up2xEDe5GBHm3genJlLJ/0hXA==
-X-Received: by 2002:a17:906:ef04:b0:ae3:63b2:dfb4 with SMTP id a640c23a62f3a-ae3d83f83d4mr177648366b.27.1751520708046;
-        Wed, 02 Jul 2025 22:31:48 -0700 (PDT)
-Received: from localhost ([2a02:8071:b783:6940:36f3:9aff:fec2:7e46])
-        by smtp.gmail.com with UTF8SMTPSA id a640c23a62f3a-ae353639be0sm1180181566b.6.2025.07.02.22.31.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Jul 2025 22:31:47 -0700 (PDT)
-Date: Thu, 3 Jul 2025 07:31:45 +0200
-From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Ben Hutchings <benh@debian.org>, 1107479@bugs.debian.org, 
-	Roland Sommer <r.sommer@gmx.de>, Chris Hofstaedtler <zeha@debian.org>, 
-	linux-block@vger.kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Salvatore Bonaccorso <carnil@debian.org>
-Subject: Re: Bug#1107479: util-linux: blkid hangs forever after inserting a
- DVD-RAM
-Message-ID: <h4bhmhv5nwtas3bylidfrf4qfb6k55cg2dmcux4426ifsuahce@g5wiqjsyfn4n>
-References: <whjbzs4o3zjgnvbr2p6wkafrqllgfmyrd63xlanhodhtklrejk@pnuxnfxvlwz5>
- <1N4hzj-1uuA3Z1OEh-00rhJD@mail.gmx.net>
- <iry3mdm2bpp2mvteytiiq3umfwfdaoph5oe345yxjx4lujym2f@2p4raxmq2f4i>
- <1MSc1L-1uKBoQ15kv-00Qx9T@mail.gmx.net>
- <aif2stfl4o6unvjn7rqwbqam2v2ntr35ik5e24jdkwvixm3hj4@d3equy4z4xjk>
- <1ML9yc-1uEpgp2oMs-00Se3k@mail.gmx.net>
- <174936596275.4210.3207965727369251912.reportbug@pc14.home.lan>
- <r253lpckktygniuxobkvgozgoslccov6i5slr5lxa7oev6gtgy@ygqjea7c6xlm>
- <e45a49a4e9656cf892e81cc12328b0983b4ef1da.camel@debian.org>
- <2ba14daf-6733-4d4b-9391-9b1512577f15@kernel.dk>
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Ngz79uYZ";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="rQpKV1LN";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Ngz79uYZ";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="rQpKV1LN"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 1E0CE21191;
+	Thu,  3 Jul 2025 06:18:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1751523532; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xVQJP7K1t29zHa2r0HLkS0OKCgM09HDXXHqWgIEtN7Y=;
+	b=Ngz79uYZJvypcya60eO+P/eNuXb2eLxhes1l3+MtucZ6LAIvZ/mnWKs1SllR6CpEmeggUt
+	ESr9GThS2WlmtI7J76jCZZ95XXHQUX8+z3sqZRawiy70zDd5F3PPMmGd1OsvRQp6eRVn4N
+	kE3/g6XAw6ah9nzVbWB7kPC/+VLPMns=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1751523532;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xVQJP7K1t29zHa2r0HLkS0OKCgM09HDXXHqWgIEtN7Y=;
+	b=rQpKV1LNj8tlfdKU7ItEYWjCTowFNr3xPad5FEeNvEcGrJDpF9YKS64idblUnAOPs0eUip
+	7j5FWDlY938gEGDg==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=Ngz79uYZ;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=rQpKV1LN
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1751523532; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xVQJP7K1t29zHa2r0HLkS0OKCgM09HDXXHqWgIEtN7Y=;
+	b=Ngz79uYZJvypcya60eO+P/eNuXb2eLxhes1l3+MtucZ6LAIvZ/mnWKs1SllR6CpEmeggUt
+	ESr9GThS2WlmtI7J76jCZZ95XXHQUX8+z3sqZRawiy70zDd5F3PPMmGd1OsvRQp6eRVn4N
+	kE3/g6XAw6ah9nzVbWB7kPC/+VLPMns=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1751523532;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xVQJP7K1t29zHa2r0HLkS0OKCgM09HDXXHqWgIEtN7Y=;
+	b=rQpKV1LNj8tlfdKU7ItEYWjCTowFNr3xPad5FEeNvEcGrJDpF9YKS64idblUnAOPs0eUip
+	7j5FWDlY938gEGDg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 2B5951368E;
+	Thu,  3 Jul 2025 06:18:51 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id AvWRB8sgZmj+RQAAD6G6ig
+	(envelope-from <hare@suse.de>); Thu, 03 Jul 2025 06:18:51 +0000
+Message-ID: <db0cbbe2-792c-4263-8be9-14b76eb0f7e6@suse.de>
+Date: Thu, 3 Jul 2025 08:18:50 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="aodn7ncszxoxrysx"
-Content-Disposition: inline
-In-Reply-To: <2ba14daf-6733-4d4b-9391-9b1512577f15@kernel.dk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 01/10] lib/group_cpus: Add group_masks_cpus_evenly()
+To: Daniel Wagner <wagi@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+ Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>,
+ Sagi Grimberg <sagi@grimberg.me>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Aaron Tomlin <atomlin@atomlin.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ Thomas Gleixner <tglx@linutronix.de>, Costa Shulyupin
+ <costa.shul@redhat.com>, Juri Lelli <juri.lelli@redhat.com>,
+ Valentin Schneider <vschneid@redhat.com>, Waiman Long <llong@redhat.com>,
+ Ming Lei <ming.lei@redhat.com>, Frederic Weisbecker <frederic@kernel.org>,
+ Mel Gorman <mgorman@suse.de>,
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-nvme@lists.infradead.org, megaraidlinux.pdl@broadcom.com,
+ linux-scsi@vger.kernel.org, storagedev@microchip.com,
+ virtualization@lists.linux.dev, GR-QLogic-Storage-Upstream@marvell.com
+References: <20250702-isolcpus-io-queues-v7-0-557aa7eacce4@kernel.org>
+ <20250702-isolcpus-io-queues-v7-1-557aa7eacce4@kernel.org>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20250702-isolcpus-io-queues-v7-1-557aa7eacce4@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-4.51 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	FROM_HAS_DN(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[25];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_TRACE(0.00)[suse.de:+];
+	RCVD_COUNT_TWO(0.00)[2];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DNSWL_BLOCKED(0.00)[2a07:de40:b281:104:10:150:64:97:from,2a07:de40:b281:106:10:150:64:167:received];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,suse.de:mid,suse.de:email,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns]
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Rspamd-Queue-Id: 1E0CE21191
+X-Rspamd-Action: no action
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spam-Score: -4.51
 
+On 7/2/25 18:33, Daniel Wagner wrote:
+> group_mask_cpus_evenly() allows the caller to pass in a CPU mask that
+> should be evenly distributed. This new function is a more generic
+> version of the existing group_cpus_evenly(), which always distributes
+> all present CPUs into groups.
+> 
+> Signed-off-by: Daniel Wagner <wagi@kernel.org>
+> ---
+>   include/linux/group_cpus.h |  3 +++
+>   lib/group_cpus.c           | 64 +++++++++++++++++++++++++++++++++++++++++++++-
+>   2 files changed, 66 insertions(+), 1 deletion(-)
+> 
+> diff --git a/include/linux/group_cpus.h b/include/linux/group_cpus.h
+> index 9d4e5ab6c314b31c09fda82c3f6ac18f77e9de36..d4604dce1316a08400e982039006331f34c18ee8 100644
+> --- a/include/linux/group_cpus.h
+> +++ b/include/linux/group_cpus.h
+> @@ -10,5 +10,8 @@
+>   #include <linux/cpu.h>
+>   
+>   struct cpumask *group_cpus_evenly(unsigned int numgrps, unsigned int *nummasks);
+> +struct cpumask *group_mask_cpus_evenly(unsigned int numgrps,
+> +				       const struct cpumask *cpu_mask,
+> +				       unsigned int *nummasks);
+>   
+>   #endif
+> diff --git a/lib/group_cpus.c b/lib/group_cpus.c
+> index 6d08ac05f371bf880571507d935d9eb501616a84..00c9b7a10c8acd29239fe20d2a30fdae22ef74a5 100644
+> --- a/lib/group_cpus.c
+> +++ b/lib/group_cpus.c
+> @@ -8,6 +8,7 @@
+>   #include <linux/cpu.h>
+>   #include <linux/sort.h>
+>   #include <linux/group_cpus.h>
+> +#include <linux/sched/isolation.h>
+>   
+>   #ifdef CONFIG_SMP
+>   
+> @@ -425,6 +426,59 @@ struct cpumask *group_cpus_evenly(unsigned int numgrps, unsigned int *nummasks)
+>   	*nummasks = min(nr_present + nr_others, numgrps);
+>   	return masks;
+>   }
+> +EXPORT_SYMBOL_GPL(group_cpus_evenly);
+> +
+> +/**
+> + * group_mask_cpus_evenly - Group all CPUs evenly per NUMA/CPU locality
+> + * @numgrps: number of groups
+> + * @cpu_mask: CPU to consider for the grouping
+> + * @nummasks: number of initialized cpusmasks
+> + *
+> + * Return: cpumask array if successful, NULL otherwise. And each element
+> + * includes CPUs assigned to this group.
+> + *
+> + * Try to put close CPUs from viewpoint of CPU and NUMA locality into
+> + * same group. Allocate present CPUs on these groups evenly.
+> + */
 
---aodn7ncszxoxrysx
-Content-Type: text/plain; protected-headers=v1; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: Bug#1107479: util-linux: blkid hangs forever after inserting a
- DVD-RAM
-MIME-Version: 1.0
+Description could be improved. Point is that you do not do any
+calculation here, you just call __group_cpus_evenly() with
+a different mask.
 
-Hello,
+> +struct cpumask *group_mask_cpus_evenly(unsigned int numgrps,
+> +				       const struct cpumask *cpu_mask,
+> +				       unsigned int *nummasks)
+> +{
+> +	cpumask_var_t *node_to_cpumask;
+> +	cpumask_var_t nmsk;
+> +	int ret = -ENOMEM;
+> +	struct cpumask *masks = NULL;
+> +
+> +	if (!zalloc_cpumask_var(&nmsk, GFP_KERNEL))
+> +		return NULL;
+> +
+> +	node_to_cpumask = alloc_node_to_cpumask();
+> +	if (!node_to_cpumask)
+> +		goto fail_nmsk;
+> +
+> +	masks = kcalloc(numgrps, sizeof(*masks), GFP_KERNEL);
+> +	if (!masks)
+> +		goto fail_node_to_cpumask;
+> +
+> +	build_node_to_cpumask(node_to_cpumask);
+> +
+> +	ret = __group_cpus_evenly(0, numgrps, node_to_cpumask, cpu_mask, nmsk,
+> +				  masks);
+> +
+> +fail_node_to_cpumask:
+> +	free_node_to_cpumask(node_to_cpumask);
+> +
+> +fail_nmsk:
+> +	free_cpumask_var(nmsk);
+> +	if (ret < 0) {
+> +		kfree(masks);
+> +		return NULL;
+> +	}
+> +	*nummasks = ret;
+> +	return masks;
+> +}
+> +EXPORT_SYMBOL_GPL(group_mask_cpus_evenly);
+> +
+>   #else /* CONFIG_SMP */
+>   struct cpumask *group_cpus_evenly(unsigned int numgrps, unsigned int *nummasks)
+>   {
+> @@ -442,5 +496,13 @@ struct cpumask *group_cpus_evenly(unsigned int numgrps, unsigned int *nummasks)
+>   	*nummasks = 1;
+>   	return masks;
+>   }
+> -#endif /* CONFIG_SMP */
+>   EXPORT_SYMBOL_GPL(group_cpus_evenly);
+> +
+> +struct cpumask *group_mask_cpus_evenly(unsigned int numgrps,
+> +				       const struct cpumask *cpu_mask,
+> +				       unsigned int *nummasks)
+> +{
+> +	return group_cpus_evenly(numgrps, nummasks);
+> +}
+> +EXPORT_SYMBOL_GPL(group_mask_cpus_evenly);
+> +#endif /* CONFIG_SMP */
+> 
 
-On Wed, Jul 02, 2025 at 05:13:45PM -0600, Jens Axboe wrote:
-> On 7/2/25 5:08 PM, Ben Hutchings wrote:
-> > My conslusion is that pktcdvd is eqaully broken for CD-RWs.
->=20
-> Not surprising. Maybe we should take another stab at killing it
-> from the kernel.
+Otherwise:
+Reviewed-by: Hannes Reinecke <hare@suse.de.
 
-Sounds reasonable. With Ben's and Roland's user experience it seems
-there can be noone left who has a benefit from that module.
+Cheers,
 
-Best regards
-Uwe
-
---aodn7ncszxoxrysx
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmhmFb4ACgkQj4D7WH0S
-/k7wegf/bIacIfWOaXBDLL2gAvahW2Zo63BwTIvHtkhvv2biwoNqXMFCTT+bOfsP
-4NBjSrpCWOjPrKtPh4hWDRtYo851HpStfgB3+cL+hh0541viEQIhFds/V07pt6yB
-5b5gZXCVS+Bgel2DHaGR4m2jDaq2bh2H1dP9Z+AslBCoRikstNro0c/PBpALnTo0
-V2WB/VoUW1znxTmPEByjuf9gG8qLX6XtDD3yPvsb+EYlrzmlPd2zCt7jUjjfeWVx
-b6Uy1YgNSxS/9Mwet5Jv38n1H5WRfWyQC9EGKc+ZECbhvSLnqe+ezGUTJl5DrW8j
-pxIHN3wW3CL/44/m3P6PKDqqxzxRVw==
-=mk8u
------END PGP SIGNATURE-----
-
---aodn7ncszxoxrysx--
+Hannes
+-- 
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
