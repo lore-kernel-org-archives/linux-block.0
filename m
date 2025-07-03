@@ -1,174 +1,130 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B41982356CB;
-	Thu,  3 Jul 2025 03:35:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ABF67462
+	for <linux-block@vger.kernel.org>; Thu,  3 Jul 2025 05:31:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751513751; cv=none; b=M2qq9J+n25bWLP31FcMT74Xgk1wkSDTCoPPMBnRzcT4NzgE3fF/sVzZqUFiKr43DrkONV2PLyTnO7ahyX3JSIbbMvmDo2r37r27mLYdkPhGydq4aHuE7s8s+NQtDjq3rC/FNiNgMgEMmpxO8bGx2cBwuhVSKX3n17ERWb+QlkTw=
+	t=1751520713; cv=none; b=AkAZm7mwuMNnoupqvaAKkcOwrZarVwqro0LvShQeQFkMuJcflNYlEuNZqnif+yOnOZhVDBsgYUmUgna+jshx2D+3YDmKacizszfyKT5mqgJUf+2Y0+9XH7feOrURLT23ur0nqipHaQXgOrBv1jD8OVmq2wFIiS5RBIxOnU8RYLA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751513751; c=relaxed/simple;
-	bh=aAiZg72MzhU/nwICqHjkhrX5X7yDG6hB2keLduoAXfU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rP3x7ENl+MzP7CcMHIkTRJ05oHHO+/d2u0mKLGU/jI/rPcRDAuDGTd+NDD83wYMB4uA2xi8gDQMwo8UxHYDrgvZ3/WX5pwh8Z6h3lo34dzyNhgSrDA0xMf3wECCgey5hRr+zirRdxo4uXTzaQ4ctji5ystQmuFaiy5/f9M4r9cE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4bXj8g3pglzKHMbj;
-	Thu,  3 Jul 2025 11:35:47 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.252])
-	by mail.maildlp.com (Postfix) with ESMTP id E416B1A1101;
-	Thu,  3 Jul 2025 11:35:45 +0800 (CST)
-Received: from [10.174.179.80] (unknown [10.174.179.80])
-	by APP3 (Coremail) with SMTP id _Ch0CgBHpySN+mVo3w_yAQ--.57305S3;
-	Thu, 03 Jul 2025 11:35:43 +0800 (CST)
-Message-ID: <99010bfd-c968-49c7-b62b-c72b38722c1b@huaweicloud.com>
-Date: Thu, 3 Jul 2025 11:35:41 +0800
+	s=arc-20240116; t=1751520713; c=relaxed/simple;
+	bh=DMoo2R0vrU64cwjgXLHGYPnRYzFErXqCaBvzTsgusA0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pZRadN9XDU756t0F0BPdyN51tGnI8VExbJcH/x4RPLzmEUI60DsXJ+JipNVzwIbEnxrQqpUlT3Mq0giJtENoqdRHYI2IspAA/+hfzHatlmY23bntNldgg4TYZV0zLX24z5vREC65Q/tssixbfkQ2bbdIlj0RZlV5ydNvA4lP7nY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=eyxcnUGX; arc=none smtp.client-ip=209.85.208.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="eyxcnUGX"
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-60768f080d8so10922660a12.1
+        for <linux-block@vger.kernel.org>; Wed, 02 Jul 2025 22:31:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1751520708; x=1752125508; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=DMoo2R0vrU64cwjgXLHGYPnRYzFErXqCaBvzTsgusA0=;
+        b=eyxcnUGXHuk3ptN5EYpgzwQbx3J4GGBo4xECziB9FrHs0LRcvJhcapFTjvBR1gjRvd
+         QozCgHBhxcmNF9TbcoWIOTJR9WmeHvO0q6+3mkSM3nIJs5gtS5projoTRioN8Nml+t1p
+         dXYgEWIgFoEnYfUicUMIVpqk9EJgzKgVR8+Fd7fsD9CbDvXutBlyHAIxo8STsg+1AXt6
+         5bfs+cERZHwVQC2ijz1kSWeM2H6wNwWEiwnaeyVT4/+1WueS58/rxQXKXG0YdB21ZJaf
+         RWQlsEAeQ505ghzRHDJppjudG9iPc8cCU2e+9HRqLw26o0DU/Ef6oDH2pHPdW6oOECKK
+         PCMA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751520708; x=1752125508;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DMoo2R0vrU64cwjgXLHGYPnRYzFErXqCaBvzTsgusA0=;
+        b=fvDSmdBKiIa2UY+YL1a0KBb7UQS0wKh0pc62xzssh4zYxVVTrwoQMXdrWyCnYWwiqJ
+         py4d5c7qOEDuCxI8DOpDVrKNhxll7xFCKJAi0soinqYbOdWi3YkqDTP+6bA+M/feBvsk
+         6wN5YDG2c1S3tcge9MkDoGze0bGSn7CJ1ZXdDp2OQA+B6LsEMCuLtgEt2O136d3o8sjz
+         gDXkGbuj/qm1DhaigDEdCoMjPkTves175ecrykNZCdHQ/O3Bd4BgRiEmL+HRJFQ5/kUV
+         XlR0sVUAGTlAb9xKIik+tmhwBsjT49N1ghjecv4TV8d9+neB0gzkuUYQTNUj8GOmYvZW
+         atCg==
+X-Forwarded-Encrypted: i=1; AJvYcCXg/oWuXKA7cecYKC2Kzp4BhW7rQehHdbLk8qSCzAh31w4Ew+GjEsIcTx1zoYoxQF+isV9V0jM5gOYt2w==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxLwFRGv8M1MYElQ9ClUVjTaouLF3td9oUKXSz5LAKR51TmiYqj
+	4YOt1sVlmt1UbG9k+aX+OJDT+ZtarXx5tzU9AkmmhaT4yAqoa0D/g3VBKuaLSB5M5QU=
+X-Gm-Gg: ASbGncv3zM+HZAALZpgrSW7Jus/pOrP0Htm7YaxVvZPZBYVUZNiOSkyC5q9nePLZGJi
+	SWC8MO+58oFI3VJppiKq5Z5IaKjUQ6mUiE1fVIw8dNFUVqZIqr7hugUNKZEK+EMEnWjib6m+33j
+	JHfBeGpmJ02BlrivrQ+6/Eo9eLtmz1cLmZsP03i3CNsj0LILIqcx1dsQvp6KRLkM+00cuWmQ9Iz
+	2S9JMO4UhGtz254RfDrY4ItP9f+w1m1quANmxfJQKzo58lL1s8cZrK6V5jk/tKv1SILAAhSn8OR
+	4NGhQQcop7+7DsfdR6Se7PxvP7z1K8ppHqcib7fh2lDBwUNFB4LP/PTdy1fRCmAlxjwbPPjdX2v
+	vnw==
+X-Google-Smtp-Source: AGHT+IEOjmqy0fY94Em0odsZyBPcQiHwkH/miqzLmABl6CrUTUeJ+up2xEDe5GBHm3genJlLJ/0hXA==
+X-Received: by 2002:a17:906:ef04:b0:ae3:63b2:dfb4 with SMTP id a640c23a62f3a-ae3d83f83d4mr177648366b.27.1751520708046;
+        Wed, 02 Jul 2025 22:31:48 -0700 (PDT)
+Received: from localhost ([2a02:8071:b783:6940:36f3:9aff:fec2:7e46])
+        by smtp.gmail.com with UTF8SMTPSA id a640c23a62f3a-ae353639be0sm1180181566b.6.2025.07.02.22.31.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Jul 2025 22:31:47 -0700 (PDT)
+Date: Thu, 3 Jul 2025 07:31:45 +0200
+From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Ben Hutchings <benh@debian.org>, 1107479@bugs.debian.org, 
+	Roland Sommer <r.sommer@gmx.de>, Chris Hofstaedtler <zeha@debian.org>, 
+	linux-block@vger.kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	Salvatore Bonaccorso <carnil@debian.org>
+Subject: Re: Bug#1107479: util-linux: blkid hangs forever after inserting a
+ DVD-RAM
+Message-ID: <h4bhmhv5nwtas3bylidfrf4qfb6k55cg2dmcux4426ifsuahce@g5wiqjsyfn4n>
+References: <whjbzs4o3zjgnvbr2p6wkafrqllgfmyrd63xlanhodhtklrejk@pnuxnfxvlwz5>
+ <1N4hzj-1uuA3Z1OEh-00rhJD@mail.gmx.net>
+ <iry3mdm2bpp2mvteytiiq3umfwfdaoph5oe345yxjx4lujym2f@2p4raxmq2f4i>
+ <1MSc1L-1uKBoQ15kv-00Qx9T@mail.gmx.net>
+ <aif2stfl4o6unvjn7rqwbqam2v2ntr35ik5e24jdkwvixm3hj4@d3equy4z4xjk>
+ <1ML9yc-1uEpgp2oMs-00Se3k@mail.gmx.net>
+ <174936596275.4210.3207965727369251912.reportbug@pc14.home.lan>
+ <r253lpckktygniuxobkvgozgoslccov6i5slr5lxa7oev6gtgy@ygqjea7c6xlm>
+ <e45a49a4e9656cf892e81cc12328b0983b4ef1da.camel@debian.org>
+ <2ba14daf-6733-4d4b-9391-9b1512577f15@kernel.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 0/9] fallocate: introduce FALLOC_FL_WRITE_ZEROES flag
-To: Christian Brauner <brauner@kernel.org>
-Cc: linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org, hch@lst.de,
- tytso@mit.edu, djwong@kernel.org, john.g.garry@oracle.com,
- bmarzins@redhat.com, chaitanyak@nvidia.com, shinichiro.kawasaki@wdc.com,
- martin.petersen@oracle.com, yi.zhang@huawei.com, chengzhihao1@huawei.com,
- yukuai3@huawei.com, yangerkun@huawei.com, linux-fsdevel@vger.kernel.org,
- linux-ext4@vger.kernel.org, linux-block@vger.kernel.org,
- dm-devel@lists.linux.dev, linux-nvme@lists.infradead.org,
- linux-scsi@vger.kernel.org
-References: <20250619111806.3546162-1-yi.zhang@huaweicloud.com>
- <20250623-woanders-allabendlich-f87ae2d9c704@brauner>
-Content-Language: en-US
-From: Zhang Yi <yi.zhang@huaweicloud.com>
-In-Reply-To: <20250623-woanders-allabendlich-f87ae2d9c704@brauner>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-CM-TRANSID:_Ch0CgBHpySN+mVo3w_yAQ--.57305S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxZF45tr1Duw4ftrWrZw1kZrb_yoWrtw15pa
-	yUJFZ8KF4DJr17J397uF109F15Zws3Ar15Ka1rKw1kZrWYqrnagFWIga4UXasrCr93Ww1x
-	ZFsFya4q9ay7AFDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUv0b4IE77IF4wAFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0En4kS
-	14v26r4a6rW5MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I
-	8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWr
-	XwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x
-	0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_
-	Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU0
-	s2-5UUUUU==
-X-CM-SenderInfo: d1lo6xhdqjqx5xdzvxpfor3voofrz/
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="aodn7ncszxoxrysx"
+Content-Disposition: inline
+In-Reply-To: <2ba14daf-6733-4d4b-9391-9b1512577f15@kernel.dk>
 
-On 2025/6/23 18:46, Christian Brauner wrote:
-> On Thu, 19 Jun 2025 19:17:57 +0800, Zhang Yi wrote:
->> From: Zhang Yi <yi.zhang@huawei.com>
->>
->> Changes since v1:
->>  - Rebase codes on 6.16-rc2.
->>  - Use max_{hw|user}_wzeroes_unmap_sectors queue limits instead of
->>    BLK_FEAT_WRITE_ZEROES_UNMAP feature to represent the status of the
->>    unmap write zeroes operation as Christoph and Darrick suggested. This
->>    redoes the first 5 patches, so remove all the reviewed-by tags,
->>    please review them again.
->>  - Simplify the description of FALLOC_FL_WRITE_ZEROES in patch 06 as
->>    Darrick suggested.
->>  - Revise the check order of FALLOC_FL_WRITE_ZEROES in patch 08 as
->>    Christoph suggested.
->> Changes since RFC v4:
->>  - Rebase codes on 6.16-rc1.
->>  - Add a new queue_limit flag, and change the write_zeroes_unmap sysfs
->>    interface to RW mode. User can disable the unmap write zeroes
->>    operation by writing '0' to it when the operation is slow.
->>  - Modify the documentation of write_zeroes_unmap sysfs interface as
->>    Martin suggested.
->>  - Remove the statx interface.
->>  - Make the bdev and ext4 don't allow to submit FALLOC_FL_WRITE_ZEROES
->>    if the block device does not enable the unmap write zeroes operation,
->>    it should return -EOPNOTSUPP.
->> Changes sicne RFC v3:
->>  - Rebase codes on 6.15-rc2.
->>  - Add a note in patch 1 to indicate that the unmap write zeros command
->>    is not always guaranteed as Christoph suggested.
->>  - Rename bdev_unmap_write_zeroes() helper and move it to patch 1 as
->>    Christoph suggested.
->>  - Introduce a new statx attribute flag STATX_ATTR_WRITE_ZEROES_UNMAP as
->>    Christoph and Christian suggested.
->>  - Exchange the order of the two patches that modified
->>    blkdev_fallocate() as Christoph suggested.
->> Changes since RFC v2:
->>  - Rebase codes on next-20250314.
->>  - Add support for nvme multipath.
->>  - Add support for NVMeT with block device backing.
->>  - Clear FALLOC_FL_WRITE_ZEROES if dm clear
->>    limits->max_write_zeroes_sectors.
->>  - Complement the counterpart userspace tools(util-linux and xfs_io)
->>    and tests(blktests and xfstests), please see below for details.
->> Changes since RFC v1:
->>  - Switch to add a new write zeroes operation, FALLOC_FL_WRITE_ZEROES,
->>    in fallocate, instead of just adding a supported flag to
->>    FALLOC_FL_ZERO_RANGE.
->>  - Introduce a new flag BLK_FEAT_WRITE_ZEROES_UNMAP to the block
->>    device's queue limit features, and implement it on SCSI sd driver,
->>    NVMe SSD driver and dm driver.
->>  - Implement FALLOC_FL_WRITE_ZEROES on both the ext4 filesystem and
->>    block device (bdev).
->>
->> [...]
-> 
-> If needed, the branch can be declared stable and thus be used as base
-> for other work.
-> 
-> ---
-> 
-> Applied to the vfs-6.17.fallocate branch of the vfs/vfs.git tree.
-> Patches in the vfs-6.17.fallocate branch should appear in linux-next soon.
-> 
-> Please report any outstanding bugs that were missed during review in a
-> new review to the original patch series allowing us to drop it.
-> 
-> It's encouraged to provide Acked-bys and Reviewed-bys even though the
-> patch has now been applied. If possible patch trailers will be updated.
-> 
-> Note that commit hashes shown below are subject to change due to rebase,
-> trailer updates or similar. If in doubt, please check the listed branch.
-> 
-> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
-> branch: vfs-6.17.fallocate
 
-Hi Christian,
+--aodn7ncszxoxrysx
+Content-Type: text/plain; protected-headers=v1; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: Bug#1107479: util-linux: blkid hangs forever after inserting a
+ DVD-RAM
+MIME-Version: 1.0
 
-I noticed that this patch series doesn't appear to be merged into this
-branch. Just wondering if it might have been missed?
+Hello,
 
-Best regards,
-Yi.
+On Wed, Jul 02, 2025 at 05:13:45PM -0600, Jens Axboe wrote:
+> On 7/2/25 5:08 PM, Ben Hutchings wrote:
+> > My conslusion is that pktcdvd is eqaully broken for CD-RWs.
+>=20
+> Not surprising. Maybe we should take another stab at killing it
+> from the kernel.
 
-> 
-> [1/9] block: introduce max_{hw|user}_wzeroes_unmap_sectors to queue limits
->       https://git.kernel.org/vfs/vfs/c/2695a9b086fd
-> [2/9] nvme: set max_hw_wzeroes_unmap_sectors if device supports DEAC bit
->       https://git.kernel.org/vfs/vfs/c/bf07c1180194
-> [3/9] nvmet: set WZDS and DRB if device enables unmap write zeroes operation
->       https://git.kernel.org/vfs/vfs/c/a6c7ab5adcba
-> [4/9] scsi: sd: set max_hw_wzeroes_unmap_sectors if device supports SD_ZERO_*_UNMAP
->       https://git.kernel.org/vfs/vfs/c/92372ed1cc88
-> [5/9] dm: clear unmap write zeroes limits when disabling write zeroes
->       https://git.kernel.org/vfs/vfs/c/e383d550e716
-> [6/9] fs: introduce FALLOC_FL_WRITE_ZEROES to fallocate
->       https://git.kernel.org/vfs/vfs/c/1ed1b5df86ec
-> [7/9] block: factor out common part in blkdev_fallocate()
->       https://git.kernel.org/vfs/vfs/c/96433508c8c0
-> [8/9] block: add FALLOC_FL_WRITE_ZEROES support
->       https://git.kernel.org/vfs/vfs/c/2b4e5f9b3eb9
-> [9/9] ext4: add FALLOC_FL_WRITE_ZEROES support
->       https://git.kernel.org/vfs/vfs/c/51954e469396
+Sounds reasonable. With Ben's and Roland's user experience it seems
+there can be noone left who has a benefit from that module.
 
+Best regards
+Uwe
+
+--aodn7ncszxoxrysx
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmhmFb4ACgkQj4D7WH0S
+/k7wegf/bIacIfWOaXBDLL2gAvahW2Zo63BwTIvHtkhvv2biwoNqXMFCTT+bOfsP
+4NBjSrpCWOjPrKtPh4hWDRtYo851HpStfgB3+cL+hh0541viEQIhFds/V07pt6yB
+5b5gZXCVS+Bgel2DHaGR4m2jDaq2bh2H1dP9Z+AslBCoRikstNro0c/PBpALnTo0
+V2WB/VoUW1znxTmPEByjuf9gG8qLX6XtDD3yPvsb+EYlrzmlPd2zCt7jUjjfeWVx
+b6Uy1YgNSxS/9Mwet5Jv38n1H5WRfWyQC9EGKc+ZECbhvSLnqe+ezGUTJl5DrW8j
+pxIHN3wW3CL/44/m3P6PKDqqxzxRVw==
+=mk8u
+-----END PGP SIGNATURE-----
+
+--aodn7ncszxoxrysx--
