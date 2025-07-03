@@ -1,230 +1,174 @@
-Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 649FF2DE710
-	for <linux-block@vger.kernel.org>; Thu,  3 Jul 2025 02:33:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B41982356CB;
+	Thu,  3 Jul 2025 03:35:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751510021; cv=none; b=Uo0vhME7Rh4dow4FgGQ4OSGp3jN2L6tB8sLmccmELDTL0LryBnjkGUa+t6Q7qd/JGce6plVsUiW2a69uDyd6y+Dy8Zbbdv0ow8D/PMqqCYSiCsWN9oSL1ATu7uBNp1845D6luxLqnzjxOczHuycdPBayRAf9eqAs7SGoJMWm+Mg=
+	t=1751513751; cv=none; b=M2qq9J+n25bWLP31FcMT74Xgk1wkSDTCoPPMBnRzcT4NzgE3fF/sVzZqUFiKr43DrkONV2PLyTnO7ahyX3JSIbbMvmDo2r37r27mLYdkPhGydq4aHuE7s8s+NQtDjq3rC/FNiNgMgEMmpxO8bGx2cBwuhVSKX3n17ERWb+QlkTw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751510021; c=relaxed/simple;
-	bh=m7man3lPLg6/YVK5C/zQcjtDJTVMHedVgqxZoYdy7L4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=g6PV87XqaKON+x4FdbdLZTNLs9lw4cw2M+/UENKpYLCySDz9TXtKpUJKRB4jo8uJEFJ6qRUveCEWBtsZ0ezJ4TaKXo7LmbtHr6yXbygti71iszdV8MRYMCrClWKCBFXk/D3hTT3I+kig5qWaGPLgCUC+3VjZpnFYnT0Ux/sZ4/w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=EhiJ+Etp; arc=none smtp.client-ip=209.85.216.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="EhiJ+Etp"
-Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-312efc384fcso1018190a91.3
-        for <linux-block@vger.kernel.org>; Wed, 02 Jul 2025 19:33:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1751510018; x=1752114818; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VraFNwm6Wz2P0NSaaWR1JWMSUmBi4F2SuZ6VekOG15M=;
-        b=EhiJ+EtpmLF9la9MQDOZYAOdTr6iSm92sImrq+wM9ir7FGdsUKXrlRXjUkFfjd/bzy
-         QicdZKMBaR440+48KJ2oAJRpiDsI+OAOZi0NfTnGj+nt+bkQPQiW5S18caR+2lvjqpnE
-         Qm8H2lxDCVFjTJx5jUxchB1GbtSuB+gIlUspEUNMpcCFe8T4xVz3LB7vOxa/k69FN4t/
-         jGn+wOb9l+ZISWJJxVpvtZA1KonWGSACkclM4XNwlb0bb1jl5HlBfyJ6HU33/7iec4tf
-         xtbyZtzE7j+Yi/mpL2JHd6IFiJo+zE610MUb5guhQ79D478BARiwtizcIpMfqKuV9Q7Q
-         lezA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751510018; x=1752114818;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=VraFNwm6Wz2P0NSaaWR1JWMSUmBi4F2SuZ6VekOG15M=;
-        b=CYCIHRpHug3jmW1WMb0yteCzPpnziUV2CvUfAyM09dvELMJ05lBzcI6QXFmGShw0J8
-         K/mwyfRVI8V77tvGg3u+3Shjn0rOp0uYgdDIfQ4ITwgmE8YLTUfJ0/yeYxS/CVZBXYhs
-         s8uAheUZ+NQn/qcB/2RVuYgrAUtu1UHSmncRKs+YLeCBActuuXUEtNCcLDOm9jnXB5Ac
-         uvnHh2DSb2Ln2yoKtR6arlpi0XO4ds6j/yVplawUB6YM97e2RvcQ6Swt6olnhr1GJjht
-         yR1rIyjrRrHYS5H53+kxkVH1VgnetMAk+2r8p6H1LXUMzY9oUBHuKC1RP+xCLnRXUtS9
-         wtQA==
-X-Forwarded-Encrypted: i=1; AJvYcCU2XXt845K2tTLPBRC4hsnSgpr4uDv9iICPZ7FiH5VHoPWRh3pe3dlb9NKAyJTYdhN0toKNUSIvoM2caQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxsDVeJEClRTtaZ8aIc3P5zLjc3IjUjOZLYQX7LsSJ+ne55CBqL
-	ckkpTQxk64LXTU1I7W9lspLIi67QFXppjOGSlnDSe4DanObJgc0mTNHsXq4G3bk96CHjcsmdjuw
-	KC+5maELJAlvSV5NngXQcDhWdQsb6fvF1v+6gca8CsA==
-X-Gm-Gg: ASbGnctnXucoLHjr3ov7YWTn6MDGAvMECk8ARffcBuiY+AbJsVx7bOekl6iFJz1ls28
-	Alyy060w4FJyPFSgyyLHVrB+953U9HE/+OGzJYfG8p5nYU/4bzdWAo+spjllRAauK0tkuuv+zbb
-	hmipKMTRCw9mhSq4unRXXmEe36UdsjyWAVrBHe6Jn5oA==
-X-Google-Smtp-Source: AGHT+IFAk+0TNMoK+8RtWCW2LVYjFJ9/WE4XTlOZzfecHv6yy59ZLxOIRRHPJI342qo68IKx6biYBj8qSQL065BlY7s=
-X-Received: by 2002:a17:90b:2f0b:b0:310:cf92:7899 with SMTP id
- 98e67ed59e1d1-31a90bdb55emr2624244a91.3.1751510017532; Wed, 02 Jul 2025
- 19:33:37 -0700 (PDT)
+	s=arc-20240116; t=1751513751; c=relaxed/simple;
+	bh=aAiZg72MzhU/nwICqHjkhrX5X7yDG6hB2keLduoAXfU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rP3x7ENl+MzP7CcMHIkTRJ05oHHO+/d2u0mKLGU/jI/rPcRDAuDGTd+NDD83wYMB4uA2xi8gDQMwo8UxHYDrgvZ3/WX5pwh8Z6h3lo34dzyNhgSrDA0xMf3wECCgey5hRr+zirRdxo4uXTzaQ4ctji5ystQmuFaiy5/f9M4r9cE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.93.142])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4bXj8g3pglzKHMbj;
+	Thu,  3 Jul 2025 11:35:47 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.252])
+	by mail.maildlp.com (Postfix) with ESMTP id E416B1A1101;
+	Thu,  3 Jul 2025 11:35:45 +0800 (CST)
+Received: from [10.174.179.80] (unknown [10.174.179.80])
+	by APP3 (Coremail) with SMTP id _Ch0CgBHpySN+mVo3w_yAQ--.57305S3;
+	Thu, 03 Jul 2025 11:35:43 +0800 (CST)
+Message-ID: <99010bfd-c968-49c7-b62b-c72b38722c1b@huaweicloud.com>
+Date: Thu, 3 Jul 2025 11:35:41 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250702040344.1544077-1-ming.lei@redhat.com> <20250702040344.1544077-5-ming.lei@redhat.com>
-In-Reply-To: <20250702040344.1544077-5-ming.lei@redhat.com>
-From: Caleb Sander Mateos <csander@purestorage.com>
-Date: Wed, 2 Jul 2025 22:33:25 -0400
-X-Gm-Features: Ac12FXzM8oDKkgtQZbge_rZnwPd8Ldid4yddjEKkM0uzMXduc916SaI3lpfWrvI
-Message-ID: <CADUfDZq84Lt+xK+JYqdp5sGjp4c_7E1nb_sdfjMa0V2Qv+-prw@mail.gmail.com>
-Subject: Re: [PATCH 04/16] ublk: avoid to pass `struct ublksrv_io_cmd *` to ublk_commit_and_fetch()
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
-	Uday Shankar <ushankar@purestorage.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 0/9] fallocate: introduce FALLOC_FL_WRITE_ZEROES flag
+To: Christian Brauner <brauner@kernel.org>
+Cc: linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org, hch@lst.de,
+ tytso@mit.edu, djwong@kernel.org, john.g.garry@oracle.com,
+ bmarzins@redhat.com, chaitanyak@nvidia.com, shinichiro.kawasaki@wdc.com,
+ martin.petersen@oracle.com, yi.zhang@huawei.com, chengzhihao1@huawei.com,
+ yukuai3@huawei.com, yangerkun@huawei.com, linux-fsdevel@vger.kernel.org,
+ linux-ext4@vger.kernel.org, linux-block@vger.kernel.org,
+ dm-devel@lists.linux.dev, linux-nvme@lists.infradead.org,
+ linux-scsi@vger.kernel.org
+References: <20250619111806.3546162-1-yi.zhang@huaweicloud.com>
+ <20250623-woanders-allabendlich-f87ae2d9c704@brauner>
+Content-Language: en-US
+From: Zhang Yi <yi.zhang@huaweicloud.com>
+In-Reply-To: <20250623-woanders-allabendlich-f87ae2d9c704@brauner>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-CM-TRANSID:_Ch0CgBHpySN+mVo3w_yAQ--.57305S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxZF45tr1Duw4ftrWrZw1kZrb_yoWrtw15pa
+	yUJFZ8KF4DJr17J397uF109F15Zws3Ar15Ka1rKw1kZrWYqrnagFWIga4UXasrCr93Ww1x
+	ZFsFya4q9ay7AFDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUv0b4IE77IF4wAFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0En4kS
+	14v26r4a6rW5MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I
+	8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWr
+	XwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x
+	0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_
+	Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU0
+	s2-5UUUUU==
+X-CM-SenderInfo: d1lo6xhdqjqx5xdzvxpfor3voofrz/
 
-On Wed, Jul 2, 2025 at 12:04=E2=80=AFAM Ming Lei <ming.lei@redhat.com> wrot=
-e:
->
-> Refactor ublk_commit_and_fetch() in the following way for removing
-> parameter of `struct ublksrv_io_cmd *`:
->
-> - return `struct request *` from ublk_fill_io_cmd(), so that we can
-> use request reference reliably in this way cause both request and
-> io_uring_cmd reference share same storage
->
-> - move ublk_fill_io_cmd() before calling into ublk_commit_and_fetch(),
-> so that ublk_fill_io_cmd() could be run with per-io lock held for
-> supporting command batch.
->
-> - pass ->zone_append_lba to ublk_commit_and_fetch() directly
->
-> The main motivation is to reproduce ublk_commit_and_fetch() for fetching
-> io command batch with multishot uring_cmd.
->
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+On 2025/6/23 18:46, Christian Brauner wrote:
+> On Thu, 19 Jun 2025 19:17:57 +0800, Zhang Yi wrote:
+>> From: Zhang Yi <yi.zhang@huawei.com>
+>>
+>> Changes since v1:
+>>  - Rebase codes on 6.16-rc2.
+>>  - Use max_{hw|user}_wzeroes_unmap_sectors queue limits instead of
+>>    BLK_FEAT_WRITE_ZEROES_UNMAP feature to represent the status of the
+>>    unmap write zeroes operation as Christoph and Darrick suggested. This
+>>    redoes the first 5 patches, so remove all the reviewed-by tags,
+>>    please review them again.
+>>  - Simplify the description of FALLOC_FL_WRITE_ZEROES in patch 06 as
+>>    Darrick suggested.
+>>  - Revise the check order of FALLOC_FL_WRITE_ZEROES in patch 08 as
+>>    Christoph suggested.
+>> Changes since RFC v4:
+>>  - Rebase codes on 6.16-rc1.
+>>  - Add a new queue_limit flag, and change the write_zeroes_unmap sysfs
+>>    interface to RW mode. User can disable the unmap write zeroes
+>>    operation by writing '0' to it when the operation is slow.
+>>  - Modify the documentation of write_zeroes_unmap sysfs interface as
+>>    Martin suggested.
+>>  - Remove the statx interface.
+>>  - Make the bdev and ext4 don't allow to submit FALLOC_FL_WRITE_ZEROES
+>>    if the block device does not enable the unmap write zeroes operation,
+>>    it should return -EOPNOTSUPP.
+>> Changes sicne RFC v3:
+>>  - Rebase codes on 6.15-rc2.
+>>  - Add a note in patch 1 to indicate that the unmap write zeros command
+>>    is not always guaranteed as Christoph suggested.
+>>  - Rename bdev_unmap_write_zeroes() helper and move it to patch 1 as
+>>    Christoph suggested.
+>>  - Introduce a new statx attribute flag STATX_ATTR_WRITE_ZEROES_UNMAP as
+>>    Christoph and Christian suggested.
+>>  - Exchange the order of the two patches that modified
+>>    blkdev_fallocate() as Christoph suggested.
+>> Changes since RFC v2:
+>>  - Rebase codes on next-20250314.
+>>  - Add support for nvme multipath.
+>>  - Add support for NVMeT with block device backing.
+>>  - Clear FALLOC_FL_WRITE_ZEROES if dm clear
+>>    limits->max_write_zeroes_sectors.
+>>  - Complement the counterpart userspace tools(util-linux and xfs_io)
+>>    and tests(blktests and xfstests), please see below for details.
+>> Changes since RFC v1:
+>>  - Switch to add a new write zeroes operation, FALLOC_FL_WRITE_ZEROES,
+>>    in fallocate, instead of just adding a supported flag to
+>>    FALLOC_FL_ZERO_RANGE.
+>>  - Introduce a new flag BLK_FEAT_WRITE_ZEROES_UNMAP to the block
+>>    device's queue limit features, and implement it on SCSI sd driver,
+>>    NVMe SSD driver and dm driver.
+>>  - Implement FALLOC_FL_WRITE_ZEROES on both the ext4 filesystem and
+>>    block device (bdev).
+>>
+>> [...]
+> 
+> If needed, the branch can be declared stable and thus be used as base
+> for other work.
+> 
 > ---
->  drivers/block/ublk_drv.c | 43 ++++++++++++++++++++++++++--------------
->  1 file changed, 28 insertions(+), 15 deletions(-)
->
-> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> index 2dc6962c804a..1780f9ce3a24 100644
-> --- a/drivers/block/ublk_drv.c
-> +++ b/drivers/block/ublk_drv.c
-> @@ -1983,10 +1983,13 @@ static inline int ublk_check_cmd_op(u32 cmd_op)
->         return 0;
->  }
->
-> -static inline void ublk_fill_io_cmd(struct ublk_io *io,
-> -               struct io_uring_cmd *cmd, unsigned long buf_addr,
-> -               int result)
-> +/* Once we return, `io->req` can't be used any more */
-> +static inline struct request *
-> +ublk_fill_io_cmd(struct ublk_io *io, struct io_uring_cmd *cmd,
-> +                unsigned long buf_addr, int result)
->  {
-> +       struct request *req =3D io->req;
-> +
->         io->cmd =3D cmd;
->         io->flags |=3D UBLK_IO_FLAG_ACTIVE;
->         io->addr =3D buf_addr;
-> @@ -1994,6 +1997,8 @@ static inline void ublk_fill_io_cmd(struct ublk_io =
-*io,
->
->         /* now this cmd slot is owned by ublk driver */
->         io->flags &=3D ~UBLK_IO_FLAG_OWNED_BY_SRV;
-> +
-> +       return req;
+> 
+> Applied to the vfs-6.17.fallocate branch of the vfs/vfs.git tree.
+> Patches in the vfs-6.17.fallocate branch should appear in linux-next soon.
+> 
+> Please report any outstanding bugs that were missed during review in a
+> new review to the original patch series allowing us to drop it.
+> 
+> It's encouraged to provide Acked-bys and Reviewed-bys even though the
+> patch has now been applied. If possible patch trailers will be updated.
+> 
+> Note that commit hashes shown below are subject to change due to rebase,
+> trailer updates or similar. If in doubt, please check the listed branch.
+> 
+> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
+> branch: vfs-6.17.fallocate
 
-This is nice symmetry with __ublk_prep_compl_io_cmd().
+Hi Christian,
 
-Reviewed-by: Caleb Sander Mateos <csander@purestorage.com>
+I noticed that this patch series doesn't appear to be merged into this
+branch. Just wondering if it might have been missed?
 
->  }
->
->  static inline void ublk_prep_cancel(struct io_uring_cmd *cmd,
-> @@ -2159,10 +2164,8 @@ static int ublk_fetch(struct io_uring_cmd *cmd, st=
-ruct ublk_queue *ubq,
->         return ret;
->  }
->
-> -static int ublk_commit_and_fetch(const struct ublk_queue *ubq,
-> -                                struct ublk_io *io, struct io_uring_cmd =
-*cmd,
-> -                                const struct ublksrv_io_cmd *ub_cmd,
-> -                                unsigned int issue_flags)
-> +static int ublk_check_commit_and_fetch(const struct ublk_queue *ubq,
-> +                                      struct ublk_io *io, __u64 buf_addr=
-)
->  {
->         struct request *req =3D io->req;
->
-> @@ -2171,10 +2174,10 @@ static int ublk_commit_and_fetch(const struct ubl=
-k_queue *ubq,
->                  * COMMIT_AND_FETCH_REQ has to provide IO buffer if
->                  * NEED GET DATA is not enabled or it is Read IO.
->                  */
-> -               if (!ub_cmd->addr && (!ublk_need_get_data(ubq) ||
-> +               if (!buf_addr && (!ublk_need_get_data(ubq) ||
->                                         req_op(req) =3D=3D REQ_OP_READ))
->                         return -EINVAL;
-> -       } else if (req_op(req) !=3D REQ_OP_ZONE_APPEND && ub_cmd->addr) {
-> +       } else if (req_op(req) !=3D REQ_OP_ZONE_APPEND && buf_addr) {
->                 /*
->                  * User copy requires addr to be unset when command is
->                  * not zone append
-> @@ -2182,6 +2185,14 @@ static int ublk_commit_and_fetch(const struct ublk=
-_queue *ubq,
->                 return -EINVAL;
->         }
->
-> +       return 0;
-> +}
-> +
-> +static int ublk_commit_and_fetch(const struct ublk_queue *ubq,
-> +                                struct ublk_io *io, struct io_uring_cmd =
-*cmd,
-> +                                struct request *req, unsigned int issue_=
-flags,
-> +                                __u64 zone_append_lba)
-> +{
->         if (ublk_support_auto_buf_reg(ubq)) {
->                 int ret;
->
-> @@ -2207,10 +2218,8 @@ static int ublk_commit_and_fetch(const struct ublk=
-_queue *ubq,
->                         return ret;
->         }
->
-> -       ublk_fill_io_cmd(io, cmd, ub_cmd->addr, ub_cmd->result);
-> -
->         if (req_op(req) =3D=3D REQ_OP_ZONE_APPEND)
-> -               req->__sector =3D ub_cmd->zone_append_lba;
-> +               req->__sector =3D zone_append_lba;
->
->         if (ublk_need_req_ref(ubq))
->                 ublk_sub_req_ref(io, req);
-> @@ -2316,7 +2325,12 @@ static int __ublk_ch_uring_cmd(struct io_uring_cmd=
- *cmd,
->                 return ublk_daemon_register_io_buf(cmd, ubq, io, ub_cmd->=
-addr,
->                                                    issue_flags);
->         case UBLK_IO_COMMIT_AND_FETCH_REQ:
-> -               ret =3D ublk_commit_and_fetch(ubq, io, cmd, ub_cmd, issue=
-_flags);
-> +               ret =3D ublk_check_commit_and_fetch(ubq, io, ub_cmd->addr=
-);
-> +               if (ret)
-> +                       goto out;
-> +               req =3D ublk_fill_io_cmd(io, cmd, ub_cmd->addr, ub_cmd->r=
-esult);
-> +               ret =3D ublk_commit_and_fetch(ubq, io, cmd, req, issue_fl=
-ags,
-> +                                           ub_cmd->zone_append_lba);
->                 if (ret)
->                         goto out;
->                 break;
-> @@ -2326,8 +2340,7 @@ static int __ublk_ch_uring_cmd(struct io_uring_cmd =
-*cmd,
->                  * uring_cmd active first and prepare for handling new re=
-queued
->                  * request
->                  */
-> -               req =3D io->req;
-> -               ublk_fill_io_cmd(io, cmd, ub_cmd->addr, 0);
-> +               req =3D ublk_fill_io_cmd(io, cmd, ub_cmd->addr, 0);
->                 if (likely(ublk_get_data(ubq, io, req))) {
->                         __ublk_prep_compl_io_cmd(io, req);
->                         return UBLK_IO_RES_OK;
-> --
-> 2.47.0
->
+Best regards,
+Yi.
+
+> 
+> [1/9] block: introduce max_{hw|user}_wzeroes_unmap_sectors to queue limits
+>       https://git.kernel.org/vfs/vfs/c/2695a9b086fd
+> [2/9] nvme: set max_hw_wzeroes_unmap_sectors if device supports DEAC bit
+>       https://git.kernel.org/vfs/vfs/c/bf07c1180194
+> [3/9] nvmet: set WZDS and DRB if device enables unmap write zeroes operation
+>       https://git.kernel.org/vfs/vfs/c/a6c7ab5adcba
+> [4/9] scsi: sd: set max_hw_wzeroes_unmap_sectors if device supports SD_ZERO_*_UNMAP
+>       https://git.kernel.org/vfs/vfs/c/92372ed1cc88
+> [5/9] dm: clear unmap write zeroes limits when disabling write zeroes
+>       https://git.kernel.org/vfs/vfs/c/e383d550e716
+> [6/9] fs: introduce FALLOC_FL_WRITE_ZEROES to fallocate
+>       https://git.kernel.org/vfs/vfs/c/1ed1b5df86ec
+> [7/9] block: factor out common part in blkdev_fallocate()
+>       https://git.kernel.org/vfs/vfs/c/96433508c8c0
+> [8/9] block: add FALLOC_FL_WRITE_ZEROES support
+>       https://git.kernel.org/vfs/vfs/c/2b4e5f9b3eb9
+> [9/9] ext4: add FALLOC_FL_WRITE_ZEROES support
+>       https://git.kernel.org/vfs/vfs/c/51954e469396
+
