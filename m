@@ -1,108 +1,262 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C18372EF67F
-	for <linux-block@vger.kernel.org>; Thu,  3 Jul 2025 14:54:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1439915442C;
+	Thu,  3 Jul 2025 15:08:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751554480; cv=none; b=bZDxyKkEP5uCslgyS1b5x1g7m+c1jC8QyD7OPNmczhUz9UKhOYvH6MfTjKuQaK8lTB8bB8wOaKhRvMPxVwTrR82DN0SxKZ0ppX6HZdYq7ixOL/kC4Cf1Q0Hiy66KsBjala7BbDCOVh5uLTWSiyKg2E5xIPWfXW8O4ywmgFe9A68=
+	t=1751555316; cv=none; b=XzJnIY2NPr2wHXqiVaAsV4Fk8JURykD9k9T/GKZydB/5g5yMpuKpZH8VJQnOdl8uQXSfdxpTBV4KNstEAICXvcD1qyHiccZPTL9JZoBmbSvjx0juVL9vk8s0XMJe11s9q13hattYb+0mAf5It4tdRSSInsjqDTv0gYhuRLlhMk8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751554480; c=relaxed/simple;
-	bh=RoH5FPBfNY5kOVrjdtcmJjb/6bRPe9fE/HoaKAzaHa4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BwcFdWPKjUJGlmP3t7A92sG28oOVoD2fucc6bJysBWORkbSADidGHRKKwQW9pEJ/qoO1XDrxsu1kmXzRhR84EFgXF/XPCcP+XrK7cCnQES7qXl7f0zl9pRXrNmipA+0Mk4Z87LyulOc9Xno4c3sNoacmv9pwG+DjfMw3/3c3oEo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=re4xtsTg; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1751555316; c=relaxed/simple;
+	bh=8GljKLrHpe9kEXKa3hqzrNoCIsl56DSFqDvkVIih/VM=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=Sc6/BQoNQNdwu8w7Zaiq/Wgo6+QgxsmVrSHskkbAz8z/XeRykUsLOjFL/eCeLlCNyfUsnGlFS/lXU/E3dm5ZQ8qNJyI/7MhxATTCWnBpfsQQFcbNnRh5QJ6ZXJp9lArg5E5Uwk/jKxYHEHw/ryPDgcv/c1oA1ERgLMM+lS5aRDI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sqiylDDl; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="re4xtsTg"
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5636oLOc006903;
-	Thu, 3 Jul 2025 14:54:27 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=RoH5FP
-	BfNY5kOVrjdtcmJjb/6bRPe9fE/HoaKAzaHa4=; b=re4xtsTgf2k+2jUWDo7YV0
-	rmyKjjL8mGGNkHYCzJf1w3W8ZstRtMvQBjDgKZVK6oBU08Q729UEzAVgjCeMB/dW
-	pvkif0GhVr1qUDeB6nm3SqxotRx9d3tn97HhqTYliihHZcKIzcRx98zQtvXqMI13
-	9egLI73xRqpN1Yc8Axa9TzWNcw44j0IjkggRpKE2mLG/21RoCZwa93XoUyU47sSB
-	HL2TaOgrvK8OtfTsJNqaA0ZK3dSuUX0ne2/DsGKTx0ChPVyqByQrndtouTgKQBF5
-	7a7k6hFVaMjS+oTiTUsuu+dA1nH36EhpVdnHZ5eqVayt+lFK8xb3PevrQwGSk2hw
-	==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 47j6u246x8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 03 Jul 2025 14:54:27 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 563EXgiO006841;
-	Thu, 3 Jul 2025 14:54:26 GMT
-Received: from smtprelay02.dal12v.mail.ibm.com ([172.16.1.4])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 47jvxmn8g0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 03 Jul 2025 14:54:26 +0000
-Received: from smtpav01.wdc07v.mail.ibm.com (smtpav01.wdc07v.mail.ibm.com [10.39.53.228])
-	by smtprelay02.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 563EsQSk25690824
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 3 Jul 2025 14:54:26 GMT
-Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 28CCE5805B;
-	Thu,  3 Jul 2025 14:54:26 +0000 (GMT)
-Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 89CCB5804B;
-	Thu,  3 Jul 2025 14:54:24 +0000 (GMT)
-Received: from [9.61.113.48] (unknown [9.61.113.48])
-	by smtpav01.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Thu,  3 Jul 2025 14:54:24 +0000 (GMT)
-Message-ID: <7ab65e37-c226-4db5-8138-1db1f0c1c861@linux.ibm.com>
-Date: Thu, 3 Jul 2025 20:24:22 +0530
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sqiylDDl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D734DC4CEED;
+	Thu,  3 Jul 2025 15:08:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751555315;
+	bh=8GljKLrHpe9kEXKa3hqzrNoCIsl56DSFqDvkVIih/VM=;
+	h=Date:Cc:Subject:From:To:References:In-Reply-To:From;
+	b=sqiylDDl2AA2H7oObOdp9HnXMvLCM5hmnb6+/+MaxrqmX3gDy8ZShwCyGlfIyap/G
+	 +7azaRN8FrYZT4oKRXiUCRfO+CqSSXm5T9GXI84E6Pa2TuJkvuZQwAROBV5FE5VJ8h
+	 g9dT/h6I7czTQp/Rlz02Tp07mpnCYSt4Eoe/Po/8s6XjPEA6/2nULo6w+IShgITWpv
+	 9t/P2XvQXr9RVsxQdIg4h7R0n2vQk0Uai3C/J2zSGKxlJvqemQBwkQmFj6KwoFCxVz
+	 CBILc4T0vMxDj5eEIfvb3CzXrE1KOadGjHOtdX4cfhY9147utvIV7umZv8Jf5AgeeF
+	 vnxs7Lkq8KyeQ==
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/3] block: Restrict the duration of sysfs attribute
- changes
-To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
-References: <20250702182430.3764163-1-bvanassche@acm.org>
- <20250702182430.3764163-3-bvanassche@acm.org>
-Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <20250702182430.3764163-3-bvanassche@acm.org>
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: uCTSakXmrr5D5iDCnFJTQtfw3yaSgeny
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzAzMDEyNSBTYWx0ZWRfX0wPTbRivyWHj hZSP3bvlMvgh2Nkpa3cOqP6Ba6TfwsbVxy46bWmlFZt64NftNGB2QO97NFe1+Lq4DNOs2xJ2HVX 25DE4EYtsJJOpI4eJvn9C1AS9aCD4lBJyJ3mOLSokOH7/4k1wlTJ5eufcoZC1sXfUJmcLpyRWvn
- pHerWUBUZopovJlMdNYVJY0NDcHJzPumTPxMEINQ70f7F57Ff5YD1CghC5AlDQ2YuDaLqq2CVUh H6p2WFrrxe4+qOHXbqtgOkhl5MeTcWq6cz25KuXlSzxpEidhl+Bldy9r4tR5H5LGgg82ZSSzp2M eoDUvIj2lQjr5ioHE73Y+lyeWi0hn4lbNFyTalsGUZSNNqscpW0Fr7ZnLsAMF+iYnJ50XukiHyj
- lJXnNUCtqICZRF6rv1/u5pxvHEBuYUT03BW6nSAMYPO4vMFQTCdVgtESxJKz8tE69KKUcuW3
-X-Proofpoint-GUID: uCTSakXmrr5D5iDCnFJTQtfw3yaSgeny
-X-Authority-Analysis: v=2.4 cv=GrRC+l1C c=1 sm=1 tr=0 ts=686699a3 cx=c_pps a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17 a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=MTV04HYMyJ8qHcmmLUIA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
- definitions=2025-07-03_04,2025-07-02_04,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
- priorityscore=1501 adultscore=0 mlxlogscore=999 mlxscore=0 impostorscore=0
- phishscore=0 spamscore=0 suspectscore=0 bulkscore=0 malwarescore=0
- lowpriorityscore=0 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
- definitions=main-2507030125
+Date: Thu, 03 Jul 2025 17:08:22 +0200
+Message-Id: <DB2IJ9HBIM0W.3N0JVGKX558QI@kernel.org>
+Cc: "Michal Rostecki" <vadorovsky@protonmail.com>, "Miguel Ojeda"
+ <ojeda@kernel.org>, "Alex Gaynor" <alex.gaynor@gmail.com>, "Boqun Feng"
+ <boqun.feng@gmail.com>, "Gary Guo" <gary@garyguo.net>,
+ =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, "Andreas
+ Hindborg" <a.hindborg@kernel.org>, "Alice Ryhl" <aliceryhl@google.com>,
+ "Trevor Gross" <tmgross@umich.edu>, "Brendan Higgins"
+ <brendan.higgins@linux.dev>, "David Gow" <davidgow@google.com>, "Rae Moar"
+ <rmoar@google.com>, "Danilo Krummrich" <dakr@kernel.org>, "Maarten
+ Lankhorst" <maarten.lankhorst@linux.intel.com>, "Maxime Ripard"
+ <mripard@kernel.org>, "Thomas Zimmermann" <tzimmermann@suse.de>, "David
+ Airlie" <airlied@gmail.com>, "Simona Vetter" <simona@ffwll.ch>, "Greg
+ Kroah-Hartman" <gregkh@linuxfoundation.org>, "Rafael J. Wysocki"
+ <rafael@kernel.org>, "Luis Chamberlain" <mcgrof@kernel.org>, "Russ Weight"
+ <russ.weight@linux.dev>, "FUJITA Tomonori" <fujita.tomonori@gmail.com>,
+ "Rob Herring" <robh@kernel.org>, "Saravana Kannan" <saravanak@google.com>,
+ "Peter Zijlstra" <peterz@infradead.org>, "Ingo Molnar" <mingo@redhat.com>,
+ "Will Deacon" <will@kernel.org>, "Waiman Long" <longman@redhat.com>,
+ "Nathan Chancellor" <nathan@kernel.org>, "Nick Desaulniers"
+ <nick.desaulniers+lkml@gmail.com>, "Bill Wendling" <morbo@google.com>,
+ "Justin Stitt" <justinstitt@google.com>, "Andrew Lunn" <andrew@lunn.ch>,
+ "Heiner Kallweit" <hkallweit1@gmail.com>, "Russell King"
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>, "Paolo
+ Abeni" <pabeni@redhat.com>, "Bjorn Helgaas" <bhelgaas@google.com>, "Arnd
+ Bergmann" <arnd@arndb.de>, "Jens Axboe" <axboe@kernel.dk>,
+ =?utf-8?q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, "Dave
+ Ertman" <david.m.ertman@intel.com>, "Ira Weiny" <ira.weiny@intel.com>,
+ "Leon Romanovsky" <leon@kernel.org>, "Breno Leitao" <leitao@debian.org>,
+ "Viresh Kumar" <viresh.kumar@linaro.org>, "Michael Turquette"
+ <mturquette@baylibre.com>, "Stephen Boyd" <sboyd@kernel.org>,
+ <rust-for-linux@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <linux-kselftest@vger.kernel.org>, <kunit-dev@googlegroups.com>,
+ <dri-devel@lists.freedesktop.org>, <netdev@vger.kernel.org>,
+ <devicetree@vger.kernel.org>, <llvm@lists.linux.dev>,
+ <linux-pci@vger.kernel.org>, <nouveau@lists.freedesktop.org>,
+ <linux-block@vger.kernel.org>, <linux-pm@vger.kernel.org>,
+ <linux-clk@vger.kernel.org>
+Subject: Re: [PATCH v13 2/5] rust: support formatting of foreign types
+From: "Benno Lossin" <lossin@kernel.org>
+To: "Tamir Duberstein" <tamird@gmail.com>
+X-Mailer: aerc 0.20.1
+References: <20250701-cstr-core-v13-0-29f7d3eb97a6@gmail.com>
+ <20250701-cstr-core-v13-2-29f7d3eb97a6@gmail.com>
+ <DB2BDSN1JH51.14ZZPETJORBC6@kernel.org>
+ <CAJ-ks9nC=AyBPXRY3nJ0NuZvjFskzMcOkVNrBEfXD2hZ5uRntQ@mail.gmail.com>
+In-Reply-To: <CAJ-ks9nC=AyBPXRY3nJ0NuZvjFskzMcOkVNrBEfXD2hZ5uRntQ@mail.gmail.com>
 
+On Thu Jul 3, 2025 at 3:55 PM CEST, Tamir Duberstein wrote:
+> On Thu, Jul 3, 2025 at 5:32=E2=80=AFAM Benno Lossin <lossin@kernel.org> w=
+rote:
+>> On Tue Jul 1, 2025 at 6:49 PM CEST, Tamir Duberstein wrote:
+>> > Introduce a `fmt!` macro which wraps all arguments in
+>> > `kernel::fmt::Adapter` and a `kernel::fmt::Display` trait. This enable=
+s
+>> > formatting of foreign types (like `core::ffi::CStr`) that do not
+>> > implement `core::fmt::Display` due to concerns around lossy conversion=
+s which
+>> > do not apply in the kernel.
+>> >
+>> > Replace all direct calls to `format_args!` with `fmt!`.
+>> >
+>> > Replace all implementations of `core::fmt::Display` with implementatio=
+ns
+>> > of `kernel::fmt::Display`.
+>> >
+>> > Suggested-by: Alice Ryhl <aliceryhl@google.com>
+>> > Link: https://rust-for-linux.zulipchat.com/#narrow/channel/288089-Gene=
+ral/topic/Custom.20formatting/with/516476467
+>> > Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+>> > Reviewed-by: Alice Ryhl <aliceryhl@google.com>
+>> > Signed-off-by: Tamir Duberstein <tamird@gmail.com>
+>> > ---
+>> >  drivers/block/rnull.rs       |  2 +-
+>> >  drivers/gpu/nova-core/gpu.rs |  4 +-
+>> >  rust/kernel/block/mq.rs      |  2 +-
+>> >  rust/kernel/device.rs        |  2 +-
+>> >  rust/kernel/fmt.rs           | 89 +++++++++++++++++++++++++++++++++++=
+++++
+>> >  rust/kernel/kunit.rs         |  6 +--
+>> >  rust/kernel/lib.rs           |  1 +
+>> >  rust/kernel/prelude.rs       |  3 +-
+>> >  rust/kernel/print.rs         |  4 +-
+>> >  rust/kernel/seq_file.rs      |  2 +-
+>> >  rust/kernel/str.rs           | 22 ++++------
+>> >  rust/macros/fmt.rs           | 99 +++++++++++++++++++++++++++++++++++=
++++++++++
+>> >  rust/macros/lib.rs           | 19 +++++++++
+>> >  rust/macros/quote.rs         |  7 ++++
+>> >  scripts/rustdoc_test_gen.rs  |  2 +-
+>> >  15 files changed, 236 insertions(+), 28 deletions(-)
+>>
+>> This would be a lot easier to review if he proc-macro and the call
+>> replacement were different patches.
+>>
+>> Also the `kernel/fmt.rs` file should be a different commit.
+>
+> Can you help me understand why? The changes you ask to be separated
+> would all be in different files, so why would separate commits make it
+> easier to review?
 
+It takes less time to go through the entire patch and give a RB. I can
+take smaller time chunks and don't have to get back into the entire
+context of the patch when I don't have 30-60min available.
 
-On 7/2/25 11:54 PM, Bart Van Assche wrote:
-> Freezing the request queue from inside sysfs store callbacks may cause a
-> deadlock in combination with the dm-multipath driver and the
-> queue_if_no_path option. Fix this by restricting how long to wait until
-> the queue is frozen inside the remaining sysfs callback methods that
-> freeze the request queue.
+In this patch the biggest problem is the rename & addition of new
+things, maybe just adding 200 lines in those files could be okay to go
+together, see below for more.
 
-I think we should explicitly list the attribute names that are affected by
-this change. Also, it would help clarify which sysfs store callbacks are
-impacted.
+> I prefer to keep things in one commit because the changes are highly
+> interdependent. The proc macro doesn't make sense without
+> kernel/fmt.rs and kernel/fmt.rs is useless without the proc macro.
 
-Thanks,
---Nilay
+I think that `Adapter`, the custom `Display` and their impl blocks
+don't need to be in the same commit as the proc-macro. They are related,
+but maybe someone is not well-versed in proc-macros and thus doesn't
+want to review that part.
 
+>> > diff --git a/rust/kernel/fmt.rs b/rust/kernel/fmt.rs
+>> > new file mode 100644
+>> > index 000000000000..348d16987de6
+>> > --- /dev/null
+>> > +++ b/rust/kernel/fmt.rs
+>> > @@ -0,0 +1,89 @@
+>> > +// SPDX-License-Identifier: GPL-2.0
+>> > +
+>> > +//! Formatting utilities.
+>> > +
+>> > +use core::fmt;
+>>
+>> I think we should pub export all types that we are still using from
+>> `core::fmt`. For example `Result`, `Formatter`, `Debug` etc.
+>>
+>> That way I can still use the same pattern of importing `fmt` and then
+>> writing
+>>
+>>     impl fmt::Display for MyType {
+>>         fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {}
+>>     }
+>
+> Great idea, done for the next spin. It would be nice to be able to
+> lint against references to `core::fmt` outside of kernel/fmt.rs.
+
+I think there was something in clippy that can do that globally and we
+could allow that in this file?
+
+>> > +
+>> > +/// Internal adapter used to route allow implementations of formattin=
+g traits for foreign types.
+>> > +///
+>> > +/// It is inserted automatically by the [`fmt!`] macro and is not mea=
+nt to be used directly.
+>> > +///
+>> > +/// [`fmt!`]: crate::prelude::fmt!
+>> > +#[doc(hidden)]
+>> > +pub struct Adapter<T>(pub T);
+>> > +
+>> > +macro_rules! impl_fmt_adapter_forward {
+>> > +    ($($trait:ident),* $(,)?) =3D> {
+>> > +        $(
+>> > +            impl<T: fmt::$trait> fmt::$trait for Adapter<T> {
+>> > +                fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Res=
+ult {
+>> > +                    let Self(t) =3D self;
+>> > +                    fmt::$trait::fmt(t, f)
+>> > +                }
+>> > +            }
+>> > +        )*
+>> > +    };
+>> > +}
+>> > +
+>> > +impl_fmt_adapter_forward!(Debug, LowerHex, UpperHex, Octal, Binary, P=
+ointer, LowerExp, UpperExp);
+>> > +
+>> > +/// A copy of [`fmt::Display`] that allows us to implement it for for=
+eign types.
+>> > +///
+>> > +/// Types should implement this trait rather than [`fmt::Display`]. T=
+ogether with the [`Adapter`]
+>> > +/// type and [`fmt!`] macro, it allows for formatting foreign types (=
+e.g. types from core) which do
+>> > +/// not implement [`fmt::Display`] directly.
+>> > +///
+>> > +/// [`fmt!`]: crate::prelude::fmt!
+>> > +pub trait Display {
+>> > +    /// Same as [`fmt::Display::fmt`].
+>> > +    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result;
+>> > +}
+>> > +
+>> > +impl<T: ?Sized + Display> Display for &T {
+>> > +    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+>> > +        Display::fmt(*self, f)
+>> > +    }
+>> > +}
+>> > +
+>> > +impl<T: ?Sized + Display> fmt::Display for Adapter<&T> {
+>> > +    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+>> > +        let Self(t) =3D self;
+>> > +        Display::fmt(t, f)
+>>
+>> Why not `Display::fmt(&self.0, f)`?
+>
+> I like destructuring because it shows me that there's only one field.
+> With `self.0` I don't see that.
+
+And what is the benefit here?
+
+>> > +
+>> > +    let mut args =3D TokenStream::from_iter(first_opt);
+>> > +    {
+>> > +        let mut flush =3D |args: &mut TokenStream, current: &mut Toke=
+nStream| {
+>>
+>> You don't need to pass `args` as a closure argument, since you always
+>> call it with `&mut args`.
+>
+> This doesn't work because of the borrow checker. If I wrote what you
+> suggest, then `args` is mutably borrowed by the closure, which
+> prohibits the mutable borrow needed for the .extend() call here:
+
+Ahh right... Well then it's fine.
+
+---
+Cheers,
+Benno
