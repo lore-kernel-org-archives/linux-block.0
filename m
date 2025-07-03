@@ -1,262 +1,114 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1439915442C;
-	Thu,  3 Jul 2025 15:08:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D2B3FC0B
+	for <linux-block@vger.kernel.org>; Thu,  3 Jul 2025 15:36:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751555316; cv=none; b=XzJnIY2NPr2wHXqiVaAsV4Fk8JURykD9k9T/GKZydB/5g5yMpuKpZH8VJQnOdl8uQXSfdxpTBV4KNstEAICXvcD1qyHiccZPTL9JZoBmbSvjx0juVL9vk8s0XMJe11s9q13hattYb+0mAf5It4tdRSSInsjqDTv0gYhuRLlhMk8=
+	t=1751557019; cv=none; b=SWLdWkvOIGAP4bE6iCbYCqTSnyquTXmbTWJDeC3e3wf3rmMDPm0ftji5ppsxDi1UrtpqFyE4wbN85JswKQb8lNa1b384N4hSvGHdUo6+X2AVFYfdg4fCInuZBIGu18FDPQIr41/Ag9QZfxQ2hJ1ql/OlyEDv606Ti7Hoplhd2J8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751555316; c=relaxed/simple;
-	bh=8GljKLrHpe9kEXKa3hqzrNoCIsl56DSFqDvkVIih/VM=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=Sc6/BQoNQNdwu8w7Zaiq/Wgo6+QgxsmVrSHskkbAz8z/XeRykUsLOjFL/eCeLlCNyfUsnGlFS/lXU/E3dm5ZQ8qNJyI/7MhxATTCWnBpfsQQFcbNnRh5QJ6ZXJp9lArg5E5Uwk/jKxYHEHw/ryPDgcv/c1oA1ERgLMM+lS5aRDI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sqiylDDl; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1751557019; c=relaxed/simple;
+	bh=HjhLvZ/H1P2qjBwChvmJUpJrRBCOZ7tQGFPyGBSuZ7E=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=Xv61Ls/xmgDKfLLqQjtCL2KMXFVLKewzloQxdU8ljZ9It7mB+K5YaOx2dHwkdXLpNF4vT2DKjTpmWuBYJB3uIm2AUxVdqpYibaRrudq05scebioH83YOSKrng8NXJ6ppj92AAOZUH3sqotf8c/71EraYPcZflzbOWnkozyIWPuE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gXtgXu5y; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sqiylDDl"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D734DC4CEED;
-	Thu,  3 Jul 2025 15:08:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751555315;
-	bh=8GljKLrHpe9kEXKa3hqzrNoCIsl56DSFqDvkVIih/VM=;
-	h=Date:Cc:Subject:From:To:References:In-Reply-To:From;
-	b=sqiylDDl2AA2H7oObOdp9HnXMvLCM5hmnb6+/+MaxrqmX3gDy8ZShwCyGlfIyap/G
-	 +7azaRN8FrYZT4oKRXiUCRfO+CqSSXm5T9GXI84E6Pa2TuJkvuZQwAROBV5FE5VJ8h
-	 g9dT/h6I7czTQp/Rlz02Tp07mpnCYSt4Eoe/Po/8s6XjPEA6/2nULo6w+IShgITWpv
-	 9t/P2XvQXr9RVsxQdIg4h7R0n2vQk0Uai3C/J2zSGKxlJvqemQBwkQmFj6KwoFCxVz
-	 CBILc4T0vMxDj5eEIfvb3CzXrE1KOadGjHOtdX4cfhY9147utvIV7umZv8Jf5AgeeF
-	 vnxs7Lkq8KyeQ==
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gXtgXu5y"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1751557017;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7ZIDgAzyBTQUEBiTF8A+c8zCA7OsCfb4nYut225EcXo=;
+	b=gXtgXu5yYF8aRdP5nm+SIik5jWmZU4aoXuwnkkCePOXfx99kolsLRoeevpV4cQYuGNJzJR
+	iCwFcGSeOIiNTm1PxolzQPY20/zVcNqldjxz0/CW6Ec4L4PIBYsmg97IzOcOUgX8BeDAk1
+	/sEQKMEnEU+A6WQ5z4MwmCdb0MUHb68=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-37-xJKfPUenPTaLJA_uasGIVw-1; Thu,
+ 03 Jul 2025 11:36:53 -0400
+X-MC-Unique: xJKfPUenPTaLJA_uasGIVw-1
+X-Mimecast-MFC-AGG-ID: xJKfPUenPTaLJA_uasGIVw_1751557011
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 918041955D4E;
+	Thu,  3 Jul 2025 15:36:50 +0000 (UTC)
+Received: from [10.22.80.10] (unknown [10.22.80.10])
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 333D11956087;
+	Thu,  3 Jul 2025 15:36:45 +0000 (UTC)
+Date: Thu, 3 Jul 2025 17:36:38 +0200 (CEST)
+From: Mikulas Patocka <mpatocka@redhat.com>
+To: John Garry <john.g.garry@oracle.com>
+cc: axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org, song@kernel.org, 
+    yukuai3@huawei.com, hch@lst.de, nilay@linux.ibm.com, 
+    dm-devel@lists.linux.dev, linux-kernel@vger.kernel.org, 
+    linux-raid@vger.kernel.org, linux-block@vger.kernel.org, 
+    ojaswin@linux.ibm.com, martin.petersen@oracle.com
+Subject: Re: [PATCH v3 5/5] block: use chunk_sectors when evaluating stacked
+ atomic write limits
+In-Reply-To: <f7f342de-1087-47f6-a0c1-e41574abe985@oracle.com>
+Message-ID: <8b5e009a-9e2a-4542-69fb-fc6d47287255@redhat.com>
+References: <20250703114613.9124-1-john.g.garry@oracle.com> <20250703114613.9124-6-john.g.garry@oracle.com> <b7bd63a0-7aa6-2fb3-0a2b-23285b9fc5fc@redhat.com> <f7f342de-1087-47f6-a0c1-e41574abe985@oracle.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Thu, 03 Jul 2025 17:08:22 +0200
-Message-Id: <DB2IJ9HBIM0W.3N0JVGKX558QI@kernel.org>
-Cc: "Michal Rostecki" <vadorovsky@protonmail.com>, "Miguel Ojeda"
- <ojeda@kernel.org>, "Alex Gaynor" <alex.gaynor@gmail.com>, "Boqun Feng"
- <boqun.feng@gmail.com>, "Gary Guo" <gary@garyguo.net>,
- =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, "Andreas
- Hindborg" <a.hindborg@kernel.org>, "Alice Ryhl" <aliceryhl@google.com>,
- "Trevor Gross" <tmgross@umich.edu>, "Brendan Higgins"
- <brendan.higgins@linux.dev>, "David Gow" <davidgow@google.com>, "Rae Moar"
- <rmoar@google.com>, "Danilo Krummrich" <dakr@kernel.org>, "Maarten
- Lankhorst" <maarten.lankhorst@linux.intel.com>, "Maxime Ripard"
- <mripard@kernel.org>, "Thomas Zimmermann" <tzimmermann@suse.de>, "David
- Airlie" <airlied@gmail.com>, "Simona Vetter" <simona@ffwll.ch>, "Greg
- Kroah-Hartman" <gregkh@linuxfoundation.org>, "Rafael J. Wysocki"
- <rafael@kernel.org>, "Luis Chamberlain" <mcgrof@kernel.org>, "Russ Weight"
- <russ.weight@linux.dev>, "FUJITA Tomonori" <fujita.tomonori@gmail.com>,
- "Rob Herring" <robh@kernel.org>, "Saravana Kannan" <saravanak@google.com>,
- "Peter Zijlstra" <peterz@infradead.org>, "Ingo Molnar" <mingo@redhat.com>,
- "Will Deacon" <will@kernel.org>, "Waiman Long" <longman@redhat.com>,
- "Nathan Chancellor" <nathan@kernel.org>, "Nick Desaulniers"
- <nick.desaulniers+lkml@gmail.com>, "Bill Wendling" <morbo@google.com>,
- "Justin Stitt" <justinstitt@google.com>, "Andrew Lunn" <andrew@lunn.ch>,
- "Heiner Kallweit" <hkallweit1@gmail.com>, "Russell King"
- <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>, "Paolo
- Abeni" <pabeni@redhat.com>, "Bjorn Helgaas" <bhelgaas@google.com>, "Arnd
- Bergmann" <arnd@arndb.de>, "Jens Axboe" <axboe@kernel.dk>,
- =?utf-8?q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, "Dave
- Ertman" <david.m.ertman@intel.com>, "Ira Weiny" <ira.weiny@intel.com>,
- "Leon Romanovsky" <leon@kernel.org>, "Breno Leitao" <leitao@debian.org>,
- "Viresh Kumar" <viresh.kumar@linaro.org>, "Michael Turquette"
- <mturquette@baylibre.com>, "Stephen Boyd" <sboyd@kernel.org>,
- <rust-for-linux@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
- <linux-kselftest@vger.kernel.org>, <kunit-dev@googlegroups.com>,
- <dri-devel@lists.freedesktop.org>, <netdev@vger.kernel.org>,
- <devicetree@vger.kernel.org>, <llvm@lists.linux.dev>,
- <linux-pci@vger.kernel.org>, <nouveau@lists.freedesktop.org>,
- <linux-block@vger.kernel.org>, <linux-pm@vger.kernel.org>,
- <linux-clk@vger.kernel.org>
-Subject: Re: [PATCH v13 2/5] rust: support formatting of foreign types
-From: "Benno Lossin" <lossin@kernel.org>
-To: "Tamir Duberstein" <tamird@gmail.com>
-X-Mailer: aerc 0.20.1
-References: <20250701-cstr-core-v13-0-29f7d3eb97a6@gmail.com>
- <20250701-cstr-core-v13-2-29f7d3eb97a6@gmail.com>
- <DB2BDSN1JH51.14ZZPETJORBC6@kernel.org>
- <CAJ-ks9nC=AyBPXRY3nJ0NuZvjFskzMcOkVNrBEfXD2hZ5uRntQ@mail.gmail.com>
-In-Reply-To: <CAJ-ks9nC=AyBPXRY3nJ0NuZvjFskzMcOkVNrBEfXD2hZ5uRntQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-On Thu Jul 3, 2025 at 3:55 PM CEST, Tamir Duberstein wrote:
-> On Thu, Jul 3, 2025 at 5:32=E2=80=AFAM Benno Lossin <lossin@kernel.org> w=
-rote:
->> On Tue Jul 1, 2025 at 6:49 PM CEST, Tamir Duberstein wrote:
->> > Introduce a `fmt!` macro which wraps all arguments in
->> > `kernel::fmt::Adapter` and a `kernel::fmt::Display` trait. This enable=
-s
->> > formatting of foreign types (like `core::ffi::CStr`) that do not
->> > implement `core::fmt::Display` due to concerns around lossy conversion=
-s which
->> > do not apply in the kernel.
->> >
->> > Replace all direct calls to `format_args!` with `fmt!`.
->> >
->> > Replace all implementations of `core::fmt::Display` with implementatio=
-ns
->> > of `kernel::fmt::Display`.
->> >
->> > Suggested-by: Alice Ryhl <aliceryhl@google.com>
->> > Link: https://rust-for-linux.zulipchat.com/#narrow/channel/288089-Gene=
-ral/topic/Custom.20formatting/with/516476467
->> > Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
->> > Reviewed-by: Alice Ryhl <aliceryhl@google.com>
->> > Signed-off-by: Tamir Duberstein <tamird@gmail.com>
->> > ---
->> >  drivers/block/rnull.rs       |  2 +-
->> >  drivers/gpu/nova-core/gpu.rs |  4 +-
->> >  rust/kernel/block/mq.rs      |  2 +-
->> >  rust/kernel/device.rs        |  2 +-
->> >  rust/kernel/fmt.rs           | 89 +++++++++++++++++++++++++++++++++++=
-++++
->> >  rust/kernel/kunit.rs         |  6 +--
->> >  rust/kernel/lib.rs           |  1 +
->> >  rust/kernel/prelude.rs       |  3 +-
->> >  rust/kernel/print.rs         |  4 +-
->> >  rust/kernel/seq_file.rs      |  2 +-
->> >  rust/kernel/str.rs           | 22 ++++------
->> >  rust/macros/fmt.rs           | 99 +++++++++++++++++++++++++++++++++++=
-+++++++++
->> >  rust/macros/lib.rs           | 19 +++++++++
->> >  rust/macros/quote.rs         |  7 ++++
->> >  scripts/rustdoc_test_gen.rs  |  2 +-
->> >  15 files changed, 236 insertions(+), 28 deletions(-)
->>
->> This would be a lot easier to review if he proc-macro and the call
->> replacement were different patches.
->>
->> Also the `kernel/fmt.rs` file should be a different commit.
->
-> Can you help me understand why? The changes you ask to be separated
-> would all be in different files, so why would separate commits make it
-> easier to review?
 
-It takes less time to go through the entire patch and give a RB. I can
-take smaller time chunks and don't have to get back into the entire
-context of the patch when I don't have 30-60min available.
 
-In this patch the biggest problem is the rename & addition of new
-things, maybe just adding 200 lines in those files could be okay to go
-together, see below for more.
+On Thu, 3 Jul 2025, John Garry wrote:
 
-> I prefer to keep things in one commit because the changes are highly
-> interdependent. The proc macro doesn't make sense without
-> kernel/fmt.rs and kernel/fmt.rs is useless without the proc macro.
+> > >   -/* Check stacking of first bottom device */
+> > > -static bool blk_stack_atomic_writes_head(struct queue_limits *t,
+> > > -				struct queue_limits *b)
+> > > +static void blk_stack_atomic_writes_chunk_sectors(struct queue_limits *t)
+> > >   {
+> > > -	if (b->atomic_write_hw_boundary &&
+> > > -	    !blk_stack_atomic_writes_boundary_head(t, b))
+> > > -		return false;
+> > > +	unsigned int chunk_bytes = t->chunk_sectors << SECTOR_SHIFT;
+> > 
+> > What about integer overflow?
+> 
+> I suppose theoretically it could happen, and I'm happy to change.
+> 
+> However there seems to be precedent in assuming it won't:
+> 
+> - in stripe_op_hints(), we hold chunk_size in an unsigned int
+> - in raid0_set_limits(), we hold mddev->chunk_sectors << 9 in lim.io_min,
+> which is an unsigned int type.
+> 
+> Please let me know your thoughts on also changing these sort of instances. Is
+> it realistic to expect chunk_bytes > UINT_MAX?
+> 
+> Thanks,
+> John
 
-I think that `Adapter`, the custom `Display` and their impl blocks
-don't need to be in the same commit as the proc-macro. They are related,
-but maybe someone is not well-versed in proc-macros and thus doesn't
-want to review that part.
+dm-stripe can be created with a stripe size that is more than 0xffffffff 
+bytes.
 
->> > diff --git a/rust/kernel/fmt.rs b/rust/kernel/fmt.rs
->> > new file mode 100644
->> > index 000000000000..348d16987de6
->> > --- /dev/null
->> > +++ b/rust/kernel/fmt.rs
->> > @@ -0,0 +1,89 @@
->> > +// SPDX-License-Identifier: GPL-2.0
->> > +
->> > +//! Formatting utilities.
->> > +
->> > +use core::fmt;
->>
->> I think we should pub export all types that we are still using from
->> `core::fmt`. For example `Result`, `Formatter`, `Debug` etc.
->>
->> That way I can still use the same pattern of importing `fmt` and then
->> writing
->>
->>     impl fmt::Display for MyType {
->>         fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {}
->>     }
->
-> Great idea, done for the next spin. It would be nice to be able to
-> lint against references to `core::fmt` outside of kernel/fmt.rs.
+Though, the integer overflow already exists in the existing dm-stripe 
+target:
+static void stripe_io_hints(struct dm_target *ti,
+                            struct queue_limits *limits)
+{
+        struct stripe_c *sc = ti->private;
+        unsigned int chunk_size = sc->chunk_size << SECTOR_SHIFT;
 
-I think there was something in clippy that can do that globally and we
-could allow that in this file?
+        limits->io_min = chunk_size;
+        limits->io_opt = chunk_size * sc->stripes;
+}
+What should we set there as io_min and io_opt if sc->chunk_size << 
+SECTOR_SHIFT overflows? Should we set nothing?
 
->> > +
->> > +/// Internal adapter used to route allow implementations of formattin=
-g traits for foreign types.
->> > +///
->> > +/// It is inserted automatically by the [`fmt!`] macro and is not mea=
-nt to be used directly.
->> > +///
->> > +/// [`fmt!`]: crate::prelude::fmt!
->> > +#[doc(hidden)]
->> > +pub struct Adapter<T>(pub T);
->> > +
->> > +macro_rules! impl_fmt_adapter_forward {
->> > +    ($($trait:ident),* $(,)?) =3D> {
->> > +        $(
->> > +            impl<T: fmt::$trait> fmt::$trait for Adapter<T> {
->> > +                fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Res=
-ult {
->> > +                    let Self(t) =3D self;
->> > +                    fmt::$trait::fmt(t, f)
->> > +                }
->> > +            }
->> > +        )*
->> > +    };
->> > +}
->> > +
->> > +impl_fmt_adapter_forward!(Debug, LowerHex, UpperHex, Octal, Binary, P=
-ointer, LowerExp, UpperExp);
->> > +
->> > +/// A copy of [`fmt::Display`] that allows us to implement it for for=
-eign types.
->> > +///
->> > +/// Types should implement this trait rather than [`fmt::Display`]. T=
-ogether with the [`Adapter`]
->> > +/// type and [`fmt!`] macro, it allows for formatting foreign types (=
-e.g. types from core) which do
->> > +/// not implement [`fmt::Display`] directly.
->> > +///
->> > +/// [`fmt!`]: crate::prelude::fmt!
->> > +pub trait Display {
->> > +    /// Same as [`fmt::Display::fmt`].
->> > +    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result;
->> > +}
->> > +
->> > +impl<T: ?Sized + Display> Display for &T {
->> > +    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
->> > +        Display::fmt(*self, f)
->> > +    }
->> > +}
->> > +
->> > +impl<T: ?Sized + Display> fmt::Display for Adapter<&T> {
->> > +    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
->> > +        let Self(t) =3D self;
->> > +        Display::fmt(t, f)
->>
->> Why not `Display::fmt(&self.0, f)`?
->
-> I like destructuring because it shows me that there's only one field.
-> With `self.0` I don't see that.
+Mikulas
 
-And what is the benefit here?
-
->> > +
->> > +    let mut args =3D TokenStream::from_iter(first_opt);
->> > +    {
->> > +        let mut flush =3D |args: &mut TokenStream, current: &mut Toke=
-nStream| {
->>
->> You don't need to pass `args` as a closure argument, since you always
->> call it with `&mut args`.
->
-> This doesn't work because of the borrow checker. If I wrote what you
-> suggest, then `args` is mutably borrowed by the closure, which
-> prohibits the mutable borrow needed for the .extend() call here:
-
-Ahh right... Well then it's fine.
-
----
-Cheers,
-Benno
