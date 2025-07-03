@@ -1,43 +1,32 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1E2E2D77F2
-	for <linux-block@vger.kernel.org>; Thu,  3 Jul 2025 11:51:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A806C2E6119;
+	Thu,  3 Jul 2025 12:17:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751543503; cv=none; b=VRog9KlBQJ2ieFRhtQn56ITr0Z+xfgjdVzO2o/EHsO+Iov2hyXJAYOU5l2C84D1fOzLCPgOJ59bMJ0PqDe6N+V6uVXx+aSWnKEF0g7n3ymudilFJ9z0fLMjpcKB7ZbwNW+Dd+0DI5OWnl5+VibZ1qpz93423qkyQ70+QRTkCpNw=
+	t=1751545022; cv=none; b=qmurSEpnETf7NVLjc97/CiE2/t2JaNPlRmqkomjT8IaeL9LsOpPypIhVEVlXF62BEoJskV3JYjzAehiSZgR53zb+Vz7v/wdPJmcjQQQSMqkuRxmjbMYTWP4DOSTP7Wq9SoVyCMSWqQ5GGEkGBbMTlf0xBW6v4V1GDdmC9nJhNYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751543503; c=relaxed/simple;
-	bh=h60KY1LPsYKjnmqvpLB9DeO2tZzHh/UgtTWQJPV8B30=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=lbembiowVwynOGflnheiTyCzTbI+ie8NSfD+c7SlMtzxpG8htZpviBKMg32B1PEf6iq3ZWzTP5cWTFKAygLmx+ep4nPw8jzvvVNuLEyxPYibdUgZOgShnUhX3LoEn3aUvlVQnSKFJLwoVqt29t3TMPUMLNQzGUY8GLumj+O5hsk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=qXVbwdJs; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="qXVbwdJs"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Type:MIME-Version:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:In-Reply-To:References;
-	bh=mrnEFAQtqxLZGcbjaYw141JliT60nsKNTrMACRJgZbA=; b=qXVbwdJsjS/VslyxCZ4ZzAL0hi
-	YsABqq3sU4oV6JV8OXfy/771uAxt9ePjM15vpTutTDc0PHEFiYbP6Q8DiHos+v4ewnIAe6p072Q+m
-	KWbObytr0pslETF5A9LaRm1OzbtgIR+bOXbAp+ZCtHm0TLccuLbDr9QnpgbUMI5V4tOCOGUL5NC2W
-	miGdegeyODLG/GF71Qm4qo48jX1Zo5ydRghw5BDf7d14L/Ypdg3ub6NQkQnmcKxOPznSXNURATeGI
-	lTOMNGDlhAjBEpSsMt7pdKbjO55RkQN4/Er6isYTiJAZT1kzPG+ZfYEimAvtQ8oq5s4jHrseF+LbZ
-	5+272wPA==;
-Received: from 2a02-8389-2341-5b80-d601-7564-c2e0-491c.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:d601:7564:c2e0:491c] helo=localhost)
-	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1uXITc-0000000BDvY-1OWm;
-	Thu, 03 Jul 2025 11:51:40 +0000
-Date: Thu, 3 Jul 2025 13:51:36 +0200
-From: Christoph Hellwig <hch@infradead.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Keith Busch <kbusch@kernel.org>,
-	Jens Axboe <axboe@fb.com>, Sagi Grimberg <sagi@grimberg.me>,
-	Chaitanya Kulkarni <kch@nvidia.com>, linux-nvme@lists.infradead.org
-Subject: [GIT PULL] nvme fixes for Linux 6.16
-Message-ID: <aGZuyPbzY__Rb8Kz@infradead.org>
+	s=arc-20240116; t=1751545022; c=relaxed/simple;
+	bh=YhSYv4Apjbr3Oj47VGbhmJgYZ9AgT0VyunWVMHcnmU0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pQxPY6E1uY4/2REteJp+sZ3aEwCyXJBqBCpwB4FcDi7silEnav2VT2UbP2y5Nabu3XgCPAZ3m/Fg61GSjb6+aGx2aiH/4Ogewv60m0q/eeT0+5Ow+NlxBjvtYLHcI5DbppCaZyUCwKkSkTr4IlvKAgsICMVjsn5VLbsFZJ3fUoY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id E0FB368C7B; Thu,  3 Jul 2025 14:16:54 +0200 (CEST)
+Date: Thu, 3 Jul 2025 14:16:54 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: "Darrick J. Wong" <djwong@kernel.org>
+Cc: Joanne Koong <joannelkoong@gmail.com>, linux-fsdevel@vger.kernel.org,
+	hch@lst.de, miklos@szeredi.hu, brauner@kernel.org,
+	anuj20.g@samsung.com, linux-xfs@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-block@vger.kernel.org,
+	gfs2@lists.linux.dev, kernel-team@meta.com
+Subject: Re: [PATCH v3 03/16] iomap: refactor the writeback interface
+Message-ID: <20250703121654.GA19114@lst.de>
+References: <20250624022135.832899-1-joannelkoong@gmail.com> <20250624022135.832899-4-joannelkoong@gmail.com> <20250702171353.GW10009@frogsfrogsfrogs>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -46,47 +35,41 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20250702171353.GW10009@frogsfrogsfrogs>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-The following changes since commit c007062188d8e402c294117db53a24b2bed2b83f:
+On Wed, Jul 02, 2025 at 10:13:53AM -0700, Darrick J. Wong wrote:
+> > +    int (*writeback_range)(struct iomap_writepage_ctx *wpc,
+> > +    		struct folio *folio, u64 pos, unsigned int len, u64 end_pos);
+> 
+> Why does @pos change from loff_t to u64 here?  Are we expecting
+> filesystems that set FOP_UNSIGNED_OFFSET?
 
-  block: fix false warning in bdev_count_inflight_rw() (2025-06-26 07:34:11 -0600)
+It doesn't really change, it matches what iomap_writepage_map_blocks
+was doing.  I guess it simply doesn't fix the existing inconsistency.
 
-are available in the Git repository at:
+> > +    int (*submit_ioend)(struct iomap_writepage_ctx *wpc, int status);
+> 
+> Nit:   ^^ indenting change here.
 
-  git://git.infradead.org/nvme.git tags/nvme-6.16-2025-07-03
+Yeah, RST formatting is a mess unfortunately.   I think the problem is
+that the exiting code uses 4 space indents.  I wonder if that's required
+by %##% RST?
 
-for you to fetch changes up to d6811074203b13f715ce2480ac64c5b1c773f2a5:
+> > +		if (wpc->iomap.type != IOMAP_HOLE)
+> > +			*wb_pending = true;
+> 
+> /me wonders if this should be an outparam of ->writeback_range to signal
+> that it actually added the folio to the writeback ioend chain?  Or maybe
+> just a boolean in iomap_writepage_ctx that we clear before calling
+> ->writeback_range and iomap_add_to_ioend can set it as appropriate?
 
-  nvme-multipath: fix suspicious RCU usage warning (2025-07-01 08:17:02 +0200)
+What's the benefit of that?  A hole pretty clearly signal there is
+no writeback here.
 
-----------------------------------------------------------------
-nvme fixes for Linux 6.16
+> Should this jump label should be named add_to_ioend or something?  We
+> already mapped the blocks.  The same applies to the zoned version of
+> this function.
 
- - fix incorrect cdw15 value in passthru error logging (Alok Tiwari)
- - fix memory leak of bio integrity in nvmet (Dmitry Bogdanov)
- - refresh visible attrs after being checked (Eugen Hristev)
- - fix suspicious RCU usage warning in the multipath code (Geliang Tang)
- - correctly account for namespace head reference counter (Nilay Shroff)
+The newer version already uses a map_blocks helper for both again.
 
-----------------------------------------------------------------
-Alok Tiwari (1):
-      nvme: Fix incorrect cdw15 value in passthru error logging
-
-Dmitry Bogdanov (1):
-      nvmet: fix memory leak of bio integrity
-
-Eugen Hristev (1):
-      nvme-pci: refresh visible attrs after being checked
-
-Geliang Tang (1):
-      nvme-multipath: fix suspicious RCU usage warning
-
-Nilay Shroff (1):
-      nvme: correctly account for namespace head reference counter
-
- drivers/nvme/host/core.c      | 18 ++++++++++++++++--
- drivers/nvme/host/multipath.c |  8 ++++++--
- drivers/nvme/host/pci.c       |  6 ++++--
- drivers/nvme/target/nvmet.h   |  2 ++
- 4 files changed, 28 insertions(+), 6 deletions(-)
