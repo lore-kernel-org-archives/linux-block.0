@@ -1,59 +1,136 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ADF12D8DC8;
-	Fri,  4 Jul 2025 12:47:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 854A230115E;
+	Fri,  4 Jul 2025 13:00:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751633250; cv=none; b=VcHrsMW761swXMb6m4LqgfT/pRRoMfMm67Uetl305uknWQvIxtg8xRN7Ke4LZLaPA6u4bu9UfPKl+Nvt4u70OKIsBaTE9Gx9JobiI89eicHiKrbVU6aBrzMzxqqSrzofIbKijE24D05Hlfnerm9SmWCkh8kr/9FzbZzUHB70dSI=
+	t=1751634040; cv=none; b=SKe0fAGSOx1JFqKAcC7jmbgGSKazfi17EXF98nTfCmeLnq5yV7JyZniqn3sNm6fGwQLfnaIfSZLVUC+FbTQn4OP/RgdcfInNo+4CMKE5qavggoSjnODOt4nhk3dqf3bDU2yp8zT4MMt9x24YnXYwbL4otgL1SIEvJhq/e6tLIH8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751633250; c=relaxed/simple;
-	bh=T90gNZWoeIwPdQb9kKnDO8z31RKQxyE2y9k3W8A2j4w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ENznDwKOABhlNx8+fMPFXnmQV5fPtYlZjj/T7RYkqPgoC/d98Z4aAIjza9UdwpqSID1TsSSIMzXGpB2rU38RGjqQ/V6q5BgH2cgqlpMshJ1vkaECyNSqLKHDTMObI5ps4j7G0orzLm8j9l4vWJAA00DGikNDpDhRmVqiwOx/zRA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=KCtfqo3A; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1751634040; c=relaxed/simple;
+	bh=PQ+uuvbgXKFc5vIr220QI1Lf8oYUGvsoSa+Kga5uCxI=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Subject:From:To:Cc:
+	 References:In-Reply-To; b=CyR8vl9fWmINm7RKWId4dKPyemJ+9FqSebnWLZfFSs+UEEcvziTdvmE78TALAjSnNGurITdNjyS+SEu8DCBS807qDW6WL/bDrnQZx5dCJuxYJE94bbP6/KZGu2OL2Hm6q/X0mtxxoz1z+F233S/Li37GmVT0W4joNTzs5rGAUGU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mi+LrZHj; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="KCtfqo3A"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=dF0QLrRnHi3q/gPd8eAQq74gho4ELrDX/tZACh7jpxM=; b=KCtfqo3A4oBwiDisV4+rPARY+c
-	Uevmp12uGtkEP7tBjRwuC6ikO8G2y1WkNlYOb1519VvqrWUWYOshNs+LXgGaKim7XMr/2ttxIZRU3
-	Fxvr2QCKTU+5h0djOBeHVaWl7xH/f+CFWBwcprqX1PSTvcGljoibqZ6KL6JpobtfDQJc3Z9OiosAD
-	xhSy2S5Zh3XJV6yKQ6FaiMazM/j/SSUdRDW5ZwJlCQOdxzZFuPLXFRGQHGO9twyDkvWHKsZaVtY8V
-	yTTV48gahvduciOuyC/7qwV+8iF2hkLRvBT0uERbKwENmKa3LP41N7THGe+W7N4dlUup6QwXl8okz
-	I1WvluPw==;
-Received: from willy by casper.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1uXfp7-0000000Gvhr-3gxj;
-	Fri, 04 Jul 2025 12:47:25 +0000
-Date: Fri, 4 Jul 2025 13:47:25 +0100
-From: Matthew Wilcox <willy@infradead.org>
-To: "Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>
-Cc: Hannes Reinecke <hare@suse.de>, mcgrof@kernel.org,
-	Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
-	hch@lst.de, linux-block@vger.kernel.org,
-	Christian Brauner <brauner@kernel.org>, gost.dev@samsung.com,
-	Pankaj Raghav <p.raghav@samsung.com>
-Subject: Re: [PATCH v2] block: reject bs > ps block devices when THP is
- disabled
-Message-ID: <aGfNXbQ5ExO95Uf8@casper.infradead.org>
-References: <20250704095036.293568-1-kernel@pankajraghav.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mi+LrZHj"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F840C4CEE3;
+	Fri,  4 Jul 2025 13:00:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751634040;
+	bh=PQ+uuvbgXKFc5vIr220QI1Lf8oYUGvsoSa+Kga5uCxI=;
+	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
+	b=mi+LrZHjF+yRfLmrMqCm45+w6sUTBWLIFLln4t06TCRfNNID72odMCaUkq6P7uCUX
+	 6UUsEVXl8dcAwtsGpEQ4be8tzBNVlVqFR/dHUws6kyBu1YvtpkQhwwKUxloNwWR9R/
+	 IGSdHN0MxrYLaSCkpAV78+BdMxg3sCNdQTC9sRmKmYWFLMqIw4rrFCZRyV7KRJtd2E
+	 0j73lXtusTnleqcS0NxrPxjaCD0MHAoeWaeskbB4i7ET3pELASmMynDmabvpgju8s5
+	 lM5kWnUgAXLXzxzcI7AEuaVKCn3OYtKdR4/uhCwyRJ5lqmW3Ng5o+Qj0VkMX0rxdf6
+	 342H5Q7Nz/erA==
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250704095036.293568-1-kernel@pankajraghav.com>
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Fri, 04 Jul 2025 15:00:24 +0200
+Message-Id: <DB3AFTUC22W1.39C4DMWSENZGB@kernel.org>
+Subject: Re: [PATCH v13 3/5] rust: replace `CStr` with `core::ffi::CStr`
+From: "Benno Lossin" <lossin@kernel.org>
+To: "Tamir Duberstein" <tamird@gmail.com>, "Michal Rostecki"
+ <vadorovsky@protonmail.com>, "Miguel Ojeda" <ojeda@kernel.org>, "Alex
+ Gaynor" <alex.gaynor@gmail.com>, "Boqun Feng" <boqun.feng@gmail.com>, "Gary
+ Guo" <gary@garyguo.net>, =?utf-8?q?Bj=C3=B6rn_Roy_Baron?=
+ <bjorn3_gh@protonmail.com>, "Andreas Hindborg" <a.hindborg@kernel.org>,
+ "Alice Ryhl" <aliceryhl@google.com>, "Trevor Gross" <tmgross@umich.edu>,
+ "Brendan Higgins" <brendan.higgins@linux.dev>, "David Gow"
+ <davidgow@google.com>, "Rae Moar" <rmoar@google.com>, "Danilo Krummrich"
+ <dakr@kernel.org>, "Maarten Lankhorst" <maarten.lankhorst@linux.intel.com>,
+ "Maxime Ripard" <mripard@kernel.org>, "Thomas Zimmermann"
+ <tzimmermann@suse.de>, "David Airlie" <airlied@gmail.com>, "Simona Vetter"
+ <simona@ffwll.ch>, "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
+ "Rafael J. Wysocki" <rafael@kernel.org>, "Luis Chamberlain"
+ <mcgrof@kernel.org>, "Russ Weight" <russ.weight@linux.dev>, "FUJITA
+ Tomonori" <fujita.tomonori@gmail.com>, "Rob Herring" <robh@kernel.org>,
+ "Saravana Kannan" <saravanak@google.com>, "Peter Zijlstra"
+ <peterz@infradead.org>, "Ingo Molnar" <mingo@redhat.com>, "Will Deacon"
+ <will@kernel.org>, "Waiman Long" <longman@redhat.com>, "Nathan Chancellor"
+ <nathan@kernel.org>, "Nick Desaulniers" <nick.desaulniers+lkml@gmail.com>,
+ "Bill Wendling" <morbo@google.com>, "Justin Stitt"
+ <justinstitt@google.com>, "Andrew Lunn" <andrew@lunn.ch>, "Heiner Kallweit"
+ <hkallweit1@gmail.com>, "Russell King" <linux@armlinux.org.uk>, "David S.
+ Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>, "Bjorn
+ Helgaas" <bhelgaas@google.com>, "Arnd Bergmann" <arnd@arndb.de>, "Jens
+ Axboe" <axboe@kernel.dk>, =?utf-8?q?Krzysztof_Wilczy=C5=84ski?=
+ <kwilczynski@kernel.org>, "Dave Ertman" <david.m.ertman@intel.com>, "Ira
+ Weiny" <ira.weiny@intel.com>, "Leon Romanovsky" <leon@kernel.org>, "Breno
+ Leitao" <leitao@debian.org>, "Viresh Kumar" <viresh.kumar@linaro.org>,
+ "Michael Turquette" <mturquette@baylibre.com>, "Stephen Boyd"
+ <sboyd@kernel.org>
+Cc: <rust-for-linux@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <linux-kselftest@vger.kernel.org>, <kunit-dev@googlegroups.com>,
+ <dri-devel@lists.freedesktop.org>, <netdev@vger.kernel.org>,
+ <devicetree@vger.kernel.org>, <llvm@lists.linux.dev>,
+ <linux-pci@vger.kernel.org>, <nouveau@lists.freedesktop.org>,
+ <linux-block@vger.kernel.org>, <linux-pm@vger.kernel.org>,
+ <linux-clk@vger.kernel.org>
+X-Mailer: aerc 0.20.1
+References: <20250701-cstr-core-v13-0-29f7d3eb97a6@gmail.com>
+ <20250701-cstr-core-v13-3-29f7d3eb97a6@gmail.com>
+In-Reply-To: <20250701-cstr-core-v13-3-29f7d3eb97a6@gmail.com>
 
-On Fri, Jul 04, 2025 at 11:50:36AM +0200, Pankaj Raghav (Samsung) wrote:
-> Changes since v1:
-> - Use mapping_max_folio_size_supported() instead of doing a ifdef with
->   CONFIG_THP
+On Tue Jul 1, 2025 at 6:49 PM CEST, Tamir Duberstein wrote:
+> `kernel::ffi::CStr` was introduced in commit d126d2380131 ("rust: str:
+> add `CStr` type") in November 2022 as an upstreaming of earlier work
+> that was done in May 2021[0]. That earlier work, having predated the
+> inclusion of `CStr` in `core`, largely duplicated the implementation of
+> `std::ffi::CStr`.
+>
+> `std::ffi::CStr` was moved to `core::ffi::CStr` in Rust 1.64 in
+> September 2022. Hence replace `kernel::str::CStr` with `core::ffi::CStr`
+> to reduce our custom code footprint, and retain needed custom
+> functionality through an extension trait.
+>
+> C-String literals were added in Rust 1.77, while our MSRV is 1.78. Thus
+> opportunistically replace instances of `kernel::c_str!` with C-String
+> literals where other code changes were already necessary or where
+> existing code triggered clippy lints; the rest will be done in a later
+> commit.
+>
+> Link: https://github.com/Rust-for-Linux/linux/commit/faa3cbcca03d0dec8f8e=
+43f1d8d5c0860d98a23f [0]
+> Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> Reviewed-by: Alice Ryhl <aliceryhl@google.com>
+> Signed-off-by: Tamir Duberstein <tamird@gmail.com>
+> ---
+>  drivers/gpu/drm/drm_panic_qr.rs |   2 +-
+>  rust/kernel/auxiliary.rs        |   4 +-
+>  rust/kernel/configfs.rs         |   4 +-
+>  rust/kernel/cpufreq.rs          |   2 +-
+>  rust/kernel/device.rs           |   4 +-
+>  rust/kernel/drm/device.rs       |   4 +-
+>  rust/kernel/error.rs            |   4 +-
+>  rust/kernel/firmware.rs         |  11 +-
+>  rust/kernel/kunit.rs            |   6 +-
+>  rust/kernel/miscdevice.rs       |   2 +-
+>  rust/kernel/net/phy.rs          |   2 +-
+>  rust/kernel/of.rs               |   2 +-
+>  rust/kernel/prelude.rs          |   5 +-
+>  rust/kernel/seq_file.rs         |   4 +-
+>  rust/kernel/str.rs              | 394 +++++++++++-----------------------=
+------
+>  rust/kernel/sync/condvar.rs     |   2 +-
+>  rust/kernel/sync/lock.rs        |   2 +-
+>  rust/kernel/sync/lock/global.rs |   2 +-
+>  samples/rust/rust_configfs.rs   |   2 +-
+>  19 files changed, 140 insertions(+), 318 deletions(-)
 
-why?  v1 looked better to me
+Is it also possible to split this? First rename the existing functions
+on our CStr to match upstream & then you don't need to do the rename &
+removal of our CStr in the same patch?
+
+---
+Cheers,
+Benno
