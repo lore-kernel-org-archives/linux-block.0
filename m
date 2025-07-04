@@ -1,168 +1,63 @@
-Received: from mail-yb1-f177.google.com (mail-yb1-f177.google.com [209.85.219.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 325D420B7F9
-	for <linux-block@vger.kernel.org>; Fri,  4 Jul 2025 17:29:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D6B5327185
+	for <linux-block@vger.kernel.org>; Fri,  4 Jul 2025 17:36:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751650174; cv=none; b=YlLRCFiwDryvzsH+4byCfQFe/iCCgJjnRvNKwIifs0ivsjqTmP3KeQ/vkEfgOcH+yCnWzZyqfgK1ho3SAEDiARenTaCCNMGVrTmKVCTdPFusEk7abH33yZOQedx2urve6GuKpRkmafEh1nmMHRB5lFibM8KsZpwiT1tIo5eoS6A=
+	t=1751650595; cv=none; b=fIB83LpG/8itKceSSfH/GPt0hDniJMzg+F414ydWN1QrvQ3lAbJnihXZHZfE6fWXvbOwTsSlA4Tp9xnOWCeO80T4V9J93eWP2Gq5IZ+G+RSVphbRFHgndX5trUrWy7XEf6N/LPzOhDjmBsHBYdwluCzBWRQHVMVGgKNk9w9hVQE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751650174; c=relaxed/simple;
-	bh=iDbM20iQNedl8N2hzi1Pep7gBZiDuMA5oe8q7lPmVJk=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=PbjQlvqf9GZAefX8ALadu7JyiNbpsEppd5hfnl5K1mq7oqUI6FoEUMDYStM+x0rj5HwDatJqauTjPP50mLe7XE1IP5opJ/2SFf1kmpC4tyj7XJz6rb6YjbQugM1Cs/HNMmf80p+0A/qqLSC8X+JGmip6YWwd+uUhyfJb0MsInII=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dubeyko.com; spf=pass smtp.mailfrom=dubeyko.com; dkim=pass (2048-bit key) header.d=dubeyko-com.20230601.gappssmtp.com header.i=@dubeyko-com.20230601.gappssmtp.com header.b=qKY65Tke; arc=none smtp.client-ip=209.85.219.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dubeyko.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dubeyko.com
+	s=arc-20240116; t=1751650595; c=relaxed/simple;
+	bh=AL28R5C8wuUFgNaOVpWFHgYjFMqmYvcDP7BAmVefvuw=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=DRR4rHU7AL3v3dT/1sDit9xNpphOheg24kPIAVAFpttIT0lD5ApC8ZfbC8v5ZDCmZQ+ZQ0xbFFjTmfhKY/Fbsa9TuSBtP93fDWDMKR5NWvGmD/29w1V5lt0x9Ge2CzL9Zaf0PfkkjRCzjv/jEeohvwGytZiJkK4bME3p98odvGA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZTC8R89E; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dubeyko-com.20230601.gappssmtp.com header.i=@dubeyko-com.20230601.gappssmtp.com header.b="qKY65Tke"
-Received: by mail-yb1-f177.google.com with SMTP id 3f1490d57ef6-e731a56e111so990437276.1
-        for <linux-block@vger.kernel.org>; Fri, 04 Jul 2025 10:29:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dubeyko-com.20230601.gappssmtp.com; s=20230601; t=1751650171; x=1752254971; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=NKZOXif4dY8WW9PJKNKuGFpmuROoWR4AN0EGiAV7vcE=;
-        b=qKY65Tke4HoGO3XCKHNaT9zzKkoNLIJV7K9Ab34K9ZY4HcSnXQ6LpH03X5oR0nKz66
-         U87ye6WBxhZgaOc8oWef9WLLyIvmGZb+UTyPT40hiHBam/+vZRdB+ZJF0x9HU5gbbDaX
-         mFEyhedoLpZo8bkDs9Bz2Kir2Gu3pnkuyX4DjIwMA7SUYJ1C5I9eDP0QZico19gCu558
-         y9WcDhz2SXUSbBbVB3KBSTOel0AtfUmQPfqGzsR86Fb40D8EQKNIxOaOqdyn4/+10T4p
-         0k8W5HZE1f/uZ441oY9CtduPBvn2uZ4xVlNQRF86gExdEm72KlJyfJGW5JmTi+NHY79Y
-         aXKw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751650171; x=1752254971;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NKZOXif4dY8WW9PJKNKuGFpmuROoWR4AN0EGiAV7vcE=;
-        b=XplfWrOJLFLWH6twh1y9Dm2oj8/KhXS3TP1agLjS5wcozMQ9RSgj3CxODO2NbN5lql
-         1edMhjd6OI/IpAVv6HZfNwcYZ8/uuZoUC6GyAnhBGJeHz0XFCb6HHWuCdFTMYVipNJAf
-         rhXbCOON4awsN0ewTDv0BlWehJ+r/9Ddnd2tzmitP/Ep0PjM9aYZtT8rcbz59Hif2kL/
-         VJr6eNoEu1dSzsMH63kmvECF2IEeMZ8rj/kzYfLNSH2tTadqGWvGMMVEksaK69cJW5EB
-         gHYlkpgLgyTF/p7PTpVL4le9p2k5gx5EkBz+8fSkXKU0LmS33ZFEjv6byN/h+ftCRXEL
-         UCjg==
-X-Gm-Message-State: AOJu0Yz/ktBv30Hf8T76msJ1HCY+WCbUURcWdUhMo+lg0Lycswfj+xiT
-	Tzo3fp87aoo1BfSv/AJdzJKawO84NKaPfHHkYZLBkQIiUltxyXQSkMmZ4gvMHtkkMJw=
-X-Gm-Gg: ASbGncujXbaMC8mdp1SBwKq9xiTmz7YZ6A5x+jYgs9ad5mEaRQsJPsLhyxCrSNA64lI
-	OTw4vz2N0n4FWUZbPzOq4POshyHvQlkgWlr6Gp01G8S2mQS5Ax+VnS8WrS80KYorsNj6gdYLnvA
-	EiHTcu5toZ16zMJYCr3pDl23LQ4Ye/dDF2sjs+/IWn7CQvj/6I0LFbgbYCEI+MiUtey9cSKIryj
-	lWHNG+st1cuLeaie5vZJqdG9fTx3J31B8+wtEMlB/ruxIndJJ+0fd+t6fy9fIdvOx+zdD2c286b
-	YfpfheFSQUPh3guLYIGNUu77zzpj/KLgJEif8Oeot2UZmIRRBJSBV/PwDAPGlOtYAtnOEYI0RG2
-	Jy9e4Udc+77fYWUWRcCRDyVm/5eqUbWM=
-X-Google-Smtp-Source: AGHT+IH90uXGHA1KLkxMwBoLjKzi40wo5WwD8z6pePkSFDnX+wBofTNDe+oRgHEM+GBC/SzPv5geJw==
-X-Received: by 2002:a05:6902:2808:b0:e81:b6b1:153d with SMTP id 3f1490d57ef6-e89a0c1fb0emr3480402276.21.1751650171096;
-        Fri, 04 Jul 2025 10:29:31 -0700 (PDT)
-Received: from ?IPv6:2600:1700:6476:1430:f030:281a:9e2c:722? ([2600:1700:6476:1430:f030:281a:9e2c:722])
-        by smtp.gmail.com with ESMTPSA id 3f1490d57ef6-e899c48b086sm742656276.42.2025.07.04.10.29.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Jul 2025 10:29:30 -0700 (PDT)
-Message-ID: <d698490f3ee35889d8922f392079846b647cd47e.camel@dubeyko.com>
-Subject: Re: [PATCH 2/4] fs/buffer: parse IOCB_DONTCACHE flag in
- block_write_begin()
-From: Viacheslav Dubeyko <slava@dubeyko.com>
-To: Yangtao Li <frank.li@vivo.com>, axboe@kernel.dk,
- aivazian.tigran@gmail.com, 	viro@zeniv.linux.org.uk, brauner@kernel.org,
- jack@suse.cz, linkinjeon@kernel.org, 	sj1557.seo@samsung.com,
- yuezhang.mo@sony.com, glaubitz@physik.fu-berlin.de, 	shaggy@kernel.org,
- konishi.ryusuke@gmail.com, 	almaz.alexandrovich@paragon-software.com,
- me@bobcopeland.com, 	willy@infradead.org, josef@toxicpanda.com,
- kovalev@altlinux.org, dave@stgolabs.net, 	mhocko@suse.com,
- chentaotao@didiglobal.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org, 
-	jfs-discussion@lists.sourceforge.net, linux-nilfs@vger.kernel.org, 
-	ntfs3@lists.linux.dev, linux-karma-devel@lists.sourceforge.net, 
-	bpf@vger.kernel.org
-Date: Fri, 04 Jul 2025 10:29:27 -0700
-In-Reply-To: <20250626173023.2702554-3-frank.li@vivo.com>
-References: <20250626173023.2702554-1-frank.li@vivo.com>
-	 <20250626173023.2702554-3-frank.li@vivo.com>
-Autocrypt: addr=slava@dubeyko.com; prefer-encrypt=mutual;
- keydata=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
- fAMjjkInIPg7RLGs8FiwxfcpkILP0YbVWHiNAaQ==
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.1 (by Flathub.org) 
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZTC8R89E"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 721E0C4CEE3;
+	Fri,  4 Jul 2025 17:36:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751650595;
+	bh=AL28R5C8wuUFgNaOVpWFHgYjFMqmYvcDP7BAmVefvuw=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=ZTC8R89EF5APJZfVzUIuVrV8AHC1hD1+CjsxJBwXqePna23IxbK9I1dqPThcH4LD3
+	 O558RbGknvxkEQlgCz2fC/X3BfBVDuMYnsyl/l8e7iydYXOjLWG5TfI916+GFJh3Ic
+	 3Sl8j68gum4hVWED5Brf/cnxZDUpKpTvXjJdnkX/KDWH0jSGA/5MBEIQvDW04Wkf+W
+	 eoAgol6wGaAC0DE7kMu9BDKGbFYThXgtWaR2mCd3X3gegQ02fL+/tihOl6mL4MqK3J
+	 8G/S2j6fAqhm6l3/I0zC1bh4N58gerBjoSZvSAy5+LOZsTD3Z+2J7EiZxbivcXmmHd
+	 vOi1F2rCH9QjA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADC0B383BA01;
+	Fri,  4 Jul 2025 17:37:00 +0000 (UTC)
+Subject: Re: [GIT PULL] Block fixes for 6.16-rc5
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <67e6b4d7-0eaf-410b-94c8-a9ee2cb09de6@kernel.dk>
+References: <67e6b4d7-0eaf-410b-94c8-a9ee2cb09de6@kernel.dk>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <67e6b4d7-0eaf-410b-94c8-a9ee2cb09de6@kernel.dk>
+X-PR-Tracked-Remote: git://git.kernel.dk/linux.git tags/block-6.16-20250704
+X-PR-Tracked-Commit-Id: 75ef7b8d44c30a76cfbe42dde9413d43055a00a7
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 1880df2cf44af6266b48a905596726c267bc2b04
+Message-Id: <175165061930.2287194.7956584572134314266.pr-tracker-bot@kernel.org>
+Date: Fri, 04 Jul 2025 17:36:59 +0000
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
 
-On Thu, 2025-06-26 at 11:30 -0600, Yangtao Li wrote:
-> When iocb flags passes IOCB_DONTCACHE, use FGP_DONTCACHE mode to get
-> folio.
->=20
-> Signed-off-by: Yangtao Li <frank.li@vivo.com>
-> ---
-> =C2=A0fs/buffer.c | 7 +++++--
-> =C2=A01 file changed, 5 insertions(+), 2 deletions(-)
->=20
-> diff --git a/fs/buffer.c b/fs/buffer.c
-> index f2b7b30a76ca..0ed80b62feea 100644
-> --- a/fs/buffer.c
-> +++ b/fs/buffer.c
-> @@ -2251,11 +2251,14 @@ int block_write_begin(struct kiocb *iocb,
-> struct address_space *mapping, loff_t
-> =C2=A0		unsigned len, struct folio **foliop, get_block_t
-> *get_block)
-> =C2=A0{
-> =C2=A0	pgoff_t index =3D pos >> PAGE_SHIFT;
-> +	fgf_t fgp =3D FGP_WRITEBEGIN;
-> =C2=A0	struct folio *folio;
-> =C2=A0	int status;
-> =C2=A0
-> -	folio =3D __filemap_get_folio(mapping, index, FGP_WRITEBEGIN,
-> -			mapping_gfp_mask(mapping));
-> +	if (iocb->ki_flags & IOCB_DONTCACHE)
-> +		fgp |=3D FGP_DONTCACHE;
-> +
-> +	folio =3D __filemap_get_folio(mapping, index, fgp,
-> mapping_gfp_mask(mapping));
-> =C2=A0	if (IS_ERR(folio))
-> =C2=A0		return PTR_ERR(folio);
-> =C2=A0
+The pull request you sent on Fri, 4 Jul 2025 09:34:17 -0600:
 
-Correct me if I am wrong. As far as I can see, the first patch depends
-from  second one. It means that if somebody applies the first patch
-but, somehow, don't apply the second one, then nobody will be able to
-compile the kernel code. Am I correct?
+> git://git.kernel.dk/linux.git tags/block-6.16-20250704
 
-Why do we need to make this modification and, then, touch other file
-systems? What the justification of this? Why do we need to make this
-modification at the first place?
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/1880df2cf44af6266b48a905596726c267bc2b04
 
-Thanks,
-Slava.
+Thank you!
+
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
