@@ -1,150 +1,168 @@
-Received: from mail-io1-f45.google.com (mail-io1-f45.google.com [209.85.166.45])
+Received: from mail-yb1-f177.google.com (mail-yb1-f177.google.com [209.85.219.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CB4B33E1
-	for <linux-block@vger.kernel.org>; Fri,  4 Jul 2025 15:34:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 325D420B7F9
+	for <linux-block@vger.kernel.org>; Fri,  4 Jul 2025 17:29:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751643263; cv=none; b=m8v7spFcvmQTyJUt/DZeymUgzmVkSDFLiN1qFURrsequ1TfXvKUisbdIW8tQiBdCAVbuySIBQGIDXF1Dv461fg6foHVIJsib2xkQwAXEgMeUT/1KoCHLP23c5bafwk76cDQF7zO7VnLT57SP3kH1jQo8S2I0C0GrWWVPs70+KwE=
+	t=1751650174; cv=none; b=YlLRCFiwDryvzsH+4byCfQFe/iCCgJjnRvNKwIifs0ivsjqTmP3KeQ/vkEfgOcH+yCnWzZyqfgK1ho3SAEDiARenTaCCNMGVrTmKVCTdPFusEk7abH33yZOQedx2urve6GuKpRkmafEh1nmMHRB5lFibM8KsZpwiT1tIo5eoS6A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751643263; c=relaxed/simple;
-	bh=lxsXsG7h/UHCxzG7awBAPAsMt2frmmQcaLQkKM4tVZo=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=Gx+vnmTSg/gDm654z1TyW7BCaYhT4dJJcLhhAveyJmLKML8VwgMUsaLAyIimtkhrlvAeeS2oTxeHeWrmEJsCKD3H5wLgi2CXFcDTPQf4DmFBn3Oqao86iA2OfM70/GBGvO4c/Mh8Mu0kvOfPLfwUVo7vcX4OOn3DV1QVmFt+3CA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=mqbDLZaA; arc=none smtp.client-ip=209.85.166.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1751650174; c=relaxed/simple;
+	bh=iDbM20iQNedl8N2hzi1Pep7gBZiDuMA5oe8q7lPmVJk=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=PbjQlvqf9GZAefX8ALadu7JyiNbpsEppd5hfnl5K1mq7oqUI6FoEUMDYStM+x0rj5HwDatJqauTjPP50mLe7XE1IP5opJ/2SFf1kmpC4tyj7XJz6rb6YjbQugM1Cs/HNMmf80p+0A/qqLSC8X+JGmip6YWwd+uUhyfJb0MsInII=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dubeyko.com; spf=pass smtp.mailfrom=dubeyko.com; dkim=pass (2048-bit key) header.d=dubeyko-com.20230601.gappssmtp.com header.i=@dubeyko-com.20230601.gappssmtp.com header.b=qKY65Tke; arc=none smtp.client-ip=209.85.219.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dubeyko.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dubeyko.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="mqbDLZaA"
-Received: by mail-io1-f45.google.com with SMTP id ca18e2360f4ac-87694a21617so28376839f.1
-        for <linux-block@vger.kernel.org>; Fri, 04 Jul 2025 08:34:19 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=dubeyko-com.20230601.gappssmtp.com header.i=@dubeyko-com.20230601.gappssmtp.com header.b="qKY65Tke"
+Received: by mail-yb1-f177.google.com with SMTP id 3f1490d57ef6-e731a56e111so990437276.1
+        for <linux-block@vger.kernel.org>; Fri, 04 Jul 2025 10:29:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1751643259; x=1752248059; darn=vger.kernel.org;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mkmFnOVLTiRvsjSsoKZdQ0LwtOTZ4NIebQUqL+wW+cw=;
-        b=mqbDLZaAUnvXnztS8VR0zpun2GStQdUBvjaFYHIewLhfhp/kijG97G3RLpUf0RuSbp
-         A2vxVv7G5HGhMpSlNGDmdQhinaVJmLUcD+ZKGu2v2FiJYn43LF5lQQ9B6ROz5SR5ioZL
-         4uHx9qdXbsh3b77nZ6T4bRN4tSjCUmLc0KH5N0sDTYWdpkEwA6HF5nn9TfDw+wrRzRDl
-         RBPsQI4P10/lKF8zcurTV4aLnU/7g9w3aFv+BjK0kVQnh7RJH0RCmJMeHA6WCoopBO8w
-         RxaQmz6oYvkWJIL0ySTWpWvToYaqYw91E1RgPvwpio/K/ag5JTcy0wPca9y/ro/CP5I/
-         ISrg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751643259; x=1752248059;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+        d=dubeyko-com.20230601.gappssmtp.com; s=20230601; t=1751650171; x=1752254971; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=mkmFnOVLTiRvsjSsoKZdQ0LwtOTZ4NIebQUqL+wW+cw=;
-        b=SrZg1VOUWW1OgVoCJQ5uNoTOC+xM3OmU+UhLhTFwSFabl2ZjjdFJnq8oLbfUtdERXW
-         3fFtfA/Wmtgb+9CDuFuPpydnjsrdS5c+It0Wca72JGS3hSoUbra4GzPQryO1nsA2VeDd
-         gcIl55/udMDTWzU6M1TZqvrMLHWDgl2VdawzCBl/C+UZ1vSHpRB3TEkaivKHv4rAFDpm
-         x5eSmUYwSEbnBy2YG048UMpCnTtGWuCBb8vyk7+z1BvMTdUhNGdUqQM0tHnSAATIjhqE
-         V6TjNMQa1mKtQcmrSB5RkWzgKYVW162SVtpKJ45n0FwyUEuZ/MJfiUQwhONhsv8dBfkX
-         Kdew==
-X-Gm-Message-State: AOJu0YxFLRJMAbNF9QN0KSYbiyTrOhYBnSiydgGtA9CFJu8QKj7sEIxw
-	4tI5TXDOtw4iRPlaN1+ZjCis67DtylfI+LHQGQPjObV/tp6FSrgv5mt0tlB+2efF9YfbukQgBVt
-	J0DRp
-X-Gm-Gg: ASbGnct2ze1XqknSSrTg1Z5Wxbyjy7c9qJ9D0jNUg59hBIqRDXTV8Qh6ctTt3abkJUX
-	sRAffYbHv2B4EyZyzcdbZJssX/Xv6mvXaCe/l719m9mYsjZyYdYRdBs7E1FYomqWV6sSAJcVpsn
-	d6gNoA617gMrssU0Scum7MNdSsnAloQT68pyxoD0O21N2y49El9eElIrkbJXdQoNkys6CCbAkdP
-	tLTRLuINIq4qAdRDefmgkt+xdrqzMfIE0dN/0r5rderM0PKyWXlF+HMn9GD12sMhhnDZaNARYFL
-	Gj/GnITYwfYsF00Qhjs4sCO3eW9qUP52S+EdXbg8jfKkLM9NsEdftMWc96Q=
-X-Google-Smtp-Source: AGHT+IFt+d7Yr2Z0spSs6m+rPLhOVRmOpUlr4XYpH+aPaBb5+2wzeBjQfa97qDD7Y67t+rcuEe8/rw==
-X-Received: by 2002:a05:6602:820e:b0:876:737:85da with SMTP id ca18e2360f4ac-876e089488fmr201688639f.0.1751643259086;
-        Fri, 04 Jul 2025 08:34:19 -0700 (PDT)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-503b5c0f7f5sm431586173.106.2025.07.04.08.34.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 04 Jul 2025 08:34:18 -0700 (PDT)
-Message-ID: <67e6b4d7-0eaf-410b-94c8-a9ee2cb09de6@kernel.dk>
-Date: Fri, 4 Jul 2025 09:34:17 -0600
+        bh=NKZOXif4dY8WW9PJKNKuGFpmuROoWR4AN0EGiAV7vcE=;
+        b=qKY65Tke4HoGO3XCKHNaT9zzKkoNLIJV7K9Ab34K9ZY4HcSnXQ6LpH03X5oR0nKz66
+         U87ye6WBxhZgaOc8oWef9WLLyIvmGZb+UTyPT40hiHBam/+vZRdB+ZJF0x9HU5gbbDaX
+         mFEyhedoLpZo8bkDs9Bz2Kir2Gu3pnkuyX4DjIwMA7SUYJ1C5I9eDP0QZico19gCu558
+         y9WcDhz2SXUSbBbVB3KBSTOel0AtfUmQPfqGzsR86Fb40D8EQKNIxOaOqdyn4/+10T4p
+         0k8W5HZE1f/uZ441oY9CtduPBvn2uZ4xVlNQRF86gExdEm72KlJyfJGW5JmTi+NHY79Y
+         aXKw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751650171; x=1752254971;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=NKZOXif4dY8WW9PJKNKuGFpmuROoWR4AN0EGiAV7vcE=;
+        b=XplfWrOJLFLWH6twh1y9Dm2oj8/KhXS3TP1agLjS5wcozMQ9RSgj3CxODO2NbN5lql
+         1edMhjd6OI/IpAVv6HZfNwcYZ8/uuZoUC6GyAnhBGJeHz0XFCb6HHWuCdFTMYVipNJAf
+         rhXbCOON4awsN0ewTDv0BlWehJ+r/9Ddnd2tzmitP/Ep0PjM9aYZtT8rcbz59Hif2kL/
+         VJr6eNoEu1dSzsMH63kmvECF2IEeMZ8rj/kzYfLNSH2tTadqGWvGMMVEksaK69cJW5EB
+         gHYlkpgLgyTF/p7PTpVL4le9p2k5gx5EkBz+8fSkXKU0LmS33ZFEjv6byN/h+ftCRXEL
+         UCjg==
+X-Gm-Message-State: AOJu0Yz/ktBv30Hf8T76msJ1HCY+WCbUURcWdUhMo+lg0Lycswfj+xiT
+	Tzo3fp87aoo1BfSv/AJdzJKawO84NKaPfHHkYZLBkQIiUltxyXQSkMmZ4gvMHtkkMJw=
+X-Gm-Gg: ASbGncujXbaMC8mdp1SBwKq9xiTmz7YZ6A5x+jYgs9ad5mEaRQsJPsLhyxCrSNA64lI
+	OTw4vz2N0n4FWUZbPzOq4POshyHvQlkgWlr6Gp01G8S2mQS5Ax+VnS8WrS80KYorsNj6gdYLnvA
+	EiHTcu5toZ16zMJYCr3pDl23LQ4Ye/dDF2sjs+/IWn7CQvj/6I0LFbgbYCEI+MiUtey9cSKIryj
+	lWHNG+st1cuLeaie5vZJqdG9fTx3J31B8+wtEMlB/ruxIndJJ+0fd+t6fy9fIdvOx+zdD2c286b
+	YfpfheFSQUPh3guLYIGNUu77zzpj/KLgJEif8Oeot2UZmIRRBJSBV/PwDAPGlOtYAtnOEYI0RG2
+	Jy9e4Udc+77fYWUWRcCRDyVm/5eqUbWM=
+X-Google-Smtp-Source: AGHT+IH90uXGHA1KLkxMwBoLjKzi40wo5WwD8z6pePkSFDnX+wBofTNDe+oRgHEM+GBC/SzPv5geJw==
+X-Received: by 2002:a05:6902:2808:b0:e81:b6b1:153d with SMTP id 3f1490d57ef6-e89a0c1fb0emr3480402276.21.1751650171096;
+        Fri, 04 Jul 2025 10:29:31 -0700 (PDT)
+Received: from ?IPv6:2600:1700:6476:1430:f030:281a:9e2c:722? ([2600:1700:6476:1430:f030:281a:9e2c:722])
+        by smtp.gmail.com with ESMTPSA id 3f1490d57ef6-e899c48b086sm742656276.42.2025.07.04.10.29.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 04 Jul 2025 10:29:30 -0700 (PDT)
+Message-ID: <d698490f3ee35889d8922f392079846b647cd47e.camel@dubeyko.com>
+Subject: Re: [PATCH 2/4] fs/buffer: parse IOCB_DONTCACHE flag in
+ block_write_begin()
+From: Viacheslav Dubeyko <slava@dubeyko.com>
+To: Yangtao Li <frank.li@vivo.com>, axboe@kernel.dk,
+ aivazian.tigran@gmail.com, 	viro@zeniv.linux.org.uk, brauner@kernel.org,
+ jack@suse.cz, linkinjeon@kernel.org, 	sj1557.seo@samsung.com,
+ yuezhang.mo@sony.com, glaubitz@physik.fu-berlin.de, 	shaggy@kernel.org,
+ konishi.ryusuke@gmail.com, 	almaz.alexandrovich@paragon-software.com,
+ me@bobcopeland.com, 	willy@infradead.org, josef@toxicpanda.com,
+ kovalev@altlinux.org, dave@stgolabs.net, 	mhocko@suse.com,
+ chentaotao@didiglobal.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org, 
+	jfs-discussion@lists.sourceforge.net, linux-nilfs@vger.kernel.org, 
+	ntfs3@lists.linux.dev, linux-karma-devel@lists.sourceforge.net, 
+	bpf@vger.kernel.org
+Date: Fri, 04 Jul 2025 10:29:27 -0700
+In-Reply-To: <20250626173023.2702554-3-frank.li@vivo.com>
+References: <20250626173023.2702554-1-frank.li@vivo.com>
+	 <20250626173023.2702554-3-frank.li@vivo.com>
+Autocrypt: addr=slava@dubeyko.com; prefer-encrypt=mutual;
+ keydata=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
+ fAMjjkInIPg7RLGs8FiwxfcpkILP0YbVWHiNAaQ==
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.1 (by Flathub.org) 
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 6.16-rc5
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
 
-Hi Linus,
+On Thu, 2025-06-26 at 11:30 -0600, Yangtao Li wrote:
+> When iocb flags passes IOCB_DONTCACHE, use FGP_DONTCACHE mode to get
+> folio.
+>=20
+> Signed-off-by: Yangtao Li <frank.li@vivo.com>
+> ---
+> =C2=A0fs/buffer.c | 7 +++++--
+> =C2=A01 file changed, 5 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/fs/buffer.c b/fs/buffer.c
+> index f2b7b30a76ca..0ed80b62feea 100644
+> --- a/fs/buffer.c
+> +++ b/fs/buffer.c
+> @@ -2251,11 +2251,14 @@ int block_write_begin(struct kiocb *iocb,
+> struct address_space *mapping, loff_t
+> =C2=A0		unsigned len, struct folio **foliop, get_block_t
+> *get_block)
+> =C2=A0{
+> =C2=A0	pgoff_t index =3D pos >> PAGE_SHIFT;
+> +	fgf_t fgp =3D FGP_WRITEBEGIN;
+> =C2=A0	struct folio *folio;
+> =C2=A0	int status;
+> =C2=A0
+> -	folio =3D __filemap_get_folio(mapping, index, FGP_WRITEBEGIN,
+> -			mapping_gfp_mask(mapping));
+> +	if (iocb->ki_flags & IOCB_DONTCACHE)
+> +		fgp |=3D FGP_DONTCACHE;
+> +
+> +	folio =3D __filemap_get_folio(mapping, index, fgp,
+> mapping_gfp_mask(mapping));
+> =C2=A0	if (IS_ERR(folio))
+> =C2=A0		return PTR_ERR(folio);
+> =C2=A0
 
-Set of fixes for block that should go into the 6.16 kernel release. This
-pull request contains:
+Correct me if I am wrong. As far as I can see, the first patch depends
+from  second one. It means that if somebody applies the first patch
+but, somehow, don't apply the second one, then nobody will be able to
+compile the kernel code. Am I correct?
 
-- NVMe fixes via Christoph
-	- fix incorrect cdw15 value in passthru error logging
-	  (Alok Tiwari)
-	- fix memory leak of bio integrity in nvmet (Dmitry Bogdanov)
-	- refresh visible attrs after being checked (Eugen Hristev)
-	- fix suspicious RCU usage warning in the multipath code
-	  (Geliang Tang)
-	- correctly account for namespace head reference counter
-	  (Nilay Shroff)
+Why do we need to make this modification and, then, touch other file
+systems? What the justification of this? Why do we need to make this
+modification at the first place?
 
-- Fix for a regression introduced in ublk in this cycle, where it would
-  attempt to queue a canceled request.
-
-- brd RCU sleeping fix, also introduced in this cycle. Bare bones fix,
-  should be improved upon for the next release.
-
-Please pull!
-
-
-The following changes since commit c007062188d8e402c294117db53a24b2bed2b83f:
-
-  block: fix false warning in bdev_count_inflight_rw() (2025-06-26 07:34:11 -0600)
-
-are available in the Git repository at:
-
-  git://git.kernel.dk/linux.git tags/block-6.16-20250704
-
-for you to fetch changes up to 75ef7b8d44c30a76cfbe42dde9413d43055a00a7:
-
-  Merge tag 'nvme-6.16-2025-07-03' of git://git.infradead.org/nvme into block-6.16 (2025-07-03 09:42:07 -0600)
-
-----------------------------------------------------------------
-block-6.16-20250704
-
-----------------------------------------------------------------
-Alok Tiwari (1):
-      nvme: Fix incorrect cdw15 value in passthru error logging
-
-Dmitry Bogdanov (1):
-      nvmet: fix memory leak of bio integrity
-
-Eugen Hristev (1):
-      nvme-pci: refresh visible attrs after being checked
-
-Geliang Tang (1):
-      nvme-multipath: fix suspicious RCU usage warning
-
-Jens Axboe (1):
-      Merge tag 'nvme-6.16-2025-07-03' of git://git.infradead.org/nvme into block-6.16
-
-Ming Lei (1):
-      ublk: don't queue request if the associated uring_cmd is canceled
-
-Nilay Shroff (1):
-      nvme: correctly account for namespace head reference counter
-
-Yu Kuai (1):
-      brd: fix sleeping function called from invalid context in brd_insert_page()
-
- drivers/block/brd.c           |  6 ++++--
- drivers/block/ublk_drv.c      | 11 ++++++-----
- drivers/nvme/host/core.c      | 18 ++++++++++++++++--
- drivers/nvme/host/multipath.c |  8 ++++++--
- drivers/nvme/host/pci.c       |  6 ++++--
- drivers/nvme/target/nvmet.h   |  2 ++
- 6 files changed, 38 insertions(+), 13 deletions(-)
-
--- 
-Jens Axboe
-
+Thanks,
+Slava.
