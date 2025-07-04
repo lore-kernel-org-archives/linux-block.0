@@ -1,161 +1,161 @@
-Received: from mail-yb1-f170.google.com (mail-yb1-f170.google.com [209.85.219.170])
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64D02134CB
-	for <linux-block@vger.kernel.org>; Fri,  4 Jul 2025 17:45:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B080A1EE7B7;
+	Fri,  4 Jul 2025 17:50:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751651134; cv=none; b=qVyDaBTzylneFtsee5V09xOv3DWwcEX+FhevBLkCZ8yhowO0xvFCLK30ouMytmwUkxX4G2skojOk4i3W3HG0p4vVuKsCmeGaSPpBbyPJb1E6zMmwSsfWA+dlw7eguEFvKdKubd++m3UrHxUzMWosMrmZRJ+3hBY2S8yOnsHVIFE=
+	t=1751651445; cv=none; b=H+xIxQjKlFExysI/K9v0UN0TC8ijqRn3aVX8yp7oMUCETUaj5YrvhrJMvoadivvgUPhdPCC4tHwfVapvYkoedInO0GuqfxjSEqt3qyrH42sHdUaxoQnKE/D6i8dnCzqUdn9STpvN+ICyTsq1BQUCXYjZ9vpEmPgpN9jeO2U+WiA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751651134; c=relaxed/simple;
-	bh=Nqm9M4UJIqwudHAuGH7UYCWuSwRLdeHqz5vOhTfsqY0=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=bYmi4Pll6Zj3Pt654t6emueBhI18tJtN97gKgaViw+D/u7bcnIXnFJdB/9fgfSG/TE8TqOZAhNxDFMMp6HX5u3GepooT1D1DUoe771P8kZ7bc0KKCC/23PkZal+e5Vhue2g+wDKCProro2qU0ygukW03FGLORjztwsr1mWWLs74=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dubeyko.com; spf=pass smtp.mailfrom=dubeyko.com; dkim=pass (2048-bit key) header.d=dubeyko-com.20230601.gappssmtp.com header.i=@dubeyko-com.20230601.gappssmtp.com header.b=kVHFVuE8; arc=none smtp.client-ip=209.85.219.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dubeyko.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dubeyko.com
+	s=arc-20240116; t=1751651445; c=relaxed/simple;
+	bh=wB4CRAZJy+K0gy6uZ0Y5nkA+Q6wo0BrNhBcOAGOBIaQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nfTWjnciqAp5puE1m+asJ6B9VlLqxZXwu/Hozj9AwO8pdXs8h9G72VRZ/i7KFOWGGHDNoXydfq2MHbFJMUUxn1MAaxbAQBEXfe7g3nRmo6lFZEisFXf6qGjYCorh6/eMb2+xjL+JFlqpKn8wcjMq9n0Xxk2bN54HBagqZhWrSOI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J4Vvk7Sp; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dubeyko-com.20230601.gappssmtp.com header.i=@dubeyko-com.20230601.gappssmtp.com header.b="kVHFVuE8"
-Received: by mail-yb1-f170.google.com with SMTP id 3f1490d57ef6-e81a7d90835so951520276.1
-        for <linux-block@vger.kernel.org>; Fri, 04 Jul 2025 10:45:32 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J4Vvk7Sp"
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-3a57ae5cb17so743821f8f.0;
+        Fri, 04 Jul 2025 10:50:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dubeyko-com.20230601.gappssmtp.com; s=20230601; t=1751651131; x=1752255931; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=sRRTUBR1HhzbPWZOo6ysCxsvxUXtkw1uTBwQrVosYbE=;
-        b=kVHFVuE8jGnyzQdWYrL9udFsL0iMBPRmEyadwhxcLNrX6PDfKdNPNT9naBKapb8K8g
-         GUylmwYGn6ekk2Mb9/UzFsxXqF8gl/w3kkI/IlNCUlOED4nwDtUvjPGlXg18kcg0h/4C
-         ZYrM2SYfJ0u9Oq0Wus3FzUo4WOtaRZoGotJTF6dN5fqhilicNygIRAGZjQHnE0BnS/ZR
-         4ELs8MJ868dMBRyOcWpdM0AL4/+DQsH2sP5Y/uhhSRi8IiYb4xj7eZJcLGGzHEgpvs6b
-         yc6OpyJmc9XBeu6ayBjQc7rKgG5LAq1PVpOw0iM4MMDb2UMJbmApocNSIOk53fF5qSW+
-         0erg==
+        d=gmail.com; s=20230601; t=1751651442; x=1752256242; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=7kzxKyGyUkMQNU8zFP39T97KAl93oC6U2R3DXkWnfQQ=;
+        b=J4Vvk7Sp2tnW2ZttP3cc27u36YkhpzVtSw4dHao5Fy9kPTaueBOwrs2GYpfA9KIKlV
+         VcsjGPUcaHYGnVIJe7ItKwDV+RQDsaLtE9lOxA09/OrQ9YgpEwOn8UXccztI/9FqxwGQ
+         0PcQbg4lr4pVWbTyIDt6yu5UikJWn6NMpSSH6ckuwBvf76jXIncMYMg8ef9cERQjqZkD
+         MSeoDLck/pMF8JZH3WNhNCJxfzPIGzA+VN2fQvSE156oO8aRrJoo/JPphlSyZPnHrNc2
+         rOqfSkNUPEAcwmZQNLSJlTnMUtEa0JynQt6UaUHJl8TDqHRxlI6NchX/jqTWuSo9Hw+8
+         2Xug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751651131; x=1752255931;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=sRRTUBR1HhzbPWZOo6ysCxsvxUXtkw1uTBwQrVosYbE=;
-        b=v/Q19ode3w85WWspR15E8ibOSFQfe1JSDTRT2dKVpQ3JRJNRGhq0SIa20GyQ8/cOC9
-         5Qn8jr2G2IWCyebK4a7ES3yvWEu8nRpvY7NhdGFDtKUHWPaIK96CU2JCXiWwaV3q7VdU
-         Fml94OljIXtDOjQf0diEQfS0sNVFWY/fIRdiDhumJHOchL8NqLnZhuXVyVR8rXZo1hWG
-         6Dms2qu1D2I4pXGZwtJIDpN8/YGJL1Jv5aqdTZ3iZ+B6nxrEQc08vlStv3cCHDPWBDsO
-         7q6mCq4qs9SH83L/u8L42E8/a5Gmxico9tzALCODrYXrQ7RjisyflBSjlBBDisp+X3CQ
-         hPLw==
-X-Gm-Message-State: AOJu0Yw37TnNFNJsjIr3MiE2D2p173vtv38End27OyUJFRoGIASMh+H4
-	jnVrSARDUrbXIkJ4j91h0djfyyR2+KUji8l1V/YrRUvHPPdWs3G0Uw4NoqxmvF+XkCQ=
-X-Gm-Gg: ASbGncvbSOhYRCccMm3YBiTlM6NjU2uDZ4yEdAi1034vNQ0hcHyUuo7oLMefIJPK0wY
-	FBRzF0Ng3Sr8aOGY/PqFk+ngNUqQ8wpnLs4KFcvatr6zH9CqYx/IyPJqrnVyY2QmKRiceIl9bee
-	X30cxLu5HK9efS423BgusUOoIJtKIqFfBo3hzKryPYqYrzkMwoZCx/xuIPcCt38hpKjb94gewlP
-	oPFFal5a25xvL+ON/wyrAX4+zkpn+ZOFpT8SOspIicEatEeXhNV4vcIeKzFzP5PG4VsNNHskUlV
-	aXkX3sgtbm7qymUDVEqvHJ9dqjtdirnruOdElef5/fjrWvRYU3TjvFWWCBhuKfxfOcT7bthNV9W
-	L8K94ZbDar7MkcMb6VJYmv9OvoEiZvyo=
-X-Google-Smtp-Source: AGHT+IHavxdRXfQcFPtCri7JPle6nXppaWnSECfYS7k4+PrbVcT/6JmmoNF/J8UBNVnhAzeOW0UVtw==
-X-Received: by 2002:a05:690c:3709:b0:70e:29d2:fba1 with SMTP id 00721157ae682-7166b66f4d6mr36192927b3.23.1751651131297;
-        Fri, 04 Jul 2025 10:45:31 -0700 (PDT)
-Received: from ?IPv6:2600:1700:6476:1430:f030:281a:9e2c:722? ([2600:1700:6476:1430:f030:281a:9e2c:722])
-        by smtp.gmail.com with ESMTPSA id 3f1490d57ef6-e899c48ba54sm754640276.43.2025.07.04.10.45.28
+        d=1e100.net; s=20230601; t=1751651442; x=1752256242;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7kzxKyGyUkMQNU8zFP39T97KAl93oC6U2R3DXkWnfQQ=;
+        b=Pn0VJuoR666QPflScM5nxqUYxA88RfXYmSGWN/sbkcGKi+H9/7T+E2G9W929bFV1D/
+         5W7uOifyPEDVoecFkjisyjeFBcuQwasUS8vLPv8hgEehsPzkH4IbKLfjnsoUfi3nR+pV
+         6PrnVqzGQ4bUnRZ3TzC7FI6ZG77vuRJhlJau2ECoptpzfAgJNL/yfFkLXPyIFZD9O6fX
+         hETpiAZlA8GeJ8TKv00pIUZc2rb9cXUY9SBTLL/9oVhj2UdEVuqTjKIMEnJgDf0knupi
+         Bz5lHDQj6vI0w3112/7a7kaGegIbTTOV2FNS2ZkEyJMzqBWdc12R3oe+Otcfm5GUlDxz
+         xmLg==
+X-Forwarded-Encrypted: i=1; AJvYcCVKv95AGUtB0jvrE6tWKB3MTL0qLb+N+/uN75BOO4BJ6dTs5x3nuFuTEIzKw3y9yfwvMGyyN2rHsOIM8g==@vger.kernel.org, AJvYcCXaddmmmaji2W1lXGWJgxzmUog7vMvdGHeR62ArcH05DqUN2o/k4nnN2JKpE91Gw1GZOU77P6qWsy9zGzmw@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywu2aHPAjYpY+jjHgm6AiLX3IOvHu527cCzdGE7J4d/6qeTyydh
+	yaHqje0wIdPwDqihHoZ8tAMAih2Cx71MuCJ39MFqm3PDGpMmlJI8G9y5
+X-Gm-Gg: ASbGncshw3enH0Mgo6NmW9/3IXNJ4qhLX05LRHXk5Z+Cht85MLpI6vv1EYof2S8/3Vw
+	rMkdFyobafuMLk9gcwBrDdCX2RI3bmGJxI3xerpnP56IaXYB/6IZhS1ijxmHeNneg37iG9dYeh/
+	eYe6EDfub0EpRpsYGqIZRh4qRTRXN7lUFcdcer2mkZ8yGK3ZWFhhWmw1M7K9Wu92OyW6W9gYWgC
+	JLcl0j4MaNiCju5F5Uh4cwVBaf5z3DWUsllfBj7NI2eFqg+Jsxv7YJn063Sq/W6Zkx5qbkuTFwe
+	4JcsBhedXqJMRxWPt28cNWAVtE2Co16wccG7eZDgkeEsyJgT1zrcGYxRIjelvAc8hdmSPstGT2Y
+	DI8A+uJC1gXLy3sBPFL04e/F3ljVKw1bGu4bU1Q==
+X-Google-Smtp-Source: AGHT+IHkGqUW4qYzaIeEVo4MIPsGKugMbjdQlEOB95vKMllXraZTUlpZPd8DNQlc+GfPIEvC/98pUg==
+X-Received: by 2002:a05:6000:2c13:b0:3a4:ef0d:e614 with SMTP id ffacd0b85a97d-3b4964def6bmr3030814f8f.33.1751651441612;
+        Fri, 04 Jul 2025 10:50:41 -0700 (PDT)
+Received: from ekhafagy-ROG-Zephyrus-M16-GU603HR-GU603HR.. ([156.204.255.91])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b4708d0ed9sm3063745f8f.38.2025.07.04.10.50.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Jul 2025 10:45:30 -0700 (PDT)
-Message-ID: <3c4ac1ab5f7afbbd745f88c595ee1465fc2e9ac6.camel@dubeyko.com>
-Subject: Re: [PATCH 3/4] hfsplus: enable uncached buffer io support
-From: Viacheslav Dubeyko <slava@dubeyko.com>
-To: Yangtao Li <frank.li@vivo.com>, axboe@kernel.dk,
- aivazian.tigran@gmail.com, 	viro@zeniv.linux.org.uk, brauner@kernel.org,
- jack@suse.cz, linkinjeon@kernel.org, 	sj1557.seo@samsung.com,
- yuezhang.mo@sony.com, glaubitz@physik.fu-berlin.de, 	shaggy@kernel.org,
- konishi.ryusuke@gmail.com, 	almaz.alexandrovich@paragon-software.com,
- me@bobcopeland.com, 	willy@infradead.org, josef@toxicpanda.com,
- kovalev@altlinux.org, dave@stgolabs.net, 	mhocko@suse.com,
- chentaotao@didiglobal.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org, 
-	jfs-discussion@lists.sourceforge.net, linux-nilfs@vger.kernel.org, 
-	ntfs3@lists.linux.dev, linux-karma-devel@lists.sourceforge.net, 
-	bpf@vger.kernel.org
-Date: Fri, 04 Jul 2025 10:45:27 -0700
-In-Reply-To: <20250626173023.2702554-4-frank.li@vivo.com>
-References: <20250626173023.2702554-1-frank.li@vivo.com>
-	 <20250626173023.2702554-4-frank.li@vivo.com>
-Autocrypt: addr=slava@dubeyko.com; prefer-encrypt=mutual;
- keydata=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
- fAMjjkInIPg7RLGs8FiwxfcpkILP0YbVWHiNAaQ==
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.1 (by Flathub.org) 
+        Fri, 04 Jul 2025 10:50:41 -0700 (PDT)
+From: Eslam Khafagy <eslam.medhat1993@gmail.com>
+To: 
+Cc: skhan@linuxfoundation.com,
+	Eslam Khafagy <eslam.medhat1993@gmail.com>,
+	Philipp Reisner <philipp.reisner@linbit.com>,
+	Lars Ellenberg <lars.ellenberg@linbit.com>,
+	=?UTF-8?q?Christoph=20B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	drbd-dev@lists.linbit.com,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] DRBD: replace strcpy with strscpy
+Date: Fri,  4 Jul 2025 20:50:15 +0300
+Message-ID: <20250704175018.333165-1-eslam.medhat1993@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Thu, 2025-06-26 at 11:30 -0600, Yangtao Li wrote:
-> Now cont_write_begin() support DONTCACHE mode, let's set
-> FOP_DONTCACHE
-> flag to enable uncached buffer io support for hfsplus.
->=20
-> Signed-off-by: Yangtao Li <frank.li@vivo.com>
-> ---
-> =C2=A0fs/hfsplus/inode.c | 1 +
-> =C2=A01 file changed, 1 insertion(+)
->=20
-> diff --git a/fs/hfsplus/inode.c b/fs/hfsplus/inode.c
-> index 26cc150856b9..b790ffe92019 100644
-> --- a/fs/hfsplus/inode.c
-> +++ b/fs/hfsplus/inode.c
-> @@ -372,6 +372,7 @@ static const struct file_operations
-> hfsplus_file_operations =3D {
-> =C2=A0	.open		=3D hfsplus_file_open,
-> =C2=A0	.release	=3D hfsplus_file_release,
-> =C2=A0	.unlocked_ioctl =3D hfsplus_ioctl,
-> +	.fop_flags	=3D FOP_DONTCACHE,
-> =C2=A0};
-> =C2=A0
-> =C2=A0struct inode *hfsplus_new_inode(struct super_block *sb, struct inod=
-e
-> *dir,
+strcpy is deprecated due to lack of bounds checking. This patch replaces
+strcpy with strscpy, the recommended alternative for null terminated
+strings, to follow best practices.
 
-The same question for HFS+. Because, it is again old and pretty
-obsolete file system. :) The main use-case is simply support the
-capability to mount HFS+ volume is created under Mac OS X, for example,
-and to access the data there. What is the point to support this feature
-in HFS+? Currently, around 200 xfstests fails in HFS/HFS+. We even
-cannot test any new functionality properly. And guys reports bugs in
-existing functionality. We need to be focused on this right now. Sorry,
-HFS/HFS+ is not so good ground for implementing new features. :)
-We really need to stabilize the existing functionality right now. And
-we have a lot of work yet. :)=20
+I had to do a small refactor for __drbd_send_protocol since it uses
+strlen anyways. so why not use that for strscpy.
 
-Thanks,
-Slava.=20
+Signed-off-by: Eslam Khafagy <eslam.medhat1993@gmail.com>
+---
+ drivers/block/drbd/drbd_main.c     | 17 +++++++++--------
+ drivers/block/drbd/drbd_receiver.c |  4 ++--
+ 2 files changed, 11 insertions(+), 10 deletions(-)
+
+diff --git a/drivers/block/drbd/drbd_main.c b/drivers/block/drbd/drbd_main.c
+index 52724b79be30..4e5bd74be90a 100644
+--- a/drivers/block/drbd/drbd_main.c
++++ b/drivers/block/drbd/drbd_main.c
+@@ -742,9 +742,9 @@ int drbd_send_sync_param(struct drbd_peer_device *peer_device)
+ 	}
+ 
+ 	if (apv >= 88)
+-		strcpy(p->verify_alg, nc->verify_alg);
++		strscpy(p->verify_alg, nc->verify_alg);
+ 	if (apv >= 89)
+-		strcpy(p->csums_alg, nc->csums_alg);
++		strscpy(p->csums_alg, nc->csums_alg);
+ 	rcu_read_unlock();
+ 
+ 	return drbd_send_command(peer_device, sock, cmd, size, NULL, 0);
+@@ -771,10 +771,6 @@ int __drbd_send_protocol(struct drbd_connection *connection, enum drbd_packet cm
+ 		return -EOPNOTSUPP;
+ 	}
+ 
+-	size = sizeof(*p);
+-	if (connection->agreed_pro_version >= 87)
+-		size += strlen(nc->integrity_alg) + 1;
+-
+ 	p->protocol      = cpu_to_be32(nc->wire_protocol);
+ 	p->after_sb_0p   = cpu_to_be32(nc->after_sb_0p);
+ 	p->after_sb_1p   = cpu_to_be32(nc->after_sb_1p);
+@@ -787,8 +783,13 @@ int __drbd_send_protocol(struct drbd_connection *connection, enum drbd_packet cm
+ 		cf |= CF_DRY_RUN;
+ 	p->conn_flags    = cpu_to_be32(cf);
+ 
+-	if (connection->agreed_pro_version >= 87)
+-		strcpy(p->integrity_alg, nc->integrity_alg);
++	size = sizeof(*p);
++	if (connection->agreed_pro_version >= 87) {
++		int integrity_len = strlen(nc->integrity_alg);
++		size += integrity_len + 1;
++		strscpy(p->integrity_alg, nc->integrity_alg, integrity_len);
++	}
++
+ 	rcu_read_unlock();
+ 
+ 	return __conn_send_command(connection, sock, cmd, size, NULL, 0);
+diff --git a/drivers/block/drbd/drbd_receiver.c b/drivers/block/drbd/drbd_receiver.c
+index e5a2e5f7887b..9c2d439f26e8 100644
+--- a/drivers/block/drbd/drbd_receiver.c
++++ b/drivers/block/drbd/drbd_receiver.c
+@@ -3985,14 +3985,14 @@ static int receive_SyncParam(struct drbd_connection *connection, struct packet_i
+ 			*new_net_conf = *old_net_conf;
+ 
+ 			if (verify_tfm) {
+-				strcpy(new_net_conf->verify_alg, p->verify_alg);
++				strscpy(new_net_conf->verify_alg, p->verify_alg);
+ 				new_net_conf->verify_alg_len = strlen(p->verify_alg) + 1;
+ 				crypto_free_shash(peer_device->connection->verify_tfm);
+ 				peer_device->connection->verify_tfm = verify_tfm;
+ 				drbd_info(device, "using verify-alg: \"%s\"\n", p->verify_alg);
+ 			}
+ 			if (csums_tfm) {
+-				strcpy(new_net_conf->csums_alg, p->csums_alg);
++				strscpy(new_net_conf->csums_alg, p->csums_alg);
+ 				new_net_conf->csums_alg_len = strlen(p->csums_alg) + 1;
+ 				crypto_free_shash(peer_device->connection->csums_tfm);
+ 				peer_device->connection->csums_tfm = csums_tfm;
+-- 
+2.43.0
+
