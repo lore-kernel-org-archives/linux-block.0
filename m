@@ -1,181 +1,126 @@
-Received: from smtp.gentoo.org (woodpecker.gentoo.org [140.211.166.183])
+Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C9E1225761
-	for <linux-block@vger.kernel.org>; Fri,  4 Jul 2025 18:30:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=140.211.166.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19C8429A2;
+	Fri,  4 Jul 2025 19:38:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751653806; cv=none; b=lv7P3flAWLO8OS9vY667RK6LIubIZWPFSD/28pZQIyoGvJzo6de9QaMXJqpHmnI9/jJSMykOJfa0zLSVKFliHlSuu6LeW46gOolnxZ0BZctQhu+Kwsn3fHjYhztblldCmZR1gT3ODV5XNfUFtUbUrL6DytkFqynrmyI+ENsfa40=
+	t=1751657931; cv=none; b=VIRiLcW3YAFzcZyLKTa1gONt2YJIYa1Jm2cforGRYTojnMNW0yxRt/11qu4FJ8oOxKtjlgPUykChX1IBamED11v4sx1aCHqBCxFG4XxSjrM5/YBG6+y9I6vgAnsabOh1xoe22ySw90NFcAqb1wt4EvdFrChAaQWl5kc3pECMsQw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751653806; c=relaxed/simple;
-	bh=l1XUot6t31BKfQ2g+v50CHmHImQMZroV95qQTp5JJ44=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GiXvJ8DraIcCjOa9QO6s0Wuqdr0hSXb1gvrA1ebnL35GF9vJ+TNdZwEskTPkVbLFKhrstr8tq+BWPaXB7cyNdAlxMw2rqXDxZf1hEvI7gqAyJRrfTxH4ZPdlWw3nFQCAcwSdxFdk6TkFq+7RMQFjw6ml5lG/5nmC3+Oq4u2nXFQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gentoo.org; spf=pass smtp.mailfrom=gentoo.org; arc=none smtp.client-ip=140.211.166.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gentoo.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gentoo.org
-Received: from doudna.orbis-terrarum.net (doudna.orbis-terrarum.net [IPv6:2a01:4f9:4b:19c2::2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: relay-lists.gentoo.org@gentoo.org)
-	by smtp.gentoo.org (Postfix) with ESMTPSA id CF1DD340FAB;
-	Fri, 04 Jul 2025 18:30:02 +0000 (UTC)
-Received: from bohr-int.orbis-terrarum.net (node-1w7jr9qj3rbr48myelzfsw8ag.ipv6.telus.net [IPv6:2001:569:72ba:9300:305f:add3:6c04:99f8])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: robbat2-bohr@orbis-terrarum.net)
-	by doudna.orbis-terrarum.net (Postfix) with ESMTPSA id 4bYhxy4kTPzB6WB;
-	Fri, 04 Jul 2025 18:29:58 +0000 (UTC)
-DKIM-Filter: OpenDKIM Filter v2.10.3 doudna.orbis-terrarum.net 4bYhxy4kTPzB6WB
-Authentication-Results: OpenDKIM@doudna/4bYhxy4kTPzB6WB; dkim=none;
-	dkim-atps=neutral
-Received: (nullmailer pid 3870 invoked by uid 10000);
-	Fri, 04 Jul 2025 18:28:54 -0000
-From: "Robin H. Johnson" <robbat2@gentoo.org>
-To: linux-block@vger.kernel.org
-Cc: "Robin H. Johnson" <robbat2@gentoo.org>
-Subject: [PATCH] block/partitions: detect LUKS-formatted disks
-Date: Fri,  4 Jul 2025 11:28:53 -0700
-Message-ID: <20250704182853.3857-1-robbat2@gentoo.org>
-X-Mailer: git-send-email 2.47.0
+	s=arc-20240116; t=1751657931; c=relaxed/simple;
+	bh=+1vlZgumgifEwNecl68EJAlB8Sprq//BvrO4WzNYsMM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=O4UqPNW32Rh1SCOTZO87PQX/GFrZveNMutozpUdxltB7vkbg4pawbxJTabQpAbUuJTzhFZgBK/20OtDieb1w/cKWeD4NdF3wkf/Y+TAikX82d5QGEFufleSQIcfyUb2CpHujiUVagml3YgBOy03jNHVd85+hmSbx1gKxgPwIfXM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PcwR5aNk; arc=none smtp.client-ip=209.85.208.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PcwR5aNk"
+Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-32b2f5d91c8so11076721fa.0;
+        Fri, 04 Jul 2025 12:38:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1751657928; x=1752262728; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+1vlZgumgifEwNecl68EJAlB8Sprq//BvrO4WzNYsMM=;
+        b=PcwR5aNkrf7IHfPVH1MG1RCWor6BX4Vv1JxMCP4wh6qtC1hIjk8HRYHvCW5XAVOHpc
+         RbHgNf3wXsnM2dSCiIYrIMyND6cQe0MmRUn45QpS47CTIkv7Xqh1RbZpxRT0ClH2SyPA
+         X9rDu9fiUdpwlcY6okwUgaVr1AOlWCam1lCf58vMahsBAFfLICRU+I/yGr+3fKlKTj2Z
+         Rw2gnW5O3r7YhCjdCTwFFoBbL9jYvx15vSLlR0p2E7p0R/0bqfM84x1Jrv43kEn95G1d
+         04a0c4ra8k5+E9PsZVARYx8TviIMsplG6B2+rrLKyMPwCpnf4hxPJKikH2uXWZJNNFIC
+         0DPg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751657928; x=1752262728;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+1vlZgumgifEwNecl68EJAlB8Sprq//BvrO4WzNYsMM=;
+        b=raxSgSuaVgX7fQ+wX9K+s0u+GvO5Aw6t2ncC/2HO8KYUhjMV0CyIPHtQENFJ6Q862Q
+         t4d959zdiVr4Ydl6FDdNSAiymlT/MIIfncSDWam7q5MkBqjqn9VkQyv2xnJRl3Qf+tQZ
+         EUxtIuG49RDbkxlLFwtDcs1Vbe62eyqVcgMVNGUjQNjxAY1JewNSYkWSM9O2Q8QGXfy2
+         LT+A7pzga2purScOBDAEzvxDSgVhKWdtF0kSn6NH7cRtLifoKUK6i9th1sHPP63GPGjI
+         rI9nmzuvvNYDCHwVNNN/cvRCQkDVmJe/0+sSXYa7hHQQQWXWqNNVpxlbk0t7qiKZVKkO
+         wRGg==
+X-Forwarded-Encrypted: i=1; AJvYcCUHCy55bSmZk4jpp621J/soN5QPIdagC/ixqvPqUrR/Apr8Df66TWcvbwGp1nLFGZkT2Lslc32EhQE=@vger.kernel.org, AJvYcCVM673+sBvzHRJgAcngzCBUOpx1nSAzLlBstq9wPZsz8PHyE3B4TporMsSQIvWjUA6oXLNb8I+ydWwcDllI@vger.kernel.org, AJvYcCVoTwxWo0g1NuaV+qLTapK1TnYDJsieAVQZ3jG8456dsX4p3jtbDQgFL13sGBAQUoI+kOQrP95M@vger.kernel.org, AJvYcCWZrSlRoogZfOjFNalN9ML9VEgZjNcEpYHyvSLBEbLoacw9QdxEXcZy5Kdr3jbYlI0QrCjtDCBzzsITcgWR4iYn@vger.kernel.org, AJvYcCWxgf+UiP5R/W7etgzKzjZezrJDN6xD7YVEm9Hm06YLh+neCAe3GW/JwCBnrqSCLD/gUR8Cjx8GFBIb@vger.kernel.org, AJvYcCWy1a/VkwRrMIHGtDp+auByY0+u29V6b38yAJTzv4uimbnOQI8RMbn1iiV0j7+uBPcOcOBsSHiyTOxY@vger.kernel.org, AJvYcCWzAcGvs1dy/a4s2L1Qhho0ytI/m/rQUbgkIr32GKDaeYYrmPDDnHhZp47MDG/cDJC296+pgJU0yfuB@vger.kernel.org, AJvYcCX2wnjAeztcciqCgRk+FnFOf+uNTcxRyqwkR96ZwcaUxfC5GyOySeDYJ1+pssc+sNBwmlsY0+o/a8Umxdg=@vger.kernel.org, AJvYcCXpbVRtNAkIGAhMIDg7g2ZFXvuMH6JTgZTDpvsTyB+mzrTcN1NuOcMFXmwYKCtJIieNpAFagHVURbCtdNS1Pps=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx0NRdHaXHF0yfak5KDlnhLKA/0kfeyrb1Mh+7VzZJPdzKZha0j
+	+nd4wTMkZfpASgA/yMXIgBGzAX9+hLROad+i4lqYAqRNHxCQ6lAt4iL1ys8SVm1N+i/lLUnT8tr
+	nxXVfju7d60fgl04REwi+466IsObtq+0=
+X-Gm-Gg: ASbGncuMDJJrjpQX40Sl5aD0i8pttq1CctJIRLw/lJeuEVHPkM1cjuWE1X3UHS1/8iu
+	Eg50sQ7KdawCsHbic4tGloTDPe/u3q1yKVfWiwO0ZAR8arIN87QhLVPGFsRXGVLECadmq/LWCmq
+	8J/XX5WvVbK030n/5x175pkUaJnBFiLmJ0Knh2VNM6clNdzsGd+253/Z1iadINMA8S0z8TUjykU
+	gP6uK7esChwwRMb
+X-Google-Smtp-Source: AGHT+IEtZIZHyQdOcRcbH+zRF5QnKwCn2iKXPxprHvYuNR2jSg6UqBw9KbMdEWrPUWxqoAE0oN54aToeuNsJtUiGyRY=
+X-Received: by 2002:a05:651c:542:b0:32c:a097:4198 with SMTP id
+ 38308e7fff4ca-32f00c63744mr9980551fa.1.1751657927846; Fri, 04 Jul 2025
+ 12:38:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250701-cstr-core-v13-0-29f7d3eb97a6@gmail.com>
+ <20250701-cstr-core-v13-2-29f7d3eb97a6@gmail.com> <DB2BDSN1JH51.14ZZPETJORBC6@kernel.org>
+ <CAJ-ks9nC=AyBPXRY3nJ0NuZvjFskzMcOkVNrBEfXD2hZ5uRntQ@mail.gmail.com>
+ <DB2IJ9HBIM0W.3N0JVGKX558QI@kernel.org> <CAJ-ks9nF5+m+_bn0Pzi9yU0pw0TyN7Fs4x--mQ4ygyHz4A6hzg@mail.gmail.com>
+ <DB2PIGAQHCJR.3BF8ZHECYH3KB@kernel.org> <CAJ-ks9=WmuXLJ6KkMEOP2jTvM_YBJO10SNsq0DU2J+_d4jp7qw@mail.gmail.com>
+ <CAJ-ks9kNiOgPO7FF3cAbaSNtTWs0_PzQ4k4W0AxjHNFuMJnDcQ@mail.gmail.com>
+ <DB36T5JWBL10.2F56EDJ1XKAD0@kernel.org> <CAJ-ks9=Jutg+UAwCVER_X91BGxWzmVq=OdStDgLZjTyMQSEX6Q@mail.gmail.com>
+ <CANiq72nZhgpbWOD4Evy-qw2J=G=RY4Hsoq9_rj6HGWMQW=2kTw@mail.gmail.com>
+In-Reply-To: <CANiq72nZhgpbWOD4Evy-qw2J=G=RY4Hsoq9_rj6HGWMQW=2kTw@mail.gmail.com>
+From: Tamir Duberstein <tamird@gmail.com>
+Date: Fri, 4 Jul 2025 15:38:11 -0400
+X-Gm-Features: Ac12FXw768F_Lk3HRxkz7eCyR4EleC6ZiRWgAxdQvNU_x7ZQ7VCNlmwZ-Al3Xv8
+Message-ID: <CAJ-ks9m4S1jujQvyt9TOvNMewjNSztps8vayGga+MnNU+0YUcQ@mail.gmail.com>
+Subject: Re: [PATCH v13 2/5] rust: support formatting of foreign types
+To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Cc: Benno Lossin <lossin@kernel.org>, Michal Rostecki <vadorovsky@protonmail.com>, 
+	Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
+	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
+	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
+	Trevor Gross <tmgross@umich.edu>, Brendan Higgins <brendan.higgins@linux.dev>, 
+	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, 
+	Danilo Krummrich <dakr@kernel.org>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
+	Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, 
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
+	Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, 
+	FUJITA Tomonori <fujita.tomonori@gmail.com>, Rob Herring <robh@kernel.org>, 
+	Saravana Kannan <saravanak@google.com>, Peter Zijlstra <peterz@infradead.org>, 
+	Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>, Waiman Long <longman@redhat.com>, 
+	Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, 
+	Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, Andrew Lunn <andrew@lunn.ch>, 
+	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Bjorn Helgaas <bhelgaas@google.com>, 
+	Arnd Bergmann <arnd@arndb.de>, Jens Axboe <axboe@kernel.dk>, 
+	=?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, 
+	Dave Ertman <david.m.ertman@intel.com>, Ira Weiny <ira.weiny@intel.com>, 
+	Leon Romanovsky <leon@kernel.org>, Breno Leitao <leitao@debian.org>, 
+	Viresh Kumar <viresh.kumar@linaro.org>, Michael Turquette <mturquette@baylibre.com>, 
+	Stephen Boyd <sboyd@kernel.org>, rust-for-linux@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	kunit-dev@googlegroups.com, dri-devel@lists.freedesktop.org, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, llvm@lists.linux.dev, 
+	linux-pci@vger.kernel.org, nouveau@lists.freedesktop.org, 
+	linux-block@vger.kernel.org, linux-pm@vger.kernel.org, 
+	linux-clk@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-If an entire device is formatted as LUKS, there is a small chance it
-maybe be detected as an Atari/AHDI disk - causing the kernel to create
-partitions, and confusing other systems.
+On Fri, Jul 4, 2025 at 8:15=E2=80=AFAM Miguel Ojeda
+<miguel.ojeda.sandonis@gmail.com> wrote:
+>
+> On Fri, Jul 4, 2025 at 1:59=E2=80=AFPM Tamir Duberstein <tamird@gmail.com=
+> wrote:
+> >
+> > That would probably work. We will probably see regressions because we
+> > can't just replace `core::fmt` imports with `kernel::fmt`, so new code
+> > may appear that uses the former.
+>
+> That is fine -- it happens all the time with this sort of approach.
 
-Detect the LUKS header before the Atari partition table to prevent this
-from creating partitions on top of the LUKS volume.
-
-Link: https://unix.stackexchange.com/questions/561745/what-are-the-md-partitions-under-a-mdadm-array
-Link: https://github.com/rook/rook/issues/7940
-Link: https://bugs.launchpad.net/ubuntu/+source/util-linux/+bug/1531404
-Signed-off-by: Robin H. Johnson <robbat2@gentoo.org>
----
- block/partitions/Kconfig  |  8 +++++++
- block/partitions/Makefile |  1 +
- block/partitions/check.h  |  1 +
- block/partitions/core.c   |  3 +++
- block/partitions/luks.c   | 46 +++++++++++++++++++++++++++++++++++++++
- 5 files changed, 59 insertions(+)
- create mode 100644 block/partitions/luks.c
-
-diff --git a/block/partitions/Kconfig b/block/partitions/Kconfig
-index ce17e41451af..341880eeb8f1 100644
---- a/block/partitions/Kconfig
-+++ b/block/partitions/Kconfig
-@@ -96,6 +96,14 @@ config AMIGA_PARTITION
- 	  Say Y here if you would like to use hard disks under Linux which
- 	  were partitioned under AmigaOS.
- 
-+config LUKS_PARTITION
-+	bool "LUKS partition support" if PARTITION_ADVANCED
-+	default y if ATARI_PARTITION
-+	help
-+	  Say Y here to detect hard disks which have a LUKS header instead of a
-+	  partition table. This is valuable as LUKS header may also be wrongly
-+	  detected as other partition types.
-+
- config ATARI_PARTITION
- 	bool "Atari partition table support" if PARTITION_ADVANCED
- 	default y if ATARI
-diff --git a/block/partitions/Makefile b/block/partitions/Makefile
-index 25d424922c6e..d6a68b45bb2f 100644
---- a/block/partitions/Makefile
-+++ b/block/partitions/Makefile
-@@ -11,6 +11,7 @@ obj-$(CONFIG_AIX_PARTITION) += aix.o
- obj-$(CONFIG_CMDLINE_PARTITION) += cmdline.o
- obj-$(CONFIG_MAC_PARTITION) += mac.o
- obj-$(CONFIG_LDM_PARTITION) += ldm.o
-+obj-$(CONFIG_LUKS_PARTITION) += luks.o
- obj-$(CONFIG_MSDOS_PARTITION) += msdos.o
- obj-$(CONFIG_OF_PARTITION) += of.o
- obj-$(CONFIG_OSF_PARTITION) += osf.o
-diff --git a/block/partitions/check.h b/block/partitions/check.h
-index e5c1c61eb353..eddab0d5b4ec 100644
---- a/block/partitions/check.h
-+++ b/block/partitions/check.h
-@@ -60,6 +60,7 @@ int efi_partition(struct parsed_partitions *state);
- int ibm_partition(struct parsed_partitions *);
- int karma_partition(struct parsed_partitions *state);
- int ldm_partition(struct parsed_partitions *state);
-+int luks_partition(struct parsed_partitions *state);
- int mac_partition(struct parsed_partitions *state);
- int msdos_partition(struct parsed_partitions *state);
- int of_partition(struct parsed_partitions *state);
-diff --git a/block/partitions/core.c b/block/partitions/core.c
-index 815ed33caa1b..fb21a9e08024 100644
---- a/block/partitions/core.c
-+++ b/block/partitions/core.c
-@@ -67,6 +67,9 @@ static int (*const check_part[])(struct parsed_partitions *) = {
- #ifdef CONFIG_AMIGA_PARTITION
- 	amiga_partition,
- #endif
-+#ifdef CONFIG_LUKS_PARTITION
-+	luks_partition, /* this must come before atari */
-+#endif
- #ifdef CONFIG_ATARI_PARTITION
- 	atari_partition,
- #endif
-diff --git a/block/partitions/luks.c b/block/partitions/luks.c
-new file mode 100644
-index 000000000000..4185ca64630d
---- /dev/null
-+++ b/block/partitions/luks.c
-@@ -0,0 +1,46 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ *  fs/partitions/luks.c
-+ *  LUKS on raw partition; this is important because a LUKS volume may detected
-+ *  as a valid Atari partition table, breaking other detection.
-+ *
-+ *  Copyright (C) 2025 Robin H. Johnson (robbat2@gentoo.org)
-+ *
-+ *  Reference: https://gitlab.com/cryptsetup/LUKS2-docs/blob/master/luks2_doc_wip.pdf
-+ *  Page 5, Figure 2: LUKS2 binary header on-disk structure
-+ *  This only looks for the Magic & version; and NOT a UUID that starts at
-+ *  offset 0xA8.
-+ */
-+
-+#include <linux/ctype.h>
-+#include <linux/compiler.h>
-+#include "check.h"
-+
-+#define LUKS_MAGIC_1ST_V1		"LUKS\xba\xbe\x00\x01"
-+#define LUKS_MAGIC_1ST_V2		"LUKS\xba\xbe\x00\x02"
-+#define LUKS_MAGIC_2ND_V1		"SKUL\xba\xbe\x00\x01"
-+#define LUKS_MAGIC_2ND_V2		"SKUL\xba\xbe\x00\x02"
-+
-+int luks_partition(struct parsed_partitions *state)
-+{
-+	Sector sect;
-+	int ret = 0;
-+	unsigned char *data;
-+
-+	data = read_part_sector(state, 0, &sect);
-+
-+	if (!data)
-+		return -1;
-+
-+	if (memcmp(data, LUKS_MAGIC_1ST_V1, 8) == 0
-+		|| memcmp(data, LUKS_MAGIC_2ND_V1, 8) == 0) {
-+		strlcat(state->pp_buf, "LUKSv1\n", PAGE_SIZE);
-+		ret = 1;
-+	} else if (memcmp(data, LUKS_MAGIC_1ST_V2, 8) == 0
-+		|| memcmp(data, LUKS_MAGIC_2ND_V2, 8) == 0) {
-+		strlcat(state->pp_buf, "LUKSv2\n", PAGE_SIZE);
-+		ret = 1;
-+	}
-+	put_dev_sector(sect);
-+	return ret;
-+}
--- 
-2.47.0
-
+OK, with all the splitting requested, this comes out to ~54 patches.
+I'll send the first bit (which can go in cycle 0) as v14.
