@@ -1,106 +1,150 @@
-Received: from mail-io1-f48.google.com (mail-io1-f48.google.com [209.85.166.48])
+Received: from mail-io1-f45.google.com (mail-io1-f45.google.com [209.85.166.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B9B81684A4
-	for <linux-block@vger.kernel.org>; Fri,  4 Jul 2025 15:31:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CB4B33E1
+	for <linux-block@vger.kernel.org>; Fri,  4 Jul 2025 15:34:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751643068; cv=none; b=JV8xOLHIF5y3NIvXdoLt/f8YMeUAKMrZVLzTxIbQlSPLYjsLfj8UFIjiNqipDlfrM3Ik541gPzUXLkj51EBBVYUCagcPJx/eE6qyqzaaeaT5doE/NmT+g53uEAjpxpjXrxEEuU35Ha6EFvrfhsv1w7LzBgfnRWs6joSexQ5hb6c=
+	t=1751643263; cv=none; b=m8v7spFcvmQTyJUt/DZeymUgzmVkSDFLiN1qFURrsequ1TfXvKUisbdIW8tQiBdCAVbuySIBQGIDXF1Dv461fg6foHVIJsib2xkQwAXEgMeUT/1KoCHLP23c5bafwk76cDQF7zO7VnLT57SP3kH1jQo8S2I0C0GrWWVPs70+KwE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751643068; c=relaxed/simple;
-	bh=nHadSmOQ4fj+9ocF6rtES/ek/GuvZAir7sGoHBqWim0=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=aWXdjlTkUcXCgpmPDhg1KP70onskNaoGJepdnLbxirZXaf2kdRWHCdT0e8dbUzAKLbwSc9+THMDyEDiCb5GQhAKAN5UyY5FAVY+2vp4vEeLx83QPnba8m/0H2FVHZ0BsFen5cH4dS05MWBopVb0nk5nMkFgo9qyVuKEJI1N2/cY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=TvFn2PDE; arc=none smtp.client-ip=209.85.166.48
+	s=arc-20240116; t=1751643263; c=relaxed/simple;
+	bh=lxsXsG7h/UHCxzG7awBAPAsMt2frmmQcaLQkKM4tVZo=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=Gx+vnmTSg/gDm654z1TyW7BCaYhT4dJJcLhhAveyJmLKML8VwgMUsaLAyIimtkhrlvAeeS2oTxeHeWrmEJsCKD3H5wLgi2CXFcDTPQf4DmFBn3Oqao86iA2OfM70/GBGvO4c/Mh8Mu0kvOfPLfwUVo7vcX4OOn3DV1QVmFt+3CA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=mqbDLZaA; arc=none smtp.client-ip=209.85.166.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="TvFn2PDE"
-Received: by mail-io1-f48.google.com with SMTP id ca18e2360f4ac-875b52a09d1so32083339f.0
-        for <linux-block@vger.kernel.org>; Fri, 04 Jul 2025 08:31:05 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="mqbDLZaA"
+Received: by mail-io1-f45.google.com with SMTP id ca18e2360f4ac-87694a21617so28376839f.1
+        for <linux-block@vger.kernel.org>; Fri, 04 Jul 2025 08:34:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1751643065; x=1752247865; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1751643259; x=1752248059; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=J9U2YxSqLeeEvmDWj03WV/W/8jXHi/A1A5Rn3s5NR3A=;
-        b=TvFn2PDEE08DvdNjlBnqzAndh4c0St6Y/7jdZgEcbLFuiljZ5rGnOSJbOLZcUKFHtp
-         O9+hawkMyI6UOVuh429NsvuxJlTP/MGVW/Z1oC5gGvQpBMCzHt91NU3YcQ5iQ1V7c+Gv
-         oM+vxkMGY6wgnxsfXaCj8Dwxq6soSHgiZmphNChGJFmEWltkb0TZIzmaNFLTB143ENZW
-         2snHLK3nD4fajayCubJ0wUYEcn+F09JQBvJpEYjdCe4DL+4TlsZoIbFWYZyHFYEjImkU
-         WD1PeQWJ71H1QykiGYi972nH2VGKTut/Q6wBkX1bPn3qOMOgVViqfQfDvtzqKAjAy/Bt
-         bF/g==
+        bh=mkmFnOVLTiRvsjSsoKZdQ0LwtOTZ4NIebQUqL+wW+cw=;
+        b=mqbDLZaAUnvXnztS8VR0zpun2GStQdUBvjaFYHIewLhfhp/kijG97G3RLpUf0RuSbp
+         A2vxVv7G5HGhMpSlNGDmdQhinaVJmLUcD+ZKGu2v2FiJYn43LF5lQQ9B6ROz5SR5ioZL
+         4uHx9qdXbsh3b77nZ6T4bRN4tSjCUmLc0KH5N0sDTYWdpkEwA6HF5nn9TfDw+wrRzRDl
+         RBPsQI4P10/lKF8zcurTV4aLnU/7g9w3aFv+BjK0kVQnh7RJH0RCmJMeHA6WCoopBO8w
+         RxaQmz6oYvkWJIL0ySTWpWvToYaqYw91E1RgPvwpio/K/ag5JTcy0wPca9y/ro/CP5I/
+         ISrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751643065; x=1752247865;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=J9U2YxSqLeeEvmDWj03WV/W/8jXHi/A1A5Rn3s5NR3A=;
-        b=u5rm6+3Ws06wDrlb9olnS5Fwfd1AE4elNFbVgPsE/+CLGESLLtyqcbAUtvsI08x4yJ
-         9MzBxj173NcDhFlWAhHScHkw5BfeSXNBVAj0eSAMlBQn2hUxzf8DLI8neQBEDhRZofsw
-         ntO+74bpRdikSdJ+spEvj6hipUfKWNP84Kxk0Bl4VuycgVRdHBKy4rQJ1Z0wP5jYbMgl
-         Tev9YXW890UNFw64A6UmLdudypo+kYL6o8hDCmn7LxpE0/uTV7pdPLbZ6e1u/ZkDj9lS
-         1XdVJ9BRLaXulbn6Ri+8YD4Kuxq3DTk5S3V8W/p9YmcgZsW1vVBv8yBy+rNjdzoAieOd
-         x0zw==
-X-Gm-Message-State: AOJu0Yx20TBmm3f09ZSiq30B/n/uzlQ3wL9DkQi6cTtL7fRXy/Bp1ox7
-	DAOEF3vKIdX3osU9oWiSfopD/ASoTQwU3loZozrbQ9H5ZHPo00+nUV+ekJ68EntecQw=
-X-Gm-Gg: ASbGnctYKrYOLgvO2k/5o87wkocepYDvFYDEoipK1rOQhVVgAxS6t5S7KrThvpfbVGp
-	JSikEPonHKOKUckV1Kp7rxRpdPlUKvizDFGfmih9zAF3E2N4OVtv4E91NJKt98vt4bbSojkYMjn
-	GhT5N5oh0zKyUZd2kZ/2709O50wi9GTeK6JP7MC8NzP+GotdBeKDHGSmXTuWZ74iSZNxgns/6D2
-	7Ta8MVNnO/8LCtA5VCu9KjSnLSIdru0R0wG24zJnPz/KUWA03ajBNNefozu+Vz9DEHpDAoSCtbH
-	7dCZZH9xauQELTHQfiEprlxkjfusz534qCis2ewyfT0y88QJ/VqkdQ==
-X-Google-Smtp-Source: AGHT+IHEmIEl2VIpJwn0U2kmzedfnLAA7Xc0aynsYELESl9e1a7hV/8vJyBS3dHfv/hzMTr/lr+CkQ==
-X-Received: by 2002:a05:6602:3a07:b0:873:35c8:16f9 with SMTP id ca18e2360f4ac-876e47b0dadmr215484139f.8.1751643064818;
-        Fri, 04 Jul 2025 08:31:04 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-876e06c9440sm53826139f.0.2025.07.04.08.31.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Jul 2025 08:31:04 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: Ming Lei <ming.lei@redhat.com>, 
- Caleb Sander Mateos <csander@purestorage.com>, 
- Uday Shankar <ushankar@purestorage.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-In-Reply-To: <20250703-ublk_too_many_quiesce-v2-0-3527b5339eeb@purestorage.com>
-References: <20250703-ublk_too_many_quiesce-v2-0-3527b5339eeb@purestorage.com>
-Subject: Re: [PATCH v2 0/2] ublk: speed up ublk server exit handling
-Message-Id: <175164306375.597273.4784854727001872046.b4-ty@kernel.dk>
-Date: Fri, 04 Jul 2025 09:31:03 -0600
+        d=1e100.net; s=20230601; t=1751643259; x=1752248059;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=mkmFnOVLTiRvsjSsoKZdQ0LwtOTZ4NIebQUqL+wW+cw=;
+        b=SrZg1VOUWW1OgVoCJQ5uNoTOC+xM3OmU+UhLhTFwSFabl2ZjjdFJnq8oLbfUtdERXW
+         3fFtfA/Wmtgb+9CDuFuPpydnjsrdS5c+It0Wca72JGS3hSoUbra4GzPQryO1nsA2VeDd
+         gcIl55/udMDTWzU6M1TZqvrMLHWDgl2VdawzCBl/C+UZ1vSHpRB3TEkaivKHv4rAFDpm
+         x5eSmUYwSEbnBy2YG048UMpCnTtGWuCBb8vyk7+z1BvMTdUhNGdUqQM0tHnSAATIjhqE
+         V6TjNMQa1mKtQcmrSB5RkWzgKYVW162SVtpKJ45n0FwyUEuZ/MJfiUQwhONhsv8dBfkX
+         Kdew==
+X-Gm-Message-State: AOJu0YxFLRJMAbNF9QN0KSYbiyTrOhYBnSiydgGtA9CFJu8QKj7sEIxw
+	4tI5TXDOtw4iRPlaN1+ZjCis67DtylfI+LHQGQPjObV/tp6FSrgv5mt0tlB+2efF9YfbukQgBVt
+	J0DRp
+X-Gm-Gg: ASbGnct2ze1XqknSSrTg1Z5Wxbyjy7c9qJ9D0jNUg59hBIqRDXTV8Qh6ctTt3abkJUX
+	sRAffYbHv2B4EyZyzcdbZJssX/Xv6mvXaCe/l719m9mYsjZyYdYRdBs7E1FYomqWV6sSAJcVpsn
+	d6gNoA617gMrssU0Scum7MNdSsnAloQT68pyxoD0O21N2y49El9eElIrkbJXdQoNkys6CCbAkdP
+	tLTRLuINIq4qAdRDefmgkt+xdrqzMfIE0dN/0r5rderM0PKyWXlF+HMn9GD12sMhhnDZaNARYFL
+	Gj/GnITYwfYsF00Qhjs4sCO3eW9qUP52S+EdXbg8jfKkLM9NsEdftMWc96Q=
+X-Google-Smtp-Source: AGHT+IFt+d7Yr2Z0spSs6m+rPLhOVRmOpUlr4XYpH+aPaBb5+2wzeBjQfa97qDD7Y67t+rcuEe8/rw==
+X-Received: by 2002:a05:6602:820e:b0:876:737:85da with SMTP id ca18e2360f4ac-876e089488fmr201688639f.0.1751643259086;
+        Fri, 04 Jul 2025 08:34:19 -0700 (PDT)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-503b5c0f7f5sm431586173.106.2025.07.04.08.34.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 04 Jul 2025 08:34:18 -0700 (PDT)
+Message-ID: <67e6b4d7-0eaf-410b-94c8-a9ee2cb09de6@kernel.dk>
+Date: Fri, 4 Jul 2025 09:34:17 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 6.16-rc5
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-d7477
+
+Hi Linus,
+
+Set of fixes for block that should go into the 6.16 kernel release. This
+pull request contains:
+
+- NVMe fixes via Christoph
+	- fix incorrect cdw15 value in passthru error logging
+	  (Alok Tiwari)
+	- fix memory leak of bio integrity in nvmet (Dmitry Bogdanov)
+	- refresh visible attrs after being checked (Eugen Hristev)
+	- fix suspicious RCU usage warning in the multipath code
+	  (Geliang Tang)
+	- correctly account for namespace head reference counter
+	  (Nilay Shroff)
+
+- Fix for a regression introduced in ublk in this cycle, where it would
+  attempt to queue a canceled request.
+
+- brd RCU sleeping fix, also introduced in this cycle. Bare bones fix,
+  should be improved upon for the next release.
+
+Please pull!
 
 
-On Thu, 03 Jul 2025 23:41:06 -0600, Uday Shankar wrote:
-> Recently, we've observed a few cases where a ublk server is able to
-> complete restart more quickly than the driver can process the exit of
-> the previous ublk server. The new ublk server comes up, attempts
-> recovery of the preexisting ublk devices, and observes them still in
-> state UBLK_S_DEV_LIVE. While this is possible due to the asynchronous
-> nature of io_uring cleanup and should therefore be handled properly in
-> the ublk server, it is still preferable to make ublk server exit
-> handling faster if possible, as we should strive for it to not be a
-> limiting factor in how fast a ublk server can restart and provide
-> service again.
-> 
-> [...]
+The following changes since commit c007062188d8e402c294117db53a24b2bed2b83f:
 
-Applied, thanks!
+  block: fix false warning in bdev_count_inflight_rw() (2025-06-26 07:34:11 -0600)
 
-[1/2] ublk: speed up ublk server exit handling
-      commit: 2fa9c93035e17380cafa897ee1a4d503881a3770
-[2/2] ublk: introduce and use ublk_set_canceling helper
-      commit: 10d77a8c60b2b117868a64875a55c4c8db6f1f2e
+are available in the Git repository at:
 
-Best regards,
+  git://git.kernel.dk/linux.git tags/block-6.16-20250704
+
+for you to fetch changes up to 75ef7b8d44c30a76cfbe42dde9413d43055a00a7:
+
+  Merge tag 'nvme-6.16-2025-07-03' of git://git.infradead.org/nvme into block-6.16 (2025-07-03 09:42:07 -0600)
+
+----------------------------------------------------------------
+block-6.16-20250704
+
+----------------------------------------------------------------
+Alok Tiwari (1):
+      nvme: Fix incorrect cdw15 value in passthru error logging
+
+Dmitry Bogdanov (1):
+      nvmet: fix memory leak of bio integrity
+
+Eugen Hristev (1):
+      nvme-pci: refresh visible attrs after being checked
+
+Geliang Tang (1):
+      nvme-multipath: fix suspicious RCU usage warning
+
+Jens Axboe (1):
+      Merge tag 'nvme-6.16-2025-07-03' of git://git.infradead.org/nvme into block-6.16
+
+Ming Lei (1):
+      ublk: don't queue request if the associated uring_cmd is canceled
+
+Nilay Shroff (1):
+      nvme: correctly account for namespace head reference counter
+
+Yu Kuai (1):
+      brd: fix sleeping function called from invalid context in brd_insert_page()
+
+ drivers/block/brd.c           |  6 ++++--
+ drivers/block/ublk_drv.c      | 11 ++++++-----
+ drivers/nvme/host/core.c      | 18 ++++++++++++++++--
+ drivers/nvme/host/multipath.c |  8 ++++++--
+ drivers/nvme/host/pci.c       |  6 ++++--
+ drivers/nvme/target/nvmet.h   |  2 ++
+ 6 files changed, 38 insertions(+), 13 deletions(-)
+
 -- 
 Jens Axboe
-
-
 
