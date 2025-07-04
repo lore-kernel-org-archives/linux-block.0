@@ -1,76 +1,44 @@
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+Received: from smtp.gentoo.org (woodpecker.gentoo.org [140.211.166.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B080A1EE7B7;
-	Fri,  4 Jul 2025 17:50:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C9E1225761
+	for <linux-block@vger.kernel.org>; Fri,  4 Jul 2025 18:30:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=140.211.166.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751651445; cv=none; b=H+xIxQjKlFExysI/K9v0UN0TC8ijqRn3aVX8yp7oMUCETUaj5YrvhrJMvoadivvgUPhdPCC4tHwfVapvYkoedInO0GuqfxjSEqt3qyrH42sHdUaxoQnKE/D6i8dnCzqUdn9STpvN+ICyTsq1BQUCXYjZ9vpEmPgpN9jeO2U+WiA=
+	t=1751653806; cv=none; b=lv7P3flAWLO8OS9vY667RK6LIubIZWPFSD/28pZQIyoGvJzo6de9QaMXJqpHmnI9/jJSMykOJfa0zLSVKFliHlSuu6LeW46gOolnxZ0BZctQhu+Kwsn3fHjYhztblldCmZR1gT3ODV5XNfUFtUbUrL6DytkFqynrmyI+ENsfa40=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751651445; c=relaxed/simple;
-	bh=wB4CRAZJy+K0gy6uZ0Y5nkA+Q6wo0BrNhBcOAGOBIaQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nfTWjnciqAp5puE1m+asJ6B9VlLqxZXwu/Hozj9AwO8pdXs8h9G72VRZ/i7KFOWGGHDNoXydfq2MHbFJMUUxn1MAaxbAQBEXfe7g3nRmo6lFZEisFXf6qGjYCorh6/eMb2+xjL+JFlqpKn8wcjMq9n0Xxk2bN54HBagqZhWrSOI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J4Vvk7Sp; arc=none smtp.client-ip=209.85.221.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J4Vvk7Sp"
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-3a57ae5cb17so743821f8f.0;
-        Fri, 04 Jul 2025 10:50:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751651442; x=1752256242; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=7kzxKyGyUkMQNU8zFP39T97KAl93oC6U2R3DXkWnfQQ=;
-        b=J4Vvk7Sp2tnW2ZttP3cc27u36YkhpzVtSw4dHao5Fy9kPTaueBOwrs2GYpfA9KIKlV
-         VcsjGPUcaHYGnVIJe7ItKwDV+RQDsaLtE9lOxA09/OrQ9YgpEwOn8UXccztI/9FqxwGQ
-         0PcQbg4lr4pVWbTyIDt6yu5UikJWn6NMpSSH6ckuwBvf76jXIncMYMg8ef9cERQjqZkD
-         MSeoDLck/pMF8JZH3WNhNCJxfzPIGzA+VN2fQvSE156oO8aRrJoo/JPphlSyZPnHrNc2
-         rOqfSkNUPEAcwmZQNLSJlTnMUtEa0JynQt6UaUHJl8TDqHRxlI6NchX/jqTWuSo9Hw+8
-         2Xug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751651442; x=1752256242;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7kzxKyGyUkMQNU8zFP39T97KAl93oC6U2R3DXkWnfQQ=;
-        b=Pn0VJuoR666QPflScM5nxqUYxA88RfXYmSGWN/sbkcGKi+H9/7T+E2G9W929bFV1D/
-         5W7uOifyPEDVoecFkjisyjeFBcuQwasUS8vLPv8hgEehsPzkH4IbKLfjnsoUfi3nR+pV
-         6PrnVqzGQ4bUnRZ3TzC7FI6ZG77vuRJhlJau2ECoptpzfAgJNL/yfFkLXPyIFZD9O6fX
-         hETpiAZlA8GeJ8TKv00pIUZc2rb9cXUY9SBTLL/9oVhj2UdEVuqTjKIMEnJgDf0knupi
-         Bz5lHDQj6vI0w3112/7a7kaGegIbTTOV2FNS2ZkEyJMzqBWdc12R3oe+Otcfm5GUlDxz
-         xmLg==
-X-Forwarded-Encrypted: i=1; AJvYcCVKv95AGUtB0jvrE6tWKB3MTL0qLb+N+/uN75BOO4BJ6dTs5x3nuFuTEIzKw3y9yfwvMGyyN2rHsOIM8g==@vger.kernel.org, AJvYcCXaddmmmaji2W1lXGWJgxzmUog7vMvdGHeR62ArcH05DqUN2o/k4nnN2JKpE91Gw1GZOU77P6qWsy9zGzmw@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywu2aHPAjYpY+jjHgm6AiLX3IOvHu527cCzdGE7J4d/6qeTyydh
-	yaHqje0wIdPwDqihHoZ8tAMAih2Cx71MuCJ39MFqm3PDGpMmlJI8G9y5
-X-Gm-Gg: ASbGncshw3enH0Mgo6NmW9/3IXNJ4qhLX05LRHXk5Z+Cht85MLpI6vv1EYof2S8/3Vw
-	rMkdFyobafuMLk9gcwBrDdCX2RI3bmGJxI3xerpnP56IaXYB/6IZhS1ijxmHeNneg37iG9dYeh/
-	eYe6EDfub0EpRpsYGqIZRh4qRTRXN7lUFcdcer2mkZ8yGK3ZWFhhWmw1M7K9Wu92OyW6W9gYWgC
-	JLcl0j4MaNiCju5F5Uh4cwVBaf5z3DWUsllfBj7NI2eFqg+Jsxv7YJn063Sq/W6Zkx5qbkuTFwe
-	4JcsBhedXqJMRxWPt28cNWAVtE2Co16wccG7eZDgkeEsyJgT1zrcGYxRIjelvAc8hdmSPstGT2Y
-	DI8A+uJC1gXLy3sBPFL04e/F3ljVKw1bGu4bU1Q==
-X-Google-Smtp-Source: AGHT+IHkGqUW4qYzaIeEVo4MIPsGKugMbjdQlEOB95vKMllXraZTUlpZPd8DNQlc+GfPIEvC/98pUg==
-X-Received: by 2002:a05:6000:2c13:b0:3a4:ef0d:e614 with SMTP id ffacd0b85a97d-3b4964def6bmr3030814f8f.33.1751651441612;
-        Fri, 04 Jul 2025 10:50:41 -0700 (PDT)
-Received: from ekhafagy-ROG-Zephyrus-M16-GU603HR-GU603HR.. ([156.204.255.91])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b4708d0ed9sm3063745f8f.38.2025.07.04.10.50.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Jul 2025 10:50:41 -0700 (PDT)
-From: Eslam Khafagy <eslam.medhat1993@gmail.com>
-To: 
-Cc: skhan@linuxfoundation.com,
-	Eslam Khafagy <eslam.medhat1993@gmail.com>,
-	Philipp Reisner <philipp.reisner@linbit.com>,
-	Lars Ellenberg <lars.ellenberg@linbit.com>,
-	=?UTF-8?q?Christoph=20B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	drbd-dev@lists.linbit.com,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] DRBD: replace strcpy with strscpy
-Date: Fri,  4 Jul 2025 20:50:15 +0300
-Message-ID: <20250704175018.333165-1-eslam.medhat1993@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1751653806; c=relaxed/simple;
+	bh=l1XUot6t31BKfQ2g+v50CHmHImQMZroV95qQTp5JJ44=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GiXvJ8DraIcCjOa9QO6s0Wuqdr0hSXb1gvrA1ebnL35GF9vJ+TNdZwEskTPkVbLFKhrstr8tq+BWPaXB7cyNdAlxMw2rqXDxZf1hEvI7gqAyJRrfTxH4ZPdlWw3nFQCAcwSdxFdk6TkFq+7RMQFjw6ml5lG/5nmC3+Oq4u2nXFQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gentoo.org; spf=pass smtp.mailfrom=gentoo.org; arc=none smtp.client-ip=140.211.166.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gentoo.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gentoo.org
+Received: from doudna.orbis-terrarum.net (doudna.orbis-terrarum.net [IPv6:2a01:4f9:4b:19c2::2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: relay-lists.gentoo.org@gentoo.org)
+	by smtp.gentoo.org (Postfix) with ESMTPSA id CF1DD340FAB;
+	Fri, 04 Jul 2025 18:30:02 +0000 (UTC)
+Received: from bohr-int.orbis-terrarum.net (node-1w7jr9qj3rbr48myelzfsw8ag.ipv6.telus.net [IPv6:2001:569:72ba:9300:305f:add3:6c04:99f8])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: robbat2-bohr@orbis-terrarum.net)
+	by doudna.orbis-terrarum.net (Postfix) with ESMTPSA id 4bYhxy4kTPzB6WB;
+	Fri, 04 Jul 2025 18:29:58 +0000 (UTC)
+DKIM-Filter: OpenDKIM Filter v2.10.3 doudna.orbis-terrarum.net 4bYhxy4kTPzB6WB
+Authentication-Results: OpenDKIM@doudna/4bYhxy4kTPzB6WB; dkim=none;
+	dkim-atps=neutral
+Received: (nullmailer pid 3870 invoked by uid 10000);
+	Fri, 04 Jul 2025 18:28:54 -0000
+From: "Robin H. Johnson" <robbat2@gentoo.org>
+To: linux-block@vger.kernel.org
+Cc: "Robin H. Johnson" <robbat2@gentoo.org>
+Subject: [PATCH] block/partitions: detect LUKS-formatted disks
+Date: Fri,  4 Jul 2025 11:28:53 -0700
+Message-ID: <20250704182853.3857-1-robbat2@gentoo.org>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -79,83 +47,135 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-strcpy is deprecated due to lack of bounds checking. This patch replaces
-strcpy with strscpy, the recommended alternative for null terminated
-strings, to follow best practices.
+If an entire device is formatted as LUKS, there is a small chance it
+maybe be detected as an Atari/AHDI disk - causing the kernel to create
+partitions, and confusing other systems.
 
-I had to do a small refactor for __drbd_send_protocol since it uses
-strlen anyways. so why not use that for strscpy.
+Detect the LUKS header before the Atari partition table to prevent this
+from creating partitions on top of the LUKS volume.
 
-Signed-off-by: Eslam Khafagy <eslam.medhat1993@gmail.com>
+Link: https://unix.stackexchange.com/questions/561745/what-are-the-md-partitions-under-a-mdadm-array
+Link: https://github.com/rook/rook/issues/7940
+Link: https://bugs.launchpad.net/ubuntu/+source/util-linux/+bug/1531404
+Signed-off-by: Robin H. Johnson <robbat2@gentoo.org>
 ---
- drivers/block/drbd/drbd_main.c     | 17 +++++++++--------
- drivers/block/drbd/drbd_receiver.c |  4 ++--
- 2 files changed, 11 insertions(+), 10 deletions(-)
+ block/partitions/Kconfig  |  8 +++++++
+ block/partitions/Makefile |  1 +
+ block/partitions/check.h  |  1 +
+ block/partitions/core.c   |  3 +++
+ block/partitions/luks.c   | 46 +++++++++++++++++++++++++++++++++++++++
+ 5 files changed, 59 insertions(+)
+ create mode 100644 block/partitions/luks.c
 
-diff --git a/drivers/block/drbd/drbd_main.c b/drivers/block/drbd/drbd_main.c
-index 52724b79be30..4e5bd74be90a 100644
---- a/drivers/block/drbd/drbd_main.c
-+++ b/drivers/block/drbd/drbd_main.c
-@@ -742,9 +742,9 @@ int drbd_send_sync_param(struct drbd_peer_device *peer_device)
- 	}
+diff --git a/block/partitions/Kconfig b/block/partitions/Kconfig
+index ce17e41451af..341880eeb8f1 100644
+--- a/block/partitions/Kconfig
++++ b/block/partitions/Kconfig
+@@ -96,6 +96,14 @@ config AMIGA_PARTITION
+ 	  Say Y here if you would like to use hard disks under Linux which
+ 	  were partitioned under AmigaOS.
  
- 	if (apv >= 88)
--		strcpy(p->verify_alg, nc->verify_alg);
-+		strscpy(p->verify_alg, nc->verify_alg);
- 	if (apv >= 89)
--		strcpy(p->csums_alg, nc->csums_alg);
-+		strscpy(p->csums_alg, nc->csums_alg);
- 	rcu_read_unlock();
- 
- 	return drbd_send_command(peer_device, sock, cmd, size, NULL, 0);
-@@ -771,10 +771,6 @@ int __drbd_send_protocol(struct drbd_connection *connection, enum drbd_packet cm
- 		return -EOPNOTSUPP;
- 	}
- 
--	size = sizeof(*p);
--	if (connection->agreed_pro_version >= 87)
--		size += strlen(nc->integrity_alg) + 1;
--
- 	p->protocol      = cpu_to_be32(nc->wire_protocol);
- 	p->after_sb_0p   = cpu_to_be32(nc->after_sb_0p);
- 	p->after_sb_1p   = cpu_to_be32(nc->after_sb_1p);
-@@ -787,8 +783,13 @@ int __drbd_send_protocol(struct drbd_connection *connection, enum drbd_packet cm
- 		cf |= CF_DRY_RUN;
- 	p->conn_flags    = cpu_to_be32(cf);
- 
--	if (connection->agreed_pro_version >= 87)
--		strcpy(p->integrity_alg, nc->integrity_alg);
-+	size = sizeof(*p);
-+	if (connection->agreed_pro_version >= 87) {
-+		int integrity_len = strlen(nc->integrity_alg);
-+		size += integrity_len + 1;
-+		strscpy(p->integrity_alg, nc->integrity_alg, integrity_len);
-+	}
++config LUKS_PARTITION
++	bool "LUKS partition support" if PARTITION_ADVANCED
++	default y if ATARI_PARTITION
++	help
++	  Say Y here to detect hard disks which have a LUKS header instead of a
++	  partition table. This is valuable as LUKS header may also be wrongly
++	  detected as other partition types.
 +
- 	rcu_read_unlock();
- 
- 	return __conn_send_command(connection, sock, cmd, size, NULL, 0);
-diff --git a/drivers/block/drbd/drbd_receiver.c b/drivers/block/drbd/drbd_receiver.c
-index e5a2e5f7887b..9c2d439f26e8 100644
---- a/drivers/block/drbd/drbd_receiver.c
-+++ b/drivers/block/drbd/drbd_receiver.c
-@@ -3985,14 +3985,14 @@ static int receive_SyncParam(struct drbd_connection *connection, struct packet_i
- 			*new_net_conf = *old_net_conf;
- 
- 			if (verify_tfm) {
--				strcpy(new_net_conf->verify_alg, p->verify_alg);
-+				strscpy(new_net_conf->verify_alg, p->verify_alg);
- 				new_net_conf->verify_alg_len = strlen(p->verify_alg) + 1;
- 				crypto_free_shash(peer_device->connection->verify_tfm);
- 				peer_device->connection->verify_tfm = verify_tfm;
- 				drbd_info(device, "using verify-alg: \"%s\"\n", p->verify_alg);
- 			}
- 			if (csums_tfm) {
--				strcpy(new_net_conf->csums_alg, p->csums_alg);
-+				strscpy(new_net_conf->csums_alg, p->csums_alg);
- 				new_net_conf->csums_alg_len = strlen(p->csums_alg) + 1;
- 				crypto_free_shash(peer_device->connection->csums_tfm);
- 				peer_device->connection->csums_tfm = csums_tfm;
+ config ATARI_PARTITION
+ 	bool "Atari partition table support" if PARTITION_ADVANCED
+ 	default y if ATARI
+diff --git a/block/partitions/Makefile b/block/partitions/Makefile
+index 25d424922c6e..d6a68b45bb2f 100644
+--- a/block/partitions/Makefile
++++ b/block/partitions/Makefile
+@@ -11,6 +11,7 @@ obj-$(CONFIG_AIX_PARTITION) += aix.o
+ obj-$(CONFIG_CMDLINE_PARTITION) += cmdline.o
+ obj-$(CONFIG_MAC_PARTITION) += mac.o
+ obj-$(CONFIG_LDM_PARTITION) += ldm.o
++obj-$(CONFIG_LUKS_PARTITION) += luks.o
+ obj-$(CONFIG_MSDOS_PARTITION) += msdos.o
+ obj-$(CONFIG_OF_PARTITION) += of.o
+ obj-$(CONFIG_OSF_PARTITION) += osf.o
+diff --git a/block/partitions/check.h b/block/partitions/check.h
+index e5c1c61eb353..eddab0d5b4ec 100644
+--- a/block/partitions/check.h
++++ b/block/partitions/check.h
+@@ -60,6 +60,7 @@ int efi_partition(struct parsed_partitions *state);
+ int ibm_partition(struct parsed_partitions *);
+ int karma_partition(struct parsed_partitions *state);
+ int ldm_partition(struct parsed_partitions *state);
++int luks_partition(struct parsed_partitions *state);
+ int mac_partition(struct parsed_partitions *state);
+ int msdos_partition(struct parsed_partitions *state);
+ int of_partition(struct parsed_partitions *state);
+diff --git a/block/partitions/core.c b/block/partitions/core.c
+index 815ed33caa1b..fb21a9e08024 100644
+--- a/block/partitions/core.c
++++ b/block/partitions/core.c
+@@ -67,6 +67,9 @@ static int (*const check_part[])(struct parsed_partitions *) = {
+ #ifdef CONFIG_AMIGA_PARTITION
+ 	amiga_partition,
+ #endif
++#ifdef CONFIG_LUKS_PARTITION
++	luks_partition, /* this must come before atari */
++#endif
+ #ifdef CONFIG_ATARI_PARTITION
+ 	atari_partition,
+ #endif
+diff --git a/block/partitions/luks.c b/block/partitions/luks.c
+new file mode 100644
+index 000000000000..4185ca64630d
+--- /dev/null
++++ b/block/partitions/luks.c
+@@ -0,0 +1,46 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ *  fs/partitions/luks.c
++ *  LUKS on raw partition; this is important because a LUKS volume may detected
++ *  as a valid Atari partition table, breaking other detection.
++ *
++ *  Copyright (C) 2025 Robin H. Johnson (robbat2@gentoo.org)
++ *
++ *  Reference: https://gitlab.com/cryptsetup/LUKS2-docs/blob/master/luks2_doc_wip.pdf
++ *  Page 5, Figure 2: LUKS2 binary header on-disk structure
++ *  This only looks for the Magic & version; and NOT a UUID that starts at
++ *  offset 0xA8.
++ */
++
++#include <linux/ctype.h>
++#include <linux/compiler.h>
++#include "check.h"
++
++#define LUKS_MAGIC_1ST_V1		"LUKS\xba\xbe\x00\x01"
++#define LUKS_MAGIC_1ST_V2		"LUKS\xba\xbe\x00\x02"
++#define LUKS_MAGIC_2ND_V1		"SKUL\xba\xbe\x00\x01"
++#define LUKS_MAGIC_2ND_V2		"SKUL\xba\xbe\x00\x02"
++
++int luks_partition(struct parsed_partitions *state)
++{
++	Sector sect;
++	int ret = 0;
++	unsigned char *data;
++
++	data = read_part_sector(state, 0, &sect);
++
++	if (!data)
++		return -1;
++
++	if (memcmp(data, LUKS_MAGIC_1ST_V1, 8) == 0
++		|| memcmp(data, LUKS_MAGIC_2ND_V1, 8) == 0) {
++		strlcat(state->pp_buf, "LUKSv1\n", PAGE_SIZE);
++		ret = 1;
++	} else if (memcmp(data, LUKS_MAGIC_1ST_V2, 8) == 0
++		|| memcmp(data, LUKS_MAGIC_2ND_V2, 8) == 0) {
++		strlcat(state->pp_buf, "LUKSv2\n", PAGE_SIZE);
++		ret = 1;
++	}
++	put_dev_sector(sect);
++	return ret;
++}
 -- 
-2.43.0
+2.47.0
 
