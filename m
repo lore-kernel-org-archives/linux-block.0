@@ -1,122 +1,137 @@
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8894326A58;
-	Fri,  4 Jul 2025 07:57:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD4E1328AE4;
+	Fri,  4 Jul 2025 08:40:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751615865; cv=none; b=cDaMhBwWbO1DNHBi08PTmAI5q1r0TrfsEVn1pJge7w+07gJmfg5AdS54ZBvDCgfAE+cVBROpQNKXvbSPLJooufNB78vOB4ShfaMpZfPYw9Yh5JLvGJjuaVsznCRLAIbCMjQ1hwRu1opQ971XplUT5a1GBuqOAO6Gcv5n1Hkspbo=
+	t=1751618400; cv=none; b=DO+4XH/igW6zNQMj0MVkKegBUBQ5eHX2kwSpIIBpWYNCR67Na0tpeQqzLdMOyHyp2/Cr3r6v7DDQ+HotVFFZE3hpUxgCrku98eRVEvUZK+O28N7aIXDISxzOUUmPW177vHnnVrY0+lL5+Vwf01+U0pLv9VsHbtzdttH9xpMVTFE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751615865; c=relaxed/simple;
-	bh=bPS2JYksrIppycfYjPG2JSlEWAOe/ZXoQROBn/MlDBY=;
+	s=arc-20240116; t=1751618400; c=relaxed/simple;
+	bh=FHas3OLzhcWmJla/w9SVAWfRsC/N5brO1Le2ihalCNg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=q+n42N1qAmQGfEgKQU7fEUxmTehC3RfmxKXaQl2hQ4PhipArRBasdEAUpdP+S1MVIZLYvViSi+GrQIh5qMQS8FtqOTI2DWKNeB6+ERR8KEj5jT+velnKS0+92nmktO5vRACuY3wMTqAuEbF8RiqfQcNmmehFeByDHPQQrOm+K3U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=jTK77Tij; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+	 Content-Type:Content-Disposition:In-Reply-To; b=TN2UI3xyCfwRG2Zl3GjjqEP0gUD97Lrde26YuFL2ocVGOzIcKvc4MrsbLy7pOFTOE+SYnfxnbQwcJ/byijjLYkVgyMtM4bvdb/ZaPjiHX6cF53fbz1/XHoGaNUhohKRw6JpXr+sywUrNN/+CZ2gCEdKBEZBuydk+4csAmU3hG+s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VLpy79R3; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="jTK77Tij"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=5qrkD9bX+jI4ab6c+XtoSydd7j+KnW2OaBzeTTEC/QE=; b=jTK77Tij9gZIa4yFat5vka5xRz
-	zxo2K3t3N98K2N9r3t0x1GzxeIxrNCnwCWaXoIAcYUClezLp6LYgcNldRMWVG6g9Wl76TbfZVdEJo
-	8webAKr8ryhcY5PYw6AJiDWHNqoMr5QS+4SvlL1Zc3qnZ4gKNAd4lQYtfsMSWHxyzqpY=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uXbIH-000BBm-4J; Fri, 04 Jul 2025 09:57:13 +0200
-Date: Fri, 4 Jul 2025 09:57:13 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Tamir Duberstein <tamird@gmail.com>
-Cc: Benno Lossin <lossin@kernel.org>,
-	Michal Rostecki <vadorovsky@protonmail.com>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Alex Gaynor <alex.gaynor@gmail.com>,
-	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>,
-	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
-	Andreas Hindborg <a.hindborg@kernel.org>,
-	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>,
-	Brendan Higgins <brendan.higgins@linux.dev>,
-	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>,
-	Danilo Krummrich <dakr@kernel.org>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Russ Weight <russ.weight@linux.dev>,
-	FUJITA Tomonori <fujita.tomonori@gmail.com>,
-	Rob Herring <robh@kernel.org>,
-	Saravana Kannan <saravanak@google.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
-	Waiman Long <longman@redhat.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Bjorn Helgaas <bhelgaas@google.com>, Arnd Bergmann <arnd@arndb.de>,
-	Jens Axboe <axboe@kernel.dk>,
-	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
-	Dave Ertman <david.m.ertman@intel.com>,
-	Ira Weiny <ira.weiny@intel.com>, Leon Romanovsky <leon@kernel.org>,
-	Breno Leitao <leitao@debian.org>,
-	Viresh Kumar <viresh.kumar@linaro.org>,
-	Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>, rust-for-linux@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	kunit-dev@googlegroups.com, dri-devel@lists.freedesktop.org,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	llvm@lists.linux.dev, linux-pci@vger.kernel.org,
-	nouveau@lists.freedesktop.org, linux-block@vger.kernel.org,
-	linux-pm@vger.kernel.org, linux-clk@vger.kernel.org
-Subject: Re: [PATCH v13 2/5] rust: support formatting of foreign types
-Message-ID: <efe97ed7-dd60-4f1c-ac5c-b700300f0390@lunn.ch>
-References: <20250701-cstr-core-v13-0-29f7d3eb97a6@gmail.com>
- <20250701-cstr-core-v13-2-29f7d3eb97a6@gmail.com>
- <DB2BDSN1JH51.14ZZPETJORBC6@kernel.org>
- <CAJ-ks9nC=AyBPXRY3nJ0NuZvjFskzMcOkVNrBEfXD2hZ5uRntQ@mail.gmail.com>
- <DB2IJ9HBIM0W.3N0JVGKX558QI@kernel.org>
- <CAJ-ks9nF5+m+_bn0Pzi9yU0pw0TyN7Fs4x--mQ4ygyHz4A6hzg@mail.gmail.com>
- <DB2PIGAQHCJR.3BF8ZHECYH3KB@kernel.org>
- <CAJ-ks9=WmuXLJ6KkMEOP2jTvM_YBJO10SNsq0DU2J+_d4jp7qw@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VLpy79R3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11EA7C4CEF0;
+	Fri,  4 Jul 2025 08:39:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751618400;
+	bh=FHas3OLzhcWmJla/w9SVAWfRsC/N5brO1Le2ihalCNg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=VLpy79R3WoowQ0dde0FpFT1YyHsXsurqva+SkoBcww5fjPVnQMcwqe87L2wtjyLYi
+	 kRKqWJIQ81p4a1f0xNgpRmdmn+OPlPkQk/4+3lz4NrJRi0wbmnDt4pjvgXFACOvZxO
+	 qU9E5LKN5/hna1bw+wpVR2YB99mwlJCTB2beguJ1mHivp02SKA4At/U4wBW5k3iT/Q
+	 u3HMCjJxxvd2r71zcnuKhwU/Z06IvtD7wFREJ9CXS/1miJCbu6oYZeK5DrvOvTrTgE
+	 IHzvXhhXfrV+PFyTdnHzAjREeo0FCEO0Q5nKDCaILrTwFadudwtNVY/apMjWmKyCd5
+	 QDeadiD91wJeA==
+Date: Fri, 4 Jul 2025 10:39:53 +0200
+From: Christian Brauner <brauner@kernel.org>
+To: Zhang Yi <yi.zhang@huaweicloud.com>
+Cc: linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org, hch@lst.de, 
+	tytso@mit.edu, djwong@kernel.org, john.g.garry@oracle.com, bmarzins@redhat.com, 
+	chaitanyak@nvidia.com, shinichiro.kawasaki@wdc.com, martin.petersen@oracle.com, 
+	yi.zhang@huawei.com, chengzhihao1@huawei.com, yukuai3@huawei.com, 
+	yangerkun@huawei.com, linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org, 
+	linux-block@vger.kernel.org, dm-devel@lists.linux.dev, linux-nvme@lists.infradead.org, 
+	linux-scsi@vger.kernel.org
+Subject: Re: [PATCH v2 0/9] fallocate: introduce FALLOC_FL_WRITE_ZEROES flag
+Message-ID: <20250704-gemein-addieren-62ad4d210c70@brauner>
+References: <20250619111806.3546162-1-yi.zhang@huaweicloud.com>
+ <20250623-woanders-allabendlich-f87ae2d9c704@brauner>
+ <99010bfd-c968-49c7-b62b-c72b38722c1b@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CAJ-ks9=WmuXLJ6KkMEOP2jTvM_YBJO10SNsq0DU2J+_d4jp7qw@mail.gmail.com>
+In-Reply-To: <99010bfd-c968-49c7-b62b-c72b38722c1b@huaweicloud.com>
 
-> Yes, it probably can. As you say, some subsystems might interact - the
-> claimed benefit of doing this subsystem-by-subsystem split is that it
-> avoids conflicts with ongoing work that will conflict with a large
-> patch, but this is also the downside; if ongoing work changes the set
-> of interactions between subsystems then a maintainer may find
-> themselves unable to emit the log message they want (because one
-> subsystem is using kernel::fmt while another is still on core::fmt).
+On Thu, Jul 03, 2025 at 11:35:41AM +0800, Zhang Yi wrote:
+> On 2025/6/23 18:46, Christian Brauner wrote:
+> > On Thu, 19 Jun 2025 19:17:57 +0800, Zhang Yi wrote:
+> >> From: Zhang Yi <yi.zhang@huawei.com>
+> >>
+> >> Changes since v1:
+> >>  - Rebase codes on 6.16-rc2.
+> >>  - Use max_{hw|user}_wzeroes_unmap_sectors queue limits instead of
+> >>    BLK_FEAT_WRITE_ZEROES_UNMAP feature to represent the status of the
+> >>    unmap write zeroes operation as Christoph and Darrick suggested. This
+> >>    redoes the first 5 patches, so remove all the reviewed-by tags,
+> >>    please review them again.
+> >>  - Simplify the description of FALLOC_FL_WRITE_ZEROES in patch 06 as
+> >>    Darrick suggested.
+> >>  - Revise the check order of FALLOC_FL_WRITE_ZEROES in patch 08 as
+> >>    Christoph suggested.
+> >> Changes since RFC v4:
+> >>  - Rebase codes on 6.16-rc1.
+> >>  - Add a new queue_limit flag, and change the write_zeroes_unmap sysfs
+> >>    interface to RW mode. User can disable the unmap write zeroes
+> >>    operation by writing '0' to it when the operation is slow.
+> >>  - Modify the documentation of write_zeroes_unmap sysfs interface as
+> >>    Martin suggested.
+> >>  - Remove the statx interface.
+> >>  - Make the bdev and ext4 don't allow to submit FALLOC_FL_WRITE_ZEROES
+> >>    if the block device does not enable the unmap write zeroes operation,
+> >>    it should return -EOPNOTSUPP.
+> >> Changes sicne RFC v3:
+> >>  - Rebase codes on 6.15-rc2.
+> >>  - Add a note in patch 1 to indicate that the unmap write zeros command
+> >>    is not always guaranteed as Christoph suggested.
+> >>  - Rename bdev_unmap_write_zeroes() helper and move it to patch 1 as
+> >>    Christoph suggested.
+> >>  - Introduce a new statx attribute flag STATX_ATTR_WRITE_ZEROES_UNMAP as
+> >>    Christoph and Christian suggested.
+> >>  - Exchange the order of the two patches that modified
+> >>    blkdev_fallocate() as Christoph suggested.
+> >> Changes since RFC v2:
+> >>  - Rebase codes on next-20250314.
+> >>  - Add support for nvme multipath.
+> >>  - Add support for NVMeT with block device backing.
+> >>  - Clear FALLOC_FL_WRITE_ZEROES if dm clear
+> >>    limits->max_write_zeroes_sectors.
+> >>  - Complement the counterpart userspace tools(util-linux and xfs_io)
+> >>    and tests(blktests and xfstests), please see below for details.
+> >> Changes since RFC v1:
+> >>  - Switch to add a new write zeroes operation, FALLOC_FL_WRITE_ZEROES,
+> >>    in fallocate, instead of just adding a supported flag to
+> >>    FALLOC_FL_ZERO_RANGE.
+> >>  - Introduce a new flag BLK_FEAT_WRITE_ZEROES_UNMAP to the block
+> >>    device's queue limit features, and implement it on SCSI sd driver,
+> >>    NVMe SSD driver and dm driver.
+> >>  - Implement FALLOC_FL_WRITE_ZEROES on both the ext4 filesystem and
+> >>    block device (bdev).
+> >>
+> >> [...]
+> > 
+> > If needed, the branch can be declared stable and thus be used as base
+> > for other work.
+> > 
+> > ---
+> > 
+> > Applied to the vfs-6.17.fallocate branch of the vfs/vfs.git tree.
+> > Patches in the vfs-6.17.fallocate branch should appear in linux-next soon.
+> > 
+> > Please report any outstanding bugs that were missed during review in a
+> > new review to the original patch series allowing us to drop it.
+> > 
+> > It's encouraged to provide Acked-bys and Reviewed-bys even though the
+> > patch has now been applied. If possible patch trailers will be updated.
+> > 
+> > Note that commit hashes shown below are subject to change due to rebase,
+> > trailer updates or similar. If in doubt, please check the listed branch.
+> > 
+> > tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
+> > branch: vfs-6.17.fallocate
+> 
+> Hi Christian,
+> 
+> I noticed that this patch series doesn't appear to be merged into this
+> branch. Just wondering if it might have been missed?
 
-This sounds like an abstraction problem. As a developer, i just want
-an API to print stuff. I don't care about what happens underneath.
-
-Could you add an implementation of the API which uses core:fmt
-underneath. Get that merged. You can then convert each subsystem one
-by one to use the new API. Since all you are changing is the API, not
-the implementation, there is no compatibility issues. Then, once all
-users are converted to the API, you can have one patch which flips the
-implementation from core:fmt to kernel:fmt. It might take you three
-kernel cycles to get this done, but that is relatively fast for a tree
-wide change, which sometimes takes years.
-
-	Andrew
+Dammit, my script missed to push the branch. Fixed now. Thanks for
+checking!
