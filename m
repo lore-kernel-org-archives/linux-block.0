@@ -1,64 +1,64 @@
-Received: from mail-yb1-f178.google.com (mail-yb1-f178.google.com [209.85.219.178])
+Received: from mail-yb1-f170.google.com (mail-yb1-f170.google.com [209.85.219.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E31862D3EFC
-	for <linux-block@vger.kernel.org>; Fri,  4 Jul 2025 17:37:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64D02134CB
+	for <linux-block@vger.kernel.org>; Fri,  4 Jul 2025 17:45:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751650679; cv=none; b=hYd0wblVGrUjWbR2mHhKrhH4Rc7m+wRHfASw9jkZZK9MoCFr6B8qDXfRVdc7gtt+9xQHOHEnMm+OG9YLRPKV2me9p85Wf26Rm1OS9P7DL8VRPWw/bVOIt7VgGLzWPRZ1bm/UgckXrY4pMth6wHOpvhQ6xBZdmaVfiVx42kTfkRk=
+	t=1751651134; cv=none; b=qVyDaBTzylneFtsee5V09xOv3DWwcEX+FhevBLkCZ8yhowO0xvFCLK30ouMytmwUkxX4G2skojOk4i3W3HG0p4vVuKsCmeGaSPpBbyPJb1E6zMmwSsfWA+dlw7eguEFvKdKubd++m3UrHxUzMWosMrmZRJ+3hBY2S8yOnsHVIFE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751650679; c=relaxed/simple;
-	bh=9EALfSFFBRNxRqRk7VUICyoOrPWaEk2Bqic5Nq+c1QU=;
+	s=arc-20240116; t=1751651134; c=relaxed/simple;
+	bh=Nqm9M4UJIqwudHAuGH7UYCWuSwRLdeHqz5vOhTfsqY0=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Z29L7htXc4J8SlFJjK2p8fTc1KC7NIu627gROzNpyxwKcQMEjG11x8PSsP6HLNjLpkBdBThO3gAN3OYEprNjZJ7uI761xlF+s+uBVVGw5y+CWX5+EOdbi8J2aPlAUn4lWPx9UfxDWSeJ2xnZj/P2PN7IOWwblaDva6NzD50jvhE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dubeyko.com; spf=pass smtp.mailfrom=dubeyko.com; dkim=pass (2048-bit key) header.d=dubeyko-com.20230601.gappssmtp.com header.i=@dubeyko-com.20230601.gappssmtp.com header.b=IEoZN18k; arc=none smtp.client-ip=209.85.219.178
+	 Content-Type:MIME-Version; b=bYmi4Pll6Zj3Pt654t6emueBhI18tJtN97gKgaViw+D/u7bcnIXnFJdB/9fgfSG/TE8TqOZAhNxDFMMp6HX5u3GepooT1D1DUoe771P8kZ7bc0KKCC/23PkZal+e5Vhue2g+wDKCProro2qU0ygukW03FGLORjztwsr1mWWLs74=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dubeyko.com; spf=pass smtp.mailfrom=dubeyko.com; dkim=pass (2048-bit key) header.d=dubeyko-com.20230601.gappssmtp.com header.i=@dubeyko-com.20230601.gappssmtp.com header.b=kVHFVuE8; arc=none smtp.client-ip=209.85.219.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dubeyko.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dubeyko.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dubeyko-com.20230601.gappssmtp.com header.i=@dubeyko-com.20230601.gappssmtp.com header.b="IEoZN18k"
-Received: by mail-yb1-f178.google.com with SMTP id 3f1490d57ef6-e81cf6103a6so1069488276.3
-        for <linux-block@vger.kernel.org>; Fri, 04 Jul 2025 10:37:56 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=dubeyko-com.20230601.gappssmtp.com header.i=@dubeyko-com.20230601.gappssmtp.com header.b="kVHFVuE8"
+Received: by mail-yb1-f170.google.com with SMTP id 3f1490d57ef6-e81a7d90835so951520276.1
+        for <linux-block@vger.kernel.org>; Fri, 04 Jul 2025 10:45:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dubeyko-com.20230601.gappssmtp.com; s=20230601; t=1751650676; x=1752255476; darn=vger.kernel.org;
+        d=dubeyko-com.20230601.gappssmtp.com; s=20230601; t=1751651131; x=1752255931; darn=vger.kernel.org;
         h=mime-version:user-agent:content-transfer-encoding:autocrypt
          :references:in-reply-to:date:cc:to:from:subject:message-id:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=lLUj9yr52QgRuAClbNBOdP/RkbfnWsisubBXRJYh1fQ=;
-        b=IEoZN18kzQIDka8i89xchVuT9VJi5TSDgmA7iajf9iCpKJMdLU/FME99+PaRpUf1/4
-         qc7CsT4GxkO/hGTtDdUPGGNKS4qpG2egKULafSUTVvPUcgooIJHIGchgA20rgyFEvLkW
-         LMohtkvYAdOPNTRoUyxYxOQf/AXi633E4PfqiCHDa2rmOVZvim3U7Z6S2TVRp+WaynWO
-         +/xsSdARGxzVyti2okmY0NBhy1z4jas5mxFbIBrw1kl5sCVK0TltKHA8KmltkZtac+zh
-         VSnXvkt8hdoxeuv/ug7FSpRQL8lyVWNlLnZdqe/4E1DVTG2/EDfWYogE4aytjx/yt7mY
-         fwjg==
+        bh=sRRTUBR1HhzbPWZOo6ysCxsvxUXtkw1uTBwQrVosYbE=;
+        b=kVHFVuE8jGnyzQdWYrL9udFsL0iMBPRmEyadwhxcLNrX6PDfKdNPNT9naBKapb8K8g
+         GUylmwYGn6ekk2Mb9/UzFsxXqF8gl/w3kkI/IlNCUlOED4nwDtUvjPGlXg18kcg0h/4C
+         ZYrM2SYfJ0u9Oq0Wus3FzUo4WOtaRZoGotJTF6dN5fqhilicNygIRAGZjQHnE0BnS/ZR
+         4ELs8MJ868dMBRyOcWpdM0AL4/+DQsH2sP5Y/uhhSRi8IiYb4xj7eZJcLGGzHEgpvs6b
+         yc6OpyJmc9XBeu6ayBjQc7rKgG5LAq1PVpOw0iM4MMDb2UMJbmApocNSIOk53fF5qSW+
+         0erg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751650676; x=1752255476;
+        d=1e100.net; s=20230601; t=1751651131; x=1752255931;
         h=mime-version:user-agent:content-transfer-encoding:autocrypt
          :references:in-reply-to:date:cc:to:from:subject:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lLUj9yr52QgRuAClbNBOdP/RkbfnWsisubBXRJYh1fQ=;
-        b=YObMwb2aM5kkdGWUrTYTqYj3Zc7+owda7sRkCgU39d6dyeV0F/tXwlUDLoNdplRo56
-         NT9ZhWND7Un/K/mx/iT0Vb7huTk+8wh1JUemaAQhCD9mxyk+FiD/l4bGWQoUjEbhHaj6
-         9NGflBf9xg+7VMLoGSEkX7vmGHEA1Er/NocvUhvjZgkaXnD0XQVkox/RT2h2HUkTP8qu
-         +EdPUuBkmoAqV3b/bHVQKMtdKrtikFxBZbWZbQfzPaojPKlnZYwTAUsya9QY0/IEgUGT
-         KKmM8VUrhpgNwTF6kP2Y+eedJYcGA1HGhkkmV+Kq0LhArc0J1zwZnDIDFd970R5NnLl2
-         D57Q==
-X-Gm-Message-State: AOJu0YyWL3wqhSR1ylzpcL/wV5FMNfrDjlpLYofeKxLViirVBf/P9+lW
-	dpXmXWut9Sjn2tJNywYugzYVxHJ23eS9HZMoxPXW3xADA/daGpx2gslqJzQwk+B+zqc=
-X-Gm-Gg: ASbGncvo+VVV9lh16IzhrIJDTUDFMpbD/TILPZOzoX13YvaJxDEUu69Q0wjbaW5pdaS
-	s1CE7Tt+cRSXPGAQN+B9Cwa0yJQuHtNrCCQhTOFD5QQTpRoIeMv7jtvCsDTFSkEbu9RXm+7/+TV
-	CosgZjM+RL+yKSVaYoQ2ZhysXc1V/tsVrICN2HUjaaWUDZt/6vp8d+BUKBqQfRoJHS3qx0wzSQA
-	ae+37Z/F1fLPYu0FSR8uT7FmKJpQzjJAzpA7vus1MZk5GS2enqMO+CxshCsBwWBYs9mbugW6H22
-	zTxvlj8uJzPGWxlbwQyLvY4BCpEmTs/xQ1rZzcag7wMW2jLuwFXGSZEIwyU/Gbshwgx7Sq6rTDW
-	fjg5I2b2mM2onotRQauS3Ow552nKfpz4=
-X-Google-Smtp-Source: AGHT+IG/aHreLeb27PwZvmI50YVh3KULg7kve7WZz2i4AoC208Quitrbot6B7W1w0/7tBwFUvl1n9g==
-X-Received: by 2002:a05:690c:b84:b0:70f:84c8:3105 with SMTP id 00721157ae682-71668d73139mr47948477b3.37.1751650675940;
-        Fri, 04 Jul 2025 10:37:55 -0700 (PDT)
+        bh=sRRTUBR1HhzbPWZOo6ysCxsvxUXtkw1uTBwQrVosYbE=;
+        b=v/Q19ode3w85WWspR15E8ibOSFQfe1JSDTRT2dKVpQ3JRJNRGhq0SIa20GyQ8/cOC9
+         5Qn8jr2G2IWCyebK4a7ES3yvWEu8nRpvY7NhdGFDtKUHWPaIK96CU2JCXiWwaV3q7VdU
+         Fml94OljIXtDOjQf0diEQfS0sNVFWY/fIRdiDhumJHOchL8NqLnZhuXVyVR8rXZo1hWG
+         6Dms2qu1D2I4pXGZwtJIDpN8/YGJL1Jv5aqdTZ3iZ+B6nxrEQc08vlStv3cCHDPWBDsO
+         7q6mCq4qs9SH83L/u8L42E8/a5Gmxico9tzALCODrYXrQ7RjisyflBSjlBBDisp+X3CQ
+         hPLw==
+X-Gm-Message-State: AOJu0Yw37TnNFNJsjIr3MiE2D2p173vtv38End27OyUJFRoGIASMh+H4
+	jnVrSARDUrbXIkJ4j91h0djfyyR2+KUji8l1V/YrRUvHPPdWs3G0Uw4NoqxmvF+XkCQ=
+X-Gm-Gg: ASbGncvbSOhYRCccMm3YBiTlM6NjU2uDZ4yEdAi1034vNQ0hcHyUuo7oLMefIJPK0wY
+	FBRzF0Ng3Sr8aOGY/PqFk+ngNUqQ8wpnLs4KFcvatr6zH9CqYx/IyPJqrnVyY2QmKRiceIl9bee
+	X30cxLu5HK9efS423BgusUOoIJtKIqFfBo3hzKryPYqYrzkMwoZCx/xuIPcCt38hpKjb94gewlP
+	oPFFal5a25xvL+ON/wyrAX4+zkpn+ZOFpT8SOspIicEatEeXhNV4vcIeKzFzP5PG4VsNNHskUlV
+	aXkX3sgtbm7qymUDVEqvHJ9dqjtdirnruOdElef5/fjrWvRYU3TjvFWWCBhuKfxfOcT7bthNV9W
+	L8K94ZbDar7MkcMb6VJYmv9OvoEiZvyo=
+X-Google-Smtp-Source: AGHT+IHavxdRXfQcFPtCri7JPle6nXppaWnSECfYS7k4+PrbVcT/6JmmoNF/J8UBNVnhAzeOW0UVtw==
+X-Received: by 2002:a05:690c:3709:b0:70e:29d2:fba1 with SMTP id 00721157ae682-7166b66f4d6mr36192927b3.23.1751651131297;
+        Fri, 04 Jul 2025 10:45:31 -0700 (PDT)
 Received: from ?IPv6:2600:1700:6476:1430:f030:281a:9e2c:722? ([2600:1700:6476:1430:f030:281a:9e2c:722])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-7166599fc22sm4941937b3.28.2025.07.04.10.37.53
+        by smtp.gmail.com with ESMTPSA id 3f1490d57ef6-e899c48ba54sm754640276.43.2025.07.04.10.45.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Jul 2025 10:37:55 -0700 (PDT)
-Message-ID: <9d9d7bbab5443bd1c3dfd7d81d9bc91debecf4ef.camel@dubeyko.com>
-Subject: Re: [PATCH 4/4] hfs: enable uncached buffer io support
+        Fri, 04 Jul 2025 10:45:30 -0700 (PDT)
+Message-ID: <3c4ac1ab5f7afbbd745f88c595ee1465fc2e9ac6.camel@dubeyko.com>
+Subject: Re: [PATCH 3/4] hfsplus: enable uncached buffer io support
 From: Viacheslav Dubeyko <slava@dubeyko.com>
 To: Yangtao Li <frank.li@vivo.com>, axboe@kernel.dk,
  aivazian.tigran@gmail.com, 	viro@zeniv.linux.org.uk, brauner@kernel.org,
@@ -73,10 +73,10 @@ Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
 	jfs-discussion@lists.sourceforge.net, linux-nilfs@vger.kernel.org, 
 	ntfs3@lists.linux.dev, linux-karma-devel@lists.sourceforge.net, 
 	bpf@vger.kernel.org
-Date: Fri, 04 Jul 2025 10:37:52 -0700
-In-Reply-To: <20250626173023.2702554-5-frank.li@vivo.com>
+Date: Fri, 04 Jul 2025 10:45:27 -0700
+In-Reply-To: <20250626173023.2702554-4-frank.li@vivo.com>
 References: <20250626173023.2702554-1-frank.li@vivo.com>
-	 <20250626173023.2702554-5-frank.li@vivo.com>
+	 <20250626173023.2702554-4-frank.li@vivo.com>
 Autocrypt: addr=slava@dubeyko.com; prefer-encrypt=mutual;
  keydata=mQINBGgaTLYBEADaJc/WqWTeunGetXyyGJ5Za7b23M/ozuDCWCp+yWUa2GqQKH40dxRIR
  zshgOmAue7t9RQJU9lxZ4ZHWbi1Hzz85+0omefEdAKFmxTO6+CYV0g/sapU0wPJws3sC2Pbda9/eJ
@@ -123,45 +123,39 @@ MIME-Version: 1.0
 On Thu, 2025-06-26 at 11:30 -0600, Yangtao Li wrote:
 > Now cont_write_begin() support DONTCACHE mode, let's set
 > FOP_DONTCACHE
-> flag to enable uncached buffer io support for hfs.
+> flag to enable uncached buffer io support for hfsplus.
 >=20
 > Signed-off-by: Yangtao Li <frank.li@vivo.com>
 > ---
-> =C2=A0fs/hfs/inode.c | 1 +
+> =C2=A0fs/hfsplus/inode.c | 1 +
 > =C2=A01 file changed, 1 insertion(+)
 >=20
-> diff --git a/fs/hfs/inode.c b/fs/hfs/inode.c
-> index 8409e4412366..a62f45e9745d 100644
-> --- a/fs/hfs/inode.c
-> +++ b/fs/hfs/inode.c
-> @@ -695,6 +695,7 @@ static const struct file_operations
-> hfs_file_operations =3D {
-> =C2=A0	.fsync		=3D hfs_file_fsync,
-> =C2=A0	.open		=3D hfs_file_open,
-> =C2=A0	.release	=3D hfs_file_release,
+> diff --git a/fs/hfsplus/inode.c b/fs/hfsplus/inode.c
+> index 26cc150856b9..b790ffe92019 100644
+> --- a/fs/hfsplus/inode.c
+> +++ b/fs/hfsplus/inode.c
+> @@ -372,6 +372,7 @@ static const struct file_operations
+> hfsplus_file_operations =3D {
+> =C2=A0	.open		=3D hfsplus_file_open,
+> =C2=A0	.release	=3D hfsplus_file_release,
+> =C2=A0	.unlocked_ioctl =3D hfsplus_ioctl,
 > +	.fop_flags	=3D FOP_DONTCACHE,
 > =C2=A0};
 > =C2=A0
-> =C2=A0static const struct inode_operations hfs_file_inode_operations =3D =
-{
+> =C2=A0struct inode *hfsplus_new_inode(struct super_block *sb, struct inod=
+e
+> *dir,
 
-Frankly speaking, I am not convinced that HFS really need to support
-this feature. It is old and pretty obsolete file system. The main use-
-case is simply support the capability to mount HFS volume is created
-under Mac OS X, for example, and to access the data there. Of course,
-we can support this feature, but what is the point of this?
-
-As far as I can see, the goal of RWF_DONTCACHE feature is:
-
-"Common for both reads and writes with RWF_DONTCACHE is that they use
-the page cache for IO. Reads work just like a normal buffered read
-would, with the only exception being that the touched ranges will get
-pruned after data has been copied. For writes, the ranges will get
-writeback kicked off before the syscall returns, and then writeback
-completion will prune the range."
-
-So, who would like to see such efficiency in HFS? Do we really need to
-support it in HFS? I think that it is not.
+The same question for HFS+. Because, it is again old and pretty
+obsolete file system. :) The main use-case is simply support the
+capability to mount HFS+ volume is created under Mac OS X, for example,
+and to access the data there. What is the point to support this feature
+in HFS+? Currently, around 200 xfstests fails in HFS/HFS+. We even
+cannot test any new functionality properly. And guys reports bugs in
+existing functionality. We need to be focused on this right now. Sorry,
+HFS/HFS+ is not so good ground for implementing new features. :)
+We really need to stabilize the existing functionality right now. And
+we have a lot of work yet. :)=20
 
 Thanks,
-Slava. =20
+Slava.=20
