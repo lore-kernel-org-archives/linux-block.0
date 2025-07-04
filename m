@@ -1,71 +1,71 @@
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BE502FC3AF
-	for <linux-block@vger.kernel.org>; Fri,  4 Jul 2025 13:21:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D536C2FCE31
+	for <linux-block@vger.kernel.org>; Fri,  4 Jul 2025 13:30:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751635291; cv=none; b=Fh2R0VgDMMNdWZ5uCZENxRVbl+aYIF1WPPEJRlbzRbSygMpC4Bcya+9bNxrSzpXDuA1g2HHbOXXHARaGv+/uxFOjMzKJtxYPHUSSyahZdxu2eYRQFJOAiorRaovfNte+lh7uxXQzopsk85h8YVFe/uS8tT+e3BHwbyuImLbK3K0=
+	t=1751635837; cv=none; b=Z09IyOqGJh0X9YpkEfq9XSb++LA271vecQM1lXJhElJ7WDP1SKhSIZDv9QwF+juR1bXdkwRzql8w4KejgQJaz9LFTovuCSYjMQFMtVcPyLZnv2aeYt5vlD+8GlBRTSlpr9Y1YDT8rLHJ6qxq149xLLgL9ZeHMmWV9CLL9E2TE/U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751635291; c=relaxed/simple;
-	bh=7pn26wqB7E4DE9j9SBfVpNf9QfVcZlLPWhXa5E3wFDY=;
+	s=arc-20240116; t=1751635837; c=relaxed/simple;
+	bh=6KJTPyg9FavyyZPcffQhZl5PmrN3fsq62PnGfmpzhmw=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZetK69WwqQ6xp3GbM5oO4Efmcz12JHDdMdc4QaGUhY68ehMvqsXeTj5HCYRNpXyzqPhbBZjD2rVY9ZIKiRfaXUpiH8MiJIjCMPG8pSiU3++EvqAClCQF31JYY/bxyYYOl7LpGSQBxRWAQnbCHqevmLe/X5AtLr9yjZ6ig8z9R/g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=RqO4wxcA; arc=none smtp.client-ip=209.85.216.46
+	 To:Cc:Content-Type; b=XFquo0gptb3MBBnnY/FanKNaNe53dgNGX8Ex7xNYX38MMZ8qttbQjnsRSDrZNRZQxfpB/ojYkGFeO+YoAJXxZPrgstkK/zwHPmSWqnkTuXpv1jbQL0LWvUk9qWeerW3eLaFWsx130lSt2799kJxZW9hZ1dglMeeK3yTEJjEYcBo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=blKLZUgj; arc=none smtp.client-ip=209.85.216.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="RqO4wxcA"
-Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-313336f8438so163084a91.0
-        for <linux-block@vger.kernel.org>; Fri, 04 Jul 2025 06:21:28 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="blKLZUgj"
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-312f53d0609so162157a91.1
+        for <linux-block@vger.kernel.org>; Fri, 04 Jul 2025 06:30:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1751635288; x=1752240088; darn=vger.kernel.org;
+        d=purestorage.com; s=google2022; t=1751635834; x=1752240634; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=csIpx3MVIrBW0iB8PUre3Gjdgc8zO1/zBahLxylLNK4=;
-        b=RqO4wxcATY0DN1w0xMdQTqSQvbj/XBdi62Ap1815F11TgkV8hr4xQZy9rc/8q0OxGo
-         SvFvqnLVixyqdV6HvHBkvtDwgOTG6nuHWCSVFn5Abkl1K+rsMK7TrIlJT8igRNSEbDhM
-         LuFm/NJqRogi2DKGP3jj7uVxYTP0rGmpWveti4xRspeWUu8qDJDz0aMAT4ANdhJUy700
-         /N9Dj4Bkv0DaV7JicGjwFl1N2RHwabOgNIFUiC+jnq8BE0Uq38p0XC9fLC1WJ4Lq7HYM
-         MpTKpfm3TxTZJEcoLf+1qwwJOgJkqr1QazWUmVi7VIMV8cjnzoTh7CyTq7eazmcFzx3r
-         8/rQ==
+        bh=9OuIoHNns7sXRaM1bPO1h61cNT5JAFzjWi4tPy7COWQ=;
+        b=blKLZUgjHZxmUipf3zKlYBB8cOIX8XtOLC5RPnFO7+Wul3lXsfKZUyM+ErcR6uS/fb
+         p9s+XzYehnInQPLXty4abwwsu7sxGsqQtpXsIWBfiSQccWA6JsuVZY2hwr8eNK0FrItw
+         +OVqskVu3KtnD/+58eTgBP4JOcVyuqJ3+sgSy4sS2Jyp/vUXN9DYBBUx9LGfcqb82KXU
+         l07GNqlQifoqF8Nt6cy60l1fChUnxaq/DA2LBL+0xnxqFbR1GhBOx7+D70Wu8Wb6r2Eb
+         RACIzzbkrdG/SHm9cYsJeILz1abHPwVe+rha/mn9Om44XCc3/0CDfNGUMYGI+FRC6+sZ
+         sriQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751635288; x=1752240088;
+        d=1e100.net; s=20230601; t=1751635834; x=1752240634;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=csIpx3MVIrBW0iB8PUre3Gjdgc8zO1/zBahLxylLNK4=;
-        b=ECwNmYHJtMvRqA5HoVrd7yX9nFXYdvnKPIuSp7Eq6eYND+H/Y3J6ZpLhY3QJZo+FN8
-         lrXmVkhliaFJBWW9eif0Z9LXwZuEZXFzQz17c0rZP+Cnuu+8ZkwIQJpgBjWpHlORtj0G
-         nR+Y8wa3mKV0qLjmiuPHbmP68RZJdLQHqceQJJ2B+8qCoZkHmTxqSmVmpXnWNOuTFvH6
-         1I3oP+1glKNEeuxH2oylmEdBRSJ2qlCbq6xvMETJ2hOFWmyO8IABgOh/DfEiqHOqGCAo
-         ReAiU4dNJZhfJUuqei13e3/UJebwCC0LOE6MkT71Rwkx7yzLkqeAxho9S7pKVeDB0625
-         XZ3w==
-X-Forwarded-Encrypted: i=1; AJvYcCV5XwWH+Jp2VCOeTi/O09i1xiQksOSJrP0hkLW6B+ORkCDXrDook2D+WA7VLeqPH28nm8EhQBBpg75RCQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyeuTQYvlosXY0fDbllu8bxxkyG0jR+zUDhztkJIGvLEVG09VMl
-	PaDVTZ+Dye6fhEH2WYu+5dqrDLEAjjJWcestjcrESaoJgxjRusL7SDDvye49Y5BxF22L+lqce01
-	oktkSdEYGni3Wrn7y41dWkj5ERzXJs+2PjPTNvX80Jw==
-X-Gm-Gg: ASbGncsxBsTyteugohnfgS/Pyb+aBuNyCHvmbEmYvZPqKGNHGix1en5AR29VXRspzOh
-	khkqi1amyMKDo3q7D7QymNY//VweHo7dITvOd3xDzQChLmVmwIu3V65biSa3ucHROucmUtZTPQr
-	H3W+et7OpTc/sRDfbyi3igLFn2/qgjaYMEp1tfp1ceZw==
-X-Google-Smtp-Source: AGHT+IFIalK1q7PuYQacEOOylwigm3MLqAVV4a++wSj1Fi7xAU3siZ8xFwMAdPQtVl58SiCfoJH2rt6pVCi3h6Mkyec=
-X-Received: by 2002:a17:90b:50c7:b0:311:b0d3:851 with SMTP id
- 98e67ed59e1d1-31aacc13ff3mr1578721a91.4.1751635287572; Fri, 04 Jul 2025
- 06:21:27 -0700 (PDT)
+        bh=9OuIoHNns7sXRaM1bPO1h61cNT5JAFzjWi4tPy7COWQ=;
+        b=bJJO7+hSTDe/okicT2Y/sn0ob9ZhxkR3wfAm99tWx1W2zevsvL0flHAuoiiFel5Gsg
+         WyQuNfOlLoQIAAhf7DfwqV/VXBD+wecMTOVuGfw45ZSSON4mliCmCQRJC32CITA0wTXO
+         +O5B7Q6rbLTgAquQNHg8cTDOvTB9a0K2It4ZQr96pjh7qcp8GN58CacDv3BR1xp6Vfbu
+         K3jdD+3V79/cPaU58Vu1FcntgTc8u/stOkJta66Umodc+EFVErfx5rhWYtGtuziy1yhB
+         9GTpht621BSJD6re1s4o/+GFg65qu/4OHbhNGVKsO8G4LrIKmhQnhHbLamAtDcK95Wrz
+         5TwQ==
+X-Forwarded-Encrypted: i=1; AJvYcCULtYJhLUMKZNOMPXBGu1rxoJ5Z3TT4+AiaqyYfKMwKEtkYki9XiUlmA7AZHv34nXA/9IxXJ+KIBxd4Rg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzojMhLQkkhC6UmtaYMBRrZDvUwEdGovdksTGioq5/TcqERIbNg
+	GGHUWpFBkd3n5V1AZlh47+Y9ukTTvWqySUpV9576LyZ73cnpWRwb+/7EPgv0f8nAKBbBnqRerNG
+	qMwUOsHvDMh23PJbZYanYX6LwCqqZmuBP0fYGI/g/V1ucOPyBIWelpfw=
+X-Gm-Gg: ASbGncuqbT9lEzEtI3aL99WEpc+EhIgAjQDgGpUdKdoO5Gjhs39UevOUyGk6ELrHNZt
+	P0n12ujuEwWgJXMO6fnviTOQdWIfszRaRYLtHHOEYKbmvjSR+iuD194CFdv7FsuIPmmPInzszTu
+	yfZ/iCp/4ycDR0AppJ22enFjUV0SPLExBJS/o46z43JA==
+X-Google-Smtp-Source: AGHT+IHwuYt2meGxCPjsTKyKJX5r/H6iPran+P4kV/Mw56crza3jEFOkV8KGZv4EHHMsjSjVx23ud+wlMZvgN+zTSLE=
+X-Received: by 2002:a17:90b:3a48:b0:311:e9a6:332e with SMTP id
+ 98e67ed59e1d1-31aacaeafb0mr1647930a91.0.1751635834029; Fri, 04 Jul 2025
+ 06:30:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250703-ublk_too_many_quiesce-v2-0-3527b5339eeb@purestorage.com> <20250703-ublk_too_many_quiesce-v2-1-3527b5339eeb@purestorage.com>
-In-Reply-To: <20250703-ublk_too_many_quiesce-v2-1-3527b5339eeb@purestorage.com>
+References: <20250703-ublk_too_many_quiesce-v2-0-3527b5339eeb@purestorage.com> <20250703-ublk_too_many_quiesce-v2-2-3527b5339eeb@purestorage.com>
+In-Reply-To: <20250703-ublk_too_many_quiesce-v2-2-3527b5339eeb@purestorage.com>
 From: Caleb Sander Mateos <csander@purestorage.com>
-Date: Fri, 4 Jul 2025 09:21:16 -0400
-X-Gm-Features: Ac12FXzn9AZ9Q0t65Fv80-Zd62OhTB3LYs186s63t3QM7-GfH540rIL_HbSxleQ
-Message-ID: <CADUfDZrLOwGxwDg+QOPLXQKfZZbO5kVaV-V-qFQrFTkyOyHPkQ@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] ublk: speed up ublk server exit handling
+Date: Fri, 4 Jul 2025 09:30:22 -0400
+X-Gm-Features: Ac12FXwQzlE78Loda4q0DlP6iU3xmDaLeUCLiFUPl69-LZuHD0wllGiqI1RyMr4
+Message-ID: <CADUfDZoQHneCUQyB_kS7Jdm_sN9+d+FrUFa83a0yqiw66=ui+Q@mail.gmail.com>
+Subject: Re: [PATCH v2 2/2] ublk: introduce and use ublk_set_canceling helper
 To: Uday Shankar <ushankar@purestorage.com>
 Cc: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
 	linux-kernel@vger.kernel.org
@@ -75,61 +75,151 @@ Content-Transfer-Encoding: quoted-printable
 On Fri, Jul 4, 2025 at 1:41=E2=80=AFAM Uday Shankar <ushankar@purestorage.c=
 om> wrote:
 >
-> Recently, we've observed a few cases where a ublk server is able to
-> complete restart more quickly than the driver can process the exit of
-> the previous ublk server. The new ublk server comes up, attempts
-> recovery of the preexisting ublk devices, and observes them still in
-> state UBLK_S_DEV_LIVE. While this is possible due to the asynchronous
-> nature of io_uring cleanup and should therefore be handled properly in
-> the ublk server, it is still preferable to make ublk server exit
-> handling faster if possible, as we should strive for it to not be a
-> limiting factor in how fast a ublk server can restart and provide
-> service again.
+> For performance reasons (minimizing the number of cache lines accessed
+> in the hot path), we store the "canceling" state redundantly - there is
+> one flag in the device, which can be considered the source of truth, and
+> per-queue copies of that flag. This redundancy can cause confusion, and
+> opens the door to bugs where the state is set inconsistently. Try to
+> guard against these bugs by introducing a ublk_set_canceling helper
+> which is the sole mutator of both the per-device and per-queue canceling
+> state. This helper always sets the state consistently. Use the helper in
+> all places where we need to modify the canceling state.
 >
-> Analysis of the issue showed that the vast majority of the time spent in
-> handling the ublk server exit was in calls to blk_mq_quiesce_queue,
-> which is essentially just a (relatively expensive) call to
-> synchronize_rcu. The ublk server exit path currently issues an
-> unnecessarily large number of calls to blk_mq_quiesce_queue, for two
-> reasons:
->
-> 1. It tries to call blk_mq_quiesce_queue once per ublk_queue. However,
->    blk_mq_quiesce_queue targets the request_queue of the underlying ublk
->    device, of which there is only one. So the number of calls is larger
->    than necessary by a factor of nr_hw_queues.
-> 2. In practice, it calls blk_mq_quiesce_queue _more_ than once per
->    ublk_queue. This is because of a data race where we read
->    ubq->canceling without any locking when deciding if we should call
->    ublk_start_cancel. It is thus possible for two calls to
->    ublk_uring_cmd_cancel_fn against the same ublk_queue to both call
->    ublk_start_cancel against the same ublk_queue.
->
-> Fix this by making the "canceling" flag a per-device state. This
-> actually matches the existing code better, as there are several places
-> where the flag is set or cleared for all queues simultaneously, and
-> there is the general expectation that cancellation corresponds with ublk
-> server exit. This per-device canceling flag is then checked under a
-> (new) lock (addressing the data race (2) above), and the queue is only
-> quiesced if it is cleared (addressing (1) above). The result is just one
-> call to blk_mq_quiesce_queue per ublk device.
->
-> To minimize the number of cache lines that are accessed in the hot path,
-> the per-queue canceling flag is kept. The values of the per-device
-> canceling flag and all per-queue canceling flags should always match.
->
-> In our setup, where one ublk server handles I/O for 128 ublk devices,
-> each having 24 hardware queues of depth 4096, here are the results
-> before and after this patch, where teardown time is measured from the
-> first call to io_ring_ctx_wait_and_kill to the return from the last
-> ublk_ch_release:
->
->                                                 before          after
-> number of calls to blk_mq_quiesce_queue:        6469            256
-> teardown time:                                  11.14s          2.44s
->
-> There are still some potential optimizations here, but this takes care
-> of a big chunk of the ublk server exit handling delay.
+> No functional changes are expected.
 >
 > Signed-off-by: Uday Shankar <ushankar@purestorage.com>
+> ---
+>  drivers/block/ublk_drv.c | 54 ++++++++++++++++++++++++++++++------------=
+------
+>  1 file changed, 34 insertions(+), 20 deletions(-)
+>
+> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> index 870d57a853a481c2443337717c50d39355804f66..a1a700c7e67a72597e740aaa6=
+0f5c3c73f0085e5 100644
+> --- a/drivers/block/ublk_drv.c
+> +++ b/drivers/block/ublk_drv.c
+> @@ -1563,6 +1563,27 @@ static void ublk_put_disk(struct gendisk *disk)
+>                 put_device(disk_to_dev(disk));
+>  }
+>
+> +/*
+> + * Use this function to ensure that ->canceling is consistently set for
+> + * the device and all queues. Do not set these flags directly.
+> + *
+> + * Caller must ensure that:
+> + * - cancel_mutex is held. This ensures that there is no concurrent
+> + *   access to ub->canceling and no concurrent writes to ubq->canceling.
+> + * - there are no concurrent reads of ubq->canceling from the queue_rq
+> + *   path. This can be done by quiescing the queue, or through other
+> + *   means.
+> + */
+> +static void ublk_set_canceling(struct ublk_device *ub, bool canceling)
+> +       __must_hold(&ub->cancel_mutex)
+> +{
+> +       int i;
+> +
+> +       ub->canceling =3D canceling;
+> +       for (i =3D 0; i < ub->dev_info.nr_hw_queues; i++)
+> +               ublk_get_queue(ub, i)->canceling =3D canceling;
+> +}
+> +
+>  static int ublk_ch_release(struct inode *inode, struct file *filp)
+>  {
+>         struct ublk_device *ub =3D filp->private_data;
+> @@ -1591,13 +1612,11 @@ static int ublk_ch_release(struct inode *inode, s=
+truct file *filp)
+>          * All requests may be inflight, so ->canceling may not be set, s=
+et
+>          * it now.
+>          */
+> -       ub->canceling =3D true;
+> -       for (i =3D 0; i < ub->dev_info.nr_hw_queues; i++) {
+> -               struct ublk_queue *ubq =3D ublk_get_queue(ub, i);
+> -
+> -               ubq->canceling =3D true;
+> -               ublk_abort_queue(ub, ubq);
+> -       }
+> +       mutex_lock(&ub->cancel_mutex);
+> +       ublk_set_canceling(ub, true);
+> +       for (i =3D 0; i < ub->dev_info.nr_hw_queues; i++)
+> +               ublk_abort_queue(ub, ublk_get_queue(ub, i));
+> +       mutex_unlock(&ub->cancel_mutex);
 
-Reviewed-by: Caleb Sander Mateos <csander@purestorage.com>
+Pre-existing, but it doesn't look like the queue is quiesced yet here
+(that happens later in this function).
+
+Best,
+Caleb
+
+>         blk_mq_kick_requeue_list(disk->queue);
+>
+>         /*
+> @@ -1723,7 +1742,6 @@ static void ublk_abort_queue(struct ublk_device *ub=
+, struct ublk_queue *ubq)
+>  static void ublk_start_cancel(struct ublk_device *ub)
+>  {
+>         struct gendisk *disk =3D ublk_get_disk(ub);
+> -       int i;
+>
+>         /* Our disk has been dead */
+>         if (!disk)
+> @@ -1740,9 +1758,7 @@ static void ublk_start_cancel(struct ublk_device *u=
+b)
+>          * touch completed uring_cmd
+>          */
+>         blk_mq_quiesce_queue(disk->queue);
+> -       ub->canceling =3D true;
+> -       for (i =3D 0; i < ub->dev_info.nr_hw_queues; i++)
+> -               ublk_get_queue(ub, i)->canceling =3D true;
+> +       ublk_set_canceling(ub, true);
+>         blk_mq_unquiesce_queue(disk->queue);
+>  out:
+>         mutex_unlock(&ub->cancel_mutex);
+> @@ -1942,10 +1958,11 @@ static void ublk_reset_io_flags(struct ublk_devic=
+e *ub)
+>                 for (j =3D 0; j < ubq->q_depth; j++)
+>                         ubq->ios[j].flags &=3D ~UBLK_IO_FLAG_CANCELED;
+>                 spin_unlock(&ubq->cancel_lock);
+> -               ubq->canceling =3D false;
+>                 ubq->fail_io =3D false;
+>         }
+> -       ub->canceling =3D false;
+> +       mutex_lock(&ub->cancel_mutex);
+> +       ublk_set_canceling(ub, false);
+> +       mutex_unlock(&ub->cancel_mutex);
+>  }
+>
+>  /* device can only be started after all IOs are ready */
+> @@ -3417,7 +3434,7 @@ static int ublk_ctrl_quiesce_dev(struct ublk_device=
+ *ub,
+>         /* zero means wait forever */
+>         u64 timeout_ms =3D header->data[0];
+>         struct gendisk *disk;
+> -       int i, ret =3D -ENODEV;
+> +       int ret =3D -ENODEV;
+>
+>         if (!(ub->dev_info.flags & UBLK_F_QUIESCE))
+>                 return -EOPNOTSUPP;
+> @@ -3435,14 +3452,11 @@ static int ublk_ctrl_quiesce_dev(struct ublk_devi=
+ce *ub,
+>                 goto put_disk;
+>
+>         /* Mark the device as canceling */
+> +       mutex_lock(&ub->cancel_mutex);
+>         blk_mq_quiesce_queue(disk->queue);
+> -       ub->canceling =3D true;
+> -       for (i =3D 0; i < ub->dev_info.nr_hw_queues; i++) {
+> -               struct ublk_queue *ubq =3D ublk_get_queue(ub, i);
+> -
+> -               ubq->canceling =3D true;
+> -       }
+> +       ublk_set_canceling(ub, true);
+>         blk_mq_unquiesce_queue(disk->queue);
+> +       mutex_unlock(&ub->cancel_mutex);
+>
+>         if (!timeout_ms)
+>                 timeout_ms =3D UINT_MAX;
+>
+> --
+> 2.34.1
+>
