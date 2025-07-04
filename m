@@ -1,119 +1,102 @@
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB8F62857FA;
-	Fri,  4 Jul 2025 07:47:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B12E82FC00C;
+	Fri,  4 Jul 2025 07:55:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751615236; cv=none; b=urDJincCOqg36IldaJIJHfOI7099astX/6wi49t+5ES69vtnuqrjg9r2vcK0u/w5/g0D9Hlr+rknQAZTYEnXhT2HexlypjduVUT27RO+usfYOCgk8H2cn6Lm2+8wLAeYWjF6l0HKF6tC2Wc0ohvwP7rLgvMRWnuHdrYXHhEY240=
+	t=1751615718; cv=none; b=DnbiO0Qekwib/l27fygs8KM+lPBNs2/YHwEvJa6wTNmibjZ3/vt5NMfLSnKDLbn1EMW8xCf7daoRNx62ijIqBgRxGJSGhdWjUeiU0wNTOWgt/NJosy3OLFYo9eTi7M24CN6RCFv0wf/EB1SO7tzrHxWRvXKf35S/oGczFEjBlIk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751615236; c=relaxed/simple;
-	bh=8gB+AO68oAYcL/RcwfcXX8F3VEcyUkNlDhqHsTYg8h4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DcNPGJhB8nWy0p/8vuHuFAx9f/OaNeC5w16RBEBXto/KVM4cjFDsA/MM2Lt+ET+4sNXToLytGJ8BrrmKVCQLVtZLIcrSDn4A/xKzS5FO7AlYsLuQlYzfgF1tvxXm73q3WAvfbu3KSjNNqWkN4pw90DKuBS6b+Llwh2kXit9gHH0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=s7b8gHjl; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+	s=arc-20240116; t=1751615718; c=relaxed/simple;
+	bh=BB3rhAsySMZ6PI5adPReuYJsqbTYSmLkgXXONyBiWNQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=hmVSk+lOnKxeWbB2whf8EYa4L0Okc6L78nq3RwnjT9lZGszukhXzEeGOtb6fDX9kOBZn+hHxqaHBwibwtgjjoIIhXZtJqyDzIbc3033py5oabb+1pJsjvmUChFDGVjbxuM2mdzrtFkd2cQjZMebaVu+5WEiuDzxchZnr9lZzBfc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Bx3uzdZK; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="s7b8gHjl"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=lLeBr9v7iWnmJB5WR8E+Qdx4chL/QEo8kPrObOm2XBg=; b=s7b8gHjlLshr/s6aHjDwESkoZv
-	9xldLQc20XR4fF5OqxXWznCzk91go6X0+1hokaiCtTzgcvzRs3qRiKtfsqTUJE7KKzeAgCKHREsra
-	kvnr9afUyBdWT23H0Pp+eDaPiqOZEqx4FXHdDlmRumtj22gq0Q3GoFqjbkWKDBxQn6m8=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uXb7w-000B5q-N9; Fri, 04 Jul 2025 09:46:32 +0200
-Date: Fri, 4 Jul 2025 09:46:32 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Tamir Duberstein <tamird@gmail.com>
-Cc: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
-	Benno Lossin <lossin@kernel.org>,
-	Michal Rostecki <vadorovsky@protonmail.com>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Alex Gaynor <alex.gaynor@gmail.com>,
-	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>,
-	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
-	Andreas Hindborg <a.hindborg@kernel.org>,
-	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>,
-	Brendan Higgins <brendan.higgins@linux.dev>,
-	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>,
-	Danilo Krummrich <dakr@kernel.org>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Russ Weight <russ.weight@linux.dev>,
-	FUJITA Tomonori <fujita.tomonori@gmail.com>,
-	Rob Herring <robh@kernel.org>,
-	Saravana Kannan <saravanak@google.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
-	Waiman Long <longman@redhat.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Bjorn Helgaas <bhelgaas@google.com>, Arnd Bergmann <arnd@arndb.de>,
-	Jens Axboe <axboe@kernel.dk>,
-	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
-	Dave Ertman <david.m.ertman@intel.com>,
-	Ira Weiny <ira.weiny@intel.com>, Leon Romanovsky <leon@kernel.org>,
-	Breno Leitao <leitao@debian.org>,
-	Viresh Kumar <viresh.kumar@linaro.org>,
-	Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>, rust-for-linux@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	kunit-dev@googlegroups.com, dri-devel@lists.freedesktop.org,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	llvm@lists.linux.dev, linux-pci@vger.kernel.org,
-	nouveau@lists.freedesktop.org, linux-block@vger.kernel.org,
-	linux-pm@vger.kernel.org, linux-clk@vger.kernel.org
-Subject: Re: [PATCH v13 2/5] rust: support formatting of foreign types
-Message-ID: <307d7547-b8da-4a82-9ae6-c95f66a283d2@lunn.ch>
-References: <20250701-cstr-core-v13-0-29f7d3eb97a6@gmail.com>
- <20250701-cstr-core-v13-2-29f7d3eb97a6@gmail.com>
- <DB2BDSN1JH51.14ZZPETJORBC6@kernel.org>
- <CAJ-ks9nC=AyBPXRY3nJ0NuZvjFskzMcOkVNrBEfXD2hZ5uRntQ@mail.gmail.com>
- <DB2IJ9HBIM0W.3N0JVGKX558QI@kernel.org>
- <CAJ-ks9nF5+m+_bn0Pzi9yU0pw0TyN7Fs4x--mQ4ygyHz4A6hzg@mail.gmail.com>
- <34c00dfa-8302-45ee-8d80-58b97a08e52e@lunn.ch>
- <CANiq72ksOG10vc36UDdBytsM-LT7PdgjcZ9B0dkqSETH6a0ezA@mail.gmail.com>
- <CAJ-ks9mkC3ncTeTiJo54p2nAgoBgTKdRsAwEEwZE2CtwbAS7BA@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Bx3uzdZK"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1751615717; x=1783151717;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=BB3rhAsySMZ6PI5adPReuYJsqbTYSmLkgXXONyBiWNQ=;
+  b=Bx3uzdZKL1qSdVIXvUCcDbfiwZ4LTFacw8Z43uGNX1DGa/XS1qtCV/6u
+   V4n/qkEKV4ttWH7o84s+wtp3yUSBPOtfs6dpqhZDRKtJ21G8rdP4E/o6h
+   qeT3ZMnls9Ur0z/kjTdRoDijnhf1NtHljVwhtY7trrrUaPBCYGQZ98e+l
+   cJLVYg4zaYTaBuReDkQLJqDfOsRtgBTeJ7JOXRREaRAz6e1bk/T6gXnyk
+   glZ6yEX6ecBIW3iGgPm7rKZedaqQNd+Vg+0OjVerljpWpm13ttviS1JDB
+   X6gONKaH5NuZdYIK/5XZm0lU5OWzrFre6v2Rtx1SuSTNXe8fsj6rGzLXS
+   A==;
+X-CSE-ConnectionGUID: X/ljuuA1TvGv4h2RFwld4Q==
+X-CSE-MsgGUID: khq9JthbTY2eSyiCVshPog==
+X-IronPort-AV: E=McAfee;i="6800,10657,11483"; a="64194371"
+X-IronPort-AV: E=Sophos;i="6.16,286,1744095600"; 
+   d="scan'208";a="64194371"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jul 2025 00:55:05 -0700
+X-CSE-ConnectionGUID: k4jNQM5LRgW24dmJhqpysg==
+X-CSE-MsgGUID: 4+8QGBjSTfKjJk3ao15Olg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,286,1744095600"; 
+   d="scan'208";a="158616721"
+Received: from jkrzyszt-mobl2.ger.corp.intel.com (HELO svinhufvud.fi.intel.com) ([10.245.244.244])
+  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jul 2025 00:55:03 -0700
+Received: from svinhufvud.lan (localhost [IPv6:::1])
+	by svinhufvud.fi.intel.com (Postfix) with ESMTP id C686E44419;
+	Fri,  4 Jul 2025 10:55:01 +0300 (EEST)
+Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6 krs, Bertel Jungin Aukio 5, 02600 Espoo
+From: Sakari Ailus <sakari.ailus@linux.intel.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 77/80] block: pm: Remove redundant pm_runtime_mark_last_busy() calls
+Date: Fri,  4 Jul 2025 10:55:01 +0300
+Message-Id: <20250704075501.3223068-1-sakari.ailus@linux.intel.com>
+X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20250704075225.3212486-1-sakari.ailus@linux.intel.com>
+References: <20250704075225.3212486-1-sakari.ailus@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJ-ks9mkC3ncTeTiJo54p2nAgoBgTKdRsAwEEwZE2CtwbAS7BA@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
 
-> There's also a tactical question about splitting by subsystem: are
-> there any tools that would assist in doing this, or is it a matter of
-> manually consulting MAINTAINERS to figure out file groupings?
+pm_runtime_put_autosuspend(), pm_runtime_put_sync_autosuspend(),
+pm_runtime_autosuspend() and pm_request_autosuspend() now include a call
+to pm_runtime_mark_last_busy(). Remove the now-reduntant explicit call to
+pm_runtime_mark_last_busy().
 
-You can run ./scripts/get_maintainer -f path/to/file.c
+Signed-off-by: Sakari Ailus <sakari.ailus@linux.intel.com>
+---
+The cover letter of the set can be found here
+<URL:https://lore.kernel.org/linux-pm/20250704075225.3212486-1-sakari.ailus@linux.intel.com>.
 
-and it will give you the Maintainers for that file. From that you can
-imply the subsystem.
+In brief, this patch depends on PM runtime patches adding marking the last
+busy timestamp in autosuspend related functions. The patches are here, on
+rc2:
 
-It might be possible to do one tree wide patchset, since Rust is still
-small at the moment. But you will need to get Reviewed-by: or
-Acked-by: from each subsystem Maintainer for the patches. That is not
-always easy, since some subsystems have CI systems, and will want the
-patch to pass their CI tests before giving an Reviewed-by.
+        git://git.kernel.org/pub/scm/linux/kernel/git/rafael/linux-pm.git \
+                pm-runtime-6.17-rc1
 
-	Andrew
+ block/blk-pm.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/block/blk-pm.c b/block/blk-pm.c
+index 8d3e052f91da..d6eab3193a20 100644
+--- a/block/blk-pm.c
++++ b/block/blk-pm.c
+@@ -181,7 +181,6 @@ void blk_post_runtime_resume(struct request_queue *q)
+ 	spin_lock_irq(&q->queue_lock);
+ 	old_status = q->rpm_status;
+ 	q->rpm_status = RPM_ACTIVE;
+-	pm_runtime_mark_last_busy(q->dev);
+ 	pm_request_autosuspend(q->dev);
+ 	spin_unlock_irq(&q->queue_lock);
+ 
+-- 
+2.39.5
+
