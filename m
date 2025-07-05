@@ -1,42 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F2841F0995;
-	Sat,  5 Jul 2025 01:33:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8986CF9C0;
+	Sat,  5 Jul 2025 02:18:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751679210; cv=none; b=jhoYDd4C1fXPg1H7dMQfMMJBP5gH+wY5y9ybctSV2p3OPRFn7Ga+89IUWEDOKhdoOzA+53LMfZjclldvUNy72UbTp17gPf3qKZxwkSKudvhJ662SX1td5w3QToa/Ge2obbUcfvliD3V7bciZp0fnYc9rmrMz5gjPcYo48yMjJD4=
+	t=1751681880; cv=none; b=pGCBkEQkPZo3t4m2+obhLSMqRhnRzAqSMfmfW9mcnOXGYtfhAGmCbKQPKkIZFNlaCTTTFYQuzi8hS+HCznY1HEBFlP9nis8uj2BAu9kLr8E+6Xq8cBd7CgfqoBE0MOfbiAfSctHma5FK9P51R5mWZlhwve1OQZFw2P/VqgY3/PU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751679210; c=relaxed/simple;
-	bh=Mt7nBG61m28mg1SmjDJBIU0VSnjB5SNnAUT6Jhbbl60=;
+	s=arc-20240116; t=1751681880; c=relaxed/simple;
+	bh=KLjzJvmcBlWpVpZts+62XfmqQ3g7Cx0jAYoobQykBWQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bh8apkAe410PEhi4uCE5FOd2+rcGfF9fvheAIXp7xks99W/k6JM4UNM4GFV1vvTM6teI5m5jc7QtTD0DtcQsM6364PVpough5kFwM7lFaFL3+037zjlK3psitMngTDmgDo9zSQOrzCDNDqg8aq5O18H+v6lhiUqlFfRheFAYA9E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TnnvYafJ; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=ErI0svsGcqFFpsVV0l9IeJsJqVdGqlAThJiP6lB5UYIA9H3+yJ9dIGFy4OLxfV29HUghmYceA0dc73uUTzdrCcUrFSfDeH3AJyexMEoLmS/BpKEjVyH9BR1LfdR9FLSqoZde4LK6RP9eYnMGEQltPf96Ibw3T2hMEUqYMLgb900=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VzETWLqj; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TnnvYafJ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D969C4CEEF;
-	Sat,  5 Jul 2025 01:33:29 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VzETWLqj"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9EE1C4CEE3;
+	Sat,  5 Jul 2025 02:17:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751679209;
-	bh=Mt7nBG61m28mg1SmjDJBIU0VSnjB5SNnAUT6Jhbbl60=;
+	s=k20201202; t=1751681880;
+	bh=KLjzJvmcBlWpVpZts+62XfmqQ3g7Cx0jAYoobQykBWQ=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=TnnvYafJ1FqL3kk/niuTAHCn1JLzZdjtxcscpJ7d3XKB5PLc9QYOuH5mrqyVz6CAx
-	 vZC7eAp/H753aUcrOt0O2knMuCDOUOZLlIwCJJpA+b8X03aX+qPVD6hUg53Zre7uL7
-	 c2p3AcwfRCFqddiHWKGQXHCMWDqhwfZ6auHambPZtHCdsWPm9jvIjxNkq87yn6KgYf
-	 VGNvLIjgHzUZHvTJTKja4ArFFoASvs3fJg/1HjjwJl3rSFbcb331pKr2e/4UPuyaaZ
-	 YTmMmsQzh9UPX3fbSXihDptsOeAJuoXWXubkBNJDuuEMTmCQ211aK4ym+EIngAkyYa
-	 ffOQDW/so2NMA==
-Date: Fri, 4 Jul 2025 18:33:27 -0700
+	b=VzETWLqjWZcKNCgqZ4QwJI8Y8jNIC8TpkG3aA0Dg9PMGymVZ3TZnIcm0Wb1SiOzGZ
+	 XllzMlAJkoQyvhtxNX2hwbZDUdKb12OcouivgEEr0Y+85oG6KvFProfFCPK1XZKDfR
+	 nu2Mf9pT59RBIU6DXd3RJIyrTJEH8Jhs/np6BWGWFQcKfgWIh6iChcJePC4Wp3UTHz
+	 /xjVhl3DvZBC8xPtPAn5D1S1xRJPOWy6yYYLbEkfi763bDdlInLn8f7ZoOjGNJses3
+	 913qVza8FoCm6n5nAf5Q4lLDFRfqIZ2dsqzkxhwh5Vn0VjIYbrFo0RBFKtQOD36RP4
+	 l/HXzUENQ9z3A==
+Date: Fri, 4 Jul 2025 19:17:58 -0700
 From: Luis Chamberlain <mcgrof@kernel.org>
-To: Pankaj Raghav <p.raghav@samsung.com>
-Cc: Matthew Wilcox <willy@infradead.org>, Hannes Reinecke <hare@suse.de>,
-	Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org, gost.dev@samsung.com,
-	kernel@pankajraghav.com, hch@lst.de,
-	Christian Brauner <brauner@kernel.org>
-Subject: Re: [PATCH] block: reject bs > ps block devices when THP is disabled
-Message-ID: <aGiA5yayJwnGdp6i@bombadil.infradead.org>
-References: <20250704092134.289491-1-p.raghav@samsung.com>
+To: syzbot <syzbot+f4f84b57a01d6b8364ad@syzkaller.appspotmail.com>
+Cc: axboe@kernel.dk, brauner@kernel.org, hare@suse.de,
+	hirofumi@mail.parknet.co.jp, linkinjeon@kernel.org,
+	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org, sj1557.seo@samsung.com,
+	syzkaller-bugs@googlegroups.com, willy@infradead.org,
+	p.raghav@samsung.com
+Subject: Re: [syzbot] [exfat?] kernel BUG in folio_set_bh
+Message-ID: <aGiLVkgBqh19rc6w@bombadil.infradead.org>
+References: <6865e87a.a70a0220.2b31f5.000a.GAE@google.com>
+ <68663a26.a70a0220.5d25f.0856.GAE@google.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -45,51 +47,41 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250704092134.289491-1-p.raghav@samsung.com>
+In-Reply-To: <68663a26.a70a0220.5d25f.0856.GAE@google.com>
 
-On Fri, Jul 04, 2025 at 11:21:34AM +0200, Pankaj Raghav wrote:
-> If THP is disabled and when a block device with logical block size >
-> page size is present, the following null ptr deref panic happens during
-> boot:
+On Thu, Jul 03, 2025 at 01:07:02AM -0700, syzbot wrote:
+> syzbot has bisected this issue to:
 > 
-> [   [13.2 mK  AOSAN: null-ptr-deref in range [0x0000000000000000-0x0000000000K0 0 0[07]
-> [   13.017749] RIP: 0010:create_empty_buffers+0x3b/0x380
-> <snip>
-> [   13.025448] Call Trace:
-> [   13.025692]  <TASK>
-> [   13.025895]  block_read_full_folio+0x610/0x780
-> [   13.026379]  ? __pfx_blkdev_get_block+0x10/0x10
-> [   13.027008]  ? __folio_batch_add_and_move+0x1fa/0x2b0
-> [   13.027548]  ? __pfx_blkdev_read_folio+0x10/0x10
-> [   13.028080]  filemap_read_folio+0x9b/0x200
-> [   13.028526]  ? __pfx_filemap_read_folio+0x10/0x10
-> [   13.029030]  ? __filemap_get_folio+0x43/0x620
-> [   13.029497]  do_read_cache_folio+0x155/0x3b0
-> [   13.029962]  ? __pfx_blkdev_read_folio+0x10/0x10
-> [   13.030381]  read_part_sector+0xb7/0x2a0
-> [   13.030805]  read_lba+0x174/0x2c0
-> <snip>
-> [   13.045348]  nvme_scan_ns+0x684/0x850 [nvme_core]
-> [   13.045858]  ? __pfx_nvme_scan_ns+0x10/0x10 [nvme_core]
-> [   13.046414]  ? _raw_spin_unlock+0x15/0x40
-> [   13.046843]  ? __switch_to+0x523/0x10a0
-> [   13.047253]  ? kvm_clock_get_cycles+0x14/0x30
-> [   13.047742]  ? __pfx_nvme_scan_ns_async+0x10/0x10 [nvme_core]
-> [   13.048353]  async_run_entry_fn+0x96/0x4f0
-> [   13.048787]  process_one_work+0x667/0x10a0
-> [   13.049219]  worker_thread+0x63c/0xf60
+> commit 47dd67532303803a87f43195e088b3b4bcf0454d
+> Author: Luis Chamberlain <mcgrof@kernel.org>
+> Date:   Fri Feb 21 22:38:22 2025 +0000
 > 
-> As large folio support depends on THP, only allow bs > ps block devices
-> if THP is enabled.
+>     block/bdev: lift block size restrictions to 64k
 > 
+> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=15ec33d4580000
+> start commit:   50c8770a42fa Add linux-next specific files for 20250702
+> git tree:       linux-next
+> final oops:     https://syzkaller.appspot.com/x/report.txt?x=17ec33d4580000
+> console output: https://syzkaller.appspot.com/x/log.txt?x=13ec33d4580000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=d831c9dfe03f77ec
+> dashboard link: https://syzkaller.appspot.com/bug?extid=f4f84b57a01d6b8364ad
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15c93770580000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1001aebc580000
+> 
+> Reported-by: syzbot+f4f84b57a01d6b8364ad@syzkaller.appspotmail.com
 > Fixes: 47dd67532303 ("block/bdev: lift block size restrictions to 64k")
-> Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
+> 
+> For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
-Reviewed-by: Luis Chamberlain <mcgrof@kernel.org>
+Odd, I can't see where the null pointer comes from.
 
-I guess 0-day and syzbot doesn't test non-THP kernels, or they just
-hand't tried a block device with a larger sector size yet. I know LTP
-had their code updated to use the new limit so that'll take a while to
-propagate.
+bdev_getblk() --> __getblk_slow() properly returns NULL and doesn't use
+the data. But neither does fat_fill_super() on failure. My only
+suspicion was on fat_msg() but that sb usage seems fine and the goto out_fail
+seems fine as iput() also doesn't process null inodes and unload_nls()
+is fine. The return value is also set to -EIO correctly so we don't return NULL
+actually. I jus tdon't see anything odd on _fat_msg() either.
+
+Hrm..
 
   Luis
