@@ -1,44 +1,97 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8986CF9C0;
-	Sat,  5 Jul 2025 02:18:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C5771FE474;
+	Sat,  5 Jul 2025 08:04:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751681880; cv=none; b=pGCBkEQkPZo3t4m2+obhLSMqRhnRzAqSMfmfW9mcnOXGYtfhAGmCbKQPKkIZFNlaCTTTFYQuzi8hS+HCznY1HEBFlP9nis8uj2BAu9kLr8E+6Xq8cBd7CgfqoBE0MOfbiAfSctHma5FK9P51R5mWZlhwve1OQZFw2P/VqgY3/PU=
+	t=1751702701; cv=none; b=ayOVNnrjpiQlEHnOrSvPQ0falbp3Av6AtF/B9p3gUCq3XvlRhRKgN9FbWZlTae+oBv5gtocWQbBUcZEJnLccPf0p/kPQa07eaNzFSJvRKxcilBrNg6ic+pUY+VNZaqfiSfVlQC6oM9aV5xFh291g+KOqfGM+N3AqBTzdDC1/RDg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751681880; c=relaxed/simple;
-	bh=KLjzJvmcBlWpVpZts+62XfmqQ3g7Cx0jAYoobQykBWQ=;
+	s=arc-20240116; t=1751702701; c=relaxed/simple;
+	bh=U8NsfQg6c0knWs9dyk4H2KnEFXMYtXjYXDrkEYXnUb8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ErI0svsGcqFFpsVV0l9IeJsJqVdGqlAThJiP6lB5UYIA9H3+yJ9dIGFy4OLxfV29HUghmYceA0dc73uUTzdrCcUrFSfDeH3AJyexMEoLmS/BpKEjVyH9BR1LfdR9FLSqoZde4LK6RP9eYnMGEQltPf96Ibw3T2hMEUqYMLgb900=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VzETWLqj; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=X0rl+dPl5tzYI3sMzDO2uuFCP5hzRTuW417RuQHgC47TLaaE2Wv1fY20lghC0olrqJESeUfFMRjI8eYqieHUZZNCC9B1ohZeaOpZ4o6BNGprfbwiXEYQ1aG/utnX49ATlcjWkrGc8rW5/LR402M1vMfOp397GsLDFDPMwa8Ipi0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=WovYhOnm; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VzETWLqj"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9EE1C4CEE3;
-	Sat,  5 Jul 2025 02:17:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751681880;
-	bh=KLjzJvmcBlWpVpZts+62XfmqQ3g7Cx0jAYoobQykBWQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=VzETWLqjWZcKNCgqZ4QwJI8Y8jNIC8TpkG3aA0Dg9PMGymVZ3TZnIcm0Wb1SiOzGZ
-	 XllzMlAJkoQyvhtxNX2hwbZDUdKb12OcouivgEEr0Y+85oG6KvFProfFCPK1XZKDfR
-	 nu2Mf9pT59RBIU6DXd3RJIyrTJEH8Jhs/np6BWGWFQcKfgWIh6iChcJePC4Wp3UTHz
-	 /xjVhl3DvZBC8xPtPAn5D1S1xRJPOWy6yYYLbEkfi763bDdlInLn8f7ZoOjGNJses3
-	 913qVza8FoCm6n5nAf5Q4lLDFRfqIZ2dsqzkxhwh5Vn0VjIYbrFo0RBFKtQOD36RP4
-	 l/HXzUENQ9z3A==
-Date: Fri, 4 Jul 2025 19:17:58 -0700
-From: Luis Chamberlain <mcgrof@kernel.org>
-To: syzbot <syzbot+f4f84b57a01d6b8364ad@syzkaller.appspotmail.com>
-Cc: axboe@kernel.dk, brauner@kernel.org, hare@suse.de,
-	hirofumi@mail.parknet.co.jp, linkinjeon@kernel.org,
-	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org, sj1557.seo@samsung.com,
-	syzkaller-bugs@googlegroups.com, willy@infradead.org,
-	p.raghav@samsung.com
-Subject: Re: [syzbot] [exfat?] kernel BUG in folio_set_bh
-Message-ID: <aGiLVkgBqh19rc6w@bombadil.infradead.org>
-References: <6865e87a.a70a0220.2b31f5.000a.GAE@google.com>
- <68663a26.a70a0220.5d25f.0856.GAE@google.com>
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="WovYhOnm"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=ZyzKEihZDNZ16DmOGMSJ88ULGx/pSbICKS/fdJw2ya4=; b=WovYhOnmAWVhGBmVShxVSXCTwl
+	KsTC761cpyV/PL7pyO1+z87KG4GV/WJ5cZTpgj4Kw6nxQ5HZ6uDgyaA/G/6CqEJfp/U0bgh+VOJFS
+	0yOZfJvHjAhF4e6yYUVUNjWH8BzxdJ/qNqWFS3TdQMHJToKBKeHkHyGdHnexNZTTDYdA=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uXxsY-000NJL-1K; Sat, 05 Jul 2025 10:04:10 +0200
+Date: Sat, 5 Jul 2025 10:04:10 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Tamir Duberstein <tamird@gmail.com>
+Cc: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
+	Benno Lossin <lossin@kernel.org>,
+	Michal Rostecki <vadorovsky@protonmail.com>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	Alex Gaynor <alex.gaynor@gmail.com>,
+	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>,
+	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
+	Andreas Hindborg <a.hindborg@kernel.org>,
+	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>,
+	Brendan Higgins <brendan.higgins@linux.dev>,
+	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Russ Weight <russ.weight@linux.dev>,
+	FUJITA Tomonori <fujita.tomonori@gmail.com>,
+	Rob Herring <robh@kernel.org>,
+	Saravana Kannan <saravanak@google.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
+	Waiman Long <longman@redhat.com>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Bjorn Helgaas <bhelgaas@google.com>, Arnd Bergmann <arnd@arndb.de>,
+	Jens Axboe <axboe@kernel.dk>,
+	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
+	Dave Ertman <david.m.ertman@intel.com>,
+	Ira Weiny <ira.weiny@intel.com>, Leon Romanovsky <leon@kernel.org>,
+	Breno Leitao <leitao@debian.org>,
+	Viresh Kumar <viresh.kumar@linaro.org>,
+	Michael Turquette <mturquette@baylibre.com>,
+	Stephen Boyd <sboyd@kernel.org>, rust-for-linux@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	kunit-dev@googlegroups.com, dri-devel@lists.freedesktop.org,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	llvm@lists.linux.dev, linux-pci@vger.kernel.org,
+	nouveau@lists.freedesktop.org, linux-block@vger.kernel.org,
+	linux-pm@vger.kernel.org, linux-clk@vger.kernel.org
+Subject: Re: [PATCH v13 2/5] rust: support formatting of foreign types
+Message-ID: <a9bd145e-b634-41ca-972c-5f81e5e1033d@lunn.ch>
+References: <CAJ-ks9nC=AyBPXRY3nJ0NuZvjFskzMcOkVNrBEfXD2hZ5uRntQ@mail.gmail.com>
+ <DB2IJ9HBIM0W.3N0JVGKX558QI@kernel.org>
+ <CAJ-ks9nF5+m+_bn0Pzi9yU0pw0TyN7Fs4x--mQ4ygyHz4A6hzg@mail.gmail.com>
+ <DB2PIGAQHCJR.3BF8ZHECYH3KB@kernel.org>
+ <CAJ-ks9=WmuXLJ6KkMEOP2jTvM_YBJO10SNsq0DU2J+_d4jp7qw@mail.gmail.com>
+ <CAJ-ks9kNiOgPO7FF3cAbaSNtTWs0_PzQ4k4W0AxjHNFuMJnDcQ@mail.gmail.com>
+ <DB36T5JWBL10.2F56EDJ1XKAD0@kernel.org>
+ <CAJ-ks9=Jutg+UAwCVER_X91BGxWzmVq=OdStDgLZjTyMQSEX6Q@mail.gmail.com>
+ <CANiq72nZhgpbWOD4Evy-qw2J=G=RY4Hsoq9_rj6HGWMQW=2kTw@mail.gmail.com>
+ <CAJ-ks9m4S1jujQvyt9TOvNMewjNSztps8vayGga+MnNU+0YUcQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -47,41 +100,17 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <68663a26.a70a0220.5d25f.0856.GAE@google.com>
+In-Reply-To: <CAJ-ks9m4S1jujQvyt9TOvNMewjNSztps8vayGga+MnNU+0YUcQ@mail.gmail.com>
 
-On Thu, Jul 03, 2025 at 01:07:02AM -0700, syzbot wrote:
-> syzbot has bisected this issue to:
-> 
-> commit 47dd67532303803a87f43195e088b3b4bcf0454d
-> Author: Luis Chamberlain <mcgrof@kernel.org>
-> Date:   Fri Feb 21 22:38:22 2025 +0000
-> 
->     block/bdev: lift block size restrictions to 64k
-> 
-> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=15ec33d4580000
-> start commit:   50c8770a42fa Add linux-next specific files for 20250702
-> git tree:       linux-next
-> final oops:     https://syzkaller.appspot.com/x/report.txt?x=17ec33d4580000
-> console output: https://syzkaller.appspot.com/x/log.txt?x=13ec33d4580000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=d831c9dfe03f77ec
-> dashboard link: https://syzkaller.appspot.com/bug?extid=f4f84b57a01d6b8364ad
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15c93770580000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1001aebc580000
-> 
-> Reported-by: syzbot+f4f84b57a01d6b8364ad@syzkaller.appspotmail.com
-> Fixes: 47dd67532303 ("block/bdev: lift block size restrictions to 64k")
-> 
-> For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+> OK, with all the splitting requested, this comes out to ~54 patches.
+> I'll send the first bit (which can go in cycle 0) as v14.
 
-Odd, I can't see where the null pointer comes from.
+FYI: Some subsystems have limits as to how many patches can be posted
+at once. e.g. for netdev, don't send more than 15.
 
-bdev_getblk() --> __getblk_slow() properly returns NULL and doesn't use
-the data. But neither does fat_fill_super() on failure. My only
-suspicion was on fat_msg() but that sb usage seems fine and the goto out_fail
-seems fine as iput() also doesn't process null inodes and unload_nls()
-is fine. The return value is also set to -EIO correctly so we don't return NULL
-actually. I jus tdon't see anything odd on _fat_msg() either.
+This is another rule about making it easier for reviewers. If i see 20
+patches, i will defer reviewing them until later, when i have more
+time. For a handful of patches, especially small obvious patches, i'm
+more likely to look at them straight away.
 
-Hrm..
-
-  Luis
+	Andrew
