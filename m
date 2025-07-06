@@ -1,80 +1,71 @@
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10E43C2D1;
-	Sat,  5 Jul 2025 17:32:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D545C2E3710;
+	Sun,  6 Jul 2025 07:23:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751736777; cv=none; b=r38lfhArl2yyFQBdKCbYYozDBqKpu8g9QwhVbwXaR4G9U+ogPHwPJyKSJcgFmkM1ofIDo5ww8+cbdHOGEeDcLi2+2UBphTGxH2g3ZxAE+dN5+33zInROEKIT/37KM4+a458dKcY3zZMUg/w3Vpn2uxXDWOgmUFGH6FTwEEEZoBI=
+	t=1751786623; cv=none; b=eUPaxNpwIV1bMGQLC1w5GYrOehbc1o4o0gBs2MvpE8QsZijOVndyjEvO3SyE0HphpmtKL9Dnu9FJAxmtSRco5WtHGf7vEDZgLzssWdE4VGo2/H9huzISOxGCxHEWCdJaYvhZk9t+5h1ZpZSAZFBv7qfIZ/3wArEjM7bdy20x2wU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751736777; c=relaxed/simple;
-	bh=63cUjIB4osdOi2aZ9nh3xxhbq84WuucWLl+AmrtOrgQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FCy5KFrBhoY2M9suBWOSlV1J+GKKuYDsZrkX3xxHG/Rb2YPSfVfLjMGGlF0h9lPfyDLpiv1uycubJe4tZ3UgBuU0A1xwddhiwXkDCFHogBX5+G0XzQW6/TLjvDn7V+FgrxxAECQnluRFZlVoDY/V39tk+fZY9tgX+RNxLp15YRY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DnBJJyti; arc=none smtp.client-ip=209.85.128.51
+	s=arc-20240116; t=1751786623; c=relaxed/simple;
+	bh=+Jpz5fT8UZI9h0JQ8Vd2p7U6j6ILiBAW8DawEZvZbNs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Q+eFCIk7Q+m9WKsVjBt7W68YTbSr53I1MiIUnqBYe0LkOufYKwWh6DrvPrrqlyRY+M3gS6/lVFQUgQE+DAdabmvUkgxAIMMB3X0cvSfYfOZm+3KTiIX6Plw9NiP8yOSDGEkslKEyFJnllanJLHpa+2mW0V0BS62JsooI1YUiwk8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DXBxx0so; arc=none smtp.client-ip=209.85.210.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DnBJJyti"
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-4531e146a24so11934275e9.0;
-        Sat, 05 Jul 2025 10:32:55 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DXBxx0so"
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-747e41d5469so2437637b3a.3;
+        Sun, 06 Jul 2025 00:23:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751736774; x=1752341574; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Vr/ZD3BCUnN4ej5gioLyrHVyB4YH9QmjY1UHVXxI2VU=;
-        b=DnBJJytimcTSuWU4l4hPZLmwjcxoxZh+hK/RBWUjLcPqmk3SVVdICb/r7ehbiLbcTz
-         nyrvncMryYypMBhPgdhXN8zpamaRHydarzS0cG4IOahgmz6PrGVzSriUN3lx9d8xA7Qf
-         18e0WZFO3YgOnzu5oMNAdoa+4Y3cqo8a/hs0RBODFiewD/mU9bDgOzoelU5wv/y5+DMU
-         oO4PUIBFcI5/KVnvMZSeF/k4ASu4kO0ki0amb5PXdwMpTis95ShnSBvEJyL7HNNGBwca
-         rAmErubXzLq7NJr5ceA9Zsao6/B1Ce0w6NGj7/Gq7YLaPrWGoZfGLog2Ky/JESfH43uW
-         Hmvg==
+        d=gmail.com; s=20230601; t=1751786621; x=1752391421; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=0F/piBOlPUmOPt5QqSaELuOTnzlcUBcvkKa6RjbsxuI=;
+        b=DXBxx0soC96HmPuN1m10bUjzFxYnY8qvYoORCJniy36+okBUHWmC9winFuT0A4JluW
+         aUXMOTBK7DaFEKsf6ASI4zu91IevFd/M/gkENIo49IfGzLUlBT7QZktj54E+n8YKLlaa
+         5NcybcyINk7IXyUKSbpbMY4XScyqwMW9VuBv0HHawzjp5XkVBRWJY/Vrrs2Y6PP1bVC6
+         2AxXd3KNEXtK6y32NoI/RErRvrJBAMtI4ajizEg1XHHK+5nF/VsUa+SfrBIg0u/LSARA
+         LEricbsA8NrwXGPsnFYFpVMDH9VPSa5EpmzZjGyVtMmR4QKyLZ0DMS5BAkdixc7MA2xR
+         VlBw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751736774; x=1752341574;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Vr/ZD3BCUnN4ej5gioLyrHVyB4YH9QmjY1UHVXxI2VU=;
-        b=Y2D21q1dox8VYqozfTvBbOaxx4UIPuruXBd6EE2HWCli0R183T66TaXvWyYk9zurex
-         JCinE9lLrW24hOs8LPvAqOmLsaAWauvA42DVkY0wWROkAq2CpMaqnInir8icht9YNhUU
-         7dvYtqGWtbczzSTRWDRPVNzjyOdO9klun4THVXw3g6gKEnMX4i6h8R17G/nB7yvVRuB/
-         CupJndaFEj4unREkPKcV/DoIXuvzH+sjUbSX4YsMRcy24xMFOVbZprvK+22W2pAs1CJQ
-         sxaCz7yRk3A/stHbASK+AWzCeArCgyzGFIcmSWHsOLPr7N/aDd1W1n/8nMCFJoNKrrvv
-         BYmg==
-X-Forwarded-Encrypted: i=1; AJvYcCUo1HPqACBnTFDKeu4wGbPZc07j3Z1Ibu6fVmvCxFuZifnqRA3L4tEhjoJe8DMT5BDubXDKX2bA2k6a2TY+@vger.kernel.org, AJvYcCXYT86hMXhednXt2LYJjlhvOJulTejNGmxoglY4qEM7CqFTqArwJZzWStPVKIQC/Ykq8QHWjCrCanDLBg==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz/+DEbxuH8Tb5yd4rqKR5fc84ri5lhWh1On2gOcNbEF5PuonqW
-	u/fE+j7axciitYbUwTMf+kaJxiBGmZmMkUdjv6Mlb14JpBtcVD1gxVeQ
-X-Gm-Gg: ASbGnctSII+Nhp+xCLqPSNCw5MGO4lgmqVz2PbnLU9A30+9iEuUa4F6qca5utB1iyqY
-	dtvcC8O6O7NnZlt1I99QrMTI8lJTCoTjij8QufLxto3ccYR2aNU02VaXgWu3zVNfS3F3XmiiOPH
-	XTAKNyFUvw6le79T9cPomi60exR8XX2Xf4wMmMY1u0WeYUnGR3RSubFVIktQ6K8XCeCme2SRomq
-	vXOo5FJkTZMBgTlhjBLYC9ZiBySEwFqiouob5sAD9frdjT5OP3ge5foSr/Ensfg8VKniCnQWGwy
-	uoAcCuN90OJbZ73nFWZk+JGh9kJeLYp1lXu0qjA3+ErTXUEU50ZB/4swSwiZzmUx5+2geCHpMAb
-	fJhlGdNaQxQx0n8C108LVdrWK2hzbDl5Y2RRu
-X-Google-Smtp-Source: AGHT+IG/6HH9ShvrRUcFIgouUs+F16roF+T0fvocNgtyC7J6R2vbml3IdtiWwj7ol8JOeLlHcd8OBg==
-X-Received: by 2002:a05:6000:4807:b0:3a8:6260:d321 with SMTP id ffacd0b85a97d-3b49aa429cemr1784449f8f.3.1751736774164;
-        Sat, 05 Jul 2025 10:32:54 -0700 (PDT)
-Received: from ekhafagy-ROG-Zephyrus-M16-GU603HR-GU603HR.. ([197.46.88.143])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-454c041cd4asm5618845e9.28.2025.07.05.10.32.52
+        d=1e100.net; s=20230601; t=1751786621; x=1752391421;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=0F/piBOlPUmOPt5QqSaELuOTnzlcUBcvkKa6RjbsxuI=;
+        b=oiifbh4hWbFE+gx7+61eoYuQ40xeAmNgnh3qZYB65Vioi78DEvUCitc+8UIWijU/wi
+         PqXyd8Y8iQNiOC93nr97n7A9ahJ7+5w4pNaPFpFhu5NYysUTrzvfcQpajmNFP2fag2fD
+         b/vGMfvHw/Lt4lZPe0EPyTdeETJPblW0DwdFTmlkZmsvZlHCo++dAKpPR1oRwXbMdfql
+         qkGyW7lCfRjpoAP8n4ix+OPzW4EXboU+d5pFIXdUH+/8RNiCnqxjJp2Et9nsoOHvJGwH
+         RPcNP28XTvQz0OHuwyuOH6Lhlkz8PVjwVQapvP/8iqP6HBf91Ws7OYonMK5FPl/oixZq
+         4L3A==
+X-Forwarded-Encrypted: i=1; AJvYcCV/uxXxGOG/Zr6ZopXDAK378E3qfP3EneZGib+FPeQRuvQIZgEvfVGXvzTM6+yPuY87+TxufYYX4nLg6WA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwoKewnl50ezw40MbiW4dQlv/ZB/X0n8Zaxa2yruZswKjyb5g0M
+	PmOj6VYdg0PbZzucGTQitaeBM2BgaoVoLTi7ehV7B/WOCGgLUDTzlvgj
+X-Gm-Gg: ASbGncuWY8Lmzbj6/RVjMCUGs+PKBIxE4Db84OaaABpXAxg5iNYCaCzLS2LtMwFiWJR
+	gfP7gozxIJebLa6WyQe9wMfhHu2cmm+GIShiCrBj92r5LYHsjSu94jTkTxsDXLSnt7y3Ro0YcgA
+	nrWcYT5ZDqrK0S7duoyoan6BKP5ZZhaWXVBpNjST/psgEamO2HdLf7JNT6Oop4EXBD2mLmOM1rX
+	uAQ0ZJO9s0X4J7Md4b5W2KR6uuN3XIZb5PwHK3GLx0Y1Ap0dFcCGYSAKLgDwbxf42xmGrDABa78
+	4u8MBWP1NzwTIsBY4uYEyET3ZqPZwjUXFa3Jk80zch7qsmHEUr29gowRex1BGP8ku4iz7BBZznn
+	gDvR4OmwLXb4aTebcHrLijA4V
+X-Google-Smtp-Source: AGHT+IHFTdNX1cxiPV5k1Yfv+OFlG9FKw52ATRDTyKgWCRkhLxm9RzgLzYtpszckajz4u1AwmI9n0g==
+X-Received: by 2002:a05:6a00:bd03:b0:736:35d4:f03f with SMTP id d2e1a72fcca58-74ce884debbmr10483271b3a.6.1751786620921;
+        Sun, 06 Jul 2025 00:23:40 -0700 (PDT)
+Received: from purva-IdeaPad-Gaming-3-15IHU6.lan ([2409:4090:20a4:5c0c:bc44:62c9:acfb:7029])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74ce429a0b1sm6141794b3a.115.2025.07.06.00.23.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 05 Jul 2025 10:32:53 -0700 (PDT)
-From: Eslam Khafagy <eslam.medhat1993@gmail.com>
-To: 
-Cc: skhan@linuxfoundation.com,
-	eslam.medhat1993@gmail.com,
-	Philipp Reisner <philipp.reisner@linbit.com>,
-	Lars Ellenberg <lars.ellenberg@linbit.com>,
-	=?UTF-8?q?Christoph=20B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	drbd-dev@lists.linbit.com,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2] DRBD: replace strcpy with strscpy
-Date: Sat,  5 Jul 2025 20:32:44 +0300
-Message-ID: <20250705173248.59003-1-eslam.medhat1993@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250704175018.333165-1-eslam.medhat1993@gmail.com>
-References: <20250704175018.333165-1-eslam.medhat1993@gmail.com>
+        Sun, 06 Jul 2025 00:23:40 -0700 (PDT)
+From: Purva Yeshi <purvayeshi550@gmail.com>
+To: efremov@linux.com,
+	axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Purva Yeshi <purvayeshi550@gmail.com>
+Subject: [PATCH] block: floppy: fix uninitialized use of outparam in fd_locked_ioctl
+Date: Sun,  6 Jul 2025 12:52:13 +0530
+Message-Id: <20250706072213.14954-1-purvayeshi550@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -83,86 +74,92 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-strcpy is deprecated due to lack of bounds checking. This patch replaces
-strcpy with strscpy, the recommended alternative for null terminated
-strings, to follow best practices.
+Fix Smatch-detected error:
+drivers/block/floppy.c:3569 fd_locked_ioctl() error:
+uninitialized symbol 'outparam'.
 
-I had to do a small refactor for __drbd_send_protocol since it uses
-strlen anyways. so why not use that for strscpy.
+Use the outparam pointer only after it is explicitly initialized.
+Previously, fd_copyout() was called unconditionally after the switch-case
+statement, assuming outparam would always be set when _IOC_READ was active.
+However, not all paths ensured this, which led to potential use of an
+uninitialized pointer.
 
-V2:
- - I forgot about null termination so i fixed it.
+Move fd_copyout() calls directly into the relevant case blocks immediately
+after outparam is set. This ensures it is only called when safe and
+applicable.
 
-Signed-off-by: Eslam Khafagy <eslam.medhat1993@gmail.com>
+Signed-off-by: Purva Yeshi <purvayeshi550@gmail.com>
 ---
- drivers/block/drbd/drbd_main.c     | 17 +++++++++--------
- drivers/block/drbd/drbd_receiver.c |  4 ++--
- 2 files changed, 11 insertions(+), 10 deletions(-)
+ drivers/block/floppy.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/block/drbd/drbd_main.c b/drivers/block/drbd/drbd_main.c
-index 52724b79be30..028a5cf41d7f 100644
---- a/drivers/block/drbd/drbd_main.c
-+++ b/drivers/block/drbd/drbd_main.c
-@@ -742,9 +742,9 @@ int drbd_send_sync_param(struct drbd_peer_device *peer_device)
+diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
+index e97432032f01..34ef756bb3b7 100644
+--- a/drivers/block/floppy.c
++++ b/drivers/block/floppy.c
+@@ -3482,6 +3482,7 @@ static int fd_locked_ioctl(struct block_device *bdev, blk_mode_t mode,
+ 		memcpy(&inparam.g, outparam,
+ 				offsetof(struct floppy_struct, name));
+ 		outparam = &inparam.g;
++		return fd_copyout((void __user *)param, outparam, size);
+ 		break;
+ 	case FDMSGON:
+ 		drive_params[drive].flags |= FTD_MSG;
+@@ -3515,6 +3516,7 @@ static int fd_locked_ioctl(struct block_device *bdev, blk_mode_t mode,
+ 		return 0;
+ 	case FDGETMAXERRS:
+ 		outparam = &drive_params[drive].max_errors;
++		return fd_copyout((void __user *)param, outparam, size);
+ 		break;
+ 	case FDSETMAXERRS:
+ 		drive_params[drive].max_errors = inparam.max_errors;
+@@ -3522,6 +3524,7 @@ static int fd_locked_ioctl(struct block_device *bdev, blk_mode_t mode,
+ 	case FDGETDRVTYP:
+ 		outparam = drive_name(type, drive);
+ 		SUPBOUND(size, strlen((const char *)outparam) + 1);
++		return fd_copyout((void __user *)param, outparam, size);
+ 		break;
+ 	case FDSETDRVPRM:
+ 		if (!valid_floppy_drive_params(inparam.dp.autodetect,
+@@ -3531,6 +3534,7 @@ static int fd_locked_ioctl(struct block_device *bdev, blk_mode_t mode,
+ 		break;
+ 	case FDGETDRVPRM:
+ 		outparam = &drive_params[drive];
++		return fd_copyout((void __user *)param, outparam, size);
+ 		break;
+ 	case FDPOLLDRVSTAT:
+ 		if (lock_fdc(drive))
+@@ -3541,17 +3545,20 @@ static int fd_locked_ioctl(struct block_device *bdev, blk_mode_t mode,
+ 		fallthrough;
+ 	case FDGETDRVSTAT:
+ 		outparam = &drive_state[drive];
++		return fd_copyout((void __user *)param, outparam, size);
+ 		break;
+ 	case FDRESET:
+ 		return user_reset_fdc(drive, (int)param, true);
+ 	case FDGETFDCSTAT:
+ 		outparam = &fdc_state[FDC(drive)];
++		return fd_copyout((void __user *)param, outparam, size);
+ 		break;
+ 	case FDWERRORCLR:
+ 		memset(&write_errors[drive], 0, sizeof(write_errors[drive]));
+ 		return 0;
+ 	case FDWERRORGET:
+ 		outparam = &write_errors[drive];
++		return fd_copyout((void __user *)param, outparam, size);
+ 		break;
+ 	case FDRAWCMD:
+ 		return floppy_raw_cmd_ioctl(type, drive, cmd, (void __user *)param);
+@@ -3565,9 +3572,6 @@ static int fd_locked_ioctl(struct block_device *bdev, blk_mode_t mode,
+ 		return -EINVAL;
  	}
  
- 	if (apv >= 88)
--		strcpy(p->verify_alg, nc->verify_alg);
-+		strscpy(p->verify_alg, nc->verify_alg);
- 	if (apv >= 89)
--		strcpy(p->csums_alg, nc->csums_alg);
-+		strscpy(p->csums_alg, nc->csums_alg);
- 	rcu_read_unlock();
- 
- 	return drbd_send_command(peer_device, sock, cmd, size, NULL, 0);
-@@ -771,10 +771,6 @@ int __drbd_send_protocol(struct drbd_connection *connection, enum drbd_packet cm
- 		return -EOPNOTSUPP;
- 	}
- 
--	size = sizeof(*p);
--	if (connection->agreed_pro_version >= 87)
--		size += strlen(nc->integrity_alg) + 1;
+-	if (_IOC_DIR(cmd) & _IOC_READ)
+-		return fd_copyout((void __user *)param, outparam, size);
 -
- 	p->protocol      = cpu_to_be32(nc->wire_protocol);
- 	p->after_sb_0p   = cpu_to_be32(nc->after_sb_0p);
- 	p->after_sb_1p   = cpu_to_be32(nc->after_sb_1p);
-@@ -787,8 +783,13 @@ int __drbd_send_protocol(struct drbd_connection *connection, enum drbd_packet cm
- 		cf |= CF_DRY_RUN;
- 	p->conn_flags    = cpu_to_be32(cf);
+ 	return 0;
+ }
  
--	if (connection->agreed_pro_version >= 87)
--		strcpy(p->integrity_alg, nc->integrity_alg);
-+	size = sizeof(*p);
-+	if (connection->agreed_pro_version >= 87) {
-+		int integrity_len = strlen(nc->integrity_alg) + 1;
-+		size += integrity_len;
-+		strscpy(p->integrity_alg, nc->integrity_alg, integrity_len);
-+	}
-+
- 	rcu_read_unlock();
- 
- 	return __conn_send_command(connection, sock, cmd, size, NULL, 0);
-diff --git a/drivers/block/drbd/drbd_receiver.c b/drivers/block/drbd/drbd_receiver.c
-index e5a2e5f7887b..9c2d439f26e8 100644
---- a/drivers/block/drbd/drbd_receiver.c
-+++ b/drivers/block/drbd/drbd_receiver.c
-@@ -3985,14 +3985,14 @@ static int receive_SyncParam(struct drbd_connection *connection, struct packet_i
- 			*new_net_conf = *old_net_conf;
- 
- 			if (verify_tfm) {
--				strcpy(new_net_conf->verify_alg, p->verify_alg);
-+				strscpy(new_net_conf->verify_alg, p->verify_alg);
- 				new_net_conf->verify_alg_len = strlen(p->verify_alg) + 1;
- 				crypto_free_shash(peer_device->connection->verify_tfm);
- 				peer_device->connection->verify_tfm = verify_tfm;
- 				drbd_info(device, "using verify-alg: \"%s\"\n", p->verify_alg);
- 			}
- 			if (csums_tfm) {
--				strcpy(new_net_conf->csums_alg, p->csums_alg);
-+				strscpy(new_net_conf->csums_alg, p->csums_alg);
- 				new_net_conf->csums_alg_len = strlen(p->csums_alg) + 1;
- 				crypto_free_shash(peer_device->connection->csums_tfm);
- 				peer_device->connection->csums_tfm = csums_tfm;
 -- 
-2.43.0
+2.34.1
 
