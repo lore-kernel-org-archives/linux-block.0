@@ -1,97 +1,115 @@
-Received: from 003.mia.mailroute.net (003.mia.mailroute.net [199.89.3.6])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EF5C265282
-	for <linux-block@vger.kernel.org>; Mon,  7 Jul 2025 18:35:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F4641C5D55
+	for <linux-block@vger.kernel.org>; Mon,  7 Jul 2025 20:16:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751913339; cv=none; b=NiNtmtybsWBD+xsaPD0hhPY3fANbhGi7UIIPWgX1Fr5/9GJM1x3OGa9EpwMdTEQatXN5uClFg2vAc74bZTqgW/TODdgj7EGMRPpEslAAHapmdNULeJbsoJY6NwWRac5CyvvELVcLgY1fbizii1zILG8CuG9otav5o/GyRbrX9Uk=
+	t=1751919398; cv=none; b=iI0MB4JPMCj9b2S5ol+Zj11KIFm6jdF+TDtkpCcObpw10GVrC+C+x2lPxoXVrBFesVMDd+uoDf/nCMo6HDqGKT2kqDpjdxdsza3GM19tkECPewJG4nqv11/CwjxarboWPDbzo/sEzHNKm5v7Ff2uZQfiyZ2L0mG2k/tghz35qIs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751913339; c=relaxed/simple;
-	bh=rPuLYwYlh0zw9E24LygyF8vZuNtQm7rdIa2EPjJ98Jc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=L6yEOZxn6NQRC9rUxfWoYwAwRk5pZ3rKcKsIjMtkEjm7ea9Xg01ykmD/qxMOTV6DB7PA0zeiMfUlK0zHyKqvrLwlz6VQsKmafkHUCUZWOUOXckGZMt1llbYo4V569VqhlKOmjaa3WdZN794qDyH85PKvusib+J1b9HTu2U5xY3s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=p2RNoKSb; arc=none smtp.client-ip=199.89.3.6
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1751919398; c=relaxed/simple;
+	bh=jYEw+dpQOLsLhqtci6KxjAhEKrOUjQnuRdygwxBmALc=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=XwB73Y3/R7XyAZJEb6Z84SBtJs+GmGvrCL9qjlSo7Qqz/e73V8/ASMcUanCr9qX3nmm4OyCQDse8xLRCvAwarniYI6rySolvjRc+k47BFdy+uX4/eLS0L6UCsKmK4d4UEsR50cclX5IctOOdrY381t0zRbEC7hiJn5Prndxt39k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Q/34JVyg; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="p2RNoKSb"
-Received: from localhost (localhost [127.0.0.1])
-	by 003.mia.mailroute.net (Postfix) with ESMTP id 4bbXx519BhzlgqyR;
-	Mon,  7 Jul 2025 18:35:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1751913336; x=1754505337; bh=uho3eGsTHyAARNa07IiIoTqt
-	qZe1gmlnofi/CWdDoHc=; b=p2RNoKSbjgqYz067vqjz3gA3uo5b1/T/8kFwAV39
-	uUyD3tZuvLLYXjUTNtwMD57WwXgtzAKvZNmrF3XDBn1+mMdhT+e5YHe38Y2hX0tB
-	dsDNK7J24Iziba/ums6F6CQC9PQRWWG7bMFsDhEXdkLs/3Ovy0GQ8TJrJs9fQLeR
-	vYH5SUanwY8hM5Bw64OBD8JRybGxfoAfc9aSqLQy17e9mwldaIhxShU6vZc11GHu
-	uls/t+FwSNn6Y8E8AHYyVt2N7n1V3AWzEdUQPsU9J+w4Lm6g2En48Fld5OoSTAx/
-	aIAo+M9oPCGCOHG9iYjBOZ+4pAgxOiQe9qiHLy0sIYnVkA==
-X-Virus-Scanned: by MailRoute
-Received: from 003.mia.mailroute.net ([127.0.0.1])
- by localhost (003.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id JpPgy0SXnlUZ; Mon,  7 Jul 2025 18:35:36 +0000 (UTC)
-Received: from [100.66.154.22] (unknown [104.135.204.82])
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q/34JVyg"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1751919394;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=acOOSG4Qq2nv4W4b3/Nnbhcn7CmsttwwzAN835fhnjc=;
+	b=Q/34JVyg4JXhiOeJgdF51a81Mr+I/8CexS38Ei+GsNCGkkFqVyVaQOOPYNYh9737UbsBXe
+	OWgsFY/zxmZx9R8strL5JKn4eCA2tc7vOS94unByMeMZDHKzUGep/lvfJv+ktUmHZTWYCs
+	HIJ+hdu9lmw6aWMHNRThyckt7tkUCQY=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-473-YFZl0pC0NLq_XoKGDL9m0w-1; Mon,
+ 07 Jul 2025 16:16:31 -0400
+X-MC-Unique: YFZl0pC0NLq_XoKGDL9m0w-1
+X-Mimecast-MFC-AGG-ID: YFZl0pC0NLq_XoKGDL9m0w_1751919390
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4bbXx23M00zlgqVY;
-	Mon,  7 Jul 2025 18:35:33 +0000 (UTC)
-Message-ID: <918963a5-a349-433a-80a8-6d06c609f20e@acm.org>
-Date: Mon, 7 Jul 2025 11:35:32 -0700
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 349701801208;
+	Mon,  7 Jul 2025 20:16:29 +0000 (UTC)
+Received: from [10.22.80.10] (unknown [10.22.80.10])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 54B6E19560AB;
+	Mon,  7 Jul 2025 20:16:24 +0000 (UTC)
+Date: Mon, 7 Jul 2025 22:16:19 +0200 (CEST)
+From: Mikulas Patocka <mpatocka@redhat.com>
+To: Dongsheng Yang <dongsheng.yang@linux.dev>
+cc: agk@redhat.com, snitzer@kernel.org, axboe@kernel.dk, hch@lst.de, 
+    dan.j.williams@intel.com, Jonathan.Cameron@Huawei.com, 
+    linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+    linux-cxl@vger.kernel.org, nvdimm@lists.linux.dev, 
+    dm-devel@lists.linux.dev
+Subject: =?UTF-8?Q?Re=3A_=5BPATCH_v2_00=2F11=5D_dm-pcache_=E2=80=93_pe?=
+ =?UTF-8?Q?rsistent-memory_cache_for_block_devices?=
+In-Reply-To: <20250707065809.437589-1-dongsheng.yang@linux.dev>
+Message-ID: <85b5cb31-b272-305f-8910-c31152485ecf@redhat.com>
+References: <20250707065809.437589-1-dongsheng.yang@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/3] Fix a deadlock related to modifying queue attributes
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-References: <20250702182430.3764163-1-bvanassche@acm.org>
- <20250703090906.GG4757@lst.de>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20250703090906.GG4757@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=US-ASCII
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On 7/3/25 2:09 AM, Christoph Hellwig wrote:
-> I'm still very doubtful on this whole approach, and I think you are
-> ignoring the root cause, which is dm-multipath keeping a q_usage_count
-> reference for an unbounded time.  It is only supposed to be held over
-> I/O, and I/O is expected to time out.
 
-No. Since queue_if_no_path was introduced, it can queue I/O
-indefinitely. The oldest reference I could find to the queue_if_no_path
-implementation is from 20 years ago:
 
-Author: Alasdair G. Kergon <agk@redhat.com>
-Date:   Wed Mar 9 17:19:15 2005 -0800
+On Mon, 7 Jul 2025, Dongsheng Yang wrote:
 
-     [PATCH] device-mapper: multipath
+> Hi Mikulas,
+> 	This is V2 for dm-pcache, please take a look.
+> 
+> Code:
+>     https://github.com/DataTravelGuide/linux tags/pcache_v2
+> 
+> Changelogs
+> 
+> V2 from V1:
+> 	- introduce req_alloc() and req_init() in backing_dev.c, then we
+> 	  can do req_alloc() before holding spinlock and do req_init()
+> 	  in subtree_walk().
+> 	- introduce pre_alloc_key and pre_alloc_req in walk_ctx, that
+> 	  means we can pre-allocate cache_key or backing_dev_request
+> 	  before subtree walking.
+> 	- use mempool_alloc() with NOIO for the allocation of cache_key
+> 	  and backing_dev_req.
+> 	- some coding style changes from comments of Jonathan.
 
-     The core device-mapper multipath and path-selector code.
-     [ ... ]
-     As a last resort there is an option to 'queue_if_no_path' which 
-queues I/O if
-     all paths have failed e.g.  temporarily during a firmware update or 
-if the
-     userspace daemon is slow reinstating paths.
+Hi
 
-> You'll probably get much farther by changing dm-multipath to not hold
-> a q_usage_count reference for something not actually under I/O.
+mempool_alloc with GFP_NOIO never fails - so you don't have to check the 
+returned value for NULL and propagate the error upwards.
 
-Please make yourself familiar with how the dm-mpath driver works. The
-default behavior for the dm-mpath driver is to operate in request based
-mode (DM_TYPE_REQUEST_BASED). Hence, a request is allocated before the
-dm-mpath driver sees any I/O. Hence, q_usage_counter is increased before
-the dm-mpath driver sees any I/O. Hence, what has been suggested cannot
-be implemented.
+"backing_req->kmem.bvecs = kmalloc_array(n_vecs, sizeof(struct bio_vec), 
+GFP_NOIO)" - this call may fail and you should handle the error gracefully 
+(i.e. don't end the bio with an error). Would it be possible to trim the 
+request to BACKING_DEV_REQ_INLINE_BVECS vectors and retry it? 
+Alternativelly, you can create a mempool for the largest possible n_vecs 
+and allocate from this mempool if kmalloc_array fails.
 
-Bart.
+I'm sending two patches for dm-pcache - the first patch adds the include 
+file linux/bitfield.h - it is needed in my config. The second patch makes 
+slab caches per-module rather than per-device, if you have them 
+per-device, there are warnings about duplicate cache names.
+
+
+BTW. What kind of persistent memory do you use? (afaik Intel killed the 
+Optane products and I don't know of any replacement)
+
+Some times ago I created a filesystem for persistent memory - see 
+git://leontynka.twibright.com/nvfs.git - I'd be interested if you can test 
+it on your persistent memory implementation.
+
+Mikulas
+
