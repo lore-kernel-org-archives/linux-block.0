@@ -1,80 +1,155 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from mout-p-103.mailbox.org (mout-p-103.mailbox.org [80.241.56.161])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A442C29A9ED
-	for <linux-block@vger.kernel.org>; Mon,  7 Jul 2025 14:18:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94ABD2D8DBC;
+	Mon,  7 Jul 2025 14:23:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.161
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751897922; cv=none; b=KlGLZamXQoDFXmT5lk/jj9DNsrVyvZ2T/IMf7EZGstRVEzfFJ1TPPne1EVff8VmF23uOILMCNBFZgRVBNToJNPNN3y/7UbaGJgUVwclgEyVezn71nRQTXqYselrj0eiCp4T+gyGiM0/lRlZPrzhpXBUcDq9FNPWbY+yXrsb0ys0=
+	t=1751898221; cv=none; b=HAkqDM0PuDLv9dw2E9L51ysYpNzUB5rxm7p083SAzIAmkk81jr4WWAzs8pW/rmZlEcJzhwHKzAgVXmmpZpBFdG2Y1hJwiuKmiXvWJAmo2nBSFTRBVjsXOupORirV9hwX5aqzioSsEr+GzpKXA/2U0wa6RU+XTElR4ro8UKhDUEo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751897922; c=relaxed/simple;
-	bh=vc/3+CgThDGMIVO83uKF9zpezircqbtNPggYoNL6JTo=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=FKHX4oTsxJkYDJfeCzwm568La9b1Lr+VuPcZzwRp+9lqIyZmZ64pz5CA29nxE3pW9TVkBVRgnxbfRzGn8R4JG8TKpCtwveTpQ4WjoH6Pu5FtJMD63PPQ7NCou1xsWlb2JB+1JnJ3xTtzpRqAMMsFf9ha6dRVSIb2/r6Uvl/CHfI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id A872468C7B; Mon,  7 Jul 2025 16:18:34 +0200 (CEST)
-Date: Mon, 7 Jul 2025 16:18:34 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Alan Adamson <alan.adamson@oracle.com>,
-	John Garry <john.g.garry@oracle.com>,
-	Keith Busch <kbusch@kernel.org>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	s=arc-20240116; t=1751898221; c=relaxed/simple;
+	bh=RUjQXbCJnwboPtEi0gct+9fAzyg2mYvrTnWVxKHKEYU=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=pr8aMhXvmm8enlGbTHtvojMDfxThmUP1u17J7r+0Amq4ZMIPFj21MqD+j1PtZlcCeVRsimrgRfJdavxmMXDcAB8WmC+MzWpRJGW08nEud0og4aw6hcjRwNAlA63XrsZytnpCsxx5b5GBmq1s5YRNZRSaA0h7ff+NC1oBPKegdJY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pankajraghav.com; spf=pass smtp.mailfrom=pankajraghav.com; dkim=pass (2048-bit key) header.d=pankajraghav.com header.i=@pankajraghav.com header.b=MehnIVD/; arc=none smtp.client-ip=80.241.56.161
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pankajraghav.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pankajraghav.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=pankajraghav.com header.i=@pankajraghav.com header.b="MehnIVD/"
+Received: from smtp2.mailbox.org (smtp2.mailbox.org [10.196.197.2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-103.mailbox.org (Postfix) with ESMTPS id 4bbRLB14fvz9tCk;
+	Mon,  7 Jul 2025 16:23:30 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pankajraghav.com;
+	s=MBO0001; t=1751898210;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=s4EZdHf+U3R+v43lcZijWizNqsqKvK4IRVcr5nu5cj0=;
+	b=MehnIVD/KloRf9rrD61bo8uVvO5mi99kSgMuUHeUYXOq1A2yxGunRzTwFMljMjGdO3rsq4
+	k78IzmiGbP2h2P76t6xsZOb4fGQgYFde80jo21p6JNNwqoTMjKQw/sZW2ykSSNq7su0VrS
+	3JObETkyU/36rBzUEKeXhn3//bturtQRiYGi/g2CeeEIL6XfqDdADkRFgSjuhQBhd01HlL
+	fD0+wRlqHp9eWWZBEkUgNgwTfd1vUi2VbSQEpXffRiw5zX6Am92eIxHm6snQlXBeylxkOk
+	aUR/7HreJ2iBQWDgQYtNyQRLg83nDzPRFd5YzQeNMcwJRPe1BN/UrM54QIfV9g==
+From: "Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>
+To: Suren Baghdasaryan <surenb@google.com>,
+	Ryan Roberts <ryan.roberts@arm.com>,
+	Baolin Wang <baolin.wang@linux.alibaba.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	"H . Peter Anvin" <hpa@zytor.com>,
+	Vlastimil Babka <vbabka@suse.cz>,
+	Zi Yan <ziy@nvidia.com>,
+	Mike Rapoport <rppt@kernel.org>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Michal Hocko <mhocko@suse.com>,
+	David Hildenbrand <david@redhat.com>,
+	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Nico Pache <npache@redhat.com>,
+	Dev Jain <dev.jain@arm.com>,
+	"Liam R . Howlett" <Liam.Howlett@oracle.com>,
 	Jens Axboe <axboe@kernel.dk>
-Cc: linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
-Subject: What should we do about the nvme atomics mess?
-Message-ID: <20250707141834.GA30198@lst.de>
+Cc: linux-kernel@vger.kernel.org,
+	willy@infradead.org,
+	linux-mm@kvack.org,
+	x86@kernel.org,
+	linux-block@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	"Darrick J . Wong" <djwong@kernel.org>,
+	mcgrof@kernel.org,
+	gost.dev@samsung.com,
+	kernel@pankajraghav.com,
+	hch@lst.de,
+	Pankaj Raghav <p.raghav@samsung.com>
+Subject: [PATCH v2 0/5] add static PMD zero page support
+Date: Mon,  7 Jul 2025 16:23:14 +0200
+Message-ID: <20250707142319.319642-1-kernel@pankajraghav.com>
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 8bit
 
-Hi all,
+From: Pankaj Raghav <p.raghav@samsung.com>
 
-I'm a bit lost on what to do about the sad state of NVMe atomic writes.
+There are many places in the kernel where we need to zeroout larger
+chunks but the maximum segment we can zeroout at a time by ZERO_PAGE
+is limited by PAGE_SIZE.
 
-As a short reminder the main issues are:
+This concern was raised during the review of adding Large Block Size support
+to XFS[1][2].
 
- 1) there is no flag on a command to request atomic (aka non-torn)
-    behavior, instead writes adhering to the atomicy requirements will
-    never be torn, and writes not adhering them can be torn any time.
-    This differs from SCSI where atomic writes have to be be explicitly
-    requested and fail when they can't be satisfied
- 2) the original way to indicate the main atomicy limit is the AWUPF
-    field, which is in Identify Controller, but specified in logical
-    blocks which only exist at a namespace layer.  This a) lead to
-    various problems because the limit is a mess when namespace have
-    different logical block sizes, and it b) also causes additional
-    issues because NVMe allows it to be different for different
-    controllers in the same subsystem.
+This is especially annoying in block devices and filesystems where we
+attach multiple ZERO_PAGEs to the bio in different bvecs. With multipage
+bvec support in block layer, it is much more efficient to send out
+larger zero pages as a part of a single bvec.
 
-Commit 8695f060a029 added some sanity checks to deal with issue 2b,
-but we kept running into more issues with it.  Partially because
-the check wasn't quite correct, but also because we've gotten
-reports of controllers that change the AWUPF value when reformatting
-namespaces to deal with issue 2a.
+Some examples of places in the kernel where this could be useful:
+- blkdev_issue_zero_pages()
+- iomap_dio_zero()
+- vmalloc.c:zero_iter()
+- rxperf_process_call()
+- fscrypt_zeroout_range_inline_crypt()
+- bch2_checksum_update()
+...
 
-And I'm a bit lost on what to do here.
+We already have huge_zero_folio that is allocated on demand, and it will be
+deallocated by the shrinker if there are no users of it left.
 
-We could:
+At moment, huge_zero_folio infrastructure refcount is tied to the process
+lifetime that created it. This might not work for bio layer as the completions
+can be async and the process that created the huge_zero_folio might no
+longer be alive.
 
- I.	 revert the check and the subsequent fixup.  If you really want
-         to use the nvme atomics you already better pray a lot anyway
-	 due to issue 1)
- II.	 limit the check to multi-controller subsystems
- III.	 don't allow atomics on controllers that only report AWUPF and
- 	 limit support to controllers that support that more sanely
-	 defined NAWUPF
+Add a config option STATIC_PMD_ZERO_PAGE that will always allocate
+the huge_zero_folio via memblock, and it will never be freed.
 
-I guess for 6.16 we are limited to I. to bring us back to the previous
-state, but I have a really bad gut feeling about it given the really
-bad spec language and a lot of low quality NVMe implementations we're
-seeing these days.
- not the 
+I have converted blkdev_issue_zero_pages() as an example as a part of
+this series.
+
+I will send patches to individual subsystems using the huge_zero_folio
+once this gets upstreamed.
+
+Looking forward to some feedback.
+
+[1] https://lore.kernel.org/linux-xfs/20231027051847.GA7885@lst.de/
+[2] https://lore.kernel.org/linux-xfs/ZitIK5OnR7ZNY0IG@infradead.org/
+
+Changes since v1:
+- Move from .bss to allocating it through memblock(David)
+
+Changes since RFC:
+- Added the config option based on the feedback from David.
+- Encode more info in the header to avoid dead code (Dave hansen
+  feedback)
+- The static part of huge_zero_folio in memory.c and the dynamic part
+  stays in huge_memory.c
+- Split the patches to make it easy for review.
+
+Pankaj Raghav (5):
+  mm: move huge_zero_page declaration from huge_mm.h to mm.h
+  huge_memory: add huge_zero_page_shrinker_(init|exit) function
+  mm: add static PMD zero page
+  mm: add largest_zero_folio() routine
+  block: use largest_zero_folio in __blkdev_issue_zero_pages()
+
+ block/blk-lib.c         | 17 +++++----
+ include/linux/huge_mm.h | 31 ----------------
+ include/linux/mm.h      | 81 +++++++++++++++++++++++++++++++++++++++++
+ mm/Kconfig              |  9 +++++
+ mm/huge_memory.c        | 62 +++++++++++++++++++++++--------
+ mm/memory.c             | 25 +++++++++++++
+ mm/mm_init.c            |  1 +
+ 7 files changed, 173 insertions(+), 53 deletions(-)
+
+
+base-commit: d7b8f8e20813f0179d8ef519541a3527e7661d3a
+-- 
+2.49.0
+
