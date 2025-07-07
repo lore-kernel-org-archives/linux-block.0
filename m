@@ -1,41 +1,44 @@
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A77463597A
-	for <linux-block@vger.kernel.org>; Mon,  7 Jul 2025 05:58:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC2F670813;
+	Mon,  7 Jul 2025 05:59:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751867897; cv=none; b=B21BAwHzaS2pHpDwhusZTb13K8axLbZ/UQtw2JwM7vsRwZ1VAodcZp4xN+cMSFf84W7vj2Oh/y13oGCQJQsBc2SAIdsTEqnqap1CNHM1kl5m2ElriQ3rREfbDvHYoeA39NlGRCdWQpiQXrdx6FsxphHRjA+UTFKHyvBh8FjXzC4=
+	t=1751867969; cv=none; b=S2DhMYTBYrA0avA6bxQnig5Uq8Z3vTeKrOe4nqGpIBzMdmyKN/2RISFHL6wlm39EdYTPWgOz6bSqbruwOQMrPjvg5tQrvIQnZpMaN/NXMZ87twwZPTN86JsTATizvXFry1/LR9OYIL+gSdS0C7URJALo3m32LonA72zM++sa4BI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751867897; c=relaxed/simple;
-	bh=PH2sqhT7qeJrq8dD2MiIz8VmB9QdzQSeLSgxtiVUWR4=;
+	s=arc-20240116; t=1751867969; c=relaxed/simple;
+	bh=8g0ar6DF+kofijbjdY0k7eoZW++N+JeAnr+Kd+aZ+e0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PRwiVLPwlux2V0ZaTIt8ZV7Ay8XGIeVbGIXSejqrmcQGzPCR4y+4ud5N+cp6JN2j9hP0DOFor3u1EUqWuNDV4/Zq0yPMWpv8AnCNiJKWjiOUMe4SuFsAG4cukcJw8pwBWpVW76/aKdAmlYihM1pWuz5mdFvMRWmPbreTnnFRC/g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=bLgz4MeS; arc=none smtp.client-ip=198.137.202.133
+	 Content-Type:Content-Disposition:In-Reply-To; b=LA/XYeNGbXX7XqMZhCz+4DFDnxYfzp2RvkxxI6G4kdZy0pTjeM7K6uzqtAS/IooLJqWe9y54iOGmxhBR6j5AuLphT8UHARtn4gVtKrQKNLPq5XM+ZJY1gQQrqNuECAQhyh2QRecZ4TPSlcgx1n6gXXm3xNawItAZARDUOHD035I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=kFJMCrS/; arc=none smtp.client-ip=198.137.202.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="bLgz4MeS"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="kFJMCrS/"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
 	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=xt4I4YUFQM9EwnPEKGgxPkY0dEeu1vbLZcvwuIWh9oA=; b=bLgz4MeSNabCpLYjWxkn7a+q2v
-	hb6idk5Txb4zHl8Zy1umOwZoWAmau0nmGqE6w4eSIWkyfeJeTUNOl06ptyn8S6Du1huRLrTBVX0qO
-	XgPnrJyy3aQ9UdUfNokxE5fMMRq5/VmF3te5KB8mCf0pas012ebl5kFe6OZqdaiWtoeGQvDKHv3GM
-	tY61FDLwf3I0Tt83AlZsfKUSoHSlJf1F3ofW7/Gu2F4a2WlXPHF6rl56B16Dg95XKKs7savUf+Z7H
-	KKwNSHYcxh2gaTeJSa5ki/GuJH3rFOe4c0t65PNCPp46WFFCkPK8EN31LhJLtOstMZ4ORlf3EdlQ8
-	hPnFpkKQ==;
+	bh=8g0ar6DF+kofijbjdY0k7eoZW++N+JeAnr+Kd+aZ+e0=; b=kFJMCrS/PkBWqf41JH3xhptgo8
+	gQ6EmMAFkBoxe8AIn5gAnCwntJDUY8GWzstylLgdzT4Wz4ZrXEuxHGj/l7K7jokQ6xRhefrNxluNa
+	jBAvg6VGQAfsBZkY1/KPSr1G9wWnKXdklZV2hpViikkRr8BYDnx+agsBfka6LzgNszUuXhGyhI1RF
+	ihLWkJReqSaFhjpSuEFojEKE4ChVUAk7mxXcgJBaHNPAhNA8odY7dYbR1ZQEMVNGyBl9whAMT+mLq
+	fzFrXZOdvgOcYewZZVDy6DLPIYO2a7yaTCh9cGiIwkZA1qyHkEncBwlcUf3vQVQhF7qhbo+JuTkzC
+	uAwOR+tA==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1uYero-00000001UtH-0dJh;
-	Mon, 07 Jul 2025 05:58:16 +0000
-Date: Sun, 6 Jul 2025 22:58:16 -0700
+	id 1uYesx-00000001V63-2ObU;
+	Mon, 07 Jul 2025 05:59:27 +0000
+Date: Sun, 6 Jul 2025 22:59:27 -0700
 From: Christoph Hellwig <hch@infradead.org>
-To: "Robin H. Johnson" <robbat2@gentoo.org>
-Cc: linux-block@vger.kernel.org
-Subject: Re: [PATCH] block/partitions: detect LUKS-formatted disks
-Message-ID: <aGth-G3oYNF39WJQ@infradead.org>
-References: <20250704182853.3857-1-robbat2@gentoo.org>
+To: Sakari Ailus <sakari.ailus@linux.intel.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 77/80] block: pm: Remove redundant
+ pm_runtime_mark_last_busy() calls
+Message-ID: <aGtiP3FKLi92Gral@infradead.org>
+References: <20250704075225.3212486-1-sakari.ailus@linux.intel.com>
+ <20250704075501.3223068-1-sakari.ailus@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -44,25 +47,11 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250704182853.3857-1-robbat2@gentoo.org>
+In-Reply-To: <20250704075501.3223068-1-sakari.ailus@linux.intel.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-I'm not sure this is the best way to approach it, as what you add
-is not really a partition format.
+Sending a single patch out of many to a list makes it unreviable.
 
-I'd suggest checking for the LUKS signature in the atari partition
-parser instead - that way the code is automatically built when the
-atari partition parser is built in, and not built when not needed.
-
-Minor nitpick:
-
-> +	if (memcmp(data, LUKS_MAGIC_1ST_V1, 8) == 0
-> +		|| memcmp(data, LUKS_MAGIC_2ND_V1, 8) == 0) {
-
-The || goes at the end of the line for the linux coding style, and the
-continuing line is indented either after the opening brace or by an
-extra tab vs the following code:
-
-	if (memcmp(data, LUKS_MAGIC_1ST_V1, 8) == 0 ||
-	    memcmp(data, LUKS_MAGIC_2ND_V1, 8) == 0) {
+That might not matter as a 80 patch series is basically unreviable
+anyway.
 
