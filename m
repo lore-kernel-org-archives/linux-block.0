@@ -1,93 +1,74 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from 004.mia.mailroute.net (004.mia.mailroute.net [199.89.3.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECEBE1D5145
-	for <linux-block@vger.kernel.org>; Mon,  7 Jul 2025 15:56:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BD371531D5
+	for <linux-block@vger.kernel.org>; Mon,  7 Jul 2025 17:26:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751903816; cv=none; b=TWOXo39AhqZjY2UJKB8l2alryFa4+TR9JiNP+peMTHTztlHMqygQE+lZcW59P3C5Sn3W3WV997kQ8/zwlyxGa9Ps7FfptfRcuAkja0y5y8PyGKvpaHv3t/Vd4R4go7I1kipwhY35ez7ANyhzFO7GE7mUdUX+VtrNYQgjol/+A70=
+	t=1751909172; cv=none; b=Qv383athmJ521OEi0PmCXCr9gfaAuucrSQ/zNnoavPVZDS2weFmnBZG+CA1rooVEGqJfDkHmTHOzkGCA7LyEt35ozdo58rDL0ggHbBWGRw1HR05hU+6VW04Qji1I3al0hDGQxGm2me3AAXxLDDPl2GmwBpnf5RZo83fZbgHWLac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751903816; c=relaxed/simple;
-	bh=K4TsgEfbZBCaB5T+UtpxvoxOzf99yOdPJVsE+Cw+Y0k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=I8ykAA3Q192Ok+YnrsqP7ufidqq0EV0z+rzxLS4S4dT2gZOqzlkkvSXbZDnDqUvtsxj15m9VDg4c8+GI3OfAOPdbadeb75IvtLNF7HQxo61EHiRZ3MT1zi1uV4RBnYmoM1ufS1TSlIsbUy8xJ7JTq0RxAK9ql3VDnMIfVMogDyw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z5AcbnHd; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1751909172; c=relaxed/simple;
+	bh=ffd1lv3TZuHF9hAnP/ZwJT8am8FyPRA8V6CiULBQDcs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=eJ7PB2zBg9+KYcQLQiQDxz8s1eROap+ukRamp5ypVusu7pAQzngBcAU4a4odjGjQQ3ZDi8QJQBtbPIUbuo5OuXjnqZzheSl3clD9Jrjud4fRNFkR+ath5nHslroXhu45MsQQosaLY0bh7tI49xUK8Me7QqlUcLNixNrGzTxB2KU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=rfJZGRUd; arc=none smtp.client-ip=199.89.3.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z5AcbnHd"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 014CCC4CEE3;
-	Mon,  7 Jul 2025 15:56:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751903815;
-	bh=K4TsgEfbZBCaB5T+UtpxvoxOzf99yOdPJVsE+Cw+Y0k=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Z5AcbnHd8RRLiGwhKyQCEKRiHwDNnLOxKiGli9/0YhEm80kN3aq/ruts5qIlYk5A6
-	 6LpG+1G1+nv05A1Wxr2wUxcViszbUUm6gRJ2PqKzMEPDftjSXMsLAnPx0t/HtgU+st
-	 aqb4rtSXW2NfYnQuUwDRBiTdswIlRVJchl73ewkVGZ+x5/szVxEYKqT3RhUV5sw1pF
-	 R6nLYOibtMPyw1r6GIReKmpLlJCUhkTQUuSks/bAkErPer/csYqicOpJusESYU0MBH
-	 v/28k6znhy+zdn7NhyN02dMIM1MVXWXuUzUAXgK81kQxg1bzeeefYX5fR8CSVJrZ7d
-	 5OAt+Oi6Olaxw==
-Date: Mon, 7 Jul 2025 09:56:53 -0600
-From: Keith Busch <kbusch@kernel.org>
-To: Hannes Reinecke <hare@suse.de>
-Cc: Christoph Hellwig <hch@lst.de>, Alan Adamson <alan.adamson@oracle.com>,
-	John Garry <john.g.garry@oracle.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Jens Axboe <axboe@kernel.dk>, linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org
-Subject: Re: What should we do about the nvme atomics mess?
-Message-ID: <aGvuRS8VmC0JXAR3@kbusch-mbp>
-References: <20250707141834.GA30198@lst.de>
- <aGvYnMciN_IZC65Z@kbusch-mbp>
- <b2ff30b5-5f12-4276-876d-81a8b2f180c1@suse.de>
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="rfJZGRUd"
+Received: from localhost (localhost [127.0.0.1])
+	by 004.mia.mailroute.net (Postfix) with ESMTP id 4bbWNx3V78zm0yVD;
+	Mon,  7 Jul 2025 17:26:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1751909168; x=1754501169; bh=ffd1lv3TZuHF9hAnP/ZwJT8a
+	m8FyPRA8V6CiULBQDcs=; b=rfJZGRUdIKRURPu0OshGGURtwAS739ahgn15zLG3
+	/FA8SmvHWaJy4ucOsY6rynDZonkpYPF4ahajLHLYZRQ8dz0oc2K8uw+3tiexprsP
+	7CPYMrxoC/bI/Bm2TNV93Nznnc3vUCAXTfmp32NRMixQeOgkyXhaW+IEqAo6EWF8
+	1qGP1I3RGZA9frEdoKZigtnNFhkajwjYP+uGTGSlJ1PPGk9lSdQzZIaoHVAPOHWW
+	BA+jUjfrz4QRGhRGVax5xO2GmVlowiAl6KDvWNSnZANAW9ZtNhnGD90BKrvjHDun
+	OgEu3fTRSDUOQE23jIqVlAZ+uus8ltPJ1woX1N3gI24FBg==
+X-Virus-Scanned: by MailRoute
+Received: from 004.mia.mailroute.net ([127.0.0.1])
+ by localhost (004.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id BAae-LKsBSl9; Mon,  7 Jul 2025 17:26:08 +0000 (UTC)
+Received: from [100.66.154.22] (unknown [104.135.204.82])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 004.mia.mailroute.net (Postfix) with ESMTPSA id 4bbWNt2LMgzm0ySG;
+	Mon,  7 Jul 2025 17:26:05 +0000 (UTC)
+Message-ID: <d51daad2-dde4-4a74-9b74-5d0a87424834@acm.org>
+Date: Mon, 7 Jul 2025 10:26:04 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b2ff30b5-5f12-4276-876d-81a8b2f180c1@suse.de>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH blktests] common/null_blk: check FULL file availability
+ before write
+To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+ linux-block@vger.kernel.org
+Cc: Yi Zhang <yi.zhang@redhat.com>
+References: <20250704105425.127341-1-shinichiro.kawasaki@wdc.com>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20250704105425.127341-1-shinichiro.kawasaki@wdc.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jul 07, 2025 at 05:26:46PM +0200, Hannes Reinecke wrote:
-> On 7/7/25 16:24, Keith Busch wrote:
-> > On Mon, Jul 07, 2025 at 04:18:34PM +0200, Christoph Hellwig wrote:
-> > > We could:
-> > > 
-> > >   I.	 revert the check and the subsequent fixup.  If you really want
-> > >           to use the nvme atomics you already better pray a lot anyway
-> > > 	 due to issue 1)
-> > >   II.	 limit the check to multi-controller subsystems
-> > >   III.	 don't allow atomics on controllers that only report AWUPF and
-> > >   	 limit support to controllers that support that more sanely
-> > > 	 defined NAWUPF
-> > > 
-> > > I guess for 6.16 we are limited to I. to bring us back to the previous
-> > > state, but I have a really bad gut feeling about it given the really
-> > > bad spec language and a lot of low quality NVMe implementations we're
-> > > seeing these days.
-> > 
-> > I like option III. The controler scoped atomic size is broken for all
-> > the reasons you mentioned, so I vote we not bother trying to make sense
-> > of it.
-> > 
-> Agree. We might consider I. as a fixup for stable, but should continue
-> with III going forward.
+On 7/4/25 3:54 AM, Shin'ichiro Kawasaki wrote:
+> Commit e2805c7911a4 ("common/null_blk: Log null_blk configuration
+> parameters") introduced the write to the $FULL file in
+> _configure_null_blk(). However, the $FULL file is not available when
+> _configure_null_blk() is called in the fallback_device() context. In
+> this case, the write fails with the error "No such file or directory".
+> To avoid the error, confirm that $FULL is available before write to it.
 
-I think the NVMe TWG might want to consider an ECN to deprecate or at
-least recommend against AUWPF, too.
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
 
-Just to throw AWUPF a lifeline for legecy devices, we could potentially
-make sense of the value if Identify Controller says:
-
-  1. CMIC == 0; and
-  2. OACS.NMS == 0; and
-  3.
-    a. FNA.FNS == 1; or
-    b. NN == 1
-
-And if those conditions are true, then the controller and namespace
-scopes resolve to a single namespace format, so the values should be one
-in the same. The only way it could change, then, is a format command,
-which means there couldn't be an in-use filesystem depending on it not
-changing.
