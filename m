@@ -1,31 +1,43 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFC802BDC0B
-	for <linux-block@vger.kernel.org>; Mon,  7 Jul 2025 15:01:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1051BEEDE
+	for <linux-block@vger.kernel.org>; Mon,  7 Jul 2025 15:13:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751900483; cv=none; b=sGHQTDhJYcQQRc/I0xSgRurKpZ7kcbXsI8AEjSV18auuQMV+oV4EGGQrbgjGaaVfM2la7O832mx6docqGyuu4KRJ/gMjGDpi745S4XpvvZKDRIS8VDtm2IY9hD/mqbfXvXGx6nWhNAvRLUQP/PgwU84RLgwpkLt99LDdpzKlUw8=
+	t=1751901204; cv=none; b=cGUSSMbptDJB5naiNH4AHXlAwi4Ey5m69Y8xYeB3AziDxmwCS+SxafeheEGXXxzxKk0VdjfO4m8xj0rvdCOfRpO+NmtLGF95o9QyCkSixtmhyUNc361du7vf8xFb9hj+DorQ2O13ZdGkvS7zmiOoc6ecQvqiCZfNji1JIDRs5kA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751900483; c=relaxed/simple;
-	bh=zh845HLfEfmDzFavXD+TwwTgUig9Bc93q2D5lWSZ5Dg=;
+	s=arc-20240116; t=1751901204; c=relaxed/simple;
+	bh=mp5jA2iGXeOxyKviqtC+9eLHu4JEDEMD2R4myXHhrwI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IvG210FdH+RA6uLeKz5Vc6X1gf4Uhx43SWemIc6PvB5Bc7dS2/g/noc3yYyYlJy/j9OAc9UPviTKJ4mEGAjne+IpafVlX9j35dZdGp9zfKvmt5Lzfzatuat3xUzpTjWrOMLpGL3WqOXgQHMLnjFgdXYFj1VgHTBfKWWRaLH9UJk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 0B54C68C7B; Mon,  7 Jul 2025 17:01:17 +0200 (CEST)
-Date: Mon, 7 Jul 2025 17:01:16 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Keith Busch <kbusch@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>, axboe@kernel.dk, sagi@grimberg.me,
-	ben.copeland@linaro.org, leon@kernel.org,
-	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=F9OYLN6K6vtnqBAZbdDiLd+yOWnp9om2DV6EyN68ltPPre/BJ0D7XZ085zc+WnxxJvDIMdkqSVZ6foA6NqYt6DIIAIpX04QZA181i9kqYZyNTyvxhD/xxBP1KPmEefz2X5dK6y+Dz649FY0Hehe3sj5QF/99BbG+2ro+A36qcEI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m+b1QmqV; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m+b1QmqV"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E1BDC4CEE3;
+	Mon,  7 Jul 2025 15:13:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751901203;
+	bh=mp5jA2iGXeOxyKviqtC+9eLHu4JEDEMD2R4myXHhrwI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=m+b1QmqVimJOFoZZvhcYArSv3nlj5kxA68W9/fsXU6fS592pTkTnmkoA3iXe5BzWZ
+	 QSaGqVs7jiQwNbp1fWb+Q02MaBkiGosgZphh+ds8f6K4fzvZWKP7FwvwDAXM55cbES
+	 eFEJ4J26Tma/3D1CWRGgLjR9E6WqAJYb8rQd5F5f4gqAIckQoIqkhNRUs1B8kedEMv
+	 zzpSEPlKKMzbZtRaJrGqSM5tG4k7ETDvEQhWi8CVInISO3L1mO3Jl+steqKBW8uuUs
+	 /azbyYPIMViesARI26/azAq3uNGVMLoo8ZvV0HyGhfiZYuPLGrU0+RA5dbcJzCb6VI
+	 sMC++qo5tvYdQ==
+Date: Mon, 7 Jul 2025 09:13:21 -0600
+From: Keith Busch <kbusch@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: axboe@kernel.dk, sagi@grimberg.me, ben.copeland@linaro.org,
+	leon@kernel.org, linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org
 Subject: Re: [PATCH] nvme-pci: fix dma unmapping when using PRPs and not
  using the IOVA mapping
-Message-ID: <20250707150116.GA1939@lst.de>
-References: <20250707125223.3022531-1-hch@lst.de> <aGvZ5Xk5L66sNWJL@kbusch-mbp>
+Message-ID: <aGvkEcvMykZkx3MB@kbusch-mbp>
+References: <20250707125223.3022531-1-hch@lst.de>
+ <aGvZ5Xk5L66sNWJL@kbusch-mbp>
+ <20250707150116.GA1939@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -34,28 +46,16 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aGvZ5Xk5L66sNWJL@kbusch-mbp>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20250707150116.GA1939@lst.de>
 
-On Mon, Jul 07, 2025 at 08:29:57AM -0600, Keith Busch wrote:
-> Given it works fine for SGL, how do you feel about unconditionally
-> creating an NVMe SGL, and then call some "nvme_sgl_to_prp()" helper only
-> when needed? This means we only have one teardown path that matches the
-> setup.
+On Mon, Jul 07, 2025 at 05:01:16PM +0200, Christoph Hellwig wrote:
+> This looks a lot less complex than I feared.  I still don't think having
+> to allocate DMA memory for storing the ranges is all that great, mostly
+> because this is exactly the path we're going to hit for non-coherent
+> attachment where the DMA coherent memory will have a performance impact
+> because it is marked uncachable.
 
-I briefly thought about it and discard it because:
-
-  1) I thought it was too complex
-  2) the need to allocate relatively expensive data dma coherent
-     memory for something that is never DMAed to.
-
-> This is something I hacked up over the weekend. It's only lightly
-> tested, and I know there's a bug somewhere here with the chainging, but
-> it's a start.
-
-This looks a lot less complex than I feared.  I still don't think having
-to allocate DMA memory for storing the ranges is all that great, mostly
-because this is exactly the path we're going to hit for non-coherent
-attachment where the DMA coherent memory will have a performance impact
-because it is marked uncachable.
-
+Okay. I was hoping to avoid bringing back a mempool, but yes, I can see
+how abusing the dma pool allocation to hold the driver's sgl (that won't
+be DMA'd) may be harmful on non-coherent machines. Let's go with your
+patch now; we can always continue improving on this if needed later.
