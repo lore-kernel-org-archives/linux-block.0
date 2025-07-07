@@ -1,144 +1,93 @@
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37E7C1DDC3F;
-	Mon,  7 Jul 2025 15:39:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECEBE1D5145
+	for <linux-block@vger.kernel.org>; Mon,  7 Jul 2025 15:56:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751902799; cv=none; b=g+z3SQ1LVn6WrCZEpnE+xsF7dXeEwkSbz6meA2OtMXWJkCfauj44OaVOcgVXfVo9YZIb01al5ptX3U4mXx6wBZQc7+C9DVpcnfrLUIGX3O0dkcw2kUIKnbVAg+Ds00q67dPXFfWOnHiaj2rBgg/NKHBaA0dTcA2XnvBek+T9/Y8=
+	t=1751903816; cv=none; b=TWOXo39AhqZjY2UJKB8l2alryFa4+TR9JiNP+peMTHTztlHMqygQE+lZcW59P3C5Sn3W3WV997kQ8/zwlyxGa9Ps7FfptfRcuAkja0y5y8PyGKvpaHv3t/Vd4R4go7I1kipwhY35ez7ANyhzFO7GE7mUdUX+VtrNYQgjol/+A70=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751902799; c=relaxed/simple;
-	bh=ZhePww66v7+1u0nIf44yCLlcotDjaiAnFcUMwsGVNqU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=G35s7rAnBvxon/p/XRY4sYV9GZZqktFf6/HpCWoU1KNyyOwi7q31ciBhcyQD0NyrEjfstNpN7wV0jUbotv7HaflctJg3KEmSLczBDxmNn1/g5vQTAESBNLBlaFBhmkKcQS0XinbShJgoM2vodsoedYF6PD2R5GLgtxK3v2US1MI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RFi1DEKs; arc=none smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1751903816; c=relaxed/simple;
+	bh=K4TsgEfbZBCaB5T+UtpxvoxOzf99yOdPJVsE+Cw+Y0k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=I8ykAA3Q192Ok+YnrsqP7ufidqq0EV0z+rzxLS4S4dT2gZOqzlkkvSXbZDnDqUvtsxj15m9VDg4c8+GI3OfAOPdbadeb75IvtLNF7HQxo61EHiRZ3MT1zi1uV4RBnYmoM1ufS1TSlIsbUy8xJ7JTq0RxAK9ql3VDnMIfVMogDyw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z5AcbnHd; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RFi1DEKs"
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-60c9d8a16e5so6021600a12.0;
-        Mon, 07 Jul 2025 08:39:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751902796; x=1752507596; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ezjQuXHd5Rf3mpNjV8Fq8zwJgH75aSXDhZDfm3b1TCM=;
-        b=RFi1DEKsK5xAwKTB1PhW4pIYpw/cY2GRAqlmIQeFkaxgCQavx1aFtvvRIudV0+Z5qk
-         Oy7RNEDDK9yIrffoJRE11EFP9agoDvvQ/65+c/Fc7pKN6v8bsGzWpfnZBaN+AnXYX8/j
-         GQdEPtEudQHOqtfLxj+RLw6Fnwnw7KKroFtg0qCXan4Kr7oKGBAMUWAkI7NvCN+/j7A0
-         dRthouoLfW9g0OGWxfLFpYnbkyuhwowCsWn8uG2Ef5yUOYHkf3umU8tWhUUsSCfWtUv5
-         F+tWRzwgeTyoERaxT7oP4POR9vzVz+IsvDcyGvs5nPe9c0cyZNdtRzpTntghUAoW8bZ8
-         BNFQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751902796; x=1752507596;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ezjQuXHd5Rf3mpNjV8Fq8zwJgH75aSXDhZDfm3b1TCM=;
-        b=VoHmg+tsAArpdCmmDXluEfkW0zGu6MWRHS8WvyXk91Sg4eE9P2YmUNkplHnKrO4vvK
-         uR0FstOWaz1aIdzkiI2pjZP+G2C1GfDnehqtOPaZXzcLcAaBAuD1eFsgopHsUawxnIrP
-         mUKy7usKHmpl8NSL/Mp07J8FjNMAq/uGCqe8ssbqVyIXmBZQx9vPNjLWkKX7/y3ZAEyd
-         qpeMxTu7oTPXoSiyDIf9JTZN/U2RO85NHEfPNf5j4CIWBtpDnWcSS/zcIEUa8OFEs0IH
-         X4L7SpNYkUy2HB0+yJUErVw/5GGZ7q2h8aJA/JsHHZbwNcNIn67tJ8WlvctMZdopShKF
-         WzUg==
-X-Forwarded-Encrypted: i=1; AJvYcCVBvZKcUBYngIgUZgbfb3THjBl0eRZxRlu7ah67K/gPzTnpYnKRXBfryj1dZqw9j1MgwJZxTUbnsgQ6BaClHQ==@vger.kernel.org, AJvYcCVhxBfomePNfYOrBbo43dXI7S2QqjYTKnBX9kahEhfAzlWIDGsKgbG0bZyJe7MOu4qXVMxBkUxHm1oHCxY=@vger.kernel.org, AJvYcCWqNpFIXfP9Olc/tFVYnQjSOK4P7VdMcytwnyj7BX5JQ6un73rzoGNhhHupJbUhZNoaVkXyiqZtJec/Bw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxsGbsopAn/7/8rBHjvgT0kclySpXNDCmpU8wYBvWflY1eW2dzD
-	HcPZMTs9BRS7uBxoNRjB7sCzefy3WKNM4HqN2TgAVBnoN2Pd+PrOgcsMGWAykQ==
-X-Gm-Gg: ASbGncvzPeFT41pFMPNzgpo2UqlCOd50igmMP81NFAW7DUUMmFbb/Awcu34eUiwMbPB
-	SkJPzDN3AtO8DjocWd4cP7jCTj7zvTBZ6A6ZVTp+krRRXtPej74rg1PikvveCITpgga6tbCiKB5
-	qhxTZQZIacuMWMeK8FNG2h3wnKmCMqO9W2/xxEqmcf7A+6xSMYcmG0WAwG2Lr0Fff9IMmvk5l/E
-	xgK/MHzMMIsNdn2TxMbBHgekO8OB+/RZE73x3d/wav45YaAfQGjS0QUYKdo4maQdOvIPNenKykX
-	OLKfVFI1xzjTr4fQEqPHXf3oc4JoPKyECtM10aJQlzCRBEDFfeAqBnBN2BVhcW1LpQKX52wCGNY
-	raK3hYAk=
-X-Google-Smtp-Source: AGHT+IECUz+0dR+mX/jDHZopafgoqx5arH4cJ6TohfaPi6RZy5DB6VxRs0wsEPpg/JVzP6t3CV7CTA==
-X-Received: by 2002:a17:907:c29:b0:ad5:78ca:2126 with SMTP id a640c23a62f3a-ae4109062f9mr811114166b.59.1751902795974;
-        Mon, 07 Jul 2025 08:39:55 -0700 (PDT)
-Received: from [192.168.8.100] ([148.252.146.232])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-60fcb0c78efsm5939890a12.44.2025.07.07.08.39.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 07 Jul 2025 08:39:55 -0700 (PDT)
-Message-ID: <e210595b-d01f-4405-9b5d-a486ddca49ed@gmail.com>
-Date: Mon, 7 Jul 2025 16:41:23 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z5AcbnHd"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 014CCC4CEE3;
+	Mon,  7 Jul 2025 15:56:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751903815;
+	bh=K4TsgEfbZBCaB5T+UtpxvoxOzf99yOdPJVsE+Cw+Y0k=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Z5AcbnHd8RRLiGwhKyQCEKRiHwDNnLOxKiGli9/0YhEm80kN3aq/ruts5qIlYk5A6
+	 6LpG+1G1+nv05A1Wxr2wUxcViszbUUm6gRJ2PqKzMEPDftjSXMsLAnPx0t/HtgU+st
+	 aqb4rtSXW2NfYnQuUwDRBiTdswIlRVJchl73ewkVGZ+x5/szVxEYKqT3RhUV5sw1pF
+	 R6nLYOibtMPyw1r6GIReKmpLlJCUhkTQUuSks/bAkErPer/csYqicOpJusESYU0MBH
+	 v/28k6znhy+zdn7NhyN02dMIM1MVXWXuUzUAXgK81kQxg1bzeeefYX5fR8CSVJrZ7d
+	 5OAt+Oi6Olaxw==
+Date: Mon, 7 Jul 2025 09:56:53 -0600
+From: Keith Busch <kbusch@kernel.org>
+To: Hannes Reinecke <hare@suse.de>
+Cc: Christoph Hellwig <hch@lst.de>, Alan Adamson <alan.adamson@oracle.com>,
+	John Garry <john.g.garry@oracle.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Jens Axboe <axboe@kernel.dk>, linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org
+Subject: Re: What should we do about the nvme atomics mess?
+Message-ID: <aGvuRS8VmC0JXAR3@kbusch-mbp>
+References: <20250707141834.GA30198@lst.de>
+ <aGvYnMciN_IZC65Z@kbusch-mbp>
+ <b2ff30b5-5f12-4276-876d-81a8b2f180c1@suse.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC 00/12] io_uring dmabuf read/write support
-To: Christoph Hellwig <hch@infradead.org>
-Cc: io-uring@vger.kernel.org, linux-block@vger.kernel.org,
- linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
- Keith Busch <kbusch@kernel.org>, David Wei <dw@davidwei.uk>,
- Vishal Verma <vishal1.verma@intel.com>,
- Sumit Semwal <sumit.semwal@linaro.org>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
- linaro-mm-sig@lists.linaro.org
-References: <cover.1751035820.git.asml.silence@gmail.com>
- <aGaSb5rpLD9uc1IK@infradead.org>
- <f2216c30-6540-4b1a-b798-d9a3f83547b2@gmail.com>
- <aGveLlLDcsyCBKuU@infradead.org>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <aGveLlLDcsyCBKuU@infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b2ff30b5-5f12-4276-876d-81a8b2f180c1@suse.de>
 
-On 7/7/25 15:48, Christoph Hellwig wrote:
-> On Mon, Jul 07, 2025 at 12:15:54PM +0100, Pavel Begunkov wrote:
->>> to attach to / detach from a dma_buf, and then have an iter that
->>> specifies a dmabuf and offsets into.  That way the code behind the
->>> file operations can forward the attachment to all the needed
->>> devices (including more/less while it remains attached to the file)
->>> and can pick the right dma address for each device.
->>
->> By "iter that specifies a dmabuf" do you mean an opaque file-specific
->> structure allocated inside the new fop?
-> 
-> I mean a reference the actual dma_buf (probably indirect through the file
-> * for it, but listen to the dma_buf experts for that and not me).
+On Mon, Jul 07, 2025 at 05:26:46PM +0200, Hannes Reinecke wrote:
+> On 7/7/25 16:24, Keith Busch wrote:
+> > On Mon, Jul 07, 2025 at 04:18:34PM +0200, Christoph Hellwig wrote:
+> > > We could:
+> > > 
+> > >   I.	 revert the check and the subsequent fixup.  If you really want
+> > >           to use the nvme atomics you already better pray a lot anyway
+> > > 	 due to issue 1)
+> > >   II.	 limit the check to multi-controller subsystems
+> > >   III.	 don't allow atomics on controllers that only report AWUPF and
+> > >   	 limit support to controllers that support that more sanely
+> > > 	 defined NAWUPF
+> > > 
+> > > I guess for 6.16 we are limited to I. to bring us back to the previous
+> > > state, but I have a really bad gut feeling about it given the really
+> > > bad spec language and a lot of low quality NVMe implementations we're
+> > > seeing these days.
+> > 
+> > I like option III. The controler scoped atomic size is broken for all
+> > the reasons you mentioned, so I vote we not bother trying to make sense
+> > of it.
+> > 
+> Agree. We might consider I. as a fixup for stable, but should continue
+> with III going forward.
 
-My expectation is that io_uring would pass struct dma_buf to the
-file during registration, so that it can do a bunch of work upfront,
-but iterators will carry sth already pre-attached and pre dma mapped,
-probably in a file specific format hiding details for multi-device
-support, and possibly bundled with the dma-buf pointer if necessary.
-(All modulo move notify which I need to look into first).
+I think the NVMe TWG might want to consider an ECN to deprecate or at
+least recommend against AUWPF, too.
 
->> Akin to what Keith proposed back
->> then. That sounds good and has more potential for various optimisations.
->> My concern would be growing struct iov_iter by an extra pointer:
-> 
->> struct iov_iter {
->> 	union {
->> 		struct iovec *iov;
->> 		struct dma_seg *dmav;
->> 		...
->> 	};
->> 	void *dma_token;	
->> };
->>
->> But maybe that's fine. It's 40B -> 48B,
-> 
-> Alternatively we could the union point to a struct that has the dma buf
-> pointer and a variable length array of dma_segs. Not sure if that would
-> create a mess in the callers, though.
+Just to throw AWUPF a lifeline for legecy devices, we could potentially
+make sense of the value if Identify Controller says:
 
-Iteration helpers adjust the pointer, so either it needs to store
-the pointer directly in iter or keep the current index. It could rely
-solely on offsets, but that'll be a mess with nested loops (where the
-inner one would walk some kind of sg table).
+  1. CMIC == 0; and
+  2. OACS.NMS == 0; and
+  3.
+    a. FNA.FNS == 1; or
+    b. NN == 1
 
->> and it'll get back to
->> 40 when / if xarray_start / ITER_XARRAY is removed.
-> 
-> Would it?  At least for 64-bit architectures nr_segs is the same size.
-
-Ah yes
-
--- 
-Pavel Begunkov
-
+And if those conditions are true, then the controller and namespace
+scopes resolve to a single namespace format, so the values should be one
+in the same. The only way it could change, then, is a format command,
+which means there couldn't be an in-use filesystem depending on it not
+changing.
