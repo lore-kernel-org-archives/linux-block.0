@@ -1,80 +1,65 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 574A32E266D
-	for <linux-block@vger.kernel.org>; Mon,  7 Jul 2025 15:27:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37E7C1DDC3F;
+	Mon,  7 Jul 2025 15:39:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751902026; cv=none; b=pl9ecJa0BqCpJKMZKj8/rqaQGG03Uyx8N/7R8qCOSB7tt1HHfxIEFxrB98GY+P/gsKXuvwNGXnWNskUFQn3WpoNrYgv3L9Nu20YgjmObXX6776cw6gyAZWtTVLzIn9puk3IsjL0JdNMZTdTC4HewtfNP+aJZlIXSLwl43BSYt3M=
+	t=1751902799; cv=none; b=g+z3SQ1LVn6WrCZEpnE+xsF7dXeEwkSbz6meA2OtMXWJkCfauj44OaVOcgVXfVo9YZIb01al5ptX3U4mXx6wBZQc7+C9DVpcnfrLUIGX3O0dkcw2kUIKnbVAg+Ds00q67dPXFfWOnHiaj2rBgg/NKHBaA0dTcA2XnvBek+T9/Y8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751902026; c=relaxed/simple;
-	bh=OmJRu/p7HHi59gaQJPH1COfIfgEa1UgD7bDbyRQSRqY=;
+	s=arc-20240116; t=1751902799; c=relaxed/simple;
+	bh=ZhePww66v7+1u0nIf44yCLlcotDjaiAnFcUMwsGVNqU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bTY/cocfF36rdkmnuNwEscuA2EfG4MOHpGHrg8naHkDReri336JvFJJpzFnN3/6zJ+3ZBG+JetzQDDS8XvSubaQzNW7EAdz2Xta+nOBPeA1neffFlZ5N3pLxLWiwvOcDFq10jngTHQJ1Z1WjlHpITMMBk11qOff2Dym5Q3O31CA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=cVLOTojA; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=u0LFMmYS; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=cVLOTojA; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=u0LFMmYS; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	 In-Reply-To:Content-Type; b=G35s7rAnBvxon/p/XRY4sYV9GZZqktFf6/HpCWoU1KNyyOwi7q31ciBhcyQD0NyrEjfstNpN7wV0jUbotv7HaflctJg3KEmSLczBDxmNn1/g5vQTAESBNLBlaFBhmkKcQS0XinbShJgoM2vodsoedYF6PD2R5GLgtxK3v2US1MI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RFi1DEKs; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="cVLOTojA";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="u0LFMmYS";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="cVLOTojA";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="u0LFMmYS"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 792D51F390;
-	Mon,  7 Jul 2025 15:27:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1751902021; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PyUW2jNQ1CDdGSRifykhkuvSJEfICwLp3bIC3AG654A=;
-	b=cVLOTojAsaEzE2ylJrc14lyBlCoujSmt871bNTemWjd44vFTUXrwnAN5rngNIzpAmS/04S
-	lSyIm17lG15homkFtgiOIR3+q4bbOKpAOYQjMSokHbtbV/MzOvU9CY7F1B0no3m/nTw8KA
-	Hi6cFVA20+fBD2orQM9tLs5ARVFgKqM=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1751902021;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PyUW2jNQ1CDdGSRifykhkuvSJEfICwLp3bIC3AG654A=;
-	b=u0LFMmYSXLyPaeTdNeTKJX/sfPeif70MwlpcQ0dCaDDU9zLoKyAbRM6/4o4JQO8HanQ54j
-	WlwdU6sOWxkV1IBA==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1751902021; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PyUW2jNQ1CDdGSRifykhkuvSJEfICwLp3bIC3AG654A=;
-	b=cVLOTojAsaEzE2ylJrc14lyBlCoujSmt871bNTemWjd44vFTUXrwnAN5rngNIzpAmS/04S
-	lSyIm17lG15homkFtgiOIR3+q4bbOKpAOYQjMSokHbtbV/MzOvU9CY7F1B0no3m/nTw8KA
-	Hi6cFVA20+fBD2orQM9tLs5ARVFgKqM=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1751902021;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PyUW2jNQ1CDdGSRifykhkuvSJEfICwLp3bIC3AG654A=;
-	b=u0LFMmYSXLyPaeTdNeTKJX/sfPeif70MwlpcQ0dCaDDU9zLoKyAbRM6/4o4JQO8HanQ54j
-	WlwdU6sOWxkV1IBA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 267A613A5E;
-	Mon,  7 Jul 2025 15:27:01 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id F4FrB0Xna2hHQwAAD6G6ig
-	(envelope-from <hare@suse.de>); Mon, 07 Jul 2025 15:27:01 +0000
-Message-ID: <b2ff30b5-5f12-4276-876d-81a8b2f180c1@suse.de>
-Date: Mon, 7 Jul 2025 17:26:46 +0200
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RFi1DEKs"
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-60c9d8a16e5so6021600a12.0;
+        Mon, 07 Jul 2025 08:39:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1751902796; x=1752507596; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ezjQuXHd5Rf3mpNjV8Fq8zwJgH75aSXDhZDfm3b1TCM=;
+        b=RFi1DEKsK5xAwKTB1PhW4pIYpw/cY2GRAqlmIQeFkaxgCQavx1aFtvvRIudV0+Z5qk
+         Oy7RNEDDK9yIrffoJRE11EFP9agoDvvQ/65+c/Fc7pKN6v8bsGzWpfnZBaN+AnXYX8/j
+         GQdEPtEudQHOqtfLxj+RLw6Fnwnw7KKroFtg0qCXan4Kr7oKGBAMUWAkI7NvCN+/j7A0
+         dRthouoLfW9g0OGWxfLFpYnbkyuhwowCsWn8uG2Ef5yUOYHkf3umU8tWhUUsSCfWtUv5
+         F+tWRzwgeTyoERaxT7oP4POR9vzVz+IsvDcyGvs5nPe9c0cyZNdtRzpTntghUAoW8bZ8
+         BNFQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751902796; x=1752507596;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ezjQuXHd5Rf3mpNjV8Fq8zwJgH75aSXDhZDfm3b1TCM=;
+        b=VoHmg+tsAArpdCmmDXluEfkW0zGu6MWRHS8WvyXk91Sg4eE9P2YmUNkplHnKrO4vvK
+         uR0FstOWaz1aIdzkiI2pjZP+G2C1GfDnehqtOPaZXzcLcAaBAuD1eFsgopHsUawxnIrP
+         mUKy7usKHmpl8NSL/Mp07J8FjNMAq/uGCqe8ssbqVyIXmBZQx9vPNjLWkKX7/y3ZAEyd
+         qpeMxTu7oTPXoSiyDIf9JTZN/U2RO85NHEfPNf5j4CIWBtpDnWcSS/zcIEUa8OFEs0IH
+         X4L7SpNYkUy2HB0+yJUErVw/5GGZ7q2h8aJA/JsHHZbwNcNIn67tJ8WlvctMZdopShKF
+         WzUg==
+X-Forwarded-Encrypted: i=1; AJvYcCVBvZKcUBYngIgUZgbfb3THjBl0eRZxRlu7ah67K/gPzTnpYnKRXBfryj1dZqw9j1MgwJZxTUbnsgQ6BaClHQ==@vger.kernel.org, AJvYcCVhxBfomePNfYOrBbo43dXI7S2QqjYTKnBX9kahEhfAzlWIDGsKgbG0bZyJe7MOu4qXVMxBkUxHm1oHCxY=@vger.kernel.org, AJvYcCWqNpFIXfP9Olc/tFVYnQjSOK4P7VdMcytwnyj7BX5JQ6un73rzoGNhhHupJbUhZNoaVkXyiqZtJec/Bw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxsGbsopAn/7/8rBHjvgT0kclySpXNDCmpU8wYBvWflY1eW2dzD
+	HcPZMTs9BRS7uBxoNRjB7sCzefy3WKNM4HqN2TgAVBnoN2Pd+PrOgcsMGWAykQ==
+X-Gm-Gg: ASbGncvzPeFT41pFMPNzgpo2UqlCOd50igmMP81NFAW7DUUMmFbb/Awcu34eUiwMbPB
+	SkJPzDN3AtO8DjocWd4cP7jCTj7zvTBZ6A6ZVTp+krRRXtPej74rg1PikvveCITpgga6tbCiKB5
+	qhxTZQZIacuMWMeK8FNG2h3wnKmCMqO9W2/xxEqmcf7A+6xSMYcmG0WAwG2Lr0Fff9IMmvk5l/E
+	xgK/MHzMMIsNdn2TxMbBHgekO8OB+/RZE73x3d/wav45YaAfQGjS0QUYKdo4maQdOvIPNenKykX
+	OLKfVFI1xzjTr4fQEqPHXf3oc4JoPKyECtM10aJQlzCRBEDFfeAqBnBN2BVhcW1LpQKX52wCGNY
+	raK3hYAk=
+X-Google-Smtp-Source: AGHT+IECUz+0dR+mX/jDHZopafgoqx5arH4cJ6TohfaPi6RZy5DB6VxRs0wsEPpg/JVzP6t3CV7CTA==
+X-Received: by 2002:a17:907:c29:b0:ad5:78ca:2126 with SMTP id a640c23a62f3a-ae4109062f9mr811114166b.59.1751902795974;
+        Mon, 07 Jul 2025 08:39:55 -0700 (PDT)
+Received: from [192.168.8.100] ([148.252.146.232])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-60fcb0c78efsm5939890a12.44.2025.07.07.08.39.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 07 Jul 2025 08:39:55 -0700 (PDT)
+Message-ID: <e210595b-d01f-4405-9b5d-a486ddca49ed@gmail.com>
+Date: Mon, 7 Jul 2025 16:41:23 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -82,72 +67,78 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: What should we do about the nvme atomics mess?
-To: Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>
-Cc: Alan Adamson <alan.adamson@oracle.com>,
- John Garry <john.g.garry@oracle.com>,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- Jens Axboe <axboe@kernel.dk>, linux-nvme@lists.infradead.org,
- linux-block@vger.kernel.org
-References: <20250707141834.GA30198@lst.de> <aGvYnMciN_IZC65Z@kbusch-mbp>
+Subject: Re: [RFC 00/12] io_uring dmabuf read/write support
+To: Christoph Hellwig <hch@infradead.org>
+Cc: io-uring@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+ Keith Busch <kbusch@kernel.org>, David Wei <dw@davidwei.uk>,
+ Vishal Verma <vishal1.verma@intel.com>,
+ Sumit Semwal <sumit.semwal@linaro.org>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ linaro-mm-sig@lists.linaro.org
+References: <cover.1751035820.git.asml.silence@gmail.com>
+ <aGaSb5rpLD9uc1IK@infradead.org>
+ <f2216c30-6540-4b1a-b798-d9a3f83547b2@gmail.com>
+ <aGveLlLDcsyCBKuU@infradead.org>
 Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <aGvYnMciN_IZC65Z@kbusch-mbp>
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <aGveLlLDcsyCBKuU@infradead.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-3.30 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	SUBJECT_ENDS_QUESTION(1.00)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-0.997];
-	MIME_GOOD(-0.10)[text/plain];
-	MID_RHS_MATCH_FROM(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	ARC_NA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.de:mid,suse.de:email]
-X-Spam-Flag: NO
-X-Spam-Level: 
-X-Spam-Score: -3.30
+Content-Transfer-Encoding: 7bit
 
-On 7/7/25 16:24, Keith Busch wrote:
-> On Mon, Jul 07, 2025 at 04:18:34PM +0200, Christoph Hellwig wrote:
->> We could:
+On 7/7/25 15:48, Christoph Hellwig wrote:
+> On Mon, Jul 07, 2025 at 12:15:54PM +0100, Pavel Begunkov wrote:
+>>> to attach to / detach from a dma_buf, and then have an iter that
+>>> specifies a dmabuf and offsets into.  That way the code behind the
+>>> file operations can forward the attachment to all the needed
+>>> devices (including more/less while it remains attached to the file)
+>>> and can pick the right dma address for each device.
 >>
->>   I.	 revert the check and the subsequent fixup.  If you really want
->>           to use the nvme atomics you already better pray a lot anyway
->> 	 due to issue 1)
->>   II.	 limit the check to multi-controller subsystems
->>   III.	 don't allow atomics on controllers that only report AWUPF and
->>   	 limit support to controllers that support that more sanely
->> 	 defined NAWUPF
+>> By "iter that specifies a dmabuf" do you mean an opaque file-specific
+>> structure allocated inside the new fop?
+> 
+> I mean a reference the actual dma_buf (probably indirect through the file
+> * for it, but listen to the dma_buf experts for that and not me).
+
+My expectation is that io_uring would pass struct dma_buf to the
+file during registration, so that it can do a bunch of work upfront,
+but iterators will carry sth already pre-attached and pre dma mapped,
+probably in a file specific format hiding details for multi-device
+support, and possibly bundled with the dma-buf pointer if necessary.
+(All modulo move notify which I need to look into first).
+
+>> Akin to what Keith proposed back
+>> then. That sounds good and has more potential for various optimisations.
+>> My concern would be growing struct iov_iter by an extra pointer:
+> 
+>> struct iov_iter {
+>> 	union {
+>> 		struct iovec *iov;
+>> 		struct dma_seg *dmav;
+>> 		...
+>> 	};
+>> 	void *dma_token;	
+>> };
 >>
->> I guess for 6.16 we are limited to I. to bring us back to the previous
->> state, but I have a really bad gut feeling about it given the really
->> bad spec language and a lot of low quality NVMe implementations we're
->> seeing these days.
+>> But maybe that's fine. It's 40B -> 48B,
 > 
-> I like option III. The controler scoped atomic size is broken for all
-> the reasons you mentioned, so I vote we not bother trying to make sense
-> of it.
+> Alternatively we could the union point to a struct that has the dma buf
+> pointer and a variable length array of dma_segs. Not sure if that would
+> create a mess in the callers, though.
+
+Iteration helpers adjust the pointer, so either it needs to store
+the pointer directly in iter or keep the current index. It could rely
+solely on offsets, but that'll be a mess with nested loops (where the
+inner one would walk some kind of sg table).
+
+>> and it'll get back to
+>> 40 when / if xarray_start / ITER_XARRAY is removed.
 > 
-Agree. We might consider I. as a fixup for stable, but should continue
-with III going forward.
+> Would it?  At least for 64-bit architectures nr_segs is the same size.
 
-Cheers,
+Ah yes
 
-Hannes
 -- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+Pavel Begunkov
+
