@@ -1,134 +1,153 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 779102DEA6E
-	for <linux-block@vger.kernel.org>; Mon,  7 Jul 2025 15:20:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 574A32E266D
+	for <linux-block@vger.kernel.org>; Mon,  7 Jul 2025 15:27:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751901612; cv=none; b=UzODv9EwyAF5QTf7xOPZ+TjXVI5fnxrAsC4XrgYNY9Nostb85v6rACx4cNnrHjwKbCEchG1lWs1xz6yRpLzKeCIQ+Irp11mED9SmQccxIcEtWBi7yS1oz8y2sjwvtYFgOdB1UpWV6Zfcj3j/GmK+IdO3UrE7/Qnyxpl/+VsuG9E=
+	t=1751902026; cv=none; b=pl9ecJa0BqCpJKMZKj8/rqaQGG03Uyx8N/7R8qCOSB7tt1HHfxIEFxrB98GY+P/gsKXuvwNGXnWNskUFQn3WpoNrYgv3L9Nu20YgjmObXX6776cw6gyAZWtTVLzIn9puk3IsjL0JdNMZTdTC4HewtfNP+aJZlIXSLwl43BSYt3M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751901612; c=relaxed/simple;
-	bh=9I48L1irnweIBx4TTSac9Gg780m997BU0eeBHwEtAjQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=i2zvmP0cnGrEn0Xf3JgjeLe4+giSvEj/7VeppQLYMkKFBRTy02fUpdwECJfNpwHFfymOcfOnDUQtXrr3eA7umE5xTk77Ws2Hg6B6AdkB85NLdxwka+w7Mwp4QezeeCarxzDP33shy83hZmYxZLlQipRlLF4fkrMOykuUjMfORCA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MZVVBUzd; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1751902026; c=relaxed/simple;
+	bh=OmJRu/p7HHi59gaQJPH1COfIfgEa1UgD7bDbyRQSRqY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bTY/cocfF36rdkmnuNwEscuA2EfG4MOHpGHrg8naHkDReri336JvFJJpzFnN3/6zJ+3ZBG+JetzQDDS8XvSubaQzNW7EAdz2Xta+nOBPeA1neffFlZ5N3pLxLWiwvOcDFq10jngTHQJ1Z1WjlHpITMMBk11qOff2Dym5Q3O31CA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=cVLOTojA; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=u0LFMmYS; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=cVLOTojA; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=u0LFMmYS; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MZVVBUzd"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1751901609;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="cVLOTojA";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="u0LFMmYS";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="cVLOTojA";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="u0LFMmYS"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 792D51F390;
+	Mon,  7 Jul 2025 15:27:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1751902021; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=muwzm2Yj9piz8p4XGq/kFFkCDvcXS0AOAX32kThgznE=;
-	b=MZVVBUzdo+PejHhFUO7waPtYSMDPkeYjRSutMH8ZHmDiTKZKj2g1DxQEIxqJKjrttXILbb
-	sKUNBqe8B0T6IfnaDGofxkvGbrtAIO8qdTkhjWzSKhvDlWVYTBIgJ6Pj6LXyZnzuWiatYe
-	xiX7MWYBmRBSSAQfCDvtMWVLE0WKZCg=
-Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
- [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-347-urkvq5Q3PIiZflKR-AsW0g-1; Mon, 07 Jul 2025 11:20:07 -0400
-X-MC-Unique: urkvq5Q3PIiZflKR-AsW0g-1
-X-Mimecast-MFC-AGG-ID: urkvq5Q3PIiZflKR-AsW0g_1751901605
-Received: by mail-lf1-f72.google.com with SMTP id 2adb3069b0e04-55629c3a5daso2567158e87.2
-        for <linux-block@vger.kernel.org>; Mon, 07 Jul 2025 08:20:05 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751901604; x=1752506404;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=muwzm2Yj9piz8p4XGq/kFFkCDvcXS0AOAX32kThgznE=;
-        b=nRth2f8U2ombeQxd84QnCO9xBNg+OGU5b2viMGdAIJl3EZoFL+1jXez3sfFzXE5V5A
-         NAyPT23PGI1wNB/A2IVDtUuFQcLCbOEj1lrjrXxrSPH3GJB5nAmaoies7SCuRJxq+edT
-         0jK0EwOdVumrnPGFHoV31Q7d31BuFRqgnncD0tm6mKj51vcPeoN/CJn3HK2ELX9msvpq
-         pyZx8HxyVhD8PU5PzQiEGLrHwFaB7NJkgd5fsVRyjdqSbybSUvMjSVvjbJpPnnOXWncI
-         gW5AyBurxoWL/MKFG7tYF0Rzn5TGGfyq5oI7SMfX/bI2q3vV3nJuSMIvoxewfD0Ftt37
-         WpAg==
-X-Gm-Message-State: AOJu0YzFwccXqxD40ymmF1avTVpsanmO30z1ymBb7tI8IjiQTxbEKLK0
-	gQVh+xzH5U1qhqKhdjpnuFO8jAilA8EE5uRMlwsx/o8mql5VGoNphoTJDK3qNz/Gc1URR2+pVM+
-	vtwwcqUSncAKzgLAdiYnGErQVXbk3RRHNxN59kbWkrNefIRZypO2y53P94/D1oBPItsgCzwD2V8
-	qqROaOES2Yavf4BlpjLuGRX9D8yAeeU+7l61pzR2o=
-X-Gm-Gg: ASbGncsRBm43dHr/xTz/jy6UcvmkCFqfcFP4FFB/bkpC8pWVZFCFRJ1itiLpeLaEf7K
-	FMHlCxRpBxttuJLirZS8HnfCGDgzy5gqGEp++nAqwFqf22xNugxDej3HcWQe7M42fb9wNZQk1Nh
-	7y81yo
-X-Received: by 2002:a05:6512:1107:b0:553:5d3c:e444 with SMTP id 2adb3069b0e04-557e5539548mr2083842e87.25.1751901604284;
-        Mon, 07 Jul 2025 08:20:04 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFWquwldnTvkGhVJKYGr2KGtT55cJm5gyjZm3YsR7Xde3v6NJCAFUwNaIOGqwYgOzotqSopmEKaLK7TOQ4S+tc=
-X-Received: by 2002:a05:6512:1107:b0:553:5d3c:e444 with SMTP id
- 2adb3069b0e04-557e5539548mr2083836e87.25.1751901603841; Mon, 07 Jul 2025
- 08:20:03 -0700 (PDT)
+	bh=PyUW2jNQ1CDdGSRifykhkuvSJEfICwLp3bIC3AG654A=;
+	b=cVLOTojAsaEzE2ylJrc14lyBlCoujSmt871bNTemWjd44vFTUXrwnAN5rngNIzpAmS/04S
+	lSyIm17lG15homkFtgiOIR3+q4bbOKpAOYQjMSokHbtbV/MzOvU9CY7F1B0no3m/nTw8KA
+	Hi6cFVA20+fBD2orQM9tLs5ARVFgKqM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1751902021;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PyUW2jNQ1CDdGSRifykhkuvSJEfICwLp3bIC3AG654A=;
+	b=u0LFMmYSXLyPaeTdNeTKJX/sfPeif70MwlpcQ0dCaDDU9zLoKyAbRM6/4o4JQO8HanQ54j
+	WlwdU6sOWxkV1IBA==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1751902021; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PyUW2jNQ1CDdGSRifykhkuvSJEfICwLp3bIC3AG654A=;
+	b=cVLOTojAsaEzE2ylJrc14lyBlCoujSmt871bNTemWjd44vFTUXrwnAN5rngNIzpAmS/04S
+	lSyIm17lG15homkFtgiOIR3+q4bbOKpAOYQjMSokHbtbV/MzOvU9CY7F1B0no3m/nTw8KA
+	Hi6cFVA20+fBD2orQM9tLs5ARVFgKqM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1751902021;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PyUW2jNQ1CDdGSRifykhkuvSJEfICwLp3bIC3AG654A=;
+	b=u0LFMmYSXLyPaeTdNeTKJX/sfPeif70MwlpcQ0dCaDDU9zLoKyAbRM6/4o4JQO8HanQ54j
+	WlwdU6sOWxkV1IBA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 267A613A5E;
+	Mon,  7 Jul 2025 15:27:01 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id F4FrB0Xna2hHQwAAD6G6ig
+	(envelope-from <hare@suse.de>); Mon, 07 Jul 2025 15:27:01 +0000
+Message-ID: <b2ff30b5-5f12-4276-876d-81a8b2f180c1@suse.de>
+Date: Mon, 7 Jul 2025 17:26:46 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250704105425.127341-1-shinichiro.kawasaki@wdc.com>
-In-Reply-To: <20250704105425.127341-1-shinichiro.kawasaki@wdc.com>
-From: Yi Zhang <yi.zhang@redhat.com>
-Date: Mon, 7 Jul 2025 23:19:51 +0800
-X-Gm-Features: Ac12FXx8fsNpm_nlAZuvWYlA6qj9xSI95yY7Gqn0AvIWVTHcO-QSTnLXckxivKo
-Message-ID: <CAHj4cs83b59HMPfWNyvt4Uj6hhgooYZfXuu8zqeJ-LOLq6i7Jg@mail.gmail.com>
-Subject: Re: [PATCH blktests] common/null_blk: check FULL file availability
- before write
-To: "Shin'ichiro Kawasaki" <shinichiro.kawasaki@wdc.com>
-Cc: linux-block@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: What should we do about the nvme atomics mess?
+To: Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>
+Cc: Alan Adamson <alan.adamson@oracle.com>,
+ John Garry <john.g.garry@oracle.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ Jens Axboe <axboe@kernel.dk>, linux-nvme@lists.infradead.org,
+ linux-block@vger.kernel.org
+References: <20250707141834.GA30198@lst.de> <aGvYnMciN_IZC65Z@kbusch-mbp>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <aGvYnMciN_IZC65Z@kbusch-mbp>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-3.30 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	SUBJECT_ENDS_QUESTION(1.00)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-0.997];
+	MIME_GOOD(-0.10)[text/plain];
+	MID_RHS_MATCH_FROM(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	ARC_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.de:mid,suse.de:email]
+X-Spam-Flag: NO
+X-Spam-Level: 
+X-Spam-Score: -3.30
 
-Tested-by: Yi Zhang <yi.zhang@redhat.com>
+On 7/7/25 16:24, Keith Busch wrote:
+> On Mon, Jul 07, 2025 at 04:18:34PM +0200, Christoph Hellwig wrote:
+>> We could:
+>>
+>>   I.	 revert the check and the subsequent fixup.  If you really want
+>>           to use the nvme atomics you already better pray a lot anyway
+>> 	 due to issue 1)
+>>   II.	 limit the check to multi-controller subsystems
+>>   III.	 don't allow atomics on controllers that only report AWUPF and
+>>   	 limit support to controllers that support that more sanely
+>> 	 defined NAWUPF
+>>
+>> I guess for 6.16 we are limited to I. to bring us back to the previous
+>> state, but I have a really bad gut feeling about it given the really
+>> bad spec language and a lot of low quality NVMe implementations we're
+>> seeing these days.
+> 
+> I like option III. The controler scoped atomic size is broken for all
+> the reasons you mentioned, so I vote we not bother trying to make sense
+> of it.
+> 
+Agree. We might consider I. as a fixup for stable, but should continue
+with III going forward.
 
-# ./check zbd/001
-common/null_blk: line 67: : No such file or directory
-zbd/001 =3D> nullb1 (sysfs and ioctl)                          [passed]
-    runtime    ...  0.167s
-With the patch
-# ./check zbd/001
-zbd/001 =3D> nullb1 (sysfs and ioctl)                          [passed]
-    runtime  0.167s  ...  0.174s
+Cheers,
 
-On Fri, Jul 4, 2025 at 6:54=E2=80=AFPM Shin'ichiro Kawasaki
-<shinichiro.kawasaki@wdc.com> wrote:
->
-> Commit e2805c7911a4 ("common/null_blk: Log null_blk configuration
-> parameters") introduced the write to the $FULL file in
-> _configure_null_blk(). However, the $FULL file is not available when
-> _configure_null_blk() is called in the fallback_device() context. In
-> this case, the write fails with the error "No such file or directory".
-> To avoid the error, confirm that $FULL is available before write to it.
->
-> Fixes: e2805c7911a4 ("common/null_blk: Log null_blk configuration paramet=
-ers")
-> Link: https://github.com/linux-blktests/blktests/issues/187
-> Reported-by: Yi Zhang <yi.zhang@redhat.com>
-> Suggested-by: Bart Van Assche <bvanassche@acm.org>
-> Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-> ---
->  common/null_blk | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/common/null_blk b/common/null_blk
-> index 83f508f..7395754 100644
-> --- a/common/null_blk
-> +++ b/common/null_blk
-> @@ -64,7 +64,7 @@ _configure_null_blk() {
->         fi
->         params+=3D("$@")
->
-> -       echo "$nullb_path ${params[*]}" >>"${FULL}"
-> +       [[ -n "${FULL}" ]] && echo "$nullb_path ${params[*]}" >>"${FULL}"
->
->         for param in "${params[@]}"; do
->                 local key=3D"${param%%=3D*}" val=3D"${param#*=3D}"
-> --
-> 2.50.0
->
->
-
-
---=20
-Best Regards,
-  Yi Zhang
-
+Hannes
+-- 
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
