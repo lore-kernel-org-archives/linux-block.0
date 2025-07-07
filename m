@@ -1,137 +1,61 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A58772E1730;
-	Mon,  7 Jul 2025 14:58:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFC802BDC0B
+	for <linux-block@vger.kernel.org>; Mon,  7 Jul 2025 15:01:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751900300; cv=none; b=UFOcNPbzgbJVDdydDHs/aFMXvc/0P0vus9wfguBEzgGImrS71zFTOkg1jVEyKKQh29r5MWNG6Hg9wA00CP9O9MIWZIT+JrOpa7Agm7nEGXq9tAJVVOYP+dSWJX6sov3Vfd3z/x1/UdZHNNX7nksPTYGCE5ohltOvolOPGEYqhXo=
+	t=1751900483; cv=none; b=sGHQTDhJYcQQRc/I0xSgRurKpZ7kcbXsI8AEjSV18auuQMV+oV4EGGQrbgjGaaVfM2la7O832mx6docqGyuu4KRJ/gMjGDpi745S4XpvvZKDRIS8VDtm2IY9hD/mqbfXvXGx6nWhNAvRLUQP/PgwU84RLgwpkLt99LDdpzKlUw8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751900300; c=relaxed/simple;
-	bh=PhN12gIU8BIJ5VKiBnTir2bDTMuW0pc6OzWU1moQax4=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=S8t77TJWq5vAratTxhtW98mSFBKMd/dGunIWYFj5OyU+4iL+vqFleQpYF3+vujLncs4NiPoIRyKhHHjJVn9aCAQ9tFwZ9JtxmkuYXmL7QUKYZCjKlSXJqlFUoPGiE1jQOncX0FcCQlEl8gPJr6o3AWYOehAJrZfM8TxYhZl95ww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pE4LfnzD; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pE4LfnzD"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3398DC4CEE3;
-	Mon,  7 Jul 2025 14:58:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751900300;
-	bh=PhN12gIU8BIJ5VKiBnTir2bDTMuW0pc6OzWU1moQax4=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=pE4LfnzDkmD442B5l+oZOIrTprN4zD/ARoX0ruGGAdbpGolBgjhgC/F+vVUk+V0ik
-	 TutR/i4p4dYO+XnY1tMUxvokNDeQc0fl7hc66xdknBFLBYO4NWMvJVgGqVIq0R8usd
-	 Um1G0mFhuH8c61sDTkRqRWx8z8KK4s8FdMmAAUl23/mNaw0fx0vj6VDu9eR2jOcjZm
-	 l10oH8NaD6DXl7JwPIv6fEhLeNtDDo/+NuZc0XHvKUrzBlYE5i2UkNLxe/FufqmJpe
-	 kTgXGqSkx656sX7FymFZ6smj+LJmwrL+h4dfnPBH2r3r+B9pwziTmmgDrvKHEOih7p
-	 XwyEGPC3VEBRA==
-From: Andreas Hindborg <a.hindborg@kernel.org>
-To: "Miguel Ojeda" <miguel.ojeda.sandonis@gmail.com>
-Cc: "Boqun Feng" <boqun.feng@gmail.com>,  "Miguel Ojeda" <ojeda@kernel.org>,
-  "Alex Gaynor" <alex.gaynor@gmail.com>,  "Gary Guo" <gary@garyguo.net>,
-  =?utf-8?Q?Bj=C3=B6rn?= Roy Baron <bjorn3_gh@protonmail.com>,  "Benno
- Lossin"
- <lossin@kernel.org>,  "Alice Ryhl" <aliceryhl@google.com>,  "Trevor Gross"
- <tmgross@umich.edu>,  "Danilo Krummrich" <dakr@kernel.org>,  "Jens Axboe"
- <axboe@kernel.dk>,  <linux-block@vger.kernel.org>,
-  <rust-for-linux@vger.kernel.org>,  <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 3/9] rust: block,core: rename `RawWriter` to `BufferWriter`
-In-Reply-To: <CANiq72nfeGwm17kp8OsmpgO-U6xMsuL9KBNwX34Rt1xz-Nxa1Q@mail.gmail.com>
- (Miguel
-	Ojeda's message of "Mon, 07 Jul 2025 16:18:13 +0200")
-References: <20250616-rnull-up-v6-16-v1-0-a4168b8e76b2@kernel.org>
-	<20250616-rnull-up-v6-16-v1-3-a4168b8e76b2@kernel.org>
-	<bpbFNIoKHyMEJSNSRBaq96hzfyrWNtFJIotbYdqEAcPhLhPf_sg-1kNlty_Uj-1tPs0ZQHcGrT-wlVRHYbANqg==@protonmail.internalid>
-	<CANiq72nfeGwm17kp8OsmpgO-U6xMsuL9KBNwX34Rt1xz-Nxa1Q@mail.gmail.com>
-User-Agent: mu4e 1.12.9; emacs 30.1
-Date: Mon, 07 Jul 2025 16:58:11 +0200
-Message-ID: <87o6twoxoc.fsf@kernel.org>
+	s=arc-20240116; t=1751900483; c=relaxed/simple;
+	bh=zh845HLfEfmDzFavXD+TwwTgUig9Bc93q2D5lWSZ5Dg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IvG210FdH+RA6uLeKz5Vc6X1gf4Uhx43SWemIc6PvB5Bc7dS2/g/noc3yYyYlJy/j9OAc9UPviTKJ4mEGAjne+IpafVlX9j35dZdGp9zfKvmt5Lzfzatuat3xUzpTjWrOMLpGL3WqOXgQHMLnjFgdXYFj1VgHTBfKWWRaLH9UJk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 0B54C68C7B; Mon,  7 Jul 2025 17:01:17 +0200 (CEST)
+Date: Mon, 7 Jul 2025 17:01:16 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Keith Busch <kbusch@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>, axboe@kernel.dk, sagi@grimberg.me,
+	ben.copeland@linaro.org, leon@kernel.org,
+	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH] nvme-pci: fix dma unmapping when using PRPs and not
+ using the IOVA mapping
+Message-ID: <20250707150116.GA1939@lst.de>
+References: <20250707125223.3022531-1-hch@lst.de> <aGvZ5Xk5L66sNWJL@kbusch-mbp>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aGvZ5Xk5L66sNWJL@kbusch-mbp>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-"Miguel Ojeda" <miguel.ojeda.sandonis@gmail.com> writes:
+On Mon, Jul 07, 2025 at 08:29:57AM -0600, Keith Busch wrote:
+> Given it works fine for SGL, how do you feel about unconditionally
+> creating an NVMe SGL, and then call some "nvme_sgl_to_prp()" helper only
+> when needed? This means we only have one teardown path that matches the
+> setup.
 
-> On Mon, Jun 16, 2025 at 3:26=E2=80=AFPM Andreas Hindborg <a.hindborg@kern=
-el.org> wrote:
->>
->> Rename the `RawWriter` to `BufferWriter`, wihich is a more suitable name.
->> Also move the module from `block` to `str`.
->
-> The prefix should probably be "rust: block,str", or just "rust:".
+I briefly thought about it and discard it because:
 
-OK =F0=9F=91=8D
+  1) I thought it was too complex
+  2) the need to allocate relatively expensive data dma coherent
+     memory for something that is never DMAed to.
 
->
-> (This patch would be ideally first in the series rather than in the
-> middle, by the way)
+> This is something I hacked up over the weekend. It's only lightly
+> tested, and I know there's a bug somewhere here with the chainging, but
+> it's a start.
 
-I'll move it.
-
->
->> -pub(crate) struct RawWriter<'a> {
->> +pub struct BufferWriter<'a> {
->
-> Since you are re-exporting, can this be kept for the crate?
-
-Yep.
-
->
->> +    /// Create a new [`Self`] instance.
->
-> It is not a big deal here, but when you have a "move" commit, please
-> try to keep changes to the minimum, e.g. type renaming could be done
-> before or after.
-
-Will do.
-
->
->> +    /// Return the position of the write pointer in the underlying buff=
-er.
->> +    pub fn pos(&self) -> usize {
->> +        self.pos
->> +    }
->
-> This is not mentioned in the commit message (and should have been a
-> different patch too).
-
-Right.
-
-> By the way, cannot you use `{Raw,}Formatter`? You could add a
-> formatter that null-terminates automatically and/or that tracks the
-> lifetime, but we add the null manually elsewhere.
-
-I'll look into that. It looks like I could just use `RawFormatter`. I
-don't recall the reason for `RawWriter`, it's been years and it was
-Wedson who introduced it originally.
-
->
-> Speaking of which, aren't you null-terminating manually anyway in `gen_di=
-sk.rs`?
->
-> Ah, no, you are adding two nulls -- one at the end of the buffer, and
-> one in the middle. So the current code will fail if it needs one final
-> byte (i.e. when the last null would have been enough).
-
-The null insertion at the call site should be removed, it's a leftover
-from before `BufferWriter` handled that.
-
->
-> Given all that, I would say just drop this one, and use the one we
-> have. Then we can add a fancier formatter later on independently if
-> needed.
-
-Will try that. Thanks for taking a look.
-
-
-Best regards,
-Andreas Hindborg
-
-
+This looks a lot less complex than I feared.  I still don't think having
+to allocate DMA memory for storing the ranges is all that great, mostly
+because this is exactly the path we're going to hit for non-coherent
+attachment where the DMA coherent memory will have a performance impact
+because it is marked uncachable.
 
