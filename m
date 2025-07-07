@@ -1,281 +1,211 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FE4028FFE6
-	for <linux-block@vger.kernel.org>; Mon,  7 Jul 2025 12:52:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751892762; cv=none; b=MbGIB3FyjzlFHt48MVbcq5KXpUXMu6GDiTu9xfwmQAs1tCsSn30hxX0VEOp5dSh6Hs2tm889cuWEJvJ78Nsg4f8jZeHVMMtN9QWzewB+HhMJv/9dV2CbU7DxYh6aN6K135Lu6AIv69Z05t8fXGuKlAjYqZaoPYPxmAZ9U5pua2Y=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751892762; c=relaxed/simple;
-	bh=hpVwAXHPRr1nNPk84ET2dNIZTA9CBJm2PlyJxB4PwmY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LtYX5En1Li0ubeuoiSHnC4Rq5sHhXWnu73WseUlQv+reS4/xgJGeSR3NgpzLkilrkij79YNfxYN0kUqHpCMGf1RGLKP32I0cRvwQrLbniuhYPC9B3NmstZV9/4I7NNaC4cKmlRKMxyPDL0giDFfcxH7f8ukX6+3Mt+JFhTN1aOM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=AYRrLAxQ; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B04C28F94E;
+	Mon,  7 Jul 2025 13:12:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1751893939; cv=fail; b=Wq1jsD6q10WQ+MKpmmlpnlAs86NcgqzV6eET+IycPefsj+UGkf1OTOKUj/TllBzxhImHBFSnWdo2FdvYd/aFCJRzfEbLL2rbgUykJONSqOSKeEShUvQD/eLG9pmuCTb6YluY5j7wVhu/ajASQmy+P6Jse8WEEkTpVF8bnNPdFf8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1751893939; c=relaxed/simple;
+	bh=FCEN1pczawj+2x5UuZHr0Km43itOqO9sUFh9gQctssQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=GH9L2uQaAde+C8sO5St44jVtr2Hy2peGtcQjwPm/IB64GLHd6pI5O9ibRprhHj5sEthlz5hKjMhgP17n3uyTpTq2cVQqBnTw/xnm3iee5Y5Qg5nJzinZW48+9oAeeQAf5jOo8wwraip4gBwuFildh2ZQG9CtNVJdqMt2uRV8kSI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=IynefbTQ; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=ivwo777m; arc=fail smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="AYRrLAxQ"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-	Content-ID:Content-Description:In-Reply-To:References;
-	bh=Yl4rSAtWm2DohyKC+WSCG8lQ0N5zr3M1Nf2Xp8x9Q7E=; b=AYRrLAxQNOW4FZqPl4FSzhS0lD
-	HqM8AcsSAvvfNAwof3+gY2jlOmp0mTokNzKQou2XYtY3/3Z+GLY3C70ZWqQlzI2ZgWZBrXrj8zY94
-	iHcfCDo/YKdE7iLaa1rjPV0grhXl1tDSnJHqhcC47B325pNNsHIHMa+yPeVhiXn4f2OUBMPmWEjQU
-	XEoADLW4FR4SBhfLKBlD2fMvOqp2M+/VEZLoalS8x0K7lEhJJ8KRDWjCte0gPHWIzdcVOo1dG8ISM
-	7y+6+vr4LhHum3oBI396U1JbJv2OWDWeyfkX0h/roVZiz2zHY025kTfxNg1DUddHcOD48R4oCrUrl
-	5eT4TWoQ==;
-Received: from 2a02-8389-2341-5b80-d601-7564-c2e0-491c.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:d601:7564:c2e0:491c] helo=localhost)
-	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1uYlKj-00000002SeG-2agf;
-	Mon, 07 Jul 2025 12:52:34 +0000
-From: Christoph Hellwig <hch@lst.de>
-To: kbusch@kernel.org,
-	axboe@kernel.dk,
-	sagi@grimberg.me
-Cc: ben.copeland@linaro.org,
-	leon@kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH] nvme-pci: fix dma unmapping when using PRPs and not using the IOVA mapping
-Date: Mon,  7 Jul 2025 14:52:23 +0200
-Message-ID: <20250707125223.3022531-1-hch@lst.de>
-X-Mailer: git-send-email 2.47.2
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="IynefbTQ";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="ivwo777m"
+Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 567CpuDb007668;
+	Mon, 7 Jul 2025 13:12:03 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=
+	corp-2025-04-25; bh=r+ZOCiW9J1w6DfiVUleMtEgXSchl7yhV3pwDA/QY97U=; b=
+	IynefbTQLO8IO5fDwsXsAPg1i7WaDSTjKz9hE26Jxik1e4BitsqUhHuJLJcnBVww
+	yZ/EdHt6MthKw6/Zk2EE5XrfIV91CB10egHcaoYdIOtYuevJUy0hZjGV93i+UvnN
+	3z6cWBmEFyR44+OkdZ/TeuZj+4kpA3HMqKZMByT0mhTeJXvle616UmqNNIoudDoN
+	V4lESRaxHSFCZ+ynPb4zKa/VqgdzWJn6XUHbKWpeebupGK+DYBpDV5s72GWF/BMO
+	TCzh+SnED2sfSsypKL9OPxugXE8HJoG4pfcG6xVIPSc63o/CfPJvQDZeCl6rUrhT
+	Vo/wxxj5+j7WDzv84zviqA==
+Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 47rem4r1g5-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 07 Jul 2025 13:12:03 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 567CUxAw027228;
+	Mon, 7 Jul 2025 13:12:02 GMT
+Received: from nam12-bn8-obe.outbound.protection.outlook.com (mail-bn8nam12on2073.outbound.protection.outlook.com [40.107.237.73])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 47ptg875yv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 07 Jul 2025 13:12:02 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=xKpfwop+mn32QVf1RTD+EHf5Dl6gfopvHZBPf+z6Odx4MWTNsBY7cZFS4BPHfDHsI2vany+4vd/eATqvRAAi5urcVRihNuc+ueTsMZt9KuedX1/Y2sA2EcjggOH9cDcInC2QoKn2KlV5NeA7DW/vUKWq5PnNkDIbKqculMYpPGuk3ct7lLQMZjm2Ho3ttZN+2pt37ojy6an02dF6ezlhe0ugdwPy2munzTJkNFa46ia1TSoIhYM+24GC+7mFSFwqSv9wMqEjb1wq9ue2SMd1uRYZJGUVWyLjK+4eN4EM1M5NwdkaqT2mI5YI3wtRMz8iLM1jsZ5OdHb6HahHs2JRYQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=r+ZOCiW9J1w6DfiVUleMtEgXSchl7yhV3pwDA/QY97U=;
+ b=V/EetZ2SCb9Y7pizB9CVARzu9sx53d5moyc6KKRclRkv02Kwi+efpD83t+o23Cim4GUWHf8Th5Cs2ObvlgGntq8sN8w/eMzDp10FQXt3WekyAfISE4GDuZe1byI5v8Hv++vDreabnUVhpbuyOHQkv80YAAuOzuD+zqIKcpn3ZRuNUuNs6YnUzHnD13pirPEAorFdu+mDAUiA1hZFodgzDwYzgueABgXJDjUcRg/6LOOnHre8IVnrAFJ8aWrAAcFJ5cNNKSai85iy1WKJVMY/U/gQeZF08mVPYd61e8Nt6CHvs0DO+iixijRBxrDrT1Oi/R/jwXw5ybWZoRJe2ZCV+w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=r+ZOCiW9J1w6DfiVUleMtEgXSchl7yhV3pwDA/QY97U=;
+ b=ivwo777mqK4eS5gn4Ve6Klogmi9+JOUgrlsZjwX/gfuCG1mWbvpO59f2C7WN9rLh7bAxwn8dwCEduriHjay8IvXVYoLwoRtXi2i3aOVC7BAchRUwcA1UXzNB4D+4HtNFZZlLUpK22zmimocqkTRp0vKTwa8Ag3yOxNJ/moKPLms=
+Received: from MN2PR10MB4320.namprd10.prod.outlook.com (2603:10b6:208:1d5::16)
+ by LV8PR10MB7776.namprd10.prod.outlook.com (2603:10b6:408:1e7::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8901.25; Mon, 7 Jul
+ 2025 13:11:57 +0000
+Received: from MN2PR10MB4320.namprd10.prod.outlook.com
+ ([fe80::42ec:1d58:8ba8:800c]) by MN2PR10MB4320.namprd10.prod.outlook.com
+ ([fe80::42ec:1d58:8ba8:800c%3]) with mapi id 15.20.8901.024; Mon, 7 Jul 2025
+ 13:11:57 +0000
+From: John Garry <john.g.garry@oracle.com>
+To: agk@redhat.com, snitzer@kernel.org, mpatocka@redhat.com, song@kernel.org,
+        yukuai3@huawei.com, hch@lst.de, nilay@linux.ibm.com, axboe@kernel.dk,
+        cem@kernel.org
+Cc: dm-devel@lists.linux.dev, linux-kernel@vger.kernel.org,
+        linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
+        ojaswin@linux.ibm.com, martin.petersen@oracle.com,
+        akpm@linux-foundation.org, linux-xfs@vger.kernel.org,
+        djwong@kernel.org, John Garry <john.g.garry@oracle.com>
+Subject: [PATCH v4 4/6] md/raid10: set chunk_sectors limit
+Date: Mon,  7 Jul 2025 13:11:33 +0000
+Message-ID: <20250707131135.1572830-5-john.g.garry@oracle.com>
+X-Mailer: git-send-email 2.43.5
+In-Reply-To: <20250707131135.1572830-1-john.g.garry@oracle.com>
+References: <20250707131135.1572830-1-john.g.garry@oracle.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: PH0P220CA0004.NAMP220.PROD.OUTLOOK.COM
+ (2603:10b6:510:d3::22) To MN2PR10MB4320.namprd10.prod.outlook.com
+ (2603:10b6:208:1d5::16)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN2PR10MB4320:EE_|LV8PR10MB7776:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7d72f023-c0cc-4f60-7ef6-08ddbd57d9c3
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?vPGNuIegzDwr2aslepgtHmcUU+Y06D4qnylYu0VyreAvIrjBIWzVdYIdtFSG?=
+ =?us-ascii?Q?7pLrNSPINrC3d5355cSgN/VAhlGeFnFnsKJJR23LQIDR5WxZixWVE5BCqyOL?=
+ =?us-ascii?Q?9e8uZc6j7tdebnpVug3nujC9gC7WY8B/PlPskQvDKDwiP/Pq0RS9YPnt9HEl?=
+ =?us-ascii?Q?unZxNwmV9XOuxH71h2xKBOVgVOXDXdRoS/E8Vo9mOjOsomK2IaThwD8Ye+Jt?=
+ =?us-ascii?Q?NB9fdG3WZrEHUOJmHQbvz+RFvekGgTxVxLbqT02WgmEStTJ4nfPFnELMGdfr?=
+ =?us-ascii?Q?1T9R/ooAmVS3z/J148xL8dBblDA1RRSm3YSODnbhUlRyoAvXF+y13fanl7kH?=
+ =?us-ascii?Q?HE+x/Pk/Bhbpn7NcYIFwlUEzFf1bwGVPgv5ejPag0ojtGmw4VOUvfOgv0xgI?=
+ =?us-ascii?Q?RodbGgAJSViKZD5eA4Y4+LqLGtBl4Kst4Phhel0BttKpVxrC4RVVSv8J1TDQ?=
+ =?us-ascii?Q?0VxQ4F5wvAxAMDdSiUbyuP1hp5nRvnbeid1K2mzT1rLBATZ5L7SKA1LP3DRE?=
+ =?us-ascii?Q?Sdev6svLLHEhVL6XPion6FZMDTsv9SGcISj6rcRJcZXUobezPvXaIJAZUiYf?=
+ =?us-ascii?Q?av4BF5NcU8SCaWfC7RyPCjKvRzqu80aVc07QYaANTQZJa/4YywLJjDb0EuTg?=
+ =?us-ascii?Q?aCKoL7/Bbk192hAnO27pGlbfo8ArgSeIjC9+7b4OqyQTwjCIBeLU8zoF2Z0/?=
+ =?us-ascii?Q?Enkg0vP7bSgaT57DeotzAnVxE42ha3HRO+xU+pukoEk0GMs21qI9mfOWpE56?=
+ =?us-ascii?Q?F9eqhzlqBnMrdXJHYVFWwxqA6wDpj2wMmAPRsSB0ZtV6ZSTAagefbtJvajtR?=
+ =?us-ascii?Q?sgDBI+5TT2wlyrehPvSWevbmy6tEB0tbvaYUjee+DfteqxR0p/Zo/F62ooeO?=
+ =?us-ascii?Q?GVyZYiT6gBNVc9JTxRELZzZZUurDUyOl1T7jEVQUjtC/IU01u89FEM0ANep6?=
+ =?us-ascii?Q?rsUCgWYU7C7wSO9xmqvv0rwIu5SSADq447TIYQb8n+e1tDOjPslXtvhOr2Ei?=
+ =?us-ascii?Q?zoViY+YR38Ivs9D5V8uPXbtbZF9e0RrhboHmJDh65PPGu4prAlYE+hPrUxiZ?=
+ =?us-ascii?Q?gyVzqBXVhT367koIcneQ5TthYaEHO6+PXzmUOBKHRcdePiIc6SgFiGx4eK/+?=
+ =?us-ascii?Q?qrW69YA4xTrnFiABxT5ywfoZwZ6sIIf2ZGPvw41eJSkiNmE4DYI0jzTB+sj5?=
+ =?us-ascii?Q?r5qcp0KGg8PMeQ+K1wrLQVhrpzq+kVWhIxf/n8+iHrI/D4+EFFAqKnWiEKZ6?=
+ =?us-ascii?Q?79bfWQYKDWbIYv7QFWM6bg9+KiD0MmPUSRmGihX4rEOFFqh4Wdx5XlcbBQzg?=
+ =?us-ascii?Q?36y+zaEKzxJavfKWlwK13LRXr59ikj1PiJXVEzwKIqyoJiaYRTzaqhV54cZy?=
+ =?us-ascii?Q?c/FB78MAj9PiG0CB60419ZKS+iJvhbekA9Cmk1bvRDOmihMDFpga5mpsPos7?=
+ =?us-ascii?Q?ZwN2RgWThEI=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR10MB4320.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?wYpUyIh0GKgGED/tQfCFCzcOjQsNpknYhm1VWwj8vq0hwX2eJVO2bzoYL45M?=
+ =?us-ascii?Q?e7O+sED5CqZDy0tyWFk45V47Uph/ND+hTL5rIdGXLAEh4TbH9MlBeN3BzH6n?=
+ =?us-ascii?Q?XzB40PFLRwhO8g0DgmqCj6mjqM8eqoDWxf0Lh+0DMv28mGtXg46od3/IzMfb?=
+ =?us-ascii?Q?y/M2ZIna5KcwQTyqIWLlZ2N0tu+fy+i4mgF+AT+aofF5tEwBK0pPyA78hIYA?=
+ =?us-ascii?Q?tyU8Esltn2I9xxHhwu/kk2ygwcHi5NcB+MwzEs1yNQ2Q4kZ59WFx3NntldOb?=
+ =?us-ascii?Q?dQBfyj8Pd8h6ik4vklkdnQ/0onXzVSWlSUNYxeCAukP+DGOcFoif3yMGMFvE?=
+ =?us-ascii?Q?57ROe6w4k8LDGBHScfmuz0OWDGldbevv3vCuKDpM/8zqX+kVLzzqaV3tQGTq?=
+ =?us-ascii?Q?46Id+tsifb8JicWH+KO1e7sF1EF6ZtJUhBiW1Qd5ZZq5rI3QdVbZrRUHaBJp?=
+ =?us-ascii?Q?vibOXET81pyNOYPmw4k7He6FMSUBB876x81jcg9qu7ffrmIuOcQaacqcSHRe?=
+ =?us-ascii?Q?n1CGbC1tFw2TlJwwQpxyyE6M8aqIGW3FVOgnX85i9SJBrfaxjvh8eBof6Bwu?=
+ =?us-ascii?Q?2e+WRV34y+9fZ4mSXxpi2d/AjVuGhSMttaGPlD9DGYYCM62BpTcLVNOv0Tho?=
+ =?us-ascii?Q?+dI/uDJwQuv5I+QYmcFO9kRZg+QAwNm+Cbf4coIWMsPzLFyPOJsgv25QKiJu?=
+ =?us-ascii?Q?mDUXtlrJeYTDH8cFQz4HEQs9taZjVBgN6souPfxpAzIJhVKMZ9CGjbqfYQYk?=
+ =?us-ascii?Q?N2D36K52H24WWAK2HKiyqe2ErD0eX+msxMU1iqH6K1DoJJ/AnOhTZ8iClx6q?=
+ =?us-ascii?Q?3gKX3z8+y4wkATOfQ6OlpTT8eU/EbBfQTMcQKBdVGP39PCoP7rSR80T6NUvp?=
+ =?us-ascii?Q?dBqPuYxaC/ASp27lvrwrdTGiIIV1oMxhXUsvyAobthHH4JYCjzoeHPpjxErW?=
+ =?us-ascii?Q?6zmQdxEPs9y6lGbowhPAD6bP9ptvDUO33LoR5HlL8o5jPyiN+zevFwzxsrfh?=
+ =?us-ascii?Q?PL7mQeKMvz/OgbIiEez+C+/Yif8UL3cKbCQihK0TF7nZkdlW9glz5jzRfyy0?=
+ =?us-ascii?Q?rVU3AJojZ7LLjZZVWb97BC5q1oVC8wV1escA/gWoburHSgAXTNRKOAytm9w/?=
+ =?us-ascii?Q?1T1X1ewfOuQyTgYJmfC88IQ38y6BHk5KP0A7IiSjybghnXprymcjauc2pPPg?=
+ =?us-ascii?Q?euNM0liD1uL3U2pSl5WUK3XpXdMQ8uWjtaus1Ywq6c6C6aPkIBrB9TE+sSB+?=
+ =?us-ascii?Q?1bsUOwU4EBDbzuqbipjC2DHNdBtwVTCwlgliCMreo9Od19roLwu5Pk8sW+Bv?=
+ =?us-ascii?Q?toG2JM+Qh2pRZNFqqNZ27i8YHrYukVWgeOEcqEcemS/mvSTQU0/ovkCEBj4R?=
+ =?us-ascii?Q?rQviiMzZN3nqeBOJ6kXx6Hg+WOgSDcFP4TxMm/FE8Nk59ZYbvDbv3kxE/tNj?=
+ =?us-ascii?Q?4nxrW23VctcxLTyw1k61aYS7cQZuG1UyGWaMuxdyOZk9jbRaM/TMxE126STJ?=
+ =?us-ascii?Q?8Owb65hsLaXXiI4YzK7C6RwxmqpRRoiuvXuGXC3N2P32DRguZlmpWEgQdIm6?=
+ =?us-ascii?Q?BTBFmTPzVa4KFq9S2RcXzS8xn6L7iuhjafWSqOM2QalfN8rRil7xL6eRIHyR?=
+ =?us-ascii?Q?Dw=3D=3D?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	nchO3QgCkCFODr+sF21Act9fKO0+WHUXWIzN/zFd4S8CppDgQEJ6wI80Tm5KXOSB8mDji48KlyYGdtFDTFA6hEs99rMPl4QNpJNb/o3WNaLafwi2y538avwaWM97mtte/jNBEGvFsyEiqMFlpfmVkcsgt+SOZfXFcqFqmXZZbIru02Pi8xK4apt9WJ01nbdeNnuSMSnwJXkbQntlme4u9gHODj/8gHwNsLSCmAJazg+MgTkGXSPluQx1rx844i38Wk6Hu0msch6VLywFyxkfTOnHJWdyGFuugP0B9nmdWnOx/oKE5soOefqk3SywF14iYvRTWYadeKWPOjRhAc+atZF4oRSqvzhE87OzmzQLEJE2mPaY4Ww0zq2x7U3JnCJlI22Pn+Ab3iDrosEwe5WG29VDrXOGI5fQDkMc6aJz9EnfU04gRvbeJczSQONLut15WRMIV60zNvR5GYr1HkMMbb18Nqs/3IyGz/B9IkIzTfseL5jnwOCL+2T3zKxtQ7+FEpLM/VK52iLQOppdtAbYCJnpGYemoJvHHhm3fwMephmugFrMD1A3vCbiflDnB3vELMags03pWfWihNJFl3jXbMFdjmFX8aNQ84OVucUlzqI=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7d72f023-c0cc-4f60-7ef6-08ddbd57d9c3
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR10MB4320.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jul 2025 13:11:57.1173
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: SJOKMYloX6DytVBTjqalfoWyhsPf/VxKwhX/lKfhmOkIqbqN5PKYC5bC8wCWB7u+OJkIHjf8LbzCyWLcICDMAw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR10MB7776
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
+ definitions=2025-07-07_03,2025-07-07_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 malwarescore=0 adultscore=0
+ suspectscore=0 phishscore=0 mlxlogscore=999 bulkscore=0 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2505160000
+ definitions=main-2507070077
+X-Proofpoint-ORIG-GUID: w8XNSiYdhWMwAk-GV4MUmhjZHMd7Ysae
+X-Proofpoint-GUID: w8XNSiYdhWMwAk-GV4MUmhjZHMd7Ysae
+X-Authority-Analysis: v=2.4 cv=GvtC+l1C c=1 sm=1 tr=0 ts=686bc7a3 b=1 cx=c_pps a=zPCbziy225d3KhSqZt3L1A==:117 a=zPCbziy225d3KhSqZt3L1A==:17 a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=wKuvFiaSGQ0qltdbU6+NXLB8nM8=:19
+ a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19 a=xqWC_Br6kY4A:10 a=Wb1JkmetP80A:10 a=GoEa3M9JfhUA:10 a=VnNF1IyMAAAA:8 a=i0EeH86SAAAA:8 a=yPCof4ZbAAAA:8 a=w2tMMWzikjCRSElI7Q0A:9 cc=ntf awl=host:12057
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzA3MDA3NyBTYWx0ZWRfX3z/4soo9276p BbCW/HfsVHlHiq8UZfSfiELBwv8BeIU6a5kMfXwXsvB7hULZ/J3xCh7KBGqLG/rjdmFha7golhl Zn2kqyYNn2mKrJwsrTBCcH2jXFrM9/9nvt+mv0RuLVZ6dXojcVkVNJgPi/5Cpug3OjRtEW2eSr4
+ hGTTGrStMQhlagGTMtGeIG/TcvOQMWM0TS0rKhsX+x1KoYmGNh+O1xQN4deeqCAjC9S9c1apjPz L7mn+foAFtoO9rAJ7smYIpiiwREva/T13thBpUsHSp9XYXts9CoNXVbM5mfDwfZ6XT8fsU6NNn2 Oq1n1JiH+TuXVij5You5psE/a94EC7KHgPwBMYV4WPE2RDy9IGQOgkOFwsM1noFqC7/2Kn2KKRY
+ GByvoGki9WaCTOtEEVdHFLrH1MOUTxgOFxWTFpJuu0GckLLSJCDe+m7FbMEh8LOFRJfcgLgc
 
-The current version of the blk_rq_dma_map support in nvme-pci tries to
-reconstruct the DMA mappings from the on the wire descriptors if they
-are needed for unmapping.  While this is not the case for the direct
-mapping fast path and the IOVA path, it is needed for the non-IOVA slow
-path, e.g. when using the interconnect is not dma coherent, when using
-swiotlb bounce buffering, or a IOMMU mapping that can't coalesce.
+Same as done for raid0, set chunk_sectors limit to appropriately set the
+atomic write size limit.
 
-While the reconstruction is easy and works fine for the SGL path, where
-the on the wire representation maps 1:1 to DMA mappings, the code to
-reconstruct the DMA mapping ranges from PRPs can't always work, as a
-given PRP layout can come from different DMA mappings, and the current
-code doesn't even always get that right.
-
-Give up on this approach and track the actual DMA mapping when actually
-needed again.
-
-Fixes: 7ce3c1dd78fc ("nvme-pci: convert the data mapping to blk_rq_dma_map")
-Reported-by: Ben Copeland <ben.copeland@linaro.org>
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Nilay Shroff <nilay@linux.ibm.com>
+Reviewed-by: Yu Kuai <yukuai3@huawei.com>
+Signed-off-by: John Garry <john.g.garry@oracle.com>
 ---
- drivers/nvme/host/pci.c | 114 ++++++++++++++++++++++------------------
- 1 file changed, 62 insertions(+), 52 deletions(-)
+ drivers/md/raid10.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index 6a7a8bdbf385..6af184f2b73b 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -173,6 +173,7 @@ struct nvme_dev {
- 	bool hmb;
- 	struct sg_table *hmb_sgt;
- 
-+	mempool_t *dmavec_mempool;
- 	mempool_t *iod_meta_mempool;
- 
- 	/* shadow doorbell buffer support: */
-@@ -262,6 +263,11 @@ enum nvme_iod_flags {
- 	IOD_SINGLE_SEGMENT	= 1U << 2,
- };
- 
-+struct nvme_dma_vec {
-+	dma_addr_t addr;
-+	unsigned int len;
-+};
-+
- /*
-  * The nvme_iod describes the data in an I/O.
-  */
-@@ -274,6 +280,8 @@ struct nvme_iod {
- 	unsigned int total_len;
- 	struct dma_iova_state dma_state;
- 	void *descriptors[NVME_MAX_NR_DESCRIPTORS];
-+	struct nvme_dma_vec *dma_vecs;
-+	unsigned int nr_dma_vecs;
- 
- 	dma_addr_t meta_dma;
- 	struct sg_table meta_sgt;
-@@ -674,44 +682,12 @@ static void nvme_free_prps(struct request *req)
- {
- 	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
- 	struct nvme_queue *nvmeq = req->mq_hctx->driver_data;
--	struct device *dma_dev = nvmeq->dev->dev;
--	enum dma_data_direction dir = rq_dma_dir(req);
--	int length = iod->total_len;
--	dma_addr_t dma_addr;
--	int i, desc;
--	__le64 *prp_list;
--	u32 dma_len;
--
--	dma_addr = le64_to_cpu(iod->cmd.common.dptr.prp1);
--	dma_len = min_t(u32, length,
--		NVME_CTRL_PAGE_SIZE - (dma_addr & (NVME_CTRL_PAGE_SIZE - 1)));
--	length -= dma_len;
--	if (!length) {
--		dma_unmap_page(dma_dev, dma_addr, dma_len, dir);
--		return;
--	}
--
--	if (length <= NVME_CTRL_PAGE_SIZE) {
--		dma_unmap_page(dma_dev, dma_addr, dma_len, dir);
--		dma_addr = le64_to_cpu(iod->cmd.common.dptr.prp2);
--		dma_unmap_page(dma_dev, dma_addr, length, dir);
--		return;
--	}
--
--	i = 0;
--	desc = 0;
--	prp_list = iod->descriptors[desc];
--	do {
--		dma_unmap_page(dma_dev, dma_addr, dma_len, dir);
--		if (i == NVME_CTRL_PAGE_SIZE >> 3) {
--			prp_list = iod->descriptors[++desc];
--			i = 0;
--		}
-+	unsigned int i;
- 
--		dma_addr = le64_to_cpu(prp_list[i++]);
--		dma_len = min(length, NVME_CTRL_PAGE_SIZE);
--		length -= dma_len;
--	} while (length);
-+	for (i = 0; i < iod->nr_dma_vecs; i++)
-+		dma_unmap_page(nvmeq->dev->dev, iod->dma_vecs[i].addr,
-+				iod->dma_vecs[i].len, rq_dma_dir(req));
-+	mempool_free(iod->dma_vecs, nvmeq->dev->dmavec_mempool);
- }
- 
- static void nvme_free_sgls(struct request *req)
-@@ -760,6 +736,23 @@ static void nvme_unmap_data(struct request *req)
- 		nvme_free_descriptors(req);
- }
- 
-+static bool nvme_pci_prp_iter_next(struct request *req, struct device *dma_dev,
-+		struct blk_dma_iter *iter)
-+{
-+	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
-+
-+	if (iter->len)
-+		return true;
-+	if (!blk_rq_dma_map_iter_next(req, dma_dev, &iod->dma_state, iter))
-+		return false;
-+	if (dma_need_unmap(dma_dev)) {
-+		iod->dma_vecs[iod->nr_dma_vecs].addr = iter->addr;
-+		iod->dma_vecs[iod->nr_dma_vecs].len = iter->len;
-+		iod->nr_dma_vecs++;
-+	}
-+	return true;
-+}
-+
- static blk_status_t nvme_pci_setup_data_prp(struct request *req,
- 		struct blk_dma_iter *iter)
- {
-@@ -770,6 +763,16 @@ static blk_status_t nvme_pci_setup_data_prp(struct request *req,
- 	unsigned int prp_len, i;
- 	__le64 *prp_list;
- 
-+	if (dma_need_unmap(nvmeq->dev->dev)) {
-+		iod->dma_vecs = mempool_alloc(nvmeq->dev->dmavec_mempool,
-+				GFP_ATOMIC);
-+		if (!iod->dma_vecs)
-+			return BLK_STS_RESOURCE;
-+		iod->dma_vecs[0].addr = iter->addr;
-+		iod->dma_vecs[0].len = iter->len;
-+		iod->nr_dma_vecs = 1;
-+	}
-+
- 	/*
- 	 * PRP1 always points to the start of the DMA transfers.
- 	 *
-@@ -786,13 +789,10 @@ static blk_status_t nvme_pci_setup_data_prp(struct request *req,
- 	if (!length)
- 		goto done;
- 
--	if (!iter->len) {
--		if (!blk_rq_dma_map_iter_next(req, nvmeq->dev->dev,
--				&iod->dma_state, iter)) {
--			if (WARN_ON_ONCE(!iter->status))
--				goto bad_sgl;
--			goto done;
--		}
-+	if (!nvme_pci_prp_iter_next(req, nvmeq->dev->dev, iter)) {
-+		if (WARN_ON_ONCE(!iter->status))
-+			goto bad_sgl;
-+		goto done;
- 	}
- 
- 	/*
-@@ -831,13 +831,10 @@ static blk_status_t nvme_pci_setup_data_prp(struct request *req,
- 		if (!length)
- 			break;
- 
--		if (iter->len == 0) {
--			if (!blk_rq_dma_map_iter_next(req, nvmeq->dev->dev,
--					&iod->dma_state, iter)) {
--				if (WARN_ON_ONCE(!iter->status))
--					goto bad_sgl;
--				goto done;
--			}
-+		if (!nvme_pci_prp_iter_next(req, nvmeq->dev->dev, iter)) {
-+			if (WARN_ON_ONCE(!iter->status))
-+				goto bad_sgl;
-+			goto done;
- 		}
- 
- 		/*
-@@ -3025,14 +3022,25 @@ static int nvme_disable_prepare_reset(struct nvme_dev *dev, bool shutdown)
- static int nvme_pci_alloc_iod_mempool(struct nvme_dev *dev)
- {
- 	size_t meta_size = sizeof(struct scatterlist) * (NVME_MAX_META_SEGS + 1);
-+	size_t alloc_size = sizeof(struct nvme_dma_vec) * NVME_MAX_SEGS;
-+
-+	dev->dmavec_mempool = mempool_create_node(1,
-+			mempool_kmalloc, mempool_kfree,
-+			(void *)alloc_size, GFP_KERNEL,
-+			dev_to_node(dev->dev));
-+	if (!dev->dmavec_mempool)
-+		return -ENOMEM;
- 
- 	dev->iod_meta_mempool = mempool_create_node(1,
- 			mempool_kmalloc, mempool_kfree,
- 			(void *)meta_size, GFP_KERNEL,
- 			dev_to_node(dev->dev));
- 	if (!dev->iod_meta_mempool)
--		return -ENOMEM;
-+		goto free;
- 	return 0;
-+free:
-+	mempool_destroy(dev->dmavec_mempool);
-+	return -ENOMEM;
- }
- 
- static void nvme_free_tagset(struct nvme_dev *dev)
-@@ -3477,6 +3485,7 @@ static int nvme_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 	nvme_dbbuf_dma_free(dev);
- 	nvme_free_queues(dev, 0);
- out_release_iod_mempool:
-+	mempool_destroy(dev->dmavec_mempool);
- 	mempool_destroy(dev->iod_meta_mempool);
- out_dev_unmap:
- 	nvme_dev_unmap(dev);
-@@ -3540,6 +3549,7 @@ static void nvme_remove(struct pci_dev *pdev)
- 	nvme_dev_remove_admin(dev);
- 	nvme_dbbuf_dma_free(dev);
- 	nvme_free_queues(dev, 0);
-+	mempool_destroy(dev->dmavec_mempool);
- 	mempool_destroy(dev->iod_meta_mempool);
- 	nvme_release_descriptor_pools(dev);
- 	nvme_dev_unmap(dev);
+diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
+index b74780af4c22..97065bb26f43 100644
+--- a/drivers/md/raid10.c
++++ b/drivers/md/raid10.c
+@@ -4004,6 +4004,7 @@ static int raid10_set_queue_limits(struct mddev *mddev)
+ 	md_init_stacking_limits(&lim);
+ 	lim.max_write_zeroes_sectors = 0;
+ 	lim.io_min = mddev->chunk_sectors << 9;
++	lim.chunk_sectors = mddev->chunk_sectors;
+ 	lim.io_opt = lim.io_min * raid10_nr_stripes(conf);
+ 	lim.features |= BLK_FEAT_ATOMIC_WRITES;
+ 	err = mddev_stack_rdev_limits(mddev, &lim, MDDEV_STACK_INTEGRITY);
 -- 
-2.47.2
+2.43.5
 
