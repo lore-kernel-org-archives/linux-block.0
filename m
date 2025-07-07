@@ -1,97 +1,97 @@
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 003.mia.mailroute.net (003.mia.mailroute.net [199.89.3.6])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC1321E47A3;
-	Mon,  7 Jul 2025 18:25:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EF5C265282
+	for <linux-block@vger.kernel.org>; Mon,  7 Jul 2025 18:35:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.6
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751912742; cv=none; b=D4dzWcwGlD65MaAb8qci4HKTaowf+5HIx8AVn2R3GoR8XBgoG6+TgsOj/4VYcOypU/CMyp5wTLmoHnJnR6KO2UpLCjjk7lbC4d9pUIiCCzwf4jYPCmWZ9MhdOGs3unMKVNlUNexzcW1Ox0umCA/qj/jpa5dPgOoiuHY6d0tiv5Q=
+	t=1751913339; cv=none; b=NiNtmtybsWBD+xsaPD0hhPY3fANbhGi7UIIPWgX1Fr5/9GJM1x3OGa9EpwMdTEQatXN5uClFg2vAc74bZTqgW/TODdgj7EGMRPpEslAAHapmdNULeJbsoJY6NwWRac5CyvvELVcLgY1fbizii1zILG8CuG9otav5o/GyRbrX9Uk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751912742; c=relaxed/simple;
-	bh=anZp5DdyOR1f8FLHZ4XdqcWK+2212BKfuyZE8y4g9u8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pbhyqSICQXoP8XLfkMEP2iQcPCYR/INAeK0tQCeQV7z6bLzx8Ox52vQ1K0ie8nFIkVKC8uBf9f6LZHzFdnbnk+FLxyS147F7s7Md1JMaOkT47H/YKnWYjQT5ZYGO0A2iL3os/MhI4hYzxYMaBU7rNMnoNNskGZzPF78rkyjDbKw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EzFub007; arc=none smtp.client-ip=209.85.216.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1751913339; c=relaxed/simple;
+	bh=rPuLYwYlh0zw9E24LygyF8vZuNtQm7rdIa2EPjJ98Jc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=L6yEOZxn6NQRC9rUxfWoYwAwRk5pZ3rKcKsIjMtkEjm7ea9Xg01ykmD/qxMOTV6DB7PA0zeiMfUlK0zHyKqvrLwlz6VQsKmafkHUCUZWOUOXckGZMt1llbYo4V569VqhlKOmjaa3WdZN794qDyH85PKvusib+J1b9HTu2U5xY3s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=p2RNoKSb; arc=none smtp.client-ip=199.89.3.6
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EzFub007"
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-31305ee3281so688992a91.0;
-        Mon, 07 Jul 2025 11:25:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751912740; x=1752517540; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=anZp5DdyOR1f8FLHZ4XdqcWK+2212BKfuyZE8y4g9u8=;
-        b=EzFub007CUHGqIHK6MfY1dBZyRYDaWlIalwMUiD2ucjZSEHbM1WuyfYSQYUuTmqtxi
-         UAvA0KrYNqLrKbS9GNdmdMA5GsTtIdlbnK5COLY/TFOECv+cOasVr/LtWOkKrBJcGi/5
-         D5wwA7azJc0wPvNMY2o4conbduPgwoGG557DYuJQf6BsalAiCgFBdahKQnVrDNKEzCYH
-         3KgYgNa2O1yN1SAncN/ROPweigl+yXiQM9DsLvIB5Y2dL9PaRbzi63V1W7SPQ90OouA7
-         BUm/idaaEuoMn3e/wrQOl2pobLY1HXpqKqFjeOa3ULpn4Gg6N9tLUsUpwLDI00kxJ3gK
-         3P2g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751912740; x=1752517540;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=anZp5DdyOR1f8FLHZ4XdqcWK+2212BKfuyZE8y4g9u8=;
-        b=t2B9ng9X2+Z3IP3P84NnaT/JnAF830JUTUg/6QA6FMSrxfF4h6HOdYpz0J7WBG56tu
-         K75qMecGP04NSypnnAdAZh8gStKGBKP3ZocAK1O5OOaXOOI6axMjzAXe5GRlYoKYpy6D
-         QUP/geMvjNp7YDpK621GcmF4P/u8zlgb3r2vZEnqyzjmv+NDy76b6Q9RVwbHbAn+dUtC
-         CWLN9X8h1xSr1m2oOQWNJuatgBQCgz58bDtswyTVcGu4VzKo4eNQL+AUzPnk3i4lVxGL
-         kZJkgtFGB15WkCCzF3t85eQPU8Pa/Fm3MPUakFZ7zix0GVtkAgtKoyyqk1f0LX8Te2he
-         iMDQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW/BPdk7SB0rl0trnpELWHxrjmfXW6dn1q12Lw8I0h8yoc8HymFeexL2eAmqSr9/0K1nn1yCH0bR1uiMWPt@vger.kernel.org, AJvYcCXFFwTDY9qy6z3qdX3SXNH/i5ow6qy9cI6NSYRzazfjlSJWOPq1CWD8DBBSoIPwG/dJPO4hGWdjAeh6XaXsRNo=@vger.kernel.org, AJvYcCXXuGeAu+lwRhuGbCQ+81z90nZtpZ6Nf+9/iqxHZFI87XF8sUFjqsUE2KFD7aeoXv0/EKKe52LUzSAPrw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzTRlCji3VcZzW4ldvWrRSxSYw0zvBiTuhMUfK/eV7OrE0QsviK
-	DMDQ58pZqJFBC8SDsiz/MX8hWExL7SqtrGBPzPoQKk77qFJDVnLAybHUK6qkp+IRUTsh5rsK/fg
-	QmxjOAnQeEnokVrPx1hTGnTPSP5Ud84o=
-X-Gm-Gg: ASbGncvEjtN5tUyxkzCY/VxGUiUNaJJ5SVON17Kboz/kW3Zv/qVMnHqh+bN3z0/aZaf
-	cJ6gS//xReBruhLkw9R5SuPkbgh915uz2EYXSWTx0np+/re/vkWBqymyT14PdJhQkoe8rup4yhn
-	xqXImVG7YCXEjZNg3T5S4fij+GhGzx6WMAMJ3e+QfM1dO9
-X-Google-Smtp-Source: AGHT+IHKKiclk6LnFYU4xwnGBoz1P28AKtkC14eS32bLf+F5N8snKmGqdMiJVaa10jQj/25gyuU7OEoCaS/GnlBT8QQ=
-X-Received: by 2002:a17:90a:c105:b0:312:e9d:4001 with SMTP id
- 98e67ed59e1d1-31aaccdb82dmr7759682a91.8.1751912740163; Mon, 07 Jul 2025
- 11:25:40 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="p2RNoKSb"
+Received: from localhost (localhost [127.0.0.1])
+	by 003.mia.mailroute.net (Postfix) with ESMTP id 4bbXx519BhzlgqyR;
+	Mon,  7 Jul 2025 18:35:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1751913336; x=1754505337; bh=uho3eGsTHyAARNa07IiIoTqt
+	qZe1gmlnofi/CWdDoHc=; b=p2RNoKSbjgqYz067vqjz3gA3uo5b1/T/8kFwAV39
+	uUyD3tZuvLLYXjUTNtwMD57WwXgtzAKvZNmrF3XDBn1+mMdhT+e5YHe38Y2hX0tB
+	dsDNK7J24Iziba/ums6F6CQC9PQRWWG7bMFsDhEXdkLs/3Ovy0GQ8TJrJs9fQLeR
+	vYH5SUanwY8hM5Bw64OBD8JRybGxfoAfc9aSqLQy17e9mwldaIhxShU6vZc11GHu
+	uls/t+FwSNn6Y8E8AHYyVt2N7n1V3AWzEdUQPsU9J+w4Lm6g2En48Fld5OoSTAx/
+	aIAo+M9oPCGCOHG9iYjBOZ+4pAgxOiQe9qiHLy0sIYnVkA==
+X-Virus-Scanned: by MailRoute
+Received: from 003.mia.mailroute.net ([127.0.0.1])
+ by localhost (003.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id JpPgy0SXnlUZ; Mon,  7 Jul 2025 18:35:36 +0000 (UTC)
+Received: from [100.66.154.22] (unknown [104.135.204.82])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4bbXx23M00zlgqVY;
+	Mon,  7 Jul 2025 18:35:33 +0000 (UTC)
+Message-ID: <918963a5-a349-433a-80a8-6d06c609f20e@acm.org>
+Date: Mon, 7 Jul 2025 11:35:32 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250616-rnull-up-v6-16-v1-0-a4168b8e76b2@kernel.org>
- <20250616-rnull-up-v6-16-v1-3-a4168b8e76b2@kernel.org> <bpbFNIoKHyMEJSNSRBaq96hzfyrWNtFJIotbYdqEAcPhLhPf_sg-1kNlty_Uj-1tPs0ZQHcGrT-wlVRHYbANqg==@protonmail.internalid>
- <CANiq72nfeGwm17kp8OsmpgO-U6xMsuL9KBNwX34Rt1xz-Nxa1Q@mail.gmail.com> <87o6twoxoc.fsf@kernel.org>
-In-Reply-To: <87o6twoxoc.fsf@kernel.org>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Mon, 7 Jul 2025 20:25:27 +0200
-X-Gm-Features: Ac12FXxOBYHlumDpp_OJHopwJSbZRBul7wVIj35x1jwdWWcN77DVEbOMGcX1RmI
-Message-ID: <CANiq72kcR2Mct=uTzDQrWzAFOePsxG8Y=pS_6aGocbAe+Xaimw@mail.gmail.com>
-Subject: Re: [PATCH 3/9] rust: block,core: rename `RawWriter` to `BufferWriter`
-To: Andreas Hindborg <a.hindborg@kernel.org>
-Cc: Boqun Feng <boqun.feng@gmail.com>, Miguel Ojeda <ojeda@kernel.org>, 
-	Alex Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>, 
-	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <lossin@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
-	Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
-	linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/3] Fix a deadlock related to modifying queue attributes
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+References: <20250702182430.3764163-1-bvanassche@acm.org>
+ <20250703090906.GG4757@lst.de>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20250703090906.GG4757@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jul 7, 2025 at 4:58=E2=80=AFPM Andreas Hindborg <a.hindborg@kernel.=
-org> wrote:
->
-> The null insertion at the call site should be removed, it's a leftover
-> from before `BufferWriter` handled that.
+On 7/3/25 2:09 AM, Christoph Hellwig wrote:
+> I'm still very doubtful on this whole approach, and I think you are
+> ignoring the root cause, which is dm-multipath keeping a q_usage_count
+> reference for an unbounded time.  It is only supposed to be held over
+> I/O, and I/O is expected to time out.
 
-Just in case -- I think that if you do that then you would only get
-the null terminator at the end of the buffer.
+No. Since queue_if_no_path was introduced, it can queue I/O
+indefinitely. The oldest reference I could find to the queue_if_no_path
+implementation is from 20 years ago:
 
-i.e. the one your formatter (`RawWriter`) places is really at the end
-of the buffer, rather than immediately after your formatted text, so
-if you don't have the one at the call site, you would end with garbage
-in the middle unless the disk name fits perfectly into the buffer.
+Author: Alasdair G. Kergon <agk@redhat.com>
+Date:   Wed Mar 9 17:19:15 2005 -0800
 
-Cheers,
-Miguel
+     [PATCH] device-mapper: multipath
+
+     The core device-mapper multipath and path-selector code.
+     [ ... ]
+     As a last resort there is an option to 'queue_if_no_path' which 
+queues I/O if
+     all paths have failed e.g.  temporarily during a firmware update or 
+if the
+     userspace daemon is slow reinstating paths.
+
+> You'll probably get much farther by changing dm-multipath to not hold
+> a q_usage_count reference for something not actually under I/O.
+
+Please make yourself familiar with how the dm-mpath driver works. The
+default behavior for the dm-mpath driver is to operate in request based
+mode (DM_TYPE_REQUEST_BASED). Hence, a request is allocated before the
+dm-mpath driver sees any I/O. Hence, q_usage_counter is increased before
+the dm-mpath driver sees any I/O. Hence, what has been suggested cannot
+be implemented.
+
+Bart.
