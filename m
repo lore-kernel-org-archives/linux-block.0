@@ -1,57 +1,139 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC2F670813;
-	Mon,  7 Jul 2025 05:59:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78F5B33993
+	for <linux-block@vger.kernel.org>; Mon,  7 Jul 2025 06:06:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751867969; cv=none; b=S2DhMYTBYrA0avA6bxQnig5Uq8Z3vTeKrOe4nqGpIBzMdmyKN/2RISFHL6wlm39EdYTPWgOz6bSqbruwOQMrPjvg5tQrvIQnZpMaN/NXMZ87twwZPTN86JsTATizvXFry1/LR9OYIL+gSdS0C7URJALo3m32LonA72zM++sa4BI=
+	t=1751868378; cv=none; b=jk89zBQRFPbv6tCBFuB2XwMts9HmIe3ciTNb9rDqvr3Ir+sIyDAge7oZZofTXZgJUcfeb8qnouzf2DC5fqPYnFWPWN2CeS2jZp4cH5o+vISK6LHsCjKdnIUCmYdfaBpSJoM6McMLt/6GCd1mqmQ9mTaqRhd+bIh38Wg89pV/mbc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751867969; c=relaxed/simple;
-	bh=8g0ar6DF+kofijbjdY0k7eoZW++N+JeAnr+Kd+aZ+e0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LA/XYeNGbXX7XqMZhCz+4DFDnxYfzp2RvkxxI6G4kdZy0pTjeM7K6uzqtAS/IooLJqWe9y54iOGmxhBR6j5AuLphT8UHARtn4gVtKrQKNLPq5XM+ZJY1gQQrqNuECAQhyh2QRecZ4TPSlcgx1n6gXXm3xNawItAZARDUOHD035I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=kFJMCrS/; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1751868378; c=relaxed/simple;
+	bh=JpvNM43L/EayG/41IE1/A/AQ4z/Gko47AN3imBJUM3c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=R1YWNchGbkCrSKMh6j1SbhBv+NQw0t9XNHnvluZvOuKTcqX2bfr3EuH7ClloNxMEt6+f+oM30a8Q09hYGOhnPbxUlyuuMUrwA//ZwoqIlQTN7IdrlLcw2QP7TeSfdCAAbnksb6EwobN5T2T1kGEEDk3t1b1+u1xchU7G21QMNc0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=wtrkAoxW; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=d5YYig9t; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=RGDrB4cG; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=G1n/63r6; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="kFJMCrS/"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=8g0ar6DF+kofijbjdY0k7eoZW++N+JeAnr+Kd+aZ+e0=; b=kFJMCrS/PkBWqf41JH3xhptgo8
-	gQ6EmMAFkBoxe8AIn5gAnCwntJDUY8GWzstylLgdzT4Wz4ZrXEuxHGj/l7K7jokQ6xRhefrNxluNa
-	jBAvg6VGQAfsBZkY1/KPSr1G9wWnKXdklZV2hpViikkRr8BYDnx+agsBfka6LzgNszUuXhGyhI1RF
-	ihLWkJReqSaFhjpSuEFojEKE4ChVUAk7mxXcgJBaHNPAhNA8odY7dYbR1ZQEMVNGyBl9whAMT+mLq
-	fzFrXZOdvgOcYewZZVDy6DLPIYO2a7yaTCh9cGiIwkZA1qyHkEncBwlcUf3vQVQhF7qhbo+JuTkzC
-	uAwOR+tA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1uYesx-00000001V63-2ObU;
-	Mon, 07 Jul 2025 05:59:27 +0000
-Date: Sun, 6 Jul 2025 22:59:27 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Sakari Ailus <sakari.ailus@linux.intel.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 77/80] block: pm: Remove redundant
- pm_runtime_mark_last_busy() calls
-Message-ID: <aGtiP3FKLi92Gral@infradead.org>
-References: <20250704075225.3212486-1-sakari.ailus@linux.intel.com>
- <20250704075501.3223068-1-sakari.ailus@linux.intel.com>
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="wtrkAoxW";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="d5YYig9t";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="RGDrB4cG";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="G1n/63r6"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 4BCA621168;
+	Mon,  7 Jul 2025 06:06:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1751868374; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9jQoZ3h34iT4lM0EDYPVkLNZ3ikUlsV4Mn6UQjoGTh8=;
+	b=wtrkAoxWj7YdFyvQbOXM/ZIHJwRSlQRGWyDr55o9XAS39DPk1OqIiSjDOMs7+FH3jEY02x
+	+NvaL2FQRS7Sq+8qH8k/taVxagZS/ZjVtJEFC9ZfTSJ1Ssi1I2Th35/0qGdR9XfhJmrcL0
+	5h7wc0MPc2juQE40+KThAlBVVpSeFUI=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1751868374;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9jQoZ3h34iT4lM0EDYPVkLNZ3ikUlsV4Mn6UQjoGTh8=;
+	b=d5YYig9t0ub4KVfQZ5g1gUPtqiXV9TIbjz+r6M1TWSytJBLHJxEL8MzL2ty1TBkQ9wXW76
+	Rc3JEDCJRt9LwgCQ==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1751868373; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9jQoZ3h34iT4lM0EDYPVkLNZ3ikUlsV4Mn6UQjoGTh8=;
+	b=RGDrB4cGCrsC9GstV+7pFct7Pn+bVWpkMeQhqDwurJxZ+cr1svhMe5C5L58GEkpdaA3MJ/
+	IQBSr0z1Pgja/A0fmBL/LgMKVAoGX5K97YC1GlJa0GbxHY2nzmz9mghUqikds81bS6xK3I
+	tHkMbVTMmKy3WXxPpAL00Z9vuundt7w=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1751868373;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9jQoZ3h34iT4lM0EDYPVkLNZ3ikUlsV4Mn6UQjoGTh8=;
+	b=G1n/63r6OkjIH2hVOhfeUQXQZCS7AjM84M/TGe8Q/l+o4wNRvIin6+08Fej9H4MaBzWORX
+	Ph5O25G9G+JGX3BA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 1040013797;
+	Mon,  7 Jul 2025 06:06:12 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id v954O9Rja2ihCQAAD6G6ig
+	(envelope-from <hare@suse.de>); Mon, 07 Jul 2025 06:06:12 +0000
+Message-ID: <069d95d7-5a76-4255-a75a-22d1d68e6047@suse.de>
+Date: Mon, 7 Jul 2025 08:06:12 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250704075501.3223068-1-sakari.ailus@linux.intel.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] block: remove pktcdvd driver
+To: Jens Axboe <axboe@kernel.dk>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <dcc4836e-6da9-4208-ad27-bbd44b3a2063@kernel.dk>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <dcc4836e-6da9-4208-ad27-bbd44b3a2063@kernel.dk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-4.30 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-0.999];
+	MIME_GOOD(-0.10)[text/plain];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ARC_NA(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	MIME_TRACE(0.00)[0:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_TWO(0.00)[2];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,kernel.dk:email,suse.de:mid,suse.de:email]
+X-Spam-Flag: NO
+X-Spam-Level: 
+X-Spam-Score: -4.30
 
-Sending a single patch out of many to a list makes it unreviable.
+On 7/7/25 01:23, Jens Axboe wrote:
+> This driver has long outlived it's utility, and it's broken and unloved.
+> The main use case for this was direct mount with UDF of cd-rw drives
+> that required 32kb packets. It would collect writes into that size and
+> write them out in multiples of that. That's not a common use case
+> anymore, the world has moved on from those kinds of media. To make
+> matters worse, it's actively breaking setups where it's not even
+> required or useful.
+> 
+> Link: https://lore.kernel.org/linux-block/fxg6dksau4jsk3u5xldlyo2m7qgiux6vtdrz5rywseotsouqdv@urcrwz6qtd3r/
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> 
+Reviewed-by: Hannes Reinecke <hare@kernel.org>
 
-That might not matter as a 80 patch series is basically unreviable
-anyway.
+Cheers,
 
+Hannes
+-- 
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
