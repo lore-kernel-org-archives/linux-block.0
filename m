@@ -1,90 +1,97 @@
-Received: from 003.mia.mailroute.net (003.mia.mailroute.net [199.89.3.6])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EABA263F5D
-	for <linux-block@vger.kernel.org>; Mon,  7 Jul 2025 18:22:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC1321E47A3;
+	Mon,  7 Jul 2025 18:25:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751912537; cv=none; b=ABU6+MJzxtRIxs+iiq3uAOEQbnCGcpydkGNgRmPgVaO68Q0UaJGZMK6ZtXgTyGBswM8DaCOHQe9Vo6Co6xC9gd/vFkiOODWSxU1HJzpmV8Yy8bc0FsVqz8oaIdNS7g76mpeA49OnZh8XefTRkjja0LcZ0o27BzkPxChUX3jjYB0=
+	t=1751912742; cv=none; b=D4dzWcwGlD65MaAb8qci4HKTaowf+5HIx8AVn2R3GoR8XBgoG6+TgsOj/4VYcOypU/CMyp5wTLmoHnJnR6KO2UpLCjjk7lbC4d9pUIiCCzwf4jYPCmWZ9MhdOGs3unMKVNlUNexzcW1Ox0umCA/qj/jpa5dPgOoiuHY6d0tiv5Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751912537; c=relaxed/simple;
-	bh=ITfM3Vm8yRBmlg81kwiZtxomlwdH5yqI25xqYSqdFF8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GdjFe6EVu6uBboAj+VvdHa/N9OF5pesUKgLNS0HtGrw4EwvSAu9Id6gMQqg4x2Znm8Oh7KsGL46pGwlp3T9OYnNuwihqaAlPvIXVrrjC1xkUkpH6WkqsZOpFiYiO5CBoNruZOe4JfBA8E/oq9R+xLb0RvolP3xyb+sdg1U1OBtw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=gImaJ6z7; arc=none smtp.client-ip=199.89.3.6
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1751912742; c=relaxed/simple;
+	bh=anZp5DdyOR1f8FLHZ4XdqcWK+2212BKfuyZE8y4g9u8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=pbhyqSICQXoP8XLfkMEP2iQcPCYR/INAeK0tQCeQV7z6bLzx8Ox52vQ1K0ie8nFIkVKC8uBf9f6LZHzFdnbnk+FLxyS147F7s7Md1JMaOkT47H/YKnWYjQT5ZYGO0A2iL3os/MhI4hYzxYMaBU7rNMnoNNskGZzPF78rkyjDbKw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EzFub007; arc=none smtp.client-ip=209.85.216.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="gImaJ6z7"
-Received: from localhost (localhost [127.0.0.1])
-	by 003.mia.mailroute.net (Postfix) with ESMTP id 4bbXdf3xdKzlvWhD;
-	Mon,  7 Jul 2025 18:22:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1751912533; x=1754504534; bh=LaGc1Kj+La5YRGYG8suHYsQI
-	Ur42LYNX8Hl55vSeGak=; b=gImaJ6z7iu8LYPK/7s5Ub1BFkLnEW/dgZHOv/Bh5
-	dv5FzyqLHoS5sai8ixf1zURo6mCS0xGnZxHHKzsyfSOcRU75Dx3Lx1ScAC6/Vg6z
-	OhAPD2SUSV3SHKhegXLZUO2sZK4+FyQ699mLuKZzgF2kDaDYMaQQvsMRp95vU3C7
-	wG1DCEq8y0oCKifeDc9KmayaQiSA+AULjFeKvthum8dH8mrKiRZO1hjlYHCS6dMJ
-	+Npzqn746DD1GZ0qAVl74hDW4zGCbfZMe3iI8H5lhnOYaFCCXqmC1cj49g6I69ll
-	q0YUb5jqhx4CYaqYjxV6FlF+IPcdwAAxU5MQ54bs8xfEeA==
-X-Virus-Scanned: by MailRoute
-Received: from 003.mia.mailroute.net ([127.0.0.1])
- by localhost (003.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id XyuJeAWFIJ6E; Mon,  7 Jul 2025 18:22:13 +0000 (UTC)
-Received: from [100.66.154.22] (unknown [104.135.204.82])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4bbXdY3cJ7zlvRyX;
-	Mon,  7 Jul 2025 18:22:08 +0000 (UTC)
-Message-ID: <bbf1ec71-6a6c-440d-9ddd-efb5c5e10d44@acm.org>
-Date: Mon, 7 Jul 2025 11:22:07 -0700
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EzFub007"
+Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-31305ee3281so688992a91.0;
+        Mon, 07 Jul 2025 11:25:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1751912740; x=1752517540; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=anZp5DdyOR1f8FLHZ4XdqcWK+2212BKfuyZE8y4g9u8=;
+        b=EzFub007CUHGqIHK6MfY1dBZyRYDaWlIalwMUiD2ucjZSEHbM1WuyfYSQYUuTmqtxi
+         UAvA0KrYNqLrKbS9GNdmdMA5GsTtIdlbnK5COLY/TFOECv+cOasVr/LtWOkKrBJcGi/5
+         D5wwA7azJc0wPvNMY2o4conbduPgwoGG557DYuJQf6BsalAiCgFBdahKQnVrDNKEzCYH
+         3KgYgNa2O1yN1SAncN/ROPweigl+yXiQM9DsLvIB5Y2dL9PaRbzi63V1W7SPQ90OouA7
+         BUm/idaaEuoMn3e/wrQOl2pobLY1HXpqKqFjeOa3ULpn4Gg6N9tLUsUpwLDI00kxJ3gK
+         3P2g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751912740; x=1752517540;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=anZp5DdyOR1f8FLHZ4XdqcWK+2212BKfuyZE8y4g9u8=;
+        b=t2B9ng9X2+Z3IP3P84NnaT/JnAF830JUTUg/6QA6FMSrxfF4h6HOdYpz0J7WBG56tu
+         K75qMecGP04NSypnnAdAZh8gStKGBKP3ZocAK1O5OOaXOOI6axMjzAXe5GRlYoKYpy6D
+         QUP/geMvjNp7YDpK621GcmF4P/u8zlgb3r2vZEnqyzjmv+NDy76b6Q9RVwbHbAn+dUtC
+         CWLN9X8h1xSr1m2oOQWNJuatgBQCgz58bDtswyTVcGu4VzKo4eNQL+AUzPnk3i4lVxGL
+         kZJkgtFGB15WkCCzF3t85eQPU8Pa/Fm3MPUakFZ7zix0GVtkAgtKoyyqk1f0LX8Te2he
+         iMDQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW/BPdk7SB0rl0trnpELWHxrjmfXW6dn1q12Lw8I0h8yoc8HymFeexL2eAmqSr9/0K1nn1yCH0bR1uiMWPt@vger.kernel.org, AJvYcCXFFwTDY9qy6z3qdX3SXNH/i5ow6qy9cI6NSYRzazfjlSJWOPq1CWD8DBBSoIPwG/dJPO4hGWdjAeh6XaXsRNo=@vger.kernel.org, AJvYcCXXuGeAu+lwRhuGbCQ+81z90nZtpZ6Nf+9/iqxHZFI87XF8sUFjqsUE2KFD7aeoXv0/EKKe52LUzSAPrw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzTRlCji3VcZzW4ldvWrRSxSYw0zvBiTuhMUfK/eV7OrE0QsviK
+	DMDQ58pZqJFBC8SDsiz/MX8hWExL7SqtrGBPzPoQKk77qFJDVnLAybHUK6qkp+IRUTsh5rsK/fg
+	QmxjOAnQeEnokVrPx1hTGnTPSP5Ud84o=
+X-Gm-Gg: ASbGncvEjtN5tUyxkzCY/VxGUiUNaJJ5SVON17Kboz/kW3Zv/qVMnHqh+bN3z0/aZaf
+	cJ6gS//xReBruhLkw9R5SuPkbgh915uz2EYXSWTx0np+/re/vkWBqymyT14PdJhQkoe8rup4yhn
+	xqXImVG7YCXEjZNg3T5S4fij+GhGzx6WMAMJ3e+QfM1dO9
+X-Google-Smtp-Source: AGHT+IHKKiclk6LnFYU4xwnGBoz1P28AKtkC14eS32bLf+F5N8snKmGqdMiJVaa10jQj/25gyuU7OEoCaS/GnlBT8QQ=
+X-Received: by 2002:a17:90a:c105:b0:312:e9d:4001 with SMTP id
+ 98e67ed59e1d1-31aaccdb82dmr7759682a91.8.1751912740163; Mon, 07 Jul 2025
+ 11:25:40 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/8] block: Do not run frozen queues
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Yu Kuai <yukuai1@huaweicloud.com>, Jens Axboe <axboe@kernel.dk>,
- linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
- "yukuai (C)" <yukuai3@huawei.com>
-References: <20250702203845.3844510-1-bvanassche@acm.org>
- <20250702203845.3844510-3-bvanassche@acm.org>
- <699f9f38-009f-c5da-dfd3-60531e16c1ce@huaweicloud.com>
- <93500d50-ba11-425b-8d5f-1ce1930e4160@acm.org> <aGXiH1HqSlLk-QSI@fedora>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <aGXiH1HqSlLk-QSI@fedora>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20250616-rnull-up-v6-16-v1-0-a4168b8e76b2@kernel.org>
+ <20250616-rnull-up-v6-16-v1-3-a4168b8e76b2@kernel.org> <bpbFNIoKHyMEJSNSRBaq96hzfyrWNtFJIotbYdqEAcPhLhPf_sg-1kNlty_Uj-1tPs0ZQHcGrT-wlVRHYbANqg==@protonmail.internalid>
+ <CANiq72nfeGwm17kp8OsmpgO-U6xMsuL9KBNwX34Rt1xz-Nxa1Q@mail.gmail.com> <87o6twoxoc.fsf@kernel.org>
+In-Reply-To: <87o6twoxoc.fsf@kernel.org>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Mon, 7 Jul 2025 20:25:27 +0200
+X-Gm-Features: Ac12FXxOBYHlumDpp_OJHopwJSbZRBul7wVIj35x1jwdWWcN77DVEbOMGcX1RmI
+Message-ID: <CANiq72kcR2Mct=uTzDQrWzAFOePsxG8Y=pS_6aGocbAe+Xaimw@mail.gmail.com>
+Subject: Re: [PATCH 3/9] rust: block,core: rename `RawWriter` to `BufferWriter`
+To: Andreas Hindborg <a.hindborg@kernel.org>
+Cc: Boqun Feng <boqun.feng@gmail.com>, Miguel Ojeda <ojeda@kernel.org>, 
+	Alex Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>, 
+	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Benno Lossin <lossin@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
+	Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
+	linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 7/2/25 6:51 PM, Ming Lei wrote:
-> The dispatch critical area is much _longer_ than queue_rq()/queue_rqs(),
-> block layer data structure may still be accessed after .q_usage_counter drops
-> to zero.
+On Mon, Jul 7, 2025 at 4:58=E2=80=AFPM Andreas Hindborg <a.hindborg@kernel.=
+org> wrote:
+>
+> The null insertion at the call site should be removed, it's a leftover
+> from before `BufferWriter` handled that.
 
-I think the above is only correct for block drivers that set the
-BLK_MQ_F_BLOCKING flag. If BLK_MQ_F_BLOCKING is not set,
-__blk_mq_run_dispatch_ops() uses rcu_read_lock() and rcu_read_unlock().
-After q_usage_counter drops to zero, the percpu_refcount implementation
-uses call_rcu_hurry() to invoke blk_queue_usage_counter_release().
-Hence, when blk_queue_usage_counter_release() is called, a grace period 
-has occurred since q_usage_counter dropped to zero. Hence, all request
-processing and all dispatch activity has finished for non-blocking block
-drivers. For BLK_MQ_F_BLOCKING drivers a synchronize_srcu() call could
-be added in blk_mq_freeze_queue_wait() and also in
-blk_mq_freeze_queue_wait_timeout(). However, I'm not sure this change
-would be acceptable because it would slow down queue freezing even if it
-is not necessary to wait for dispatch activity.
+Just in case -- I think that if you do that then you would only get
+the null terminator at the end of the buffer.
 
-Thanks,
+i.e. the one your formatter (`RawWriter`) places is really at the end
+of the buffer, rather than immediately after your formatted text, so
+if you don't have the one at the call site, you would end with garbage
+in the middle unless the disk name fits perfectly into the buffer.
 
-Bart.
-
+Cheers,
+Miguel
