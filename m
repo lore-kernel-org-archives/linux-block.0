@@ -1,47 +1,41 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39F4013AF2;
-	Mon,  7 Jul 2025 05:42:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F423513AA3C
+	for <linux-block@vger.kernel.org>; Mon,  7 Jul 2025 05:55:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751866956; cv=none; b=PqnPkpdAmJvbFOx4AKkulbMeapxwPaQDSaUyJSqPwubERzkWKUyFjUfgi7B/0jlHIR8kaK6/7CxZnPPBPGA2mYjExE3XbuSDBb/+H49GCLXPUsxwZo4didk5mQTBnqNWvZn/UdvM6D6lktCZCHEDoJ13asIIXZM4Nn42emODnYc=
+	t=1751867718; cv=none; b=rqrhvaXUJfbhqstq2vgPCNHT/Fh5W4FDAvQyQNDV7KhYXlhwfv1ZVsz3fwQ6Qhyf4JdilhYfhTbDOcZ3hKLWwCX9Zch7l44XZB1MZ3cQXLAuNJkp4pXXfcfFVjajemZwsSBSfFokJzhEvV7pgCKhLxC1TKoe2I0S9Chv7mzuGiU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751866956; c=relaxed/simple;
-	bh=kuw5IbnV7fi6rLoKY/KXvSEqEshcimO+A5gdlD8ZJyM=;
+	s=arc-20240116; t=1751867718; c=relaxed/simple;
+	bh=KvhKuOUZ8zpX6OZXdzMU1NE9kvVb13C8v0ut4mocPhw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gcACazluDlHLkZ/qbycavwkPBSxPyp+uhbPFZHEy8niWQw1b8Rk2ydLro5GEtDJ6rGE4CbKKgS854dm//ga3WRI6kFDEAn1ZcOSQQWDfgWjKKMBwccRbs6HgEewi/sgJ9lbzQne0Eg+F6Pl7OnQME+jp28uEWWUBEYbzDuobXMw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 07766227A87; Mon,  7 Jul 2025 07:42:28 +0200 (CEST)
-Date: Mon, 7 Jul 2025 07:42:27 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Daniel Wagner <dwagner@suse.de>
-Cc: Christoph Hellwig <hch@lst.de>, Daniel Wagner <wagi@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Aaron Tomlin <atomlin@atomlin.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Costa Shulyupin <costa.shul@redhat.com>,
-	Juri Lelli <juri.lelli@redhat.com>,
-	Valentin Schneider <vschneid@redhat.com>,
-	Waiman Long <llong@redhat.com>, Ming Lei <ming.lei@redhat.com>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Mel Gorman <mgorman@suse.de>, Hannes Reinecke <hare@suse.de>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org, megaraidlinux.pdl@broadcom.com,
-	linux-scsi@vger.kernel.org, storagedev@microchip.com,
-	virtualization@lists.linux.dev,
-	GR-QLogic-Storage-Upstream@marvell.com
-Subject: Re: [PATCH v7 08/10] blk-mq: use hk cpus only when
- isolcpus=io_queue is enabled
-Message-ID: <20250707054227.GB28625@lst.de>
-References: <20250702-isolcpus-io-queues-v7-0-557aa7eacce4@kernel.org> <20250702-isolcpus-io-queues-v7-8-557aa7eacce4@kernel.org> <20250703090158.GA4757@lst.de> <75aafd33-0aff-4cf7-872f-f110ed896213@flourine.local>
+	 Content-Type:Content-Disposition:In-Reply-To; b=iaD3hajm+zilxWDlSL27XueKtfuwtl8pEniEAWY3ceQ8E245KZAaxSddUjyTm8LA8LkLgKRihUNC7RkmV+5/rF4KPgvoik/jOrmD2INyzvy24+NLInkKPH5pjWo8kQwLjgD96TOX+5WM/jbB8zJJHof+Zh9YhnSCSFGO/Pewfwo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=dWAJ4IPV; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="dWAJ4IPV"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=KvhKuOUZ8zpX6OZXdzMU1NE9kvVb13C8v0ut4mocPhw=; b=dWAJ4IPVV7omuQaJkYGpVntRkA
+	pGVN/iCX+2O5nLvWZhkrpSSnDXySE2jdiaEM+kypN9iYS8/RnB5Parvl/rTjthLlYCqySIK1ov2mB
+	l0x/8l05rzK5rAJx1diLkTGSnnSHPAhabeGdXiR9FrU7wcsnmRNNpnZ3KJD29TnjLaJoC2SwUhXPC
+	/kKXE8yr7/ElyeVcf/Jzej7PitdSyGRBGPWWFD8bObRH9c48t8kOVGuhdRvLgFJL4vdSLDw7MeoJk
+	cScBRVE6ZLwyqJPsSbmFNkMsyUk5L/QVjvR0hlKWTayr9fjY0ImEdWvkEwGcOd0C7cldASSUwzHx2
+	0q5Bm0OQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1uYeos-00000001UCj-2iy4;
+	Mon, 07 Jul 2025 05:55:14 +0000
+Date: Sun, 6 Jul 2025 22:55:14 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH] block: remove pktcdvd driver
+Message-ID: <aGthQvKMYKBcHkwT@infradead.org>
+References: <dcc4836e-6da9-4208-ad27-bbd44b3a2063@kernel.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -50,29 +44,10 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <75aafd33-0aff-4cf7-872f-f110ed896213@flourine.local>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <dcc4836e-6da9-4208-ad27-bbd44b3a2063@kernel.dk>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Fri, Jul 04, 2025 at 11:00:56AM +0200, Daniel Wagner wrote:
-> > I'm no expert on the housekeeping stuff, but why isn't the
-> > housekeeping_enabled check done in housekeeping_cpumask directly so
-> > that the drivers could use housekeeping_cpumask without a blk-mq
-> > wrapper?
-> 
-> Yes, housekeeping_cpumask will return cpu_possible_mask when housekeping
-> is disabled. Though some drivers want cpu_online_mask instead. If all
-> drivers would agree on one version of the mask it should allow to drop
-> to these helpers (maybe we the houskeeping API needs to be extended then
-> though)
+Finally!
 
-Drivers don't get cpu hotplug notifications, so cpu_possible_mask is
-the only valid answer right now.  That could change if we ever implement
-notifications to the drivers.
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 
-> This is also what Hannes brought up. If the number of supported hardware
-> queues for a device is less than cpu_possible_mask, it really makes
-> sense to distribute the hardware queues only between the online cpus. I
-> think the only two drivers which are interested in the cpu_possible_mask
-> are nvme-pci and virtio.
-
-That's the only two drivers that get it right :(
