@@ -1,97 +1,150 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8EB927B4E8
-	for <linux-block@vger.kernel.org>; Mon,  7 Jul 2025 07:44:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 803F228A3F7
+	for <linux-block@vger.kernel.org>; Mon,  7 Jul 2025 09:44:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751874300; cv=none; b=ugcYtq0mKGE3/4jPcxmbpwv3dsEdnyYIc4Z0FVaEHhZdnv68QF58+I+MJfXQyGfuRK3aYycC//VPBYJaLIQ8073HeWg1BdKU06O6e2M+zKye36uMpBd5EGyjfZ02zCAwXz3ZzdkDa70feDke1WZvOgcCDlFcKSEIpb9CBGCoD2A=
+	t=1751881495; cv=none; b=jC/VEyKbejcYDynmOR5WjwSV3yJjdr9hW51HvhjgkNIRfj0RaZzNoitiqvbGiHvMhnJAc7HOfQ1DOHkD98LOpEpXJ89q59wG7vSUwSqDlw9ql8Wp1P/prco8LXDEWQ8KF9vNY1xd1iXL0brlOMjc7vSg5naeyqkhVjVmqJMYpfM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751874300; c=relaxed/simple;
-	bh=yK4aIwKsyQJ35dvSsCmxtiNLfyzf0Pq1Pic5u+EzrNY=;
+	s=arc-20240116; t=1751881495; c=relaxed/simple;
+	bh=27kPDHNu5ioHNBIDG3RGc2ZItUClnEI4MI6px4NQQY4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ArZDpjhNKo32pffogD3NHmxavoPWxkrY0uX6PhrVjyJOZECpjbM5oLetWSlG2AyI4J88GhNafMJ/pMz+1H9yNA3zf2NB44iVoAEh0PoT4NfO4J6722kcESI4L6CKULsUjlHNGwhCj/KYW3zsnG7R1lTajuIZCS3ufTM5iOXSPWo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dDGijxWp; arc=none smtp.client-ip=170.10.133.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=N+waGIqufKXZGEBosirlmVe2YCSbAoNjkUqVvDVVMlP5rZnxfZ0FUNPHpZIlbeHZnzaMpRF/azv/XqTe1Y7TJnF3LOGUM4crL1lZrXmZm3HZ+puK4rjanoOMAlw++FhG6tf1eoiz/lWQNr3raF1JNmNTdv/jiknuXQTW8f6ANHY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PO2jazvS; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dDGijxWp"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PO2jazvS"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1751874297;
+	s=mimecast20190719; t=1751881492;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=OalrTZVgCTcY8CfgCXR2MxPAgz7dMXIrKso6Jipbb5U=;
-	b=dDGijxWpHbNYb+VT5IavBhEi1c0N3tNKzlu+6rJkMc+zhqq22cbndKl+dBZXaFAEPIsuZm
-	hjkwfXv+uzcubfBUXq/lieC8YQhK74MvkGOeFyqAvsOySGEd54xd0M2gr2/qUQ5I5UTTDM
-	+HT2dvLD9oBDRbqR0uxoXV3KOi9OSB0=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+	bh=8/q/AxiC8BPDCr7vW3PgW92g3apgii+JmJcKYGFYmhY=;
+	b=PO2jazvSSt1jjTbrh9/vX/oYYuZNDEOhVfLhC9u3aUngCqX2jAWGLvSPNkDEZnhBscQp0N
+	2Zeo4MchnuKP7YregmyAVsCyDMDboxHFQmugC3taTtceZaZb0DPbX9XorcEZ/5D2pjbO1N
+	O/o1kfsOkO8Q8ac9GbpPFl5TMCZ0yls=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-282-ZccoFHbxPKqYGcrylrjfjg-1; Mon,
- 07 Jul 2025 03:44:54 -0400
-X-MC-Unique: ZccoFHbxPKqYGcrylrjfjg-1
-X-Mimecast-MFC-AGG-ID: ZccoFHbxPKqYGcrylrjfjg_1751874292
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-147-25j0m1p7O1CaKrg0i_Xy0w-1; Mon,
+ 07 Jul 2025 05:44:49 -0400
+X-MC-Unique: 25j0m1p7O1CaKrg0i_Xy0w-1
+X-Mimecast-MFC-AGG-ID: 25j0m1p7O1CaKrg0i_Xy0w_1751881488
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 60B6F1801211;
-	Mon,  7 Jul 2025 07:44:50 +0000 (UTC)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C820A19560BE;
+	Mon,  7 Jul 2025 09:44:47 +0000 (UTC)
 Received: from fedora (unknown [10.72.116.160])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0525F1956087;
-	Mon,  7 Jul 2025 07:44:35 +0000 (UTC)
-Date: Mon, 7 Jul 2025 15:44:30 +0800
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6A29318046C5;
+	Mon,  7 Jul 2025 09:44:44 +0000 (UTC)
+Date: Mon, 7 Jul 2025 17:44:39 +0800
 From: Ming Lei <ming.lei@redhat.com>
-To: Daniel Wagner <wagi@kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
-	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Aaron Tomlin <atomlin@atomlin.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Costa Shulyupin <costa.shul@redhat.com>,
-	Juri Lelli <juri.lelli@redhat.com>,
-	Valentin Schneider <vschneid@redhat.com>,
-	Waiman Long <llong@redhat.com>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Mel Gorman <mgorman@suse.de>, Hannes Reinecke <hare@suse.de>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org, megaraidlinux.pdl@broadcom.com,
-	linux-scsi@vger.kernel.org, storagedev@microchip.com,
-	virtualization@lists.linux.dev,
-	GR-QLogic-Storage-Upstream@marvell.com
-Subject: Re: [PATCH v7 09/10] blk-mq: prevent offlining hk CPUs with
- associated online isolated CPUs
-Message-ID: <aGt63lJr2JY8VAqc@fedora>
-References: <20250702-isolcpus-io-queues-v7-0-557aa7eacce4@kernel.org>
- <20250702-isolcpus-io-queues-v7-9-557aa7eacce4@kernel.org>
+To: Caleb Sander Mateos <csander@purestorage.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Uday Shankar <ushankar@purestorage.com>
+Subject: Re: [PATCH 05/16] ublk: move auto buffer register handling into one
+ dedicated helper
+Message-ID: <aGuXBzbLEreWzNJ_@fedora>
+References: <20250702040344.1544077-1-ming.lei@redhat.com>
+ <20250702040344.1544077-6-ming.lei@redhat.com>
+ <CADUfDZpaNOqvqwMNUi_YavV9nHc8tkmPhZHKkx7UVk3W=Pbn6w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250702-isolcpus-io-queues-v7-9-557aa7eacce4@kernel.org>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CADUfDZpaNOqvqwMNUi_YavV9nHc8tkmPhZHKkx7UVk3W=Pbn6w@mail.gmail.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On Wed, Jul 02, 2025 at 06:33:59PM +0200, Daniel Wagner wrote:
-> When isolcpus=io_queue is enabled, and the last housekeeping CPU for a
-> given hctx goes offline, there would be no CPU left to handle I/O. To
-> prevent I/O stalls, prevent offlining housekeeping CPUs that are still
-> serving isolated CPUs.
+On Thu, Jul 03, 2025 at 04:19:50PM -0400, Caleb Sander Mateos wrote:
+> On Wed, Jul 2, 2025 at 12:04 AM Ming Lei <ming.lei@redhat.com> wrote:
+> >
+> > Move check & clearing UBLK_IO_FLAG_AUTO_BUF_REG to
+> > ublk_handle_auto_buf_reg(), also return buffer index from this helper.
+> >
+> > Also move ublk_set_auto_buf_reg() to this single helper too.
+> >
+> > Add ublk_config_io_buf() for setting up ublk io buffer, covers both
+> > ublk buffer copy or auto buffer register.
+> >
+> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > ---
+> >  drivers/block/ublk_drv.c | 132 ++++++++++++++++++++++-----------------
+> >  1 file changed, 76 insertions(+), 56 deletions(-)
+> >
+> > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> > index 1780f9ce3a24..ba1b2672e7a8 100644
+> > --- a/drivers/block/ublk_drv.c
+> > +++ b/drivers/block/ublk_drv.c
+> > @@ -48,6 +48,8 @@
+> >
+> >  #define UBLK_MINORS            (1U << MINORBITS)
+> >
+> > +#define UBLK_INVALID_BUF_IDX   ((unsigned short)-1)
 > 
-> When isolcpus=io_queue is enabled and the last housekeeping CPU
-> for a given hctx goes offline, no CPU would be left to handle I/O.
-> To prevent I/O stalls, disallow offlining housekeeping CPUs that are
-> still serving isolated CPUs.
+> u16?
 
-If you do so, cpu offline is failed, and this change is user visible, please
-document the cpu offline failure limit on Documentation/admin-guide/kernel-parameters.txt.
-in the next patch.
+Yeah.
+
+> 
+> > +
+> >  /* private ioctl command mirror */
+> >  #define UBLK_CMD_DEL_DEV_ASYNC _IOC_NR(UBLK_U_CMD_DEL_DEV_ASYNC)
+> >  #define UBLK_CMD_UPDATE_SIZE   _IOC_NR(UBLK_U_CMD_UPDATE_SIZE)
+> > @@ -1983,16 +1985,53 @@ static inline int ublk_check_cmd_op(u32 cmd_op)
+> >         return 0;
+> >  }
+> >
+> > +static inline int ublk_set_auto_buf_reg(struct io_uring_cmd *cmd)
+> > +{
+> > +       struct ublk_uring_cmd_pdu *pdu = ublk_get_uring_cmd_pdu(cmd);
+> > +
+> > +       pdu->buf = ublk_sqe_addr_to_auto_buf_reg(READ_ONCE(cmd->sqe->addr));
+> > +
+> > +       if (pdu->buf.reserved0 || pdu->buf.reserved1)
+> > +               return -EINVAL;
+> > +
+> > +       if (pdu->buf.flags & ~UBLK_AUTO_BUF_REG_F_MASK)
+> > +               return -EINVAL;
+> > +       return 0;
+> > +}
+> > +
+> > +static int ublk_handle_auto_buf_reg(struct ublk_io *io,
+> > +                                   struct io_uring_cmd *cmd,
+> > +                                   u16 *buf_idx)
+> > +{
+> > +       if (io->flags & UBLK_IO_FLAG_AUTO_BUF_REG) {
+> > +               io->flags &= ~UBLK_IO_FLAG_AUTO_BUF_REG;
+> > +
+> > +               /*
+> > +                * `UBLK_F_AUTO_BUF_REG` only works iff `UBLK_IO_FETCH_REQ`
+> > +                * and `UBLK_IO_COMMIT_AND_FETCH_REQ` are issued from same
+> > +                * `io_ring_ctx`.
+> > +                *
+> > +                * If this uring_cmd's io_ring_ctx isn't same with the
+> > +                * one for registering the buffer, it is ublk server's
+> > +                * responsibility for unregistering the buffer, otherwise
+> > +                * this ublk request gets stuck.
+> > +                */
+> > +               if (io->buf_ctx_handle == io_uring_cmd_ctx_handle(cmd) &&
+> > +                               buf_idx)
+> 
+> Not sure the buf_idx check here is necessary. This io->flags &
+> UBLK_IO_FLAG_AUTO_BUF_REG path should only be reachable from
+> ublk_commit_and_fetch(), not ublk_fetch() or UBLK_IO_NEED_GET_DATA.
+
+Good catch, UBLK_IO_FLAG_AUTO_BUF_REG can only be set from
+ublk_commit_and_fetch(), will fix it in next version.
+
 
 Thanks,
 Ming
