@@ -1,92 +1,94 @@
-Received: from 004.mia.mailroute.net (004.mia.mailroute.net [199.89.3.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3412621D5B6;
-	Mon,  7 Jul 2025 21:14:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BD4A218E8B;
+	Mon,  7 Jul 2025 22:38:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751922860; cv=none; b=F+fiFLU5YKtYkO3TzEj2AFyXlkHpxd1NsDFVlWq0LcBOQHJ7Nt6WURP0ZQno14P7bCNY+3YrmwXGur0r5UA/qLPQKPL4qKB1Lsckc5DW229E1JWU6mG1UdzR+D/8vVD3nfne08fC0QZfci5rMtaRX3WKMQzOnTttwbPkX4OWmOE=
+	t=1751927926; cv=none; b=EIh8as7wAxkJwq7jjOzxwHL8QraM6JEQ5nEgtfwTEck37oibE7gRu/pcQZo/DqYIBYBtDR8i7VU8AVug9+KxFvss3L8jhI5vvUNMUkYH72dj/m3kIFHpSqZzHOwwCr9kd+2DKjmFxOPFM994bS45wXyZffwSllZXf3+AAs9zndU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751922860; c=relaxed/simple;
-	bh=Fjap2xSsko+w7KDhnAl893n5tTyw2ZbP1/ejRaKFNsU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lrB6Ayv7bhyPvKMfYXlMaRvR0f9HtLhsKW6xdALLxUPCGgX4KEgww0NaAjULuAUDZ1xPvcG1EI1v/JhlVMcpymBUkq0HZxt0zv6qdr/YGo6/IdPrO6C0k2EBSxigWZ05YAAi+6ZD1agCdLFXi5zOkZ70uQDVn0T7vbsKyw/aA1g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=BYO/exIX; arc=none smtp.client-ip=199.89.3.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1751927926; c=relaxed/simple;
+	bh=ZHXT1F7ky+DycoXihHKVXqJluWPUcKdBjSeD3GvA/+A=;
+	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=ceeAIGrlQNs5QM2h84LvRnbcTRRXUqAbnxktLEquSsqnsDUCsoBUDFbEsy2KNzpYbMcxZo3311rfa3zOuJ39d28WmWG57t0+G1C+dSdxRayVXEgUo5y37K11M5k68tiYOtD5mTf2U4DKOokTSVj4NC1a1tGYlJSnsCpcC6D1Mgw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=YSAw3x7U; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="BYO/exIX"
-Received: from localhost (localhost [127.0.0.1])
-	by 004.mia.mailroute.net (Postfix) with ESMTP id 4bbcSB0pgWzm0ySc;
-	Mon,  7 Jul 2025 21:14:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1751922856; x=1754514857; bh=wJKxG0xSrrtCdoNKRmX5ZL91
-	1r/pXL8iTzwGCux5+0M=; b=BYO/exIXQCxPdys7x3kUJPYqACqiPB3/q+nbJtJ1
-	k51wiRg1PPX8ZP+iLemGCDyGGAvt3FRTdAJnwySJDZ+nG65IMh2C2kXCtOr9Qtj1
-	KytrYNz+B2NA5Pjc8whxIa6iDD0Og1uP9ZnjXJ8hOeW2N+gXMqsaRqp/pds7ymX5
-	2yFopCEcYBCkeh2WAjMVAvf63/gIRkQHg7oIjbJ1aPrisPYxEIh/aX+p2NV9xQRB
-	uwtUZXP2qTZKElw67uglgrqC8+hIpNct7LZmn+xjm71D+4Evcviwx3mM3ArFY6Eu
-	yCwUKe8iYswrbAHFTGgSwJlKB24wsUpCM+c4xLAnJFJNyw==
-X-Virus-Scanned: by MailRoute
-Received: from 004.mia.mailroute.net ([127.0.0.1])
- by localhost (004.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id tSbmb0RguPMQ; Mon,  7 Jul 2025 21:14:16 +0000 (UTC)
-Received: from [100.66.154.22] (unknown [104.135.204.82])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 004.mia.mailroute.net (Postfix) with ESMTPSA id 4bbcS336Yrzm0ySG;
-	Mon,  7 Jul 2025 21:14:10 +0000 (UTC)
-Message-ID: <38a74ff2-1aa1-4119-9fbb-e18b8d796ba3@acm.org>
-Date: Mon, 7 Jul 2025 14:14:09 -0700
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="YSAw3x7U"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0BE78C4CEE3;
+	Mon,  7 Jul 2025 22:38:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
+	s=korg; t=1751927925;
+	bh=ZHXT1F7ky+DycoXihHKVXqJluWPUcKdBjSeD3GvA/+A=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=YSAw3x7U+rLv0xQ3x1tri6xBUf3RSx1Lf09XEKM6xTP3BH2qsTDBNFS46u3XnaNg7
+	 F4nv5BPXF743X+05Ox8CW1NTguMNSbS2F7UYzJeoNGhMT2QT2DwZ34fcAWUiQwwVKX
+	 RWG3UPR0cQrbhw01mez3XDUz/hs/isiqUlz5mBuA=
+Date: Mon, 7 Jul 2025 15:38:44 -0700
+From: Andrew Morton <akpm@linux-foundation.org>
+To: "Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>
+Cc: Suren Baghdasaryan <surenb@google.com>, Ryan Roberts
+ <ryan.roberts@arm.com>, Baolin Wang <baolin.wang@linux.alibaba.com>,
+ Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
+ "H . Peter Anvin" <hpa@zytor.com>, Vlastimil Babka <vbabka@suse.cz>, Zi Yan
+ <ziy@nvidia.com>, Mike Rapoport <rppt@kernel.org>, Dave Hansen
+ <dave.hansen@linux.intel.com>, Michal Hocko <mhocko@suse.com>, David
+ Hildenbrand <david@redhat.com>, Lorenzo Stoakes
+ <lorenzo.stoakes@oracle.com>, Thomas Gleixner <tglx@linutronix.de>, Nico
+ Pache <npache@redhat.com>, Dev Jain <dev.jain@arm.com>, "Liam R . Howlett"
+ <Liam.Howlett@oracle.com>, Jens Axboe <axboe@kernel.dk>,
+ linux-kernel@vger.kernel.org, willy@infradead.org, linux-mm@kvack.org,
+ x86@kernel.org, linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ "Darrick J . Wong" <djwong@kernel.org>, mcgrof@kernel.org,
+ gost.dev@samsung.com, hch@lst.de, Pankaj Raghav <p.raghav@samsung.com>
+Subject: Re: [PATCH v2 0/5] add static PMD zero page support
+Message-Id: <20250707153844.d868f7cfe16830cce66f3929@linux-foundation.org>
+In-Reply-To: <20250707142319.319642-1-kernel@pankajraghav.com>
+References: <20250707142319.319642-1-kernel@pankajraghav.com>
+X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v19 01/11] block: Support block drivers that preserve the
- order of write requests
-To: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
- Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
- Nitesh Shetty <nj.shetty@samsung.com>, Ming Lei <ming.lei@redhat.com>
-References: <20250630223003.2642594-1-bvanassche@acm.org>
- <20250630223003.2642594-2-bvanassche@acm.org>
- <0f9f5900-b7d0-4df2-8c05-fc147c991534@kernel.org>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <0f9f5900-b7d0-4df2-8c05-fc147c991534@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On 7/2/25 3:57 AM, Damien Le Moal wrote:
-> On 7/1/25 07:29, Bart Van Assche wrote:
->> diff --git a/block/blk-settings.c b/block/blk-settings.c
->> index a000daafbfb4..bceb9a9cb5ba 100644
->> --- a/block/blk-settings.c
->> +++ b/block/blk-settings.c
->> @@ -814,6 +814,8 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
->>   	}
->>   	t->max_secure_erase_sectors = min_not_zero(t->max_secure_erase_sectors,
->>   						   b->max_secure_erase_sectors);
->> +	t->driver_preserves_write_order = t->driver_preserves_write_order &&
->> +		b->driver_preserves_write_order;
+On Mon,  7 Jul 2025 16:23:14 +0200 "Pankaj Raghav (Samsung)" <kernel@pankajraghav.com> wrote:
+
+> There are many places in the kernel where we need to zeroout larger
+> chunks but the maximum segment we can zeroout at a time by ZERO_PAGE
+> is limited by PAGE_SIZE.
 > 
-> Why not use a feature instead ? Stacking of the features does exactly this, no ?
-> That would be less code and one less limit.
+> This concern was raised during the review of adding Large Block Size support
+> to XFS[1][2].
+> 
+> This is especially annoying in block devices and filesystems where we
+> attach multiple ZERO_PAGEs to the bio in different bvecs. With multipage
+> bvec support in block layer, it is much more efficient to send out
+> larger zero pages as a part of a single bvec.
+> 
+> Some examples of places in the kernel where this could be useful:
+> - blkdev_issue_zero_pages()
+> - iomap_dio_zero()
+> - vmalloc.c:zero_iter()
+> - rxperf_process_call()
+> - fscrypt_zeroout_range_inline_crypt()
+> - bch2_checksum_update()
+> ...
+> 
+> We already have huge_zero_folio that is allocated on demand, and it will be
+> deallocated by the shrinker if there are no users of it left.
+> 
+> At moment, huge_zero_folio infrastructure refcount is tied to the process
+> lifetime that created it. This might not work for bio layer as the completions
+> can be async and the process that created the huge_zero_folio might no
+> longer be alive.
 
-Not all device mapper drivers preserve the bio order. The above code
-allows device mapper drivers to declare whether or not the bio order is
-preserved. The suggested alternative implements a different behavior,
-namely that the driver at the top of the stack inherits the behavior
-from the bottommost driver. I prefer to keep the above code.
+Can we change that?  Alter the refcounting model so that dropping the
+final reference at interrupt time works as expected?
 
-Thanks,
+And if we were to do this, what sort of benefit might it produce?
 
-Bart.
+> Add a config option STATIC_PMD_ZERO_PAGE that will always allocate
+> the huge_zero_folio via memblock, and it will never be freed.
