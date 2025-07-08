@@ -1,91 +1,77 @@
-Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 787A5189905
-	for <linux-block@vger.kernel.org>; Tue,  8 Jul 2025 02:19:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39A5421CC5A
+	for <linux-block@vger.kernel.org>; Tue,  8 Jul 2025 02:27:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751941173; cv=none; b=Id06mYZ/F+ECbgL0A201dYlH32E5ACfiaIV/wXL4irELhTkrip/g+oYVtarxBT8R9z6NFQRg8PywMShznc8Fag0vcYrmetqA7nw+9tu17yQBXpurmwHxgGwX85/BU6928vRgIhbS+FiTmiVJrtdbA5zdvrP1WaPigFzH87D3zfk=
+	t=1751941667; cv=none; b=kXmEj5y/WW/UlUPsI5YbLmn7YCwo8bCPj5R/nsjyejpkjgKvZLLu/3rDBJOXIFkaxZUwwH9j6MEbwjCabOPv+06GX1TKM7LhN3hN2gx2amUrcQ4nZSjHKD604uUpOt3gw/JnE2eCoXkX6w/v4AAdCMwRxcBnbmhuJea4nU43PhY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751941173; c=relaxed/simple;
-	bh=ekax5Fkx9rdon1V8yh03rP61qKT/NyxAxE1FJbTtIbk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=q0HytG0yyh0SD12GIkyMQ6rVJt7rdaKFUuTiRhVofXw3laLfcZmlL/XlvKriXchblZc8+B6LD1lb8rTdYDsouEW8EE6zTVfziEK4ZXU8hoUW8OkIlFi0Z3Zf11p2WSnLAwHCDRhDiUvryai98mXuZRdoXotrY57QPkvo7OJYA7Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
-Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 5682JS3a080667;
-	Tue, 8 Jul 2025 11:19:28 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Received: from [192.168.1.6] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-	(authenticated bits=0)
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 5682JSpQ080661
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-	Tue, 8 Jul 2025 11:19:28 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Message-ID: <aebcb155-d161-46a1-b120-f247a3eaf5a2@I-love.SAKURA.ne.jp>
-Date: Tue, 8 Jul 2025 11:19:28 +0900
+	s=arc-20240116; t=1751941667; c=relaxed/simple;
+	bh=01pWccaiT/a3nvWnmcclCumAkVqj/xd68Zh8X2khoIs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LS7zqodQGu+K9spptkg+hF8u7OMlNIFjCBvB6A6hpH4aoqAdNwYl94Tka+dc3jZ/9SETlQyjDdhDo/0PyVeeEcUBJdNwl3cUBe8U1JuyVoxA91BmT5cwvTRZH6vpk89Z6KhduESmQspLFGabZA7bLWrCI+JeAvsY6ZH9y7HDPHQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L9Hi+X9c; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L9Hi+X9c"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67C60C4CEE3;
+	Tue,  8 Jul 2025 02:27:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751941665;
+	bh=01pWccaiT/a3nvWnmcclCumAkVqj/xd68Zh8X2khoIs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=L9Hi+X9cD5E7akEXAU0QbGsKkA67wgvWCrIVK1bf24lZzV1uBaiaQlwwanNqM4x10
+	 0hFSos+T/UqUMd9XzUjKUUCzZArtly01DSDT+ggVGjEs8GSUBMpI87yvPLU0kKkInQ
+	 lYrnJ9mcJLC4foqZ78KjGXzuEB293pyge5I9Cb7tWfzULUxKvn33oTHQ+OmHF1VPse
+	 gS3bifBOoiC9EvCO/HSjnyLk1Kfcd0rmpXUbfOAfIncdOBnideNh1OBZRlz5MXJaCd
+	 37pGCefGAStdG3R5IdOZFWtMFxrhoZjtdCumq+od+sWr+U/7X+8mOiRv/XrLML5wrj
+	 e1VGzgB/xC3LQ==
+Date: Mon, 7 Jul 2025 20:27:43 -0600
+From: Keith Busch <kbusch@kernel.org>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>, Alan Adamson <alan.adamson@oracle.com>,
+	John Garry <john.g.garry@oracle.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Jens Axboe <axboe@kernel.dk>, linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org
+Subject: Re: What should we do about the nvme atomics mess?
+Message-ID: <aGyCH8TOQgVY3AP9@kbusch-mbp>
+References: <20250707141834.GA30198@lst.de>
+ <aGxz6s9oUp2FkbyX@fedora>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [syzbot] [nbd?] possible deadlock in nbd_queue_rq
-To: Hillf Danton <hdanton@sina.com>
-Cc: Bart Van Assche <bvanassche@acm.org>, axboe@kernel.dk,
-        josef@toxicpanda.com, linux-block@vger.kernel.org,
-        syzbot <syzbot+3dbc6142c85cc77eaf04@syzkaller.appspotmail.com>,
-        Ming Lei <ming.lei@redhat.com>, linux-kernel@vger.kernel.org,
-        nbd@other.debian.org, syzkaller-bugs@googlegroups.com
-References: <20250707005946.2669-1-hdanton@sina.com>
- <20250708001848.2775-1-hdanton@sina.com>
- <20250708012450.2858-1-hdanton@sina.com>
-Content-Language: en-US
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-In-Reply-To: <20250708012450.2858-1-hdanton@sina.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Anti-Virus-Server: fsav105.rs.sakura.ne.jp
-X-Virus-Status: clean
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aGxz6s9oUp2FkbyX@fedora>
 
-On 2025/07/08 10:24, Hillf Danton wrote:
-> On Tue, 8 Jul 2025 09:52:18 +0900 Tetsuo Handa wrote:
->> On 2025/07/08 9:18, Hillf Danton wrote:
->>> On Mon, 7 Jul 2025 10:39:44 -0700 Bart Van Assche wrote:
->>>> On 7/6/25 5:59 PM, Hillf Danton wrote:
->>>>> and given the second one, the report is false positive.
->>>>
->>>> Whether or not this report is a false positive, the root cause should be
->>>> fixed because lockdep disables itself after the first circular locking
->>>> complaint. From print_usage_bug() in kernel/locking/lockdep.c:
->>>>
->>>> 	if (!debug_locks_off() || debug_locks_silent)
->>>> 		return;
->>>>
->>> The root cause could be walked around for example by trying not to init
->>> nbd more than once.
->>
->> How did you come to think so?
->>
-> Based on that nbd_init appears twice in the lock chain syzbot reported.
+On Tue, Jul 08, 2025 at 09:27:06AM +0800, Ming Lei wrote:
+> On Mon, Jul 07, 2025 at 04:18:34PM +0200, Christoph Hellwig wrote:
+> > Hi all,
+> > 
+> > I'm a bit lost on what to do about the sad state of NVMe atomic writes.
+> > 
+> > As a short reminder the main issues are:
+> > 
+> >  1) there is no flag on a command to request atomic (aka non-torn)
+> >     behavior, instead writes adhering to the atomicy requirements will
+> >     never be torn, and writes not adhering them can be torn any time.
+> >     This differs from SCSI where atomic writes have to be be explicitly
+> >     requested and fail when they can't be satisfied
+> >  2) the original way to indicate the main atomicy limit is the AWUPF
+> >     field, which is in Identify Controller, but specified in logical
+> >     blocks which only exist at a namespace layer.  This a) lead to
 > 
+> If controller-wide AWUPF is a must property, the length has to be aligned
+> with block size.
 
-You might be misunderstanding what the lock chain is reporting.
-
-The stack backtrace of a lock is taken only when that lock is taken
-for the first time. That is, two stack backtraces from two locks might
-share one or more functions. Also, the stack backtrace of a lock which
-is printed when lockdep fired might not be a backtrace of that lock
-when actual deadlock happens.
-
-You need to understand all possible locking patterns (because lockdep
-can associate only one backtrace with one lock) before you conclude
-that the report is a false positive.
-
->> nbd_init() is already called only once because of module_init(nbd_init).
->>
-> Ok Bart is misguiding.
-
+What block size? The controller doesn't have one. Block sizes are
+properties of namespaces, not controllers or subsystems. If you have 10
+namespaces with 10 different block formats, what does AUWPF mean? If the
+controller must report something, the only rational thing it could
+declare is reduced to the greatest common denominator, which is out of
+sync with the true value reported in the appropriately scoped NAUWPF
+value.
