@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4BCC2192F9;
-	Tue,  8 Jul 2025 19:45:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAC1423C507;
+	Tue,  8 Jul 2025 19:45:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752003939; cv=none; b=VIwoFOUsLYBUiTX+pn4OlVjkgpva1lEItjI9D1IrmI4IeVolTEWgVCpLmuvOvqxN0xIEx26W9KzXw7wZ2tyl9EYCXimD8aPUuu/TRWxHPgergQwbZxHXk3WNxCqbyya22p0yy/gEcs2U7TEAY86H0641YSFmjIEzAc3BoLZxQ2o=
+	t=1752003941; cv=none; b=l4sBJsmqQImLS6rX2sjmQFdK06yilggkrMIVNeZXVyWZrAHsRxBzUdyTkb41y1Sc2AWi2rKwKhgqky0xbMcJch0rP/DO5fydCfV7O4m3g+Lp/Asqa1mky3oOQO++9piLzzCKjmi9uaCZjHgpk7iIovvoQ2dn1bEgtHVAVbJVYrQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752003939; c=relaxed/simple;
-	bh=CTNIjJksV39rh1vFRofP0gEi36ZUmiBHOsMajM2KEl0=;
+	s=arc-20240116; t=1752003941; c=relaxed/simple;
+	bh=z0+jOSZzCCJUSyUkPI8s+JDMHgPTdqPWG6ejwrYP3mo=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=De4lmhlKLvdPFPJaaoQ6CcQeGg/wWUvaKrRjiN50mdFIvEUXCV3kVANfGQp4yAbyA0FfYRA9KQrD4Lh9ef7WKnsq/mQN/fqEp0C8MW8Ioe+MuMTsJneb4w/fWYOnzzUWZ8zTlCIk/mAq9MoW9moyHvYJgWo9G0n5hNWSayv+bJc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uR0kh2cr; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=W5my0Bola2vtdCGoHtK2gnCPG2WY2VZfwSgpcrczB080xn8rPrsstRgTd5iyVuwIaZAePcrpjwt922jgknl+VCZ3aDMQRSAx4YFTBTqOkO3oz8tlbbbFHiVI2bZ23OWF+yZpfEKF70x0Rxg5RA6wUymJOaXXV8B21/7Y52aTKBM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KW4fjsve; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uR0kh2cr"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24D22C4CEED;
-	Tue,  8 Jul 2025 19:45:31 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KW4fjsve"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07650C4CEF0;
+	Tue,  8 Jul 2025 19:45:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752003936;
-	bh=CTNIjJksV39rh1vFRofP0gEi36ZUmiBHOsMajM2KEl0=;
+	s=k20201202; t=1752003940;
+	bh=z0+jOSZzCCJUSyUkPI8s+JDMHgPTdqPWG6ejwrYP3mo=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=uR0kh2crNrboAt87xB96IzHU+EicAu2vZIpdaro6u/wXy56susc+EOCfLvgOKAP3y
-	 tE4df7XUEpvmSGjZeWN3ubj6kPL1zW/vHtPTec0faxAcvC4WBMaB63ZBPORuvvRSTN
-	 38ctoc/ICnR0GVkXErQ3RGhO6Z5qZypnklztmaGawOOa33dRzLW7E72Wd5VNzwREtq
-	 /LkE9ZZpFNUqRpLFeApAm6492nmRPEQwZB0k/zkC6Sz8RNzABiXLdiupmlJTx3wx0e
-	 Jkx7nSADRJhW4hTJR/tUbhYWGhpRLLoZ6FC1go1kIQxjbb1aiG6YUJ9y8Dru619AFz
-	 aot+C7hxcV51A==
+	b=KW4fjsverz1sLkNuZuhm+M1UyyaFr38t6Tn/wRUdn5D6gEHeN0TZ2oMneVlaKRpv8
+	 CHcqBUHvrsxRE6D9RntP5yCJ0fAfv9Y16DLd60WzRFl0qnes35VRzVKMp/o/+YPyc6
+	 lxDlBpOU3R1yj6qTy8pU0iUXD4xp+dNPNpV0zpA0msQ6FJJIiGSJRJ8tq2M2YVOoQr
+	 pFFuydt2uLsW27Ft2GpP7exsQ+oGlRAKlF2/kkuTOPkiHOvZShJjVBCm/vx/ZF4E+T
+	 tMVB1BVTd8jJC/nkn3wnhytpOLxanpJ1pQGklSMxR+5ndVbcalU6Al24aRH9p/3lPF
+	 BlM5/jd7S0Vnw==
 From: Andreas Hindborg <a.hindborg@kernel.org>
-Date: Tue, 08 Jul 2025 21:45:04 +0200
-Subject: [PATCH v2 09/14] rnull: move driver to separate directory
+Date: Tue, 08 Jul 2025 21:45:07 +0200
+Subject: [PATCH v2 12/14] rust: block: mq: fix spelling in a safety comment
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -37,7 +37,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250708-rnull-up-v6-16-v2-9-ab93c0ff429b@kernel.org>
+Message-Id: <20250708-rnull-up-v6-16-v2-12-ab93c0ff429b@kernel.org>
 References: <20250708-rnull-up-v6-16-v2-0-ab93c0ff429b@kernel.org>
 In-Reply-To: <20250708-rnull-up-v6-16-v2-0-ab93c0ff429b@kernel.org>
 To: Boqun Feng <boqun.feng@gmail.com>, Miguel Ojeda <ojeda@kernel.org>, 
@@ -49,131 +49,43 @@ To: Boqun Feng <boqun.feng@gmail.com>, Miguel Ojeda <ojeda@kernel.org>,
 Cc: linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org, 
  linux-kernel@vger.kernel.org, Andreas Hindborg <a.hindborg@kernel.org>
 X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3682; i=a.hindborg@kernel.org;
- h=from:subject:message-id; bh=CTNIjJksV39rh1vFRofP0gEi36ZUmiBHOsMajM2KEl0=;
- b=owEBbQKS/ZANAwAIAeG4Gj55KGN3AcsmYgBobXVIHFJxLawG6BbjGd2qf1DI9BWdswMqTl91c
- VwaqS1iL12JAjMEAAEIAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaG11SAAKCRDhuBo+eShj
- dxDtD/wKS34qv+11LdMaa9Lkxb2/fdmDkQcNx7CBaTf0JLBxSwmYuom1Vz6ozCbTioAgh8t03mc
- SKAin0ySXlz/dRuG46NzFumnQEnwpkPr7fwAwp5VrqAEz0bBfUHQd9tE8L0pDeOhuh5+d1oeOWn
- CVOLacjT6Qds2vSbIngsgHFKr16M9Tx2Wy0DRwcBm/1Uy5HuCV6aUoUARisIPZr+rk6rXtZ3kS9
- GpadYe8bpRAJSofdh5DKsTsz+6y95y2H95y0C37j0YMska+7w5Fb/kZ7d0hnyJD2FGTJ7BjWl+q
- I5C5vfDq/rcKAHW70W+cAbb7PMommxqToEwbsyf9P3I8/d5LOepTPWfszwWqtgFT+JV3bfvuTGe
- dqEYJNgHFeXWHBWYrKHxbbccxlOYPxqGpFJknHJQ+k67NE4lzKiJ/7FXi8W8C29EnJHWzNWwdI4
- 8ZVeP218YHwcSIDSUsJ8ldCqHJeF79ERoK8Hn+HFzt7TIT5yw509FH77zULcyaKK+RG0HkHYxY8
- GqC3oK8vvgRRXiyaakMIukJZDqLLS3SnmXSelojyhhPFxszoQ6HltQFRAzWXBXEtcHIxvUz0opk
- OWu8EyfLtvc8jkQVbqDWdNV6AkOZwkRsQNx6rc2yHwfaY8vcWwJZeZdMJl7O7+l7oF00kqMdRo2
- Mc+o1v+5Q243dWg==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=930; i=a.hindborg@kernel.org;
+ h=from:subject:message-id; bh=z0+jOSZzCCJUSyUkPI8s+JDMHgPTdqPWG6ejwrYP3mo=;
+ b=owEBbQKS/ZANAwAIAeG4Gj55KGN3AcsmYgBobXVL2BNjzLJTazu9p0aBbWi5VxY6sIudKezm9
+ U9lZkXR/JCJAjMEAAEIAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaG11SwAKCRDhuBo+eShj
+ d4jzD/0Vl+QhDQ9TzC2wDCbB2E0Zswy8wbWlcX9YsLptw6xfv2xcV4TNB5D8CCXf5wEOVmMspiV
+ dqeaUplFJcZftgDCKTWsST5Pnag6PhRoBI/DMTprQle1kH2TwnIp1BXZ/GWkgV9UXi6/3DVp1XX
+ 29fYB/pkmBQcmA80JBfVyR8EV+JCzEmqHJqHNj2nWXAU2Fy8/FK28ZXnmMJzvathTR9UKqJvSno
+ cn2h/Ctn+MPGwTf+Syo4gIJQxauZ9adFI1Ll7fHkRaXgRcRJteJV9USL1oT/EnF9QAT2XFkCUs0
+ rN3BkrKBmxYTNK6Z85+cAL6nmmwymeelCuBdKkHNQMwA/2zkcFJOAkQsf8dYbWNMa/ERNjlnqNS
+ hDDmNHLPqge0bHF0p/h4RpeObCDiBB3c1REtWhPmqA14hYjxa/x8uEv87DVGLJGR+tmhpXVJ1jn
+ joc14CFRj65S7jPyL8uQrfKRnBG0ZY4DcFL87vj9399MhAhsg8It2vdIy62LaLHcm6LFPdPL6dV
+ oojFpnlh7052HED5KKB/qL51rv+1vB88A79ksd8uUDhB71Om9MPFtOr+3kzB3+He6H01EWU+RmL
+ bop21V7zo2MynDrykz2s6rrFakFZrLdRVljfziehp721rP7sKysvWBL9lF0ZhPvafSZm9YLr6mz
+ Aaz9wZXLFPJc1hQ==
 X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
  fpr=3108C10F46872E248D1FB221376EB100563EF7A7
 
-The rust null block driver is about to gain some additional modules. Rather
-than pollute the current directory, move the driver to a subdirectory.
+Add code block quotes to a safety comment.
 
 Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
 ---
- MAINTAINERS                        |  2 +-
- drivers/block/Kconfig              | 10 +---------
- drivers/block/Makefile             |  4 +---
- drivers/block/rnull/Kconfig        | 13 +++++++++++++
- drivers/block/rnull/Makefile       |  3 +++
- drivers/block/{ => rnull}/rnull.rs |  0
- 6 files changed, 19 insertions(+), 13 deletions(-)
+ rust/kernel/block/mq/request.rs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 0c1d245bf7b84..29b14aec3559f 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -4246,7 +4246,7 @@ W:	https://rust-for-linux.com
- B:	https://github.com/Rust-for-Linux/linux/issues
- C:	https://rust-for-linux.zulipchat.com/#narrow/stream/Block
- T:	git https://github.com/Rust-for-Linux/linux.git rust-block-next
--F:	drivers/block/rnull.rs
-+F:	drivers/block/rnull/
- F:	rust/kernel/block.rs
- F:	rust/kernel/block/
- 
-diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
-index 0f70e2374e7fa..6b50dbc0495ba 100644
---- a/drivers/block/Kconfig
-+++ b/drivers/block/Kconfig
-@@ -17,6 +17,7 @@ menuconfig BLK_DEV
- if BLK_DEV
- 
- source "drivers/block/null_blk/Kconfig"
-+source "drivers/block/rnull/Kconfig"
- 
- config BLK_DEV_FD
- 	tristate "Normal floppy disk support"
-@@ -354,15 +355,6 @@ config VIRTIO_BLK
- 	  This is the virtual block driver for virtio.  It can be used with
-           QEMU based VMMs (like KVM or Xen).  Say Y or M.
- 
--config BLK_DEV_RUST_NULL
--	tristate "Rust null block driver (Experimental)"
--	depends on RUST
--	help
--	  This is the Rust implementation of the null block driver. For now it
--	  is only a minimal stub.
--
--	  If unsure, say N.
--
- config BLK_DEV_RBD
- 	tristate "Rados block device (RBD)"
- 	depends on INET && BLOCK
-diff --git a/drivers/block/Makefile b/drivers/block/Makefile
-index 097707aca7255..aba3e93d5014b 100644
---- a/drivers/block/Makefile
-+++ b/drivers/block/Makefile
-@@ -9,9 +9,6 @@
- # needed for trace events
- ccflags-y				+= -I$(src)
- 
--obj-$(CONFIG_BLK_DEV_RUST_NULL) += rnull_mod.o
--rnull_mod-y := rnull.o
--
- obj-$(CONFIG_MAC_FLOPPY)	+= swim3.o
- obj-$(CONFIG_BLK_DEV_SWIM)	+= swim_mod.o
- obj-$(CONFIG_BLK_DEV_FD)	+= floppy.o
-@@ -39,6 +36,7 @@ obj-$(CONFIG_ZRAM) += zram/
- obj-$(CONFIG_BLK_DEV_RNBD)	+= rnbd/
- 
- obj-$(CONFIG_BLK_DEV_NULL_BLK)	+= null_blk/
-+obj-$(CONFIG_BLK_DEV_RUST_NULL) += rnull/
- 
- obj-$(CONFIG_BLK_DEV_UBLK)			+= ublk_drv.o
- obj-$(CONFIG_BLK_DEV_ZONED_LOOP) += zloop.o
-diff --git a/drivers/block/rnull/Kconfig b/drivers/block/rnull/Kconfig
-new file mode 100644
-index 0000000000000..6dc5aff96bf4e
---- /dev/null
-+++ b/drivers/block/rnull/Kconfig
-@@ -0,0 +1,13 @@
-+# SPDX-License-Identifier: GPL-2.0
-+#
-+# Rust null block device driver configuration
-+
-+config BLK_DEV_RUST_NULL
-+	tristate "Rust null block driver (Experimental)"
-+	depends on RUST
-+	help
-+	  This is the Rust implementation of the null block driver. Like
-+	  the C version, the driver allows the user to create virutal block
-+	  devices that can be configured via various configuration options.
-+
-+	  If unsure, say N.
-diff --git a/drivers/block/rnull/Makefile b/drivers/block/rnull/Makefile
-new file mode 100644
-index 0000000000000..11cfa5e615dcf
---- /dev/null
-+++ b/drivers/block/rnull/Makefile
-@@ -0,0 +1,3 @@
-+
-+obj-$(CONFIG_BLK_DEV_RUST_NULL) += rnull_mod.o
-+rnull_mod-y := rnull.o
-diff --git a/drivers/block/rnull.rs b/drivers/block/rnull/rnull.rs
-similarity index 100%
-rename from drivers/block/rnull.rs
-rename to drivers/block/rnull/rnull.rs
+diff --git a/rust/kernel/block/mq/request.rs b/rust/kernel/block/mq/request.rs
+index 2d14a6261a313..873d00db74dd5 100644
+--- a/rust/kernel/block/mq/request.rs
++++ b/rust/kernel/block/mq/request.rs
+@@ -143,7 +143,7 @@ pub(crate) unsafe fn wrapper_ptr(this: *mut Self) -> NonNull<RequestDataWrapper>
+         // valid allocation.
+         let wrapper_ptr =
+             unsafe { bindings::blk_mq_rq_to_pdu(request_ptr).cast::<RequestDataWrapper>() };
+-        // SAFETY: By C API contract, wrapper_ptr points to a valid allocation
++        // SAFETY: By C API contract, `wrapper_ptr` points to a valid allocation
+         // and is not null.
+         unsafe { NonNull::new_unchecked(wrapper_ptr) }
+     }
 
 -- 
 2.47.2
