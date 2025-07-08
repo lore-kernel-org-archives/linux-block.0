@@ -1,74 +1,144 @@
-Received: from 003.mia.mailroute.net (003.mia.mailroute.net [199.89.3.6])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 033592E54B2;
-	Tue,  8 Jul 2025 16:23:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C6022E62A0
+	for <linux-block@vger.kernel.org>; Tue,  8 Jul 2025 16:59:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751991842; cv=none; b=MuNvneM4F+QE60hy92ULlHb4dK5rOi1L4f+u4Q9r6ubmALUWDZ/hD3X9PTcjvvd3Eq6pUi2X+Wo0NdckUHCYniE27oiF4hWozfw3bq1UgOVRyoosTi+djkEktdHC3PyLJo32ASDxo4h8ehKerys2brwV5BAlu6UH6MOOQyIRSBY=
+	t=1751993977; cv=none; b=menYaxqGUtui5g0v/ABnJggBbmo0dQJpc9hkZFsWXGvjgi78G0DSuh690PtzBVL9vc8pOh7wOwCpSRnqGYAYkr0GoAncbxtOwWV47rVWDw1FBpFGOjUBh3vZp9Xz2sscVQTAtttqCGHlbUd2bynhDI5wE5ainxEFSNwGQ+3dGB0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751991842; c=relaxed/simple;
-	bh=5hNTFrE0bpBaPPbMXhxAESHBYjh+m+dxnlVSSAeGXAU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JvMSzuo5SN/IAycJVAQi/6DKyV34UCsgV8wYqJG89rJ4uI1wpjb1LJT7lUnLtzRNXTWhDe6J44E12nHazKEllzkc+F4B/Aj1PUxQQHlnRzvBBIadEIPRLzSb34rbXNA1BED0yvVx36Rn71m2O1c+w4Q2rjvNaRa77xxvSKLuhbY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=f58eezT/; arc=none smtp.client-ip=199.89.3.6
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1751993977; c=relaxed/simple;
+	bh=E8SMxKBRB9kxzDAXjp9QuVVcwFm86lamgTddZeM3ZM4=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=awKMG5N2Jt0KdGue8H/usowXUvN9PsRswu9aZm3HbQef6xYUuUWiPqOj8Wgf+1wB0TeA34tXxm89mu+Icfki1e/oURv/xVlyU6gvTFp7/TGzB9tLEwLkz4pXADWjVOWuFFLAR6n45kRoV1dxSfcsiLpPrwY4Dt/MaAQnUFZpZLA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=i8s+6lfh; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="f58eezT/"
-Received: from localhost (localhost [127.0.0.1])
-	by 003.mia.mailroute.net (Postfix) with ESMTP id 4bc5yd3LCvzlgqy6;
-	Tue,  8 Jul 2025 16:23:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1751991831; x=1754583832; bh=5hNTFrE0bpBaPPbMXhxAESHB
-	Yjh+m+dxnlVSSAeGXAU=; b=f58eezT/silJaQsprkEDvvH9KkUwFlNnp0hirGGg
-	1rsUrHdyIWJ7wGX+W+1QB5IXr7n5poiEbhGZfKAZtir0K0gjYaDoK0r8bNks4w4f
-	G8avDIh5ZetwZHKH0vmXZ+6bavSCrQ+enyz2kgT+ZxdYPQylWAFTShEngIN6ys8h
-	SPWBj8F6Kd0we+va8KpCEWPgNTbGFyiGlJWIQQ3yPGSW514AW3JligIIopquQzqM
-	JWMJ3Oj3ddZ63XrTAW2BMc6yWCrnvsLg1lAHk8uKcd9F+9furB/QyDUA6Jw83MmZ
-	f9JRp8JoK9mDCPVO+GVWpD5vhPSOTL5QykJn8ZdYrd7h9w==
-X-Virus-Scanned: by MailRoute
-Received: from 003.mia.mailroute.net ([127.0.0.1])
- by localhost (003.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id 3XEFc24SopK7; Tue,  8 Jul 2025 16:23:51 +0000 (UTC)
-Received: from [100.66.154.22] (unknown [104.135.204.82])
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i8s+6lfh"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1751993974;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5eadIydjygmdVrAvV3gcaJXEaiXTDN8BupiuAPwYI2k=;
+	b=i8s+6lfh+BM786iNUFOxQIjedDSomTp0jH5OldgSdshRWPzxdJZ2VCILT1FKniR0Mo3yUV
+	QpajlW2qqjNfgt0wztrKk4/5wRWTQfWkO0I4AaxoSoyLa4f0YXKVkCwQbV31P44HrH3YKu
+	3yJFlLPuKuFO0XNhBSos8lItEALOEfA=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-488-Q7OICD-UN4GQCVEfevW_mA-1; Tue,
+ 08 Jul 2025 12:59:31 -0400
+X-MC-Unique: Q7OICD-UN4GQCVEfevW_mA-1
+X-Mimecast-MFC-AGG-ID: Q7OICD-UN4GQCVEfevW_mA_1751993969
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4bc5yS2pY3zlgqVj;
-	Tue,  8 Jul 2025 16:23:43 +0000 (UTC)
-Message-ID: <d9894a7d-3531-4c2a-a016-1b560a13b2d8@acm.org>
-Date: Tue, 8 Jul 2025 09:23:42 -0700
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 61BDB1955EC3;
+	Tue,  8 Jul 2025 16:59:28 +0000 (UTC)
+Received: from [10.22.80.10] (unknown [10.22.80.10])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0E26230001B1;
+	Tue,  8 Jul 2025 16:59:21 +0000 (UTC)
+Date: Tue, 8 Jul 2025 18:59:17 +0200 (CEST)
+From: Mikulas Patocka <mpatocka@redhat.com>
+To: Nilay Shroff <nilay@linux.ibm.com>
+cc: John Garry <john.g.garry@oracle.com>, agk@redhat.com, snitzer@kernel.org, 
+    song@kernel.org, yukuai3@huawei.com, hch@lst.de, axboe@kernel.dk, 
+    cem@kernel.org, dm-devel@lists.linux.dev, linux-kernel@vger.kernel.org, 
+    linux-raid@vger.kernel.org, linux-block@vger.kernel.org, 
+    ojaswin@linux.ibm.com, martin.petersen@oracle.com, 
+    akpm@linux-foundation.org, linux-xfs@vger.kernel.org, djwong@kernel.org
+Subject: Re: [PATCH v4 6/6] block: use chunk_sectors when evaluating stacked
+ atomic write limits
+In-Reply-To: <51e56dcf-6a64-42d1-b488-7043f880026e@linux.ibm.com>
+Message-ID: <f5ddc161-5683-f008-4794-32eccf88af65@redhat.com>
+References: <20250707131135.1572830-1-john.g.garry@oracle.com> <20250707131135.1572830-7-john.g.garry@oracle.com> <51e56dcf-6a64-42d1-b488-7043f880026e@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [syzbot] [nbd?] possible deadlock in nbd_queue_rq
-To: Hillf Danton <hdanton@sina.com>,
- Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Cc: axboe@kernel.dk, josef@toxicpanda.com, linux-block@vger.kernel.org,
- syzbot <syzbot+3dbc6142c85cc77eaf04@syzkaller.appspotmail.com>,
- Ming Lei <ming.lei@redhat.com>, linux-kernel@vger.kernel.org,
- nbd@other.debian.org, syzkaller-bugs@googlegroups.com
-References: <20250707005946.2669-1-hdanton@sina.com>
- <20250708001848.2775-1-hdanton@sina.com>
- <20250708012450.2858-1-hdanton@sina.com>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20250708012450.2858-1-hdanton@sina.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=US-ASCII
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On 7/7/25 6:24 PM, Hillf Danton wrote:
->> nbd_init() is already called only once because of module_init(nbd_init).
->>
-> Ok Bart is misguiding.
 
-No, I'm not. I didn't write anything about nbd_init().
+
+On Tue, 8 Jul 2025, Nilay Shroff wrote:
+
+> 
+> 
+> On 7/7/25 6:41 PM, John Garry wrote:
+> > The atomic write unit max value is limited by any stacked device stripe
+> > size.
+> > 
+> > It is required that the atomic write unit is a power-of-2 factor of the
+> > stripe size.
+> > 
+> > Currently we use io_min limit to hold the stripe size, and check for a
+> > io_min <= SECTOR_SIZE when deciding if we have a striped stacked device.
+> > 
+> > Nilay reports that this causes a problem when the physical block size is
+> > greater than SECTOR_SIZE [0].
+> > 
+> > Furthermore, io_min may be mutated when stacking devices, and this makes
+> > it a poor candidate to hold the stripe size. Such an example (of when
+> > io_min may change) would be when the io_min is less than the physical
+> > block size.
+> > 
+> > Use chunk_sectors to hold the stripe size, which is more appropriate.
+> > 
+> > [0] https://lore.kernel.org/linux-block/888f3b1d-7817-4007-b3b3-1a2ea04df771@linux.ibm.com/T/#mecca17129f72811137d3c2f1e477634e77f06781
+> > 
+> > Signed-off-by: John Garry <john.g.garry@oracle.com>
+> > ---
+> >  block/blk-settings.c | 58 ++++++++++++++++++++++++++------------------
+> >  1 file changed, 35 insertions(+), 23 deletions(-)
+> > 
+> > diff --git a/block/blk-settings.c b/block/blk-settings.c
+> > index 761c6ccf5af7..3259cfac5d0d 100644
+> > --- a/block/blk-settings.c
+> > +++ b/block/blk-settings.c
+> > @@ -597,41 +597,52 @@ static bool blk_stack_atomic_writes_boundary_head(struct queue_limits *t,
+> >  	return true;
+> >  }
+> >  
+> > -
+> > -/* Check stacking of first bottom device */
+> > -static bool blk_stack_atomic_writes_head(struct queue_limits *t,
+> > -				struct queue_limits *b)
+> > +static void blk_stack_atomic_writes_chunk_sectors(struct queue_limits *t)
+> >  {
+> > -	if (b->atomic_write_hw_boundary &&
+> > -	    !blk_stack_atomic_writes_boundary_head(t, b))
+> > -		return false;
+> > +	unsigned int chunk_sectors = t->chunk_sectors, chunk_bytes;
+> >  
+> > -	if (t->io_min <= SECTOR_SIZE) {
+> > -		/* No chunk sectors, so use bottom device values directly */
+> > -		t->atomic_write_hw_unit_max = b->atomic_write_hw_unit_max;
+> > -		t->atomic_write_hw_unit_min = b->atomic_write_hw_unit_min;
+> > -		t->atomic_write_hw_max = b->atomic_write_hw_max;
+> > -		return true;
+> > -	}
+> > +	if (!chunk_sectors)
+> > +		return;
+> > +
+> > +	/*
+> > +	 * If chunk sectors is so large that its value in bytes overflows
+> > +	 * UINT_MAX, then just shift it down so it definitely will fit.
+> > +	 * We don't support atomic writes of such a large size anyway.
+> > +	 */
+> > +	if ((unsigned long)chunk_sectors << SECTOR_SHIFT > UINT_MAX)
+> > +		chunk_bytes = chunk_sectors;
+> > +	else
+> > +		chunk_bytes = chunk_sectors << SECTOR_SHIFT;
+
+Why do we cast it to unsigned long? unsigned long is 32-bit on 32-bit 
+machines, so the code will not detect the overflow in that case. We should 
+cast it to unsigned long long (or uint64_t).
+
+Mikulas
+
