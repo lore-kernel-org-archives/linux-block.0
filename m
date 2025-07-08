@@ -1,144 +1,144 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from 004.mia.mailroute.net (004.mia.mailroute.net [199.89.3.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C6022E62A0
-	for <linux-block@vger.kernel.org>; Tue,  8 Jul 2025 16:59:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 519EA2E5413
+	for <linux-block@vger.kernel.org>; Tue,  8 Jul 2025 17:16:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751993977; cv=none; b=menYaxqGUtui5g0v/ABnJggBbmo0dQJpc9hkZFsWXGvjgi78G0DSuh690PtzBVL9vc8pOh7wOwCpSRnqGYAYkr0GoAncbxtOwWV47rVWDw1FBpFGOjUBh3vZp9Xz2sscVQTAtttqCGHlbUd2bynhDI5wE5ainxEFSNwGQ+3dGB0=
+	t=1751995005; cv=none; b=SDDnQGC2EHud8el7IQ7wLSuFWp/M+vjQT1mpvYiAv0T1m9fbQmaUeJkZze0sH7jq+JvL395AZFTCE2obhiafLSOMG6fOLroLrop9sMhTRjqdmyu10vKmmtL6pykONkjMlHnuqMPwLqf2Rkn5ZKRPzB4PnH7+v1HjzVaq002kg7g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751993977; c=relaxed/simple;
-	bh=E8SMxKBRB9kxzDAXjp9QuVVcwFm86lamgTddZeM3ZM4=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=awKMG5N2Jt0KdGue8H/usowXUvN9PsRswu9aZm3HbQef6xYUuUWiPqOj8Wgf+1wB0TeA34tXxm89mu+Icfki1e/oURv/xVlyU6gvTFp7/TGzB9tLEwLkz4pXADWjVOWuFFLAR6n45kRoV1dxSfcsiLpPrwY4Dt/MaAQnUFZpZLA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=i8s+6lfh; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1751995005; c=relaxed/simple;
+	bh=eUP3JaiXG+DMEzOAb2wgJ2VWKHPtTPNI0LO58wsrGLY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=p79wzPiGuKQw+dEzpfLz9ahg2kk8IR4QWa4NBrR2ntV8uycds1lA+0pn6gnZ2kjrk3VjwBWQDZ4tvdfD+PGbD0HHQdIaSI3mNLGJdULqoB+j3T7vSffPZnLe3YrzRjLm865fAaxNaTdgVlavhtmCRZnhX8GnbvJi5/JE0er35h0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=QCQdsRIH; arc=none smtp.client-ip=199.89.3.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i8s+6lfh"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1751993974;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5eadIydjygmdVrAvV3gcaJXEaiXTDN8BupiuAPwYI2k=;
-	b=i8s+6lfh+BM786iNUFOxQIjedDSomTp0jH5OldgSdshRWPzxdJZ2VCILT1FKniR0Mo3yUV
-	QpajlW2qqjNfgt0wztrKk4/5wRWTQfWkO0I4AaxoSoyLa4f0YXKVkCwQbV31P44HrH3YKu
-	3yJFlLPuKuFO0XNhBSos8lItEALOEfA=
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-488-Q7OICD-UN4GQCVEfevW_mA-1; Tue,
- 08 Jul 2025 12:59:31 -0400
-X-MC-Unique: Q7OICD-UN4GQCVEfevW_mA-1
-X-Mimecast-MFC-AGG-ID: Q7OICD-UN4GQCVEfevW_mA_1751993969
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="QCQdsRIH"
+Received: from localhost (localhost [127.0.0.1])
+	by 004.mia.mailroute.net (Postfix) with ESMTP id 4bc77Z2SjZzm174C;
+	Tue,  8 Jul 2025 17:16:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1751995001; x=1754587002; bh=oa3V0r8GVwOogBFXfFzHlk1B
+	gIGONNISYt59L70T1SI=; b=QCQdsRIHKcXMYqSKwePVPl1vffoufIYsIB1GyRxq
+	ZE/v6s5oC7UxbgOKQJp37VEQXjnsiEoTRhElDMAHhAJGNSU1F0VjDAA+GDXaVOW4
+	8qgLM2lVbgLKXJU2qSg7tGTbxXYQQuq3kdjrcrOdO2XVRPiz5aDST3avVNzGapHs
+	xjXO+lrGYlOkdqtV5hf/llh4LsXcSctSP58Jerje4mXuhzuDDFRWCstZqllRmq9Y
+	1038stEY/TAEqu/rLxyKT3Dgd0PEIppc38DpG9uXjgoWBqBjFXcS+h9UVRqjUx3J
+	m366g9NZ0LMxdPLxpFQvW3/dP3IediZTQQQRrV8IP/5KFA==
+X-Virus-Scanned: by MailRoute
+Received: from 004.mia.mailroute.net ([127.0.0.1])
+ by localhost (004.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id 9rj1NpAaYIa7; Tue,  8 Jul 2025 17:16:41 +0000 (UTC)
+Received: from [100.66.154.22] (unknown [104.135.204.82])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 61BDB1955EC3;
-	Tue,  8 Jul 2025 16:59:28 +0000 (UTC)
-Received: from [10.22.80.10] (unknown [10.22.80.10])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0E26230001B1;
-	Tue,  8 Jul 2025 16:59:21 +0000 (UTC)
-Date: Tue, 8 Jul 2025 18:59:17 +0200 (CEST)
-From: Mikulas Patocka <mpatocka@redhat.com>
-To: Nilay Shroff <nilay@linux.ibm.com>
-cc: John Garry <john.g.garry@oracle.com>, agk@redhat.com, snitzer@kernel.org, 
-    song@kernel.org, yukuai3@huawei.com, hch@lst.de, axboe@kernel.dk, 
-    cem@kernel.org, dm-devel@lists.linux.dev, linux-kernel@vger.kernel.org, 
-    linux-raid@vger.kernel.org, linux-block@vger.kernel.org, 
-    ojaswin@linux.ibm.com, martin.petersen@oracle.com, 
-    akpm@linux-foundation.org, linux-xfs@vger.kernel.org, djwong@kernel.org
-Subject: Re: [PATCH v4 6/6] block: use chunk_sectors when evaluating stacked
- atomic write limits
-In-Reply-To: <51e56dcf-6a64-42d1-b488-7043f880026e@linux.ibm.com>
-Message-ID: <f5ddc161-5683-f008-4794-32eccf88af65@redhat.com>
-References: <20250707131135.1572830-1-john.g.garry@oracle.com> <20250707131135.1572830-7-john.g.garry@oracle.com> <51e56dcf-6a64-42d1-b488-7043f880026e@linux.ibm.com>
+	(Authenticated sender: bvanassche@acm.org)
+	by 004.mia.mailroute.net (Postfix) with ESMTPSA id 4bc77W4GNPzm10gS;
+	Tue,  8 Jul 2025 17:16:38 +0000 (UTC)
+Message-ID: <4e5f8e45-93c4-4833-97b9-c97d5db0c2e1@acm.org>
+Date: Tue, 8 Jul 2025 10:16:37 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/3] Fix a deadlock related to modifying queue attributes
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+References: <20250702182430.3764163-1-bvanassche@acm.org>
+ <20250703090906.GG4757@lst.de> <918963a5-a349-433a-80a8-6d06c609f20e@acm.org>
+ <20250708095707.GA28737@lst.de>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20250708095707.GA28737@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
+On 7/8/25 2:57 AM, Christoph Hellwig wrote:
+> That still doesn't make it sensible to keep the q usage counter
+> elevator for unlimited time.  See nvme multipath for how we can keep
+> bios around forever without elevating the usage counter which is
+> supposed to be transient.  Note that dm-multipath should in fact
+> already be doing the right thing in bio based mode as well.
 
+This blktests patch should be sufficient to switch from rq-based to
+bio-based dm-multipathing:
 
-On Tue, 8 Jul 2025, Nilay Shroff wrote:
+diff --git a/common/multipath-over-rdma b/common/multipath-over-rdma
+index e157e0a19560..167428b1f53e 100644
+--- a/common/multipath-over-rdma
++++ b/common/multipath-over-rdma
+@@ -267,7 +267,7 @@ mpath_has_stale_dev() {
+  # Check whether multipath definition $1 includes the queue_if_no_path 
+keyword.
+  is_qinp_def() {
+         case "$1" in
+-               *" 3 queue_if_no_path queue_mode mq "*)
++               *" 3 queue_if_no_path queue_mode "*)
+                         return 0;;
+                 *" 1 queue_if_no_path "*)
+                         return 0;;
+diff --git a/tests/srp/multipath.conf b/tests/srp/multipath.conf
+index e0da32e29917..dffea925466f 100644
+--- a/tests/srp/multipath.conf
++++ b/tests/srp/multipath.conf
+@@ -8,6 +8,7 @@ devices {
+                 vendor          "LIO-ORG|SCST_BIO|FUSIONIO"
+                 product         ".*"
+                 no_path_retry   queue
++               queue_mode      bio
+                 path_checker    tur
+         }
+  }
 
-> 
-> 
-> On 7/7/25 6:41 PM, John Garry wrote:
-> > The atomic write unit max value is limited by any stacked device stripe
-> > size.
-> > 
-> > It is required that the atomic write unit is a power-of-2 factor of the
-> > stripe size.
-> > 
-> > Currently we use io_min limit to hold the stripe size, and check for a
-> > io_min <= SECTOR_SIZE when deciding if we have a striped stacked device.
-> > 
-> > Nilay reports that this causes a problem when the physical block size is
-> > greater than SECTOR_SIZE [0].
-> > 
-> > Furthermore, io_min may be mutated when stacking devices, and this makes
-> > it a poor candidate to hold the stripe size. Such an example (of when
-> > io_min may change) would be when the io_min is less than the physical
-> > block size.
-> > 
-> > Use chunk_sectors to hold the stripe size, which is more appropriate.
-> > 
-> > [0] https://lore.kernel.org/linux-block/888f3b1d-7817-4007-b3b3-1a2ea04df771@linux.ibm.com/T/#mecca17129f72811137d3c2f1e477634e77f06781
-> > 
-> > Signed-off-by: John Garry <john.g.garry@oracle.com>
-> > ---
-> >  block/blk-settings.c | 58 ++++++++++++++++++++++++++------------------
-> >  1 file changed, 35 insertions(+), 23 deletions(-)
-> > 
-> > diff --git a/block/blk-settings.c b/block/blk-settings.c
-> > index 761c6ccf5af7..3259cfac5d0d 100644
-> > --- a/block/blk-settings.c
-> > +++ b/block/blk-settings.c
-> > @@ -597,41 +597,52 @@ static bool blk_stack_atomic_writes_boundary_head(struct queue_limits *t,
-> >  	return true;
-> >  }
-> >  
-> > -
-> > -/* Check stacking of first bottom device */
-> > -static bool blk_stack_atomic_writes_head(struct queue_limits *t,
-> > -				struct queue_limits *b)
-> > +static void blk_stack_atomic_writes_chunk_sectors(struct queue_limits *t)
-> >  {
-> > -	if (b->atomic_write_hw_boundary &&
-> > -	    !blk_stack_atomic_writes_boundary_head(t, b))
-> > -		return false;
-> > +	unsigned int chunk_sectors = t->chunk_sectors, chunk_bytes;
-> >  
-> > -	if (t->io_min <= SECTOR_SIZE) {
-> > -		/* No chunk sectors, so use bottom device values directly */
-> > -		t->atomic_write_hw_unit_max = b->atomic_write_hw_unit_max;
-> > -		t->atomic_write_hw_unit_min = b->atomic_write_hw_unit_min;
-> > -		t->atomic_write_hw_max = b->atomic_write_hw_max;
-> > -		return true;
-> > -	}
-> > +	if (!chunk_sectors)
-> > +		return;
-> > +
-> > +	/*
-> > +	 * If chunk sectors is so large that its value in bytes overflows
-> > +	 * UINT_MAX, then just shift it down so it definitely will fit.
-> > +	 * We don't support atomic writes of such a large size anyway.
-> > +	 */
-> > +	if ((unsigned long)chunk_sectors << SECTOR_SHIFT > UINT_MAX)
-> > +		chunk_bytes = chunk_sectors;
-> > +	else
-> > +		chunk_bytes = chunk_sectors << SECTOR_SHIFT;
+With the above patch applied, the following deadlock is triggered by the
+SRP tests:
 
-Why do we cast it to unsigned long? unsigned long is 32-bit on 32-bit 
-machines, so the code will not detect the overflow in that case. We should 
-cast it to unsigned long long (or uint64_t).
+Call Trace:
+  <TASK>
+  __schedule+0x8c1/0x1be0
+  schedule+0xdd/0x270
+  schedule_preempt_disabled+0x1c/0x30
+  __mutex_lock+0xb89/0x1650
+  mutex_lock_nested+0x1f/0x30 <- queue_limits_start_update()
+  dm_table_set_restrictions+0x823/0xdf0
+  __bind+0x166/0x5a0
+  dm_swap_table+0x2a7/0x490
+  do_resume+0x1b1/0x610
+  dev_suspend+0x55/0x1a0
+  ctl_ioctl+0x3a5/0x810
+  dm_ctl_ioctl+0x12/0x20
+  __x64_sys_ioctl+0x127/0x1a0
+  x64_sys_call+0xe2b/0x17d0
+  do_syscall_64+0x96/0x3a0
+  entry_SYSCALL_64_after_hwframe+0x4b/0x53
+task:(udev-worker)   state:D stack:27360 pid:8369  tgid:8369  ppid:1758 
+  task_flags:0x480140 flags:0x00004002
+Call Trace:
+  <TASK>
+  __schedule+0x8c1/0x1be0
+  schedule+0xdd/0x270
+  blk_mq_freeze_queue_wait+0xf2/0x140
+  blk_mq_freeze_queue_nomemsave+0x23/0x30
+  queue_ra_store+0x14e/0x290
+  queue_attr_store+0x23e/0x2c0
+  sysfs_kf_write+0xde/0x140
+  kernfs_fop_write_iter+0x3b2/0x630
+  vfs_write+0x4fd/0x1390
+  ksys_write+0xfd/0x230
+  __x64_sys_write+0x76/0xc0
+  x64_sys_call+0x276/0x17d0
+  do_syscall_64+0x96/0x3a0
+  entry_SYSCALL_64_after_hwframe+0x4b/0x53
 
-Mikulas
+Thanks,
 
+Bart.
