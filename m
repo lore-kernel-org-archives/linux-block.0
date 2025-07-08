@@ -1,175 +1,166 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD98C220F4C;
-	Tue,  8 Jul 2025 12:27:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 574F8CA52
+	for <linux-block@vger.kernel.org>; Tue,  8 Jul 2025 12:31:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751977675; cv=none; b=PPFaHYx6Oh9PntWM4acPGlnEu3g9cLGnDIbaFabG/ejiTDRqqvMAC6wsRjDlfO/JOi3LrFFtBho0I6vYLECuom/t/Y6y5T/jxr9BTZfoAAXWUVSBEv7k4IkUrzScl7zT7kYyGdKD3HOS9wfF2tYf2/aB5JRfAOY1uZyS7j5GD3M=
+	t=1751977880; cv=none; b=kMHRhlxNEc9WHNSCy16C5wUJ1dQWe5fwHwGgqKBOHhpzJY1DKRDgElESnZFe98L9g9+IaBU06RY7PSinmBDBGSyI5b99+omtfoBgtFwJ3jFmoxQQj3MQqevozrtIoKYfCxXUmdrIfR4YI20W3rwCyUXZEbTrS2svqfpiipqOcUs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751977675; c=relaxed/simple;
-	bh=EPrH0MQpypzbX+tCkpS73VGBROjayzO6K1EBpuHehvM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EznOx8gkLAUBv0xcL5rQ+hi/bKhwYeEfLlubHP327AyR6WPPsUAIC9II2fSO7gRnVSoXRZpAwEava+2qlJmc2cazJd5tntg+1Cfd9sIMfxbMmQ6o2qlYU7uR5xSnuIpiJPDLUg8eQGWHx/RN/U8FjxkyNZjMh4sLrFT50Y3mYX4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=URUl/7YP; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1751977880; c=relaxed/simple;
+	bh=AGdnilHErE4WvOFyyPFWltUIwSTl+i9JZ94ZNPU1/Fw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Rm09djA2C0FY0HZAWybGZbmRmMqlbqhGpb/7wuJn9qVB7B+75Ix1YYBewDwJZAPNxkRevwwLl9LKU+Hb/stREcsSC9xh6msSEt1vKTA3NA0KATjsQgNZ3QrKb/Ldl6LZ3d/PosJY2msYZe5VliSSjVMiV4u2ho1hV2Gsqc5P8M4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=SSagacsg; arc=none smtp.client-ip=209.85.216.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="URUl/7YP"
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 568CEl0U025616;
-	Tue, 8 Jul 2025 12:27:33 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=nO4MbO
-	xSSz/KXFgOZDOLTWbrtwC85UMkZ6xwwBiH7YI=; b=URUl/7YPtfI7ppj/NzacnZ
-	6PHP55hvLCXwDVKnsWKxiQL6f15LfZcfH/4WbdjNUAADr4tYmn/yP5ZbDeiRs0vY
-	4TesGAN6cZFxPNeS8ErWcAy/4cZ/plt8wlTj9YjWs8S3IDJXuBrrf5d5EQuhR7sN
-	0VKqIYC/UiDMNAUU4sWUqgnhDnKQPE29IWmo5tMecp7U1x7cIYuq0dwA+zw5nr2o
-	vrmlrdcfrTi5MTUKUogYiMGYlMdm1IL5oZ7HLd6N/zkZQOgYZ3owbhWKRU6Xuozs
-	rawmFUvv+pEtQ9h6gmU+2yC80HPhbNjBw1NVihvYfmkFZie+NA97pba3Bq3guhKQ
-	==
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 47ptfyq84n-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 08 Jul 2025 12:27:33 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5689qGlE021561;
-	Tue, 8 Jul 2025 12:27:32 GMT
-Received: from smtprelay04.wdc07v.mail.ibm.com ([172.16.1.71])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 47qectk2ve-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 08 Jul 2025 12:27:32 +0000
-Received: from smtpav03.wdc07v.mail.ibm.com (smtpav03.wdc07v.mail.ibm.com [10.39.53.230])
-	by smtprelay04.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 568CRVlu56754484
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 8 Jul 2025 12:27:31 GMT
-Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 47CA25805C;
-	Tue,  8 Jul 2025 12:27:31 +0000 (GMT)
-Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 556C358054;
-	Tue,  8 Jul 2025 12:27:25 +0000 (GMT)
-Received: from [9.109.244.163] (unknown [9.109.244.163])
-	by smtpav03.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Tue,  8 Jul 2025 12:27:25 +0000 (GMT)
-Message-ID: <51e56dcf-6a64-42d1-b488-7043f880026e@linux.ibm.com>
-Date: Tue, 8 Jul 2025 17:57:23 +0530
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="SSagacsg"
+Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-312efc384fcso966363a91.3
+        for <linux-block@vger.kernel.org>; Tue, 08 Jul 2025 05:31:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1751977876; x=1752582676; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ADwjwyev8t6ODVTrzcGkPahRPOL0BA0wKbuxDTdYR5c=;
+        b=SSagacsgRJiGOu4j9ukSnutfNv/1HSJ7e8DWTHm2HZEcVsirIcTa+PN67lN4VHsqp4
+         681+oBfLsg86vIgA1V4t8DQ60rct19SBNBAOcoxhPd2KfzpXmVYwS1f1pOQ7tjDdA2aK
+         6/1qpppsojAW687vXVm/3+0q4JJ7EJzr0Pp9ANhRKCgtzp8S06+J70IkDSGTvRNBUgHz
+         caOsYrEqFL2nKD66wMyUnxXvwSqHgOlJq15pJ/VuGMBYnxCJagjtH9esCexbgu4EWIcT
+         bEmI4o7PJZfdQ9TS9ezDGcOxsARs43N8hsmB8WVWCn/wAKGQDA1YZsbpOAkfoKp7OZUH
+         sYIA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751977876; x=1752582676;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ADwjwyev8t6ODVTrzcGkPahRPOL0BA0wKbuxDTdYR5c=;
+        b=mhAUqDg7d2zDCbKR7/UyFHFByCgs4bgWixGPE0YZJBDYLmZ0bQ0oFqvEOENppYOp9G
+         mEu8AGjZ2RshlkhrBb7SQ/odInuuzAovy5GVXnILjRiApmwz8XHyrdACAvHNimCBtxOh
+         ispOE/eShKlCrXHvfzjtRj0FToduRH08ZBnUKN83gfhUyweNjKEXp2H9r8RpyxE3RJ5E
+         5fyA4wJL6Sgujp8olM38N7jBpH6qo2FoRz33/UXkzo/V1dj3xcGmWmIOmY1uZFFz7JgH
+         JWxB0gxvmJ1aEwmtG8SBXO8XaR5E0hi0LID7AnXEhXCMX4Q6vSaPFqtwO1AjqHkSyZca
+         pgXw==
+X-Forwarded-Encrypted: i=1; AJvYcCUP1idp6du7emsNwAQCQEIXGkgKknWcuyJedgbl7daHAgfH/NT9TnBh3ec1L2JlBL61IsLajm/WPPrqhg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyTvA4656VJJucN6eb65G8AJBrW6kV0niyHd8f9bGnESha2YQt1
+	6oCHkSqG/0ED1f3U7cGk398hwJdbs35Jh3Ws05GRp2xz9zxNEXQfxzROVlIqXmO8WjOJ326h51Y
+	I41TTfzHGhYPpesPZ5k997XXuB6r8NdwJ3D1QwON2CQ==
+X-Gm-Gg: ASbGncvkGXYxzIRdhDz8PTT60zj6AChogzjx/+A6whFkPtppc37euyMA4/8SuhGFEoF
+	DOcPJGP+CDXlHxpcyspiqsVn+EEK5dmh10xGPYBjfmBMHIZq/WNvUvXF7/51N5FtyHrsurrp0Xe
+	DNun/Xioe4ZL0FlS0S0rWxoXcU8JbNxNikzauvpwqmc7zB
+X-Google-Smtp-Source: AGHT+IFIyA/qH2A8huTe1guXPdLxrGns+s1VQh8PJC28jVrsz5fEw/soDJ2QJKbKWgAMxBlwMmKwGUnMDBG+bLFj/UU=
+X-Received: by 2002:a17:90b:4d8e:b0:310:8d54:3209 with SMTP id
+ 98e67ed59e1d1-31aac44a30amr8466896a91.2.1751977876177; Tue, 08 Jul 2025
+ 05:31:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 6/6] block: use chunk_sectors when evaluating stacked
- atomic write limits
-To: John Garry <john.g.garry@oracle.com>, agk@redhat.com, snitzer@kernel.org,
-        mpatocka@redhat.com, song@kernel.org, yukuai3@huawei.com, hch@lst.de,
-        axboe@kernel.dk, cem@kernel.org
-Cc: dm-devel@lists.linux.dev, linux-kernel@vger.kernel.org,
-        linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
-        ojaswin@linux.ibm.com, martin.petersen@oracle.com,
-        akpm@linux-foundation.org, linux-xfs@vger.kernel.org,
-        djwong@kernel.org
-References: <20250707131135.1572830-1-john.g.garry@oracle.com>
- <20250707131135.1572830-7-john.g.garry@oracle.com>
-Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <20250707131135.1572830-7-john.g.garry@oracle.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=crubk04i c=1 sm=1 tr=0 ts=686d0eb5 cx=c_pps a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17 a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=VwQbUJbxAAAA:8 a=VnNF1IyMAAAA:8 a=yPCof4ZbAAAA:8 a=yJhl33u1EdvM2cd53HsA:9
- a=QEXdDO2ut3YA:10
-X-Proofpoint-ORIG-GUID: oFeuZO25s8jZhY9N7Q4_OwOi2QA0LlNs
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzA4MDEwMiBTYWx0ZWRfX9R+zUyptV1ib dvpjJ1NMO7XTm6M8VTrCdpuBTeYomqz3kec2VbCmalMuDWeMjXGDM1Ea865m1vzqCd4fSgenqdw Dg/m9c4T5haZvlwRC8/MJXLWvi+QRL2mTwEjyh+6hndAcz0lxOH4CiydXntm+fIuggviehN1wB6
- 0xeqAJcAZ/daSQAAQYqWSYmaTpS2XgaLZfDyo5MG/S3pQ+MzXp2sbqXxKnLUkgiDwpKYkZltt7W 2lmN2aiosg4kuXiHKzBbxrv3aDCIL2U9LEAw99I4/qGpJ75FAnS741HCZFlTI5GucFq5djrT+U0 de3qYa1CTkA3ROi86knjPZpwcmDHhhAzC/Lp1Y7KeKlQnRnWCQL5wk5EZ1LI9jGAQeWKqUHjMxk
- wQo2HSmRgYvR9QQkuYKf3SD48nJR/ZmAOxeYEOqS/zKmi5nNsT3OwqLaus1B1WN0K2APTPek
-X-Proofpoint-GUID: oFeuZO25s8jZhY9N7Q4_OwOi2QA0LlNs
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
- definitions=2025-07-08_03,2025-07-07_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 mlxlogscore=999
- priorityscore=1501 adultscore=0 suspectscore=0 lowpriorityscore=0
- clxscore=1011 impostorscore=0 malwarescore=0 spamscore=0 bulkscore=0
- phishscore=0 classifier=spam authscore=0 authtc=n/a authcc= route=outbound
- adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
- definitions=main-2507080102
+References: <20250702040344.1544077-1-ming.lei@redhat.com> <20250702040344.1544077-8-ming.lei@redhat.com>
+In-Reply-To: <20250702040344.1544077-8-ming.lei@redhat.com>
+From: Caleb Sander Mateos <csander@purestorage.com>
+Date: Tue, 8 Jul 2025 08:31:05 -0400
+X-Gm-Features: Ac12FXxsuNX74PZUIP2d5c5PJ3TYEgK_Kg_aaR7hSK6zuTRZEe7jKQ47wagb4Pg
+Message-ID: <CADUfDZrY0H4w1PNjGiSvE0jr4dGu=UjC3nq+6ejze7kut22KLw@mail.gmail.com>
+Subject: Re: [PATCH 07/16] ublk: add helper ublk_check_fetch_buf()
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
+	Uday Shankar <ushankar@purestorage.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Wed, Jul 2, 2025 at 12:04=E2=80=AFAM Ming Lei <ming.lei@redhat.com> wrot=
+e:
+>
+> Add helper ublk_check_fetch_buf() for checking buffer only.
+>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
 
+The commit message seems a bit sparse. How about something like:
+Add a helper ublk_check_fetch_buf() to validate UBLK_IO_FETCH_REQ's
+addr. This doesn't require access to the ublk_io, so it can be done
+before taking the ublk_device mutex.
 
-On 7/7/25 6:41 PM, John Garry wrote:
-> The atomic write unit max value is limited by any stacked device stripe
-> size.
-> 
-> It is required that the atomic write unit is a power-of-2 factor of the
-> stripe size.
-> 
-> Currently we use io_min limit to hold the stripe size, and check for a
-> io_min <= SECTOR_SIZE when deciding if we have a striped stacked device.
-> 
-> Nilay reports that this causes a problem when the physical block size is
-> greater than SECTOR_SIZE [0].
-> 
-> Furthermore, io_min may be mutated when stacking devices, and this makes
-> it a poor candidate to hold the stripe size. Such an example (of when
-> io_min may change) would be when the io_min is less than the physical
-> block size.
-> 
-> Use chunk_sectors to hold the stripe size, which is more appropriate.
-> 
-> [0] https://lore.kernel.org/linux-block/888f3b1d-7817-4007-b3b3-1a2ea04df771@linux.ibm.com/T/#mecca17129f72811137d3c2f1e477634e77f06781
-> 
-> Signed-off-by: John Garry <john.g.garry@oracle.com>
 > ---
->  block/blk-settings.c | 58 ++++++++++++++++++++++++++------------------
->  1 file changed, 35 insertions(+), 23 deletions(-)
-> 
-> diff --git a/block/blk-settings.c b/block/blk-settings.c
-> index 761c6ccf5af7..3259cfac5d0d 100644
-> --- a/block/blk-settings.c
-> +++ b/block/blk-settings.c
-> @@ -597,41 +597,52 @@ static bool blk_stack_atomic_writes_boundary_head(struct queue_limits *t,
->  	return true;
+>  drivers/block/ublk_drv.c | 32 +++++++++++++++++++-------------
+>  1 file changed, 19 insertions(+), 13 deletions(-)
+>
+> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> index 6d3aa08eef22..7fd2fa493d6a 100644
+> --- a/drivers/block/ublk_drv.c
+> +++ b/drivers/block/ublk_drv.c
+> @@ -2146,6 +2146,22 @@ static int ublk_unregister_io_buf(struct io_uring_=
+cmd *cmd,
+>         return io_buffer_unregister_bvec(cmd, index, issue_flags);
 >  }
->  
-> -
-> -/* Check stacking of first bottom device */
-> -static bool blk_stack_atomic_writes_head(struct queue_limits *t,
-> -				struct queue_limits *b)
-> +static void blk_stack_atomic_writes_chunk_sectors(struct queue_limits *t)
->  {
-> -	if (b->atomic_write_hw_boundary &&
-> -	    !blk_stack_atomic_writes_boundary_head(t, b))
-> -		return false;
-> +	unsigned int chunk_sectors = t->chunk_sectors, chunk_bytes;
->  
-> -	if (t->io_min <= SECTOR_SIZE) {
-> -		/* No chunk sectors, so use bottom device values directly */
-> -		t->atomic_write_hw_unit_max = b->atomic_write_hw_unit_max;
-> -		t->atomic_write_hw_unit_min = b->atomic_write_hw_unit_min;
-> -		t->atomic_write_hw_max = b->atomic_write_hw_max;
-> -		return true;
-> -	}
-> +	if (!chunk_sectors)
-> +		return;
+>
+> +static int ublk_check_fetch_buf(const struct ublk_queue *ubq, __u64 buf_=
+addr)
+> +{
+> +       if (ublk_need_map_io(ubq)) {
+> +               /*
+> +                * FETCH_RQ has to provide IO buffer if NEED GET
+> +                * DATA is not enabled
+> +                */
+> +               if (!buf_addr && !ublk_need_get_data(ubq))
+> +                       return -EINVAL;
+> +       } else if (buf_addr) {
+> +               /* User copy requires addr to be unset */
+> +               return -EINVAL;
+> +       }
+> +       return 0;
+> +}
 > +
-> +	/*
-> +	 * If chunk sectors is so large that its value in bytes overflows
-> +	 * UINT_MAX, then just shift it down so it definitely will fit.
-> +	 * We don't support atomic writes of such a large size anyway.
-> +	 */
-> +	if ((unsigned long)chunk_sectors << SECTOR_SHIFT > UINT_MAX)
-> +		chunk_bytes = chunk_sectors;
-> +	else
-> +		chunk_bytes = chunk_sectors << SECTOR_SHIFT;
->  
+>  static int ublk_fetch(struct io_uring_cmd *cmd, struct ublk_queue *ubq,
+>                       struct ublk_io *io, __u64 buf_addr)
+>  {
+> @@ -2172,19 +2188,6 @@ static int ublk_fetch(struct io_uring_cmd *cmd, st=
+ruct ublk_queue *ubq,
+>
+>         WARN_ON_ONCE(io->flags & UBLK_IO_FLAG_OWNED_BY_SRV);
+>
+> -       if (ublk_need_map_io(ubq)) {
+> -               /*
+> -                * FETCH_RQ has to provide IO buffer if NEED GET
+> -                * DATA is not enabled
+> -                */
+> -               if (!buf_addr && !ublk_need_get_data(ubq))
+> -                       goto out;
 
-Can we use check_shl_overflow() here for checking overflow? Otherwise,
-changes look good to me. I've also tested it using my NVMe disk which
-supports up to 256kb of atomic writes. 
+Was it a bug that this didn't set ret =3D -EINVAL before jumping to out?
+Looks like ublk_fetch() would incorrectly skip initializing the
+ublk_io and return 0 in this case. So probably this needs a Fixes tag.
+Looks like the bug was introduced by the code movement in b69b8edfb27d
+("ublk: properly serialize all FETCH_REQs").
 
-Reviewed-by: Nilay Shroff <nilay@linux.ibm.com>
-Tested-by: Nilay Shroff <nilay@linux.ibm.com>
+Other than that,
 
+Reviewed-by: Caleb Sander Mateos <csander@purestorage.com>
+
+> -       } else if (buf_addr) {
+> -               /* User copy requires addr to be unset */
+> -               ret =3D -EINVAL;
+> -               goto out;
+> -       }
+> -
+>         ublk_fill_io_cmd(io, cmd, 0);
+>         ret =3D ublk_config_io_buf(ubq, io, cmd, buf_addr, NULL);
+>         if (ret)
+> @@ -2297,6 +2300,9 @@ static int __ublk_ch_uring_cmd(struct io_uring_cmd =
+*cmd,
+>         io =3D &ubq->ios[tag];
+>         /* UBLK_IO_FETCH_REQ can be handled on any task, which sets io->t=
+ask */
+>         if (unlikely(_IOC_NR(cmd_op) =3D=3D UBLK_IO_FETCH_REQ)) {
+> +               ret =3D ublk_check_fetch_buf(ubq, ub_cmd->addr);
+> +               if (ret)
+> +                       goto out;
+>                 ret =3D ublk_fetch(cmd, ubq, io, ub_cmd->addr);
+>                 if (ret)
+>                         goto out;
+> --
+> 2.47.0
+>
