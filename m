@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 673D9248871;
-	Tue,  8 Jul 2025 19:45:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 247E7248871;
+	Tue,  8 Jul 2025 19:45:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752003954; cv=none; b=oTpb7Mh5Sq24Oh5bCIHYhcPHICV9NJIoqhzxGAT8CU4HcIO+h3UUcKTgTqvxmHj/KFmrkU2FackjTKkvno898oHJTmqOgA3cMda8Q17mmRoOJgWGj+ECEiQyPmIjNO4DDFOUeGDThksDph8ChL35JcWA3/XAiewRewbOIHONAOE=
+	t=1752003958; cv=none; b=QxUXx0hMdUkMZV5eP9ZfX1OJcF1o3R/o6oX50A089w4GrOXCcqW0/j8VFENAgvg8DafgkJOESTH6quuvyOGVN0JbfvtpdiehvvaChUXg0wI9dos5vdUvn9rv523r7GS1IpL2jX6jJlfcefQZvhHQRkbw6ot3iZRdKPHQlinl7Pw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752003954; c=relaxed/simple;
-	bh=RO+tyqWrHCbnzP2crbU2WSIANTt1IoquzI2eUdQ4Jgs=;
+	s=arc-20240116; t=1752003958; c=relaxed/simple;
+	bh=Tc69NpZsnd7U7OJBUvDg6vLnyx/YuYb6KbZ5n87FHyw=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=bHU1fvGPbvTgm2MNSR3oqo/44iQgBqip/r5ZLLjEbnrU9EXJw4fl1m0P7te5s2QqaurwQbb2yscopjAz76r1TjzCKJvL6DqSrPukEIxhYDtl2JQz+LSjJXvJsG0KrljJFfSN5GfDZrUe9UXTFvm/fPqxF9uBgdeGTKN5f7SsbKc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DTmIp99g; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=sDwaeq/Ac/hKJOLy72JTv0N/RNUdwHKRU6y1x6G38YkJ70XONwI6wCVFQhJ9jwmZ5yiMLp3nZd4WoT1kyT80S4ga7V2cL40M6RvyC47O5X0V1rE64/luYOBP61QyiHBLQaZ+YSx7Y+k61LAN1jgwsbr9ROAHyJSVgi5ZsrxiVOg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tdntC6Uk; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DTmIp99g"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56682C4CEF0;
-	Tue,  8 Jul 2025 19:45:51 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tdntC6Uk"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0203C4CEED;
+	Tue,  8 Jul 2025 19:45:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752003954;
-	bh=RO+tyqWrHCbnzP2crbU2WSIANTt1IoquzI2eUdQ4Jgs=;
+	s=k20201202; t=1752003958;
+	bh=Tc69NpZsnd7U7OJBUvDg6vLnyx/YuYb6KbZ5n87FHyw=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=DTmIp99gTpVr5Jmw3A0m1aU4I6v3Pdo7AOA1XhgzGwkd+3fmMH6Buf70sun8PovGd
-	 7Vay58Nra6QDFkzv7nuLj0WcO8okpLBYP7BuG5pnGXu2QRupWpc7NvX5J6rxwea0oW
-	 f15C1+2bA9S1fYf1026410nNYAZaLXrMfshxDSb5A+hpaer6PHVOF/i27jOXT+zy2y
-	 y2h4XIHOcoNgVnR2KpazGnEhbIEEz1rrmLCPBkzrDfoZ9TcNbu6UVROAwRF+SUgPzZ
-	 6mDr2qZRBe0C5Fih2zBrKvZ3COXo9rPC5WnyM0qR1wABWTBiERH1B0kV+o4F679Vd2
-	 qNeK0GRSJbF4w==
+	b=tdntC6UkSZ7F7DdjJkJWDuW15dnotGqWbLgVC1VAFsr6YuklEq09j9XdBYCVWMsci
+	 RGKlu5KezaXkXriRM7kY0i+MhBN8aEoZ3ImcKRy4IGwJH9D63or6Hel2MxAplsGP+f
+	 mG8aXZSaQa0oXEOF5iTA4Gp7U6sm3iKq7giTkVjbHnna2mbVbRTD4sLGaW5Bz5pHdN
+	 tzDA9ywNbNcp8v6QDjB5DNHq8jgbwzgFNXi1GjCWTSwjVWgTUJZgqhCDgjh+oI8/8K
+	 OjVcFdOdFOr2ZJLJZm/N5r3gUUMTpvaXk24rE6jQmQOHIb1LeaNQzQ5BpePiXQt/kS
+	 FR2uBXeEkM4Rg==
 From: Andreas Hindborg <a.hindborg@kernel.org>
-Date: Tue, 08 Jul 2025 21:45:03 +0200
-Subject: [PATCH v2 08/14] rust: block: add block related constants
+Date: Tue, 08 Jul 2025 21:44:58 +0200
+Subject: [PATCH v2 03/14] rust: str: introduce `NullBorrowFormatter`
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -37,7 +37,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250708-rnull-up-v6-16-v2-8-ab93c0ff429b@kernel.org>
+Message-Id: <20250708-rnull-up-v6-16-v2-3-ab93c0ff429b@kernel.org>
 References: <20250708-rnull-up-v6-16-v2-0-ab93c0ff429b@kernel.org>
 In-Reply-To: <20250708-rnull-up-v6-16-v2-0-ab93c0ff429b@kernel.org>
 To: Boqun Feng <boqun.feng@gmail.com>, Miguel Ojeda <ojeda@kernel.org>, 
@@ -49,51 +49,102 @@ To: Boqun Feng <boqun.feng@gmail.com>, Miguel Ojeda <ojeda@kernel.org>,
 Cc: linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org, 
  linux-kernel@vger.kernel.org, Andreas Hindborg <a.hindborg@kernel.org>
 X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=963; i=a.hindborg@kernel.org;
- h=from:subject:message-id; bh=RO+tyqWrHCbnzP2crbU2WSIANTt1IoquzI2eUdQ4Jgs=;
- b=owEBbQKS/ZANAwAIAeG4Gj55KGN3AcsmYgBobXVH+GZmiXeE7Y47innOMVFwgcZO1TcQ4uQ6Y
- NkEoJ3KD2aJAjMEAAEIAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaG11RwAKCRDhuBo+eShj
- d4eGEACunnqesWrxZ0yRDuKSHCfSG7jn9oz45l2C2TjKpg+R9osmock0kBfUwAXlmFRu9eg/tF1
- lZHv95o6PEouK/Yp8FaohtxnrM1r4uNsHcLbBo3tQ87ItTCT/vPmFbMwiK11Yr1Gw6YYsKLEYe3
- YKPilfB7jHN4gRfVqphThGPVJU+TQnnQQA0zHKlxFyXdlWDnVhqdW9e7rY7rFhYU7mmLuUPJ7xJ
- FhJuKXhAyMTqVW3NjbUeXeqgqwQH29AHAjQvfFTSbIut7hiR81J6cVGZR7xmUCmV3WKoExSKBoI
- lKsHog4QNUesnMe/PNaek/wnsurTEdfVWu+1DRys6mT0dBPBfPXDUiO6nre0nFIj3tMhz2yprTK
- LB3Pq6kk/+zb7RtOTufb9bW6p0yrtdbYREsJWXFSyQDH9+pNM8BpZMKoEI/znQTd+6rvKzoIikR
- O3LvpElBlnSNCPbGMLNEY5vGKpAhXZOexgWe1oNB7iNsKi4gHs51LSq3tKnlpuIFoiDfUCWSWvw
- uOABhPHgLYcTNm9liUbQP1nTpqBEoXDfKFGAhZtTVVNnF9d8MyGV734hXmqTIravYAgm8S8b5Ij
- 9J2mfSKiLS5UmMBF1CJLQFTPYxcUViEKelabjdQhI2xQuPd9SvtoIw6W+dS+0XVTbeLSskdi+Nf
- JZv7rwkCJjYQBWA==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2660; i=a.hindborg@kernel.org;
+ h=from:subject:message-id; bh=Tc69NpZsnd7U7OJBUvDg6vLnyx/YuYb6KbZ5n87FHyw=;
+ b=owEBbQKS/ZANAwAIAeG4Gj55KGN3AcsmYgBobXVDxefYaaw1FyQfRThv9Lp6u74GZ80xXa9hq
+ cLhVemmuAKJAjMEAAEIAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaG11QwAKCRDhuBo+eShj
+ d7yBEACOHt07/pNgojf/PNidcBKq3qj6UG5iv6qDOtFuv8W9FNsqcAHX80ECtElLNo228irDdRr
+ yze/AkN6NmpOorqMAvQArEXc3BEJktLlcz311J2/5Uhy/QeDdj4TVEmKd0LgmMWAOTQjNXvn7CM
+ /8gIwtBT4YEti/wodwpcPXvlH0Hv5se0tKrI6iWlbsiKSVpsGKjeZ8DBOld8hLr1R70spQIzjHr
+ nlHrk2AJQIbyAkSB5lPwZvOUinecnYVF7H5Eqp0rNRyWyEne8f30Pwr6jAab7EtT4Djsw8FT4+K
+ 7/GcIkiThHIL2oMO4E6ePHv0vIT8zuZLpUogsjs27rm8Q/R3GLTPwn6wyfQ4Bv9inpVhnyVxuyO
+ W5uBis0EoGwCB2Rmzo4ez5pwwPUOlnddK0dAfqwKw436NfTbow7uKybgcSTAmvzrPg6sikI0m2v
+ qcRePKupl0cKhYhn//VF7wrC6F2HP1UIaXgXRbYEBpHPb0fuQFx3qR+UgxKC1UQlgDQXFwwhIw1
+ w2gP3uF7vpIJ4itxVkNNIkWTP8lq3OT5xQdS1SOmehBVJQXv2taq+7yHrgvemW73C5+QJ+BImgY
+ R9iGBu253bPoRQRVUFTXWER5h8SmtADRwj/u1AEwLhi4wIHZLwhFTBVtjcPfND+k/IUY9wXOfiq
+ kpIW6gLj5CEAC4Q==
 X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
  fpr=3108C10F46872E248D1FB221376EB100563EF7A7
 
-Add a few block subsystem constants to the rust `kernel::block` name space.
-This makes it easier to access the constants from rust code.
+Add `NullBorrowFormatter`, a formatter that writes a null terminated string
+to an array or slice buffer. Because this type needs to manage the trailing
+null marker, the existing formatters cannot be used to implement this type.
 
 Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
 ---
- rust/kernel/block.rs | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ rust/kernel/str.rs | 59 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 59 insertions(+)
 
-diff --git a/rust/kernel/block.rs b/rust/kernel/block.rs
-index 150f710efe5b4..7461adf4d7e06 100644
---- a/rust/kernel/block.rs
-+++ b/rust/kernel/block.rs
-@@ -3,3 +3,15 @@
- //! Types for working with the block layer.
+diff --git a/rust/kernel/str.rs b/rust/kernel/str.rs
+index 78b2f95eb3171..05d79cf40c201 100644
+--- a/rust/kernel/str.rs
++++ b/rust/kernel/str.rs
+@@ -860,6 +860,65 @@ fn deref_mut(&mut self) -> &mut Self::Target {
+     }
+ }
  
- pub mod mq;
++/// A mutable reference to a byte buffer where a string can be written into.
++///
++/// The buffer will be automatically null terminated after the last written character.
++///
++/// # Invariants
++///
++/// `buffer` is always null terminated.
++pub(crate) struct NullBorrowFormatter<'a> {
++    buffer: &'a mut [u8],
++    pos: usize,
++}
 +
-+/// Bit mask for masking out [`SECTOR_SIZE`]
-+pub const SECTOR_MASK: u32 = bindings::SECTOR_MASK;
++impl<'a> NullBorrowFormatter<'a> {
++    /// Create a new [`Self`] instance.
++    pub(crate) fn new(buffer: &'a mut [u8]) -> Result<NullBorrowFormatter<'a>> {
++        *(buffer.first_mut().ok_or(EINVAL)?) = 0;
 +
-+/// Sectors are size `1 << SECTOR_SHIFT`.
-+pub const SECTOR_SHIFT: u32 = bindings::SECTOR_SHIFT;
++        // INVARIANT: We null terminated the buffer above.
++        Ok(Self { buffer, pos: 0 })
++    }
 +
-+/// Size of a sector.
-+pub const SECTOR_SIZE: u32 = bindings::SECTOR_SIZE;
++    #[expect(dead_code)]
++    pub(crate) fn from_array<const N: usize>(
++        a: &'a mut [crate::ffi::c_char; N],
++    ) -> Result<NullBorrowFormatter<'a>> {
++        Self::new(
++            // SAFETY: the buffer of `a` is valid for read and write as `u8` for
++            // at least `N` bytes.
++            unsafe { core::slice::from_raw_parts_mut(a.as_mut_ptr().cast::<u8>(), N) },
++        )
++    }
 +
-+/// Power of two difference in size of a page and size of a sector.
-+pub const PAGE_SECTORS_SHIFT: u32 = bindings::PAGE_SECTORS_SHIFT;
++    /// Return the position of the write pointer in the underlying buffer.
++    #[expect(dead_code)]
++    pub(crate) fn pos(&self) -> usize {
++        self.pos
++    }
++}
++
++impl Write for NullBorrowFormatter<'_> {
++    fn write_str(&mut self, s: &str) -> fmt::Result {
++        let bytes = s.as_bytes();
++        let len = bytes.len();
++
++        // We want space for a null terminator
++        if self.pos + len > self.buffer.len() - 1 {
++            return Err(fmt::Error);
++        }
++
++        self.buffer[self.pos..self.pos + len].copy_from_slice(bytes);
++        self.pos += len;
++
++        // INVARIANT: The buffer is null terminated.
++        self.buffer[self.pos] = 0;
++
++        Ok(())
++    }
++}
++
+ /// An owned string that is guaranteed to have exactly one `NUL` byte, which is at the end.
+ ///
+ /// Used for interoperability with kernel APIs that take C strings.
 
 -- 
 2.47.2
