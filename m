@@ -1,144 +1,105 @@
-Received: from 004.mia.mailroute.net (004.mia.mailroute.net [199.89.3.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f44.google.com (mail-io1-f44.google.com [209.85.166.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 519EA2E5413
-	for <linux-block@vger.kernel.org>; Tue,  8 Jul 2025 17:16:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A17E8488
+	for <linux-block@vger.kernel.org>; Tue,  8 Jul 2025 18:00:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751995005; cv=none; b=SDDnQGC2EHud8el7IQ7wLSuFWp/M+vjQT1mpvYiAv0T1m9fbQmaUeJkZze0sH7jq+JvL395AZFTCE2obhiafLSOMG6fOLroLrop9sMhTRjqdmyu10vKmmtL6pykONkjMlHnuqMPwLqf2Rkn5ZKRPzB4PnH7+v1HjzVaq002kg7g=
+	t=1751997617; cv=none; b=EOSlbX7KI8Zu3nDNNz0P1QEDixXQF7kkdQjgJzEnPNxnHuR4tJBDBBQlAQ48i0k4JEtrkWg+AT6deqBdRxngBlnkh0PEBHpXfOM2siXhDQpBu3Qdg3LLP370j+IqLywTmcB6UXBHrKbaR/DzDQ5bW3PWgAH5Vbnl7MD3RrRbgN8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751995005; c=relaxed/simple;
-	bh=eUP3JaiXG+DMEzOAb2wgJ2VWKHPtTPNI0LO58wsrGLY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=p79wzPiGuKQw+dEzpfLz9ahg2kk8IR4QWa4NBrR2ntV8uycds1lA+0pn6gnZ2kjrk3VjwBWQDZ4tvdfD+PGbD0HHQdIaSI3mNLGJdULqoB+j3T7vSffPZnLe3YrzRjLm865fAaxNaTdgVlavhtmCRZnhX8GnbvJi5/JE0er35h0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=QCQdsRIH; arc=none smtp.client-ip=199.89.3.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1751997617; c=relaxed/simple;
+	bh=K0FtaLvPDD58SdNpxuK7ai80vnTyKwzEJVT+QPt4lJE=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=WJFN633+3VT0wg4U+7y0DxvwAurXpGdc4BIKsUJL6upGrMz8aQuRf2AtRuvGcFKALPLm/EgJLRwAuqkcicsqcmIoPbjAsF33/FT/oauinROG0jKpiUWDdDALnx0oaYpfDowQXBzMJ7HNyj0Ly8MaCRHrKBfxZHoIaLsvygSbDaA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=X5b3c/0g; arc=none smtp.client-ip=209.85.166.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="QCQdsRIH"
-Received: from localhost (localhost [127.0.0.1])
-	by 004.mia.mailroute.net (Postfix) with ESMTP id 4bc77Z2SjZzm174C;
-	Tue,  8 Jul 2025 17:16:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1751995001; x=1754587002; bh=oa3V0r8GVwOogBFXfFzHlk1B
-	gIGONNISYt59L70T1SI=; b=QCQdsRIHKcXMYqSKwePVPl1vffoufIYsIB1GyRxq
-	ZE/v6s5oC7UxbgOKQJp37VEQXjnsiEoTRhElDMAHhAJGNSU1F0VjDAA+GDXaVOW4
-	8qgLM2lVbgLKXJU2qSg7tGTbxXYQQuq3kdjrcrOdO2XVRPiz5aDST3avVNzGapHs
-	xjXO+lrGYlOkdqtV5hf/llh4LsXcSctSP58Jerje4mXuhzuDDFRWCstZqllRmq9Y
-	1038stEY/TAEqu/rLxyKT3Dgd0PEIppc38DpG9uXjgoWBqBjFXcS+h9UVRqjUx3J
-	m366g9NZ0LMxdPLxpFQvW3/dP3IediZTQQQRrV8IP/5KFA==
-X-Virus-Scanned: by MailRoute
-Received: from 004.mia.mailroute.net ([127.0.0.1])
- by localhost (004.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id 9rj1NpAaYIa7; Tue,  8 Jul 2025 17:16:41 +0000 (UTC)
-Received: from [100.66.154.22] (unknown [104.135.204.82])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 004.mia.mailroute.net (Postfix) with ESMTPSA id 4bc77W4GNPzm10gS;
-	Tue,  8 Jul 2025 17:16:38 +0000 (UTC)
-Message-ID: <4e5f8e45-93c4-4833-97b9-c97d5db0c2e1@acm.org>
-Date: Tue, 8 Jul 2025 10:16:37 -0700
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="X5b3c/0g"
+Received: by mail-io1-f44.google.com with SMTP id ca18e2360f4ac-86cfc1b6dcaso156338039f.0
+        for <linux-block@vger.kernel.org>; Tue, 08 Jul 2025 11:00:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1751997614; x=1752602414; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jpAeStKhuXFhmoLjTEJdf1ChqrXW0xgEt5fFi6Rv3U0=;
+        b=X5b3c/0gI+ME3H87aw58cyaiWUUTANGDq/BbV9NkvevC4YQTJi4d+sNChbyOD6vsqT
+         d64Ht28xoiXcY0n4I8T5S2LHgIU3LIEPdxPS/nZD7CWmIoDZ6IyNqf6TwJVO0Zd6BesO
+         HgcdFJe/3aR+5y4+fMK2LQYfrfbdckGs98AFwsqg2yKQfez2HIXE0e2IMlAGMU//uqbj
+         kqpqT0uLM2uBzqFQO6n0zTOuL5xMuKsCN5+6eJMueTImqn6aRMClHOLkGYcjFYoBa6+x
+         c8ZZIipZMTsUsah+E8q3PPfERjJ/2DsIdbvwQ7Svf2bZzkpRUqELYJps5y6YX/Dt54UZ
+         Zehg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751997614; x=1752602414;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jpAeStKhuXFhmoLjTEJdf1ChqrXW0xgEt5fFi6Rv3U0=;
+        b=PJRBtkGSZxJH418c6Hu1KOjZcE13q4pepvqtNoC5V3SVpf/NMVEsalOdqU76f1Vvw3
+         KdFilH+ufzlV5GJrCbUU2p9Sqh1g0maM6jsaPSIybo4qDBuSk2Vca4Q2S4JCOKKQ9uY9
+         KrKjgJTXq799NHSkvvhCo5LjBomzO40qBAyW0x9Iy/fNSQ/VzlN6q2iewwDWsk3jsg8t
+         zZXbSNKs26kBmUwOt/nvrJJu1R1Lu8PPsyI/oZbbny5FWZFzWCiryzpRgjkdAWwcYr81
+         kpjpUV4bHZKy9gM10dFqyXNhZt496G8M7S4orWPzMBHksueLc/06licrL2dMphtFNpRs
+         ga2Q==
+X-Forwarded-Encrypted: i=1; AJvYcCX++aLZLckziuec6T6yrDxdxb9k0qmVsaKqoZsj5a1eEDYrcbgVGtkCdeynuFppdNab9gNrzyPZSBZ7mg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzlaWndLOfipjwyl6SW50Fz4PgMG/jKLAXcL0uCDoE9gYc/F/s7
+	HaAwwA+xPKKSBTRnq3/nQHDcDisz8npKuR3+bNg7lJrswNOBqUAb+eWPfI36+oA3g+xljBEFL6h
+	Yde40
+X-Gm-Gg: ASbGncuu3GzPLcCywFOSTfrFkVsGHzFtdYS5jEtz0k6aRoKL4Gh2qLP+DlSjEOMKKh3
+	tPctiycLIRwvAGhU6FtMxbyMYJ2kSUTh/QSzJ6UEm5w1pEnpRQT/QCDYI6VpP8efUVYr6KwaWBe
+	XH+TvK1boHxwciasjncsj1S7RIQa6Gd1vwbPPaU8L5SB0/Pm0/uX+G1JgCzLM3BNGI/IyFL1Gnu
+	t395WNyGjtLr/oKCD4RcVJypd+/7s/4k4GdbRXkpQHPifDYywl1mLtRlRZueXMBN15bXnAfCzf2
+	oDpSOBRStkn6iI+ZaDFIoi1uagilSzG2AspsVyUWXifjytuqH8fIthHDiSkNIFg=
+X-Google-Smtp-Source: AGHT+IF7FEKSKTg37RdYgnx6ZNfepZlDJuC0fV06sUWu4KRmrj0zOy1YhAyMZYb/GQVD06m6nkGkVw==
+X-Received: by 2002:a6b:d319:0:b0:879:26b0:1cca with SMTP id ca18e2360f4ac-879596436abmr83046639f.13.1751997614319;
+        Tue, 08 Jul 2025 11:00:14 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-503b59c72bbsm2276958173.38.2025.07.08.11.00.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Jul 2025 11:00:13 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: Thomas Fourier <fourier.thomas@gmail.com>
+Cc: Philipp Stanner <phasta@kernel.org>, Anuj Gupta <anuj20.g@samsung.com>, 
+ Andy Shevchenko <andriy.shevchenko@linux.intel.com>, 
+ Al Viro <viro@zeniv.linux.org.uk>, Li Zetao <lizetao1@huawei.com>, 
+ Asai Thambi S P <asamymuthupa@micron.com>, 
+ Sam Bradshaw <sbradshaw@micron.com>, linux-block@vger.kernel.org, 
+ linux-kernel@vger.kernel.org
+In-Reply-To: <20250627121123.203731-2-fourier.thomas@gmail.com>
+References: <20250627121123.203731-2-fourier.thomas@gmail.com>
+Subject: Re: [PATCH] block: mtip32xx: Fix usage of dma_map_sg()
+Message-Id: <175199761337.1185853.10292369872403699020.b4-ty@kernel.dk>
+Date: Tue, 08 Jul 2025 12:00:13 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/3] Fix a deadlock related to modifying queue attributes
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-References: <20250702182430.3764163-1-bvanassche@acm.org>
- <20250703090906.GG4757@lst.de> <918963a5-a349-433a-80a8-6d06c609f20e@acm.org>
- <20250708095707.GA28737@lst.de>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20250708095707.GA28737@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3-dev-d7477
 
-On 7/8/25 2:57 AM, Christoph Hellwig wrote:
-> That still doesn't make it sensible to keep the q usage counter
-> elevator for unlimited time.  See nvme multipath for how we can keep
-> bios around forever without elevating the usage counter which is
-> supposed to be transient.  Note that dm-multipath should in fact
-> already be doing the right thing in bio based mode as well.
 
-This blktests patch should be sufficient to switch from rq-based to
-bio-based dm-multipathing:
+On Fri, 27 Jun 2025 14:11:19 +0200, Thomas Fourier wrote:
+> The dma_map_sg() can fail and, in case of failure, returns 0.  If it
+> fails, mtip_hw_submit_io() returns an error.
+> 
+> The dma_unmap_sg() requires the nents parameter to be the same as the
+> one passed to dma_map_sg(). This patch saves the nents in
+> command->scatter_ents.
+> 
+> [...]
 
-diff --git a/common/multipath-over-rdma b/common/multipath-over-rdma
-index e157e0a19560..167428b1f53e 100644
---- a/common/multipath-over-rdma
-+++ b/common/multipath-over-rdma
-@@ -267,7 +267,7 @@ mpath_has_stale_dev() {
-  # Check whether multipath definition $1 includes the queue_if_no_path 
-keyword.
-  is_qinp_def() {
-         case "$1" in
--               *" 3 queue_if_no_path queue_mode mq "*)
-+               *" 3 queue_if_no_path queue_mode "*)
-                         return 0;;
-                 *" 1 queue_if_no_path "*)
-                         return 0;;
-diff --git a/tests/srp/multipath.conf b/tests/srp/multipath.conf
-index e0da32e29917..dffea925466f 100644
---- a/tests/srp/multipath.conf
-+++ b/tests/srp/multipath.conf
-@@ -8,6 +8,7 @@ devices {
-                 vendor          "LIO-ORG|SCST_BIO|FUSIONIO"
-                 product         ".*"
-                 no_path_retry   queue
-+               queue_mode      bio
-                 path_checker    tur
-         }
-  }
+Applied, thanks!
 
-With the above patch applied, the following deadlock is triggered by the
-SRP tests:
+[1/1] block: mtip32xx: Fix usage of dma_map_sg()
+      commit: 8e1fab9cccc7b806b0cffdceabb09b310b83b553
 
-Call Trace:
-  <TASK>
-  __schedule+0x8c1/0x1be0
-  schedule+0xdd/0x270
-  schedule_preempt_disabled+0x1c/0x30
-  __mutex_lock+0xb89/0x1650
-  mutex_lock_nested+0x1f/0x30 <- queue_limits_start_update()
-  dm_table_set_restrictions+0x823/0xdf0
-  __bind+0x166/0x5a0
-  dm_swap_table+0x2a7/0x490
-  do_resume+0x1b1/0x610
-  dev_suspend+0x55/0x1a0
-  ctl_ioctl+0x3a5/0x810
-  dm_ctl_ioctl+0x12/0x20
-  __x64_sys_ioctl+0x127/0x1a0
-  x64_sys_call+0xe2b/0x17d0
-  do_syscall_64+0x96/0x3a0
-  entry_SYSCALL_64_after_hwframe+0x4b/0x53
-task:(udev-worker)   state:D stack:27360 pid:8369  tgid:8369  ppid:1758 
-  task_flags:0x480140 flags:0x00004002
-Call Trace:
-  <TASK>
-  __schedule+0x8c1/0x1be0
-  schedule+0xdd/0x270
-  blk_mq_freeze_queue_wait+0xf2/0x140
-  blk_mq_freeze_queue_nomemsave+0x23/0x30
-  queue_ra_store+0x14e/0x290
-  queue_attr_store+0x23e/0x2c0
-  sysfs_kf_write+0xde/0x140
-  kernfs_fop_write_iter+0x3b2/0x630
-  vfs_write+0x4fd/0x1390
-  ksys_write+0xfd/0x230
-  __x64_sys_write+0x76/0xc0
-  x64_sys_call+0x276/0x17d0
-  do_syscall_64+0x96/0x3a0
-  entry_SYSCALL_64_after_hwframe+0x4b/0x53
+Best regards,
+-- 
+Jens Axboe
 
-Thanks,
 
-Bart.
+
