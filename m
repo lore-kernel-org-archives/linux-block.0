@@ -1,273 +1,199 @@
-Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28025207E1D
-	for <linux-block@vger.kernel.org>; Tue,  8 Jul 2025 12:58:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E8B22DECCE
+	for <linux-block@vger.kernel.org>; Tue,  8 Jul 2025 13:28:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751979515; cv=none; b=C637UDnuuE82dPTQVwL5QYjNtW00RfhxqLje87rf/W82jXzD5j8XeKrJBU0XWQ6UJNwabKfh7kFzmNDyva+79LzxqeZN9J63+UqmSsR4FGFf9Hl2HmLsVn++FVFc3yusXaRfKyhpXRdhOPNhzBG4FUQOmImK4u62ofhEMbH2MEU=
+	t=1751981292; cv=none; b=Tf/1s1ec2COt9g0gPxpKwZZCu+CrcPGTfVrn6Na+6GBjTkePbqQYpM6tH9HQY231nTHJutCjOPiXHY1x4NNFnV/xGQp5czVhOqJY5TQwh7a6bRASyeb7Y6eDkL/leGZdNs9HnORawWiTgmrYUK8kl4mOON13sE5dtz4jk0zAduk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751979515; c=relaxed/simple;
-	bh=GFp21yRRDHkZr4cCjY4/NQ6IGi4IO90BeOiQ8FLxxNM=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=OOSugFDpApSHyIZV0ySJ70Cr73dmFbbKwG9lD57gC4lkUrLkdYmn6rbBt4YVqGneggrHoBRfiDMHkjTJ1mcy8mR35m6An+IQgSKD070e0A/comCP22rYSlg0UhS1dLfRhm8KJC3RMiPvnMRknesXWCSkLqkyYWRvHqFvKn/GveE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=UDiYgsJ/; arc=none smtp.client-ip=209.85.215.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1751981292; c=relaxed/simple;
+	bh=RkXrETQP6dNXhhrmFN4ROJ3MegE8PjiV2JvnWrQErTI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ksmOYVUc4piNe1kPw/yuHwTdMVaTdKG0P/kif7SBj+E3IbjRbAPFreQQb0kV0I0x0QZBRXUBEEJ68frQfLwVxy2WR4Zc3IhNM3230IRwdjEMORxz56n8iB71biMwjXA6xqzXJci5AQZyaIosjMWh9/TZxGv8TZhsstLANcuEC2U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=JAykvJXK; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UDiYgsJ/"
-Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-b321bd36a41so3700770a12.2
-        for <linux-block@vger.kernel.org>; Tue, 08 Jul 2025 05:58:33 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="JAykvJXK"
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-234ae2bf851so5443105ad.1
+        for <linux-block@vger.kernel.org>; Tue, 08 Jul 2025 06:28:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1751979513; x=1752584313; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=+X7a8SwyNPxgnTjPQjoQvFIKm71E0lpWMhaVdYWW8Ws=;
-        b=UDiYgsJ/fbsKPpi0u1S+3EnJEqHbcvV82whIEThUOPjtStoZtMF0sRlzIuXLt32vcL
-         ux5VfNln1Mzq0iD9ojv3EADPdr2HuwJBdaE7T8zWjGLix/ZzOUeuSZj1YdHyBhkbZeow
-         fg7g7B/+D47SSnrhui9wlTvq2bT+R1hWKelP9IuvJkC0dqxzUAxPpmP8FuiRnO8bGdaY
-         0I0w66v0uCMEpeQe+UmZh0t4OeIXv4u7kNgYeHAo2Z1ZHllrR2QNw9P83eR8mOEV6izd
-         AB4Lx8Z2RBSC08a5scoVwyBOrQCXwfrn7ByZCI0pCF09uzsN2+SgCKItCHyIEKCffAax
-         OFeQ==
+        d=purestorage.com; s=google2022; t=1751981290; x=1752586090; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Ov8VXRRuUXygVJkAV0gtPWitQwLVR2uUzxUpFYL7yXs=;
+        b=JAykvJXKi96SqBmTUshrTaakvW42G6enVDXxdNkHgltTrfA1fho+COKaXv+jypv+OY
+         oIp8lATRFhyDUs+zbdCNxrifP8vNjMsR7ygfGYozr6z5T7PzkN+cuAQ+xOhTJlDmpmno
+         rh29ihStA/Q6eQqbjy9yqL4BbF5U9FcGljp5y2DANwHuXg66TaT3IC1QqaSIdSoJLyVo
+         3QPPvN3rFL992qdqWU5ALBlpmBYmQcrgiZWZmy4jSIjDbW95mbr29SpaDZWr5aMqOnK4
+         MxGL0Jl5V11Jj3VjYPEyeuWQ5+SiNHpelSSuLLIrkTfr6g8IjnB8j6LpWPkuRKzdqiMu
+         RMCg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751979513; x=1752584313;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=+X7a8SwyNPxgnTjPQjoQvFIKm71E0lpWMhaVdYWW8Ws=;
-        b=ornFFHTuQb/yzT1Sv1OdTMWlPR2NSIDQWwW5hmUJFNUlKy4oLpxncqnQqf8CH2Y7Ve
-         ufy28wReQDcPCFn3D0zqUt0hB+LLdFS1ftvg9JRXu9yraR2oETiQGlFK/UTBubg8uzXU
-         DESzNyoNLtV5ZHAFCVi5ipwwhJbTSHN2Ol0ogF2GH6h5xcDAnJgo8i7LHheOrGlfwRzD
-         1gyrTvZZisMQ/9z71jSV4Nk3a6dbAPOuvBivbintwDO9kdAhQ7bmnnF58HwG4hc9KxYg
-         zCIxZhHDcl4BllhTflIAeb3rkjA+58+rudeSNJYrWJCYuDQghz2ps5pPQotDAJOJENfY
-         Df7A==
-X-Forwarded-Encrypted: i=1; AJvYcCWBkXgYEjsxwMSTfYMg7o25eIpkhkeXT8RiMJfgVoPElb7d8+mRvQ1s04+xw46tOdWf+FafqsRvVYMJIQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyS5MhE1Le9ppYTxr7pruEq6bIhOmAgtM67iwY5uDoqG57ShajB
-	Sr+23H2wUx/USumy6t9047rbo42VRyQ/KdEXNoCuRc/3Zo/pCnbuf3Giwb5F2Dt+9orQDAZsyxh
-	/pit1y84VOS2Fqf7lkJdzq8l17l4UmwLmI0kjMXJyVw==
-X-Gm-Gg: ASbGnctUTZ3E2krTfZvpjAg30dhiashxePIw1CEcd0+bZ7NU6lda7BQcKlssTR7ZXSE
-	oqNKvr3Q6thPPS5/wRBvg5/YlQjfmQTVAzgKB2GB7Bl0X/Fy9MTxR/OEeSGf3DWJhQn57dV0f4A
-	ioE9u6a+yr813UFSuqA3+s9ZgU0pPj0cP/WQ31iYuVSGpiMvhe0f+v4EUV92gMqle4NvnyNZwa7
-	g==
-X-Google-Smtp-Source: AGHT+IEAroSV9QM2u8Khd5heAl2VGKIwbciV1NozFVDk7m9ivDnulTuum/WrPGnR1hmbsA4sVwMc5gI6C1gsYlXHc2E=
-X-Received: by 2002:a17:90b:3c8f:b0:313:1a8c:c2d3 with SMTP id
- 98e67ed59e1d1-31aadd8535fmr18954212a91.22.1751979513324; Tue, 08 Jul 2025
- 05:58:33 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1751981290; x=1752586090;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Ov8VXRRuUXygVJkAV0gtPWitQwLVR2uUzxUpFYL7yXs=;
+        b=KYFciiqYad1Ifj4IEIM/gxdTpZVV83KXtVpqloILgbYh0ZH8tGPz9KGns5dJOAkXUV
+         WF0y0dgRQWY8+ZuMQYEqeRWgoDP+Tin1t+xBKAunVf77NGS/PcNJaN+p2GFOxoAej+3x
+         rTl7ZY0reEglhmOCDKsOejy0snVAUfLroRV8r1/jDG/r0wIppgPqC+gURD1cpdF5jhqm
+         gXGBRCPLThQ2Qhdh+na0XMioDY7jrAZ/fePiwsohp47RIiMPgCIWV6wAhGcgvEgODXJ+
+         16RlCb3FXZp9ulyG5soB/OhhKoU+hY9zfjl29Zpjjo9h/QxMDUr1vqqTc8JQZH4UopAp
+         JYNQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWBSM5BGrwFOmVez3P8tL4r3TbLi3L8H7qEyiHJo/OeJLA+cF2MYGafwf3bc/P+SwdZx0caSRIzu8Ci7Q==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyev3rCf/Dv5ncG0PBRfpPrbcXyL1CqMcKKA3XVhnJvdm6PH7dF
+	aqB7DmHOii1bVAhQWKl4QjwMZ61+Sz1J8Y6/DM5loCojXA/5B21rSmwX6diWsd8cuGH09zSqPxe
+	0jXuCQzhIajMCI8t/LETvRskorCGSh5OgtEhnQDhvQg==
+X-Gm-Gg: ASbGncvHfbnWgB3PqYCREhvS0/H8yM9td6DOqFoQFe05xF9PuUF5yJO0SKhsb5sfaYr
+	o6+4VSF6Eb6flob+B18UHSQxJiGvOGTz0tCwDCP9TeWV6Gb0zfzUh7e1Nq19jKCGf/OELolqIRX
+	mpZY4K3WO6QsS7SDroZ7nEMCFre+1ecRUb9ZBW9Isx5t7gYtsB6QW4E7M=
+X-Google-Smtp-Source: AGHT+IGqndmFKkTJz+a/plR6yamwBitiOkjcw5JEBZ23JUYq5k4+HDzZtCnp4BJu2AMJWBJXVCKkyuP5pMEazJRTS4Y=
+X-Received: by 2002:a17:902:f689:b0:234:d7b2:2abe with SMTP id
+ d9443c01a7336-23c873b7648mr89500045ad.7.1751981289651; Tue, 08 Jul 2025
+ 06:28:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Naresh Kamboju <naresh.kamboju@linaro.org>
-Date: Tue, 8 Jul 2025 18:28:20 +0530
-X-Gm-Features: Ac12FXwWrUCbiwerbOClJgpOYjoDYvos-PTDZgR-SJk-i4t_-gCTbszd43doxzs
-Message-ID: <CA+G9fYvk9HHE5UJ7cdJHTcY6P5JKnp+_e+sdC5U-ZQFTP9_hqQ@mail.gmail.com>
-Subject: LTP: syscalls: TWARN ioctl(/dev/loop0, LOOP_SET_STATUS, test_dev.img)
- failed EOPNOTSUPP (95)
-To: LTP List <ltp@lists.linux.it>, open list <linux-kernel@vger.kernel.org>, 
-	lkft-triage@lists.linaro.org, linux-fsdevel@vger.kernel.org, 
-	linux-block <linux-block@vger.kernel.org>
-Cc: Anders Roxell <anders.roxell@linaro.org>, Dan Carpenter <dan.carpenter@linaro.org>, 
-	Arnd Bergmann <arnd@arndb.de>, Ben Copeland <benjamin.copeland@linaro.org>, 
-	Petr Vorel <pvorel@suse.cz>, chrubis <chrubis@suse.cz>, rbm@suse.com, 
-	Jens Axboe <axboe@kernel.dk>, willy@infradead.org
+References: <20250702040344.1544077-1-ming.lei@redhat.com> <20250702040344.1544077-9-ming.lei@redhat.com>
+In-Reply-To: <20250702040344.1544077-9-ming.lei@redhat.com>
+From: Caleb Sander Mateos <csander@purestorage.com>
+Date: Tue, 8 Jul 2025 09:27:57 -0400
+X-Gm-Features: Ac12FXxchdMtRvIh9kudWN_2Glp_2h1lJNFAGBHKLq5Rrb624DzdWTkVfcdtWHs
+Message-ID: <CADUfDZo9SADywa6a_D5ZjwoU+3Y14CTg7Y1Ywhf-5Hsnu=fCyQ@mail.gmail.com>
+Subject: Re: [PATCH 08/16] ublk: remove ublk_commit_and_fetch()
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
+	Uday Shankar <ushankar@purestorage.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Regressions were observed while testing LTP syscalls cachestat01 and
-other related tests on the next-20250702 Linux kernel across several devices.
+On Wed, Jul 2, 2025 at 12:04=E2=80=AFAM Ming Lei <ming.lei@redhat.com> wrot=
+e:
+>
+> Remove ublk_commit_and_fetch() and open code request completion.
+>
+> Now request reference is stored in 'ublk_io', which becomes one global
+> variable, the motivation is to centralize access 'struct ublk_io' referen=
+ce,
+> then we can introduce lock to protect `ublk_io` in future for supporting
+> io batch.
 
-The issue appears to be related to the inability to configure /dev/loop0
-via the LOOP_SET_STATUS ioctl, which returned EOPNOTSUPP
-(Operation not supported). This results in a TBROK condition,
-causing the test to fail.
+I didn't follow this. What do you mean by "global variable"?
 
-Test environments:
-- arm64
-- qemu-x86_64
-- qemu-riscv
+>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>  drivers/block/ublk_drv.c | 36 ++++++++++++++++++------------------
+>  1 file changed, 18 insertions(+), 18 deletions(-)
+>
+> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> index 7fd2fa493d6a..13c6b1e0e1ef 100644
+> --- a/drivers/block/ublk_drv.c
+> +++ b/drivers/block/ublk_drv.c
+> @@ -711,13 +711,12 @@ static inline void ublk_put_req_ref(struct ublk_io =
+*io, struct request *req)
+>                 __ublk_complete_rq(req);
+>  }
+>
+> -static inline void ublk_sub_req_ref(struct ublk_io *io, struct request *=
+req)
+> +static inline bool ublk_sub_req_ref(struct ublk_io *io, struct request *=
+req)
+>  {
+>         unsigned sub_refs =3D UBLK_REFCOUNT_INIT - io->task_registered_bu=
+ffers;
+>
+>         io->task_registered_buffers =3D 0;
+> -       if (refcount_sub_and_test(sub_refs, &io->ref))
+> -               __ublk_complete_rq(req);
+> +       return refcount_sub_and_test(sub_refs, &io->ref);
 
-Regression Analysis:
-- New regression? Yes
-- Reproducibility? Yes
+The struct request *req parameter can be removed now. Looks like it
+can be removed from ublk_need_complete_req() too.
 
-Regressions started from next-20250702 ( next-20250708)
-Good: next-20250701
-Bad: next-20250702
+>  }
+>
+>  static inline bool ublk_need_get_data(const struct ublk_queue *ubq)
+> @@ -2224,21 +2223,13 @@ static int ublk_check_commit_and_fetch(const stru=
+ct ublk_queue *ubq,
+>         return 0;
+>  }
+>
+> -static void ublk_commit_and_fetch(const struct ublk_queue *ubq,
+> -                                 struct ublk_io *io, struct io_uring_cmd=
+ *cmd,
+> -                                 struct request *req, unsigned int issue=
+_flags,
+> -                                 __u64 zone_append_lba, u16 buf_idx)
+> +static bool ublk_need_complete_req(const struct ublk_queue *ubq,
+> +                                  struct ublk_io *io,
+> +                                  struct request *req)
+>  {
+> -       if (buf_idx !=3D UBLK_INVALID_BUF_IDX)
+> -               io_buffer_unregister_bvec(cmd, buf_idx, issue_flags);
+> -
+> -       if (req_op(req) =3D=3D REQ_OP_ZONE_APPEND)
+> -               req->__sector =3D zone_append_lba;
+> -
+>         if (ublk_need_req_ref(ubq))
+> -               ublk_sub_req_ref(io, req);
+> -       else
+> -               __ublk_complete_rq(req);
+> +               return ublk_sub_req_ref(io, req);
+> +       return true;
+>  }
+>
+>  static bool ublk_get_data(const struct ublk_queue *ubq, struct ublk_io *=
+io,
+> @@ -2271,6 +2262,7 @@ static int __ublk_ch_uring_cmd(struct io_uring_cmd =
+*cmd,
+>         unsigned tag =3D ub_cmd->tag;
+>         struct request *req;
+>         int ret;
+> +       bool compl;
+>
+>         pr_devel("%s: received: cmd op %d queue %d tag %d result %d\n",
+>                         __func__, cmd->cmd_op, ub_cmd->q_id, tag,
+> @@ -2347,8 +2339,16 @@ static int __ublk_ch_uring_cmd(struct io_uring_cmd=
+ *cmd,
+>                         goto out;
+>                 req =3D ublk_fill_io_cmd(io, cmd, ub_cmd->result);
+>                 ret =3D ublk_config_io_buf(ubq, io, cmd, ub_cmd->addr, &b=
+uf_idx);
+> -               ublk_commit_and_fetch(ubq, io, cmd, req, issue_flags,
+> -                                     ub_cmd->zone_append_lba, buf_idx);
+> +               compl =3D ublk_need_complete_req(ubq, io, req);
+> +
+> +               /* can't touch 'ublk_io' any more */
+> +               if (buf_idx !=3D UBLK_INVALID_BUF_IDX)
+> +                       io_buffer_unregister_bvec(cmd, buf_idx, issue_fla=
+gs);
+> +               if (req_op(req) =3D=3D REQ_OP_ZONE_APPEND)
+> +                       req->__sector =3D ub_cmd->zone_append_lba;
+> +               if (compl)
+> +                       __ublk_complete_rq(req);
 
-Test regression: Linux next-20250702 TWARN ioctl(/dev/loop0,
-LOOP_SET_STATUS, test_dev.img) failed EOPNOTSUPP (95) TBROK Failed to
-acquire device
+What is the benefit of separating the reference count decrement from
+the call to __ublk_complete_rq()? I can understand if you want to keep
+the code manipulating ublk_io separate from the code dispatching the
+completed request. But it seems like this could be written more simply
+as
 
-Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
+if (ublk_need_complete_req(ubq, io, req))
+        __ublk_complete_rq(req);
 
-## Test log
-tst_buffers.c:57: TINFO: Test is using guarded buffers
-tst_tmpdir.c:316: TINFO: Using /tmp/LTP_cacQ9AfS0 as tmpdir (tmpfs filesystem)
-tst_device.c:98: TINFO: Found free device 0 '/dev/loop0'
-tst_device.c:190: TWARN: ioctl(/dev/loop0, LOOP_SET_STATUS,
-test_dev.img) failed: EOPNOTSUPP (95)
-tst_device.c:362: TBROK: Failed to acquire device
+Best,
+Caleb
 
-
-## Source
-* Kernel version: 6.16.0-rc4-next-20250702
-* Git tree: https://kernel.googlesource.com/pub/scm/linux/kernel/git/next/linux-next.git
-* Git sha: 50c8770a42faf8b1c7abe93e7c114337f580a97d
-* Git describe: next-20250702
-* Project: https://qa-reports.linaro.org/lkft/linux-next-master/build/next-20250704/testrun/29017637
-* Architectures: arm64, x86_64, riscv64.
-* Toolchains: gcc-13 and clang-20
-* Kconfigs: defconfig+ltp
-
-## Build
-* Test log: https://qa-reports.linaro.org/api/testruns/28986655/log_file/
-* Test details:
-https://regressions.linaro.org/lkft/linux-next-master/next-20250702/ltp-syscalls/cachestat01/
-* Test history:
-https://qa-reports.linaro.org/lkft/linux-next-master/build/next-20250704/testrun/29017637/suite/ltp-syscalls/test/cachestat01/history/
-* Build link: https://storage.tuxsuite.com/public/linaro/lkft/builds/2zJjY2EmRMul6P0UgjdOm4Ssiqh/
-* Kernel config:
-https://storage.tuxsuite.com/public/linaro/lkft/builds/2zJjY2EmRMul6P0UgjdOm4Ssiqh/config
-
-## List of tests
-  - cachestat01
-  - cachestat04
-  - chdir01
-  - chmod09
-  - close_range01
-  - copy_file_range01
-  - copy_file_range02
-  - creat09
-  - fallocate04
-  - fallocate05
-  - fallocate06
-  - fanotify01
-  - fanotify05
-  - fanotify06
-  - fanotify10
-  - fanotify13
-  - fanotify14
-  - fanotify15
-  - fanotify16
-  - fanotify17
-  - fanotify18
-  - fanotify19
-  - fanotify20
-  - fanotify21
-  - fanotify22
-  - fanotify23
-  - fchmodat2_01
-  - fdatasync03
-  - fgetxattr01
-  - fremovexattr01
-  - fremovexattr02
-  - fsetxattr01
-  - fsmount01
-  - fsmount02
-  - fsopen01
-  - fsopen02
-  - fspick01
-  - fspick02
-  - fsskipig01
-  - fsskipig02
-  - fsskipig03
-  - fstatfs01
-  - fstatfs01_64
-  - fsync01
-  - fsync04
-  - getdents01
-  - getdents02
-  - getxattr02
-  - getxattr03
-  - inotify03
-  - ioctl04
-  - ioctl05
-  - ioctl06
-  - ioctl_ficlone02
-  - ioctl_fiemap01
-  - ioctl_loop01
-  - lchown03
-  - linkat02
-  - listmount01
-  - listmount02
-  - lremovexattr01
-  - lstat03
-  - lstat03_64
-  - mkdir09
-  - mknodat02
-  - mmap16
-  - mount01
-  - mount02
-  - mount03
-  - mount04
-  - mount05
-  - mount06
-  - mount07
-  - mount_setattr01
-  - move_mount01
-  - move_mount02
-  - msync04
-  - open_tree01
-  - open_tree02
-  - prctl06
-  - preadv03
-  - preadv03_64
-  - preadv203
-  - preadv203_64
-  - pwritev03
-  - pwritev03_64
-  - quotactl01
-  - quotactl04
-  - quotactl06
-  - quotactl08
-  - quotactl09
-  - readahead02
-  - readdir01
-  - rename01
-  - rename03
-  - rename04
-  - rename05
-  - rename06
-  - rename07
-  - rename08
-  - rename10
-  - rename11
-  - rename12
-  - rename13
-  - rename15
-  - renameat01
-  - setxattr01
-  - stat04
-  - stat04_64
-  - statfs01
-  - statfs01_64
-  - statmount01
-  - statmount02
-  - statmount04
-  - statmount05
-  - statmount06
-  - statmount07
-  - statvfs01
-  - statx06
-  - statx08
-  - statx10
-  - statx11
-  - statx12
-  - sync01
-  - syncfs01
-  - umount01
-  - umount02
-  - umount03
-  - umount2_01
-  - umount2_02
-  - unlink09
-  - utime01
-  - utime02
-  - utime03
-  - utime04
-  - utime05
-  - utimensat01
-  - writev03
-
---
-Linaro LKFT
-https://lkft.linaro.org
+> +
+>                 if (ret)
+>                         goto out;
+>                 break;
+> --
+> 2.47.0
+>
