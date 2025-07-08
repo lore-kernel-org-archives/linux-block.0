@@ -1,64 +1,48 @@
-Received: from mail-il1-f181.google.com (mail-il1-f181.google.com [209.85.166.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 003.mia.mailroute.net (003.mia.mailroute.net [199.89.3.6])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F06FC1C8632
-	for <linux-block@vger.kernel.org>; Tue,  8 Jul 2025 15:32:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E3F72E4264
+	for <linux-block@vger.kernel.org>; Tue,  8 Jul 2025 16:11:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.6
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751988746; cv=none; b=O8lp1tw/xRs5YNzn5K+bSu73v361QVwTELy/gegRSiVDluy8j5kb1AjyJ8l7870j1+HojPBYBJBQdEc1tPTg7jn/n54D0ybmqYG6Lgcq+dVmGiouhel6lNv4v535fMg49ZLsxw8m80nm8ehjrdQZsptVYlXO4N1SysUip/pumHE=
+	t=1751991110; cv=none; b=Hk3IWwSbeVZH88tnyASYIPjJ6eCPGI60M4zbCc0As+R5l6lNIMULkEbqO1ehLFlfIUrT8qgS7VdnrDf63c2fji7Rla+DJItsYfqoBQQnzJqwqOqgKYkI50MEPenDCQ3KuLjqGw3+DDPuTJn/VQ6BY3uiBqjilBLZPlTNWrCgY04=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751988746; c=relaxed/simple;
-	bh=tGfGh9c2UzTqwWh1vwi2rPoQL2/OkL4qtzqx7hgAWHA=;
+	s=arc-20240116; t=1751991110; c=relaxed/simple;
+	bh=Nt1OhngUp2vLVCwYepPmx6F0BX9J31zlXuv8oHxwxss=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Gi0dtCUGQvoMsWnNC5kYoMaWQy7WwFYqhEbw6unOWAwoQ2osvYPUEtuLZTW5EukEefEnZ3hs/x9vh9/94zTQbGb/G+P0+mzgQMP4anMScVavRa5rSjGk4p2lhLQvk1eARqFAgYjj1Jrir09bF4QtAvdSav7hsy2kK2ya+Hy2Gm8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=ffvTqqUj; arc=none smtp.client-ip=209.85.166.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	 In-Reply-To:Content-Type; b=Hh6ubQsNP6DGlGMvQBA43BCesbo4rhc6OEFWkpEuN5/zuMqoHzGAaQekDqLtmS9AlK41tFMr0b9K04AChfc3sVppRh5lwLx2ojtX9noH7y6xAMcViVAAqDHNoYjZQt6N7gG8nv4ufINs451vNTrKHYB5IhFEhm/GQjW4NKQh0AQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=f+hbE5Fx; arc=none smtp.client-ip=199.89.3.6
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="ffvTqqUj"
-Received: by mail-il1-f181.google.com with SMTP id e9e14a558f8ab-3de18fde9cfso27520415ab.3
-        for <linux-block@vger.kernel.org>; Tue, 08 Jul 2025 08:32:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1751988742; x=1752593542; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=AZWmeRm3Kcd5Lu3tbKrd+XxI6nkcaZVcZ+1ITj/1BMY=;
-        b=ffvTqqUj2188kJv4KSZ8rOPfRv+XhNwopEm71biUkHzZVhqkr6tzLi7OQDpkpfUb1F
-         1+r1Tdh0wRC8NQhoyr08pWL/HqagY2dk2hLHgX0dp5pCm3251rIyR04vw4YvyPfOG4bM
-         l720SPBcKMM9pzLoqSNKH6OSj8vV5MpW1fXjpfQhJ5M/Qg8iwqrXcfWshUzmbc9fYSCw
-         CBURQNbZB2C8zFjuma+qtYXFMwU2zUrEuDjAF2+z69Ejlwu79+sW62tTm9kdw17wEzly
-         NqBrn9GvKvh0cX6y3lWloK+nkC6aAVzwJJhQFGSDoiReN7ZFEmXALJ7nsD5Wg92z4aLg
-         Q/xw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751988742; x=1752593542;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=AZWmeRm3Kcd5Lu3tbKrd+XxI6nkcaZVcZ+1ITj/1BMY=;
-        b=bcs2KpmRLm/YAvG1hWcOlTiQRwZj9B+nHFKDrefn976xOiUED4Df9k6z0LJTDa58Qu
-         e4DX4iKv+ukhujwi5mLZfSmo2Oz1d4GfdwFosLnz65Eywv7VsyQF5XcUZ04wcoySmk1J
-         4inTDjoygbbzyw2d/kZ8KnUR83ipHfvss7o3mAKVC82volxOyqPMeBBwk5faqFlny6Hr
-         keT7ecl9gP7vT+yyLf8+KVolahMOZwjDIcW2hIgaAJxqC0j0FJoh7VXlLaNXMJTUW+cm
-         0Kg9o0SEUVQUrGW1gU9HsCIQqILTjSy+xZotVs7OBJU6+Vn++LWT4+5OqydArkGYn8IW
-         U+Jg==
-X-Forwarded-Encrypted: i=1; AJvYcCW8j2EgewWEZ3YKyAjTu1Q0fBm9b2cZfXzCNSxWH+ADK2zQemdN2DBSPmQIqWYiFOC9bmjP4uIiTrtqvQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyjzjikBiV/SPqaoeMci+xt5zaZsyqqs75Ylyz/UtbYl5SO52ay
-	QjlpJ0Abdd6wgZ+L4JKJmDm/1tEAlnlQMauJDyxrcm2OaTmwJOYNUAgHZp/5SC07v6s=
-X-Gm-Gg: ASbGnctUIeIfbauPqD81ip3dDtQ0P+D080wS7BNzclfO1n1B4tK8A8kGo+OQrSHA4yb
-	woubb0jK+i1e09Lf0X8mF3vrc03ABisNlFH5Ar8vJtpeWDjEDs3zjhf0AN4FwDdjFqDnrWfAxy9
-	wfrhhCG0LT/XCf6qtHWhpSrX1jrBa+EhFMuG5PaU+Prub2KT0YHeL2h/Jcz+B9EH2ayoIlmn/pn
-	hYgC4NJkl1px8FwwcvLMkbIu6C5e3ihQQzErgw8X2EIpQUqLdPal/4hDF9H1Y2VWo6EsEtbc5Y9
-	Zhz5jvtVGDKBqnvROmn3fi/Zvd9oiRe+Q61rPBXPKI0n0dydt11RwHxfZrA=
-X-Google-Smtp-Source: AGHT+IF74BoqvYr1m5U/CIBiWzSBsfRr8+ncgQC7M4gVnHX4HZ+TVCWSBJ0MvtLv+xjPYa/ft18vDQ==
-X-Received: by 2002:a05:6602:3e8c:b0:873:1a0e:a496 with SMTP id ca18e2360f4ac-876e491e3c9mr1327548039f.10.1751988740837;
-        Tue, 08 Jul 2025 08:32:20 -0700 (PDT)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-876e085968bsm297101939f.38.2025.07.08.08.32.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Jul 2025 08:32:20 -0700 (PDT)
-Message-ID: <ce06bf7b-d916-4ee8-af4c-3af5f7959b42@kernel.dk>
-Date: Tue, 8 Jul 2025 09:32:19 -0600
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="f+hbE5Fx"
+Received: from localhost (localhost [127.0.0.1])
+	by 003.mia.mailroute.net (Postfix) with ESMTP id 4bc5hg0vLyzlfnCV;
+	Tue,  8 Jul 2025 16:11:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1751991106; x=1754583107; bh=a1utIRAbDvpkVaoplAtruh1J
+	zA+Gd2Cpy9tKzJAzh4o=; b=f+hbE5FxQOBKijJAgtO9ZZBCES0TC8oDKvzD6KKb
+	snc/FoDWL9KO4p6gjSth/WoGrKcpzkvabX/uDV5r9OfrnESECL+udXpiyAT6w0/A
+	3cb2w4un3gf14IaUs5Yqq/39prKDIx9pXsj25jENI04PK0W2wtK4B87RkuwlUsk8
+	QkQBsVJAGt0L23qQUY6N7cBkpalXQgvzGfRYtiP+jvKjr36voqOHScXanO9AaQY3
+	1NL93g+aldKnQoaYz3nbWCl1s6nz62Hxq7zgFBPPL5eUJiUD/4PS2PMpjloqiZNu
+	wOpJCx/RQ1LWSnyX1RYl8YJge3tFpArbnnBw7kAWA/oxVQ==
+X-Virus-Scanned: by MailRoute
+Received: from 003.mia.mailroute.net ([127.0.0.1])
+ by localhost (003.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id 54xF69uiw6s1; Tue,  8 Jul 2025 16:11:46 +0000 (UTC)
+Received: from [100.66.154.22] (unknown [104.135.204.82])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4bc5hc2NTZzlh0dn;
+	Tue,  8 Jul 2025 16:11:42 +0000 (UTC)
+Message-ID: <b23c05be-2bde-424a-a275-811ccc01567c@acm.org>
+Date: Tue, 8 Jul 2025 09:11:41 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -66,78 +50,43 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: Bug#1107479: util-linux: blkid hangs forever after inserting a
- DVD-RAM
-To: Andy Shevchenko <andriy.shevchenko@intel.com>
-Cc: Ben Hutchings <benh@debian.org>,
- =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>,
- 1107479@bugs.debian.org, Roland Sommer <r.sommer@gmx.de>,
- Chris Hofstaedtler <zeha@debian.org>, linux-block@vger.kernel.org,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Salvatore Bonaccorso <carnil@debian.org>
-References: <whjbzs4o3zjgnvbr2p6wkafrqllgfmyrd63xlanhodhtklrejk@pnuxnfxvlwz5>
- <1N4hzj-1uuA3Z1OEh-00rhJD@mail.gmx.net>
- <iry3mdm2bpp2mvteytiiq3umfwfdaoph5oe345yxjx4lujym2f@2p4raxmq2f4i>
- <1MSc1L-1uKBoQ15kv-00Qx9T@mail.gmx.net>
- <aif2stfl4o6unvjn7rqwbqam2v2ntr35ik5e24jdkwvixm3hj4@d3equy4z4xjk>
- <1ML9yc-1uEpgp2oMs-00Se3k@mail.gmx.net>
- <174936596275.4210.3207965727369251912.reportbug@pc14.home.lan>
- <r253lpckktygniuxobkvgozgoslccov6i5slr5lxa7oev6gtgy@ygqjea7c6xlm>
- <e45a49a4e9656cf892e81cc12328b0983b4ef1da.camel@debian.org>
- <2ba14daf-6733-4d4b-9391-9b1512577f15@kernel.dk>
- <aG0CmhnEHGtUEkWz@black.fi.intel.com>
-From: Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH 0/3] Fix a deadlock related to modifying queue attributes
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+References: <20250702182430.3764163-1-bvanassche@acm.org>
+ <20250703090906.GG4757@lst.de> <918963a5-a349-433a-80a8-6d06c609f20e@acm.org>
+ <20250708095707.GA28737@lst.de>
 Content-Language: en-US
-In-Reply-To: <aG0CmhnEHGtUEkWz@black.fi.intel.com>
-Content-Type: text/plain; charset=UTF-8
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20250708095707.GA28737@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 7/8/25 5:35 AM, Andy Shevchenko wrote:
-> On Wed, Jul 02, 2025 at 05:13:45PM -0600, Jens Axboe wrote:
->> On 7/2/25 5:08 PM, Ben Hutchings wrote:
->>> On Sun, 2025-06-29 at 12:26 +0200, Uwe Kleine-K?nig wrote:
->>>> On Sun, Jun 29, 2025 at 11:46:00AM +0200, Roland Sommer wrote:
->>>>
->>>> Huh, how did I manage that (rhetorical question)? Thanks
->>>>
->>>>>> Ahh, now that makes sense. pktsetup calls `/sbin/modprobe pktcdvd`
->>>>>> explicitly, the blacklist entry doesn't help for that. Without the
->>>>>> kernel module renamed, does the 2nd DVD-RAM result in the blocking
->>>>>> behaviour?
->>>>>
->>>>> Yes.
->>>>
->>>> OK, that makes sense. So udev does in this order:
->>>>
->>>>  - auto-load the module (which is suppressed with the backlist entry)
->>>>  - call blkid (which blocks if the module is loaded)
->>>>  - call pktsetup (which loads the module even in presence of the
->>>>    blacklist entry).
->>> [...]
->>>
->>> I tested with a CD-RW, and the behaviour was slightly different:
->>>
->>> - Nothing automtically created a pktcdvd device, so blkid initially
->>> worked with a CD-RW inserted and the pktcdvd modules loaded.
->>> - After running pktsetup to create the block device /dev/pktcdvd/0,
->>> blkid and any other program attempting to open that device hung.
->>>
->>> My conslusion is that pktcdvd is eqaully broken for CD-RWs.
->>
->> Not surprising. Maybe we should take another stab at killing it
->> from the kernel.
-> 
-> In the commit 4b83e99ee709 ("Revert "pktcdvd: remove driver."") you
-> wrote that we would wait for better user space solution is developed.
-> Any news there?
-> 
-> Just asking (I'm in favour to kill the old fart) as you haven't
-> mentioned that in a new attempt.
+On 7/8/25 2:57 AM, Christoph Hellwig wrote:
+> That still doesn't make it sensible to keep the q usage counter
+> elevator for unlimited time.  See nvme multipath for how we can keep
+> bios around forever without elevating the usage counter which is
+> supposed to be transient.  Note that dm-multipath should in fact
+> already be doing the right thing in bio based mode as well.
 
-No work has been done there, to my knowledge. But as the current driver
-is totally broken and people aren't even complaining about that (outside
-of running into that for unrelated reasons), I don't think there's any
-reason for keeping the driver in-tree.
+Hi Christoph,
 
--- 
-Jens Axboe
+I will look into modifying the SRP tests in the blktests repository such
+that these use bio-based mode instead of request-based mode.
+
+However, that won't make the regressions disappear that I have reported.
+Many users prefer the request-based dm-multipath mode because of better
+support for I/O scheduling and merging. For more information, see also
+this cover letter from 2008: [PATCH 00/13] request-based dm-multipath
+(https://lwn.net/Articles/298882/).
+
+So the question remains what to do about these two regressions:
+* The deadlock triggered by modifying a sysfs attribute of a
+   dm-multipath device configured with "queue_if_no_path" and no paths
+   (temporarily).
+* Slower booting of Linux devices that modify sysfs attributes
+   synchronously during boot.
+
+Thanks,
+
+Bart.
