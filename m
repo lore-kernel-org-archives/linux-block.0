@@ -1,105 +1,184 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from CWXP265CU008.outbound.protection.outlook.com (mail-ukwestazon11020081.outbound.protection.outlook.com [52.101.195.81])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3FAC1DB54C
-	for <linux-block@vger.kernel.org>; Tue,  8 Jul 2025 01:27:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751938044; cv=none; b=rxmn4ifYvnR1y3xVo8ZWtoWeS9n2c0o2+tMq97ZNit2iW/IT7GdIkEHre6Q1K5PJZxSCUVM8KxmXzx7M0pbCzSl+ZzSCKj/kfoy3mz59q4GD5B1XgRve/dddXjxXb+FkAvOvzayb5RiRlRalXlzffqFWFmU5S4kwrnoswyvtlsQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751938044; c=relaxed/simple;
-	bh=MT4H1nbSE38RD7bzCrjXJ5Soq8AyeKrptUDN1HXU40Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KxOBN3o9JCF1w/gUxi1bRfT6lTBZQEkY8ZbArtV9H1AIrYEFRRKSesNu6yzBajzE7FoPzde5tWjGUt7dhpbr59oYJkJSAGxQ9wqSh/mUARhcoOt/narNxVhwxiueEb+9QIOscfAIxLsEZ1VlhLOKJjBjv7qkeRJIsCttcZ42zAM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OafbUt1u; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OafbUt1u"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1751938041;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bxRWAschZwxjZ/NDyPK1WTeZlS6Oh3VBdv4rI2QJkPY=;
-	b=OafbUt1ut4pLHV7fES8ezD0sUGXqeg0Gb7ygw6YaO5iFUVFcotUhinNOqpltHyhSlqacvX
-	2gW4HmHep64TSOp6amQaSr24VhTfRtjo7Kwxr1TbGeJYwid10FyKriHP6UFM/q2KMMM9ak
-	kbwL1cCft6bOgfr7GvbY72dUzb2e7oE=
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-682-z9yWvXEnNweP8hSVYutr7g-1; Mon,
- 07 Jul 2025 21:27:18 -0400
-X-MC-Unique: z9yWvXEnNweP8hSVYutr7g-1
-X-Mimecast-MFC-AGG-ID: z9yWvXEnNweP8hSVYutr7g_1751938037
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 93F8F1955F38;
-	Tue,  8 Jul 2025 01:27:16 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.39])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C6D3B30001B1;
-	Tue,  8 Jul 2025 01:27:10 +0000 (UTC)
-Date: Tue, 8 Jul 2025 09:27:06 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Alan Adamson <alan.adamson@oracle.com>,
-	John Garry <john.g.garry@oracle.com>,
-	Keith Busch <kbusch@kernel.org>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Jens Axboe <axboe@kernel.dk>, linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org
-Subject: Re: What should we do about the nvme atomics mess?
-Message-ID: <aGxz6s9oUp2FkbyX@fedora>
-References: <20250707141834.GA30198@lst.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3B512BAF9;
+	Tue,  8 Jul 2025 01:31:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.195.81
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1751938310; cv=fail; b=dfrt43730AnD0tseaWQV+jzk1h9DFevUWszpKeoF2AEl+WYhwawa89kmP3ob+oyYxSfNpjpeKmgqCBIHWi/80EwRO2uMZLrSwp1lkdWy5inQKWc3YwWtMwBxNhGznqEzT91fQeVkTTXPPNrmpglOFrBslJa4FjWK/ZOACiv9cT4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1751938310; c=relaxed/simple;
+	bh=v4/hmSlXkMOoNLwcz66bbiXrP6m+WQU+j1jqhdQivmI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=M+3tpKF+afJ/PixeMr7velQBu3BeA1cpY7eqhZy4j7LH+pKH51JAfYJxI4Xes6zY88P18U1fOINJuNAYOfvcksHSaOuorBwtwgz+5XssbjHBGhmTQhhwdEry6ul5DLTl9IgdVz1GhcYuT5DWl7f5yB2s/OJvicm/nb7/5m2MG6c=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=atomlin.com; spf=pass smtp.mailfrom=atomlin.com; arc=fail smtp.client-ip=52.101.195.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=atomlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=atomlin.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=xV+id6fWEuAAbvUUPkAIxHiVEMk41DyWrAucg5XAO9Ab73lqKVJS1Nesb3gdaM4y2las9AZe1qA7wAM9ZCf9wSx8hf7BPm/gYaK208/yARRBy7+wAjRKKZ2WejfVXmzt+jQyaTfgRcuP+yJotCbmkAXon5QpFzb2mju+supEYIo6KM6tURxRoXUqmYFrLN0mL636XhcmKH0b72hvBtVWaQ+MK9MQ5LBxapvcLiyc9XEwb2AJx4LWZ2qQYUqMyqam+InXZcXusdcZjLJSgyZS4TX8bKimT82tB2LVch4gPzkMjdckWs8sByGva0hZ1hvzsuDE7z6pkiZhCjcXnyPkog==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=cYNZj6oXkBZDOQW+PabzG6DIhltUZWupu7joh/ZMpnc=;
+ b=cceuQF/76fmDHDFKRLN0iJYE6/U/IjcvJi8jE/7nrsK1KnnDyDwglgJX3gwfGKHZNOldGATUbRJFLLcObLKm3t75ohSa6sadZ34WWwDe00fo5rvKrfy04QVq3TYglO6zl5mGlg0ey1AIQ7iC7JIbzvlwXgunfcxVLdI5v4uksj0EvepGpIrOGOHP9kvr9FiWArHcQBc1P7COtlsuOsL/1a0OP+3u1ZxyCRiPJlcbDz330nCfPZwG4HuXscdRiYL8WMsusRSHtMxLgbaq5THqtcXVOtx/WiqTSNr/Ohwko2vDhERXM6GWNBX/tNPpgXDbRkWfXBVdUEdZVQSmjpFZcg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=atomlin.com; dmarc=pass action=none header.from=atomlin.com;
+ dkim=pass header.d=atomlin.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=atomlin.com;
+Received: from CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM (2603:10a6:400:70::10)
+ by CWLP123MB5770.GBRP123.PROD.OUTLOOK.COM (2603:10a6:400:1b5::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8901.27; Tue, 8 Jul
+ 2025 01:31:44 +0000
+Received: from CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM
+ ([fe80::5352:7866:8b0f:21f6]) by CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM
+ ([fe80::5352:7866:8b0f:21f6%4]) with mapi id 15.20.8901.024; Tue, 8 Jul 2025
+ 01:31:44 +0000
+Date: Mon, 7 Jul 2025 21:31:40 -0400
+From: Aaron Tomlin <atomlin@atomlin.com>
+To: Daniel Wagner <wagi@kernel.org>, Ming Lei <ming.lei@redhat.com>
+Cc: Daniel Wagner <wagi@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
+	Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, "Martin K. Petersen" <martin.petersen@oracle.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Costa Shulyupin <costa.shul@redhat.com>, 
+	Juri Lelli <juri.lelli@redhat.com>, Valentin Schneider <vschneid@redhat.com>, 
+	Waiman Long <llong@redhat.com>, Frederic Weisbecker <frederic@kernel.org>, 
+	Mel Gorman <mgorman@suse.de>, Hannes Reinecke <hare@suse.de>, 
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
+	linux-nvme@lists.infradead.org, megaraidlinux.pdl@broadcom.com, linux-scsi@vger.kernel.org, 
+	storagedev@microchip.com, virtualization@lists.linux.dev, 
+	GR-QLogic-Storage-Upstream@marvell.com
+Subject: Re: [PATCH v7 09/10] blk-mq: prevent offlining hk CPUs with
+ associated online isolated CPUs
+Message-ID: <w5rxrdtvk7n473stsjqhq4dvtdqearnsuu7yw63e6lhc5tzszg@dnrl22hyr7br>
+References: <20250702-isolcpus-io-queues-v7-0-557aa7eacce4@kernel.org>
+ <20250702-isolcpus-io-queues-v7-9-557aa7eacce4@kernel.org>
+ <aGt63lJr2JY8VAqc@fedora>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <aGt63lJr2JY8VAqc@fedora>
+X-ClientProxiedBy: BN9PR03CA0410.namprd03.prod.outlook.com
+ (2603:10b6:408:111::25) To CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:400:70::10)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250707141834.GA30198@lst.de>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CWLP123MB3523:EE_|CWLP123MB5770:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3624b45d-a3c2-410b-66e0-08ddbdbf32a3
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?T3RSR0RpSUhoTXBQUC9kK2krYkJDVHA3UENPT1piZkxNN2FFNmtVbm5ZSHg5?=
+ =?utf-8?B?ZlBmR2dveDF0VWtXV0llRERySU1VaW9NaDEvQ21QV2cySjFUeWRzNGNJTGtt?=
+ =?utf-8?B?cUx1cTgzNDZTWXdzMVNrak8xQ3Q5b0RNa09IRDFlczBVc2dxK2Z4bGpnQmZh?=
+ =?utf-8?B?V2JRaFFzdEpHQmt5Tklqc05oV0piMVoyNG5hMjgrQUdBaVdEZDdLRGgzT1c4?=
+ =?utf-8?B?b0tXc0xmZDRLdkVBYURTQkVML25UUUlUWHk2L0lQbG9lbWFnQ0wzaE9PZXE3?=
+ =?utf-8?B?UmdFNFZEcURHK2ZIUzJtOWpENDVQVWVESGE2VE83dWZ3YlVxSnJlM0pTQVVL?=
+ =?utf-8?B?M2F0TnpMVnNwYXUvenZ3eG9NU05FdmFSYjdRZHhVdkFERlpsanZ5Z3dLTEFV?=
+ =?utf-8?B?WjVKWHZjNXNrS3htUDZKSXBKWTR6TDdDQ0JLNVVTWXpxdGY3YjQ4MWlkSXZ2?=
+ =?utf-8?B?MVVFQlBBYUFNNk1lZU9zRGNNQ0VEVHQ3Sk1JZkdiOVVtS0paQUQ3cklJdmNt?=
+ =?utf-8?B?REpOREhmTXdEKzYwUzVqYmRmSTFReUFFUnVhcjVNUHZKMktiTXlWQW8yQjhq?=
+ =?utf-8?B?SEpCVSswR1AxVlJSclpYc0R6ckdVcXJqQTRFK1hpdVRkNHl4cVVvYW1mdUxx?=
+ =?utf-8?B?aFRPajh4VTcrYXJJNnl5N3FKT0ViZ1ZRajk0aXNHNTQ5K3FvWVhhWFRubStL?=
+ =?utf-8?B?Unl0Mk9WckFqVEJnam9TWVVPZmowV2NqNlplTjJ1a09QTUg0eE5wS3FoUG13?=
+ =?utf-8?B?clVHc1hIcThIOEFyV0pQRm1lZ0tsK21YZjRPQ2RybHFSakNoUU5oRGt4NVhi?=
+ =?utf-8?B?ZXJLNzBvK0J5UE4xNS9JcjdiOXpFRkZYVzhMeEd0dHBwZVZUc1N3bEFUWGFH?=
+ =?utf-8?B?bVgwZyt4ckplUUdVTVJUV2VnUmc3aHczU09EUk92Y042V3VTUmhuZzIyR1Z3?=
+ =?utf-8?B?VmR1OGVQRkN0NytVOU9Gc0RzNDdpMWFJc0U1aTQ1TXNzZHhFYmx3TGRGQlRr?=
+ =?utf-8?B?SktDT2FQZHJGUkgxZUtBeEJKYU1jdnViVkNiVnZWS2FvZDJpUGdwd1hDNzFQ?=
+ =?utf-8?B?NjZjR2Y3d0E2OFp4UHBLKzIveHVRbm5qUVNsdGJUMDBmdkNqcFVlTjVzQmdU?=
+ =?utf-8?B?cnVhaWtkVUV4V0Z1R28vemprcS9PWTI5cGtFS2p5RWNyNzh2S0JWeFVSMW5o?=
+ =?utf-8?B?aXcwbWJRdk5JZ1RpMGZnZkdnbjM5WGpqOG1oU0ZTcG9DRnNWbXM1UDcvYkor?=
+ =?utf-8?B?YTNTUDJNY1hSR0FvZ29xQSsyc21ZVGc4YXBQMlI4QXpZOXcvVkJPK2hxWHR1?=
+ =?utf-8?B?VXZibzIwNkhWbkFLemxiMGNRR3FEME1NL1d2eFREVENKWXJhQUJSMVA4SmNC?=
+ =?utf-8?B?bm94bXlzSkFzT1hQWVNDR1dDTUJWQ05BRnNBdDBEUk1TQzVoQmhuV0FWWlRT?=
+ =?utf-8?B?Smw2Mmt2d1NrNE5PVFYxbnk4ZVFEd1dORGVDcGtnRUQ0U1BTaDM1Q2FQYmFl?=
+ =?utf-8?B?bVBtc1E2d1l3U1h3ZVVPYkl2YlpyWmVxUDU3NjM0VDlQbkVYVDFQa2piVnI0?=
+ =?utf-8?B?RXoyRlFlelBBMUROdFMzdXpXRFhiTUFUK3B5cnZrTkN0SzJPSHBPejMzZEQx?=
+ =?utf-8?B?MUN4VG1sczhEc2NXSW1Uc1NHajd0d0hBWFlNQzVKUUFmcWFGSU1aV0lyYVJs?=
+ =?utf-8?B?NTFtbjVtdHJMWW9ZQTc1WkNoa3pSRE0rNjQ4QUpvT0Z1V3NmZnpJVVJUSDZS?=
+ =?utf-8?B?WFFQMkpodkYyai9wNlJRL1RXRjRLQUZlSEx0VmQwTjl6SkQ0UWhrazNFMW80?=
+ =?utf-8?B?NThwaHpGOGFRRjB4REtsaFFIQlYwYlc2RDZmc1A0c1hUdDRlNHQ3eE16Q1kr?=
+ =?utf-8?B?aUoybTBpY2VLMTV5ckd4WlpCc0J2eVhWcDBWYWFremtFZkF0VHRCcWdoVmNO?=
+ =?utf-8?Q?LfiGgkdk57k=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?aW1ybkk3eW9BN0svNTcyeXVSbnVNUW1BNmJyUExXMkFGL0g4MHJoZTlNcmI1?=
+ =?utf-8?B?cXhLSW5zMEpwK3BBcWtCVzZ2UjBvSkg3d3lOYkREYjRJbkttQ0VJdWhVV0Uz?=
+ =?utf-8?B?MDBleUJLT0FFOEI2cW1NVTY2RitlVEpZYUYrbHpMNHE3TENnMkpNN1E5VjZr?=
+ =?utf-8?B?b1BGNDdXV05ncmJ2N2NJMFcrQ0VPV2EvRXk4U3ZEUGRyVDZoRzlQODduNjdm?=
+ =?utf-8?B?VDl4dXlRZ0oycEI1eGgxODdlQTJFaXRuR09sajVhSmVsaHBMdjQrdUsvUEVa?=
+ =?utf-8?B?TjBUVTE2cjFhbGxSMkcvczRwMmdOejdZb1RlbXYzaXd4bFEzRGhJano5djBP?=
+ =?utf-8?B?alFobjc3bTNFZ1FpcndXZ2pEc0tueGtXVFZvU0lKQWE2ZVdGU2ZMc0JVbXo4?=
+ =?utf-8?B?cmJHM0hDNzgvemZUMkNpVVdKVU1DUVFNQWV6ZEZYNllIckFVLzBRRDljaS9j?=
+ =?utf-8?B?Smo2VnVIZ3ZsU3czUWpkTnA2dEpReU5qREtmcUp3KzcrSmo1Zmtzelp6SkVp?=
+ =?utf-8?B?UHZHOTNLbS9ZUGluSzNTN0dIS0xnOVdWeE9ra3Y4OFNacFFLRkdhbXdsN3I4?=
+ =?utf-8?B?Slk3a3BqYnN0NXJFQ1FESlViK29OUE52Uk15aS96VHlDeGgvNEYwSzdQYmQw?=
+ =?utf-8?B?SXZ5VFJOU29wQ2U1WTRrdXNjVWdDRE8zMm5wWCt0b1k4Mk1zRDUxMlVDSFB1?=
+ =?utf-8?B?M1hGWm1LejJydTBGeTAxOVpTT2VPT1hENmJ4YXEvenJiZGdkZDIyWWVKSDdC?=
+ =?utf-8?B?NXJHSm5pTjl3R0RaTlhIWlEvenJybXU0QkQ4dkZ0Uld1V1lxVGs2UWFQbkN3?=
+ =?utf-8?B?RThmVnM1bHo3dWwzUGFYR0lqY3habHFLNDU2aDUrb0hwdXlsS0FwK2pNa0sx?=
+ =?utf-8?B?Tk55YTBnT1c2ZUpZVUU1UzNhWDhxNDF2UWxrV2pIWURBSythTG1oOE9wS1JI?=
+ =?utf-8?B?RXh3YmtDaHhlbDJMSllLRnFOSllEaTJxSzlFNTRvcEhYRUJqd1JnZURwSFNx?=
+ =?utf-8?B?NnlIWWozV0s0TXlkTXNxY1FMdTVkTUpOUHFWdk85bnV4dzhGSXpTOVRENmwr?=
+ =?utf-8?B?WjJOVnZqV1dJWHMxa1ExSGxoZHVrZ0VtYVlyRFdLU1NPamY4NjVtaDU2SmxY?=
+ =?utf-8?B?cEpMcTBObXE0bGg2alovOFRvVDNORnpuR25yaFdSS21iVW1VVDRCaHAvMm1M?=
+ =?utf-8?B?NTl3azVHUFYxbHlhMVA1REFCVFRlakZ3akYzWk81RWFXd2I0eWxja0VEV2g0?=
+ =?utf-8?B?Z3krYytobklZUUlRN0hUbUM0Y2NLTVBRL3pxYzhRazNXNTVRNC9zdFNRclA4?=
+ =?utf-8?B?b3EvbTM0L3NvVU5tT2VjYiswdXRHV0hOLzcwOC9YTC84L21BRlBWRUhQNjR2?=
+ =?utf-8?B?djUyUERrT1YvcGRhLzA0Z3lkTlFpYytDR2prLzRFelNjQzZUSmRNUXFSVWFk?=
+ =?utf-8?B?VGF4aHJLWkw3c2hNa0tWODhiT0FBZ3YyeWlPSzR0ZkNtNXBBOElLb1NFc2lN?=
+ =?utf-8?B?Vml2Wlh6RFdmeDhENzRQWFhVZkxZdmhZdENvNFJENDVXRFRMVHNRb3YwR2dY?=
+ =?utf-8?B?bTFNTUN0TDJUamZ6Q29lQk5HWlNXQVNJTjZReU1oTGFIc0hFNGNoaDdpaGJq?=
+ =?utf-8?B?dnVyZXlTdmhhajFmWVVCWS9JUDVGSFdoVkhaU1J3emV4Mk0zcmFPZXhFZG01?=
+ =?utf-8?B?WlYzVWRqb2VvUzQ2UHdKcmdUNUVwVlJiL05JcUZESUh3bWlteDhSeTE4SUpJ?=
+ =?utf-8?B?N013M2tmVEJYRHFjdU9zR3djS1lEb3R3Q2QyTXBZdk1zTDZNUzl5cHlISkxO?=
+ =?utf-8?B?dk43VkVOdlZsZnIrNE9jVko1MnR0a1M1QXBacWVGM2IrYkdzR091ZlVGNFY1?=
+ =?utf-8?B?b2NFeHZVYnM4ZTdDREZ1ZWhBVVlQdFkyQkZRcCtBbTVYbVFoLzU0VXlkWEU5?=
+ =?utf-8?B?TWhrQmQvVld2S0pka3Z2YlBrcm5hQU5BNkNNVnE4RWRlRDk1WnBXeVNhNklC?=
+ =?utf-8?B?NFZnSnczRTBqSW1sVUl6cFhyZnhuQlBSWTkrN29DK1o1VVFhV2lHbkVQMWNr?=
+ =?utf-8?B?UXVZMGxoYXNvZllLVGNkdlN2cTh2VUtWNFlyUk5PRUsyeDJZRXFvR3VlenlS?=
+ =?utf-8?Q?6ixbd8RMauoU/F6rkqsJU85+g?=
+X-OriginatorOrg: atomlin.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3624b45d-a3c2-410b-66e0-08ddbdbf32a3
+X-MS-Exchange-CrossTenant-AuthSource: CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jul 2025 01:31:44.4458
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: e6a32402-7d7b-4830-9a2b-76945bbbcb57
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: zBH+nTIXPSbaa3l7/Sc7KxRoG+flJC6z26mRNf5PkecmA+8HNqPDzMJoxeIbJU7WGx51H8PhcQBlokJSU+R26g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CWLP123MB5770
 
-On Mon, Jul 07, 2025 at 04:18:34PM +0200, Christoph Hellwig wrote:
-> Hi all,
+On Mon, Jul 07, 2025 at 03:44:30PM +0800, Ming Lei wrote:
+> On Wed, Jul 02, 2025 at 06:33:59PM +0200, Daniel Wagner wrote:
+> > When isolcpus=io_queue is enabled, and the last housekeeping CPU for a
+> > given hctx goes offline, there would be no CPU left to handle I/O. To
+> > prevent I/O stalls, prevent offlining housekeeping CPUs that are still
+> > serving isolated CPUs.
+> > 
+> > When isolcpus=io_queue is enabled and the last housekeeping CPU
+> > for a given hctx goes offline, no CPU would be left to handle I/O.
+> > To prevent I/O stalls, disallow offlining housekeeping CPUs that are
+> > still serving isolated CPUs.
 > 
-> I'm a bit lost on what to do about the sad state of NVMe atomic writes.
+> If you do so, cpu offline is failed, and this change is user visible, please
+> document the cpu offline failure limit on Documentation/admin-guide/kernel-parameters.txt.
+> in the next patch.
 > 
-> As a short reminder the main issues are:
-> 
->  1) there is no flag on a command to request atomic (aka non-torn)
->     behavior, instead writes adhering to the atomicy requirements will
->     never be torn, and writes not adhering them can be torn any time.
->     This differs from SCSI where atomic writes have to be be explicitly
->     requested and fail when they can't be satisfied
->  2) the original way to indicate the main atomicy limit is the AWUPF
->     field, which is in Identify Controller, but specified in logical
->     blocks which only exist at a namespace layer.  This a) lead to
+> Thanks,
+> Ming
 
-If controller-wide AWUPF is a must property, the length has to be aligned
-with block size.
++1
 
->     various problems because the limit is a mess when namespace have
->     different logical block sizes, and it b) also causes additional
->     issues because NVMe allows it to be different for different
->     controllers in the same subsystem.
-
-The spec mentioned clearly that controller AWUPF should be supported by
-any namespace format:
-
-```
-Atomic Write Unit Power Fail (AWUPF): This field indicates the size of the write
-operation guaranteed to be written atomically to the NVM across all namespaces
-with any supported namespace format during a power fail or error condition.
-```
-
-So I am wondering why nvme driver can't validate NAWUN against AWUPF?
-
-
-Thanks, 
-Ming
-
+-- 
+Aaron Tomlin
