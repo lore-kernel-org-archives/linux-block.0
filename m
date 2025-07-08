@@ -1,204 +1,222 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E92501419A9;
-	Tue,  8 Jul 2025 05:17:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751951872; cv=none; b=X+oln3la7IiV/RYHiB8SiW7ys29ajUXgQH8zM4YdspB31EVGk3fYCx9+wPUk48fCa94LC7/dJxj1FxF6BSjoDn6wMbgWal59JdntLorUJZUDuu9bapG/qPWVx0Q1zJ69BcSpoYTStJ4S5tzg3bmVkoj9Y95RqiEufvlUW4i5v78=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751951872; c=relaxed/simple;
-	bh=aMO8N3eiZ+C7kFSYhUr+y770QsbPSSShfPNmtsRhMA0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LNlPd3iupbYJICdFAX9hPRK3Un7yanjny25r87O91iVYMhT8I4h15Oa+1DMv8blO4HMfeuKkBxjpzCKel28kC5L69rTlrct01jb6SDsK+YHao4qEgLON/nanaJAlt7W7Nd3VMObH1nTmyA1r//C+RwXWCQHDZ6v5bfe/UZNsPqE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=I09U4vSn; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22F791E5705
+	for <linux-block@vger.kernel.org>; Tue,  8 Jul 2025 05:36:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=216.71.153.144
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1751952967; cv=fail; b=fnhrFLSqcrxiWflQ3RleS751POaqSmJZKHjZWPfPqgl/wmyu8akdhLUWR7rIqq1tq3/uVEl1S8IYVqEuOaUkKflEvvSvgTmLd2jGegZD2jsaxRBsjAMPRrV3NmRN/auyfylPCmwE2WeOEkJQ6c9j946jReBfEzneEM8ttQ/oLgw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1751952967; c=relaxed/simple;
+	bh=NK8n7dh602J/IvI2Fl94BqWnFE435epkly8gyu0CRX8=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=dyWkEXkjPzJ7o73RYG1Ksy1EHrWnWaHCo8dvlRcgtJOUZTbG/vP0PVF7U+/EzaYcaHlABAEc0xLuWQuTlyw6kDEuY+TSOM8jyfYsiayqoFDbo9u6DlJ+ydgZZpH/YLoqyZieVUKsEtVoXTHqqnK7yT/x1MNRuzoFe7t6hg0Cv1I=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=Tt16p+sJ; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=fBCklp9G; arc=fail smtp.client-ip=216.71.153.144
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="I09U4vSn"
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56801JGM022666;
-	Tue, 8 Jul 2025 05:12:08 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=YIo1q4
-	dd0RPsvXkyj654gELeQyNh3xOur1uKto2yx+w=; b=I09U4vSnqXfajrjhkj/4Lb
-	KcEdl3iqFJwYqxWWW5nlTMHY8VbZitx23nmc69vxZCrXfnwF5tQdiSscy0URvlZP
-	6rkc0eV44CPgWWwJFsLKmglCB3ukIQ0zGnJopydBK0KDf+TWRhielauHicqxacMk
-	UJDxnCxQdao+8aWfbZ/yccWyfKJUAv8Ppez6PpCE2rqoLsoBd8cH+8N2+ZzxbZcq
-	32nm2HPq1n4rEjSE5BB6IBNElub+AuPyEdWumYS8yynK1PNFJ8rR250oXdbUQ1fa
-	vv2RggNuUM6k4iC7c928TuP6JQEOG9VlqPaX+VR4ikkbXCIX2Br18NIsOnTnQuEA
-	==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 47ptfyn6j6-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 08 Jul 2025 05:12:07 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5681FVAe010841;
-	Tue, 8 Jul 2025 05:12:07 GMT
-Received: from smtprelay02.dal12v.mail.ibm.com ([172.16.1.4])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 47qes01hk8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 08 Jul 2025 05:12:07 +0000
-Received: from smtpav05.dal12v.mail.ibm.com (smtpav05.dal12v.mail.ibm.com [10.241.53.104])
-	by smtprelay02.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5685C6AV31457798
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 8 Jul 2025 05:12:06 GMT
-Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5411758056;
-	Tue,  8 Jul 2025 05:12:06 +0000 (GMT)
-Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 4B09558052;
-	Tue,  8 Jul 2025 05:12:02 +0000 (GMT)
-Received: from [9.109.244.163] (unknown [9.109.244.163])
-	by smtpav05.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Tue,  8 Jul 2025 05:12:01 +0000 (GMT)
-Message-ID: <91174432-8c70-437f-811f-7c8a6c028f64@linux.ibm.com>
-Date: Tue, 8 Jul 2025 10:42:00 +0530
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Tt16p+sJ";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="fBCklp9G"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1751952964; x=1783488964;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=NK8n7dh602J/IvI2Fl94BqWnFE435epkly8gyu0CRX8=;
+  b=Tt16p+sJt47ne0RZaxZ6yLqmS4jiEnrgu+MCaoqyYkcVowYNlavqlRGa
+   sDiYmsMSTmP7a3HxolQ/yZU3IsYx69srCvxUAS0ajuE6+689AvwVz+myw
+   hRkZMKiJF36RxRm482LWsPym0JF9cFkpuoj+qmkmasgF51VuboI8jJhtP
+   mBhLrGQgqt6zPLHsYi50TFvHishufFKlM9KI+qHHSqmCFKSqsZFBjd4RK
+   gLdNVvBf8cx4ikz51iCT4dWK5si2FdX7CZFEu/YsDI96/cbhEXDriTexf
+   HsLL6JsUzWdoF5S8wsuPeFxbOQAIzOCu/RYeRLpaGkxR4r1J0yVlt+I9N
+   Q==;
+X-CSE-ConnectionGUID: JMWnuZMeSHmzc6zoxu7WWQ==
+X-CSE-MsgGUID: m+jW1EyVRlOi0+Emf0h1iw==
+X-IronPort-AV: E=Sophos;i="6.16,296,1744041600"; 
+   d="scan'208";a="85991829"
+Received: from mail-dm6nam12on2060.outbound.protection.outlook.com (HELO NAM12-DM6-obe.outbound.protection.outlook.com) ([40.107.243.60])
+  by ob1.hgst.iphmx.com with ESMTP; 08 Jul 2025 13:35:56 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Fulv0hnC6Prmgbuw+qSAGMbsjOr1XWw8EE913IVC0jHS/4yosW9i4ijb4y8QaMEDvRq3RNMqIXhLnD1Day/m6QcDxDJ1EoVkeHdzffHN8SVJTQCVML+LrAxUE1Xj+OHY3RR7QSDsery8t/PxPLp4KsufkNbobkHNWiArERRXBah5ebacr76OoROJJuwQ/LpYNVFzXpA+wL+onLHa+29E9Dcbx2WyJJxQqKbOulnB+3Fb6pd27lsZrD+W+vjIr/S5+b6+VogyscDVPn8l7Gl2a1E4zXSV0Z1p8hbjzKtoaafU6FKO56G3tHvb2riJTEsjsMSafKeIUXFKdAzR36ymug==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=NK8n7dh602J/IvI2Fl94BqWnFE435epkly8gyu0CRX8=;
+ b=qYmygu4KmDKYZk/C/4MvTqUKPhBsDCmH4CBNoG2Uq/kdpxd0x9UpSJqSp3eI9/pJpyE/C7ZcJWXW3p6VcA+aBL9de3A1DbsP1xEWbk9y/hQhRoSUY/IkxC6FtZWKwPX6JQJNFTFGWcnORjNirWIn3FT1a1sDw7bXxS6HHMyWC2Y7BoDIynISvrqSaQ5zEAzF665b8fekokUDBCjYPYmPPGTXIsFCTKSqxmuc8wDcc0UITtroXC7vlkjk45hHjIxY3VWgl62Sae2Jc3YDmieefTREXukX5K7R1obhN4gPpnT9mO7hmY9RAfQC3m5EbNM4vMjN1o3xLywZrVtRgMHKQw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=NK8n7dh602J/IvI2Fl94BqWnFE435epkly8gyu0CRX8=;
+ b=fBCklp9G+gTgN8oP8L8xAzfL0UZbtF/H3kCabI3qs520AgeytAMdYR+G4XYNBdUjuSPL27f3XbHzLlv4RexqcWJRgUHJZ7WgN998Gtv3AZAwPcT5pr34vYlUfy4inmUHZ91GH/+wAdBe+uaAPxfOpD9j1onXJxT79RDc/jO6M2c=
+Received: from SN7PR04MB8532.namprd04.prod.outlook.com (2603:10b6:806:350::6)
+ by SA2PR04MB7595.namprd04.prod.outlook.com (2603:10b6:806:148::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8901.24; Tue, 8 Jul
+ 2025 05:35:54 +0000
+Received: from SN7PR04MB8532.namprd04.prod.outlook.com
+ ([fe80::4e14:94e7:a9b3:a4d4]) by SN7PR04MB8532.namprd04.prod.outlook.com
+ ([fe80::4e14:94e7:a9b3:a4d4%6]) with mapi id 15.20.8901.018; Tue, 8 Jul 2025
+ 05:35:54 +0000
+From: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+CC: Ming Lei <ming.lei@redhat.com>
+Subject: Re: [PATCH blktests v2] block: add block/040 for test updating
+ nr_hw_queues vs switching elevator
+Thread-Topic: [PATCH blktests v2] block: add block/040 for test updating
+ nr_hw_queues vs switching elevator
+Thread-Index: AQHb6zlr9Qq3Tl+Ae0uaFtOjRCGBD7QnveSA
+Date: Tue, 8 Jul 2025 05:35:53 +0000
+Message-ID: <ps4jetorwolaf77l3hg3syucovfiy7ejfrflinpy45nrstedbp@qjt2occmuhth>
+References: <20250702100932.647761-1-shinichiro.kawasaki@wdc.com>
+In-Reply-To: <20250702100932.647761-1-shinichiro.kawasaki@wdc.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SN7PR04MB8532:EE_|SA2PR04MB7595:EE_
+x-ms-office365-filtering-correlation-id: d5463cb8-598e-44d6-6c40-08ddbde14ea4
+wdcipoutbound: EOP-TRUE
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|366016|1800799024|19092799006|376014|38070700018;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?Cwy8FGIfPeDBSGEH90INE9iY/esBUCCAyfMYIcDeeLY3oX1WTDVVb+yJlZtI?=
+ =?us-ascii?Q?Y7De4ZT6PSBPvZBVrUWYOjklbMIlvTioRB6hTzT2gK00wN/Df73uB5WvqxN2?=
+ =?us-ascii?Q?gPgGTIOOVEfo5+i1DoomXy+b66wvrRgGLqo7nbDTQd0w60Wx8YokhteIeSmO?=
+ =?us-ascii?Q?YpKIw5hegsAT0k7QikI/X5N5UeBTRch5X2PYPv4DCeyPurlMAzyzFnQ/gGrz?=
+ =?us-ascii?Q?XHMrAZT8Tt/tFaF7qowtrX0JrqfSH0Hzyv96tR10tZtehFjm8hD3yhO/1bPM?=
+ =?us-ascii?Q?GjEI1kd6NgX0bzy1W0VHrcclVyg53p97sItVSHEg/1mvpg+ReNF8kfTsnvKk?=
+ =?us-ascii?Q?2F5ljS/1Bk3C8Bd3NXCqUSlqkKttsYOVpyNEM+xm7i/XekMkjY/WS2/Qt1jJ?=
+ =?us-ascii?Q?m4/9+973e/p2uBUHTGTFQhIkTSp5wYsMK3iMm11VlDYJ7eXozTQNUOGMq3DU?=
+ =?us-ascii?Q?HHoDqqK9Vy0RwIKd/LOFrgfGAWoIFLfCHv/el8vZ5du6YVHfEwaj4olm9oQh?=
+ =?us-ascii?Q?7QCprkIKkwHQAfx8xjC1Nm6I40kVLvK/rjK2L90Pt8TE3ix0igHcSt+VPJqd?=
+ =?us-ascii?Q?u5n2WPBlDPYwR+MvHjMPl9ZwmQtQ69kUgQRHTtKwT1XiKR5kYNjLnAVwyZtO?=
+ =?us-ascii?Q?Uylrd6ZSXf3tJYtSouzPga4lnKPry+q5j4MkzREDyVxoOAz9c38vF6uNH+6M?=
+ =?us-ascii?Q?0KaLDuYq74libGbtKV4y+WS9DKjB+EuG6qAzxCL6JA7pJcUFqPbT3aiP9YGQ?=
+ =?us-ascii?Q?HnRXy3tZJ9T94ew4NLhDt7KFijOpgAEbILOz51qWxKq0f40GB6fwrWGj+axD?=
+ =?us-ascii?Q?aaNXckLTcedyk8NfARoJEn503CTr12FCySxy4ySkq3zKkda0zqPMEzGQcU3S?=
+ =?us-ascii?Q?WTpObZGWNhTVOnejh7/LkQq00E4r5fZJcfusCNneVJeZ+zrHtu8vx8Ev3yeE?=
+ =?us-ascii?Q?MmV1njJypExfOH9qFqhh661dZrOv2+f8+gDWgIpue3soQh5F6ikSD+BcC64g?=
+ =?us-ascii?Q?SWP6mdxMlDrNEisueRFaruq29fogWO+OpBr1ZkVStdyy3RYQ9lMFW5FWy8T/?=
+ =?us-ascii?Q?awp058SmyVx/NeIAqeoou2TzHFuUjwiMkQO4L0Ot/fGFoP+ewLugYhX/xJjp?=
+ =?us-ascii?Q?3BTNBmAKgi7pGQxF1EBGOOlkfr6IV5X8r5DFQdzoZTdMtEPDuQ/9pr+ZIYa3?=
+ =?us-ascii?Q?m6rqaYUbWDTKiXMmTzJMGR8cuMWiw/7Vo4ancL/q5qhIQsIB/TqNGUHjL6HA?=
+ =?us-ascii?Q?N8eqDEtvCnsZ2H6pwsn8oBk10WrtciDJAgOfzVCkaP5JJgGP/abPFWwcpF/R?=
+ =?us-ascii?Q?wIeISzdVFgDXE/2mgfk6hrmlRApCRqjN+UYZnrunL4MXjv7bC/4+eEWYAxik?=
+ =?us-ascii?Q?ibWn74LsLwkGuXlTk8/wwAub5T8JoYbiOAM4e4lQmnPLkjp1fTRc1YrnBzNc?=
+ =?us-ascii?Q?lK68KeCgA8eX5ICMs6vC0lVS5QKUFu5P2F82B+aiSNHrR0zVJ4W4rTYMfvGM?=
+ =?us-ascii?Q?liHWnYIHTnsu16s=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR04MB8532.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(19092799006)(376014)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?zQm9OAIFnRx1t8qylf6kioL0dxjEZd4EQMc5ahObMtgdQsg+2cRxqz1/u8D3?=
+ =?us-ascii?Q?IFs0dCPI4/bhwvGRmbOM0ebti+Y2ftYseP49+h65+aEBbTK8h7Hr18xLR9wC?=
+ =?us-ascii?Q?ZNDmq7vlADYGFqUkyT/kOaWeYZic6nv/IBtX98Ow7icgdfc7ZbBHFqnjyrEw?=
+ =?us-ascii?Q?kjcJ2xHoeCe9WnXMi8mgGHkXePDOVT/KwCLFEPVR2UONdow+EPihgUw0LzkD?=
+ =?us-ascii?Q?98kF+ETTeWqoH9udM9wTbiNnfwVEM3izH5FKF4T4BJvxTs8fQG22uJ3KaK3C?=
+ =?us-ascii?Q?t/ijLK8KkmkUYJtZb1Uiw6bqgfMhO0d+TM5LrXoCrM8B+s8LJGbPiixsIalE?=
+ =?us-ascii?Q?sbvM+oqXDVWcQ/yYvqCjTtJgDlJYwa2HsCYduTm+mF7tN5ZN0u2GYy01dEW0?=
+ =?us-ascii?Q?JhTYnYQY3DG29HS2W23YP9bd96IqwZ6dhMu307MJ5gPXMrOwwsqqqerSesq7?=
+ =?us-ascii?Q?g+F6bKTqnOgAPOBCxNq/2X57MTZUxVqrt6391JpjDSzExhGuZ4ZtbWpmrLit?=
+ =?us-ascii?Q?iC1qc7iwMTT5Su1e5Z7UKyUrw9IiFaleNk6004PSh9SVYPe2SA12rSnqEyn3?=
+ =?us-ascii?Q?U4ufog5pdut6ENTBgbFv05MXshVpMJ9zMZnPyLopUsZiu1psEjmW2olflqLc?=
+ =?us-ascii?Q?5bWFW8UaW5slxCPLw+f8LG79MRnoXgI4BsB6L8Wh81tCQjILpbkHmxY6GvBa?=
+ =?us-ascii?Q?yFHwj6b8FztzoEmiuKIVeyYGM/xbr1h3h4ZzF3hyM9ZMPgSVtyPAfGrQIibd?=
+ =?us-ascii?Q?oLlBokp9Qe3C/C06sVEJkzcSZJjeWt0jKwue1xSFOyYQ5fIYTvm2R/npaqy4?=
+ =?us-ascii?Q?rz3IxS4IopW8nJl8WfgozicqcqPrL5jWQHLskCVInlSElJWeCJs2HyyAZOWP?=
+ =?us-ascii?Q?RhWE5utVo+dfGQl4gdI/qSb9ip0bgJr6N2G7ISLW5gYQsfN2PLDYnzuhPCAc?=
+ =?us-ascii?Q?QuUQLcbjgpISKriTHCB35QRPmvm4XyDjXkLYjfmDRBlLBEKygMDOIDyrdVas?=
+ =?us-ascii?Q?JLr+uGWKlW8WUPiI631GxBiZrJSTXhwKpkqrleYUomsCMpogFbcOk3EeNXKk?=
+ =?us-ascii?Q?7PGEEVi5t2VWtNJyBisqxchvW2vavIpM1II9MejxqoVNPc8HeKVpdc2EPDKm?=
+ =?us-ascii?Q?2hWtNNhml+0VOtL480Ce0PCvsMFjVpYrI4RaMfiDTLMw8uVFpzoIFg9asJBb?=
+ =?us-ascii?Q?KVTNJw9PTNTWpb03T3jRuowA9dKiQ7tYr2taG7xil7NXc6/cBC1JqXlbbXsi?=
+ =?us-ascii?Q?yg7uOZ3fN/wuIBmyN+yf9YnGff4FSin5Ccr8Xq0kzqB1C55TiKxH9UWzav4z?=
+ =?us-ascii?Q?huA8vB+QDhqqLlP7Vff7bgD6NMjR30dIKT5g2V5HwsGf2a8ddC3YOd6T48Yc?=
+ =?us-ascii?Q?HyMTmJU5Nli82U2N0xJRDjaWiUWFEh+RSJvmRrBYaJ0hCJ4ZQNc8ye6BtSfO?=
+ =?us-ascii?Q?UUFxv70MXBR2BBUL19f2A0EdcU6YOSgn4efGWEInnx8M3ltORypcw92n6bG4?=
+ =?us-ascii?Q?Obz24cNDd1LWAzNz0zSYtxd/tmkWcUFyDMwH9yT32IbEe33W5r2rqM/tccTM?=
+ =?us-ascii?Q?qXKumDrB/Jk/wMEDn5PmnrhNnCUiXJJhIVZcqBtUB3e4UJTxpN4usbvPBFS0?=
+ =?us-ascii?Q?LA=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <8C9B5EF10F162249AED64B431477A9FC@namprd04.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] nbd: fix false lockdep deadlock warning
-To: Yu Kuai <yukuai1@huaweicloud.com>, Ming Lei <ming.lei@redhat.com>
-Cc: josef@toxicpanda.com, axboe@kernel.dk, hch@infradead.org, hare@suse.de,
-        linux-block@vger.kernel.org, nbd@other.debian.org,
-        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
-        yangerkun@huawei.com, johnny.chenyi@huawei.com,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <20250627092348.1527323-1-yukuai1@huaweicloud.com>
- <aF56oVEzTygIOUTN@fedora>
- <c2fbaacc-62a1-4a98-4157-2637b7f242b7@huaweicloud.com>
- <197b6dca-56be-438d-a60f-21011367c5ed@linux.ibm.com>
- <99b4afce-de05-ddcb-2634-b19214cf4534@huaweicloud.com>
- <aGSaVhiH2DeTvtdr@fedora>
- <7b09167f-bf8d-4d94-9317-3cfbb4f83cd8@linux.ibm.com>
- <bc3f20c3-21f8-443b-619f-da7569b37aaf@huaweicloud.com>
- <08ce91d9-756a-a8fa-a988-a13ec74d8c1c@huaweicloud.com>
-Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <08ce91d9-756a-a8fa-a988-a13ec74d8c1c@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=crubk04i c=1 sm=1 tr=0 ts=686ca8a7 cx=c_pps a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17 a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=VwQbUJbxAAAA:8 a=tZyX4RX2Dpwam7ClYu8A:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
-X-Proofpoint-ORIG-GUID: SARxAeRUtbsx8cT6B8GZwT_V5ryi8NZe
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzA4MDAzMSBTYWx0ZWRfX4fID3x1Nn7ZK VcSNPe6sZZjRnRGVa5wnb/+vWgSV38LR7kkYnARo2gG75zGtMB5HKfYG+fMxDLRtqJA5Ti+yTi3 ixPErlLyAg0+PfnDGX1h9iMTL+QES7X3n/s2+F+YFkmcnkw6mcCONZSaqia33gsehcIM6ioo4wt
- rnYwmoQ09vZK0LWf5PyWINEPwdX4L2VRQkKTqDhIosvrr3r8yLyG9vl4rrH6b8tQgdvT+X1efLZ Hnek1ew0FVfLgBbguPfFi+2OnCy00wxIXcX/1thHLMPlHwRVv89l5JI1GQfAD9H60+FA3kP74SO 9UJdz0rGXT9FSfMqyEERVazCNJhPVaFXES162/HnVAYdy00f2wURbmK2F81EhXg7T8hAkokJ7jY
- DPK3AX3VyoQ1rI+HW9rgtSA6FoW52mKwErNbgIRIAydlHdRyTpE+Zv8sHAkwoVzvOdq+qr/p
-X-Proofpoint-GUID: SARxAeRUtbsx8cT6B8GZwT_V5ryi8NZe
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
- definitions=2025-07-08_01,2025-07-07_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 mlxlogscore=999
- priorityscore=1501 adultscore=0 suspectscore=0 lowpriorityscore=0
- clxscore=1015 impostorscore=0 malwarescore=0 spamscore=0 bulkscore=0
- phishscore=0 classifier=spam authscore=0 authtc=n/a authcc= route=outbound
- adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
- definitions=main-2507080031
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	c21GASsSJus53KlSb2zUY8Wmqw0xuZwCax4WfYrmdXYTLMto4t28B7zMlvS+bd2eQkb4i80/pq6dQqVKV+NVmI38N4c336zxTU6JBgTz4kqrjsVeYAbulCgKae+C5gZ/li2/lvpOoWc5g4kfjLMqF0vSDwnmYWc0e1T0LaUq4HEnpBEajlfwCnT2sAN0F3AlNvfdYo1DFXHgfljf7GwLot+P/Woutz37VoihanKcI1ES4A838xSkknfQB3lvKYSc1ff1mRnguhKOJVyysRLwAR9Bzn+LwAI3KdIxhPAuWt7mhzHxz98yCKtYmd/7cqzcwjgFyZXYSB7o8plzZtAuZ+uKvd4N8rwK/nZ8YGbTQEEtE1+1YrX9IcYY3snzswgnPmZq8Ms+CgLSZw9Lor+rQxXXdXiylKehmWOmiN3KBAem3O0dURVg1SNNBofxPSA4mXQr/iHJW5X0wygbBE4o5UWF9m1pyQvun6w4z5jyIyzdNpeKmEJ2MDNkcxRfMBtiuVkQaT1jFjemHWspzgXu9y3Xw4IyWmCslzaJj0FaGJBdqo+UvU35SuTni3CAuPO7PfjZ2Mtz6PyTd4etfzbGbQizO4zqjp1YR8H+VSSeD+0sLC7mKrwSamjwgR7urvTt
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SN7PR04MB8532.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d5463cb8-598e-44d6-6c40-08ddbde14ea4
+X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Jul 2025 05:35:54.0635
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: s76rJfgW4BOjegiWQVASTxcbLk/1GCPZQ+a9VNNzB0tR9T+/4Ktv8JF+F15CkMJ08082ssWI349LkUt8VpXaCSjThSj2odEDdYrR7iXnP9w=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR04MB7595
 
+On Jul 02, 2025 / 19:09, Shin'ichiro Kawasaki wrote:
+> From: Ming Lei <ming.lei@redhat.com>
+>=20
+> Add block/040 for covering updating nr_hw_queues and switching elevator.
+>=20
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> [Shin'ichiro: fixed redirection to scheduler file and skip reason check]
+> [Shin'ichiro: renumbered test case]
+> Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+> ---
+> I take the liberty to modify the original patch by Ming [1] to reflect my
+> review comments. The new test case had caused hang with the v6.15-rcX
+> kernel. Now it works good with the v6.16-rcX kernel. Thank you for the
+> fix work.
+>=20
+> [1] https://lore.kernel.org/linux-block/20250402041429.942623-1-ming.lei@=
+redhat.com/
 
+FYI, I applied the patch, with tow slight modifications below.
 
-On 7/5/25 6:45 AM, Yu Kuai wrote:
-> Hi,
-> 
-> 在 2025/07/02 15:30, Yu Kuai 写道:
->> Hi,
->>
->> 在 2025/07/02 14:22, Nilay Shroff 写道:
->>>
->>>
->>> On 7/2/25 8:02 AM, Ming Lei wrote:
->>>> On Wed, Jul 02, 2025 at 09:12:09AM +0800, Yu Kuai wrote:
->>>>> Hi,
->>>>>
->>>>> 在 2025/07/01 21:28, Nilay Shroff 写道:
->>>>>>
->>>>>>
->>>>>> On 6/28/25 6:18 AM, Yu Kuai wrote:
->>>>>>> Hi,
->>>>>>>
->>>>>>> 在 2025/06/27 19:04, Ming Lei 写道:
->>>>>>>> I guess the patch in the following link may be simper, both two take
->>>>>>>> similar approach:
->>>>>>>>
->>>>>>>> https://lore.kernel.org/linux-block/aFjbavzLAFO0Q7n1@fedora/
->>>>>>>
->>>>>>> I this the above approach has concurrent problems if nbd_start_device
->>>>>>> concurrent with nbd_start_device:
->>>>>>>
->>>>>>> t1:
->>>>>>> nbd_start_device
->>>>>>> lock
->>>>>>> num_connections = 1
->>>>>>> unlock
->>>>>>>       t2:
->>>>>>>       nbd_add_socket
->>>>>>>       lock
->>>>>>>       config->num_connections++
->>>>>>>       unlock
->>>>>>>           t3:
->>>>>>>           nbd_start_device
->>>>>>>           lock
->>>>>>>           num_connections = 2
->>>>>>>           unlock
->>>>>>>           blk_mq_update_nr_hw_queues
->>>>>>>
->>>>>>> blk_mq_update_nr_hw_queues
->>>>>>> //nr_hw_queues updated to 1 before failure
->>>>>>> return -EINVAL
->>>>>>>
->>>>>>
->>>>>> In the above case, yes I see that t1 would return -EINVAL (as
->>>>>> config->num_connections doesn't match with num_connections)
->>>>>> but then t3 would succeed to update nr_hw_queue (as both
->>>>>> config->num_connections and num_connections set to 2 this
->>>>>> time). Isn't it? If yes, then the above patch (from Ming)
->>>>>> seems good.
->>>>>
->>>>> Emm, I'm confused, If you agree with the concurrent process, then
->>>>> t3 update nr_hw_queues to 2 first and return sucess, later t1 update
->>>>> nr_hw_queues back to 1 and return failure.
->>>>
->>>> It should be easy to avoid failure by simple retrying.
->>>>
->>> Yeah I think retry should be a safe bet here.
->>>
->>
->> I really not sure about the retry, the above is just a scenario that I
->> think of with a quick review, and there are still many concurrent
->> scenarios that need to be checked, I'm kind of lost here.
->>
->> Except nbd_start_device() and nbd_add_socked(), I'm not confident
->> other context that is synchronized with config_lock is not broken.
->> However, I'm ok with the bet.
->>
->>> On another note, synchronizing nbd_start_device and nbd_add_socket
->>> using nbd->task_setup looks more complex and rather we may use
->>> nbd->pid to synchronize both. We need to move setting of nbd->pid
->>> before we invoke blk_mq_update_nr_hw_queues in nbd_start_device.
->>> Then in nbd_add_socket we can evaluate nbd->pid and if it's
->>> non-NULL then we could assume that either nr_hw_queues update is in
->>> progress or device has been setup and so return -EBUSY. I think
->>> anyways updating number of connections once device is configured
->>> would not be possible, so once nbd_start_device is initiated, we
->>> shall prevent user adding more connections. If we follow this
->>> approach then IMO we don't need to add retry discussed above.
->>
->> It's ok for me to forbit nbd_add_socked after nbd is configured, there
->> is nowhere to use the added sock. And if there really are other contexts
->> need to be synchronized, I think nbd->pid can be used as well.
->>
-> 
-> Do we have a conclusion now? Feel free to send the retry version, or let
-> me know if I should send a new synchronize version.
-> 
-Personally, I prefer synchronizing nbd_start_device and nbd_add_socket
-using nbd->pid but I do agree retry version would also work. Having
-said that, lets wait for Ming's feedback as well.
+...
 
-Thanks,
---Nilay
+> diff --git a/tests/block/040 b/tests/block/040
+> new file mode 100755
+> index 0000000..fbc433a
+> --- /dev/null
+> +++ b/tests/block/040
+> @@ -0,0 +1,71 @@
+> +#!/bin/bash
+> +# SPDX-License-Identifier: GPL-2.0
+> +# Copyright 2025 Ming Lei <ming.lei@redhat.com>
+> +#
+> +# Most of code is copied from block/029
+> +#
+> +# Trigger blk_mq_update_nr_hw_queues() & elevator switch
+
+I added some more descriptions here, especially about the relevant kernel c=
+ommit
+b126d9d7475e.
+
+> +
+> +. tests/block/rc
+> +. common/null_blk
+> +
+> +DESCRIPTION=3D"test blk_mq_update_nr_hw_queues() vs switch elevator"
+> +QUICK=3D1
+
+I replaced this "QUICK=3D1" flag with "TIMED=3D1" flag.
+
+Anyway, thank you for the contribution :)=
