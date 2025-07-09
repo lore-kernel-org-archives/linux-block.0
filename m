@@ -1,239 +1,113 @@
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9793B202F8F;
-	Wed,  9 Jul 2025 20:40:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F73E22D793;
+	Wed,  9 Jul 2025 21:02:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752093616; cv=none; b=Uv+g7AyPfk79iybiA4XIz3a5anMqJXMA6JD86P6nSjvVcvfTAEPMBlrXVWy1XbpMUrNkAWOynxNHi2kEXKCNBgHdxMJMFUSSr8PdK9TgHK09GMLBe/7FRrVaBkCfhtOWcMYr9tzZZsHaUTT7nBXkWxlrH06/yklMFYs8Xdj53Bw=
+	t=1752094930; cv=none; b=OzNPi2tOuIjUZ6t8nt9Ec4SNQ8CycuqWLBfH+bv0pCna7nlAwNuEctY8j9d2KiCQf/hWSVLqNmJ4bDuOmEY1+kJzEXqYNEVMR78+eORgvLJAwqGZpMDp3oIDW28Fw80e0desaRTApqIEw/qlVdywlEt+3GKUX0vPZeHMPB5ozaw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752093616; c=relaxed/simple;
-	bh=6bCNaAgvFnAoxUXkG51sXFPAF2A8790czG/Stio24hM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=p5AQJFGa9r0YWXG/KJ0M2IhEytQYIPIJSIu6Dl5NhuLBgi3j10FeX+M/DIYOA25oq40OTRk757CkCiUU4GWC3blKo+1iltFeHqXPVBjWKMdT6e/jJVqQKTHaFH4xnoOKlaw2i3K5dNEd4+Sw6lj8EH4NKEKJj/1CdPQduTzR9Wc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.com; spf=pass smtp.mailfrom=gmx.com; dkim=pass (2048-bit key) header.d=gmx.com header.i=quwenruo.btrfs@gmx.com header.b=QfxLRjgb; arc=none smtp.client-ip=212.227.15.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.com
+	s=arc-20240116; t=1752094930; c=relaxed/simple;
+	bh=Tv3TPTR5E+wGvhY1J4ym9T3lNka/SXP07Y7RXtDtqhI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BNSqYBvyhAJRJQKwDJgUwTORamKY0BdFz/Iw/piWFJ4xt04c3sf9t1QbU4uGrSimqdcHwwBLNpJxz9NZfvTr+OBXrNYyW/1bOSrqyJBT/AXlw/7hzr9m1rqsyB9H/eHRomZ/LRNFKatEelIqOxWtj6eIsQ7VxrGqqxqNBsVnJXM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U06PViuT; arc=none smtp.client-ip=209.85.208.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.com header.i=quwenruo.btrfs@gmx.com header.b="QfxLRjgb"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.com;
-	s=s31663417; t=1752093611; x=1752698411; i=quwenruo.btrfs@gmx.com;
-	bh=7u2SCYDTY11+D5/U+Iljw8ciYu2Uiz0x7huvA6oXWLk=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding:cc:content-transfer-encoding:
-	 content-type:date:from:message-id:mime-version:reply-to:subject:
-	 to;
-	b=QfxLRjgbeW9fw+ryxzK3IEmk+g/btYHPl5UyumVoUAs5upPG53DzeE/wjjwiSKGb
-	 0nUtKC14xBELfzjutFkcFTktfDlF/0/bpjuIcIFH9Tdxs0FAMdKJYGx7pg2XrLnSr
-	 TnurZ4S6L/MDVLMoqMFmyu3sjRXSvurVymXBaxNi42DKNuZ4p3I2tcTsw8jqEXrJO
-	 gBcsAGkLBKaYTEFXsq8RcOWRlU9m6sWOcc7xGNc/7D/aHTKPeqDmkrQBIQoiIZFfq
-	 W1i/GRWJ7td7D0ZrWQNt0pzjLi4AQGcLyyGdligArZ1e6VdO3d6jI2PKWJSSzmXd2
-	 bP+aArDPexNtpGyOvQ==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from [172.16.0.229] ([159.196.52.54]) by mail.gmx.net (mrgmx004
- [212.227.17.184]) with ESMTPSA (Nemesis) id 1MulqD-1uqifC06F9-00tCD2; Wed, 09
- Jul 2025 22:40:09 +0200
-Message-ID: <02bf24f8-c7f1-4f70-8af0-73b9656c00b6@gmx.com>
-Date: Thu, 10 Jul 2025 06:10:04 +0930
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U06PViuT"
+Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-32cdc9544ceso2434211fa.0;
+        Wed, 09 Jul 2025 14:02:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1752094927; x=1752699727; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=i/NYN5eCrplLxDbEYSWBaln4nRDogh/r4mbR4dmIqRU=;
+        b=U06PViuTX2xwGhWroVTEJIyryIAIjRTKcJ7JrY24lBjyJ0SYZPRaJqMSvvZKRHIXQT
+         qQ/w9DNqsFQj9DtSRavMJ2/Go59lEvZdrpOQuamXEVAc1dEaSDF3fGSE3jTWqno305Jj
+         xiXJ3AjHB28jhkyPGtKOPaDvrZBIC/jSIAstDN54ZtFSPE4J/XkQiHbhl3cKY38yMuZP
+         i4/vHVOrt369s6UE1gmW++lBDBI1FBLizbvIruUgvBNJQ6uc0ZKHwiwhk0d36pxZZZiA
+         xz4jOaSFfGD8gavB2LjGtVKEPugJTRLezSmDyD6V57suW6Cp9LCpnUCA17cECPjz7FMG
+         KFqQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752094927; x=1752699727;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=i/NYN5eCrplLxDbEYSWBaln4nRDogh/r4mbR4dmIqRU=;
+        b=TuIUE/7Pd+lE+EjGJUXwcLjOu8PUMxYRLJsh99RY+NgP5qnhAU9VFQN5mZvzAmaQ+U
+         axMivrTGSC16eS2QKxaGbgGXJjGf9F3NqSgZUA7Ad4rJ8Ep04L7UgIRzwwyfmDdYMjqP
+         2QVp0jwRl0fPkZ2l+SOzLURi6Gnmm/QSXWlGShiwBnhYuQQD7LKBG9k1tZaBrc5mfnZ5
+         SSlZJAQKMx/1569Z/p7Gl8CPTV1nrlpAhJjof+cSlGW4zV0LfkCDl38Ox6wH77RJLS1j
+         glD4JV5aJt49K/Ri82VPeaH8MhsP7Z3Tsi7/1Jxwh1n/Sf9bbw/JIZHhcMQ40nMo8TZv
+         IBAQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUHs+9V70UrbtN9zY6vDi1015avZpn+pL00oURJvOEGWkuwtm79nmyb54995XF+2zXzM6gp9KTz7PupVv43@vger.kernel.org, AJvYcCVZ2IM/b5MLSs10hPRpz0NkqKc4C3SxlGyDQePtJaI3HH49BFQ3O7aqVPF12CbUcOZ11MiKhViWGlSJI4LwHqMr@vger.kernel.org, AJvYcCW+/9vkBlaxHMB/o7FO30Tk6Px4Iz7K++lyGGuQT96XuI9liNtZG62bdd6ldGdvo5NmToMWdlAOOadmi4WhoiU=@vger.kernel.org, AJvYcCWy8EhwzvUDTSLkOvoKNk0klhlrKOxby9Yiqqa8FugrRLWmcS9hFwsaY3iiiJMYECl9oPYxP8tDEZwcaQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwzGB/LSzgjcA1m5MVLrJAYAemLnYrjf87hXhx1PWg5osuZI7fR
+	W3wOWpzxFSIOEWmSwFCrI0oMNhhRTzdLv9NkoVHghckA4U7IlXibh+2ZLdE3jJxB8NbIxPNWiSe
+	usUDyYwopjLhCZ/84D+lDRQrqShNuix8=
+X-Gm-Gg: ASbGncs4+2ENz4O5HHCkoDS+5xtWK6PS5RmRKbbO1J/MxDrKqzJlSxgr0GhJfrkPSL1
+	21LMDQLFPgvqIgxMjyI8rr6qBcxVf30AU0Vddv+CzqQfNIUt2WtI7hvdnN/71BfiN041H8fsyV2
+	kv53+CJyCzQXIr5GNoKiyRthVXkGlH6sUjlbiWyrOEBXjy
+X-Google-Smtp-Source: AGHT+IExWIJ6hhfEb6UoxlwctM02YNDW0TZ2aarCHGVCLMDXTN2AKn+P851gVPEhqrddHdHhddIZDLinIFW32pqJpSE=
+X-Received: by 2002:a2e:9d09:0:b0:310:81a0:64f7 with SMTP id
+ 38308e7fff4ca-32f5011b1ddmr2792091fa.24.1752094926332; Wed, 09 Jul 2025
+ 14:02:06 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Why a lot of fses are using bdev's page cache to do super block
- read/write?
-To: "Darrick J. Wong" <djwong@kernel.org>
-Cc: "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
- linux-btrfs <linux-btrfs@vger.kernel.org>,
- Matthew Wilcox <willy@infradead.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- Catherine Hoang <catherine.hoang@oracle.com>
-References: <5459cd6d-3fdb-4a4e-b5c7-00ef74f17f7d@gmx.com>
- <20250709150436.GG2672029@frogsfrogsfrogs>
-Content-Language: en-US
-From: Qu Wenruo <quwenruo.btrfs@gmx.com>
-Autocrypt: addr=quwenruo.btrfs@gmx.com; keydata=
- xsBNBFnVga8BCACyhFP3ExcTIuB73jDIBA/vSoYcTyysFQzPvez64TUSCv1SgXEByR7fju3o
- 8RfaWuHCnkkea5luuTZMqfgTXrun2dqNVYDNOV6RIVrc4YuG20yhC1epnV55fJCThqij0MRL
- 1NxPKXIlEdHvN0Kov3CtWA+R1iNN0RCeVun7rmOrrjBK573aWC5sgP7YsBOLK79H3tmUtz6b
- 9Imuj0ZyEsa76Xg9PX9Hn2myKj1hfWGS+5og9Va4hrwQC8ipjXik6NKR5GDV+hOZkktU81G5
- gkQtGB9jOAYRs86QG/b7PtIlbd3+pppT0gaS+wvwMs8cuNG+Pu6KO1oC4jgdseFLu7NpABEB
- AAHNIlF1IFdlbnJ1byA8cXV3ZW5ydW8uYnRyZnNAZ214LmNvbT7CwJQEEwEIAD4CGwMFCwkI
- BwIGFQgJCgsCBBYCAwECHgECF4AWIQQt33LlpaVbqJ2qQuHCPZHzoSX+qAUCZxF1YAUJEP5a
- sQAKCRDCPZHzoSX+qF+mB/9gXu9C3BV0omDZBDWevJHxpWpOwQ8DxZEbk9b9LcrQlWdhFhyn
- xi+l5lRziV9ZGyYXp7N35a9t7GQJndMCFUWYoEa+1NCuxDs6bslfrCaGEGG/+wd6oIPb85xo
- naxnQ+SQtYLUFbU77WkUPaaIU8hH2BAfn9ZSDX9lIxheQE8ZYGGmo4wYpnN7/hSXALD7+oun
- tZljjGNT1o+/B8WVZtw/YZuCuHgZeaFdhcV2jsz7+iGb+LsqzHuznrXqbyUQgQT9kn8ZYFNW
- 7tf+LNxXuwedzRag4fxtR+5GVvJ41Oh/eygp8VqiMAtnFYaSlb9sjia1Mh+m+OBFeuXjgGlG
- VvQFzsBNBFnVga8BCACqU+th4Esy/c8BnvliFAjAfpzhI1wH76FD1MJPmAhA3DnX5JDORcga
- CbPEwhLj1xlwTgpeT+QfDmGJ5B5BlrrQFZVE1fChEjiJvyiSAO4yQPkrPVYTI7Xj34FnscPj
- /IrRUUka68MlHxPtFnAHr25VIuOS41lmYKYNwPNLRz9Ik6DmeTG3WJO2BQRNvXA0pXrJH1fN
- GSsRb+pKEKHKtL1803x71zQxCwLh+zLP1iXHVM5j8gX9zqupigQR/Cel2XPS44zWcDW8r7B0
- q1eW4Jrv0x19p4P923voqn+joIAostyNTUjCeSrUdKth9jcdlam9X2DziA/DHDFfS5eq4fEv
- ABEBAAHCwHwEGAEIACYCGwwWIQQt33LlpaVbqJ2qQuHCPZHzoSX+qAUCZxF1gQUJEP5a0gAK
- CRDCPZHzoSX+qHGpB/kB8A7M7KGL5qzat+jBRoLwB0Y3Zax0QWuANVdZM3eJDlKJKJ4HKzjo
- B2Pcn4JXL2apSan2uJftaMbNQbwotvabLXkE7cPpnppnBq7iovmBw++/d8zQjLQLWInQ5kNq
- Vmi36kmq8o5c0f97QVjMryHlmSlEZ2Wwc1kURAe4lsRG2dNeAd4CAqmTw0cMIrR6R/Dpt3ma
- +8oGXJOmwWuDFKNV4G2XLKcghqrtcRf2zAGNogg3KulCykHHripG3kPKsb7fYVcSQtlt5R6v
- HZStaZBzw4PcDiaAF3pPDBd+0fIKS6BlpeNRSFG94RYrt84Qw77JWDOAZsyNfEIEE0J6LSR/
-In-Reply-To: <20250709150436.GG2672029@frogsfrogsfrogs>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+References: <20250709-core-cstr-fanout-1-v1-0-64308e7203fc@gmail.com>
+ <20250709-core-cstr-fanout-1-v1-7-64308e7203fc@gmail.com> <DB7SVTBZ46QB.31WTHFLWDHPZY@kernel.org>
+In-Reply-To: <DB7SVTBZ46QB.31WTHFLWDHPZY@kernel.org>
+From: Tamir Duberstein <tamird@gmail.com>
+Date: Wed, 9 Jul 2025 17:01:28 -0400
+X-Gm-Features: Ac12FXyhsUe6smRBxo6FiBw1g5N18SKhkX08Ac6QMkarBxohB2ddH5MIOdKITP8
+Message-ID: <CAJ-ks9nNc_pThtb+gHUcjEnvR6V0RAEG0tkv+_DHYYjXs1N7=A@mail.gmail.com>
+Subject: Re: [PATCH 7/9] rust: pin-init: use `kernel::{fmt,prelude::fmt!}`
+To: Benno Lossin <lossin@kernel.org>
+Cc: Danilo Krummrich <dakr@kernel.org>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
+	Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
+	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
+	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
+	Trevor Gross <tmgross@umich.edu>, Jens Axboe <axboe@kernel.dk>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
+	Brendan Higgins <brendan.higgins@linux.dev>, David Gow <davidgow@google.com>, 
+	Rae Moar <rmoar@google.com>, nouveau@lists.freedesktop.org, 
+	dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org, 
+	rust-for-linux@vger.kernel.org, linux-block@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:Q9rIlRXjKpYAgjC74tvIkGsQsrpvVxzXlsF1wqz+4UcDpQihmRo
- 3oauzGxaDGcMb1L7KHASr2KCg70fAjRVit8Pg3eDZS26/XONjQ4QrLg9L3Ecfbv5eIzlZ/Y
- 1zS0x0s10ipZQPY9u7DfzBaJBqnYNQTXLkbiR5oX9veY1ZHlqrF61kssNJspFap2qGPBKqz
- JfBnHWGUVbglNJIKyI/jg==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:Xx+WpaXSmis=;f6jgJDkIMFVbz687wCPHdDzgSxy
- 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
- uemXQZNk5j8qoM8cf80FNx4=
 
+On Wed, Jul 9, 2025 at 4:18=E2=80=AFPM Benno Lossin <lossin@kernel.org> wro=
+te:
+>
+> On Wed Jul 9, 2025 at 10:00 PM CEST, Tamir Duberstein wrote:
+> > Reduce coupling to implementation details of the formatting machinery b=
+y
+> > avoiding direct use for `core`'s formatting traits and macros.
+> >
+> > Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> > Reviewed-by: Alice Ryhl <aliceryhl@google.com>
+> > Signed-off-by: Tamir Duberstein <tamird@gmail.com>
+> > ---
+> >  rust/kernel/init.rs | 4 ++--
+> >  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> I usually prefix patches to init.rs with `rust: init`. I'll fix it up
+> when picking the patch or Miguel can do it if he takes it:
+>
+> Acked-by: Benno Lossin <lossin@kernel.org>
 
+Actually, squinting at this patch more closely now, I think this isn't
+what you had in mind. The comment says "Dummy error that can be
+constructed outside the `kernel` crate." but the error now comes from
+the kernel crate :(
 
-=E5=9C=A8 2025/7/10 00:34, Darrick J. Wong =E5=86=99=E9=81=93:
-> On Wed, Jul 09, 2025 at 06:35:00PM +0930, Qu Wenruo wrote:
->> Hi,
->>
->> Recently I'm trying to remove direct bdev's page cache usage from btrfs
->> super block IOs.
->>
->> And replace it with common bio interface (mostly with bdev_rw_virt()).
->>
->> However I'm hitting random generic/492 failure where sometimes blkid fa=
-iled
->> to detect any useful super block signature of btrfs.
->=20
-> Yes, you need to invalidate_bdev() after writing the superblock directly
-> to disk via submit_bio.
-
-Since invalidate_bdev() is invaliding the whole page cache of the bdev,=20
-it may increase the latency of super block writeback, which may bring=20
-unexpected performance change.
-
-All we want is only to ensure the content of folio where our sb is,
-so it looks like we're better sticking with the existing bdev page cache=
-=20
-usage.
-Although the btrfs' super block writeback is still doing something out=20
-of normal, and will be properly addressed.
-
-Thanks Matthew and Darrick for this detailed explanation,
-Qu
-
->=20
->> This leads more digging, and to my surprise using bdev's page cache to =
-do
->> superblock IOs is not an exception, in fact f2fs is doing exactly the s=
-ame
->> thing.
->>
->>
->> This makes me wonder:
->>
->> - Should a fs use bdev's page cache directly?
->>    I thought a fs shouldn't do this, and bio interface should be
->>    enough for most if not all cases.
->>
->>    Or am I wrong in the first place?
->=20
-> As willy said, most filesystems use the bdev pagecache because then they
-> don't have to implement their own (metadata) buffer cache.  The downside
-> is that any filesystem that does so must be prepared to handle the
-> buffer_head contents changing any time they cycle the bh lock because
-> anyone can write to the block device of a mounted fs ala tune2fs.
->=20
-> Effectively this means that you have to (a) revalidate the entire buffer
-> contents every time you lock_buffer(); and (b) you can't make decisions
-> based on superblock feature bits in the superblock bh directly.
->=20
-> I made that mistake when adding metadata_csum support to ext4 -- we'd
-> only connect to the crc32c "crypto" module if checksums were enabled in
-> the ondisk super at mount time, but then there were a couple of places
-> that looked at the ondisk super bits at runtime, so you could flip the
-> bit on and crash the kernel almost immediately.
->=20
-> Nowadays you could protect against malicious writes with the
-> BLK_DEV_WRITE_MOUNTED=3Dn so at least that's mitigated a little bit.
-> Note (a) implies that the use of BH_Verified is a giant footgun.
->=20
-> Catherine Hoang [now cc'd] has prototyped a generic buffer cache so that
-> we can fix these vulnerabilities in ext2:
-> https://lore.kernel.org/linux-ext4/20250326014928.61507-1-catherine.hoan=
-g@oracle.com/
->=20
->> - What is keeping fs super block update from racing with user space
->>    device scan?
->>
->>    I guess it's the regular page/folio locking of the bdev page cache.
->>    But that also means, pure bio based IO will always race with buffere=
-d
->>    read of a block device.
->=20
-> Right.  In theory you could take the posix advisory lock (aka flock)
-> from inside the kernel for the duration of the sb write, and that would
-> prevent libblkid/udev from seeing torn/stale contents because they take
-> LOCK_SH.
->=20
->> - If so, is there any special bio flag to prevent such race?
->>    So far I am unable to find out such flag.
->=20
-> No.
->=20
-> --D
->=20
->> Thanks,
->> Qu
->>
->=20
-
+Perhaps you could suggest a different modification that would both
+meet the original intent and allow references to core::fmt to
+disappear?
