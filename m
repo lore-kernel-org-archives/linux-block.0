@@ -1,76 +1,121 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from 003.mia.mailroute.net (003.mia.mailroute.net [199.89.3.6])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A3462E717B;
-	Wed,  9 Jul 2025 15:11:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D6F68F40
+	for <linux-block@vger.kernel.org>; Wed,  9 Jul 2025 15:31:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.6
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752073910; cv=none; b=r2CFBeJWns3mMp290a3u3XH8GItn7h2S6tqpbH2rmrD8z35owTt4+Eu6+ZVZZFvqMKzNSdDnHuKKDmKofTtSGd9C9s8GhuHOXZq2TVyQjnllEq6ufqQAw0s9pfrbOglSBw0mUG75hbc8HTy2IEjv57EO7rqWgZEEMMnzGr2WcOI=
+	t=1752075069; cv=none; b=rjL4PMwKYjhGKDgwDtrPG68McCEAVdBw8+XLsLsaK6P+5++rCcytUzRtI68ipl29r3vnvyRQs0FGoi6vUC9UVVOqtqwY091RgX1aXoxlse/A0/r7K4tEa6EoEpKz4SsosqRqxIRFdhl+cFsdJNRLYQGgG2Ct5Sk5VJwR+SSsyKU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752073910; c=relaxed/simple;
-	bh=HN/A+MnroCUkLAvblyMBj2F9v7tw8Kej5OqPbBp4+5w=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=erhxJOutgooNXj6qJye1UShkD+wbTWJin7knRoTX5EVlw0BfW4dn9frFR5hy/8KOccIt09ng53Q6YPrMa0jU+HBJgBFk+03JY4NyMluuC8TbqjBv//cVZeprtmNaazjoQaLtKiol6opq/2pYPlLgR3Vv/v7zNsSdQr/jIbnjTwM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=glCiv403; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1752075069; c=relaxed/simple;
+	bh=dU+Ved/g5d7SCrq1W+opf0g98wicJCdou66CkHAxarU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pxT0BG2W/+YodG0/QDa4+ivYbGwihY1hoWVgXU1hwEsYkCWyY44BPZz5nhRo7b3T2dr2njjRJ+ITaVK0Uf1wqWij17hPDgp6nRfi9237CmT78bdVXoXgBuMNMzJtqPO63NjM1JBLum/VGzj3xT0U8hhJkf4fP4z+auwa6K085mE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=USWsGdZd; arc=none smtp.client-ip=199.89.3.6
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="glCiv403"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6AB73C4CEEF;
-	Wed,  9 Jul 2025 15:11:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752073910;
-	bh=HN/A+MnroCUkLAvblyMBj2F9v7tw8Kej5OqPbBp4+5w=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=glCiv403F5rktJnGzHeOLi35qbzOXC40V3Bt3ZbXLJj5KMApYDL87/1saKM8rDryo
-	 ZmGo9QH6jEtVAbkSNqkS9Wn6/F/QeEQg9x8diUdyOyG7u4BLwVqa4ZEdZUN7IgcxTV
-	 Aqjb1dYD8DDR0Fe/PFEPKHPL1mluYY/vYAKtsR2D+CPhNEFq/Cj5vlZXzDcDeEM/Gn
-	 NlvgfreGuDTi9d2ORL08O7OiYNeabvSjHbDCZa1FoR415hmorvLUXpRIeqb2RT9s6W
-	 mQjJq3zmIiqXSgY7L++FNrD5z1EUA7moqDwtLxW+OLiW8v9KysSqhBmPo3pIqrZfiz
-	 JXMM5D+pWy6wg==
-From: Andreas Hindborg <a.hindborg@kernel.org>
-To: "Alice Ryhl" <aliceryhl@google.com>
-Cc: "Boqun Feng" <boqun.feng@gmail.com>,  "Miguel Ojeda" <ojeda@kernel.org>,
-  "Alex Gaynor" <alex.gaynor@gmail.com>,  "Gary Guo" <gary@garyguo.net>,
-  =?utf-8?Q?Bj=C3=B6rn?= Roy Baron <bjorn3_gh@protonmail.com>,  "Benno
- Lossin"
- <lossin@kernel.org>,  "Trevor Gross" <tmgross@umich.edu>,  "Danilo
- Krummrich" <dakr@kernel.org>,  "Jens Axboe" <axboe@kernel.dk>,
-  <linux-block@vger.kernel.org>,  <rust-for-linux@vger.kernel.org>,
-  <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2 02/14] rust: str: introduce `BorrowFormatter`
-In-Reply-To: <aG5rTNGn_NbnCISe@google.com> (Alice Ryhl's message of "Wed, 09
-	Jul 2025 13:14:52 +0000")
-References: <20250708-rnull-up-v6-16-v2-0-ab93c0ff429b@kernel.org>
-	<20250708-rnull-up-v6-16-v2-2-ab93c0ff429b@kernel.org>
-	<zr4gYI-Z4wTdXvcQMqGuUgU5Z47a3b4VgVtckO7APEwzIfvLTQzn7I92gu-bBhnNylJHkiPgTSCdIxhWNUZxzw==@protonmail.internalid>
-	<aG5rTNGn_NbnCISe@google.com>
-User-Agent: mu4e 1.12.9; emacs 30.1
-Date: Wed, 09 Jul 2025 17:11:40 +0200
-Message-ID: <87wm8hjt5f.fsf@kernel.org>
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="USWsGdZd"
+Received: from localhost (localhost [127.0.0.1])
+	by 003.mia.mailroute.net (Postfix) with ESMTP id 4bchlG27kLzlgqV5;
+	Wed,  9 Jul 2025 15:31:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1752075064; x=1754667065; bh=6qDxA14Cpzy36gs4e9lfBoOY
+	dFYUxIHYbk3l+DK5sf0=; b=USWsGdZdY8hjer2hCLwDdXZiLGri4jpTE0w7leX+
+	sDwlwQSRruj0iN+UzQC5Xl+8fUDbAq83cgp1ZXIU3ZtLSt83A1PDVUG68ijsuzwr
+	/tyXgZ/uDWnombDS0vFQUPmfOyIC9kl5EgCsUYWbNMfuE3CrU7CMJAc/i8pPR5PJ
+	7ofwnnBWMT+laD7wAaDQwRQ8xS6kNTvPWBmMf8TFhpo8tQpXWZvXsV8aMZT9FEU0
+	jl/uNny9AQ/y9IvN5MVOkuCgvbg/ATUqplqhm5bhtNStmKGzFiIQOX2kIZmE/2e8
+	vKqtiJ4ZqgForAvcgobXWWvReyTVdYka0mGPrvsn9uw7oA==
+X-Virus-Scanned: by MailRoute
+Received: from 003.mia.mailroute.net ([127.0.0.1])
+ by localhost (003.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id aFQUVxwpWrsX; Wed,  9 Jul 2025 15:31:04 +0000 (UTC)
+Received: from [100.66.154.22] (unknown [104.135.204.82])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4bchl71vnhzlgqV7;
+	Wed,  9 Jul 2025 15:30:58 +0000 (UTC)
+Message-ID: <de8c6c73-3647-4cc7-a8a2-6848b2f4607e@acm.org>
+Date: Wed, 9 Jul 2025 08:30:57 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/5] blktrace: add zoned block commands to blk_fill_rwbs
+To: Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+ Jens Axboe <axboe@kernel.dk>
+Cc: Damien Le Moal <dlemoal@kernel.org>, Christoph Hellwig <hch@lst.de>,
+ linux-block@vger.kernel.org,
+ Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+ Chaitanya Kulkarni <chaitanyak@nvidia.com>
+References: <20250709114704.70831-1-johannes.thumshirn@wdc.com>
+ <20250709114704.70831-2-johannes.thumshirn@wdc.com>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20250709114704.70831-2-johannes.thumshirn@wdc.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-"Alice Ryhl" <aliceryhl@google.com> writes:
+On 7/9/25 4:47 AM, Johannes Thumshirn wrote:
+> Add zoned block commands to blk_fill_rwbs:
+> 
+> - ZONE APPEND will be decoded as 'ZA'
+> - ZONE RESET and ZONE RESET ALL will be decoded as 'ZR'
+> - ZONE FINISH will be decoded as 'ZF'
+> - ZONE OPEN will be decoded as 'ZO'
+> - ZONE CLOSE will be decoded as 'ZC'
+> 
+> Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+> ---
+>   kernel/trace/blktrace.c | 21 +++++++++++++++++++++
+>   1 file changed, 21 insertions(+)
+> 
+> diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
+> index 3f6a7bdc6edf..f1dc00c22e37 100644
+> --- a/kernel/trace/blktrace.c
+> +++ b/kernel/trace/blktrace.c
+> @@ -1875,6 +1875,27 @@ void blk_fill_rwbs(char *rwbs, blk_opf_t opf)
+>   	case REQ_OP_READ:
+>   		rwbs[i++] = 'R';
+>   		break;
+> +	case REQ_OP_ZONE_APPEND:
+> +		rwbs[i++] = 'Z';
+> +		rwbs[i++] = 'A';
+> +		break;
+> +	case REQ_OP_ZONE_RESET:
+> +	case REQ_OP_ZONE_RESET_ALL:
+> +		rwbs[i++] = 'Z';
+> +		rwbs[i++] = 'R';
+> +		break;
+> +	case REQ_OP_ZONE_FINISH:
+> +		rwbs[i++] = 'Z';
+> +		rwbs[i++] = 'F';
+> +		break;
+> +	case REQ_OP_ZONE_OPEN:
+> +		rwbs[i++] = 'Z';
+> +		rwbs[i++] = 'O';
+> +		break;
+> +	case REQ_OP_ZONE_CLOSE:
+> +		rwbs[i++] = 'Z';
+> +		rwbs[i++] = 'C';
+> +		break;
+>   	default:
+>   		rwbs[i++] = 'N';
+>   	}
 
-> On Tue, Jul 08, 2025 at 09:44:57PM +0200, Andreas Hindborg wrote:
->> Add `BorrowFormatter`, a formatter that writes to an array or slice buffer.
->> This formatter is backed by the existing `Formatter`.
->>
->> Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
->
-> I don't think we need a separate BorrowFormatter. We can instead add a
-> lifetime to Formatter and give it a safe constructor from a mutable
-> slice.
+Has it been considered to add a warning statement in blk_fill_rwbs()
+that verifies that blk_fill_rwbs() does not write outside the bounds of
+the rwbs array? See also the RWBS_LEN definition.
 
-Ah, good idea.
+Thanks,
 
-
-Best regards,
-Andreas Hindborg
-
-
-
+Bart.
