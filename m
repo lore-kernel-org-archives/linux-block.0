@@ -1,117 +1,138 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A957A284B3F
-	for <linux-block@vger.kernel.org>; Wed,  9 Jul 2025 08:11:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10CE0283153
+	for <linux-block@vger.kernel.org>; Wed,  9 Jul 2025 09:04:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752048719; cv=none; b=GrZgmV2e7tHo8rsL5hdhKPTDURBODf8bOISda1EjP8ZTu9fo/UMYEauVLfxOb17jdCJ25vzyqp/9hrIO0MEl/sD/dqu0fatrXGWq799YjnGgZv+zevGUNyd1/+24SHJiU/ghltWi9tYoQodI9B5WWX7udEJFzJioRjjCKWUz2Yk=
+	t=1752051885; cv=none; b=PMKj02J8KQqhcwNmWfThx//2F4b0qPHssvy958ppjBc2oYPryF8QXrQxQ3t0qKMMG9jW/uNjaUPCWOpuVXGG/3be/oeruIBduSKadI/rlkxnrt1WQbdhyLnYHGCXi87KsYsmRcPsl0B32+F8l/8T28On/vCwp4/jHzMWM2pMExo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752048719; c=relaxed/simple;
-	bh=jmfYmYyuWEpRGKg6t9NRAgF6MKtJrC7ft7iXy8ShjRU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=O1Qkooj8ta5cSOnWl2RtqgGyeikDLT46QvfiW+4UDnKVXUqepwAelXnruPUHLnY85eBJI16UGcNAunRjEYz29qf5H1cav9S7CweOEWQn9wQVv6eVHi85DR6Xbd2pgB1iJI8k7pfq0bPSkAE7CYPR+cHyfAIOH65SWQ8UW2JfiIk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZK+h41F8; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1752051885; c=relaxed/simple;
+	bh=YkiSIros1J4wxzjDae83XDFtPS6hGqYUw+KwTlnP0Ts=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DnrciLRtGeTM0K8CkU2vIOiB522owPskXjiDYm+0NYFXSZCktoSGm1SM6E3Pch0DnVXxh7ybcsMWIy3C1ra16Nc5c4I8gXy5c7dclrBK4IC+aSDIHGH3BSIaDm3apBELg7PMZOKnOQcDMWq+vaPnG/jT3r1bZJgDnQ9yf5u1pyU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DeDfwXxP; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZK+h41F8"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752048716;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CygDYFg4LD05rAXGmEIR6KVF9VD54bTYRORnXbkiq8A=;
-	b=ZK+h41F89ELDsd0PbherKiU0v9l3qOaokTFGagYGWfFQEyUv+ONeJqqAYCwOZ0urlxoY12
-	mdhWmSzv+jSGVl6hKdhiJcTXHL25Z7Xe1X3zWcz3d2RGu7huzFUGu8rMeMC7x2eoclXJX2
-	Iw7ouNn6wOZiLB1Re40/0B8kqxiQlKk=
-Received: from mail-vk1-f198.google.com (mail-vk1-f198.google.com
- [209.85.221.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-363-ZCG7QspcPo-l4KPneduQDQ-1; Wed, 09 Jul 2025 04:11:11 -0400
-X-MC-Unique: ZCG7QspcPo-l4KPneduQDQ-1
-X-Mimecast-MFC-AGG-ID: ZCG7QspcPo-l4KPneduQDQ_1752048670
-Received: by mail-vk1-f198.google.com with SMTP id 71dfb90a1353d-53145a42434so1052070e0c.0
-        for <linux-block@vger.kernel.org>; Wed, 09 Jul 2025 01:11:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752048670; x=1752653470;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=CygDYFg4LD05rAXGmEIR6KVF9VD54bTYRORnXbkiq8A=;
-        b=XiCArogKQ7fF7tFYIfZ76fOVe+vwUq5G/0ls0/ofNCCt38Kt2E41qdJ6JUApfFCk65
-         4etRC3Bt8dmhPf9ulzJFjeF5bKXhqO5TpqYI+nm4z46nW/r4AujdhIgpKwmKOtKRGoSK
-         /GphVfJ9z0bwOiAYHNB1hz9o8/aMVMGwzyrzhiCO7yjnkMJC7qE5YMDhRPQDXxAUhCDG
-         2j8BR9DH7nFvMIDOh5kBFz6jk3Z4+Mohav5uHTbpUL49Yi/Tu9cliFbeJFvnNx21/1zK
-         cv9cAEB7tTojDrPoctP25pKheHJivVKXd7iSi+ZpxhMl+nIrcnDZB90UaI5b2xiXNXbQ
-         X1qw==
-X-Forwarded-Encrypted: i=1; AJvYcCUfhEYEe3FYmsp9rqnLUaTZg8JKiEdaGJqbYBsp6dY25ljLkrMxBNF2OH34os8ZwH/XYKK0JKbVHwNbVQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyPyOW/u3oWZ2d4r1+NVULj7ADO1zfTOOnOeRi3vU3e9y6gwX0X
-	Qgk4PXTc+1SMlSHhthVKuDamaYFK2TDMwpEHbCDelhwHmB29Yhh58JnW4cG1JFmQG99eZ5pP+vA
-	rtK/8LqhxoVY6D9eCPPU0cHkwtAmYndxzvRpQLlY35ceXxZbJ0XIrIzgNd86ZfZb9+j9WJ4oIf1
-	KTDlOKYzUk7gRTe62bLha11/MeAblc9ryEUHk6WKg=
-X-Gm-Gg: ASbGncsPlHoZ7Bnc0nK4+nZ3+LR7mq97bVtPaLBRo4bMKyeZK6hkJOjun4p5kKT341N
-	06fLIDwSsRBI5FlePylkv2RLgOzcPdtbdBL/Zschj9fF+UFFLUD7RJ1nrOG00ZgSB8bw2uKiGsy
-	cPj8F6
-X-Received: by 2002:a05:6122:d12:b0:531:19ee:93e9 with SMTP id 71dfb90a1353d-535d7531b0dmr757148e0c.2.1752048670639;
-        Wed, 09 Jul 2025 01:11:10 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE0W5MA6EE24ZGWfX16D3hExrNdugUswdEht9/c4UpuDpVlT1JBY3LVxJJ1QgG9lKRs4X91KPxNUpcL+DnwESY=
-X-Received: by 2002:a05:6122:d12:b0:531:19ee:93e9 with SMTP id
- 71dfb90a1353d-535d7531b0dmr757146e0c.2.1752048670413; Wed, 09 Jul 2025
- 01:11:10 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DeDfwXxP"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1752051884; x=1783587884;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=YkiSIros1J4wxzjDae83XDFtPS6hGqYUw+KwTlnP0Ts=;
+  b=DeDfwXxPpgJF2UcJklKCZbUXZTG4Yg0fpY++mGHw40kyac/nEuzJSSbU
+   2hK0I6VKwYe0M8/Lo88IGCxH370czJi312r0DPQcmc5OA3LY/tBDFmP0K
+   8ylV5ckxYUPMG6UyJ9Z1a+oIq0YC2YocpR1RDYpc3ay+rocMiXxLUz6i/
+   pPCBcBu3K2WTx2voIofEdRxSjt7uLL3wbZrXz7ceIy79MGecANdRCKLkB
+   fOzR/1tB6Z06r2MKy/FkDX6TAl2+Ro/3mn8Rrx5f3OrDa+LYHZUHyEK8M
+   idGRP8BvaE75/3sQeS9TWVNmgMH/p94KRhjB2XdSPZ2efcT1+9sf9AK03
+   g==;
+X-CSE-ConnectionGUID: BQMZAOqQTo+RtzgjCQiwgA==
+X-CSE-MsgGUID: 0V3/tZUbSIy2KQYctIfJIg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11487"; a="54188720"
+X-IronPort-AV: E=Sophos;i="6.16,298,1744095600"; 
+   d="scan'208";a="54188720"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jul 2025 02:04:43 -0700
+X-CSE-ConnectionGUID: tVNzeBpGSauK5mukHnWm3Q==
+X-CSE-MsgGUID: sb+msiXuSayBBhYjd8aBww==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,298,1744095600"; 
+   d="scan'208";a="156301378"
+Received: from smile.fi.intel.com ([10.237.72.52])
+  by fmviesa008.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jul 2025 02:04:41 -0700
+Received: from andy by smile.fi.intel.com with local (Exim 4.98.2)
+	(envelope-from <andriy.shevchenko@intel.com>)
+	id 1uZQjF-0000000Dojd-3Efe;
+	Wed, 09 Jul 2025 12:04:37 +0300
+Date: Wed, 9 Jul 2025 12:04:37 +0300
+From: Andy Shevchenko <andriy.shevchenko@intel.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Ben Hutchings <benh@debian.org>,
+	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@baylibre.com>,
+	1107479@bugs.debian.org, Roland Sommer <r.sommer@gmx.de>,
+	Chris Hofstaedtler <zeha@debian.org>, linux-block@vger.kernel.org,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Salvatore Bonaccorso <carnil@debian.org>
+Subject: Re: Bug#1107479: util-linux: blkid hangs forever after inserting a
+ DVD-RAM
+Message-ID: <aG4wpd_afBxEXjjA@smile.fi.intel.com>
+References: <iry3mdm2bpp2mvteytiiq3umfwfdaoph5oe345yxjx4lujym2f@2p4raxmq2f4i>
+ <1MSc1L-1uKBoQ15kv-00Qx9T@mail.gmx.net>
+ <aif2stfl4o6unvjn7rqwbqam2v2ntr35ik5e24jdkwvixm3hj4@d3equy4z4xjk>
+ <1ML9yc-1uEpgp2oMs-00Se3k@mail.gmx.net>
+ <174936596275.4210.3207965727369251912.reportbug@pc14.home.lan>
+ <r253lpckktygniuxobkvgozgoslccov6i5slr5lxa7oev6gtgy@ygqjea7c6xlm>
+ <e45a49a4e9656cf892e81cc12328b0983b4ef1da.camel@debian.org>
+ <2ba14daf-6733-4d4b-9391-9b1512577f15@kernel.dk>
+ <aG0CmhnEHGtUEkWz@black.fi.intel.com>
+ <ce06bf7b-d916-4ee8-af4c-3af5f7959b42@kernel.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250709014109.2292837-1-ming.lei@redhat.com> <95e6bce2-19dc-4085-908e-c81fa7a1d5d3@linux.ibm.com>
-In-Reply-To: <95e6bce2-19dc-4085-908e-c81fa7a1d5d3@linux.ibm.com>
-From: Ming Lei <ming.lei@redhat.com>
-Date: Wed, 9 Jul 2025 16:10:59 +0800
-X-Gm-Features: Ac12FXy8ks1l4Wo_-J8ivo8RgBG0uI5uU4efROU1pWrmbFfhdh-S3NkZbSqHa6s
-Message-ID: <CAFj5m9Lira89JzPO9gf9gcnn0hDtiJ2f2+iayKXUtDu-J_P25A@mail.gmail.com>
-Subject: Re: [PATCH] nbd: fix lockdep deadlock warning
-To: Nilay Shroff <nilay@linux.ibm.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
-	syzbot+2bcecf3c38cb3e8fdc8d@syzkaller.appspotmail.com, 
-	Yu Kuai <yukuai3@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ce06bf7b-d916-4ee8-af4c-3af5f7959b42@kernel.dk>
+Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
+ krs, Bertel Jungin Aukio 5, 02600 Espoo
 
-On Wed, Jul 9, 2025 at 3:59=E2=80=AFPM Nilay Shroff <nilay@linux.ibm.com> w=
-rote:
->
->
->
-> On 7/9/25 7:11 AM, Ming Lei wrote:
-> > diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-> > index 7bdc7eb808ea..136640e4c866 100644
-> > --- a/drivers/block/nbd.c
-> > +++ b/drivers/block/nbd.c
-> > @@ -1473,7 +1473,15 @@ static int nbd_start_device(struct nbd_device *n=
-bd)
-> >               return -EINVAL;
-> >       }
-> >
-> > -     blk_mq_update_nr_hw_queues(&nbd->tag_set, config->num_connections=
-);
-> > +retry:
-> > +     mutex_unlock(&nbd->config_lock);
-> > +     blk_mq_update_nr_hw_queues(&nbd->tag_set, num_connections);
-> > +     mutex_lock(&nbd->config_lock);
-> > +
-> > +     /* if another code path updated nr_hw_queues, retry until succeed=
- */
-> > +     if (num_connections !=3D config->num_connections)
-> > +             goto retry;
-> > +
->
-> Don't we need to update num_connections to config->num_connections
-> here before we attempt retry?
+On Tue, Jul 08, 2025 at 09:32:19AM -0600, Jens Axboe wrote:
+> On 7/8/25 5:35 AM, Andy Shevchenko wrote:
+> > On Wed, Jul 02, 2025 at 05:13:45PM -0600, Jens Axboe wrote:
+> >> On 7/2/25 5:08 PM, Ben Hutchings wrote:
+> >>> On Sun, 2025-06-29 at 12:26 +0200, Uwe Kleine-K?nig wrote:
+> >>>> On Sun, Jun 29, 2025 at 11:46:00AM +0200, Roland Sommer wrote:
+> >>>>
+> >>>> Huh, how did I manage that (rhetorical question)? Thanks
+> >>>>
+> >>>>>> Ahh, now that makes sense. pktsetup calls `/sbin/modprobe pktcdvd`
+> >>>>>> explicitly, the blacklist entry doesn't help for that. Without the
+> >>>>>> kernel module renamed, does the 2nd DVD-RAM result in the blocking
+> >>>>>> behaviour?
+> >>>>>
+> >>>>> Yes.
+> >>>>
+> >>>> OK, that makes sense. So udev does in this order:
+> >>>>
+> >>>>  - auto-load the module (which is suppressed with the backlist entry)
+> >>>>  - call blkid (which blocks if the module is loaded)
+> >>>>  - call pktsetup (which loads the module even in presence of the
+> >>>>    blacklist entry).
+> >>> [...]
+> >>>
+> >>> I tested with a CD-RW, and the behaviour was slightly different:
+> >>>
+> >>> - Nothing automtically created a pktcdvd device, so blkid initially
+> >>> worked with a CD-RW inserted and the pktcdvd modules loaded.
+> >>> - After running pktsetup to create the block device /dev/pktcdvd/0,
+> >>> blkid and any other program attempting to open that device hung.
+> >>>
+> >>> My conslusion is that pktcdvd is eqaully broken for CD-RWs.
+> >>
+> >> Not surprising. Maybe we should take another stab at killing it
+> >> from the kernel.
+> > 
+> > In the commit 4b83e99ee709 ("Revert "pktcdvd: remove driver."") you
+> > wrote that we would wait for better user space solution is developed.
+> > Any news there?
+> > 
+> > Just asking (I'm in favour to kill the old fart) as you haven't
+> > mentioned that in a new attempt.
+> 
+> No work has been done there, to my knowledge. But as the current driver
+> is totally broken and people aren't even complaining about that (outside
+> of running into that for unrelated reasons), I don't think there's any
+> reason for keeping the driver in-tree.
 
-Good catch, will fix it v2.
+Sure, thanks for clarifications!
 
-thanks,
+-- 
+With Best Regards,
+Andy Shevchenko
+
 
