@@ -1,158 +1,190 @@
-Received: from esa6.hgst.iphmx.com (esa6.hgst.iphmx.com [216.71.154.45])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB6B12DA765
-	for <linux-block@vger.kernel.org>; Wed,  9 Jul 2025 11:47:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.71.154.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B14C52D8DC4
+	for <linux-block@vger.kernel.org>; Wed,  9 Jul 2025 11:57:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752061644; cv=none; b=DqIWM5WWL1rJGSBK0FxSvipQar5oiC89M4wISWV4y4M1DB1zb6uqTfM5ruW31/r+n7LYp2qkTpnj89bo75JveK+ho5lKaaHquTqIxhHij42DatFKxz8z5nyRATyoo4iXQgWkRzDVmgIqJ1mU6E037ekS7MPOXsqdeB/tsUK0N5I=
+	t=1752062223; cv=none; b=TP8Y7HKkpxSBKALdkziNt9tsl3WRx/nKuUwaNdhOTwQJdXeBIyzTQChOSUBs2fhjUzUndnTb4NJ6C5WD+q0KtqgYu5bVqu546POHQwo69qfSaZXYA1CNK3/ZYOdeHJ+GNtbBV+a3CVXxphFiL7ZkjtkbWqqn7tzi6dUZWc+6Grc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752061644; c=relaxed/simple;
-	bh=3ZxBF+mJRdsMCmq2cUzpeAQpBa4aynD/O3CRM1S2nm8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=FAG+o9qnCBgnpVSr6/+4Uyy6LNQAFhIxBFEXnJBt2HVy4Z6tpDa9LxuZpERs42MNO/YFB4vpcEudEnkNfMkmp3L1fJ/w2vpj9fykWo2ctJhP2Ub61Q/pAgzJaI9sL1dNdUbH2pRlv6JnamwOILMk00MkBDR/UPnB3JSLH416qo8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=QcAU8ltr; arc=none smtp.client-ip=216.71.154.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
+	s=arc-20240116; t=1752062223; c=relaxed/simple;
+	bh=qFGbZT07CgcWK41hDsUpz62EpYLLM+dGrg4reJVV5X8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AI5CqLQIChHsuYVEkpW4uULgrOl028sBAWVw+NHwID9E8FISYR0UgfXf/Zjay+8xRgQpGPm1k9ul/qsvx6i6BSJOIKyFJa+UDEp7cSn369Ymxmvm6cSHtPP5zvt/OKSTYdX4LvLKmUx3IA1ad3jJ4AN9stDS8ubnVopNTbC2vP8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IX7wosww; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="QcAU8ltr"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1752061642; x=1783597642;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=3ZxBF+mJRdsMCmq2cUzpeAQpBa4aynD/O3CRM1S2nm8=;
-  b=QcAU8ltrMd8Zo0NUOuVyNUaYH/2oRTue3wOsD7G+oHRgI6yOZBKRbQcl
-   asmQBoki+Ja0wL0F91AOUm9wVQgDupna2lPH2sj236bRpRlDvsFfiwV7v
-   c8NmN3UQlzPS6jqDj0PhyzwvTWKtRzcblRL5+LF9qyw+287Bkdm0OjoFf
-   pWYduHF9RagMdnLnnfNMsOvKLgz4dDSGjiO8/jD58gj0Eq191aRXhbOfQ
-   3o1zuYDlm9LmKC24kLhU4K4P1eerb1qf80cvbP4wdIVmlYYkS/8/yQmtd
-   pTZP3KNopItDlGpEhuiXgyfQHquFDLE13os5hfahxTrRfljBRgh0XEogh
-   g==;
-X-CSE-ConnectionGUID: DfFfkm9fQqW3xxgCZPuWqg==
-X-CSE-MsgGUID: s4giFf+jTCGclSIaX3K7Jw==
-X-IronPort-AV: E=Sophos;i="6.16,298,1744041600"; 
-   d="scan'208";a="91096361"
-Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 09 Jul 2025 19:47:22 +0800
-IronPort-SDR: 686e4834_8P14r9A5rWkLltl0/lnbCck7kEHdJxd2el9x66D48AzjYU8
- vrbg+PnLdqKbVbUVH2yWUgY+ThZcedN549kU4lA==
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 09 Jul 2025 03:45:08 -0700
-WDCIronportException: Internal
-Received: from c02g55f6ml85.ad.shared (HELO C02G55F6ML85.wdc.com) ([10.224.183.46])
-  by uls-op-cesaip01.wdc.com with ESMTP; 09 Jul 2025 04:47:21 -0700
-From: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Damien Le Moal <dlemoal@kernel.org>,
-	Christoph Hellwig <hch@lst.de>,
-	linux-block@vger.kernel.org,
-	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-	Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Subject: [PATCH 5/5] block: add trace messages to zone write plugging
-Date: Wed,  9 Jul 2025 13:47:04 +0200
-Message-Id: <20250709114704.70831-6-johannes.thumshirn@wdc.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <20250709114704.70831-1-johannes.thumshirn@wdc.com>
-References: <20250709114704.70831-1-johannes.thumshirn@wdc.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IX7wosww"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1752062220;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Vz98EhfbifwMPNpu43xO/mYGZM7FqU1wVuZ4iAUNLc8=;
+	b=IX7woswwrld+lmiBjFAkJyF/2uWDY4upKiam8QACBUuRDIS80VNG1qvBaRW0TrdSEps2Ge
+	jSBT296V/GhbvfuDwgVsxr2iXe0KSnjl2t3eDqvYNEmpo+kCx+w/exBcTHecNFDUQzGZs/
+	9RSz+7y53ZhW3tM30v6s04L/Rn6ZiYs=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-456-lfovo3urPuWu_nyeKK79Qg-1; Wed,
+ 09 Jul 2025 07:56:59 -0400
+X-MC-Unique: lfovo3urPuWu_nyeKK79Qg-1
+X-Mimecast-MFC-AGG-ID: lfovo3urPuWu_nyeKK79Qg_1752062218
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id F0692180136B;
+	Wed,  9 Jul 2025 11:56:57 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.141])
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B8BD51956089;
+	Wed,  9 Jul 2025 11:56:54 +0000 (UTC)
+Date: Wed, 9 Jul 2025 19:56:49 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Caleb Sander Mateos <csander@purestorage.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Uday Shankar <ushankar@purestorage.com>
+Subject: Re: [PATCH 08/16] ublk: remove ublk_commit_and_fetch()
+Message-ID: <aG5ZAQs4TSHovUyd@fedora>
+References: <20250702040344.1544077-1-ming.lei@redhat.com>
+ <20250702040344.1544077-9-ming.lei@redhat.com>
+ <CADUfDZo9SADywa6a_D5ZjwoU+3Y14CTg7Y1Ywhf-5Hsnu=fCyQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CADUfDZo9SADywa6a_D5ZjwoU+3Y14CTg7Y1Ywhf-5Hsnu=fCyQ@mail.gmail.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-Add tracepoints to zone write plugging plug and unplug events.
+On Tue, Jul 08, 2025 at 09:27:57AM -0400, Caleb Sander Mateos wrote:
+> On Wed, Jul 2, 2025 at 12:04 AM Ming Lei <ming.lei@redhat.com> wrote:
+> >
+> > Remove ublk_commit_and_fetch() and open code request completion.
+> >
+> > Now request reference is stored in 'ublk_io', which becomes one global
+> > variable, the motivation is to centralize access 'struct ublk_io' reference,
+> > then we can introduce lock to protect `ublk_io` in future for supporting
+> > io batch.
+> 
+> I didn't follow this. What do you mean by "global variable"?
 
-  kworker/u9:3-162  [000] d..1. 2231.939277: disk_zone_wplug_add_bio: 8,0 zone 12, BIO 6291456 + 14
-  kworker/0:1H-59   [000] d..1. 2231.939884: blk_zone_wplug_bio: 8,0 zone 24, BIO 12775168 + 4
+ublk server can send anything to driver with specified tag if batch io
+extension is added and per-io task is relaxed, then 'ublk_io' instance can be
+visible to any userpsace command, which needs protection, looks like one
+global variable.
 
-Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
----
- block/blk-zoned.c            |  5 ++++
- include/trace/events/block.h | 44 ++++++++++++++++++++++++++++++++++++
- 2 files changed, 49 insertions(+)
+If reference is stored in request pdu, things becomes more like local
+variable, since the early ublk_io flag check guarantees that concurrent
+access can't reach 'request'.
 
-diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index 48f75f58d05e..b881aadbe35f 100644
---- a/block/blk-zoned.c
-+++ b/block/blk-zoned.c
-@@ -822,6 +822,8 @@ static inline void disk_zone_wplug_add_bio(struct gendisk *disk,
- 	 * at the tail of the list to preserve the sequential write order.
- 	 */
- 	bio_list_add(&zwplug->bio_list, bio);
-+	trace_disk_zone_wplug_add_bio(zwplug->disk->queue, zwplug->zone_no,
-+				      bio->bi_iter.bi_sector, nr_segs);
- 
- 	zwplug->flags |= BLK_ZONE_WPLUG_PLUGGED;
- 
-@@ -1317,6 +1319,9 @@ static void blk_zone_wplug_bio_work(struct work_struct *work)
- 		goto put_zwplug;
- 	}
- 
-+	trace_blk_zone_wplug_bio(zwplug->disk->queue, zwplug->zone_no,
-+				 bio->bi_iter.bi_sector, bio->__bi_nr_segments);
-+
- 	if (!blk_zone_wplug_prepare_bio(zwplug, bio)) {
- 		blk_zone_wplug_bio_io_error(zwplug, bio);
- 		goto again;
-diff --git a/include/trace/events/block.h b/include/trace/events/block.h
-index 9a25b686fd09..16d5a87f3030 100644
---- a/include/trace/events/block.h
-+++ b/include/trace/events/block.h
-@@ -633,6 +633,50 @@ TRACE_EVENT(blkdev_zone_mgmt,
- 		  (unsigned long long)__entry->sector,
- 		  __entry->nr_sectors)
- );
-+
-+DECLARE_EVENT_CLASS(block_zwplug,
-+
-+	TP_PROTO(struct request_queue *q, unsigned int zno, sector_t sector,
-+		 unsigned int nr_segs),
-+
-+	TP_ARGS(q, zno, sector, nr_segs),
-+
-+	TP_STRUCT__entry(
-+		__field( dev_t,		dev		)
-+		__field( unsigned int,	zno		)
-+		__field( sector_t,	sector		)
-+		__field( unsigned int,	nr_segs		)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->dev		= disk_devt(q->disk);
-+		__entry->zno		= zno;
-+		__entry->sector		= sector;
-+		__entry->nr_segs	= nr_segs;
-+	),
-+
-+	TP_printk("%d,%d zone %u, BIO %llu + %u",
-+		  MAJOR(__entry->dev), MINOR(__entry->dev), __entry->zno,
-+		  (unsigned long long)__entry->sector,
-+		  __entry->nr_segs)
-+);
-+
-+DEFINE_EVENT(block_zwplug, disk_zone_wplug_add_bio,
-+
-+	TP_PROTO(struct request_queue *q, unsigned int zno, sector_t sector,
-+		 unsigned int nr_segs),
-+
-+	TP_ARGS(q, zno, sector, nr_segs)
-+);
-+
-+DEFINE_EVENT(block_zwplug, blk_zone_wplug_bio,
-+
-+	TP_PROTO(struct request_queue *q, unsigned int zno, sector_t sector,
-+		 unsigned int nr_segs),
-+
-+	TP_ARGS(q, zno, sector, nr_segs)
-+);
-+
- #endif /* _TRACE_BLOCK_H */
- 
- /* This part must be outside protection */
--- 
-2.50.0
+> 
+> >
+> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > ---
+> >  drivers/block/ublk_drv.c | 36 ++++++++++++++++++------------------
+> >  1 file changed, 18 insertions(+), 18 deletions(-)
+> >
+> > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> > index 7fd2fa493d6a..13c6b1e0e1ef 100644
+> > --- a/drivers/block/ublk_drv.c
+> > +++ b/drivers/block/ublk_drv.c
+> > @@ -711,13 +711,12 @@ static inline void ublk_put_req_ref(struct ublk_io *io, struct request *req)
+> >                 __ublk_complete_rq(req);
+> >  }
+> >
+> > -static inline void ublk_sub_req_ref(struct ublk_io *io, struct request *req)
+> > +static inline bool ublk_sub_req_ref(struct ublk_io *io, struct request *req)
+> >  {
+> >         unsigned sub_refs = UBLK_REFCOUNT_INIT - io->task_registered_buffers;
+> >
+> >         io->task_registered_buffers = 0;
+> > -       if (refcount_sub_and_test(sub_refs, &io->ref))
+> > -               __ublk_complete_rq(req);
+> > +       return refcount_sub_and_test(sub_refs, &io->ref);
+> 
+> The struct request *req parameter can be removed now. Looks like it
+> can be removed from ublk_need_complete_req() too.
+
+Good catch!
+
+> 
+> >  }
+> >
+> >  static inline bool ublk_need_get_data(const struct ublk_queue *ubq)
+> > @@ -2224,21 +2223,13 @@ static int ublk_check_commit_and_fetch(const struct ublk_queue *ubq,
+> >         return 0;
+> >  }
+> >
+> > -static void ublk_commit_and_fetch(const struct ublk_queue *ubq,
+> > -                                 struct ublk_io *io, struct io_uring_cmd *cmd,
+> > -                                 struct request *req, unsigned int issue_flags,
+> > -                                 __u64 zone_append_lba, u16 buf_idx)
+> > +static bool ublk_need_complete_req(const struct ublk_queue *ubq,
+> > +                                  struct ublk_io *io,
+> > +                                  struct request *req)
+> >  {
+> > -       if (buf_idx != UBLK_INVALID_BUF_IDX)
+> > -               io_buffer_unregister_bvec(cmd, buf_idx, issue_flags);
+> > -
+> > -       if (req_op(req) == REQ_OP_ZONE_APPEND)
+> > -               req->__sector = zone_append_lba;
+> > -
+> >         if (ublk_need_req_ref(ubq))
+> > -               ublk_sub_req_ref(io, req);
+> > -       else
+> > -               __ublk_complete_rq(req);
+> > +               return ublk_sub_req_ref(io, req);
+> > +       return true;
+> >  }
+> >
+> >  static bool ublk_get_data(const struct ublk_queue *ubq, struct ublk_io *io,
+> > @@ -2271,6 +2262,7 @@ static int __ublk_ch_uring_cmd(struct io_uring_cmd *cmd,
+> >         unsigned tag = ub_cmd->tag;
+> >         struct request *req;
+> >         int ret;
+> > +       bool compl;
+> >
+> >         pr_devel("%s: received: cmd op %d queue %d tag %d result %d\n",
+> >                         __func__, cmd->cmd_op, ub_cmd->q_id, tag,
+> > @@ -2347,8 +2339,16 @@ static int __ublk_ch_uring_cmd(struct io_uring_cmd *cmd,
+> >                         goto out;
+> >                 req = ublk_fill_io_cmd(io, cmd, ub_cmd->result);
+> >                 ret = ublk_config_io_buf(ubq, io, cmd, ub_cmd->addr, &buf_idx);
+> > -               ublk_commit_and_fetch(ubq, io, cmd, req, issue_flags,
+> > -                                     ub_cmd->zone_append_lba, buf_idx);
+> > +               compl = ublk_need_complete_req(ubq, io, req);
+> > +
+> > +               /* can't touch 'ublk_io' any more */
+> > +               if (buf_idx != UBLK_INVALID_BUF_IDX)
+> > +                       io_buffer_unregister_bvec(cmd, buf_idx, issue_flags);
+> > +               if (req_op(req) == REQ_OP_ZONE_APPEND)
+> > +                       req->__sector = ub_cmd->zone_append_lba;
+> > +               if (compl)
+> > +                       __ublk_complete_rq(req);
+> 
+> What is the benefit of separating the reference count decrement from
+> the call to __ublk_complete_rq()? I can understand if you want to keep
+> the code manipulating ublk_io separate from the code dispatching the
+> completed request. But it seems like this could be written more simply
+> as
+> 
+> if (ublk_need_complete_req(ubq, io, req))
+>         __ublk_complete_rq(req);
+
+ublk_need_complete_req() has to be protected, but the following code
+(buffer unregister, complete req needn't and can't be covered with spin lock).
+
+It is for putting anything needing protection in future together.
+
+
+Thanks,
+Ming
 
