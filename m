@@ -1,120 +1,130 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mout-p-102.mailbox.org (mout-p-102.mailbox.org [80.241.56.152])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0906274668
-	for <linux-block@vger.kernel.org>; Wed,  9 Jul 2025 07:59:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABEEB2222C3;
+	Wed,  9 Jul 2025 08:04:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752047965; cv=none; b=G/+AmOblTM93HfzLVV8/2Yr17wffJyFsWWq0oU2Mhfo0Y4GotamZa8GLYD91zWR10W2X0cZiI7LXOyR9E862nCSQ5MgwMXYzXw7y/EpuLn4K1RzFt/Kdl0PGtAbSGBs6SyUv9tiSWg9tEu3P0mohQbrnEEpqs6ujxHp+cet1Itg=
+	t=1752048256; cv=none; b=MvyIuoHtxQkKV75frKMJB6PFZkgs/LPrRxEOEvBmgei+9dN7NTnelN1caxrZza86eGUUgrHMqFIxsbFECdQ+udw4FPqa/jadY2yByyby0RDgyWl0uPh4McT19BzPN+UYlb5kOL9xSOWzEeYWwU+dmqIXVUx+YjIpgU7ZTL3ZzcQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752047965; c=relaxed/simple;
-	bh=t+CPgDF0g0h2/U3um6zTipZ0g8x9lC+Cp14p+9PSf8o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=N5uWieTzV6ds8RHAZ16jmSxvw74bOUKGMlBDecpJINkpDNreoJEb+U/m3bv7eQ71hVHp3KF0AKcYZx3Zub+o+hpz1mgkA7ztuh+Z5bbS8WkqjKbKtSqFBDC85ocnheRPI3YCn2ENYr47xFp8kXdhAUfYTRnYroBsH32/m3K/1B4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=FJCuIYea; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1752048256; c=relaxed/simple;
+	bh=4dvYtEbOtmwJ+1IDZR1sB8eZS1Ly2JkBVTnZJvK2PIQ=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=VynYzggDkhbBGBUlE+hdwkt22HMwOjBl3qj7CTiLzf4icX9im4M+XYg0pWhJnsCUJJACpUvhWmfSNbC+WOMdsfkjTzFZ1aEjwRdTxLgAQj92DxFwuRAIM8fjOdwZtEaTvfH5kfzdhVJmuEXDFfA2tT3UWsuQycAnooFkfCGL0Sc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pankajraghav.com; spf=pass smtp.mailfrom=pankajraghav.com; dkim=pass (2048-bit key) header.d=pankajraghav.com header.i=@pankajraghav.com header.b=XX6tE8mN; arc=none smtp.client-ip=80.241.56.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pankajraghav.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pankajraghav.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="FJCuIYea"
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5694MYa0024482;
-	Wed, 9 Jul 2025 07:59:13 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=Uj3p27
-	IbfpOi4bUET5dHlqbtsW25PO5mkzWP+VCzV+M=; b=FJCuIYeak8yZF0cUPPs+fi
-	lRE7PHmqZ233UR3OJe+XAzIw+nOTNQf3UOUPk2N24PYM9O3WDJEM8FHEwt25Pndo
-	zVncQWy+XdeCfLqf7D3I+vm8vB6bjtyJ5bZ2P6Xnu/RAK7Eodj7hO+l5/jdRumjC
-	8hhREsnV1mWhX8N5gh+b+HqmIQOSa4IhLnDHgns0S1mnWO5qYeum7WHAU/FEYiNs
-	miJWn0Rti0x1gh8ZHz4lJ5vAthU+XnD7Zt+EB+fDy6kyB2ENKxF3YOxDa1eNTYn+
-	/hOp5kUdAiMeRDeV/cimAkHFJebqlWAjrldg/yiLSDBJiII/Rvh3jMoZ7DRsCICw
-	==
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 47pur74vfd-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 09 Jul 2025 07:59:12 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5697N27Q002865;
-	Wed, 9 Jul 2025 07:59:11 GMT
-Received: from smtprelay07.wdc07v.mail.ibm.com ([172.16.1.74])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 47qfvmf1cn-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 09 Jul 2025 07:59:11 +0000
-Received: from smtpav05.dal12v.mail.ibm.com (smtpav05.dal12v.mail.ibm.com [10.241.53.104])
-	by smtprelay07.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5697xBB219661544
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 9 Jul 2025 07:59:11 GMT
-Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1294758056;
-	Wed,  9 Jul 2025 07:59:11 +0000 (GMT)
-Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 22AD45805D;
-	Wed,  9 Jul 2025 07:59:09 +0000 (GMT)
-Received: from [9.61.141.34] (unknown [9.61.141.34])
-	by smtpav05.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Wed,  9 Jul 2025 07:59:08 +0000 (GMT)
-Message-ID: <95e6bce2-19dc-4085-908e-c81fa7a1d5d3@linux.ibm.com>
-Date: Wed, 9 Jul 2025 13:29:07 +0530
+	dkim=pass (2048-bit key) header.d=pankajraghav.com header.i=@pankajraghav.com header.b="XX6tE8mN"
+Received: from smtp2.mailbox.org (smtp2.mailbox.org [10.196.197.2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-102.mailbox.org (Postfix) with ESMTPS id 4bcVqT1NHrz9v7v;
+	Wed,  9 Jul 2025 10:04:05 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pankajraghav.com;
+	s=MBO0001; t=1752048245;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ALSg0QD8uRphF8/oxSCVKyEeBf8l1V1KzIwjcnUWqG4=;
+	b=XX6tE8mNF+WRKfctp233Q8R5d91TxrSW4Wp3rGRmG54yh6tmy+CFbWrPNd+Zxh3E6r61oW
+	AAO6pSiq3hgyjQoPgOTVlYVSaYOYmU0sHh464sOvk/a8L4wxIviL21atL97v2h7wb+4qQT
+	N1dgVpUunhtHFZt8zr1YzsAVmBchkWdqzASoGoLxpiMma+IRXD7ZxSjyIEcwkYGIGdv9/C
+	NoumHmmkQIUWS37PTQQuspEbghG9yPS8SeNO8KamONfeHEG/6kw/Zbmw+35SnHmKojck1Q
+	L9EpOxY1u8Z3e0xocCbgBoOKqGbTR/enWahc5qCdqO4Uj9URDKeGtsDgMOkhgw==
+Message-ID: <ad876991-5736-4d4c-9f19-6076832d0c69@pankajraghav.com>
+Date: Wed, 9 Jul 2025 10:03:51 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] nbd: fix lockdep deadlock warning
-To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org
-Cc: syzbot+2bcecf3c38cb3e8fdc8d@syzkaller.appspotmail.com,
-        Yu Kuai <yukuai3@huawei.com>
-References: <20250709014109.2292837-1-ming.lei@redhat.com>
+From: Pankaj Raghav <kernel@pankajraghav.com>
+Subject: Re: [PATCH v2 0/5] add static PMD zero page support
+To: Zi Yan <ziy@nvidia.com>
+Cc: Suren Baghdasaryan <surenb@google.com>,
+ Ryan Roberts <ryan.roberts@arm.com>,
+ Baolin Wang <baolin.wang@linux.alibaba.com>, Borislav Petkov <bp@alien8.de>,
+ Ingo Molnar <mingo@redhat.com>, "H . Peter Anvin" <hpa@zytor.com>,
+ Vlastimil Babka <vbabka@suse.cz>, Mike Rapoport <rppt@kernel.org>,
+ Dave Hansen <dave.hansen@linux.intel.com>, Michal Hocko <mhocko@suse.com>,
+ David Hildenbrand <david@redhat.com>,
+ Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Thomas Gleixner <tglx@linutronix.de>, Nico Pache <npache@redhat.com>,
+ Dev Jain <dev.jain@arm.com>, "Liam R . Howlett" <Liam.Howlett@oracle.com>,
+ Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
+ willy@infradead.org, linux-mm@kvack.org, x86@kernel.org,
+ linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ "Darrick J . Wong" <djwong@kernel.org>, mcgrof@kernel.org,
+ gost.dev@samsung.com, hch@lst.de, Pankaj Raghav <p.raghav@samsung.com>
+References: <20250707142319.319642-1-kernel@pankajraghav.com>
+ <F8FE3338-F0E9-4C1B-96A3-393624A6E904@nvidia.com>
 Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <20250709014109.2292837-1-ming.lei@redhat.com>
+In-Reply-To: <F8FE3338-F0E9-4C1B-96A3-393624A6E904@nvidia.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzA5MDA2OSBTYWx0ZWRfX1/tVoB7nDoBN nWE7Q0vOj1g/6tOgjhH6/teQhZet3bk+vc9aRXDd8mXZoYklCpGEByYL0F/zjR2/ciGiECjgBtz tLitGIYB6HWJVWbpsW0SFg5lRXo6VmJP8YY7kx1m4DERKN+fhJNWhoQwyucSv7joe4Nh6dTPYFo
- AtkAdHUeOi4T8yBItxFoEpvSEAbkep/Uqz27d/7Xy3cz5GQA61+lWIpkWHqXahOAazs9sg01raY vxzZwnDUete22hdHXG0yX7UYW4eLbgMRw4cOm502PMDT3DT3uqV/Tu6UetPkMCQ2ZAxln0k3e7U qR7iUSN11yOt/9qqJfJRcb587SBzTNEvm+DTR0T5pPJFHuiye3Pr7FmAY2Ioar589w5s2dpUVSJ
- WBguvznnylx3ZmlUGbWofZgX4R/WaIzOHrQlrUXzKJuIhcEfas8B2En+fLh7tlS2HoUNUGcB
-X-Proofpoint-GUID: 4VNtBjF6qqTiO187HwbmzvLQV4YQ5ZBx
-X-Proofpoint-ORIG-GUID: 4VNtBjF6qqTiO187HwbmzvLQV4YQ5ZBx
-X-Authority-Analysis: v=2.4 cv=W/M4VQWk c=1 sm=1 tr=0 ts=686e2150 cx=c_pps a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17 a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=-tVqgtyqGLMlycA9sdMA:9 a=QEXdDO2ut3YA:10 a=ZXulRonScM0A:10 a=zZCYzV9kfG8A:10
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
- definitions=2025-07-09_02,2025-07-08_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 phishscore=0
- mlxscore=0 priorityscore=1501 adultscore=0 clxscore=1011 suspectscore=0
- spamscore=0 lowpriorityscore=0 mlxlogscore=999 bulkscore=0 impostorscore=0
- classifier=spam authscore=0 authtc=n/a authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2505280000
- definitions=main-2507090069
+
+Hi Zi,
+
+>> Add a config option STATIC_PMD_ZERO_PAGE that will always allocate the huge_zero_folio via 
+>> memblock, and it will never be freed.
+> 
+> Do the above users want a PMD sized zero page or a 2MB zero page? Because on systems with non 
+> 4KB base page size, e.g., ARM64 with 64KB base page, PMD size is different. ARM64 with 64KB base 
+> page has 512MB PMD sized pages. Having STATIC_PMD_ZERO_PAGE means losing half GB memory. I am 
+> not sure if it is acceptable.
+> 
+
+That is a good point. My intial RFC patches allocated 2M instead of a PMD sized
+page.
+
+But later David wanted to reuse the memory we allocate here with huge_zero_folio. So
+if this config is enabled, we simply just use the same pointer for huge_zero_folio.
+
+Since that happened, I decided to go with PMD sized page.
+
+This config is still opt in and I would expect the users with 64k page size systems to not enable
+this.
+
+But to make sure we don't enable this for those architecture, I could do a per-arch opt in with
+something like this[1] that I did in my previous patch:
+
+diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+index 340e5468980e..c3a9d136ec0a 100644
+--- a/arch/x86/Kconfig
++++ b/arch/x86/Kconfig
+@@ -153,6 +153,7 @@ config X86
+ 	select ARCH_WANT_OPTIMIZE_HUGETLB_VMEMMAP	if X86_64
+ 	select ARCH_WANT_HUGETLB_VMEMMAP_PREINIT if X86_64
+ 	select ARCH_WANTS_THP_SWAP		if X86_64
++	select ARCH_HAS_STATIC_PMD_ZERO_PAGE	if X86_64
+ 	select ARCH_HAS_PARANOID_L1D_FLUSH
+ 	select ARCH_WANT_IRQS_OFF_ACTIVATE_MM
+ 	select BUILDTIME_TABLE_SORT
 
 
+diff --git a/mm/Kconfig b/mm/Kconfig
+index 781be3240e21..fd1c51995029 100644
+--- a/mm/Kconfig
++++ b/mm/Kconfig
+@@ -826,6 +826,19 @@ config ARCH_WANTS_THP_SWAP
+ config MM_ID
+ 	def_bool n
 
-On 7/9/25 7:11 AM, Ming Lei wrote:
-> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-> index 7bdc7eb808ea..136640e4c866 100644
-> --- a/drivers/block/nbd.c
-> +++ b/drivers/block/nbd.c
-> @@ -1473,7 +1473,15 @@ static int nbd_start_device(struct nbd_device *nbd)
->  		return -EINVAL;
->  	}
->  
-> -	blk_mq_update_nr_hw_queues(&nbd->tag_set, config->num_connections);
-> +retry:
-> +	mutex_unlock(&nbd->config_lock);
-> +	blk_mq_update_nr_hw_queues(&nbd->tag_set, num_connections);
-> +	mutex_lock(&nbd->config_lock);
-> +
-> +	/* if another code path updated nr_hw_queues, retry until succeed */
-> +	if (num_connections != config->num_connections)
-> +		goto retry;
-> +
++config ARCH_HAS_STATIC_PMD_ZERO_PAGE
++	def_bool n
++
++config STATIC_PMD_ZERO_PAGE
++	bool "Allocate a PMD page for zeroing"
++	depends on ARCH_HAS_STATIC_PMD_ZERO_PAGE
+<snip>
 
-Don't we need to update num_connections to config->num_connections
-here before we attempt retry?
+Let me know your thoughts.
 
-Thanks,
---Nilay
-
+[1] https://lore.kernel.org/linux-mm/20250612105100.59144-4-p.raghav@samsung.com/#Z31mm:Kconfig
+--
+Pankaj
