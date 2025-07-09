@@ -1,138 +1,112 @@
-Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
+Received: from mout-p-101.mailbox.org (mout-p-101.mailbox.org [80.241.56.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3D9A2367B3;
-	Wed,  9 Jul 2025 09:45:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1830424B26;
+	Wed,  9 Jul 2025 09:59:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752054355; cv=none; b=Lk3OWjNgDTkKRSmT1DC7TStsxjJQh/VtuEkhRfQYh+1edbp+wiol0YIWWFuHb3qQ4xyDj/jTHplCxbstTTQc0/Rs7S1MmFPzRJ5J3wFk0GmbIdhO8CQ+KT60M7HIfhrzKGTCKBaG+yweM8T0mFOy7qhhpPlbfEUuDI3sDfwg7Oo=
+	t=1752055158; cv=none; b=gsIxtMA9oNxoHryeb/2AeP9WHK9py2TcW5sDGhX7WL8DnJcnjzsksJQU4f/25ICigOnMf6YZXIm14pAhXv+LuHCG3nUiRC3m6ucHESweZyw7OPvaVUDAFgW1xZHVJMPJwCcISFIXZ8+XqwXLpYGEtyreJQDtSkLu1LF2Km0lbj8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752054355; c=relaxed/simple;
-	bh=c6W+pjdL3fLgs4DKE4VuxDUC5yEKStcV+xtF81Jhgic=;
+	s=arc-20240116; t=1752055158; c=relaxed/simple;
+	bh=V3I5hLDpVu9hQyAkfXoHs+QWYvl3bUpi55121rBny4I=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gVDhZiL6wE9vAuvqnhERS/x53hhgA6QygoyqSiMoljgv1kZwefuzDHYEfJhrCCdDYfjTHYwNmaso3fRgWWFCH2QZ7BLn+BTmUsdOwDoWLQe95Np3C2vUCbQuKmuedAyybXntEu6FFaakJa11lAL5K956uIjpOez3yqBPX1/YrH0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=HQo71xhS; arc=none smtp.client-ip=95.215.58.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	 In-Reply-To:Content-Type; b=YC7M1VQRBnSnsYFnZ+xmEFOEjAxNy6OMXIhAlNCaCazqlHeTullCxw59W/4NkJCWND0cYKLTwKvBgIj+gy1AQZpUz524omaYQmBJTJlSXcg/tF3vTBLhZkBTTgFEkVF9d4rPlGhZGpTfPJrG2cUk6TZX3LK+wXQWztvt0M7abIc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pankajraghav.com; spf=pass smtp.mailfrom=pankajraghav.com; dkim=pass (2048-bit key) header.d=pankajraghav.com header.i=@pankajraghav.com header.b=iMW6PKHA; arc=none smtp.client-ip=80.241.56.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pankajraghav.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pankajraghav.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="HQo71xhS"
-Message-ID: <e50ef45e-4c1a-4874-8d5f-9ca86f9a532c@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1752054340;
+	dkim=pass (2048-bit key) header.d=pankajraghav.com header.i=@pankajraghav.com header.b="iMW6PKHA"
+Received: from smtp102.mailbox.org (smtp102.mailbox.org [IPv6:2001:67c:2050:b231:465::102])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-101.mailbox.org (Postfix) with ESMTPS id 4bcYNJ6s2Wz9sSf;
+	Wed,  9 Jul 2025 11:59:12 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pankajraghav.com;
+	s=MBO0001; t=1752055153;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=WTz2wkEPilJ291aBXf8EittiLv9aIr5saM/qqA8YaKY=;
-	b=HQo71xhSDwkfGOSIB3FWw3v/YQdNclez8WkEdYwBvOTAIOl6AqbhbkkiJL16330Fl8+IFB
-	JIkYnrPO3KuLCRrrExhedm3XPWRaiA0VaUDJTQKabNmyYEFozGZqLnF6S6ObqT2+JOBPnh
-	CPfeQNHTjT8MKj0ZxmbHLM06SQaVEyI=
-Date: Wed, 9 Jul 2025 17:45:23 +0800
+	bh=MaNm/Rqy67eO1HZemeROtIk1IORMMZeTew+oRtrvGkQ=;
+	b=iMW6PKHALmPyYY17kX+7z/UasELzVAlOwMHkXhfmMfYQ/HGql/rTF8RnQV/PY/RKU2dbTv
+	Q1wW0tPyR4pJpPZukYuAdQh7+xBhk+xD18a/CmM7ZQf1WuimGQjMXFOVqCLMCIptjtbVat
+	NM9TO+Vu4oJiQDPY6wTAbYUO3uWnNXxqlsxu6CY5Mi7Wm3KcYBnb5jjtoU4s5bojivYl6d
+	au6Jm0/uFu4tf9hZPt5U/AyAyhzkpH/XE0Fq7fEGRjMd/NnirMwGNMKOAUNX/b/3sBuWaV
+	Dyytuh906m1aINvPOuiJvUzah44GbnrgicnGClNOIJaF4X4YJfRO/swAnCxFbQ==
+Authentication-Results: outgoing_mbo_mout;
+	dkim=none;
+	spf=pass (outgoing_mbo_mout: domain of kernel@pankajraghav.com designates 2001:67c:2050:b231:465::102 as permitted sender) smtp.mailfrom=kernel@pankajraghav.com
+Message-ID: <3ed1e744-5536-4b47-a5ab-66cd300ded67@pankajraghav.com>
+Date: Wed, 9 Jul 2025 11:59:00 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: =?UTF-8?Q?Re=3A_=5BPATCH_v2_00/11=5D_dm-pcache_=E2=80=93_persistent?=
- =?UTF-8?Q?-memory_cache_for_block_devices?=
-To: Mikulas Patocka <mpatocka@redhat.com>
-Cc: agk@redhat.com, snitzer@kernel.org, axboe@kernel.dk, hch@lst.de,
- dan.j.williams@intel.com, Jonathan.Cameron@Huawei.com,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-cxl@vger.kernel.org, nvdimm@lists.linux.dev, dm-devel@lists.linux.dev
-References: <20250707065809.437589-1-dongsheng.yang@linux.dev>
- <85b5cb31-b272-305f-8910-c31152485ecf@redhat.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Dongsheng Yang <dongsheng.yang@linux.dev>
-In-Reply-To: <85b5cb31-b272-305f-8910-c31152485ecf@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Subject: Re: [PATCH v2 0/5] add static PMD zero page support
+To: Andrew Morton <akpm@linux-foundation.org>,
+ David Hildenbrand <david@redhat.com>
+Cc: Suren Baghdasaryan <surenb@google.com>,
+ Ryan Roberts <ryan.roberts@arm.com>,
+ Baolin Wang <baolin.wang@linux.alibaba.com>, Borislav Petkov <bp@alien8.de>,
+ Ingo Molnar <mingo@redhat.com>, "H . Peter Anvin" <hpa@zytor.com>,
+ Vlastimil Babka <vbabka@suse.cz>, Zi Yan <ziy@nvidia.com>,
+ Mike Rapoport <rppt@kernel.org>, Dave Hansen <dave.hansen@linux.intel.com>,
+ Michal Hocko <mhocko@suse.com>, Lorenzo Stoakes
+ <lorenzo.stoakes@oracle.com>, Thomas Gleixner <tglx@linutronix.de>,
+ Nico Pache <npache@redhat.com>, Dev Jain <dev.jain@arm.com>,
+ "Liam R . Howlett" <Liam.Howlett@oracle.com>, Jens Axboe <axboe@kernel.dk>,
+ linux-kernel@vger.kernel.org, willy@infradead.org, linux-mm@kvack.org,
+ x86@kernel.org, linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ "Darrick J . Wong" <djwong@kernel.org>, mcgrof@kernel.org,
+ gost.dev@samsung.com, hch@lst.de, Pankaj Raghav <p.raghav@samsung.com>
+References: <20250707142319.319642-1-kernel@pankajraghav.com>
+ <20250707153844.d868f7cfe16830cce66f3929@linux-foundation.org>
+Content-Language: en-US
+From: Pankaj Raghav <kernel@pankajraghav.com>
+In-Reply-To: <20250707153844.d868f7cfe16830cce66f3929@linux-foundation.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 4bcYNJ6s2Wz9sSf
 
+Hi Andrew,
 
-在 7/8/2025 4:16 AM, Mikulas Patocka 写道:
->
-> On Mon, 7 Jul 2025, Dongsheng Yang wrote:
->
->> Hi Mikulas,
->> 	This is V2 for dm-pcache, please take a look.
+>> We already have huge_zero_folio that is allocated on demand, and it will be
+>> deallocated by the shrinker if there are no users of it left.
 >>
->> Code:
->>      https://github.com/DataTravelGuide/linux tags/pcache_v2
->>
->> Changelogs
->>
->> V2 from V1:
->> 	- introduce req_alloc() and req_init() in backing_dev.c, then we
->> 	  can do req_alloc() before holding spinlock and do req_init()
->> 	  in subtree_walk().
->> 	- introduce pre_alloc_key and pre_alloc_req in walk_ctx, that
->> 	  means we can pre-allocate cache_key or backing_dev_request
->> 	  before subtree walking.
->> 	- use mempool_alloc() with NOIO for the allocation of cache_key
->> 	  and backing_dev_req.
->> 	- some coding style changes from comments of Jonathan.
-> Hi
->
-> mempool_alloc with GFP_NOIO never fails - so you don't have to check the
-> returned value for NULL and propagate the error upwards.
+>> At moment, huge_zero_folio infrastructure refcount is tied to the process
+>> lifetime that created it. This might not work for bio layer as the completions
+>> can be async and the process that created the huge_zero_folio might no
+>> longer be alive.
+> 
+> Can we change that?  Alter the refcounting model so that dropping the
+> final reference at interrupt time works as expected?
+> 
 
+That is an interesting point. I did not try it. At the moment, we always drop the reference in
+__mmput().
 
-Hi Mikulas:
+Going back to the discussion before this work started, one of the main thing that people wanted was
+to use some sort of a **drop in replacement** for ZERO_PAGE that can be bigger than PAGE_SIZE[1].
 
-    I noticed that the implementation of mempool_alloc—it waits for 5 
-seconds and retries when allocation fails.
+And, during the RFCs of these patches, one of the feedback I got from David was in big server
+systems, 2M (in the case of 4k page size) should not be a problem and we don't need any unnecessary
+refcounting for them.
 
-With this in mind, I propose that we handle -ENOMEM inside defer_req() 
-using a similar mechanism. something like this commit:
+Also when I had a chat with David, he also wants to make changes to the existing mm_huge_zero_folio
+infrastructure to get rid of shrinker if possible. So we decided that it is better to have opt-in
+static allocation and keep the existing dynamic allocation path.
 
+So that is why I went with this approach of having a static PMD allocation.
 
-https://github.com/DataTravelGuide/linux/commit/e6fc2e5012b1fe2312ed7dd02d6fbc2d038962c0
+I hope this clarifies the motivation a bit.
 
+Let me know if you have more questions.
 
-Here are two key reasons why:
-
-(1) If we manage -ENOMEM in defer_req(), we don’t need to modify every 
-lower-level allocation to use mempool to avoid failures—for example,
-
-cache_key, backing_req, and the kmem.bvecs you mentioned. More 
-importantly, there’s no easy way to prevent allocation failure in some 
-places—for instance, bio_init_clone() could still return -ENOMEM.
-
-(2) If we use a mempool, it will block and wait indefinitely when memory 
-is unavailable, preventing the process from exiting.
-
-But with defer_req(), the user can still manually stop the pcache device 
-using dmsetup remove, releasing some memory if user want.
-
-
-What do you think?
-
-Thanx
-
-Dongsheng
-
->
-> "backing_req->kmem.bvecs = kmalloc_array(n_vecs, sizeof(struct bio_vec),
-> GFP_NOIO)" - this call may fail and you should handle the error gracefully
-> (i.e. don't end the bio with an error). Would it be possible to trim the
-> request to BACKING_DEV_REQ_INLINE_BVECS vectors and retry it?
-> Alternativelly, you can create a mempool for the largest possible n_vecs
-> and allocate from this mempool if kmalloc_array fails.
->
-> I'm sending two patches for dm-pcache - the first patch adds the include
-> file linux/bitfield.h - it is needed in my config. The second patch makes
-> slab caches per-module rather than per-device, if you have them
-> per-device, there are warnings about duplicate cache names.
->
->
-> BTW. What kind of persistent memory do you use? (afaik Intel killed the
-> Optane products and I don't know of any replacement)
->
-> Some times ago I created a filesystem for persistent memory - see
-> git://leontynka.twibright.com/nvfs.git - I'd be interested if you can test
-> it on your persistent memory implementation.
->
-> Mikulas
->
+> And if we were to do this, what sort of benefit might it produce?
+> 
+>> Add a config option STATIC_PMD_ZERO_PAGE that will always allocate
+>> the huge_zero_folio via memblock, and it will never be freed.
+[1] https://lore.kernel.org/linux-xfs/20231027051847.GA7885@lst.de/
