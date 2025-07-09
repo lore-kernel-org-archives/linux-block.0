@@ -1,290 +1,145 @@
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout-a1-smtp.messagingengine.com (fout-a1-smtp.messagingengine.com [103.168.172.144])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 185092E1C7C
-	for <linux-block@vger.kernel.org>; Wed,  9 Jul 2025 13:49:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACA9E2E5B21;
+	Wed,  9 Jul 2025 14:10:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.144
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752068948; cv=none; b=GilsVVQqfqcVEWlJc5aMHfjjww/dxnqKUP+ggCfEV2FP0Y704aKYqnIxQuqFEoDVhmWBZ7nGtd29ikCqdBnWBlQn+IfcbvcP1GtV36/v1CLYK8yd+jZvR9TY7Rw0G0oRuZHwg4Sa0gTksV0KgQ1/lWeHTIZnefS1FBMhQc7wOHs=
+	t=1752070202; cv=none; b=U6uAttSt0/Qehn7OVbYSfYtbt25jkgEn24lzyiKYeeBuH1QwjaH70bUCgZyWj6b8JktfAt0A5wtiAppARBRJfnsB9VWfqyRSAO5TiwoLaqDZ8PQfzs3hnAaUFlxqhO4WGNl6p2O/WCvE8zhjLPWBs0q4E7Cx9Kkj2U9YZCJ/X2g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752068948; c=relaxed/simple;
-	bh=u6pIaYjMS3IKe3laU0ihfZ43XKRHDXUnACjtbvu0k1s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ppXx3W09/0TJ3InnLIAhdWEVrTWQu6NRYXJLwbZcvBIv310ASzeIc2uk50cZHf/VJ4XY5B84V57G4gZVkQHWk0upyeJOowZg+DzucllxhuuQmXAp43iOwRq9iiEzLilGaaLHBKCkE/ITSxleO9Y7A+gKNZAcSYkwxjP+n4dbX7E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=qnG91yrP; arc=none smtp.client-ip=209.85.216.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1752070202; c=relaxed/simple;
+	bh=m62TkjTTmCz9G9a7tBMmsOZHwwbtguD4Ia1+JlyvOro=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=VfyZBVxtwv+QeU45Vnm9fQRvU503Yov32jmb7DppX855qT/Sum6HQqIZKCuc3bwhFlht5pStb6d7TZgJvP+vSx6N6RU6PHQT35yeEsMFJ/5V1ImbYk3XgdHqTEQPFL1N7ogs7VP3kuARBlKrUUhzlb4MpGmG2HZ2AbaQ9tdgdGw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=RU2Hgw1M; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=n9Q3AGEz; arc=none smtp.client-ip=103.168.172.144
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qnG91yrP"
-Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-3134c67a173so4938882a91.1
-        for <linux-block@vger.kernel.org>; Wed, 09 Jul 2025 06:49:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1752068945; x=1752673745; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=8ateKzkbCHc5sIaL8yEpNYKQqvJ9cJ8N1E9YOvRIl00=;
-        b=qnG91yrPubh+SjqXBl0yhKECCHcvQ3L5KOP65eVW9mLs8XpxgrQ4oBlrnsKzu7FB6v
-         pdumAAFqWsoRbsFESJOuNBziNl84Pzsg/svYcjY4m8ueDUfhMZnUUwUYrti4gi4MyFCD
-         +rGmdJLvniMRV16HubPLExGkGLTHjlnOstKe2RN3EdcCNfuJ/Lv+w9YoncCsa2hQUqjl
-         3J6La3svcJqreKV4GAjC3wfQQeqUBks2sEbKTf2WL+NvcH+ZutgsqjrczOxvzXxvPq+A
-         L34CaSA2H8KJmVfHaxd0KNfGb2BStuNPqau6bEQ1ewOiEAjpI6/t0qCSHnde1dUghy1/
-         8F0w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752068945; x=1752673745;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=8ateKzkbCHc5sIaL8yEpNYKQqvJ9cJ8N1E9YOvRIl00=;
-        b=CUlPSG2A0iThzmcWRilCNJYKNp7M+AGCVOzyZPzHls97EBhlo/wsSMioVjGEAnHFH5
-         WHG44LGa1VTVdagYlhF8PaSgAOtzL02thY5yKQ7xqUezfZdFcT/pJnfyTYY6Yjr0jdPj
-         b2tB42aOeo7wzMt30WFpgcKODKn+Cywv0sKpdMFLplPU1RJr4lANzOI+yTYP3oyulv41
-         pIeDeCEo1RhkBPANtkAjfERndhY7fsoZ3vVcOOlJ6sgN4OrhkoJviZihSesc/x3JO3S1
-         zMrGZ4Z5A+3H1UHyqsK6d6QHOmXShbxL6Cmj0LIM1oS6gzn6tbyqhFfezpyIjDaWUb61
-         UWSQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUDxMjFsAME1zIdDJuuVKPLOnWoVKyDP0rknoPdoDwDpumJoHNB+88ggcdrSc77RjQDzWF+RRx4mVtjUA==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxi1Ar4Vx0qvO8ZJ/j8q6G1Q7HIz9zgZnsyGUEjjBQ1E0d/1QXS
-	vSDfMGGLFaIxJHIPHF0fYD7wgIVKjTFxidfjkZsZgI2vs0Nr1yCxjCrabCHWGQKdY5jbzHx6Zij
-	sDPK56bCKY4p9cKzriEGkMWgEBlwi5kXf//iBHOp9FQ==
-X-Gm-Gg: ASbGncvrZ9vCJbpGGIOla+fWMapYzEUh5Rm+tQDad6AsYLvxprdxGzlbFuHcNUw5Gwi
-	Dann6Nm99OyCRCObm6Ufr4ayUcN3WbKpwDqXWu/xOaiI4FHddY2VBfmoQ3V1fww4qdfpx6fGagv
-	GT/KUgec4doIZIulak30gz28me341LOG22RqSzpoNC1K6QoN5HX8C6NWRrGaYTK3RxAiK5vCYHS
-	1hS
-X-Google-Smtp-Source: AGHT+IEQhV/nQ/B4d0iM22W5NrME2JaC25s+7CHkU0EidyyHVczc0JiUB1Lee+thAVIgRRGr45oEj47FGwEV1HtC4tQ=
-X-Received: by 2002:a17:90b:1c83:b0:312:1d2d:18e2 with SMTP id
- 98e67ed59e1d1-31c2fda93a0mr4025868a91.20.1752068945122; Wed, 09 Jul 2025
- 06:49:05 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="RU2Hgw1M";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="n9Q3AGEz"
+Received: from phl-compute-05.internal (phl-compute-05.phl.internal [10.202.2.45])
+	by mailfout.phl.internal (Postfix) with ESMTP id C1842EC04E8;
+	Wed,  9 Jul 2025 10:09:59 -0400 (EDT)
+Received: from phl-imap-02 ([10.202.2.81])
+  by phl-compute-05.internal (MEProxy); Wed, 09 Jul 2025 10:09:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm1; t=1752070199;
+	 x=1752156599; bh=OXiuJfa6GzzwWykYEMepJESwQapIIKQPPmHJ+Tf85BQ=; b=
+	RU2Hgw1MuM8b2gVsM5NxXSn7wjdJEuabk3tdZCwVd9Y5SSD1DgZOmCjZgTMeAm8/
+	Hifn/RJOq6PaGfgCl9V39D8zyZC6ZZQX3mCzllQ+njxcTYTiqcIlnC8CQ7IO2RU8
+	hpJg4w1ntaLGXOioYOH1NtXONC+94Ds2KRxYa0M7EWsKywkNKHnfkMgX8xGY+42U
+	bIddLRdDdecU3JzbvwXnvKT3OC/nmBjBJG26EV6fr0kqI3hWx5QiJOnWl23ejk9S
+	URMoM96nbPolOSo372vR+HI5eOfcN77YfC5jJyp9CxEh8cFRB4qS13tLayBXpnhG
+	5L7dmUuyTc/vldr0OwupBw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1752070199; x=
+	1752156599; bh=OXiuJfa6GzzwWykYEMepJESwQapIIKQPPmHJ+Tf85BQ=; b=n
+	9Q3AGEzMpSjTI0dCEGaf/0MZQw5OEUMcMsnLpP4IM3M5hmtgHiSXhCuzs8mJXHlX
+	H8l2Dxg6tBjeeawP/oYPW9PhFOCL08im0LkMa3FDnfHIJWV8o0k0LZl27NWi28ec
+	thIN4M6um3zt90IMcPozFNklW9dZXZoNjWHe0qm9/iUSjLCao581xHYw3X7W6OtC
+	zZcZWjmAyQsWLRJxTMtjvZEm4Ad9NtTL8QbaGXlkCGlZ5buBEJJhuZN8NT5Y1M7Q
+	geTMwiTonTMVHNPXTjgh/nvUE+avsoTbMjQx1wJorCHtIKjoDN9QvZHNBRNpaLMu
+	GlL5GAWGBRuzkRMFw5WiQ==
+X-ME-Sender: <xms:NnhuaLGNSpYSHqJVnMiULv2h0ByQ5qAww3mrZPb-KWk_64bi1PpGNQ>
+    <xme:NnhuaIV2LV44mWStCa-ZwX2laSsrhz7JvmZmRM_kFXeDSQnXgifjZoL1FFDrKtIHL
+    NQHcy9HJRrEqBAKw0k>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgdefjeejjecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
+    hrpefoggffhffvvefkjghfufgtgfesthejredtredttdenucfhrhhomhepfdetrhhnugcu
+    uegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrghtthgvrh
+    hnpefhtdfhvddtfeehudekteeggffghfejgeegteefgffgvedugeduveelvdekhfdvieen
+    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrhhnug
+    esrghrnhgusgdruggvpdhnsggprhgtphhtthhopeduledpmhhouggvpehsmhhtphhouhht
+    pdhrtghpthhtohepfihilhhlhiesihhnfhhrrgguvggrugdrohhrghdprhgtphhtthhope
+    grgigsohgvsehkvghrnhgvlhdrughkpdhrtghpthhtohepsghrrghunhgvrheskhgvrhhn
+    vghlrdhorhhgpdhrtghpthhtoheprghnuggvrhhsrdhrohigvghllheslhhinhgrrhhord
+    horhhgpdhrtghpthhtohepsggvnhhjrghmihhnrdgtohhpvghlrghnugeslhhinhgrrhho
+    rdhorhhgpdhrtghpthhtohepuggrnhdrtggrrhhpvghnthgvrheslhhinhgrrhhordhorh
+    hgpdhrtghpthhtohepnhgrrhgvshhhrdhkrghmsghojhhusehlihhnrghrohdrohhrghdp
+    rhgtphhtthhopehlkhhfthdqthhrihgrghgvsehlihhsthhsrdhlihhnrghrohdrohhrgh
+    dprhgtphhtthhopehlthhpsehlihhsthhsrdhlihhnuhigrdhith
+X-ME-Proxy: <xmx:NnhuaOC3XXADYW-FsyPw-X5u6Qq5HKgoZ0V7N97HVOXeVgVXQTX4Jg>
+    <xmx:NnhuaOTS5gAWkDPz0h6urrY8qLKIn-AbqiOtanzEdU-op6_jB-2bDA>
+    <xmx:NnhuaPrx88Gi5Z0HpJNfzeNbDNymXSJSLp9-HwbRCkcNHIle_V6lTA>
+    <xmx:NnhuaHWK0Ke-jQEy3F6nTSgH0tvn8A5dIwt1T5okM-EGcuxc_cjyGA>
+    <xmx:N3huaFviz_ZIc3uK5VG5NJtYuRyA08PK23qjjhuZLall_bACdCY7Ixs0>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id 772AB700069; Wed,  9 Jul 2025 10:09:58 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CA+G9fYvk9HHE5UJ7cdJHTcY6P5JKnp+_e+sdC5U-ZQFTP9_hqQ@mail.gmail.com>
-In-Reply-To: <CA+G9fYvk9HHE5UJ7cdJHTcY6P5JKnp+_e+sdC5U-ZQFTP9_hqQ@mail.gmail.com>
-From: Naresh Kamboju <naresh.kamboju@linaro.org>
-Date: Wed, 9 Jul 2025 19:18:53 +0530
-X-Gm-Features: Ac12FXzgk6k00MV94kKXG4l_JDYuhQNs3d5XgUxk-gImCMO8BtDoIe_cQgiLU2U
-Message-ID: <CA+G9fYs=3LHdf1ge1MiCoCOUpW=VjPdVWrNJX8+wi7u6N18j3Q@mail.gmail.com>
-Subject: Re: LTP: syscalls: TWARN ioctl(/dev/loop0, LOOP_SET_STATUS,
- test_dev.img) failed EOPNOTSUPP (95)
-To: LTP List <ltp@lists.linux.it>, open list <linux-kernel@vger.kernel.org>, 
-	lkft-triage@lists.linaro.org, linux-fsdevel@vger.kernel.org, 
-	linux-block <linux-block@vger.kernel.org>
-Cc: Anders Roxell <anders.roxell@linaro.org>, Dan Carpenter <dan.carpenter@linaro.org>, 
-	Arnd Bergmann <arnd@arndb.de>, Ben Copeland <benjamin.copeland@linaro.org>, 
-	Petr Vorel <pvorel@suse.cz>, chrubis <chrubis@suse.cz>, rbm@suse.com, 
-	Jens Axboe <axboe@kernel.dk>, willy@infradead.org, 
-	"Martin K. Petersen" <martin.petersen@oracle.com>, Anuj Gupta <anuj20.g@samsung.com>, 
-	Kanchan Joshi <joshi.k@samsung.com>, Christoph Hellwig <hch@lst.de>, Christian Brauner <brauner@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+X-ThreadId: Tc5542b2421753b41
+Date: Wed, 09 Jul 2025 16:09:38 +0200
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Naresh Kamboju" <naresh.kamboju@linaro.org>,
+ "LTP List" <ltp@lists.linux.it>, "open list" <linux-kernel@vger.kernel.org>,
+ lkft-triage@lists.linaro.org, linux-fsdevel@vger.kernel.org,
+ linux-block <linux-block@vger.kernel.org>
+Cc: "Anders Roxell" <anders.roxell@linaro.org>,
+ "Dan Carpenter" <dan.carpenter@linaro.org>,
+ "Benjamin Copeland" <benjamin.copeland@linaro.org>,
+ "Petr Vorel" <pvorel@suse.cz>, chrubis <chrubis@suse.cz>, rbm@suse.com,
+ "Jens Axboe" <axboe@kernel.dk>, "Matthew Wilcox" <willy@infradead.org>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ "Anuj Gupta" <anuj20.g@samsung.com>, "Kanchan Joshi" <joshi.k@samsung.com>,
+ "Christoph Hellwig" <hch@lst.de>, "Christian Brauner" <brauner@kernel.org>
+Message-Id: <61787165-8559-4ad6-90db-5ab6ee5e6fd9@app.fastmail.com>
+In-Reply-To: 
+ <CA+G9fYs=3LHdf1ge1MiCoCOUpW=VjPdVWrNJX8+wi7u6N18j3Q@mail.gmail.com>
+References: 
+ <CA+G9fYvk9HHE5UJ7cdJHTcY6P5JKnp+_e+sdC5U-ZQFTP9_hqQ@mail.gmail.com>
+ <CA+G9fYs=3LHdf1ge1MiCoCOUpW=VjPdVWrNJX8+wi7u6N18j3Q@mail.gmail.com>
+Subject: Re: LTP: syscalls: TWARN ioctl(/dev/loop0, LOOP_SET_STATUS, test_dev.img)
+ failed EOPNOTSUPP (95)
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-On Tue, 8 Jul 2025 at 18:28, Naresh Kamboju <naresh.kamboju@linaro.org> wrote:
+On Wed, Jul 9, 2025, at 15:48, Naresh Kamboju wrote:
+> On Tue, 8 Jul 2025 at 18:28, Naresh Kamboju <naresh.kamboju@linaro.org> wrote:
+>>
+>> Regressions were observed while testing LTP syscalls cachestat01 and
+>> other related tests on the next-20250702 Linux kernel across several devices.
+>>
+>> The issue appears to be related to the inability to configure /dev/loop0
+>> via the LOOP_SET_STATUS ioctl, which returned EOPNOTSUPP
+>> (Operation not supported). This results in a TBROK condition,
+>> causing the test to fail.
 >
-> Regressions were observed while testing LTP syscalls cachestat01 and
-> other related tests on the next-20250702 Linux kernel across several devices.
->
-> The issue appears to be related to the inability to configure /dev/loop0
-> via the LOOP_SET_STATUS ioctl, which returned EOPNOTSUPP
-> (Operation not supported). This results in a TBROK condition,
-> causing the test to fail.
+> Anders, bisected this down to this commit id,
+>    # first bad commit:
+>        [9eb22f7fedfc9eb1b7f431a5359abd4d15b0b0cd]
+>        fs: add ioctl to query metadata and protection info capabilities
 
-Anders, bisected this down to this commit id,
-   # first bad commit:
-       [9eb22f7fedfc9eb1b7f431a5359abd4d15b0b0cd]
-       fs: add ioctl to query metadata and protection info capabilities
+I see the problem now in
 
-> Test environments:
-> - arm64
-> - qemu-x86_64
-> - qemu-riscv
->
-> Regression Analysis:
-> - New regression? Yes
-> - Reproducibility? Yes
->
-> Regressions started from next-20250702 ( next-20250708)
-> Good: next-20250701
-> Bad: next-20250702
->
-> Test regression: Linux next-20250702 TWARN ioctl(/dev/loop0,
-> LOOP_SET_STATUS, test_dev.img) failed EOPNOTSUPP (95) TBROK Failed to
-> acquire device
->
-> Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
->
-> ## Test log
-> tst_buffers.c:57: TINFO: Test is using guarded buffers
-> tst_tmpdir.c:316: TINFO: Using /tmp/LTP_cacQ9AfS0 as tmpdir (tmpfs filesystem)
-> tst_device.c:98: TINFO: Found free device 0 '/dev/loop0'
-> tst_device.c:190: TWARN: ioctl(/dev/loop0, LOOP_SET_STATUS,
-> test_dev.img) failed: EOPNOTSUPP (95)
-> tst_device.c:362: TBROK: Failed to acquire device
++       if (_IOC_NR(cmd) == _IOC_NR(FS_IOC_GETLBMD_CAP))
++               return blk_get_meta_cap(bdev, cmd, argp);
++
 
-Lore link,
-* https://lore.kernel.org/all/CA+G9fYvk9HHE5UJ7cdJHTcY6P5JKnp+_e+sdC5U-ZQFTP9_hqQ@mail.gmail.com/
+This only compares _IOC_NR() but not _IOC_TYPE, so LOOP_SET_STATUS
+is treated the same as FS_IOC_GETLBMD_CAP, since both use '2' in
+the lower 8 bit.
 
->
-> ## Source
-> * Kernel version: 6.16.0-rc4-next-20250702
-> * Git tree: https://kernel.googlesource.com/pub/scm/linux/kernel/git/next/linux-next.git
-> * Git sha: 50c8770a42faf8b1c7abe93e7c114337f580a97d
-> * Git describe: next-20250702
-> * Project: https://qa-reports.linaro.org/lkft/linux-next-master/build/next-20250704/testrun/29017637
-> * Architectures: arm64, x86_64, riscv64.
-> * Toolchains: gcc-13 and clang-20
-> * Kconfigs: defconfig+ltp
->
-> ## Build
-> * Test log: https://qa-reports.linaro.org/api/testruns/28986655/log_file/
-> * Test details:
-> https://regressions.linaro.org/lkft/linux-next-master/next-20250702/ltp-syscalls/cachestat01/
-> * Test history:
-> https://qa-reports.linaro.org/lkft/linux-next-master/build/next-20250704/testrun/29017637/suite/ltp-syscalls/test/cachestat01/history/
-> * Build link: https://storage.tuxsuite.com/public/linaro/lkft/builds/2zJjY2EmRMul6P0UgjdOm4Ssiqh/
-> * Kernel config:
-> https://storage.tuxsuite.com/public/linaro/lkft/builds/2zJjY2EmRMul6P0UgjdOm4Ssiqh/config
->
-> ## List of tests
->   - cachestat01
->   - cachestat04
->   - chdir01
->   - chmod09
->   - close_range01
->   - copy_file_range01
->   - copy_file_range02
->   - creat09
->   - fallocate04
->   - fallocate05
->   - fallocate06
->   - fanotify01
->   - fanotify05
->   - fanotify06
->   - fanotify10
->   - fanotify13
->   - fanotify14
->   - fanotify15
->   - fanotify16
->   - fanotify17
->   - fanotify18
->   - fanotify19
->   - fanotify20
->   - fanotify21
->   - fanotify22
->   - fanotify23
->   - fchmodat2_01
->   - fdatasync03
->   - fgetxattr01
->   - fremovexattr01
->   - fremovexattr02
->   - fsetxattr01
->   - fsmount01
->   - fsmount02
->   - fsopen01
->   - fsopen02
->   - fspick01
->   - fspick02
->   - fsskipig01
->   - fsskipig02
->   - fsskipig03
->   - fstatfs01
->   - fstatfs01_64
->   - fsync01
->   - fsync04
->   - getdents01
->   - getdents02
->   - getxattr02
->   - getxattr03
->   - inotify03
->   - ioctl04
->   - ioctl05
->   - ioctl06
->   - ioctl_ficlone02
->   - ioctl_fiemap01
->   - ioctl_loop01
->   - lchown03
->   - linkat02
->   - listmount01
->   - listmount02
->   - lremovexattr01
->   - lstat03
->   - lstat03_64
->   - mkdir09
->   - mknodat02
->   - mmap16
->   - mount01
->   - mount02
->   - mount03
->   - mount04
->   - mount05
->   - mount06
->   - mount07
->   - mount_setattr01
->   - move_mount01
->   - move_mount02
->   - msync04
->   - open_tree01
->   - open_tree02
->   - prctl06
->   - preadv03
->   - preadv03_64
->   - preadv203
->   - preadv203_64
->   - pwritev03
->   - pwritev03_64
->   - quotactl01
->   - quotactl04
->   - quotactl06
->   - quotactl08
->   - quotactl09
->   - readahead02
->   - readdir01
->   - rename01
->   - rename03
->   - rename04
->   - rename05
->   - rename06
->   - rename07
->   - rename08
->   - rename10
->   - rename11
->   - rename12
->   - rename13
->   - rename15
->   - renameat01
->   - setxattr01
->   - stat04
->   - stat04_64
->   - statfs01
->   - statfs01_64
->   - statmount01
->   - statmount02
->   - statmount04
->   - statmount05
->   - statmount06
->   - statmount07
->   - statvfs01
->   - statx06
->   - statx08
->   - statx10
->   - statx11
->   - statx12
->   - sync01
->   - syncfs01
->   - umount01
->   - umount02
->   - umount03
->   - umount2_01
->   - umount2_02
->   - unlink09
->   - utime01
->   - utime02
->   - utime03
->   - utime04
->   - utime05
->   - utimensat01
->   - writev03
->
+include/uapi/linux/fs.h:#define FS_IOC_GETLBMD_CAP              _IOWR(0x15, 2, struct logical_block_metadata_cap)
+include/uapi/linux/loop.h:#define LOOP_SET_STATUS               0x4C02
 
---
-Linaro LKFT
-https://lkft.linaro.org
+I checked a couple of other drivers using _IOC_NR(), and it seems
+that they many of them have the same bug, e.g.:
+
+drivers/accel/habanalabs/common/habanalabs_ioctl.c
+drivers/block/ublk_drv.c
+drivers/dma-buf/dma-heap.c
+
+    Arnd
