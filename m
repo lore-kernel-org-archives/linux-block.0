@@ -1,46 +1,47 @@
 Received: from esa6.hgst.iphmx.com (esa6.hgst.iphmx.com [216.71.154.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 908682D8368
-	for <linux-block@vger.kernel.org>; Wed,  9 Jul 2025 11:47:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AABBC2D838B
+	for <linux-block@vger.kernel.org>; Wed,  9 Jul 2025 11:47:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.71.154.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752061639; cv=none; b=l99Q8A0oGCrqbJcDAK2oUfpAgkuUT4O/QTk7fEz/HnetyvqFn18H/rIDD60/flqURt8wXzvGp8N95N72N/8dRfDaNPHbY3PqtirW4Mw2NTrrhBGb5+z2KHqfRztY8K8WmYOeFKcIy0P3S5sw5QoIq8J8esE4jBi5yScMsKnd9k8=
+	t=1752061640; cv=none; b=je0kE5la/fAOzpTc4uxQvA6Ru8sr1XDnLtCRrBVmnyecL7hIUbnrqo7YEQ+ZdiGDtxdee1LHCZW1KN5oYMc8ZC5E/h/VfR2VhPCrFOoJaH8+pb/Q96to3KeR0yne33vuV1m8Kg1qM1uXB67eiQzmVVtZYgd+06SerG9ziURY8oA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752061639; c=relaxed/simple;
-	bh=yPrZyp6L0EDubHFT9+G8MgFYTqOrCUtEep8UOVwyPzw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=pDZFVP3ho5F9nuzRi/U/MkgbzSTexFvTbfXH+GiXEjDtt1pVAN3zlbiqydsmJgFYeeuwm576vCOQbvZlU2tUmFBAwPAMOjLF3pP/X1CibLQAxp3l+Gvsymp85x9EBL0wSTCRYXl5qtAH+Wr2dKPhYT8zg1+yf+QvjlMkzV6DX/o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=YONin1+B; arc=none smtp.client-ip=216.71.154.45
+	s=arc-20240116; t=1752061640; c=relaxed/simple;
+	bh=DbuxOtVlHu+bLcqIaSy+AzItONUxbV/qLHqmtWRBgXg=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=p9wODwork2iJt5woAJJKk89rzipSrrhvXi1amcWy4ZTgxiDnqYdOTI7dcRHsIi1Up8jFZF6l+SsnDTFYLmKUP3a+JaHHD3XyaPgId/J4khE5Z6yehmHTURwHl1mtT6hQ9ED1VbsCY9Op7S3b6wQggH5+I0mdHOpDhqqpBCwR+PQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=cno4ln69; arc=none smtp.client-ip=216.71.154.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="YONin1+B"
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="cno4ln69"
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1752061637; x=1783597637;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=yPrZyp6L0EDubHFT9+G8MgFYTqOrCUtEep8UOVwyPzw=;
-  b=YONin1+Bh41Xg0mW+Qjyn/4lrf8Yl6CMFdOBRcygTiFQ9XA8cyeS6Tr/
-   dm783uaPcOB3f+kSXOK2jIfrWBBAwxPN+lkrTxGA95TDA9lNd384vYo88
-   Gk3eWprnVFkxEOEhxMo00+xWGhm67udCbbkV6eCb1Z9lnb+Ozjr7teLK8
-   O1q5pcheSDouWrO/TdCSj6o0t/yDW1BtmjwhM1m5YY7+pvJCnqZWbfp5O
-   /QBpZikY13dE8tIjXPUl2Te/WCsToFlxaSmaT2aTkVnfGkkA8gGqox2In
-   SM7i7Ja+kWUBAGln1B8pSWHgXcgy81B3GmoW8ywXCm6ZQtx/yUyttfRwZ
-   w==;
-X-CSE-ConnectionGUID: 7bHZrereRx+Qes5IGMYJ5Q==
-X-CSE-MsgGUID: vjiTwvJUSmCzVCl3nbDMjg==
+  t=1752061638; x=1783597638;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=DbuxOtVlHu+bLcqIaSy+AzItONUxbV/qLHqmtWRBgXg=;
+  b=cno4ln69z1El72x4SfjqsF0T9bSpliUC/zboXchRuPV8mTr+WReLsYFy
+   q6KShUR+Jhf9o+zKbMJPc1QiXBqa75lqa1xFLDBQbEBXRGucCeJ/1Nk9f
+   UpXoiFlSmEuUDnXcrsqImwZXws7ZkS94QLdH34WyGjcCwWups2oUv21Q5
+   YO0CoN5gJ+uprMlKSxfTVjaf4RmemO0L4zbhWFmLoRRPtf0ssts2r/jhJ
+   wHvXX4aUEhJ3GiHB5ITjSwvK2qCm6nzOALYxxUhKciHHJ3EsAaKTq6sSD
+   8woYS9h43uD2Fpl+epXQk1sOwIY6WBR5VzzK25AAMZyrJh7cSZHByopw9
+   g==;
+X-CSE-ConnectionGUID: kaKBF9r7T4aJOoaCLF7mug==
+X-CSE-MsgGUID: R1Sks0+oSByVSkmXvCyGiw==
 X-IronPort-AV: E=Sophos;i="6.16,298,1744041600"; 
-   d="scan'208";a="91096340"
+   d="scan'208";a="91096343"
 Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 09 Jul 2025 19:47:11 +0800
-IronPort-SDR: 686e4828_HEe/Vk9N/JOLkbK4Gd9fMCDQezE1aYrArKQrUPfo17zmqh4
- OSdCb//ux3sm+i4f1doEWlog5gql7ZxOTldjUgA==
+  by ob1.hgst.iphmx.com with ESMTP; 09 Jul 2025 19:47:13 +0800
+IronPort-SDR: 686e482a_eFNFGVuVv3YoIuMz1VGeYszJ2hwzv4NkmK53wqgfPZfHjp5
+ YwwUD/97Pftjo1drJLA3dN5YDAjVMn0GGTd+y7w==
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 09 Jul 2025 03:44:56 -0700
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 09 Jul 2025 03:44:58 -0700
 WDCIronportException: Internal
 Received: from c02g55f6ml85.ad.shared (HELO C02G55F6ML85.wdc.com) ([10.224.183.46])
-  by uls-op-cesaip01.wdc.com with ESMTP; 09 Jul 2025 04:47:10 -0700
+  by uls-op-cesaip01.wdc.com with ESMTP; 09 Jul 2025 04:47:12 -0700
 From: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: Damien Le Moal <dlemoal@kernel.org>,
@@ -49,10 +50,12 @@ Cc: Damien Le Moal <dlemoal@kernel.org>,
 	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
 	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
 	Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Subject: [PATCH 0/5] block: add tracepoints for ZBD specific operations 
-Date: Wed,  9 Jul 2025 13:46:59 +0200
-Message-Id: <20250709114704.70831-1-johannes.thumshirn@wdc.com>
+Subject: [PATCH 1/5] blktrace: add zoned block commands to blk_fill_rwbs
+Date: Wed,  9 Jul 2025 13:47:00 +0200
+Message-Id: <20250709114704.70831-2-johannes.thumshirn@wdc.com>
 X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <20250709114704.70831-1-johannes.thumshirn@wdc.com>
+References: <20250709114704.70831-1-johannes.thumshirn@wdc.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -61,29 +64,51 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add tracepoints for operations specific to zoned block devices. 
+Add zoned block commands to blk_fill_rwbs:
 
-These tracepoints are also the foundation for adding zoned block device
-support to blktrace, which will be sent in a follow up.
+- ZONE APPEND will be decoded as 'ZA'
+- ZONE RESET and ZONE RESET ALL will be decoded as 'ZR'
+- ZONE FINISH will be decoded as 'ZF'
+- ZONE OPEN will be decoded as 'ZO'
+- ZONE CLOSE will be decoded as 'ZC'
 
-But even without the immediate support for ZBD operations in blktrace, these
-tracepoints have prooven to be effective in debugging issues with filesystems
-on zoned block devices.
+Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+---
+ kernel/trace/blktrace.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
-Johannes Thumshirn (5):
-  blktrace: add zoned block commands to blk_fill_rwbs
-  block: split blk_zone_update_request_bio into two functions
-  block: add tracepoint for blk_zone_update_request_bio
-  block: add tracepoint for blkdev_zone_mgmt
-  block: add trace messages to zone write plugging
-
- block/blk-mq.c               |  6 ++-
- block/blk-zoned.c            | 23 ++++++++++
- block/blk.h                  | 31 ++++++-------
- include/trace/events/block.h | 89 ++++++++++++++++++++++++++++++++++++
- kernel/trace/blktrace.c      | 21 +++++++++
- 5 files changed, 151 insertions(+), 19 deletions(-)
-
+diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
+index 3f6a7bdc6edf..f1dc00c22e37 100644
+--- a/kernel/trace/blktrace.c
++++ b/kernel/trace/blktrace.c
+@@ -1875,6 +1875,27 @@ void blk_fill_rwbs(char *rwbs, blk_opf_t opf)
+ 	case REQ_OP_READ:
+ 		rwbs[i++] = 'R';
+ 		break;
++	case REQ_OP_ZONE_APPEND:
++		rwbs[i++] = 'Z';
++		rwbs[i++] = 'A';
++		break;
++	case REQ_OP_ZONE_RESET:
++	case REQ_OP_ZONE_RESET_ALL:
++		rwbs[i++] = 'Z';
++		rwbs[i++] = 'R';
++		break;
++	case REQ_OP_ZONE_FINISH:
++		rwbs[i++] = 'Z';
++		rwbs[i++] = 'F';
++		break;
++	case REQ_OP_ZONE_OPEN:
++		rwbs[i++] = 'Z';
++		rwbs[i++] = 'O';
++		break;
++	case REQ_OP_ZONE_CLOSE:
++		rwbs[i++] = 'Z';
++		rwbs[i++] = 'C';
++		break;
+ 	default:
+ 		rwbs[i++] = 'N';
+ 	}
 -- 
 2.50.0
 
