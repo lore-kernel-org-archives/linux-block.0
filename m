@@ -1,169 +1,161 @@
-Received: from mout.gmx.net (mout.gmx.net [212.227.17.20])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B57478F36;
-	Wed,  9 Jul 2025 09:05:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D27C0271443;
+	Wed,  9 Jul 2025 09:10:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752051908; cv=none; b=BlYcayKMcHC7zINgUJ7bJ0ZSXLPP7WvFzzKL7bb4lk1wzQ1yl+w0m4BUwhtbfG8s1Ddfcen7vc6xoTAzWC+scwhgaAKOXAFkUIi9DTpW2CwIylMWJRAgLJ8DAJwb2oGfbQHt7kybm9ddYrlZHFj1iOYDqChc6+giNqd2HoJPf9k=
+	t=1752052211; cv=none; b=NLrTLLSLR5E2p3qJ9Pnt9GCseieRJiqQesEmuIxkvZqb/F1HRHJ4h4MbyfxUGAOZZBQderHCdz1x4ufJzuVV9K185KgKKNjWyWmt3BAbt5CD9A88M9lbOC+g0FYh3uY0puT5T80RaowmubNcNkXMfJJqhq+CBEGX0yaKha3zzC8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752051908; c=relaxed/simple;
-	bh=naos+ztsM462dlUt3nnLFc74Mtmx6bRL1OC1kvlTzF0=;
-	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=owZ/RRbEAwlb67QX+1zW/GiPe156GeuzIi9V/7ss4+aCPK19vSABKSvYUuH77Iz90JyFeWVT+EhgBuF7za6vdOKtRBUCXOOa+HZhpHHS9RZJctC917NB6GD4U58MGA6/iKNd2N1yupqhgVi/hNPHJnERh0yVBPgOkIu/VIHbMi0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.com; spf=pass smtp.mailfrom=gmx.com; dkim=pass (2048-bit key) header.d=gmx.com header.i=quwenruo.btrfs@gmx.com header.b=SkoQt1Ur; arc=none smtp.client-ip=212.227.17.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.com
+	s=arc-20240116; t=1752052211; c=relaxed/simple;
+	bh=IJjJgM4OeRcDQZbbuj3g79bHehoQC7+ut1sOtWZkbZs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=okCDQxW0jI0GlMzkSwtRKb/4YIxvVjCkHOgRTNhSJkCYQxOfRKcPm74CtVU9zOrlR4Qaq33QftQC72GcaIkXnSlNQ7egGxy5OkePpioXJvzOSq/WhDB0uGb2/yzGdbIcNsm2lC3rEbdG6vkFAr1PYzHY7+oiyRqrsw5OKtSXJZU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QzW535K+; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.com header.i=quwenruo.btrfs@gmx.com header.b="SkoQt1Ur"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.com;
-	s=s31663417; t=1752051903; x=1752656703; i=quwenruo.btrfs@gmx.com;
-	bh=t4+CgnpsKZh4/GcF8WEpqmkQtOZhdGm5Eecfk+/kx7k=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:From:Subject:
-	 Content-Type:Content-Transfer-Encoding:cc:
-	 content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=SkoQt1UrCmEe/v3R9esyEoQdU8sxEWp6SJo80QeNZC4u6yDUDl3lOBYqbx5Qjo5j
-	 5t4pZh8zsq4s5YhrYH7Chfq6p2GXWIY3KiJFXtRFXk7pL/RuOJng2mQvQ8pCq8wgA
-	 e+etCUytDi6hgJDxPahTTqEyhescHXpqx3ME2VR/t4A84qlTz71UfKSJIhJcrZu+0
-	 tB61PbWdFRaj/NLJ8oFMAIRedZy4fRvF6GOgdiP7DDFZcjtiWh8pvDFWHQht/4dfF
-	 dK2EScHuLQObPu1/Q6k3lUwVCYI+h4jb2dzrZtHnIZWn0lgK1MN8D8FzoKzqHjSKD
-	 k/wX0O12J448WeR/qQ==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from [172.16.0.229] ([159.196.52.54]) by mail.gmx.net (mrgmx105
- [212.227.17.174]) with ESMTPSA (Nemesis) id 1MiaYJ-1vBmQ40N9D-00qDTK; Wed, 09
- Jul 2025 11:05:03 +0200
-Message-ID: <5459cd6d-3fdb-4a4e-b5c7-00ef74f17f7d@gmx.com>
-Date: Wed, 9 Jul 2025 18:35:00 +0930
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QzW535K+"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1752052210; x=1783588210;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=IJjJgM4OeRcDQZbbuj3g79bHehoQC7+ut1sOtWZkbZs=;
+  b=QzW535K+xfDaHCNexMYzWVCUvLjy2T+RkUb3NyQa1550zSztnkeh8TGn
+   3fcICDvc3vbCF+6xYGyvQGBgYzYoVOI9PP6ESL8LO3hDHCo5YwzGvs7OJ
+   7fcQgL3hDjE75xmurGu/xxBtPWRqaSaAyTEtgc+VMHFldojTxmPiEGWoa
+   yhhGpS50Odmqhp43lnSVi0r/Sap4pEMGgw3oNZLGDAoSPEXiCal4/kU3i
+   eeS5Wj8y07Kve6GR/OHwOJjOje6DUT5mYnXzq42Dey2nOG21OqjO7plJP
+   j/YW1PXgd3dfgDzYpnNyNeOvdZ3+PI+JIgyNDLNtd8Y6hn3W0njQXSsEy
+   Q==;
+X-CSE-ConnectionGUID: +aJockTGRDqTm4GMhZ330A==
+X-CSE-MsgGUID: 8OLsZH+aQy+dUUhUM8it6A==
+X-IronPort-AV: E=McAfee;i="6800,10657,11487"; a="54163374"
+X-IronPort-AV: E=Sophos;i="6.16,298,1744095600"; 
+   d="scan'208";a="54163374"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jul 2025 02:10:09 -0700
+X-CSE-ConnectionGUID: 3G6X9a/9QZGs4/E1Nu1G6A==
+X-CSE-MsgGUID: 8VeCwGwHRoyx12QvGTKIaw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,298,1744095600"; 
+   d="scan'208";a="155458330"
+Received: from lkp-server01.sh.intel.com (HELO 9ee84586c615) ([10.239.97.150])
+  by orviesa009.jf.intel.com with ESMTP; 09 Jul 2025 02:10:07 -0700
+Received: from kbuild by 9ee84586c615 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uZQoW-0003Kz-1d;
+	Wed, 09 Jul 2025 09:10:04 +0000
+Date: Wed, 9 Jul 2025 17:09:19 +0800
+From: kernel test robot <lkp@intel.com>
+To: Christoph Hellwig <hch@lst.de>, Christian Brauner <brauner@kernel.org>
+Cc: oe-kbuild-all@lists.linux.dev, "Darrick J. Wong" <djwong@kernel.org>,
+	Joanne Koong <joannelkoong@gmail.com>, linux-xfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-block@vger.kernel.org, gfs2@lists.linux.dev
+Subject: Re: [PATCH 01/14] iomap: header diet
+Message-ID: <202507091656.dMTKUTBY-lkp@intel.com>
+References: <20250708135132.3347932-2-hch@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
- linux-btrfs <linux-btrfs@vger.kernel.org>,
- Matthew Wilcox <willy@infradead.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Qu Wenruo <quwenruo.btrfs@gmx.com>
-Subject: Why a lot of fses are using bdev's page cache to do super block
- read/write?
-Autocrypt: addr=quwenruo.btrfs@gmx.com; keydata=
- xsBNBFnVga8BCACyhFP3ExcTIuB73jDIBA/vSoYcTyysFQzPvez64TUSCv1SgXEByR7fju3o
- 8RfaWuHCnkkea5luuTZMqfgTXrun2dqNVYDNOV6RIVrc4YuG20yhC1epnV55fJCThqij0MRL
- 1NxPKXIlEdHvN0Kov3CtWA+R1iNN0RCeVun7rmOrrjBK573aWC5sgP7YsBOLK79H3tmUtz6b
- 9Imuj0ZyEsa76Xg9PX9Hn2myKj1hfWGS+5og9Va4hrwQC8ipjXik6NKR5GDV+hOZkktU81G5
- gkQtGB9jOAYRs86QG/b7PtIlbd3+pppT0gaS+wvwMs8cuNG+Pu6KO1oC4jgdseFLu7NpABEB
- AAHNIlF1IFdlbnJ1byA8cXV3ZW5ydW8uYnRyZnNAZ214LmNvbT7CwJQEEwEIAD4CGwMFCwkI
- BwIGFQgJCgsCBBYCAwECHgECF4AWIQQt33LlpaVbqJ2qQuHCPZHzoSX+qAUCZxF1YAUJEP5a
- sQAKCRDCPZHzoSX+qF+mB/9gXu9C3BV0omDZBDWevJHxpWpOwQ8DxZEbk9b9LcrQlWdhFhyn
- xi+l5lRziV9ZGyYXp7N35a9t7GQJndMCFUWYoEa+1NCuxDs6bslfrCaGEGG/+wd6oIPb85xo
- naxnQ+SQtYLUFbU77WkUPaaIU8hH2BAfn9ZSDX9lIxheQE8ZYGGmo4wYpnN7/hSXALD7+oun
- tZljjGNT1o+/B8WVZtw/YZuCuHgZeaFdhcV2jsz7+iGb+LsqzHuznrXqbyUQgQT9kn8ZYFNW
- 7tf+LNxXuwedzRag4fxtR+5GVvJ41Oh/eygp8VqiMAtnFYaSlb9sjia1Mh+m+OBFeuXjgGlG
- VvQFzsBNBFnVga8BCACqU+th4Esy/c8BnvliFAjAfpzhI1wH76FD1MJPmAhA3DnX5JDORcga
- CbPEwhLj1xlwTgpeT+QfDmGJ5B5BlrrQFZVE1fChEjiJvyiSAO4yQPkrPVYTI7Xj34FnscPj
- /IrRUUka68MlHxPtFnAHr25VIuOS41lmYKYNwPNLRz9Ik6DmeTG3WJO2BQRNvXA0pXrJH1fN
- GSsRb+pKEKHKtL1803x71zQxCwLh+zLP1iXHVM5j8gX9zqupigQR/Cel2XPS44zWcDW8r7B0
- q1eW4Jrv0x19p4P923voqn+joIAostyNTUjCeSrUdKth9jcdlam9X2DziA/DHDFfS5eq4fEv
- ABEBAAHCwHwEGAEIACYCGwwWIQQt33LlpaVbqJ2qQuHCPZHzoSX+qAUCZxF1gQUJEP5a0gAK
- CRDCPZHzoSX+qHGpB/kB8A7M7KGL5qzat+jBRoLwB0Y3Zax0QWuANVdZM3eJDlKJKJ4HKzjo
- B2Pcn4JXL2apSan2uJftaMbNQbwotvabLXkE7cPpnppnBq7iovmBw++/d8zQjLQLWInQ5kNq
- Vmi36kmq8o5c0f97QVjMryHlmSlEZ2Wwc1kURAe4lsRG2dNeAd4CAqmTw0cMIrR6R/Dpt3ma
- +8oGXJOmwWuDFKNV4G2XLKcghqrtcRf2zAGNogg3KulCykHHripG3kPKsb7fYVcSQtlt5R6v
- HZStaZBzw4PcDiaAF3pPDBd+0fIKS6BlpeNRSFG94RYrt84Qw77JWDOAZsyNfEIEE0J6LSR/
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:NMqfGCd5DuW+6E9+fcb0Yb4wonnLM6P8Yb90GJcq5vVAM64T+qp
- /NehyB5mHUqgv/fbohhagjsizuLxEsJ4S6H7MDqfuXL1DDCKjQLMUqbngH6z8O55GfYVl9v
- +RAzhsyNu0fXGtZrNoQoTTx7WKXMW++67YvcuvNONC+VfRg/2gXRJpbbkGWSbevG3fi5pxe
- FsyKfgj2az3dz3WnyyqNQ==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:UYaz9elAtTQ=;/zSFRBJ4zDk9KQB7sq8I2uL3poy
- C02Mb4DaLuPafuLhkXbqBiy9Ubu80r5ckxn/sigarXcoc4VZWgutEB72xoCvZEoECVo2YMVV/
- JXKWPynl2iqPRrVBSe5vr/xI7WOsdzyKcOAityJRcNUAmBl44s4D6XFZSiw4l+hdXo8rtpd4C
- tW5cp43LftoToMMroFWJllNsrxStyeyaZlSnQ+vSsi2jpF8pA5VmqiNBcc0ibt+JBYxsg/HcA
- wanL0S40UJXNXGStHyImqrmQACWW3D8S/Sl/Cy6vToio/meX+hcz2rDe+6aDtIwiJyoOon6Vo
- 23HMwN05qWBj6K6zFo8H65tEiBHKvcKiw8+mCcrJ6wIEzGbkVk1gRmk0QnuVhhIM41vj0RxKU
- Jm8xl99Ug3NqTuvFZU+t//9dju9wFtFYnEP19DGU7kcy1p9X1B1SekptzfMBXbUCutV7rE8EZ
- srfyNH8Dk7zJhcggYpwNcPAsMRLG4+bNI68SAbqTBYeoqsPEmqHBYOT1uQg2FF6ihrVk98W6w
- ESICC3RsfLa3UPSHkeIbEbsz4hRR/BwoTZsPVDwPlc2vVcBVj5U1Rableo183MwjfV64uenbh
- Gy9SqfgNp+FVB9/s73YBHbaP1qyAUfHfGPeYQv/o0kvMTAqno+08zImk0ZuyVG98znDDoEIGy
- WRlPO+5vpO4z8TuSlOLmazZH7ZEjWQHiyEzfDhOe4gWk/vVbG0KvYRXBvjnXW7Ii2/TNxU4n5
- HAxfhY6he07MzDHQ5BQj1IdhpF7v5p7AEPShX5BqOBs0Tq43CmXiqIXR1uqCh/ZozDi4CeHib
- xMFxmsb4u/mG362KKEFqf3adYaY+BUESpvZp5a4k/CYZuiK/Mbsn/msVWvrYPyKL+pI7Hrzhx
- +sJTWjTBozSUzGQl7NsrNeITtTt03NXMoq9KEOSNsxJBXj3ph7e+ex0lBC61jJOEis05l/qvO
- gdDFNY3f0M5EvAvJcCbCXkJD4vgUDEsYU3/GOCr71XKouZBVjrlndTLTDqQCIF7RKveILaCYi
- 1ljfP9AU33ZMtijPyJ0mnvwiaAfJU0nBq+q2htH3DfkCDZDWP8opmdf7GxvUQ9QPzwJ72+sxy
- VLM6UrEkpWARFsF6pwrfMLsWGfnUPy3AuRcuLkZS15CNG6uIRNJk6eqwA1sp4nddE1clopo1F
- Y3KqHGi72qVtPjsateEJhDuyBvkE248ak0ClQi8+hqj8XQp3G0x2mihIdsJoHIaW3+kxM6GLe
- Gf1nreDfNI+bDvW8lafcOVGZSjaUQGj3yr7Wjd72i9NhB+FoHNQe/cmsS36xiiaAurBA0iGNE
- EVxWzwSzrD1JOjVDZwTX+p/i2abDFuuDn9OZu+6DsXBLUkBZkeI6IL8op9Ja1aMbQSE1ZKa9K
- K38RP2wzCrL8t6FyfL4dF2/0xMt0oOSD9greYKsZT3JvUQ8wgrDqekysKqbwVOmawC1czqSR2
- TLkGzYXsoXfunvESPsw11k0F9HoGlZv3lxQjQ7t273Y77QDuvVTUdr/DaJRaSptw3wmmjnIsA
- rHDwCcy+xFx8olZSbnskGSgg/fTHeKtbMfMosAv4iWSqnnIm5mFHtg9VtRFRGcGcSkCJnLiN7
- u/2/BMR9cS9nafstU8xJ6TLyi5+c6k3IIfz+CmtJx7ISHBuBBESNwvQipMook3dbsxYjNOaIu
- FHJ1rFZGT7ePzPiFcTktHVOEzkz71m6AJv16HiQxm72CC3SRE7zB8pp5YQWD8+ntTCWcq/fvc
- G2a51kFXSsLoAr331WKFl/JNs7lvX4E0vRj5G8tJLEY9e/QNen8NarRqXGPxFJFqYVJOTtEIt
- U9PIBed/xfbUCx7uy79Iyx/Elrws+waxeYA+hiEzp2HhuThN+Y/wUhH+HzjSokbmikHd6yjst
- ZIFBMkzOBFBKfpRatw2bDoqVdCFdsgooQ0z1CAIpKpXw11nSvzPRkGhFMEHyFwHhMTUGUeacH
- Af2iZeQVT0ANWIISg9SAi0OwuTEzv94z6SvHlHMtFaUcmxCz1XZZlQB1VB9ZLq651PH95Ims3
- XXx6b5gEZLbZ4PG6nEfHQFmBVIVI7wRbtIZ1iIL7b6ahPkPXUfYN64YwvOLwspva4RUS+4Re+
- 3GYtYjcYXYAQhUR0kJPEZ9fGIq7T0hz2A35BzLP1Mbvh6X6lF4BGqfwvt/3RUuGR/CWqh4kTT
- z6LuFEdj8PL1HyaHm+W11L2ygFQ+2VljVp6o8AHIvxeTe+pSZTjwJXiK1otXUM9aokgBXyKei
- UT3WhuelSnk3uVT+j45NOIpuVPAXQXTcZrX1WPAKujLY0W3GDGx2oi/T43iKi/wHukzhSPM3j
- OAvkLTjdxClmz4qwwLaJVN9+AYaxoFB+C7pFNk5bM5sJfw//r2FUKEW9w8B50sDzheFgx35Rw
- zYtFuUHihZ6Sm9NHnkthtHM6kYLMkztgZvkZuAOWQC4F9a7exfXKxvIC7Tor9GbLaqmAmsz44
- zTuxHXW2siTKXprPatoIZKIohRKPiN3QxEkmdZfLupjnk9hG2lb7Ch6O4abiXHr0zaSZuSW0v
- C578KG04R2oYiZwUNAcRfAHLSfPHGtQN6jtOHCIkVihphCJwpQAzHoi8cZmDlF/GYOrPthn3t
- oiO4lyxx5u6Mbv2haJlXghMBJrPQNjYdi5GTa/Tfgp+XRJmg/W/z3LuwxvLA8LSWlnfJ10JxS
- mqZeKPPeDgq3oF/UAXdMHqKldSADsOrxNoNj1sMfYwtqsBd/XzoDOMVuEW5re1e2MNz4TB3Bs
- vG5oQrKcZgq3mZja9Lv2k5CIC5hKu1etjisaGVk94GMAJiPCR3HARrzVh92FSjXbppEBx435T
- rEVRmrCsq38Xuv+nDOgftQkQz/AnyHFEiSUBoFaMLduHQdzuSbM2d0wenW6Rfc+Hgb/9sSDXg
- h64Xl33qjmxHk7oRTduCYPNjtXmvrdJvq/6O1u7BaC+CTtonCbTh7HdmpICe7HeDUqfXo42zw
- yAvspJWAQ5nM/dml1PG9zywU1LBEnad/8eH1jU7+3wmPK4/tkQ0Uj3NwDk3sdLoIHFsA7GtHC
- 5gwx1ip/z6L+tTPw2nvkJ5DR4HndMnjKCavL4UH3VliOpsPBJmo01QZnshuyC8DNLy5oz+rtz
- YLuedUirapYuZZxas1KF9W6Xqr01LBErh1jeWsYmKDRfzBlGAo9q7vUQdCt/LU+XTWsE45xtV
- QgZQnJRlF38+yJXyQI6T6635/pWxOg3A0mBkJp9ngeu1iix3HT7HB1RzOYJuySUwSzcv7hMGs
- 9VGpOC0xtrVr3Y+Ua5JDI+VEVScpyuGUmfOLJZpAPAHQt25jUO4UUtfJl/rljPA8sjvvS64qI
- +isrUP7uE2PGsGjxBxz4BrZA5HoGYztp7VFKVYT8I8cyzLczcT1jdPrFdQ506+SRX4GygKuOM
- l7U3qwHddp2ZHv4zE5pkO449+EHc+avC9FNeam1QQ=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250708135132.3347932-2-hch@lst.de>
 
-Hi,
+Hi Christoph,
 
-Recently I'm trying to remove direct bdev's page cache usage from btrfs=20
-super block IOs.
+kernel test robot noticed the following build errors:
 
-And replace it with common bio interface (mostly with bdev_rw_virt()).
+[auto build test ERROR on brauner-vfs/vfs.all]
+[also build test ERROR on xfs-linux/for-next gfs2/for-next linus/master v6.16-rc5 next-20250708]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-However I'm hitting random generic/492 failure where sometimes blkid=20
-failed to detect any useful super block signature of btrfs.
+url:    https://github.com/intel-lab-lkp/linux/commits/Christoph-Hellwig/iomap-pass-more-arguments-using-the-iomap-writeback-context/20250708-225155
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git vfs.all
+patch link:    https://lore.kernel.org/r/20250708135132.3347932-2-hch%40lst.de
+patch subject: [PATCH 01/14] iomap: header diet
+config: arc-randconfig-001-20250709 (https://download.01.org/0day-ci/archive/20250709/202507091656.dMTKUTBY-lkp@intel.com/config)
+compiler: arc-linux-gcc (GCC) 8.5.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250709/202507091656.dMTKUTBY-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202507091656.dMTKUTBY-lkp@intel.com/
+
+All error/warnings (new ones prefixed by >>):
+
+   fs/iomap/buffered-io.c: In function 'iomap_dirty_folio':
+>> fs/iomap/buffered-io.c:642:9: error: implicit declaration of function 'filemap_dirty_folio'; did you mean 'iomap_dirty_folio'? [-Werror=implicit-function-declaration]
+     return filemap_dirty_folio(mapping, folio);
+            ^~~~~~~~~~~~~~~~~~~
+            iomap_dirty_folio
+   fs/iomap/buffered-io.c: In function 'iomap_write_iter':
+>> fs/iomap/buffered-io.c:930:58: error: 'BDP_ASYNC' undeclared (first use in this function); did you mean 'I_SYNC'?
+     unsigned int bdp_flags = (iter->flags & IOMAP_NOWAIT) ? BDP_ASYNC : 0;
+                                                             ^~~~~~~~~
+                                                             I_SYNC
+   fs/iomap/buffered-io.c:930:58: note: each undeclared identifier is reported only once for each function it appears in
+>> fs/iomap/buffered-io.c:945:12: error: implicit declaration of function 'balance_dirty_pages_ratelimited_flags' [-Werror=implicit-function-declaration]
+      status = balance_dirty_pages_ratelimited_flags(mapping,
+               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   fs/iomap/buffered-io.c: In function 'iomap_unshare_iter':
+>> fs/iomap/buffered-io.c:1309:3: error: implicit declaration of function 'balance_dirty_pages_ratelimited'; did you mean 'pr_alert_ratelimited'? [-Werror=implicit-function-declaration]
+      balance_dirty_pages_ratelimited(iter->inode->i_mapping);
+      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      pr_alert_ratelimited
+   fs/iomap/buffered-io.c: In function 'iomap_zero_iter':
+>> fs/iomap/buffered-io.c:1376:3: error: implicit declaration of function 'folio_mark_accessed'; did you mean 'folio_wait_locked'? [-Werror=implicit-function-declaration]
+      folio_mark_accessed(folio);
+      ^~~~~~~~~~~~~~~~~~~
+      folio_wait_locked
+   fs/iomap/buffered-io.c: In function 'iomap_alloc_ioend':
+   fs/iomap/buffered-io.c:1624:26: error: implicit declaration of function 'wbc_to_write_flags'; did you mean 'do_pipe_flags'? [-Werror=implicit-function-declaration]
+              REQ_OP_WRITE | wbc_to_write_flags(wbc),
+                             ^~~~~~~~~~~~~~~~~~
+                             do_pipe_flags
+   fs/iomap/buffered-io.c:1629:2: error: implicit declaration of function 'wbc_init_bio'; did you mean 'arc_init_IRQ'? [-Werror=implicit-function-declaration]
+     wbc_init_bio(wbc, bio);
+     ^~~~~~~~~~~~
+     arc_init_IRQ
+   fs/iomap/buffered-io.c: In function 'iomap_add_to_ioend':
+   fs/iomap/buffered-io.c:1748:2: error: implicit declaration of function 'wbc_account_cgroup_owner'; did you mean 'pr_cont_cgroup_name'? [-Werror=implicit-function-declaration]
+     wbc_account_cgroup_owner(wbc, folio, len);
+     ^~~~~~~~~~~~~~~~~~~~~~~~
+     pr_cont_cgroup_name
+   fs/iomap/buffered-io.c: In function 'iomap_writepages':
+>> fs/iomap/buffered-io.c:1965:18: error: implicit declaration of function 'writeback_iter'; did you mean 'write_lock_irq'? [-Werror=implicit-function-declaration]
+     while ((folio = writeback_iter(mapping, wbc, folio, &error)))
+                     ^~~~~~~~~~~~~~
+                     write_lock_irq
+>> fs/iomap/buffered-io.c:1965:16: warning: assignment to 'struct folio *' from 'int' makes pointer from integer without a cast [-Wint-conversion]
+     while ((folio = writeback_iter(mapping, wbc, folio, &error)))
+                   ^
+   cc1: some warnings being treated as errors
 
 
-This leads more digging, and to my surprise using bdev's page cache to=20
-do superblock IOs is not an exception, in fact f2fs is doing exactly the=
-=20
-same thing.
+vim +642 fs/iomap/buffered-io.c
 
+8306a5f5630552 Matthew Wilcox (Oracle  2021-04-28  634) 
+4ce02c67972211 Ritesh Harjani (IBM     2023-07-10  635) bool iomap_dirty_folio(struct address_space *mapping, struct folio *folio)
+4ce02c67972211 Ritesh Harjani (IBM     2023-07-10  636) {
+4ce02c67972211 Ritesh Harjani (IBM     2023-07-10  637) 	struct inode *inode = mapping->host;
+4ce02c67972211 Ritesh Harjani (IBM     2023-07-10  638) 	size_t len = folio_size(folio);
+4ce02c67972211 Ritesh Harjani (IBM     2023-07-10  639) 
+4ce02c67972211 Ritesh Harjani (IBM     2023-07-10  640) 	ifs_alloc(inode, folio, 0);
+4ce02c67972211 Ritesh Harjani (IBM     2023-07-10  641) 	iomap_set_range_dirty(folio, 0, len);
+4ce02c67972211 Ritesh Harjani (IBM     2023-07-10 @642) 	return filemap_dirty_folio(mapping, folio);
+4ce02c67972211 Ritesh Harjani (IBM     2023-07-10  643) }
+4ce02c67972211 Ritesh Harjani (IBM     2023-07-10  644) EXPORT_SYMBOL_GPL(iomap_dirty_folio);
+4ce02c67972211 Ritesh Harjani (IBM     2023-07-10  645) 
 
-This makes me wonder:
-
-- Should a fs use bdev's page cache directly?
-   I thought a fs shouldn't do this, and bio interface should be
-   enough for most if not all cases.
-
-   Or am I wrong in the first place?
-
-- What is keeping fs super block update from racing with user space
-   device scan?
-
-   I guess it's the regular page/folio locking of the bdev page cache.
-   But that also means, pure bio based IO will always race with buffered
-   read of a block device.
-
-- If so, is there any special bio flag to prevent such race?
-   So far I am unable to find out such flag.
-
-Thanks,
-Qu
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
