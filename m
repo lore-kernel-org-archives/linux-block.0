@@ -1,155 +1,159 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 449F8239E9F;
-	Wed,  9 Jul 2025 18:27:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D13D242925;
+	Wed,  9 Jul 2025 20:00:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752085627; cv=none; b=PE7yM6YPwhxwHNxSnq1azuZlz5wglWl4YZUxvkTiUN29Mj21N9Wtgio+fE9TQm9LlzhmMrcfyEK3hxjuyrPSOYw3xlErJ4hJE+2fWkgXyinjtOU+h4388jLexbesUbyG1u6qOpn37/tYHCJBesHiXC6S2dCj8CCsZ1jOo7HBBGU=
+	t=1752091209; cv=none; b=Q+fwuauOc7pKJay75tW127qNQbNMaqlkaVf1NlAPfJAsEdlmWvUYCVk0U3lRqGvalXi+cVm0iuCg1M2w2A45Dt0VGBX1IW14tUbsLwt1/HkloHkW+7iglvni51dG18GHBK9sSLaO7bgBasPRF1qgfVzq7v3jS7R2ZCsPa+mRTKI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752085627; c=relaxed/simple;
-	bh=TkEtI4TBo+oLh+9EDnF1wp+1HPKjhz3UEa6azIGpx8s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K4URxisy5Rs08+FHRIDSGDDc5xKdzbNUEt9+KA851WyR0yaZTQ1LYt9MpRnGEu8W1il2mxCiMlix3SKcB6POPTUIzpAeZCF37J4v3bJCu3PeHUJfysLANmwcz5np6AYlb3SE5cudIw0wKVWAfrXbnukznIJvAwEZiUV0WHcuimY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A0eLWdrX; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1752091209; c=relaxed/simple;
+	bh=3uVzBwpZOZRwh4aQxcecwTnih0t2Su/HW/bH4b6okHs=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=CwafkeQoLvCiqi6qqxe5bup/RfEaTApkYa2x7oJRIw2DTbprgf1MFQnIdaI2zmCuI1pi1/MG7sDiQ+t4CxMqgKKLwO2VfrAtQfz2rse4CbiwFp3VsPlnZTRCMQ1kmEsw1eKYrkiImD5qtIoudosQPII8JVFHKsDdqC0Ci3OHggU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fxYA5y3U; arc=none smtp.client-ip=209.85.160.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A0eLWdrX"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF20CC4CEF4;
-	Wed,  9 Jul 2025 18:27:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752085626;
-	bh=TkEtI4TBo+oLh+9EDnF1wp+1HPKjhz3UEa6azIGpx8s=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=A0eLWdrX2EjFSwq0YRgjpLMGmLYq9wZ/5E1px/SdSaCuRcpGJhnSpY8Av8ZaTHqnF
-	 2uanjGMyhegxve7PCLAzmnAJEd4kQMd0IiqGJ9tI2Vj2UPsTM+oMXiK8QoCyhUwQl/
-	 Dfonxy1bBUy7AsVN/OT/ASxMcZ0SViomyGzvHtmu8g/8m/Zx1/AVhjFdSle0slHTAt
-	 +GwxwOSxKqU4/aW2UujOh/Hc3WHYx9pWBjMtxs1CMtHussLvrBzR5HN9Cfi9Qn4FXS
-	 0XSYsbHW8a8Untd/Sgxnm68Px4swGCddzbFY3Hn/sNUyRnTBOCcbrpFWZJ4lYn5S2w
-	 Q6Ge/2SbPzkYQ==
-Date: Wed, 9 Jul 2025 11:27:06 -0700
-From: "Darrick J. Wong" <djwong@kernel.org>
-To: Arnd Bergmann <arnd@kernel.org>
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-	Anuj Gupta <anuj20.g@samsung.com>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	Kanchan Joshi <joshi.k@samsung.com>, ltp@lists.linux.it,
-	dan.carpenter@linaro.org, benjamin.copeland@linaro.org,
-	rbm@suse.com, Arnd Bergmann <arnd@arndb.de>,
-	Naresh Kamboju <naresh.kamboju@linaro.org>,
-	Anders Roxell <anders.roxell@linaro.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	Pavel Begunkov <asml.silence@gmail.com>,
-	Christian Brauner <brauner@kernel.org>,
-	Alexey Dobriyan <adobriyan@gmail.com>,
-	Eric Biggers <ebiggers@google.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] block: fix FS_IOC_GETLBMD_CAP parsing in
- blkdev_common_ioctl()
-Message-ID: <20250709182706.GF2672070@frogsfrogsfrogs>
-References: <20250709181030.236190-1-arnd@kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fxYA5y3U"
+Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-4a58d95ea53so4621121cf.0;
+        Wed, 09 Jul 2025 13:00:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1752091206; x=1752696006; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=bBPH7FnIuiVsSiPlIYMq7bGgWWPkIuqhlOH0NbxWPbw=;
+        b=fxYA5y3UDUVFv6Pv8RlqOzUHQ/OmovWiTmdc7NW0VmR5gEKuZ2JpNrEQ00/vMos7gj
+         8Cza2Gwf0PovjOkfVV338D4MMvdFA0b/iWiv9qo3JSkGhL1b+mqYtieEWvI/48UVkI5f
+         96uCMe09OmLzz1GmoPqvCh32Ymx7vjzWRfdUqS6nSXnydLl9WCZbET+jdJ0HDPAgOoOL
+         Kk9iMXZXE7/ByFWh/mlfvKcr8LfDSHEE0QVKcZRdeXtq3wyK+Lw8OoFMN0JuZXFGer6B
+         l83IyEAWNqjTScwR/z+9vLYaNZHwZgsOUEL08YIHty0cy2bNh1HSG35Ch08vElWTOMGI
+         uUGw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752091206; x=1752696006;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=bBPH7FnIuiVsSiPlIYMq7bGgWWPkIuqhlOH0NbxWPbw=;
+        b=mWRzqCU4jBtLGF/Bmm450xHktZiImyZZff13AtqXH8ysAOJyFSGcVxNYfFjDlCXgtm
+         xsFCet06tl5/kVOjAoEmh6WHgE2+ILt7toGGxZIfeomCV2QWYBZG2iEKKIRt2FdCsLdX
+         0H157k245wOE2cuXLW2LXyf6zw33wvQt/4D3ehRk0kACM50NAGWDaacvc3eh3jifpfAS
+         112dK9KMONz0WlkyVmeoPlsqOmuiBqOKNnJ7vQ5H3llgq6WWfbhel20SptfCZ1X3+gOO
+         jAFk8oRhJjq9LizXglsNz0z3r4pHlnfQk4O2venfQvz6GKTeaEBrWjYCX0IPo/hmzBYH
+         mCVw==
+X-Forwarded-Encrypted: i=1; AJvYcCVRGksgJSdaaabxZAkofWZ5wuTLYS30JAkOo/MrOJlevaBQGCepGNEJSG3dvSBxHR95RDTyDUKp0Do4YlyPITQ=@vger.kernel.org, AJvYcCW3PvsGxDi88jMsNRPpRYI+LvMZA174snp4fJZPsdmuquLAvqf3kBYNlFxZPGueyws+4vhAxUAG35sH0A==@vger.kernel.org, AJvYcCWO57qZbBwZ7+/YBGUb+oVo0sNPTAXgP4EkgHUwvnRwdDRpMkxyg4RJqutU8WjHRgtfdHAiOmvYETliXW7VLl8k@vger.kernel.org, AJvYcCWhq1AgCm6hjjAQ/Skrgwp+HZ/zzALqzWKN8upjInUIAV3chY84pMITx2EFC9YSgqQ1ThC1a8rbZtSWS6/l@vger.kernel.org
+X-Gm-Message-State: AOJu0YyePcmtkN4xJCUO6QKcQ7dH4NsCLiD1jKfSV/9Mw2DdEnWwr2Xm
+	myuUPwj4UPu0ZM6VvNuxzXjbds/ak0IbBm/+AONAEol2R2avJFUBzcdd
+X-Gm-Gg: ASbGncu+XlJJvZpmpmOaqCINq4/hxg6FvvdF818DKbt4VDu/4V6G+5TMlxTsaFnzWjp
+	Do21N/x7T10pEVnZ+L9oEA0eeeKEBbmcUXaFmVcPwUMqJQvnbN0EIN4foJ0juVu8/AA11UY/HrO
+	cCP8tUn4Qn5ujEegfFqkcr8f7d4PvVg1ExKY8FMVlemyr3s7BQIFgWrceq+rHmR+tIkcyrF8m2P
+	0thbnAJamavYXfuEX5N+JmNOowxdP6GI8g2hgsL3BrxdieaVAX0svcWeCA8soEK3Yb1TfW84ISo
+	YWLOE+GynoFIBaWHVvWchwGljGfSPbYj+owdzP7FA90HTOGbxOPNfsn1/kRyj/E/JXa4/fjwbac
+	MEkx628cls/Oi8YGmXVh3ckllHk3UqbDsLshTQQ+okvnal4Vul/Q7uhz7dA==
+X-Google-Smtp-Source: AGHT+IEjvhAx4Fexn1s+7YjFkkN49k26NgQzpiKzVdxw5gpNGSXQ/darWIe+uClarfZ+hMNJzu4LEQ==
+X-Received: by 2002:a05:622a:53c4:b0:4a7:6408:b449 with SMTP id d75a77b69052e-4a9e9bf79afmr13743511cf.2.1752091206317;
+        Wed, 09 Jul 2025 13:00:06 -0700 (PDT)
+Received: from 1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa ([148.76.185.197])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4a9949e4aaasm100432891cf.3.2025.07.09.13.00.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 09 Jul 2025 13:00:05 -0700 (PDT)
+From: Tamir Duberstein <tamird@gmail.com>
+Subject: [PATCH 0/9] rust: use `kernel::{fmt,prelude::fmt!}`
+Date: Wed, 09 Jul 2025 15:59:59 -0400
+Message-Id: <20250709-core-cstr-fanout-1-v1-0-64308e7203fc@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250709181030.236190-1-arnd@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAD/KbmgC/02OzQ7CIBAGX6XZsySwpaz0VYwHfhblYKvQGpOm7
+ y5RDx5nk51vNqhcMlcYuw0KP3PN89RAHToIVzddWOTYGFDiIElaEebCItSliOSmeV2EEgmlUer
+ YIxJCe7wXTvn1kZ7OXy78WJt7+R7Bu9ok8+2Wl7EjY7lH7Y3xMlqMUqdeDVEGPTiZCKmnQNpq+
+ G8au1+R/itqQ3fXwHrLxpGPA/H4VHDe9zfyzQPq6QAAAA==
+X-Change-ID: 20250709-core-cstr-fanout-1-f20611832272
+To: Danilo Krummrich <dakr@kernel.org>, David Airlie <airlied@gmail.com>, 
+ Simona Vetter <simona@ffwll.ch>, Miguel Ojeda <ojeda@kernel.org>, 
+ Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, 
+ Gary Guo <gary@garyguo.net>, 
+ =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+ Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
+ Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
+ Jens Axboe <axboe@kernel.dk>, 
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ "Rafael J. Wysocki" <rafael@kernel.org>, 
+ Brendan Higgins <brendan.higgins@linux.dev>, 
+ David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>
+Cc: nouveau@lists.freedesktop.org, dri-devel@lists.freedesktop.org, 
+ linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org, 
+ linux-block@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+ kunit-dev@googlegroups.com, Tamir Duberstein <tamird@gmail.com>
+X-Mailer: b4 0.15-dev
+X-Developer-Signature: v=1; a=openssh-sha256; t=1752091203; l=2543;
+ i=tamird@gmail.com; h=from:subject:message-id;
+ bh=3uVzBwpZOZRwh4aQxcecwTnih0t2Su/HW/bH4b6okHs=;
+ b=U1NIU0lHAAAAAQAAADMAAAALc3NoLWVkMjU1MTkAAAAgtYz36g7iDMSkY5K7Ab51ksGX7hJgs
+ MRt+XVZTrIzMVIAAAAGcGF0YXR0AAAAAAAAAAZzaGE1MTIAAABTAAAAC3NzaC1lZDI1NTE5AAAA
+ QOFx1gBF76r4ZDYB2EZOTwsUwSVSVp3sKW88+0lIx1FnbguWzfge/GtyFqlJhS0kWl0FJEONZDI
+ dw5ZmS5n/ygg=
+X-Developer-Key: i=tamird@gmail.com; a=openssh;
+ fpr=SHA256:264rPmnnrb+ERkS7DDS3tuwqcJss/zevJRzoylqMsbc
 
-On Wed, Jul 09, 2025 at 08:10:14PM +0200, Arnd Bergmann wrote:
-> From: Arnd Bergmann <arnd@arndb.de>
-> 
-> Anders and Naresh found that the addition of the FS_IOC_GETLBMD_CAP
-> handling in the blockdev ioctl handler breaks all ioctls with
-> _IOC_NR==2, as the new command is not added to the switch but only
-> a few of the command bits are check.
-> 
-> Refine the check to also validate the direction/type/length bits,
-> but still allow all supported sizes for future extensions.
-> 
-> Move the new command to the end of the function to avoid slowing
-> down normal ioctl commands with the added branches.
-> 
-> Fixes: 9eb22f7fedfc ("fs: add ioctl to query metadata and protection info capabilities")
-> Link: https://lore.kernel.org/all/CA+G9fYvk9HHE5UJ7cdJHTcY6P5JKnp+_e+sdC5U-ZQFTP9_hqQ@mail.gmail.com/
-> Reported-by: Naresh Kamboju <naresh.kamboju@linaro.org>
-> Cc: Anders Roxell <anders.roxell@linaro.org>
-> Cc: Naresh Kamboju <naresh.kamboju@linaro.org>
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> ---
-> It seems that we have a lot of drivers with the same bug, as the
-> large majority of all _IOC_NR() users in the kernel fail to also
-> check the other bits of the ioctl command code. There are currently
-> 55 files referencing _IOC_NR, and they all need to be manually
-> checked for this problem.
-> ---
->  block/ioctl.c | 14 +++++++++-----
->  1 file changed, 9 insertions(+), 5 deletions(-)
-> 
-> diff --git a/block/ioctl.c b/block/ioctl.c
-> index 9ad403733e19..5e5a422bd09f 100644
-> --- a/block/ioctl.c
-> +++ b/block/ioctl.c
-> @@ -567,9 +567,6 @@ static int blkdev_common_ioctl(struct block_device *bdev, blk_mode_t mode,
->  {
->  	unsigned int max_sectors;
->  
-> -	if (_IOC_NR(cmd) == _IOC_NR(FS_IOC_GETLBMD_CAP))
-> -		return blk_get_meta_cap(bdev, cmd, argp);
-> -
->  	switch (cmd) {
->  	case BLKFLSBUF:
->  		return blkdev_flushbuf(bdev, cmd, arg);
-> @@ -647,9 +644,16 @@ static int blkdev_common_ioctl(struct block_device *bdev, blk_mode_t mode,
->  		return blkdev_pr_preempt(bdev, mode, argp, true);
->  	case IOC_PR_CLEAR:
->  		return blkdev_pr_clear(bdev, mode, argp);
-> -	default:
-> -		return -ENOIOCTLCMD;
->  	}
-> +
-> +	if (_IOC_DIR(cmd)  == _IOC_DIR(FS_IOC_GETLBMD_CAP) &&
-> +	    _IOC_TYPE(cmd) == _IOC_TYPE(FS_IOC_GETLBMD_CAP) &&
-> +	    _IOC_NR(cmd)   == _IOC_NR(FS_IOC_GETLBMD_CAP) &&
+This is series 2a/5 of the migration to `core::ffi::CStr`[0].
+20250704-core-cstr-prepare-v1-0-a91524037783@gmail.com.
 
-I think this problem was introduced by brauner trying to persuade people
-to perform size independent dispatch of ioctls:
+This series depends on the prior series[0] and is intended to go through
+the rust tree to reduce the number of release cycles required to
+complete the work.
 
-       switch (_IOC_NR(cmd)) {
-       case _IOC_NR(FS_IOC_FSGETXATTR):
-               if (WARN_ON_ONCE(_IOC_TYPE(cmd) != _IOC_TYPE(FS_IOC_FSGETXATTR)))
-                       return SOMETHING_SOMETHING;
-               /* Only handle original size. */
-               return ioctl_fsgetxattr(filp, argp);
+Subsystem maintainers: I would appreciate your `Acked-by`s so that this
+can be taken through Miguel's tree (where the other series must go).
 
-https://lore.kernel.org/linux-xfs/20250515-bedarf-absagen-464773be3e72@brauner/
+[0] https://lore.kernel.org/all/20250704-core-cstr-prepare-v1-0-a91524037783@gmail.com/
 
-though we probably want a helper or something to encapsulate those three
-comparisons to avoid the SOMETHING_SOMETHING part:
+Signed-off-by: Tamir Duberstein <tamird@gmail.com>
+---
+Tamir Duberstein (9):
+      gpu: nova-core: use `kernel::{fmt,prelude::fmt!}`
+      rust: alloc: use `kernel::{fmt,prelude::fmt!}`
+      rust: block: use `kernel::{fmt,prelude::fmt!}`
+      rust: device: use `kernel::{fmt,prelude::fmt!}`
+      rust: file: use `kernel::{fmt,prelude::fmt!}`
+      rust: kunit: use `kernel::{fmt,prelude::fmt!}`
+      rust: pin-init: use `kernel::{fmt,prelude::fmt!}`
+      rust: seq_file: use `kernel::{fmt,prelude::fmt!}`
+      rust: sync: use `kernel::{fmt,prelude::fmt!}`
 
-#define IOC_DISPATCH(c) \
-	((c) & ~(_IOC(0, 0, 0, _IOC_SIZE(_IOC_SIZEMASK))))
+ drivers/block/rnull.rs               | 2 +-
+ drivers/gpu/nova-core/gpu.rs         | 3 +--
+ drivers/gpu/nova-core/regs/macros.rs | 6 +++---
+ rust/kernel/alloc/kbox.rs            | 2 +-
+ rust/kernel/alloc/kvec.rs            | 2 +-
+ rust/kernel/alloc/kvec/errors.rs     | 2 +-
+ rust/kernel/block/mq.rs              | 2 +-
+ rust/kernel/block/mq/gen_disk.rs     | 2 +-
+ rust/kernel/block/mq/raw_writer.rs   | 3 +--
+ rust/kernel/device.rs                | 6 +++---
+ rust/kernel/fs/file.rs               | 5 +++--
+ rust/kernel/init.rs                  | 4 ++--
+ rust/kernel/kunit.rs                 | 8 ++++----
+ rust/kernel/seq_file.rs              | 6 +++---
+ rust/kernel/sync/arc.rs              | 3 +--
+ scripts/rustdoc_test_gen.rs          | 2 +-
+ 16 files changed, 28 insertions(+), 30 deletions(-)
+---
+base-commit: 769e324b66b0d92d04f315d0c45a0f72737c7494
+change-id: 20250709-core-cstr-fanout-1-f20611832272
+prerequisite-change-id: 20250704-core-cstr-prepare-9b9e6a7bd57e:v1
+prerequisite-patch-id: 83b1239d1805f206711a5a936bbb61c83227d573
+prerequisite-patch-id: a0355dd0efcc945b0565dc4e5a0f42b5a3d29c7e
+prerequisite-patch-id: 8585bf441cfab705181f5606c63483c2e88d25aa
+prerequisite-patch-id: 04ec344c0bc23f90dbeac10afe26df1a86ce53ec
+prerequisite-patch-id: a2fc6cd05fce6d6da8d401e9f8a905bb5c0b2f27
+prerequisite-patch-id: f14c099c87562069f25fb7aea6d9aae4086c49a8
 
-	switch (IOC_DISPATCH(cmd)) {
-	case IOC_DISPATCH(FS_IOC_FSGETXATTR):
-		return ioctl_fsgetxattr(filp, cmd, argp);
+Best regards,
+--  
+Tamir Duberstein <tamird@gmail.com>
 
-Assuming that ioctl_fsgetxattr derives size from @cmd and rejects values
-that it doesn't like.  Hrm?
-
-> +	    _IOC_SIZE(cmd) >= LBMD_SIZE_VER0 &&
-> +	    _IOC_SIZE(cmd) <= _IOC_SIZE(FS_IOC_GETLBMD_CAP))
-
-blk_get_meta_cap already checks this.
-
---D
-
-> +		return blk_get_meta_cap(bdev, cmd, argp);
-> +
-> +	return -ENOIOCTLCMD;
->  }
->  
->  /*
-> -- 
-> 2.39.5
-> 
