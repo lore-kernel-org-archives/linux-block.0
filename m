@@ -1,79 +1,162 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fhigh-b5-smtp.messagingengine.com (fhigh-b5-smtp.messagingengine.com [202.12.124.156])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70E245661;
-	Wed,  9 Jul 2025 20:18:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B57C23BD13;
+	Wed,  9 Jul 2025 20:31:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.156
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752092303; cv=none; b=J1lPhZfhBf+yKy5Sz5cP3ha2BUZLpUx3Mqusovo8ppusftf0n0NongsHDeAU3Hi076mk/1JHLEBy6jnFf19gicOvpFSlkphQSm9ShDPkIBy0cdaqLrLXTWWA0dXT6QqEEWU6dyNz0qAvxUqcnTON3HjjUAzZQFNpjw2FGDGvcDU=
+	t=1752093076; cv=none; b=oPH6fxGyy8JiFclfUyqL2TxD6xxaWDAz7GMMx8QE3+FGiK/ytSMJnNfaTkDN+sTJ7dRMAH2w9IW8PT3L7MQ9jArl28orlM+5j+6VJhN2P6CnW0cXzeyv4XBc0hKtDoROuu+6QOdwyEgRlZ4wLbl/w4vCqv8Vh43Ob3s2/s58D5s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752092303; c=relaxed/simple;
-	bh=6CR39NgMbcKd+hNEk754/31daJAAsaoy5EewA9veMuM=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=j9XiYBtrX6Vy3P5BRWHoo8IkFJdQX3e+vc8LrlvpEwUS4CskfcYdzRbE36+yIVmnzXgivhOsmErApzOGGMPXwRUZTntdgRPRqQF6P+9SyOfu+WGks6r1UTGXh9yd5t/g2TeWcbkbQNyewspdwCWz7zmgCn3BAExPpkLYEbog7zA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Pe4a+AP/; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1752093076; c=relaxed/simple;
+	bh=6Tz614NpehH6aczQmxQyMihVZ7CmfcI4Z562x5DJW+s=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=u6Qe+mMPcFWGkXUgnB+kwDC4FvZsjKWgGPiIXQ+8bMq8EfQ/FBYfB4KlbsrB9ove4iAiajt0jPkd8wt6LB36WSX/DrLzOp1bivpzhzVdst252IdcWwueHs3ecEcVPLLiq6qsyBsc/4+5PRLeexAWV7W5wFjRwd2DQ4JiAMU8XQY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=GzVYg66v; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=iT/xiKGb; arc=none smtp.client-ip=202.12.124.156
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Pe4a+AP/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7AC1EC4CEEF;
-	Wed,  9 Jul 2025 20:18:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752092303;
-	bh=6CR39NgMbcKd+hNEk754/31daJAAsaoy5EewA9veMuM=;
-	h=Date:Cc:Subject:From:To:References:In-Reply-To:From;
-	b=Pe4a+AP/AhHZk8t3rcsQ/1og7b4y1QwCzYv9LFgXa2mAX2gu6d7A0Xs9OyPXQZy7K
-	 5VFRoHNeV9ZcKEPC0jgo5/NfIB64qHe7+tT6ijzH57rfE3sDK03oZ/8iyee9gBS+yr
-	 36Ec820desW6oCWxV8dvLg1756m/lIaPWuxkVrYiTiAK42zKPeN36M7nJINbjJ3yGp
-	 PgOhN82d0Z/wsQV2oDvoi3wwkO2m0XjGEGDumc49dZ3z026mBGcsBAbGEXOaYp9Xg8
-	 vwR/AFk/vyVRa/PRYs22GULSAX62oY0DYSNTQ0wO/QLVUKLTWGLhBuX3st95jJNXNu
-	 Olt8kO8GVPGcA==
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="GzVYg66v";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="iT/xiKGb"
+Received: from phl-compute-05.internal (phl-compute-05.phl.internal [10.202.2.45])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id E3B4C7A0026;
+	Wed,  9 Jul 2025 16:31:11 -0400 (EDT)
+Received: from phl-imap-02 ([10.202.2.81])
+  by phl-compute-05.internal (MEProxy); Wed, 09 Jul 2025 16:31:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm1; t=1752093071;
+	 x=1752179471; bh=llWN7pp7aG8O86Zdueocuq+HHi9GtObRXw5Q6xFES9w=; b=
+	GzVYg66v0Kt4dpjX55f7iOuq5EVY2oP4JgRptCTQcb5nzz3i7Fjzvyh3AyTS8jrR
+	xkJds4514NzxlftiOAQpGI5K3wqlL/qh4bsRR3szkwbGi2O5eFuXLBng8WxtxBYt
+	OM8rvADWIEHyGFofs+2Rz9YRWoNLLET3/PzjPuOAX+pUuX++sanAquruw8OXeaOP
+	p4bEJft9Q2krlf4ZzegRYZtecJ+xUZp9TwMAZDNRhQ9M+glyO29X4mTEggx2vUkD
+	gOMuYAvRqfIwNP6BsWlSoE2M6+YjBiabBIziatnKcIZcLOpUCqGiQ8JljIooc62v
+	p7J7qS1FsgoOgBu0+VAygw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1752093071; x=
+	1752179471; bh=llWN7pp7aG8O86Zdueocuq+HHi9GtObRXw5Q6xFES9w=; b=i
+	T/xiKGbREElYeICO1GVUd8Wbc9/JdYb7S4JmpTpoWkZIga+XJ+7Cym/uMEvqNLCp
+	pQVrO1GfTBYwku6kWCcjkoPbb/Aw82ibuV8b4NVGYT2oGnzfli2qSJW46Yo0nU4h
+	4OzgEiAi+LGy13vMdyjNViFQNSgQVS5tvaORatsyWgcMoA2dBoWphLJ1fO59TYjs
+	JnxS650QpAD2JO68ruY8FbQJsKbNoGLJhY/DI+8hXoP9lBeyvGghdCWoqDFMdbm9
+	u5ILFbAdPFZfuW32a7xSs7rU9OkgCLXkNtqnB9FO9g1YJ+0yCBWN7SJX2QUonbGE
+	Bz7jQQi/r713VZiqLSaiA==
+X-ME-Sender: <xms:jtFuaEelBli-5kOnOZB6hhPcG6fCxWVNB6rHWs67jQaJpKUZKB6dew>
+    <xme:jtFuaGNFvKphXetz-u55UIOwy3Z_psjqLhWAqia69D2hjdFWgNg_8mjjLLqNgKr1H
+    ch_E6h4MhZoJ_xSa3Y>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgdefkeehfecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
+    hrpefoggffhffvvefkjghfufgtgfesthejredtredttdenucfhrhhomhepfdetrhhnugcu
+    uegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrghtthgvrh
+    hnpefhtdfhvddtfeehudekteeggffghfejgeegteefgffgvedugeduveelvdekhfdvieen
+    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrhhnug
+    esrghrnhgusgdruggvpdhnsggprhgtphhtthhopeduledpmhhouggvpehsmhhtphhouhht
+    pdhrtghpthhtoheprgguohgsrhhihigrnhesghhmrghilhdrtghomhdprhgtphhtthhope
+    grshhmlhdrshhilhgvnhgtvgesghhmrghilhdrtghomhdprhgtphhtthhopegvsghighhg
+    vghrshesghhoohhglhgvrdgtohhmpdhrtghpthhtoheprgigsghovgeskhgvrhhnvghlrd
+    gukhdprhgtphhtthhopegrrhhnugeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepsghr
+    rghunhgvrheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepughjfihonhhgsehkvghrnh
+    gvlhdrohhrghdprhgtphhtthhopegrnhguvghrshdrrhhogigvlhhlsehlihhnrghrohdr
+    ohhrghdprhgtphhtthhopegsvghnjhgrmhhinhdrtghophgvlhgrnhgusehlihhnrghroh
+    drohhrgh
+X-ME-Proxy: <xmx:jtFuaO6_FMAkDNEIbADE6FHbTV5t3LEdm25z6UdKWn1S2P48ExFB_A>
+    <xmx:jtFuaNCADNtE1ya6ZR9w3QASJia8WSPQujdxLUarZzB7CgJvkqnpog>
+    <xmx:jtFuaAaQnxw7iVxXR1yNvntVrGI-hWB1n-KYgVMrIbWGx8ES2RChyg>
+    <xmx:jtFuaBL_Kbi20z6ONoLdImTLKa8rvSCSVC8ruSu5T5Go51WmS-C6Rg>
+    <xmx:j9FuaKudRgcrBp3K67bNCujH_k1ZtWuyRy2tn6FLgBReOHoOiMT8hM4b>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id 65A0A700065; Wed,  9 Jul 2025 16:31:10 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Wed, 09 Jul 2025 22:18:16 +0200
-Message-Id: <DB7SVTBZ46QB.31WTHFLWDHPZY@kernel.org>
-Cc: <nouveau@lists.freedesktop.org>, <dri-devel@lists.freedesktop.org>,
- <linux-kernel@vger.kernel.org>, <rust-for-linux@vger.kernel.org>,
- <linux-block@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
- <kunit-dev@googlegroups.com>
-Subject: Re: [PATCH 7/9] rust: pin-init: use `kernel::{fmt,prelude::fmt!}`
-From: "Benno Lossin" <lossin@kernel.org>
-To: "Tamir Duberstein" <tamird@gmail.com>, "Danilo Krummrich"
- <dakr@kernel.org>, "David Airlie" <airlied@gmail.com>, "Simona Vetter"
- <simona@ffwll.ch>, "Miguel Ojeda" <ojeda@kernel.org>, "Alex Gaynor"
- <alex.gaynor@gmail.com>, "Boqun Feng" <boqun.feng@gmail.com>, "Gary Guo"
- <gary@garyguo.net>, =?utf-8?q?Bj=C3=B6rn_Roy_Baron?=
- <bjorn3_gh@protonmail.com>, "Andreas Hindborg" <a.hindborg@kernel.org>,
- "Alice Ryhl" <aliceryhl@google.com>, "Trevor Gross" <tmgross@umich.edu>,
- "Jens Axboe" <axboe@kernel.dk>, "Greg Kroah-Hartman"
- <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>,
- "Brendan Higgins" <brendan.higgins@linux.dev>, "David Gow"
- <davidgow@google.com>, "Rae Moar" <rmoar@google.com>
-X-Mailer: aerc 0.20.1
-References: <20250709-core-cstr-fanout-1-v1-0-64308e7203fc@gmail.com>
- <20250709-core-cstr-fanout-1-v1-7-64308e7203fc@gmail.com>
-In-Reply-To: <20250709-core-cstr-fanout-1-v1-7-64308e7203fc@gmail.com>
+MIME-Version: 1.0
+X-ThreadId: Tfdac8457399410f6
+Date: Wed, 09 Jul 2025 22:30:40 +0200
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Darrick J. Wong" <djwong@kernel.org>, "Arnd Bergmann" <arnd@kernel.org>
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+ "Anuj Gupta" <anuj20.g@samsung.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ "Kanchan Joshi" <joshi.k@samsung.com>, "LTP List" <ltp@lists.linux.it>,
+ "Dan Carpenter" <dan.carpenter@linaro.org>,
+ "Benjamin Copeland" <benjamin.copeland@linaro.org>, rbm@suse.com,
+ "Naresh Kamboju" <naresh.kamboju@linaro.org>,
+ "Anders Roxell" <anders.roxell@linaro.org>, "Jens Axboe" <axboe@kernel.dk>,
+ "Pavel Begunkov" <asml.silence@gmail.com>,
+ "Christian Brauner" <brauner@kernel.org>,
+ "Alexey Dobriyan" <adobriyan@gmail.com>,
+ "Eric Biggers" <ebiggers@google.com>, linux-kernel@vger.kernel.org
+Message-Id: <290c17df-1bf2-45b8-b0c2-7a1865585d0a@app.fastmail.com>
+In-Reply-To: <20250709182706.GF2672070@frogsfrogsfrogs>
+References: <20250709181030.236190-1-arnd@kernel.org>
+ <20250709182706.GF2672070@frogsfrogsfrogs>
+Subject: Re: [PATCH] block: fix FS_IOC_GETLBMD_CAP parsing in blkdev_common_ioctl()
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-On Wed Jul 9, 2025 at 10:00 PM CEST, Tamir Duberstein wrote:
-> Reduce coupling to implementation details of the formatting machinery by
-> avoiding direct use for `core`'s formatting traits and macros.
+On Wed, Jul 9, 2025, at 20:27, Darrick J. Wong wrote:
+> On Wed, Jul 09, 2025 at 08:10:14PM +0200, Arnd Bergmann wrote:
+
+> though we probably want a helper or something to encapsulate those three
+> comparisons to avoid the SOMETHING_SOMETHING part:
 >
-> Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Reviewed-by: Alice Ryhl <aliceryhl@google.com>
-> Signed-off-by: Tamir Duberstein <tamird@gmail.com>
-> ---
->  rust/kernel/init.rs | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+> #define IOC_DISPATCH(c) \
+> 	((c) & ~(_IOC(0, 0, 0, _IOC_SIZE(_IOC_SIZEMASK))))
+>
+> 	switch (IOC_DISPATCH(cmd)) {
+> 	case IOC_DISPATCH(FS_IOC_FSGETXATTR):
+> 		return ioctl_fsgetxattr(filp, cmd, argp);
+>
+> Assuming that ioctl_fsgetxattr derives size from @cmd and rejects values
+> that it doesn't like.  Hrm?
 
-I usually prefix patches to init.rs with `rust: init`. I'll fix it up
-when picking the patch or Miguel can do it if he takes it:
+This may work in specific cases, but it adds a lot of complexity
+and room for error if we try to do this in more places:
 
-Acked-by: Benno Lossin <lossin@kernel.org>
+Ignoring the 'size' argument as above would mean that
+each case now has to add an extra size check in each 'case',
+which then defeats the entire purpose.
 
----
-Cheers,
-Benno
+I should maybe dig out my notes for table-driver ioctl
+handlers, if we want to improve the way that drivers define
+their ioctl implementations, I'm sure there is some
+infrastructure we can come up with that can help here,
+but I don't think 'same as before but more macros' is the
+answer.
+
+joydev_ioctl_common() is an existing example doing something
+like it and gets it right, while snd_compr_ioctl() is an
+example that looks completely broken to me.
+
+>> +	    _IOC_SIZE(cmd) >= LBMD_SIZE_VER0 &&
+>> +	    _IOC_SIZE(cmd) <= _IOC_SIZE(FS_IOC_GETLBMD_CAP))
+>
+> blk_get_meta_cap already checks this.
+
+I had thought about removing it there, but decided against that.
+Maybe a better way would be to have the full check inside of 
+blk_get_meta_cap() and use the -ENOIOCTLCMD return code
+to keep the caller simple:
+
+   switch(cmd) {
+   ...
+   default:
+         break;
+   }
+   ret = blk_get_meta_cap(bdev, cmd, argp);
+   if (ret != -ENOIOCTLCMD)
+        return ret;
+   ...
+   return -ENOIOCTLCMD;
+
+       Arnd
