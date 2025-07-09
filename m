@@ -1,205 +1,187 @@
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48C8F1FC0F3
-	for <linux-block@vger.kernel.org>; Wed,  9 Jul 2025 06:47:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752043633; cv=none; b=b3VBub1/pgbuouDUjY5K6aPt43Ful0lsxNIVCrt4VLYDQd5uolzCVlWCNohsMViw0kPrFYzISjdkC6oPpfM0xuAoHVtG03M9U8Bn7Cef9BIm7eX9YO/xCahqUC/UygQikTH1HkTuK+F+T7FaQBrLcsNygY8ZXiaBk/3Z2HIp7X8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752043633; c=relaxed/simple;
-	bh=Ycs/LdLt9pIjnJP+ZUYjzwZzAu3aVjG6e47G3ZJFQGw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OlbO5rCIqYa6bjEh72xw0Twu6EYh6d9QE5WDcuT7N4ceJ+Wnux8BHnWVPaq9een82tvcby8UfqNeDQ4/T7aVwnPWxPTRNraEotQD1KtytfXiedp0zeY/Ur4oeCv9y9BuWqKmGIkWLp0bgrsMFKC+dMhdrz+7FTrMV1j6sU6t8wA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kyUZ2ppc; arc=none smtp.client-ip=209.85.218.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3F3178F36
+	for <linux-block@vger.kernel.org>; Wed,  9 Jul 2025 06:59:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=68.232.141.245
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752044376; cv=fail; b=uQc/K8CaBtM2G5IS4RbC9BQLK2MJ70R9oj/az4BtG+WKtSc6cC2iokdaWMuG7xGdLEdvalB2M7YIt95/3zf6C4RIeb6Cs1o8kVdmQC6+SwherUUVyfqz6av6TtKBt4oI3cp+Eif8OzM+0+wwTKgM//91utslVRV+icA52J4QTro=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752044376; c=relaxed/simple;
+	bh=K/FM3l7ZDjTEzUuRnzm/wZeu1ATS6Amwca4ef/LxScA=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=limNxUklTjHi+n1maKbhrDfu+8CjLpMtQ0IuQPk2W6q3GOXc37QgOmSurQjPI8GiBLmdfK66on/sxAwSTj3Jmdrqj73wLfWRDOjiXbyFakDXm5wIAaeGqR3OgWwdPnue2jzeQHHT5TK5QUYqOOjPoEbrirsMuo8AT+66B1d8iB4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=Q823n1W2; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=M82246NJ; arc=fail smtp.client-ip=68.232.141.245
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kyUZ2ppc"
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-ae0bc7aa21bso1111340066b.2
-        for <linux-block@vger.kernel.org>; Tue, 08 Jul 2025 23:47:10 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Q823n1W2";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="M82246NJ"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1752044374; x=1783580374;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=K/FM3l7ZDjTEzUuRnzm/wZeu1ATS6Amwca4ef/LxScA=;
+  b=Q823n1W271PZkbYbcn0ESH4Chql9VCOdMLL2T6TIqunzA97etJDa8/vk
+   QVlEhBzgUXqeseLvMuqwCtR3EJJBPyI/2DEHcEf0PQqUoemD9pLzIkMiC
+   Bhfu6WQWq5BO/+YTpkog5EuyHAHRSWMk+i03rLWlJ7DaiUgcxQN/y2AyT
+   ekbYSIaaN/xAHVtqcAWiupFPjvMuvzwY/U8l47FxnNNXPlSH9SzyuZn8N
+   n7U0xzRkaJqLNBM8Zi1OaW04m3N9wqIqmRfguGom0/ItCz/uf1TjSjm0E
+   qjlFhNVcU9GIDE49X3HQc8NotD1qaQmBt46XUl9yaj5DkN/foz+PeSQd/
+   w==;
+X-CSE-ConnectionGUID: 3aIsdO4gR8+5HRq6lr7sHw==
+X-CSE-MsgGUID: YIPqSET5Toa6BDxYQ6LF9w==
+X-IronPort-AV: E=Sophos;i="6.16,298,1744041600"; 
+   d="scan'208";a="85633766"
+Received: from mail-mw2nam12on2084.outbound.protection.outlook.com (HELO NAM12-MW2-obe.outbound.protection.outlook.com) ([40.107.244.84])
+  by ob1.hgst.iphmx.com with ESMTP; 09 Jul 2025 14:59:28 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=qmJfpj5hmrre3qsJ2hebWxCld2d05mL348JFDK7NQ7JgTZf43fWYh8CTTp+A1NwnjxbHhuVVCGoH79YQErd0RibG1izpyyBdT3Ii/emolFtWIkAY9UskdkobQKeEvuhXriWMnPnFDZNQEOSEiBVbHA90BfEVQwAYyAkEXmi6whARk8iFH50OIcQUUNj7Vig0GY0LJ9H+PfuY5Fvc6szRr0MgOAVnv8IUHhUhk8hFmffO6NxClL42DEFb1WzCSk+XwszFRbdo2Wwlb/AC+TAp0k4P9BiF5AnL64qnL8zzc1PtRQfSbJDQXatfM3mKxg8ziogMOgL0NKOLxKkiHBA7vA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=K/FM3l7ZDjTEzUuRnzm/wZeu1ATS6Amwca4ef/LxScA=;
+ b=QGUyks3sppweC6oudJn9AHRkGtUoDig9BSh4Mbwb4bIifhUnrCBLiwf0Q+QtMM6qLRBkmvvkGPpfDqNrCAX/c2nH5GFNpn5//0NU3Ej6hM0pKvhKJE3zOOeDNpUcZH0kT+yMISPTThT6aPSs7Oyk+xF9IPSWh1jWjY8W7vOmC1bkX0cLeOna6juCB7Boz+BWa8Op/1pjrCL4JiEenWJlH5nScbeI8cROvY4RIevF3Owfxjw7lZYLkXaQZXGRM6xQJZ+0Pg2+Ahl9UX4/c02pz4JoklBB6vFk4YVoHk+kk7+ZKhlS2MWPddAH5Orn0sKpaTEJDqb2+B0/x7nZeDvVQw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752043629; x=1752648429; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DMToQ0iAocdIAV7rRs7Yz+IQW4y93c34/s7OSSBdPqA=;
-        b=kyUZ2ppcGgI+bOnK0i03HvH5niM7E1FQBYGeIpDegFRsrnCaD7CzhwOc/P0e4H/8J6
-         r50Y9Q48j/WBHzOXn7/QSnHYk2yWOYoCsWHfeieEU+iZWLDezdBJpVqi8zWjddrtsVme
-         Q3YPWrd5T5L3AgvKWk17gEXqs0HIwycMj2bER7J1pVFPbzCzzEkvzStwq1jrE+cBN0wm
-         tbJhma3QF7DdZuGDpGhTkeD19tAbjBU5mEAus13M05bbgx2C8sXBy0gwz+i2OSCMLW7c
-         McJBBAhFSs2uOMsQDVJck4gnzCDZQYS2ad7MRyu7o4a4cVn1K5ibPAWTUbDVHwZ3BRpF
-         awTQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752043629; x=1752648429;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=DMToQ0iAocdIAV7rRs7Yz+IQW4y93c34/s7OSSBdPqA=;
-        b=MGiDU9C3HtqEd9p9G2jZQHHg7XUMVGRHTXmET50gw3M7IclJ4LdN7c9EH+GBXRaZ7d
-         Rtj2OA4/cjqSuA+mE4Ts7IMbLInZ/RHSdksuzK7JhR9VkOrmVxaoZ/dletRVyTwb1V0x
-         UTX3XVruqqyhoLnhNkjuOMQUtfC3dE7z5fj3FZYd6eJ+oQTxJw32cAaHVkwbwT/NP8jS
-         yGDK2gqejY0vlLMX9KvopCE6eQ4sRutOrBQyfXg3rx/jD2X9bxdqOJLdVeXFLYWeZpSN
-         RHX8/JTubTWeuAha+787ZvpRBC8szU78eDGOlHG8Nx7OsLaeLAX8joNE8IPLdr1wctud
-         drnw==
-X-Forwarded-Encrypted: i=1; AJvYcCV63yfw7LsSwEMLtj89TIC7VBa5e1PGzCC6CG2HbguAOse3VUsh7OqOe3hYtfg3wlpxSHTNtstkk56K/Q==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxy0eYQ93Q3+swP2iDDLAeNMH8M6bAZrEGt9VYdGR5jQpy/aDbj
-	3SSP9gwIAwbIP0cISD3Zs4nXtqffF4ycfosXecuJvAJhFt1RYPuababvbfqiML6kV/ntASLGOu4
-	eZ5loA6jCy6sPX2Y7Soh+xL6odxwzgt4=
-X-Gm-Gg: ASbGncvwFQDjOE+h6VxOYbRTLMp2vTlIGEO6+58poEsP1/ICR/U9Mu8Rrk+OO/L/3yR
-	Qyv/+i9WYMgyPHz/rXYNfo3aWnZi9/upHfSQkz2lPuHS4faDREMVxyiEzORVrPuLyGJTA/doBI6
-	l3cI6SSC0QUwRzYUC5FlALpS9YfvTFkXMT7rGFCeN5UhF9qZI4
-X-Google-Smtp-Source: AGHT+IF4vecSUGYpMY96tD4hiQceFs98SZUAJIWC7HbviNefU3qoFuVAcUUySEn1C5z3YLDJpSSbXAyUe+7iwAb29rQ=
-X-Received: by 2002:a17:907:d22:b0:ad8:e477:970c with SMTP id
- a640c23a62f3a-ae6cf69db80mr120031366b.23.1752043629281; Tue, 08 Jul 2025
- 23:47:09 -0700 (PDT)
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=K/FM3l7ZDjTEzUuRnzm/wZeu1ATS6Amwca4ef/LxScA=;
+ b=M82246NJ+tIxiLTjJbZ3VzuveLuvQwuplAbvC8m4Ed97TIeCLvUUV79ORsKnMa5BuFfw4f5zaASLFKO8kNOLdFOV1yFzbpz1tWD+ulx0okBkY13pKPwVrIzn1eh4OJ1RnD2fHIsEJOV395IpsAMRh+xmbPrK/hFRo0z085N0IUw=
+Received: from SN7PR04MB8532.namprd04.prod.outlook.com (2603:10b6:806:350::6)
+ by CY1PR04MB9737.namprd04.prod.outlook.com (2603:10b6:930:107::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8901.26; Wed, 9 Jul
+ 2025 06:59:26 +0000
+Received: from SN7PR04MB8532.namprd04.prod.outlook.com
+ ([fe80::4e14:94e7:a9b3:a4d4]) by SN7PR04MB8532.namprd04.prod.outlook.com
+ ([fe80::4e14:94e7:a9b3:a4d4%6]) with mapi id 15.20.8901.018; Wed, 9 Jul 2025
+ 06:59:26 +0000
+From: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+CC: Yi Zhang <yi.zhang@redhat.com>, Bart Van Assche <bvanassche@acm.org>
+Subject: Re: [PATCH blktests] common/null_blk: check FULL file availability
+ before write
+Thread-Topic: [PATCH blktests] common/null_blk: check FULL file availability
+ before write
+Thread-Index: AQHb7NIGFneyHVsIKUigcXsAW5S1U7QpZF6A
+Date: Wed, 9 Jul 2025 06:59:26 +0000
+Message-ID: <54bkuwde7uyewf3uwgtin64iwf4o7bzjsywf5ll3lz3pg4cvgr@kyafaozbphws>
+References: <20250704105425.127341-1-shinichiro.kawasaki@wdc.com>
+In-Reply-To: <20250704105425.127341-1-shinichiro.kawasaki@wdc.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SN7PR04MB8532:EE_|CY1PR04MB9737:EE_
+x-ms-office365-filtering-correlation-id: 0ed06269-7ed3-4d4e-1ebd-08ddbeb624ae
+wdcipoutbound: EOP-TRUE
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|366016|19092799006|1800799024|376014|38070700018;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?/kWVzEtf+wo3WpfPU4LwKrKC/59Y+WvDETJGab6elCqVzU+V0H989FD956lP?=
+ =?us-ascii?Q?OYRQQ+rpzYQSXoQiy9xZxiS//4iyjo2U4R+hO5wWzAdVaTcEqojpto8OaqXa?=
+ =?us-ascii?Q?Kz/Shc10VvPdID5PFzaDBm8ysB6/V/wjCtaaMukrQmrDOvQHRV9xdNIKXzA+?=
+ =?us-ascii?Q?arFyFfQL7IL83l8mAS7/rxYkN3tk5rh0s0Z1s0nY3RzJDQ3j5CNZjyBRo64c?=
+ =?us-ascii?Q?aaiD41WkD75iyd2eNqXT3/fkP6OCGZpWpPIKPExyVffXz5Z/KKmvJOKYYPfx?=
+ =?us-ascii?Q?0iY+xm3kNyjB+YvgNJk3f346xgaBD3enmTlnb1Gjy+2oHTl/XeF1jJaURT4C?=
+ =?us-ascii?Q?HzfVV6FY3SDtXOY4qIsi/yVprvqQOBSK3In275EF6guVwOtZdKod69UB2/9v?=
+ =?us-ascii?Q?3mb20QKRQC2amJqBycSGj5t0fCzp4b6hYeg2rrRy+y6rECCYVIY74kJO59q0?=
+ =?us-ascii?Q?ZElaxcf37mdFFYVGXN0ef+yA2oRi8zTfJOAT9jGZqI6fS8+wa1FrfJnYVnep?=
+ =?us-ascii?Q?rlHc/k2l7QAWFdUOIvf5yzRojscDMjFGt7yXR2c7gh1ZcvfypbFOuXq8bwjx?=
+ =?us-ascii?Q?sxeXgtaMTROV8p3aB0BS4G72SevAAOQhLmaEHZDj8kCtRAwE4cFlnF+DZrNt?=
+ =?us-ascii?Q?QpsrZXu2ffmBxlwD2DAWTZRzRePSVmwBzVF0LdN7rT6HgwEtF7AD7EPtyTZf?=
+ =?us-ascii?Q?zdO5K+QVAIYL1LozYFxLBCwI16sT6j6q2LDD+FJmfdzWHEk1W7DLL273HpMH?=
+ =?us-ascii?Q?hKOd9yquRrEK2MrfPWrOVmpkb4Iy7jyBTcp3SsCeGIw1kJvwMu2tFuyPO1t+?=
+ =?us-ascii?Q?IrvPLKkaEScsLWIifewZGasH8amH4WHUopQ+q855xNAduF0vVK/WrRFDZ4nS?=
+ =?us-ascii?Q?g3DWBrK+XJSo9k1Z0FDj1r1rbjm7fqTnBudDbKTtR+IbSiFE5T/NB5EE3QIx?=
+ =?us-ascii?Q?k75jJ4ngjoIFopCQrVIlK+cLTJC5nI13nhozYOQjSam0m2lJhgIlpvGCcWbe?=
+ =?us-ascii?Q?zrfZ47OPMk6/+HNlMlYSucd6na2L77+1Nrq6rbwlaEoj+88EVILuoiHgyeMF?=
+ =?us-ascii?Q?ixJg5i3RoCgrpwkoA/7R3+CU1a5o5YM4aTc0/QOPukd8tNMR5/rukqOVD4ew?=
+ =?us-ascii?Q?+MB2Imc9yzRjbjMXWn4cdVe5SUoLoa4VbRoMBo7cMDcqlIWfGQsBV3YkE2jH?=
+ =?us-ascii?Q?2Egg5vMqVcDwiY2JD/YTZYZyMEY7+fw9JZRVJRkKs0Z5l1itdmcuWOMWjSX1?=
+ =?us-ascii?Q?pCOPzPW8X4nAGvku2URSaLhdkqy/kfcZZW8TFi97HbaYPFa2K+jchuyFE5K/?=
+ =?us-ascii?Q?4XrRHyf6vLk8bxTlw3x0QBoCxaPHDlajItWXqq5Sv5ui0I0IULJvOU5LgoKw?=
+ =?us-ascii?Q?Gpw8EqS9tG3n4gg66ItczUKvNjI4AdR56RLSAbXqdX4Lkf3H8YffnO1fYdNi?=
+ =?us-ascii?Q?/fLqjzdpiGHrO5dfjuSbqtl0UsCAIP25sbS8ssf9Pq7mGDofmT1+nQ=3D=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR04MB8532.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(19092799006)(1800799024)(376014)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?5P/P3AruMMmOb7teHCLLjFcXvY9jdi1nIwzpYRYapIYnacKKgnJyXTS2vtSg?=
+ =?us-ascii?Q?QmSGNRGO1Xl09fk0ha74gPMbIJ9EJW1/PA1SMgi5VLIpFhJeEa/lqTjCA+d4?=
+ =?us-ascii?Q?MS4ovDNz95E2Zirj+XVtRx3/lqgjdAOOBHSc8H26FnjQzcIITzFY9L9wiXsg?=
+ =?us-ascii?Q?oQA8fNPAjE19fPDDywJJqCrgDA2lAIH0X4UjqGWnaHJqVI+YQK0WwdBx1Zmp?=
+ =?us-ascii?Q?2uTrlCuHKJsjewjmJvJag2geP7z22sbbvWZsfeDp1qqqO6NYnuySQfqaBaIp?=
+ =?us-ascii?Q?xhmaXj+ompLr2l9n/DiF9z0IOhgW4e8MEUS4HIyVcnOZ4PC7TxWsbjrLtq4W?=
+ =?us-ascii?Q?aevU2AX99kKVXcDoEuwNRcGoVaF2DJLQAWpCfjp7FgwPPFk0X2lsLUnGzMRu?=
+ =?us-ascii?Q?19dlrCdO8OQxqv0haZdX5EqlqK37bPVUAO+AYZ52wIM7xnUMOCXmo7g+L9Yd?=
+ =?us-ascii?Q?TDWNyrLHEbEeh0hLidds6sRTqocJcu7b3OqQkVQaGafer1s115tyNL79Nwcb?=
+ =?us-ascii?Q?9Y6X+dg2q2Q0i5ONvraBffgLFn/L5qeMc25m1bCDFAEFtpzA6ELKXTpTG9mc?=
+ =?us-ascii?Q?qSavSLliH/vj+s5qZQu+SnDsZaeCvHGUi4fcAZEkfDZhzAWLh1xRHVmz7kI4?=
+ =?us-ascii?Q?AWafPb2XVhoK0dcevw0CHbFVv6aK2wq/ka6c8OT4vWrxGMTHW3m1QQDP7kdg?=
+ =?us-ascii?Q?iusuFEH0/cc1JF814XbenyavPa6e6PjdhGPWEgY/Pw48761N4ntBHXUxJqql?=
+ =?us-ascii?Q?Ku1xIrqvM71JKdtqTxbsHuPOblaaDMQUkHf3mHOGsRtF3QeoxbbJQ+zamWQP?=
+ =?us-ascii?Q?haKjdOC6joEAgGLnFAtzry4yNlgYGfk+FjFr4+jerTft8rHhoOrtco4eKJvZ?=
+ =?us-ascii?Q?fm4SDJVRXoB8Uv2SfE343LCT4NVv/itJAZHPZdz0ptKyRKxbK1B7LDmDIP5g?=
+ =?us-ascii?Q?WIF7rBse6IQ+JOuUKj8E6R3ecwj+fYv1ox9CsXk5/NL115BqIfG8J5nuXqxt?=
+ =?us-ascii?Q?jN/IF8TDTtF2M/3uQr3vUCMl/BjYmqdIgWNppVaDMaWMzd8hW1tDJS+bqj4C?=
+ =?us-ascii?Q?bQ8WKjy4ZyEtk8j/rcBxcBScU0Bf+MhT1NV65wvczGujw85Ck34nwUord42S?=
+ =?us-ascii?Q?MrK/Qpc/smTF/AKtvGzL5Ixoin6kukYnoKp/TINrulOMJZ94ppz8l7AZoHCg?=
+ =?us-ascii?Q?1Xx9w2n9bxXdUXEkcT8DK033ZdvdI9OyqxQi4j3fSLyWKd1elWhyR0j0dYLE?=
+ =?us-ascii?Q?e75szFqcFr0dIq0XXMK4ydAf+hOEo9PMkJyxVGVWtt3vwgCXKBBxRpvPyxpK?=
+ =?us-ascii?Q?+CKslU/n439G8uA3ZobO5B3Q44g/MX52g1aTzPX0YIe6SHyZswJ4XPH1Zm8t?=
+ =?us-ascii?Q?iv7TKtP1zDKXUv8vx2q6NrduiCJKJDZGIChNt3TJzQgtBRIVDUETadDV+pVI?=
+ =?us-ascii?Q?9BCwrpqEj8ReIKLJNqyapAKn9PuL2jGmTvcBq/fQQtT8cGYnbsKtByhG24uz?=
+ =?us-ascii?Q?/oOIJS3lUR1rcaPQGhngFGQCZC5PPVAsKRGZUiFzeB9zVHpDVeNwDG1cF+xp?=
+ =?us-ascii?Q?hbXRgLOS5e0LGFY877YyDPdfZnc2fsE9DH/niGDHK21bYtIXSACtrygz23YB?=
+ =?us-ascii?Q?i7dJq4gRmzk4iJ8pPcx0hc4=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <B82BB8F2DA51304F897B13FFFBFAD049@namprd04.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250709014109.2292837-1-ming.lei@redhat.com>
-In-Reply-To: <20250709014109.2292837-1-ming.lei@redhat.com>
-From: =?UTF-8?B?5L2Z5b+r?= <yukuai1994@gmail.com>
-Date: Wed, 9 Jul 2025 14:46:57 +0800
-X-Gm-Features: Ac12FXzKVbEFAUXCS7x0aHNh9flAgPLMgV9f_Hxigwol6tTtmZViKwy50WCxOLk
-Message-ID: <CAHW3Dri2uVagQ8AYcUii_+qH-h1tv=ekjteLxHySADOvsn-VEg@mail.gmail.com>
-Subject: Re: [PATCH] nbd: fix lockdep deadlock warning
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
-	syzbot+2bcecf3c38cb3e8fdc8d@syzkaller.appspotmail.com, 
-	Yu Kuai <yukuai3@huawei.com>, Nilay Shroff <nilay@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	x3JNJ3wu2sugilOs1L0JakB40jpgMK2myvuuG5QoC4m4whOCqiGS6WplI6BPnVqNBQnDqSYnOP6IytkYr0W4PXAgGtrWy1M2+xGdEXKQ4grmKU2BvQdnFCv6UevXej0prT2LPljngpn99z21CKRLoxUQvs3eSDv7GwtdPVaYeuw2bA1BRExtQkmVHFTCg7cvgfbfttftyeHy2h46kJMJsbME6PYNNVxmyhEFeJP3c6usp6eI03MjIbFuD9VyksN6XOeT2JERfA+8Owkd/CWV+hd2yMgzqLJ388tBQOqfOKK0zVIskWxJzso0gUCgLOLZUE8IUjE1tyFXWkAulYZjSJEQoDuF4+4YYldeh7sPXIV0u+uxfzJP0wM3EDLLBZl2so+/4SFsHYv8yZgfIorj9QXML6sHyAQnegA9OP/BFJF8rXafaZKysguk4F9LIi/jANlKpP8CrjIvryQ6v0ASHVv1nvMmKoqjzuKHu0pqXTe/c+HJ42O8UaBg0tuiB1dO2nXWHuE7vtgqxTqqGRhTRFShXdJl+yI9faASp4X17F7p6GWVlVPW8jXfyDqRsjbYMJ/PTt2Ha5mEG0VvMAfSCa73HdQ8M8GvF1rIK3c/FjtC8GoBSkFXhhoqDwtN+lxi
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SN7PR04MB8532.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0ed06269-7ed3-4d4e-1ebd-08ddbeb624ae
+X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Jul 2025 06:59:26.5001
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 2gYNloB27GEJd34ILxeezqrCN58rlfv8X1WO40acKhv5IWpYjnHfqfKEp9yiQCRXV2mJFvd+7khOC2A+x0jK2v2GMmJaroH8zOifli0oQbk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY1PR04MB9737
 
-Reviewed-by: Yu Kuai <yukuai3@huawei.com>
+On Jul 04, 2025 / 19:54, Shin'ichiro Kawasaki wrote:
+> Commit e2805c7911a4 ("common/null_blk: Log null_blk configuration
+> parameters") introduced the write to the $FULL file in
+> _configure_null_blk(). However, the $FULL file is not available when
+> _configure_null_blk() is called in the fallback_device() context. In
+> this case, the write fails with the error "No such file or directory".
+> To avoid the error, confirm that $FULL is available before write to it.
+>=20
+> Fixes: e2805c7911a4 ("common/null_blk: Log null_blk configuration paramet=
+ers")
+> Link: https://github.com/linux-blktests/blktests/issues/187
+> Reported-by: Yi Zhang <yi.zhang@redhat.com>
+> Suggested-by: Bart Van Assche <bvanassche@acm.org>
+> Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 
-
-Ming Lei <ming.lei@redhat.com> =E4=BA=8E2025=E5=B9=B47=E6=9C=889=E6=97=A5=
-=E5=91=A8=E4=B8=89 09:41=E5=86=99=E9=81=93=EF=BC=9A
->
-> nbd grabs device lock nbd->config_lock for updating nr_hw_queues, this
-> ways cause the following lock dependency:
->
-> -> #2 (&disk->open_mutex){+.+.}-{4:4}:
->        lock_acquire kernel/locking/lockdep.c:5871 [inline]
->        lock_acquire+0x1ac/0x448 kernel/locking/lockdep.c:5828
->        __mutex_lock_common kernel/locking/mutex.c:602 [inline]
->        __mutex_lock+0x166/0x1292 kernel/locking/mutex.c:747
->        mutex_lock_nested+0x14/0x1c kernel/locking/mutex.c:799
->        __del_gendisk+0x132/0xac6 block/genhd.c:706
->        del_gendisk+0xf6/0x19a block/genhd.c:819
->        nbd_dev_remove+0x3c/0xf2 drivers/block/nbd.c:268
->        nbd_dev_remove_work+0x1c/0x26 drivers/block/nbd.c:284
->        process_one_work+0x96a/0x1f32 kernel/workqueue.c:3238
->        process_scheduled_works kernel/workqueue.c:3321 [inline]
->        worker_thread+0x5ce/0xde8 kernel/workqueue.c:3402
->        kthread+0x39c/0x7d4 kernel/kthread.c:464
->        ret_from_fork_kernel+0x2a/0xbb2 arch/riscv/kernel/process.c:214
->        ret_from_fork_kernel_asm+0x16/0x18 arch/riscv/kernel/entry.S:327
->
-> -> #1 (&set->update_nr_hwq_lock){++++}-{4:4}:
->        lock_acquire kernel/locking/lockdep.c:5871 [inline]
->        lock_acquire+0x1ac/0x448 kernel/locking/lockdep.c:5828
->        down_write+0x9c/0x19a kernel/locking/rwsem.c:1577
->        blk_mq_update_nr_hw_queues+0x3e/0xb86 block/blk-mq.c:5041
->        nbd_start_device+0x140/0xb2c drivers/block/nbd.c:1476
->        nbd_genl_connect+0xae0/0x1b24 drivers/block/nbd.c:2201
->        genl_family_rcv_msg_doit+0x206/0x2e6 net/netlink/genetlink.c:1115
->        genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
->        genl_rcv_msg+0x514/0x78e net/netlink/genetlink.c:1210
->        netlink_rcv_skb+0x206/0x3be net/netlink/af_netlink.c:2534
->        genl_rcv+0x36/0x4c net/netlink/genetlink.c:1219
->        netlink_unicast_kernel net/netlink/af_netlink.c:1313 [inline]
->        netlink_unicast+0x4f0/0x82c net/netlink/af_netlink.c:1339
->        netlink_sendmsg+0x85e/0xdd6 net/netlink/af_netlink.c:1883
->        sock_sendmsg_nosec net/socket.c:712 [inline]
->        __sock_sendmsg+0xcc/0x160 net/socket.c:727
->        ____sys_sendmsg+0x63e/0x79c net/socket.c:2566
->        ___sys_sendmsg+0x144/0x1e6 net/socket.c:2620
->        __sys_sendmsg+0x188/0x246 net/socket.c:2652
->        __do_sys_sendmsg net/socket.c:2657 [inline]
->        __se_sys_sendmsg net/socket.c:2655 [inline]
->        __riscv_sys_sendmsg+0x70/0xa2 net/socket.c:2655
->        syscall_handler+0x94/0x118 arch/riscv/include/asm/syscall.h:112
->        do_trap_ecall_u+0x396/0x530 arch/riscv/kernel/traps.c:341
->        handle_exception+0x146/0x152 arch/riscv/kernel/entry.S:197
->
-> -> #0 (&nbd->config_lock){+.+.}-{4:4}:
->        check_noncircular+0x132/0x146 kernel/locking/lockdep.c:2178
->        check_prev_add kernel/locking/lockdep.c:3168 [inline]
->        check_prevs_add kernel/locking/lockdep.c:3287 [inline]
->        validate_chain kernel/locking/lockdep.c:3911 [inline]
->        __lock_acquire+0x12b2/0x24ea kernel/locking/lockdep.c:5240
->        lock_acquire kernel/locking/lockdep.c:5871 [inline]
->        lock_acquire+0x1ac/0x448 kernel/locking/lockdep.c:5828
->        __mutex_lock_common kernel/locking/mutex.c:602 [inline]
->        __mutex_lock+0x166/0x1292 kernel/locking/mutex.c:747
->        mutex_lock_nested+0x14/0x1c kernel/locking/mutex.c:799
->        refcount_dec_and_mutex_lock+0x60/0xd8 lib/refcount.c:118
->        nbd_config_put+0x3a/0x610 drivers/block/nbd.c:1423
->        nbd_release+0x94/0x15c drivers/block/nbd.c:1735
->        blkdev_put_whole+0xac/0xee block/bdev.c:721
->        bdev_release+0x3fe/0x600 block/bdev.c:1144
->        blkdev_release+0x1a/0x26 block/fops.c:684
->        __fput+0x382/0xa8c fs/file_table.c:465
->        ____fput+0x1c/0x26 fs/file_table.c:493
->        task_work_run+0x16a/0x25e kernel/task_work.c:227
->        resume_user_mode_work include/linux/resume_user_mode.h:50 [inline]
->        exit_to_user_mode_loop+0x118/0x134 kernel/entry/common.c:114
->        exit_to_user_mode_prepare include/linux/entry-common.h:330 [inline=
-]
->        syscall_exit_to_user_mode_work include/linux/entry-common.h:414 [i=
-nline]
->        syscall_exit_to_user_mode include/linux/entry-common.h:449 [inline=
-]
->        do_trap_ecall_u+0x3f0/0x530 arch/riscv/kernel/traps.c:355
->        handle_exception+0x146/0x152 arch/riscv/kernel/entry.S:197
->
-> Also it isn't necessary to require nbd->config_lock, because
-> blk_mq_update_nr_hw_queues() does grab tagset lock for sync everything.
->
-> Fixes the issue by releasing ->config_lock & retry in case of concurrent
-> updating nr_hw_queues.
->
-> Fixes: 98e68f67020c ("block: prevent adding/deleting disk during updating=
- nr_hw_queues")
-> Reported-by: syzbot+2bcecf3c38cb3e8fdc8d@syzkaller.appspotmail.com
-> Closes: https://lore.kernel.org/all/6855034f.a00a0220.137b3.0031.GAE@goog=
-le.com
-> Cc: Yu Kuai <yukuai3@huawei.com>
-> Cc: Nilay Shroff <nilay@linux.ibm.com>
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
->  drivers/block/nbd.c | 10 +++++++++-
->  1 file changed, 9 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-> index 7bdc7eb808ea..136640e4c866 100644
-> --- a/drivers/block/nbd.c
-> +++ b/drivers/block/nbd.c
-> @@ -1473,7 +1473,15 @@ static int nbd_start_device(struct nbd_device *nbd=
-)
->                 return -EINVAL;
->         }
->
-> -       blk_mq_update_nr_hw_queues(&nbd->tag_set, config->num_connections=
-);
-> +retry:
-> +       mutex_unlock(&nbd->config_lock);
-> +       blk_mq_update_nr_hw_queues(&nbd->tag_set, num_connections);
-> +       mutex_lock(&nbd->config_lock);
-> +
-> +       /* if another code path updated nr_hw_queues, retry until succeed=
- */
-> +       if (num_connections !=3D config->num_connections)
-> +               goto retry;
-> +
->         nbd->pid =3D task_pid_nr(current);
->
->         nbd_parse_flags(nbd);
-> --
-> 2.47.0
->
->
+FYI, I have applied this patch.=
