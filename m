@@ -1,113 +1,98 @@
-Received: from mail-il1-f179.google.com (mail-il1-f179.google.com [209.85.166.179])
+Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A03C944F
-	for <linux-block@vger.kernel.org>; Wed,  9 Jul 2025 22:51:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B978801;
+	Wed,  9 Jul 2025 22:51:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752101485; cv=none; b=PRtYnyee0WcueFG9YRvKxlDCTJ2+crXTdNEhJzcPLgU8xLpsS4vnQQkx9bp4c5wuPiwCfaG3ZIIUdlOntTnu+1u16PaBjQT73W0hxEVTyVtNPgneng3wcOqQus0Bh2RBspQ1W56/TNzB7048fHY0/m0OtgfuLPeB8+bCxwXlUX8=
+	t=1752101496; cv=none; b=K3S1Pa+g2d5Gmvehxivv16vBh6sWsXCcOAayyJdG0tDUoBOjQ9vynApZNDmxrIXOpfk61itUNNG0JW5kBz11P5Q2OyYjwulIeHuuewZUQzrJ/h8zI36XAAenMVoAF9ehSVmwGsOL6iTqY4f2kv5qKsoLXtOsMtJtNJ1Y2jpCh14=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752101485; c=relaxed/simple;
-	bh=rrggvFzTKf71d726gmomOvvxRIYdGY7+rR8j9BpC9HU=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=sAmLZITdGDq0aevURPKP+NMpH492CSkAiJfGZq6CXavYKhUYG5Wj/lm7Z8r6Qp4YnKK7VlNLa4KIKbffUy0ilD2zGLEnoLORvOpYinPimWip/VSf5zh4DoD5ANr0geCI8l99+UeGQD3M1VUNHfwOTBRABrJXY1Xl6QrWMlffDes=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=B2guoNXQ; arc=none smtp.client-ip=209.85.166.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1752101496; c=relaxed/simple;
+	bh=AT7zdgEz0XpzQD4/Kb0V7s5h4j2xaoLGpeNlxuiDd50=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=MpV2MY0T8OBOOYM78rz+yA9X0qmML5zoxoM5C5FIq68c7f9xhEC3RRBqComcunKXAGjrNV4MnOmJid5vw/Sfn9M9zufPL8IW+I9NM82hd03ZLKZf3ydbk5PLFoVJ7ARRsbJGirAjRr3q7lxk/8ZNPaOwlkMXezUej97lBpwuwaQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Hr5HDwF8; arc=none smtp.client-ip=209.85.208.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="B2guoNXQ"
-Received: by mail-il1-f179.google.com with SMTP id e9e14a558f8ab-3df2e7cdc64so3041215ab.1
-        for <linux-block@vger.kernel.org>; Wed, 09 Jul 2025 15:51:19 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hr5HDwF8"
+Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-32f1df5703aso2514151fa.3;
+        Wed, 09 Jul 2025 15:51:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1752101479; x=1752706279; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1752101493; x=1752706293; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=eLjN7k8Nb+pKx8iR0qvK0pBES2cbjfkP0zWhh5s0+6Y=;
-        b=B2guoNXQfSBVcu27yswPS8PeFT2C5gUkinXul6ga0KUyQ9tsrT7xZVPsq4ZnaXkntb
-         SCcTv2i2xKA2j/LTY1Sy5zZPGHKCjR6wE/xTvkSeOMegwNNKyaq9DOsPJAdmLZTUU8Zm
-         yYgZ62/Tn9UL2w1WNKb8fzSwT4Pu2ClVDBcGWysDkx3j/he+V5xqny5JH8LP1lU2OOsu
-         b1KQA+Fgjd75LPFbpiB6sVoJgMvc1tUjHSjETelcGO/IEmmwa5BRAhplGphrkkwDlJfC
-         CSZuCyK7/EoFRGEyaHQvoDGTdcAyfEDzN80cyw2JfdIzobRNj5jjNo8+Qxmk+Ha8HwqZ
-         HzVw==
+        bh=AT7zdgEz0XpzQD4/Kb0V7s5h4j2xaoLGpeNlxuiDd50=;
+        b=Hr5HDwF8CY+CWdmx0FV8RuoB9auBYi8mv1lKnmLKtSjAjMEtEu26jUvkONYpgKInWm
+         VRCSjrSfoi7bbWy1qTtASppkGaq8SxbJdNJZhRhsnljlEm0iySD1AqOrjR4QyCSENLyF
+         VR6Nj/cEEBKGx5xRWauR4/WuVhKAn/bV9qOSjNDhDpicqYgaW6AsDPFNAKbLoJ59I98E
+         dWg2ufMuccrOZGciN+v99R84ql4G1vLO5ndNg1mf01UDPG+W57I29fRrjCio137p/hWW
+         2wmpK3bUfntLAj7BPBU2ced/Hd0thAWqrbmwg+HkqY/GFRTPMF76l45x0uPRQdC8wo6F
+         EwXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752101479; x=1752706279;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1752101493; x=1752706293;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=eLjN7k8Nb+pKx8iR0qvK0pBES2cbjfkP0zWhh5s0+6Y=;
-        b=pv2kGalq/S1dwIaStj7HGv8GO5Z4imDwCUwFrg08zAb2y145BUCOqqnl45ztvFwXY3
-         xhaUq+YgH3ZABtUCKt4uODgxe6NjO+L+8/mTHGnxErCdfdbzTLu5dyTHOBb2x8eeD26n
-         1hL6azg70G/Pe0eruyE5csIKLsddTWP6TMdw+xfJ1+7wCMUvhN+nekuOeg9JUf+rwn+A
-         dDPfdALJ9pfz4qsd7qVOXh/woCNceVOOj7ifPMvIpO8CAQI4HqJYfSdC1d4iNl8QxsSg
-         MB8+7oafM/KGBmqWTfmONQmtPkT2fVochhjAqtP4t/XXPz7T8JO6eQrPkY9bx3wI9U1k
-         1S+Q==
-X-Gm-Message-State: AOJu0YxYjNJ7yDOFYnM6evPKfRMYQTX/G9R17T6qPDGVf6alGkyNkQsC
-	GQyYfBPkTyjmFwSqPIfzQhKf2LUp7AIGhxh0B5mKLdEJoBkOVtpqlB4OVHPoyI4sTZLH16a6OoA
-	GvaK2
-X-Gm-Gg: ASbGncsBjndpFGE4Yi0+2dEEK6kgHc1QOYKWT740CWPl41w0qQJfhV6CA87EchNCNhH
-	hrHtyylJNSkRCQEaCEnjqdZgOpjc4l/AqmA7WuEI4Y920tnL6PJRl1w7kXoFCZ2vHGe/YZDL5Yl
-	BSIWhDThKHKLK0AbvvZrJ1v81/ZBwRL4p4RBAlZ8Onvg+/30bk7uziUbGMzxnIusXQgzsZp7GTR
-	HpjnE+ZEjUaxhvMR+vVLPstOxIuHYK1FunpeJqEskvgPRJj7lLlx3pSfTbaiScYhbbN06NC8ct/
-	xOlWjQ0zLmdSSez/UGJ86kzk1thw8o1mkCXOfbUZgUgEVetwbW8pgw==
-X-Google-Smtp-Source: AGHT+IHCD3YCAj80HmB++fqysfkj73vEEJzSfUIU4jB1XRvknj07xLgtwy9jehsxm1YN89/KqSg00A==
-X-Received: by 2002:a05:6e02:1c2d:b0:3df:3a4f:c884 with SMTP id e9e14a558f8ab-3e1670190bemr43111895ab.8.1752101478596;
-        Wed, 09 Jul 2025 15:51:18 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3e246134dd3sm1000435ab.21.2025.07.09.15.51.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Jul 2025 15:51:17 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
-Cc: syzbot+2bcecf3c38cb3e8fdc8d@syzkaller.appspotmail.com, 
- Yu Kuai <yukuai3@huawei.com>, Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <20250709111744.2353050-1-ming.lei@redhat.com>
-References: <20250709111744.2353050-1-ming.lei@redhat.com>
-Subject: Re: [PATCH V2] nbd: fix lockdep deadlock warning
-Message-Id: <175210147757.1343379.13770714524265499576.b4-ty@kernel.dk>
-Date: Wed, 09 Jul 2025 16:51:17 -0600
+        bh=AT7zdgEz0XpzQD4/Kb0V7s5h4j2xaoLGpeNlxuiDd50=;
+        b=UqTiwvPq0OAV4A4oxjlNzZ8lfhKOEmrQfZ8ctDjT1ih36WGBvb5v7OzIlX5l0hXu5m
+         ZWJk0+57+hRTxDaAX4JVkeZl5r4IYoOXYKOORprq4rdhNM6ckNkRGs0wIMuwXAFIJVkl
+         VOUpwh9oE5gthIqWFYrhRRt/ByRUPQhwo+Yo3pmNdCMiIsfbjstNvUUslnGHUoL23r/V
+         zj2NpFg1md9bkLEG/yLdjIccBEkDR/g9E9/BlyeDDsZ39HV+W9pLSqNg1pnpBzHDPJ+q
+         3p6rAt7fffFjXXYNkAxakAqHIeDtdarlZ7MnR2BIzqqdUV2EvLm1NH+qGshefPL2u4Sj
+         vasA==
+X-Forwarded-Encrypted: i=1; AJvYcCW+0qe8I3/GZifxXyh3jTmRp01GpOYi43PXP2a4UYjaPTZJAUrpEqAkXzKEG/mYWbIst29nDz/FLboSTz7s4GOl@vger.kernel.org, AJvYcCW30P0Dl+j19PHv2bvG9kIYY4+zkLeEdUj6V+jqj4QBXpQhOlC12yqi98SVroJ2rbizFoqo6nscs/9/kl3T@vger.kernel.org, AJvYcCW3zF6EEXALZXvCC76FaMFZrzeyMPdMtIW9nHN5K0YyGjRbZvwAgjI6/JwCgL8/2uZtHFCIpLicKk3Gkg==@vger.kernel.org, AJvYcCX5zs1QLzVTxjYsWLCoFp7HPMTPgZdm/ceBH+7rKDCRYTMZ/ZbUDujESsRLyQ16ikRzURbjrmB/L7sq2MRdQnU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YynKva+nqN4nEEMQP6riOKYkIO9U9yXWo+3qXNin0R7pC1j770F
+	17cQy0iCtQXbJWIfukD0n0fOzwp7wV7CCcAeVo4repjHtVCSUzXnwoDBDoVPMDRRCHGNfK3ERoy
+	/E9GHlMPlclZbQw4msUlF4A+NF4g7iWw=
+X-Gm-Gg: ASbGncu6g7cLXFwgFXIzSAASkf1J5p4vHTgCIcyXis4cWkNpz0HqxbZbUVeSEYQHrBH
+	JT8ivKkI6nw9/WSDTbujoCHRvWJtmkROOMu0OGdXgNEXbiwTa9Go/axsFwj3wiB2NEvAOVN4yQ6
+	eyVkih8fWEGoDtw9SKYshiDKcyvXfXASSHzqGQBiCNaMLpTjTRLVHBbjkmYUo7sfCLEG9VUfKsM
+	d+qZgb/uFeNnerk
+X-Google-Smtp-Source: AGHT+IF27+KrVs2nw7zMxm/lAjmI7ad0idRyIl1c4CvKZ8/UEyE7oxDB/OUDydZblbt7SfQMSlfdwda0M1ohVpNso+I=
+X-Received: by 2002:a05:651c:220d:b0:32f:41a4:5584 with SMTP id
+ 38308e7fff4ca-32f48584db9mr13809651fa.27.1752101492829; Wed, 09 Jul 2025
+ 15:51:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-2ce6c
+References: <20250709-core-cstr-fanout-1-v1-0-64308e7203fc@gmail.com>
+ <20250709-core-cstr-fanout-1-v1-7-64308e7203fc@gmail.com> <DB7SVTBZ46QB.31WTHFLWDHPZY@kernel.org>
+ <CAJ-ks9nNc_pThtb+gHUcjEnvR6V0RAEG0tkv+_DHYYjXs1N7=A@mail.gmail.com>
+ <DB7V0GL2HVMV.BR1JSWQPDMC3@kernel.org> <CAJ-ks9n9Z0PtBmqNupS2390B+gq7UJuV0npD+3Ri0tJrQZVB9g@mail.gmail.com>
+In-Reply-To: <CAJ-ks9n9Z0PtBmqNupS2390B+gq7UJuV0npD+3Ri0tJrQZVB9g@mail.gmail.com>
+From: Tamir Duberstein <tamird@gmail.com>
+Date: Wed, 9 Jul 2025 18:50:56 -0400
+X-Gm-Features: Ac12FXy4ZkLQdVyOcORlDTRU2dOMP13FGi20G8_0yikxCOUmMBlYgA2CbZFOSII
+Message-ID: <CAJ-ks9=hdDghvG5d2sK6SWz3OME6BFxZEmrDmfkrAV7Dse8wXQ@mail.gmail.com>
+Subject: Re: [PATCH 7/9] rust: pin-init: use `kernel::{fmt,prelude::fmt!}`
+To: Benno Lossin <lossin@kernel.org>
+Cc: Danilo Krummrich <dakr@kernel.org>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
+	Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
+	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
+	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
+	Trevor Gross <tmgross@umich.edu>, Jens Axboe <axboe@kernel.dk>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
+	Brendan Higgins <brendan.higgins@linux.dev>, David Gow <davidgow@google.com>, 
+	Rae Moar <rmoar@google.com>, nouveau@lists.freedesktop.org, 
+	dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org, 
+	rust-for-linux@vger.kernel.org, linux-block@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Wed, Jul 9, 2025 at 6:36=E2=80=AFPM Tamir Duberstein <tamird@gmail.com> =
+wrote:
+>
+>
+> Ack, sent https://lore.kernel.org/all/20250709-init-remove-old-workaround=
+-v1-1-a922d32338d2@gmail.com/.
 
-On Wed, 09 Jul 2025 19:17:44 +0800, Ming Lei wrote:
-> nbd grabs device lock nbd->config_lock for updating nr_hw_queues, this
-> ways cause the following lock dependency:
-> 
-> -> #2 (&disk->open_mutex){+.+.}-{4:4}:
->        lock_acquire kernel/locking/lockdep.c:5871 [inline]
->        lock_acquire+0x1ac/0x448 kernel/locking/lockdep.c:5828
->        __mutex_lock_common kernel/locking/mutex.c:602 [inline]
->        __mutex_lock+0x166/0x1292 kernel/locking/mutex.c:747
->        mutex_lock_nested+0x14/0x1c kernel/locking/mutex.c:799
->        __del_gendisk+0x132/0xac6 block/genhd.c:706
->        del_gendisk+0xf6/0x19a block/genhd.c:819
->        nbd_dev_remove+0x3c/0xf2 drivers/block/nbd.c:268
->        nbd_dev_remove_work+0x1c/0x26 drivers/block/nbd.c:284
->        process_one_work+0x96a/0x1f32 kernel/workqueue.c:3238
->        process_scheduled_works kernel/workqueue.c:3321 [inline]
->        worker_thread+0x5ce/0xde8 kernel/workqueue.c:3402
->        kthread+0x39c/0x7d4 kernel/kthread.c:464
->        ret_from_fork_kernel+0x2a/0xbb2 arch/riscv/kernel/process.c:214
->        ret_from_fork_kernel_asm+0x16/0x18 arch/riscv/kernel/entry.S:327
-> 
-> [...]
-
-Applied, thanks!
-
-[1/1] nbd: fix lockdep deadlock warning
-      commit: 8b428f42f3edfd62422aa7ad87049ab232a2eaa9
-
-Best regards,
--- 
-Jens Axboe
-
-
-
+Messed it up, sent v2:
+https://lore.kernel.org/all/20250709-init-remove-old-workaround-v2-0-a3b1be=
+8fd490@gmail.com/.
