@@ -1,161 +1,138 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D27C0271443;
-	Wed,  9 Jul 2025 09:10:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3D9A2367B3;
+	Wed,  9 Jul 2025 09:45:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752052211; cv=none; b=NLrTLLSLR5E2p3qJ9Pnt9GCseieRJiqQesEmuIxkvZqb/F1HRHJ4h4MbyfxUGAOZZBQderHCdz1x4ufJzuVV9K185KgKKNjWyWmt3BAbt5CD9A88M9lbOC+g0FYh3uY0puT5T80RaowmubNcNkXMfJJqhq+CBEGX0yaKha3zzC8=
+	t=1752054355; cv=none; b=Lk3OWjNgDTkKRSmT1DC7TStsxjJQh/VtuEkhRfQYh+1edbp+wiol0YIWWFuHb3qQ4xyDj/jTHplCxbstTTQc0/Rs7S1MmFPzRJ5J3wFk0GmbIdhO8CQ+KT60M7HIfhrzKGTCKBaG+yweM8T0mFOy7qhhpPlbfEUuDI3sDfwg7Oo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752052211; c=relaxed/simple;
-	bh=IJjJgM4OeRcDQZbbuj3g79bHehoQC7+ut1sOtWZkbZs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=okCDQxW0jI0GlMzkSwtRKb/4YIxvVjCkHOgRTNhSJkCYQxOfRKcPm74CtVU9zOrlR4Qaq33QftQC72GcaIkXnSlNQ7egGxy5OkePpioXJvzOSq/WhDB0uGb2/yzGdbIcNsm2lC3rEbdG6vkFAr1PYzHY7+oiyRqrsw5OKtSXJZU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QzW535K+; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1752054355; c=relaxed/simple;
+	bh=c6W+pjdL3fLgs4DKE4VuxDUC5yEKStcV+xtF81Jhgic=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gVDhZiL6wE9vAuvqnhERS/x53hhgA6QygoyqSiMoljgv1kZwefuzDHYEfJhrCCdDYfjTHYwNmaso3fRgWWFCH2QZ7BLn+BTmUsdOwDoWLQe95Np3C2vUCbQuKmuedAyybXntEu6FFaakJa11lAL5K956uIjpOez3yqBPX1/YrH0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=HQo71xhS; arc=none smtp.client-ip=95.215.58.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QzW535K+"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1752052210; x=1783588210;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=IJjJgM4OeRcDQZbbuj3g79bHehoQC7+ut1sOtWZkbZs=;
-  b=QzW535K+xfDaHCNexMYzWVCUvLjy2T+RkUb3NyQa1550zSztnkeh8TGn
-   3fcICDvc3vbCF+6xYGyvQGBgYzYoVOI9PP6ESL8LO3hDHCo5YwzGvs7OJ
-   7fcQgL3hDjE75xmurGu/xxBtPWRqaSaAyTEtgc+VMHFldojTxmPiEGWoa
-   yhhGpS50Odmqhp43lnSVi0r/Sap4pEMGgw3oNZLGDAoSPEXiCal4/kU3i
-   eeS5Wj8y07Kve6GR/OHwOJjOje6DUT5mYnXzq42Dey2nOG21OqjO7plJP
-   j/YW1PXgd3dfgDzYpnNyNeOvdZ3+PI+JIgyNDLNtd8Y6hn3W0njQXSsEy
-   Q==;
-X-CSE-ConnectionGUID: +aJockTGRDqTm4GMhZ330A==
-X-CSE-MsgGUID: 8OLsZH+aQy+dUUhUM8it6A==
-X-IronPort-AV: E=McAfee;i="6800,10657,11487"; a="54163374"
-X-IronPort-AV: E=Sophos;i="6.16,298,1744095600"; 
-   d="scan'208";a="54163374"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jul 2025 02:10:09 -0700
-X-CSE-ConnectionGUID: 3G6X9a/9QZGs4/E1Nu1G6A==
-X-CSE-MsgGUID: 8VeCwGwHRoyx12QvGTKIaw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,298,1744095600"; 
-   d="scan'208";a="155458330"
-Received: from lkp-server01.sh.intel.com (HELO 9ee84586c615) ([10.239.97.150])
-  by orviesa009.jf.intel.com with ESMTP; 09 Jul 2025 02:10:07 -0700
-Received: from kbuild by 9ee84586c615 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uZQoW-0003Kz-1d;
-	Wed, 09 Jul 2025 09:10:04 +0000
-Date: Wed, 9 Jul 2025 17:09:19 +0800
-From: kernel test robot <lkp@intel.com>
-To: Christoph Hellwig <hch@lst.de>, Christian Brauner <brauner@kernel.org>
-Cc: oe-kbuild-all@lists.linux.dev, "Darrick J. Wong" <djwong@kernel.org>,
-	Joanne Koong <joannelkoong@gmail.com>, linux-xfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-block@vger.kernel.org, gfs2@lists.linux.dev
-Subject: Re: [PATCH 01/14] iomap: header diet
-Message-ID: <202507091656.dMTKUTBY-lkp@intel.com>
-References: <20250708135132.3347932-2-hch@lst.de>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="HQo71xhS"
+Message-ID: <e50ef45e-4c1a-4874-8d5f-9ca86f9a532c@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1752054340;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=WTz2wkEPilJ291aBXf8EittiLv9aIr5saM/qqA8YaKY=;
+	b=HQo71xhSDwkfGOSIB3FWw3v/YQdNclez8WkEdYwBvOTAIOl6AqbhbkkiJL16330Fl8+IFB
+	JIkYnrPO3KuLCRrrExhedm3XPWRaiA0VaUDJTQKabNmyYEFozGZqLnF6S6ObqT2+JOBPnh
+	CPfeQNHTjT8MKj0ZxmbHLM06SQaVEyI=
+Date: Wed, 9 Jul 2025 17:45:23 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250708135132.3347932-2-hch@lst.de>
-
-Hi Christoph,
-
-kernel test robot noticed the following build errors:
-
-[auto build test ERROR on brauner-vfs/vfs.all]
-[also build test ERROR on xfs-linux/for-next gfs2/for-next linus/master v6.16-rc5 next-20250708]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Christoph-Hellwig/iomap-pass-more-arguments-using-the-iomap-writeback-context/20250708-225155
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git vfs.all
-patch link:    https://lore.kernel.org/r/20250708135132.3347932-2-hch%40lst.de
-patch subject: [PATCH 01/14] iomap: header diet
-config: arc-randconfig-001-20250709 (https://download.01.org/0day-ci/archive/20250709/202507091656.dMTKUTBY-lkp@intel.com/config)
-compiler: arc-linux-gcc (GCC) 8.5.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250709/202507091656.dMTKUTBY-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202507091656.dMTKUTBY-lkp@intel.com/
-
-All error/warnings (new ones prefixed by >>):
-
-   fs/iomap/buffered-io.c: In function 'iomap_dirty_folio':
->> fs/iomap/buffered-io.c:642:9: error: implicit declaration of function 'filemap_dirty_folio'; did you mean 'iomap_dirty_folio'? [-Werror=implicit-function-declaration]
-     return filemap_dirty_folio(mapping, folio);
-            ^~~~~~~~~~~~~~~~~~~
-            iomap_dirty_folio
-   fs/iomap/buffered-io.c: In function 'iomap_write_iter':
->> fs/iomap/buffered-io.c:930:58: error: 'BDP_ASYNC' undeclared (first use in this function); did you mean 'I_SYNC'?
-     unsigned int bdp_flags = (iter->flags & IOMAP_NOWAIT) ? BDP_ASYNC : 0;
-                                                             ^~~~~~~~~
-                                                             I_SYNC
-   fs/iomap/buffered-io.c:930:58: note: each undeclared identifier is reported only once for each function it appears in
->> fs/iomap/buffered-io.c:945:12: error: implicit declaration of function 'balance_dirty_pages_ratelimited_flags' [-Werror=implicit-function-declaration]
-      status = balance_dirty_pages_ratelimited_flags(mapping,
-               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   fs/iomap/buffered-io.c: In function 'iomap_unshare_iter':
->> fs/iomap/buffered-io.c:1309:3: error: implicit declaration of function 'balance_dirty_pages_ratelimited'; did you mean 'pr_alert_ratelimited'? [-Werror=implicit-function-declaration]
-      balance_dirty_pages_ratelimited(iter->inode->i_mapping);
-      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      pr_alert_ratelimited
-   fs/iomap/buffered-io.c: In function 'iomap_zero_iter':
->> fs/iomap/buffered-io.c:1376:3: error: implicit declaration of function 'folio_mark_accessed'; did you mean 'folio_wait_locked'? [-Werror=implicit-function-declaration]
-      folio_mark_accessed(folio);
-      ^~~~~~~~~~~~~~~~~~~
-      folio_wait_locked
-   fs/iomap/buffered-io.c: In function 'iomap_alloc_ioend':
-   fs/iomap/buffered-io.c:1624:26: error: implicit declaration of function 'wbc_to_write_flags'; did you mean 'do_pipe_flags'? [-Werror=implicit-function-declaration]
-              REQ_OP_WRITE | wbc_to_write_flags(wbc),
-                             ^~~~~~~~~~~~~~~~~~
-                             do_pipe_flags
-   fs/iomap/buffered-io.c:1629:2: error: implicit declaration of function 'wbc_init_bio'; did you mean 'arc_init_IRQ'? [-Werror=implicit-function-declaration]
-     wbc_init_bio(wbc, bio);
-     ^~~~~~~~~~~~
-     arc_init_IRQ
-   fs/iomap/buffered-io.c: In function 'iomap_add_to_ioend':
-   fs/iomap/buffered-io.c:1748:2: error: implicit declaration of function 'wbc_account_cgroup_owner'; did you mean 'pr_cont_cgroup_name'? [-Werror=implicit-function-declaration]
-     wbc_account_cgroup_owner(wbc, folio, len);
-     ^~~~~~~~~~~~~~~~~~~~~~~~
-     pr_cont_cgroup_name
-   fs/iomap/buffered-io.c: In function 'iomap_writepages':
->> fs/iomap/buffered-io.c:1965:18: error: implicit declaration of function 'writeback_iter'; did you mean 'write_lock_irq'? [-Werror=implicit-function-declaration]
-     while ((folio = writeback_iter(mapping, wbc, folio, &error)))
-                     ^~~~~~~~~~~~~~
-                     write_lock_irq
->> fs/iomap/buffered-io.c:1965:16: warning: assignment to 'struct folio *' from 'int' makes pointer from integer without a cast [-Wint-conversion]
-     while ((folio = writeback_iter(mapping, wbc, folio, &error)))
-                   ^
-   cc1: some warnings being treated as errors
+Subject: =?UTF-8?Q?Re=3A_=5BPATCH_v2_00/11=5D_dm-pcache_=E2=80=93_persistent?=
+ =?UTF-8?Q?-memory_cache_for_block_devices?=
+To: Mikulas Patocka <mpatocka@redhat.com>
+Cc: agk@redhat.com, snitzer@kernel.org, axboe@kernel.dk, hch@lst.de,
+ dan.j.williams@intel.com, Jonathan.Cameron@Huawei.com,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-cxl@vger.kernel.org, nvdimm@lists.linux.dev, dm-devel@lists.linux.dev
+References: <20250707065809.437589-1-dongsheng.yang@linux.dev>
+ <85b5cb31-b272-305f-8910-c31152485ecf@redhat.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Dongsheng Yang <dongsheng.yang@linux.dev>
+In-Reply-To: <85b5cb31-b272-305f-8910-c31152485ecf@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
 
-vim +642 fs/iomap/buffered-io.c
+在 7/8/2025 4:16 AM, Mikulas Patocka 写道:
+>
+> On Mon, 7 Jul 2025, Dongsheng Yang wrote:
+>
+>> Hi Mikulas,
+>> 	This is V2 for dm-pcache, please take a look.
+>>
+>> Code:
+>>      https://github.com/DataTravelGuide/linux tags/pcache_v2
+>>
+>> Changelogs
+>>
+>> V2 from V1:
+>> 	- introduce req_alloc() and req_init() in backing_dev.c, then we
+>> 	  can do req_alloc() before holding spinlock and do req_init()
+>> 	  in subtree_walk().
+>> 	- introduce pre_alloc_key and pre_alloc_req in walk_ctx, that
+>> 	  means we can pre-allocate cache_key or backing_dev_request
+>> 	  before subtree walking.
+>> 	- use mempool_alloc() with NOIO for the allocation of cache_key
+>> 	  and backing_dev_req.
+>> 	- some coding style changes from comments of Jonathan.
+> Hi
+>
+> mempool_alloc with GFP_NOIO never fails - so you don't have to check the
+> returned value for NULL and propagate the error upwards.
 
-8306a5f5630552 Matthew Wilcox (Oracle  2021-04-28  634) 
-4ce02c67972211 Ritesh Harjani (IBM     2023-07-10  635) bool iomap_dirty_folio(struct address_space *mapping, struct folio *folio)
-4ce02c67972211 Ritesh Harjani (IBM     2023-07-10  636) {
-4ce02c67972211 Ritesh Harjani (IBM     2023-07-10  637) 	struct inode *inode = mapping->host;
-4ce02c67972211 Ritesh Harjani (IBM     2023-07-10  638) 	size_t len = folio_size(folio);
-4ce02c67972211 Ritesh Harjani (IBM     2023-07-10  639) 
-4ce02c67972211 Ritesh Harjani (IBM     2023-07-10  640) 	ifs_alloc(inode, folio, 0);
-4ce02c67972211 Ritesh Harjani (IBM     2023-07-10  641) 	iomap_set_range_dirty(folio, 0, len);
-4ce02c67972211 Ritesh Harjani (IBM     2023-07-10 @642) 	return filemap_dirty_folio(mapping, folio);
-4ce02c67972211 Ritesh Harjani (IBM     2023-07-10  643) }
-4ce02c67972211 Ritesh Harjani (IBM     2023-07-10  644) EXPORT_SYMBOL_GPL(iomap_dirty_folio);
-4ce02c67972211 Ritesh Harjani (IBM     2023-07-10  645) 
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Hi Mikulas:
+
+    I noticed that the implementation of mempool_alloc—it waits for 5 
+seconds and retries when allocation fails.
+
+With this in mind, I propose that we handle -ENOMEM inside defer_req() 
+using a similar mechanism. something like this commit:
+
+
+https://github.com/DataTravelGuide/linux/commit/e6fc2e5012b1fe2312ed7dd02d6fbc2d038962c0
+
+
+Here are two key reasons why:
+
+(1) If we manage -ENOMEM in defer_req(), we don’t need to modify every 
+lower-level allocation to use mempool to avoid failures—for example,
+
+cache_key, backing_req, and the kmem.bvecs you mentioned. More 
+importantly, there’s no easy way to prevent allocation failure in some 
+places—for instance, bio_init_clone() could still return -ENOMEM.
+
+(2) If we use a mempool, it will block and wait indefinitely when memory 
+is unavailable, preventing the process from exiting.
+
+But with defer_req(), the user can still manually stop the pcache device 
+using dmsetup remove, releasing some memory if user want.
+
+
+What do you think?
+
+Thanx
+
+Dongsheng
+
+>
+> "backing_req->kmem.bvecs = kmalloc_array(n_vecs, sizeof(struct bio_vec),
+> GFP_NOIO)" - this call may fail and you should handle the error gracefully
+> (i.e. don't end the bio with an error). Would it be possible to trim the
+> request to BACKING_DEV_REQ_INLINE_BVECS vectors and retry it?
+> Alternativelly, you can create a mempool for the largest possible n_vecs
+> and allocate from this mempool if kmalloc_array fails.
+>
+> I'm sending two patches for dm-pcache - the first patch adds the include
+> file linux/bitfield.h - it is needed in my config. The second patch makes
+> slab caches per-module rather than per-device, if you have them
+> per-device, there are warnings about duplicate cache names.
+>
+>
+> BTW. What kind of persistent memory do you use? (afaik Intel killed the
+> Optane products and I don't know of any replacement)
+>
+> Some times ago I created a filesystem for persistent memory - see
+> git://leontynka.twibright.com/nvfs.git - I'd be interested if you can test
+> it on your persistent memory implementation.
+>
+> Mikulas
+>
