@@ -1,145 +1,123 @@
-Received: from fout-a1-smtp.messagingengine.com (fout-a1-smtp.messagingengine.com [103.168.172.144])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACA9E2E5B21;
-	Wed,  9 Jul 2025 14:10:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.144
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C386F1D54F7;
+	Wed,  9 Jul 2025 15:04:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752070202; cv=none; b=U6uAttSt0/Qehn7OVbYSfYtbt25jkgEn24lzyiKYeeBuH1QwjaH70bUCgZyWj6b8JktfAt0A5wtiAppARBRJfnsB9VWfqyRSAO5TiwoLaqDZ8PQfzs3hnAaUFlxqhO4WGNl6p2O/WCvE8zhjLPWBs0q4E7Cx9Kkj2U9YZCJ/X2g=
+	t=1752073478; cv=none; b=cmuaJErzzRK3JemJpknINRUeLkkD4MpST4qdS7RAk89vLFe94Ko6PyqqvLGg4MtC01xTHD+Sf2yM0yRR7e2pDEeW3aMtDBZXJvsfJ1obd7wfwc+f7qJsUfus/7aSfyUVVZD/xUfs8JgYS46VNbIOgF7Q6qtIbF8x7ZIpewlhg7g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752070202; c=relaxed/simple;
-	bh=m62TkjTTmCz9G9a7tBMmsOZHwwbtguD4Ia1+JlyvOro=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=VfyZBVxtwv+QeU45Vnm9fQRvU503Yov32jmb7DppX855qT/Sum6HQqIZKCuc3bwhFlht5pStb6d7TZgJvP+vSx6N6RU6PHQT35yeEsMFJ/5V1ImbYk3XgdHqTEQPFL1N7ogs7VP3kuARBlKrUUhzlb4MpGmG2HZ2AbaQ9tdgdGw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=RU2Hgw1M; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=n9Q3AGEz; arc=none smtp.client-ip=103.168.172.144
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+	s=arc-20240116; t=1752073478; c=relaxed/simple;
+	bh=AlzZ6o1HrNfQ09llKHDD4OoK91Jxu8FYl9PqkkdFCCI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AmZ1zGJZ2qf+cAf5jy+sfBvkoNBCBGIgg5wdLgzfJ3wMVKboHn+480J87RsjzN3cuGgY/SFHxcP2tdjalsq8CgbVAZ6hn1/dV5vh2v51l7eDRie6pklbPtXBzD4KgkbOqA4S+tzAikupyRKVzUsRR0/NyKsC7LHwDhcde9hd5BI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l0l0/d75; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="RU2Hgw1M";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="n9Q3AGEz"
-Received: from phl-compute-05.internal (phl-compute-05.phl.internal [10.202.2.45])
-	by mailfout.phl.internal (Postfix) with ESMTP id C1842EC04E8;
-	Wed,  9 Jul 2025 10:09:59 -0400 (EDT)
-Received: from phl-imap-02 ([10.202.2.81])
-  by phl-compute-05.internal (MEProxy); Wed, 09 Jul 2025 10:09:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm1; t=1752070199;
-	 x=1752156599; bh=OXiuJfa6GzzwWykYEMepJESwQapIIKQPPmHJ+Tf85BQ=; b=
-	RU2Hgw1MuM8b2gVsM5NxXSn7wjdJEuabk3tdZCwVd9Y5SSD1DgZOmCjZgTMeAm8/
-	Hifn/RJOq6PaGfgCl9V39D8zyZC6ZZQX3mCzllQ+njxcTYTiqcIlnC8CQ7IO2RU8
-	hpJg4w1ntaLGXOioYOH1NtXONC+94Ds2KRxYa0M7EWsKywkNKHnfkMgX8xGY+42U
-	bIddLRdDdecU3JzbvwXnvKT3OC/nmBjBJG26EV6fr0kqI3hWx5QiJOnWl23ejk9S
-	URMoM96nbPolOSo372vR+HI5eOfcN77YfC5jJyp9CxEh8cFRB4qS13tLayBXpnhG
-	5L7dmUuyTc/vldr0OwupBw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1752070199; x=
-	1752156599; bh=OXiuJfa6GzzwWykYEMepJESwQapIIKQPPmHJ+Tf85BQ=; b=n
-	9Q3AGEzMpSjTI0dCEGaf/0MZQw5OEUMcMsnLpP4IM3M5hmtgHiSXhCuzs8mJXHlX
-	H8l2Dxg6tBjeeawP/oYPW9PhFOCL08im0LkMa3FDnfHIJWV8o0k0LZl27NWi28ec
-	thIN4M6um3zt90IMcPozFNklW9dZXZoNjWHe0qm9/iUSjLCao581xHYw3X7W6OtC
-	zZcZWjmAyQsWLRJxTMtjvZEm4Ad9NtTL8QbaGXlkCGlZ5buBEJJhuZN8NT5Y1M7Q
-	geTMwiTonTMVHNPXTjgh/nvUE+avsoTbMjQx1wJorCHtIKjoDN9QvZHNBRNpaLMu
-	GlL5GAWGBRuzkRMFw5WiQ==
-X-ME-Sender: <xms:NnhuaLGNSpYSHqJVnMiULv2h0ByQ5qAww3mrZPb-KWk_64bi1PpGNQ>
-    <xme:NnhuaIV2LV44mWStCa-ZwX2laSsrhz7JvmZmRM_kFXeDSQnXgifjZoL1FFDrKtIHL
-    NQHcy9HJRrEqBAKw0k>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgdefjeejjecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpefoggffhffvvefkjghfufgtgfesthejredtredttdenucfhrhhomhepfdetrhhnugcu
-    uegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrghtthgvrh
-    hnpefhtdfhvddtfeehudekteeggffghfejgeegteefgffgvedugeduveelvdekhfdvieen
-    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrhhnug
-    esrghrnhgusgdruggvpdhnsggprhgtphhtthhopeduledpmhhouggvpehsmhhtphhouhht
-    pdhrtghpthhtohepfihilhhlhiesihhnfhhrrgguvggrugdrohhrghdprhgtphhtthhope
-    grgigsohgvsehkvghrnhgvlhdrughkpdhrtghpthhtohepsghrrghunhgvrheskhgvrhhn
-    vghlrdhorhhgpdhrtghpthhtoheprghnuggvrhhsrdhrohigvghllheslhhinhgrrhhord
-    horhhgpdhrtghpthhtohepsggvnhhjrghmihhnrdgtohhpvghlrghnugeslhhinhgrrhho
-    rdhorhhgpdhrtghpthhtohepuggrnhdrtggrrhhpvghnthgvrheslhhinhgrrhhordhorh
-    hgpdhrtghpthhtohepnhgrrhgvshhhrdhkrghmsghojhhusehlihhnrghrohdrohhrghdp
-    rhgtphhtthhopehlkhhfthdqthhrihgrghgvsehlihhsthhsrdhlihhnrghrohdrohhrgh
-    dprhgtphhtthhopehlthhpsehlihhsthhsrdhlihhnuhigrdhith
-X-ME-Proxy: <xmx:NnhuaOC3XXADYW-FsyPw-X5u6Qq5HKgoZ0V7N97HVOXeVgVXQTX4Jg>
-    <xmx:NnhuaOTS5gAWkDPz0h6urrY8qLKIn-AbqiOtanzEdU-op6_jB-2bDA>
-    <xmx:NnhuaPrx88Gi5Z0HpJNfzeNbDNymXSJSLp9-HwbRCkcNHIle_V6lTA>
-    <xmx:NnhuaHWK0Ke-jQEy3F6nTSgH0tvn8A5dIwt1T5okM-EGcuxc_cjyGA>
-    <xmx:N3huaFviz_ZIc3uK5VG5NJtYuRyA08PK23qjjhuZLall_bACdCY7Ixs0>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 772AB700069; Wed,  9 Jul 2025 10:09:58 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l0l0/d75"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D61BC4CEEF;
+	Wed,  9 Jul 2025 15:04:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752073478;
+	bh=AlzZ6o1HrNfQ09llKHDD4OoK91Jxu8FYl9PqkkdFCCI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=l0l0/d75LHIF0xW8U158TUbCa7E8JtYOQi9eCPBSNFGB8rD8rmZKa/J/fIIMRwu6L
+	 2WDkCTegAmZ31jUzETf42XnYTqvhizdEdfSFdSbgFONBtlqWCEpXQC701VeLjxkkkZ
+	 JfM/kvk9ukvN6I/NDevJggC/aPNrjypWokwm63LRBA0zkBc+sEuSaL6HGIOUX8F5Pf
+	 fTARs1NcvzjSZBTCpKyjq4p2S28r4clr9LdrnT2N5GZYKnRCLq8IDJjm5sT2qD/GRS
+	 RgksmrQWJT7RPcbWzYLfO+anaiVlmzATMwktQeiYDMx5bJ5yV+S9MUmv5Xb3pReZ1H
+	 q0FHL4GPV9cdw==
+Date: Wed, 9 Jul 2025 08:04:36 -0700
+From: "Darrick J. Wong" <djwong@kernel.org>
+To: Qu Wenruo <quwenruo.btrfs@gmx.com>
+Cc: "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+	linux-btrfs <linux-btrfs@vger.kernel.org>,
+	Matthew Wilcox <willy@infradead.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	Catherine Hoang <catherine.hoang@oracle.com>
+Subject: Re: Why a lot of fses are using bdev's page cache to do super block
+ read/write?
+Message-ID: <20250709150436.GG2672029@frogsfrogsfrogs>
+References: <5459cd6d-3fdb-4a4e-b5c7-00ef74f17f7d@gmx.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: Tc5542b2421753b41
-Date: Wed, 09 Jul 2025 16:09:38 +0200
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Naresh Kamboju" <naresh.kamboju@linaro.org>,
- "LTP List" <ltp@lists.linux.it>, "open list" <linux-kernel@vger.kernel.org>,
- lkft-triage@lists.linaro.org, linux-fsdevel@vger.kernel.org,
- linux-block <linux-block@vger.kernel.org>
-Cc: "Anders Roxell" <anders.roxell@linaro.org>,
- "Dan Carpenter" <dan.carpenter@linaro.org>,
- "Benjamin Copeland" <benjamin.copeland@linaro.org>,
- "Petr Vorel" <pvorel@suse.cz>, chrubis <chrubis@suse.cz>, rbm@suse.com,
- "Jens Axboe" <axboe@kernel.dk>, "Matthew Wilcox" <willy@infradead.org>,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- "Anuj Gupta" <anuj20.g@samsung.com>, "Kanchan Joshi" <joshi.k@samsung.com>,
- "Christoph Hellwig" <hch@lst.de>, "Christian Brauner" <brauner@kernel.org>
-Message-Id: <61787165-8559-4ad6-90db-5ab6ee5e6fd9@app.fastmail.com>
-In-Reply-To: 
- <CA+G9fYs=3LHdf1ge1MiCoCOUpW=VjPdVWrNJX8+wi7u6N18j3Q@mail.gmail.com>
-References: 
- <CA+G9fYvk9HHE5UJ7cdJHTcY6P5JKnp+_e+sdC5U-ZQFTP9_hqQ@mail.gmail.com>
- <CA+G9fYs=3LHdf1ge1MiCoCOUpW=VjPdVWrNJX8+wi7u6N18j3Q@mail.gmail.com>
-Subject: Re: LTP: syscalls: TWARN ioctl(/dev/loop0, LOOP_SET_STATUS, test_dev.img)
- failed EOPNOTSUPP (95)
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5459cd6d-3fdb-4a4e-b5c7-00ef74f17f7d@gmx.com>
 
-On Wed, Jul 9, 2025, at 15:48, Naresh Kamboju wrote:
-> On Tue, 8 Jul 2025 at 18:28, Naresh Kamboju <naresh.kamboju@linaro.org> wrote:
->>
->> Regressions were observed while testing LTP syscalls cachestat01 and
->> other related tests on the next-20250702 Linux kernel across several devices.
->>
->> The issue appears to be related to the inability to configure /dev/loop0
->> via the LOOP_SET_STATUS ioctl, which returned EOPNOTSUPP
->> (Operation not supported). This results in a TBROK condition,
->> causing the test to fail.
->
-> Anders, bisected this down to this commit id,
->    # first bad commit:
->        [9eb22f7fedfc9eb1b7f431a5359abd4d15b0b0cd]
->        fs: add ioctl to query metadata and protection info capabilities
+On Wed, Jul 09, 2025 at 06:35:00PM +0930, Qu Wenruo wrote:
+> Hi,
+> 
+> Recently I'm trying to remove direct bdev's page cache usage from btrfs
+> super block IOs.
+> 
+> And replace it with common bio interface (mostly with bdev_rw_virt()).
+> 
+> However I'm hitting random generic/492 failure where sometimes blkid failed
+> to detect any useful super block signature of btrfs.
 
-I see the problem now in
+Yes, you need to invalidate_bdev() after writing the superblock directly
+to disk via submit_bio.
 
-+       if (_IOC_NR(cmd) == _IOC_NR(FS_IOC_GETLBMD_CAP))
-+               return blk_get_meta_cap(bdev, cmd, argp);
-+
+> This leads more digging, and to my surprise using bdev's page cache to do
+> superblock IOs is not an exception, in fact f2fs is doing exactly the same
+> thing.
+> 
+> 
+> This makes me wonder:
+> 
+> - Should a fs use bdev's page cache directly?
+>   I thought a fs shouldn't do this, and bio interface should be
+>   enough for most if not all cases.
+> 
+>   Or am I wrong in the first place?
 
-This only compares _IOC_NR() but not _IOC_TYPE, so LOOP_SET_STATUS
-is treated the same as FS_IOC_GETLBMD_CAP, since both use '2' in
-the lower 8 bit.
+As willy said, most filesystems use the bdev pagecache because then they
+don't have to implement their own (metadata) buffer cache.  The downside
+is that any filesystem that does so must be prepared to handle the
+buffer_head contents changing any time they cycle the bh lock because
+anyone can write to the block device of a mounted fs ala tune2fs.
 
-include/uapi/linux/fs.h:#define FS_IOC_GETLBMD_CAP              _IOWR(0x15, 2, struct logical_block_metadata_cap)
-include/uapi/linux/loop.h:#define LOOP_SET_STATUS               0x4C02
+Effectively this means that you have to (a) revalidate the entire buffer
+contents every time you lock_buffer(); and (b) you can't make decisions
+based on superblock feature bits in the superblock bh directly.
 
-I checked a couple of other drivers using _IOC_NR(), and it seems
-that they many of them have the same bug, e.g.:
+I made that mistake when adding metadata_csum support to ext4 -- we'd
+only connect to the crc32c "crypto" module if checksums were enabled in
+the ondisk super at mount time, but then there were a couple of places
+that looked at the ondisk super bits at runtime, so you could flip the
+bit on and crash the kernel almost immediately.
 
-drivers/accel/habanalabs/common/habanalabs_ioctl.c
-drivers/block/ublk_drv.c
-drivers/dma-buf/dma-heap.c
+Nowadays you could protect against malicious writes with the
+BLK_DEV_WRITE_MOUNTED=n so at least that's mitigated a little bit.
+Note (a) implies that the use of BH_Verified is a giant footgun.
 
-    Arnd
+Catherine Hoang [now cc'd] has prototyped a generic buffer cache so that
+we can fix these vulnerabilities in ext2:
+https://lore.kernel.org/linux-ext4/20250326014928.61507-1-catherine.hoang@oracle.com/
+
+> - What is keeping fs super block update from racing with user space
+>   device scan?
+> 
+>   I guess it's the regular page/folio locking of the bdev page cache.
+>   But that also means, pure bio based IO will always race with buffered
+>   read of a block device.
+
+Right.  In theory you could take the posix advisory lock (aka flock)
+from inside the kernel for the duration of the sb write, and that would
+prevent libblkid/udev from seeing torn/stale contents because they take
+LOCK_SH.
+
+> - If so, is there any special bio flag to prevent such race?
+>   So far I am unable to find out such flag.
+
+No.
+
+--D
+
+> Thanks,
+> Qu
+> 
