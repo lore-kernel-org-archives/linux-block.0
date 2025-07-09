@@ -1,55 +1,58 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from esa6.hgst.iphmx.com (esa6.hgst.iphmx.com [216.71.154.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32ED82D46A0
-	for <linux-block@vger.kernel.org>; Wed,  9 Jul 2025 11:17:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 908682D8368
+	for <linux-block@vger.kernel.org>; Wed,  9 Jul 2025 11:47:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.71.154.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752059878; cv=none; b=kXkJCoXJemdKXRLt5xRDJ0b4tsD3yETkTiGi802mYJ9eyNKfp+tjwdNMLiWDIeXJLsX5HV457Wyr8fBZ2RyxhZT3r3TIk8/5xptaR+0kjanmd6K8ssAoxD+AQM3ZusSIC12oWQ52Zvv/28FNdYScRJ60wldio+TSLA6TVePqle8=
+	t=1752061639; cv=none; b=l99Q8A0oGCrqbJcDAK2oUfpAgkuUT4O/QTk7fEz/HnetyvqFn18H/rIDD60/flqURt8wXzvGp8N95N72N/8dRfDaNPHbY3PqtirW4Mw2NTrrhBGb5+z2KHqfRztY8K8WmYOeFKcIy0P3S5sw5QoIq8J8esE4jBi5yScMsKnd9k8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752059878; c=relaxed/simple;
-	bh=iTntNPGD7r6vopybUbH6IpBDJ9/mzl3HtolAwzjkQso=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=InA8661kKuJoGp22IcRWh66Vf0ZPCfbBqKCkHq6jAWyNaoTkuNMs7+vMu2koLMqO6iSj6JZkXu9oX/8stJMZau05Kyh4WQlcVe6hPvRPoliEPvvtDlc1m4higrov1A8GmDfwO8Zui7rq5/fJRzreO54/rCNxBODLymesiPd6Hq0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KsHBFNRX; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1752061639; c=relaxed/simple;
+	bh=yPrZyp6L0EDubHFT9+G8MgFYTqOrCUtEep8UOVwyPzw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=pDZFVP3ho5F9nuzRi/U/MkgbzSTexFvTbfXH+GiXEjDtt1pVAN3zlbiqydsmJgFYeeuwm576vCOQbvZlU2tUmFBAwPAMOjLF3pP/X1CibLQAxp3l+Gvsymp85x9EBL0wSTCRYXl5qtAH+Wr2dKPhYT8zg1+yf+QvjlMkzV6DX/o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=YONin1+B; arc=none smtp.client-ip=216.71.154.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KsHBFNRX"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752059875;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=DC7iMRSdjmh0Jpdr5XWacCi6V5gjDnVM41Pda8YmdKw=;
-	b=KsHBFNRXF6GXSQoTugCVPzi4LzQEgCHGirS35t12j6qNQDZsDepQRkJtBEZnBcQf8+y5Vu
-	5eI9C08FVRfWa8H25Xzu+ijaqUGvrN7aIT7QerSdNs1mSQnoqFZQ7yFyZv6El7TLQz1p7E
-	GlEvPPpd3UTJVGyIf/DQtPdw1NgSVjo=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-677-vXUIMOtzOmSvffVnKHdhkw-1; Wed,
- 09 Jul 2025 07:17:54 -0400
-X-MC-Unique: vXUIMOtzOmSvffVnKHdhkw-1
-X-Mimecast-MFC-AGG-ID: vXUIMOtzOmSvffVnKHdhkw_1752059873
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8F78C1801211;
-	Wed,  9 Jul 2025 11:17:52 +0000 (UTC)
-Received: from localhost (unknown [10.72.116.141])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 4BFDB30001B9;
-	Wed,  9 Jul 2025 11:17:50 +0000 (UTC)
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: Ming Lei <ming.lei@redhat.com>,
-	syzbot+2bcecf3c38cb3e8fdc8d@syzkaller.appspotmail.com,
-	Yu Kuai <yukuai3@huawei.com>,
-	Nilay Shroff <nilay@linux.ibm.com>
-Subject: [PATCH V2] nbd: fix lockdep deadlock warning
-Date: Wed,  9 Jul 2025 19:17:44 +0800
-Message-ID: <20250709111744.2353050-1-ming.lei@redhat.com>
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="YONin1+B"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1752061637; x=1783597637;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=yPrZyp6L0EDubHFT9+G8MgFYTqOrCUtEep8UOVwyPzw=;
+  b=YONin1+Bh41Xg0mW+Qjyn/4lrf8Yl6CMFdOBRcygTiFQ9XA8cyeS6Tr/
+   dm783uaPcOB3f+kSXOK2jIfrWBBAwxPN+lkrTxGA95TDA9lNd384vYo88
+   Gk3eWprnVFkxEOEhxMo00+xWGhm67udCbbkV6eCb1Z9lnb+Ozjr7teLK8
+   O1q5pcheSDouWrO/TdCSj6o0t/yDW1BtmjwhM1m5YY7+pvJCnqZWbfp5O
+   /QBpZikY13dE8tIjXPUl2Te/WCsToFlxaSmaT2aTkVnfGkkA8gGqox2In
+   SM7i7Ja+kWUBAGln1B8pSWHgXcgy81B3GmoW8ywXCm6ZQtx/yUyttfRwZ
+   w==;
+X-CSE-ConnectionGUID: 7bHZrereRx+Qes5IGMYJ5Q==
+X-CSE-MsgGUID: vjiTwvJUSmCzVCl3nbDMjg==
+X-IronPort-AV: E=Sophos;i="6.16,298,1744041600"; 
+   d="scan'208";a="91096340"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 09 Jul 2025 19:47:11 +0800
+IronPort-SDR: 686e4828_HEe/Vk9N/JOLkbK4Gd9fMCDQezE1aYrArKQrUPfo17zmqh4
+ OSdCb//ux3sm+i4f1doEWlog5gql7ZxOTldjUgA==
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 09 Jul 2025 03:44:56 -0700
+WDCIronportException: Internal
+Received: from c02g55f6ml85.ad.shared (HELO C02G55F6ML85.wdc.com) ([10.224.183.46])
+  by uls-op-cesaip01.wdc.com with ESMTP; 09 Jul 2025 04:47:10 -0700
+From: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Damien Le Moal <dlemoal@kernel.org>,
+	Christoph Hellwig <hch@lst.de>,
+	linux-block@vger.kernel.org,
+	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+	Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Subject: [PATCH 0/5] block: add tracepoints for ZBD specific operations 
+Date: Wed,  9 Jul 2025 13:46:59 +0200
+Message-Id: <20250709114704.70831-1-johannes.thumshirn@wdc.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -57,125 +60,30 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-nbd grabs device lock nbd->config_lock for updating nr_hw_queues, this
-ways cause the following lock dependency:
+Add tracepoints for operations specific to zoned block devices. 
 
--> #2 (&disk->open_mutex){+.+.}-{4:4}:
-       lock_acquire kernel/locking/lockdep.c:5871 [inline]
-       lock_acquire+0x1ac/0x448 kernel/locking/lockdep.c:5828
-       __mutex_lock_common kernel/locking/mutex.c:602 [inline]
-       __mutex_lock+0x166/0x1292 kernel/locking/mutex.c:747
-       mutex_lock_nested+0x14/0x1c kernel/locking/mutex.c:799
-       __del_gendisk+0x132/0xac6 block/genhd.c:706
-       del_gendisk+0xf6/0x19a block/genhd.c:819
-       nbd_dev_remove+0x3c/0xf2 drivers/block/nbd.c:268
-       nbd_dev_remove_work+0x1c/0x26 drivers/block/nbd.c:284
-       process_one_work+0x96a/0x1f32 kernel/workqueue.c:3238
-       process_scheduled_works kernel/workqueue.c:3321 [inline]
-       worker_thread+0x5ce/0xde8 kernel/workqueue.c:3402
-       kthread+0x39c/0x7d4 kernel/kthread.c:464
-       ret_from_fork_kernel+0x2a/0xbb2 arch/riscv/kernel/process.c:214
-       ret_from_fork_kernel_asm+0x16/0x18 arch/riscv/kernel/entry.S:327
+These tracepoints are also the foundation for adding zoned block device
+support to blktrace, which will be sent in a follow up.
 
--> #1 (&set->update_nr_hwq_lock){++++}-{4:4}:
-       lock_acquire kernel/locking/lockdep.c:5871 [inline]
-       lock_acquire+0x1ac/0x448 kernel/locking/lockdep.c:5828
-       down_write+0x9c/0x19a kernel/locking/rwsem.c:1577
-       blk_mq_update_nr_hw_queues+0x3e/0xb86 block/blk-mq.c:5041
-       nbd_start_device+0x140/0xb2c drivers/block/nbd.c:1476
-       nbd_genl_connect+0xae0/0x1b24 drivers/block/nbd.c:2201
-       genl_family_rcv_msg_doit+0x206/0x2e6 net/netlink/genetlink.c:1115
-       genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
-       genl_rcv_msg+0x514/0x78e net/netlink/genetlink.c:1210
-       netlink_rcv_skb+0x206/0x3be net/netlink/af_netlink.c:2534
-       genl_rcv+0x36/0x4c net/netlink/genetlink.c:1219
-       netlink_unicast_kernel net/netlink/af_netlink.c:1313 [inline]
-       netlink_unicast+0x4f0/0x82c net/netlink/af_netlink.c:1339
-       netlink_sendmsg+0x85e/0xdd6 net/netlink/af_netlink.c:1883
-       sock_sendmsg_nosec net/socket.c:712 [inline]
-       __sock_sendmsg+0xcc/0x160 net/socket.c:727
-       ____sys_sendmsg+0x63e/0x79c net/socket.c:2566
-       ___sys_sendmsg+0x144/0x1e6 net/socket.c:2620
-       __sys_sendmsg+0x188/0x246 net/socket.c:2652
-       __do_sys_sendmsg net/socket.c:2657 [inline]
-       __se_sys_sendmsg net/socket.c:2655 [inline]
-       __riscv_sys_sendmsg+0x70/0xa2 net/socket.c:2655
-       syscall_handler+0x94/0x118 arch/riscv/include/asm/syscall.h:112
-       do_trap_ecall_u+0x396/0x530 arch/riscv/kernel/traps.c:341
-       handle_exception+0x146/0x152 arch/riscv/kernel/entry.S:197
+But even without the immediate support for ZBD operations in blktrace, these
+tracepoints have prooven to be effective in debugging issues with filesystems
+on zoned block devices.
 
--> #0 (&nbd->config_lock){+.+.}-{4:4}:
-       check_noncircular+0x132/0x146 kernel/locking/lockdep.c:2178
-       check_prev_add kernel/locking/lockdep.c:3168 [inline]
-       check_prevs_add kernel/locking/lockdep.c:3287 [inline]
-       validate_chain kernel/locking/lockdep.c:3911 [inline]
-       __lock_acquire+0x12b2/0x24ea kernel/locking/lockdep.c:5240
-       lock_acquire kernel/locking/lockdep.c:5871 [inline]
-       lock_acquire+0x1ac/0x448 kernel/locking/lockdep.c:5828
-       __mutex_lock_common kernel/locking/mutex.c:602 [inline]
-       __mutex_lock+0x166/0x1292 kernel/locking/mutex.c:747
-       mutex_lock_nested+0x14/0x1c kernel/locking/mutex.c:799
-       refcount_dec_and_mutex_lock+0x60/0xd8 lib/refcount.c:118
-       nbd_config_put+0x3a/0x610 drivers/block/nbd.c:1423
-       nbd_release+0x94/0x15c drivers/block/nbd.c:1735
-       blkdev_put_whole+0xac/0xee block/bdev.c:721
-       bdev_release+0x3fe/0x600 block/bdev.c:1144
-       blkdev_release+0x1a/0x26 block/fops.c:684
-       __fput+0x382/0xa8c fs/file_table.c:465
-       ____fput+0x1c/0x26 fs/file_table.c:493
-       task_work_run+0x16a/0x25e kernel/task_work.c:227
-       resume_user_mode_work include/linux/resume_user_mode.h:50 [inline]
-       exit_to_user_mode_loop+0x118/0x134 kernel/entry/common.c:114
-       exit_to_user_mode_prepare include/linux/entry-common.h:330 [inline]
-       syscall_exit_to_user_mode_work include/linux/entry-common.h:414 [inline]
-       syscall_exit_to_user_mode include/linux/entry-common.h:449 [inline]
-       do_trap_ecall_u+0x3f0/0x530 arch/riscv/kernel/traps.c:355
-       handle_exception+0x146/0x152 arch/riscv/kernel/entry.S:197
+Johannes Thumshirn (5):
+  blktrace: add zoned block commands to blk_fill_rwbs
+  block: split blk_zone_update_request_bio into two functions
+  block: add tracepoint for blk_zone_update_request_bio
+  block: add tracepoint for blkdev_zone_mgmt
+  block: add trace messages to zone write plugging
 
-Also it isn't necessary to require nbd->config_lock, because
-blk_mq_update_nr_hw_queues() does grab tagset lock for sync everything.
+ block/blk-mq.c               |  6 ++-
+ block/blk-zoned.c            | 23 ++++++++++
+ block/blk.h                  | 31 ++++++-------
+ include/trace/events/block.h | 89 ++++++++++++++++++++++++++++++++++++
+ kernel/trace/blktrace.c      | 21 +++++++++
+ 5 files changed, 151 insertions(+), 19 deletions(-)
 
-Fixes the issue by releasing ->config_lock & retry in case of concurrent
-updating nr_hw_queues.
-
-Fixes: 98e68f67020c ("block: prevent adding/deleting disk during updating nr_hw_queues")
-Reported-by: syzbot+2bcecf3c38cb3e8fdc8d@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/all/6855034f.a00a0220.137b3.0031.GAE@google.com
-Reviewed-by: Yu Kuai <yukuai3@huawei.com>
-Cc: Nilay Shroff <nilay@linux.ibm.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
-V2:
-	- update 'nr_connections' in case retry is needed (Nilay)
-
- drivers/block/nbd.c | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 7bdc7eb808ea..709bad75c47b 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -1473,7 +1473,17 @@ static int nbd_start_device(struct nbd_device *nbd)
- 		return -EINVAL;
- 	}
- 
--	blk_mq_update_nr_hw_queues(&nbd->tag_set, config->num_connections);
-+retry:
-+	mutex_unlock(&nbd->config_lock);
-+	blk_mq_update_nr_hw_queues(&nbd->tag_set, num_connections);
-+	mutex_lock(&nbd->config_lock);
-+
-+	/* if another code path updated nr_hw_queues, retry until succeed */
-+	if (num_connections != config->num_connections) {
-+		num_connections = config->num_connections;
-+		goto retry;
-+	}
-+
- 	nbd->pid = task_pid_nr(current);
- 
- 	nbd_parse_flags(nbd);
 -- 
-2.47.0
+2.50.0
 
