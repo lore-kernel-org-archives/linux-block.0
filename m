@@ -1,276 +1,299 @@
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+Received: from 004.mia.mailroute.net (004.mia.mailroute.net [199.89.3.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C5502E6D22
-	for <linux-block@vger.kernel.org>; Thu, 10 Jul 2025 17:39:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752169152; cv=fail; b=ePC/5jqe7zm/zmdUGqOH1qcObopKpj5Y+4BjOHFBxLE9SCArLxNGPsT3k//NdW98JS+SFsLrLhRGrbYPUb+mG9pmDTUgRHUen5OW4Bnptbv29u3qyNvKRjPztbd8gymESzK9KHuwR/7ejG6wt4eibfp7FrYynmpVd3mKHzu5thc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752169152; c=relaxed/simple;
-	bh=CVbklZPcwYEGy8MgMJQ7HTUlxEofDdaC9TGy1QC5vFg=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=CKNM4XV6djUWs3dWTtI+Bjk24dTHR5CQ+gqmTl7JlT4uknP8pz1V6b/CHKCiAbYMsLlxSMXL9gGPsTDVyCLYVtIM4IVw/FL0fGVKqilqwml/EkX+v95uVKWDdq8UtU9p07OLxGmoxgKW5jCB8Al0eQ27vCRRfGXlmjpPdUU4TYY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=shQhaItj; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=Gm2wzoik; arc=fail smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 716662253A7
+	for <linux-block@vger.kernel.org>; Thu, 10 Jul 2025 18:05:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.7
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752170706; cv=none; b=tggr+l6eh8Tx881UgeaZ8jBlaLC6fCTTcNfusXE2JjmePsAtnvr88l5tNk9gKe9jy+f2vTLGZ8l0v4oG1rqUc/fGvQb8lEJHvx9eRENWTtfBaj8Qkt1cpwgRLWO8I3PCaUwE30voMrQE77fwwWk6d1OOQV1e5nq8w7x12EIZWvY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752170706; c=relaxed/simple;
+	bh=dxBXusDSpUkl/Wu4Y1OP7wxnWlW6VKPT8cwyUAHpdpk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=t5hWwXRBu9LHATRi7KU9TiaoDBHSaZvTRPylK/DqnNl5jpfwxgsyjwAJnRiNQuxMt3YmRmEu1CIrS2U7QTpe5WMOcI3ePdQC+4On5UxCdNFDo1iaqOn3qo7w2w2/34dyFcn8pv5yoZZ4L404GqwOmvFCdGOgYgGM5RRGPsebf6s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=lwF0CKV2; arc=none smtp.client-ip=199.89.3.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="shQhaItj";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="Gm2wzoik"
-Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56AHYuXA013154;
-	Thu, 10 Jul 2025 17:39:10 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=
-	corp-2025-04-25; bh=CpChBmN1TnM0p/pdOAfAmRhEer20aFBjDJ67oQcjaGc=; b=
-	shQhaItjAo8m7AjqwSpN2f/rbpHq4GT6Sf7RUykM7gBf4Z7haEAXMCorc95lrEC5
-	Gf5Btf/z5JFyuWeNZ4JGcaEGPlIUSShdMlKxgdc5IBHciMwucmBNol9dg1MXW8p2
-	5acq662tVWsaUYdd09NYEy5ZCNg9AslnZ2gO5YH0wx6AlGVLCJfOYbJR1OruxX+A
-	f3ve4i4/iXPoTbCnDB9cSIqE/EIfdvVXu6uZQAYjYiPjz191fIslaZ7VQ8l2yE83
-	q/aE+b6sMEY+pwfBJTFRo4MBqWTRWoSca6x04dqjza0LhneLO4FX/IKf5pz83QKG
-	+6keMQ0CZQ2QZ9FO3xLp3Q==
-Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 47thwxr130-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 10 Jul 2025 17:39:09 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 56AHLeCv014067;
-	Thu, 10 Jul 2025 17:39:09 GMT
-Received: from nam11-bn8-obe.outbound.protection.outlook.com (mail-bn8nam11on2078.outbound.protection.outlook.com [40.107.236.78])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 47ptgckqp6-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 10 Jul 2025 17:39:08 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Ej+2LtS/Zd8d7Ch9YeymwWqmbwN2R55kAu66/SBkvGtnKv4NHuOd3Dfu46Y2mv1rsI7vPkJiw8LEvD31ECov8D7wN0YBhZoKWevJXg04hFWtNbUkxNBy+TLKonYKwQE4RLj3Z6h6cS1oJYRl1FGi033P5Bj7m8NiMSt5rVkVEXRu6fNSjWWKwUzRpCQoaViBmvb9rHw5gcdBs2HS7lrtIgPTBQFdy4Fkwh/MTuTLwOXM4YfjZGEUQmy2d5/CK8092aSNt2Ix2U9BP2u6njlJhkEe70/b21ABqzN10MqS92BpTpPYTjzgf7XaeRmWPX30Qfa5hR1R2KfkkGbH/3qqIg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=CpChBmN1TnM0p/pdOAfAmRhEer20aFBjDJ67oQcjaGc=;
- b=fnLG1smDh/CxxOEaA751CHsiZOUKe5z3Xgs2f2kvpMFiXoaQbAdBeAPJyRPYiKdz3CS75IVb7epFdCl0gJv8GHe4IougtFbHrvLEjp7JW/bvwDRhO3e6VMEuvY3k4QQcI1eqOSDAAVS7oEoMrgZyhd3CR4NW4M7DzswhUMEZGrqxzeLTMEELExcaDB53KJxdv0HO9Vcyog9ubJdtCx2wVi714p2Qj6lpstzg3Q/gun7eLnAkh/Ru88AlT77BUgw7EKtj01y02VOQsHj67WCk39s86XnGkpFMaysXfOMiMmVL9/a6OlClpZFxDu0klNmWJaMiT/mpps376x3xOt2umg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=CpChBmN1TnM0p/pdOAfAmRhEer20aFBjDJ67oQcjaGc=;
- b=Gm2wzoikvH78mIaa5nWymAWGrjMS08C5XYoNq9SK6zO3sT35Hv5sT41c9wTJKrDKCD1LWOBuByxwl1cIpV1bgrMirHtt7r1/TE+InppTwGqgZYyVsdUqQBOhPpQr6HZ2bvXr3+EThJe+vkhPZcua0MYWXLkEciOadut1H0ZV/oY=
-Received: from SJ0PR10MB5550.namprd10.prod.outlook.com (2603:10b6:a03:3d3::5)
- by SJ5PPFB6A054FAC.namprd10.prod.outlook.com (2603:10b6:a0f:fc02::7c5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8835.28; Thu, 10 Jul
- 2025 17:39:05 +0000
-Received: from SJ0PR10MB5550.namprd10.prod.outlook.com
- ([fe80::10a5:f5f4:a06d:ecdf]) by SJ0PR10MB5550.namprd10.prod.outlook.com
- ([fe80::10a5:f5f4:a06d:ecdf%6]) with mapi id 15.20.8901.030; Thu, 10 Jul 2025
- 17:39:05 +0000
-Message-ID: <1c2ce026-2ba7-417e-bafc-f6bebfd79ad3@oracle.com>
-Date: Thu, 10 Jul 2025 10:38:58 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH blktests v3] md/002: add atomic write tests for md/stacked
- devices
-To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        linux-block@vger.kernel.org
-Cc: John Garry <john.g.garry@oracle.com>
-References: <20250710045537.70498-1-shinichiro.kawasaki@wdc.com>
-Content-Language: en-US
-From: alan.adamson@oracle.com
-In-Reply-To: <20250710045537.70498-1-shinichiro.kawasaki@wdc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: AM0PR02CA0143.eurprd02.prod.outlook.com
- (2603:10a6:20b:28d::10) To SJ0PR10MB5550.namprd10.prod.outlook.com
- (2603:10b6:a03:3d3::5)
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="lwF0CKV2"
+Received: from localhost (localhost [127.0.0.1])
+	by 004.mia.mailroute.net (Postfix) with ESMTP id 4bdN6R2BF0zm1751;
+	Thu, 10 Jul 2025 18:05:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1752170701; x=1754762702; bh=IHbRf6SOfWu/DeRrSoHBpGVp
+	v0NSYZ5Nhnn3HYS5XW8=; b=lwF0CKV2fCl9/MwbcybXZqN0d9HMh6fp1JWcu+9F
+	26d/wf/lXq3Z4zIibRcf0qLI6ezB8DUMxc9vKcsUOnPf7IxS46mNZdlJEQJmhlUz
+	8rr0FzVb+GpmFj2glzJbfttQQoMI+mENWfo6l2eI/+d6rj5t5AFgy4bCFAExmIXP
+	QIT0dslhU4ReSK7e09khxfBLYPKWSH534W0K3zVYDJHVJSPwjTcUmigt5I/J0Bsp
+	ldBtNvG4inAs9+fpaTtUZNhQqcXeau2DdiJ6OULozCVHuJjxxtlK7zhEojhqVFoL
+	4qWlSTqtouCE/F3UADZvIotJVs/8ClFnxqrVwtvQV9BfDg==
+X-Virus-Scanned: by MailRoute
+Received: from 004.mia.mailroute.net ([127.0.0.1])
+ by localhost (004.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id iSyS7v9srOJU; Thu, 10 Jul 2025 18:05:01 +0000 (UTC)
+Received: from [100.66.154.22] (unknown [104.135.204.82])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 004.mia.mailroute.net (Postfix) with ESMTPSA id 4bdN6L0MGczm174r;
+	Thu, 10 Jul 2025 18:04:57 +0000 (UTC)
+Message-ID: <fe36a76d-f859-4607-a09d-708472565d35@acm.org>
+Date: Thu, 10 Jul 2025 11:04:55 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ0PR10MB5550:EE_|SJ5PPFB6A054FAC:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9ad72171-080a-4678-9fa0-08ddbfd8aa81
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?b2dyVGgveWZES05SRytlV1VoKzhUNnJXQzhjc0NOWm1VYXp3RUFWbExqdFVQ?=
- =?utf-8?B?NHE1bjJzVHFqNHp5YkNIZmR1MUJZWGl2d3dVckR0TDRseVZNdVZ3YUZpUnh0?=
- =?utf-8?B?VGxoU2VPVGgwekZoMU1rak5LUUxyNnI2clZCdnp4UENZeTZQb1hocXQyUTV2?=
- =?utf-8?B?bjIvaW1pZ2lvMEVTQUZNYnBmMS9BQzQ4N0hFSEo1aUo4ZmM0UFpNeUNXcWtO?=
- =?utf-8?B?c3lNU3lGUkpOYW1oNWxWeXUxS2VlSFNhdTBwWUNUTXpsS0pYR2Fvdk1TTytp?=
- =?utf-8?B?QVg3b09QeDFKRWE3amxWQ0kvenBIdWltRUFlR29jbStKOGZ5NGh0VXhyTWZj?=
- =?utf-8?B?a3RsWStYRkRKR25qNzJYYmV0QmVVRWlJeTNyWmpZdmJ1TTNVZjF6Nzd1cEVS?=
- =?utf-8?B?VFROSjErbndvMTRMU0I4N1Z6Sk9DbmEyTmxDWFhyWFZtMHAwVkZKUDU5Q1RM?=
- =?utf-8?B?Y0pKZ1pMUTc1cGxuYzZRbUlibk85eGl3TzNRZHBOY094YXFmOFUxOXFjU0la?=
- =?utf-8?B?Q2lINndCUDE0a1dIZDZVdS9lR2lxTG5nUkl6TGdBYTYzTHE1NVlGZ25NUDNh?=
- =?utf-8?B?WFJmSXlrQjU5Zk81WkFzdmJpSVY3QXQxUUFvYjdiREhXNk4wMXpMZ3lrWE1H?=
- =?utf-8?B?encwTjEzek5MZUF1MzV1T25HUFRHSTJkMVlDV0VPYS9iNzQ1VW1oOElqdk9z?=
- =?utf-8?B?NG10YUJENjRKcWFDcW4vYnJRQ0ZtVEJhaDR4ZjdWbG1qc0U1NFhSemdaRnhl?=
- =?utf-8?B?TmN0VU1JWnRqdmI4UXJRNnVpV2FpZDRhaDlPLy85cjJBMUdWVHQ2MGNhVHpw?=
- =?utf-8?B?Y05JN01EWG5HcjRNcjZDZjdXc0lzYmdiTnBBaThjS2NxVkRDbXRkUDlXMllP?=
- =?utf-8?B?ZVF1Z3E3Rm9qeVRPNTdUUzNlekpxdTJBbk1XbEVSMGNBTyt5eFA5Tk9nT3pK?=
- =?utf-8?B?SjFraXFtSUxQd3RHc1lMVER5Y2ZhT3lFbkw1aXRRQzkrYTdEMlE1M1B6QzJC?=
- =?utf-8?B?TVpwTkdvTldOY05reUxlSlllVUdVR00yWGJlc0JibnppTzZ4OXdjWWZRSmQ0?=
- =?utf-8?B?MFBuRTNXaHM2TUw3V2VLVFpvQm1pbEhHRllvcC9wUUZiQW1mSm03bXRKNy9u?=
- =?utf-8?B?cGFrU3RUOWhMdTJZUE5TMHlsVUdYNlZzOE9oemVPaXRLMmtxTWFMQnU0aXBD?=
- =?utf-8?B?WnpITzhJYUJPSHpNRXAxdTZmREx0T3RBaDJZV3h5TEpLbnpRSlZ3UlhzcTlV?=
- =?utf-8?B?UTJ0V3Bhc0EzN3pidDFNT0FHN3YxUTg4OGZ4WGtUWmFkSG5wbW5XWUtCaEhp?=
- =?utf-8?B?ZUUyS2tNQTd5WkZiWExLV0ZtbExaVE9LZEp1OGx1R1lIWHFqT2lCQ1ppQnU5?=
- =?utf-8?B?bkU3WjExTnBoUmFXbkUxRWxUZ2puTUFEeXQvejVyMzJCUU5oMnJQU0V3b3Ar?=
- =?utf-8?B?YWFtREZneE5MQ0FlYVdqT05kV1NFVEVZNFp1a1dGcXNlNnNCRDRZVlcydFJJ?=
- =?utf-8?B?WS9CSWhobWY1SmZFOEhJQk42Y3NyNEp6YVdlNGQxSU9tT0xzNmRYcmF2WTRv?=
- =?utf-8?B?OG8zcjZvVUdZSnczR0M3K0FkNHdqMVdTWUFSTjV5TFV2YWplb1FzTlBUcDZ1?=
- =?utf-8?B?ZVBESHVIOGFjajdRYXNvRzMyTVVMZVZmSnR6aGJqRTVCUnc1dHdKSnhTV0Y1?=
- =?utf-8?B?Y2lyOSticktidzdtRTFuTCt1ZE5lR1dvUHdGcHNPelZOSEsvWFJoZjRDRGRv?=
- =?utf-8?B?SFY2QzR2bXZBWFo5Vzlra0ZiVUJzSHJ5MUFZRGtFVU9PSkdwMjNudUVoUWE4?=
- =?utf-8?B?ejZ5bm8xalJucFFlVGJoNUNDaDgzaEtsd3pheDVqQWMyUStJUHhzemJoRHNQ?=
- =?utf-8?B?QytYbzNtdFRVWWQ1UmZuRitydUF0QkhYTEpPSmgwc0EweWRlSXFhVjNlMG9r?=
- =?utf-8?Q?ctwFRO7dSDc=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR10MB5550.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?UUFoNjBHRXNwbUhqcC9nV3BzaFNKQXZFcW03bUhIT3k1THNhM2RuNnRQYXk1?=
- =?utf-8?B?RTBUYU1Ud3pRWVpqMUgvdlZCcGFvSnlVL3BBMkd4MHNzcFhDeWlBV0loa055?=
- =?utf-8?B?dzVIMzdIZDJpUzdBK25qREdXMzZVWkVXRStjaHJDL2VPYW9yQThnTGpGVUtw?=
- =?utf-8?B?cmovUndKMzJkM2JETEw0NnlwQnBUbWYrWXcreXNnN1g0UlJrSGw5VUVNV0Fu?=
- =?utf-8?B?dEhnQkZ2OU5JQUlFTnNHblFRbE90dGNvMnhWNFNubVdzQ3pBVVd3ZHptdlZ2?=
- =?utf-8?B?dWE0b1VIRjlEakFtcG5YWFpFUElvU3BkZ3hmUVpmeEN4Sk5tQ1l2TjlmWmNO?=
- =?utf-8?B?R1IvQnlBU29obitRdmp0T09oNmhxU2oxQkRYRk1rUy9vVCs4aWNUTk5GVTB0?=
- =?utf-8?B?aHV0UUZiUUkwWlhqWGRNbHBvRzlHdTRqUDBiSUtEa0MwNUZldjhXdEhGTE5G?=
- =?utf-8?B?eWZuZkJwTjFwemw3RXhFam84YitVWTFpY2FxaHI4bHNZZDVUWTdMZENmRG5a?=
- =?utf-8?B?TmdLTHBGQmVzVEFnV0tBM2pScWoyYnJ0V1lzQU1MempJYWo0QzBscjRjT3Y5?=
- =?utf-8?B?M3V5UmVRb1ptSzh3T09xaG5ScitzTG8wTXZlbUFJNEU4a205M092QlVYcyt1?=
- =?utf-8?B?RkR0ejJURHEvV0pkb0VxRVBsS2hvdXN2OTBDTkVxTENCWm9NMGEvN0JtSklr?=
- =?utf-8?B?RzZSU2tscjgzcjFEZzNubkFwSHVLdS8yT08wU1ZmUDVrRE5aOGd2THd0QnBy?=
- =?utf-8?B?clkvOVhBdDNzVktzWm4yeUsxR1lRSVVxVDNwck1RWGNIY2RPK3F0bUwvWXAr?=
- =?utf-8?B?cWdKQURHaUZpazZTTXNJWGpacFlGU1ZVQjRiRUwzYzR5QlBPSEc3Q2locGZV?=
- =?utf-8?B?a0hITDJNTjJjWXBTWGw0OTdBNFJoRTRiL0d3UXlwRTZzK0s2eEovaUdiQmZz?=
- =?utf-8?B?NjVhVTF5ZWQ1RUFBWndXSFIrc2pPd3h3ZFB4Q29GSzE4d09yWDh0VkhYRTBS?=
- =?utf-8?B?MndpMnBJa2wvclNaODNhanUvK09XL1RIZEZSMEdxUTJwejJiVkl2T21lUFFU?=
- =?utf-8?B?VlpUeE1vRVpRRmhtaGN5NlgrNXllNFZ2S3VOdmJCYm1hNEFIQnVYQk5OcVdp?=
- =?utf-8?B?eUx2bTk4djBTcTc0RVgzbGpyYlRmeGhEczhuNWxrMTVsQjlOT0RSdEtFUzRx?=
- =?utf-8?B?L2d6NjNHWVNYQU9lM3Y0dXhSZmhONEUxOWlJN21TUk95bTFiVUNPNjEwb2U3?=
- =?utf-8?B?SGcrV2IwbUlaOEsrcTRoelJZZjM4U2pPTExBRVRGck1yMlM2VTVQcXZYaENL?=
- =?utf-8?B?RmlzdjhuODdBT1Mwbnc2R2p2VlJTdm1kZEZzNnNreVNBSFlqV2tYUGpqODZh?=
- =?utf-8?B?cCt0UDdYbmV4TmdQdFQ3ZkxQSmpFTVRIU1RzekZiaCt6OElOQXJ3OHQ5WC9y?=
- =?utf-8?B?TFljVkNNUVpOYU85SWhVRk8yd0lsRjhNbStYQmdrR24zUFhWa0dqektBQ1Ry?=
- =?utf-8?B?SmV3b0w3dGYydGRDUGU4TEROM3pjcW5TTXlBbHVTVGhXT0Q4Nm84YVVpWS9t?=
- =?utf-8?B?dzlIR1BVMVdNcE1YQVBUdmN1QW0rZGttMzlQWktPMHMzWTFsSG9KRnh4QUEx?=
- =?utf-8?B?eEQ0amlDZGdobUVLaHFuRytVQ1c2ZThEc1ByRjN6dlhYK1BpU0FDalhlL3Nx?=
- =?utf-8?B?T09XOFBCMGpodkpkYkZWRk90NzhqTU5UMkdOSXBhUThLemNFQ1RSRWFtZ3lY?=
- =?utf-8?B?Ym9FOG5yWXZxZWc3NjZ0MW85T2FHRnoxbm1kMVcvVzl1bDJ0OEM5TnpzNXhS?=
- =?utf-8?B?ZlNxYjc5eFQwenVZVys0MkdIOGFKc1g0Q0pCQXhXUU0remw0Ymh3RlA4MGxS?=
- =?utf-8?B?Q2NjcVQ2UG1Wd2dyV01pWmEram5NYU93Rmt4dTVLUG56UUxCT0ZSMDJYbkw3?=
- =?utf-8?B?dk1ORURXMVVqNjlEZEFERTRpbXFXNzhVZmthQ3lhb1hTbnlwOGRCa2I1Vmh5?=
- =?utf-8?B?L2Y1dVo1dVdNNG5jQ1VNWi9VQU94Y2tFZjJxbVNITjZlSnpZQlBybmlWb0F4?=
- =?utf-8?B?R1B0ZGplczN6cFNvMmxzV1NNSm96eEZiV21xQmJMQk4zdmtMU2Nod3FYM200?=
- =?utf-8?B?cFJVTHlCbm42VWRQM3ZLQXJoVGpzSzQ1THd0bm9WRWNzYWw3QVhYaFlGM1lx?=
- =?utf-8?B?L1E9PQ==?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	MPhxF6T1mlLlo/byG/WwsPs+DbhkdTCmU/hk3MYnnmeuFZ2eI0MPI38+uYvcXEELCEU+j2fdMNq4aDVNs96k97vDAwdfclv8e9ylevY+xmjWi5cNhf+2zx1Fj7jD09vkOeS86aCcSuHnI0XTfIP+3ZAhZ4pfanVJsW7dMLGSEoZEYq8VWzttgAohTrbZy7ynHpbnJSkL+CIytgPnxjF5efjGcGpJoA5sjI/q1aS+tcpIzC9nXJz1qW3F7Hriznmx/ja8+MK9NNo5ckqrtaWMe6GgcIUZ2utFhs6msCH7QJ0/CKhKKHaXn3cgfPcLzgs/7ufZV7LA0IaXe5OV0Q/MUAgeDJeG0KaM/63uBkdjvAXnZl46b1yi9f9gUyg2vGgkpxGMZPdpwIPYnNboelEWL+zU5D343S3LnQL48drHuKCZKaI/tJJB8HbqMEZY4uptfMBCgEf4o5R8vjFyyv/uOeDiTx9OxAqc9y/KD7Hccn6FBK1/qML6XoJROyYrUMbsWnkAMu4+tr7P3X8otRDJYe8kopsN7xmF7BGTWTqPiWkfzJa8IkFCXwQoapB6oMGtwbvW4qWBdpQfwinep2P4NeE0MNbgzd1WuAiTVMaeLe0=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9ad72171-080a-4678-9fa0-08ddbfd8aa81
-X-MS-Exchange-CrossTenant-AuthSource: SJ0PR10MB5550.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jul 2025 17:39:05.5341
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: cKNbiyZeyh37RfqHN9yOhciWdMlRRyV+vLiqDbsARo+SJQOqGR55zOuwkmDcDslqGgL0wfXSFYI3mla03RulaA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ5PPFB6A054FAC
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
- definitions=2025-07-10_04,2025-07-09_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 adultscore=0
- suspectscore=0 malwarescore=0 bulkscore=0 mlxlogscore=999 spamscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2505160000 definitions=main-2507100150
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzEwMDE1MCBTYWx0ZWRfX3qE1+8JT5qcL y359hvMDLkarnJsgRspGi9cgsWqwZmi+CUaR33+AlElOa8qtOCOpcGHeRm9/Kt1nsEmGFQoIsfh SbyVSamZTlpewm8G8fD0e//6PAKnvjkDDTLdX4FrrToIirdCWa2C8ugM8UN1UDA8AcNf8Q6LMEo
- R1PNs/vKUQrUxkpqhumju5AADuZngun7CFKcjnMHi16AUdmvn8SyasMbhr6z4O/WVz0QrPjE+o8 SW4FrCJ3oEFZCF1hzr0aScM9PDV784BniXvpE8S1nyxz6tKT9SGiDomoPjnmv6j+CaFFn4PBqMF RLYzKsvOqDLNAegnlgTx3IVE7+u1PIKkh8g73o7o0H+/OBcj1FqloQdF9fYLcc/mKOmewgeiTE2
- mnmcK2W1MHHqPaERuu6DLXjzQzZJH57TnSBuY5D03spVFh+pxCOYr7SD5AD7z4ZaPLtilaF7
-X-Proofpoint-GUID: 1sG_nOnAjSG2c2bOrLocNi6MoxOW1Zw5
-X-Authority-Analysis: v=2.4 cv=JeO8rVKV c=1 sm=1 tr=0 ts=686ffabd b=1 cx=c_pps a=qoll8+KPOyaMroiJ2sR5sw==:117 a=qoll8+KPOyaMroiJ2sR5sw==:17 a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=wKuvFiaSGQ0qltdbU6+NXLB8nM8=:19
- a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=GoEa3M9JfhUA:10 a=KboM1uzekkU_W5_Bh0YA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10 cc=ntf awl=host:12062
-X-Proofpoint-ORIG-GUID: 1sG_nOnAjSG2c2bOrLocNi6MoxOW1Zw5
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 3/3] block: Rework splitting of encrypted bios
+To: Christop Hellwig <hch@infradead.org>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+ Eric Biggers <ebiggers@google.com>, Keith Busch <kbusch@kernel.org>
+References: <20250625234259.1985366-1-bvanassche@acm.org>
+ <20250625234259.1985366-4-bvanassche@acm.org>
+ <aFzadpzYv14Qbs5K@infradead.org>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <aFzadpzYv14Qbs5K@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-> +		if [ "$raid_level" = 0 ] || [ "$raid_level" = 10 ]
-> +		then
-> +			md_chunk_size=$(( "$scsi_sysfs_atomic_unit_max_bytes" / 2048))
-> +
-> +			if [ "$raid_level" = 0 ]
-> +			then
-> +				echo y | mdadm --create /dev/md/blktests_md --level=$raid_level \
-> +					--raid-devices=2 --chunk="${md_chunk_size}"K --force \
-> +					/dev/"${scsi_0}" /dev/"${scsi_1}" 2> /dev/null 1>&2
-> +			else
-> +				echo y | mdadm --create /dev/md/blktests_md --level=$raid_level \
-> +					--raid-devices=4 --chunk="${md_chunk_size}"K --force \
-> +					/dev/"${scsi_0}" /dev/"${scsi_1}" \
-> +					/dev/"${scsi_2}" /dev/"${scsi_3}" 2> /dev/null 1>&2
-> +			fi
-> +
-> +			md_dev=$(readlink /dev/md/blktests_md | sed 's|\.\./||')
-> +			md_dev_sysfs="/sys/devices/virtual/block/${md_dev}"
-> +			md_sysfs_atomic_unit_max_bytes=$(< "${md_dev_sysfs}"/queue/atomic_write_unit_max_bytes)
-> +			test_desc="TEST 12 RAID $raid_level - Verify chunk size "
-> +			if [ "$md_chunk_size" -le "$md_sysfs_atomic_unit_max_bytes" ] && \
-> +				   (( md_sysfs_atomic_unit_max_bytes % md_chunk_size == 0 ))
-> +			then
-> +				echo "$test_desc - pass"
-> +			else
-> +				echo "$test_desc - fail $md_chunk_size - $md_sysfs_atomic_unit_max_bytes"
-> +			fi
-> +
+On 6/25/25 10:28 PM, Christop Hellwig wrote:
+> This adds a lot of mess to work around the blk-crypto fallback code, and
+> looking at it a bit more I think the fundamental problem is that we
+> call into the blk-crypto fallback code from the block layer, which is
+> very much against how the rest of the block layer works for submit_bio
+> based driver.
+> 
+> So instead of piling up workarounds in the block layer code I'd suggest
+> you change the blk-crypto code to work more like the rest of the block
+> layer for bio based drivers, i.e. move the call into the drivers that
+> you care about and stop supporting it for others.  The whole concept
+> of working around the lack of features in drivers in the block layer
+> is just going to cause more and more problems.
 
-Oops, md_chunk_size is in kbs.  Should be in bytes.
+Hi Christoph,
+
+Thanks for having proposed a path forward.
+
+The blk-crypto-fallback code replaces a bio because it allocates a data
+buffer for the encrypted or decrypted data. I think this data buffer
+allocation is fundamental. Hence, the crypto fallback code must be
+called before DMA mapping has happened. In case of the UFS driver, DMA
+mapping happens by the SCSI core. Would it be acceptable to keep the
+blk-crypto-fallback code in the block layer core instead of moving it
+into the SCSI core? The patch below shows that is is possible without
+the disadvantages of the patch series I'm replying to. In the patch
+below the BIO_HAS_BEEN_SPLIT and BLK_FEAT_CALLS_BIO_SPLIT_TO_LIMITS
+flags are gone. I have verified that the patch below doesn't trigger any
+write errors in combination with zoned storage.
+
+Thanks,
+
+Bart.
 
 
-diff --git a/tests/md/002 b/tests/md/002
-index 79c0d15..79f260b 100755
---- a/tests/md/002
-+++ b/tests/md/002
-@@ -29,6 +29,7 @@ test() {
-         local md_sysfs_max_hw_sectors_kb
-         local md_max_hw_bytes
-         local md_chunk_size
-+       local md_chunk_size_bytes
-         local md_sysfs_logical_block_size
-         local md_sysfs_atomic_max_bytes
-         local md_sysfs_atomic_unit_max_bytes
-@@ -226,13 +227,14 @@ test() {
-                         md_dev=$(readlink /dev/md/blktests_md | sed 
-'s|\.\./||')
-md_dev_sysfs="/sys/devices/virtual/block/${md_dev}"
-                         md_sysfs_atomic_unit_max_bytes=$(< 
-"${md_dev_sysfs}"/queue/atomic_write_unit_max_bytes)
-+                       md_chunk_size_bytes=$(( "$md_chunk_size" * 1024))
-                         test_desc="TEST 12 RAID $raid_level - Verify 
-chunk size "
--                       if [ "$md_chunk_size" -le 
-"$md_sysfs_atomic_unit_max_bytes" ] && \
--                                  (( md_sysfs_atomic_unit_max_bytes % 
-md_chunk_size == 0 ))
-+                       if [ "$md_chunk_size_bytes" -le 
-"$md_sysfs_atomic_unit_max_bytes" ] && \
-+                                  (( md_sysfs_atomic_unit_max_bytes % 
-md_chunk_size_bytes == 0 ))
-                         then
-                                 echo "$test_desc - pass"
-                         else
--                               echo "$test_desc - fail $md_chunk_size - 
-$md_sysfs_atomic_unit_max_bytes"
-+                               echo "$test_desc - fail 
-$md_chunk_size_bytes - $md_sysfs_atomic_unit_max_bytes"
-                         fi
+Subject: block: Rework splitting of encrypted bios
 
-                         mdadm --quiet --stop /dev/md/blktests_md
+Modify splitting of encrypted bios as follows:
+- Stop calling blk_crypto_bio_prep() for bio-based block drivers that do not
+   call bio_split_to_limits().
+- For request-based block drivers and for bio-based block drivers that call
+   bio_split_to_limits(), call blk_crypto_bio_prep() after bio splitting
+   happened instead of before bio splitting happened.
+- In bio_split_rw(), restrict the bio size to the smaller size of what is
+   supported to the block driver and the crypto fallback code.
 
+The advantages of these changes are as follows:
+- This patch fixes write errors on zoned storage caused by out-of-order
+   submission of bios. This out-of-order submission happens if both the
+   crypto fallback code and bio_split_to_limits() split a bio.
+- Less code duplication. The crypto fallback code now calls
+   bio_split_to_limits() instead of open-coding it.
 
-Alan
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 
+diff --git a/block/blk-core.c b/block/blk-core.c
+index fdac48aec5ef..5af5f8c3cd06 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -626,9 +626,6 @@ static void __submit_bio(struct bio *bio)
+  	/* If plug is not used, add new plug here to cache nsecs time. */
+  	struct blk_plug plug;
+
+-	if (unlikely(!blk_crypto_bio_prep(&bio)))
+-		return;
+-
+  	blk_start_plug(&plug);
+
+  	if (!bdev_test_flag(bio->bi_bdev, BD_HAS_SUBMIT_BIO)) {
+diff --git a/block/blk-crypto-fallback.c b/block/blk-crypto-fallback.c
+index 005c9157ffb3..3b9ae57141b0 100644
+--- a/block/blk-crypto-fallback.c
++++ b/block/blk-crypto-fallback.c
+@@ -209,9 +209,12 @@ blk_crypto_fallback_alloc_cipher_req(struct 
+blk_crypto_keyslot *slot,
+  	return true;
+  }
+
+-static bool blk_crypto_fallback_split_bio_if_needed(struct bio **bio_ptr)
++/*
++ * The encryption fallback code allocates bounce pages individually. 
+Hence this
++ * function that calculates an upper limit for the bio size.
++ */
++unsigned int blk_crypto_max_io_size(struct bio *bio)
+  {
+-	struct bio *bio = *bio_ptr;
+  	unsigned int i = 0;
+  	unsigned int num_sectors = 0;
+  	struct bio_vec bv;
+@@ -222,21 +225,8 @@ static bool 
+blk_crypto_fallback_split_bio_if_needed(struct bio **bio_ptr)
+  		if (++i == BIO_MAX_VECS)
+  			break;
+  	}
+-	if (num_sectors < bio_sectors(bio)) {
+-		struct bio *split_bio;
+-
+-		split_bio = bio_split(bio, num_sectors, GFP_NOIO,
+-				      &crypto_bio_split);
+-		if (IS_ERR(split_bio)) {
+-			bio->bi_status = BLK_STS_RESOURCE;
+-			return false;
+-		}
+-		bio_chain(split_bio, bio);
+-		submit_bio_noacct(bio);
+-		*bio_ptr = split_bio;
+-	}
+
+-	return true;
++	return num_sectors;
+  }
+
+  union blk_crypto_iv {
+@@ -257,8 +247,10 @@ static void blk_crypto_dun_to_iv(const u64 
+dun[BLK_CRYPTO_DUN_ARRAY_SIZE],
+   * The crypto API fallback's encryption routine.
+   * Allocate a bounce bio for encryption, encrypt the input bio using 
+crypto API,
+   * and replace *bio_ptr with the bounce bio. May split input bio if 
+it's too
+- * large. Returns true on success. Returns false and sets bio->bi_status on
+- * error.
++ * large. Returns %true on success. On error, %false is returned and one of
++ * these two actions is taken:
++ * - Either @bio_ptr->bi_status is set and *@bio_ptr is not modified.
++ * - Or bio_endio() is called and *@bio_ptr is changed into %NULL.
+   */
+  static bool blk_crypto_fallback_encrypt_bio(struct bio **bio_ptr)
+  {
+@@ -275,9 +267,12 @@ static bool blk_crypto_fallback_encrypt_bio(struct 
+bio **bio_ptr)
+  	bool ret = false;
+  	blk_status_t blk_st;
+
+-	/* Split the bio if it's too big for single page bvec */
+-	if (!blk_crypto_fallback_split_bio_if_needed(bio_ptr))
++	/* Verify that bio splitting has occurred. */
++	if (WARN_ON_ONCE(bio_sectors(*bio_ptr) >
++			 blk_crypto_max_io_size(*bio_ptr))) {
++		src_bio->bi_status = BLK_STS_IOERR;
+  		return false;
++	}
+
+  	src_bio = *bio_ptr;
+  	bc = src_bio->bi_crypt_context;
+@@ -475,9 +470,8 @@ static void blk_crypto_fallback_decrypt_endio(struct 
+bio *bio)
+   * @bio_ptr: pointer to the bio to prepare
+   *
+   * If bio is doing a WRITE operation, this splits the bio into two 
+parts if it's
+- * too big (see blk_crypto_fallback_split_bio_if_needed()). It then 
+allocates a
+- * bounce bio for the first part, encrypts it, and updates bio_ptr to 
+point to
+- * the bounce bio.
++ * too big. It then allocates a bounce bio for the first part, encrypts 
+it, and
++ * updates bio_ptr to point to the bounce bio.
+   *
+   * For a READ operation, we mark the bio for decryption by using 
+bi_private and
+   * bi_end_io.
+diff --git a/block/blk-crypto-internal.h b/block/blk-crypto-internal.h
+index ccf6dff6ff6b..443ba1fd82e6 100644
+--- a/block/blk-crypto-internal.h
++++ b/block/blk-crypto-internal.h
+@@ -223,6 +223,8 @@ bool blk_crypto_fallback_bio_prep(struct bio **bio_ptr);
+
+  int blk_crypto_fallback_evict_key(const struct blk_crypto_key *key);
+
++unsigned int blk_crypto_max_io_size(struct bio *bio);
++
+  #else /* CONFIG_BLK_INLINE_ENCRYPTION_FALLBACK */
+
+  static inline int
+@@ -245,6 +247,11 @@ blk_crypto_fallback_evict_key(const struct 
+blk_crypto_key *key)
+  	return 0;
+  }
+
++static inline unsigned int blk_crypto_max_io_size(struct bio *bio)
++{
++	return UINT_MAX;
++}
++
+  #endif /* CONFIG_BLK_INLINE_ENCRYPTION_FALLBACK */
+
+  #endif /* __LINUX_BLK_CRYPTO_INTERNAL_H */
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index 70d704615be5..caaec70477bb 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -9,6 +9,7 @@
+  #include <linux/blk-integrity.h>
+  #include <linux/part_stat.h>
+  #include <linux/blk-cgroup.h>
++#include <linux/blk-crypto.h>
+
+  #include <trace/events/block.h>
+
+@@ -124,9 +125,14 @@ static struct bio *bio_submit_split(struct bio 
+*bio, int split_sectors)
+  		trace_block_split(split, bio->bi_iter.bi_sector);
+  		WARN_ON_ONCE(bio_zone_write_plugging(bio));
+  		submit_bio_noacct(bio);
+-		return split;
++
++		bio = split;
+  	}
+
++	WARN_ON_ONCE(!bio);
++	if (unlikely(!blk_crypto_bio_prep(&bio)))
++		return NULL;
++
+  	return bio;
+  error:
+  	bio->bi_status = errno_to_blk_status(split_sectors);
+@@ -355,9 +361,12 @@ EXPORT_SYMBOL_GPL(bio_split_rw_at);
+  struct bio *bio_split_rw(struct bio *bio, const struct queue_limits *lim,
+  		unsigned *nr_segs)
+  {
++	u32 max_sectors =
++		min(get_max_io_size(bio, lim), blk_crypto_max_io_size(bio));
++
+  	return bio_submit_split(bio,
+  		bio_split_rw_at(bio, lim, nr_segs,
+-			get_max_io_size(bio, lim) << SECTOR_SHIFT));
++				(u64)max_sectors << SECTOR_SHIFT));
+  }
+
+  /*
 
