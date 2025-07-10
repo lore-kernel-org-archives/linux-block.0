@@ -1,223 +1,114 @@
-Received: from fout-b1-smtp.messagingengine.com (fout-b1-smtp.messagingengine.com [202.12.124.144])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C42A2D6404;
-	Thu, 10 Jul 2025 10:11:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.144
+Received: from mx9.didiglobal.com (mx9.didiglobal.com [111.202.70.124])
+	by smtp.subspace.kernel.org (Postfix) with SMTP id ACE9A2D660E;
+	Thu, 10 Jul 2025 10:14:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=111.202.70.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752142308; cv=none; b=u+3XvjIBdp67tFMH+aJmqpX0M7F7mJHyIDcDWGqAo/wPXSfenM5T2Cjc0GS2Ka5MVwZpX9Af6SBPPqypTflt4uJPOWF1BpQU7W8Ret8d04NAWPlJbd9WV8fEhIn2AlWfJ4viHodRzloEOHR/6Mqd3YuVQSiHe4y/9EiEG3KKwr4=
+	t=1752142466; cv=none; b=NEryNUCSYvKqPXLFigCtOwN0uYAr5486ctf40aFJD/uZjx1bvZVscz7Hjf9SJdrdL8ZHdAyawuiFZEzeiuTOkEF633lt1WV2kM9cqJaHflabaNyeZueo7z3WvTXMPaC81JoQkyEgS5aru0jMAev1GV1n2rRCJ6CebAYVYF982GE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752142308; c=relaxed/simple;
-	bh=IF+FueXXPhxbQmMzZ8TSJEEChMnwlObkIVgzWrxskaQ=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=NzoOPamOv8nJoWQb6vc+Z8quu+z8FWXP+MOf6SfgJgeM2FB3D2sSHJ/En80UwZun0HQrYRGeAsv2LIQuB7zInPO/QT3sCIMvjOUwCKaYWwvm/RPMKsRCB6O6w5J3AX9pgAxgWUOAPGWKFD6QAmJO0lvHdB2EJ7Gf94SFI8vf0kg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=U48+wTGE; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=aS7MD8ca; arc=none smtp.client-ip=202.12.124.144
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+	s=arc-20240116; t=1752142466; c=relaxed/simple;
+	bh=G4rwVJYLKQqnce8QoPmaSGWeYFRMyGi7Hu7kmAMCExA=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:Content-Type:
+	 MIME-Version; b=TIR/3cxilY22k0vQLUs6r9DYxo3VMw4XqQlBgT3RyzBzTNoDfqAfEFF7EJzhMXzzVsCJx3trV0nxkrAQAM1iB/0/iazlAYviyAGAlSzmxL1A+lCQReWcaahgFEiZWMRnVGt9CMRGZvb/fmLyOvfDoPp0F0vtf6G2wPmWrGSVtWM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=didiglobal.com; spf=pass smtp.mailfrom=didiglobal.com; dkim=pass (1024-bit key) header.d=didiglobal.com header.i=@didiglobal.com header.b=Z6/jK5gL; arc=none smtp.client-ip=111.202.70.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=didiglobal.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=didiglobal.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="U48+wTGE";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="aS7MD8ca"
-Received: from phl-compute-05.internal (phl-compute-05.phl.internal [10.202.2.45])
-	by mailfout.stl.internal (Postfix) with ESMTP id 748CE1D000CF;
-	Thu, 10 Jul 2025 06:11:44 -0400 (EDT)
-Received: from phl-imap-02 ([10.202.2.81])
-  by phl-compute-05.internal (MEProxy); Thu, 10 Jul 2025 06:11:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm1; t=1752142304;
-	 x=1752228704; bh=ydaHlBV5gJlTgiENGrFYzr8bwPeWnPe7RkMn21aUeIM=; b=
-	U48+wTGEOnDa0rOSVjCylRWZ4mgOPikGmxnGn6zgNKihmazbvsr7U0+UFWyvvrcw
-	yW/7gfnf5XEPb7Z1stemw3LEdlE8jLr09LjTJLzm8tVuPjdgUDQP3BH5J6yuqQbz
-	/xLvSJvqW0HxlAcMByG7jEhQI5tRmDJlpHyydLePkvUbdGWumU6foJMxdJLn4dcG
-	5GLZT9hbAhvtoBhtBWuJq3Q2JdGjN/aUD1JFKy4fXr6xrJiVdlytoLHSAJQe+1xh
-	XVOUYlclE7eChY3XX44no8J+8n3g9E+kxAbAD+KkLRRVFgf8bdHnNgsTrEFphPrW
-	/WiNfXeGTgKIPcRwofBj2w==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1752142304; x=
-	1752228704; bh=ydaHlBV5gJlTgiENGrFYzr8bwPeWnPe7RkMn21aUeIM=; b=a
-	S7MD8ca4kgudog25pPsFOzlN0Cg5w82G+y2083q8RY7l+scyECuzWqa5rZX2SgvN
-	+J+jNYkaotWVW6wpJlkV2zVM59cGFKb2hQuMvl2kfbKS0p+pmBh5Zorhar1YzCP7
-	4m3E+AU84M/gt+2ki6Do9mJv/t36WkXm6cUPYXgbbWjghYAjiZankWtNY6NgcpRi
-	OZywdA9R6bnG/5NFqi+L9VYowuxINHEeCt2ZKpyNYY3tDCF2MeF2QFKUL2WRKQXy
-	ASLS+GZGDXiLQnOUZwWS/OXQV5KQWZKXSBRCtQDGXbiMKlK+4tjeGuWyDm+Wu2gP
-	5sGQavnvyltc3+9h9+pKg==
-X-ME-Sender: <xms:35FvaDJFn-2y4V7KEfI0Uh8UTKDqPcODQ7KU_jVgLuxQ4Giqyahk1g>
-    <xme:35FvaHJ-CbPByJZGY8DchBoPuZjBRroyUbdiS_0jLArK4dKAetXE4OjHTiMTF015H
-    W6eYJUyI7fF_h5LAsA>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgdegtddujecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpefoggffhffvvefkjghfufgtgfesthejredtredttdenucfhrhhomhepfdetrhhnugcu
-    uegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrghtthgvrh
-    hnpefhtdfhvddtfeehudekteeggffghfejgeegteefgffgvedugeduveelvdekhfdvieen
-    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrhhnug
-    esrghrnhgusgdruggvpdhnsggprhgtphhtthhopeduledpmhhouggvpehsmhhtphhouhht
-    pdhrtghpthhtoheprgguohgsrhhihigrnhesghhmrghilhdrtghomhdprhgtphhtthhope
-    grshhmlhdrshhilhgvnhgtvgesghhmrghilhdrtghomhdprhgtphhtthhopegvsghighhg
-    vghrshesghhoohhglhgvrdgtohhmpdhrtghpthhtoheprgigsghovgeskhgvrhhnvghlrd
-    gukhdprhgtphhtthhopegrrhhnugeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepsghr
-    rghunhgvrheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepughjfihonhhgsehkvghrnh
-    gvlhdrohhrghdprhgtphhtthhopegrnhguvghrshdrrhhogigvlhhlsehlihhnrghrohdr
-    ohhrghdprhgtphhtthhopegsvghnjhgrmhhinhdrtghophgvlhgrnhgusehlihhnrghroh
-    drohhrgh
-X-ME-Proxy: <xmx:35FvaCltc2zsvaaY_Md0KzCHB0PMLi4OisOpT4_ZCT0g2MVeVmWK7A>
-    <xmx:35FvaO9EYyuoJqzan-TGmKsPz1_3lEWLrdnwjEaKCin3aDeWsDmW6Q>
-    <xmx:35FvaDnrWPRhBYPyGervbtbFavwcCCIlGk8rYgBvqIqdtF_dqPvygg>
-    <xmx:35FvaMmlCWdmTnvRpMa84ndCLVe5M3Ljd_d_-19qvs8bYgax4FYmCg>
-    <xmx:4JFvaL6SHoLpYaV_TxPFRoEf_GlqruVC7gwsoNTvNnHh8X-YO7M_5h7V>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 27641700065; Thu, 10 Jul 2025 06:11:43 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	dkim=pass (1024-bit key) header.d=didiglobal.com header.i=@didiglobal.com header.b="Z6/jK5gL"
+Received: from mail.didiglobal.com (unknown [10.79.71.38])
+	by mx9.didiglobal.com (MailData Gateway V2.8.8) with ESMTPS id 86542181988061;
+	Thu, 10 Jul 2025 18:14:05 +0800 (CST)
+Received: from BJ03-ACTMBX-07.didichuxing.com (10.79.71.34) by
+ BJ03-ACTMBX-02.didichuxing.com (10.79.71.38) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.10; Thu, 10 Jul 2025 18:14:08 +0800
+Received: from BJ03-ACTMBX-07.didichuxing.com (10.79.71.34) by
+ BJ03-ACTMBX-07.didichuxing.com (10.79.71.34) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.10; Thu, 10 Jul 2025 18:14:08 +0800
+Received: from BJ03-ACTMBX-07.didichuxing.com ([fe80::2e1a:dd47:6d25:287e]) by
+ BJ03-ACTMBX-07.didichuxing.com ([fe80::2e1a:dd47:6d25:287e%7]) with mapi id
+ 15.02.1748.010; Thu, 10 Jul 2025 18:14:08 +0800
+X-MD-Sfrom: chentaotao@didiglobal.com
+X-MD-SrcIP: 10.79.71.38
+From: =?gb2312?B?s8LMzszOIFRhb3RhbyBDaGVu?= <chentaotao@didiglobal.com>
+To: "tytso@mit.edu" <tytso@mit.edu>, "hch@infradead.org" <hch@infradead.org>,
+	"adilger.kernel@dilger.ca" <adilger.kernel@dilger.ca>, "willy@infradead.org"
+	<willy@infradead.org>, "brauner@kernel.org" <brauner@kernel.org>,
+	"jani.nikula@linux.intel.com" <jani.nikula@linux.intel.com>,
+	"rodrigo.vivi@intel.com" <rodrigo.vivi@intel.com>, "tursulin@ursulin.net"
+	<tursulin@ursulin.net>, "airlied@gmail.com" <airlied@gmail.com>
+CC: "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+	"linux-ext4@vger.kernel.org" <linux-ext4@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+	"dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
+	"linux-mm@kvack.org" <linux-mm@kvack.org>, "linux-doc@vger.kernel.org"
+	<linux-doc@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "chentao325@qq.com" <chentao325@qq.com>,
+	"frank.li@vivo.com" <frank.li@vivo.com>,
+	=?gb2312?B?s8LMzszOIFRhb3RhbyBDaGVu?= <chentaotao@didiglobal.com>
+Subject: [PATCH v5 1/5] drm/i915: Use kernel_write() in shmem object create
+Thread-Topic: [PATCH v5 1/5] drm/i915: Use kernel_write() in shmem object
+ create
+Thread-Index: AQHb8YNfdAtlZSbKRkmOcPt/kk2Uzg==
+Date: Thu, 10 Jul 2025 10:14:08 +0000
+Message-ID: <20250710101404.362146-2-chentaotao@didiglobal.com>
+In-Reply-To: <20250710101404.362146-1-chentaotao@didiglobal.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="gb2312"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: Tfdac8457399410f6
-Date: Thu, 10 Jul 2025 12:11:12 +0200
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Christian Brauner" <brauner@kernel.org>,
- "Arnd Bergmann" <arnd@kernel.org>
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
- "Anuj Gupta" <anuj20.g@samsung.com>,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- "Kanchan Joshi" <joshi.k@samsung.com>, "LTP List" <ltp@lists.linux.it>,
- "Dan Carpenter" <dan.carpenter@linaro.org>,
- "Benjamin Copeland" <benjamin.copeland@linaro.org>, rbm@suse.com,
- "Naresh Kamboju" <naresh.kamboju@linaro.org>,
- "Anders Roxell" <anders.roxell@linaro.org>, "Jens Axboe" <axboe@kernel.dk>,
- "Pavel Begunkov" <asml.silence@gmail.com>,
- "Alexey Dobriyan" <adobriyan@gmail.com>,
- "Darrick J. Wong" <djwong@kernel.org>, "Eric Biggers" <ebiggers@google.com>,
- linux-kernel@vger.kernel.org
-Message-Id: <d2e1d4a9-d475-43e3-824b-579e5084aaf3@app.fastmail.com>
-In-Reply-To: <20250710-passen-petersilie-32f6f1e9a1fc@brauner>
-References: <20250709181030.236190-1-arnd@kernel.org>
- <20250710-passen-petersilie-32f6f1e9a1fc@brauner>
-Subject: Re: [PATCH] block: fix FS_IOC_GETLBMD_CAP parsing in blkdev_common_ioctl()
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=didiglobal.com;
+	s=2025; t=1752142447;
+	bh=G4rwVJYLKQqnce8QoPmaSGWeYFRMyGi7Hu7kmAMCExA=;
+	h=From:To:CC:Subject:Date:Message-ID:Content-Type;
+	b=Z6/jK5gLCbJsbl1surobq42/zdAi8K0ts+lLuOOo9L4Wve9bIiesXsPmhPAF0ZPSV
+	 6gAGXSQuZVL0bCdS8qppbGk5s3xHO0UkTkNCWmJZqiL7CouGgjlKnXAO4j4TRwyUM1
+	 5oqHT1f42ie3Nn9qrDTrpX1cyFOI6vhKMS6fM4BM=
 
-On Thu, Jul 10, 2025, at 10:00, Christian Brauner wrote:
-> On Wed, Jul 09, 2025 at 08:10:14PM +0200, Arnd Bergmann wrote:
-
->> +	if (_IOC_DIR(cmd)  == _IOC_DIR(FS_IOC_GETLBMD_CAP) &&
->> +	    _IOC_TYPE(cmd) == _IOC_TYPE(FS_IOC_GETLBMD_CAP) &&
->> +	    _IOC_NR(cmd)   == _IOC_NR(FS_IOC_GETLBMD_CAP) &&
->> +	    _IOC_SIZE(cmd) >= LBMD_SIZE_VER0 &&
->> +	    _IOC_SIZE(cmd) <= _IOC_SIZE(FS_IOC_GETLBMD_CAP))
->
-> This part is wrong as we handle larger sizes just fine via
-> copy_struct_{from,to}_user().
-
-I feel that is still an open question. As I understand it,
-you want to make it slightly easier for userspace callers
-to use future versions of an ioctl command by allowing them in
-old kernels as well, by moving that complexity into the kernel.
-
-Checking against _IOC_SIZE(FS_IOC_GETLBMD_CAP) would keep the
-behavior consistent with the traditional model where userspace
-needs to have a fallback to previous ABI versions.
-
-> Arnd, objections to writing it as follows?:
-
-> +       /* extensible ioctls */
-> +       switch (_IOC_NR(cmd)) {
-> +       case _IOC_NR(FS_IOC_GETLBMD_CAP):
-> +               if (_IOC_DIR(cmd) != _IOC_DIR(FS_IOC_GETLBMD_CAP))
-> +                       break;
-> +               if (_IOC_TYPE(cmd) != _IOC_TYPE(FS_IOC_GETLBMD_CAP))
-> +                       break;
-> +               if (_IOC_NR(cmd) != _IOC_NR(FS_IOC_GETLBMD_CAP))
-> +                       break;
-> +               if (_IOC_SIZE(cmd) < LBMD_SIZE_VER0)
-> +                       break;
-> +               if (_IOC_SIZE(cmd) > PAGE_SIZE)
-> +                       break;
-> +               return blk_get_meta_cap(bdev, cmd, argp);
-
-The 'PAGE_SIZE' seems arbitrary here, especially since that is often
-larger than the maximum size that can be encoded in an ioctl command
-number (8KB or 16KB depending on the architecture). If we do need
-an upper bound larger than _IOC_SIZE(FS_IOC_GETLBMD_CAP), I think it
-should be a fixed number rather than a configuration dependent
-one, and I would prefer a smaller one over a larger one. Anything
-over a few dozen bytes is certainly suspicious, and once it gets
-to thousands of bytes, you need a dynamic allocation to avoid stack
-overflow in the kernel.
-
-I had already updated my patch to move the checks into
-blk_get_meta_cap() itself and keep the caller simpler:
-
-diff --git a/block/blk-integrity.c b/block/blk-integrity.c
-index 9d9dc9c32083..2909ebf27dc2 100644
---- a/block/blk-integrity.c
-+++ b/block/blk-integrity.c
-@@ -62,10 +62,13 @@ int blk_get_meta_cap(struct block_device *bdev, unsigned int cmd,
-        struct logical_block_metadata_cap meta_cap = {};
-        size_t usize = _IOC_SIZE(cmd);
- 
--       if (!argp)
--               return -EINVAL;
--       if (usize < LBMD_SIZE_VER0)
--               return -EINVAL;
-+       if (_IOC_DIR(cmd)  != _IOC_DIR(FS_IOC_GETLBMD_CAP) ||
-+           _IOC_TYPE(cmd) != _IOC_TYPE(FS_IOC_GETLBMD_CAP) ||
-+           _IOC_NR(cmd)   != _IOC_NR(FS_IOC_GETLBMD_CAP) ||
-+           _IOC_SIZE(cmd) < LBMD_SIZE_VER0 ||
-+           _IOC_SIZE(cmd) > _IOC_SIZE(FS_IOC_GETLBMD_CAP))
-+               return -ENOIOCTLCMD;
-+
-        if (!bi)
-                goto out;
- 
-diff --git a/block/ioctl.c b/block/ioctl.c
-index 9ad403733e19..af2e22e5533c 100644
---- a/block/ioctl.c
-+++ b/block/ioctl.c
-@@ -566,9 +566,11 @@ static int blkdev_common_ioctl(struct block_device *bdev, blk_mode_t mode,
-                               void __user *argp)
- {
-        unsigned int max_sectors;
-+       int ret;
- 
--       if (_IOC_NR(cmd) == _IOC_NR(FS_IOC_GETLBMD_CAP))
--               return blk_get_meta_cap(bdev, cmd, argp);
-+       ret = blk_get_meta_cap(bdev, cmd, argp);
-+       if (ret != -ENOIOCTLCMD)
-+               return ret;
- 
-        switch (cmd) {
-        case BLKFLSBUF:
-
-Regardless of what upper bound we pick, that at least limits
-the complexity to the one function that actually wants it.
-
-> And can I ask you to please take a look at fs/pidfs.c:pidfd_ioctl() and
-
-PIDFD_GET_INFO has part of the same problem, as it still fails to
-check the _IOC_DIR() bits. I see you added a check for _IOC_TYPE()
-in commit 091ee63e36e8 ("pidfs: improve ioctl handling"), but
-the comment you added describes an unrelated issue and the fix
-was incomplete.
-
-> fs/nsfs.c:ns_ioctl()?
-
-You tried to add a similar validation in commit 7fd511f8c911
-("nsfs: validate ioctls"), but it seems you got that wrong
-both by missing the _IOC_DIR check and by having a typo in the
-'_IOC_TYPE(cmd) == _IOC_TYPE(cmd)' line that means this is
-always true rather than comparing against 'NSIO'.
-
-Overall my feeling is similar to Christoph's, that the added
-complexity in any of these three cases was a mistake, as it's
-too easy to mess it up.
-
-     Arnd
+RnJvbTogVGFvdGFvIENoZW4gPGNoZW50YW90YW9AZGlkaWdsb2JhbC5jb20+DQoNClJlcGxhY2Ug
+dGhlIHdyaXRlX2JlZ2luL3dyaXRlX2VuZCBsb29wIGluDQppOTE1X2dlbV9vYmplY3RfY3JlYXRl
+X3NobWVtX2Zyb21fZGF0YSgpIHdpdGggY2FsbCB0byBrZXJuZWxfd3JpdGUoKS4NCg0KVGhpcyBm
+dW5jdGlvbiBpbml0aWFsaXplcyBzaG1lbS1iYWNrZWQgR0VNIG9iamVjdHMuIGtlcm5lbF93cml0
+ZSgpDQpzaW1wbGlmaWVzIHRoZSBjb2RlIGJ5IHJlbW92aW5nIG1hbnVhbCBmb2xpbyBoYW5kbGlu
+Zy4NCg0KUGFydCBvZiBhIHNlcmllcyByZWZhY3RvcmluZyBhZGRyZXNzX3NwYWNlX29wZXJhdGlv
+bnMgd3JpdGVfYmVnaW4gYW5kDQp3cml0ZV9lbmQgY2FsbGJhY2tzIHRvIHVzZSBzdHJ1Y3Qga2lv
+Y2IgZm9yIHBhc3Npbmcgd3JpdGUgY29udGV4dCBhbmQNCmZsYWdzLg0KDQpTaWduZWQtb2ZmLWJ5
+OiBUYW90YW8gQ2hlbiA8Y2hlbnRhb3Rhb0BkaWRpZ2xvYmFsLmNvbT4NCi0tLQ0KIGRyaXZlcnMv
+Z3B1L2RybS9pOTE1L2dlbS9pOTE1X2dlbV9zaG1lbS5jIHwgMzMgKysrKysrKy0tLS0tLS0tLS0t
+LS0tLS0NCiAxIGZpbGUgY2hhbmdlZCwgOSBpbnNlcnRpb25zKCspLCAyNCBkZWxldGlvbnMoLSkN
+Cg0KZGlmZiAtLWdpdCBhL2RyaXZlcnMvZ3B1L2RybS9pOTE1L2dlbS9pOTE1X2dlbV9zaG1lbS5j
+IGIvZHJpdmVycy9ncHUvZHJtL2k5MTUvZ2VtL2k5MTVfZ2VtX3NobWVtLmMNCmluZGV4IDE5YTNl
+YjgyZGM2YS4uMWU4ZjY2YWM0OGNhIDEwMDY0NA0KLS0tIGEvZHJpdmVycy9ncHUvZHJtL2k5MTUv
+Z2VtL2k5MTVfZ2VtX3NobWVtLmMNCisrKyBiL2RyaXZlcnMvZ3B1L2RybS9pOTE1L2dlbS9pOTE1
+X2dlbV9zaG1lbS5jDQpAQCAtNjM3LDkgKzYzNyw4IEBAIGk5MTVfZ2VtX29iamVjdF9jcmVhdGVf
+c2htZW1fZnJvbV9kYXRhKHN0cnVjdCBkcm1faTkxNV9wcml2YXRlICppOTE1LA0KIHsNCiAJc3Ry
+dWN0IGRybV9pOTE1X2dlbV9vYmplY3QgKm9iajsNCiAJc3RydWN0IGZpbGUgKmZpbGU7DQotCWNv
+bnN0IHN0cnVjdCBhZGRyZXNzX3NwYWNlX29wZXJhdGlvbnMgKmFvcHM7DQotCWxvZmZfdCBwb3M7
+DQotCWludCBlcnI7DQorCWxvZmZfdCBwb3MgPSAwOw0KKwlzc2l6ZV90IGVycjsNCiANCiAJR0VN
+X1dBUk5fT04oSVNfREdGWChpOTE1KSk7DQogCW9iaiA9IGk5MTVfZ2VtX29iamVjdF9jcmVhdGVf
+c2htZW0oaTkxNSwgcm91bmRfdXAoc2l6ZSwgUEFHRV9TSVpFKSk7DQpAQCAtNjQ5LDI5ICs2NDgs
+MTUgQEAgaTkxNV9nZW1fb2JqZWN0X2NyZWF0ZV9zaG1lbV9mcm9tX2RhdGEoc3RydWN0IGRybV9p
+OTE1X3ByaXZhdGUgKmk5MTUsDQogCUdFTV9CVUdfT04ob2JqLT53cml0ZV9kb21haW4gIT0gSTkx
+NV9HRU1fRE9NQUlOX0NQVSk7DQogDQogCWZpbGUgPSBvYmotPmJhc2UuZmlscDsNCi0JYW9wcyA9
+IGZpbGUtPmZfbWFwcGluZy0+YV9vcHM7DQotCXBvcyA9IDA7DQotCWRvIHsNCi0JCXVuc2lnbmVk
+IGludCBsZW4gPSBtaW5fdCh0eXBlb2Yoc2l6ZSksIHNpemUsIFBBR0VfU0laRSk7DQotCQlzdHJ1
+Y3QgZm9saW8gKmZvbGlvOw0KLQkJdm9pZCAqZnNkYXRhOw0KLQ0KLQkJZXJyID0gYW9wcy0+d3Jp
+dGVfYmVnaW4oZmlsZSwgZmlsZS0+Zl9tYXBwaW5nLCBwb3MsIGxlbiwNCi0JCQkJCSZmb2xpbywg
+JmZzZGF0YSk7DQotCQlpZiAoZXJyIDwgMCkNCi0JCQlnb3RvIGZhaWw7DQorCWVyciA9IGtlcm5l
+bF93cml0ZShmaWxlLCBkYXRhLCBzaXplLCAmcG9zKTsNCiANCi0JCW1lbWNweV90b19mb2xpbyhm
+b2xpbywgb2Zmc2V0X2luX2ZvbGlvKGZvbGlvLCBwb3MpLCBkYXRhLCBsZW4pOw0KKwlpZiAoZXJy
+IDwgMCkNCisJCWdvdG8gZmFpbDsNCiANCi0JCWVyciA9IGFvcHMtPndyaXRlX2VuZChmaWxlLCBm
+aWxlLT5mX21hcHBpbmcsIHBvcywgbGVuLCBsZW4sDQotCQkJCSAgICAgIGZvbGlvLCBmc2RhdGEp
+Ow0KLQkJaWYgKGVyciA8IDApDQotCQkJZ290byBmYWlsOw0KLQ0KLQkJc2l6ZSAtPSBsZW47DQot
+CQlkYXRhICs9IGxlbjsNCi0JCXBvcyArPSBsZW47DQotCX0gd2hpbGUgKHNpemUpOw0KKwlpZiAo
+ZXJyICE9IHNpemUpIHsNCisJCWVyciA9IC1FSU87DQorCQlnb3RvIGZhaWw7DQorCX0NCiANCiAJ
+cmV0dXJuIG9iajsNCiANCi0tIA0KMi4zNC4xDQo=
