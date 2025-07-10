@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A17C2F3E
-	for <linux-block@vger.kernel.org>; Thu, 10 Jul 2025 04:15:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C690F2F3E
+	for <linux-block@vger.kernel.org>; Thu, 10 Jul 2025 04:17:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752120957; cv=none; b=eIv9RBSRkKm5AElm8O5dvx8SDZi9/dZ0s3EStYSE5Lp3EneN8ruFEdDDQqQ0VsRYK6NaeF4Pih1DfCO8mkg5MNDyfhBHcPzHXoy8YQRhKk7Kjb5U7UyxrhPM2GsQPnf+wLErpnxFn0pH75mlqoXACgOgLj6s/ZT8MNGoiLQgmn8=
+	t=1752121036; cv=none; b=I4gikf27Qfg/O5GKUjx0C78Qp5qax5nAsfeCjxDMFU84bMsxPhBGBKtjq+yOfsGZt1Mvul3C7+WdBy8LmisxNugfEfS05RZXW1ddBX9WLKDegOgTQGWfWYmuuUKpWoQetWrT8Qmz/U+BUBx1hrCD5s0wA9n7L3HfM8Cm/lhjc7Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752120957; c=relaxed/simple;
-	bh=YHOepXdOE12xu0t0jyCDuEz5cYjGH+RWqvfo4Lt9fzM=;
+	s=arc-20240116; t=1752121036; c=relaxed/simple;
+	bh=2IqYWLLjroHBkJr3OBJ08jEm5zTLj/pnzoltRRFNfgQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TFAFxyvLGsTazw0hpZTppv+Ad8D/C6zQq/QY2PlIH7Wyyd5P0nL++D18hkElIEQ9a+oDGedWm8uq82aAus9KKmVqOtHvWGTkl1UZB8DVDSj7XHCFrXE4RKoLHtC3/mhlpbwwjPDGquiKPImxvzB7XRtAN6jksNdv6QkC8zcLhNM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QdbWdwI6; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:Content-Type; b=n8fFbGgyLV44fyFR7nZqpQbl5Tx6yI64nNnssY5S7Yuc7mDQswHE4fVFnLThmfeuvm2IjtQlAdunwKvak5VCDOc/eqRJgPJSvsA/SdzNU9nQYzi78tV/UKUQfocVzGsbf3ude66xo7qaXQC0vEwvNTxoWfKX8pZtqCY93SVET5w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RvnBlvf8; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QdbWdwI6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E03DEC4CEE3;
-	Thu, 10 Jul 2025 04:15:55 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RvnBlvf8"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5B4AC4CEE3;
+	Thu, 10 Jul 2025 04:17:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752120956;
-	bh=YHOepXdOE12xu0t0jyCDuEz5cYjGH+RWqvfo4Lt9fzM=;
+	s=k20201202; t=1752121036;
+	bh=2IqYWLLjroHBkJr3OBJ08jEm5zTLj/pnzoltRRFNfgQ=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=QdbWdwI6oZG0McE6H0AJc9d9vR2ruvahGDA2Vr5s3zfpMWOa5VV29LD/UsEeuIbnx
-	 ZtvhwdoNpgtKulLHrTsaR12We+MKOEngi7RLlPtY+BR5Ht+omGK7NSKlENkCjb9Cmr
-	 ODYmcV8HZyCJu6Nm1St2lTspN083cN1hMDKQo+apc858kAcvYwrGF+NEQqoxCU62BP
-	 mzq34Uo8ZP+BMsFaQ+UeN6Py2I/Y0cJQAP1KZMoJvaG5s1c68JpUWI2RypLB1ofd85
-	 twftWDJkIXHdViIt78DLt5aLFzQ2PX8g2hZL8EaPsLKQQ/udbfcy7Q566gCDWz+3rq
-	 TqqUtUWpJy4UA==
-Message-ID: <41730c5c-33cf-45bd-a0eb-44057da37eaa@kernel.org>
-Date: Thu, 10 Jul 2025 13:13:39 +0900
+	b=RvnBlvf8BhdMjxUPafvZ1j8ArqiP0WQJLeXGHJs8yx7a3mIxM/01APJt0R7epPss5
+	 AGYX19bHv1aSHCdW/PsoJrKjfkNBYc0nYx6nXNANitn/5u8yVSIHCXWQpNVh4aDBbt
+	 jtE4t51F0hLKmrpwSd07+MeH8qu3qmeq130IFCrZRU03+nZKq3kGYariwVVGWvYmt8
+	 U958PdSQZdLnpRcd43nEF8c/4ybA438uuGKR3JbW15u6fEVWPJeAoowbFHbgFxONDC
+	 xY86VA3YqRIGvm2w4fsdgJKsAHsUMc6xFZLoBG/1JynzwGTrH/ZsSj8Hw+4op8uXKK
+	 fCwjCh9S+P8Lw==
+Message-ID: <0ae57bd8-3f0f-4434-956c-fa6747cb319b@kernel.org>
+Date: Thu, 10 Jul 2025 13:15:00 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -35,78 +35,38 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/5] blktrace: add zoned block commands to blk_fill_rwbs
+Subject: Re: [PATCH 2/5] block: split blk_zone_update_request_bio into two
+ functions
 To: Johannes Thumshirn <johannes.thumshirn@wdc.com>,
  Jens Axboe <axboe@kernel.dk>
 Cc: Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
  Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
  Chaitanya Kulkarni <chaitanyak@nvidia.com>
 References: <20250709114704.70831-1-johannes.thumshirn@wdc.com>
- <20250709114704.70831-2-johannes.thumshirn@wdc.com>
+ <20250709114704.70831-3-johannes.thumshirn@wdc.com>
 From: Damien Le Moal <dlemoal@kernel.org>
 Content-Language: en-US
 Organization: Western Digital Research
-In-Reply-To: <20250709114704.70831-2-johannes.thumshirn@wdc.com>
+In-Reply-To: <20250709114704.70831-3-johannes.thumshirn@wdc.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 7/9/25 8:47 PM, Johannes Thumshirn wrote:
-> Add zoned block commands to blk_fill_rwbs:
+> blk_zone_update_request_bio() does two things. First it checks if the
+> request to be completed was written via ZONE APPEND and if yes it then
+> updates the sector to the one that the data was written to.
 > 
-> - ZONE APPEND will be decoded as 'ZA'
-> - ZONE RESET and ZONE RESET ALL will be decoded as 'ZR'
-> - ZONE FINISH will be decoded as 'ZF'
-> - ZONE OPEN will be decoded as 'ZO'
-> - ZONE CLOSE will be decoded as 'ZC'
+> This is small enough to be an inline function. But upcoming changes adding
+> a tracepoint don't work if the function is inlined.
+> 
+> Split the function into two, the first is blk_req_bio_is_zone_append()
+> checking if the sector needs to be updated. This can still be an inline
+> function. The second is blk_zone_append_update_request_bio() doing the
+> sector update.
 > 
 > Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-> ---
->  kernel/trace/blktrace.c | 21 +++++++++++++++++++++
->  1 file changed, 21 insertions(+)
-> 
-> diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-> index 3f6a7bdc6edf..f1dc00c22e37 100644
-> --- a/kernel/trace/blktrace.c
-> +++ b/kernel/trace/blktrace.c
-> @@ -1875,6 +1875,27 @@ void blk_fill_rwbs(char *rwbs, blk_opf_t opf)
->  	case REQ_OP_READ:
->  		rwbs[i++] = 'R';
->  		break;
 
-May be enclode this new hunk under a #ifdef CONFIG_BLK_DEV_ZONED ?
-
-> +	case REQ_OP_ZONE_APPEND:
-> +		rwbs[i++] = 'Z';
-> +		rwbs[i++] = 'A';
-> +		break;
-> +	case REQ_OP_ZONE_RESET:
-> +	case REQ_OP_ZONE_RESET_ALL:
-> +		rwbs[i++] = 'Z';
-> +		rwbs[i++] = 'R';
-
-I would really prefer the ability to distinguish single zone reset and all
-zones reset... Are we limited to 2 chars for the operation name ? If not,
-making REQ_OP_ZONE_RESET_ALL be "ZRA" would be better I think. If you want to
-preserve the 2 chars for the op name, then maybe ... no goo idea... Naming is
-hard :)
-
-> +		break;
-> +	case REQ_OP_ZONE_FINISH:
-> +		rwbs[i++] = 'Z';
-> +		rwbs[i++] = 'F';
-> +		break;
-> +	case REQ_OP_ZONE_OPEN:
-> +		rwbs[i++] = 'Z';
-> +		rwbs[i++] = 'O';
-> +		break;
-> +	case REQ_OP_ZONE_CLOSE:
-> +		rwbs[i++] = 'Z';
-> +		rwbs[i++] = 'C';
-> +		break;
->  	default:
->  		rwbs[i++] = 'N';
->  	}
-
+Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
 
 -- 
 Damien Le Moal
