@@ -1,30 +1,55 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20EEE28935D
-	for <linux-block@vger.kernel.org>; Thu, 10 Jul 2025 08:03:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B907F28983F;
+	Thu, 10 Jul 2025 08:14:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752134628; cv=none; b=Dk4nL7RR8VCfXovjFfPRgQs472zHfHMY5JgUMC65uWXjPkahMTRMpaVAKWmbJook46ix8LVVj4qxbMcj7wOWAh52Ub5x6tWue2lUmILw1CT2kAuoFnprcUl5kFhEIsJ0ceIccQ2HNjdfCle81Vxl4miws6dEAD8yPgb39K69wVY=
+	t=1752135276; cv=none; b=a38cki5efUO8fCG0FU5H5TlkzH1IcXLXSgoZCiuFy9ZCBS15ZZUIfnGOLc0RFtLsu6zCN+Bja4a8fCOcIwgTtfJotxE/ApC4Sw1i/l/nHINpNcHDEVbJQndIHrfJBYvk//ck1VuY9hTW0yAadTI6RZxVqLZ48gMcHIs288qED1o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752134628; c=relaxed/simple;
-	bh=tABg9cdrJ9tPFMs99lq2WazD83tr86JLM6QguN57cmA=;
+	s=arc-20240116; t=1752135276; c=relaxed/simple;
+	bh=Uf2bKkveCd5eeYTIYxiJBJQrt9uh9wn7rGVqPe+eAQQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ki34hoz2yAA5W+sRbz7ual9fcbUnY4cdzUT3tU43xkZfKeEWgaj87zHTFlmQaYnXNvcspn363GjqU4eha9sxU2CUaucqEO4Zrhc+Bi8/O25ANgLvAt5u9QvNcRDtTX1F/ZJofdt6eO8Bwkn1cx/nDVQEuG727wxfVNWkVmyejL0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id CE4BC67373; Thu, 10 Jul 2025 10:03:41 +0200 (CEST)
-Date: Thu, 10 Jul 2025 10:03:41 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Subject: Re: [PATCH 0/3] Fix a deadlock related to modifying queue
- attributes
-Message-ID: <20250710080341.GA8622@lst.de>
-References: <20250702182430.3764163-1-bvanassche@acm.org> <20250703090906.GG4757@lst.de> <918963a5-a349-433a-80a8-6d06c609f20e@acm.org> <20250708095707.GA28737@lst.de> <b23c05be-2bde-424a-a275-811ccc01567c@acm.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=qcOuwr5pYOhNoQbyr02UWxicC7ofwkkZxqp6zwZzfFyGdjfgrxdgSwQEWER//Suv6Zr6DZs2L3gJZMkAVbSFACkrJNnetU+aJqMgkE6tfX2GP0ukCeuMIrJlik8x5j1OC0vHfNvP/qVeKXBOpzilLQFGokofl7M6Q14JFyMghKc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=l0rdLHvS; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="l0rdLHvS"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=AJpJ7CHfROH+35o2twlxL0uolXlA5ZgQUcP1WJNCmfw=; b=l0rdLHvSj8mPHA/M6NJjtoeqEZ
+	HL47DtEGcn6xNC4Ly08/V+oJYgC4V84kLlwFgwKPd6cS0HU9n0haUiO9+eww/Fh0rRDnuoKQoX5s2
+	LangJNsBPEC51RKRX6HuJAkwTpvh4z+W7MPMcFvYdxawwCQkwlFonOxfpcMTEt2qXJOihPgPk3HGN
+	x9Vh5DlX2taCyr0rc5THuIolRXXPurch77quBXqIXJCyJHVl3BUjUDZovAliFpHXCSwc09RkN+evT
+	Nr2UaXnLjNwKFj5JC698Hnsk8KJ10SfyLXXNhLcYXA0KwqAfx7ALKGVHqMIMwwxrYZOgtJqz4VIdM
+	Fs4ZbI/w==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1uZmQL-0000000B8Rp-1YiR;
+	Thu, 10 Jul 2025 08:14:33 +0000
+Date: Thu, 10 Jul 2025 01:14:33 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Christian Brauner <brauner@kernel.org>
+Cc: Arnd Bergmann <arnd@kernel.org>, linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org, Anuj Gupta <anuj20.g@samsung.com>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	Kanchan Joshi <joshi.k@samsung.com>, ltp@lists.linux.it,
+	dan.carpenter@linaro.org, benjamin.copeland@linaro.org,
+	rbm@suse.com, Arnd Bergmann <arnd@arndb.de>,
+	Naresh Kamboju <naresh.kamboju@linaro.org>,
+	Anders Roxell <anders.roxell@linaro.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	Pavel Begunkov <asml.silence@gmail.com>,
+	Alexey Dobriyan <adobriyan@gmail.com>,
+	"Darrick J. Wong" <djwong@kernel.org>,
+	Eric Biggers <ebiggers@google.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] block: fix FS_IOC_GETLBMD_CAP parsing in
+ blkdev_common_ioctl()
+Message-ID: <aG92abpCeyML01E1@infradead.org>
+References: <20250709181030.236190-1-arnd@kernel.org>
+ <20250710-passen-petersilie-32f6f1e9a1fc@brauner>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -33,33 +58,30 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <b23c05be-2bde-424a-a275-811ccc01567c@acm.org>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20250710-passen-petersilie-32f6f1e9a1fc@brauner>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Tue, Jul 08, 2025 at 09:11:41AM -0700, Bart Van Assche wrote:
-> I will look into modifying the SRP tests in the blktests repository such
-> that these use bio-based mode instead of request-based mode.
+On Thu, Jul 10, 2025 at 10:00:48AM +0200, Christian Brauner wrote:
+> +       switch (_IOC_NR(cmd)) {
+> +       case _IOC_NR(FS_IOC_GETLBMD_CAP):
+> +               if (_IOC_DIR(cmd) != _IOC_DIR(FS_IOC_GETLBMD_CAP))
+> +                       break;
+> +               if (_IOC_TYPE(cmd) != _IOC_TYPE(FS_IOC_GETLBMD_CAP))
+> +                       break;
+> +               if (_IOC_NR(cmd) != _IOC_NR(FS_IOC_GETLBMD_CAP))
+> +                       break;
+> +               if (_IOC_SIZE(cmd) < LBMD_SIZE_VER0)
+> +                       break;
+> +               if (_IOC_SIZE(cmd) > PAGE_SIZE)
+> +                       break;
+> +               return blk_get_meta_cap(bdev, cmd, argp);
+> +       }
 
-Note that this just fixes the test case.  The fact that request
-based dm-multipath keeps active requests and thus an elevated 
-q_usage_counter around still exists then, with effects both to sysfs
-and other users of queue freezing.
+Yikes.  I really don't get why we're trying change the way how ioctls
+worked forever.  We can and usually do use the size based macro already.
+And when we introduce a new size (which should happen rarely), we add a
+new entry to the switch using the normal _IO* macros, and either
+rename the struct, or use offsetofend in the _IO* entry for the old one.
 
-> So the question remains what to do about these two regressions:
-> * The deadlock triggered by modifying a sysfs attribute of a
->   dm-multipath device configured with "queue_if_no_path" and no paths
->   (temporarily).
-
-That's not a deadlock by the classic definition, but yes, it is hang
-that should be addressed.
-
-> * Slower booting of Linux devices that modify sysfs attributes
->   synchronously during boot.
-
-
-So which attributes are regularly modified?  Note that for read-ahead
-it should be safe to drop the freeze as unlike the others it is not
-used for splitting I/O to the limits accepted by the hardware.  So
-we could probably drop the freeze IFF the patch documents that it is
-safe.  But it still won't fix the root cause.
-
+Just in XFS which I remember in detail we've done that to extend
+structures in backwards compatible ways multiple times.
