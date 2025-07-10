@@ -1,73 +1,122 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DC45241664;
-	Thu, 10 Jul 2025 12:11:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A31EF258CFF;
+	Thu, 10 Jul 2025 13:33:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752149496; cv=none; b=eCUqbOXBcMB2ZJfvUFyIbXmcqKQihXJJci45AacvgjoNvD7QN4+Lno3Qbg19rlx5MKLz0/EVRN4uzch0QleNggw074dCVle2BA5JdBdHIsE4ooRGQt7FmTHMvlShV0OhJxJ7Zz6EKo+zGIery3ziJbTzL1I/fS5CxaQMxtBSUrk=
+	t=1752154433; cv=none; b=uy3n5+vIdubIykSEVlsJEsL8lb5e6q5ZpZ3bbshhjdNMCqnlcrXuXqYhc7/M7trZyCojgY1EaGdtRZ4ItzRH9kZ9IMj4Q3xgA8IjYrHazmAVVRzvkPheteOxShpq8BL/orCARO1WAA0bqtxxWxtC5ueVWX6Z/isOup9vG90Rlxc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752149496; c=relaxed/simple;
-	bh=tUT68e6Q8IKXdlF8aaRcx77PZdPTzcKSQIzQYR02AQA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TJDf5rF7a2xScCRCOsVzRqcQnO9m0Z/gjnL3f8OETOQuB/z1lXmx6XDvP38HpBpzxV2fDkh8vEFTrff1uRGjTY6DJ15/LiQt0/AjHoS3gkzFAeJ8vbiUv97D80FH31jq9AgSKAHVrIXCXEM/WLxPzw1fmIUxQq+0cfD6KzQn4N8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LBTOtfAU; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1752154433; c=relaxed/simple;
+	bh=MWn5XlCdAjB+sK9dSdXIVMPxxACg3YrERKdTXwshHVk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WVrQFUzvVoFYGvCCQA24UldrNluyjfDCrC/zDc6hZNRL8pgSkM5AjeP7rLBRaVFlXD8K+8VVTZW1fBl/sbUrh3LiDn8W9aF9yeKtR1GuTYJ+3rqlhWpvOUdzYp8QbIKodd5ctWNbYXKbCCHt3IpWlM1+/s+I4S/XiXS/Z7KBRAs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=1oem0Rlo; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LBTOtfAU"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 542F3C4CEE3;
-	Thu, 10 Jul 2025 12:11:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752149494;
-	bh=tUT68e6Q8IKXdlF8aaRcx77PZdPTzcKSQIzQYR02AQA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=LBTOtfAUyAstWFgBpC3YlBfuVTH2LN/6eBNw78s78xfUv8B9xnZsW+VCHie78Q2Ky
-	 VaeNylNO5zv18Tt/Zh4b7F0MzuhM/I112yMqoKXyjrqh/9FElF2Y6VSNszxiHVE/SP
-	 3PwaQOl6GqFEhUDxCgoJisX/s6CHUR9hd6/xnRUSlrFeCX1U/Si0GlGyJUqj1GiUfX
-	 SXLLakzuEdaAoypuL3tHNTYkgi2J90VWx1ZcT69hp9CnetbI5zQGuGreo9//1/A1KM
-	 o9pSxQUr48tO/TQ/hDS//z5o7pegnSpcxrQYdrUVb0GvMj6tvpEehJC2YeDhTglZYO
-	 xCK32e5uH/Fzg==
-Date: Thu, 10 Jul 2025 14:11:26 +0200
-From: Christian Brauner <brauner@kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Christoph Hellwig <hch@infradead.org>, Arnd Bergmann <arnd@kernel.org>, 
-	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org, Anuj Gupta <anuj20.g@samsung.com>, 
-	"Martin K. Petersen" <martin.petersen@oracle.com>, Kanchan Joshi <joshi.k@samsung.com>, 
-	LTP List <ltp@lists.linux.it>, Dan Carpenter <dan.carpenter@linaro.org>, 
-	Benjamin Copeland <benjamin.copeland@linaro.org>, rbm@suse.com, Naresh Kamboju <naresh.kamboju@linaro.org>, 
-	Anders Roxell <anders.roxell@linaro.org>, Jens Axboe <axboe@kernel.dk>, 
-	Pavel Begunkov <asml.silence@gmail.com>, Alexey Dobriyan <adobriyan@gmail.com>, 
-	"Darrick J. Wong" <djwong@kernel.org>, Eric Biggers <ebiggers@google.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] block: fix FS_IOC_GETLBMD_CAP parsing in
- blkdev_common_ioctl()
-Message-ID: <20250710-ehegatte-undicht-6b71310cb1ef@brauner>
-References: <20250709181030.236190-1-arnd@kernel.org>
- <20250710-passen-petersilie-32f6f1e9a1fc@brauner>
- <aG92abpCeyML01E1@infradead.org>
- <14865b4a-dfad-4336-9113-b70d65c9ad52@app.fastmail.com>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="1oem0Rlo"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=tetkzlCfenrpH7MgGkZct/9GsLBQFBzGpcaOg7hONcs=; b=1oem0RlogcLMNVqqMJ4Y/EJTeP
+	cWLlfzX7BH8XzjU0z7Bcx7TTQLlM1R8QHpcxv5YT+5NnGw0i0cr7gYVkUflo8bojjqInu3ThiRRXZ
+	XIxmKal8isykNv6LnYb5G05wRnujmp2EjhdOPBdjaZ7xQJUrroEi52bQ/+YEHrVgSW6j2VRa4821U
+	dZtcl0/n91f5q4TuChnxrkunFYm57HDRxsv8g64cYxrVGa8O6gud9V22PvGNz/QEQgB4SrplM7hjK
+	8op6FfnX32uYJqWPGBg6/gUhee9M8rVq2hKIITyi4Vys7sIMcFGDe9A/YfNSMRNLHOHNgXQv94m0h
+	p48NlWgg==;
+Received: from 2a02-8389-2341-5b80-d601-7564-c2e0-491c.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:d601:7564:c2e0:491c] helo=localhost)
+	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1uZrPI-0000000BwQQ-2Dbk;
+	Thu, 10 Jul 2025 13:33:48 +0000
+From: Christoph Hellwig <hch@lst.de>
+To: Christian Brauner <brauner@kernel.org>
+Cc: "Darrick J. Wong" <djwong@kernel.org>,
+	Joanne Koong <joannelkoong@gmail.com>,
+	linux-xfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	gfs2@lists.linux.dev
+Subject: refactor the iomap writeback code v5
+Date: Thu, 10 Jul 2025 15:33:24 +0200
+Message-ID: <20250710133343.399917-1-hch@lst.de>
+X-Mailer: git-send-email 2.47.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <14865b4a-dfad-4336-9113-b70d65c9ad52@app.fastmail.com>
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-> Christian's version using the copy_struct_{from,to}_user()
-> aims to avoid most of the problems. The main downside I see
-> here is the extra complexity in the kernel. As far as I can
-> tell, this has mainly led to extra kernel bugs but has not
-> actually resulted in any structure getting seamlessly
-> extended.
+Hi all,
 
-We extended ioctls multiple times seemlessly and other than this bug
-right here I'm not aware of anything serious. Not liking it is fine of
-course but saying "this caused a bug so go away" I won't take all too
-seriously, sorry.
+this is an alternative approach to the writeback part of the
+"fuse: use iomap for buffered writes + writeback" series from Joanne.
+It doesn't try to make the code build without CONFIG_BLOCK yet.
 
-I don't want to go down the road of structure revisions for stuff in the
-generic layer. Others can do whatever they see fit ofc and userspace can
-then have its usualy ifdeffery and structure layout detection party
-instead of a clean generic solution. I'd rather clean up the necessary
-vetting bits and properly document how this can be done.
+The big difference compared to Joanne's version is that I hope the
+split between the generic and ioend/bio based writeback code is a bit
+cleaner here.  We have two methods that define the split between the
+generic writeback code, and the implemementation of it, and all knowledge
+of ioends and bios now sits below that layer.
+
+This version passes testing on xfs, and gets as far as mainline for
+gfs2 (crashes in generic/361).
+
+Changes since v4:
+ - add back includes needed in some configs
+ - drop an include not needed after a code move
+
+Changes since v3:
+ - add a patch to drop unused includes
+ - drop the iomap_writepage_ctx renaming - we should do this separately and
+   including the variable names if desired
+ - add a comment about special casing of holes in iomap_writeback_range
+ - split the cleanups to iomap_read_folio_sync into a separate prep patch
+ - explain the IOMAP_HOLE check in xfs_iomap_valid
+ - explain the iomap_writeback_folio later folio unlock vs dropbehind
+ - some cargo culting for the #$W# RST formatting
+ - "improve" the documentation coverage a bit
+
+Changes since v2:
+ - rename iomap_writepage_ctx to iomap_writeback_ctx
+ - keep local map_blocks helpers in XFS
+ - allow buildinging the writeback and write code for !CONFIG_BLOCK
+
+Changes since v1:
+ - fix iomap reuse in block/zonefs/gfs2 
+ - catch too large return value from ->writeback_range
+ - mention the correct file name in a commit log
+ - add patches for folio laundering
+ - add patches for read/modify write in the generic write helpers
+
+Diffstat:
+ Documentation/filesystems/iomap/design.rst     |    3 
+ Documentation/filesystems/iomap/operations.rst |   57 +-
+ block/fops.c                                   |   37 +
+ fs/gfs2/aops.c                                 |    8 
+ fs/gfs2/bmap.c                                 |   48 +-
+ fs/gfs2/bmap.h                                 |    1 
+ fs/gfs2/file.c                                 |    3 
+ fs/iomap/Makefile                              |    6 
+ fs/iomap/buffered-io.c                         |  553 +++++++------------------
+ fs/iomap/direct-io.c                           |    5 
+ fs/iomap/fiemap.c                              |    3 
+ fs/iomap/internal.h                            |    1 
+ fs/iomap/ioend.c                               |  220 +++++++++
+ fs/iomap/iter.c                                |    1 
+ fs/iomap/seek.c                                |    4 
+ fs/iomap/swapfile.c                            |    3 
+ fs/iomap/trace.c                               |    1 
+ fs/iomap/trace.h                               |    4 
+ fs/xfs/xfs_aops.c                              |  212 +++++----
+ fs/xfs/xfs_file.c                              |    6 
+ fs/xfs/xfs_iomap.c                             |   12 
+ fs/xfs/xfs_iomap.h                             |    1 
+ fs/xfs/xfs_reflink.c                           |    3 
+ fs/zonefs/file.c                               |   40 +
+ include/linux/iomap.h                          |   82 ++-
+ 25 files changed, 705 insertions(+), 609 deletions(-)
