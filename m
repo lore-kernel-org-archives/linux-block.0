@@ -1,172 +1,65 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7F3628935D;
-	Thu, 10 Jul 2025 08:00:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20EEE28935D
+	for <linux-block@vger.kernel.org>; Thu, 10 Jul 2025 08:03:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752134456; cv=none; b=QGoARZRaW82BcUUC9FArHMYi8dylyEHit2pU4McqT1pkz3IUIn441FopxH/SPxR3CmXdVNTs7++5EhURDpGng42x2ZFjK3k17iBKX3tUHm8BjpGwe+rRaYwymHq/eZoG0iFnFx4JYT1o2440PUVq9cZhNcMFntECsKwbtUCypjY=
+	t=1752134628; cv=none; b=Dk4nL7RR8VCfXovjFfPRgQs472zHfHMY5JgUMC65uWXjPkahMTRMpaVAKWmbJook46ix8LVVj4qxbMcj7wOWAh52Ub5x6tWue2lUmILw1CT2kAuoFnprcUl5kFhEIsJ0ceIccQ2HNjdfCle81Vxl4miws6dEAD8yPgb39K69wVY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752134456; c=relaxed/simple;
-	bh=3kJXKGVy19HwRS0v8G4JAZbl9NgESNksh+wuchZQHok=;
+	s=arc-20240116; t=1752134628; c=relaxed/simple;
+	bh=tABg9cdrJ9tPFMs99lq2WazD83tr86JLM6QguN57cmA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NlAvWiuhtQSd0N1woR7HG0yCb2r+iQswhmWYK23dtyVrLCb8T1q/RM1CWWhH7gCNgpjlfuxqJaZvpXIkG2khBjhTBuXUrGSZeC4W7kBevFLnHPx7maSkST40kSyntfh/ACTCzK+6fHeOnAEQ4xEXthGhhpQsqVEGF2lE6NJFq4Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GGf2wODU; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GGf2wODU"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D9BDC4CEE3;
-	Thu, 10 Jul 2025 08:00:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752134455;
-	bh=3kJXKGVy19HwRS0v8G4JAZbl9NgESNksh+wuchZQHok=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=GGf2wODUPZB/EEXI0mi84RwgS5MLrJXyRX17IKrUPTWEWDDQQ+nINLDhMYWR5/uoO
-	 go2vPoVflCUWA3uyRgB11W5vOfq7RKfENtWfYwj6BiLnNLSlipSmfzLKVnPfl1eS/+
-	 t+SfH91y5Qs4IbTW8SzuLoyyzuhnG/rXubMaQTSo1r6DphveXGcxcpXQ/NamJHBStM
-	 3q06LyImZ559wXvkq7miclNeKMHLEciIx/esPs/ZueLMqe0q4lmJYaTLBnhchQjef7
-	 dyvfBjs9ez5J/FKNxug3E7XivS1a+IMXqf2Mg6oyROilNFuRXi67c4C46GB4GTBQCC
-	 jdAYHoKSrlkHw==
-Date: Thu, 10 Jul 2025 10:00:48 +0200
-From: Christian Brauner <brauner@kernel.org>
-To: Arnd Bergmann <arnd@kernel.org>
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org, 
-	Anuj Gupta <anuj20.g@samsung.com>, "Martin K . Petersen" <martin.petersen@oracle.com>, 
-	Kanchan Joshi <joshi.k@samsung.com>, ltp@lists.linux.it, dan.carpenter@linaro.org, 
-	benjamin.copeland@linaro.org, rbm@suse.com, Arnd Bergmann <arnd@arndb.de>, 
-	Naresh Kamboju <naresh.kamboju@linaro.org>, Anders Roxell <anders.roxell@linaro.org>, 
-	Jens Axboe <axboe@kernel.dk>, Pavel Begunkov <asml.silence@gmail.com>, 
-	Alexey Dobriyan <adobriyan@gmail.com>, "Darrick J. Wong" <djwong@kernel.org>, 
-	Eric Biggers <ebiggers@google.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] block: fix FS_IOC_GETLBMD_CAP parsing in
- blkdev_common_ioctl()
-Message-ID: <20250710-passen-petersilie-32f6f1e9a1fc@brauner>
-References: <20250709181030.236190-1-arnd@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ki34hoz2yAA5W+sRbz7ual9fcbUnY4cdzUT3tU43xkZfKeEWgaj87zHTFlmQaYnXNvcspn363GjqU4eha9sxU2CUaucqEO4Zrhc+Bi8/O25ANgLvAt5u9QvNcRDtTX1F/ZJofdt6eO8Bwkn1cx/nDVQEuG727wxfVNWkVmyejL0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id CE4BC67373; Thu, 10 Jul 2025 10:03:41 +0200 (CEST)
+Date: Thu, 10 Jul 2025 10:03:41 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Bart Van Assche <bvanassche@acm.org>
+Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Subject: Re: [PATCH 0/3] Fix a deadlock related to modifying queue
+ attributes
+Message-ID: <20250710080341.GA8622@lst.de>
+References: <20250702182430.3764163-1-bvanassche@acm.org> <20250703090906.GG4757@lst.de> <918963a5-a349-433a-80a8-6d06c609f20e@acm.org> <20250708095707.GA28737@lst.de> <b23c05be-2bde-424a-a275-811ccc01567c@acm.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250709181030.236190-1-arnd@kernel.org>
+In-Reply-To: <b23c05be-2bde-424a-a275-811ccc01567c@acm.org>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Wed, Jul 09, 2025 at 08:10:14PM +0200, Arnd Bergmann wrote:
-> From: Arnd Bergmann <arnd@arndb.de>
-> 
-> Anders and Naresh found that the addition of the FS_IOC_GETLBMD_CAP
-> handling in the blockdev ioctl handler breaks all ioctls with
-> _IOC_NR==2, as the new command is not added to the switch but only
-> a few of the command bits are check.
-> 
-> Refine the check to also validate the direction/type/length bits,
-> but still allow all supported sizes for future extensions.
-> 
-> Move the new command to the end of the function to avoid slowing
-> down normal ioctl commands with the added branches.
-> 
-> Fixes: 9eb22f7fedfc ("fs: add ioctl to query metadata and protection info capabilities")
-> Link: https://lore.kernel.org/all/CA+G9fYvk9HHE5UJ7cdJHTcY6P5JKnp+_e+sdC5U-ZQFTP9_hqQ@mail.gmail.com/
-> Reported-by: Naresh Kamboju <naresh.kamboju@linaro.org>
-> Cc: Anders Roxell <anders.roxell@linaro.org>
-> Cc: Naresh Kamboju <naresh.kamboju@linaro.org>
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> ---
+On Tue, Jul 08, 2025 at 09:11:41AM -0700, Bart Van Assche wrote:
+> I will look into modifying the SRP tests in the blktests repository such
+> that these use bio-based mode instead of request-based mode.
 
-Thanks!
+Note that this just fixes the test case.  The fact that request
+based dm-multipath keeps active requests and thus an elevated 
+q_usage_counter around still exists then, with effects both to sysfs
+and other users of queue freezing.
 
-> It seems that we have a lot of drivers with the same bug, as the
-> large majority of all _IOC_NR() users in the kernel fail to also
-> check the other bits of the ioctl command code. There are currently
-> 55 files referencing _IOC_NR, and they all need to be manually
-> checked for this problem.
-> ---
+> So the question remains what to do about these two regressions:
+> * The deadlock triggered by modifying a sysfs attribute of a
+>   dm-multipath device configured with "queue_if_no_path" and no paths
+>   (temporarily).
 
-The current documentation in Documentation/dev-tools/checkuapi.rst needs
-updating too then.
+That's not a deadlock by the classic definition, but yes, it is hang
+that should be addressed.
 
-I want this to work. So as a start we should have a common static inline
-helper that encapsulates the barrage of checks.
+> * Slower booting of Linux devices that modify sysfs attributes
+>   synchronously during boot.
 
->  block/ioctl.c | 14 +++++++++-----
->  1 file changed, 9 insertions(+), 5 deletions(-)
-> 
-> diff --git a/block/ioctl.c b/block/ioctl.c
-> index 9ad403733e19..5e5a422bd09f 100644
-> --- a/block/ioctl.c
-> +++ b/block/ioctl.c
-> @@ -567,9 +567,6 @@ static int blkdev_common_ioctl(struct block_device *bdev, blk_mode_t mode,
->  {
->  	unsigned int max_sectors;
->  
-> -	if (_IOC_NR(cmd) == _IOC_NR(FS_IOC_GETLBMD_CAP))
-> -		return blk_get_meta_cap(bdev, cmd, argp);
-> -
->  	switch (cmd) {
->  	case BLKFLSBUF:
->  		return blkdev_flushbuf(bdev, cmd, arg);
-> @@ -647,9 +644,16 @@ static int blkdev_common_ioctl(struct block_device *bdev, blk_mode_t mode,
->  		return blkdev_pr_preempt(bdev, mode, argp, true);
->  	case IOC_PR_CLEAR:
->  		return blkdev_pr_clear(bdev, mode, argp);
-> -	default:
-> -		return -ENOIOCTLCMD;
->  	}
-> +
-> +	if (_IOC_DIR(cmd)  == _IOC_DIR(FS_IOC_GETLBMD_CAP) &&
-> +	    _IOC_TYPE(cmd) == _IOC_TYPE(FS_IOC_GETLBMD_CAP) &&
-> +	    _IOC_NR(cmd)   == _IOC_NR(FS_IOC_GETLBMD_CAP) &&
-> +	    _IOC_SIZE(cmd) >= LBMD_SIZE_VER0 &&
-> +	    _IOC_SIZE(cmd) <= _IOC_SIZE(FS_IOC_GETLBMD_CAP))
 
-This part is wrong as we handle larger sizes just fine via
-copy_struct_{from,to}_user().
-
-Arnd, objections to writing it as follows?:
-
-diff --git a/block/ioctl.c b/block/ioctl.c
-index 9ad403733e19..9887ec55f8ce 100644
---- a/block/ioctl.c
-+++ b/block/ioctl.c
-@@ -567,9 +567,6 @@ static int blkdev_common_ioctl(struct block_device *bdev, blk_mode_t mode,
- {
-        unsigned int max_sectors;
-
--       if (_IOC_NR(cmd) == _IOC_NR(FS_IOC_GETLBMD_CAP))
--               return blk_get_meta_cap(bdev, cmd, argp);
--
-        switch (cmd) {
-        case BLKFLSBUF:
-                return blkdev_flushbuf(bdev, cmd, arg);
-@@ -647,9 +644,25 @@ static int blkdev_common_ioctl(struct block_device *bdev, blk_mode_t mode,
-                return blkdev_pr_preempt(bdev, mode, argp, true);
-        case IOC_PR_CLEAR:
-                return blkdev_pr_clear(bdev, mode, argp);
--       default:
--               return -ENOIOCTLCMD;
-        }
-+
-+       /* extensible ioctls */
-+       switch (_IOC_NR(cmd)) {
-+       case _IOC_NR(FS_IOC_GETLBMD_CAP):
-+               if (_IOC_DIR(cmd) != _IOC_DIR(FS_IOC_GETLBMD_CAP))
-+                       break;
-+               if (_IOC_TYPE(cmd) != _IOC_TYPE(FS_IOC_GETLBMD_CAP))
-+                       break;
-+               if (_IOC_NR(cmd) != _IOC_NR(FS_IOC_GETLBMD_CAP))
-+                       break;
-+               if (_IOC_SIZE(cmd) < LBMD_SIZE_VER0)
-+                       break;
-+               if (_IOC_SIZE(cmd) > PAGE_SIZE)
-+                       break;
-+               return blk_get_meta_cap(bdev, cmd, argp);
-+       }
-+
-+       return -ENOIOCTLCMD;
- }
-
- /*
-
-And can I ask you to please take a look at fs/pidfs.c:pidfd_ioctl() and
-fs/nsfs.c:ns_ioctl()?
+So which attributes are regularly modified?  Note that for read-ahead
+it should be safe to drop the freeze as unlike the others it is not
+used for splitting I/O to the limits accepted by the hardware.  So
+we could probably drop the freeze IFF the patch documents that it is
+safe.  But it still won't fix the root cause.
 
