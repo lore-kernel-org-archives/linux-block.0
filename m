@@ -1,114 +1,134 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fout-b2-smtp.messagingengine.com (fout-b2-smtp.messagingengine.com [202.12.124.145])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAC052E0934;
-	Thu, 10 Jul 2025 11:01:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84BD3248F7D;
+	Thu, 10 Jul 2025 11:53:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.145
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752145299; cv=none; b=T5wIwkPYXyib+EQxI243AeCV8PHB2qRhV6LfzW9d6NdV8+rsz9czQG2gyZrMoKPLz0y/q1inzi7TFtbYR0AfhlsTn30hpHO32Lmy2ktkN9HUT+TPkrK4/DNYr+YJjvIRjN0unv7Z4EXXtWZKY8xOUWYD1M/qamR+dK5wwEvd5yM=
+	t=1752148403; cv=none; b=pqMDoxN3IQoEjkW+a5rEnB09FO6oLp0yi7AfUhdt1jnOqrm1wKtAh2pNbW1Jq3JyPZE1U8aeDNo7hFsb/SJRSzfPtlEHTqablUVI5Bt/o7QCX4Sb28ogFzO+UFzxqVNaiyFvswGK1HZWiS5oRO3E3dX53Yn5iLHaq3Wbtn9cAc4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752145299; c=relaxed/simple;
-	bh=X71JMXi59Za+IKf0pTlfsK0EprH85uHIYSj1WhXz/OM=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=njYmNeCMgEPQg5Wyr4pc533WA6xyKqng1MAoRr0WVidXes5V1zyNx70O4moDZIOOOKltp0xqLu/Ycg1cHQAlRp0E4rgTPSTGZ7WLai0B9xcbql2GYTPbVuqLiiPrXxZKkmuQSyJ8Sg2ri1ilElDt0JqcHqfJYfWboIE55klcNr4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LePMbE8Q; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1752148403; c=relaxed/simple;
+	bh=0rNi0NWwAGS/m3tH+/mj7RHCQBBaydL72v9Fg5u9Ueg=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=b7xEH8shOpIEjSp/03vE93wecRIMZ14aE5qplVHg+BLzjU3KLfhTpNKTc2FObca0xeF2PtPeSd43ZXTzi0vD+9eoCD5CWtyTiRxP76MqxDmdyB8TmJVPVB/3mCGZ8537m0a+0urMrjVcZpAxi/9jWB5Q9NITWot8a/zbmFHiAz8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=H5g/QZFU; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=OPezGPcZ; arc=none smtp.client-ip=202.12.124.145
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LePMbE8Q"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64753C4CEF5;
-	Thu, 10 Jul 2025 11:01:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752145295;
-	bh=X71JMXi59Za+IKf0pTlfsK0EprH85uHIYSj1WhXz/OM=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=LePMbE8Q4VnqzJJQd40yodb7dF/PTBBhs9eEMSvxIjQrm4trIcfk4sAWOdLaMB7RA
-	 Yiwzb3tZAGvZD9ILyO/NhNc4ePVGcJdk4Y+2aNDJj6JTypCauGULJ161xwZW7gx8EN
-	 TG1tN+2IXYq+JperkhtY6KPpWwGWYlCKJfgMQRPOSw8yJMc498ilc0eo73Lf4zNhjC
-	 as5/Giku0Wh8CWNs5D9rLIqhfTeSXarjg3codZcvMvQe+m1ZRwrOSO1eoL3a13K8uM
-	 Ihty9yfOsiHNG0WQ+bdMTBIeWAbh5HJsbS16gXQVU4LtFAoZb30jIinUnoEdR/zkfc
-	 TkfpEKl8D4lQw==
-From: Andreas Hindborg <a.hindborg@kernel.org>
-To: "Alice Ryhl" <aliceryhl@google.com>
-Cc: "Boqun Feng" <boqun.feng@gmail.com>,  "Miguel Ojeda" <ojeda@kernel.org>,
-  "Alex Gaynor" <alex.gaynor@gmail.com>,  "Gary Guo" <gary@garyguo.net>,
-  =?utf-8?Q?Bj=C3=B6rn?= Roy Baron <bjorn3_gh@protonmail.com>,  "Benno
- Lossin"
- <lossin@kernel.org>,  "Trevor Gross" <tmgross@umich.edu>,  "Danilo
- Krummrich" <dakr@kernel.org>,  "Jens Axboe" <axboe@kernel.dk>,
-  <linux-block@vger.kernel.org>,  <rust-for-linux@vger.kernel.org>,
-  <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2 03/14] rust: str: introduce `NullBorrowFormatter`
-In-Reply-To: <aG9-MAwbNbjuoR0i@google.com> (Alice Ryhl's message of "Thu, 10
-	Jul 2025 08:47:44 +0000")
-References: <20250708-rnull-up-v6-16-v2-0-ab93c0ff429b@kernel.org>
-	<20250708-rnull-up-v6-16-v2-3-ab93c0ff429b@kernel.org>
-	<kpVk60lBMPJ_b4glgS0w-BfbIjN1cMCDSKDoM0RAB4p1Bg1BNfIdA4YRuOu70BbSZjlserkd8EJDwy0vVmR7yQ==@protonmail.internalid>
-	<aG5tObucycBg9dP1@google.com> <87qzypjrdm.fsf@kernel.org>
-	<RQVk_m5qeMyxOBjTkh4S3_hAqUB-GPrIS_zYnBx8fEWS8FDk95TR9IiWfmJA5hZxswqj4h-cYUqEIjlHf6srEg==@protonmail.internalid>
-	<aG9-MAwbNbjuoR0i@google.com>
-User-Agent: mu4e 1.12.9; emacs 30.1
-Date: Thu, 10 Jul 2025 13:01:24 +0200
-Message-ID: <877c0gjomz.fsf@kernel.org>
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="H5g/QZFU";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="OPezGPcZ"
+Received: from phl-compute-05.internal (phl-compute-05.phl.internal [10.202.2.45])
+	by mailfout.stl.internal (Postfix) with ESMTP id 240371D000FD;
+	Thu, 10 Jul 2025 07:53:19 -0400 (EDT)
+Received: from phl-imap-02 ([10.202.2.81])
+  by phl-compute-05.internal (MEProxy); Thu, 10 Jul 2025 07:53:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm1; t=1752148398;
+	 x=1752234798; bh=sje5hVMNJ8lPTMZdAUbJxjg9+p9H/ddbEIFabV5Qvsk=; b=
+	H5g/QZFUxQ7xVn9yddlLHQ0YjxLDnqSf1BIV8mBUShvFeRMBDKhXER5GYcjHDGHd
+	1fu88NUSLA5oyMVQRmQWMz1B7+4l9ejbI+srWjmtrTrLWXDQOpKyDL9MmErGWz61
+	Se0y3wkbZ8xrJG8Dux+VBRUXWjvTMER0jxMNvpSriT8f/nY6/YURf69x7/YA0veZ
+	jNolUp6MYMkGsJzyWOMrD52NUhyxW7XFRDftUTHcjHTnnFHB5YPw5Hh1aNA/R1nC
+	+xDVH6GSJwS6MFWri1nJVOm58y+5ng76NnLNtWAXAgAWHLErjF2+Su5HLSNwkDim
+	xRvgj/F+iSQg7w4UZ5BakQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1752148398; x=
+	1752234798; bh=sje5hVMNJ8lPTMZdAUbJxjg9+p9H/ddbEIFabV5Qvsk=; b=O
+	PezGPcZCPi7/YI6RyX0H7hEWY6gO8J+wGDeVAv8ZJNDoAK9DK5xH5s7hL8PxkjCA
+	2Q2Had7guZJC/veJIiFvpld6N2QkbQVd5zUkX/6kwgL+XLSgVa1/Pu6sxiiu/AZO
+	Ug/3hVOYqetr6DcvUbuGcKkvTlgiuFJ4Ny7pSsK8z7nUnsOQxYd2fBVvrDwxM+tj
+	6e6XjA9stwjgjlsXj++o68ZAOUMgn4UBQiCR1EwpXoEdKl9ysMIxh9BDEOxR/IY8
+	1gzoFt6GaFcLmqtEFZSLiyEnWZyO8iTEa+nOCgT1kRGw0ZFzhTCt4Dr2Lh5RZNwm
+	1HeSxPKYkwIXtnyfgio4g==
+X-ME-Sender: <xms:rqlvaIL-OWtGobJ1BygHkArXG8NxhDInoaWQkevKsHA7E038cYk2Pw>
+    <xme:rqlvaIJFKGavDtgfz1irQKtYLyk-9KN7jUFP1eDfAaVXq-jOCmvuWO7bN7R70Nt6-
+    SB2zWaItmBeF_FGN9k>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgdegtdefjecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
+    hrpefoggffhffvvefkjghfufgtgfesthejredtredttdenucfhrhhomhepfdetrhhnugcu
+    uegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrghtthgvrh
+    hnpefhtdfhvddtfeehudekteeggffghfejgeegteefgffgvedugeduveelvdekhfdvieen
+    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrhhnug
+    esrghrnhgusgdruggvpdhnsggprhgtphhtthhopedvtddpmhhouggvpehsmhhtphhouhht
+    pdhrtghpthhtoheprgguohgsrhhihigrnhesghhmrghilhdrtghomhdprhgtphhtthhope
+    grshhmlhdrshhilhgvnhgtvgesghhmrghilhdrtghomhdprhgtphhtthhopegvsghighhg
+    vghrshesghhoohhglhgvrdgtohhmpdhrtghpthhtohephhgthhesihhnfhhrrgguvggrug
+    drohhrghdprhgtphhtthhopegrgigsohgvsehkvghrnhgvlhdrughkpdhrtghpthhtohep
+    rghrnhgusehkvghrnhgvlhdrohhrghdprhgtphhtthhopegsrhgruhhnvghrsehkvghrnh
+    gvlhdrohhrghdprhgtphhtthhopegujhifohhngheskhgvrhhnvghlrdhorhhgpdhrtghp
+    thhtoheprghnuggvrhhsrdhrohigvghllheslhhinhgrrhhordhorhhg
+X-ME-Proxy: <xmx:rqlvaJgth2K4VWfvfXK_ydRAItC1dpGByAKUCbDdSiaZcbVLkOagTA>
+    <xmx:rqlvaLuyELow4oH9maxfs-PYJk0tTRDa9z1vpUQQNzGdumf9o2makg>
+    <xmx:rqlvaDiyb-hS6MjVhM7nn1HGTWos7O7P53HGbsfC_EI6u9pCX8xfmw>
+    <xmx:rqlvaGdTFzdFQOPw6oZ3qgf08FBCwlB89Uvp3NIzEqAQUoD-Mo747Q>
+    <xmx:rqlvaE2LP-vm7ChxAYptsC5zW5BZrB0ztKgF6gt4f-68g-j3q0sERj7d>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id F28FA700065; Thu, 10 Jul 2025 07:53:17 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-ThreadId: Tfdac8457399410f6
+Date: Thu, 10 Jul 2025 13:52:57 +0200
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Christoph Hellwig" <hch@infradead.org>
+Cc: "Christian Brauner" <brauner@kernel.org>,
+ "Arnd Bergmann" <arnd@kernel.org>, linux-fsdevel@vger.kernel.org,
+ linux-block@vger.kernel.org, "Anuj Gupta" <anuj20.g@samsung.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ "Kanchan Joshi" <joshi.k@samsung.com>, "LTP List" <ltp@lists.linux.it>,
+ "Dan Carpenter" <dan.carpenter@linaro.org>,
+ "Benjamin Copeland" <benjamin.copeland@linaro.org>, rbm@suse.com,
+ "Naresh Kamboju" <naresh.kamboju@linaro.org>,
+ "Anders Roxell" <anders.roxell@linaro.org>, "Jens Axboe" <axboe@kernel.dk>,
+ "Pavel Begunkov" <asml.silence@gmail.com>,
+ "Alexey Dobriyan" <adobriyan@gmail.com>,
+ "Darrick J. Wong" <djwong@kernel.org>, "Eric Biggers" <ebiggers@google.com>,
+ linux-kernel@vger.kernel.org
+Message-Id: <50e77c3f-4704-4fb8-a3ac-9686d76fad30@app.fastmail.com>
+In-Reply-To: <aG-dI2wJDl-HfzFG@infradead.org>
+References: <20250709181030.236190-1-arnd@kernel.org>
+ <20250710-passen-petersilie-32f6f1e9a1fc@brauner>
+ <aG92abpCeyML01E1@infradead.org>
+ <14865b4a-dfad-4336-9113-b70d65c9ad52@app.fastmail.com>
+ <aG-dI2wJDl-HfzFG@infradead.org>
+Subject: Re: [PATCH] block: fix FS_IOC_GETLBMD_CAP parsing in blkdev_common_ioctl()
 Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-"Alice Ryhl" <aliceryhl@google.com> writes:
-
-> On Wed, Jul 09, 2025 at 05:49:57PM +0200, Andreas Hindborg wrote:
->> "Alice Ryhl" <aliceryhl@google.com> writes:
->>
->> > On Tue, Jul 08, 2025 at 09:44:58PM +0200, Andreas Hindborg wrote:
->> >> Add `NullBorrowFormatter`, a formatter that writes a null terminated string
->> >> to an array or slice buffer. Because this type needs to manage the trailing
->> >> null marker, the existing formatters cannot be used to implement this type.
->> >>
->> >> Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
->> >> ---
->> >>  rust/kernel/str.rs | 59 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
->> >>  1 file changed, 59 insertions(+)
->> >>
->> >> diff --git a/rust/kernel/str.rs b/rust/kernel/str.rs
->> >> index 78b2f95eb3171..05d79cf40c201 100644
->> >> --- a/rust/kernel/str.rs
->> >> +++ b/rust/kernel/str.rs
->> >> @@ -860,6 +860,65 @@ fn deref_mut(&mut self) -> &mut Self::Target {
->> >>      }
->> >>  }
->> >>
->> >> +/// A mutable reference to a byte buffer where a string can be written into.
->> >> +///
->> >> +/// The buffer will be automatically null terminated after the last written character.
->> >> +///
->> >> +/// # Invariants
->> >> +///
->> >> +/// `buffer` is always null terminated.
->> >> +pub(crate) struct NullBorrowFormatter<'a> {
->> >> +    buffer: &'a mut [u8],
->> >> +    pos: usize,
->> >> +}
->> >
->> > Do you need `pos`? Often I see this kind of code subslice `buffer`
->> > instead.
->>
->> How would that work? Can I move the start index of `buffer` in some way
->> without an unsafe block?
+On Thu, Jul 10, 2025, at 12:59, Christoph Hellwig wrote:
+>> I think the variant from commit 1b6d968de22b ("xfs: bump
+>> XFS_IOC_FSGEOMETRY to v5 structures") where the old structure
+>> gets renamed and the existing macro refers to a different
+>> command code is more problematic. We used to always require
+>> userspace to be built against the oldest kernel headers it could run
+>> on. This worked fine in the past but it appears that userspace
+>> (in particular glibc) has increasingly expected to also work
+>> on older kernels when building against new headers.
 >
-> Yes. I think this will work:
->
-> let buffer = mem::take(&mut self.buffer);
-> self.buffer = &mut buffer[pos..];
->
-> Temporarily storing an empty slice avoids lifetime issues.
+> This is what I meant.  Note that the userspace in this case also keeps a
+> case trying the old structure, but that does indeed require keeping the
+> userspace somewhat in lockstep if you do the renaming as in this example.
 
-Ah, that is neat.
+Right, it's fine for applications that keep a copy of the uapi
+header file, because they can implement both versions when they
+update to the new version of that file.
 
+Redefining the ioctl command code does break if you have an
+unmodified application source tree that unintentionally uses
+the updated /usr/include/linux/*.h file. In this case there is
+no benefit from the new header because it isn't aware of the
+new struct member but it still ends up failing on old kernels.
 
-Best regards,
-Andreas Hindborg
-
-
-
+   Arnd
