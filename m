@@ -1,153 +1,114 @@
-Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8A462E0937;
-	Thu, 10 Jul 2025 11:00:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAC052E0934;
+	Thu, 10 Jul 2025 11:01:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752145205; cv=none; b=l9W6mRpNVXGNht1pQymO6/vO3JYSy2E7UFPcxLF8OXMPlr5mOSISS7j0jP81G7JNYLfwcZykPK0EHQJpEFrUsKGlsRjveJ77zvBGjcL4PE1T9OjStxgK/twRQRiJkzjgMY29cNZON7O0JaBG4ex9Vu8o1SfN+b0G0gVfbScxxx8=
+	t=1752145299; cv=none; b=T5wIwkPYXyib+EQxI243AeCV8PHB2qRhV6LfzW9d6NdV8+rsz9czQG2gyZrMoKPLz0y/q1inzi7TFtbYR0AfhlsTn30hpHO32Lmy2ktkN9HUT+TPkrK4/DNYr+YJjvIRjN0unv7Z4EXXtWZKY8xOUWYD1M/qamR+dK5wwEvd5yM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752145205; c=relaxed/simple;
-	bh=4DFOJCCsvI24QKbrJDm/aFnyarYSoJI2WT5J2wb9AVM=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=Ku/c9axVObPaQeMXuW0X3pf13khOeMBq+kdpUSRZ4Qt/WRYUjYSR8exyE1fAF7C9UU/5Dbp0stTfWCAt6tYt2rP3VoMcpqL5bqvVR8iVslJ3UR1sHFcKXTAsVuqUnt+Y1l/BtM0dMCv3sfysrnQjq0yhsR8JECzJvHLH5rbWpZg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=JTkO1R1x; arc=none smtp.client-ip=91.218.175.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1752145299; c=relaxed/simple;
+	bh=X71JMXi59Za+IKf0pTlfsK0EprH85uHIYSj1WhXz/OM=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=njYmNeCMgEPQg5Wyr4pc533WA6xyKqng1MAoRr0WVidXes5V1zyNx70O4moDZIOOOKltp0xqLu/Ycg1cHQAlRp0E4rgTPSTGZ7WLai0B9xcbql2GYTPbVuqLiiPrXxZKkmuQSyJ8Sg2ri1ilElDt0JqcHqfJYfWboIE55klcNr4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LePMbE8Q; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="JTkO1R1x"
-Message-ID: <41d1245c-8a7f-4c5a-ba84-8e7e33b896b2@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1752145191;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KtJpoUInX8ucjkyFAiUJkj/ubfAu8PdaUF9qEnnOSvU=;
-	b=JTkO1R1xjDfTuBgYIJDFm3myKaXQxfj7KA99JQhTwFwRfJfdlMfVqNb/32AJd5hVEQc+/y
-	ikDzG1CMPk+cf8GKLXp/oLnpGKCdp7YDNo5FxvVniKBGn3a8Zm+sh5S0I4Llam3Gk8JIy6
-	rXWG6A9C3kEzH2Wcxqp1WgkQkckbLIs=
-Date: Thu, 10 Jul 2025 18:59:40 +0800
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LePMbE8Q"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64753C4CEF5;
+	Thu, 10 Jul 2025 11:01:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752145295;
+	bh=X71JMXi59Za+IKf0pTlfsK0EprH85uHIYSj1WhXz/OM=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=LePMbE8Q4VnqzJJQd40yodb7dF/PTBBhs9eEMSvxIjQrm4trIcfk4sAWOdLaMB7RA
+	 Yiwzb3tZAGvZD9ILyO/NhNc4ePVGcJdk4Y+2aNDJj6JTypCauGULJ161xwZW7gx8EN
+	 TG1tN+2IXYq+JperkhtY6KPpWwGWYlCKJfgMQRPOSw8yJMc498ilc0eo73Lf4zNhjC
+	 as5/Giku0Wh8CWNs5D9rLIqhfTeSXarjg3codZcvMvQe+m1ZRwrOSO1eoL3a13K8uM
+	 Ihty9yfOsiHNG0WQ+bdMTBIeWAbh5HJsbS16gXQVU4LtFAoZb30jIinUnoEdR/zkfc
+	 TkfpEKl8D4lQw==
+From: Andreas Hindborg <a.hindborg@kernel.org>
+To: "Alice Ryhl" <aliceryhl@google.com>
+Cc: "Boqun Feng" <boqun.feng@gmail.com>,  "Miguel Ojeda" <ojeda@kernel.org>,
+  "Alex Gaynor" <alex.gaynor@gmail.com>,  "Gary Guo" <gary@garyguo.net>,
+  =?utf-8?Q?Bj=C3=B6rn?= Roy Baron <bjorn3_gh@protonmail.com>,  "Benno
+ Lossin"
+ <lossin@kernel.org>,  "Trevor Gross" <tmgross@umich.edu>,  "Danilo
+ Krummrich" <dakr@kernel.org>,  "Jens Axboe" <axboe@kernel.dk>,
+  <linux-block@vger.kernel.org>,  <rust-for-linux@vger.kernel.org>,
+  <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2 03/14] rust: str: introduce `NullBorrowFormatter`
+In-Reply-To: <aG9-MAwbNbjuoR0i@google.com> (Alice Ryhl's message of "Thu, 10
+	Jul 2025 08:47:44 +0000")
+References: <20250708-rnull-up-v6-16-v2-0-ab93c0ff429b@kernel.org>
+	<20250708-rnull-up-v6-16-v2-3-ab93c0ff429b@kernel.org>
+	<kpVk60lBMPJ_b4glgS0w-BfbIjN1cMCDSKDoM0RAB4p1Bg1BNfIdA4YRuOu70BbSZjlserkd8EJDwy0vVmR7yQ==@protonmail.internalid>
+	<aG5tObucycBg9dP1@google.com> <87qzypjrdm.fsf@kernel.org>
+	<RQVk_m5qeMyxOBjTkh4S3_hAqUB-GPrIS_zYnBx8fEWS8FDk95TR9IiWfmJA5hZxswqj4h-cYUqEIjlHf6srEg==@protonmail.internalid>
+	<aG9-MAwbNbjuoR0i@google.com>
+User-Agent: mu4e 1.12.9; emacs 30.1
+Date: Thu, 10 Jul 2025 13:01:24 +0200
+Message-ID: <877c0gjomz.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: =?UTF-8?Q?Re=3A_=5BPATCH_v2_00/11=5D_dm-pcache_=E2=80=93_persistent?=
- =?UTF-8?Q?-memory_cache_for_block_devices?=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Dongsheng Yang <dongsheng.yang@linux.dev>
-To: Mikulas Patocka <mpatocka@redhat.com>
-Cc: agk@redhat.com, snitzer@kernel.org, axboe@kernel.dk, hch@lst.de,
- dan.j.williams@intel.com, Jonathan.Cameron@Huawei.com,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-cxl@vger.kernel.org, nvdimm@lists.linux.dev, dm-devel@lists.linux.dev
-References: <20250707065809.437589-1-dongsheng.yang@linux.dev>
- <85b5cb31-b272-305f-8910-c31152485ecf@redhat.com>
- <e50ef45e-4c1a-4874-8d5f-9ca86f9a532c@linux.dev>
-In-Reply-To: <e50ef45e-4c1a-4874-8d5f-9ca86f9a532c@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain
+
+"Alice Ryhl" <aliceryhl@google.com> writes:
+
+> On Wed, Jul 09, 2025 at 05:49:57PM +0200, Andreas Hindborg wrote:
+>> "Alice Ryhl" <aliceryhl@google.com> writes:
+>>
+>> > On Tue, Jul 08, 2025 at 09:44:58PM +0200, Andreas Hindborg wrote:
+>> >> Add `NullBorrowFormatter`, a formatter that writes a null terminated string
+>> >> to an array or slice buffer. Because this type needs to manage the trailing
+>> >> null marker, the existing formatters cannot be used to implement this type.
+>> >>
+>> >> Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
+>> >> ---
+>> >>  rust/kernel/str.rs | 59 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>> >>  1 file changed, 59 insertions(+)
+>> >>
+>> >> diff --git a/rust/kernel/str.rs b/rust/kernel/str.rs
+>> >> index 78b2f95eb3171..05d79cf40c201 100644
+>> >> --- a/rust/kernel/str.rs
+>> >> +++ b/rust/kernel/str.rs
+>> >> @@ -860,6 +860,65 @@ fn deref_mut(&mut self) -> &mut Self::Target {
+>> >>      }
+>> >>  }
+>> >>
+>> >> +/// A mutable reference to a byte buffer where a string can be written into.
+>> >> +///
+>> >> +/// The buffer will be automatically null terminated after the last written character.
+>> >> +///
+>> >> +/// # Invariants
+>> >> +///
+>> >> +/// `buffer` is always null terminated.
+>> >> +pub(crate) struct NullBorrowFormatter<'a> {
+>> >> +    buffer: &'a mut [u8],
+>> >> +    pos: usize,
+>> >> +}
+>> >
+>> > Do you need `pos`? Often I see this kind of code subslice `buffer`
+>> > instead.
+>>
+>> How would that work? Can I move the start index of `buffer` in some way
+>> without an unsafe block?
+>
+> Yes. I think this will work:
+>
+> let buffer = mem::take(&mut self.buffer);
+> self.buffer = &mut buffer[pos..];
+>
+> Temporarily storing an empty slice avoids lifetime issues.
+
+Ah, that is neat.
 
 
-在 7/9/2025 5:45 PM, Dongsheng Yang 写道:
->
-> 在 7/8/2025 4:16 AM, Mikulas Patocka 写道:
->>
->> On Mon, 7 Jul 2025, Dongsheng Yang wrote:
->>
->>> Hi Mikulas,
->>>     This is V2 for dm-pcache, please take a look.
->>>
->>> Code:
->>>      https://github.com/DataTravelGuide/linux tags/pcache_v2
->>>
->>> Changelogs
->>>
->>> V2 from V1:
->>>     - introduce req_alloc() and req_init() in backing_dev.c, then we
->>>       can do req_alloc() before holding spinlock and do req_init()
->>>       in subtree_walk().
->>>     - introduce pre_alloc_key and pre_alloc_req in walk_ctx, that
->>>       means we can pre-allocate cache_key or backing_dev_request
->>>       before subtree walking.
->>>     - use mempool_alloc() with NOIO for the allocation of cache_key
->>>       and backing_dev_req.
->>>     - some coding style changes from comments of Jonathan.
->> Hi
->>
->> mempool_alloc with GFP_NOIO never fails - so you don't have to check the
->> returned value for NULL and propagate the error upwards.
->
->
-> Hi Mikulas:
->
->    I noticed that the implementation of mempool_alloc—it waits for 5 
-> seconds and retries when allocation fails.
->
-> With this in mind, I propose that we handle -ENOMEM inside defer_req() 
-> using a similar mechanism. something like this commit:
->
->
-> https://github.com/DataTravelGuide/linux/commit/e6fc2e5012b1fe2312ed7dd02d6fbc2d038962c0 
->
->
->
-> Here are two key reasons why:
->
-> (1) If we manage -ENOMEM in defer_req(), we don’t need to modify every 
-> lower-level allocation to use mempool to avoid failures—for example,
->
-> cache_key, backing_req, and the kmem.bvecs you mentioned. More 
-> importantly, there’s no easy way to prevent allocation failure in some 
-> places—for instance, bio_init_clone() could still return -ENOMEM.
->
-> (2) If we use a mempool, it will block and wait indefinitely when 
-> memory is unavailable, preventing the process from exiting.
->
-> But with defer_req(), the user can still manually stop the pcache 
-> device using dmsetup remove, releasing some memory if user want.
->
->
-> What do you think?
+Best regards,
+Andreas Hindborg
 
 
-BTW, I added a test case for NOMEM scenario by using failslab:
 
-
-https://github.com/DataTravelGuide/dtg-tests/blob/main/pcache.py.data/pcache_failslab.sh
-
->
-> Thanx
->
-> Dongsheng
->
->>
->> "backing_req->kmem.bvecs = kmalloc_array(n_vecs, sizeof(struct bio_vec),
->> GFP_NOIO)" - this call may fail and you should handle the error 
->> gracefully
->> (i.e. don't end the bio with an error). Would it be possible to trim the
->> request to BACKING_DEV_REQ_INLINE_BVECS vectors and retry it?
->> Alternativelly, you can create a mempool for the largest possible n_vecs
->> and allocate from this mempool if kmalloc_array fails.
->>
->> I'm sending two patches for dm-pcache - the first patch adds the include
->> file linux/bitfield.h - it is needed in my config. The second patch 
->> makes
->> slab caches per-module rather than per-device, if you have them
->> per-device, there are warnings about duplicate cache names.
->>
->>
->> BTW. What kind of persistent memory do you use? (afaik Intel killed the
->> Optane products and I don't know of any replacement)
->>
->> Some times ago I created a filesystem for persistent memory - see
->> git://leontynka.twibright.com/nvfs.git - I'd be interested if you can 
->> test
->> it on your persistent memory implementation.
->>
->> Mikulas
->>
->
