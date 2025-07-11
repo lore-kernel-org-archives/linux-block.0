@@ -1,97 +1,138 @@
-Received: from mail-io1-f42.google.com (mail-io1-f42.google.com [209.85.166.42])
+Received: from mail-il1-f173.google.com (mail-il1-f173.google.com [209.85.166.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AD5F2AD21
-	for <linux-block@vger.kernel.org>; Fri, 11 Jul 2025 13:46:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4D851A2632
+	for <linux-block@vger.kernel.org>; Fri, 11 Jul 2025 13:47:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752241600; cv=none; b=B2SiO1Oh59wexPQvzx7D4M0pBo0/jlqBvwNJabuZFH9MkXP9NxuTDCgNQOhGAlVwDUHw44Bi1z4w2a9EBXutsVSPwyF38wKcx+cWEAh9VYX/5MqxNC8nue95LNDyYjcnWP3MR9ng++3NHE3bsRGD01xMmU+j2wpySdgiztv0zLU=
+	t=1752241679; cv=none; b=e6nZkny6hX0Z4FqHVSVqAPkVIcA62y5Rx3NsltAzeowQbjp1C2e7C4nBYpLUNp4Jq4nltXmoECs4vfvn+gpXRmxldXJa1rtuMop4WvQ/rFXNevEogqdbxLyGWhGkR1c96S5qqQQZaEBhDpaaHqmAqZLwNnVKgrtjt52szZjF294=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752241600; c=relaxed/simple;
-	bh=D9dpK6dD3qlvJaJirzKxgO+jWPO4OeERtDtmXQkM/w8=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=AVqS5Asj4iY0MxoVFQKbh/exFUiZkKS4EjU7kj3uowLwzf7TdK2pumc0G27Q6T0Qfq/Ba0rnySo7A0QqiLYgkxG5vUOQPoE0ask8npcKHTFy8zt+9Be9xk2cEcEMZn/6CsGE6uhCkj4G6mugyXbI4oLhPsQBB7hv/+4x4W9uxhk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=YT3ZVZit; arc=none smtp.client-ip=209.85.166.42
+	s=arc-20240116; t=1752241679; c=relaxed/simple;
+	bh=5u84HIHhuESrOGWvWQVTuBH5D+Lshweo14BDzlTjphE=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=E+UXSchFLKltVn45CvnmLebAyXt4LSJYIMYaKJVeHJlE3j33n592ZmakIurJg4Tm6CHISRZw7oCnencA234hEa7xvZ6X/W9Afj7BcLVswZz35kwQT5Hc3jZhfFIoSIyaTC2igGYjLtW+qy2dMFViRuf6Fsz9cDvbDDj+Yue9Kds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=rkkfNAHC; arc=none smtp.client-ip=209.85.166.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="YT3ZVZit"
-Received: by mail-io1-f42.google.com with SMTP id ca18e2360f4ac-86d0c5981b3so85210639f.3
-        for <linux-block@vger.kernel.org>; Fri, 11 Jul 2025 06:46:37 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="rkkfNAHC"
+Received: by mail-il1-f173.google.com with SMTP id e9e14a558f8ab-3df2d8cb8d2so7160825ab.2
+        for <linux-block@vger.kernel.org>; Fri, 11 Jul 2025 06:47:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1752241597; x=1752846397; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1752241677; x=1752846477; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-language:cc:to:subject:from
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=/juseajL28aExOR0ncFEkgamJFYX4aY2BgbPyJWuRxo=;
-        b=YT3ZVZit3U2UJs9GpS3C6CwcM+11nn1BOD55qrkXdHSzTA9JJfhTGsx0ny/P6nlMAy
-         3MRRhqMLM/VcppfbsMq7HKBBULoPKNPlWwqISyrWsqBul6FqXKKS7tEcoW/37TtKvzv5
-         YOS/DqXWWsFxJdYT7iD4JnvH3jI2XtGtYPQ8QRhJqPU2nvNVDQLQ5tpWOp4NOoSGfjSM
-         WbF/MuRdhLqsnWhxbTkT0iqiSWduvgjx8/vyfBxWDHjKCzZqtz8YDZWiS/wWMAN7Ti0w
-         ilVSVn/HZZjR0IgwW972FRtCwRWYzsvRSX7X0dpXRpDkKlEm7qtmyRagXOdWD9A1nunV
-         vCwQ==
+        bh=maVnG3kN4js766vih4nVNg644PO78+2HpNmHimxFz/E=;
+        b=rkkfNAHCG9/5BEMr3+MlAtM1ip0Sg1GoNpDmY7hJyCie6hM/dkJLh9SpISK3Mokh5p
+         VhVN37HPBRxl99Rd2s23ffUd/nD3VrRq3pKzcfldnDk6rHLTZm1fLOBIAeyIGFHhAP0O
+         zSMGUpmGk0o2KKA2JatcUI/vuGDCisKg4xiFpp0nz0JcP77/dVj0G076bpidoQxcDyAt
+         kMcpv8xPqNAHYcAsuGJuPuKmJsa2Y+xBslUaI4crZUdCGj53ixDTL90BhXRMTi6J1YxF
+         t9sNCFVpuohYWSQAeM4/ljovyVFsiZ/k4Cxk244wRPwJlxOoefEaCbarRLQ/Jjr7lNRb
+         TfBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752241597; x=1752846397;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/juseajL28aExOR0ncFEkgamJFYX4aY2BgbPyJWuRxo=;
-        b=Rru8nDn6sxIMSJdKFx8ZGsXjVrqFi6yKQxjf80XQGP+LCAuB3jT+3lO0igiO33Dqys
-         aoWcmJLC3y13GmtXsuVz77ZzdG4pUC1cnHG0TntrJWSepOhIoZ24cUH9O/DmfO0ZUgjc
-         OKekH5OaiJ+qBgfSa9UAjrZt/LGTY8vsuoHbgTdP4Ns7S8bhkwVoK0h8gZMeHyFf2f3z
-         9Ci4VyYkskbNO86IX6O181VYw2X18iEnTGfcCmewi5aa6Noyihg5UUEs4YNBcXfAzJbP
-         nNpXI5U5NkNSNA7c8hmpPiDLuGq7jN9oSnlUFUZ2N2lRd19ZYelhOAgtyItK540+d1cU
-         2D7w==
-X-Forwarded-Encrypted: i=1; AJvYcCVEOhtlDMsnr+vssGKi++QcJ9A6Zk3shKdYInrElD9aSZsp1YtE6WNAOGglFEBWCENs6XJxx2GqxXDJuQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyTptqlduWcvTz6X6XE/ZfUTN5GFmMY4LXAXR7B4a0F4uFGQ2tK
-	Dsf7cAPRMR/zzq7ywMmpONr2dnyJ/rggrCti6H5aLRzej73zFP2RF2or75IY5O+ad10=
-X-Gm-Gg: ASbGncv6kQH3UD9y1dxEZFy8UtTwuVdLbaTT3GMIEHZS7jueTgZeOPHoGtMLiSZr6Ww
-	c9nQNVUabox18CAcg9XW9ytBLNLs/6TIVNf258HRfd/7bZ7APRkBroGxyRcybO39+J1rvk5daue
-	dDnx8IWljbjCUus32Xxyn/i13Su2wJADZ2acZj4TjJAv7umMYPi3fAu2A+msl8o9EvsKEquaoo0
-	zS/8kOSnkZWZpjmB+oIQA9VsDFxwXg1D4LyhGIjO4yJdRtwOA/ureCw4kyjiBh3k9sjKJRXAhDU
-	Md4cff867iLfThhNM0MLLiMk66q+EuKzsu4MEBDJX/Oh49H0SKOAqpdz840AVBXbTdCqI73/z2F
-	kMhh4Z3zIepvUUA==
-X-Google-Smtp-Source: AGHT+IHC39aaGhMdGdrpBQXoGqq43BIWcV2gT087/3qAkm55jq0BVsD9zJu4zapauSL4z+v7y+zNpw==
-X-Received: by 2002:a05:6602:3fcc:b0:875:dcde:77a9 with SMTP id ca18e2360f4ac-87977fbe295mr457592739f.14.1752241597239;
-        Fri, 11 Jul 2025 06:46:37 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-8796b79fe4bsm97569039f.0.2025.07.11.06.46.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Jul 2025 06:46:36 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: Christoph Hellwig <hch@lst.de>
-Cc: kbusch@kernel.org, sagi@grimberg.me, linux-nvme@lists.infradead.org, 
- linux-block@vger.kernel.org, Klara Modin <klarasmodin@gmail.com>
-In-Reply-To: <20250711112250.633269-1-hch@lst.de>
-References: <20250711112250.633269-1-hch@lst.de>
-Subject: Re: [PATCH] nvme-pci: don't allocate dma_vec for IOVA mappings
-Message-Id: <175224159635.1454175.11115661661587383197.b4-ty@kernel.dk>
-Date: Fri, 11 Jul 2025 07:46:36 -0600
+        d=1e100.net; s=20230601; t=1752241677; x=1752846477;
+        h=content-transfer-encoding:content-language:cc:to:subject:from
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=maVnG3kN4js766vih4nVNg644PO78+2HpNmHimxFz/E=;
+        b=tISxM1mKscuSBX5AA9TRtFQCfQ/Ry3i3ONMWQvhx2QQy4J0oxzmt3e1vtgQyrDx6Gk
+         K+/QM88u9W2SzEW1jPbZMZ2kppuLv2E7bLqFPDSa6h1SvqeG7RQEc/iNMiiWteUt5dTW
+         0j5/bk/avAzo2Ae5J4osrJotqC1nJ3ysjdnDqfsvPQgSTG2TXjMexB/wq9fbYsSFtGo0
+         E8QwH3Yx/LEmpZp1JGQu881SJQLawN0znIzkU9N+qLeW7HxZzHMLiDzWCJ0W/eohwkyr
+         BQzzA1g78LqRd+uMPZdiW9uKelf/P4q67QnBvuH/R0znUI+XecP06i4RMiT0QT2NmGt5
+         XkXQ==
+X-Gm-Message-State: AOJu0YxztUVxPSfYgxsgu4xkI3mCFV7yVk7Cpzt7WKjK4tNRd0tRwQzM
+	/7tg/wS0/JtJqbZjE8J4bJ3r9+CcBBY9dgS9cCTUF+OYdLwf0hcnLKk2Qr6xlITV0J+V93U2jmG
+	CsR+a
+X-Gm-Gg: ASbGnctF6vg13w3G40Uj2tPw8gZ3R1Tr4Jqo0YfdfLHFbMqhm7kAIG57t7ZqHhirIlw
+	Q67WRpHoqjrrs7bMLABkPCjs6T6eyuylFofhgqAAngfIumS/oRLymXv+1h16ktqtU668R7KnyA5
+	KouZYBc1sT2xioxKsV1aAQylVvuy5UD4fjqVafZ8X+XZZgoShSKKXo6awUlZ4vOUrQc4DP8vXd4
+	Wi4sM0O1+xzhaZ56elX6vNw05ri9zT+MOggwcZe5UtKj5FmP+C7N5MP8pVwsMZjFyxtYToHsagz
+	eO+zWlJYrsADJaEzzmP2nWWrfq2c/cuzhJ2Nwc01LOmTJrh48xY+L6yp4LF4styqcfcrjgy9EWS
+	x719kBxagb4b350yVS/s=
+X-Google-Smtp-Source: AGHT+IEmNP9NG69PY/gfLv/V8u2kxOgdYKBNpC7F0CTiibc/m0S0ce+ki+afjWqcHYFLMEMpt2R//A==
+X-Received: by 2002:a05:6e02:b2d:b0:3df:4eb6:d04e with SMTP id e9e14a558f8ab-3e253342979mr39570005ab.22.1752241676544;
+        Fri, 11 Jul 2025 06:47:56 -0700 (PDT)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3e24628b574sm12033625ab.71.2025.07.11.06.47.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 11 Jul 2025 06:47:56 -0700 (PDT)
+Message-ID: <623d3918-3595-42ce-8d47-6d232a94a277@kernel.dk>
+Date: Fri, 11 Jul 2025 07:47:55 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-2ce6c
+User-Agent: Mozilla Thunderbird
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 6.16-rc6
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Hi Linus,
+
+Set of fixes for block for the 6.16 kernel release. This pull request
+contains:
+
+- MD changes via Yu
+	- fix uaf due to stack memory used for bio mempool, from Jinchao
+	- fix raid10/raid1 nowait IO error path, from Nigel and Qixing
+	- fix kernel crash from reading bitmap sysfs entry, by Håkon
+
+- Fix for a UAF in the nbd connect error path
+
+- Fix for blocksize being bigger than pagesize, if THP isn't enabled
+
+Please pull!
 
 
-On Fri, 11 Jul 2025 13:22:50 +0200, Christoph Hellwig wrote:
-> Not only do IOVA mappings no need the separate dma_vec tracking, it
-> also won't free it and thus leak the allocations.
-> 
-> 
+The following changes since commit 75ef7b8d44c30a76cfbe42dde9413d43055a00a7:
 
-Applied, thanks!
+  Merge tag 'nvme-6.16-2025-07-03' of git://git.infradead.org/nvme into block-6.16 (2025-07-03 09:42:07 -0600)
 
-[1/1] nvme-pci: don't allocate dma_vec for IOVA mappings
-      commit: 1bb94ff5ab4be2485884e0a46483f12629f3bb92
+are available in the Git repository at:
 
-Best regards,
+  git://git.kernel.dk/linux.git tags/block-6.16-20250710
+
+for you to fetch changes up to 4cdf1bdd45ac78a088773722f009883af30ad318:
+
+  block: reject bs > ps block devices when THP is disabled (2025-07-07 11:58:57 -0600)
+
+----------------------------------------------------------------
+block-6.16-20250710
+
+----------------------------------------------------------------
+Håkon Bugge (1):
+      md/md-bitmap: fix GPF in bitmap_get_stats()
+
+Jens Axboe (1):
+      Merge tag 'md-6.16-20250705' of gitolite.kernel.org:pub/scm/linux/kernel/git/mdraid/linux into block-6.16
+
+Nigel Croxon (1):
+      raid10: cleanup memleak at raid10_make_request
+
+Pankaj Raghav (1):
+      block: reject bs > ps block devices when THP is disabled
+
+Wang Jinchao (1):
+      md/raid1: Fix stack memory use after return in raid1_reshape
+
+Zheng Qixing (2):
+      md/raid1,raid10: strip REQ_NOWAIT from member bios
+      nbd: fix uaf in nbd_genl_connect() error path
+
+ drivers/block/nbd.c    |  6 +++---
+ drivers/md/md-bitmap.c |  3 +--
+ drivers/md/raid1.c     |  4 +++-
+ drivers/md/raid10.c    | 12 ++++++++++--
+ include/linux/blkdev.h |  5 +++++
+ 5 files changed, 22 insertions(+), 8 deletions(-)
+
 -- 
 Jens Axboe
-
-
 
