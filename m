@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17BD02D46A6;
-	Fri, 11 Jul 2025 11:43:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 249172DE6E6;
+	Fri, 11 Jul 2025 11:43:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752234218; cv=none; b=ciD0VoW1pxXjAGPp+4k9hB5VLLSAFcJwDRUhN1ulkSw25fBYAqWnMQvgCYxckAe2zcv6akjFfQI/FLjPYXfsIc2OdDIdEVH7B0pycqfkROxd3Rq677UEyp6hKR4i682GqP+92Lbhx1VBQW05noZN8fje/pwSl12XsRdXko23Xa0=
+	t=1752234221; cv=none; b=O1MiwIW+m7O91USJFPxpaOg62A2c+tBJ5qwDF4rzFfTF1weed/+hfzOeDV8qa3sa2VAgp15EOncjGQeTr1akAd214jNCX3u4tpU2EC3x6mkm69HBSNuBPqIpsQaeA8ONaJxLtKnMar+d3Fz/B6cBsQnoFLpWavsoTFwOnGgEo7s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752234218; c=relaxed/simple;
-	bh=AYWYuPxO7KkBuuMRitEmKq+GxfKULamC7whXKRkZjjs=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=UENt1FXvqN2aaTw8S9AdBmDlZxGAaZlVrjTAM58BtLhn/HU+w9aixSucJl7BREzEq2qSRSGDko+Nz6ns23avK2a10wR0POKYYrQK7FN5vBlcCowRxWKnjvByurUbV9FriqX+AK6N3WiYdNd1jmrEpTR0MBszMYhVCVUWLIRKvGE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Uz/lqMRr; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1752234221; c=relaxed/simple;
+	bh=LSx1ItJzMBA57/EBhXrxJqKwSb/byhu1bF1rbuvWUgY=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=n0awLvZa2teugz/MR/zRKM9QQeKFoK/UqvZLz9vHdplqlDfJaza3uGSyViF8hSrhMsG9Wj96N+g2rhFC3YEl1MVGl0M6oUdZLAh15x0vw3u3h4kcr1VPCacgA0ODIbyO1J/I/YaM1DWD/EElDjZAkghLWXNNYmOFztqdQnepLAM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LrR7ni1Y; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Uz/lqMRr"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DEF33C4CEF4;
-	Fri, 11 Jul 2025 11:43:34 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LrR7ni1Y"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F5EEC4CEED;
+	Fri, 11 Jul 2025 11:43:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752234217;
-	bh=AYWYuPxO7KkBuuMRitEmKq+GxfKULamC7whXKRkZjjs=;
-	h=From:Subject:Date:To:Cc:From;
-	b=Uz/lqMRr0tE2mwFqBzOkD9mc0jQEu0rxpvKyiONs0QyE2s0lBLvgno0d/lVTezMD3
-	 1v8W5VRdSudX7qW58yn/L/iG36/Zo/HaSAbz1Z0FH1jChR1A92lHp/6F28AnyLgt7e
-	 PCDWlcMSf06mKkIiMDBszdUUcOtdHeiPyIYTJ1cFv1RaxjVO9Ygv3S98ez4gK05uEG
-	 52QBYz8f2AmJT2T+NDENE/dUHQ/e39ti2DzuW1e77YVDwsIO6uqJkVSahEEbEldLwZ
-	 oMNSU9V4ylqrp0sGrq1TZ0EYyZnduUeH0HTTKS+63gATIhElE+077sZqJZLDYdxOko
-	 pcf3cvxunVrBg==
+	s=k20201202; t=1752234221;
+	bh=LSx1ItJzMBA57/EBhXrxJqKwSb/byhu1bF1rbuvWUgY=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
+	b=LrR7ni1YPSs0r3RkVSo17/sicYi83TfoU7GHxB4EWODIP0rV+EbT+/uAuefgSKZUK
+	 UaAruYDXt7t1q2uIKxmDQ12UumUX2eL5DcB+dcb3iugJuuYx0AJOACjmzqTJVA9vXb
+	 o8kZ7rpWK4gNheUwc9YCsjNYoLPSfgzSYCW2rNqGnX7uxdOTEAALcE33raTSaStq9d
+	 fheV6pI3040MyLD6seCVNQTKPQZ+b/2GjE+Yw3/s1/ZGA2DXDxm6pP1eQBmgiwfw6S
+	 7i2yRKH2Hkw4v+gQqqUgvQTLfbRWPLDvYgJzVMDbpOrEvVTN6zFxJT66SrFBkW5obw
+	 +OW/GF1ZIF4gg==
 From: Andreas Hindborg <a.hindborg@kernel.org>
-Subject: [PATCH v3 00/16] rnull: add configfs, remote completion to rnull
-Date: Fri, 11 Jul 2025 13:43:01 +0200
-Message-Id: <20250711-rnull-up-v6-16-v3-0-3a262b4e2921@kernel.org>
+Date: Fri, 11 Jul 2025 13:43:16 +0200
+Subject: [PATCH v3 15/16] rust: block: add remote completion to `Request`
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -37,11 +37,9 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAMX4cGgC/3WMQQ6CMBAAv0J6dk1boBRP/sN4oLiFRlLIVhoN4
- e8WLsYYjzPJzMICksPATtnCCKMLbvQJ8kPG2r7xHYK7JWaSy5IroYD8PAwwTxAVJDRFWQmU2iI
- iS9FEaN1zH16uiXsXHiO99n8Um/27igI4NIVQ2mislJHnO5LH4ThSx7ZXlJ++4vqnl1tv6rzl1
- hayNl/9uq5voQLIYe0AAAA=
-X-Change-ID: 20250616-rnull-up-v6-16-b4571e28feee
+Message-Id: <20250711-rnull-up-v6-16-v3-15-3a262b4e2921@kernel.org>
+References: <20250711-rnull-up-v6-16-v3-0-3a262b4e2921@kernel.org>
+In-Reply-To: <20250711-rnull-up-v6-16-v3-0-3a262b4e2921@kernel.org>
 To: Boqun Feng <boqun.feng@gmail.com>, Miguel Ojeda <ojeda@kernel.org>, 
  Alex Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>, 
  =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
@@ -51,96 +49,139 @@ To: Boqun Feng <boqun.feng@gmail.com>, Miguel Ojeda <ojeda@kernel.org>,
 Cc: linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org, 
  linux-kernel@vger.kernel.org, Andreas Hindborg <a.hindborg@kernel.org>
 X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3443; i=a.hindborg@kernel.org;
- h=from:subject:message-id; bh=AYWYuPxO7KkBuuMRitEmKq+GxfKULamC7whXKRkZjjs=;
- b=owEBbQKS/ZANAwAIAeG4Gj55KGN3AcsmYgBocPjHP5ZnY61f3XZXqAPVIRxWptdUKlYpsvJoi
- SWyQtqAhbCJAjMEAAEIAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaHD4xwAKCRDhuBo+eShj
- d1CWD/4j4glz2Sc6XkUenGPfXgQjlHIrjFLYiRzcTHRYvmrZcx1CP7FA77GlJTW/dIsaZY0OVCg
- JQ4MA6ODg39orRN+W2NZ1cuAn1nbmfyxKTFcyRKnz4JD5ZL+z2xmxaLGkao/4TXRLLFHl1HnR/A
- PZdSZEJ0BTLuHSaLXmaSGw5ImjHzFWGNcuYIKrq+Ty8HAO1DJkHHy8ZO0455ofM1ZIF0jzoY2Yq
- Ruyb6O7YVN0hlhQMOg92I48oBDJHgsCwLEbuMPdCnVp0YZurjbUr4FJOLFs5EXPHU/oYPlPd0mP
- DhhqfVH49N8aZ0nL3fIem1H1naImXPgWXPlspVAQ5SrLvJjqfCvHR9WVZCb4rT44zfssOg62J0j
- yINp7inr6Vzh7fzAFof650DLiYR7I8chacMwWJDsi4zJZk3l1gcfJq9WwqqiAbSLf3qCt4v9Ldr
- Uab/IxZqv/SsPW6365cEbYUwsA/qcbR9Rx6+yQsrYwp8TJrhE1VA0yokoDNo9PEQMw1KiSYqNzO
- N+8cz7E9bEs0xbC9Wy8R5GA5tKfSAMEG10xjoky0ux1Dipr4HwxmJ4eZB07F7/zg/KMnLn3dS3O
- C2MLoJm7X4BiT2RtIjavKR0oTmtHla5GB9CRtMS5tnERCtoJMJX6t45QgyHP9AEYbsfSMTyEfx5
- 4sG0TG6Az07nO4w==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4988; i=a.hindborg@kernel.org;
+ h=from:subject:message-id; bh=LSx1ItJzMBA57/EBhXrxJqKwSb/byhu1bF1rbuvWUgY=;
+ b=owEBbQKS/ZANAwAIAeG4Gj55KGN3AcsmYgBocPjXjJ5h+X/52bpiq+g1p0EkDmulUlDzWVwK+
+ Hqe0mke+Z+JAjMEAAEIAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaHD41wAKCRDhuBo+eShj
+ d/N6D/9n2oK3tRZ+5im8UulYawUc/j2qGQgm5MhJ1gGksKmQfI5DmBJxd3rryoC2C4xXqExELO4
+ 6KXrk5yOIrLBjS/0QTO8SNt9UlxmP97I+IuKcASEoLnf/a7NmXq2mFrpU/fiQVQQHn0W7vOTle6
+ CsrcjzK7Gj4ZsjWrcjBpAeFpiAWAP3n1i/jr9CwkF6hV3p+7QlzeGU32CgbbfPqrrIHzd695Jwj
+ rEJiJKG91udigrzconxABqna/n2kdXCfD4ZIkOOwIiUOjafhh/V5aGauHXq0JO1AZxZLhYI6oTw
+ 9rguHAyFU8rIG5aPrjiUcmLS6cFbG1Vq8V/su+3PMdH8ZCjdKhmLPBpEHcu5bVo610TwsrQlKxZ
+ 08wlnKeAAwfMikag0T6KE1LMc8UL7GX/xWEEr4sBe3zvc/HAVduD2iHT6Pc3zpztQ4IBrSiIkFF
+ Rs18tjkmmFHN3HWqiEGKpv8FckqX5WWNUO/rhP6GyIqdAPRCbZGxLugf+qUHR5pK28XXSSxtPO9
+ cTdHfaVQ1wlqREECASoZD+6+VudZTtoghp0fKHlSOOFbDsFhk0faIja+aXVfnudg9G2K47YaOYB
+ 0nPTotxoA97GR0j4yJIfCLDGef0NEaFgLTmRCa4bZnv8Dl8ChUtpkVFKhUKTp4ssUW3M0cDnhFi
+ 1SonFjAD6S4ryoA==
 X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
  fpr=3108C10F46872E248D1FB221376EB100563EF7A7
 
-This series adds configuration via configfs and remote completion to
-the rnull driver. The series also includes a set of changes to the
-rust block device driver API: a few cleanup patches, and a few features
-supporting the rnull changes.
-
-The series removes the raw buffer formatting logic from `kernel::block`
-and improves the logic available in `kernel::string` to support the same
-use as the removed logic.
-
-This series is a smaller subset of the patches available in the
-downstream rnull tree. I hope to minimize the delta between upstream
-and downstream over the next few kernel releases.
+Allow users of rust block device driver API to schedule completion of
+requests via `blk_mq_complete_request_remote`.
 
 Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
 ---
-Changes in v3:
-- Rename `NullBorrowFormatter` as `NullTerminatedFormatter`.
-- Remove `pos` from `NullBorrowFormatter`.
-- Call into `Self::new` in `NullBorrowFormatter::from_array`.
-- Use `Option` return type in `NullBorrowFormatter::from_array`
-- Use `Option` return type in `NullBorrowFormatter::new`.
-- Remove `BorrowFormatter` and update `Formatter` with a generic lifetime.
-- Split visibility change of `str::Formatter` into separate patch.
-- Link to v2: https://lore.kernel.org/r/20250708-rnull-up-v6-16-v2-0-ab93c0ff429b@kernel.org
+ drivers/block/rnull/rnull.rs       |  9 +++++++++
+ rust/kernel/block/mq.rs            |  6 ++++++
+ rust/kernel/block/mq/operations.rs | 19 +++++++++++++++----
+ rust/kernel/block/mq/request.rs    | 17 +++++++++++++++++
+ 4 files changed, 47 insertions(+), 4 deletions(-)
 
-Changes in v2:
-- Rework formatter logic. Add two new formatters that write to slices,
-  one of which adds a trailing null byte.
-- Reorder and split patches so that changes are more clear.
-- Fix a typo in soft-irq patch summary.
-- Link to v1: https://lore.kernel.org/r/20250616-rnull-up-v6-16-v1-0-a4168b8e76b2@kernel.org
+diff --git a/drivers/block/rnull/rnull.rs b/drivers/block/rnull/rnull.rs
+index a012c59ecb3c..371786be7f47 100644
+--- a/drivers/block/rnull/rnull.rs
++++ b/drivers/block/rnull/rnull.rs
+@@ -83,4 +83,13 @@ fn queue_rq(_queue_data: (), rq: ARef<mq::Request<Self>>, _is_last: bool) -> Res
+     }
+ 
+     fn commit_rqs(_queue_data: ()) {}
++
++    fn complete(rq: ARef<mq::Request<Self>>) {
++        mq::Request::end_ok(rq)
++            .map_err(|_e| kernel::error::code::EIO)
++            // We take no refcounts on the request, so we expect to be able to
++            // end the request. The request reference must be unique at this
++            // point, and so `end_ok` cannot fail.
++            .expect("Fatal error - expected to be able to end request");
++    }
+ }
+diff --git a/rust/kernel/block/mq.rs b/rust/kernel/block/mq.rs
+index 34b7425fa94d..551ef38efea2 100644
+--- a/rust/kernel/block/mq.rs
++++ b/rust/kernel/block/mq.rs
+@@ -77,6 +77,12 @@
+ //!     }
+ //!
+ //!     fn commit_rqs(_queue_data: ()) {}
++//!
++//!     fn complete(rq: ARef<Request<Self>>) {
++//!         Request::end_ok(rq)
++//!             .map_err(|_e| kernel::error::code::EIO)
++//!             .expect("Fatal error - expected to be able to end request");
++//!     }
+ //! }
+ //!
+ //! let tagset: Arc<TagSet<MyBlkDevice>> =
+diff --git a/rust/kernel/block/mq/operations.rs b/rust/kernel/block/mq/operations.rs
+index c50959d5517b..b6b26cebd4f5 100644
+--- a/rust/kernel/block/mq/operations.rs
++++ b/rust/kernel/block/mq/operations.rs
+@@ -42,6 +42,9 @@ fn queue_rq(
+     /// Called by the kernel to indicate that queued requests should be submitted.
+     fn commit_rqs(queue_data: ForeignBorrowed<'_, Self::QueueData>);
+ 
++    /// Called by the kernel when the request is completed.
++    fn complete(rq: ARef<Request<Self>>);
++
+     /// Called by the kernel to poll the device for completed requests. Only
+     /// used for poll queues.
+     fn poll() -> bool {
+@@ -143,13 +146,21 @@ impl<T: Operations> OperationsVTable<T> {
+         T::commit_rqs(queue_data)
+     }
+ 
+-    /// This function is called by the C kernel. It is not currently
+-    /// implemented, and there is no way to exercise this code path.
++    /// This function is called by the C kernel. A pointer to this function is
++    /// installed in the `blk_mq_ops` vtable for the driver.
+     ///
+     /// # Safety
+     ///
+-    /// This function may only be called by blk-mq C infrastructure.
+-    unsafe extern "C" fn complete_callback(_rq: *mut bindings::request) {}
++    /// This function may only be called by blk-mq C infrastructure. `rq` must
++    /// point to a valid request that has been marked as completed. The pointee
++    /// of `rq` must be valid for write for the duration of this function.
++    unsafe extern "C" fn complete_callback(rq: *mut bindings::request) {
++        // SAFETY: This function can only be dispatched through
++        // `Request::complete`. We leaked a refcount then which we pick back up
++        // now.
++        let aref = unsafe { Request::aref_from_raw(rq) };
++        T::complete(aref);
++    }
+ 
+     /// This function is called by the C kernel. A pointer to this function is
+     /// installed in the `blk_mq_ops` vtable for the driver.
+diff --git a/rust/kernel/block/mq/request.rs b/rust/kernel/block/mq/request.rs
+index 873d00db74dd..244578a802ce 100644
+--- a/rust/kernel/block/mq/request.rs
++++ b/rust/kernel/block/mq/request.rs
+@@ -130,6 +130,23 @@ pub fn end_ok(this: ARef<Self>) -> Result<(), ARef<Self>> {
+         Ok(())
+     }
+ 
++    /// Complete the request by scheduling `Operations::complete` for
++    /// execution.
++    ///
++    /// The function may be scheduled locally, via SoftIRQ or remotely via IPMI.
++    /// See `blk_mq_complete_request_remote` in [`blk-mq.c`] for details.
++    ///
++    /// [`blk-mq.c`]: srctree/block/blk-mq.c
++    pub fn complete(this: ARef<Self>) {
++        let ptr = ARef::into_raw(this).cast::<bindings::request>().as_ptr();
++        // SAFETY: By type invariant, `self.0` is a valid `struct request`
++        if !unsafe { bindings::blk_mq_complete_request_remote(ptr) } {
++            // SAFETY: We released a refcount above that we can reclaim here.
++            let this = unsafe { Request::aref_from_raw(ptr) };
++            T::complete(this);
++        }
++    }
++
+     /// Return a pointer to the [`RequestDataWrapper`] stored in the private area
+     /// of the request structure.
+     ///
 
----
-Andreas Hindborg (16):
-      rust: str: normalize imports in `str.rs`
-      rust: str: allow `str::Formatter` to format into `&mut [u8]`.
-      rust: str: expose `str::Formatter::new` publicly.
-      rust: str: make `RawFormatter::bytes_written` public.
-      rust: str: introduce `NullTerminatedFormatter`
-      rust: block: normalize imports for `gen_disk.rs`
-      rust: block: use `NullTerminatedFormatter`
-      rust: block: remove `RawWriter`
-      rust: block: remove trait bound from `mq::Request` definition
-      rust: block: add block related constants
-      rnull: move driver to separate directory
-      rnull: enable configuration via `configfs`
-      rust: block: add `GenDisk` private data support
-      rust: block: mq: fix spelling in a safety comment
-      rust: block: add remote completion to `Request`
-      rnull: add soft-irq completion support
-
- MAINTAINERS                        |   2 +-
- drivers/block/Kconfig              |  10 +-
- drivers/block/Makefile             |   4 +-
- drivers/block/rnull.rs             |  80 -----------
- drivers/block/rnull/Kconfig        |  13 ++
- drivers/block/rnull/Makefile       |   3 +
- drivers/block/rnull/configfs.rs    | 277 +++++++++++++++++++++++++++++++++++++
- drivers/block/rnull/rnull.rs       | 105 ++++++++++++++
- rust/kernel/block.rs               |  12 ++
- rust/kernel/block/mq.rs            |  14 +-
- rust/kernel/block/mq/gen_disk.rs   |  53 +++++--
- rust/kernel/block/mq/operations.rs |  65 +++++++--
- rust/kernel/block/mq/raw_writer.rs |  55 --------
- rust/kernel/block/mq/request.rs    |  21 ++-
- rust/kernel/str.rs                 |  78 +++++++++--
- 15 files changed, 603 insertions(+), 189 deletions(-)
----
-base-commit: e04c78d86a9699d136910cfc0bdcf01087e3267e
-change-id: 20250616-rnull-up-v6-16-b4571e28feee
-
-Best regards,
 -- 
-Andreas Hindborg <a.hindborg@kernel.org>
+2.47.2
 
 
