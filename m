@@ -1,136 +1,154 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10F022EAB62;
-	Fri, 11 Jul 2025 11:44:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 326653209;
+	Fri, 11 Jul 2025 12:44:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752234268; cv=none; b=G2GVvs3/zU5t/f7Xs5wAhRbym4ry1qxRCP8rqLB0nil7oAXFNQC+gEdPMKzem9NuIHtJAl3Sfu2kV43BJFb52V/mYVf8sBJYsOU8AfJ+jPEUCnJTqTJnkz84y4igpw83arp8pI2aEH5iXEF0ti+dOiDqY6ZmS6HSwdCdwPLEsiE=
+	t=1752237861; cv=none; b=fFjwmTz/952O8NvuXl177kLxm2V5Q26DHniGBmW5lBHi6ynZ8Su4Xnp/7/ny8UPjDarp5KO+SUrZ0kKNfZrY5oy0f1JgMe3CBnUX7f0kIfpSw4m17pMc4ErfyIB2b6Glcti5S1pArXQYLXcQtbRQayoqK1BafNAemGrbWHfWcEo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752234268; c=relaxed/simple;
-	bh=YR3+KxDyGdcP+mNlRtl4taUFDwd89vDjI3tc8bE0Zrc=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=BT6nfjyXURWUD1/thRSjgZ5BTYR4uSkhJfsXi5PIChACvSrGu+d4a7BO1N3ycnZdNmGW4xtMb6fE1xfKFnED8RUmZs+de3XGimxmB9P682G83T8wYCV+Gr3t1hHVImOJ6ZtCuNgzQj+RWPxUCg6wZ5SF9Chaw9l1mTkZgKgaymM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l/EfB5VF; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1752237861; c=relaxed/simple;
+	bh=teZJaqxYI5b4Zi5Q3t/5mosyvGb3FX+DYiKRW0d6N6s=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=boeNj87B25QnNn94n0ufDiJHOZ5laYoBd+TLCRqnLoasFuVNdOdFmYv/BDybyucAL0huboW6HmfJ7HtrDRNk60kMCevbm0yjOQyM2F8NzQFsfDcneOl3u3UkFHDYomKDBMWYSAvAq2fQ9qKckSdYeqV6adDRKHQObx6Y64eSH+g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IJDmPs2c; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l/EfB5VF"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1CB3FC4CEED;
-	Fri, 11 Jul 2025 11:44:24 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IJDmPs2c"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 244B9C4CEED;
+	Fri, 11 Jul 2025 12:44:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752234267;
-	bh=YR3+KxDyGdcP+mNlRtl4taUFDwd89vDjI3tc8bE0Zrc=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=l/EfB5VFaOH9n3pwwxaB+J2zSQYRdKTthzcmHAgR9j2ccJIGcL4R3GzmB2EyUsQYt
-	 a1pRhH9ZccX28O2puUaUWFxduLJLlYIYO/vHC4/2eg3D8VhdI/FfbMgtMY9ThhY2qr
-	 ZYTUEO22HFSsY3qocRrc4JLgERW5uwc2n8cF0b37487IF2lgho/xBPZmBfmhPNh+fp
-	 Cl0H3afjPidm+5h0lIKwIepvuQ86k8P7E8Ty3AMQ4BHEYOJZmjHQ0ga4nKUZjkWrKm
-	 VyPTwAyx0sSHVL1SFVNb8CLtFxXgldIAhBJDKg9EuClDNybAWvgWDP9xP+cphC8Ygj
-	 v2OWJQIQnaOfQ==
-From: Andreas Hindborg <a.hindborg@kernel.org>
-Date: Fri, 11 Jul 2025 13:43:03 +0200
-Subject: [PATCH v3 02/16] rust: str: allow `str::Formatter` to format into
- `&mut [u8]`.
+	s=k20201202; t=1752237860;
+	bh=teZJaqxYI5b4Zi5Q3t/5mosyvGb3FX+DYiKRW0d6N6s=;
+	h=Date:Cc:Subject:From:To:References:In-Reply-To:From;
+	b=IJDmPs2c3NbqO3wxva11UXJLk9zZYU+B2fZtvtfwnFwoEOyxy64podMGkXpF4Srr3
+	 3GctEfA87rhazleam3+lU8Q7ILT1r5aaQAIGUeaQMKwml83rX69qG61ch5ThQyXrfr
+	 gPjD9Nb7q3B3sHaOfG16wjiXJpZwHmHh4BnSbqysc8Xl91V0iLPjwhf5mZ4Ii3AJr3
+	 ALKh/mpgnKqGHTLc+6he887VpV6qrxjkJe0D57+XI880GRuTPANwid4VbJbkUPpjyl
+	 umhId6gP+TabFKBnQ2H8FvO2WONWNIJtxCD87joyUgyy0ukGUP/qAUsGwkTBOM2wb6
+	 qUYmv0wyaRYhQ==
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250711-rnull-up-v6-16-v3-2-3a262b4e2921@kernel.org>
-References: <20250711-rnull-up-v6-16-v3-0-3a262b4e2921@kernel.org>
-In-Reply-To: <20250711-rnull-up-v6-16-v3-0-3a262b4e2921@kernel.org>
-To: Boqun Feng <boqun.feng@gmail.com>, Miguel Ojeda <ojeda@kernel.org>, 
- Alex Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>, 
- =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
- Benno Lossin <lossin@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
- Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, 
- Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Andreas Hindborg <a.hindborg@kernel.org>
-X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2171; i=a.hindborg@kernel.org;
- h=from:subject:message-id; bh=YR3+KxDyGdcP+mNlRtl4taUFDwd89vDjI3tc8bE0Zrc=;
- b=owEBbQKS/ZANAwAIAeG4Gj55KGN3AcsmYgBocPjLa/RPa7IihwUNcpudTtRNnpMt3yl/RrYb9
- W1u1CEqjECJAjMEAAEIAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaHD4ywAKCRDhuBo+eShj
- d0OrD/4yBwrg+x8SfhqC1StjqxYxDerfuLQC5zH6ntePB3nydWy1awF/QWcW6s+6eZaNSvRwtFg
- OKWGzlmOWMgxdfSpiX752ELAsTmF9ge74MkbPnRLjTyrzvxKQtzrY9jTYAmk1XcSUZUN/NPUDQe
- 7bTeHvM4lNOZ4DE2Y1hoQ9uPhNbGb8mUH2ukexbCTbpTPVuf/smH8+N5PVFUwbc0mWvPHaLAFq3
- 0L8J1/jduPzdpohhZeRYDrPZjAH+6515zvaKCzdE42boj6fF1d68Vv5SsgJ9GJSzwF0l6DJSrLR
- uCzAWjcxwzNxVfWZT+l4YRWpXu7OqBHjyo2IZs30jRzbsPKkvsh3CsRC/lwnGy1ItcCXhkWF2Ii
- YOljPM2MX2/Fxhuwmckm0tStPDpRdaeq8jdetjvvZn3RROwHl/PwZcTccyDO7Grq1l93e5BVo3K
- nUpaahKPxa4peV/tADjc4tKg14gEGoZHFMBXqNpbare7RmFA0z8md0IYNN2nI1MhpeXIavyDaPM
- hmfY2NaJkczQJhTqkGSlpYbSimOjC83xshHd8WF4K2FiP1Aj+hfT9NgCpw2ciSgso0leaN7YJKw
- auYVwyQ1sqeVpN8fz75ecbOdmkcFDU1omC2NT1vmRhjV7JMgkUbBbf8+d6YUNJEcymxUrgdQ17p
- OgAoECwIGfGUBqw==
-X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
- fpr=3108C10F46872E248D1FB221376EB100563EF7A7
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Fri, 11 Jul 2025 14:44:09 +0200
+Message-Id: <DB98H7EGG96J.2FC3ZWDENYWW5@kernel.org>
+Cc: <linux-pm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <rust-for-linux@vger.kernel.org>, <nouveau@lists.freedesktop.org>,
+ <dri-devel@lists.freedesktop.org>, <netdev@vger.kernel.org>,
+ <linux-clk@vger.kernel.org>, <linux-pci@vger.kernel.org>,
+ <linux-kselftest@vger.kernel.org>, <kunit-dev@googlegroups.com>,
+ <linux-block@vger.kernel.org>
+Subject: Re: [PATCH 00/17] rust: replace `kernel::c_str!` with C-Strings
+From: "Benno Lossin" <lossin@kernel.org>
+To: "Tamir Duberstein" <tamird@gmail.com>, "Rafael J. Wysocki"
+ <rafael@kernel.org>, "Viresh Kumar" <viresh.kumar@linaro.org>, "Miguel
+ Ojeda" <ojeda@kernel.org>, "Alex Gaynor" <alex.gaynor@gmail.com>, "Boqun
+ Feng" <boqun.feng@gmail.com>, "Gary Guo" <gary@garyguo.net>,
+ =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, "Andreas
+ Hindborg" <a.hindborg@kernel.org>, "Alice Ryhl" <aliceryhl@google.com>,
+ "Trevor Gross" <tmgross@umich.edu>, "Danilo Krummrich" <dakr@kernel.org>,
+ "Maarten Lankhorst" <maarten.lankhorst@linux.intel.com>, "Maxime Ripard"
+ <mripard@kernel.org>, "Thomas Zimmermann" <tzimmermann@suse.de>, "David
+ Airlie" <airlied@gmail.com>, "Simona Vetter" <simona@ffwll.ch>, "FUJITA
+ Tomonori" <fujita.tomonori@gmail.com>, "Andrew Lunn" <andrew@lunn.ch>,
+ "Heiner Kallweit" <hkallweit1@gmail.com>, "Russell King"
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>, "Paolo
+ Abeni" <pabeni@redhat.com>, "Michael Turquette" <mturquette@baylibre.com>,
+ "Stephen Boyd" <sboyd@kernel.org>, "Breno Leitao" <leitao@debian.org>,
+ "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>, "Luis Chamberlain"
+ <mcgrof@kernel.org>, "Russ Weight" <russ.weight@linux.dev>, "Dave Ertman"
+ <david.m.ertman@intel.com>, "Ira Weiny" <ira.weiny@intel.com>, "Leon
+ Romanovsky" <leon@kernel.org>, "Bjorn Helgaas" <bhelgaas@google.com>,
+ =?utf-8?q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, "Arnd
+ Bergmann" <arnd@arndb.de>, "Brendan Higgins" <brendan.higgins@linux.dev>,
+ "David Gow" <davidgow@google.com>, "Rae Moar" <rmoar@google.com>, "Jens
+ Axboe" <axboe@kernel.dk>
+X-Mailer: aerc 0.20.1
+References: <20250710-core-cstr-cstrings-v1-0-027420ea799e@gmail.com>
+In-Reply-To: <20250710-core-cstr-cstrings-v1-0-027420ea799e@gmail.com>
 
-Improve `Formatter` so that it can write to an array or slice buffer.
+On Thu Jul 10, 2025 at 5:31 PM CEST, Tamir Duberstein wrote:
+> This series depends on step 3[0] which depends on steps 2a[1] and 2b[2]
+> which both depend on step 1[3].
+>
+> This series also has a minor merge conflict with a small change[4] that
+> was taken through driver-core-testing. This series is marked as
+> depending on that change; as such it contains the post-conflict patch.
+>
+> Subsystem maintainers: I would appreciate your `Acked-by`s so that this
+> can be taken through Miguel's tree (where the previous series must go).
+>
+> Link  https://lore.kernel.org/all/20250710-cstr-core-v14-0-ca7e0ca82c82@g=
+mail.com/ [0]
+> Link: https://lore.kernel.org/all/20250709-core-cstr-fanout-1-v1-0-64308e=
+7203fc@gmail.com/ [1]
+> Link: https://lore.kernel.org/all/20250709-core-cstr-fanout-1-v1-0-fd793b=
+3e58a2@gmail.com/ [2]
+> Link: https://lore.kernel.org/all/20250704-core-cstr-prepare-v1-0-a915240=
+37783@gmail.com/ [3]
+> Link: https://lore.kernel.org/all/20250704-cstr-include-aux-v1-1-e1a404ae=
+92ac@gmail.com/ [4]
+>
+> Signed-off-by: Tamir Duberstein <tamird@gmail.com>
+> ---
+> Tamir Duberstein (17):
+>       drivers: net: replace `kernel::c_str!` with C-Strings
+>       gpu: nova-core: replace `kernel::c_str!` with C-Strings
+>       rust: auxiliary: replace `kernel::c_str!` with C-Strings
+>       rust: clk: replace `kernel::c_str!` with C-Strings
+>       rust: configfs: replace `kernel::c_str!` with C-Strings
+>       rust: cpufreq: replace `kernel::c_str!` with C-Strings
+>       rust: device: replace `kernel::c_str!` with C-Strings
+>       rust: firmware: replace `kernel::c_str!` with C-Strings
+>       rust: kunit: replace `kernel::c_str!` with C-Strings
+>       rust: macros: replace `kernel::c_str!` with C-Strings
+>       rust: miscdevice: replace `kernel::c_str!` with C-Strings
+>       rust: net: replace `kernel::c_str!` with C-Strings
+>       rust: pci: replace `kernel::c_str!` with C-Strings
+>       rust: platform: replace `kernel::c_str!` with C-Strings
+>       rust: seq_file: replace `kernel::c_str!` with C-Strings
+>       rust: str: replace `kernel::c_str!` with C-Strings
+>       rust: sync: replace `kernel::c_str!` with C-Strings
+>
+>  drivers/block/rnull.rs                |  2 +-
+>  drivers/cpufreq/rcpufreq_dt.rs        |  5 ++---
+>  drivers/gpu/drm/nova/driver.rs        | 10 +++++-----
+>  drivers/gpu/nova-core/driver.rs       |  6 +++---
+>  drivers/net/phy/ax88796b_rust.rs      |  7 +++----
+>  drivers/net/phy/qt2025.rs             |  5 ++---
+>  rust/kernel/clk.rs                    |  6 ++----
+>  rust/kernel/configfs.rs               |  5 ++---
+>  rust/kernel/cpufreq.rs                |  3 +--
+>  rust/kernel/device.rs                 |  4 +---
+>  rust/kernel/firmware.rs               |  6 +++---
+>  rust/kernel/kunit.rs                  | 11 ++++-------
+>  rust/kernel/net/phy.rs                |  6 ++----
+>  rust/kernel/platform.rs               |  4 ++--
+>  rust/kernel/seq_file.rs               |  4 ++--
+>  rust/kernel/str.rs                    |  5 ++---
+>  rust/kernel/sync.rs                   |  5 ++---
+>  rust/kernel/sync/completion.rs        |  2 +-
+>  rust/kernel/workqueue.rs              |  8 ++++----
+>  rust/macros/kunit.rs                  | 10 +++++-----
+>  rust/macros/module.rs                 |  2 +-
+>  samples/rust/rust_configfs.rs         |  5 ++---
+>  samples/rust/rust_driver_auxiliary.rs |  4 ++--
+>  samples/rust/rust_driver_faux.rs      |  4 ++--
+>  samples/rust/rust_driver_pci.rs       |  4 ++--
+>  samples/rust/rust_driver_platform.rs  |  4 ++--
+>  samples/rust/rust_misc_device.rs      |  3 +--
+>  scripts/rustdoc_test_gen.rs           |  4 ++--
+>  28 files changed, 63 insertions(+), 81 deletions(-)
 
-Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
+For the entire series:
+
+Reviewed-by: Benno Lossin <lossin@kernel.org>
+
 ---
- rust/kernel/str.rs | 19 ++++++++++++++-----
- 1 file changed, 14 insertions(+), 5 deletions(-)
-
-diff --git a/rust/kernel/str.rs b/rust/kernel/str.rs
-index 488b0e97004e..41af456a46c8 100644
---- a/rust/kernel/str.rs
-+++ b/rust/kernel/str.rs
-@@ -6,6 +6,7 @@
- use crate::prelude::*;
- use core::{
-     fmt::{self, Write},
-+    marker::PhantomData,
-     ops::{self, Deref, DerefMut, Index},
- };
- 
-@@ -794,9 +795,9 @@ fn write_str(&mut self, s: &str) -> fmt::Result {
- /// Allows formatting of [`fmt::Arguments`] into a raw buffer.
- ///
- /// Fails if callers attempt to write more than will fit in the buffer.
--pub(crate) struct Formatter(RawFormatter);
-+pub(crate) struct Formatter<'a>(RawFormatter, PhantomData<&'a mut ()>);
- 
--impl Formatter {
-+impl Formatter<'_> {
-     /// Creates a new instance of [`Formatter`] with the given buffer.
-     ///
-     /// # Safety
-@@ -805,11 +806,19 @@ impl Formatter {
-     /// for the lifetime of the returned [`Formatter`].
-     pub(crate) unsafe fn from_buffer(buf: *mut u8, len: usize) -> Self {
-         // SAFETY: The safety requirements of this function satisfy those of the callee.
--        Self(unsafe { RawFormatter::from_buffer(buf, len) })
-+        Self(unsafe { RawFormatter::from_buffer(buf, len) }, PhantomData)
-+    }
-+
-+    /// Create a new [`Self`] instance.
-+    #[expect(dead_code)]
-+    pub(crate) fn new<'a>(buffer: &'a mut [u8]) -> Formatter<'a> {
-+        // SAFETY: `buffer` is valid for writes for the entire length for
-+        // the lifetime of `Self`.
-+        unsafe { Formatter::from_buffer(buffer.as_mut_ptr(), buffer.len()) }
-     }
- }
- 
--impl Deref for Formatter {
-+impl Deref for Formatter<'_> {
-     type Target = RawFormatter;
- 
-     fn deref(&self) -> &Self::Target {
-@@ -817,7 +826,7 @@ fn deref(&self) -> &Self::Target {
-     }
- }
- 
--impl fmt::Write for Formatter {
-+impl fmt::Write for Formatter<'_> {
-     fn write_str(&mut self, s: &str) -> fmt::Result {
-         self.0.write_str(s)?;
- 
-
--- 
-2.47.2
-
-
+Cheers,
+Benno
