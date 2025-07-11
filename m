@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B48A5299A9A;
-	Fri, 11 Jul 2025 11:43:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17BD02D46A6;
+	Fri, 11 Jul 2025 11:43:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752234215; cv=none; b=mKjAdGAlFN67iAHbixlvxzsIVlxYxXwG+yWpgUpiOdJ/qwVS1WHEqcSksSSyBYevLUokLoEnp3OYW1ivzBio4Ezm6k6iMqZGBabc8H/lau3178EVNKOLaSQ2ffTnSEfQuQskYq1rnsreFrrdJW+ROVD14NyZHe5xBrXHhoHYiws=
+	t=1752234218; cv=none; b=ciD0VoW1pxXjAGPp+4k9hB5VLLSAFcJwDRUhN1ulkSw25fBYAqWnMQvgCYxckAe2zcv6akjFfQI/FLjPYXfsIc2OdDIdEVH7B0pycqfkROxd3Rq677UEyp6hKR4i682GqP+92Lbhx1VBQW05noZN8fje/pwSl12XsRdXko23Xa0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752234215; c=relaxed/simple;
-	bh=EhHdiid3UqGuUgMiYwFJtu8dUDXo0aTr/QDEzmI5oUc=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=a6vxbmK9Y0vfxEi+kxeRyV/K/YRorXEOTeOQhE5zQ/xOd+qjQBnPPWXDuQA8endjL1Au/bi2CnmtsZBsJBASHSRg8HqYXTWHIt1Ebge3GVgd0oFPQnUgPbv6FXx54bNS6VoYUPH4MkXEjJ5aL+0BaGr+0M9dhc34l8id22VIGbE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fuz9EZwK; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1752234218; c=relaxed/simple;
+	bh=AYWYuPxO7KkBuuMRitEmKq+GxfKULamC7whXKRkZjjs=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=UENt1FXvqN2aaTw8S9AdBmDlZxGAaZlVrjTAM58BtLhn/HU+w9aixSucJl7BREzEq2qSRSGDko+Nz6ns23avK2a10wR0POKYYrQK7FN5vBlcCowRxWKnjvByurUbV9FriqX+AK6N3WiYdNd1jmrEpTR0MBszMYhVCVUWLIRKvGE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Uz/lqMRr; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fuz9EZwK"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A06C7C4CEED;
-	Fri, 11 Jul 2025 11:43:31 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Uz/lqMRr"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DEF33C4CEF4;
+	Fri, 11 Jul 2025 11:43:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752234214;
-	bh=EhHdiid3UqGuUgMiYwFJtu8dUDXo0aTr/QDEzmI5oUc=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=fuz9EZwKBmjSvH5fGej6no7QVdsInQo2sKOPB0s+58nAswK4J0l+dopviO78U9ObG
-	 vY0STPEUPVQmM6CONsK5w01wY6XAndqad+ztNC1r3KNIBfwY4Jwek0aBjvog5aZRYB
-	 +uLLiQ++mbkZgjB0Lj/ZOWBRLiyNUZK+lNbb+/sMNuXRMqQ4t7LeqVinAG3c6XqDuU
-	 347IwJ0BhqakI3tOruBFE4djUrALeMbXtTSYvbx57BbuX/MI5plX9d/4eMPdLipP/g
-	 wyUhV4TL4ROq3RLliNItIy9VjRDKLRjB7b0Sc3TXT9claCqVVhuUSeofxClFta+Vyw
-	 59u4GgzKSaQrw==
+	s=k20201202; t=1752234217;
+	bh=AYWYuPxO7KkBuuMRitEmKq+GxfKULamC7whXKRkZjjs=;
+	h=From:Subject:Date:To:Cc:From;
+	b=Uz/lqMRr0tE2mwFqBzOkD9mc0jQEu0rxpvKyiONs0QyE2s0lBLvgno0d/lVTezMD3
+	 1v8W5VRdSudX7qW58yn/L/iG36/Zo/HaSAbz1Z0FH1jChR1A92lHp/6F28AnyLgt7e
+	 PCDWlcMSf06mKkIiMDBszdUUcOtdHeiPyIYTJ1cFv1RaxjVO9Ygv3S98ez4gK05uEG
+	 52QBYz8f2AmJT2T+NDENE/dUHQ/e39ti2DzuW1e77YVDwsIO6uqJkVSahEEbEldLwZ
+	 oMNSU9V4ylqrp0sGrq1TZ0EYyZnduUeH0HTTKS+63gATIhElE+077sZqJZLDYdxOko
+	 pcf3cvxunVrBg==
 From: Andreas Hindborg <a.hindborg@kernel.org>
-Date: Fri, 11 Jul 2025 13:43:06 +0200
-Subject: [PATCH v3 05/16] rust: str: introduce `NullTerminatedFormatter`
+Subject: [PATCH v3 00/16] rnull: add configfs, remote completion to rnull
+Date: Fri, 11 Jul 2025 13:43:01 +0200
+Message-Id: <20250711-rnull-up-v6-16-v3-0-3a262b4e2921@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -37,9 +37,11 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250711-rnull-up-v6-16-v3-5-3a262b4e2921@kernel.org>
-References: <20250711-rnull-up-v6-16-v3-0-3a262b4e2921@kernel.org>
-In-Reply-To: <20250711-rnull-up-v6-16-v3-0-3a262b4e2921@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAMX4cGgC/3WMQQ6CMBAAv0J6dk1boBRP/sN4oLiFRlLIVhoN4
+ e8WLsYYjzPJzMICksPATtnCCKMLbvQJ8kPG2r7xHYK7JWaSy5IroYD8PAwwTxAVJDRFWQmU2iI
+ iS9FEaN1zH16uiXsXHiO99n8Um/27igI4NIVQ2mislJHnO5LH4ThSx7ZXlJ++4vqnl1tv6rzl1
+ hayNl/9uq5voQLIYe0AAAA=
+X-Change-ID: 20250616-rnull-up-v6-16-b4571e28feee
 To: Boqun Feng <boqun.feng@gmail.com>, Miguel Ojeda <ojeda@kernel.org>, 
  Alex Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>, 
  =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
@@ -49,96 +51,96 @@ To: Boqun Feng <boqun.feng@gmail.com>, Miguel Ojeda <ojeda@kernel.org>,
 Cc: linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org, 
  linux-kernel@vger.kernel.org, Andreas Hindborg <a.hindborg@kernel.org>
 X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2415; i=a.hindborg@kernel.org;
- h=from:subject:message-id; bh=EhHdiid3UqGuUgMiYwFJtu8dUDXo0aTr/QDEzmI5oUc=;
- b=owEBbQKS/ZANAwAIAeG4Gj55KGN3AcsmYgBocPjO0ay/x8XurYLiBY9uUrinQhxpWdlIN08tx
- O/PlQFgf7WJAjMEAAEIAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaHD4zgAKCRDhuBo+eShj
- dy7DD/90N/KMj2ZMuzp6xbysj2qmyIXagWj9lcuKrdAK6j653C7Y5lwSkKGoBWO/psiT0k8w2tF
- p5zcOd3NhTsmdriIfZJN29y4/UWpawpVeiB/5ilz1o0jP7b84JruSQjKqB+BKqHt4Sg8s8MeZLt
- guedU0rjY3vos4Vlj+XVVdhuf3BLztLpEyNfQ1nmjeeo/MkqhHFmJBfw7bPcpYK5pLRu8PBPpMw
- py7P7JQPRIOcK8WgKbyStSDzS5/onth15SON6rHyMXQ7tl+Tz8UkOO2+Nqqvfm+fPDXN1UcgzLn
- a2p3e8/xUaYDOwelkAWxmgtA6HbiUHV0Z0EbCBZ/2SJkiiC9khe9iUq2Mj2qv/hpyOOhU3pfaKg
- FwnsRp0G7FWSQGbQRsr3KCqf5A89eUkCXcS8g6/Y9GRwavmnkk1zamGewaQMZlo+3hmf+bhmAa3
- BK6FD0CB+wGKaOCeClBg8uqUlaln7SJic0TfjE3nB38eVIKNHSBXJbOkDwaP/I+D2d5F7H0ZrXf
- v3BG3WCSowYbkv/M+vnhQArlDuU6NVmR75rxa3bNXu4lVY78Whqfbyi8dm1eoCs+ejeOz8SxWv4
- 6ENi7wlC36jVdOF4uU4TXL5UMX1GMSmziLBtvWzyXZqe6oLsMw9yCXLopB+3TO/XrW2UEkyXlwX
- u4CmFp48PstXWxA==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3443; i=a.hindborg@kernel.org;
+ h=from:subject:message-id; bh=AYWYuPxO7KkBuuMRitEmKq+GxfKULamC7whXKRkZjjs=;
+ b=owEBbQKS/ZANAwAIAeG4Gj55KGN3AcsmYgBocPjHP5ZnY61f3XZXqAPVIRxWptdUKlYpsvJoi
+ SWyQtqAhbCJAjMEAAEIAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaHD4xwAKCRDhuBo+eShj
+ d1CWD/4j4glz2Sc6XkUenGPfXgQjlHIrjFLYiRzcTHRYvmrZcx1CP7FA77GlJTW/dIsaZY0OVCg
+ JQ4MA6ODg39orRN+W2NZ1cuAn1nbmfyxKTFcyRKnz4JD5ZL+z2xmxaLGkao/4TXRLLFHl1HnR/A
+ PZdSZEJ0BTLuHSaLXmaSGw5ImjHzFWGNcuYIKrq+Ty8HAO1DJkHHy8ZO0455ofM1ZIF0jzoY2Yq
+ Ruyb6O7YVN0hlhQMOg92I48oBDJHgsCwLEbuMPdCnVp0YZurjbUr4FJOLFs5EXPHU/oYPlPd0mP
+ DhhqfVH49N8aZ0nL3fIem1H1naImXPgWXPlspVAQ5SrLvJjqfCvHR9WVZCb4rT44zfssOg62J0j
+ yINp7inr6Vzh7fzAFof650DLiYR7I8chacMwWJDsi4zJZk3l1gcfJq9WwqqiAbSLf3qCt4v9Ldr
+ Uab/IxZqv/SsPW6365cEbYUwsA/qcbR9Rx6+yQsrYwp8TJrhE1VA0yokoDNo9PEQMw1KiSYqNzO
+ N+8cz7E9bEs0xbC9Wy8R5GA5tKfSAMEG10xjoky0ux1Dipr4HwxmJ4eZB07F7/zg/KMnLn3dS3O
+ C2MLoJm7X4BiT2RtIjavKR0oTmtHla5GB9CRtMS5tnERCtoJMJX6t45QgyHP9AEYbsfSMTyEfx5
+ 4sG0TG6Az07nO4w==
 X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
  fpr=3108C10F46872E248D1FB221376EB100563EF7A7
 
-Add `NullTerminatedFormatter`, a formatter that writes a null terminated
-string to an array or slice buffer. Because this type needs to manage the
-trailing null marker, the existing formatters cannot be used to implement
-this type.
+This series adds configuration via configfs and remote completion to
+the rnull driver. The series also includes a set of changes to the
+rust block device driver API: a few cleanup patches, and a few features
+supporting the rnull changes.
+
+The series removes the raw buffer formatting logic from `kernel::block`
+and improves the logic available in `kernel::string` to support the same
+use as the removed logic.
+
+This series is a smaller subset of the patches available in the
+downstream rnull tree. I hope to minimize the delta between upstream
+and downstream over the next few kernel releases.
 
 Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
 ---
- rust/kernel/str.rs | 50 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 50 insertions(+)
+Changes in v3:
+- Rename `NullBorrowFormatter` as `NullTerminatedFormatter`.
+- Remove `pos` from `NullBorrowFormatter`.
+- Call into `Self::new` in `NullBorrowFormatter::from_array`.
+- Use `Option` return type in `NullBorrowFormatter::from_array`
+- Use `Option` return type in `NullBorrowFormatter::new`.
+- Remove `BorrowFormatter` and update `Formatter` with a generic lifetime.
+- Split visibility change of `str::Formatter` into separate patch.
+- Link to v2: https://lore.kernel.org/r/20250708-rnull-up-v6-16-v2-0-ab93c0ff429b@kernel.org
 
-diff --git a/rust/kernel/str.rs b/rust/kernel/str.rs
-index b1bc584803b0..c58925438c6e 100644
---- a/rust/kernel/str.rs
-+++ b/rust/kernel/str.rs
-@@ -838,6 +838,56 @@ fn write_str(&mut self, s: &str) -> fmt::Result {
-     }
- }
- 
-+/// A mutable reference to a byte buffer where a string can be written into.
-+///
-+/// The buffer will be automatically null terminated after the last written character.
-+///
-+/// # Invariants
-+///
-+/// `buffer` is always null terminated.
-+pub(crate) struct NullTerminatedFormatter<'a> {
-+    buffer: &'a mut [u8],
-+}
-+
-+impl<'a> NullTerminatedFormatter<'a> {
-+    /// Create a new [`Self`] instance.
-+    pub(crate) fn new(buffer: &'a mut [u8]) -> Option<NullTerminatedFormatter<'a>> {
-+        *(buffer.first_mut()?) = 0;
-+
-+        // INVARIANT: We null terminated the buffer above.
-+        Some(Self { buffer })
-+    }
-+
-+    #[expect(dead_code)]
-+    pub(crate) fn from_array<const N: usize>(
-+        buffer: &'a mut [crate::ffi::c_char; N],
-+    ) -> Option<NullTerminatedFormatter<'a>> {
-+        Self::new(buffer)
-+    }
-+}
-+
-+impl Write for NullTerminatedFormatter<'_> {
-+    fn write_str(&mut self, s: &str) -> fmt::Result {
-+        let bytes = s.as_bytes();
-+        let len = bytes.len();
-+
-+        // We want space for a null terminator. Buffer length is always at least 1, so no overflow.
-+        if len > self.buffer.len() - 1 {
-+            return Err(fmt::Error);
-+        }
-+
-+        let buffer = core::mem::take(&mut self.buffer);
-+        // We break the null termination invariant for a short while.
-+        buffer[..len].copy_from_slice(bytes);
-+        self.buffer = &mut buffer[len..];
-+
-+        // INVARIANT: We null terminate the buffer.
-+        self.buffer[0] = 0;
-+
-+        Ok(())
-+    }
-+}
-+
- /// An owned string that is guaranteed to have exactly one `NUL` byte, which is at the end.
- ///
- /// Used for interoperability with kernel APIs that take C strings.
+Changes in v2:
+- Rework formatter logic. Add two new formatters that write to slices,
+  one of which adds a trailing null byte.
+- Reorder and split patches so that changes are more clear.
+- Fix a typo in soft-irq patch summary.
+- Link to v1: https://lore.kernel.org/r/20250616-rnull-up-v6-16-v1-0-a4168b8e76b2@kernel.org
 
+---
+Andreas Hindborg (16):
+      rust: str: normalize imports in `str.rs`
+      rust: str: allow `str::Formatter` to format into `&mut [u8]`.
+      rust: str: expose `str::Formatter::new` publicly.
+      rust: str: make `RawFormatter::bytes_written` public.
+      rust: str: introduce `NullTerminatedFormatter`
+      rust: block: normalize imports for `gen_disk.rs`
+      rust: block: use `NullTerminatedFormatter`
+      rust: block: remove `RawWriter`
+      rust: block: remove trait bound from `mq::Request` definition
+      rust: block: add block related constants
+      rnull: move driver to separate directory
+      rnull: enable configuration via `configfs`
+      rust: block: add `GenDisk` private data support
+      rust: block: mq: fix spelling in a safety comment
+      rust: block: add remote completion to `Request`
+      rnull: add soft-irq completion support
+
+ MAINTAINERS                        |   2 +-
+ drivers/block/Kconfig              |  10 +-
+ drivers/block/Makefile             |   4 +-
+ drivers/block/rnull.rs             |  80 -----------
+ drivers/block/rnull/Kconfig        |  13 ++
+ drivers/block/rnull/Makefile       |   3 +
+ drivers/block/rnull/configfs.rs    | 277 +++++++++++++++++++++++++++++++++++++
+ drivers/block/rnull/rnull.rs       | 105 ++++++++++++++
+ rust/kernel/block.rs               |  12 ++
+ rust/kernel/block/mq.rs            |  14 +-
+ rust/kernel/block/mq/gen_disk.rs   |  53 +++++--
+ rust/kernel/block/mq/operations.rs |  65 +++++++--
+ rust/kernel/block/mq/raw_writer.rs |  55 --------
+ rust/kernel/block/mq/request.rs    |  21 ++-
+ rust/kernel/str.rs                 |  78 +++++++++--
+ 15 files changed, 603 insertions(+), 189 deletions(-)
+---
+base-commit: e04c78d86a9699d136910cfc0bdcf01087e3267e
+change-id: 20250616-rnull-up-v6-16-b4571e28feee
+
+Best regards,
 -- 
-2.47.2
+Andreas Hindborg <a.hindborg@kernel.org>
 
 
