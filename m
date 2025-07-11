@@ -1,34 +1,35 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEF812BD016;
-	Fri, 11 Jul 2025 11:43:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04F4328C035;
+	Fri, 11 Jul 2025 11:43:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752234231; cv=none; b=r28wFbyhK+L+qdoRigJz6NC/Nqw7ouD8DjqF+IHSvT8IleYA7aVQGtXDdWwaPgH5r/5tf4JT6eI/2yzU52uddRK9f6qLW95cGR9pT5IMHVYsWnPKu+mS6R8j5a/AgSO+GpJeNNuZyA4xdYEBFEQiu9F38AqpnI1H4NjHExk1WHA=
+	t=1752234237; cv=none; b=DGyqijRAuYc1fICBBXLaN1tqrZJZsZlIUU4BNcTsF+76OVts96kuwLBTHmO1QO4OxczWUMc6d1NJqi+rEdFeLNBf4UaeuvoVGZA24LgAKcxuhioDGVOKBTPbMvETTShB0tJo2/0ZvKqaQ7/v2Pwnmz0QN5Byowt2lWb09DAAOQ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752234231; c=relaxed/simple;
-	bh=MFRvhK8iPDT6FMh7J1nCDqXSyE+ZNVaoKHHwymSCd0o=;
+	s=arc-20240116; t=1752234237; c=relaxed/simple;
+	bh=0EQMqwW4o3TiIuFA9NjfmF2wt3+kw0d4Rv4MVtzTMgM=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=D0KpcWbpEgzmyljB4P991Jx3cX4yRgAFIwFt8pD/dEslprlB3U7XAfm7g7aHll6TzhjxbRdIuhRQoUE1yb1ZGtWVVa26Oswe5AEKOmfY1LADS47zIEv+bc4q4mmgIPfNyma4fOJalN7bUVcrhcITG5ZYdH5amKBWcbnc471NUrc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rSddd0uh; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=Kvau66TlCfOwYDQQUoBKM5gGpnAm36Y+JMMvyeZ8fBC4anpVlDMMaz3n/qFq3Ezo6VR/cdjeJCgPwBuw/DpKaMadF0hE7hmlbuLNPtHlMa7s/Xl0fMwc9o7p6WNzJZ0uejTzwwdn35HDVrkASM9MeUw9a/rUkZksEvra+VMySpE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uPx1VSrL; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rSddd0uh"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 831FEC4CEED;
-	Fri, 11 Jul 2025 11:43:48 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uPx1VSrL"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42A94C4CEED;
+	Fri, 11 Jul 2025 11:43:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752234231;
-	bh=MFRvhK8iPDT6FMh7J1nCDqXSyE+ZNVaoKHHwymSCd0o=;
+	s=k20201202; t=1752234236;
+	bh=0EQMqwW4o3TiIuFA9NjfmF2wt3+kw0d4Rv4MVtzTMgM=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=rSddd0uhFozLcQMSccVl6VLJ0v47c+rk+t3WSZmYw40Dnuz4jNeZTiPRGuZrSu81X
-	 cUMX+konBdDDLe18Jt5X94wXz+nvMS/30gxXmen42ZkJ2CBJUg4fpu2aFhCxQHbA32
-	 yt1JEhgrNqb/K2PxnaPPt6LtYOVSDfErUHzo69FGtkNqy8l2aHQlbEcBFmudP3pe/5
-	 F6Kn98ZW+EWbsoFTGg+k+nqhnRPjvgrJGhiy9o+zPtjfwD03giyO21DFd7M7e39SmB
-	 J0O3jjKSfT2UileQ6a8WPY9Y4DNlgXG8/67DoIuCgJ1HvX1/lqbc/LkZfydSSujxcZ
-	 UKawDEzXYUVSw==
+	b=uPx1VSrL1qUSMH2yx4i7iPhRQwN1dNmOKWFBkiOBiZWerIakMcdnhE+SI51tj5V4W
+	 vcyq6W0jjrqC9/zDjhGmm2Uwxe2SQacFzPkPMA798y4jsbbdvj0nDB+WpfEk9m0b9M
+	 MRtGpfcVHh1W+VxnhJd8RkOeAqgF8CFLs2/q0QzdYW+sjpZvtZgEbg//NOr2T9NWND
+	 k3NP2ksNqk5tRGLsnOCjhG6Q542JRbj0WHCS5w3Be1wLa7RgXbSFdVIUxyP5Ww9bH1
+	 dB/NgMbtwIiEYhfA9ea2mV75pVbYxADbOFynH9Mdp1RbXaFoPzsZEqlGytT3G/o7CS
+	 JsOPd9dwdbUDQ==
 From: Andreas Hindborg <a.hindborg@kernel.org>
-Date: Fri, 11 Jul 2025 13:43:04 +0200
-Subject: [PATCH v3 03/16] rust: str: expose `str::Formatter::new` publicly.
+Date: Fri, 11 Jul 2025 13:43:10 +0200
+Subject: [PATCH v3 09/16] rust: block: remove trait bound from
+ `mq::Request` definition
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -37,7 +38,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250711-rnull-up-v6-16-v3-3-3a262b4e2921@kernel.org>
+Message-Id: <20250711-rnull-up-v6-16-v3-9-3a262b4e2921@kernel.org>
 References: <20250711-rnull-up-v6-16-v3-0-3a262b4e2921@kernel.org>
 In-Reply-To: <20250711-rnull-up-v6-16-v3-0-3a262b4e2921@kernel.org>
 To: Boqun Feng <boqun.feng@gmail.com>, Miguel Ojeda <ojeda@kernel.org>, 
@@ -49,63 +50,45 @@ To: Boqun Feng <boqun.feng@gmail.com>, Miguel Ojeda <ojeda@kernel.org>,
 Cc: linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org, 
  linux-kernel@vger.kernel.org, Andreas Hindborg <a.hindborg@kernel.org>
 X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1687; i=a.hindborg@kernel.org;
- h=from:subject:message-id; bh=MFRvhK8iPDT6FMh7J1nCDqXSyE+ZNVaoKHHwymSCd0o=;
- b=owEBbQKS/ZANAwAIAeG4Gj55KGN3AcsmYgBocPjMNEVGX2NFrpauvhDJbDfkW+/YUeSQRb1U1
- ZAKq6h7gtmJAjMEAAEIAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaHD4zAAKCRDhuBo+eShj
- d9ypD/4pjC5iRSq9F2EevIp+MEPWVyVynL5WashYO2zdZbOfpmyz0ViYVUz2SCGonKwCMasAU2b
- kn1n0/2C263SP56sUGgEnwswG8sBTmlrs5xsKL4FFWO7e+I+ft49cNginJajEGnfSAejUdEMl+Y
- z45RS5S91O0UUfNjs1fQzJ6rODtMivxdDIbRBWTGw6eyNOVvJ872Xt2JBcTWJuVUhJ7i3r1dwck
- kOK7vMWvuBOuMWE1S5GQT3+VBnl/gvDOA3btcVbhnTb0jpTPy8wWjJeuH8yztqOwgu0gNu/Cvnv
- whWMdzt2LKr3ZyM5ioiq9gdXO/lUG4Ti1WHx1BDe7WOTSCu/IlccVAyfsj6Fh5RYHzcEVQhAJrx
- K1kw7Olrdp27Fs22O2Kk7R428SAuL8E+eqXtObaItAVGtUgYZiyMXm5tV7TW+44YfPZY4jSpzc9
- jWIbUC7JTuSOB3j2X5ATbi5TMpfDHnXWyfX7tJjvESVJrYNWHRIymqehYwlpmKGllxZBSaLZ/1P
- UnKizTajESklGykT5YuBAFzm33doKKMgrmkHLmmIAgMusT+sizCHYvbruPltebllqTuGjc6q0wU
- f9dBEGoW1y95iqPJD+asFongyQKuKe04JepWOtJAvMQfcvj8GiyONsu1Eto06PhNamdPcelz5ri
- 8kUWrQI5oNBrjHQ==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=903; i=a.hindborg@kernel.org;
+ h=from:subject:message-id; bh=0EQMqwW4o3TiIuFA9NjfmF2wt3+kw0d4Rv4MVtzTMgM=;
+ b=owEBbQKS/ZANAwAIAeG4Gj55KGN3AcsmYgBocPjSkIuSjcnlZY9GDxYXn2lSIO/Xb/XtfY6ig
+ WyxQC2KJ22JAjMEAAEIAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaHD40gAKCRDhuBo+eShj
+ dyxRD/0Rjacli0N+bgNxxLgMjy2/7QOV6TIx+3QHQJ8hBtihGeZDtGxUmoo5Lad8rK04RPTE2Pb
+ DlQru3haN/a4zWB7VAbr8xtr2e/vdEtcUPqqmziul1AWUF7eS4+DgUNttzdwi/sZoq4Sd+A3geM
+ HhquptK+5o4x5AK8ImD8Ins8PKbjfneKLIDX4SU8ypdByk8D5bcK6IJx0Xef9pPUBwnHGJOYSs/
+ rSl/qshZlJIxz9RWfYN9xaIKQK+PMJEKUUyrvSTQXCOXEGvUO04x2/WPobSbCD6sRjcSn9cPQLp
+ 4Uk+KT36C0lewZ/JWKJ1kN/YqE5TT2b+yE7pxlFyyck0q4gH+lLmzpqBkZmSYdH/BK8gW7XdxTN
+ rTL/sB+CpE9tv21xRHUruQymO31JJia01UjyJjwOq1SpDsYfCLurHkLPng/SBzImX1QoeNkcTD8
+ Vso/y/OiHNCReQ+j9yKx54hO7u0yeFw7C18QogQQDMZPnq0nEt57sTS7svJoTWkRaLw2TQ3o3HI
+ 8dhFtQwJKCtjdcUluF+DNEZZzI5UIOOmLhzmzRuYDXLWDOpP9rrzkbnPwz7aysfwaCL6AuJFVoj
+ fK/+ZLZau2lRphmTkqizq7VHpBsSXUO3gIKKZ4YNr2YxlxWDZcCLrvFM/EmJdxMLFwDHMfa/M6A
+ X4Sxy0IZpIr1bwQ==
 X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
  fpr=3108C10F46872E248D1FB221376EB100563EF7A7
 
-rnull is going to make use of `str::Formatter`, so expose it with public
-visibility.
+Remove the trait bound `T:Operations` from `mq::Request`. The bound is not
+required, so remove it to reduce complexity.
 
+Reviewed-by: Alice Ryhl <aliceryhl@google.com>
 Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
 ---
- rust/kernel/str.rs | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+ rust/kernel/block/mq/request.rs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/rust/kernel/str.rs b/rust/kernel/str.rs
-index 41af456a46c8..28a6179385fc 100644
---- a/rust/kernel/str.rs
-+++ b/rust/kernel/str.rs
-@@ -703,7 +703,7 @@ fn test_bstr_debug() -> Result {
+diff --git a/rust/kernel/block/mq/request.rs b/rust/kernel/block/mq/request.rs
+index 4a5b7ec914ef..2d14a6261a31 100644
+--- a/rust/kernel/block/mq/request.rs
++++ b/rust/kernel/block/mq/request.rs
+@@ -53,7 +53,7 @@
+ /// [`struct request`]: srctree/include/linux/blk-mq.h
  ///
- /// The memory region between `pos` (inclusive) and `end` (exclusive) is valid for writes if `pos`
- /// is less than `end`.
--pub(crate) struct RawFormatter {
-+pub struct RawFormatter {
-     // Use `usize` to use `saturating_*` functions.
-     beg: usize,
-     pos: usize,
-@@ -795,7 +795,7 @@ fn write_str(&mut self, s: &str) -> fmt::Result {
- /// Allows formatting of [`fmt::Arguments`] into a raw buffer.
- ///
- /// Fails if callers attempt to write more than will fit in the buffer.
--pub(crate) struct Formatter<'a>(RawFormatter, PhantomData<&'a mut ()>);
-+pub struct Formatter<'a>(RawFormatter, PhantomData<&'a mut ()>);
+ #[repr(transparent)]
+-pub struct Request<T: Operations>(Opaque<bindings::request>, PhantomData<T>);
++pub struct Request<T>(Opaque<bindings::request>, PhantomData<T>);
  
- impl Formatter<'_> {
-     /// Creates a new instance of [`Formatter`] with the given buffer.
-@@ -810,8 +810,7 @@ pub(crate) unsafe fn from_buffer(buf: *mut u8, len: usize) -> Self {
-     }
- 
-     /// Create a new [`Self`] instance.
--    #[expect(dead_code)]
--    pub(crate) fn new<'a>(buffer: &'a mut [u8]) -> Formatter<'a> {
-+    pub fn new<'a>(buffer: &'a mut [u8]) -> Formatter<'a> {
-         // SAFETY: `buffer` is valid for writes for the entire length for
-         // the lifetime of `Self`.
-         unsafe { Formatter::from_buffer(buffer.as_mut_ptr(), buffer.len()) }
+ impl<T: Operations> Request<T> {
+     /// Create an [`ARef<Request>`] from a [`struct request`] pointer.
 
 -- 
 2.47.2
