@@ -1,92 +1,97 @@
-Received: from mail-il1-f177.google.com (mail-il1-f177.google.com [209.85.166.177])
+Received: from mail-io1-f42.google.com (mail-io1-f42.google.com [209.85.166.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9C352D3EC8
-	for <linux-block@vger.kernel.org>; Fri, 11 Jul 2025 13:46:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AD5F2AD21
+	for <linux-block@vger.kernel.org>; Fri, 11 Jul 2025 13:46:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752241573; cv=none; b=qx0L29yCcyBgzp9GQlUeDDj5Y5QTMToJNEpqDWaBPoVE3kaQShdN33o3xqprTS67uGbXoEl76faCxTLxBdhoCNS022s+VgJS9lJZ7jcF9cF1EaSsHNdz7dsD3eR9XA6pG21JFVBXsMUbIuwpO4BOELD/sfYAMyyJ14BH7b0UN1I=
+	t=1752241600; cv=none; b=B2SiO1Oh59wexPQvzx7D4M0pBo0/jlqBvwNJabuZFH9MkXP9NxuTDCgNQOhGAlVwDUHw44Bi1z4w2a9EBXutsVSPwyF38wKcx+cWEAh9VYX/5MqxNC8nue95LNDyYjcnWP3MR9ng++3NHE3bsRGD01xMmU+j2wpySdgiztv0zLU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752241573; c=relaxed/simple;
-	bh=J4sU6VTvWKKTAwDD7WfZnoaI6D0zzyXD9dtPfdGAk7Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=l/2JgymQZOrzw1ReH+auakNC+DlG5L7cilbgsq4IsMGVxtY6yCmPYSm/rJKOKpGxMv0YZdFTouPOo6ucZDKccyqKcJ2rFtPzIquvLjQ/WmO/XAYtoIUqAs6pVhU/xNpSQmSs/H3yew5ipOv9o425q6ITXNg+Y42rkw7cgZpXdmg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=HbHox6Jh; arc=none smtp.client-ip=209.85.166.177
+	s=arc-20240116; t=1752241600; c=relaxed/simple;
+	bh=D9dpK6dD3qlvJaJirzKxgO+jWPO4OeERtDtmXQkM/w8=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=AVqS5Asj4iY0MxoVFQKbh/exFUiZkKS4EjU7kj3uowLwzf7TdK2pumc0G27Q6T0Qfq/Ba0rnySo7A0QqiLYgkxG5vUOQPoE0ask8npcKHTFy8zt+9Be9xk2cEcEMZn/6CsGE6uhCkj4G6mugyXbI4oLhPsQBB7hv/+4x4W9uxhk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=YT3ZVZit; arc=none smtp.client-ip=209.85.166.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="HbHox6Jh"
-Received: by mail-il1-f177.google.com with SMTP id e9e14a558f8ab-3df2d8cb8d2so7154715ab.2
-        for <linux-block@vger.kernel.org>; Fri, 11 Jul 2025 06:46:10 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="YT3ZVZit"
+Received: by mail-io1-f42.google.com with SMTP id ca18e2360f4ac-86d0c5981b3so85210639f.3
+        for <linux-block@vger.kernel.org>; Fri, 11 Jul 2025 06:46:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1752241569; x=1752846369; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=xGoi4r9NKJs+rl11znJ79jmIWSjCjlQ97Hi9PxhBxVc=;
-        b=HbHox6JhCMXR/UjSgVMjM9kfdzIkkgGlSTWJc17b/Foo5XKaktey7FdvBPEyMf8MnX
-         u0qXC0dZbG/zngRiZBqXJepTr+SAIWpWd7hBT0RNzwdS+BTyvlkblnETMG/QSEYWr46A
-         DKD0oWtq6GfNU6tKCIwlLU6G/gviHO4VpD/fP4XCaS6Z6LmZ+PgKwr/VL4gXqGg6R0Eu
-         oswqbexe+Rss/x6OF6cUFQ5YDf2HBiQnh9eFk+X5RHH2AwbzV8fv5aE5lOx2yRD9obBo
-         NYy+HYWVoeKfr2Lg8SUDvMmwzksXytHR4EhMXZgnR94zcbxtjl/a0We0oddOZFzkQqr9
-         vw4Q==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1752241597; x=1752846397; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/juseajL28aExOR0ncFEkgamJFYX4aY2BgbPyJWuRxo=;
+        b=YT3ZVZit3U2UJs9GpS3C6CwcM+11nn1BOD55qrkXdHSzTA9JJfhTGsx0ny/P6nlMAy
+         3MRRhqMLM/VcppfbsMq7HKBBULoPKNPlWwqISyrWsqBul6FqXKKS7tEcoW/37TtKvzv5
+         YOS/DqXWWsFxJdYT7iD4JnvH3jI2XtGtYPQ8QRhJqPU2nvNVDQLQ5tpWOp4NOoSGfjSM
+         WbF/MuRdhLqsnWhxbTkT0iqiSWduvgjx8/vyfBxWDHjKCzZqtz8YDZWiS/wWMAN7Ti0w
+         ilVSVn/HZZjR0IgwW972FRtCwRWYzsvRSX7X0dpXRpDkKlEm7qtmyRagXOdWD9A1nunV
+         vCwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752241569; x=1752846369;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xGoi4r9NKJs+rl11znJ79jmIWSjCjlQ97Hi9PxhBxVc=;
-        b=H+XVw2rJEqsh4RJRIdv3av6EzMNQeErx5QmYErflh/QkNFb7/Rfyc+zslsn5ozfl4K
-         pam9KY5EcHCsSzWigULYfHIZrwhFeQa7/e11XmOjKBKHcMuAvazkAIiaySJ6v+DPWYnW
-         JY4f1ei24xGoxGWsT7eTFXS8lxG6ZQmBJHGvpfRH3A5MhWyWtJioIWCpuIlUHsXmvjpK
-         ENn7eQfxO9lQBG8/B/qvcfzrESXZg0buMXeiXGLo8pujrxzZ9EXMVU/SrRyQdrrmQM3S
-         LMYUEGvsqZBJqEY0XB3sJewWpN3VRkdk1FAFPc/MaozUAMioghU0pRlXwmK2rD83ll20
-         DRlA==
-X-Forwarded-Encrypted: i=1; AJvYcCWKl6zupTAAwx+kK/G7T6dhTge/jNKkXw+q5/UNSicC6vugoBYwWqRPeVAjBCFt1EvbDKpp7WaDF1UxmQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyLIt68MAhsRaByfDBUq4+G9GuXotGLmexaA8zOyg2OZSsmHpat
-	p2OsAdg1Vl+nbIcZskSjUr163leQMufCD2iq7aG+HVyp0DKOQsSwm7GUnLH8a/5B248=
-X-Gm-Gg: ASbGncvzMlfaBvEAC+e9t3eo2dUMsMUU5mBUBjUiShWK3JkbWZKgc/R4WBzLCgopBif
-	JrJJuNOLtSBFJmPyhXObOjGkIgxULoKmIdUzgpy3ix2DVWKXJ2hVhiQc9jGKyIoL6ROqXvtsa98
-	5IAU3htaBrelXAEFwLiyszMHFVGKhKfye+om5FGrG6nzgcJ/Ie1NkqB7R2yKFQg9W/rFfLdFFyC
-	iugdT68qJPwJl7YEaoMnlMtp3y4BZNI3r80UTYzQNVnTnBh79/VC/hL9RCW5N9XkjFAUx0Fqd5t
-	1JNMAab/M4cc2YwkTpcCgEGDsxhmCRsM0FR7PzVI4ESh0hFRWe3KB6PdeD/8C2HtVc8hVT/ZVjJ
-	ViL+k9pmdAHBrCDFdjXI=
-X-Google-Smtp-Source: AGHT+IEyicA1J20nDNiTVC2pjs5quNqkKDeOeKrXMpB1/yVxblKgbnjmlVmI6B21RyzWKcGzAV1WfA==
-X-Received: by 2002:a05:6e02:198b:b0:3dd:d33a:741a with SMTP id e9e14a558f8ab-3e253325ffbmr37975045ab.18.1752241569426;
-        Fri, 11 Jul 2025 06:46:09 -0700 (PDT)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-5055653244fsm853838173.21.2025.07.11.06.46.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 11 Jul 2025 06:46:08 -0700 (PDT)
-Message-ID: <3ec40c94-ad7f-4985-bb40-275ebc6427bd@kernel.dk>
-Date: Fri, 11 Jul 2025 07:46:08 -0600
+        d=1e100.net; s=20230601; t=1752241597; x=1752846397;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/juseajL28aExOR0ncFEkgamJFYX4aY2BgbPyJWuRxo=;
+        b=Rru8nDn6sxIMSJdKFx8ZGsXjVrqFi6yKQxjf80XQGP+LCAuB3jT+3lO0igiO33Dqys
+         aoWcmJLC3y13GmtXsuVz77ZzdG4pUC1cnHG0TntrJWSepOhIoZ24cUH9O/DmfO0ZUgjc
+         OKekH5OaiJ+qBgfSa9UAjrZt/LGTY8vsuoHbgTdP4Ns7S8bhkwVoK0h8gZMeHyFf2f3z
+         9Ci4VyYkskbNO86IX6O181VYw2X18iEnTGfcCmewi5aa6Noyihg5UUEs4YNBcXfAzJbP
+         nNpXI5U5NkNSNA7c8hmpPiDLuGq7jN9oSnlUFUZ2N2lRd19ZYelhOAgtyItK540+d1cU
+         2D7w==
+X-Forwarded-Encrypted: i=1; AJvYcCVEOhtlDMsnr+vssGKi++QcJ9A6Zk3shKdYInrElD9aSZsp1YtE6WNAOGglFEBWCENs6XJxx2GqxXDJuQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyTptqlduWcvTz6X6XE/ZfUTN5GFmMY4LXAXR7B4a0F4uFGQ2tK
+	Dsf7cAPRMR/zzq7ywMmpONr2dnyJ/rggrCti6H5aLRzej73zFP2RF2or75IY5O+ad10=
+X-Gm-Gg: ASbGncv6kQH3UD9y1dxEZFy8UtTwuVdLbaTT3GMIEHZS7jueTgZeOPHoGtMLiSZr6Ww
+	c9nQNVUabox18CAcg9XW9ytBLNLs/6TIVNf258HRfd/7bZ7APRkBroGxyRcybO39+J1rvk5daue
+	dDnx8IWljbjCUus32Xxyn/i13Su2wJADZ2acZj4TjJAv7umMYPi3fAu2A+msl8o9EvsKEquaoo0
+	zS/8kOSnkZWZpjmB+oIQA9VsDFxwXg1D4LyhGIjO4yJdRtwOA/ureCw4kyjiBh3k9sjKJRXAhDU
+	Md4cff867iLfThhNM0MLLiMk66q+EuKzsu4MEBDJX/Oh49H0SKOAqpdz840AVBXbTdCqI73/z2F
+	kMhh4Z3zIepvUUA==
+X-Google-Smtp-Source: AGHT+IHC39aaGhMdGdrpBQXoGqq43BIWcV2gT087/3qAkm55jq0BVsD9zJu4zapauSL4z+v7y+zNpw==
+X-Received: by 2002:a05:6602:3fcc:b0:875:dcde:77a9 with SMTP id ca18e2360f4ac-87977fbe295mr457592739f.14.1752241597239;
+        Fri, 11 Jul 2025 06:46:37 -0700 (PDT)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-8796b79fe4bsm97569039f.0.2025.07.11.06.46.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 11 Jul 2025 06:46:36 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: Christoph Hellwig <hch@lst.de>
+Cc: kbusch@kernel.org, sagi@grimberg.me, linux-nvme@lists.infradead.org, 
+ linux-block@vger.kernel.org, Klara Modin <klarasmodin@gmail.com>
+In-Reply-To: <20250711112250.633269-1-hch@lst.de>
+References: <20250711112250.633269-1-hch@lst.de>
+Subject: Re: [PATCH] nvme-pci: don't allocate dma_vec for IOVA mappings
+Message-Id: <175224159635.1454175.11115661661587383197.b4-ty@kernel.dk>
+Date: Fri, 11 Jul 2025 07:46:36 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] nvme-pci: don't allocate dma_vec for IOVA mappings
-To: Christoph Hellwig <hch@lst.de>
-Cc: kbusch@kernel.org, sagi@grimberg.me, linux-nvme@lists.infradead.org,
- linux-block@vger.kernel.org, Klara Modin <klarasmodin@gmail.com>
-References: <20250711112250.633269-1-hch@lst.de>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20250711112250.633269-1-hch@lst.de>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3-dev-2ce6c
 
-On 7/11/25 5:22 AM, Christoph Hellwig wrote:
+
+On Fri, 11 Jul 2025 13:22:50 +0200, Christoph Hellwig wrote:
 > Not only do IOVA mappings no need the separate dma_vec tracking, it
 > also won't free it and thus leak the allocations.
 > 
-> Fixes: 10f50d4127e2 ("nvme-pci: fix dma unmapping when using PRPs and not using the IOVA mapping")
-         ^^^^^^^^^^^^
+> 
 
-b8b7570a7ec872f2a27b775c4f8710ca8a357adf
+Applied, thanks!
 
+[1/1] nvme-pci: don't allocate dma_vec for IOVA mappings
+      commit: 1bb94ff5ab4be2485884e0a46483f12629f3bb92
+
+Best regards,
 -- 
 Jens Axboe
+
+
 
