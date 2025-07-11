@@ -1,171 +1,168 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C494C279DB8;
-	Fri, 11 Jul 2025 09:29:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B485A27CB02
+	for <linux-block@vger.kernel.org>; Fri, 11 Jul 2025 09:40:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752226196; cv=none; b=jwMXnN61KVHwi4O7/QlxbAjatrBRd+9TuB/ciKzEhXzrXW8XzCzdcm06wo1U2Ugakyx7EOXSYSVB0fgRNVlbcVwksv4MuhTt35tkqCR0IgxJEobQXrZsI/AHcdg4rwYFDUEksJSgCqGmGVogYeTf/k2sXzvXNa39gZYWR7n7JdI=
+	t=1752226827; cv=none; b=AnxYMNe2hQbig98eripBKs/EwUcOLV64LYB0noAu5QampBS6akjW23aCPNUtBG42D6h9vjAjCabBolB0OO6Rx+y/dhXzkGNnusRcQg6cKWp7IV7BiRcpbRPJS8Hivt7zpOkFNwlDEnawyh0141duUyXEvItaE8cmSII0AMVquyY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752226196; c=relaxed/simple;
-	bh=g635AuROiIJUsnlRuPb0NpgIXG9FJEv+7lx2i4prxN8=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=DAiWFeVyk14VUyv2uMY+D4Lu5n/duvhneEkyGSQPlOLFbtkgUVJtshKm1bm4UT44104fPpbIvwOS461SrVaML0nwZp328hnVhl+OSVNRwAq+ugC+TGNYVtHEpiUBTHqbegQssyNADj17f6GQCGT8cTvH622RvVJW7U90do6AMVs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lE9NDK9O; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1752226827; c=relaxed/simple;
+	bh=hPqqT4/tdZjpo59sRnSJlzrkOv3hNmONJhZos3vk2rk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=FAiDkT82aqikAT0xvQbPjSy/58cQyNjM9IJOmQfICHitrjJXDXHPOi/kdxG85jQitG78z0EDnnhzrFffor85+YMpZh+5/HmJhCkHkEebacHix7UN+20irX8OR+XXYSbRIWVJP6IvC0A7gAFbbR+qwGq2nVvffN1EB7ETrGkvf7k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=yIbaaZlZ; arc=none smtp.client-ip=209.85.160.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lE9NDK9O"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D190FC4CEF5;
-	Fri, 11 Jul 2025 09:29:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752226196;
-	bh=g635AuROiIJUsnlRuPb0NpgIXG9FJEv+7lx2i4prxN8=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=lE9NDK9Oqx9H593Fkd6BUGxrwcePtgfvnCJ4HjUbRKYaTOlnHH4m7zdDIVhH7pJU0
-	 bjC70qQg+2NhJvwfgAsO9aGW2BsMASEhzugg6Ysy2RCCBfuXsmZ7tKtYVepA9ADVf4
-	 paI5r7yCC4wmNrdH6yvyASgWKIrIjoHqU58pqHcuugsPhVoDYdgkkBz07tFZgZk004
-	 eWcQLgZ7+IGRPCfCn+x1tg4vu6Nx7MuiHV3HNu8a09D8ITF3jo8ywkjnw+p3W1urS+
-	 jTgCHvo+YD3dzx/JDGZl51bEMGHpgxUnuOBVAFMdq1BrxFOknyxkWNqoLA58EGpFFS
-	 JKbeTyJ5VWD1Q==
-From: Andreas Hindborg <a.hindborg@kernel.org>
-To: "Alice Ryhl" <aliceryhl@google.com>
-Cc: "Boqun Feng" <boqun.feng@gmail.com>,  "Miguel Ojeda" <ojeda@kernel.org>,
-  "Alex Gaynor" <alex.gaynor@gmail.com>,  "Gary Guo" <gary@garyguo.net>,
-  =?utf-8?Q?Bj=C3=B6rn?= Roy Baron <bjorn3_gh@protonmail.com>,  "Benno
- Lossin"
- <lossin@kernel.org>,  "Trevor Gross" <tmgross@umich.edu>,  "Danilo
- Krummrich" <dakr@kernel.org>,  "Jens Axboe" <axboe@kernel.dk>,
-  <linux-block@vger.kernel.org>,  <rust-for-linux@vger.kernel.org>,
-  <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2 05/14] rust: block: use `NullBorrowFormatter`
-In-Reply-To: <aG5ttHBYW3SQlSv7@google.com> (Alice Ryhl's message of "Wed, 09
-	Jul 2025 13:25:08 +0000")
-References: <20250708-rnull-up-v6-16-v2-0-ab93c0ff429b@kernel.org>
-	<20250708-rnull-up-v6-16-v2-5-ab93c0ff429b@kernel.org>
-	<1RnkSkM82_BGKhOM4PKNTPqEQdSFQhpr6UlkVOD7EDhmTJxZ_hlNFhVuiqpUtKKW1uFUFSB7Ow3LJ31nvHUnDQ==@protonmail.internalid>
-	<aG5ttHBYW3SQlSv7@google.com>
-User-Agent: mu4e 1.12.9; emacs 30.1
-Date: Fri, 11 Jul 2025 11:29:46 +0200
-Message-ID: <878qkvhy7p.fsf@kernel.org>
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yIbaaZlZ"
+Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-4a9df9ef114so2529621cf.3
+        for <linux-block@vger.kernel.org>; Fri, 11 Jul 2025 02:40:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1752226824; x=1752831624; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=EiToprrY2vSG7wDWswnp6OahCh2Aw5GevBEnK+p/NMU=;
+        b=yIbaaZlZm1ESG/lmxmbJkgFqisMeie4SIoiJSaCAAkiyXPG6wqP3TEalJAFRRrjTIl
+         O9d/RrbEvp0Httob9npX5zrW8jerKIJKQytdmYYVpA9fCQ3TUACaz5RmGs//lOGts444
+         a0ZTPhKlpBc+3c6mSzxcgTrz5PeHppC1ktT4xSoSny7sObgpsgxuf8HQ6k7BOpU2lBEZ
+         9NxZDC7vxcH9gP5gWal8b614k17oBWy2uss3xRhhbmmQ3UMOtqxAVfdMOYGMNxB20yi8
+         xHtqbrqDseaG5hTxx0xuIdTau02mLQNFTfi5BtXsBbTXvLMIdneV50SP3RbtY66Cbns7
+         a1Sw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752226824; x=1752831624;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=EiToprrY2vSG7wDWswnp6OahCh2Aw5GevBEnK+p/NMU=;
+        b=kVehbDiGmJI+mjf35SBlc365OrRBY/VOLksbFhJTipvi1lq4gGXMVgQ3SFmy2/jgo0
+         tdUnv7yqN89ymG6b7r/j46vh/SMZDCOHWCayclIC8Hcf7i91VCrqIKtsw/SUFnzxvdpa
+         Y46OA5ReDuQYJ+lXqo+8n3QUN79vrPPLpIqE20lXBwW+cl+Ane0k0iFtIe0rPArV2L73
+         Wf06bSA7felJ1SC1Y/U9ECYImasL8JQ9Sj2419XGUqV1zDmwPbXLoII8rC/NzADngbKj
+         vYUMHP7abEtDp3M7KfXoK+Ty21Z2AWUGrkRUt+QfFtXp3G8Fc6eyQeFSJrLg7zAXYaco
+         CH1A==
+X-Forwarded-Encrypted: i=1; AJvYcCXKZg8GV+1THHwgeSXPraGh+42DI60sj7UzY5xuQdtBevARVt9TX9P8zUIvN72mUCgYkyelHVC1ulgcfg==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz1MWbY4TUvKXXUAPNdS955wiGe+VYDUJizEnEQ+WNnUUaeTJPc
+	E4CDHXQtdIQNOjEvitLiMOau2SUq7Z8jUrmeUAKSAiFELYhrdwr0kr69Yy6Lz8nP86wyd/Qmscd
+	e0M7zHoJB9Q5RCfldSx2aDh3Xd21LssoplrX6uPILeA==
+X-Gm-Gg: ASbGncviQQjo2K0gO6/s56klmqfvpX82tdKSlMB3qpnz+QD4dkpZT0VC30exp1m8KpF
+	Vd6+xyYk5pr0SwD+lyCoIouCXMMddOoRlYtB/OLnkT6t2Njvl6Bycf724P1v12ifQfUzDj7FTe5
+	/thcvNVb8Gu5TYWNFGaBsp1z1ScJyGN8x1xgfuJLCD/asRgYhCWFL1pBns4YGdKmOw+fkVRy7Vr
+	NzgxA==
+X-Google-Smtp-Source: AGHT+IGt7Q2UqhjAv5rvjGTqWJkmfPMxEWXDaNMoSAqadHSOVa3yKAj/RGQ5pNmYTvcFx6kGvI49Wq9aML1dz+RFIak=
+X-Received: by 2002:a05:622a:d13:b0:4a9:d98b:78b0 with SMTP id
+ d75a77b69052e-4a9fbebcb05mr15398421cf.7.1752226824464; Fri, 11 Jul 2025
+ 02:40:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20250711084708.2714436-1-arnd@kernel.org>
+In-Reply-To: <20250711084708.2714436-1-arnd@kernel.org>
+From: Anders Roxell <anders.roxell@linaro.org>
+Date: Fri, 11 Jul 2025 11:40:13 +0200
+X-Gm-Features: Ac12FXz2oo9QpWwn_wXugwUdwMkaTK7Q-py-EyqBK4mF-NG0Nl0JpgY506ozzxA
+Message-ID: <CADYN=9KHYSQRLk00RZUygSD28CwfmbpjWa+W+P7B5xgB9vPCsQ@mail.gmail.com>
+Subject: Re: [PATCH] [v2] block: fix FS_IOC_GETLBMD_CAP parsing in blkdev_common_ioctl()
+To: Arnd Bergmann <arnd@kernel.org>
+Cc: Anuj Gupta <anuj20.g@samsung.com>, "Martin K. Petersen" <martin.petersen@oracle.com>, 
+	Kanchan Joshi <joshi.k@samsung.com>, Christian Brauner <brauner@kernel.org>, 
+	Christoph Hellwig <hch@infradead.org>, Arnd Bergmann <arnd@arndb.de>, 
+	Naresh Kamboju <naresh.kamboju@linaro.org>, Jens Axboe <axboe@kernel.dk>, 
+	Keith Busch <kbusch@kernel.org>, Caleb Sander Mateos <csander@purestorage.com>, 
+	Pavel Begunkov <asml.silence@gmail.com>, Alexey Dobriyan <adobriyan@gmail.com>, 
+	"Darrick J. Wong" <djwong@kernel.org>, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-"Alice Ryhl" <aliceryhl@google.com> writes:
-
-> On Tue, Jul 08, 2025 at 09:45:00PM +0200, Andreas Hindborg wrote:
->> Use the new `NullBorrowFormatter` to write the name of a `GenDisk` to the
->> name buffer. This new formatter automatically adds a trailing null marker
->> after the written characters, so we don't need to append that at the call
->> site any longer.
->>
->> Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
->> ---
->>  rust/kernel/block/mq/gen_disk.rs   | 8 ++++----
->>  rust/kernel/block/mq/raw_writer.rs | 1 +
->>  rust/kernel/str.rs                 | 7 -------
->>  3 files changed, 5 insertions(+), 11 deletions(-)
->>
->> diff --git a/rust/kernel/block/mq/gen_disk.rs b/rust/kernel/block/mq/gen_disk.rs
->> index 679ee1bb21950..e0e42f7028276 100644
->> --- a/rust/kernel/block/mq/gen_disk.rs
->> +++ b/rust/kernel/block/mq/gen_disk.rs
->> @@ -7,9 +7,10 @@
->>
->>  use crate::{
->>      bindings,
->> -    block::mq::{raw_writer::RawWriter, Operations, TagSet},
->> +    block::mq::{Operations, TagSet},
->>      error::{self, from_err_ptr, Result},
->>      static_lock_class,
->> +    str::NullBorrowFormatter,
->>      sync::Arc,
->>  };
->>  use core::fmt::{self, Write};
->> @@ -143,14 +144,13 @@ pub fn build<T: Operations>(
->>          // SAFETY: `gendisk` is a valid pointer as we initialized it above
->>          unsafe { (*gendisk).fops = &TABLE };
->>
->> -        let mut raw_writer = RawWriter::from_array(
->> +        let mut writer = NullBorrowFormatter::from_array(
->>              // SAFETY: `gendisk` points to a valid and initialized instance. We
->>              // have exclusive access, since the disk is not added to the VFS
->>              // yet.
->>              unsafe { &mut (*gendisk).disk_name },
->>          )?;
->> -        raw_writer.write_fmt(name)?;
->> -        raw_writer.write_char('\0')?;
->> +        writer.write_fmt(name)?;
+On Fri, 11 Jul 2025 at 10:47, Arnd Bergmann <arnd@kernel.org> wrote:
 >
-> Although this is nicer than the existing code, I wonder if it should
-> just be a function rather than a whole NullBorrowFormatter struct? Take
-> a slice and a fmt::Arguments and write it with a nul-terminator. Do you
-> need anything more complex than what you have here?
+> From: Arnd Bergmann <arnd@arndb.de>
+>
+> Anders and Naresh found that the addition of the FS_IOC_GETLBMD_CAP
+> handling in the blockdev ioctl handler breaks all ioctls with
+> _IOC_NR==2, as the new command is not added to the switch but only
+> a few of the command bits are check.
+>
+> Move the check into the blk_get_meta_cap() function itself and make
+> it return -ENOIOCTLCMD for any unsupported command code, including
+> those with a smaller size that previously returned -EINVAL.
+>
+> For consistency this also drops the check for NULL 'arg' that
+> is really useless, as any invalid pointer should return -EFAULT.
+>
+> Fixes: 9eb22f7fedfc ("fs: add ioctl to query metadata and protection info capabilities")
+> Link: https://lore.kernel.org/all/CA+G9fYvk9HHE5UJ7cdJHTcY6P5JKnp+_e+sdC5U-ZQFTP9_hqQ@mail.gmail.com/
+> Reported-by: Naresh Kamboju <naresh.kamboju@linaro.org>
+> Cc: Anders Roxell <anders.roxell@linaro.org>
+> Cc: Naresh Kamboju <naresh.kamboju@linaro.org>
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 
-I don't need anything more complex right now. But I think the
-`NullTerminatedFormatter` could be useful anyway:
+Tested-by: Anders Roxell <anders.roxell@linaro.org>
 
-  +/// A mutable reference to a byte buffer where a string can be written into.
-  +///
-  +/// The buffer will be automatically null terminated after the last written character.
-  +///
-  +/// # Invariants
-  +///
-  +/// `buffer` is always null terminated.
-  +pub(crate) struct NullTerminatedFormatter<'a> {
-  +    buffer: &'a mut [u8],
-  +}
-  +
-  +impl<'a> NullTerminatedFormatter<'a> {
-  +    /// Create a new [`Self`] instance.
-  +    pub(crate) fn new(buffer: &'a mut [u8]) -> Option<NullTerminatedFormatter<'a>> {
-  +        *(buffer.first_mut()?) = 0;
-  +
-  +        // INVARIANT: We null terminated the buffer above.
-  +        Some(Self { buffer })
-  +    }
-  +
-  +    pub(crate) fn from_array<const N: usize>(
-  +        buffer: &'a mut [crate::ffi::c_char; N],
-  +    ) -> Option<NullTerminatedFormatter<'a>> {
-  +        Self::new(buffer)
-  +    }
-  +}
-  +
-  +impl Write for NullTerminatedFormatter<'_> {
-  +    fn write_str(&mut self, s: &str) -> fmt::Result {
-  +        let bytes = s.as_bytes();
-  +        let len = bytes.len();
-  +
-  +        // We want space for a null terminator. Buffer length is always at least 1, so no overflow.
-  +        if len > self.buffer.len() - 1 {
-  +            return Err(fmt::Error);
-  +        }
-  +
-  +        let buffer = core::mem::take(&mut self.buffer);
-  +        // We break the null termination invariant for a short while.
-  +        buffer[..len].copy_from_slice(bytes);
-  +        self.buffer = &mut buffer[len..];
-  +
-  +        // INVARIANT: We null terminate the buffer.
-  +        self.buffer[0] = 0;
-  +
-  +        Ok(())
-  +    }
-  +}
-  +
+Tested it in qemu-aarch64, it now ran the ltp-smoke test fine.
 
-If you insist, I can write something like
+Cheers,
+Anders
 
-  fn format_to_buffer(buffer: &mut [u8], args: fmt::Arguments) -> fmt::Result
-
-although I am not sure I see the point of this change.
-
-
-Best regards,
-Andreas Hindborg
-
-
+> ---
+> v2: add the check in blk-integrity.c instead of ioctl.c
+>
+> I've left out the maximum-size check this time, as there was no
+> consensus on whether there should be one, or what value.
+>
+> We still need to come up with a better way of handling these in
+> general, for now the patch just addresses the immediate regression
+> that Naresh found.
+>
+> I have also sent a handful of patches for other drivers that have
+> variations of the same bug.
+> ---
+>  block/blk-integrity.c | 10 ++++++----
+>  block/ioctl.c         |  6 ++++--
+>  2 files changed, 10 insertions(+), 6 deletions(-)
+>
+> diff --git a/block/blk-integrity.c b/block/blk-integrity.c
+> index 9d9dc9c32083..61a79e19c78f 100644
+> --- a/block/blk-integrity.c
+> +++ b/block/blk-integrity.c
+> @@ -62,10 +62,12 @@ int blk_get_meta_cap(struct block_device *bdev, unsigned int cmd,
+>         struct logical_block_metadata_cap meta_cap = {};
+>         size_t usize = _IOC_SIZE(cmd);
+>
+> -       if (!argp)
+> -               return -EINVAL;
+> -       if (usize < LBMD_SIZE_VER0)
+> -               return -EINVAL;
+> +       if (_IOC_DIR(cmd)  != _IOC_DIR(FS_IOC_GETLBMD_CAP) ||
+> +           _IOC_TYPE(cmd) != _IOC_TYPE(FS_IOC_GETLBMD_CAP) ||
+> +           _IOC_NR(cmd)   != _IOC_NR(FS_IOC_GETLBMD_CAP) ||
+> +           _IOC_SIZE(cmd) < LBMD_SIZE_VER0)
+> +               return -ENOIOCTLCMD;
+> +
+>         if (!bi)
+>                 goto out;
+>
+> diff --git a/block/ioctl.c b/block/ioctl.c
+> index 9ad403733e19..af2e22e5533c 100644
+> --- a/block/ioctl.c
+> +++ b/block/ioctl.c
+> @@ -566,9 +566,11 @@ static int blkdev_common_ioctl(struct block_device *bdev, blk_mode_t mode,
+>                                void __user *argp)
+>  {
+>         unsigned int max_sectors;
+> +       int ret;
+>
+> -       if (_IOC_NR(cmd) == _IOC_NR(FS_IOC_GETLBMD_CAP))
+> -               return blk_get_meta_cap(bdev, cmd, argp);
+> +       ret = blk_get_meta_cap(bdev, cmd, argp);
+> +       if (ret != -ENOIOCTLCMD)
+> +               return ret;
+>
+>         switch (cmd) {
+>         case BLKFLSBUF:
+> --
+> 2.39.5
+>
