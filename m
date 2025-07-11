@@ -1,135 +1,74 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0036932C85;
-	Fri, 11 Jul 2025 08:47:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 251851F239B;
+	Fri, 11 Jul 2025 08:59:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752223635; cv=none; b=R+ZOBJMNOVkjB7J2Gkg0bfXWX90HHq6WsC1+O//XMgmopc4Dh7tCutfKQk5T9nMUoxeTSayHmE+YNNt+OFvWsNPg0TKeXxme4KmONfHOSwLLren9QV03f1DyQHeQdcxCL+VxUmjhLcPuMINecKCeOVlxPTrv822WSR+1j1ERH+4=
+	t=1752224351; cv=none; b=fR+QPMQ179ZGNvyUViKPnCap1YId0hiGFFtT5Oab70uL9UVv00RXlPcLZcEFHc0q84KglhHO6RFux2LRGEAmEXKo8xeemOSR+v0RocexAgSHIDnF61sPddAEgr++KwXzvMMaE3T0sdpYhvZ2YSyiqj6iYWFcSSEZ7LzfA7dlReI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752223635; c=relaxed/simple;
-	bh=baGQ5YS+ZK9z3gpBSNqV5jmIr/yj6WC3OsLe7dghTtY=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=OLXJAbMapbjbVWmSVTG5GD6ioVsDOEe+oTp1dDXG2JfIs3tJIZVYgghyx9QibRU3pX2+dX9gS0HVJAuYsr3Ee959PPO76EinFeA5r2GJHF8m8/xVKNMJs93n91Ppha3ospxj7eYdg4rSMRnS/5syndyJVMtZ/8MxQAFz04KcxpI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X0ITwQRX; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1752224351; c=relaxed/simple;
+	bh=kEXza4Ha2xIKkCBtUM8X6B50TAnGx1/rcfDQeDo3DYs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hfoFQN2Gi2j1f1Ui+hOTcalg0F+2dHWI39hg28BDJufKD8OGK5jQ1Nkecb60K44gP4pzDd++sd/FhPLtHez6mxU5J9IebCNH/Bcg3Q8yw7jVcVEQgQX6kLX4iACyYzEd82Pwdx8eGo9TUXcV45fW8xWjhgzCbul/tHWXhKKT2mI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=4vjfcKQ/; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=7jOi4t25; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X0ITwQRX"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42D34C4CEED;
-	Fri, 11 Jul 2025 08:47:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752223634;
-	bh=baGQ5YS+ZK9z3gpBSNqV5jmIr/yj6WC3OsLe7dghTtY=;
-	h=From:To:Cc:Subject:Date:From;
-	b=X0ITwQRX/rlibabBo0I/BUxPaQ4zbbm4hbsuv71QWtie5V3oJDusa3w+A0YZsO6X5
-	 dGXqnwxse2lM1QzeDt81+b+LuWUnVCxVKRfzcZc3qbEGtA7tTEpAGcZIvhn17I/yaZ
-	 zfrdlglDOQzmIs5pgEm6Unl3i8t0hvzk6KruiAJdVEeBrViBUBnO2Z1RJMxZ5saDDO
-	 s9wNQPG4Wmr0db2Yq/U68buOiCXP4xbfYKVuQr54RzqGk7NToumYMukJ7AFND4RAO6
-	 wz0X36I0aTLXTCR19nxiH4Hk/c6pHZ8esLfCswLfn3hXBq6HqYGLIREquXvwWyK7kZ
-	 fJtqkyhcFTGpg==
-From: Arnd Bergmann <arnd@kernel.org>
-To: Anuj Gupta <anuj20.g@samsung.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Kanchan Joshi <joshi.k@samsung.com>,
-	Christian Brauner <brauner@kernel.org>
-Cc: Christoph Hellwig <hch@infradead.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Naresh Kamboju <naresh.kamboju@linaro.org>,
-	Anders Roxell <anders.roxell@linaro.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <kbusch@kernel.org>,
-	Caleb Sander Mateos <csander@purestorage.com>,
-	Pavel Begunkov <asml.silence@gmail.com>,
-	Alexey Dobriyan <adobriyan@gmail.com>,
-	"Darrick J. Wong" <djwong@kernel.org>,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] [v2] block: fix FS_IOC_GETLBMD_CAP parsing in blkdev_common_ioctl()
-Date: Fri, 11 Jul 2025 10:46:51 +0200
-Message-Id: <20250711084708.2714436-1-arnd@kernel.org>
-X-Mailer: git-send-email 2.39.5
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="4vjfcKQ/";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="7jOi4t25"
+Date: Fri, 11 Jul 2025 10:59:06 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1752224348;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=b0llLkde7WG4AF/KGQ4nlp3OLeowJCKa+95llvSgan4=;
+	b=4vjfcKQ/oST+LbyZmq5cq7uUByrWjRJnYh8IFh7b2DzsbcMDYSG9z6aKbvckdBIxedVIT9
+	0qIQn73OIUPtWSIPYmUjDoFjS13gMcby/04jw4eSOiCMif+Z0pnvRocHIEDvhCd7vYHcC0
+	ZCHZKRQgtwKjOAyw7G5wZX1dSlv0E0Gnn5ROY479OAss08QkuslBwu2Lo45kOBGwcAdHQf
+	z3JnJMK7LL+MZC6DanTtDL6mPbIrU1rd9H637HJrruSpB3GTsM+LUtJH5wR1vne9PtVH9o
+	QgFLkuKSYDZ+2I2fKXqX/IyqHZtYYvsUBnCZMBsxlvliFntzwlz5kSc64rGYrA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1752224348;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=b0llLkde7WG4AF/KGQ4nlp3OLeowJCKa+95llvSgan4=;
+	b=7jOi4t25c8zbcIY9iTonlu/egoHxD2uMJW0N9zB9gBarWYMfLuRFIaX4H+YGwSB580H6yF
+	5cfujcExqiQ2QyAA==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Mike Galbraith <efault@gmx.de>
+Cc: linux-block <linux-block@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>,
+	RT <linux-rt-users@vger.kernel.org>
+Subject: Re: block: lockdep splat with RT config v6.15+
+Message-ID: <20250711085906._cTpNNFu@linutronix.de>
+References: <7c42fe5a6158445e150e7d63991767e44fc36d3d.camel@decadent.org.uk>
+ <aG6nMhimN1lWKAEP@intel.com>
+ <20250709194443.lkevdn6m@linutronix.de>
+ <aG7MckLkTuzZ5LBe@intel.com>
+ <da51a963b04f0a1b628e80a2c5df72a1609960d1.camel@gmx.de>
+ <aG_hNb-c_m0yfVE4@intel.com>
+ <641d3228244517fd1cfb4a103339e86a222cae2b.camel@gmx.de>
+ <cb6f0eb4abcbae7b0d447b679823b5d537b25b70.camel@gmx.de>
+ <990089f6aaf73d7e3a49d1db1fe677bb575043ac.camel@gmx.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <990089f6aaf73d7e3a49d1db1fe677bb575043ac.camel@gmx.de>
 
-From: Arnd Bergmann <arnd@arndb.de>
+On 2025-07-11 10:05:18 [+0200], Mike Galbraith wrote:
+> (was PREEMPT_RT vs i915)
+> 
+> Ok, the splat below is not new to the 6.16 cycle, seems it landed in
+> the 6.15 cycle, as that also gripes but 6.14 boots clean.
 
-Anders and Naresh found that the addition of the FS_IOC_GETLBMD_CAP
-handling in the blockdev ioctl handler breaks all ioctls with
-_IOC_NR==2, as the new command is not added to the switch but only
-a few of the command bits are check.
+I don't remember how you triggered this. Do you happen to know if this
+is RT only or also triggers without the RT bits?
 
-Move the check into the blk_get_meta_cap() function itself and make
-it return -ENOIOCTLCMD for any unsupported command code, including
-those with a smaller size that previously returned -EINVAL.
-
-For consistency this also drops the check for NULL 'arg' that
-is really useless, as any invalid pointer should return -EFAULT.
-
-Fixes: 9eb22f7fedfc ("fs: add ioctl to query metadata and protection info capabilities")
-Link: https://lore.kernel.org/all/CA+G9fYvk9HHE5UJ7cdJHTcY6P5JKnp+_e+sdC5U-ZQFTP9_hqQ@mail.gmail.com/
-Reported-by: Naresh Kamboju <naresh.kamboju@linaro.org>
-Cc: Anders Roxell <anders.roxell@linaro.org>
-Cc: Naresh Kamboju <naresh.kamboju@linaro.org>
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
-v2: add the check in blk-integrity.c instead of ioctl.c
-
-I've left out the maximum-size check this time, as there was no
-consensus on whether there should be one, or what value.
-
-We still need to come up with a better way of handling these in
-general, for now the patch just addresses the immediate regression
-that Naresh found.
-
-I have also sent a handful of patches for other drivers that have
-variations of the same bug.
----
- block/blk-integrity.c | 10 ++++++----
- block/ioctl.c         |  6 ++++--
- 2 files changed, 10 insertions(+), 6 deletions(-)
-
-diff --git a/block/blk-integrity.c b/block/blk-integrity.c
-index 9d9dc9c32083..61a79e19c78f 100644
---- a/block/blk-integrity.c
-+++ b/block/blk-integrity.c
-@@ -62,10 +62,12 @@ int blk_get_meta_cap(struct block_device *bdev, unsigned int cmd,
- 	struct logical_block_metadata_cap meta_cap = {};
- 	size_t usize = _IOC_SIZE(cmd);
- 
--	if (!argp)
--		return -EINVAL;
--	if (usize < LBMD_SIZE_VER0)
--		return -EINVAL;
-+	if (_IOC_DIR(cmd)  != _IOC_DIR(FS_IOC_GETLBMD_CAP) ||
-+	    _IOC_TYPE(cmd) != _IOC_TYPE(FS_IOC_GETLBMD_CAP) ||
-+	    _IOC_NR(cmd)   != _IOC_NR(FS_IOC_GETLBMD_CAP) ||
-+	    _IOC_SIZE(cmd) < LBMD_SIZE_VER0)
-+		return -ENOIOCTLCMD;
-+
- 	if (!bi)
- 		goto out;
- 
-diff --git a/block/ioctl.c b/block/ioctl.c
-index 9ad403733e19..af2e22e5533c 100644
---- a/block/ioctl.c
-+++ b/block/ioctl.c
-@@ -566,9 +566,11 @@ static int blkdev_common_ioctl(struct block_device *bdev, blk_mode_t mode,
- 			       void __user *argp)
- {
- 	unsigned int max_sectors;
-+	int ret;
- 
--	if (_IOC_NR(cmd) == _IOC_NR(FS_IOC_GETLBMD_CAP))
--		return blk_get_meta_cap(bdev, cmd, argp);
-+	ret = blk_get_meta_cap(bdev, cmd, argp);
-+	if (ret != -ENOIOCTLCMD)
-+		return ret;
- 
- 	switch (cmd) {
- 	case BLKFLSBUF:
--- 
-2.39.5
-
+Sebastian
