@@ -1,112 +1,222 @@
-Received: from mail-il1-f171.google.com (mail-il1-f171.google.com [209.85.166.171])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6C622E9739
-	for <linux-block@vger.kernel.org>; Fri, 11 Jul 2025 14:47:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 093C615A858
+	for <linux-block@vger.kernel.org>; Fri, 11 Jul 2025 16:32:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752245256; cv=none; b=FPcE76jHF94aYDk4tR1duPvfKyFWEIy10lOaW8DlbtXM9qWfpvmZcsbQbR1BJchV2UW3ZNPnJOevOXWgfhZBhT9Na4KW1S9TM4/I9gKETFG+1yCY2sAkSmSFv3fh49eFxiqx/Ovrfo9+SrKOvLKW8Q1XOkQEhclbmUb1JWYC5og=
+	t=1752251537; cv=none; b=jDsiaE3AHXA5aQRsYwdWKJLREdf4BK/CRFA2UVbl1P3Uptnxucpbdd8E8jOiVCmon5NDwywBlXleGP6kVJBKHSKWTzFxUkD+yeP/pbQj72hSm5OHAgYE1ZzLqF+IQwhXlGTexPy4EEeiqQlpxUvgJWRzscXYsgzIbC9G2jCL44Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752245256; c=relaxed/simple;
-	bh=40YLiJGtlMV75vim5GTwj8WRKEQtxPlQPilZVhGD5Vo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=L7DWjbaZ9FN2NgOuaM7tR9XhsKDu+Z659DdAxBGcPNgqJff+nI89ENIujOoypW1IjhouwRDBQHd9gd/MOonj6HMVUCu5VeyZtnSDYQFWbP0bokx5kR1e9sGYSvznp4CKDty9iNux6JBS7dtj6NbBZ5V8HA1enYpji/31uBfugRg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=VXYxD055; arc=none smtp.client-ip=209.85.166.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1752251537; c=relaxed/simple;
+	bh=cdZuEh4Dk+/Xi2fTOZRQxovM+RzBRb1FW6MBEN4Icws=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BMUzaLEY6mXzxcw9xO7ozT6Hapb/I9qGenu5ivP3jQHTt6PkCk/HCugSaWIid5YAUe+pDYGIZWh58KMfNC0Vta3sK44ZnDuMMpqeo0doYqAzj2KKA5sDgp2LicbsVlJsPm7RjampL7v2T6ioMMPukIcYwAl9Q/VMHl9HiQlFXa0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=2VjT8zQE; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=VANr30i1; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=2VjT8zQE; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=VANr30i1; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="VXYxD055"
-Received: by mail-il1-f171.google.com with SMTP id e9e14a558f8ab-3de2b02c69eso12834485ab.1
-        for <linux-block@vger.kernel.org>; Fri, 11 Jul 2025 07:47:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1752245253; x=1752850053; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Zcd/YQds+2VAgDHHik/Mx+4kMgTfoFA0V9ZGlHTyX8Y=;
-        b=VXYxD055b4Dyv5c6uiHkCkNBXbe6OtAH85SXrXCDidViW8PJw1ynj+f/Y7o76Tm+Lc
-         kB4F4DuxiECjGttJ0GmwZXYLLxXGDDG0Wds47/R08zTjMExObmsYv7hORVmJQB2Ezp5I
-         dbaJ1zZ52Do65Jd+AkO9pUI+YYnQee9xKigdfQSv+h4xxK88een8swj3rgSl4lXrWTqz
-         tB/aPE6gnhakf2lUJNg9SaJd8a/JhMOk6GG+LbK2YtqUPAF98WlsuKAdaMZ4+RhXZEDh
-         QQ0XTD3r1TAH8ebQJ7+UUPUjTE1K9TI4FocmPWsoQO8Uc+jeHU9JHwVbwl1691QvxIg6
-         ljAA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752245253; x=1752850053;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Zcd/YQds+2VAgDHHik/Mx+4kMgTfoFA0V9ZGlHTyX8Y=;
-        b=MT3Aby14KQ/RUEWLN0OPhS6z/ru+dM+wkggqzwu7lXWYmxlOvr6KN2Ew63V/lJr7J5
-         pvfRiVWROit2x65VDah4psmC9pdXHVV0gIWKDjk7AfJYQqv1Fb0MOBzzLg+YhAPnTcND
-         UCowC243OGOF1sgspd9XHJQCOzOZIA08YvNM+004g7iwzJUDZjPvYBN9i+pGiUFhQr/3
-         huulpStG/8WwJEA8Hye5zMTdCi6x6Yeode4ImfRtUgug9URUXjI8/UgZAE+uS92gaLB2
-         sFM4H6Zj5Kff2wRcmDieMD/YwN8s3tGsGttam9NeVTRI36piELuTGhgUmajWxJKcqYFk
-         N9+g==
-X-Forwarded-Encrypted: i=1; AJvYcCUkOKrsQ+uQBS8EYhX4cUEEPb45JmCSnfj/0CY1GOkeeMUryKFNDeAcIROaru3UloGLuGlc+OOnmoHLHQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx/hltQgrkszbUglNIqgO0ybXTwDIv6m8jp9eheDlk/cIXTUwpS
-	UZV6jwaGwOtV8zp7IZ5hWFRTs66pn200BmujA7P56MFxJ+VkkDOqI9Iz1f2n34XjaCs=
-X-Gm-Gg: ASbGnctpEKaUNmT4+Yy5OL9WtV+PyUT94izPSDNX9xxQpMfuIpOZfstvZ0n8knSWAsv
-	UhphmKwZDI5aZaEGlJ24ojOFwyk36MU7fFsIc74wSRN81xVo6enA3R7ge0dbKkhGoAL4ZlhV1zz
-	f8NHfKfG0HW0DC6CLGrkQ9NvHDj4VHGop9P6nKeAixXGxCbbSm67qx0L9HpiPjB5xSOLu43PXUd
-	+3qJbJ/ryC5LNMTBJ0xaPgNHQbSlEUBpw75RNU3HdkzmR/SqyDU2Qk0ho5syHmHe87BL2pfuGac
-	W+jodattg5t4zQTJAOTtY+MtF8lIsn0vqR1m+IY0h1GQjPAtnsRaeGDZFQ31IP0dRB4SJ15PEQn
-	6CWn1NUe31YPuGYa/sUQ=
-X-Google-Smtp-Source: AGHT+IFHa21P15JH0dsJFMLE6O6OM/qUMychTO2XSL+yzRmWrNM0AfUhxkqN0w44VxXhBk955nhVuw==
-X-Received: by 2002:a92:cda8:0:b0:3df:2cd5:80c1 with SMTP id e9e14a558f8ab-3e2541dc704mr32741355ab.4.1752245252959;
-        Fri, 11 Jul 2025 07:47:32 -0700 (PDT)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3e24613447asm12376765ab.17.2025.07.11.07.47.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 11 Jul 2025 07:47:32 -0700 (PDT)
-Message-ID: <e3450519-dbeb-4741-9772-7e33462155f9@kernel.dk>
-Date: Fri, 11 Jul 2025 08:47:31 -0600
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="2VjT8zQE";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="VANr30i1";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="2VjT8zQE";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="VANr30i1"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 16D6B1F79A;
+	Fri, 11 Jul 2025 16:32:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1752251532; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=8+3HFNjXjHREl6hvy4YGDTeevGivV8BudVSskYuO9E4=;
+	b=2VjT8zQEVCOKpggM5SvF9lRgZIIuHKddyLQHYbBt2GpfTnw7GXqK+E5UZ4pJMEHXR4vYo6
+	hNTTCj7NuA+m5ZNh9vCtA2kecehSa9qXm1HLP2/tWWzEHIjmcJxjt6XqCylN+vkZD/mEHY
+	c6bF2olUt+njLmCyOgtUuYIKxKT+evU=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1752251532;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=8+3HFNjXjHREl6hvy4YGDTeevGivV8BudVSskYuO9E4=;
+	b=VANr30i1CuUa4IF13xYNodiqWR4qgkr0YW1HLYkSsArhzmbagQG4i+kP6CHdegRvMbT65J
+	tf+f6+tyIAHCZmDw==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=2VjT8zQE;
+	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=VANr30i1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1752251532; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=8+3HFNjXjHREl6hvy4YGDTeevGivV8BudVSskYuO9E4=;
+	b=2VjT8zQEVCOKpggM5SvF9lRgZIIuHKddyLQHYbBt2GpfTnw7GXqK+E5UZ4pJMEHXR4vYo6
+	hNTTCj7NuA+m5ZNh9vCtA2kecehSa9qXm1HLP2/tWWzEHIjmcJxjt6XqCylN+vkZD/mEHY
+	c6bF2olUt+njLmCyOgtUuYIKxKT+evU=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1752251532;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=8+3HFNjXjHREl6hvy4YGDTeevGivV8BudVSskYuO9E4=;
+	b=VANr30i1CuUa4IF13xYNodiqWR4qgkr0YW1HLYkSsArhzmbagQG4i+kP6CHdegRvMbT65J
+	tf+f6+tyIAHCZmDw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 05FA81388B;
+	Fri, 11 Jul 2025 16:32:12 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 6iUUAYw8cWiSeQAAD6G6ig
+	(envelope-from <jack@suse.cz>); Fri, 11 Jul 2025 16:32:12 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+	id A693CA099A; Fri, 11 Jul 2025 18:32:11 +0200 (CEST)
+From: Jan Kara <jack@suse.cz>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: <linux-fsdevel@vger.kernel.org>,
+	<linux-block@vger.kernel.org>,
+	Jan Kara <jack@suse.cz>,
+	syzbot+01ef7a8da81a975e1ccd@syzkaller.appspotmail.com
+Subject: [PATCH] loop: Avoid updating block size under exclusive owner
+Date: Fri, 11 Jul 2025 18:32:03 +0200
+Message-ID: <20250711163202.19623-2-jack@suse.cz>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] [v2] block: fix FS_IOC_GETLBMD_CAP parsing in
- blkdev_common_ioctl()
-To: Arnd Bergmann <arnd@kernel.org>, Anuj Gupta <anuj20.g@samsung.com>,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- Kanchan Joshi <joshi.k@samsung.com>, Christian Brauner <brauner@kernel.org>
-Cc: Christoph Hellwig <hch@infradead.org>, Arnd Bergmann <arnd@arndb.de>,
- Naresh Kamboju <naresh.kamboju@linaro.org>,
- Anders Roxell <anders.roxell@linaro.org>, Keith Busch <kbusch@kernel.org>,
- Caleb Sander Mateos <csander@purestorage.com>,
- Pavel Begunkov <asml.silence@gmail.com>,
- Alexey Dobriyan <adobriyan@gmail.com>, "Darrick J. Wong"
- <djwong@kernel.org>, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250711084708.2714436-1-arnd@kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Content-Language: en-US
-In-Reply-To: <20250711084708.2714436-1-arnd@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3277; i=jack@suse.cz; h=from:subject; bh=cdZuEh4Dk+/Xi2fTOZRQxovM+RzBRb1FW6MBEN4Icws=; b=owGbwMvMwME4Z+4qdvsUh5uMp9WSGDIKbZq0xH0Ml+s1mUn/FXh44vuGfB7/6WemZT/fv/SJRXZ0 +Oc9nYzGLAyMHAyyYoosqyMval+bZ9S1NVRDBmYQKxPIFAYuTgGYyJE37P+TzLkNtVn5K1Q9Umaq3T Vmcb4tyOvXYsYcLfHv9g9F9zVruARylmxL8Gx73a307cwFM9/kww0b8vqYHvX33H2TnVeYsO+NW0RF KsOmd0cUjl7aWW4kFO6cOtNdIZ/HrHijk2bAKdYZ1wwucvbN27p4kRvXZfMu06WeZyz/7+FrF/9270 Ostl1ml45ORWBlp5amyvXZvl33u5tr76znST50+oRf0to8n2afbSZCK3Ris+7MjpqnMo+lK+Sf5s/+ L65hUjq2EwOyugu3PAk1khb9cHXhXN6anJo32VfsI6N+MsSzMxh+4O86wRg/98EH3obLLcIX2wOjKu es+vb1lH1Gx6ctQVE7E7Ok87oA
+X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
+Content-Transfer-Encoding: 8bit
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Rspamd-Queue-Id: 16D6B1F79A
+X-Rspamd-Action: no action
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spamd-Result: default: False [-1.51 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	MIME_TRACE(0.00)[0:+];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	ARC_NA(0.00)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[01ef7a8da81a975e1ccd];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[suse.cz:+];
+	FROM_HAS_DN(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo]
+X-Spam-Score: -1.51
 
-On 7/11/25 2:46 AM, Arnd Bergmann wrote:
-> From: Arnd Bergmann <arnd@arndb.de>
-> 
-> Anders and Naresh found that the addition of the FS_IOC_GETLBMD_CAP
-> handling in the blockdev ioctl handler breaks all ioctls with
-> _IOC_NR==2, as the new command is not added to the switch but only
-> a few of the command bits are check.
-> 
-> Move the check into the blk_get_meta_cap() function itself and make
-> it return -ENOIOCTLCMD for any unsupported command code, including
-> those with a smaller size that previously returned -EINVAL.
-> 
-> For consistency this also drops the check for NULL 'arg' that
-> is really useless, as any invalid pointer should return -EFAULT.
-> 
-> Fixes: 9eb22f7fedfc ("fs: add ioctl to query metadata and protection info capabilities")
+Syzbot came up with a reproducer where a loop device block size is
+changed underneath a mounted filesystem. This causes a mismatch between
+the block device block size and the block size stored in the superblock
+causing confusion in various places such as fs/buffer.c. The particular
+issue triggered by syzbot was a warning in __getblk_slow() due to
+requested buffer size not matching block device block size.
 
-Since this isn't from my tree:
+Fix the problem by getting exclusive hold of the loop device to change
+its block size. This fails if somebody (such as filesystem) has already
+an exclusive ownership of the block device and thus prevents modifying
+the loop device under some exclusive owner which doesn't expect it.
 
-Reviewed-by: Jens Axboe <axboe@kernel.dk>
+Reported-by: syzbot+01ef7a8da81a975e1ccd@syzkaller.appspotmail.com
+Signed-off-by: Jan Kara <jack@suse.cz>
+---
+ drivers/block/loop.c | 38 ++++++++++++++++++++++++++++++--------
+ 1 file changed, 30 insertions(+), 8 deletions(-)
 
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 500840e4a74e..5cc72770e253 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -1432,17 +1432,34 @@ static int loop_set_dio(struct loop_device *lo, unsigned long arg)
+ 	return 0;
+ }
+ 
+-static int loop_set_block_size(struct loop_device *lo, unsigned long arg)
++static int loop_set_block_size(struct loop_device *lo, blk_mode_t mode,
++			       struct block_device *bdev, unsigned long arg)
+ {
+ 	struct queue_limits lim;
+ 	unsigned int memflags;
+ 	int err = 0;
+ 
+-	if (lo->lo_state != Lo_bound)
+-		return -ENXIO;
++	/*
++	 * If we don't hold exclusive handle for the device, upgrade to it
++	 * here to avoid changing device under exclusive owner.
++	 */
++	if (!(mode & BLK_OPEN_EXCL)) {
++		err = bd_prepare_to_claim(bdev, loop_set_block_size, NULL);
++		if (err)
++			return err;
++	}
++
++	err = mutex_lock_killable(&lo->lo_mutex);
++	if (err)
++		goto abort_claim;
++
++	if (lo->lo_state != Lo_bound) {
++		err = -ENXIO;
++		goto unlock;
++	}
+ 
+ 	if (lo->lo_queue->limits.logical_block_size == arg)
+-		return 0;
++		goto unlock;
+ 
+ 	sync_blockdev(lo->lo_device);
+ 	invalidate_bdev(lo->lo_device);
+@@ -1455,6 +1472,11 @@ static int loop_set_block_size(struct loop_device *lo, unsigned long arg)
+ 	loop_update_dio(lo);
+ 	blk_mq_unfreeze_queue(lo->lo_queue, memflags);
+ 
++unlock:
++	mutex_unlock(&lo->lo_mutex);
++abort_claim:
++	if (!(mode & BLK_OPEN_EXCL))
++		bd_abort_claiming(bdev, loop_set_block_size);
+ 	return err;
+ }
+ 
+@@ -1473,9 +1495,6 @@ static int lo_simple_ioctl(struct loop_device *lo, unsigned int cmd,
+ 	case LOOP_SET_DIRECT_IO:
+ 		err = loop_set_dio(lo, arg);
+ 		break;
+-	case LOOP_SET_BLOCK_SIZE:
+-		err = loop_set_block_size(lo, arg);
+-		break;
+ 	default:
+ 		err = -EINVAL;
+ 	}
+@@ -1530,9 +1549,12 @@ static int lo_ioctl(struct block_device *bdev, blk_mode_t mode,
+ 		break;
+ 	case LOOP_GET_STATUS64:
+ 		return loop_get_status64(lo, argp);
++	case LOOP_SET_BLOCK_SIZE:
++		if (!(mode & BLK_OPEN_WRITE) && !capable(CAP_SYS_ADMIN))
++			return -EPERM;
++		return loop_set_block_size(lo, mode, bdev, arg);
+ 	case LOOP_SET_CAPACITY:
+ 	case LOOP_SET_DIRECT_IO:
+-	case LOOP_SET_BLOCK_SIZE:
+ 		if (!(mode & BLK_OPEN_WRITE) && !capable(CAP_SYS_ADMIN))
+ 			return -EPERM;
+ 		fallthrough;
 -- 
-Jens Axboe
+2.43.0
+
