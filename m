@@ -1,35 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 928752E03EA;
-	Fri, 11 Jul 2025 11:43:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C3472E498D;
+	Fri, 11 Jul 2025 11:43:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752234224; cv=none; b=ILPy53hzjxiTiAd2QnQKZMjqlZHsj02qv+zYtK1z/1XaUGEFg2XaxCOGt6NmFS28xMfHEo7mvMUFz1NEwYeCOqr8F4z/ARdAP8qpT95hMtV5B6nK/3dP9nd3g9Hgagmy0l7B2Pc4oBSlSg0hLVpEnJq3VTkQVCTmK1rf0gx0Tr8=
+	t=1752234228; cv=none; b=cSkF+u641doH3SAE0+0nYweFUzrdps6NKgEPmBoa96ppVpJCl1UpMOAKnrARTPWW5pcq7+uT0vQ8sV7aJ2bgabflcEJw8iNcN/+FwVF8rraDwCBqS2HR4mzM36DPzAkCibXtlsT5KLfcwUCuqVs5Q41cJlbZfT/GW5gwzAS64Qs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752234224; c=relaxed/simple;
-	bh=vgGFsiKABw+m9kDtLSj7y9JLgW+Gk/xJ51MxKxfWHeE=;
+	s=arc-20240116; t=1752234228; c=relaxed/simple;
+	bh=xZxbhgmVN01wUF60DeMwDRhnPjojUh1KgzCRHhMmUmA=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=ZpKgau/MOmj875KcHLglq0Xwi5BG/8DOA2DKDdS6UzYOegkkdqyKqvJ1LzTHi8S655IFQtsbn75U3lPymgrfK3aJYYDeLkaQhYwO2vlBuc4NaUWvjkcHarGHqo1YE1U6HE64Prwuqloe5xeALhs2NWfbI6Evnr3P+HPqYPwuIrg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=szUMbKzE; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=PNQhePvMW6kyl/wc/JBIprr5AeuUsEAuq0j0rmFk36Skk+Yl0J06+Zwt/3+2YOxbSfy173fHqnk7FlW5ZnbXMv8RWpH6DEwF9okW/cavWZ1v0jkCfuXta4m/ZmgVA0QojWiSMDauwrlXFMKLcnD5mE7nYOZW/xiS/6zRXYeTaPI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hSO+xglU; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="szUMbKzE"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B8A8C4CEED;
-	Fri, 11 Jul 2025 11:43:41 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hSO+xglU"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14D78C4CEED;
+	Fri, 11 Jul 2025 11:43:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752234224;
-	bh=vgGFsiKABw+m9kDtLSj7y9JLgW+Gk/xJ51MxKxfWHeE=;
+	s=k20201202; t=1752234227;
+	bh=xZxbhgmVN01wUF60DeMwDRhnPjojUh1KgzCRHhMmUmA=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=szUMbKzEg7cw4GH87BzqC0rSy4jsrc/UMIqvLUDkbVYZ5T9uvuPOlhBjByLM5e4qy
-	 kOIr9rEcI8QGWu0F0FYLtLbhfNxUM8x4K0AafjvxCg4nh3mh4EPT80m8nSLrhwRIRe
-	 AmogqJh/KjJlA8f/p6rKFhYvltX8dFMeBNfWFQffbvlM6psVsiGuyWosFuQzhcJ7+0
-	 wyFgcChOpn85Hw0e4mvIhFEwsFvtYkjtZTtVBtoVdsYaC2DColk8JVufpd9eGmk5j6
-	 uOa/r0Jz5DhMootY4lUAhkLjufc6G+YSvjMOQWGIUHNKNsvvrB0JWRguR2Pz2EazrP
-	 rnu5HuJ18YW5A==
+	b=hSO+xglU/FqjynG7/j8fwnroX0gNti24HDSlnUdwWaG2KUqVDlwtdG2gZpwsCsDa2
+	 /ZwfzbFxZlniX1/mp2elzZuHMaW3Ku8yGEUgoEp8sScpcFdBEAb5jb06t8rtIbO6jk
+	 rtG3JbMGW05maE/XMBTPzf9q+lCgqTRbYrXz11OWWl3peGLrDWNko+7ZDUC7RCmPBt
+	 k4Ge+gD4GIPeMlaZuDR3VVGW3KTAalLkkbEEfHZLVljqCQwdVaTNU8bNSH8hUTchhU
+	 TQQ4Y1y+gDaH6r/NLBmdwlvpGLfHZkg15YvbnNKyLN4PbpeBDP++Qe5cW4g6Rl9H2J
+	 oRRfI1aAm+NJw==
 From: Andreas Hindborg <a.hindborg@kernel.org>
-Date: Fri, 11 Jul 2025 13:43:05 +0200
-Subject: [PATCH v3 04/16] rust: str: make `RawFormatter::bytes_written`
- public.
+Date: Fri, 11 Jul 2025 13:43:07 +0200
+Subject: [PATCH v3 06/16] rust: block: normalize imports for `gen_disk.rs`
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -38,7 +37,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250711-rnull-up-v6-16-v3-4-3a262b4e2921@kernel.org>
+Message-Id: <20250711-rnull-up-v6-16-v3-6-3a262b4e2921@kernel.org>
 References: <20250711-rnull-up-v6-16-v3-0-3a262b4e2921@kernel.org>
 In-Reply-To: <20250711-rnull-up-v6-16-v3-0-3a262b4e2921@kernel.org>
 To: Boqun Feng <boqun.feng@gmail.com>, Miguel Ojeda <ojeda@kernel.org>, 
@@ -50,44 +49,53 @@ To: Boqun Feng <boqun.feng@gmail.com>, Miguel Ojeda <ojeda@kernel.org>,
 Cc: linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org, 
  linux-kernel@vger.kernel.org, Andreas Hindborg <a.hindborg@kernel.org>
 X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=684; i=a.hindborg@kernel.org;
- h=from:subject:message-id; bh=vgGFsiKABw+m9kDtLSj7y9JLgW+Gk/xJ51MxKxfWHeE=;
- b=owEBbQKS/ZANAwAIAeG4Gj55KGN3AcsmYgBocPjNxcEYjeAkY0MGRQ0Mh/HGA6ILX2qDqZ1Nl
- YDx3bkCS3CJAjMEAAEIAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaHD4zQAKCRDhuBo+eShj
- d782D/9XKgb7ERKPIoL156wLxet8cxy5LHF+uVxpm4iJa8Wc+Cn7HJTn0o7bpieyBuER4I5Ft6H
- Pkqfw5eqHNU0jHOT1cosXSuigCRYZ30rEOjfEsPdyBTMfCAlFxPMCxY4Jxf7I0yXdpGtinppf69
- wj9S5X3JgSse4g0CVI8qtQ5Eqs4XsAkoxOv4LLsdmeZDeqKpI0CoLimdzrW9omQIcuxLA6RfnZ5
- vHe4rlhhpiXkpJSoYuTU5p7LOwX9G2Od7cYb4NRUiRCmUekV5BQ6L2eetawF2/16cZKzKiqr3Ag
- 5qllCPBor7G+pnY5dgVAIQIbfSsQeKqlVdwetqLRANiQAVzEUogCC9b7jOYuY49OZ0q94oJt/ri
- yaF3AQUjmKQNHQJzGOATB9OhKRmo/723Ej0bF1dlwYEtoMtmBCRbPezgB8t8IwZjuQfjfzghCgI
- 1LL1dL7aVcb6wAqq4lys6eIqxXR+S0ZS/OCRUpBgtlrG54wajvzp2w/Cu3RaMVRYT9B9BXVv3jr
- Hlx5Nu99HfmO42FxwUYTSsOoVSYnaeyphS5GOVTYf3kpk5iB18CcxGBgRmYhIJWb3Hapv80a/3S
- 0LPrFY4W0lNm+kCUJmib5ymsSRDghLnUwJ+d6yh6mOZC6k8zuX/lIu8gX0DO7cce9Tifqe5coXc
- es3+yC5+HrYFijw==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1124; i=a.hindborg@kernel.org;
+ h=from:subject:message-id; bh=xZxbhgmVN01wUF60DeMwDRhnPjojUh1KgzCRHhMmUmA=;
+ b=owEBbQKS/ZANAwAIAeG4Gj55KGN3AcsmYgBocPjPTftHNyvPJOZBiXgWJKvvRUufBbmAXg+Hm
+ nu8v+K5DaCJAjMEAAEIAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaHD4zwAKCRDhuBo+eShj
+ d9TrEACYuzwo6y8OnstIRUqvJK5xiumnApmqBDRQqE2BaCPQ8hQDVC72NEmfxRgMQf8leI7QjgV
+ Ami7PcQwyBGp9xkK1dMeAvrLfHvgW1VQ9q9Rnm37hwndOT8xV6gKFOETe1mvi9aH0HhS4GGTRgB
+ RSDMTwsygG6iFz9mTeB/BwTVwPsa/wb63iCfGNl65O3e2My/PazDyUB5cu4LuOKaT4CIHmG693q
+ OyLwizIw6gCagMUcI2pLW3LmxLFB+j3K/2HgaA/Hsx9EcOW2du0J2/TFTDAVDGFtnQT+MQXWmmY
+ CvEme6mP+i0FsJGR4lvwjus0SPU6mWkzVmJXAwXlVQMclpoWEAOUXoFsMM/62uhiUE5sfkGX8ZQ
+ XoEPhFSdRuL53IVO/8BmUcb1WZRyXv/RhEzddj3HEVbwSRcNcliJhC08C+ZY4MdHw2ZysAg8SGT
+ Ak2uu7AK2AKjESax8OJmA34hRfyb5kZ/ThDQJK7Ky42ojVSb1VRGDmYBs7bBRlLCdXkVZS2/hQy
+ TtxgNG0yvXc5f/YMXYGlZidw/aHCV1TU9hzt4AGaboUXGtqEdW9r87KL4qEyyjNQW7v+CpClC7C
+ oGpIfqgw8vjtDPyk3J5UF5JOOvBZ4VNL22eCSFXl+8y12sAdxFTuFkVFTxLVEz6OwWz4v8pQAbJ
+ 9OqpPGXdtixG5zg==
 X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
  fpr=3108C10F46872E248D1FB221376EB100563EF7A7
 
-rnull is going to make use of `kernel::str::RawFormatter::bytes_written`,
-so make the visibility public.
+Clean up the import statements in `gen_disk.rs` to make the code easier to
+maintain.
 
+Reviewed-by: Alice Ryhl <aliceryhl@google.com>
 Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
 ---
- rust/kernel/str.rs | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ rust/kernel/block/mq/gen_disk.rs | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
 
-diff --git a/rust/kernel/str.rs b/rust/kernel/str.rs
-index 28a6179385fc..b1bc584803b0 100644
---- a/rust/kernel/str.rs
-+++ b/rust/kernel/str.rs
-@@ -761,7 +761,7 @@ pub(crate) fn pos(&self) -> *mut u8 {
-     }
+diff --git a/rust/kernel/block/mq/gen_disk.rs b/rust/kernel/block/mq/gen_disk.rs
+index cd54cd64ea88..679ee1bb2195 100644
+--- a/rust/kernel/block/mq/gen_disk.rs
++++ b/rust/kernel/block/mq/gen_disk.rs
+@@ -5,9 +5,13 @@
+ //! C header: [`include/linux/blkdev.h`](srctree/include/linux/blkdev.h)
+ //! C header: [`include/linux/blk_mq.h`](srctree/include/linux/blk_mq.h)
  
-     /// Returns the number of bytes written to the formatter.
--    pub(crate) fn bytes_written(&self) -> usize {
-+    pub fn bytes_written(&self) -> usize {
-         self.pos - self.beg
-     }
- }
+-use crate::block::mq::{raw_writer::RawWriter, Operations, TagSet};
+-use crate::{bindings, error::from_err_ptr, error::Result, sync::Arc};
+-use crate::{error, static_lock_class};
++use crate::{
++    bindings,
++    block::mq::{raw_writer::RawWriter, Operations, TagSet},
++    error::{self, from_err_ptr, Result},
++    static_lock_class,
++    sync::Arc,
++};
+ use core::fmt::{self, Write};
+ 
+ /// A builder for [`GenDisk`].
 
 -- 
 2.47.2
