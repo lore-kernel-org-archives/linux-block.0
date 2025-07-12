@@ -1,70 +1,73 @@
-Received: from mail-io1-f45.google.com (mail-io1-f45.google.com [209.85.166.45])
+Received: from mail-io1-f43.google.com (mail-io1-f43.google.com [209.85.166.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D6DA1E260D
-	for <linux-block@vger.kernel.org>; Sat, 12 Jul 2025 02:40:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F5201E51EB
+	for <linux-block@vger.kernel.org>; Sat, 12 Jul 2025 02:40:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752288008; cv=none; b=uUSWPjY4dAcNINU0Shvy8q7qjk8rF/WcIk7uoNpXqdvpSxAzzZEGWebAbOdAJmrT7LLwouGEtnW7Uv7gVFzWsHwPBrcrbajiDfXOL5dt38GsruE82dOthKARbT2LoUp/RjTg08ksZovwbjynnz9Wo+rop4fDHNnfG0B+X4dumoE=
+	t=1752288009; cv=none; b=ZEsiVegMmT9qjuU4EiSsDr47KVOe3cWVY4NprfJLGxUlm03pyh4EDqsNY0xOnWby30FFk9ePZqZBwDaG+F476HlVuzf8hVbqjfqEnka6rmIEI8nnBZy2sDdPeUoOOtg9+VAF+PDDMVwQQQmW0s7M5XUIUOUWvri9mDBP0Aht0HI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752288008; c=relaxed/simple;
-	bh=2m+6X0VPNiU/NUe1sUd+j4JsRt1PlFoB7dSjkMIRlSY=;
+	s=arc-20240116; t=1752288009; c=relaxed/simple;
+	bh=zpLNea46eqilpaXHIo3ln75NHPKf5uwXU7dO1N3gFWY=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=rrEMFjvfPogGCX97zKVKXMsEhrLiC0o7bdMD1I3GUpPtLHo2AbHWCq1COjqMJXqa/TDrDqZzunkEZ7W3g0KKPYgfmqSXWA2Ch5/+54XHqJl6frYGMhp9TNrGaii97Y3stOAEZwOTPXwnS2T4WOmMxgfWGmzEMf+VjAaR83fMQKE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=216oRf16; arc=none smtp.client-ip=209.85.166.45
+	 MIME-Version:Content-Type; b=FmV/Ic/2rMdMWcD5Kw/wgnpy4ubaTgWtFDPRjj8WhzWgSRX0I444LzVPkdegykXKBRKkDP2DCyAjpv5LX7LpOnpJo4XnQnbnAaSGl/lO7m14bEPiUYyL9M0SnZcI0gDkg3Z2tmZbZD+tIBrHcSL/mH/xlNDWTBYHP5GPdj1/GD8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=bD3T+j/v; arc=none smtp.client-ip=209.85.166.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="216oRf16"
-Received: by mail-io1-f45.google.com with SMTP id ca18e2360f4ac-87640a9e237so221621939f.2
-        for <linux-block@vger.kernel.org>; Fri, 11 Jul 2025 19:40:05 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="bD3T+j/v"
+Received: by mail-io1-f43.google.com with SMTP id ca18e2360f4ac-8733548c627so96127639f.3
+        for <linux-block@vger.kernel.org>; Fri, 11 Jul 2025 19:40:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1752288004; x=1752892804; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1752288006; x=1752892806; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=PFgFaKapqqeDGdQAyet3S4gcpObJE1uGZIgPENqJ6Qw=;
-        b=216oRf16HQYXQKWFt68EaFyw3BDpUsVuCBqkXhji1DUgdu23LSdOUpkKF8XhC3Ac93
-         R4ld2pLbjK8QqtT8OpBxUv0XGDWQZ0mPyHZiz1xQ5NaByHt3KfJ7hqr/ztWfqTPaHw1h
-         aM4CC1cU1+90XtefhRZ+zELpQGkKZhPhMpVK/VnIue6BIqg3lvGScCbrBq8WIokk3KmC
-         p5DIHei3RsOWLh+829APYxy3jAGxMCBrNujufJEN+eOByQa6JPwQi3Pa6+m+pEg0RqUI
-         ZVpUrVxFcUd6GpDpSPK/wLMjZrRl0tbKr1GrdJ61S372O0Q2bHKP/7IzJ3Xp9oHYF5ik
-         nqSw==
+        bh=z4WImu2NtZSrJkqdjdhLHzSmNsrp14bAane9ntQopr8=;
+        b=bD3T+j/v2y6zVjf5basTwu9vTyfO8gGAS1p6rFgBHVW+yw6535bl2frtNTYj+SmLNH
+         O7oDpBHe+4uZ1d3NEZ3ik1z/EXPAgmzkibO1qZ2IazJuqk8N5W4Gpq0ddIYZ7iGBljMG
+         S45Oh0/lNg+M60VjAMVuo1SccwcepSXm6aMzvK3Tf1QS/n1gm7A+VX6z0YFlC/JFSS02
+         px2vnDrtHx2t2NZATHzRnzgRAPmioxQ7K3u3zQjI8S5cZCZquYAJf1a+ADxwyxSWeeQU
+         fj3mRLAvKtWlaKFg01/UAJg+3Pc4UpRsRsB2I3Y39Hfnt1wUDSzgx+lyV/5bEyDYviGJ
+         HTKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752288004; x=1752892804;
+        d=1e100.net; s=20230601; t=1752288006; x=1752892806;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=PFgFaKapqqeDGdQAyet3S4gcpObJE1uGZIgPENqJ6Qw=;
-        b=CbrP9a9cVqzyJRcA+4eomcLJQ/YRb9edGUOD2EqZnxf3mhV6GiEFVm2o3oC7ZgZZMZ
-         Vj9OzlX1iXJSRa/w7tB4jRYgluGBtGI0+vqUz7Fs0a7O26D3Y4/AscGfKp6A3x51Z0du
-         0l0w/BFB4kBZ5azdJtGo2wkx3jp1zbGv8Tj4lgaNbCBTRelAZdBfVaP2WQMHukf5tQ/H
-         gJxERYpSKl5KneI1Rtsq7DeseMtlFBjbChP0QMUQEj9YLAhc8iNup12H0GmOdwg2tzp8
-         XgDBUuCi4wri94Um/3KT/owyrBgqP1/u/c7qdqkE8tHBxtrM/XQ4+wMyXbFyLuFHDW7u
-         Lf3A==
-X-Gm-Message-State: AOJu0Yw/ksZHdorkdzwyq6Y4z+Z+fJ4RDTCMa8Tq9bE8ExcSmYKlA4G/
-	0gJMfejqtIMD6gvzNYyXcOriPXz5SHHILUrqKcKQ+m+mc5xC6p5zhsx73i068ufdajU=
-X-Gm-Gg: ASbGnctfH0fg4kf7Tc/UJskKPfLdGiiigH7App9gn4KHFNx+hIZMtThrsGDaN9BxiOB
-	l5jI6e8b1SEyHb3Tp6vHDd98qQvCG8zG3ovty36Ao6/njZifmqjX9OYVC/rRnmUSwsgJphAQ6rU
-	1IV4SYUT+hVddwUPMW7im/FHQBnnujQ5f4Ycabp6dFKrU/PFRupuf0ukxf/cUXt4BJpdHZ58I9P
-	3PZKS9S7/BP+jT9NOIi+0139PD2+QVqYVj7VpBBLZ5gWJNGXQpV7ooj6YR3YDT7F/wVTeNPDp11
-	9kjOGdmslBe5X/KIA5jcamBKkzvSAFrJO6nhtZ3/Ktj+flJe7lsE/Mg1WQuKTf6cP0vCyMGfMEy
-	ylDCrQK90BKJ5Lw==
-X-Google-Smtp-Source: AGHT+IGOuxgrEegWqgCh+uOnfW39X49Ls0tE5MHZmtiH0CuCOsyobaA+AbupyGwMJSjEJQ3RYjDj8g==
-X-Received: by 2002:a05:6602:7207:b0:875:b8b7:7864 with SMTP id ca18e2360f4ac-87977f7f5b7mr822930539f.6.1752288004135;
-        Fri, 11 Jul 2025 19:40:04 -0700 (PDT)
+        bh=z4WImu2NtZSrJkqdjdhLHzSmNsrp14bAane9ntQopr8=;
+        b=EBBsGM3o5l0rEtH02g/Zx2WHYr14UL6g3vJkNB6bopg7cOUbIE3arWblpITShAYF/7
+         ARCFqmbDsrMDp3r4xZIP0XGiq2kEkKobKWvtg0rvq6AQSMPqZ11Y0yQiNKuWzvoptLwc
+         XtG91E7LTd4JxF+vslsdDp7Eg3QK0HPAaaEDq5CxZRfTTxoNXkcqaA11pCFf6kP3EYKR
+         wqEhVwCIJvWJPzvHfMEw9t6a66pLl3X9DlFlINSpc+L4MbwoY+vzNthJR+s7h1IHkmzL
+         fm/YzlDEUvbz5OHg7KjHu6X32L3vY04Bljs6XDR9dulCjP/+4BnuZH3De8KKBy42rC1Z
+         SYHQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWGxiaApHkLWfJLvp4KvunzZ/rEe8EW9mFaNz0HVAXcCm5IX2CdtpkmSNJd+ycZttP/QNEazZf4Dne+OQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxHNQGqYAZfNfD8FdHsf8vh4EIyX85S2kXP4oHEFetyZjyGOw+7
+	6BwQq2q549gfYrMoVcslEp1v9+BOqfLm4GVp4cvoRkFkYusm4Abb+c9MIDvpZYHVmuJUswtHPor
+	69Myq
+X-Gm-Gg: ASbGncvl5+Cyxi5u/V8OsLleogAcZCluf2XcOz7ok+C6kK2BR5FCOfap7ydNcF4dB+J
+	mh6Jemp1nlYknyFfE07Cjunlh5VOecA2h6OyXg+r4Gi53oRJYYADEbFFmNQPU230bbzmMTK5Y7J
+	QMDHfqVZ6qxJ0+MFBgme/lIo8tVTIxHl7AI6DTpE7YDWEKywyrdkV6vxV5o+43F37C9b+9ASMpW
+	7DhztHTloyR3VQLDHYWgq1yp2mm2PS/qBLxcQMMSCxN3h4n1BUGvommx7wLc9gXqYU3YcIta3Vf
+	1CnHl+9/BeivI9EyfF3HAtSTvnGl2+MTX8zeckXhQL5ZNSrQk8kt0NnRmaDXRR63+HQJiHSDeLd
+	qvsD5/1nDgXiinQ==
+X-Google-Smtp-Source: AGHT+IEpxYkdBcisV7HP3p3UR14Bkj/gzDXrJtNLWIvqBII+yXOz6A2rCxpTknGn2X7a/ulxOaJs8g==
+X-Received: by 2002:a05:6602:1354:b0:876:d18f:fb06 with SMTP id ca18e2360f4ac-87977ea916amr685927139f.0.1752288006313;
+        Fri, 11 Jul 2025 19:40:06 -0700 (PDT)
 Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-8796bc34395sm126333739f.32.2025.07.11.19.40.03
+        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-8796bc34395sm126333739f.32.2025.07.11.19.40.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Jul 2025 19:40:03 -0700 (PDT)
+        Fri, 11 Jul 2025 19:40:04 -0700 (PDT)
 From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
-In-Reply-To: <20250711083009.2574432-1-ming.lei@redhat.com>
-References: <20250711083009.2574432-1-ming.lei@redhat.com>
-Subject: Re: [PATCH] block: fix kobject leak in blk_unregister_queue
-Message-Id: <175228800299.1597338.9364384111369193524.b4-ty@kernel.dk>
-Date: Fri, 11 Jul 2025 20:40:02 -0600
+To: Jan Kara <jack@suse.cz>
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org, 
+ syzbot+01ef7a8da81a975e1ccd@syzkaller.appspotmail.com
+In-Reply-To: <20250711163202.19623-2-jack@suse.cz>
+References: <20250711163202.19623-2-jack@suse.cz>
+Subject: Re: [PATCH] loop: Avoid updating block size under exclusive owner
+Message-Id: <175228800423.1597338.7519956192674264145.b4-ty@kernel.dk>
+Date: Fri, 11 Jul 2025 20:40:04 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -76,21 +79,20 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.14.3-dev-2ce6c
 
 
-On Fri, 11 Jul 2025 16:30:09 +0800, Ming Lei wrote:
-> The kobject for the queue, `disk->queue_kobj`, is initialized with a
-> reference count of 1 via `kobject_init()` in `blk_register_queue()`.
-> While `kobject_del()` is called during the unregister path to remove
-> the kobject from sysfs, the initial reference is never released.
-> 
-> Add a call to `kobject_put()` in `blk_unregister_queue()` to properly
-> decrement the reference count and fix the leak.
+On Fri, 11 Jul 2025 18:32:03 +0200, Jan Kara wrote:
+> Syzbot came up with a reproducer where a loop device block size is
+> changed underneath a mounted filesystem. This causes a mismatch between
+> the block device block size and the block size stored in the superblock
+> causing confusion in various places such as fs/buffer.c. The particular
+> issue triggered by syzbot was a warning in __getblk_slow() due to
+> requested buffer size not matching block device block size.
 > 
 > [...]
 
 Applied, thanks!
 
-[1/1] block: fix kobject leak in blk_unregister_queue
-      (no commit info)
+[1/1] loop: Avoid updating block size under exclusive owner
+      commit: 7e49538288e523427beedd26993d446afef1a6fb
 
 Best regards,
 -- 
