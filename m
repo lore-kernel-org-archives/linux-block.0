@@ -1,100 +1,100 @@
-Received: from 004.mia.mailroute.net (004.mia.mailroute.net [199.89.3.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f45.google.com (mail-io1-f45.google.com [209.85.166.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C1341991C9;
-	Fri, 11 Jul 2025 21:42:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D6DA1E260D
+	for <linux-block@vger.kernel.org>; Sat, 12 Jul 2025 02:40:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752270156; cv=none; b=n2zwUTV1GH3uK3Y7g/E2JHSkKxeP6Ec/huP5SC5b0BMw3DrnJtVJ7tLu7pvYyLlOViubWzkZ3MTzPTb3L3+5zo1yxWdxQN7N+7HKdyHFhBGv1s8gVQScjzG6jCrNFzhSlQtLjVf13bVlmtLCm4uiXtPyrkMePIOydNAi3iN5lPs=
+	t=1752288008; cv=none; b=uUSWPjY4dAcNINU0Shvy8q7qjk8rF/WcIk7uoNpXqdvpSxAzzZEGWebAbOdAJmrT7LLwouGEtnW7Uv7gVFzWsHwPBrcrbajiDfXOL5dt38GsruE82dOthKARbT2LoUp/RjTg08ksZovwbjynnz9Wo+rop4fDHNnfG0B+X4dumoE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752270156; c=relaxed/simple;
-	bh=HlGNRHlqbdFhn/2cFmzlGSkoeIkuuhm1Aepa6F2dRvs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ns4D1OqmPYX+wjBNdHcmY44gb2OnRd8+im9Q7naFg5F7RhbWn1lHsY4LVaT3uvd3VpuGKWJKXoxVoVJpIFgcAojnNOh6JuypIrPTawnuGvImC1xp4uZ963ZxGGTTwGSJJTx+KuYkp92B5/E2Bx9ft5+iSckG/Eep7QtA5XyirXo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=vP4pWF6A; arc=none smtp.client-ip=199.89.3.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1752288008; c=relaxed/simple;
+	bh=2m+6X0VPNiU/NUe1sUd+j4JsRt1PlFoB7dSjkMIRlSY=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=rrEMFjvfPogGCX97zKVKXMsEhrLiC0o7bdMD1I3GUpPtLHo2AbHWCq1COjqMJXqa/TDrDqZzunkEZ7W3g0KKPYgfmqSXWA2Ch5/+54XHqJl6frYGMhp9TNrGaii97Y3stOAEZwOTPXwnS2T4WOmMxgfWGmzEMf+VjAaR83fMQKE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=216oRf16; arc=none smtp.client-ip=209.85.166.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="vP4pWF6A"
-Received: from localhost (localhost [127.0.0.1])
-	by 004.mia.mailroute.net (Postfix) with ESMTP id 4bf4tx4Ftczm0yTg;
-	Fri, 11 Jul 2025 21:42:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1752270152; x=1754862153; bh=11+WtG58jM6hfL3QHapg96Ql
-	YWxfuHB3PBCg5gAXPyA=; b=vP4pWF6A8BVzJ8GPZRKlBFyl2fuSlfz4IfTV4Rqn
-	zD82aiTGo5ovWHNChFucItvBqQdfKG7pBiqJrTA7WtPQIrsVS2Z4J3bHQES76o43
-	PVhCgWoEG9vXaO39EfeEsbNE0n87qWtBgyjxgmhyzgHJ4c0lg5pt8QUyAP3NMu+8
-	M1Yjq4PchwfBd5wg9/u5pclTGU7SQzLj1qZ7UY36c0FI+ruOHZKGR3/ktV5PpJWW
-	lS9PN9t1bvVjpJBtmsgQa9ODfak9zJ0x3yRdGketR1e0xMOywx/amd1Le/luuBlb
-	zdBXkFAC+fbKmYBynNXZ3GnXSK/QNWIyJVhyPCt8qYEA3w==
-X-Virus-Scanned: by MailRoute
-Received: from 004.mia.mailroute.net ([127.0.0.1])
- by localhost (004.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id 4LInP-km_g2c; Fri, 11 Jul 2025 21:42:32 +0000 (UTC)
-Received: from [100.66.154.22] (unknown [104.135.204.82])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 004.mia.mailroute.net (Postfix) with ESMTPSA id 4bf4ts3bYhzm0ytT;
-	Fri, 11 Jul 2025 21:42:28 +0000 (UTC)
-Message-ID: <946afbba-dde6-46d9-a2dc-e51f195aedc4@acm.org>
-Date: Fri, 11 Jul 2025 14:42:27 -0700
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="216oRf16"
+Received: by mail-io1-f45.google.com with SMTP id ca18e2360f4ac-87640a9e237so221621939f.2
+        for <linux-block@vger.kernel.org>; Fri, 11 Jul 2025 19:40:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1752288004; x=1752892804; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PFgFaKapqqeDGdQAyet3S4gcpObJE1uGZIgPENqJ6Qw=;
+        b=216oRf16HQYXQKWFt68EaFyw3BDpUsVuCBqkXhji1DUgdu23LSdOUpkKF8XhC3Ac93
+         R4ld2pLbjK8QqtT8OpBxUv0XGDWQZ0mPyHZiz1xQ5NaByHt3KfJ7hqr/ztWfqTPaHw1h
+         aM4CC1cU1+90XtefhRZ+zELpQGkKZhPhMpVK/VnIue6BIqg3lvGScCbrBq8WIokk3KmC
+         p5DIHei3RsOWLh+829APYxy3jAGxMCBrNujufJEN+eOByQa6JPwQi3Pa6+m+pEg0RqUI
+         ZVpUrVxFcUd6GpDpSPK/wLMjZrRl0tbKr1GrdJ61S372O0Q2bHKP/7IzJ3Xp9oHYF5ik
+         nqSw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752288004; x=1752892804;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=PFgFaKapqqeDGdQAyet3S4gcpObJE1uGZIgPENqJ6Qw=;
+        b=CbrP9a9cVqzyJRcA+4eomcLJQ/YRb9edGUOD2EqZnxf3mhV6GiEFVm2o3oC7ZgZZMZ
+         Vj9OzlX1iXJSRa/w7tB4jRYgluGBtGI0+vqUz7Fs0a7O26D3Y4/AscGfKp6A3x51Z0du
+         0l0w/BFB4kBZ5azdJtGo2wkx3jp1zbGv8Tj4lgaNbCBTRelAZdBfVaP2WQMHukf5tQ/H
+         gJxERYpSKl5KneI1Rtsq7DeseMtlFBjbChP0QMUQEj9YLAhc8iNup12H0GmOdwg2tzp8
+         XgDBUuCi4wri94Um/3KT/owyrBgqP1/u/c7qdqkE8tHBxtrM/XQ4+wMyXbFyLuFHDW7u
+         Lf3A==
+X-Gm-Message-State: AOJu0Yw/ksZHdorkdzwyq6Y4z+Z+fJ4RDTCMa8Tq9bE8ExcSmYKlA4G/
+	0gJMfejqtIMD6gvzNYyXcOriPXz5SHHILUrqKcKQ+m+mc5xC6p5zhsx73i068ufdajU=
+X-Gm-Gg: ASbGnctfH0fg4kf7Tc/UJskKPfLdGiiigH7App9gn4KHFNx+hIZMtThrsGDaN9BxiOB
+	l5jI6e8b1SEyHb3Tp6vHDd98qQvCG8zG3ovty36Ao6/njZifmqjX9OYVC/rRnmUSwsgJphAQ6rU
+	1IV4SYUT+hVddwUPMW7im/FHQBnnujQ5f4Ycabp6dFKrU/PFRupuf0ukxf/cUXt4BJpdHZ58I9P
+	3PZKS9S7/BP+jT9NOIi+0139PD2+QVqYVj7VpBBLZ5gWJNGXQpV7ooj6YR3YDT7F/wVTeNPDp11
+	9kjOGdmslBe5X/KIA5jcamBKkzvSAFrJO6nhtZ3/Ktj+flJe7lsE/Mg1WQuKTf6cP0vCyMGfMEy
+	ylDCrQK90BKJ5Lw==
+X-Google-Smtp-Source: AGHT+IGOuxgrEegWqgCh+uOnfW39X49Ls0tE5MHZmtiH0CuCOsyobaA+AbupyGwMJSjEJQ3RYjDj8g==
+X-Received: by 2002:a05:6602:7207:b0:875:b8b7:7864 with SMTP id ca18e2360f4ac-87977f7f5b7mr822930539f.6.1752288004135;
+        Fri, 11 Jul 2025 19:40:04 -0700 (PDT)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-8796bc34395sm126333739f.32.2025.07.11.19.40.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 11 Jul 2025 19:40:03 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>
+In-Reply-To: <20250711083009.2574432-1-ming.lei@redhat.com>
+References: <20250711083009.2574432-1-ming.lei@redhat.com>
+Subject: Re: [PATCH] block: fix kobject leak in blk_unregister_queue
+Message-Id: <175228800299.1597338.9364384111369193524.b4-ty@kernel.dk>
+Date: Fri, 11 Jul 2025 20:40:02 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v20 05/13] blk-zoned: Move code from
- disk_zone_wplug_add_bio() into its caller
-To: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
- Christoph Hellwig <hch@lst.de>
-References: <20250708220710.3897958-1-bvanassche@acm.org>
- <20250708220710.3897958-6-bvanassche@acm.org>
- <f612d306-f8bd-4e05-9fe2-936c00b2beb4@kernel.org>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <f612d306-f8bd-4e05-9fe2-936c00b2beb4@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3-dev-2ce6c
 
-On 7/9/25 9:46 PM, Damien Le Moal wrote:
-> On 7/9/25 7:07 AM, Bart Van Assche wrote:
->> Move the following code into the only caller of disk_zone_wplug_add_bio():
->>   - bio->bi_opf &= ~REQ_NOWAIT
->>   - wplug->flags |= BLK_ZONE_WPLUG_PLUGGED
->>   - The disk_zone_wplug_schedule_bio_work() call.
+
+On Fri, 11 Jul 2025 16:30:09 +0800, Ming Lei wrote:
+> The kobject for the queue, `disk->queue_kobj`, is initialized with a
+> reference count of 1 via `kobject_init()` in `blk_register_queue()`.
+> While `kobject_del()` is called during the unregister path to remove
+> the kobject from sysfs, the initial reference is never released.
 > 
-> Please make sentences instead of copy-pasting code. We can see that in the
-> patch itself.
-
-Is this good enough?
-
-Move the following code into the only caller of disk_zone_wplug_add_bio():
-  - The code for clearing the REQ_NOWAIT flag.
-  - The code that sets the BLK_ZONE_WPLUG_PLUGGED flag.
-  - The disk_zone_wplug_schedule_bio_work() call.
-
->>   	/* If the zone is already plugged, add the BIO to the plug BIO list. */
->>   	if (zwplug->flags & BLK_ZONE_WPLUG_PLUGGED)
->> -		goto plug;
->> +		goto queue_bio;
+> Add a call to `kobject_put()` in `blk_unregister_queue()` to properly
+> decrement the reference count and fix the leak.
 > 
-> "queue_bio" is not a good name. Please make that "add_bio" or "plug_bio" to
-> match the call to disk_zone_wplug_add_bio() done.
+> [...]
 
-bio_list_add() adds BIOs at the end of zwplug->bio_list and
-bio_list_pop() removes BIOs from the front of zwplug->bio_list. Hence,
-zwplug->bio_list is used as a queue, isn't it? This is why I chose the
-name "queue_bio". Anyway, if that label name isn't considered
-good enough, how about changing it into "add_to_bio_list"?
+Applied, thanks!
 
-Thanks,
+[1/1] block: fix kobject leak in blk_unregister_queue
+      (no commit info)
 
-Bart.
+Best regards,
+-- 
+Jens Axboe
+
+
+
