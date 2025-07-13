@@ -1,176 +1,219 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6862D6FC3
-	for <linux-block@vger.kernel.org>; Sun, 13 Jul 2025 02:38:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E59821367;
+	Sun, 13 Jul 2025 05:52:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752374310; cv=none; b=W2w3z7LNOpW4o8quV+GyY/Moc3ghSXG7mlu/GnNWFbazDJ3gweBZENDSaOzZh7AkXPre6nQ6RmOCM/Hzn09yZ+DZahFLWjbcoJ+jEKYCKMiCZjXCQDO1rm+s/1llCB8PpNnUjrApomvD8Qxc+l9oKhjpJtFzeKM1AQGKzzRnjRg=
+	t=1752385962; cv=none; b=Sesv7ZCoEQYy3Ljo7GnSa56QtNesnvDS662N7xUwB00pixWzv+URTT6rUJzIkmGoibHcBVDhdCJyrV91R/MLVqKDtYPzyGPWI0un0ObcVP1uhOtM+sBcuxz4ujPe0d8Oxvb8X1aGbQwJyXz+ghwyKl0x6qCHxUlfl7eSDEnacHY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752374310; c=relaxed/simple;
-	bh=XCH4qywf3hI3hgMxrFX9yAoRCyPIY4uIVFHZfIwOqMM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Sitk/1MLjhRU6afeYp1SvjGDYCINENI8LoOQUWfOAVsjmcBOsRbevJrM7F21uOvyFvB3s+HrVBkUalC72bMP89ibNExsYMcTXIiiCt9Meo1d7qo9B242MJzMNcM8esZED/i5gfFugU5EifSJa68SnmonC2cGr0+Dw9BEMWbzZmk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eCMkNd0P; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1752385962; c=relaxed/simple;
+	bh=GhDzbwNHGtxtIhspi9ej4WtdLYl0UwaV5DvSgWGJu/k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fHdgstLWf1/NSbHZ4LS/YEfRAFGb42pCXG15DT/yvSiQCIhP4JWjCoFDfgCs1yqScboRSnxDD6lGOaeHBswDAluklpORCcxCg4ZaEO3ytaI3EesYKbiPj/lnxfQw+cDKKps56jRSQO63zQptH5u/RfdjxLt2W1cd7PyymdpKnWY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JYUyPLc2; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eCMkNd0P"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752374307;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wmiVUBVUYuW3NDZnxa+pcm/SSpIt/+vycvCWgqtMj+8=;
-	b=eCMkNd0P91d6qd+zqYTQN4gbU9zwKlG6LDzQESS4Nkm3tYhSsaJsFtzspUmb7ZUBv370mG
-	XejnkVmkpNQg0IUICFtQgzZF/9r2nlODpC/3ivnykhsMo+J8snuDFw3H1Y5i5ELLyTwufO
-	rizdUuINZmTBuAQixTK0e0lR0yNMlf8=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-594-64R7OAI9OkS7M-BU2tDNZA-1; Sat,
- 12 Jul 2025 22:38:23 -0400
-X-MC-Unique: 64R7OAI9OkS7M-BU2tDNZA-1
-X-Mimecast-MFC-AGG-ID: 64R7OAI9OkS7M-BU2tDNZA_1752374302
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B80D6180047F;
-	Sun, 13 Jul 2025 02:38:22 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.7])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5D8AE3000225;
-	Sun, 13 Jul 2025 02:38:18 +0000 (UTC)
-Date: Sun, 13 Jul 2025 10:38:13 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Caleb Sander Mateos <csander@purestorage.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Uday Shankar <ushankar@purestorage.com>
-Subject: Re: [PATCH V2 05/16] ublk: move auto buffer register handling into
- one dedicated helper
-Message-ID: <aHMcFY96ZREasty8@fedora>
-References: <20250708011746.2193389-1-ming.lei@redhat.com>
- <20250708011746.2193389-6-ming.lei@redhat.com>
- <CADUfDZqZTJmz4bN99P6tRTL__8Uu6Lt=qLwwOFB2yTMb=XiBfg@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JYUyPLc2"
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-235a3dd4f0dso21285915ad.0;
+        Sat, 12 Jul 2025 22:52:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1752385960; x=1752990760; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=pBb4G5WTwy/TsInw+HkF37iU/w2ZZ7t4IPWePnbcVD4=;
+        b=JYUyPLc2ianUjmVlqKwrB87Dh2ryQWrplPOVk4ceW9FsSPe1wMfPJo12QcCRcoPwzk
+         1aktSeuvHDf6/PpjVej6zBwLR0/MTY6GpS9pxsIODXrwUzXgAPsrMjtYKzwOUQ0oa93s
+         EGCoDS5hNAuGyzvu8tgGmFQOSZKfPLkwnvlrToH1iwIxVFuQ9yfJ7hbyyISjS3WSGMfn
+         gh4qWoIJhDG0TNc2NMM77k0SUKZg1+XClNnXzmG8kOfY+KLWvXn5Qdg8Jp3D8blSPr3K
+         1fTaG/hUvMa67ETTKfvWRNV/THNEBfiGn672NZLxxrpjk9CIYDeSDZEcXaii0JYCnx+6
+         7hDA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752385960; x=1752990760;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=pBb4G5WTwy/TsInw+HkF37iU/w2ZZ7t4IPWePnbcVD4=;
+        b=OCXw7+Qhed2tz895U6LJudSNAZsuZswMI5w1/GUB2C7QnyfvJfxVLyM14gG00hGJCt
+         0kZUtVwK0aQuEcgJJLGJg5m5KvA5PL9f9wI8SJdYWCmZIeU1iiEVYDpMgtxs+c8miIsB
+         PKLxN9im6rdRS5CGp+6jnF1DpIsb5qklYgrVc75kweHUCfKoJrmaEiBgFDoMgAk5Qiwu
+         mFUVxySKCgs2p9UZgxbev3bFGeUTwrhxPi3wBYiHDrx1KfefrImF/KOla17zdeBHXRZS
+         szF57mDOenXkbctzhA2YolHF9lwbo+2aphVefYY3eCdXO5sC0l/hZnNC85AljLsGdbbb
+         w9Lw==
+X-Forwarded-Encrypted: i=1; AJvYcCWcNiHCVL2ve9fpx8TOvyY5yaoaCN5vYZEPa02g4I9Ds+PV1IuICbeGDG1RnE0anvwqC0oMF6Br2b567AU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwpSCLl8ebVizEKw2TwSvj/AVRnQfwVhIXGoCz2F9l7VKLSq5dn
+	rp7dY2WjT7lS2xGNDr/D5/6b+A698bp96zLYbfCzF7qhZ3y4tAY4OSZQ
+X-Gm-Gg: ASbGncs/4yscx8qhLDd8LaZ0TDtBa6nancoru12xp5FdiIi5L5COlmmCawqHNSLnhxe
+	2wg+y4wjRBfY6SDOIZjHWQmD3OvVmJN1VlJZq74j/MCerPe8WplnVxqaY4NSKuW6hriQSpcXGPI
+	FGLt9JaSnCIcdAWLgIpGMGmvEl2ZZUOnQtW+L3Arh2tKPbBabEr3V6UjkYts6MTmDT826P6NG/A
+	1AI3P6YH4CdBT1N8X9seDjGvLaj1SmJDbfmylwIW3S5cRb+ZA11xiN3pGdeVDij6jIiX9M+Fpvy
+	lNFlijG1OFYXQg7oB1/ujXnOGbodxEPW1xgs8jaB44qy0VM5g4V3OcD6MQ3wQom4uTA/XAqt+R9
+	agLwfQJkDQ619Bc6ym2PigEii05VWVK1kqfKB5ZN94VozvAm9gQZZzG87+pgl4vPkqao1hflYY2
+	ee9g==
+X-Google-Smtp-Source: AGHT+IHpkJ22xsSD44YG86JZ0DqajuNO4X03Hv3zWOHJ1V4ZfpV4xQaShwbANNP2MbUAKAJio3wLkw==
+X-Received: by 2002:a17:902:fa06:b0:235:c973:ba20 with SMTP id d9443c01a7336-23dede969aemr93463115ad.49.1752385959965;
+        Sat, 12 Jul 2025 22:52:39 -0700 (PDT)
+Received: from ?IPV6:2409:4090:20a4:5c0c:1e40:3e52:2edc:d779? ([2409:4090:20a4:5c0c:1e40:3e52:2edc:d779])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23de42847casm77426895ad.14.2025.07.12.22.52.37
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 12 Jul 2025 22:52:39 -0700 (PDT)
+Message-ID: <7dd94691-0b37-4855-be43-661f954275c8@gmail.com>
+Date: Sun, 13 Jul 2025 11:22:35 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] block: floppy: fix uninitialized use of outparam in
+ fd_locked_ioctl
+To: efremov@linux.com, axboe@kernel.dk
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250706072213.14954-1-purvayeshi550@gmail.com>
+ <1d255c16-46fb-413d-b25a-0f1fea682a33@linux.com>
+Content-Language: en-US
+From: Purva Yeshi <purvayeshi550@gmail.com>
+In-Reply-To: <1d255c16-46fb-413d-b25a-0f1fea682a33@linux.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CADUfDZqZTJmz4bN99P6tRTL__8Uu6Lt=qLwwOFB2yTMb=XiBfg@mail.gmail.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Fri, Jul 11, 2025 at 09:47:56AM -0400, Caleb Sander Mateos wrote:
-> On Mon, Jul 7, 2025 at 9:18 PM Ming Lei <ming.lei@redhat.com> wrote:
-> >
-> > Move check & clearing UBLK_IO_FLAG_AUTO_BUF_REG to
-> > ublk_handle_auto_buf_reg(), also return buffer index from this helper.
-> >
-> > Also move ublk_set_auto_buf_reg() to this single helper too.
-> >
-> > Add ublk_config_io_buf() for setting up ublk io buffer, covers both
-> > ublk buffer copy or auto buffer register.
-> >
-> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > ---
-> >  drivers/block/ublk_drv.c | 131 ++++++++++++++++++++++-----------------
-> >  1 file changed, 75 insertions(+), 56 deletions(-)
-> >
-> > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> > index 41248b0d1182..dab02a8be41a 100644
-> > --- a/drivers/block/ublk_drv.c
-> > +++ b/drivers/block/ublk_drv.c
-> > @@ -48,6 +48,8 @@
-> >
-> >  #define UBLK_MINORS            (1U << MINORBITS)
-> >
-> > +#define UBLK_INVALID_BUF_IDX   ((u16)-1)
-> > +
-> >  /* private ioctl command mirror */
-> >  #define UBLK_CMD_DEL_DEV_ASYNC _IOC_NR(UBLK_U_CMD_DEL_DEV_ASYNC)
-> >  #define UBLK_CMD_UPDATE_SIZE   _IOC_NR(UBLK_U_CMD_UPDATE_SIZE)
-> > @@ -2002,16 +2004,52 @@ static inline int ublk_check_cmd_op(u32 cmd_op)
-> >         return 0;
-> >  }
-> >
-> > +static inline int ublk_set_auto_buf_reg(struct io_uring_cmd *cmd)
-> > +{
-> > +       struct ublk_uring_cmd_pdu *pdu = ublk_get_uring_cmd_pdu(cmd);
-> > +
-> > +       pdu->buf = ublk_sqe_addr_to_auto_buf_reg(READ_ONCE(cmd->sqe->addr));
-> > +
-> > +       if (pdu->buf.reserved0 || pdu->buf.reserved1)
-> > +               return -EINVAL;
-> > +
-> > +       if (pdu->buf.flags & ~UBLK_AUTO_BUF_REG_F_MASK)
-> > +               return -EINVAL;
-> > +       return 0;
-> > +}
-> > +
-> > +static int ublk_handle_auto_buf_reg(struct ublk_io *io,
-> > +                                   struct io_uring_cmd *cmd,
-> > +                                   u16 *buf_idx)
-> > +{
-> > +       if (io->flags & UBLK_IO_FLAG_AUTO_BUF_REG) {
-> > +               io->flags &= ~UBLK_IO_FLAG_AUTO_BUF_REG;
-> > +
-> > +               /*
-> > +                * `UBLK_F_AUTO_BUF_REG` only works iff `UBLK_IO_FETCH_REQ`
-> > +                * and `UBLK_IO_COMMIT_AND_FETCH_REQ` are issued from same
-> > +                * `io_ring_ctx`.
-> > +                *
-> > +                * If this uring_cmd's io_ring_ctx isn't same with the
-> > +                * one for registering the buffer, it is ublk server's
-> > +                * responsibility for unregistering the buffer, otherwise
-> > +                * this ublk request gets stuck.
-> > +                */
-> > +               if (io->buf_ctx_handle == io_uring_cmd_ctx_handle(cmd))
-> > +                       *buf_idx = io->buf_index;
-> > +       }
-> > +
-> > +       return ublk_set_auto_buf_reg(cmd);
-> > +}
-> > +
-> >  /* Once we return, `io->req` can't be used any more */
-> >  static inline struct request *
-> > -ublk_fill_io_cmd(struct ublk_io *io, struct io_uring_cmd *cmd,
-> > -                unsigned long buf_addr, int result)
-> > +ublk_fill_io_cmd(struct ublk_io *io, struct io_uring_cmd *cmd, int result)
-> >  {
-> >         struct request *req = io->req;
-> >
-> >         io->cmd = cmd;
-> >         io->flags |= UBLK_IO_FLAG_ACTIVE;
-> > -       io->addr = buf_addr;
-> >         io->res = result;
-> >
-> >         /* now this cmd slot is owned by ublk driver */
-> > @@ -2020,6 +2058,22 @@ ublk_fill_io_cmd(struct ublk_io *io, struct io_uring_cmd *cmd,
-> >         return req;
-> >  }
-> >
-> > +static inline int
-> > +ublk_config_io_buf(const struct ublk_queue *ubq, struct ublk_io *io,
-> > +                  struct io_uring_cmd *cmd, unsigned long buf_addr,
-> > +                  u16 *buf_idx)
-> > +{
-> > +       if (ublk_support_auto_buf_reg(ubq)) {
-> > +               int ret = ublk_handle_auto_buf_reg(io, cmd, buf_idx);
-> > +
-> > +               if (ret)
-> > +                       return ret;
+On 13/07/25 00:46, Denis Efremov wrote:
+> Hello,
 > 
-> I mentioned this before, but just return ublk_handle_auto_buf_reg(io,
-> cmd, buf_idx) to avoid the intermediate variable?
+> Thank you for the report!
+> 
+> On 06/07/2025 11:22, Purva Yeshi wrote:
+>> Fix Smatch-detected error:
+>> drivers/block/floppy.c:3569 fd_locked_ioctl() error:
+>> uninitialized symbol 'outparam'.
+>>
+> 
+> This a false-positive diagnostic. Smatch doesn't see the dependency
+> between FDGET... commands and _IOC_READ.
 
-Will do it in next version.
+Hi Denis,
 
+Thank you for the detailed explanation and for reviewing patch.
 
-Thanks,
-Ming
+> 
+>> Use the outparam pointer only after it is explicitly initialized.
+>> Previously, fd_copyout() was called unconditionally after the switch-case
+>> statement, assuming outparam would always be set when _IOC_READ was active.
+> 
+>          if (_IOC_DIR(cmd) & _IOC_READ)
+>                  return fd_copyout((void __user *)param, outparam, size);
+> 
+> and all FDGET... macro are defined as _IOR(...).
+
+Yes, I see it now.
+All FDGET... commands that would enter the _IOC_READ block do initialize 
+`outparam`, so it's guaranteed to be safe.
+
+> 
+>> However, not all paths ensured this, which led to potential use of an
+>> uninitialized pointer.
+> 
+> Not all paths, but commands that fall under _IOC_READ condition.
+
+Got it.
+
+> 
+>>
+>> Move fd_copyout() calls directly into the relevant case blocks immediately
+>> after outparam is set. This ensures it is only called when safe and
+>> applicable.
+> 
+> If you want to suppress this "error" you can just initialize outparam
+> to NULL.
+
+I’ll update the patch to just initialize `outparam` to NULL to suppress 
+the warning.
+
+I’ll send a v2 patch soon.
+
+> 
+>>
+>> Signed-off-by: Purva Yeshi <purvayeshi550@gmail.com>
+>> ---
+>>   drivers/block/floppy.c | 10 +++++++---
+>>   1 file changed, 7 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
+>> index e97432032f01..34ef756bb3b7 100644
+>> --- a/drivers/block/floppy.c
+>> +++ b/drivers/block/floppy.c
+>> @@ -3482,6 +3482,7 @@ static int fd_locked_ioctl(struct block_device *bdev, blk_mode_t mode,
+>>   		memcpy(&inparam.g, outparam,
+>>   				offsetof(struct floppy_struct, name));
+>>   		outparam = &inparam.g;
+>> +		return fd_copyout((void __user *)param, outparam, size);
+>>   		break;
+>>   	case FDMSGON:
+>>   		drive_params[drive].flags |= FTD_MSG;
+>> @@ -3515,6 +3516,7 @@ static int fd_locked_ioctl(struct block_device *bdev, blk_mode_t mode,
+>>   		return 0;
+>>   	case FDGETMAXERRS:
+>>   		outparam = &drive_params[drive].max_errors;
+>> +		return fd_copyout((void __user *)param, outparam, size);
+>>   		break;
+>>   	case FDSETMAXERRS:
+>>   		drive_params[drive].max_errors = inparam.max_errors;
+>> @@ -3522,6 +3524,7 @@ static int fd_locked_ioctl(struct block_device *bdev, blk_mode_t mode,
+>>   	case FDGETDRVTYP:
+>>   		outparam = drive_name(type, drive);
+>>   		SUPBOUND(size, strlen((const char *)outparam) + 1);
+>> +		return fd_copyout((void __user *)param, outparam, size);
+>>   		break;
+>>   	case FDSETDRVPRM:
+>>   		if (!valid_floppy_drive_params(inparam.dp.autodetect,
+>> @@ -3531,6 +3534,7 @@ static int fd_locked_ioctl(struct block_device *bdev, blk_mode_t mode,
+>>   		break;
+>>   	case FDGETDRVPRM:
+>>   		outparam = &drive_params[drive];
+>> +		return fd_copyout((void __user *)param, outparam, size);
+>>   		break;
+>>   	case FDPOLLDRVSTAT:
+>>   		if (lock_fdc(drive))
+>> @@ -3541,17 +3545,20 @@ static int fd_locked_ioctl(struct block_device *bdev, blk_mode_t mode,
+>>   		fallthrough;
+>>   	case FDGETDRVSTAT:
+>>   		outparam = &drive_state[drive];
+>> +		return fd_copyout((void __user *)param, outparam, size);
+>>   		break;
+>>   	case FDRESET:
+>>   		return user_reset_fdc(drive, (int)param, true);
+>>   	case FDGETFDCSTAT:
+>>   		outparam = &fdc_state[FDC(drive)];
+>> +		return fd_copyout((void __user *)param, outparam, size);
+>>   		break;
+>>   	case FDWERRORCLR:
+>>   		memset(&write_errors[drive], 0, sizeof(write_errors[drive]));
+>>   		return 0;
+>>   	case FDWERRORGET:
+>>   		outparam = &write_errors[drive];
+>> +		return fd_copyout((void __user *)param, outparam, size);
+>>   		break;
+>>   	case FDRAWCMD:
+>>   		return floppy_raw_cmd_ioctl(type, drive, cmd, (void __user *)param);
+>> @@ -3565,9 +3572,6 @@ static int fd_locked_ioctl(struct block_device *bdev, blk_mode_t mode,
+>>   		return -EINVAL;
+>>   	}
+>>   
+>> -	if (_IOC_DIR(cmd) & _IOC_READ)
+>> -		return fd_copyout((void __user *)param, outparam, size);
+>> -
+>>   	return 0;
+>>   }
+>>   
+> 
+> Thanks,
+> Denis
+
+Best regards,
+Purva Yeshi
+
+> 
 
