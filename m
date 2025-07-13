@@ -1,56 +1,56 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C3608836
-	for <linux-block@vger.kernel.org>; Sun, 13 Jul 2025 14:35:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C9FA8836
+	for <linux-block@vger.kernel.org>; Sun, 13 Jul 2025 14:35:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752417332; cv=none; b=BG2deN6km8t6UyLmIjtIysUWempnRMoMfbrA5r4nNwfv2d0DJOgqX1rxEUxW7pyn4u5UBTrlOOxXQ3AEWF1uuV6clRR7FCme+u3yzkVxLPW1Bkr0HMKAXjv29zfmp5ShYSGCTTm5AxUosLSX3X6uZqr4HVn5FikfVP1Uwez24BI=
+	t=1752417337; cv=none; b=LKOThaMLZ/z3dqsxn/fe9Ad0rCwnYUg9tWFRpEvcmrAsZA8zmRd9/S60NarNX8Z76OIkWTscyH9uUdH5A1jnX/PSAKN6L4uKWDOn7lwkWmjPFF3n/5nYqe3/tMXy1tr9qYhRSu7EMYgs0PWJpaQSE2thqUjRHU9QrwiNuDRm654=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752417332; c=relaxed/simple;
-	bh=HmXxlDO5YYi6sjQiyMtqATKiKXys+N3hqXNFk4ldjUY=;
+	s=arc-20240116; t=1752417337; c=relaxed/simple;
+	bh=0xnOJuqda7cPNycfeK6piOE4lj8B2/PWZjhE2f/j3Sw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Px/72YRAEpKoVL63YU3wZbjIj+r3UIzNkgTSmB0p+E75KhpeKaDXJCwkq9PxxahzvDsxXNOjTNqdtXq5HBmV2SR5Tuc52bnYXHWDLxbbyOaK6hTO6aqddWOIrpTUbE0K+OP3mVGqgYOEoF5g9T6BU3Cl8Tj0zBB0FnjHUWJiRjs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AzwIdyFS; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=f9nAyYXEbS/GvD+2VmYEBeRRW+VlUHZcHrOA3X3Gu9wy9TV7N/iV9iiEU5tRzlvsGosQvT+iSpKTTdC6b7HDQyc/KhKoM28tOGwdmlBr01GJTCXKuWDhgu/Rm+WKxfUbz9EYUXPOyV7u+AWJRnOFxjK+F2dyJSTMrt/Sgzakx+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Q7+rB2XF; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AzwIdyFS"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q7+rB2XF"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752417329;
+	s=mimecast20190719; t=1752417335;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=iGYjyZD0trjEzKBmYpBpRWlxfGLDJ5UAtcdW3zaJXNY=;
-	b=AzwIdyFS6NFxbkRJ8IK4wkgxrBMVW0C3vj1lWdsv+OnBcBxiSsZCw4z//Npmd8LwvEcG4a
-	+PW4NKZNZVu1B3ruKPKye7x69frAHNVg36a/h/Pr9hnTJ7wmJ9vge7KifIpReTkfrWIheN
-	EYVamIfmcS0tF6Or2CF9Nk3nqwnhuGk=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+	bh=4CJtTCY3I0VAs+W9hACNFAI+04BsW+QJkhTkHZNCHZ4=;
+	b=Q7+rB2XF8g60Ny+/k5KAdiFkErbGwEiWXIe5v8u2T4fG8gL4jorSdk1AAp0KXY1Zq2H9Y2
+	GC6qi5tyf5xAAoEH66tfIBSA2BfVwlpMN5MgxbrBpdNQvCHLnApuRsQs6liHFZN24UYIoP
+	9PDhxm4oJ/uzQvbCBYNskLmaqQwg7tc=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-529-ZbH5A6AmNOaeI42SPm1Jkg-1; Sun,
- 13 Jul 2025 10:35:24 -0400
-X-MC-Unique: ZbH5A6AmNOaeI42SPm1Jkg-1
-X-Mimecast-MFC-AGG-ID: ZbH5A6AmNOaeI42SPm1Jkg_1752417323
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-126-pLquiUpENFWBiWlFrBxEYw-1; Sun,
+ 13 Jul 2025 10:35:32 -0400
+X-MC-Unique: pLquiUpENFWBiWlFrBxEYw-1
+X-Mimecast-MFC-AGG-ID: pLquiUpENFWBiWlFrBxEYw_1752417331
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 91AE81956080;
-	Sun, 13 Jul 2025 14:35:23 +0000 (UTC)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C3792180028B;
+	Sun, 13 Jul 2025 14:35:31 +0000 (UTC)
 Received: from localhost (unknown [10.72.116.36])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 5B9DB19560A7;
-	Sun, 13 Jul 2025 14:35:22 +0000 (UTC)
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id AA1D019560A3;
+	Sun, 13 Jul 2025 14:35:30 +0000 (UTC)
 From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org
 Cc: Uday Shankar <ushankar@purestorage.com>,
 	Caleb Sander Mateos <csander@purestorage.com>,
 	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V3 11/17] selftests: ublk: remove `tag` parameter of ->tgt_io_done()
-Date: Sun, 13 Jul 2025 22:34:06 +0800
-Message-ID: <20250713143415.2857561-12-ming.lei@redhat.com>
+Subject: [PATCH V3 13/17] selftests: ublk: pass 'ublk_thread *' to more common helpers
+Date: Sun, 13 Jul 2025 22:34:08 +0800
+Message-ID: <20250713143415.2857561-14-ming.lei@redhat.com>
 In-Reply-To: <20250713143415.2857561-1-ming.lei@redhat.com>
 References: <20250713143415.2857561-1-ming.lei@redhat.com>
 Precedence: bulk
@@ -60,122 +60,239 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-The `tag` parameter can be figured out from cqe->user_data, and that is
-also the only way to get the info, so remove `tag` parameter, and
-let target code retrieve it from cqe->user_data.
+Pass 'ublk_thread *' to more common helpers, then we can avoid to store
+this reference into 'struct ublk_io'.
+
+Prepare for supporting to handle IO via different task context.
 
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- tools/testing/selftests/ublk/fault_inject.c | 3 ++-
- tools/testing/selftests/ublk/file_backed.c  | 3 ++-
- tools/testing/selftests/ublk/kublk.c        | 4 +---
- tools/testing/selftests/ublk/kublk.h        | 3 +--
- tools/testing/selftests/ublk/null.c         | 3 ++-
- tools/testing/selftests/ublk/stripe.c       | 3 ++-
- 6 files changed, 10 insertions(+), 9 deletions(-)
+ tools/testing/selftests/ublk/fault_inject.c |  6 +++---
+ tools/testing/selftests/ublk/file_backed.c  |  6 +++---
+ tools/testing/selftests/ublk/kublk.c        | 11 ++++-------
+ tools/testing/selftests/ublk/kublk.h        | 20 +++++++++++---------
+ tools/testing/selftests/ublk/null.c         |  8 ++++----
+ tools/testing/selftests/ublk/stripe.c       |  6 +++---
+ 6 files changed, 28 insertions(+), 29 deletions(-)
 
 diff --git a/tools/testing/selftests/ublk/fault_inject.c b/tools/testing/selftests/ublk/fault_inject.c
-index 6e60f7d97125..c980958ec045 100644
+index b4e9355e0eab..b227bd78b252 100644
 --- a/tools/testing/selftests/ublk/fault_inject.c
 +++ b/tools/testing/selftests/ublk/fault_inject.c
-@@ -55,9 +55,10 @@ static int ublk_fault_inject_queue_io(struct ublk_queue *q, int tag)
+@@ -51,7 +51,7 @@ static int ublk_fault_inject_queue_io(struct ublk_thread *t,
+ 	io_uring_prep_timeout(sqe, &ts, 1, 0);
+ 	sqe->user_data = build_user_data(tag, ublksrv_get_op(iod), 0, q->q_id, 1);
+ 
+-	ublk_queued_tgt_io(q, tag, 1);
++	ublk_queued_tgt_io(t, q, tag, 1);
+ 
  	return 0;
  }
- 
--static void ublk_fault_inject_tgt_io_done(struct ublk_queue *q, int tag,
-+static void ublk_fault_inject_tgt_io_done(struct ublk_queue *q,
- 					  const struct io_uring_cqe *cqe)
- {
-+	unsigned tag = user_data_to_tag(cqe->user_data);
- 	const struct ublksrv_io_desc *iod = ublk_get_iod(q, tag);
- 
+@@ -66,8 +66,8 @@ static void ublk_fault_inject_tgt_io_done(struct ublk_thread *t,
  	if (cqe->res != -ETIME)
+ 		ublk_err("%s: unexpected cqe res %d\n", __func__, cqe->res);
+ 
+-	if (ublk_completed_tgt_io(q, tag))
+-		ublk_complete_io(q, tag, iod->nr_sectors << 9);
++	if (ublk_completed_tgt_io(t, q, tag))
++		ublk_complete_io(t, q, tag, iod->nr_sectors << 9);
+ 	else
+ 		ublk_err("%s: io not complete after 1 cqe\n", __func__);
+ }
 diff --git a/tools/testing/selftests/ublk/file_backed.c b/tools/testing/selftests/ublk/file_backed.c
-index cfa59b631693..02fb8a411d3b 100644
+index eeac7af2230f..2d93ac860bd5 100644
 --- a/tools/testing/selftests/ublk/file_backed.c
 +++ b/tools/testing/selftests/ublk/file_backed.c
-@@ -108,9 +108,10 @@ static int ublk_loop_queue_io(struct ublk_queue *q, int tag)
+@@ -107,7 +107,7 @@ static int ublk_loop_queue_io(struct ublk_thread *t, struct ublk_queue *q,
+ {
+ 	int queued = loop_queue_tgt_io(t, q, tag);
+ 
+-	ublk_queued_tgt_io(q, tag, queued);
++	ublk_queued_tgt_io(t, q, tag, queued);
  	return 0;
  }
  
--static void ublk_loop_io_done(struct ublk_queue *q, int tag,
-+static void ublk_loop_io_done(struct ublk_queue *q,
- 		const struct io_uring_cqe *cqe)
- {
-+	unsigned tag = user_data_to_tag(cqe->user_data);
- 	unsigned op = user_data_to_op(cqe->user_data);
- 	struct ublk_io *io = ublk_get_io(q, tag);
+@@ -130,8 +130,8 @@ static void ublk_loop_io_done(struct ublk_thread *t, struct ublk_queue *q,
+ 	if (op == ublk_cmd_op_nr(UBLK_U_IO_REGISTER_IO_BUF))
+ 		io->tgt_ios += 1;
  
+-	if (ublk_completed_tgt_io(q, tag))
+-		ublk_complete_io(q, tag, io->result);
++	if (ublk_completed_tgt_io(t, q, tag))
++		ublk_complete_io(t, q, tag, io->result);
+ }
+ 
+ static int ublk_loop_tgt_init(const struct dev_ctx *ctx, struct ublk_dev *dev)
 diff --git a/tools/testing/selftests/ublk/kublk.c b/tools/testing/selftests/ublk/kublk.c
-index e2d2042810d4..fba4e80e9bab 100644
+index 180b6da08eab..944e0806ba05 100644
 --- a/tools/testing/selftests/ublk/kublk.c
 +++ b/tools/testing/selftests/ublk/kublk.c
-@@ -717,8 +717,6 @@ static int ublk_thread_is_done(struct ublk_thread *t)
- static inline void ublksrv_handle_tgt_cqe(struct ublk_queue *q,
- 		struct io_uring_cqe *cqe)
- {
--	unsigned tag = user_data_to_tag(cqe->user_data);
--
- 	if (cqe->res < 0 && cqe->res != -EAGAIN)
- 		ublk_err("%s: failed tgt io: res %d qid %u tag %u, cmd_op %u\n",
- 			__func__, cqe->res, q->q_id,
-@@ -726,7 +724,7 @@ static inline void ublksrv_handle_tgt_cqe(struct ublk_queue *q,
- 			user_data_to_op(cqe->user_data));
- 
- 	if (q->tgt_ops->tgt_io_done)
--		q->tgt_ops->tgt_io_done(q, tag, cqe);
-+		q->tgt_ops->tgt_io_done(q, cqe);
+@@ -589,9 +589,8 @@ static void ublk_set_auto_buf_reg(const struct ublk_queue *q,
+ 	sqe->addr = ublk_auto_buf_reg_to_sqe_addr(&buf);
  }
  
- static void ublk_handle_cqe(struct ublk_thread *t,
+-int ublk_queue_io_cmd(struct ublk_io *io)
++int ublk_queue_io_cmd(struct ublk_thread *t, struct ublk_io *io)
+ {
+-	struct ublk_thread *t = io->t;
+ 	struct ublk_queue *q = ublk_io_to_queue(io);
+ 	struct ublksrv_io_cmd *cmd;
+ 	struct io_uring_sqe *sqe[1];
+@@ -685,9 +684,8 @@ static void ublk_submit_fetch_commands(struct ublk_thread *t)
+ 			int tag = i % dinfo->queue_depth;
+ 			q = &t->dev->q[q_id];
+ 			io = &q->ios[tag];
+-			io->t = t;
+ 			io->buf_index = j++;
+-			ublk_queue_io_cmd(io);
++			ublk_queue_io_cmd(t, io);
+ 		}
+ 	} else {
+ 		/*
+@@ -697,9 +695,8 @@ static void ublk_submit_fetch_commands(struct ublk_thread *t)
+ 		struct ublk_queue *q = &t->dev->q[t->idx];
+ 		for (i = 0; i < q->q_depth; i++) {
+ 			io = &q->ios[i];
+-			io->t = t;
+ 			io->buf_index = i;
+-			ublk_queue_io_cmd(io);
++			ublk_queue_io_cmd(t, io);
+ 		}
+ 	}
+ }
+@@ -770,7 +767,7 @@ static void ublk_handle_cqe(struct ublk_thread *t,
+ 			q->tgt_ops->queue_io(t, q, tag);
+ 	} else if (cqe->res == UBLK_IO_RES_NEED_GET_DATA) {
+ 		io->flags |= UBLKSRV_NEED_GET_DATA | UBLKSRV_IO_FREE;
+-		ublk_queue_io_cmd(io);
++		ublk_queue_io_cmd(t, io);
+ 	} else {
+ 		/*
+ 		 * COMMIT_REQ will be completed immediately since no fetching
 diff --git a/tools/testing/selftests/ublk/kublk.h b/tools/testing/selftests/ublk/kublk.h
-index 6be601536b3d..d7b711e63822 100644
+index 91e0286c5ca6..a4049984b055 100644
 --- a/tools/testing/selftests/ublk/kublk.h
 +++ b/tools/testing/selftests/ublk/kublk.h
-@@ -145,8 +145,7 @@ struct ublk_tgt_ops {
- 	void (*deinit_tgt)(struct ublk_dev *);
+@@ -136,7 +136,6 @@ struct ublk_io {
+ 	unsigned short buf_index;
+ 	unsigned short tgt_ios;
+ 	void *private_data;
+-	struct ublk_thread *t;
+ };
  
- 	int (*queue_io)(struct ublk_queue *, int tag);
--	void (*tgt_io_done)(struct ublk_queue *,
--			int tag, const struct io_uring_cqe *);
-+	void (*tgt_io_done)(struct ublk_queue *, const struct io_uring_cqe *);
+ struct ublk_tgt_ops {
+@@ -232,7 +231,7 @@ struct ublk_dev {
  
- 	/*
- 	 * Target specific command line handling
-diff --git a/tools/testing/selftests/ublk/null.c b/tools/testing/selftests/ublk/null.c
-index afe0b99d77ee..ea3da53437e9 100644
---- a/tools/testing/selftests/ublk/null.c
-+++ b/tools/testing/selftests/ublk/null.c
-@@ -87,9 +87,10 @@ static int null_queue_auto_zc_io(struct ublk_queue *q, int tag)
- 	return 1;
+ 
+ extern unsigned int ublk_dbg_mask;
+-extern int ublk_queue_io_cmd(struct ublk_io *io);
++extern int ublk_queue_io_cmd(struct ublk_thread *t, struct ublk_io *io);
+ 
+ 
+ static inline int ublk_io_auto_zc_fallback(const struct ublksrv_io_desc *iod)
+@@ -402,33 +401,36 @@ static inline struct ublk_io *ublk_get_io(struct ublk_queue *q, unsigned tag)
+ 	return &q->ios[tag];
  }
  
--static void ublk_null_io_done(struct ublk_queue *q, int tag,
-+static void ublk_null_io_done(struct ublk_queue *q,
- 		const struct io_uring_cqe *cqe)
+-static inline int ublk_complete_io(struct ublk_queue *q, unsigned tag, int res)
++static inline int ublk_complete_io(struct ublk_thread *t, struct ublk_queue *q,
++				   unsigned tag, int res)
  {
-+	unsigned tag = user_data_to_tag(cqe->user_data);
- 	unsigned op = user_data_to_op(cqe->user_data);
+ 	struct ublk_io *io = &q->ios[tag];
+ 
+ 	ublk_mark_io_done(io, res);
+ 
+-	return ublk_queue_io_cmd(io);
++	return ublk_queue_io_cmd(t, io);
+ }
+ 
+-static inline void ublk_queued_tgt_io(struct ublk_queue *q, unsigned tag, int queued)
++static inline void ublk_queued_tgt_io(struct ublk_thread *t, struct ublk_queue *q,
++				      unsigned tag, int queued)
+ {
+ 	if (queued < 0)
+-		ublk_complete_io(q, tag, queued);
++		ublk_complete_io(t, q, tag, queued);
+ 	else {
+ 		struct ublk_io *io = ublk_get_io(q, tag);
+ 
+-		io->t->io_inflight += queued;
++		t->io_inflight += queued;
+ 		io->tgt_ios = queued;
+ 		io->result = 0;
+ 	}
+ }
+ 
+-static inline int ublk_completed_tgt_io(struct ublk_queue *q, unsigned tag)
++static inline int ublk_completed_tgt_io(struct ublk_thread *t,
++					struct ublk_queue *q, unsigned tag)
+ {
  	struct ublk_io *io = ublk_get_io(q, tag);
  
-diff --git a/tools/testing/selftests/ublk/stripe.c b/tools/testing/selftests/ublk/stripe.c
-index 37d50bbf5f5e..53cefffaf32e 100644
---- a/tools/testing/selftests/ublk/stripe.c
-+++ b/tools/testing/selftests/ublk/stripe.c
-@@ -226,9 +226,10 @@ static int ublk_stripe_queue_io(struct ublk_queue *q, int tag)
+-	io->t->io_inflight--;
++	t->io_inflight--;
+ 
+ 	return --io->tgt_ios == 0;
+ }
+diff --git a/tools/testing/selftests/ublk/null.c b/tools/testing/selftests/ublk/null.c
+index e29a005fc1cc..452dcc369c8b 100644
+--- a/tools/testing/selftests/ublk/null.c
++++ b/tools/testing/selftests/ublk/null.c
+@@ -108,8 +108,8 @@ static void ublk_null_io_done(struct ublk_thread *t, struct ublk_queue *q,
+ 	if (op == ublk_cmd_op_nr(UBLK_U_IO_REGISTER_IO_BUF))
+ 		io->tgt_ios += 1;
+ 
+-	if (ublk_completed_tgt_io(q, tag))
+-		ublk_complete_io(q, tag, io->result);
++	if (ublk_completed_tgt_io(t, q, tag))
++		ublk_complete_io(t, q, tag, io->result);
+ }
+ 
+ static int ublk_null_queue_io(struct ublk_thread *t, struct ublk_queue *q,
+@@ -125,10 +125,10 @@ static int ublk_null_queue_io(struct ublk_thread *t, struct ublk_queue *q,
+ 	else if (zc)
+ 		queued = null_queue_zc_io(t, q, tag);
+ 	else {
+-		ublk_complete_io(q, tag, iod->nr_sectors << 9);
++		ublk_complete_io(t, q, tag, iod->nr_sectors << 9);
+ 		return 0;
+ 	}
+-	ublk_queued_tgt_io(q, tag, queued);
++	ublk_queued_tgt_io(t, q, tag, queued);
  	return 0;
  }
  
--static void ublk_stripe_io_done(struct ublk_queue *q, int tag,
-+static void ublk_stripe_io_done(struct ublk_queue *q,
- 		const struct io_uring_cqe *cqe)
+diff --git a/tools/testing/selftests/ublk/stripe.c b/tools/testing/selftests/ublk/stripe.c
+index 462fab7492ce..1fb9b7cc281b 100644
+--- a/tools/testing/selftests/ublk/stripe.c
++++ b/tools/testing/selftests/ublk/stripe.c
+@@ -226,7 +226,7 @@ static int ublk_stripe_queue_io(struct ublk_thread *t, struct ublk_queue *q,
  {
-+	unsigned tag = user_data_to_tag(cqe->user_data);
- 	const struct ublksrv_io_desc *iod = ublk_get_iod(q, tag);
- 	unsigned op = user_data_to_op(cqe->user_data);
- 	struct ublk_io *io = ublk_get_io(q, tag);
+ 	int queued = stripe_queue_tgt_io(t, q, tag);
+ 
+-	ublk_queued_tgt_io(q, tag, queued);
++	ublk_queued_tgt_io(t, q, tag, queued);
+ 	return 0;
+ }
+ 
+@@ -262,13 +262,13 @@ static void ublk_stripe_io_done(struct ublk_thread *t, struct ublk_queue *q,
+ 		}
+ 	}
+ 
+-	if (ublk_completed_tgt_io(q, tag)) {
++	if (ublk_completed_tgt_io(t, q, tag)) {
+ 		int res = io->result;
+ 
+ 		if (!res)
+ 			res = iod->nr_sectors << 9;
+ 
+-		ublk_complete_io(q, tag, res);
++		ublk_complete_io(t, q, tag, res);
+ 
+ 		free_stripe_array(io->private_data);
+ 		io->private_data = NULL;
 -- 
 2.47.0
 
