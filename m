@@ -1,77 +1,136 @@
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52A1E54654
-	for <linux-block@vger.kernel.org>; Sun, 13 Jul 2025 12:20:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCEC3247DF9
+	for <linux-block@vger.kernel.org>; Sun, 13 Jul 2025 14:13:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752409206; cv=none; b=FaTZNFfHMaF4lRRQfkFP5hrYJuiTLCWV7Sy2HRvL1wz2hxTxylUKGNk+YuN1YAks30EWQqx5CXUCdEtw4QoPN3qgLduI7p3QvBWVjOhTIkwV/VjazxUEzsljM4IuVapPqY1dcgIhRsh3nxdOm1ZDr2o5pJ+kYk/fpK/1z0jO87Q=
+	t=1752416031; cv=none; b=MWVs0Ny9Z5jwxLt+nKRSDZk9Dp5ZXlGFsjjfQY4pO2HMbzZZxJxKhLxm3LQqRIZPIHuxRDFC0prC4ooFtpSi48Y+5YiMsXCj3ziSLT1d9cTu/w78kvXC2pNEGWXBd1uq+WU2giZuiCpM7Br5+Ghi+4hjOp2rWJV2ebJcOMHqKmo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752409206; c=relaxed/simple;
-	bh=4TLGo6GK4QSP+WPahMdSl6hUqJJNrHr+VZrospIkjj0=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=mlMxtqqaQfT++hlZAyNJ31gXlilGRu+6OekgPbxVz+B/xNsro0aQrK1OfE1yE5dn/VtNe2HE/6HKPLsavE0H2xX2vf9/pa6GJiDaFvoKEPyByev4iN+7n2Px0FCAPi9jYCP6utJix9wZCoYxxhZY/WGCdnPFs/f12Ks+6TuoVQ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3e05997f731so82348155ab.3
-        for <linux-block@vger.kernel.org>; Sun, 13 Jul 2025 05:20:05 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752409204; x=1753014004;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GHfZZYwlltX3cnWzSRwgx2BtUxjdDvi1oy+Wb8i2L5c=;
-        b=mrUSujfaWUw/1t9fTjTwwG1m2YSxhVNOIz8Jek5Hic1KgEWUq0cxKCHe/qYjBamizY
-         tx2XJqNpGLuW80df7r6cWmHqPaMxqCQv1NJwPOEldRXV1tXx2nuhf2T1xjnl8cQ61XNF
-         YhxQHNpNPR6SMuKHduV0tJJig+jI7rKWoc1OfaL6LK7si6ibCbpMy0HQvIs20E+KrDuZ
-         ISps1okmOs/zeUW1Dyub9dmCQaq7VeR5ekYcMpbPqnvrZF1R5uRJtwGG36FaReTdmBKH
-         K7hJjW1Cc9pce5EH6tQv37tcLJpcr4m8tHEZqhFt3g046ZWFatZtPZu3ix5Th3dpFynQ
-         pMjA==
-X-Forwarded-Encrypted: i=1; AJvYcCUBidubjt0+q+qBaJ8WIW+06C9HbsFhto0mODmi9edvyyy950qjkpXPHzcFNfpxUheKV/A8xLrNL5ZgAQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwidjlRK6r4YTYA3+C5fa7wQ/DZpE31ijTuZYpLnengOaf5lEY2
-	SDAe8fEhWdFLVC/GEB88cPIa9I03Hasllk1jKaoF8XcrfTfUnwaWZjWjVgQ+N0BBG4apfle2VLS
-	dubK+x0l9+pEjvSza/Yue3kOcdaf3fZMYMpmsgr6Xax38FF1nuAxX2dGjeJk=
-X-Google-Smtp-Source: AGHT+IF2Exx2IUNfv7fdIrV5sTW8rBytOis0b7TGzJm4zo9XvFCq3New/6Dkvq4Mr7o0fywQcedS34O/GhHp43TJvQ62c0w91YUL
+	s=arc-20240116; t=1752416031; c=relaxed/simple;
+	bh=IsyHVr+oNPWhKs37WYyOsu5eYAFphhoa7rLwLZOjktk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XFEPBbSX2RwhjMoyJAz5syFfgB+ZVI/0Yk3iKmQGanSmBVfYqmZlyVVgpZmhqBEep38q+axvicAJK/CVRfZ2iLxVFNbqWWjkJjS/3rnmf3T1QYdAQHJD00upHntNo1pZlyBKRre1N2cggthAGE7OmoTP1KjJm44CiQ62gqoP2hc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dA4nkU5y; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dA4nkU5y"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1752416027;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1/KY95ixncqz5SSiiUhsPqSzMiJxbxFR9F4vzB4sWlA=;
+	b=dA4nkU5yTln8eUoPts8q4Fc6b5UV3FB+UjEb/k4F6grpd587FQm/9YFQw44Msi/e39kAAm
+	kjBksp7uJoUL+7aDOoMu9o+q4PP9EWvcBQhUiyJ/uJpdAbO1Q6a0Q107kW9JH8Q/Hpi3/4
+	cBVveABZbgS2wJzZXYtz7S1WDMoPpvM=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-543-O7qkJHF7Ph-Zc50J6EbNcA-1; Sun,
+ 13 Jul 2025 10:13:44 -0400
+X-MC-Unique: O7qkJHF7Ph-Zc50J6EbNcA-1
+X-Mimecast-MFC-AGG-ID: O7qkJHF7Ph-Zc50J6EbNcA_1752416023
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CAA5C18001D6;
+	Sun, 13 Jul 2025 14:13:42 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.36])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B7AAC30001A1;
+	Sun, 13 Jul 2025 14:13:36 +0000 (UTC)
+Date: Sun, 13 Jul 2025 22:13:24 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Caleb Sander Mateos <csander@purestorage.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Uday Shankar <ushankar@purestorage.com>
+Subject: Re: [PATCH 07/16] ublk: add helper ublk_check_fetch_buf()
+Message-ID: <aHO_BLnBB9RAalrO@fedora>
+References: <20250702040344.1544077-1-ming.lei@redhat.com>
+ <20250702040344.1544077-8-ming.lei@redhat.com>
+ <CADUfDZrY0H4w1PNjGiSvE0jr4dGu=UjC3nq+6ejze7kut22KLw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:3b85:b0:3df:399d:39c9 with SMTP id
- e9e14a558f8ab-3e2542e803amr113121025ab.2.1752409203286; Sun, 13 Jul 2025
- 05:20:03 -0700 (PDT)
-Date: Sun, 13 Jul 2025 05:20:03 -0700
-In-Reply-To: <6743b30d.050a0220.1cc393.004e.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6873a473.a70a0220.3b380f.0031.GAE@google.com>
-Subject: Re: [syzbot] [block?] possible deadlock in blk_mq_update_nr_hw_queues
-From: syzbot <syzbot+6279b273d888c2017726@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, hch@lst.de, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, ming.lei@redhat.com, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CADUfDZrY0H4w1PNjGiSvE0jr4dGu=UjC3nq+6ejze7kut22KLw@mail.gmail.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-syzbot has bisected this issue to:
+On Tue, Jul 08, 2025 at 08:31:05AM -0400, Caleb Sander Mateos wrote:
+> On Wed, Jul 2, 2025 at 12:04 AM Ming Lei <ming.lei@redhat.com> wrote:
+> >
+> > Add helper ublk_check_fetch_buf() for checking buffer only.
+> >
+> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> 
+> The commit message seems a bit sparse. How about something like:
+> Add a helper ublk_check_fetch_buf() to validate UBLK_IO_FETCH_REQ's
+> addr. This doesn't require access to the ublk_io, so it can be done
+> before taking the ublk_device mutex.
 
-commit f1be1788a32e8fa63416ad4518bbd1a85a825c9d
-Author: Ming Lei <ming.lei@redhat.com>
-Date:   Fri Oct 25 00:37:20 2024 +0000
+OK, looks much better.
 
-    block: model freeze & enter queue as lock for supporting lockdep
+> 
+> > ---
+> >  drivers/block/ublk_drv.c | 32 +++++++++++++++++++-------------
+> >  1 file changed, 19 insertions(+), 13 deletions(-)
+> >
+> > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> > index 6d3aa08eef22..7fd2fa493d6a 100644
+> > --- a/drivers/block/ublk_drv.c
+> > +++ b/drivers/block/ublk_drv.c
+> > @@ -2146,6 +2146,22 @@ static int ublk_unregister_io_buf(struct io_uring_cmd *cmd,
+> >         return io_buffer_unregister_bvec(cmd, index, issue_flags);
+> >  }
+> >
+> > +static int ublk_check_fetch_buf(const struct ublk_queue *ubq, __u64 buf_addr)
+> > +{
+> > +       if (ublk_need_map_io(ubq)) {
+> > +               /*
+> > +                * FETCH_RQ has to provide IO buffer if NEED GET
+> > +                * DATA is not enabled
+> > +                */
+> > +               if (!buf_addr && !ublk_need_get_data(ubq))
+> > +                       return -EINVAL;
+> > +       } else if (buf_addr) {
+> > +               /* User copy requires addr to be unset */
+> > +               return -EINVAL;
+> > +       }
+> > +       return 0;
+> > +}
+> > +
+> >  static int ublk_fetch(struct io_uring_cmd *cmd, struct ublk_queue *ubq,
+> >                       struct ublk_io *io, __u64 buf_addr)
+> >  {
+> > @@ -2172,19 +2188,6 @@ static int ublk_fetch(struct io_uring_cmd *cmd, struct ublk_queue *ubq,
+> >
+> >         WARN_ON_ONCE(io->flags & UBLK_IO_FLAG_OWNED_BY_SRV);
+> >
+> > -       if (ublk_need_map_io(ubq)) {
+> > -               /*
+> > -                * FETCH_RQ has to provide IO buffer if NEED GET
+> > -                * DATA is not enabled
+> > -                */
+> > -               if (!buf_addr && !ublk_need_get_data(ubq))
+> > -                       goto out;
+> 
+> Was it a bug that this didn't set ret = -EINVAL before jumping to out?
+> Looks like ublk_fetch() would incorrectly skip initializing the
+> ublk_io and return 0 in this case. So probably this needs a Fixes tag.
+> Looks like the bug was introduced by the code movement in b69b8edfb27d
+> ("ublk: properly serialize all FETCH_REQs").
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=14ea5d82580000
-start commit:   a52f9f0d77f2 Merge tag 'batadv-next-pullrequest-20250710' ..
-git tree:       net-next
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=16ea5d82580000
-console output: https://syzkaller.appspot.com/x/log.txt?x=12ea5d82580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=f8235fb7e74dd7f6
-dashboard link: https://syzkaller.appspot.com/bug?extid=6279b273d888c2017726
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14321d82580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=179590f0580000
+Good catch!
 
-Reported-by: syzbot+6279b273d888c2017726@syzkaller.appspotmail.com
-Fixes: f1be1788a32e ("block: model freeze & enter queue as lock for supporting lockdep")
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+Thanks, 
+Ming
+
