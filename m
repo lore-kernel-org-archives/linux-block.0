@@ -1,114 +1,144 @@
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DEB42E370F
-	for <linux-block@vger.kernel.org>; Mon, 14 Jul 2025 20:53:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D210E13D521;
+	Mon, 14 Jul 2025 21:09:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752526415; cv=none; b=O94fq0Ui0nzpUHi+OPPDz7PpQ0OW2bvwyfDN5Y0tHp7OYCpReHgF4eImMB62tbrzjMIxcXv7oAYiurmxT5yGmo7NHN8ga82yIvNMHMgDwQEhY7pJufj+Cu6vPKwhaRR+KVdmVj/OSmoyzlgQsbYnpVURjlHIiDOi+LJE5/Hg+AM=
+	t=1752527362; cv=none; b=P6hmEzpQds+uWVuyiYQ/nqq2arsm1N8M0O8JDkRSOtNJBjUD87m8IUgc/2leyNWcSnw1xc/Ab/pSwAyWcF1x94PAW1BOFfSSonQ6ZX+B6xqEDTJAT6b/Hxukl3ocWdM6xDPcOQNE6tHSOE9a2gvglWKHa7jJ5rPuDi/foN4F61w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752526415; c=relaxed/simple;
-	bh=tawgDwkEVojw2NKv3CCTeFgxnOZvyRkv0Ij9fIpT1q8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uW+DkSwBhohAWtjAcE2FGb96Ikbhm46ZGnyhvS6dbc4tauAViT7ByPscRLh1jQGoURNE8QL5g2OYGGk/rovHJCx2BcUeuBv9Upowp8W23jWkUAbekUXpZ01vK67lwh1fqt4X5MVwgb+fO9SoAs/+5Y7M1TF+7SuyzntvsoXWIFY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com; spf=pass smtp.mailfrom=fromorbit.com; dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b=WVcUu3Ec; arc=none smtp.client-ip=209.85.210.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fromorbit.com
+	s=arc-20240116; t=1752527362; c=relaxed/simple;
+	bh=pp7EZJHNhKgZVRNgGdA+nKTDA2ZEIWR5JbdJfIvQgqk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Yrodm6r/2bES8u+ddEiewxATV1cbM3/NbU9jHQA/2nsgcGeLdYpaFEc7fVjL9EGAeJ03eaFlV9PMaNDcAqbtrvyaolkWjhp5HotUiDvpkBxfeK0lp2Rrg5jxN79Xa1IoYFWZB9Y0cSgQ1ESa1GQ933QkPRrX+qBpGDTc8ZdlsjI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=giyJ68Je; arc=none smtp.client-ip=209.85.208.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b="WVcUu3Ec"
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-73972a54919so4312503b3a.3
-        for <linux-block@vger.kernel.org>; Mon, 14 Jul 2025 13:53:34 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="giyJ68Je"
+Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-32b5226e6beso41368691fa.2;
+        Mon, 14 Jul 2025 14:09:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1752526413; x=1753131213; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=5cPjSq9x4JfK6ES05iG56c2eRWJnFpbKNKAZhIdXJx4=;
-        b=WVcUu3EcyUWDMr4Db3o/k3d1rGqBToLoC4m6y7TOnYgaQF6NVsoW4Qz1hJFxqVy/rb
-         yvdvB03zGshWUydtQl9Ki5USN8M3JvnCiRk4CcgPUUez8WYwn0P7dbK0l4Hh1kWZN41k
-         PY8OQjJbpphLNFzraemZ3WHnLqXoxZzvOPGRm11OWCLmq0hngEuvVQWZUTMx3h9MGkPp
-         rtlXoS3MNwRzraFe7JqspyFbBI1XFkWRnkDAhEvzTxblL35OJxF5WRuo/XVkFV8v2KMW
-         FRNYxf114pSiL+L60F/xcUneJewAOmZueur0anMFLWpMh8skgjCWAD0enfSDvYnC68nq
-         k5dg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752526413; x=1753131213;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1752527359; x=1753132159; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=5cPjSq9x4JfK6ES05iG56c2eRWJnFpbKNKAZhIdXJx4=;
-        b=o/FEx9l95EXuuP/N9VqxRmAPPNr4pmcYTsv297QsKPDhU8ObuSMsb8pOVAVIZboFxi
-         soaS2SAuHcqkl7yBKZDVGFLcuU+3WGpmhF0mpBDIWOyF8V/KhSb8wJ+ozfof6fjpLQ6v
-         tBxrUjEMcihB1/ve+y2IZ3TNKkF8bQAfRoTH3pz03unQGUST53eT1VordQBFhSW8PPNs
-         Q8MhtlXNpcfp6iJGcz7lswD3DPOEMHBfDyz8VYNnuYCL4Jp5LV7+4usIQTn/AJaSzGuR
-         KYq/C/rMEzftSFs8dJ3MIfxozYaS8X4VFWBYccJrBLxgJDykIVCTco2VIzZ8Et6eycfQ
-         WkMQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWYvVTi+DjaDVQwmR+LNx13O8rBOh0SX1t/BGVa4yZclxTsXKm/jlVE8qf26TxY/WO/QNg6cEYQPDfrAg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyJzguv6q7mrNYbeDgSa4Ed3X/Hf7ZUJyDsHPY13yhpg4QoOBbd
-	I7uaVwCvu89mspBNpw+kz/7uJlvEl29B+ssHUih0tB2N2JYleYw63uE6IU6MrE9zH3w=
-X-Gm-Gg: ASbGncsjuM3jiLCfFsmUx5evL92/mKrpf8OZ9zpjrjyQxAuumF+i7knAhbjqY0th5hZ
-	H5LNPnlUP+Ll5zg5d58PUnc/ZDY//NYAitNIJ08PM3uSU7nDsq351hq2mU6t/38/I3M1d1B3KJm
-	Z4IX1TVKrx3FRtIXWeUQGFicw7Djj3uZuR7haqmZwE+pGFoPQ30Cc527dq93gbEjfn/JzhczCsb
-	t03LE1BJtTmWJaKEYAU22vAjBWYVLtx2EKSpCgCYUDGZFmrRFTGAF54qK93P4aa1K/chExeeWGf
-	2U/NHZxsTd95Eb3GnYVbBcSw1SD11baLmeLws2BzwDspGl3rC9QmeEAMisFcNIN4olRjh/oaRLv
-	wJB2iJq1vKTSRXH+IXFKkW3uhkK6tQWwB4Y7rHsooTl0WTWUQ3Zs5kuuaZQlcBc8IqOrilPXKtw
-	==
-X-Google-Smtp-Source: AGHT+IHnv77H5wfprCmfDWdElJKQH3XAqXLK31tfmThyrslKpxVkW1UVIPHA5IdRfKXL32HPE3IWSA==
-X-Received: by 2002:a05:6300:40f:b0:232:1668:848d with SMTP id adf61e73a8af0-23216688519mr15759146637.27.1752526413510;
-        Mon, 14 Jul 2025 13:53:33 -0700 (PDT)
-Received: from dread.disaster.area (pa49-180-184-88.pa.nsw.optusnet.com.au. [49.180.184.88])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b3bbe7297bcsm10529816a12.73.2025.07.14.13.53.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Jul 2025 13:53:32 -0700 (PDT)
-Received: from dave by dread.disaster.area with local (Exim 4.98.2)
-	(envelope-from <david@fromorbit.com>)
-	id 1ubQAz-0000000B4D2-3tkT;
-	Tue, 15 Jul 2025 06:53:29 +1000
-Date: Tue, 15 Jul 2025 06:53:29 +1000
-From: Dave Chinner <david@fromorbit.com>
-To: Christoph Hellwig <hch@lst.de>
-Cc: John Garry <john.g.garry@oracle.com>,
-	"Darrick J. Wong" <djwong@kernel.org>,
-	linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-Subject: Re: Do we need an opt-in for file systems use of hw atomic writes?
-Message-ID: <aHVuSU3TB4eNRq8V@dread.disaster.area>
-References: <20250714131713.GA8742@lst.de>
+        bh=a2NGUJZIs6JXP/sAdJptIUUuAIdinFtA6zHN1UcDf48=;
+        b=giyJ68JeAIjFE3R1OsNHERrrF1kv4a/i4iIVcwZwJbH/vjZfEyDXWC8H8XG9lTBt51
+         akYCqGpkGqqnq5C85eUwf46/XVcVQQBmFzE6vXwr4ys+xRHuaWlVgNu8NVCBYq1tu1ZF
+         JEozwXi7YbpwvF5JX1rVjTeI25+E0jEKso/Nc3BW906bqAbagL9Dr6qcFLxrnzp5j/CM
+         jurUNWY6q2NGz/i5GePeNDgR/yDr8roWNcu6w6JMPtfod7k+b4Ua+nUDsNDyr7SGnHKJ
+         gB4tJSd3BTFTyNRvfWvtKSiqzkWPfVUr6zZRflzK9/ybMKz1NXfyb74x/7i92fO3bX9r
+         Vc0A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752527359; x=1753132159;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=a2NGUJZIs6JXP/sAdJptIUUuAIdinFtA6zHN1UcDf48=;
+        b=XrZ+xPbzd4OfnopCSOYN28IiGl3x14jJY6ypIHp1sI6ee7i1fGVm7mVgbQfpqyImQO
+         TiHRIuv2EZ98zpmscspz0tdeK46AQLdfRmdseclqYUdsm1tA/OvCvflc9vdWs5FuS7hY
+         jtPEKGzvka0W7boi7VEPROWAO9iNDhAoBgI+kgMga7q3t4nco0bcNLCjb4qe0ndeZ/ks
+         lnPMYAts/1E8peb2jKEAHv0wwaNMRwgUBe6H30bmUl5ScqJt5TnFB7oiT7m6I1yp2HwD
+         3Q7Li4lZ7+H140tXYeuz/rfRmOPZShMFuZSWWOmH1F3V7nEzI2VtxnzCjWrVUPIwuH+Y
+         zbtg==
+X-Forwarded-Encrypted: i=1; AJvYcCUPWti49PuUMZIwpwmXLvxIMtSEOpsWYKj1bRKXdxq2SLji3i9TnCJKLOSENtWqAhEF9C+nJQ33jhfZzg==@vger.kernel.org, AJvYcCV+lPWEr9aPYrSdNAc01p7voZ5X9VbqzNqm91wxXH3/rtueBJYy3qjtgNzzOx+JgEPVCc2W5K/NRC4xIJbFvkU=@vger.kernel.org, AJvYcCVuYgjYdbf3RjABhtNGmcLi0LzB8rVAjvOZmAzNibQOfG4pC91knFpEpnDQMSIHGVbdNPyNKP9r4kMBujvNWzX5@vger.kernel.org, AJvYcCXa0FKqi/kVtDA8z6o+fVmAaldCbkfePCHvNC0P/66NB1gunYOCzxN2iX5T2k+L0OukLzYIUX+U1V6OToNW@vger.kernel.org
+X-Gm-Message-State: AOJu0YxgOcCTSpV+/0iQg5ib/kAZl5rw4VmqsCyuDIg3gsyYg7o0K219
+	KFzlaUlFhnpBsWqFzF6VxDSV3I3YwuAWXguM2zz3agz3QqrVsPvJJVWDKMO0APAnQbDlopxBPJy
+	9Ebl0zgWEmujDClkmePTs4Gyaj00FvnYc7Ws6BxVuAQQo
+X-Gm-Gg: ASbGnct+ST05Gw974zmgdGLIUK4WbSK7gp2728dHX9I2/wMFjCLg/k7EjumG2PBkxva
+	jXu3mbFpjk7pD9FoIvbdXkIyr4sTlJKYxdo+hOjrMm13p8H+1SCRbnHz8rFQ9pxZ8L5x7ZquiNR
+	cD1ZHdjwn+VLnC0kxRoXaaCCiGOYtAqNFN/Bp9TAtk11ifTx3W7s9JEOp13r3w/QhYC9hNNJ9YK
+	17uSqrF77fCl3gNJ9bpzzaVQ+eNQAjaecpvHyyn1g==
+X-Google-Smtp-Source: AGHT+IFIVDCB7L/eB3uWUEMPtrD+l6c9ix8jySxxyANfqPuxUfbMymVsdKjgYjWTiEHRsDI7xj3AbxpdXdL0khzdR6c=
+X-Received: by 2002:a2e:a594:0:b0:32b:7284:7b with SMTP id 38308e7fff4ca-3305329b33emr52619951fa.6.1752527358610;
+ Mon, 14 Jul 2025 14:09:18 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250714131713.GA8742@lst.de>
+References: <20250709-core-cstr-fanout-1-v1-0-64308e7203fc@gmail.com> <20250709-core-cstr-fanout-1-v1-8-64308e7203fc@gmail.com>
+In-Reply-To: <20250709-core-cstr-fanout-1-v1-8-64308e7203fc@gmail.com>
+From: Tamir Duberstein <tamird@gmail.com>
+Date: Mon, 14 Jul 2025 17:08:42 -0400
+X-Gm-Features: Ac12FXyyrImsukAEONZO1t5G1kFxNsU4eIQFIToYW9Gkgy7rbvMrpAOfWyMPO9c
+Message-ID: <CAJ-ks9=ux6BuPYmRVSjhfn7kuagxPWicBZbumDFKAqmHKd8+PQ@mail.gmail.com>
+Subject: Re: [PATCH 8/9] rust: seq_file: use `kernel::{fmt,prelude::fmt!}`
+To: Danilo Krummrich <dakr@kernel.org>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
+	Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
+	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
+	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
+	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, Jens Axboe <axboe@kernel.dk>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
+	Brendan Higgins <brendan.higgins@linux.dev>, David Gow <davidgow@google.com>, 
+	Rae Moar <rmoar@google.com>
+Cc: nouveau@lists.freedesktop.org, dri-devel@lists.freedesktop.org, 
+	linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org, 
+	linux-block@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	kunit-dev@googlegroups.com, Christian Brauner <brauner@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jul 14, 2025 at 03:17:13PM +0200, Christoph Hellwig wrote:
-> Hi all,
-> 
-> I'm currently trying to sort out the nvme atomics limits mess, and
-> between that, the lack of a atomic write command in nvme, and the
-> overall degrading quality of cheap consumer nvme devices I'm starting
-> to free really uneasy about XFS using hardware atomics by default without
-> an explicit opt-in, as broken atomics implementations will lead to
-> really subtle data corruption.
-> 
-> Is is just me, or would it be a good idea to require an explicit
-> opt-in to user hardware atomics?
+On Wed, Jul 9, 2025 at 4:00=E2=80=AFPM Tamir Duberstein <tamird@gmail.com> =
+wrote:
+>
+> Reduce coupling to implementation details of the formatting machinery by
+> avoiding direct use for `core`'s formatting traits and macros.
+>
+> Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> Reviewed-by: Alice Ryhl <aliceryhl@google.com>
+> Signed-off-by: Tamir Duberstein <tamird@gmail.com>
 
-This isn't a filesystem question - this is a question about what
-features the block device should expose by default to the
-user/filesystem by default.
+Oops, forgot to include Christian Brauner. Christian, could you please
+take a look?
 
-Block device feature configuration is typically done at hotplug time
-with udev rules.  Require the user to add a custom udev rule for the
-block device to enable hardware atomics if you are concerned that
-hardware atomic writes are problematic.
+MAINTAINERS entry being added in
+https://lore.kernel.org/all/20250714124637.1905722-1-aliceryhl@google.com/.
+(Thanks Alice!)
 
-Once the user has opted in to having their bdev feature activated,
-then the filesystem should be able to detect and use it
-automatically.
-
--Dave.
--- 
-Dave Chinner
-david@fromorbit.com
+> ---
+>  rust/kernel/seq_file.rs | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+>
+> diff --git a/rust/kernel/seq_file.rs b/rust/kernel/seq_file.rs
+> index 8f199b1a3bb1..59fbfc2473f8 100644
+> --- a/rust/kernel/seq_file.rs
+> +++ b/rust/kernel/seq_file.rs
+> @@ -4,7 +4,7 @@
+>  //!
+>  //! C header: [`include/linux/seq_file.h`](srctree/include/linux/seq_fil=
+e.h)
+>
+> -use crate::{bindings, c_str, types::NotThreadSafe, types::Opaque};
+> +use crate::{bindings, c_str, fmt, types::NotThreadSafe, types::Opaque};
+>
+>  /// A utility for generating the contents of a seq file.
+>  #[repr(transparent)]
+> @@ -31,7 +31,7 @@ pub unsafe fn from_raw<'a>(ptr: *mut bindings::seq_file=
+) -> &'a SeqFile {
+>
+>      /// Used by the [`seq_print`] macro.
+>      #[inline]
+> -    pub fn call_printf(&self, args: core::fmt::Arguments<'_>) {
+> +    pub fn call_printf(&self, args: fmt::Arguments<'_>) {
+>          // SAFETY: Passing a void pointer to `Arguments` is valid for `%=
+pA`.
+>          unsafe {
+>              bindings::seq_printf(
+> @@ -47,7 +47,7 @@ pub fn call_printf(&self, args: core::fmt::Arguments<'_=
+>) {
+>  #[macro_export]
+>  macro_rules! seq_print {
+>      ($m:expr, $($arg:tt)+) =3D> (
+> -        $m.call_printf(format_args!($($arg)+))
+> +        $m.call_printf($crate::prelude::fmt!($($arg)+))
+>      );
+>  }
+>  pub use seq_print;
+>
+> --
+> 2.50.0
+>
