@@ -1,144 +1,78 @@
-Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 003.mia.mailroute.net (003.mia.mailroute.net [199.89.3.6])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D210E13D521;
-	Mon, 14 Jul 2025 21:09:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 440BB13D521
+	for <linux-block@vger.kernel.org>; Mon, 14 Jul 2025 21:33:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.6
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752527362; cv=none; b=P6hmEzpQds+uWVuyiYQ/nqq2arsm1N8M0O8JDkRSOtNJBjUD87m8IUgc/2leyNWcSnw1xc/Ab/pSwAyWcF1x94PAW1BOFfSSonQ6ZX+B6xqEDTJAT6b/Hxukl3ocWdM6xDPcOQNE6tHSOE9a2gvglWKHa7jJ5rPuDi/foN4F61w=
+	t=1752528787; cv=none; b=QBKQuZHsk99KrTVQxIpILgGeLk90I9ClIBRSJJvWsyHnYPfH4qW9+833TAh/EhPWdCTPdNb+PTJ/0z0ay2zSJyHiXXMLFTPbcVVVhTE+g2ZpINFi4S4wZJqFaSKnLYiCdLT72GYbtsTk+VZG2y8AsJMAfbypCktWyuyI/0dGeoY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752527362; c=relaxed/simple;
-	bh=pp7EZJHNhKgZVRNgGdA+nKTDA2ZEIWR5JbdJfIvQgqk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Yrodm6r/2bES8u+ddEiewxATV1cbM3/NbU9jHQA/2nsgcGeLdYpaFEc7fVjL9EGAeJ03eaFlV9PMaNDcAqbtrvyaolkWjhp5HotUiDvpkBxfeK0lp2Rrg5jxN79Xa1IoYFWZB9Y0cSgQ1ESa1GQ933QkPRrX+qBpGDTc8ZdlsjI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=giyJ68Je; arc=none smtp.client-ip=209.85.208.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1752528787; c=relaxed/simple;
+	bh=qPiCPI4soT5I10K5g1Q+Wc01rVueLXCy/9CUKeSmvWk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CGy128o2tt5IPlXpLcxrYzxplZNlvjRwukvQUPd479D3pTo0BVvD70a4pYrjgnq8AeRa0D3hkUgU3NiL84JLzH76tAJk1QMGc4uoHEkZB9eyv4GvK2pTUONK/e7jJ+3EZ7mfPtzgZB5+sAcWCoqKa9wgEw5MF/TmcbLxgEzG7nQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=q/jNeYey; arc=none smtp.client-ip=199.89.3.6
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="giyJ68Je"
-Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-32b5226e6beso41368691fa.2;
-        Mon, 14 Jul 2025 14:09:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752527359; x=1753132159; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=a2NGUJZIs6JXP/sAdJptIUUuAIdinFtA6zHN1UcDf48=;
-        b=giyJ68JeAIjFE3R1OsNHERrrF1kv4a/i4iIVcwZwJbH/vjZfEyDXWC8H8XG9lTBt51
-         akYCqGpkGqqnq5C85eUwf46/XVcVQQBmFzE6vXwr4ys+xRHuaWlVgNu8NVCBYq1tu1ZF
-         JEozwXi7YbpwvF5JX1rVjTeI25+E0jEKso/Nc3BW906bqAbagL9Dr6qcFLxrnzp5j/CM
-         jurUNWY6q2NGz/i5GePeNDgR/yDr8roWNcu6w6JMPtfod7k+b4Ua+nUDsNDyr7SGnHKJ
-         gB4tJSd3BTFTyNRvfWvtKSiqzkWPfVUr6zZRflzK9/ybMKz1NXfyb74x/7i92fO3bX9r
-         Vc0A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752527359; x=1753132159;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=a2NGUJZIs6JXP/sAdJptIUUuAIdinFtA6zHN1UcDf48=;
-        b=XrZ+xPbzd4OfnopCSOYN28IiGl3x14jJY6ypIHp1sI6ee7i1fGVm7mVgbQfpqyImQO
-         TiHRIuv2EZ98zpmscspz0tdeK46AQLdfRmdseclqYUdsm1tA/OvCvflc9vdWs5FuS7hY
-         jtPEKGzvka0W7boi7VEPROWAO9iNDhAoBgI+kgMga7q3t4nco0bcNLCjb4qe0ndeZ/ks
-         lnPMYAts/1E8peb2jKEAHv0wwaNMRwgUBe6H30bmUl5ScqJt5TnFB7oiT7m6I1yp2HwD
-         3Q7Li4lZ7+H140tXYeuz/rfRmOPZShMFuZSWWOmH1F3V7nEzI2VtxnzCjWrVUPIwuH+Y
-         zbtg==
-X-Forwarded-Encrypted: i=1; AJvYcCUPWti49PuUMZIwpwmXLvxIMtSEOpsWYKj1bRKXdxq2SLji3i9TnCJKLOSENtWqAhEF9C+nJQ33jhfZzg==@vger.kernel.org, AJvYcCV+lPWEr9aPYrSdNAc01p7voZ5X9VbqzNqm91wxXH3/rtueBJYy3qjtgNzzOx+JgEPVCc2W5K/NRC4xIJbFvkU=@vger.kernel.org, AJvYcCVuYgjYdbf3RjABhtNGmcLi0LzB8rVAjvOZmAzNibQOfG4pC91knFpEpnDQMSIHGVbdNPyNKP9r4kMBujvNWzX5@vger.kernel.org, AJvYcCXa0FKqi/kVtDA8z6o+fVmAaldCbkfePCHvNC0P/66NB1gunYOCzxN2iX5T2k+L0OukLzYIUX+U1V6OToNW@vger.kernel.org
-X-Gm-Message-State: AOJu0YxgOcCTSpV+/0iQg5ib/kAZl5rw4VmqsCyuDIg3gsyYg7o0K219
-	KFzlaUlFhnpBsWqFzF6VxDSV3I3YwuAWXguM2zz3agz3QqrVsPvJJVWDKMO0APAnQbDlopxBPJy
-	9Ebl0zgWEmujDClkmePTs4Gyaj00FvnYc7Ws6BxVuAQQo
-X-Gm-Gg: ASbGnct+ST05Gw974zmgdGLIUK4WbSK7gp2728dHX9I2/wMFjCLg/k7EjumG2PBkxva
-	jXu3mbFpjk7pD9FoIvbdXkIyr4sTlJKYxdo+hOjrMm13p8H+1SCRbnHz8rFQ9pxZ8L5x7ZquiNR
-	cD1ZHdjwn+VLnC0kxRoXaaCCiGOYtAqNFN/Bp9TAtk11ifTx3W7s9JEOp13r3w/QhYC9hNNJ9YK
-	17uSqrF77fCl3gNJ9bpzzaVQ+eNQAjaecpvHyyn1g==
-X-Google-Smtp-Source: AGHT+IFIVDCB7L/eB3uWUEMPtrD+l6c9ix8jySxxyANfqPuxUfbMymVsdKjgYjWTiEHRsDI7xj3AbxpdXdL0khzdR6c=
-X-Received: by 2002:a2e:a594:0:b0:32b:7284:7b with SMTP id 38308e7fff4ca-3305329b33emr52619951fa.6.1752527358610;
- Mon, 14 Jul 2025 14:09:18 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="q/jNeYey"
+Received: from localhost (localhost [127.0.0.1])
+	by 003.mia.mailroute.net (Postfix) with ESMTP id 4bgwXd10XKzlfl2l;
+	Mon, 14 Jul 2025 21:33:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1752528783; x=1755120784; bh=9cCQFozfJw3Fs2AGaFzHP+Qw
+	IJgE9ei6RNMRq7r8TIE=; b=q/jNeYeybfbxCe+ASgOZw1o/K3Axy2kEj6bue//M
+	CUq7OE3yFUhg6LJjR/THTvdtDKwd5UUm80AUDWAcP0qc55un2AKwLbpws4xAwPo3
+	TzGJDKy8Kz3gzBWQpJGkQJQuwIzbhHo3OD+vENyo82FkEDt8VTnOnpsKPzw7sH5L
+	xfq35iXkq7uxFV6IdLFO2YEnD6p/XuegcckWTihMJh3kQmIzPB7u8SeKcN52jFl4
+	X4GKa6A37NOg3fzzW2THKRwrzAdB3CuIrP9fFoBtdk+f1O6o8x9znaNG7nZ18A0r
+	onY85/kAkwmOhsoj+u0w1FqYXFOAwhLhec89G3+HVMZtQw==
+X-Virus-Scanned: by MailRoute
+Received: from 003.mia.mailroute.net ([127.0.0.1])
+ by localhost (003.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id nsnMX3aGmgUe; Mon, 14 Jul 2025 21:33:03 +0000 (UTC)
+Received: from [100.66.154.22] (unknown [104.135.204.82])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4bgwXX4znzzlfl5C;
+	Mon, 14 Jul 2025 21:32:59 +0000 (UTC)
+Message-ID: <780796cb-dff0-437b-8959-9ea7a5d80f52@acm.org>
+Date: Mon, 14 Jul 2025 14:32:58 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250709-core-cstr-fanout-1-v1-0-64308e7203fc@gmail.com> <20250709-core-cstr-fanout-1-v1-8-64308e7203fc@gmail.com>
-In-Reply-To: <20250709-core-cstr-fanout-1-v1-8-64308e7203fc@gmail.com>
-From: Tamir Duberstein <tamird@gmail.com>
-Date: Mon, 14 Jul 2025 17:08:42 -0400
-X-Gm-Features: Ac12FXyyrImsukAEONZO1t5G1kFxNsU4eIQFIToYW9Gkgy7rbvMrpAOfWyMPO9c
-Message-ID: <CAJ-ks9=ux6BuPYmRVSjhfn7kuagxPWicBZbumDFKAqmHKd8+PQ@mail.gmail.com>
-Subject: Re: [PATCH 8/9] rust: seq_file: use `kernel::{fmt,prelude::fmt!}`
-To: Danilo Krummrich <dakr@kernel.org>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
-	Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
-	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
-	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
-	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, Jens Axboe <axboe@kernel.dk>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
-	Brendan Higgins <brendan.higgins@linux.dev>, David Gow <davidgow@google.com>, 
-	Rae Moar <rmoar@google.com>
-Cc: nouveau@lists.freedesktop.org, dri-devel@lists.freedesktop.org, 
-	linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org, 
-	linux-block@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	kunit-dev@googlegroups.com, Christian Brauner <brauner@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/5] blktrace: add zoned block commands to
+ blk_fill_rwbs
+To: Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+ Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Damien Le Moal <dlemoal@kernel.org>,
+ Christoph Hellwig <hch@lst.de>
+References: <20250714143825.3575-1-johannes.thumshirn@wdc.com>
+ <20250714143825.3575-2-johannes.thumshirn@wdc.com>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20250714143825.3575-2-johannes.thumshirn@wdc.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jul 9, 2025 at 4:00=E2=80=AFPM Tamir Duberstein <tamird@gmail.com> =
-wrote:
->
-> Reduce coupling to implementation details of the formatting machinery by
-> avoiding direct use for `core`'s formatting traits and macros.
->
-> Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Reviewed-by: Alice Ryhl <aliceryhl@google.com>
-> Signed-off-by: Tamir Duberstein <tamird@gmail.com>
+On 7/14/25 7:38 AM, Johannes Thumshirn wrote:
+> +		if ((opf & REQ_OP_MASK) == REQ_OP_ZONE_RESET_ALL)
+> +			 rwbs[i++] = 'A';
 
-Oops, forgot to include Christian Brauner. Christian, could you please
-take a look?
+                         ^
 
-MAINTAINERS entry being added in
-https://lore.kernel.org/all/20250714124637.1905722-1-aliceryhl@google.com/.
-(Thanks Alice!)
+There is an issue with the indentation of the assignment: the space
+in front of the assignment statement should be removed.
 
-> ---
->  rust/kernel/seq_file.rs | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
->
-> diff --git a/rust/kernel/seq_file.rs b/rust/kernel/seq_file.rs
-> index 8f199b1a3bb1..59fbfc2473f8 100644
-> --- a/rust/kernel/seq_file.rs
-> +++ b/rust/kernel/seq_file.rs
-> @@ -4,7 +4,7 @@
->  //!
->  //! C header: [`include/linux/seq_file.h`](srctree/include/linux/seq_fil=
-e.h)
->
-> -use crate::{bindings, c_str, types::NotThreadSafe, types::Opaque};
-> +use crate::{bindings, c_str, fmt, types::NotThreadSafe, types::Opaque};
->
->  /// A utility for generating the contents of a seq file.
->  #[repr(transparent)]
-> @@ -31,7 +31,7 @@ pub unsafe fn from_raw<'a>(ptr: *mut bindings::seq_file=
-) -> &'a SeqFile {
->
->      /// Used by the [`seq_print`] macro.
->      #[inline]
-> -    pub fn call_printf(&self, args: core::fmt::Arguments<'_>) {
-> +    pub fn call_printf(&self, args: fmt::Arguments<'_>) {
->          // SAFETY: Passing a void pointer to `Arguments` is valid for `%=
-pA`.
->          unsafe {
->              bindings::seq_printf(
-> @@ -47,7 +47,7 @@ pub fn call_printf(&self, args: core::fmt::Arguments<'_=
->) {
->  #[macro_export]
->  macro_rules! seq_print {
->      ($m:expr, $($arg:tt)+) =3D> (
-> -        $m.call_printf(format_args!($($arg)+))
-> +        $m.call_printf($crate::prelude::fmt!($($arg)+))
->      );
->  }
->  pub use seq_print;
->
-> --
-> 2.50.0
->
+Thanks,
+
+Bart.
