@@ -1,91 +1,69 @@
-Received: from 004.mia.mailroute.net (004.mia.mailroute.net [199.89.3.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07BF21891A9
-	for <linux-block@vger.kernel.org>; Mon, 14 Jul 2025 16:00:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D31B41F94A;
+	Mon, 14 Jul 2025 16:04:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752508822; cv=none; b=gGmMjiL2q66fciJvHkEiwrZBkGDQI/1lOcEKJdJ58j92xXGxhT00OAl941Pf9ph/wHMVJnV7WE5xMFafW8Uo102cHXmnj67LAG6PIp9YDI3pGFEvNECdfh/YZtfOdQGe4QLQQppxPGlXuDwx3VwHq/1JliizRLfdQWG3XdKNugA=
+	t=1752509041; cv=none; b=S/Hgn+XBeOmdUT6hlHlXuhInI/hYGYG9G/rTA5cfjjhDv1R3EFl6LRLz+cLEoaiBgnVZXXPpYSX/d4AFUd1rbSZf1xPvUQPbQFSVfs9fA19uavZ9nVkYxjeF6zOqJc2/NpKhryiGcacsqZ+NJKoACHSDF/9Q8I5jp3g+qGTTcvk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752508822; c=relaxed/simple;
-	bh=8XsoBYhFIEBZTQkZs8vAgDbtzDYECANbIX1Ura7u8Gg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Dy28xo2IpT6XbxW9FH4vYlz9UBAQ23jTLfBK+DPDOto6oCqdXXcwq16PMPhh5fCqdds5uZatcXLMLE+cOTD7b4RBHeBD7ftrpzVZpbnAgjZGtdI9m7V+AOvsijFiFSidLNrrEhInUS6fM7z9NER+2XmRKRAx7RWdRwwDY9zLsXw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=I9s9jytH; arc=none smtp.client-ip=199.89.3.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1752509041; c=relaxed/simple;
+	bh=AHdmcwDk69P0bsuDXUAUbKZgYi6IjvT1mhl/qsg2pFw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cqHtHnqDefufDQS3NMCLuynGtjGVn7PorfXSL+DqiI1F1IG6DnT3eDU9FY8zgkAHMZqRR4iEcDmow53dfKhn6Xm2eIh+F8eSAE0QxtlFN65/T/qNkYAQ8xJI42MJFIqcXQuK3Q+A093jMU7vwHQTcJK8r702d923HlWZ1giXvuI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G/0Zk/Dl; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="I9s9jytH"
-Received: from localhost (localhost [127.0.0.1])
-	by 004.mia.mailroute.net (Postfix) with ESMTP id 4bgn8h0bS0zm0jwM;
-	Mon, 14 Jul 2025 16:00:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1752508818; x=1755100819; bh=uNf8Syk7VFqbD7NXmtjC+Srs
-	YGQRc3JnyU6Z9+cqde0=; b=I9s9jytHzoAVzrr1YE2Z3Wz88Jdsd//RZanW+oaY
-	pmCuaKtWqkyVa00klIuE8YUXSzt9ujltlwjOGPknFHfBjg0YyJqipRrXZbTKZ44b
-	b0QOTqYu48oMqvAXb42sD3+XdeyAWhSOJVFfL/wAhzKQeKkmRtLIn3UwBWWGNUbZ
-	UtO11h8AnwM10bayAu2nGhZHAX98RmNYmnmF/IPlaRrzUVAeeUnsGYgRgdvAgjvw
-	qxJKZPz87J9AE7XkCzyX5jGYpb9vHQautwbh33Irqpe3eREZrG+DVtj1V+SjhY4O
-	+CbkWaC4gXJZMAgVJZkzAcTf0cUg1E1DXe1V6XATLRqZPQ==
-X-Virus-Scanned: by MailRoute
-Received: from 004.mia.mailroute.net ([127.0.0.1])
- by localhost (004.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id zA1360iISh2S; Mon, 14 Jul 2025 16:00:18 +0000 (UTC)
-Received: from [100.66.154.22] (unknown [104.135.204.82])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 004.mia.mailroute.net (Postfix) with ESMTPSA id 4bgn8Y0ttHzm0gbQ;
-	Mon, 14 Jul 2025 16:00:12 +0000 (UTC)
-Message-ID: <87a8998e-ba7d-4ca4-a9f0-642d56f4682f@acm.org>
-Date: Mon, 14 Jul 2025 09:00:09 -0700
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G/0Zk/Dl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52AA6C4CEF0;
+	Mon, 14 Jul 2025 16:04:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752509041;
+	bh=AHdmcwDk69P0bsuDXUAUbKZgYi6IjvT1mhl/qsg2pFw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=G/0Zk/DlO4/RGceMRxhdRCcVamfcty52cZZds5h1ZtTGD1N/s0qVnZzVVIKATF5ZN
+	 fcnomUp7Nkq/zyNgKumD3M1G+Ba7iz7qM4ukSEeQB75MYfTZoKNX0vcb2QdXttFS2L
+	 yEtEAIY1YMM8L4JsLctZ7G8gMSB5Wy1ElbNlTRaLV1zsdR5pwSWVatXFVbLKiEffB7
+	 2avLGgmbKkY6WRDjGX5P50O45SlosYxfPpw8BB3BI3NPNRmirTrqANymHNgHm7sm7F
+	 J44cYxkml4vMF/IHRcuS6CF2UwQF5rjPTCMuiXqUU9w7o5umLg8GnMKhjtrTJ9GzeW
+	 RknHjdOMVGf4Q==
+Date: Mon, 14 Jul 2025 09:04:00 -0700
+From: "Darrick J. Wong" <djwong@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Theodore Ts'o <tytso@mit.edu>, John Garry <john.g.garry@oracle.com>,
+	linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+Subject: Re: Do we need an opt-in for file systems use of hw atomic writes?
+Message-ID: <20250714160400.GK2672049@frogsfrogsfrogs>
+References: <20250714131713.GA8742@lst.de>
+ <20250714132407.GC41071@mit.edu>
+ <20250714133014.GA10090@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/5] blktrace: add zoned block commands to blk_fill_rwbs
-To: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
- Jens Axboe <axboe@kernel.dk>
-Cc: Damien Le Moal <dlemoal@kernel.org>, hch <hch@lst.de>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
- Chaitanya Kulkarni <chaitanyak@nvidia.com>
-References: <20250709114704.70831-1-johannes.thumshirn@wdc.com>
- <20250709114704.70831-2-johannes.thumshirn@wdc.com>
- <de8c6c73-3647-4cc7-a8a2-6848b2f4607e@acm.org>
- <07fa0a60-1541-4201-b4e9-b02a994c915c@wdc.com>
- <6e25e109-33bf-413f-812a-69a7f33e783e@acm.org>
- <c53e8414-f3ad-4eb7-8963-8532790ccbb2@wdc.com>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <c53e8414-f3ad-4eb7-8963-8532790ccbb2@wdc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250714133014.GA10090@lst.de>
 
-On 7/14/25 3:23 AM, Johannes Thumshirn wrote:
-> Do you mean something like this:
+On Mon, Jul 14, 2025 at 03:30:14PM +0200, Christoph Hellwig wrote:
+> On Mon, Jul 14, 2025 at 09:24:07AM -0400, Theodore Ts'o wrote:
+> > > Is is just me, or would it be a good idea to require an explicit
+> > > opt-in to user hardware atomics?
+> > 
+> > How common do we think broken atomics implementations; is this
+> > something that we could solve using a blacklist of broken devices?
 > 
-> diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-> index f1dc00c22e37..ac30cb83067f 100644
-> --- a/kernel/trace/blktrace.c
-> +++ b/kernel/trace/blktrace.c
-> @@ -1911,6 +1911,8 @@ void blk_fill_rwbs(char *rwbs, blk_opf_t opf)
->           if (opf & REQ_ATOMIC)
->                   rwbs[i++] = 'U';
-> 
-> +       WARN_ON_ONCE(i >= RWBS_LEN);
-> +
->           rwbs[i] = '\0';
->    }
->    EXPORT_SYMBOL_GPL(blk_fill_rwbs);
+> I don't know.  But cheap consumer SSDs can basically exhibit any
+> brokenness you can imagine.  And claiming to support atomics basically
+> just means filling out a single field in identify with a non-zero
+> value.  So my hopes of only seeing it in a few devices is low,
+> moreover we will only notice it was broken when people lost data.
 
-Yes, thanks!
+Do you want to handle it the same way as we do discard-zeroes-data and
+have a quirks list of devices we trust?  Though I can hardly talk,
+knowing the severe limitations of allowlists vs. product managers trying
+to win benchmarks with custom firmware. :(
 
-Bart.
+--D
