@@ -1,47 +1,58 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 619202E3718;
-	Mon, 14 Jul 2025 08:52:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5513C23BCF7;
+	Mon, 14 Jul 2025 09:11:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752483158; cv=none; b=WN/BRM14KxLWEgmJ7Fvvp1LO4jZMAPH3xbm3Lco5fFXmEb1yxXPw0PJswjjWHvgH1O7jb8Dc0gYBnfh6SbG7sXrteb1Vuq8CtXONw42Aqb3leOI5+5qFFnsg2i2EaPz3aaxNS93cCWB/TU/im4uUffrydahw2rv+5/nJCZLf9G0=
+	t=1752484318; cv=none; b=thAFIaxZpchqXg37VASkJtRqKcss2rhTiscMNYXCNdGWR03uJ0I6kX47ZK+2lkTAfgxFIKiRhqdjERG/nGQzMO5RVZJheVZfL/ox0taMZazeb/hRKD/TWB2lNiO5OoA3pOxSVwg7lzYH1QiG1AuVhPYr8v1dYqA8OFy2IXg4oZA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752483158; c=relaxed/simple;
-	bh=FMNrS1Z1UilPJzSrb1Ap/6lM+9eqZRJQR6eXPg4Hlxc=;
+	s=arc-20240116; t=1752484318; c=relaxed/simple;
+	bh=nBAAdS/h14HP9PCoH6AZ+SV1+KPCQ3mc43HpXEsPKvA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=h/ikDVFWF9WYB4VUQG5xqWMs7KGGTw2ZlXHAlVAMxAriqYAQ+kH3EpGzzouRlinYqQz0PC1rrk3ihSdacQpCU7hOY5ASkikNJ2lR0tsFhYx+oy1rooB8qSOGAPqUBRtlieGxBMYdQQ+Z7UGAA5IUd1du1WJIuj/bAzgNqAgricY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=py0ZCIOV; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=ThI7PFKFp5GjBZSxjUwXUS0uZpo5ZY7oKP6iTlaGELEk39RRX0D0JJB6LfcHzsZYc+XOx7E3WdribDovszjVqudBKU3rK3RKJYggDqYNHOcXZYo6Fj/dKa6i+sDL+BT10RqLW+VmkIpKVulfHwoz7y8xwLnrkoSwKUR1lBho75g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o7bKE20C; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="py0ZCIOV"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AADABC4CEED;
-	Mon, 14 Jul 2025 08:52:35 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o7bKE20C"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6403C4CEED;
+	Mon, 14 Jul 2025 09:11:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752483157;
-	bh=FMNrS1Z1UilPJzSrb1Ap/6lM+9eqZRJQR6eXPg4Hlxc=;
+	s=k20201202; t=1752484317;
+	bh=nBAAdS/h14HP9PCoH6AZ+SV1+KPCQ3mc43HpXEsPKvA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=py0ZCIOVIui3LKHdgAy9ffVUUf72EMbd0ZoWs6qMQc2905RrwGDd3SySm0k4zeV/l
-	 NMki8OSXEU5962IcQn3u40q6UCo3C2xF6m864tCZzZTf3z6PQ48dxn7cXOhEw01cmi
-	 B75+cIeYMA4/CKIua3oKVducjyMaVsP64oLLhDmyRqKzuATzVHYbkZynhndSh+Eg3L
-	 nnJYtIIagI+IrtdRCmAuaEIgCMq+QaHm2iyuu77M70pGLk6g4GQrVHfkpVHvgjH120
-	 SJFimMnKDu8XjxbkK8V75lMKw83KFmzLsDBOG1iNKYfYtRwl32YWf7TCoKDLdwcPm+
-	 FTNDDbDfzwLsg==
+	b=o7bKE20CDPlKcHI0e/TC6KGBJLrWFb6B/a2488r6tyIou5DTxTnLIABvmNvKLFpXa
+	 7ihWDKxdO+vv/6dxAFhP+KNmK7biaOatcxOCFGnogbNAFbLIAlMfDckEtLV2ItloNd
+	 q+sgzKQhx9CjxrP8q9qMnwsebgfC2xO65g6gAWZtgvzGGgarDWPO+UCj1ATob1DSYy
+	 hB0b5IXoIRePk5yKXTPmpQl2MnaS+xpxe/mC4fHAMsZmTxp6rVoD6nDOCT+DHyi51T
+	 4PGbMRz/p7FqCOWASMEOE/MMeQNI6ZYPxHwhKlsQeEecnBP7GF1NJ8nqpzOWCDgaYb
+	 VWjmAtYCQd4xw==
 From: Christian Brauner <brauner@kernel.org>
-To: Christoph Hellwig <hch@lst.de>
+To: =?UTF-8?q?=E9=99=88=E6=B6=9B=E6=B6=9B=20Taotao=20Chen?= <chentaotao@didiglobal.com>
 Cc: Christian Brauner <brauner@kernel.org>,
-	"Darrick J. Wong" <djwong@kernel.org>,
-	Joanne Koong <joannelkoong@gmail.com>,
-	linux-xfs@vger.kernel.org,
 	linux-fsdevel@vger.kernel.org,
-	linux-doc@vger.kernel.org,
+	linux-ext4@vger.kernel.org,
 	linux-block@vger.kernel.org,
-	gfs2@lists.linux.dev
-Subject: Re: refactor the iomap writeback code v5
-Date: Mon, 14 Jul 2025 10:52:07 +0200
-Message-ID: <20250714-untiefen-zonen-36da5ea68518@brauner>
+	intel-gfx@lists.freedesktop.org,
+	dri-devel@lists.freedesktop.org,
+	linux-mm@kvack.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	chentao325@qq.com,
+	frank.li@vivo.com,
+	tytso@mit.edu,
+	hch@infradead.org,
+	adilger.kernel@dilger.ca,
+	willy@infradead.org,
+	jani.nikula@linux.intel.com,
+	rodrigo.vivi@intel.com,
+	tursulin@ursulin.net,
+	airlied@gmail.com
+Subject: Re: [PATCH v5 0/5] fs: refactor write_begin/write_end and add ext4 IOCB_DONTCACHE support
+Date: Mon, 14 Jul 2025 11:11:43 +0200
+Message-ID: <20250714-tolerant-begreifbar-970f01d32a30@brauner>
 X-Mailer: git-send-email 2.47.2
-In-Reply-To: <20250710133343.399917-1-hch@lst.de>
-References: <20250710133343.399917-1-hch@lst.de>
+In-Reply-To: <20250710101404.362146-1-chentaotao@didiglobal.com>
+References: <20250710101404.362146-1-chentaotao@didiglobal.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -49,28 +60,22 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2905; i=brauner@kernel.org; h=from:subject:message-id; bh=y7lmWAifSLj+7kxdAkI5hCPYWKy8/kHG+/dQ0pKC5Ng=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWSUHLWMDzx/1DbrLcs/fYvVr+JmNb9wXp2xZpHfdx1mu ffP22VFO0pZGMS4GGTFFFkc2k3C5ZbzVGw2ytSAmcPKBDKEgYtTACbyfyXD/5Bp7mwzLG9JHP6a zZ6yo/HyIRetWytumgfsn/rJoH72rUyG/6kTG3cF/J+8KeWV/54Zj5SaPQT8XVo5ku2PTT2Xc9R 4CzcA
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1628; i=brauner@kernel.org; h=from:subject:message-id; bh=nBAAdS/h14HP9PCoH6AZ+SV1+KPCQ3mc43HpXEsPKvA=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWSUnLzKYeyw62Dl9TVnpl9493JFlYSRQmE0u5D7zYaTH VYLqhZndZSyMIhxMciKKbI4tJuEyy3nqdhslKkBM4eVCWQIAxenAExkpQYjw6KZcwvUGF5FPO6s 6GaL7nsjfX+TyxvnthUTtT43P/Z4kMLwP1l6jpx52reoUxda313fE28u3GfckRy1UKN5s9+nyff /MQIA
 X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
 Content-Transfer-Encoding: 8bit
 
-On Thu, 10 Jul 2025 15:33:24 +0200, Christoph Hellwig wrote:
-> this is an alternative approach to the writeback part of the
-> "fuse: use iomap for buffered writes + writeback" series from Joanne.
-> It doesn't try to make the code build without CONFIG_BLOCK yet.
-
-I dropped that sentence from the merge commit.
-
+On Thu, 10 Jul 2025 10:14:06 +0000, 陈涛涛 Taotao Chen wrote:
+> From: Taotao Chen <chentaotao@didiglobal.com>
 > 
-> The big difference compared to Joanne's version is that I hope the
-> split between the generic and ioend/bio based writeback code is a bit
-> cleaner here.  We have two methods that define the split between the
-> generic writeback code, and the implemementation of it, and all knowledge
-> of ioends and bios now sits below that layer.
+> This patch series refactors the address_space_operations write_begin()
+> and write_end() callbacks to take const struct kiocb * as their first
+> argument, allowing IOCB flags such as IOCB_DONTCACHE to propagate to the
+> filesystem's buffered I/O path.
 > 
 > [...]
 
-Applied to the vfs-6.17.iomap branch of the vfs/vfs.git tree.
-Patches in the vfs-6.17.iomap branch should appear in linux-next soon.
+Applied to the vfs-6.17.misc branch of the vfs/vfs.git tree.
+Patches in the vfs-6.17.misc branch should appear in linux-next soon.
 
 Please report any outstanding bugs that were missed during review in a
 new review to the original patch series allowing us to drop it.
@@ -82,33 +87,15 @@ Note that commit hashes shown below are subject to change due to rebase,
 trailer updates or similar. If in doubt, please check the listed branch.
 
 tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
-branch: vfs-6.17.iomap
+branch: vfs-6.17.misc
 
-[01/14] iomap: header diet
-        https://git.kernel.org/vfs/vfs/c/8cd0a39cab56
-[02/14] iomap: pass more arguments using the iomap writeback context
-        https://git.kernel.org/vfs/vfs/c/67fd9615a782
-[03/14] iomap: cleanup the pending writeback tracking in iomap_writepage_map_blocks
-        https://git.kernel.org/vfs/vfs/c/40368a6acb95
-[04/14] iomap: refactor the writeback interface
-        https://git.kernel.org/vfs/vfs/c/fb7399cf2d0b
-[05/14] iomap: hide ioends from the generic writeback code
-        https://git.kernel.org/vfs/vfs/c/f4fa7981fa26
-[06/14] iomap: add public helpers for uptodate state manipulation
-        https://git.kernel.org/vfs/vfs/c/9caf1ea80ced
-[07/14] iomap: move all ioend handling to ioend.c
-        https://git.kernel.org/vfs/vfs/c/8f02cecd80b9
-[08/14] iomap: rename iomap_writepage_map to iomap_writeback_folio
-        https://git.kernel.org/vfs/vfs/c/58f0d5a30427
-[09/14] iomap: move folio_unlock out of iomap_writeback_folio
-        https://git.kernel.org/vfs/vfs/c/f8b6a94a4cca
-[10/14] iomap: export iomap_writeback_folio
-        https://git.kernel.org/vfs/vfs/c/8b217cf779cb
-[11/14] iomap: replace iomap_folio_ops with iomap_write_ops
-        https://git.kernel.org/vfs/vfs/c/2a5574fc57d1
-[12/14] iomap: improve argument passing to iomap_read_folio_sync
-        https://git.kernel.org/vfs/vfs/c/e6caf01d3f57
-[13/14] iomap: add read_folio_range() handler for buffered writes
-        https://git.kernel.org/vfs/vfs/c/c5690dd01978
-[14/14] iomap: build the writeback code without CONFIG_BLOCK
-        https://git.kernel.org/vfs/vfs/c/5699b7e21d20
+[1/5] drm/i915: Use kernel_write() in shmem object create
+      https://git.kernel.org/vfs/vfs/c/110ae5fb48ed
+[2/5] drm/i915: Refactor shmem_pwrite() to use kiocb and write_iter
+      https://git.kernel.org/vfs/vfs/c/dd09194ff58c
+[3/5] fs: change write_begin/write_end interface to take struct kiocb *
+      https://git.kernel.org/vfs/vfs/c/254a06118b31
+[4/5] mm/pagemap: add write_begin_get_folio() helper function
+      https://git.kernel.org/vfs/vfs/c/ff2219c021c5
+[5/5] ext4: support uncached buffered I/O
+      https://git.kernel.org/vfs/vfs/c/2677497bc6f4
