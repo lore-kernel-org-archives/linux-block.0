@@ -1,97 +1,155 @@
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C77B34690;
-	Sun, 13 Jul 2025 21:14:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E29EFDDC5;
+	Mon, 14 Jul 2025 02:50:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752441245; cv=none; b=boSDQVyg/K1FLxWkKTGvR14gXufCEFzKpV7DyOgAyo2wcZCk7kPExX8LYr8IurZGZDd8y/MT42k8IX5fDVmPdDbjmcM8pZOIBXDvEZp5/aWoaAtYJr8iVVIR9zKNlPTP6tp8cm/jTz5Aq3wMWXX939vXz7SmWLI0sxFxLH+cGBs=
+	t=1752461457; cv=none; b=V4qrgj9YLkFO5vrm1aMs1RrdS/Ak99i3fbdUKcralXlu5gn2aQKD+9s4gCGuc4+JWFKuheqcLNTa7pOhaNEU2VI1kEQAGKW5CAWm/zb+Io9Y1LGIWsc6/rBmuYLAqr9c/ZUzMw/JZXnRM/syT4Wqg82CVGc49L4QbPAWTzbd+hc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752441245; c=relaxed/simple;
-	bh=YpjIq41OCYiF9UjeV3H3L2DUJ45H5ZCrwWjNbLBiS0Y=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=f2W755zCoPahW/EAgSfsesofUORF2qVYitTmGo+sBg4SCNW7+jYlsL1eAii5SiPSb247ztuFTXSKgvJyh1ZQm9KiXzuaL0FkY6h/ty1QAfxSpOGyzbyQ4qvhwDy8HIjH7cVI++XRoeVGmiZMtpJDvLt8IVrvuut8ZYVuEILWY8s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BTHMgLXg; arc=none smtp.client-ip=209.85.216.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1752461457; c=relaxed/simple;
+	bh=MTiQu2gCfuCkj0Da/Vt0SXpxQqJ4UedMVOpHMm7iJvo=;
+	h=Content-Type:Message-ID:Date:MIME-Version:Subject:To:Cc:
+	 References:From:In-Reply-To; b=UdWDdXe58NC5dOYCziDtOKr1Ro8uUnnqAtjoWm7vWRNf+P/clJa0OPEM2kfRBmg++mRHi7mJ6cAevBO+B5EH4C4inoae7gXh+X8A3gCQkGcQM9fLsQ8fyzJYc4iB3URAiJ29tidhXaf6dI/8nwmBzlUeazGrit4gnItYhp+8KTs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WnbAVoh1; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BTHMgLXg"
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-313336f8438so704962a91.0;
-        Sun, 13 Jul 2025 14:14:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752441243; x=1753046043; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OGWesuVv5u7KHfAwqVYlVI6V4CR55/7okfmVa7+QiC4=;
-        b=BTHMgLXgxO6oSR0UayluGsecb1G0jvUJMOtyotdRemhblZwB8la0fXc/ozMM1+S61Z
-         faMmXnI3wE3v+byvSCLZFGSfc2Hnzvg511ujtTUQkm313sq9gW0DzBPr/XuOoQOmrM3p
-         12hWOCQnYFroLkZb5togxJaz0nprdW/jVhsmJ3hKGsYJzJEswgbHTxLYT/5ZzXL/ONpv
-         Zo5Wpaz86durA3C+KdkZvg5B3tTTUT1tccXSgNeiLi0WGfBTQj9cKISgQCvnAOPPDMRr
-         3apkRZPYlpJYlFH4EX+Eoy/SWo37xPtWEXa4vZfoX/RetQe0DgeA3I0TLChDcxL25oW0
-         +YYA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752441243; x=1753046043;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=OGWesuVv5u7KHfAwqVYlVI6V4CR55/7okfmVa7+QiC4=;
-        b=fnvi0okuUZ3Tp8jEtGQx5nrc/73Xrl99NRHAdaHgVecqJW0NfCGwU+VzxB4Rk2k3Tl
-         yzd6MW6Ec7sm4IehQVnCjezMEsouMNUaAXgtjjrfTNE+Kz40hsYhb4Iw3tsRXUMfrBMt
-         mZGCbKVq8hBPqdaUIgGUWb7l3MLNYXzoptSMo6HE+mm43ensyTCRNCJIMtcMU+bQeb4G
-         q96m3+USqqyX2cBWMXKQ9D1OIpgxxxJ7rzIb3FfUIboheRNtRc2CQnO9DTt0fX4H8iAk
-         kLvcwKKcEkn4TtSJTkcgRwANDh4X/IlEChNDEOmMmmel4ELT48jC7UzYtfz+acdLSsB6
-         SFOQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVGleaDyUsqGvZUZTm/QxlXiORGwa9/zrlZ0dJgdYtrG5G4iEZpd9na2KXUVlUEfEzIGVwx/LTLo1cTpcss@vger.kernel.org, AJvYcCWOsLynfq209bMbkNmDwkC+gXE6gSeK62QXWgGo29Z9Ajb3Vd6YA3PJYVtTBD7DZfM/FLWzg0XaMOdbcw==@vger.kernel.org, AJvYcCWg2rs/DBML24HrpxcnBKhF+J1vpxX85BiTbuZxZBjdOf7Ku8ZN/XeRyFiFhay13a52qijw7dN2IW263SgGkPg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzEvTfnYvqvM+LpfBFgbjbpumT+6mxZxYgNYVQA61f8M8fSylZ/
-	bBueyLfsG816eJphtEUo7/UuLOEOMClFqQzXkTwomh4c1DZS21YqrEkINk4DfjIiETwCayt38cK
-	pkn1XpLgvrIr91y8fXU2wLtTD3bq5vaw=
-X-Gm-Gg: ASbGncvFbGynAnIfFepZGQJNuis3GoaHOHc1pPXCFSf6g5CPHOFzO1C2B+PZBrYrfgn
-	0AVllWKnDIgMeNGotolsc8BcwcDU+FCy3CVqqvnHI63xpUTqCVbhHRbgqPMg7MfV5oB2zfL9nRS
-	VbGZFXZUBDA9sYpcmzUJbpOZt8CrazGrTU2KGiVhqrX51+REA8tADYgXiryMj2L07vZB2+Xm9uI
-	wlK+W/2
-X-Google-Smtp-Source: AGHT+IEGI9RZ0oyAnz4GZ1w7V+NM9uVh7YV4G5JHdJDwLv4SHxibYNJHOlRq/rD7kBS9A5+sODMX7YfXoqUPegPRcMM=
-X-Received: by 2002:a17:90b:2e8b:b0:311:c5d9:2c8b with SMTP id
- 98e67ed59e1d1-31c4f540066mr6414918a91.5.1752441242925; Sun, 13 Jul 2025
- 14:14:02 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WnbAVoh1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47805C4CEE3;
+	Mon, 14 Jul 2025 02:50:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752461456;
+	bh=MTiQu2gCfuCkj0Da/Vt0SXpxQqJ4UedMVOpHMm7iJvo=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=WnbAVoh1Onl2jy3PPITHMbzn5/kCl8PQhoknjagTDs/b2XunG4mCEwxUvI4YPJyzk
+	 XWukX32jkePJXE8j6vLe0WY4k7ElbAnYU6I98TPV8fbqnSJeH48f7zsIR/oY7sDPfv
+	 xJCoIWvi2FqxF39posxk0HS3Fd0YMKaDpB0F2JchRI7G4+6QWiGkgxAxtMs6IM4wVJ
+	 Hi5Z4gW3c+VDgCrD+JD0sCZGskAkXctBwPROxolPvR0q/VzCYVjmGCG8SE+ioj+9iN
+	 344lPUuYi/+UpTUE70IN3Wp/lbHrHF2eXemz9t0PGDaLXI2xDEXaiXAgD8H17f/zSR
+	 3Aw3Tj6JALfnw==
+Content-Type: multipart/mixed; boundary="------------GSF3WdoAO5xjtfrRGnJ0BjBS"
+Message-ID: <3b2a6cfe-5bf3-4818-8633-c200d8e6f122@kernel.org>
+Date: Mon, 14 Jul 2025 11:48:36 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250708141442.1339091-1-lossin@kernel.org>
-In-Reply-To: <20250708141442.1339091-1-lossin@kernel.org>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Sun, 13 Jul 2025 23:13:49 +0200
-X-Gm-Features: Ac12FXw79VYx8SsMbm9m8VzO4lQMLpYQrjt4HxD5ZNFn8jiSolsIzy25cevEXLU
-Message-ID: <CANiq72=ADjJBmreY5Sm0U15tbXGCD+GSt2VWt0u7jXasvOL78Q@mail.gmail.com>
-Subject: Re: [GIT PULL] Rust pin-init for v6.17
-To: Benno Lossin <lossin@kernel.org>
-Cc: Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
-	Andreas Hindborg <a.hindborg@kernel.org>, Boqun Feng <boqun.feng@gmail.com>, 
-	Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
-	Danilo Krummrich <dakr@kernel.org>, Breno Leitao <leitao@debian.org>, Fiona Behrens <me@kloenk.dev>, 
-	Christian Schrefl <chrisi.schrefl@gmail.com>, Alban Kurti <kurti@invicto.ai>, 
-	Michael Vetter <jubalh@iodoru.org>, linux-block@vger.kernel.org, 
-	rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 08/19] scsi: detect support for command duration limits
+To: Friedrich Weber <f.weber@proxmox.com>,
+ Mira Limbeck <m.limbeck@proxmox.com>, Niklas Cassel <nks@flawful.org>,
+ Jens Axboe <axboe@kernel.dk>, "Martin K. Petersen"
+ <martin.petersen@oracle.com>, "James E.J. Bottomley" <jejb@linux.ibm.com>,
+ Kashyap Desai <kashyap.desai@broadcom.com>,
+ Sumit Saxena <sumit.saxena@broadcom.com>,
+ Shivasharan S <shivasharan.srikanteshwara@broadcom.com>,
+ Chandrakanth patil <chandrakanth.patil@broadcom.com>,
+ Sathya Prakash Veerichetty <sathya.prakash@broadcom.com>,
+ Sreekanth Reddy <sreekanth.reddy@broadcom.com>,
+ megaraidlinux.pdl@broadcom.com, mpi3mr-linuxdrv.pdl@broadcom.com
+Cc: Bart Van Assche <bvanassche@acm.org>, Christoph Hellwig <hch@lst.de>,
+ Hannes Reinecke <hare@suse.de>, linux-scsi@vger.kernel.org,
+ linux-ide@vger.kernel.org, linux-block@vger.kernel.org,
+ Niklas Cassel <niklas.cassel@wdc.com>
+References: <20230511011356.227789-1-nks@flawful.org>
+ <20230511011356.227789-9-nks@flawful.org>
+ <3dee186c-285e-4c1c-b879-6445eb2f3edf@proxmox.com>
+ <6fb8499a-b5bc-4d41-bf37-32ebdea43e9a@kernel.org>
+ <2e7d6a7e-4a82-4da5-ab39-267a7400ca49@proxmox.com>
+ <b1d9e928-a7f3-4555-9c0a-5b83ba87a698@kernel.org>
+ <a927b51b-1b34-4d4f-9447-d8c559127707@proxmox.com>
+ <54e0a717-e9fc-4534-bc27-8bc1ee745048@kernel.org>
+ <72bf0fd7-f646-46f7-a2aa-ef815dbfa4e2@proxmox.com>
+From: Damien Le Moal <dlemoal@kernel.org>
+Content-Language: en-US
+Organization: Western Digital Research
+In-Reply-To: <72bf0fd7-f646-46f7-a2aa-ef815dbfa4e2@proxmox.com>
 
-On Tue, Jul 8, 2025 at 4:15=E2=80=AFPM Benno Lossin <lossin@kernel.org> wro=
-te:
->
-> Please pull for v6.17 -- thanks!
+This is a multi-part message in MIME format.
+--------------GSF3WdoAO5xjtfrRGnJ0BjBS
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Merged into `rust-next` -- thank you!
+On 7/10/25 5:41 PM, Friedrich Weber wrote:
+> Thanks for looking into this, it is definitely a strange problem.
+> 
+> Considering these drives don't support CDL anyway: Do you think it would
+> be possible to provide an "escape hatch" to disable only the CDL checks
+> (a module parameter?) so hotplug can work for the user again for their
+> device? If I see correctly, disabling just the CDL checks is not
+> possible (without recompiling the kernel) -- scsi_mod.dev_flags can be
+> used to disable RSOC, but I guess that has other unintended consequences
+> too, so a more "targeted" escape hatch would be nice.
 
-I added Andreas' Acked-by in the merge commit as discussed.
+Could you test the attached patch ? That should solve the issue.
 
-I noticed a missing space while inspecting the commits, so I sent a PR
-to you upstream so that eventually it arrives back here:
+> 
+> Best,
+> 
+> Friedrich
+> 
 
-    https://github.com/Rust-for-Linux/pin-init/pull/73
 
-Cheers,
-Miguel
+-- 
+Damien Le Moal
+Western Digital Research
+--------------GSF3WdoAO5xjtfrRGnJ0BjBS
+Content-Type: text/x-patch; charset=UTF-8;
+ name="0001-scsi-mpt3sas-Disable-CDL-probing.patch"
+Content-Disposition: attachment;
+ filename="0001-scsi-mpt3sas-Disable-CDL-probing.patch"
+Content-Transfer-Encoding: base64
+
+RnJvbSBjOGVjNWNmNzk1NzY5MDQxOGI3ZTg4ODhlNzI5ZjAwMmY5YmM3ZDZlIE1vbiBTZXAg
+MTcgMDA6MDA6MDAgMjAwMQpGcm9tOiBEYW1pZW4gTGUgTW9hbCA8ZGxlbW9hbEBrZXJuZWwu
+b3JnPgpEYXRlOiBNb24sIDE0IEp1bCAyMDI1IDExOjQ3OjEyICswOTAwClN1YmplY3Q6IFtQ
+QVRDSF0gc2NzaTogbXB0M3NhczogRGlzYWJsZSBDREwgcHJvYmluZwoKU2lnbmVkLW9mZi1i
+eTogRGFtaWVuIExlIE1vYWwgPGRsZW1vYWxAa2VybmVsLm9yZz4KLS0tCiBkcml2ZXJzL3Nj
+c2kvbXB0M3Nhcy9tcHQzc2FzX3Njc2loLmMgfCAyICsrCiBkcml2ZXJzL3Njc2kvc2NzaS5j
+ICAgICAgICAgICAgICAgICAgfCA0ICsrKy0KIGluY2x1ZGUvc2NzaS9zY3NpX2hvc3QuaCAg
+ICAgICAgICAgICB8IDMgKysrCiAzIGZpbGVzIGNoYW5nZWQsIDggaW5zZXJ0aW9ucygrKSwg
+MSBkZWxldGlvbigtKQoKZGlmZiAtLWdpdCBhL2RyaXZlcnMvc2NzaS9tcHQzc2FzL21wdDNz
+YXNfc2NzaWguYyBiL2RyaXZlcnMvc2NzaS9tcHQzc2FzL21wdDNzYXNfc2NzaWguYwppbmRl
+eCBkN2Q4MjQ0ZGZlZGMuLjYyNmM2NjUyOGJiMSAxMDA2NDQKLS0tIGEvZHJpdmVycy9zY3Np
+L21wdDNzYXMvbXB0M3Nhc19zY3NpaC5jCisrKyBiL2RyaXZlcnMvc2NzaS9tcHQzc2FzL21w
+dDNzYXNfc2NzaWguYwpAQCAtMTE5NDMsNiArMTE5NDMsNyBAQCBzdGF0aWMgY29uc3Qgc3Ry
+dWN0IHNjc2lfaG9zdF90ZW1wbGF0ZSBtcHQyc2FzX2RyaXZlcl90ZW1wbGF0ZSA9IHsKIAku
+c2hvc3RfZ3JvdXBzCQkJPSBtcHQzc2FzX2hvc3RfZ3JvdXBzLAogCS5zZGV2X2dyb3VwcwkJ
+CT0gbXB0M3Nhc19kZXZfZ3JvdXBzLAogCS50cmFja19xdWV1ZV9kZXB0aAkJPSAxLAorCS5u
+b19jZGwJCQkJPSAxLAogCS5jbWRfc2l6ZQkJCT0gc2l6ZW9mKHN0cnVjdCBzY3NpaW9fdHJh
+Y2tlciksCiB9OwogCkBAIC0xMTk4Miw2ICsxMTk4Myw3IEBAIHN0YXRpYyBjb25zdCBzdHJ1
+Y3Qgc2NzaV9ob3N0X3RlbXBsYXRlIG1wdDNzYXNfZHJpdmVyX3RlbXBsYXRlID0gewogCS5z
+aG9zdF9ncm91cHMJCQk9IG1wdDNzYXNfaG9zdF9ncm91cHMsCiAJLnNkZXZfZ3JvdXBzCQkJ
+PSBtcHQzc2FzX2Rldl9ncm91cHMsCiAJLnRyYWNrX3F1ZXVlX2RlcHRoCQk9IDEsCisJLm5v
+X2NkbAkJCQk9IDEsCiAJLmNtZF9zaXplCQkJPSBzaXplb2Yoc3RydWN0IHNjc2lpb190cmFj
+a2VyKSwKIAkubWFwX3F1ZXVlcwkJCT0gc2NzaWhfbWFwX3F1ZXVlcywKIAkubXFfcG9sbAkJ
+CT0gbXB0M3Nhc19ibGtfbXFfcG9sbCwKZGlmZiAtLWdpdCBhL2RyaXZlcnMvc2NzaS9zY3Np
+LmMgYi9kcml2ZXJzL3Njc2kvc2NzaS5jCmluZGV4IDUzNDMxMDIyNGU4Zi4uZTEzZDE4NmJk
+MzNjIDEwMDY0NAotLS0gYS9kcml2ZXJzL3Njc2kvc2NzaS5jCisrKyBiL2RyaXZlcnMvc2Nz
+aS9zY3NpLmMKQEAgLTY0OSw2ICs2NDksNyBAQCBzdGF0aWMgYm9vbCBzY3NpX2NkbF9jaGVj
+a19jbWQoc3RydWN0IHNjc2lfZGV2aWNlICpzZGV2LCB1OCBvcGNvZGUsIHUxNiBzYSwKICAq
+Lwogdm9pZCBzY3NpX2NkbF9jaGVjayhzdHJ1Y3Qgc2NzaV9kZXZpY2UgKnNkZXYpCiB7CisJ
+Y29uc3Qgc3RydWN0IHNjc2lfaG9zdF90ZW1wbGF0ZSAqaG9zdHQgPSBzZGV2LT5ob3N0LT5o
+b3N0dDsKIAlib29sIGNkbF9zdXBwb3J0ZWQ7CiAJdW5zaWduZWQgY2hhciAqYnVmOwogCkBA
+IC02NTcsOCArNjU4LDkgQEAgdm9pZCBzY3NpX2NkbF9jaGVjayhzdHJ1Y3Qgc2NzaV9kZXZp
+Y2UgKnNkZXYpCiAJICogbG93ZXIgU1BDIHZlcnNpb24uIFRoaXMgYWxzbyBhdm9pZHMgcHJv
+YmxlbXMgd2l0aCBvbGQgZHJpdmVzIGNob2tpbmcKIAkgKiBvbiBNQUlOVEVOQU5DRV9JTiAv
+IE1JX1JFUE9SVF9TVVBQT1JURURfT1BFUkFUSU9OX0NPREVTIHdpdGggYQogCSAqIHNlcnZp
+Y2UgYWN0aW9uIHNwZWNpZmllZCwgYXMgZG9uZSBpbiBzY3NpX2NkbF9jaGVja19jbWQoKS4K
+KwkgKiBBbHNvIGlnbm9yZSBDREwgZm9yIGFueSBob3N0IGRlY2xhcmluZyBsYWNraW5nIHN1
+cHBvcnQgZm9yIENETC4KIAkgKi8KLQlpZiAoc2Rldi0+c2NzaV9sZXZlbCA8IFNDU0lfU1BD
+XzUpIHsKKwlpZiAoc2Rldi0+c2NzaV9sZXZlbCA8IFNDU0lfU1BDXzUgfHwgaG9zdHQtPm5v
+X2NkbCkgewogCQlzZGV2LT5jZGxfc3VwcG9ydGVkID0gMDsKIAkJcmV0dXJuOwogCX0KZGlm
+ZiAtLWdpdCBhL2luY2x1ZGUvc2NzaS9zY3NpX2hvc3QuaCBiL2luY2x1ZGUvc2NzaS9zY3Np
+X2hvc3QuaAppbmRleCBjNTM4MTJiOTAyNmYuLjVjNTllNjRmNzZiOCAxMDA2NDQKLS0tIGEv
+aW5jbHVkZS9zY3NpL3Njc2lfaG9zdC5oCisrKyBiL2luY2x1ZGUvc2NzaS9zY3NpX2hvc3Qu
+aApAQCAtNDYyLDYgKzQ2Miw5IEBAIHN0cnVjdCBzY3NpX2hvc3RfdGVtcGxhdGUgewogCS8q
+IFRydWUgaWYgdGhlIGNvbnRyb2xsZXIgZG9lcyBub3Qgc3VwcG9ydCBXUklURSBTQU1FICov
+CiAJdW5zaWduZWQgbm9fd3JpdGVfc2FtZToxOwogCisJLyogVHJ1ZSBpZiB0aGUgY29udHJv
+bGxlciBkb2VzIG5vdCBzdXBwb3J0IENvbW1hbmQgRHVyYXRpb24gTGltaXRzLiAqLworCXVu
+c2lnbmVkIG5vX2NkbDoxOworCiAJLyogVHJ1ZSBpZiB0aGUgaG9zdCB1c2VzIGhvc3Qtd2lk
+ZSB0YWdzcGFjZSAqLwogCXVuc2lnbmVkIGhvc3RfdGFnc2V0OjE7CiAKLS0gCjIuNTAuMQoK
+
+
+--------------GSF3WdoAO5xjtfrRGnJ0BjBS--
