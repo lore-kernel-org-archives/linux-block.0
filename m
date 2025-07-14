@@ -1,108 +1,83 @@
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89C2D1F19A;
-	Mon, 14 Jul 2025 05:01:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C378C13B;
+	Mon, 14 Jul 2025 05:53:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752469311; cv=none; b=XmTnMZesm/0JLyDJnl9tYnOpYoNOQljLJik1w//iyUgTEuuLfq9/OLV3Q63mVsHzuJRN1X4uXCG+6u/mlUPMA2GMC8Imc36V4nxGW92ByAOvyy5jo43SdRJMG3lEhjFTmwbQr60UKZ+Hi9xPnYTrACxKbSwUt6PpCMWvFQ7JUPE=
+	t=1752472430; cv=none; b=lhKrjHSNiQ+xg722l0fZf6sudMZhVJGk707IQLhM8wXhJ8TKfzXCpdzd5luWf5k3ddfk+hgY/EWKlKYpZ1RqdqVx743Mc+Sh49IEQejvIFNDq1nGL/wbCo9Qzrfs8NrBGucfBfsy8QIZRtscGo+NmOO68H6SwfU9lLQ9dF6sgrI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752469311; c=relaxed/simple;
-	bh=GNxzXsYzlNDPVH27Z5T91SIlMeNBsdS+2ls/3XwDN+o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GpKmtabnc6SgWwaHJPu6coWsH5HmwsC4g7sY2AQCxyZ2fDtcMFJQpp3kPQcnkpGIjc/wQRhNaLhkEjVuJr0+lhCEFbjvaFEc5YUiyOsdeTQH0gKy5HFED281QQMeQ6khR1g3049vuQ7jfCULjzbrlYawDDTG8SQWlzp+iKkKlRk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y6GI6UVc; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y6GI6UVc"
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-23dea2e01e4so40101395ad.1;
-        Sun, 13 Jul 2025 22:01:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752469310; x=1753074110; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=W+yJisL55v29eyx2sRZ1lV9ZD+fajqVVRY3S+f2r7hc=;
-        b=Y6GI6UVcYBAVPUkcTe7bCoEQ6w7un4B677UtBC3Qls4371SxpSbuIz91K9YbKMaxPL
-         uA9/aD7rCS6MnlTqXJWzwbduE6QvGVN/QjMOYDMe+EFEvvCljmV39gBevZMVDFe/PaAH
-         70IebWx4qw7uuUmT4/9MEYQYJukGHKRZFf1BPcpCatxhlGGvwXqbP81O5xUiYmaogp6/
-         yvhhJnJZBDvGPbWVfKRUpT5NOQ2PL/cykuVdURFPjaK4vHqHVXrlfptrzrbxD2DXPHp9
-         l7hbd/OregVS2tkseFvdWYHi6J3NbZJCwc0zB6rs4lj+3V99qL9mpz3D8T9YZPhB6Hdb
-         kxAg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752469310; x=1753074110;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=W+yJisL55v29eyx2sRZ1lV9ZD+fajqVVRY3S+f2r7hc=;
-        b=BKBscAvNylhppjrpcHH447caXGNnutilq2gczLtWSv2tLukMlzajQBoBxMONUqLxaB
-         KgFJOq21P8+4pfwYma7la7/ES9qzMUjmQ7RXSr8zFa3m8UbIi3Q3l3k0oDk8uRbIJ7DZ
-         9XPF7HhDPVoTFRWuBc/OKlSImahSDGvUsRF9HF1t/MX5DQDWZjOkPhUkoJIXER2CA/1W
-         VtEheviOZ2e4JEBBNyBucM4mwc3ZoBLUvIcSx9Gmhii5ikgkAZo3YFkw/vlCt6GXag1U
-         0JSNdMXT9YTlXW5HjBAIn52ulfZMjEeOZhJQPkcylRM4eb2z8YNxyeYw2aryEunvcBdO
-         f0sQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUtcN8L1e6U8GtGyoYYmeWOHF6hhWubAwwmSyMwRO2BwHzWzt5UHhwK9VNgp6dL7NwdkHZEK9uBQxemqtE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw+2IJ5ueqKJgaPvQJgCCvy9hET3UcwR+RmbYExAvz3Jk9RthcR
-	LPnGSySK27+GCpBqF3DTNnIPpoJ3LTVX7F90aqxZ5nKji/EwBLdj6Fah
-X-Gm-Gg: ASbGnctSvoYYUpi1QeGoqGMg0YnmBGiNYfivt/wxlWjDWKxCoOb2StsU+rUWIlfhORX
-	FyP3mot0IzTAuji8zHd/EMOsMDLYH5KfSC5aO5UOzxu7Wscw0d74gncsnUH29zmqHC6aSqJEHA0
-	oGdrT3cJw0fH1krg8EwW2SkRS55ekVuJ6/fJizIGsDBohr1396rn+MQ7ng2XOB88TqBWyUeRVW1
-	GPa3GDJHv1G+vssY1B8S27DOhUkLmiuh9MjcBRqDevTlbqXicMpn3EaQoEsxs0R4oQ51PQ6fL2Q
-	xe4I7cFodqgWYFyuOJeWsa7psGZqJ9CRRJaoL4ljWBVwUeci+cv7yIYAPz1FIRDrDbZvzeu+/zq
-	Zfxst41zJxQUe3nE9WHh0SIuzV9dGUSu7BD9TRCwzaUCmpZahb/uOLlcavDIsfVlR2lm8RJIhFW
-	HLog==
-X-Google-Smtp-Source: AGHT+IGGRJZ0TN2pbJo6LSslcMT5o/cPZHsOJ0HiUeWBjmZ2uA9BnQZDwFW1S9tqGVvYk0720IH/Tg==
-X-Received: by 2002:a17:902:ec8c:b0:234:b743:c7a4 with SMTP id d9443c01a7336-23dede874cbmr189167135ad.38.1752469309569;
-        Sun, 13 Jul 2025 22:01:49 -0700 (PDT)
-Received: from ?IPV6:2409:4090:20a4:5c0c:45b1:8db9:582c:7df4? ([2409:4090:20a4:5c0c:45b1:8db9:582c:7df4])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23de436056bsm84429175ad.238.2025.07.13.22.01.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 13 Jul 2025 22:01:49 -0700 (PDT)
-Message-ID: <21a075b9-8a2e-4b55-b63d-fedce36e7260@gmail.com>
-Date: Mon, 14 Jul 2025 10:31:45 +0530
+	s=arc-20240116; t=1752472430; c=relaxed/simple;
+	bh=nzVIWQotXzvOVvdbcH+aGWC4scCIOpcd6RbOnD+5JXE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=u5N7Y2kv46il9vQfpAa6PRnNBPeAmAfYTj/dXQjhwkptOL3N0EJ82AYn7jd7XDtadqKn3U/r+IrBcrHrE5WmQmQ9HpogxAuIhovlmRf8uds3eqpdPK7pDN7kU/wItsv2nQVrk8wikfm3yUN8H+qdVx+DZ7TQKF2pI6HxNMJuTM4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id DF74067373; Mon, 14 Jul 2025 07:53:38 +0200 (CEST)
+Date: Mon, 14 Jul 2025 07:53:38 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Damien Le Moal <dlemoal@kernel.org>
+Cc: John Garry <john.g.garry@oracle.com>, agk@redhat.com,
+	snitzer@kernel.org, mpatocka@redhat.com, song@kernel.org,
+	yukuai3@huawei.com, hch@lst.de, nilay@linux.ibm.com,
+	axboe@kernel.dk, cem@kernel.org, dm-devel@lists.linux.dev,
+	linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
+	linux-block@vger.kernel.org, ojaswin@linux.ibm.com,
+	martin.petersen@oracle.com, akpm@linux-foundation.org,
+	linux-xfs@vger.kernel.org, djwong@kernel.org
+Subject: Re: [PATCH v6 0/6] block/md/dm: set chunk_sectors from stacked dev
+ stripe size
+Message-ID: <20250714055338.GA13470@lst.de>
+References: <20250711080929.3091196-1-john.g.garry@oracle.com> <f80713ec-fef1-4a33-b7bf-820ca69cb6ce@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] block: floppy: Fix uninitialized use of outparam
-To: Jens Axboe <axboe@kernel.dk>, efremov@linux.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250713070020.14530-1-purvayeshi550@gmail.com>
- <175243012818.93872.4165824196717735145.b4-ty@kernel.dk>
-Content-Language: en-US
-From: Purva Yeshi <purvayeshi550@gmail.com>
-In-Reply-To: <175243012818.93872.4165824196717735145.b4-ty@kernel.dk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f80713ec-fef1-4a33-b7bf-820ca69cb6ce@kernel.org>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On 13/07/25 23:38, Jens Axboe wrote:
+On Fri, Jul 11, 2025 at 05:44:26PM +0900, Damien Le Moal wrote:
+> On 7/11/25 5:09 PM, John Garry wrote:
+> > This value in io_min is used to configure any atomic write limit for the
+> > stacked device. The idea is that the atomic write unit max is a
+> > power-of-2 factor of the stripe size, and the stripe size is available
+> > in io_min.
+> > 
+> > Using io_min causes issues, as:
+> > a. it may be mutated
+> > b. the check for io_min being set for determining if we are dealing with
+> > a striped device is hard to get right, as reported in [0].
+> > 
+> > This series now sets chunk_sectors limit to share stripe size.
 > 
-> On Sun, 13 Jul 2025 12:30:20 +0530, Purva Yeshi wrote:
->> Fix Smatch-detected error:
->> drivers/block/floppy.c:3569 fd_locked_ioctl() error:
->> uninitialized symbol 'outparam'.
->>
->> Smatch may incorrectly warn about uninitialized use of 'outparam'
->> in fd_locked_ioctl(), even though all _IOC_READ commands guarantee
->> its initialization. Initialize outparam to NULL to make this explicit
->> and suppress the false positive.
->>
->> [...]
-> 
-> Applied, thanks!
-> 
-> [1/1] block: floppy: Fix uninitialized use of outparam
->        commit: cb1bdf0797acd79c53a899f72a06ab8c1ebc5bcb
-> 
-> Best regards,
+> Hmm... chunk_sectors for a zoned device is the zone size. So is this all safe
+> if we are dealing with a zoned block device that also supports atomic writes ?
 
-Hi Jens,
+Btw, I wonder if it's time to decouple the zone size from the chunk
+size eventually.  It seems like a nice little hack, but with things
+like parity raid for zoned devices now showing up at least in academia,
+and nvme devices reporting chunk sizes the overload might not be that
+good any more.
 
-Thank you for applying the patch.
+> Not that I know of any such device, but better be safe, so maybe for now
+> do not enable atomic write support on zoned devices ?
 
-Best regards,
-Purva Yeshi
+How would atomic writes make sense for zone devices?  Because all writes
+up to the reported write pointer must be valid, there usual checks for
+partial updates a lacking, so the only use would be to figure out if a
+write got truncated.  At least for file systems we detects this using the
+fs metadata that must be written on I/O completion anyway, so the only
+user would be an application with some sort of speculative writes that
+can't detect partial writes. Which sounds rather fringe and dangerous.
+
+Now we should be able to implement the software atomic writes pretty
+easily for zoned XFS, and funnily they might actually be slightly faster
+than normal writes due to the transaction batching.  Now that we're
+getting reasonable test coverage we should be able to give it a spin, but
+I have a few too many things on my plate at the moment.
