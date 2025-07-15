@@ -1,165 +1,149 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 873EA1DF99C
-	for <linux-block@vger.kernel.org>; Tue, 15 Jul 2025 15:45:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 566A51DF99C
+	for <linux-block@vger.kernel.org>; Tue, 15 Jul 2025 15:48:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752594337; cv=none; b=s7W6OYBUPEjUSuw7dRBkfjcQE2F4pO+1+UYpB2GLy3b1eWdN0JV5hQ+0mDeHQkVpjFPu7M8XcyLN3+nAv5qU95DTGITfuB4iZ8agSSaUvb6p0bBqmSzsRZ/oyHe8g2bUhK8zsmNIY/TtpbG1lNyCi7z/O4f50t2P9FUKNKbBBMw=
+	t=1752594505; cv=none; b=P/YABpSPb8cbGIlz83w5s8Cky26wcXumm12oPD/fSPR9ZdcERxqejkWy3oxE2uxK4VsLnFFUQ75X9DDb/3FBwYwvSHHHrnE5Yq2Kb3ugkZc3AXM1OcafzWssMmxvSqVT21moE89FGDP70UfqeujvAPV9Tosys0/rBhufDSraACY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752594337; c=relaxed/simple;
-	bh=LDpNTipuO5bRSqJl1m3c3YNQeDiHo/SOS4mTmQGmiwM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Y7j03jPAaH36PGPMjh98l42tT/K25sNN1lRYz/9RRejVJYIipLuWXxcecigm3ZzgS9pGFC18bPrhckutCdl+tAIr+7cyFWlFyEF4gliB1heeBwXwia+CNVx+o9YkWMwnbBQ8JI8Fc4aDn+xzzvYRp8XGexBrm+PjuJztQg3+bHE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=TKc0KITs; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=0Ttg9INF; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=TKc0KITs; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=0Ttg9INF; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1752594505; c=relaxed/simple;
+	bh=RH96XpcDJBxXiI+o48Ks9OrHhfsc3OL/5IzUI6g3mPY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=dso2s6ZlTq6cUjlwBKuUDzA0Sz9/uIkwFTs2hm2OfsSu6dnKePtoq3wNIEuoG48ezVmj/UtLBHG+LNrhK/GC2gf6uw6A5ArT6MX3Ip+o3EhwgglC59OwLRYkmzUEi9VoXVWBxrfEiRc5Fea8OV/GAjANmoPRVsrbY2f8uBQdvbg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=AcqOEiX3; arc=none smtp.client-ip=209.85.216.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="TKc0KITs";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="0Ttg9INF";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="TKc0KITs";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="0Ttg9INF"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id B25FF1F7D2;
-	Tue, 15 Jul 2025 15:45:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1752594333; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gZUtDa8Gu1XzlNh0JTUT8Vy6AJDYvm4awcDQs1w5mww=;
-	b=TKc0KITsE47uX6yHEkRMdU2n4mWxchQRES0Txba/MnT+KbZ+GIvVpwGcCYY0g63kK01jUK
-	QVR3cup0ErtqF8hyupN8NoHqwIIXwJqeroXjaCMd4Ydq/UcPomNTdj3OsyOMUetD4Qobd4
-	ceqlT5xhRfY7AmrZYrlw1dIHpdyoC14=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1752594333;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gZUtDa8Gu1XzlNh0JTUT8Vy6AJDYvm4awcDQs1w5mww=;
-	b=0Ttg9INF+n5mGmRfO8oRH6bJWwQt+XKyEt4b42fVvLtFFQU91T3bk88HAxs+JeWOsZkbbW
-	PQIK5RSFIGiPh/AA==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=TKc0KITs;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=0Ttg9INF
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1752594333; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gZUtDa8Gu1XzlNh0JTUT8Vy6AJDYvm4awcDQs1w5mww=;
-	b=TKc0KITsE47uX6yHEkRMdU2n4mWxchQRES0Txba/MnT+KbZ+GIvVpwGcCYY0g63kK01jUK
-	QVR3cup0ErtqF8hyupN8NoHqwIIXwJqeroXjaCMd4Ydq/UcPomNTdj3OsyOMUetD4Qobd4
-	ceqlT5xhRfY7AmrZYrlw1dIHpdyoC14=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1752594333;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gZUtDa8Gu1XzlNh0JTUT8Vy6AJDYvm4awcDQs1w5mww=;
-	b=0Ttg9INF+n5mGmRfO8oRH6bJWwQt+XKyEt4b42fVvLtFFQU91T3bk88HAxs+JeWOsZkbbW
-	PQIK5RSFIGiPh/AA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 2F42213A68;
-	Tue, 15 Jul 2025 15:45:33 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id cWt4Cp13dmgsZAAAD6G6ig
-	(envelope-from <hare@suse.de>); Tue, 15 Jul 2025 15:45:33 +0000
-Message-ID: <0a33bc37-bb9e-4e70-afd8-59366d46b250@suse.de>
-Date: Tue, 15 Jul 2025 17:45:28 +0200
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="AcqOEiX3"
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-312a806f002so944124a91.3
+        for <linux-block@vger.kernel.org>; Tue, 15 Jul 2025 08:48:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1752594503; x=1753199303; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=j627q4ORHb51CZCllyqxMTaNNKt8GFVJaQkKXQE2d38=;
+        b=AcqOEiX3Huduf7rLpdG0SHE9VUIg50fqFb5ZAAfzKHLx7676pkCh+rSJtRLh/c+LZm
+         C8F2bf6M/DQGMrLtfwIu89hjFwwJSS59sHg71rx1GhdkjEZsn3YpB6j/Zl2uXBUCbAIp
+         snRtsQOqdJ6P6Z6feRKhZKhVZEEaiN0WSMouvibe/cjMRSFlbNcgXVjyh0CNWR7jhJBe
+         1leum2ewxLVSsq9bXEXEtVeQ5GkFG4eH55XbA4yWdPLO9CbH4rYetKLTp/RVCFZIonWN
+         wDcbHnFUW4nYoLtAwJsHbVfasz9SU67g1c+td1lEGWRfFE3TyEDeOjqilHLpe8xyE/qQ
+         WDZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752594503; x=1753199303;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=j627q4ORHb51CZCllyqxMTaNNKt8GFVJaQkKXQE2d38=;
+        b=WqZhvhu9+nCTvzQddlfqOOt9mpVuEvvex2P3zHxhNcztbZQMyVy1/k7Yi9vRAIuGW/
+         4JuJPoX6P3DzJIev5KJQO28ng5vLwDM8GIlPRf+F23eELqm5cu5RFHTh691TmzZOKwmY
+         q3WeLNy+7lOqJzelKrZsF5ger+bhqc+IiicLJmNf0HuAsFbBv7dF2hb0NVtjIe7gawDR
+         oOikRycSUqDY3Kqaa1gnEU8rUYRmB++u4uEt5xEAoS5uAtqwhzMMOt7na4kRicUuXAx+
+         MFbNhl8cTuJRM0HVRgjlf8e8fZnyqC3W5D2qbLxfhp6yQrv5D+emJ69+tsciYrF8VZ93
+         /zwQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUd4Z952zd1nlIw6V/5wqts3+3G+4RU5NH0P/x6nIHY0QsEIuoVfBUWPonP3BAjT6dU3OH6FdMW1R4T2g==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxC+h5mVk3JOsvJfgTGAV7K635Dk3WwlfqSklOtd/ZxXZQwbtUC
+	LhO/SORFk5M24MV/atzFS3L+tLZkoM8D6B/WhK1P1vV14qBHaI8XJ4eCU/Kk2dxOD8zpgY60Q4d
+	CVI+51ftXRIjxyLlw7v04BCDlEPgawH4Yo5n6D4zrqA==
+X-Gm-Gg: ASbGnctpF6GCEV//7OKG8WEdQpJlc2xowaNKPA8l06WfsxcEOlrWB/m49/HDuSkiq5B
+	awoci8YDBWl1yDNhrF9lltGgJlbp4CWHvyzWTMDCkI8e68BBmcJ2Nky8BoFpfFgb8KLtVw+nKY0
+	jO96XVlcpwnzLp+FdqP5CKA6Ybjnd181ZGsDE1v8Fs4sfu+x5xLl0rAqMuFI4vg2MfHab0JBu2x
+	rFb1g==
+X-Google-Smtp-Source: AGHT+IGo4lIg587pr9i9d+xs903/W8E7OjkK4k1p8m6cIepBcuRl9sCr29txrqtPxr940gQ8nUqs/xl8kJW3yuPNlho=
+X-Received: by 2002:a17:90b:270b:b0:314:29ff:6845 with SMTP id
+ 98e67ed59e1d1-31c94dbc0a8mr1329634a91.4.1752594503457; Tue, 15 Jul 2025
+ 08:48:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 0/6] block/md/dm: set chunk_sectors from stacked dev
- stripe size
-To: Christoph Hellwig <hch@lst.de>, Damien Le Moal <dlemoal@kernel.org>
-Cc: John Garry <john.g.garry@oracle.com>, agk@redhat.com, snitzer@kernel.org,
- mpatocka@redhat.com, song@kernel.org, yukuai3@huawei.com,
- nilay@linux.ibm.com, axboe@kernel.dk, cem@kernel.org,
- dm-devel@lists.linux.dev, linux-kernel@vger.kernel.org,
- linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
- ojaswin@linux.ibm.com, martin.petersen@oracle.com,
- akpm@linux-foundation.org, linux-xfs@vger.kernel.org, djwong@kernel.org
-References: <20250711080929.3091196-1-john.g.garry@oracle.com>
- <f80713ec-fef1-4a33-b7bf-820ca69cb6ce@kernel.org>
- <20250714055338.GA13470@lst.de>
- <c71ce330-d7b5-45ea-ba46-97598516e9fc@kernel.org>
- <20250714061300.GA13893@lst.de>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20250714061300.GA13893@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Level: 
-X-Spam-Flag: NO
-X-Rspamd-Queue-Id: B25FF1F7D2
-X-Rspamd-Action: no action
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Spamd-Result: default: False [-4.51 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	ARC_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	MIME_TRACE(0.00)[0:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,suse.de:dkim,suse.de:mid,suse.de:email];
-	DNSWL_BLOCKED(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	DKIM_TRACE(0.00)[suse.de:+]
-X-Spam-Score: -4.51
+References: <20250713143415.2857561-1-ming.lei@redhat.com> <20250713143415.2857561-2-ming.lei@redhat.com>
+ <CADUfDZrZ+SDQFC_-upFJNx2cj=xGuggvHMMubfWCaVGy_D4BjA@mail.gmail.com> <aHZ22o0znAVFFDJf@fedora>
+In-Reply-To: <aHZ22o0znAVFFDJf@fedora>
+From: Caleb Sander Mateos <csander@purestorage.com>
+Date: Tue, 15 Jul 2025 11:48:12 -0400
+X-Gm-Features: Ac12FXxAF711k_Mlg6sLiotEaY7xQAOuDJKQN8IqvTmuY3oCjnEVLOJkQ3KxhcI
+Message-ID: <CADUfDZq86kMtc=OLCK6jUNwgRf6+VTmVqzHXqyD+5zK0FEqfSw@mail.gmail.com>
+Subject: Re: [PATCH V3 01/17] ublk: validate ublk server pid
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
+	Uday Shankar <ushankar@purestorage.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 7/14/25 08:13, Christoph Hellwig wrote:
-> On Mon, Jul 14, 2025 at 03:00:57PM +0900, Damien Le Moal wrote:
->> Agreed, it would be nice to clean that up. BUT, the chunk_sectors sysfs
->> attribute file is reporting the zone size today. Changing that may break
->> applications. So I am not sure if we can actually do that, unless the sysfs
->> interface is considered as "unstable" ?
-> 
-> Good point.  I don't think it is considered unstable.
+On Tue, Jul 15, 2025 at 11:42=E2=80=AFAM Ming Lei <ming.lei@redhat.com> wro=
+te:
 >
-Hmm. It does, but really the meaning of 'chunk_sectors' (ie a boundary 
-which I/O requests may not cross) hasn't changed. And that's also
-the original use-case for the mapping of zone size to chunk_sectors,
-namely to ensure that the block layer generates valid I/O.
-So from that standpoint I guess we can change it; in the end, there may
-(and will) be setups where 'chunk_sectors' is smaller than the zone
-size.
-We would need to have another attribute for the zone size, though :-)
-But arguably we should have that even if we don't follow the above
-reasoning.
+> On Tue, Jul 15, 2025 at 10:50:39AM -0400, Caleb Sander Mateos wrote:
+> > On Sun, Jul 13, 2025 at 10:34=E2=80=AFAM Ming Lei <ming.lei@redhat.com>=
+ wrote:
+> > >
+> > > ublk server pid(the `tgid` of the process opening the ublk device) is=
+ stored
+> > > in `ublk_device->ublksrv_tgid`. This `tgid` is then checked against t=
+he
+> > > `ublksrv_pid` in `ublk_ctrl_start_dev` and `ublk_ctrl_end_recovery`.
+> > >
+> > > This ensures that correct ublk server pid is stored in device info.
+> > >
+> > > Fixes: 71f28f3136af ("ublk_drv: add io_uring based userspace block dr=
+iver")
+> > > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > > ---
+> > >  drivers/block/ublk_drv.c | 9 +++++++++
+> > >  1 file changed, 9 insertions(+)
+> > >
+> > > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> > > index a1a700c7e67a..2b894de29823 100644
+> > > --- a/drivers/block/ublk_drv.c
+> > > +++ b/drivers/block/ublk_drv.c
+> > > @@ -237,6 +237,7 @@ struct ublk_device {
+> > >         unsigned int            nr_privileged_daemon;
+> > >         struct mutex cancel_mutex;
+> > >         bool canceling;
+> > > +       pid_t   ublksrv_tgid;
+> > >  };
+> > >
+> > >  /* header of ublk_params */
+> > > @@ -1528,6 +1529,7 @@ static int ublk_ch_open(struct inode *inode, st=
+ruct file *filp)
+> > >         if (test_and_set_bit(UB_STATE_OPEN, &ub->state))
+> > >                 return -EBUSY;
+> > >         filp->private_data =3D ub;
+> > > +       ub->ublksrv_tgid =3D current->tgid;
+> > >         return 0;
+> > >  }
+> > >
+> > > @@ -1542,6 +1544,7 @@ static void ublk_reset_ch_dev(struct ublk_devic=
+e *ub)
+> > >         ub->mm =3D NULL;
+> > >         ub->nr_queues_ready =3D 0;
+> > >         ub->nr_privileged_daemon =3D 0;
+> > > +       ub->ublksrv_tgid =3D -1;
+> >
+> > Should this be reset to 0? The next patch checks whether ublksrv_tgid
+> > is 0 in ublk_timeout().
+>
+> No, swapper pid is 0.
+>
+> The check in next patch just tries to double check if ublk char device
+> is opened.
+>
+> > Also, the accesses to it should probably be
+> > using {READ,WRITE}_ONCE() since ublk server open/close can happen
+> > concurrently with ublk I/O timeout handling.
+>
+> ublk_abort_queue() is called in ublk_ch_release(), and any inflight reque=
+st
+> is either requeued or failed, so ublk I/O timeout handling won't happen
+> concurrently with ublk char open()/close().
 
-Cheers,
+Thanks for explaining. If the ublk server closing the char device
+ensures there are no in-flight requests, does that make the
+ublksrv_tgid check in ublk_timeout() unnecessary?
 
-Hannes
--- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+Best,
+Caleb
