@@ -1,99 +1,103 @@
-Received: from mail-io1-f42.google.com (mail-io1-f42.google.com [209.85.166.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 004.mia.mailroute.net (004.mia.mailroute.net [199.89.3.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B02DB25A331
-	for <linux-block@vger.kernel.org>; Tue, 15 Jul 2025 18:13:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2458486337
+	for <linux-block@vger.kernel.org>; Tue, 15 Jul 2025 20:11:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752603185; cv=none; b=drqBZL3V/OtS9ntWGO0IuHm5V2SXhRQO/WTVXIFWKCyR8chKgHY6R7jtNg0qM/54e9v45RB6bl8qpux3WpQHtz7i7qNIhSrP4uzXypepPcSqysCh4FeiNUOKcDBhl/p9F6AZ5sP3goE9Yhl8ug5u4LayZZuZrXqSfmYZEd9fIq8=
+	t=1752610287; cv=none; b=ZkCmii654+QdEnnPXK/x5HKHXJjcURVter+E9RbIGrgsWOyEGsfUXd5DPt0ntzSWi/8L4aZfl1Mlr58yKT/R/UdXPQPI95Hhsaszjxpg0bQuxHhlGGTVg1lkvDjrOSBkERlXtDUKHPdiE0jCqsMwjgHeqRo7jAK4tEn0O+IHf/8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752603185; c=relaxed/simple;
-	bh=EX9IJIBE07MrxbjNekDEu4Bys7YOOtxBGSxYZ5KqQ6g=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=W2z2vYlmUOb5798m3iNkW0XySAWoBxUdh/YKra5LNN4G1US6lEfKHVvyOM72YIvbiAmm+qI+X95B+TjQupZZmaKQ+J6fXqzn6sWkwVJVJ/KWpfo7KuDDxssBj+WB4rFkBesnvBVjnUAMiiTUYAcr09OItEwp03A0Lucssinn3Vk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=p726jWpe; arc=none smtp.client-ip=209.85.166.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1752610287; c=relaxed/simple;
+	bh=W7yaa9O3iOlD4ShP4uPrxAZ211SaXWBo1KsIh/t/qEc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TFDW5SXTX0+sU5gqb1WfbpUv0ylew5ArBQb2DqF0OoeGS3WOc9vxzgIXB0TOsRrH/FxOkYy81L6F3E8ghyowpM6Sz7dZeQxCzLLVRBMnLpUy9sFaxMdQR8bfHAGsLqcC5THWL/ZGgkowWSdCjjlzpFFPgPZJN6700HGcP9t5At4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=DKP5NxiO; arc=none smtp.client-ip=199.89.3.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="p726jWpe"
-Received: by mail-io1-f42.google.com with SMTP id ca18e2360f4ac-8733548c627so208565439f.3
-        for <linux-block@vger.kernel.org>; Tue, 15 Jul 2025 11:13:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1752603183; x=1753207983; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QD0vJ10NkjciUlBMfv/7NTn82Nio+gQ7e7sXbXu83co=;
-        b=p726jWpe5VN5//j8xoDpI8DqEmjurbXosNFytWunlBovxFmm47TgX+8/WStOMS6mlv
-         v8sLWU8E3r4NraMW8c7prvso8UucLrTrLVeaXUaJ9REBmRwfmgFSpo92qyeFReEMWi8v
-         6EP0Su7ijnQMn+L0a/DzO7cy+qwwjiZCRY4EYmFq9kC+1tHXqKiH9IMig8mXwyMRvOC1
-         VYs6IhdvUgeo2stGRBLzue9G+TfciZoPtfdzqmm6wd0q9a6Dem9vvaQshAY8ekoJ4/xk
-         aVITGImBGCfSJN/Ta0eQdGoLFlf3X0HogiQbIdh2mtGQrNkWsCTolFSbG52RWbY4NPXR
-         m7lQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752603183; x=1753207983;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QD0vJ10NkjciUlBMfv/7NTn82Nio+gQ7e7sXbXu83co=;
-        b=vZdyKIXixJ0xxjfk0DMNH4As7gRmh0xMPTKJnaB8I9tOgO3KozRplN77RWjJ6y5sjK
-         VaGnfxCJhLMzStGZhzW/RZ1MUQDNGNKtcJURbxbTQDOKMK+s6hOthinWdSWAW/DOuf9O
-         W1kfMZK1/23oMFCJpXvYis29lMNuXYurSr5SE/MnnYv8j3EkYRgIrg6PEtEnk1nGagn5
-         pgSSkcDT+yEavVTah0xrDCqV6oI2y1tEf3iHipb/lHy3iEItPzQs5pSjtOGOebMXreoe
-         o1j4Sow/73zciuTvCVPJyD479RWjvixzgMYj/yESLJvcnsW3sVIiNr86tlJYg3YkAdMT
-         W2KA==
-X-Gm-Message-State: AOJu0Yxo69niOetAOzFz7QzgtWF5kFaNnW2ffXHGbCF9NAiwIxMWpxFT
-	vJzHDapsFKoK1gHxRsAYLgOBzPtH+2/dHpTaesEW5h85IhRfJpwQVWofwRDk72Xr9hM=
-X-Gm-Gg: ASbGncv5+xaoHfR97i7Plg3LcJEZl1a5NKQwXcXYNTuiVW74uvxr83bJMjRtKtxO0i+
-	gO5mGAefCUZmgHc5OxMx+3Mh2W/YMPcnBvTZZD6wFamQU4Lbnx9gq/GUDpUAw7ZTsrbj1LiyVXT
-	bhMkhb/Vymj/GxecZC5ubQn28bNkfTOR565MbhAyxfBnIYTWh4nVAoxdubsrZPmraDf1mLimfxU
-	CiOk4x3NdorEuiGcJXn03KTPXFIK3GoD2s972Pq45dI+oUq1hpr8XfqZO9GK5lKquH2OOIYeaPb
-	cRKRyhf4cDx0l2foxEF7a+P+syHBz5JrhjYt7ZI5RGDXqJUFLsW6GKPSo9iHQZuuZo9pFBm8o14
-	ltz1cjfXW0hTf
-X-Google-Smtp-Source: AGHT+IG552JG7n4td8lyOkEY2AdLnq++1FllxqUqpHx566DhENpB4MIn3derfPlgLwY/V4STyhuYIw==
-X-Received: by 2002:a05:6602:14c5:b0:879:66fe:8d1e with SMTP id ca18e2360f4ac-879c088b6d9mr51206239f.8.1752603182765;
-        Tue, 15 Jul 2025 11:13:02 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-8796bc1313asm318097639f.28.2025.07.15.11.13.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Jul 2025 11:13:02 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: Ming Lei <ming.lei@redhat.com>, 
- Caleb Sander Mateos <csander@purestorage.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-In-Reply-To: <20250715154244.1626810-1-csander@purestorage.com>
-References: <20250715154244.1626810-1-csander@purestorage.com>
-Subject: Re: [PATCH] ublk: remove unused req argument from
- ublk_sub_req_ref()
-Message-Id: <175260318198.192467.13750945616516417106.b4-ty@kernel.dk>
-Date: Tue, 15 Jul 2025 12:13:01 -0600
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="DKP5NxiO"
+Received: from localhost (localhost [127.0.0.1])
+	by 004.mia.mailroute.net (Postfix) with ESMTP id 4bhVgx14p7zm174M;
+	Tue, 15 Jul 2025 20:11:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:mime-version:x-mailer:message-id:date
+	:date:subject:subject:from:from:received:received; s=mr01; t=
+	1752610283; x=1755202284; bh=xHVmBgqq72VtV3nUuj4640JuV2mc8sIJEMS
+	l2XLEDA4=; b=DKP5NxiOSDM4CkzUJHJjgDZJlA0EBJNFjwNpxYtqH/QnOYwugr2
+	u+73zIrKvoGtbChVEh/ZOWigOxyA9fvhiKsd4xrxfAoAMrrls2J5dZJ0Bdi+Pjsk
+	RxB+GzV54KgVhdFYdh6jmmn0qMvxvY5BVHG25zfMIKNDWnSLlYm8uRKQGnR6BCpV
+	obfMMD+X/l/3cyHrMS13BeKMuQKnSvajl18QyotG/iLcwpcbRqe6oEuRQngcEbgk
+	hWpRre1jUL1MTMI+4XMiBEqJwJbfK3bdI7IGxbYJtOUC0yQbjUiNIhMrv/Dhro1M
+	I5UY36aZHJcpvFeV6VngN7aX3B621fxAJNQ==
+X-Virus-Scanned: by MailRoute
+Received: from 004.mia.mailroute.net ([127.0.0.1])
+ by localhost (004.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id 8Ce2qYY4WnyV; Tue, 15 Jul 2025 20:11:23 +0000 (UTC)
+Received: from bvanassche.mtv.corp.google.com (unknown [104.135.204.82])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 004.mia.mailroute.net (Postfix) with ESMTPSA id 4bhVgq68Whzm0xkf;
+	Tue, 15 Jul 2025 20:11:19 +0000 (UTC)
+From: Bart Van Assche <bvanassche@acm.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Eric Biggers <ebiggers@kernel.org>,
+	Bart Van Assche <bvanassche@acm.org>
+Subject: [PATCH v3 0/7] Fix bio splitting by the crypto fallback code
+Date: Tue, 15 Jul 2025 13:10:48 -0700
+Message-ID: <20250715201057.1176740-1-bvanassche@acm.org>
+X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-2ce6c
+Content-Transfer-Encoding: quoted-printable
 
+Hi Jens,
 
-On Tue, 15 Jul 2025 09:42:43 -0600, Caleb Sander Mateos wrote:
-> Since commit b749965edda8 ("ublk: remove ublk_commit_and_fetch()"),
-> ublk_sub_req_ref() no longer uses its struct request *req argument.
-> So drop the argument from ublk_sub_req_ref(), and from
-> ublk_need_complete_req(), which only passes it to ublk_sub_req_ref().
-> 
-> 
+When using the crypto fallback code, large bios are split twice. A first
+time by bio_split_to_limits() and a second time by the crypto fallback
+code. This causes bios not to be submitted in LBA error and hence trigger=
+s
+write errors for zoned block devices. This patch series fixes this by
+splitting bios once. Please consider this patch series for the next merge
+window.
 
-Applied, thanks!
+Thanks,
 
-[1/1] ublk: remove unused req argument from ublk_sub_req_ref()
-      commit: 01ceec076ba10cb6c9f5642f996203170412cd78
+Bart.
 
-Best regards,
--- 
-Jens Axboe
+Changes compared to v2:
+ - Added a patch that optimizes blk_crypto_max_io_size().
+ - Added three patches that change calling conventions in the crypto fall=
+back
+   code.
+ - Added a patch to remove crypto_bio_split.
+ - Moved the blk_crypto_max_io_size() call into get_max_io_size().
 
+Changes compared to v1:
+ - Dropped support for bio-based drivers that do not call bio_split_to_li=
+mits().
+ - Removed the BLK_FEAT_CALLS_BIO_SPLIT_TO_LIMITS and BIO_HAS_BEEN_SPLIT =
+flags.
 
+Bart Van Assche (7):
+  block: Improve blk_crypto_fallback_split_bio_if_needed()
+  block: Split blk_crypto_fallback_split_bio_if_needed()
+  block: Modify the blk_crypto_bio_prep() calling convention
+  block: Modify the blk_crypto_fallback_bio_prep() calling convention
+  block: Change the blk_crypto_fallback_encrypt_bio() calling convention
+  block: Rework splitting of encrypted bios
+  block, crypto: Remove crypto_bio_split
+
+ block/blk-core.c            |  3 --
+ block/blk-crypto-fallback.c | 85 ++++++++++++++-----------------------
+ block/blk-crypto-internal.h | 25 +++++++----
+ block/blk-crypto.c          | 26 ++++++------
+ block/blk-merge.c           |  9 +++-
+ 5 files changed, 68 insertions(+), 80 deletions(-)
 
