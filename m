@@ -1,179 +1,99 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f42.google.com (mail-io1-f42.google.com [209.85.166.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4087273D89;
-	Tue, 15 Jul 2025 18:02:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B02DB25A331
+	for <linux-block@vger.kernel.org>; Tue, 15 Jul 2025 18:13:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752602569; cv=none; b=dIau525DhbxUlHLQ2hZwCyvhcFrjCHteaUXoigS6KyV8ZptzK04+VYzzZeht0j7C9TL7cAJRv715iOncEO5RmaknIop9/awX9yuTFBgeHcG2xh3+dLOiW9zvvb+eQZrIGj1/m4hsu1TP9if1YhchG0I1nqHBZsGsiLFZMdWZgCk=
+	t=1752603185; cv=none; b=drqBZL3V/OtS9ntWGO0IuHm5V2SXhRQO/WTVXIFWKCyR8chKgHY6R7jtNg0qM/54e9v45RB6bl8qpux3WpQHtz7i7qNIhSrP4uzXypepPcSqysCh4FeiNUOKcDBhl/p9F6AZ5sP3goE9Yhl8ug5u4LayZZuZrXqSfmYZEd9fIq8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752602569; c=relaxed/simple;
-	bh=Af+DxG2+ysyDU6gOtaSIdtUVvk5g9lM1d8KO0YhEd8k=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=UDUkx7g7oliD+9ASIrcO8CxpI8JMQd3qwdoOF8ZFU2F3r9yKYcubqca21mCYLw3DGDWu+y63p4PW5pQodcUIc57RCv1Gr4F6UUOvpJFaUmdNC3KMzgxYgI911XHKvdNjpmmswhU4FrtRpokuhVA4rcSqOiIfjm1GJ659NUjwseQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iqTCvhch; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1752603185; c=relaxed/simple;
+	bh=EX9IJIBE07MrxbjNekDEu4Bys7YOOtxBGSxYZ5KqQ6g=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=W2z2vYlmUOb5798m3iNkW0XySAWoBxUdh/YKra5LNN4G1US6lEfKHVvyOM72YIvbiAmm+qI+X95B+TjQupZZmaKQ+J6fXqzn6sWkwVJVJ/KWpfo7KuDDxssBj+WB4rFkBesnvBVjnUAMiiTUYAcr09OItEwp03A0Lucssinn3Vk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=p726jWpe; arc=none smtp.client-ip=209.85.166.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iqTCvhch"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 09F8DC4CEE3;
-	Tue, 15 Jul 2025 18:02:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752602569;
-	bh=Af+DxG2+ysyDU6gOtaSIdtUVvk5g9lM1d8KO0YhEd8k=;
-	h=From:To:Cc:Subject:Date:From;
-	b=iqTCvhchFTCGB3V/QxGaCFh7GBj0JUvu/fGP+wMZbRnd1D4+II9DONEn5goX4z8R5
-	 YzlgZi4ivZmWE4z0PQto4jz2ZmCqmOAC9zXNx+aBma+Z4D5cXs95LS74LPtHEQj4E1
-	 muSH1KlN6dfiUI3krRgYH0/8NRmmOpspWhBfd2cUiqkAjOD3GqldC/HSvDVJQEygkV
-	 23hjOhAWYUB4ffiqy4F3S7r+crDMxDCQn7/RoI/1XRJHnsYw3aRRJjT7SrH3fCLp1n
-	 NS2JOX73gZ+4F8uoPGRHOmnhtHS9XQf8LtgSYXoyXdTq1p+i2keTxvONwQHCVyOm3O
-	 X0S2RLeI2rJvQ==
-From: colyli@kernel.org
-To: linux-raid@vger.kernel.org
-Cc: linux-block@vger.kernel.org,
-	Coly Li <colyli@kernel.org>,
-	Yu Kuai <yukuai3@huawei.com>,
-	Xiao Ni <xni@redhat.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Martin Wilck <mwilck@suse.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Keith Busch <kbusch@kernel.org>
-Subject: [RFC PATCH] md: split bio by io_opt size in md_submit_bio()
-Date: Wed, 16 Jul 2025 02:02:41 +0800
-Message-Id: <20250715180241.29731-1-colyli@kernel.org>
-X-Mailer: git-send-email 2.39.5
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="p726jWpe"
+Received: by mail-io1-f42.google.com with SMTP id ca18e2360f4ac-8733548c627so208565439f.3
+        for <linux-block@vger.kernel.org>; Tue, 15 Jul 2025 11:13:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1752603183; x=1753207983; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QD0vJ10NkjciUlBMfv/7NTn82Nio+gQ7e7sXbXu83co=;
+        b=p726jWpe5VN5//j8xoDpI8DqEmjurbXosNFytWunlBovxFmm47TgX+8/WStOMS6mlv
+         v8sLWU8E3r4NraMW8c7prvso8UucLrTrLVeaXUaJ9REBmRwfmgFSpo92qyeFReEMWi8v
+         6EP0Su7ijnQMn+L0a/DzO7cy+qwwjiZCRY4EYmFq9kC+1tHXqKiH9IMig8mXwyMRvOC1
+         VYs6IhdvUgeo2stGRBLzue9G+TfciZoPtfdzqmm6wd0q9a6Dem9vvaQshAY8ekoJ4/xk
+         aVITGImBGCfSJN/Ta0eQdGoLFlf3X0HogiQbIdh2mtGQrNkWsCTolFSbG52RWbY4NPXR
+         m7lQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752603183; x=1753207983;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=QD0vJ10NkjciUlBMfv/7NTn82Nio+gQ7e7sXbXu83co=;
+        b=vZdyKIXixJ0xxjfk0DMNH4As7gRmh0xMPTKJnaB8I9tOgO3KozRplN77RWjJ6y5sjK
+         VaGnfxCJhLMzStGZhzW/RZ1MUQDNGNKtcJURbxbTQDOKMK+s6hOthinWdSWAW/DOuf9O
+         W1kfMZK1/23oMFCJpXvYis29lMNuXYurSr5SE/MnnYv8j3EkYRgIrg6PEtEnk1nGagn5
+         pgSSkcDT+yEavVTah0xrDCqV6oI2y1tEf3iHipb/lHy3iEItPzQs5pSjtOGOebMXreoe
+         o1j4Sow/73zciuTvCVPJyD479RWjvixzgMYj/yESLJvcnsW3sVIiNr86tlJYg3YkAdMT
+         W2KA==
+X-Gm-Message-State: AOJu0Yxo69niOetAOzFz7QzgtWF5kFaNnW2ffXHGbCF9NAiwIxMWpxFT
+	vJzHDapsFKoK1gHxRsAYLgOBzPtH+2/dHpTaesEW5h85IhRfJpwQVWofwRDk72Xr9hM=
+X-Gm-Gg: ASbGncv5+xaoHfR97i7Plg3LcJEZl1a5NKQwXcXYNTuiVW74uvxr83bJMjRtKtxO0i+
+	gO5mGAefCUZmgHc5OxMx+3Mh2W/YMPcnBvTZZD6wFamQU4Lbnx9gq/GUDpUAw7ZTsrbj1LiyVXT
+	bhMkhb/Vymj/GxecZC5ubQn28bNkfTOR565MbhAyxfBnIYTWh4nVAoxdubsrZPmraDf1mLimfxU
+	CiOk4x3NdorEuiGcJXn03KTPXFIK3GoD2s972Pq45dI+oUq1hpr8XfqZO9GK5lKquH2OOIYeaPb
+	cRKRyhf4cDx0l2foxEF7a+P+syHBz5JrhjYt7ZI5RGDXqJUFLsW6GKPSo9iHQZuuZo9pFBm8o14
+	ltz1cjfXW0hTf
+X-Google-Smtp-Source: AGHT+IG552JG7n4td8lyOkEY2AdLnq++1FllxqUqpHx566DhENpB4MIn3derfPlgLwY/V4STyhuYIw==
+X-Received: by 2002:a05:6602:14c5:b0:879:66fe:8d1e with SMTP id ca18e2360f4ac-879c088b6d9mr51206239f.8.1752603182765;
+        Tue, 15 Jul 2025 11:13:02 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-8796bc1313asm318097639f.28.2025.07.15.11.13.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 15 Jul 2025 11:13:02 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: Ming Lei <ming.lei@redhat.com>, 
+ Caleb Sander Mateos <csander@purestorage.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+In-Reply-To: <20250715154244.1626810-1-csander@purestorage.com>
+References: <20250715154244.1626810-1-csander@purestorage.com>
+Subject: Re: [PATCH] ublk: remove unused req argument from
+ ublk_sub_req_ref()
+Message-Id: <175260318198.192467.13750945616516417106.b4-ty@kernel.dk>
+Date: Tue, 15 Jul 2025 12:13:01 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3-dev-2ce6c
 
-From: Coly Li <colyli@kernel.org>
 
-Currently in md_submit_bio() the incoming request bio is split by
-bio_split_to_limits() which makes sure the bio won't exceed
-max_hw_sectors of a specific raid level before senting into its
-.make_request method.
+On Tue, 15 Jul 2025 09:42:43 -0600, Caleb Sander Mateos wrote:
+> Since commit b749965edda8 ("ublk: remove ublk_commit_and_fetch()"),
+> ublk_sub_req_ref() no longer uses its struct request *req argument.
+> So drop the argument from ublk_sub_req_ref(), and from
+> ublk_need_complete_req(), which only passes it to ublk_sub_req_ref().
+> 
+> 
 
-For raid level 4/5/6 such split method might be problematic and hurt
-large read/write perforamnce. Because limits.max_hw_sectors are not
-always aligned to limits.io_opt size, the split bio won't be full
-stripes covered on all data disks, and will introduce extra read-in I/O.
-Even the bio's bi_sector is aligned to limits.io_opt size and large
-enough, the resulted split bio is not size-friendly to corresponding
-raid456 level.
+Applied, thanks!
 
-This patch introduces bio_split_by_io_opt() to solve the above issue,
-1, If the incoming bio is not limits.io_opt aligned, split the non-
-   aligned head part. Then the next one will be aligned.
-2, If the imcoming bio is limits.io_opt aligned, and split is necessary,
-   then try to split a by multiple of limits.io_opt but not exceed
-   limits.max_hw_sectors.
+[1/1] ublk: remove unused req argument from ublk_sub_req_ref()
+      commit: 01ceec076ba10cb6c9f5642f996203170412cd78
 
-Then for large bio, the sligned split part will be full-stripes covered
-to all data disks, no extra read-in I/Os when rmw_level is 0. And for
-rmw_level > 0 condistions, the limits.io_opt aligned bios are welcomed
-for performace as well.
-
-This RFC patch only tests on 8 disks raid5 array with 64KiB chunk size.
-By this patch, 64KiB chunk size for a 8 disks raid5 array, sequential
-write performance increases from 900MiB/s to 1.1GiB/s by fio bs=10M.
-If fio bs=488K (exact limits.io_opt size) the peak sequential write
-throughput can reach 1.51GiB/s.
-
-(Resend to include Christoph and Keith in CC list.)
-
-Signed-off-by: Coly Li <colyli@kernel.org>
-Cc: Yu Kuai <yukuai3@huawei.com>
-Cc: Xiao Ni <xni@redhat.com>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Martin Wilck <mwilck@suse.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Keith Busch <kbusch@kernel.org>
----
- drivers/md/md.c | 63 ++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 62 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/md/md.c b/drivers/md/md.c
-index 0f03b21e66e4..363cff633af3 100644
---- a/drivers/md/md.c
-+++ b/drivers/md/md.c
-@@ -426,6 +426,67 @@ bool md_handle_request(struct mddev *mddev, struct bio *bio)
- }
- EXPORT_SYMBOL(md_handle_request);
- 
-+static struct bio *bio_split_by_io_opt(struct bio *bio)
-+{
-+	sector_t io_opt_sectors, sectors, n;
-+	struct queue_limits lim;
-+	struct mddev *mddev;
-+	struct bio *split;
-+	int level;
-+
-+	mddev = bio->bi_bdev->bd_disk->private_data;
-+	level = mddev->level;
-+	if (level == 1 || level == 10 || level == 0 || level == LEVEL_LINEAR)
-+		return bio_split_to_limits(bio);
-+
-+	lim = mddev->gendisk->queue->limits;
-+	io_opt_sectors = min3(bio_sectors(bio), lim.io_opt >> SECTOR_SHIFT,
-+			      lim.max_hw_sectors);
-+
-+	/* No need to split */
-+	if (bio_sectors(bio) == io_opt_sectors)
-+		return bio;
-+
-+	n = bio->bi_iter.bi_sector;
-+	sectors = do_div(n, io_opt_sectors);
-+	/* Aligned to io_opt size and no need to split for radi456 */
-+	if (!sectors && (bio_sectors(bio) <=  lim.max_hw_sectors))
-+		return bio;
-+
-+	if (sectors) {
-+		/**
-+		 * Not aligned to io_opt, split
-+		 * non-aligned head part.
-+		 */
-+		sectors = io_opt_sectors - sectors;
-+	} else {
-+		/**
-+		 * Aligned to io_opt, split to the largest multiple
-+		 * of io_opt within max_hw_sectors, to make full
-+		 * stripe write/read for underlying raid456 levels.
-+		 */
-+		n = lim.max_hw_sectors;
-+		do_div(n, io_opt_sectors);
-+		sectors = n * io_opt_sectors;
-+	}
-+
-+	/* Almost won't happen */
-+	if (unlikely(sectors >= bio_sectors(bio))) {
-+		pr_warn("%s raid level %d: sectors %llu >= bio_sectors %u, not split\n",
-+			__func__, level, sectors, bio_sectors(bio));
-+		return bio;
-+	}
-+
-+	split = bio_split(bio, sectors, GFP_NOIO,
-+			  &bio->bi_bdev->bd_disk->bio_split);
-+	if (!split)
-+		return bio;
-+	split->bi_opf |= REQ_NOMERGE;
-+	bio_chain(split, bio);
-+	submit_bio_noacct(bio);
-+	return split;
-+}
-+
- static void md_submit_bio(struct bio *bio)
- {
- 	const int rw = bio_data_dir(bio);
-@@ -441,7 +502,7 @@ static void md_submit_bio(struct bio *bio)
- 		return;
- 	}
- 
--	bio = bio_split_to_limits(bio);
-+	bio = bio_split_by_io_opt(bio);
- 	if (!bio)
- 		return;
- 
+Best regards,
 -- 
-2.39.5
+Jens Axboe
+
+
 
