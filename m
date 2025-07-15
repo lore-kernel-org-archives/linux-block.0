@@ -1,41 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEF0F1F0E24;
-	Tue, 15 Jul 2025 20:56:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35B0929B8E4
+	for <linux-block@vger.kernel.org>; Tue, 15 Jul 2025 21:44:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752612967; cv=none; b=DJavZePG0VKMzZOzM4nmQpXtaszkhz7UagdAXih+/QDpOlvgZLMJUmsFckkt/zeLA3Ho4RCQL3YNw8YRzx2w6A8H71jvs7jQxshI03K/ArXgmCzePhpcHqUknlBbZmavzJHtR3Z/vfo/vntrkCN5goLF9OLqd72DSOLaKPFBSvU=
+	t=1752615899; cv=none; b=tgxEXqKXD29v6qjGvsSbrxafJCybgFdcpdKQMv+R02SgKlrQAO/MMiMqypk4GchkETHeuNF+hsIAfDDd3KvwbiZDnbvcoVjqB9Q4S+p14Uz+6SGOVPAuYfhgsAM1xUq2KIefJCL0sQUMEvh8/WBMmJ29n1N2UKtrLt3hbSUoynw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752612967; c=relaxed/simple;
-	bh=BypLHT8P3y7WLcxpAqRf9nezS1MXJSKqpoWXatLi35Q=;
+	s=arc-20240116; t=1752615899; c=relaxed/simple;
+	bh=FRWUUCWhPKFToIQd0nFXhqkclscsYjy2l6b6I1gwF04=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GwM3cgZGp7vTJ1fIUFVhwLvjcw7yRjxZl34kuGXMdW0i9FaTsvmFkACshM+cE3x2Xmy0ebtshA7KU8HdQqcSvBmD59GP4XoRhkn+oqAheC9yMG74JaSnWFk9HONv4dLDjWS5a68ytbj/OHklv25WjrepOpfce/VFdXzakk0mnho=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gAgPb5sS; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=CEFzuM0W3WDtDkAFkO1hrZrkOhI1wGgEwSzGPoGJLOCy5BMzWdR8JVBFT4HU0bJ5QY1sCas1Uc+mxi82culDuv4J7DvtRnaSqFWVyOIuMhdAMOAN4UNkcyuf7jXLdbPc0ZejG7ZvJY3L29sPxcAfuQaNBm8LbldpU1c/bTMtFpU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ABvpJIMv; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gAgPb5sS"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BFC9BC4CEE3;
-	Tue, 15 Jul 2025 20:56:06 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ABvpJIMv"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A073C4CEE3;
+	Tue, 15 Jul 2025 21:44:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752612967;
-	bh=BypLHT8P3y7WLcxpAqRf9nezS1MXJSKqpoWXatLi35Q=;
+	s=k20201202; t=1752615898;
+	bh=FRWUUCWhPKFToIQd0nFXhqkclscsYjy2l6b6I1gwF04=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=gAgPb5sSG955z0OLvwZTks1uWTR0zFbzL+bgn37yNPO9OwCbjWyZenxB2NhU9PjEK
-	 2nWUmDRao/DnjxwrGOKGCopYuqmXp5ayTa31AnSCS7eJDn5LQ4+uMFKCleJoWTT2S8
-	 rXtFFVJQLFcf/k1KI7+rlsN6jNlj/774pp24ThYNdEjBonSXFG43QamgWrp9Gpe3sl
-	 jlwU1bKkMxYBR2vx29ZCNEgaCZtfJ/2zgbJ/zTOUmlAOg3OtD3I5ytGaTSdYmjsFA2
-	 8mtVnEu0K64YvnY5WsHSwP/3eV7MjGMPai0FcDwYWWWQOC85+m+9JVNVX3raJGWwcm
-	 sYESA+iKvoLFA==
-Date: Tue, 15 Jul 2025 14:56:04 -0600
-From: Keith Busch <kbusch@kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: John Garry <john.g.garry@oracle.com>,
-	"Darrick J. Wong" <djwong@kernel.org>,
-	linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-Subject: Re: Do we need an opt-in for file systems use of hw atomic writes?
-Message-ID: <aHbAZBf12kiEdXfH@kbusch-mbp>
-References: <20250714131713.GA8742@lst.de>
+	b=ABvpJIMvwrxK2URfBWIsxZfzulaHxrXY+bHjrS8YFtYKjXolU0RyAkPNLiTrJjVRr
+	 HQ44MpEIeWZl7/Eiwx0BTV0Gf7iGWRcC75j2MYvPHzbyZ2Zw0wBeeyIwrDGLddm9pj
+	 ya8waF0zM9ZWtIj6Ck2nB9FLKAy+E3nkmKVKDhMjGYgKMON+eiokMRLP5s7lF4Evhh
+	 1YlRTE0eamT2wMv4qzqCwi6P+rT+ezLkBQTjqWo2V25SgpPnmeRGXDRg4f/0gmp6vQ
+	 GbwsvR1froJy38mAecv7SylFa1fI29UBkeXcXJB3bVSoQh8/6edJL4cSN0lb940ZjM
+	 maJ2A49aD1rQg==
+Date: Tue, 15 Jul 2025 21:44:56 +0000
+From: Eric Biggers <ebiggers@kernel.org>
+To: Bart Van Assche <bvanassche@acm.org>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH v3 0/7] Fix bio splitting by the crypto fallback code
+Message-ID: <20250715214456.GA765749@google.com>
+References: <20250715201057.1176740-1-bvanassche@acm.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -44,19 +42,37 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250714131713.GA8742@lst.de>
+In-Reply-To: <20250715201057.1176740-1-bvanassche@acm.org>
 
-On Mon, Jul 14, 2025 at 03:17:13PM +0200, Christoph Hellwig wrote:
-> Is is just me, or would it be a good idea to require an explicit
-> opt-in to user hardware atomics?
+On Tue, Jul 15, 2025 at 01:10:48PM -0700, Bart Van Assche wrote:
+> Changes compared to v2:
+>  - Added a patch that optimizes blk_crypto_max_io_size().
+>  - Added three patches that change calling conventions in the crypto fallback
+>    code.
+>  - Added a patch to remove crypto_bio_split.
+>  - Moved the blk_crypto_max_io_size() call into get_max_io_size().
 
-IMO, if the block device's limits reports atomic capabilities, it's fair
-game for any in kernel use. These are used outside of filesystems too,
-like through raw block fops.
+But this doesn't address the issue we're discussing where this patchset
+makes data be silently left unencrypted on some block devices.
 
-We've already settled on discarding problematic nvme attributes from
-consideration. Is there something beyond that you've really found? If
-so, maybe we should continue down the path of splitting more queue
-limits into "hardware" and "user" values, and make filesystems subscribe
-to the udev value where it defaults to "unsupported" for untrusted
-devices.
+If it's really only a "few random drivers that almost no one cares
+about", then it's possible we can drop the blk-crypto-fallback support
+for them anyway, as Christoph is suggesting.
+
+However, it needs to be done safely.  That means at least making
+blk_crypto_config_supported() continue to return false when called on a
+block_device that doesn't support any form of blk-crypto (either native
+or fallback), and likewise making blk_crypto_start_using_key() continue
+to return an error.  Ideally, the actual I/O would also continue to fail
+if it's attempted anyway.
+
+Overall, it's a bit frustrating seeing these patches go by that propose
+to silently leave data unencrypted when upper layers requested that it
+be encrypted.  IMO this is actually a point against handling encryption
+in the block layer...  The whole point of storage encryption (whether
+fscrypt, dm-crypt, dm-inlinecrypt, or something else) is that the data
+is actually encrypted.  But if the actual encryption is done using code
+whose developers / maintainers don't really consider encryption to be a
+priority, that's not a great place to be.
+
+- Eric
