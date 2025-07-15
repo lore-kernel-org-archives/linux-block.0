@@ -1,129 +1,154 @@
-Received: from 004.mia.mailroute.net (004.mia.mailroute.net [199.89.3.7])
+Received: from mout-p-201.mailbox.org (mout-p-201.mailbox.org [80.241.56.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA8DD2D948B
-	for <linux-block@vger.kernel.org>; Tue, 15 Jul 2025 12:58:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED2422ECD16;
+	Tue, 15 Jul 2025 13:54:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752584313; cv=none; b=NPiAkvPE8rREY/depzI/GnZqChhwr8DVVYrTAj8pc1i9vA/WU5b/8m1x4mjpvO4iBo5kHPcw7cTzvm2qAURpnYoBbIc/xs9Nq+p9mpXQm+C6vHp7XMBdJCs4kSQcQ16g1mHEeFwSmsSwZ8agK/GgDPT2UZW9pbE4VnOeZWKuaQA=
+	t=1752587647; cv=none; b=KTeljGaDc90H+msqzq5xqWxgXBXXBwRmFrXjB551IdODbbVm+MXPq1Z2Dh/gy/6dqAAOLh3XDbVVs4pyvHQAO8BbThA6FxyEti3vOx3fG5xHkbjX91oitlMGHnIqcH3flZIleI/oLadZ1ZTCoTw6PTwMrmUS+D6zBaaC9moQGu4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752584313; c=relaxed/simple;
-	bh=rJxJmkMjv9hRU1poHNldVepS3PnnBBFEAF0M9FOygeI=;
+	s=arc-20240116; t=1752587647; c=relaxed/simple;
+	bh=TI+q4X7B5ajg00//PiUBxtm7Tx45E2OavIud3tLqh7k=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MuefW91x0CW7F7FBbX5V/dkvsdVxkXio7n9ph+wC5QZYtnhq+ub976c/q4X4f0oxNVbcr1z4hneTn6g64Fst76INzY9Jpaoa3I9MroCevLjFfzSWGt0H9ydKPAcyJtbbu2jz8Hsf+U6hf+STBGr/uDw8TqbpwAjdVM8ovaRskQs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=KNqNJy16; arc=none smtp.client-ip=199.89.3.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	 In-Reply-To:Content-Type; b=aU1Q5fZP7ij1dUMiYjYMcegowA6KjqOu3/5zfKSrjV5KrRxe9kSsQxi2c95QYCRRAtFuZI7t4FlM1q/zTjhSAUNBP6OasBwPPEOGkdZeVCVGSuThDgTWezHNTQwv6DTX+lt6XPnh2CN+BkZy6XxiI2+Sb3r3AYDSuRToJcxsjOc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pankajraghav.com; spf=pass smtp.mailfrom=pankajraghav.com; dkim=pass (2048-bit key) header.d=pankajraghav.com header.i=@pankajraghav.com header.b=KchWQKSf; arc=none smtp.client-ip=80.241.56.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pankajraghav.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pankajraghav.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="KNqNJy16"
-Received: from localhost (localhost [127.0.0.1])
-	by 004.mia.mailroute.net (Postfix) with ESMTP id 4bhK4Q5GcJzm174N;
-	Tue, 15 Jul 2025 12:58:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1752584309; x=1755176310; bh=xe7K3OdBh+FNPMbmGNMvhXaN
-	jUUA5NFp9Fx1Or9rpRw=; b=KNqNJy168+m2P7XIxQGeigiYZGj4H6O31m+LlbTg
-	kuSj83mApghVx7at67rI5EhqIjwBH1nrk9+K0i+JX42503gN8SgCQHRrNwb8aY3C
-	9mNxftFj3ExiN2I3MQwxhJtYKCs8J+txsYcTvX4ZFY4XA9mCRdNC41QCo1Fi1z4K
-	zvDHRx0vfRAoFLcpZPb/5zbTNK3N6iVDelKGkNP10RY9h9kBOH4FGtF0vbxo8B/5
-	H9WUBfj3d2aE7sQ5rAWKmCCVcZoXFi6K048k+GWmD0rInq3zzrd2kkd0Mlj5AjqR
-	maJmDVOpSA5bcr3PO+CCK5ueYZOgZDweF+oFvC+8oxNsdw==
-X-Virus-Scanned: by MailRoute
-Received: from 004.mia.mailroute.net ([127.0.0.1])
- by localhost (004.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id fe2k-7uyz2qz; Tue, 15 Jul 2025 12:58:29 +0000 (UTC)
-Received: from [192.168.51.14] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
+	dkim=pass (2048-bit key) header.d=pankajraghav.com header.i=@pankajraghav.com header.b="KchWQKSf"
+Received: from smtp202.mailbox.org (smtp202.mailbox.org [10.196.197.202])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 004.mia.mailroute.net (Postfix) with ESMTPSA id 4bhK4J6Dh6zm0yQp;
-	Tue, 15 Jul 2025 12:58:22 +0000 (UTC)
-Message-ID: <d14a3b85-a950-436f-95c0-62b3c9cd1053@acm.org>
-Date: Tue, 15 Jul 2025 05:58:21 -0700
+	by mout-p-201.mailbox.org (Postfix) with ESMTPS id 4bhLJS6ZJhz9tJh;
+	Tue, 15 Jul 2025 15:54:00 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pankajraghav.com;
+	s=MBO0001; t=1752587641;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=f+/pRfnziQy+vnrr7cy84X8As3YxPBFjo6viEF0K4AM=;
+	b=KchWQKSfMAVs5akCV9f1abNSHWlPgTEZYnAr/TBieZnSm6LGk5YhpCi2CPiagz9rloCJnU
+	5V+irsqtIe3z3O66EoJGSDBpAOAXpfUhVnKabLFn62PqumdoU/26UXEIbfk7lmDIAyGXTb
+	lzmuvm8oMug9rLOtQchKKowFg0DBd0OD5sf6wGQzggcTvGgHsiGQv0gSzvJdg1f6ITF29g
+	hz1SUTlSwUua2jfdjYzBzKnYYELaB8wSJCDjXwYLIPYnSsqJ4Ud0Rd97DEB9gBx7CBJfMo
+	BsKx3j29JVYo0YdByz7sOBeG7th/B73sF9pTKgTB5KEN4UDe7L+aim3Xw5uj9Q==
+Message-ID: <f51efc9a-20ae-4304-812b-824d64d17e4f@pankajraghav.com>
+Date: Tue, 15 Jul 2025 15:53:45 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH blktests v2] loop/010, common/rc: drain udev events after
- test
-To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
- linux-block@vger.kernel.org
-Cc: Yi Zhang <yi.zhang@redhat.com>, Gulam Mohamed <gulam.mohamed@oracle.com>,
- Daniel Wagner <dwagner@suse.de>
-References: <20250715043202.28788-1-shinichiro.kawasaki@wdc.com>
+Subject: Re: [PATCH v2 0/5] add static PMD zero page support
+To: Zi Yan <ziy@nvidia.com>, David Hildenbrand <david@redhat.com>
+Cc: Dave Hansen <dave.hansen@linux.intel.com>, Michal Hocko
+ <mhocko@suse.com>, Jens Axboe <axboe@kernel.dk>,
+ "Liam R . Howlett" <Liam.Howlett@oracle.com>, Nico Pache
+ <npache@redhat.com>, Andrew Morton <akpm@linux-foundation.org>,
+ Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, Mike Rapoport
+ <rppt@kernel.org>, Vlastimil Babka <vbabka@suse.cz>,
+ "H . Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>,
+ Baolin Wang <baolin.wang@linux.alibaba.com>,
+ Ryan Roberts <ryan.roberts@arm.com>, Suren Baghdasaryan <surenb@google.com>,
+ linux-kernel@vger.kernel.org, Dev Jain <dev.jain@arm.com>,
+ Thomas Gleixner <tglx@linutronix.de>, willy@infradead.org,
+ linux-mm@kvack.org, x86@kernel.org, linux-block@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, "Darrick J . Wong" <djwong@kernel.org>,
+ mcgrof@kernel.org, gost.dev@samsung.com, hch@lst.de,
+ Pankaj Raghav <p.raghav@samsung.com>, Ingo Molnar <mingo@redhat.com>
+References: <20250707142319.319642-1-kernel@pankajraghav.com>
 Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20250715043202.28788-1-shinichiro.kawasaki@wdc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Pankaj Raghav <kernel@pankajraghav.com>
+In-Reply-To: <20250707142319.319642-1-kernel@pankajraghav.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 7/14/25 9:32 PM, Shin'ichiro Kawasaki wrote:
-> The test case repeats creating and deleting a loop device. This
-> generates many udev events and makes following test cases fail. To avoid
-> the unexpected test case failures, drain the udev events. For that
-> purpose, introduce the helper function _drain_udev_events(). When
-> systemd-udevd service is running, restart it to discard the events
-> quickly. When systemd-udevd service is not available, call
-> "udevadm settle", which takes longer time to drain the events.
-> 
-> Link: https://github.com/linux-blktests/blktests/issues/181
-> Reported-by: Yi Zhang <yi.zhang@redhat.com>
-> Suggested-by: Bart Van Assche <bvanassche@acm.org>
-> Suggested-by: Daniel Wagner <dwagner@suse.de>
-> Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-> ---
-> Changes from v1:
-> * Added "udevadm settle" in case systemd-udevd.service is not available
-> * Introduced _drain_udev_events()
-> 
->   common/rc      | 9 +++++++++
->   tests/loop/010 | 5 +++++
->   2 files changed, 14 insertions(+)
-> 
-> diff --git a/common/rc b/common/rc
-> index 72441ab..dfc389f 100644
-> --- a/common/rc
-> +++ b/common/rc
-> @@ -544,6 +544,15 @@ _systemctl_stop() {
->   	done
->   }
->   
-> +_drain_udev_events() {
-> +	if command -v systemctl &>/dev/null &&
-> +			systemctl is-active --quiet systemd-udevd; then
-> +		systemctl restart systemd-udevd.service
-> +	else
-> +		udevadm settle --timeout=900
-> +	fi
-> +}
-> +
->   # Run the given command as NORMAL_USER
->   _run_user() {
->   	su "$NORMAL_USER" -c "$1"
-> diff --git a/tests/loop/010 b/tests/loop/010
-> index 309fd8a..b1a4926 100755
-> --- a/tests/loop/010
-> +++ b/tests/loop/010
-> @@ -78,5 +78,10 @@ test() {
->   	if _dmesg_since_test_start | grep --quiet "$grep_str"; then
->   		echo "Fail"
->   	fi
-> +
-> +	# The repeated loop device creations and deletions generated so many
-> +	# udev events. Drain the events to not influence following test cases.
-> +	_drain_udev_events
-> +
+Hi David,
 
-How about changing the above comment into the following to make it more 
-clear? "This test generates udev events faster than the rate at which
-udevd can process events. Drain udev events to prevent that future test
-cases fail." Anyway:
+For now I have some feedback from Zi. It would be great to hear your
+feedback before I send the next version :)
 
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+--
+Pankaj
+
+On Mon, Jul 07, 2025 at 04:23:14PM +0200, Pankaj Raghav (Samsung) wrote:
+> From: Pankaj Raghav <p.raghav@samsung.com>
+>
+> There are many places in the kernel where we need to zeroout larger
+> chunks but the maximum segment we can zeroout at a time by ZERO_PAGE
+> is limited by PAGE_SIZE.
+>
+> This concern was raised during the review of adding Large Block Size support
+> to XFS[1][2].
+>
+> This is especially annoying in block devices and filesystems where we
+> attach multiple ZERO_PAGEs to the bio in different bvecs. With multipage
+> bvec support in block layer, it is much more efficient to send out
+> larger zero pages as a part of a single bvec.
+>
+> Some examples of places in the kernel where this could be useful:
+> - blkdev_issue_zero_pages()
+> - iomap_dio_zero()
+> - vmalloc.c:zero_iter()
+> - rxperf_process_call()
+> - fscrypt_zeroout_range_inline_crypt()
+> - bch2_checksum_update()
+> ...
+>
+> We already have huge_zero_folio that is allocated on demand, and it will be
+> deallocated by the shrinker if there are no users of it left.
+>
+> At moment, huge_zero_folio infrastructure refcount is tied to the process
+> lifetime that created it. This might not work for bio layer as the completions
+> can be async and the process that created the huge_zero_folio might no
+> longer be alive.
+>
+> Add a config option STATIC_PMD_ZERO_PAGE that will always allocate
+> the huge_zero_folio via memblock, and it will never be freed.
+>
+> I have converted blkdev_issue_zero_pages() as an example as a part of
+> this series.
+>
+> I will send patches to individual subsystems using the huge_zero_folio
+> once this gets upstreamed.
+>
+> Looking forward to some feedback.
+>
+> [1] https://lore.kernel.org/linux-xfs/20231027051847.GA7885@lst.de/
+> [2] https://lore.kernel.org/linux-xfs/ZitIK5OnR7ZNY0IG@infradead.org/
+>
+> Changes since v1:
+> - Move from .bss to allocating it through memblock(David)
+>
+> Changes since RFC:
+> - Added the config option based on the feedback from David.
+> - Encode more info in the header to avoid dead code (Dave hansen
+>   feedback)
+> - The static part of huge_zero_folio in memory.c and the dynamic part
+>   stays in huge_memory.c
+> - Split the patches to make it easy for review.
+>
+> Pankaj Raghav (5):
+>   mm: move huge_zero_page declaration from huge_mm.h to mm.h
+>   huge_memory: add huge_zero_page_shrinker_(init|exit) function
+>   mm: add static PMD zero page
+>   mm: add largest_zero_folio() routine
+>   block: use largest_zero_folio in __blkdev_issue_zero_pages()
+>
+>  block/blk-lib.c         | 17 +++++----
+>  include/linux/huge_mm.h | 31 ----------------
+>  include/linux/mm.h      | 81 +++++++++++++++++++++++++++++++++++++++++
+>  mm/Kconfig              |  9 +++++
+>  mm/huge_memory.c        | 62 +++++++++++++++++++++++--------
+>  mm/memory.c             | 25 +++++++++++++
+>  mm/mm_init.c            |  1 +
+>  7 files changed, 173 insertions(+), 53 deletions(-)
+>
+>
+> base-commit: d7b8f8e20813f0179d8ef519541a3527e7661d3a
+> --
+> 2.49.0
 
