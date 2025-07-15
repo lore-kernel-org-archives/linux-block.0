@@ -1,149 +1,141 @@
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 566A51DF99C
-	for <linux-block@vger.kernel.org>; Tue, 15 Jul 2025 15:48:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EC4B25486D
+	for <linux-block@vger.kernel.org>; Tue, 15 Jul 2025 15:57:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752594505; cv=none; b=P/YABpSPb8cbGIlz83w5s8Cky26wcXumm12oPD/fSPR9ZdcERxqejkWy3oxE2uxK4VsLnFFUQ75X9DDb/3FBwYwvSHHHrnE5Yq2Kb3ugkZc3AXM1OcafzWssMmxvSqVT21moE89FGDP70UfqeujvAPV9Tosys0/rBhufDSraACY=
+	t=1752595023; cv=none; b=hU6lCuiJNMdSJ4GXo3BF4ehJpqVEQbnySbOVlkHin0GXaa4/l6S2WGRj2MqlyUuNOxm43ed0k/B0fKmDtJR4FJRVmTtRmCmy9IwQ4j2a8PyiuSxEopXxixLZCleue8bZ412eih65yCeanlGazwYiI+3ge5poh1q9PPOVJr3s/Hc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752594505; c=relaxed/simple;
-	bh=RH96XpcDJBxXiI+o48Ks9OrHhfsc3OL/5IzUI6g3mPY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dso2s6ZlTq6cUjlwBKuUDzA0Sz9/uIkwFTs2hm2OfsSu6dnKePtoq3wNIEuoG48ezVmj/UtLBHG+LNrhK/GC2gf6uw6A5ArT6MX3Ip+o3EhwgglC59OwLRYkmzUEi9VoXVWBxrfEiRc5Fea8OV/GAjANmoPRVsrbY2f8uBQdvbg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=AcqOEiX3; arc=none smtp.client-ip=209.85.216.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	s=arc-20240116; t=1752595023; c=relaxed/simple;
+	bh=BEZrOkhpb24HE3sPI9hTEW3vL9h+HeOuOxJOLMzukHQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=NizTEyvTt/WJ3JAdPztReFNzudaNj7ZyKWVNKP+a21ZNM7xxVQrAergB4yZlC8XEIM0+X7OGJfW/zIeBOEcXyrOKkpXS5EqiLlAtfS+sgWNk5e+V8gU71r0PVg3bRfX9uIOQGr3ngjMTVSspI1p27EvXWKfepMl/I3bZKRWD/fE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cTzMiOMn; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="AcqOEiX3"
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-312a806f002so944124a91.3
-        for <linux-block@vger.kernel.org>; Tue, 15 Jul 2025 08:48:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1752594503; x=1753199303; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=j627q4ORHb51CZCllyqxMTaNNKt8GFVJaQkKXQE2d38=;
-        b=AcqOEiX3Huduf7rLpdG0SHE9VUIg50fqFb5ZAAfzKHLx7676pkCh+rSJtRLh/c+LZm
-         C8F2bf6M/DQGMrLtfwIu89hjFwwJSS59sHg71rx1GhdkjEZsn3YpB6j/Zl2uXBUCbAIp
-         snRtsQOqdJ6P6Z6feRKhZKhVZEEaiN0WSMouvibe/cjMRSFlbNcgXVjyh0CNWR7jhJBe
-         1leum2ewxLVSsq9bXEXEtVeQ5GkFG4eH55XbA4yWdPLO9CbH4rYetKLTp/RVCFZIonWN
-         wDcbHnFUW4nYoLtAwJsHbVfasz9SU67g1c+td1lEGWRfFE3TyEDeOjqilHLpe8xyE/qQ
-         WDZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752594503; x=1753199303;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=j627q4ORHb51CZCllyqxMTaNNKt8GFVJaQkKXQE2d38=;
-        b=WqZhvhu9+nCTvzQddlfqOOt9mpVuEvvex2P3zHxhNcztbZQMyVy1/k7Yi9vRAIuGW/
-         4JuJPoX6P3DzJIev5KJQO28ng5vLwDM8GIlPRf+F23eELqm5cu5RFHTh691TmzZOKwmY
-         q3WeLNy+7lOqJzelKrZsF5ger+bhqc+IiicLJmNf0HuAsFbBv7dF2hb0NVtjIe7gawDR
-         oOikRycSUqDY3Kqaa1gnEU8rUYRmB++u4uEt5xEAoS5uAtqwhzMMOt7na4kRicUuXAx+
-         MFbNhl8cTuJRM0HVRgjlf8e8fZnyqC3W5D2qbLxfhp6yQrv5D+emJ69+tsciYrF8VZ93
-         /zwQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUd4Z952zd1nlIw6V/5wqts3+3G+4RU5NH0P/x6nIHY0QsEIuoVfBUWPonP3BAjT6dU3OH6FdMW1R4T2g==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxC+h5mVk3JOsvJfgTGAV7K635Dk3WwlfqSklOtd/ZxXZQwbtUC
-	LhO/SORFk5M24MV/atzFS3L+tLZkoM8D6B/WhK1P1vV14qBHaI8XJ4eCU/Kk2dxOD8zpgY60Q4d
-	CVI+51ftXRIjxyLlw7v04BCDlEPgawH4Yo5n6D4zrqA==
-X-Gm-Gg: ASbGnctpF6GCEV//7OKG8WEdQpJlc2xowaNKPA8l06WfsxcEOlrWB/m49/HDuSkiq5B
-	awoci8YDBWl1yDNhrF9lltGgJlbp4CWHvyzWTMDCkI8e68BBmcJ2Nky8BoFpfFgb8KLtVw+nKY0
-	jO96XVlcpwnzLp+FdqP5CKA6Ybjnd181ZGsDE1v8Fs4sfu+x5xLl0rAqMuFI4vg2MfHab0JBu2x
-	rFb1g==
-X-Google-Smtp-Source: AGHT+IGo4lIg587pr9i9d+xs903/W8E7OjkK4k1p8m6cIepBcuRl9sCr29txrqtPxr940gQ8nUqs/xl8kJW3yuPNlho=
-X-Received: by 2002:a17:90b:270b:b0:314:29ff:6845 with SMTP id
- 98e67ed59e1d1-31c94dbc0a8mr1329634a91.4.1752594503457; Tue, 15 Jul 2025
- 08:48:23 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cTzMiOMn"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5BC7C4CEFB;
+	Tue, 15 Jul 2025 15:57:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752595021;
+	bh=BEZrOkhpb24HE3sPI9hTEW3vL9h+HeOuOxJOLMzukHQ=;
+	h=Date:From:To:Cc:Subject:From;
+	b=cTzMiOMnm+FAQXE0H7U5dEuGw8bJnYsDpqd03JKYrvRk0K9szE1CTFiBgRbscVksR
+	 jKtvhMZKMNUs4HLLE+VBY2I75bb/azMGPXnL8OG19cF2GiZGhrxLjid1YG/l4R/ROg
+	 Xxqwh2VlwZMw5vrX0bwBCYtny2ew1HMYQeJyh/lzmHdb2MvZKDvJrJq+oYwP3X/H8c
+	 Ulh3ImWwkJo5DyImmpOoMuKkUewFpwD5NFJZmcR1VH1VX0A7llV27spqP/ecwz92mP
+	 cnh0D6uoVJ2PkVs+N9EQ3EjskBLdCQRH/k9qLunt21HSM+kp+oz++0xBAfpwUd13dp
+	 uiKFcS3CR2AlA==
+Date: Tue, 15 Jul 2025 23:56:57 +0800
+From: Coly Li <colyli@kernel.org>
+To: hch@lst.de
+Cc: linux-block@vger.kernel.org
+Subject: Improper io_opt setting for md raid5
+Message-ID: <ywsfp3lqnijgig6yrlv2ztxram6ohf5z4yfeebswjkvp2dzisd@f5ikoyo3sfq5>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250713143415.2857561-1-ming.lei@redhat.com> <20250713143415.2857561-2-ming.lei@redhat.com>
- <CADUfDZrZ+SDQFC_-upFJNx2cj=xGuggvHMMubfWCaVGy_D4BjA@mail.gmail.com> <aHZ22o0znAVFFDJf@fedora>
-In-Reply-To: <aHZ22o0znAVFFDJf@fedora>
-From: Caleb Sander Mateos <csander@purestorage.com>
-Date: Tue, 15 Jul 2025 11:48:12 -0400
-X-Gm-Features: Ac12FXxAF711k_Mlg6sLiotEaY7xQAOuDJKQN8IqvTmuY3oCjnEVLOJkQ3KxhcI
-Message-ID: <CADUfDZq86kMtc=OLCK6jUNwgRf6+VTmVqzHXqyD+5zK0FEqfSw@mail.gmail.com>
-Subject: Re: [PATCH V3 01/17] ublk: validate ublk server pid
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
-	Uday Shankar <ushankar@purestorage.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jul 15, 2025 at 11:42=E2=80=AFAM Ming Lei <ming.lei@redhat.com> wro=
-te:
->
-> On Tue, Jul 15, 2025 at 10:50:39AM -0400, Caleb Sander Mateos wrote:
-> > On Sun, Jul 13, 2025 at 10:34=E2=80=AFAM Ming Lei <ming.lei@redhat.com>=
- wrote:
-> > >
-> > > ublk server pid(the `tgid` of the process opening the ublk device) is=
- stored
-> > > in `ublk_device->ublksrv_tgid`. This `tgid` is then checked against t=
-he
-> > > `ublksrv_pid` in `ublk_ctrl_start_dev` and `ublk_ctrl_end_recovery`.
-> > >
-> > > This ensures that correct ublk server pid is stored in device info.
-> > >
-> > > Fixes: 71f28f3136af ("ublk_drv: add io_uring based userspace block dr=
-iver")
-> > > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > > ---
-> > >  drivers/block/ublk_drv.c | 9 +++++++++
-> > >  1 file changed, 9 insertions(+)
-> > >
-> > > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> > > index a1a700c7e67a..2b894de29823 100644
-> > > --- a/drivers/block/ublk_drv.c
-> > > +++ b/drivers/block/ublk_drv.c
-> > > @@ -237,6 +237,7 @@ struct ublk_device {
-> > >         unsigned int            nr_privileged_daemon;
-> > >         struct mutex cancel_mutex;
-> > >         bool canceling;
-> > > +       pid_t   ublksrv_tgid;
-> > >  };
-> > >
-> > >  /* header of ublk_params */
-> > > @@ -1528,6 +1529,7 @@ static int ublk_ch_open(struct inode *inode, st=
-ruct file *filp)
-> > >         if (test_and_set_bit(UB_STATE_OPEN, &ub->state))
-> > >                 return -EBUSY;
-> > >         filp->private_data =3D ub;
-> > > +       ub->ublksrv_tgid =3D current->tgid;
-> > >         return 0;
-> > >  }
-> > >
-> > > @@ -1542,6 +1544,7 @@ static void ublk_reset_ch_dev(struct ublk_devic=
-e *ub)
-> > >         ub->mm =3D NULL;
-> > >         ub->nr_queues_ready =3D 0;
-> > >         ub->nr_privileged_daemon =3D 0;
-> > > +       ub->ublksrv_tgid =3D -1;
-> >
-> > Should this be reset to 0? The next patch checks whether ublksrv_tgid
-> > is 0 in ublk_timeout().
->
-> No, swapper pid is 0.
->
-> The check in next patch just tries to double check if ublk char device
-> is opened.
->
-> > Also, the accesses to it should probably be
-> > using {READ,WRITE}_ONCE() since ublk server open/close can happen
-> > concurrently with ublk I/O timeout handling.
->
-> ublk_abort_queue() is called in ublk_ch_release(), and any inflight reque=
-st
-> is either requeued or failed, so ublk I/O timeout handling won't happen
-> concurrently with ublk char open()/close().
+Hi Christoph,
 
-Thanks for explaining. If the ublk server closing the char device
-ensures there are no in-flight requests, does that make the
-ublksrv_tgid check in ublk_timeout() unnecessary?
+I don’t know why is the proper person to ask for this issue, but I see your
+patch in the questionable code path and I know you are always helpful, so
+ask you here.
 
-Best,
-Caleb
+Let me rescript the problem I encountered.
+1, There is an 8 disks raid5 with 64K chunk size on my machine, I observe
+/sys/block/md0/queue/optimal_io_size is very large value, which isn’t
+reasonable size IMHO.
+
+2,  It was from drivers/scsi/mpt3sas/mpt3sas_scsih.c, 
+11939 static const struct scsi_host_template mpt3sas_driver_template = {
+11940         .module                         = THIS_MODULE,
+11941         .name                           = "Fusion MPT SAS Host",
+11942         .proc_name                      = MPT3SAS_DRIVER_NAME,
+11943         .queuecommand                   = scsih_qcmd,
+11944         .target_alloc                   = scsih_target_alloc,
+11945         .sdev_init                      = scsih_sdev_init,
+11946         .sdev_configure                 = scsih_sdev_configure,
+11947         .target_destroy                 = scsih_target_destroy,
+11948         .sdev_destroy                   = scsih_sdev_destroy,
+11949         .scan_finished                  = scsih_scan_finished,
+11950         .scan_start                     = scsih_scan_start,
+11951         .change_queue_depth             = scsih_change_queue_depth,
+11952         .eh_abort_handler               = scsih_abort,
+11953         .eh_device_reset_handler        = scsih_dev_reset,
+11954         .eh_target_reset_handler        = scsih_target_reset,
+11955         .eh_host_reset_handler          = scsih_host_reset,
+11956         .bios_param                     = scsih_bios_param,
+11957         .can_queue                      = 1,
+11958         .this_id                        = -1,
+11959         .sg_tablesize                   = MPT3SAS_SG_DEPTH,
+11960         .max_sectors                    = 32767,
+11961         .max_segment_size               = 0xffffffff,
+11962         .cmd_per_lun                    = 128,
+11963         .shost_groups                   = mpt3sas_host_groups,
+11964         .sdev_groups                    = mpt3sas_dev_groups,
+11965         .track_queue_depth              = 1,
+11966         .cmd_size                       = sizeof(struct scsiio_tracker),
+11967         .map_queues                     = scsih_map_queues,
+11968         .mq_poll                        = mpt3sas_blk_mq_poll,
+11969 };
+at line 11960, max_sectors of mpt3sas driver is defined as 32767.
+
+Then in drivers/scsi/scsi_transport_sas.c, at line 241 inside sas_host_setup(),
+shots->opt_sectors is assigned by 32767 from the following code,
+240         if (dma_dev->dma_mask) {
+241                 shost->opt_sectors = min_t(unsigned int, shost->max_sectors,
+242                                 dma_opt_mapping_size(dma_dev) >> SECTOR_SHIFT);
+243         }
+
+Then in drivers/scsi/sd.c, inside sd_revalidate_disk() from the following coce,
+3785         /*
+3786          * Limit default to SCSI host optimal sector limit if set. There may be
+3787          * an impact on performance for when the size of a request exceeds this
+3788          * host limit.
+3789          */
+3790         lim.io_opt = sdp->host->opt_sectors << SECTOR_SHIFT;
+3791         if (sd_validate_opt_xfer_size(sdkp, dev_max)) {
+3792                 lim.io_opt = min_not_zero(lim.io_opt,
+3793                                 logical_to_bytes(sdp, sdkp->opt_xfer_blocks));
+3794         }
+
+lim.io_opt of all my sata disks attached to mpt3sas HBA are all 32767 sectors,
+because the above code block.
+
+Then when my raid5 array sets its queue limits, because its io_opt is 64KiB*7,
+and the raid component sata hard drive has io_opt with 32767 sectors, by
+calculation in block/blk-setting.c:blk_stack_limits() at line 753,
+753         t->io_opt = lcm_not_zero(t->io_opt, b->io_opt);
+the calculated opt_io_size of my raid5 array is more than 1GiB. It is too large.
+
+I know the purpose of lcm_not_zero() is to get an optimized io size for both
+raid device and underlying component devices, but the resulted io_opt is bigger
+than 1 GiB that's too big.
+
+For me, I just feel uncomfortable that using max_sectors as opt_sectors in
+sas_host_stup(), but I don't know a better way to improve. Currently I just
+modify the mpt3sas_driver_template's max_sectors from 32767 to 64, and observed
+5~10% sequetial write performance improvement (direct io) for my raid5 devices
+by fio.
+
+So there should be something to fix. Can you take a look, or give me some hint
+to fix?
+
+Thanks in advance.
+
+Coly Li
+
+
+
+
+
+
+-- 
+Coly Li
