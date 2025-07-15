@@ -1,62 +1,72 @@
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F7D02CCC5
-	for <linux-block@vger.kernel.org>; Tue, 15 Jul 2025 05:40:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADDE12CCC5
+	for <linux-block@vger.kernel.org>; Tue, 15 Jul 2025 05:44:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752558050; cv=none; b=d3kvMZez7MJj+/kZOes6wd56rODhypjYrOPzp5R7NIx9jaRtBsMg8mT/hvxzl5vOAZLu41kfm8k1Fr2vtjhv0vkJEGpiwJtqg6CzacHUCDHUKepPedTSdrsH9TDE+h9GjNiP/DX51HP/MeR+7FvsSMAAsq50M2Gyr/S/o5ezOC0=
+	t=1752558266; cv=none; b=uyCzKsnevykoBXgItpzxJ3x7O6nTgoKrG05AZEuH1AdpIuoUSLNMJqayW3kohqXLe4tAhzTOPKNqIQV9C5M2cOreFXjOy2DqzIJu0uysUPPE8MwemL0bbKwJoEbzMe/eATCnSFrGc+LgCFwYtCZtgPmsE+Rz2oP5OY1mOdU+WTY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752558050; c=relaxed/simple;
-	bh=JdTRMLGJl/n1z3sHNdcZh4ibbUD267vBFMWNSbfyQIA=;
+	s=arc-20240116; t=1752558266; c=relaxed/simple;
+	bh=BUEmaN+WJQ9hvVn3YdE37p3862s/5r2p+ZK3zuwnHyc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Kpf+zsCBxsnjDGeZysV92MDPN1uzo3vchdK8rVOqOHYWuFtLgSxBtoyURueVidL4M8OnNemo6/qf12niqk35AlFZLnyzsGC+QGCNicnYVQpZPTKvndYGIHbLZK7/7MJAaXVAXeeKfUg2fLO5/ni8CMPi0rLYQYANKFFzmkzzBnw=
+	 Content-Type:Content-Disposition:In-Reply-To; b=lDzk7JW8hAJm+xkp6L0QToW9hUoebriATmDxmFubLSbDnjFnPncLID3C1g49nwDP5JiRekkh80gaHsOOr5axzKfHptItcahNz/6Y3xM6ylAnEfjR0ORqIDVVvDJ1YK/jWdpOO76oKRlGu2jYcwTQbKHhgGVjwFqeVjpZqoZCT3U=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
 Received: by verein.lst.de (Postfix, from userid 2407)
-	id BEB1E227AAC; Tue, 15 Jul 2025 07:40:44 +0200 (CEST)
-Date: Tue, 15 Jul 2025 07:40:44 +0200
+	id 42FCF227AAD; Tue, 15 Jul 2025 07:44:20 +0200 (CEST)
+Date: Tue, 15 Jul 2025 07:44:19 +0200
 From: Christoph Hellwig <hch@lst.de>
 To: Bart Van Assche <bvanassche@acm.org>
-Cc: John Garry <john.g.garry@oracle.com>, Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-	Eric Biggers <ebiggers@kernel.org>
-Subject: Re: [PATCH v2 1/2] block: Split
- blk_crypto_fallback_split_bio_if_needed()
-Message-ID: <20250715054044.GA18159@lst.de>
-References: <20250711171853.68596-1-bvanassche@acm.org> <20250711171853.68596-2-bvanassche@acm.org> <a276765d-665d-49af-9776-d06e88c766cd@oracle.com> <52c19699-cead-41b7-a5c5-517f412bcbec@acm.org>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>, Eric Biggers <ebiggers@kernel.org>
+Subject: Re: [PATCH v2 2/2] block: Rework splitting of encrypted bios
+Message-ID: <20250715054419.GB18159@lst.de>
+References: <20250711171853.68596-1-bvanassche@acm.org> <20250711171853.68596-3-bvanassche@acm.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <52c19699-cead-41b7-a5c5-517f412bcbec@acm.org>
+In-Reply-To: <20250711171853.68596-3-bvanassche@acm.org>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Mon, Jul 14, 2025 at 08:35:33AM -0700, Bart Van Assche wrote:
-> On 7/14/25 6:48 AM, John Garry wrote:
->> since you are touching this code:
->>
->>      bio_for_each_segment(bv, bio, iter) {
->>          num_sectors += bv.bv_len >> SECTOR_SHIFT;
->>          if (++i == BIO_MAX_VECS)
->>              break;
->>      }
->>
->> if efficiency is a concern, then it seems better to keep the running total 
->> in bytes and then >> SECTOR_SHIFT
-> Anyone who cares about efficiency should support encryption in hardware
-> instead of using the software fallback code. As far as I know, on
-> Android phones, the crypto fallback code is only used during hardware
-> bringup and not on any devices that are shipped to consumers.
+On Fri, Jul 11, 2025 at 10:18:52AM -0700, Bart Van Assche wrote:
+> @@ -289,9 +266,12 @@ static bool blk_crypto_fallback_encrypt_bio(struct bio **bio_ptr)
+>  	bool ret = false;
+>  	blk_status_t blk_st;
+>  
+> -	/* Split the bio if it's too big for single page bvec */
+> -	if (!blk_crypto_fallback_split_bio_if_needed(bio_ptr))
+> +	/* Verify that bio splitting has occurred. */
+> +	if (WARN_ON_ONCE(bio_sectors(*bio_ptr) >
+> +			 blk_crypto_max_io_size(*bio_ptr))) {
+> +		(*bio_ptr)->bi_status = BLK_STS_IOERR;
+>  		return false;
+> +	}
+>  
+>  	src_bio = *bio_ptr;
 
-I don't think that's a good argument to not clean something so
-obvious up.  It doesn't belong into this patch, but if you touch
-the area anyway it would be really helpful if you added another patch
-for this trivial cleanup and obvious optimization.
+I'd move the check below this line so that you can use src_bio instead
+of dereferencing bio_ptr multiple times.
 
+> +	if (unlikely(!blk_crypto_bio_prep(&bio)))
+> +		return NULL;
+> +
+
+It feels like returning the new bio would be a better calling
+convention than the in-out argument.
+
+> @@ -355,9 +360,12 @@ EXPORT_SYMBOL_GPL(bio_split_rw_at);
+>  struct bio *bio_split_rw(struct bio *bio, const struct queue_limits *lim,
+>  		unsigned *nr_segs)
+>  {
+> +	u32 max_sectors =
+> +		min(get_max_io_size(bio, lim), blk_crypto_max_io_size(bio));
+
+The blk_crypto_max_io_size should move into get_max_io_size to keep
+this tidy.
