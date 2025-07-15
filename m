@@ -1,47 +1,47 @@
 Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 033EC2D9EEA
-	for <linux-block@vger.kernel.org>; Tue, 15 Jul 2025 11:53:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E4B25103F
+	for <linux-block@vger.kernel.org>; Tue, 15 Jul 2025 11:53:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.71.153.144
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752580429; cv=none; b=RjZ3ZufqwwzsTRlM8QhVvgXmVClwbnqyWCVy/liIE2xqQyOOjaCkKuopqesb1UFqeODO5OJ96+9znwizS+T1u361DIa78v7YBDjNr4ZB1aHcMa5TtUQ6Ux8/RJ+S0rOjNMW4JluElbtAKdslymtljP65ruyIUNp60Ofu6uDclWk=
+	t=1752580429; cv=none; b=twcoi3PSsgwtOjqSFg+JXvauZ90hEGnZCmNQ7LlKJK/K4EgN7oA2uLBmBdxevqzsa6rgEAl8tN9onaqimVAOnWWvRdJz6nolZDkS2pIuSjuCeMOSBSeoBMy7677hKOXUTu5WD7v+Z9IhauilKVXsgoCz9jnPRzXz8pU5b2IS8XU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1752580429; c=relaxed/simple;
-	bh=4h6RhvTLwDcng2amX47KJdDZ1ciCVcMQ4eCiadg3LvQ=;
+	bh=cBH9UFmgKVC85uSfEjHvYPVgaUaRygjmLW3nRLI8Lx0=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=oW8ZGjl7rTGhHFFDXzEjPbzLgaR8FKk6yCF0LlKM7g+d2rtrfKXHzCR/VSjjs9BR/UTFPP2XRXLolJtGtfxEmG27/Ng9PwscT4z5pGPTsPd5YQh0kbTeo7nCoRHDdoWvRaRnPFOtd52K/eOjLiXZBx5y0nN2xEI6rbYIIbZrFl0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=Sqz2bfbE; arc=none smtp.client-ip=216.71.153.144
+	 MIME-Version; b=h1mHqPY66e4DeAtvHFxZwrKpyhSAsE+anyYk3CecQU1M8EEMW6b6jtKge3DY+jAESuBsmiMpLfLD90nAFJG1+j0yhne19xy0MpxTvaBJ7RCVUeg68U4ZXR9VwQebZKLh4shzZk2pNYYZsYjxIQRsOPWWhJ68YjB35hdSRYdvFVw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=R0EVI8Z9; arc=none smtp.client-ip=216.71.153.144
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Sqz2bfbE"
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="R0EVI8Z9"
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1752580426; x=1784116426;
+  t=1752580428; x=1784116428;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=4h6RhvTLwDcng2amX47KJdDZ1ciCVcMQ4eCiadg3LvQ=;
-  b=Sqz2bfbE8YWXM55to5VtlfIdMD5YsNqmHg3R4oa4praa/MtEsga7AECF
-   eYqnrcOji/vjZPqkoNTyJgpV3btt+HlXpPwx6ESngN8H9YnrmSLYJP9ot
-   x6lGelaYAjDKFMf8/+BNfcoEprMybviNPLUpFZVGFhODj6kLu/+Q3JaBg
-   F9KbCCe+YwCvUR1xhoqpGJjvX5ml9PmaIwWaxWNFWhfC247AJISsiSyKH
-   jubuN4j7Urpl+ov14R0k5pWEcZMSQNF0NtNnQwL2SuWZiGOZD9gDdqkeV
-   Y65WbgdcTJsny6DJ3idTkuEn4gVcewdO+SIpxxTVNKW3MqB5uQI1TrJQY
-   w==;
-X-CSE-ConnectionGUID: hk7JsJMrTwC4xJbBMQmWSw==
-X-CSE-MsgGUID: C9EixTKPT6CFqoh0Yb4EdA==
+  bh=cBH9UFmgKVC85uSfEjHvYPVgaUaRygjmLW3nRLI8Lx0=;
+  b=R0EVI8Z9uvb4cvxtCQf2y0H/uZfuPbWxj/Zst0kJx8FWAFdU8NG0zskf
+   UGgq8BVO+wg3RA8GzJDhRhm2WE7hOFacDvcb4TTEKvNV8x6KuFav+0++t
+   zSXKicohEocQK0VP0Vg5zOol6nxbo9fgTLzTcC3wF2DUN0BDX7chRaLdK
+   K2Bx9dXAs9S/3g6BE6x2UjsR4oJEdIT1mhjCMNjxGKyRg3AS9F6h9tBX7
+   RH+Ms4HoyGywhJxmkEVvsTVoRiiBTr/mP9IgB1njW3XEB7M3OntfoqFeh
+   dUhdA0E5wt5oPylFmaN/n81e/aJNKzj9jeyGhzxpdGr/r8LkEbl2SCepc
+   g==;
+X-CSE-ConnectionGUID: kz14kptYSZy6sJVwrhvg2w==
+X-CSE-MsgGUID: Hk/AsdlzS5mWRXJu/hCDuA==
 X-IronPort-AV: E=Sophos;i="6.16,313,1744041600"; 
-   d="scan'208";a="87768615"
+   d="scan'208";a="87768626"
 Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 15 Jul 2025 19:53:45 +0800
-IronPort-SDR: 687632a8_/pfDZL8SdBVhky2PdYHjCzdSDzCLTOoz7LzmT3QVWvVWwhk
- XeeQJIW6cl3DJnsmvUaSSb7G6Oh5W6EveanhRMg==
+  by ob1.hgst.iphmx.com with ESMTP; 15 Jul 2025 19:53:47 +0800
+IronPort-SDR: 687632ab_jw3Oj7/ZFAyYAC9EXRFcc8o8YvI3bGgcxyjGzokNcrbhfPD
+ MsICa5TgDvQuBI8BYKYaNrKQl+IfFahhBCt2wJA==
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 15 Jul 2025 03:51:21 -0700
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 15 Jul 2025 03:51:23 -0700
 WDCIronportException: Internal
 Received: from c02g55f6ml85.ad.shared (HELO C02G55F6ML85.wdc.com) ([10.224.183.46])
-  by uls-op-cesaip01.wdc.com with ESMTP; 15 Jul 2025 04:53:44 -0700
+  by uls-op-cesaip01.wdc.com with ESMTP; 15 Jul 2025 04:53:46 -0700
 From: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: Bart Van Assche <bvanassche@acm.org>,
@@ -51,9 +51,9 @@ Cc: Bart Van Assche <bvanassche@acm.org>,
 	linux-block@vger.kernel.org,
 	Johannes Thumshirn <johannes.thumshirn@wdc.com>,
 	Chaitanya Kulkarni <kch@nvidia.com>
-Subject: [PATCH v3 4/5] block: add tracepoint for blkdev_zone_mgmt
-Date: Tue, 15 Jul 2025 13:53:23 +0200
-Message-Id: <20250715115324.53308-5-johannes.thumshirn@wdc.com>
+Subject: [PATCH v3 5/5] block: add trace messages to zone write plugging
+Date: Tue, 15 Jul 2025 13:53:24 +0200
+Message-Id: <20250715115324.53308-6-johannes.thumshirn@wdc.com>
 X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 In-Reply-To: <20250715115324.53308-1-johannes.thumshirn@wdc.com>
 References: <20250715115324.53308-1-johannes.thumshirn@wdc.com>
@@ -65,88 +65,95 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add a tracepoint for blkdev_zone_mgmt to trace zone management commands
-submitted by higher layers like file systems or user space.
+Add tracepoints to zone write plugging plug and unplug events.
 
-An example output for this tracepoint is as follows:
+Examples for these events are:
 
-  mkfs.btrfs-203  [001] .....  42.877493: blkdev_zone_mgmt: 8,0 ZRS 5242880 + 0
+  kworker/u10:4-393  [001] d..1. 282.991660: disk_zone_wplug_add_bio: 8,0 zone 16, BIO 8388608 + 128
+  kworker/0:1H-58    [ [000] d..1. 283.083294: blk_zone_wplug_bio: 8,0 zone 15, BIO 7864320 + 128
 
-This example output shows a REQ_OP_ZONE_RESET operation submitted by
-mkfs.btrfs.
-
-Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
 Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
 Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 ---
- block/blk-zoned.c            |  2 ++
- include/trace/events/block.h | 34 ++++++++++++++++++++++++++++++++++
- 2 files changed, 36 insertions(+)
+ block/blk-zoned.c            |  5 ++++
+ include/trace/events/block.h | 44 ++++++++++++++++++++++++++++++++++++
+ 2 files changed, 49 insertions(+)
 
 diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index 2584ffb6b022..48f75f58d05e 100644
+index 48f75f58d05e..5c409c118135 100644
 --- a/block/blk-zoned.c
 +++ b/block/blk-zoned.c
-@@ -179,6 +179,7 @@ static int blkdev_zone_reset_all(struct block_device *bdev)
- 	struct bio bio;
+@@ -822,6 +822,8 @@ static inline void disk_zone_wplug_add_bio(struct gendisk *disk,
+ 	 * at the tail of the list to preserve the sequential write order.
+ 	 */
+ 	bio_list_add(&zwplug->bio_list, bio);
++	trace_disk_zone_wplug_add_bio(zwplug->disk->queue, zwplug->zone_no,
++				      bio->bi_iter.bi_sector, bio_sectors(bio));
  
- 	bio_init(&bio, bdev, NULL, 0, REQ_OP_ZONE_RESET_ALL | REQ_SYNC);
-+	trace_blkdev_zone_mgmt(&bio, 0);
- 	return submit_bio_wait(&bio);
- }
+ 	zwplug->flags |= BLK_ZONE_WPLUG_PLUGGED;
  
-@@ -242,6 +243,7 @@ int blkdev_zone_mgmt(struct block_device *bdev, enum req_op op,
- 		cond_resched();
+@@ -1317,6 +1319,9 @@ static void blk_zone_wplug_bio_work(struct work_struct *work)
+ 		goto put_zwplug;
  	}
  
-+	trace_blkdev_zone_mgmt(bio, nr_sectors);
- 	ret = submit_bio_wait(bio);
- 	bio_put(bio);
- 
++	trace_blk_zone_wplug_bio(zwplug->disk->queue, zwplug->zone_no,
++				 bio->bi_iter.bi_sector, bio_sectors(bio));
++
+ 	if (!blk_zone_wplug_prepare_bio(zwplug, bio)) {
+ 		blk_zone_wplug_bio_io_error(zwplug, bio);
+ 		goto again;
 diff --git a/include/trace/events/block.h b/include/trace/events/block.h
-index 4855abdf9880..ff7698efdfde 100644
+index ff7698efdfde..3e582d5e3a57 100644
 --- a/include/trace/events/block.h
 +++ b/include/trace/events/block.h
-@@ -599,6 +599,40 @@ TRACE_EVENT(block_rq_remap,
- 		  (unsigned long long)__entry->old_sector, __entry->nr_bios)
+@@ -633,6 +633,50 @@ TRACE_EVENT(blkdev_zone_mgmt,
+ 		  (unsigned long long)__entry->sector,
+ 		  __entry->nr_sectors)
  );
- 
-+/**
-+ * blkdev_zone_mgmt - Execute a zone management operation on a range of zones
-+ * @bio: The block IO operation sent down to the device
-+ * @nr_sectors: The number of sectors affected by this operation
-+ *
-+ * Execute a zone management operation on a specified range of zones. This
-+ * range is encoded in %nr_sectors, which has to be a multiple of the zone
-+ * size.
-+ */
-+TRACE_EVENT(blkdev_zone_mgmt,
 +
-+	TP_PROTO(struct bio *bio, sector_t nr_sectors),
++DECLARE_EVENT_CLASS(block_zwplug,
 +
-+	TP_ARGS(bio, nr_sectors),
++	TP_PROTO(struct request_queue *q, unsigned int zno, sector_t sector,
++		 unsigned int nr_sectors),
++
++	TP_ARGS(q, zno, sector, nr_sectors),
 +
 +	TP_STRUCT__entry(
-+	    __field(  dev_t,	dev		)
-+	    __field(  sector_t,	sector		)
-+	    __field(  sector_t, nr_sectors	)
-+	    __array(  char,	rwbs,	RWBS_LEN)
++		__field( dev_t,		dev		)
++		__field( unsigned int,	zno		)
++		__field( sector_t,	sector		)
++		__field( unsigned int,	nr_sectors	)
 +	),
 +
 +	TP_fast_assign(
-+	    __entry->dev	= bio_dev(bio);
-+	    __entry->sector	= bio->bi_iter.bi_sector;
-+	    __entry->nr_sectors	= bio_sectors(bio);
-+	    blk_fill_rwbs(__entry->rwbs, bio->bi_opf);
-+        ),
++		__entry->dev		= disk_devt(q->disk);
++		__entry->zno		= zno;
++		__entry->sector		= sector;
++		__entry->nr_sectors	= nr_sectors;
++	),
 +
-+	TP_printk("%d,%d %s %llu + %llu",
-+		  MAJOR(__entry->dev), MINOR(__entry->dev), __entry->rwbs,
++	TP_printk("%d,%d zone %u, BIO %llu + %u",
++		  MAJOR(__entry->dev), MINOR(__entry->dev), __entry->zno,
 +		  (unsigned long long)__entry->sector,
 +		  __entry->nr_sectors)
 +);
++
++DEFINE_EVENT(block_zwplug, disk_zone_wplug_add_bio,
++
++	TP_PROTO(struct request_queue *q, unsigned int zno, sector_t sector,
++		 unsigned int nr_sectors),
++
++	TP_ARGS(q, zno, sector, nr_sectors)
++);
++
++DEFINE_EVENT(block_zwplug, blk_zone_wplug_bio,
++
++	TP_PROTO(struct request_queue *q, unsigned int zno, sector_t sector,
++		 unsigned int nr_sectors),
++
++	TP_ARGS(q, zno, sector, nr_sectors)
++);
++
  #endif /* _TRACE_BLOCK_H */
  
  /* This part must be outside protection */
