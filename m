@@ -1,94 +1,192 @@
-Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18EDF1D63D3
-	for <linux-block@vger.kernel.org>; Wed, 16 Jul 2025 13:36:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.141.245
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2084F1ADC97
+	for <linux-block@vger.kernel.org>; Wed, 16 Jul 2025 15:24:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752673002; cv=none; b=RgF9C9YSAKJtqzLM7Iwr4f2OIV7rLwFkHNK5pmG+qtgiVqq0Jf8Fxu38/OGdbFzTI/KYKNJ57kNN5C5Z7BjRg9EoFylSYW5dRY36IzXsal6YnIK/M/rUbXFIc4Z0ATxmg0WanLKd6b9CdHQMwk840EsG1fB/fjlKMh8wm0ip/Yw=
+	t=1752679463; cv=none; b=OU2xuub7fzwW15tbpiSkeMfhWaRmgEpfh+IBkDOT3sBy++op+jHbnx+tSFrxhbJfWPP5Bp8f88hUh//TlJ+v/K8cDjyhYeQ6vfwkARnCkpLoeenIWOvpbfHm3uZezli8l0DUtGqJQwwd94n3klKrtAE4xImrgzt9jehqtp8Q338=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752673002; c=relaxed/simple;
-	bh=Mp5cuLp2D+8y6VA0YTw4IxOI2YK2LuOHvr6LOpDRQtQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Pf3yB/vlzF1h2PGfmznsfnNFw4uW0aejLNIBbTj4RboaFudkbiBPSuJKDsvPO17OkqQ/Q1yjq8vaHs0Ydne2vanarskG2ujxlxi6E5HX/QwPqs8gaOM083wck85HnarYwju29emWRM7dbtUorWS54IJqXYGhi1WdonJPpJkXV+k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=IVFRUQEf; arc=none smtp.client-ip=68.232.141.245
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
+	s=arc-20240116; t=1752679463; c=relaxed/simple;
+	bh=DSlA9dD8ZHLAS7jGHsLfZpClyYfaGsrYQtqA4+tdm4Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XbtBiNpM82/KwUnajkDszErj9mWEm3lHINrF89ZbxiutwSXKMmDqdbDlq5NZIIeg+M7m1dJdywdUsU3iv9eyuT4rTPwnxoMzxj23HqZj+BFxLabRqIXN0OujINeBLwB6w/Dzeym4AUGrTicHYtK6Edw+Eq5eOCS98LRtSMJVzx8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=T8jFtMlj; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="IVFRUQEf"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1752673001; x=1784209001;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=Mp5cuLp2D+8y6VA0YTw4IxOI2YK2LuOHvr6LOpDRQtQ=;
-  b=IVFRUQEfyEkPyEm6gFS57yjBRENrmIqnGHA/F8jncHv39nS146gmcOg6
-   I4rp3X9OrB75r40BnACA1xyUzRYFm50LYqTeoYXg3QJk2jO8Kyi9TwnkG
-   97B4zP7eK6z5k6UEmvZa/Og6Z1qriX5R0QlfQOo9sqFn3lsRYFicmMXPt
-   4wBiqJ+ynTaYzA+PWSvb+Al2PNbUraPmKUk8w2ZCvmPQteTkjLoll24Fh
-   aEbR0rVvWMZ/UQw406e+pUeSeNeAnKc7riO6MIOWevS88fG2ua+MGjDr1
-   wSvsqNJvPKeBlFOhqdc/xFtNLk03+QniYdYTY3YaBAZ1gCTCtFDCVese6
-   Q==;
-X-CSE-ConnectionGUID: HWaqnZouRnKzVflMInUpIw==
-X-CSE-MsgGUID: QdjVKiP5QP6e7/wS6gPjTw==
-X-IronPort-AV: E=Sophos;i="6.16,316,1744041600"; 
-   d="scan'208";a="88380644"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 16 Jul 2025 21:36:40 +0800
-IronPort-SDR: 68779c46_9F3x/hxIXx4KfoFFxXTokB4PsptMwMkHr26XPy9SOJgwNyP
- wd2/bBfEoZhSWiDEzQ++9koXuEjqBP4dhK4UQrQ==
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 16 Jul 2025 05:34:15 -0700
-WDCIronportException: Internal
-Received: from c02g55f6ml85.ad.shared (HELO C02G55F6ML85.wdc.com) ([10.224.183.46])
-  by uls-op-cesaip01.wdc.com with ESMTP; 16 Jul 2025 06:36:39 -0700
-From: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-	Stephen Rothwell <sfr@canb.auug.org.au>
-Subject: [PATCH] block: fix blk_zone_append_update_request_bio() kernel-doc
-Date: Wed, 16 Jul 2025 15:36:31 +0200
-Message-Id: <20250716133631.94898-1-johannes.thumshirn@wdc.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T8jFtMlj"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1752679461;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=SNFlWBNpt9SYbkpdkC3AxTClHyrZUSfwmCSW8R0rlhI=;
+	b=T8jFtMlj0ndhFitistB6zgL5ci8LHXjlRuIdHxevm6gDmV9Td+/V1QBBmx+7bJ3Ek1tIF7
+	a36fjWFzBK5eUvnNII7/JaiaxKeOk7uw4tp1qV1sf3iXGz1PCXWti5wDVpxBB/dExSYT5v
+	BKYO37uEDoF792EUc1m+/OGRnt3sjCw=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-142-efzei7OWNzeENnBpCPduUw-1; Wed, 16 Jul 2025 11:24:19 -0400
+X-MC-Unique: efzei7OWNzeENnBpCPduUw-1
+X-Mimecast-MFC-AGG-ID: efzei7OWNzeENnBpCPduUw_1752679459
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4560b81ff9eso27826645e9.1
+        for <linux-block@vger.kernel.org>; Wed, 16 Jul 2025 08:24:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752679458; x=1753284258;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=SNFlWBNpt9SYbkpdkC3AxTClHyrZUSfwmCSW8R0rlhI=;
+        b=PzNi8HEY52Dxd7vBhRnzaaRypbUJ4V6BNhI7kt0xEdIN7VKBV4BlRlFsefj/5Dqbdj
+         7s7DIHRFzCa0SD5Iera3WNaWRfN3GgEOmHClEzJSfVD1jKLeslcmkp1xmRPMP4U55p55
+         LxdDqlYm5tf6BGHQJiDheEVNiIgO/m++zYoyFwBwoBim3OhJPV16QXTw67IstZsN4E6z
+         YmkHrxGv5IMh2ht8vdTunCr4bjiBiXR8SDC0h3bbXfA9K1QfhBBfjebGGAZxYnxhOmto
+         IVD0hgTccWhruEA4IZupyznY4Bv+neCaprbLkSLlFqIMxZkl8aG7RRwOh0QEs2cWPwAi
+         hwDg==
+X-Forwarded-Encrypted: i=1; AJvYcCWrBpe6gnk9PmGv8ugGltpMkQlTU4jp5B2vDOt18tflavNb57iOc0t7Q9J+fWmNRdlPQMPFeXoCtu4tuQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy6G15Trzc9hl7RSS7cb9Dwc3hFPduegWwCOOZIT+F6QE3B7c4V
+	DGgtm7RXXxebOH2vStrWsQ93pTGZf7/whhMQglEswUKz7klCU3gRboKRwh+mAkpLPFjoEY/9c+z
+	c+B9QAhcs34kPhQiZY3W4a/L22RBeN3Y6DEDcQ/XKtpx4mM0EQmSUUhUM/pINuawD
+X-Gm-Gg: ASbGnctBZ3ssAVLHlbHMJGv2+bj2k/AuN+yGp84OWbT59XBfV3A6tt+Z8ehJxt1cJao
+	K5RPv0XpFQhmY1HloHtKIdYIZ10XhrJ3u8Q4YSbvCzqJzgc5Bhbi2KIH/PGN94iUqm5XhhxPSLT
+	42ruGtJctIHZZDp1EP7Fj4Sf6v/UXnKnrd3GC0bQzx2SNteqxnnU6nuXJ6/xOrLN7YbMVdsnnV2
+	iyFqfRjoLy5G6lmyQe+GUOJn0upVFKWLBPZap1iPh+Wwwf2RlM7B/Okcs45JUMl9pir29NXZwZG
+	e6FYYxGfvPhm0b/szqeBiHWSNUhmiDaujS6HARiVOno9uSrO8DV3ke7xA9eDuby21X6EULWfGz2
+	SxynJ2OVSyi3QEQfTYJgKV/MAF36MgYGpmyLAx+GG4HOr2wmHxK3S/KYVtBXsPAh4v18=
+X-Received: by 2002:a05:600c:1987:b0:456:12ad:ec30 with SMTP id 5b1f17b1804b1-4562dfe73c0mr37112825e9.13.1752679458475;
+        Wed, 16 Jul 2025 08:24:18 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFxuqbrkcZx4M5Xzniv4108zBNJL/oqX3SoCcALdEHsTatmbIhhC93lstqiOhvQonpy37IcTg==
+X-Received: by 2002:a05:600c:1987:b0:456:12ad:ec30 with SMTP id 5b1f17b1804b1-4562dfe73c0mr37112315e9.13.1752679458022;
+        Wed, 16 Jul 2025 08:24:18 -0700 (PDT)
+Received: from ?IPV6:2003:d8:2f1d:ed00:1769:dd7c:7208:eb33? (p200300d82f1ded001769dd7c7208eb33.dip0.t-ipconnect.de. [2003:d8:2f1d:ed00:1769:dd7c:7208:eb33])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b5e8dc22a8sm18558624f8f.34.2025.07.16.08.24.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 16 Jul 2025 08:24:17 -0700 (PDT)
+Message-ID: <da5aea8a-bae5-4cd5-83a1-94cfcb61a29f@redhat.com>
+Date: Wed, 16 Jul 2025 17:24:15 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/5] mm: move huge_zero_page declaration from huge_mm.h
+ to mm.h
+To: "Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>,
+ Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
+Cc: Suren Baghdasaryan <surenb@google.com>,
+ Ryan Roberts <ryan.roberts@arm.com>,
+ Baolin Wang <baolin.wang@linux.alibaba.com>, Borislav Petkov <bp@alien8.de>,
+ Ingo Molnar <mingo@redhat.com>, "H . Peter Anvin" <hpa@zytor.com>,
+ Vlastimil Babka <vbabka@suse.cz>, Zi Yan <ziy@nvidia.com>,
+ Mike Rapoport <rppt@kernel.org>, Dave Hansen <dave.hansen@linux.intel.com>,
+ Michal Hocko <mhocko@suse.com>, Andrew Morton <akpm@linux-foundation.org>,
+ Thomas Gleixner <tglx@linutronix.de>, Nico Pache <npache@redhat.com>,
+ Dev Jain <dev.jain@arm.com>, "Liam R . Howlett" <Liam.Howlett@oracle.com>,
+ Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
+ willy@infradead.org, linux-mm@kvack.org, x86@kernel.org,
+ linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ "Darrick J . Wong" <djwong@kernel.org>, mcgrof@kernel.org,
+ gost.dev@samsung.com, hch@lst.de, Pankaj Raghav <p.raghav@samsung.com>
+References: <20250707142319.319642-1-kernel@pankajraghav.com>
+ <20250707142319.319642-2-kernel@pankajraghav.com>
+ <a0233f30-b04d-461e-a662-b6f20dca02c5@lucifer.local>
+ <hi7i4k7gbbd27mtjyucwxjgwhjq7z4wtzm2nd6fqfnd5m7yo52@k7vwf576a44x>
+From: David Hildenbrand <david@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ g3eXuA==
+Organization: Red Hat
+In-Reply-To: <hi7i4k7gbbd27mtjyucwxjgwhjq7z4wtzm2nd6fqfnd5m7yo52@k7vwf576a44x>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Stephen reported new 'make htmldocs' warnings introduced by 4cc21a00762b
-("block: add tracepoint for blk_zone_update_request_bio").
+On 16.07.25 09:47, Pankaj Raghav (Samsung) wrote:
+> On Tue, Jul 15, 2025 at 03:08:40PM +0100, Lorenzo Stoakes wrote:
+>> On Mon, Jul 07, 2025 at 04:23:15PM +0200, Pankaj Raghav (Samsung) wrote:
+>>> From: Pankaj Raghav <p.raghav@samsung.com>
+>>>
+>>> Move the declaration associated with huge_zero_page from huge_mm.h to
+>>> mm.h. This patch is in preparation for adding static PMD zero page as we
+>>> will be reusing some of the huge_zero_page infrastructure.
+>>
+>> Hmm this is really iffy.
+>>
+>> The whole purpose of huge_mm.h is to handle huge page stuff, and now you're
+>> moving it to a general header... not a fan of this - now we have _some_
+>> huge stuff in mm.h and some stuff here.
+>>
+>> Yes this might be something we screwed up already, but that's not a recent
+>> to perpetuate mistakes.
+>>
+>> Surely you don't _need_ to do this and this is a question of fixing up
+>> header includes right?
+>>
+>> Or is them some horrible cyclical header issue here?
+>>
+>> Also your commit message doesn't give any reason as to why you _need_ to do
+>> this also. For something like this where you're doing something that at
+>> face value seems to contradict the purpose of these headers, you need to
+>> explain why.
+>>
+> 
+> In one of the earlier versions, David asked me to experiment by moving some of these
+> declarations to mm.h and see how it looks. Mainly because, as you
+> guessed it later, we can use it without THP being enabled.
 
-One is a wrong function name in the tracepoint's kernel-doc and one is a
-wrong function parameter.
+I assume, in the future, most setups we care about (-> performance) will 
+have THP compiled in. So likely we can defer moving it until it's really 
+required.
 
-Fix these so 'make htmldocs' is warning free again for the block layer
-tracepoints.
-
-Fixes: 4cc21a00762b ("block: add tracepoint for blk_zone_update_request_bio")
-Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
-Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
----
- include/trace/events/block.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/include/trace/events/block.h b/include/trace/events/block.h
-index 3e582d5e3a57..6aa79e2d799c 100644
---- a/include/trace/events/block.h
-+++ b/include/trace/events/block.h
-@@ -405,8 +405,8 @@ DEFINE_EVENT(block_bio, block_getrq,
- );
- 
- /**
-- * block_zone_update_request_bio - update the bio sector after a zone append
-- * @bio: the completed block IO operation
-+ * blk_zone_append_update_request_bio - update bio sector after zone append
-+ * @rq: the completed request that sets the bio sector
-  *
-  * Update the bio's bi_sector after a zone append command has been completed.
-  */
 -- 
-2.50.0
+Cheers,
+
+David / dhildenb
 
