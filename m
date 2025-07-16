@@ -1,125 +1,121 @@
-Received: from mx10.didiglobal.com (mx10.didiglobal.com [111.202.70.125])
-	by smtp.subspace.kernel.org (Postfix) with SMTP id 325592F1987;
-	Wed, 16 Jul 2025 09:36:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=111.202.70.125
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBEFA2F0E49
+	for <linux-block@vger.kernel.org>; Wed, 16 Jul 2025 09:44:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752658604; cv=none; b=dgL48Yhj7TDwWuBOSusBi5UwZfxlSIm8YmarOGXzRkvZH4J+S3SAItyhqFp/bfNYKSSOB9fvSaQJHX2q2ynPefHfCOSNSBBkQkfoyF36z+xna3qD8fsxT8+9Ms2brPJVPotxa2mAJ1T1bOfmZWyTb6OFogMvp5r8N+CxJPTWkC8=
+	t=1752659061; cv=none; b=Mi53pZO2BTdCzjr1b3fGtLGABe1UFPj8yNKN8cUVJObbEFXjxhSfpQqzel62R63iG1TeJZuFbkSug4QhOPxtrGXI06nY2agUmVkOijm4ga55VPSOlc3BitvB1L1hhqxPaJG41adeonnf+XZqP82wQ8NLqUVuBzxrjcOiOYS8GDM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752658604; c=relaxed/simple;
-	bh=7NwIqzCgC1RdJfhixz5bD3co5fgHiYbQk2Lmr3rknQE=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:Content-Type:
-	 MIME-Version; b=sYixVLpYIzE3VTI/I0eR2JF38gv/zB8EYZUBHGkCHSHfev96ZzWCK+RdI98fTGQGGKYtQammr1bQsoylck56Z5c8ZwXqhTz6GasjtMwSkzuXtKn0zH7MtqZGGZG7INPeSyjHPko2OxUpAv31DyzT8SsyJFs1L4RGOPPLOjeIAU0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=didiglobal.com; spf=pass smtp.mailfrom=didiglobal.com; dkim=pass (1024-bit key) header.d=didiglobal.com header.i=@didiglobal.com header.b=gMjjMenR; arc=none smtp.client-ip=111.202.70.125
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=didiglobal.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=didiglobal.com
+	s=arc-20240116; t=1752659061; c=relaxed/simple;
+	bh=NudOtJaHKfwpKRxiG+P4sUEmDYIZSqhwxiYyu/1rXRk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=p3og+imw13cuTLYdoaEsWm8hXsUpEvzmLlYAhR/83/TU26CEWz1+pyfO/2WHkpejdvQ0qcYIyR9nAHWExVRzUbrbjoE8Qaai66oTXn2MLB7lxJIaGfDVolx+sE0LrGHJATwbkE2njxHhxnAcLqyNwFt7LVsIQwhyHaA8jrJzT6o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=LsdgkQZi; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=didiglobal.com header.i=@didiglobal.com header.b="gMjjMenR"
-Received: from mail.didiglobal.com (unknown [10.79.64.20])
-	by mx10.didiglobal.com (MailData Gateway V2.8.8) with ESMTPS id F00C118BE806D6;
-	Wed, 16 Jul 2025 17:35:24 +0800 (CST)
-Received: from BJ02-ACTMBX-08.didichuxing.com (10.79.65.15) by
- BJ01-ACTMBX-01.didichuxing.com (10.79.64.20) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.10; Wed, 16 Jul 2025 17:36:10 +0800
-Received: from BJ03-ACTMBX-07.didichuxing.com (10.79.71.34) by
- BJ02-ACTMBX-08.didichuxing.com (10.79.65.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.10; Wed, 16 Jul 2025 17:36:10 +0800
-Received: from BJ03-ACTMBX-07.didichuxing.com ([fe80::2e1a:dd47:6d25:287e]) by
- BJ03-ACTMBX-07.didichuxing.com ([fe80::2e1a:dd47:6d25:287e%7]) with mapi id
- 15.02.1748.010; Wed, 16 Jul 2025 17:36:10 +0800
-X-MD-Sfrom: chentaotao@didiglobal.com
-X-MD-SrcIP: 10.79.64.20
-From: =?gb2312?B?s8LMzszOIFRhb3RhbyBDaGVu?= <chentaotao@didiglobal.com>
-To: "tytso@mit.edu" <tytso@mit.edu>, "hch@infradead.org" <hch@infradead.org>,
-	"adilger.kernel@dilger.ca" <adilger.kernel@dilger.ca>, "willy@infradead.org"
-	<willy@infradead.org>, "brauner@kernel.org" <brauner@kernel.org>,
-	"jani.nikula@linux.intel.com" <jani.nikula@linux.intel.com>,
-	"rodrigo.vivi@intel.com" <rodrigo.vivi@intel.com>, "tursulin@ursulin.net"
-	<tursulin@ursulin.net>, "airlied@gmail.com" <airlied@gmail.com>
-CC: "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-	"linux-ext4@vger.kernel.org" <linux-ext4@vger.kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
-	"dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
-	"linux-mm@kvack.org" <linux-mm@kvack.org>, "linux-doc@vger.kernel.org"
-	<linux-doc@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "chentao325@qq.com" <chentao325@qq.com>,
-	"frank.li@vivo.com" <frank.li@vivo.com>,
-	=?gb2312?B?s8LMzszOIFRhb3RhbyBDaGVu?= <chentaotao@didiglobal.com>
-Subject: [PATCH v6 5/5] ext4: support uncached buffered I/O
-Thread-Topic: [PATCH v6 5/5] ext4: support uncached buffered I/O
-Thread-Index: AQHb9jUP9LOYES+YUEOSUxZdtu5kSg==
-Date: Wed, 16 Jul 2025 09:36:09 +0000
-Message-ID: <20250716093559.217344-6-chentaotao@didiglobal.com>
-In-Reply-To: <20250716093559.217344-1-chentaotao@didiglobal.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="gb2312"
-Content-Transfer-Encoding: base64
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="LsdgkQZi"
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-23aeac7d77aso50085915ad.3
+        for <linux-block@vger.kernel.org>; Wed, 16 Jul 2025 02:44:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1752659058; x=1753263858; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=j/MRaoTHxwRJvwPm3IFe8X5kWdiLlCM66v6ozoa84TI=;
+        b=LsdgkQZimnPCSV9ePms7DYbGzY/kVxKqgBXvWkt+wBHhP1EnhDRVBGK72tyq7liwvT
+         c+jW8GqpRoA9aB5jOvqxw2UmV7iK9GhGRij/vvGF6jzgPzF3RmABTI+ntvQVHXOkclco
+         F/HCi9N1gWc+k5dfgX0yNN3VDbCwmL6vg4cXk=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752659058; x=1753263858;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=j/MRaoTHxwRJvwPm3IFe8X5kWdiLlCM66v6ozoa84TI=;
+        b=FHA2T0ANpMT1hFmN7zT3Jw6Dfjpn9Yq1S5RUvtSMbx6oiOHyerGyIfFPRotms1HGvD
+         VB0TfIynIBtE1rFt9BIkIwqFI/R2JGeomYS8tMc1I1D068tqa5yALeqyErAWwBvNXVfY
+         gufbmf3KfZFXDXWywPCKETyEqu4nsdUx1SNRPQI9t9Km4luo9t7MN3wsj6SqkbHg5Nag
+         CmDp/bRnqcikvyHjBUc9LajUhytKZa5xFtRlsiRjfEqbxixee0rzYByp4xGCw52Z5/gd
+         jC7MWhrkgTQSGpUVPvag2TujqK/U1WQ2NSECKjY4CHJGhjtWygrEaOnb6zqEi5zCY2LW
+         mgpQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU52aqMU5tymTPg2GjZ0FJAMwX/ZXTU7lwGSrCRk+9gkvNhAtRpErdoaIMIkZEKzh5vv+M7gm0bZDrDZA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzp3Fr06g/cn8JwxqVfXZuqQTal+DxI6o2SOK+LGdCMxd8iSOSr
+	Xcwbakm5tyyahd46mRsRI8NT+xbcNGXPOmqpBMvH6WQTW0JQz2jPw6I6CbGDNnwi3w==
+X-Gm-Gg: ASbGncvrpx2sqf8x3rJt7aqzopI6+reugOQeCUGRbdmbL0zK3gzMub+l2eSvbKZkePD
+	Cq5kOsIS9JCgGV3C+n309tlq2d2ms/UWGngRG/Isi9cp/8nN5NJ28rRLL7Rz/5dmdje9VY3+/yT
+	aaCl0AuGYvlfC1GzvNlcFqljIWU9x8XgrbZXSBNjQX6YjGcF9RbQhuBEcrF/w69dA4MtcsBxeWr
+	vnc5UPUUGvix3tpR3O0Ikexg5YmFSZt9wwmHAVjCNPdNwNEIvaZGVos6mipIsnV30UEF3j0ESJX
+	9NXnLOLKVpTf7jobRfGvvShhoXCexlavNm8ZZi+yOkUW1MlCjMvA7aXWO3Xlq35w0N25MaveERn
+	dM/dAYqdYGMgSjs/rI64fUD3h4Q==
+X-Google-Smtp-Source: AGHT+IF157mzUMUiSNCvgg8EkSviHMXOPMi99eiUONM56I4rAkB9RYJl0pAuuVoDQbXQVjwMQ3KhVw==
+X-Received: by 2002:a17:902:e743:b0:235:e76c:4353 with SMTP id d9443c01a7336-23e25000edfmr30647405ad.51.1752659057890;
+        Wed, 16 Jul 2025 02:44:17 -0700 (PDT)
+Received: from google.com ([2401:fa00:8f:203:9ab6:c2f9:ca7e:e672])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-31c9f1ba62dsm1062298a91.1.2025.07.16.02.44.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 16 Jul 2025 02:44:17 -0700 (PDT)
+Date: Wed, 16 Jul 2025 18:44:13 +0900
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Minchan Kim <minchan@kernel.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
+	Sergey Senozhatsky <senozhatsky@chromium.org>
+Subject: Re: [PATCH 16/17] zram: fix synchronous reads
+Message-ID: <sbqfktl3qwfizfg3b5mkmme26ks5xkazeh7y45yoo4bpbr65kb@ya4eepk7jprz>
+References: <20230411171459.567614-1-hch@lst.de>
+ <20230411171459.567614-17-hch@lst.de>
+ <rjq6lrsq2mflcry4vtks7wth63cgpjzngcbjxy65z7ucupin3q@owvyk5befvpt>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=didiglobal.com;
-	s=2025; t=1752658546;
-	bh=7NwIqzCgC1RdJfhixz5bD3co5fgHiYbQk2Lmr3rknQE=;
-	h=From:To:CC:Subject:Date:Message-ID:Content-Type;
-	b=gMjjMenRDOz/Z1BVB8tmb1b4gC5PKmiKtyf6fjnfZfHUb4Ee90HbPIsEIi6iDGH3G
-	 S7hJg03IR9ijacY2D6rD9P2rnqqDwUU/cqKfuIUbSGOqPUCJNH746hYEfWtFsXHf/B
-	 dgPpUf0GDlc/u4/HzaRGVmB7Piz7Oj9KSnrpB5hU=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <rjq6lrsq2mflcry4vtks7wth63cgpjzngcbjxy65z7ucupin3q@owvyk5befvpt>
 
-RnJvbTogVGFvdGFvIENoZW4gPGNoZW50YW90YW9AZGlkaWdsb2JhbC5jb20+DQoNClNldCBGT1Bf
-RE9OVENBQ0hFIGluIGV4dDRfZmlsZV9vcGVyYXRpb25zIHRvIGRlY2xhcmUgc3VwcG9ydCBmb3IN
-CnVuY2FjaGVkIGJ1ZmZlcmVkIEkvTy4NCg0KVG8gaGFuZGxlIHRoaXMgZmxhZywgdXBkYXRlIGV4
-dDRfd3JpdGVfYmVnaW4oKSBhbmQgZXh0NF9kYV93cml0ZV9iZWdpbigpDQp0byB1c2Ugd3JpdGVf
-YmVnaW5fZ2V0X2ZvbGlvKCksIHdoaWNoIGVuY2Fwc3VsYXRlcyBGR1BfRE9OVENBQ0hFIGxvZ2lj
-DQpiYXNlZCBvbiBpb2NiLT5raV9mbGFncy4NCg0KUGFydCBvZiBhIHNlcmllcyByZWZhY3Rvcmlu
-ZyBhZGRyZXNzX3NwYWNlX29wZXJhdGlvbnMgd3JpdGVfYmVnaW4gYW5kDQp3cml0ZV9lbmQgY2Fs
-bGJhY2tzIHRvIHVzZSBzdHJ1Y3Qga2lvY2IgZm9yIHBhc3Npbmcgd3JpdGUgY29udGV4dCBhbmQN
-CmZsYWdzLg0KDQpTaWduZWQtb2ZmLWJ5OiBUYW90YW8gQ2hlbiA8Y2hlbnRhb3Rhb0BkaWRpZ2xv
-YmFsLmNvbT4NCi0tLQ0KIGZzL2V4dDQvZmlsZS5jICB8ICAzICsrLQ0KIGZzL2V4dDQvaW5vZGUu
-YyB8IDEyICsrKy0tLS0tLS0tLQ0KIDIgZmlsZXMgY2hhbmdlZCwgNSBpbnNlcnRpb25zKCspLCAx
-MCBkZWxldGlvbnMoLSkNCg0KZGlmZiAtLWdpdCBhL2ZzL2V4dDQvZmlsZS5jIGIvZnMvZXh0NC9m
-aWxlLmMNCmluZGV4IDIxZGY4MTM0NzE0Ny4uMjc0YjQxYTQ3NmM4IDEwMDY0NA0KLS0tIGEvZnMv
-ZXh0NC9maWxlLmMNCisrKyBiL2ZzL2V4dDQvZmlsZS5jDQpAQCAtOTc3LDcgKzk3Nyw4IEBAIGNv
-bnN0IHN0cnVjdCBmaWxlX29wZXJhdGlvbnMgZXh0NF9maWxlX29wZXJhdGlvbnMgPSB7DQogCS5z
-cGxpY2Vfd3JpdGUJPSBpdGVyX2ZpbGVfc3BsaWNlX3dyaXRlLA0KIAkuZmFsbG9jYXRlCT0gZXh0
-NF9mYWxsb2NhdGUsDQogCS5mb3BfZmxhZ3MJPSBGT1BfTU1BUF9TWU5DIHwgRk9QX0JVRkZFUl9S
-QVNZTkMgfA0KLQkJCSAgRk9QX0RJT19QQVJBTExFTF9XUklURSwNCisJCQkgIEZPUF9ESU9fUEFS
-QUxMRUxfV1JJVEUgfA0KKwkJCSAgRk9QX0RPTlRDQUNIRSwNCiB9Ow0KIA0KIGNvbnN0IHN0cnVj
-dCBpbm9kZV9vcGVyYXRpb25zIGV4dDRfZmlsZV9pbm9kZV9vcGVyYXRpb25zID0gew0KZGlmZiAt
-LWdpdCBhL2ZzL2V4dDQvaW5vZGUuYyBiL2ZzL2V4dDQvaW5vZGUuYw0KaW5kZXggOWExNmVmZDA3
-MmJiLi41YzcwMjQwNTFmMWUgMTAwNjQ0DQotLS0gYS9mcy9leHQ0L2lub2RlLmMNCisrKyBiL2Zz
-L2V4dDQvaW5vZGUuYw0KQEAgLTEyNjQsNyArMTI2NCw2IEBAIHN0YXRpYyBpbnQgZXh0NF93cml0
-ZV9iZWdpbihjb25zdCBzdHJ1Y3Qga2lvY2IgKmlvY2IsDQogCXN0cnVjdCBmb2xpbyAqZm9saW87
-DQogCXBnb2ZmX3QgaW5kZXg7DQogCXVuc2lnbmVkIGZyb20sIHRvOw0KLQlmZ2ZfdCBmZ3AgPSBG
-R1BfV1JJVEVCRUdJTjsNCiANCiAJcmV0ID0gZXh0NF9lbWVyZ2VuY3lfc3RhdGUoaW5vZGUtPmlf
-c2IpOw0KIAlpZiAodW5saWtlbHkocmV0KSkNCkBAIC0xMjg4LDE2ICsxMjg3LDE0IEBAIHN0YXRp
-YyBpbnQgZXh0NF93cml0ZV9iZWdpbihjb25zdCBzdHJ1Y3Qga2lvY2IgKmlvY2IsDQogCX0NCiAN
-CiAJLyoNCi0JICogX19maWxlbWFwX2dldF9mb2xpbygpIGNhbiB0YWtlIGEgbG9uZyB0aW1lIGlm
-IHRoZQ0KKwkgKiB3cml0ZV9iZWdpbl9nZXRfZm9saW8oKSBjYW4gdGFrZSBhIGxvbmcgdGltZSBp
-ZiB0aGUNCiAJICogc3lzdGVtIGlzIHRocmFzaGluZyBkdWUgdG8gbWVtb3J5IHByZXNzdXJlLCBv
-ciBpZiB0aGUgZm9saW8NCiAJICogaXMgYmVpbmcgd3JpdHRlbiBiYWNrLiAgU28gZ3JhYiBpdCBm
-aXJzdCBiZWZvcmUgd2Ugc3RhcnQNCiAJICogdGhlIHRyYW5zYWN0aW9uIGhhbmRsZS4gIFRoaXMg
-YWxzbyBhbGxvd3MgdXMgdG8gYWxsb2NhdGUNCiAJICogdGhlIGZvbGlvIChpZiBuZWVkZWQpIHdp
-dGhvdXQgdXNpbmcgR0ZQX05PRlMuDQogCSAqLw0KIHJldHJ5X2dyYWI6DQotCWZncCB8PSBmZ2Zf
-c2V0X29yZGVyKGxlbik7DQotCWZvbGlvID0gX19maWxlbWFwX2dldF9mb2xpbyhtYXBwaW5nLCBp
-bmRleCwgZmdwLA0KLQkJCQkgICAgbWFwcGluZ19nZnBfbWFzayhtYXBwaW5nKSk7DQorCWZvbGlv
-ID0gd3JpdGVfYmVnaW5fZ2V0X2ZvbGlvKGlvY2IsIG1hcHBpbmcsIGluZGV4LCBsZW4pOw0KIAlp
-ZiAoSVNfRVJSKGZvbGlvKSkNCiAJCXJldHVybiBQVFJfRVJSKGZvbGlvKTsNCiANCkBAIC0zMDQ2
-LDcgKzMwNDMsNiBAQCBzdGF0aWMgaW50IGV4dDRfZGFfd3JpdGVfYmVnaW4oY29uc3Qgc3RydWN0
-IGtpb2NiICppb2NiLA0KIAlzdHJ1Y3QgZm9saW8gKmZvbGlvOw0KIAlwZ29mZl90IGluZGV4Ow0K
-IAlzdHJ1Y3QgaW5vZGUgKmlub2RlID0gbWFwcGluZy0+aG9zdDsNCi0JZmdmX3QgZmdwID0gRkdQ
-X1dSSVRFQkVHSU47DQogDQogCXJldCA9IGV4dDRfZW1lcmdlbmN5X3N0YXRlKGlub2RlLT5pX3Ni
-KTsNCiAJaWYgKHVubGlrZWx5KHJldCkpDQpAQCAtMzA3Miw5ICszMDY4LDcgQEAgc3RhdGljIGlu
-dCBleHQ0X2RhX3dyaXRlX2JlZ2luKGNvbnN0IHN0cnVjdCBraW9jYiAqaW9jYiwNCiAJfQ0KIA0K
-IHJldHJ5Og0KLQlmZ3AgfD0gZmdmX3NldF9vcmRlcihsZW4pOw0KLQlmb2xpbyA9IF9fZmlsZW1h
-cF9nZXRfZm9saW8obWFwcGluZywgaW5kZXgsIGZncCwNCi0JCQkJICAgIG1hcHBpbmdfZ2ZwX21h
-c2sobWFwcGluZykpOw0KKwlmb2xpbyA9IHdyaXRlX2JlZ2luX2dldF9mb2xpbyhpb2NiLCBtYXBw
-aW5nLCBpbmRleCwgbGVuKTsNCiAJaWYgKElTX0VSUihmb2xpbykpDQogCQlyZXR1cm4gUFRSX0VS
-Uihmb2xpbyk7DQogDQotLSANCjIuMzQuMQ0K
+On (25/07/16 17:38), Sergey Senozhatsky wrote:
+> Hi Christoph,
+> 
+> >  static int read_from_bdev(struct zram *zram, struct page *page,
+> > -			unsigned long entry, struct bio *parent, bool sync)
+> > +			unsigned long entry, struct bio *parent)
+> >  {
+> >  	atomic64_inc(&zram->stats.bd_reads);
+> > -	if (sync) {
+> > +	if (!parent) {
+> >  		if (WARN_ON_ONCE(!IS_ENABLED(ZRAM_PARTIAL_IO)))
+> >  			return -EIO;
+> > -		return read_from_bdev_sync(zram, page, entry, parent);
+> > +		return read_from_bdev_sync(zram, page, entry);
+> >  	}
+> >  	read_from_bdev_async(zram, page, entry, parent);
+> >  	return 1;
+> 
+> I was looking at zram's bdev (read from a backing device) today
+> and got a bit puzzled by that !parent check in read_from_bdev():
+> 
+> zram_bio_read(zram, bio)
+>   zram_bvec_read(bio)
+>     zram_read_page(bio)
+>       read_from_bdev(bio) {
+>          if (!parent)
+>            return read_from_bdev_sync()
+>       }
+> 
+> The thing is, that "parent" is basically "bio" which is passed to
+> zram_bio_read(), and it cannot be NULL (zram_bio_read() dereferences
+> it multiple times before passing it down the call chain.)  Is sync
+> read basically a dead code now?  Am I missing something?
+
+Ah, wait, I think I see it now.
+Synchronous reads seem to be only for partial IO:
+
+zram_bvec_read()
+  zram_bvec_read_partial()
+    zram_read_page(NULL)
+      read_from_bdev(NULL)
+        read_from_bdev(NULL)
+          if (!parent)
+            read_from_bdev_sync()
