@@ -1,309 +1,114 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D19C1FF1D1;
-	Wed, 16 Jul 2025 09:30:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+Received: from mx9.didiglobal.com (mx9.didiglobal.com [111.202.70.124])
+	by smtp.subspace.kernel.org (Postfix) with SMTP id BB2082EAB8D;
+	Wed, 16 Jul 2025 09:36:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=111.202.70.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752658241; cv=none; b=dIwNIJcAH6zzrzQX5xmEs0OICX+gkz87JosuT/8xsByOyx3WRl36dDGogcZ+m/L2WCW1rCuQMD/0v706TUk2U8uExOcEl5jI9rTL6CfP5vLVzgagS03vUDmxj2nFB9y0WRBNWJYapAX0S2aIQOpgUtQTXxXMHaf5hDtbyahSAT4=
+	t=1752658583; cv=none; b=pEQSNbGbGS2jnQaDfYEeWSpvkBCEsj3Dp79LcsVx4EzMU8WPOiN46rYK87FGK8uP6zy8isCV9HOLSdpRNAfDhy7RX4vxP6zIbdxlrGrsXCz9J2gZIw/EInMqsgBCveckXGmeq2dvcuWYKlkc3Plxk8C6rcFXd0XJYLjVOw3rL9U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752658241; c=relaxed/simple;
-	bh=HQX5vVvKOg++t/tKq595zg3QzRYd1IFoh8IT5DrOqWk=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=YZWIx2kqI2WdTV2omkBZh5mHJPhvns2/kOlXwPs9uM+Liq1K5+YzZqWgFAREE1WaS8hphbDn7DZVAiAEnX5MIojRJju75YwY915NSoqLwaGK1vWmQEuYQag1KzkpwzsqsKIc5s9L9T7hbXHWho9Xzpg8BqyCaPShZhgpzhL6z1Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4bhrQ43B3jzYQvW0;
-	Wed, 16 Jul 2025 17:30:36 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 3307F1A19C2;
-	Wed, 16 Jul 2025 17:30:35 +0800 (CST)
-Received: from [10.174.179.143] (unknown [10.174.179.143])
-	by APP4 (Coremail) with SMTP id gCh0CgD3chM3cXdonY7IAQ--.5121S3;
-	Wed, 16 Jul 2025 17:30:32 +0800 (CST)
-Subject: Re: [RFC PATCH] md: split bio by io_opt size in md_submit_bio()
-To: Coly Li <colyli@kernel.org>, Yu Kuai <yukuai1@huaweicloud.com>
-Cc: linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
- Xiao Ni <xni@redhat.com>, Hannes Reinecke <hare@suse.de>,
- Martin Wilck <mwilck@suse.com>, Christoph Hellwig <hch@lst.de>,
- Keith Busch <kbusch@kernel.org>, "yukuai (C)" <yukuai3@huawei.com>
-References: <20250715180241.29731-1-colyli@kernel.org>
- <f158675c-7bbe-45d4-413b-3e984589d08f@huaweicloud.com>
- <5fgrmteq5ltqi4o6bvsohcc33u3jiblyqmqv7b3g7cwawofjdl@xk4nvl3w7ndr>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <e29d71ac-6744-41ad-d4ce-1d9eb2bfb439@huaweicloud.com>
-Date: Wed, 16 Jul 2025 17:30:31 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.1
+	s=arc-20240116; t=1752658583; c=relaxed/simple;
+	bh=G4rwVJYLKQqnce8QoPmaSGWeYFRMyGi7Hu7kmAMCExA=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:Content-Type:
+	 MIME-Version; b=HT7b3epv9JS9GVryqqJ1ySdRDBu8CMsDyMHS0m1TEaGWecLAOtR5PJyC8FeceXxMORInwlhT0n3ka2Dt9sa8vmlRMMofjST2q5GW4Yejg7PHB/UTb3lItN5+S2VHVQE0Vz4QA0wU8HDgW3D4xDtc+E3Pkr4IDf6zHMMaMprLZjE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=didiglobal.com; spf=pass smtp.mailfrom=didiglobal.com; dkim=pass (1024-bit key) header.d=didiglobal.com header.i=@didiglobal.com header.b=pinRda3o; arc=none smtp.client-ip=111.202.70.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=didiglobal.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=didiglobal.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=didiglobal.com header.i=@didiglobal.com header.b="pinRda3o"
+Received: from mail.didiglobal.com (unknown [10.79.64.20])
+	by mx9.didiglobal.com (MailData Gateway V2.8.8) with ESMTPS id D02EC18121AECF;
+	Wed, 16 Jul 2025 17:35:52 +0800 (CST)
+Received: from BJ03-ACTMBX-07.didichuxing.com (10.79.71.34) by
+ BJ01-ACTMBX-01.didichuxing.com (10.79.64.20) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.10; Wed, 16 Jul 2025 17:36:03 +0800
+Received: from BJ03-ACTMBX-07.didichuxing.com (10.79.71.34) by
+ BJ03-ACTMBX-07.didichuxing.com (10.79.71.34) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.10; Wed, 16 Jul 2025 17:36:03 +0800
+Received: from BJ03-ACTMBX-07.didichuxing.com ([fe80::2e1a:dd47:6d25:287e]) by
+ BJ03-ACTMBX-07.didichuxing.com ([fe80::2e1a:dd47:6d25:287e%7]) with mapi id
+ 15.02.1748.010; Wed, 16 Jul 2025 17:36:03 +0800
+X-MD-Sfrom: chentaotao@didiglobal.com
+X-MD-SrcIP: 10.79.64.20
+From: =?gb2312?B?s8LMzszOIFRhb3RhbyBDaGVu?= <chentaotao@didiglobal.com>
+To: "tytso@mit.edu" <tytso@mit.edu>, "hch@infradead.org" <hch@infradead.org>,
+	"adilger.kernel@dilger.ca" <adilger.kernel@dilger.ca>, "willy@infradead.org"
+	<willy@infradead.org>, "brauner@kernel.org" <brauner@kernel.org>,
+	"jani.nikula@linux.intel.com" <jani.nikula@linux.intel.com>,
+	"rodrigo.vivi@intel.com" <rodrigo.vivi@intel.com>, "tursulin@ursulin.net"
+	<tursulin@ursulin.net>, "airlied@gmail.com" <airlied@gmail.com>
+CC: "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+	"linux-ext4@vger.kernel.org" <linux-ext4@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+	"dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
+	"linux-mm@kvack.org" <linux-mm@kvack.org>, "linux-doc@vger.kernel.org"
+	<linux-doc@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "chentao325@qq.com" <chentao325@qq.com>,
+	"frank.li@vivo.com" <frank.li@vivo.com>,
+	=?gb2312?B?s8LMzszOIFRhb3RhbyBDaGVu?= <chentaotao@didiglobal.com>
+Subject: [PATCH v6 1/5] drm/i915: Use kernel_write() in shmem object create
+Thread-Topic: [PATCH v6 1/5] drm/i915: Use kernel_write() in shmem object
+ create
+Thread-Index: AQHb9jUL3N5ZE20a3kaRBvbcgwGzNQ==
+Date: Wed, 16 Jul 2025 09:36:03 +0000
+Message-ID: <20250716093559.217344-2-chentaotao@didiglobal.com>
+In-Reply-To: <20250716093559.217344-1-chentaotao@didiglobal.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="gb2312"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <5fgrmteq5ltqi4o6bvsohcc33u3jiblyqmqv7b3g7cwawofjdl@xk4nvl3w7ndr>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgD3chM3cXdonY7IAQ--.5121S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxtr1DXrWUCF47JFyfAr1fWFg_yoW3tw4Dpr
-	WUWF9IyrWkJFnFkwnIq3W29FnYv3yrXry5AryfJ3yUCrn0gwnrKFWxWw1ruFy3Gr48C3yj
-	vw40vFy3C3Z0yFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBF14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
-	0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x
-	0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E
-	7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcV
-	C0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF
-	04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7
-	CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUd-B_UUUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=didiglobal.com;
+	s=2025; t=1752658558;
+	bh=G4rwVJYLKQqnce8QoPmaSGWeYFRMyGi7Hu7kmAMCExA=;
+	h=From:To:CC:Subject:Date:Message-ID:Content-Type;
+	b=pinRda3o8oP5gwhYhmDu6fD7x4SNtZiVFE84ISrzkXEuSYGANSX9/72WzX/GQGYCq
+	 LScVqHvMJZn29M4wVjAj/qq9oye05KfyO2ap2YG+/HMCE3kCodXm5EjN9ZG2crnw4l
+	 Qng7qtjtz4lOvjlz7IA3mw3UVuhzwJ4/6z2Z1/XU=
 
-Hi,
-
-在 2025/07/16 16:50, Coly Li 写道:
-> On Wed, Jul 16, 2025 at 02:58:13PM +0800, Yu Kuai wrote:
->> Hi,
->>
->> 在 2025/07/16 2:02, colyli@kernel.org 写道:
->>> From: Coly Li <colyli@kernel.org>
->>>
->>> Currently in md_submit_bio() the incoming request bio is split by
->>> bio_split_to_limits() which makes sure the bio won't exceed
->>> max_hw_sectors of a specific raid level before senting into its
->>> .make_request method.
->>>
->>> For raid level 4/5/6 such split method might be problematic and hurt
->>> large read/write perforamnce. Because limits.max_hw_sectors are not
->>> always aligned to limits.io_opt size, the split bio won't be full
->>> stripes covered on all data disks, and will introduce extra read-in I/O.
->>> Even the bio's bi_sector is aligned to limits.io_opt size and large
->>> enough, the resulted split bio is not size-friendly to corresponding
->>> raid456 level.
->>>
->>> This patch introduces bio_split_by_io_opt() to solve the above issue,
->>> 1, If the incoming bio is not limits.io_opt aligned, split the non-
->>>      aligned head part. Then the next one will be aligned.
->>> 2, If the imcoming bio is limits.io_opt aligned, and split is necessary,
->>>      then try to split a by multiple of limits.io_opt but not exceed
->>>      limits.max_hw_sectors.
->>>
->>> Then for large bio, the sligned split part will be full-stripes covered
->>> to all data disks, no extra read-in I/Os when rmw_level is 0. And for
->>> rmw_level > 0 condistions, the limits.io_opt aligned bios are welcomed
->>> for performace as well.
->>>
->>> This RFC patch only tests on 8 disks raid5 array with 64KiB chunk size.
->>> By this patch, 64KiB chunk size for a 8 disks raid5 array, sequential
->>> write performance increases from 900MiB/s to 1.1GiB/s by fio bs=10M.
->>> If fio bs=488K (exact limits.io_opt size) the peak sequential write
->>> throughput can reach 1.51GiB/s.
->>>
->>> (Resend to include Christoph and Keith in CC list.)
->>>
->>> Signed-off-by: Coly Li <colyli@kernel.org>
->>> Cc: Yu Kuai <yukuai3@huawei.com>
->>> Cc: Xiao Ni <xni@redhat.com>
->>> Cc: Hannes Reinecke <hare@suse.de>
->>> Cc: Martin Wilck <mwilck@suse.com>
->>> Cc: Christoph Hellwig <hch@lst.de>
->>> Cc: Keith Busch <kbusch@kernel.org>
->>> ---
->>>    drivers/md/md.c | 63 ++++++++++++++++++++++++++++++++++++++++++++++++-
->>>    1 file changed, 62 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/drivers/md/md.c b/drivers/md/md.c
->>> index 0f03b21e66e4..363cff633af3 100644
->>> --- a/drivers/md/md.c
->>> +++ b/drivers/md/md.c
->>> @@ -426,6 +426,67 @@ bool md_handle_request(struct mddev *mddev, struct bio *bio)
->>>    }
->>>    EXPORT_SYMBOL(md_handle_request);
->>> +static struct bio *bio_split_by_io_opt(struct bio *bio)
->>> +{
->>> +	sector_t io_opt_sectors, sectors, n;
->>> +	struct queue_limits lim;
->>> +	struct mddev *mddev;
->>> +	struct bio *split;
->>> +	int level;
->>> +
->>> +	mddev = bio->bi_bdev->bd_disk->private_data;
->>> +	level = mddev->level;
->>> +	if (level == 1 || level == 10 || level == 0 || level == LEVEL_LINEAR)
->>> +		return bio_split_to_limits(bio);
->>
->> There is another patch that provide a helper raid_is_456()
->> https://lore.kernel.org/all/20250707165202.11073-3-yukuai@kernel.org/
->>
->> You might want to use it here.
-> 
-> Copied, I will use raid_is_456() after it gets merged.
-> 
->>> +
->>> +	lim = mddev->gendisk->queue->limits;
->>> +	io_opt_sectors = min3(bio_sectors(bio), lim.io_opt >> SECTOR_SHIFT,
->>> +			      lim.max_hw_sectors);
->>
->> You might want to use max_sectors here, to honor user setting.
->>
->> And max_hw_sectors is just for normal read and write, for other IO like
->> discard, atomic write, write zero, the limit is different.
->>
-> 
-> Yeah, this is a reason why I want your comments :-) Originally I want to
-> change bio_split_to_limits(), but the raid5 logic cannot be accessed
-> there. If I write a clone of bio_split_to_limits(), it seems too heavy
-> and unncessary.
-> 
-> How about only handle read/write bio here, and let bio_split_to_limits()
-> to do the rested, like,
-> 
-> 	level = mddev->level;
-> 	if (level == 1 || level == 10 || level == 0 || level == LEVEL_LINEAR ||
-> 	    (bio_op(bio) != REQ_OP_READ && bio_op(bio) != REQ_OP_WRITE))
-> 		return bio_split_to_limits(bio);
-> 
-> 
->>> +
->>> +	/* No need to split */
->>> +	if (bio_sectors(bio) == io_opt_sectors)
->>> +		return bio;
->>> +
->>
->> If the bio happend to accross two io_opt, do you think it's better to
->> split it here? For example:
->>
-> 
-> I assume raid5 code will handle this, the pages of this bio will belong
-> to different stripe pages belong to different chunks. So no need to
-> split here. For such condition, it is same handling process as calling
-> bio_split_to_limits().
-> 
->> io_opt is 64k(chunk size) * 7 = 448k, issue an IO start from 444k with
->> len = 8k. raid5 will have to use 2 stripes to handle such IO.
->>
-> 
-> Yes, I assume although this bio is not split, raid5 will have different
-> cloned bio to map different stripe pages in __add_stripe_bio().
-> 
-> And because they belong to difference chunks, extra read-in for XOR (when
-> rmw_level == 0) cannot be avoided.
->   
->>> +	n = bio->bi_iter.bi_sector;
->>> +	sectors = do_div(n, io_opt_sectors);
->>> +	/* Aligned to io_opt size and no need to split for radi456 */
->>> +	if (!sectors && (bio_sectors(bio) <=  lim.max_hw_sectors))
->>> +		return bio;
->>
->> I'm confused here, do_div doesn't mean aligned, should bio_offset() be
->> taken into consideration? For example, issue an IO start from 4k with
->> len = 448 * 2 k, if I read the code correctly, the result is:
->>
->> 4 + 896 -> 4 + 896 (not split if within max_sectors)
->>
->> What we really expect is:
->>
->> 4 + 896 -> 4 + 444, 448 + 448, 892 + 4
-> 
-> Yes you are right. And I do this on purpose, becasue the size of bio
-> is small (less then max_hw_sectors). Even split the bio as you exampled,
-> the full-stripes-write in middle doesn't help performance because the
-> extra read-in will happen for head and tail part when rmw_level == 0.
-> 
-> For small bio (size < io_opt x 2 in this case), there is almost no
-> performance difference. The performance loss of incorrect bio split will
-> show up when the bio is large enough and many split bios in middle are
-> not full-stripes covered.
-> 
-> For bio size < max_hw_sectors, just let raid5 handle it as what it does.
-
-I'm still a bit confused :( I do understand that in the above case that
-IO size < max_sectors, raid5 can handle it and there is not much
-difference, what I don't understand is why not aligned to io_opt, for
-example, in the above case if I increase io size to 448 *n, I would
-expect the result as following:(assume max_sectors = 1M)
-
-4 + 444, 448 + 448*2, 448*3 + 448*2, ..., 448*n + 4;
-
-Other than the head and tail, all splited bio in the middle will end up
-with full stripes.
-
-And in this patch, becasue do_div can pass, then splited bio will end up
-like:
-
-4 + 448*2, 4+448*2 + 448*2, ...
-
-And each bio will not end up with full stripes, I don't get it how this
-behaviour have any difference without this patch, raid5 will have to try
-fill in stripes with different bio.
-
-Thanks,
-Kuai
-
->>> +
->>> +	if (sectors) {
->>> +		/**
->>> +		 * Not aligned to io_opt, split
->>> +		 * non-aligned head part.
->>> +		 */
->>> +		sectors = io_opt_sectors - sectors;
->>> +	} else {
->>> +		/**
->>> +		 * Aligned to io_opt, split to the largest multiple
->>> +		 * of io_opt within max_hw_sectors, to make full
->>> +		 * stripe write/read for underlying raid456 levels.
->>> +		 */
->>> +		n = lim.max_hw_sectors;
->>> +		do_div(n, io_opt_sectors);
->>> +		sectors = n * io_opt_sectors;
->>
->> roundown() ?
-> 
-> Yes, of course :-)
-> 
-> 
->>> +	}
->>> +
->>> +	/* Almost won't happen */
->>> +	if (unlikely(sectors >= bio_sectors(bio))) {
->>> +		pr_warn("%s raid level %d: sectors %llu >= bio_sectors %u, not split\n",
->>> +			__func__, level, sectors, bio_sectors(bio));
->>> +		return bio;
->>> +	}
->>> +
->>> +	split = bio_split(bio, sectors, GFP_NOIO,
->>> +			  &bio->bi_bdev->bd_disk->bio_split);
->>> +	if (!split)
->>> +		return bio;
->>> +	split->bi_opf |= REQ_NOMERGE;
->>> +	bio_chain(split, bio);
->>> +	submit_bio_noacct(bio);
->>> +	return split;
->>> +}
->>> +
->>>    static void md_submit_bio(struct bio *bio)
->>>    {
->>>    	const int rw = bio_data_dir(bio);
->>> @@ -441,7 +502,7 @@ static void md_submit_bio(struct bio *bio)
->>>    		return;
->>>    	}
->>> -	bio = bio_split_to_limits(bio);
->>> +	bio = bio_split_by_io_opt(bio);
->>>    	if (!bio)
->>>    		return;
->>>
->>
-> 
-> Thanks for the review.
-> 
-> Coly Li
-> 
-> .
-> 
-
+RnJvbTogVGFvdGFvIENoZW4gPGNoZW50YW90YW9AZGlkaWdsb2JhbC5jb20+DQoNClJlcGxhY2Ug
+dGhlIHdyaXRlX2JlZ2luL3dyaXRlX2VuZCBsb29wIGluDQppOTE1X2dlbV9vYmplY3RfY3JlYXRl
+X3NobWVtX2Zyb21fZGF0YSgpIHdpdGggY2FsbCB0byBrZXJuZWxfd3JpdGUoKS4NCg0KVGhpcyBm
+dW5jdGlvbiBpbml0aWFsaXplcyBzaG1lbS1iYWNrZWQgR0VNIG9iamVjdHMuIGtlcm5lbF93cml0
+ZSgpDQpzaW1wbGlmaWVzIHRoZSBjb2RlIGJ5IHJlbW92aW5nIG1hbnVhbCBmb2xpbyBoYW5kbGlu
+Zy4NCg0KUGFydCBvZiBhIHNlcmllcyByZWZhY3RvcmluZyBhZGRyZXNzX3NwYWNlX29wZXJhdGlv
+bnMgd3JpdGVfYmVnaW4gYW5kDQp3cml0ZV9lbmQgY2FsbGJhY2tzIHRvIHVzZSBzdHJ1Y3Qga2lv
+Y2IgZm9yIHBhc3Npbmcgd3JpdGUgY29udGV4dCBhbmQNCmZsYWdzLg0KDQpTaWduZWQtb2ZmLWJ5
+OiBUYW90YW8gQ2hlbiA8Y2hlbnRhb3Rhb0BkaWRpZ2xvYmFsLmNvbT4NCi0tLQ0KIGRyaXZlcnMv
+Z3B1L2RybS9pOTE1L2dlbS9pOTE1X2dlbV9zaG1lbS5jIHwgMzMgKysrKysrKy0tLS0tLS0tLS0t
+LS0tLS0NCiAxIGZpbGUgY2hhbmdlZCwgOSBpbnNlcnRpb25zKCspLCAyNCBkZWxldGlvbnMoLSkN
+Cg0KZGlmZiAtLWdpdCBhL2RyaXZlcnMvZ3B1L2RybS9pOTE1L2dlbS9pOTE1X2dlbV9zaG1lbS5j
+IGIvZHJpdmVycy9ncHUvZHJtL2k5MTUvZ2VtL2k5MTVfZ2VtX3NobWVtLmMNCmluZGV4IDE5YTNl
+YjgyZGM2YS4uMWU4ZjY2YWM0OGNhIDEwMDY0NA0KLS0tIGEvZHJpdmVycy9ncHUvZHJtL2k5MTUv
+Z2VtL2k5MTVfZ2VtX3NobWVtLmMNCisrKyBiL2RyaXZlcnMvZ3B1L2RybS9pOTE1L2dlbS9pOTE1
+X2dlbV9zaG1lbS5jDQpAQCAtNjM3LDkgKzYzNyw4IEBAIGk5MTVfZ2VtX29iamVjdF9jcmVhdGVf
+c2htZW1fZnJvbV9kYXRhKHN0cnVjdCBkcm1faTkxNV9wcml2YXRlICppOTE1LA0KIHsNCiAJc3Ry
+dWN0IGRybV9pOTE1X2dlbV9vYmplY3QgKm9iajsNCiAJc3RydWN0IGZpbGUgKmZpbGU7DQotCWNv
+bnN0IHN0cnVjdCBhZGRyZXNzX3NwYWNlX29wZXJhdGlvbnMgKmFvcHM7DQotCWxvZmZfdCBwb3M7
+DQotCWludCBlcnI7DQorCWxvZmZfdCBwb3MgPSAwOw0KKwlzc2l6ZV90IGVycjsNCiANCiAJR0VN
+X1dBUk5fT04oSVNfREdGWChpOTE1KSk7DQogCW9iaiA9IGk5MTVfZ2VtX29iamVjdF9jcmVhdGVf
+c2htZW0oaTkxNSwgcm91bmRfdXAoc2l6ZSwgUEFHRV9TSVpFKSk7DQpAQCAtNjQ5LDI5ICs2NDgs
+MTUgQEAgaTkxNV9nZW1fb2JqZWN0X2NyZWF0ZV9zaG1lbV9mcm9tX2RhdGEoc3RydWN0IGRybV9p
+OTE1X3ByaXZhdGUgKmk5MTUsDQogCUdFTV9CVUdfT04ob2JqLT53cml0ZV9kb21haW4gIT0gSTkx
+NV9HRU1fRE9NQUlOX0NQVSk7DQogDQogCWZpbGUgPSBvYmotPmJhc2UuZmlscDsNCi0JYW9wcyA9
+IGZpbGUtPmZfbWFwcGluZy0+YV9vcHM7DQotCXBvcyA9IDA7DQotCWRvIHsNCi0JCXVuc2lnbmVk
+IGludCBsZW4gPSBtaW5fdCh0eXBlb2Yoc2l6ZSksIHNpemUsIFBBR0VfU0laRSk7DQotCQlzdHJ1
+Y3QgZm9saW8gKmZvbGlvOw0KLQkJdm9pZCAqZnNkYXRhOw0KLQ0KLQkJZXJyID0gYW9wcy0+d3Jp
+dGVfYmVnaW4oZmlsZSwgZmlsZS0+Zl9tYXBwaW5nLCBwb3MsIGxlbiwNCi0JCQkJCSZmb2xpbywg
+JmZzZGF0YSk7DQotCQlpZiAoZXJyIDwgMCkNCi0JCQlnb3RvIGZhaWw7DQorCWVyciA9IGtlcm5l
+bF93cml0ZShmaWxlLCBkYXRhLCBzaXplLCAmcG9zKTsNCiANCi0JCW1lbWNweV90b19mb2xpbyhm
+b2xpbywgb2Zmc2V0X2luX2ZvbGlvKGZvbGlvLCBwb3MpLCBkYXRhLCBsZW4pOw0KKwlpZiAoZXJy
+IDwgMCkNCisJCWdvdG8gZmFpbDsNCiANCi0JCWVyciA9IGFvcHMtPndyaXRlX2VuZChmaWxlLCBm
+aWxlLT5mX21hcHBpbmcsIHBvcywgbGVuLCBsZW4sDQotCQkJCSAgICAgIGZvbGlvLCBmc2RhdGEp
+Ow0KLQkJaWYgKGVyciA8IDApDQotCQkJZ290byBmYWlsOw0KLQ0KLQkJc2l6ZSAtPSBsZW47DQot
+CQlkYXRhICs9IGxlbjsNCi0JCXBvcyArPSBsZW47DQotCX0gd2hpbGUgKHNpemUpOw0KKwlpZiAo
+ZXJyICE9IHNpemUpIHsNCisJCWVyciA9IC1FSU87DQorCQlnb3RvIGZhaWw7DQorCX0NCiANCiAJ
+cmV0dXJuIG9iajsNCiANCi0tIA0KMi4zNC4xDQo=
