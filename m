@@ -1,121 +1,104 @@
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBEFA2F0E49
-	for <linux-block@vger.kernel.org>; Wed, 16 Jul 2025 09:44:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B6B52BF017
+	for <linux-block@vger.kernel.org>; Wed, 16 Jul 2025 10:40:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752659061; cv=none; b=Mi53pZO2BTdCzjr1b3fGtLGABe1UFPj8yNKN8cUVJObbEFXjxhSfpQqzel62R63iG1TeJZuFbkSug4QhOPxtrGXI06nY2agUmVkOijm4ga55VPSOlc3BitvB1L1hhqxPaJG41adeonnf+XZqP82wQ8NLqUVuBzxrjcOiOYS8GDM=
+	t=1752662429; cv=none; b=hDu4hO3d+0U2Q074w7oozsSBj0n+kXYL7lFYR0b4kCZwt44f6ET0DQYkeR0ahcCqWjxZLVyznqWvffQXPJBg4M9UJwdHt5U+AYajxGvHwjey64mhdC/Yscg5pSjnIWUJcOtSH7oLlHdzp6wY6PKjB1PsKwtDPS8sGzfCH6jwQI8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752659061; c=relaxed/simple;
-	bh=NudOtJaHKfwpKRxiG+P4sUEmDYIZSqhwxiYyu/1rXRk=;
+	s=arc-20240116; t=1752662429; c=relaxed/simple;
+	bh=mu1ScGbck9q9MWwoSAExzCntTfv6hbeKLVl0usR+ybc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=p3og+imw13cuTLYdoaEsWm8hXsUpEvzmLlYAhR/83/TU26CEWz1+pyfO/2WHkpejdvQ0qcYIyR9nAHWExVRzUbrbjoE8Qaai66oTXn2MLB7lxJIaGfDVolx+sE0LrGHJATwbkE2njxHhxnAcLqyNwFt7LVsIQwhyHaA8jrJzT6o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=LsdgkQZi; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=i3iUZnpdMcxoNobsCY9OCH0NgotxEHeyMmKoekDjlqb41X7/x4TaAYm8BlOL8pNDMHYR0QHQuV6jBluFAQR75TsNshxVpLMZY9J+y+xLj/JhPZxHlplISwwPbvZ/S9joBJAgZdwLRrFjuqrL67NeQ28bkcPkQCmJcp73NCb50F0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YoaOnCDG; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="LsdgkQZi"
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-23aeac7d77aso50085915ad.3
-        for <linux-block@vger.kernel.org>; Wed, 16 Jul 2025 02:44:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1752659058; x=1753263858; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=j/MRaoTHxwRJvwPm3IFe8X5kWdiLlCM66v6ozoa84TI=;
-        b=LsdgkQZimnPCSV9ePms7DYbGzY/kVxKqgBXvWkt+wBHhP1EnhDRVBGK72tyq7liwvT
-         c+jW8GqpRoA9aB5jOvqxw2UmV7iK9GhGRij/vvGF6jzgPzF3RmABTI+ntvQVHXOkclco
-         F/HCi9N1gWc+k5dfgX0yNN3VDbCwmL6vg4cXk=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752659058; x=1753263858;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=j/MRaoTHxwRJvwPm3IFe8X5kWdiLlCM66v6ozoa84TI=;
-        b=FHA2T0ANpMT1hFmN7zT3Jw6Dfjpn9Yq1S5RUvtSMbx6oiOHyerGyIfFPRotms1HGvD
-         VB0TfIynIBtE1rFt9BIkIwqFI/R2JGeomYS8tMc1I1D068tqa5yALeqyErAWwBvNXVfY
-         gufbmf3KfZFXDXWywPCKETyEqu4nsdUx1SNRPQI9t9Km4luo9t7MN3wsj6SqkbHg5Nag
-         CmDp/bRnqcikvyHjBUc9LajUhytKZa5xFtRlsiRjfEqbxixee0rzYByp4xGCw52Z5/gd
-         jC7MWhrkgTQSGpUVPvag2TujqK/U1WQ2NSECKjY4CHJGhjtWygrEaOnb6zqEi5zCY2LW
-         mgpQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU52aqMU5tymTPg2GjZ0FJAMwX/ZXTU7lwGSrCRk+9gkvNhAtRpErdoaIMIkZEKzh5vv+M7gm0bZDrDZA==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzp3Fr06g/cn8JwxqVfXZuqQTal+DxI6o2SOK+LGdCMxd8iSOSr
-	Xcwbakm5tyyahd46mRsRI8NT+xbcNGXPOmqpBMvH6WQTW0JQz2jPw6I6CbGDNnwi3w==
-X-Gm-Gg: ASbGncvrpx2sqf8x3rJt7aqzopI6+reugOQeCUGRbdmbL0zK3gzMub+l2eSvbKZkePD
-	Cq5kOsIS9JCgGV3C+n309tlq2d2ms/UWGngRG/Isi9cp/8nN5NJ28rRLL7Rz/5dmdje9VY3+/yT
-	aaCl0AuGYvlfC1GzvNlcFqljIWU9x8XgrbZXSBNjQX6YjGcF9RbQhuBEcrF/w69dA4MtcsBxeWr
-	vnc5UPUUGvix3tpR3O0Ikexg5YmFSZt9wwmHAVjCNPdNwNEIvaZGVos6mipIsnV30UEF3j0ESJX
-	9NXnLOLKVpTf7jobRfGvvShhoXCexlavNm8ZZi+yOkUW1MlCjMvA7aXWO3Xlq35w0N25MaveERn
-	dM/dAYqdYGMgSjs/rI64fUD3h4Q==
-X-Google-Smtp-Source: AGHT+IF157mzUMUiSNCvgg8EkSviHMXOPMi99eiUONM56I4rAkB9RYJl0pAuuVoDQbXQVjwMQ3KhVw==
-X-Received: by 2002:a17:902:e743:b0:235:e76c:4353 with SMTP id d9443c01a7336-23e25000edfmr30647405ad.51.1752659057890;
-        Wed, 16 Jul 2025 02:44:17 -0700 (PDT)
-Received: from google.com ([2401:fa00:8f:203:9ab6:c2f9:ca7e:e672])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-31c9f1ba62dsm1062298a91.1.2025.07.16.02.44.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Jul 2025 02:44:17 -0700 (PDT)
-Date: Wed, 16 Jul 2025 18:44:13 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Minchan Kim <minchan@kernel.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
-	Sergey Senozhatsky <senozhatsky@chromium.org>
-Subject: Re: [PATCH 16/17] zram: fix synchronous reads
-Message-ID: <sbqfktl3qwfizfg3b5mkmme26ks5xkazeh7y45yoo4bpbr65kb@ya4eepk7jprz>
-References: <20230411171459.567614-1-hch@lst.de>
- <20230411171459.567614-17-hch@lst.de>
- <rjq6lrsq2mflcry4vtks7wth63cgpjzngcbjxy65z7ucupin3q@owvyk5befvpt>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YoaOnCDG"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1752662427;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=jUmwdkpVWgrx6g8+0Yxmx/sQbjsE7kvd7nlNgws5rzs=;
+	b=YoaOnCDGktfAFCMBbJfol6T2clPPjj8jaRmc1LTuVjcbrs5q9bvT5jeZBlR9nbti+t0Yah
+	o6eh5t05Vjk3S7huciPQNHZwO2ckseiC88Vu9MqQRJowXWEM1MOr38znEuiDjDJ0bcHFBV
+	aNfN/MwQ1YRk+c5MjUv5IvFAlsqBVd0=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-623-LU0V9BbOMYyo4t5irbC1kw-1; Wed,
+ 16 Jul 2025 06:40:23 -0400
+X-MC-Unique: LU0V9BbOMYyo4t5irbC1kw-1
+X-Mimecast-MFC-AGG-ID: LU0V9BbOMYyo4t5irbC1kw_1752662422
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C22221956089;
+	Wed, 16 Jul 2025 10:40:21 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.29])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9131B195E772;
+	Wed, 16 Jul 2025 10:40:15 +0000 (UTC)
+Date: Wed, 16 Jul 2025 18:40:10 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Yu Kuai <yukuai1@huaweicloud.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Yi Zhang <yi.zhang@redhat.com>,
+	linux-block <linux-block@vger.kernel.org>,
+	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+	"yukuai (C)" <yukuai3@huawei.com>
+Subject: Re: [bug report] kmemleak issue observed during blktests
+Message-ID: <aHeBiu9pHZwO95vW@fedora>
+References: <CAHj4cs8oJFvz=daCvjHM5dYCNQH4UXwSySPPU4v-WHce_kZXZA@mail.gmail.com>
+ <d52a8216-dd70-4489-a645-55d174bcdd9e@kernel.dk>
+ <08f3f802-e3c3-b851-b4ee-912eade04c6f@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <rjq6lrsq2mflcry4vtks7wth63cgpjzngcbjxy65z7ucupin3q@owvyk5befvpt>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <08f3f802-e3c3-b851-b4ee-912eade04c6f@huaweicloud.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On (25/07/16 17:38), Sergey Senozhatsky wrote:
-> Hi Christoph,
+On Wed, Jul 16, 2025 at 03:50:34PM +0800, Yu Kuai wrote:
+> Hi,
 > 
-> >  static int read_from_bdev(struct zram *zram, struct page *page,
-> > -			unsigned long entry, struct bio *parent, bool sync)
-> > +			unsigned long entry, struct bio *parent)
-> >  {
-> >  	atomic64_inc(&zram->stats.bd_reads);
-> > -	if (sync) {
-> > +	if (!parent) {
-> >  		if (WARN_ON_ONCE(!IS_ENABLED(ZRAM_PARTIAL_IO)))
-> >  			return -EIO;
-> > -		return read_from_bdev_sync(zram, page, entry, parent);
-> > +		return read_from_bdev_sync(zram, page, entry);
-> >  	}
-> >  	read_from_bdev_async(zram, page, entry, parent);
-> >  	return 1;
+> 在 2025/07/16 9:54, Jens Axboe 写道:
+> > unreferenced object 0xffff8882e7fbb000 (size 2048):
+> >    comm "check", pid 10460, jiffies 4324980514
+> >    hex dump (first 32 bytes):
+> >      00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+> >      00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+> >    backtrace (crc c47e6a37):
+> >      __kvmalloc_node_noprof+0x55d/0x7a0
+> >      sbitmap_init_node+0x15a/0x6a0
+> >      kyber_init_hctx+0x316/0xb90
+> >      blk_mq_init_sched+0x416/0x580
+> >      elevator_switch+0x18b/0x630
+> >      elv_update_nr_hw_queues+0x219/0x2c0
+> >      __blk_mq_update_nr_hw_queues+0x36a/0x6f0
+> >      blk_mq_update_nr_hw_queues+0x3a/0x60
+> >      find_fallback+0x510/0x540 [nbd]
 > 
-> I was looking at zram's bdev (read from a backing device) today
-> and got a bit puzzled by that !parent check in read_from_bdev():
-> 
-> zram_bio_read(zram, bio)
->   zram_bvec_read(bio)
->     zram_read_page(bio)
->       read_from_bdev(bio) {
->          if (!parent)
->            return read_from_bdev_sync()
->       }
-> 
-> The thing is, that "parent" is basically "bio" which is passed to
-> zram_bio_read(), and it cannot be NULL (zram_bio_read() dereferences
-> it multiple times before passing it down the call chain.)  Is sync
-> read basically a dead code now?  Am I missing something?
+> This is werid, and I check the code that it's impossible
+> blk_mq_update_nr_hw_queues() can be called from find_fallback().
 
-Ah, wait, I think I see it now.
-Synchronous reads seem to be only for partial IO:
+Yes.
 
-zram_bvec_read()
-  zram_bvec_read_partial()
-    zram_read_page(NULL)
-      read_from_bdev(NULL)
-        read_from_bdev(NULL)
-          if (!parent)
-            read_from_bdev_sync()
+> Does kmemleak show wrong backtrace?
+
+I tried to run blktests block/005 over nbd, but can't reproduce this
+kmemleak report after setting up the detector.
+
+Yi, can you share your reproducer?
+
+
+Thanks
+Ming
+
