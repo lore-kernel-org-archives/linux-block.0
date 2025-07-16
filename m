@@ -1,124 +1,101 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A39D92F5322
-	for <linux-block@vger.kernel.org>; Wed, 16 Jul 2025 12:34:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F4092F4A07;
+	Wed, 16 Jul 2025 12:39:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752669294; cv=none; b=owQlIwVNfYZ3wNGXYoQOuCBQEiqDXgYO51uy7dorlW3f1OkfJDN+sqNJ8sK06unQsNTP6ONTUwihUdSCMwK0Tb3jjKUmZZ5pm4R2QlFMxYSFA6EnPqAvNuJWSsl7LAz7LdXurkD2BQXjgnCHFrskAnuv+76z218ofHefxAy8K20=
+	t=1752669544; cv=none; b=JZKn4uICy4VIM+RvFM2nCtk0f0ykSKmcSyUAQlZLlidTA1Lc7pVDveAEFDQmCF9EggbdAtR/y260itVig3iV1qDucj/6sc+w0mp9Zl0c1BTf89JPS7+DFxaOjoC9wPNFb7fiouYUKiKr6jRSD8asZP5haVemfsYregWTLDdSAE8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752669294; c=relaxed/simple;
-	bh=fPTJ4SsZh3OpT+9/wSZEo/B3FjzU/0X+obKUW00jtgk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZGpR4dmLevsb+o2CahuPcPmeb8KOG4eTnnX3pJ1U0meFxTJjsQaIS+C2l3bTzHb+5v+IT9prq0cEqyhZc/XiEnUoXwx8PfCo+sbqYKA6fmdktBBTVoVvdxqAAM0tXIAnl5CRubHlnlSgfWNhwNNb7P7wmem2TVw+zvtjuI1XI0Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ED3o/H8Y; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1752669544; c=relaxed/simple;
+	bh=t7yMTiyIn5bVl5n5EJK+KgGqnp8cXTzAmhlo+kbDvd8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=npFxQ3WT3iMWyB0KQHB6BvO1CeImDk5B6zCZEpEurhmes2XUF4ywqaMWZNjPx7UpM3hMhDZtWbuFeRYLCljY1jfL4HzN8ba56h3v9v4RJq3SlVeuxoL4gkex6nPG3q0Xm28BdIT1dbe3dbC6o/JjjNGzWEzz4ubrWhu/cbKUqC0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AdUFVIpH; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ED3o/H8Y"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80CB4C4CEF0;
-	Wed, 16 Jul 2025 12:34:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752669294;
-	bh=fPTJ4SsZh3OpT+9/wSZEo/B3FjzU/0X+obKUW00jtgk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ED3o/H8Y2GnuDpH2Sv9iFuIEAAqGezQi2b7DrgxJbAV53BicBeEl/NCEHfdjoO6j2
-	 lyMurmVtP8gimPi1EFiY8ERCiC8JIrFIzprQLMnfdGC63X84uilFU1Gkm7/MhiVq6f
-	 8jeHdbD9zoKImefA9uW/l7JSLHUBFlrhc+PXH4kIbbMZJe7wjZVtj2LlgCRAne3xml
-	 bBwDCGoEIcD8Q3doplkP7nnnjXiG8YRlxKH/lMDhzCoLv28GgGYJE2hvthTu67MdUi
-	 7UKoUwl/rBSlrKJXlcD1eL7qSR1SGF2Elp39UXHeEf8HLk9wR7Qc5FgcD0cwj4U3TG
-	 JQdb0vSDKiMZw==
-Date: Wed, 16 Jul 2025 20:34:49 +0800
-From: Coly Li <colyli@kernel.org>
-To: Yu Kuai <yukuai1@huaweicloud.com>
-Cc: hch@lst.de, linux-block@vger.kernel.org, 
-	"yukuai (C)" <yukuai3@huawei.com>
-Subject: Re: Improper io_opt setting for md raid5
-Message-ID: <w56eyedneaptamuyl7gju6vl45egk4yza7lw5expwrqwe4f5ha@k25uqrq4f2mf>
-References: <ywsfp3lqnijgig6yrlv2ztxram6ohf5z4yfeebswjkvp2dzisd@f5ikoyo3sfq5>
- <9b4027e8-6efa-7b28-8f00-3f4a5435b6c9@huaweicloud.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AdUFVIpH"
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-235db423abdso4016075ad.1;
+        Wed, 16 Jul 2025 05:39:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1752669542; x=1753274342; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=t7yMTiyIn5bVl5n5EJK+KgGqnp8cXTzAmhlo+kbDvd8=;
+        b=AdUFVIpHDon3Sp45y0NUMvQdff67kaSYpbyY31Xz8GWLjWeO1RZcZiVkgQXW68idzA
+         R2/MAH5QtCoEgqoYuaUFXH7gH8h+sCRhRlqbb8ltw6iIBekODfOnUHoxL7x3+hZSpelF
+         aQ+37GgKbQhAR+nV9iZvU8FMPpYZVjJPHS6fB38NTcQoaR3s3mvA1mUIm7nnVh0SnIU7
+         /khxAWPvLkWwfanEu3YmKyGTJKl924ybRKiKjojzwYydnuFTP7AtyJhM8eUCeNMmggTE
+         k08TfPwAHKDO9jv/EeMjLEX+KhMsGGcsF5m+3iAFCwqnkEqAz+T1AHZQc8wchABeUnp9
+         Elag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752669542; x=1753274342;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=t7yMTiyIn5bVl5n5EJK+KgGqnp8cXTzAmhlo+kbDvd8=;
+        b=bnD6m2O1a+Odv14/Vnv2aa0yAtGwSp2799nGkCnVZ9ecne0B2tKxaKQ1miW6SEwS9/
+         yHb5d1z9RNBB0O/qn4TDO7ujNMpBFkIEJYpuxUSEox/ma7nFzerUtDT4CIYSHeBbxSe2
+         98OPEIJuOvhTzI09hMnFs9L/g4rSJRD277Yl7a+MZCHKN4vzWnWsbpyEFtG+Bo7LV1Zb
+         ee6DNHdCDzo9LQfjmpDfaYj+pihyYJYI61c9vrpQPFxkcvjFIDouAmOvTRBL5JJ2Z6Jy
+         57bI5WoNdlc3JHcojHFSRUPoRLI1Cct4tVEoLGVbueSzLjuo11HnRyLyJaFZYennkHFA
+         kgaQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVaG+yuNhNMJ3RK4tFMeOfrprYevableQIYRXraD0EeuskucUyqag9/TBxDpp2xn+scSXu8EFV2glpDuUqM@vger.kernel.org, AJvYcCW0GtTnJd6Uc8sSMGqwdED5Y13IU6KhNz+O8neqyviHc6yClCWt1PfwlcsWalEI0HwkdEXlbBj9kLLR2A==@vger.kernel.org, AJvYcCWBdl3pS0RQtfuelwe8r5aua+xEjcY/70LqWwLFlmux1Pr0E1e+NIzAOyKbwaQD07A6u52ZmM4WDwSI9pTPbJI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwQJxY9lQFsyANen/C4IFQicq4pjI0SbZFHMtLv/sugAk0iWwWN
+	6YnI7Sz7CGt0EqctGQKmv1bZfPPtxHtBvZnGTUNZQxZnLEQ1/iKa2pnuxpv+xJXUVe5dtzLPbH7
+	TJ+hvNWNEOjtgSQM+wBluxiPDse8VVQ0=
+X-Gm-Gg: ASbGncs+bqVL3YPGF8liHCak9p5d6ACkF7RJHGVc1k1MVguqDtSCNSt1RFeI5eI05kR
+	tXYK/295rz+avHcSR/gY3FtrJ5chbpb3Mdr2l6fURdccFPG/1ZgVVguC/69BB3zlRaXGSYBSMNR
+	xSW4J9o32Y5a6C/nAyxyuUytZ1JpQIQkCg28MrrGmhMwiN9aY7bbYIdIc4TM5mEtOtfOM66SEoi
+	X0laFpLxnj/sTlE
+X-Google-Smtp-Source: AGHT+IHb7twDbZS717sooFnpEeuTv8foFpUNdQt/t+N7nFBUSXSl8rv6EaBwPEQgIjJO6rxn22+uDFocPFtD3HxmqoA=
+X-Received: by 2002:a17:902:d4cb:b0:236:7165:6ed3 with SMTP id
+ d9443c01a7336-23e24f4c2edmr15175785ad.10.1752669542136; Wed, 16 Jul 2025
+ 05:39:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <9b4027e8-6efa-7b28-8f00-3f4a5435b6c9@huaweicloud.com>
+References: <20250716090712.809750-1-shankari.ak0208@gmail.com>
+In-Reply-To: <20250716090712.809750-1-shankari.ak0208@gmail.com>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Wed, 16 Jul 2025 14:38:49 +0200
+X-Gm-Features: Ac12FXyBbubE7ZsrFEb4VKL5PU_-XhTL2cDJ2Apjzdi3F4Mbeg7nmMtrlhi_wVI
+Message-ID: <CANiq72k1ENBFw7eNc5Kb5cFagysqfsHt9a=Tr4NxuVcV2TD=nQ@mail.gmail.com>
+Subject: Re: [PATCH 1/7] rust: block: update ARef and AlwaysRefCounted imports
+ from sync::aref
+To: Shankari Anand <shankari.ak0208@gmail.com>
+Cc: Andreas Hindborg <a.hindborg@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
+	Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, linux-block@vger.kernel.org, 
+	rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
+	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Benno Lossin <lossin@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
+	Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jul 16, 2025 at 03:26:02PM +0800, Yu Kuai wrote:
-> Hi,
-> 
-> 在 2025/07/15 23:56, Coly Li 写道:
-> > Then when my raid5 array sets its queue limits, because its io_opt is 64KiB*7,
-> > and the raid component sata hard drive has io_opt with 32767 sectors, by
-> > calculation in block/blk-setting.c:blk_stack_limits() at line 753,
-> > 753         t->io_opt = lcm_not_zero(t->io_opt, b->io_opt);
-> > the calculated opt_io_size of my raid5 array is more than 1GiB. It is too large.
-> 
-> Perhaps we should at least provide a helper for raid5 that we prefer
-> raid5 io_opt over underlying disk's io_opt. Because of raid5 internal
-> implemation, chunk_size * data disks is the best choice, there will be
-> significant differences in performance if not aligned with io_opt.
-> 
-> Something like following:
-> 
+On Wed, Jul 16, 2025 at 11:07=E2=80=AFAM Shankari Anand
+<shankari.ak0208@gmail.com> wrote:
+>
+> It part of a subsystem-wise split series, as suggested in:
+> https://lore.kernel.org/rust-for-linux/CANiq72=3DNSRMV_6UxXVgkebmWmbgN4i=
+=3DsfRszr-G+x3W5A4DYOg@mail.gmail.com/T/#u
+> This split series is intended to ease review and subsystem-level maintena=
+nce.
+>
+> The original moving patch is here:
+> https://lore.kernel.org/rust-for-linux/20250625111133.698481-1-shankari.a=
+k0208@gmail.com/
+>
+> Gradually the re-export from types.rs will be eliminated in the
+> future cycle.
 
-Yeah, this one also solves my issue. Thanks.
+Thanks for splitting it Shankari, that should help get this landed.
 
-Coly Li
-
-
-> diff --git a/block/blk-settings.c b/block/blk-settings.c
-> index a000daafbfb4..04e7b4808e7a 100644
-> --- a/block/blk-settings.c
-> +++ b/block/blk-settings.c
-> @@ -700,6 +700,7 @@ int blk_stack_limits(struct queue_limits *t, struct
-> queue_limits *b,
->                 t->features &= ~BLK_FEAT_POLL;
-> 
->         t->flags |= (b->flags & BLK_FLAG_MISALIGNED);
-> +       t->flags |= (b->flags & BLK_FLAG_STACK_IO_OPT);
-> 
->         t->max_sectors = min_not_zero(t->max_sectors, b->max_sectors);
->         t->max_user_sectors = min_not_zero(t->max_user_sectors,
-> @@ -750,7 +751,10 @@ int blk_stack_limits(struct queue_limits *t, struct
-> queue_limits *b,
->                                      b->physical_block_size);
-> 
->         t->io_min = max(t->io_min, b->io_min);
-> -       t->io_opt = lcm_not_zero(t->io_opt, b->io_opt);
-> +       if (!t->io_opt || !(t->flags & BLK_FLAG_STACK_IO_OPT) ||
-> +           (b->flags & BLK_FLAG_STACK_IO_OPT))
-> +           t->io_opt = lcm_not_zero(t->io_opt, b->io_opt);
-> +
->         t->dma_alignment = max(t->dma_alignment, b->dma_alignment);
-> 
->         /* Set non-power-of-2 compatible chunk_sectors boundary */
-> diff --git a/drivers/md/raid5.c b/drivers/md/raid5.c
-> index 5b270d4ee99c..bb482ec40506 100644
-> --- a/drivers/md/raid5.c
-> +++ b/drivers/md/raid5.c
-> @@ -7733,6 +7733,7 @@ static int raid5_set_limits(struct mddev *mddev)
->         lim.io_min = mddev->chunk_sectors << 9;
->         lim.io_opt = lim.io_min * (conf->raid_disks - conf->max_degraded);
->         lim.features |= BLK_FEAT_RAID_PARTIAL_STRIPES_EXPENSIVE;
-> +       lim.flags |= BLK_FLAG_STACK_IO_OPT;
->         lim.discard_granularity = stripe;
->         lim.max_write_zeroes_sectors = 0;
->         mddev_stack_rdev_limits(mddev, &lim, 0);
-> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-> index 332b56f323d9..65317e93790e 100644
-> --- a/include/linux/blkdev.h
-> +++ b/include/linux/blkdev.h
-> @@ -360,6 +360,9 @@ typedef unsigned int __bitwise blk_flags_t;
->  /* passthrough command IO accounting */
->  #define BLK_FLAG_IOSTATS_PASSTHROUGH   ((__force blk_flags_t)(1u << 2))
-> 
-> +/* ignore underlying disks io_opt */
-> +#define BLK_FLAG_STACK_IO_OPT          ((__force blk_flags_t)(1u << 3))
-> +
->  struct queue_limits {
->         blk_features_t          features;
->         blk_flags_t             flags;
-> 
+Cheers,
+Miguel
