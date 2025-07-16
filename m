@@ -1,130 +1,108 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from mout-p-101.mailbox.org (mout-p-101.mailbox.org [80.241.56.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CC051EA7D2
-	for <linux-block@vger.kernel.org>; Wed, 16 Jul 2025 07:26:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFDA928C872;
+	Wed, 16 Jul 2025 07:48:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752650769; cv=none; b=dCl/WgDrwtitUfTgNQxLkDsyBjVHeBoreuwlud8KjHWqBl/8Q8Gbkt4cGHDInd2GZQ9MPNmvMPHPDjQONSxoZJu8NNCO4wJgpl70MeQfaMFHd4axz1D3fua9pvkpyzPV7ut0TKXMTGSRDvULKjxwQ+bt4UgPr2MxU9FqvZ2K4uU=
+	t=1752652091; cv=none; b=SXDr/yjpZ58c8HfzdNkwyWGEeUs9Nu/F9ztjIQFttQdJdZD0rO5LG2mcPYTKSJbPOJ3XCtLiYOEwATKA5Q1MOW8byzbbFqX7niMgpQOoIixBq/VLSmeUdyLxdebX8agpXhtdYijlbTAZ/ah7i5926Op0aYvf7cdIs6e46ueQKBw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752650769; c=relaxed/simple;
-	bh=SSEcvsfNdFTMymvo2j5DOCIUVrUd6bODDh+sgoJUCB0=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=jdLfE/UZfzeYpMFnAizcPvnGV773rDoEiff2S+1Zfdg/s5CM6MCHftdaYgbe70FThAJWmOJfruaEeQ6f390IYFUIU0AqhtT9Iqp5MfjlU3SPF0vlLULUkRFLTlLHxKwA8UI+xtpE51yZAOUFG+yNoC3kc73lbZ5fjd8vo6L91LM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4bhnfP1XhNzYQv0w
-	for <linux-block@vger.kernel.org>; Wed, 16 Jul 2025 15:26:05 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id F15441A2206
-	for <linux-block@vger.kernel.org>; Wed, 16 Jul 2025 15:26:03 +0800 (CST)
-Received: from [10.174.179.143] (unknown [10.174.179.143])
-	by APP4 (Coremail) with SMTP id gCh0CgDnYhMKVHdoWOy+AQ--.2420S3;
-	Wed, 16 Jul 2025 15:26:03 +0800 (CST)
-Subject: Re: Improper io_opt setting for md raid5
-To: Coly Li <colyli@kernel.org>, hch@lst.de
-Cc: linux-block@vger.kernel.org, "yukuai (C)" <yukuai3@huawei.com>
-References: <ywsfp3lqnijgig6yrlv2ztxram6ohf5z4yfeebswjkvp2dzisd@f5ikoyo3sfq5>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <9b4027e8-6efa-7b28-8f00-3f4a5435b6c9@huaweicloud.com>
-Date: Wed, 16 Jul 2025 15:26:02 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.1
+	s=arc-20240116; t=1752652091; c=relaxed/simple;
+	bh=q5tlGgN4hGF7YyJcCpPiQlN4oYyRAg/tS0iZ2xg1lFQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uFPVlCTLpCLOFM4knKPsytvS6iR/Ytu2uXdskwjxUSAGy2xC0Ziq5w5zDmNbwVU3p2NFOY/kBkf2BImeUyDaKBSrr+PDkXhrJKXP97gmW0hudQCayM44giyaDmZ7bJOoNAB05qxA4NP9exT0zxCAB9pzGezcpwVDJOVOZS7Y510=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pankajraghav.com; spf=pass smtp.mailfrom=pankajraghav.com; dkim=pass (2048-bit key) header.d=pankajraghav.com header.i=@pankajraghav.com header.b=1izeZ3gS; arc=none smtp.client-ip=80.241.56.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pankajraghav.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pankajraghav.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=pankajraghav.com header.i=@pankajraghav.com header.b="1izeZ3gS"
+Received: from smtp2.mailbox.org (smtp2.mailbox.org [10.196.197.2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-101.mailbox.org (Postfix) with ESMTPS id 4bhp7h18QTz9st4;
+	Wed, 16 Jul 2025 09:48:00 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pankajraghav.com;
+	s=MBO0001; t=1752652080;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=N1EqZLQw7tah4DL/vfuoIKpuF0J4DZz2EQrgNRTQ+98=;
+	b=1izeZ3gS36y6dVm2SXoZQMgV4uu6K4WUpBSOW12sVGpNYwQGQUku64h5dqtCwnmuWO8J5U
+	gze6egm9P63dUUxgFRq1lyFsY4tku2LSw/nT9YrVBi2V29TQt/Wy+So/cM/xCepnOkiWpO
+	rFtLohVOjXS0PdibyNaaS91YXkE2cz4qWaCG30DbcQfNCDqTVmFLWuS8jaajRNnl1BpeRE
+	L5B79psuz5kOZs2RQaRygFGh/BzQPcZknyZrxKRAdA5fmoI6nhPI55QRYayZbedL2Ypg1b
+	YKExuvbtKbqKend7+zQM0gy+XtM9HSaqrytymH5pd59Y7ilCDpdL5Bd0dXef8Q==
+Date: Wed, 16 Jul 2025 09:47:47 +0200
+From: "Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>
+To: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
+Cc: Suren Baghdasaryan <surenb@google.com>, 
+	Ryan Roberts <ryan.roberts@arm.com>, Baolin Wang <baolin.wang@linux.alibaba.com>, 
+	Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>, 
+	"H . Peter Anvin" <hpa@zytor.com>, Vlastimil Babka <vbabka@suse.cz>, Zi Yan <ziy@nvidia.com>, 
+	Mike Rapoport <rppt@kernel.org>, Dave Hansen <dave.hansen@linux.intel.com>, 
+	Michal Hocko <mhocko@suse.com>, David Hildenbrand <david@redhat.com>, 
+	Andrew Morton <akpm@linux-foundation.org>, Thomas Gleixner <tglx@linutronix.de>, 
+	Nico Pache <npache@redhat.com>, Dev Jain <dev.jain@arm.com>, 
+	"Liam R . Howlett" <Liam.Howlett@oracle.com>, Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org, 
+	willy@infradead.org, linux-mm@kvack.org, x86@kernel.org, linux-block@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, "Darrick J . Wong" <djwong@kernel.org>, mcgrof@kernel.org, 
+	gost.dev@samsung.com, hch@lst.de, Pankaj Raghav <p.raghav@samsung.com>
+Subject: Re: [PATCH v2 1/5] mm: move huge_zero_page declaration from
+ huge_mm.h to mm.h
+Message-ID: <hi7i4k7gbbd27mtjyucwxjgwhjq7z4wtzm2nd6fqfnd5m7yo52@k7vwf576a44x>
+References: <20250707142319.319642-1-kernel@pankajraghav.com>
+ <20250707142319.319642-2-kernel@pankajraghav.com>
+ <a0233f30-b04d-461e-a662-b6f20dca02c5@lucifer.local>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <ywsfp3lqnijgig6yrlv2ztxram6ohf5z4yfeebswjkvp2dzisd@f5ikoyo3sfq5>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgDnYhMKVHdoWOy+AQ--.2420S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxWw1rCFWxKF4fCF47GFWrAFb_yoW5Ww1DpF
-	nruF9rZayjqF17Za4kA3W3CFZYvr45KrWxCF1rCws5uw1v9r129rWxtFy5Xr97Krs8u3yU
-	t3WrtryDZayj9rDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUyKb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij
-	64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x
-	8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE
-	2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42
-	xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF
-	7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUzsqWUUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a0233f30-b04d-461e-a662-b6f20dca02c5@lucifer.local>
 
-Hi,
+On Tue, Jul 15, 2025 at 03:08:40PM +0100, Lorenzo Stoakes wrote:
+> On Mon, Jul 07, 2025 at 04:23:15PM +0200, Pankaj Raghav (Samsung) wrote:
+> > From: Pankaj Raghav <p.raghav@samsung.com>
+> >
+> > Move the declaration associated with huge_zero_page from huge_mm.h to
+> > mm.h. This patch is in preparation for adding static PMD zero page as we
+> > will be reusing some of the huge_zero_page infrastructure.
+> 
+> Hmm this is really iffy.
+> 
+> The whole purpose of huge_mm.h is to handle huge page stuff, and now you're
+> moving it to a general header... not a fan of this - now we have _some_
+> huge stuff in mm.h and some stuff here.
+> 
+> Yes this might be something we screwed up already, but that's not a recent
+> to perpetuate mistakes.
+> 
+> Surely you don't _need_ to do this and this is a question of fixing up
+> header includes right?
+> 
+> Or is them some horrible cyclical header issue here?
+> 
+> Also your commit message doesn't give any reason as to why you _need_ to do
+> this also. For something like this where you're doing something that at
+> face value seems to contradict the purpose of these headers, you need to
+> explain why.
+> 
 
-在 2025/07/15 23:56, Coly Li 写道:
-> Then when my raid5 array sets its queue limits, because its io_opt is 64KiB*7,
-> and the raid component sata hard drive has io_opt with 32767 sectors, by
-> calculation in block/blk-setting.c:blk_stack_limits() at line 753,
-> 753         t->io_opt = lcm_not_zero(t->io_opt, b->io_opt);
-> the calculated opt_io_size of my raid5 array is more than 1GiB. It is too large.
+In one of the earlier versions, David asked me to experiment by moving some of these
+declarations to mm.h and see how it looks. Mainly because, as you
+guessed it later, we can use it without THP being enabled.
 
-Perhaps we should at least provide a helper for raid5 that we prefer
-raid5 io_opt over underlying disk's io_opt. Because of raid5 internal
-implemation, chunk_size * data disks is the best choice, there will be
-significant differences in performance if not aligned with io_opt.
+But I see that you strongly feel against moving this to mm.h (and I see
+why).
 
-Something like following:
+I can move it back to huge_mm.h.
 
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index a000daafbfb4..04e7b4808e7a 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -700,6 +700,7 @@ int blk_stack_limits(struct queue_limits *t, struct 
-queue_limits *b,
-                 t->features &= ~BLK_FEAT_POLL;
+Thanks
 
-         t->flags |= (b->flags & BLK_FLAG_MISALIGNED);
-+       t->flags |= (b->flags & BLK_FLAG_STACK_IO_OPT);
-
-         t->max_sectors = min_not_zero(t->max_sectors, b->max_sectors);
-         t->max_user_sectors = min_not_zero(t->max_user_sectors,
-@@ -750,7 +751,10 @@ int blk_stack_limits(struct queue_limits *t, struct 
-queue_limits *b,
-                                      b->physical_block_size);
-
-         t->io_min = max(t->io_min, b->io_min);
--       t->io_opt = lcm_not_zero(t->io_opt, b->io_opt);
-+       if (!t->io_opt || !(t->flags & BLK_FLAG_STACK_IO_OPT) ||
-+           (b->flags & BLK_FLAG_STACK_IO_OPT))
-+           t->io_opt = lcm_not_zero(t->io_opt, b->io_opt);
-+
-         t->dma_alignment = max(t->dma_alignment, b->dma_alignment);
-
-         /* Set non-power-of-2 compatible chunk_sectors boundary */
-diff --git a/drivers/md/raid5.c b/drivers/md/raid5.c
-index 5b270d4ee99c..bb482ec40506 100644
---- a/drivers/md/raid5.c
-+++ b/drivers/md/raid5.c
-@@ -7733,6 +7733,7 @@ static int raid5_set_limits(struct mddev *mddev)
-         lim.io_min = mddev->chunk_sectors << 9;
-         lim.io_opt = lim.io_min * (conf->raid_disks - conf->max_degraded);
-         lim.features |= BLK_FEAT_RAID_PARTIAL_STRIPES_EXPENSIVE;
-+       lim.flags |= BLK_FLAG_STACK_IO_OPT;
-         lim.discard_granularity = stripe;
-         lim.max_write_zeroes_sectors = 0;
-         mddev_stack_rdev_limits(mddev, &lim, 0);
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 332b56f323d9..65317e93790e 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -360,6 +360,9 @@ typedef unsigned int __bitwise blk_flags_t;
-  /* passthrough command IO accounting */
-  #define BLK_FLAG_IOSTATS_PASSTHROUGH   ((__force blk_flags_t)(1u << 2))
-
-+/* ignore underlying disks io_opt */
-+#define BLK_FLAG_STACK_IO_OPT          ((__force blk_flags_t)(1u << 3))
-+
-  struct queue_limits {
-         blk_features_t          features;
-         blk_flags_t             flags;
+--
+Pankaj
 
