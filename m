@@ -1,75 +1,261 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88CC228C872;
-	Wed, 16 Jul 2025 08:41:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B687289805;
+	Wed, 16 Jul 2025 08:50:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752655266; cv=none; b=NxGzuvHVjSsYeHOZ0kJSZVNP8f1su6qNd7AA/P4R8E1V73ODK/fIOwxqgEfxjGT9Wk1d+J4wDRYoeU9VvU6fxzaTEOuzjB1RNwwpfhsmg2YQsqIYcuMMNiD3kfsOiwUvoyK08fcKmR/wP8U0HFXy8hAPnwNu/3CpHU/ZMZHu5So=
+	t=1752655830; cv=none; b=Kx2qgAGMStD2RAOep6NyJh+q9fDUl+EDtyKLkSnDcScGDaF8LasLvhKoLiAHIFweBNi39tvlZSma7yzpZhMULjgdfmBxBMLBNH/6582YhuX4/RIW1YtM/eQKFb0Ufueu5nCwabeENuYoolekXAJgMjqx1hsrDrJbsDVz2HVGN78=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752655266; c=relaxed/simple;
-	bh=mi/iQzwAUcNWNN3xOVg3QIwFGDVYgNwHIeGU+B4JcDU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ajf/NZpPnCc+348bBITiAl9u0VCYCp4UtK7s4FibINcKJKd9qDjBV+oO8h8lgQNfenjm01nwkflTEYqvOHC4Hde+Xx+mKvt265xCxoIfESSCDEpQpruxZKfUDXsO7/PksfdZkd/ijjIjGPuDlECTGegUqvXIlZUeXen5XQDsgi8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DdVB5mp2; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1752655830; c=relaxed/simple;
+	bh=HD6fEAmUuVmTp9sPjh3zDmW2Hp1aaXZVBD1CNuo20Ys=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=f8WZ4vx5PtU3pwWueKI31xvpr2QCF5eLRWa+pL/abdS1UYDeHtnd88QMSrI5USoikqN6Cw8BIdyiERqhao47k5NhGDjJYbPFv5EtqUfZgxRCcDMdcrXnqhAcO7CCfJq8DmnwdVaE43Xmhp1IMk76GQs6gaw1cjuQnCZIQSKNvGY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JZYWFgi0; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DdVB5mp2"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4ABCEC4CEF0;
-	Wed, 16 Jul 2025 08:41:04 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JZYWFgi0"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 703FDC4CEF0;
+	Wed, 16 Jul 2025 08:50:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752655266;
-	bh=mi/iQzwAUcNWNN3xOVg3QIwFGDVYgNwHIeGU+B4JcDU=;
-	h=From:To:Cc:Subject:Date:From;
-	b=DdVB5mp2uePcrb3oJDCIQbVydQ+zDPDeDAewPwkDCdFXgHifjMJpQlnFdMp8FU6zo
-	 6id886dDcLUfRz/mNaVckKfhkwq3gZi+tozrn/Rx7CDp1PWMGdDUuMPbspBUeRQvzv
-	 BacCaf/PX8D2qC/u4OQrvC2BGk35fRH3pVvEnWI3F/Cw3HztjFR00EP5pD0+NuRFiH
-	 vTcV/vme8IIQjskFU1BXmEc1vhH2XIv1y7pFbG6cx1cJ6FuHanOQe6x4FXmdC/abdK
-	 z7886Ivmsal2WiQ0pnsH6DKn+ap3a9CrIUBY3KTy+m6mRwmV3o8xTiBoR8TcQGiQ10
-	 8UQ75r2LU2m7A==
-From: Christian Brauner <brauner@kernel.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Christian Brauner <brauner@kernel.org>,
-	linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	Al Viro <viro@zeniv.linux.org.uk>,
-	Jan Kara <jack@suse.com>
-Subject: [PATCH] MAINTAINERS: add block and fsdevel lists to iov_iter
-Date: Wed, 16 Jul 2025 10:40:45 +0200
-Message-ID: <20250716-eklig-rasten-ec8c4dc05a1e@brauner>
-X-Mailer: git-send-email 2.47.2
+	s=k20201202; t=1752655829;
+	bh=HD6fEAmUuVmTp9sPjh3zDmW2Hp1aaXZVBD1CNuo20Ys=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=JZYWFgi0CMZPcAxHE7yDct1+IlAaN5ZFCTv5k520mkIL/SjM3vWm5MuLGDh32QekC
+	 EsC9j+CZvENPBRI0x5j9OPiNuS735zFp5z/+xbAY9rF0bRhyWMQ3gnTBAEyheNNA33
+	 l7HEbSus8byxxnx1E7O8uYnN9xtpFJkn+hVqKV0x+Gse8LHaAv2WdNRsHyjj4iVBIe
+	 mKsh/Au0yqKjMO6ZkmRkBu3j9cr/vSwqsiWaFiVcqbGH+MxPSr9oPOt7mHuVZk7Ki/
+	 Pca2Wv6DWQhheVqhgs1oRObhi1rQpsdhRKNk5USlA3hovL+GvaeRDlCwPnB2qaoDRd
+	 1nK6LNq07ucKw==
+Date: Wed, 16 Jul 2025 16:50:22 +0800
+From: Coly Li <colyli@kernel.org>
+To: Yu Kuai <yukuai1@huaweicloud.com>
+Cc: linux-raid@vger.kernel.org, linux-block@vger.kernel.org, 
+	Xiao Ni <xni@redhat.com>, Hannes Reinecke <hare@suse.de>, Martin Wilck <mwilck@suse.com>, 
+	Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>, 
+	"yukuai (C)" <yukuai3@huawei.com>
+Subject: Re: [RFC PATCH] md: split bio by io_opt size in md_submit_bio()
+Message-ID: <5fgrmteq5ltqi4o6bvsohcc33u3jiblyqmqv7b3g7cwawofjdl@xk4nvl3w7ndr>
+References: <20250715180241.29731-1-colyli@kernel.org>
+ <f158675c-7bbe-45d4-413b-3e984589d08f@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=821; i=brauner@kernel.org; h=from:subject:message-id; bh=mi/iQzwAUcNWNN3xOVg3QIwFGDVYgNwHIeGU+B4JcDU=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWSUp85kapFUP+vK3TY785HIpM+s+2XmPT/g7iG8mn/36 wvLKvsEO0pZGMS4GGTFFFkc2k3C5ZbzVGw2ytSAmcPKBDKEgYtTACZS+prhf+65gyUsuXb6KTWC s0tvMi2bFrb43k+ntbubfxVK7a2/2svwP/Na60uxc1EsGS+c4u34Tv3X/fPXtHL/npOfK2O/zim LYwAA
-X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <f158675c-7bbe-45d4-413b-3e984589d08f@huaweicloud.com>
 
-We've had multiple instances where people didn't Cc fsdevel or block
-which are easily the most affected subsystems by iov_iter changes.
-Put a stop to that and make sure both lists are Cced so we can catch
-stuff like [1] early.
+On Wed, Jul 16, 2025 at 02:58:13PM +0800, Yu Kuai wrote:
+> Hi,
+> 
+> 在 2025/07/16 2:02, colyli@kernel.org 写道:
+> > From: Coly Li <colyli@kernel.org>
+> > 
+> > Currently in md_submit_bio() the incoming request bio is split by
+> > bio_split_to_limits() which makes sure the bio won't exceed
+> > max_hw_sectors of a specific raid level before senting into its
+> > .make_request method.
+> > 
+> > For raid level 4/5/6 such split method might be problematic and hurt
+> > large read/write perforamnce. Because limits.max_hw_sectors are not
+> > always aligned to limits.io_opt size, the split bio won't be full
+> > stripes covered on all data disks, and will introduce extra read-in I/O.
+> > Even the bio's bi_sector is aligned to limits.io_opt size and large
+> > enough, the resulted split bio is not size-friendly to corresponding
+> > raid456 level.
+> > 
+> > This patch introduces bio_split_by_io_opt() to solve the above issue,
+> > 1, If the incoming bio is not limits.io_opt aligned, split the non-
+> >     aligned head part. Then the next one will be aligned.
+> > 2, If the imcoming bio is limits.io_opt aligned, and split is necessary,
+> >     then try to split a by multiple of limits.io_opt but not exceed
+> >     limits.max_hw_sectors.
+> > 
+> > Then for large bio, the sligned split part will be full-stripes covered
+> > to all data disks, no extra read-in I/Os when rmw_level is 0. And for
+> > rmw_level > 0 condistions, the limits.io_opt aligned bios are welcomed
+> > for performace as well.
+> > 
+> > This RFC patch only tests on 8 disks raid5 array with 64KiB chunk size.
+> > By this patch, 64KiB chunk size for a 8 disks raid5 array, sequential
+> > write performance increases from 900MiB/s to 1.1GiB/s by fio bs=10M.
+> > If fio bs=488K (exact limits.io_opt size) the peak sequential write
+> > throughput can reach 1.51GiB/s.
+> > 
+> > (Resend to include Christoph and Keith in CC list.)
+> > 
+> > Signed-off-by: Coly Li <colyli@kernel.org>
+> > Cc: Yu Kuai <yukuai3@huawei.com>
+> > Cc: Xiao Ni <xni@redhat.com>
+> > Cc: Hannes Reinecke <hare@suse.de>
+> > Cc: Martin Wilck <mwilck@suse.com>
+> > Cc: Christoph Hellwig <hch@lst.de>
+> > Cc: Keith Busch <kbusch@kernel.org>
+> > ---
+> >   drivers/md/md.c | 63 ++++++++++++++++++++++++++++++++++++++++++++++++-
+> >   1 file changed, 62 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/drivers/md/md.c b/drivers/md/md.c
+> > index 0f03b21e66e4..363cff633af3 100644
+> > --- a/drivers/md/md.c
+> > +++ b/drivers/md/md.c
+> > @@ -426,6 +426,67 @@ bool md_handle_request(struct mddev *mddev, struct bio *bio)
+> >   }
+> >   EXPORT_SYMBOL(md_handle_request);
+> > +static struct bio *bio_split_by_io_opt(struct bio *bio)
+> > +{
+> > +	sector_t io_opt_sectors, sectors, n;
+> > +	struct queue_limits lim;
+> > +	struct mddev *mddev;
+> > +	struct bio *split;
+> > +	int level;
+> > +
+> > +	mddev = bio->bi_bdev->bd_disk->private_data;
+> > +	level = mddev->level;
+> > +	if (level == 1 || level == 10 || level == 0 || level == LEVEL_LINEAR)
+> > +		return bio_split_to_limits(bio);
+> 
+> There is another patch that provide a helper raid_is_456()
+> https://lore.kernel.org/all/20250707165202.11073-3-yukuai@kernel.org/
+> 
+> You might want to use it here.
 
-Link: https://lore.kernel.org/linux-nvme/20250715132750.9619-4-aaptel@nvidia.com [1]
-Signed-off-by: Christian Brauner <brauner@kernel.org>
----
- MAINTAINERS | 2 ++
- 1 file changed, 2 insertions(+)
+Copied, I will use raid_is_456() after it gets merged.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index fad6cb025a19..fcefe222f093 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -25907,6 +25907,8 @@ F:	fs/hostfs/
+> > +
+> > +	lim = mddev->gendisk->queue->limits;
+> > +	io_opt_sectors = min3(bio_sectors(bio), lim.io_opt >> SECTOR_SHIFT,
+> > +			      lim.max_hw_sectors);
+> 
+> You might want to use max_sectors here, to honor user setting.
+> 
+> And max_hw_sectors is just for normal read and write, for other IO like
+> discard, atomic write, write zero, the limit is different.
+> 
+
+Yeah, this is a reason why I want your comments :-) Originally I want to
+change bio_split_to_limits(), but the raid5 logic cannot be accessed
+there. If I write a clone of bio_split_to_limits(), it seems too heavy
+and unncessary.
+
+How about only handle read/write bio here, and let bio_split_to_limits()
+to do the rested, like,
+
+	level = mddev->level;
+	if (level == 1 || level == 10 || level == 0 || level == LEVEL_LINEAR ||
+	    (bio_op(bio) != REQ_OP_READ && bio_op(bio) != REQ_OP_WRITE))
+		return bio_split_to_limits(bio);
+
+
+> > +
+> > +	/* No need to split */
+> > +	if (bio_sectors(bio) == io_opt_sectors)
+> > +		return bio;
+> > +
+> 
+> If the bio happend to accross two io_opt, do you think it's better to
+> split it here? For example:
+> 
+
+I assume raid5 code will handle this, the pages of this bio will belong
+to different stripe pages belong to different chunks. So no need to
+split here. For such condition, it is same handling process as calling
+bio_split_to_limits().
+
+> io_opt is 64k(chunk size) * 7 = 448k, issue an IO start from 444k with
+> len = 8k. raid5 will have to use 2 stripes to handle such IO.
+>
+
+Yes, I assume although this bio is not split, raid5 will have different
+cloned bio to map different stripe pages in __add_stripe_bio().
+
+And because they belong to difference chunks, extra read-in for XOR (when
+rmw_level == 0) cannot be avoided.
  
- USERSPACE COPYIN/COPYOUT (UIOVEC)
- M:	Alexander Viro <viro@zeniv.linux.org.uk>
-+L:	linux-block@vger.kernel.org
-+L:	linux-fsdevel@vger.kernel.org
- S:	Maintained
- F:	include/linux/uio.h
- F:	lib/iov_iter.c
--- 
-2.47.2
+> > +	n = bio->bi_iter.bi_sector;
+> > +	sectors = do_div(n, io_opt_sectors);
+> > +	/* Aligned to io_opt size and no need to split for radi456 */
+> > +	if (!sectors && (bio_sectors(bio) <=  lim.max_hw_sectors))
+> > +		return bio;
+> 
+> I'm confused here, do_div doesn't mean aligned, should bio_offset() be
+> taken into consideration? For example, issue an IO start from 4k with
+> len = 448 * 2 k, if I read the code correctly, the result is:
+> 
+> 4 + 896 -> 4 + 896 (not split if within max_sectors)
+> 
+> What we really expect is:
+> 
+> 4 + 896 -> 4 + 444, 448 + 448, 892 + 4
 
+Yes you are right. And I do this on purpose, becasue the size of bio
+is small (less then max_hw_sectors). Even split the bio as you exampled,
+the full-stripes-write in middle doesn't help performance because the
+extra read-in will happen for head and tail part when rmw_level == 0.
+
+For small bio (size < io_opt x 2 in this case), there is almost no
+performance difference. The performance loss of incorrect bio split will
+show up when the bio is large enough and many split bios in middle are
+not full-stripes covered.
+
+For bio size < max_hw_sectors, just let raid5 handle it as what it does.
+> > +
+> > +	if (sectors) {
+> > +		/**
+> > +		 * Not aligned to io_opt, split
+> > +		 * non-aligned head part.
+> > +		 */
+> > +		sectors = io_opt_sectors - sectors;
+> > +	} else {
+> > +		/**
+> > +		 * Aligned to io_opt, split to the largest multiple
+> > +		 * of io_opt within max_hw_sectors, to make full
+> > +		 * stripe write/read for underlying raid456 levels.
+> > +		 */
+> > +		n = lim.max_hw_sectors;
+> > +		do_div(n, io_opt_sectors);
+> > +		sectors = n * io_opt_sectors;
+> 
+> roundown() ?
+
+Yes, of course :-)
+
+
+> > +	}
+> > +
+> > +	/* Almost won't happen */
+> > +	if (unlikely(sectors >= bio_sectors(bio))) {
+> > +		pr_warn("%s raid level %d: sectors %llu >= bio_sectors %u, not split\n",
+> > +			__func__, level, sectors, bio_sectors(bio));
+> > +		return bio;
+> > +	}
+> > +
+> > +	split = bio_split(bio, sectors, GFP_NOIO,
+> > +			  &bio->bi_bdev->bd_disk->bio_split);
+> > +	if (!split)
+> > +		return bio;
+> > +	split->bi_opf |= REQ_NOMERGE;
+> > +	bio_chain(split, bio);
+> > +	submit_bio_noacct(bio);
+> > +	return split;
+> > +}
+> > +
+> >   static void md_submit_bio(struct bio *bio)
+> >   {
+> >   	const int rw = bio_data_dir(bio);
+> > @@ -441,7 +502,7 @@ static void md_submit_bio(struct bio *bio)
+> >   		return;
+> >   	}
+> > -	bio = bio_split_to_limits(bio);
+> > +	bio = bio_split_by_io_opt(bio);
+> >   	if (!bio)
+> >   		return;
+> > 
+>
+
+Thanks for the review.
+
+Coly Li 
