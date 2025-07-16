@@ -1,59 +1,64 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86ED028BA8D;
-	Wed, 16 Jul 2025 12:17:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89D6723ABB0
+	for <linux-block@vger.kernel.org>; Wed, 16 Jul 2025 12:20:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752668272; cv=none; b=KL/rfnWM7zSA5UdpXdJD5MpT/DEDxAxsVpFhtT1j2GWoOzUPHsFVfEivnT9lfJ+lp7WtZlqyaJuoCU3o0PFdJ2e3dfhiP2/D02sO5qlcMy1x06CsxDBkr1L30w8XnwOolzTiXhznz5JL5tMPSahsflgIoJ+OAQ3o773X00zuO/k=
+	t=1752668422; cv=none; b=CTMS3nRWPma9fNuIYT7HDWjWpVuLpv7beoZUHzEr8qN3Lk+l8i2Q3BONGluwU+5i6/b+mI39XrsZYNH0CT1mmgyG7zZA6ZrVt/2TN5KKyyvfLouBPXR5HS++Q43cvRHxE3DbrhXMjvA09jKDp23MbIlHp+QULhJHC8uf5IuNSgE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752668272; c=relaxed/simple;
-	bh=V4MeM2PQ2JhErRHk73m2EXf2vRq45TySVkh6JEnAjOk=;
+	s=arc-20240116; t=1752668422; c=relaxed/simple;
+	bh=QNo/SsxxHegwQ/v075cC0ZOaxML3NCfrjRsX5MgIAL0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JTiZjb6Rxyc6bIp4TPhteAPWhV8PQzeqLLEesyqPxtPWqCzY/kmdayQyqjmDu6cEk45DtQgSTrS7/EYpyBRRttd6ZuGfy4ibQuD4lexd/CaUCCJUD+l5vH3Q/JH/bSKrCc/aBt4/aSe3nHwWceZY/azpzEoYRmlSdT81yMaKif8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id ABDD968BEB; Wed, 16 Jul 2025 14:17:45 +0200 (CEST)
-Date: Wed, 16 Jul 2025 14:17:45 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Coly Li <i@coly.li>
-Cc: Christoph Hellwig <hch@lst.de>, Coly Li <colyli@kernel.org>,
-	linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
-	Yu Kuai <yukuai3@huawei.com>, Xiao Ni <xni@redhat.com>,
-	Hannes Reinecke <hare@suse.de>, Martin Wilck <mwilck@suse.com>,
-	Keith Busch <kbusch@kernel.org>
-Subject: Re: [RFC PATCH] md: split bio by io_opt size in md_submit_bio()
-Message-ID: <20250716121745.GA2700@lst.de>
-References: <20250715180241.29731-1-colyli@kernel.org> <20250716113737.GA31369@lst.de> <437E98DD-7D64-49BF-9F2C-04CB0A142A88@coly.li> <20250716114121.GA32207@lst.de> <D12A8BDA-5C2B-4FA7-9C92-731BD321A611@coly.li> <20250716114533.GA32631@lst.de> <danlsghtalte7sku3vlfxkgngujgwzspanfayaxy4jfnk54jbf@yfvmr5plavmp> <20250716121449.GB2043@lst.de> <DE36C995-4014-44DC-A998-1C4FF9AFD7F9@coly.li>
+	 Content-Type:Content-Disposition:In-Reply-To; b=cf6lpun33DJfxpqFCeyBmgINBzHObeag0LcT4FJB/1tp7HC5ai5e2bfjdR2qTYgA+rEMxW9mbq+JnyUrxVOKH8Dd7zPSdEqvusCh9XLaOB6g92RH6ieNyD/cMAi9jZAU7+E7YU+npnI0mlACjqgyRDsDSjmfpKzAbKXdyhei4ko=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=MMJlfGu2; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="MMJlfGu2"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=cEhGASYKLz7MvFmf59N2Afmkq6r3+CaQTYATBZjxfmI=; b=MMJlfGu2XlPhX5jzMGTgJWwOau
+	spuK6x/fMgV5AmxeaHHM2Rqwx1abErnB+9fcDqixa7bj30M0Eaou7Jh3JwTGWimZKaz29uMUDQW9I
+	qaNvaDvlr15RXFCrgEDEag+VUmimb5JSmIIEJ7Iwhcj47Bun9OrCZhBsz4qsOjov+EG1qAaOi5Wpv
+	e/yiZ0ZVTYkD6N9RqzF22V+9IqdTUJ0mvTUzxdkvubBpYab/s5OgJZChxTJaXe6WLCZIkn7tSPZIK
+	NfBEstXbU7NHuGWPyVaVd+IepT4EL/AeG1l20XludXDuWcsivaVqydY2rBcHJ33d2rmvsNyJE5Ezf
+	4ZQgoEFw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1uc17T-00000007e6I-3z4V;
+	Wed, 16 Jul 2025 12:20:19 +0000
+Date: Wed, 16 Jul 2025 05:20:19 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Changhui Zhong <czhong@redhat.com>
+Subject: Re: [PATCH] loop: use kiocb helpers to fix lockdep warning
+Message-ID: <aHeZA3sT_o2O5JWs@infradead.org>
+References: <20250716114808.3159657-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <DE36C995-4014-44DC-A998-1C4FF9AFD7F9@coly.li>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20250716114808.3159657-1-ming.lei@redhat.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Wed, Jul 16, 2025 at 08:16:34PM +0800, Coly Li wrote:
-> 
-> 
-> > 2025年7月16日 20:14，Christoph Hellwig <hch@lst.de> 写道：
-> > 
-> > On Wed, Jul 16, 2025 at 08:10:33PM +0800, Coly Li wrote:
-> >> Just like hanlding discard requests, handling raid5 read/write bios should
-> >> try to split the large bio into opt_io_size aligned both *offset* and
-> >> *length*. If I understand correctly, bio_split_to_limits() doesn't handle
-> >> offset alignment for read5 read/write bios.
-> > 
-> > Well, if you want offset alignment, set chunk_sectors.
-> > 
-> 
-> Do you mean setting max_hw_sectors as chunk_sectors?
+On Wed, Jul 16, 2025 at 07:48:08PM +0800, Ming Lei wrote:
+> This patch fixes the issue by using the AIO-specific helpers
+> `kiocb_start_write()` and `kiocb_end_write()`. These functions are
+> designed to be used with a `kiocb` and manage write sequencing
+> correctly for asynchronous I/O without introducing the problematic
+> lock dependency.
 
-Setting both to the desired value (full stipe width).
+Maybe explain what it actually does.  That is drop and reacquire the
+lockdep notion of a held lock, because the process is not holding it
+but instead handing it of to the one handling the completion of the
+asynchronous I/O.
+
+The change looks fine to me, but this commit log is rather confusing.
 
