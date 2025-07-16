@@ -1,108 +1,100 @@
-Received: from mout-p-101.mailbox.org (mout-p-101.mailbox.org [80.241.56.151])
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFDA928C872;
-	Wed, 16 Jul 2025 07:48:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFFB2273FD
+	for <linux-block@vger.kernel.org>; Wed, 16 Jul 2025 07:50:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752652091; cv=none; b=SXDr/yjpZ58c8HfzdNkwyWGEeUs9Nu/F9ztjIQFttQdJdZD0rO5LG2mcPYTKSJbPOJ3XCtLiYOEwATKA5Q1MOW8byzbbFqX7niMgpQOoIixBq/VLSmeUdyLxdebX8agpXhtdYijlbTAZ/ah7i5926Op0aYvf7cdIs6e46ueQKBw=
+	t=1752652246; cv=none; b=MntMb6BuHxdTA9OyCup1UKjj/sObJLmYhxPBuAAL4a4xNAUGvGM8+jvrnveTY14eVRrt/OJB9S185YH2Z8g+zBD/NZnjxkbuhXbGn9A0LThC04J5XRdBOxwEBHUAsUl0DBhIsYiFGjEiub6a3vwBWjebv6TXBsXyXGyahNumUAk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752652091; c=relaxed/simple;
-	bh=q5tlGgN4hGF7YyJcCpPiQlN4oYyRAg/tS0iZ2xg1lFQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uFPVlCTLpCLOFM4knKPsytvS6iR/Ytu2uXdskwjxUSAGy2xC0Ziq5w5zDmNbwVU3p2NFOY/kBkf2BImeUyDaKBSrr+PDkXhrJKXP97gmW0hudQCayM44giyaDmZ7bJOoNAB05qxA4NP9exT0zxCAB9pzGezcpwVDJOVOZS7Y510=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pankajraghav.com; spf=pass smtp.mailfrom=pankajraghav.com; dkim=pass (2048-bit key) header.d=pankajraghav.com header.i=@pankajraghav.com header.b=1izeZ3gS; arc=none smtp.client-ip=80.241.56.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pankajraghav.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pankajraghav.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=pankajraghav.com header.i=@pankajraghav.com header.b="1izeZ3gS"
-Received: from smtp2.mailbox.org (smtp2.mailbox.org [10.196.197.2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-101.mailbox.org (Postfix) with ESMTPS id 4bhp7h18QTz9st4;
-	Wed, 16 Jul 2025 09:48:00 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pankajraghav.com;
-	s=MBO0001; t=1752652080;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=N1EqZLQw7tah4DL/vfuoIKpuF0J4DZz2EQrgNRTQ+98=;
-	b=1izeZ3gS36y6dVm2SXoZQMgV4uu6K4WUpBSOW12sVGpNYwQGQUku64h5dqtCwnmuWO8J5U
-	gze6egm9P63dUUxgFRq1lyFsY4tku2LSw/nT9YrVBi2V29TQt/Wy+So/cM/xCepnOkiWpO
-	rFtLohVOjXS0PdibyNaaS91YXkE2cz4qWaCG30DbcQfNCDqTVmFLWuS8jaajRNnl1BpeRE
-	L5B79psuz5kOZs2RQaRygFGh/BzQPcZknyZrxKRAdA5fmoI6nhPI55QRYayZbedL2Ypg1b
-	YKExuvbtKbqKend7+zQM0gy+XtM9HSaqrytymH5pd59Y7ilCDpdL5Bd0dXef8Q==
-Date: Wed, 16 Jul 2025 09:47:47 +0200
-From: "Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>
-To: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
-Cc: Suren Baghdasaryan <surenb@google.com>, 
-	Ryan Roberts <ryan.roberts@arm.com>, Baolin Wang <baolin.wang@linux.alibaba.com>, 
-	Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>, 
-	"H . Peter Anvin" <hpa@zytor.com>, Vlastimil Babka <vbabka@suse.cz>, Zi Yan <ziy@nvidia.com>, 
-	Mike Rapoport <rppt@kernel.org>, Dave Hansen <dave.hansen@linux.intel.com>, 
-	Michal Hocko <mhocko@suse.com>, David Hildenbrand <david@redhat.com>, 
-	Andrew Morton <akpm@linux-foundation.org>, Thomas Gleixner <tglx@linutronix.de>, 
-	Nico Pache <npache@redhat.com>, Dev Jain <dev.jain@arm.com>, 
-	"Liam R . Howlett" <Liam.Howlett@oracle.com>, Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org, 
-	willy@infradead.org, linux-mm@kvack.org, x86@kernel.org, linux-block@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, "Darrick J . Wong" <djwong@kernel.org>, mcgrof@kernel.org, 
-	gost.dev@samsung.com, hch@lst.de, Pankaj Raghav <p.raghav@samsung.com>
-Subject: Re: [PATCH v2 1/5] mm: move huge_zero_page declaration from
- huge_mm.h to mm.h
-Message-ID: <hi7i4k7gbbd27mtjyucwxjgwhjq7z4wtzm2nd6fqfnd5m7yo52@k7vwf576a44x>
-References: <20250707142319.319642-1-kernel@pankajraghav.com>
- <20250707142319.319642-2-kernel@pankajraghav.com>
- <a0233f30-b04d-461e-a662-b6f20dca02c5@lucifer.local>
+	s=arc-20240116; t=1752652246; c=relaxed/simple;
+	bh=XT3c1EClRI3RJFi4KbIc5DOd+vsIM5Zf9LzKqRipfQw=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=iuIlb268Z9cUiRdYGHYcx4VTo9eoK8WC9tuy5qXKEJtfcbc70yghWhFVHILeYX/EUTRt017jsPDrPolFthmv3q4kH3Vp+Q1IXpqsyY3OlFzBXR7I6WuSWqSJToR4uDoQOc7DqSXTwL3BTPDYdxLlerl0I8yZknQQnszx3lS/nHQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.93.142])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4bhpBj34wnzKHN4J
+	for <linux-block@vger.kernel.org>; Wed, 16 Jul 2025 15:50:37 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 080BE1A0CC3
+	for <linux-block@vger.kernel.org>; Wed, 16 Jul 2025 15:50:36 +0800 (CST)
+Received: from [10.174.179.143] (unknown [10.174.179.143])
+	by APP4 (Coremail) with SMTP id gCh0CgDnYhPKWXdoK9PAAQ--.2959S3;
+	Wed, 16 Jul 2025 15:50:35 +0800 (CST)
+Subject: Re: [bug report] kmemleak issue observed during blktests
+To: Jens Axboe <axboe@kernel.dk>, Yi Zhang <yi.zhang@redhat.com>,
+ linux-block <linux-block@vger.kernel.org>
+Cc: Ming Lei <ming.lei@redhat.com>,
+ Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+ "yukuai (C)" <yukuai3@huawei.com>
+References: <CAHj4cs8oJFvz=daCvjHM5dYCNQH4UXwSySPPU4v-WHce_kZXZA@mail.gmail.com>
+ <d52a8216-dd70-4489-a645-55d174bcdd9e@kernel.dk>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <08f3f802-e3c3-b851-b4ee-912eade04c6f@huaweicloud.com>
+Date: Wed, 16 Jul 2025 15:50:34 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a0233f30-b04d-461e-a662-b6f20dca02c5@lucifer.local>
+In-Reply-To: <d52a8216-dd70-4489-a645-55d174bcdd9e@kernel.dk>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgDnYhPKWXdoK9PAAQ--.2959S3
+X-Coremail-Antispam: 1UD129KBjvdXoWruF4fGrWxJr4DCFyrZF15twb_yoWDtFc_ur
+	W0vr18Kw4DJr15KF1qgFyrXr1UGF1xZF1UGaykJr1fAr4Ik3y7Zw4UuF1rWr1jq347AFWq
+	9r4UW3Z5X3yagjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUbx8YFVCjjxCrM7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E6xAIw20E
+	Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwV
+	A0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x02
+	67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
+	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
+	x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
+	0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AK
+	xVWUAVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F4
+	0E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1l
+	IxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxV
+	AFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j
+	6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07UK2N
+	tUUUUU=
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On Tue, Jul 15, 2025 at 03:08:40PM +0100, Lorenzo Stoakes wrote:
-> On Mon, Jul 07, 2025 at 04:23:15PM +0200, Pankaj Raghav (Samsung) wrote:
-> > From: Pankaj Raghav <p.raghav@samsung.com>
-> >
-> > Move the declaration associated with huge_zero_page from huge_mm.h to
-> > mm.h. This patch is in preparation for adding static PMD zero page as we
-> > will be reusing some of the huge_zero_page infrastructure.
-> 
-> Hmm this is really iffy.
-> 
-> The whole purpose of huge_mm.h is to handle huge page stuff, and now you're
-> moving it to a general header... not a fan of this - now we have _some_
-> huge stuff in mm.h and some stuff here.
-> 
-> Yes this might be something we screwed up already, but that's not a recent
-> to perpetuate mistakes.
-> 
-> Surely you don't _need_ to do this and this is a question of fixing up
-> header includes right?
-> 
-> Or is them some horrible cyclical header issue here?
-> 
-> Also your commit message doesn't give any reason as to why you _need_ to do
-> this also. For something like this where you're doing something that at
-> face value seems to contradict the purpose of these headers, you need to
-> explain why.
-> 
+Hi,
 
-In one of the earlier versions, David asked me to experiment by moving some of these
-declarations to mm.h and see how it looks. Mainly because, as you
-guessed it later, we can use it without THP being enabled.
+在 2025/07/16 9:54, Jens Axboe 写道:
+> unreferenced object 0xffff8882e7fbb000 (size 2048):
+>    comm "check", pid 10460, jiffies 4324980514
+>    hex dump (first 32 bytes):
+>      00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+>      00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+>    backtrace (crc c47e6a37):
+>      __kvmalloc_node_noprof+0x55d/0x7a0
+>      sbitmap_init_node+0x15a/0x6a0
+>      kyber_init_hctx+0x316/0xb90
+>      blk_mq_init_sched+0x416/0x580
+>      elevator_switch+0x18b/0x630
+>      elv_update_nr_hw_queues+0x219/0x2c0
+>      __blk_mq_update_nr_hw_queues+0x36a/0x6f0
+>      blk_mq_update_nr_hw_queues+0x3a/0x60
+>      find_fallback+0x510/0x540 [nbd]
 
-But I see that you strongly feel against moving this to mm.h (and I see
-why).
+This is werid, and I check the code that it's impossible
+blk_mq_update_nr_hw_queues() can be called from find_fallback().
 
-I can move it back to huge_mm.h.
+Does kmemleak show wrong backtrace?
 
-Thanks
+Thanks,
+Kuai
 
---
-Pankaj
+>      nbd_send_cmd+0x24b/0x1480 [nbd]
+>      configfs_write_iter+0x2ae/0x470
+>      vfs_write+0x524/0xe70
+>      ksys_write+0xff/0x200
+>      do_syscall_64+0x98/0x3c0
+>      entry_SYSCALL_64_after_hwframe+0x76/0x7e
 
