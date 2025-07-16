@@ -1,94 +1,62 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3CA913D53B
-	for <linux-block@vger.kernel.org>; Wed, 16 Jul 2025 01:11:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57DB7C2D1
+	for <linux-block@vger.kernel.org>; Wed, 16 Jul 2025 01:14:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752628290; cv=none; b=FpOxKdgfKK6ZjPM41QPPzXjm6Xxbrxn0ZVbzlZWZ4b1Pd2kg4oofwzXSHbUtcoRqzEQu71V8wXI6R/SrUo7AJ54MUpMaPse1bfI9ultNUGoiKcki2gSZ7DAti5ob7VhTJ3Mia8EwLeg8c/76+46U/doSWanRUbJXKlO62AAE5VI=
+	t=1752628475; cv=none; b=pEjIdoiqjBE2+8Oua6MPuIjXn1F3cVoLeKbpTMgsfTlhiPD8AW53d0IaczZEjxMgevYXlX++AmTwcm5EzxZNZz8jbwnybEjlkjfvUwPzs054J+PV2jBv9k7HojChsfPBiyhXBPivyzRMvtTwk5Iro9qt9rfZt7n/tOw8LX2oXSM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752628290; c=relaxed/simple;
-	bh=eJl+0a3QwG090klt5oDPAjIiurBOkv4TyReyX0MnpYc=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=hjuGX1mSKeBdQh4JLCsYAyGOS6j6SChZRcbFgJsia7i6aj//2J8OGuX0u0tYtjf/ceiToE87cH87fS6807qgVYofuojxqMumQVQwN8FA3+UIXy0DI0+s8PBossdnUy0Iv/OzwQ9cs+1/RB5vdednTWb0Gt/NbFDyFzutaGnv2bs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4bhdL53JtlzYQvZ9
-	for <linux-block@vger.kernel.org>; Wed, 16 Jul 2025 09:11:25 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 3AD0D1A1712
-	for <linux-block@vger.kernel.org>; Wed, 16 Jul 2025 09:11:24 +0800 (CST)
-Received: from [10.174.179.143] (unknown [10.174.179.143])
-	by APP4 (Coremail) with SMTP id gCh0CgD3chM6_HZo8VqhAQ--.59592S3;
-	Wed, 16 Jul 2025 09:11:24 +0800 (CST)
-Subject: Re: [PATCH 1/5] block, bfq: Remove a superfluous cast
-To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
- "yukuai (C)" <yukuai3@huawei.com>
-References: <20250715165249.1024639-1-bvanassche@acm.org>
- <20250715165249.1024639-2-bvanassche@acm.org>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <a614f086-d44e-8a36-b1b4-40a1611dd666@huaweicloud.com>
-Date: Wed, 16 Jul 2025 09:11:22 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.1
+	s=arc-20240116; t=1752628475; c=relaxed/simple;
+	bh=BIobLUhCRywcqD9DTRaeIFV04RlNHS5NSlp/K47bkCg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iNuYwVoTPQluka3Ocp8lyX9ub4002Il+22pHFpoWOM1RobwpzuO+YScFmSX9L806m1cmvH0UBoWt1o4rjPmL++0OuM7t4EK4kcZZsm0265keJUuMLvRUociJyjoAKJt0dvDS678dbiY0bC00vlVPFhVoTgkyakud8K+zz4PKL9g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FlTL1JpQ; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FlTL1JpQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A240FC4CEE3;
+	Wed, 16 Jul 2025 01:14:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752628474;
+	bh=BIobLUhCRywcqD9DTRaeIFV04RlNHS5NSlp/K47bkCg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=FlTL1JpQ4cjIeHm4K8OKTt8Q36Y4QBwkInPrs5DLj6GijS91mP1j37SVNj+x0oCxR
+	 iJ+D4Xd1Yb/FrbIY1uI6kJg73rL7JAQB/qYo2Uq4zuFNY3NAsDyx9lUjlDDXs14A+N
+	 ZxECsKEyZIjOvFs9cMvNFdab8KKPf+OWxYjMnLtHMrfi9Dx57LcVSQz+IrTRkm4uvb
+	 rQ9baXTU+4c5cUwubKfsZMjGAKrRQF50v4onCCzB1h8ideAyz9Iz0hBxafMilVqTfJ
+	 wYr4Ap1aHvBDjxbotYHcbD5CrL5bqtdzyKALrO8PCHd3p7mPhjCrc35D8eMZbCuG01
+	 aL6tV/f5zqnuA==
+Date: Wed, 16 Jul 2025 01:14:32 +0000
+From: Eric Biggers <ebiggers@kernel.org>
+To: Bart Van Assche <bvanassche@acm.org>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH v3 0/7] Fix bio splitting by the crypto fallback code
+Message-ID: <20250716011432.GB765749@google.com>
+References: <20250715201057.1176740-1-bvanassche@acm.org>
+ <20250715214456.GA765749@google.com>
+ <9ed44419-ec53-431d-ad71-c19f83c3f98d@acm.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20250715165249.1024639-2-bvanassche@acm.org>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgD3chM6_HZo8VqhAQ--.59592S3
-X-Coremail-Antispam: 1UD129KBjvdXoW7XFWkXr47Zr15Kr1fCr47twb_yoWDJwbEyw
-	4ktF48Wrs5JFy0yF1rAF13JayayFW5X3WqgFy5Xrn8Xa1xtanIv3s7Krs8ZFs8Cw4fJF1Y
-	qFn0vw13Jr9IgjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUb4AYFVCjjxCrM7AC8VAFwI0_Jr0_Gr1l1xkIjI8I6I8E6xAIw20E
-	Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwV
-	A0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x02
-	67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
-	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
-	x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
-	0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AK
-	xVWUAVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F4
-	0E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1l
-	IxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxV
-	AFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j
-	6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU80fO7
-	UUUUU==
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9ed44419-ec53-431d-ad71-c19f83c3f98d@acm.org>
 
-ÔÚ 2025/07/16 0:52, Bart Van Assche Ð´µÀ:
-> sector_t is a synonym for u64 and all architectures define u64 as unsigned
-> long long. Hence, it is not necessary to cast type sector_t to unsigned
-> long long. Remove a superfluous cast to improve compile-time type checking.
+On Tue, Jul 15, 2025 at 03:35:19PM -0700, Bart Van Assche wrote:
+> On 7/15/25 2:44 PM, Eric Biggers wrote:
+> > But if the actual encryption is done using code
+> > whose developers / maintainers don't really consider encryption to be a
+> > priority, that's not a great place to be.
 > 
-> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-> ---
->   block/bfq-iosched.c | 3 +--
->   1 file changed, 1 insertion(+), 2 deletions(-)
-> 
+> Why does the crypto fallback code clone a bio instead of encrypting /
+> decrypting in place?
 
-Reviewed-by: Yu Kuai <yukuai3@huawei.com>
-Thanks
-> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-> index 0cb1e9873aab..74f03bf27d82 100644
-> --- a/block/bfq-iosched.c
-> +++ b/block/bfq-iosched.c
-> @@ -769,8 +769,7 @@ bfq_rq_pos_tree_lookup(struct bfq_data *bfqd, struct rb_root *root,
->   	if (rb_link)
->   		*rb_link = p;
->   
-> -	bfq_log(bfqd, "rq_pos_tree_lookup %llu: returning %d",
-> -		(unsigned long long)sector,
-> +	bfq_log(bfqd, "rq_pos_tree_lookup %llu: returning %d", sector,
->   		bfqq ? bfqq->pid : 0);
->   
->   	return bfqq;
-> .
-> 
+Decryption is already in-place.  Encryption is not, and unfortunately it
+can't be since the source data must not be changed.  If you encrypt
+in-place, then the data would get corrupted every time it's written.
 
+- Eric
