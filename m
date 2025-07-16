@@ -1,121 +1,75 @@
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D806E289E1C
-	for <linux-block@vger.kernel.org>; Wed, 16 Jul 2025 08:38:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88CC228C872;
+	Wed, 16 Jul 2025 08:41:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752655114; cv=none; b=iUKeVKBaMcdpZ9bhlm0msqyS/GF5smAmbi94RnZscfhKqe43Gu8R8AeYXfvzIuGANngQu7ult6kTRLkfLxEGfN6RrM5cphNXnTwZNgqK74cSkLKDCIi+EwouPvt0kQcfPXzP5p48CttQiPDB4TBaPHftxKjjRVp3ef/m6MXYd+8=
+	t=1752655266; cv=none; b=NxGzuvHVjSsYeHOZ0kJSZVNP8f1su6qNd7AA/P4R8E1V73ODK/fIOwxqgEfxjGT9Wk1d+J4wDRYoeU9VvU6fxzaTEOuzjB1RNwwpfhsmg2YQsqIYcuMMNiD3kfsOiwUvoyK08fcKmR/wP8U0HFXy8hAPnwNu/3CpHU/ZMZHu5So=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752655114; c=relaxed/simple;
-	bh=izAb8FBqphT5f3PHM4yD/k9xGN60OY9mnwfC3ZgMZbU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kG8uozqN0P3vH/OeRqpK2He7+QfKVYyRxeEGjpNg3GhF7IyHa9S/6Ld1TBZUjqBwTuACUoQHPwX49giKu3aP/vLswkWbp8NHGQHfxyknTbeFUhcUpfT6TUTx09PJoiALYGQnKl776UM5/nilJ7ulduCDOYV1Ds7zX5SSdNIHtbs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=fWhKKHjB; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	s=arc-20240116; t=1752655266; c=relaxed/simple;
+	bh=mi/iQzwAUcNWNN3xOVg3QIwFGDVYgNwHIeGU+B4JcDU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ajf/NZpPnCc+348bBITiAl9u0VCYCp4UtK7s4FibINcKJKd9qDjBV+oO8h8lgQNfenjm01nwkflTEYqvOHC4Hde+Xx+mKvt265xCxoIfESSCDEpQpruxZKfUDXsO7/PksfdZkd/ijjIjGPuDlECTGegUqvXIlZUeXen5XQDsgi8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DdVB5mp2; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="fWhKKHjB"
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-234c5b57557so64224415ad.3
-        for <linux-block@vger.kernel.org>; Wed, 16 Jul 2025 01:38:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1752655112; x=1753259912; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=lLh2sm8WqaPVFHFHlj7r6lDUy4RVlkLyvSGa8jle5v4=;
-        b=fWhKKHjB7A+IMjx7pSLDgcEwCW/Mp6uY8rSTkzJwwasgpsloWeDX7CupVGvON/AB+r
-         Mio9GsDW9gXBywvagZJDT7Cvd8phouPp2XvIMxyd6R12Knt41+bdyajdpZ0y1XbEACJm
-         F5ycg6/2zylWyt7v62+JwaShyc54pGSfi2nR4=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752655112; x=1753259912;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lLh2sm8WqaPVFHFHlj7r6lDUy4RVlkLyvSGa8jle5v4=;
-        b=ct7sdCte2W9qkBJIjqEUwAMhl/1Lna7CX+0TWT2GvUc6XUrbtCu0GRV2j0ND/wzc1v
-         WhxwY+mt6a0TSoKd/Lcfp9CAplK2O1aa3IduUUAdglmrhoxvx7bRWy0yz8BSqD0rxSLW
-         +je3UNSI/3NzbPNTHcHGRhlCig0eSzzLYupfdaFS5oKBHiCW/UmWL4YCqt5qdoIseJAu
-         +wSs7954ln7iS9+cM88oc/+QTOw7Imbopp9ad5kjZAYYSRF/kf2X/xACMdY9wicgxbK1
-         QKc55nexJ9KUbxG3qzAuYZpSib/djTJUqVSoCF7U7YkIJwmsZYb7MhnlJXDSG6jEsX9Q
-         FRkg==
-X-Forwarded-Encrypted: i=1; AJvYcCUXQCC0+aBlCAViKczMwDXl4/gb/Wh4uIGlw+Nk0sTghp1dVMc2g+6GhyM50JeJSWkLIYvOQeP65qXSSA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwsR9BFZg+h74+Ff6YxOtCwmq5IYbr9Ipm+O2ArwBdpXyR/Sk5U
-	kB7CIzyVXOKWsxijgNtt//tZ0YCSj2gV+RFBy1QyCZ1rp9Z/05LlLkJFUJjMdsOvWMJ5Gu6r5B9
-	k6BA=
-X-Gm-Gg: ASbGncvysXMVzYbOa5Y32xGWhKICStHMfkifWiB+ABPY6psis8X/hiSfu+5zdabCw7H
-	Ty6rn7kmngZxDp8vXFFtl2SGEO/Hp6KBcHbiuWndCq4YeUAHr1WLl+ZsXthVvN5VIJjDYgvSHp7
-	Tewh0gCSGPSCF/5OrYZOWlReGcDdkaPdu7bvgIlnKlixoDgT3sOXwKkBG7FLFi+Om78tfQ8uR8I
-	Zw3/FEQQ6acF6smzPYQ/ncRRrXvNe7XTSzeQYUGqrFDp3ba/WTwyjzxS/m8qwhgkPrVAKAN3Xk5
-	kEHSbjCeWlggMW8JbeC41Aw89HDSCc0a28TyEEGqQy73F7EixcZ4ml4Rj4MEIxfJ0H5glEUHVd2
-	cTmEj3ePCEGeAX63Q5N2Qsp7G5w==
-X-Google-Smtp-Source: AGHT+IG3S6Rcx6GMavXOlUdkf9wUf4NC0zv2qrJv8Iv5AETpdbF5yoAKLe/cibG5UK2VUQFwtBG2Ng==
-X-Received: by 2002:a17:902:e850:b0:234:c549:da0e with SMTP id d9443c01a7336-23e2578f49fmr22953325ad.47.1752655112070;
-        Wed, 16 Jul 2025 01:38:32 -0700 (PDT)
-Received: from google.com ([2401:fa00:8f:203:9ab6:c2f9:ca7e:e672])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23de43415b0sm120511365ad.188.2025.07.16.01.38.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Jul 2025 01:38:31 -0700 (PDT)
-Date: Wed, 16 Jul 2025 17:38:27 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Minchan Kim <minchan@kernel.org>, 
-	Sergey Senozhatsky <senozhatsky@chromium.org>, Andrew Morton <akpm@linux-foundation.org>, 
-	Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: Re: [PATCH 16/17] zram: fix synchronous reads
-Message-ID: <rjq6lrsq2mflcry4vtks7wth63cgpjzngcbjxy65z7ucupin3q@owvyk5befvpt>
-References: <20230411171459.567614-1-hch@lst.de>
- <20230411171459.567614-17-hch@lst.de>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DdVB5mp2"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4ABCEC4CEF0;
+	Wed, 16 Jul 2025 08:41:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752655266;
+	bh=mi/iQzwAUcNWNN3xOVg3QIwFGDVYgNwHIeGU+B4JcDU=;
+	h=From:To:Cc:Subject:Date:From;
+	b=DdVB5mp2uePcrb3oJDCIQbVydQ+zDPDeDAewPwkDCdFXgHifjMJpQlnFdMp8FU6zo
+	 6id886dDcLUfRz/mNaVckKfhkwq3gZi+tozrn/Rx7CDp1PWMGdDUuMPbspBUeRQvzv
+	 BacCaf/PX8D2qC/u4OQrvC2BGk35fRH3pVvEnWI3F/Cw3HztjFR00EP5pD0+NuRFiH
+	 vTcV/vme8IIQjskFU1BXmEc1vhH2XIv1y7pFbG6cx1cJ6FuHanOQe6x4FXmdC/abdK
+	 z7886Ivmsal2WiQ0pnsH6DKn+ap3a9CrIUBY3KTy+m6mRwmV3o8xTiBoR8TcQGiQ10
+	 8UQ75r2LU2m7A==
+From: Christian Brauner <brauner@kernel.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Christian Brauner <brauner@kernel.org>,
+	linux-block@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	Al Viro <viro@zeniv.linux.org.uk>,
+	Jan Kara <jack@suse.com>
+Subject: [PATCH] MAINTAINERS: add block and fsdevel lists to iov_iter
+Date: Wed, 16 Jul 2025 10:40:45 +0200
+Message-ID: <20250716-eklig-rasten-ec8c4dc05a1e@brauner>
+X-Mailer: git-send-email 2.47.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230411171459.567614-17-hch@lst.de>
+X-Developer-Signature: v=1; a=openpgp-sha256; l=821; i=brauner@kernel.org; h=from:subject:message-id; bh=mi/iQzwAUcNWNN3xOVg3QIwFGDVYgNwHIeGU+B4JcDU=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWSUp85kapFUP+vK3TY785HIpM+s+2XmPT/g7iG8mn/36 wvLKvsEO0pZGMS4GGTFFFkc2k3C5ZbzVGw2ytSAmcPKBDKEgYtTACZS+prhf+65gyUsuXb6KTWC s0tvMi2bFrb43k+ntbubfxVK7a2/2svwP/Na60uxc1EsGS+c4u34Tv3X/fPXtHL/npOfK2O/zim LYwAA
+X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
+Content-Transfer-Encoding: 8bit
 
-On (23/04/11 19:14), Christoph Hellwig wrote:
-> Currently nothing waits for the synchronous reads before accessing
-> the data.  Switch them to an on-stack bio and submit_bio_wait to
-> make sure the I/O has actually completed when the work item has been
-> flushed.  This also removes the call to page_endio that would unlock
-> a page that has never been locked.
-> 
-> Drop the partial_io/sync flag, as chaining only makes sense for the
-> asynchronous reads of the entire page.
+We've had multiple instances where people didn't Cc fsdevel or block
+which are easily the most affected subsystems by iov_iter changes.
+Put a stop to that and make sure both lists are Cced so we can catch
+stuff like [1] early.
 
-[..]
+Link: https://lore.kernel.org/linux-nvme/20250715132750.9619-4-aaptel@nvidia.com [1]
+Signed-off-by: Christian Brauner <brauner@kernel.org>
+---
+ MAINTAINERS | 2 ++
+ 1 file changed, 2 insertions(+)
 
-Hi Christoph,
+diff --git a/MAINTAINERS b/MAINTAINERS
+index fad6cb025a19..fcefe222f093 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -25907,6 +25907,8 @@ F:	fs/hostfs/
+ 
+ USERSPACE COPYIN/COPYOUT (UIOVEC)
+ M:	Alexander Viro <viro@zeniv.linux.org.uk>
++L:	linux-block@vger.kernel.org
++L:	linux-fsdevel@vger.kernel.org
+ S:	Maintained
+ F:	include/linux/uio.h
+ F:	lib/iov_iter.c
+-- 
+2.47.2
 
->  static int read_from_bdev(struct zram *zram, struct page *page,
-> -			unsigned long entry, struct bio *parent, bool sync)
-> +			unsigned long entry, struct bio *parent)
->  {
->  	atomic64_inc(&zram->stats.bd_reads);
-> -	if (sync) {
-> +	if (!parent) {
->  		if (WARN_ON_ONCE(!IS_ENABLED(ZRAM_PARTIAL_IO)))
->  			return -EIO;
-> -		return read_from_bdev_sync(zram, page, entry, parent);
-> +		return read_from_bdev_sync(zram, page, entry);
->  	}
->  	read_from_bdev_async(zram, page, entry, parent);
->  	return 1;
-
-I was looking at zram's bdev (read from a backing device) today
-and got a bit puzzled by that !parent check in read_from_bdev():
-
-zram_bio_read(zram, bio)
-  zram_bvec_read(bio)
-    zram_read_page(bio)
-      read_from_bdev(bio) {
-         if (!parent)
-           return read_from_bdev_sync()
-      }
-
-The thing is, that "parent" is basically "bio" which is passed to
-zram_bio_read(), and it cannot be NULL (zram_bio_read() dereferences
-it multiple times before passing it down the call chain.)  Is sync
-read basically a dead code now?  Am I missing something?
