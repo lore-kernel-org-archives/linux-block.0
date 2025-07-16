@@ -1,33 +1,48 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from 004.mia.mailroute.net (004.mia.mailroute.net [199.89.3.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70CC4EC2;
-	Wed, 16 Jul 2025 16:29:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FA04277030
+	for <linux-block@vger.kernel.org>; Wed, 16 Jul 2025 17:20:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752683379; cv=none; b=AZvUuOC97J91D807wNATALuz3byA8rADLwDnLqZXHxJE4oZ7cNXtFtz96aSBLraOXlMBfvKZK4jKXkS1/k0heDKgIe7n/r5IJ3j5aLebWg4ys7HwvKLjKLMN+dO061ixWrGw6h3mKLwkJxrgwuXAuMRwMuDwuAZWVKYvRZXbc2g=
+	t=1752686423; cv=none; b=nrkICywJ4+bLHYQKFso1BiB7g1ViW1u3L2p/O4/tOCdA0rYWY3v1DUDE+OQ3Pc346+OLyegAxGS0XZjruVXMzpBjy7j5ntFV4dVubKcS7Pu+ZcRhSzDi9BGoW6i0L/ygvx3BvY1w742w/fkriImIXC7b57IwJkmrDGn3+5wfA/Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752683379; c=relaxed/simple;
-	bh=7LtaZGbcu3N/ibo5xwvQDTM1d1oOAkSar/tn3F2rQEc=;
+	s=arc-20240116; t=1752686423; c=relaxed/simple;
+	bh=VBoYeeyT5uiPk6sdFVooM1nU4nPGP5c8Rv4Lcf4hqZU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=N43Y4inLC4fz6W73tn7qyZ5m4iMLPDOJrZOhUc+d9lAhF4KvTvcxPF6/mZUW9Lmj9zgf5gjiOzMbBzBsTXnqODVzhavbNxwjShgOM/ML42C08is7qvlFSd80SXLa4202OQyGS6XWpS58CgOTbEm6W7xmsu3sAxUUyBzilcwQ36c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PMzghLaK; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:Content-Type; b=HUHx+ZaiaXSDAluEqdvnGvmSLnnJFU1czElYPYWuYzE+epJKqb3+LD6U6jROnK41RTnj87PWOGPgbelxUYBmu/PsPXxJ2JeUY5jDomAjkvmG3Dgjl0t0+1pIS4hJpIYdKbd7sZhzL7jnv6TfaXW898HUlWx36qrrOa+hyF0xqfk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=w56PYkJ2; arc=none smtp.client-ip=199.89.3.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PMzghLaK"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B964BC4CEE7;
-	Wed, 16 Jul 2025 16:29:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752683376;
-	bh=7LtaZGbcu3N/ibo5xwvQDTM1d1oOAkSar/tn3F2rQEc=;
-	h=Date:Reply-To:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=PMzghLaK3//doW21Uo6om0hMmYJHZ/MkKaICDlyY7Jvfkq1OPbDagN8iKYP4K4tEA
-	 iL6Ju+zSsvFjyro+W5EB8KSs6JsDffUtExHr+3iQf3fpiEuYvStZWZMMt/jOsaBppY
-	 P5T+vSt1rIckK8vyCeUTw5Wkfpt/0/anAGdMyusBXpo44NswwzoXIztHjW34Ij4Y6+
-	 BcPaGaRydunkb5ABqS/ItRUQgwNxHjYJzEp2xsGpzSu1+Mrl1rePKttcN3pj8cadrd
-	 n7F2YIj3OpWe1xKzVc6zZeO8RGlUSJTZowAkGVjCI4PCOheFQJMR0fOOdHY9v7+oB9
-	 AKLSydxGzym3g==
-Message-ID: <284433c9-c11d-401f-8015-41faa9d0fde1@kernel.org>
-Date: Thu, 17 Jul 2025 00:29:27 +0800
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="w56PYkJ2"
+Received: from localhost (localhost [127.0.0.1])
+	by 004.mia.mailroute.net (Postfix) with ESMTP id 4bj2qy4zq2zm0ySk;
+	Wed, 16 Jul 2025 17:20:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1752686413; x=1755278414; bh=ZRK/Z9xy6iL64Lt/DgG6Xjil
+	NPd5df9npBqwp/yubFA=; b=w56PYkJ2TiaP3lu2DHrB3q3tvRK/EfjIw1VT1BT0
+	wBfYzd+cbgWVT1QH11crTUeHWyVDpJvDymLg+zEMhM6bA2SHSMR+l7BYfQwmHCKu
+	l+etEa065T331b4d1JxWA6PPQe4an9HCGdEYVqvuHA4kjV39LCNG5BZLS4jBJsIe
+	/sqUrE5hk2HVnoQmc+Vg38sGc3NDwPiVJJfpWDVktbjadB84GBZHHFEHdiIIF460
+	58P0hVLmyeFSiSiiL642TaqDtmdh6epRU01UnYY291naPGhI/6Q751T76eMd5Oa2
+	pZXSp/vNFnELIMpRM8RC/czvTGyyVORJABcHXQdr7WjEsA==
+X-Virus-Scanned: by MailRoute
+Received: from 004.mia.mailroute.net ([127.0.0.1])
+ by localhost (004.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id RED1rr4uXr-l; Wed, 16 Jul 2025 17:20:13 +0000 (UTC)
+Received: from [100.66.154.22] (unknown [104.135.204.82])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 004.mia.mailroute.net (Postfix) with ESMTPSA id 4bj2qr0j3xzm0yQ4;
+	Wed, 16 Jul 2025 17:20:07 +0000 (UTC)
+Message-ID: <f16d3f34-b39b-4045-91c2-aa174067d44d@acm.org>
+Date: Wed, 16 Jul 2025 10:20:06 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -35,66 +50,28 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Reply-To: yukuai@kernel.org
-Subject: Re: [RFC PATCH] md: split bio by io_opt size in md_submit_bio()
-To: Coly Li <i@coly.li>, Christoph Hellwig <hch@lst.de>
-Cc: Coly Li <colyli@kernel.org>, linux-raid@vger.kernel.org,
- linux-block@vger.kernel.org, Yu Kuai <yukuai3@huawei.com>,
- Xiao Ni <xni@redhat.com>, Hannes Reinecke <hare@suse.de>,
- Martin Wilck <mwilck@suse.com>, Keith Busch <kbusch@kernel.org>
-References: <20250715180241.29731-1-colyli@kernel.org>
- <20250716113737.GA31369@lst.de>
- <437E98DD-7D64-49BF-9F2C-04CB0A142A88@coly.li>
- <20250716114121.GA32207@lst.de>
- <D12A8BDA-5C2B-4FA7-9C92-731BD321A611@coly.li>
- <20250716114533.GA32631@lst.de>
- <danlsghtalte7sku3vlfxkgngujgwzspanfayaxy4jfnk54jbf@yfvmr5plavmp>
- <20250716121449.GB2043@lst.de> <DE36C995-4014-44DC-A998-1C4FF9AFD7F9@coly.li>
- <20250716121745.GA2700@lst.de> <109C6212-FE63-4FD2-ACC3-F64C44C7D227@coly.li>
+Subject: Re: [PATCH v3 1/7] block: Improve
+ blk_crypto_fallback_split_bio_if_needed()
+To: John Garry <john.g.garry@oracle.com>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+ Eric Biggers <ebiggers@kernel.org>, Eric Biggers <ebiggers@google.com>
+References: <20250715201057.1176740-1-bvanassche@acm.org>
+ <20250715201057.1176740-2-bvanassche@acm.org>
+ <f8bb19ca-5e16-491f-9542-51fb44adde69@oracle.com>
 Content-Language: en-US
-From: Yu Kuai <yukuai@kernel.org>
-In-Reply-To: <109C6212-FE63-4FD2-ACC3-F64C44C7D227@coly.li>
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <f8bb19ca-5e16-491f-9542-51fb44adde69@oracle.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-Hi,
+On 7/16/25 4:49 AM, John Garry wrote:
+> On 15/07/2025 21:10, Bart Van Assche wrote:
+>> Fixes: 488f6682c832 ("block: blk-crypto-fallback for Inline Encryption")
+> 
+> is this really a fix?
 
-在 2025/7/16 20:23, Coly Li 写道:
->
->> 2025年7月16日 20:17，Christoph Hellwig <hch@lst.de> 写道：
->>
->> On Wed, Jul 16, 2025 at 08:16:34PM +0800, Coly Li wrote:
->>>
->>>> 2025年7月16日 20:14，Christoph Hellwig <hch@lst.de> 写道：
->>>>
->>>> On Wed, Jul 16, 2025 at 08:10:33PM +0800, Coly Li wrote:
->>>>> Just like hanlding discard requests, handling raid5 read/write bios should
->>>>> try to split the large bio into opt_io_size aligned both *offset* and
->>>>> *length*. If I understand correctly, bio_split_to_limits() doesn't handle
->>>>> offset alignment for read5 read/write bios.
->>>> Well, if you want offset alignment, set chunk_sectors.
->>>>
->>> Do you mean setting max_hw_sectors as chunk_sectors?
->> Setting both to the desired value (full stipe width).
->>
-> Do you mean setting chunk_size as (chunk_size * data_disks)?  This is deadlock…
->
-> If opt_io_size is (chunk_size * data_disks), setting new max_hw_sectors as rounddown(current max_hw_sectors, opt_io_size) is good idea.
-
-I think round down max_hw_sectors to io_opt(chunk_size * data_disks) 
-will really
-make things much easier, perhaps Christoph means this way. All you need 
-to do is to
-handle not aligned bio and split that part, and for aligned bio fall 
-back to use
-bio_split_to_limits().
+I will drop the Fixes: tag before I repost this patch series.
 
 Thanks,
-Kuai
->
-> Thanks.
->
-> Coly Li
->
->
 
+Bart.
