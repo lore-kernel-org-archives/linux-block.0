@@ -1,50 +1,60 @@
-Received: from out162-62-58-216.mail.qq.com (out162-62-58-216.mail.qq.com [162.62.58.216])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6349311187;
-	Wed, 16 Jul 2025 03:28:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.58.216
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37B5517D2;
+	Wed, 16 Jul 2025 05:50:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752636545; cv=none; b=iUAvgJKZaiwUo+7BHmbU8eYuYFMBZ+D2xKxAE+FRmUCBnXbPY/e6f5rzHjXV48SGs0fR48kQbNONIl1vj/80OaW67WhRqKBiiJZyeVQQygi2Not6xlid7Q6haBbwtZwrnvA1rphURFjAo9dQ1EHkfLXMR862tNKSHoI0UWZOZRg=
+	t=1752645061; cv=none; b=BG5DwSiPuhsb2mFwqZJUQwupch0sIpwp7tZf/3OJpsL+83rY8dx1X+NTZopJ2LNmCIUNaNfq+XecG/ceUp27ZDhmnCOa0MQcJbn38v1IH2skiowrZMpMyfzeid1x32fKUNLQcEauCdyLT1xu9iHSnmHxSJl5mJgQu3d1SMLuxl0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752636545; c=relaxed/simple;
-	bh=9fVuKRupkpK0jeXpqHJzfBtwNx3YJfAqnBuOqi1+Yog=;
+	s=arc-20240116; t=1752645061; c=relaxed/simple;
+	bh=q46vvL0cdhW+fij7BHHjw4OxEuyA13PBh6VX1NpVcL4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LMneHEj80qEOyqeH91czQ8cBIke2LwH/xFc2RNKFUmv+xEvbexwylNad7JJtr1nS+hmJdN4oSJdBMFZo5swdY8dcCfEK265htOstoxqgPjvRa8h9eQTWiuaz31Gtk6keh7kfh0gepcXrAsprZLCCa+wqjo+KmoXqqpwCerDHoRU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=Z+jouwOD; arc=none smtp.client-ip=162.62.58.216
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+	 In-Reply-To:Content-Type; b=rp8eEcyPzPbH/33ua7mJHV2kojRH+XQK7MkFB78LqSRmqEq/XBVocv/bv3dpFjMbbpvLs0B31T9/gjbt0wH6nGYbLw3UXfJTOtxowE+OkoIHEABoFkJSb9/i54b2s6NK8Lwh3OQROerMS7TCmzeZHyMhJWabva0vu/DI3eO6IGw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=fUNDB1iK; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="Z+jouwOD"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1752636224; bh=rVYXfJ28puNpDsYuCqlsBIEx1NeRES2IwwJ6mZh08HU=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=Z+jouwODo5fKme7FRH/Ag79iESRnzlQ77J/b0EKsxfiRvcnvOoWGm58iPcQdgPioq
-	 pXM5HsAae9UA2MnRyJ6vESygyrKS4ov2opGA/7WjvezxFIb5IPxnQmz1R+m1v1P3UA
-	 uzDzQdbNrpAYYa3mQlHqMNBZ1NGRsCtnwR9fTEDg=
-Received: from [172.25.20.187] ([111.202.154.66])
-	by newxmesmtplogicsvrszb16-1.qq.com (NewEsmtp) with SMTP
-	id 5E88D015; Wed, 16 Jul 2025 11:23:40 +0800
-X-QQ-mid: xmsmtpt1752636220tycb83gcn
-Message-ID: <tencent_1C2FC8524B8F624445562817A2BE18E5700A@qq.com>
-X-QQ-XMAILINFO: OeJ9zRfntlNPdKuf745NpqchrcYrT80cSkGsEezOdvuR17zHQEAfAqb15k9v58
-	 e6/aINkDvUFB6XtpkSJZ5KY6+PyfVNNOTf8mD4q7weZ7nzy0eZssb4PasUrqSFHhZoxI2KFbfqsF
-	 5uLIgB0jbNAWf+qPV0EYjIE56Ia5BU4l6fV2lfFV+vazL7cUVAqssEw6T5qWHQx5ezxPUFU+Ezpe
-	 bZxOa+0uSgVLhYwFMiIaO8LTbBmE9vmzAs1jp/q4c/z9YCJW5yfAIC13ZXcN/pHnW4BAkbQcazmi
-	 4yv9Bp5ceti/eLFLsHe5ClFNl0tWAWWkfOQkmtS7RQM49aSFxG1pwa3bMTWZc97UJFuus71FETLz
-	 6vQXOTiDzKbl7pYAjYRiIvva3K+qDQINKquuXYbwpT3VwI2iRlb4gCmW94pnMtQJXCARi9G0GL9j
-	 2R7D3ZKfqnz1biSCgdZAq0IfkFcoow7tReKz05Ol8TmGhiPqQbawgy1PpGHg8Di0Beoex1rurbnM
-	 avA3ieh+UrpVV7cjuwRhxy5mDeGZIa19rJWmSnp6kvq1kfuZpHIbohexe2U8LFuCt8kcQiMH3n+y
-	 83UmSX+1vH7z67biSLOGUXze5Pxx3D8huAF+HT4f8dzFfNZ6ziDC8kg8LBrdbd3qHtOHgpsSR8VG
-	 Aid7treeFoiLHnqmd3raHkpQAe16YMDfGGb4IfN1W/5CL2CLgz6e3y8AinBfy9NX8uTxTtM0ujr1
-	 ld4DTcuZWv52alaCQ56b+7JyGb48tm+52llAkbeKrkA6I06FBsFCrakEu0y+OO+Qu5gNpvrgnI6d
-	 q+UVJNPSbVSxwv/6WLjRXqsFxzJ+te7n5AjtM2UCDJOnwn8rCF2+v7xLKkN7kmp+CkGm1nrmbN1R
-	 u7etkw9ViyDwluV2oh312yNMag4FfzrZuZDx498iefnQ040V7R39wtKT2FZfzRzeYdgv3BN2IAlP
-	 p7K4/7Dr3eD9QaPAihIasG/TqpR48mGdeu7F6TzZREX2lkb55/EkSpSNxm2Z/hD0kPBeK2KbPWGa
-	 fo8o4tAV5gqaFp8WFGgHxzUB1lZCpXI4ZNTzhBoity48Yz8FYN
-X-QQ-XMRINFO: NI4Ajvh11aEj8Xl/2s1/T8w=
-X-OQ-MSGID: <99f2ff09-6921-4c68-9783-c590ed4977f2@qq.com>
-Date: Wed, 16 Jul 2025 11:23:40 +0800
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="fUNDB1iK"
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56G0000D016701;
+	Wed, 16 Jul 2025 05:50:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=I61Ysx
+	kMcSL5KjNUzEumFFJQqgMjHFGv+4NaJWpDZr8=; b=fUNDB1iKwFs0OcnDzCF/Yy
+	9ASv4zz65kon90zS0PZAHGl+8pjhfgieuWXfYEptqN/3wDXx16xrLxhLhyTB1mDC
+	n0VKZWGBolvfg8Cj3T4Qb1m6B95JVZeIB5eCAoz5kV05q2AvKUGci6Cl89BTyGK3
+	EmunL0yrCQUPUa4+HTnGDzIXZwrruB4X9i4CHQ7WN/YuoAyF/IgsGWxRwZJLzoBS
+	AQvw6WqJ6yoicauTyXWMaWUu7LYSI7BmMxOWXOBk67vTll1E2KUPOjsM66E71yLO
+	6Onfx3usWkMxyYiCzomtY5XqL7xMxNjXY1yiM9QxM1Nw5tJJDFxIjZtue09DJkqA
+	==
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 47vamtxhc4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 16 Jul 2025 05:50:42 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 56G23WIW008988;
+	Wed, 16 Jul 2025 05:50:41 GMT
+Received: from smtprelay05.dal12v.mail.ibm.com ([172.16.1.7])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 47v3hmntef-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 16 Jul 2025 05:50:41 +0000
+Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
+	by smtprelay05.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 56G5oeWT32244368
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 16 Jul 2025 05:50:41 GMT
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A214658059;
+	Wed, 16 Jul 2025 05:50:40 +0000 (GMT)
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 126A158058;
+	Wed, 16 Jul 2025 05:50:37 +0000 (GMT)
+Received: from [9.43.110.2] (unknown [9.43.110.2])
+	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 16 Jul 2025 05:50:36 +0000 (GMT)
+Message-ID: <a1bd4aed-a1c3-4546-bf99-4e427c45ab46@linux.ibm.com>
+Date: Wed, 16 Jul 2025 11:20:35 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -52,76 +62,67 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 0/5] fs: refactor write_begin/write_end and add ext4
- IOCB_DONTCACHE support
-To: Christian Brauner <brauner@kernel.org>
-Cc: linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
- linux-block@vger.kernel.org, intel-gfx@lists.freedesktop.org,
- dri-devel@lists.freedesktop.org, linux-mm@kvack.org,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, frank.li@vivo.com,
- tytso@mit.edu, hch@infradead.org, adilger.kernel@dilger.ca,
- willy@infradead.org, jani.nikula@linux.intel.com, rodrigo.vivi@intel.com,
- tursulin@ursulin.net, airlied@gmail.com
-References: <20250710101404.362146-1-chentaotao@didiglobal.com>
- <20250714-tolerant-begreifbar-970f01d32a30@brauner>
-From: Taotao Chen <chentao325@qq.com>
-In-Reply-To: <20250714-tolerant-begreifbar-970f01d32a30@brauner>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Subject: Re: Do we need an opt-in for file systems use of hw atomic writes?
+To: Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>
+Cc: John Garry <john.g.garry@oracle.com>,
+        "Darrick J. Wong"
+ <djwong@kernel.org>, linux-fsdevel@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org
+References: <20250714131713.GA8742@lst.de> <aHbAZBf12kiEdXfH@kbusch-mbp>
+Content-Language: en-US
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <aHbAZBf12kiEdXfH@kbusch-mbp>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: ngaxYKAAVLqcHHt3SW9M3GdVR8WR3_En
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzE2MDA1MCBTYWx0ZWRfX1XIyTzkq4ss9 uJbvVN3xdufRl9u6Qe5SPy7HSWVIj1TPTxg/WSTXb1C7BdWbbtK9Qsl2QXsjWJTc4QHMnQENLbI ZgfIg9JlLVEpSUo8iimqFFOizBlNw4qKu55wtu5ZB5OZT542QuoZbuOhJ+t7l4mOQu4eOvHBF/C
+ +6NcdCFScCOno1V8EvPhEcEcJ6YTMFC0NKLiWQcZDsX1MbUvEeeId2kXrO18m4UrMIhUuxhBkaS uMrj+sM3GZrBAIb3XYbpl7LkpJl6PLRi4m7i/zhG3+rsrggJnOUEByTZ/xangBpJYQS0zSHV4XW ZuKdJUZjQMY0YSNuKRdJlNjaoPZNMjPgr4sQ0pR1gfhFfnLvLW9aCBNrO58tm+TbGQC/OYVBbKn
+ +YRa/0j7ACGhW5kUV/7BJvhxTS3e/bQFWcSqWWnIL1dcFKsjPAd3+iYetMh0cx1gC1vvMvjP
+X-Proofpoint-ORIG-GUID: ngaxYKAAVLqcHHt3SW9M3GdVR8WR3_En
+X-Authority-Analysis: v=2.4 cv=dNSmmPZb c=1 sm=1 tr=0 ts=68773db2 cx=c_pps a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17 a=kLWA3gBXtu5QbDPQ:21 a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=Cdajwa0swSnkgbHL8UIA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-07-16_01,2025-07-15_02,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ mlxlogscore=895 bulkscore=0 lowpriorityscore=0 suspectscore=0 spamscore=0
+ clxscore=1011 phishscore=0 malwarescore=0 mlxscore=0 adultscore=0
+ impostorscore=0 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
+ definitions=main-2507160050
 
 
-在 2025/7/14 17:11, Christian Brauner 写道:
-> On Thu, 10 Jul 2025 10:14:06 +0000, 陈涛涛 Taotao Chen wrote:
->> From: Taotao Chen <chentaotao@didiglobal.com>
->>
->> This patch series refactors the address_space_operations write_begin()
->> and write_end() callbacks to take const struct kiocb * as their first
->> argument, allowing IOCB flags such as IOCB_DONTCACHE to propagate to the
->> filesystem's buffered I/O path.
->>
->> [...]
-> Applied to the vfs-6.17.misc branch of the vfs/vfs.git tree.
-> Patches in the vfs-6.17.misc branch should appear in linux-next soon.
->
-> Please report any outstanding bugs that were missed during review in a
-> new review to the original patch series allowing us to drop it.
->
-> It's encouraged to provide Acked-bys and Reviewed-bys even though the
-> patch has now been applied. If possible patch trailers will be updated.
->
-> Note that commit hashes shown below are subject to change due to rebase,
-> trailer updates or similar. If in doubt, please check the listed branch.
->
-> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
-> branch: vfs-6.17.misc
->
-> [1/5] drm/i915: Use kernel_write() in shmem object create
->        https://git.kernel.org/vfs/vfs/c/110ae5fb48ed
-> [2/5] drm/i915: Refactor shmem_pwrite() to use kiocb and write_iter
->        https://git.kernel.org/vfs/vfs/c/dd09194ff58c
-> [3/5] fs: change write_begin/write_end interface to take struct kiocb *
->        https://git.kernel.org/vfs/vfs/c/254a06118b31
-> [4/5] mm/pagemap: add write_begin_get_folio() helper function
->        https://git.kernel.org/vfs/vfs/c/ff2219c021c5
-> [5/5] ext4: support uncached buffered I/O
->        https://git.kernel.org/vfs/vfs/c/2677497bc6f4
-Hi Christian,
 
-Kernel testing reported regression bugs in this patch series:
--  Reported-by: kernel test robot <lkp@intel.com>
-    Closes: 
-202507142128.Zr5StnYh-lkp@intel.com/">https://lore.kernel.org/oe-kbuild-all/202507142128.Zr5StnYh-lkp@intel.com/
+On 7/16/25 2:26 AM, Keith Busch wrote:
+> On Mon, Jul 14, 2025 at 03:17:13PM +0200, Christoph Hellwig wrote:
+>> Is is just me, or would it be a good idea to require an explicit
+>> opt-in to user hardware atomics?
+> 
+> IMO, if the block device's limits reports atomic capabilities, it's fair
+> game for any in kernel use. These are used outside of filesystems too,
+> like through raw block fops.
+> 
+> We've already settled on discarding problematic nvme attributes from
+> consideration. Is there something beyond that you've really found? If
+> so, maybe we should continue down the path of splitting more queue
+> limits into "hardware" and "user" values, and make filesystems subscribe
+> to the udev value where it defaults to "unsupported" for untrusted
+> devices.
+> 
+If we're going down the path of disregarding atomic write support for 
+NVMe devices that don't report NAWUPF, then we likely need an opt-in
+mechanism for users who trust their device to have a sane AWUPF value.
 
-- Reported-by: kernel test robot <lkp@intel.com>
-   Closes: 
-202507142040.wppyoX1s-lkp@intel.com/">https://lore.kernel.org/oe-kbuild-all/202507142040.wppyoX1s-lkp@intel.com/
+For example, consider an NVMe disk that does not support NAWUPF, but 
+does consistently support AWUPF across all namespaces and for different
+LBA sizes. In such cases, I would still want to enable atomic writes on
+this disk, even if the kernel driver marks it as "unsupported" due to
+missing NAWUPF.
 
-I will send an updated version of the patch series shortly to address 
-these issues.
-Please consider dropping the original series from the vfs-6.17.misc 
-branch once the new version is reviewed.
+Having an explicit user opt-in mechanism in such scenarios would be very
+useful, allowing advanced users to take advantage of hardware capabilities
+they trust, despite conservative kernel defaults. 
 
-Thanks, and sorry for the trouble.
-
-Taotao
-
+Thanks,
+--Nilay
