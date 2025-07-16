@@ -1,103 +1,139 @@
-Received: from mail-il1-f170.google.com (mail-il1-f170.google.com [209.85.166.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 003.mia.mailroute.net (003.mia.mailroute.net [199.89.3.6])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 693911D7E26
-	for <linux-block@vger.kernel.org>; Wed, 16 Jul 2025 16:02:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8542D274B30
+	for <linux-block@vger.kernel.org>; Wed, 16 Jul 2025 16:12:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.6
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752681770; cv=none; b=c8JvPvYSctRfPpSj+Dl5KyWWUZcz322wNNYO1EzxLiHxMSyH9eRyNYWPB4MJccUWIfOwpAp7yCFKFl2BrQ3/5F90JsjlFg4rE7hkHEOAHdTDq0rpqHPoOC1YMnUPfdUfOwgZ3Z0bZZ4zUgdyytNd0lhw/UXgnbXlQYYViPcYyuU=
+	t=1752682344; cv=none; b=AkN26o/sp99XNQ3qe69zoxSxzQ28gsufPnOkByxuU6m3SuF9MBeRCuelSR/EnRZOZynTcDKOYJf+noF0xKOimiWHSUGD8m8PKL+F9tOvN6QbloTM1O0nylHnwBGLY3qh1i7Yar7gXw4HDNJ08E1B8rNNw4+rOEa/DoGOofgkZlc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752681770; c=relaxed/simple;
-	bh=vTcYX7fNfoQTfQukGT6rjSXtIcvhhfSy0DYv3Ah/+/g=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=S0FZ9B0CoAQFVgkzCTPrQJeUuw2nICLEKJ51UzgFIgAWJdM3DXgGd9jFxWsS4zPMWNP+RSC0c40Sgu2xgYw6N5sfjBwz4lI77W3fk/2fc0MScLcCHKdEH3m6cj2hAh69sGqqCgeX9K26gm9IwXGTQy9nXTfyj71pihz0ezWnK2c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=R+5Jp/o/; arc=none smtp.client-ip=209.85.166.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1752682344; c=relaxed/simple;
+	bh=aCwphz1g1j81d6534fv7wLS9vdZNDbLwhQAcDGe5drg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=i0uTbGF7NcAKnkFNTTux8c2rx2PGmorw3W6lmaa9iaUOifH3EqzEwWp0nW4/VxF8v5RynBPXD71cxLiaPld1SJtBUznfMuNVqSnPSEBiNIvJtUe3ppCxvgHlWdSoIGuHvYLyVISVi6Jmia14MigIqmmJV3teBz8tjSwnF5dsMfA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=I4gWGQOO; arc=none smtp.client-ip=199.89.3.6
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="R+5Jp/o/"
-Received: by mail-il1-f170.google.com with SMTP id e9e14a558f8ab-3ddda0a8ba2so49679985ab.0
-        for <linux-block@vger.kernel.org>; Wed, 16 Jul 2025 09:02:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1752681766; x=1753286566; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qsIbsnYA3DIl+Gp2Bi4UCyQX5eQJbJ6yj/BF/RV6/x0=;
-        b=R+5Jp/o/jhPqs0TqwKEcSdErk5dKMWTpkvt5FE4ryKK6nmXJLS9bzTgFRSrezEVtM8
-         MwNUP9Cn0DzyFGHrl8Dq/CLZKVHEjdl+EXwPoqiskRmet1GHs3mVGHc0KpRbQZueHm95
-         03qcWIUV4MbLWDjTxr/ZkB4Ieipu2SFv2NU6LuFFcuQeEdYpWZTkE5inZ3x7L4SSGoU4
-         CIA+XKzq3vCDtxROcul55b+kkeBA5QqvIld12/dGcUSPls4V+euZkm4OlBrjb05tCP0W
-         fB9iWqF+rsKCe9F6axy7uaUZUUJYu6Crz6t6itYzF1tX1HP6V00bVa3EfMfstiqpAfNK
-         Lwvw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752681766; x=1753286566;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qsIbsnYA3DIl+Gp2Bi4UCyQX5eQJbJ6yj/BF/RV6/x0=;
-        b=rI3o+vYlgi+U8A2pgQ8P6TrVNVTsRhG70Ky3XlCcafWk92QxF7HXyWDZcRc9Nirsru
-         CduUyWHqqphbf331KbmHnWKJ4ZxGt9b24P23ANktAe2qHvcBF0tUcWCmRxhfMHBcW36K
-         U2FAOWxVwPiZZcxwurnBWIMlZTOgD6cute5uJOUo+/5TGFuZnz4LuSTiLaJFV7/bLthp
-         akK2BMTySco2Y1dODx034sKI7PP2Kdd8RZJu9kFct6fgxy8s1LX0Qzz4cG3ashMMFUIu
-         miHUJ9bvv7prN1KBDINLXO16cVfKWvQxMzgbUo/ADiJu+GU7bGjTyrf6e+IX8ApQbDDZ
-         k6Yw==
-X-Gm-Message-State: AOJu0Yzn3qUg7xnb6DAbpoBGoJmIdsc2bhnW7vEJXWzp3dFYDsPm8WPW
-	lXvNBzIwEJUzmAC+Fmv8tpXab8JqE73Ebw9QFFe+yrbE6DCrgKIMWFHbAVX7PbVjRHDWZznXw/e
-	GupBo
-X-Gm-Gg: ASbGncvzrg6J6LngWuUSzP5Pno1M+SeIH0+sQX80CSRk1oRQLK0YZo8oWGhuwERYCyh
-	BZ5/iKVkKivC0lhoDq9Pj5waW8k7EHv/m1ltdeyXMjkOBBygu34jD2nbdKsxlYDF3s0HA0SMi2k
-	5ig/7GScgcyObhNjHZLJYRbdMLy4deJFfiGir5fU37PkFUvRhRf06aLrJuoEvpzb9FfL47yg0tl
-	Msz1VydPCaYr9FilXLfy1/ud3Exu86eG5b8irVYDBsvAWCbWUZ4iO3dvt63gldvpnwFWJoKKseu
-	7Fp+IoC8Y5+tMQzp5roOI9RzTOxQKfVMFseTJqTqL1qmsSbj0xrdyZpHbIbW8LmgZxcgRuVF6Xd
-	oSYmgS8rqvhCDXQ==
-X-Google-Smtp-Source: AGHT+IEUh5NARKjyL5Sq1ywVzH4VA9EIs8xOc+p6cLFCfjRJ02MFZmhdrbh2VmZVLvF8zSpyz3yemQ==
-X-Received: by 2002:a05:6e02:2501:b0:3dd:9a7e:13f4 with SMTP id e9e14a558f8ab-3e2823d4176mr37514685ab.6.1752681765828;
-        Wed, 16 Jul 2025 09:02:45 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3e2462422casm47200785ab.63.2025.07.16.09.02.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Jul 2025 09:02:45 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Cc: linux-block@vger.kernel.org, Stephen Rothwell <sfr@canb.auug.org.au>
-In-Reply-To: <20250716133631.94898-1-johannes.thumshirn@wdc.com>
-References: <20250716133631.94898-1-johannes.thumshirn@wdc.com>
-Subject: Re: [PATCH] block: fix blk_zone_append_update_request_bio()
- kernel-doc
-Message-Id: <175268176496.313644.4229551614496959474.b4-ty@kernel.dk>
-Date: Wed, 16 Jul 2025 10:02:44 -0600
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="I4gWGQOO"
+Received: from localhost (localhost [127.0.0.1])
+	by 003.mia.mailroute.net (Postfix) with ESMTP id 4bj1Kd3qDPzlgqyP;
+	Wed, 16 Jul 2025 16:12:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1752682340; x=1755274341; bh=jIDqQm6Ipt3Tjz7quSUGM0D+
+	sCPBEHx+Nf9KJOnWqpQ=; b=I4gWGQOOxYIid3RsBy9fTuhBnw9bNGpP/R0t+VyV
+	lNFW3GszlBE0hlC9gZ7x8U4RDmCHNNDGjsxNVhtoAkV+0mBBeuafVZreOZ00E21T
+	dqzXSLwk/XFvN3oR+8R9NnZY3wym1hbshSbb4tE65Zbv7OtQdgBiBbGvjMo2h6CV
+	6YTxwbynAR0Xu8q3hSde1z73AoXICNWcNQTUu3YWxr9fedjHV4CfM+1f/cNz7xVN
+	ZFkRoF1ulS9Z1ijVJ7c3ekwrVNbRnaA9DoBQGnl/66X5d4Pqh3+jxUxMCfWPFgYJ
+	z5zlP8slzWpQeud6ON7E4/ta2iTGeLGOBTpGzA3m3zNoXA==
+X-Virus-Scanned: by MailRoute
+Received: from 003.mia.mailroute.net ([127.0.0.1])
+ by localhost (003.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id cfi1wPidnoXi; Wed, 16 Jul 2025 16:12:20 +0000 (UTC)
+Received: from [100.66.154.22] (unknown [104.135.204.82])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4bj1KW4YNQzlgqy3;
+	Wed, 16 Jul 2025 16:12:14 +0000 (UTC)
+Message-ID: <3b19ea31-00b4-4c01-9f6d-4374300c7a9b@acm.org>
+Date: Wed, 16 Jul 2025 09:12:13 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 0/7] Fix bio splitting by the crypto fallback code
+To: Eric Biggers <ebiggers@kernel.org>, Christoph Hellwig <hch@lst.de>
+Cc: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+References: <20250715201057.1176740-1-bvanassche@acm.org>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20250715201057.1176740-1-bvanassche@acm.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-2ce6c
+
+On 7/15/25 1:10 PM, Bart Van Assche wrote:
+> [ ... ]
+
+(replying to my own email)
+
+If nobody objects I will integrate the patch below in patch 6/7 from
+this series. This patch addresses all concerns about this patch series
+that have been formulated so far and that I'm aware of, including
+restoring inline encryption support for all block devices. This is
+realized by moving the blk_crypto_bio_prep() call from
+bio_submit_split() back to where it was originally, namely in
+blk_crypto_bio_prep(). Because of this change it is necessary to restore
+bio splitting in blk_crypto_fallback_encrypt_bio(). Instead of restoring
+the custom bio splitting code, call bio_split_to_limits(). This call
+takes the inline encryption fallback bio limits into account because
+patch 6/7 modifies get_max_io_size().
+
+Thanks,
+
+Bart.
 
 
-On Wed, 16 Jul 2025 15:36:31 +0200, Johannes Thumshirn wrote:
-> Stephen reported new 'make htmldocs' warnings introduced by 4cc21a00762b
-> ("block: add tracepoint for blk_zone_update_request_bio").
-> 
-> One is a wrong function name in the tracepoint's kernel-doc and one is a
-> wrong function parameter.
-> 
-> Fix these so 'make htmldocs' is warning free again for the block layer
-> tracepoints.
-> 
-> [...]
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 5af5f8c3cd06..2c3c8576aa9b 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -626,6 +626,10 @@ static void __submit_bio(struct bio *bio)
+  	/* If plug is not used, add new plug here to cache nsecs time. */
+  	struct blk_plug plug;
 
-Applied, thanks!
++	bio = blk_crypto_bio_prep(bio);
++	if (unlikely(!bio))
++		return;
++
+  	blk_start_plug(&plug);
 
-[1/1] block: fix blk_zone_append_update_request_bio() kernel-doc
-      commit: ab17ead0e0ee8650cd1cf4e481b1ed0ee9731956
+  	if (!bdev_test_flag(bio->bi_bdev, BD_HAS_SUBMIT_BIO)) {
+diff --git a/block/blk-crypto-fallback.c b/block/blk-crypto-fallback.c
+index b08e4d89d9a6..3b1c277e4375 100644
+--- a/block/blk-crypto-fallback.c
++++ b/block/blk-crypto-fallback.c
+@@ -262,12 +262,8 @@ static struct bio 
+*blk_crypto_fallback_encrypt_bio(struct bio *src_bio)
+  	unsigned int i, j;
+  	blk_status_t blk_st;
 
-Best regards,
--- 
-Jens Axboe
+-	/* Verify that bio splitting has occurred. */
+-	if (WARN_ON_ONCE(bio_sectors(src_bio) >
+-			 blk_crypto_max_io_size(src_bio))) {
+-		src_bio->bi_status = BLK_STS_IOERR;
+-		return NULL;
+-	}
++	/* Split the bio if it's too big for single page bvec */
++	src_bio = bio_split_to_limits(src_bio);
 
+  	bc = src_bio->bi_crypt_context;
+  	data_unit_size = bc->bc_key->crypto_cfg.data_unit_size;
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index f4e210279cd3..990f2847c820 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -125,11 +125,10 @@ static struct bio *bio_submit_split(struct bio 
+*bio, int split_sectors)
+  		trace_block_split(split, bio->bi_iter.bi_sector);
+  		WARN_ON_ONCE(bio_zone_write_plugging(bio));
+  		submit_bio_noacct(bio);
+-
+-		bio = split;
++		return split;
+  	}
 
+-	return blk_crypto_bio_prep(bio);
++	return bio;
+
+  error:
+  	bio->bi_status = errno_to_blk_status(split_sectors);
 
