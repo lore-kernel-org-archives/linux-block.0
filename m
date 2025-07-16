@@ -1,66 +1,50 @@
-Received: from mail-il1-f173.google.com (mail-il1-f173.google.com [209.85.166.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out162-62-58-216.mail.qq.com (out162-62-58-216.mail.qq.com [162.62.58.216])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF6EE265609
-	for <linux-block@vger.kernel.org>; Wed, 16 Jul 2025 01:54:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6349311187;
+	Wed, 16 Jul 2025 03:28:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.58.216
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752630863; cv=none; b=Rr9qL78flYhGm8mk/ekd9mtIeNWoatNYXYcO7AbKQnxplZKVJMsTEU47+eUfd9lKkeZ8iQdTP4uuZbW+enay+FqOaN/TX+A1Q1uoP41c0bfews9Rqxa4s5rWr41byTJ36TJU9jjJAgpkYMKFaXJzyHJjfAbi8CUm20v95zPc5GE=
+	t=1752636545; cv=none; b=iUAvgJKZaiwUo+7BHmbU8eYuYFMBZ+D2xKxAE+FRmUCBnXbPY/e6f5rzHjXV48SGs0fR48kQbNONIl1vj/80OaW67WhRqKBiiJZyeVQQygi2Not6xlid7Q6haBbwtZwrnvA1rphURFjAo9dQ1EHkfLXMR862tNKSHoI0UWZOZRg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752630863; c=relaxed/simple;
-	bh=hTV3r6/XDkRjptq9O4ZKFp8aAzwD1Pu4WVB01ZErpNs=;
+	s=arc-20240116; t=1752636545; c=relaxed/simple;
+	bh=9fVuKRupkpK0jeXpqHJzfBtwNx3YJfAqnBuOqi1+Yog=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oanckDRmESKZyACQEMTFKbdNFccwxpvwpeL3+jeb8P+sFiI2nObzo36q0tgB9e/+kiHQs8yZYm6cNwd7wQZlrG/y5vGHH6U6pROdt6eGjL9+S5lu65nTypsfY0GTKCvLMoTkubSoWLYHN3uqeXanwahL2MwnsL8WEsPHEjrO6fM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=aL2hHK5G; arc=none smtp.client-ip=209.85.166.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	 In-Reply-To:Content-Type; b=LMneHEj80qEOyqeH91czQ8cBIke2LwH/xFc2RNKFUmv+xEvbexwylNad7JJtr1nS+hmJdN4oSJdBMFZo5swdY8dcCfEK265htOstoxqgPjvRa8h9eQTWiuaz31Gtk6keh7kfh0gepcXrAsprZLCCa+wqjo+KmoXqqpwCerDHoRU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=Z+jouwOD; arc=none smtp.client-ip=162.62.58.216
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="aL2hHK5G"
-Received: by mail-il1-f173.google.com with SMTP id e9e14a558f8ab-3df2d8cb8d2so22097785ab.2
-        for <linux-block@vger.kernel.org>; Tue, 15 Jul 2025 18:54:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1752630856; x=1753235656; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=aTmeP8qpyCHmA/g2+LUU/MHMZPdFolBFtPEoJnC4prM=;
-        b=aL2hHK5GTaUid01+T4j/cATzw0Nu6OEZMml4xNFBaDQknyNNQ4rz6/xQ8IXwvckB2M
-         4KFNBq0c21LlK9eMyECikPYHaB0Tuv+v/PPsBsRjwt3wKe6qtT4Q0kfUwjN9VK03EzkV
-         77TOvuPx2ViS5/HS0zfvcZFd675QsqwvtMYOFL70xQxS0nsl/86ogw0SZkv4z9VzAAOG
-         bFcQ7e2AurM9WAECAgSF0KVRhPHFrRfCL9UWSZvgMm21qhcZlYRbOI1ubtwyUFLqYHmQ
-         J2w42cEBqQuInBtNj3EOTmaecMVZvJHviGfmihEANusYUorSSVzin8xX7/nMRHbAGXAX
-         7NOA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752630856; x=1753235656;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=aTmeP8qpyCHmA/g2+LUU/MHMZPdFolBFtPEoJnC4prM=;
-        b=oA4YgOvxq99W9Dea1HxODfVzk4AY87Ff6lT5xjeWSko7fXeZJ/UXxMFtAvHEsW4E1m
-         Hbg3Ysr3UWzlxBSCBBPwLbh/4OnrnhZEgi4L9XtC2m2fO2s7StBa+ZBop5yE0qSVm+an
-         OWt0ytSuwQ6AeUiBH3ddvF1aPsbIUHv4LgGS5EQZETmnnyRewa6bxxUcA/IgV+DbBPfu
-         bHQIpwgtqwYAHUVl332F6AqJiZfPLbNkuo0bw88U5lV/xJ+qNky5XgMlRMUMHS88jysR
-         7NENgxEcMajFq2PgTbdYuFNgEO5dBlr1niBBWNCGx57N2tcnYwqOP7wCiYKmi2q2vRvE
-         ILDw==
-X-Forwarded-Encrypted: i=1; AJvYcCXURr3WKub3K03D7SFpCKFuZSFWJooAyphh2a4FWtl1eIRleUdK3ljg7vzvY8fpPwzwtiiBtBszugJmNQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwzrMuZvQmarNtxa5gb7DkL00zSoRjtLE5jNPtHpI2uvhNbgJw+
-	Ns/fzx4MmqBouiKJMB26RIye57HR8Do2HxSeBPJCebl7546n84zJMjahpytgyo4mTVI311CjMiR
-	nl9y8
-X-Gm-Gg: ASbGncuh4lTVvALsTrJaUqvaQwUU6OI1/C2mpi8agsM536D9v5mvCgSucJ5ynDFTjT3
-	x3amr9rADmuWYOqllRuFnsNMY9oXNI/tveHvGjXZtTwvx0N2Oth/wdAJ/cYQcjwTBRM4zH2aJAS
-	6rV3a2XDEKo4BVu3VeYtbVBTbSEFGAJSREPPa8rYxebgjsg5ROBPnf0zpqCciLyO5sgm1Kyos1e
-	hLgnRaQtfOFvKJ8lfIQ27hZNWR+t6eS4X3J9lOpYpIoCbxWuMHR4ebZhvqiDQwUaJGrCwXSLLFT
-	uzbWhU5H2DH1PMfBQ6JGCmTRPu2AVbPc+7sV/Ct8OEB1bTkIfe/VnNppW8NhnmJIFFEzkm3v8MY
-	fvWaYf6odaWJFy9ZwOns=
-X-Google-Smtp-Source: AGHT+IGxq71zOazX9frNe40QOYlU0yiVuzBNaRtc144t7dJRYEozgrUBmSNeWxaafc0OmaqBbBHu8Q==
-X-Received: by 2002:a05:6e02:216c:b0:3df:29c8:4a0f with SMTP id e9e14a558f8ab-3e28249b9demr14939895ab.21.1752630856297;
-        Tue, 15 Jul 2025 18:54:16 -0700 (PDT)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3e24620a9f8sm41060885ab.36.2025.07.15.18.54.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 15 Jul 2025 18:54:15 -0700 (PDT)
-Message-ID: <d52a8216-dd70-4489-a645-55d174bcdd9e@kernel.dk>
-Date: Tue, 15 Jul 2025 19:54:14 -0600
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="Z+jouwOD"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1752636224; bh=rVYXfJ28puNpDsYuCqlsBIEx1NeRES2IwwJ6mZh08HU=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=Z+jouwODo5fKme7FRH/Ag79iESRnzlQ77J/b0EKsxfiRvcnvOoWGm58iPcQdgPioq
+	 pXM5HsAae9UA2MnRyJ6vESygyrKS4ov2opGA/7WjvezxFIb5IPxnQmz1R+m1v1P3UA
+	 uzDzQdbNrpAYYa3mQlHqMNBZ1NGRsCtnwR9fTEDg=
+Received: from [172.25.20.187] ([111.202.154.66])
+	by newxmesmtplogicsvrszb16-1.qq.com (NewEsmtp) with SMTP
+	id 5E88D015; Wed, 16 Jul 2025 11:23:40 +0800
+X-QQ-mid: xmsmtpt1752636220tycb83gcn
+Message-ID: <tencent_1C2FC8524B8F624445562817A2BE18E5700A@qq.com>
+X-QQ-XMAILINFO: OeJ9zRfntlNPdKuf745NpqchrcYrT80cSkGsEezOdvuR17zHQEAfAqb15k9v58
+	 e6/aINkDvUFB6XtpkSJZ5KY6+PyfVNNOTf8mD4q7weZ7nzy0eZssb4PasUrqSFHhZoxI2KFbfqsF
+	 5uLIgB0jbNAWf+qPV0EYjIE56Ia5BU4l6fV2lfFV+vazL7cUVAqssEw6T5qWHQx5ezxPUFU+Ezpe
+	 bZxOa+0uSgVLhYwFMiIaO8LTbBmE9vmzAs1jp/q4c/z9YCJW5yfAIC13ZXcN/pHnW4BAkbQcazmi
+	 4yv9Bp5ceti/eLFLsHe5ClFNl0tWAWWkfOQkmtS7RQM49aSFxG1pwa3bMTWZc97UJFuus71FETLz
+	 6vQXOTiDzKbl7pYAjYRiIvva3K+qDQINKquuXYbwpT3VwI2iRlb4gCmW94pnMtQJXCARi9G0GL9j
+	 2R7D3ZKfqnz1biSCgdZAq0IfkFcoow7tReKz05Ol8TmGhiPqQbawgy1PpGHg8Di0Beoex1rurbnM
+	 avA3ieh+UrpVV7cjuwRhxy5mDeGZIa19rJWmSnp6kvq1kfuZpHIbohexe2U8LFuCt8kcQiMH3n+y
+	 83UmSX+1vH7z67biSLOGUXze5Pxx3D8huAF+HT4f8dzFfNZ6ziDC8kg8LBrdbd3qHtOHgpsSR8VG
+	 Aid7treeFoiLHnqmd3raHkpQAe16YMDfGGb4IfN1W/5CL2CLgz6e3y8AinBfy9NX8uTxTtM0ujr1
+	 ld4DTcuZWv52alaCQ56b+7JyGb48tm+52llAkbeKrkA6I06FBsFCrakEu0y+OO+Qu5gNpvrgnI6d
+	 q+UVJNPSbVSxwv/6WLjRXqsFxzJ+te7n5AjtM2UCDJOnwn8rCF2+v7xLKkN7kmp+CkGm1nrmbN1R
+	 u7etkw9ViyDwluV2oh312yNMag4FfzrZuZDx498iefnQ040V7R39wtKT2FZfzRzeYdgv3BN2IAlP
+	 p7K4/7Dr3eD9QaPAihIasG/TqpR48mGdeu7F6TzZREX2lkb55/EkSpSNxm2Z/hD0kPBeK2KbPWGa
+	 fo8o4tAV5gqaFp8WFGgHxzUB1lZCpXI4ZNTzhBoity48Yz8FYN
+X-QQ-XMRINFO: NI4Ajvh11aEj8Xl/2s1/T8w=
+X-OQ-MSGID: <99f2ff09-6921-4c68-9783-c590ed4977f2@qq.com>
+Date: Wed, 16 Jul 2025 11:23:40 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -68,106 +52,76 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [bug report] kmemleak issue observed during blktests
-To: Yi Zhang <yi.zhang@redhat.com>, linux-block <linux-block@vger.kernel.org>
-Cc: Ming Lei <ming.lei@redhat.com>,
- Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-References: <CAHj4cs8oJFvz=daCvjHM5dYCNQH4UXwSySPPU4v-WHce_kZXZA@mail.gmail.com>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <CAHj4cs8oJFvz=daCvjHM5dYCNQH4UXwSySPPU4v-WHce_kZXZA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH v5 0/5] fs: refactor write_begin/write_end and add ext4
+ IOCB_DONTCACHE support
+To: Christian Brauner <brauner@kernel.org>
+Cc: linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+ linux-block@vger.kernel.org, intel-gfx@lists.freedesktop.org,
+ dri-devel@lists.freedesktop.org, linux-mm@kvack.org,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, frank.li@vivo.com,
+ tytso@mit.edu, hch@infradead.org, adilger.kernel@dilger.ca,
+ willy@infradead.org, jani.nikula@linux.intel.com, rodrigo.vivi@intel.com,
+ tursulin@ursulin.net, airlied@gmail.com
+References: <20250710101404.362146-1-chentaotao@didiglobal.com>
+ <20250714-tolerant-begreifbar-970f01d32a30@brauner>
+From: Taotao Chen <chentao325@qq.com>
+In-Reply-To: <20250714-tolerant-begreifbar-970f01d32a30@brauner>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On 7/15/25 7:42 PM, Yi Zhang wrote:
-> Hi
-> 
-> I found the following kmemleak issue on the latest
-> linux-block/for-next, please help check it and let me know if you need
-> any info/testing for it, thanks.
-> 
-> commit: linux-block/for-next: 8192f418ee2f (HEAD -> for-next,
-> origin/for-next) Merge branch 'for-6.17/io_uring' into for-next
-> 
-> # dmesg | grep kmemleak
-> [31404.993877] kmemleak: 608 new suspected memory leaks (see
-> /sys/kernel/debug/kmemleak)
-> 
-> unreferenced object 0xffff8882e7fb9000 (size 2048):
->   comm "check", pid 10460, jiffies 4324980514
->   hex dump (first 32 bytes):
->     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
->     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
->   backtrace (crc c47e6a37):
->     __kvmalloc_node_noprof+0x55d/0x7a0
->     sbitmap_init_node+0x15a/0x6a0
->     kyber_init_hctx+0x316/0xb90
->     blk_mq_init_sched+0x416/0x580
->     elevator_switch+0x18b/0x630
->     elv_update_nr_hw_queues+0x219/0x2c0
->     __blk_mq_update_nr_hw_queues+0x36a/0x6f0
->     blk_mq_update_nr_hw_queues+0x3a/0x60
->     find_fallback+0x510/0x540 [nbd]
->     nbd_send_cmd+0x24b/0x1480 [nbd]
->     configfs_write_iter+0x2ae/0x470
->     vfs_write+0x524/0xe70
->     ksys_write+0xff/0x200
->     do_syscall_64+0x98/0x3c0
->     entry_SYSCALL_64_after_hwframe+0x76/0x7e
-> unreferenced object 0xffff8882e7fbb000 (size 2048):
->   comm "check", pid 10460, jiffies 4324980514
->   hex dump (first 32 bytes):
->     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
->     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
->   backtrace (crc c47e6a37):
->     __kvmalloc_node_noprof+0x55d/0x7a0
->     sbitmap_init_node+0x15a/0x6a0
->     kyber_init_hctx+0x316/0xb90
->     blk_mq_init_sched+0x416/0x580
->     elevator_switch+0x18b/0x630
->     elv_update_nr_hw_queues+0x219/0x2c0
->     __blk_mq_update_nr_hw_queues+0x36a/0x6f0
->     blk_mq_update_nr_hw_queues+0x3a/0x60
->     find_fallback+0x510/0x540 [nbd]
->     nbd_send_cmd+0x24b/0x1480 [nbd]
->     configfs_write_iter+0x2ae/0x470
->     vfs_write+0x524/0xe70
->     ksys_write+0xff/0x200
->     do_syscall_64+0x98/0x3c0
->     entry_SYSCALL_64_after_hwframe+0x76/0x7e
-> unreferenced object 0xffff88819e855000 (size 2048):
->   comm "check", pid 10460, jiffies 4324980514
->   hex dump (first 32 bytes):
->     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
->     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
->   backtrace (crc c47e6a37):
->     __kvmalloc_node_noprof+0x55d/0x7a0
->     sbitmap_init_node+0x15a/0x6a0
->     kyber_init_hctx+0x316/0xb90
->     blk_mq_init_sched+0x416/0x580
->     elevator_switch+0x18b/0x630
->     elv_update_nr_hw_queues+0x219/0x2c0
->     __blk_mq_update_nr_hw_queues+0x36a/0x6f0
->     blk_mq_update_nr_hw_queues+0x3a/0x60
->     find_fallback+0x510/0x540 [nbd]
->     nbd_send_cmd+0x24b/0x1480 [nbd]
->     configfs_write_iter+0x2ae/0x470
->     vfs_write+0x524/0xe70
->     ksys_write+0xff/0x200
->     do_syscall_64+0x98/0x3c0
->     entry_SYSCALL_64_after_hwframe+0x76/0x7e
 
-Can you try and revert:
+在 2025/7/14 17:11, Christian Brauner 写道:
+> On Thu, 10 Jul 2025 10:14:06 +0000, 陈涛涛 Taotao Chen wrote:
+>> From: Taotao Chen <chentaotao@didiglobal.com>
+>>
+>> This patch series refactors the address_space_operations write_begin()
+>> and write_end() callbacks to take const struct kiocb * as their first
+>> argument, allowing IOCB flags such as IOCB_DONTCACHE to propagate to the
+>> filesystem's buffered I/O path.
+>>
+>> [...]
+> Applied to the vfs-6.17.misc branch of the vfs/vfs.git tree.
+> Patches in the vfs-6.17.misc branch should appear in linux-next soon.
+>
+> Please report any outstanding bugs that were missed during review in a
+> new review to the original patch series allowing us to drop it.
+>
+> It's encouraged to provide Acked-bys and Reviewed-bys even though the
+> patch has now been applied. If possible patch trailers will be updated.
+>
+> Note that commit hashes shown below are subject to change due to rebase,
+> trailer updates or similar. If in doubt, please check the listed branch.
+>
+> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
+> branch: vfs-6.17.misc
+>
+> [1/5] drm/i915: Use kernel_write() in shmem object create
+>        https://git.kernel.org/vfs/vfs/c/110ae5fb48ed
+> [2/5] drm/i915: Refactor shmem_pwrite() to use kiocb and write_iter
+>        https://git.kernel.org/vfs/vfs/c/dd09194ff58c
+> [3/5] fs: change write_begin/write_end interface to take struct kiocb *
+>        https://git.kernel.org/vfs/vfs/c/254a06118b31
+> [4/5] mm/pagemap: add write_begin_get_folio() helper function
+>        https://git.kernel.org/vfs/vfs/c/ff2219c021c5
+> [5/5] ext4: support uncached buffered I/O
+>        https://git.kernel.org/vfs/vfs/c/2677497bc6f4
+Hi Christian,
 
-commit 8b428f42f3edfd62422aa7ad87049ab232a2eaa9
-Author: Ming Lei <ming.lei@redhat.com>
-Date:   Wed Jul 9 19:17:44 2025 +0800
+Kernel testing reported regression bugs in this patch series:
+-  Reported-by: kernel test robot <lkp@intel.com>
+    Closes: 
+202507142128.Zr5StnYh-lkp@intel.com/">https://lore.kernel.org/oe-kbuild-all/202507142128.Zr5StnYh-lkp@intel.com/
 
-    nbd: fix lockdep deadlock warning
+- Reported-by: kernel test robot <lkp@intel.com>
+   Closes: 
+202507142040.wppyoX1s-lkp@intel.com/">https://lore.kernel.org/oe-kbuild-all/202507142040.wppyoX1s-lkp@intel.com/
 
-and see if that fixes it? If not, then checkout for-6.17/block instead,
-and then run a bisect with that sha marked as bad, and v6.16-rc4 as the
-known good one.
+I will send an updated version of the patch series shortly to address 
+these issues.
+Please consider dropping the original series from the vfs-6.17.misc 
+branch once the new version is reviewed.
 
--- 
-Jens Axboe
+Thanks, and sorry for the trouble.
+
+Taotao
+
