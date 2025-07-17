@@ -1,180 +1,150 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8708F2F7CF3
-	for <linux-block@vger.kernel.org>; Thu, 17 Jul 2025 14:29:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E05C914E2E2
+	for <linux-block@vger.kernel.org>; Thu, 17 Jul 2025 14:32:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752762547; cv=none; b=J71IerEkDEdh7maRqR7YBCGmtFqz4NGgLovPMI02DKVMbhpcXdBH1bxHz+hF7zPkzLIOT0PZRBux8/fyjS0aOVgUxXEU/k7P28cmYCra8rDQXRB8492lL8uf9mAN9BdDBwkoP+lecMkUt9wIuAWsYzZj1SIRo8K0tvRUieiKQfw=
+	t=1752762737; cv=none; b=qW5ruJwuLzelSyEJn40EgARbM0aDpGv0GdB/1UBrR8eRO1990nmYjCyHiQ0oY3EOZfYhj7aQbjlkZn1mIqm21rHsIe8x6kEscXqdmfGDlSbghNkIZHLM30ZQal4iRjUrJtYRbwS8DTR0rdVXi5fjEKpV8enyYruvdtJSts8V9U4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752762547; c=relaxed/simple;
-	bh=HnM+CeS02DDPFncPgbgZ2fRJ2Yu1HNQQwj7chvKk1ak=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Qg13tUPnhKQBqp/5PhBs/2nabsne+88m9sCdRneDowz+nlRZ0gEX9K80Pwk4s4HF0Hl4Y+A1N0cMU70E3/zEUdKnvySURI3RKeiJiUoPRJxvUcKC/cn/lopY8P3vlxRYGj28RZpWvOfea7yT8XnqLNP20nc8gdeWrTtWycpUmFs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=m3Fthz+4; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1752762737; c=relaxed/simple;
+	bh=BpKvTGSzcGxYqR26tI4+GLZNjRei4vvrs43ux7EVVbU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=EDoup9gZtJfC/sj056KbA65h73nnjDeOMY8C43QaXXE1ZAaTWGMTvzfGm6m1fJdUubElcBRLPTZEiuvg9HeLPOUcbqd3ezvA/RebbJ6EYnVndJJm5958T1qX02G8SE389gwr/8ZrJl5WzH7rM3C+F2mGBbmAQjwXuzZlDWMS0IU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MROfHUi5; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="m3Fthz+4"
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56HD7aqH014315;
-	Thu, 17 Jul 2025 14:28:48 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=S/HpYY
-	KMaWXRT1ss2z5UWKVb51kVIaGv3kIDZC785FI=; b=m3Fthz+4w7NJspymN0HeRA
-	kRdGb2XzZVwsrkpr3fqy69VHaNrm17CHfZXmZq/0WsCHDEnG1KgB+EkS+V9ZcDH8
-	nxtx95IQGedxTQ7NarZAUKNWGS322h1Wi/5yJu+ASmua/iYpwfmCq2rfn6IRq3s+
-	44wvC+Q+Z0qqdg25DasbuQeFqSFa+pITt/a6hHKPKuuz3nqr5/qGFnu4Ep6rS5j8
-	NQ9QkeAkLE12LvOZlRmVCFixE2zQQgE1LsKWIEyrIsj/DcyJ9MqmmJqFa6LAb6nE
-	KiSyagI9u1Rf9zf359gPDfv0SaVYoqN6LxyP03xqbw/wc1gsNR/RkFZUhS2N5bGg
-	==
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 47uf7dbkqd-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 17 Jul 2025 14:28:47 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 56HE72TH021914;
-	Thu, 17 Jul 2025 14:28:43 GMT
-Received: from smtprelay02.dal12v.mail.ibm.com ([172.16.1.4])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 47v4r3c9rf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 17 Jul 2025 14:28:43 +0000
-Received: from smtpav06.dal12v.mail.ibm.com (smtpav06.dal12v.mail.ibm.com [10.241.53.105])
-	by smtprelay02.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 56HEShQ18258148
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 17 Jul 2025 14:28:43 GMT
-Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7B2A258055;
-	Thu, 17 Jul 2025 14:28:43 +0000 (GMT)
-Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 4ACBE58043;
-	Thu, 17 Jul 2025 14:28:41 +0000 (GMT)
-Received: from [9.79.196.226] (unknown [9.79.196.226])
-	by smtpav06.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 17 Jul 2025 14:28:41 +0000 (GMT)
-Message-ID: <94ca52fd-2c16-4e3a-b0ad-8ced1c4526a9@linux.ibm.com>
-Date: Thu, 17 Jul 2025 19:58:40 +0530
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MROfHUi5"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1752762734;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4FA0ONGYpZe5LNmkbnmUH+TqjZUs1MQRrjuF3bYicL8=;
+	b=MROfHUi5h+zs74kmT+P4QYWpMIBvUAnYlGLxB+4lG7AqPHJVKKkvlNeqA9BAy8zOemZioj
+	yJVtysBAog6oiDWJxXwGlyE66f+XQ9kN3ww9LFkd8m7IupCn4iqFLQhQPEfEsg8UJ+Pz/s
+	FKT9+eV/KUmPkExoYYO7rLNyQEQKMQk=
+Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
+ [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-649-P0v3PYkDNtGgzzgcslp4cg-1; Thu, 17 Jul 2025 10:32:13 -0400
+X-MC-Unique: P0v3PYkDNtGgzzgcslp4cg-1
+X-Mimecast-MFC-AGG-ID: P0v3PYkDNtGgzzgcslp4cg_1752762731
+Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-313f8835f29so1512178a91.3
+        for <linux-block@vger.kernel.org>; Thu, 17 Jul 2025 07:32:12 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752762731; x=1753367531;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4FA0ONGYpZe5LNmkbnmUH+TqjZUs1MQRrjuF3bYicL8=;
+        b=ObL76CYhRS9JVXAS7q0kPoJ4afgiJU8XlpRxtghx6UImSEj4d91k8T9xD7ZQJOIb4O
+         zv29miimqrQw+dW+9iKAMtr87t+pUjMXf2P+jDQI9gweZzXEqVXktYf9g6CGpk1J7Gxd
+         mw9TtJrUAFaMp7Ou0kS63dK0eC9qtFs4Kpf3C7BZCJlYiEiZL0dfds/IK5yzrYf4MX7I
+         qIw4pUq+1ivcs1FCFqxgf39Exj3YAXYqjf1NA5oo8NzG382mGQsDv/x6BijERs0F3T4o
+         vGmtfRvfPzJZR5qANHxAETtIvEMXzeXDEFALlc7IEYYotzlNQCdqa8xiO9aeZKMFi7Ek
+         lb2Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVm66CWYGdTKGGgZO8pliWPVm4r7c7dSKwdVOgmE25Sy5obRdzCGqNINQdtitzcESXDsPBhSbuYHzKEiA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxxcrLVOuliXrSbj1CJID7vA+Gt8LfucfsHSALnzWj0u+Z4LloF
+	IM545KAuMVrl/fH/Za97vbP9ZCSOlDQo8IZw3DKBxhZklCxccYzzqi55nC27juBFBoKh/0dzqDS
+	cze9nkEpIWk8X1RO/CGegueZ2jKdHGnM0gxqxhnWol3/6p7Rg287MaDdP0eHGBH3B4kCnukDu9D
+	KJu0VgwTBga1mhS6oXZrUHwquc+J/RUt2uPRuV740=
+X-Gm-Gg: ASbGncvGKVtn31bgX4nC4jwy/WMu0FU1HL8pnpx9Sg57L3yxTsziSfsh45Rm18ZmKpq
+	EDP3J6Ap3xzBYCxln2IBVqXqd1Jbyo0N0RB4s4q2d4Q0LQF93Ox7gNMHP4shOQhaROdq8p1El02
+	5OCLhwda7p64fUPfgcY03MbQ==
+X-Received: by 2002:a17:90b:4d11:b0:311:f05b:869a with SMTP id 98e67ed59e1d1-31c9f3fbc53mr10281479a91.8.1752762731351;
+        Thu, 17 Jul 2025 07:32:11 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFQUUCc3pM4Lu5no+Q5BLA2dXohC4lCNgxZo/MbUSKCn/toalxZgxeSFOGednPIk8W8hlu7LcflGG9xEg+XeU8=
+X-Received: by 2002:a17:90b:4d11:b0:311:f05b:869a with SMTP id
+ 98e67ed59e1d1-31c9f3fbc53mr10281048a91.8.1752762726191; Thu, 17 Jul 2025
+ 07:32:06 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [bug report] kmemleak issue observed during blktests
-To: Yi Zhang <yi.zhang@redhat.com>
-Cc: Ming Lei <ming.lei@redhat.com>, Yu Kuai <yukuai1@huaweicloud.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        linux-block <linux-block@vger.kernel.org>,
-        Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <CAHj4cs8oJFvz=daCvjHM5dYCNQH4UXwSySPPU4v-WHce_kZXZA@mail.gmail.com>
- <d52a8216-dd70-4489-a645-55d174bcdd9e@kernel.dk>
- <08f3f802-e3c3-b851-b4ee-912eade04c6f@huaweicloud.com>
- <aHeBiu9pHZwO95vW@fedora>
- <99b5326f-7ef6-46d8-a423-95b1b4e7c7fb@linux.ibm.com>
- <aHg9oRFYjSsNvY0_@fedora>
- <d55c37f0-d21c-48e8-9856-1e3d08d6cde4@linux.ibm.com>
- <CAHj4cs-hrakSa7ht_yD-CKMX5CVEs=etZWyi75Jvzj75DCxnZQ@mail.gmail.com>
-Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <CAHj4cs-hrakSa7ht_yD-CKMX5CVEs=etZWyi75Jvzj75DCxnZQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: RSR96gcmVwe_XjTh0nZRWXcc4u--y-rX
-X-Authority-Analysis: v=2.4 cv=LoGSymdc c=1 sm=1 tr=0 ts=6879089f cx=c_pps a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17 a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=lRhqbHx4yJLUIVgMKPkA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-GUID: RSR96gcmVwe_XjTh0nZRWXcc4u--y-rX
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzE3MDEyNiBTYWx0ZWRfX/5L1q3BALyf0 zd6+88JrSLH/QfqZG9ASP7fOLET3ESRDIyv8fcrOjpQMJYElcltdB7cFEp8W8lAyf7Wz4987wf8 tmcFu1eWw0rWiXFVUmMG7YzdPSDs+0VLTt8ntkKueT9LBDoum1fuQU814q1RffmBLME75fd03Iw
- KxXRIBr3GqUPhZTVYM8MDIGVz1ux7nCuWMPwI5awZi/Bykdh0TJ2eI2+Zeyb225FKvxg/VCdYoG tmpMP3eKo51LKamRqY6AHl4/DL96xRSuo+j7zjU4JfAOuh/GcjLFM8B/wR6L7qcIY/jldz13Rm8 s9WyXXIG6Mt9tADNdYIn+vFFmnZhvIh3s5WGuYfykxhCUlJLGnxYC+sEFLYXzpjDN1FN6d7UqFj
- 012qMgabt0F93qkyTJAC1tAsnOzDKv4hInhncraHBg6cqvRR9Kpjqb8pWTYaxHRjSamC2zIl
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-07-17_01,2025-07-17_02,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
- lowpriorityscore=0 spamscore=0 malwarescore=0 impostorscore=0
- clxscore=1015 phishscore=0 mlxlogscore=880 priorityscore=1501
- suspectscore=0 mlxscore=0 adultscore=0 classifier=spam authscore=0
- authtc=n/a authcc= route=outbound adjust=0 reason=mlx scancount=1
- engine=8.19.0-2505280000 definitions=main-2507170126
+References: <CAHj4cs9wqRvxxTVMYxPcaCQoedeRNn6CHJ_K5GsqS6YKMHeXiA@mail.gmail.com>
+ <CALTww2_+3zTsbSxr36iscO6q0iV4VYLRE-PNKZ_aCRS5TDCwBw@mail.gmail.com>
+In-Reply-To: <CALTww2_+3zTsbSxr36iscO6q0iV4VYLRE-PNKZ_aCRS5TDCwBw@mail.gmail.com>
+From: Yi Zhang <yi.zhang@redhat.com>
+Date: Thu, 17 Jul 2025 22:31:51 +0800
+X-Gm-Features: Ac12FXyMbln4vaRFu624g2b2ZajluZDKzvbBmLj9p1rqnqb5RfhE77c_AxsPVPA
+Message-ID: <CAHj4cs-dvYWvMQ=ojvz6Chsy-tA7gogXnfVikixVyUzrG3jzVQ@mail.gmail.com>
+Subject: Re: [bug report] blktests md/001 failed with "buffer overflow detected"
+To: Xiao Ni <xni@redhat.com>
+Cc: linux-raid@vger.kernel.org, 
+	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>, linux-block <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, Jul 17, 2025 at 5:33=E2=80=AFPM Xiao Ni <xni@redhat.com> wrote:
+>
+> Hi Yi
+>
+> Is it possible to use the latest mdadm
+> https://github.com/md-raid-utilities/mdadm for testing? This problem
+> should already be fixed.
+
+Yes, the issue cannot be reproduced now with the latest upstream
+mdadm, thanks for the update.
 
 
+>
+> Best Regards
+> Xiao
+>
+>
+>
+> On Thu, Jul 17, 2025 at 3:21=E2=80=AFPM Yi Zhang <yi.zhang@redhat.com> wr=
+ote:
+> >
+> > Hi
+> > I reproduced this failure on the latest linux-block/for-next, please
+> > help check it and let me know if you need any infor/test, thanks.
+> >
+> > Environment:
+> > mdadm-4.3-7.fc43.x86_64
+> > linux-block/for-next: 522390782310 (HEAD -> for-next, origin/for-next)
+> > Merge branch 'for-6.17/io_uring' into for-next
+> >
+> > Reproducer steps
+> > # ./check md/001
+> > md/001 (Raid with bitmap on tcp nvmet with opt-io-size over bitmap
+> > size) [failed]
+> >     runtime  3.511s  ...  5.924s
+> >     --- tests/md/001.out 2025-07-15 06:27:41.496610277 -0400
+> >     +++ /root/blktests/results/nodev/md/001.out.bad 2025-07-17
+> > 03:10:50.718820367 -0400
+> >     @@ -1,3 +1,9 @@
+> >      Running md/001
+> >     ++ mdadm --quiet --create /dev/md/blktests_md --level=3D1
+> > --bitmap=3Dinternal --bitmap-chunk=3D1024K --assume-clean --run
+> > --raid-devices=3D2 /dev/nvme0n1 missing
+> >     +*** buffer overflow detected ***: terminated
+> >     +tests/md/001: line 69:  1835 Aborted                 (core
+> > dumped) mdadm --quiet --create /dev/md/blktests_md --level=3D1
+> > --bitmap=3Dinternal --bitmap-chunk=3D1024K --assume-clean --run
+> > --raid-devices=3D2 /dev/"${ns}" missing
+> >     ++ mdadm --quiet --stop /dev/md/blktests_md
+> >     +mdadm: error opening /dev/md/blktests_md: No such file or director=
+y
+> >     ++ set +x
+> >     ...
+> >     (Run 'diff -u tests/md/001.out
+> > /root/blktests/results/nodev/md/001.out.bad' to see the entire diff)
+> >
+> > --
+> > Best Regards,
+> >   Yi Zhang
+> >
+> >
+>
 
-On 7/17/25 7:55 PM, Yi Zhang wrote:
-> 
-> Hi Nilay
-> 
-> How about update the patch with the below trace which doesn't have nbd info:
-> 
-> unreferenced object 0xffff8881b82f7400 (size 512):
->   comm "check", pid 68454, jiffies 4310588881
->   hex dump (first 32 bytes):
->     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
->     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
->   backtrace (crc 5bac8b34):
->     __kvmalloc_node_noprof+0x55d/0x7a0
->     sbitmap_init_node+0x15a/0x6a0
->     kyber_init_hctx+0x316/0xb90
->     blk_mq_init_sched+0x419/0x580
->     elevator_switch+0x18b/0x630
->     elv_update_nr_hw_queues+0x219/0x2c0
->     __blk_mq_update_nr_hw_queues+0x36a/0x6f0
->     blk_mq_update_nr_hw_queues+0x3a/0x60
->     0xffffffffc09ceb80
->     0xffffffffc09d7e0b
->     configfs_write_iter+0x2b1/0x470
->     vfs_write+0x527/0xe70
->     ksys_write+0xff/0x200
->     do_syscall_64+0x98/0x3c0
->     entry_SYSCALL_64_after_hwframe+0x76/0x7e
-> unreferenced object 0xffff8881b82f6000 (size 512):
->   comm "check", pid 68454, jiffies 4310588881
->   hex dump (first 32 bytes):
->     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
->     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
->   backtrace (crc 5bac8b34):
->     __kvmalloc_node_noprof+0x55d/0x7a0
->     sbitmap_init_node+0x15a/0x6a0
->     kyber_init_hctx+0x316/0xb90
->     blk_mq_init_sched+0x419/0x580
->     elevator_switch+0x18b/0x630
->     elv_update_nr_hw_queues+0x219/0x2c0
->     __blk_mq_update_nr_hw_queues+0x36a/0x6f0
->     blk_mq_update_nr_hw_queues+0x3a/0x60
->     0xffffffffc09ceb80
->     0xffffffffc09d7e0b
->     configfs_write_iter+0x2b1/0x470
->     vfs_write+0x527/0xe70
->     ksys_write+0xff/0x200
->     do_syscall_64+0x98/0x3c0
->     entry_SYSCALL_64_after_hwframe+0x76/0x7e
-> unreferenced object 0xffff8881b82f5800 (size 512):
->   comm "check", pid 68454, jiffies 4310588881
->   hex dump (first 32 bytes):
->     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
->     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
->   backtrace (crc 5bac8b34):
->     __kvmalloc_node_noprof+0x55d/0x7a0
->     sbitmap_init_node+0x15a/0x6a0
->     kyber_init_hctx+0x316/0xb90
->     blk_mq_init_sched+0x419/0x580
->     elevator_switch+0x18b/0x630
->     elv_update_nr_hw_queues+0x219/0x2c0
->     __blk_mq_update_nr_hw_queues+0x36a/0x6f0
->     blk_mq_update_nr_hw_queues+0x3a/0x60
->     0xffffffffc09ceb80
->     0xffffffffc09d7e0b
->     configfs_write_iter+0x2b1/0x470
->     vfs_write+0x527/0xe70
-> 
->     ksys_write+0xff/0x200
->     do_syscall_64+0x98/0x3c0
->     entry_SYSCALL_64_after_hwframe+0x76/0x7e
-> 
-Sure, I will send another patch with the updated 
-commit message.
 
-Thanks,
---Nilay
+--=20
+Best Regards,
+  Yi Zhang
 
