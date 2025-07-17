@@ -1,133 +1,259 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 824012F85D7
-	for <linux-block@vger.kernel.org>; Thu, 17 Jul 2025 14:22:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B735C2F7D0D
+	for <linux-block@vger.kernel.org>; Thu, 17 Jul 2025 14:26:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752762167; cv=none; b=YmZusl5tBW+AdPnRXDb8SpizSDRHuZm/KfG+FeFYuOHm7stTVmBAJYzn07lnw68lfzPF8dg2jg/UHMZYm0gnf0w4LbgDc+DqeFNYxRa9aS9Df2H//tMQbGHvkBJzE08ogp3L1G/nD356XQ8b8AFQ3jULOQ2XnIIyZUxsXSUn6Zg=
+	t=1752762383; cv=none; b=tJyH7uQIRa9OLGzt3IDcUQjqlN+QVa6oc20YV7ejNuAK5e1HOfd/O8uAv7ePr1f7yNDUj6NbUFXzKUHn+NrtwlTXitFPR9G6pPXcnPUpln+dQMNakjYLQ8aYUDAFX03S08l0Pi19ajTB/8d2ro8xWfSYJb5HYPdjgDNlaKs1TwM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752762167; c=relaxed/simple;
-	bh=An0pFdgpuHjT2xlaz1aO/B26hRt8Sn/6KAkx4byKjSY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iKl1H2sz5RIJ9aA3wVQ8/NGYRBc+xMIZdbMhycTrtyLZaD8zkLb+SkrNmoKO5CEVOR+m21cs00IegLvCTkjUjguZ6oLtbuBp20q6ruAm4/V1thdgG/kfzRne+o1J7cPMJEFDZ0WspgR33gUiXDV+r+IyyKeViHosgHZY7RynfZg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=dePpLtgs; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1752762383; c=relaxed/simple;
+	bh=lYs1SRSQ+fBX2ipCQLufZcVFXNvlqqzjxc/IJUuSNGE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=DJq2r/eqzdLE4texr9yqDG2H92RS/K9ZxG21W4kSBTIC6WdqZA+l7EFdJZ/M4MJEAwCpRX7Sd8Qoe0mXFehzKtzw52RKK9pUyRfGoPqO2UmiSMlV0kFcoHetmK0yhxAKc75JUg/yu209ldL1aMkIslLF5Fi7oW0vqcjF5e2cfOs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VJguyPSg; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="dePpLtgs"
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56HBJ3Zf027402;
-	Thu, 17 Jul 2025 14:22:26 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=huxOp1
-	Dlm2fcDr2K1SY7BcpEyj+J+/qJraT5rXRA+fk=; b=dePpLtgsMbJnMVijtSQZeo
-	FKwYTjfK3kdbJXXonzwm1V7R/VMH3Rk5GrnbLjc8jzJ2eV21ooiCYz0JNY/OBI6N
-	NZ/XyfzE0WuDTTHaljIhGb2hsmbTpTPZds5615WQgxk5sRdVCL0mWnD/RDuaOCvi
-	4YOhwtaWHkQZkd2U48KzwgM3GKz50ks/cLXBAXS3CQZDkbjhQWIvlFjrl6WKxJy4
-	Lc/QF6DFXaTFCLwFaqLqs9PlrxC4ZDbwjvtIhy+t5lileIrNPJGs24aU3I20ecQi
-	aXcGZO3gcu3O9LHUzam3uIT+X+knVhdOhNyaMlDdTP/k1V0nB4s9V15Ce7DcwjMQ
-	==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 47ufc7b8qu-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 17 Jul 2025 14:22:26 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 56HDiS2e000733;
-	Thu, 17 Jul 2025 14:22:25 GMT
-Received: from smtprelay06.wdc07v.mail.ibm.com ([172.16.1.73])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 47v48mcavp-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 17 Jul 2025 14:22:25 +0000
-Received: from smtpav06.dal12v.mail.ibm.com (smtpav06.dal12v.mail.ibm.com [10.241.53.105])
-	by smtprelay06.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 56HEMOHm31457912
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 17 Jul 2025 14:22:24 GMT
-Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6B77A58055;
-	Thu, 17 Jul 2025 14:22:24 +0000 (GMT)
-Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 45DB058043;
-	Thu, 17 Jul 2025 14:22:22 +0000 (GMT)
-Received: from [9.79.196.226] (unknown [9.79.196.226])
-	by smtpav06.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 17 Jul 2025 14:22:21 +0000 (GMT)
-Message-ID: <23039b02-2595-4a6c-962b-fbfa7ae4736d@linux.ibm.com>
-Date: Thu, 17 Jul 2025 19:52:20 +0530
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VJguyPSg"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1752762379;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JkH6JWo8mTS5GsMuk57tBxlJcQGpiGIklLHcffCuBDw=;
+	b=VJguyPSg+I/Sx5vbh2wgSj4GeDUMXjXvO7+JAgETBy0MK5/137UkZ/3V1jv2ZEaa/cX1U0
+	3+++YmPw6ogchGltnngcHbgctD7IseEOo69naqlgNXTJIKRYBr6yRFbocn431+qlK6rFLQ
+	xO/f3fGVxg9ueX/xiV5JIRP2bP/iMFU=
+Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
+ [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-169-jYejEOh3M82eNlltCgi9ow-1; Thu, 17 Jul 2025 10:26:17 -0400
+X-MC-Unique: jYejEOh3M82eNlltCgi9ow-1
+X-Mimecast-MFC-AGG-ID: jYejEOh3M82eNlltCgi9ow_1752762376
+Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-32ca160b4bbso3245991fa.1
+        for <linux-block@vger.kernel.org>; Thu, 17 Jul 2025 07:26:17 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752762371; x=1753367171;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=JkH6JWo8mTS5GsMuk57tBxlJcQGpiGIklLHcffCuBDw=;
+        b=U0pjICkk6bbknpfIn6Z0bQ7SPdmfyeq1MbtuApF/PZJKhQoq75Cm+RELGb/SqIzTSJ
+         QWYe3tsxBFahAX7IwaP4bqgjnWK2biBbnCk7/hBQxnJ1I0oVOWDs+Cbc8XIWYgdIWE3c
+         wJroJCcKeKOxPUu+wsM/D74GuiCSu6iNHLMbpZM4wrnpysq8nt6Gh8ruRTkdmiX+TUAs
+         ppsIaYY3ApF93zWl+FEPj5scZj4qKz6w959yCRSSZDeCPDAb92Z7Eo8weH3Djy2iDzWR
+         g8CoFXPFlS3s9nMLJcii4HTflTroQsQTLRsUqSo+Rk01d5ImmraCUzfWvoQ+jubuU/Fp
+         mBCw==
+X-Forwarded-Encrypted: i=1; AJvYcCX+oOqq8q7BVnYJ/1VHmF565SJi4Y0JcwW1kWFrUzj5rwmcao5+rl3D5wTudn/+Fh1kS87afA9s7wCD2A==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw84RNUEWmTOCqlRh0Dd3ayFNJx1gjjFvgZ1+TvLgY5Odni9Mvq
+	S/CH4fZSMQhwNEaVp+IMiXT1cOleEO6E3TPNnjKwYQd16IKS/qrueP9xYv8i9tLX0B8HlvfKe6H
+	D6dPgpyKw6/bZPLWPZsocOERkY/01VDYuxE30wT58Zvq65rSSFCFiU/kPJOLQNf58d/5m1/A6gJ
+	ZTniPyggJOoDj/1xRcJW2vsOaHsjUKxWX+NaEU84OoeQ2JHR0=
+X-Gm-Gg: ASbGncvv8zwPKUlE7WwvTODWoeEIlYnTXgR1lTiGIwAkLVderEwLP+uo4KmA8o78M1M
+	7tYMsBLs7Mw8VB/3u8pjHy7eSmXXT45/B3U5rZeBTMSVodU4+Evg/i72nmDf5+ZwU48NWzwPLqL
+	rayA7kSIed6uX1Jrn5t/jD7g==
+X-Received: by 2002:a2e:b802:0:b0:32b:75f0:cfb1 with SMTP id 38308e7fff4ca-3309a57811fmr5536681fa.24.1752762370401;
+        Thu, 17 Jul 2025 07:26:10 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGlGN+kGw9glV3szRat6ao3EO+niF9BvSVt1f9JcGHmO+KbKbkzodo/5KcUMeS6rQI1lXsA4/OOVCCV+6Ufaks=
+X-Received: by 2002:a2e:b802:0:b0:32b:75f0:cfb1 with SMTP id
+ 38308e7fff4ca-3309a57811fmr5536601fa.24.1752762369851; Thu, 17 Jul 2025
+ 07:26:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [bug report] kmemleak issue observed during blktests
-To: Yi Zhang <yi.zhang@redhat.com>, Ming Lei <ming.lei@redhat.com>
-Cc: Yu Kuai <yukuai1@huaweicloud.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-block <linux-block@vger.kernel.org>,
-        Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        "yukuai (C)" <yukuai3@huawei.com>
 References: <CAHj4cs8oJFvz=daCvjHM5dYCNQH4UXwSySPPU4v-WHce_kZXZA@mail.gmail.com>
- <d52a8216-dd70-4489-a645-55d174bcdd9e@kernel.dk>
- <08f3f802-e3c3-b851-b4ee-912eade04c6f@huaweicloud.com>
- <aHeBiu9pHZwO95vW@fedora>
- <99b5326f-7ef6-46d8-a423-95b1b4e7c7fb@linux.ibm.com>
- <aHg9oRFYjSsNvY0_@fedora>
- <CAHj4cs-WTU0Y2VbgtKL24Wxe+1CGJoPP+je_w=Xg1bu+JizHMA@mail.gmail.com>
-Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <CAHj4cs-WTU0Y2VbgtKL24Wxe+1CGJoPP+je_w=Xg1bu+JizHMA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=Je68rVKV c=1 sm=1 tr=0 ts=68790722 cx=c_pps a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17 a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=lYAvP-sluYjmnx_0C4YA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzE3MDEyNiBTYWx0ZWRfX6ONgkhZVgw1C gDNoXVlRQexmsIBRDY477r0KQXHTh78Su//oKbKftiClD7rSnFFCSpK+xjXJLqIYUhzFtcLxnp/ 4LccRhGYXevxr50E2yBWOYsSakNpNfA0mCPpz486lGdCfPrE7aoWbEng905lUdLIIvbAd7C9reZ
- bHMPgor7WO/eSNUobtoAfNumwiAZgV2iJdTWDjU9fxqUe/3I93tFTzYWgTmhWFEXus4jyOTYW8s 7KLNH78qWCty0BMtXmz/RKjNIwy+u3ZIMXQsg73LZg2Lsn47kOr41VLk91f8oCgxCV6I1ldwwgE hzVXCmSkG+I0X0LlpZLGWqBLFpAywbJiVOnyYVrU7XWdcNf6dLttKRKrF2HcOETlnHggOsJOY7B
- XEfrTe/WpKSSZgX/jzGOr/gmpe8D9XH8RutPA+2hsZXVnYtIs3gLgxr7Qqkbzl1z2wz5/gLB
-X-Proofpoint-GUID: Fq4fS4gYvQGDIr7sQQoEsd84BSEkGfnM
-X-Proofpoint-ORIG-GUID: Fq4fS4gYvQGDIr7sQQoEsd84BSEkGfnM
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-07-17_01,2025-07-17_02,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- malwarescore=0 lowpriorityscore=0 suspectscore=0 adultscore=0
- priorityscore=1501 clxscore=1015 bulkscore=0 phishscore=0 spamscore=0
- mlxlogscore=999 mlxscore=0 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
- definitions=main-2507170126
+ <d52a8216-dd70-4489-a645-55d174bcdd9e@kernel.dk> <08f3f802-e3c3-b851-b4ee-912eade04c6f@huaweicloud.com>
+ <aHeBiu9pHZwO95vW@fedora> <99b5326f-7ef6-46d8-a423-95b1b4e7c7fb@linux.ibm.com>
+ <aHg9oRFYjSsNvY0_@fedora> <d55c37f0-d21c-48e8-9856-1e3d08d6cde4@linux.ibm.com>
+In-Reply-To: <d55c37f0-d21c-48e8-9856-1e3d08d6cde4@linux.ibm.com>
+From: Yi Zhang <yi.zhang@redhat.com>
+Date: Thu, 17 Jul 2025 22:25:56 +0800
+X-Gm-Features: Ac12FXxm95zBIsAwCRMu41Ez8Hu9ym05PUillPXF6BTpO8qgux9SA0GXmACZgYI
+Message-ID: <CAHj4cs-hrakSa7ht_yD-CKMX5CVEs=etZWyi75Jvzj75DCxnZQ@mail.gmail.com>
+Subject: Re: [bug report] kmemleak issue observed during blktests
+To: Nilay Shroff <nilay@linux.ibm.com>
+Cc: Ming Lei <ming.lei@redhat.com>, Yu Kuai <yukuai1@huaweicloud.com>, 
+	Jens Axboe <axboe@kernel.dk>, linux-block <linux-block@vger.kernel.org>, 
+	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>, "yukuai (C)" <yukuai3@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Thu, Jul 17, 2025 at 10:12=E2=80=AFPM Nilay Shroff <nilay@linux.ibm.com>=
+ wrote:
+>
+>
+>
+> On 7/17/25 5:32 AM, Ming Lei wrote:
+> > On Thu, Jul 17, 2025 at 12:54:31AM +0530, Nilay Shroff wrote:
+> >>
+> >>
+> >> On 7/16/25 4:10 PM, Ming Lei wrote:
+> >>> On Wed, Jul 16, 2025 at 03:50:34PM +0800, Yu Kuai wrote:
+> >>>> Hi,
+> >>>>
+> >>>> =E5=9C=A8 2025/07/16 9:54, Jens Axboe =E5=86=99=E9=81=93:
+> >>>>> unreferenced object 0xffff8882e7fbb000 (size 2048):
+> >>>>>    comm "check", pid 10460, jiffies 4324980514
+> >>>>>    hex dump (first 32 bytes):
+> >>>>>      00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  .............=
+...
+> >>>>>      00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  .............=
+...
+> >>>>>    backtrace (crc c47e6a37):
+> >>>>>      __kvmalloc_node_noprof+0x55d/0x7a0
+> >>>>>      sbitmap_init_node+0x15a/0x6a0
+> >>>>>      kyber_init_hctx+0x316/0xb90
+> >>>>>      blk_mq_init_sched+0x416/0x580
+> >>>>>      elevator_switch+0x18b/0x630
+> >>>>>      elv_update_nr_hw_queues+0x219/0x2c0
+> >>>>>      __blk_mq_update_nr_hw_queues+0x36a/0x6f0
+> >>>>>      blk_mq_update_nr_hw_queues+0x3a/0x60
+> >>>>>      find_fallback+0x510/0x540 [nbd]
+> >>>>
+> >>>> This is werid, and I check the code that it's impossible
+> >>>> blk_mq_update_nr_hw_queues() can be called from find_fallback().
+> >>>
+> >>> Yes.
+> >>>
+> >>>> Does kmemleak show wrong backtrace?
+> >>>
+> >>> I tried to run blktests block/005 over nbd, but can't reproduce this
+> >>> kmemleak report after setting up the detector.
+> >>
+> >> I have analyzed this bug and found the root cause:
+> >>
+> >> The issue arises while we run nr_hw_queue update,  Specifically, we fi=
+rst
+> >> reallocate hardware contexts (hctx) via __blk_mq_realloc_hw_ctxs(), an=
+d
+> >> then later invoke elevator_switch() (assuming q->elevator is not NULL)=
+.
+> >> The elevator switch code would first exit old elevator (elevator_exit)
+> >> and then switch to new elevator. The elevator_exit loops through
+> >> each hctx and invokes the elevator=E2=80=99s per-hctx exit method ->ex=
+it_hctx(),
+> >> which releases resources allocated during ->init_hctx().
+> >>
+> >> This memleak manifests when we reduce the num of h/w queues - for exam=
+ple,
+> >> when the initial update sets the number of queues to X, and a later up=
+date
+> >> reduces it to Y, where Y < X. In this case, we'd loose the access to o=
+ld
+> >> hctxs while we get to elevator exit code because __blk_mq_realloc_hw_c=
+txs
+> >> would have already released the old hctxs. As we don't now have any re=
+ference
+> >> left to the old hctxs, we don't have any way to free the scheduler res=
+ources
+> >> (which are allocate in ->init_hctx()) and kmemleak complains about it.
+> >>
+> >> Regarding reproduction, I was also not able to recreate it using block=
+/005
+> >> but then I wrote a script using null-blk driver which updates nr_hw_qu=
+eue
+> >> from X to Y (where Y < X) and I encountered this memleak. So this is n=
+ot
+> >> an issue with nbd driver.
+> >>
+> >> I've implemented a potential fix for the above issue and I'm unit
+> >> testing it now. I will post a formal patch in some time.
+> >
+> > Great!
+> >
+> > Looks it is introduced in commit 596dce110b7d ("block: simplify elevato=
+r reattachment
+> > for updating nr_hw_queues"), but easy to cause panic with that patchset=
+.
+> >
+> Yeah correct.
+>
+> > One simple fix is to restore to original two-stage elevator switch, mea=
+ntime saving
+> > elevator name in xarray for not adding boilerplate code back.
+>
+> Agreed, I did implement the same and the fix is on its way...
+>
+> Thanks,
+> --Nilay
+>
 
+Hi Nilay
 
-On 7/17/25 6:16 AM, Yi Zhang wrote:
-> 
-> Sorry for the late response, it takes me some time to find which case
-> triggered the kmemleak.
-> It turns out that block/040[1] triggered the kmemleak, and just
-> running [2] after block/040 can not trigger the kmemleak immediately.
-> We have to wait for more time.
-> [1]
-> [  458.175983] null_blk: disk nullb0 created
-> [  458.180035] null_blk: module loaded
-> [  458.397994] run blktests block/040 at 2025-07-16 20:31:20
-> [  458.571488] null_blk: disk nullb1 created
-> [  874.620574] kmemleak: 522 new suspected memory leaks (see
-> /sys/kernel/debug/kmemleak)
-> [2]
-> echo scan >/sys/kernel/debug/kmemleak
-> 
-This brings to mind a potential improvement: why don’t we enable
-kmemleak checks in blktests? We could clear the kmemleak state at
-the beginning of each test, run the test, and then scan for any
-reported memory leaks.
+How about update the patch with the below trace which doesn't have nbd info=
+:
 
-If kmemleak reports a leak, we could:
-- Mark the test as failed.
-- Append the leak details to the test log for later review.
+unreferenced object 0xffff8881b82f7400 (size 512):
+  comm "check", pid 68454, jiffies 4310588881
+  hex dump (first 32 bytes):
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace (crc 5bac8b34):
+    __kvmalloc_node_noprof+0x55d/0x7a0
+    sbitmap_init_node+0x15a/0x6a0
+    kyber_init_hctx+0x316/0xb90
+    blk_mq_init_sched+0x419/0x580
+    elevator_switch+0x18b/0x630
+    elv_update_nr_hw_queues+0x219/0x2c0
+    __blk_mq_update_nr_hw_queues+0x36a/0x6f0
+    blk_mq_update_nr_hw_queues+0x3a/0x60
+    0xffffffffc09ceb80
+    0xffffffffc09d7e0b
+    configfs_write_iter+0x2b1/0x470
+    vfs_write+0x527/0xe70
+    ksys_write+0xff/0x200
+    do_syscall_64+0x98/0x3c0
+    entry_SYSCALL_64_after_hwframe+0x76/0x7e
+unreferenced object 0xffff8881b82f6000 (size 512):
+  comm "check", pid 68454, jiffies 4310588881
+  hex dump (first 32 bytes):
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace (crc 5bac8b34):
+    __kvmalloc_node_noprof+0x55d/0x7a0
+    sbitmap_init_node+0x15a/0x6a0
+    kyber_init_hctx+0x316/0xb90
+    blk_mq_init_sched+0x419/0x580
+    elevator_switch+0x18b/0x630
+    elv_update_nr_hw_queues+0x219/0x2c0
+    __blk_mq_update_nr_hw_queues+0x36a/0x6f0
+    blk_mq_update_nr_hw_queues+0x3a/0x60
+    0xffffffffc09ceb80
+    0xffffffffc09d7e0b
+    configfs_write_iter+0x2b1/0x470
+    vfs_write+0x527/0xe70
+    ksys_write+0xff/0x200
+    do_syscall_64+0x98/0x3c0
+    entry_SYSCALL_64_after_hwframe+0x76/0x7e
+unreferenced object 0xffff8881b82f5800 (size 512):
+  comm "check", pid 68454, jiffies 4310588881
+  hex dump (first 32 bytes):
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace (crc 5bac8b34):
+    __kvmalloc_node_noprof+0x55d/0x7a0
+    sbitmap_init_node+0x15a/0x6a0
+    kyber_init_hctx+0x316/0xb90
+    blk_mq_init_sched+0x419/0x580
+    elevator_switch+0x18b/0x630
+    elv_update_nr_hw_queues+0x219/0x2c0
+    __blk_mq_update_nr_hw_queues+0x36a/0x6f0
+    blk_mq_update_nr_hw_queues+0x3a/0x60
+    0xffffffffc09ceb80
+    0xffffffffc09d7e0b
+    configfs_write_iter+0x2b1/0x470
+    vfs_write+0x527/0xe70
 
-This would help catch resource leaks more proactively during 
-automated testing. If all agrees, then I could workout a patch
-to blktests for the above improvement.
+    ksys_write+0xff/0x200
+    do_syscall_64+0x98/0x3c0
+    entry_SYSCALL_64_after_hwframe+0x76/0x7e
 
-Thanks,
---Nilay
+--
+Best Regards,
+  Yi Zhang
+
