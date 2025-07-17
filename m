@@ -1,29 +1,32 @@
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B59E91ADFFB
-	for <linux-block@vger.kernel.org>; Thu, 17 Jul 2025 04:43:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 142594C9D;
+	Thu, 17 Jul 2025 04:52:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752727431; cv=none; b=YzyhCh73BVbjqxeT+ZHeWN21jYBrgkGiJqcMeNDfBdsmGtqq90fs4Ekd1vDqRKNReaxq/7UZxGHL50DZYo8/yZLmHrScfUx8YoON4IoY/C1wTtW0mOr3n3Uin8eVutB1MIPrFJRmm/G7rgzGQ38XcSFJ2zPFjNLSif1XB3VWv0I=
+	t=1752727939; cv=none; b=SFNjsKlbzJhg2nRsYXM0quqM7uGUPl+3EQBR30BomfANGltWeOlmC2xL/vGNm5LptO3KGi9+X7Rijv4gxdEQioLG6n7In4rP/enCi1W99IxG5npsvUfAjAgj8pG6u6YWJ1/MpiI2KwiEzMsoj2Z+k5ohTX5IOagvFcmAtEJ3v8g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752727431; c=relaxed/simple;
-	bh=dng3xfXcwSkfpXsZ7pZ54ry+QYJwjgyS4HsFMaEU6+M=;
+	s=arc-20240116; t=1752727939; c=relaxed/simple;
+	bh=1DHr20168nm4djO5OBO8XISMQPBKPH9fESyvyeP1R1s=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=luDM3LOAOuu9KqvAuMxSzIXHKB1gVEFwvOKU4b8/fz/+zXx1qnvl3c3+r5jvq0XLNy61bwemMzpu2QkGlZbGxhIrcKrvxfRoxSA1is0wiysdLenaB9W2YQNvSiKmNRirwfe8XkYZvXr3ubTtHrgV4jIP8XzUrZdrC14WthTNnus=
+	 Content-Type:Content-Disposition:In-Reply-To; b=t0aQH2BCYF5MEDCCwiMQrBKs4uDWvVmb2b6rVz48JdnbNrCDUYTieTiHTvBCsjF8vZ/NUWYNELGPdlZT2Pe07XAOd5hzOuqmF3EUgELDeBfxNTYmJP9zqjkL1zlVkFabijHUXXgHfk9qp6RVYxGr4emKmJ20HIv0FHW8jitH4PI=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
 Received: by verein.lst.de (Postfix, from userid 2407)
-	id C1045227A87; Thu, 17 Jul 2025 06:43:42 +0200 (CEST)
-Date: Thu, 17 Jul 2025 06:43:42 +0200
+	id E6955227A87; Thu, 17 Jul 2025 06:52:10 +0200 (CEST)
+Date: Thu, 17 Jul 2025 06:52:10 +0200
 From: Christoph Hellwig <hch@lst.de>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH v3 0/7] Fix bio splitting by the crypto fallback code
-Message-ID: <20250717044342.GA26995@lst.de>
-References: <20250715201057.1176740-1-bvanassche@acm.org> <20250715214456.GA765749@google.com>
+To: Yu Kuai <yukuai@kernel.org>
+Cc: Coly Li <i@coly.li>, Christoph Hellwig <hch@lst.de>,
+	Coly Li <colyli@kernel.org>, linux-raid@vger.kernel.org,
+	linux-block@vger.kernel.org, Yu Kuai <yukuai3@huawei.com>,
+	Xiao Ni <xni@redhat.com>, Hannes Reinecke <hare@suse.de>,
+	Martin Wilck <mwilck@suse.com>, Keith Busch <kbusch@kernel.org>
+Subject: Re: [RFC PATCH] md: split bio by io_opt size in md_submit_bio()
+Message-ID: <20250717045210.GA27227@lst.de>
+References: <437E98DD-7D64-49BF-9F2C-04CB0A142A88@coly.li> <20250716114121.GA32207@lst.de> <D12A8BDA-5C2B-4FA7-9C92-731BD321A611@coly.li> <20250716114533.GA32631@lst.de> <danlsghtalte7sku3vlfxkgngujgwzspanfayaxy4jfnk54jbf@yfvmr5plavmp> <20250716121449.GB2043@lst.de> <DE36C995-4014-44DC-A998-1C4FF9AFD7F9@coly.li> <20250716121745.GA2700@lst.de> <109C6212-FE63-4FD2-ACC3-F64C44C7D227@coly.li> <284433c9-c11d-401f-8015-41faa9d0fde1@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -32,44 +35,21 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250715214456.GA765749@google.com>
+In-Reply-To: <284433c9-c11d-401f-8015-41faa9d0fde1@kernel.org>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Tue, Jul 15, 2025 at 09:44:56PM +0000, Eric Biggers wrote:
-> Overall, it's a bit frustrating seeing these patches go by that propose
-> to silently leave data unencrypted when upper layers requested that it
-> be encrypted.  IMO this is actually a point against handling encryption
-> in the block layer...  The whole point of storage encryption (whether
-> fscrypt, dm-crypt, dm-inlinecrypt, or something else) is that the data
-> is actually encrypted.  But if the actual encryption is done using code
-> whose developers / maintainers don't really consider encryption to be a
-> priority, that's not a great place to be.
+On Thu, Jul 17, 2025 at 12:29:27AM +0800, Yu Kuai wrote:
+>> If opt_io_size is (chunk_size * data_disks), setting new max_hw_sectors as rounddown(current max_hw_sectors, opt_io_size) is good idea.
+>
+> I think round down max_hw_sectors to io_opt(chunk_size * data_disks) will 
+> really
+> make things much easier, perhaps Christoph means this way. All you need to 
+> do is to
+> handle not aligned bio and split that part, and for aligned bio fall back 
+> to use
+> bio_split_to_limits().
 
-Getting back to this.  While the ton is a bit snarky, it brings up a good
-point.  Relying on the block layer to ensure that data is always
-encrypted seems like a bad idea, given that is really not what the block
-layer is about, and definitively not high on the mind of anyone touching
-the code.  So I would not want to rely on the block layer developers to
-ensure that data is encrypted properly through APIs not one believes part
-that mission.
+If the raid5 code can handle multiple stripes per I/O, than you
+just need to round it down, yes.  I assumed it could only handle
+a single full or partial stripe at a time, but I guess I was wrong.
 
-So I think you'd indeed be much better off not handling the (non-inline)
-incryption in the block layer.
-
-Doing that in fact sounds pretty easy - instead of calling the
-blk-crypto-fallback code from inside the block layer, call it from the
-callers instead of submit_bio when inline encryption is not actually
-supported, e.g.
-
-	if (!blk_crypto_config_supported(bdev, &crypto_cfg))
-		blk_crypto_fallback_submit_bio(bio);
-	else
-		submit_bio(bio);
-
-combined with checks in the low-level block code that we never get a
-crypto context into the low-level submission into ->submit_bio or
-->queue_rq when not supported.
-
-That approach not only is much easier to verify for correct encryption
-operation, but also makes things like bio splitting and the required
-memory allocation for it less fragile.
