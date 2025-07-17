@@ -1,152 +1,93 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A2E129B22D
-	for <linux-block@vger.kernel.org>; Thu, 17 Jul 2025 10:52:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9290729A9FE
+	for <linux-block@vger.kernel.org>; Thu, 17 Jul 2025 11:37:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752749567; cv=none; b=BW0fCO4oj1mxgldo9YJTeS+S3alU+ZyP0tGkNaDKPZr9RXJvJgcbbuaO7h1k1rYBbxjf6Xnpi0aJWwKI+ern/0WH9/PNoH/W+UGHbw48hSNXgRg29fxetnR/EiBfgRE+KuvdJRoo3F6wWFUnZw0XKwZPUCy5V+udZ5MnaLU7baM=
+	t=1752752223; cv=none; b=PQM1jncuAB4h0JOg2l1OoBps0iQiNQacuK6yDNXp0GcrtyHyFHvYv8057tMHAeodnuwpLFKFNIXiXI1Vdchrnbce+vjE23jdBRznAoNOaRMUfViWbTCweauk93iFnrBpRdYB5kWKjLchfgkl8j+N+fM/YRVr2w6dIxyNwFC40vQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752749567; c=relaxed/simple;
-	bh=Yjrduz0zHZnXsjD1NCSlvcO896Gr7Ip/3vFBC5vN66M=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=H4THDWJ3JqtmXxxepQb2UpvYSbMuLrEBzg2skouXKjlH5oW5Ytd6wlmYurPdRUwPdhpUFWjIKmoC3Y+DBvRd3OOr6wcyIBA3zMJIfnXeCkG7AJGGm1KBMZbaxMX13EKccMG9wjPJdCVxmE8On3OSAvax+U/vwh46fSoSyJmhYtA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RvMDB73Z; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1752752223; c=relaxed/simple;
+	bh=9J1Ew4TZsghQQfy890MfkF8wAm2MwJv2s26WVEL+A6Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=rZULW2igZ/FHNvhQm3//lTSmGYeY1i8qyD190Hqb2k1yMUJfqgSA+tpm16ueMvc1SehVCFOMsv6Hz8CvWJCi1VUeP58FCchP4NIJmccyuVS/7i2eeuS/bvNdfGd5fzdYx4O+r/3+bQArDvL8RyroeQ+opXdPjZfk5cKMSFIzCFk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=fyYBzgdm; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RvMDB73Z"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752749564;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Ky4QUOopsMW3nX5KHpu6kPgcddWT/xNbScFkjjv2xpE=;
-	b=RvMDB73ZGcGjIrPJQ66Hcsuij5x6r4d5cQ78LXAKESDInJrES81GQZYop+9ziWzp8wBzr6
-	vdyumxUkGT97ErlXmDv6lhjY57Pl2jrk1D6EinurHF3iXgkYkeqxGv6NPt5XUdumyjjXpC
-	U/Yq7deUkmnlJLJgPjCQgp/iSMYdMWM=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-673-hK2DZC_KPoyfLLNxXspa8g-1; Thu,
- 17 Jul 2025 06:52:41 -0400
-X-MC-Unique: hK2DZC_KPoyfLLNxXspa8g-1
-X-Mimecast-MFC-AGG-ID: hK2DZC_KPoyfLLNxXspa8g_1752749560
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 71D9E1800282;
-	Thu, 17 Jul 2025 10:52:39 +0000 (UTC)
-Received: from [10.22.80.10] (unknown [10.22.80.10])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 32624196664F;
-	Thu, 17 Jul 2025 10:52:36 +0000 (UTC)
-Date: Thu, 17 Jul 2025 12:52:31 +0200 (CEST)
-From: Mikulas Patocka <mpatocka@redhat.com>
-To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-cc: linux-block@vger.kernel.org, dm-devel@lists.linux.dev, 
-    Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
-    Mike Snitzer <snitzer@kernel.org>
-Subject: Re: [PATCH for-next v2] dm: split write BIOs on zone boundaries when
- zone append is not emulated
-In-Reply-To: <20250717103539.37279-1-shinichiro.kawasaki@wdc.com>
-Message-ID: <1c653ea9-2cb0-8d81-0940-b9bfb9940545@redhat.com>
-References: <20250717103539.37279-1-shinichiro.kawasaki@wdc.com>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="fyYBzgdm"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Type:MIME-Version:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:In-Reply-To:References;
+	bh=LiMX4zXZm5inHHY6IvtGUw3iKra4Hn1K3aeA1DUKkgU=; b=fyYBzgdmWP+gij/+3SwyJQZhdC
+	GxpmrK1TwhOlEno2NlvA3xzDRZQIOMehfMZ+aLGXMHrISoeLJZX+lrwVx2fKV17T00OVjWX8rLLgK
+	RdZ9cD49rmhMNJttdH52gally+EVzEbNLK6jj8cQ7glYWon0LlFjwt1q7kopS8v1LBMPh9UTAfDY9
+	AvPhQXIpRcD5IxO4rHqcwVCg5kEFCE1lCGOJ9hgkr7NbAeiYdkpjCIK/CVVMOSWs3HVs5KCH67U68
+	E1tyDRU8MEaavu4OXGY6jo/X5J+zbA74JJlpFROF0pOYKHb+2w08zgg4WP8gfGdVSvB4i65r51zM4
+	q3GqSkEw==;
+Received: from 2a02-8389-2341-5b80-d601-7564-c2e0-491c.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:d601:7564:c2e0:491c] helo=localhost)
+	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1ucMv5-00000009zfq-3x5k;
+	Thu, 17 Jul 2025 11:37:00 +0000
+Date: Thu, 17 Jul 2025 13:36:56 +0200
+From: Christoph Hellwig <hch@infradead.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Keith Busch <kbusch@kernel.org>,
+	Jens Axboe <axboe@fb.com>, Sagi Grimberg <sagi@grimberg.me>,
+	Chaitanya Kulkarni <kch@nvidia.com>, linux-nvme@lists.infradead.org
+Subject: [GIT PULL] nvme fixes for Linux 6.16
+Message-ID: <aHjgWKyuasbJrqg6@infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
+The following changes since commit 3051247e4faa32a3d90c762a243c2c62dde310db:
 
+  block: fix kobject leak in blk_unregister_queue (2025-07-11 20:39:23 -0600)
 
-On Thu, 17 Jul 2025, Shin'ichiro Kawasaki wrote:
+are available in the Git repository at:
 
-> Commit 2df7168717b7 ("dm: Always split write BIOs to zoned device
-> limits") updates the device-mapper driver to perform splits for the
-> write BIOs. However, it did not address the cases where DM targets do
-> not emulate zone append, such as in the cases of dm-linear or dm-flakey.
-> For these targets, when the write BIOs span across zone boundaries, they
-> trigger WARN_ON_ONCE(bio_straddles_zones(bio)) in
-> blk_zone_wplug_handle_write(). This results in I/O errors. The errors
-> are reproduced by running blktests test case zbd/004 using zoned
-> dm-linear or dm-flakey devices.
-> 
-> To avoid the I/O errors, handle the write BIOs regardless whether DM
-> targets emulate zone append or not, so that all write BIOs are split at
-> zone boundaries. For that purpose, drop the check for zone append
-> emulation in dm_zone_bio_needs_split(). Its argument 'md' is no longer
-> used then drop it also.
-> 
-> Fixes: 2df7168717b7 ("dm: Always split write BIOs to zoned device limits")
-> Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-> Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
+  git://git.infradead.org/nvme.git tags/nvme-6.16-2025-07-17
 
-Reviewed-by: Mikulas Patocka <mpatocka@redhat.com>
+for you to fetch changes up to 0523c6cc87e558c50ff4489c87c54c55068b1169:
 
-> ---
-> * Changes from v1:
-> - Dropped the first paragraph of the commit message
-> - Improved the block comment
-> 
->  drivers/md/dm.c | 18 +++++++-----------
->  1 file changed, 7 insertions(+), 11 deletions(-)
-> 
-> diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-> index ca889328fdfe..abfe0392b5a4 100644
-> --- a/drivers/md/dm.c
-> +++ b/drivers/md/dm.c
-> @@ -1785,8 +1785,7 @@ static void init_clone_info(struct clone_info *ci, struct dm_io *io,
->  }
->  
->  #ifdef CONFIG_BLK_DEV_ZONED
-> -static inline bool dm_zone_bio_needs_split(struct mapped_device *md,
-> -					   struct bio *bio)
-> +static inline bool dm_zone_bio_needs_split(struct bio *bio)
->  {
->  	/*
->  	 * Special case the zone operations that cannot or should not be split.
-> @@ -1802,13 +1801,11 @@ static inline bool dm_zone_bio_needs_split(struct mapped_device *md,
->  	}
->  
->  	/*
-> -	 * Mapped devices that require zone append emulation will use the block
-> -	 * layer zone write plugging. In such case, we must split any large BIO
-> -	 * to the mapped device limits to avoid potential deadlocks with queue
-> -	 * freeze operations.
-> +	 * When mapped devices use the block layer zone write plugging, we must
-> +	 * split any large BIO to the mapped device limits to not submit BIOs
-> +	 * that span zone boundaries and to avoid potential deadlocks with
-> +	 * queue freeze operations.
->  	 */
-> -	if (!dm_emulate_zone_append(md))
-> -		return false;
->  	return bio_needs_zone_write_plugging(bio) || bio_straddles_zones(bio);
->  }
->  
-> @@ -1932,8 +1929,7 @@ static blk_status_t __send_zone_reset_all(struct clone_info *ci)
->  }
->  
->  #else
-> -static inline bool dm_zone_bio_needs_split(struct mapped_device *md,
-> -					   struct bio *bio)
-> +static inline bool dm_zone_bio_needs_split(struct bio *bio)
->  {
->  	return false;
->  }
-> @@ -1960,7 +1956,7 @@ static void dm_split_and_process_bio(struct mapped_device *md,
->  
->  	is_abnormal = is_abnormal_io(bio);
->  	if (static_branch_unlikely(&zoned_enabled)) {
-> -		need_split = is_abnormal || dm_zone_bio_needs_split(md, bio);
-> +		need_split = is_abnormal || dm_zone_bio_needs_split(bio);
->  	} else {
->  		need_split = is_abnormal;
->  	}
-> -- 
-> 2.50.1
-> 
+  nvmet-tcp: fix callback lock for TLS handshake (2025-07-15 09:49:13 +0200)
 
+----------------------------------------------------------------
+nvme-fix for Linux 6.16
+
+ - revert the cross-controller atomic write size validation that caused
+   regressions (Christoph Hellwig)
+ - fix endianness of command word prints in nvme_log_err_passthru()
+   (John Garry)
+ - fix callback lock for TLS handshake (Maurizio Lombardi)
+ - fix misaccounting of nvme-mpath inflight I/O (Yu Kuai)
+ - fix inconsistent RCU list manipulation in nvme_ns_add_to_ctrl_list()
+   (Zheng Qixing)
+
+----------------------------------------------------------------
+Christoph Hellwig (1):
+      nvme: revert the cross-controller atomic write size validation
+
+John Garry (1):
+      nvme: fix endianness of command word prints in nvme_log_err_passthru()
+
+Maurizio Lombardi (1):
+      nvmet-tcp: fix callback lock for TLS handshake
+
+Yu Kuai (1):
+      nvme: fix misaccounting of nvme-mpath inflight I/O
+
+Zheng Qixing (1):
+      nvme: fix inconsistent RCU list manipulation in nvme_ns_add_to_ctrl_list()
+
+ drivers/nvme/host/core.c  | 27 +++++++++++----------------
+ drivers/nvme/target/tcp.c |  4 ++--
+ 2 files changed, 13 insertions(+), 18 deletions(-)
