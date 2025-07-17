@@ -1,79 +1,73 @@
-Received: from mail-il1-f172.google.com (mail-il1-f172.google.com [209.85.166.172])
+Received: from mail-il1-f179.google.com (mail-il1-f179.google.com [209.85.166.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5AF129CB3A
-	for <linux-block@vger.kernel.org>; Thu, 17 Jul 2025 12:01:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AFDD29DB76
+	for <linux-block@vger.kernel.org>; Thu, 17 Jul 2025 12:03:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752753716; cv=none; b=m8VWm2IwIsADPyB0t95ykZZubpBiAwnm34BLM42RLfxBfp2l0CsMBXnp4s/4V1oZMCXkoS/NsfYsvQPRyBiioNbEAsqZySpC0nbZyI8haQrMP8vFK/6Ax5UE2XBTDWMkSrr5YwOt6GbrQ2aeABHKvC96svdEFya5KqB2NHPRLkU=
+	t=1752753800; cv=none; b=ILgmycei4fTTx2bM3dekzYaQaO34uWUpUYergTg//MBKLwHPMnIs55EzWVURIeT5QuyJbHvIfmyf0FrRJeaRJKajJDOp6NJAUoOpAV3UNm9Z8uVxhoGcq60q1AC56OV4YneFvDCTCuA1H9oMZ9hA6XNtymoYBZiLlRdUaE7AAF0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752753716; c=relaxed/simple;
-	bh=kjEyn7nEjF8oiVB6GgmGedSuLAr7HCIjBycrDFOZBKY=;
+	s=arc-20240116; t=1752753800; c=relaxed/simple;
+	bh=jy1nYicwP571nkfz1sS0ftJUShTC8h6ew9d+l9gdzcs=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=fP6e7N/rGjxt4Noq9A5gqdRJWO55NkqXeO8tNiAwp7uQEBWRC5mDHflpVXWiY3R5BEKL7gUNIfh3mG5DoDsnZw3YCWu+MAc/D56NwIIRkMSm2DInwTslSwEA5kwRVrr7Sbwu9ewbtEllVWPqF6QbGbR1gi8kpqeRZgo9+xS28v0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=gwAgVBlH; arc=none smtp.client-ip=209.85.166.172
+	 MIME-Version:Content-Type; b=Tl6LBwpgMjm4LxtE97bhSCmu8PhgvSWaLy5quveSAT6aJvFk6pJ7hU+c7Os+WSQ1v8QWmLalfs9tWY1ZU6aqiiAQp6xx4YpPZwXlfKLFlCJMgju2nHkhe2WLzsRX6BZSXw34KD8Yt8/jNR9mujq0AQ4Xsn+Kqv+G7b231Hkq1fE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=meG3iLwg; arc=none smtp.client-ip=209.85.166.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="gwAgVBlH"
-Received: by mail-il1-f172.google.com with SMTP id e9e14a558f8ab-3df3854e622so5715485ab.1
-        for <linux-block@vger.kernel.org>; Thu, 17 Jul 2025 05:01:54 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="meG3iLwg"
+Received: by mail-il1-f179.google.com with SMTP id e9e14a558f8ab-3df2d111fefso7385585ab.1
+        for <linux-block@vger.kernel.org>; Thu, 17 Jul 2025 05:03:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1752753713; x=1753358513; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1752753797; x=1753358597; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=61ZOPEc1Npv0N7lkKyvYLgeXrgu1p1u4u8vtKljsiog=;
-        b=gwAgVBlHVddGdAXzMkhgmfDRRtYO4Nzb3OGqynGQZjRMPf1DbQUXszMLglgqndBcqZ
-         pS2sM7bMkm7PLrpsxjQWkaugLqf1GlUjebeayRFg3IxDnennguEMowzFx0lch5GU5kd0
-         H9I6QIpMGkfMOQOWDacz6KGFg5J9Fqz9o8VAsqmFLHofMVSRN49+HKT1UdL2lXIZunSS
-         BX1FMRP65Qgist2k0pFGgoGMywgWszSeCwIf69k/r58XuaqyRbPE4wrpeW4hXK4cHxi+
-         Noik0kZ5JzRZR4gBI9K+rwqI88I9re8YjPwd0Rlgwz8Cm1haiQjpQAEuc3brSnHlA7W6
-         2wvw==
+        bh=lumM2yQ8Yhssc9akl4RdGjzpp2HwGSl6F0XVW4q/Y04=;
+        b=meG3iLwgvanPWmulsmxWgB3fV0xfW7VwFBq1gp93yVEhOIw3skz50y5PW71GB4Jhqh
+         wU5rhI2vEU9WXImCDGWLM/7ZS+E0A7IO3ftSGQKYCtg1oCwuXfhYELYB81sDprE6FjmI
+         L0K2yiiwoq8l6M7YuI/jSsUyfd6Zf4zRV2t/c9xlfz5lFVUQDAIhFBYu7j8aKhKDMJpz
+         EyaqGrK4O9UIxAvgxdR/UXrvTsyAGEQ3DIOK+inTnxiwC96rSGqLQs1H6pTlpDoPjoFq
+         Q55ULT6TRoAIuidv3+AlQ32wpGOs41wDRWfOusasyZbD/Ory7VWzisTqn22WcLe6XCTl
+         irWg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752753713; x=1753358513;
+        d=1e100.net; s=20230601; t=1752753797; x=1753358597;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=61ZOPEc1Npv0N7lkKyvYLgeXrgu1p1u4u8vtKljsiog=;
-        b=fpTJ56LKjRikhLiyhr2lIm7GxnNOF87kd7wos1ApACfUKYgYybPFewJHGTTws/k2HE
-         xLpJyRMLNrFbq+kmUW+EST5J8w9ud+7LNwQMhpoLyl9PUl8QSx5lKY3RX/UPwq37bAIE
-         LXFpZILMQDG5YDAsDVlMxApeFuyqmayb2jR4tOugRNCZO8dWXKMnlYzTosgmETkCVo/5
-         T6fO73JakQOXPyLJIMiu+SRSg1yPx8dI1XlupyCfymyycVBfDGbzzn0c9T2cixc2tybe
-         Ft9c2YSbWDIozrEftfRxzcg+JUUUjW9lnI1qZJ9vqMHT5yxBv+qbB4z6aOxN/IOjoc4F
-         v+BA==
-X-Forwarded-Encrypted: i=1; AJvYcCWnYWIg9bE285B1LmuZHHCoGoZR8mFmaMafAW7WVGpsFPVkqNeNJSYC7z+o2tER1M3yNZ97aMW6F6OeKA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwM1Q33AEpQpa/XFEtFvaBMI5U7dnjgYeDM5zsV81wOdmdQz6up
-	Rf0XcZz1AEklB9Q8xzFAtmmpxMS11dvUz8CLcceHYmlYLBkw9oEhXCeceNfk5zjsf3w/J8e+foz
-	jKOIX
-X-Gm-Gg: ASbGncu3uQfg1DRQhYVCbca7X2an/RYOJY63MIY4RgCF+bmVLgsFdrm/aHbZU3HgXbI
-	DtaeZy5VVh3fq5ujQmSs9FuKSYNHixDvISbvig2j45FYnYDvm+8vd7ucNZbjUByrZVtpodMn+0d
-	natWLIb+qOR7b5SSdm/JFNWYbGM1/hOVV7HeH3yFfWaVJgLmLL+0e1wdZKSc/mwmb0dIY1/21lh
-	e2Jjzr4+8u7UReCwe/H6Us6NmYa54NNN8jewrTR3C8XDSi7cjLxprL66IeKCOHRYqNHorWgoF27
-	o80hbGaJIseWzs9Rq9CAmgMUweNek+/VfAZ3GVJJVS8nGG/gPUs1oc5qQLaxTw7g6kJl1Nv42NJ
-	bytvFCUeh7PWx/g==
-X-Google-Smtp-Source: AGHT+IGuqUVz1MlM22DWouaSIEqVc7JUz/swP0ZPOQK4pvQiO3B+o4V938h5qOKiQPbhSq72i+cb3A==
-X-Received: by 2002:a05:6e02:4618:b0:3df:e7d:fda8 with SMTP id e9e14a558f8ab-3e28b718bcamr29664265ab.1.1752753712400;
-        Thu, 17 Jul 2025 05:01:52 -0700 (PDT)
+        bh=lumM2yQ8Yhssc9akl4RdGjzpp2HwGSl6F0XVW4q/Y04=;
+        b=H/DBZdvT2epx4PdWtAf1ist9GpVO992mTvVDW7wZLkPZdR59idQ8++pz2OLUQ8w18G
+         gMjabhWmIBK5y7oVvtwqX+bhRWZ1HL9vn4wNEzoJd94lGpLKxgwLZE1cnnpplVagPBCT
+         JZwO7w/lYDuSjnq85Jh5qRWbEbzgri3SxZmQhjOFxAGVGAoXTnRUZRlLJGIaAPIK1Iic
+         lyRd2q/7kWnII+yFaHyaZjkrjQdoc5FfmH+RTIMelZrw9qzHvxo2rJN6XPMMuDilW5fU
+         cGe2aOSHl/rwSFcqnODUG2ohRoQfJFGHNsEAg/x1pJ99O4fA0+RZutQih1FhHeCy2d+w
+         j2gA==
+X-Gm-Message-State: AOJu0YwvAg5SwAyakQFknv6FfYaCjGcdsSG7JUl8fPTxLNzdHbYnTqHF
+	Cf3Pv3Gl+xL1q40lBh82T+kzq3clSpEw+O2Fkn6toYz+Pt2lh0y1VEvLnp3TMxiaU8M=
+X-Gm-Gg: ASbGncugL8I3WqDH+XKyGpTlvyqDkyUQSR1P0q9mc7QRGr9gIW8DS6seiGJr/oB+nEh
+	G7aUvvJ0ZRBSIqFaPYi8XgkT5DSCWOy4pELZ+p9ijieEXzgOFb+wvXjU1WVvpMHWX40GGnOYLqk
+	9786qDPUussb8w3lyfaLqDLSOK9V+za+qHgmy5+mZNzJ0X8+62YScZLLsbLwTe52bNOJ+LPWsGh
+	6K+wOKLdz9CyfVEfQoPIAk6+6x9XZ8e+NR+AdDnDMxvP5ERdrAKyIgxIfW8JC982D4YmLKX+dlI
+	L2ft76jIdU+kFElS4i1U0B4L4MHT8RH6cktQKw0ekNQqn2JJg5ODJW416hPL0kMKGntTWVLZb7P
+	+YVWQ6X+7x2gCNg==
+X-Google-Smtp-Source: AGHT+IESYYPRRnwpIfIUlJmZvxU37W0TRppo3py5BUppAuu9K4QZ3AtW+Gdv9q6Kcv0H8Z/O4o9tCQ==
+X-Received: by 2002:a05:6e02:16c7:b0:3df:4cf8:dd50 with SMTP id e9e14a558f8ab-3e282ecaaf5mr67232655ab.19.1752753796717;
+        Thu, 17 Jul 2025 05:03:16 -0700 (PDT)
 Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3e24611ce92sm49563745ab.6.2025.07.17.05.01.51
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3e24620ac53sm52360525ab.41.2025.07.17.05.03.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Jul 2025 05:01:51 -0700 (PDT)
+        Thu, 17 Jul 2025 05:03:16 -0700 (PDT)
 From: Jens Axboe <axboe@kernel.dk>
-To: agk@redhat.com, snitzer@kernel.org, mpatocka@redhat.com, 
- song@kernel.org, yukuai3@huawei.com, hch@lst.de, nilay@linux.ibm.com, 
- cem@kernel.org, John Garry <john.g.garry@oracle.com>
-Cc: dm-devel@lists.linux.dev, linux-kernel@vger.kernel.org, 
- linux-raid@vger.kernel.org, linux-block@vger.kernel.org, 
- ojaswin@linux.ibm.com, martin.petersen@oracle.com, 
- akpm@linux-foundation.org, linux-xfs@vger.kernel.org, djwong@kernel.org, 
- dlemoal@kernel.org
-In-Reply-To: <20250711105258.3135198-1-john.g.garry@oracle.com>
-References: <20250711105258.3135198-1-john.g.garry@oracle.com>
-Subject: Re: [PATCH v7 0/6] block/md/dm: set chunk_sectors from stacked dev
- stripe size
-Message-Id: <175275371113.371765.7347642796595215334.b4-ty@kernel.dk>
-Date: Thu, 17 Jul 2025 06:01:51 -0600
+To: linux-block@vger.kernel.org, dm-devel@lists.linux.dev, 
+ Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc: Damien Le Moal <dlemoal@kernel.org>, Mike Snitzer <snitzer@kernel.org>, 
+ Mikulas Patocka <mpatocka@redhat.com>
+In-Reply-To: <20250717103539.37279-1-shinichiro.kawasaki@wdc.com>
+References: <20250717103539.37279-1-shinichiro.kawasaki@wdc.com>
+Subject: Re: [PATCH for-next v2] dm: split write BIOs on zone boundaries
+ when zone append is not emulated
+Message-Id: <175275379583.372539.3488682715732901571.b4-ty@kernel.dk>
+Date: Thu, 17 Jul 2025 06:03:15 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -85,33 +79,23 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.14.3-dev-2ce6c
 
 
-On Fri, 11 Jul 2025 10:52:52 +0000, John Garry wrote:
-> This value in io_min is used to configure any atomic write limit for the
-> stacked device. The idea is that the atomic write unit max is a
-> power-of-2 factor of the stripe size, and the stripe size is available
-> in io_min.
-> 
-> Using io_min causes issues, as:
-> a. it may be mutated
-> b. the check for io_min being set for determining if we are dealing with
-> a striped device is hard to get right, as reported in [0].
+On Thu, 17 Jul 2025 19:35:39 +0900, Shin'ichiro Kawasaki wrote:
+> Commit 2df7168717b7 ("dm: Always split write BIOs to zoned device
+> limits") updates the device-mapper driver to perform splits for the
+> write BIOs. However, it did not address the cases where DM targets do
+> not emulate zone append, such as in the cases of dm-linear or dm-flakey.
+> For these targets, when the write BIOs span across zone boundaries, they
+> trigger WARN_ON_ONCE(bio_straddles_zones(bio)) in
+> blk_zone_wplug_handle_write(). This results in I/O errors. The errors
+> are reproduced by running blktests test case zbd/004 using zoned
+> dm-linear or dm-flakey devices.
 > 
 > [...]
 
 Applied, thanks!
 
-[1/6] ilog2: add max_pow_of_two_factor()
-      commit: 6381061d82141909c382811978ccdd7566698bca
-[2/6] block: sanitize chunk_sectors for atomic write limits
-      commit: 1de67e8e28fc47d71ee06ffa0185da549b378ffb
-[3/6] md/raid0: set chunk_sectors limit
-      commit: 4b8beba60d324d259f5a1d1923aea2c205d17ebc
-[4/6] md/raid10: set chunk_sectors limit
-      commit: 7ef50c4c6a9c36fa3ea6f1681a80c0bf9a797345
-[5/6] dm-stripe: limit chunk_sectors to the stripe size
-      commit: 5fb9d4341b782a80eefa0dc1664d131ac3c8885d
-[6/6] block: use chunk_sectors when evaluating stacked atomic write limits
-      commit: 63d092d1c1b1f773232c67c87debe557aab5aca0
+[1/1] dm: split write BIOs on zone boundaries when zone append is not emulated
+      commit: 675f940576351bb049f5677615140b9d0a7712d0
 
 Best regards,
 -- 
