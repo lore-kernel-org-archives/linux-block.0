@@ -1,105 +1,110 @@
-Received: from mail-il1-f179.google.com (mail-il1-f179.google.com [209.85.166.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout-p-101.mailbox.org (mout-p-101.mailbox.org [80.241.56.151])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AFDD29DB76
-	for <linux-block@vger.kernel.org>; Thu, 17 Jul 2025 12:03:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F025A29E114;
+	Thu, 17 Jul 2025 12:07:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752753800; cv=none; b=ILgmycei4fTTx2bM3dekzYaQaO34uWUpUYergTg//MBKLwHPMnIs55EzWVURIeT5QuyJbHvIfmyf0FrRJeaRJKajJDOp6NJAUoOpAV3UNm9Z8uVxhoGcq60q1AC56OV4YneFvDCTCuA1H9oMZ9hA6XNtymoYBZiLlRdUaE7AAF0=
+	t=1752754067; cv=none; b=fJ7XH+mHaUa9f4Pqy7CJKhS/PzzRb3guW5L2LINCQHzXQr3M/6/DmT2UWWIRQCVRPzgMobBXW5vXyDFJo9RaeQGlSHoa4vpGBpKEJrCQAPuKA2ZxLESFUfGVikWjmJO+bi4106C64Z0G8+a9OemmMRm3BbzhbDk3V3qgHb/EYS0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752753800; c=relaxed/simple;
-	bh=jy1nYicwP571nkfz1sS0ftJUShTC8h6ew9d+l9gdzcs=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=Tl6LBwpgMjm4LxtE97bhSCmu8PhgvSWaLy5quveSAT6aJvFk6pJ7hU+c7Os+WSQ1v8QWmLalfs9tWY1ZU6aqiiAQp6xx4YpPZwXlfKLFlCJMgju2nHkhe2WLzsRX6BZSXw34KD8Yt8/jNR9mujq0AQ4Xsn+Kqv+G7b231Hkq1fE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=meG3iLwg; arc=none smtp.client-ip=209.85.166.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1752754067; c=relaxed/simple;
+	bh=heLBpBS+UNyu400fsfQ7AHME4bX/Aw6S0dGsXsDJqx4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nKMFrsPx9xXHzjYaHYQBwhAGu7WXj199BAAB5dm8ManY8iIpzLrGcA9KMhVj1B0twUZJ/cYwY55Ij8w6wQ6t2g1uh1VgWXqSlk+S1WEDXW+m1ihRkIyuJdjc73sb+qBPbqHmer8LNxOOZ7zR6aPugK3v3ckyMzyEcaDlsm0QH3k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pankajraghav.com; spf=pass smtp.mailfrom=pankajraghav.com; dkim=pass (2048-bit key) header.d=pankajraghav.com header.i=@pankajraghav.com header.b=Nbg/lMwq; arc=none smtp.client-ip=80.241.56.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pankajraghav.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pankajraghav.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="meG3iLwg"
-Received: by mail-il1-f179.google.com with SMTP id e9e14a558f8ab-3df2d111fefso7385585ab.1
-        for <linux-block@vger.kernel.org>; Thu, 17 Jul 2025 05:03:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1752753797; x=1753358597; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lumM2yQ8Yhssc9akl4RdGjzpp2HwGSl6F0XVW4q/Y04=;
-        b=meG3iLwgvanPWmulsmxWgB3fV0xfW7VwFBq1gp93yVEhOIw3skz50y5PW71GB4Jhqh
-         wU5rhI2vEU9WXImCDGWLM/7ZS+E0A7IO3ftSGQKYCtg1oCwuXfhYELYB81sDprE6FjmI
-         L0K2yiiwoq8l6M7YuI/jSsUyfd6Zf4zRV2t/c9xlfz5lFVUQDAIhFBYu7j8aKhKDMJpz
-         EyaqGrK4O9UIxAvgxdR/UXrvTsyAGEQ3DIOK+inTnxiwC96rSGqLQs1H6pTlpDoPjoFq
-         Q55ULT6TRoAIuidv3+AlQ32wpGOs41wDRWfOusasyZbD/Ory7VWzisTqn22WcLe6XCTl
-         irWg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752753797; x=1753358597;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lumM2yQ8Yhssc9akl4RdGjzpp2HwGSl6F0XVW4q/Y04=;
-        b=H/DBZdvT2epx4PdWtAf1ist9GpVO992mTvVDW7wZLkPZdR59idQ8++pz2OLUQ8w18G
-         gMjabhWmIBK5y7oVvtwqX+bhRWZ1HL9vn4wNEzoJd94lGpLKxgwLZE1cnnpplVagPBCT
-         JZwO7w/lYDuSjnq85Jh5qRWbEbzgri3SxZmQhjOFxAGVGAoXTnRUZRlLJGIaAPIK1Iic
-         lyRd2q/7kWnII+yFaHyaZjkrjQdoc5FfmH+RTIMelZrw9qzHvxo2rJN6XPMMuDilW5fU
-         cGe2aOSHl/rwSFcqnODUG2ohRoQfJFGHNsEAg/x1pJ99O4fA0+RZutQih1FhHeCy2d+w
-         j2gA==
-X-Gm-Message-State: AOJu0YwvAg5SwAyakQFknv6FfYaCjGcdsSG7JUl8fPTxLNzdHbYnTqHF
-	Cf3Pv3Gl+xL1q40lBh82T+kzq3clSpEw+O2Fkn6toYz+Pt2lh0y1VEvLnp3TMxiaU8M=
-X-Gm-Gg: ASbGncugL8I3WqDH+XKyGpTlvyqDkyUQSR1P0q9mc7QRGr9gIW8DS6seiGJr/oB+nEh
-	G7aUvvJ0ZRBSIqFaPYi8XgkT5DSCWOy4pELZ+p9ijieEXzgOFb+wvXjU1WVvpMHWX40GGnOYLqk
-	9786qDPUussb8w3lyfaLqDLSOK9V+za+qHgmy5+mZNzJ0X8+62YScZLLsbLwTe52bNOJ+LPWsGh
-	6K+wOKLdz9CyfVEfQoPIAk6+6x9XZ8e+NR+AdDnDMxvP5ERdrAKyIgxIfW8JC982D4YmLKX+dlI
-	L2ft76jIdU+kFElS4i1U0B4L4MHT8RH6cktQKw0ekNQqn2JJg5ODJW416hPL0kMKGntTWVLZb7P
-	+YVWQ6X+7x2gCNg==
-X-Google-Smtp-Source: AGHT+IESYYPRRnwpIfIUlJmZvxU37W0TRppo3py5BUppAuu9K4QZ3AtW+Gdv9q6Kcv0H8Z/O4o9tCQ==
-X-Received: by 2002:a05:6e02:16c7:b0:3df:4cf8:dd50 with SMTP id e9e14a558f8ab-3e282ecaaf5mr67232655ab.19.1752753796717;
-        Thu, 17 Jul 2025 05:03:16 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3e24620ac53sm52360525ab.41.2025.07.17.05.03.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Jul 2025 05:03:16 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, dm-devel@lists.linux.dev, 
- Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc: Damien Le Moal <dlemoal@kernel.org>, Mike Snitzer <snitzer@kernel.org>, 
- Mikulas Patocka <mpatocka@redhat.com>
-In-Reply-To: <20250717103539.37279-1-shinichiro.kawasaki@wdc.com>
-References: <20250717103539.37279-1-shinichiro.kawasaki@wdc.com>
-Subject: Re: [PATCH for-next v2] dm: split write BIOs on zone boundaries
- when zone append is not emulated
-Message-Id: <175275379583.372539.3488682715732901571.b4-ty@kernel.dk>
-Date: Thu, 17 Jul 2025 06:03:15 -0600
+	dkim=pass (2048-bit key) header.d=pankajraghav.com header.i=@pankajraghav.com header.b="Nbg/lMwq"
+Received: from smtp202.mailbox.org (smtp202.mailbox.org [IPv6:2001:67c:2050:b231:465::202])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-101.mailbox.org (Postfix) with ESMTPS id 4bjWrt05HWz9spH;
+	Thu, 17 Jul 2025 14:07:42 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pankajraghav.com;
+	s=MBO0001; t=1752754062;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=M2ybh1HtN61EqnwEX7w+RBXpg6drT9A8UjYiaAe7+9c=;
+	b=Nbg/lMwqYQ7RdUmujBnBs7sqvXWbAL1VjgMtWdfg6Vod71r7uQGV6MlSF1iJS3sgoYwmjC
+	ITsrV5wLVFlsVwEHveYY4MmVvDLIKioRhEbz8Tx1uqYCexUWMzJkrbSRQbEph6ZxD8YA+B
+	hLjLl4ygK/sLIQosFGBKbpTYt6J1NGRIaF1aNgau5MhKsKxBOyQqh1IYGI+WtpsgaOZQfJ
+	UNHCCsPxg+IUmX8KQLkhmEqbEAmAvHLYE3Aqfplup74bYRVuAVqE0cNHeNLx5h4GlL9Rq9
+	eMNglH3B6JzyC/mexb8GCIii/yPfEZEbFJh1lAvCLkpgVcO9j5MoY+r7/JuYVg==
+Authentication-Results: outgoing_mbo_mout;
+	dkim=none;
+	spf=pass (outgoing_mbo_mout: domain of kernel@pankajraghav.com designates 2001:67c:2050:b231:465::202 as permitted sender) smtp.mailfrom=kernel@pankajraghav.com
+Date: Thu, 17 Jul 2025 14:07:31 +0200
+From: "Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: Suren Baghdasaryan <surenb@google.com>, 
+	Ryan Roberts <ryan.roberts@arm.com>, Baolin Wang <baolin.wang@linux.alibaba.com>, 
+	Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>, 
+	"H . Peter Anvin" <hpa@zytor.com>, Vlastimil Babka <vbabka@suse.cz>, Zi Yan <ziy@nvidia.com>, 
+	Mike Rapoport <rppt@kernel.org>, Dave Hansen <dave.hansen@linux.intel.com>, 
+	Michal Hocko <mhocko@suse.com>, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, 
+	Andrew Morton <akpm@linux-foundation.org>, Thomas Gleixner <tglx@linutronix.de>, 
+	Nico Pache <npache@redhat.com>, Dev Jain <dev.jain@arm.com>, 
+	"Liam R . Howlett" <Liam.Howlett@oracle.com>, Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org, 
+	willy@infradead.org, linux-mm@kvack.org, x86@kernel.org, linux-block@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, "Darrick J . Wong" <djwong@kernel.org>, mcgrof@kernel.org, 
+	gost.dev@samsung.com, hch@lst.de, Pankaj Raghav <p.raghav@samsung.com>
+Subject: Re: [PATCH v2 3/5] mm: add static PMD zero page
+Message-ID: <pesfhdmkz2essyfcesxqekwkxbrkw343qifwkuzrvirw6yyn4i@xjkigwtyczrh>
+References: <20250707142319.319642-1-kernel@pankajraghav.com>
+ <20250707142319.319642-4-kernel@pankajraghav.com>
+ <26fded53-b79d-4538-bc56-3d2055eb5d62@redhat.com>
+ <fbcb6038-43a9-4d47-8cf7-f5ca32824079@redhat.com>
+ <gr6zfputin56222rjxbvnsacvuhh3ghabjbk6dgf4mcvgm2bs6@w7jak5ywgskw>
+ <ea55eb30-552a-4fca-83e0-342ec7c98768@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-2ce6c
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ea55eb30-552a-4fca-83e0-342ec7c98768@redhat.com>
+X-Rspamd-Queue-Id: 4bjWrt05HWz9spH
 
-
-On Thu, 17 Jul 2025 19:35:39 +0900, Shin'ichiro Kawasaki wrote:
-> Commit 2df7168717b7 ("dm: Always split write BIOs to zoned device
-> limits") updates the device-mapper driver to perform splits for the
-> write BIOs. However, it did not address the cases where DM targets do
-> not emulate zone append, such as in the cases of dm-linear or dm-flakey.
-> For these targets, when the write BIOs span across zone boundaries, they
-> trigger WARN_ON_ONCE(bio_straddles_zones(bio)) in
-> blk_zone_wplug_handle_write(). This results in I/O errors. The errors
-> are reproduced by running blktests test case zbd/004 using zoned
-> dm-linear or dm-flakey devices.
+On Thu, Jul 17, 2025 at 01:46:03PM +0200, David Hildenbrand wrote:
+> On 17.07.25 12:34, Pankaj Raghav (Samsung) wrote:
+> > > > Then, we'd only need a config option to allow for that to happen.
+> > > 
+> > > Something incomplete and very hacky just to give an idea. It would try allocating
+> > > it if there is actual code running that would need it, and then have it
+> > > stick around forever.
+> > > 
+> > Thanks a lot for this David :) I think this is a much better idea and
+> > reduces the amount code and reuse the existing infrastructure.
+> > 
+> > I will try this approach in the next version.
+> > 
+> > <snip>
+> > > +       /*
+> > > +        * Our raised reference will prevent the shrinker from ever having
+> > > +        * success -> static.
+> > > +        */
+> > > +       if (atomic_read(&huge_zero_folio_is_static))
+> > > +               return huge_zero_folio;
+> > > +       /* TODO: memblock allocation if buddy is not up yet? Or Reject that earlier. */
+> > 
+> > Do we need memblock allocation? At least the use cases I forsee for
+> > static pmd zero page are all after the mm is up. So I don't see why we
+> > need to allocate it via memblock.
 > 
-> [...]
+> Even better!
+> 
+> We might want to detect whether allocation of the huge zeropage failed a
+> couple of times and then just give up. Otherwise, each and every user of the
+> largest zero folio will keep allocating it.
 
-Applied, thanks!
+Yes, that makes sense. We need sort of like a global counter to count
+the nr of failures and then give up trying to allocate it if it goes
+above a threshold.
 
-[1/1] dm: split write BIOs on zone boundaries when zone append is not emulated
-      commit: 675f940576351bb049f5677615140b9d0a7712d0
-
-Best regards,
--- 
-Jens Axboe
-
-
-
+--
+Pankaj
