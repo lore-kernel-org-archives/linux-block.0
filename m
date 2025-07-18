@@ -1,48 +1,48 @@
-Received: from 003.mia.mailroute.net (003.mia.mailroute.net [199.89.3.6])
+Received: from 004.mia.mailroute.net (004.mia.mailroute.net [199.89.3.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA998AD24
-	for <linux-block@vger.kernel.org>; Fri, 18 Jul 2025 15:37:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D7B529B8C2;
+	Fri, 18 Jul 2025 15:54:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752853033; cv=none; b=L0S7uazrDSYLqySx7z4oR32Zr2aVzcfCoe40C3GLrhY67iyDoS+1953KuagxMWSeNQq0IGeXCVxbSWsAJ/rYeVM9EdfyMorVozdRKwcpuuI4pf7a92xT1bsccIyB6wghhHk1MlYL4BGuExS7MwcM4cAx7gkfElZuZdxdkUpJDLc=
+	t=1752854066; cv=none; b=iwohI4aa4usvb84E/Y6X6+3wn3GhtN7/m/jI8XzmrNLqvIDXrHBAGJ67EDXaVUeAGpm41WXgcd34/YSxvteMYDZ61olrWIXqYYn29oD3gl/Xq9ZMxxrACw0iDsPvukBPNTcTUWGYHi0weAs0je20c81F/6DcKQ7lN4XRu4/PLu8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752853033; c=relaxed/simple;
-	bh=yHxCjO92mAK9VeGfNUpnUMj+xof26+SxYtMHsWUcRok=;
+	s=arc-20240116; t=1752854066; c=relaxed/simple;
+	bh=4XDQPkNdV4slch1Zvmvcajx94L6Rki4tub6PxZD5o4s=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HwaZoTAGnFgyY+0ZKNx9SP5k/p+X80yriAiKujepwXCzOZ7/CHlMDqzT6ydDOjvMj8Y7T0v2pUM+H+dWRZz2sbRbj3q84b88a/coHmzVvpjbM/2rJu9JKcypCF4bYgrwY9clGeb9qiKagPDpRTs/mEAB1n2CiQbP6R+3ks58qY4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=4FjonPJF; arc=none smtp.client-ip=199.89.3.6
+	 In-Reply-To:Content-Type; b=BGOgFts2G9GLV71MWsJIurHs4dPZcgzamiU5tIZVuyOxEkqyAP5UUH2g75JFbctK7s94Si8NU2NvHcExedv/4dOqtEq3SU6KaaChqgox1XmoggU37E+igVOS5LO+s6J3t4W0IeSjHQZqo1K5psjhunJ7z5/Nxygd0GEyhSkaHms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=xr5KkONc; arc=none smtp.client-ip=199.89.3.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="4FjonPJF"
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="xr5KkONc"
 Received: from localhost (localhost [127.0.0.1])
-	by 003.mia.mailroute.net (Postfix) with ESMTP id 4bkDS652hMzlgqV0;
-	Fri, 18 Jul 2025 15:37:10 +0000 (UTC)
+	by 004.mia.mailroute.net (Postfix) with ESMTP id 4bkDr03VcNzm0yVk;
+	Fri, 18 Jul 2025 15:54:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
 	content-transfer-encoding:content-type:content-type:in-reply-to
 	:from:from:content-language:references:subject:subject
 	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1752853029; x=1755445030; bh=t5JaEu8UDKzh7C7v57Kt/7UZ
-	63BhGGs64unxPHichLo=; b=4FjonPJFAamK1LXKaQ15HUhrvhVf5RvFgeq3yGrg
-	OOY/WBYk8IW2f2AZxFi0avyFhfe0vYaZtQsp+B7kruAP/XYhReNr64NDyDQ37JNu
-	JkfhB3QUvWpMg6REkV+dhLGf3bWb+MbcGngIo9ChQwbIcK+BYneRTIDXHtF1hk+5
-	1eNn05C6+7l6y/WMqS3FFtBShd9yLpU2Octu+hEa6PGc1NEFdonIhLvYh5WXXDS3
-	9+Qdlxcu69RNspkinBRMVbx81j4v5Jxc9icrXzTActN/dzfvwHaD+dml0gPK4gAB
-	8xxHckQ7pyZHh6UJ3xJ9BqbNq2wm5UL4u8O7clFgwAptFw==
+	 s=mr01; t=1752854062; x=1755446063; bh=W63/koGubiYj2tWQlzrfrG79
+	F7ylsbnCGV3lGigxmUg=; b=xr5KkONcPrs8yhkPWPg2y4uAI+PVIycjOSmY+M2K
+	gL/1Sv0OGvViOayA0YWlX1SHC4ckQjLGoCiiwr8ol3u90CwPqVgzrMTL67vG6h+q
+	qWNEMfF8pK6qK35JUp66dr6XnSBlqXm5ySqXfqwvZIB/xPSWDYc3gOlAGomandz9
+	8iCgV8s1UvR+68Ch/9nyMSa4aejYW91Q0oBi0OazqMCTy/AMs/ZPkVb5VZxGrEc9
+	ip1uX1fenrA1ugTBlI4A/mLujozFa6e9xYCobt5ETpr/KZZZ3Po3HFZ3AK5OzFay
+	9Yc2a8gysH5pqSoaMhykd3G9y+E+f9QZFUoJyWOzQl6P4g==
 X-Virus-Scanned: by MailRoute
-Received: from 003.mia.mailroute.net ([127.0.0.1])
- by localhost (003.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id DLz-Odu9USMY; Fri, 18 Jul 2025 15:37:09 +0000 (UTC)
+Received: from 004.mia.mailroute.net ([127.0.0.1])
+ by localhost (004.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id QinSqasYWzzw; Fri, 18 Jul 2025 15:54:22 +0000 (UTC)
 Received: from [100.66.154.22] (unknown [104.135.204.82])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: bvanassche@acm.org)
-	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4bkDS257S8zlgqV4;
-	Fri, 18 Jul 2025 15:37:05 +0000 (UTC)
-Message-ID: <3d6e8317-7697-4bb4-8462-c67b5e6683b4@acm.org>
-Date: Fri, 18 Jul 2025 08:37:04 -0700
+	by 004.mia.mailroute.net (Postfix) with ESMTPSA id 4bkDqv2l6Qzm0yV3;
+	Fri, 18 Jul 2025 15:54:18 +0000 (UTC)
+Message-ID: <2d06bfe0-0ea6-4c52-83fa-e933557ea399@acm.org>
+Date: Fri, 18 Jul 2025 08:54:17 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -50,55 +50,45 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 0/7] Fix bio splitting by the crypto fallback code
-To: Christoph Hellwig <hch@lst.de>, Eric Biggers <ebiggers@kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-References: <20250715201057.1176740-1-bvanassche@acm.org>
- <20250715214456.GA765749@google.com> <20250717044342.GA26995@lst.de>
+Subject: Re: [PATCH v21 03/12] blk-zoned: Add an argument to
+ blk_zone_plug_bio()
+To: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+ Christoph Hellwig <hch@lst.de>
+References: <20250717205808.3292926-1-bvanassche@acm.org>
+ <20250717205808.3292926-4-bvanassche@acm.org>
+ <eae89738-44e6-46ea-ada6-665fdfd8db07@kernel.org>
 Content-Language: en-US
 From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20250717044342.GA26995@lst.de>
+In-Reply-To: <eae89738-44e6-46ea-ada6-665fdfd8db07@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 7/16/25 9:43 PM, Christoph Hellwig wrote:
-> Getting back to this.  While the ton is a bit snarky, it brings up a good
-> point.  Relying on the block layer to ensure that data is always
-> encrypted seems like a bad idea, given that is really not what the block
-> layer is about, and definitively not high on the mind of anyone touching
-> the code.  So I would not want to rely on the block layer developers to
-> ensure that data is encrypted properly through APIs not one believes part
-> that mission.
-> 
-> So I think you'd indeed be much better off not handling the (non-inline)
-> incryption in the block layer.
-> 
-> Doing that in fact sounds pretty easy - instead of calling the
-> blk-crypto-fallback code from inside the block layer, call it from the
-> callers instead of submit_bio when inline encryption is not actually
-> supported, e.g.
-> 
-> 	if (!blk_crypto_config_supported(bdev, &crypto_cfg))
-> 		blk_crypto_fallback_submit_bio(bio);
-> 	else
-> 		submit_bio(bio);
-> 
-> combined with checks in the low-level block code that we never get a
-> crypto context into the low-level submission into ->submit_bio or
-> ->queue_rq when not supported.
-> 
-> That approach not only is much easier to verify for correct encryption
-> operation, but also makes things like bio splitting and the required
-> memory allocation for it less fragile.
 
-Has it ever been considered to merge the inline encryption code into
-dm-crypt or convert the inline encryption fallback code into a new dm
-driver? If user space code would insert a dm device between filesystems
-and block devices if hardware encryption is not supported that would
-have the following advantages:
-* No filesystem implementations would have to be modified.
-* It would make it easier to deal with bio splitting since dm drivers
-   can set stacking limits in their .io_hints() callback.
+On 7/18/25 12:13 AM, Damien Le Moal wrote:
+> I still do not understand why this patch is needed because you can get the
+> current CPU submitting the BIO inside blk_zone_plug_bio() with
+> raw_smp_processor_id(). That CPU ID should be the same as the cached request
+> that we will use only if the BIO is not going through the BIO work, that is, if
+> it is the first write BIO in-flight for the zone.
+
+I do not agree with the above. With CONFIG_PREEMPT enabled, migration to 
+another CPU may happen after a cached request has been allocated and
+before the zoned block device code is called. This can be prevented by
+surrounding code with preempt_disable() and preempt_enable(). However, I
+don't think that we want to do this in submit_bio() since there is code
+in submit_bio() that may sleep (bio_queue_enter()) and sleeping with
+preemption disabled is not allowed.
+
+Is there perhaps something that I'm overlooking or misunderstanding?
+
+> Furthermore, for the DM case, you pass a CPU of "-1", but if the DM target needs
+> zone append emulation, it will use zone write plugging. So the same control as
+> for blk-mq is needed.
+
+This "-1" means that it is not known from which CPU a request will be
+allocated since a migration to another CPU may happen between the
+blk_zone_plug_bio() call and request allocation.
 
 Thanks,
 
