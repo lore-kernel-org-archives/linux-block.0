@@ -1,118 +1,145 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00DD42DEA8E
-	for <linux-block@vger.kernel.org>; Fri, 18 Jul 2025 16:50:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7AC51C862C
+	for <linux-block@vger.kernel.org>; Fri, 18 Jul 2025 16:55:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752857430; cv=none; b=bLSv7oBoX9OZmHa/B0J7g9xUb6Wz4wNjaSAtYluuDdm0eIAGfNXhag9sK5UOiFHIHRmRwM1tq6kvNKo36ZWqM1yxzYLpOlfOMmzoL2DzkZ9rftvw9FiIHDKXgJIeHPb8m2DQRZplSdekN8zgGIDqIJqN8wjyh0CfjpeF2BwCE+s=
+	t=1752857741; cv=none; b=Pqa4JgzhG+nR7ZAaA66S4M/lfrWZ5IgEq4ro7nerQW0FN9W3AXs1JwnlYMR1qj/95LxYVzHU2PrN4ReDUSXMnYSwT2PrrRHcDhXl5Sr/MN0l7SDn9+IXzdHHKOtzQcO/jO9NleGTXztls655J332IsK6XTSvONwZxYVeC6rirpQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752857430; c=relaxed/simple;
-	bh=p0IkI9BFFQwf7PGF4dnHd4MoNDGbIFKcjpiSnXIjxJU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QuVN4gnT51Uiy0c2emQSRbAVw/pKFawZ5+wHvfAw07ef0GPcmChysElcQ2GWzvc9ztt1Jk8z2GwsABQlbUgUUNnlDL32A49vK3+9r6r2r8WzGyuVpVjrMTu/TwRwiAzCVTe5gNAx4qK069n8BlQztelRyG9yjGwTVYup2AlVD0I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dJPnID9+; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1752857741; c=relaxed/simple;
+	bh=xB92aoVRLNGCxtzT1lOuWPRc8zXYoECWUAdkEf3ZoUo=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=lwSdfS+7jv0ZDxaKCYkB56Md6WvCdrOYExTDpGzIRXN9CKBD/iV6J55n0S9Z6ykpDfcrusBzTPZAHmxrsVY9IwruZNE/L5M5nmM0ZYo9BSzN8/s3XkXFdqABFKTH9getx9jCS5JoFEePkyfcJF+5/2GBqGlqmxBviLK36qcRTeA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=0LqlZ+jG; arc=none smtp.client-ip=209.85.210.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dJPnID9+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C3CBC4CEF1;
-	Fri, 18 Jul 2025 16:50:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752857429;
-	bh=p0IkI9BFFQwf7PGF4dnHd4MoNDGbIFKcjpiSnXIjxJU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=dJPnID9+uBXkLrhFOpaBjXUh4XRE1A2rkbJRc26n3cZs4unWHjKlNIpWUP/2dQ2Co
-	 UjN3zHHTFk1i4AJh3CIcybn8ZB/0WV4+6E7yXA8UqPUPaKiJc4i9DrdUmwS16bvYLc
-	 z+0c1oQu3y6nPVF+OG2GoWz64wUpawb6PlLISiWZsIg8rlbxve5i0fuJv/FS3UEQMa
-	 kskjbx0P5vxIh17AVXVEQUROdql0YdQ8HZalLbZhruFfSmCc1xWURynvUalsX8XinL
-	 wbkzc3ygDWEvoxr4pYTiiU9pMN+dVc/1Bmq9o1sww4iWlSXXDNVCkyLeCeDAQuv/qA
-	 iplMzPk9Q4ePg==
-Date: Fri, 18 Jul 2025 09:50:24 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Subject: Re: [PATCH v3 0/7] Fix bio splitting by the crypto fallback code
-Message-ID: <20250718165024.GD1574@quark>
-References: <20250715201057.1176740-1-bvanassche@acm.org>
- <20250715214456.GA765749@google.com>
- <20250717044342.GA26995@lst.de>
- <3d6e8317-7697-4bb4-8462-c67b5e6683b4@acm.org>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="0LqlZ+jG"
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-74b56b1d301so1682845b3a.1
+        for <linux-block@vger.kernel.org>; Fri, 18 Jul 2025 09:55:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1752857738; x=1753462538; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KYGdSi1wF9Spg1hLyFNHzVFHU03XZvkGlrjLFkz7QsI=;
+        b=0LqlZ+jGJjhJfZguHQIzQo8TIBQasMN0rCY3Q8zpyns8uZ9EtkkMxgHgCZ5DBeQick
+         8eSRwiJ3mpH0rel1kljNATVakHsXbzC9PDDcvs2tjTSeI4dds3FeRCr4n/gE6xc+UL1a
+         MN2bp7P/54lVfronDCrHkQUxQOzzwnwp0EWi0gN4ekUuGpTJRn7eeHHWJGmzwPvM+Ibg
+         PY9sqS6CWPXPBXfzAQJHDZcaNtJS6N9o8c4WfzMV7gxhT4KBJgIV/AVCRE9BKRk2Yo/i
+         /Sc2WrSiIiovdALx5pCc2NPf1pbKPDQqOWuskuDoai59jef2do3SZtK1rqEA+CxGESB3
+         138g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752857738; x=1753462538;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=KYGdSi1wF9Spg1hLyFNHzVFHU03XZvkGlrjLFkz7QsI=;
+        b=YfUfKxb7qoXFWhgYRJx3cYHvnZBsKbGSqJdzqq6sn+OraFabNH0V+iAfdMy9sAXGQZ
+         RJuemJ57XvUQQRc8TKK3kkOB1lXJZaOjrE1O/21piUqaDNmUxEMj++tg2xnfji0sLo3J
+         LwAdVcvNnSWcBwb4fRjZzZ0LAjYXfkprgr8Z0cHm5+R/JIj+WZ5d+lwWPEbjcDNs6qjN
+         s0jNn2FOu9BsvDBJDbdmmLlYCksZBu7DDOe+FOk8Qyjb2jho7UXbpsJBunTUxtPvt8vv
+         KF7iWbjaBVyyiNnre2DkK3Fqb7cIMIp1P+ZiNDzRpSGuOt62h6XNc05CzQMq0zHUebnD
+         /Dlw==
+X-Gm-Message-State: AOJu0Yx8uuDlN03uifyBsgdfP5mj2UIugtv9ic7gxRfheAOtSI87GZ5v
+	adcKg9hhHnro0kGnq7ZkHjcbjzOIM/TzkruwU3+9LcXmBHC0Ty9ZyxshyXp8bRl8IbOC6LIhZWY
+	u9HDe
+X-Gm-Gg: ASbGncsfXMwEvrmAuAxfy3eUO3ctyoOCvIjN1uTbbTezFJSGTrzSdDZfFFN7ZA1IF0U
+	81mYOgB0A7HhQsBvSN92oArwdz1+CATrRj6bQBg3yhsh62PWThz7d0KKb7XzoYfPvntIVwQj3Wr
+	4BDMS6zIDjvGnCj2Dn2s/jXxNLLOgtU4UXVIbFX8GPzcPPJYMZKPSYzTCFE1p4k0qzYmGZcqMT0
+	PeNKI6fkztX5ZMsQH7jdp+pLCCaA/gY5aB4nUxK7qAghYyUfr6JTJYAQ00B5KNF9PiC5k3tpngX
+	KgkYdHK2ZNmfQ2sbXAy1oF+/HpcjVCI74o7VMPYrPnwZvIanMXYS8H6RU7Em9EH/FeVUx6HgTxi
+	Jk2kjFmKViu4NRcBU0aD6pYJz7ZrcRnJqsvqsLBw84Tpk/ajkFtrTDx+eFQS1kLyx7Tw=
+X-Google-Smtp-Source: AGHT+IG7EeSbuzfX/m+yzaEf4j6tePQ30nm4KctKQgB0cErIZVZxSrPmwWCCNhBUyrBiMfquy4jRbA==
+X-Received: by 2002:a05:6a00:2350:b0:742:a91d:b2f6 with SMTP id d2e1a72fcca58-7572466bc03mr15554133b3a.13.1752857737406;
+        Fri, 18 Jul 2025 09:55:37 -0700 (PDT)
+Received: from [172.20.8.9] (syn-071-095-160-189.biz.spectrum.com. [71.95.160.189])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-759cb67900fsm1541314b3a.101.2025.07.18.09.55.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 18 Jul 2025 09:55:36 -0700 (PDT)
+Message-ID: <effd0d40-999f-4590-a10b-4422daf91662@kernel.dk>
+Date: Fri, 18 Jul 2025 10:55:35 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3d6e8317-7697-4bb4-8462-c67b5e6683b4@acm.org>
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 6.16-rc7
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Jul 18, 2025 at 08:37:04AM -0700, Bart Van Assche wrote:
-> On 7/16/25 9:43 PM, Christoph Hellwig wrote:
-> > Getting back to this.  While the ton is a bit snarky, it brings up a good
-> > point.  Relying on the block layer to ensure that data is always
-> > encrypted seems like a bad idea, given that is really not what the block
-> > layer is about, and definitively not high on the mind of anyone touching
-> > the code.  So I would not want to rely on the block layer developers to
-> > ensure that data is encrypted properly through APIs not one believes part
-> > that mission.
-> > 
-> > So I think you'd indeed be much better off not handling the (non-inline)
-> > incryption in the block layer.
-> > 
-> > Doing that in fact sounds pretty easy - instead of calling the
-> > blk-crypto-fallback code from inside the block layer, call it from the
-> > callers instead of submit_bio when inline encryption is not actually
-> > supported, e.g.
-> > 
-> > 	if (!blk_crypto_config_supported(bdev, &crypto_cfg))
-> > 		blk_crypto_fallback_submit_bio(bio);
-> > 	else
-> > 		submit_bio(bio);
-> > 
-> > combined with checks in the low-level block code that we never get a
-> > crypto context into the low-level submission into ->submit_bio or
-> > ->queue_rq when not supported.
-> > 
-> > That approach not only is much easier to verify for correct encryption
-> > operation, but also makes things like bio splitting and the required
-> > memory allocation for it less fragile.
-> 
-> Has it ever been considered to merge the inline encryption code into
-> dm-crypt or convert the inline encryption fallback code into a new dm
-> driver? If user space code would insert a dm device between filesystems
-> and block devices if hardware encryption is not supported that would
-> have the following advantages:
-> * No filesystem implementations would have to be modified.
-> * It would make it easier to deal with bio splitting since dm drivers
->   can set stacking limits in their .io_hints() callback.
+Hi Linus,
 
-Yes, this was considered back when blk-crypto-fallback was being added.
-But it is useful to support blk-crypto unconditionally without userspace
-having to set up a dm device:
+Set of fixes for block for the 6.16 kernel release. This pull request
+contains:
 
-- It allows testing the inline encryption code paths in ext4 and f2fs
-  with xfstests on any system, just by adding the inlinecrypt mount
-  option.  See e.g.
-  https://lore.kernel.org/linux-block/20191031205045.GG16197@mit.edu/
-  and 
-  https://lore.kernel.org/linux-block/20200515170059.GA1009@sol.localdomain/
+- NVMe changes via Christoph
+	- revert the cross-controller atomic write size validation that
+	  caused regressions (Christoph Hellwig)
+	- fix endianness of command word prints in
+	  nvme_log_err_passthru() (John Garry)
+	- fix callback lock for TLS handshake (Maurizio Lombardi)
+	- fix misaccounting of nvme-mpath inflight I/O (Yu Kuai)
+	- fix inconsistent RCU list manipulation in
+	  nvme_ns_add_to_ctrl_list() (Zheng Qixing)
 
-- It allows upper layers to just use blk-crypto instead of having both
-  blk-crypto and non-blk-crypto code paths.  While I've been late on
-  converting fscrypt to actually rely on this, it still might be a good
-  idea, especially as we now need to revisit the code for reasons like
-  large folio support.  (And Christoph seems to support this too -- see
-  https://lore.kernel.org/linux-block/20250715062112.GC18672@lst.de/)
+- Fix for a kobject leak in queue unregistration
 
-But, as suggested at
-https://lore.kernel.org/linux-block/20250717044342.GA26995@lst.de/ it
-should also be okay to reorganize things so that the regular
-submit_bio() does not support the fallback, and upper layers have to
-call a different function blk_crypto_fallback_submit_bio() if they want
-the fallback.  I don't think that would help with the splitting issue
-directly, but perhaps we could make the filesystems just not submit bios
-that would need splitting by blk-crypto-fallback, which would solve the
-issue.
+- Fix for loop async file write start/end handling
 
-- Eric
+Please pull!
+
+
+The following changes since commit 4cdf1bdd45ac78a088773722f009883af30ad318:
+
+  block: reject bs > ps block devices when THP is disabled (2025-07-07 11:58:57 -0600)
+
+are available in the Git repository at:
+
+  git://git.kernel.dk/linux.git tags/block-6.16-20250718
+
+for you to fetch changes up to 2680efde75ccdd745da7ae6f5e30026f70439588:
+
+  Merge tag 'nvme-6.16-2025-07-17' of git://git.infradead.org/nvme into block-6.16 (2025-07-17 05:56:12 -0600)
+
+----------------------------------------------------------------
+block-6.16-20250718
+
+----------------------------------------------------------------
+Christoph Hellwig (1):
+      nvme: revert the cross-controller atomic write size validation
+
+Jens Axboe (1):
+      Merge tag 'nvme-6.16-2025-07-17' of git://git.infradead.org/nvme into block-6.16
+
+John Garry (1):
+      nvme: fix endianness of command word prints in nvme_log_err_passthru()
+
+Maurizio Lombardi (1):
+      nvmet-tcp: fix callback lock for TLS handshake
+
+Ming Lei (2):
+      block: fix kobject leak in blk_unregister_queue
+      loop: use kiocb helpers to fix lockdep warning
+
+Yu Kuai (1):
+      nvme: fix misaccounting of nvme-mpath inflight I/O
+
+Zheng Qixing (1):
+      nvme: fix inconsistent RCU list manipulation in nvme_ns_add_to_ctrl_list()
+
+ block/blk-sysfs.c         |  1 +
+ drivers/block/loop.c      |  5 ++---
+ drivers/nvme/host/core.c  | 27 +++++++++++----------------
+ drivers/nvme/target/tcp.c |  4 ++--
+ 4 files changed, 16 insertions(+), 21 deletions(-)
+
+-- 
+Jens Axboe
+
