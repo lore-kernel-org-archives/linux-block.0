@@ -1,40 +1,40 @@
 Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3319B18E20
-	for <linux-block@vger.kernel.org>; Fri, 18 Jul 2025 19:28:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 142E118E20
+	for <linux-block@vger.kernel.org>; Fri, 18 Jul 2025 19:29:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.89.141.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752866904; cv=none; b=caSUxfMREelzWYGHud9atWK9E+p1SWEH9bHwwH+aVtl9lhXBkRduG8XLjAhxpSNZU/A1pQQLgCO9lIHy5FoWYJtvzdUMMudw+c0Ag1CAde3t1ljcqYklXagZOMpiZVHeMpqTxRP3OSn3Ae1T5Cj8w16IrSpaUnVI5qUDcCT5wJM=
+	t=1752866947; cv=none; b=D00TKKRXS4ejw05XUZ9yZXxWDxhj2yj5pUJSq3YPHPIMWDHGXKnU4IfIUpnEaw5fsG0LqrdYj6bO0aHSKq4cxytFHj6IG4sALec6Yn3lK0L1lK7wdPu153nAvn7OLploLaMpHj7t8+RHWTmWiBiKNz89bbMqqtLiL+KGKvs0EY8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752866904; c=relaxed/simple;
-	bh=rvHSQtmZA2qDxUXqlRk4D+JKx2+bQWHTxNKDKCGmzYc=;
+	s=arc-20240116; t=1752866947; c=relaxed/simple;
+	bh=w8TFfPmwh3CFXA/a4xNIyoNkvsKKWIOKcEuhRq3nxk4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WISRbWIKfJ6b+N8rt3dRn1qtYNEArrBHBBA7kacOSF5Iw2K1+Pe3/FfQeGv5lOsn8po2KF8xNBH1Qctm/3UNrtByTOnuOhxqzaywA8skDNvTBdi5/FCoZg/u6ijxlVzKz/Mee6Ynql8/oHPabC698herrbvIM9/bOSsaNn2hJW8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=pdSepMqV; arc=none smtp.client-ip=62.89.141.173
+	 Content-Type:Content-Disposition:In-Reply-To; b=dgTct+j5XGuXSvcAvVdQpPJRFDdZH4PhbBFEgbGz5/jpXfhrT3xahivi8nZ7tinim0gJKLQUFuO/hEcYG467ANIG9mKdOMfqQFGrvKeafBXeDk9qOVsfp1Ihdfl0clvjaWKUmk0e9hGurzHZ7OxAu1t9uQaElgpGmxwzKIhlaA0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=h+kv9jGg; arc=none smtp.client-ip=62.89.141.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="pdSepMqV"
+	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="h+kv9jGg"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
 	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=aMGTaa/hbE31Sq/Q4GXytLUjjRsoYxmv1QrjszDbO1A=; b=pdSepMqVej0fp9+OvWaUTnPuHD
-	Z+idGq0Rth4ukCE1j/+vN/RdQLWPw/VEIRZ8Zm3t1goDZKwlCOlxFl8GdOgdPHrM4+RtnKukXVmCf
-	NCDMFUhS64ej6702BoijqpEoaPHNZ7WawzfewzuFOEtGKm+tNhDwJLak67AOlY8MqY4FthXH45mNp
-	nAZNVE/aav37gAPeEYx8ggQmfiQYNkugmouZ2NUXJpnMNR54CuNppiqk1FQf1Q58jabDVc/NqxOYX
-	zWzz3dEuxWjp6nZnMXXEf10W9ipQ7lKrjUAjrWBdM6mIlZCAIysmC3FMcOJI2/5HFbS3zs4nZ8xb4
-	O8QVW1EA==;
+	bh=ibhB5k2nGD58BHK76zOX4KXEMeZsX6suWyBUk1IHYyc=; b=h+kv9jGgibBc/AErj80c0x0nzY
+	cTBLcT8R03tR2M/GpsaPiyI3UXq9GBE3RtgQvdlWi6q7NVaN46Bdj2q0jewreikpaFMffWzkmk6V3
+	DQZYZjyr0N3dKgsZcwwrnzKvNJccpVQf8DvaAmxZDYLWfGk6v3xevmc6bwKQ8OnJ8VDoCJ2saNuhR
+	DeD/I/7sbAzUkHdgrqh/Da+zD8mJJ/oZmqUM6p6d1WhhvAwMERkrlp0fPPDA3lPPzh44FoxWwIozJ
+	D7KVHujI6QvyPMxbgwAvM+V4KJwVfcgJWjEeUCyQ7w9cM+tkZQ7jpgbvWWnc6FkKVIaHklBIVJVfO
+	xMcpEQZg==;
 Received: from viro by zeniv.linux.org.uk with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1ucqkl-0000000DYwR-3pFC;
-	Fri, 18 Jul 2025 19:28:19 +0000
-Date: Fri, 18 Jul 2025 20:28:19 +0100
+	id 1ucqlT-0000000DZAg-2amm;
+	Fri, 18 Jul 2025 19:29:03 +0000
+Date: Fri, 18 Jul 2025 20:29:03 +0100
 From: Al Viro <viro@zeniv.linux.org.uk>
 To: linux-block@vger.kernel.org
 Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@infradead.org>
-Subject: [RFC][PATCH 2/3] scsi: switch ->bios_param() to passing gendisk
-Message-ID: <20250718192819.GG2580412@ZenIV>
+Subject: [RFC][PATCH 3/3] block: switch ->getgeo() to struct gendisk
+Message-ID: <20250718192903.GH2580412@ZenIV>
 References: <20250718192642.GE2580412@ZenIV>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -47,823 +47,543 @@ Content-Disposition: inline
 In-Reply-To: <20250718192642.GE2580412@ZenIV>
 Sender: Al Viro <viro@ftp.linux.org.uk>
 
-Instances are passed struct block_device *bdev argument; the only thing
-it is used for (if it's used in the first place) is bdev->bd_disk.
-Might as well pass that in the first place...
+Instances are happier that way and it makes more sense anyway -
+the only part of the result that is related to partition we are given
+is the start sector, and that has been filled in by the caller.
+
+Everything else is a function of the disk.  Only one instance
+(DASD) is ever looking at anything other than bdev->bd_disk and
+that one is trivial to adjust.
 
 Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
 ---
- Documentation/scsi/scsi_mid_low_api.rst   | 4 ++--
- drivers/ata/libata-scsi.c                 | 4 ++--
- drivers/message/fusion/mptscsih.c         | 2 +-
- drivers/message/fusion/mptscsih.h         | 2 +-
- drivers/scsi/3w-9xxx.c                    | 2 +-
- drivers/scsi/3w-sas.c                     | 2 +-
- drivers/scsi/3w-xxxx.c                    | 2 +-
- drivers/scsi/BusLogic.c                   | 4 ++--
- drivers/scsi/BusLogic.h                   | 2 +-
- drivers/scsi/aacraid/linit.c              | 6 +++---
- drivers/scsi/advansys.c                   | 2 +-
- drivers/scsi/aha152x.c                    | 4 ++--
- drivers/scsi/aha1542.c                    | 2 +-
- drivers/scsi/aha1740.c                    | 2 +-
- drivers/scsi/aic7xxx/aic79xx_osm.c        | 4 ++--
- drivers/scsi/aic7xxx/aic7xxx_osm.c        | 4 ++--
- drivers/scsi/arcmsr/arcmsr_hba.c          | 6 +++---
- drivers/scsi/atp870u.c                    | 2 +-
- drivers/scsi/fdomain.c                    | 4 ++--
- drivers/scsi/imm.c                        | 2 +-
- drivers/scsi/initio.c                     | 4 ++--
- drivers/scsi/ipr.c                        | 8 ++++----
- drivers/scsi/ips.c                        | 2 +-
- drivers/scsi/ips.h                        | 2 +-
- drivers/scsi/libsas/sas_scsi_host.c       | 2 +-
- drivers/scsi/megaraid.c                   | 4 ++--
- drivers/scsi/megaraid.h                   | 2 +-
- drivers/scsi/megaraid/megaraid_sas_base.c | 4 ++--
- drivers/scsi/mpi3mr/mpi3mr_os.c           | 4 ++--
- drivers/scsi/mpt3sas/mpt3sas_scsih.c      | 4 ++--
- drivers/scsi/mvumi.c                      | 2 +-
- drivers/scsi/myrb.c                       | 2 +-
- drivers/scsi/pcmcia/sym53c500_cs.c        | 2 +-
- drivers/scsi/ppa.c                        | 2 +-
- drivers/scsi/qla1280.c                    | 2 +-
- drivers/scsi/qlogicfas408.c               | 2 +-
- drivers/scsi/qlogicfas408.h               | 2 +-
- drivers/scsi/scsicam.c                    | 6 +++---
- drivers/scsi/sd.c                         | 4 ++--
- drivers/scsi/stex.c                       | 2 +-
- drivers/scsi/storvsc_drv.c                | 2 +-
- drivers/scsi/wd719x.c                     | 2 +-
- include/linux/libata.h                    | 2 +-
- include/scsi/libsas.h                     | 2 +-
- include/scsi/scsi_host.h                  | 2 +-
- include/scsi/scsicam.h                    | 2 +-
- 46 files changed, 68 insertions(+), 68 deletions(-)
+ Documentation/filesystems/locking.rst |  2 +-
+ arch/m68k/emu/nfblock.c               |  4 ++--
+ arch/um/drivers/ubd_kern.c            |  6 +++---
+ block/ioctl.c                         |  4 ++--
+ block/partitions/ibm.c                |  2 +-
+ drivers/block/amiflop.c               | 10 +++++-----
+ drivers/block/aoe/aoeblk.c            |  4 ++--
+ drivers/block/floppy.c                |  4 ++--
+ drivers/block/mtip32xx/mtip32xx.c     |  6 +++---
+ drivers/block/rnbd/rnbd-clt.c         |  4 ++--
+ drivers/block/sunvdc.c                |  3 +--
+ drivers/block/swim.c                  |  4 ++--
+ drivers/block/virtio_blk.c            |  6 +++---
+ drivers/block/xen-blkfront.c          |  4 ++--
+ drivers/md/dm.c                       |  4 ++--
+ drivers/md/md.c                       |  4 ++--
+ drivers/memstick/core/ms_block.c      |  4 ++--
+ drivers/memstick/core/mspro_block.c   |  4 ++--
+ drivers/mmc/core/block.c              |  4 ++--
+ drivers/mtd/mtd_blkdevs.c             |  4 ++--
+ drivers/mtd/ubi/block.c               |  4 ++--
+ drivers/nvdimm/btt.c                  |  4 ++--
+ drivers/nvme/host/core.c              |  4 ++--
+ drivers/nvme/host/nvme.h              |  2 +-
+ drivers/s390/block/dasd.c             |  7 ++++---
+ drivers/scsi/sd.c                     |  8 ++++----
+ include/linux/blkdev.h                |  2 +-
+ 27 files changed, 59 insertions(+), 59 deletions(-)
 
-diff --git a/Documentation/scsi/scsi_mid_low_api.rst b/Documentation/scsi/scsi_mid_low_api.rst
-index 96c8230d638e..634f5c28a849 100644
---- a/Documentation/scsi/scsi_mid_low_api.rst
-+++ b/Documentation/scsi/scsi_mid_low_api.rst
-@@ -623,7 +623,7 @@ Details::
-     *      bios_param - fetch head, sector, cylinder info for a disk
-     *      @sdev: pointer to scsi device context (defined in
-     *             include/scsi/scsi_device.h)
--    *      @bdev: pointer to block device context (defined in fs.h)
-+    *      @disk: pointer to gendisk (defined in blkdev.h)
-     *      @capacity:  device size (in 512 byte sectors)
-     *      @params: three element array to place output:
-     *              params[0] number of heads (max 255)
-@@ -643,7 +643,7 @@ Details::
-     *
-     *      Optionally defined in: LLD
-     **/
--	int bios_param(struct scsi_device * sdev, struct block_device *bdev,
-+	int bios_param(struct scsi_device * sdev, struct gendisk *disk,
- 		    sector_t capacity, int params[3])
+diff --git a/Documentation/filesystems/locking.rst b/Documentation/filesystems/locking.rst
+index 2e567e341c3b..cb32ec9382ac 100644
+--- a/Documentation/filesystems/locking.rst
++++ b/Documentation/filesystems/locking.rst
+@@ -443,7 +443,7 @@ prototypes::
+ 	int (*direct_access) (struct block_device *, sector_t, void **,
+ 				unsigned long *);
+ 	void (*unlock_native_capacity) (struct gendisk *);
+-	int (*getgeo)(struct block_device *, struct hd_geometry *);
++	int (*getgeo)(struct gendisk *, struct hd_geometry *);
+ 	void (*swap_slot_free_notify) (struct block_device *, unsigned long);
  
+ locking rules:
+diff --git a/arch/m68k/emu/nfblock.c b/arch/m68k/emu/nfblock.c
+index 83410f8184ec..94a4fadc651a 100644
+--- a/arch/m68k/emu/nfblock.c
++++ b/arch/m68k/emu/nfblock.c
+@@ -77,9 +77,9 @@ static void nfhd_submit_bio(struct bio *bio)
+ 	bio_endio(bio);
+ }
  
-diff --git a/drivers/ata/libata-scsi.c b/drivers/ata/libata-scsi.c
-index a21c9895408d..75d0d3081acb 100644
---- a/drivers/ata/libata-scsi.c
-+++ b/drivers/ata/libata-scsi.c
-@@ -351,7 +351,7 @@ EXPORT_SYMBOL_GPL(ata_common_sdev_groups);
- /**
-  *	ata_std_bios_param - generic bios head/sector/cylinder calculator used by sd.
-  *	@sdev: SCSI device for which BIOS geometry is to be determined
-- *	@bdev: block device associated with @sdev
-+ *	@unused: gendisk associated with @sdev
-  *	@capacity: capacity of SCSI device
-  *	@geom: location to which geometry will be output
-  *
-@@ -366,7 +366,7 @@ EXPORT_SYMBOL_GPL(ata_common_sdev_groups);
-  *	RETURNS:
-  *	Zero.
-  */
--int ata_std_bios_param(struct scsi_device *sdev, struct block_device *bdev,
-+int ata_std_bios_param(struct scsi_device *sdev, struct gendisk *unused,
- 		       sector_t capacity, int geom[])
+-static int nfhd_getgeo(struct block_device *bdev, struct hd_geometry *geo)
++static int nfhd_getgeo(struct gendisk *disk, struct hd_geometry *geo)
  {
- 	geom[0] = 255;
-diff --git a/drivers/message/fusion/mptscsih.c b/drivers/message/fusion/mptscsih.c
-index 3a64dc7a7e27..3304f8824cf7 100644
---- a/drivers/message/fusion/mptscsih.c
-+++ b/drivers/message/fusion/mptscsih.c
-@@ -2074,7 +2074,7 @@ mptscsih_taskmgmt_complete(MPT_ADAPTER *ioc, MPT_FRAME_HDR *mf,
-  *	This is anyones guess quite frankly.
-  */
- int
--mptscsih_bios_param(struct scsi_device * sdev, struct block_device *bdev,
-+mptscsih_bios_param(struct scsi_device * sdev, struct gendisk *unused,
- 		sector_t capacity, int geom[])
+-	struct nfhd_device *dev = bdev->bd_disk->private_data;
++	struct nfhd_device *dev = disk->private_data;
+ 
+ 	geo->cylinders = dev->blocks >> (6 - dev->bshift);
+ 	geo->heads = 4;
+diff --git a/arch/um/drivers/ubd_kern.c b/arch/um/drivers/ubd_kern.c
+index 4de6613e7468..f2b2feeeb455 100644
+--- a/arch/um/drivers/ubd_kern.c
++++ b/arch/um/drivers/ubd_kern.c
+@@ -108,7 +108,7 @@ static DEFINE_MUTEX(ubd_lock);
+ 
+ static int ubd_ioctl(struct block_device *bdev, blk_mode_t mode,
+ 		     unsigned int cmd, unsigned long arg);
+-static int ubd_getgeo(struct block_device *bdev, struct hd_geometry *geo);
++static int ubd_getgeo(struct gendisk *disk, struct hd_geometry *geo);
+ 
+ #define MAX_DEV (16)
+ 
+@@ -1324,9 +1324,9 @@ static blk_status_t ubd_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 	return res;
+ }
+ 
+-static int ubd_getgeo(struct block_device *bdev, struct hd_geometry *geo)
++static int ubd_getgeo(struct gendisk *disk, struct hd_geometry *geo)
  {
- 	int		heads;
-diff --git a/drivers/message/fusion/mptscsih.h b/drivers/message/fusion/mptscsih.h
-index 8c2bb2331fc1..f9678d48100c 100644
---- a/drivers/message/fusion/mptscsih.h
-+++ b/drivers/message/fusion/mptscsih.h
-@@ -123,7 +123,7 @@ extern int mptscsih_abort(struct scsi_cmnd * SCpnt);
- extern int mptscsih_dev_reset(struct scsi_cmnd * SCpnt);
- extern int mptscsih_bus_reset(struct scsi_cmnd * SCpnt);
- extern int mptscsih_host_reset(struct scsi_cmnd *SCpnt);
--extern int mptscsih_bios_param(struct scsi_device * sdev, struct block_device *bdev, sector_t capacity, int geom[]);
-+extern int mptscsih_bios_param(struct scsi_device * sdev, struct gendisk *unused, sector_t capacity, int geom[]);
- extern int mptscsih_io_done(MPT_ADAPTER *ioc, MPT_FRAME_HDR *mf, MPT_FRAME_HDR *r);
- extern int mptscsih_taskmgmt_complete(MPT_ADAPTER *ioc, MPT_FRAME_HDR *mf, MPT_FRAME_HDR *r);
- extern int mptscsih_scandv_complete(MPT_ADAPTER *ioc, MPT_FRAME_HDR *mf, MPT_FRAME_HDR *r);
-diff --git a/drivers/scsi/3w-9xxx.c b/drivers/scsi/3w-9xxx.c
-index 883d4a12a172..a377a6f6900a 100644
---- a/drivers/scsi/3w-9xxx.c
-+++ b/drivers/scsi/3w-9xxx.c
-@@ -1695,7 +1695,7 @@ static int twa_reset_sequence(TW_Device_Extension *tw_dev, int soft_reset)
- } /* End twa_reset_sequence() */
+-	struct ubd *ubd_dev = bdev->bd_disk->private_data;
++	struct ubd *ubd_dev = disk->private_data;
  
- /* This funciton returns unit geometry in cylinders/heads/sectors */
--static int twa_scsi_biosparam(struct scsi_device *sdev, struct block_device *bdev, sector_t capacity, int geom[])
-+static int twa_scsi_biosparam(struct scsi_device *sdev, struct gendisk *unused, sector_t capacity, int geom[])
- {
- 	int heads, sectors, cylinders;
- 
-diff --git a/drivers/scsi/3w-sas.c b/drivers/scsi/3w-sas.c
-index e057ab9c7b90..9bced6bca16e 100644
---- a/drivers/scsi/3w-sas.c
-+++ b/drivers/scsi/3w-sas.c
-@@ -1404,7 +1404,7 @@ static int twl_reset_device_extension(TW_Device_Extension *tw_dev, int ioctl_res
- } /* End twl_reset_device_extension() */
- 
- /* This funciton returns unit geometry in cylinders/heads/sectors */
--static int twl_scsi_biosparam(struct scsi_device *sdev, struct block_device *bdev, sector_t capacity, int geom[])
-+static int twl_scsi_biosparam(struct scsi_device *sdev, struct gendisk *unused, sector_t capacity, int geom[])
- {
- 	int heads, sectors;
- 
-diff --git a/drivers/scsi/3w-xxxx.c b/drivers/scsi/3w-xxxx.c
-index 89bd56f78ef9..0306a228c702 100644
---- a/drivers/scsi/3w-xxxx.c
-+++ b/drivers/scsi/3w-xxxx.c
-@@ -1340,7 +1340,7 @@ static int tw_reset_device_extension(TW_Device_Extension *tw_dev)
- } /* End tw_reset_device_extension() */
- 
- /* This funciton returns unit geometry in cylinders/heads/sectors */
--static int tw_scsi_biosparam(struct scsi_device *sdev, struct block_device *bdev,
-+static int tw_scsi_biosparam(struct scsi_device *sdev, struct gendisk *unused,
- 			     sector_t capacity, int geom[])
- {
- 	int heads, sectors, cylinders;
-diff --git a/drivers/scsi/BusLogic.c b/drivers/scsi/BusLogic.c
-index 743be2ef6d1a..8b17d8103e90 100644
---- a/drivers/scsi/BusLogic.c
-+++ b/drivers/scsi/BusLogic.c
-@@ -3240,7 +3240,7 @@ static int blogic_resetadapter(struct blogic_adapter *adapter, bool hard_reset)
-   the BIOS, and a warning may be displayed.
- */
- 
--static int blogic_diskparam(struct scsi_device *sdev, struct block_device *dev,
-+static int blogic_diskparam(struct scsi_device *sdev, struct gendisk *disk,
- 		sector_t capacity, int *params)
- {
- 	struct blogic_adapter *adapter =
-@@ -3261,7 +3261,7 @@ static int blogic_diskparam(struct scsi_device *sdev, struct block_device *dev,
- 		diskparam->sectors = 32;
- 	}
- 	diskparam->cylinders = (unsigned long) capacity / (diskparam->heads * diskparam->sectors);
--	buf = scsi_bios_ptable(dev->bd_disk);
-+	buf = scsi_bios_ptable(disk);
- 	if (buf == NULL)
- 		return 0;
- 	/*
-diff --git a/drivers/scsi/BusLogic.h b/drivers/scsi/BusLogic.h
-index 61bf26d4fc10..79de815e33b0 100644
---- a/drivers/scsi/BusLogic.h
-+++ b/drivers/scsi/BusLogic.h
-@@ -1273,7 +1273,7 @@ static inline void blogic_incszbucket(unsigned int *cmdsz_buckets,
- 
- static const char *blogic_drvr_info(struct Scsi_Host *);
- static int blogic_qcmd(struct Scsi_Host *h, struct scsi_cmnd *);
--static int blogic_diskparam(struct scsi_device *, struct block_device *, sector_t, int *);
-+static int blogic_diskparam(struct scsi_device *, struct gendisk *, sector_t, int *);
- static int blogic_sdev_configure(struct scsi_device *,
- 				 struct queue_limits *lim);
- static void blogic_qcompleted_ccb(struct blogic_ccb *);
-diff --git a/drivers/scsi/aacraid/linit.c b/drivers/scsi/aacraid/linit.c
-index 2264a97d91a0..ea66196ef7c7 100644
---- a/drivers/scsi/aacraid/linit.c
-+++ b/drivers/scsi/aacraid/linit.c
-@@ -273,7 +273,7 @@ struct aac_driver_ident* aac_get_driver_ident(int devtype)
- /**
-  *	aac_biosparm	-	return BIOS parameters for disk
-  *	@sdev: The scsi device corresponding to the disk
-- *	@bdev: the block device corresponding to the disk
-+ *	@disk: the gendisk corresponding to the disk
-  *	@capacity: the sector capacity of the disk
-  *	@geom: geometry block to fill in
-  *
-@@ -292,7 +292,7 @@ struct aac_driver_ident* aac_get_driver_ident(int devtype)
-  *	be displayed.
-  */
- 
--static int aac_biosparm(struct scsi_device *sdev, struct block_device *bdev,
-+static int aac_biosparm(struct scsi_device *sdev, struct gendisk *disk,
- 			sector_t capacity, int *geom)
- {
- 	struct diskparm *param = (struct diskparm *)geom;
-@@ -324,7 +324,7 @@ static int aac_biosparm(struct scsi_device *sdev, struct block_device *bdev,
- 	 *	entry whose end_head matches one of the standard geometry
- 	 *	translations ( 64/32, 128/32, 255/63 ).
+ 	geo->heads = 128;
+ 	geo->sectors = 32;
+diff --git a/block/ioctl.c b/block/ioctl.c
+index e472cc1030c6..57ee2b9d3c8d 100644
+--- a/block/ioctl.c
++++ b/block/ioctl.c
+@@ -480,7 +480,7 @@ static int blkdev_getgeo(struct block_device *bdev,
  	 */
--	buf = scsi_bios_ptable(bdev->bd_disk);
-+	buf = scsi_bios_ptable(disk);
- 	if (!buf)
- 		return 0;
- 	if (*(__le16 *)(buf + 0x40) == cpu_to_le16(MSDOS_LABEL_MAGIC)) {
-diff --git a/drivers/scsi/advansys.c b/drivers/scsi/advansys.c
-index 3a2c336307c0..063e1b5818d3 100644
---- a/drivers/scsi/advansys.c
-+++ b/drivers/scsi/advansys.c
-@@ -7096,7 +7096,7 @@ static int advansys_reset(struct scsi_cmnd *scp)
-  * ip[2]: cylinders
-  */
- static int
--advansys_biosparam(struct scsi_device *sdev, struct block_device *bdev,
-+advansys_biosparam(struct scsi_device *sdev, struct gendisk *unused,
- 		   sector_t capacity, int ip[])
+ 	memset(&geo, 0, sizeof(geo));
+ 	geo.start = get_start_sect(bdev);
+-	ret = disk->fops->getgeo(bdev, &geo);
++	ret = disk->fops->getgeo(disk, &geo);
+ 	if (ret)
+ 		return ret;
+ 	if (copy_to_user(argp, &geo, sizeof(geo)))
+@@ -514,7 +514,7 @@ static int compat_hdio_getgeo(struct block_device *bdev,
+ 	 * want to override it.
+ 	 */
+ 	geo.start = get_start_sect(bdev);
+-	ret = disk->fops->getgeo(bdev, &geo);
++	ret = disk->fops->getgeo(disk, &geo);
+ 	if (ret)
+ 		return ret;
+ 
+diff --git a/block/partitions/ibm.c b/block/partitions/ibm.c
+index 82d9c4c3fb41..631291fbb356 100644
+--- a/block/partitions/ibm.c
++++ b/block/partitions/ibm.c
+@@ -358,7 +358,7 @@ int ibm_partition(struct parsed_partitions *state)
+ 		goto out_nolab;
+ 	/* set start if not filled by getgeo function e.g. virtblk */
+ 	geo->start = get_start_sect(bdev);
+-	if (disk->fops->getgeo(bdev, geo))
++	if (disk->fops->getgeo(disk, geo))
+ 		goto out_freeall;
+ 	if (!fn || fn(disk, info)) {
+ 		kfree(info);
+diff --git a/drivers/block/amiflop.c b/drivers/block/amiflop.c
+index 6357d86eafdc..2932b6653b6f 100644
+--- a/drivers/block/amiflop.c
++++ b/drivers/block/amiflop.c
+@@ -1523,13 +1523,13 @@ static blk_status_t amiflop_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 	return BLK_STS_OK;
+ }
+ 
+-static int fd_getgeo(struct block_device *bdev, struct hd_geometry *geo)
++static int fd_getgeo(struct gendisk *disk, struct hd_geometry *geo)
  {
- 	struct asc_board *boardp = shost_priv(sdev->host);
-diff --git a/drivers/scsi/aha152x.c b/drivers/scsi/aha152x.c
-index e94c0a19c435..182aa80ec4c6 100644
---- a/drivers/scsi/aha152x.c
-+++ b/drivers/scsi/aha152x.c
-@@ -1246,7 +1246,7 @@ int aha152x_host_reset_host(struct Scsi_Host *shpnt)
-  * Return the "logical geometry"
+-	int drive = MINOR(bdev->bd_dev) & 3;
++	struct amiga_floppy_struct *p = disk->private_data;
+ 
+-	geo->heads = unit[drive].type->heads;
+-	geo->sectors = unit[drive].dtype->sects * unit[drive].type->sect_mult;
+-	geo->cylinders = unit[drive].type->tracks;
++	geo->heads = p->type->heads;
++	geo->sectors = p->dtype->sects * p->type->sect_mult;
++	geo->cylinders = p->type->tracks;
+ 	return 0;
+ }
+ 
+diff --git a/drivers/block/aoe/aoeblk.c b/drivers/block/aoe/aoeblk.c
+index 00b74a845328..34ead75e7e02 100644
+--- a/drivers/block/aoe/aoeblk.c
++++ b/drivers/block/aoe/aoeblk.c
+@@ -269,9 +269,9 @@ static blk_status_t aoeblk_queue_rq(struct blk_mq_hw_ctx *hctx,
+ }
+ 
+ static int
+-aoeblk_getgeo(struct block_device *bdev, struct hd_geometry *geo)
++aoeblk_getgeo(struct gendisk *disk, struct hd_geometry *geo)
+ {
+-	struct aoedev *d = bdev->bd_disk->private_data;
++	struct aoedev *d = disk->private_data;
+ 
+ 	if ((d->flags & DEVFL_UP) == 0) {
+ 		printk(KERN_ERR "aoe: disk not up\n");
+diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
+index e97432032f01..307be2817466 100644
+--- a/drivers/block/floppy.c
++++ b/drivers/block/floppy.c
+@@ -3363,9 +3363,9 @@ static int get_floppy_geometry(int drive, int type, struct floppy_struct **g)
+ 	return 0;
+ }
+ 
+-static int fd_getgeo(struct block_device *bdev, struct hd_geometry *geo)
++static int fd_getgeo(struct gendisk *disk, struct hd_geometry *geo)
+ {
+-	int drive = (long)bdev->bd_disk->private_data;
++	int drive = (long)disk->private_data;
+ 	int type = ITYPE(drive_state[drive].fd_device);
+ 	struct floppy_struct *g;
+ 	int ret;
+diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/mtip32xx.c
+index 66ce6b81c7d9..ac0f8bfb6b89 100644
+--- a/drivers/block/mtip32xx/mtip32xx.c
++++ b/drivers/block/mtip32xx/mtip32xx.c
+@@ -3143,17 +3143,17 @@ static int mtip_block_compat_ioctl(struct block_device *dev,
+  * that each partition is also 4KB aligned. Non-aligned partitions adversely
+  * affects performance.
   *
-  */
--static int aha152x_biosparam(struct scsi_device *sdev, struct block_device *bdev,
-+static int aha152x_biosparam(struct scsi_device *sdev, struct gendisk *disk,
- 		sector_t capacity, int *info_array)
- {
- 	struct Scsi_Host *shpnt = sdev->host;
-@@ -1261,7 +1261,7 @@ static int aha152x_biosparam(struct scsi_device *sdev, struct block_device *bdev
- 		int info[3];
- 
- 		/* try to figure out the geometry from the partition table */
--		if (scsicam_bios_param(bdev, capacity, info) < 0 ||
-+		if (scsicam_bios_param(disk, capacity, info) < 0 ||
- 		    !((info[0] == 64 && info[1] == 32) || (info[0] == 255 && info[1] == 63))) {
- 			if (EXT_TRANS) {
- 				printk(KERN_NOTICE
-diff --git a/drivers/scsi/aha1542.c b/drivers/scsi/aha1542.c
-index 389499d3e00a..371e8300f029 100644
---- a/drivers/scsi/aha1542.c
-+++ b/drivers/scsi/aha1542.c
-@@ -992,7 +992,7 @@ static int aha1542_host_reset(struct scsi_cmnd *cmd)
- }
- 
- static int aha1542_biosparam(struct scsi_device *sdev,
--		struct block_device *bdev, sector_t capacity, int geom[])
-+		struct gendisk *unused, sector_t capacity, int geom[])
- {
- 	struct aha1542_hostdata *aha1542 = shost_priv(sdev->host);
- 
-diff --git a/drivers/scsi/aha1740.c b/drivers/scsi/aha1740.c
-index be7ebbbb9ba8..b234621f6b37 100644
---- a/drivers/scsi/aha1740.c
-+++ b/drivers/scsi/aha1740.c
-@@ -510,7 +510,7 @@ static void aha1740_getconfig(unsigned int base, unsigned int *irq_level,
- }
- 
- static int aha1740_biosparam(struct scsi_device *sdev,
--			     struct block_device *dev,
-+			     struct gendisk *unused,
- 			     sector_t capacity, int* ip)
- {
- 	int size = capacity;
-diff --git a/drivers/scsi/aic7xxx/aic79xx_osm.c b/drivers/scsi/aic7xxx/aic79xx_osm.c
-index 2cff19e95fec..c3d1b9dd24ae 100644
---- a/drivers/scsi/aic7xxx/aic79xx_osm.c
-+++ b/drivers/scsi/aic7xxx/aic79xx_osm.c
-@@ -720,7 +720,7 @@ ahd_linux_sdev_configure(struct scsi_device *sdev, struct queue_limits *lim)
-  * Return the disk geometry for the given SCSI device.
-  */
- static int
--ahd_linux_biosparam(struct scsi_device *sdev, struct block_device *bdev,
-+ahd_linux_biosparam(struct scsi_device *sdev, struct gendisk *disk,
- 		    sector_t capacity, int geom[])
- {
- 	int	 heads;
-@@ -731,7 +731,7 @@ ahd_linux_biosparam(struct scsi_device *sdev, struct block_device *bdev,
- 
- 	ahd = *((struct ahd_softc **)sdev->host->hostdata);
- 
--	if (scsi_partsize(bdev->bd_disk, capacity, geom))
-+	if (scsi_partsize(disk, capacity, geom))
- 		return 0;
- 
- 	heads = 64;
-diff --git a/drivers/scsi/aic7xxx/aic7xxx_osm.c b/drivers/scsi/aic7xxx/aic7xxx_osm.c
-index 05bdb73d1157..8b2b98666d61 100644
---- a/drivers/scsi/aic7xxx/aic7xxx_osm.c
-+++ b/drivers/scsi/aic7xxx/aic7xxx_osm.c
-@@ -683,7 +683,7 @@ ahc_linux_sdev_configure(struct scsi_device *sdev, struct queue_limits *lim)
-  * Return the disk geometry for the given SCSI device.
-  */
- static int
--ahc_linux_biosparam(struct scsi_device *sdev, struct block_device *bdev,
-+ahc_linux_biosparam(struct scsi_device *sdev, struct gendisk *disk,
- 		    sector_t capacity, int geom[])
- {
- 	int	 heads;
-@@ -696,7 +696,7 @@ ahc_linux_biosparam(struct scsi_device *sdev, struct block_device *bdev,
- 	ahc = *((struct ahc_softc **)sdev->host->hostdata);
- 	channel = sdev_channel(sdev);
- 
--	if (scsi_partsize(bdev->bd_disk, capacity, geom))
-+	if (scsi_partsize(disk, capacity, geom))
- 		return 0;
- 
- 	heads = 64;
-diff --git a/drivers/scsi/arcmsr/arcmsr_hba.c b/drivers/scsi/arcmsr/arcmsr_hba.c
-index 6968da9fb67c..f0c5a30ce51b 100644
---- a/drivers/scsi/arcmsr/arcmsr_hba.c
-+++ b/drivers/scsi/arcmsr/arcmsr_hba.c
-@@ -112,7 +112,7 @@ static int arcmsr_iop_confirm(struct AdapterControlBlock *acb);
- static int arcmsr_abort(struct scsi_cmnd *);
- static int arcmsr_bus_reset(struct scsi_cmnd *);
- static int arcmsr_bios_param(struct scsi_device *sdev,
--		struct block_device *bdev, sector_t capacity, int *info);
-+		struct gendisk *disk, sector_t capacity, int *info);
- static int arcmsr_queue_command(struct Scsi_Host *h, struct scsi_cmnd *cmd);
- static int arcmsr_probe(struct pci_dev *pdev,
- 				const struct pci_device_id *id);
-@@ -377,11 +377,11 @@ static irqreturn_t arcmsr_do_interrupt(int irq, void *dev_id)
- }
- 
- static int arcmsr_bios_param(struct scsi_device *sdev,
--		struct block_device *bdev, sector_t capacity, int *geom)
-+		struct gendisk *disk, sector_t capacity, int *geom)
- {
- 	int heads, sectors, cylinders, total_capacity;
- 
--	if (scsi_partsize(bdev->bd_disk, capacity, geom))
-+	if (scsi_partsize(disk, capacity, geom))
- 		return 0;
- 
- 	total_capacity = capacity;
-diff --git a/drivers/scsi/atp870u.c b/drivers/scsi/atp870u.c
-index 401242912855..df6f40b51deb 100644
---- a/drivers/scsi/atp870u.c
-+++ b/drivers/scsi/atp870u.c
-@@ -1692,7 +1692,7 @@ static int atp870u_show_info(struct seq_file *m, struct Scsi_Host *HBAptr)
- }
- 
- 
--static int atp870u_biosparam(struct scsi_device *disk, struct block_device *dev,
-+static int atp870u_biosparam(struct scsi_device *disk, struct gendisk *unused,
- 			sector_t capacity, int *ip)
- {
- 	int heads, sectors, cylinders;
-diff --git a/drivers/scsi/fdomain.c b/drivers/scsi/fdomain.c
-index 4a3716dc644c..c0b2a980db34 100644
---- a/drivers/scsi/fdomain.c
-+++ b/drivers/scsi/fdomain.c
-@@ -469,10 +469,10 @@ static int fdomain_host_reset(struct scsi_cmnd *cmd)
- }
- 
- static int fdomain_biosparam(struct scsi_device *sdev,
--			     struct block_device *bdev,	sector_t capacity,
-+			     struct gendisk *disk, sector_t capacity,
- 			     int geom[])
- {
--	unsigned char *p = scsi_bios_ptable(bdev->bd_disk);
-+	unsigned char *p = scsi_bios_ptable(disk);
- 
- 	if (p && p[65] == 0xaa && p[64] == 0x55 /* Partition table valid */
- 	    && p[4]) {	 /* Partition type */
-diff --git a/drivers/scsi/imm.c b/drivers/scsi/imm.c
-index 0821cf994b98..5c602c057798 100644
---- a/drivers/scsi/imm.c
-+++ b/drivers/scsi/imm.c
-@@ -954,7 +954,7 @@ static DEF_SCSI_QCMD(imm_queuecommand)
-  * be done in sd.c.  Even if it gets fixed there, this will still
-  * work.
-  */
--static int imm_biosparam(struct scsi_device *sdev, struct block_device *dev,
-+static int imm_biosparam(struct scsi_device *sdev, struct gendisk *unused,
- 			 sector_t capacity, int ip[])
- {
- 	ip[0] = 0x40;
-diff --git a/drivers/scsi/initio.c b/drivers/scsi/initio.c
-index 8648bd965287..ed34ad92c807 100644
---- a/drivers/scsi/initio.c
-+++ b/drivers/scsi/initio.c
-@@ -2645,7 +2645,7 @@ static int i91u_bus_reset(struct scsi_cmnd * cmnd)
- /**
-  *	i91u_biosparam			-	return the "logical geometry
-  *	@sdev: SCSI device
-- *	@dev: Matching block device
-+ *	@unused: Matching gendisk
-  *	@capacity: Sector size of drive
-  *	@info_array: Return space for BIOS geometry
+- * @dev Pointer to the block_device strucutre.
++ * @disk Pointer to the gendisk strucutre.
+  * @geo Pointer to a hd_geometry structure.
   *
-@@ -2655,7 +2655,7 @@ static int i91u_bus_reset(struct scsi_cmnd * cmnd)
-  *	FIXME: limited to 2^32 sector devices.
+  * return value
+  *	0       Operation completed successfully.
+  *	-ENOTTY An error occurred while reading the drive capacity.
   */
+-static int mtip_block_getgeo(struct block_device *dev,
++static int mtip_block_getgeo(struct gendisk *disk,
+ 				struct hd_geometry *geo)
+ {
+-	struct driver_data *dd = dev->bd_disk->private_data;
++	struct driver_data *dd = disk->private_data;
+ 	sector_t capacity;
  
--static int i91u_biosparam(struct scsi_device *sdev, struct block_device *dev,
-+static int i91u_biosparam(struct scsi_device *sdev, struct gendisk *unused,
- 		sector_t capacity, int *info_array)
- {
- 	struct initio_host *host;		/* Point to Host adapter control block */
-diff --git a/drivers/scsi/ipr.c b/drivers/scsi/ipr.c
-index b29bec6abd72..36710df9b723 100644
---- a/drivers/scsi/ipr.c
-+++ b/drivers/scsi/ipr.c
-@@ -4644,10 +4644,10 @@ ATTRIBUTE_GROUPS(ipr_dev);
- 
- /**
-  * ipr_biosparam - Return the HSC mapping
-- * @sdev:			scsi device struct
-- * @block_device:	block device pointer
-+ * @sdev:		scsi device struct
-+ * @unused:		gendisk pointer
-  * @capacity:		capacity of the device
-- * @parm:			Array containing returned HSC values.
-+ * @parm:		Array containing returned HSC values.
-  *
-  * This function generates the HSC parms that fdisk uses.
-  * We want to make sure we return something that places partitions
-@@ -4657,7 +4657,7 @@ ATTRIBUTE_GROUPS(ipr_dev);
-  * 	0 on success
-  **/
- static int ipr_biosparam(struct scsi_device *sdev,
--			 struct block_device *block_device,
-+			 struct gendisk *unused,
- 			 sector_t capacity, int *parm)
- {
- 	int heads, sectors;
-diff --git a/drivers/scsi/ips.c b/drivers/scsi/ips.c
-index 94adb6ac02a4..3393a288fd23 100644
---- a/drivers/scsi/ips.c
-+++ b/drivers/scsi/ips.c
-@@ -1123,7 +1123,7 @@ static DEF_SCSI_QCMD(ips_queue)
- /*   Set bios geometry for the controller                                   */
- /*                                                                          */
- /****************************************************************************/
--static int ips_biosparam(struct scsi_device *sdev, struct block_device *bdev,
-+static int ips_biosparam(struct scsi_device *sdev, struct gendisk *unused,
- 			 sector_t capacity, int geom[])
- {
- 	ips_ha_t *ha = (ips_ha_t *) sdev->host->hostdata;
-diff --git a/drivers/scsi/ips.h b/drivers/scsi/ips.h
-index 8ac932ec4444..30a4d4a580e9 100644
---- a/drivers/scsi/ips.h
-+++ b/drivers/scsi/ips.h
-@@ -398,7 +398,7 @@
-    /*
-     * Scsi_Host Template
-     */
--   static int ips_biosparam(struct scsi_device *sdev, struct block_device *bdev,
-+   static int ips_biosparam(struct scsi_device *sdev, struct gendisk *unused,
- 		sector_t capacity, int geom[]);
-    static int ips_sdev_configure(struct scsi_device *SDptr,
- 				 struct queue_limits *lim);
-diff --git a/drivers/scsi/libsas/sas_scsi_host.c b/drivers/scsi/libsas/sas_scsi_host.c
-index 928723c90b75..ffa5b49aaf08 100644
---- a/drivers/scsi/libsas/sas_scsi_host.c
-+++ b/drivers/scsi/libsas/sas_scsi_host.c
-@@ -845,7 +845,7 @@ int sas_change_queue_depth(struct scsi_device *sdev, int depth)
- EXPORT_SYMBOL_GPL(sas_change_queue_depth);
- 
- int sas_bios_param(struct scsi_device *scsi_dev,
--			  struct block_device *bdev,
-+			  struct gendisk *unused,
- 			  sector_t capacity, int *hsc)
- {
- 	hsc[0] = 255;
-diff --git a/drivers/scsi/megaraid.c b/drivers/scsi/megaraid.c
-index c7581c7829af..a00622c0c526 100644
---- a/drivers/scsi/megaraid.c
-+++ b/drivers/scsi/megaraid.c
-@@ -2780,7 +2780,7 @@ static inline void mega_create_proc_entry(int index, struct proc_dir_entry *pare
-  * Return the disk geometry for a particular disk
-  */
- static int
--megaraid_biosparam(struct scsi_device *sdev, struct block_device *bdev,
-+megaraid_biosparam(struct scsi_device *sdev, struct gendisk *disk,
- 		    sector_t capacity, int geom[])
- {
- 	adapter_t	*adapter;
-@@ -2813,7 +2813,7 @@ megaraid_biosparam(struct scsi_device *sdev, struct block_device *bdev,
- 			geom[2] = cylinders;
- 	}
- 	else {
--		if (scsi_partsize(bdev->bd_disk, capacity, geom))
-+		if (scsi_partsize(disk, capacity, geom))
- 			return 0;
- 
- 		dev_info(&adapter->dev->dev,
-diff --git a/drivers/scsi/megaraid.h b/drivers/scsi/megaraid.h
-index 013fbfb911b9..d6bfd26a8843 100644
---- a/drivers/scsi/megaraid.h
-+++ b/drivers/scsi/megaraid.h
-@@ -975,7 +975,7 @@ static void mega_free_scb(adapter_t *, scb_t *);
- static int megaraid_abort(struct scsi_cmnd *);
- static int megaraid_reset(struct scsi_cmnd *);
- static int megaraid_abort_and_reset(adapter_t *, struct scsi_cmnd *, int);
--static int megaraid_biosparam(struct scsi_device *, struct block_device *,
-+static int megaraid_biosparam(struct scsi_device *, struct gendisk *,
- 		sector_t, int []);
- 
- static int mega_build_sglist (adapter_t *adapter, scb_t *scb,
-diff --git a/drivers/scsi/megaraid/megaraid_sas_base.c b/drivers/scsi/megaraid/megaraid_sas_base.c
-index 9179f8aee964..fd1047cc00e0 100644
---- a/drivers/scsi/megaraid/megaraid_sas_base.c
-+++ b/drivers/scsi/megaraid/megaraid_sas_base.c
-@@ -3137,12 +3137,12 @@ static int megasas_reset_target(struct scsi_cmnd *scmd)
- /**
-  * megasas_bios_param - Returns disk geometry for a disk
-  * @sdev:		device handle
-- * @bdev:		block device
-+ * @unused:		gendisk
-  * @capacity:		drive capacity
-  * @geom:		geometry parameters
-  */
- static int
--megasas_bios_param(struct scsi_device *sdev, struct block_device *bdev,
-+megasas_bios_param(struct scsi_device *sdev, struct gendisk *unused,
- 		 sector_t capacity, int geom[])
- {
- 	int heads;
-diff --git a/drivers/scsi/mpi3mr/mpi3mr_os.c b/drivers/scsi/mpi3mr/mpi3mr_os.c
-index ce444efd859e..1355823cbbc0 100644
---- a/drivers/scsi/mpi3mr/mpi3mr_os.c
-+++ b/drivers/scsi/mpi3mr/mpi3mr_os.c
-@@ -4013,7 +4013,7 @@ int mpi3mr_issue_tm(struct mpi3mr_ioc *mrioc, u8 tm_type,
- /**
-  * mpi3mr_bios_param - BIOS param callback
-  * @sdev: SCSI device reference
-- * @bdev: Block device reference
-+ * @unused: gendisk reference
-  * @capacity: Capacity in logical sectors
-  * @params: Parameter array
-  *
-@@ -4022,7 +4022,7 @@ int mpi3mr_issue_tm(struct mpi3mr_ioc *mrioc, u8 tm_type,
-  * Return: 0 always
-  */
- static int mpi3mr_bios_param(struct scsi_device *sdev,
--	struct block_device *bdev, sector_t capacity, int params[])
-+	struct gendisk *unused, sector_t capacity, int params[])
- {
- 	int heads;
- 	int sectors;
-diff --git a/drivers/scsi/mpt3sas/mpt3sas_scsih.c b/drivers/scsi/mpt3sas/mpt3sas_scsih.c
-index 508861e88d9f..d52ecbdb4564 100644
---- a/drivers/scsi/mpt3sas/mpt3sas_scsih.c
-+++ b/drivers/scsi/mpt3sas/mpt3sas_scsih.c
-@@ -2746,7 +2746,7 @@ scsih_sdev_configure(struct scsi_device *sdev, struct queue_limits *lim)
- /**
-  * scsih_bios_param - fetch head, sector, cylinder info for a disk
-  * @sdev: scsi device struct
-- * @bdev: pointer to block device context
-+ * @unused: pointer to gendisk
-  * @capacity: device size (in 512 byte sectors)
-  * @params: three element array to place output:
-  *              params[0] number of heads (max 255)
-@@ -2754,7 +2754,7 @@ scsih_sdev_configure(struct scsi_device *sdev, struct queue_limits *lim)
-  *              params[2] number of cylinders
-  */
- static int
--scsih_bios_param(struct scsi_device *sdev, struct block_device *bdev,
-+scsih_bios_param(struct scsi_device *sdev, struct gendisk *unused,
- 	sector_t capacity, int params[])
- {
- 	int		heads;
-diff --git a/drivers/scsi/mvumi.c b/drivers/scsi/mvumi.c
-index 96549e7f5705..bdc2f2f17753 100644
---- a/drivers/scsi/mvumi.c
-+++ b/drivers/scsi/mvumi.c
-@@ -2142,7 +2142,7 @@ static enum scsi_timeout_action mvumi_timed_out(struct scsi_cmnd *scmd)
+ 	if (!dd)
+diff --git a/drivers/block/rnbd/rnbd-clt.c b/drivers/block/rnbd/rnbd-clt.c
+index 15627417f12e..119b7e27023f 100644
+--- a/drivers/block/rnbd/rnbd-clt.c
++++ b/drivers/block/rnbd/rnbd-clt.c
+@@ -942,11 +942,11 @@ static void rnbd_client_release(struct gendisk *gen)
+ 	rnbd_clt_put_dev(dev);
  }
  
- static int
--mvumi_bios_param(struct scsi_device *sdev, struct block_device *bdev,
-+mvumi_bios_param(struct scsi_device *sdev, struct gendisk *unused,
- 			sector_t capacity, int geom[])
+-static int rnbd_client_getgeo(struct block_device *block_device,
++static int rnbd_client_getgeo(struct gendisk *disk,
+ 			      struct hd_geometry *geo)
  {
- 	int heads, sectors;
-diff --git a/drivers/scsi/myrb.c b/drivers/scsi/myrb.c
-index 486db5b2f05d..b8453c0333dc 100644
---- a/drivers/scsi/myrb.c
-+++ b/drivers/scsi/myrb.c
-@@ -1745,7 +1745,7 @@ static void myrb_sdev_destroy(struct scsi_device *sdev)
- 	kfree(sdev->hostdata);
+ 	u64 size;
+-	struct rnbd_clt_dev *dev = block_device->bd_disk->private_data;
++	struct rnbd_clt_dev *dev = disk->private_data;
+ 	struct queue_limits *limit = &dev->queue->limits;
+ 
+ 	size = dev->size * (limit->logical_block_size / SECTOR_SIZE);
+diff --git a/drivers/block/sunvdc.c b/drivers/block/sunvdc.c
+index b5727dea15bd..0172c0bc34ea 100644
+--- a/drivers/block/sunvdc.c
++++ b/drivers/block/sunvdc.c
+@@ -119,9 +119,8 @@ static inline u32 vdc_tx_dring_avail(struct vio_dring_state *dr)
+ 	return vio_dring_avail(dr, VDC_TX_RING_SIZE);
  }
  
--static int myrb_biosparam(struct scsi_device *sdev, struct block_device *bdev,
-+static int myrb_biosparam(struct scsi_device *sdev, struct gendisk *unused,
- 		sector_t capacity, int geom[])
+-static int vdc_getgeo(struct block_device *bdev, struct hd_geometry *geo)
++static int vdc_getgeo(struct gendisk *disk, struct hd_geometry *geo)
  {
- 	struct myrb_hba *cb = shost_priv(sdev->host);
-diff --git a/drivers/scsi/pcmcia/sym53c500_cs.c b/drivers/scsi/pcmcia/sym53c500_cs.c
-index 278c78d066c4..a3b505240351 100644
---- a/drivers/scsi/pcmcia/sym53c500_cs.c
-+++ b/drivers/scsi/pcmcia/sym53c500_cs.c
-@@ -597,7 +597,7 @@ SYM53C500_host_reset(struct scsi_cmnd *SCpnt)
+-	struct gendisk *disk = bdev->bd_disk;
+ 	sector_t nsect = get_capacity(disk);
+ 	sector_t cylinders = nsect;
  
- static int 
- SYM53C500_biosparm(struct scsi_device *disk,
--    struct block_device *dev,
-+    struct gendisk *unused,
-     sector_t capacity, int *info_array)
- {
- 	int size;
-diff --git a/drivers/scsi/ppa.c b/drivers/scsi/ppa.c
-index 1ed3171f1797..ea682f3044b6 100644
---- a/drivers/scsi/ppa.c
-+++ b/drivers/scsi/ppa.c
-@@ -845,7 +845,7 @@ static DEF_SCSI_QCMD(ppa_queuecommand)
-  * be done in sd.c.  Even if it gets fixed there, this will still
-  * work.
-  */
--static int ppa_biosparam(struct scsi_device *sdev, struct block_device *dev,
-+static int ppa_biosparam(struct scsi_device *sdev, struct gendisk *unused,
- 	      sector_t capacity, int ip[])
- {
- 	ip[0] = 0x40;
-diff --git a/drivers/scsi/qla1280.c b/drivers/scsi/qla1280.c
-index 6af018f1ca22..ef841f643171 100644
---- a/drivers/scsi/qla1280.c
-+++ b/drivers/scsi/qla1280.c
-@@ -1023,7 +1023,7 @@ qla1280_eh_adapter_reset(struct scsi_cmnd *cmd)
+diff --git a/drivers/block/swim.c b/drivers/block/swim.c
+index eda33c5eb5e2..416015947ae6 100644
+--- a/drivers/block/swim.c
++++ b/drivers/block/swim.c
+@@ -711,9 +711,9 @@ static int floppy_ioctl(struct block_device *bdev, blk_mode_t mode,
+ 	return -ENOTTY;
  }
  
- static int
--qla1280_biosparam(struct scsi_device *sdev, struct block_device *bdev,
-+qla1280_biosparam(struct scsi_device *sdev, struct gendisk *unused,
- 		  sector_t capacity, int geom[])
+-static int floppy_getgeo(struct block_device *bdev, struct hd_geometry *geo)
++static int floppy_getgeo(struct gendisk *disk, struct hd_geometry *geo)
  {
- 	int heads, sectors, cylinders;
-diff --git a/drivers/scsi/qlogicfas408.c b/drivers/scsi/qlogicfas408.c
-index 3e065d5fc80c..1ce469b7db99 100644
---- a/drivers/scsi/qlogicfas408.c
-+++ b/drivers/scsi/qlogicfas408.c
-@@ -492,7 +492,7 @@ DEF_SCSI_QCMD(qlogicfas408_queuecommand)
-  *	Return bios parameters
-  */
+-	struct floppy_state *fs = bdev->bd_disk->private_data;
++	struct floppy_state *fs = disk->private_data;
+ 	struct floppy_struct *g;
+ 	int ret;
  
--int qlogicfas408_biosparam(struct scsi_device *disk, struct block_device *dev,
-+int qlogicfas408_biosparam(struct scsi_device *disk, struct gendisk *unused,
- 			   sector_t capacity, int ip[])
- {
- /* This should mimic the DOS Qlogic driver's behavior exactly */
-diff --git a/drivers/scsi/qlogicfas408.h b/drivers/scsi/qlogicfas408.h
-index a971db11d293..83ef86c71f2f 100644
---- a/drivers/scsi/qlogicfas408.h
-+++ b/drivers/scsi/qlogicfas408.h
-@@ -106,7 +106,7 @@ struct qlogicfas408_priv {
- irqreturn_t qlogicfas408_ihandl(int irq, void *dev_id);
- int qlogicfas408_queuecommand(struct Scsi_Host *h, struct scsi_cmnd * cmd);
- int qlogicfas408_biosparam(struct scsi_device * disk,
--			   struct block_device *dev,
-+			   struct gendisk *unused,
- 			   sector_t capacity, int ip[]);
- int qlogicfas408_abort(struct scsi_cmnd * cmd);
- extern int qlogicfas408_host_reset(struct scsi_cmnd *cmd);
-diff --git a/drivers/scsi/scsicam.c b/drivers/scsi/scsicam.c
-index 3ff2cf51d5b0..887de505bcf9 100644
---- a/drivers/scsi/scsicam.c
-+++ b/drivers/scsi/scsicam.c
-@@ -205,7 +205,7 @@ static int setsize(unsigned long capacity, unsigned int *cyls, unsigned int *hds
+diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+index 30bca8cb7106..4a6b1e6dcd17 100644
+--- a/drivers/block/virtio_blk.c
++++ b/drivers/block/virtio_blk.c
+@@ -829,9 +829,9 @@ static int virtblk_get_id(struct gendisk *disk, char *id_str)
+ }
  
- /**
-  * scsicam_bios_param - Determine geometry of a disk in cylinders/heads/sectors.
-- * @bdev: which device
-+ * @disk: which device
-  * @capacity: size of the disk in sectors
-  * @ip: return value: ip[0]=heads, ip[1]=sectors, ip[2]=cylinders
-  *
-@@ -215,13 +215,13 @@ static int setsize(unsigned long capacity, unsigned int *cyls, unsigned int *hds
-  *
-  * Returns : -1 on failure, 0 on success.
-  */
--int scsicam_bios_param(struct block_device *bdev, sector_t capacity, int *ip)
-+int scsicam_bios_param(struct gendisk *disk, sector_t capacity, int *ip)
+ /* We provide getgeo only to please some old bootloader/partitioning tools */
+-static int virtblk_getgeo(struct block_device *bd, struct hd_geometry *geo)
++static int virtblk_getgeo(struct gendisk *disk, struct hd_geometry *geo)
  {
- 	u64 capacity64 = capacity;	/* Suppress gcc warning */
+-	struct virtio_blk *vblk = bd->bd_disk->private_data;
++	struct virtio_blk *vblk = disk->private_data;
  	int ret = 0;
  
- 	/* try to infer mapping from partition table */
--	if (scsi_partsize(bdev->bd_disk, capacity, ip))
-+	if (scsi_partsize(disk, capacity, ip))
- 		return 0;
+ 	mutex_lock(&vblk->vdev_mutex);
+@@ -853,7 +853,7 @@ static int virtblk_getgeo(struct block_device *bd, struct hd_geometry *geo)
+ 		/* some standard values, similar to sd */
+ 		geo->heads = 1 << 6;
+ 		geo->sectors = 1 << 5;
+-		geo->cylinders = get_capacity(bd->bd_disk) >> 11;
++		geo->cylinders = get_capacity(disk) >> 11;
+ 	}
+ out:
+ 	mutex_unlock(&vblk->vdev_mutex);
+diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
+index 5babe575c288..04fc6b552c04 100644
+--- a/drivers/block/xen-blkfront.c
++++ b/drivers/block/xen-blkfront.c
+@@ -493,11 +493,11 @@ static void blkif_restart_queue_callback(void *arg)
+ 	schedule_work(&rinfo->work);
+ }
  
- 	if (capacity64 < (1ULL << 32)) {
+-static int blkif_getgeo(struct block_device *bd, struct hd_geometry *hg)
++static int blkif_getgeo(struct gendisk *disk, struct hd_geometry *hg)
+ {
+ 	/* We don't have real geometry info, but let's at least return
+ 	   values consistent with the size of the device */
+-	sector_t nsect = get_capacity(bd->bd_disk);
++	sector_t nsect = get_capacity(disk);
+ 	sector_t cylinders = nsect;
+ 
+ 	hg->heads = 0xff;
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index 1726f0f828cc..20202f8ad4ce 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -403,9 +403,9 @@ static void do_deferred_remove(struct work_struct *w)
+ 	dm_deferred_remove();
+ }
+ 
+-static int dm_blk_getgeo(struct block_device *bdev, struct hd_geometry *geo)
++static int dm_blk_getgeo(struct gendisk *disk, struct hd_geometry *geo)
+ {
+-	struct mapped_device *md = bdev->bd_disk->private_data;
++	struct mapped_device *md = disk->private_data;
+ 
+ 	return dm_get_geometry(md, geo);
+ }
+diff --git a/drivers/md/md.c b/drivers/md/md.c
+index 0f03b21e66e4..5e75b388b096 100644
+--- a/drivers/md/md.c
++++ b/drivers/md/md.c
+@@ -7669,9 +7669,9 @@ static int set_disk_faulty(struct mddev *mddev, dev_t dev)
+  * 4 sectors (with a BIG number of cylinders...). This drives
+  * dosfs just mad... ;-)
+  */
+-static int md_getgeo(struct block_device *bdev, struct hd_geometry *geo)
++static int md_getgeo(struct gendisk *disk, struct hd_geometry *geo)
+ {
+-	struct mddev *mddev = bdev->bd_disk->private_data;
++	struct mddev *mddev = disk->private_data;
+ 
+ 	geo->heads = 2;
+ 	geo->sectors = 4;
+diff --git a/drivers/memstick/core/ms_block.c b/drivers/memstick/core/ms_block.c
+index d34892782f6e..1af157ce0a63 100644
+--- a/drivers/memstick/core/ms_block.c
++++ b/drivers/memstick/core/ms_block.c
+@@ -1953,10 +1953,10 @@ static void msb_data_clear(struct msb_data *msb)
+ 	msb->card = NULL;
+ }
+ 
+-static int msb_bd_getgeo(struct block_device *bdev,
++static int msb_bd_getgeo(struct gendisk *disk,
+ 				 struct hd_geometry *geo)
+ {
+-	struct msb_data *msb = bdev->bd_disk->private_data;
++	struct msb_data *msb = disk->private_data;
+ 	*geo = msb->geometry;
+ 	return 0;
+ }
+diff --git a/drivers/memstick/core/mspro_block.c b/drivers/memstick/core/mspro_block.c
+index c9853d887d28..075519caa547 100644
+--- a/drivers/memstick/core/mspro_block.c
++++ b/drivers/memstick/core/mspro_block.c
+@@ -189,10 +189,10 @@ static void mspro_block_bd_free_disk(struct gendisk *disk)
+ 	kfree(msb);
+ }
+ 
+-static int mspro_block_bd_getgeo(struct block_device *bdev,
++static int mspro_block_bd_getgeo(struct gendisk *disk,
+ 				 struct hd_geometry *geo)
+ {
+-	struct mspro_block_data *msb = bdev->bd_disk->private_data;
++	struct mspro_block_data *msb = disk->private_data;
+ 
+ 	geo->heads = msb->heads;
+ 	geo->sectors = msb->sectors_per_track;
+diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
+index 9cc47bf94804..d1f295af9713 100644
+--- a/drivers/mmc/core/block.c
++++ b/drivers/mmc/core/block.c
+@@ -435,9 +435,9 @@ static void mmc_blk_release(struct gendisk *disk)
+ }
+ 
+ static int
+-mmc_blk_getgeo(struct block_device *bdev, struct hd_geometry *geo)
++mmc_blk_getgeo(struct gendisk *disk, struct hd_geometry *geo)
+ {
+-	geo->cylinders = get_capacity(bdev->bd_disk) / (4 * 16);
++	geo->cylinders = get_capacity(disk) / (4 * 16);
+ 	geo->heads = 4;
+ 	geo->sectors = 16;
+ 	return 0;
+diff --git a/drivers/mtd/mtd_blkdevs.c b/drivers/mtd/mtd_blkdevs.c
+index 847c11542f02..28e09d080440 100644
+--- a/drivers/mtd/mtd_blkdevs.c
++++ b/drivers/mtd/mtd_blkdevs.c
+@@ -246,9 +246,9 @@ static void blktrans_release(struct gendisk *disk)
+ 	blktrans_dev_put(dev);
+ }
+ 
+-static int blktrans_getgeo(struct block_device *bdev, struct hd_geometry *geo)
++static int blktrans_getgeo(struct gendisk *disk, struct hd_geometry *geo)
+ {
+-	struct mtd_blktrans_dev *dev = bdev->bd_disk->private_data;
++	struct mtd_blktrans_dev *dev = disk->private_data;
+ 	int ret = -ENXIO;
+ 
+ 	mutex_lock(&dev->lock);
+diff --git a/drivers/mtd/ubi/block.c b/drivers/mtd/ubi/block.c
+index 39cc0a6a4d37..b53fd147fa65 100644
+--- a/drivers/mtd/ubi/block.c
++++ b/drivers/mtd/ubi/block.c
+@@ -282,12 +282,12 @@ static void ubiblock_release(struct gendisk *gd)
+ 	mutex_unlock(&dev->dev_mutex);
+ }
+ 
+-static int ubiblock_getgeo(struct block_device *bdev, struct hd_geometry *geo)
++static int ubiblock_getgeo(struct gendisk *disk, struct hd_geometry *geo)
+ {
+ 	/* Some tools might require this information */
+ 	geo->heads = 1;
+ 	geo->cylinders = 1;
+-	geo->sectors = get_capacity(bdev->bd_disk);
++	geo->sectors = get_capacity(disk);
+ 	geo->start = 0;
+ 	return 0;
+ }
+diff --git a/drivers/nvdimm/btt.c b/drivers/nvdimm/btt.c
+index 423dcd190906..88ac859258f9 100644
+--- a/drivers/nvdimm/btt.c
++++ b/drivers/nvdimm/btt.c
+@@ -1478,12 +1478,12 @@ static void btt_submit_bio(struct bio *bio)
+ 	bio_endio(bio);
+ }
+ 
+-static int btt_getgeo(struct block_device *bd, struct hd_geometry *geo)
++static int btt_getgeo(struct gendisk *disk, struct hd_geometry *geo)
+ {
+ 	/* some standard values */
+ 	geo->heads = 1 << 6;
+ 	geo->sectors = 1 << 5;
+-	geo->cylinders = get_capacity(bd->bd_disk) >> 11;
++	geo->cylinders = get_capacity(disk) >> 11;
+ 	return 0;
+ }
+ 
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 7493e5aa984c..3f2cfb007a65 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -1799,12 +1799,12 @@ static void nvme_release(struct gendisk *disk)
+ 	nvme_ns_release(disk->private_data);
+ }
+ 
+-int nvme_getgeo(struct block_device *bdev, struct hd_geometry *geo)
++int nvme_getgeo(struct gendisk *disk, struct hd_geometry *geo)
+ {
+ 	/* some standard values */
+ 	geo->heads = 1 << 6;
+ 	geo->sectors = 1 << 5;
+-	geo->cylinders = get_capacity(bdev->bd_disk) >> 11;
++	geo->cylinders = get_capacity(disk) >> 11;
+ 	return 0;
+ }
+ 
+diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+index 7df2ea21851f..83bc93fa124a 100644
+--- a/drivers/nvme/host/nvme.h
++++ b/drivers/nvme/host/nvme.h
+@@ -936,7 +936,7 @@ int nvme_ns_head_chr_uring_cmd(struct io_uring_cmd *ioucmd,
+ 		unsigned int issue_flags);
+ int nvme_identify_ns(struct nvme_ctrl *ctrl, unsigned nsid,
+ 		struct nvme_id_ns **id);
+-int nvme_getgeo(struct block_device *bdev, struct hd_geometry *geo);
++int nvme_getgeo(struct gendisk *disk, struct hd_geometry *geo);
+ int nvme_dev_uring_cmd(struct io_uring_cmd *ioucmd, unsigned int issue_flags);
+ 
+ extern const struct attribute_group *nvme_ns_attr_groups[];
+diff --git a/drivers/s390/block/dasd.c b/drivers/s390/block/dasd.c
+index b16efecfde4b..d7307c68b1b5 100644
+--- a/drivers/s390/block/dasd.c
++++ b/drivers/s390/block/dasd.c
+@@ -3316,11 +3316,11 @@ static void dasd_release(struct gendisk *disk)
+ /*
+  * Return disk geometry.
+  */
+-static int dasd_getgeo(struct block_device *bdev, struct hd_geometry *geo)
++static int dasd_getgeo(struct gendisk *disk, struct hd_geometry *geo)
+ {
+ 	struct dasd_device *base;
+ 
+-	base = dasd_device_from_gendisk(bdev->bd_disk);
++	base = dasd_device_from_gendisk(disk);
+ 	if (!base)
+ 		return -ENODEV;
+ 
+@@ -3330,7 +3330,8 @@ static int dasd_getgeo(struct block_device *bdev, struct hd_geometry *geo)
+ 		return -EINVAL;
+ 	}
+ 	base->discipline->fill_geometry(base->block, geo);
+-	geo->start = get_start_sect(bdev) >> base->block->s2b_shift;
++	// geo->start is left unchanged by the above
++	geo->start >>= base->block->s2b_shift;
+ 	dasd_put_device(base);
+ 	return 0;
+ }
 diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
-index eeaa6af294b8..0dd2a092170a 100644
+index 0dd2a092170a..9f701bca6dae 100644
 --- a/drivers/scsi/sd.c
 +++ b/drivers/scsi/sd.c
+@@ -1594,9 +1594,9 @@ static void sd_release(struct gendisk *disk)
+ 	scsi_device_put(sdev);
+ }
+ 
+-static int sd_getgeo(struct block_device *bdev, struct hd_geometry *geo)
++static int sd_getgeo(struct gendisk *disk, struct hd_geometry *geo)
+ {
+-	struct scsi_disk *sdkp = scsi_disk(bdev->bd_disk);
++	struct scsi_disk *sdkp = scsi_disk(disk);
+ 	struct scsi_device *sdp = sdkp->device;
+ 	struct Scsi_Host *host = sdp->host;
+ 	sector_t capacity = logical_to_sectors(sdp, sdkp->capacity);
 @@ -1609,9 +1609,9 @@ static int sd_getgeo(struct block_device *bdev, struct hd_geometry *geo)
  
  	/* override with calculated, extended default, or driver values */
  	if (host->hostt->bios_param)
--		host->hostt->bios_param(sdp, bdev, capacity, diskinfo);
-+		host->hostt->bios_param(sdp, bdev->bd_disk, capacity, diskinfo);
+-		host->hostt->bios_param(sdp, bdev->bd_disk, capacity, diskinfo);
++		host->hostt->bios_param(sdp, disk, capacity, diskinfo);
  	else
--		scsicam_bios_param(bdev, capacity, diskinfo);
-+		scsicam_bios_param(bdev->bd_disk, capacity, diskinfo);
+-		scsicam_bios_param(bdev->bd_disk, capacity, diskinfo);
++		scsicam_bios_param(disk, capacity, diskinfo);
  
  	geo->heads = diskinfo[0];
  	geo->sectors = diskinfo[1];
-diff --git a/drivers/scsi/stex.c b/drivers/scsi/stex.c
-index 63ed7f9aaa93..d8ad02c29320 100644
---- a/drivers/scsi/stex.c
-+++ b/drivers/scsi/stex.c
-@@ -1457,7 +1457,7 @@ static void stex_reset_work(struct work_struct *work)
- }
- 
- static int stex_biosparam(struct scsi_device *sdev,
--	struct block_device *bdev, sector_t capacity, int geom[])
-+	struct gendisk *unused, sector_t capacity, int geom[])
- {
- 	int heads = 255, sectors = 63;
- 
-diff --git a/drivers/scsi/storvsc_drv.c b/drivers/scsi/storvsc_drv.c
-index d9e59204a9c3..dc51ea352198 100644
---- a/drivers/scsi/storvsc_drv.c
-+++ b/drivers/scsi/storvsc_drv.c
-@@ -1615,7 +1615,7 @@ static int storvsc_sdev_configure(struct scsi_device *sdevice,
- 	return 0;
- }
- 
--static int storvsc_get_chs(struct scsi_device *sdev, struct block_device * bdev,
-+static int storvsc_get_chs(struct scsi_device *sdev, struct gendisk *unused,
- 			   sector_t capacity, int *info)
- {
- 	sector_t nsect = capacity;
-diff --git a/drivers/scsi/wd719x.c b/drivers/scsi/wd719x.c
-index 5a380eecfc75..0c9987828774 100644
---- a/drivers/scsi/wd719x.c
-+++ b/drivers/scsi/wd719x.c
-@@ -544,7 +544,7 @@ static int wd719x_host_reset(struct scsi_cmnd *cmd)
- 	return wd719x_chip_init(wd) == 0 ? SUCCESS : FAILED;
- }
- 
--static int wd719x_biosparam(struct scsi_device *sdev, struct block_device *bdev,
-+static int wd719x_biosparam(struct scsi_device *sdev, struct gendisk *unused,
- 			    sector_t capacity, int geom[])
- {
- 	if (capacity >= 0x200000) {
-diff --git a/include/linux/libata.h b/include/linux/libata.h
-index 1e5aec839041..1baf1df88b02 100644
---- a/include/linux/libata.h
-+++ b/include/linux/libata.h
-@@ -1187,7 +1187,7 @@ extern void ata_qc_complete(struct ata_queued_cmd *qc);
- extern u64 ata_qc_get_active(struct ata_port *ap);
- extern void ata_scsi_simulate(struct ata_device *dev, struct scsi_cmnd *cmd);
- extern int ata_std_bios_param(struct scsi_device *sdev,
--			      struct block_device *bdev,
-+			      struct gendisk *unused,
- 			      sector_t capacity, int geom[]);
- extern void ata_scsi_unlock_native_capacity(struct scsi_device *sdev);
- extern int ata_scsi_sdev_init(struct scsi_device *sdev);
-diff --git a/include/scsi/libsas.h b/include/scsi/libsas.h
-index ba460b6c0374..9c6e90829dbd 100644
---- a/include/scsi/libsas.h
-+++ b/include/scsi/libsas.h
-@@ -685,7 +685,7 @@ extern int sas_queuecommand(struct Scsi_Host *, struct scsi_cmnd *);
- extern int sas_target_alloc(struct scsi_target *);
- int sas_sdev_configure(struct scsi_device *dev, struct queue_limits *lim);
- extern int sas_change_queue_depth(struct scsi_device *, int new_depth);
--extern int sas_bios_param(struct scsi_device *, struct block_device *,
-+extern int sas_bios_param(struct scsi_device *, struct gendisk *,
- 			  sector_t capacity, int *hsc);
- int sas_execute_internal_abort_single(struct domain_device *device,
- 				      u16 tag, unsigned int qid,
-diff --git a/include/scsi/scsi_host.h b/include/scsi/scsi_host.h
-index c53812b9026f..f5a243261236 100644
---- a/include/scsi/scsi_host.h
-+++ b/include/scsi/scsi_host.h
-@@ -318,7 +318,7 @@ struct scsi_host_template {
- 	 *
- 	 * Status: OPTIONAL
- 	 */
--	int (* bios_param)(struct scsi_device *, struct block_device *,
-+	int (* bios_param)(struct scsi_device *, struct gendisk *,
- 			sector_t, int []);
- 
- 	/*
-diff --git a/include/scsi/scsicam.h b/include/scsi/scsicam.h
-index 67f4e8835bc8..1131f51ed2c8 100644
---- a/include/scsi/scsicam.h
-+++ b/include/scsi/scsicam.h
-@@ -14,7 +14,7 @@
- #ifndef SCSICAM_H
- #define SCSICAM_H
- struct gendisk;
--int scsicam_bios_param(struct block_device *bdev, sector_t capacity, int *ip);
-+int scsicam_bios_param(struct gendisk *disk, sector_t capacity, int *ip);
- bool scsi_partsize(struct gendisk *disk, sector_t capacity, int geom[3]);
- unsigned char *scsi_bios_ptable(struct gendisk *disk);
- #endif /* def SCSICAM_H */
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index a59880c809c7..3a1695007395 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1597,7 +1597,7 @@ struct block_device_operations {
+ 	unsigned int (*check_events) (struct gendisk *disk,
+ 				      unsigned int clearing);
+ 	void (*unlock_native_capacity) (struct gendisk *);
+-	int (*getgeo)(struct block_device *, struct hd_geometry *);
++	int (*getgeo)(struct gendisk *, struct hd_geometry *);
+ 	int (*set_read_only)(struct block_device *bdev, bool ro);
+ 	void (*free_disk)(struct gendisk *disk);
+ 	/* this callback is with swap_lock and sometimes page table lock held */
 -- 
 2.39.5
 
