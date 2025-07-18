@@ -1,77 +1,52 @@
-Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15B762417E0;
-	Thu, 17 Jul 2025 23:37:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87977D515
+	for <linux-block@vger.kernel.org>; Fri, 18 Jul 2025 01:05:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.9.28.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752795465; cv=none; b=pNFjIF7xbl3KklJtCvEhHkOUwJSLeb1JelS9u5yT1nLWesr+qmN//LL9NirxSiJPQzqBXMa1dhyV/ANFazRq9NDFl0ARBsX6ZfowBzwwhO1AbhPcbFlS6SKY1nUxkxPOffMf01tn+oNmBXeh2uVNEqBKS51cJM6Ypr6Dn6ShKHY=
+	t=1752800736; cv=none; b=h25cD5wGSAYltXWSITlGSOgWtIMQA9bkrn4couHxn3vl9HEbFEG9iy2EjQd7uIQSwqdRiuFSnFuAJ3xXXrWpgjPkA6/mDJPs1S9XzDQz7nsQE64FJopmzYKveGxFTrp067vI7AtJkwdYL/M1KJ1bTMvCuPzrqJm7FYNDGiJRuUk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752795465; c=relaxed/simple;
-	bh=luwEMShkvWVCsjmR6HNLMQIY9KglyhOuZde7/i+hkIU=;
+	s=arc-20240116; t=1752800736; c=relaxed/simple;
+	bh=XOrlqtqrDX/2HGjlVR4wdMWUi738RFOWWukkfL1LH3s=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kBLEKNi0UQ3SQ5r8Aegf7+SvOeEd6C7YK7hkpw+0Xt+d+w7zgTaFmOInOD5YpRxXHZw+OQT38oHpPHd3PouEYsdD4EWKRgPUvAZqzAeB6u4SbBi0Q69GmW1H9FwzssnLfx6uLKYuNzY1M9dDZFywTw49IUkd1EooVXrifMoEocc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lwM6/lPb; arc=none smtp.client-ip=209.85.167.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=nXU6HnA0H6pfOhraNuGpE9I5BOfCzOmSKqkTrPGw2xQPpI10q8svmC72pSPUZOad4rFbhAGDHf+nNzI5fvVwZvI+n/DAOam+pMZWxZhSwFwC2lR2agCFDSHHQlEsb3OLvqMXOFX3h4S4rVSiCzxLyv8Xr4FzDAxOkvRTx+Ygb3U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu; spf=pass smtp.mailfrom=mit.edu; dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b=G3RCeyHQ; arc=none smtp.client-ip=18.9.28.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mit.edu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lwM6/lPb"
-Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-556373661aaso1362500e87.2;
-        Thu, 17 Jul 2025 16:37:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752795461; x=1753400261; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tO5anYBMKUIP2eKGDmEn6W1tLK3SxEqRsEp2IYD/aOw=;
-        b=lwM6/lPbMazLkUboolsSqXfhq3UZZ1QZ24Nkp85+i83ZXkP4EdX/lU2NWINHjweNWA
-         jeIKi1lrG+Ss/PQ8MRiapQ8HFt9qNduKh6KxHZL6uxvh4VS6ubr9sIm7L1FawUhOD9h3
-         qk8qz/lUDBxQTObKh8FERMNrjFposy/6ofZSehraT0us1xMUJF7UryZykN8fNEsaJivj
-         EPlp1J9R9GtJPoxEGleXnbV1GIpokERs19ZScYGbsNGg/OI6wXbQDmBP8wXQqYFVL4GK
-         thoWYFm6z2lO3x/PwVqYfawZWG8rCQ7XeYdIINYNaEuyN29IWUuZX2q3rdndxGbJT8BQ
-         YRSw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752795461; x=1753400261;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tO5anYBMKUIP2eKGDmEn6W1tLK3SxEqRsEp2IYD/aOw=;
-        b=WK4L+6O0bcWAtu7N2ozebNi/hSypllRZ0yvOdqKYGfuLruXR75bqJoFFODb/xWbtmH
-         OD2YsgYeh+KeTrrZ5KxXNkGWp66mqSBLtj100LSNH45nnyZNTWstELQGKV2vPdg537gu
-         ixF1ZamvcyEP9MlBzZCDLiRgkWcSIT4Ao3SYryBUzcuXy4B6AnWVzA26Lcw/r5gUYVuS
-         FatZNPwZx6OWwC0BEaTlVDLW6r2fIZrO7J3uIMMqqvDXuXOwOC9GW6UP6q1v8nbhPdB2
-         t3ktjX8dEUs75PwjqnyI4G41Oj+dk41HWlNEBGzmo0tPjwv1FlXKzL0zkdbdjhgxYD+g
-         QZDQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUE3Avjdt7uTIhsxtkKZoP44VtuMAF6xrI11WQNL/Qn/r/gxZrhIMazUEC/1b15lU9fkrcPBjWgdLOIng==@vger.kernel.org, AJvYcCUJay7TtBEkSF4eY9DKRQkJ6sCKrqdBReuq1KTO+NCxX4BQ9PeehPr2aWbZWtdUnnui+GPS02gC+GakGsqw@vger.kernel.org
-X-Gm-Message-State: AOJu0YyzrFKysQu5twYTQNzJR2WIxIX/rq2nXBX49FYGB9ysTEQXqtqM
-	hTFAIxGTG/qtvgn0Nc7bzqPytl4Jc5tQ6m9Fp+yN/Qw4HZ39AnfIIrVh
-X-Gm-Gg: ASbGncu9Yg2KT7l34zYDsYO6x5bbGcluZrh7PEVABfl6wPKVZaXxixg9G+Hr4iyBIa0
-	NwUI4k/kczaeRGcD1AFWov00jMXyv+j4+a64g1584isdv3yaeQp7mb/zspoCacHoIpWrCpWuRmr
-	AXCYSwyO+DlMXNxOZte92idGqbtaOwtH1dqs5wLdRmZhw6OnucmbfPtdQZRz49pVj6vIUx+L2km
-	08Na9DktWQ3SXFodAaVQ+jVpfUyVUuJ3GzZNStMlgL2/vJtqn7SagCKPJlP5WktMtRZkuunOeKO
-	GITnfWiJusuueZQh5eY+Bk4c6eM4M8PvedII0ngEutagtQathGi1bIfC5IkTj5Qq309yxLbTJuo
-	uaiV2iKcnDnI7QDPmvsknyFyI
-X-Google-Smtp-Source: AGHT+IGkfAYurY+ewnx7eJ5OG8WEhScW7/nSoelbCOrRsOt132b5QBioe3UC7rR6qWU/oZNIbUkl/g==
-X-Received: by 2002:a05:6512:3e14:b0:54f:bdfe:ece5 with SMTP id 2adb3069b0e04-55a23315c0bmr3330071e87.14.1752795460620;
-        Thu, 17 Jul 2025 16:37:40 -0700 (PDT)
-Received: from localhost ([2001:678:a5c:1204:126f:f00a:513f:807b])
-        by smtp.gmail.com with UTF8SMTPSA id 2adb3069b0e04-55a31a9bf3bsm45174e87.40.2025.07.17.16.37.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Jul 2025 16:37:40 -0700 (PDT)
-Date: Fri, 18 Jul 2025 01:37:39 +0200
-From: Klara Modin <klarasmodin@gmail.com>
-To: Arnd Bergmann <arnd@kernel.org>
-Cc: Anuj Gupta <anuj20.g@samsung.com>, 
-	"Martin K. Petersen" <martin.petersen@oracle.com>, Kanchan Joshi <joshi.k@samsung.com>, 
-	Christian Brauner <brauner@kernel.org>, Christoph Hellwig <hch@infradead.org>, 
-	Arnd Bergmann <arnd@arndb.de>, Naresh Kamboju <naresh.kamboju@linaro.org>, 
-	Anders Roxell <anders.roxell@linaro.org>, Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>, 
-	Caleb Sander Mateos <csander@purestorage.com>, Pavel Begunkov <asml.silence@gmail.com>, 
-	Alexey Dobriyan <adobriyan@gmail.com>, "Darrick J. Wong" <djwong@kernel.org>, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] [v2] block: fix FS_IOC_GETLBMD_CAP parsing in
- blkdev_common_ioctl()
-Message-ID: <szmagqqo6lx36ozaqd5qf72xnzoi4e23jbfehjli6rfbvhps6w@if2cvmlgvmxv>
-References: <20250711084708.2714436-1-arnd@kernel.org>
+	dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b="G3RCeyHQ"
+Received: from trampoline.thunk.org (pool-108-26-156-131.bstnma.fios.verizon.net [108.26.156.131])
+	(authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+	by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 56I15LnL015966
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 17 Jul 2025 21:05:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
+	t=1752800724; bh=47MrvFVIL5gfquO0TuUwWAIK+sNLLvE+ehK38vF6nHU=;
+	h=Date:From:Subject:Message-ID:MIME-Version:Content-Type;
+	b=G3RCeyHQjLKBOadQ9r+lAWFneQuzh9IPGwMcsmVilGMsRgDAQbeV1IaM0EDVCXTwQ
+	 f4qGjUQ/WUGQEsZyNZbWUnCuXxyab8IBnxtW9/MpDiYoXXeyihB0bnfEGpjEJJiTUo
+	 HzY2pX/sQqYwUS3o6bm5AXGq8/w5Xn7mdAAdEcKv0PSmioxM6dA+ib6XJEaofJmYHe
+	 CRh1QhyIFgXNsZxw88zeHXuEOc53EWfvh86Kh4GRrKP8Oe/dIf6rLFqCo03uuDUi4R
+	 5BMLUGZYy0Uu1zxd0P1aUiK5tmvxEC6+bU3aYD+mrsMR2sp6Byd6c+cWn1ajVOjsKP
+	 FTebFHj+ortxw==
+Received: by trampoline.thunk.org (Postfix, from userid 15806)
+	id 176282E00D5; Thu, 17 Jul 2025 21:05:21 -0400 (EDT)
+Date: Thu, 17 Jul 2025 21:05:21 -0400
+From: "Theodore Ts'o" <tytso@mit.edu>
+To: Moon Hee Lee <moonhee.lee.ca@gmail.com>
+Cc: syzbot+544248a761451c0df72f@syzkaller.appspotmail.com,
+        adilger.kernel@dilger.ca, linux-ext4@vger.kernel.org,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
+        Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH] ext4: do not BUG when INLINE_DATA_FL lacks system.data
+ xattr
+Message-ID: <20250718010521.GC112967@mit.edu>
+References: <CAF3JpA7a0ExYEJ8_c7v7evKsV83s+_p7qUoH9uiYZLPxT_Md6g@mail.gmail.com>
+ <20250717145911.GB112967@mit.edu>
+ <CAF3JpA6RwyzQMdG4y3P_8jkaS8qUFPerE5MJ8Xecs+VkbPEmpg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -80,114 +55,80 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250711084708.2714436-1-arnd@kernel.org>
+In-Reply-To: <CAF3JpA6RwyzQMdG4y3P_8jkaS8qUFPerE5MJ8Xecs+VkbPEmpg@mail.gmail.com>
 
-Hi,
+On Thu, Jul 17, 2025 at 09:59:13AM -0700, Moon Hee Lee wrote:
+> The current patch addresses ext4_update_inline_data() directly, but the
+> same condition also leads to a BUG_ON in ext4_create_inline_data() [2],
+> which the earlier approach intended to prevent as well.
 
-On 2025-07-11 10:46:51 +0200, Arnd Bergmann wrote:
-> From: Arnd Bergmann <arnd@arndb.de>
-> 
-> Anders and Naresh found that the addition of the FS_IOC_GETLBMD_CAP
-> handling in the blockdev ioctl handler breaks all ioctls with
-> _IOC_NR==2, as the new command is not added to the switch but only
-> a few of the command bits are check.
-> 
-> Move the check into the blk_get_meta_cap() function itself and make
-> it return -ENOIOCTLCMD for any unsupported command code, including
-> those with a smaller size that previously returned -EINVAL.
-> 
-> For consistency this also drops the check for NULL 'arg' that
-> is really useless, as any invalid pointer should return -EFAULT.
-> 
-> Fixes: 9eb22f7fedfc ("fs: add ioctl to query metadata and protection info capabilities")
-> Link: https://lore.kernel.org/all/CA+G9fYvk9HHE5UJ7cdJHTcY6P5JKnp+_e+sdC5U-ZQFTP9_hqQ@mail.gmail.com/
-> Reported-by: Naresh Kamboju <naresh.kamboju@linaro.org>
-> Cc: Anders Roxell <anders.roxell@linaro.org>
-> Cc: Naresh Kamboju <naresh.kamboju@linaro.org>
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> ---
-> v2: add the check in blk-integrity.c instead of ioctl.c
-> 
-> I've left out the maximum-size check this time, as there was no
-> consensus on whether there should be one, or what value.
-> 
-> We still need to come up with a better way of handling these in
-> general, for now the patch just addresses the immediate regression
-> that Naresh found.
-> 
-> I have also sent a handful of patches for other drivers that have
-> variations of the same bug.
-> ---
->  block/blk-integrity.c | 10 ++++++----
->  block/ioctl.c         |  6 ++++--
->  2 files changed, 10 insertions(+), 6 deletions(-)
-> 
-> diff --git a/block/blk-integrity.c b/block/blk-integrity.c
-> index 9d9dc9c32083..61a79e19c78f 100644
-> --- a/block/blk-integrity.c
-> +++ b/block/blk-integrity.c
-> @@ -62,10 +62,12 @@ int blk_get_meta_cap(struct block_device *bdev, unsigned int cmd,
->  	struct logical_block_metadata_cap meta_cap = {};
->  	size_t usize = _IOC_SIZE(cmd);
->  
-> -	if (!argp)
-> -		return -EINVAL;
-> -	if (usize < LBMD_SIZE_VER0)
-> -		return -EINVAL;
-> +	if (_IOC_DIR(cmd)  != _IOC_DIR(FS_IOC_GETLBMD_CAP) ||
-> +	    _IOC_TYPE(cmd) != _IOC_TYPE(FS_IOC_GETLBMD_CAP) ||
-> +	    _IOC_NR(cmd)   != _IOC_NR(FS_IOC_GETLBMD_CAP) ||
-> +	    _IOC_SIZE(cmd) < LBMD_SIZE_VER0)
-> +		return -ENOIOCTLCMD;
-> +
->  	if (!bi)
->  		goto out;
->  
-> diff --git a/block/ioctl.c b/block/ioctl.c
-> index 9ad403733e19..af2e22e5533c 100644
-> --- a/block/ioctl.c
-> +++ b/block/ioctl.c
-> @@ -566,9 +566,11 @@ static int blkdev_common_ioctl(struct block_device *bdev, blk_mode_t mode,
->  			       void __user *argp)
->  {
->  	unsigned int max_sectors;
-> +	int ret;
->  
-> -	if (_IOC_NR(cmd) == _IOC_NR(FS_IOC_GETLBMD_CAP))
-> -		return blk_get_meta_cap(bdev, cmd, argp);
+Actually, the two conditions are opposite to each other.  The one in
+ext4_update_inline_data() was:
 
-> +	ret = blk_get_meta_cap(bdev, cmd, argp);
-> +	if (ret != -ENOIOCTLCMD)
-> +		return ret;
+         BUG_ON(is.s.not_found);
 
-This check seems to be incomplete. In the case when BLK_DEV_INTEGRITY is
-disabled the ioctl can never complete as blk_get_meta_cap will then
-always return -EOPNOTSUPP. Or should the !BLK_DEV_INTEGRITY stub be
-changed to return -ENOIOCTLCMD instead?
+while te one in ext4_create_inline_data() was:
 
-It makes e.g. cryptsetup fail in my initramfs. Adding -EOPNOTSUPP to the
-check fixes it for me:
+	BUG_ON(!is.s.not_found);
 
-diff --git a/block/ioctl.c b/block/ioctl.c
-index af2e22e5533c..7d5361fd1b7d 100644
---- a/block/ioctl.c
-+++ b/block/ioctl.c
-@@ -569,7 +569,7 @@ static int blkdev_common_ioctl(struct block_device *bdev, blk_mode_t mode,
- 	int ret;
- 
- 	ret = blk_get_meta_cap(bdev, cmd, argp);
--	if (ret != -ENOIOCTLCMD)
-+	if (ret != -EOPNOTSUPP && ret != -ENOIOCTLCMD)
- 		return ret;
- 
- 	switch (cmd) {
+So your patch would not only cause an extra xattr lookup in
+ext4_prepare_inline_data(), but it would actually cause problems by
+causing spurious failures when first writing to an inline data file.
+(Which makes me suspect that you hadn't run other test on your patich
+other than just vaidating that the syzkaller reproduce was no longer
+reproducing.)   
 
-Regards,
-Klara Modin
+Also, having taking a closer look at te code paths, I became
+suspicious that there is something about the syzkaller reproducer is
+doing which might be a bit sus.  That's because whether we call
+ext4_update_inline_data() or ext4_create_inline_data() is based on
+whether i_inline off is set or not:
 
->  
->  	switch (cmd) {
->  	case BLKFLSBUF:
-> -- 
-> 2.39.5
-> 
+	if (ei->i_inline_off)
+		ret = ext4_update_inline_data(handle, inode, len);
+	else
+		ret = ext4_create_inline_data(handle, inode, len);
+
+
+But how is ei->i_inline_off set?  It's set from a former call to
+ext4_xattr_ibody_find():
+
+	error = ext4_xattr_ibody_find(inode, &i, &is);
+	if (error)
+		goto out;
+
+	if (!is.s.not_found) {
+		if (is.s.here->e_value_inum) {
+			EXT4_ERROR_INODE(inode, "inline data xattr refers "
+					 "to an external xattr inode");
+			error = -EFSCORRUPTED;
+			goto out;
+		}
+		EXT4_I(inode)->i_inline_off = (u16)((void *)is.s.here -
+					(void *)ext4_raw_inode(&is.iloc));
+		EXT4_I(inode)->i_inline_size = EXT4_MIN_INLINE_DATA_SIZE +
+				le32_to_cpu(is.s.here->e_value_size);
+	}
+
+So the whole *reason* why i_inline_off exists is because we're caching
+the result of calling ext4_xattr_ibody_find().  So if i_inline_off is
+non-zero, and then when we call ext4_ibody_find() later on, and we
+find that xattr has suddenly disappeared, there is something weird
+going on.   That's why the BUG_ON was added orginally.
+
+When I took a look at the reproduer, I found that indeed, it is
+calling LOOP_CLR_FD and LOOP_SET_STATUS64 to reconfigure the loop
+device out from under the mounted file system.  This is smashing the
+file system, and is therefore corrupting the block device.  As it
+turns out, Jan Kara recently sent out a patch, and it has been
+accepted in the block tree, to prevent a similar Syzkaller issue using
+LOOP_SET_BLOCK_SIZE[1].
+
+[1] https://lore.kernel.org/r/20250711163202.19623-2-jack@suse.cz
+
+We need to do something similar for LOOP_CLR_FD, LOOP_SET_STATUS,
+LOOP_SET_STATUS64, LOOP_CHANGE_FD, and LOOP_SET_CAPACITY ioctls.
+
+Cheers,
+
+						- Ted
