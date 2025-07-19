@@ -1,152 +1,169 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE20419BBC
-	for <linux-block@vger.kernel.org>; Sat, 19 Jul 2025 13:27:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07D277F477;
+	Sat, 19 Jul 2025 22:42:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752931661; cv=none; b=TKU4Q6FLU1zm690IE3uhaB72MiZChUND/qNOdmHnfg7nqrPc46ONgLu0q9JKZLLfXh5Q62mjV6HJjldxjxQQaljVzTxT+xlBy+1MHeqWidafyJgSiqh3qH8oB2ZiPrhblJBeeMsqJbu15FiAw82aXRv6jZh5t4LGzIW1ntPUuK8=
+	t=1752964930; cv=none; b=DIFZR3tLyYR2cB72F1bPoeyAe9lytuuRZjS++qw6tg0s3CUbCrj2dkL5HRU6pPzGWgUwkQRnPZVo1ym+D4uluXLB8ruyW3MjHx4pKCwzMuJ7/Qv936w3CUaSFPhJsO5u6l/N4NR8pd9KBFgKjAHvePbYWhmGfB1LC3FOnrwGyRw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752931661; c=relaxed/simple;
-	bh=AGMRt3yOoPbWBnPOjeZlddTNZD7BI3lqOFaIDHhK9q8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tvF9GAaUETswgL9ck33wlGi4Vy3FH1M2Jwntnnk/1Cp2CCns2NZSNNX6Qel3gKmVjXy6NYdpPaAh6eAlqpr2BLG3bWAmj3CKuVwGLnDJKoYeK7fO0/7lxvcArM2qwbMbuOoQeIQJNYhvxrTMWalyNWZUTnJ9sQWBz6Ch1hk9EQw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=F08xDSUx; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1752964930; c=relaxed/simple;
+	bh=vbgrYCnB5GbWpCXhaPw8I4u9NCR+1Fim6HSx76fv2mQ=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=SiE/LtpssGqOi33PVsOwfw98LeL5u9mAAPliL46YYiiocGAJ3nh8dl+0ARr3ez+CIoLAUIblrWD4esb7C1vnaPmllO1Ky4lZrnNKlV3Tvve0l/zKT8U8yf7C/ENFy0vdr+gVlPb7K/GLpEW3WdDQHuiOBE3xbcEmD8Brw2gvJD8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=b3cvJ/5L; arc=none smtp.client-ip=209.85.222.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="F08xDSUx"
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56J9C303015602;
-	Sat, 19 Jul 2025 13:27:30 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=pp1; bh=rURdsGaaMbNM3W4mOYBnMj1seWldsTbjTGtbxDHHU
-	BM=; b=F08xDSUxTinlSwYbs0w5VbFuthfM+Io8VMuMxtNCAGzDJZ55+J1xgGrrs
-	HVLD67+SOJ1miAFz5s2SQVHe/Vavg6xjlzqmaurfGodK0Q5LO+n51AfuukW/eiAm
-	CtQZn+HljTDwW0mtsYYIYPVvh3QfrM2eeYZ8gnciE3B6dTDiPlOKTZR4KN1wo1Pv
-	AaWu7/9v/95kYIGGq4JJe4+DLFY+YhJBRPyFXMG7MtjbPr0HeLQq/6fsKKf7iXPV
-	g/xv5I+blB5hBYG1d4/IviU8nbo+I7Uk4UdGdMvqjarovUPqusMklF5v/xyWL98r
-	Ka2JrOjc2eSUhRfVFO1YZfphYBI0g==
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48069v114t-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sat, 19 Jul 2025 13:27:29 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 56JDEqWt025517;
-	Sat, 19 Jul 2025 13:27:28 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 47v31q5vww-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sat, 19 Jul 2025 13:27:28 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 56JDRQpp18940384
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Sat, 19 Jul 2025 13:27:26 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id AE32920043;
-	Sat, 19 Jul 2025 13:27:26 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C920F20040;
-	Sat, 19 Jul 2025 13:27:24 +0000 (GMT)
-Received: from li-c9696b4c-3419-11b2-a85c-f9edc3bf8a84.ibm.com.com (unknown [9.43.22.142])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Sat, 19 Jul 2025 13:27:24 +0000 (GMT)
-From: Nilay Shroff <nilay@linux.ibm.com>
-To: linux-block@vger.kernel.org
-Cc: hch@lst.de, ming.lei@redhat.com, hare@suse.de, axboe@kernel.dk,
-        gjoyce@ibm.com
-Subject: [PATCH] block: fix module reference leak in mq-deadline I/O scheduler
-Date: Sat, 19 Jul 2025 18:56:47 +0530
-Message-ID: <20250719132722.769536-1-nilay@linux.ibm.com>
-X-Mailer: git-send-email 2.50.1
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b3cvJ/5L"
+Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-7dfc604107eso310397485a.2;
+        Sat, 19 Jul 2025 15:42:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1752964927; x=1753569727; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=IYtqZBE28LZ0UGLaX8MEv+0dHfoGt4V/IBm1NTd57go=;
+        b=b3cvJ/5LGILbIVJWtOJn99Yd1PX+65jh6cL8rz5blkRLH+ta/Iw7tvVMNxdbrULnxr
+         135sjc2+BYCsY/MIsPTnS03f+popAeuHyDo+zjcFl4B6+UtniaQOtTbr7fpIs++zvZQI
+         kQIxvkeeCpuwlYn6VMZB9e4nHwrS5qmeN0yTIx2uixBK0V4GGFaZXQVoY778k5Y2pr87
+         y2h5rNUs2iowYRJrG0HF0lw5x7NwdXnwl+5WVvNQdrerA6fQZwSlHLyqLbLSH8Pc2H0e
+         FV0UQYUseuhnyyb/H8pqBMFUZglUlD1XaJ0xpgtp238i2bhdmsRiN9LdyuzPIVlK/R2m
+         B81Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752964927; x=1753569727;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=IYtqZBE28LZ0UGLaX8MEv+0dHfoGt4V/IBm1NTd57go=;
+        b=CHyc8IvceddheY1jd3iUVVNy4etWg6pUZscMYevwGSTfaKvcfvPt+O6+bcvEu3IokU
+         wLXn8BrFlnAAVOf1aLvaPXSCvzzUMlvShKTP4MRgM63PvzBdkHe0LwPZZAeswGFKssiF
+         kivtoysZkm4bKSjlwodPofw8/TUYotDeaepO4uMcEGHYcUzjcZzXnh2K1p0wiw/2XxhJ
+         iGuixF6GAKhm4HqdvtxkwWacKOhuL+y4JJ08+66G78c6IBXBugHOAOxN3MVb8z/wADI0
+         CWQr3vSWp5zBGx+Z7Wi7YGx68wqigT6zFlArJ5e6egFMtI7O6bYcrTwe5jqYsb0gXeNn
+         1m/Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVHmPVnB/dbcYTavuasGL5+qTK7nQ7TEtmyE4LBsvSRsjRamiXiu61TkLHxtCAItICetyExwdDK0FA/WPyJ@vger.kernel.org, AJvYcCWgpPBoJfWPLjNiO989pytNnXFkjkA4gj5LIuVMp9zna+V5fRdYswvxzZUfD/iYZtpPvZ9UdYM4NtaHXOP3XB8=@vger.kernel.org, AJvYcCXiVm78ZsdvSzbHBCayvZJY2QMJm+NKFA8xT1I0NZ5scva4/CsXou5yA4X16XVDMWAsQGdSh9CwopIRjKTWJY/K@vger.kernel.org, AJvYcCXkdeCG0mFACc7e+KR+zaxrs0WreUNk7waz3SotC2Q+GmY+k+gx0rWN6/Z4OLWCOdosnrEt8hDtizbHyA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx3GTB3wns42UJwdGtceKqWUKiAmjkm/dLDwVBbQJyuIq//vwVd
+	BabA18fmPdi5FQYCWR6cIszuZZq/GxvdknbHHvjig8a5F/9FSWXlcALC
+X-Gm-Gg: ASbGncvM08i5URVeLvh6CpIZVpz5y9rWgMyAEaqHvqOSMLMWKGANUARzJlyadP2ErOs
+	Q+RUOvlNbTU3mxf7GdwHB1gt23xD9JnKCXge1omhMcH7DDmFIrYdNOzwM84DZ2OK6OO1REll9Xw
+	il/zQx7kMmvT3ObR21KU0R91Ot4FvAmCQfDqzQhksNPMSEYa1ngGpgNLpIyWTUyMDz0OnKPWp/x
+	Ieay4GUV6Dgu8E3U0ZXryZWMxqMAvQkiIZ/d1EAC//Dhi9nNxb0VtMMsPYX0NhIWjrofwo1WFYm
+	chavq78NIBgixJ2NnEGFOtw4WYXj2HRnamcagYBPC4RCxjr+nOINyVwMj6eDq0dUnX8p8SHnZy3
+	GLCmOQlkIUYRqdJpZhnmzVXU88YEt1fKOdn5HS8MimMxW5pzCFYp5e6Zr/u6OMs1NaN2CZfCvba
+	ebzrqHRH7NvBV4KvcCrJ4/aAJ9+jmk
+X-Google-Smtp-Source: AGHT+IEiARXQyHTIyMuT3fUQxXz/kzFJUN0F5TuE4Y+GyJF6HI6/8bptvftq/fAC42E6NKFRIuKCzQ==
+X-Received: by 2002:a05:620a:40d4:b0:7e3:3417:a5e3 with SMTP id af79cd13be357-7e3435709c5mr2426367585a.19.1752964926749;
+        Sat, 19 Jul 2025 15:42:06 -0700 (PDT)
+Received: from 1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa ([2600:4041:5c29:e400:78d6:5625:d350:50d1])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7e356c75cf5sm251550785a.84.2025.07.19.15.42.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 19 Jul 2025 15:42:06 -0700 (PDT)
+From: Tamir Duberstein <tamird@gmail.com>
+Subject: [PATCH v2 0/8] rust: use `kernel::{fmt,prelude::fmt!}`
+Date: Sat, 19 Jul 2025 18:41:49 -0400
+Message-Id: <20250719-core-cstr-fanout-1-v2-0-1ab5ba189c6e@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=QLdoRhLL c=1 sm=1 tr=0 ts=687b9d42 cx=c_pps
- a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
- a=Wb1JkmetP80A:10 a=VwQbUJbxAAAA:8 a=VnNF1IyMAAAA:8 a=RFxZD7pVsyVzHcZ24eIA:9
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzE5MDEzMSBTYWx0ZWRfX78T+MOjdB5gP
- uZrjdQa7hzvPojhgPmUucBFwUzI0UP+XWafSIPAG1n3FCDwray7YYhyTYMVnDCJpH5uGDIiVs5p
- E5+3Z6bZAE+BMPoHgq5P7D8pXgkq0dNV9ci9KKccoCfae9h5Lh/S9TiyQu7/2+5dSNW+Fkwd5sN
- xfT5ZVsK8s/60ekgk0eVKPc5sqq3hgwUbA1vNOvvznQQSGn+wH2XLXL0JI4gNW/h8OziKeevbTT
- F50w7NEXR5srdpO4zmYmU8Q0jh5LHgV0+BKVoZIDsmSVbwDjbqSQZIZd82In0hLM9stfkzG50d1
- Dke1jSjkwkp6lYsiHOt4tE9y2VzciaWDF+pVTBUdribJSTUXWYmIkV0i5wF8r5p2VSRzaVGn70y
- t8FvaYxnkj3GOZytdsP9/HYh4NCKNMODRIEQE24I/wDyKMmsfac4R/4pPi7GTE6Duo7x42RM
-X-Proofpoint-ORIG-GUID: LyPfrmSJ5__YLBBNqOYid0PUZWldvHqj
-X-Proofpoint-GUID: LyPfrmSJ5__YLBBNqOYid0PUZWldvHqj
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-07-19_01,2025-07-17_02,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 priorityscore=1501 bulkscore=0 malwarescore=0 spamscore=0
- suspectscore=0 lowpriorityscore=0 mlxscore=0 mlxlogscore=999 clxscore=1015
- adultscore=0 impostorscore=0 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
- definitions=main-2507190131
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAC4ffGgC/32Py27DIBBFf8WadakAm4e96n9UWQAeEqTapECsV
+ pH/vZN4k1WX90pz5tw7VCwJK0zdHQpuqaa8UpBvHYSLW8/I0kwZJJeKGz6ykAuyUFth0a351ph
+ gUXIthO2lNBLo8Fowpp8n9PN05ILfN2K3owTvKkHysqQ2dSHYAWPvrY0DN2j9rJyKxuuR61mgH
+ q0SwSoNr06keBgNL0b06OoojH5E7QyBDE6bgIfEJdWWy+9zKFUPi/82bYJxpoeeWzSS9zF8nBe
+ Xvt5JGk77vv8BSAOG5TkBAAA=
+X-Change-ID: 20250709-core-cstr-fanout-1-f20611832272
+To: Danilo Krummrich <dakr@kernel.org>, David Airlie <airlied@gmail.com>, 
+ Simona Vetter <simona@ffwll.ch>, Miguel Ojeda <ojeda@kernel.org>, 
+ Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, 
+ Gary Guo <gary@garyguo.net>, 
+ =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+ Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
+ Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
+ Jens Axboe <axboe@kernel.dk>, 
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ "Rafael J. Wysocki" <rafael@kernel.org>, 
+ Brendan Higgins <brendan.higgins@linux.dev>, 
+ David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, 
+ Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, 
+ Vlastimil Babka <vbabka@suse.cz>, 
+ "Liam R. Howlett" <Liam.Howlett@oracle.com>, 
+ Uladzislau Rezki <urezki@gmail.com>
+Cc: nouveau@lists.freedesktop.org, dri-devel@lists.freedesktop.org, 
+ linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org, 
+ linux-block@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+ kunit-dev@googlegroups.com, Tamir Duberstein <tamird@gmail.com>
+X-Mailer: b4 0.15-dev
+X-Developer-Signature: v=1; a=openssh-sha256; t=1752964923; l=2632;
+ i=tamird@gmail.com; h=from:subject:message-id;
+ bh=vbgrYCnB5GbWpCXhaPw8I4u9NCR+1Fim6HSx76fv2mQ=;
+ b=U1NIU0lHAAAAAQAAADMAAAALc3NoLWVkMjU1MTkAAAAgtYz36g7iDMSkY5K7Ab51ksGX7hJgs
+ MRt+XVZTrIzMVIAAAAGcGF0YXR0AAAAAAAAAAZzaGE1MTIAAABTAAAAC3NzaC1lZDI1NTE5AAAA
+ QCu0Eab3XaeXjLZDUQ3ddLY//J9C+sC+ywoIlzS121Jh4xTPdsG4c76spmKHrnjg4eQIbIkKIcu
+ 2gdLHhR8aSA0=
+X-Developer-Key: i=tamird@gmail.com; a=openssh;
+ fpr=SHA256:264rPmnnrb+ERkS7DDS3tuwqcJss/zevJRzoylqMsbc
 
-During probe, when the block layer registers a request queue, it
-defaults to the mq-deadline I/O scheduler if the device is single-queue
-and the mq-deadline module is available. To determine availability, the
-elevator_set_default() invokes elevator_find_get(), which increments the
-module's reference count. However, this reference is never released,
-resulting in a module reference leak that prevents the mq-deadline module
-from being unloaded.
+This is series 2a/5 of the migration to `core::ffi::CStr`[0].
+20250704-core-cstr-prepare-v1-0-a91524037783@gmail.com.
 
-This patch fixes the issue by ensuring the acquired module reference is
-properly released.
+This series depends on the prior series[0] and is intended to go through
+the rust tree to reduce the number of release cycles required to
+complete the work.
 
-Fixes: 1e44bedbc921 ("block: unifying elevator change")
-Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
+Subsystem maintainers: I would appreciate your `Acked-by`s so that this
+can be taken through Miguel's tree (where the other series must go).
+
+[0] https://lore.kernel.org/all/20250704-core-cstr-prepare-v1-0-a91524037783@gmail.com/
+
+Signed-off-by: Tamir Duberstein <tamird@gmail.com>
 ---
-Note: This patch is based on https://lore.kernel.org/all/20250718133232.626418-1-nilay@linux.ibm.com/
-So please apply this patch after the above is merged.
----
- block/elevator.c | 19 +++++++++++++------
- 1 file changed, 13 insertions(+), 6 deletions(-)
+Changes in v2:
+- Rebase on rust-next.
+- Drop pin-init patch, which is no longer needed.
+- Link to v1: https://lore.kernel.org/r/20250709-core-cstr-fanout-1-v1-0-64308e7203fc@gmail.com
 
-diff --git a/block/elevator.c b/block/elevator.c
-index 83d0bfb90a03..2bbf7ad7f4db 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -719,7 +719,8 @@ void elevator_set_default(struct request_queue *q)
- 		.name = "mq-deadline",
- 		.no_uevent = true,
- 	};
--	int err = 0;
-+	int err;
-+	struct elevator_type *e;
- 
- 	/* now we allow to switch elevator */
- 	blk_queue_flag_clear(QUEUE_FLAG_NO_ELV_SWITCH, q);
-@@ -732,12 +733,18 @@ void elevator_set_default(struct request_queue *q)
- 	 * have multiple queues or mq-deadline is not available, default
- 	 * to "none".
- 	 */
--	if (elevator_find_get(ctx.name) && (q->nr_hw_queues == 1 ||
--			 blk_mq_is_shared_tags(q->tag_set->flags)))
-+	e = elevator_find_get(ctx.name);
-+	if (!e)
-+		return;
-+
-+	if ((q->nr_hw_queues == 1 ||
-+			blk_mq_is_shared_tags(q->tag_set->flags))) {
- 		err = elevator_change(q, &ctx);
--	if (err < 0)
--		pr_warn("\"%s\" elevator initialization, failed %d, "
--			"falling back to \"none\"\n", ctx.name, err);
-+		if (err < 0)
-+			pr_warn("\"%s\" elevator initialization, failed %d, falling back to \"none\"\n",
-+					ctx.name, err);
-+	}
-+	elevator_put(e);
- }
- 
- void elevator_set_none(struct request_queue *q)
--- 
-2.50.1
+---
+Tamir Duberstein (8):
+      gpu: nova-core: use `kernel::{fmt,prelude::fmt!}`
+      rust: alloc: use `kernel::{fmt,prelude::fmt!}`
+      rust: block: use `kernel::{fmt,prelude::fmt!}`
+      rust: device: use `kernel::{fmt,prelude::fmt!}`
+      rust: file: use `kernel::{fmt,prelude::fmt!}`
+      rust: kunit: use `kernel::{fmt,prelude::fmt!}`
+      rust: seq_file: use `kernel::{fmt,prelude::fmt!}`
+      rust: sync: use `kernel::{fmt,prelude::fmt!}`
+
+ drivers/block/rnull.rs               | 2 +-
+ drivers/gpu/nova-core/gpu.rs         | 3 +--
+ drivers/gpu/nova-core/regs/macros.rs | 6 +++---
+ rust/kernel/alloc/kbox.rs            | 2 +-
+ rust/kernel/alloc/kvec.rs            | 2 +-
+ rust/kernel/alloc/kvec/errors.rs     | 2 +-
+ rust/kernel/block/mq.rs              | 2 +-
+ rust/kernel/block/mq/gen_disk.rs     | 2 +-
+ rust/kernel/block/mq/raw_writer.rs   | 3 +--
+ rust/kernel/device.rs                | 6 +++---
+ rust/kernel/fs/file.rs               | 5 +++--
+ rust/kernel/kunit.rs                 | 8 ++++----
+ rust/kernel/seq_file.rs              | 6 +++---
+ rust/kernel/sync/arc.rs              | 2 +-
+ scripts/rustdoc_test_gen.rs          | 2 +-
+ 15 files changed, 26 insertions(+), 27 deletions(-)
+---
+base-commit: cc84ef3b88f407e8bd5a5f7b6906d1e69851c856
+change-id: 20250709-core-cstr-fanout-1-f20611832272
+prerequisite-change-id: 20250704-core-cstr-prepare-9b9e6a7bd57e:v1
+prerequisite-patch-id: 83b1239d1805f206711a5a936bbb61c83227d573
+prerequisite-patch-id: a0355dd0efcc945b0565dc4e5a0f42b5a3d29c7e
+prerequisite-patch-id: 8585bf441cfab705181f5606c63483c2e88d25aa
+prerequisite-patch-id: 04ec344c0bc23f90dbeac10afe26df1a86ce53ec
+prerequisite-patch-id: a2fc6cd05fce6d6da8d401e9f8a905bb5c0b2f27
+prerequisite-patch-id: f14c099c87562069f25fb7aea6d9aae4086c49a8
+
+Best regards,
+--  
+Tamir Duberstein <tamird@gmail.com>
 
