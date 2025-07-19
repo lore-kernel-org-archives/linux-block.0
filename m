@@ -1,106 +1,103 @@
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B8A0C2C9
-	for <linux-block@vger.kernel.org>; Fri, 18 Jul 2025 21:20:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC71A1E9905;
+	Sat, 19 Jul 2025 07:59:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752873607; cv=none; b=p1L/SygRwHxIelSNzTlbQd2UziiWpshiBDbF8F/UIP8cXSRbzK5vMgAGXAngq/69k/wR4OpNtSsawa2Nfpg+PqF7mUlIvoJVnlTivX7NYAiSzHMo0F8UpMhp0JB31XFZy3uk1nvFuiRoilg1o86xs9J0ClLQ4nmz811wmkdrT64=
+	t=1752911957; cv=none; b=Yan/oN4IYXlWquj51/l6tzPxmuAtRzDnK4Mmq9/EHP735rWeZv6H8I2qpe6atb0oPldgm391vVmTTIp/SeneYcAmBD/5Tw4MX3puTZk0JBlGZUaH3AAakPjcgpthYXdrk6Da6gJGj/PGFF8+cmEcGgZmdWBsafwvjumMLJ9v66Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752873607; c=relaxed/simple;
-	bh=VV0k/p4lE70BxAFDLlj7sH+buKjUMQPXfnp+qptqqCo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eIf+QOGwnS3B1sAILLmLaswfWwfrs8yehToIM3gBW5981o1szXe/ajLfExfeoMbnoRkO+HQLJbuzaXGmDW/MGCUU/IODg5Uu+Ngg655nxO6Au1bt3q2/rwogaExqs2H+heFFBjNnRf3WuxIy0vu5pB2lCJRVUyOl8CK9r9CFu4I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=dhmJe+K8; arc=none smtp.client-ip=209.85.210.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="dhmJe+K8"
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-742c7a52e97so2249444b3a.3
-        for <linux-block@vger.kernel.org>; Fri, 18 Jul 2025 14:20:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1752873604; x=1753478404; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=jrDpOIYNKEvR3I2rjvl8PrpvBtE1YFXcEtv1bnvVFek=;
-        b=dhmJe+K8KpkpYR1Mj/uVc3l7eIhXM5Fva0/qRMdWLtGLB8Qn8ZhPfJBgpeWlhF2Kde
-         GfGa35C4XeWlNN3DLXPo08LMMVhgeMZWdfvuy7zOSJ2y/ItqxysCFPQ8qHynF6hXrH89
-         YhH3P7u+T9dFIlL5049BIMDXaonc+KZjWXooo7Dee1Tq3UcoDnaCgowEWo97a1mmndfR
-         RFdC018JnBTbyk6eAwxIr3npebr8BFJcwoVm6wugreJy34aMM7FOYVhdENOe6RQv2l3+
-         Za4OHxKAMXlZKEOlPFhcvDrZMAYyOlY0SAawbQmA3IJZ7wH38XVcaIn+ritPfMVrvzll
-         yOQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752873604; x=1753478404;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jrDpOIYNKEvR3I2rjvl8PrpvBtE1YFXcEtv1bnvVFek=;
-        b=CQBbUmfb/USNwU4BaUd+J4Dlu816F/wjxVuAYmfG4Rui1orHd1LxoUymODs9Ce7Pwy
-         p4JgpImawjl0zu4Jbw1MgmifXv0EsdDfmMVjrtudoMBKWVMMtKegxlGDGiE1iUTN4en4
-         qaTMgq6nz264wWlugru8LOtKec6tke5/LUATYuL83cmaalXDuWKEjeBTxm8jLdJ7yMLV
-         /CSvTOMbtUCQeIC4PoQ5nab0l3qIsOE3f90smDfHxzaVdVVu9gtRfiGPl+lf4XHO62CM
-         gqIHJkuaD78geFh9v8VL2RzsitF2cMxoe21bW84jPIn0jEaS0frD0N/YaVJejSz+WNwW
-         7tRw==
-X-Forwarded-Encrypted: i=1; AJvYcCVkUVE+dMMsIqrVYDZFXk8Burp20xYr5lG3X53mYZuRdr/rjNPfGk8r7KUXoEX3rRigN7dVVCj9uCqCDQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzDIM8wULmt/P8QCdjFF4W23U7mlxnyWl3EJonE29AqDy2FVsuQ
-	LlO/+YCEy4MIv/bWfCmWPNQM9tHp8Gy12UNMJqfBERwfe2/k8DSdjSm5gAFyElKVVqQ=
-X-Gm-Gg: ASbGnctNR23ea2OZ+M9R3v2wuZV6apx2vsvKV2kHS2WvhNeCRxEppgormJ1mQv5DVqf
-	K24IWEANl4fqNpwkIhMtLRkupk2MLGrCOGY2nBqhc4Hzfju+leLil4rKbLD71yafZWQLT3YEFs8
-	VQllnp7qF5YCZ5Px5QXoFp70/dHL8VAHrqBOA+hpqa5EP3gBxcN1caVxvPiS+uVcu8msAPTeCxT
-	52s4rsaZBnXiAKfm2C7CwWkrVWB/czEA96HNKc3JEUwFNeFEnK1HjSCBEh/Zcoi6sdr+bDOsXiC
-	vCE73HN8h56NmuG2hTMO2SZC63ETi/OmivBSpvUl87jISX8HNkUIrVzNNuPkfCotvNQ4iEJKUjn
-	P/yKMItinKparG0qEloIbPM5Kt4CNDuZs0giuSzg7s+Rfacml6I/uBk8I
-X-Google-Smtp-Source: AGHT+IGqYI/R7Eyc4bvJSzGt0YxEzaNGG5QDWsSs2xVwN56ZLN0/PxwhjL7o5+Vrjh1/z/pqh3Mexw==
-X-Received: by 2002:a05:6a00:1827:b0:749:421:efcc with SMTP id d2e1a72fcca58-759ab639270mr4848176b3a.5.1752873603834;
-        Fri, 18 Jul 2025 14:20:03 -0700 (PDT)
-Received: from [172.20.8.9] (syn-071-095-160-189.biz.spectrum.com. [71.95.160.189])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-759c84e25besm1730039b3a.2.2025.07.18.14.20.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 18 Jul 2025 14:20:03 -0700 (PDT)
-Message-ID: <c821c881-76c4-4dde-a208-bb9e8f3ea63f@kernel.dk>
-Date: Fri, 18 Jul 2025 15:20:02 -0600
+	s=arc-20240116; t=1752911957; c=relaxed/simple;
+	bh=CFyDh4S72NcYIkhbHgpug4yukC/Pb2g2Qpc43L+6ttw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=luLG25PWSBtahnkcuYDhUeGcsSPjsR8+HOaF0D1U9kNp8M7utwN6sPiwFltb2NGojLtBMEYCm0lOPWVijE5MqqKmjHzEekpeRGG9hGYUgQ5lrovjOUCEkDK0HgS3gBwggFMEGuvoY8dReEM7OLC0vNu1NYXieUTucBUKb6SExXg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from icess-ProLiant-DL380-Gen10.. (unknown [211.71.28.34])
+	by APP-03 (Coremail) with SMTP id rQCowADXanxBUHtopMR8BQ--.10061S2;
+	Sat, 19 Jul 2025 15:59:08 +0800 (CST)
+From: Ma Ke <make24@iscas.ac.cn>
+To: axboe@kernel.dk,
+	Jim.Quigley@oracle.com,
+	davem@davemloft.net,
+	sln@onemain.com,
+	alexandre.chartre@oracle.com,
+	aaron.young@oracle.com
+Cc: akpm@linux-foundation.org,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Ma Ke <make24@iscas.ac.cn>,
+	stable@vger.kernel.org
+Subject: [PATCH v2] sunvdc: Balance device refcount in vdc_port_mpgroup_check
+Date: Sat, 19 Jul 2025 15:58:56 +0800
+Message-Id: <20250719075856.3447953-1-make24@iscas.ac.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC][PATCHES] convert ->getgeo() from block_device of partition
- to gendisk
-To: Al Viro <viro@zeniv.linux.org.uk>, linux-block@vger.kernel.org
-Cc: Christoph Hellwig <hch@infradead.org>
-References: <20250718192642.GE2580412@ZenIV>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20250718192642.GE2580412@ZenIV>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:rQCowADXanxBUHtopMR8BQ--.10061S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7tryDZw1xAr1kGFykXryrZwb_yoW8Jw4DpF
+	4DCa45ZrW5GF17Kr4kXa47ZryFka4jyryfWFWUAw1Yk3s3XryIyrWUt34jgw18JF93XFWD
+	JF12yayrGFWDuaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUP014x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
+	6F4UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVCY1x0267AKxVWxJr
+	0_GcWlnxkEFVAIw20F6cxK64vIFxWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xv
+	F2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r
+	4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I
+	648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2AFwI0_Jw0_GFylc2xSY4AK67
+	AK6r4xMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAF
+	wI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc4
+	0Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AK
+	xVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr
+	1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbsmitUU
+	UUU==
+X-CM-SenderInfo: ppdnvj2u6l2u1dvotugofq/
 
-On 7/18/25 1:26 PM, Al Viro wrote:
-> 	Instances of ->getgeo() get a block_device of partition and
-> fill the (mostly fake) geometry information of the disk into caller's
-> struct hd_geometry.  It *does* contain one member related to specific
-> partition (the starting sector), but... that member is actually filled
-> by the callers of ->getgeo() (blkdev_getgeo() and compat_hdio_getgeo()),
-> leaving the instances partition-agnostic.
-> 
-> 	All actual work is done using bdev->bd_disk, be it the disk
-> capacity, IO, or cached geometry information.  AFAICS, it would make
-> more sense to pass it gendisk to start with.
-> 
-> 	The series is pretty straightforward - conversion of scsi_bios_ptable()
-> and scsi_partsize() to gendisk, then the same for ->bios_param(), then
-> ->getgeo() itself.   It sits in viro/vfs.git#rebase.getgeo, individual patches
-> in followups.
-> 
-> 	Comments, objections?
+Using device_find_child() to locate a probed virtual-device-port node
+causes a device refcount imbalance, as device_find_child() internally
+calls get_device() to increment the device’s reference count before
+returning its pointer. vdc_port_mpgroup_check() directly returns true
+upon finding a matching device without releasing the reference via
+put_device(). We should call put_device() to decrement refcount.
 
-None from me, looks fine:
+As comment of device_find_child() says, 'NOTE: you will need to drop
+the reference with put_device() after use'.
 
-Acked-by: Jens Axboe <axboe@kernel.dk>
+Found by code review.
 
+Cc: stable@vger.kernel.org
+Fixes: 3ee70591d6c4 ("sunvdc: prevent sunvdc panic when mpgroup disk added to guest domain")
+Signed-off-by: Ma Ke <make24@iscas.ac.cn>
+---
+Changes in v2:
+- keep the change style simple as suggestions.
+---
+ drivers/block/sunvdc.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/block/sunvdc.c b/drivers/block/sunvdc.c
+index b5727dea15bd..7af21fe67671 100644
+--- a/drivers/block/sunvdc.c
++++ b/drivers/block/sunvdc.c
+@@ -957,8 +957,10 @@ static bool vdc_port_mpgroup_check(struct vio_dev *vdev)
+ 	dev = device_find_child(vdev->dev.parent, &port_data,
+ 				vdc_device_probed);
+ 
+-	if (dev)
++	if (dev) {
++		put_device(dev);
+ 		return true;
++	}
+ 
+ 	return false;
+ }
 -- 
-Jens Axboe
+2.25.1
 
