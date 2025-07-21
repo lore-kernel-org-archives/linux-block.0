@@ -1,30 +1,29 @@
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D062E555
-	for <linux-block@vger.kernel.org>; Mon, 21 Jul 2025 07:47:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B814CDF49
+	for <linux-block@vger.kernel.org>; Mon, 21 Jul 2025 07:50:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753084024; cv=none; b=S6EGG06eahoWoX/UqatLvwqY/bnteiTkGxtn7HwrAMRwbrSpbMkhl1qh6Q6ebNjBvhH0tp9fWzz498P9U7L8buol8uaRXRlMX7sJh2x2CemAUiDya0nAKuRODKI9WBdZyCs16oWlB26SBswHkf85vepaps5QCbZYJnxVo7EMkjg=
+	t=1753084260; cv=none; b=R+OWH9eYA8CpXuMj9jMSc5pt8X6SNH7wgKAFMXAZEYbXcAakvUm0X/2Sq6li1cdKKnIZV8gqc8Z5WuUcWxVLbPYkFWq9K3FyjjWv3M8NS4LdyyXY6LvsIKetlcB5OMbloPhjq1uyw+SmudACkOtYKAKqYGD4pK23XdVJofJ0Tho=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753084024; c=relaxed/simple;
-	bh=qbl3dFGSxAjvpHe5LoN0JgPA1d4ot6RSjj9xhcRRf1o=;
+	s=arc-20240116; t=1753084260; c=relaxed/simple;
+	bh=OvvC0RbLOZLfKfnrhS/laVui0toO8UHT7c23Di6F8yU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sZBQi8pe2fK2ck8ZMp1DtKtqWxhKFk9jQW+FOH1YaQPM3qeoOaV7Rt0pAic9VSQw2Zxrb2KBFPGFz0eCSj8qaHdVjGdJTyS1MofWrRcK4CpPdGQyAI3GwnrZem7mvv0GyTlJWPbtZ012OIK+blGDdlSj8lXOloQ8zCSAIpKwBho=
+	 Content-Type:Content-Disposition:In-Reply-To; b=ESv+fkp6LP9tU6K5/sBY1y2WX6xznKFvSQr6tjgg+1UClJgVy0Fgde+RywU9W3xMUxbmYzfhHfWaRgIlknnBJ/B+30gTa5MO1UpOi42xHiqToQ7yXyIxpKyGCnmfa1R81E4Q4dm5LrXJ0Ns38NKoXGE3E7rIULqur/hYyVmBuLg=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
 Received: by verein.lst.de (Postfix, from userid 2407)
-	id 555EE68B05; Mon, 21 Jul 2025 09:46:58 +0200 (CEST)
-Date: Mon, 21 Jul 2025 09:46:58 +0200
+	id 806DB68B05; Mon, 21 Jul 2025 09:50:53 +0200 (CEST)
+Date: Mon, 21 Jul 2025 09:50:53 +0200
 From: Christoph Hellwig <hch@lst.de>
 To: Keith Busch <kbusch@meta.com>
 Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, hch@lst.de,
 	axboe@kernel.dk, leonro@nvidia.com, Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCHv2 6/7] blk-mq-dma: add support for mapping integrity
- metadata
-Message-ID: <20250721074658.GG32034@lst.de>
-References: <20250720184040.2402790-1-kbusch@meta.com> <20250720184040.2402790-7-kbusch@meta.com>
+Subject: Re: [PATCHv2 7/7] nvme: convert metadata mapping to dma iter
+Message-ID: <20250721075053.GH32034@lst.de>
+References: <20250720184040.2402790-1-kbusch@meta.com> <20250720184040.2402790-8-kbusch@meta.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -33,58 +32,37 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250720184040.2402790-7-kbusch@meta.com>
+In-Reply-To: <20250720184040.2402790-8-kbusch@meta.com>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Sun, Jul 20, 2025 at 11:40:39AM -0700, Keith Busch wrote:
-> +static bool blk_dma_iter_next(struct blk_dma_iter *iter)
+> +	if (!blk_rq_integrity_dma_map_iter_start(req, dev->dev,
+> +						&iod->meta_dma_state, &iter))
 
-This is at the blk_map_iter level and one level below dma, so it
-should not have a dma in the name.  I'm not entirely sure what a good
-name is, though.  Maybe blk_map_iter_next_bio wich was the original
-intention behind the refactored loop, although it isn't quite true
-with the later !iter->iter.bi_bvec_done addition.
+Do the normal two-tab indent here to make this a bit more readable?
 
-> +#ifdef CONFIG_BLK_DEV_INTEGRITY
-> +bool blk_rq_integrity_dma_map_iter_start(struct request *req,
-> +		struct device *dma_dev,  struct dma_iova_state *state,
-> +		struct blk_dma_iter *iter)
-> +{
-> +	unsigned len = bio_integrity_bytes(&req->q->limits.integrity,
-> +					   blk_rq_sectors(req));
-> +	iter->iter = req->bio->bi_integrity->bip_iter;
-> +	iter->bvec = req->bio->bi_integrity->bip_vec;
-> +	iter->integrity = true;
-> +	return blk_dma_map_iter_start(req, dma_dev, state, iter, len);
-> +}
-> +EXPORT_SYMBOL_GPL(blk_rq_integrity_dma_map_iter_start);
+>  	if (entries == 1) {
+> -		nvme_pci_sgl_set_data_sg(sg_list, sgl);
+> +		iod->meta_total_len = iter.len;
+> +		nvme_pci_sgl_set_data(sg_list, &iter);
+> +		iod->nr_meta_descriptors = 0;
+
+This should probably just set up the linear metadata pointer instead
+of a single-segment SGL.
+
+> +	if (!iod->nr_meta_descriptors) {
+> +		dma_unmap_page(dma_dev, le64_to_cpu(sg_list->addr),
+> +				le32_to_cpu(sg_list->length), dir);
+> +		return;
+> +	}
 > +
-> +bool blk_rq_integrity_dma_map_iter_next(struct request *req,
-> +               struct device *dma_dev, struct blk_dma_iter *iter)
-
-The wans kernel doc comments that can be mostly copy and pasted
-from the data mapping version.
-
-Also it would be great to convert the integrity sg mapping and
-count macros to blk_dma_map_iter_ just like I did for the data
-version.
-
-> +bool blk_rq_integrity_dma_map_iter_start(struct request *req,
-> +		struct device *dma_dev,  struct dma_iova_state *state,
-> +		struct blk_dma_iter *iter)
-> +{
-> +	return false;
+> +	for (i = 1; i <= iod->nr_meta_descriptors; i++)
+> +		dma_unmap_page(dma_dev, le64_to_cpu(sg_list[i].addr),
+> +				le32_to_cpu(sg_list[i].length), dir);
 > +}
-> +bool blk_rq_integrity_dma_map_iter_next(struct request *req,
 
-As you've probably noticed from the buildbot these need to be inline.
-
-> @@ -18,6 +18,7 @@ struct blk_dma_iter {
->  	struct bvec_iter		iter;
->  	struct bio			*bio;
->  	struct pci_p2pdma_map_state	p2pdma;
-> +	bool				integrity;
-
-Add an is_ prefix for the new field?  Or replace it with checks
-for ->bvec (or ->bvec_table as it should be) != bio->bi_io_vec?
+The use of nr_meta_descriptors is still incorrect here.  nr_descriptors
+counts the number of descriptors we got from the dma pools, which
+currently is always 1 for metadata SGLs.  The length of the SGL
+descriptor simplify comes from le32_to_cpu(sg_list[0].length) divided
+by the sgl entry size.
 
