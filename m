@@ -1,62 +1,72 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D73F21DB34C
-	for <linux-block@vger.kernel.org>; Mon, 21 Jul 2025 03:18:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D48A1F3D56
+	for <linux-block@vger.kernel.org>; Mon, 21 Jul 2025 03:23:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753067907; cv=none; b=Jfkl1H+guvdkzv2DHVE/tXF2wIgdG0HY1CPhjlhov2iAQJkXjh1ITtoYYCSQrZiGp0KrtdUie+MUT/n/f7iU781O/HjHoTlvtrOrkzJDptQHhKYEpCw1QBKQaZsG/eMb+VOJKpfvWLKQBaq3YZptjyIih2fdaAKJCySIu1IELAk=
+	t=1753068201; cv=none; b=QfV7eYPqJY0KzNqROAO8IPoyhSkZVFaOdVKR7ZvaFuF4IQGnK68BF+JTebpLeesL43ISyGmtOP9Vb83cMQWnQw7ZtEJkO/soTZJ8MtCl73xjo9/D8dUydR6vuCK8ysQkGj5mSS6a014zyUO4LOE7tdmpL/ER5u8lSUISAHQf/+U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753067907; c=relaxed/simple;
-	bh=NB/3g3CKXVMN+VyWjazs/iNfNp4t6kaGPAFZ6ryxo30=;
+	s=arc-20240116; t=1753068201; c=relaxed/simple;
+	bh=ccqhZ6D/BBFVT/2vphyPtM9hsxZ3BdFQnc0Ne90kRXc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LH0QJKc2YnxldsuOfGmm5nzabt7JyFSdvUPFFq1Xsgdkc0I8XYXzbdwUTdOqarQiBtwZ7/3g5cSkGtqnjshU8jvAArxWzAowOkvSdjlGYTO0bHdYfcGNvx9Odzz1+OoKnhWsubSFdBfeGjRWGVi6eIfQAqITNCm05nkTXe+57NE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XcpofzTa; arc=none smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=les1EGkk93huQuONwS1WzNLPco5CbMX5KNd0mUSN5cRv3BgQkIJITH+i69WNegQQ6WvsVqQ+Sb9/ygoFTqAQE+MXWLeQtS7ACnT/HufcQ1KfDqvJnKmXOCcB9JxWcIhbVZYP2Ju7LnHaLG0Ah/2oGJ5qlFXzXmw807sSIK58jVs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=V9k4ZDt8; arc=none smtp.client-ip=209.85.216.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XcpofzTa"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1753067906; x=1784603906;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=NB/3g3CKXVMN+VyWjazs/iNfNp4t6kaGPAFZ6ryxo30=;
-  b=XcpofzTa61pICo2C0pGihZ/AQTruqaA0J8OE6lQILaOC11jJJunkxeqM
-   KhRwXB0xgIPmzCn0Djf3m0L9necarXOqVYM4WdZKKFT+bz6rxpDx0GLwf
-   gbZNKOVgOLAdu3PhtoklCW9IjB+hQ/U1wm6Tx5AYUuXAYMpZRXKd0yCQD
-   XletiPgihigxrGzJi0cWBUxs2WaIluYk/GOfEMavN3lxofcG/aizfq/W2
-   9hcOiwWPDK40sfU0K9h5l5s2qyJplGO6AslnjgraQdwjo6LGwNW/fZtpK
-   epoSych2ytW+qJaawH9B9Wq7BhjrqhGwqWua2Ilc5tfbh2t+w6tYmZSWK
-   A==;
-X-CSE-ConnectionGUID: Vo49bGewTSKVfPM0jBWSbQ==
-X-CSE-MsgGUID: 9LA3MeG+TWCRCND2S4Njdw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11498"; a="55154516"
-X-IronPort-AV: E=Sophos;i="6.16,328,1744095600"; 
-   d="scan'208";a="55154516"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jul 2025 20:18:25 -0700
-X-CSE-ConnectionGUID: 21tY3aaWT2uX9lHI3haEKQ==
-X-CSE-MsgGUID: uatQ71rUTMe5O77rcYQr1w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,328,1744095600"; 
-   d="scan'208";a="163264139"
-Received: from lkp-server01.sh.intel.com (HELO 9ee84586c615) ([10.239.97.150])
-  by orviesa004.jf.intel.com with ESMTP; 20 Jul 2025 20:18:23 -0700
-Received: from kbuild by 9ee84586c615 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1udh2i-000GRB-1z;
-	Mon, 21 Jul 2025 03:18:20 +0000
-Date: Mon, 21 Jul 2025 11:18:18 +0800
-From: kernel test robot <lkp@intel.com>
-To: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org, hch@lst.de
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev, axboe@kernel.dk,
-	leonro@nvidia.com, Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCHv2 6/7] blk-mq-dma: add support for mapping integrity
- metadata
-Message-ID: <202507211037.lzkMQLrY-lkp@intel.com>
-References: <20250720184040.2402790-7-kbusch@meta.com>
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="V9k4ZDt8"
+Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-31393526d0dso2661269a91.0
+        for <linux-block@vger.kernel.org>; Sun, 20 Jul 2025 20:23:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1753068199; x=1753672999; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=LQYfFfM/mtR1CICbJUBbGQ90ReaVEsvi5HRRAnkzelk=;
+        b=V9k4ZDt8uy4e321aKMRrX2kTOqpGhUnbCINVuehoqB3B+QcudnSgdJZRnbd1r4cEiw
+         V9f6mRphNV1M7927W8ojbuKPQGUgha51cMS4NqJaJ31idC10waaRP/SDUS/oaG1478fe
+         +qNRVYURsql0MWgCgStpj5/kDKJiTOIQvJo4g=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753068199; x=1753672999;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LQYfFfM/mtR1CICbJUBbGQ90ReaVEsvi5HRRAnkzelk=;
+        b=YLHDfO3mvpgAgCD9WUs9DExXWQO6giHLIJmBB8+zP2Qxlq6+1CH4Bbh5EfKtvP9ZiR
+         ZOMpHXoSya3JyuJgcjGjLXRO62xVjh/vdmseR0doPSZlOtYUcguhZZAqp7Y9NvevJOmi
+         bwI92WZu8NK0OfE73T5pI8YPPp4uECtlnffhCYKwvJ6hFqnBVsjX2h141ry/PqSYqSkl
+         vYDjQBhyyaCZjh2wFWoY7QLRUh7DDxOPC4+jnTxdW19ypxlli0riex4+Br2UEPCEEOPo
+         rC0EHYmrkRorJuthmkOa9uP1cbIRtzPiOr5Yd86BhZXb1T8hx8PdOo6wus6ekkT02dAr
+         lyJw==
+X-Forwarded-Encrypted: i=1; AJvYcCVR7uNbUbH9NTFQgxOigfLoJ+PXwBoHR4jgxZbtWiYj/hx8iaY4VDCXE5RtiUYqNmLTd7iQxOl3kQ5KkQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzkn09YdA2oSb4uoAe1ApAwrWAvujnZaJYvLNrVKoG1gG2rSqhZ
+	ScV1/Hwa3tKj5OatPK6vbwwVxUEGNQIwpPFaRX0esrVuZC1pOySbnccMD9duE8ikVw==
+X-Gm-Gg: ASbGnctKZBbFKlHo/y+WhZ2OrfSH8cKurbOITo22GdwIz2oqvLl+rqMkdnwY6Ix0NbR
+	O2YzEvVU9A+iiB69okz9JXAQMtTJjhl63MEgF2A+ljcAC/enlH2x4uPaB3EdmgTEtzSF0K0Kz+X
+	+Y5Q92PjeXtm70811D3rIGYSOFI8dYQqOcRIQ8oQhiaHWqLtCjEW6VXeMlDqi9fYIRSfMwGvILX
+	C216ZkgiEB3QrIg+Vl/ViEK01it/SjqBURoa/V9p/6Hq3MAHH7iCC79pr2l3HJ7ASOp0Rr2e5g4
+	fHt6wWRCNz8d/hzv0Fcsdr5qxqBzNbKkwZbLua/PWXkVdjspwB3spKT1Njt1N3vem2m+fmHaxJQ
+	JwnvRSDwDIQTB4rnTAdeu5BkC1zf7/OsYdKNH
+X-Google-Smtp-Source: AGHT+IGMOr/h4t/0+dcYhb0THiLSuS0RfTOtcYQsA0CBLh3fChq1lYhkQ68N31p/ZeB4Swgqevsz+w==
+X-Received: by 2002:a17:90b:2d4d:b0:311:c1ec:7cfd with SMTP id 98e67ed59e1d1-31cc25e7a85mr16061926a91.26.1753068199361;
+        Sun, 20 Jul 2025 20:23:19 -0700 (PDT)
+Received: from google.com ([2401:fa00:8f:203:ca29:2ade:bb46:a1fb])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-31cc3e4571asm5092945a91.6.2025.07.20.20.23.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 20 Jul 2025 20:23:18 -0700 (PDT)
+Date: Mon, 21 Jul 2025 12:23:14 +0900
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Phillip Potter <phil@philpotter.co.uk>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, 
+	Christoph Hellwig <hch@infradead.org>, Chris Rankin <rankincj@gmail.com>, linux-kernel@vger.kernel.org, 
+	linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Subject: Re: cdrom: cdrom_mrw_exit() NULL ptr deref
+Message-ID: <r7mtqczhwcyt7xwpmvn5k7iwevta46z7xsu7t2y2xxnwlv7byc@ksiuu4zlllod>
+References: <uxgzea5ibqxygv3x7i4ojbpvcpv2wziorvb3ns5cdtyvobyn7h@y4g4l5ezv2ec>
+ <aHF4GRvXhM6TnROz@equinox>
+ <6686fe78-a050-4a1d-aa27-b7bf7ca6e912@kernel.dk>
+ <z64pki236n2mertom6jmgznj4t3dkxeosr56fhpmykjdrnzs2l@5xlhh7htcaw4>
+ <aHzZSKqAJR9Wk7SX@equinox>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -65,134 +75,27 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250720184040.2402790-7-kbusch@meta.com>
+In-Reply-To: <aHzZSKqAJR9Wk7SX@equinox>
 
-Hi Keith,
+On (25/07/20 12:55), Phillip Potter wrote:
+> > I don't have a CD/DVD drive to test this, but from what I can tell
+> > the patch looks good to me.  Thanks for taking a look!
+> 
+> Hi Sergey,
+> 
+> Just to say, I haven't forgotten this :-) Have run a few tests with the
+> patch and so far looks all good.
 
-kernel test robot noticed the following build warnings:
+Hi Phillip,
+Thanks for the update!
 
-[auto build test WARNING on axboe-block/for-next]
-[cannot apply to linux-nvme/for-next hch-configfs/for-next linus/master v6.16-rc7 next-20250718]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+> Still been unable to replicate the specific issue though.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Keith-Busch/blk-mq-dma-move-the-bio-and-bvec_iter-to-blk_dma_iter/20250721-024616
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
-patch link:    https://lore.kernel.org/r/20250720184040.2402790-7-kbusch%40meta.com
-patch subject: [PATCHv2 6/7] blk-mq-dma: add support for mapping integrity metadata
-config: riscv-randconfig-001-20250721 (https://download.01.org/0day-ci/archive/20250721/202507211037.lzkMQLrY-lkp@intel.com/config)
-compiler: clang version 21.0.0git (https://github.com/llvm/llvm-project 16534d19bf50bde879a83f0ae62875e2c5120e64)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250721/202507211037.lzkMQLrY-lkp@intel.com/reproduce)
+Hmm that's interesting.  I thought that unplugging a USB cdrom
+drive would hit the issue relatively reliably.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202507211037.lzkMQLrY-lkp@intel.com/
+> Assuming my testing uncovers nothing else, I will
+> revert to Jens with fully crafted patch submission in next day or two.
 
-All warnings (new ones prefixed by >>):
-
-   In file included from block/blk-mq.c:13:
->> include/linux/blk-integrity.h:117:6: warning: no previous prototype for function 'blk_rq_integrity_dma_map_iter_start' [-Wmissing-prototypes]
-     117 | bool blk_rq_integrity_dma_map_iter_start(struct request *req,
-         |      ^
-   include/linux/blk-integrity.h:117:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
-     117 | bool blk_rq_integrity_dma_map_iter_start(struct request *req,
-         | ^
-         | static 
->> include/linux/blk-integrity.h:123:6: warning: no previous prototype for function 'blk_rq_integrity_dma_map_iter_next' [-Wmissing-prototypes]
-     123 | bool blk_rq_integrity_dma_map_iter_next(struct request *req,
-         |      ^
-   include/linux/blk-integrity.h:123:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
-     123 | bool blk_rq_integrity_dma_map_iter_next(struct request *req,
-         | ^
-         | static 
-   2 warnings generated.
---
-   In file included from block/blk-mq-dma.c:5:
->> include/linux/blk-integrity.h:117:6: warning: no previous prototype for function 'blk_rq_integrity_dma_map_iter_start' [-Wmissing-prototypes]
-     117 | bool blk_rq_integrity_dma_map_iter_start(struct request *req,
-         |      ^
-   include/linux/blk-integrity.h:117:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
-     117 | bool blk_rq_integrity_dma_map_iter_start(struct request *req,
-         | ^
-         | static 
->> include/linux/blk-integrity.h:123:6: warning: no previous prototype for function 'blk_rq_integrity_dma_map_iter_next' [-Wmissing-prototypes]
-     123 | bool blk_rq_integrity_dma_map_iter_next(struct request *req,
-         |      ^
-   include/linux/blk-integrity.h:123:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
-     123 | bool blk_rq_integrity_dma_map_iter_next(struct request *req,
-         | ^
-         | static 
-   block/blk-mq-dma.c:23:27: error: no member named 'bi_integrity' in 'struct bio'
-      23 |                 iter->iter = iter->bio->bi_integrity->bip_iter;
-         |                              ~~~~~~~~~  ^
-   block/blk-mq-dma.c:24:27: error: no member named 'bi_integrity' in 'struct bio'
-      24 |                 iter->bvec = iter->bio->bi_integrity->bip_vec;
-         |                              ~~~~~~~~~  ^
-   2 warnings and 2 errors generated.
-
-
-vim +/blk_rq_integrity_dma_map_iter_start +117 include/linux/blk-integrity.h
-
-    90	
-    91	/*
-    92	 * Return the current bvec that contains the integrity data. bip_iter may be
-    93	 * advanced to iterate over the integrity data.
-    94	 */
-    95	static inline struct bio_vec rq_integrity_vec(struct request *rq)
-    96	{
-    97		return mp_bvec_iter_bvec(rq->bio->bi_integrity->bip_vec,
-    98					 rq->bio->bi_integrity->bip_iter);
-    99	}
-   100	#else /* CONFIG_BLK_DEV_INTEGRITY */
-   101	static inline int blk_rq_count_integrity_sg(struct request_queue *q,
-   102						    struct bio *b)
-   103	{
-   104		return 0;
-   105	}
-   106	static inline int blk_rq_map_integrity_sg(struct request *q,
-   107						  struct scatterlist *s)
-   108	{
-   109		return 0;
-   110	}
-   111	static inline int blk_rq_integrity_map_user(struct request *rq,
-   112						    void __user *ubuf,
-   113						    ssize_t bytes)
-   114	{
-   115		return -EINVAL;
-   116	}
- > 117	bool blk_rq_integrity_dma_map_iter_start(struct request *req,
-   118			struct device *dma_dev,  struct dma_iova_state *state,
-   119			struct blk_dma_iter *iter)
-   120	{
-   121		return false;
-   122	}
- > 123	bool blk_rq_integrity_dma_map_iter_next(struct request *req,
-   124			struct device *dma_dev, struct blk_dma_iter *iter)
-   125	{
-   126		return false;
-   127	}
-   128	static inline struct blk_integrity *bdev_get_integrity(struct block_device *b)
-   129	{
-   130		return NULL;
-   131	}
-   132	static inline struct blk_integrity *blk_get_integrity(struct gendisk *disk)
-   133	{
-   134		return NULL;
-   135	}
-   136	static inline bool
-   137	blk_integrity_queue_supports_integrity(struct request_queue *q)
-   138	{
-   139		return false;
-   140	}
-   141	static inline unsigned short
-   142	queue_max_integrity_segments(const struct request_queue *q)
-   143	{
-   144		return 0;
-   145	}
-   146	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Sounds like a plan.  Once we have an upstream patch we can cherry-pick
+it and roll it out to our LTS kernels (and eventually to our users.)
