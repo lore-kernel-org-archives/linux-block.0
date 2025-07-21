@@ -1,83 +1,159 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18ACA2D46A2
-	for <linux-block@vger.kernel.org>; Mon, 21 Jul 2025 13:15:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C479C1607A4
+	for <linux-block@vger.kernel.org>; Mon, 21 Jul 2025 13:37:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753103744; cv=none; b=TatRs81eZz15arWRDaCdSZTG+ulqGy9e6+xYThjE5ScikCEVnJO8gD97XkJDFjrbKfkAkMeDN/ITAwswWMHDoj83BRoYIdn3GP2i89PXFUXnO8OX5fczrlUMl0cFlzOTQCfEQnPSh7QbEObn28K5+Ha+dPq/zKU84yJzIjn6KLI=
+	t=1753105068; cv=none; b=Diyzr9PolXT3PANppLoPGdsHvFJItctPwgOcXBCH67ukyrVhNEiCcKbsr0Mde/LwnFH3EVUAtHDfwLr79MCyjwICb6dntVaNHfCUOShu0VGJzrVzRs3Ml07m4EzxxIEeuKKIHw5DzJ5Ud7zhXA4KEE0kubYn/96nuwP1ATzjqCw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753103744; c=relaxed/simple;
-	bh=mwwxA6mQpFGv/fMSObulRQgthQ8CoywztVNbwD6LVJU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gBMZ931sj9DCn74c4Q6MjJ1IrAwCu7Kh30kR22wLy/QybvcDydAGCzzdDDa+iXXZ63rxQ0YrHFyybWQQBtf7vheZB+NbwsbiNq7Y5jwl4sxBXUQp0MKIKb/caL2JErxDDZFYkvwYwT90z6zCiT4MdIs9x6njNc488JpVE2+isKk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F8Uf7fF3; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1753105068; c=relaxed/simple;
+	bh=ZQPipNDdjVBAbFgfxxDJ95AbpmZYa3Qy8MSXa1QiDcs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=k3kwPkK2+pszIkbjBsLpA8LB2Yv5fNUyLQ2JOsD+Nz9BzI0dXgjNhCQbnEmKQCz91jldQmG46kkmi5yZx+MjWuByUQD/Og4kkS6jARp2dhM2s3EO45dXCCKFD8VUK6sYeNm4MQcjWEOVKl+mJkoSgqAF81Et8jfCewBRwQzNUpc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=WLbWWHMT; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F8Uf7fF3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3752DC4CEED;
-	Mon, 21 Jul 2025 13:15:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753103743;
-	bh=mwwxA6mQpFGv/fMSObulRQgthQ8CoywztVNbwD6LVJU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=F8Uf7fF33mwkmPDNI8ecdi4l0ppwuaq4Om6A7aSvZwa1VrdzDYOKFaqox6IaOeoFJ
-	 R4qCH8CUcFUPlq7twRUvsn6yp3HlkTbLpVcM4lk2qEWDvq6ynuTCgmpGSnxoN/r1LP
-	 pU55/I0GFR/i6JcriobOJzHYnKEJfrDwnPagTy4fD7pZ5zyn/whO7YuHayIIJ/tfPn
-	 /LRGwHdzudKoc069TmYeBL82EqSfoeXYXzdEtTleX5nmwm2g91+cxADokV7nL7B2LW
-	 rukV6sdececKdTkhUPOWuFEarUZwH6bly7BV6Vb/XFmM0Bg6urVnx1psXgJEa4Rh5h
-	 9d2/CmH69tHuA==
-Date: Mon, 21 Jul 2025 07:15:41 -0600
-From: Keith Busch <kbusch@kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org, axboe@kernel.dk, leonro@nvidia.com
-Subject: Re: [PATCHv2 7/7] nvme: convert metadata mapping to dma iter
-Message-ID: <aH49fa1qH4HN5P7w@kbusch-mbp>
-References: <20250720184040.2402790-1-kbusch@meta.com>
- <20250720184040.2402790-8-kbusch@meta.com>
- <20250721075053.GH32034@lst.de>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="WLbWWHMT"
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56LB74Uc004113;
+	Mon, 21 Jul 2025 13:37:36 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=uQvhZD
+	BgG5GczamMR6oaGwLiWPTFPI5BzM55hDfW6IM=; b=WLbWWHMTba6NnD771A7vcA
+	mjbVIfLa+HfV2/0tnnb/oFohEXjUmQn5xcfZEDU8DNqQpmLz4QqOz6S/csaQIh1W
+	JSupj8p98FX4E345+xNbnFaSywcG0T5fF5KKfBNY5FNqfSGbyM3d+4nYhKpWcBaP
+	RmPUeByP2FFhWB9TW4RO/e/kQ7iIrjDqKPwlC4cTOxeI6eZjMljB1jq5o6YYvuV2
+	UNyMbymK9pYiPa6Gk2i5TYyLrlhRUMbTzM4kmrvM6yJ8g+vbD0adpvEforzPZ31e
+	a8WkPnG0pPdOy6R8faO3JjvbuN7hBS9r8Jlzh9ryrFJ16wfi5SKhBHt7fk/Kk92w
+	==
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4805uqru7j-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 21 Jul 2025 13:37:35 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 56LCIOKT005253;
+	Mon, 21 Jul 2025 13:37:35 GMT
+Received: from smtprelay07.wdc07v.mail.ibm.com ([172.16.1.74])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 480u8fnhjb-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 21 Jul 2025 13:37:35 +0000
+Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
+	by smtprelay07.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 56LDbYHH59703710
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 21 Jul 2025 13:37:34 GMT
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id B510D5805E;
+	Mon, 21 Jul 2025 13:37:34 +0000 (GMT)
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E62B55805C;
+	Mon, 21 Jul 2025 13:37:30 +0000 (GMT)
+Received: from [9.43.127.174] (unknown [9.43.127.174])
+	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 21 Jul 2025 13:37:30 +0000 (GMT)
+Message-ID: <a4f4d30e-c032-46b8-bc29-2254ddcf8fea@linux.ibm.com>
+Date: Mon, 21 Jul 2025 19:07:28 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250721075053.GH32034@lst.de>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/2] null_blk: fix set->driver_data while setting up
+ tagset
+To: Damien Le Moal <dlemoal@kernel.org>, linux-block@vger.kernel.org
+Cc: hch@lst.de, ming.lei@redhat.com, hare@suse.de, axboe@kernel.dk,
+        johannes.thumshirn@wdc.com, gjoyce@ibm.com
+References: <20250720113553.913034-1-nilay@linux.ibm.com>
+ <20250720113553.913034-3-nilay@linux.ibm.com>
+ <4b30df72-72e0-484e-99d5-820af02619d9@kernel.org>
+Content-Language: en-US
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <4b30df72-72e0-484e-99d5-820af02619d9@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: mzAwUg7uSyTeTF6rpH5zLUKUP8YCDLvz
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzIxMDExNyBTYWx0ZWRfX7OZPu1L+v+cj
+ u/CzYtAOEU94BCjMm88ZRWZyV4EcPNXKcY4T1Rwj03gFBn35wYWFXhJOKvaHJm0VuhpCvjnKnEN
+ Vf1xxe/zJ8r5TmgjY4lrzyMZSF6O5dVRxbJfLSR1jnvU31+cZw72Wb9ahVuWiEizDP+XcraOVlB
+ ppDSdZ/3O0SBv3cMyz4m2D/90BKH/vLGewUVa9howmYeCS6fPJeCdtEMe+Qlpcbq7OtR7M5saLK
+ mQmvhN2OisgAFOtTdyKY58pPMFdGu0Exn304JvM0r27oqA5H/51JCHmORznM5I2Qufqq+iCoQGl
+ tZEB8Nc8ttzwlgyXNsgFTdxuZH2UUZW9uCw0at1QmPkHlv2JAG6dJNNfxKIAQTAH0QgXDizp22L
+ O77F6ASmtXcvwMFzAUK2KBQ1mNiMwFsKB3hvl8a+J7hZkHqrQqK77TXOSd7DK00g+cYBOO+s
+X-Authority-Analysis: v=2.4 cv=dpnbC0g4 c=1 sm=1 tr=0 ts=687e429f cx=c_pps
+ a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
+ a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=VnNF1IyMAAAA:8 a=NuxngZXgg-Y-D_1eyDsA:9
+ a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+X-Proofpoint-GUID: mzAwUg7uSyTeTF6rpH5zLUKUP8YCDLvz
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-07-21_04,2025-07-21_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 impostorscore=0 suspectscore=0 adultscore=0 phishscore=0
+ lowpriorityscore=0 priorityscore=1501 bulkscore=0 mlxscore=0 malwarescore=0
+ mlxlogscore=999 clxscore=1015 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
+ definitions=main-2507210117
 
-On Mon, Jul 21, 2025 at 09:50:53AM +0200, Christoph Hellwig wrote:
-> >  	if (entries == 1) {
-> > -		nvme_pci_sgl_set_data_sg(sg_list, sgl);
-> > +		iod->meta_total_len = iter.len;
-> > +		nvme_pci_sgl_set_data(sg_list, &iter);
-> > +		iod->nr_meta_descriptors = 0;
+
+
+On 7/21/25 6:34 PM, Damien Le Moal wrote:
+> On 2025/07/20 20:35, Nilay Shroff wrote:
+>> When setting up a null block device, we initialize a tagset that
+>> includes a driver_data field—typically used by block drivers to
+>> store a pointer to driver-specific data. In the case of null_blk,
+>> this should point to the struct nullb instance.
+>>
+>> However, due to recent tagset refactoring in the null_blk driver, we
+>> missed initializing driver_data when creating a shared tagset. As a
+>> result, software queues (ctx) fail to map correctly to new hardware
+>> queues (hctx). For example, increasing the number of submit queues
+>> triggers an nr_hw_queues update, which invokes null_map_queues() to
+>> remap queues. Since set->driver_data is unset, null_map_queues()
+>> fails to map any ctx to the new hctxs, leading to hctx->nr_ctx == 0,
+>> effectively making the hardware queues unusable for I/O.
+>>
+>> This patch fixes the issue by ensuring that set->driver_data is properly
+>> initialized to point to the struct nullb during tagset setup.
+>>
+>> Fixes: 72ca28765fc4 ("null_blk: refactor tag_set setup")
+>> Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
+>> ---
+>>  drivers/block/null_blk/main.c | 3 ++-
+>>  1 file changed, 2 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
+>> index aa163ae9b2aa..9e1c4ce6fc42 100644
+>> --- a/drivers/block/null_blk/main.c
+>> +++ b/drivers/block/null_blk/main.c
+>> @@ -1854,13 +1854,14 @@ static int null_init_global_tag_set(void)
+>>  
+>>  static int null_setup_tagset(struct nullb *nullb)
+>>  {
+>> +	nullb->tag_set->driver_data = nullb;
+>> +
 > 
-> This should probably just set up the linear metadata pointer instead
-> of a single-segment SGL.
-
-Okay, but we should still use SGL with user passthrough commands for
-memory safety. Even if we have an iommu protecting access, there's still
-a possibility of corrupting adjacent iova's if using MPTR.
- 
-> > +	if (!iod->nr_meta_descriptors) {
-> > +		dma_unmap_page(dma_dev, le64_to_cpu(sg_list->addr),
-> > +				le32_to_cpu(sg_list->length), dir);
-> > +		return;
-> > +	}
-> > +
-> > +	for (i = 1; i <= iod->nr_meta_descriptors; i++)
-> > +		dma_unmap_page(dma_dev, le64_to_cpu(sg_list[i].addr),
-> > +				le32_to_cpu(sg_list[i].length), dir);
-> > +}
+> How can this be correct since the tag_set pointer is initialized below ?
 > 
-> The use of nr_meta_descriptors is still incorrect here.  nr_descriptors
-> counts the number of descriptors we got from the dma pools, which
-> currently is always 1 for metadata SGLs.  The length of the SGL
-> descriptor simplify comes from le32_to_cpu(sg_list[0].length) divided
-> by the sgl entry size.
+>>  	if (nullb->dev->shared_tags) {
+>>  		nullb->tag_set = &tag_set;
+> 
+> Shouldn't you add:
+> 
+> 		nullb->tag_set->driver_data = nullb;
+> 
+> here instead ?
+> 
+>>  		return null_init_global_tag_set();
+>>  	}
 
-In this patch, the nr_meta_descriptors value matches the sg_list length.
-The only real reason I need this 'nr_' value is to distinguish the
-single data descriptor condition from the segment descriptor use, but I
-can just add an iod flag for that too and save some space.
+Oh yes good catch! I'll fix this in the next patchset.
+My bad.. :(
+
+Thanks,
+--Nilay
+
