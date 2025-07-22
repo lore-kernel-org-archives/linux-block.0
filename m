@@ -1,133 +1,215 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 487AB4A28
-	for <linux-block@vger.kernel.org>; Tue, 22 Jul 2025 02:38:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753151895; cv=none; b=ESHXgqsn8GKithmRA29fWhElpPI5yBXtbiJvTUxDKK8yoMrEbhOh5cEK8qQFzzS/ExHdgMlXAQHUHOwssvv4p4IIQqYLwDm2VJLPf4Ghh9TvZ3nj6gZItefgyLQSuODiTdD7G4TNDXxCmbLRtMybOuce3Vsu/pkKXAnMANOEjrU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753151895; c=relaxed/simple;
-	bh=4BSi+Pcst1Ua4Gm+pCi7UJWVBAa+zvA+esk+WgnVPuE=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=RWQebL+VI6sJgK7Hql+aI/PTTM9hi67Tr9bBGzFc/oEkDckhKTUi9TmnDVjGy1eVJ/pvLy4bAwnNjOEMVCt6Pv+Aefp1MO1MxUx4HZjq3FHXCY/NP5gg3OkCrWM1i0laNBGr7f3MrHyj4HK9DAtp5bL7WibkTMjNXgGSEJLpgZQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4bmLzJ2JrWzYQtvS
-	for <linux-block@vger.kernel.org>; Tue, 22 Jul 2025 10:38:04 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 0EE451A018D
-	for <linux-block@vger.kernel.org>; Tue, 22 Jul 2025 10:38:03 +0800 (CST)
-Received: from [10.174.179.143] (unknown [10.174.179.143])
-	by APP4 (Coremail) with SMTP id gCh0CgBHERKJ+X5oLD9GBA--.33597S3;
-	Tue, 22 Jul 2025 10:38:02 +0800 (CST)
-Subject: Re: [PATCHv2 2/2] null_blk: fix set->driver_data while setting up
- tagset
-To: Damien Le Moal <dlemoal@kernel.org>, Nilay Shroff <nilay@linux.ibm.com>,
- linux-block@vger.kernel.org
-Cc: hch@lst.de, hare@suse.de, ming.lei@redhat.com, axboe@kernel.dk,
- johannes.thumshirn@wdc.com, gjoyce@ibm.com, "yukuai (C)" <yukuai3@huawei.com>
-References: <20250721140450.1030511-1-nilay@linux.ibm.com>
- <20250721140450.1030511-3-nilay@linux.ibm.com>
- <1cadba31-8e73-4693-9ea5-b5fce8b69ba9@kernel.org>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <5e926df5-0a6f-6ebb-8078-98f21dd10eef@huaweicloud.com>
-Date: Tue, 22 Jul 2025 10:38:01 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F17FE19E826
+	for <linux-block@vger.kernel.org>; Tue, 22 Jul 2025 03:30:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1753155033; cv=fail; b=h0mFvIqXT9mgYYCdBQy2qeQGR/DDZMGqpB29j7EBvRCnfweW+xEoReYiSm27SEbOLXRPjuVDMtW5LY/S8DvFABpzjD0l6rWesCp0x3rhr/DiaN51e22ttzVArWg3GNwOd86LXpSBlF52/DneXiicWZzIP/XiOd7UVKq9X32+n8c=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1753155033; c=relaxed/simple;
+	bh=f8yILv7dZ5oSG+fugXOyG+XLFp57fqti92oZidTJOhY=;
+	h=To:Cc:Subject:From:In-Reply-To:Message-ID:References:Date:
+	 Content-Type:MIME-Version; b=XXjTKwp0FDOcHTw3A4zpA1m5hCUfCmlTnkqoeRZ6uDz5NGo9iDYL/lUz1jRS2EHgPGzus3dDC+Oa6BXwFEXmrO/hQ/yUExIWf2UgiKlHhDdQS/ZA8vhi6YuImE5URPb4RYd6lJZcP3rDk31bjdgjTYjI9cR/jO9Degp1b/zX90Y=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=YcFqgrKa; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=yupo+Dw7; arc=fail smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="YcFqgrKa";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="yupo+Dw7"
+Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56M1BvQu018902;
+	Tue, 22 Jul 2025 03:30:25 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=corp-2025-04-25; bh=PriYHxE16wnnlQhIQ1
+	3yiUjV0tHYZjZMAbUWjrCJWLM=; b=YcFqgrKaaIL7PbqCx2Khdpws2+1l3j+DiA
+	lkgIV5VJGaln4Xo5wKB+rKmpo/YoO7IN2/Z5qS7m1NBrWZRQ3RUTVpumuKlrfK1a
+	1tprvaN4lZAse7CKoUcSBCq5f6PepexI5dJ0/r+T+Xh33aezRkNumGkqOsVqViTF
+	nSNIQ8Yixv63mURLIeVHjba5GboZJ9VhlbzSbeAT2Wy+wwokw/GrqTLC2R5sq0Pm
+	rqQSEwLYSSSNcymjZ2WFmVh3KvaFFzkEXk2ILv0bI6CP0PEvJPo0c5UnEirUODWd
+	ztpyx3UVNDZivWd/NoNi7mYDh52dIXJDLMfiuz7lpC915f0YXqlg==
+Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 480576m5bs-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 22 Jul 2025 03:30:25 +0000 (GMT)
+Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 56M0EiO8011321;
+	Tue, 22 Jul 2025 03:30:24 GMT
+Received: from nam10-bn7-obe.outbound.protection.outlook.com (mail-bn7nam10on2085.outbound.protection.outlook.com [40.107.92.85])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 4801t8s6kt-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 22 Jul 2025 03:30:24 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=NFpOWodtpH/Y2mM+TRgouwHBzZodDWYjIYAVyc3h65rRmBM7CkeQuht18wpXjSIPc8on7GyLq36xGsoYe7wsBTjHmch/Rwgjx2ba+j+gMATfyPRsaFSWF4qSnUqQgeOJ4Ko1Z/GeQeWGXgwfJD1obxw7EAxV3hdOHjMILjfPWK/d0ux9tLYJwGU9uNOoLfsrd3VVoI806yW+5vFnxEZWtapd0VP70Gzbehs2Iv5307MLvJ2EobYZcUpN/ebrjfdMqUaXCZ0VOTn9vgVd1nDL2zTuFEm88g6VhN2ncGlDvPJfJZ01+9U6jhmnio1ifL/ZVf87WripKgKmMmcuWQJ83g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=PriYHxE16wnnlQhIQ13yiUjV0tHYZjZMAbUWjrCJWLM=;
+ b=InJZPFntjT/6wBXiXHD3bbj/haqlOrt2ht8BTxaEANJe3FibS8McO6N9Ni08jPNhVAm1MX+Hecwog9SUbapPDwGCMn2xMsuVWEqsdpXCzbBayYiqFcS9Ugq9X9O10PzC9b4UbPnpEdCiX4dL9lGAQZVMJfGYHLZuqpJlBF11rbe7rs59N0QEHLvEtNmEIdScMX1Q47A4fAaL+Gtq6gSMMuOqcNzbY8pCWYH9BgT+imc5PgZpmU06hyTCVpmi/wpWxpHRGMhqZab0xYkDTVdST0HB3BK3S7K7lMAN4rtYduUlHusJDnNdfy08YLLLmx538yZHetKhWPzaHMNdvLBtCQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=PriYHxE16wnnlQhIQ13yiUjV0tHYZjZMAbUWjrCJWLM=;
+ b=yupo+Dw73wOKo7QaJSsqkTq4XCEI32ldiP+UVWrO5HaqsP7wg2rEBnm52wykXTvcvO6J52HbUvw7l8RGVxLeQhz9B3MQl4fb10ka1udELP+1qdr4wAPFsnGUnjNK3DsI2o1+PWCGK94GYhaqiD88xZk0Q68C7/TK6RLd+UmyGPQ=
+Received: from CH0PR10MB5338.namprd10.prod.outlook.com (2603:10b6:610:cb::8)
+ by PH0PR10MB4757.namprd10.prod.outlook.com (2603:10b6:510:3f::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8943.30; Tue, 22 Jul
+ 2025 03:30:21 +0000
+Received: from CH0PR10MB5338.namprd10.prod.outlook.com
+ ([fe80::5cca:2bcc:cedb:d9bf]) by CH0PR10MB5338.namprd10.prod.outlook.com
+ ([fe80::5cca:2bcc:cedb:d9bf%6]) with mapi id 15.20.8943.028; Tue, 22 Jul 2025
+ 03:30:21 +0000
+To: Al Viro <viro@zeniv.linux.org.uk>
+Cc: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Christoph
+ Hellwig <hch@infradead.org>
+Subject: Re: [RFC][PATCHES] convert ->getgeo() from block_device of
+ partition to gendisk
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+In-Reply-To: <20250718192642.GE2580412@ZenIV> (Al Viro's message of "Fri, 18
+	Jul 2025 20:26:42 +0100")
+Organization: Oracle Corporation
+Message-ID: <yq1y0sgx5rb.fsf@ca-mkp.ca.oracle.com>
+References: <20250718192642.GE2580412@ZenIV>
+Date: Mon, 21 Jul 2025 23:30:18 -0400
+Content-Type: text/plain
+X-ClientProxiedBy: SJ0PR13CA0188.namprd13.prod.outlook.com
+ (2603:10b6:a03:2c3::13) To CH0PR10MB5338.namprd10.prod.outlook.com
+ (2603:10b6:610:cb::8)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <1cadba31-8e73-4693-9ea5-b5fce8b69ba9@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgBHERKJ+X5oLD9GBA--.33597S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxGw17WFWDWrW8Zw15Xr48tFb_yoW5GF4xpF
-	W2ga1Ikry8tF47X39Fyw45WFy3t3WUAFW8WF4Iy34Fv3y5ZryxZrsrtFW5XF18Ka1DAw4S
-	vFsrZFW5Xa4DXFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9Ib4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7Mxk0xIA0c2IE
-	e2xFo4CEbIxvr21lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4I
-	kC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWU
-	WwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr
-	0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWU
-	JVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJb
-	IYCTnIWIevJa73UjIFyTuYvjxUF1v3UUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH0PR10MB5338:EE_|PH0PR10MB4757:EE_
+X-MS-Office365-Filtering-Correlation-Id: 654e1cfe-2be5-4bb0-54a9-08ddc8d0168f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?2ou7W0IBqxY1wMEv0JfGMLU6R3mh/DVClV0Ge/ecJcfvfpYyA70oRowe2JMh?=
+ =?us-ascii?Q?WemXzXMyWy8o7ljMCsbJgp42avi2FOr5J74XbdnUP04l/Iw8JiujfREyn1pP?=
+ =?us-ascii?Q?oOl9Yhn/7mb9T5ip8jJ8sES5/h1X66TE67RtXY7LR5Bcd62JQx8HTZHdW+iM?=
+ =?us-ascii?Q?7DYIEJDPPj+nRFyzBJiVytj+KH+iOPUxLZjPRkgSiwz9M/HG1K17QDyQMaHm?=
+ =?us-ascii?Q?EZUzBvDC7gevJVfOsuOzxJ0gBInnVYcjYXeh+mIfyhBsgPDaT/orXqOn8mXt?=
+ =?us-ascii?Q?E8h4rLFXA1Z0YMJKXx47udF2B72jVdIdi5DYH8xQAgbVvqWQevE9vKWSWRnF?=
+ =?us-ascii?Q?/EAfOY498xPhRQd6BgIMDhIUVqtWBRI3xkKADgTkJqHRcs4uuRLqqXzmAjq9?=
+ =?us-ascii?Q?tX/XMIHbMtdWJrZok0l5NrRBDR0JBRHe29bfM6eRnkWsJqzlzBSTPkTYAxSI?=
+ =?us-ascii?Q?a49Oxyswqd1qBPRd4oRl2kaVkXCNPMlh5evEnXSOFF2e3wejrbEYvcAUTTTk?=
+ =?us-ascii?Q?+rxvBqEExNfic0MrCvxlGPKx7uJSN3zBAblcKbLCcWhfvDWm6gz5yULFbE1G?=
+ =?us-ascii?Q?gu8QawfNXYHfpAH5t6CQ0uEb2q85m6PYO631MEe4SLJKI64ybkqdQuAulB/A?=
+ =?us-ascii?Q?cm30RvNUTJmBrpqlPwpUmjH9mHLNqrlNZCDcweASsiKNYNqBb3pudOgiz9g+?=
+ =?us-ascii?Q?62ibSRyzqlAevC4Yz8AKx7aQoRS7TULmALIldz6G4QSh7Zrl2B6WKC+8/VvW?=
+ =?us-ascii?Q?wIiyhySydHt0kehIGgH0UUMPwx87HYoShrh9fzE0i+16mARuM3uuftvvUdd+?=
+ =?us-ascii?Q?4HJGTTL7TSqfkE0lJz5DrbU0DipkfulVLpf5q0OY0JG+c/XGmwFwgCYctDxX?=
+ =?us-ascii?Q?y2X5T/SIfoUNtn58upyIbBHJLTJeRpPRHh/hAKHA+UiZ4302F3hXaiX+gC2l?=
+ =?us-ascii?Q?yfEXI+SAnHkrfsFi/T6gnzoqqW2UPO3OQTQ/w26cPrgXu9iYcyOG1iJ4duFN?=
+ =?us-ascii?Q?tsAlNIa4RJQku8iqffdlOhXMV6QBcKUmWtS2GqOGl9yNdw35ENXDyFlCnviV?=
+ =?us-ascii?Q?MjCT+WzveuhmbpmxHhEEc3fszMJ6z2BkFdeuJz1QXGtcLxpWuhGfik6nj3Gj?=
+ =?us-ascii?Q?7MyhaguBQ21wrMFkWfEeluVGhgUH+IF+ZhDZ3gq1+GLQ4j/igIQdaV/PkHDX?=
+ =?us-ascii?Q?7y1q69/nB6M5xtnL4m0YwLym4iBpx4tHcpfak/Kh7UTj2xhssUYiplYchyrp?=
+ =?us-ascii?Q?B73PY3y50iAE6DOnzH4qsxeIwReTjCJ449yLSPcUFdoVVJgof+b7jeBNSPi5?=
+ =?us-ascii?Q?wf4D31LeiTHTqQHdDEO/spD/4HpmAis9ymbru0eOM/HJ1+NcIGPKyFIe45oP?=
+ =?us-ascii?Q?jbV3WrmwTH7xSGgbbVg8lrHwbqYwkFDAMHJ6UP8e0rBDLeacjnO3i69L5poa?=
+ =?us-ascii?Q?w2ujmC5QS+8=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH0PR10MB5338.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?y/9X6gTv9ppaprFo+/N9pYBT+U15sjzuourAmKT0sZPRNrB5GF8ensSOHhGn?=
+ =?us-ascii?Q?0DjDqCCo8Y++JhtvY44swVBpd85Wl7Tp3eocBoda6/1f1IqcINmF7RbTXVhl?=
+ =?us-ascii?Q?VMgxue9FK4/Jf492GF7roxfngxwVfF8fs+5B9CQyGm/5viI7km1yveBovV9t?=
+ =?us-ascii?Q?3E3x7m0zYeZVR9Fcf4vZrJ53U7jDFFcSfYD07HByp4mczVe32xfwW9o3bR93?=
+ =?us-ascii?Q?GJih0RBAITLZ6geZKTlSZDKtIHFCePTpKBG94lVIszCn9MUdn9y9Y1lmocVa?=
+ =?us-ascii?Q?Ua1Vjqd7hPkKEpZNHmg1KBZh/ChOEyRsgfVjOq4dXxhYWCIiI1hFERQ6hqUt?=
+ =?us-ascii?Q?EA6/Kdk9u5/lyL+X3vh4qj2W6XMG7KULFMD1JwV3fR+c6OGqDeavyBa5Jmgx?=
+ =?us-ascii?Q?Q/91LtI4XWLDnYH6HJoz3qdKAMT/3wuFqN/Ih0GB9hqeOYPDrwBlDBdjjoxE?=
+ =?us-ascii?Q?M12aNllUXnw9YTsUKvnfrXZTTdEC+5ojp7Kdx/1vFjHb8K+U8KItlli0gLHV?=
+ =?us-ascii?Q?dX/mBH/KE8IgOehylZJ7HqYE7cP9mVBsTxi7YeBQyIHa3t+IaHD2O8N1vasz?=
+ =?us-ascii?Q?8Sd/stq79cGRmtcboWr+6eul3Hgrfb8lfPHeJHiZi8VW7pMVthHMcvDcut/4?=
+ =?us-ascii?Q?hCiWMdllhbQGjrPJz2izm0XSdVr7oJIX8ePE283vUA3rPg+5XXU8T0FJa6EC?=
+ =?us-ascii?Q?m8KTDMVzdfgKPiCtmxkZIp1l1KVy8zf69Et9aRPKhFux3TU1YHevh8dBslJa?=
+ =?us-ascii?Q?Whbipdj9hZ+NoXSqqkcKRfI9ogAIB/smheRt9w18TA3/OyaSG/GofmESD/UC?=
+ =?us-ascii?Q?dhI24A96M7kdCpmTFnwT9EXyjil/IdS/kPuyb9DCjpoamYLHoTZSc7D8oseb?=
+ =?us-ascii?Q?N8mhCSnoMZsWNpC/38Y+RvWWe17jx47Ihb5XTMbxFxUXkU7NctJaAsUtEzGg?=
+ =?us-ascii?Q?ryvibnMl+dnVykZi6lE6folEkvg7End+dAQKwsjbGouO8Lrj9OR03YPWs3VB?=
+ =?us-ascii?Q?cf17CnI0ZsFklzJVJQ/DgQdeawvA0LA7EmYqYj/EgA4ZHpFQ38HeW3O1p17k?=
+ =?us-ascii?Q?FPS9529SfolZLl3rpg7cXDdk5qZkPyN1DYEqhrNjYDnmxIju7ueUnMkg/Obk?=
+ =?us-ascii?Q?12hfF5cZq912+YRZYxhDSlWqde2zJBml7rDVVoAHkSRA2fCJYIzXgVH0iLy+?=
+ =?us-ascii?Q?9JfqIUsRxRi13ybESMBCgJnlD9gXnBsJ1cphWXKCnpBuigwWq5w7K/C1/KSl?=
+ =?us-ascii?Q?khQvddSeVjlLMKYGZbsvPOEx2tF10MHD8kxqfvpubYYRumYtnRcwDlpcVjz5?=
+ =?us-ascii?Q?PwkquiuKIzQCOkO6ZjRjOCNfqRCl0dPurarqOY08zQOmWYvx9U8/Jkba7Zb8?=
+ =?us-ascii?Q?Nkv79tREX2xJeyfLcFZhaGnvLLRTJjaNO/pQReoGcf0iwrinxcZeOvSEnysJ?=
+ =?us-ascii?Q?nMhH9dCxz0cUnsiQKl/mULTaqOgHSRcNRhC4nRw2EmiuSGxKZ6epJJRV603v?=
+ =?us-ascii?Q?teFKe4KkYcZUqFZviYwFskZpDrq7vNJFQNgn2DKu3qennKFXzz6BKL35dw5O?=
+ =?us-ascii?Q?9t1VK7MwOsMEIuNaU4h6BzbGPyjlPE19CJcMM7Bs2FgdErfN5P2Nk2yvWZqm?=
+ =?us-ascii?Q?DQ=3D=3D?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	k8WORqWRBmEirw6m8ugCvCztYaz4jbtEh6V48LW1fZORlRc7m4SnlcOsET4iXmdVTUOs7f42QRZMpqCE9CVjaGOeRo5+cYgk9PO5HnmPfZQ+/HdtXU3+/1Bz7lJdxFxvflOCRdIOEka3w6qwTWvF1bgveApaLHcu97V0mnhUnm+O0PGRllZJRuTsRecf3W4ODugB7orLsxW7RpttRJ3CPwWNjPG6Y9+6MyYkM5fbrY4K14cXGphaeDugrfvY55jqtjzFLFduD4l1E6uN2R/+DMB5K365g1j4AxkKP0XNogQ+mDUY9FhRe2ShyGRxt4cryHj/nl4Rr4C0L//rs4zmeTR/tGvyJd+57Jtm0cWhLeUdt+Sy03Q/vZypI3bhUzZtpKmsGX2xTtsObwZpK7RmidC8kLYX8+p0vETD/10oCDfF4RDxrOtr2exKveCt81RDJi+ywunOivpKUfe/iMUmdExRV0Lc394iBJXvy1T6YYInKPmP1Uauw5FHgMTJSYPXM1VclTtvptOEU8FJaKgfgU3rtNCa9Cbipx4C1JSGSx0VVcxaYuXolIpLIfkJeMt4N5NPVYxXWkFINpOzZTaMXrVAuIIp++swbaT+4wwPvEo=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 654e1cfe-2be5-4bb0-54a9-08ddc8d0168f
+X-MS-Exchange-CrossTenant-AuthSource: CH0PR10MB5338.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jul 2025 03:30:21.4867
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Tb1/BQJXY+wNGSUSfslMsGdlXxnJQ3x/Mqf+ldL6RLAVbYwNVl0VeKXEUCbShtQoqrYLopHfcJ8I+RmQbry/oTn7ADTIvq54oJYHOdm5icA=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR10MB4757
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-07-21_05,2025-07-21_02,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 phishscore=0
+ mlxlogscore=999 bulkscore=0 adultscore=0 suspectscore=0 mlxscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2505160000 definitions=main-2507220026
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzIyMDAyNiBTYWx0ZWRfX+/9skNNjJN0G
+ zsj/AADTnyzyLjUlDmzp1N2XQ6c0iX1yt1GuNP3AeBtm2alwzJpaokS08n5w/BfVeY4ACdkgoAI
+ ED4aZEApEKv2wtGhuL58vHjeE6npkLmGzUy0NGI51PunuGs0oAcnvycrDkZhWyzYgL4Aeuz53a8
+ JdWkdsHLlSWPE9AKmq+jeq+/rKQBvwmi+eWr8rannA2PvwgTrZag9BV9uaAldKRmNkyIGzK/QHi
+ u0BAjGZ64CzKrEWkIcKfqo4XiGYJrzapunOC3up7T5s7HiBAf4id8PYeuF8tmZpi+mY5M3deXv8
+ qUUl/9S2pxzvieQXjCt6IHWcBK+M9LQpOpMbsywGpvkEzNpzS8PzT8bokm4gAAuAva700+P0CMR
+ jPFtx1zNxNYGxKKAvYotd1bkxtNhHKiMOjbPreUMAqL6UQmNyfj8eBO7pnZvFJfbYTSBoQd5
+X-Authority-Analysis: v=2.4 cv=doDbC0g4 c=1 sm=1 tr=0 ts=687f05d1 b=1 cx=c_pps
+ a=WeWmnZmh0fydH62SvGsd2A==:117 a=WeWmnZmh0fydH62SvGsd2A==:17
+ a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19
+ a=wKuvFiaSGQ0qltdbU6+NXLB8nM8=:19 a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19
+ a=xqWC_Br6kY4A:10 a=Wb1JkmetP80A:10 a=GoEa3M9JfhUA:10 a=yPCof4ZbAAAA:8
+ a=kKNMEWOT1K8_i5yIBM4A:9
+X-Proofpoint-GUID: dei_ZkPHLA50h5-OKhfkwZUyAhlVC7B4
+X-Proofpoint-ORIG-GUID: dei_ZkPHLA50h5-OKhfkwZUyAhlVC7B4
 
-Hi,
 
-在 2025/07/22 9:07, Damien Le Moal 写道:
-> On 7/21/25 11:04 PM, Nilay Shroff wrote:
->> When setting up a null block device, we initialize a tagset that
->> includes a driver_data field—typically used by block drivers to
->> store a pointer to driver-specific data. In the case of null_blk,
->> this should point to the struct nullb instance.
->>
->> However, due to recent tagset refactoring in the null_blk driver, we
->> missed initializing driver_data when creating a shared tagset. As a
->> result, software queues (ctx) fail to map correctly to new hardware
->> queues (hctx). For example, increasing the number of submit queues
->> triggers an nr_hw_queues update, which invokes null_map_queues() to
->> remap queues. Since set->driver_data is unset, null_map_queues()
->> fails to map any ctx to the new hctxs, leading to hctx->nr_ctx == 0,
->> effectively making the hardware queues unusable for I/O.
+Hi Al!
 
-I don't get it, for the case shared tagset, g_submit_queues and
-g_poll_queues should be used, how can you increasing submit_queues?
->>
->> This patch fixes the issue by ensuring that set->driver_data is properly
->> initialized to point to the struct nullb during tagset setup.
->>
->> Fixes: 72ca28765fc4 ("null_blk: refactor tag_set setup")
->> Reviewed-by: Hannes Reinecke <hare@suse.de>
->> Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
->> ---
->>   drivers/block/null_blk/main.c | 1 +
->>   1 file changed, 1 insertion(+)
->>
->> diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
->> index aa163ae9b2aa..fbae0427263d 100644
->> --- a/drivers/block/null_blk/main.c
->> +++ b/drivers/block/null_blk/main.c
->> @@ -1856,6 +1856,7 @@ static int null_setup_tagset(struct nullb *nullb)
->>   {
->>   	if (nullb->dev->shared_tags) {
->>   		nullb->tag_set = &tag_set;
->> +		nullb->tag_set->driver_data = nullb;
-> 
-> This looks better, but in the end, why is this even needed ? Since this is a
-> shared tagset, multiple nullb devices can use that same tagset, so setting the
-> driver_data pointer to this device only seems incorrect.
+> 	Instances of ->getgeo() get a block_device of partition and
+> fill the (mostly fake) geometry information of the disk into caller's
+> struct hd_geometry.  It *does* contain one member related to specific
+> partition (the starting sector), but... that member is actually filled
+> by the callers of ->getgeo() (blkdev_getgeo() and compat_hdio_getgeo()),
+> leaving the instances partition-agnostic.
+>
+> 	All actual work is done using bdev->bd_disk, be it the disk
+> capacity, IO, or cached geometry information.  AFAICS, it would make
+> more sense to pass it gendisk to start with.
+>
+> 	The series is pretty straightforward - conversion of scsi_bios_ptable()
+> and scsi_partsize() to gendisk, then the same for ->bios_param(), then
+> ->getgeo() itself.   It sits in viro/vfs.git#rebase.getgeo, individual patches
+> in followups.
 
-Yes this looks incorrect, if there are multiple null_dev shared one
-tag_set and blk_mq_update_nr_hw_queues() is triggered, all null_dev will
-end up accesing the same null_dev in the map_queues callback.
-> 
-> Checking the code, the only function that makes use of this pointer is
-> null_map_queues(), which correctly test for private_data being NULL.
-> 
-> So why do we need this ? Isn't your patch 1/2 enough to fix the crash you got ?
+Looks OK to me.
 
-Same question :)
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
 
-Thanks,
-Kuai
-
-> 
->>   		return null_init_global_tag_set();
->>   	}
->>   
-> 
-> 
-
+-- 
+Martin K. Petersen
