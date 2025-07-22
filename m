@@ -1,119 +1,188 @@
-Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97DC31DF25C
-	for <linux-block@vger.kernel.org>; Tue, 22 Jul 2025 08:20:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94E0D155725
+	for <linux-block@vger.kernel.org>; Tue, 22 Jul 2025 08:31:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753172442; cv=none; b=GiMumKR36aFqO0TEH25PTFpeS2UHSFCaGqp5mcCWBHY1FtW9b9kcKMhthZvAmak2GP+EPiFoaQDDUGonafcdovEUUVghWXZnTRQkwFdaE3lTVg6Nn+7SF9UCFBAHihm0Coc/7KmN+xflTEXtdr0XXnqlUtZClde5Vbn86Yaxk/8=
+	t=1753173079; cv=none; b=bzSE/uPCF9x37BFeUA1B0vj1Y2kYE5Co68E5IqUcP1ZdI/r/eF+/6l3phsgmqm5BDUCKm7clxhla/sWdh4l4q86iizFizETWuLitKYOk8asv30J/pHNVcaMdnxMLT0ajy0Mj9bgLqiMPZlY7iicUrLTnLsNbrUUCaHrnsVVnnXE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753172442; c=relaxed/simple;
-	bh=QhV4gxQsozeZt4rJSw20XGTJ1UT1SgZp4TqFwqe39XI=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type:
-	 References; b=BZrIXpcEqNZjzQQV7wjzjHsgwrA0uBDs/kwKMqsF9xdviU/FoID0qPPJPuCvnQJ4tiUtsMomVvBL+SHgKCJjaOErZLrvYP6/GjJGT+4xASucoSU3w0+MEmkoIhcS94+A9qzEQJYdCLpxyCjdZa/CYKd9iWCxvQB66TAQZNGV3DE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=II7azpUW; arc=none smtp.client-ip=203.254.224.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	s=arc-20240116; t=1753173079; c=relaxed/simple;
+	bh=g5DShMZ9QXQ1Np4XwPFZohrFDzo5vxupWti91wsWQXI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=sMzUMxUTvNZ+RSQkr70uAGOWjDYimpa+iU0/clYoiSVLx24wAZPkCGwlpwPieeIiWGHtQOHMaxbCvbw2wIUbh2gme3ODtB69UUIR0m+FxMrUWMBz0Wxd9Ftbkfz08KZ1rDhHWSy4q0Eg6bSeCLlVx+tltCq107MDKd0YUTbbtrM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=JdRzIWbx; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="II7azpUW"
-Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
-	by mailout4.samsung.com (KnoxPortal) with ESMTP id 20250722082032epoutp0415a5e1e80ddbb38b8ecaaf165b70eba8~UhQnps1rU2275022750epoutp04b
-	for <linux-block@vger.kernel.org>; Tue, 22 Jul 2025 08:20:32 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20250722082032epoutp0415a5e1e80ddbb38b8ecaaf165b70eba8~UhQnps1rU2275022750epoutp04b
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1753172432;
-	bh=SIdi21AOkpyDnx2ZeL+pzOQAYPuPZaU/ZAeCKSe3EtI=;
-	h=From:To:Cc:Subject:Date:References:From;
-	b=II7azpUWz7cgLIGxU5ldaMwQMndx7Tm0iTauUhDdQcaq/klwOcknmvLvoXCcIrhFO
-	 XodHBZ+QuVmc0UyG/cWZRXAwF0eLkt5nU7ZTmQ5wi0Uu0cQCoqsnUsHJaJ1vOnJ+IE
-	 L3WV09JTbADTAfcROxizG+KGf/1/Lejf1inxWvRs=
-Received: from epsnrtp01.localdomain (unknown [182.195.42.153]) by
-	epcas5p1.samsung.com (KnoxPortal) with ESMTPS id
-	20250722082032epcas5p137a6d8fc1c5d3db4130db6097a7d20c1~UhQnU-SUX1467414674epcas5p11;
-	Tue, 22 Jul 2025 08:20:32 +0000 (GMT)
-Received: from epcas5p3.samsung.com (unknown [182.195.38.86]) by
-	epsnrtp01.localdomain (Postfix) with ESMTP id 4bmVZR1tsvz6B9m7; Tue, 22 Jul
-	2025 08:20:31 +0000 (GMT)
-Received: from epsmtip2.samsung.com (unknown [182.195.34.31]) by
-	epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
-	20250722081938epcas5p12a1ee45419754afa2f1c1c9040d519d6~UhP1q8gYD1959219592epcas5p12;
-	Tue, 22 Jul 2025 08:19:38 +0000 (GMT)
-Received: from localhost.localdomain (unknown [107.99.41.245]) by
-	epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20250722081937epsmtip2870bdae7aa8d409559f60c9f1cb5fd18~UhP0l9owm2336023360epsmtip2g;
-	Tue, 22 Jul 2025 08:19:37 +0000 (GMT)
-From: Anuj Gupta <anuj20.g@samsung.com>
-To: vincent.fu@samsung.com, anuj1072538@gmail.com, axboe@kernel.dk,
-	hch@infradead.org, martin.petersen@oracle.com
-Cc: linux-block@vger.kernel.org, joshi.k@samsung.com, Anuj Gupta
-	<anuj20.g@samsung.com>
-Subject: [PATCH] block: fix lbmd_guard_tag_type assignment in
- FS_IOC_GETLBMD_CAP
-Date: Tue, 22 Jul 2025 13:49:11 +0530
-Message-Id: <20250722081911.78327-1-anuj20.g@samsung.com>
-X-Mailer: git-send-email 2.25.1
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="JdRzIWbx"
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56LKtPg4015385;
+	Tue, 22 Jul 2025 08:31:00 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=KwwLIW
+	GC2YveFJqLQzdfd4zpj0BZl375AC6aW9R6a0o=; b=JdRzIWbx+jmUprLpDhUe6M
+	T/lSggecuxN4qycXXqm7gBM8Sq69IVzh2LaQGCWHRCTP3dbovwJCsYB3Krms4KhV
+	IgikxoXvPYInCpGyIj8iG797F0vRiDlNWjVEWNSKvA2SXt0bi8rvTej6N+FU/VQx
+	rnp/ojEumZBHnvFH6hurL9sKZcgKyrZXyUBojooD3ouVRQGhHhx/FYvAH0h/ZZH5
+	Rh1nutW5Fr+ZxKGbDfFg8sfDblzTuMm4n0L6s8gZZfn6eaUANnBsyaIaxbAmYXyk
+	PrxyxjDeGdQ4pnjUETcuDNV5a9FdYWIlBX3WHg1Z2iz1areHAkPPmomSxcUkIUTQ
+	==
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4805uqw7qy-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 22 Jul 2025 08:30:59 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 56M81sNI024975;
+	Tue, 22 Jul 2025 08:30:59 GMT
+Received: from smtprelay06.dal12v.mail.ibm.com ([172.16.1.8])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 480rd29ra2-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 22 Jul 2025 08:30:59 +0000
+Received: from smtpav04.dal12v.mail.ibm.com (smtpav04.dal12v.mail.ibm.com [10.241.53.103])
+	by smtprelay06.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 56M8Uw1v28836552
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 22 Jul 2025 08:30:58 GMT
+Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8604758056;
+	Tue, 22 Jul 2025 08:30:58 +0000 (GMT)
+Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 1413158052;
+	Tue, 22 Jul 2025 08:30:56 +0000 (GMT)
+Received: from [9.109.203.242] (unknown [9.109.203.242])
+	by smtpav04.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 22 Jul 2025 08:30:55 +0000 (GMT)
+Message-ID: <3c33c551-b707-4fd2-bd52-418ff3bc547c@linux.ibm.com>
+Date: Tue, 22 Jul 2025 14:00:54 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCHv2 2/2] null_blk: fix set->driver_data while setting up
+ tagset
+To: Damien Le Moal <dlemoal@kernel.org>, linux-block@vger.kernel.org
+Cc: hch@lst.de, hare@suse.de, ming.lei@redhat.com, axboe@kernel.dk,
+        johannes.thumshirn@wdc.com, gjoyce@ibm.com
+References: <20250721140450.1030511-1-nilay@linux.ibm.com>
+ <20250721140450.1030511-3-nilay@linux.ibm.com>
+ <1cadba31-8e73-4693-9ea5-b5fce8b69ba9@kernel.org>
+Content-Language: en-US
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <1cadba31-8e73-4693-9ea5-b5fce8b69ba9@kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-CMS-MailID: 20250722081938epcas5p12a1ee45419754afa2f1c1c9040d519d6
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-cpgsPolicy: CPGSC10-542,Y
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20250722081938epcas5p12a1ee45419754afa2f1c1c9040d519d6
-References: <CGME20250722081938epcas5p12a1ee45419754afa2f1c1c9040d519d6@epcas5p1.samsung.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: kLxLBr7u9JMrmLCFGvDpsnr_mSpvt9HM
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzIyMDA2NiBTYWx0ZWRfXzVfYMPgQziaE
+ WVtCkQOs6rhFLUty93LkNSLx75oFonuhVD1qsaIpB0ATHRTid0z2ezoPjCxW+sGihZycMwksv3d
+ LC429nGAJ3/LUTwajGHXA8ssW1cjD8EWFAx/BOJu2syYRJDud9Xy9EV1no9NfrWdCyrM2z5Rirs
+ iV2o80cm6+146yaCf119iSZwx9RvqEHwDLpV8kKN2On5XmncHIR9f1sXnMjBa0c3Av6SIMZHqa9
+ /5Dw0Ej6N+zveSAPCH+JDyOF1+y/SBZ7XtXxCDxuLe1K+5T+V72teu7LmKy4CiNpzUhP7cRNPTS
+ eav5wdoAuMRLKkgcuUkSw2rzCQts3g+0i4rfJebbynA2HoHa4WMIZJS9Ug9KRzvF9xGRbL7mci6
+ WmldIrdSjEdOkpGgiICEmp71bczn1U+ROX/lAEWpS8mH+jDXeCBeefe98+qLrs57R/pfF8dN
+X-Authority-Analysis: v=2.4 cv=dpnbC0g4 c=1 sm=1 tr=0 ts=687f4c43 cx=c_pps
+ a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
+ a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=VnNF1IyMAAAA:8 a=cheBbqodGBAJMB35WJIA:9
+ a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+X-Proofpoint-GUID: kLxLBr7u9JMrmLCFGvDpsnr_mSpvt9HM
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-07-22_01,2025-07-21_02,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 impostorscore=0 suspectscore=0 adultscore=0 phishscore=0
+ lowpriorityscore=0 priorityscore=1501 bulkscore=0 mlxscore=0 malwarescore=0
+ mlxlogscore=999 clxscore=1015 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
+ definitions=main-2507220066
 
-The blk_get_meta_cap() implementation directly assigns bi->csum_type to
-the UAPI field lbmd_guard_tag_type. This is not right as the kernel enum
-blk_integrity_checksum values is not guaranteed to match the UAPI
-defined values.
 
-Fix this by explicitly mapping internal checksum types to UAPI-defined
-constants to ensure compatibility and correctness, especially for the
-devices using CRC64 PI.
 
-Fixes: 9eb22f7fedfc (add ioctl to query metadata and protection info capabilities)
-Reported-by: Vincent Fu <vincent.fu@samsung.com>
-Signed-off-by: Anuj Gupta <anuj20.g@samsung.com>
----
- block/blk-integrity.c | 18 +++++++++++++++++-
- 1 file changed, 17 insertions(+), 1 deletion(-)
+On 7/22/25 6:37 AM, Damien Le Moal wrote:
+> On 7/21/25 11:04 PM, Nilay Shroff wrote:
+>> When setting up a null block device, we initialize a tagset that
+>> includes a driver_data field—typically used by block drivers to
+>> store a pointer to driver-specific data. In the case of null_blk,
+>> this should point to the struct nullb instance.
+>>
+>> However, due to recent tagset refactoring in the null_blk driver, we
+>> missed initializing driver_data when creating a shared tagset. As a
+>> result, software queues (ctx) fail to map correctly to new hardware
+>> queues (hctx). For example, increasing the number of submit queues
+>> triggers an nr_hw_queues update, which invokes null_map_queues() to
+>> remap queues. Since set->driver_data is unset, null_map_queues()
+>> fails to map any ctx to the new hctxs, leading to hctx->nr_ctx == 0,
+>> effectively making the hardware queues unusable for I/O.
+>>
+>> This patch fixes the issue by ensuring that set->driver_data is properly
+>> initialized to point to the struct nullb during tagset setup.
+>>
+>> Fixes: 72ca28765fc4 ("null_blk: refactor tag_set setup")
+>> Reviewed-by: Hannes Reinecke <hare@suse.de>
+>> Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
+>> ---
+>>  drivers/block/null_blk/main.c | 1 +
+>>  1 file changed, 1 insertion(+)
+>>
+>> diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
+>> index aa163ae9b2aa..fbae0427263d 100644
+>> --- a/drivers/block/null_blk/main.c
+>> +++ b/drivers/block/null_blk/main.c
+>> @@ -1856,6 +1856,7 @@ static int null_setup_tagset(struct nullb *nullb)
+>>  {
+>>  	if (nullb->dev->shared_tags) {
+>>  		nullb->tag_set = &tag_set;
+>> +		nullb->tag_set->driver_data = nullb;
+> 
+> This looks better, but in the end, why is this even needed ? Since this is a
+> shared tagset, multiple nullb devices can use that same tagset, so setting the
+> driver_data pointer to this device only seems incorrect.
+> 
+> Checking the code, the only function that makes use of this pointer is
+> null_map_queues(), which correctly test for private_data being NULL.
+> 
+> So why do we need this ? Isn't your patch 1/2 enough to fix the crash you got ?
+> 
+I think you were right — the first patch alone is sufficient to prevent the crash.
+Initially, I thought the second patch might also be necessary, especially for the
+scenario where the user increases the number of submit_queues for a null_blk device.
+While the block layer does create a new hardware queue (hctx) in response to such
+an update, null_blk (null_map_queues()) does not map any software queue (ctx) to it. 
+As a result, the newly added hctx remains unused for I/O.
 
-diff --git a/block/blk-integrity.c b/block/blk-integrity.c
-index 61a79e19c78f..2b5829c58aa1 100644
---- a/block/blk-integrity.c
-+++ b/block/blk-integrity.c
-@@ -83,7 +83,23 @@ int blk_get_meta_cap(struct block_device *bdev, unsigned int cmd,
- 	if (meta_cap.lbmd_opaque_size && !bi->pi_offset)
- 		meta_cap.lbmd_opaque_offset = bi->pi_tuple_size;
+Given this behavior, I believe we should not allow users to update submit_queues 
+on a null_blk device if it is using a shared tagset. Currently, the code allows
+this update, but it’s misleading since the change has no actual effect.
+
+Would it make sense to explicitly prevent updating submit_queues in this case?
+That would align the interface with the actual behavior and avoid potential
+confusion and also saves us allocating memory for hctx which remains unused.
+Maybe we should have this check, in nullb_update_nr_hw_queues():
+
+diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
+index fbae0427263d..aed2a6904db1 100644
+--- a/drivers/block/null_blk/main.c
++++ b/drivers/block/null_blk/main.c
+@@ -388,6 +388,12 @@ static int nullb_update_nr_hw_queues(struct nullb_device *dev,
+        if (!submit_queues)
+                return -EINVAL;
  
--	meta_cap.lbmd_guard_tag_type = bi->csum_type;
-+	switch (bi->csum_type) {
-+	case BLK_INTEGRITY_CSUM_NONE:
-+		meta_cap.lbmd_guard_tag_type = LBMD_PI_CSUM_NONE;
-+		break;
-+	case BLK_INTEGRITY_CSUM_IP:
-+		meta_cap.lbmd_guard_tag_type = LBMD_PI_CSUM_IP;
-+		break;
-+	case BLK_INTEGRITY_CSUM_CRC:
-+		meta_cap.lbmd_guard_tag_type = LBMD_PI_CSUM_CRC16_T10DIF;
-+		break;
-+	case BLK_INTEGRITY_CSUM_CRC64:
-+		meta_cap.lbmd_guard_tag_type = LBMD_PI_CSUM_CRC64_NVME;
-+		break;
-+	default:
-+		break;
-+	}
++       /*
++        * Cannot update queues with shared tagset.
++        */
++       if (dev->shared_tags)
++               return -EINVAL;
 +
- 	if (bi->csum_type != BLK_INTEGRITY_CSUM_NONE)
- 		meta_cap.lbmd_app_tag_size = 2;
- 
--- 
-2.25.1
+        /*
+         * Make sure that null_init_hctx() does not access nullb->queues[] past
+         * the end of that array.
+
+If the above change looks good, maybe I can update second patch with
+the above change.
+
+Thanks,
+--Nilay
 
