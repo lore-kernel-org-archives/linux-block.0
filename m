@@ -1,104 +1,101 @@
-Received: from mail-io1-f50.google.com (mail-io1-f50.google.com [209.85.166.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 003.mia.mailroute.net (003.mia.mailroute.net [199.89.3.6])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CAB520CCE5
-	for <linux-block@vger.kernel.org>; Tue, 22 Jul 2025 16:02:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA5FF279354
+	for <linux-block@vger.kernel.org>; Tue, 22 Jul 2025 17:54:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.6
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753200160; cv=none; b=WCwITsNngY2CAbCHVuzBR8dde2Gx3avPJDUhk/HqW03dGvIy49Xc/+/zn+fNlOoCDK5aZVC/PYHq9D+tMoqw/BZ9GWjCW0RxDzQASR5L3bcIFghmaNe+92O82L42bjpJXUA+ursINhgSU2inZwTFVVG4zFNBuGZWdEMzI8sRQo8=
+	t=1753206853; cv=none; b=R1Ai6zYs/9dqUFXplk0663tqGDI2Ad5aGTuUxtLpXE9Ed7mBmc2VDg+KxB5lHhYRmMjxBoWFWaIHgLaYtslHrFH21j7SCjH37qXkhyNjb6ycmsq5AuIIrf45BarqCSJaCzHlptoB557purvd33JaQtgYVfFin0as0PurPtiqbmU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753200160; c=relaxed/simple;
-	bh=noCp+eXK33xOruhl37s/mqn60tBI6l0AIHoZYe0gMCk=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=lgA8cdJmDkdVRH6/b6AEelFQfITL1mgF2I6yA1yJAubFThckygcLzdI79HvCFnAgYMNMal/PSCTGj29N9mnvrO4Li3NyFPqSmTR0xdO3z/ZiNGxYlNtsm0diA3akfHUJHSv2Fbhqdk3G/By36Zx56meMA9jbsTvqxzMElHrwMi0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=xt3xVbJs; arc=none smtp.client-ip=209.85.166.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1753206853; c=relaxed/simple;
+	bh=AeoG5HiDKnBp1HYYNHx1uycIU61Ybj3lvnRl12OD5bc=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=ZSoIxBOc/iGt1AzsGHWFwAcSAr2g7q0i33apeNoKG34abGV70srBKHfzE+YOPPU1aa7HZwM2M4r69rlPnsImJYfwQmCpbmpZwaaapnoo/GhddGNv3tKakntqoRTWSoKqwApiE+GJFvDdsYoO13jU4IkxqWtuQXeA+6i/zkLqLBI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=vM5bjkeN; arc=none smtp.client-ip=199.89.3.6
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="xt3xVbJs"
-Received: by mail-io1-f50.google.com with SMTP id ca18e2360f4ac-879c737bcebso1351339f.0
-        for <linux-block@vger.kernel.org>; Tue, 22 Jul 2025 09:02:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1753200156; x=1753804956; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dBDUtHjG8WwK4Nzt7OVo+JKFrKxCJS3/depqRx3MmAo=;
-        b=xt3xVbJsXEzkPhPitoRtfx5sqT2K6sM94IayNFRZvpJe538HdUludl83xXLiAiaPbI
-         Y+DTlJBMwcLQrv3bHNIiwMNS0qnBgk7Xd4BH81HI3fOlhhkoeNfLRJDBCbljhjedtxi8
-         ly6ura0OF04Jsc799gZ8ZEmzRJ6R8akr3Bl3v/czMOyA2Pf9n+NJb/5fzjXnYZ1Ko0Yj
-         M/X9hccYU/7e/aJE3bFdYuJTL8E9g1XEAGGpBbl1isaykTzDpSH5ghfBGIv/bzK0QPph
-         6+aXJgEOh4erjwbahzyOonudSopGu0r8fuz0ten8Yr/mnYl4pfhEJAGoTjq44+JG74jC
-         tNVQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753200156; x=1753804956;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dBDUtHjG8WwK4Nzt7OVo+JKFrKxCJS3/depqRx3MmAo=;
-        b=J3XBbwaNkQReSnfHXCawGks/osEKbDCL+ez+Tu8wkwRLssCEf7rXLKElBZrYT6wy2m
-         hI1XtnR0egfc1ny7v5E/217Egjct/LR+ZdlyU4xxxQx9R6rKHnZObVUEqg8wkX0mydqE
-         ocKS5kzpaIgAyEzYkj069MCxM51ShRd3rXGDS8wnvwUfv7TEDEZAn4ZtzlMfH1ArvY4e
-         T9Ffebc9oEX5Vrw09KI2SjU0bPgh1MV25cxCyIDJKouTnugCjz3Rvr+LIIYk69H1GaTF
-         CeX/XqrjJSj2/pdipUOJwbwmJoeYdepQ8aOw48qeCNOBSF5YJ87NFnRWbfVG1vRXpU5b
-         1ZPw==
-X-Forwarded-Encrypted: i=1; AJvYcCVT48r0bnxt16KF5s84eYx2gwYEIsMuFuNyTGt1OyFsBLIjWdWypfDFKcJv/dbmYBUWD/nFAY4XdBqegQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzgOS1LqUTvhmA3gD0dQKKepZ9c5Fr/KNx+odrsU0wu7WTxOw98
-	jo1Rze3ZUHaMWj4R0wPd6ve3GA9JipmtYMo2iGzt8wlvoNM9c4sV9PpwTP7nECcWpv0=
-X-Gm-Gg: ASbGncsAyw6uyZpYvPipG4hiplfMRErCXf3UloiJ9iOd63Kw6oUnqh4RWOfKMAn9hJ2
-	813rossW3S+fIXbbtJ+sgZKUF1Ar0jHZjg2FKQFvGDZDg69J2vIiObspoF7Idt2KmJON71b74Uq
-	7dT9IUmtGteDQcYYNMaYfxDvsR4Jr6PwXo9Rqc2yQCOi/EFS2Flgx99BpzGSkmkHTxlul1dVhGN
-	ApFGWYX+fNyDGYYVk2dFkyX4ys8/c2P0jnqYiu9VSVqyZWwob6Q0O+RRrbk/fQgxCDDsl2u+ecL
-	3ytnTGTCg2woIiAYoKn0Owcl7684rKxLLZuRSHE/NG/c3w0MuND0cTXmQgoXLotTkMlGmVcW17g
-	0YBv4UjT2lPow
-X-Google-Smtp-Source: AGHT+IGwFeinDrd1apvfPiLCe115kkPKtu21yo+ZtYpYX23SlO5YPHk6OgHUI5gPbzer2SUz6HNeAQ==
-X-Received: by 2002:a05:6602:7417:b0:873:1e91:210e with SMTP id ca18e2360f4ac-87c538883bcmr676458339f.4.1753200151901;
-        Tue, 22 Jul 2025 09:02:31 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-5084ca62884sm2493638173.123.2025.07.22.09.02.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Jul 2025 09:02:31 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: Jim.Quigley@oracle.com, davem@davemloft.net, sln@onemain.com, 
- alexandre.chartre@oracle.com, aaron.young@oracle.com, 
- Ma Ke <make24@iscas.ac.cn>
-Cc: akpm@linux-foundation.org, linux-block@vger.kernel.org, 
- linux-kernel@vger.kernel.org, stable@vger.kernel.org
-In-Reply-To: <20250719075856.3447953-1-make24@iscas.ac.cn>
-References: <20250719075856.3447953-1-make24@iscas.ac.cn>
-Subject: Re: [PATCH v2] sunvdc: Balance device refcount in
- vdc_port_mpgroup_check
-Message-Id: <175320015081.186214.5828107139805643955.b4-ty@kernel.dk>
-Date: Tue, 22 Jul 2025 10:02:30 -0600
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="vM5bjkeN"
+Received: from localhost (localhost [127.0.0.1])
+	by 003.mia.mailroute.net (Postfix) with ESMTP id 4bmlJL5lWHzlvX7v;
+	Tue, 22 Jul 2025 17:54:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:content-language:references:subject:subject:from:from
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1753206849; x=1755798850; bh=DXgu9J61MDYL2WAdCyswZoq4
+	NP9mKkrYIxMk0SeedEU=; b=vM5bjkeN6ZO7nUN/r3k9EjLEzxcnUKx+ANKyxRuC
+	W3DYqKja3jjsMmBlU9pL6MrU5TXS2sgQZkUX0v5pc7TomE8Tkmfd4wzx0JT71PZA
+	ue35G0pmb84dwcZH2R7ahzeYlavw+ugR5UKm9pfg9QQAOwDFD1Hvr321wZEVXnMZ
+	J+tb81bYDpxburj2hB0K5yDAj4i8P/CxDEY+ZbPjXCPetroOd7PkFXOCqU196IoP
+	WApZDj/T1ZubYDUvq31luWLMzOZl2DKds1qZNlq/Q0pKBFSz0UGOVAS3Iq7Y/arP
+	sNQyhjSH0tMWdkKySljq6kX+hbByq/EJzCtR2Ddg08aBFg==
+X-Virus-Scanned: by MailRoute
+Received: from 003.mia.mailroute.net ([127.0.0.1])
+ by localhost (003.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id IIki-ofUehm2; Tue, 22 Jul 2025 17:54:09 +0000 (UTC)
+Received: from [100.66.154.22] (unknown [104.135.204.82])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4bmlJD1hsKzlfnC3;
+	Tue, 22 Jul 2025 17:54:03 +0000 (UTC)
+Message-ID: <34508ac0-2060-4ea4-8fe7-de59ac64c677@acm.org>
+Date: Tue, 22 Jul 2025 10:54:02 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Mailer: b4 0.14.3-dev-2ce6c
+User-Agent: Mozilla Thunderbird
+From: Bart Van Assche <bvanassche@acm.org>
+Subject: Re: [PATCH 3/5] bcache, tracing: Do not truncate orig_sector
+To: Coly Li <colyli@kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+ Christoph Hellwig <hch@lst.de>, Kent Overstreet <kent.overstreet@linux.dev>,
+ Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu
+ <mhiramat@kernel.org>, Kent Overstreet <koverstreet@google.com>
+References: <20250715165249.1024639-1-bvanassche@acm.org>
+ <20250715165249.1024639-4-bvanassche@acm.org>
+Content-Language: en-US
+In-Reply-To: <20250715165249.1024639-4-bvanassche@acm.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-
-On Sat, 19 Jul 2025 15:58:56 +0800, Ma Ke wrote:
-> Using device_find_child() to locate a probed virtual-device-port node
-> causes a device refcount imbalance, as device_find_child() internally
-> calls get_device() to increment the device’s reference count before
-> returning its pointer. vdc_port_mpgroup_check() directly returns true
-> upon finding a matching device without releasing the reference via
-> put_device(). We should call put_device() to decrement refcount.
+On 7/15/25 9:52 AM, Bart Van Assche wrote:
+> Change the type of orig_sector from dev_t (unsigned int) into sector_t (u64)
+> to prevent truncation of orig_sector by the tracing code.
 > 
-> [...]
+> Cc: Kent Overstreet <kent.overstreet@linux.dev>
+> Fixes: cafe56359144 ("bcache: A block layer cache")
+> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+> ---
+>   include/trace/events/bcache.h | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/include/trace/events/bcache.h b/include/trace/events/bcache.h
+> index 899fdacf57b9..d0eee403dc15 100644
+> --- a/include/trace/events/bcache.h
+> +++ b/include/trace/events/bcache.h
+> @@ -16,7 +16,7 @@ DECLARE_EVENT_CLASS(bcache_request,
+>   		__field(unsigned int,	orig_major		)
+>   		__field(unsigned int,	orig_minor		)
+>   		__field(sector_t,	sector			)
+> -		__field(dev_t,		orig_sector		)
+> +		__field(sector_t,	orig_sector		)
+>   		__field(unsigned int,	nr_sector		)
+>   		__array(char,		rwbs,	6		)
+>   	),
 
-Applied, thanks!
+Hi Coly,
 
-[1/1] sunvdc: Balance device refcount in vdc_port_mpgroup_check
-      commit: 63ce53724637e2e7ba51fe3a4f78351715049905
+Can you please help with reviewing the two bcache patches in this patch
+series? Apparently you didn't get Cc-ed automatically by
+scripts/get_maintainer.pl. See also
+https://lore.kernel.org/linux-block/20250715165249.1024639-1-bvanassche@acm.org/.
 
-Best regards,
--- 
-Jens Axboe
+Thanks,
 
-
-
+Bart.
