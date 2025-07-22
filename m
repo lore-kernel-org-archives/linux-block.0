@@ -1,65 +1,64 @@
-Received: from mail-io1-f54.google.com (mail-io1-f54.google.com [209.85.166.54])
+Received: from mail-oi1-f169.google.com (mail-oi1-f169.google.com [209.85.167.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DFA52E0B6E
-	for <linux-block@vger.kernel.org>; Tue, 22 Jul 2025 10:55:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D364D8F40
+	for <linux-block@vger.kernel.org>; Tue, 22 Jul 2025 11:00:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753181713; cv=none; b=rvJJGHkO+e+aT/JgAEDwos07g4DbBz1Yezdth+sD5/cM2RO8AOivs66YZV6+Wsk5KOlyFDvFBuWUAaeYMRSHAn9R6NRr8c2Yr9L3qCypAg8WFO5MtaFjMVsvJicJkWaGOCSnUpQwgi4th88MxFhtKg+A014jk/DCTgdz93lSa0Q=
+	t=1753182058; cv=none; b=X2YWqsQz7ONGx/At+tnmCc3S038CwNOPKNpkJkl6P0GxYySi4hgvCFFjaRYirCs9Cp8p8kRUZtNEN9M654IsmhXZLIxTnzhXOu9+5t8dl2OQmWja8scObxg4vWSDlh6EpKpqfcdrzH3aXam4yJcVNigjuLHtaNhT7oWmXrYR50s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753181713; c=relaxed/simple;
-	bh=8c3ghX9kbjh14YRu4po0WyGn4QtrA3Wu0UmRP7E5kZk=;
+	s=arc-20240116; t=1753182058; c=relaxed/simple;
+	bh=aHhUwbPOUVytjz/JqFm59v1d8/zHlaDMa0Xn/Simv/s=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WPtOuel84QHg/uzHYl0ykdXjCQ03yhF1WvWQ/lzcfOCIg2jTJD9rbSoUs9IuWVG5mu9As9RUBNqJf6TmC3uUw9kR6D0SF9KdMgWVitmVF8fyoo8AXIGmrj5FE/1TiRq4k7Th4NF7yGYrVGa2wSHhTmDhoZ/jvLRaHEwbyZ9XJog=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=pjHGy9YG; arc=none smtp.client-ip=209.85.166.54
+	 In-Reply-To:Content-Type; b=anN0U3Tnf2dZbfVhvBOcrwkuWVNOzlqCmhhzwvmO0q3slEzO9ruwC8FQ3l8j+sV63zr6RBClDpEUL8bYcglnwy3aREDmEHluYkDY+CGqwwCiccSKvg/3PXrW8k4XP5Y21bopEoWEcmJzC1FSOTSNcFLYFGWHgucv7fzSQianWYM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=X+v2ARMO; arc=none smtp.client-ip=209.85.167.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="pjHGy9YG"
-Received: by mail-io1-f54.google.com with SMTP id ca18e2360f4ac-87c420ac179so80163839f.1
-        for <linux-block@vger.kernel.org>; Tue, 22 Jul 2025 03:55:09 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="X+v2ARMO"
+Received: by mail-oi1-f169.google.com with SMTP id 5614622812f47-4218ecf4565so1328160b6e.0
+        for <linux-block@vger.kernel.org>; Tue, 22 Jul 2025 04:00:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1753181709; x=1753786509; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1753182055; x=1753786855; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=q8mQgNDfj9/DCSMwSj4e+eU/AqdUmKFCb2rpaObipto=;
-        b=pjHGy9YG8494AyVm/kHHFdIm9D0ZNj5+elteR0lFF+rhSt+J59vbNeIol7UINvPmSg
-         GFZSN/8tbhrW/rk5ASiA6HFKPfkOW4jOoLw3QcWAnGcPpP0aDNFWn4xl6Qh4pdsDvBKn
-         EYYxZeALm6BiMcw+SQgUhjIn+oZFX1I0EeCWqmXblT/av8wfNGlikqt0wCDG6ujMT66R
-         oGDWT2gQASFH7qtA4KBKhq+NMQlqQrj17i+f9v0wq80vHnF5J9F5HfUXG0Cp9PdiwD5h
-         VfUIxf8hYyXy1OgeaK3ppkL/3BThFdxlDQiGuAoCm5pyZMeJmubx4RdsVBnKYtpBTnDp
-         Nhdw==
+        bh=IscIK1wlVZGQe2iZsUX5uf2wnmdFCseBw88jV5THu0Q=;
+        b=X+v2ARMO0AxXM4xii2hoTl/aT2zVF7m3vrgXUdJg3xvL5qIl11k/P55CXTH0l3UYL0
+         E9CzM0XTpKcsfyHICQfut9a27qa+O/+VEHlp7g9bshxkAtBmjXQ8ZzgspfKapFTTrYTP
+         SBCPXqpXBo+YVaHcQZ2e7HVnEHhG/LFA4eYLyXi1DQ0nD9dgjWgxcWfDkdVtaAL4dWKv
+         Mc5qZ9ZuyqXPXvj5obEmcFoPBxP77ijNJRQo3IUIMfqbQCdLHJch3QnxGzA/D1Fht1QX
+         4q5mIca1VXgzWeK7h13qRZdiNg/TFMawkh3S8KwnYemTtLmxMl7guxl7IA0D1HEMwWma
+         j3IA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753181709; x=1753786509;
+        d=1e100.net; s=20230601; t=1753182055; x=1753786855;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=q8mQgNDfj9/DCSMwSj4e+eU/AqdUmKFCb2rpaObipto=;
-        b=IYAkQ5KRwSZ2eCGJIagFiI2tGuv9OV0kCjGmmQLZ4YsfEWh+3ZwlkinAaFqt+pq9aL
-         2nzJKSAJZ1in4MEFXDvJq0ciSDjwHyWWaZDOXzK77E6aKZ9w431C3KDv6Rsdr3Kxs71G
-         wusc8O4C1nJia9eXf868VFwl44ETd8ZZjKeqmw8un90awbREbEd76fqoMIvjz8MNW8/Q
-         O/HlDxo95vaypOUL3aziVgsxgIpUquLNMI/lK3sAgDdx7CsN7eMVNr/HX12AEkUAnRMg
-         p06EUPZmG2yAg9wkPyFSR/DPsLJh3SORtRFthRevltGxL9gKCrYpRNePSQjiHV9+JRFU
-         b2jg==
-X-Gm-Message-State: AOJu0YxY930/9d/NWyicl39DQSRrjPpOiv0aIRJ61ldCUMddaEfUPfu7
-	7SP7Y3YmFyO0LYEiF4cdXU4s6mvxlW9fDAnoGQ9QPBPQELzhw46INBK8ZFKC6xek+mVefMO/yOB
-	mZMjV
-X-Gm-Gg: ASbGncuFSZpFnjJkKQzshKsO5GTDKHw9GzyYHe6c/40N/xLgDVrYx4IxbBwjgHb84L2
-	JDir11i33EXADwk4kxi1hVsqI04BbEECOplJL8/MYNuOoJniSJlKXieMyOlo8jFmssxPNvwBA2/
-	ObvRpNuPBGMRe90OWIn+BrW6+mVLZjNmvAEOwFdT2Gf1enRVlDGuKslt3q6lVSluSn+d75HjNpt
-	p7P0q+tiwqHv7ezmPYCN0rgziSElCuqaWbUCFvOjmr/SioPBNpTAPxGxnO5WInEO2cLHZjM9z6b
-	JgL4vLlMpAwHduAOePhPuXBkoK9Z/DIfu+UTD6Vc6BZLtDw1sYsYBX4Q4rgDNrek0ebOJgNX5qg
-	YS/r+QBj87XQG0Migzp4=
-X-Google-Smtp-Source: AGHT+IFg4g8uCoZqaZi2cgFfI8SmZnEMwMa0z6ZfpKmCt/Qia/PM+IeeQoX8fzecqzLOKJrgT8ciiQ==
-X-Received: by 2002:a05:6e02:180b:b0:3df:29c8:49ff with SMTP id e9e14a558f8ab-3e282ef06b8mr312674345ab.22.1753181708591;
-        Tue, 22 Jul 2025 03:55:08 -0700 (PDT)
+        bh=IscIK1wlVZGQe2iZsUX5uf2wnmdFCseBw88jV5THu0Q=;
+        b=j9BHxEQOYNo94qYrOm5rkSJKqSFdtX1pwv8549p6ZtyZOxKof/fUOs3ny1yfOOnRqO
+         W/9w9tlzGiQvNVeiXpGnBaaF99v/CiH0Iu6V3bxx40LGwsND195n/NMCx/whcen8+UAZ
+         eC+9eENp5KbXElc/PBT1fy4oMDBZigGDHKM4hBLW2plJpKzpOgowdXJYagyg3jUmrqWO
+         UXlZOFUuMCdGIjiRfavJkiG65XdyRDhJ4pk8pqOt3edSRWo30EO6GQ5oF1pV/tB87EP2
+         1kNl6qxdnmNw0HEd/r9NQ6+guwTsEM/TnD5qwuHKuI+O9V3k0rWLneM+aQHYxFw6oE8z
+         GkJA==
+X-Gm-Message-State: AOJu0YyGepkKZ9xG/vpxEJolhai4bnghAex01ygU+63TLqVJRPkaUZa+
+	Od4edVWJCcVTnGZmgwu/KUTyKgsIrL8JoN0wrsXDHiEG4lU9PJoU7QcYnYk/GWlTz48=
+X-Gm-Gg: ASbGncuJOM4EXHnb2cRSOKJIZBNfDq02w1yk6fa74z3kYmNcMW/TtYxzRXOAZR9zVIy
+	DEa0ttb1dI57dRBHjgRPjElBVMORr5659NPWfeJWA+0XSuAL0xX2aDDLpwjcQ0ShWhBkuDHOJjc
+	kqTX1ftHHzGaj3O8JCJLSQ9nv5jDRaNGDUiH7e1cL146niDNqiz2//1E5EAtgvNwRx5Pdj3d7xC
+	47i8X/q1bKgBDXwvHI5Aw2ff1WwR63HAK2AiRemOf0eVWpYB6QwaXcvTiRfAvLeDFkNQ/0ievnq
+	xUYpKMmsTyXpWoqaSVclnDqUGMF3RGPVdSP7UMnGxrwv+lCxi2oz3a3Gppdyi2dE82P0fbfA2q4
+	4qW1+MEEkcdsZQ2fsous=
+X-Google-Smtp-Source: AGHT+IFH4hszfKlcjmM+E3XIs4bLTiqNr1FYs1W7xInjOCarQV1lzVre1IXTX6N3/REntXzT+XM54w==
+X-Received: by 2002:a05:6808:50aa:b0:408:fe75:419f with SMTP id 5614622812f47-424a785ca2bmr2214448b6e.13.1753182055383;
+        Tue, 22 Jul 2025 04:00:55 -0700 (PDT)
 Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3e2a86bb755sm20270715ab.57.2025.07.22.03.55.07
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-5084c7bc643sm2397742173.27.2025.07.22.04.00.54
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 22 Jul 2025 03:55:07 -0700 (PDT)
-Message-ID: <252e6af4-7024-4805-807f-ac8407808c24@kernel.dk>
-Date: Tue, 22 Jul 2025 04:55:07 -0600
+        Tue, 22 Jul 2025 04:00:54 -0700 (PDT)
+Message-ID: <e4bc2fa4-5137-43b5-b11b-4a9ca6519b54@kernel.dk>
+Date: Tue, 22 Jul 2025 05:00:53 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -67,41 +66,35 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [GIT PULL] nvme updates for Linux 6.17
-To: Christoph Hellwig <hch@infradead.org>
-Cc: linux-block@vger.kernel.org, Keith Busch <kbusch@kernel.org>,
- Sagi Grimberg <sagi@grimberg.me>, Chaitanya Kulkarni <kch@nvidia.com>,
- linux-nvme@lists.infradead.org
-References: <aH8qCeSvpt3eH5g_@infradead.org>
+Subject: Re: [PATCH v2] block: fix lbmd_guard_tag_type assignment in
+ FS_IOC_GETLBMD_CAP
+To: Anuj Gupta <anuj20.g@samsung.com>, vincent.fu@samsung.com,
+ anuj1072538@gmail.com, hch@infradead.org, martin.petersen@oracle.com
+Cc: linux-block@vger.kernel.org, joshi.k@samsung.com
+References: <CGME20250722091328epcas5p4c8707b75d657da9e0590ba634977d71e@epcas5p4.samsung.com>
+ <20250722091303.80564-1-anuj20.g@samsung.com>
 Content-Language: en-US
 From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <aH8qCeSvpt3eH5g_@infradead.org>
+In-Reply-To: <20250722091303.80564-1-anuj20.g@samsung.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 7/22/25 12:04 AM, Christoph Hellwig wrote:
-> The following changes since commit ab17ead0e0ee8650cd1cf4e481b1ed0ee9731956:
+On 7/22/25 3:13 AM, Anuj Gupta wrote:
+> The blk_get_meta_cap() implementation directly assigns bi->csum_type to
+> the UAPI field lbmd_guard_tag_type. This is not right as the kernel enum
+> blk_integrity_checksum values are not guaranteed to match the UAPI
+> defined values.
 > 
->   block: fix blk_zone_append_update_request_bio() kernel-doc (2025-07-16 10:02:18 -0600)
+> Fix this by explicitly mapping internal checksum types to UAPI-defined
+> constants to ensure compatibility and correctness, especially for the
+> devices using CRC64 PI.
 > 
-> are available in the Git repository at:
-> 
->   git://git.infradead.org/nvme.git tags/nvme-6.17-2025-07-22
-> 
-> for you to fetch changes up to 5b2c214a95942f7997d1916a4c44017becbc3cac:
-> 
->   nvme-pci: try function level reset on init failure (2025-07-17 17:46:33 +0200)
-> 
-> ----------------------------------------------------------------
-> nvme updates for Linux 6.17
-> 
->  - try PCIe function level reset on init failure (Keith Busch)
->  - log TLS handshake failures at error level (Maurizio Lombardi)
->  - pci-epf: do not complete commands twice if nvmet_req_init() fails
->    (Rick Wertenbroek)
->  - misc cleanups (Alok Tiwari)
+> Fixes: 9eb22f7fedfc ("fs: add ioctl to query metadata and protection info capabilities")
 
-Pulled, thanks.
+Where is this sha? It's not in the block or upstream tree, presumably
+it's in the vfs tree due to it being an fs commit? In which case
+you should probably CC that side, as this cannot be picked up on
+the block side.
 
 -- 
 Jens Axboe
