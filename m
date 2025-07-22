@@ -1,162 +1,91 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53C4928936B
-	for <linux-block@vger.kernel.org>; Tue, 22 Jul 2025 11:29:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4679A920
+	for <linux-block@vger.kernel.org>; Tue, 22 Jul 2025 11:57:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753183742; cv=none; b=SofzZgH23BRGIaxPRIBBlB4cLVumz5wqBFBSRwW9YyAaZ6M+ZLxFjuft+srTJYZiOFcRHWUvLNHZT8PwZd2QXyL4SnfkhyYRAmiXVE9fw/AQ5uGT9AF4oDDt0OVl6v8wfYrBi8kjpcJxC/Nf/FMKJlgHENu2EVdoiIC5xOD0YoY=
+	t=1753185462; cv=none; b=Om9sHPicchpEBPepg7LW0IN5/J5P/ln7PE6MVXTuQzyGjhcN1Y2OCILsadd4JIodM/dVJPVjCQL/kn5yh2y9W88HffrXPG1gfwT17cHPxV0rWthLPrysrzxLWNu9FNNCLh+Dy0WMC1/oQfHkf1X3FIBvdCu2+RNjRUqbytaonFY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753183742; c=relaxed/simple;
-	bh=fYlDv5D82NDsNCSHLbGHvoxmczo7LZmemLmISpEY1GQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=j+SEdCLcvcv5xqpwuK3jSBl+FIAZmTVLGBpFglW3KgfXUHMxoOtBnwSkPOE0D0I9tgmSmCiazbaO6t2XDcUT+EOjbiJRdjjlSTcrFP9xdDEKcFwARljSiMlKAKfAtKcvJOQWsIfcyAoo589ibMDOjbcAhhPgqZMRCssbECG3HHY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=oXMzORTI; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=YI7GEhQJ; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=oXMzORTI; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=YI7GEhQJ; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1753185462; c=relaxed/simple;
+	bh=XMGQh/zyfxVWSHnYYnjLTSzIKpMxaH6QrUZBb+zOr6g=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Y8V0jwuVzaFNwca3BmqbcBbpzxhX0O9ny3n2oe5arjifu2juHXGlUWioyd/SFV7RwtGRLcmCKacGnusrhApW4VWpyFehTcI3R6wWDMR8cTRrnatlsrQ+CMiomlJgPZodHywyN5hJA5Wjz1yIE4XiSqyRXk5FWyTGXihAk6vw8Vk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=G99BRHIb; arc=none smtp.client-ip=209.85.218.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="oXMzORTI";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="YI7GEhQJ";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="oXMzORTI";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="YI7GEhQJ"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 6A35221ADC;
-	Tue, 22 Jul 2025 11:28:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1753183738; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=I0TbSwF/4FJcllmNgeLdPebKTAXgaCMBnlXiCL22s24=;
-	b=oXMzORTIURzw75+emLpnnJEZd/cgb1gLWWWGR+3ohoFm3MRFJFGxTF6wzgbQ80TAxpxWsd
-	nMa28j8sffRvhsBF+SlJh3YkESMrmCIg/roS9WnflMCJEaUE44YToc2wk5xyONXtHVL0rX
-	yFSzLyXElWG5kQq8xNsk2uKsTMzidxU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1753183738;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=I0TbSwF/4FJcllmNgeLdPebKTAXgaCMBnlXiCL22s24=;
-	b=YI7GEhQJGgugNOBbi/vcOgIorFabURKNvNbzpK/LWmYc4YANAhC+YKS77bKntivceCFZNL
-	UFM+7D4T3FQ/FaDA==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=oXMzORTI;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=YI7GEhQJ
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1753183738; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=I0TbSwF/4FJcllmNgeLdPebKTAXgaCMBnlXiCL22s24=;
-	b=oXMzORTIURzw75+emLpnnJEZd/cgb1gLWWWGR+3ohoFm3MRFJFGxTF6wzgbQ80TAxpxWsd
-	nMa28j8sffRvhsBF+SlJh3YkESMrmCIg/roS9WnflMCJEaUE44YToc2wk5xyONXtHVL0rX
-	yFSzLyXElWG5kQq8xNsk2uKsTMzidxU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1753183738;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=I0TbSwF/4FJcllmNgeLdPebKTAXgaCMBnlXiCL22s24=;
-	b=YI7GEhQJGgugNOBbi/vcOgIorFabURKNvNbzpK/LWmYc4YANAhC+YKS77bKntivceCFZNL
-	UFM+7D4T3FQ/FaDA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 57FC313A32;
-	Tue, 22 Jul 2025 11:28:58 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 91MAFfp1f2jZRgAAD6G6ig
-	(envelope-from <hare@suse.de>); Tue, 22 Jul 2025 11:28:58 +0000
-Message-ID: <d0adde51-8fb8-4fea-ada0-176a9d745db4@suse.de>
-Date: Tue, 22 Jul 2025 13:28:58 +0200
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G99BRHIb"
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-ae0d758c3a2so879487066b.2
+        for <linux-block@vger.kernel.org>; Tue, 22 Jul 2025 04:57:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1753185458; x=1753790258; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XMGQh/zyfxVWSHnYYnjLTSzIKpMxaH6QrUZBb+zOr6g=;
+        b=G99BRHIbbb20ReZ1X8Be3eVwALr1gIOlXtxobR+1dR1PAzAt9q/HiXOVPZdS/PW6SO
+         0Uq2e5MOa+ka3+OgPERpH/eFe9esictgeOGX6FqX2zIManywvwrLAs0fsac9fqs3Q821
+         ENYYYQYchK0E7luLROxaX6euepyNqtc/yxoDvkeUn/K9Gya9dysIe232tkt/FdzlEJOY
+         eJSY+QumpXBtR+l/J/L6hF+tiNfUinE4ZkyvQvAyzS5WxWY7YG4k92Y1K2bPQPI5ixyy
+         VZUpnX4S1TkKfFYUV5TAUCl15UOkQRgBXK8V4i3w0CEQipE8Eyxw9TdK+WqhsCk9zPBk
+         7ZNA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753185458; x=1753790258;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=XMGQh/zyfxVWSHnYYnjLTSzIKpMxaH6QrUZBb+zOr6g=;
+        b=VuOMQpW5JArKKNYkT+q6CQJbHeF3HDZakfDPSFTQn7r5/RrQ7H+gaX28a9SWLHqebD
+         kFFh7x7e20Jp7BG1N4136RjVzgf/IzEwWYHcOQb8hothyIefQ7bm4cb3bFBEXd4USrTR
+         gs29lXLS/JUAnwnSv6jKVAeeagpA2qBBJaFzi3aAEE096QwfJVSgidUiFCfq8i5Kdajc
+         wcGeyVd6SiZEl2LVzJ1R0bDZR0oBtQ4a4IYEQnl46tR7RdrTHjucQTgowVaUp4DlHZOH
+         Gk2gkn0/R+Ag5igeNURJqFhv89xHClQfimTgqguZHj8PjzFvJ7gLn7l+5xdtpeYzya70
+         4Vzw==
+X-Forwarded-Encrypted: i=1; AJvYcCUuEOia42JQB21u6uA0Odz2h+husgFA6uez45Rnu8p26VjtIYWJJ6RvL8ka4IJrkE+2pvBAGzDlbJH1BQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyvv2/wJ9JlThP2pDo8ggi/Ev0/y/XHnxnUyaUxyPOX6HB6eiwN
+	I7o1tZmJqXiynpwi2woftJUsPWNAFt7vGEZnv1tgei5aJ9Q8yMMYnRa+Mns0miZ167N6TuFGv30
+	/Kyn3vjPXdVRAWYcfCyhDD/GMDNq7Vted4q4Cgw==
+X-Gm-Gg: ASbGncuSLZL4p4YkNmuQ/jfzGx58mtgPHmm/sKodTcd0XAcLGgXlwhFw1iBHJfZDsqq
+	dagAb7AHDVaaVuvn4UfY6uosa1PatT2V2MtQIReMmJ6rGz1g0Cb0Z4GsqwHAoW4OH93567CnuLH
+	gpd8LCaGo+9CJLPmWOg+sEhnTU+YZ5mGNgTPm8h6NQ4I85Wq4c2S8DPqDxVm2obcykaTauRqlF0
+	qsdYXe2YNaz+SzuLw1lokwZxN6x/WYVT+jo+g==
+X-Google-Smtp-Source: AGHT+IFecnxQGo7tjWR/0rrEMMAULIS+3LWv5b3qyFFlBUrRWIzqkGfpRjO04WtozbnO0N6+lwqkKaAchBGGm2U74A8=
+X-Received: by 2002:a17:907:7e81:b0:aec:4aa6:7800 with SMTP id
+ a640c23a62f3a-aec4aa6a010mr2117114666b.20.1753185457529; Tue, 22 Jul 2025
+ 04:57:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC 2/2] block: Enforce power-of-2 physical block size
-To: John Garry <john.g.garry@oracle.com>, axboe@kernel.dk
-Cc: linux-block@vger.kernel.org, martin.petersen@oracle.com, hch@lst.de
-References: <20250722102620.3208878-1-john.g.garry@oracle.com>
- <20250722102620.3208878-3-john.g.garry@oracle.com>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20250722102620.3208878-3-john.g.garry@oracle.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-4.51 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	ARC_NA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid,suse.de:dkim,suse.de:email,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	DKIM_TRACE(0.00)[suse.de:+]
-X-Spam-Flag: NO
-X-Spam-Level: 
-X-Rspamd-Queue-Id: 6A35221ADC
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Rspamd-Action: no action
-X-Spam-Score: -4.51
+References: <CGME20250722091328epcas5p4c8707b75d657da9e0590ba634977d71e@epcas5p4.samsung.com>
+ <20250722091303.80564-1-anuj20.g@samsung.com> <e4bc2fa4-5137-43b5-b11b-4a9ca6519b54@kernel.dk>
+In-Reply-To: <e4bc2fa4-5137-43b5-b11b-4a9ca6519b54@kernel.dk>
+From: Anuj gupta <anuj1072538@gmail.com>
+Date: Tue, 22 Jul 2025 17:27:00 +0530
+X-Gm-Features: Ac12FXz0YF0peij3D90SjMsM2M7AB9TszT1RXI1i1ZFQlxWgbNaY24duI92SQ_8
+Message-ID: <CACzX3Av=CdrHfchof+LXpAS9=0eTAMxjh0Zs_Cu3O3e8nxYDEQ@mail.gmail.com>
+Subject: Re: [PATCH v2] block: fix lbmd_guard_tag_type assignment in FS_IOC_GETLBMD_CAP
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Anuj Gupta <anuj20.g@samsung.com>, vincent.fu@samsung.com, hch@infradead.org, 
+	martin.petersen@oracle.com, linux-block@vger.kernel.org, joshi.k@samsung.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 7/22/25 12:26, John Garry wrote:
-> The merging/splitting code and other queue limits checking depends on the
-> physical block size being a power-of-2, so enforce it.
-> 
-> Signed-off-by: John Garry <john.g.garry@oracle.com>
-> ---
->   block/blk-settings.c | 4 ++++
->   1 file changed, 4 insertions(+)
-> 
-> diff --git a/block/blk-settings.c b/block/blk-settings.c
-> index fa53a330f9b9..5ae0a253e43f 100644
-> --- a/block/blk-settings.c
-> +++ b/block/blk-settings.c
-> @@ -274,6 +274,10 @@ int blk_validate_limits(struct queue_limits *lim)
->   	}
->   	if (lim->physical_block_size < lim->logical_block_size)
->   		lim->physical_block_size = lim->logical_block_size;
-> +	else if (!is_power_of_2(lim->physical_block_size)) {
-> +		pr_warn("Invalid physical block size (%d)\n", lim->physical_block_size);
-> +		return -EINVAL;
-> +	}
->   
->   	/*
->   	 * The minimum I/O size defaults to the physical block size unless
+>
+> Where is this sha? It's not in the block or upstream tree, presumably
+> it's in the vfs tree due to it being an fs commit? In which case
+> you should probably CC that side, as this cannot be picked up on
+> the block side.
+>
+Thanks Jens, you're right =E2=80=94 the original patch went through the VFS
+tree. I'll resend the patch and CC Christian and fsdevel accordingly so
+that it can be routed through the correct tree.
 
-Why not calling 'blk_validate_block_size()' here?
-
-Cheers,
-
-Hannes
--- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+Thanks,
+Anuj Gupta
+> --
+> Jens Axboe
+>
