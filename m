@@ -1,122 +1,96 @@
-Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f44.google.com (mail-io1-f44.google.com [209.85.166.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98C991F09AC
-	for <linux-block@vger.kernel.org>; Tue, 22 Jul 2025 12:59:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.33
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 537C22877FA
+	for <linux-block@vger.kernel.org>; Tue, 22 Jul 2025 13:56:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753189171; cv=none; b=Y1GktfoG32FtNchavWM+SYYTraCO7R1r1/VyouMjJMlrMq9PkXjuCEXCfrA1S9ipnoTYrTD1pRZYtXr0qyhbPF/bHqPcHTaz3Tu0Cd6Ivr4LRXY/0p6sWJlIImmdAYziNsjfZ7ERGMshjaC/LBtdJIx+M35q1JbEMnjoJVE1XiQ=
+	t=1753192619; cv=none; b=ivuMvXecLl3cOO+FrqXbod5ui+HwWMWuNrPxsqshVhFFpxxE0ZT3fFlnCqF6Y46lcP7+H6uQMq3FJGNrHokAgPBCo0VQJS+J5D4A2hmHspvavxUzeI7ilGl3CDOoaxztqLwqpWKcfrDraVskK8dJ3v8NfZrjfriUrgC12bX6l/o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753189171; c=relaxed/simple;
-	bh=dNboiCYnvOQ/i/dAAniiFz8Cxzdg0xu2uLo3rxvmf0A=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type:
-	 References; b=bP67lkN+6gH3Invlq+6lwJk/XyY+UzaL73EE0uKZSc3HfVxZBEM90aXvyrnKXhNg/s6XtNqrY3QiJKLO0nRlytzgAaqOWHis3/I4GBYQvcGrZXmnq+ova1IznUPW58mt2uI3LFIbWqv1/M6gz1Pe3Z/FB6p6qMubQGlQRvURi+A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=eSociMXI; arc=none smtp.client-ip=203.254.224.33
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	s=arc-20240116; t=1753192619; c=relaxed/simple;
+	bh=WD4UPgWwrp87c7JvBmxtXsetEVuHqNKEul4WKe735JY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=V2oTSuoBsuWzEAXyY3dVhf6JXhKilMDvliUQPpQYRzISlNI34qPEdNssVH1ZaKE9TqeTIAQTXn4FkASYdJLr/XhZICjQz1cNX1sAS1U+4tQKPmk4/IxMqL4KxJSg5Yv5lVp7IDBHdt+a0ThL5wtJr1HlJQJX98kmsBt7rfQGswE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=VywL/X9X; arc=none smtp.client-ip=209.85.166.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="eSociMXI"
-Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
-	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20250722125926epoutp03e2acb3d53e69d78ac9d738a75c7aa12c~UlEIMP7K_1883718837epoutp03h
-	for <linux-block@vger.kernel.org>; Tue, 22 Jul 2025 12:59:26 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20250722125926epoutp03e2acb3d53e69d78ac9d738a75c7aa12c~UlEIMP7K_1883718837epoutp03h
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1753189166;
-	bh=t2N2RdsmomzGRnLA5OCrx1H5380TMeiOrBLlyLmumAI=;
-	h=From:To:Cc:Subject:Date:References:From;
-	b=eSociMXI/r3TMoFBO2he9W2Zp5hX0PXsB+s1y49jAxDfu/QX3AyOvcYsjFf8fOb2l
-	 VcVv96O891LAbiKJkAtc6C2pHnD6TkmaaAvFfsEpA+gMI++/kZsajEQM3dZhL8ceh/
-	 StlGvY9FsxTcdheQ47s9mXa/P0XINVc7Meq08aiE=
-Received: from epsnrtp04.localdomain (unknown [182.195.42.156]) by
-	epcas5p4.samsung.com (KnoxPortal) with ESMTPS id
-	20250722125925epcas5p4448e922074292bb7621d1ccae707c08d~UlEHv-pu70936109361epcas5p4a;
-	Tue, 22 Jul 2025 12:59:25 +0000 (GMT)
-Received: from epcas5p4.samsung.com (unknown [182.195.38.95]) by
-	epsnrtp04.localdomain (Postfix) with ESMTP id 4bmcmD6hQrz6B9m6; Tue, 22 Jul
-	2025 12:59:24 +0000 (GMT)
-Received: from epsmtip2.samsung.com (unknown [182.195.34.31]) by
-	epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
-	20250722120822epcas5p100667bdb8c199361a66dcef2ae09fdd1~UkXivYGzL0066500665epcas5p12;
-	Tue, 22 Jul 2025 12:08:22 +0000 (GMT)
-Received: from localhost.localdomain (unknown [107.99.41.245]) by
-	epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20250722120820epsmtip2b3cbbcaab6ae301751f037453e0a26ee~UkXhFrVyo0221102211epsmtip2j;
-	Tue, 22 Jul 2025 12:08:20 +0000 (GMT)
-From: Anuj Gupta <anuj20.g@samsung.com>
-To: vincent.fu@samsung.com, anuj1072538@gmail.com, axboe@kernel.dk,
-	hch@infradead.org, martin.petersen@oracle.com, viro@zeniv.linux.org.uk,
-	brauner@kernel.org, jack@suse.cz
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-	joshi.k@samsung.com, Anuj Gupta <anuj20.g@samsung.com>, Christoph Hellwig
-	<hch@lst.de>
-Subject: [PATCH v3] block: fix lbmd_guard_tag_type assignment in
- FS_IOC_GETLBMD_CAP
-Date: Tue, 22 Jul 2025 17:37:55 +0530
-Message-Id: <20250722120755.87501-1-anuj20.g@samsung.com>
-X-Mailer: git-send-email 2.25.1
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="VywL/X9X"
+Received: by mail-io1-f44.google.com with SMTP id ca18e2360f4ac-87c32f46253so84149739f.1
+        for <linux-block@vger.kernel.org>; Tue, 22 Jul 2025 06:56:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1753192616; x=1753797416; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=tjmFlUiMS8WhvA/SoS60Dh4RJFEn5lp/yFwJABcPh+o=;
+        b=VywL/X9XlLouPHqv4vY9/WsyCGZBjKEdSwRdltghOutRBpeDDfsizJbgrlBN9jDVqu
+         H5xgN2/NtYPf0kt7fzAn/NtH3fR3ymSAnoSwFx7p6dd76I5+/kmwEu0xsRtzsxLajfvh
+         78HxqmC93Psx0g4wmFsVeC9lw3qWAVOUVPLRsp0HW1Q7e3Ihvr8fh/HhwWqtSBp/Ictp
+         kS+wClNzeGGLUYpWcc68wGSRlXjuoalINKMjDy7tocN3aimOVX6NFxxpXJsMNkYh7LJJ
+         B6FWCrXWC4Gw1FKszlm1bz9g6OeXMXLwFDzwE4ApB0ttB7KwyLAuJqsbF9TN6ymqEPA5
+         bSyg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753192616; x=1753797416;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=tjmFlUiMS8WhvA/SoS60Dh4RJFEn5lp/yFwJABcPh+o=;
+        b=B9ewk0avQXZWL1L/fW+Wd1kgD0qbt6yIvLjtwZPVoZG/oMKdWoSoSrGt0iZ+pWAE7+
+         lqsxRVX0CC4B0cftn4/ZjSzAkqWZ8cs3U/lsX/ttnSizFijnfALrXHrbfd+iN4/Uu++V
+         tSVLuTDFOPiZLqBSkDb2mQBjgOs5/23vaqL3QWlHYyaj9hyI+AdY0OGQVYjDnsHaOjkW
+         0TqUWTiExDU5cInc7NqpqcOKwiMDyRrGM9k6gXwxuWM2pyb3XUgDaxPEdky65VfMo04e
+         LGcUAey1KaiCj46KRrV1QY2Wo0SKYMTEhcwCn7HIZiesbtDjLHuPMzbO/DukcJoiVe5M
+         LuMA==
+X-Forwarded-Encrypted: i=1; AJvYcCVu0cV/ICc82eu/2bFUYhbK2nnuVQuf6zbuiHsaC1Gwlor9iUQJBFdS+2AqhZmaWLEyuLNmKMavhrGz7A==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxzhvtJM7RPGDx9ECjryrEwjaYDGvrBhMXwaBG04a4FC/r6qHQB
+	fTdIUTsyrkyIG+ymvc9bVQS5p8IKTiMp2FhHt2Hx/n73QlRcWWWKCTQ/azMVSzK22lc=
+X-Gm-Gg: ASbGncvLJZ3QZCmiJptvqqqcJai1N+oja17bm2Mt18wxZjVfTTEV3JWZ55xfjEq0+Yy
+	ifpP2SZ4V2FsyldWYjOWQ+JxdOhfVca9YpJHufa369JNURYfDQCSpjkDIOVatvhAp9a1iESS2mg
+	5Im49LwKMHmr57JCmnmX+361C8H5C0wQeN0YQhzVATK+kr33+6bejWBxNxDCAH/yHJco0p8/5ut
+	lmcv3AXj1y6dnLrSgC5rxxWQtNSBThan85Z6uzpkl9pedJsvKDXSqvr3mJXaHky4vMtLBd96eWA
+	DeCwlZousCNDDT2zbWTjgT9Mj8aA846RmqCY4NkBCl8+64dyUwZsZB5+q4RcVwy/EfllsLFuMvi
+	Dw/FhyQF+UBNlitRWHNIU+ZIbUkpi7A==
+X-Google-Smtp-Source: AGHT+IFDr+fErNv5tH7IdOj2j7uUgenlIGzMOgYCLt1qeLE9jnEGv4AQM7YVl9je3Z12CEdDAW/qHw==
+X-Received: by 2002:a05:6e02:1fe4:b0:3dd:cc4f:d85a with SMTP id e9e14a558f8ab-3e28d3b88bamr240624905ab.6.1753192615551;
+        Tue, 22 Jul 2025 06:56:55 -0700 (PDT)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-5084ca5f843sm2502681173.129.2025.07.22.06.56.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 22 Jul 2025 06:56:55 -0700 (PDT)
+Message-ID: <62b5f680-5d54-48e3-979b-8d09a876130f@kernel.dk>
+Date: Tue, 22 Jul 2025 07:56:54 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CMS-MailID: 20250722120822epcas5p100667bdb8c199361a66dcef2ae09fdd1
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-cpgsPolicy: CPGSC10-542,Y
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20250722120822epcas5p100667bdb8c199361a66dcef2ae09fdd1
-References: <CGME20250722120822epcas5p100667bdb8c199361a66dcef2ae09fdd1@epcas5p1.samsung.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] Fixed several coding style issues in the efi driver as
+ reported by checkpatch.pl:
+To: Dishank Jogi <dishank.jogi@siqol.com>, Davidlohr Bueso
+ <dave@stgolabs.net>, linux-efi@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Cc: Manish Narani <manish.narani@siqol.com>
+References: <20250722121927.780623-1-dishank.jogi@siqol.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20250722121927.780623-1-dishank.jogi@siqol.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-The blk_get_meta_cap() implementation directly assigns bi->csum_type to
-the UAPI field lbmd_guard_tag_type. This is not right as the kernel enum
-blk_integrity_checksum values are not guaranteed to match the UAPI
-defined values.
+On 7/22/25 6:19 AM, Dishank Jogi wrote:
+> - Moved assignments out of 'if' conditions.
+> - Removed trailing whitespaces.
+> - Fixed indentation and spacing inconsistencies.
+> - Replaced 'unsigned' with 'unsigned int'.
+> 
+> These changes improve readability and follow kernel coding style guidelines.
 
-Fix this by explicitly mapping internal checksum types to UAPI-defined
-constants to ensure compatibility and correctness, especially for the
-devices using CRC64 PI.
+Will only cause backport/stable issues. Please don't send checkpatch
+fixes for existing code, it's for new patches only.
 
-Fixes: 9eb22f7fedfc ("fs: add ioctl to query metadata and protection info capabilities")
-Reported-by: Vincent Fu <vincent.fu@samsung.com>
-Signed-off-by: Anuj Gupta <anuj20.g@samsung.com>
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Jens Axboe <axboe@kernel.dk>
----
- block/blk-integrity.c | 16 +++++++++++++++-
- 1 file changed, 15 insertions(+), 1 deletion(-)
-
-diff --git a/block/blk-integrity.c b/block/blk-integrity.c
-index 61a79e19c78f..056b8948369d 100644
---- a/block/blk-integrity.c
-+++ b/block/blk-integrity.c
-@@ -83,7 +83,21 @@ int blk_get_meta_cap(struct block_device *bdev, unsigned int cmd,
- 	if (meta_cap.lbmd_opaque_size && !bi->pi_offset)
- 		meta_cap.lbmd_opaque_offset = bi->pi_tuple_size;
- 
--	meta_cap.lbmd_guard_tag_type = bi->csum_type;
-+	switch (bi->csum_type) {
-+	case BLK_INTEGRITY_CSUM_NONE:
-+		meta_cap.lbmd_guard_tag_type = LBMD_PI_CSUM_NONE;
-+		break;
-+	case BLK_INTEGRITY_CSUM_IP:
-+		meta_cap.lbmd_guard_tag_type = LBMD_PI_CSUM_IP;
-+		break;
-+	case BLK_INTEGRITY_CSUM_CRC:
-+		meta_cap.lbmd_guard_tag_type = LBMD_PI_CSUM_CRC16_T10DIF;
-+		break;
-+	case BLK_INTEGRITY_CSUM_CRC64:
-+		meta_cap.lbmd_guard_tag_type = LBMD_PI_CSUM_CRC64_NVME;
-+		break;
-+	}
-+
- 	if (bi->csum_type != BLK_INTEGRITY_CSUM_NONE)
- 		meta_cap.lbmd_app_tag_size = 2;
- 
 -- 
-2.25.1
+Jens Axboe
 
