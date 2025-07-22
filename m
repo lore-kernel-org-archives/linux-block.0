@@ -1,31 +1,43 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 519D828CF6D
-	for <linux-block@vger.kernel.org>; Tue, 22 Jul 2025 05:53:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A16F7288CAC
+	for <linux-block@vger.kernel.org>; Tue, 22 Jul 2025 06:05:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753163626; cv=none; b=Z8SVVRnxd+8vEOl86bCkzlhKvic4rnhdCEpvyCps4qB/U0VW8YKSsQg0mIA1yHTIpECUnZmmOywk5stjWyDXohAxSLUMJJTuWjXAOttfiSw+bnmYkk7xSL9FufuDpzaSrM7+rGN8+8PFXISeDLU6yn8fSRKgmbI6ACsrT++Qt9c=
+	t=1753164302; cv=none; b=QpJv+o9zlM933O0/55udrudOvxCV/Ww/5L7ek/o4or1ONZOFPx7vOeThFYpINtNiU+cev/uSnWfvchNxlK3uNB4z/XFozVQ0VdEdWvsHDizm6rakCbxZpgi3gw61ioAu8v3B8B6kCXz+rawWvAJNEfyBYSMAclwloGe3Uzb03t8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753163626; c=relaxed/simple;
-	bh=8P88nmybSdt6par1HmuSfKl0o1ivIxV0cYgSGht2lzM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uISyKqtkpixSj3Rb+zKMBn/LqoA5mLjdyG99dA32J/0LomizDPa8BwuDP0gCGO4CvMcOLKIdno3MU48y0JzXuRaFpkjd7wbtE96XRGUDHMcPVmE4T/AZAEajkILKAQmXkctrEO2IkWVdMsiiuSecL/BxjVOepVT7ywPPX4athb4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 9AC0768AA6; Tue, 22 Jul 2025 07:53:39 +0200 (CEST)
-Date: Tue, 22 Jul 2025 07:53:39 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Keith Busch <kbusch@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@meta.com>,
-	linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-	axboe@kernel.dk, leonro@nvidia.com
-Subject: Re: [PATCHv2 1/7] blk-mq-dma: move the bio and bvec_iter to
- blk_dma_iter
-Message-ID: <20250722055339.GB13634@lst.de>
-References: <20250720184040.2402790-1-kbusch@meta.com> <20250720184040.2402790-2-kbusch@meta.com> <20250721074223.GF32034@lst.de> <aH74XluC0BnerBaQ@kbusch-mbp>
+	s=arc-20240116; t=1753164302; c=relaxed/simple;
+	bh=8rH0nxwzxW86iWVv9SDWF6qc3/R11FUo8jvfRqjBGG0=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=lerPr5ZnzW87iJA7CjSyPtlYESBOng+Hh0JPIAYStkRuxeH/gBmZyFIXqW+SXEZORMuzO0eeaaToeMkTnpHNbFbL31mEEwycBUt2v7e32HlTbVE2qpKxN653Y0n90WwgkaUFyjUITL9vA4t0RNDE6deBMurYoxQWYG3wxeH4l0I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=yAJij+vx; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="yAJij+vx"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Type:MIME-Version:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:In-Reply-To:References;
+	bh=L8O+JavWYdIu/uRuDiGUA+k1UuTdTqMRcqDi9Y6C2Kc=; b=yAJij+vxPO7yoo7G4kOxEGZh+y
+	CRpZH7tQ60jMkB3LRVg7wn+fg+5kRlPaP4cSRPJvCPIsr/DjMXRYouEOVDaGw///8NAEGolmFgv+N
+	6BmduRQYGwYf73xchXCwQD2Q0t08vlHcvRN8bTE+H40hjw9GUg6oHa2nRNh1Ioxs6aY1PCPJ0adl5
+	bMC6x8UzviEmvKhARojS0tdzYphTZ83J9FGKhLGae1kk09V1CG9RD9ZN3GcHsPPuDwVI9gAkWrD1r
+	zLTOHgGSd+xyIe5ZXi1ElsMp/o1DszCZ8SEQJJ79TOflBoMOWSlYdVFI2TJLha2P3hwAvaL/dxBVG
+	vK3gduxQ==;
+Received: from [81.144.254.34] (helo=localhost)
+	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1ue67X-00000001OKp-1szm;
+	Tue, 22 Jul 2025 06:04:59 +0000
+Date: Tue, 22 Jul 2025 07:04:57 +0100
+From: Christoph Hellwig <hch@infradead.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Keith Busch <kbusch@kernel.org>,
+	Jens Axboe <axboe@fb.com>, Sagi Grimberg <sagi@grimberg.me>,
+	Chaitanya Kulkarni <kch@nvidia.com>, linux-nvme@lists.infradead.org
+Subject: [GIT PULL] nvme updates for Linux 6.17
+Message-ID: <aH8qCeSvpt3eH5g_@infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -34,38 +46,58 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aH74XluC0BnerBaQ@kbusch-mbp>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Mon, Jul 21, 2025 at 08:33:02PM -0600, Keith Busch wrote:
-> On Mon, Jul 21, 2025 at 09:42:23AM +0200, Christoph Hellwig wrote:
-> > On Sun, Jul 20, 2025 at 11:40:34AM -0700, Keith Busch wrote:
-> > > From: Keith Busch <kbusch@kernel.org>
-> > > 
-> > > The req_iterator just happens to have a similar fields to what the dma
-> > > iterator needs, but we're not necessarily iterating a bio_vec here. Have
-> > > the dma iterator define its private fields directly. It also helps to
-> > > remove eyesores like "iter->iter.iter".
-> > 
-> > Going back to this after looking at the later patches.  The level
-> > for which this iter exists is only called blk_map_* as there is
-> > nothing dma specific about, just mapping to physical addresses.
-> > 
-> > So maybe call it blk_map_iter instead?
-> 
-> But the structure yields "dma_addr_t" type values to the consumer.
-> Whether those are physical addresses or remapped io virtual addresses,
-> they're still used for direct memory access, so I think the name as-is
-> is a pretty good fit.
+The following changes since commit ab17ead0e0ee8650cd1cf4e481b1ed0ee9731956:
 
-There's two layers:
+  block: fix blk_zone_append_update_request_bio() kernel-doc (2025-07-16 10:02:18 -0600)
 
-The lower layer implemented by blk_map_iter_next just yields a phys_vec.
+are available in the Git repository at:
 
-The upper layer built on top does the dma mapping in case of the new
-blk_rq_dma_map_iter_start / blk_rq_dma_map_iter_next API.  But in case of
-the old __blk_rq_map_sg API it doesn't even directly do the DMA mapping
-yet.  And some drivers at least historically used the blk_map_sg without
-then doing a DMA mapping, either for MMIO or platform specific things
-using physical address.  My hope was to eventually migrate them to use
-blk_map_iter_next.
+  git://git.infradead.org/nvme.git tags/nvme-6.17-2025-07-22
+
+for you to fetch changes up to 5b2c214a95942f7997d1916a4c44017becbc3cac:
+
+  nvme-pci: try function level reset on init failure (2025-07-17 17:46:33 +0200)
+
+----------------------------------------------------------------
+nvme updates for Linux 6.17
+
+ - try PCIe function level reset on init failure (Keith Busch)
+ - log TLS handshake failures at error level (Maurizio Lombardi)
+ - pci-epf: do not complete commands twice if nvmet_req_init() fails
+   (Rick Wertenbroek)
+ - misc cleanups (Alok Tiwari)
+
+----------------------------------------------------------------
+Alok Tiwari (5):
+      nvme: fix multiple spelling and grammar issues in host drivers
+      nvme: fix incorrect variable in io cqes error message
+      nvmet: remove redundant assignment of error code in nvmet_ns_enable()
+      nvme: fix typo in status code constant for self-test in progress
+      docs: nvme: fix grammar in nvme-pci-endpoint-target.rst
+
+Keith Busch (1):
+      nvme-pci: try function level reset on init failure
+
+Maurizio Lombardi (1):
+      nvme-tcp: log TLS handshake failures at error level
+
+Rick Wertenbroek (1):
+      nvmet: pci-epf: Do not complete commands twice if nvmet_req_init() fails
+
+ Documentation/nvme/nvme-pci-endpoint-target.rst | 22 ++++++++++-----------
+ drivers/nvme/host/apple.c                       |  4 ++--
+ drivers/nvme/host/constants.c                   |  4 ++--
+ drivers/nvme/host/core.c                        |  2 +-
+ drivers/nvme/host/fc.c                          | 10 +++++-----
+ drivers/nvme/host/nvme.h                        |  2 +-
+ drivers/nvme/host/pci.c                         | 26 ++++++++++++++++++++++---
+ drivers/nvme/host/rdma.c                        |  2 +-
+ drivers/nvme/host/tcp.c                         | 11 ++++++++---
+ drivers/nvme/target/core.c                      |  2 --
+ drivers/nvme/target/passthru.c                  |  4 ++--
+ drivers/nvme/target/pci-epf.c                   | 25 ++++++++++++++++--------
+ drivers/nvme/target/zns.c                       |  2 +-
+ include/linux/nvme.h                            |  2 +-
+ 14 files changed, 75 insertions(+), 43 deletions(-)
