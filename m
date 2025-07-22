@@ -1,56 +1,88 @@
-Received: from PNZPR01CU001.outbound.protection.outlook.com (mail-centralindiaazon11021085.outbound.protection.outlook.com [40.107.51.85])
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5755241131;
-	Tue, 22 Jul 2025 12:19:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.51.85
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 897B82E9EB7
+	for <linux-block@vger.kernel.org>; Tue, 22 Jul 2025 12:45:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753186785; cv=fail; b=aTuy17wv6t/rtiONAhckXrBOtD0FOrkmdKfcf2QcCn/wwAJ4Vpf/teTMk/+4vkDW8H57u2UNNldSXyqKRXLxxVIdySkq+xvJF4di0IzCy2z6IrwfQNxCsMZ0Imxe2DtXnvncswmiMnD0HgDeUVdY1sIWkAshqncGvlCjiym8jV0=
+	t=1753188320; cv=fail; b=EuvxO4XNb/C4HFutBjZDTR2M+VbHVUIqlL+Caqah2FY5+7qQlRG+z9Jo2act+tdzYvLSP7n6zPkpM8oyz0prp8RcpRTK+Py2ohw+bF2qji1curbDlnrn8TwMZhAHr9VSE7KULV4UtPwizAJviQ2HYc3ycnHvpG1J6voui72a47w=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753186785; c=relaxed/simple;
-	bh=SfgnuxIVS++AAi+y9TF23nsvWYKp/daePXGhsGuN3Rs=;
-	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=nWCi6KJDA8zyj+NLzlepmZiclkCmCOHJLygQm4MkG1r73VnJobv1XnCSVbCAtYaZXUmyl2qKUdYYYVoggND+DapSBNQxtO6AZSOlVDwTAPh27SFwnItOHjjz+QNEyVvDtWJINjxcFfsYFIfGUpGk70MP9f5C+r7iRW5UmYc33o4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=siqol.com; spf=fail smtp.mailfrom=siqol.com; arc=fail smtp.client-ip=40.107.51.85
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=siqol.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=siqol.com
+	s=arc-20240116; t=1753188320; c=relaxed/simple;
+	bh=wRH0+w6Xg1df92V3AsGFkIF5FQxfGZXouq+xQtNZSZU=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=GSt9m2k4QadvZGBPfUYq/vwOyKVDNmOb1aKuzKxfEIk+eZflH2OsU79U0LMKo5tYMoZZo07ieuMsaTOCfk8QqnidjF9htH/pv0YlGyGSvsPPdUvgG8372HOGwts5r5xOsnIU9gEsB4KB4V4fJusymtNyFrILgXjekMof+KMyJK8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=UVcKFthO; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=j0Q442rI; arc=fail smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="UVcKFthO";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="j0Q442rI"
+Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56M5TCVG009173;
+	Tue, 22 Jul 2025 12:45:11 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=
+	corp-2025-04-25; bh=BV6+3W4oS5w9MnCRK3oecEjwRs3Yn+tf0ppHmP72DNw=; b=
+	UVcKFthOWQABWXXg+4BDwISSP8zcw5c0q4oDnl8gCoP6kaPdOPqMMpJcSHvPzKAV
+	MZa3avPx2Gk9VKJkWYCVrZ3dODDEv6xEhQy5s8nzH+ShEwWPokCgfBTM2Nk3W3m2
+	X9traFneaNTFw20Ri3RYgSaLQaJQX/dKjsf3SfdYtwR7ycJcPR4ME2R46GYhZniN
+	XIHpqh8If9MiKEQ8/hIUSFQ/V6HvVyA0YVhrNGBED/FhFJqTy6mwUBvBShkyZXFN
+	4axI/piDdaTFdRGZOcZ7SQUdZU+K5bXQEef2Pa/6BBFEP9vmmtb9FS+Q1Xe/ysHz
+	VorUwa/rzq9hLZ4AzRqdvA==
+Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4805tx58d6-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 22 Jul 2025 12:45:11 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 56MArekq031526;
+	Tue, 22 Jul 2025 12:45:00 GMT
+Received: from nam10-dm6-obe.outbound.protection.outlook.com (mail-dm6nam10on2080.outbound.protection.outlook.com [40.107.93.80])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 4801tfjqdk-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 22 Jul 2025 12:45:00 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=e/X+23z1BIJdx+jfPYJ9J9/MMC7efJjheS5ZWH1vIRMdLb5MY3VQydVXl8SjOMgI8GupKt1Rb7LknqEz9s+K5V3sEYiSOLUYblkRUHV6xS00i5Ho/mwdm7CHeb5+1ArGyqRBE5ZdX3CDjqoo5CB5FUemaWVTVD/KaFADx9XtMc6X0NR+ifbrJ8uJbSUmtp/dxHv09TWvFWIY39o11BOkYvlKu55LkhCQv/ro0/Edi5WaemWAyvZcqz17GBeVYEE/sH3LDjK2qc7LIPkUf6m9XIGXw4w/ycfdYKuZh+Ng7DtvpZlSiIA8qG0vTiNB59PjQvcbAvoHu+/Z0oZBYcDz2Q==
+ b=RI3KwSbWbwsIEWMYrw/ah//jueFidTkY14NtSby/FCBB1QRyggdFGvLES2Hx1pGzGs0gCK1dcnnXyAXx8j42hnQKXFu+mFzvtDnnFG0/O3LcF4bj+LzJe+CLbcOoUMB2iVnoXZRduSEmjiA3x5+i22MmkAZmkjTQHI8gbIJFRLlN+406ZqWaAKOf1BO74YL+tQFASjqR5IxLcFtMiyqWBYEpqEgE6BDiDendizpS31HcgpIkpY6DBz5mXTj3sLTW/ual7RVJbWE5tJDhlek/ZVYMReVVI5qVGjj5y3cWZUDsG1/XN0FSM4X/JXfk4HnaWBsc3DOwHAFnSDz7s81fxQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=2BbP2jxnFw5lOVZdtvkLlj86FCoXYvQlSnrmf9uld/4=;
- b=cJGt2H3TEOBcmLxOppBKk/LSYeauysX2ZM13zsxEDi++HNBLHUbvUNBBNFfMYKPuuWOXlxDezELgJCE0tp5mbvJLxosAODO/1UbYRXL9HMpXRHcxhnOJSmwGvMhfsGbfCEZkGMJJyI1uHY0wrwbxGj9+9symKnXY6QCh7aEPqjHBymoXw8VjeGUwjvNCF17mKoDUM4XZF1iK4hDlLW68QJX3KCuc0iEKfxnUBgqSO4ulv8d6/GYvv03aMLiQWgagZOkWhXHgL8Pb5Jq8nzUrf6K7UUSupwOxbxX2Kx1oz/jj1RpizcW+iyq5bd7Fo4viVty5MW5kei+zaOzXWAx59A==
+ bh=BV6+3W4oS5w9MnCRK3oecEjwRs3Yn+tf0ppHmP72DNw=;
+ b=xZsOKMDBGJaGJ535WDOBSHDsshssjpOtoxqCfnk9BF7GA/7L8L1Vq/8l7ufPth3Y6mSqYZ8BUwQBeBfyHtYskTbA0d2ryhVoNT2oOrJyX6FploLZ3Dp8CHqrbYLrEW5012p97FDZFTiw2ZR/JBTa5UkcpWM4epkV4GHW+q1HoFeXvdHCZ5KLerD8kocnk0r1R7gMSTIiW9j7mWy684nrZ3dMzl4LW34u0pzu9GF0MjZwvgLdJT8DstxbWdGhWmdeAR/UnJtBAbiigCE/+Oc62fID9G9oGUSE5AfUc/iGCNp66VpDmZPnZIeqRaycDczIfelJq4Jd+Lr1Ctiqlr6UUA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=siqol.com; dmarc=pass action=none header.from=siqol.com;
- dkim=pass header.d=siqol.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=siqol.com;
-Received: from PN3PPF6710BA041.INDP287.PROD.OUTLOOK.COM (2603:1096:c04:1::ac)
- by PN2PPFD76E1DA34.INDP287.PROD.OUTLOOK.COM (2603:1096:c04:1::14e) with
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=BV6+3W4oS5w9MnCRK3oecEjwRs3Yn+tf0ppHmP72DNw=;
+ b=j0Q442rIL59A8Q40kJ1DVnDJcxRq3e20Wn1BLr0RX3mz9Vt4t+O8C+hJvQrf1r7lOE7kdqAiPA2hrtXiBmtSPJdUcJcz3PhN/A22EyRHGnlQTgZpDG0eq2Ql7uVCUHrGJHUS7CmkHERpkAGRdvArGaVtfqCVpu9rN03316lvy7E=
+Received: from MN2PR10MB4320.namprd10.prod.outlook.com (2603:10b6:208:1d5::16)
+ by DS0PR10MB7270.namprd10.prod.outlook.com (2603:10b6:8:f4::13) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8964.21; Tue, 22 Jul
- 2025 12:19:38 +0000
-Received: from PN3PPF6710BA041.INDP287.PROD.OUTLOOK.COM
- ([fe80::dbab:5ea2:1e63:5fe9]) by PN3PPF6710BA041.INDP287.PROD.OUTLOOK.COM
- ([fe80::dbab:5ea2:1e63:5fe9%7]) with mapi id 15.20.8943.029; Tue, 22 Jul 2025
- 12:19:37 +0000
-From: Dishank Jogi <dishank.jogi@siqol.com>
-To: Davidlohr Bueso <dave@stgolabs.net>,
-	Jens Axboe <axboe@kernel.dk>,
-	linux-efi@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Dishank Jogi <dishank.jogi@siqol.com>,
-	Manish Narani <manish.narani@siqol.com>
-Subject: [PATCH] Fixed several coding style issues in the efi driver as reported by checkpatch.pl:
-Date: Tue, 22 Jul 2025 17:49:27 +0530
-Message-Id: <20250722121927.780623-1-dishank.jogi@siqol.com>
-X-Mailer: git-send-email 2.25.1
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8943.30; Tue, 22 Jul
+ 2025 12:44:58 +0000
+Received: from MN2PR10MB4320.namprd10.prod.outlook.com
+ ([fe80::42ec:1d58:8ba8:800c]) by MN2PR10MB4320.namprd10.prod.outlook.com
+ ([fe80::42ec:1d58:8ba8:800c%7]) with mapi id 15.20.8943.029; Tue, 22 Jul 2025
+ 12:44:58 +0000
+Message-ID: <5c7f71a8-98fe-467e-a238-3ebb10023c87@oracle.com>
+Date: Tue, 22 Jul 2025 13:44:51 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC 2/2] block: Enforce power-of-2 physical block size
+To: Hannes Reinecke <hare@suse.de>, axboe@kernel.dk
+Cc: linux-block@vger.kernel.org, martin.petersen@oracle.com, hch@lst.de
+References: <20250722102620.3208878-1-john.g.garry@oracle.com>
+ <20250722102620.3208878-3-john.g.garry@oracle.com>
+ <d0adde51-8fb8-4fea-ada0-176a9d745db4@suse.de>
+Content-Language: en-US
+From: John Garry <john.g.garry@oracle.com>
+Organization: Oracle Corporation
+In-Reply-To: <d0adde51-8fb8-4fea-ada0-176a9d745db4@suse.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: PN2PR01CA0229.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:c01:eb::11) To PN3PPF6710BA041.INDP287.PROD.OUTLOOK.COM
- (2603:1096:c04:1::ac)
+X-ClientProxiedBy: PN2PR01CA0219.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:c01:ea::13) To MN2PR10MB4320.namprd10.prod.outlook.com
+ (2603:10b6:208:1d5::16)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -58,461 +90,158 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PN3PPF6710BA041:EE_|PN2PPFD76E1DA34:EE_
-X-MS-Office365-Filtering-Correlation-Id: abfe4043-be99-4da9-4cd6-08ddc91a06c3
+X-MS-TrafficTypeDiagnostic: MN2PR10MB4320:EE_|DS0PR10MB7270:EE_
+X-MS-Office365-Filtering-Correlation-Id: eb83a885-36e5-423f-ff4f-08ddc91d9128
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|10070799003|52116014|376014|1800799024;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?cjQ0AHyAFMleMSruiQS/FyVlwyvcFceFmO4+nKRpAElUfSpJNKzNdgLrifiS?=
- =?us-ascii?Q?PdBFjDrgEcAEa8uVLHo3MbXrWz16HOi4YaQ92XoklHzOZob1Af6e9a5TFsNk?=
- =?us-ascii?Q?YsPeWe0Rcc9hF+hf08aJZ4iL15EYfySxSKdAwMeWFjGllQy6TO4gZhPAvRmd?=
- =?us-ascii?Q?h2qW6Oo3eNry2metMjDcjYd6iHWyQtmG/ut3Jhs3SyohyTW8/57PtqyJxLQQ?=
- =?us-ascii?Q?toWOuZfv07DFA7FebRXF94PMv+IOhdy7pt6TWjMzGFOCSY4djftBvt94o/B9?=
- =?us-ascii?Q?PalVmE2Qv1d8EPcW7pqzRj3j4O99gF4yfaDbTcYSn33QYeWguDGtNOe9/kaD?=
- =?us-ascii?Q?4eB1sjpix1WcKyExpNhNNtkdmab4l/86V9TtDJZLu4MO6zIGuLYhmA3ns+9S?=
- =?us-ascii?Q?gsHK/O9RhsWW6Cg0dBoR9O9xgmSWCV+7BKzsnyFq4124H3P1Uy7edp8fCnxY?=
- =?us-ascii?Q?OWHCvw7WNVO//svWjke6RPOblMD/Z+mFF2BIrPow4bPMjN8//tQ2hCg9tHvk?=
- =?us-ascii?Q?elv1Y7phejSVzh4vPaQFdtqtXx1s+MMb21XPb1g3r3a+Nht9Q0bFHkql5VMX?=
- =?us-ascii?Q?iVDPfPTlQCNckbtRlJC2RTEKqF9cZZ2g23c3TuP99HBINvJz9UE6q0gpLy4S?=
- =?us-ascii?Q?jGiDv7uFpb4B+IQqROd1BcTrPS5B3jwPripGEjEPPXQ++wEOazrtLjjW8rgC?=
- =?us-ascii?Q?/EomECoClB11kutNGy39WXj0SJRkV0uTR67GnudI26ozE99bLNXCz3a0VCHn?=
- =?us-ascii?Q?pDRIJ51I1S4jKwuRuQ2RAN2k9ATSQ3EUOMZtInSBUNqJH/yMzDvJ0YjBFk2n?=
- =?us-ascii?Q?7vCuR5SEitVHkVyK8h6WONoAvcThF/Yv/0VJXmJwKpw62yb6+KGRVRUMHLRn?=
- =?us-ascii?Q?Df2fGRT8lyyKjnYgKnLssakRYPkNy4F4PZNhU9s8YF7cLXHGgNAPtlaFUZ5o?=
- =?us-ascii?Q?HyHoZhbo4pKCaPDgYPiR11wHnIFdLPnQL6dxB+OjbptxrhzTMu8ogSTiR79M?=
- =?us-ascii?Q?z9XddsWpDWe1T3sOAvC4vqGI6wnXTebDQ6eL+fYquGEA1D6LPATis4c+ZI5L?=
- =?us-ascii?Q?hIaZ7D42GnfuQF+gRnTHoQAA3S4a99rbpwI1NM78er6agDZq+8tQ31Ur59aH?=
- =?us-ascii?Q?fixAd+M/NVt+9k+0t/rsUa9qForeDYPkU06NwD9O3xzP97XQcVMXcNTE4mX5?=
- =?us-ascii?Q?6DDPDuHabjaeM1KTOLBv9zz8LEsJYFQCgx9abue6fLowJ30mJxiwk7G6e2PT?=
- =?us-ascii?Q?A0VUb08hA9AIfdLWxlKnYQZaRNA1VjkZOdeyu7GTM+hJ+dhS9pWLZ/HA0nvz?=
- =?us-ascii?Q?pDoRV3oPwAd7vWEbrzxw8XV1VEO0KtPo8t5EzFvZ372wGbX2ijCCRXNzzMte?=
- =?us-ascii?Q?vYSg7AekIKAwWSYrilSRWEb7pRg6ipIoq4MjU9zayfu/lyLdYhFs7CAs5xgV?=
- =?us-ascii?Q?mEsxc/QJyVA=3D?=
+	=?utf-8?B?dVF6ZWI3b2grbVc5V3FGcmc5RUJENk1scnFFTTFWdTFXaFJCTlBQQjNvT1Mw?=
+ =?utf-8?B?S3ZQOHZ4eXEwSjYvRVVtOEtVOW1KRWJLQ050NUtwZHJGSThqemZSN09XY3VR?=
+ =?utf-8?B?SFhSTUFUODNqTmV5aGF0Qk9CbEFvSyt4OGlJVUd5TngxQVpuYXc5WndJZE1G?=
+ =?utf-8?B?dzVwZStUaWs1T2c0OE1kaXpDSENYTHJyL1VISGZOYkNzSkQ0Nis1L3J3M0JK?=
+ =?utf-8?B?NThoVzZJVEtWT09tUU9nU1BQMHY3eHpJRFE3TlFnaE1VSlJvQzV6Q1owSnlt?=
+ =?utf-8?B?b0wyVWNqSmFMQ1lDUEY1TnE1N1orWUU3QzZDclpSZW1Jd1ZTYXI1SkgvTFlx?=
+ =?utf-8?B?UThLSXFYVnhKTXY3b0NwbTFvVFNaZWpUZGVMMVhUaWtwcU5GSXdEdWdmSWxk?=
+ =?utf-8?B?R1NBQlo1eHp1TTEyZzNlcFRqM1diZ3g2TU5LS2xsUXhrbXlDRU9KRUg4TGQ1?=
+ =?utf-8?B?K3JBTDhsUU4wS1U1NENwYno5VDJzUHF4WTIxNXVucTN1SzRWajVLTUphQ3Bq?=
+ =?utf-8?B?SlQ5TkhPdVJYejMxSktPUGh2azNqYWJYVWZZb1R0Q3gwSzFydE1WM2xvQm1O?=
+ =?utf-8?B?Qlp1dkNHejRXcHh2Vm9YSStMY0h2QmNSSzdZenVoalJtS05QTUkvTHp5c2xD?=
+ =?utf-8?B?ZHBKaW1UZStmbWNLclhydU5EeHRrcFRvOGpINjFnMlBGeUxaMElKMmtEYlhO?=
+ =?utf-8?B?VHdZQ0oveTdYdnc3NUdPQmlHSllkWldhbFRqQ3hpa0xhSkd2TXpiQUN1eGwy?=
+ =?utf-8?B?VDZJaVVCY254RU9NR08yMWdNS2Y2cExjcllaMkxSWndkL3pVN2FzUnB3VEgw?=
+ =?utf-8?B?SHdma29FL08ySHVtcks4elNmREEyajVHbmdBNm5BclorT2tTdWl4dGlWZ1Zv?=
+ =?utf-8?B?VVE1SnZhY0FjNHU2elQyM2tkOFpXQUx5WGM0N1BCcmdQaUxJam9ENGVwOGlu?=
+ =?utf-8?B?c0YrZFYzSXJrMElJVVN3UGpwVS9oT1hmREV5R24zck9FNVZuOEVMeGdFNG80?=
+ =?utf-8?B?TTI2UkhoNHpDK0dSeDFhUU1lZnJtY1YyTitENzh3WCtxdlhWTXB0L3RJK3lh?=
+ =?utf-8?B?cGZpd1VRcTdwZWJmNExxdk52c1dKbEdzeXVNcTRKUkNFNEZsbFNQbmRDRDYy?=
+ =?utf-8?B?YUZyb1ZVakhVQ1Z1c0VqZmdaSktHMy9pR2QxdlhNV0tUeU45ajVoUmhBbnkw?=
+ =?utf-8?B?a0I4THVHZHBJd3FCR3l0dTFSMXFyMUk4NmVhTDRiMkdKV2RlZ1pVbjRYSmhv?=
+ =?utf-8?B?cDhNSnBtU21qN2N2N2NleXFxcDduT1pwR0Ywd0tvS3gwQmQ1VUw4THdKcnlG?=
+ =?utf-8?B?Z1BKK1hsazNrZEhrcGZLWkhlbGVJZ2JMSHM3a2lIb1JGNXRsZWNLRTZZMFFF?=
+ =?utf-8?B?SUdlUU56UmFNM2pOMTh0ckRGUjBMN1JINmliSGZBVG1hZ2ZXRTJTZkE0aGdW?=
+ =?utf-8?B?V0xEL2RzcXRTZ3p6cWJERWgrNG81TTV4ZFlLMll2aWdKa3NNMGpYMUMvYlln?=
+ =?utf-8?B?WEFKckNPanZldDkxamhGYklsT2F5L2Rqak9Sd0RIVVl3RkhMMzBPZ05seUV3?=
+ =?utf-8?B?WEtGRVhKY0J4ekJwTW9rZ04vdHdDc2NZSHAybzhQdEYyWFdjeVVEL1RLaXE0?=
+ =?utf-8?B?b2tENDVjNGVpK25MbUczaHFxS0p6V0Y0S20vWlUyY2U4cEJxQWtZN1dneVRx?=
+ =?utf-8?B?TlNSbGJuYnZSajVmTmgrNWp0OCs1YlNOZzVoWlFkQXQzR0J5ZkJYdlhObWJt?=
+ =?utf-8?B?d0VpTDl2L1Yzc0xlTy92ZkNReExGcXJLTFJKdGFMUUpqeGxjWEp0d21qd3Br?=
+ =?utf-8?B?cmdVRkNoOG04QldiOE11T2dhMi9WbDVJQ295c3loUDlmOXpURVQ3bXcyYlM5?=
+ =?utf-8?B?TUJpWjZxRCs1Sk5iVlRpNDl6YmExOWlmQ040OVViOGVkVmc9PQ==?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PN3PPF6710BA041.INDP287.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(366016)(10070799003)(52116014)(376014)(1800799024);DIR:OUT;SFP:1102;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR10MB4320.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?nZBm85jQwqRL3IPd/vwFsOXFh4h0kEJi0krO7AL049BuW7HWeBpPt5DJ02Xq?=
- =?us-ascii?Q?TXtqLpFWc0B6EOnNfusrxMh2hSOnVDb/1/IQprLbWZbsGt8qXZLpA8i29I8Z?=
- =?us-ascii?Q?MsVZh29gsGMzPMCyqmABPn61QFtbzbFniKpnTMmFhLlm9qUgdbymJBsKSP/C?=
- =?us-ascii?Q?RgK4s+mdq4cPpmYZ0YeRgrji4cUU5mg7C7bsZMM73gXUPiJYqPFTqZ1miW4z?=
- =?us-ascii?Q?uD6xfYAKgG+NzHyhqf4f6wkzyUnMMPdS0F7beWupO2AlMaSQiS/TU+SPE1Ov?=
- =?us-ascii?Q?58b5Zmvu5GBZS69dKT3ozvgY0oulEWiAwNyV14atE7ZckpLAiRgtEqVR5akM?=
- =?us-ascii?Q?rwSSsZI0ytVVEQBGpUf53cKgrDxFcWaHWXYieCeyjKvE8XaYtamG1EkYNsdS?=
- =?us-ascii?Q?4oIEFkmK+BbV0sQegY/r68hGr3jLMwuL/uBUJ1m23OvnJAC+PHDpE55q0gKv?=
- =?us-ascii?Q?OJwyPXGlBPe1Tm0PUWAKYi2awC39eYarGNyp+F4Wmop6ukzcqmBz/McUKD78?=
- =?us-ascii?Q?b5nuAlWvRJb/wbQxYAKIxZ0idP7nEdgU1zCAPTSpSSGpApUtASdDjjb26LvH?=
- =?us-ascii?Q?rtsZ30Nm/bAEp49SIX485h6aHsFNMMUGAflsYHKcsmDtVvJhXBWYDNleK630?=
- =?us-ascii?Q?4nZ2qTDW+0gKkS01grQruODyrvzk8CA63z6ABOM6CSOkhqD+S7KuoZxJ9kmy?=
- =?us-ascii?Q?leq3cQHB7cPd4eYByYPIF9BVy+V9nU51cIIr8ulpU6+J6z9Sb2POMu6NH+61?=
- =?us-ascii?Q?NCrusDKQGqUxqmgR1rju7CBDQxT3bIKpDLUusDNyehIIkLYeleWT8hpBy95P?=
- =?us-ascii?Q?tOtOJNSiHM3UbPGZMzR6ivoweLNFNj75uP3LhH3EWMvp3+cDX4GtLHCdyVWR?=
- =?us-ascii?Q?dfZ2E/KxLm5n4oQaZcW7dq3Z+lYrHfWANrm8weAMn9Lyz7syA6sh97+8FjMj?=
- =?us-ascii?Q?4h7V0DXh0MKTKnzaFJBrGQHzZeEWlxO9phKhMCnPqcAkilMZa9qHt7tMnI2B?=
- =?us-ascii?Q?Y8c4X5QwdQUtovb8dXz8U7fUJNpV3uS3YD3XvyYbLAPVDVlWE8YDP9nBjVPs?=
- =?us-ascii?Q?sZC7ct3aMS0rBvmQv11SuE+O55V3QTv3GMSD6gnTFPZi9+9ApXPAIF8i4wCy?=
- =?us-ascii?Q?Uh0C3kxoS/gevDgDOp5lTpdu1eIUBDWu8XzPr3UwYcaHDCobiwk0RhcsJQh6?=
- =?us-ascii?Q?sqVQxMYxdcvzbDoM1zwyLsqFg7Ap58IVxmshXXMYMU6Fp9WLyPlLP8TyKdP8?=
- =?us-ascii?Q?2Xxa838zQ2jTc/9DvMVig/qNPO+5MTrz7b2ut2gfO5fzjdmyvlJBeKKTJGXv?=
- =?us-ascii?Q?IXTBdj83gCHIqrH9e8UGyC0uem2dJ1U0uOVm+/Z6jnka/M3KHWShWewkMeTQ?=
- =?us-ascii?Q?KHNp/QQ3CXDEA8Kdnd412Gwex1AH3tv070W32RHxE/9e6+k+S4yizE3i0SpF?=
- =?us-ascii?Q?oqFJcqP0E/gr0tBFjy61YZKgU5pQE71ksKvJqhf0q5PMgys5PG/HmyMGMyb0?=
- =?us-ascii?Q?u+naMFjIlygJO4xGGn1OUd0dzovu72V9ccY+IL6lva5JhX/jYxkWYA55Rzze?=
- =?us-ascii?Q?JaZ8+ixBM2CMKyHjA7WtjRBPCpRtDNXUXbcmyn9CUk/Mnyps6rGeZVc53CHS?=
- =?us-ascii?Q?T/f++83UcLviYtUaosMcFDHZcTPLze+3p0yEUSzH5H2z?=
-X-OriginatorOrg: siqol.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: abfe4043-be99-4da9-4cd6-08ddc91a06c3
-X-MS-Exchange-CrossTenant-AuthSource: PN3PPF6710BA041.INDP287.PROD.OUTLOOK.COM
+	=?utf-8?B?WmVtK3pwdlNybkwwbWF3RHJsaWtBWGc3dnVDaWd0SFNaK3c5NDBGOCt2NFNO?=
+ =?utf-8?B?NFVsaXJ2TXBkMGtWYjVxNDVTa01JSG00T1h0THlaTE5YVzY5MnFLOXY5VEdy?=
+ =?utf-8?B?OUpVckVVYW53YUMvV2d6RUg2TjJmVDcrbmk0WWFuUURiUnYxNDFRVEs0d3dN?=
+ =?utf-8?B?SVg2WlZKV2YvNHdSaWVEUTJuem56UzBhWXJ5eFR0Z1gxeG1teVJ3d2tZTkJh?=
+ =?utf-8?B?MDdvZzJJY0tIRlVJU0QwRFhodTBlcUkxQ3ZQZGNhMW9jVVZ0MkVuWWsxcmRi?=
+ =?utf-8?B?VW53QitFU3ltaEN2elF4OENZTlRpcFBTOUdwZlBSdjFkd0NYN0Y1Q3FVTmJJ?=
+ =?utf-8?B?cFQxV3hmU3pLZ1JFV0I3c2dzT1NOdHRvRm9SZktEMXJnYlBWOFErVHdETzha?=
+ =?utf-8?B?MjhWZ1JQWk5lbVFwVUwzbXE2dVh2VjVKaTdwU0hNQjdLOWNpUGZueC9EK1hj?=
+ =?utf-8?B?ODdHclRzTXZPNVpHSTZkQ1BHN09Xd1grRzZPOVIvTFNOampidC9lTkZhNUlj?=
+ =?utf-8?B?MXB0bVdsbXVUeDFKZms5THlqQk5UUFdmODN3NHVSVUFCVVRYTGVDaG50ay9l?=
+ =?utf-8?B?VDRjVGtSczMwWXFzZXNTZVczL0ZmWGxDdzBMaHl2S0VPRVZRUSs1U204aVE3?=
+ =?utf-8?B?eXBnVU50ZU1iZ2gwa0MzenRPUEg2N1dZaUlmS1dtYmRuSTEwUDdBbmlHOTY3?=
+ =?utf-8?B?ZW1zWk8rRGl5c0syaHprbnphNDhnYVZ1NG5vcUlDVzltMVlIeUtVUkNqNGMx?=
+ =?utf-8?B?Q1FqR3lmZm5MVlpTU3BCa0ZJcTBMM0Z1Yk9zMlYxVHdTcy90UEtvNmFuNktJ?=
+ =?utf-8?B?dWRxSzMyWmhSNUk1WEltNnRUZlhpTGxEU1lDMGY4R3FlcjRMMnJ3Uklmc0tW?=
+ =?utf-8?B?QnhiUDhPcWxVeFFwS0Y5bWIvRk9NNloyQXRMRTFRbjMrUnlrdmFmV204QnM4?=
+ =?utf-8?B?MXI0bDdSUXkyNlVIMWFkYWtaRGlyRzFKU2FIelJtUkFKcmZHald3SVRGMDlo?=
+ =?utf-8?B?c2FJMjRaVjRsdlBrZHFFZlRvUDNNMys1M2FvZC9RRjFEclkvNXN1c2I5alJH?=
+ =?utf-8?B?NlU1VWVsVDhGeFBFbkVGN25CZjI0WWZCL1NybE01RjRocFhvRXdVMEo2b3U3?=
+ =?utf-8?B?WW8zT2hRSm5KTkdaYm9pVEJKUlUwRDJwOHM1OExDbkpjV2JqOHlaSHBJdW92?=
+ =?utf-8?B?SmhPSmhsbVFlVCtwb24zdTNJWHRGSXhXOG1sdS9QT3JCbGw5dDdkRThtOHc1?=
+ =?utf-8?B?Tk50NFpOMDZ1b2JEWDkvQWZLVzdVWGVJeTc2cGhBQU1GZ2NyYlgvSmswTlNa?=
+ =?utf-8?B?eStUcXVNTFpxSkZHR3ArdHNpeTRHQ3pBYUhUSDU3NUNCUU1SdzdOOGFraEVo?=
+ =?utf-8?B?QUZuSWVjd0xSanR4aTdVMjF0YVB3N3VJQnNsdXIyQkNhMWRRUlNEY2dHUSsy?=
+ =?utf-8?B?MDYrY2xYT1Y3dmxLRys3UE1xRG5LUmQrUnlXdHVNOSs4b2o4eTJlMmNUN1R5?=
+ =?utf-8?B?Q0RZa0xIejlYM1lxOHBJc05oWHMwRkd1TFRnQUVzWFBUMVYxK2JQNm9HcUhj?=
+ =?utf-8?B?Y2JIcER5aUwwK1dPazNwMkQ1alRjOWNyOGJNZzNicXBmVktoRWxWSjNweWRJ?=
+ =?utf-8?B?VzgrU2FhMk1oVGpOaFEvaTRDVWY0VkxDTnVmOFpkR2pmTnRMSDM2QmJEdFlE?=
+ =?utf-8?B?Y1NnMHJVU3p4V2QzK0E4cGRoemkwR09DSlZZVTVaald3NFdEUzF6Y3lrcXYy?=
+ =?utf-8?B?OWkxajU5czdqdURXSVFTd0pQMWQwcmhkTm50eE8rbWNuTkhDckVWdVYrU1Zo?=
+ =?utf-8?B?TkRod1dwSnR1ZXlSdFZjOVNkWERBcFcrRHhTQ2NxTEU2TU0reEZ1SS93bUZ2?=
+ =?utf-8?B?NHNLS1dERS92UlZFeXArQW8rT1grTVBPTzlrWXV0UldlUDZnam8zSGxwNzlv?=
+ =?utf-8?B?WTNuVHZkQmgxQ0hoekxTT1RrMnZTUW9sYkRtcllTNFNtM2J2VVBrYmh2ZkNi?=
+ =?utf-8?B?NnFkOUVWY2lHU1R6YmdsTWp0RkFmR2tNd0pVVWxoY1g4RWhMRXo5cGMvTXRO?=
+ =?utf-8?B?clA3N0NhcTFaZGZMM0RFZGNyRDI4NHZPNlk5WUx3QzBCZjAvM3NMNmhrWFVU?=
+ =?utf-8?B?Q25EaHk4UEhTR085VHJzMXNkNUxMdXh1WDR4b1NZNGl0RWNIZmliNnJ4aDM1?=
+ =?utf-8?B?Smc9PQ==?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	15K2eTfnx71e+LJZkqBCvPfvTIfWz4ZYarrnXXQIeOFXMh2n2FShcT3P0n3rRQCjk6YqhQ3C4FYMv66DVkyYx5abL10w9FUmifmg4vNifw1295gCT3fIvTna9f6lFWk0JJnJL9nCk6cKci5g6CJeRWpXjHBVPHv0B53U3Xq7mQeMGr3sw6EOqarq0K95iFOSkw0Ft3rqXupd4CvUzg4kSokoIbPtgEqkvqfCNwdXRwX1Hq+GAnFIhGX0fVkoxjsxsYKCmvQFt4M5NKAszv12arh34YYo0kH+j5TMurWb4oixPRtiH4jTcBzFX2D706t7O7gaarrFSQ0SF3Ee5gqaoEk/5gSERgOTkRjUeY2VVChbWQPjvUOhHB/mJpCAv5TObPeqOm4kxkhX+c+mG1MznuvgH7uqmY1CTlDsmfQbp2bhx0xAHA8ntLIbvej6u7Sj41qKj+aSf23juILYfSfiq2ig+8lKLbZ0gIxElaXaOF2yjUs3lDHkekh277VLG+DmT8q4TuryrNJq3h78OYJT+edbGbd3ukNdcI7a/7riyh1uCKvcZ8BJHbAfO05TeJ/MDp4C+JGKFTX/a1tJ9/rO4ACItYDcIaIHL0yb3/LCW4Q=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: eb83a885-36e5-423f-ff4f-08ddc91d9128
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR10MB4320.namprd10.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jul 2025 12:19:37.7967
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jul 2025 12:44:58.6146
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: e93cdbe6-5a59-4d5d-8570-7b6ea0400c3e
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: rHOkSxOL0Yp+lFJGPi2dZufxFTGxmZuOhM/OBv1O86KvKhXQi26xO/mlRmSw4K46etr0jNfBHcvX1vg5tsR/4g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PN2PPFD76E1DA34
+X-MS-Exchange-CrossTenant-UserPrincipalName: fKGvahA4GPJDKekqrcmSX9OwUMPPzZ5+8Y6Vax+zsjuW5+NFxypKW23ORWD69fYI9MZ26tBjgWKGniKMgBtakw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR10MB7270
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-07-22_02,2025-07-21_02,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 bulkscore=0 mlxscore=0
+ suspectscore=0 malwarescore=0 spamscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2505160000
+ definitions=main-2507220105
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzIyMDEwNSBTYWx0ZWRfXyce2sQMYBBVp
+ xFXipZnW/MNq61tZPBfWtTAbO0iPqpdtueghbGh2MjQgtK2651B0DBUySNLO5kdrZUwEWdnYGPJ
+ vPlgyNhE4YpT4zY/7iYr04yBcqm7PS+xYAOeAmg67c6OHbjFu8uLEa6hRJS0SLf44SIGCzccX7t
+ pDJPBeF0mav6B01x+dGX6ufU0dE/bXToxCPiPnn/fZ54JiZJcXrUDuOEBeqCo9PoX4pJdp4fTgL
+ AsT5TWQJcC2X1CWgbB+QzQGbvLu6F4RR0Qb62jn59ymSP/wv00B2F84hruMe/CRJqaVXktFEHDt
+ g3kwVQ/tT5Hpus8ybeZMOgUk/lLnJ9lhOKvbcJKc1Hf0ZcL/PZwCSpDuXxwfgRLFrJN4b565Zer
+ 0CMPfDT1MDowJeA3mwvB25xgvbelJ69yuirtZiyGtTFv//rjxI31Mkfuv4h1ry7RppgLDH4P
+X-Proofpoint-GUID: 88Ft8CAU2xKTgJGRg8CTC_de4ZhckG-1
+X-Authority-Analysis: v=2.4 cv=IsYecK/g c=1 sm=1 tr=0 ts=687f87d7 b=1 cx=c_pps
+ a=e1sVV491RgrpLwSTMOnk8w==:117 a=e1sVV491RgrpLwSTMOnk8w==:17
+ a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19
+ a=wKuvFiaSGQ0qltdbU6+NXLB8nM8=:19 a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19
+ a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=GoEa3M9JfhUA:10
+ a=yPCof4ZbAAAA:8 a=1PhKf-v-ultnJKlcvAoA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+ cc=ntf awl=host:13600
+X-Proofpoint-ORIG-GUID: 88Ft8CAU2xKTgJGRg8CTC_de4ZhckG-1
 
-- Moved assignments out of 'if' conditions.
-- Removed trailing whitespaces.
-- Fixed indentation and spacing inconsistencies.
-- Replaced 'unsigned' with 'unsigned int'.
+On 22/07/2025 12:28, Hannes Reinecke wrote:
+>> The merging/splitting code and other queue limits checking depends on the
+>> physical block size being a power-of-2, so enforce it.
+>>
+>> Signed-off-by: John Garry <john.g.garry@oracle.com>
+>> ---
+>>   block/blk-settings.c | 4 ++++
+>>   1 file changed, 4 insertions(+)
+>>
+>> diff --git a/block/blk-settings.c b/block/blk-settings.c
+>> index fa53a330f9b9..5ae0a253e43f 100644
+>> --- a/block/blk-settings.c
+>> +++ b/block/blk-settings.c
+>> @@ -274,6 +274,10 @@ int blk_validate_limits(struct queue_limits *lim)
+>>       }
+>>       if (lim->physical_block_size < lim->logical_block_size)
+>>           lim->physical_block_size = lim->logical_block_size;
+>> +    else if (!is_power_of_2(lim->physical_block_size)) {
+>> +        pr_warn("Invalid physical block size (%d)\n", lim- 
+>> >physical_block_size);
+>> +        return -EINVAL;
+>> +    }
+>>       /*
+>>        * The minimum I/O size defaults to the physical block size unless
+> 
+> Why not calling 'blk_validate_block_size()' here?
 
-These changes improve readability and follow kernel coding style guidelines.
+blk_validate_block_size() enforces that that size cannot be greater than 
+64K - does such a limit exist for the physical block size?
 
-Reviewed-by: Manish Narani <manish.narani@siqol.com>
+Incidentally blk_validate_block_size() also checks that the size is not 
+less then SECTOR_SIZE, which would never be true in 
+blk_validate_limits() for the physical block size. But duplicating such 
+a check is not a huge deal.
 
-Signed-off-by: Dishank Jogi <dishank.jogi@siqol.com>
----
- block/partitions/efi.c | 153 +++++++++++++++++++++--------------------
- 1 file changed, 80 insertions(+), 73 deletions(-)
-
-diff --git a/block/partitions/efi.c b/block/partitions/efi.c
-index 7acba66eed48..c821ad07a80c 100644
---- a/block/partitions/efi.c
-+++ b/block/partitions/efi.c
-@@ -23,7 +23,7 @@
-  * - Ported to 2.5.7-pre1 and 2.5.7-dj2
-  * - Applied patch to avoid fault in alternate header handling
-  * - cleaned up find_valid_gpt
-- * - On-disk structure and copy in memory is *always* LE now - 
-+ * - On-disk structure and copy in memory is *always* LE now -
-  *   swab fields as needed
-  * - remove print_gpt_header()
-  * - only use first max_p partition entries, to keep the kernel minor number
-@@ -40,7 +40,7 @@
-  * - moved le_efi_guid_to_cpus() back into this file.  GPT is the only
-  *   thing that keeps EFI GUIDs on disk.
-  * - Changed gpt structure names and members to be simpler and more Linux-like.
-- * 
-+ *
-  * Wed Oct 17 2001 Matt Domsch <Matt_Domsch@dell.com>
-  * - Removed CONFIG_DEVFS_VOLUMES_UUID code entirely per Martin Wilck
-  *
-@@ -65,7 +65,7 @@
-  *
-  * Wed Jun  6 2001 Martin Wilck <Martin.Wilck@Fujitsu-Siemens.com>
-  * - added devfs volume UUID support (/dev/volumes/uuids) for
-- *   mounting file systems by the partition GUID. 
-+ *   mounting file systems by the partition GUID.
-  *
-  * Tue Dec  5 2000 Matt Domsch <Matt_Domsch@dell.com>
-  * - Moved crc32() to linux/lib, added efi_crc32().
-@@ -110,7 +110,7 @@ __setup("gpt", force_gpt_fn);
-  * @len: length of buf
-  *
-  * Description: Returns EFI-style CRC32 value for @buf
-- * 
-+ *
-  * This function uses the little endian Ethernet polynomial
-  * but seeds the function with ~0, and xor's with ~0 at the end.
-  * Note, the EFI Specification, v1.02, has a reference to
-@@ -125,7 +125,7 @@ efi_crc32(const void *buf, unsigned long len)
- /**
-  * last_lba(): return number of last logical block of device
-  * @disk: block device
-- * 
-+ *
-  * Description: Returns last LBA value on success, 0 on error.
-  * This is stored (by sd and ide-geometry) in
-  *  the part[0] entry for this disk, and is the number of
-@@ -240,12 +240,13 @@ static size_t read_lba(struct parsed_partitions *state,
- 		(queue_logical_block_size(state->disk->queue) / 512);
- 
- 	if (!buffer || lba > last_lba(state->disk))
--                return 0;
-+		return 0;
- 
- 	while (count) {
- 		int copied = 512;
- 		Sector sect;
- 		unsigned char *data = read_part_sector(state, n++, &sect);
-+
- 		if (!data)
- 			break;
- 		if (copied > count)
-@@ -253,7 +254,7 @@ static size_t read_lba(struct parsed_partitions *state,
- 		memcpy(buffer, data, copied);
- 		put_dev_sector(sect);
- 		buffer += copied;
--		totalreadcount +=copied;
-+		totalreadcount += copied;
- 		count -= copied;
- 	}
- 	return totalreadcount;
-@@ -263,7 +264,7 @@ static size_t read_lba(struct parsed_partitions *state,
-  * alloc_read_gpt_entries(): reads partition entries from disk
-  * @state: disk parsed partitions
-  * @gpt: GPT header
-- * 
-+ *
-  * Description: Returns ptes on success,  NULL on error.
-  * Allocates space for PTEs based on information found in @gpt.
-  * Notes: remember to free pte when you're done!
-@@ -278,7 +279,7 @@ static gpt_entry *alloc_read_gpt_entries(struct parsed_partitions *state,
- 		return NULL;
- 
- 	count = (size_t)le32_to_cpu(gpt->num_partition_entries) *
--                le32_to_cpu(gpt->sizeof_partition_entry);
-+		le32_to_cpu(gpt->sizeof_partition_entry);
- 	if (!count)
- 		return NULL;
- 	pte = kmalloc(count, GFP_KERNEL);
-@@ -288,7 +289,7 @@ static gpt_entry *alloc_read_gpt_entries(struct parsed_partitions *state,
- 	if (read_lba(state, le64_to_cpu(gpt->partition_entry_lba),
- 			(u8 *) pte, count) < count) {
- 		kfree(pte);
--                pte=NULL;
-+		pte = NULL;
- 		return NULL;
- 	}
- 	return pte;
-@@ -298,7 +299,7 @@ static gpt_entry *alloc_read_gpt_entries(struct parsed_partitions *state,
-  * alloc_read_gpt_header(): Allocates GPT header, reads into it from disk
-  * @state: disk parsed partitions
-  * @lba: the Logical Block Address of the partition table
-- * 
-+ *
-  * Description: returns GPT header on success, NULL on error.   Allocates
-  * and fills a GPT header starting at @ from @state->disk.
-  * Note: remember to free gpt when finished with it.
-@@ -307,7 +308,7 @@ static gpt_header *alloc_read_gpt_header(struct parsed_partitions *state,
- 					 u64 lba)
- {
- 	gpt_header *gpt;
--	unsigned ssz = queue_logical_block_size(state->disk->queue);
-+	unsigned int ssz = queue_logical_block_size(state->disk->queue);
- 
- 	gpt = kmalloc(ssz, GFP_KERNEL);
- 	if (!gpt)
-@@ -315,7 +316,7 @@ static gpt_header *alloc_read_gpt_header(struct parsed_partitions *state,
- 
- 	if (read_lba(state, lba, (u8 *) gpt, ssz) < ssz) {
- 		kfree(gpt);
--                gpt=NULL;
-+		gpt = NULL;
- 		return NULL;
- 	}
- 
-@@ -340,7 +341,8 @@ static int is_gpt_valid(struct parsed_partitions *state, u64 lba,
- 
- 	if (!ptes)
- 		return 0;
--	if (!(*gpt = alloc_read_gpt_header(state, lba)))
-+	*gpt = alloc_read_gpt_header(state, lba);
-+	if (!*gpt)
- 		return 0;
- 
- 	/* Check the GUID Partition Table signature */
-@@ -427,7 +429,8 @@ static int is_gpt_valid(struct parsed_partitions *state, u64 lba,
- 		goto fail;
- 	}
- 
--	if (!(*ptes = alloc_read_gpt_entries(state, *gpt)))
-+	*ptes = alloc_read_gpt_entries(state, *gpt);
-+	if (!*ptes)
- 		goto fail;
- 
- 	/* Check the GUID Partition Entry Array CRC */
-@@ -475,69 +478,74 @@ is_pte_valid(const gpt_entry *pte, const u64 lastlba)
-  *
-  * Description: Returns nothing.  Sanity checks pgpt and agpt fields
-  * and prints warnings on discrepancies.
-- * 
-+ *
-  */
- static void
- compare_gpts(gpt_header *pgpt, gpt_header *agpt, u64 lastlba)
- {
- 	int error_found = 0;
-+
- 	if (!pgpt || !agpt)
- 		return;
-+
- 	if (le64_to_cpu(pgpt->my_lba) != le64_to_cpu(agpt->alternate_lba)) {
- 		pr_warn("GPT:Primary header LBA != Alt. header alternate_lba\n");
- 		pr_warn("GPT:%lld != %lld\n",
--		       (unsigned long long)le64_to_cpu(pgpt->my_lba),
--                       (unsigned long long)le64_to_cpu(agpt->alternate_lba));
-+			(unsigned long long)le64_to_cpu(pgpt->my_lba),
-+			(unsigned long long)le64_to_cpu(agpt->alternate_lba));
- 		error_found++;
- 	}
- 	if (le64_to_cpu(pgpt->alternate_lba) != le64_to_cpu(agpt->my_lba)) {
- 		pr_warn("GPT:Primary header alternate_lba != Alt. header my_lba\n");
- 		pr_warn("GPT:%lld != %lld\n",
--		       (unsigned long long)le64_to_cpu(pgpt->alternate_lba),
--                       (unsigned long long)le64_to_cpu(agpt->my_lba));
-+			(unsigned long long)le64_to_cpu(pgpt->alternate_lba),
-+			(unsigned long long)le64_to_cpu(agpt->my_lba));
- 		error_found++;
- 	}
-+
- 	if (le64_to_cpu(pgpt->first_usable_lba) !=
--            le64_to_cpu(agpt->first_usable_lba)) {
-+		le64_to_cpu(agpt->first_usable_lba)) {
- 		pr_warn("GPT:first_usable_lbas don't match.\n");
- 		pr_warn("GPT:%lld != %lld\n",
--		       (unsigned long long)le64_to_cpu(pgpt->first_usable_lba),
--                       (unsigned long long)le64_to_cpu(agpt->first_usable_lba));
-+			(unsigned long long)le64_to_cpu(pgpt->first_usable_lba),
-+			(unsigned long long)le64_to_cpu(agpt->first_usable_lba));
- 		error_found++;
- 	}
-+
- 	if (le64_to_cpu(pgpt->last_usable_lba) !=
--            le64_to_cpu(agpt->last_usable_lba)) {
-+		le64_to_cpu(agpt->last_usable_lba)) {
- 		pr_warn("GPT:last_usable_lbas don't match.\n");
- 		pr_warn("GPT:%lld != %lld\n",
--		       (unsigned long long)le64_to_cpu(pgpt->last_usable_lba),
--                       (unsigned long long)le64_to_cpu(agpt->last_usable_lba));
-+		(unsigned long long)le64_to_cpu(pgpt->last_usable_lba),
-+		(unsigned long long)le64_to_cpu(agpt->last_usable_lba));
- 		error_found++;
- 	}
- 	if (efi_guidcmp(pgpt->disk_guid, agpt->disk_guid)) {
- 		pr_warn("GPT:disk_guids don't match.\n");
- 		error_found++;
- 	}
--	if (le32_to_cpu(pgpt->num_partition_entries) !=
--            le32_to_cpu(agpt->num_partition_entries)) {
-+	if (le32_to_cpu(pgpt->num_partition_entries)
-+			!= le32_to_cpu(agpt->num_partition_entries)) {
- 		pr_warn("GPT:num_partition_entries don't match: "
--		       "0x%x != 0x%x\n",
--		       le32_to_cpu(pgpt->num_partition_entries),
--		       le32_to_cpu(agpt->num_partition_entries));
-+		"0x%x != 0x%x\n",
-+		le32_to_cpu(pgpt->num_partition_entries),
-+		le32_to_cpu(agpt->num_partition_entries));
- 		error_found++;
- 	}
-+
- 	if (le32_to_cpu(pgpt->sizeof_partition_entry) !=
--            le32_to_cpu(agpt->sizeof_partition_entry)) {
--		pr_warn("GPT:sizeof_partition_entry values don't match: "
-+			le32_to_cpu(agpt->sizeof_partition_entry)) {
-+			pr_warn("GPT:sizeof_partition_entry values don't match: "
- 		       "0x%x != 0x%x\n",
--                       le32_to_cpu(pgpt->sizeof_partition_entry),
-+		       le32_to_cpu(pgpt->sizeof_partition_entry),
- 		       le32_to_cpu(agpt->sizeof_partition_entry));
- 		error_found++;
- 	}
- 	if (le32_to_cpu(pgpt->partition_entry_array_crc32) !=
--            le32_to_cpu(agpt->partition_entry_array_crc32)) {
-+			le32_to_cpu(agpt->partition_entry_array_crc32)) {
- 		pr_warn("GPT:partition_entry_array_crc32 values don't match: "
- 		       "0x%x != 0x%x\n",
--                       le32_to_cpu(pgpt->partition_entry_array_crc32),
-+		       le32_to_cpu(pgpt->partition_entry_array_crc32),
- 		       le32_to_cpu(agpt->partition_entry_array_crc32));
- 		error_found++;
- 	}
-@@ -559,7 +567,6 @@ compare_gpts(gpt_header *pgpt, gpt_header *agpt, u64 lastlba)
- 
- 	if (error_found)
- 		pr_warn("GPT: Use GNU Parted to correct GPT errors.\n");
--	return;
- }
- 
- /**
-@@ -594,8 +601,8 @@ static int find_valid_gpt(struct parsed_partitions *state, gpt_header **gpt,
- 		return 0;
- 
- 	lastlba = last_lba(state->disk);
--        if (!force_gpt) {
--		/* This will be added to the EFI Spec. per Intel after v1.02. */
-+	if (!force_gpt) {
-+	/* This will be added to the EFI Spec. per Intel after v1.02. */
- 		legacymbr = kzalloc(sizeof(*legacymbr), GFP_KERNEL);
- 		if (!legacymbr)
- 			goto fail;
-@@ -614,12 +621,13 @@ static int find_valid_gpt(struct parsed_partitions *state, gpt_header **gpt,
- 
- 	good_pgpt = is_gpt_valid(state, GPT_PRIMARY_PARTITION_TABLE_LBA,
- 				 &pgpt, &pptes);
--        if (good_pgpt)
-+	if (good_pgpt)
- 		good_agpt = is_gpt_valid(state,
--					 le64_to_cpu(pgpt->alternate_lba),
--					 &agpt, &aptes);
--        if (!good_agpt && force_gpt)
--                good_agpt = is_gpt_valid(state, lastlba, &agpt, &aptes);
-+					le64_to_cpu(pgpt->alternate_lba),
-+					&agpt, &aptes);
-+
-+	if (!good_agpt && force_gpt)
-+		good_agpt = is_gpt_valid(state, lastlba, &agpt, &aptes);
- 
- 	if (!good_agpt && force_gpt && fops->alternative_gpt_sector) {
- 		sector_t agpt_sector;
-@@ -631,39 +639,38 @@ static int find_valid_gpt(struct parsed_partitions *state, gpt_header **gpt,
- 						 &agpt, &aptes);
- 	}
- 
--        /* The obviously unsuccessful case */
--        if (!good_pgpt && !good_agpt)
--                goto fail;
-+	/* The obviously unsuccessful case */
-+	if (!good_pgpt && !good_agpt)
-+		goto fail;
- 
--        compare_gpts(pgpt, agpt, lastlba);
-+	compare_gpts(pgpt, agpt, lastlba);
- 
--        /* The good cases */
--        if (good_pgpt) {
--                *gpt  = pgpt;
--                *ptes = pptes;
--                kfree(agpt);
--                kfree(aptes);
-+	/* The good cases */
-+	if (good_pgpt) {
-+		*gpt  = pgpt;
-+		*ptes = pptes;
-+		kfree(agpt);
-+		kfree(aptes);
- 		if (!good_agpt)
--                        pr_warn("Alternate GPT is invalid, using primary GPT.\n");
--                return 1;
--        }
--        else if (good_agpt) {
--                *gpt  = agpt;
--                *ptes = aptes;
--                kfree(pgpt);
--                kfree(pptes);
-+			pr_warn("Alternate GPT is invalid, using primary GPT.\n");
-+		return 1;
-+	} else if (good_agpt) {
-+		*gpt  = agpt;
-+		*ptes = aptes;
-+		kfree(pgpt);
-+		kfree(pptes);
- 		pr_warn("Primary GPT is invalid, using alternate GPT.\n");
--                return 1;
--        }
-+		return 1;
-+	}
- 
-  fail:
--        kfree(pgpt);
--        kfree(agpt);
--        kfree(pptes);
--        kfree(aptes);
--        *gpt = NULL;
--        *ptes = NULL;
--        return 0;
-+	kfree(pgpt);
-+	kfree(agpt);
-+	kfree(pptes);
-+	kfree(aptes);
-+	*gpt = NULL;
-+	*ptes = NULL;
-+	return 0;
- }
- 
- /**
-@@ -715,7 +722,7 @@ int efi_partition(struct parsed_partitions *state)
- 	gpt_header *gpt = NULL;
- 	gpt_entry *ptes = NULL;
- 	u32 i;
--	unsigned ssz = queue_logical_block_size(state->disk->queue) / 512;
-+	unsigned int ssz = queue_logical_block_size(state->disk->queue) / 512;
- 
- 	if (!find_valid_gpt(state, &gpt, &ptes) || !gpt || !ptes) {
- 		kfree(gpt);
-@@ -727,7 +734,7 @@ int efi_partition(struct parsed_partitions *state)
- 
- 	for (i = 0; i < le32_to_cpu(gpt->num_partition_entries) && i < state->limit-1; i++) {
- 		struct partition_meta_info *info;
--		unsigned label_max;
-+		unsigned int label_max;
- 		u64 start = le64_to_cpu(ptes[i].starting_lba);
- 		u64 size = le64_to_cpu(ptes[i].ending_lba) -
- 			   le64_to_cpu(ptes[i].starting_lba) + 1ULL;
--- 
-2.25.1
+Thanks,
+John
 
