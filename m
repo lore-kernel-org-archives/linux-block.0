@@ -1,42 +1,41 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEFCD279DDF
-	for <linux-block@vger.kernel.org>; Wed, 23 Jul 2025 11:24:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62D5B28C5A5
+	for <linux-block@vger.kernel.org>; Wed, 23 Jul 2025 11:25:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753269887; cv=none; b=tYCRjSzLettZtk3OVEDhdzmWbU1fakhf+UAQWjXnsEQRJNqAYZaKm0qf4zHVQuZ+XzAmojA2KV96kmx3I+vupCe2gihU8kdkGRlh1v6t+o0g9DWZ6ioCSYfz4ehs+cgKZbV5ifnIexroLdWGFI2oVGnFJYubYG/q0BK2ZFShRDQ=
+	t=1753269945; cv=none; b=caLJx8/87pWL9QwOgW9Dmc/SZiPYz7nh5L2lowRhCyGxF78ljS4mXdFRsRAci+bivg2ClkLHwFMSGO0aYbwQIPACNQ1igcaLQ869CQNuOpZV0npDIrso9SG/KEQlbFXvvwYP5b5XjGbinPjir9SKjXiFwOQ/NN7c1blvrpf4rG8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753269887; c=relaxed/simple;
-	bh=ltbN6s7Tmo2BYFYRumKAtVqby7x25UOvdcAzEdEvrrM=;
+	s=arc-20240116; t=1753269945; c=relaxed/simple;
+	bh=viBfvw0b+o5LAMCwnd67+2wCsa0i9NjH8GcHO0QLknc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pleKt4YTo2qnvDzu+/9yxsRoFCcuzB7De9I1hrYqecwas4eVGWOW8fGd5xuLJmBciu4XJTYI0w8wnZkNOJ8P+sMxffwwYOfDYYDXSOFOU9BnkmwFS4+8wItRKWNgnW/TNURQEke3gZxAYXertUXOoz1YH9qJzBbVbqhw+P88nzE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WeUisogG; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=f/X+HThjA/E/2/bXyDBFLxm4imb6r0tOm7Y00fPwMy3l/X428UmkSgYkEN42/2PT+fAJdid3BkG38wjpgfTiAcv+RuPseCCKMkm5dAjKfQBsBO3z8piGJis9yAvX2atI5l1WhhQdWCfXYHRB6EaZh+OMBSHPErN8QiZBZQEsHkY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RLTi8G/N; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WeUisogG"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B176C4CEF5;
-	Wed, 23 Jul 2025 11:24:44 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RLTi8G/N"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D349EC4CEF6;
+	Wed, 23 Jul 2025 11:25:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753269887;
-	bh=ltbN6s7Tmo2BYFYRumKAtVqby7x25UOvdcAzEdEvrrM=;
+	s=k20201202; t=1753269943;
+	bh=viBfvw0b+o5LAMCwnd67+2wCsa0i9NjH8GcHO0QLknc=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=WeUisogGCFbSpgwfIcb9F6sTAopnZ357HCljwKM9e0BtZ4vqBunvi95gVakKGr4tV
-	 vdJXdiEYPAy5Kw1k2iTcN0fayB49+LBlvgsR/2m16HcBOTGj0/dVfJx2SZ0tyR9b0/
-	 msNIDVNV3Z/ac+DHDORktiukq2ER6mYXD1Gf29P4hwDx2xZIpxjuVVbbCHoMv7eF5G
-	 c5yoGJS4yq/94dlsfRJbpPPC538FUaNR7sZYU5Hf4PJyRKmGg96SfmbWkEW4eWwnnc
-	 A77Ef9aMQj1/H05/d2ZoxLGA5/5GAz1tqij1VZQFLf/FmIjhyUJJVKxOo6hznXnyS4
-	 pXpmNjw0RUXPw==
-Date: Wed, 23 Jul 2025 19:24:40 +0800
+	b=RLTi8G/NwtDfWzyubzKlv+AgWjaBFLk9YDoox2l/rLbgce+/oESHAZFJm4hHaGt6K
+	 XE8DKiAON5oKtoiQLANc/L4ldMQ347by6GkTVqmk1ySekc5Q79lNV9zTsV9RY6p3d+
+	 YhyKPLpcHCkViEtWPj1BHONf5vu0np0FO5KUYsTW2pCJvxTf4gquapLJLdVsx3G0U7
+	 upfMZWLDfoIwPTLCyuGQa/FuuNckj+sOTEliFYDTEkiDXFpxk17RXykWq1p5evPtMw
+	 4PhCZIGbtCKAeL4Y0Tqy9Rrd0iUwTsH60TfT4paDp8yAgVEBdBrdcJ63a/FveDUqn8
+	 HJ9Tmbxd17Z1A==
+Date: Wed, 23 Jul 2025 19:25:36 +0800
 From: Coly Li <colyli@kernel.org>
 To: Bart Van Assche <bvanassche@acm.org>
 Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
-	Christoph Hellwig <hch@lst.de>, Kent Overstreet <kent.overstreet@linux.dev>, 
-	Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>, 
-	Kent Overstreet <koverstreet@google.com>
-Subject: Re: [PATCH 3/5] bcache, tracing: Do not truncate orig_sector
-Message-ID: <6qwngbewg6exkavqy764j2mfjaqgb3gu2ijh4urhz3ailxmmv4@slhnftlxhwhe>
+	Christoph Hellwig <hch@lst.de>, Steven Rostedt <rostedt@goodmis.org>, 
+	Masami Hiramatsu <mhiramat@kernel.org>
+Subject: Re: [PATCH 4/5] bcache, tracing: Remove superfluous casts
+Message-ID: <6lyettjmfycegqwh5vs5k2d4gbigeljnw7tdllezctpoi5i554@l2zzodakdi54>
 References: <20250715165249.1024639-1-bvanassche@acm.org>
- <20250715165249.1024639-4-bvanassche@acm.org>
+ <20250715165249.1024639-5-bvanassche@acm.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -45,14 +44,13 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250715165249.1024639-4-bvanassche@acm.org>
+In-Reply-To: <20250715165249.1024639-5-bvanassche@acm.org>
 
-On Tue, Jul 15, 2025 at 09:52:37AM +0800, Bart Van Assche wrote:
-> Change the type of orig_sector from dev_t (unsigned int) into sector_t (u64)
-> to prevent truncation of orig_sector by the tracing code.
+On Tue, Jul 15, 2025 at 09:52:38AM +0800, Bart Van Assche wrote:
+> sector_t is a synonym for u64 and all architectures define u64 as unsigned
+> long long. Hence, it is not necessary to cast type sector_t to unsigned
+> long long. Remove the superfluous casts to improve compile-time type checking.
 > 
-> Cc: Kent Overstreet <kent.overstreet@linux.dev>
-> Fixes: cafe56359144 ("bcache: A block layer cache")
 > Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 
 Acked-by: Coly Li <colyli@kernel.org>
@@ -62,20 +60,60 @@ Thanks.
 Coly Li
 
 > ---
->  include/trace/events/bcache.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  include/trace/events/bcache.h | 13 ++++++-------
+>  1 file changed, 6 insertions(+), 7 deletions(-)
 > 
 > diff --git a/include/trace/events/bcache.h b/include/trace/events/bcache.h
-> index 899fdacf57b9..d0eee403dc15 100644
+> index d0eee403dc15..697e0f80d17c 100644
 > --- a/include/trace/events/bcache.h
 > +++ b/include/trace/events/bcache.h
-> @@ -16,7 +16,7 @@ DECLARE_EVENT_CLASS(bcache_request,
->  		__field(unsigned int,	orig_major		)
->  		__field(unsigned int,	orig_minor		)
->  		__field(sector_t,	sector			)
-> -		__field(dev_t,		orig_sector		)
-> +		__field(sector_t,	orig_sector		)
->  		__field(unsigned int,	nr_sector		)
->  		__array(char,		rwbs,	6		)
->  	),
+> @@ -33,9 +33,9 @@ DECLARE_EVENT_CLASS(bcache_request,
+>  
+>  	TP_printk("%d,%d %s %llu + %u (from %d,%d @ %llu)",
+>  		  MAJOR(__entry->dev), MINOR(__entry->dev),
+> -		  __entry->rwbs, (unsigned long long)__entry->sector,
+> +		  __entry->rwbs, __entry->sector,
+>  		  __entry->nr_sector, __entry->orig_major, __entry->orig_minor,
+> -		  (unsigned long long)__entry->orig_sector)
+> +		  __entry->orig_sector)
+>  );
+>  
+>  DECLARE_EVENT_CLASS(bkey,
+> @@ -107,7 +107,7 @@ DECLARE_EVENT_CLASS(bcache_bio,
+>  
+>  	TP_printk("%d,%d  %s %llu + %u",
+>  		  MAJOR(__entry->dev), MINOR(__entry->dev), __entry->rwbs,
+> -		  (unsigned long long)__entry->sector, __entry->nr_sector)
+> +		  __entry->sector, __entry->nr_sector)
+>  );
+>  
+>  DEFINE_EVENT(bcache_bio, bcache_bypass_sequential,
+> @@ -144,7 +144,7 @@ TRACE_EVENT(bcache_read,
+>  
+>  	TP_printk("%d,%d  %s %llu + %u hit %u bypass %u",
+>  		  MAJOR(__entry->dev), MINOR(__entry->dev),
+> -		  __entry->rwbs, (unsigned long long)__entry->sector,
+> +		  __entry->rwbs, __entry->sector,
+>  		  __entry->nr_sector, __entry->cache_hit, __entry->bypass)
+>  );
+>  
+> @@ -175,7 +175,7 @@ TRACE_EVENT(bcache_write,
+>  
+>  	TP_printk("%pU inode %llu  %s %llu + %u hit %u bypass %u",
+>  		  __entry->uuid, __entry->inode,
+> -		  __entry->rwbs, (unsigned long long)__entry->sector,
+> +		  __entry->rwbs, __entry->sector,
+>  		  __entry->nr_sector, __entry->writeback, __entry->bypass)
+>  );
+>  
+> @@ -243,8 +243,7 @@ TRACE_EVENT(bcache_journal_write,
+>  
+>  	TP_printk("%d,%d  %s %llu + %u keys %u",
+>  		  MAJOR(__entry->dev), MINOR(__entry->dev), __entry->rwbs,
+> -		  (unsigned long long)__entry->sector, __entry->nr_sector,
+> -		  __entry->nr_keys)
+> +		  __entry->sector, __entry->nr_sector, __entry->nr_keys)
+>  );
+>  
+>  /* Btree */
 > 
