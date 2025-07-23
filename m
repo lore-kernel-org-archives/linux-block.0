@@ -1,65 +1,65 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D04CB28751F
-	for <linux-block@vger.kernel.org>; Wed, 23 Jul 2025 13:45:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36F6B2E7F1F
+	for <linux-block@vger.kernel.org>; Wed, 23 Jul 2025 13:45:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753278317; cv=none; b=XLSYFrHwV2u2aYVZVMr8atk+eeWJBRvIGmLxeUCpBTsX62Wojvv57cusDjCu4RcliFmRICQy/ymFGi1eU1/d83Ad59Fad9fF7RJWZXpT7jt9pEiHHNPjePdv/Gk70vc/uJTYzgdJTpqWcIiKiP2HAN76OqIgUxbvvbdFjuFB8eU=
+	t=1753278323; cv=none; b=Ju9Sg7z68QbBL6rWerU7jb77iy5xT0chVAPBi/WtPqWlobk5WZHz2kaYrOd3n+4kFjI5h2N7RRZnMiIvVWVqmrtDFyJL1YZBBu6ZCZ9ejmMVVE/x/XPfg2rQbWTOl0igddGedb5J0rwxsm3+65UzMVYYGdyrdgTR2Znpbt7xH5M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753278317; c=relaxed/simple;
-	bh=8G/jbtxc/a+hCWlL52xrZaXySVIHMvuhnLKUb0RWsS8=;
+	s=arc-20240116; t=1753278323; c=relaxed/simple;
+	bh=cIdFuBn2qXNafq3iQFinlHaROviwHUZu51bXkrQ5E7s=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=W3oqLYxPe7oyymv9eEXCbHOzMStS7eOMFgXVEDoMssXnQ9gAowE/zOCxCNpf6WaXfLFvqOAjVZP0O5np7qEdjeuBNJy1VsOVJJegjojr/gp+Cq32vgfrpMBe07S0YLy5De7VieeprzR/3v6jwnRMIIEr1UJdoN4LvuRBAsW8QtA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=HTt1TO48; arc=none smtp.client-ip=148.163.158.5
+	 MIME-Version; b=PEKEyQq/hEKBnUDuC1G5PJqk7T6ip6c4AYHG2wlHx/Mm97YN0WoypTxNXBUo+Wb55YxkxBQmRQLf8qfykNTicjL/nwYWn8dH383VIjfXNGY75B9tiG/a46JCX73Vy69y/ruJcZg2Q93+dbNvqiJHyVlm8c1nPNNHNBzmYgYDQo4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=fkDk5r0s; arc=none smtp.client-ip=148.163.156.1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="HTt1TO48"
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56N6Ys0G015888;
-	Wed, 23 Jul 2025 13:44:53 GMT
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="fkDk5r0s"
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56N9EXpS028810;
+	Wed, 23 Jul 2025 13:44:59 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=4wg8/rVLaHOcbggAD
-	7sISYXz+84PDhrHy0F7yQ+IZ2E=; b=HTt1TO48T5hXSuSVBlHDABZUkXZPbxkzB
-	0fEaBLVjA2saV4oXrhiuMiBVALf09wl6I3fJoT1Mj8XJBD6MgldRm9jH0fzmQdWI
-	MWB/YjzwbnMfEQOu9jHUbF/Kgy22I0a46cGPzZ3O3sY5vmqRrH6GkCJuk8GIlwB5
-	bSojdK2Obm2YlDCKTyWcCdIe91XEeCYKD2lCcCI0tWU5TZFeFc+v3BJDNJILk5Y+
-	JxvLmaQmT8lrpFNjPzCxP80vukr2NFD/3jJo1MS/WWUZx/k5YQj7uE6dFwB+KNny
-	VVY67guQX5Z/0woLiXcnUN0gslbwKyMf85dQBzQSNiToFkgntoNjg==
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 482ff651uv-1
+	:mime-version:references:subject:to; s=pp1; bh=RkkVl0Xe7hFUpHB02
+	YyvakwjQx3PpP2UOr/tWECmHAE=; b=fkDk5r0sA7qzRUj3DsSORPnM+5BSA4Xvt
+	PcbZQ/3Q6vPbE1YIE+9v9VL7LOTibvs+6bAd9L+WtBngQ9dWaM66kS8WjDpgWKA0
+	zbCkClZVPcUQKPjQWvWXoxZqcaD0JHW79sUuavr5q28hshWd9ofNXMXpYdKkHDYM
+	MJyaaUlWCPxYSNjaoKn7wofaLlZnWT96NVlPS8AWUSjOdAjdf0UsgVMWXDG1nu/i
+	sL9P4wg+4+lNN3o4XmxvYw4L3S8h0q6t0hf7QAsQrwy/U/Cn0raTqTF5jN77r/LY
+	vDkchO1p9AFjwhLMobzaiaZgunD4O/qycjF5AN3uhdbZzQNVGNevQ==
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 482kdyktsd-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 23 Jul 2025 13:44:52 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 56NB5vAo024960;
-	Wed, 23 Jul 2025 13:44:52 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 480nptr6uh-1
+	Wed, 23 Jul 2025 13:44:58 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 56NCcT38004735;
+	Wed, 23 Jul 2025 13:44:57 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 480u8fy6we-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 23 Jul 2025 13:44:51 +0000
+	Wed, 23 Jul 2025 13:44:57 +0000
 Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 56NDioPB19530058
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 56NDis8G27918758
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 23 Jul 2025 13:44:50 GMT
+	Wed, 23 Jul 2025 13:44:54 GMT
 Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3F2162005A;
+	by IMSVA (Postfix) with ESMTP id 0F7D720040;
+	Wed, 23 Jul 2025 13:44:54 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id ACD762004B;
 	Wed, 23 Jul 2025 13:44:50 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6DBFE2004F;
-	Wed, 23 Jul 2025 13:44:47 +0000 (GMT)
 Received: from li-c9696b4c-3419-11b2-a85c-f9edc3bf8a84.ibm.com.com (unknown [9.43.41.196])
 	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 23 Jul 2025 13:44:47 +0000 (GMT)
+	Wed, 23 Jul 2025 13:44:50 +0000 (GMT)
 From: Nilay Shroff <nilay@linux.ibm.com>
 To: linux-block@vger.kernel.org
 Cc: hch@lst.de, dlemoal@kernel.org, yukuai1@huaweicloud.com, hare@suse.de,
         ming.lei@redhat.com, axboe@kernel.dk, johannes.thumshirn@wdc.com,
         gjoyce@ibm.com
-Subject: [PATCHv3 1/2] lib/sbitmap: fix kernel crash observed when sbitmap depth is zero
-Date: Wed, 23 Jul 2025 19:13:54 +0530
-Message-ID: <20250723134442.1283664-2-nilay@linux.ibm.com>
+Subject: [PATCHv3 2/2] null_blk: prevent submit and poll queues update for shared tagset
+Date: Wed, 23 Jul 2025 19:13:55 +0530
+Message-ID: <20250723134442.1283664-3-nilay@linux.ibm.com>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <20250723134442.1283664-1-nilay@linux.ibm.com>
 References: <20250723134442.1283664-1-nilay@linux.ibm.com>
@@ -71,96 +71,102 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzIzMDExNyBTYWx0ZWRfXw4Cmyts+URbR
- 8XrNkxIbMLilc4qBkTwkxxsTZMFD6HgMR/Je9WkpOhxOgl5iIkvkj6M+mJMRXeVpiqDuw5DUkmo
- u4zqgqKReQT2DzTXkm5vOn+g04nd8UNi1Dl9BpTusefPAmNFeGzqtb9O6A297NiJtoRrw67S3yl
- CvToHJGxrwc6IM0rtGWUor91hHRvhsDEOn6QAfm35lD9XkPbdb1MBgKglDhCIJHaoxFJ9UCv3Qd
- oPrkHIYiZsSfHaAa1W/XnSDKE1vTr+A/WPFnTHYHvaaMuimge7hcn2LLN+sU/OvfmLf25UtuSn8
- hx/QcLCu9yIv4KijrTzVUxFj/fbFit/4TOzKKCcepuAu+llZOpGfdh0RW9gfcAPZJQdMgBXm0aO
- SoGOobKtChZhiAtqiXZHA3Mkyv79JejoT2fx0As/oG4tKsxNM/cfXrkg+xX0WHJeiCVGbsIE
-X-Proofpoint-ORIG-GUID: tXscNBYCotcz797X2HURRWacBthEPN4A
-X-Proofpoint-GUID: tXscNBYCotcz797X2HURRWacBthEPN4A
-X-Authority-Analysis: v=2.4 cv=TtbmhCXh c=1 sm=1 tr=0 ts=6880e754 cx=c_pps
- a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
- a=Wb1JkmetP80A:10 a=VwQbUJbxAAAA:8 a=VnNF1IyMAAAA:8 a=ROuT8l1ZTOG_tuEbkxEA:9
+X-Proofpoint-ORIG-GUID: OPc8qNm_iu51YbVApzunDMRLsl3gO_iY
+X-Authority-Analysis: v=2.4 cv=XP0wSRhE c=1 sm=1 tr=0 ts=6880e75a cx=c_pps
+ a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
+ a=Wb1JkmetP80A:10 a=VnNF1IyMAAAA:8 a=HfARY0vCpeR-NTxWe5oA:9
+X-Proofpoint-GUID: OPc8qNm_iu51YbVApzunDMRLsl3gO_iY
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzIzMDExNyBTYWx0ZWRfX9vJ1gCSOnLiK
+ PYqmxp7yv6poR2QI2OkTdhx397GxvWILN7niPW6ynHiJdrjPKF5RQqIJv4k9dCHKzbxm0IA1mMv
+ Zj9iaXqGehiVok7Z45DXZ3RHb77ywSCc49o1DaQGGkmC4DNJs7Ga1R175N0h7loqK1d0ATrj/Pt
+ vO93qePAWElwxXc9TpI0n/44IPvq/FlkEvLE/UCci5rZYkL+vRW8EcSL426IZ/uy9IpuA89AODK
+ w42HVYmV5+fPFMWHyXcmg76Nkhfw7iUxNPYkQcXwNDmSpBi3HnrJMAN8HjUoxylTz35zhx7up/r
+ 4+o0Wpm1e+R4yBQWmq3bIXjTrj08GbTDT/4Enfxm18K16XbPzMCE1JzUBiqLAYkYg50U0bu/Q6o
+ MRZaooHhneJvVno04inj2mtPixDMRM3ifGkemcrhNhmKsCW/ZJBs19Wxhn+braMWES26hIFw
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
  definitions=2025-07-23_02,2025-07-22_01,2025-03-28_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- mlxlogscore=529 suspectscore=0 impostorscore=0 malwarescore=0
- priorityscore=1501 clxscore=1015 mlxscore=0 lowpriorityscore=0 spamscore=0
- adultscore=0 phishscore=0 bulkscore=0 classifier=spam authscore=0 authtc=n/a
- authcc= route=outbound adjust=0 reason=mlx scancount=1
+ mlxscore=0 bulkscore=0 priorityscore=1501 mlxlogscore=840 spamscore=0
+ suspectscore=0 clxscore=1015 malwarescore=0 impostorscore=0
+ lowpriorityscore=0 adultscore=0 phishscore=0 classifier=spam authscore=0
+ authtc=n/a authcc= route=outbound adjust=0 reason=mlx scancount=1
  engine=8.19.0-2505280000 definitions=main-2507230117
 
-We observed a kernel crash when the I/O scheduler allocates an sbitmap
-for a hardware queue (hctx) that has no associated software queues (ctx),
-and later attempts to free it. When no software queues are mapped to a
-hardware queue, the sbitmap is initialized with a depth of zero. In such
-cases, the sbitmap_init_node() function should set sb->alloc_hint to NULL.
-However, if this is not done, sb->alloc_hint may contain garbage, and
-calling sbitmap_free() will pass this invalid pointer to free_percpu(),
-resulting in a kernel crash.
+When a user updates the number of submit or poll queues on a null_blk
+device, the block layer creates new hardware queues (hctxs). However, if
+the device is using a shared tagset, null_blk does not map any software
+queues (ctx) to the newly created hctx (via null_map_queues()), resulting
+in those hardware queues being left unused for I/O. This behavior is
+misleading, as the user may expect the new queues to be functional, even
+though they are effectively ignored. To avoid this confusion and potential
+misconfiguration:
+- Reject runtime updates to submit_queues or poll_queues via sysfs when
+  the device uses a shared tagset by returning -EINVAL.
+- During configuration validation (prior to powering on the device), reset
+  submit_queues and poll_queues to the module parameters (g_submit_queues
+  and g_poll_queues) if the shared tagset is enabled.
 
-Example crash trace:
-==================================================================
-Kernel attempted to read user page (28) - exploit attempt? (uid: 0)
-BUG: Kernel NULL pointer dereference on read at 0x00000028
-Faulting instruction address: 0xc000000000708f88
-Oops: Kernel access of bad area, sig: 11 [#1]
-LE PAGE_SIZE=64K MMU=Radix  SMP NR_CPUS=2048 NUMA pSeries
-[...]
-CPU: 5 UID: 0 PID: 5491 Comm: mk_nullb_shared Kdump: loaded Tainted: G    B               6.16.0-rc5+ #294 VOLUNTARY
-Tainted: [B]=BAD_PAGE
-Hardware name: IBM,9043-MRX POWER10 (architected) 0x800200 0xf000006 of:IBM,FW1060.00 (NM1060_028) hv:phyp pSeries
-[...]
-NIP [c000000000708f88] free_percpu+0x144/0xba8
-LR [c000000000708f84] free_percpu+0x140/0xba8
-Call Trace:
-    free_percpu+0x140/0xba8 (unreliable)
-    kyber_exit_hctx+0x94/0x124
-    blk_mq_exit_sched+0xe4/0x214
-    elevator_exit+0xa8/0xf4
-    elevator_switch+0x3b8/0x5d8
-    elv_update_nr_hw_queues+0x14c/0x300
-    blk_mq_update_nr_hw_queues+0x5cc/0x670
-    nullb_update_nr_hw_queues+0x118/0x1f8 [null_blk]
-    nullb_device_submit_queues_store+0xac/0x170 [null_blk]
-    configfs_write_iter+0x1dc/0x2d0
-    vfs_write+0x5b0/0x77c
-    ksys_write+0xa0/0x180
-    system_call_exception+0x1b0/0x4f0
-    system_call_vectored_common+0x15c/0x2ec
+This ensures consistent behavior and avoids creating unused hardware queues
+(hctxs) due to ineffective runtime queue updates.
 
-If the sbitmap depth is zero, sb->alloc_hint memory is NOT allocated, but
-the pointer is not explicitly set to NULL. Later, during sbitmap_free(),
-the kernel attempts to free sb->alloc_hint, which is a per cpu pointer
-variable, regardless of whether it was valid, leading to a crash.
-
-This patch ensures that sb->alloc_hint is explicitly set to NULL in
-sbitmap_init_node() when the requested depth is zero. This prevents
-free_percpu() from freeing sb->alloc_hint and thus avoids the observed
-crash.
-
-Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
-Reviewed-by: Hannes Reinecke <hare@suse.de>
 Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
 ---
- lib/sbitmap.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/block/null_blk/main.c | 32 ++++++++++++++++++++++----------
+ 1 file changed, 22 insertions(+), 10 deletions(-)
 
-diff --git a/lib/sbitmap.c b/lib/sbitmap.c
-index d3412984170c..aa8b6ca76169 100644
---- a/lib/sbitmap.c
-+++ b/lib/sbitmap.c
-@@ -119,6 +119,7 @@ int sbitmap_init_node(struct sbitmap *sb, unsigned int depth, int shift,
+diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
+index aa163ae9b2aa..57bd9aeb9aaf 100644
+--- a/drivers/block/null_blk/main.c
++++ b/drivers/block/null_blk/main.c
+@@ -388,6 +388,12 @@ static int nullb_update_nr_hw_queues(struct nullb_device *dev,
+ 	if (!submit_queues)
+ 		return -EINVAL;
  
- 	if (depth == 0) {
- 		sb->map = NULL;
-+		sb->alloc_hint = NULL;
- 		return 0;
++	/*
++	 * Cannot update queues with shared tagset.
++	 */
++	if (dev->shared_tags)
++		return -EINVAL;
++
+ 	/*
+ 	 * Make sure that null_init_hctx() does not access nullb->queues[] past
+ 	 * the end of that array.
+@@ -1884,18 +1890,24 @@ static int null_validate_conf(struct nullb_device *dev)
+ 		dev->queue_mode = NULL_Q_MQ;
  	}
  
+-	if (dev->use_per_node_hctx) {
+-		if (dev->submit_queues != nr_online_nodes)
+-			dev->submit_queues = nr_online_nodes;
+-	} else if (dev->submit_queues > nr_cpu_ids)
+-		dev->submit_queues = nr_cpu_ids;
+-	else if (dev->submit_queues == 0)
+-		dev->submit_queues = 1;
+-	dev->prev_submit_queues = dev->submit_queues;
+-
+-	if (dev->poll_queues > g_poll_queues)
++	if (dev->shared_tags) {
++		dev->submit_queues = g_submit_queues;
+ 		dev->poll_queues = g_poll_queues;
++	} else {
++		if (dev->use_per_node_hctx) {
++			if (dev->submit_queues != nr_online_nodes)
++				dev->submit_queues = nr_online_nodes;
++		} else if (dev->submit_queues > nr_cpu_ids)
++			dev->submit_queues = nr_cpu_ids;
++		else if (dev->submit_queues == 0)
++			dev->submit_queues = 1;
++
++		if (dev->poll_queues > g_poll_queues)
++			dev->poll_queues = g_poll_queues;
++	}
++	dev->prev_submit_queues = dev->submit_queues;
+ 	dev->prev_poll_queues = dev->poll_queues;
++
+ 	dev->irqmode = min_t(unsigned int, dev->irqmode, NULL_IRQ_TIMER);
+ 
+ 	/* Do memory allocation, so set blocking */
 -- 
 2.50.1
 
