@@ -1,147 +1,107 @@
-Received: from r3-18.sinamail.sina.com.cn (r3-18.sinamail.sina.com.cn [202.108.3.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f42.google.com (mail-io1-f42.google.com [209.85.166.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9446D433A6
-	for <linux-block@vger.kernel.org>; Wed, 23 Jul 2025 01:03:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.108.3.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 209A3335BA
+	for <linux-block@vger.kernel.org>; Wed, 23 Jul 2025 01:10:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753232645; cv=none; b=NCipB2oI21DRYN/+Pf9zrp2+WdZh4HacsYSZ3vPvluIgQjfUrtIKZieBXBMCdr4Dac5xtHMkk+AdYDfVe7U2+7j0vFK8DI2B3uvgClRHgQ9SwTp5DQ6OW85PT8wr7WATRxgzf6oPORipsgKYI4L/esCftzhYLLhNXAc9VXNJLRs=
+	t=1753233057; cv=none; b=TySnqX9qNF4hTYS21I/apEyc7SODR8PwMONiSj7vxg83VFFLmCZvY7Ydj1BBEySU9586CjscIwfYvp+WQ3b5vopRLlbnkZF1YEJFjh+0y7iT3bbaPS7BSz02JMnOKoRDl6pLRcTy16HeOJGX7tES2GOipMZffddCYkY1fNnTALc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753232645; c=relaxed/simple;
-	bh=uSar9xHTnGUQj7iYqiDRlLrJCkeSSB2Ouf2GH3Pr1+Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dgI9LIR5v0UZz2jH9mnt+D1DwJ+5nCqtqlDo+uhI864+1RxD4oo2u1t2oUwta4NsxYkeM1K6IDuc4tWe+T4YMpPFkJyQF7LBuxIly20AmdEDIt4np/Vp8x8XBy0Vcv68ZuKPIMHAqskbilJ0fb421bimOLQQlb/wk/5Ov8azvxM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b=clgkFyNV; arc=none smtp.client-ip=202.108.3.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
+	s=arc-20240116; t=1753233057; c=relaxed/simple;
+	bh=O2cLLDnRJXHh2AKpILww38Y0YgjO0hf76mm3Tg8VtcE=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=TcGFCQdKBTOWe0ssYjG5NkUZkTq36CxYV4sTBrfgIUjaBg9ULwlDD4DuMyRa/TgIzoO5fvtWAYT1Z1bg4peYCRa/0UjJIBKjr0mau4gEPncQAcuwsFp2BV2kRbI2hBkZMrEvXb/iDWx/aw6rVyUDGGnXQeKcVba29LYW8giXfEs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=qBWB9+wk; arc=none smtp.client-ip=209.85.166.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b="clgkFyNV"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sina.com; s=201208; t=1753232640;
-	bh=xV1mGKNcZIdCI/Yqy+MW7AgI9iRp29g0Rl6VzIV3Dek=;
-	h=From:Subject:Date:Message-ID;
-	b=clgkFyNVjQG5T2w1MWhLLhtsSjCV5T1Cn4/YeEmgXj4kNN7Gm4/d3WK6qtz33FKB6
-	 UjD1S2M5A5FL6pv6hXNDhIzQKQ7+Ls4SFRJMgOU2/qCEu3bj5lcyWlWE8R4nearfq/
-	 jiaLTo45e25PDL+Ptc4lc/iahoRDDNRi/mS56gK4=
-X-SMAIL-HELO: localhost.localdomain
-Received: from unknown (HELO localhost.localdomain)([114.249.58.236])
-	by sina.com (10.54.253.32) with ESMTP
-	id 688034F200000F1B; Wed, 23 Jul 2025 09:03:50 +0800 (CST)
-X-Sender: hdanton@sina.com
-X-Auth-ID: hdanton@sina.com
-Authentication-Results: sina.com;
-	 spf=none smtp.mailfrom=hdanton@sina.com;
-	 dkim=none header.i=none;
-	 dmarc=none action=none header.from=hdanton@sina.com
-X-SMAIL-MID: 1175294456963
-X-SMAIL-UIID: FB494A7CF96241028F43B38BAFEACAE8-20250723-090350-1
-From: Hillf Danton <hdanton@sina.com>
-To: Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>
-Cc: thomas.hellstrom@linux.intel.com,
-	axboe@kernel.dk,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	regressions@lists.linux.dev
-Subject: Re: 6.15/regression/bisected - lockdep warning: circular locking dependency detected when plugging USB stick after ffa1e7ada456
-Date: Wed, 23 Jul 2025 09:03:34 +0800
-Message-ID: <20250723010336.2793-1-hdanton@sina.com>
-In-Reply-To: <CABXGCsO5mFu9fOq8oKwByZaAjJrCB_V0hKgOsLLJJ4x3PmHr1g@mail.gmail.com>
-References: <CABXGCsPgCBahYRtEZUZiAZtkX51gDE_XZQqK=apuhZ_fOK=Dkg@mail.gmail.com> <20250722005125.2765-1-hdanton@sina.com>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="qBWB9+wk"
+Received: by mail-io1-f42.google.com with SMTP id ca18e2360f4ac-87c420ac179so112394439f.1
+        for <linux-block@vger.kernel.org>; Tue, 22 Jul 2025 18:10:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1753233053; x=1753837853; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jMeioSeoLLVCX+QQEnBPgQrlZDtfj238PIFn9zdvAZQ=;
+        b=qBWB9+wk0+0QICLCDi1Yeqim5W67s+MmDsxE5PV1c7GTMMXo1m6tdKpog0c/npxNV6
+         SSnxHMviBWebNiK0RQK3K0XK6PK+suscN9MN/8MENH0ORd1tJ2j+585NSXr6P4S7PuFB
+         Cc1JAqGKqbAMlH+EaO6SoPbhj5mVrWoumfKpejpT0xpVLmMQLArMaKpjZ6e+7MSBrjO4
+         +5+fTiZiHuHzlkXnuKI0BTZlT1FzIoDgaYWlKqs3xjLyMyGXi0Ru9dgNhgUdoGgqmYlo
+         UJ8+Mg5bOWFp6ZmSaYJqjnM66dTs0oTwtPtqDKKpPsaTFTSAKd60Ux1cKoNHtNTIWl2K
+         VZDA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753233053; x=1753837853;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jMeioSeoLLVCX+QQEnBPgQrlZDtfj238PIFn9zdvAZQ=;
+        b=dC5CbUhKXShYjBQZ6gcNA00S8elSOE262etJjDpKDTrY/dLqqLD5i6RRO8EEuwPLmM
+         KQzmtq03rnd5dJCnmWBXRIfuxguxVAWKxLDvDG5YKeb+kyxhzVvNKWpBr2UwwfayPHg6
+         IPlMdG02eY2JABKWXZBGWZ8gTAP8991mC9/teSGB7lM7dAXuElKGibyefJbzW14fWXJq
+         lSGI3KvLun+U5oIDXZyhXpwRrs3ijm1DN3wVEH2gMEBKCkZehbhzgA8D3Srrod4gSyhs
+         muiDookAGltITS/ce0wccH/oIF4PSOi4ouWfzuWwp/kab1gPeViGMPyarM2XnBSUTftJ
+         Feqg==
+X-Forwarded-Encrypted: i=1; AJvYcCXb5Jt6uYlU5hIWYmJ2aI4IT2ZaQGoWK+hd5X+d13iEUKxq6rPGPX3qWTO24K6mWSZPG2HWLgmRosiOjw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzW+uwsOUYjh08xqKcs6G0oId6CRHiPEgsfeGpb6l6kZ+Yjmuj/
+	aXHxxann24s9yYPsElHoFU3lH30eNIoGor5BNTK/eY8iX7NjPgTtmR5Drqg40sCvHO0=
+X-Gm-Gg: ASbGncuwvYSVeQK3QoKaEJY+MxIRtCXPs0vyoINouNbxbAsNIqKp8rzypApP5aqaHHO
+	BRPnW19gpuP4G/UWqRyn3rnkz36guFGxQ/VCuX3C6IGemMXdbqW+lJi2p+D/PbroBlmSJ9dlbC+
+	LuQoEHrE7mfZUVsltaahl30VKnttQpY0+skbSb0gAJViZkvVZ/qKzKbXcHoeHjkD+jFf3p4x6RT
+	FJqbAq7/N0nAh15aTNJafr3zrh9nYrgDIQH1JnSwDdYjb6UGjvQ88CHKO4NrTswxUKq4lac4Bkg
+	deBOHKXPW4qHzK24S9BK110JZmL/thugFdsKoE41GZyY35cLwKHEby3LTlArOAqNXqBTMLLH/U/
+	GO4E0jST866v4GWecPlby3k3I
+X-Google-Smtp-Source: AGHT+IFn+5ZL76WVMJGeIs14YLA4vnhBQYiqDA7c4GpwNj/OF+ryxNElOqS5GOkhfx/iiA6Y5DbX7g==
+X-Received: by 2002:a05:6e02:2706:b0:3e3:a1eb:4462 with SMTP id e9e14a558f8ab-3e3a1eb4985mr6482215ab.6.1753233052867;
+        Tue, 22 Jul 2025 18:10:52 -0700 (PDT)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-5084c7bf781sm2857423173.38.2025.07.22.18.10.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Jul 2025 18:10:52 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: Phillip Potter <phil@philpotter.co.uk>
+Cc: senozhatsky@chromium.org, linux-block@vger.kernel.org
+In-Reply-To: <20250722231900.1164-1-phil@philpotter.co.uk>
+References: <20250722231900.1164-1-phil@philpotter.co.uk>
+Subject: Re: [PATCH 0/1] cdrom: patch for inclusion
+Message-Id: <175323305207.246647.208696758551846344.b4-ty@kernel.dk>
+Date: Tue, 22 Jul 2025 19:10:52 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3-dev-2ce6c
 
-On Tue, 22 Jul 2025 12:11:36 +0500 Mikhail Gavrilov wrote:
-> On Tue, Jul 22, 2025 at 5:51 AM Hillf Danton <hdanton@sina.com> wrote:
-> >
-> > Try the diff that serializes elevator_change() with q->elevator_lock if
-> > reproducer is available.
-> >
-> > --- x/block/elevator.c
-> > +++ y/block/elevator.c
-> > @@ -661,6 +661,7 @@ static int elevator_change(struct reques
-> >         unsigned int memflags;
-> >         int ret = 0;
-> >
-> > +       /* updaters should be serialized */
-> >         lockdep_assert_held(&q->tag_set->update_nr_hwq_lock);
-> >
-> >         memflags = blk_mq_freeze_queue(q);
-> > @@ -674,11 +675,11 @@ static int elevator_change(struct reques
-> >          * Disk isn't added yet, so verifying queue lock only manually.
-> >          */
-> >         blk_mq_cancel_work_sync(q);
-> > +       blk_mq_unfreeze_queue(q, memflags);
-> >         mutex_lock(&q->elevator_lock);
-> >         if (!(q->elevator && elevator_match(q->elevator->type, ctx->name)))
-> >                 ret = elevator_switch(q, ctx);
-> >         mutex_unlock(&q->elevator_lock);
-> > -       blk_mq_unfreeze_queue(q, memflags);
-> >         if (!ret)
-> >                 ret = elevator_change_done(q, ctx);
-> >
-> 
-> Hi Hillf,
-> 
-> Thanks for the patch.
-> 
-> I tested your proposed diff that serializes elevator_change() with
-> q->elevator_lock. Unfortunately, instead of the previous lockdep
-> warning, I'm now seeing a soft lockup warning.
-> 
-> Here is the relevant excerpt from the kernel log:
-> 
-> [   78.573292] sd 6:0:0:0: [sda] Assuming drive cache: write through
-> [   78.581496] ------------[ cut here ]------------
-> [   78.581507] WARNING: CPU: 7 PID: 300 at block/elevator.c:578
-> elevator_switch+0x512/0x630
-> 
-> This happens after plugging in a USB flash stick (sd 6:0:0:0) with the
-> patched kernel.
-> 
-> Full dmesg trace is attached below.
-> 
-> Let me know if you'd like me to try additional debugging or patches.
-> 
-> Thanks for looking into this!
 
-In order to cure the deadlock, queue is thawed before switching elevator,
-so lets see what comes out with that warning ignored.
+On Wed, 23 Jul 2025 00:18:59 +0100, Phillip Potter wrote:
+> Please apply the following patch, suggested by yourself and credited as
+> such. I have tested that this call does not make things actively worse,
+> and indeed that optical drive functionality (and in particular release)
+> still works as expected.
+> 
+> That said, I've been unable to replicate the issue seen in the report
+> thus far. I have tried a variety of approaches including just yanking
+> the cable out several times, and in all cases, my kernel does crash or
+> post a BUG, and properly unloads the driver - this is both on the latest
+> 6.16-rc7 and also on 6.6.98 LTS, and including when I am specifically
+> inside cdrom_mrw_exit. I plan to do more digging regarding this, hopefully
+> this weekend when I have some free time, as I'd really love to replicate
+> the original crash.
+> 
+> [...]
 
---- x/block/elevator.c
-+++ y/block/elevator.c
-@@ -575,7 +575,6 @@ static int elevator_switch(struct reques
- 	struct elevator_type *new_e = NULL;
- 	int ret = 0;
- 
--	WARN_ON_ONCE(q->mq_freeze_depth == 0);
- 	lockdep_assert_held(&q->elevator_lock);
- 
- 	if (strncmp(ctx->name, "none", 4)) {
-@@ -661,6 +660,7 @@ static int elevator_change(struct reques
- 	unsigned int memflags;
- 	int ret = 0;
- 
-+	/* updaters should be serialized */
- 	lockdep_assert_held(&q->tag_set->update_nr_hwq_lock);
- 
- 	memflags = blk_mq_freeze_queue(q);
-@@ -674,11 +674,11 @@ static int elevator_change(struct reques
- 	 * Disk isn't added yet, so verifying queue lock only manually.
- 	 */
- 	blk_mq_cancel_work_sync(q);
-+	blk_mq_unfreeze_queue(q, memflags);
- 	mutex_lock(&q->elevator_lock);
- 	if (!(q->elevator && elevator_match(q->elevator->type, ctx->name)))
- 		ret = elevator_switch(q, ctx);
- 	mutex_unlock(&q->elevator_lock);
--	blk_mq_unfreeze_queue(q, memflags);
- 	if (!ret)
- 		ret = elevator_change_done(q, ctx);
- 
---
+Applied, thanks!
+
+[1/1] cdrom: Call cdrom_mrw_exit from cdrom_release function
+      commit: 5ec9d26b78c4eb7c2fab54dcec6c0eb845302a98
+
+Best regards,
+-- 
+Jens Axboe
+
+
+
