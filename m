@@ -1,284 +1,148 @@
-Received: from mout-p-102.mailbox.org (mout-p-102.mailbox.org [80.241.56.152])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBCAF28688D;
-	Wed, 23 Jul 2025 09:24:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A7E022DF86
+	for <linux-block@vger.kernel.org>; Wed, 23 Jul 2025 11:06:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753262698; cv=none; b=GnjsbCHDm3HUNZcLNyQ1tQWhOiWenbZ97gpEk4ZiMoOcXDzSJxB1x9bXKSIUEfqQgwkV+W+ikz8ObkoZe1W8AB9mDNhJ8wTmlfj235iFaaIkKrlBHdpc27Sl9gzpSEeXM0EzZQZEisEGkCtf5CFyXNGireawGmaUup8tsggaX0o=
+	t=1753268764; cv=none; b=OjbHlm0FL1Hxz+JL1FBQNa7Xxpps/DZm0sM+nljVFtmhQmBmLGi3IwQNiXFLz3cSx6Hf+Lh7YoqSM0aVqjvgoVFZVW/u4zVmOqT+iOR6CKTzWVI9dGq3a5H3hLILOZUFoW4srPSRJJ4pV4jOqoqbZYERZ8ECTfc8KkaVNotmA3Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753262698; c=relaxed/simple;
-	bh=miti0fBWg9l4CTRUeAOI1spPURaA2m4Iuf5wjnsIqho=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=e3/H+x18XS9tX7Hoq7DjNPFKu+f3CkwLKcfzTEGxf5Fhyiukbuw7sw7KsfPgymEtu+9u8c5NLJ6g5u6UhlVxOoUhJADACT+Nq++yqRsOxWH9rrKenb7ccSoVV12tM6tkyVq1Y0lS53xuK95k7/4wbqi+29GFDsf7UHEO7q4+V0s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pankajraghav.com; spf=pass smtp.mailfrom=pankajraghav.com; dkim=pass (2048-bit key) header.d=pankajraghav.com header.i=@pankajraghav.com header.b=PEAbKjiW; arc=none smtp.client-ip=80.241.56.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pankajraghav.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pankajraghav.com
+	s=arc-20240116; t=1753268764; c=relaxed/simple;
+	bh=bCcwCKd1rc8KetZU7TL6kiDUls0H0gZS6lDy+JyYwHE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=u2DyPK6E2VQFVCF1teL2AHEbFUNM+cUJHixQl/bvdgsS9kKMZ43ww+aOgi6EtNz/WeYOt+tok4sP/ct/O4jzaPM59+EsAbVtZ4ZD1qIYjRGA8lzhWmtFFpEBeQV5Vp2I30udaCONm6LLM35n6nFriPBIConOiWpnQIydzJLVch4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Edg1SL2n; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=pankajraghav.com header.i=@pankajraghav.com header.b="PEAbKjiW"
-Received: from smtp102.mailbox.org (smtp102.mailbox.org [IPv6:2001:67c:2050:b231:465::102])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-102.mailbox.org (Postfix) with ESMTPS id 4bn7yC4Zvzz9tkl;
-	Wed, 23 Jul 2025 11:24:51 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pankajraghav.com;
-	s=MBO0001; t=1753262691;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=iJbmUAH3vRKxe2rKHTAfLf2Cof6kOw4q34nGIRQ3JMU=;
-	b=PEAbKjiWzHtfkjreRjIVdaxfqTNLVSCaWcofOgAwQ9HpHjX8H/Tj9E21Q948J/hUE9/egN
-	wLPM3ig7M27l+9V4qf5jOOyxE4spDW6RIWPHTlmpMaMZLiYyC1K3kcBzumGnQ+Vzpg8W3j
-	bkW4ymZn2X9cJhhfZhI9NZ6l0kVBn37qBEfWZYRc+G0xLl/aMnz0GZIoGSJlsLLVMw+jbF
-	WyglR6/veImYAxH86w/9901c5yN4TvGRgYV3yeaKQNKIN+pm7PKTEFJeldveA1wEFVRxzf
-	ucF4/Dyu4hGTzwNOYdHjnewbs547GIpF9QhI6hj13zkRCZX4N2MoOzR/qB8NNg==
-Authentication-Results: outgoing_mbo_mout;
-	dkim=none;
-	spf=pass (outgoing_mbo_mout: domain of kernel@pankajraghav.com designates 2001:67c:2050:b231:465::102 as permitted sender) smtp.mailfrom=kernel@pankajraghav.com
-Date: Wed, 23 Jul 2025 11:24:42 +0200
-From: "Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>
-To: David Hildenbrand <david@redhat.com>
-Cc: Suren Baghdasaryan <surenb@google.com>, 
-	Ryan Roberts <ryan.roberts@arm.com>, Mike Rapoport <rppt@kernel.org>, Michal Hocko <mhocko@suse.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Nico Pache <npache@redhat.com>, Dev Jain <dev.jain@arm.com>, 
-	Baolin Wang <baolin.wang@linux.alibaba.com>, Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>, 
-	"H . Peter Anvin" <hpa@zytor.com>, Vlastimil Babka <vbabka@suse.cz>, Zi Yan <ziy@nvidia.com>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, 
-	Andrew Morton <akpm@linux-foundation.org>, "Liam R . Howlett" <Liam.Howlett@oracle.com>, 
-	Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
-	willy@infradead.org, x86@kernel.org, linux-block@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, "Darrick J . Wong" <djwong@kernel.org>, mcgrof@kernel.org, 
-	gost.dev@samsung.com, hch@lst.de, Pankaj Raghav <p.raghav@samsung.com>
-Subject: Re: [RFC 2/4] mm: add static huge zero folio
-Message-ID: <fd7yh3ndu7rvo46sc5hg34ihgy4suer5lwl4llixbn2uhko3b3@vc46kzdyjdi4>
-References: <20250722094215.448132-1-kernel@pankajraghav.com>
- <20250722094215.448132-3-kernel@pankajraghav.com>
- <3d935889-fcda-4345-bd57-6c7a84458493@redhat.com>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Edg1SL2n"
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56N50vIg005394;
+	Wed, 23 Jul 2025 11:05:41 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=GKsRQU
+	Jcra76SvEAl/rv3kkVqDulESFt0P37dc1I5l4=; b=Edg1SL2np1lOYOXqpUtGEq
+	x5EBmCcQUGB4OW6zimuZL/s6xXzSlSBlYDLGvM4R838J79rwEUVVORjitmD6Czgn
+	Zu+O7XjqaKR2KNu4N1XQ4zM4/vApz0z8ognkHpDR+Ge1yWTdPuQd4eC1KDaIySc9
+	b5Dm+8Ox02OPdwfyd0gf8JWvR3U9cYpLE9RFBrExx12bz9c3XQPp1AX5VIrUetk0
+	QepzSDSoUW8EbsT/0WjiJaLFWUbxM4fxU7SqogZXtrlG3dDkUn06UUc9SIkoOq8b
+	p2pb1RGaF7NVonL9O6Pbblqkh6j158cpS8k8IfcGYfCtk1tgVmzKs4nkew5rpb8A
+	==
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 482ff4v94e-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 23 Jul 2025 11:05:40 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 56N8Bdra014330;
+	Wed, 23 Jul 2025 11:05:40 GMT
+Received: from smtprelay03.wdc07v.mail.ibm.com ([172.16.1.70])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 480ppp7ghr-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 23 Jul 2025 11:05:40 +0000
+Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
+	by smtprelay03.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 56NB5X9M27918850
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 23 Jul 2025 11:05:33 GMT
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 97DBB58162;
+	Wed, 23 Jul 2025 11:05:39 +0000 (GMT)
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A8BCB58160;
+	Wed, 23 Jul 2025 11:05:35 +0000 (GMT)
+Received: from [9.43.41.196] (unknown [9.43.41.196])
+	by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 23 Jul 2025 11:05:35 +0000 (GMT)
+Message-ID: <19972ca9-804e-407b-a784-ba2566bc907a@linux.ibm.com>
+Date: Wed, 23 Jul 2025 16:35:33 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3d935889-fcda-4345-bd57-6c7a84458493@redhat.com>
-X-Rspamd-Queue-Id: 4bn7yC4Zvzz9tkl
-
-On Wed, Jul 23, 2025 at 11:06:05AM +0200, David Hildenbrand wrote:
-> On 22.07.25 11:42, Pankaj Raghav (Samsung) wrote:
-> > From: Pankaj Raghav <p.raghav@samsung.com>
-> > 
-> > There are many places in the kernel where we need to zeroout larger
-> > chunks but the maximum segment we can zeroout at a time by ZERO_PAGE
-> > is limited by PAGE_SIZE.
-> > 
-> > This is especially annoying in block devices and filesystems where we
-> > attach multiple ZERO_PAGEs to the bio in different bvecs. With multipage
-> > bvec support in block layer, it is much more efficient to send out
-> > larger zero pages as a part of single bvec.
-> > 
-> > This concern was raised during the review of adding LBS support to
-> > XFS[1][2].
-> > 
-> > Usually huge_zero_folio is allocated on demand, and it will be
-> > deallocated by the shrinker if there are no users of it left. At moment,
-> > huge_zero_folio infrastructure refcount is tied to the process lifetime
-> > that created it. This might not work for bio layer as the completions
-> > can be async and the process that created the huge_zero_folio might no
-> > longer be alive. And, one of the main point that came during discussion
-> > is to have something bigger than zero page as a drop-in replacement.
-> > 
-> > Add a config option STATIC_HUGE_ZERO_FOLIO that will always allocate
-> > the huge_zero_folio, and it will never drop the reference. This makes
-> > using the huge_zero_folio without having to pass any mm struct and does
-> > not tie the lifetime of the zero folio to anything, making it a drop-in
-> > replacement for ZERO_PAGE.
-> > 
-> > If STATIC_PMD_ZERO_PAGE config option is enabled, then
-> > mm_get_huge_zero_folio() will simply return this page instead of
-> > dynamically allocating a new PMD page.
-> > 
-> > This option can waste memory in small systems or systems with 64k base
-> > page size. So make it an opt-in and also add an option from individual
-> > architecture so that we don't enable this feature for larger base page
-> > size systems.
-> > 
-> > [1] https://lore.kernel.org/linux-xfs/20231027051847.GA7885@lst.de/
-> > [2] https://lore.kernel.org/linux-xfs/ZitIK5OnR7ZNY0IG@infradead.org/
-> > 
-> > Co-Developed-by: David Hildenbrand <david@redhat.com>
-> 
-> "Co-developed-by:"
-> 
-> And must be followed by
-> 
-> Signed-of-by: David Hildenbrand <david@redhat.com>
-
-Sounds good. Actually, I didn't want to add your sign-off without
-your consent. But I will add it to the patch :)
-
-> 
-> As mentioned to the cover letter: spaces vs. tabs.
-> 
-> > Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
-> > ---
-> >   arch/x86/Kconfig        |  1 +
-> >   include/linux/huge_mm.h | 16 ++++++++++++++++
-> >   mm/Kconfig              | 12 ++++++++++++
-> >   mm/huge_memory.c        | 28 ++++++++++++++++++++++++++++
-> >   4 files changed, 57 insertions(+)
-> > 
-> > diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
-> > index 0ce86e14ab5e..8e2aa1887309 100644
-> > --- a/arch/x86/Kconfig
-> > +++ b/arch/x86/Kconfig
-> > @@ -153,6 +153,7 @@ config X86
-> >   	select ARCH_WANT_OPTIMIZE_HUGETLB_VMEMMAP	if X86_64
-> >   	select ARCH_WANT_HUGETLB_VMEMMAP_PREINIT if X86_64
-> >   	select ARCH_WANTS_THP_SWAP		if X86_64
-> > +	select ARCH_WANTS_STATIC_HUGE_ZERO_FOLIO if X86_64
-> >   	select ARCH_HAS_PARANOID_L1D_FLUSH
-> >   	select ARCH_WANT_IRQS_OFF_ACTIVATE_MM
-> >   	select BUILDTIME_TABLE_SORT
-> > diff --git a/include/linux/huge_mm.h b/include/linux/huge_mm.h
-> > index 7748489fde1b..0ddd9c78f9f4 100644
-> > --- a/include/linux/huge_mm.h
-> > +++ b/include/linux/huge_mm.h
-> > @@ -476,6 +476,7 @@ vm_fault_t do_huge_pmd_numa_page(struct vm_fault *vmf);
-> >   extern struct folio *huge_zero_folio;
-> >   extern unsigned long huge_zero_pfn;
-> > +extern atomic_t huge_zero_folio_is_static;
-> >   static inline bool is_huge_zero_folio(const struct folio *folio)
-> >   {
-> > @@ -494,6 +495,16 @@ static inline bool is_huge_zero_pmd(pmd_t pmd)
-> >   struct folio *mm_get_huge_zero_folio(struct mm_struct *mm);
-> >   void mm_put_huge_zero_folio(struct mm_struct *mm);
-> > +struct folio *__get_static_huge_zero_folio(void);
-> > +
-> > +static inline struct folio *get_static_huge_zero_folio(void)
-> > +{
-> > +       if (!IS_ENABLED(CONFIG_STATIC_HUGE_ZERO_FOLIO))
-> > +               return NULL;
-> > +       if (likely(atomic_read(&huge_zero_folio_is_static)))
-> > +               return huge_zero_folio;
-> > +       return __get_static_huge_zero_folio();> +}
-> >   static inline bool thp_migration_supported(void)
-> >   {
-> > @@ -685,6 +696,11 @@ static inline int change_huge_pud(struct mmu_gather *tlb,
-> >   {
-> >   	return 0;
-> >   }
-> > +
-> > +static inline struct folio *get_static_huge_zero_folio(void)
-> > +{
-> > +       return NULL;
-> > +}
-> >   #endif /* CONFIG_TRANSPARENT_HUGEPAGE */
-> >   static inline int split_folio_to_list_to_order(struct folio *folio,
-> > diff --git a/mm/Kconfig b/mm/Kconfig
-> > index 0287e8d94aea..14721171846f 100644
-> > --- a/mm/Kconfig
-> > +++ b/mm/Kconfig
-> > @@ -835,6 +835,18 @@ config ARCH_WANT_GENERAL_HUGETLB
-> >   config ARCH_WANTS_THP_SWAP
-> >   	def_bool n
-> > +config ARCH_WANTS_STATIC_HUGE_ZERO_FOLIO
-> > +	def_bool n
-> > +
-> > +config STATIC_HUGE_ZERO_FOLIO
-> > +	bool "Allocate a PMD sized folio for zeroing"
-> > +	depends on ARCH_WANTS_STATIC_HUGE_ZERO_FOLIO
-> > +	help
-> > +	  Typically huge_zero_folio, which is a PMD page of zeroes, is allocated
-> > +	  on demand and deallocated when not in use. This option will
-> > +	  allocate huge_zero_folio but it will never free it.
-> > +	  Not suitable for memory constrained systems.
-> 
-> Maybe something like
-> 
-> "
-> Without this config enabled, the huge zero folio is allocated on demand and
-> freed under memory pressure once no longer in use. To detect remaining users
-> reliably, references to the huge zero folio must be tracked precisely, so it
-> is commonly only available for mapping it into user page tables.
-> 
-> With this config enabled, the huge zero folio can also be used for other
-> purposes that do not implement precise reference counting: it is still
-> allocated on demand, but never freed, allowing for more wide-spread use,
-> for example, when performing I/O similar to the traditional shared
-> zeropage."
-> 
-> Not suitable for memory constrained systems.
-> "
-
-Sounds much better! I will add it.
-
-> 
-> Should we make it clear that this is currently limited to THP configs?
-> 
-> depends on TRANSPARENT_HUGEPAGE
-
-You are right. As we use the existing infrastructure, we do become
-dependent on THP.
-> 
-> > +
-> >   config MM_ID
-> >   	def_bool n
-> > diff --git a/mm/huge_memory.c b/mm/huge_memory.c
-> > index 5d8365d1d3e9..6c890a1482f3 100644
-> > --- a/mm/huge_memory.c
-> > +++ b/mm/huge_memory.c
-> > @@ -75,6 +75,8 @@ static unsigned long deferred_split_scan(struct shrinker *shrink,
-> >   static bool split_underused_thp = true;
-> >   static atomic_t huge_zero_refcount;
-> > +static atomic_t huge_zero_static_fail_count __read_mostly;
-> > +atomic_t huge_zero_folio_is_static __read_mostly;
-> >   struct folio *huge_zero_folio __read_mostly;
-> >   unsigned long huge_zero_pfn __read_mostly = ~0UL;
-> >   unsigned long huge_anon_orders_always __read_mostly;
-> > @@ -266,6 +268,32 @@ void mm_put_huge_zero_folio(struct mm_struct *mm)
-> >   		put_huge_zero_page();
-> >   }
-> > +#ifdef CONFIG_STATIC_HUGE_ZERO_FOLIO
-> > +struct folio *__get_static_huge_zero_folio(void)
-> 
-> Do we want to play safe and have a
-> 
-> if (unlikely(!slab_is_available()))
-> 	return NULL;
-> 
-Yes, sounds good.
-
-> > +{
-> > +       /*
-> > +        * If we failed to allocate a huge zero folio multiple times,
-> > +        * just refrain from trying.
-> > +        */
-> 
-> Hmmm, I wonder if we want to retry "some time later" again. Meaning, we'd
-> base it on the jiffies, maybe?
-> 
-> See print_bad_pte() for an example.
-
-That is a good idea. I was thinking somethign like that while I was
-making the changes. This seems more logical.
-
-> 
-> > +       if (atomic_read(&huge_zero_static_fail_count) > 2)
-> > +               return NULL;
-> > +
-> 
-> We could make some smart decision regarding totalram_pages() and just
-> disable it. A bit tricky, we can do that as a follow-up.
-> 
-
-oooh. Yeah, I will add it in my todos to make this as a follow up :)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCHv2] block: restore two stage elevator switch while running
+ nr_hw_queue update
+To: Yu Kuai <yukuai1@huaweicloud.com>, linux-block@vger.kernel.org
+Cc: yi.zhang@redhat.com, ming.lei@redhat.com, hch@lst.de, axboe@kernel.dk,
+        shinichiro.kawasaki@wdc.com, gjoyce@ibm.com,
+        "yukuai (C)"
+ <yukuai3@huawei.com>
+References: <20250718133232.626418-1-nilay@linux.ibm.com>
+ <b7cc0c1c-6027-4f1a-8ca1-e7ac4ae9e5ec@huaweicloud.com>
+ <43099391-2279-473d-8c13-70486b96f50f@linux.ibm.com>
+ <c339715d-4a4b-0a4a-4d53-86eabe7b5d97@huaweicloud.com>
+ <50fc4df5-991d-4076-ab72-eea33b9e5e07@linux.ibm.com>
+ <a707901a-1d21-313f-0456-01f419181f2c@huaweicloud.com>
+Content-Language: en-US
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <a707901a-1d21-313f-0456-01f419181f2c@huaweicloud.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: PNpnyt2WPlrfxArCJHvaTCByA9lfuxVJ
+X-Proofpoint-ORIG-GUID: PNpnyt2WPlrfxArCJHvaTCByA9lfuxVJ
+X-Authority-Analysis: v=2.4 cv=Ae2xH2XG c=1 sm=1 tr=0 ts=6880c204 cx=c_pps
+ a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
+ a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=oI82WSWj1OA9ISeKEK8A:9
+ a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzIzMDA5MCBTYWx0ZWRfX64G3/mlyGz1h
+ Qv9l0zByNm6n27AVnqK5SV/cD0LMw2DBj+A97Dt83fF5+IQoElXEIk7TSgZiCt1/Nb6lDArpFBy
+ 8J9E5EZS3BvouxWg8ZlmdnrqN/p3j/KUtQ8H0hyGyY81ZVobUfrMDBsbcBGo5q64IePHZm5m8n6
+ dT1d2Wpy3ztOwR5I86I6leXBoEn/IigHlzjxSz+zuTSCYUiscxOBLBThRZyyZr9FXxI8ro1s3ip
+ 2+6wpveWLSAGPu900DMNzocdf70uoeoCzyjb2UnHcx9qwlsFJ5zozkVfX6fkSD/e+OFJ98kDBql
+ k9gNHV9j34hgTq7YmfouHOSCPuMTYgXrOPiREt1OzX7OcWEysUaXm2zKGUNhXTYvpzkSp/+XfE1
+ WY/VColK5OVUKH/Q2A5K5uiAZAHm3gfnGRZ4Xy3AGy1geRHmBS15TeToXK3I/vbLkiSg3EJk
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-07-23_02,2025-07-22_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ mlxlogscore=999 lowpriorityscore=0 adultscore=0 malwarescore=0 bulkscore=0
+ clxscore=1015 phishscore=0 impostorscore=0 suspectscore=0 priorityscore=1501
+ spamscore=0 mlxscore=0 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
+ definitions=main-2507230090
 
 
-Thanks for all your comments David! Can I send it next series as a normal patch
-series instead of an RFC? It looks like this series is shaping up nicely.
 
---
-Pankaj
+On 7/23/25 12:28 PM, Yu Kuai wrote:
+>>>>> BTW, this is not related to this patch. Should we handle fall_back
+>>>>> failure like blk_mq_sysfs_register_hctxs()?
+>>>>>
+>>>> OKay I guess you meant here handle failure case by unwinding the
+>>>> queue instead of looping through it from start to end. If yes, then
+>>>> it could be done but again we may not want to do it the bug fix patch.
+>>>>
+>>>
+>>> Not like that, actually I don't have any ideas for now, the hctxs is
+>>> unregistered first, and if register failed, for example, due to -ENOMEM,
+>>> I can't find a way to fallback :(
+>>>
+>> If registering new hctxs fails, we fall back to the previous value of
+>> nr_hw_queues (prev_nr_hw_queues). When prev_nr_hw_queues is less than
+>> the new nr_hw_queues, we do not reallocate memory for the existing hctxs—
+>> instead, we reuse the memory that was already allocated.
+>>
+>> Memory allocation is only attempted for the additional hctxs beyond
+>> prev_nr_hw_queues. Therefore, if memory allocation for these new hctxs
+>> fails, we can safely fall back to prev_nr_hw_queues because the memory
+>> of the previously allocated hctxs remains intact.
+> 
+> No, like I said before, blk_mq_sysfs_unregister_hctxs() will free memory
+> by kobject_del() for hctx->kobj and ctx->kobj, and
+> __blk_mq_update_nr_hw_queues() call that helper in the beginning.
+> And later in the fall back code, blk_mq_sysfs_register_hctxs() can fail
+> by memory allocation in kobject_add(), however, the return value is not
+> checked.
+> 
+This can be done checking the kobject state in sysfs: kobj->state_in_sysfs.
+If kobj->state_in_sysfs is 1 then it implies that kobject_add() for this
+kobj was successful and we can safely call kobject_del() on it otherwise
+we can skip it. We already have few places in the kernel using this trick.
+For instance, check sysfs_slab_unlink(). So, IMO, similar technique could be
+used for hctx->kobj and ctx->kobj as well while we attempt to delete these 
+kobjects from unregistering queue and nr_hw_queue update.
+
+Thanks,
+--Nilay
