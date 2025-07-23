@@ -1,82 +1,67 @@
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp153-171.sina.com.cn (smtp153-171.sina.com.cn [61.135.153.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 901444A1A
-	for <linux-block@vger.kernel.org>; Wed, 23 Jul 2025 01:14:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88BD91F94A
+	for <linux-block@vger.kernel.org>; Wed, 23 Jul 2025 01:16:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=61.135.153.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753233278; cv=none; b=Ie8uykq1S2qdjKxZnUL5FR3G/yVDVrFMvCVd/owNfd/CWvPVw+z3tp6AisGX07dXw4sLLTHnlBmXGuGCVCTQYlo9dp9roCiNXYdJebW+hsNECw7vMmhM9r38WJ3ProPG0a7C9KEH9TFH3/ZhyJ1CRV5myfWrXsb8mw7QdlAslVI=
+	t=1753233403; cv=none; b=sV8Wf1M63ul2yTK5HINgzNCszdMIzG6Wz5I+dxmRJ13lKHHg95OoyfetVeDkUsoFj6h9eI7akkaflotU5u635MYHxa9eAQwO7qlOhcm3NKL9EcKTd+X8eJMOTsfKFztEk9cBB7EwzXZhAQZRI05xHNl0j3WRWm8uIAadqiBd/0w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753233278; c=relaxed/simple;
-	bh=JcJgKNnTHj8vX7MpYvazLsGMhel08hAo1LltIV3vqNs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hG2smvoBVGVlasbDYjmZRAI5dYOc26lcU9eIrROborOkjfb2fLUEJMOKXej3ZYZfDnnupIpLgBySy3XfYkkuA6b2lxN8pxK5iooQbuR/5k/9KggZuqLu2SnLImZ8V4hGE8li0LLot2+5UzfBz0LWk5/J+3rgErelmbTpm5106dQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=dGtjZO9d; arc=none smtp.client-ip=209.85.216.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	s=arc-20240116; t=1753233403; c=relaxed/simple;
+	bh=HpWAxKz6dfEx2qW8PsoDIuxoAlc/svq1hqnRyFq7Tqo=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=lY6Sm9HgQCLpfIP4BMq2tah38Q+AcSGJNamvqa1u9X8i8ja2QWAjNmDMBRo0SoG4laWqnnh/pDeTiZt4nQ/Z6l1Z/+mxR8sdD1eGurchXl/9RlfsEmi/BpfrWTqhSThiPPAY3P/66ssRNP6sxgGt6D+zEvcQOdhbsWcEPJK+kXo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b=yjGek5gU; arc=none smtp.client-ip=61.135.153.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="dGtjZO9d"
-Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-3138e64b42aso6195525a91.0
-        for <linux-block@vger.kernel.org>; Tue, 22 Jul 2025 18:14:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1753233277; x=1753838077; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=C1gp7JY68r71znkwnVBWesr0kQc8oTF6uDq6pszfl4o=;
-        b=dGtjZO9dHOE35xmEJDbKo6A/dkDMQQvhf6NQNvLl6JZdx//S6LUvGa3Koodrelei8p
-         GUYIAwxMwzQGjMQqLOSwM99y+h2xbVkCg/xOvt/GN7HPfDaJ2mfI35KX7NAZkCUavgck
-         BazdzYzs9KldV36cUJxk7ylp5NIB7pd/GKiNY=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753233277; x=1753838077;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=C1gp7JY68r71znkwnVBWesr0kQc8oTF6uDq6pszfl4o=;
-        b=Mf5RG7x7yvAUYMyTMxMe4sr8q3R+nFMTw0d4crt3HgkRS0TXIB8dPstMTdogfxJV5b
-         v2b7Avffirv8GyD31qB5f0LB4Cs2IphP31XT+6UtcXdMnbRQsVfgERzdYpvZw++jSF6q
-         4reuqJHsxwYwhPD+HPuuszHkkiaP73jbPH9wwcNGkLavvQTWULJEnxgVSIj67tnmLYfa
-         4da9CYXy2cUDs7NUJW5T1I9k7heTyZIsto0lazqpGanW50jvXHaYdu4ybj+oSDJJG+hV
-         sIXMRYed16WH5WmkL3P+NIu6s3v4PQ7tDZDDUgdKUJ3/fxLM+go1WOlRXas9i5LszTdU
-         7pxA==
-X-Forwarded-Encrypted: i=1; AJvYcCXwgaNfJYaX1zqm8td68KMRfhq5yYCyHm/K0SgRy35a5zpzNhDFSIAm4/sgEWEjeo22dEdREUIABf++oA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxnOekffIUTcCyPDl4kW/QzAa3DVidWxIc/NSjX7DSl0XIbfuhy
-	PEBj0GjRKOpHfXb43bQVSnqq5sal3uHxlTie5LxVC84YZ9jYoI6ItvOH1z+HjEJAz11Zaj36s68
-	RxKs=
-X-Gm-Gg: ASbGncsR7JeYat/rreZh7JuTWXRxGB17L2PKcwIM3u4YveENnqV+5LJR/rzFlWEnrj/
-	wzaeZ1G9RafrAy04qDpZzWE+assVFBtKVAK2BJMp2PvtKiLfrWniLK6ZP5kgMGL9a/1Krgwa/7f
-	inIbSqIb3vttWgDMaopKyziirYZKzO6JZCN8zFM45jN1lVsKEUFn/h6VFs54bihTAylng8VAegy
-	YBA/fM5RIr+nD/JefQPOFi+dVZi1W3coRDTPYXAmCvotfX0vtcvt2R9J6I2gLdy1J3GdlfBPmqv
-	4UsAknWp+2Q63+hwuHnUQHDbTLaLXhMruXyUeGq0kgkNHVYSzvxj+fO5aDcYmtzrLeyDEriiXDh
-	8TviublAXO8XcmZIRUsDwi0DRnw==
-X-Google-Smtp-Source: AGHT+IFldo8mVFdXKh+UiKvwMGAiyHjybyxb585rrzs4kjVrvK0tbOIlV7r3zsqA2HqjS9fAk5Bu2Q==
-X-Received: by 2002:a17:90b:58e8:b0:311:ba2e:bdc9 with SMTP id 98e67ed59e1d1-31e5082bb99mr1891484a91.27.1753233276680;
-        Tue, 22 Jul 2025 18:14:36 -0700 (PDT)
-Received: from google.com ([2401:fa00:8f:203:fad8:2894:2c8d:4d33])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-31e51a2ffcdsm313781a91.41.2025.07.22.18.14.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Jul 2025 18:14:36 -0700 (PDT)
-Date: Wed, 23 Jul 2025 10:14:32 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Phillip Potter <phil@philpotter.co.uk>
-Cc: axboe@kernel.dk, senozhatsky@chromium.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH 0/1] cdrom: patch for inclusion
-Message-ID: <eyejjkuzdzl7qlq3os534ckt3jsvvnvp76pyqcrpzcignj3oms@w7cvw6oht5lk>
-References: <20250722231900.1164-1-phil@philpotter.co.uk>
+	dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b="yjGek5gU"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sina.com; s=201208; t=1753233396;
+	bh=UdnmmYRw0AJu5tW+PGAvB+7PLFGNJroJtC9cg2Qz3GQ=;
+	h=From:Subject:Date:Message-ID;
+	b=yjGek5gUDUiDjMMgHIWNLKPSEuwz3XvuMYMC3qfj4eN8u+spHjYoE3qM1YU1k8R15
+	 Kze2/TH7Tv6N66PKZHpKn98HMMnhp+pmu4fO/8N3g8vX7BJdIEnUrbrxMBdtwkT+Aw
+	 wnq+bsu8l5i8YkJQ4+h6k0f0/fi2UOVjcTCzNxjY=
+X-SMAIL-HELO: localhost.localdomain
+Received: from unknown (HELO localhost.localdomain)([114.249.58.236])
+	by sina.com (10.54.253.34) with ESMTP
+	id 688037E800006558; Wed, 23 Jul 2025 09:16:26 +0800 (CST)
+X-Sender: hdanton@sina.com
+X-Auth-ID: hdanton@sina.com
+Authentication-Results: sina.com;
+	 spf=none smtp.mailfrom=hdanton@sina.com;
+	 dkim=none header.i=none;
+	 dmarc=none action=none header.from=hdanton@sina.com
+X-SMAIL-MID: 6659856291967
+X-SMAIL-UIID: 56B947E8854B457CB095FF38F41598FD-20250723-091626-1
+From: Hillf Danton <hdanton@sina.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>,
+	thomas.hellstrom@linux.intel.com,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>,
+	regressions@lists.linux.dev
+Subject: Re: 6.15/regression/bisected - lockdep warning: circular locking dependency detected when plugging USB stick after ffa1e7ada456
+Date: Wed, 23 Jul 2025 09:16:13 +0800
+Message-ID: <20250723011614.2812-1-hdanton@sina.com>
+In-Reply-To: <8acbc346-98f8-44fc-9675-0c3a7da87d21@kernel.dk>
+References: <20250722005125.2765-1-hdanton@sina.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250722231900.1164-1-phil@philpotter.co.uk>
+Content-Transfer-Encoding: 8bit
 
-On (25/07/23 00:18), Phillip Potter wrote:
-> [..] I plan to do more digging regarding this, hopefully
-> this weekend when I have some free time, as I'd really love to replicate
-> the original crash.
-
-I waiting for LG GP65NB60 shipment (arriving today/tomorrow), which
-shows up in crash reports (it should have CDC_MRW_W.)  So I'll be able
-to run some tests soon.
+On Tue, 22 Jul 2025 06:14:18 -0600 Jens Axboe wrote:
+> On 7/21/25 6:51 PM, Hillf Danton wrote:
+> > Try the diff that serializes elevator_change() with q->elevator_lock if
+> > reproducer is available.
+> 
+> Hillf, these seemingly random and not tested or thought through patches
+> flung out in response to reports is not useful. It just wastes peoples
+> time and resources.
+> 
+Interesting, if you are right, so does the guy who created the deadlock, no?
