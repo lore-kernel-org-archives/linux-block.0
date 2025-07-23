@@ -1,88 +1,154 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E00FD2FF;
-	Wed, 23 Jul 2025 12:56:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4110F2E719E;
+	Wed, 23 Jul 2025 13:01:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753275375; cv=none; b=DNPcap0TNOImGsPQ470zT2adjrSOpECsNOAmqG+VKIMcIpF8bbxnQO39o0YAtjL4CIUBWc9B7uoaNo8r1EOco5REnMxY26/k+1pv51ynpACLHOtvMWmFAN/Ji2AOEDgz0F9Z9BDrGjA0Cu+rj4MN20wkLFUIfoj1ecwTv2QaSJE=
+	t=1753275716; cv=none; b=kP6tU4CUhW75n9iO2pFESSoI4QlDWMdyMi79QjLp/hnR3CoK6IeACqX7VWAjJZ6QXH1H5R5LJDqyv7NJIoFiqBPzxVgbAxHeuBep7vSXiTDqG1n1ZLAvn/8GmDivI7Vost4a7L9ViDZSpA83FFEcDFd2URJTtJjwq5EK/pNfEPw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753275375; c=relaxed/simple;
-	bh=4LObQmvPGP4Xdx54gMT9v2IhlSCfWXU+fc410oxbZs8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CJ/0AB2ZqAqkxSFQvMyZXmdjV5H4EHIxFO3kmY68iq11dh3tLGC3/iCEzjdmPhbfQ5SScduivztIrshLja898dRF6I3b7eqDaAIYT8zQWCY5T5VOiYdvsfDxx+uDIBN6H310aJq+iPap4I/JovxEoWdHvYY1Iga28Yib84wDx3o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rOHA+p7t; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1753275716; c=relaxed/simple;
+	bh=VeEaP0I6Ju84rRyRYaicpp+t8ePJyjkfRFyzhb+AudA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kX3AoCjtEHuP0uCVSLdqLSkdwSTGrvc0f6imQZjxnTEge0rk0deFpS+TUGK5E6k/WT3EuV1o/f+sAILN4ijv52fydnkwTXhwaY9eI+FrwAfmQguaS3EUKsDXgQRj/PCtTZIFdd0rUhiGLrEfMElFRxPZmotDDPyGyeONuY80FQo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PyvJ2iUl; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rOHA+p7t"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05BC6C4CEE7;
-	Wed, 23 Jul 2025 12:56:11 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PyvJ2iUl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB36AC4CEE7;
+	Wed, 23 Jul 2025 13:01:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753275375;
-	bh=4LObQmvPGP4Xdx54gMT9v2IhlSCfWXU+fc410oxbZs8=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=rOHA+p7ttbBQ8036RJGSlySh/y+ZJqFWBRaPjDL+EHaU5Q0A51GoipNlEWkbhN1xb
-	 Nrl9A0bgLwjkEhV1L2X+r1X4ySWNaLnFExU8+k3XDOj2baHrVcGe3HL0B84SzBjL2p
-	 NLtgQN8S2wP6jNRh2+7UIFKurMD4NBxB/muAaUzQ5NNINI5GvEdv+PWnuS3C9daroI
-	 X20XR6I2usEIGUr5VJLYNFr2hxuhWzcWDbMqnLITENGefOhWY0nCpFT5PcYrzfrTTP
-	 El1+54LaeABTU2Mz7eR8OsaOyQqgqLcmTHUkRJ+Xy0kPkEpEMmTizhcyR3Zz1canI0
-	 q+HZ2kIAbvYXQ==
-From: Christian Brauner <brauner@kernel.org>
-To: Anuj Gupta <anuj20.g@samsung.com>
-Cc: Christian Brauner <brauner@kernel.org>,
-	linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	joshi.k@samsung.com,
+	s=k20201202; t=1753275715;
+	bh=VeEaP0I6Ju84rRyRYaicpp+t8ePJyjkfRFyzhb+AudA=;
+	h=From:To:Cc:Subject:Date:From;
+	b=PyvJ2iUlLMlbGzX5qzJpPwU19z2ZHVNgRRR6I6pgdUocqIvlwyAEVWlzxFVyH+O5B
+	 rgvRUW0KyWJCaIjAWkNSjYQZTjUA8hXt537lM2z1lqW3QLRM+cccx6Wa7AnC47Kdh5
+	 5vyhtPdVK3eYgRSInD6ot6DkzLAf5sTN26YAlVnpeeskZCszqRTW1E/3s1cIFoXbIv
+	 cwHrWiFoDlhJYh6kh2ZXmBFSyLLP1YH2+JOYj0Akmjoq6YhcbZiRr95b4qm1dHfFnN
+	 OpoAwh1yBhmId5vMmQ85Jwdtkwph/jN1NrrSQ24V5bB3R7cAOPmCfMDkPo1fsYxenn
+	 0kqYO1EMHe0rw==
+From: Leon Romanovsky <leon@kernel.org>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Leon Romanovsky <leonro@nvidia.com>,
 	Christoph Hellwig <hch@lst.de>,
-	vincent.fu@samsung.com,
-	anuj1072538@gmail.com,
-	axboe@kernel.dk,
-	hch@infradead.org,
-	martin.petersen@oracle.com,
-	viro@zeniv.linux.org.uk,
-	jack@suse.cz
-Subject: Re: [PATCH v3] block: fix lbmd_guard_tag_type assignment in FS_IOC_GETLBMD_CAP
-Date: Wed, 23 Jul 2025 14:56:03 +0200
-Message-ID: <20250723-rollbahn-abwesend-2179df4eefd9@brauner>
-X-Mailer: git-send-email 2.47.2
-In-Reply-To: <20250722120755.87501-1-anuj20.g@samsung.com>
-References: <20250722120755.87501-1-anuj20.g@samsung.com>
+	Jason Gunthorpe <jgg@nvidia.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	=?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
+	dri-devel@lists.freedesktop.org,
+	iommu@lists.linux.dev,
+	Jens Axboe <axboe@kernel.dk>,
+	=?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
+	Joerg Roedel <joro@8bytes.org>,
+	kvm@vger.kernel.org,
+	linaro-mm-sig@lists.linaro.org,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-media@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-pci@vger.kernel.org,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Vivek Kasireddy <vivek.kasireddy@intel.com>,
+	Will Deacon <will@kernel.org>
+Subject: [PATCH 00/10] vfio/pci: Allow MMIO regions to be exported through dma-buf
+Date: Wed, 23 Jul 2025 16:00:01 +0300
+Message-ID: <cover.1753274085.git.leonro@nvidia.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1291; i=brauner@kernel.org; h=from:subject:message-id; bh=4LObQmvPGP4Xdx54gMT9v2IhlSCfWXU+fc410oxbZs8=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWQ03H4pdrMzNOvNeZXgtNeaWrM+7J1sb8z6QJbjvmDbz x4tX22LjlIWBjEuBlkxRRaHdpNwueU8FZuNMjVg5rAygQxh4OIUgIkc2czIMFte+94zq6t1PCkS KbPuygpohm7km1T7eeJk9557EybOUWb4Xzl54sy+2h3r44OZfNu73nOdM9witULsgP20tsy6nYc 3swEA
-X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
 Content-Transfer-Encoding: 8bit
 
-On Tue, 22 Jul 2025 17:37:55 +0530, Anuj Gupta wrote:
-> The blk_get_meta_cap() implementation directly assigns bi->csum_type to
-> the UAPI field lbmd_guard_tag_type. This is not right as the kernel enum
-> blk_integrity_checksum values are not guaranteed to match the UAPI
-> defined values.
-> 
-> Fix this by explicitly mapping internal checksum types to UAPI-defined
-> constants to ensure compatibility and correctness, especially for the
-> devices using CRC64 PI.
-> 
-> [...]
+From: Leon Romanovsky <leonro@nvidia.com>
 
-Applied to the vfs-6.17.integrity branch of the vfs/vfs.git tree.
-Patches in the vfs-6.17.integrity branch should appear in linux-next soon.
+---------------------------------------------------------------------------
+Based on blk and DMA patches which will be sent during coming merge window.
+---------------------------------------------------------------------------
 
-Please report any outstanding bugs that were missed during review in a
-new review to the original patch series allowing us to drop it.
+This series extends the VFIO PCI subsystem to support exporting MMIO regions
+from PCI device BARs as dma-buf objects, enabling safe sharing of non-struct
+page memory with controlled lifetime management. This allows RDMA and other
+subsystems to import dma-buf FDs and build them into memory regions for PCI
+P2P operations.
 
-It's encouraged to provide Acked-bys and Reviewed-bys even though the
-patch has now been applied. If possible patch trailers will be updated.
+The series supports a use case for SPDK where a NVMe device will be owned
+by SPDK through VFIO but interacting with a RDMA device. The RDMA device
+may directly access the NVMe CMB or directly manipulate the NVMe device's
+doorbell using PCI P2P.
 
-Note that commit hashes shown below are subject to change due to rebase,
-trailer updates or similar. If in doubt, please check the listed branch.
+However, as a general mechanism, it can support many other scenarios with
+VFIO. This dmabuf approach can be usable by iommufd as well for generic
+and safe P2P mappings.
 
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
-branch: vfs-6.17.integrity
+In addition to the SPDK use-case mentioned above, the capability added
+in this patch series can also be useful when a buffer (located in device
+memory such as VRAM) needs to be shared between any two dGPU devices or
+instances (assuming one of them is bound to VFIO PCI) as long as they
+are P2P DMA compatible.
 
-[1/1] block: fix lbmd_guard_tag_type assignment in FS_IOC_GETLBMD_CAP
-      https://git.kernel.org/vfs/vfs/c/bc5b0c8febcc
+The implementation provides a revocable attachment mechanism using dma-buf
+move operations. MMIO regions are normally pinned as BARs don't change
+physical addresses, but access is revoked when the VFIO device is closed
+or a PCI reset is issued. This ensures kernel self-defense against
+potentially hostile userspace.
+
+The series includes significant refactoring of the PCI P2PDMA subsystem
+to separate core P2P functionality from memory allocation features,
+making it more modular and suitable for VFIO use cases that don't need
+struct page support.
+
+-----------------------------------------------------------------------
+This is based on
+https://lore.kernel.org/all/20250307052248.405803-1-vivek.kasireddy@intel.com/
+but heavily rewritten to be based on DMA physical API.
+-----------------------------------------------------------------------
+The WIP branch can be found here:
+https://git.kernel.org/pub/scm/linux/kernel/git/leon/linux-rdma.git/log/?h=dmabuf-vfio
+
+Thanks
+
+Leon Romanovsky (8):
+  PCI/P2PDMA: Remove redundant bus_offset from map state
+  PCI/P2PDMA: Introduce p2pdma_provider structure for cleaner
+    abstraction
+  PCI/P2PDMA: Simplify bus address mapping API
+  PCI/P2PDMA: Refactor to separate core P2P functionality from memory
+    allocation
+  PCI/P2PDMA: Export pci_p2pdma_map_type() function
+  types: move phys_vec definition to common header
+  vfio/pci: Enable peer-to-peer DMA transactions by default
+  vfio/pci: Add dma-buf export support for MMIO regions
+
+Vivek Kasireddy (2):
+  vfio: Export vfio device get and put registration helpers
+  vfio/pci: Share the core device pointer while invoking feature
+    functions
+
+ block/blk-mq-dma.c                 |   7 +-
+ drivers/iommu/dma-iommu.c          |   4 +-
+ drivers/pci/p2pdma.c               | 144 +++++++++----
+ drivers/vfio/pci/Kconfig           |  20 ++
+ drivers/vfio/pci/Makefile          |   2 +
+ drivers/vfio/pci/vfio_pci_config.c |  22 +-
+ drivers/vfio/pci/vfio_pci_core.c   |  59 ++++--
+ drivers/vfio/pci/vfio_pci_dmabuf.c | 321 +++++++++++++++++++++++++++++
+ drivers/vfio/pci/vfio_pci_priv.h   |  23 +++
+ drivers/vfio/vfio_main.c           |   2 +
+ include/linux/dma-buf.h            |   1 +
+ include/linux/pci-p2pdma.h         | 114 +++++-----
+ include/linux/types.h              |   5 +
+ include/linux/vfio.h               |   2 +
+ include/linux/vfio_pci_core.h      |   4 +
+ include/uapi/linux/vfio.h          |  19 ++
+ kernel/dma/direct.c                |   4 +-
+ mm/hmm.c                           |   2 +-
+ 18 files changed, 631 insertions(+), 124 deletions(-)
+ create mode 100644 drivers/vfio/pci/vfio_pci_dmabuf.c
+
+-- 
+2.50.1
+
