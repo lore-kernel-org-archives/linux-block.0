@@ -1,176 +1,147 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from r3-18.sinamail.sina.com.cn (r3-18.sinamail.sina.com.cn [202.108.3.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6A4E126C05
-	for <linux-block@vger.kernel.org>; Wed, 23 Jul 2025 00:41:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9446D433A6
+	for <linux-block@vger.kernel.org>; Wed, 23 Jul 2025 01:03:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.108.3.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753231299; cv=none; b=BWBytQV+7uD5y3YwZNKcG/CZ9tPFfmD5xOWQssSGGbs88Rl2mZ/OxZ7AwZH0S5a34BVufnUjNpSWRvPl7LIYB4YuP2WXvKIlwm2F5CBxr53NvoqMrpkUX7F71EjAx0eX64P7Kb/6UkKS0NubpEbMEOhbPQIsqCzfgnnZiFvyDUo=
+	t=1753232645; cv=none; b=NCipB2oI21DRYN/+Pf9zrp2+WdZh4HacsYSZ3vPvluIgQjfUrtIKZieBXBMCdr4Dac5xtHMkk+AdYDfVe7U2+7j0vFK8DI2B3uvgClRHgQ9SwTp5DQ6OW85PT8wr7WATRxgzf6oPORipsgKYI4L/esCftzhYLLhNXAc9VXNJLRs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753231299; c=relaxed/simple;
-	bh=K+1MXdnS1CCzO5Fdi2JOpfvZQKVa38cqXDm5FCTETfk=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=UzUVcA0sr6KNv8K1WfuitDOtUe0I8R9QTlyzHNGEbaODho6vrQ8utZnPJT2EDxYv7mWKBqOtcmzLD7Gro84h7PsznTGJiplswg/QrU/hfpUurLOXnNcW73H2aLvH5YuLMU5iMM5kEy2hxTfXTxde0TPa3+/RQ7GlgWUP/CEHvmI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4bmwLQ4ryszYQvCw
-	for <linux-block@vger.kernel.org>; Wed, 23 Jul 2025 08:41:34 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.252])
-	by mail.maildlp.com (Postfix) with ESMTP id 61B9F1A0E29
-	for <linux-block@vger.kernel.org>; Wed, 23 Jul 2025 08:41:33 +0800 (CST)
-Received: from [10.174.179.143] (unknown [10.174.179.143])
-	by APP3 (Coremail) with SMTP id _Ch0CgCnbdi8L4BonleXBA--.46205S3;
-	Wed, 23 Jul 2025 08:41:33 +0800 (CST)
-Subject: Re: [PATCHv2 2/2] null_blk: fix set->driver_data while setting up
- tagset
-To: Nilay Shroff <nilay@linux.ibm.com>, Yu Kuai <yukuai1@huaweicloud.com>,
- Damien Le Moal <dlemoal@kernel.org>, linux-block@vger.kernel.org
-Cc: hch@lst.de, hare@suse.de, ming.lei@redhat.com, axboe@kernel.dk,
- johannes.thumshirn@wdc.com, gjoyce@ibm.com, "yukuai (C)" <yukuai3@huawei.com>
-References: <20250721140450.1030511-1-nilay@linux.ibm.com>
- <20250721140450.1030511-3-nilay@linux.ibm.com>
- <1cadba31-8e73-4693-9ea5-b5fce8b69ba9@kernel.org>
- <3c33c551-b707-4fd2-bd52-418ff3bc547c@linux.ibm.com>
- <ffa76a0b-3067-129c-ead4-f1e5f0a65357@huaweicloud.com>
- <0687504a-ea0e-497c-b36e-a942520f7177@kernel.org>
- <8bb4fb9e-e79b-cc92-264f-ae2914093a64@huaweicloud.com>
- <3d591f18-b914-4df6-a46c-2644b6a2ce36@linux.ibm.com>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <a1c888d6-e913-b225-0033-610e9794c297@huaweicloud.com>
-Date: Wed, 23 Jul 2025 08:41:32 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.1
+	s=arc-20240116; t=1753232645; c=relaxed/simple;
+	bh=uSar9xHTnGUQj7iYqiDRlLrJCkeSSB2Ouf2GH3Pr1+Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=dgI9LIR5v0UZz2jH9mnt+D1DwJ+5nCqtqlDo+uhI864+1RxD4oo2u1t2oUwta4NsxYkeM1K6IDuc4tWe+T4YMpPFkJyQF7LBuxIly20AmdEDIt4np/Vp8x8XBy0Vcv68ZuKPIMHAqskbilJ0fb421bimOLQQlb/wk/5Ov8azvxM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b=clgkFyNV; arc=none smtp.client-ip=202.108.3.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b="clgkFyNV"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sina.com; s=201208; t=1753232640;
+	bh=xV1mGKNcZIdCI/Yqy+MW7AgI9iRp29g0Rl6VzIV3Dek=;
+	h=From:Subject:Date:Message-ID;
+	b=clgkFyNVjQG5T2w1MWhLLhtsSjCV5T1Cn4/YeEmgXj4kNN7Gm4/d3WK6qtz33FKB6
+	 UjD1S2M5A5FL6pv6hXNDhIzQKQ7+Ls4SFRJMgOU2/qCEu3bj5lcyWlWE8R4nearfq/
+	 jiaLTo45e25PDL+Ptc4lc/iahoRDDNRi/mS56gK4=
+X-SMAIL-HELO: localhost.localdomain
+Received: from unknown (HELO localhost.localdomain)([114.249.58.236])
+	by sina.com (10.54.253.32) with ESMTP
+	id 688034F200000F1B; Wed, 23 Jul 2025 09:03:50 +0800 (CST)
+X-Sender: hdanton@sina.com
+X-Auth-ID: hdanton@sina.com
+Authentication-Results: sina.com;
+	 spf=none smtp.mailfrom=hdanton@sina.com;
+	 dkim=none header.i=none;
+	 dmarc=none action=none header.from=hdanton@sina.com
+X-SMAIL-MID: 1175294456963
+X-SMAIL-UIID: FB494A7CF96241028F43B38BAFEACAE8-20250723-090350-1
+From: Hillf Danton <hdanton@sina.com>
+To: Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>
+Cc: thomas.hellstrom@linux.intel.com,
+	axboe@kernel.dk,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>,
+	regressions@lists.linux.dev
+Subject: Re: 6.15/regression/bisected - lockdep warning: circular locking dependency detected when plugging USB stick after ffa1e7ada456
+Date: Wed, 23 Jul 2025 09:03:34 +0800
+Message-ID: <20250723010336.2793-1-hdanton@sina.com>
+In-Reply-To: <CABXGCsO5mFu9fOq8oKwByZaAjJrCB_V0hKgOsLLJJ4x3PmHr1g@mail.gmail.com>
+References: <CABXGCsPgCBahYRtEZUZiAZtkX51gDE_XZQqK=apuhZ_fOK=Dkg@mail.gmail.com> <20250722005125.2765-1-hdanton@sina.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <3d591f18-b914-4df6-a46c-2644b6a2ce36@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_Ch0CgCnbdi8L4BonleXBA--.46205S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxCrW8uFyDXw48Gw1rKrWrAFb_yoWrAFW3pF
-	WkJa13C348GFs5J342kw1UJFySyF1UAw13Xr1xJay0kr1qvry09r1UZFn0gw48Jrs5C3yI
-	qF1UXFZIvFyUXrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBF14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
-	0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x
-	0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E
-	7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcV
-	C0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF
-	04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7
-	CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUZYFZUUUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-Hi,
+On Tue, 22 Jul 2025 12:11:36 +0500 Mikhail Gavrilov wrote:
+> On Tue, Jul 22, 2025 at 5:51 AM Hillf Danton <hdanton@sina.com> wrote:
+> >
+> > Try the diff that serializes elevator_change() with q->elevator_lock if
+> > reproducer is available.
+> >
+> > --- x/block/elevator.c
+> > +++ y/block/elevator.c
+> > @@ -661,6 +661,7 @@ static int elevator_change(struct reques
+> >         unsigned int memflags;
+> >         int ret = 0;
+> >
+> > +       /* updaters should be serialized */
+> >         lockdep_assert_held(&q->tag_set->update_nr_hwq_lock);
+> >
+> >         memflags = blk_mq_freeze_queue(q);
+> > @@ -674,11 +675,11 @@ static int elevator_change(struct reques
+> >          * Disk isn't added yet, so verifying queue lock only manually.
+> >          */
+> >         blk_mq_cancel_work_sync(q);
+> > +       blk_mq_unfreeze_queue(q, memflags);
+> >         mutex_lock(&q->elevator_lock);
+> >         if (!(q->elevator && elevator_match(q->elevator->type, ctx->name)))
+> >                 ret = elevator_switch(q, ctx);
+> >         mutex_unlock(&q->elevator_lock);
+> > -       blk_mq_unfreeze_queue(q, memflags);
+> >         if (!ret)
+> >                 ret = elevator_change_done(q, ctx);
+> >
+> 
+> Hi Hillf,
+> 
+> Thanks for the patch.
+> 
+> I tested your proposed diff that serializes elevator_change() with
+> q->elevator_lock. Unfortunately, instead of the previous lockdep
+> warning, I'm now seeing a soft lockup warning.
+> 
+> Here is the relevant excerpt from the kernel log:
+> 
+> [   78.573292] sd 6:0:0:0: [sda] Assuming drive cache: write through
+> [   78.581496] ------------[ cut here ]------------
+> [   78.581507] WARNING: CPU: 7 PID: 300 at block/elevator.c:578
+> elevator_switch+0x512/0x630
+> 
+> This happens after plugging in a USB flash stick (sd 6:0:0:0) with the
+> patched kernel.
+> 
+> Full dmesg trace is attached below.
+> 
+> Let me know if you'd like me to try additional debugging or patches.
+> 
+> Thanks for looking into this!
 
-在 2025/07/22 18:19, Nilay Shroff 写道:
-> 
-> 
-> On 7/22/25 2:54 PM, Yu Kuai wrote:
->>>>>> So why do we need this ? Isn't your patch 1/2 enough to fix the crash you got ?
->>>>>>
->>>>> I think you were right — the first patch alone is sufficient to prevent the
->>>>> crash.
->>>>> Initially, I thought the second patch might also be necessary, especially for
->>>>> the
->>>>> scenario where the user increases the number of submit_queues for a null_blk
->>>>> device.
->>>>> While the block layer does create a new hardware queue (hctx) in response to
->>>>> such
->>>>> an update, null_blk (null_map_queues()) does not map any software queue (ctx)
->>>>> to it.
->>>>> As a result, the newly added hctx remains unused for I/O.
->>>>>
->>>>> Given this behavior, I believe we should not allow users to update submit_queues
->>>>> on a null_blk device if it is using a shared tagset. Currently, the code allows
->>>>> this update, but it’s misleading since the change has no actual effect.
->>>>>
->>>>> Would it make sense to explicitly prevent updating submit_queues in this case?
->>>>> That would align the interface with the actual behavior and avoid potential
->>>>> confusion and also saves us allocating memory for hctx which remains unused.
->>>>> Maybe we should have this check, in nullb_update_nr_hw_queues():
->>>>>
->>>>> diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
->>>>> index fbae0427263d..aed2a6904db1 100644
->>>>> --- a/drivers/block/null_blk/main.c
->>>>> +++ b/drivers/block/null_blk/main.c
->>>>> @@ -388,6 +388,12 @@ static int nullb_update_nr_hw_queues(struct nullb_device
->>>>> *dev,
->>>>>            if (!submit_queues)
->>>>>                    return -EINVAL;
->>>>>     +       /*
->>>>> +        * Cannot update queues with shared tagset.
->>>>> +        */
->>>>> +       if (dev->shared_tags)
->>>>> +               return -EINVAL;
->>>>> +
->>>>>            /*
->>>>>             * Make sure that null_init_hctx() does not access nullb->queues[] past
->>>>>             * the end of that array.
->>>>>
->>>>> If the above change looks good, maybe I can update second patch with
->>>>> the above change.
->>>>
->>>> I'm good with this change, howerver, with a quick look it seems lots of
->>>> configfs api are broken for shared_tags. For example:
->>>>
->>>> If we switch shared_tags from 0 to 1, and then read submit_queues,
->>>> looks like it's the old dev->submit_queues instead of g_submit_queues;
->>>
->>> g_submit_queues is used as the initial value for dev->submit_queues. See
->>> nullb_alloc_dev(). So if we prevent changing dev->submit_queues with configfs,
->>> we'll get whatever g_submit_queues was set on modprobe for the shared tagset.
->>
->> I know that, I mean in the case shared_tags is 0 and set submit_queues
->> different from g_submit_queues, and then *switch shared_tags from 0 to
->> 1*, user will read wrong submit_queues :)
->>
-> I think I got what you were referring here. So in addition to the above change
-> we also need to validate the nullb config before we power on nullb device. And
-> we can add that in null_validate_conf():
-> 
-> diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-> index aa163ae9b2aa..1762dc541a17 100644
-> --- a/drivers/block/null_blk/main.c
-> +++ b/drivers/block/null_blk/main.c
-> @@ -1893,6 +1893,10 @@ static int null_validate_conf(struct nullb_device *dev)
->                  dev->submit_queues = 1;
->          dev->prev_submit_queues = dev->submit_queues;
->   
-> +       if (dev->shared_tags)
-> +               if (dev->submit_queues > g_submit_queues)
-> +                       dev->submit_queues = g_submit_queues;
+In order to cure the deadlock, queue is thawed before switching elevator,
+so lets see what comes out with that warning ignored.
 
-Perhaps:
-
-	if (dev->shared_tags) {
-		dev->submit_queues = g_submit_queues;
-		dev->poll_queues = g_poll_queues;
-	} else if (dev->poll_queues > g_poll_queues) {
-		dev->poll_queues = g_poll_queues;
-	}
-
-Thanks,
-Kuai
-> +
->          if (dev->poll_queues > g_poll_queues)
->                  dev->poll_queues = g_poll_queues;
->          dev->prev_poll_queues = dev->poll_queues;
-> 
-> If this looks good then I could also add the above change in this
-> patchset.
-> 
-> Thanks,
-> --Nilay
-> .
-> 
-
+--- x/block/elevator.c
++++ y/block/elevator.c
+@@ -575,7 +575,6 @@ static int elevator_switch(struct reques
+ 	struct elevator_type *new_e = NULL;
+ 	int ret = 0;
+ 
+-	WARN_ON_ONCE(q->mq_freeze_depth == 0);
+ 	lockdep_assert_held(&q->elevator_lock);
+ 
+ 	if (strncmp(ctx->name, "none", 4)) {
+@@ -661,6 +660,7 @@ static int elevator_change(struct reques
+ 	unsigned int memflags;
+ 	int ret = 0;
+ 
++	/* updaters should be serialized */
+ 	lockdep_assert_held(&q->tag_set->update_nr_hwq_lock);
+ 
+ 	memflags = blk_mq_freeze_queue(q);
+@@ -674,11 +674,11 @@ static int elevator_change(struct reques
+ 	 * Disk isn't added yet, so verifying queue lock only manually.
+ 	 */
+ 	blk_mq_cancel_work_sync(q);
++	blk_mq_unfreeze_queue(q, memflags);
+ 	mutex_lock(&q->elevator_lock);
+ 	if (!(q->elevator && elevator_match(q->elevator->type, ctx->name)))
+ 		ret = elevator_switch(q, ctx);
+ 	mutex_unlock(&q->elevator_lock);
+-	blk_mq_unfreeze_queue(q, memflags);
+ 	if (!ret)
+ 		ret = elevator_change_done(q, ctx);
+ 
+--
