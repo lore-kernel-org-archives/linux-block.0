@@ -1,148 +1,113 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 856821F099C;
-	Wed, 23 Jul 2025 02:55:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38DDA1E5714;
+	Wed, 23 Jul 2025 04:37:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753239358; cv=none; b=LlmTAv2fBQ1/vr63ESpoJDSErhV3P28zJZ3o2JCJdDfeelreDDUie/6JFR3qk4kizdV2uGL74LsZ5bHi9wRu1X20orAs+Uj0pWgcRvz5HSB2ZvznifxXXeEbji8YZ7JDQRPOZ09byxmRkJZk+Jz8awZiVp0ng8UkHML6QStMmwQ=
+	t=1753245440; cv=none; b=tqU9TK1vxkgRIFSwllLwEidBmdIprq/R7uoqbeycJfpXferyay1AaX8QAGkmhdN0xSaqrMN948s6QdcpajD9aHNUTqdO21Wp0GwUYVIndbBjgpGsOQ/mk1ZJAgMmtVQ4LL/QpY47R+SmOyxpWm2XehfLT33t1taSvpKz83IhlnE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753239358; c=relaxed/simple;
-	bh=b0b31nNNlAwI2VMSuGDFyRcBdjbFR0jIZlLOQe/v4cY=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=H+gF/msrlhe7Gm7DIyzm9N92ledOX0NGVYzzTYMHKOr44J0u9QOyo8TUhqAmKi+cm9/opIOd/h0wg79oitf128/ZW5lEvOmq4ShxntEt8/1eEU37kZJkX/k1Qcd5tTnDEg2n6Yx/qxcjqPCeT/u6pWg5PK/Y2gWdunPCJGrafJ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4bmzKL0vV0zYQvF0;
-	Wed, 23 Jul 2025 10:55:50 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id D27A41A0E6F;
-	Wed, 23 Jul 2025 10:55:48 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.104.67])
-	by APP4 (Coremail) with SMTP id gCh0CgBHERIxT4Bo+m64BA--.3463S6;
-	Wed, 23 Jul 2025 10:55:48 +0800 (CST)
-From: Yu Kuai <yukuai1@huaweicloud.com>
-To: dlemoal@kernel.org,
-	axboe@kernel.dk,
-	akpm@linux-foundation.org,
-	ming.lei@redhat.com,
-	yang.yang@vivo.com
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	yukuai3@huawei.com,
-	yukuai1@huaweicloud.com,
-	yi.zhang@huawei.com,
-	yangerkun@huawei.com,
-	johnny.chenyi@huawei.com
-Subject: [PATCH 2/2] lib/sbitmap: make sbitmap_get_shallow() internal
-Date: Wed, 23 Jul 2025 10:49:23 +0800
-Message-Id: <20250723024923.3211744-3-yukuai1@huaweicloud.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20250723024923.3211744-1-yukuai1@huaweicloud.com>
-References: <20250723024923.3211744-1-yukuai1@huaweicloud.com>
+	s=arc-20240116; t=1753245440; c=relaxed/simple;
+	bh=LNB7c8Q3FWbbUT0jg4u0cBveqnm3xYrnm8Y9cg2oYVI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BPNTDhSi18g4PhIFC/TMV+j7HK89lAwrZc8hfd3FhSP3cO/4NcBXmurAFju1+t0ctRcEbVJeN2Xd4aPV9R/T+5k7uXkwypzWW7vX8gigjRgGGHlhpHeZb3nD3hPLg2vygYfSAhaxYdVtzmRW1+we2a2ob1lxL/24sG2VgQhmv/M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RFPQJu1M; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RFPQJu1M"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A16DC4CEE7;
+	Wed, 23 Jul 2025 04:37:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753245439;
+	bh=LNB7c8Q3FWbbUT0jg4u0cBveqnm3xYrnm8Y9cg2oYVI=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=RFPQJu1Msu3nhQ3efoSHcgAldmwtMlzxfNw8OoVOoqy/1AfLc6RWnNDmj0kMWE4tq
+	 aZZKeSsg6ZaA0JHqcRX3KXVpbD44MFsuzQJZw6f0q/lo2YEQW4e0h51gwT3+Cp3XEC
+	 NleQTC2XDk+aq+ea5/cs+o71UJd+nh3rDHf1YcSWFSw2hZ6z1677D1m2qQS23+Tn5r
+	 RNREoQbzKxRG6hqmZrbW76ztt9xBfO+4xxWuPiu4FsgZhppCJH1ldbLUyVMkTLma1x
+	 uPT09fiYA7EAf6MUsmBPYi1hypmyEjBT4Gsr3G7fPEGOsrx9yWviq100Q7Oz5Q4NPU
+	 X2qEwJJsi4mDQ==
+Message-ID: <352c67be-b39e-4372-9f69-f942b0a9818d@kernel.org>
+Date: Wed, 23 Jul 2025 13:34:51 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 4/6] elevator: factor elevator lock out of
+ dispatch_request method
+To: Yu Kuai <yukuai1@huaweicloud.com>, hare@suse.de, tj@kernel.org,
+ josef@toxicpanda.com, axboe@kernel.dk
+Cc: cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, yi.zhang@huawei.com, yangerkun@huawei.com,
+ johnny.chenyi@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
+References: <20250722072431.610354-1-yukuai1@huaweicloud.com>
+ <20250722072431.610354-5-yukuai1@huaweicloud.com>
+ <08c989bd-20d8-476c-af99-c9eb8065349d@kernel.org>
+ <cc6f72cb-3782-4426-57c2-4d54fc4f38f2@huaweicloud.com>
+ <d32d44ef-a964-430a-a735-f63f2fa5e7ed@kernel.org>
+ <2b48b0eb-7294-c4e1-8b84-ce2e860f3a75@huaweicloud.com>
+From: Damien Le Moal <dlemoal@kernel.org>
+Content-Language: en-US
+Organization: Western Digital Research
+In-Reply-To: <2b48b0eb-7294-c4e1-8b84-ce2e860f3a75@huaweicloud.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgBHERIxT4Bo+m64BA--.3463S6
-X-Coremail-Antispam: 1UD129KBjvJXoWxCF17AF45Xw18XF4xZryrZwb_yoW5AFW8pF
-	4xKa48Gr9Yvry29rnrXrWDZF90qw4kJFnxGFsagF1Fkr4Dt3Zaqrn5CFW3t343CFW8AF45
-	AFyY9ry8Cr1UXFDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUQm14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_Jryl82xGYIkIc2
-	x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0
-	Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJw
-	A2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS
-	0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2
-	IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0
-	Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kIc2
-	xKxwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCF54CYxVCY1x0262kKe7AK
-	xVWUtVW8ZwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I
-	0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAI
-	cVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcV
-	CF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIE
-	c7CjxVAFwI0_Gr1j6F4UJbIYCTnIWIevJa73UjIFyTuYvjfUOdgAUUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-From: Yu Kuai <yukuai3@huawei.com>
+On 7/23/25 11:51 AM, Yu Kuai wrote:
+>> If you apply this patch, stop here without applying the following patches, and
+>> test the changes up to this point, things will break since there is no locking
+>> during dispatch.
+> 
+> Do you missed the following change in this patch? Dispatch do switch to
+> the new lock, I don't get it why there is no locking.
 
-Because it's only used in sbitmap.c
+My bad. Yes, I completely missed it. Sorry for the noise.
 
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
- include/linux/sbitmap.h | 17 -----------------
- lib/sbitmap.c           | 18 ++++++++++++++++--
- 2 files changed, 16 insertions(+), 19 deletions(-)
+> @@ -113,7 +114,12 @@ static int __blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx
+> *hctx)
+>          if (budget_token < 0)
+>              break;
+> 
+> +        if (sq_sched)
+> +            spin_lock_irq(&e->lock);
+>          rq = e->type->ops.dispatch_request(hctx);
+> +        if (sq_sched)
+> +            spin_unlock_irq(&e->lock);
+> +
+>          if (!rq) {
+>              blk_mq_put_dispatch_budget(q, budget_token);
+>              /*
+>>
+>> So you need to organize the patches so that you first have the elevator level
+>> common locking in place and then have one patch for bfq and one patch for
+>> mq-deadline that switch to using that new lock. Hence the suggestion to reverse
+>> the order of your changes: change the block layer first, then have bfq and
+>> mq-deadline use that new locking.
+> 
+> I think I understand what you mean, just to be sure.
+> 
+> 1. patch 5 in this set
+> 2. patch to introduce high level lock, and grab it during dispatch in block layer.
+> 3. changes in ioc
+> 4. changes in bfq
+> 5. changes in deadline
+> 6. patch 6 in this set.
 
-diff --git a/include/linux/sbitmap.h b/include/linux/sbitmap.h
-index 4adf4b364fcd..ffb9907c7070 100644
---- a/include/linux/sbitmap.h
-+++ b/include/linux/sbitmap.h
-@@ -209,23 +209,6 @@ void sbitmap_resize(struct sbitmap *sb, unsigned int depth);
-  */
- int sbitmap_get(struct sbitmap *sb);
- 
--/**
-- * sbitmap_get_shallow() - Try to allocate a free bit from a &struct sbitmap,
-- * limiting the depth used from each word.
-- * @sb: Bitmap to allocate from.
-- * @shallow_depth: The maximum number of bits to allocate from the bitmap.
-- *
-- * This rather specific operation allows for having multiple users with
-- * different allocation limits. E.g., there can be a high-priority class that
-- * uses sbitmap_get() and a low-priority class that uses sbitmap_get_shallow()
-- * with a @shallow_depth of (sb->depth >> 1). Then, the low-priority
-- * class can only allocate half of the total bits in the bitmap, preventing it
-- * from starving out the high-priority class.
-- *
-- * Return: Non-negative allocated bit number if successful, -1 otherwise.
-- */
--int sbitmap_get_shallow(struct sbitmap *sb, unsigned long shallow_depth);
--
- /**
-  * sbitmap_any_bit_set() - Check for a set bit in a &struct sbitmap.
-  * @sb: Bitmap to check.
-diff --git a/lib/sbitmap.c b/lib/sbitmap.c
-index f2e90ac6b56e..5e3c35086253 100644
---- a/lib/sbitmap.c
-+++ b/lib/sbitmap.c
-@@ -306,7 +306,22 @@ static int __sbitmap_get_shallow(struct sbitmap *sb,
- 	return sbitmap_find_bit(sb, shallow_depth, index, alloc_hint, true);
- }
- 
--int sbitmap_get_shallow(struct sbitmap *sb, unsigned long shallow_depth)
-+/**
-+ * sbitmap_get_shallow() - Try to allocate a free bit from a &struct sbitmap,
-+ * limiting the depth used from each word.
-+ * @sb: Bitmap to allocate from.
-+ * @shallow_depth: The maximum number of bits to allocate from the bitmap.
-+ *
-+ * This rather specific operation allows for having multiple users with
-+ * different allocation limits. E.g., there can be a high-priority class that
-+ * uses sbitmap_get() and a low-priority class that uses sbitmap_get_shallow()
-+ * with a @shallow_depth of (sb->depth >> 1). Then, the low-priority
-+ * class can only allocate half of the total bits in the bitmap, preventing it
-+ * from starving out the high-priority class.
-+ *
-+ * Return: Non-negative allocated bit number if successful, -1 otherwise.
-+ */
-+static int sbitmap_get_shallow(struct sbitmap *sb, unsigned long shallow_depth)
- {
- 	int nr;
- 	unsigned int hint, depth;
-@@ -321,7 +336,6 @@ int sbitmap_get_shallow(struct sbitmap *sb, unsigned long shallow_depth)
- 
- 	return nr;
- }
--EXPORT_SYMBOL_GPL(sbitmap_get_shallow);
- 
- bool sbitmap_any_bit_set(const struct sbitmap *sb)
- {
+What about something like this:
+1) Introduce the elevator common/generic lock (first part of patch 1 + middle
+of patch 4 squashed together)
+2) Convert deadline to use elevator generic lock (second part of patch 1 + end
+of patch 4)
+3) Convert bfq to use elevator generic lock (patch 3 + beginning of patch 4)
+4) Patch 6
+
+As for the ioc changes, they do not seem directly related to the elevator lock
+changes, but since the code may conflict, maybe bring them as prep patches at
+the beginning (0).
+
+
 -- 
-2.39.2
-
+Damien Le Moal
+Western Digital Research
