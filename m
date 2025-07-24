@@ -1,112 +1,140 @@
-Received: from r3-18.sinamail.sina.com.cn (r3-18.sinamail.sina.com.cn [202.108.3.18])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1246878F54
-	for <linux-block@vger.kernel.org>; Thu, 24 Jul 2025 01:20:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.108.3.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5654818CC13
+	for <linux-block@vger.kernel.org>; Thu, 24 Jul 2025 02:19:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753320016; cv=none; b=bicdHDwRHdKNIawEihRIZgagLmblNZ4OCaHppKa/tkoZ59w8VWU5u0ejLj0C6nIbaV9McWfv3wPswgUZZrN2sGr1KebO4va+scxQbhFS42Iqq64JrQ4S+Yz1a6pO3/YzbMiIgHRYykbwJdrAOaapiWKpR5YyohFI1m6V25hKw1Y=
+	t=1753323572; cv=none; b=EnBhzy01sgEdxH3cscQMtZRKxzwUrFk4n8nF5EBFlNbfNlOTyjT7FICDalV7RZCUbvOvPqaY5LxKsOP722e00sq8WzdlnqkLNisdbg3xxMnedFaK706tcTJ6xVvrOHczL5Jt2A5yDvpBuVJKQ6KH4sUUGGjme2kIjnuNpL80Cbc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753320016; c=relaxed/simple;
-	bh=mDD70Q0yeAlFwV7OKohDiy4mFKvI3jVQz1CMtmTBuJE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=G/WRtTVE3eGYbpbBa0NiFhRjzr3YzXZ8QJnZ8Jvb/x1H+if2u6FxhcixnGguohnLafUEkymYNckPWKPEvF3/FZI8hHQJGb7pSHeIFK92gYhIpi2BVKF50ou3ow6Kk4Jj9jWxeHf2ictbbvHEJURGtGMGQEWEC50GvHea2t8ojtY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b=xFNRCseF; arc=none smtp.client-ip=202.108.3.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b="xFNRCseF"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sina.com; s=201208; t=1753320011;
-	bh=HxOg07j8XSOPOmST+Z7BvpNeAdBjsjbaa+rEGh4idSc=;
-	h=From:Subject:Date:Message-ID;
-	b=xFNRCseFpw/9eRHR8I19U3ENkIE1TQAf26VG4lQPuDyHkD8CW4YdzParAlTgt/Nbo
-	 P4nRSi565tRGNjxEfzQSP3wwesX1Z7sRBNCSHtr+ND7hs3HkUbPw/KbxceehJO0zea
-	 dWVEYWS9djIJ0BssFjb/h7TnclE2PRikRupJxKho=
-X-SMAIL-HELO: localhost.localdomain
-Received: from unknown (HELO localhost.localdomain)([114.249.58.236])
-	by sina.com (10.54.253.32) with ESMTP
-	id 68818A41000067DB; Thu, 24 Jul 2025 09:20:02 +0800 (CST)
-X-Sender: hdanton@sina.com
-X-Auth-ID: hdanton@sina.com
-Authentication-Results: sina.com;
-	 spf=none smtp.mailfrom=hdanton@sina.com;
-	 dkim=none header.i=none;
-	 dmarc=none action=none header.from=hdanton@sina.com
-X-SMAIL-MID: 6893174456743
-X-SMAIL-UIID: 40610C3A39A743CCBCBE9913FDAE4EA7-20250724-092002-1
-From: Hillf Danton <hdanton@sina.com>
-To: Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>
-Cc: thomas.hellstrom@linux.intel.com,
-	axboe@kernel.dk,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	regressions@lists.linux.dev
-Subject: Re: 6.15/regression/bisected - lockdep warning: circular locking dependency detected when plugging USB stick after ffa1e7ada456
-Date: Thu, 24 Jul 2025 09:19:49 +0800
-Message-ID: <20250724011950.2836-1-hdanton@sina.com>
-In-Reply-To: <CABXGCsOwAQuisqpfUvW+1BWtOV+O1GypcQ6mb4SSUgN3YkAZUQ@mail.gmail.com>
-References: <CABXGCsPgCBahYRtEZUZiAZtkX51gDE_XZQqK=apuhZ_fOK=Dkg@mail.gmail.com> <20250722005125.2765-1-hdanton@sina.com> <CABXGCsO5mFu9fOq8oKwByZaAjJrCB_V0hKgOsLLJJ4x3PmHr1g@mail.gmail.com> <20250723010336.2793-1-hdanton@sina.com>
+	s=arc-20240116; t=1753323572; c=relaxed/simple;
+	bh=XpjK2s2eq0vOz9AoLtVoSpGBT2DYbN0Q7OdV6MxZooU=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=FjDI8XxONlqxVK8VegRfFuGoYsfhNVfwVCr8DZXuGI1jxAoXcfCj18POtcSlvqiJCgJ+LIF2cNosaq/zOg+9ZmatFyRfGuIo/QbNgD1vTrLXWl12QlcST3Gn5oHVWpw0/ojxdBOAjsFjr30kUoF8WVT2GNuxCJmwlDoRtOoibNA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4bnZSt4W0YzYQtxV
+	for <linux-block@vger.kernel.org>; Thu, 24 Jul 2025 10:19:26 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 5AB6B1A1447
+	for <linux-block@vger.kernel.org>; Thu, 24 Jul 2025 10:19:25 +0800 (CST)
+Received: from [10.174.179.143] (unknown [10.174.179.143])
+	by APP4 (Coremail) with SMTP id gCh0CgCnIxQrmIFog0MnBQ--.51554S3;
+	Thu, 24 Jul 2025 10:19:25 +0800 (CST)
+Subject: Re: [PATCHv3 1/2] lib/sbitmap: fix kernel crash observed when sbitmap
+ depth is zero
+To: Nilay Shroff <nilay@linux.ibm.com>, linux-block@vger.kernel.org
+Cc: hch@lst.de, dlemoal@kernel.org, yukuai1@huaweicloud.com, hare@suse.de,
+ ming.lei@redhat.com, axboe@kernel.dk, johannes.thumshirn@wdc.com,
+ gjoyce@ibm.com, "yukuai (C)" <yukuai3@huawei.com>
+References: <20250723134442.1283664-1-nilay@linux.ibm.com>
+ <20250723134442.1283664-2-nilay@linux.ibm.com>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <ec93c0a4-4237-f4d8-67e0-4307be05397d@huaweicloud.com>
+Date: Thu, 24 Jul 2025 10:19:23 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20250723134442.1283664-2-nilay@linux.ibm.com>
+Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgCnIxQrmIFog0MnBQ--.51554S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxXryDCF45AFW7Gry8tryUGFg_yoW5CrWkpF
+	ZrGFWIkr40q34Uuw4UJFyxuFy8uFs0kF9rG3sayr1Y9a1qgr95WF1DCFW7XFWUGr1kAF1r
+	tas8Cw17K34DZaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUBF14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
+	0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x
+	0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E
+	7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcV
+	C0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF
+	04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7
+	CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUd-B_UUUUU=
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On Thu, 24 Jul 2025 01:36:37 +0500 Mikhail Gavrilov wrote:
-> On Wed, Jul 23, 2025 at 6:03â€¯AM Hillf Danton <hdanton@sina.com> wrote:
-> >
-> > In order to cure the deadlock, queue is thawed before switching elevator,
-> > so lets see what comes out with that warning ignored.
-> >
-> > --- x/block/elevator.c
-> > +++ y/block/elevator.c
-> > @@ -575,7 +575,6 @@ static int elevator_switch(struct reques
-> >         struct elevator_type *new_e = NULL;
-> >         int ret = 0;
-> >
-> > -       WARN_ON_ONCE(q->mq_freeze_depth == 0);
-> >         lockdep_assert_held(&q->elevator_lock);
-> >
-> >         if (strncmp(ctx->name, "none", 4)) {
-> > @@ -661,6 +660,7 @@ static int elevator_change(struct reques
-> >         unsigned int memflags;
-> >         int ret = 0;
-> >
-> > +       /* updaters should be serialized */
-> >         lockdep_assert_held(&q->tag_set->update_nr_hwq_lock);
-> >
-> >         memflags = blk_mq_freeze_queue(q);
-> > @@ -674,11 +674,11 @@ static int elevator_change(struct reques
-> >          * Disk isn't added yet, so verifying queue lock only manually.
-> >          */
-> >         blk_mq_cancel_work_sync(q);
-> > +       blk_mq_unfreeze_queue(q, memflags);
-> >         mutex_lock(&q->elevator_lock);
-> >         if (!(q->elevator && elevator_match(q->elevator->type, ctx->name)))
-> >                 ret = elevator_switch(q, ctx);
-> >         mutex_unlock(&q->elevator_lock);
-> > -       blk_mq_unfreeze_queue(q, memflags);
-> >         if (!ret)
-> >                 ret = elevator_change_done(q, ctx);
-> >
-> > --
+ÔÚ 2025/07/23 21:43, Nilay Shroff Ð´µÀ:
+> We observed a kernel crash when the I/O scheduler allocates an sbitmap
+> for a hardware queue (hctx) that has no associated software queues (ctx),
+> and later attempts to free it. When no software queues are mapped to a
+> hardware queue, the sbitmap is initialized with a depth of zero. In such
+> cases, the sbitmap_init_node() function should set sb->alloc_hint to NULL.
+> However, if this is not done, sb->alloc_hint may contain garbage, and
+> calling sbitmap_free() will pass this invalid pointer to free_percpu(),
+> resulting in a kernel crash.
 > 
-> Hi Hillf,
+> Example crash trace:
+> ==================================================================
+> Kernel attempted to read user page (28) - exploit attempt? (uid: 0)
+> BUG: Kernel NULL pointer dereference on read at 0x00000028
+> Faulting instruction address: 0xc000000000708f88
+> Oops: Kernel access of bad area, sig: 11 [#1]
+> LE PAGE_SIZE=64K MMU=Radix  SMP NR_CPUS=2048 NUMA pSeries
+> [...]
+> CPU: 5 UID: 0 PID: 5491 Comm: mk_nullb_shared Kdump: loaded Tainted: G    B               6.16.0-rc5+ #294 VOLUNTARY
+> Tainted: [B]=BAD_PAGE
+> Hardware name: IBM,9043-MRX POWER10 (architected) 0x800200 0xf000006 of:IBM,FW1060.00 (NM1060_028) hv:phyp pSeries
+> [...]
+> NIP [c000000000708f88] free_percpu+0x144/0xba8
+> LR [c000000000708f84] free_percpu+0x140/0xba8
+> Call Trace:
+>      free_percpu+0x140/0xba8 (unreliable)
+>      kyber_exit_hctx+0x94/0x124
+>      blk_mq_exit_sched+0xe4/0x214
+>      elevator_exit+0xa8/0xf4
+>      elevator_switch+0x3b8/0x5d8
+>      elv_update_nr_hw_queues+0x14c/0x300
+>      blk_mq_update_nr_hw_queues+0x5cc/0x670
+>      nullb_update_nr_hw_queues+0x118/0x1f8 [null_blk]
+>      nullb_device_submit_queues_store+0xac/0x170 [null_blk]
+>      configfs_write_iter+0x1dc/0x2d0
+>      vfs_write+0x5b0/0x77c
+>      ksys_write+0xa0/0x180
+>      system_call_exception+0x1b0/0x4f0
+>      system_call_vectored_common+0x15c/0x2ec
 > 
-> Thanks for the patch.
+> If the sbitmap depth is zero, sb->alloc_hint memory is NOT allocated, but
+> the pointer is not explicitly set to NULL. Later, during sbitmap_free(),
+> the kernel attempts to free sb->alloc_hint, which is a per cpu pointer
+> variable, regardless of whether it was valid, leading to a crash.
 > 
-> With this patch applied, I haven't seen either the lockdep warning or
-> a soft lockup within 13 hours of runtime. Not sure if that's
-> sufficient yet for a final verdict, but it's definitely promising.
+> This patch ensures that sb->alloc_hint is explicitly set to NULL in
+> sbitmap_init_node() when the requested depth is zero. This prevents
+> free_percpu() from freeing sb->alloc_hint and thus avoids the observed
+> crash.
+> 
+> Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
+> Reviewed-by: Hannes Reinecke <hare@suse.de>
+> Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
+> ---
+>   lib/sbitmap.c | 1 +
+>   1 file changed, 1 insertion(+)
+> 
+Reviewed-by: Yu Kuai <yukuai3@huawei.com>
+Thanks
 
-Thank you for testing it.
+> diff --git a/lib/sbitmap.c b/lib/sbitmap.c
+> index d3412984170c..aa8b6ca76169 100644
+> --- a/lib/sbitmap.c
+> +++ b/lib/sbitmap.c
+> @@ -119,6 +119,7 @@ int sbitmap_init_node(struct sbitmap *sb, unsigned int depth, int shift,
+>   
+>   	if (depth == 0) {
+>   		sb->map = NULL;
+> +		sb->alloc_hint = NULL;
+>   		return 0;
+>   	}
+>   
+> 
 
-It works for you so far, but given the "correct" locking order enforced
-in ffa1e7ada456, I know the chance for reversing that order is not zero
-yet either in Jens or upstream tree. Nor simple to fix every single case.
-
-Hillf Danton
