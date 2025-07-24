@@ -1,146 +1,404 @@
-Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C2887F9;
-	Thu, 24 Jul 2025 10:16:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57EEB266B56
+	for <linux-block@vger.kernel.org>; Thu, 24 Jul 2025 10:26:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753352205; cv=none; b=OCQDjTjVIFuax5MjR5OgsTusGUg1Tnld5jyWejCm2r9I2+7qQMdonYyQBtq4iUTx/Ld36ydhRgiG/Cb/7xF+QBOFr/JpVxLWMA+I0OlBeIPdFnVAdNXB7+wwBYAQal4OIzpKZFKW6zPWxsxWRa8H2Snob/F4tW2usWkoyfdx+ms=
+	t=1753352781; cv=none; b=eoo+xZ8f1TlTTbAU6w0hwoEznb5AYtN+aQyEHPT2AXLZ83oZ5OsyJcUbDwcmrtA5Ac2B8xtITQXPDJcyVrd0SL/6VafjlPMo/3Q4+7PGQxRLxcnI01bXSf1zEDm/AVkMTsEGU763GQsHQJRxkj4NUl2AExvbSl4KFK+siRTYhmI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753352205; c=relaxed/simple;
-	bh=6QJNDpM0NSkICZZvi+OOhGR48b8nkoDYyIe91De/OqM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IEj+Rj/USbq1oJNflJpTkc09vERs00To3XUXA7L8Igriv5u3gUmo2ebM3quBmJmzmQvYX+XhR/m6gCEDzir5O20SpM5tmJS547AMJLiBE+zqHDMfi/sHoiWS9R/NJLWQ+hkb8l6u8TKwB6ysW8367SM1MHJ/6EO+QvfA6F3xVHA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L0XDZkXz; arc=none smtp.client-ip=209.85.208.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1753352781; c=relaxed/simple;
+	bh=HvT8Z5TmLXY026z0+f+4/xVWcCWh6FOPeq1kMItjEbY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=vFPPhts+32rzDDV2l5tbwQZ55P7hfwF/gyld4qoCjjK7MU7KIBkMBnCyVmq2Cbo1XQc80BGre2aQLcqFlTpTlPHKIqNkjIFOGvlQ2oMTY6j0wajOWsHEa1Zr6sbPAMR1XKNGBQL58hx0IFMPHUKGc9k3oqzBEsc03OdAw9UAui0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=tdwOdSuV; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L0XDZkXz"
-Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-32b2f5d91c8so6727801fa.0;
-        Thu, 24 Jul 2025 03:16:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753352202; x=1753957002; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7nRXIsxKDx+EHQ+ewmB7GHMOLLLIjUjSDjsF/PUy3dM=;
-        b=L0XDZkXzcOA0uHfvsBEVzFqNgtvGNZycAoy2HAC1wzxJJv9leX8oovkiXC+9n4Erho
-         AFk0h8CR0kErru0d3uHT7bRPaCHPAQ86N4EjYvLmHeVTDdyFGUDRyQiNeIncLzdQqRsN
-         ooEb2JgiONXJLo7z0hJWG7To2dvJOkPigX4SZ7W/hCYKIHy/3PFzNojAOgA4746aSyJg
-         0gdsI4ShkaMavsieklbWHvohs9lEcfLGo3xF4vuAtPCmRTMbR1NNC682K0Oq+At17pN5
-         eNxjqiFV91YRPBXVOLS0TLcVCvi3o2gvVb684zpgmuZL/lQ0LaiKTHNslSMD5TLPgZp0
-         dTYA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753352202; x=1753957002;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7nRXIsxKDx+EHQ+ewmB7GHMOLLLIjUjSDjsF/PUy3dM=;
-        b=JoQoFIQlYE3dPlYtVhkxD+Q8DVjcCDny8063aTzehhvGJHOR/Snsj/+50r8Hq8+/RO
-         Iw38MF02vl/Ef+3RFaqJiiFX6IouSsbV3yT0d6dTSQVkoY12RJiAqO4sMKkom0B/8yZd
-         88EGluYCn66niFwGsScT+jpO29coC1xbmCK7Xcm/cRZ7TCADBKACqQ0p8lpMcgUItCXk
-         xKUD4AtzR4eZL2Ks03269NyV6TlwpUF/t6yg7HMvq9O7B+9gAfPvXJ6NNkXT1mhugLbd
-         jrN538dr88zF2wvADVpi1Ko4JrNJ9YzcV2VkX+FVpwVIcnEu6t72gdkYooUSqRSlsPzw
-         fujA==
-X-Forwarded-Encrypted: i=1; AJvYcCV/fo6efBVFG7VkVOYKEyQDszeDXEa5wco+kRCMLuTb+y7Ee4XM9lv7k3QlImZm+hTos0rM8hlxv7xaLA==@vger.kernel.org, AJvYcCWMRYard5sQ0N+pKlNndcWAtoV6eMooBfoOupIjRsKgdF4z9dKTFJtAMvkWVo2Wb/39U+/Sh2CEtbZPfM6U@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz4+GpOexH4iIUWMd6v4ddUnJyJLC1Dvmn3uK+/3OUwXHx4T8nd
-	rqo5ANoVf6VAZk9BqyjEnOMfL4DpD9l7SBOj81/I86NgiQTmRiyd7WsD
-X-Gm-Gg: ASbGncszA6klyszN9lH7YRD8ryFtAFMKpXLArFh3d7PTujhK8d+cz4/pa4Wua/LEpzG
-	qCsqukxKqEje/c4uLTpMtxVl6hVdgOoD2jv5pgbNcESNj3t4FrGn3lM4yPZ9RTcfN1KVN6f+Tx1
-	CmBoJGJiePMjsau663NHGsF+hPLaMFdqSq3kGlzPIPCUg2fRiB0SRdIHP/5VtbXKr/EmJ/JxHWZ
-	kKaXs6qyaIXwe0/6UK8Nq73JJSWyhfj/yg4DOHdpDGk+XLSmbOZp3t6lo2+tZ/5OSY1/mFhqHln
-	VjE0FoPkQuWPcTyXSMulnSL9WemgIXwszr0Evzo95FbArpfUCaTvGcOuBO413N7/ktDq6K3aRQW
-	oCwcLLfcPWe1Nay9DY/Oh97z87MX7wHmCg9LM5M/uZEzH3Pa/0GinPbtv5SnIDTrNaoNdkIg=
-X-Google-Smtp-Source: AGHT+IHbvep+/IiKtqAaTAeoELx3JXG0DMzJS0uGTSEYeNhDWHmOW1AheiIS7ATEPGIR+vi2q9+ChA==
-X-Received: by 2002:a2e:a58d:0:b0:331:e667:90e5 with SMTP id 38308e7fff4ca-331e667abd6mr1624001fa.18.1753352201916;
-        Thu, 24 Jul 2025 03:16:41 -0700 (PDT)
-Received: from localhost (host-95-193-188-192.mobileonline.telia.com. [95.193.188.192])
-        by smtp.gmail.com with UTF8SMTPSA id 38308e7fff4ca-331e08e82ffsm2476901fa.51.2025.07.24.03.16.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Jul 2025 03:16:41 -0700 (PDT)
-Date: Thu, 24 Jul 2025 12:16:40 +0200
-From: Klara Modin <klarasmodin@gmail.com>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Arnd Bergmann <arnd@kernel.org>, Anuj Gupta <anuj20.g@samsung.com>, 
-	"Martin K. Petersen" <martin.petersen@oracle.com>, Kanchan Joshi <joshi.k@samsung.com>, 
-	Christian Brauner <brauner@kernel.org>, Christoph Hellwig <hch@infradead.org>, 
-	Naresh Kamboju <naresh.kamboju@linaro.org>, Anders Roxell <anders.roxell@linaro.org>, 
-	Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>, 
-	Caleb Sander Mateos <csander@purestorage.com>, Pavel Begunkov <asml.silence@gmail.com>, 
-	Alexey Dobriyan <adobriyan@gmail.com>, "Darrick J. Wong" <djwong@kernel.org>, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] [v2] block: fix FS_IOC_GETLBMD_CAP parsing in
- blkdev_common_ioctl()
-Message-ID: <u67ijiie6n2w3crfpuipprrmkocja7bxadlo3sbr47w7hysjgj@rjduhmczwwdz>
-References: <20250711084708.2714436-1-arnd@kernel.org>
- <szmagqqo6lx36ozaqd5qf72xnzoi4e23jbfehjli6rfbvhps6w@if2cvmlgvmxv>
- <b6346235-cc66-4ce0-8768-52a1a89fd699@app.fastmail.com>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="tdwOdSuV"
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56O65iXa028748;
+	Thu, 24 Jul 2025 10:25:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pp1; bh=9w+K6B7FZ7rveQwmhyI3uHKbiNyY
+	IvRnAfMqA741E+8=; b=tdwOdSuVaLC6ezeOrcES83qt/pT3rN5nEsD9/yPbf4Gu
+	N49T0eSbIzTdkKUihtHiMf+OZQ6TZtb5Dv98wQSUN5eipF2SK2fqr5Rtmwyo5+Z8
+	pWDoE3w79mWWtdTJquUNIfVHTTMYRTPt+Zz5/4ERgjGck0ofmwrZWz2I65iXWB3w
+	uEFDOsl1WqiM9qq0RoB/3OlrM8HA1urFTeAqscLVnFl/bjvd4ALsPfpOmlFbTpkF
+	lC0XJDYVsRU9vYw3M88SrXKnSdxbKnjycmlfK0ix5gZgQm2UgNMlua+CUjnwnH8t
+	NzeN8tPvuK9kp0JKXq0rhbkB/QwA0t3cP+BAWbv/AA==
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 482kdyruap-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 24 Jul 2025 10:25:57 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 56O6dlER005057;
+	Thu, 24 Jul 2025 10:25:56 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 480u8g3991-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 24 Jul 2025 10:25:55 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 56OAPssE28967536
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 24 Jul 2025 10:25:54 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 058D02004E;
+	Thu, 24 Jul 2025 10:25:54 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id EE4C62004D;
+	Thu, 24 Jul 2025 10:25:51 +0000 (GMT)
+Received: from li-c9696b4c-3419-11b2-a85c-f9edc3bf8a84.in.ibm.com (unknown [9.109.198.188])
+	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 24 Jul 2025 10:25:51 +0000 (GMT)
+From: Nilay Shroff <nilay@linux.ibm.com>
+To: linux-block@vger.kernel.org
+Cc: yi.zhang@redhat.com, hch@lst.de, ming.lei@redhat.com,
+        yukuai1@huaweicloud.com, yukuai3@huawei.com, axboe@kernel.dk,
+        shinichiro.kawasaki@wdc.com, gjoyce@ibm.com
+Subject: [PATCHv3] block: restore two stage elevator switch while running nr_hw_queue update
+Date: Thu, 24 Jul 2025 15:31:51 +0530
+Message-ID: <20250724102540.1366308-1-nilay@linux.ibm.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b6346235-cc66-4ce0-8768-52a1a89fd699@app.fastmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: Fm15sVPMbYWT2CrMMJgeBtcwv2ggAKgk
+X-Authority-Analysis: v=2.4 cv=XP0wSRhE c=1 sm=1 tr=0 ts=68820a35 cx=c_pps
+ a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
+ a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=VwQbUJbxAAAA:8 a=pGLkceISAAAA:8
+ a=20KFwNOVAAAA:8 a=VnNF1IyMAAAA:8 a=tiNElXcWUx9n9e3lJFUA:9 a=3ZKOabzyN94A:10
+ a=QEXdDO2ut3YA:10
+X-Proofpoint-GUID: Fm15sVPMbYWT2CrMMJgeBtcwv2ggAKgk
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzI0MDA3MSBTYWx0ZWRfX1QteNuppUFQA
+ ROpf/H8djWcGU71n7nbUxq4NJQwLeXQqA6iARRJoD0OuCMRdUvFQNQ34w/CCxVAyKp0Y33tPP3P
+ 2Xep8J2c3WCexzkR8/jjh7QpQfGwOW9NXuXm/OGMnzida5usaN+5eT7XYA0Fhte9OCd5pTqlLyD
+ M/D4oI3yMhgZeA4vWyZ2cDcxNaEjh/9DNqgwtZzJIDr00wiNegfOpM43It4I4h+KG8JyagEvlWo
+ YeMeCzx4pjzAbbbul6to+ZnZi7+klViiwvEWdAzXvcpyNUNdnu92NY/oWux2rGVWcD2hbsskpbB
+ Uk4lyklgadrdRrGfMblwfNd3NEz3uV2l7jUIjV/TzC66g14xGDC1mKrmIdrCG/yA/LEtiyjZkU6
+ g+prI/9PQY0q3tbOmTMuSmB+ePziK4Abis+HQ07/o10t2lGwv2IVyB8BYd7li2tpEOMJAsqC
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-07-24_01,2025-07-23_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ mlxscore=0 bulkscore=0 priorityscore=1501 mlxlogscore=999 spamscore=0
+ suspectscore=0 clxscore=1015 malwarescore=0 impostorscore=0
+ lowpriorityscore=0 adultscore=0 phishscore=0 classifier=spam authscore=0
+ authtc=n/a authcc= route=outbound adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2505280000 definitions=main-2507240071
 
-On 2025-07-18 07:56:49 +0200, Arnd Bergmann wrote:
-> On Fri, Jul 18, 2025, at 01:37, Klara Modin wrote:
->   
-> >> diff --git a/block/ioctl.c b/block/ioctl.c
-> >> index 9ad403733e19..af2e22e5533c 100644
-> >> --- a/block/ioctl.c
-> >> +++ b/block/ioctl.c
-> >> @@ -566,9 +566,11 @@ static int blkdev_common_ioctl(struct block_device *bdev, blk_mode_t mode,
-> >>  			       void __user *argp)
-> >>  {
-> >>  	unsigned int max_sectors;
-> >> +	int ret;
-> >>  
-> >> -	if (_IOC_NR(cmd) == _IOC_NR(FS_IOC_GETLBMD_CAP))
-> >> -		return blk_get_meta_cap(bdev, cmd, argp);
-> >
-> >> +	ret = blk_get_meta_cap(bdev, cmd, argp);
-> >> +	if (ret != -ENOIOCTLCMD)
-> >> +		return ret;
-> >
-> > This check seems to be incomplete. In the case when BLK_DEV_INTEGRITY is
-> > disabled the ioctl can never complete as blk_get_meta_cap will then
-> > always return -EOPNOTSUPP. Or should the !BLK_DEV_INTEGRITY stub be
-> > changed to return -ENOIOCTLCMD instead?
-> 
-> Ah, I did miss the stub.
-> 
-> > It makes e.g. cryptsetup fail in my initramfs. Adding -EOPNOTSUPP to the
-> > check fixes it for me:
-> >
-> > diff --git a/block/ioctl.c b/block/ioctl.c
-> > index af2e22e5533c..7d5361fd1b7d 100644
-> > --- a/block/ioctl.c
-> > +++ b/block/ioctl.c
-> > @@ -569,7 +569,7 @@ static int blkdev_common_ioctl(struct block_device 
-> > *bdev, blk_mode_t mode,
-> >  	int ret;
-> > 
-> >  	ret = blk_get_meta_cap(bdev, cmd, argp);
-> > -	if (ret != -ENOIOCTLCMD)
-> > +	if (ret != -EOPNOTSUPP && ret != -ENOIOCTLCMD)
-> >  		return ret;
-> > 
-> >  	switch (cmd) {
-> 
-> I think returning -ENOIOCTLCMD from the stub makes more sense,
-> but I don't know what the motivation for the -EOPNOTSUPP was.
-> 
->      Arnd
+The kmemleak reports memory leaks related to elevator resources that
+were originally allocated in the ->init_hctx() method. The following
+leak traces are observed after running blktests block/040:
 
-Should I send a patch changing the stub? At least from reading
-Documentation/driver-api/ioctl.rst it seems clear that only -ENOIOCTLCMD
-or -ENOTTY is correct when the command number is unknown.
+unreferenced object 0xffff8881b82f7400 (size 512):
+  comm "check", pid 68454, jiffies 4310588881
+  hex dump (first 32 bytes):
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace (crc 5bac8b34):
+    __kvmalloc_node_noprof+0x55d/0x7a0
+    sbitmap_init_node+0x15a/0x6a0
+    kyber_init_hctx+0x316/0xb90
+    blk_mq_init_sched+0x419/0x580
+    elevator_switch+0x18b/0x630
+    elv_update_nr_hw_queues+0x219/0x2c0
+    __blk_mq_update_nr_hw_queues+0x36a/0x6f0
+    blk_mq_update_nr_hw_queues+0x3a/0x60
+    0xffffffffc09ceb80
+    0xffffffffc09d7e0b
+    configfs_write_iter+0x2b1/0x470
+    vfs_write+0x527/0xe70
+    ksys_write+0xff/0x200
+    do_syscall_64+0x98/0x3c0
+    entry_SYSCALL_64_after_hwframe+0x76/0x7e
+unreferenced object 0xffff8881b82f6000 (size 512):
+  comm "check", pid 68454, jiffies 4310588881
+  hex dump (first 32 bytes):
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace (crc 5bac8b34):
+    __kvmalloc_node_noprof+0x55d/0x7a0
+    sbitmap_init_node+0x15a/0x6a0
+    kyber_init_hctx+0x316/0xb90
+    blk_mq_init_sched+0x419/0x580
+    elevator_switch+0x18b/0x630
+    elv_update_nr_hw_queues+0x219/0x2c0
+    __blk_mq_update_nr_hw_queues+0x36a/0x6f0
+    blk_mq_update_nr_hw_queues+0x3a/0x60
+    0xffffffffc09ceb80
+    0xffffffffc09d7e0b
+    configfs_write_iter+0x2b1/0x470
+    vfs_write+0x527/0xe70
+    ksys_write+0xff/0x200
+    do_syscall_64+0x98/0x3c0
+    entry_SYSCALL_64_after_hwframe+0x76/0x7e
+unreferenced object 0xffff8881b82f5800 (size 512):
+  comm "check", pid 68454, jiffies 4310588881
+  hex dump (first 32 bytes):
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace (crc 5bac8b34):
+    __kvmalloc_node_noprof+0x55d/0x7a0
+    sbitmap_init_node+0x15a/0x6a0
+    kyber_init_hctx+0x316/0xb90
+    blk_mq_init_sched+0x419/0x580
+    elevator_switch+0x18b/0x630
+    elv_update_nr_hw_queues+0x219/0x2c0
+    __blk_mq_update_nr_hw_queues+0x36a/0x6f0
+    blk_mq_update_nr_hw_queues+0x3a/0x60
+    0xffffffffc09ceb80
+    0xffffffffc09d7e0b
+    configfs_write_iter+0x2b1/0x470
+    vfs_write+0x527/0xe70
 
-I didn't find any particular reason in 9eb22f7fedfc ("fs: add ioctl to
-query metadata and protection info capabilities") for the -EOPNOTSUPP
-return.
+    ksys_write+0xff/0x200
+    do_syscall_64+0x98/0x3c0
+    entry_SYSCALL_64_after_hwframe+0x76/0x7e
 
-Regards,
-Klara Modin
+The issue arises while we run nr_hw_queue update,  Specifically, we first
+reallocate hardware contexts (hctx) via __blk_mq_realloc_hw_ctxs(), and
+then later invoke elevator_switch() (assuming q->elevator is not NULL).
+The elevator switch code would first exit old elevator (elevator_exit)
+and then switches to the new elevator. The elevator_exit loops through
+each hctx and invokes the elevator’s per-hctx exit method ->exit_hctx(),
+which releases resources allocated during ->init_hctx().
+
+This memleak manifests when we reduce the num of h/w queues - for example,
+when the initial update sets the number of queues to X, and a later update
+reduces it to Y, where Y < X. In this case, we'd loose the access to old
+hctxs while we get to elevator exit code because __blk_mq_realloc_hw_ctxs
+would have already released the old hctxs. As we don't now have any
+reference left to the old hctxs, we don't have any way to free the
+scheduler resources (which are allocate in ->init_hctx()) and kmemleak
+complains about it.
+
+This issue was caused due to the commit 596dce110b7d ("block: simplify
+elevator reattachment for updating nr_hw_queues"). That change unified
+the two-stage elevator teardown and reattachment into a single call that
+occurs after __blk_mq_realloc_hw_ctxs() has already freed the hctxs.
+
+This patch restores the previous two-stage elevator switch logic during
+nr_hw_queues updates. First, the elevator is switched to 'none', which
+ensures all scheduler resources are properly freed. Then, the hardware
+contexts (hctxs) are reallocated, and the software-to-hardware queue
+mappings are updated. Finally, the original elevator is reattached. This
+sequence prevents loss of references to old hctxs and avoids the scheduler
+resource leaks reported by kmemleak.
+
+Reported-by : Yi Zhang <yi.zhang@redhat.com>
+Fixes: 596dce110b7d ("block: simplify elevator reattachment for updating nr_hw_queues")
+Closes: https://lore.kernel.org/all/CAHj4cs8oJFvz=daCvjHM5dYCNQH4UXwSySPPU4v-WHce_kZXZA@mail.gmail.com/
+Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
+---
+Changes from v2:
+    - Simplified error handling by combining WARN_ON_ONCE() and the
+      return value check of xa_insert() into a single statement.
+      This makes code more concise and easier to read without changing
+      the behavior. (Yu Kuai)
+    - Reduced the scope of ->elevator_lock in elv_update_nr_hw_queues().
+      Since elevator_type does not need protection, the lock now only
+      covers the critical section where elevator_switch() is called.
+      (Yu Kuai)
+
+Changes from v1:
+    - Updated commit message with kmemleak trace generated using null-blk
+      (Yi Zhang)
+    - The elevator module could be removed while nr_hw_queue update is
+      running, so protect elevator switch using elevator_get() and 
+      elevator_put() (Ming Lei)
+    - Invoke elv_update_nr_hw_queues() from blk_mq_elv_switch_back() and 
+      that way avoid elevator code restructuring in a patch which fixes
+      a regression. (Ming Lei)
+
+---
+ block/blk-mq.c   | 84 ++++++++++++++++++++++++++++++++++++++++++------
+ block/blk.h      |  2 +-
+ block/elevator.c | 10 +++---
+ 3 files changed, 81 insertions(+), 15 deletions(-)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 4806b867e37d..dec1cd4f1f5b 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -4966,6 +4966,60 @@ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
+ 	return ret;
+ }
+ 
++/*
++ * Switch back to the elevator type stored in the xarray.
++ */
++static void blk_mq_elv_switch_back(struct request_queue *q,
++		struct xarray *elv_tbl)
++{
++	struct elevator_type *e = xa_load(elv_tbl, q->id);
++
++	/* The elv_update_nr_hw_queues unfreezes the queue. */
++	elv_update_nr_hw_queues(q, e);
++
++	/* Drop the reference acquired in blk_mq_elv_switch_none. */
++	if (e)
++		elevator_put(e);
++}
++
++/*
++ * Stores elevator type in xarray and set current elevator to none. It uses
++ * q->id as an index to store the elevator type into the xarray.
++ */
++static int blk_mq_elv_switch_none(struct request_queue *q,
++		struct xarray *elv_tbl)
++{
++	int ret = 0;
++
++	lockdep_assert_held_write(&q->tag_set->update_nr_hwq_lock);
++
++	/*
++	 * Accessing q->elevator without holding q->elevator_lock is safe here
++	 * because we're called from nr_hw_queue update which is protected by
++	 * set->update_nr_hwq_lock in the writer context. So, scheduler update/
++	 * switch code (which acquires the same lock in the reader context)
++	 * can't run concurrently.
++	 */
++	if (q->elevator) {
++
++		ret = xa_insert(elv_tbl, q->id, q->elevator->type, GFP_KERNEL);
++		if (WARN_ON_ONCE(ret))
++			return ret;
++
++		/*
++		 * Before we switch elevator to 'none', take a reference to
++		 * the elevator module so that while nr_hw_queue update is
++		 * running, no one can remove elevator module. We'd put the
++		 * reference to elevator module later when we switch back
++		 * elevator.
++		 */
++		__elevator_get(q->elevator->type);
++
++		elevator_set_none(q);
++	}
++	return ret;
++}
++
+ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
+ 							int nr_hw_queues)
+ {
+@@ -4973,6 +5027,7 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
+ 	int prev_nr_hw_queues = set->nr_hw_queues;
+ 	unsigned int memflags;
+ 	int i;
++	struct xarray elv_tbl;
+ 
+ 	lockdep_assert_held(&set->tag_list_lock);
+ 
+@@ -4984,6 +5039,9 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
+ 		return;
+ 
+ 	memflags = memalloc_noio_save();
++
++	xa_init(&elv_tbl);
++
+ 	list_for_each_entry(q, &set->tag_list, tag_set_list) {
+ 		blk_mq_debugfs_unregister_hctxs(q);
+ 		blk_mq_sysfs_unregister_hctxs(q);
+@@ -4992,11 +5050,17 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
+ 	list_for_each_entry(q, &set->tag_list, tag_set_list)
+ 		blk_mq_freeze_queue_nomemsave(q);
+ 
+-	if (blk_mq_realloc_tag_set_tags(set, nr_hw_queues) < 0) {
+-		list_for_each_entry(q, &set->tag_list, tag_set_list)
+-			blk_mq_unfreeze_queue_nomemrestore(q);
+-		goto reregister;
+-	}
++	/*
++	 * Switch IO scheduler to 'none', cleaning up the data associated
++	 * with the previous scheduler. We will switch back once we are done
++	 * updating the new sw to hw queue mappings.
++	 */
++	list_for_each_entry(q, &set->tag_list, tag_set_list)
++		if (blk_mq_elv_switch_none(q, &elv_tbl))
++			goto switch_back;
++
++	if (blk_mq_realloc_tag_set_tags(set, nr_hw_queues) < 0)
++		goto switch_back;
+ 
+ fallback:
+ 	blk_mq_update_queue_map(set);
+@@ -5016,12 +5080,11 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
+ 		}
+ 		blk_mq_map_swqueue(q);
+ 	}
+-
+-	/* elv_update_nr_hw_queues() unfreeze queue for us */
++switch_back:
++	/* The blk_mq_elv_switch_back unfreezes queue for us. */
+ 	list_for_each_entry(q, &set->tag_list, tag_set_list)
+-		elv_update_nr_hw_queues(q);
++		blk_mq_elv_switch_back(q, &elv_tbl);
+ 
+-reregister:
+ 	list_for_each_entry(q, &set->tag_list, tag_set_list) {
+ 		blk_mq_sysfs_register_hctxs(q);
+ 		blk_mq_debugfs_register_hctxs(q);
+@@ -5029,6 +5092,9 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
+ 		blk_mq_remove_hw_queues_cpuhp(q);
+ 		blk_mq_add_hw_queues_cpuhp(q);
+ 	}
++
++	xa_destroy(&elv_tbl);
++
+ 	memalloc_noio_restore(memflags);
+ 
+ 	/* Free the excess tags when nr_hw_queues shrink. */
+diff --git a/block/blk.h b/block/blk.h
+index 37ec459fe656..fae7653a941f 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -321,7 +321,7 @@ bool blk_bio_list_merge(struct request_queue *q, struct list_head *list,
+ 
+ bool blk_insert_flush(struct request *rq);
+ 
+-void elv_update_nr_hw_queues(struct request_queue *q);
++void elv_update_nr_hw_queues(struct request_queue *q, struct elevator_type *e);
+ void elevator_set_default(struct request_queue *q);
+ void elevator_set_none(struct request_queue *q);
+ 
+diff --git a/block/elevator.c b/block/elevator.c
+index ab22542e6cf0..9d81a06db6ec 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -689,21 +689,21 @@ static int elevator_change(struct request_queue *q, struct elv_change_ctx *ctx)
+  * The I/O scheduler depends on the number of hardware queues, this forces a
+  * reattachment when nr_hw_queues changes.
+  */
+-void elv_update_nr_hw_queues(struct request_queue *q)
++void elv_update_nr_hw_queues(struct request_queue *q, struct elevator_type *e)
+ {
+ 	struct elv_change_ctx ctx = {};
+ 	int ret = -ENODEV;
+ 
+ 	WARN_ON_ONCE(q->mq_freeze_depth == 0);
+ 
+-	mutex_lock(&q->elevator_lock);
+-	if (q->elevator && !blk_queue_dying(q) && blk_queue_registered(q)) {
+-		ctx.name = q->elevator->type->elevator_name;
++	if (e && !blk_queue_dying(q) && blk_queue_registered(q)) {
++		ctx.name = e->elevator_name;
+ 
++		mutex_lock(&q->elevator_lock);
+ 		/* force to reattach elevator after nr_hw_queue is updated */
+ 		ret = elevator_switch(q, &ctx);
++		mutex_unlock(&q->elevator_lock);
+ 	}
+-	mutex_unlock(&q->elevator_lock);
+ 	blk_mq_unfreeze_queue_nomemrestore(q);
+ 	if (!ret)
+ 		WARN_ON_ONCE(elevator_change_done(q, &ctx));
+-- 
+2.50.1
+
