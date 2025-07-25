@@ -1,128 +1,94 @@
-Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from ale.deltatee.com (ale.deltatee.com [204.191.154.188])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26F592EF289;
-	Fri, 25 Jul 2025 16:44:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E884D2EF647;
+	Fri, 25 Jul 2025 17:10:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=204.191.154.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753461858; cv=none; b=qrMFaDqB510QuRRuYOft5B9MziGnea3NQVGEtrpuE47mOQSDeJWdYMUqZheHZG8dIeDcQbbfBBujs8tB0mExyL5WOxuwg1gJgpid3JyPfRY+oUEio4pqnPpxSAodVY7lsZheA3FK0WyXqY26zxfdVZLrARYlqkAm3cd2WXHigqc=
+	t=1753463405; cv=none; b=BAnztAuWLs63FTFtTO0lHKwJVL6+pkagiqLz8+p/mRSRrdnKTsrIqF7MW5hxiV94xIw9mfUNUQsSirg4gzf7h7r2kp0PCRAjQG7bhu/poEwy0ysrf7coOlVHURcKPP40ZoXMrLNZ92SIFdXB4efFEkjWPZ4a1EQi8pguSiBLWfY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753461858; c=relaxed/simple;
-	bh=h78yE1DkQ3fTjlceS0tehFkgWYsLhUQn3uH2GMwQ9s4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=f30i0CAg2LOMlKlAK2Z8K94xjBWmecBvdkJ37nHBuQIM5BYlP0mmHH3g0RaURnV966vliGbbI1Kc9+ONAooLCfpkgfwGFZInvcGMAtR5pPG9yHaCUO67h/MvloIGuAC6cSz1RTb5ILP6ii1PiTBRzVS5xTZnyFHWG6Tc5Mb9UmA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cpDQEuvn; arc=none smtp.client-ip=209.85.208.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1753463405; c=relaxed/simple;
+	bh=oVAaxXaaVQWWWIQFP0Hh2cN/zmIiJIe6UurtigGiPfw=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:From:In-Reply-To:
+	 Content-Type:Subject; b=YjzPXixvijKPa37jLy4uSPfdLFzrMXPiztM9EOHIZ6W6MU3K9AiCsWJ7wq3M8iXEP6cXziVQYEwilkHBY7oljfZBfVonE7RzooQdbuE/D8PHdRHQ/dysJHBGzN1E3iZ9bq1QgaJL5do/M77avwQ/YZPC+0AvbZ8kwPCFbbgfdIc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=deltatee.com; spf=pass smtp.mailfrom=deltatee.com; dkim=pass (2048-bit key) header.d=deltatee.com header.i=@deltatee.com header.b=QwPbWJ/O; arc=none smtp.client-ip=204.191.154.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=deltatee.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=deltatee.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cpDQEuvn"
-Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-32cd0dfbdb8so22597411fa.0;
-        Fri, 25 Jul 2025 09:44:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753461855; x=1754066655; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=2jkkxxr1tvEIQXkKkETdG3gEvMrEI02eI/QjeRb314U=;
-        b=cpDQEuvn3aP5NKHwLpPp7WEmSjy2HOd3f3gYBnFU9YkdTgXqPe3D9BV8bbVz5Q+lw9
-         Ph8s5u+VCoKlcwAW9cESgUyLxpZWiu9F/RbQyM42aKHNmiCL6xfqtGoCJFn53DwVh+K1
-         zGhHY9aZ+T/Uvy8xVqrT/6UE0NRx+55fBd1zkkdCs/bIjwB1HZyjZ7mTypr+IqzOSJNU
-         aDl5PAQHjbfoKuMqnmmZSeL8xsUwn/gT5ioLfV9aIO6lt74hS24OInIK98hYvdgqYAR/
-         O61pm9RFE94uWK5LdHaZm4fte5M48jqI+QfUjFS8cZXBpSRoLSpkgTl6NzgnzKYWaRLE
-         cnRQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753461855; x=1754066655;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=2jkkxxr1tvEIQXkKkETdG3gEvMrEI02eI/QjeRb314U=;
-        b=ukoxS7AqoMeV/9Enx4qw4RuqdyNiIbhc16g1v95eNUMBvPAd8RlJZMXk955zaIsGal
-         fwpPVXdwW2SX8kTGwjSKKJN6qrsbkQ4HWxTgrENokEHvK8hL1/nrJ61TW7sIKcT6bpzx
-         Nugqg7NIoaLnlH2cFYjO8YViJ9PEGdHpXrawswKwnfFfFjAEqPSn25zGHOcwzWrSF3SM
-         +ju9Sle3TZnRM+nP5UR0KjoFVhw5WU08q2OkISmdxvo50/SJgu/kZ8XPRFJZfDzJlEXo
-         L/Nw0cIjU7Ynv2r+j69TobHS/cmErtmJRjPw61sxUMkABJOSytsAXtF9rPK/AD7cXyeB
-         ZROw==
-X-Forwarded-Encrypted: i=1; AJvYcCUBzTSwJFlE038Gqm5Z/qCiR7KVPqwuH1SOqjsGLe1yifffMnXrewlrPqd/EjCyn7P7jbkcWyOrLQbe/+3E@vger.kernel.org, AJvYcCXrLOxE2gWqfD1QyT8PLzqSdDTaLX4I3OiJs1xxR2AJ/Epy3Q8cCFgaL6IInGFUPNgoVa7ojl+toYP4Aw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwJQwCoUHiDkzs4yENRegK58VVZcfGoxJN2sbVXCbVvWi7/6HWO
-	/TBS8evKKiN39Z8IUSQAUQXwFxiwyTgaqJxjTrA/sz37k3EAj+7SMltS
-X-Gm-Gg: ASbGncsYyxHb47/LWOGqZtksSj7OzUB1+xnfsQh26gFJG749hbRmdMItTizJdzNps89
-	bZ2gJWh7E+SEbTecsGm9n6Vsm1F9YkOHaeXdhCQ1U87yHLzoFoSitnFtLlZ95V4CfJiG8846ub/
-	3VkW6cL3nE3fTrD/ObOdd13mVlgZ8VTyXJV2wyvWQH69aao3z8My9EGZg8zgyA4G8njW2nT75aT
-	xQoHXM1EnL9oJt96PfqMSNVxK3QIbWqIMOpCGYsw1tBEQihM84y3eLmSmpgysUfpSij0/0zdI5Z
-	ybFFfl+Xau/kHyFwOCq0SdBrNKoqpGD9XmpjNLavA7NbTRj23ZNd/BieuZx3BPDKbsOl82frHbE
-	jXi+6SiEKLPSAR/YPgMQEz7BfisvEB73Kz1Tm+nA2E4lnX3Y=
-X-Google-Smtp-Source: AGHT+IE8hXJ25wF8ru+MlHrYUzqY59qEsX0o5q6j4nN8guTvq6nc+6mXIb/PIJqdE5luSZTran9WEg==
-X-Received: by 2002:a05:651c:31c3:b0:330:4f46:9467 with SMTP id 38308e7fff4ca-331ee819570mr9244521fa.27.1753461854815;
-        Fri, 25 Jul 2025 09:44:14 -0700 (PDT)
-Received: from soda.int.kasm.eu (soda.int.kasm.eu. [2001:678:a5c:1202:4fb5:f16a:579c:6dcb])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-331f407b023sm705931fa.6.2025.07.25.09.44.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 25 Jul 2025 09:44:14 -0700 (PDT)
-From: Klara Modin <klarasmodin@gmail.com>
-To: brauner@kernel.org,
-	anuj20.g@samsung.com,
-	arnd@kernel.org
-Cc: martin.petersen@oracle.com,
-	joshi.k@samsung.com,
-	hch@infradead.org,
-	arnd@arndb.de,
-	naresh.kamboju@linaro.org,
-	anders.roxell@linaro.org,
-	axboe@kernel.dk,
-	kbusch@kernel.org,
-	csander@purestorage.com,
-	asml.silence@gmail.com,
-	adobriyan@gmail.com,
-	djwong@kernel.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Klara Modin <klarasmodin@gmail.com>
-Subject: [PATCH] block: change blk_get_meta_cap() stub return -ENOIOCTLCMD
-Date: Fri, 25 Jul 2025 18:43:34 +0200
-Message-ID: <20250725164334.9606-1-klarasmodin@gmail.com>
-X-Mailer: git-send-email 2.50.1
+	dkim=pass (2048-bit key) header.d=deltatee.com header.i=@deltatee.com header.b="QwPbWJ/O"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=deltatee.com; s=20200525; h=Subject:In-Reply-To:From:References:Cc:To:
+	MIME-Version:Date:Message-ID:content-disposition;
+	bh=f47Ky90dFPkL1Ya+qWKSgUqpFHN5ODLjpNudWVSb5u8=; b=QwPbWJ/OWzQX8Q226ojxfza0WS
+	hTwTo6/vPF246VLRi+47uocSVLkOn0eD6rbMZRZD07tT3AUM6z95tZTUeAEDALmOKRCr9SwWCtSWo
+	Vl40IAQDTTCjPykxMQJzgZjUrWmcuoWHdCN8wv2e2ot8dxaFvJW7K4bmnXuC/9eazXKfZuuVimmSg
+	tGZI0VE8yThg0M2uXVwtlJ46NYkhpaiehvoG18/F/CMQ0pf9gs/S0p4bVOocrwE1PtjveEbBVRg1u
+	Kb4oYtEyAdpejHSKoYmOlKpt55+jX9YkR+phKZwkr98AAn+Xl4RiugB4uevi4n7lK1TZ6DnW/l4Ya
+	BaSNp5Dg==;
+Received: from guinness.priv.deltatee.com ([172.16.1.162])
+	by ale.deltatee.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.96)
+	(envelope-from <logang@deltatee.com>)
+	id 1ufLJz-006C5W-2Q;
+	Fri, 25 Jul 2025 10:31:00 -0600
+Message-ID: <b32ae619-6c4a-46fc-a368-6ad4e245d581@deltatee.com>
+Date: Fri, 25 Jul 2025 10:30:46 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+To: Leon Romanovsky <leon@kernel.org>, Christoph Hellwig <hch@lst.de>
+Cc: Alex Williamson <alex.williamson@redhat.com>,
+ Jason Gunthorpe <jgg@nvidia.com>, Andrew Morton <akpm@linux-foundation.org>,
+ Bjorn Helgaas <bhelgaas@google.com>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
+ Jens Axboe <axboe@kernel.dk>, =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?=
+ <jglisse@redhat.com>, Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+ linaro-mm-sig@lists.linaro.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
+ linux-mm@kvack.org, linux-pci@vger.kernel.org,
+ Marek Szyprowski <m.szyprowski@samsung.com>,
+ Robin Murphy <robin.murphy@arm.com>, Sumit Semwal <sumit.semwal@linaro.org>,
+ Vivek Kasireddy <vivek.kasireddy@intel.com>, Will Deacon <will@kernel.org>
+References: <cover.1753274085.git.leonro@nvidia.com>
+ <82e62eb59afcd39b68ae143573d5ed113a92344e.1753274085.git.leonro@nvidia.com>
+ <20250724080313.GA31887@lst.de> <20250724081321.GT402218@unreal>
+Content-Language: en-CA
+From: Logan Gunthorpe <logang@deltatee.com>
+In-Reply-To: <20250724081321.GT402218@unreal>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 172.16.1.162
+X-SA-Exim-Rcpt-To: leon@kernel.org, hch@lst.de, alex.williamson@redhat.com, jgg@nvidia.com, akpm@linux-foundation.org, bhelgaas@google.com, christian.koenig@amd.com, dri-devel@lists.freedesktop.org, iommu@lists.linux.dev, axboe@kernel.dk, jglisse@redhat.com, joro@8bytes.org, kvm@vger.kernel.org, linaro-mm-sig@lists.linaro.org, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, linux-media@vger.kernel.org, linux-mm@kvack.org, linux-pci@vger.kernel.org, m.szyprowski@samsung.com, robin.murphy@arm.com, sumit.semwal@linaro.org, vivek.kasireddy@intel.com, will@kernel.org
+X-SA-Exim-Mail-From: logang@deltatee.com
+X-Spam-Level: 
+Subject: Re: [PATCH 05/10] PCI/P2PDMA: Export pci_p2pdma_map_type() function
+X-SA-Exim-Version: 4.2.1 (built Wed, 06 Jul 2022 17:57:39 +0000)
+X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 
-When introduced in commit 9eb22f7fedfc ("fs: add ioctl to query metadata
-and protection info capabilities") the stub of blk_get_meta_cap() for
-!BLK_DEV_INTEGRITY always returns -EOPNOTSUPP. The motivation was that
-while the command was unsupported in that configuration it was still
-recognized.
 
-A later change instead assumed -ENOIOCTLCMD as is required for unknown
-ioctl commands per Documentation/driver-api/ioctl.rst. The result being
-that on !BLK_DEV_INTEGRITY configs, any ioctl which reaches
-blkdev_common_ioctl() will return -EOPNOTSUPP.
 
-Change the stub to return -ENOIOCTLCMD, fixing the issue and better
-matching with expectations.
+On 2025-07-24 02:13, Leon Romanovsky wrote:
+> On Thu, Jul 24, 2025 at 10:03:13AM +0200, Christoph Hellwig wrote:
+>> On Wed, Jul 23, 2025 at 04:00:06PM +0300, Leon Romanovsky wrote:
+>>> From: Leon Romanovsky <leonro@nvidia.com>
+>>>
+>>> Export the pci_p2pdma_map_type() function to allow external modules
+>>> and subsystems to determine the appropriate mapping type for P2PDMA
+>>> transfers between a provider and target device.
+>>
+>> External modules have no business doing this.
+> 
+> VFIO PCI code is built as module. There is no way to access PCI p2p code
+> without exporting functions in it.
 
-Link: https://lore.kernel.org/lkml/CACzX3AsRd__fXb9=CJPTTJC494SDnYAtYrN2=+bZgMCvM6UQDg@mail.gmail.com
-Fixes: 42b0ef01e6b5 ("block: fix FS_IOC_GETLBMD_CAP parsing in blkdev_common_ioctl()")
-Signed-off-by: Klara Modin <klarasmodin@gmail.com>
----
- include/linux/blk-integrity.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+The solution that would make more sense to me would be for either
+dma_iova_try_alloc() or another helper in dma-iommu.c to handle the
+P2PDMA case. dma-iommu.c already uses those same interfaces and thus
+there would be no need to export the low level helpers from the p2pdma code.
 
-diff --git a/include/linux/blk-integrity.h b/include/linux/blk-integrity.h
-index e04c6e5bf1c6..e67a2b6e8f11 100644
---- a/include/linux/blk-integrity.h
-+++ b/include/linux/blk-integrity.h
-@@ -97,7 +97,7 @@ static inline struct bio_vec rq_integrity_vec(struct request *rq)
- static inline int blk_get_meta_cap(struct block_device *bdev, unsigned int cmd,
- 				   struct logical_block_metadata_cap __user *argp)
- {
--	return -EOPNOTSUPP;
-+	return -ENOIOCTLCMD;
- }
- static inline int blk_rq_count_integrity_sg(struct request_queue *q,
- 					    struct bio *b)
-
-base-commit: bc5b0c8febccbeabfefc9b59083b223ec7c7b53a
--- 
-2.50.1
-
+Logan
