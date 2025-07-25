@@ -1,94 +1,89 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F09BFBE65;
-	Fri, 25 Jul 2025 12:04:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B26E17F4F6
+	for <linux-block@vger.kernel.org>; Fri, 25 Jul 2025 12:10:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753445046; cv=none; b=tQaq34zLmulEwNpRDIMQODU9FiWL5CbUPW4ohOwW/lB9JOfjH/q91YoVk1H7p2aqZmkPDADumSKOPvrEAa/mdaO47bxdEBTKyxD5hgGnbC8jadoeNOGUVLh8Vipjt3/EJetiMvMxVxy9iZ7Qf6peVqB3YL2AzE7yne/bSJtOLpo=
+	t=1753445445; cv=none; b=R4wCzAnERPo+Ra0tHGXw3BdMbwuTsvZQqriRjpmtV7ZjmXfZoWj9jxMWvxHuuR0Dey7JFTchB92DMaTYox6joKiez4LfLVi6ahwy3yrdkN3usa7A2BUUF8fDhz3sVlfSOmw4DVGwXfZN279uvZLGu11OA8Lt9NbhgETj+Y/wNMk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753445046; c=relaxed/simple;
-	bh=jg0MiCs6Po5ZRx/w8FmPIFw4SEGPVSu2akZ6JIqO8HU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pUqt3xIcAf8Jr+uvHh2H1f37xIiT6mKcq6vg0b5WP9GOx+zD5vd3RpFXwKTSQBWGn/Fn5Hj6hXrM+q3Dxy/tcMbeQ5tZyyp86eoUbGiA9PO4sraZJF/HRAnYTwHn6eCONlYRmsCyUXguMgaHnhctqNxPDHCs8Sc+gjFJ/Ej37zA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=xawo2ZYa; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1753445445; c=relaxed/simple;
+	bh=mR1HZMubzuDo88qoDWRxX2DiK7pQX51amaHggzE4Up8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=iKCANMe59w3sPqboZdDKcn1QnXJNid5lUhFDULzUGYtvNdOBjXJZp4qv0yVJrLpLdZNuD5e9N9d5yqtvTYgiBx3KaUDCQnH06EDkDErLcC82I3eqMRuZPhX2edb0ZmWEtHm3rITs/rZtYDoyvX7gLGTJAuNkE0NdSfl6BiUdru8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=NQT9MmNx; arc=none smtp.client-ip=209.85.216.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="xawo2ZYa"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA6A7C4CEE7;
-	Fri, 25 Jul 2025 12:04:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1753445045;
-	bh=jg0MiCs6Po5ZRx/w8FmPIFw4SEGPVSu2akZ6JIqO8HU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=xawo2ZYacbJ7O0jS9FlDOnvtcQqMASajSLi6ezYxe8pC7nllp1MWKrRg8xdCiGpOF
-	 /Lw9NuBdDawbVcOb8hn4hDycUMAkpPspGpqQeWkLZ2SOxyTdiLaEmlVzYc3yJBubBe
-	 luiTgtzLE1X2cGzrhWvmACTsp1jnOnBatTQgEbqY=
-Date: Fri, 25 Jul 2025 14:04:01 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Hardeep Sharma <quic_hardshar@quicinc.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Hannes Reinecke <hare@suse.de>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH 6.6.y v2 1/1] block: Fix bounce check logic in
- blk_queue_may_bounce()
-Message-ID: <2025072551-tingling-botany-f00d@gregkh>
-References: <20250725112710.219313-1-quic_hardshar@quicinc.com>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="NQT9MmNx"
+Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-3138e64b42aso2043316a91.0
+        for <linux-block@vger.kernel.org>; Fri, 25 Jul 2025 05:10:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1753445442; x=1754050242; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=4BB2oK4kVlFMA8R70kPOxJrlj1emQHcqQrUadj6so5I=;
+        b=NQT9MmNxZOh1fzaKu+kGG7jvbsJUqIDqcjBLcGxKVl0ectlkqP2U4MMEgdQeHVBhf2
+         Q+WBexLUgMHbUwzlpLImRAyGcWSajzXVNes48Oil40Cy19AUw9uky5S8F8hOIBuXGZTz
+         05lW/XnesurxlCkgur0l6LB2dlHyrT7sGXTETuL2BCRnlYu3suByB/wpIj3WJmGI4usA
+         thF+2zc2Erg8S6+DL0BvpevqIh9iug6TReWjQa+ZPDo4rRGoyz39mDsWRcWoIpM/Pddr
+         Y8WRd6xOMLRgp/O9pzxg+BSFYRzouZOrQKwhFe4t+11DJwaufj8FBWl5j5f0JkWlz02g
+         X9jw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753445442; x=1754050242;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4BB2oK4kVlFMA8R70kPOxJrlj1emQHcqQrUadj6so5I=;
+        b=LK0aNOwGUdkRBS0Y0qdXbKIyiUv0MqnutRNIA6qCwZYe0p6/lOyTwyZ3Owvq4nF/CF
+         CpnD5pECKA1mPnONSOHWfKOQcWEK1UKtoNPUi2yB5JyObWYRBydXxoIqB7y+qNCL+m+a
+         hNAfEk1jMR9hKsaEXwo5xSjqi6xa+tetB/2xfb+5FcxWI6yZOS1BMLshe0Wj9bqaAuDl
+         Ifq/tFV8Wx0l7CyhZvBVteBwshMfk6WK/4Vnmt1NPGzF4SBsCzRGe1k2eYdSAz26g8TG
+         6ALClbUAf3TBgi+SVwW8Z7g3nuMjYuAqgjXaj6YF2Y5GLBeAGWftZ2SgJYSRMCrkBupg
+         UP/Q==
+X-Gm-Message-State: AOJu0Yx8DvXqH8pPok9xo1No9yC0sL0vrHi5SKL5HBQJJl0ViuqqfW7i
+	K9L9lSyrFXqg7SrL3hDSKQIwYIQmewCMVtISkyyst/ceJh76+EjsFN2Y4Zq6pVqQx7U=
+X-Gm-Gg: ASbGnctp8TI4V1GL44RFDLr5f3oThBPc+Zz3FRdk2M6HV/Tqwv01coHDQMk6PCPy7D0
+	tezOVwBYP2fSM/Yek+mkipoDzfRP5MC9KHjjDvYyTiHJrNUJhLWu9G/qmBGrFp3VusrcW+1ADAQ
+	nGNVdnJcPVIA1XGmnuCIEldoNSXgHGDNSeYGtd2aM0p0X3gteqAurac5ka0FD0aOr6dukqvVOCh
+	x4xMJusL9DQdPdMzP3rqJC+UzEJXjWFVJb/keOV2b47Oxi7P2a0asI9L7QvmfrR/dkhpxE7yeWB
+	U1DbLdQu8rXauqJYkuYV9nKaJu/XtUhozWVFgRQQLDkBLeybD5nI7ZFTeZmLldeG2Ouv1BLD69V
+	7nUr53QmXqxrbdoMdLzI=
+X-Google-Smtp-Source: AGHT+IFevLnjs8vNfTzc8Bky8ffMZ/QArwnsNrHPcQoA35FdKYhdd/g0uxmZ5R0tMqrKafUOSc9h3A==
+X-Received: by 2002:a17:90b:33d0:b0:313:d6ce:6c6e with SMTP id 98e67ed59e1d1-31e77858116mr2556706a91.8.1753445442209;
+        Fri, 25 Jul 2025 05:10:42 -0700 (PDT)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b3f6c09bd9fsm3299292a12.26.2025.07.25.05.10.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 25 Jul 2025 05:10:41 -0700 (PDT)
+Message-ID: <67bfc411-d944-4d1a-94e5-610122ac6976@kernel.dk>
+Date: Fri, 25 Jul 2025 06:10:40 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] block: Fix typo 'prefered' -> 'preferred'
+To: =?UTF-8?Q?Ignacio_Pe=C3=B1a?= <ignacio.pena87@gmail.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250725040939.73175-1-ignacio.pena87@gmail.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20250725040939.73175-1-ignacio.pena87@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250725112710.219313-1-quic_hardshar@quicinc.com>
 
-On Fri, Jul 25, 2025 at 04:57:10PM +0530, Hardeep Sharma wrote:
-> Buffer bouncing is needed only when memory exists above the lowmem region,
-> i.e., when max_low_pfn < max_pfn. The previous check (max_low_pfn >=
-> max_pfn) was inverted and prevented bouncing when it could actually be
-> required.
+On 7/24/25 10:09 PM, Ignacio Peña wrote:
+> Fix spelling mistake.
 > 
-> Note that bouncing depends on CONFIG_HIGHMEM, which is typically enabled
-> on 32-bit ARM where not all memory is permanently mapped into the kernel’s
-> lowmem region.
-> 
-> Fixes: 9bb33f24abbd0 ("block: refactor the bounce buffering code")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Hardeep Sharma <quic_hardshar@quicinc.com>
-> ---
-> Changelog v1..v2:
-> 
-> * Updated subject line
-> 
->  block/blk.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/block/blk.h b/block/blk.h
-> index 67915b04b3c1..f8a1d64be5a2 100644
-> --- a/block/blk.h
-> +++ b/block/blk.h
-> @@ -383,7 +383,7 @@ static inline bool blk_queue_may_bounce(struct request_queue *q)
->  {
->  	return IS_ENABLED(CONFIG_BOUNCE) &&
->  		q->limits.bounce == BLK_BOUNCE_HIGH &&
-> -		max_low_pfn >= max_pfn;
-> +		max_low_pfn < max_pfn;
->  }
->  
->  static inline struct bio *blk_queue_bounce(struct bio *bio,
-> -- 
-> 2.25.1
-> 
-> 
+> No functional change.
 
-<formletter>
+I don't take just spelling patches, it just causes pain in terms
+of backports.
 
-This is not the correct way to submit patches for inclusion in the
-stable kernel tree.  Please read:
-    https://www.kernel.org/doc/html/latest/process/stable-kernel-rules.html
-for how to do this properly.
+-- 
+Jens Axboe
 
-</formletter>
