@@ -1,64 +1,48 @@
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 003.mia.mailroute.net (003.mia.mailroute.net [199.89.3.6])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E04E61C6BE
-	for <linux-block@vger.kernel.org>; Fri, 25 Jul 2025 12:15:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E8F51E766F;
+	Fri, 25 Jul 2025 14:57:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.6
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753445746; cv=none; b=YrfnMN3LS4VFQILQdhKPJ+yVx/ycEysWsFtbNAB2VbtyFwOUjKrXGrzmq9QH47JiSguG1AL2tJYakLEdUoE/57Vp2zsbenBsNrliOeXor6Hx6W8CUECvHWieUipigdWMCYnGGq4sYkw+9ulJSPVdKQRsvabWDV5BF99gMVN4ulE=
+	t=1753455454; cv=none; b=Hwx9YohUwmWIZMBgVPNhwSJ4suuqlG0N9b2L6g8XMVQHLEaIFscqdw154ycjvsLiw0+k0RtodfwmWCjScMG3R9pKOLLdLgVme31r2AosD0iuGYPdF5Mmr5BNtXh5GrXcXhhfpeeiHW5M6P4HF3qAKwf3sFX5Cs6qumJZ+T1C9ZU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753445746; c=relaxed/simple;
-	bh=pkrmcYP5beaWXfSnlzeFe8szIbHljUrcs1E0f5bx0FA=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=WNiz80dS5X4z7bVyA4VEaK8iVSspD5flHcsAHe2VTN7NIilLx0EQ/pLCYTbAZ508ZtKX+1jA0rALkqDjBICU0F7iZ8TvkYjlC8JJtUCPllVlZ6DU5Zgj6me1wK2/TcS7LNUK6ZgLKsRL3FCBv8OWixD7TqYRmxyKfwh0QyGASXo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=ANgPUTHX; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1753455454; c=relaxed/simple;
+	bh=efRsqmiKdTfVnl5wIYBaRfnw2qtiUPPbBzsckE19XAo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CBWHP8KyB+ra2429IoX14n74x9J14Pua85vuKD8QaCrGYjEFEN/tiH11oKk4/UsHgNSLBOW/OxnibuJX/PXhVoY4D2ULBOpcckC2Y40I9KQjlFr6znkopNSEKlGungZnUR5VD/H8CVrFbNDxVWn1QDKX21z7KtlPiMPWAG2XZb0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=3fl2KCZ5; arc=none smtp.client-ip=199.89.3.6
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="ANgPUTHX"
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-236377f00a1so17950825ad.3
-        for <linux-block@vger.kernel.org>; Fri, 25 Jul 2025 05:15:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1753445744; x=1754050544; darn=vger.kernel.org;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=u50KxGSm/dJ8vk23OWj94nl3J/HKsjQPInCB6cEucew=;
-        b=ANgPUTHXl80ZGjhq6iW43sifw65nJMzfL98LY6svKj/bJ3phtAIW+9OaYY56NQI+e/
-         3/24CdzjblaBS7Hk+XbAFmhdYjCI58iWhC6OZpxahDweuxZY7rtugDeMrQkaPBvTcH7p
-         xkZEm7Uj/yNB8aUf4//HEtwpq0eOavbsrMG0mkR5/B2iWG+z+ho2UOoIdb94mdiB0TGd
-         brzvx6+VyaIpnzmhAJ8+OB7N6nepjd5Fdxk862V90LnQSqh0RuW5MVM7pHvyg4gMHUox
-         IPNhK2LLYXu8JzG0pT9pSTFZ7rbDdeadpl1+n2qNDSP+LD/uqKjsBMmZOkYRdqRF8F/n
-         Ph5w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753445744; x=1754050544;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=u50KxGSm/dJ8vk23OWj94nl3J/HKsjQPInCB6cEucew=;
-        b=Rfo4MSMxbZmuWRGTrsP1izY2jupJI6lAUhP2cY/6sF/IcaQzhC4PTtiba7bp7QQNzA
-         Lul82evQiLphwM55/iQNs/agp2s43pTpMewJmSG+LyG4Xijnm+6Qfo12baELpNVdCOrA
-         s5BOrt7DerdQnVeUKxrHNj2NFJOFnKsTtY9EbIyjk0lIvX+1q3/jl3RMIdvcQ0PQ7UT7
-         CgTPokJHZGhsHAIdL6yJP8Hom7gd+QnFtfJt4xdFjrBcRl54YgMMJCJVdHocteZNKOCg
-         kQD1hj0q72sKr3ttN7oc3Wy5TVCl9end/dwkWjFmLSt2Vb4lBJ0JgQCwrSOCkX5qPUo4
-         jIBg==
-X-Gm-Message-State: AOJu0YxctKy/ep6p/Sx8uOq2Ws+ZsSvbT9gtP5wYHLjFMwCL2qHYdWac
-	SJgXFRHwACwLusRDLCQPOwDp67x4oamy+x9V6hUT39I9fBpnNVIBurAMHIq5+IzWHnA9RV8e5A9
-	ktNPB
-X-Gm-Gg: ASbGncutp0uYcMSbXPzeqNdY/lTDsR/PrmXah4wW7kJgwYMAfelunQoDI7R6wOV+yqe
-	gthTIrTfuOlG1fid7/1a4wTJ+uvKpL+WQGM7/+cvPR/btGqoMcgA1Iqxk7t/gIQ3FesPtEjBlS9
-	vvqYHpT+7cCU7Pugq1W6+yReOc0f53MA0SS4PUgPwoMHtANYfJmgZzSy3i9xohmOaiyxkp8Ok97
-	whxxUNjGlTi0EzK8GqGTgBKM+9hvuiAfiYpsVlJGbGNjeXX2aPtOXhxr1MNQ1sNHcfx9YNdOh59
-	LrbpA/r3JbE3hTYquP2O2ZpMhvDkcl/8gvQxXeIL2rxwUwB58a9XC8CjZUI5I9zKuULpGCLjR3t
-	g06KqYRFzTHh2ATlQYn0=
-X-Google-Smtp-Source: AGHT+IHpVwNaSmCUhScaAni2YHIiHp1n4TKMEgkqizyljUxGGUXDXvjMRj6ACLIx6q40DgMY8Fu/zw==
-X-Received: by 2002:a17:902:ebc3:b0:235:f298:cbbe with SMTP id d9443c01a7336-23fb301c29amr29083915ad.12.1753445744035;
-        Fri, 25 Jul 2025 05:15:44 -0700 (PDT)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23fbb27ddc5sm2505765ad.21.2025.07.25.05.15.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 25 Jul 2025 05:15:43 -0700 (PDT)
-Message-ID: <a0ffa959-d8e5-4ac6-95cd-620aef122a23@kernel.dk>
-Date: Fri, 25 Jul 2025 06:15:42 -0600
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="3fl2KCZ5"
+Received: from localhost (localhost [127.0.0.1])
+	by 003.mia.mailroute.net (Postfix) with ESMTP id 4bpWF81JPBzlgqV3;
+	Fri, 25 Jul 2025 14:57:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1753455451; x=1756047452; bh=sRefQD6SLgT5XB1Gr/GmRGut
+	lvpyNP/b7Qtq1m/qCbo=; b=3fl2KCZ5odc1nFa/dVj17Cc318Nq7BMnht74h7Qe
+	IIArAZm7QCmVuD3oB4NdEKm1EZLpXNIR2QYiSl3fvqCcUkKYe/OSVlKHscHR3MV+
+	9rla8RX7FZv2sQwPl/hF016XTg8KY3S31HLz3PpiPfQ5ZEP+/RnzM5MSr7311VPp
+	FxoJkwiOCh65DANfuLzGGASNhq40TMuIHI7+EWX5rL52wmrU1ir6jNIq1jkbk/Vn
+	aMaPqV5nlc6CuGNLhLd3VNlH3shzfjWnrY09E1eyMQhQbCHBHVeySRbaRqVuyZ3T
+	l594y28IugLFL9aOuWSdzQJtb/9EfSzQaXjnGld21Oqcqw==
+X-Virus-Scanned: by MailRoute
+Received: from 003.mia.mailroute.net ([127.0.0.1])
+ by localhost (003.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id ZkWeoJ6Jv9mE; Fri, 25 Jul 2025 14:57:31 +0000 (UTC)
+Received: from [100.66.154.22] (unknown [104.135.204.82])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4bpWF35HKqzlnfqg;
+	Fri, 25 Jul 2025 14:57:26 +0000 (UTC)
+Message-ID: <ee09984e-5b01-4454-b982-e5a51c05295e@acm.org>
+Date: Fri, 25 Jul 2025 07:57:25 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -66,42 +50,24 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] block: Fix typo 'programm' -> 'program'
+To: =?UTF-8?Q?Ignacio_Pe=C3=B1a?= <ignacio.pena87@gmail.com>,
+ Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250725041416.73567-1-ignacio.pena87@gmail.com>
 Content-Language: en-US
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fix for 6.16-final
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20250725041416.73567-1-ignacio.pena87@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 
-Hi Linus,
+On 7/24/25 9:14 PM, Ignacio Pe=C3=B1a wrote:
+> - * Re-program all keyslots that are supposed to have a key programmed.=
+  This is
+> + * Re-program all keyslots that are supposed to have a key programed. =
+ This is
 
-Just a single fix for regression in this release, where a module
-reference could be leaked. Please pull!
+My dictionary tells me that the current spelling is correct and=20
+preferred. See also https://www.merriam-webster.com/dictionary/program.
 
-
-The following changes since commit 2680efde75ccdd745da7ae6f5e30026f70439588:
-
-  Merge tag 'nvme-6.16-2025-07-17' of git://git.infradead.org/nvme into block-6.16 (2025-07-17 05:56:12 -0600)
-
-are available in the Git repository at:
-
-  git://git.kernel.dk/linux.git tags/block-6.16-20250725
-
-for you to fetch changes up to 1966554b2e82b89d4f6490f430ce76a379e23f1f:
-
-  block: fix module reference leak in mq-deadline I/O scheduler (2025-07-20 13:18:13 -0600)
-
-----------------------------------------------------------------
-block-6.16-20250725
-
-----------------------------------------------------------------
-Nilay Shroff (1):
-      block: fix module reference leak in mq-deadline I/O scheduler
-
- block/elevator.c | 19 +++++++++++++------
- 1 file changed, 13 insertions(+), 6 deletions(-)
-
--- 
-Jens Axboe
-
+Bart.
