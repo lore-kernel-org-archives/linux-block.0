@@ -1,218 +1,379 @@
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E7A41465A5
-	for <linux-block@vger.kernel.org>; Fri, 25 Jul 2025 00:33:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753403631; cv=fail; b=Mh7hRO6YIpDKW/q4aTl/AnnPJuEDZwuYFIkzyR+DnunNOhSM2urX8Ijdq85Dxj7zkB1NyB9A5/TPzqNRwHxMOhDD1yFyhUqT8VM/HfgQ+Z3u1PFUSslxNgjUTZTLziGsw5mIdBTu52utV2p3J9uuWxKIBELi6jdr1mHJKL1XQ5g=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753403631; c=relaxed/simple;
-	bh=07KownquVKCt5A87TraH+fFWiy6KF8fnRJVGFWOzR+c=;
-	h=To:Cc:Subject:From:In-Reply-To:Message-ID:References:Date:
-	 Content-Type:MIME-Version; b=gZu85EHAElaL6DhQKXE75ql9eRcKnELpAA59Noiff7F50lVxKTwaxwUQ81xvWnPGkpQ5BJN68ee2HsSqITZ2igKu1A+ez6HkHptFiT14YNSNUaI8n3lS2zil2dM517/X1lnISqMGwq5iU8vRgFY1Q45oHq4RJAacZQDzVxLIuzk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=ei27YjJ4; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=eooL1O39; arc=fail smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="ei27YjJ4";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="eooL1O39"
-Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56OLp1pf008701;
-	Fri, 25 Jul 2025 00:33:39 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=corp-2025-04-25; bh=X5Ur4GfQ6bXmrN6LII
-	FQWFK1lWBPq8wOvjBDbZ8Vqoo=; b=ei27YjJ4vDMSTgHRdxPNC3k/XxhDgdzNSt
-	fpeKqNFE1q5wgZaUIdUoShC+NXgIbTyozLxhDNG+L++1VB7+qigzEdmgBm1etgGw
-	1XMn4BDnOqM9HIgYncJ//Ssu+Ko7lyfKw3umuabHhOGOk+VeoONYOssABLcAsKlF
-	47TYLyEt6+Z8a+577dixdPk34gR0NdunF3BvX+1uUoVfaWstLzErB/SHhCh8xcD6
-	XrtWgwRJn+3FsYPLpjYFZrBFZ+JfUH7PdOtm2KJiuXwCYePru8McHiPWHxE6JJ+S
-	WsQQqnOiLWOSTQLEBip4Ki90/tTB5HkVDmmdDYZqKoB98BT38/jg==
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 483w3wg4ts-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 25 Jul 2025 00:33:39 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 56ON0I5u014403;
-	Fri, 25 Jul 2025 00:33:37 GMT
-Received: from nam12-dm6-obe.outbound.protection.outlook.com (mail-dm6nam12on2081.outbound.protection.outlook.com [40.107.243.81])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 4801tjtn6y-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 25 Jul 2025 00:33:37 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=HNagnAAO4hFxLQK6FWOqArRVGEFNxbAMBJefBLtqCyzI6C9+JqnvkEn1lVc5kdKC7mhrAX5WSvLrN27u5A5dYLdz1L2I83bXGudo1CMIx2TFEEQx8E+pIAH1C0OB0ba1ERcVt1IF1pIXQBAzUdyUvXUaomoGMG5qAg6EN7qzrPnVSusbnjbGryd39WG7im2ZT1WW9Bsso9NYrTNesb29SzMM+irZRmxoO7z/MR62q0xp9boTcLySM59sENx0qh2jZg9T7zzcPAD9L7Uvd+lLRIrLUDP3VKu0DV4DiOXO4fu14u2LBBEKsVcxYTJ2gb5859Kxp9UK43rQN5VBARQwhA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=X5Ur4GfQ6bXmrN6LIIFQWFK1lWBPq8wOvjBDbZ8Vqoo=;
- b=nzE95tP5Rj8Vx6lDVkYJhA7My+eSm/wdE5DV1W3aMdREAJpQVihDHl4kcIlRPYV8w6JTRj4A35Jigl2fBwXSO2YI/051kaHysTMhWtb4uGVT+Lk1j9WKyi6QXxOLX56uuFofqgEgzzAxGB7gtgdKXVbPv1EKQEJ4Gw9Y3midKUkLs58cdBXA/HbfGZS4eBve75GH7QDjoTnDhDzJFkEZk85NYMgVi6cilEJHtu6Ypwl6/sNl9s2ralcsrOU/MlhjV3WbpCpd+ZAWFbxYbyk5Z6T1TqvzAfFyrk0tZgOqtHoU8s/fhkZXtsZljw/4mEmVdYLUYFoWR4Rl7tVzO+bbNQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=X5Ur4GfQ6bXmrN6LIIFQWFK1lWBPq8wOvjBDbZ8Vqoo=;
- b=eooL1O39B7Jd65mrpLJoBLREKKRfLN7KxTB9R/pPLYQDqL2lavhpuB+PFSRsK7Hbq2fvylAH+ibWAuAMJYvPBvGcafGHVhkfN9G+9exHZY6d59l/r1xk89Ey4/FLtqu7TNiVG/U0e2iKDF8Qs8+qM/HtFcovVjEFV+gJR38YZCk=
-Received: from CH0PR10MB5338.namprd10.prod.outlook.com (2603:10b6:610:cb::8)
- by MN2PR10MB4175.namprd10.prod.outlook.com (2603:10b6:208:1d9::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8964.22; Fri, 25 Jul
- 2025 00:33:34 +0000
-Received: from CH0PR10MB5338.namprd10.prod.outlook.com
- ([fe80::5cca:2bcc:cedb:d9bf]) by CH0PR10MB5338.namprd10.prod.outlook.com
- ([fe80::5cca:2bcc:cedb:d9bf%6]) with mapi id 15.20.8964.021; Fri, 25 Jul 2025
- 00:33:34 +0000
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: Hannes Reinecke <hare@suse.com>, John Garry <john.g.garry@oracle.com>,
-        axboe@kernel.dk, linux-block@vger.kernel.org,
-        martin.petersen@oracle.com, hch@lst.de, dlemoal@kernel.org
-Subject: Re: [PATCH RFC 2/2] block: Enforce power-of-2 physical block size
-From: "Martin K. Petersen" <martin.petersen@oracle.com>
-In-Reply-To: <b595ae91-1fb3-404f-8633-7d18efc71fc4@acm.org> (Bart Van Assche's
-	message of "Thu, 24 Jul 2025 08:19:13 -0700")
-Organization: Oracle Corporation
-Message-ID: <yq1frelt8tz.fsf@ca-mkp.ca.oracle.com>
-References: <20250722102620.3208878-1-john.g.garry@oracle.com>
-	<20250722102620.3208878-3-john.g.garry@oracle.com>
-	<f0605f62-0562-420a-b121-67dc247638c9@oracle.com>
-	<2969b760-2f7a-4cbb-895a-097dbd88974a@suse.com>
-	<b595ae91-1fb3-404f-8633-7d18efc71fc4@acm.org>
-Date: Thu, 24 Jul 2025 20:33:32 -0400
-Content-Type: text/plain
-X-ClientProxiedBy: PH8P222CA0004.NAMP222.PROD.OUTLOOK.COM
- (2603:10b6:510:2d7::34) To CH0PR10MB5338.namprd10.prod.outlook.com
- (2603:10b6:610:cb::8)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02BD9262BE
+	for <linux-block@vger.kernel.org>; Fri, 25 Jul 2025 01:13:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1753406028; cv=none; b=XbhzHzDd/mCRLx2A6l3VDvhJUBdPf2QxXF+uFQTkOVOquK3aLPEaNIa92VIPHUkbxX2JK9p7H7PravwITCSgeuvOg4ysj/32iLEeziUNhVyui0y4a/fAACJMxyU0BytxiLzgJQNFO6XNgwb/692IW1r16b5Y212KLT3iTkejszA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1753406028; c=relaxed/simple;
+	bh=i/LP2QYSLsTri6UTNScmYZIcLS26VCraKqJqqks0OR8=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=gqEVFPuqIS1wEQFQw/HOB2eRAHrE0wPydzai9YFZjHUJoJYIF+AzTY3b/ViZmsZEkAmdj2QWEr1O93ONnOcv/4UVPEMGkFczzz9wS15EdKDFNw9vy9MjjhIHk2+q0Ep/Gn8qwTfPLu8VDAD/hIhIf1dqjwNWIAyfsod4+tSFxUU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4bp8yc1wR1zKHMrr
+	for <linux-block@vger.kernel.org>; Fri, 25 Jul 2025 09:13:44 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 07F2E1A0C4D
+	for <linux-block@vger.kernel.org>; Fri, 25 Jul 2025 09:13:43 +0800 (CST)
+Received: from [10.174.179.143] (unknown [10.174.179.143])
+	by APP4 (Coremail) with SMTP id gCh0CgBHERJD2oJo8gyTBQ--.1291S3;
+	Fri, 25 Jul 2025 09:13:40 +0800 (CST)
+Subject: Re: [PATCHv3] block: restore two stage elevator switch while running
+ nr_hw_queue update
+To: Nilay Shroff <nilay@linux.ibm.com>, linux-block@vger.kernel.org
+Cc: yi.zhang@redhat.com, hch@lst.de, ming.lei@redhat.com,
+ yukuai1@huaweicloud.com, axboe@kernel.dk, shinichiro.kawasaki@wdc.com,
+ gjoyce@ibm.com, "yukuai (C)" <yukuai3@huawei.com>
+References: <20250724102540.1366308-1-nilay@linux.ibm.com>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <c7b3ad81-dff8-078a-df02-65a0df7f62d1@huaweicloud.com>
+Date: Fri, 25 Jul 2025 09:13:38 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH0PR10MB5338:EE_|MN2PR10MB4175:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1a2e3305-77fc-4eea-3888-08ddcb12e397
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?x06IODl4wehkm97urZ3Un1MNpB+5VfZDAHE3bQ+kLVZk9nI9t/pkeChpeq3J?=
- =?us-ascii?Q?ejqlBag+HhsoPzOUhHbCTA6USb55MKl6sW41eZFNhcwE+5s7IUEM+hNHKVAG?=
- =?us-ascii?Q?AkWG2oYzYsvF8XNsraAzLhMxC0AoubZNpmgRUjaHwz/TIUfqJu/RRWQfQ9/H?=
- =?us-ascii?Q?ZzeV63RKzIWicBJAtlzFPl0dZOb8BiGD0JVvba6dDjRvBkbhfwrcitIRYpgv?=
- =?us-ascii?Q?XL4p8UX78OCGQhjn2OrxKxUNIV9bPUOlTbPHWwa57fHmIZSZ6gx0GLPfRoep?=
- =?us-ascii?Q?DXv4xxMuk/iZZp7P1+laeorP418BC/N0lwdM0eUrw5TC/YZ2lqwNvQGbyKcl?=
- =?us-ascii?Q?aG4MYrZHdReC3iW7bzdUWGNoORMC9FkvFJw2RLlJJMjEeMONklkCj9fNuwK9?=
- =?us-ascii?Q?jg/aKNnNBzm4x4nbprQtQIPePQNd0Q8B0WtF/lHZitUwu0T7ITx/ZYA+PRe3?=
- =?us-ascii?Q?ui7NzvBxEyBrLVw9QoRPNqOWXWszyG4Aq308TuPQKAWhdOC/UcnaM+ar0u5p?=
- =?us-ascii?Q?+ZxaQmMjCzRECjbYVQS7IWS9fa383jn7PTmBp0YpaQK3vYxj8JbKDMSTLss3?=
- =?us-ascii?Q?MVWS1tsefYYw2l87qXakiMLC/dE0Hv2gt9BlY+kMRy4DKiO5qvkaPmpRLBee?=
- =?us-ascii?Q?CBboAfn4baveXaB4gABgICddpzXhxCIaypKC0NxhwWBKQpvDKMlzknUkEUMd?=
- =?us-ascii?Q?nVkFKKR1FxhQ5NNUVzZDdGS7zZ+gkXvdRGARlUfarLMfnEMrzwI1i8/QfheJ?=
- =?us-ascii?Q?yyOPqLoKW3s3QPjUPsjvOOm8wDDa+nkJAQ1qvLxF/kP7yDpqP15iI5Wz/ChL?=
- =?us-ascii?Q?jKLrA37t6GASnaNbK/k7LCUi41EO7chlZnhNVDqvVFBdZMA67f+a4+mkYQ4Q?=
- =?us-ascii?Q?cpTO9tKzWIfABi4gTZ/IYQ5KvMp3EEEi539EakMUvVbifEcOokEfPs31a71i?=
- =?us-ascii?Q?s4Uv0f9Zul+jY4HChg7IvDq/x9Os6FWX7cYXI7hZHqAK1LNZmdA7RvGaWXQg?=
- =?us-ascii?Q?2R+PhOFNQ4mMilD4/JsIpRyRPRXq4tWX8S/eg4/4W7q6VQNrq5TCUZyI22mW?=
- =?us-ascii?Q?Bis6CBlWvIlqRlzVhX0JMrPI9dYLiBGAVWO8dtH/tplGtm494f3Vp8dfPJEX?=
- =?us-ascii?Q?/0zdpX5zDg8B2Quq71bvwrhW9S5RlNKSku34SMzsvvcD8lO79So/psxuOe5l?=
- =?us-ascii?Q?CE1+wrnaglLCtUMzFudQKcQVJ207A9TXneyQ8YMNet+TpTqZ+cT22T3W4wK0?=
- =?us-ascii?Q?4K9CoTzp26Ur78dl9NuzPbjyJwuypLfj3fbAG27GT9mWiZSp7GFOVcZhSNpO?=
- =?us-ascii?Q?vwv7DqqAq4hQV0IuDKW/uzNc8yw/+zKKUqp/P6RsQ+brmR2auunHGFUPa9CE?=
- =?us-ascii?Q?VMl5S+lbI/wrcorJMBZU1l1rHvHnhd4IXHsNdvsyxeTvLY80tOsy5cqaujkZ?=
- =?us-ascii?Q?TpCl5RGyo8I=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH0PR10MB5338.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?FHfSUX5zm1SGosZ4N4iVugOmEVuD4XEnQdccsF6kPMkdQoB8csDv4cHP4uSZ?=
- =?us-ascii?Q?EvOv9Z9Z6MqfX7atbHqPBy5F/ALPajP2g6y5owBe1ovQ6pdraDoTv1UjRzuj?=
- =?us-ascii?Q?tFK+DKgZPdG54QiC8vqEtUiP5VzP9RyuoRGsMpk6CcHSKdW7BxO0jyFrBqlB?=
- =?us-ascii?Q?3zEi35QGJC/PHbm50zSNl/lXFbwCVjscppj92gW+0PL9j8kQ+sjnuCYWg5de?=
- =?us-ascii?Q?YnGTHTWamBGmKyfnYmQQGl7e5+jyLgM6a5xLkyesylLyGfpYDk+ic4RAPeW4?=
- =?us-ascii?Q?s9Cg+0ERSO/p8uIvUIjVNbdNP5QwNOL+pex8tIFPtzHfNnkWo/uYon3+6eGe?=
- =?us-ascii?Q?PgS/f73K7EP/fPizSP5CK7vAVgr4mafs76F5bGyN1lpOdrHwEkp1rseWexE4?=
- =?us-ascii?Q?IS5M9GZ11CwfkMJ+2EqXwrdIGIhOePt1ce5gsboKY5YDuYqloqFOwwG7m9Jm?=
- =?us-ascii?Q?pS4PpfTUhdnDezL32kRnWofi76mxOEbwBRTam5A0BtVe5hCtf3/3yhQmVHK/?=
- =?us-ascii?Q?SLUZ+GVucR0xQk7SkoTsF1kgHEQhW9ACsZe74jgGf6mcpDVBpC46gyxyouZB?=
- =?us-ascii?Q?QQLlViKLFDsEQzcFVXTy8egHjfsQ0MZZtMH6k10rLiV58aGsEzrfk92L/MzF?=
- =?us-ascii?Q?r34mCVzmnv5cp4RfHhOMET6I/SZVfR8Eb+zmbcr73vJvkd6dS7ABeaZWwelv?=
- =?us-ascii?Q?xkzUN293KvNUyzv3hPNZlMYZOf7j0xe/jL1ouBiR56/yaLaw2eHMKFF6RNk1?=
- =?us-ascii?Q?3YgEXdpjZiKY9+HgPeNIWtPZ6BvCDzPjGpQNsZ354dqLnWSP9W/i5nD1U+Bw?=
- =?us-ascii?Q?qyrzr1MTY1p/6fFW5MoOYYjpSeH3AcdddZQksiiCAzQW9oH2VQpW1m5DjLWX?=
- =?us-ascii?Q?f+ceFdrl0ftblFwke5FtViRgYIOMQBZdiDXfdAe3LEHIMiyMCzYj/PGPHy/o?=
- =?us-ascii?Q?M8Knl2ZicfHvVrlwsfQ8ADVLWs1H5NHr+pcXuNnvnPm7CFQ+aYJtqx/AE9fP?=
- =?us-ascii?Q?gETu8kJO3hLV6xgl/kKquruxuueHis4wlBtRQG+AMgJfXKv01wD6U9hU24EQ?=
- =?us-ascii?Q?451Vy/zWd1N9ZfTHoWzmMxCi2VUSsvIBTfWNPUS11OAswWxJCLi7WXCN5Sso?=
- =?us-ascii?Q?Amj25j7e4tLpvK17aPCEKpVytP4aKZDAp9K0jKOSle41P4jkLl2EXOpLR9m5?=
- =?us-ascii?Q?w/qrL4XrTUtta91JJVmiukJqCwUaxtgAi+Wbae7Bl84xQ1PtGCUPCfVHE+mZ?=
- =?us-ascii?Q?u2PRtnBmsiXg0SDD7RFmsfVKie6+QrbcN+zfMfT3ybCcpaDPJPzROPTsZ+EP?=
- =?us-ascii?Q?9/wh/xnB8/Exw2sMfYg1EPQnTXWg1QCnwQccJUaiTwn0fVUFRU58wRRhYrSR?=
- =?us-ascii?Q?jWWTAs8NF3T+mYpXtSjVq1dIrCoVq0RC5/2IRteduBQhB9ijrpRgqfUE6YEK?=
- =?us-ascii?Q?ZfgKuYFCgglOSGmZZFS+l0Ib21NLcJKPS6sxw8gUaxj6lt6KCPSY02I4IbNi?=
- =?us-ascii?Q?fGvN6BU0J6v8R9gBQbfuR96PNhCuldDm52DL4uMVKCQEgMNqV6fTOgd4adgr?=
- =?us-ascii?Q?BgVXQPcD8Q4hZblXWGv8gRUC2Z31UqY7RNePR/0R8X2UqDFf5yE7W7ymtlEm?=
- =?us-ascii?Q?hg=3D=3D?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	gx6XZTHUz/ES4eAio3VONtdpBlg5vRJ4nZiExLr+TGX8Go5tdw0+7w5FtVVRw0Hxg1UdGJKkM5EfYWvSYkVycxDzCP+3DF/ia5IS7x7jm1oZr1rY9ocQ1B/pcUu0k1Zm5WLj18PuzwOvr3MM2emuN5LjGGNB/Jrd39CNgjlnSTL5iFIoiMoLspe+SPxoyp6UHDj24ZvWnCMPhMA2IW8eJ+UM2WP3Qo/glZnrun5Ga/ykBIAP7UJbZ5upWZt6wIJ7ovFPTtox8xQizQryoa9i3xg9xBxIGwAj4Vcu5DF/21igzbmTRHlh+8VxpyIOUrejkQksCo+WqtqWpK6ylSlyHY4Nj9+3+sCAcirfwOscoVbcF97cU7FY8NERoeW054GFAwpWqhF+NX+vlrfqwlys6qFVE4QbRu9NxEYG3C9Uhh6rZszUfZp3z6mjeJ3fjG11Uess67JfHumLTHO5p73TPQTDbDqeuGFBNhypZUyHNpU4KWGTqitIZWGGAbeFCEGa+a+Il1PoVg2xyeOXDay4FiiViMkkRiW4aa8qqZzwsYiJCf6hYQBfH0GBpctsL5y+Jd7gS5vZP7Cz4P4bIVOOOjBaXTwBdjS+Nr9YJpb6TZY=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1a2e3305-77fc-4eea-3888-08ddcb12e397
-X-MS-Exchange-CrossTenant-AuthSource: CH0PR10MB5338.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jul 2025 00:33:34.6190
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: taWLoGa6oOBuLwV11UccQH4ZdPB9DSXvfyX0gsSdcbLyFysqf1Qps6CfUcDUENGnlcVliG0fJreTNMeUaeXuT3+G+Xa1eJ3MV0HFb7/A7Co=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR10MB4175
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-07-24_06,2025-07-24_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 adultscore=0 bulkscore=0
- suspectscore=0 mlxscore=0 phishscore=0 mlxlogscore=660 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2505160000
- definitions=main-2507250002
-X-Proofpoint-ORIG-GUID: YTuFfeUBqC-0EA7i7d-t0IiOCoVAIugL
-X-Proofpoint-GUID: YTuFfeUBqC-0EA7i7d-t0IiOCoVAIugL
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzI1MDAwMiBTYWx0ZWRfX2fecahs24lfF
- NUCCMAYYfSHWIFZOOZzVwm1na59IhvTyE1PndvkLormLJiMvxFcOF8Es4X82D7oxBypFC2ffmCI
- gG9rfQtRxWSnLZk/nQ4yu7Cv0sSup7ld7wEBccd9N7uv6+4+43grp44XXzQsXx9tK1GPu4QGsw5
- 00LszLs4uGRq3l1Iu/7gdrXJtDYcgMw4FOpSYi4S9G1Dn54AmFpREt5J087tTXY+R1ucj0ywOZh
- 2viVL7kBfURBXsiSOonwPPqvC98Lic69HSn8VmPspdKZPVRfUelZrODustb3p8OzqwmGp7gW7zp
- F8nWzlTFusagdXYr9dNWJq2TX6u4riXj4KIPJpGeKXg93B302vDERTBvg6BbHgZuvl7/syav7eY
- z/hZIloHk1oRbYYWlTx9gcFaBmHzZvEgYE2ncwPnIcEqADStCXt995A3MMccMIAlTqKVFMTI
-X-Authority-Analysis: v=2.4 cv=Jt7xrN4C c=1 sm=1 tr=0 ts=6882d0e3 b=1 cx=c_pps
- a=zPCbziy225d3KhSqZt3L1A==:117 a=zPCbziy225d3KhSqZt3L1A==:17
- a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19
- a=wKuvFiaSGQ0qltdbU6+NXLB8nM8=:19 a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19
- a=xqWC_Br6kY4A:10 a=Wb1JkmetP80A:10 a=GoEa3M9JfhUA:10
- a=Y_2mfXcCao6oKECiFpQA:9 a=zZCYzV9kfG8A:10 cc=ntf awl=host:12061
+In-Reply-To: <20250724102540.1366308-1-nilay@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgBHERJD2oJo8gyTBQ--.1291S3
+X-Coremail-Antispam: 1UD129KBjvAXoWfGF43XrWrGFW7ArW5uF17KFg_yoW8Jr1DCo
+	WfWrs2yw4kKw18GrykJw1kZrWrXr18Way3ZryUu3W5Xa1UKw4IkFyUGr43AryfGF1F9F10
+	93srKw1ftayftF95n29KB7ZKAUJUUUU8529EdanIXcx71UUUUU7v73VFW2AGmfu7bjvjm3
+	AaLaJ3UjIYCTnIWjp_UUUYX7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E6xAIw20EY4v20xva
+	j40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2
+	x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8
+	Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26r
+	xl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj
+	6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr
+	0_Gr1lF7xvr2IY64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxa
+	n2IY04v7Mxk0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2
+	Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s02
+	6x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0x
+	vE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE
+	42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6x
+	kF7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x0JUd-B_UUUUU=
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
+Hi,
 
-Bart,
+在 2025/07/24 18:01, Nilay Shroff 写道:
+> The kmemleak reports memory leaks related to elevator resources that
+> were originally allocated in the ->init_hctx() method. The following
+> leak traces are observed after running blktests block/040:
+> 
+> unreferenced object 0xffff8881b82f7400 (size 512):
+>    comm "check", pid 68454, jiffies 4310588881
+>    hex dump (first 32 bytes):
+>      00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+>      00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+>    backtrace (crc 5bac8b34):
+>      __kvmalloc_node_noprof+0x55d/0x7a0
+>      sbitmap_init_node+0x15a/0x6a0
+>      kyber_init_hctx+0x316/0xb90
+>      blk_mq_init_sched+0x419/0x580
+>      elevator_switch+0x18b/0x630
+>      elv_update_nr_hw_queues+0x219/0x2c0
+>      __blk_mq_update_nr_hw_queues+0x36a/0x6f0
+>      blk_mq_update_nr_hw_queues+0x3a/0x60
+>      0xffffffffc09ceb80
+>      0xffffffffc09d7e0b
+>      configfs_write_iter+0x2b1/0x470
+>      vfs_write+0x527/0xe70
+>      ksys_write+0xff/0x200
+>      do_syscall_64+0x98/0x3c0
+>      entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> unreferenced object 0xffff8881b82f6000 (size 512):
+>    comm "check", pid 68454, jiffies 4310588881
+>    hex dump (first 32 bytes):
+>      00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+>      00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+>    backtrace (crc 5bac8b34):
+>      __kvmalloc_node_noprof+0x55d/0x7a0
+>      sbitmap_init_node+0x15a/0x6a0
+>      kyber_init_hctx+0x316/0xb90
+>      blk_mq_init_sched+0x419/0x580
+>      elevator_switch+0x18b/0x630
+>      elv_update_nr_hw_queues+0x219/0x2c0
+>      __blk_mq_update_nr_hw_queues+0x36a/0x6f0
+>      blk_mq_update_nr_hw_queues+0x3a/0x60
+>      0xffffffffc09ceb80
+>      0xffffffffc09d7e0b
+>      configfs_write_iter+0x2b1/0x470
+>      vfs_write+0x527/0xe70
+>      ksys_write+0xff/0x200
+>      do_syscall_64+0x98/0x3c0
+>      entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> unreferenced object 0xffff8881b82f5800 (size 512):
+>    comm "check", pid 68454, jiffies 4310588881
+>    hex dump (first 32 bytes):
+>      00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+>      00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+>    backtrace (crc 5bac8b34):
+>      __kvmalloc_node_noprof+0x55d/0x7a0
+>      sbitmap_init_node+0x15a/0x6a0
+>      kyber_init_hctx+0x316/0xb90
+>      blk_mq_init_sched+0x419/0x580
+>      elevator_switch+0x18b/0x630
+>      elv_update_nr_hw_queues+0x219/0x2c0
+>      __blk_mq_update_nr_hw_queues+0x36a/0x6f0
+>      blk_mq_update_nr_hw_queues+0x3a/0x60
+>      0xffffffffc09ceb80
+>      0xffffffffc09d7e0b
+>      configfs_write_iter+0x2b1/0x470
+>      vfs_write+0x527/0xe70
+> 
+>      ksys_write+0xff/0x200
+>      do_syscall_64+0x98/0x3c0
+>      entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> 
+> The issue arises while we run nr_hw_queue update,  Specifically, we first
+> reallocate hardware contexts (hctx) via __blk_mq_realloc_hw_ctxs(), and
+> then later invoke elevator_switch() (assuming q->elevator is not NULL).
+> The elevator switch code would first exit old elevator (elevator_exit)
+> and then switches to the new elevator. The elevator_exit loops through
+> each hctx and invokes the elevator’s per-hctx exit method ->exit_hctx(),
+> which releases resources allocated during ->init_hctx().
+> 
+> This memleak manifests when we reduce the num of h/w queues - for example,
+> when the initial update sets the number of queues to X, and a later update
+> reduces it to Y, where Y < X. In this case, we'd loose the access to old
+> hctxs while we get to elevator exit code because __blk_mq_realloc_hw_ctxs
+> would have already released the old hctxs. As we don't now have any
+> reference left to the old hctxs, we don't have any way to free the
+> scheduler resources (which are allocate in ->init_hctx()) and kmemleak
+> complains about it.
+> 
+> This issue was caused due to the commit 596dce110b7d ("block: simplify
+> elevator reattachment for updating nr_hw_queues"). That change unified
+> the two-stage elevator teardown and reattachment into a single call that
+> occurs after __blk_mq_realloc_hw_ctxs() has already freed the hctxs.
+> 
+> This patch restores the previous two-stage elevator switch logic during
+> nr_hw_queues updates. First, the elevator is switched to 'none', which
+> ensures all scheduler resources are properly freed. Then, the hardware
+> contexts (hctxs) are reallocated, and the software-to-hardware queue
+> mappings are updated. Finally, the original elevator is reattached. This
+> sequence prevents loss of references to old hctxs and avoids the scheduler
+> resource leaks reported by kmemleak.
+> 
+> Reported-by : Yi Zhang <yi.zhang@redhat.com>
+> Fixes: 596dce110b7d ("block: simplify elevator reattachment for updating nr_hw_queues")
+> Closes: https://lore.kernel.org/all/CAHj4cs8oJFvz=daCvjHM5dYCNQH4UXwSySPPU4v-WHce_kZXZA@mail.gmail.com/
+> Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
+> ---
+> Changes from v2:
+>      - Simplified error handling by combining WARN_ON_ONCE() and the
+>        return value check of xa_insert() into a single statement.
+>        This makes code more concise and easier to read without changing
+>        the behavior. (Yu Kuai)
+>      - Reduced the scope of ->elevator_lock in elv_update_nr_hw_queues().
+>        Since elevator_type does not need protection, the lock now only
+>        covers the critical section where elevator_switch() is called.
+>        (Yu Kuai)
+> 
+> Changes from v1:
+>      - Updated commit message with kmemleak trace generated using null-blk
+>        (Yi Zhang)
+>      - The elevator module could be removed while nr_hw_queue update is
+>        running, so protect elevator switch using elevator_get() and
+>        elevator_put() (Ming Lei)
+>      - Invoke elv_update_nr_hw_queues() from blk_mq_elv_switch_back() and
+>        that way avoid elevator code restructuring in a patch which fixes
+>        a regression. (Ming Lei)
+> 
+> ---
+>   block/blk-mq.c   | 84 ++++++++++++++++++++++++++++++++++++++++++------
+>   block/blk.h      |  2 +-
+>   block/elevator.c | 10 +++---
+>   3 files changed, 81 insertions(+), 15 deletions(-)
+> 
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 4806b867e37d..dec1cd4f1f5b 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -4966,6 +4966,60 @@ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
+>   	return ret;
+>   }
+>   
+> +/*
+> + * Switch back to the elevator type stored in the xarray.
+> + */
+> +static void blk_mq_elv_switch_back(struct request_queue *q,
+> +		struct xarray *elv_tbl)
+> +{
+> +	struct elevator_type *e = xa_load(elv_tbl, q->id);
+> +
+> +	/* The elv_update_nr_hw_queues unfreezes the queue. */
+> +	elv_update_nr_hw_queues(q, e);
+> +
+> +	/* Drop the reference acquired in blk_mq_elv_switch_none. */
+> +	if (e)
+> +		elevator_put(e);
+> +}
+> +
+> +/*
+> + * Stores elevator type in xarray and set current elevator to none. It uses
+> + * q->id as an index to store the elevator type into the xarray.
+> + */
+> +static int blk_mq_elv_switch_none(struct request_queue *q,
+> +		struct xarray *elv_tbl)
+> +{
+> +	int ret = 0;
+> +
+> +	lockdep_assert_held_write(&q->tag_set->update_nr_hwq_lock);
+> +
+> +	/*
+> +	 * Accessing q->elevator without holding q->elevator_lock is safe here
+> +	 * because we're called from nr_hw_queue update which is protected by
+> +	 * set->update_nr_hwq_lock in the writer context. So, scheduler update/
+> +	 * switch code (which acquires the same lock in the reader context)
+> +	 * can't run concurrently.
+> +	 */
+> +	if (q->elevator) {
+> +Emptly line here. Otherweise LGTM
 
-> I think this means that the SCSI standards support physical blocks
-> that are smaller than the logical block size.
+Reviewed-by: Yu Kuai <yukuai3@huawei.com>
 
-It's just boilerplate weasel wording to avoid breaking the seal of
-compliance for any devices that may have done something like this in the
-past.
+> +		ret = xa_insert(elv_tbl, q->id, q->elevator->type, GFP_KERNEL);
+> +		if (WARN_ON_ONCE(ret))
+> +			return ret;
+> +
+> +		/*
+> +		 * Before we switch elevator to 'none', take a reference to
+> +		 * the elevator module so that while nr_hw_queue update is
+> +		 * running, no one can remove elevator module. We'd put the
+> +		 * reference to elevator module later when we switch back
+> +		 * elevator.
+> +		 */
+> +		__elevator_get(q->elevator->type);
+> +
+> +		elevator_set_none(q);
+> +	}
+> +	return ret;
+> +}
+> +
+>   static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
+>   							int nr_hw_queues)
+>   {
+> @@ -4973,6 +5027,7 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
+>   	int prev_nr_hw_queues = set->nr_hw_queues;
+>   	unsigned int memflags;
+>   	int i;
+> +	struct xarray elv_tbl;
+>   
+>   	lockdep_assert_held(&set->tag_list_lock);
+>   
+> @@ -4984,6 +5039,9 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
+>   		return;
+>   
+>   	memflags = memalloc_noio_save();
+> +
+> +	xa_init(&elv_tbl);
+> +
+>   	list_for_each_entry(q, &set->tag_list, tag_set_list) {
+>   		blk_mq_debugfs_unregister_hctxs(q);
+>   		blk_mq_sysfs_unregister_hctxs(q);
+> @@ -4992,11 +5050,17 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
+>   	list_for_each_entry(q, &set->tag_list, tag_set_list)
+>   		blk_mq_freeze_queue_nomemsave(q);
+>   
+> -	if (blk_mq_realloc_tag_set_tags(set, nr_hw_queues) < 0) {
+> -		list_for_each_entry(q, &set->tag_list, tag_set_list)
+> -			blk_mq_unfreeze_queue_nomemrestore(q);
+> -		goto reregister;
+> -	}
+> +	/*
+> +	 * Switch IO scheduler to 'none', cleaning up the data associated
+> +	 * with the previous scheduler. We will switch back once we are done
+> +	 * updating the new sw to hw queue mappings.
+> +	 */
+> +	list_for_each_entry(q, &set->tag_list, tag_set_list)
+> +		if (blk_mq_elv_switch_none(q, &elv_tbl))
+> +			goto switch_back;
+> +
+> +	if (blk_mq_realloc_tag_set_tags(set, nr_hw_queues) < 0)
+> +		goto switch_back;
+>   
+>   fallback:
+>   	blk_mq_update_queue_map(set);
+> @@ -5016,12 +5080,11 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
+>   		}
+>   		blk_mq_map_swqueue(q);
+>   	}
+> -
+> -	/* elv_update_nr_hw_queues() unfreeze queue for us */
+> +switch_back:
+> +	/* The blk_mq_elv_switch_back unfreezes queue for us. */
+>   	list_for_each_entry(q, &set->tag_list, tag_set_list)
+> -		elv_update_nr_hw_queues(q);
+> +		blk_mq_elv_switch_back(q, &elv_tbl);
+>   
+> -reregister:
+>   	list_for_each_entry(q, &set->tag_list, tag_set_list) {
+>   		blk_mq_sysfs_register_hctxs(q);
+>   		blk_mq_debugfs_register_hctxs(q);
+> @@ -5029,6 +5092,9 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
+>   		blk_mq_remove_hw_queues_cpuhp(q);
+>   		blk_mq_add_hw_queues_cpuhp(q);
+>   	}
+> +
+> +	xa_destroy(&elv_tbl);
+> +
+>   	memalloc_noio_restore(memflags);
+>   
+>   	/* Free the excess tags when nr_hw_queues shrink. */
+> diff --git a/block/blk.h b/block/blk.h
+> index 37ec459fe656..fae7653a941f 100644
+> --- a/block/blk.h
+> +++ b/block/blk.h
+> @@ -321,7 +321,7 @@ bool blk_bio_list_merge(struct request_queue *q, struct list_head *list,
+>   
+>   bool blk_insert_flush(struct request *rq);
+>   
+> -void elv_update_nr_hw_queues(struct request_queue *q);
+> +void elv_update_nr_hw_queues(struct request_queue *q, struct elevator_type *e);
+>   void elevator_set_default(struct request_queue *q);
+>   void elevator_set_none(struct request_queue *q);
+>   
+> diff --git a/block/elevator.c b/block/elevator.c
+> index ab22542e6cf0..9d81a06db6ec 100644
+> --- a/block/elevator.c
+> +++ b/block/elevator.c
+> @@ -689,21 +689,21 @@ static int elevator_change(struct request_queue *q, struct elv_change_ctx *ctx)
+>    * The I/O scheduler depends on the number of hardware queues, this forces a
+>    * reattachment when nr_hw_queues changes.
+>    */
+> -void elv_update_nr_hw_queues(struct request_queue *q)
+> +void elv_update_nr_hw_queues(struct request_queue *q, struct elevator_type *e)
+>   {
+>   	struct elv_change_ctx ctx = {};
+>   	int ret = -ENODEV;
+>   
+>   	WARN_ON_ONCE(q->mq_freeze_depth == 0);
+>   
+> -	mutex_lock(&q->elevator_lock);
+> -	if (q->elevator && !blk_queue_dying(q) && blk_queue_registered(q)) {
+> -		ctx.name = q->elevator->type->elevator_name;
+> +	if (e && !blk_queue_dying(q) && blk_queue_registered(q)) {
+> +		ctx.name = e->elevator_name;
+>   
+> +		mutex_lock(&q->elevator_lock);
+>   		/* force to reattach elevator after nr_hw_queue is updated */
+>   		ret = elevator_switch(q, &ctx);
+> +		mutex_unlock(&q->elevator_lock);
+>   	}
+> -	mutex_unlock(&q->elevator_lock);
+>   	blk_mq_unfreeze_queue_nomemrestore(q);
+>   	if (!ret)
+>   		WARN_ON_ONCE(elevator_change_done(q, &ctx));
+> 
 
-> However, as far as I know the Linux kernel does not try to determine
-> the physical block size in this case. As one can see in
-> drivers/scsi/sd.c LBPPBE == 0 is treated as one physical block per
-> logical block:
->
-> 	/* Logical blocks per physical block exponent */
-> 	sdkp->physical_block_size = (1 << (buffer[13] & 0xf)) * sector_size;
-
-Yep. It's the only sensible choice. There is no way for the device to
-report a physical block size smaller than the logical block size. Also,
-there is no way for us to send a read or a write operation to a block
-smaller than the reported logical block size.
-
--- 
-Martin K. Petersen
