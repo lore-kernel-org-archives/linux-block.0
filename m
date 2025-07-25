@@ -1,90 +1,99 @@
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa4.hgst.iphmx.com (esa4.hgst.iphmx.com [216.71.154.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA31B224B1F
-	for <linux-block@vger.kernel.org>; Fri, 25 Jul 2025 07:47:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F0552BE65D
+	for <linux-block@vger.kernel.org>; Fri, 25 Jul 2025 08:10:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.71.154.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753429660; cv=none; b=kE49smUAn7m5ktWMMvjlcDK7PUEz5EURl9pUvNbecPf6hx4H171Wl0bWnIHnq//wZP1JJ5zOSvv8JF7QBaBIFbH4RTmc6nRl+kF63ISWaEI4czUTIiZF2ho89Se/1OiRSVbGpnjGhvmDd07FRdgp9aXg2oqBHf2eQDZjO/rbmfg=
+	t=1753431012; cv=none; b=EadhJkK/Q8J78KjvCaiFHYoHvddDXlAu/HHtqLNeCp1titMr2aKJlEHP5Ct8jJT37BPJquI34RY0H6PZ+4auI8dETwNUGgL6gKiB59XJBs5kQYQP9+TSpNnyYJsX/YqtM+GUVqUYHa2hje9UmudGkvLe7uLQsC/qPJIWdw79njs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753429660; c=relaxed/simple;
-	bh=6aKQxPLJm86iinj3SgtDljcu5SlapFV6C34x/TU5I5Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Hi/DeqStwOlQpkR6XFwoInEmiU+z1EQvOH6sQrXUKWllxeouhRU/mecZID/zSRvY+IbG/QDImOeT3v9KbS/HBoMKVt0x+23UxY/PGxq3CPugXiwO1BZhzwFSn/m41MH8udhxul0kraz7Qu+sGhBlwHhZA2OsiQzvCOFmZ/lpOxY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=XlamKxp2; arc=none smtp.client-ip=209.85.214.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	s=arc-20240116; t=1753431012; c=relaxed/simple;
+	bh=w2HMzhVqQf4yfasGaTYxhpukXi/pg1pzj1D7pLUqFAU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bYU5RWNgBM1K52NrvjAX9XYV0op9ukpPfS/jEEcDmmABCGuOC8EBEW+QC8ztyCvO0xYkJ9j9n/ABxGWBl+qzbKO4TohVxxZzmAy12Wcn929zwcPsSOo6dEhJkMmdE6/Ipd7JM0Ns/gMpv3KJzjjPxmxFIfXqLSBFT/Ws2Teeg1c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=T5c/giv3; arc=none smtp.client-ip=216.71.154.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="XlamKxp2"
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-234bfe37cccso15195675ad.0
-        for <linux-block@vger.kernel.org>; Fri, 25 Jul 2025 00:47:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1753429658; x=1754034458; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=pbHfEdsfKeW3Ro0FE+/3vNweKKctdvcx0ysGRNJMYRQ=;
-        b=XlamKxp2bA9cZTt8TjTWqwnTDKQuKzTTmAPtFafoJ0xgsuYy3ZAi2Tye0ERU0WRtxW
-         RMUp0QNei5+PkM42QSAWbbQhosKjOSU16eNFblmg7qC1CE0lFNLvdW2Ip5/oUO366eSu
-         NIDpGOsPk/yvKaiL939HHOzmbxZ90Njaqp56k=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753429658; x=1754034458;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pbHfEdsfKeW3Ro0FE+/3vNweKKctdvcx0ysGRNJMYRQ=;
-        b=QlHoIV461T5ek2PzP8O6/IzwPGdrOYTeCvS1ifoJ8S2TYYMwLzqA4hoDJNYv7cVv8q
-         NQruCI9ce3ru2PyXpL1Gh9qS8zhG7O2VkhT3qTNe1VBp31YHy7H7m7I2ON7D/V8Yu7T3
-         lshEODWvBPCD5MeNyAUUv7zYhDQYAK8F01Uzm4/ImcxHJGC7HVBhfSdj83WwHGVG4lAV
-         KXESbmpNMpe6qQcpYG30iIdOdzuCTQiWE6xrewaejMsicpk0D6OJpPtQqXcxPOBgRT86
-         BjMHxjZd5cjQ3ayWiJgoZlLhJZXeDGznt56AS+CE1eIB3No6wCE7lv+3lNqew8sU0Snl
-         Kp6g==
-X-Forwarded-Encrypted: i=1; AJvYcCUhbyKwWNzUgy50S8xwWsbwbqiFihOXRcte2x+EX2PxIP+65/abV9ioznFIFhsGGMEfgCkNYCmBjqZILg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzrZXaJ0UPNoBxnK8Vgo7cm92rJxH0EbzRZe/aHI1BTTH53MPuc
-	+1NYF83QgWwQHft226nLYcdhQ+amLECiRaZGBMRt26DPg8x6u/bp9AdZYqcgQT60OA==
-X-Gm-Gg: ASbGnct5hB0w2rtXEM5Ez9C/Vr7W9hQUELvxmR2NOcWAvbK1PVBCfB0laGh173Ciom3
-	RKgfHYxBQZNaKMHpVDu3mfro/6TVlpnZPlUClQ/iOH2CHindRaDd/30ZsbKxJaxp7T9kH7v+Cr1
-	6Ttcvfi7ebujV4ONrRRKXqd7z2kFikz0+jJf4I72HvGT7y54GypzSe6CuvnhoRH2NJTws+NuRyG
-	EehtmpucI96JYccRJ2cNG1TDv4BnDW28GeV9gpoYgg0rKov0O3TI/1qporD/lsFgwc6/7g0QYx7
-	oLQBNzWI6L9au78dMzhN9dyhkTcB9ECu+ixvkr4fyW+/2tqdcXioDrMWAJfhYF70ScxyC6CgLi6
-	DgXde0X0DkrmhNcr+uOEoP+B+Tw==
-X-Google-Smtp-Source: AGHT+IEdRJwQ3rQ5V/fiR0qq9nIpl2g3oSLrSDM9VbQL4T+8/gPpt7ppYqzAAyiYy8krZFxaJx97KQ==
-X-Received: by 2002:a17:903:1cc:b0:235:eb71:a389 with SMTP id d9443c01a7336-23fb30c8a10mr14800305ad.36.1753429657970;
-        Fri, 25 Jul 2025 00:47:37 -0700 (PDT)
-Received: from google.com ([2401:fa00:8f:203:9f06:aba2:20da:9eaa])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23fb431d102sm5207825ad.18.2025.07.25.00.47.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 25 Jul 2025 00:47:37 -0700 (PDT)
-Date: Fri, 25 Jul 2025 16:47:33 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Phillip Potter <phil@philpotter.co.uk>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, axboe@kernel.dk, 
-	linux-block@vger.kernel.org
-Subject: Re: [PATCH 0/1] cdrom: patch for inclusion
-Message-ID: <4ifniioxsakjgvuqxhkm73e4htopanqhm7uhp7o57gb233vyin@kjwdyvfzsgqx>
-References: <20250722231900.1164-1-phil@philpotter.co.uk>
- <eyejjkuzdzl7qlq3os534ckt3jsvvnvp76pyqcrpzcignj3oms@w7cvw6oht5lk>
- <aICXICNEcwutw9C4@equinox>
- <nlskide2ahqj4gn4jvvazhhmdajqsacz5ch3zukgg2fbfmw2dk@tkyujyzz4pks>
- <3a5hhkymroystnc2ztkyejgyvfsaamfrlwwoagorymonftlkln@7qzlqyaq4zpa>
- <aIM1Cx-YLm3nky58@equinox>
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="T5c/giv3"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1753431010; x=1784967010;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=w2HMzhVqQf4yfasGaTYxhpukXi/pg1pzj1D7pLUqFAU=;
+  b=T5c/giv3B1/Q+jiVE1k+klv/DfsBcBlRDHBdeD/Pijx80uPGQHoRRv//
+   FLXcHh5RLrRqEXRSM8l7r6bEC+NlMzEG6tCe+O7/UC4Dz6gthXhB6PCu4
+   lD9dOR9syqIPwZhQj8nnzkq9lm8+FvTdlcouklPqmnXO4nbC2Gw4lXDIo
+   9LNsTDS2p504LXdaJwijPj4qXgFklcWpAvSWFWP75fJKZotDppcHERMYc
+   qytUl0RvQ3Si2tv+6JgAhAf7d7QB1fo1ZVd5DCTlc1cg730oN3f7xdVcm
+   NrWqea0LB+ufyvre+YSSCAN8oDgbC/6B4cISLColy7zIoOQwGgUqs5A6n
+   g==;
+X-CSE-ConnectionGUID: i8p34F/OSjeOtoAlWF4gJQ==
+X-CSE-MsgGUID: Jl2QQC55SGKTUgbhxYROgQ==
+X-IronPort-AV: E=Sophos;i="6.16,338,1744041600"; 
+   d="scan'208";a="98694735"
+Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 25 Jul 2025 16:09:03 +0800
+IronPort-SDR: vCOsz7KeHdsFVy2eK7wl10Hgjb4+nhp17qtSDZd5fWf5+Pq3fFAX26z/rt2ubF5Nq5s1akpQT7
+ SSiMSwYxx6Et1tzJ0JsIZQ//NdzpZIjJ5QEoN755FWRISZrFMo27mTzkO4yNuENc52FKomw1S5
+ E3xymYoJDiqBFCrMWOaYJl9ZkxGYfMhzr2IhBrmw2/Gqis/04d79lh1GKiHdpzRdkbKvUfxgtu
+ HjHtSxiobNPYvY/oCBaE9erl0+jxytW8RuJzA4eVaKsu39fMF4CKLxysZW+NaFk4dz8uQSnzIu
+ Ss0=
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 25 Jul 2025 00:05:21 -0700
+WDCIronportException: Internal
+Received: from wdap-nbqxrzw6z4.ad.shared (HELO shinmob.wdc.com) ([10.224.163.174])
+  by uls-op-cesaip01.wdc.com with ESMTP; 25 Jul 2025 01:08:57 -0700
+From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To: linux-block@vger.kernel.org
+Cc: Damien Le Moal <dlemoal@kernel.org>,
+	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Subject: [PATCH blktests] zbd/005: remove offset option of blkzone reset command
+Date: Fri, 25 Jul 2025 17:08:56 +0900
+Message-ID: <20250725080856.232478-1-shinichiro.kawasaki@wdc.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aIM1Cx-YLm3nky58@equinox>
+Content-Transfer-Encoding: 8bit
 
-On (25/07/25 08:40), Phillip Potter wrote:
-> > The patched one doesn't.
-> 
-> Fantastic news. Thanks for testing this, and for your other testing
-> too, much appreciated.
+The test case zbd/005 performs sequential writes to all sequential
+write required zone on the test target zoned block device. To prepare
+the device for this operation, the test invokes the blkzone reset
+command. However, it takes very long time to complete.
 
-Thanks for working on this, folks.
+The root cause of the long reset time is the offset option of the
+blkzone reset command. This option specifies the first sequential write
+required zone. When the offset options is provided, the kernel processes
+the reset operation zone by zone. As a result, a separated zone reset
+command is issued to each sequential write required zone, significantly
+increasing the overall time.
 
-> Have a great weekend.
+To reduce the execution time of the blkzone reset command, remove the
+offset option. Without this option, the kernel can perform a single zone
+reset operation that resets all sequential write required zones.
 
-Thanks, have a great one too!
+Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+---
+ tests/zbd/005 | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/zbd/005 b/tests/zbd/005
+index 4aa1ab5..790d24e 100755
+--- a/tests/zbd/005
++++ b/tests/zbd/005
+@@ -46,7 +46,7 @@ test_device() {
+ 		zbdmode=("--zonemode=zbd" "--max_open_zones=${moaz}")
+ 	fi
+ 
+-	blkzone reset -o "${ZONE_STARTS[zone_idx]}" "${TEST_DEV}"
++	blkzone reset "${TEST_DEV}"
+ 
+ 	_test_dev_set_scheduler deadline
+ 
+-- 
+2.50.1
+
