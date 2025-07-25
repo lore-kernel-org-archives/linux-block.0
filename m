@@ -1,130 +1,205 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CEC12114;
-	Fri, 25 Jul 2025 11:27:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14B74239E6B
+	for <linux-block@vger.kernel.org>; Fri, 25 Jul 2025 12:03:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753442846; cv=none; b=qJHjdOh2lxkOuwx6DuEqIDeEHRoEAhmvL+shD/Zc0ccNWWC6k0qIiPn/zPxlprVGllGP8VOHAGS9u3TveBxjDv2N1Y/iKzy6hnWwgvywUpQYnPzN4VEen/+K20fwvXv4V1A6Gc7EHbYoMM7m30u/XYE9PH8MKGKm5YtcjT6Hyx0=
+	t=1753445035; cv=none; b=HrPlUBgeiSRr6AdlsP6JXqCS3nAb54HCUtHiq+gEpQtoATi3uUhRnUEaK8SR3O4yoTeuYhmvUHMMsv85UJXYW9Zqux3bLvClpJvKsaEAZl7CDgALGAD2PJ112bN1mJA9WmLpTQ9ekRVLo866LFbz9SUsMsM++0StjqXmfpA9GUw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753442846; c=relaxed/simple;
-	bh=+wEueGMSq/GWSW913wV+r02q1yzQXRc5gpvONjMAkfk=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=hhO8/fwPxId3/CvZLNvuIuo8WNbahHAeDojU1YwMJhtSgNG0fR9PLV9iq0fvzkTRsMYbzjfhDu9EnvnblrNgkee5ukKs+3inuo3leYJLp3FayjRX6MqCB4zequk8SfRCNOQhENCvNTJXGDC8VK/7gXg+vSLmA81CNnseV/6xa0I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=lmsIkubR; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
+	s=arc-20240116; t=1753445035; c=relaxed/simple;
+	bh=eefAk3MqP+D8xxNIwPCweoehiD+g1bsLUqd9nG1FIb0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=K/rIrc0s71A7pST6Z/MrTo+oru56zccBxpk56LSrAwUMjhRkHypCWjB+YEx8QqDK47cWMvS2hFSEKcRY9irQPKj+O4eZLlpp8Q0iVUeBBb03n2Iq54Q+18Gng+n2IWUHDTD2+iq4GxeLABccwTSORuOzpFNoazUQuhBr/+HGXb8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=xJnBTG0v; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=TN2+G7k/; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=xJnBTG0v; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=TN2+G7k/; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="lmsIkubR"
-Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56P8s9IR015762;
-	Fri, 25 Jul 2025 11:27:19 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=qcppdkim1; bh=dzjU7ttLJ/mNbzQTDtKPdy
-	iYr7bxF356Q7uC+lXe6Hw=; b=lmsIkubRD7bgOc7yjPlIKFFu99M+49UecYiu7m
-	EzcR5iqvUb4Btnj7RZutcKJ+raeJ8jbqcXEA5buWD8NNiiG3ut6lTL+P3kkd2MiP
-	4e0HKPVJH+ParGeW/YX+8RFAOKrv9nSp140W2lXfQiTHGALfGwluYRyLj3A+BqYV
-	AR2z5ziuj5YUh9fKmLjbxL83AIe6EZDgc4JVQR68WCxBFFjiIQksZdCAc6OKpXS7
-	k7OSO9yLSqjlFD3I7uzNgrh8iupVy1RRKxKBv8pC1Ss+UTqlZiu72/Fr3V5MkqqK
-	Vqym/Hm4meWowKD15/Vhtt9BpFNf4B+JjQJMfYtBGVSfDcig==
-Received: from apblrppmta01.qualcomm.com (blr-bdr-fw-01_GlobalNAT_AllZones-Outside.qualcomm.com [103.229.18.19])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 483w501vea-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 25 Jul 2025 11:27:19 +0000 (GMT)
-Received: from pps.filterd (APBLRPPMTA01.qualcomm.com [127.0.0.1])
-	by APBLRPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTP id 56PBRFfN031820;
-	Fri, 25 Jul 2025 11:27:15 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by APBLRPPMTA01.qualcomm.com (PPS) with ESMTPS id 483ef2s3qq-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 25 Jul 2025 11:27:15 +0000
-Received: from APBLRPPMTA01.qualcomm.com (APBLRPPMTA01.qualcomm.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 56PBREVh031815;
-	Fri, 25 Jul 2025 11:27:14 GMT
-Received: from hu-devc-blr-u20-c-new.qualcomm.com (hu-hardshar-blr.qualcomm.com [10.190.104.221])
-	by APBLRPPMTA01.qualcomm.com (PPS) with ESMTPS id 56PBRELT031814
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 25 Jul 2025 11:27:14 +0000
-Received: by hu-devc-blr-u20-c-new.qualcomm.com (Postfix, from userid 3848816)
-	id E3C8620A5F; Fri, 25 Jul 2025 16:57:13 +0530 (+0530)
-From: Hardeep Sharma <quic_hardshar@quicinc.com>
-To: Jens Axboe <axboe@kernel.dk>, Hannes Reinecke <hare@suse.de>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        stable@vger.kernel.org, Hardeep Sharma <quic_hardshar@quicinc.com>
-Subject: [PATCH 6.6.y v2 1/1] block: Fix bounce check logic in blk_queue_may_bounce()
-Date: Fri, 25 Jul 2025 16:57:10 +0530
-Message-Id: <20250725112710.219313-1-quic_hardshar@quicinc.com>
-X-Mailer: git-send-email 2.25.1
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="xJnBTG0v";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="TN2+G7k/";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="xJnBTG0v";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="TN2+G7k/"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 255F21F79A;
+	Fri, 25 Jul 2025 12:03:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1753445032; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tQMTp6swxYnc8K/hMs8JaIeGAceL4YshZHyyeK4FbDw=;
+	b=xJnBTG0vqv0zQVEh1oO39sQ11B1bDT+VQuHewDILoYGmQKgNnCu7uDUSakyp/iOocg1TFF
+	hWHhTRH54UBnI23B6jOBxnTiJB5vcwZFcpBzV2jX4VJc9PrxtynNY2IyxdXO8lCgXdGO7v
+	EcN5/lrqSDA4xuB5OoB45e0L07yrY3E=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1753445032;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tQMTp6swxYnc8K/hMs8JaIeGAceL4YshZHyyeK4FbDw=;
+	b=TN2+G7k/hYC4Iq8jr5i7bcZ3qk984JeDctnCMO/k4alir23UYiaHt57f2cN14mrscB8JdP
+	UgCbMKSgrbEED6BQ==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=xJnBTG0v;
+	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b="TN2+G7k/"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1753445032; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tQMTp6swxYnc8K/hMs8JaIeGAceL4YshZHyyeK4FbDw=;
+	b=xJnBTG0vqv0zQVEh1oO39sQ11B1bDT+VQuHewDILoYGmQKgNnCu7uDUSakyp/iOocg1TFF
+	hWHhTRH54UBnI23B6jOBxnTiJB5vcwZFcpBzV2jX4VJc9PrxtynNY2IyxdXO8lCgXdGO7v
+	EcN5/lrqSDA4xuB5OoB45e0L07yrY3E=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1753445032;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tQMTp6swxYnc8K/hMs8JaIeGAceL4YshZHyyeK4FbDw=;
+	b=TN2+G7k/hYC4Iq8jr5i7bcZ3qk984JeDctnCMO/k4alir23UYiaHt57f2cN14mrscB8JdP
+	UgCbMKSgrbEED6BQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 1A6361373A;
+	Fri, 25 Jul 2025 12:03:52 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id naxqBqhyg2gUJAAAD6G6ig
+	(envelope-from <jack@suse.cz>); Fri, 25 Jul 2025 12:03:52 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+	id BC6F4A29BD; Fri, 25 Jul 2025 14:03:46 +0200 (CEST)
+Date: Fri, 25 Jul 2025 14:03:46 +0200
+From: Jan Kara <jack@suse.cz>
+To: Damien Le Moal <dlemoal@kernel.org>
+Cc: Yu Kuai <yukuai1@huaweicloud.com>, jack@suse.cz, axboe@kernel.dk, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, yukuai3@huawei.com, 
+	yi.zhang@huawei.com, yangerkun@huawei.com, johnny.chenyi@huawei.com
+Subject: Re: [PATCH 1/3] blk-ioc: add a new helper ioc_lookup_icq_rcu()
+Message-ID: <3up6wgkarspq7zo34pe72zd5a5lygdo2sokbstxc63fajrl3gw@tpk3ihmc7k7l>
+References: <20250725070547.3953398-1-yukuai1@huaweicloud.com>
+ <20250725070547.3953398-2-yukuai1@huaweicloud.com>
+ <3653febf-0c36-48ca-9d51-7cf93e5b25f1@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-QCInternal: smtphost
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: uDR2AzBEjnWe6eR8y_qZn4lC_Oebq-lx
-X-Proofpoint-ORIG-GUID: uDR2AzBEjnWe6eR8y_qZn4lC_Oebq-lx
-X-Authority-Analysis: v=2.4 cv=bKAWIO+Z c=1 sm=1 tr=0 ts=68836a17 cx=c_pps
- a=Ou0eQOY4+eZoSc0qltEV5Q==:117 a=Ou0eQOY4+eZoSc0qltEV5Q==:17
- a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=VwQbUJbxAAAA:8 a=COk6AnOGAAAA:8
- a=6abORDSa23aJwOuxMHkA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
- a=TjNXssC_j7lpFel5tvFf:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzI1MDA5NyBTYWx0ZWRfX2lxgPXhYh/AK
- oAlndLLqc7CF363FR8zfpgHs9nRYB2iMJHSfnumr/6IVkc6/64dw/LYGxocdhiayIq4NwYsKafA
- 3deo0JsP0/iJ8RLT34dLgPEyNIiQBdNIAmmSFft+Hk128UyMG7DDAA5lTT3UiQaFf0l/Kqd5c0e
- ygkxDzxyfqITq1GJz19l9SX2ofG0bjPg4ckeho6y6klbjtHdUDzM9OSf9P29+KDk7ng9BZad+dn
- l1syhrRDT6isvjWpggUgwslFDZ1J25sQzcmch63YxekHYTuX/fM6/F1wZEuCUZFVadbATtcSlWL
- dSFNHkzKl9pU1IpkM3YjBu8rCAtVFp/hzVs2CwfKPjIAqjjQfuHP66g7vauCcDimUkIwIs12ZyC
- ixC44rVjXWbc5JBdeXaUv7ZaWhKgwb/NspVOr1aRaov3BzPS1uqqYuaZvetKugOGeZ75vIBR
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-07-25_03,2025-07-24_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 bulkscore=0 spamscore=0 mlxlogscore=739 clxscore=1015
- phishscore=0 priorityscore=1501 lowpriorityscore=0 adultscore=0 mlxscore=0
- suspectscore=0 malwarescore=0 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
- definitions=main-2507250097
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3653febf-0c36-48ca-9d51-7cf93e5b25f1@kernel.org>
+X-Spamd-Result: default: False [-4.01 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.cz:dkim,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.com:email];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ARC_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	DNSWL_BLOCKED(0.00)[2a07:de40:b281:104:10:150:64:97:from,2a07:de40:b281:106:10:150:64:167:received];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[suse.cz:+]
+X-Spam-Flag: NO
+X-Spam-Level: 
+X-Rspamd-Queue-Id: 255F21F79A
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Rspamd-Action: no action
+X-Spam-Score: -4.01
 
-Buffer bouncing is needed only when memory exists above the lowmem region,
-i.e., when max_low_pfn < max_pfn. The previous check (max_low_pfn >=
-max_pfn) was inverted and prevented bouncing when it could actually be
-required.
+On Fri 25-07-25 19:21:06, Damien Le Moal wrote:
+> On 7/25/25 16:05, Yu Kuai wrote:
+> > From: Yu Kuai <yukuai3@huawei.com>
+> > 
+> > ioc_lookup_icq() is used by bfq to lookup bfqq from IO path, the helper
+> > have to be protected by queue_lock, which is too heavy. Hence add a new
+> > helper that is lookless, this is safe because both request_queue and ioc
+> > can be pinged by IO that is still issuing.
+> > 
+> > Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+> > ---
+> >  block/blk-ioc.c | 34 ++++++++++++++++++++++++++++++++++
+> >  block/blk.h     |  1 +
+> >  2 files changed, 35 insertions(+)
+> > 
+> > diff --git a/block/blk-ioc.c b/block/blk-ioc.c
+> > index ce82770c72ab..4945b48dfdb6 100644
+> > --- a/block/blk-ioc.c
+> > +++ b/block/blk-ioc.c
+> > @@ -343,6 +343,40 @@ struct io_cq *ioc_lookup_icq(struct request_queue *q)
+> >  }
+> >  EXPORT_SYMBOL(ioc_lookup_icq);
+> >  
+> > +/**
+> > + * ioc_lookup_icq_rcu - lookup io_cq from ioc in io path
+> > + * @q: the associated request_queue
+> > + *
+> > + * Look up io_cq associated with @ioc - @q pair from @ioc. Must be called from
+> > + * io issue path, either return NULL if current issue io to @q for the first
+> > + * time, or return a valid icq.
+> > + */
+> > +struct io_cq *ioc_lookup_icq_rcu(struct request_queue *q)
+> > +{
+> > +	struct io_context *ioc = current->io_context;
+> > +	struct io_cq *icq;
+> > +
+> > +	WARN_ON_ONCE(percpu_ref_is_zero(&q->q_usage_counter));
+> 
+> I do not think this is necessary.
+> 
+> > +
+> > +	if (!ioc)
+> > +		return NULL;
+> > +
+> > +	icq = rcu_dereference(ioc->icq_hint);
+> > +	if (icq && icq->q == q)
+> > +		return icq;
+> > +
+> > +	icq = radix_tree_lookup(&ioc->icq_tree, q->id);
+> > +	if (!icq)
+> > +		return NULL;
+> > +
+> > +	if (WARN_ON_ONCE(icq->q != q))
+> > +		return NULL;
+> > +
+> > +	rcu_assign_pointer(ioc->icq_hint, icq);
+> > +	return icq;
+> > +}
+> > +EXPORT_SYMBOL(ioc_lookup_icq_rcu);
+> 
+> Patch 2 calls this function with the rcu_read_lock() held. Why not move that rcu
+> read lock here inside this function ? That is how ioc_lookup_icq() was doing
+> things, with code that is more compact than this.
+> 
+> And since ioc_lookup_icq() was already using RCU, it seems that the only change
+> you need is to remove the "lockdep_assert_held(&q->queue_lock);" from that
+> function to endup with the same above functionality. So why all the churn ?
 
-Note that bouncing depends on CONFIG_HIGHMEM, which is typically enabled
-on 32-bit ARM where not all memory is permanently mapped into the kernel’s
-lowmem region.
+Yes, I agree, just dropping the assert and updating callers should be fine.
 
-Fixes: 9bb33f24abbd0 ("block: refactor the bounce buffering code")
-Cc: stable@vger.kernel.org
-Signed-off-by: Hardeep Sharma <quic_hardshar@quicinc.com>
----
-Changelog v1..v2:
+> Another question is: is it safe to call radix_tree_lookup() without any lock
+> held ? What if this races with a radix tree insertion ? (I may be wrong here as
+> I am not familiar with that code).
 
-* Updated subject line
+Yes, radix_tree_lookup() is fine to call with just rcu protection.
 
- block/blk.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/block/blk.h b/block/blk.h
-index 67915b04b3c1..f8a1d64be5a2 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -383,7 +383,7 @@ static inline bool blk_queue_may_bounce(struct request_queue *q)
- {
- 	return IS_ENABLED(CONFIG_BOUNCE) &&
- 		q->limits.bounce == BLK_BOUNCE_HIGH &&
--		max_low_pfn >= max_pfn;
-+		max_low_pfn < max_pfn;
- }
- 
- static inline struct bio *blk_queue_bounce(struct bio *bio,
+								Honza
 -- 
-2.25.1
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
