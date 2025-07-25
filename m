@@ -1,160 +1,107 @@
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 441D724113D
-	for <linux-block@vger.kernel.org>; Fri, 25 Jul 2025 12:13:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E04E61C6BE
+	for <linux-block@vger.kernel.org>; Fri, 25 Jul 2025 12:15:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753445640; cv=none; b=TRriPqGgqf/nJoi7CNoXDXEcpVLmr98XoBHHxu8gpR1BnqAA63OUETBZwd++n7iyYadtAP1v2Qefci8sZdDTr7BRhCt9ncsshbdblqTWAdxALUYjfv7mrxqiDochYYk36MoY8JTqsR0MHZ1MD+uzZkxKfRmUgMH6J1aRMmEMI8U=
+	t=1753445746; cv=none; b=YrfnMN3LS4VFQILQdhKPJ+yVx/ycEysWsFtbNAB2VbtyFwOUjKrXGrzmq9QH47JiSguG1AL2tJYakLEdUoE/57Vp2zsbenBsNrliOeXor6Hx6W8CUECvHWieUipigdWMCYnGGq4sYkw+9ulJSPVdKQRsvabWDV5BF99gMVN4ulE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753445640; c=relaxed/simple;
-	bh=f4wl+vcgIKBIOjO4jpW10mqP3jLPh7VleEMc3RPonzo=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=t/nnBxkOk1zluA1WCmlwp3AuiuVHaEI5aZvn/oGzbhTv5+2aWaoK829vPS2YRoxe60AiWaS1XgAyAgORvE2Br4YWYHfaIzX6RUekJKXT7S/EQP/pXxsE1ymhQ35Y7h9q0rMT0YUguwR+CeuHtJKW+hz4eR0JtOqvxVdlzbvrNmw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=WtvISMKI; arc=none smtp.client-ip=209.85.210.181
+	s=arc-20240116; t=1753445746; c=relaxed/simple;
+	bh=pkrmcYP5beaWXfSnlzeFe8szIbHljUrcs1E0f5bx0FA=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=WNiz80dS5X4z7bVyA4VEaK8iVSspD5flHcsAHe2VTN7NIilLx0EQ/pLCYTbAZ508ZtKX+1jA0rALkqDjBICU0F7iZ8TvkYjlC8JJtUCPllVlZ6DU5Zgj6me1wK2/TcS7LNUK6ZgLKsRL3FCBv8OWixD7TqYRmxyKfwh0QyGASXo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=ANgPUTHX; arc=none smtp.client-ip=209.85.214.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="WtvISMKI"
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-74264d1832eso2384458b3a.0
-        for <linux-block@vger.kernel.org>; Fri, 25 Jul 2025 05:13:58 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="ANgPUTHX"
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-236377f00a1so17950825ad.3
+        for <linux-block@vger.kernel.org>; Fri, 25 Jul 2025 05:15:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1753445637; x=1754050437; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1753445744; x=1754050544; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=fs7OnM/L49OqrbcCYuablnaOFePtlu3SrrQ5ImGKpvU=;
-        b=WtvISMKITNPG+ZXN7VjGBd/pHjhtsfsfEHMYxqaOLKNe6SAFQgrRehWrHYGYLNy85Z
-         hyBdd/7lySEZoUmGdluJm7y+j/6UF+88JVHoR6mpVqx4TOvLQK7IH1M5UHtDAK/KfXyK
-         S1byDl7eTPbwaC0Q+YFDWNqmDli6rMUegk9sP+nS29U+vpmbwZ0AEj6l+huM/jtuhljJ
-         PI/PgQZl4Mor1dlyfFE1Apm6ol42t6BBqvAgQwlQknk6y8lr/AQgn7wXGFr/Icv3X4co
-         eLaJn3M9TfehchHZ4xz/GEFVoLd7bzW/sJfNT0cwJvFhmcx7tYDIyV5F96EbKcKn8OlJ
-         jRIA==
+        bh=u50KxGSm/dJ8vk23OWj94nl3J/HKsjQPInCB6cEucew=;
+        b=ANgPUTHXl80ZGjhq6iW43sifw65nJMzfL98LY6svKj/bJ3phtAIW+9OaYY56NQI+e/
+         3/24CdzjblaBS7Hk+XbAFmhdYjCI58iWhC6OZpxahDweuxZY7rtugDeMrQkaPBvTcH7p
+         xkZEm7Uj/yNB8aUf4//HEtwpq0eOavbsrMG0mkR5/B2iWG+z+ho2UOoIdb94mdiB0TGd
+         brzvx6+VyaIpnzmhAJ8+OB7N6nepjd5Fdxk862V90LnQSqh0RuW5MVM7pHvyg4gMHUox
+         IPNhK2LLYXu8JzG0pT9pSTFZ7rbDdeadpl1+n2qNDSP+LD/uqKjsBMmZOkYRdqRF8F/n
+         Ph5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753445637; x=1754050437;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fs7OnM/L49OqrbcCYuablnaOFePtlu3SrrQ5ImGKpvU=;
-        b=lLkGxN8xxCFPzh9emfk4DtxKAIRPNeX+skOk5xdWBOaIZ+gMvBrFR3f0q5aqtMWBGh
-         Rais7i6tvgg1o9XIMgON+14RkxD8QEvfZSzOy368OcqmIcpj1m+I6crbxhZCAfi9y9CU
-         nQGnp9QANYq/WXAh/l/qBz4xwCgHwV+AQ5q27muh0SJ+QQwfocjmW6oLbFn+X50WDlCn
-         Vla0DhptN/ZyqhRZZThIkTZRFrGYBjOZ74Tt4aXl3CzLbz5iAKtcpNN3SRRaF7Emjmvm
-         DhiiDtY/4XSkD+6cbYWUNs+m0DNomiFlNT/oBa3C6NB9MNBjJYiBxDFnQh0Vz1B/kFr9
-         o9NQ==
-X-Gm-Message-State: AOJu0YwKMfGue5DzRqeP7CaEHZiz3M+c09J8iRCEUX/TVbIm2TrHqecX
-	aiU6PEb2zkpOA2GvrkthH7vO78FOnaACyruia076EQ2urTcCHVfy6vL1f7nEVbODf6c=
-X-Gm-Gg: ASbGncuiooWM04HUXxEuZrP723COGmIy7KdnbPAbINz8Hrhq7CRogw8jCUTLAo5h10X
-	NtD6hQHgb+N4gio0MRYmGUw/zp9nzBp/WIeJAiYIT+rINiURyClxrtMxNHalyYT6ipuitbwQ/Wp
-	zWsKbNrkJrteb5M6zGliKa7lkSm0Sca32Cxwg7lJQdON59V6VxXRK2acXj3Y24tqJKg4ohHj6uk
-	IjwduXrnxYM4li26PLxeMPARVnP4nh6UUFNtu/dkVx/jjOPXuXDGT/PrYz3bSzAYV027zov0hga
-	eKFUsae+M8xwsGibHHyc7YhMqDsJ0RweeLFHQDDrHqucW4TYDcfauV9kXVAO82KXtbR62PFplR+
-	YvG7cgsncSp9iq90/pJ8U6MWl
-X-Google-Smtp-Source: AGHT+IGDAf5msIeWgMblo6PBl+lsfu7V3ivd2t8RBFUkADmEkDCNh+IldhpH6lvH4doJdr8tMlES1w==
-X-Received: by 2002:a05:6a00:139f:b0:742:da7c:3f30 with SMTP id d2e1a72fcca58-763377f0704mr2877289b3a.19.1753445637497;
-        Fri, 25 Jul 2025 05:13:57 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-761b0622bdfsm3772083b3a.121.2025.07.25.05.13.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 25 Jul 2025 05:13:56 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, Nilay Shroff <nilay@linux.ibm.com>
-Cc: yi.zhang@redhat.com, hch@lst.de, ming.lei@redhat.com, 
- yukuai1@huaweicloud.com, yukuai3@huawei.com, shinichiro.kawasaki@wdc.com, 
- gjoyce@ibm.com
-In-Reply-To: <20250724102540.1366308-1-nilay@linux.ibm.com>
-References: <20250724102540.1366308-1-nilay@linux.ibm.com>
-Subject: Re: [PATCHv3] block: restore two stage elevator switch while
- running nr_hw_queue update
-Message-Id: <175344563631.580395.16494421873653438111.b4-ty@kernel.dk>
-Date: Fri, 25 Jul 2025 06:13:56 -0600
+        d=1e100.net; s=20230601; t=1753445744; x=1754050544;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=u50KxGSm/dJ8vk23OWj94nl3J/HKsjQPInCB6cEucew=;
+        b=Rfo4MSMxbZmuWRGTrsP1izY2jupJI6lAUhP2cY/6sF/IcaQzhC4PTtiba7bp7QQNzA
+         Lul82evQiLphwM55/iQNs/agp2s43pTpMewJmSG+LyG4Xijnm+6Qfo12baELpNVdCOrA
+         s5BOrt7DerdQnVeUKxrHNj2NFJOFnKsTtY9EbIyjk0lIvX+1q3/jl3RMIdvcQ0PQ7UT7
+         CgTPokJHZGhsHAIdL6yJP8Hom7gd+QnFtfJt4xdFjrBcRl54YgMMJCJVdHocteZNKOCg
+         kQD1hj0q72sKr3ttN7oc3Wy5TVCl9end/dwkWjFmLSt2Vb4lBJ0JgQCwrSOCkX5qPUo4
+         jIBg==
+X-Gm-Message-State: AOJu0YxctKy/ep6p/Sx8uOq2Ws+ZsSvbT9gtP5wYHLjFMwCL2qHYdWac
+	SJgXFRHwACwLusRDLCQPOwDp67x4oamy+x9V6hUT39I9fBpnNVIBurAMHIq5+IzWHnA9RV8e5A9
+	ktNPB
+X-Gm-Gg: ASbGncutp0uYcMSbXPzeqNdY/lTDsR/PrmXah4wW7kJgwYMAfelunQoDI7R6wOV+yqe
+	gthTIrTfuOlG1fid7/1a4wTJ+uvKpL+WQGM7/+cvPR/btGqoMcgA1Iqxk7t/gIQ3FesPtEjBlS9
+	vvqYHpT+7cCU7Pugq1W6+yReOc0f53MA0SS4PUgPwoMHtANYfJmgZzSy3i9xohmOaiyxkp8Ok97
+	whxxUNjGlTi0EzK8GqGTgBKM+9hvuiAfiYpsVlJGbGNjeXX2aPtOXhxr1MNQ1sNHcfx9YNdOh59
+	LrbpA/r3JbE3hTYquP2O2ZpMhvDkcl/8gvQxXeIL2rxwUwB58a9XC8CjZUI5I9zKuULpGCLjR3t
+	g06KqYRFzTHh2ATlQYn0=
+X-Google-Smtp-Source: AGHT+IHpVwNaSmCUhScaAni2YHIiHp1n4TKMEgkqizyljUxGGUXDXvjMRj6ACLIx6q40DgMY8Fu/zw==
+X-Received: by 2002:a17:902:ebc3:b0:235:f298:cbbe with SMTP id d9443c01a7336-23fb301c29amr29083915ad.12.1753445744035;
+        Fri, 25 Jul 2025 05:15:44 -0700 (PDT)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23fbb27ddc5sm2505765ad.21.2025.07.25.05.15.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 25 Jul 2025 05:15:43 -0700 (PDT)
+Message-ID: <a0ffa959-d8e5-4ac6-95cd-620aef122a23@kernel.dk>
+Date: Fri, 25 Jul 2025 06:15:42 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fix for 6.16-final
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-2ce6c
+
+Hi Linus,
+
+Just a single fix for regression in this release, where a module
+reference could be leaked. Please pull!
 
 
-On Thu, 24 Jul 2025 15:31:51 +0530, Nilay Shroff wrote:
-> The kmemleak reports memory leaks related to elevator resources that
-> were originally allocated in the ->init_hctx() method. The following
-> leak traces are observed after running blktests block/040:
-> 
-> unreferenced object 0xffff8881b82f7400 (size 512):
->   comm "check", pid 68454, jiffies 4310588881
->   hex dump (first 32 bytes):
->     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
->     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
->   backtrace (crc 5bac8b34):
->     __kvmalloc_node_noprof+0x55d/0x7a0
->     sbitmap_init_node+0x15a/0x6a0
->     kyber_init_hctx+0x316/0xb90
->     blk_mq_init_sched+0x419/0x580
->     elevator_switch+0x18b/0x630
->     elv_update_nr_hw_queues+0x219/0x2c0
->     __blk_mq_update_nr_hw_queues+0x36a/0x6f0
->     blk_mq_update_nr_hw_queues+0x3a/0x60
->     0xffffffffc09ceb80
->     0xffffffffc09d7e0b
->     configfs_write_iter+0x2b1/0x470
->     vfs_write+0x527/0xe70
->     ksys_write+0xff/0x200
->     do_syscall_64+0x98/0x3c0
->     entry_SYSCALL_64_after_hwframe+0x76/0x7e
-> unreferenced object 0xffff8881b82f6000 (size 512):
->   comm "check", pid 68454, jiffies 4310588881
->   hex dump (first 32 bytes):
->     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
->     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
->   backtrace (crc 5bac8b34):
->     __kvmalloc_node_noprof+0x55d/0x7a0
->     sbitmap_init_node+0x15a/0x6a0
->     kyber_init_hctx+0x316/0xb90
->     blk_mq_init_sched+0x419/0x580
->     elevator_switch+0x18b/0x630
->     elv_update_nr_hw_queues+0x219/0x2c0
->     __blk_mq_update_nr_hw_queues+0x36a/0x6f0
->     blk_mq_update_nr_hw_queues+0x3a/0x60
->     0xffffffffc09ceb80
->     0xffffffffc09d7e0b
->     configfs_write_iter+0x2b1/0x470
->     vfs_write+0x527/0xe70
->     ksys_write+0xff/0x200
->     do_syscall_64+0x98/0x3c0
->     entry_SYSCALL_64_after_hwframe+0x76/0x7e
-> unreferenced object 0xffff8881b82f5800 (size 512):
->   comm "check", pid 68454, jiffies 4310588881
->   hex dump (first 32 bytes):
->     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
->     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
->   backtrace (crc 5bac8b34):
->     __kvmalloc_node_noprof+0x55d/0x7a0
->     sbitmap_init_node+0x15a/0x6a0
->     kyber_init_hctx+0x316/0xb90
->     blk_mq_init_sched+0x419/0x580
->     elevator_switch+0x18b/0x630
->     elv_update_nr_hw_queues+0x219/0x2c0
->     __blk_mq_update_nr_hw_queues+0x36a/0x6f0
->     blk_mq_update_nr_hw_queues+0x3a/0x60
->     0xffffffffc09ceb80
->     0xffffffffc09d7e0b
->     configfs_write_iter+0x2b1/0x470
->     vfs_write+0x527/0xe70
-> 
-> [...]
+The following changes since commit 2680efde75ccdd745da7ae6f5e30026f70439588:
 
-Applied, thanks!
+  Merge tag 'nvme-6.16-2025-07-17' of git://git.infradead.org/nvme into block-6.16 (2025-07-17 05:56:12 -0600)
 
-[1/1] block: restore two stage elevator switch while running nr_hw_queue update
-      commit: 5989bfe6ac6bf230c2c84e118c786be0ed4be3f4
+are available in the Git repository at:
 
-Best regards,
+  git://git.kernel.dk/linux.git tags/block-6.16-20250725
+
+for you to fetch changes up to 1966554b2e82b89d4f6490f430ce76a379e23f1f:
+
+  block: fix module reference leak in mq-deadline I/O scheduler (2025-07-20 13:18:13 -0600)
+
+----------------------------------------------------------------
+block-6.16-20250725
+
+----------------------------------------------------------------
+Nilay Shroff (1):
+      block: fix module reference leak in mq-deadline I/O scheduler
+
+ block/elevator.c | 19 +++++++++++++------
+ 1 file changed, 13 insertions(+), 6 deletions(-)
+
 -- 
 Jens Axboe
-
-
 
