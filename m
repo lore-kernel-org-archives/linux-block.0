@@ -1,175 +1,128 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 806DA2EE5FD
-	for <linux-block@vger.kernel.org>; Fri, 25 Jul 2025 15:56:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26F592EF289;
+	Fri, 25 Jul 2025 16:44:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753458990; cv=none; b=KanGZzkXTBRSbJWYxpiuBo0h1P/yY5k+rqief7G3iyzg/GlO+h5Zg+XpZngjIXgJZAi4LA842gL7reWjmfHiI8oGH7YiTQZDpT195DwoWmeqiGSuxR5Q6O3XFMlTc5mRDsuzGY4igrhxEQFGRMOUH/iL8BReF3hfxpldsBs9YlY=
+	t=1753461858; cv=none; b=qrMFaDqB510QuRRuYOft5B9MziGnea3NQVGEtrpuE47mOQSDeJWdYMUqZheHZG8dIeDcQbbfBBujs8tB0mExyL5WOxuwg1gJgpid3JyPfRY+oUEio4pqnPpxSAodVY7lsZheA3FK0WyXqY26zxfdVZLrARYlqkAm3cd2WXHigqc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753458990; c=relaxed/simple;
-	bh=1f2ZzkAR9ZMQnt70qBivWPhRWRzywK3smgxP3aL0ewg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=a42FOIeiel2TkZ7iPJB5Krv7MSUFyVf7RICgDgSk7JFp4uXnRW8F/AHpM2dwaCk0SFoM7xAcPKE3e6IcdosiZlKLEf3dnLPZw6ayvH3bRVJmJBYUYl8sRZ2G6Jz00PDOdb31TRfCkL9TJ76NBv+RYxr8gOlz5DY0HuETVVomFYI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=ecbnwqra; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=Z7hZO1AJ; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=ecbnwqra; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=Z7hZO1AJ; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	s=arc-20240116; t=1753461858; c=relaxed/simple;
+	bh=h78yE1DkQ3fTjlceS0tehFkgWYsLhUQn3uH2GMwQ9s4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=f30i0CAg2LOMlKlAK2Z8K94xjBWmecBvdkJ37nHBuQIM5BYlP0mmHH3g0RaURnV966vliGbbI1Kc9+ONAooLCfpkgfwGFZInvcGMAtR5pPG9yHaCUO67h/MvloIGuAC6cSz1RTb5ILP6ii1PiTBRzVS5xTZnyFHWG6Tc5Mb9UmA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cpDQEuvn; arc=none smtp.client-ip=209.85.208.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="ecbnwqra";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="Z7hZO1AJ";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="ecbnwqra";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="Z7hZO1AJ"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 8D36921190;
-	Fri, 25 Jul 2025 15:56:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1753458986; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sJST4cvcq+qixBTeJx2qKpB5Sr7AvkRTvOWP3IPB3Us=;
-	b=ecbnwqra3hFqMYgHDVagfetyQl4eCriHWLR1x11F/lHdWed/WB/ep5P3xOmV6TbRYCvk/Z
-	ijLxxUQy+ZZvUX8RG/Hd48ZbNtx1EGq1J6Fii2L9U0QGAzDn7M2Yb3GBIHVReNSf6AIFxt
-	rXiwz/08YS2ocFL52olKn4CwcNEzvsE=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1753458986;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sJST4cvcq+qixBTeJx2qKpB5Sr7AvkRTvOWP3IPB3Us=;
-	b=Z7hZO1AJMfXpoIGxAJxblLjooQWAUYbO2f8xIAL12kMWbte/ogE99qrH0YU8Bif095zcaI
-	sf3hAwf2UeH2INCw==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=ecbnwqra;
-	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=Z7hZO1AJ
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1753458986; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sJST4cvcq+qixBTeJx2qKpB5Sr7AvkRTvOWP3IPB3Us=;
-	b=ecbnwqra3hFqMYgHDVagfetyQl4eCriHWLR1x11F/lHdWed/WB/ep5P3xOmV6TbRYCvk/Z
-	ijLxxUQy+ZZvUX8RG/Hd48ZbNtx1EGq1J6Fii2L9U0QGAzDn7M2Yb3GBIHVReNSf6AIFxt
-	rXiwz/08YS2ocFL52olKn4CwcNEzvsE=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1753458986;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sJST4cvcq+qixBTeJx2qKpB5Sr7AvkRTvOWP3IPB3Us=;
-	b=Z7hZO1AJMfXpoIGxAJxblLjooQWAUYbO2f8xIAL12kMWbte/ogE99qrH0YU8Bif095zcaI
-	sf3hAwf2UeH2INCw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 742421373A;
-	Fri, 25 Jul 2025 15:56:26 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id /elSHCqpg2hBbgAAD6G6ig
-	(envelope-from <jack@suse.cz>); Fri, 25 Jul 2025 15:56:26 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id 05881A29BE; Fri, 25 Jul 2025 17:56:21 +0200 (CEST)
-Date: Fri, 25 Jul 2025 17:56:21 +0200
-From: Jan Kara <jack@suse.cz>
-To: Tang Yizhou <yizhou.tang@shopee.com>
-Cc: axboe@kernel.dk, hch@lst.de, jack@suse.cz, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, tangyeechou@gmail.com
-Subject: Re: [PATCH 1/3] blk-wbt: Optimize wbt_done() for non-throttled writes
-Message-ID: <k7g33ohjbc7tuo3vzhsdl4qzmbjafxncnvfduxggilmdb53mxc@3y37mw7jqw4z>
-References: <20250724083001.362882-1-yizhou.tang@shopee.com>
- <20250724083001.362882-2-yizhou.tang@shopee.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cpDQEuvn"
+Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-32cd0dfbdb8so22597411fa.0;
+        Fri, 25 Jul 2025 09:44:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1753461855; x=1754066655; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=2jkkxxr1tvEIQXkKkETdG3gEvMrEI02eI/QjeRb314U=;
+        b=cpDQEuvn3aP5NKHwLpPp7WEmSjy2HOd3f3gYBnFU9YkdTgXqPe3D9BV8bbVz5Q+lw9
+         Ph8s5u+VCoKlcwAW9cESgUyLxpZWiu9F/RbQyM42aKHNmiCL6xfqtGoCJFn53DwVh+K1
+         zGhHY9aZ+T/Uvy8xVqrT/6UE0NRx+55fBd1zkkdCs/bIjwB1HZyjZ7mTypr+IqzOSJNU
+         aDl5PAQHjbfoKuMqnmmZSeL8xsUwn/gT5ioLfV9aIO6lt74hS24OInIK98hYvdgqYAR/
+         O61pm9RFE94uWK5LdHaZm4fte5M48jqI+QfUjFS8cZXBpSRoLSpkgTl6NzgnzKYWaRLE
+         cnRQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753461855; x=1754066655;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2jkkxxr1tvEIQXkKkETdG3gEvMrEI02eI/QjeRb314U=;
+        b=ukoxS7AqoMeV/9Enx4qw4RuqdyNiIbhc16g1v95eNUMBvPAd8RlJZMXk955zaIsGal
+         fwpPVXdwW2SX8kTGwjSKKJN6qrsbkQ4HWxTgrENokEHvK8hL1/nrJ61TW7sIKcT6bpzx
+         Nugqg7NIoaLnlH2cFYjO8YViJ9PEGdHpXrawswKwnfFfFjAEqPSn25zGHOcwzWrSF3SM
+         +ju9Sle3TZnRM+nP5UR0KjoFVhw5WU08q2OkISmdxvo50/SJgu/kZ8XPRFJZfDzJlEXo
+         L/Nw0cIjU7Ynv2r+j69TobHS/cmErtmJRjPw61sxUMkABJOSytsAXtF9rPK/AD7cXyeB
+         ZROw==
+X-Forwarded-Encrypted: i=1; AJvYcCUBzTSwJFlE038Gqm5Z/qCiR7KVPqwuH1SOqjsGLe1yifffMnXrewlrPqd/EjCyn7P7jbkcWyOrLQbe/+3E@vger.kernel.org, AJvYcCXrLOxE2gWqfD1QyT8PLzqSdDTaLX4I3OiJs1xxR2AJ/Epy3Q8cCFgaL6IInGFUPNgoVa7ojl+toYP4Aw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwJQwCoUHiDkzs4yENRegK58VVZcfGoxJN2sbVXCbVvWi7/6HWO
+	/TBS8evKKiN39Z8IUSQAUQXwFxiwyTgaqJxjTrA/sz37k3EAj+7SMltS
+X-Gm-Gg: ASbGncsYyxHb47/LWOGqZtksSj7OzUB1+xnfsQh26gFJG749hbRmdMItTizJdzNps89
+	bZ2gJWh7E+SEbTecsGm9n6Vsm1F9YkOHaeXdhCQ1U87yHLzoFoSitnFtLlZ95V4CfJiG8846ub/
+	3VkW6cL3nE3fTrD/ObOdd13mVlgZ8VTyXJV2wyvWQH69aao3z8My9EGZg8zgyA4G8njW2nT75aT
+	xQoHXM1EnL9oJt96PfqMSNVxK3QIbWqIMOpCGYsw1tBEQihM84y3eLmSmpgysUfpSij0/0zdI5Z
+	ybFFfl+Xau/kHyFwOCq0SdBrNKoqpGD9XmpjNLavA7NbTRj23ZNd/BieuZx3BPDKbsOl82frHbE
+	jXi+6SiEKLPSAR/YPgMQEz7BfisvEB73Kz1Tm+nA2E4lnX3Y=
+X-Google-Smtp-Source: AGHT+IE8hXJ25wF8ru+MlHrYUzqY59qEsX0o5q6j4nN8guTvq6nc+6mXIb/PIJqdE5luSZTran9WEg==
+X-Received: by 2002:a05:651c:31c3:b0:330:4f46:9467 with SMTP id 38308e7fff4ca-331ee819570mr9244521fa.27.1753461854815;
+        Fri, 25 Jul 2025 09:44:14 -0700 (PDT)
+Received: from soda.int.kasm.eu (soda.int.kasm.eu. [2001:678:a5c:1202:4fb5:f16a:579c:6dcb])
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-331f407b023sm705931fa.6.2025.07.25.09.44.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 25 Jul 2025 09:44:14 -0700 (PDT)
+From: Klara Modin <klarasmodin@gmail.com>
+To: brauner@kernel.org,
+	anuj20.g@samsung.com,
+	arnd@kernel.org
+Cc: martin.petersen@oracle.com,
+	joshi.k@samsung.com,
+	hch@infradead.org,
+	arnd@arndb.de,
+	naresh.kamboju@linaro.org,
+	anders.roxell@linaro.org,
+	axboe@kernel.dk,
+	kbusch@kernel.org,
+	csander@purestorage.com,
+	asml.silence@gmail.com,
+	adobriyan@gmail.com,
+	djwong@kernel.org,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Klara Modin <klarasmodin@gmail.com>
+Subject: [PATCH] block: change blk_get_meta_cap() stub return -ENOIOCTLCMD
+Date: Fri, 25 Jul 2025 18:43:34 +0200
+Message-ID: <20250725164334.9606-1-klarasmodin@gmail.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250724083001.362882-2-yizhou.tang@shopee.com>
-X-Spam-Level: 
-X-Spam-Flag: NO
-X-Rspamd-Queue-Id: 8D36921190
-X-Rspamd-Action: no action
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Spamd-Result: default: False [-4.01 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	MIME_TRACE(0.00)[0:+];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	ARC_NA(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DKIM_TRACE(0.00)[suse.cz:+];
-	MISSING_XM_UA(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.dk,lst.de,suse.cz,vger.kernel.org,gmail.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email,shopee.com:email,suse.cz:dkim,suse.cz:email]
-X-Spam-Score: -4.01
+Content-Transfer-Encoding: 8bit
 
-On Thu 24-07-25 16:29:59, Tang Yizhou wrote:
-> From: Tang Yizhou <yizhou.tang@shopee.com>
-> 
-> In the current implementation, the sync_cookie and last_cookie members of
-> struct rq_wb are used only by read requests and not by non-throttled write
-> requests. Based on this, we can optimize wbt_done() by removing one if
-> condition check for non-throttled write requests.
-> 
-> Signed-off-by: Tang Yizhou <yizhou.tang@shopee.com>
+When introduced in commit 9eb22f7fedfc ("fs: add ioctl to query metadata
+and protection info capabilities") the stub of blk_get_meta_cap() for
+!BLK_DEV_INTEGRITY always returns -EOPNOTSUPP. The motivation was that
+while the command was unsupported in that configuration it was still
+recognized.
 
-Nah, I'm undecided if this is actually worth it. But it looks correct and
-doesn't make the code harder to follow so I guess feel free to add:
+A later change instead assumed -ENOIOCTLCMD as is required for unknown
+ioctl commands per Documentation/driver-api/ioctl.rst. The result being
+that on !BLK_DEV_INTEGRITY configs, any ioctl which reaches
+blkdev_common_ioctl() will return -EOPNOTSUPP.
 
-Reviewed-by: Jan Kara <jack@suse.cz>
+Change the stub to return -ENOIOCTLCMD, fixing the issue and better
+matching with expectations.
 
-								Honza
+Link: https://lore.kernel.org/lkml/CACzX3AsRd__fXb9=CJPTTJC494SDnYAtYrN2=+bZgMCvM6UQDg@mail.gmail.com
+Fixes: 42b0ef01e6b5 ("block: fix FS_IOC_GETLBMD_CAP parsing in blkdev_common_ioctl()")
+Signed-off-by: Klara Modin <klarasmodin@gmail.com>
+---
+ include/linux/blk-integrity.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> ---
->  block/blk-wbt.c | 11 ++++++-----
->  1 file changed, 6 insertions(+), 5 deletions(-)
-> 
-> diff --git a/block/blk-wbt.c b/block/blk-wbt.c
-> index a50d4cd55f41..30886d44f6cd 100644
-> --- a/block/blk-wbt.c
-> +++ b/block/blk-wbt.c
-> @@ -248,13 +248,14 @@ static void wbt_done(struct rq_qos *rqos, struct request *rq)
->  	struct rq_wb *rwb = RQWB(rqos);
->  
->  	if (!wbt_is_tracked(rq)) {
-> -		if (rwb->sync_cookie == rq) {
-> -			rwb->sync_issue = 0;
-> -			rwb->sync_cookie = NULL;
-> -		}
-> +		if (wbt_is_read(rq)) {
-> +			if (rwb->sync_cookie == rq) {
-> +				rwb->sync_issue = 0;
-> +				rwb->sync_cookie = NULL;
-> +			}
->  
-> -		if (wbt_is_read(rq))
->  			wb_timestamp(rwb, &rwb->last_comp);
-> +		}
->  	} else {
->  		WARN_ON_ONCE(rq == rwb->sync_cookie);
->  		__wbt_done(rqos, wbt_flags(rq));
-> -- 
-> 2.25.1
-> 
+diff --git a/include/linux/blk-integrity.h b/include/linux/blk-integrity.h
+index e04c6e5bf1c6..e67a2b6e8f11 100644
+--- a/include/linux/blk-integrity.h
++++ b/include/linux/blk-integrity.h
+@@ -97,7 +97,7 @@ static inline struct bio_vec rq_integrity_vec(struct request *rq)
+ static inline int blk_get_meta_cap(struct block_device *bdev, unsigned int cmd,
+ 				   struct logical_block_metadata_cap __user *argp)
+ {
+-	return -EOPNOTSUPP;
++	return -ENOIOCTLCMD;
+ }
+ static inline int blk_rq_count_integrity_sg(struct request_queue *q,
+ 					    struct bio *b)
+
+base-commit: bc5b0c8febccbeabfefc9b59083b223ec7c7b53a
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+2.50.1
+
