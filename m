@@ -1,73 +1,63 @@
-Received: from 003.mia.mailroute.net (003.mia.mailroute.net [199.89.3.6])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E8F51E766F;
-	Fri, 25 Jul 2025 14:57:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 177C9244692
+	for <linux-block@vger.kernel.org>; Fri, 25 Jul 2025 15:38:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753455454; cv=none; b=Hwx9YohUwmWIZMBgVPNhwSJ4suuqlG0N9b2L6g8XMVQHLEaIFscqdw154ycjvsLiw0+k0RtodfwmWCjScMG3R9pKOLLdLgVme31r2AosD0iuGYPdF5Mmr5BNtXh5GrXcXhhfpeeiHW5M6P4HF3qAKwf3sFX5Cs6qumJZ+T1C9ZU=
+	t=1753457919; cv=none; b=lgtlmeyApAjOlCwVQ0sYgSWaOMc/9+PjzoA7+hrq9vsuUZNZrJ5QMm41EZ+XCt/a03baaZZMwFGiuHt3f/ZlzFGeX3J2WBLPggLsBztQ+oqwwdqH3FDeCgNTpFxSsEmjrfMd18bAhIzn7NLd3if9IczX11gnJF0WfjoaepLWQXI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753455454; c=relaxed/simple;
-	bh=efRsqmiKdTfVnl5wIYBaRfnw2qtiUPPbBzsckE19XAo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CBWHP8KyB+ra2429IoX14n74x9J14Pua85vuKD8QaCrGYjEFEN/tiH11oKk4/UsHgNSLBOW/OxnibuJX/PXhVoY4D2ULBOpcckC2Y40I9KQjlFr6znkopNSEKlGungZnUR5VD/H8CVrFbNDxVWn1QDKX21z7KtlPiMPWAG2XZb0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=3fl2KCZ5; arc=none smtp.client-ip=199.89.3.6
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1753457919; c=relaxed/simple;
+	bh=JzD/vTuxSQtJatme9iY3cVWYW+v1ZzE7D+RXpeu/4U0=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=P6JF3xLaiqlMa2MUwiv747en2mzpXtH+skxRzNjekFMz2tjP5qbjh+dSUqIaZ7ZRz8NOjiJ0e/mNg1djoPJVp/qkoKr7eZ2YAJaSU24xZx+yCDUl+5qSKoMOU6+ShrBzhDPzN62FW7PNneHUfSEZhvHf96HtxlovAojGtVGRhj4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OoTXKydj; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="3fl2KCZ5"
-Received: from localhost (localhost [127.0.0.1])
-	by 003.mia.mailroute.net (Postfix) with ESMTP id 4bpWF81JPBzlgqV3;
-	Fri, 25 Jul 2025 14:57:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1753455451; x=1756047452; bh=sRefQD6SLgT5XB1Gr/GmRGut
-	lvpyNP/b7Qtq1m/qCbo=; b=3fl2KCZ5odc1nFa/dVj17Cc318Nq7BMnht74h7Qe
-	IIArAZm7QCmVuD3oB4NdEKm1EZLpXNIR2QYiSl3fvqCcUkKYe/OSVlKHscHR3MV+
-	9rla8RX7FZv2sQwPl/hF016XTg8KY3S31HLz3PpiPfQ5ZEP+/RnzM5MSr7311VPp
-	FxoJkwiOCh65DANfuLzGGASNhq40TMuIHI7+EWX5rL52wmrU1ir6jNIq1jkbk/Vn
-	aMaPqV5nlc6CuGNLhLd3VNlH3shzfjWnrY09E1eyMQhQbCHBHVeySRbaRqVuyZ3T
-	l594y28IugLFL9aOuWSdzQJtb/9EfSzQaXjnGld21Oqcqw==
-X-Virus-Scanned: by MailRoute
-Received: from 003.mia.mailroute.net ([127.0.0.1])
- by localhost (003.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id ZkWeoJ6Jv9mE; Fri, 25 Jul 2025 14:57:31 +0000 (UTC)
-Received: from [100.66.154.22] (unknown [104.135.204.82])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4bpWF35HKqzlnfqg;
-	Fri, 25 Jul 2025 14:57:26 +0000 (UTC)
-Message-ID: <ee09984e-5b01-4454-b982-e5a51c05295e@acm.org>
-Date: Fri, 25 Jul 2025 07:57:25 -0700
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OoTXKydj"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B904C4CEE7;
+	Fri, 25 Jul 2025 15:38:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753457918;
+	bh=JzD/vTuxSQtJatme9iY3cVWYW+v1ZzE7D+RXpeu/4U0=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=OoTXKydjQ1TpghDtDeVbLtTz5YTtFekpthdAJ0p1bn4KgTEcEQ/wr7dd4a2aOnh0o
+	 4QhwaBck3LEJ1K127LrDpmCbNBX+QdGcaENdabrvJgsoyRcbk3+DgrqbnGXNh2xr4h
+	 wQ6gcgkpUis78sqsp1v9Aqa20l9Y7BY5Gf7KyqcW/FtNYIaRiZxUDclpiloavV2Otc
+	 H9houeiHvVNZXYEbqXsCulDoUgpXnskMYO8Jc76Y6LDo77Cy4nSYiu91/SJn1WhRKQ
+	 YFO6QLhjb031zQEryuoJRbZzHct5iMZc9A/AgyZJB9QWHpeWT35P/b1/Lb1Uym/EnH
+	 P88ow01BuwXGA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 71082383BF5B;
+	Fri, 25 Jul 2025 15:38:57 +0000 (UTC)
+Subject: Re: [GIT PULL] Block fix for 6.16-final
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <a0ffa959-d8e5-4ac6-95cd-620aef122a23@kernel.dk>
+References: <a0ffa959-d8e5-4ac6-95cd-620aef122a23@kernel.dk>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <a0ffa959-d8e5-4ac6-95cd-620aef122a23@kernel.dk>
+X-PR-Tracked-Remote: git://git.kernel.dk/linux.git tags/block-6.16-20250725
+X-PR-Tracked-Commit-Id: 1966554b2e82b89d4f6490f430ce76a379e23f1f
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 327579671a9becc43369f7c0637febe7e03d4003
+Message-Id: <175345793596.3175853.3020364385104776030.pr-tracker-bot@kernel.org>
+Date: Fri, 25 Jul 2025 15:38:55 +0000
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block: Fix typo 'programm' -> 'program'
-To: =?UTF-8?Q?Ignacio_Pe=C3=B1a?= <ignacio.pena87@gmail.com>,
- Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250725041416.73567-1-ignacio.pena87@gmail.com>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20250725041416.73567-1-ignacio.pena87@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
 
-On 7/24/25 9:14 PM, Ignacio Pe=C3=B1a wrote:
-> - * Re-program all keyslots that are supposed to have a key programmed.=
-  This is
-> + * Re-program all keyslots that are supposed to have a key programed. =
- This is
+The pull request you sent on Fri, 25 Jul 2025 06:15:42 -0600:
 
-My dictionary tells me that the current spelling is correct and=20
-preferred. See also https://www.merriam-webster.com/dictionary/program.
+> git://git.kernel.dk/linux.git tags/block-6.16-20250725
 
-Bart.
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/327579671a9becc43369f7c0637febe7e03d4003
+
+Thank you!
+
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
