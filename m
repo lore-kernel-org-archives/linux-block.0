@@ -1,63 +1,158 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 177C9244692
-	for <linux-block@vger.kernel.org>; Fri, 25 Jul 2025 15:38:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3A365475E
+	for <linux-block@vger.kernel.org>; Fri, 25 Jul 2025 15:41:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753457919; cv=none; b=lgtlmeyApAjOlCwVQ0sYgSWaOMc/9+PjzoA7+hrq9vsuUZNZrJ5QMm41EZ+XCt/a03baaZZMwFGiuHt3f/ZlzFGeX3J2WBLPggLsBztQ+oqwwdqH3FDeCgNTpFxSsEmjrfMd18bAhIzn7NLd3if9IczX11gnJF0WfjoaepLWQXI=
+	t=1753458098; cv=none; b=iqkHjZmhXLA2N7ekwDbkZUvfyWp/RD62Sd4hnQTLuYZARAWSBza7nrbJB0zBceZet0HNS6FA7ECIxXrswlMIDSBhnatU9TAiQoiGuPyv1IlMQNrF0UJdLaT93GuSXnQ5ywvt6t8hWNm52ZoyV+4k90d9b/js5Wh52HXXufwbvnY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753457919; c=relaxed/simple;
-	bh=JzD/vTuxSQtJatme9iY3cVWYW+v1ZzE7D+RXpeu/4U0=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=P6JF3xLaiqlMa2MUwiv747en2mzpXtH+skxRzNjekFMz2tjP5qbjh+dSUqIaZ7ZRz8NOjiJ0e/mNg1djoPJVp/qkoKr7eZ2YAJaSU24xZx+yCDUl+5qSKoMOU6+ShrBzhDPzN62FW7PNneHUfSEZhvHf96HtxlovAojGtVGRhj4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OoTXKydj; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1753458098; c=relaxed/simple;
+	bh=Keag8gQEoU2brqEx3SnGpDjuuQ1pc4jvZo1vq/NMwsw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=COc6jRpLryEhW0TErXtnKA5ce1rK1v4e0Urt34JXdbiAv+Vk/BPRPfGEMUJUlV13yRDr4b52S8/UnPx4WRI6m5mWIjoYYZEwBIaXNCY2hUCY3ZXWMiRVnwRP7J4FvoI/OWl/2bhQqPDrNy6Egu4w+d+unZlUzWspqtsGim+W5I8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=PJdsG5RH; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=tpi5EjqH; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=PJdsG5RH; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=tpi5EjqH; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OoTXKydj"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B904C4CEE7;
-	Fri, 25 Jul 2025 15:38:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753457918;
-	bh=JzD/vTuxSQtJatme9iY3cVWYW+v1ZzE7D+RXpeu/4U0=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=OoTXKydjQ1TpghDtDeVbLtTz5YTtFekpthdAJ0p1bn4KgTEcEQ/wr7dd4a2aOnh0o
-	 4QhwaBck3LEJ1K127LrDpmCbNBX+QdGcaENdabrvJgsoyRcbk3+DgrqbnGXNh2xr4h
-	 wQ6gcgkpUis78sqsp1v9Aqa20l9Y7BY5Gf7KyqcW/FtNYIaRiZxUDclpiloavV2Otc
-	 H9houeiHvVNZXYEbqXsCulDoUgpXnskMYO8Jc76Y6LDo77Cy4nSYiu91/SJn1WhRKQ
-	 YFO6QLhjb031zQEryuoJRbZzHct5iMZc9A/AgyZJB9QWHpeWT35P/b1/Lb1Uym/EnH
-	 P88ow01BuwXGA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 71082383BF5B;
-	Fri, 25 Jul 2025 15:38:57 +0000 (UTC)
-Subject: Re: [GIT PULL] Block fix for 6.16-final
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <a0ffa959-d8e5-4ac6-95cd-620aef122a23@kernel.dk>
-References: <a0ffa959-d8e5-4ac6-95cd-620aef122a23@kernel.dk>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <a0ffa959-d8e5-4ac6-95cd-620aef122a23@kernel.dk>
-X-PR-Tracked-Remote: git://git.kernel.dk/linux.git tags/block-6.16-20250725
-X-PR-Tracked-Commit-Id: 1966554b2e82b89d4f6490f430ce76a379e23f1f
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 327579671a9becc43369f7c0637febe7e03d4003
-Message-Id: <175345793596.3175853.3020364385104776030.pr-tracker-bot@kernel.org>
-Date: Fri, 25 Jul 2025 15:38:55 +0000
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="PJdsG5RH";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="tpi5EjqH";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="PJdsG5RH";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="tpi5EjqH"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 9C17D219F9;
+	Fri, 25 Jul 2025 15:41:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1753458093; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SJgFII9dEGhLxxa1Vwkmy8l/d+gZsGa6EAV6Aa6vzp4=;
+	b=PJdsG5RH1cbwBs1/sdZ5qbX3KgAvOI4NPywgbjAtaLhP72G1EaDGoUVcR7KpmV9Be+gpfb
+	jRsw2wKWXE3E7SEbqrvJN/Sm1puBiXBB5JKXJWEVhD3Kwe4NG4AQDJPep1g1zlFxa/uNzf
+	OKGANfzBuF+UUjRhEV3DgUwQDUxGeKg=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1753458093;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SJgFII9dEGhLxxa1Vwkmy8l/d+gZsGa6EAV6Aa6vzp4=;
+	b=tpi5EjqHtq9CmyQbU3rEM1fgufRZBHCkd8/IvOFNJBToT8Lq9PkDCWDk3FxiMdx5uWf15L
+	FIZGXJHRMNAh7+Aw==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1753458093; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SJgFII9dEGhLxxa1Vwkmy8l/d+gZsGa6EAV6Aa6vzp4=;
+	b=PJdsG5RH1cbwBs1/sdZ5qbX3KgAvOI4NPywgbjAtaLhP72G1EaDGoUVcR7KpmV9Be+gpfb
+	jRsw2wKWXE3E7SEbqrvJN/Sm1puBiXBB5JKXJWEVhD3Kwe4NG4AQDJPep1g1zlFxa/uNzf
+	OKGANfzBuF+UUjRhEV3DgUwQDUxGeKg=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1753458093;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SJgFII9dEGhLxxa1Vwkmy8l/d+gZsGa6EAV6Aa6vzp4=;
+	b=tpi5EjqHtq9CmyQbU3rEM1fgufRZBHCkd8/IvOFNJBToT8Lq9PkDCWDk3FxiMdx5uWf15L
+	FIZGXJHRMNAh7+Aw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 879CE1373A;
+	Fri, 25 Jul 2025 15:41:33 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id nnfSIK2lg2i5aQAAD6G6ig
+	(envelope-from <jack@suse.cz>); Fri, 25 Jul 2025 15:41:33 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+	id D48ACA29BD; Fri, 25 Jul 2025 17:41:28 +0200 (CEST)
+Date: Fri, 25 Jul 2025 17:41:28 +0200
+From: Jan Kara <jack@suse.cz>
+To: Tang Yizhou <yizhou.tang@shopee.com>
+Cc: axboe@kernel.dk, hch@lst.de, jack@suse.cz, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, tangyeechou@gmail.com
+Subject: Re: [PATCH 2/3] blk-wbt: Eliminate ambiguity in the comments of
+ struct rq_wb
+Message-ID: <r5qjezoetjiuw6vyjvya6o7boikidjp36hzywpgqu4nfwy4jw4@dlbauxv4mmq6>
+References: <20250724083001.362882-1-yizhou.tang@shopee.com>
+ <20250724083001.362882-3-yizhou.tang@shopee.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250724083001.362882-3-yizhou.tang@shopee.com>
+X-Spam-Level: 
+X-Spamd-Result: default: False [-3.80 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-0.999];
+	MIME_GOOD(-0.10)[text/plain];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	RCVD_COUNT_THREE(0.00)[3];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	ARC_NA(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[kernel.dk,lst.de,suse.cz,vger.kernel.org,gmail.com];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	MISSING_XM_UA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email,suse.cz:email]
+X-Spam-Flag: NO
+X-Spam-Score: -3.80
 
-The pull request you sent on Fri, 25 Jul 2025 06:15:42 -0600:
+On Thu 24-07-25 16:30:00, Tang Yizhou wrote:
+> From: Tang Yizhou <yizhou.tang@shopee.com>
+> 
+> In the current implementation, the last_issue and last_comp members of
+> struct rq_wb are used only by read requests and not by non-throttled write
+> requests. Therefore, eliminate the ambiguity here.
+> 
+> Signed-off-by: Tang Yizhou <yizhou.tang@shopee.com>
 
-> git://git.kernel.dk/linux.git tags/block-6.16-20250725
+Looks good. Feel free to add:
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/327579671a9becc43369f7c0637febe7e03d4003
+Reviewed-by: Jan Kara <jack@suse.cz>
 
-Thank you!
+								Honza
 
+> ---
+>  block/blk-wbt.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/block/blk-wbt.c b/block/blk-wbt.c
+> index 30886d44f6cd..eb8037bae0bd 100644
+> --- a/block/blk-wbt.c
+> +++ b/block/blk-wbt.c
+> @@ -85,8 +85,8 @@ struct rq_wb {
+>  	u64 sync_issue;
+>  	void *sync_cookie;
+>  
+> -	unsigned long last_issue;		/* last non-throttled issue */
+> -	unsigned long last_comp;		/* last non-throttled comp */
+> +	unsigned long last_issue;	/* issue time of last read rq */
+> +	unsigned long last_comp;	/* completion time of last read rq */
+>  	unsigned long min_lat_nsec;
+>  	struct rq_qos rqos;
+>  	struct rq_wait rq_wait[WBT_NUM_RWQ];
+> -- 
+> 2.25.1
+> 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
