@@ -1,69 +1,69 @@
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94BD74685;
-	Fri, 25 Jul 2025 04:09:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A9E62E36EC;
+	Fri, 25 Jul 2025 04:14:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753416579; cv=none; b=idUI1l/sNQtS/cZyudcu2jVDg5tvzNXRgJsz03rHKGnC2PkU/L+EqxTGvnNNKYhtzbbIpAoyK1VAd838dmCLoOSvi9GlYY/VMcpfxfyQB2RrgIIhOaB04vPnusKwfuf2SJqieKsoLFgrdP6OAfPO0RVZY7XIm3SkoGK9mnNQkmo=
+	t=1753416856; cv=none; b=RptSgHC2xL9z4/mFJnf9VAdxsQk2rrqPs1nI46YHD9KQLMG90VtiXip1bCAq3xFxYTVANDuA7W0Do01PlR5vjkWKnBKnzgR5R/0RfaETXCZ3oOCOdbJg0w2+WOlFqIjo881RNgTaXiIIa6XOjBw7CralD9Eb1DiBe3y5LHFkIDM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753416579; c=relaxed/simple;
-	bh=XxDGUkrMFJiNDhqUvg5aHCm2kl7/spgyYrSDd3NdfN8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Kp7UyBgtbBIbtRZB0jZoeElynAjISoLdtMfm+zW9kZstO6ycewpZx/Y8tsq0s6d59ICwqBJdhkcHiTsidbDpnxFj6FTyPaxQ3yshPAHDeqTKbjUt3vzzg3pv71PBn+UOSaIPjqzWEGj0sxmc/o7ojc6yVsWGvG6unlP0D8SZOhM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=miZZYpaV; arc=none smtp.client-ip=209.85.214.178
+	s=arc-20240116; t=1753416856; c=relaxed/simple;
+	bh=+pn4z0ImaHtJwReAXKr+jjjCoFUB95rQqq8hiGXTxdA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KZysnpfm3JnpImQ8DMwPPRRhLhkg11/0FASL04QQPvuqWPrAlnnvqxCs4F8r0XUo0/7tyt1yFpAYofFWHndxw2ha+olwLuivizw++IIr+F18uWxIMn52V60kcO5pvSS4zkwTWa1ksN/cQlqfXBgH6g3oAAbTGUF6AK0JT7WCkAg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B+PaacS2; arc=none smtp.client-ip=209.85.214.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="miZZYpaV"
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-23aeac7d77aso16680105ad.3;
-        Thu, 24 Jul 2025 21:09:38 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B+PaacS2"
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2353a2bc210so16387895ad.2;
+        Thu, 24 Jul 2025 21:14:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753416578; x=1754021378; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1753416854; x=1754021654; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Q37ArcK3Ir4ZnLTNtMBmYNTmQ3qGIz1H0dNVEu2W9HE=;
-        b=miZZYpaVN1luvW5RJNBH6XaZn/B4EgbveYizRhsQJLJyga5nc9fAkkCX2ZFqk7GovX
-         jqOT/4fsUSx1f5ozuCvHBu/i5GPlmm0foA5JoCKNt3BrwlnOC4QAdf/dekdZys4MRVhj
-         PMDLnzdYyVPtv0y023QZ1RudOwy0JL6uHke9PrKAN7YFxAyyk2aWUm5DF1GJLB4fH9pv
-         bFxDSKREDb9QE/1Fqa/bPfdUo/deuAAC+OEQsHMrvM3vCg9pMQmyiMAU8Mh4ZgGnm5Xp
-         leN7EzaLPdXZ+RgOnnyxmevvbVzJzYaJS+fa8pqIBAmnj5Ha8fK66vMp2ma2BV3odGgQ
-         e/hQ==
+        bh=cRwRxycYYk9J656HpTEAdKZ3WukDqnxUbViNBovsoWc=;
+        b=B+PaacS2lCUNEvwws+uZFQc4SIqJVdv7erzTUY6IA7PYNsXSRn5Glp6f0cFjOlgP3U
+         f5bBrE4JdMzgOjdgAr+Sj51jMSxlPb8q39h3l7Mdj6n3v4nmcwgRtavEckrPube8Gxe9
+         tkoPU7eUJnkF5dFSz4tgm53XGz3C7i4r5t5jNivisv6hBswaQv4qwkANhAWzDkLo/hEp
+         88EewM12XiPyQhXUnN3ejmerYFK4DDm3BSP0Z9JaZCKgA3zt1limYkqcBP4IL/Tyll/q
+         Y0crJp5eq8AWsARqCsdIq79NysnEI1YdhvKGTstJrbyJw4ov1+8h+eZms9AxPRy/sUGx
+         Mo5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753416578; x=1754021378;
+        d=1e100.net; s=20230601; t=1753416854; x=1754021654;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=Q37ArcK3Ir4ZnLTNtMBmYNTmQ3qGIz1H0dNVEu2W9HE=;
-        b=sxuE41mFolN247oO+YM0lFtyFD64EHml6gWF3LVWgc7Lttb96RIjKRYGY8t19ogOQw
-         JygyEUNz27xyIJiS+5Z6D0bp258iOkHB7nBYJYeyDv8SUsh3TLT39CYjOqJNKidiPwUG
-         4MkmseAYEfa3J2VlEogHiB+YN0rtv45NgQbylON4kSV+bW8QPucO2r8NgSitS4XfX3Lc
-         C2LH9A2oCt85Mn0Esf/Bub3AzWxXNUCKqWxtbyErDqTo2k8xRb/+nsnNGrh5s7u4VAlG
-         Nvr6AAlbGfpgWrXzenWrCzeyvge22k6cZXDnP77iBMentJQXlya2y/+z/UfC//ro1PF6
-         1W0A==
-X-Forwarded-Encrypted: i=1; AJvYcCV5dDiT6ficxspBCBKmPKww408ZasNEsIFwV7SaUFng9jldryXliqajXMmZ9/wLwA6KrXU9NA2m5qa0HpQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxJceCRGCrR6AF6NLI7+BfYbmGV/YTqvsyhzA6mTOY4hXYKiN2l
-	askGgAFD4WCNnfqRW1EqYUwJDscnIemAFhoK0ZW5vD4GeUgaWfYRB5m8yFUfIHUSfD4=
-X-Gm-Gg: ASbGncv945XJhHIAcFDhuR5lXoKARgblTwD7Je9RGR/ZGKw+ERu5GaEZEk9YgPOro1A
-	PDwnqSzi/CKUYgCJbZyy1Lh26gSJ/sJYRWwSyRxeCAqU7XdIBpi5sCw3cQqeqBPvOMDUboW5D4w
-	03V5yTscLPUovxUyzdR7ZleNiNZgdUHk23pd7ZmrbIIk8XWTRX47tfz++9Ls6PU2RF4hGGLGqAp
-	SFuQe1Dn5Qqi5bi9mboVj3Q0tjpr5oo0jOTnxYcM1GsEEAyEdDWYlmVUmgEEHD+fhD+NXpoEzkT
-	fNeoCGfQAGRNoHlxYTDeh4ae19JBUFggQe2JeaYrwx1f8sbMlOqrHphjNctk5xFFSZrqUXaxa/i
-	BV85NJSl2QLaLpoqfNeSHo5q8oI+dIHPWClr5irvq0OABkqikGvZDrg8OtBVl5UzxiWg=
-X-Google-Smtp-Source: AGHT+IFdlq8xw5dVfuTzq3rQd0zTyf1mnP9Y0n6hBZT9UejI+JarkslbpU/s1YN5CjCDgvhiDecBpA==
-X-Received: by 2002:a17:903:22d2:b0:224:76f:9e4a with SMTP id d9443c01a7336-23fb308363emr5415315ad.14.1753416577882;
-        Thu, 24 Jul 2025 21:09:37 -0700 (PDT)
+        bh=cRwRxycYYk9J656HpTEAdKZ3WukDqnxUbViNBovsoWc=;
+        b=cdvbtn2amjal5y7Rfm0Isa+uVd9o2sfrIdtxZU77ByJFfdqAIMproletKap+U8yFvn
+         43+g4EJlZWdSJQy6GAy4skuyBdB8JCK+7tj6gcRfKhbHaxgptbjkbVx4mym6SJg0ZSH7
+         4iZuGAh39Z2DHowcMPlL3mt56fJSedKn2xToXWU5QibNrB6mJV6tv+QYgeoNC0YbdtUq
+         m2h2srLKMsGbEdnpBvOBofGDAp9t4IFZ7cEMNmAVl0isCVx4yFmvSs+jei4H/AZNpSnK
+         otxujAeC+giy0j0D97BQ11rDxhEQNTV6mDMGRFv8YcRRr/75mOf/b4OqEJtBd5i/Au2K
+         U21g==
+X-Forwarded-Encrypted: i=1; AJvYcCXxMLcpRbUmuo5b/DjojZoDllXei0js5oWzQlfVKoZD8vfKUL/RvHWKWWA5OzTnx0NZw051sQGodFOExEY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywcd9ZEeqlN8d8FD7U6pqNT44c3iMJDRRgzmUtgmjM29KUuL/fP
+	X8u6en0EbQD9NGzwYqH6xC62Tq/BaLC4CYy6KUQnPqPlYLFr5F02Iymu
+X-Gm-Gg: ASbGncvQk2fgtf8mOS+c+F/TBC2D7eO2jZBK4KR7fJ8CL9ka62wUJEq4CFooHbohibH
+	SVeZI1WQit7HeNAitQh/1jTKg/Qlz0bRMphIkHO6othXYxyqMohizvWP7cNrXj9pt2SBXhW7fHn
+	6SRbK6yxsW7J6uzIYdDVA92rsXMAlpiza2OclhDx43jpQu07jp/Jyv25JBdvng7Sy77kiU9jDdG
+	p/u4jM2JMfT6zZrAHVpwge0ueVoioOO6iXpTyTH1NoJ37tfK52c1iCe8cL5s0eU5xs5G1ssmQoQ
+	MMOcZHCo2IcUYnyJnzwVnWzD6G3cAQb40xhouzyaIpx9zHPgBQyBQG2H8Vx+60NsxDUEza7zmnx
+	ihcl3sDbuWZv3+e6hE5QJPisNy1UXtZpkfyCB4xawXzkpEQvbgp0FhpDn
+X-Google-Smtp-Source: AGHT+IEfGhyMvv7biK65HhfruGEzYaI5wloB/sqor7XnJ7lUm5lnZ7KHWGUWt/UC031SOzEST1HhPg==
+X-Received: by 2002:a17:902:ce86:b0:234:d7b2:2ac5 with SMTP id d9443c01a7336-23fb3047e00mr8428685ad.21.1753416854288;
+        Thu, 24 Jul 2025 21:14:14 -0700 (PDT)
 Received: from fedora (181-162-135-125.baf.movistar.cl. [181.162.135.125])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23fa48dcb39sm26681675ad.144.2025.07.24.21.09.35
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23fadc8f669sm6794165ad.12.2025.07.24.21.14.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Jul 2025 21:09:37 -0700 (PDT)
+        Thu, 24 Jul 2025 21:14:13 -0700 (PDT)
 From: =?UTF-8?q?Ignacio=20Pe=C3=B1a?= <ignacio.pena87@gmail.com>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Ignacio Pena <ignacio.pena87@gmail.com>
-Subject: [PATCH] block: Fix typo 'prefered' -> 'preferred'
-Date: Fri, 25 Jul 2025 00:09:39 -0400
-Message-ID: <20250725040939.73175-1-ignacio.pena87@gmail.com>
+Subject: [PATCH] block: Fix typo 'programm' -> 'program'
+Date: Fri, 25 Jul 2025 00:14:16 -0400
+Message-ID: <20250725041416.73567-1-ignacio.pena87@gmail.com>
 X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -79,22 +79,40 @@ No functional change.
 
 Signed-off-by: Ignacio Pena <ignacio.pena87@gmail.com>
 ---
- block/blk-mq.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ block/blk-crypto-profile.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index b1d818396..5457c0e1a 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2361,7 +2361,7 @@ void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
- EXPORT_SYMBOL(blk_mq_run_hw_queue);
+diff --git a/block/blk-crypto-profile.c b/block/blk-crypto-profile.c
+index 81918f6e0..72462b6f4 100644
+--- a/block/blk-crypto-profile.c
++++ b/block/blk-crypto-profile.c
+@@ -237,7 +237,7 @@ EXPORT_SYMBOL_GPL(blk_crypto_keyslot_index);
+  *	      will be stored here.  blk_crypto_put_keyslot() must be called
+  *	      later to release it.  Otherwise, NULL will be stored here.
+  *
+- * If the device has keyslots, this gets a keyslot that's been programmed with
++ * If the device has keyslots, this gets a keyslot that's been programed with
+  * the specified key.  If the key is already in a slot, this reuses it;
+  * otherwise this waits for a slot to become idle and programs the key into it.
+  *
+@@ -278,7 +278,7 @@ blk_status_t blk_crypto_get_keyslot(struct blk_crypto_profile *profile,
  
- /*
-- * Return prefered queue to dispatch from (if any) for non-mq aware IO
-+ * Return preferred queue to dispatch from (if any) for non-mq aware IO
-  * scheduler.
-  */
- static struct blk_mq_hw_ctx *blk_mq_get_sq_hctx(struct request_queue *q)
+ 		/*
+ 		 * If we're here, that means there wasn't a slot that was
+-		 * already programmed with the key. So try to program it.
++		 * already programed with the key. So try to program it.
+ 		 */
+ 		if (!list_empty(&profile->idle_slots))
+ 			break;
+@@ -412,7 +412,7 @@ int __blk_crypto_evict_key(struct blk_crypto_profile *profile,
+  * blk_crypto_reprogram_all_keys() - Re-program all keyslots.
+  * @profile: The crypto profile
+  *
+- * Re-program all keyslots that are supposed to have a key programmed.  This is
++ * Re-program all keyslots that are supposed to have a key programed.  This is
+  * intended only for use by drivers for hardware that loses its keys on reset.
+  *
+  * Context: Process context. Takes and releases profile->lock.
 -- 
 2.50.1
 
