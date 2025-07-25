@@ -1,89 +1,160 @@
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B26E17F4F6
-	for <linux-block@vger.kernel.org>; Fri, 25 Jul 2025 12:10:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 441D724113D
+	for <linux-block@vger.kernel.org>; Fri, 25 Jul 2025 12:13:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753445445; cv=none; b=R4wCzAnERPo+Ra0tHGXw3BdMbwuTsvZQqriRjpmtV7ZjmXfZoWj9jxMWvxHuuR0Dey7JFTchB92DMaTYox6joKiez4LfLVi6ahwy3yrdkN3usa7A2BUUF8fDhz3sVlfSOmw4DVGwXfZN279uvZLGu11OA8Lt9NbhgETj+Y/wNMk=
+	t=1753445640; cv=none; b=TRriPqGgqf/nJoi7CNoXDXEcpVLmr98XoBHHxu8gpR1BnqAA63OUETBZwd++n7iyYadtAP1v2Qefci8sZdDTr7BRhCt9ncsshbdblqTWAdxALUYjfv7mrxqiDochYYk36MoY8JTqsR0MHZ1MD+uzZkxKfRmUgMH6J1aRMmEMI8U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753445445; c=relaxed/simple;
-	bh=mR1HZMubzuDo88qoDWRxX2DiK7pQX51amaHggzE4Up8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iKCANMe59w3sPqboZdDKcn1QnXJNid5lUhFDULzUGYtvNdOBjXJZp4qv0yVJrLpLdZNuD5e9N9d5yqtvTYgiBx3KaUDCQnH06EDkDErLcC82I3eqMRuZPhX2edb0ZmWEtHm3rITs/rZtYDoyvX7gLGTJAuNkE0NdSfl6BiUdru8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=NQT9MmNx; arc=none smtp.client-ip=209.85.216.48
+	s=arc-20240116; t=1753445640; c=relaxed/simple;
+	bh=f4wl+vcgIKBIOjO4jpW10mqP3jLPh7VleEMc3RPonzo=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=t/nnBxkOk1zluA1WCmlwp3AuiuVHaEI5aZvn/oGzbhTv5+2aWaoK829vPS2YRoxe60AiWaS1XgAyAgORvE2Br4YWYHfaIzX6RUekJKXT7S/EQP/pXxsE1ymhQ35Y7h9q0rMT0YUguwR+CeuHtJKW+hz4eR0JtOqvxVdlzbvrNmw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=WtvISMKI; arc=none smtp.client-ip=209.85.210.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="NQT9MmNx"
-Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-3138e64b42aso2043316a91.0
-        for <linux-block@vger.kernel.org>; Fri, 25 Jul 2025 05:10:42 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="WtvISMKI"
+Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-74264d1832eso2384458b3a.0
+        for <linux-block@vger.kernel.org>; Fri, 25 Jul 2025 05:13:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1753445442; x=1754050242; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=4BB2oK4kVlFMA8R70kPOxJrlj1emQHcqQrUadj6so5I=;
-        b=NQT9MmNxZOh1fzaKu+kGG7jvbsJUqIDqcjBLcGxKVl0ectlkqP2U4MMEgdQeHVBhf2
-         Q+WBexLUgMHbUwzlpLImRAyGcWSajzXVNes48Oil40Cy19AUw9uky5S8F8hOIBuXGZTz
-         05lW/XnesurxlCkgur0l6LB2dlHyrT7sGXTETuL2BCRnlYu3suByB/wpIj3WJmGI4usA
-         thF+2zc2Erg8S6+DL0BvpevqIh9iug6TReWjQa+ZPDo4rRGoyz39mDsWRcWoIpM/Pddr
-         Y8WRd6xOMLRgp/O9pzxg+BSFYRzouZOrQKwhFe4t+11DJwaufj8FBWl5j5f0JkWlz02g
-         X9jw==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1753445637; x=1754050437; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fs7OnM/L49OqrbcCYuablnaOFePtlu3SrrQ5ImGKpvU=;
+        b=WtvISMKITNPG+ZXN7VjGBd/pHjhtsfsfEHMYxqaOLKNe6SAFQgrRehWrHYGYLNy85Z
+         hyBdd/7lySEZoUmGdluJm7y+j/6UF+88JVHoR6mpVqx4TOvLQK7IH1M5UHtDAK/KfXyK
+         S1byDl7eTPbwaC0Q+YFDWNqmDli6rMUegk9sP+nS29U+vpmbwZ0AEj6l+huM/jtuhljJ
+         PI/PgQZl4Mor1dlyfFE1Apm6ol42t6BBqvAgQwlQknk6y8lr/AQgn7wXGFr/Icv3X4co
+         eLaJn3M9TfehchHZ4xz/GEFVoLd7bzW/sJfNT0cwJvFhmcx7tYDIyV5F96EbKcKn8OlJ
+         jRIA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753445442; x=1754050242;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4BB2oK4kVlFMA8R70kPOxJrlj1emQHcqQrUadj6so5I=;
-        b=LK0aNOwGUdkRBS0Y0qdXbKIyiUv0MqnutRNIA6qCwZYe0p6/lOyTwyZ3Owvq4nF/CF
-         CpnD5pECKA1mPnONSOHWfKOQcWEK1UKtoNPUi2yB5JyObWYRBydXxoIqB7y+qNCL+m+a
-         hNAfEk1jMR9hKsaEXwo5xSjqi6xa+tetB/2xfb+5FcxWI6yZOS1BMLshe0Wj9bqaAuDl
-         Ifq/tFV8Wx0l7CyhZvBVteBwshMfk6WK/4Vnmt1NPGzF4SBsCzRGe1k2eYdSAz26g8TG
-         6ALClbUAf3TBgi+SVwW8Z7g3nuMjYuAqgjXaj6YF2Y5GLBeAGWftZ2SgJYSRMCrkBupg
-         UP/Q==
-X-Gm-Message-State: AOJu0Yx8DvXqH8pPok9xo1No9yC0sL0vrHi5SKL5HBQJJl0ViuqqfW7i
-	K9L9lSyrFXqg7SrL3hDSKQIwYIQmewCMVtISkyyst/ceJh76+EjsFN2Y4Zq6pVqQx7U=
-X-Gm-Gg: ASbGnctp8TI4V1GL44RFDLr5f3oThBPc+Zz3FRdk2M6HV/Tqwv01coHDQMk6PCPy7D0
-	tezOVwBYP2fSM/Yek+mkipoDzfRP5MC9KHjjDvYyTiHJrNUJhLWu9G/qmBGrFp3VusrcW+1ADAQ
-	nGNVdnJcPVIA1XGmnuCIEldoNSXgHGDNSeYGtd2aM0p0X3gteqAurac5ka0FD0aOr6dukqvVOCh
-	x4xMJusL9DQdPdMzP3rqJC+UzEJXjWFVJb/keOV2b47Oxi7P2a0asI9L7QvmfrR/dkhpxE7yeWB
-	U1DbLdQu8rXauqJYkuYV9nKaJu/XtUhozWVFgRQQLDkBLeybD5nI7ZFTeZmLldeG2Ouv1BLD69V
-	7nUr53QmXqxrbdoMdLzI=
-X-Google-Smtp-Source: AGHT+IFevLnjs8vNfTzc8Bky8ffMZ/QArwnsNrHPcQoA35FdKYhdd/g0uxmZ5R0tMqrKafUOSc9h3A==
-X-Received: by 2002:a17:90b:33d0:b0:313:d6ce:6c6e with SMTP id 98e67ed59e1d1-31e77858116mr2556706a91.8.1753445442209;
-        Fri, 25 Jul 2025 05:10:42 -0700 (PDT)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b3f6c09bd9fsm3299292a12.26.2025.07.25.05.10.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 25 Jul 2025 05:10:41 -0700 (PDT)
-Message-ID: <67bfc411-d944-4d1a-94e5-610122ac6976@kernel.dk>
-Date: Fri, 25 Jul 2025 06:10:40 -0600
+        d=1e100.net; s=20230601; t=1753445637; x=1754050437;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fs7OnM/L49OqrbcCYuablnaOFePtlu3SrrQ5ImGKpvU=;
+        b=lLkGxN8xxCFPzh9emfk4DtxKAIRPNeX+skOk5xdWBOaIZ+gMvBrFR3f0q5aqtMWBGh
+         Rais7i6tvgg1o9XIMgON+14RkxD8QEvfZSzOy368OcqmIcpj1m+I6crbxhZCAfi9y9CU
+         nQGnp9QANYq/WXAh/l/qBz4xwCgHwV+AQ5q27muh0SJ+QQwfocjmW6oLbFn+X50WDlCn
+         Vla0DhptN/ZyqhRZZThIkTZRFrGYBjOZ74Tt4aXl3CzLbz5iAKtcpNN3SRRaF7Emjmvm
+         DhiiDtY/4XSkD+6cbYWUNs+m0DNomiFlNT/oBa3C6NB9MNBjJYiBxDFnQh0Vz1B/kFr9
+         o9NQ==
+X-Gm-Message-State: AOJu0YwKMfGue5DzRqeP7CaEHZiz3M+c09J8iRCEUX/TVbIm2TrHqecX
+	aiU6PEb2zkpOA2GvrkthH7vO78FOnaACyruia076EQ2urTcCHVfy6vL1f7nEVbODf6c=
+X-Gm-Gg: ASbGncuiooWM04HUXxEuZrP723COGmIy7KdnbPAbINz8Hrhq7CRogw8jCUTLAo5h10X
+	NtD6hQHgb+N4gio0MRYmGUw/zp9nzBp/WIeJAiYIT+rINiURyClxrtMxNHalyYT6ipuitbwQ/Wp
+	zWsKbNrkJrteb5M6zGliKa7lkSm0Sca32Cxwg7lJQdON59V6VxXRK2acXj3Y24tqJKg4ohHj6uk
+	IjwduXrnxYM4li26PLxeMPARVnP4nh6UUFNtu/dkVx/jjOPXuXDGT/PrYz3bSzAYV027zov0hga
+	eKFUsae+M8xwsGibHHyc7YhMqDsJ0RweeLFHQDDrHqucW4TYDcfauV9kXVAO82KXtbR62PFplR+
+	YvG7cgsncSp9iq90/pJ8U6MWl
+X-Google-Smtp-Source: AGHT+IGDAf5msIeWgMblo6PBl+lsfu7V3ivd2t8RBFUkADmEkDCNh+IldhpH6lvH4doJdr8tMlES1w==
+X-Received: by 2002:a05:6a00:139f:b0:742:da7c:3f30 with SMTP id d2e1a72fcca58-763377f0704mr2877289b3a.19.1753445637497;
+        Fri, 25 Jul 2025 05:13:57 -0700 (PDT)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-761b0622bdfsm3772083b3a.121.2025.07.25.05.13.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 25 Jul 2025 05:13:56 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org, Nilay Shroff <nilay@linux.ibm.com>
+Cc: yi.zhang@redhat.com, hch@lst.de, ming.lei@redhat.com, 
+ yukuai1@huaweicloud.com, yukuai3@huawei.com, shinichiro.kawasaki@wdc.com, 
+ gjoyce@ibm.com
+In-Reply-To: <20250724102540.1366308-1-nilay@linux.ibm.com>
+References: <20250724102540.1366308-1-nilay@linux.ibm.com>
+Subject: Re: [PATCHv3] block: restore two stage elevator switch while
+ running nr_hw_queue update
+Message-Id: <175344563631.580395.16494421873653438111.b4-ty@kernel.dk>
+Date: Fri, 25 Jul 2025 06:13:56 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block: Fix typo 'prefered' -> 'preferred'
-To: =?UTF-8?Q?Ignacio_Pe=C3=B1a?= <ignacio.pena87@gmail.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250725040939.73175-1-ignacio.pena87@gmail.com>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20250725040939.73175-1-ignacio.pena87@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3-dev-2ce6c
 
-On 7/24/25 10:09 PM, Ignacio Peña wrote:
-> Fix spelling mistake.
+
+On Thu, 24 Jul 2025 15:31:51 +0530, Nilay Shroff wrote:
+> The kmemleak reports memory leaks related to elevator resources that
+> were originally allocated in the ->init_hctx() method. The following
+> leak traces are observed after running blktests block/040:
 > 
-> No functional change.
+> unreferenced object 0xffff8881b82f7400 (size 512):
+>   comm "check", pid 68454, jiffies 4310588881
+>   hex dump (first 32 bytes):
+>     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+>     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+>   backtrace (crc 5bac8b34):
+>     __kvmalloc_node_noprof+0x55d/0x7a0
+>     sbitmap_init_node+0x15a/0x6a0
+>     kyber_init_hctx+0x316/0xb90
+>     blk_mq_init_sched+0x419/0x580
+>     elevator_switch+0x18b/0x630
+>     elv_update_nr_hw_queues+0x219/0x2c0
+>     __blk_mq_update_nr_hw_queues+0x36a/0x6f0
+>     blk_mq_update_nr_hw_queues+0x3a/0x60
+>     0xffffffffc09ceb80
+>     0xffffffffc09d7e0b
+>     configfs_write_iter+0x2b1/0x470
+>     vfs_write+0x527/0xe70
+>     ksys_write+0xff/0x200
+>     do_syscall_64+0x98/0x3c0
+>     entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> unreferenced object 0xffff8881b82f6000 (size 512):
+>   comm "check", pid 68454, jiffies 4310588881
+>   hex dump (first 32 bytes):
+>     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+>     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+>   backtrace (crc 5bac8b34):
+>     __kvmalloc_node_noprof+0x55d/0x7a0
+>     sbitmap_init_node+0x15a/0x6a0
+>     kyber_init_hctx+0x316/0xb90
+>     blk_mq_init_sched+0x419/0x580
+>     elevator_switch+0x18b/0x630
+>     elv_update_nr_hw_queues+0x219/0x2c0
+>     __blk_mq_update_nr_hw_queues+0x36a/0x6f0
+>     blk_mq_update_nr_hw_queues+0x3a/0x60
+>     0xffffffffc09ceb80
+>     0xffffffffc09d7e0b
+>     configfs_write_iter+0x2b1/0x470
+>     vfs_write+0x527/0xe70
+>     ksys_write+0xff/0x200
+>     do_syscall_64+0x98/0x3c0
+>     entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> unreferenced object 0xffff8881b82f5800 (size 512):
+>   comm "check", pid 68454, jiffies 4310588881
+>   hex dump (first 32 bytes):
+>     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+>     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+>   backtrace (crc 5bac8b34):
+>     __kvmalloc_node_noprof+0x55d/0x7a0
+>     sbitmap_init_node+0x15a/0x6a0
+>     kyber_init_hctx+0x316/0xb90
+>     blk_mq_init_sched+0x419/0x580
+>     elevator_switch+0x18b/0x630
+>     elv_update_nr_hw_queues+0x219/0x2c0
+>     __blk_mq_update_nr_hw_queues+0x36a/0x6f0
+>     blk_mq_update_nr_hw_queues+0x3a/0x60
+>     0xffffffffc09ceb80
+>     0xffffffffc09d7e0b
+>     configfs_write_iter+0x2b1/0x470
+>     vfs_write+0x527/0xe70
+> 
+> [...]
 
-I don't take just spelling patches, it just causes pain in terms
-of backports.
+Applied, thanks!
 
+[1/1] block: restore two stage elevator switch while running nr_hw_queue update
+      commit: 5989bfe6ac6bf230c2c84e118c786be0ed4be3f4
+
+Best regards,
 -- 
 Jens Axboe
+
+
 
