@@ -1,62 +1,63 @@
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35DD021D3EC
-	for <linux-block@vger.kernel.org>; Sun, 27 Jul 2025 16:47:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 403A521FF49
+	for <linux-block@vger.kernel.org>; Sun, 27 Jul 2025 16:47:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753634840; cv=none; b=dAPGot1Gwe11OiGgqXAxsPzI7ZVVaFfzztJybgJulSvJkbPjGj5VNuBLiPsjtKx/NBHodwUdVQIPCpbYbBXJ4JEWRKf4LKLFynLipfv2YjPaXaM7HoHGj6K9vRGGuQWobpMe6+0VtX603j/QIYqbwjG+U6G6p47Dtb3YPMpo8uI=
+	t=1753634843; cv=none; b=XE80jI5hN11+/OO8NY9uLdGDDCjTqUVe0SEF07YBPtafxkZfZNIP57RKNgW1pz7Phur0FP0R0Rg0W6hpni9ck+hfz0BLjmymOsK4UMXAITjOhelhaXHOGMvNUvmMvqPULAdWiwedennQ3dYgLGi+bTiOQIGqTtVyzfq5VgXrJSY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753634840; c=relaxed/simple;
-	bh=KNhhtUFnmbc3jeA4XTRDlg8RlDWWWyXCaaLU5CW08J0=;
+	s=arc-20240116; t=1753634843; c=relaxed/simple;
+	bh=I3xew8je8GRIx1/aB/St3V1iUJkyLvLXJlWO4o8KLoY=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=G/bqKCsQVh2F+zhI9Hf+SuUV9rK4SO4CZisaF0LHY4r28TBJswIWJDv4Nkm1hGd7Ahc0A/IglN6DebKjOTnw1AGLEnpwn3uQE8w4cxTz+3pZvVa6Moo436BM/hV9ME+2WM8xDdvLdYmVjWI81ZZvRBJCGFYsC53xYojvLHCbNmQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=shopee.com; spf=pass smtp.mailfrom=shopee.com; dkim=pass (2048-bit key) header.d=shopee.com header.i=@shopee.com header.b=IziFUJru; arc=none smtp.client-ip=209.85.210.178
+	 MIME-Version; b=mTw9x+cTQxyTT3IvUY9k0xl8zn/i63yFFqRXTCN9DlrxcIotT+giykZVC22agjlSPO+V7Beof5GmKba8urTTkLT7bR7zG3NIjbwsoQHVtdEE48XuZKEVnGktdaZ+PuR+SqwIakcYhxNn3TYN2cEMrLgRbx3wra1wPld3xku7PLo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=shopee.com; spf=pass smtp.mailfrom=shopee.com; dkim=pass (2048-bit key) header.d=shopee.com header.i=@shopee.com header.b=Dd17NR6r; arc=none smtp.client-ip=209.85.210.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=shopee.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shopee.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=shopee.com header.i=@shopee.com header.b="IziFUJru"
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-747e41d5469so3954787b3a.3
-        for <linux-block@vger.kernel.org>; Sun, 27 Jul 2025 09:47:18 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=shopee.com header.i=@shopee.com header.b="Dd17NR6r"
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-748e378ba4fso4588703b3a.1
+        for <linux-block@vger.kernel.org>; Sun, 27 Jul 2025 09:47:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=shopee.com; s=shopee.com; t=1753634838; x=1754239638; darn=vger.kernel.org;
+        d=shopee.com; s=shopee.com; t=1753634841; x=1754239641; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=RMN9tLLmpGB9BsvzAxacdUhrheIgM1fafrpYT+r6ug8=;
-        b=IziFUJrurw2GIHdeNgOWBtIk5DAtdsO3jkSwrW6Bkhi6j2ZmTNF+BBLDSvh5vAv04j
-         fPSGeG7qYXPsg3+xBlUHa9V7QNAlE3/ChTtffEheu12Ce/mqNn9jYupyZhEdarM1yYQd
-         U34IXRJbtZsh+yw8aJ3Mo7GOjYZsez7AFTsS8/nPP3+bKrxufJr1vWiCXHFLqob9O3EF
-         89xcqKXPECzQZQdwbTilgB+FW/Mnpb7ws/UEw1TWXUn0cEDYj0nIy3JIct85kruAq+4n
-         19uCR8xekgGg3F8jiHCt8v9L0OE9ox1N6Re1RE2k3S8BjZqgvzs2+GbnBhx9R2aUymCZ
-         qe+g==
+        bh=QWYCKfy27tzmCzfyC4JZHP6ASajzBlmmh8Lqhq4+b6w=;
+        b=Dd17NR6rV1ZIVAWBB6atZVuY38oYNDkrMEy1LwhxI++M2WG4OaM3iR05S1yLwDxSp0
+         XTEHbzQ6X+eyBEEB4eXsDkw8qT2mNQxrx346RwdPpvq7JdoGhcuHQo1loPcS46uuZSRs
+         6g2YEBV6xRCovuEoaOQ5AK2F/h16HfKtiHYeQI7mNY18tUWgQEub71mf8T9C6AbcuS5Z
+         ai/iITIXxcSKHCq6qjfJa2eLo+MZgq359NeYtgPyAP6KS3Kgn1cEZtErP/iXp79mbgn1
+         Iqs0Toyc0oqGHGQZtTVbIKbkDw0Pg0mviogl8TWhfHk/P2GUag9/k/1yACsgAEe+kniT
+         uJBw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753634838; x=1754239638;
+        d=1e100.net; s=20230601; t=1753634841; x=1754239641;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=RMN9tLLmpGB9BsvzAxacdUhrheIgM1fafrpYT+r6ug8=;
-        b=DvBNRBcLmcyTdkZLsjeH7lFErkbclezAjKmJrh4eaTS6F1IzJDlAJjMQDGOTqI11Ov
-         Z6vD0WCCmw9YUztC3S8xEdVmz9kPwzoryuB9KhqMTAWwhZWIellR3yX9TKKvlqrbNzyc
-         f/6OEEiRW7fmETzHqAK0Pixks9r3CNTyM1VHMG6O3coaDxQeqtN39+nIgu7mE7clWJph
-         0oNpsONv6Z2/7WWalql1PVhsXkpe02qV+igHIebax8htphjeVhxKmY6Jv7xJ10Y50gbx
-         Lw1o5tNoJSwtMJULVvgwD0qa1eAWvXDmFgEi3Er8Rpu9U+OyTeLjTq7rCKhhJWQ/yD6D
-         JnjA==
-X-Gm-Message-State: AOJu0YxoRksu0LffayMCejpimAozDN8jI6puvEKAy3He6Z4tuIDVRfHo
-	crLjZiSueARQMbX5+OSxOilibtBVH1ArNQcw0/SLidhkUIvEYPs/A5+857ppKgh8BcE=
-X-Gm-Gg: ASbGnctq9JgNKxCmo1CjUOUHCGt6DOE7/Dh13ZxQmoeY4qIGwxyyumTtmu7OGdqW73L
-	vRVTUwXFVPKy+XnmE0iBmIbx+Mg6TtvJDVP6vIBlarpGWg7aX/Iorm49lLpISHsIw75Z/wfmEtX
-	IwzcsTvzibwnygE6K9TLVewDPQ1w03Zsnxhp4fKyxnmUnq2rvEpX3bGTyi5luAXVR7noiyYdEzA
-	L0g3SzvA/0nQn1LRDM9mzmcGPkcwjbQGIluLOUL6IHhRd/QPykxBQI1YJVgTOEXMxsD/vtU5cdL
-	ltb8cYH/iFcfI4o5avj9hiqUQmSKSLzwbBwxHo4bf/BJt6JA5oR5LdNkvff/msHMMChT26Fy1Bf
-	e9n3ske/rwlkgOmwj2A==
-X-Google-Smtp-Source: AGHT+IEF24zLRrvUbYzwpV5Zjh1HPgLaykm25/5HZNKSbJYH95HEaBtQmdE1+eWOfcS5Rglv3aoXiQ==
-X-Received: by 2002:a05:6a00:bd85:b0:748:ed51:1305 with SMTP id d2e1a72fcca58-7633562970fmr12389282b3a.5.1753634838365;
-        Sun, 27 Jul 2025 09:47:18 -0700 (PDT)
+        bh=QWYCKfy27tzmCzfyC4JZHP6ASajzBlmmh8Lqhq4+b6w=;
+        b=plsKLQW0FRgVg69JcdON8gt0RK90Wxts7lI2cQ137za9EpYhcKBzTJIq24f+PVSEfo
+         jMRLeD17LmYea2iLrS34gOsXn02R8vw901fOEmXZFhFiQSuQD6kLgmij/+RIG83xG4MJ
+         MjU54QzSdQKAPdAmdnLb5RH5uR9s59qWyrhuvc/3Ss7AzesT9678tOLfH3gMHFtYDiI1
+         nmxBPBxfhxYfgG8DfCeGDvo5H+jFbzOTFoDopToS1wvOviYilSHeHE42WOu5YAKk7PX8
+         Vs6byY5RH97Qk3jP4uIu3+nR9hMlO6SYvDlYGVZ+3M8YoVoDVsnHsI+dA4XBDkqA2evV
+         stTA==
+X-Gm-Message-State: AOJu0Yy7cpCQCLY21eZFfXrqVnvjXL6Gun3ndtB1+RX5DScjKfUTOEma
+	2oERWNp0GTFLkQzX8I8ltGlZkGO6C+dwzwyPIjqEnGbOjZKQO6/uRSorkl0z8TCsaGZr18BNZe5
+	gqTqt
+X-Gm-Gg: ASbGncu7QeGVe4bAlnUjubSqONZLMfo0WKyaErXqXcn54PvaehMaEezZACFeVK1iSVd
+	uUOV2YP0wzO0aZLyuttVCjS8T8FT2r3cleNZPQEVYR1GZieP/nh4ctxDxJSYxMBUMGyu9u+aKK1
+	TP9JwLoAjvFl5VTrTlmHfhB16p9yclBXSbknCom1YH7CyncMogEr5uBrMl5Pde8+szopkewqDCD
+	ZHd1dYMUSTFpdYFeM1jPIpgu8ZPcSz7QpuOx3O5vW0hI2Vi/nd6/oDUodYGkkwD6xMMhBKlBvSW
+	GCR7++zwqcKkfrQYv3p+BL6HGLSY0dQbYZEpx/Q0NwrSi7XL9O69Md8v9PyLhM1kRMuDUYPeebE
+	bTQ08i//uqorQpUkUcg==
+X-Google-Smtp-Source: AGHT+IFRol1JcpMwHBaIr/iN69m2fbS57Zw0c2c31BLpe0M2WVnu9P/3rtcV5uRwgswPSOGO4xpIVw==
+X-Received: by 2002:a05:6a00:3c88:b0:74e:ac15:10ff with SMTP id d2e1a72fcca58-76332578505mr14337976b3a.4.1753634841498;
+        Sun, 27 Jul 2025 09:47:21 -0700 (PDT)
 Received: from localhost.localdomain ([143.92.64.17])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7640baa00a9sm3402878b3a.140.2025.07.27.09.47.15
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7640baa00a9sm3402878b3a.140.2025.07.27.09.47.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 27 Jul 2025 09:47:17 -0700 (PDT)
+        Sun, 27 Jul 2025 09:47:20 -0700 (PDT)
 From: Tang Yizhou <yizhou.tang@shopee.com>
 X-Google-Original-From: Tang Yizhou
 To: axboe@kernel.dk,
@@ -65,11 +66,10 @@ To: axboe@kernel.dk,
 Cc: linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	tangyeechou@gmail.com,
-	Tang Yizhou <yizhou.tang@shopee.com>,
-	Yu Kuai <yukuai3@huawei.com>
-Subject: [PATCH v2 1/3] blk-wbt: Optimize wbt_done() for non-throttled writes
-Date: Mon, 28 Jul 2025 00:47:07 +0800
-Message-Id: <20250727164709.96477-2-yizhou.tang@shopee.com>
+	Tang Yizhou <yizhou.tang@shopee.com>
+Subject: [PATCH v2 2/3] blk-wbt: Eliminate ambiguity in the comments of struct rq_wb
+Date: Mon, 28 Jul 2025 00:47:08 +0800
+Message-Id: <20250727164709.96477-3-yizhou.tang@shopee.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20250727164709.96477-1-yizhou.tang@shopee.com>
 References: <20250727164709.96477-1-yizhou.tang@shopee.com>
@@ -83,42 +83,31 @@ Content-Transfer-Encoding: 8bit
 
 From: Tang Yizhou <yizhou.tang@shopee.com>
 
-In the current implementation, the sync_cookie and last_cookie members of
+In the current implementation, the last_issue and last_comp members of
 struct rq_wb are used only by read requests and not by non-throttled write
-requests. Based on this, we can optimize wbt_done() by removing one if
-condition check for non-throttled write requests.
+requests. Therefore, eliminate the ambiguity here.
 
 Signed-off-by: Tang Yizhou <yizhou.tang@shopee.com>
 Reviewed-by: Jan Kara <jack@suse.cz>
-Reviewed-by: Yu Kuai <yukuai3@huawei.com>
 ---
- block/blk-wbt.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+ block/blk-wbt.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/block/blk-wbt.c b/block/blk-wbt.c
-index a50d4cd55f41..30886d44f6cd 100644
+index 30886d44f6cd..eb8037bae0bd 100644
 --- a/block/blk-wbt.c
 +++ b/block/blk-wbt.c
-@@ -248,13 +248,14 @@ static void wbt_done(struct rq_qos *rqos, struct request *rq)
- 	struct rq_wb *rwb = RQWB(rqos);
+@@ -85,8 +85,8 @@ struct rq_wb {
+ 	u64 sync_issue;
+ 	void *sync_cookie;
  
- 	if (!wbt_is_tracked(rq)) {
--		if (rwb->sync_cookie == rq) {
--			rwb->sync_issue = 0;
--			rwb->sync_cookie = NULL;
--		}
-+		if (wbt_is_read(rq)) {
-+			if (rwb->sync_cookie == rq) {
-+				rwb->sync_issue = 0;
-+				rwb->sync_cookie = NULL;
-+			}
- 
--		if (wbt_is_read(rq))
- 			wb_timestamp(rwb, &rwb->last_comp);
-+		}
- 	} else {
- 		WARN_ON_ONCE(rq == rwb->sync_cookie);
- 		__wbt_done(rqos, wbt_flags(rq));
+-	unsigned long last_issue;		/* last non-throttled issue */
+-	unsigned long last_comp;		/* last non-throttled comp */
++	unsigned long last_issue;	/* issue time of last read rq */
++	unsigned long last_comp;	/* completion time of last read rq */
+ 	unsigned long min_lat_nsec;
+ 	struct rq_qos rqos;
+ 	struct rq_wait rq_wait[WBT_NUM_RWQ];
 -- 
 2.25.1
 
