@@ -1,42 +1,38 @@
-Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
+Received: from ale.deltatee.com (ale.deltatee.com [204.191.154.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D41F43147
-	for <linux-block@vger.kernel.org>; Mon, 28 Jul 2025 13:39:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75DBB1DE4EF;
+	Mon, 28 Jul 2025 16:12:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=204.191.154.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753709991; cv=none; b=KPgshaz4PvzX/T1Ic0BUP3C8Jqk49DKt6FKPXc9bemg8qHFh9xTkQRlx21yHoLXqkeQ9u3ysny+Yg06s7us41+FL1HdRvXhFdfs8RseNl531k1uaAAPMDpbXA4ko41AT+CbFySA+sNvTJ8mUaNd1iLiqrR/Hcm8+iZSPKIQ/zAY=
+	t=1753719179; cv=none; b=L6P2wcly+3L7QOB2JRl562OHItRyvq5IYLE53a85uq301egSx3hU4WJsCP3zXZp0yET9iVYdANJl6JNWw51YBXmIaiSM09ElCUK92ci7BvMBUz+mk0ENLb2jXLU90X/yQB5AwNNno60T4806K0yNYmVB6RFePo0Ph70Hxt6BsaU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753709991; c=relaxed/simple;
-	bh=gnP7Ho82e+2s2JRpLg89JIyPpoGI5zM/Q7VIgOaQq9Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
-	 Content-Type:References; b=YRWTgWy4NYei88HOgBOBEoxTDrBXo/1Dc9ShjJloJuxn5nvWAX5H21J0kLX3CeDasyVbM11Fvk7vdZyDq5QlVwIU1IBw6WxoR66CRPBVjdudI6UUQvfvdMjLHXTj+uSH2W5/N47BHVy0xMdJK+cBRRNp5kpfHYz6fnh26xLvBgE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=ur0cYhpS; arc=none smtp.client-ip=210.118.77.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	s=arc-20240116; t=1753719179; c=relaxed/simple;
+	bh=R0FQOHpsHRyxpvqcJA2ITt/gHmHam74Pd/G3iRxqIRA=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:From:In-Reply-To:
+	 Content-Type:Subject; b=G2TJaFP6nzCix3Jbl/SgulMa11AMhmll7uo1ZxTUH07+TGNppNub0ZxUqjaYV9T9FiRQU7J6d3zWPo1Yk1joul8OlvpEqJa4ZxKyaN3nZ77kxL+RReUW6eIy7s0K1DLyvoxnQfMSY4Wjf96KGsJf9VggumpdcN1bgk3XIxng2yE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=deltatee.com; spf=pass smtp.mailfrom=deltatee.com; dkim=pass (2048-bit key) header.d=deltatee.com header.i=@deltatee.com header.b=NuShxQGB; arc=none smtp.client-ip=204.191.154.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=deltatee.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=deltatee.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="ur0cYhpS"
-Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
-	by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20250728133941euoutp01588a421553e19963641ca4f2690f0e5e~Wbe-OihRZ1399013990euoutp01b
-	for <linux-block@vger.kernel.org>; Mon, 28 Jul 2025 13:39:41 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20250728133941euoutp01588a421553e19963641ca4f2690f0e5e~Wbe-OihRZ1399013990euoutp01b
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1753709981;
-	bh=rLMXzfjtCxJZTFfF29cOu6ADGH4klb3b0shQniuYdUE=;
-	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
-	b=ur0cYhpS/vzbF/MyneBpkfh74lTvzdsSmg/4oiXIcbMt9rjx4b3eCZSPGI7HIxINN
-	 ZxfUED+gU90tcoo+LWSvKxUhRzYzwGAwZR2nueWCaQajSjULxnt/aEiyz3ndqJj7iP
-	 qxk5BrFAtjTkoK/o8s6QwQKeDYzfMvPuibX6ZLr0=
-Received: from eusmtip1.samsung.com (unknown [203.254.199.221]) by
-	eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
-	20250728133941eucas1p1110f4ef3da6f291256bc704a1835c866~Wbe_1RoxF2005220052eucas1p15;
-	Mon, 28 Jul 2025 13:39:41 +0000 (GMT)
-Received: from [106.210.134.192] (unknown [106.210.134.192]) by
-	eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
-	20250728133939eusmtip1c509bd530b71e291fc5ec8af00c1a663~Wbe9ocdKY1520215202eusmtip1j;
-	Mon, 28 Jul 2025 13:39:39 +0000 (GMT)
-Message-ID: <d556ddfd-36f0-4ae3-aac4-9dc0f903d7b1@samsung.com>
-Date: Mon, 28 Jul 2025 15:39:39 +0200
+	dkim=pass (2048-bit key) header.d=deltatee.com header.i=@deltatee.com header.b="NuShxQGB"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=deltatee.com; s=20200525; h=Subject:In-Reply-To:From:References:Cc:To:
+	MIME-Version:Date:Message-ID:content-disposition;
+	bh=VSF5wX9vjIP6fRF1ybWxqYJSZXcEgqAR8cCPBeo7HdU=; b=NuShxQGBV5IaVLB+r9+8Z5iKvq
+	dFIGr5esAaj+hCO3a4jw+w6/OlzvIoB6kvaxTwpkrr6lmTchzYodZvaI+lNSnKbAzMm0EglMM03Vv
+	crZTKZAcuqrSFjxZewSYCzRT/HYo/mkFbMKO7es26V5QoeFZvRVj7QgbRx/G4WDAZX6VXrq9/YsDD
+	xRRo8ObEJbFOXuNbyFVv5S0ZE/n4R76NpOr3WVRG9mlUx6T3DEJBkwhVcxvUHoaulcQa3MefNqBEW
+	9lVNjow5xoGlNwMQVVuWUtFAwKyMGUtxejZnJC6r2JA2ZkfHlVUptsg1l/w1rFXLBfEBhBC4DZjlx
+	SCCTlj+w==;
+Received: from guinness.priv.deltatee.com ([172.16.1.162])
+	by ale.deltatee.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.96)
+	(envelope-from <logang@deltatee.com>)
+	id 1ugQSy-008Nxz-1h;
+	Mon, 28 Jul 2025 10:12:45 -0600
+Message-ID: <d69e0d74-285e-4cde-a2e4-a803accfa9e1@deltatee.com>
+Date: Mon, 28 Jul 2025 10:12:31 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -44,121 +40,84 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] [v2] block: fix FS_IOC_GETLBMD_CAP parsing in
- blkdev_common_ioctl()
-To: Arnd Bergmann <arnd@kernel.org>, Anuj Gupta <anuj20.g@samsung.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>, Kanchan Joshi
-	<joshi.k@samsung.com>, Christian Brauner <brauner@kernel.org>
-Cc: Christoph Hellwig <hch@infradead.org>, Arnd Bergmann <arnd@arndb.de>,
-	Naresh Kamboju <naresh.kamboju@linaro.org>, Anders Roxell
-	<anders.roxell@linaro.org>, Jens Axboe <axboe@kernel.dk>, Keith Busch
-	<kbusch@kernel.org>, Caleb Sander Mateos <csander@purestorage.com>, Pavel
-	Begunkov <asml.silence@gmail.com>, Alexey Dobriyan <adobriyan@gmail.com>,
-	"Darrick J. Wong" <djwong@kernel.org>, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Content-Language: en-US
-From: Marek Szyprowski <m.szyprowski@samsung.com>
-In-Reply-To: <20250711084708.2714436-1-arnd@kernel.org>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Leon Romanovsky <leon@kernel.org>, Christoph Hellwig <hch@lst.de>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Bjorn Helgaas <bhelgaas@google.com>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
+ Jens Axboe <axboe@kernel.dk>, =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?=
+ <jglisse@redhat.com>, Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+ linaro-mm-sig@lists.linaro.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
+ linux-mm@kvack.org, linux-pci@vger.kernel.org,
+ Marek Szyprowski <m.szyprowski@samsung.com>,
+ Robin Murphy <robin.murphy@arm.com>, Sumit Semwal <sumit.semwal@linaro.org>,
+ Vivek Kasireddy <vivek.kasireddy@intel.com>, Will Deacon <will@kernel.org>
+References: <cover.1753274085.git.leonro@nvidia.com>
+ <82e62eb59afcd39b68ae143573d5ed113a92344e.1753274085.git.leonro@nvidia.com>
+ <20250724080313.GA31887@lst.de> <20250724081321.GT402218@unreal>
+ <b32ae619-6c4a-46fc-a368-6ad4e245d581@deltatee.com>
+ <20250727190514.GG7551@nvidia.com>
+Content-Language: en-CA
+From: Logan Gunthorpe <logang@deltatee.com>
+In-Reply-To: <20250727190514.GG7551@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-CMS-MailID: 20250728133941eucas1p1110f4ef3da6f291256bc704a1835c866
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-RootMTR: 20250728133941eucas1p1110f4ef3da6f291256bc704a1835c866
-X-EPHeader: CA
-X-CMS-RootMailID: 20250728133941eucas1p1110f4ef3da6f291256bc704a1835c866
-References: <20250711084708.2714436-1-arnd@kernel.org>
-	<CGME20250728133941eucas1p1110f4ef3da6f291256bc704a1835c866@eucas1p1.samsung.com>
-
-On 11.07.2025 10:46, Arnd Bergmann wrote:
-> From: Arnd Bergmann <arnd@arndb.de>
->
-> Anders and Naresh found that the addition of the FS_IOC_GETLBMD_CAP
-> handling in the blockdev ioctl handler breaks all ioctls with
-> _IOC_NR==2, as the new command is not added to the switch but only
-> a few of the command bits are check.
->
-> Move the check into the blk_get_meta_cap() function itself and make
-> it return -ENOIOCTLCMD for any unsupported command code, including
-> those with a smaller size that previously returned -EINVAL.
->
-> For consistency this also drops the check for NULL 'arg' that
-> is really useless, as any invalid pointer should return -EFAULT.
->
-> Fixes: 9eb22f7fedfc ("fs: add ioctl to query metadata and protection info capabilities")
-> Link: https://lore.kernel.org/all/CA+G9fYvk9HHE5UJ7cdJHTcY6P5JKnp+_e+sdC5U-ZQFTP9_hqQ@mail.gmail.com/
-> Reported-by: Naresh Kamboju <naresh.kamboju@linaro.org>
-> Cc: Anders Roxell <anders.roxell@linaro.org>
-> Cc: Naresh Kamboju <naresh.kamboju@linaro.org>
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> ---
-> v2: add the check in blk-integrity.c instead of ioctl.c
->
-> I've left out the maximum-size check this time, as there was no
-> consensus on whether there should be one, or what value.
->
-> We still need to come up with a better way of handling these in
-> general, for now the patch just addresses the immediate regression
-> that Naresh found.
->
-> I have also sent a handful of patches for other drivers that have
-> variations of the same bug.
-> ---
-
-In my tests I've found that this patch, merged as commit 42b0ef01e6b5 
-("block: fix FS_IOC_GETLBMD_CAP parsing in blkdev_common_ioctl()"), 
-breaks udev operation on some of my test boards - no /dev/disk/* entries 
-and directories are created. Reverting $subject on top of next-20250728 
-fixes/hides this problem. I suspect that another corner case is missing 
-in the checks. I will try to investigate this a bit more later, probably 
-tomorrow.
+X-SA-Exim-Connect-IP: 172.16.1.162
+X-SA-Exim-Rcpt-To: jgg@nvidia.com, leon@kernel.org, hch@lst.de, alex.williamson@redhat.com, akpm@linux-foundation.org, bhelgaas@google.com, christian.koenig@amd.com, dri-devel@lists.freedesktop.org, iommu@lists.linux.dev, axboe@kernel.dk, jglisse@redhat.com, joro@8bytes.org, kvm@vger.kernel.org, linaro-mm-sig@lists.linaro.org, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, linux-media@vger.kernel.org, linux-mm@kvack.org, linux-pci@vger.kernel.org, m.szyprowski@samsung.com, robin.murphy@arm.com, sumit.semwal@linaro.org, vivek.kasireddy@intel.com, will@kernel.org
+X-SA-Exim-Mail-From: logang@deltatee.com
+X-Spam-Level: 
+Subject: Re: [PATCH 05/10] PCI/P2PDMA: Export pci_p2pdma_map_type() function
+X-SA-Exim-Version: 4.2.1 (built Wed, 06 Jul 2022 17:57:39 +0000)
+X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 
 
->   block/blk-integrity.c | 10 ++++++----
->   block/ioctl.c         |  6 ++++--
->   2 files changed, 10 insertions(+), 6 deletions(-)
->
-> diff --git a/block/blk-integrity.c b/block/blk-integrity.c
-> index 9d9dc9c32083..61a79e19c78f 100644
-> --- a/block/blk-integrity.c
-> +++ b/block/blk-integrity.c
-> @@ -62,10 +62,12 @@ int blk_get_meta_cap(struct block_device *bdev, unsigned int cmd,
->   	struct logical_block_metadata_cap meta_cap = {};
->   	size_t usize = _IOC_SIZE(cmd);
->   
-> -	if (!argp)
-> -		return -EINVAL;
-> -	if (usize < LBMD_SIZE_VER0)
-> -		return -EINVAL;
-> +	if (_IOC_DIR(cmd)  != _IOC_DIR(FS_IOC_GETLBMD_CAP) ||
-> +	    _IOC_TYPE(cmd) != _IOC_TYPE(FS_IOC_GETLBMD_CAP) ||
-> +	    _IOC_NR(cmd)   != _IOC_NR(FS_IOC_GETLBMD_CAP) ||
-> +	    _IOC_SIZE(cmd) < LBMD_SIZE_VER0)
-> +		return -ENOIOCTLCMD;
-> +
->   	if (!bi)
->   		goto out;
->   
-> diff --git a/block/ioctl.c b/block/ioctl.c
-> index 9ad403733e19..af2e22e5533c 100644
-> --- a/block/ioctl.c
-> +++ b/block/ioctl.c
-> @@ -566,9 +566,11 @@ static int blkdev_common_ioctl(struct block_device *bdev, blk_mode_t mode,
->   			       void __user *argp)
->   {
->   	unsigned int max_sectors;
-> +	int ret;
->   
-> -	if (_IOC_NR(cmd) == _IOC_NR(FS_IOC_GETLBMD_CAP))
-> -		return blk_get_meta_cap(bdev, cmd, argp);
-> +	ret = blk_get_meta_cap(bdev, cmd, argp);
-> +	if (ret != -ENOIOCTLCMD)
-> +		return ret;
->   
->   	switch (cmd) {
->   	case BLKFLSBUF:
 
-Best regards
--- 
-Marek Szyprowski, PhD
-Samsung R&D Institute Poland
+On 2025-07-27 13:05, Jason Gunthorpe wrote:
+> On Fri, Jul 25, 2025 at 10:30:46AM -0600, Logan Gunthorpe wrote:
+>>
+>>
+>> On 2025-07-24 02:13, Leon Romanovsky wrote:
+>>> On Thu, Jul 24, 2025 at 10:03:13AM +0200, Christoph Hellwig wrote:
+>>>> On Wed, Jul 23, 2025 at 04:00:06PM +0300, Leon Romanovsky wrote:
+>>>>> From: Leon Romanovsky <leonro@nvidia.com>
+>>>>>
+>>>>> Export the pci_p2pdma_map_type() function to allow external modules
+>>>>> and subsystems to determine the appropriate mapping type for P2PDMA
+>>>>> transfers between a provider and target device.
+>>>>
+>>>> External modules have no business doing this.
+>>>
+>>> VFIO PCI code is built as module. There is no way to access PCI p2p code
+>>> without exporting functions in it.
+>>
+>> The solution that would make more sense to me would be for either
+>> dma_iova_try_alloc() or another helper in dma-iommu.c to handle the
+>> P2PDMA case.
+> 
+> This has nothing to do with dma-iommu.c, the decisions here still need
+> to be made even if dma-iommu.c is not compiled in.
+
+Doesn't it though? Every single call in patch 10 to the newly exported
+PCI functions calls into the the dma-iommu functions. If there were
+non-iommu paths then I would expect the code would use the regular DMA
+api directly which would then call in to dma-iommu.
+
+I can't imagine a use case where someone would want to call the p2pdma
+functions to map p2p memory and not have a similar path to do the exact
+same mapping with vanilla memory and thus call the DMA API. And it seems
+much better to me to export higher level functions to drivers that take
+care of the details correctly than to expose the nuts and bolts to every
+driver.
+
+The thing that seems special to me about VFIO is that it is calling
+directly into dma-iommu code to setup unique mappings as opposed to
+using the higher level DMA API. I don't see in what way it is special
+that it needs to know intimate details of the memory it's mapping and
+have different paths to map different types of memory. That's what the
+dma layer is for.
+
+Logan
 
