@@ -1,169 +1,207 @@
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2047.outbound.protection.outlook.com [40.107.100.47])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7C8A2561A7
-	for <linux-block@vger.kernel.org>; Mon, 28 Jul 2025 17:58:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.100.47
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753725505; cv=fail; b=De4/Tnk+4iw37REyMzFNKewZl3feh+HtBbbwaYycUsCoz6klJpocsj5j+jsB0GFKO/w5yVl6xf3kjt95ifuMPcWfky+Mwou9MF9ZWzNIeBJY0wmuThBTIrYJFzGBH/PlGDLqjQTbDL62Alp9VyPQazvc/P9+x4w2HY9sFfvJbO0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753725505; c=relaxed/simple;
-	bh=tDO+mb4NlTPolk/zQ2XlMs3nSdDpfDO68H3Kmdk6MHo=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=SSp/J5qs9lgSfhEDc0JIkS42PSfpTclybSpiGUeU7cT0VRxvcZJVpTHCGRaWjLMKNju1lAMLg1JRCb9tkGwpKOQAztsK5D24xmObpbyU7v+Hc7gLmSqN4v0e9AxMHCB/ny1zqnUCvVxe5nJTVP9QiaHL9rPxvjyN3wmC/vkNXm4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=JEHwr0dq; arc=fail smtp.client-ip=40.107.100.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12F9A22F77E
+	for <linux-block@vger.kernel.org>; Mon, 28 Jul 2025 20:56:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1753736162; cv=none; b=CQJeY97epFvcwGeijlsPoUlPBERXRZWDGTlvoOcZI7jyN6ErQmLRiy3rHT2szt9d4T5ze4LvL5jxR0+YqUBrQBOjgIwI2q2dGrvNUDet0fhlaJiZiIjk+Y3PjPLfwQ0ND1x6HIxgCUQfb+3G7LHEp4Ni8mDsIVOCiTlaaF40tY4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1753736162; c=relaxed/simple;
+	bh=nRpzG9wCRVLX56km469LJwsErSpZhF+6HuuhqwgnJd0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=P32C4VBmeNI6oX4jfeTiRNx6xDpWfWfPGVstqgUSQ1yWM2Scr9rZWoEzOHgnzvUalBXGN8eGyuCf/UxOk7balsv7z8xcqcgf4KzyntCQN01Y0FAmzjMhkZtUdVh9G1XlgxD2ctfRTz5Cah57Mg8ib0T4UZHVJFydq4OVtMw9ouI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QFNnLwW7; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="JEHwr0dq"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=usPxObwZWTF6MjnAkGGfHBU7SSEWkzj6KPY7FVsXx25CdiQlns7vpqPOJrQkU7zVdXNMl9AkpEMVdOP1OcxL4OFfAzp7BwnB4qx7Pb78mtiaCZiyHkVXHe71qjTokwNUdNe9Ue+srutXXWncaLXxhngbA//2HMWa6ggKTzF67qwLEFRehPEoxJ8E5xP85AELTrvQ02fqrAxG36EoqnA4QJlGStVWs9t1cQXeu8oDcPaAwtlMHleYfPwBtemsjye6QPUuwdsAd6e3WxAxx9lbspOhoW/ObW2DllK8ARgl+0amLY5Hfaw0Fs2LPcyfq4WGMWPVldwsxHWADgUliG3x5g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=tDO+mb4NlTPolk/zQ2XlMs3nSdDpfDO68H3Kmdk6MHo=;
- b=HFoO94qQgXApdZpq7ywwsDhwVUgOIQ7nEOK4pZnJv2d2JNaTgWOrVe3ce1+kkDAxUVcNMmJLCX2ROiWHFdlzxIWKCywCB9+O7NZJHLC8T0BmKjC3yuEyPpK/RHnGR1hSqU3n9Ix4mBu78d4fiCwMFCDBZwATzBLBCZRDjQxmXkVBDa4kNgC9zVC0LEXMBp21Fl23jxF8xneLxiOe5XusMFXEEc5lm+1xtjPoCWiT9J44YhkGF/kViQJE67AkUgGbkmqWHbrYoNJoZE8IIhI18qQA2fKr+TG970qHv49iPbKkBEMoX7B3YRKwGQmXiqAOEAfowtgSOqDEjqpvXLGHCw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tDO+mb4NlTPolk/zQ2XlMs3nSdDpfDO68H3Kmdk6MHo=;
- b=JEHwr0dqZEKSa52ClRiuPA/XdLBI0o80l7xSxGIHgDLhJwkrBRNfIDd6Otgx3ht+HHP1TiqOECxcON8Mox29bVbNITMGufRCdLFP/p+UagudPZUId4TDgzcaccV0pF3Lx/QdBf9M2rkrwjs5JldJKKaxIBCJKxJM1hrm6+2pVBqDMwIsCTzdCkE1zziGza/gdKYV99Fi2w0NKKiRBmsq0/5hJHoR1RUuuuBNkv9bHLMuY3DA4cvnncClTtZ6cucIhGrMVcwIOL7aKuHkl8MR33mSmw+7dsCgWUyFb6MkM2veJ8tF0ykxowrQDcILYWFY7kYluxeWuWQsJZfF04YUAw==
-Received: from LV3PR12MB9404.namprd12.prod.outlook.com (2603:10b6:408:219::9)
- by CH3PR12MB9079.namprd12.prod.outlook.com (2603:10b6:610:1a1::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8964.27; Mon, 28 Jul
- 2025 17:58:20 +0000
-Received: from LV3PR12MB9404.namprd12.prod.outlook.com
- ([fe80::57ac:82e6:1ec5:f40b]) by LV3PR12MB9404.namprd12.prod.outlook.com
- ([fe80::57ac:82e6:1ec5:f40b%3]) with mapi id 15.20.8964.025; Mon, 28 Jul 2025
- 17:58:18 +0000
-From: Chaitanya Kulkarni <chaitanyak@nvidia.com>
-To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Christoph
- Hellwig <hch@lst.de>
-Subject: Re: [PATCH 0/5] Remove several superfluous sector casts
-Thread-Topic: [PATCH 0/5] Remove several superfluous sector casts
-Thread-Index: AQHb9aj50nhOg7ngcUO16bkPRcD8zLRH5xMA
-Date: Mon, 28 Jul 2025 17:58:18 +0000
-Message-ID: <2dd981d3-ea79-4d06-9b3c-ca671904e46c@nvidia.com>
-References: <20250715165249.1024639-1-bvanassche@acm.org>
-In-Reply-To: <20250715165249.1024639-1-bvanassche@acm.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Mozilla Thunderbird
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: LV3PR12MB9404:EE_|CH3PR12MB9079:EE_
-x-ms-office365-filtering-correlation-id: 5af16e44-ac7f-4a85-bc5b-08ddce005589
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|376014|366016|38070700018;
-x-microsoft-antispam-message-info:
- =?utf-8?B?SmlaTXpUWmpLWXR5OEtZbm8weEZ4WUlDVVhtNjRRT1ByMDlLY0YwMk5tUkpI?=
- =?utf-8?B?SXp0QVdHdUE5T0ZUYVN0Vmd2WkUzZEM4WFNWalNVNU84eXZVcWFmOFgrOUZL?=
- =?utf-8?B?TTJBZ0I0Z0tKN21oS083VVFTUnE5cEtZaWwyZVhMdDVJOUdhaU00WTVHcnpv?=
- =?utf-8?B?c0FoT0FpWEMwNmliYTJZREtCNGNoU09MTWkzZUJSTEQ2T1F1aUMvSHVMUHp2?=
- =?utf-8?B?VU93U1lXTEhObXpZSWI5WGl3djcrcmROS2ovelduay9BV2s0VlFrM2haT0w4?=
- =?utf-8?B?VnlpRVE3TEI3c0ttZStVb1BnbFpFZFJnNXlKS25oUHord3Rjd0phYVlLTWJ1?=
- =?utf-8?B?cWhRK0l5bkxUR1FrOTBzYnRaVGU5STJVVEpRZDlhejZWYTdhUk1Jdm5EQlF4?=
- =?utf-8?B?aXh0SnN2MEdmck56ZmlKKzJ0a3IyVmRqNDFHaHdqOC9yMGdodkg0dEI0T0lm?=
- =?utf-8?B?cjU1UUoyUnZTUVBMY0Z0R0dDTzVCLzlKS2E4RlhxWXhpbE54aWJwQ3kyamJX?=
- =?utf-8?B?UE93dU0wU2dKTnM1VmZlVzZSMVdNSk0rcy9ENCtZYklKYXNWckt2ZUhyT3RW?=
- =?utf-8?B?aElSMVVCQUd6YSt5Y0VHaFlUQzZleFYxcnZld1phYkJ3VDJxcUZ0d3N6WEw5?=
- =?utf-8?B?STkzN0VxT0pPeEVIQWV1cUNHbTRBcGNpUDRkUEtGTVIxeWVyS3BlZ204T1pr?=
- =?utf-8?B?dDYzTHBXWXhMa3lPY1R2MmptLzFITlIxaTlCZVRlajVKNUZyNGhEQUhoOUgx?=
- =?utf-8?B?NjJ5WlpIL3BTcXY4Q2ZEUWRxc0N2R2lKdlc4VG16YWU1MGdFRElqS3R4ZW5X?=
- =?utf-8?B?WXNlYnk2ZUVvVGcyb2xKdndCY1NQQ05UQU9Hby9MbHpwK0VyMWhYaFdVRHRS?=
- =?utf-8?B?MGlwb3lJQ2FOS0JnWmQ2TFRSSnhpV3ZzSTBrVXk2a2E0UXBqbHBxVkE2clF5?=
- =?utf-8?B?bnBtQzN2YXhIdUNyZXFHSUxlMUs2Y2toQmx0bGJYckdWd1hzc3Z0d1VhZy9L?=
- =?utf-8?B?WUVuZ09pQlluYWRUcGx4cjhEVzM2aFRrc0xuOXFZQlZIZkRwYUU2dTEvQ2J6?=
- =?utf-8?B?WDZwZFNEQ2trYlRycVBCZG0zYzhWT3NvdUs3NjNPbWpsQWJHblVkVFVvU003?=
- =?utf-8?B?YUQ2cE9CZmpKazRXaWZ5MTdQTnpHMEIwNHZ1VzgvdncycWljSCtsaHFWbk5I?=
- =?utf-8?B?QzNFUG1Pb2JyNDU3NTlzdC9uNDc3Zk5YcnlZSldqRXZsWHVTdUhyemdMa1dt?=
- =?utf-8?B?cHMzbmhiZDY4TlF2ZTRJZGZHeUtSMjd0aEVzaUdKSHlodjlNQVRzcThHVjB2?=
- =?utf-8?B?YTZxRlhKR3FuaG13SEZIZWQ1VjlJSGR3OXhsaVpqRUZWaXdDNW1QSFBnamNm?=
- =?utf-8?B?dDkyRHk1UnlkbzBKbGh4SmpMczNZVkM1ZWd4REtkUUVpUGNuRGdsU1BzUzdQ?=
- =?utf-8?B?djlrU0VxalRiVlRoTWNHK3IvSVFPYit3a1NlanZlbXhVQWpHQk5hUkNVaTFk?=
- =?utf-8?B?K1BaTFcyQkF1bkJNSmtQdXFyVG9kaDNvcjREbC9WeFZXT3dJT0pwNkJKOUVp?=
- =?utf-8?B?K09uajNjR0QzanBDNWM3MnNPWDJsNnZoUG42NlN0YzdqK3h3QkVwOUVWaXVy?=
- =?utf-8?B?aUJsS1JNMnh3aWRrVjk0YlNIYTJ3dXdMM1NDOUJhN25OU0hOd3RtOGNKeFFQ?=
- =?utf-8?B?VnIrT1JaWkJscDMwQnI4Q0dLb1RpdTlGS1pDcWE2SEgxK2JjQU9zNU5aUHBL?=
- =?utf-8?B?T2VYelpJcGhOZG84S2wwQVlqczdMc3YyaXBXVmxhOHJCRkpKSjA5amdVZnZ0?=
- =?utf-8?B?Q2cxaFBUb0ZoK1UvSUYyMDNKMGphZmV3RFZsQW95bUZRVzJOYVZ0QTYvandN?=
- =?utf-8?B?bTlFeUlHRVkrWitYc1BDWVBHcnRCMDVJOU5CbDFIcFNHaVVRdHRXSnJLNFFJ?=
- =?utf-8?B?dERCeEJwbFpRNXJqeG4zR1NvZHZSQ2F0cm8rTWtMSHVkUFFvbVUyd2tNRGJ6?=
- =?utf-8?B?TzQyczVVSWRnPT0=?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV3PR12MB9404.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?VW5ZSm1iKzNPa0hZbGtTbUxkbWozV3N2SjBvREFnNVdpYTc2c0ltZTEwOHcx?=
- =?utf-8?B?Y3NES1JHYVVCZk9hNU1mL1JvK1dkMDZwRVoydFlXeVJBbG54TzdUdlpZa0Y4?=
- =?utf-8?B?VDFJNVZDUmdHZnRoNFlKeVVOcTliMmI5ZWsxL3hFL0ZsQTc3QnlOMG5lbHZi?=
- =?utf-8?B?U3IyemsyaHhiME5mNHhmR0ZaVFJIK0ZhenVxYm9XcDdpc3I2b1NFdStWQnpv?=
- =?utf-8?B?RzA5VkNITEkrRDFjV0lETjYzN3BLclJkOUFQV3B2bHdKQnZRd0x5YXJKT2dO?=
- =?utf-8?B?UnhrVDlUOGxPZ0VsWTVYYjhSeFZMNXpid2ZFNEdhcmlIZHVxTHZOWitNejQ4?=
- =?utf-8?B?NFREUWMzakZsMjlyazQ3NDl2U2ZzekZ3aG5FV2JBMU9ZbjU4RmxNa2RKZG1M?=
- =?utf-8?B?V0lEQmZab3EyeEx6djExY2VzenB1MnliYU1DMUUvOGZwOC9UK24xZlBGSGxW?=
- =?utf-8?B?K0JNK0dHb1VqclNkWU11enNKMldLdzRKZVFoUm9URWJURTRscy9EejIyV1dH?=
- =?utf-8?B?Yzh4Mm1IMVprdUNTb2dmby9DTm1vZGpmYkpUZDc3TmxIbHlxQnFRQU12NVlC?=
- =?utf-8?B?YmVoUGQ4TjJnR1p0TTcwSEdJWEloZ3NrL0NUbDV1MFh0bkU3TjBtRGRJVWJp?=
- =?utf-8?B?S3E0REFUNHF1dmZmMlJBVnlvUEF1SkhnMGhkQVUvc1l4NUM1c3dML2xBOVVU?=
- =?utf-8?B?djJoaFZTdk9EQmFIVlpzTTV3c0h3UmlSMVdraFVLWFJiZ1h1d3llS0JVa0FD?=
- =?utf-8?B?R3RmdFdtbEI1QnRzMHY2T0UzcmRPN3I1bFdPNTNwTjh5M2U0VUdNWGtoRlNi?=
- =?utf-8?B?QUh1MFRJM0cvNGN4VmtRZnpNRGh3RDdVVFZrdk44T0VYWVR1SW9BNFhFNHlh?=
- =?utf-8?B?S3Z4R1YzRGh6cXd4dUpDN0d0VE9GaEFFbzh0VTcxcFRwR3lCVEFJTkpRazFu?=
- =?utf-8?B?Y0k2M2JNcDlzVFdjWlBaOHlWSEx2TWIxWmhiQTI5RXcrKzRGUnJ6bjh3Um9Z?=
- =?utf-8?B?QkVodisvU2hBcWFlZ1BBMEFEanJHS2JBK1d3VUl5aVBkTkVpc1FCeUl5Q1Ay?=
- =?utf-8?B?bkRrMWlEUTBIR2VsTFhzcXRvZW9SeFRBMGRzbENFMFdsYnJaR2hEc3ZaZ1dI?=
- =?utf-8?B?QzEwK2l0Z2tJbkcwcWtkVGJxQkgrSzdYZEd6UllvUUk2YkwxdGdZS3lkRDhk?=
- =?utf-8?B?NklnbnV0dkhheGZiQzNiS2ZlQjU3T21DdFllTnRiVUtubWxUOXBLRGhmbFRU?=
- =?utf-8?B?TTNBUjhXSjJUY3luQUNOVDZsd2NLSDhwTFRpY2N1bjdLT05XcFROd29qY0E5?=
- =?utf-8?B?b1pySEtSY0llWEVZNmMvbFpsYko1K29Rb3czb2xCalVjeHhDSlM1VFB6K0w5?=
- =?utf-8?B?dVZFbDA1M0RxeDlmTC9lQlFJazVEeXhnTG52ZlpSZmo5RjVFWTh6VFhDbXZH?=
- =?utf-8?B?WlBiVVo1c2REaDVhbngyTjloWmJoTXBGMzcveXM2VjhaQThyOWE2WmhFOTNk?=
- =?utf-8?B?ODRqNEp4T2lQandtWnRHdzdHaXljWDRDKzh4V1RaWXZnWVFwbytXb25HTE5Q?=
- =?utf-8?B?R3N0RTF3YXM0TGU2K2dCbFZoNVdScHkvaHF6cmVEVnRMUmpxNllDQzlUWjg1?=
- =?utf-8?B?eisvZllvUEMvelhoY1VoY1pZTWMxRE42aXNaa1FNb0F4L1NYRXQyaVdiVE03?=
- =?utf-8?B?VjZ2OTd4UnMxWkZFNHNzVFlSNGtuRkkwN3dob2dIc3dBaURCZXNycE1VSzZl?=
- =?utf-8?B?c2FnWW9lTElOSkZHQXhWR2VQSFo0Qk5EVEw1aUNBYWU1c2hsU0lqeDQwYjUr?=
- =?utf-8?B?TElpc08zd3dYN2Z2NDRFSmU0ZkhVZ3NrekRYallONWRzWHVDQURoVGVicFVh?=
- =?utf-8?B?RUR6RDE4T0tPVWVwdUZOclZXdHY5Ri9WbVM3bXVVZHNmR1ljN1V6MkpXMmM4?=
- =?utf-8?B?dmhIR3BHZVJIM3Y0c2RiajdsSmd3UFc1TkhQd1UybW5MVFdNcXZUZEQrMmtS?=
- =?utf-8?B?bElTVEovZ3hrYURoRm8xdGVLU3VoSGdiNDd6cDlvT3hRa2xSaU51L3UyVjBY?=
- =?utf-8?B?dUFlQzAyUXV3QnlQTG9MenZXSjU1ZzcyYmpFdElPUUhJRnZ1R3RFVGtINEhW?=
- =?utf-8?Q?R/E1MBGumDysG/uJd1Nzt3RA1?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <5CF66FAE4C137D4380C2E82A40709642@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QFNnLwW7"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1753736160;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3lAhpTjpbvFQu27uIQ7LZXIQUIKIfZHhU7pyfNlOjpc=;
+	b=QFNnLwW7h0LVmcrOTFzruTUTrsbLW/U87LNuxjdPDbgsnEIqJIy/+qvUElmp9bcLntM78f
+	K6d2Zzl6gkff0KdD10y2kO8uZv+H/X67NRyWUkPC6DqGetXvuFFH9Aa7XQkNL75fRhKxTV
+	4NE2O7n8DNx+ODm7VjxL57ZzGmwlBms=
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com
+ [209.85.166.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-473-zUp3k1IgP7Wk130i0pM1jQ-1; Mon, 28 Jul 2025 16:55:58 -0400
+X-MC-Unique: zUp3k1IgP7Wk130i0pM1jQ-1
+X-Mimecast-MFC-AGG-ID: zUp3k1IgP7Wk130i0pM1jQ_1753736158
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3ddd689c2b8so8277335ab.1
+        for <linux-block@vger.kernel.org>; Mon, 28 Jul 2025 13:55:58 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753736157; x=1754340957;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3lAhpTjpbvFQu27uIQ7LZXIQUIKIfZHhU7pyfNlOjpc=;
+        b=wgPD56+GA8jCo/hVg9UWeXNnX/fBR6QcLYoGO7qvwkMmLQDV++2uHOakNm8o4YbKhm
+         71OJnrBCr35UsgGx5ZSFzkqDGFkSFPT+12EHAf2iyFaCSIg0dVuBbCaCFlmwElpS3cAk
+         oQY0OAtiq+BbRExD6RC7CbtB3I6f31l8FMm9e/fmcoHh3cmFNPg/rARhmHQ00QSId1TB
+         5R1XjqG5M2bwXCry6upDojwhHWH0ngm0AwZzau22ZJBacz7W8dlk9lTZaflQRjsZ6Jo7
+         aFrF248UhSv198gJ8K5z80LBFhIoP3LUprJXMjpFNH/pQgrxhh025+byzJ3bCqgOQ6+D
+         nCVw==
+X-Forwarded-Encrypted: i=1; AJvYcCViTkM/D7sc/qjkg4evO3eT27b/GJWiHfvI+dDluyeSpSaQd2awEYV6m+lEsGyXCWTLzKalnmdlLThSVw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxvRVHaomOObjj6Eeh2+1yoR4nuVVA46c0wqTPOoI0Mfn82itXD
+	l0xSfeRiasGhNWoCAe+xp9gn1JCzFNvXYfTI8o6U+R2BqVGRkJ77O1xW9cAsFMx46Od/fQq1sLv
+	R5iGQliD3u6g7YTVMPB1bJx8DoUDER1IwqhYlg4TU81cOJmzEODTZHMMKahHhsK6Y
+X-Gm-Gg: ASbGncuvR/qDNaVh6JWZFyZqlMP8h6zXRFoYfhp221fFk3UdsgkKX3rNuV3Gb5mxw0L
+	UfX7EEkxZG/R7D0YWX1DNc77gczr4DSA0dGoq6TYvLx1VkN56lUA/y9LUNfq21RXOkQoQGuLV1a
+	na+BYY2h2Pi9UUQm9U2EbHcL9tsLbPYXlZwQcvF6yxloM+6nJ0eLeRQp1PdnUZrWDLMV2TziXu0
+	D+MPL5IwFY8OLFt/3GnNI21sn+RwFamQh472zoaps95V11jqG/QRDM9t5ufMxzKLlxgyWSbb1mW
+	bpaNjsDMJf9FnGkIBZkyppshZJcx+xE2LgDc3kQs7B8=
+X-Received: by 2002:a05:6e02:3389:b0:3e3:e461:4617 with SMTP id e9e14a558f8ab-3e3e4614777mr12699035ab.2.1753736157518;
+        Mon, 28 Jul 2025 13:55:57 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFaMLNGgu4ToITqnk/t+y4I2RkNZuq3J6YSgL+Stwkf8Y5Ta3HhAl493hrL7HwiUxfbSIOjGA==
+X-Received: by 2002:a05:6e02:3389:b0:3e3:e461:4617 with SMTP id e9e14a558f8ab-3e3e4614777mr12698925ab.2.1753736157034;
+        Mon, 28 Jul 2025 13:55:57 -0700 (PDT)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-508c9341e4csm2109194173.76.2025.07.28.13.55.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 28 Jul 2025 13:55:55 -0700 (PDT)
+Date: Mon, 28 Jul 2025 14:55:53 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Vivek Kasireddy <vivek.kasireddy@intel.com>, Christoph Hellwig
+ <hch@lst.de>, Jason Gunthorpe <jgg@nvidia.com>, Andrew Morton
+ <akpm@linux-foundation.org>, Bjorn Helgaas <bhelgaas@google.com>, Christian
+ =?UTF-8?B?S8O2bmln?= <christian.koenig@amd.com>,
+ dri-devel@lists.freedesktop.org, iommu@lists.linux.dev, Jens Axboe
+ <axboe@kernel.dk>, =?UTF-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
+ Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+ linaro-mm-sig@lists.linaro.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
+ linux-mm@kvack.org, linux-pci@vger.kernel.org, Logan Gunthorpe
+ <logang@deltatee.com>, Marek Szyprowski <m.szyprowski@samsung.com>, Robin
+ Murphy <robin.murphy@arm.com>, Sumit Semwal <sumit.semwal@linaro.org>, Will
+ Deacon <will@kernel.org>
+Subject: Re: [PATCH 09/10] vfio/pci: Share the core device pointer while
+ invoking feature functions
+Message-ID: <20250728145553.53e94d49.alex.williamson@redhat.com>
+In-Reply-To: <19f71a0f4d1a5db8c712cb4d094ccf2f10dc22c5.1753274085.git.leonro@nvidia.com>
+References: <cover.1753274085.git.leonro@nvidia.com>
+	<19f71a0f4d1a5db8c712cb4d094ccf2f10dc22c5.1753274085.git.leonro@nvidia.com>
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: LV3PR12MB9404.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5af16e44-ac7f-4a85-bc5b-08ddce005589
-X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Jul 2025 17:58:18.6460
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 4SnA5im73sdStwd5kweQmKJ8t0L1BhZxI3x3zqIE4XS6PoWm2H4V5RvK1K0w2JO2RKPQtmITm7aW2MZvFVZj8w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB9079
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-T24gNy8xNS8yNSAwOTo1MiwgQmFydCBWYW4gQXNzY2hlIHdyb3RlOg0KPiBIaSBKZW5zLA0KPg0K
-PiBUaGlzIHBhdGNoIHNlcmllcyBmaXhlcyBvbmUgYmNhY2hlIGJ1ZyBhbmQgcmVtb3ZlcyBzdXBl
-cmZsdW91cyBjYXN0cyBvZiBzZWN0b3INCj4gbnVtYmVycyAvIG9mZnNldHMuIFBsZWFzZSBjb25z
-aWRlciB0aGlzIHBhdGNoIHNlcmllcyBmb3IgdGhlIG5leHQgbWVyZ2Ugd2luZG93Lg0KPg0KPiBU
-aGFua3MsDQo+DQo+IEJhcnQuDQoNCkZvciB0aGUgd2hvbGUgc2VyaWVzLCBsb29rcyBnb29kLg0K
-DQpSZXZpZXdlZC1ieTogQ2hhaXRhbnlhIEt1bGthcm5pIDxrY2hAbnZpZGlhLmNvbT4NCg0KLWNr
-DQoNCg0K
+On Wed, 23 Jul 2025 16:00:10 +0300
+Leon Romanovsky <leon@kernel.org> wrote:
+
+> From: Vivek Kasireddy <vivek.kasireddy@intel.com>
+> 
+> There is no need to share the main device pointer (struct vfio_device *)
+> with all the feature functions as they only need the core device
+> pointer. Therefore, extract the core device pointer once in the
+> caller (vfio_pci_core_ioctl_feature) and share it instead.
+> 
+> Signed-off-by: Vivek Kasireddy <vivek.kasireddy@intel.com>
+> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+> ---
+>  drivers/vfio/pci/vfio_pci_core.c | 30 +++++++++++++-----------------
+>  1 file changed, 13 insertions(+), 17 deletions(-)
+> 
+> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+> index 1e675daab5753..5512d13bb8899 100644
+> --- a/drivers/vfio/pci/vfio_pci_core.c
+> +++ b/drivers/vfio/pci/vfio_pci_core.c
+> @@ -301,11 +301,9 @@ static int vfio_pci_runtime_pm_entry(struct vfio_pci_core_device *vdev,
+>  	return 0;
+>  }
+>  
+> -static int vfio_pci_core_pm_entry(struct vfio_device *device, u32 flags,
+> +static int vfio_pci_core_pm_entry(struct vfio_pci_core_device *vdev, u32 flags,
+>  				  void __user *arg, size_t argsz)
+>  {
+> -	struct vfio_pci_core_device *vdev =
+> -		container_of(device, struct vfio_pci_core_device, vdev);
+>  	int ret;
+>  
+>  	ret = vfio_check_feature(flags, argsz, VFIO_DEVICE_FEATURE_SET, 0);
+> @@ -322,12 +320,10 @@ static int vfio_pci_core_pm_entry(struct vfio_device *device, u32 flags,
+>  }
+>  
+>  static int vfio_pci_core_pm_entry_with_wakeup(
+> -	struct vfio_device *device, u32 flags,
+> +	struct vfio_pci_core_device *vdev, u32 flags,
+>  	struct vfio_device_low_power_entry_with_wakeup __user *arg,
+>  	size_t argsz)
+
+I'm tempted to fix the line wrapping here, but I think this patch
+stands on its own.  Even if it's rather trivial, it makes sense to
+consolidate and standardize on the vfio_pci_core_device getting passed
+around within vfio_pci_core.c.  Any reason not to split this off?
+Thanks,
+
+Alex
+
+>  {
+> -	struct vfio_pci_core_device *vdev =
+> -		container_of(device, struct vfio_pci_core_device, vdev);
+>  	struct vfio_device_low_power_entry_with_wakeup entry;
+>  	struct eventfd_ctx *efdctx;
+>  	int ret;
+> @@ -378,11 +374,9 @@ static void vfio_pci_runtime_pm_exit(struct vfio_pci_core_device *vdev)
+>  	up_write(&vdev->memory_lock);
+>  }
+>  
+> -static int vfio_pci_core_pm_exit(struct vfio_device *device, u32 flags,
+> +static int vfio_pci_core_pm_exit(struct vfio_pci_core_device *vdev, u32 flags,
+>  				 void __user *arg, size_t argsz)
+>  {
+> -	struct vfio_pci_core_device *vdev =
+> -		container_of(device, struct vfio_pci_core_device, vdev);
+>  	int ret;
+>  
+>  	ret = vfio_check_feature(flags, argsz, VFIO_DEVICE_FEATURE_SET, 0);
+> @@ -1475,11 +1469,10 @@ long vfio_pci_core_ioctl(struct vfio_device *core_vdev, unsigned int cmd,
+>  }
+>  EXPORT_SYMBOL_GPL(vfio_pci_core_ioctl);
+>  
+> -static int vfio_pci_core_feature_token(struct vfio_device *device, u32 flags,
+> -				       uuid_t __user *arg, size_t argsz)
+> +static int vfio_pci_core_feature_token(struct vfio_pci_core_device *vdev,
+> +				       u32 flags, uuid_t __user *arg,
+> +				       size_t argsz)
+>  {
+> -	struct vfio_pci_core_device *vdev =
+> -		container_of(device, struct vfio_pci_core_device, vdev);
+>  	uuid_t uuid;
+>  	int ret;
+>  
+> @@ -1506,16 +1499,19 @@ static int vfio_pci_core_feature_token(struct vfio_device *device, u32 flags,
+>  int vfio_pci_core_ioctl_feature(struct vfio_device *device, u32 flags,
+>  				void __user *arg, size_t argsz)
+>  {
+> +	struct vfio_pci_core_device *vdev =
+> +		container_of(device, struct vfio_pci_core_device, vdev);
+> +
+>  	switch (flags & VFIO_DEVICE_FEATURE_MASK) {
+>  	case VFIO_DEVICE_FEATURE_LOW_POWER_ENTRY:
+> -		return vfio_pci_core_pm_entry(device, flags, arg, argsz);
+> +		return vfio_pci_core_pm_entry(vdev, flags, arg, argsz);
+>  	case VFIO_DEVICE_FEATURE_LOW_POWER_ENTRY_WITH_WAKEUP:
+> -		return vfio_pci_core_pm_entry_with_wakeup(device, flags,
+> +		return vfio_pci_core_pm_entry_with_wakeup(vdev, flags,
+>  							  arg, argsz);
+>  	case VFIO_DEVICE_FEATURE_LOW_POWER_EXIT:
+> -		return vfio_pci_core_pm_exit(device, flags, arg, argsz);
+> +		return vfio_pci_core_pm_exit(vdev, flags, arg, argsz);
+>  	case VFIO_DEVICE_FEATURE_PCI_VF_TOKEN:
+> -		return vfio_pci_core_feature_token(device, flags, arg, argsz);
+> +		return vfio_pci_core_feature_token(vdev, flags, arg, argsz);
+>  	default:
+>  		return -ENOTTY;
+>  	}
+
