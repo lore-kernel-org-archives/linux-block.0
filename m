@@ -1,38 +1,33 @@
-Received: from ale.deltatee.com (ale.deltatee.com [204.191.154.188])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D842273D6E;
-	Mon, 28 Jul 2025 17:07:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=204.191.154.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F5782737E3;
+	Mon, 28 Jul 2025 17:08:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753722466; cv=none; b=ViBdCGHYZ5vY1Qyy5OO8ZffAYnybJlGgYp7jYkyyR2G/1xsMxKhminFVWCx0SeErwoEiL79k2h5+dfBTW7ERGwwX7wBnZ6L+ETLWJ8AHA444MzaIdKe1LO2vNu/puR8vRS//KoCLKOLeMxN9hp4GfUi0s2MJH+NIiM0S0aELTNg=
+	t=1753722526; cv=none; b=b94YF0CthcGMZFiMEm1Jp0gVV3Eo5/FfMoHNG9PAp81Crm/P/7G6V5y3oXVOrNEZs04tqnjWHwjGzpWrvFQPFf8MD6SBOILbQz4er7xA1VH5ROQg2ADiei4/IvqkeCo5X8lQcUROYcTBfhKp83M3NtBIurWzPxgjeS3aB8E2USk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753722466; c=relaxed/simple;
-	bh=8zF2yMQp+ihqRs6CXyF3EAgjaysxgFn3aji1yds87Gw=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:From:In-Reply-To:
-	 Content-Type:Subject; b=ujaZDjBRkVKbUmLahosWlaRu+SOeEoPRQ13pVaN6y+yK2YZUEEGeIRA8JFe6nBkVlTp4hvxFsxHExAkFlpQRo+YcoYsOB6cqgOGd7m5SLWNYJ7hJxXZIAfOT+j9+sOMuAZRl0gipIz6jq5AaJDDdPX8kL2tbWuzVbJ7SChHAeW0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=deltatee.com; spf=pass smtp.mailfrom=deltatee.com; dkim=pass (2048-bit key) header.d=deltatee.com header.i=@deltatee.com header.b=XHjgXFrK; arc=none smtp.client-ip=204.191.154.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=deltatee.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=deltatee.com
+	s=arc-20240116; t=1753722526; c=relaxed/simple;
+	bh=SHUD7JaD1vv7oqQPznOq9ukykwMfLFPM3jklsusef4I=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=FFnEei1DrpUNF544r0LKzW/SH/iH2fTHi+rSpike5u7fBgBOUtKPgeeiPyJi88K5m+E+Mlb2XS2K9IGWyN24e7KYbT9y2iP1dKf+krqsqK+fv5EAiO4TjjA8i3oO2kBE76cG7wBn8xiUtoIbtHS0WUA2uH4qgrYtnWGJdWpCvG4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L8R+Bf6X; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=deltatee.com header.i=@deltatee.com header.b="XHjgXFrK"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=deltatee.com; s=20200525; h=Subject:In-Reply-To:From:References:Cc:To:
-	MIME-Version:Date:Message-ID:content-disposition;
-	bh=vCTi7Vmk9aRE1IKFUsfxXldYjrZeeC/iIVRDXKgVHWo=; b=XHjgXFrKuAhiveJ6zCrvJT8Pvw
-	re9J8LZpJpl40TreVfHUPY2lnYVRFy+PufGoNxDVEgTuS0s84xxDxMwecbKLo3UpnvzoMVqFabY5O
-	fns6daDQC4GZzjzk81dgUnIBncap8IUcFBgRQ+FDj7GtQEkK7F51IIrGWpfK4rRTXW5sfS9q1MDKQ
-	6/wNP0s/OHbfhbpmZL9kyyw6F9TOJplnVRRzeSNunWZGOK7MaBeHKnz82mVkMDabojTslET5bVvMG
-	d6AG/BDnrsJDD6etzDoLtYTAaCoD+hgyhnRjFdBQiaqbGi/0dIRgNCr5slZOAZysPyyIWQSEA7f7t
-	Ibk+mOxA==;
-Received: from guinness.priv.deltatee.com ([172.16.1.162])
-	by ale.deltatee.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.96)
-	(envelope-from <logang@deltatee.com>)
-	id 1ugRK6-008OdV-0r;
-	Mon, 28 Jul 2025 11:07:39 -0600
-Message-ID: <d3c8c573-f201-4450-9400-cc3ccafd2c04@deltatee.com>
-Date: Mon, 28 Jul 2025 11:07:34 -0600
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L8R+Bf6X"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8510CC4CEE7;
+	Mon, 28 Jul 2025 17:08:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753722526;
+	bh=SHUD7JaD1vv7oqQPznOq9ukykwMfLFPM3jklsusef4I=;
+	h=Date:From:Reply-To:Subject:To:Cc:References:In-Reply-To:From;
+	b=L8R+Bf6X9lusCj5uRPFr1kbTPN4bYkHS2qrlDkWpBIDqt+xR2TJsl4uzzQWLINgZu
+	 y8DnnVWLldB9vIUprrWB1EWy5peMM5u3VV6S6ea7jbIOttxG1C4xXyt47dA/rbCMu2
+	 rWnd+s6vzTpzNFa0UTdsKcHK924RZD72YGzM0YbVuqd+YfXyOTRFSXx6JSUdaW8bzl
+	 5/AGc3nu6w5PHcBpJVNzMFgpCp/+KXpYn0fDsJWx40cPkBbORMltNHeQcvuKfF31W1
+	 iYTdy4dihyPjBu9cmkSdu06XNDHAf+MMAd5/Fo2r6bp6KBXP4AsxjGbebPvvlqXN92
+	 4UeK9801rs+7w==
+Message-ID: <9dc51c34-1e5d-4da2-bc00-a89e7c173073@kernel.org>
+Date: Tue, 29 Jul 2025 01:08:40 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -40,89 +35,90 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Jason Gunthorpe <jgg@nvidia.com>, Christoph Hellwig <hch@lst.de>,
- Alex Williamson <alex.williamson@redhat.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- Bjorn Helgaas <bhelgaas@google.com>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
- Jens Axboe <axboe@kernel.dk>, =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?=
- <jglisse@redhat.com>, Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
- linaro-mm-sig@lists.linaro.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
- linux-mm@kvack.org, linux-pci@vger.kernel.org,
- Marek Szyprowski <m.szyprowski@samsung.com>,
- Robin Murphy <robin.murphy@arm.com>, Sumit Semwal <sumit.semwal@linaro.org>,
- Vivek Kasireddy <vivek.kasireddy@intel.com>, Will Deacon <will@kernel.org>
-References: <cover.1753274085.git.leonro@nvidia.com>
- <82e62eb59afcd39b68ae143573d5ed113a92344e.1753274085.git.leonro@nvidia.com>
- <20250724080313.GA31887@lst.de> <20250724081321.GT402218@unreal>
- <b32ae619-6c4a-46fc-a368-6ad4e245d581@deltatee.com>
- <20250727190514.GG7551@nvidia.com>
- <d69e0d74-285e-4cde-a2e4-a803accfa9e1@deltatee.com>
- <20250728164136.GD402218@unreal>
-Content-Language: en-CA
-From: Logan Gunthorpe <logang@deltatee.com>
-In-Reply-To: <20250728164136.GD402218@unreal>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 172.16.1.162
-X-SA-Exim-Rcpt-To: leon@kernel.org, jgg@nvidia.com, hch@lst.de, alex.williamson@redhat.com, akpm@linux-foundation.org, bhelgaas@google.com, christian.koenig@amd.com, dri-devel@lists.freedesktop.org, iommu@lists.linux.dev, axboe@kernel.dk, jglisse@redhat.com, joro@8bytes.org, kvm@vger.kernel.org, linaro-mm-sig@lists.linaro.org, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, linux-media@vger.kernel.org, linux-mm@kvack.org, linux-pci@vger.kernel.org, m.szyprowski@samsung.com, robin.murphy@arm.com, sumit.semwal@linaro.org, vivek.kasireddy@intel.com, will@kernel.org
-X-SA-Exim-Mail-From: logang@deltatee.com
-X-Spam-Level: 
-Subject: Re: [PATCH 05/10] PCI/P2PDMA: Export pci_p2pdma_map_type() function
-X-SA-Exim-Version: 4.2.1 (built Wed, 06 Jul 2022 17:57:39 +0000)
-X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
+From: Yu Kuai <yukuai@kernel.org>
+Reply-To: yukuai@kernel.org
+Subject: Re: [PATCH v2] blk-ioc: don't hold queue_lock for ioc_lookup_icq()
+To: Jan Kara <jack@suse.cz>
+Cc: dlemoal@kernel.org, axboe@kernel.dk, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, yukuai3@huawei.com, yi.zhang@huawei.com,
+ yangerkun@huawei.com, johnny.chenyi@huawei.com
+References: <20250725180334.40187-1-yukuai@kernel.org>
+ <64sbgvovtubkm2zelenee6pjkdciqlgqmri3bmycce6y265sy4@uptdqvz7g2lk>
+Content-Language: en-US
+In-Reply-To: <64sbgvovtubkm2zelenee6pjkdciqlgqmri3bmycce6y265sy4@uptdqvz7g2lk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
+Hi,
 
-
-On 2025-07-28 10:41, Leon Romanovsky wrote:
-> On Mon, Jul 28, 2025 at 10:12:31AM -0600, Logan Gunthorpe wrote:
+在 2025/7/28 17:28, Jan Kara 写道:
+> On Sat 26-07-25 02:03:34, Yu Kuai wrote:
+>> From: Yu Kuai <yukuai3@huawei.com>
 >>
+>> Currently issue io can grab queue_lock three times from bfq_bio_merge(),
+>> bfq_limit_depth() and bfq_prepare_request(), the queue_lock is not
+>> necessary if icq is already created because both queue and ioc can't be
+>> freed before io issuing is done, hence remove the unnecessary queue_lock
+>> and use rcu to protect radix tree lookup.
 >>
->> On 2025-07-27 13:05, Jason Gunthorpe wrote:
->>> On Fri, Jul 25, 2025 at 10:30:46AM -0600, Logan Gunthorpe wrote:
->>>>
->>>>
->>>> On 2025-07-24 02:13, Leon Romanovsky wrote:
->>>>> On Thu, Jul 24, 2025 at 10:03:13AM +0200, Christoph Hellwig wrote:
->>>>>> On Wed, Jul 23, 2025 at 04:00:06PM +0300, Leon Romanovsky wrote:
->>>>>>> From: Leon Romanovsky <leonro@nvidia.com>
->>>>>>>
->>>>>>> Export the pci_p2pdma_map_type() function to allow external modules
->>>>>>> and subsystems to determine the appropriate mapping type for P2PDMA
->>>>>>> transfers between a provider and target device.
->>>>>>
->>>>>> External modules have no business doing this.
->>>>>
->>>>> VFIO PCI code is built as module. There is no way to access PCI p2p code
->>>>> without exporting functions in it.
->>>>
->>>> The solution that would make more sense to me would be for either
->>>> dma_iova_try_alloc() or another helper in dma-iommu.c to handle the
->>>> P2PDMA case.
->>>
->>> This has nothing to do with dma-iommu.c, the decisions here still need
->>> to be made even if dma-iommu.c is not compiled in.
+>> Noted this is also a prep patch to support request batch dispatching[1].
 >>
->> Doesn't it though? Every single call in patch 10 to the newly exported
->> PCI functions calls into the the dma-iommu functions. If there were
->> non-iommu paths then I would expect the code would use the regular DMA
->> api directly which would then call in to dma-iommu.
-> 
-> If p2p type is PCI_P2PDMA_MAP_BUS_ADDR, there will no dma-iommu and DMA
-> at all.
+>> [1] https://lore.kernel.org/all/20250722072431.610354-1-yukuai1@huaweicloud.com/
+>> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+> Looks good! Just one small comment below. With that fixed feel free to add:
+>
+> Reviewed-by: Jan Kara <jack@suse.cz>
+>
+>> diff --git a/block/blk-ioc.c b/block/blk-ioc.c
+>> index ce82770c72ab..ea9c975aaef7 100644
+>> --- a/block/blk-ioc.c
+>> +++ b/block/blk-ioc.c
+>> @@ -308,19 +308,18 @@ int __copy_io(unsigned long clone_flags, struct task_struct *tsk)
+>>   
+>>   #ifdef CONFIG_BLK_ICQ
+>>   /**
+>> - * ioc_lookup_icq - lookup io_cq from ioc
+>> + * ioc_lookup_icq - lookup io_cq from ioc in io issue path
+>>    * @q: the associated request_queue
+>>    *
+>>    * Look up io_cq associated with @ioc - @q pair from @ioc.  Must be called
+>> - * with @q->queue_lock held.
+>> + * from io issue path, either return NULL if current issue io to @q for the
+>> + * first time, or return a valid icq.
+>>    */
+>>   struct io_cq *ioc_lookup_icq(struct request_queue *q)
+>>   {
+>>   	struct io_context *ioc = current->io_context;
+>>   	struct io_cq *icq;
+>>   
+>> -	lockdep_assert_held(&q->queue_lock);
+>> -
+>>   	/*
+>>   	 * icq's are indexed from @ioc using radix tree and hint pointer,
+>>   	 * both of which are protected with RCU.  All removals are done
+> In this comment there's still reference to holding 'q lock'. I think you
+> should replace that with justification why when called from IO issue path
+> we are guaranteed found pointer is safe to use.
+Thanks for the review! How about:
 
-I understand that and it is completely beside my point.
+diff --git a/block/blk-ioc.c b/block/blk-ioc.c
+index ea9c975aaef7..fd77e655544f 100644
+--- a/block/blk-ioc.c
++++ b/block/blk-ioc.c
+@@ -322,9 +322,9 @@ struct io_cq *ioc_lookup_icq(struct request_queue *q)
 
-If the dma mapping for P2P memory doesn't need to create an iommu
-mapping then that's fine. But it should be the dma-iommu layer to decide
-that. It's not a decision that should be made by every driver doing this
-kind of thing.
+         /*
+          * icq's are indexed from @ioc using radix tree and hint pointer,
+-        * both of which are protected with RCU.  All removals are done
+-        * holding both q and ioc locks, and we're holding q lock - if we
+-        * find a icq which points to us, it's guaranteed to be valid.
++        * both of which are protected with RCU, io issue path ensures that
++        * both request_queue and current task are valid, the founded icq
++        * is guaranteed to be valid until the io is done.
+          */
+         rcu_read_lock();
+         icq = rcu_dereference(ioc->icq_hint);
 
-With P2PDMA memory we are still creating a DMA mapping. It's just the
-dma address will be a PCI bus address instead of an IOVA. My opinion
-remains: none of these details should be exposed to the drivers.
+>
+> 								Honza
 
-Logan
