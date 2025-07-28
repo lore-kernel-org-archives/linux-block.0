@@ -1,187 +1,260 @@
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2058.outbound.protection.outlook.com [40.107.92.58])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 099071C5F37;
-	Sun, 27 Jul 2025 19:05:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.58
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753643122; cv=fail; b=No9GETYUsnMvAf14Jquuxre8Nc21fzPiH3gN/g17NIG9OGiAdiCHaDCmPUXOWdOej9DbbPs65Io6n2Fn9dT/aovrLap8lKvfEpbZ6DrpYKhQ1mamM2UDyipcekVHA59s6eiO1cy1ntYHAGkfR65UNOiF8b0UBbp5ptYCww4Hx2M=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753643122; c=relaxed/simple;
-	bh=WWnDTqDHDu7zgX+p5riPOJcA7aVUAlvKrWD+jNbmZoM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=aWRnc6P67JNI197o9EbXY2+iWklyudgl09M02VcmRxleQhnACm2X/BkW7dbhWa4IKATbBNQxcVC+0jdgiZqArFgtX1bDllkR7Mp3HZUnGSbAhWwYbrNloRklqBGOL/3iUTc5cxN5BYrSgQbQsMsc/TdrneZ/yBj0pWA4ejIcA6g=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=At3Osj9o; arc=fail smtp.client-ip=40.107.92.58
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B99CA72636;
+	Mon, 28 Jul 2025 00:42:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1753663327; cv=none; b=A9qjBuG9IXi99j9xBEAlfsbZnB/9+CtR4nyoWOjCCCoQOaFLrRVLqF6hfNRxe8HpyPCRallD8Mhom+bvkT0VfzheiIlsaemXtAztHA3+gIyjT75D8ekGXVmipzFmw+rwhhkSl107ZoHfcIJn6aKid9VbpUvpFOwnKBDS3h4ZtIE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1753663327; c=relaxed/simple;
+	bh=Fw13axCMryPv1IW+V9sRJ4MDPyfj0F4Q4XIuxV5Ykwo=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=DXPx4DDSrlUFoH+NTUk2B/c3QISYCgz4hF+/y+8s0P9JdGbJAKNB0Zp5eo/CHFbwIAWte+oB9yuoqTGUOBxchwBsrkMcCsFZVLaZ6gO+VhNOpIbTO2rNVQOmfoIDnvCSzBX3Uk8/2dtPBrJs09PnCtv8UTMrwpav5Yocyu0818w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=skl7eEao; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="At3Osj9o"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=dg7x66/bUcUMfdR9Ps3MNteFBBiC3RemxRVvCN7U3WeLDf36DDGXpK5koJ1shvLvHZDQUbA02As78VyiX6hVJEkoDV8SUTZWwGubZ8hX98RWPSJhuwd8yeSx/zxYPJJvI5T+yoPGWLv8S6m1tm2I6BULc/jWcri6Ub8avh01HfKinJphsOoHFWtWLppLOdKlgHfqveaOWpX/X4xdp1NB9UvrN2GsGNXf6eq7yySuaxux//xik8Rx/nDPp4OD/s4Jvmt6KWqrHSd7wZZO8FtHkqoJwKk6Kt+Gn+L/ussG4Tvk1FQQ7qUYiOpPoF94hH+twag3H0oFqvB6VNW7EmGXcQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ppkMvIiK/f3S/DEb4c2LCtYu6jIS22VQe6ZJOIk9tGU=;
- b=pk2GxZX8R0zOwxf7+di8N5nGGaHmH2L+dIoKVS5CiXd1iCTmpucchnhNLE7hWbNZHyc0sRzK/pXcxBn3pkcgSs27HTUGTvjMMNCElYwP009lpD8r1qYgh3YSxv5Ytfeo8ds2uFcl0u6ApxTOV48/BB308Ms/HwnMzhlYWGJUMP6Sd5Q1XaKCduEtVXMfIplld0ULYzwoTafq+JvsBRDHXkK3HIHY8ngS2ZB7/3xM92XeyffeMh3X1dGw8dc88I9OFp9XCtYWMTi148+G1Tltmc8jCNLkbhUxwVuiKtreezu80fij/hXf6rtAr5iCNiVIqefYBe6+xg11IPi5VUApcQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ppkMvIiK/f3S/DEb4c2LCtYu6jIS22VQe6ZJOIk9tGU=;
- b=At3Osj9oJSlfdkFNnjFm5o5+UkqYaaS3Xsvs/0KfW3iubsw702+3ToE7RSeT+QjT7+0MxVhkOWNg5nZaeAC8bHuPSj386RktUqoa/iQHbIzeKsQnnx9KQ6sHwD9CcKIxm6GfMwlIlelaEm5QuRPfSvU4d9mOcU73kyq3SiJnqdYsbhhx/DxRTUtzDn2aVkQxjkipq58tmlbNjhZBAa8axgzGidNIykrKdOh44H08P3J9AcX7HuAc1y0pb1v0yd9z3CLgCIvVRcJo4pNi3R1bJps7q1SUgbJeD4qpB13tsPa9z8zlH7Y1NFXAFAoU7o9db1kXbDKDuFD1ZO/W86K2HQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
- by SJ5PPF75EAF8F39.namprd12.prod.outlook.com (2603:10b6:a0f:fc02::999) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8922.42; Sun, 27 Jul
- 2025 19:05:16 +0000
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732%7]) with mapi id 15.20.8964.024; Sun, 27 Jul 2025
- 19:05:16 +0000
-Date: Sun, 27 Jul 2025 16:05:14 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Logan Gunthorpe <logang@deltatee.com>
-Cc: Leon Romanovsky <leon@kernel.org>, Christoph Hellwig <hch@lst.de>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
-	dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
-	Jens Axboe <axboe@kernel.dk>,
-	=?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
-	Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-	linaro-mm-sig@lists.linaro.org, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
-	linux-mm@kvack.org, linux-pci@vger.kernel.org,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Vivek Kasireddy <vivek.kasireddy@intel.com>,
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH 05/10] PCI/P2PDMA: Export pci_p2pdma_map_type() function
-Message-ID: <20250727190514.GG7551@nvidia.com>
-References: <cover.1753274085.git.leonro@nvidia.com>
- <82e62eb59afcd39b68ae143573d5ed113a92344e.1753274085.git.leonro@nvidia.com>
- <20250724080313.GA31887@lst.de>
- <20250724081321.GT402218@unreal>
- <b32ae619-6c4a-46fc-a368-6ad4e245d581@deltatee.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b32ae619-6c4a-46fc-a368-6ad4e245d581@deltatee.com>
-X-ClientProxiedBy: YT4P288CA0031.CANP288.PROD.OUTLOOK.COM
- (2603:10b6:b01:d3::9) To CH3PR12MB8659.namprd12.prod.outlook.com
- (2603:10b6:610:17c::13)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="skl7eEao"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFC62C4CEEB;
+	Mon, 28 Jul 2025 00:42:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753663327;
+	bh=Fw13axCMryPv1IW+V9sRJ4MDPyfj0F4Q4XIuxV5Ykwo=;
+	h=Date:From:Subject:To:Cc:References:In-Reply-To:From;
+	b=skl7eEaoBHftZWLVMR6i6Xc6P2moTfx7MIx2Ks1E0CLRWRsD0k6DRdczl0NuxLZMA
+	 8S1jy1GYQTH4r1Spij6xZam6WO6Dwaj4+xHCOm2NcLIq9oWG+VpwNr7D0VHgH6uAAf
+	 YAFEN5dLtI27O9VzBVmdyntFAEtuIDCoI/mlihYlRV/qN0cQWasArmKei3307e0IbU
+	 dJMfS2vKgqMpYcVUMvjdMuQUJLvMdyDIpfQEPgKWLc+EnW/7dxsI17d8Mlbz3MqIGn
+	 MFM5/AezGkrHGedt4XmMls0eoEKPSUcaqrYjiMFiEj5ajXcuWadQB1YQekG47EgSiX
+	 +FFv7rPNHxIbg==
+Message-ID: <2b22f745-bbd5-4071-be9b-de9e4536f2d5@kernel.org>
+Date: Mon, 28 Jul 2025 09:39:35 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|SJ5PPF75EAF8F39:EE_
-X-MS-Office365-Filtering-Correlation-Id: f5e512f2-1f99-4108-b6b3-08ddcd40857c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?0sZO0eH4QB4Ql8XBONCtg7Ik7or2eFuee7p2ESzhrPusQksNWHWS/gwa875x?=
- =?us-ascii?Q?sdraFj13zZiEr948Y75mXCUX7c2F5PBCQ2kUju4JLGU9NFKdFVAmKfnzpcsd?=
- =?us-ascii?Q?02jN8OjbioANuS7C9mzCTvjemjYLOQ1ZT6i440h/8nsemAoHupTd3+VJKKYd?=
- =?us-ascii?Q?ldKA3kMRQ6/FDZzHI4IYxlCQ0ipiWYRwT17Mrhv3mP5mnmhEz81d1yMG5Vks?=
- =?us-ascii?Q?Z3vj4MpzvFBVto6t6eHmgAcdoLsfd4ZOjmsK5riO6viQ6N5SioCdHit4xVZm?=
- =?us-ascii?Q?J+z+ZfPSJ8vZqhNGNnl7mp0Xm+nu6EJEuZaSHqi27+FoA0NT8xBjvuUvEN+E?=
- =?us-ascii?Q?8nTPH13uvQAhKW1FIQbY5AjdfeY0Rm2jFi/AT4P55zbfGt/bH64qo2kydI7U?=
- =?us-ascii?Q?0F4I/i3ySmqENhKiSRHR3Tdpt9F1VnnwPaxCW15Lz3rMRUfQJ9L1t3KAWMem?=
- =?us-ascii?Q?4d/MivYwlW1e8f4SUJyJJZcALD+87DQvRcr4NbGJxn/RtvroX7udE0275f7k?=
- =?us-ascii?Q?vYEsR2eC3tf4oLkvBSCNLIwErnHTsN/3GfUseC0ilZaCEuJNDpwoyi6qMBir?=
- =?us-ascii?Q?vLy3rBWCrJRMfUExQlZxZNLcD8bPtwN/8Ns8lWTLoEY/X/BIKNrWX+azi02q?=
- =?us-ascii?Q?v+Enj29mr8OoAnGMT44251ETU0PeG7R2ozg/EPS4APl7xmtCsTDTpK2lB62q?=
- =?us-ascii?Q?l9QcS1CUD7dzq2jiS1aexgKgttis7qY6OUi53KDmZ7JcqNz0eZ/PJfu/v5IL?=
- =?us-ascii?Q?//P2eMGXgLAultRszhq2aXjU8TvKlI1duxoebU3VRQ7h4ZeAevQCxF+hC+Y+?=
- =?us-ascii?Q?SHMrzuw54CA8RZPBjEg9QEviXlLRFttoNC0fiaewDvUJYLp+T+mN9PEY69FE?=
- =?us-ascii?Q?sdMqIekidVxErIJ22n1FziQ5ADXqrfVsx+7gjpIcbfB6hpUfPhhPvS8M61nt?=
- =?us-ascii?Q?AWSk+te8JDP2MLigCiJTy33n8G/ZaR1TCtpfjWHcWBKAbdwbwanlzkIEd1Jm?=
- =?us-ascii?Q?6x8POPM36QIv8SvHKfGYjAQxYxxaN7qZIYZTYMcA2DHomWSHg6WZ6j5WWEbM?=
- =?us-ascii?Q?l24rUTmVcv3ftpyTEUD9pwdmi6oIKc4NDjqMBshFecqLcn2ocEyArx2j3MHN?=
- =?us-ascii?Q?BKRBeJFhH1pYf+ZAZzWw/YfrYconUsmd3rkPkDlL6mXbcPu+4PpL6tmUnng6?=
- =?us-ascii?Q?gcxVUOhHH8/ywzrS2DT/GI78+85Hbk17pN4BW1hgH2lWFA1PacyoMrtfyUgm?=
- =?us-ascii?Q?gkMckkE4P++cUGAI9s/oLiG9O7mHcU3fRTB+xF6tfhUlMdgfC7+fPBTLtmcp?=
- =?us-ascii?Q?JRgqjgR787IP5jpx1JZf8ByEUG7TCfL2E412JtJ2itQ0mGO3XKj7ee2W4EaP?=
- =?us-ascii?Q?buEyoiIjm79LnAZVZaI6iJZ4qIRhA58X/2o37OA7/ByziXiJ0Wv2EWie1naZ?=
- =?us-ascii?Q?rOLaegPBtS0=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?uiQ2rlnFLT7dJLg9vxrZrNnUHrcNf2Z8aXuh48wc7OxC2k0lh5avwbsdSu2b?=
- =?us-ascii?Q?/24rxDA4oO5IhJDl5yyEREhUcr5/42dsG63IUuqkyTKCAf37P2b1/IQI+VCW?=
- =?us-ascii?Q?rXtEJy10fXFELDOt7ed61iINtQJXAv6b+qNMxOQXw7wqieMErwqEjGBXivST?=
- =?us-ascii?Q?6N55Y9utH9MAjn+aEeU8HAz2F2BQ2e242tCmsahVL2DcEl1X/Vi/fXeefZSy?=
- =?us-ascii?Q?pSz+GsAnNy1iZES7HEkVmT+CJXChHVnsMgR+VKAmETH6DLLsCOoxgQJgY6yv?=
- =?us-ascii?Q?YtPF+ggGmqxE0Ej/cltiRW7MIgr0xC1AWrgxChB7cl1VxrmXf1ZF1l22r0IR?=
- =?us-ascii?Q?8PBeOeTlXSyMmH3b7DSm14M8Is9xsKH55gWlzbfEoCvyZB8myFgrDu15iLhu?=
- =?us-ascii?Q?rkrZ3Gd51qju3ihZfM462LSCpXQT+dPVKSDpg2roQE8Zl41AOLuwSwLspw5C?=
- =?us-ascii?Q?T2m0tIUFQU5mJyt6ttLX7XkBR1jVojnCUVerF8yQDIGjo6vLqbsUEaocXjKR?=
- =?us-ascii?Q?bxfE/KzMM4me2azFZG73dOWa+yDp8JcRzF95Ub5zpM6COABmrxJSxvPkFhnh?=
- =?us-ascii?Q?WhjAlgOO5ESYqZoieez2XAzU/LMpV5BO5aF0OUoySUu38e/arrX65R+K3WkA?=
- =?us-ascii?Q?yYxlFo926FcS+Z9dShpFnI15vw29aFo36nXCEUbu6WqT1OJgWsWkf2+LjWEs?=
- =?us-ascii?Q?6T5wXT7h3d7Eil7k0ycSxrh+MYRF1lMgvM7L5sldfekmS1NouY1+ln5mqSCf?=
- =?us-ascii?Q?98w4pz9l/gr/IM8vgMnuy0Ft6zaoBsN+H4zETBhjFBgKWoVO1D70PozUbQ6Q?=
- =?us-ascii?Q?s2GFZBCIDBmJqTgO4zXUtN23dTxtS9KEApHdmknnIfo4kMtBpo8FvSLzwF1o?=
- =?us-ascii?Q?FBI5ilgZxKZ3HObL6glPzr/tbUqCRpiRU2QgCOTuj+xfMy779y5P0VbyzoJl?=
- =?us-ascii?Q?c8TkeekH+z9DFATYGG1inxbk3LQ9XbP5Yo5V8hdXEKAwzG5G3cXGW0NaZQMS?=
- =?us-ascii?Q?59g9zTUZJbNRBmPRcjWVStq3LRsQKlQPssVGhAJCkAra7dHgfRdQsQ4GFSEV?=
- =?us-ascii?Q?GxboMcvvbk7m8/LEU2AmBxW0HyhSw/yWIOWWFonUX8RqRoNUT5y9Hkic7MNI?=
- =?us-ascii?Q?alJxcX+hHZuFjNKIQeEmxTn0ussJGSVh5oGY/psic9Pw6hBZdqzsD/HGzwoX?=
- =?us-ascii?Q?rJDliIbo1Gl2qszjm7+hhipLPt16Wgnr2ShjwogRFivXQCC/CibXliZCqFz6?=
- =?us-ascii?Q?c6cbo3xjjj4NIL+ffB1VR+chg9D6T8bXs1Sr3W581sVf3k6a49QgJCUpYxH1?=
- =?us-ascii?Q?JTSL0y+iVn/tygp8VHQPUtjIEYMv7yKYbbhUSVjh9NFybgytcdtaKVXeX1nT?=
- =?us-ascii?Q?UrRRdmqjTuVP8u5X/llT+p+rPQo9x6WyQs50Xd4PNlJhSiK46qEaZ/ZsQRdt?=
- =?us-ascii?Q?WzHIjdT3OzL+16T+cNNpBuw4UQqn3ghqbQ3RV1N+ZxFRMomUr/hP/8KfS3R2?=
- =?us-ascii?Q?5cW5FTO1IyikRlSU+wXSuFO/ryXyjnOlO8DVDnjgPSasL0/L9QKwKZSHRJda?=
- =?us-ascii?Q?b+ff1pJxjzusL9paLPM=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f5e512f2-1f99-4108-b6b3-08ddcd40857c
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Jul 2025 19:05:15.9272
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: DNBLRbleK40FGh2k8TFQC8W8ccHWZ0ii31199y9cf0Pk4w+l1bvxqaYV40vAkEk4
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ5PPF75EAF8F39
+User-Agent: Mozilla Thunderbird
+From: Damien Le Moal <dlemoal@kernel.org>
+Subject: Re: Improper io_opt setting for md raid5
+To: =?UTF-8?Q?Csord=C3=A1s_Hunor?= <csordas.hunor@gmail.com>,
+ Coly Li <colyli@kernel.org>, hch@lst.de
+Cc: linux-block@vger.kernel.org,
+ "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>, linux-scsi@vger.kernel.org
+References: <ywsfp3lqnijgig6yrlv2ztxram6ohf5z4yfeebswjkvp2dzisd@f5ikoyo3sfq5>
+ <bdf20964-e1ee-45a9-bf24-3396e957ff67@gmail.com>
+Content-Language: en-US
+Organization: Western Digital Research
+In-Reply-To: <bdf20964-e1ee-45a9-bf24-3396e957ff67@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Fri, Jul 25, 2025 at 10:30:46AM -0600, Logan Gunthorpe wrote:
+On 7/27/25 7:50 PM, Csordás Hunor wrote:
+> Adding the SCSI maintainers because I believe the culprit is in
+> drivers/scsi/sd.c, and Damien Le Moal because because he has a pending
+> patch modifying the relevant part and he might be interested in the
+> implications.
 > 
+> On 7/15/2025 5:56 PM, Coly Li wrote:
+>> Let me rescript the problem I encountered.
+>> 1, There is an 8 disks raid5 with 64K chunk size on my machine, I observe
+>> /sys/block/md0/queue/optimal_io_size is very large value, which isn’t
+>> reasonable size IMHO.
 > 
-> On 2025-07-24 02:13, Leon Romanovsky wrote:
-> > On Thu, Jul 24, 2025 at 10:03:13AM +0200, Christoph Hellwig wrote:
-> >> On Wed, Jul 23, 2025 at 04:00:06PM +0300, Leon Romanovsky wrote:
-> >>> From: Leon Romanovsky <leonro@nvidia.com>
-> >>>
-> >>> Export the pci_p2pdma_map_type() function to allow external modules
-> >>> and subsystems to determine the appropriate mapping type for P2PDMA
-> >>> transfers between a provider and target device.
-> >>
-> >> External modules have no business doing this.
-> > 
-> > VFIO PCI code is built as module. There is no way to access PCI p2p code
-> > without exporting functions in it.
+> I have come across the same problem after moving all 8 disks of a RAID6
+> md array from two separate SATA controllers to an mpt3sas device. In my
+> case, the readahead on the array became almost 4 GB:
 > 
-> The solution that would make more sense to me would be for either
-> dma_iova_try_alloc() or another helper in dma-iommu.c to handle the
-> P2PDMA case.
+> # grep ^ /sys/block/{sda,md_helium}/queue/{optimal_io_size,read_ahead_kb}
+> /sys/block/sda/queue/optimal_io_size:16773120
+> /sys/block/sda/queue/read_ahead_kb:32760
 
-This has nothing to do with dma-iommu.c, the decisions here still need
-to be made even if dma-iommu.c is not compiled in.
+For a SATA drive connected to an mpt3sas HBA, I see the same. But note that the
+optimal_io_size here is completely made up by the HBA/driver because ATA does
+not advertize/define an optimal IO size.
 
-It could be exported from the main dma code, but I think it would just
-be a 1 line wrapper around the existing function? I'd rather rename
-the functions and leave them in the p2pdma.c files...
+For SATA drive connected to AHCI SATA ports, I see:
 
-Jason
+/sys/block/sda/queue/optimal_io_size:0
+/sys/block/sda/queue/read_ahead_kb:8192
+
+read_ahead_kb in this case is twice max_sectors_kb (which with my patch is now
+4MB).
+
+> /sys/block/md_helium/queue/optimal_io_size:4293918720
+> /sys/block/md_helium/queue/read_ahead_kb:4192256
+> 
+> Note: the readahead is supposed to be twice the optimal I/O size (after
+> a unit conversion). On the md array it isn't because of an overflow in
+> blk_apply_bdi_limits. This overflow is avoidable but basically
+> irrelevant; however, it nicely highlights the fact that io_opt should
+> really never get this large.
+
+Only if io_opt is non-zero. If io_opt is zero, then read_ahead_kb by default is
+twice max_sectors_kb.
+
+> 
+>> 2,  It was from drivers/scsi/mpt3sas/mpt3sas_scsih.c, 
+>> 11939 static const struct scsi_host_template mpt3sas_driver_template = {
+> ...
+>> 11960         .max_sectors                    = 32767,
+> ...
+>> 11969 };
+>> at line 11960, max_sectors of mpt3sas driver is defined as 32767.
+
+This is another completely made-up value since SCSI allows commands transfer
+length up to 4GB (32-bits value in bytes). Even ATA drives allow up to 65536
+logical sectors per command (so 65536 * 4K = 256MB per command for $k logical
+sector drives). Not sure why it is set to this completely arbitrary value.
+
+>> Then in drivers/scsi/scsi_transport_sas.c, at line 241 inside sas_host_setup(),
+>> shots->opt_sectors is assigned by 32767 from the following code,
+>> 240         if (dma_dev->dma_mask) {
+>> 241                 shost->opt_sectors = min_t(unsigned int, shost->max_sectors,
+>> 242                                 dma_opt_mapping_size(dma_dev) >> SECTOR_SHIFT);
+>> 243         }
+>>
+>> Then in drivers/scsi/sd.c, inside sd_revalidate_disk() from the following coce,
+>> 3785         /*
+>> 3786          * Limit default to SCSI host optimal sector limit if set. There may be
+>> 3787          * an impact on performance for when the size of a request exceeds this
+>> 3788          * host limit.
+>> 3789          */
+>> 3790         lim.io_opt = sdp->host->opt_sectors << SECTOR_SHIFT;
+>> 3791         if (sd_validate_opt_xfer_size(sdkp, dev_max)) {
+>> 3792                 lim.io_opt = min_not_zero(lim.io_opt,
+>> 3793                                 logical_to_bytes(sdp, sdkp->opt_xfer_blocks));
+>> 3794         }
+>>
+>> lim.io_opt of all my sata disks attached to mpt3sas HBA are all 32767 sectors,
+>> because the above code block.
+>>
+>> Then when my raid5 array sets its queue limits, because its io_opt is 64KiB*7,
+>> and the raid component sata hard drive has io_opt with 32767 sectors, by
+>> calculation in block/blk-setting.c:blk_stack_limits() at line 753,
+>> 753         t->io_opt = lcm_not_zero(t->io_opt, b->io_opt);
+>> the calculated opt_io_size of my raid5 array is more than 1GiB. It is too large.
+
+md setting its io_opt to 64K*number of drives in the array is strange... It
+does not have to be that large since io_opt is an upper bound and not a "issue
+that IO size for optimal performance". io_opt is simply a limit saying: if you
+exceed that IO size, performance may suffer.
+
+So a default of stride size x number of drives for the io_opt may be OK, but
+that should be bound to some reasonable value. Furthermore, this is likely
+suboptimal. I woulld think that setting the md array io_opt initially to
+min(all drives io_opt) x number of drives would be a better default.
+
+>> I know the purpose of lcm_not_zero() is to get an optimized io size for both
+>> raid device and underlying component devices, but the resulted io_opt is bigger
+>> than 1 GiB that's too big.
+>>
+>> For me, I just feel uncomfortable that using max_sectors as opt_sectors in
+>> sas_host_stup(), but I don't know a better way to improve. Currently I just
+>> modify the mpt3sas_driver_template's max_sectors from 32767 to 64, and observed
+>> 5~10% sequetial write performance improvement (direct io) for my raid5 devices
+>> by fio.
+> 
+> In my case, the impact was more noticable. The system seemed to work
+> surprisingly fine under light loads, but an increased number of
+> parallel I/O operations completely tanked its performance until I
+> set the readaheads to their expected values and gave the system some
+> time to recover.
+> 
+> I came to the same conclusion as Coly Li: io_opt ultimately gets
+> populated from shost->max_sectors, which (in the case of mpt3sas and
+> several other SCSI controllers) contains a value which is both:
+> - unnecessarily large for this purpose and, more importantly,
+> - not a nice number without any large odd divisors, as blk_stack_limits
+>   clearly expects.
+
+Sounds to me like this is an md driver issue and tweak the limits automatically
+calculated by stacking the limits of the array members.
+
+> Populating io_opt from shost->max_sectors happens via
+> shost->opt_sectors. This variable was introduced in commits
+> 608128d391fa ("scsi: sd: allow max_sectors be capped at DMA optimal
+> size limit") and 4cbfca5f7750 ("scsi: scsi_transport_sas: cap shost
+> opt_sectors according to DMA optimal limit"). Despite the (in hindsight
+> perhaps unfortunate) name, it wasn't used to set io_opt. It was optimal
+> in a different sense: it was used as a (user-overridable) upper limit
+> to max_sectors, constraining the size of requests to play nicely with
+> IOMMU which might get slow with large mappings.
+> 
+> Commit 608128d391fa even mentions io_opt:
+> 
+>     It could be considered to have request queues io_opt value initially
+>     set at Scsi_Host.opt_sectors in __scsi_init_queue(), but that is not
+>     really the purpose of io_opt.
+> 
+> The last part is correct. shost->opt_sectors is an _upper_ bound on the
+> size of requests, while io_opt is used both as a sort of _lower_ bound
+> (in the form of readahead), and as a sort of indivisible "block size"
+> for I/O (by blk_stack_limits). These two existing purposes may or may
+> not already be too much for a single variable; adding a third one
+> clearly doesn't work well.
+> 
+> It was commit a23634644afc ("block: take io_opt and io_min into account
+> for max_sectors") which started setting io_opt from shost->opt_sectors.
+> It did so to stop abusing max_user_sectors to set max_sectors from
+> shost->opt_sectors, but it ended up misusing another variable for this
+> purpose -- perhaps due to inadvertently conflating the two "optimal"
+> transfer sizes, which are optimal in two very different contexts.
+> 
+> Interestingly, while I've verified that the increased values for io_opt
+> and readahead on the actual disks definitely comes from this commit
+> (a23634644afc), the io_opt and readahead of the md array are unaffected
+> until commit 9c0ba14828d6 ("blk-settings: round down io_opt to
+> physical_block_size") due to a weird coincidence. This commit rounds
+> io_opt down to the physical block size in blk_validate_limits. Without
+> this commit, io_opt for the disks is 16776704, which looks even worse
+> at first glance (512 * 32767 instead of 4096 * 4095). However, this
+> ends up overflowing in a funny way when combined with the fact that
+> blk_stack_limits (and thus lcm_not_zero) is called once per component
+> device:
+> 
+> u32 t = 3145728; // 3 MB, the optimal I/O size for the array
+> u32 b = 16776704; // the (incorrect) optimal I/O size of the disks
+
+It is not incorrect. It is a made-up value. For a SATA drive, reporting 0 would
+be the correct thing to do.
+
+> u32 x = lcm(t, b); // x == (u32)103076069376 == 4291821568
+> u32 y = lcm(x, b); // y == (u32)140630117318656 == t
+> 
+> Repeat for an even number of component devices to get the right answer
+> from the wrong inputs by an incorrect method.
+> 
+> I'm sure the issue can be reproduced before commit 9c0ba14828d6
+> (although I haven't actually tried -- if I had to, I'd start with an
+> array with an odd number of component devices), but at the same time,
+> the issue may be still present and hidden on some systems even after
+> that commit (for example, the rounding does nothing if the physical
+> block size is 512). This might help a little bit to explain why the
+> problem doesn't seem more widespread.
+> 
+>> So there should be something to fix. Can you take a look, or give me some hint
+>> to fix?
+>>
+>> Thanks in advance.
+>>
+>> Coly Li
+> 
+> I would have loved to finish with a patch here but I'm not sure what
+> the correct fix is. shost->opt_sectors was clearly added for a reason
+> and it should reach max_sectors in struct queue_limits in some way. It
+> probably isn't included in max_hw_sectors because it's meant to be
+> overridable. Apparently just setting max_sectors causes problems, and
+> so does setting max_sectors and max_user_sectors. I don't know how to
+> to fix this correctly without introducing a new variable to struct
+> queue_limits but maybe people more familiar with the code can think of
+> a less intrusive way.
+> 
+> Hunor Csordás
+> 
+
+
+-- 
+Damien Le Moal
+Western Digital Research
