@@ -1,46 +1,46 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB1642C18A;
-	Tue, 29 Jul 2025 07:32:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9B33270EAD;
+	Tue, 29 Jul 2025 07:52:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753774325; cv=none; b=ssC25Aj2rePFfUz00BjaBWaOmjALCMFpHVnmT3F+qUJ7+YaiPZlAO4/hh6CmC3UE9+OXWLU1ulnSWzxGqaj+6bMivQN+XvlZqYEoGOgMSVdswVOq6VhVDNm/iQaUc1PMa0q3QTnBsF0FxjbQ3RWIQ9z59fGbIbDogIo+KR6EAyM=
+	t=1753775538; cv=none; b=hyc8xEebfuICx/WerQmHpcIKJm5Jxdvp71WyTlJlfsQ8GRvqspSZZ67ePgoQat07nBFbc+CDj4PC2T0lrqK8Dm9/8k4bbj/HBhvkaYaHFX725Bu/Ih84xyy2C9sIOV4mbK8wNk4tem/TNxNbg0gi03trZ/cAJBGcUF6UVVU2bwQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753774325; c=relaxed/simple;
-	bh=mXawYNblOKHI8Qe1OGM3cwRbMY2bG+jXMmmwUkywnmo=;
+	s=arc-20240116; t=1753775538; c=relaxed/simple;
+	bh=qTxjpdw/DHeS/OfkN0sZot0E4aCxepXfaejZYDj9sC4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ae6iAaT2wiDZ9Ol/Uu+rNKpJVoy/cUm0jXl/th0FW1cmvKL9BuTV6V+pqfcRKn8Ti/opGkYDeqkH0teVD7N7KpsJJplI96slMPbiMXLEvqQdO9druQIpNNNvi9XrFvU6SzjaMZ4rZopKCTtHcOGfWL80KtNa5qF1ZRtLZGTy9oA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=rwCNUScz; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="rwCNUScz"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=C7K39Q4zkz0EcQTxtEs8Hc0N30C7j7wtFgFSP9Y6lZ8=; b=rwCNUSczo8Voc9WrXJJ7gMvSoM
-	KUFMSnYlokEaYwzMKBTAqnqJsnsUMMrs6bCHoGIxB0T3YXACWhBF5JxV7TneFtaGb73NXkKYMEyrS
-	IRJEQyQVbSrnT+u+oLeGoyEDqpgg+aBenBQr6ubYSPatBBKNZ5CkeoxGtqIqOvh48XA+mCJLX8/r7
-	eURBFAfy2Kx0IYU3/iByRID1WoEC+3xnYdRG0U7CvEItJlxdWH4rfQxYAozkUpAvSXjrL+eUrWQu6
-	4cuj+WUi6AYwYKnSwN8XOhT24BdecOMm5TT4Bk1xuQ9rqNzyoXB3zrgUgjHNDDmqSNHURpDK0cC/C
-	/Z9y1gsQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1ugeoW-0000000G7s2-4B6C;
-	Tue, 29 Jul 2025 07:31:57 +0000
-Date: Tue, 29 Jul 2025 00:31:56 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Klara Modin <klarasmodin@gmail.com>
-Cc: brauner@kernel.org, anuj20.g@samsung.com, arnd@kernel.org,
-	martin.petersen@oracle.com, joshi.k@samsung.com, hch@infradead.org,
-	arnd@arndb.de, naresh.kamboju@linaro.org, anders.roxell@linaro.org,
-	axboe@kernel.dk, kbusch@kernel.org, csander@purestorage.com,
-	asml.silence@gmail.com, adobriyan@gmail.com, djwong@kernel.org,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] block: change blk_get_meta_cap() stub return -ENOIOCTLCMD
-Message-ID: <aIh47Ncx5lY1vc9F@infradead.org>
-References: <20250725164334.9606-1-klarasmodin@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=dGOrNGsCQtbCvWOyYk79h3Pr5o0lfqrKShqpcRTEkbT33DF5QgIgW/0hRtohHcXB6FrX0N3WKHDo4qHaG764k9AUx0GIYqvRpCEZlpgbsSXRfWbFc13O1cg0O4LnDuCha9z2zXLvLRSBurjq3kSvEGSXTKkpVMV0UUkc3mDTg4g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 5B85168BFE; Tue, 29 Jul 2025 09:52:09 +0200 (CEST)
+Date: Tue, 29 Jul 2025 09:52:09 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Christoph Hellwig <hch@lst.de>, Leon Romanovsky <leon@kernel.org>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
+	Jens Axboe <axboe@kernel.dk>,
+	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+	Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+	linaro-mm-sig@lists.linaro.org, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
+	linux-mm@kvack.org, linux-pci@vger.kernel.org,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Vivek Kasireddy <vivek.kasireddy@intel.com>,
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH 02/10] PCI/P2PDMA: Introduce p2pdma_provider structure
+ for cleaner abstraction
+Message-ID: <20250729075209.GA23823@lst.de>
+References: <cover.1753274085.git.leonro@nvidia.com> <c2307cb4c3f1af46da138f3410738754691fbb3d.1753274085.git.leonro@nvidia.com> <20250724075145.GB30590@lst.de> <20250724075533.GR402218@unreal> <20250724075922.GD30590@lst.de> <20250727185158.GE7551@nvidia.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -49,21 +49,28 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250725164334.9606-1-klarasmodin@gmail.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20250727185158.GE7551@nvidia.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Fri, Jul 25, 2025 at 06:43:34PM +0200, Klara Modin wrote:
-> When introduced in commit 9eb22f7fedfc ("fs: add ioctl to query metadata
-> and protection info capabilities") the stub of blk_get_meta_cap() for
-> !BLK_DEV_INTEGRITY always returns -EOPNOTSUPP. The motivation was that
-> while the command was unsupported in that configuration it was still
-> recognized.
+On Sun, Jul 27, 2025 at 03:51:58PM -0300, Jason Gunthorpe wrote:
+> On Thu, Jul 24, 2025 at 09:59:22AM +0200, Christoph Hellwig wrote:
+> > On Thu, Jul 24, 2025 at 10:55:33AM +0300, Leon Romanovsky wrote:
+> > > Please, see last patch in the series https://lore.kernel.org/all/aea452cc27ca9e5169f7279d7b524190c39e7260.1753274085.git.leonro@nvidia.com
+> > > It gives me a way to call p2p code with stable pointer for whole BAR.
+> > > 
+> > 
+> > That simply can't work.
 > 
-> A later change instead assumed -ENOIOCTLCMD as is required for unknown
-> ioctl commands per Documentation/driver-api/ioctl.rst. The result being
-> that on !BLK_DEV_INTEGRITY configs, any ioctl which reaches
-> blkdev_common_ioctl() will return -EOPNOTSUPP.
+> Why not?
+> 
+> That's the whole point of this, to remove struct page and use
+> something else as a handle for the p2p when doing the DMA API stuff.
 
-FYI, I still think we should not fail the command for
-!BLK_DEV_INTEGRITY, but just report no capabilities.
+Because the struct page is the only thing that:
+
+ a) dma-mapping works on
+ b) is the only place we can discover the routing information, but also
+    more importantly ensure that the underlying page is still present
+    and the device is not hot unplugged, or in a very theoretical worst
+    case replaced by something else.
 
