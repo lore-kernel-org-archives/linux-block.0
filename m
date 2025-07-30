@@ -1,121 +1,67 @@
-Received: from sender4-pp-f112.zoho.com (sender4-pp-f112.zoho.com [136.143.188.112])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84485293454;
-	Wed, 30 Jul 2025 13:37:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.112
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753882638; cv=pass; b=JRyWkOrxy6EIngV1dLcYDdWV0UdRf0hawXZB08XbCrnSJUaGa25GU17JmPDmz+EAlJCwyaUBrzpb28yIQ3g3aua4tUetxOUXC4FkB61MSEEKjXVXOk9DRgSEoeXx2/SqlV+RDGjb7d3TCLJSxowslNNELEGSG+aecR8/EBN4T1Q=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753882638; c=relaxed/simple;
-	bh=0KmMvxy+SwDmjTd5hYeEPgp70c7lySC5m8i2ZH16PSM=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=sfZUel6CT//inmt6nMtE8AUV+4JJWZpbtUyHTtiItvOEQjY0B/K5WmaStU5TqcDPjXq6pNS8huDhpnWDl8VLwK18a8aQvw+7rtortTXmLzs2W7zHeIPER4zZz5MBISOM5DKzMcl8UWd9rge3rBR4uI5e2Vc4HE1acwXYLdYoqvQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=daniel.almeida@collabora.com header.b=Cd3pxApB; arc=pass smtp.client-ip=136.143.188.112
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51AB9296159
+	for <linux-block@vger.kernel.org>; Wed, 30 Jul 2025 14:18:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1753885110; cv=none; b=OclyN42p/OmBA70n85H1S3WzGvMwxoNa2OJDhWNPc4uFZXcEYxG4FtrugRF0xZaqo3PEf9HuGhU2iJsmYJ6VmIa4X2t78fEFV6KBVupiQwqevHH57l6VO+R4bFqp5oxa9anDkMh1C64sSbz2vtm+s74Qhvr+WKlIZsBmkM8RDiE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1753885110; c=relaxed/simple;
+	bh=5QG/cxwfN36EtLhLypaOb64DY9SBJPkXgy9O7I/pmU4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=t0Xrf/QRO+o195KD/sheMKK0p3knNB9RIb75PCTBqKmhqDfwTHDb90FByouARzMGT9qvsSTcw261IdE9w9kep58hULCNtm9P4zgPc+rjXi5SO4+fIENrKDz3ERqFbm6uvRa3Qnw4kK89JUJ8d3ZNeCRS5GLudyGRpJQSLGPFRY4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SUyG+PxC; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=collabora.com header.i=daniel.almeida@collabora.com header.b="Cd3pxApB"
-ARC-Seal: i=1; a=rsa-sha256; t=1753882611; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=KeGIAGDAWludj9s2OsBdrrpPcSWLcy/g6IcjI2qEQumzqvim3m0+G5U7zV7FiK/mOzBgOJNkz7kIKeZ49zTzg03nu97CuV45VQa30koNkQOl8zlsxHUlK2jFKDDYAljNgotAtb3sKOH878EkJQgpF/R1reW6UCALridvm2cpOWQ=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1753882611; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=ipBuX+007QmZGVBwckpwz4LW/7znlRX+ZLBlKNFcy5A=; 
-	b=J/ZEP3VHk8nmnH6k2vfTzTwFl+F2gxWoxYKo1chVvFgh5rRwjGekMPhVMz/olxLfL7H9vDFMb6ogFOyBmREVtvqvpOua0wSu7qXUNAYys/KqKeo37I33JpIm1TvkLKb1ykph41RW9lDxsPMOEF50hbMhPigm3qMFO/1rOO1xCDQ=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=collabora.com;
-	spf=pass  smtp.mailfrom=daniel.almeida@collabora.com;
-	dmarc=pass header.from=<daniel.almeida@collabora.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1753882611;
-	s=zohomail; d=collabora.com; i=daniel.almeida@collabora.com;
-	h=Content-Type:Mime-Version:Subject:Subject:From:From:In-Reply-To:Date:Date:Cc:Cc:Content-Transfer-Encoding:Message-Id:Message-Id:References:To:To:Reply-To;
-	bh=ipBuX+007QmZGVBwckpwz4LW/7znlRX+ZLBlKNFcy5A=;
-	b=Cd3pxApBJw0djL6h99BVSWsO9A9AWTc/OwKTpEyNOcnPgGsKbcdtPZl4LPotcWsU
-	pHMcLpg0/FBAdfZM6MEW/nowl/7f9nNCclIPLvgsXZSgy2EUx8UgyGq3C5/4VsXT5XX
-	1M6ZOA84lCqZ6YzylpwMZr74fCcBfirrXRc7pCBc=
-Received: by mx.zohomail.com with SMTPS id 1753882609215993.1319746622694;
-	Wed, 30 Jul 2025 06:36:49 -0700 (PDT)
-Content-Type: text/plain;
-	charset=utf-8
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SUyG+PxC"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61C90C4CEE3;
+	Wed, 30 Jul 2025 14:18:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753885109;
+	bh=5QG/cxwfN36EtLhLypaOb64DY9SBJPkXgy9O7I/pmU4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=SUyG+PxCK7rXERFWp8Qs+h68JBAUb9gurZ52iqE26peUYzk4MKbt4owEdJqVsTFWv
+	 OwIVtJ/HE0E9xzjUa5b9qRn7oGlQSbVebo9PFEUvetcMKc0iNE1iwdFBYZfhP3g/5d
+	 W363sMgoRUevsds5lWlJXKghTgsqyQ75Kk0tLFT0unhOv4XN6mJnPpdxcnYT84DAwe
+	 3MpeZdW/cRHdYN3m2Qlgu1xoLKwj0pfdufYx7fs5uZ13qogiH+3WGWvL2AyEaFayQb
+	 yctoPwEfeGgJRXm0arZyw5zme7+E0FCoJIufJgpKtELogQcgEviVtM+UA1y+uqlvzT
+	 XuXyyhJlsjyaQ==
+Date: Wed, 30 Jul 2025 08:18:27 -0600
+From: Keith Busch <kbusch@kernel.org>
+To: Kanchan Joshi <joshi.k@samsung.com>
+Cc: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org, hch@lst.de, axboe@kernel.dk,
+	leonro@nvidia.com
+Subject: Re: [PATCHv3 2/7] blk-mq-dma: provide the bio_vec list being iterated
+Message-ID: <aIopsymJJaQ0AAZC@kbusch-mbp>
+References: <20250729143442.2586575-1-kbusch@meta.com>
+ <CGME20250729143610epcas5p12a897510ef6da6563d32c7a41ed21659@epcas5p1.samsung.com>
+ <20250729143442.2586575-3-kbusch@meta.com>
+ <8a4e7512-a997-4ff1-b465-2597bc6fa778@samsung.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.600.51.1.1\))
-Subject: Re: [PATCH 0/3] Fix broken `srctree/` links and warn about them
-From: Daniel Almeida <daniel.almeida@collabora.com>
-In-Reply-To: <20250730130716.3278285-1-ojeda@kernel.org>
-Date: Wed, 30 Jul 2025 10:36:33 -0300
-Cc: Alex Gaynor <alex.gaynor@gmail.com>,
- Andreas Hindborg <a.hindborg@kernel.org>,
- Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
- Maxime Ripard <mripard@kernel.org>,
- Thomas Zimmermann <tzimmermann@suse.de>,
- David Airlie <airlied@gmail.com>,
- Simona Vetter <simona@ffwll.ch>,
- Boqun Feng <boqun.feng@gmail.com>,
- Gary Guo <gary@garyguo.net>,
- =?utf-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>,
- Benno Lossin <lossin@kernel.org>,
- Alice Ryhl <aliceryhl@google.com>,
- Trevor Gross <tmgross@umich.edu>,
- Danilo Krummrich <dakr@kernel.org>,
- rust-for-linux@vger.kernel.org,
- linux-block@vger.kernel.org,
- dri-devel@lists.freedesktop.org,
- linux-kernel@vger.kernel.org,
- patches@lists.linux.dev
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <8CCB36E4-4C5D-4E2F-BC58-255770AA4904@collabora.com>
-References: <20250730130716.3278285-1-ojeda@kernel.org>
-To: Miguel Ojeda <ojeda@kernel.org>
-X-Mailer: Apple Mail (2.3826.600.51.1.1)
-X-ZohoMailClient: External
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8a4e7512-a997-4ff1-b465-2597bc6fa778@samsung.com>
 
-Hi Miguel, this is indeed nice!
+On Wed, Jul 30, 2025 at 05:45:27PM +0530, Kanchan Joshi wrote:
+> On 7/29/2025 8:04 PM, Keith Busch wrote:
+> > @@ -151,6 +146,11 @@ bool blk_rq_dma_map_iter_start(struct request *req, struct device *dma_dev,
+> >   	memset(&iter->p2pdma, 0, sizeof(iter->p2pdma));
+> >   	iter->status = BLK_STS_OK;
+> >   
+> > +	if (req->rq_flags & RQF_SPECIAL_PAYLOAD)
+> > +		iter->iter.bvec = &req->special_vec;
+> 
+> I am not certain yet, but thinking whether this is enough to handle 
+> RQF_SPECIAL_PAYLOAD correctly.
+> Maybe "req->special_vec.bv_len" also need to be included here to 
+> initialize the iter.
 
-> On 30 Jul 2025, at 10:07, Miguel Ojeda <ojeda@kernel.org> wrote:
->=20
-> This fixes a handful of broken links and introduces a warning to
-> prevent them from happening in the future.
->=20
-> Relatedly, we could also perhaps check the other side of the links, =
-but
-> perhaps there are cases we want to customize. Alternatively, we could
-> also in the future introduce custom syntax for these that avoids
-> repetition or a fancier preprocessing step.
->=20
-> Miguel Ojeda (3):
->  rust: block: fix `srctree/` links
->  rust: drm: fix `srctree/` links
->  rust: warn if `srctree/` links do not exist
->=20
-> rust/Makefile                    | 6 ++++++
-> rust/kernel/block/mq/gen_disk.rs | 2 +-
-> rust/kernel/drm/device.rs        | 2 +-
-> rust/kernel/drm/driver.rs        | 2 +-
-> rust/kernel/drm/file.rs          | 2 +-
-> rust/kernel/drm/gem/mod.rs       | 2 +-
-> rust/kernel/drm/ioctl.rs         | 2 +-
-> 7 files changed, 12 insertions(+), 6 deletions(-)
->=20
-> =E2=80=94
-> 2.50.1
-
-Reviewed-by: Daniel Almeida <daniel.almeida@collabora.com>
-
-Patch 3 alone indeed produces the following warnings:
-
-warning: srctree/ link to include/linux/blk_mq.h does not exist
-warning: srctree/ link to include/linux/drm/drm_device.h does not exist
-warning: srctree/ link to include/linux/drm/drm_ioctl.h does not exist
-warning: srctree/ link to include/linux/drm/drm_file.h does not exist
-warning: srctree/ link to include/linux/drm/drm_drv.h does not exist
-warning: srctree/ link to include/linux/drm/drm_gem.h does not exist
-
-So you can add my Tested-by for that one.
-
-Cheers,
-=E2=80=94 Daniel=
+Yeah, I think you're right. I had only tested 'discard' for the special
+payload, and it appeared to be okay, but I suspect for the wrong
+reasons. I'll fix it up.
