@@ -1,163 +1,130 @@
-Received: from 003.mia.mailroute.net (003.mia.mailroute.net [199.89.3.6])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63A6715D1;
-	Wed, 30 Jul 2025 18:32:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD3A91EF38F
+	for <linux-block@vger.kernel.org>; Wed, 30 Jul 2025 19:58:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753900375; cv=none; b=R1XVldvZY726Gvpbw4JeYUyBvwBo4DP2Cim6F5GNA7pro0vxwWhyOOJ2zqAKDneyOjPmSZQ3QOqaT8wlCwfrAAdLgB0UxRsw6b95HeQhDMuG/h3FvO+8LCGkcyrrH6WFbvXLRaQjMEV0XZX2f5we7+mmeJNw6W1hneehulI732Y=
+	t=1753905535; cv=none; b=Kh1eWLwq4kh+7xakyPKyo66qsK5bzAJFX/2YlBBGjdY0H1FeGCYiOcHCnGCm36HheD8KRxhBi8BUPzOzEQyI5jOeDzUNV7f7Lu/t5EeVcL8WURMXbiys8VvgLgfWuogSIqMP9tBZDJ6sRx/MG+k1dNirvOA41riTdUggVJb5AOE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753900375; c=relaxed/simple;
-	bh=dayDg43ze/Lqg22nKaaDmYMM23MYRbccFrPDxVYbXLk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=H8FSU8fgqFJaLK369Ns6LC5TlnnX7Q3ChMow56QtRb56/pVKgI8cmqYKUGnT6caCtUlDiHQwR5o/6h/XGdnG80xEv302iiZhRfKYO+JML4EhGRT56gevDCLoa6OHnAAivD51y3A6Dav9A1a2rr+jC2uHPr2bK3Y7Jj3RzWqaAxI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=1Qzy4tPY; arc=none smtp.client-ip=199.89.3.6
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1753905535; c=relaxed/simple;
+	bh=CG5SKXa8zPOQn3DCX5/e8odAxj8sWImHdXc+IA7A+Io=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=CxjkNcD/t29mpZcv6kWmTd4f1CUGhoXvhNCn7ne3JJDMF1UEaIWCS6R9ZIddQX8nfjcS07ourYppjso1nqHTOfIximDTv2Rq2rHMzvllxMGnG9oGwOLFrGRiEFNGk0AYlyjSdPIvWQYMxfNwkh1UHvKQK/NATIxp9nFW1hIVDuI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Zwipy1d/; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="1Qzy4tPY"
-Received: from localhost (localhost [127.0.0.1])
-	by 003.mia.mailroute.net (Postfix) with ESMTP id 4bsgnJ0xMBzlgqVc;
-	Wed, 30 Jul 2025 18:32:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1753900369; x=1756492370; bh=Y2xMrf0OetiuAsnfKNTS1Njx
-	wzk9PNDIA+uZ7SKBR0I=; b=1Qzy4tPYd5ohDDa7Ee6o5qZkDCnJdHT7RYsFo5gD
-	mTKxUBoRGnCYwqs+MFRrlUQDx2PG6+VEiPVUDWXZmtAy6bUmxqLNue4iIsg2nvQ2
-	EkEu7RMkj57G0p8B9kEIgnG3sIYGvJWcbjhrw9M6JbBEfn74cEns56E3aZHd3ltk
-	OVzKFFryX5DC26u57z23R0ylILqzrkee36qsDAGnPReNCfeZSEAVQt3R/5jjHLtZ
-	vdJA8IwCP3mj3EONYTjJjDXyTVeYkZB1BOg/7S8MagiyHk0K/NnJ7IDvadcXEp+Y
-	ALufyQ1Twa9wqt7PQQHVLnq9j/0PDSyfVgGIvlCf86KzSg==
-X-Virus-Scanned: by MailRoute
-Received: from 003.mia.mailroute.net ([127.0.0.1])
- by localhost (003.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id gh2xo1hm_SX9; Wed, 30 Jul 2025 18:32:49 +0000 (UTC)
-Received: from [100.66.154.22] (unknown [104.135.204.82])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4bsgn423S8zlgqVY;
-	Wed, 30 Jul 2025 18:32:39 +0000 (UTC)
-Message-ID: <d5507645-6ad6-48a1-b429-c5bf7fda9523@acm.org>
-Date: Wed, 30 Jul 2025 11:32:38 -0700
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zwipy1d/"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1753905531;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MJ8yWqGXhru7WhV5DGnUZnDJthF7Yg1ZkZASyV+JWoM=;
+	b=Zwipy1d/+aYeX49YUl3RPWoAUZbooFhei0QjfGCwO7B6gicBefkcYFOHLVp3nRcdVyAnK8
+	fz9dbP/EKgOzMP/UlVW7s06aAtjY3f8I+AnGHnlKsxTV+SZKY9U+K8UdHAtu69hNexPuN+
+	a5nOYkou2V0wu0FmawyGX5zof/5RgdY=
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
+ [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-365-JhKN0bRIPGa0876KXx70BQ-1; Wed, 30 Jul 2025 15:58:50 -0400
+X-MC-Unique: JhKN0bRIPGa0876KXx70BQ-1
+X-Mimecast-MFC-AGG-ID: JhKN0bRIPGa0876KXx70BQ_1753905530
+Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-881327e173fso3159939f.0
+        for <linux-block@vger.kernel.org>; Wed, 30 Jul 2025 12:58:50 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753905530; x=1754510330;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=MJ8yWqGXhru7WhV5DGnUZnDJthF7Yg1ZkZASyV+JWoM=;
+        b=E7o5w+6MztxI/oocioguAbPDqaMZraCHBujzLLAExSlWfa6UCawVNIVYjVLAoBO7Qw
+         q//mfcFPBTEoEkEO93Rzm1wWUus+ovtfxq8ychdTt2N3Cdeu2QGlgFKs32jTNlYDZnDx
+         fHEgmMMvtMOYElNMFL4/5Vwjd3BgPm0yxxXzDHHgsvL/VUsfOyGeTsayuHD0zQ8hmLfB
+         HzAm4htK8Og7iSFBOW+1RcvUILAc2yQ1oVqt580pctt1YzuFbOIphLskroPWOpDUKLGi
+         aUyZWKE/6zNXeY9TcDNkFbIGRc1lJU3t3YcKNrpzjq7cfDkN/X2eyD55kcndD4083Msv
+         znPw==
+X-Forwarded-Encrypted: i=1; AJvYcCUHTmCj5lZOHyWPf3tDokSi7gsK9jPKIy+1U3ym+zieRXlMGOcLNnwpxJEltRs9Sw0X8qmhiVWV6FWJwA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YycYmyrDb9jjSrFoPE/lYuIy+trqOcMD3OZffyOxSiqlo4Aueyb
+	HjxuXWmvGHr89S0jED9/foD0wRNOKv+4mO/2rx8uo4ldLxWxOEYU0xqcuPXoNIV5d/t0JTEP1/+
+	WCJr7j4ikXqRF9b30G120QUEsXJ0ygzeZB0OaCsa2UttSv75VH/WB0nrLhKf/YsLw
+X-Gm-Gg: ASbGnctSrcphU5E1fWqHHEON0VUksns5Aom78HZTweignvhIvWQJmrSzsSiAEkvKEsc
+	lD2tGO+/gSNYBd8xz+DestSp6+Zf01nKl3TOdQWY3SczlHqSucXWDQ+si2Tj0/RPjBB4aPMtXCH
+	4FfRbBzoPfrZdrUJyIIdTan7END3gDC5ny7De5JNXjTC7vXtNd5fwEzB+04QfPimKJpnUhVJeME
+	wdLPgFjB2p4djBBNeA28/FlWDf1Dia5OfjoFeIofPqwcUWmw77V7ubX9WuMdpUoCu1Hf4eLolY3
+	oz5jeMiOO3igcY0uwFRkUmsL4ykhRjkjJhHeOzugjXw=
+X-Received: by 2002:a05:6602:3403:b0:85b:544c:ba6c with SMTP id ca18e2360f4ac-88137489c1bmr247637639f.1.1753905529642;
+        Wed, 30 Jul 2025 12:58:49 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEqzTNDwtWgU4diezEDNzfWAqDpdNRdRLffgeb0LuFILxM3AuzO6OxVkpYobVhQ8ZrxcWgziA==
+X-Received: by 2002:a05:6602:3403:b0:85b:544c:ba6c with SMTP id ca18e2360f4ac-88137489c1bmr247635939f.1.1753905529204;
+        Wed, 30 Jul 2025 12:58:49 -0700 (PDT)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-50a55da3278sm19521173.84.2025.07.30.12.58.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 30 Jul 2025 12:58:48 -0700 (PDT)
+Date: Wed, 30 Jul 2025 13:58:46 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Leon Romanovsky <leonro@nvidia.com>, Christoph Hellwig <hch@lst.de>,
+ Jason Gunthorpe <jgg@nvidia.com>, Andrew Morton
+ <akpm@linux-foundation.org>, Bjorn Helgaas <bhelgaas@google.com>, Christian
+ =?UTF-8?B?S8O2bmln?= <christian.koenig@amd.com>,
+ dri-devel@lists.freedesktop.org, iommu@lists.linux.dev, Jens Axboe
+ <axboe@kernel.dk>, =?UTF-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
+ Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+ linaro-mm-sig@lists.linaro.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
+ linux-mm@kvack.org, linux-pci@vger.kernel.org, Logan Gunthorpe
+ <logang@deltatee.com>, Marek Szyprowski <m.szyprowski@samsung.com>, Robin
+ Murphy <robin.murphy@arm.com>, Sumit Semwal <sumit.semwal@linaro.org>,
+ Vivek Kasireddy <vivek.kasireddy@intel.com>, Will Deacon <will@kernel.org>
+Subject: Re: [PATCH 00/10] vfio/pci: Allow MMIO regions to be exported
+ through dma-buf
+Message-ID: <20250730135846.2208fe89.alex.williamson@redhat.com>
+In-Reply-To: <cover.1753274085.git.leonro@nvidia.com>
+References: <cover.1753274085.git.leonro@nvidia.com>
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 4/5] blk-mq-sched: refactor
- __blk_mq_do_dispatch_sched()
-To: Yu Kuai <yukuai1@huaweicloud.com>, dlemoal@kernel.org, hare@suse.de,
- jack@suse.cz, tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk,
- yukuai3@huawei.com
-Cc: cgroups@vger.kernel.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, yi.zhang@huawei.com, yangerkun@huawei.com,
- johnny.chenyi@huawei.com
-References: <20250730082207.4031744-1-yukuai1@huaweicloud.com>
- <20250730082207.4031744-5-yukuai1@huaweicloud.com>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20250730082207.4031744-5-yukuai1@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On 7/30/25 1:22 AM, Yu Kuai wrote:
-> Introduce struct sched_dispatch_ctx, and split the helper into
-> elevator_dispatch_one_request() and elevator_finish_dispatch(). Also
-> and comments about the non-error return value.
+On Wed, 23 Jul 2025 16:00:01 +0300
+Leon Romanovsky <leon@kernel.org> wrote:
 
-and -> add
+> From: Leon Romanovsky <leonro@nvidia.com>
+> 
+> ---------------------------------------------------------------------------
+> Based on blk and DMA patches which will be sent during coming merge window.
+> ---------------------------------------------------------------------------
+> 
+> This series extends the VFIO PCI subsystem to support exporting MMIO regions
+> from PCI device BARs as dma-buf objects, enabling safe sharing of non-struct
+> page memory with controlled lifetime management. This allows RDMA and other
+> subsystems to import dma-buf FDs and build them into memory regions for PCI
+> P2P operations.
+> 
+> The series supports a use case for SPDK where a NVMe device will be owned
+> by SPDK through VFIO but interacting with a RDMA device. The RDMA device
+> may directly access the NVMe CMB or directly manipulate the NVMe device's
+> doorbell using PCI P2P.
+> 
+> However, as a general mechanism, it can support many other scenarios with
+> VFIO. This dmabuf approach can be usable by iommufd as well for generic
+> and safe P2P mappings.
 
-> +struct sched_dispatch_ctx {
-> +	struct blk_mq_hw_ctx *hctx;
-> +	struct elevator_queue *e;
-> +	struct request_queue *q;
+I think this will eventually enable DMA mapping of device MMIO through
+an IOMMUFD IOAS for the VM P2P use cases, right?  How do we get from
+what appears to be a point-to-point mapping between two devices to a
+shared IOVA between multiple devices?  I'm guessing we need IOMMUFD to
+support something like IOMMU_IOAS_MAP_FILE for dma-buf, but I can't
+connect all the dots.  Thanks,
 
-'e' is always equal to q->elevator so I'm not sure whether it's worth to
-have the member 'e'?
+Alex
 
-> +static bool elevator_can_dispatch(struct sched_dispatch_ctx *ctx)
-> +{
-> +	if (ctx->e->type->ops.has_work &&
-> +	    !ctx->e->type->ops.has_work(ctx->hctx))
-> +		return false;
->   
-> -		if (!list_empty_careful(&hctx->dispatch)) {
-> -			busy = true;
-> -			break;
-> -		}
-> +	if (!list_empty_careful(&ctx->hctx->dispatch)) {
-> +		ctx->busy = true;
-> +		return false;
-> +	}
->   
-> -		budget_token = blk_mq_get_dispatch_budget(q);
-> -		if (budget_token < 0)
-> -			break;
-> +	return true;
-> +}
-
-Shouldn't all function names in this file start with the blk_mq_ prefix?
-
-Additionally, please rename elevator_can_dispatch() into
-elevator_should_dispatch(). I think the latter name better reflects the
-purpose of this function.
-
-> +	if (sq_sched)
-> +		spin_lock_irq(&ctx->e->lock);
-> +	rq = ctx->e->type->ops.dispatch_request(ctx->hctx);
-> +	if (sq_sched)
-> +		spin_unlock_irq(&ctx->e->lock);
-
-Same comment here as on patch 1/5: code like the above makes it
-harder than necessary for static analyzers to verify this code.
-
->   
-> +	if (!rq) {
-> +		blk_mq_put_dispatch_budget(ctx->q, budget_token);
->   		/*
-> -		 * If we cannot get tag for the request, stop dequeueing
-> -		 * requests from the IO scheduler. We are unlikely to be able
-> -		 * to submit them anyway and it creates false impression for
-> -		 * scheduling heuristics that the device can take more IO.
-> +		 * We're releasing without dispatching. Holding the
-> +		 * budget could have blocked any "hctx"s with the
-> +		 * same queue and if we didn't dispatch then there's
-> +		 * no guarantee anyone will kick the queue.  Kick it
-> +		 * ourselves.
->   		 */
-
-Please keep the original comment. To me the new comment seems less clear
-than the existing comment.
-
-> +static int __blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
-> +{
-> +	unsigned int max_dispatch;
-> +	struct sched_dispatch_ctx ctx = {
-> +		.hctx	= hctx,
-> +		.q	= hctx->queue,
-> +		.e	= hctx->queue->elevator,
-> +	};
-> +
-> +	INIT_LIST_HEAD(&ctx.rq_list);
-
-Please remove the INIT_LIST_HEAD() invocation and add the following in
-the ctx declaration:
-
-	.rq_list = LIST_HEAD_INIT(ctx.rq_list),
-
-This is a common pattern in kernel code. The following grep command
-yields about 200 results:
-
-$ git grep -nH '= LIST_HEAD_INIT.*\.'
-
-Otherwise this patch looks good to me.
-
-Thanks,
-
-Bart.
