@@ -1,97 +1,94 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEA7D1D5AC6;
-	Wed, 30 Jul 2025 08:03:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96DEF7E1
+	for <linux-block@vger.kernel.org>; Wed, 30 Jul 2025 08:18:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753862604; cv=none; b=jviImF74GiapGvAs8Fbapl946Bu0iEPZrGXJyXynQc1ZDe2X8WjXZCoA5Ozd+Nzy3mdj5QsQ0mgN9ugmyBjvgKsoSe32mqgagapsV9vpz06yi4JX1NH9bCe9f04aqMqB7qFBH/xUpB/9FByPulWMX1Axk2SaFX4zf6+qy6kzm/Y=
+	t=1753863530; cv=none; b=E1fYsRQZCRRGQwXS/LoXTwlMJmosE1QXEc+ym1EiZRff0dlpzyWVwPuV1/nkMdtl2Knymz0mIImGHKWwGuqjTESoJksUDuwbUyLO/FoG5GYxs8GPCQURvlbEj03+sRDwK2ip64uj4OXUYlRwd7R4RVB7svySGGi/NyeLDo5BQzA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753862604; c=relaxed/simple;
-	bh=HEgPRodovJalgZ/g1kb94tmKLk2QtGEpj7zW37uzKec=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Peyl2xsLGon5YcrfgY8l/khWyYWW5Rd71BduZ4ixczHnGave63Dd5jd6a8sHk3se5KzCpOOklZrX6r3gM1OhDa3XMQaH+HDTDs6z0FluAiEfBlgym4iXBGouTqugX+t2UokHhfvGUQclmhTjQBNyiM5WYKqHMdcCLHOvZPEhq6M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Phq6ne8j; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1753863530; c=relaxed/simple;
+	bh=B5lxFhaGaMXGrKRTN2QNOQqTV02ZxORGFe9DocZYyjo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
+	 Content-Type:References; b=JszuYOBIn3qjNkQ3cHhlh0k1/Nzvjhg50xWmyAxzHL+zZmqlnsu5CeXMo7hFIOHq2Fxmc67PNiKZE5vV7x1LdvXZrFQmf1LT2YegWIQXOchbxZJyMDwKHcbxcVbWxqQe70TqtwNB/nY9w6T4G/yZGffNLzFZ3/0sW1LFGgYdT2A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=jJ/roB/E; arc=none smtp.client-ip=203.254.224.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Phq6ne8j"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C439C4CEE7;
-	Wed, 30 Jul 2025 08:03:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753862603;
-	bh=HEgPRodovJalgZ/g1kb94tmKLk2QtGEpj7zW37uzKec=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Phq6ne8jeiHRh+g/jyaIbVu24BslXtOFr5jlNeVkeq5Pd4JP4IP/urevgfTH7y8Ng
-	 IM4N1EVTTw6lIyVWLMQ5K0tdY5QpmQj79Qaao8gIoOMRohyP/vZ3M9ekEqXib6GZL+
-	 Vd2t51G/uWQd6oD58QoSzV0VWLuJ8QqSIDQStXuXWQ5G8gEHsTZDXx81LTTpzH1daZ
-	 ezVZXuukAwl9TGk23btBxOterY1GjPt8BN4i8ULPTxzKhdnMZ1IhejtxHnXHMC5Wo6
-	 rXCmw6UrvY7ectigm1BvmYyiZfOF9dlvJf0mlr92yHUxxT/i06Xv2nhdtuZ9olDn3p
-	 c3RNuuUGIqBAg==
-Date: Wed, 30 Jul 2025 11:03:17 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Logan Gunthorpe <logang@deltatee.com>
-Cc: Jason Gunthorpe <jgg@nvidia.com>, Christoph Hellwig <hch@lst.de>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
-	Jens Axboe <axboe@kernel.dk>,
-	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-	Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-	linaro-mm-sig@lists.linaro.org, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
-	linux-mm@kvack.org, linux-pci@vger.kernel.org,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Vivek Kasireddy <vivek.kasireddy@intel.com>,
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH 05/10] PCI/P2PDMA: Export pci_p2pdma_map_type() function
-Message-ID: <20250730080317.GO402218@unreal>
-References: <82e62eb59afcd39b68ae143573d5ed113a92344e.1753274085.git.leonro@nvidia.com>
- <20250724080313.GA31887@lst.de>
- <20250724081321.GT402218@unreal>
- <b32ae619-6c4a-46fc-a368-6ad4e245d581@deltatee.com>
- <20250727190514.GG7551@nvidia.com>
- <d69e0d74-285e-4cde-a2e4-a803accfa9e1@deltatee.com>
- <20250728164136.GD402218@unreal>
- <d3c8c573-f201-4450-9400-cc3ccafd2c04@deltatee.com>
- <20250728231107.GE36037@nvidia.com>
- <f332e2b9-151f-49ca-ac0c-8c9494c38027@deltatee.com>
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="jJ/roB/E"
+Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
+	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20250730081846epoutp02770763b1d98d7f11e54d462b7e75c305~W_ZW_MqHO2728927289epoutp02-
+	for <linux-block@vger.kernel.org>; Wed, 30 Jul 2025 08:18:46 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20250730081846epoutp02770763b1d98d7f11e54d462b7e75c305~W_ZW_MqHO2728927289epoutp02-
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1753863526;
+	bh=7tle2Ig+xZHeUculCrMm8JZ5XDdMkIORqRSnHOVg2S0=;
+	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
+	b=jJ/roB/EsMLARdVD7r/oQ562VpNqF7CVvwwJc795ct3/1WjfyvjolcUUyTNrzc4v7
+	 OkDS2Eas0HGjVqot64C4yT57iQTs+jXuEszV94pCNc2gpV4ZgRk4j4HyUChwjlyOE0
+	 qmG2bM0c7oFoWRrIxQpBsC99eHMIy5pXIJHkTL0s=
+Received: from epsnrtp01.localdomain (unknown [182.195.42.153]) by
+	epcas5p1.samsung.com (KnoxPortal) with ESMTPS id
+	20250730081845epcas5p1e6b259e8081b9a35240d0933d5634c71~W_ZWFR2_d0760807608epcas5p1b;
+	Wed, 30 Jul 2025 08:18:45 +0000 (GMT)
+Received: from epcas5p3.samsung.com (unknown [182.195.38.90]) by
+	epsnrtp01.localdomain (Postfix) with ESMTP id 4bsQ8h5lWqz6B9mS; Wed, 30 Jul
+	2025 08:18:44 +0000 (GMT)
+Received: from epsmtip1.samsung.com (unknown [182.195.34.30]) by
+	epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
+	20250730081844epcas5p1abca54e976cf9ab4f116c71b99a7a132~W_ZVGjnDE0760807608epcas5p1Z;
+	Wed, 30 Jul 2025 08:18:44 +0000 (GMT)
+Received: from [107.122.11.51] (unknown [107.122.11.51]) by
+	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20250730081843epsmtip1dec56cd22af8d06770003f4a91ba7673~W_ZUKBPTk2278222782epsmtip1R;
+	Wed, 30 Jul 2025 08:18:43 +0000 (GMT)
+Message-ID: <09c06697-dd77-47bb-85c5-fd64e75c7968@samsung.com>
+Date: Wed, 30 Jul 2025 13:48:42 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f332e2b9-151f-49ca-ac0c-8c9494c38027@deltatee.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCHv3 1/7] blk-mq: introduce blk_map_iter
+To: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org, hch@lst.de
+Cc: axboe@kernel.dk, leonro@nvidia.com, Keith Busch <kbusch@kernel.org>
+Content-Language: en-US
+From: Kanchan Joshi <joshi.k@samsung.com>
+In-Reply-To: <20250729143442.2586575-2-kbusch@meta.com>
+Content-Transfer-Encoding: 7bit
+X-CMS-MailID: 20250730081844epcas5p1abca54e976cf9ab4f116c71b99a7a132
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+CMS-TYPE: 105P
+cpgsPolicy: CPGSC10-542,Y
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20250729143610epcas5p114f07bbd8e9c27280e6ebd67b1afd47f
+References: <20250729143442.2586575-1-kbusch@meta.com>
+	<CGME20250729143610epcas5p114f07bbd8e9c27280e6ebd67b1afd47f@epcas5p1.samsung.com>
+	<20250729143442.2586575-2-kbusch@meta.com>
 
-On Tue, Jul 29, 2025 at 02:54:13PM -0600, Logan Gunthorpe wrote:
-> 
-> 
-> On 2025-07-28 17:11, Jason Gunthorpe wrote:
-> >> If the dma mapping for P2P memory doesn't need to create an iommu
-> >> mapping then that's fine. But it should be the dma-iommu layer to decide
-> >> that.
-> > 
-> > So above, we can't use dma-iommu.c, it might not be compiled into the
-> > kernel but the dma_map_phys() path is still valid.
-> 
-> This is an easily solved problem. I did a very rough sketch below to say
-> it's really not that hard. (Note it has some rough edges that could be
-> cleaned up and I based it off Leon's git repo which appears to not be
-> the same as what was posted, but the core concept is sound).
+On 7/29/2025 8:04 PM, Keith Busch wrote:
+> @@ -39,12 +33,11 @@ static bool blk_map_iter_next(struct request *req, struct req_iterator *iter,
+>   	 * one could be merged into it.  This typically happens when moving to
+>   	 * the next bio, but some callers also don't pack bvecs tight.
+>   	 */
+> -	while (!iter->iter.bi_size || !iter->iter.bi_bvec_done) {
+> +	while (!iter->iter.bi_size ||
+> +	       (!iter->iter.bi_bvec_done && iter->bio->bi_next)) {
+>   		struct bio_vec next;
+>   
+>   		if (!iter->iter.bi_size) {
+> -			if (!iter->bio->bi_next)
+> -				break;
+>   			iter->bio = iter->bio->bi_next;
+>   			iter->iter = iter->bio->bi_iter;
 
-I started to prepare v2, this is why posted version is slightly
-different from dmabuf-vfio branch.
+This can crash here if we come inside the loop because 
+iter->iter.bi_size is 0
+and if this is the last bio i.e., iter->bio->bi_next is NULL?
 
-In addition to what Jason wrote. there is an extra complexity with using
-state. The wrappers which operate on dma_iova_state assume that all memory,
-which is going to be mapped, is the same type: or p2p or not.
 
-This is not the cased for HMM/RDMA users, there you create state in
-advance and get mixed type of pages.
 
-Thanks
