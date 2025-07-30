@@ -1,73 +1,81 @@
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0574924B26
-	for <linux-block@vger.kernel.org>; Wed, 30 Jul 2025 08:37:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 733841D5AC6;
+	Wed, 30 Jul 2025 09:32:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753864627; cv=none; b=j/wHseT/Q2BztZDGzBKNB/ZxJxQmsPfCfx4r8qTHjWznj8MdR6cZbkB9Thla4kW7DYOY7bMmdqFlEqq/CU4cAtRLkNvs7DBNKGkHlo1TINCUjAAQvwHR4uK9xGaUWCG2ykKwDR6KYbngbuHTMklCe35cJcNW0SuADHE8fKZ7es4=
+	t=1753867941; cv=none; b=OCL9xLG4stSMrw3wBxnVDZ/UVwopXcDT1TqOOzG3+OScIh3daA4RS/2CdtibhaTtLxlRxt2I+cIuwIlAnrj0L8pTszcjRPCqn3LS393+vW4MSwax+DGI3XmRwZ4A7Q/JDPIRGki8IDujjJg5hXEsRrJ6ZZAct9FBtyccKDHgl1o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753864627; c=relaxed/simple;
-	bh=NkUOiRCCJLlWb7eUsmBdTQ2b3kyACzJhRlK8S3lG4C0=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=o5CPMwUjKTmWq/TEDgkn4R7vmpY2V/MJk/OyxgIDrMvLWqEiLIc78S2jdcpzYhx2Du5BlBGLON7pYQdl+1jbWQ5im45rALUIvefBSP3TubLS9+DT+Qr+GRGpBiRjOZd0J2oC1aFcaFY9OMXFX/qekdgIxr7fRSmDSiw9EcJ0NRs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-87c41047044so184696139f.3
-        for <linux-block@vger.kernel.org>; Wed, 30 Jul 2025 01:37:05 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753864625; x=1754469425;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EHawJtQ1MGRltb+5jXCTWQSQ/lIKowNfTpts49mnvYE=;
-        b=Kl3OTp4TOdIkahZj3VTGdVY8zxFu/BL8VXTJVQrKsY3dN94fepQTMAVKXSiiT5W471
-         PjOulH79xPQJb3Sx6claCwJ1j9y3c3cCWhGrN2HisiOvKmXDUND1NaTaDksA7u3sfcFa
-         qZy17nF/GabsJwQQviSCMOU+CJxBGTiBIQVEXHzjNYu4PxWUAoHwJeEeJC5SyFr+lKAs
-         EbugIW4oL9TfA4IwfeBx1hdWtkyyxLJ1l39dGu87il7PukwTMkWzE+ee7ezK+AEIBK5G
-         4yFcefj9NfXXbEEkW9s4oc8xhQ9Q0NUZpYQJpMKxZuj7sfMhfdBW82TyA1MCuZzr/DW6
-         kvFQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWvGys+gGJ84rGH49mQTWHzcPOU4Q9Rmd1FQpZlriJJ/SbrBvcn7C/KP7719DdVwQwHaoY85W6PiBkXfA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzbvxnqQlyAN0Uu+nciGVXlH3ogTS6iJ1lJcViAY+A/rBIHuNdo
-	O6GhIhUwqx7+2JituGD1SkX5mW+kPeV2h0cm5kOoNRs3K9L1qL11CE4HEs3/K6WfkRS8HpUt/Lq
-	gtbO0cRaicGT3yTdtFEyxoHi85HlCHOornWooPh3pEUFIDx3xqxFrVpTygV8=
-X-Google-Smtp-Source: AGHT+IHn7jUIMw81pbjrArBZNOmKvZBfVtYJhOLqBNdCKPEBye74nPONjr+15DWwZ1JzBUIdk74qVZbF88BPYUSRJd3glY27vmrR
+	s=arc-20240116; t=1753867941; c=relaxed/simple;
+	bh=4W4puONHgBcGHwoNV0CY3xma0bboz0RMz11XR/y9JNQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gxfu9Lc2X1BBXbid2aO32/1hbmawJS8Fv17vl5f5u2d2hcge84XIraU8CHirLywwLbgqHzp1IqUGsmoKxXybA/nqkc+vPnOI1x46w/nvAY57d+KfcwIY8txgPo2jM0TFoFRskLIUiN24E3Ba7nOvzk4FxLmY5d3vI2OkTEwQo1A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=re3qBfXG; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="re3qBfXG"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B5ABC4CEE7;
+	Wed, 30 Jul 2025 09:32:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753867941;
+	bh=4W4puONHgBcGHwoNV0CY3xma0bboz0RMz11XR/y9JNQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=re3qBfXG4XyZtA/RqPxafo444qv+5COTZZvAJcsIAudJvNJ5GRUrGxzmLMht7qn04
+	 hwCyO3Hzt2ruEpZEzwjjG5TqM57jCt7NS/wTLq9A4i30flu1luxSTT3gmO7ssNsvS2
+	 Lb5pXFUz6XiBnwlYG8HhanlHIjmJFWfrePje/Dln8nbnfZZITOpG3X+Mc4VYGCgMtY
+	 LtRFBtuou9BEeShW+H/gLAcqTOk0FFSJQaVIa0Z6ohVZeUE9/L2qylX3UiuRgQ91sw
+	 bEWg/OKcbPZyTRB/9hC19ZqDyhbFiEikEPzuwYdJ2SVd4jtrfVeKeJap5nBj7dN4c4
+	 1MrJJzfkPtKTQ==
+Date: Wed, 30 Jul 2025 12:32:15 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Robin Murphy <robin.murphy@arm.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
+	Jens Axboe <axboe@kernel.dk>,
+	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+	Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+	linaro-mm-sig@lists.linaro.org, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
+	linux-mm@kvack.org, linux-pci@vger.kernel.org,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Vivek Kasireddy <vivek.kasireddy@intel.com>,
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH 10/10] vfio/pci: Add dma-buf export support for MMIO
+ regions
+Message-ID: <20250730093215.GP402218@unreal>
+References: <cover.1753274085.git.leonro@nvidia.com>
+ <aea452cc27ca9e5169f7279d7b524190c39e7260.1753274085.git.leonro@nvidia.com>
+ <8f912671-f1d9-4f73-9c1d-e39938bfc09f@arm.com>
+ <20250729201351.GA82395@nvidia.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6602:7409:b0:873:47c7:6ff3 with SMTP id
- ca18e2360f4ac-8813771b53dmr493966739f.7.1753864625258; Wed, 30 Jul 2025
- 01:37:05 -0700 (PDT)
-Date: Wed, 30 Jul 2025 01:37:05 -0700
-In-Reply-To: <20250730055126.114185-1-contact@arnaud-lcm.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6889d9b1.050a0220.5d226.0005.GAE@google.com>
-Subject: Re: [syzbot] [fuse?] [block?] KASAN: slab-use-after-free Read in disk_add_events
-From: syzbot <syzbot+fa3a12519f0d3fd4ec16@syzkaller.appspotmail.com>
-To: contact@arnaud-lcm.com, linux-block@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250729201351.GA82395@nvidia.com>
 
-Hello,
+On Tue, Jul 29, 2025 at 05:13:51PM -0300, Jason Gunthorpe wrote:
+> On Tue, Jul 29, 2025 at 08:44:21PM +0100, Robin Murphy wrote:
+> 
+> > In this case with just one single
+> > contiguous mapping, it is clearly objectively worse to have to bounce in and
+> > out of the IOMMU layer 3 separate times and store a dma_map_state,
+> 
+> The non-contiguous mappings are comming back, it was in earlier drafts
+> of this. Regardless, the point is to show how to use the general API
+> that we would want to bring into the DRM drivers that don't have
+> contiguity even though VFIO is a bit special.
 
-syzbot has tested the proposed patch and the reproducer did not trigger any issue:
+Yes, we will see comeback of DMA ranges in v2.
 
-Reported-by: syzbot+fa3a12519f0d3fd4ec16@syzkaller.appspotmail.com
-Tested-by: syzbot+fa3a12519f0d3fd4ec16@syzkaller.appspotmail.com
-
-Tested on:
-
-commit:         4b290aae Merge tag 'sysctl-6.17-rc1' of git://git.kern..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=10908834580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=295b41325f4e1bab
-dashboard link: https://syzkaller.appspot.com/bug?extid=fa3a12519f0d3fd4ec16
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-patch:          https://syzkaller.appspot.com/x/patch.diff?x=15ac34a2580000
-
-Note: testing is done by a robot and is best-effort only.
+Thanks
