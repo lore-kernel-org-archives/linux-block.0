@@ -1,49 +1,27 @@
-Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from plesk.hostmyservers.fr (plesk.hostmyservers.fr [45.145.164.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 445E71E520A
-	for <linux-block@vger.kernel.org>; Wed, 30 Jul 2025 06:52:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2DA0BA33;
+	Wed, 30 Jul 2025 07:10:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.145.164.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753858371; cv=none; b=Ep4MIS7qkV7rwz9kwXXFNgB5g2r5DTV95hhzRLg6Jt7Ptn+qfQ61Iq3TiYqWpHlYX36T+J1Pxl4uhE64nmj/XfqqNdPBCrGM6IUZkIumBkYgGQdkLOc7Yz1//vJjY0nZolGTbXD45f1i9MsdHir3qQAmLJKcGAk0l6YBtePbZgo=
+	t=1753859433; cv=none; b=Z5QdSJHZD5Z7lXEO/P5bjHGj+hWiMel8/ae7IapwcNIe6GV+WJSjMH99x+onW0cPqo4boVPH1/+VwkiG916xOkRAwAsn7Zq7fl8F7uGIuX8ZjsMOGPOhWfz2IasspErbtA4DkJErAHImxfmJLue07lyzPtkfZXGcnTVKUg9Hr1w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753858371; c=relaxed/simple;
-	bh=j/z2j30d8C5e2ZnMvAlC/HdA2ADeZLA/zCIn4f13q6c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
-	 Content-Type:References; b=QopHGEnvxhcE4eESf2GJNA01mLgE6GHOY6mUcLmExl3Y4zp/gsanzVHGKGO6QRcvudATfavD55htpEkGesUui23qcEo0PSNn/9SUM7d3Pn1iuyF4u3OqzkKuFxu+Wbt3dWck3KpLr/Xh7B6ft36/7j6sbEvpkxJfTkp19btkogE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=m03oskIS; arc=none smtp.client-ip=203.254.224.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="m03oskIS"
-Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
-	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20250730065244epoutp02e7faac4504368c135c23b5086983c13d~W9OP-SJlP0274002740epoutp02k
-	for <linux-block@vger.kernel.org>; Wed, 30 Jul 2025 06:52:44 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20250730065244epoutp02e7faac4504368c135c23b5086983c13d~W9OP-SJlP0274002740epoutp02k
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1753858365;
-	bh=wCAvDXDelKt6cfEkBOtN1pGCZsc+ckqH5BOvF+vS/88=;
-	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
-	b=m03oskISCQSfZyTDk5FUTra8Oa1Ojx0QBCqv7roEI0m7if/CxY2mg4nxZ0jPd7Gh4
-	 lCl6LMblt6/kRt+OCPnG3Et4F/qXMs5aSFEUiBurPFWnocOJCXAvOgemm9Qn4VZ+XT
-	 0AB7JB38uHxE76RorrVA+oCbV0Akqdm7QGJM2mgo=
-Received: from epsnrtp02.localdomain (unknown [182.195.42.154]) by
-	epcas5p1.samsung.com (KnoxPortal) with ESMTPS id
-	20250730065244epcas5p16535b56a459c7e04df9452aa5051e495~W9OPmQ7ME0097500975epcas5p1t;
-	Wed, 30 Jul 2025 06:52:44 +0000 (GMT)
-Received: from epcas5p4.samsung.com (unknown [182.195.38.86]) by
-	epsnrtp02.localdomain (Postfix) with ESMTP id 4bsNFS0yn7z2SSKn; Wed, 30 Jul
-	2025 06:52:44 +0000 (GMT)
-Received: from epsmtip2.samsung.com (unknown [182.195.34.31]) by
-	epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
-	20250730065243epcas5p3750a9faae68daf85b1259ed2cbf0926f~W9OOdDWyt2796927969epcas5p3z;
-	Wed, 30 Jul 2025 06:52:43 +0000 (GMT)
-Received: from [107.122.11.51] (unknown [107.122.11.51]) by
-	epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20250730065242epsmtip2fa26c948125d1721c0ff4b363b1da96e~W9ONe8Zme0229502295epsmtip2Y;
-	Wed, 30 Jul 2025 06:52:42 +0000 (GMT)
-Message-ID: <8b32b82b-095f-4f2c-9a21-b4cbbbca52c7@samsung.com>
-Date: Wed, 30 Jul 2025 12:22:41 +0530
+	s=arc-20240116; t=1753859433; c=relaxed/simple;
+	bh=AYXgVU+NUpq51qEoouH9W91fgq+DWPYCXeIQaUhV9mk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qM/IF6f1WNxQ9sKMdoqo/RC0Cd/ukjmhj6c3gci/QCzbkNHnbmCdya4xkgN++iXzBEvXmctnVKNlZZziNYoUtBql0z5FZVzB7z4CZa1MxnRkSZAuP/hunS59gUwOs1wL5THaRAwcOhzNxsTHtH1dbBLPuw1Ipio8iX95iVevPTQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=arnaud-lcm.com; spf=pass smtp.mailfrom=arnaud-lcm.com; arc=none smtp.client-ip=45.145.164.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=arnaud-lcm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arnaud-lcm.com
+Received: from [IPV6:2a02:8084:255b:aa00:1726:a1d9:9a49:d971] (unknown [IPv6:2a02:8084:255b:aa00:1726:a1d9:9a49:d971])
+	by plesk.hostmyservers.fr (Postfix) with ESMTPSA id 7F9F6410A7;
+	Wed, 30 Jul 2025 07:10:28 +0000 (UTC)
+Authentication-Results: Plesk;
+        spf=pass (sender IP is 2a02:8084:255b:aa00:1726:a1d9:9a49:d971) smtp.mailfrom=contact@arnaud-lcm.com smtp.helo=[IPV6:2a02:8084:255b:aa00:1726:a1d9:9a49:d971]
+Received-SPF: pass (Plesk: connection is authenticated)
+Message-ID: <b3310f8e-3e71-42d2-a4f6-1df2c2d294c1@arnaud-lcm.com>
+Date: Wed, 30 Jul 2025 08:10:27 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -51,33 +29,63 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv3 1/7] blk-mq: introduce blk_map_iter
-To: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org, hch@lst.de
-Cc: axboe@kernel.dk, leonro@nvidia.com, Keith Busch <kbusch@kernel.org>
+Subject: Re: syztest
+To: Yu Kuai <yukuai1@huaweicloud.com>,
+ syzbot+fa3a12519f0d3fd4ec16@syzkaller.appspotmail.com
+Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
+ "yukuai (C)" <yukuai3@huawei.com>
+References: <68894408.a00a0220.26d0e1.0013.GAE@google.com>
+ <20250730055126.114185-1-contact@arnaud-lcm.com>
+ <a166383d-a19a-deb4-e170-2350f8fdafd0@huaweicloud.com>
 Content-Language: en-US
-From: Kanchan Joshi <joshi.k@samsung.com>
-In-Reply-To: <20250729143442.2586575-2-kbusch@meta.com>
-Content-Transfer-Encoding: 7bit
-X-CMS-MailID: 20250730065243epcas5p3750a9faae68daf85b1259ed2cbf0926f
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-CMS-TYPE: 105P
-cpgsPolicy: CPGSC10-542,Y
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20250729143518epcas5p2938dfecb7c1596adfa1802d46c75a75a
-References: <20250729143442.2586575-1-kbusch@meta.com>
-	<CGME20250729143518epcas5p2938dfecb7c1596adfa1802d46c75a75a@epcas5p2.samsung.com>
-	<20250729143442.2586575-2-kbusch@meta.com>
+From: Arnaud Lecomte <contact@arnaud-lcm.com>
+In-Reply-To: <a166383d-a19a-deb4-e170-2350f8fdafd0@huaweicloud.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-PPP-Message-ID: <175385942907.4005.1019230276540793814@Plesk>
+X-PPP-Vhost: arnaud-lcm.com
 
-On 7/29/2025 8:04 PM, Keith Busch wrote:
-> -	iter->addr = dma_map_page(dma_dev, phys_to_page(vec->paddr),
-> -			offset_in_page(vec->paddr), vec->len, rq_dma_dir(req));
-> -	if (dma_mapping_error(dma_dev, iter->addr)) {
-> +	iter->addr = dma_map_page(dma_dev, phys_to_page(iter->iter.paddr),
-> +			offset_in_page(iter->iter.paddr), iter->iter.len,
-> +			rq_dma_dir(req));
-> +	if (dma_mapping_error(dma_dev, iter->iter.paddr)) {
 
-This should be
-dma_mapping_error(dma_dev, iter->addr).
+On 30/07/2025 07:09, Yu Kuai wrote:
+> Hi,
+>
+> 在 2025/07/30 13:51, Arnaud Lecomte 写道:
+>> #syz test
+>>
+>> --- a/drivers/md/md.c
+>> +++ b/drivers/md/md.c
+>> @@ -5978,10 +5978,6 @@ struct mddev *md_alloc(dev_t dev, char *name)
+>>         disk->events |= DISK_EVENT_MEDIA_CHANGE;
+>>       mddev->gendisk = disk;
+>> -    error = add_disk(disk);
+>> -    if (error)
+>> -        goto out_put_disk;
+>> -
+>>       kobject_init(&mddev->kobj, &md_ktype);
+>>       error = kobject_add(&mddev->kobj, &disk_to_dev(disk)->kobj, 
+>> "%s", "md");
+>
+> This is wrong, you can't add mddev >kobj under the disk without
+> kobject_add for the disk kobj.
+>
+Will dive a bit more into that after work,
+Thanks
+
+> Thanks,
+> Kuai
+>
+>>       if (error) {
+>> @@ -5999,6 +5995,9 @@ struct mddev *md_alloc(dev_t dev, char *name)
+>>       kobject_uevent(&mddev->kobj, KOBJ_ADD);
+>>       mddev->sysfs_state = sysfs_get_dirent_safe(mddev->kobj.sd, 
+>> "array_state");
+>>       mddev->sysfs_level = sysfs_get_dirent_safe(mddev->kobj.sd, 
+>> "level");
+>> +    error = add_disk(disk);
+>> +    if (error)
+>> +        goto out_put_disk;
+>>       mutex_unlock(&disks_mutex);
+>>       return mddev;
+>>
+>
