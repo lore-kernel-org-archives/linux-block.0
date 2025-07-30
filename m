@@ -1,94 +1,180 @@
-Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96DEF7E1
-	for <linux-block@vger.kernel.org>; Wed, 30 Jul 2025 08:18:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15EF9292B43;
+	Wed, 30 Jul 2025 08:29:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753863530; cv=none; b=E1fYsRQZCRRGQwXS/LoXTwlMJmosE1QXEc+ym1EiZRff0dlpzyWVwPuV1/nkMdtl2Knymz0mIImGHKWwGuqjTESoJksUDuwbUyLO/FoG5GYxs8GPCQURvlbEj03+sRDwK2ip64uj4OXUYlRwd7R4RVB7svySGGi/NyeLDo5BQzA=
+	t=1753864144; cv=none; b=UfIhxd2of0gn+3RHll+vfz8nlhmTdqOkDjyYQwEyvnAsbxOusljnTPu4ohGIbt/o5glP9/sX25BUTdC+1ztnjCV7sN3fybHyIQYAXVfY0LLW3Y5E6hMNaiQ/mE0ywAUaBID2Wd3KRgDPVQ1HhsTsfAX4jHq4z4HflbEsn6RRJRs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753863530; c=relaxed/simple;
-	bh=B5lxFhaGaMXGrKRTN2QNOQqTV02ZxORGFe9DocZYyjo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
-	 Content-Type:References; b=JszuYOBIn3qjNkQ3cHhlh0k1/Nzvjhg50xWmyAxzHL+zZmqlnsu5CeXMo7hFIOHq2Fxmc67PNiKZE5vV7x1LdvXZrFQmf1LT2YegWIQXOchbxZJyMDwKHcbxcVbWxqQe70TqtwNB/nY9w6T4G/yZGffNLzFZ3/0sW1LFGgYdT2A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=jJ/roB/E; arc=none smtp.client-ip=203.254.224.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="jJ/roB/E"
-Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
-	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20250730081846epoutp02770763b1d98d7f11e54d462b7e75c305~W_ZW_MqHO2728927289epoutp02-
-	for <linux-block@vger.kernel.org>; Wed, 30 Jul 2025 08:18:46 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20250730081846epoutp02770763b1d98d7f11e54d462b7e75c305~W_ZW_MqHO2728927289epoutp02-
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1753863526;
-	bh=7tle2Ig+xZHeUculCrMm8JZ5XDdMkIORqRSnHOVg2S0=;
-	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
-	b=jJ/roB/EsMLARdVD7r/oQ562VpNqF7CVvwwJc795ct3/1WjfyvjolcUUyTNrzc4v7
-	 OkDS2Eas0HGjVqot64C4yT57iQTs+jXuEszV94pCNc2gpV4ZgRk4j4HyUChwjlyOE0
-	 qmG2bM0c7oFoWRrIxQpBsC99eHMIy5pXIJHkTL0s=
-Received: from epsnrtp01.localdomain (unknown [182.195.42.153]) by
-	epcas5p1.samsung.com (KnoxPortal) with ESMTPS id
-	20250730081845epcas5p1e6b259e8081b9a35240d0933d5634c71~W_ZWFR2_d0760807608epcas5p1b;
-	Wed, 30 Jul 2025 08:18:45 +0000 (GMT)
-Received: from epcas5p3.samsung.com (unknown [182.195.38.90]) by
-	epsnrtp01.localdomain (Postfix) with ESMTP id 4bsQ8h5lWqz6B9mS; Wed, 30 Jul
-	2025 08:18:44 +0000 (GMT)
-Received: from epsmtip1.samsung.com (unknown [182.195.34.30]) by
-	epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
-	20250730081844epcas5p1abca54e976cf9ab4f116c71b99a7a132~W_ZVGjnDE0760807608epcas5p1Z;
-	Wed, 30 Jul 2025 08:18:44 +0000 (GMT)
-Received: from [107.122.11.51] (unknown [107.122.11.51]) by
-	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
-	20250730081843epsmtip1dec56cd22af8d06770003f4a91ba7673~W_ZUKBPTk2278222782epsmtip1R;
-	Wed, 30 Jul 2025 08:18:43 +0000 (GMT)
-Message-ID: <09c06697-dd77-47bb-85c5-fd64e75c7968@samsung.com>
-Date: Wed, 30 Jul 2025 13:48:42 +0530
+	s=arc-20240116; t=1753864144; c=relaxed/simple;
+	bh=tFNZP/sFwuWDQj8EkBPFt3c6SYzQt4ofWGQ0udUkyVs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=rn2BMnfe1qmG7Pyg2+lqVYNnj35uGim9phL5qbEjMWmLu7BMcKeSpEKSfTO7fnvLV+99MehPisq7DqFq9Md7tgSpeHjrYa3f8P051U0KJ3p3g1sQCnPncKPQnKBJv+jY6/A+MuXmCtciEi8/ovYSbcQglln6u3nXp30uUxkYm7c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4bsQNX1rVdzKHMxX;
+	Wed, 30 Jul 2025 16:29:00 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 226B11A0AA0;
+	Wed, 30 Jul 2025 16:28:59 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+	by APP4 (Coremail) with SMTP id gCh0CgAXkxPI14lokcLlBw--.17899S4;
+	Wed, 30 Jul 2025 16:28:58 +0800 (CST)
+From: Yu Kuai <yukuai1@huaweicloud.com>
+To: dlemoal@kernel.org,
+	hare@suse.de,
+	jack@suse.cz,
+	tj@kernel.org,
+	josef@toxicpanda.com,
+	axboe@kernel.dk,
+	yukuai3@huawei.com
+Cc: cgroups@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	yukuai1@huaweicloud.com,
+	yi.zhang@huawei.com,
+	yangerkun@huawei.com,
+	johnny.chenyi@huawei.com
+Subject: [PATCH v2 0/5] blk-mq-sched: support request batch dispatching for sq elevator
+Date: Wed, 30 Jul 2025 16:22:02 +0800
+Message-Id: <20250730082207.4031744-1-yukuai1@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv3 1/7] blk-mq: introduce blk_map_iter
-To: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org, hch@lst.de
-Cc: axboe@kernel.dk, leonro@nvidia.com, Keith Busch <kbusch@kernel.org>
-Content-Language: en-US
-From: Kanchan Joshi <joshi.k@samsung.com>
-In-Reply-To: <20250729143442.2586575-2-kbusch@meta.com>
-Content-Transfer-Encoding: 7bit
-X-CMS-MailID: 20250730081844epcas5p1abca54e976cf9ab4f116c71b99a7a132
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-CMS-TYPE: 105P
-cpgsPolicy: CPGSC10-542,Y
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20250729143610epcas5p114f07bbd8e9c27280e6ebd67b1afd47f
-References: <20250729143442.2586575-1-kbusch@meta.com>
-	<CGME20250729143610epcas5p114f07bbd8e9c27280e6ebd67b1afd47f@epcas5p1.samsung.com>
-	<20250729143442.2586575-2-kbusch@meta.com>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgAXkxPI14lokcLlBw--.17899S4
+X-Coremail-Antispam: 1UD129KBjvJXoWxXryfKr45ArW3uF4rJr43Wrg_yoW5AF45pF
+	WfGanIyF4DX3ZIqF93uw17Jw1rGw4xZry3Grnxtr4SqwnrAr17AFn5Ja48ZFW7AryfWFsr
+	Wr1qqrykWa4UWaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9Y14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
+	Y2ka0xkIwI1lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x
+	0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2
+	zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF
+	4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWU
+	CwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCT
+	nIWIevJa73UjIFyTuYvjfUonmRUUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On 7/29/2025 8:04 PM, Keith Busch wrote:
-> @@ -39,12 +33,11 @@ static bool blk_map_iter_next(struct request *req, struct req_iterator *iter,
->   	 * one could be merged into it.  This typically happens when moving to
->   	 * the next bio, but some callers also don't pack bvecs tight.
->   	 */
-> -	while (!iter->iter.bi_size || !iter->iter.bi_bvec_done) {
-> +	while (!iter->iter.bi_size ||
-> +	       (!iter->iter.bi_bvec_done && iter->bio->bi_next)) {
->   		struct bio_vec next;
->   
->   		if (!iter->iter.bi_size) {
-> -			if (!iter->bio->bi_next)
-> -				break;
->   			iter->bio = iter->bio->bi_next;
->   			iter->iter = iter->bio->bi_iter;
+From: Yu Kuai <yukuai3@huawei.com>
 
-This can crash here if we come inside the loop because 
-iter->iter.bi_size is 0
-and if this is the last bio i.e., iter->bio->bi_next is NULL?
+Changes from v1:
+ - the ioc changes are send separately;
+ - change the patch 1-3 order as suggested by Damien;
 
+Currently, both mq-deadline and bfq have global spin lock that will be
+grabbed inside elevator methods like dispatch_request, insert_requests,
+and bio_merge. And the global lock is the main reason mq-deadline and
+bfq can't scale very well.
 
+For dispatch_request method, current behavior is dispatching one request at
+a time. In the case of multiple dispatching contexts, This behavior, on the
+one hand, introduce intense lock contention:
+
+t1:                     t2:                     t3:
+lock                    lock                    lock
+// grab lock
+ops.dispatch_request
+unlock
+                        // grab lock
+                        ops.dispatch_request
+                        unlock
+                                                // grab lock
+                                                ops.dispatch_request
+                                                unlock
+
+on the other hand, messing up the requests dispatching order:
+t1:
+
+lock
+rq1 = ops.dispatch_request
+unlock
+                        t2:
+                        lock
+                        rq2 = ops.dispatch_request
+                        unlock
+
+lock
+rq3 = ops.dispatch_request
+unlock
+
+                        lock
+                        rq4 = ops.dispatch_request
+                        unlock
+
+//rq1,rq3 issue to disk
+                        // rq2, rq4 issue to disk
+
+In this case, the elevator dispatch order is rq 1-2-3-4, however,
+such order in disk is rq 1-3-2-4, the order for rq2 and rq3 is inversed.
+
+While dispatching request, blk_mq_get_disatpch_budget() and
+blk_mq_get_driver_tag() must be called, and they are not ready to be
+called inside elevator methods, hence introduce a new method like
+dispatch_requests is not possible.
+
+In conclusion, this set factor the global lock out of dispatch_request
+method, and support request batch dispatch by calling the methods
+multiple time while holding the lock.
+
+nullblk setup:
+modprobe null_blk nr_devices=0 &&
+    udevadm settle &&
+    cd /sys/kernel/config/nullb &&
+    mkdir nullb0 &&
+    cd nullb0 &&
+    echo 0 > completion_nsec &&
+    echo 512 > blocksize &&
+    echo 0 > home_node &&
+    echo 0 > irqmode &&
+    echo 128 > submit_queues &&
+    echo 1024 > hw_queue_depth &&
+    echo 1024 > size &&
+    echo 0 > memory_backed &&
+    echo 2 > queue_mode &&
+    echo 1 > power ||
+    exit $?
+
+Test script:
+fio -filename=/dev/$disk -name=test -rw=randwrite -bs=4k -iodepth=32 \
+  -numjobs=16 --iodepth_batch_submit=8 --iodepth_batch_complete=8 \
+  -direct=1 -ioengine=io_uring -group_reporting -time_based -runtime=30
+
+Test result: iops
+
+|                 | deadline | bfq      |
+| --------------- | -------- | -------- |
+| before this set | 263k     | 124k     |
+| after this set  | 475k     | 292k     |
+
+Yu Kuai (5):
+  blk-mq-sched: introduce high level elevator lock
+  mq-deadline: switch to use elevator lock
+  block, bfq: switch to use elevator lock
+  blk-mq-sched: refactor __blk_mq_do_dispatch_sched()
+  blk-mq-sched: support request batch dispatching for sq elevator
+
+ block/bfq-cgroup.c   |   4 +-
+ block/bfq-iosched.c  |  49 +++++----
+ block/bfq-iosched.h  |   2 +-
+ block/blk-mq-sched.c | 241 ++++++++++++++++++++++++++++++-------------
+ block/blk-mq.h       |  21 ++++
+ block/elevator.c     |   1 +
+ block/elevator.h     |   4 +-
+ block/mq-deadline.c  |  58 +++++------
+ 8 files changed, 248 insertions(+), 132 deletions(-)
+
+-- 
+2.39.2
 
