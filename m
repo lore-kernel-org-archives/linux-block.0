@@ -1,172 +1,109 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35649A923;
-	Thu, 31 Jul 2025 06:32:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29AB32E406
+	for <linux-block@vger.kernel.org>; Thu, 31 Jul 2025 06:50:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753943581; cv=none; b=AdBN2W0WYfPlkd9XviTP7cI/eFW3E6oLV5Ic2N5blsa2REaxtf2ZNMEhVYKCHYlXpvEzLNwVKad0wrbcA4kVClEkebOnJ29PsmgjcG5VHWZAGeW+zFk8p5liZEBFR4LHj8I+5tTT1Lm1bpPLWmR+qpLwjPiby0qjqEcq2m3CA+M=
+	t=1753944658; cv=none; b=o+oPeGnGHcAHTHDZkGkCJ6IjXxbduLjU23E5kQCaezqJeXIS1RvN5tE8rMCt/cTNKC//av5ZXuH2Q2XLHl6tBiKlPQNkZfDr3bFfyjvhSygqiHbaL2JGfjwAiOkRi/splaihRR/Qg4yrVmn+xmD/khphIkL/0mZtOj5Pbm14/Bo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753943581; c=relaxed/simple;
-	bh=1beu/q288JAp9eAQhyeV+BNd9z1UK5kDh2aL43n7ynY=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=aTXr+WeIl1ULR/eilP1fDTjbQUvugEVrfrxEv95hon8CzLTslWFwayZSQmQAF7SNxC2tXr0RIZ/Ak8s/M4BjavnTogEpfAqRHYvFFK5xJTlfG0yrNAYK9Vb+8YwGGbz9HybuDh4PMwDwq2XmKsZGNRKsmvRIguZuayCJ9ZuNb/w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4bszm35xNLzYQv37;
-	Thu, 31 Jul 2025 14:32:51 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 7E03D1A06E6;
-	Thu, 31 Jul 2025 14:32:50 +0800 (CST)
-Received: from [10.174.179.143] (unknown [10.174.179.143])
-	by APP4 (Coremail) with SMTP id gCh0CgDHjxAQDoto9FxMCA--.61828S3;
-	Thu, 31 Jul 2025 14:32:50 +0800 (CST)
-Subject: Re: [PATCH v2 2/5] mq-deadline: switch to use elevator lock
-To: Damien Le Moal <dlemoal@kernel.org>, Hannes Reinecke <hare@suse.de>,
- Yu Kuai <yukuai1@huaweicloud.com>, jack@suse.cz, tj@kernel.org,
- josef@toxicpanda.com, axboe@kernel.dk
-Cc: cgroups@vger.kernel.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, yi.zhang@huawei.com, yangerkun@huawei.com,
- johnny.chenyi@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
-References: <20250730082207.4031744-1-yukuai1@huaweicloud.com>
- <20250730082207.4031744-3-yukuai1@huaweicloud.com>
- <750643e5-9f24-4e4c-8270-e421a03cf463@suse.de>
- <226d1cd7-bd35-4773-8f1c-d03f9c870133@kernel.org>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <a3ce55a4-0756-bfe7-3606-296b78672104@huaweicloud.com>
-Date: Thu, 31 Jul 2025 14:32:48 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.1
+	s=arc-20240116; t=1753944658; c=relaxed/simple;
+	bh=F1koaQpG5RiYkmXLSaH32gPgQinIXivpSy8xeXHW5uA=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=b7aWepTecRq4VmDMLz9r5phgLEc2EI8BU0OcMa/GblSJiZpKn/p7H/jmW4hTjSrq6qk+t5sYPjxlZpyEFgdkTja/zeQYvS6ieQqaYXH+IDpmMqiT2lmx17kJdxnuQIRgoZ63mCosmXYmdvXy+GF8gdD/lHsi4W2NEvFE+AIE/Us=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--richardycc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZKi5ftRr; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--richardycc.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZKi5ftRr"
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-313c3915345so1006817a91.3
+        for <linux-block@vger.kernel.org>; Wed, 30 Jul 2025 23:50:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1753944656; x=1754549456; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=eDJaxtMqe7fiyPuNTQg1qGmKmUg0reM6fAkK/O+G1w4=;
+        b=ZKi5ftRrFSMS0Xq4BzS6G2dirApUJHxzmxihdThRJjXGvxeCuT6vmliC2Qhxjml2Xu
+         xW1muFLDXVqOiq9IOpXxcB8v0lirI3IVp1wJj2XgeUs+tjyog6HKqwThbPAcfK7ZdWlV
+         e6GN5mlJL6utA9jmvYJ4DsGDJbyia4dp5t3sO/W/G9LsCHJimvYXvFaf1LKx7jtoPOUS
+         tPAoStK16paJ1f9n/So7/V8O3b7jjcrCrWCxo4uFLE7VnFMklJm81tkVecxqumA1hQmk
+         oNlQEvqDXZv1qqrCrHgaDKXjZZ+4AsEyA5GP9Yd3r0vSIMyQTTjiPoCdOrtyRJ0qykXm
+         cBpA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753944656; x=1754549456;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=eDJaxtMqe7fiyPuNTQg1qGmKmUg0reM6fAkK/O+G1w4=;
+        b=ZJNpSSnGgfKqhkgU+Jja4QnRxIVxeOf13q3JUeev1kWoa5Zj5CDn5tzTT7tewE5EHs
+         AQM85FslzBaLrE5mxID01uskVhJ+dLKrxBodYqgU7zIHPFpjIOFnm2o/UYOu78ap/p8i
+         2VmKzBghyOU5FMlCVpGLiv2XmxkYCuZYmpcSSedxW5RDzM/XiVpVZQQpC/4jfm5k4UH9
+         h+ToGJzpoSiCVczkkSnpwx60WCaADvjUw3ooiWBupunr6FyynOQv82W0O2JVLSngSDkJ
+         WQEG6nqdAn+b71g2ZAbyzRBdrUGTZ5EAylC/dIxc+/1hSeJoMIzbDpFfvZXV/+sHIF1W
+         QQOg==
+X-Forwarded-Encrypted: i=1; AJvYcCV/2RSPJZEoSuIxgc//RoHmbcdyqhoP2FQNfD+gX+riqZ6Sx2jXNnf/0DpuMV40R2daUBvJgKJQbGgDjg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyKDpCnHT4fx38do95IOIN5Bq5v+q/FUF+dTtb/DYPSTKo+kUdk
+	PDEOikScqMAv1EsEF+Sitxv4Pus2mflL5Bs6Qa9RY8CsuJ8/THlLIkc0S/3caH/ku+u3Nh+yV8h
+	OYiBsZ26oBUJI6JPYktsD
+X-Google-Smtp-Source: AGHT+IFpIPWixJhTbrmE7dv0Cm0HofhpwRmbpRh4awsTGTBSBMeWjmf38aB3IMobKpTlhlDwGPSTmVR7kD9SQmQO
+X-Received: from pjbtb15.prod.google.com ([2002:a17:90b:53cf:b0:31f:26b:cc66])
+ (user=richardycc job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:90b:4a81:b0:31f:210d:2e56 with SMTP id 98e67ed59e1d1-31f5de557femr8853490a91.28.1753944656412;
+ Wed, 30 Jul 2025 23:50:56 -0700 (PDT)
+Date: Thu, 31 Jul 2025 06:49:46 +0000
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <226d1cd7-bd35-4773-8f1c-d03f9c870133@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgDHjxAQDoto9FxMCA--.61828S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxAFW5ZFyrtFy3Ar1xtry8AFb_yoWrur1fpr
-	4kKFW5JrWrJFn7Xr1DJFWUZryYqwsrJ347Jr1fXFW8JFW7XrnFgF1UXF1v9r1DAr4xGrn8
-	JF1UXrZxuFy7Jr7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBF14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
-	0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x
-	0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E
-	7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcV
-	C0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF
-	04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7
-	CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUd-B_UUUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.50.1.565.gc32cd1483b-goog
+Message-ID: <20250731064949.1690732-1-richardycc@google.com>
+Subject: [PATCH v2 0/3] zram: support asynchronous writeback
+From: Richard Chang <richardycc@google.com>
+To: Minchan Kim <minchan@kernel.org>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
+	Jens Axboe <axboe@kernel.dk>, Andrew Morton <akpm@linux-foundation.org>
+Cc: bgeffon@google.com, liumartin@google.com, linux-kernel@vger.kernel.org, 
+	linux-block@vger.kernel.org, linux-mm@kvack.org, 
+	Richard Chang <richardycc@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Hi,
+This patch series introduces asynchronous writeback to the zram module.
+By moving to an asynchronous model, we can perform writeback operations
+more efficiently.
 
-在 2025/07/31 14:22, Damien Le Moal 写道:
-> On 7/31/25 3:20 PM, Hannes Reinecke wrote:
->> On 7/30/25 10:22, Yu Kuai wrote:
->>> From: Yu Kuai <yukuai3@huawei.com>
->>>
->>> Replace the internal spinlock 'dd->lock' with the new spinlock in
->>> elevator_queue, there are no functional changes.
->>>
->>> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
->>> ---
->>>    block/mq-deadline.c | 58 +++++++++++++++++++++------------------------
->>>    1 file changed, 27 insertions(+), 31 deletions(-)
->>>
->>> diff --git a/block/mq-deadline.c b/block/mq-deadline.c
->>> index 9ab6c6256695..2054c023e855 100644
->>> --- a/block/mq-deadline.c
->>> +++ b/block/mq-deadline.c
->>> @@ -101,7 +101,7 @@ struct deadline_data {
->>>        u32 async_depth;
->>>        int prio_aging_expire;
->>>    -    spinlock_t lock;
->>> +    spinlock_t *lock;
->>>    };
->>>      /* Maps an I/O priority class to a deadline scheduler priority. */
->>> @@ -213,7 +213,7 @@ static void dd_merged_requests(struct request_queue *q,
->>> struct request *req,
->>>        const u8 ioprio_class = dd_rq_ioclass(next);
->>>        const enum dd_prio prio = ioprio_class_to_prio[ioprio_class];
->>>    -    lockdep_assert_held(&dd->lock);
->>> +    lockdep_assert_held(dd->lock);
->>>          dd->per_prio[prio].stats.merged++;
->>>    @@ -253,7 +253,7 @@ static u32 dd_queued(struct deadline_data *dd, enum
->>> dd_prio prio)
->>>    {
->>>        const struct io_stats_per_prio *stats = &dd->per_prio[prio].stats;
->>>    -    lockdep_assert_held(&dd->lock);
->>> +    lockdep_assert_held(dd->lock);
->>>          return stats->inserted - atomic_read(&stats->completed);
->>>    }
->>> @@ -323,7 +323,7 @@ static struct request *__dd_dispatch_request(struct
->>> deadline_data *dd,
->>>        enum dd_prio prio;
->>>        u8 ioprio_class;
->>>    -    lockdep_assert_held(&dd->lock);
->>> +    lockdep_assert_held(dd->lock);
->>>          if (!list_empty(&per_prio->dispatch)) {
->>>            rq = list_first_entry(&per_prio->dispatch, struct request,
->>> @@ -434,7 +434,7 @@ static struct request
->>> *dd_dispatch_prio_aged_requests(struct deadline_data *dd,
->>>        enum dd_prio prio;
->>>        int prio_cnt;
->>>    -    lockdep_assert_held(&dd->lock);
->>> +    lockdep_assert_held(dd->lock);
->>>          prio_cnt = !!dd_queued(dd, DD_RT_PRIO) + !!dd_queued(dd, DD_BE_PRIO) +
->>>               !!dd_queued(dd, DD_IDLE_PRIO);
->>> @@ -466,10 +466,9 @@ static struct request *dd_dispatch_request(struct
->>> blk_mq_hw_ctx *hctx)
->>>        struct request *rq;
->>>        enum dd_prio prio;
->>>    -    spin_lock(&dd->lock);
->>>        rq = dd_dispatch_prio_aged_requests(dd, now);
->>>        if (rq)
->>> -        goto unlock;
->>> +        return rq;
->>>          /*
->>>         * Next, dispatch requests in priority order. Ignore lower priority
->>> @@ -481,9 +480,6 @@ static struct request *dd_dispatch_request(struct
->>> blk_mq_hw_ctx *hctx)
->>>                break;
->>>        }
->>>    -unlock:
->>> -    spin_unlock(&dd->lock);
->>> -
->>>        return rq;
->>>    }
->>>    @@ -538,9 +534,9 @@ static void dd_exit_sched(struct elevator_queue *e)
->>>            WARN_ON_ONCE(!list_empty(&per_prio->fifo_list[DD_READ]));
->>>            WARN_ON_ONCE(!list_empty(&per_prio->fifo_list[DD_WRITE]));
->>>    -        spin_lock(&dd->lock);
->>> +        spin_lock(dd->lock);
->>>            queued = dd_queued(dd, prio);
->>> -        spin_unlock(&dd->lock);
->>> +        spin_unlock(dd->lock);
->>>              WARN_ONCE(queued != 0,
->>>                  "statistics for priority %d: i %u m %u d %u c %u\n",
->>
->> Do you still need 'dd->lock'? Can't you just refer to the lock from the
->> elevator_queue structure directly?
-> 
-> Indeed. Little inline helpers for locking/unlocking q->elevator->lock would be
-> nice.
+The series is structured as follows:
 
-How about the first patch to factor out inline helpers like dd_lock()
-and dd_unlock(), still use dd->lock without any functional changes, and
-then switch to use q->elevator->lock in the next patch? (same for bfq)
+The first patch is a preparatory refactoring that moves all
+writeback-related code into its own files (zram_wb.[ch]) without any
+functional changes.
 
-Thanks,
-Kuai
+The second patch introduces the core infrastructure for asynchronicity,
+including a dedicated kthread, a request queue, and helper functions to
+manage writeback requests.
 
-> 
+The final patch enables asynchronous writeback by switching from
+submit_bio_wait() to the non-blocking submit_bio(). This patch also
+includes performance benchmarks demonstrating a 27% improvement in
+idle writeback speed on an Android platform.
+
+Changes in v2:
+- Rebase and spilt to a series of patchset
+- Add test results
+- Link to v1: https://lore.kernel.org/all/20250618132622.3730219-1-richardycc@google.com/
+
+Richard Chang (3):
+  zram: refactor writeback helpers
+  zram: add async writeback infrastructure
+  zram: enable asynchronous writeback
+
+ drivers/block/zram/Makefile   |   1 +
+ drivers/block/zram/zram_drv.c | 157 +++++++--------------
+ drivers/block/zram/zram_drv.h |  30 ++++
+ drivers/block/zram/zram_wb.c  | 248 ++++++++++++++++++++++++++++++++++
+ drivers/block/zram/zram_wb.h  |  42 ++++++
+ 5 files changed, 371 insertions(+), 107 deletions(-)
+ create mode 100644 drivers/block/zram/zram_wb.c
+ create mode 100644 drivers/block/zram/zram_wb.h
+
+-- 
+2.50.1.565.gc32cd1483b-goog
 
