@@ -1,123 +1,117 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F5A027450;
-	Thu, 31 Jul 2025 02:39:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 748A71E51D;
+	Thu, 31 Jul 2025 04:49:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753929546; cv=none; b=qD4sPfgUIPubAfVwmrVZ2s6DhaGDzOEAJQ/Zpi6Sd2pLAiUAFYOgAswjzNw81yDJ0eukYd51RCusulrVdHWNYUYt8a89S5ceA0VEAWOq2j9O/ZYzf4PzSUwxNwpFQw7FVzv6a64MF2w3gl2H6kDIV0XInBlpviB15kO51DklDVo=
+	t=1753937400; cv=none; b=mgl7Bpwuk6A2DRoCmqwPeCXGjsXYunk0kjejZjNzZP1A4xZ7092hGdJYNIEOaGSqKV8HWNPiL/Cfg8f5SgnUrlS6sE++N/8Bf/f45SAIszcNKmztMVekZa/QG6U41vVUKS8OF/z9VvxCLCkT2G8I2San+9d4XVID2OnJVMFgkaI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753929546; c=relaxed/simple;
-	bh=8V2vkQ4Paur/1HgNG/DwdwcZ95DNfzZ/MLpTsqpSrbY=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=c5FYljHzrHKPQ8U1HkKnT0rlRKbkZz+NvQQAz0bbpurU7CYs5x8R6Y2wn6vpa1E1G8qWwHEq71n6tHRgLvcNA5XRE3XZ0rom17bhbENO9ipl28nhYao2rCnXHLmeM+6YOMa6Bf+q28QZGtXkw/R3YBEkt+efmvvfEFvRevcq3aY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4bstZF4tRdzKHLtS;
-	Thu, 31 Jul 2025 10:39:01 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 97BF51A1A77;
-	Thu, 31 Jul 2025 10:39:00 +0800 (CST)
-Received: from [10.174.179.143] (unknown [10.174.179.143])
-	by APP4 (Coremail) with SMTP id gCh0CgCnIxRC14poXD46CA--.37766S3;
-	Thu, 31 Jul 2025 10:39:00 +0800 (CST)
-Subject: Re: [PATCH v2 1/2] lib/sbitmap: convert shallow_depth from one word
- to the whole sbitmap
-To: yukuai@kernel.org, Jan Kara <jack@suse.cz>,
- Yu Kuai <yukuai1@huaweicloud.com>
-Cc: axboe@kernel.dk, akpm@linux-foundation.org, yang.yang@vivo.com,
- dlemoal@kernel.org, ming.lei@redhat.com, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, yi.zhang@huawei.com, yangerkun@huawei.com,
- johnny.chenyi@huawei.com, Omar Sandoval <osandov@fb.com>,
- "yukuai (C)" <yukuai3@huawei.com>
-References: <20250729031906.3615228-1-yukuai1@huaweicloud.com>
- <20250729031906.3615228-2-yukuai1@huaweicloud.com>
- <ozjsdoiqa2uem65qqj4fjbrwm6toxlj5bzv7f5dg5xfiljv3zi@wcaamboo2r6h>
- <8edcdef6-8749-aa45-e7d2-ada677645d76@huaweicloud.com>
- <jr54uomodnzqyw4bu4hcdpllgafkhueyygiiempuudwjy3vir5@d7lv3jsxxqx2>
- <223acbc1-60d4-4687-8eea-5306aa44ae24@kernel.org>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <c748a3ee-bf33-e13e-d507-984277acbb32@huaweicloud.com>
-Date: Thu, 31 Jul 2025 10:38:58 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.1
+	s=arc-20240116; t=1753937400; c=relaxed/simple;
+	bh=+fB2bkRNyGcxN9GP3zXyYARl26p+USWz+4knIanRIrc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pWoBVUI/asS2K9E0kRorjlBLFlygI/XrQOFfg95U2Mfuq8hnSZGtCifOricrk5EXFbvAacODoMotPjYk74jD4GLFMz48sDjx5v8XU3YM5c6/9aAS8dFA5d5M7EupEqWR6mDSs8wPVej1oOsByBKydepIkd2GAHG7cbCrB+HUI+M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lRFowMqp; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lRFowMqp"
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-240418cbb8bso3448165ad.2;
+        Wed, 30 Jul 2025 21:49:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1753937398; x=1754542198; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:sender:from:to:cc:subject:date:message-id:reply-to;
+        bh=D1ha4mmeDP2q/s+7aUvqW50Enu5gjrDWFFR76rsmpUU=;
+        b=lRFowMqpZxP9UMTETAGZ9m5a6FBU41uzh1F2ycuiLqQOt5MaBR6tQDELG6w+01jSLd
+         WqErOf30YTtYrD7wqhGpYq60Mutt2UR4NfBlabh+QJFfddUCYRODlxBH4Y2odBThbgV3
+         eaG/l00pSV66uBpp8FMVHQ/ejn8BFVbXPY4EHzOIR2LS6I6hBWHEmzK1LUAZA91gZKOI
+         CscvmXeFR/dSr8wZouCnPkI+CICvifQqArWowtUONNn7/bSBSs2yxokqoc1B7zGUDDIh
+         v8aTJH54guZMacD6i86JBe6nScpLASM4fUViRmgp2lg2lZIOOdM4fKPdzWJ5VqHgFLH1
+         U3dw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753937398; x=1754542198;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:sender:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=D1ha4mmeDP2q/s+7aUvqW50Enu5gjrDWFFR76rsmpUU=;
+        b=DZjj2nHGhSKEyvevV1P3Bklcn4M42S09IHzOA2Z2kFReOgxvy2VA1zD/TTPBGKmDuM
+         hiRhwFLGrlJ4m5NvqIMayR2wACph1N2KDE+lj6BTTJ3TNgqK7hbuuLJSKz1bQfRGW2fx
+         Qy7hvKVlaMGugu2slzAU9cLdd7KzabLyOKxLGDZ65KiDFtXraIiBCY5/Jyh4b8Pceqv6
+         Tmrpheio9fnLeP3UssSVfz1QK94zQpUQZLfmZ0Uisz9HLiG+RPRowiB2LKr1+0punVmz
+         aNT70umM5+rtDhTc8EQMBwjzlw6mETM0HStsrQIU4JOiM0pf6KLWZYhFdT5H9+sMhlnm
+         nAaQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWI6dCw1IMsajTOqPPIGSI0xNaHX5GQ4I6tL+a0Fs91jkCZUg28WCSOYYyTaruyV6NNV6bHPAg7LwfEWWg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyQoaZPYHMNIuO8bzbV2rE7LSoilhFw9gnyEq0qtCRVpcKz9gBe
+	dV/NFvnbkdkWUBDpMBVo6boIIKw7E/2CSmswr4vLHV8Me5jOdDaXD0xU
+X-Gm-Gg: ASbGncvA/TzP9b5l4KHFT1OOi5c72XcEMCS8PJB4c/KToiczOHN7HBZgyZjmfartzGt
+	eJLm8MAnPYH+XaLRj0XWHzojv2VliOrt2WdHiNsXJaTg7d47p9oRseIQJFhtc8Xj46lmuva0VGv
+	Nzrwrvc1MWH0LNB9QVCUxKQPdkBf002mMofkn5XwR5/WrNuaB1I8xdSsw8aH+x7U/YAeAypSC55
+	0MVIk61aIF1ZsM+CcUcx7Wieipy2zayt30332MF7LXpDDLIMjCUyfTAyInUzPpxFoqkg5b0wzwJ
+	dMRY8JiQTyllB2oyadQYCTZFeripxF9v/KxQP+8hB55CF0FG+0PrEsvvWM8xrONfW+EuxlT1gLN
+	qrRC03yYHCAN49sUJ74flqXlAnqx2AWvSf/8=
+X-Google-Smtp-Source: AGHT+IGxB2+bcuxEBY18lgz5yA1ek3N9WgWuKxCg0dIYKvxtrf/5t3904j31rDji9XOJbwDs3V+KtQ==
+X-Received: by 2002:a17:903:3b8b:b0:23f:cf96:3071 with SMTP id d9443c01a7336-24096b48bfcmr88683325ad.49.1753937397497;
+        Wed, 30 Jul 2025 21:49:57 -0700 (PDT)
+Received: from server.roeck-us.net ([2600:1700:e321:62f0:da43:aeff:fecc:bfd5])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-241e8976cbdsm6305425ad.75.2025.07.30.21.49.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 30 Jul 2025 21:49:57 -0700 (PDT)
+Sender: Guenter Roeck <groeck7@gmail.com>
+From: Guenter Roeck <linux@roeck-us.net>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Guenter Roeck <linux@roeck-us.net>,
+	Bart Van Assche <bvanassche@acm.org>
+Subject: [PATCH] block: Fix default IO priority if there is no IO context
+Date: Wed, 30 Jul 2025 21:49:53 -0700
+Message-ID: <20250731044953.1852690-1-linux@roeck-us.net>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <223acbc1-60d4-4687-8eea-5306aa44ae24@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgCnIxRC14poXD46CA--.37766S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7AF15Wr18AFyfJFW7Aw1rXrb_yoW8XF4Dpr
-	4UKw12k348tr1jkw1Yqa1DXF15uw13GwsxGF45Xw1xCrZ8Ja10qFyYqFy5ZF9rurW8Zayj
-	vFWfXry7Gw1UXaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBF14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
-	0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x
-	0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E
-	7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcV
-	C0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF
-	04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7
-	CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUd-B_UUUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-Hi,
+Upstream commit 53889bcaf536 ("block: make __get_task_ioprio() easier to
+read") changes the IO priority returned to the caller if no IO context
+is defined for the task. Prior to this commit, the returned IO priority
+was determined by task_nice_ioclass() and task_nice_ioprio(). Now it is
+always IOPRIO_DEFAULT, which translates to IOPRIO_CLASS_NONE with priority
+0. However, task_nice_ioclass() returns IOPRIO_CLASS_IDLE, IOPRIO_CLASS_RT,
+or IOPRIO_CLASS_BE depending on the task scheduling policy, and
+task_nice_ioprio() returns a value determined by task_nice(). This causes
+regressions in test code checking the IO priority and class of IO
+operations on tasks with no IO context.
 
-在 2025/07/31 2:24, Yu Kuai 写道:
-> hi, Jan!
-> 
-> 在 2025/7/30 21:03, Jan Kara 写道:
->> I think having two APIs will be even more confusing than the current 
->> state.
->> But as I wrote I think you can have API to specify shallow depth in total
->> size and in sbitmap_queue_get_shallow() do:
->>
->> shallow_per_word = (shallow_depth << sb->shift) / sb->depth;
-In order to consider the last word, I think we should use __map_depth()
-here.
+Fix the problem by returning the IO priority calculated from
+task_nice_ioclass() and task_nice_ioprio() if no IO context is defined
+to match earlier behavior.
 
->> rounding_index = shallow_depth - shallow_per_word * sb->depth;
-And then it's not possible to calculate this rounding index easily. How
-about following, although the reminder handling is not perfect.
+Fixes: 53889bcaf536 ("block: make __get_task_ioprio() easier to read")
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: Bart Van Assche <bvanassche@acm.org>
+Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+---
+ include/linux/ioprio.h | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-  static unsigned int __map_depth_with_shallow(const struct sbitmap *sb,
-                                              int index,
-                                              unsigned int shallow_depth)
-  {
-         unsigned int word_depth = __map_depth(sb, index);
-         unsigned int shallow_word_depth = word_depth * shallow_depth;
-         unsigned reminder = do_div(shallow_word_depth, sb->depth);
-
-         if (reminder && !(index & 0x1))
-                 shallow_word_depth++;
-
-         return shallow_word_depth;
-  }
-
-
->>
->> and allow depth shallow_per_word + 1 if current index < rounding_index 
->> and
->> exactly shallow_per_word if current index >= rounding_index. This will
->> still evenly distribute shallow depth among words and I don't think the
->> additional overhead of the several arithmetic operations will be visible.
-> Yes, you're right, I did not get your idea before. Thanks for the 
-> explanation
-> and the suggestion :） Will follow this idea in the next version.
-
-> 
-> Thanks
-> 
-> .
-> 
+diff --git a/include/linux/ioprio.h b/include/linux/ioprio.h
+index b25377b6ea98..5210e8371238 100644
+--- a/include/linux/ioprio.h
++++ b/include/linux/ioprio.h
+@@ -60,7 +60,8 @@ static inline int __get_task_ioprio(struct task_struct *p)
+ 	int prio;
+ 
+ 	if (!ioc)
+-		return IOPRIO_DEFAULT;
++		return IOPRIO_PRIO_VALUE(task_nice_ioclass(p),
++					 task_nice_ioprio(p));
+ 
+ 	if (p != current)
+ 		lockdep_assert_held(&p->alloc_lock);
+-- 
+2.45.2
 
