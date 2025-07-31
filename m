@@ -1,192 +1,168 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84F8625F7B4;
-	Thu, 31 Jul 2025 07:14:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E753F3C463
+	for <linux-block@vger.kernel.org>; Thu, 31 Jul 2025 08:18:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753946059; cv=none; b=b3Rw6f101fVSKt5G1HfAYdy8KSHSQPI7QIcD+Sqr3LBkxTzAjtbTkFHsWHjoMgU8GDxDknStxiNCOB6Cjh+cOoWsO6ZZBJeyjdmmYiZgOs2Rf6hQuTPFQ3MexNsn1NbZEqa06PTx2wV9FNSOFtghpWN5/uwc7zwG3ddEFZc9v4E=
+	t=1753949909; cv=none; b=F4YvqId0Nno6Xz/bga9viOo0W/kxUc2g5odLmDjsjAcIUJSNgxHrex7eTPbDrEceBIY4TGraq/U6bL4PBjpQqH97HXCoaVi32uSDFpzZt3VN1/zfQks6VkDxqmAI/0Urf/+UQa0EnR0j26NPcOQkhO2Svy/sg3Y8Qbag8SPQU58=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753946059; c=relaxed/simple;
-	bh=r7jURrF6I5tBL8grNAQw88uKKLsBi8rIxDnW6t0DDv0=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=JsUzM/aZ+bW82bfUpouFIQ92RS+UWank9nmchFmNsGWMUedJBtY+v+ElIyaCY3FQ9o7WrZ3ySaQ3fz3j6/E8UTaoeJtBnroCSh3rZ6LOfxNorTdH87yxXPWc7nVACe+hKZ/gr9GHL0lymDb0jX9T9wno+dErxJaoN9QGYNSHe08=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4bt0gm2NPYzKHMtL;
-	Thu, 31 Jul 2025 15:14:12 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 3F63C1A1478;
-	Thu, 31 Jul 2025 15:14:11 +0800 (CST)
-Received: from [10.174.179.143] (unknown [10.174.179.143])
-	by APP4 (Coremail) with SMTP id gCh0CgDHjxC_F4tooJxPCA--.62453S3;
-	Thu, 31 Jul 2025 15:14:09 +0800 (CST)
-Subject: Re: [PATCH v2 2/5] mq-deadline: switch to use elevator lock
-To: Damien Le Moal <dlemoal@kernel.org>, Yu Kuai <yukuai1@huaweicloud.com>,
- Hannes Reinecke <hare@suse.de>, jack@suse.cz, tj@kernel.org,
- josef@toxicpanda.com, axboe@kernel.dk
-Cc: cgroups@vger.kernel.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, yi.zhang@huawei.com, yangerkun@huawei.com,
- johnny.chenyi@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
+	s=arc-20240116; t=1753949909; c=relaxed/simple;
+	bh=TpJnwz5jWr5OonsdFvsUU4fF/z2r+LxLaUCEUMSlxNE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=L92+svd5xPUjPw2KNDqeLUQQUPRE+laAm5ZKAjFE8Am+bhiJ9a9VsWscvXdjftRG+5d2C5/bEtUD64bvx9ZSlCVNpIP73r1LCLt1Ig8uIVx1pLgwcnpDhx1O80Xdj4VBxGbgMi9Y75vOWT9OgdmTnazsoC/RYtyklPVkEuSB8T8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=E932SuCC; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E932SuCC"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1753949907;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6katTsCF1LMthpbb9w2c3s1PekN7Dr6xyf8vleDZvrI=;
+	b=E932SuCCK+IU4ecIKm5IHnnZ+XfU34yfS0ksXQppog26+fHtV1AG52oqiBwO9KPydI2QkX
+	xsAWBMDIv27B0t5d8oVaD8JdOIa6nB5RrNCN81tiULa7uIn56IypOsp+qJTwV/gAI8Q1+v
+	zFSdBg4kA1iEUs88AJJ+6UozZ1XxwWQ=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-591-LnhF8j-xNvSP2Ytu6eNHZA-1; Thu,
+ 31 Jul 2025 04:18:23 -0400
+X-MC-Unique: LnhF8j-xNvSP2Ytu6eNHZA-1
+X-Mimecast-MFC-AGG-ID: LnhF8j-xNvSP2Ytu6eNHZA_1753949901
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 41B4B195609E;
+	Thu, 31 Jul 2025 08:18:20 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.62])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B215418003FC;
+	Thu, 31 Jul 2025 08:18:11 +0000 (UTC)
+Date: Thu, 31 Jul 2025 16:18:06 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Yu Kuai <yukuai1@huaweicloud.com>
+Cc: dlemoal@kernel.org, hare@suse.de, jack@suse.cz, tj@kernel.org,
+	josef@toxicpanda.com, axboe@kernel.dk, yukuai3@huawei.com,
+	cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
+	yangerkun@huawei.com, johnny.chenyi@huawei.com
+Subject: Re: [PATCH v2 0/5] blk-mq-sched: support request batch dispatching
+ for sq elevator
+Message-ID: <aIsmvj_lxLA6ZaWe@fedora>
 References: <20250730082207.4031744-1-yukuai1@huaweicloud.com>
- <20250730082207.4031744-3-yukuai1@huaweicloud.com>
- <750643e5-9f24-4e4c-8270-e421a03cf463@suse.de>
- <226d1cd7-bd35-4773-8f1c-d03f9c870133@kernel.org>
- <a3ce55a4-0756-bfe7-3606-296b78672104@huaweicloud.com>
- <9d918e77-73ef-41ad-87cf-cf87803041b5@kernel.org>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <2ada440d-5121-6c3e-71db-1f8eb63864a7@huaweicloud.com>
-Date: Thu, 31 Jul 2025 15:14:06 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <9d918e77-73ef-41ad-87cf-cf87803041b5@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgDHjxC_F4tooJxPCA--.62453S3
-X-Coremail-Antispam: 1UD129KBjvJXoW3GrWkuF15Xr18Zw1UWr45Wrg_yoW7CrW7pr
-	4kKFW5JrWrJrn7Xr1qgr4UZry5tw4UJw1DXr1fJay8JFsrtFnIgr4UXr1v9r1DJr4fGrn8
-	JF1UXrZxuF17Jr7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBF14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jrv_JF1lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
-	0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x
-	0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E
-	7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcV
-	C0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF
-	04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7
-	CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUpwZcUUUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250730082207.4031744-1-yukuai1@huaweicloud.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-Hi,
-
-在 2025/07/31 15:04, Damien Le Moal 写道:
-> On 7/31/25 3:32 PM, Yu Kuai wrote:
->> Hi,
->>
->> 在 2025/07/31 14:22, Damien Le Moal 写道:
->>> On 7/31/25 3:20 PM, Hannes Reinecke wrote:
->>>> On 7/30/25 10:22, Yu Kuai wrote:
->>>>> From: Yu Kuai <yukuai3@huawei.com>
->>>>>
->>>>> Replace the internal spinlock 'dd->lock' with the new spinlock in
->>>>> elevator_queue, there are no functional changes.
->>>>>
->>>>> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
->>>>> ---
->>>>>     block/mq-deadline.c | 58 +++++++++++++++++++++------------------------
->>>>>     1 file changed, 27 insertions(+), 31 deletions(-)
->>>>>
->>>>> diff --git a/block/mq-deadline.c b/block/mq-deadline.c
->>>>> index 9ab6c6256695..2054c023e855 100644
->>>>> --- a/block/mq-deadline.c
->>>>> +++ b/block/mq-deadline.c
->>>>> @@ -101,7 +101,7 @@ struct deadline_data {
->>>>>         u32 async_depth;
->>>>>         int prio_aging_expire;
->>>>>     -    spinlock_t lock;
->>>>> +    spinlock_t *lock;
->>>>>     };
->>>>>       /* Maps an I/O priority class to a deadline scheduler priority. */
->>>>> @@ -213,7 +213,7 @@ static void dd_merged_requests(struct request_queue *q,
->>>>> struct request *req,
->>>>>         const u8 ioprio_class = dd_rq_ioclass(next);
->>>>>         const enum dd_prio prio = ioprio_class_to_prio[ioprio_class];
->>>>>     -    lockdep_assert_held(&dd->lock);
->>>>> +    lockdep_assert_held(dd->lock);
->>>>>           dd->per_prio[prio].stats.merged++;
->>>>>     @@ -253,7 +253,7 @@ static u32 dd_queued(struct deadline_data *dd, enum
->>>>> dd_prio prio)
->>>>>     {
->>>>>         const struct io_stats_per_prio *stats = &dd->per_prio[prio].stats;
->>>>>     -    lockdep_assert_held(&dd->lock);
->>>>> +    lockdep_assert_held(dd->lock);
->>>>>           return stats->inserted - atomic_read(&stats->completed);
->>>>>     }
->>>>> @@ -323,7 +323,7 @@ static struct request *__dd_dispatch_request(struct
->>>>> deadline_data *dd,
->>>>>         enum dd_prio prio;
->>>>>         u8 ioprio_class;
->>>>>     -    lockdep_assert_held(&dd->lock);
->>>>> +    lockdep_assert_held(dd->lock);
->>>>>           if (!list_empty(&per_prio->dispatch)) {
->>>>>             rq = list_first_entry(&per_prio->dispatch, struct request,
->>>>> @@ -434,7 +434,7 @@ static struct request
->>>>> *dd_dispatch_prio_aged_requests(struct deadline_data *dd,
->>>>>         enum dd_prio prio;
->>>>>         int prio_cnt;
->>>>>     -    lockdep_assert_held(&dd->lock);
->>>>> +    lockdep_assert_held(dd->lock);
->>>>>           prio_cnt = !!dd_queued(dd, DD_RT_PRIO) + !!dd_queued(dd,
->>>>> DD_BE_PRIO) +
->>>>>                !!dd_queued(dd, DD_IDLE_PRIO);
->>>>> @@ -466,10 +466,9 @@ static struct request *dd_dispatch_request(struct
->>>>> blk_mq_hw_ctx *hctx)
->>>>>         struct request *rq;
->>>>>         enum dd_prio prio;
->>>>>     -    spin_lock(&dd->lock);
->>>>>         rq = dd_dispatch_prio_aged_requests(dd, now);
->>>>>         if (rq)
->>>>> -        goto unlock;
->>>>> +        return rq;
->>>>>           /*
->>>>>          * Next, dispatch requests in priority order. Ignore lower priority
->>>>> @@ -481,9 +480,6 @@ static struct request *dd_dispatch_request(struct
->>>>> blk_mq_hw_ctx *hctx)
->>>>>                 break;
->>>>>         }
->>>>>     -unlock:
->>>>> -    spin_unlock(&dd->lock);
->>>>> -
->>>>>         return rq;
->>>>>     }
->>>>>     @@ -538,9 +534,9 @@ static void dd_exit_sched(struct elevator_queue *e)
->>>>>             WARN_ON_ONCE(!list_empty(&per_prio->fifo_list[DD_READ]));
->>>>>             WARN_ON_ONCE(!list_empty(&per_prio->fifo_list[DD_WRITE]));
->>>>>     -        spin_lock(&dd->lock);
->>>>> +        spin_lock(dd->lock);
->>>>>             queued = dd_queued(dd, prio);
->>>>> -        spin_unlock(&dd->lock);
->>>>> +        spin_unlock(dd->lock);
->>>>>               WARN_ONCE(queued != 0,
->>>>>                   "statistics for priority %d: i %u m %u d %u c %u\n",
->>>>
->>>> Do you still need 'dd->lock'? Can't you just refer to the lock from the
->>>> elevator_queue structure directly?
->>>
->>> Indeed. Little inline helpers for locking/unlocking q->elevator->lock would be
->>> nice.
->>
->> How about the first patch to factor out inline helpers like dd_lock()
->> and dd_unlock(), still use dd->lock without any functional changes, and
->> then switch to use q->elevator->lock in the next patch? (same for bfq)
+On Wed, Jul 30, 2025 at 04:22:02PM +0800, Yu Kuai wrote:
+> From: Yu Kuai <yukuai3@huawei.com>
 > 
-> Patch one can introduce elv->lock and the helpers, then patch 2 use the helpers
-> to replace dd->lock. Just don't say "no functional change" in the commit
-> message and rather explain that things keep working the same way as before, but
-> using a different lock. That will address Bart's comment too.
-> And same for bfq in patch 3.
+> Changes from v1:
+>  - the ioc changes are send separately;
+>  - change the patch 1-3 order as suggested by Damien;
 > 
-Ok, this is what I did in the first RFC version:
+> Currently, both mq-deadline and bfq have global spin lock that will be
+> grabbed inside elevator methods like dispatch_request, insert_requests,
+> and bio_merge. And the global lock is the main reason mq-deadline and
+> bfq can't scale very well.
+> 
+> For dispatch_request method, current behavior is dispatching one request at
+> a time. In the case of multiple dispatching contexts, This behavior, on the
+> one hand, introduce intense lock contention:
+> 
+> t1:                     t2:                     t3:
+> lock                    lock                    lock
+> // grab lock
+> ops.dispatch_request
+> unlock
+>                         // grab lock
+>                         ops.dispatch_request
+>                         unlock
+>                                                 // grab lock
+>                                                 ops.dispatch_request
+>                                                 unlock
+> 
+> on the other hand, messing up the requests dispatching order:
+> t1:
+> 
+> lock
+> rq1 = ops.dispatch_request
+> unlock
+>                         t2:
+>                         lock
+>                         rq2 = ops.dispatch_request
+>                         unlock
+> 
+> lock
+> rq3 = ops.dispatch_request
+> unlock
+> 
+>                         lock
+>                         rq4 = ops.dispatch_request
+>                         unlock
+> 
+> //rq1,rq3 issue to disk
+>                         // rq2, rq4 issue to disk
+> 
+> In this case, the elevator dispatch order is rq 1-2-3-4, however,
+> such order in disk is rq 1-3-2-4, the order for rq2 and rq3 is inversed.
+> 
+> While dispatching request, blk_mq_get_disatpch_budget() and
+> blk_mq_get_driver_tag() must be called, and they are not ready to be
+> called inside elevator methods, hence introduce a new method like
+> dispatch_requests is not possible.
+> 
+> In conclusion, this set factor the global lock out of dispatch_request
+> method, and support request batch dispatch by calling the methods
+> multiple time while holding the lock.
+> 
+> nullblk setup:
+> modprobe null_blk nr_devices=0 &&
+>     udevadm settle &&
+>     cd /sys/kernel/config/nullb &&
+>     mkdir nullb0 &&
+>     cd nullb0 &&
+>     echo 0 > completion_nsec &&
+>     echo 512 > blocksize &&
+>     echo 0 > home_node &&
+>     echo 0 > irqmode &&
+>     echo 128 > submit_queues &&
+>     echo 1024 > hw_queue_depth &&
+>     echo 1024 > size &&
+>     echo 0 > memory_backed &&
+>     echo 2 > queue_mode &&
+>     echo 1 > power ||
+>     exit $?
+> 
+> Test script:
+> fio -filename=/dev/$disk -name=test -rw=randwrite -bs=4k -iodepth=32 \
+>   -numjobs=16 --iodepth_batch_submit=8 --iodepth_batch_complete=8 \
+>   -direct=1 -ioengine=io_uring -group_reporting -time_based -runtime=30
+> 
+> Test result: iops
+> 
+> |                 | deadline | bfq      |
+> | --------------- | -------- | -------- |
+> | before this set | 263k     | 124k     |
+> | after this set  | 475k     | 292k     |
 
-https://lore.kernel.org/all/20250530080355.1138759-3-yukuai1@huaweicloud.com/
+batch dispatch may hurt io merge performance which is important for
+elevator, so please provide test data on real HDD. & SSD., instead of
+null_blk only, and it can be perfect if merge sensitive workload
+is evaluated.
 
-I somehow convince myself using dd->lock is better. :(
-Will change this in the next version.
+
 
 Thanks,
-Kuai
-
-> 
+Ming
 
