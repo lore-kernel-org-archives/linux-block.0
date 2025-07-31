@@ -1,96 +1,78 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from 003.mia.mailroute.net (003.mia.mailroute.net [199.89.3.6])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BE73156C69
-	for <linux-block@vger.kernel.org>; Thu, 31 Jul 2025 15:22:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6865015A8;
+	Thu, 31 Jul 2025 15:24:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.6
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753975353; cv=none; b=l1gRL3fjoTgY5hvDKpDQTfzCaXERMk2Yi15h+Htjm2FGm4eEzi1bQp/P6wlKezv7xL3xlGLAbi4ZCarFnpPfB+84JQgPmInyZOiCzJJZTz2q7AOjafJJJhRa3OQHoKSH+WJjzprVxFPnBykFZLVtNorLWO5XFVPqxizVivAD0Lc=
+	t=1753975455; cv=none; b=As8FbzP5pnJIiD7sEwdBcbuG8jBcGS7ZJEv6XiBmBzR8jB50jcJEsMVjG0rGaCWalYt8o1Ej8++jtqZrp2ObZowgWhGYrYPib9UT5bP7/U11mmf0kvwa298axAiVvqaAFYAnV9UYjSm4OHaG4Es7vDLnxNw3SoXgTePzgeOobrA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753975353; c=relaxed/simple;
-	bh=rw7Dh/vaI2hQ4S4TLjoxnPuzCP4jY/iiRILoptnBjCg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZDEGVBclwhiSxhKextYQRwInBWyws0ZyErJ9tTXGUBIesq2diVsopE3gU2IQLPJqy38eFcN+MbKStI3eR9jzOvhIkf95zDOoRChmKOA+3P2BuH2zgLoiNtQrcf/a983gbsVDeVThk96D6s1HDEILvQ5u+3mXJDkwBb/ukCV6I+E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=OwBcvdFx; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1753975455; c=relaxed/simple;
+	bh=o1yFhBXe6Df7icg5S4t03u8nAe3RsB2OOTx7cXSxsKw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HQFm6AafodDHbgPHrSsAzobmttov9pU7UA0M6sHiKVrYOSoJR4xvnBBbcPDvm1XqS4swy9x5RNUSAGT/Y/eT6W7rSxhA8Xo0UG3df7jd1ZAOKRlciAzTlj1frUnrhwhhOpAx452v5g30M4/MoVVWa4Y/lo8+ryAS9N9MgfTltMU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=arDw/OwB; arc=none smtp.client-ip=199.89.3.6
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="OwBcvdFx"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-	Content-ID:Content-Description:In-Reply-To:References;
-	bh=XDFtipXov46axeEuyIoBj2s8aeJUslrClE6tKPL317w=; b=OwBcvdFxEfg01nytgSxu0wjMOl
-	mxDKCkLvIDe/bZlPijaDfm8wPDaaq5NaFYWuNl4RvssPmwk7TT3uJg/naUkO51Z/PLpZH8fGnVkIS
-	vhut4lWtZP3Mve2QUAxRdlBIOvsdDpWpbppfv4mRpjSKZAs0i9944YFnQ3g23CvMKCdnuL1HfmAsq
-	oqTYuK6uIN4bVHlKuPEjIZJAaEA0qicd9/gBTeoadv71RLPKydscQVGaoWq+ga0i+wEtTc/0mjNP4
-	GfIaRWSguGwDLQO5EKEy78w3TJfpFkLXvnrArUf2dtdvr95Uet+yGZufNtXCuC10FZDhYe0hrUDqp
-	AnSvYRFQ==;
-Received: from [206.0.71.13] (helo=localhost)
-	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1uhV70-00000003xQN-2WRE;
-	Thu, 31 Jul 2025 15:22:30 +0000
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: anand.jain@oracle.com,
-	martin.petersen@oracle.com,
-	linux-block@vger.kernel.org
-Subject: [PATCH] block: ensure discard_granularity is zero when discard is not supported
-Date: Thu, 31 Jul 2025 08:22:28 -0700
-Message-ID: <20250731152228.873923-1-hch@lst.de>
-X-Mailer: git-send-email 2.47.2
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="arDw/OwB"
+Received: from localhost (localhost [127.0.0.1])
+	by 003.mia.mailroute.net (Postfix) with ESMTP id 4btCY82LMFzlgqxq;
+	Thu, 31 Jul 2025 15:24:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1753975450; x=1756567451; bh=o1yFhBXe6Df7icg5S4t03u8n
+	Ae3RsB2OOTx7cXSxsKw=; b=arDw/OwBjKPG/IlbBBa0POdIU3kjKUJACJumsbkW
+	uEaLuCG1VslvRaxLE5sr5BKH9A46j2S2ns0VEVFAvNYadcgrJns76QOACzmy3hrd
+	A6LLC93g6/sll7uCsuZWwFsfOf/WJjcRd5OfGRSw4vwnf5XFUR/nNn57ddzxDNiH
+	H0iYrSHUG/wS7pRGT8tY3KeKCu0Z3UcQzacZXOd3IG5gTgub6KyRdK8Wyhga/83/
+	82+YhrzyXLAcPrXU8TyYmGsjXwglxS82cPHW+RGzt4ip5nM0n057qz2eIWlrbwpo
+	m8Y2b0jA8Pjt8qLlPo9zE56sR38RD9JxgJLo5W3NLbFbTQ==
+X-Virus-Scanned: by MailRoute
+Received: from 003.mia.mailroute.net ([127.0.0.1])
+ by localhost (003.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id Et7EXzwhqAaU; Thu, 31 Jul 2025 15:24:10 +0000 (UTC)
+Received: from [100.66.154.22] (unknown [104.135.204.82])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4btCXy6YhNzlgqxh;
+	Thu, 31 Jul 2025 15:24:02 +0000 (UTC)
+Message-ID: <46a544bd-a3dd-4a6f-967c-74c3bbe8f18c@acm.org>
+Date: Thu, 31 Jul 2025 08:24:00 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 2/3] zram: add async writeback infrastructure
+To: Richard Chang <richardycc@google.com>, Minchan Kim <minchan@kernel.org>,
+ Sergey Senozhatsky <senozhatsky@chromium.org>, Jens Axboe <axboe@kernel.dk>,
+ Andrew Morton <akpm@linux-foundation.org>
+Cc: bgeffon@google.com, liumartin@google.com, linux-kernel@vger.kernel.org,
+ linux-block@vger.kernel.org, linux-mm@kvack.org
+References: <20250731064949.1690732-1-richardycc@google.com>
+ <20250731064949.1690732-3-richardycc@google.com>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20250731064949.1690732-3-richardycc@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Documentation/ABI/stable/sysfs-block states:
+On 7/30/25 11:49 PM, Richard Chang wrote:
+> Introduce the necessary infrastructure for performing writeback
+> operations asynchronously.
+> It adds a dedicated kernel thread (`zram_wb_thread`), a request queue
+> for managing pending writebacks, and helper functions to deal with
+> the writeback requests.
 
-  What: /sys/block/<disk>/queue/discard_granularity
-  [...]
-  A discard_granularity of 0 means that the device does not support
-  discard functionality.
+Why a new kernel thread instead of a workqueue? More memory (e.g. for
+a stack) is required when a new kernel thread is created compared to
+using the workqueue mechanism.
 
-but this got broken when sorting out the block limits updates.  Fix this
-by setting the discard_granularity limit to zero when the combined
-max_discard_sectors is zero.
-
-Fixes: 3c407dc723bb ("block: default the discard granularity to sector size")
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-settings.c | 13 ++++++++++---
- 1 file changed, 10 insertions(+), 3 deletions(-)
-
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index a000daafbfb4..20f8b207d5e8 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -336,12 +336,19 @@ int blk_validate_limits(struct queue_limits *lim)
- 	lim->max_discard_sectors =
- 		min(lim->max_hw_discard_sectors, lim->max_user_discard_sectors);
- 
-+	/*
-+	 * When discard is not supported, discard_granularity should be reported
-+	 * as 0 to userspace.
-+	 */
-+	if (lim->max_discard_sectors)
-+		lim->discard_granularity =
-+			max(lim->discard_granularity, lim->physical_block_size);
-+	else
-+		lim->discard_granularity = 0;
-+
- 	if (!lim->max_discard_segments)
- 		lim->max_discard_segments = 1;
- 
--	if (lim->discard_granularity < lim->physical_block_size)
--		lim->discard_granularity = lim->physical_block_size;
--
- 	/*
- 	 * By default there is no limit on the segment boundary alignment,
- 	 * but if there is one it can't be smaller than the page size as
--- 
-2.47.2
-
+Bart.
