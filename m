@@ -1,221 +1,213 @@
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2048.outbound.protection.outlook.com [40.107.96.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 957BA22318;
-	Wed, 30 Jul 2025 23:19:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753917565; cv=none; b=UDA0hI70Nwl6wZauBg1gGMEjcR5KSeIK1RQldqe5X2qxHFGP7qcYUWjwNDmxYQ9ke9EgGyez0DsIE23UvgOTIzWhDncIhJxV2Bbc2VnaCjcZcYP9+Dce/ZUs7V5+SRVloTBAEBqAs6iz+YT7SoWUspSPsaKNS8+AZk6XbLcaILk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753917565; c=relaxed/simple;
-	bh=pfMEPyAlmbg51/rRRPFggrrQ5K9ogyYDkxL2xa53jH8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nRUCgpjGrq8k1nFwKAWUKMHgjJcSHDKYE7/2wU8skuSlkvRpdmVzLBs4wfyeNOyem24Zm4dwQ1H8g0gaEBrzv+hVC4LxEDShxr9Iy7ZvL9NYV4TIaDEFb+3fooD7YqF/TXs8fXfppreZJnhgQZtqX85Fd5pQ+BN6YSjpNHi9jnM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ShHoe0Lc; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFC4F1805B;
+	Thu, 31 Jul 2025 00:21:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.96.48
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1753921304; cv=fail; b=pCcJSNbE55zUEfwRKzjvWAOZ/X0HeePlFWMfYx+2wg5lRsJV45SJeIWdvHLPpv/OQngMSBL4v11Q23tLAFLEq/8VR+qdUWllmTa+WBzFd9is0NvWaAZ1U9hcQ3fiFWFwJkuIdTc/hR7Qx8vGIVOYSQuoEnDVOebvyKwwReIae8c=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1753921304; c=relaxed/simple;
+	bh=y9f+yFMMnTxMMPkyZwle8t2Cush3omyV/l6OwxPgLRo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=k5btYI9eN5s1SzJ/7qmiRIN5a1hgF8OIfEHBHb9RE0ANSkJ33eBy9N1AUu35vws3jkU0NAYCBTsXHS5+9QFTCDHP4pG3vcBfhSsHIxUehOEPazu8AQ4ZQ67ydfJaCN8dwiERcurhacKoGFzsI+qlhny8oPP3Pfp9TkpQ7Z2GZOE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=S2KpM2d8; arc=fail smtp.client-ip=40.107.96.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ShHoe0Lc"
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-24031a3e05cso2163295ad.1;
-        Wed, 30 Jul 2025 16:19:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753917563; x=1754522363; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:sender:from:to:cc:subject:date:message-id:reply-to;
-        bh=8s2S0s+Q/X3hyGBkcdxZoJhfiSXZ24fRAddp33bdKFs=;
-        b=ShHoe0LcUxgHICekZHG0QGliUId9s0md74EgYKchiIdW9OEQ9Glm80k/pvvg0j9apV
-         ti3cY9J4IwKtDH1kFjYoxgAg5uyAApkjy8E3cILSmJLuSNsxaGorn5Ai73CbyRbUeIiK
-         tzmWpYFdvv1WAgrdWnuLSyOwqgUfwmoG90E3/DhIulgpLe5GgDu5DdNDOCnJKTaTkw7X
-         Y/dBti53uXtWJwFkBjwn00mE07+BcTrb6yEdgyR5cMujiIMKW9IwPKBCxBHaC34XUplY
-         IBRG8R59LlORZvYXoNpMZs6QfWtFCVzO/Yl8g0fJvtc5Un4aipx6wZ+K/qDtqREPHDHa
-         cfYg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753917563; x=1754522363;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:sender:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8s2S0s+Q/X3hyGBkcdxZoJhfiSXZ24fRAddp33bdKFs=;
-        b=P7hOSY03MzvXir5P+Au12nrQam6xYW5qwwHVJuHpHfQ5ZfiwQNWCL+yhR67h9Jgl4E
-         bWDqjwLxCaVCeXy3m/ZhrnBa9PMOVURxIRU3HZdPDyHpU8JVTlb/8bslfBrVoIaYbSRA
-         WlRWvtC2DEpJcKeK4H42oqz6Bpcu7iw+gyfE1fnAEIS2vGqMnvRw2EZ4CgxtmWxZwXW2
-         iUwvyOio9PRMWjXqoSV/lS6C5WpfWcNoxjG7C2EEf0ktNkVP39wXNNs74/EtuaLbiIku
-         uhxmZDtylCGnBKPbujwTS8JOS/zCDZpqpBmtWThXeB7ipb+udRGNHCr9FJDqKKcgpZXz
-         Ch/g==
-X-Forwarded-Encrypted: i=1; AJvYcCUKjIGEvvLzXWXtCorAw3n1oLXrQkd4dq+4Ya8R4rhdiU/kobhH0Vtby+F2OvuEJO6XN570/4s6@vger.kernel.org, AJvYcCVuXVR7rRiwXFMna/DzPlfTGO3bPEvHNKCESMWXTTJ18Jp21VAY0+Ni8xYZRMs2gLnWPQICZlqEjmRve1A=@vger.kernel.org, AJvYcCWxGvi9DszWnzdVAYRrCw48fdsfmFC6q2J5/dV/a03EBxTXls+ytSPffAdpbnjznBG7VG6vByfL8rj2tJOX@vger.kernel.org
-X-Gm-Message-State: AOJu0YxjCvmMEMbky7LVnNlZ4dIWlWGDrxfj7EONCj/9/B9YdVSTq0CJ
-	RKvpWO66aoKqE6vTXCOYZgLlwBe5C07cRCzESlpYKkxg7YO67U3YBMZbvUki5A==
-X-Gm-Gg: ASbGncuQTbE7G+C036IUT9UOB5HPc4HDwF8mdj5BnY2nmL98AmLDltvvgObR2ZktN1z
-	gofzNqKt8QrtSHmMWSr1SPtL1fuDm6twCAemE+AO5mNK4RryBFVEcqnsouiDls6H8767obAHbmw
-	k3CU1uSbg+M5Dpg9G0KHqMB+kzRVt8DBqGKK7bh+I0YbaeejF0YAEIVj8R+4f50EH5p65vFOJn9
-	YTkFayrkC93XPOMP9g4zxTI8mV89o3o4iIaCmla2frP0/C+v1n1GZMoq9hXo4b6IWv0n0ARdXD6
-	XFG9A9KxThJjWH7Jqb0z6xeXMIuDkeOS6dXLbJ/ve+qxPCruE2O/FkrMRaXm0hPsuAVqOsJO+Hb
-	NEBro+pwQnloofi1UgtX9QzKQHPNtT3Vh4S0QP3pDoe4Hc5/jcmTQnkjkNwRAjp2W3ZsZ+2A=
-X-Google-Smtp-Source: AGHT+IHp1T7v3GeCocoi+vdpH0GVxi/ojy+El4cAzOnyOVrliuqPIbmBJ8oLLpVSUzUfLZCNcqUVig==
-X-Received: by 2002:a17:903:1cb:b0:23f:fa47:f933 with SMTP id d9443c01a7336-24200a5a8aamr65125ad.8.1753917562757;
-        Wed, 30 Jul 2025 16:19:22 -0700 (PDT)
-Received: from ?IPV6:2600:1700:e321:62f0:da43:aeff:fecc:bfd5? ([2600:1700:e321:62f0:da43:aeff:fecc:bfd5])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-241e897690csm1813515ad.99.2025.07.30.16.19.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 30 Jul 2025 16:19:22 -0700 (PDT)
-Sender: Guenter Roeck <groeck7@gmail.com>
-Message-ID: <2919c400-9626-4cf7-a889-63ab50e989af@roeck-us.net>
-Date: Wed, 30 Jul 2025 16:19:20 -0700
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="S2KpM2d8"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=yv01aNHLgoFQNcGQcfjwFjxPM+lpExQRhQl2bdrBRQXt2Dy5a1V3LmeB5Rq/Q+xIZbWCU31Llf+IZVek09xBMDn/kgo17qU2JelQS763t/rSAri/Tcwc61uCInTQGj/Q2XQpPJarXVEh89to4aKzX+JgwtL55LH7qSgur4Dauq1GHIcIGO2CbHr/co0EdyH+ynW9wa7FmA0pYwpgki5HrpxC6U08G6Vwp+8xRFeuPyBtssGM8RFJReg4xMxs7b4juSuiaRM6A6PfcL/3YvTyR0PeaFsYEJuu5E/TtaJkb/l4EPE15Rb++E0etylJeiVgrKiz5vJfZTaAZQxFWfi0uw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=IKc63Cawmn7SJjTjCyD85gAEB1IHRvkPC2bj/0KNU/A=;
+ b=WV0HTyjQpk9CcpjraftJGGNwQ2u6Q9ZaGvdj3eJGv0erTAIJDWhMOntuZqPfoFQQID0d6oMZ12oRabTtDd6IMNKCZgLsZsbr/vWD+5TvwWIriiQjsxP1mzzqxI5YeONGwJF9DaeeEjPLGcCG5old/bdyTqBe4lhlZYH8NhCp+uRmeq22hiPpWOQAqcDXtVejOLhWi7U59mjAFu9XKy4GsFvwke696yYpssa+0mnKNCM895mIshVtipy3qiE+4kgxrGE+jjOF1tvsozD9bU2AK6VbjRDT5y94BRttvYiUFInlZ2rBRaz1tXeHqnL5YlqaqyKTy2EZvcxOTPu1WEUaiA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=IKc63Cawmn7SJjTjCyD85gAEB1IHRvkPC2bj/0KNU/A=;
+ b=S2KpM2d8/DX1kqdkMY+cvt2mKK5wtQH+6CCUGCoWe+50umC6gIG9fGI1rzPq2hODW4zfaoshtoA/NW8qGQWKRdCQ4Xw56wCDbw0pQrC+CNiCY24k6xxk6uGIUeSZFyNeQea66VL4a7IN6F59dt5HjaBOPI63wC4L7fjyGYAK50pw4tSrmkN8wFVWTVqh/lM2RSC8NcZvX3k0TZHbMMdVHNchh1JnxiSZRr5UUp/KN4bHuUQ9id2Cv6Pxjet7G8iKKz0fgvknj4b7hTvK7fKp/oWrIYbqUhKLf0AwkkOZlepY6ySsazchyn9LwAlnPbZ0QueE22yqtn1kwPIMZKbyFg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
+ by BL1PR12MB5778.namprd12.prod.outlook.com (2603:10b6:208:391::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8964.24; Thu, 31 Jul
+ 2025 00:21:39 +0000
+Received: from CH3PR12MB8659.namprd12.prod.outlook.com
+ ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
+ ([fe80::6eb6:7d37:7b4b:1732%7]) with mapi id 15.20.8989.011; Thu, 31 Jul 2025
+ 00:21:39 +0000
+Date: Wed, 30 Jul 2025 21:21:38 -0300
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Leon Romanovsky <leon@kernel.org>, Leon Romanovsky <leonro@nvidia.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
+	dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
+	Jens Axboe <axboe@kernel.dk>,
+	=?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
+	Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+	linaro-mm-sig@lists.linaro.org, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
+	linux-mm@kvack.org, linux-pci@vger.kernel.org,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Vivek Kasireddy <vivek.kasireddy@intel.com>,
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH 00/10] vfio/pci: Allow MMIO regions to be exported
+ through dma-buf
+Message-ID: <20250731002138.GD89283@nvidia.com>
+References: <cover.1753274085.git.leonro@nvidia.com>
+ <20250730135846.2208fe89.alex.williamson@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250730135846.2208fe89.alex.williamson@redhat.com>
+X-ClientProxiedBy: YT4PR01CA0073.CANPRD01.PROD.OUTLOOK.COM
+ (2603:10b6:b01:ff::24) To CH3PR12MB8659.namprd12.prod.outlook.com
+ (2603:10b6:610:17c::13)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] block/blk-throttle: Fix throttle slice time for SSDs
-To: yukuai@kernel.org, Tejun Heo <tj@kernel.org>
-Cc: Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>,
- Yu Kuai <yukuai3@huawei.com>, cgroups@vger.kernel.org,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250730164832.1468375-1-linux@roeck-us.net>
- <20250730164832.1468375-2-linux@roeck-us.net>
- <1a1fe348-9ae5-4f3e-be9e-19fa88af513c@kernel.org>
-Content-Language: en-US
-From: Guenter Roeck <linux@roeck-us.net>
-Autocrypt: addr=linux@roeck-us.net; keydata=
- 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
- np3900V20aS7eD9K8GTU0TGC1pyz6IVJwIE=
-In-Reply-To: <1a1fe348-9ae5-4f3e-be9e-19fa88af513c@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|BL1PR12MB5778:EE_
+X-MS-Office365-Filtering-Correlation-Id: d1ffe96d-a53d-47f9-aafa-08ddcfc837bf
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|7416014|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?dxRWaf01AGlEQXan3FZtyaRabWJoZR+VzqRozd71Ryhs0/blct8Ty48AbqCL?=
+ =?us-ascii?Q?glyCF6l9Rsx7MRs1wuvlPpQhmd++NEWlApfzH2U9XUDmiCKD/2lPmk8ahGwr?=
+ =?us-ascii?Q?wd6bWFgyJlgG0R1cBk1mt9LWQj3eauRyrmSBKd6ya4QL3RcwUMq6EGBBYD7t?=
+ =?us-ascii?Q?lYghugsWSSzV1/XGdOnhqjcPdNP0S9j4MMxmdOc5cXcmzGjLLxs7Teq+MekX?=
+ =?us-ascii?Q?ny4DwdHBu7DDRMXWXZjAOXi3RdkpRnSVGekSyhnNJZndufX72SClTqrp+AvN?=
+ =?us-ascii?Q?D18x1cAFGAEN8cAQsSZTa8KRLnjjnBXik7e35QpnuUakU26+tNmrrWxEhAJi?=
+ =?us-ascii?Q?SYQrwAKODKD6Ds8GPJH/0SG8HOlhq+WR9dxYzyCUPNjDOjNqRsvIJHZL/8Js?=
+ =?us-ascii?Q?JdBpMtSigyvMryameBm1+yBd+ebmOjZcIKl1KqBese81HnyDPZ/UxJGUb1vS?=
+ =?us-ascii?Q?NfhIpszvAcyG9DtLirgTAZufDtB27HSBqYXo7mq2/w/nwLVPAd+DC8ASFj1H?=
+ =?us-ascii?Q?pSmtj6a+p/5C18rlWno/FbfJDiGjNdDuNvqHhB4hHvHCjGWKjvv3UUKP0ADX?=
+ =?us-ascii?Q?mtKP/1W9bwuc5efACcIBK4V86CnU5ulyvF4213KcQniGKFZ2LW2iUuVVB5ne?=
+ =?us-ascii?Q?7S0UDkE1lI3ZFSx+45nXN6OM77Gk9zWrjcnNtdnxmgRc8Ft8zGUX3f0PO1hB?=
+ =?us-ascii?Q?h70UuirG9/jK99+hMJM70I1Re2fxSh7KiKutWuzdXg+Y1269bm5ExRgtcDXP?=
+ =?us-ascii?Q?aJ5rLHwOnWWc7D6mUJTm7EUsdFOSlA31RuLofO74B+tF/3KEHh2RdphOCNjM?=
+ =?us-ascii?Q?rcNWEZQpJBeoXHMsAPoC9OzDwWlLINjsXOEmQFw0/L3jef2j049ffxeFwOgW?=
+ =?us-ascii?Q?hM1TbpjAWKsRinRtoZTdOAZaFNLJdemNV5UGMmDyYIgYyF3J/qfayJkdV5Ft?=
+ =?us-ascii?Q?KjtNeLFulf4VRQreCmj77OjiyaamLO1iYs8Adyz8nCxYjbJukOlb2vYceAvC?=
+ =?us-ascii?Q?SBwLkBqlCwBZNWE7r7209pPVOGTnThq3INdlRbHs7xXkxzMZ3kBn/D8dIH7f?=
+ =?us-ascii?Q?bx9W3OL+BDSNM9T+S/fB2SNciUCcPCRKPcySU0jEy9PRnmokMjvvmGePb6Fl?=
+ =?us-ascii?Q?8rzyUCQwzx1rpuOwklQfBBIOq8XETkIOgO4WAH1H1DKoQmxyqnh4fOL+0gRX?=
+ =?us-ascii?Q?kiPk9qwHf6mta9PbqwRUhLLfP9L3kMJyF3GIu1Vrm/LkL5DV5CKsFWXn/Gf0?=
+ =?us-ascii?Q?WB1LZdEIV+lUposIMC5WjzQz1RLBEsrKhkzVW9KFvTVwIRXvQcgP1xZJxTC4?=
+ =?us-ascii?Q?hQOvokPq7pbOIjV9CyWfRrzIPKWpkxNQVp5C6CzTcxO1ohy9V2oGbB0Oj0n0?=
+ =?us-ascii?Q?+B96NqUAyZJtBTq3rXYn7IVBefcJQ7jJBSTKN5XP0/BGJYzNollD2ipBsDgR?=
+ =?us-ascii?Q?DeAqypsi2EQ=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?xKQLOU782IHWQbOI9s+JVlVD4xQ/rfUmlW1rQIQq/0sMVjQC1VA1azM9HTyo?=
+ =?us-ascii?Q?GnRXQoIpRga5MeOOw0fgAgXpA4+dliSyHD7V3MKhPbebad79vk9aYyTj/iDm?=
+ =?us-ascii?Q?9YkoJvE9HpinruzZUAflCDip8YlSrBVEU02L8hOUhFNUfqkYdial4i6fWLd7?=
+ =?us-ascii?Q?KEhMWV+GGQ50RNfgo62kGN2VCiTTeuT6R++f2aPRPDdFJXtctxi8nEOu0Nbj?=
+ =?us-ascii?Q?pUH58e/xFFQ0ptDGGau5N+7ee+Z4L3WwR5qW0T4ITvdOQzk/QeAVLueMFVwg?=
+ =?us-ascii?Q?8QVn+8vqNzwvz3Q5B9OiW76E4nmQPYpK/xGQ/NJc8AAgK8VNxNKcEH1OHBc9?=
+ =?us-ascii?Q?Uh5B2D2/Yk3nWECmPh1Ix0FI9irisrVcbmYImzxMMj2ZTdJwMz6vLT1UdrvF?=
+ =?us-ascii?Q?xA2Hvqf7qS6gFIIKrBU4dKHGQFUGK0V+mLDgTTuWU68OXtrlNFqk2lPJDUNu?=
+ =?us-ascii?Q?8NG2AxuUZs5y9PZYpxcNIGxWBddcV6gbB2vbZiLe5ffPXwORPXt3BjR3j3tM?=
+ =?us-ascii?Q?TnkwrlOPG9UOcIr8Gs8Ee6kUnlZxp2rvNbjqfnnFRX9eIbcZNLVeiGApnRlb?=
+ =?us-ascii?Q?TGZP9LuP2GkoCDL8wGM7V0wA652ySoLgyElntR2a1GbiZVOMDBU03MFkZEZi?=
+ =?us-ascii?Q?29w5iMdg5qtN8mIx2iZix37lQsD1IeVBc37cjyZI7JfAETTdwTxrowJ7OqU+?=
+ =?us-ascii?Q?QmHvQB9vgduD/3c1o/C2T0vtHWG+pOB2nyOJdIB3J1TFfHxlIR3bV7zwWT11?=
+ =?us-ascii?Q?ur7uq4nv3lAjr5psmpwqRO8yaktD+GoG55vi37r44mIbVrnXHDq9cYXBOOtI?=
+ =?us-ascii?Q?ujS+Q1Sbz0SUhyuFCynx+YEaKMWu21GYLzEsxf1h5Ug94m0Fkk44rgvDnmq+?=
+ =?us-ascii?Q?J4YaI7iCidVdrcTfnRUIDTjJQRf3qYBMMdRgmsRGSn2xJJ0HNWTOJJ1XQZXZ?=
+ =?us-ascii?Q?efZCuTb+B7of7Dhh4u6ZxZiGi3Wfkeg4qGi/dy4BVf2FTRXRtJxHF/AHKheh?=
+ =?us-ascii?Q?QlEhxRUjd8N5OyiQnKysPbDDbJRCRiId7/IH/LzB60v1WyAKMdzxQNZ380n/?=
+ =?us-ascii?Q?K5FVno/DfooD9vcMAfJcglG68wvciNDC1yqo4507KbCIX19vUdTMSZQuMNRn?=
+ =?us-ascii?Q?Mbj7yPra5ROXAns9Fe/srSUb0rtjQy6Z4HTFTtTrdAhw+FOduBpv6rJXk3lW?=
+ =?us-ascii?Q?f4Y0mnoKMdDG8joSfiLQqGExVDAuwfq9Rum3y6aizAwEMA2dGjY7s2i2zkuz?=
+ =?us-ascii?Q?a73jNIIbynrNzFPjW1AXdw5d563pgyTfMOvWVWvAStDZjdVDqiShYhNc2W5E?=
+ =?us-ascii?Q?m+GtUf2xx4vbCAMrTjSt28QBNYkeML00GxcJYTK/j7oXQpCiOVTYXEphKxUD?=
+ =?us-ascii?Q?pOlDFmNVl3eeo27uFM61QXoRBuDbymIIcXISUF8664nxxSuRnr6Gr0nDpk/s?=
+ =?us-ascii?Q?GCFOaSnwtjSO7sAVT0hBmXVNcow0lHk2kG0aLXZW7ck8juVLh+SEXig/r9Br?=
+ =?us-ascii?Q?iUfdgQJiP56f7MscCEbI8jjoDwKWUouB6P84IR6Wgoljca7+oHUMaE/zcWF6?=
+ =?us-ascii?Q?TSbq4Nm5YgbQKZ2urxs=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d1ffe96d-a53d-47f9-aafa-08ddcfc837bf
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Jul 2025 00:21:39.5092
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: fBZKic+StbzkFL29chHmNUk/woDv7MiDJk3hrz/b5ExZHWvZ5RyJI+O2dUe3aKYN
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5778
 
-On 7/30/25 11:30, Yu Kuai wrote:
-> Hi,
+On Wed, Jul 30, 2025 at 01:58:46PM -0600, Alex Williamson wrote:
+> On Wed, 23 Jul 2025 16:00:01 +0300
+> Leon Romanovsky <leon@kernel.org> wrote:
 > 
-> 在 2025/7/31 0:48, Guenter Roeck 写道:
->> Commit d61fcfa4bb18 ("blk-throttle: choose a small throtl_slice for SSD")
->> introduced device type specific throttle slices if BLK_DEV_THROTTLING_LOW
->> was enabled. Commit bf20ab538c81 ("blk-throttle: remove
->> CONFIG_BLK_DEV_THROTTLING_LOW") removed support for BLK_DEV_THROTTLING_LOW,
->> but left the device type specific throttle slices in place. This
->> effectively changed throttling behavior on systems with SSD which now use
->> a different and non-configurable slice time compared to non-SSD devices.
->> Practical impact is that throughput tests with low configured throttle
->> values (65536 bps) experience less than expected throughput on SSDs,
->> presumably due to rounding errors associated with the small throttle slice
->> time used for those devices. The same tests pass when setting the throttle
->> values to 65536 * 4 = 262144 bps.
->>
->> The original code sets the throttle slice time to DFL_THROTL_SLICE_HD if
->> CONFIG_BLK_DEV_THROTTLING_LOW is disabled. Restore that code to fix the
->> problem. With that, DFL_THROTL_SLICE_SSD is no longer necessary. Revert to
->> the original code and re-introduce DFL_THROTL_SLICE to replace both
->> DFL_THROTL_SLICE_HD and DFL_THROTL_SLICE_SSD. This effectively reverts
->> commit d61fcfa4bb18 ("blk-throttle: choose a small throtl_slice for SSD").
->>
->> After the removal of CONFIG_BLK_DEV_THROTTLING_LOW, it is no longer
->> necessary to enable block accounting, so remove the call to
->> blk_stat_enable_accounting(). With that, the track_bio_latency variable
->> is no longer used and can be deleted from struct throtl_data. Also,
->> including blk-stat.h is no longer necessary.
->>
->> While at it, also remove MAX_THROTL_SLICE since it is not used anymore.
->>
->> Fixes: bf20ab538c81 ("blk-throttle: remove CONFIG_BLK_DEV_THROTTLING_LOW")
->> Cc: Yu Kuai <yukuai3@huawei.com>
->> Cc: Tejun Heo <tj@kernel.org>
->> Signed-off-by: Guenter Roeck <linux@roeck-us.net>
->> ---
->>   block/blk-throttle.c | 15 ++-------------
->>   1 file changed, 2 insertions(+), 13 deletions(-)
->>
->> diff --git a/block/blk-throttle.c b/block/blk-throttle.c
->> index 397b6a410f9e..924d09b51b69 100644
->> --- a/block/blk-throttle.c
->> +++ b/block/blk-throttle.c
->> @@ -12,7 +12,6 @@
->>   #include <linux/blktrace_api.h>
->>   #include "blk.h"
->>   #include "blk-cgroup-rwstat.h"
->> -#include "blk-stat.h"
->>   #include "blk-throttle.h"
->>   /* Max dispatch from a group in 1 round */
->> @@ -22,9 +21,7 @@
->>   #define THROTL_QUANTUM 32
->>   /* Throttling is performed over a slice and after that slice is renewed */
->> -#define DFL_THROTL_SLICE_HD (HZ / 10)
->> -#define DFL_THROTL_SLICE_SSD (HZ / 50)
->> -#define MAX_THROTL_SLICE (HZ)
->> +#define DFL_THROTL_SLICE (HZ / 10)
->>   /* A workqueue to queue throttle related work */
->>   static struct workqueue_struct *kthrotld_workqueue;
->> @@ -45,8 +42,6 @@ struct throtl_data
->>       /* Work for dispatching throttled bios */
->>       struct work_struct dispatch_work;
->> -
->> -    bool track_bio_latency;
->>   };
->>   static void throtl_pending_timer_fn(struct timer_list *t);
->> @@ -1345,13 +1340,7 @@ static int blk_throtl_init(struct gendisk *disk)
->>           goto out;
->>       }
->> -    if (blk_queue_nonrot(q))
->> -        td->throtl_slice = DFL_THROTL_SLICE_SSD;
->> -    else
->> -        td->throtl_slice = DFL_THROTL_SLICE_HD;
->> -    td->track_bio_latency = !queue_is_mq(q);
->> -    if (!td->track_bio_latency)
->> -        blk_stat_enable_accounting(q);
->> +    td->throtl_slice = DFL_THROTL_SLICE;
->>   out:
->>       blk_mq_unquiesce_queue(disk->queue);
-> This looks correct, I do missed the throtl_slice for ssd is only used with
-> BLK_DEV_THROTTLING_LOW. However, I think it's better to factor the
-> track_bio_latency changes into a separate patch.
+> > From: Leon Romanovsky <leonro@nvidia.com>
+> > 
+> > ---------------------------------------------------------------------------
+> > Based on blk and DMA patches which will be sent during coming merge window.
+> > ---------------------------------------------------------------------------
+> > 
+> > This series extends the VFIO PCI subsystem to support exporting MMIO regions
+> > from PCI device BARs as dma-buf objects, enabling safe sharing of non-struct
+> > page memory with controlled lifetime management. This allows RDMA and other
+> > subsystems to import dma-buf FDs and build them into memory regions for PCI
+> > P2P operations.
+> > 
+> > The series supports a use case for SPDK where a NVMe device will be owned
+> > by SPDK through VFIO but interacting with a RDMA device. The RDMA device
+> > may directly access the NVMe CMB or directly manipulate the NVMe device's
+> > doorbell using PCI P2P.
+> > 
+> > However, as a general mechanism, it can support many other scenarios with
+> > VFIO. This dmabuf approach can be usable by iommufd as well for generic
+> > and safe P2P mappings.
 > 
+> I think this will eventually enable DMA mapping of device MMIO through
+> an IOMMUFD IOAS for the VM P2P use cases, right?  
 
-I had combined it because it is another left-over from bf20ab538c81 and
-I don't know if enabling statistics has other side effects. But, sure,
-I can split it out if that is preferred. Let's wait for feedback from
-Jens and/or Tejun; I'll follow their guidance.
+This is the plan
 
-Thanks,
-Guenter
+> How do we get from
+> what appears to be a point-to-point mapping between two devices to a
+> shared IOVA between multiple devices?
 
+You have it right below, it is a point to point mapping between the
+vfio device and the iommufd.
+
+> I'm guessing we need IOMMUFD to support something like
+> IOMMU_IOAS_MAP_FILE for dma-buf, 
+
+1) The dma phys series which needs more work
+2) This series to get basic 'movable' DMABUF support in VFIO
+3) Add 'revokable' as a DMABUF concept and implement it with mlx5 and
+   vfio
+4) Add some way to get the phys_addr list from the DMABUF
+5) IOMMU_IOAS_MAP_FILE using a revokable attachment and the phys_addr
+   list. When VFIO does FLR the iommufd can remove the IOPTEs and then
+   put them back when FLR is done.
+
+It is not so much more code, but I think every step will take a lot of
+work to get agreements.
+
+Then we reuse all of the above with some tweaks for the CC problems
+too.
+
+Jason
