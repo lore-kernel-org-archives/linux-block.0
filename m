@@ -1,170 +1,102 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f46.google.com (mail-io1-f46.google.com [209.85.166.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6204225784;
-	Thu, 31 Jul 2025 17:12:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2BDB21CFF6
+	for <linux-block@vger.kernel.org>; Thu, 31 Jul 2025 21:02:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753981979; cv=none; b=UHfpCbjDlUmhapzZIfGUdqaC+Vd76w8oJCZrd9jP1WVFTmkSm1InTwr0OliMe0QEK29HE+EAQJhzG+PHsVFCHnlQcc66XEZZ7c+TVIOwUEPfSyrVZEQVsW0mdl56f8SZBDY3KZJdVvdpLUUrPpmB4xOIP5f9mWV5UBPykJ0TOKs=
+	t=1753995761; cv=none; b=uwK9UCl/ydYxJBHnkmDH0fSGVahFHtuQmDIOoLeoL6UXg+ucqHew2hjHAgEMIH/8/36t9e0aCyjDq61n2+QGJAU38a2YGOZeH4yY9zM88+qXOWC1uEMGV7DcTYL5c0TDDi23y+LDN12N7JZ66R2iA186ZfeflOIk1jUs02gkXyc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753981979; c=relaxed/simple;
-	bh=749QrL7J0/QGXNnQBMQXrAxmTfG1i6S/8klvDMbN0Zk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NcJ4pPzvCzWkLFcONWI40rYp06pBPMARC0qAFEjXvdEIcc7170foVQwg+4Q4JV+dcPWkmBkJL9gcbzHf4EaCqFnZzgw3fUniKtD7XAPeIwRVkve7GdbV8B9vxvcM3Y2UTEwcT1Oep4VQAR3E1qEq1/aM84tGyMxmpQ4CEJEbVjk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Kj5JV3tO; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1753995761; c=relaxed/simple;
+	bh=UJCl2cQMgRX+GlJFrWuwmM69d1vT6AAGxPT3QehxXfM=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=KpMF6uRf/FxFRDF1sBdLokkhgGO0Ma8dzAiPKg9Yml8OxYwVZGvJ8/yFTxzryN6HvUCZJGnkSHMiWQP8LjGp/rH6BQy8DZyxZE4MdlaiBROYFodvUv4E0ulbsnPh0t1C3PLlYFIw0l2/6JGeBilqWe3g9Pwp9fCtCEzDHHPVUvk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=wYFZElsf; arc=none smtp.client-ip=209.85.166.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Kj5JV3tO"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA434C4CEEF;
-	Thu, 31 Jul 2025 17:12:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753981979;
-	bh=749QrL7J0/QGXNnQBMQXrAxmTfG1i6S/8klvDMbN0Zk=;
-	h=Date:Reply-To:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Kj5JV3tOEOJziKA5GcWydOQLVXuuxUDhzo9hx04OjNFlbGyFVdEkNEXiEBglYUOFe
-	 w3UhNalj62focn6MClwC3yB/MJpPvVC1NskaaVyX6V+yymHVY5QdigQSugDkn6q48a
-	 P55+BzlRK41SUDOHMzn5OYagSncHkdOwaeMM6aRrXo+Oi5tx3mMfosRU4bqVr0pZRh
-	 K7gFBnpVaIH81SnKxhQknFTZMtkmae5WnjeJEZpamKBdFUQINSWRdV1vlQ+EltrqFH
-	 tpjgJRSSGa7R46LoRuN6ZWkOX4YS3a/MtLCZmG1XHy3irrUz4KRFWIR1PfT/PyZ6ZC
-	 9HmClJewkmwTw==
-Message-ID: <2ca5109a-341c-497a-9da7-422d56620348@kernel.org>
-Date: Fri, 1 Aug 2025 01:12:55 +0800
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="wYFZElsf"
+Received: by mail-io1-f46.google.com with SMTP id ca18e2360f4ac-87999c368e9so17401739f.0
+        for <linux-block@vger.kernel.org>; Thu, 31 Jul 2025 14:02:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1753995758; x=1754600558; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=i7W3cWn1TbHQC90X0PU0aixh2SgsR358GmA1P3kMX4k=;
+        b=wYFZElsfhJ6JEqeBoNUeXpTiO4ezO7v8rKmF7Dw/FLMbHzmov0kblA1oVVBzshtjDp
+         QEM9LND0XIiF+9Ml5CIhcy2t1llTG8b6xi6veThjx8UJ0JwDFLPEs4Keot/2NLKRPTTB
+         lK7q/CUd3I2Y3AGRZCp0YdpKWQZdrMJ6G1q6WTZmVJ92ZqRhJAXbY/QCexAB1Ds4jZWG
+         rosENgDJg2/gGZ4HFe1ewU90/fUsCSyuqLysDZWaMZJ/E1oyaMyMgZLYh1GLzJYo9Klg
+         qNGbUfvXbE0wpGfmITNV7+njkwNL5IKA5J13KGRyTe6b14wNeK6yWtqXRl7H1IAbdnME
+         Mbzw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753995758; x=1754600558;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=i7W3cWn1TbHQC90X0PU0aixh2SgsR358GmA1P3kMX4k=;
+        b=loUKpy1Tn5eiafR1FGHG2e541lgvl/pV6q/qnYTdSaTOwvKrX3ILXYaFxmTbyS2NJg
+         TXeFIO5BNmX1POaxIOKbWaPYS042nBldherrIfHI3YO7Da/j8wXaPSR+eJjdO4EldazS
+         5fsX1nTOj7i5B5qaqti4Xb4Os7uB8fW00cbNw1M5Uw9xb3zrQPw0VPd++fWo4RoMA4jx
+         ktqxqlyH5E+agghWnBCugz6h+93De9Ax/e5pt61vkVkQuBJJD+E/nm7wBEEwulyWCiIf
+         zKG9ggrAX3Li/z5wpXo+5yoofMxIeQ/fEnO6YiLZ9IORIobqwWjZzPOmju8gzLRYrihp
+         my6Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWCTLlweES20Z6ienl4PjVHsW9ItvOG4yMzzD2rxPaSw4ttnDYgILWx9H0hJSMrj8Fcnan3A56XV/WTxg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YypdubwnsVQuU6NsJpsISZKgNxWU0p0JbWI1ak7SxICL5EHwqWH
+	rCCVTz53M6D9iWLTXB+/rDmX0o1jy7+yPpmqzPBGAGVeNQXpgHJsB/QPRhKRs5Nw5OY=
+X-Gm-Gg: ASbGncvxSktDalAw1MXZ3pfFsiEMVJD8xZJI8HvOHKaDEB+Fqkv/ZSGsaKNBoSaxLL9
+	EvXQlb3PsFO7ZZHqKABFCULmExz63kmblA98uLQBdFDtpcC4RU3p7OkixDqc5oVxPeAyYjGHfEF
+	mnfcGCI9ZPThSPprPIir4T2PvaLvT4hkBIVY8TkMNkgFGbr3RZER9aL2Ys+DIuiR+bJXF+2TmP7
+	Q+zdwThONAb9AjVwENy+/VAIHbQYEW9UF327Zfm/2l9QDoJfVI+6El22pQS7w0MtAV+KD4dtLcs
+	uADbu5E6gfDCM5nuThbg69CM3Tw4ke7+4SsOUHgzzFMPXdnVUKt9m0JUJmvv0tsKEj0WY4Iuoud
+	qIYgwedGbOUnB
+X-Google-Smtp-Source: AGHT+IHIk2jE1Ye8sV1LTSszrfrw4cpyaap4oxaBCtWVjJTdYAbBjCk4wWmzF6JBbrHYN0imHYh4Qw==
+X-Received: by 2002:a05:6e02:f:b0:3e3:f914:d774 with SMTP id e9e14a558f8ab-3e3f914d892mr136903565ab.17.1753995758487;
+        Thu, 31 Jul 2025 14:02:38 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-50a55df201bsm752208173.109.2025.07.31.14.02.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 31 Jul 2025 14:02:37 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: Christoph Hellwig <hch@lst.de>
+Cc: anand.jain@oracle.com, martin.petersen@oracle.com, 
+ linux-block@vger.kernel.org
+In-Reply-To: <20250731152228.873923-1-hch@lst.de>
+References: <20250731152228.873923-1-hch@lst.de>
+Subject: Re: [PATCH] block: ensure discard_granularity is zero when discard
+ is not supported
+Message-Id: <175399575696.610680.7413167868031729595.b4-ty@kernel.dk>
+Date: Thu, 31 Jul 2025 15:02:36 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: yukuai@kernel.org
-Subject: Re: [PATCH] blk-wbt: Fix io starvation in wbt_rqw_done()
-To: Yizhou Tang <tangyeechou@gmail.com>, Julian Sun <sunjunchao2870@gmail.com>
-Cc: linux-block@vger.kernel.org, axboe@kernel.dk, stable@vger.kernel.org,
- Julian Sun <sunjunchao@bytedance.com>
-References: <20250731123319.1271527-1-sunjunchao@bytedance.com>
- <CAOB9oOZV5ObqvgNxr9m0ztm7ruM9N9RMi8QHmiG5WL4sNbLxuw@mail.gmail.com>
-Content-Language: en-US
-From: Yu Kuai <yukuai@kernel.org>
-In-Reply-To: <CAOB9oOZV5ObqvgNxr9m0ztm7ruM9N9RMi8QHmiG5WL4sNbLxuw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3-dev-2ce6c
 
-Hi,
 
-在 2025/7/31 23:40, Yizhou Tang 写道:
-> Hi Julian,
->
-> On Thu, Jul 31, 2025 at 8:33 PM Julian Sun <sunjunchao2870@gmail.com> wrote:
->> Recently, we encountered the following hungtask:
->>
->> INFO: task kworker/11:2:2981147 blocked for more than 6266 seconds
->> "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
->> kworker/11:2    D    0 2981147      2 0x80004000
->> Workqueue: cgroup_destroy css_free_rwork_fn
->> Call Trace:
->>   __schedule+0x934/0xe10
->>   schedule+0x40/0xb0
->>   wb_wait_for_completion+0x52/0x80
-> I don’t see __wbt_wait() or rq_qos_wait() here, so I suspect this call
-> stack is not directly related to wbt.
->
->
->>   ? finish_wait+0x80/0x80
->>   mem_cgroup_css_free+0x3a/0x1b0
->>   css_free_rwork_fn+0x42/0x380
->>   process_one_work+0x1a2/0x360
->>   worker_thread+0x30/0x390
->>   ? create_worker+0x1a0/0x1a0
->>   kthread+0x110/0x130
->>   ? __kthread_cancel_work+0x40/0x40
->>   ret_from_fork+0x1f/0x30
-This is writeback cgroup is waiting for writeback to be done, if you 
-figured out
-they are throttled by wbt, you need to explain clearly, and it's very 
-important to
-provide evidence to support your analysis. However, the following 
-analysis is
-a mess :(
->>
->> This is because the writeback thread has been continuously and repeatedly
->> throttled by wbt, but at the same time, the writes of another thread
->> proceed quite smoothly.
->> After debugging, I believe it is caused by the following reasons.
->>
->> When thread A is blocked by wbt, the I/O issued by thread B will
->> use a deeper queue depth(rwb->rq_depth.max_depth) because it
->> meets the conditions of wb_recent_wait(), thus allowing thread B's
->> I/O to be issued smoothly and resulting in the inflight I/O of wbt
->> remaining relatively high.
->>
->> However, when I/O completes, due to the high inflight I/O of wbt,
->> the condition "limit - inflight >= rwb->wb_background / 2"
->> in wbt_rqw_done() cannot be satisfied, causing thread A's I/O
->> to remain unable to be woken up.
->  From your description above, it seems you're suggesting that if A is
-> throttled by wbt, then a writer B on the same device could
-> continuously starve A.
-> This situation is not possible — please refer to rq_qos_wait(): if A
-> is already sleeping, then when B calls wq_has_sleeper(), it will
-> detect A’s presence, meaning B will also be throttled.
-Yes, there are three rq_wait in wbt, and each one is FIFO. It will be 
-possible
-if  A is backgroup, and B is swap.
->
-> Thanks,
-> Yi
->
->> Some on-site information:
->>
->>>>> rwb.rq_depth.max_depth
->> (unsigned int)48
->>>>> rqw.inflight.counter.value_()
->> 44
->>>>> rqw.inflight.counter.value_()
->> 35
->>>>> prog['jiffies'] - rwb.rqos.q.backing_dev_info.last_bdp_sleep
->> (unsigned long)3
->>>>> prog['jiffies'] - rwb.rqos.q.backing_dev_info.last_bdp_sleep
->> (unsigned long)2
->>>>> prog['jiffies'] - rwb.rqos.q.backing_dev_info.last_bdp_sleep
->> (unsigned long)20
->>>>> prog['jiffies'] - rwb.rqos.q.backing_dev_info.last_bdp_sleep
->> (unsigned long)12
->>
->> cat wb_normal
->> 24
->> cat wb_background
->> 12
->>
->> To fix this issue, we can use max_depth in wbt_rqw_done(), so that
->> the handling of wb_recent_wait by wbt_rqw_done() and get_limit()
->> will also be consistent, which is more reasonable.
-Are you able to reproduce this problem, and give this patch a test before
-you send it?
+On Thu, 31 Jul 2025 08:22:28 -0700, Christoph Hellwig wrote:
+> Documentation/ABI/stable/sysfs-block states:
+> 
+>   What: /sys/block/<disk>/queue/discard_granularity
+>   [...]
+>   A discard_granularity of 0 means that the device does not support
+>   discard functionality.
+> 
+> [...]
 
-Thanks,
-Kuai
->>
->> Signed-off-by: Julian Sun <sunjunchao@bytedance.com>
->> Fixes: e34cbd307477 ("blk-wbt: add general throttling mechanism")
->> ---
->>   block/blk-wbt.c | 2 ++
->>   1 file changed, 2 insertions(+)
->>
->> diff --git a/block/blk-wbt.c b/block/blk-wbt.c
->> index a50d4cd55f41..d6a2782d442f 100644
->> --- a/block/blk-wbt.c
->> +++ b/block/blk-wbt.c
->> @@ -210,6 +210,8 @@ static void wbt_rqw_done(struct rq_wb *rwb, struct rq_wait *rqw,
->>          else if (blk_queue_write_cache(rwb->rqos.disk->queue) &&
->>                   !wb_recent_wait(rwb))
->>                  limit = 0;
->> +       else if (wb_recent_wait(rwb))
->> +               limit = rwb->rq_depth.max_depth;
->>          else
->>                  limit = rwb->wb_normal;
->>
->> --
->> 2.20.1
->>
->>
+Applied, thanks!
+
+[1/1] block: ensure discard_granularity is zero when discard is not supported
+      commit: fad6551fcf537375702b9af012508156a16a1ff7
+
+Best regards,
+-- 
+Jens Axboe
+
+
 
