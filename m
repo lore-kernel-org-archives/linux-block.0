@@ -1,227 +1,101 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 981A5288C37;
-	Fri,  1 Aug 2025 16:10:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE618442C
+	for <linux-block@vger.kernel.org>; Fri,  1 Aug 2025 23:47:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754064655; cv=none; b=koCa8dCb7ILV1OcT2wk6HH68DSt1mGlFaatGdTDb8bDG93aQd8dpJxwSO7MMY6iZqEVGWX4S+v9CT0mxrdPWdv54Cdua/jaFOIW8i00QOS9K6IP6syQBq6pZfnfHgo+gEKLbAjh/IAy+BH7R/geQomjeW09z6WHFzDOEWaL4rAs=
+	t=1754092069; cv=none; b=NyOk7TBIHSRVeepOcQsp4LC4uihR0RSj8szGCqjVDfuaE+usahvQldual1qyzNat0bWt57Ji+nVU62TgYSTZlMcx+AOa8tTJ15rEL3WconIXYkCL05bwxoTZ5aFxdsPW531kK4SI3sIaC5SL4n9dnhEegP5lgqHDvZSovJ4XkGY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754064655; c=relaxed/simple;
-	bh=YJUX0fpZN2RLxt3SCQZZyd2sdDmDLe9bwhG+Ls39SMM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GhX9LEwmaNaz20pv88fXNJyxE1gpqqpGszFE9BheA/Sj5PLZkr8baGJnzo1DzhpXbCkMgWvs+pPwBexGa5zig1CQrl6lQtyIq7354wdKOZwA8yjMijHyhI3kGstA0BvCrHaxndY0fmnv8G+UQOtwgPQ6wNsHOkmuHnzShdDx5nI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J7Tpr5vU; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1754092069; c=relaxed/simple;
+	bh=yawt4GLbtfkvbaUJZ5kOUtqrePnmOrCGb6Kso3LofT4=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=hVCeRWFiZeRnTxihSvjv/8A7yc3P4ZCojj9rEL8yQINoBXEzjCSXAzrMNQN3rOUI1DT2r9ua1YlSwwadfQyLohJ1SNUt+/dl2xyxMIwDvwhTEQLivzv73PL9uoK8gbDp2tVheXnAjv5eC7LB/xroN2DU/1uKvFIH3KuUokAh0F8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=FD+ChOYW; arc=none smtp.client-ip=67.231.145.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J7Tpr5vU"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF00BC4CEE7;
-	Fri,  1 Aug 2025 16:10:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754064655;
-	bh=YJUX0fpZN2RLxt3SCQZZyd2sdDmDLe9bwhG+Ls39SMM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=J7Tpr5vUDIiquy+2FF26DmpbqK2Odv7P6GzUmjQswnMhtto/uOoEKOrxUoBkvFsqm
-	 D5aRJWoC9dKnm3OK5pEE0Vs8EtWHRd+zySlXi5Kg10BeSZ0n2rNqIa/fQZ2uCfADgy
-	 udSzfDjzuhpLuvFuafbw+CV+OhqXMGd9dLDKSfHa0iQ7nGkIGAutiMVw/tWwK1roCk
-	 XtxySqdq5NLSxq57f2OJgFQzjJoGhsRGBq4OWXp29Q/ho0L2GfoQxS9KIgFw6ZQFnZ
-	 S5tv6d0CTA+qH1NWB4LUgOZeLK/BgVA4mBv9epduMflvy1KLtCKNP5y9Gui7cAD5V+
-	 ZGEEejXJzgI8Q==
-Date: Fri, 1 Aug 2025 12:10:53 -0400
-From: Mike Snitzer <snitzer@kernel.org>
-To: Keith Busch <kbusch@kernel.org>
-Cc: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-	Jeff Layton <jlayton@kernel.org>,
-	Chuck Lever <chuck.lever@oracle.com>, NeilBrown <neil@brown.name>,
-	Olga Kornievskaia <okorniev@redhat.com>,
-	Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>,
-	Trond Myklebust <trondmy@kernel.org>,
-	Anna Schumaker <anna@kernel.org>, linux-nfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	hch@infradead.org, linux-block@vger.kernel.org
-Subject: Re: [RFC PATCH v2 4/8] lib/iov_iter: remove piecewise bvec length
- checking in iov_iter_aligned_bvec
-Message-ID: <aIznDZtTNk96V_5z@kernel.org>
-References: <20250708160619.64800-1-snitzer@kernel.org>
- <20250708160619.64800-5-snitzer@kernel.org>
- <5819d6c5bb194613a14d2dcf05605e701683ba49.camel@kernel.org>
- <aG_SpLuUv4EH7fAb@kbusch-mbp>
- <aG_mbURjwxk3vZlX@kernel.org>
- <aIzcDWJyft7kzGi3@kbusch-mbp>
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="FD+ChOYW"
+Received: from pps.filterd (m0044012.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 571MmwJ5011331
+	for <linux-block@vger.kernel.org>; Fri, 1 Aug 2025 16:47:47 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=s2048-2025-q2; bh=G6dqwmMmZJ1kXj+Rc/
+	2AKaMeSpGPdARz82Yt30s8+pQ=; b=FD+ChOYWqEK2YBnwRv07tSwOyB6n8eQqYY
+	9Zox2wW1TdtC8sJ4BKDNjHMzybYm1PhkjQfMfH/YF8NCGhS5WxjSKyex3TnKV5Go
+	7gbty3fLw4n1n2umEItsaGeEANZ5dszsFEh5KyTzZMQPISIto6ef3GjITGn0cZh6
+	uhjMRxLM3iL/jNcJNPEy4j8z3qfs4iZyIMPNm6fVucHeAaHLoZV4ycBg/53CSRRN
+	GWadbufG8EBo+Fb9MBn82PcqZMtu+XfGVxq8qN4WEaxGjHuYIgbJHh/YIdMUOTjv
+	+yRal2IqRTw0zAYJScpWu317u8IVXATxbc1CVQNzBIlPXIvfwMoA==
+Received: from mail.thefacebook.com ([163.114.134.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4896dc8ap0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <linux-block@vger.kernel.org>; Fri, 01 Aug 2025 16:47:46 -0700 (PDT)
+Received: from twshared21625.15.frc2.facebook.com (2620:10d:c085:208::7cb7) by
+ mail.thefacebook.com (2620:10d:c08b:78::2ac9) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.17; Fri, 1 Aug 2025 23:47:45 +0000
+Received: by devbig197.nha3.facebook.com (Postfix, from userid 544533)
+	id 9C2BA3105E8; Fri,  1 Aug 2025 16:47:36 -0700 (PDT)
+From: Keith Busch <kbusch@meta.com>
+To: <linux-block@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+CC: <snitzer@kernel.org>, <axboe@kernel.dk>, <dw@davidwei.uk>,
+        <brauner@kernel.org>, Keith Busch <kbusch@kernel.org>
+Subject: [PATCH 0/7] direct-io: even more flexible io vectors
+Date: Fri, 1 Aug 2025 16:47:29 -0700
+Message-ID: <20250801234736.1913170-1-kbusch@meta.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aIzcDWJyft7kzGi3@kbusch-mbp>
+Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+Content-Type: text/plain
+X-Proofpoint-GUID: 3aYCQcT0CvzfS0FP7MuwgJ3TWjy8uTc5
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODAxMDE5MyBTYWx0ZWRfX1P/OXQUoEbmu EELyinxTrvKgETiiAWB9W0F4/8Ar8Qjx7sMJ0hJwKLonbP9WrvrH/vEtzlr6FJUkiuSN9+kqHtn 1uDNw8RCurQfLeNt2kQKEl4RL2gyQ9t2EbJ/OMbJDkNmbCXXmyNckxSsgfNtMJZk4+wsTfracP4
+ FNAiub1hxo3FFHe6SEuU46chGq/WhYZt0d41Lv7pPz0xXIMPu56ZGe/M3WaVC3y2JLBdkNzREHJ vJrInoY2/A8XNZeUwj/5MbN3N3Al+epeV5sf8+F2j9N/VioaVaY0oz1TkNHI8PDhW22XLuCSJf6 7P+exrGWALwAeyBVb+fxGbpZLk0JRNES8N61MnW12zaaCKUWRDJSmJSjkmlGByHtw6Ns9U6rnp9
+ 89kL3CmiCdPw7K1XK6IfErNKW3py7rlyDkHXQmIcaJsfs6pxlwjGKqXnh3cY26SsuRLF9xA/
+X-Authority-Analysis: v=2.4 cv=Ndzm13D4 c=1 sm=1 tr=0 ts=688d5222 cx=c_pps a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17 a=2OwXVqhp2XgA:10 a=VwQbUJbxAAAA:8 a=TzghJXyiTW9mTth-5jUA:9
+X-Proofpoint-ORIG-GUID: 3aYCQcT0CvzfS0FP7MuwgJ3TWjy8uTc5
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-08-01_08,2025-08-01_01,2025-03-28_01
 
-On Fri, Aug 01, 2025 at 09:23:57AM -0600, Keith Busch wrote:
-> On Thu, Jul 10, 2025 at 12:12:29PM -0400, Mike Snitzer wrote:
-> > All said, in practice I haven't had any issues with this patch.  But
-> > it could just be I don't have the stars aligned to test the case that
-> > might have problems.  If you know of such a case I'd welcome
-> > suggestions.
-> 
-> This is something I threw together that appears to be successful with
-> NVMe through raw block direct-io. This will defer catching an invalid io
-> vector to much later in the block stack, which should be okay, and
-> removes one of the vector walks in the fast path, so that's a bonus.
-> 
-> While this is testing okay with NVMe so far, I haven't tested any more
-> complicated setups yet, and I probably need to get filesystems using
-> this relaxed limit too.
+From: Keith Busch <kbusch@kernel.org>
 
-Ship it! ;)
+In furthering direct IO use from user space buffers without bouncing to
+align to unnecessary kernel software constraints, this series removes
+the requirement that io vector lengths align to the logical block size.
+The downside (if want to call it that) is that mis-aligned io vectors
+are caught further down the block stack rather than closer to the
+syscall.
 
-Many thanks for this, I'll review closely and circle back!
+This change also removes one walking of the io vector, so that's nice
+too.
 
-Mike
+Keith Busch (7):
+  block: check for valid bio while splitting
+  block: align the bio after building it
+  block: simplify direct io validity check
+  iomap: simplify direct io validity check
+  block: remove bdev_iter_is_aligned
+  blk-integrity: use simpler alignment check
+  iov_iter: remove iov_iter_is_aligned
 
- 
-> ---
-> diff --git a/block/bio.c b/block/bio.c
-> index 92c512e876c8d..634b2031c4829 100644
-> --- a/block/bio.c
-> +++ b/block/bio.c
-> @@ -1227,13 +1227,6 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
->  	if (bio->bi_bdev && blk_queue_pci_p2pdma(bio->bi_bdev->bd_disk->queue))
->  		extraction_flags |= ITER_ALLOW_P2PDMA;
->  
-> -	/*
-> -	 * Each segment in the iov is required to be a block size multiple.
-> -	 * However, we may not be able to get the entire segment if it spans
-> -	 * more pages than bi_max_vecs allows, so we have to ALIGN_DOWN the
-> -	 * result to ensure the bio's total size is correct. The remainder of
-> -	 * the iov data will be picked up in the next bio iteration.
-> -	 */
->  	size = iov_iter_extract_pages(iter, &pages,
->  				      UINT_MAX - bio->bi_iter.bi_size,
->  				      nr_pages, extraction_flags, &offset);
-> @@ -1241,18 +1234,6 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
->  		return size ? size : -EFAULT;
->  
->  	nr_pages = DIV_ROUND_UP(offset + size, PAGE_SIZE);
-> -
-> -	if (bio->bi_bdev) {
-> -		size_t trim = size & (bdev_logical_block_size(bio->bi_bdev) - 1);
-> -		iov_iter_revert(iter, trim);
-> -		size -= trim;
-> -	}
-> -
-> -	if (unlikely(!size)) {
-> -		ret = -EFAULT;
-> -		goto out;
-> -	}
-> -
->  	for (left = size, i = 0; left > 0; left -= len, i += num_pages) {
->  		struct page *page = pages[i];
->  		struct folio *folio = page_folio(page);
-> @@ -1297,6 +1278,23 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
->  	return ret;
->  }
->  
-> +static int bio_align_to_bs(struct bio *bio, struct iov_iter *iter)
-> +{
-> +	unsigned int mask = bdev_logical_block_size(bio->bi_bdev) - 1;
-> +	unsigned int total = bio->bi_iter.bi_size;
-> +	size_t trim = total & mask;
-> +
-> +	if (!trim)
-> +	        return 0;
-> +
-> +	/* FIXME: might be leaking pages */
-> +	bio_revert(bio, trim);
-> +	iov_iter_revert(iter, trim);
-> +	if (total == trim)
-> +	        return -EFAULT;
-> +	return 0;
-> +}
-> +
->  /**
->   * bio_iov_iter_get_pages - add user or kernel pages to a bio
->   * @bio: bio to add pages to
-> @@ -1327,7 +1325,7 @@ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
->  	if (iov_iter_is_bvec(iter)) {
->  		bio_iov_bvec_set(bio, iter);
->  		iov_iter_advance(iter, bio->bi_iter.bi_size);
-> -		return 0;
-> +		return bio_align_to_bs(bio, iter);
->  	}
->  
->  	if (iov_iter_extract_will_pin(iter))
-> @@ -1336,6 +1334,7 @@ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
->  		ret = __bio_iov_iter_get_pages(bio, iter);
->  	} while (!ret && iov_iter_count(iter) && !bio_full(bio, 0));
->  
-> +	ret = bio_align_to_bs(bio, iter);
->  	return bio->bi_vcnt ? 0 : ret;
->  }
->  EXPORT_SYMBOL_GPL(bio_iov_iter_get_pages);
-> diff --git a/block/blk-merge.c b/block/blk-merge.c
-> index 70d704615be52..a3acfef8eb81d 100644
-> --- a/block/blk-merge.c
-> +++ b/block/blk-merge.c
-> @@ -298,6 +298,9 @@ int bio_split_rw_at(struct bio *bio, const struct queue_limits *lim,
->  	unsigned nsegs = 0, bytes = 0;
->  
->  	bio_for_each_bvec(bv, bio, iter) {
-> +		if (bv.bv_offset & lim->dma_alignment)
-> +			return -EFAULT;
-> +
->  		/*
->  		 * If the queue doesn't support SG gaps and adding this
->  		 * offset would create a gap, disallow it.
-> @@ -341,6 +344,8 @@ int bio_split_rw_at(struct bio *bio, const struct queue_limits *lim,
->  	 * we do not use the full hardware limits.
->  	 */
->  	bytes = ALIGN_DOWN(bytes, bio_split_alignment(bio, lim));
-> +	if (!bytes)
-> +		return -EFAULT;
->  
->  	/*
->  	 * Bio splitting may cause subtle trouble such as hang when doing sync
-> diff --git a/block/fops.c b/block/fops.c
-> index 82451ac8ff25d..820902cf10730 100644
-> --- a/block/fops.c
-> +++ b/block/fops.c
-> @@ -38,8 +38,8 @@ static blk_opf_t dio_bio_write_op(struct kiocb *iocb)
->  static bool blkdev_dio_invalid(struct block_device *bdev, struct kiocb *iocb,
->  				struct iov_iter *iter)
->  {
-> -	return iocb->ki_pos & (bdev_logical_block_size(bdev) - 1) ||
-> -		!bdev_iter_is_aligned(bdev, iter);
-> +	return (iocb->ki_pos | iov_iter_count(iter)) &
-> +			(bdev_logical_block_size(bdev) - 1);
->  }
->  
->  #define DIO_INLINE_BIO_VECS 4
-> diff --git a/include/linux/bio.h b/include/linux/bio.h
-> index 46ffac5caab78..d3ddf78d1f35e 100644
-> --- a/include/linux/bio.h
-> +++ b/include/linux/bio.h
-> @@ -169,6 +169,22 @@ static inline void bio_advance(struct bio *bio, unsigned int nbytes)
->  
->  #define bio_iter_last(bvec, iter) ((iter).bi_size == (bvec).bv_len)
->  
-> +static inline void bio_revert(struct bio *bio, unsigned int nbytes)
-> +{
-> +	bio->bi_iter.bi_size -= nbytes;
-> +
-> +	while (nbytes) {
-> +		struct bio_vec *bv = &bio->bi_io_vec[bio->bi_vcnt - 1];
-> +
-> +		if (nbytes < bv->bv_len) {
-> +			bv->bv_len -= nbytes;
-> +			return;
-> +		}
-> +		bio->bi_vcnt--;
-> +		nbytes -= bv->bv_len;
-> +       }
-> +}
-> +
->  static inline unsigned bio_segments(struct bio *bio)
->  {
->  	unsigned segs = 0;
-> --
+ block/bio-integrity.c  |  4 +-
+ block/bio.c            | 58 +++++++++++++++++---------
+ block/blk-merge.c      |  5 +++
+ block/fops.c           |  4 +-
+ fs/iomap/direct-io.c   |  3 +-
+ include/linux/blkdev.h |  7 ----
+ include/linux/uio.h    |  2 -
+ lib/iov_iter.c         | 95 ------------------------------------------
+ 8 files changed, 49 insertions(+), 129 deletions(-)
+
+--=20
+2.47.3
+
