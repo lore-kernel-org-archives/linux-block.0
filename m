@@ -1,113 +1,130 @@
-Received: from mail-il1-f181.google.com (mail-il1-f181.google.com [209.85.166.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60BF6165F16
-	for <linux-block@vger.kernel.org>; Sat,  2 Aug 2025 21:42:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AC9D1DE8B5
+	for <linux-block@vger.kernel.org>; Sat,  2 Aug 2025 23:11:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754170947; cv=none; b=hP+lvEY9IxRk90lmCNUCWgXO1lHBMZ5rgRSPWdiZXwLvf9hCQMHjJFLOOgVguGD4RzyAUf9Ua9d6hPTXER4mH4EW4lIdb8m6afzDwAwavHLIVtamozJ7DtS0nD1tR6Y4uB3JQtW6khB70gh9zsukvYDQUJwgfzXjv+t3kmpVHZI=
+	t=1754176317; cv=none; b=IsPyKf/uC+gY7H++7AK7F1WhuQsQg5NGfYuRfMfWAca+jtayDEn0v96s3417WyaRa2g8tXu2LcCEdlvO1pn/ObJDAQod5+uA+BqkJctmzdwShe0ylWBzEF93nxiP2L9m4HMpa2uaiU49z/+C2l8yoRnP3hxNj/0aabBrBqgpvTc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754170947; c=relaxed/simple;
-	bh=N745ciBY1hkF7XOnVB7x2+NHVTlKQ7Y/QCqDpmqIc7U=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=aL0GHNtpKHDYbB1COsXXykiGQg9CiCMXC6/nwjYq+/EVdKdii4De+T5PKgOE6iF4YBFVLrxBKbrpfm9lqbXWyTCvnXSXKySN7JMuFSWkZON/K68qucex6ku0XZ5GXdVEuffgtP4yng+gn6uoLIoVamnmjEX1eK/kfZxFHH6kTC4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=stCQoJ0g; arc=none smtp.client-ip=209.85.166.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1754176317; c=relaxed/simple;
+	bh=J8kmkc6Y6J6DlHjbF2pMDHETrUO3O1dG6KMFJF1BrhI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iqWtpnKyqoDFcUt25+Q73M8/c4UNqQUvxRkLphIfO5BI0uOeNZrHTTWk86P0tujsI7MSBePZIcQgQ5uvzF0oa6rxJryqNgaG1v0poFzReEp/B803C8vvxWU925eZ/sR3tXAQHdT2NLKwU4O8kTyJ5dBPYZl7CQJ77YOq/J3lVh0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mNndWx7C; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="stCQoJ0g"
-Received: by mail-il1-f181.google.com with SMTP id e9e14a558f8ab-3e406ca2d22so10298495ab.1
-        for <linux-block@vger.kernel.org>; Sat, 02 Aug 2025 14:42:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1754170943; x=1754775743; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=oFuoIDlgW+h7v2LHl/HRGX0OhwDuWjqOAfS9sfbSbEo=;
-        b=stCQoJ0goDtUd9Cs4+QXK2izpq6iJkWSzWsA9JEgGUCahemt47TvNH7JxueJniC9op
-         kRhQC2XgS/1R/ql9n0Up1ZkaEPXJTeb4HDWe0eHivPfDtXHvYv3L+WHjPGaVja9GvSaY
-         YWlmJ+ZESayMUolJ9FlBFiEz6nW9BvUXM01Gg2AE1BXILdBzFXSqWtQ5qOzeR37g9cGn
-         NdjotcJ4XYZA+4hrayC7fHhkxTYKCOrQLWEWV0mB+mgmvSDfB+aLugImLJpoNyYHjWfr
-         lFfCseF7mYUvUO4glu+9nwzMdAKkTmsRYMxxKLdDW09zqKcT7JHDfEg6wusu96MAEc/n
-         YExQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754170943; x=1754775743;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=oFuoIDlgW+h7v2LHl/HRGX0OhwDuWjqOAfS9sfbSbEo=;
-        b=WiZSx6GE1YB/PgoDwi4ZX9wRKODC8sg7Thx2RpdoWzGnkzS7GdEpC8oyR7SKmi5YGV
-         ix//sSxzsuOt4tLbSRhSaYJrthiBLcHa1voXZbaI90SaGRV7KnU7//Hu3SmUR73YGQo1
-         L0UmOLeTvTRik2O+Qjujok//7xzH7NXh0CwX7lWzI0Y8NClPIh0s3Fe31jAo+lxpJQvv
-         lrmUVJLSTAMmk8oS1tKfff+lGkXM4HR2H0eJOSHknG3wltqFcBIKXPI0d2u/Tcoo4Uj5
-         mXqtw4qZFLPIcb9wAt95uoGV/rGvAHdj3md47bgSe+qmg3GoBiI5HJ3+Gpn7mhX8xYm1
-         fOJQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXQ20SNG19RZH3O3hsG4m21KCsqzr7+DvZiBOe4Dqst+sP8kSG05BxBzXCK2Eyb6roJqH0DlPQQfOMLAg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwLb8z7ZnUYadflA3Zx4j3axJ1dHcMn7r3Zfl4lSsUqcXkpibfH
-	1bqjDR527n/rgoPyLeMFBtigfpXKh11fLR9AIWY3T+Vx+os2DTk66owmtd57c4ZFzbU=
-X-Gm-Gg: ASbGncuj5QO3fR0U5dwdxfOfT3kr4b6sHjLdXQwCeRzieqtEQqB1IcSiufxIgHTOnT1
-	eglbosY1UZgJgcQYbK+orbOao0xxQxFt8gkyxJlf4A8uwPOb+jSz6rgIOXfA8Lt0vsg9p7eOUTu
-	oSjsFd09xPW5/kZxtalDPyZUJuULfHH3a5WB5nTda7IemfF3umkohOaFFEZrCkkLKHG1DtYwP38
-	NtS0IHb6HLTMdauusDz8SxC43TWlIDEFeyr2/0/eRaKpCdec01lupE3v91xRiYbqdPaR8hx2B7Z
-	X0TwEn5+Mt3JssRH5lcaiBllhBPZYiGWAfDSnzvHQ53NwTebrE8UhSL1Qix3o387rJ5d/n2Gwvv
-	NYIkm9walwjpcraOUK3QFOP9ZsvOrFg==
-X-Google-Smtp-Source: AGHT+IFJp6txnZ87IMnvGshOLoul1tDwvotSon4D1I4ukQAYX7s2i1BeJR8Mk4VRnjQn+VJ4DpDbog==
-X-Received: by 2002:a05:6e02:b:b0:3e2:aafc:a7f with SMTP id e9e14a558f8ab-3e416122d83mr92452065ab.7.1754170943147;
-        Sat, 02 Aug 2025 14:42:23 -0700 (PDT)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3e402b12e8asm28043035ab.48.2025.08.02.14.42.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 02 Aug 2025 14:42:22 -0700 (PDT)
-Message-ID: <f02514c1-6f29-4029-a80f-f68202a863d0@kernel.dk>
-Date: Sat, 2 Aug 2025 15:42:21 -0600
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mNndWx7C"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1754176316; x=1785712316;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=J8kmkc6Y6J6DlHjbF2pMDHETrUO3O1dG6KMFJF1BrhI=;
+  b=mNndWx7CQ1ZYW5HOLArP27Ico7wHv8LL13YHI9YyyxWYfZRqjSUQPfKL
+   1cHu4zDU49hRKEx3ppUyJ1bKib/PAVs8hTu0cytS6e/aY/9Y9ePfSKwSC
+   IpAVtNbimxydbr4k/Q8uf0UYGf0TMxQDxFySyU8YmLI+tC+XZtDQhxeFh
+   jlbWiBDGsU/I3zQvcGAldj9NHJ/RPgxFiI4vFyozv/yUEciP8vOsK38rZ
+   rxXE3w1ZsPE4E+e9I/9vmkjACLiCqRIqjffYnuFd2J1DS0NgKDqRCLKgy
+   fDUzHZf4yBl/cdoPTWJ5qE/BFBpei7Tle0xETETZiVRGpMkaul9R9Bbd6
+   Q==;
+X-CSE-ConnectionGUID: BA+6Y/OlQSexAF5vBAPGGA==
+X-CSE-MsgGUID: DpXccReGTIOkRPDGr8w+Hg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11510"; a="67933634"
+X-IronPort-AV: E=Sophos;i="6.17,258,1747724400"; 
+   d="scan'208";a="67933634"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2025 16:11:56 -0700
+X-CSE-ConnectionGUID: wFtY3sCrS1SgLDt3sFAuXg==
+X-CSE-MsgGUID: 9e9MmVThTU+KGBsCfkksVw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.17,258,1747724400"; 
+   d="scan'208";a="169155890"
+Received: from lkp-server01.sh.intel.com (HELO 160750d4a34c) ([10.239.97.150])
+  by fmviesa004.fm.intel.com with ESMTP; 02 Aug 2025 16:11:52 -0700
+Received: from kbuild by 160750d4a34c with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uiLOI-0005eG-1c;
+	Sat, 02 Aug 2025 23:11:50 +0000
+Date: Sun, 3 Aug 2025 07:11:29 +0800
+From: kernel test robot <lkp@intel.com>
+To: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev, hch@lst.de,
+	axboe@kernel.dk, joshi.k@samsung.com,
+	Keith Busch <kbusch@kernel.org>
+Subject: Re: [PATCHv4 6/8] blk-mq-dma: add support for mapping integrity
+ metadata
+Message-ID: <202508030710.X3P9snty-lkp@intel.com>
+References: <20250731150513.220395-7-kbusch@meta.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [GIT PULL] md-6.17-20250803
-From: Jens Axboe <axboe@kernel.dk>
-To: Yu Kuai <yukuai@kernel.org>, linux-block@vger.kernel.org,
- inux-raid@vger.kernel.org, song@kernel.org
-Cc: yukuai3@huawei.com, yangerkun@huawei.com, yi.zhang@huawei.com,
- johnny.chenyi@huawei.com, xni@redhat.com, heming.zhao@suse.com,
- linan122@huawei.com
-References: <20250802172507.7561-1-yukuai@kernel.org>
- <0c680f7d-f656-4e79-8e1e-b6f2e5155a80@kernel.dk>
-Content-Language: en-US
-In-Reply-To: <0c680f7d-f656-4e79-8e1e-b6f2e5155a80@kernel.dk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250731150513.220395-7-kbusch@meta.com>
 
-On 8/2/25 12:29 PM, Jens Axboe wrote:
-> On 8/2/25 11:25 AM, Yu Kuai wrote:
->> Hi, Jens
->>
->> Please consider pulling following changes on your block-6.17 branch,
->> this pull request contains:
->>
->> - mddev null-ptr-dereference fix, by Erkun
->> - md-cluster fail to remove the faulty disk regression fix, by Heming
->> - minor cleanup, by Li Nan
->> - mdadm lifetime regression fix reported by syzkaller, by Yu Kuai
->> - experimental feature: introduce new lockless bitmap, by Yu Kuai
-> 
-> Why was this sent in so late? You're at least a week later sending in
-> big changes for the merge window, as we're already half way through it.
-> Generally anything big should land in my tree a week before the merge
-> window OPENS, not a week into it.
+Hi Keith,
 
-I took a closer look, because perhaps you just sent in the pull request
-pretty late. And it's a bit hard to tell because it looks like you
-rebased this code (why?), but at least the lockless bitmap code looks
-like it was finished up inside the merge window. That looks late. The
-rest looks more reasonably timed, just rebased for some reason.
+kernel test robot noticed the following build errors:
 
-If I'm going to get yelled at by a traveling Linus, there better be a
-good reason for it. In other words, is there a justification for the
-lockless bitmap code being in there?
+[auto build test ERROR on axboe-block/for-next]
+[also build test ERROR on linus/master next-20250801]
+[cannot apply to linux-nvme/for-next hch-configfs/for-next v6.16]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Keith-Busch/blk-mq-dma-introduce-blk_map_iter/20250731-230719
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
+patch link:    https://lore.kernel.org/r/20250731150513.220395-7-kbusch%40meta.com
+patch subject: [PATCHv4 6/8] blk-mq-dma: add support for mapping integrity metadata
+config: x86_64-kexec (https://download.01.org/0day-ci/archive/20250803/202508030710.X3P9snty-lkp@intel.com/config)
+compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250803/202508030710.X3P9snty-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202508030710.X3P9snty-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+>> block/blk-mq-dma.c:18:27: error: no member named 'bi_integrity' in 'struct bio'
+      18 |                 iter->iter = iter->bio->bi_integrity->bip_iter;
+         |                              ~~~~~~~~~  ^
+   block/blk-mq-dma.c:19:27: error: no member named 'bi_integrity' in 'struct bio'
+      19 |                 iter->bvec = iter->bio->bi_integrity->bip_vec;
+         |                              ~~~~~~~~~  ^
+   2 errors generated.
+
+
+vim +18 block/blk-mq-dma.c
+
+     8	
+     9	static bool __blk_map_iter_next(struct blk_map_iter *iter)
+    10	{
+    11		if (iter->iter.bi_size)
+    12			return true;
+    13		if (!iter->bio || !iter->bio->bi_next)
+    14			return false;
+    15	
+    16		iter->bio = iter->bio->bi_next;
+    17		if (iter->is_integrity) {
+  > 18			iter->iter = iter->bio->bi_integrity->bip_iter;
+    19			iter->bvec = iter->bio->bi_integrity->bip_vec;
+    20		} else {
+    21			iter->iter = iter->bio->bi_iter;
+    22			iter->bvec = iter->bio->bi_io_vec;
+    23		}
+    24		return true;
+    25	}
+    26	
 
 -- 
-Jens Axboe
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
