@@ -1,123 +1,124 @@
-Received: from smtp.smtpout.orange.fr (smtp-69.smtpout.orange.fr [80.12.242.69])
-	(using TLSv1.2 with cipher AES128-GCM-SHA256 (128/128 bits))
+Received: from mail-il1-f179.google.com (mail-il1-f179.google.com [209.85.166.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EA566ADD;
-	Sat,  2 Aug 2025 07:26:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.69
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7878219C558
+	for <linux-block@vger.kernel.org>; Sat,  2 Aug 2025 15:37:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754119585; cv=none; b=L6TMY3trkxSSLbyd8ev8SNUONZSBcCb/rpxfWebqnwvFR4iN5D9jK+womyLtOGYzYZu2EAHZHERMCOIIB60qyZ9bm3Bs6hg0FkdIyg0NcM+9+oogigpOA2bwPtp8UuBW3S3d3dJJDTcbesfOEKyAUotDpcA6sczqeQtCer3y7y0=
+	t=1754149056; cv=none; b=CIs/48UBFELNdwAMa80LR4nJZmz6OIrqMw1keEGXQeLKVN8c4bQpt++uow0ucBbyzqfxppbpnPVaFflrAuVzBZI/xs0XszmPuSyJvI2ACNOHoyEd+ot8GBiyvyua8wpFzR0AQEwVvXn9kKwE6z69ZAOy2GAo0Byq7/qXdNks2eg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754119585; c=relaxed/simple;
-	bh=NSREs7H+Yc0DM8zD9xre6BL+mYsrEFoz38UY/+fIWW4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oG1taXwPeT5FR936jN0bROpU5yTtRdcUm+kVJJA5alNvR8whRc7JVtA5nT7F/SZu7HcQgB4VWEvJPp2pR96zuKt0kORgomCfhsd9SKd/vPwhepN97aHpH8XPslCnRlGMQPyOn1V21/DcFJDdTKK+HxX2jmjxSVeIA31M3b/G+ss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=C2qrsfiX; arc=none smtp.client-ip=80.12.242.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
+	s=arc-20240116; t=1754149056; c=relaxed/simple;
+	bh=r5BclxiNA2oHNLLunK2Td77xpt9TQVXBaWGBfY2UqXo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FTf2UGDBhKRBG0UOggtFnz+tpgiNPECAKDj1dtGJPVG4+63JOs139fxRCAqrKYhfnWUpZUtPzu30Sp2IE+vkw5zcrSVugtALjwUOiPpNNaMUcDN2lGp8FT4DdbWNySMizvjG+S79iMndSX52yLp6Me2cskkZPRX/GdLRm27DIJk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=XAtq+/GB; arc=none smtp.client-ip=209.85.166.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="C2qrsfiX"
-Received: from fedora.home ([IPv6:2a01:cb10:785:b00:8347:f260:7456:7662])
-	by smtp.orange.fr with ESMTPA
-	id i6d9unmhFKxUMi6d9ue2xP; Sat, 02 Aug 2025 09:26:13 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1754119573;
-	bh=A6EO1oc43a46dugxnP2nqOm0PNJLUSOuHaQkhzSg+Ms=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version;
-	b=C2qrsfiXYEcVQDvyPH+qazkmDr3HariQnxrj0MmCVkSAj+Fpo6TMdLi7T8k6eBRD+
-	 W5JYTp8jDO4qK87ABKzVFHO7IjEB7sCBA2qxNgRntW86BwyJ7hwgjLih0gKTBN0b7X
-	 yWslMRjyTsg2lQfogFRuz5GPrHSCMmynM5n1E0fIgGF5E8jQCAlHXDzV60Jvj4PRyf
-	 OLnRu9jdoQNj8bSkNpKqPy+xrvIUKzbEHusHQzvN2bRyCpRDga3EHIwzeerR1UyfQ0
-	 D8YxQf6xdjwkwgvfFyt86oY+IX0JU6IMwFn5/tJ2vdsbIDYrUSE0qErhb7ooVjjIT+
-	 7lHwbT5SOmvrw==
-X-ME-Helo: fedora.home
-X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
-X-ME-Date: Sat, 02 Aug 2025 09:26:13 +0200
-X-ME-IP: 2a01:cb10:785:b00:8347:f260:7456:7662
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-To: Yu Kuai <yukuai3@huawei.com>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org,
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-	linux-block@vger.kernel.org
-Subject: [PATCH] block, bfq: Reorder struct bfq_iocq_bfqq_data
-Date: Sat,  2 Aug 2025 09:25:59 +0200
-Message-ID: <79394db1befaa658e8066b8e3348073ce27d9d26.1754119538.git.christophe.jaillet@wanadoo.fr>
-X-Mailer: git-send-email 2.50.1
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="XAtq+/GB"
+Received: by mail-il1-f179.google.com with SMTP id e9e14a558f8ab-3e40d006105so11740175ab.3
+        for <linux-block@vger.kernel.org>; Sat, 02 Aug 2025 08:37:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1754149053; x=1754753853; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=04FKV/5jxBcAoTht60UjROgiF7iSlnQp8Ncc9Cilojs=;
+        b=XAtq+/GB1qOsAPi1C1uMNsjlNdZG0pY91Tuo705P0vGIeCQ2ulLYjILvL6u8an64XW
+         rF1c+hh6bg3MQp1hMdn5SUGZG/+h1TQUxrcGGbbxJdVbrlW46NNO55I+YkQQ/w4hORQt
+         qjVdHGYrbYwud7y2nlnTP2u5/pgvltTQaXSMDlvEvc2pmFZ20D9JNEfj3Okk3g0ib561
+         5H9q4VfwETJ3a8wgyMOjxv2U/CtiHeiNOAnAdzdAZKyRkeMvv3pQ+g74PKVIHPJSq/0L
+         NY8/Qt+8y+HWtwlCkTQu5HkKlO+Jltnv4DzKXi5T2QkrjwjfirlHberh3j4/ZUnwHVj5
+         2PkA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754149053; x=1754753853;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=04FKV/5jxBcAoTht60UjROgiF7iSlnQp8Ncc9Cilojs=;
+        b=m2AN3YfvmH/4gykSyICo6r3BxQJbHjIfxmftip1vwv6GkPpNO1dLKuCf31w8TP1JGG
+         knINAon0xQ8Hv4FjvxBVhGPiS8yC46RwjvOTQLki6QnWjHzHrFagSf2/mgFazU+L+xeG
+         pFFwB+Ujxsb0vXPnzAnnaD0UXK68NDfiTUzU4vopmipOrcs+qIpVnydXB0upW0XA4XOU
+         cTekX8LtQTQSfxVOewZYoJQVoM0Qi8Ya6C0lBRRYgfiHE53cPlbuq07wizqt4RkdUjL3
+         LXLDCgnJ3fab6jsq3XNBnQIfelbPP4ga4YcxuFz2DBQdHCtiXEHyATm7qNSHbV8K5Lt9
+         DVVA==
+X-Forwarded-Encrypted: i=1; AJvYcCXmPwjVncAxeJ1+0kNBJmdfgSlvW2lqbw5jS8PCUtVwM/538sBk4ETCQT98wG5ErofisNSQO5DRPQnJeQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwTjQelo7XGi9E4/1YAT5bYhgJqtKoFlYlUQbw0OUuys2iqkK02
+	vNXb4IRWLkU4IIo5A4XxF4V/k2Nn4G7dqBn4vrQfbiNqnRL6iae5abFOhwlZcgFVvqM=
+X-Gm-Gg: ASbGncsWpW8BcZylIaY05RpS7OhAjPNOmpSrwFoRwCVCdbjcWYNNpvimx6iRUaJO7pD
+	m+7rn1GhKW7JZftK71u7DeX1fSma8FTHm03iUjm1r9hfeKOF9pPFgwYMNiFgdA/3kdB8NusJdAr
+	zg0Z9TnHY7ndhchXnSjBIES5fW0BWlLoVEQMd608zHmWswCINLNrbV9Y+nMn0TnebwUrKWQe3tX
+	8Ia4sY1Ogd/WkfH2yN2Bm69GFgF2jgktmkQQZoUuGUPrlSI1OUxuRP/botv8mizvT5bpc/fWy2d
+	hWC1+vx8Lez57BYBSno7Ud5KuROkuXN1XSwAYYnL3utHAspzv9Ory4dMpGQUBhjvLIbV9tsQiFj
+	AoEccaau20Y6qj2wgbSQ=
+X-Google-Smtp-Source: AGHT+IFpKu7HslfN99lpIdPLZvZStogsGBrzGWqBfvd20JQpD1Wdf3nzDTTCR48VUkNyC7cVFYirug==
+X-Received: by 2002:a05:6e02:2382:b0:3df:347f:ff3e with SMTP id e9e14a558f8ab-3e416116d8bmr66728215ab.7.1754149053646;
+        Sat, 02 Aug 2025 08:37:33 -0700 (PDT)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3e40297c3d3sm26117545ab.6.2025.08.02.08.37.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 02 Aug 2025 08:37:32 -0700 (PDT)
+Message-ID: <43716438-2fb9-4377-a4a0-6f803d7b8aec@kernel.dk>
+Date: Sat, 2 Aug 2025 09:37:32 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/7] direct-io: even more flexible io vectors
+To: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: snitzer@kernel.org, dw@davidwei.uk, brauner@kernel.org,
+ Keith Busch <kbusch@kernel.org>
+References: <20250801234736.1913170-1-kbusch@meta.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20250801234736.1913170-1-kbusch@meta.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-The size of struct bfq_iocq_bfqq_data can be reduced by moving a few fields
-around.
+On 8/1/25 5:47 PM, Keith Busch wrote:
+> From: Keith Busch <kbusch@kernel.org>
+> 
+> In furthering direct IO use from user space buffers without bouncing to
+> align to unnecessary kernel software constraints, this series removes
+> the requirement that io vector lengths align to the logical block size.
+> The downside (if want to call it that) is that mis-aligned io vectors
+> are caught further down the block stack rather than closer to the
+> syscall.
 
-On a x86_64, with allmodconfig, this shrinks the size from 144 to 128
-bytes.
-The main benefit is to reduce the size of struct bfq_io_cq from 1360 to
-1232.
+That's not a downside imho, it's much nicer to have the correct/expected
+case be fast, and catch the unexpected error case down the line when we
+have to iterate the vecs anyway.
 
-This structure is stored in a dedicated slab cache. So reducing its size
-improves cache usage.
+IOW, I love this patchset. I'll spend some time going over the details.
+Did you write some test cases for this?
 
-Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
----
-Compile tested only.
+> This change also removes one walking of the io vector, so that's nice
+> too.
+> 
+> Keith Busch (7):
+>   block: check for valid bio while splitting
+>   block: align the bio after building it
+>   block: simplify direct io validity check
+>   iomap: simplify direct io validity check
+>   block: remove bdev_iter_is_aligned
+>   blk-integrity: use simpler alignment check
+>   iov_iter: remove iov_iter_is_aligned
+> 
+>  block/bio-integrity.c  |  4 +-
+>  block/bio.c            | 58 +++++++++++++++++---------
+>  block/blk-merge.c      |  5 +++
+>  block/fops.c           |  4 +-
+>  fs/iomap/direct-io.c   |  3 +-
+>  include/linux/blkdev.h |  7 ----
+>  include/linux/uio.h    |  2 -
+>  lib/iov_iter.c         | 95 ------------------------------------------
+>  8 files changed, 49 insertions(+), 129 deletions(-)
 
-On my system, struct bfq_io_cq are stored in 8 pages slab. Each of these
-slabs hold 24 entries.
+Now that's a beautiful diffstat.
 
-$ sudo cat /proc/slabinfo | grep bfq_io
-bfq_io_cq            378    384   1360   24    8 : tunables    0    0    0 : slabdata     16     16      0
-
-With the new layout, we should store 26 entries.
-(8 * 4096 / 1232 = 26.60)
----
- block/bfq-iosched.h | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
-
-diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
-index 687a3a7ba784..0b4704932d72 100644
---- a/block/bfq-iosched.h
-+++ b/block/bfq-iosched.h
-@@ -427,9 +427,6 @@ struct bfq_iocq_bfqq_data {
- 	 */
- 	bool saved_IO_bound;
- 
--	u64 saved_io_start_time;
--	u64 saved_tot_idle_time;
--
- 	/*
- 	 * Same purpose as the previous fields for the values of the
- 	 * field keeping the queue's belonging to a large burst
-@@ -450,6 +447,9 @@ struct bfq_iocq_bfqq_data {
- 	 */
- 	unsigned int saved_weight;
- 
-+	u64 saved_io_start_time;
-+	u64 saved_tot_idle_time;
-+
- 	/*
- 	 * Similar to previous fields: save wr information.
- 	 */
-@@ -457,13 +457,13 @@ struct bfq_iocq_bfqq_data {
- 	unsigned long saved_last_wr_start_finish;
- 	unsigned long saved_service_from_wr;
- 	unsigned long saved_wr_start_at_switch_to_srt;
--	unsigned int saved_wr_cur_max_time;
- 	struct bfq_ttime saved_ttime;
-+	unsigned int saved_wr_cur_max_time;
- 
- 	/* Save also injection state */
--	u64 saved_last_serv_time_ns;
- 	unsigned int saved_inject_limit;
- 	unsigned long saved_decrease_time_jif;
-+	u64 saved_last_serv_time_ns;
- 
- 	/* candidate queue for a stable merge (due to close creation time) */
- 	struct bfq_queue *stable_merge_bfqq;
 -- 
-2.50.1
-
+Jens Axboe
