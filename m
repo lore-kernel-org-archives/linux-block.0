@@ -1,130 +1,107 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AC9D1DE8B5
-	for <linux-block@vger.kernel.org>; Sat,  2 Aug 2025 23:11:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44F35128395
+	for <linux-block@vger.kernel.org>; Sat,  2 Aug 2025 23:50:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754176317; cv=none; b=IsPyKf/uC+gY7H++7AK7F1WhuQsQg5NGfYuRfMfWAca+jtayDEn0v96s3417WyaRa2g8tXu2LcCEdlvO1pn/ObJDAQod5+uA+BqkJctmzdwShe0ylWBzEF93nxiP2L9m4HMpa2uaiU49z/+C2l8yoRnP3hxNj/0aabBrBqgpvTc=
+	t=1754178651; cv=none; b=EjMPezkb2Uf1qW7vcW2twbcC13OiezaW+tBFfGC2accTM+1XsPx+Hu6ui0qDqyhw2eZBleX7Xqq6HiNa4PVLihcvDn+j/s+O6SU8H88550VwAlv0+RI3cLsV0mYqxu7JSFH1ctQxxydICSUcx+y7su6Ubt0KZdSMH5O2dUvMxbk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754176317; c=relaxed/simple;
-	bh=J8kmkc6Y6J6DlHjbF2pMDHETrUO3O1dG6KMFJF1BrhI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iqWtpnKyqoDFcUt25+Q73M8/c4UNqQUvxRkLphIfO5BI0uOeNZrHTTWk86P0tujsI7MSBePZIcQgQ5uvzF0oa6rxJryqNgaG1v0poFzReEp/B803C8vvxWU925eZ/sR3tXAQHdT2NLKwU4O8kTyJ5dBPYZl7CQJ77YOq/J3lVh0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mNndWx7C; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1754178651; c=relaxed/simple;
+	bh=NwkFYrHxLool1VfZWHjMYCRbgx8L8vOcK4CqAgJhE1M=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=R4qYa1/gLzhN9NEUm5LUGNMp6BTS1SKDxbrlJPmfsHGpLVQl5paecg8k230YlKXnS3IDtXmUI+ygcERYPXDgzW1sCssUqDuEGyba+udw11Mnm1ILrTDXa8hfgWvgEiyc6idC7FMmBnlbnI1awi5KPBagUtT3OpVEg0b70oMex00=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CHX229Oy; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mNndWx7C"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1754176316; x=1785712316;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=J8kmkc6Y6J6DlHjbF2pMDHETrUO3O1dG6KMFJF1BrhI=;
-  b=mNndWx7CQ1ZYW5HOLArP27Ico7wHv8LL13YHI9YyyxWYfZRqjSUQPfKL
-   1cHu4zDU49hRKEx3ppUyJ1bKib/PAVs8hTu0cytS6e/aY/9Y9ePfSKwSC
-   IpAVtNbimxydbr4k/Q8uf0UYGf0TMxQDxFySyU8YmLI+tC+XZtDQhxeFh
-   jlbWiBDGsU/I3zQvcGAldj9NHJ/RPgxFiI4vFyozv/yUEciP8vOsK38rZ
-   rxXE3w1ZsPE4E+e9I/9vmkjACLiCqRIqjffYnuFd2J1DS0NgKDqRCLKgy
-   fDUzHZf4yBl/cdoPTWJ5qE/BFBpei7Tle0xETETZiVRGpMkaul9R9Bbd6
-   Q==;
-X-CSE-ConnectionGUID: BA+6Y/OlQSexAF5vBAPGGA==
-X-CSE-MsgGUID: DpXccReGTIOkRPDGr8w+Hg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11510"; a="67933634"
-X-IronPort-AV: E=Sophos;i="6.17,258,1747724400"; 
-   d="scan'208";a="67933634"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2025 16:11:56 -0700
-X-CSE-ConnectionGUID: wFtY3sCrS1SgLDt3sFAuXg==
-X-CSE-MsgGUID: 9e9MmVThTU+KGBsCfkksVw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.17,258,1747724400"; 
-   d="scan'208";a="169155890"
-Received: from lkp-server01.sh.intel.com (HELO 160750d4a34c) ([10.239.97.150])
-  by fmviesa004.fm.intel.com with ESMTP; 02 Aug 2025 16:11:52 -0700
-Received: from kbuild by 160750d4a34c with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uiLOI-0005eG-1c;
-	Sat, 02 Aug 2025 23:11:50 +0000
-Date: Sun, 3 Aug 2025 07:11:29 +0800
-From: kernel test robot <lkp@intel.com>
-To: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev, hch@lst.de,
-	axboe@kernel.dk, joshi.k@samsung.com,
-	Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCHv4 6/8] blk-mq-dma: add support for mapping integrity
- metadata
-Message-ID: <202508030710.X3P9snty-lkp@intel.com>
-References: <20250731150513.220395-7-kbusch@meta.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CHX229Oy"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED291C4CEEF;
+	Sat,  2 Aug 2025 23:50:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1754178650;
+	bh=NwkFYrHxLool1VfZWHjMYCRbgx8L8vOcK4CqAgJhE1M=;
+	h=Date:From:Reply-To:Subject:To:Cc:References:In-Reply-To:From;
+	b=CHX229OyJ9ed3VDr/mv7yd5GGSvxdR//lO4wvocpjhBLMvsW8nByHwpQSqWXC9x0u
+	 QTlWnm+BOl6vsBMEuMTVCZCGXx7TLXeakgaArLjmOA05xG2PL5aP1THEWcDMTSbvc4
+	 FqjafktbINUeUzsGBQqyGveALKrMM+O4fm44A+j1TMUbq880s3AaF0jPrsYR/mgZQy
+	 vUV84RXp7TWFOGvpH7A8jTxSLLxp+nStpztbk7iQeCAy9sV/XmBfipsalFSsonGwNw
+	 WZgV3Fb5zkDkIRYQZqX1LuvrCZHFw4qi8jFSrg50tNGqPdUr2orduIISiBaK+0Q0jQ
+	 yKnxSim6s19qg==
+Message-ID: <5884b30a-8ffc-48a1-b944-675441626fc7@kernel.org>
+Date: Sun, 3 Aug 2025 07:50:44 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250731150513.220395-7-kbusch@meta.com>
+User-Agent: Mozilla Thunderbird
+From: Yu Kuai <yukuai@kernel.org>
+Reply-To: yukuai@kernel.org
+Subject: Re: [GIT PULL] md-6.17-20250803
+To: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+ inux-raid@vger.kernel.org, song@kernel.org
+Cc: yukuai3@huawei.com, yangerkun@huawei.com, yi.zhang@huawei.com,
+ johnny.chenyi@huawei.com, xni@redhat.com, heming.zhao@suse.com,
+ linan122@huawei.com, Christoph Hellwig <hch@lst.de>,
+ Hannes Reinecke <hare@suse.de>
+References: <20250802172507.7561-1-yukuai@kernel.org>
+ <0c680f7d-f656-4e79-8e1e-b6f2e5155a80@kernel.dk>
+ <f02514c1-6f29-4029-a80f-f68202a863d0@kernel.dk>
+Content-Language: en-US
+In-Reply-To: <f02514c1-6f29-4029-a80f-f68202a863d0@kernel.dk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Hi Keith,
+Hi, Jens
 
-kernel test robot noticed the following build errors:
+在 2025/8/3 5:42, Jens Axboe 写道:
+> On 8/2/25 12:29 PM, Jens Axboe wrote:
+>> On 8/2/25 11:25 AM, Yu Kuai wrote:
+>>> Hi, Jens
+>>>
+>>> Please consider pulling following changes on your block-6.17 branch,
+>>> this pull request contains:
+>>>
+>>> - mddev null-ptr-dereference fix, by Erkun
+>>> - md-cluster fail to remove the faulty disk regression fix, by Heming
+>>> - minor cleanup, by Li Nan
+>>> - mdadm lifetime regression fix reported by syzkaller, by Yu Kuai
+>>> - experimental feature: introduce new lockless bitmap, by Yu Kuai
+>> Why was this sent in so late? You're at least a week later sending in
+>> big changes for the merge window, as we're already half way through it.
+>> Generally anything big should land in my tree a week before the merge
+>> window OPENS, not a week into it.
+> I took a closer look, because perhaps you just sent in the pull request
+> pretty late. And it's a bit hard to tell because it looks like you
+> rebased this code (why?), but at least the lockless bitmap code looks
+> like it was finished up inside the merge window. That looks late. The
+> rest looks more reasonably timed, just rebased for some reason.
+>
+> If I'm going to get yelled at by a traveling Linus, there better be a
+> good reason for it. In other words, is there a justification for the
+> lockless bitmap code being in there?
 
-[auto build test ERROR on axboe-block/for-next]
-[also build test ERROR on linus/master next-20250801]
-[cannot apply to linux-nvme/for-next hch-configfs/for-next v6.16]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Apologies for the late submission - this was unintentional. The core changes
+were ready before 6.15, but the final llbitmap patch got delayed due to 
+review
+backlog.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Keith-Busch/blk-mq-dma-introduce-blk_map_iter/20250731-230719
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
-patch link:    https://lore.kernel.org/r/20250731150513.220395-7-kbusch%40meta.com
-patch subject: [PATCHv4 6/8] blk-mq-dma: add support for mapping integrity metadata
-config: x86_64-kexec (https://download.01.org/0day-ci/archive/20250803/202508030710.X3P9snty-lkp@intel.com/config)
-compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250803/202508030710.X3P9snty-lkp@intel.com/reproduce)
+About the last patch:
+  - all feedback are addressed 2 weeks ago
+  - still waiting formal Reviewed-by tag, not sure why, possibly due to 
+this patch
+     is huge.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202508030710.X3P9snty-lkp@intel.com/
+About the rebase, this is because llbitmap set has conflicts with other 
+patches
+during the period, and I sent a new version and just pick it last night.
 
-All errors (new ones prefixed by >>):
+I do take a bet sending this pr last night, and hoping llbitmap won't 
+delayed to
+next merge window again.  However, I fully understand if this misses 6.17,
+I'm prepared to defer to 6.18.
 
->> block/blk-mq-dma.c:18:27: error: no member named 'bi_integrity' in 'struct bio'
-      18 |                 iter->iter = iter->bio->bi_integrity->bip_iter;
-         |                              ~~~~~~~~~  ^
-   block/blk-mq-dma.c:19:27: error: no member named 'bi_integrity' in 'struct bio'
-      19 |                 iter->bvec = iter->bio->bi_integrity->bip_vec;
-         |                              ~~~~~~~~~  ^
-   2 errors generated.
+Thanks,
+Kuai
 
 
-vim +18 block/blk-mq-dma.c
-
-     8	
-     9	static bool __blk_map_iter_next(struct blk_map_iter *iter)
-    10	{
-    11		if (iter->iter.bi_size)
-    12			return true;
-    13		if (!iter->bio || !iter->bio->bi_next)
-    14			return false;
-    15	
-    16		iter->bio = iter->bio->bi_next;
-    17		if (iter->is_integrity) {
-  > 18			iter->iter = iter->bio->bi_integrity->bip_iter;
-    19			iter->bvec = iter->bio->bi_integrity->bip_vec;
-    20		} else {
-    21			iter->iter = iter->bio->bi_iter;
-    22			iter->bvec = iter->bio->bi_io_vec;
-    23		}
-    24		return true;
-    25	}
-    26	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
