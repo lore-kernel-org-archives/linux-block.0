@@ -1,204 +1,147 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f78.google.com (mail-io1-f78.google.com [209.85.166.78])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BE032CA9;
-	Sat,  2 Aug 2025 02:02:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20D2E2AD11
+	for <linux-block@vger.kernel.org>; Sat,  2 Aug 2025 03:33:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754100171; cv=none; b=qpa40518lqI2frFfRkam/yCtcFLOshlbDsxmjwZBBq/Nn9Ms+MjWFF6D/FvhLUp1dCs7cq0KOhmy/AdFe98PQq1qMLd3funq7tLOkTAFM+R0vaJozLlmRk1pTWE7QftlsA/UGs+M7Pixv1qfU2tOoUjW+Wm+pR4n55eTT7t9Vi0=
+	t=1754105610; cv=none; b=CMLCrP6Yo76fC6xaP554erlCnNFosxr7acUgpwzEUw5XHy6NCxfpMlS7X0YyDdz4m80dgen73hDFgY77hQvsllRjopbjyOItYgAEVtLCBSTl6NMNt1kbmRh+sTAE0mzuvCm1Y7vSuFvwIkX9V2fvojZWv2J0RbBrxBvK0+U2S0c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754100171; c=relaxed/simple;
-	bh=6bITi9gvtbX7RAdnVVPYE2QrTPy+diCSRNMo8t0owvY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=b8rHpA5BGd49qcKlGZlzS8/zN61TS8vlTNnaNPwT6kKcaimYqMVrTaG/sLV0RfbwraGCpwIqpe3pNPn+O7KnfO4oVs2WSBTlZPXxaQ/GJAcEdy99fPho6OO9GP1h45pTBQiGnn/C+2ogLhD/wKs2XHSv/TTOftjSkFcnhRIn/T0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BySllj1F; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BySllj1F"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5BF51C4CEE7;
-	Sat,  2 Aug 2025 02:02:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754100170;
-	bh=6bITi9gvtbX7RAdnVVPYE2QrTPy+diCSRNMo8t0owvY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=BySllj1FubO0oyO0tHAr96uaOj4qO4A5jIQwliWhAJ+MYQboc8F6bjo+a4mDDl5s8
-	 vytkyV5rWN+Gb9VLglRtyPwRihX5XPLqJsa01osMw7D7w8FaMl34Am+p1N8hDuZbBE
-	 Zaj54jJyLrZ8nP1IkUUYX/+cVeezt0gNRKqL7A8bHdHztbBC9TvidGcPAyHkTzNqNl
-	 KNYxW3Vpp5rH6Cte8Idfp9ypvhJRWF1IEIbEaBXmkYbFdfVoUhOMqSS1xzsaYtPm/I
-	 WLSElLTTH4uqNDIuqPqD6rApaq56Bog93dKEY4nCl436AJxcYUnSUATRY/55mFq/+y
-	 QEBH9tOBXjljg==
-Date: Fri, 1 Aug 2025 22:02:49 -0400
-From: Mike Snitzer <snitzer@kernel.org>
-To: Keith Busch <kbusch@meta.com>
-Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org, axboe@kernel.dk, dw@davidwei.uk,
-	brauner@kernel.org, Keith Busch <kbusch@kernel.org>,
-	Chuck Lever <chuck.lever@oracle.com>, linux-nfs@vger.kernel.org
-Subject: Re: [PATCH 7/7] iov_iter: remove iov_iter_is_aligned
-Message-ID: <aI1xySNUdQ2B0dbJ@kernel.org>
-References: <20250801234736.1913170-1-kbusch@meta.com>
- <20250801234736.1913170-8-kbusch@meta.com>
+	s=arc-20240116; t=1754105610; c=relaxed/simple;
+	bh=5Cq1exZhWFLjrp8oBDKR6trzjHvPpLCE/AAS8QfIBUg=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=H8sKG2do13GP+FMW0dAaStUd6+UypTpGCV2OxbOIo2m8jvQZWnRzCCdDdeOKuFRuezh/LKEZ4OweTtn+Lf6ym7GsTHrEtiVl9svoFZ9F6iF9wdGQDB4V7QIiRJOFEQEIG+XsFHqN787cLMIrAVmYRCfnsMlEv1iGF5SNN5P8UB0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f78.google.com with SMTP id ca18e2360f4ac-8760733a107so229804539f.3
+        for <linux-block@vger.kernel.org>; Fri, 01 Aug 2025 20:33:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754105608; x=1754710408;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=laegd8mbnk5HeXrbQDy+tFC7eBnbymZo13VgtL9j0PE=;
+        b=MNI0ZP45IgTMlt0bp95LeuPIl9HbFn4itY78aR1qaYdutt1lghNp/sU363MYgr1fDn
+         agH3r8vehWRSXRzSzG8eP9CFe1LAJGyWXikwEo2WMOYTm109x6eWpPdJZDvG0E9Xr7rO
+         YS/MEQiexUAVrA13PzoE6gE+Vxa9Df02k3SICtPMGdOS3q/v5Cstk2dfx70nE8qTXmka
+         hlFM2yLT4OqTwXbWnHxhIyhvkGO95AF8QNRVlVv9x6FrJgKkIy1NsNdq5rEoNtPpcUAF
+         pfc4fV8RRB3ctp8OvxBgyUsn1Eo6l9jAX9hmXoT1Cw1hAUFvFFBTcngisXy0RNhmBYt3
+         NnbQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUduigqipPimNZSvsUsXO9U2SdY/wo11EOtBcV1SrZ1PBuMOY6rmLMhWnw7aJxswrgJ18BFmlGpA/UW0w==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxsFbK4K5WNo5xcJq9sbhzYIibPSK1kQQlRP9GIX+kn0NLGHvNf
+	45ZBns0+ABbDaEXQ38mfzSp8SPhf06eghTkJNNo7U8zXXcCZfC6UFDu3ReCVlfKkQA1Zp3bgT2z
+	j19itdijNVT3BWacp7FtHwOb0LeXdeTeptUEtxcBo31IX8J9CT7X1PNgjW1g=
+X-Google-Smtp-Source: AGHT+IGTWEHqJnWLhSs5jk10Y04IZkkIsyVJt1jogy6UoXblzZ+sfoCsOAYRbhrqvpGCj1bBjLDhbJnZ8JD27EAtuv9+c45Jos20
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250801234736.1913170-8-kbusch@meta.com>
+X-Received: by 2002:a05:6e02:3f0d:b0:3e3:fdd9:8972 with SMTP id
+ e9e14a558f8ab-3e41615d9c0mr38318945ab.11.1754105608292; Fri, 01 Aug 2025
+ 20:33:28 -0700 (PDT)
+Date: Fri, 01 Aug 2025 20:33:28 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <688d8708.050a0220.f0410.0135.GAE@google.com>
+Subject: [syzbot] [block?] WARNING: ODEBUG bug in disk_release
+From: syzbot <syzbot+1fe2f3ddc7f8f83fb196@syzkaller.appspotmail.com>
+To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Aug 01, 2025 at 04:47:36PM -0700, Keith Busch wrote:
-> From: Keith Busch <kbusch@kernel.org>
-> 
-> No more callers.
-> 
-> Signed-off-by: Keith Busch <kbusch@kernel.org>
+Hello,
 
-You had me up until this last patch.
+syzbot found the following issue on:
 
-I'm actually making use of iov_iter_is_aligned() in a series of
-changes for both NFS and NFSD.  Chuck has included some of the
-NFSD changes in his nfsd-testing branch, see:
-https://git.kernel.org/pub/scm/linux/kernel/git/cel/linux.git/commit/?h=nfsd-testing&id=5d78ac1e674b45f9c9e3769b48efb27c44f4e4d3
+HEAD commit:    89748acdf226 Merge tag 'drm-next-2025-08-01' of https://gi..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=151c12a2580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=ff858d5d4508232d
+dashboard link: https://syzkaller.appspot.com/bug?extid=1fe2f3ddc7f8f83fb196
+compiler:       gcc (Debian 12.2.0-14+deb12u1) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
 
-And the balance of my work that is pending review/inclusion is:
-https://lore.kernel.org/linux-nfs/20250731230633.89983-1-snitzer@kernel.org/
-https://lore.kernel.org/linux-nfs/20250801171049.94235-1-snitzer@kernel.org/
+Unfortunately, I don't have any reproducer for this issue yet.
 
-I only need iov_iter_aligned_bvec, but recall I want to relax its
-checking with this patch:
-https://lore.kernel.org/linux-nfs/20250708160619.64800-5-snitzer@kernel.org/
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/4f34b67c9cfc/disk-89748acd.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/2f11bb9a095b/vmlinux-89748acd.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/3e15dbd303fb/bzImage-89748acd.xz
 
-Should I just add iov_iter_aligned_bvec() to fs/nfs_common/ so that
-both NFS and NFSD can use it?
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+1fe2f3ddc7f8f83fb196@syzkaller.appspotmail.com
 
-Thanks,
-Mike
+md: md2 stopped.
+------------[ cut here ]------------
+ODEBUG: free active (active state 0) object: ffff88801f3b4448 object type: work_struct hint: mddev_delayed_delete+0x0/0x20 drivers/md/md.c:721
+WARNING: CPU: 0 PID: 11789 at lib/debugobjects.c:612 debug_print_object+0x1a2/0x2b0 lib/debugobjects.c:612
+Modules linked in:
+CPU: 0 UID: 0 PID: 11789 Comm: syz.5.1495 Not tainted 6.16.0-syzkaller-10499-g89748acdf226 #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/12/2025
+RIP: 0010:debug_print_object+0x1a2/0x2b0 lib/debugobjects.c:612
+Code: fc ff df 48 89 fa 48 c1 ea 03 80 3c 02 00 75 54 41 56 48 8b 14 dd e0 0a 16 8c 4c 89 e6 48 c7 c7 60 ff 15 8c e8 bf 92 90 fc 90 <0f> 0b 90 90 58 83 05 b6 a5 bf 0b 01 48 83 c4 18 5b 5d 41 5c 41 5d
+RSP: 0018:ffffc90004a6f928 EFLAGS: 00010286
+RAX: 0000000000000000 RBX: 0000000000000003 RCX: ffffc9001b884000
+RDX: 0000000000080000 RSI: ffffffff817a2815 RDI: 0000000000000001
+RBP: 0000000000000001 R08: 0000000000000001 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000001 R12: ffffffff8c160600
+R13: ffffffff8bac16a0 R14: ffffffff8856a0a0 R15: ffffc90004a6fa28
+FS:  00007f777160f6c0(0000) GS:ffff8881246fb000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000020000011a000 CR3: 000000005441a000 CR4: 00000000003526f0
+Call Trace:
+ <TASK>
+ __debug_check_no_obj_freed lib/debugobjects.c:1099 [inline]
+ debug_check_no_obj_freed+0x4b7/0x600 lib/debugobjects.c:1129
+ slab_free_hook mm/slub.c:2348 [inline]
+ slab_free mm/slub.c:4680 [inline]
+ kfree+0x28f/0x4d0 mm/slub.c:4879
+ disk_release+0x2a1/0x410 block/genhd.c:1310
+ device_release+0xa4/0x240 drivers/base/core.c:2565
+ kobject_cleanup lib/kobject.c:689 [inline]
+ kobject_release lib/kobject.c:720 [inline]
+ kref_put include/linux/kref.h:65 [inline]
+ kobject_put+0x1e7/0x5a0 lib/kobject.c:737
+ put_device+0x1f/0x30 drivers/base/core.c:3797
+ blkdev_release+0x15/0x20 block/fops.c:699
+ __fput+0x3ff/0xb70 fs/file_table.c:468
+ task_work_run+0x14d/0x240 kernel/task_work.c:227
+ get_signal+0x1d1/0x26d0 kernel/signal.c:2807
+ arch_do_signal_or_restart+0x8f/0x7d0 arch/x86/kernel/signal.c:337
+ exit_to_user_mode_loop+0x84/0x110 kernel/entry/common.c:40
+ exit_to_user_mode_prepare include/linux/irq-entry-common.h:224 [inline]
+ syscall_exit_to_user_mode_work include/linux/entry-common.h:175 [inline]
+ syscall_exit_to_user_mode include/linux/entry-common.h:210 [inline]
+ do_syscall_64+0x3f6/0x4c0 arch/x86/entry/syscall_64.c:100
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f777078eb69
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f777160f038 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: 0000000000000000 RBX: 00007f77709b6160 RCX: 00007f777078eb69
+RDX: 0000000000000007 RSI: 0000000000000932 RDI: 0000000000000007
+RBP: 00007f7770811df1 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 0000000000000000 R14: 00007f77709b6160 R15: 00007ffcb194e248
+ </TASK>
 
-> ---
->  include/linux/uio.h |  2 -
->  lib/iov_iter.c      | 95 ---------------------------------------------
->  2 files changed, 97 deletions(-)
-> 
-> diff --git a/include/linux/uio.h b/include/linux/uio.h
-> index 2e86c653186c6..5b127043a1519 100644
-> --- a/include/linux/uio.h
-> +++ b/include/linux/uio.h
-> @@ -286,8 +286,6 @@ size_t _copy_mc_to_iter(const void *addr, size_t bytes, struct iov_iter *i);
->  #endif
->  
->  size_t iov_iter_zero(size_t bytes, struct iov_iter *);
-> -bool iov_iter_is_aligned(const struct iov_iter *i, unsigned addr_mask,
-> -			unsigned len_mask);
->  unsigned long iov_iter_alignment(const struct iov_iter *i);
->  unsigned long iov_iter_gap_alignment(const struct iov_iter *i);
->  void iov_iter_init(struct iov_iter *i, unsigned int direction, const struct iovec *iov,
-> diff --git a/lib/iov_iter.c b/lib/iov_iter.c
-> index f9193f952f499..2fe66a6b8789e 100644
-> --- a/lib/iov_iter.c
-> +++ b/lib/iov_iter.c
-> @@ -784,101 +784,6 @@ void iov_iter_discard(struct iov_iter *i, unsigned int direction, size_t count)
->  }
->  EXPORT_SYMBOL(iov_iter_discard);
->  
-> -static bool iov_iter_aligned_iovec(const struct iov_iter *i, unsigned addr_mask,
-> -				   unsigned len_mask)
-> -{
-> -	const struct iovec *iov = iter_iov(i);
-> -	size_t size = i->count;
-> -	size_t skip = i->iov_offset;
-> -
-> -	do {
-> -		size_t len = iov->iov_len - skip;
-> -
-> -		if (len > size)
-> -			len = size;
-> -		if (len & len_mask)
-> -			return false;
-> -		if ((unsigned long)(iov->iov_base + skip) & addr_mask)
-> -			return false;
-> -
-> -		iov++;
-> -		size -= len;
-> -		skip = 0;
-> -	} while (size);
-> -
-> -	return true;
-> -}
-> -
-> -static bool iov_iter_aligned_bvec(const struct iov_iter *i, unsigned addr_mask,
-> -				  unsigned len_mask)
-> -{
-> -	const struct bio_vec *bvec = i->bvec;
-> -	unsigned skip = i->iov_offset;
-> -	size_t size = i->count;
-> -
-> -	do {
-> -		size_t len = bvec->bv_len - skip;
-> -
-> -		if (len > size)
-> -			len = size;
-> -		if (len & len_mask)
-> -			return false;
-> -		if ((unsigned long)(bvec->bv_offset + skip) & addr_mask)
-> -			return false;
-> -
-> -		bvec++;
-> -		size -= len;
-> -		skip = 0;
-> -	} while (size);
-> -
-> -	return true;
-> -}
-> -
-> -/**
-> - * iov_iter_is_aligned() - Check if the addresses and lengths of each segments
-> - * 	are aligned to the parameters.
-> - *
-> - * @i: &struct iov_iter to restore
-> - * @addr_mask: bit mask to check against the iov element's addresses
-> - * @len_mask: bit mask to check against the iov element's lengths
-> - *
-> - * Return: false if any addresses or lengths intersect with the provided masks
-> - */
-> -bool iov_iter_is_aligned(const struct iov_iter *i, unsigned addr_mask,
-> -			 unsigned len_mask)
-> -{
-> -	if (likely(iter_is_ubuf(i))) {
-> -		if (i->count & len_mask)
-> -			return false;
-> -		if ((unsigned long)(i->ubuf + i->iov_offset) & addr_mask)
-> -			return false;
-> -		return true;
-> -	}
-> -
-> -	if (likely(iter_is_iovec(i) || iov_iter_is_kvec(i)))
-> -		return iov_iter_aligned_iovec(i, addr_mask, len_mask);
-> -
-> -	if (iov_iter_is_bvec(i))
-> -		return iov_iter_aligned_bvec(i, addr_mask, len_mask);
-> -
-> -	/* With both xarray and folioq types, we're dealing with whole folios. */
-> -	if (iov_iter_is_xarray(i)) {
-> -		if (i->count & len_mask)
-> -			return false;
-> -		if ((i->xarray_start + i->iov_offset) & addr_mask)
-> -			return false;
-> -	}
-> -	if (iov_iter_is_folioq(i)) {
-> -		if (i->count & len_mask)
-> -			return false;
-> -		if (i->iov_offset & addr_mask)
-> -			return false;
-> -	}
-> -
-> -	return true;
-> -}
-> -EXPORT_SYMBOL_GPL(iov_iter_is_aligned);
-> -
->  static unsigned long iov_iter_alignment_iovec(const struct iov_iter *i)
->  {
->  	const struct iovec *iov = iter_iov(i);
-> -- 
-> 2.47.3
-> 
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
