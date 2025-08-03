@@ -1,46 +1,73 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA9A833993
-	for <linux-block@vger.kernel.org>; Sun,  3 Aug 2025 05:11:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B9771A8F60;
+	Sun,  3 Aug 2025 06:25:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754197916; cv=none; b=KvQHwQHKEyIsGMp+hscmHWfF8i/E5G8xXbotLbvGigHlLWllHfRns08PGJib8SyKE/5QsjTlypYbV10fV4nbjW6C4HS/eJPcEY3hotdnH4xsVslLZpOj2M1ZeUjxwh3OEnX06VtpjPx8LlhdnrS2VzoRkGFO+IcRHcfyWoKb3Fg=
+	t=1754202344; cv=none; b=FAyqN3Mt2Iqk0lcmMgio8e/a8WgoaFg+DgVeSsdxcjR5VIB9zeW9DML6t6u0OhI9Kzjrs/Vqe5bjFZCN1GBob/reImDsfchEyugiGg8/ZVsLvvNMjtBnV9mZxpBLR3DDs1rE4jG8SL/IwMjBHPuaXrk3mSDkR6BOJhd9rWzMfZk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754197916; c=relaxed/simple;
-	bh=/8sebOgOgONN5T2h+5tjrUNiuFKdd8V3LV3ltmXJYfs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DwgRF12qxAb/tfPJycc+KgusnAys3sOvi5cT/9lH0YOu+NyUD63FNwxNl5icHqcEgjpG5//TYSf04mU0bicgmaoTnjXQedPI0mmkvCe1MbAqL1C6DbXdt6eWiJZgC2V9MeKo95t7gTMMYqRHe9S5apZ+klPMjE3ETZfAq54FpFU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MOdmWMGk; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1754202344; c=relaxed/simple;
+	bh=z2Rlz37BzFsAO3RN3PIojtGI77f+StT+TcBS/qpMkXM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=V/S1ZwaOSHx3BSvSEiKDDjy9wito6/aoLSdfwuPNfkF82V2mGXQqWddlCN8gbne/Fk2EgfKln/eUdAgWQbeFLH9SEcG36/W5Rk1kPhADJi4/+sdM7CDeRIW+XD+PrVSBkUIIH53aOXLDF+8mCeoZ59xvv8SkBlzV1JHOG/LKN9M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fcyv2aY/; arc=none smtp.client-ip=209.85.222.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MOdmWMGk"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D147FC4CEEB;
-	Sun,  3 Aug 2025 05:11:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754197916;
-	bh=/8sebOgOgONN5T2h+5tjrUNiuFKdd8V3LV3ltmXJYfs=;
-	h=From:To:Cc:Subject:Date:From;
-	b=MOdmWMGkUdL5Sqlex+4U1BQJ26ayWNfWIZXHp9UAtCBZmFcTUTWB+Pocg30wbwyTc
-	 y2q4jp5bGpmMBKwvAdCpx709dhsXGi/ahlzFIKiOT+LA8uxFwIfCy9ywB0hbQYlzAi
-	 p7vzG54sOwB/KD7rNu5cP1NiaaMYO9qWgFLg0n9fGv1BVoJw3kye7lv029haGssdOs
-	 VL8QuhTXId/ikx5yIPatkl0ajt2fkyT/VuYL6vwf/uIlz80v2ppZpiVTLbY+wfpjxw
-	 K4qd/xfbkP8r5p81A+NQvCeWdxEHE2axee/+YZxntvEUxC8KwFWSCDgzhqCZEZdsTN
-	 7txJ6hSZXTnDg==
-From: Yu Kuai <yukuai@kernel.org>
-To: axboe@kernel.dk,
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fcyv2aY/"
+Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-7e7f9bba93fso26876885a.3;
+        Sat, 02 Aug 2025 23:25:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1754202341; x=1754807141; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=18FUEBSoMNXtCmemBKC2uYLgcBGhaKjELbQUea43rEA=;
+        b=fcyv2aY/+AzPqsgn+FpC2jc4bT26mF2uoq7Iwqdld7u1Ezs+MX8NH/g4GQKRfM2w6k
+         dRpWlsykJS/7/Sm3eWnd+vi8m6NemZCDa/RU3U4Th1MGublQ0V7YUPqL6HE47vT5BQFP
+         MI4M/jS4Osgrvo6ma+n4WpBPrK+vmiZzApe0H/AA0K8ec7qgJgR824so08ZvUJPJKmnw
+         toUyc10uHsT190NnM+Z91/JBdnnG32LBZ+zkEPLRs8hvSVEoqqDe2ihKyF0RMv+zLM4X
+         QQ+HGpRm6YTe+KfBpeej2vhfbahuW45rAer6ZeoLvZZCr20Lays75Qz7FBZtaI6NZ98q
+         zp7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754202341; x=1754807141;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=18FUEBSoMNXtCmemBKC2uYLgcBGhaKjELbQUea43rEA=;
+        b=pr50EemtsZgq4rZWtkATeb6Pj1EyriHdEb5h68fMDrOZGzxhzCnFaonuPmJSOm/fhQ
+         yM75ZzVIB6pV7srfjh8pCOZqb7TscBG8kgzVsKblXgz8/5aFV5qo4RjzYBXvDyk/9ycq
+         mMsC5JLvijZohLZb4lP29iGtVJkjfuXBBl5lG5pM/vLfENRRpQ4pKgIoxY2OFREGQ17p
+         2wrCuPoCZkEm8vq5PemwEwyGL6EJw47hqRfomn57O4vAue1mZnpvuRjv2j3wc3i/Bunw
+         xZRSuQ24l1UbGDqs0K/bhf6zdmWIimV4G/2+h641O4F43dkEY7wAavULgYSKYdXs9OHG
+         6xjw==
+X-Forwarded-Encrypted: i=1; AJvYcCV8lSozPVvcA+CQlezrVYZEI4UVCFoti8qNw/JI6zhaUDyP1ck0gytxM8bhMeOXICjyGddXduxp1Wugag==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz6D9CK2ZVLmhZum/QmTyapaGZiLMYYTH1u0Ok/iyhXPldORbdQ
+	fgv4+H9ilDiZYegspOnS6M9hqk2M24te+JP3A4skatRACieZ/AV2uarH
+X-Gm-Gg: ASbGncuokj5lGTWX0H4+voe/0tF8X/kUyr9vc+6E6mx8j49oC9az2A8+Pww0KeH36+9
+	agooInYAg5lF7yY284tkz0ZV8osk9BhJ0chdQcrEFsqRoEPeoWpfkUDVBLRAXQkE0iARjZh0d3C
+	auVGmct+Mis5If4cQPOjnPBhCBRO3hNbiyZbDvOwFQqOPbz6F4oVfH2nOckpdU3aQ04m8pjNjmZ
+	vYlG3GsyMLhRHhp+A9cUgcHpAG+POkSGoi4JbRShyuygr5U294/Q+cp55lmukbPe2GVSGUKxT8p
+	bIlaDYZcjv5trTcjwv9Ph1k6OCs55leNgYs+HgQ0J6gHa7aKq65EwEKQmOarFbrn8nZtReZXUc8
+	cGz1dXlC9G8vjg3MNT8UtMw==
+X-Google-Smtp-Source: AGHT+IFh4n13JjdrnLeDOzRP8+CtmXsyh19v5MBjZtLm2eTvH+1k0UaoCo5l2RifkPvYCJhLFbSMsA==
+X-Received: by 2002:a05:620a:2652:b0:7e6:857e:6939 with SMTP id af79cd13be357-7e69635d36emr673433985a.40.1754202341330;
+        Sat, 02 Aug 2025 23:25:41 -0700 (PDT)
+Received: from iman-pc.home ([142.186.9.88])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7e67f5cd7f4sm412585285a.38.2025.08.02.23.25.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 02 Aug 2025 23:25:40 -0700 (PDT)
+From: Seyediman Seyedarab <imandevel@gmail.com>
+X-Google-Original-From: Seyediman Seyedarab <ImanDevel@gmail.com>
+To: minchan@kernel.org,
+	senozhatsky@chromium.org,
+	axboe@kernel.dk
+Cc: linux-kernel@vger.kernel.org,
 	linux-block@vger.kernel.org,
-	inux-raid@vger.kernel.org,
-	song@kernel.org
-Cc: yukuai3@huawei.com,
-	yangerkun@huawei.com,
-	yi.zhang@huawei.com,
-	johnny.chenyi@huawei.com,
-	xni@redhat.com,
-	heming.zhao@suse.com,
-	linan122@huawei.com,
-	wangjinchao600@gmail.com
-Subject: [GIT PULL] md-6.17-20250803 v2
-Date: Sun,  3 Aug 2025 13:11:45 +0800
-Message-ID: <20250803051145.2861-1-yukuai@kernel.org>
+	Seyediman Seyedarab <ImanDevel@gmail.com>,
+	syzbot+1a281a451fd8c0945d07@syzkaller.appspotmail.com
+Subject: [PATCH] zram: fix NULL pointer dereference in zcomp_available_show()
+Date: Sun,  3 Aug 2025 02:25:19 -0400
+Message-ID: <20250803062519.35712-1-ImanDevel@gmail.com>
 X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -50,56 +77,43 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Hi, Jens
+During zram_reset_device(), comp_algs[prio] is set to NULL by
+zram_destroy_comps() before being reinitialized to the default algorithm.
+A concurrent sysfs read can occur between these operations, passing NULL
+to strcmp() and causing a crash.
 
-Please consider pulling following changes on your block-6.17 branch,
-this pull request contains:
+Additionally, there's a use-after-free race where zram_remove() frees the
+zram structure while concurrent sysfs operations may still be accessing
+it. This is because del_gendisk() doesn't wait for active sysfs operations
+to complete - it only removes the files from the filesystem but doesn't
+drain active references.
 
-- mddev null-ptr-dereference fix, by Erkun
-- md-cluster fail to remove the faulty disk regression fix, by Heming
-- minor cleanup, by Li Nan and Jinchao
-- mdadm lifetime regression fix reported by syzkaller, by Yu Kuai
+Temporarily add a NULL check in zcomp_available_show() to prevent the
+crash. The use-after-free issue requires a more comprehensive fix using
+proper reference counting to ensure the zram structure isn't freed while
+still in use.
 
-The following changes since commit 5421681bc3ef13476bd9443379cd69381e8760fa:
+Fixes: e46b8a030d76 ("zram: make compression algorithm selection possible")
+Reported-by: syzbot+1a281a451fd8c0945d07@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=1a281a451fd8c0945d07
+Signed-off-by: Seyediman Seyedarab <ImanDevel@gmail.com>
+---
+ drivers/block/zram/zcomp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-  blk-ioc: don't hold queue_lock for ioc_lookup_icq() (2025-07-29 06:26:34 -0600)
+diff --git a/drivers/block/zram/zcomp.c b/drivers/block/zram/zcomp.c
+index b1bd1daa0060..98a2a3199ba2 100644
+--- a/drivers/block/zram/zcomp.c
++++ b/drivers/block/zram/zcomp.c
+@@ -95,7 +95,7 @@ ssize_t zcomp_available_show(const char *comp, char *buf, ssize_t at)
+ 	int i;
+ 
+ 	for (i = 0; i < ARRAY_SIZE(backends) - 1; i++) {
+-		if (!strcmp(comp, backends[i]->name)) {
++		if (comp && !strcmp(comp, backends[i]->name)) {
+ 			at += sysfs_emit_at(buf, at, "[%s] ",
+ 					    backends[i]->name);
+ 		} else {
+-- 
+2.50.1
 
-are available in the Git repository at:
-
-  git@gitolite.kernel.org:pub/scm/linux/kernel/git/mdraid/linux.git tags/md-6.17-20250803
-
-for you to fetch changes up to 13017b427118f4311471ee47df74872372ca8482:
-
-  md: make rdev_addable usable for rcu mode (2025-08-03 13:08:18 +0800)
-
-----------------------------------------------------------------
-Heming Zhao (1):
-      md/md-cluster: handle REMOVE message earlier
-
-Li Nan (1):
-      md: rename recovery_cp to resync_offset
-
-Wang Jinchao (2):
-      md/raid1: change r1conf->r1bio_pool to a pointer type
-      md/raid1: remove struct pool_info and related code
-
-Yang Erkun (1):
-      md: make rdev_addable usable for rcu mode
-
-Yu Kuai (1):
-      md: fix create on open mddev lifetime regression
-
- drivers/md/dm-raid.c           | 42 +++++++++++++++++------------------
- drivers/md/md-bitmap.c         |  8 +++----
- drivers/md/md-cluster.c        | 16 +++++++-------
- drivers/md/md.c                | 73 ++++++++++++++++++++++++++++++++++++-------------------------
- drivers/md/md.h                |  2 +-
- drivers/md/raid0.c             |  6 ++---
- drivers/md/raid1-10.c          |  2 +-
- drivers/md/raid1.c             | 94 ++++++++++++++++++++++++++++++-------------------------------------------------
- drivers/md/raid1.h             | 22 +------------------
- drivers/md/raid10.c            | 16 +++++++-------
- drivers/md/raid5-ppl.c         |  6 ++---
- drivers/md/raid5.c             | 30 ++++++++++++-------------
- include/uapi/linux/raid/md_p.h |  2 +-
- 13 files changed, 145 insertions(+), 174 deletions(-)
