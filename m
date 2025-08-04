@@ -1,55 +1,45 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 625E721D3D4;
-	Mon,  4 Aug 2025 15:26:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2765F203710;
+	Mon,  4 Aug 2025 15:27:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754321184; cv=none; b=WhcUTgjgQyRNuAbroy6GmTa4ygYT9WGIWwMROzZGO8jR/eSR0m3zLDmc7b7DAmFGs9poUOdB+t+LRhLca0WMbiWvMMvhY+NvaQs+LhH8pHydOPrmLGb/Bcrh7dGzMOeDKnMcsFaBg5EHYrL6ArygNf3dmO8KwrANE98ICsxIigE=
+	t=1754321274; cv=none; b=r/I09MAtkNIAJRFU7YMOPprxd6AiD1hv5KMfnc6OJq/Z91nv1Km2WRUei9qsgCkZQQN9pB5Z35GdrGAAPrVjdlz3oc4D7uBNbDxrK4Ihqelak61PmJDDba7SDIBkEyej+MDNLjapSX2pexTJijCEU393J9YuCGV3MzTyC+ahR3Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754321184; c=relaxed/simple;
-	bh=A7QWfqthNAE1vRjDCcZdbOxk67HAqqSO9Vh3esAKykw=;
+	s=arc-20240116; t=1754321274; c=relaxed/simple;
+	bh=1SI2hREQhkWq1ojwFfeqLsp+KLaUqr1qhk4/a9t8bKc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bR2qKV8aTfiHKarR4h/eCJwFQ1JDq9andM7qLGlwga2fQDBpNX711bv3BdQqlyb4lx9eK82LceyHe1wYRRJNac0M1PHQafaV4t8NrZBJtu1B8unwuOkrERJZM0cHT+3v4ZQrfmKBKlDhfuy6Ywgs2imP0IQxnalxkXqVItVdebs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G8aHgZEn; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=LN+T4jjYuo1PPjFxCVmbSnau7x1TAvo92vPgLSjTFdRD9gwLkL6jTUbgjsoeZx/Y5wEg4dPikGEOLYhkaWKeSETh/Zm7FXVB6BPwg5P1NI8kA0cZxNBB0j4FuJo4q+XHOgftvOcCFBNPHY5BGKXMagE2XccZEsd4vp0AjGRlP0c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O2Cpt20n; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G8aHgZEn"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28538C4CEE7;
-	Mon,  4 Aug 2025 15:26:22 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O2Cpt20n"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7DCD8C4CEE7;
+	Mon,  4 Aug 2025 15:27:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754321183;
-	bh=A7QWfqthNAE1vRjDCcZdbOxk67HAqqSO9Vh3esAKykw=;
+	s=k20201202; t=1754321273;
+	bh=1SI2hREQhkWq1ojwFfeqLsp+KLaUqr1qhk4/a9t8bKc=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=G8aHgZEnu5iXvCP7Bs5tuWefE4ftgA8h8Cjl85Cwm5By9LieCOsjVqy3AdZGS2J2M
-	 gWpzl+6EFBw/RcBqC5KpnG1ipGUhJpU+Zji4nx/hTyt4NrdEsiC2Yz2U1Wkzd/Ib2a
-	 QqAw4VBqd0cclEUaixH0rs/7nLDQeEd4unvRQYUSQURTz7+jVwS/zV9otrzj3jp79N
-	 yUvnvgyE3xRQ4zHvh0Mw/ECgF8Le7V8q2qdcMJT+F/84f2NxFe4MykBa4PKbCdIa1S
-	 PCz7RUMVTUjwcVuJgGK+jMXUeWg1UaBDlwSS3wIOPEFwlaX7GvD5jEG30YanErScjg
-	 iRFzDP1lYO0Lg==
-Date: Mon, 4 Aug 2025 18:26:18 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: Jason Gunthorpe <jgg@nvidia.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	Christoph Hellwig <hch@lst.de>, dri-devel@lists.freedesktop.org,
-	iommu@lists.linux.dev, Jens Axboe <axboe@kernel.dk>,
-	Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-	linaro-mm-sig@lists.linaro.org, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
-	linux-mm@kvack.org, linux-pci@vger.kernel.org,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Vivek Kasireddy <vivek.kasireddy@intel.com>,
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v1 10/10] vfio/pci: Add dma-buf export support for MMIO
- regions
-Message-ID: <20250804152618.GU402218@unreal>
-References: <cover.1754311439.git.leon@kernel.org>
- <5e043d8b95627441db6156e7f15e6e1658e9d537.1754311439.git.leon@kernel.org>
+	b=O2Cpt20n/L8s7jJW2IRHiXg75njY5wXYZl53YCDgwTIul/Yr5/RWFMwYFjjP7IsWD
+	 MlwcehWUuw2etEB7sh0VRF9hOsTYOBWW0e/zGt6ivk5fNP+a3dEjZyc7+YL6fS16Jo
+	 K7yISx6Erv1pLsLu7k2OPrUqJVioDffCn/EkiGcNFMjoAgi/ofY/KVTzQ8k1aG1pYc
+	 NcOKxHVl0eTdfhsqQS8dnVbfO+g44/BPHiIsLs2ScwbxdhfG1gVvcslZNnNMeQCEVQ
+	 D7aiYf35VyDsjIW9vJGutklDy7uJi4eh7/1DlYTgpf0Hu4eSi4bCvLPjhWvHDUvmlx
+	 XF6u3+ZK4G3JQ==
+Date: Mon, 4 Aug 2025 11:27:52 -0400
+From: Mike Snitzer <snitzer@kernel.org>
+To: Keith Busch <kbusch@kernel.org>
+Cc: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+	axboe@kernel.dk, dw@davidwei.uk, brauner@kernel.org,
+	Chuck Lever <chuck.lever@oracle.com>, linux-nfs@vger.kernel.org
+Subject: Re: [PATCH 7/7] iov_iter: remove iov_iter_is_aligned
+Message-ID: <aJDReEEeiVBWEYLy@kernel.org>
+References: <20250801234736.1913170-1-kbusch@meta.com>
+ <20250801234736.1913170-8-kbusch@meta.com>
+ <aI1xySNUdQ2B0dbJ@kernel.org>
+ <aJDAx1Ns9Fg7F6iK@kbusch-mbp>
+ <aJDQ1GPV5F5MB1kP@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -58,50 +48,50 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <5e043d8b95627441db6156e7f15e6e1658e9d537.1754311439.git.leon@kernel.org>
+In-Reply-To: <aJDQ1GPV5F5MB1kP@kernel.org>
 
-On Mon, Aug 04, 2025 at 04:00:45PM +0300, Leon Romanovsky wrote:
-> From: Leon Romanovsky <leonro@nvidia.com>
+On Mon, Aug 04, 2025 at 11:25:08AM -0400, Mike Snitzer wrote:
+> On Mon, Aug 04, 2025 at 08:16:39AM -0600, Keith Busch wrote:
+> > On Fri, Aug 01, 2025 at 10:02:49PM -0400, Mike Snitzer wrote:
+> > > On Fri, Aug 01, 2025 at 04:47:36PM -0700, Keith Busch wrote:
+> > > > From: Keith Busch <kbusch@kernel.org>
+> > > > 
+> > > > No more callers.
+> > > > 
+> > > > Signed-off-by: Keith Busch <kbusch@kernel.org>
+> > > 
+> > > You had me up until this last patch.
+> > > 
+> > > I'm actually making use of iov_iter_is_aligned() in a series of
+> > > changes for both NFS and NFSD.  Chuck has included some of the
+> > > NFSD changes in his nfsd-testing branch, see:
+> > > https://git.kernel.org/pub/scm/linux/kernel/git/cel/linux.git/commit/?h=nfsd-testing&id=5d78ac1e674b45f9c9e3769b48efb27c44f4e4d3
+> > > 
+> > > And the balance of my work that is pending review/inclusion is:
+> > > https://lore.kernel.org/linux-nfs/20250731230633.89983-1-snitzer@kernel.org/
+> > > https://lore.kernel.org/linux-nfs/20250801171049.94235-1-snitzer@kernel.org/
+> > > 
+> > > I only need iov_iter_aligned_bvec, but recall I want to relax its
+> > > checking with this patch:
+> > > https://lore.kernel.org/linux-nfs/20250708160619.64800-5-snitzer@kernel.org/
+> > > 
+> > > Should I just add iov_iter_aligned_bvec() to fs/nfs_common/ so that
+> > > both NFS and NFSD can use it?
+> > 
+> > If at all possible, I recommend finding a place that already walks the
+> > vectors and do an opprotunistic check for the alignments there. This
+> > will save CPU cycles. For example, nfsd_iter_read already iterates the
+> > bvec while setting each page. Could you check the alignment while doing
+> > that instead of iterating a second time immediately after?
 > 
-> Add support for exporting PCI device MMIO regions through dma-buf,
-> enabling safe sharing of non-struct page memory with controlled
-> lifetime management. This allows RDMA and other subsystems to import
-> dma-buf FDs and build them into memory regions for PCI P2P operations.
+> Nice goal, I'll see if I can pull it off.
 > 
-> The implementation provides a revocable attachment mechanism using
-> dma-buf move operations. MMIO regions are normally pinned as BARs
-> don't change physical addresses, but access is revoked when the VFIO
-> device is closed or a PCI reset is issued. This ensures kernel
-> self-defense against potentially hostile userspace.
+> I'm currently using iov_iter_is_aligned() in 3 new call sites (for
+> READ and WRITE) in both NFS and NFSD: nfs_local_iter_init,
+> nfsd_iter_read, nfsd_vfs_write
 > 
-> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> Signed-off-by: Vivek Kasireddy <vivek.kasireddy@intel.com>
-> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-> ---
->  drivers/vfio/pci/Kconfig           |  20 ++
->  drivers/vfio/pci/Makefile          |   2 +
->  drivers/vfio/pci/vfio_pci_config.c |  22 +-
->  drivers/vfio/pci/vfio_pci_core.c   |  25 +-
->  drivers/vfio/pci/vfio_pci_dmabuf.c | 390 +++++++++++++++++++++++++++++
->  drivers/vfio/pci/vfio_pci_priv.h   |  23 ++
->  include/linux/dma-buf.h            |   1 +
->  include/linux/vfio_pci_core.h      |   3 +
->  include/uapi/linux/vfio.h          |  25 ++
->  9 files changed, 506 insertions(+), 5 deletions(-)
->  create mode 100644 drivers/vfio/pci/vfio_pci_dmabuf.c
+> nfsd_vfs_write is the only one that doesn't iterate the bvec as-is,
+> but it does work that _should_ obviate the need to doable check the
+> alignment.
 
-<...>
-
-> diff --git a/include/linux/dma-buf.h b/include/linux/dma-buf.h
-> index d58e329ac0e71..f14b413aae48d 100644
-> --- a/include/linux/dma-buf.h
-> +++ b/include/linux/dma-buf.h
-> @@ -483,6 +483,7 @@ struct dma_buf_attach_ops {
->   * @dev: device attached to the buffer.
->   * @node: list of dma_buf_attachment, protected by dma_resv lock of the dmabuf.
->   * @peer2peer: true if the importer can handle peer resources without pages.
-> + * #state: DMA structure to provide support for physical addresses DMA interface
-
-This is rebase error, there is no need in this hunk.
-
-Thanks
+Freudian typo: s/doable/double/ :)
