@@ -1,129 +1,86 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 085CB2522BE
-	for <linux-block@vger.kernel.org>; Mon,  4 Aug 2025 13:42:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3755D2BAF7;
+	Mon,  4 Aug 2025 14:08:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754314952; cv=none; b=T07msepRbLJ1NbIB5H/wTQAXUIOlD293BX4vP6N+FthdEi82HroRaw9oPvO+nn380nV9gl0+u3vJloMsVzUeZcbXDtmNz98BM+dgVbdplVqLy3amBy0UXQqxetWPKtDPEpJwPQW/HtRnPv9IE8cEqYZf6LSRxNlWJpfludLoaR8=
+	t=1754316522; cv=none; b=nmpXgCA2/Y4aN7AVPbd6E5v2wxO7k0ffWoQwpEOryB+ktLEDNyXig+N4JeeUNAj1bputfwLS2Eihw0eJOvWc47D6n4u7R8mXykF72U2TMJhhhq5tXWb0pwX8SpOfn6m+4rYgtCafXGOKJv4fBk7a+jqWR/FMs+fpV4KsJV8bIV4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754314952; c=relaxed/simple;
-	bh=r+35R3cMW5I905QXPJ68CBu9Hx4eTADCxXxLBeTKgiE=;
+	s=arc-20240116; t=1754316522; c=relaxed/simple;
+	bh=+7Q4LotkGwU5ARZYTGNnCuBdetHLX3DRgjQvtKWhXzg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HaOFT+WRqHafM9QlAkXLpvY17NFXoWKfa9aQYqZBh8yMXD7b3xeoTaqeikD8ZydDQ+piA3YB7KvwBFN3R14KRmptZsIRqLaACgH0GAi2Sv13eRNlWvL6VcPhheVboKJaiQqqcoeEma+vFMIMDpB+pnvSn5jPq3q6frZygIrIUys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fiDpbEoG; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=VvRTePtynmMSRvJRYINB8rH98KWNAsK+kXjGqOFz22kXOc8z0bbsSfNK1yyVAzKxfRtq5o1ROf37AZc6F4+69guTvwiGNxgwmJ5VG9ivAGg34b3WiNrI9l0AldV20awDSwiHKkiUUBWk7w0MmwLPjiBmVQeOooNMeLOroD9fmrc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ls0/4rEz; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fiDpbEoG"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1754314949;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=EZvrclNS6/cHIwXDV7qrig8vc0YOkD6KFqwoaeUmEdw=;
-	b=fiDpbEoG6O/4Zk0jIsopoHg4fzP6ybjl/9Uk3WQ1IPFOhvebGE5At4qqOsBRp8XL8tDJdj
-	ebhPBFjfY+XqbGe6QloTQ0fZ2vjL3Vbh6tfCAqGY6pLwgPqSvSCMHV/+U5IcqGeokFNwmF
-	iO+4JSemfp9HkgVCqWBBveDbXPXOL3s=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-628-OAezRv-XPxmFqWyH6aXRDw-1; Mon,
- 04 Aug 2025 09:42:25 -0400
-X-MC-Unique: OAezRv-XPxmFqWyH6aXRDw-1
-X-Mimecast-MFC-AGG-ID: OAezRv-XPxmFqWyH6aXRDw_1754314944
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A4EC3195D018;
-	Mon,  4 Aug 2025 13:42:23 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.20])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6CFFE1956094;
-	Mon,  4 Aug 2025 13:42:18 +0000 (UTC)
-Date: Mon, 4 Aug 2025 21:42:12 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Nilay Shroff <nilay@linux.ibm.com>
-Cc: linux-block@vger.kernel.org, axboe@kernel.dk, kch@nvidia.com,
-	shinichiro.kawasaki@wdc.com, hch@lst.de, gjoyce@ibm.com
-Subject: Re: [PATCH 0/2] block: blk-rq-qos: replace static key with atomic
- bitop
-Message-ID: <aJC4tDUsk42Nb9Df@fedora>
-References: <20250804122125.3271397-1-nilay@linux.ibm.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ls0/4rEz"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 040E7C4CEE7;
+	Mon,  4 Aug 2025 14:08:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1754316521;
+	bh=+7Q4LotkGwU5ARZYTGNnCuBdetHLX3DRgjQvtKWhXzg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Ls0/4rEzghBmvR0vP8lQ63jV9Ne2vih9EuPhtx0lfJsVSWafCSD8lowTwlYCWSWH3
+	 iAJoAfO8H7B7MLKxPxBO9SG6lBdmVrr2brAy4i5atmiM+4sXCE4pzamyRou9a2izWt
+	 1gKTF7IFQ6ez+NqItBxcSbZ9lFCzk/wmuHE9YRFrJcijTUag6F08uIlDle8P1fMMOU
+	 +naPsw+VTvORrZ93ujPN8krJKyIL7XapyEx9868EnbA78ubsDdJDV7yrzGl/iVy7vw
+	 vkNK730Ir8W4L8YtoEynIHYQD8/Glt5GvaR26s+rQB7y6vebZKiifieCcXEpd/BhVu
+	 wM5VBUhVvk+fg==
+Date: Mon, 4 Aug 2025 08:08:38 -0600
+From: Keith Busch <kbusch@kernel.org>
+To: Hannes Reinecke <hare@suse.de>
+Cc: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+	snitzer@kernel.org, axboe@kernel.dk, dw@davidwei.uk,
+	brauner@kernel.org
+Subject: Re: [PATCH 2/7] block: align the bio after building it
+Message-ID: <aJC-5qTTVDNjp0uk@kbusch-mbp>
+References: <20250801234736.1913170-1-kbusch@meta.com>
+ <20250801234736.1913170-3-kbusch@meta.com>
+ <14c5a629-2169-4271-97b8-a1aba45a6e54@suse.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250804122125.3271397-1-nilay@linux.ibm.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+In-Reply-To: <14c5a629-2169-4271-97b8-a1aba45a6e54@suse.de>
 
-On Mon, Aug 04, 2025 at 05:51:09PM +0530, Nilay Shroff wrote:
-> This patchset replaces the use of a static key in the I/O path (rq_qos_
-> xxx()) with an atomic queue flag (QUEUE_FLAG_QOS_ENABLED). This change
-> is made to eliminate a potential deadlock introduced by the use of static
-> keys in the blk-rq-qos infrastructure, as reported by lockdep during 
-> blktests block/005[1].
+On Mon, Aug 04, 2025 at 08:54:00AM +0200, Hannes Reinecke wrote:
+> On 8/2/25 01:47, Keith Busch wrote:
+> > +static int bio_align_to_lbs(struct bio *bio, struct iov_iter *iter)
+> > +{
+> > +	struct block_device *bdev = bio->bi_bdev;
+> > +	size_t nbytes;
+> > +
+> > +	if (!bdev)
+> > +		return 0;
+> > +
+> > +	nbytes = bio->bi_iter.bi_size & (bdev_logical_block_size(bdev) - 1);
+> > +	if (!nbytes)
+> > +		return 0;
+> > +
+> > +	bio_revert(bio, nbytes);
+> > +	iov_iter_revert(iter, nbytes);
+> > +	if (!bio->bi_iter.bi_size)
+> > +		return -EFAULT;
+> > +
+> > +	return 0;
+> > +}
+> > +
+> >   /**
+> >    * bio_iov_iter_get_pages - add user or kernel pages to a bio
+> >    * @bio: bio to add pages to
+> > @@ -1336,6 +1355,7 @@ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+> >   		ret = __bio_iov_iter_get_pages(bio, iter);
+> >   	} while (!ret && iov_iter_count(iter) && !bio_full(bio, 0));
+> > +	ret = bio_align_to_lbs(bio, iter);
+> >   	return bio->bi_vcnt ? 0 : ret;
 > 
-> The original static key approach was introduced to avoid unnecessary
-> dereferencing of q->rq_qos when no blk-rq-qos module (e.g., blk-wbt or
-> blk-iolatency) is configured. While efficient, enabling a static key at
-> runtime requires taking cpu_hotplug_lock and jump_label_mutex, which 
-> becomes problematic if the queue is already frozen — causing a reverse
-> dependency on ->freeze_lock. This results in a lockdep splat indicating
-> a potential deadlock.
-> 
-> To resolve this, we now gate q->rq_qos access with a q->queue_flags
-> bitop (QUEUE_FLAG_QOS_ENABLED), avoiding the static key and the associated
-> locking altogether.
-> 
-> I compared both static key and atomic bitop implementations using ftrace
-> function graph tracer over ~50 invocations of rq_qos_issue() while ensuring
-> blk-wbt/blk-iolatency were disabled (i.e., no QoS functionality). For
-> easy comparision, I made rq_qos_issue() noinline. The comparision was
-> made on PowerPC machine.
-> 
-> Static Key (disabled : QoS is not configured):
-> 5d0: 00 00 00 60     nop    # patched in by static key framework (not taken)
-> 5d4: 20 00 80 4e     blr    # return (branch to link register)
-> 
-> Only a nop and blr (branch to link register) are executed — very lightweight.
-> 
-> atomic bitop (QoS is not configured):
-> 5d0: 20 00 23 e9     ld      r9,32(r3)     # load q->queue_flags
-> 5d4: 00 80 29 71     andi.   r9,r9,32768   # check QUEUE_FLAG_QOS_ENABLED (bit 15)
-> 5d8: 20 00 82 4d     beqlr                 # return if bit not set
-> 
-> This performs an ld and and andi. before returning. Slightly more work, 
-> but q->queue_flags is typically hot in cache during I/O submission.
-> 
-> With Static Key (disabled):
-> Duration (us): min=0.668 max=0.816 avg≈0.750
-> 
-> With atomic bitop QUEUE_FLAG_QOS_ENABLED (bit not set):
-> Duration (us): min=0.684 max=0.834 avg≈0.759
-> 
-> As expected, both versions are almost similar in cost. The added latency
-> from an extra ld and andi. is in the range of ~9ns.
-> 
-> There're two patches in the series. The first patch replaces static key
-> with QUEUE_FLAG_QOS_ENABLED. The second patch ensures that we disable
-> the QUEUE_FLAG_QOS_ENABLED when the queue no longer has any associated
-> rq_qos policies.
-> 
-> As usual, feedback and review comments are welcome!
-> 
-> [1] https://lore.kernel.org/linux-block/4fdm37so3o4xricdgfosgmohn63aa7wj3ua4e5vpihoamwg3ui@fq42f5q5t5ic/
+> Wouldn't that cause the error from bio_align_to_lba() to be ignored
+> if bio->bi_vcnt is greater than 0?
 
-
-Another approach is to call memalloc_noio_save() in cpu hotplug code...
-
-
-Thanks,
-Ming
-
+That returns an error only if the alignment reduces the size to 0, so
+there would be a bug somewhere if bi_vcnt is not also 0 in that case.
