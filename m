@@ -1,86 +1,153 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3755D2BAF7;
-	Mon,  4 Aug 2025 14:08:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from kanga.kvack.org (kanga.kvack.org [205.233.56.17])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A38D8F58;
+	Mon,  4 Aug 2025 14:10:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.233.56.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754316522; cv=none; b=nmpXgCA2/Y4aN7AVPbd6E5v2wxO7k0ffWoQwpEOryB+ktLEDNyXig+N4JeeUNAj1bputfwLS2Eihw0eJOvWc47D6n4u7R8mXykF72U2TMJhhhq5tXWb0pwX8SpOfn6m+4rYgtCafXGOKJv4fBk7a+jqWR/FMs+fpV4KsJV8bIV4=
+	t=1754316640; cv=none; b=IMi7ZFWIWom/OXdTLBBSkUjxLIwzrWLZyzQPrcatz1p6noS/M/joqKKwIYfBdu0Iki+9SZ/OmKmfiPox9jnjQwErXrm8rCoSm27GNzBNOUVEuMGEUb5xB9YgRHK7Q2bJxWlNtjzdHPM5/Uij4M/CSt+KjbKHV6j5wGhDoj6qUOY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754316522; c=relaxed/simple;
-	bh=+7Q4LotkGwU5ARZYTGNnCuBdetHLX3DRgjQvtKWhXzg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VvRTePtynmMSRvJRYINB8rH98KWNAsK+kXjGqOFz22kXOc8z0bbsSfNK1yyVAzKxfRtq5o1ROf37AZc6F4+69guTvwiGNxgwmJ5VG9ivAGg34b3WiNrI9l0AldV20awDSwiHKkiUUBWk7w0MmwLPjiBmVQeOooNMeLOroD9fmrc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ls0/4rEz; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ls0/4rEz"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 040E7C4CEE7;
-	Mon,  4 Aug 2025 14:08:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754316521;
-	bh=+7Q4LotkGwU5ARZYTGNnCuBdetHLX3DRgjQvtKWhXzg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Ls0/4rEzghBmvR0vP8lQ63jV9Ne2vih9EuPhtx0lfJsVSWafCSD8lowTwlYCWSWH3
-	 iAJoAfO8H7B7MLKxPxBO9SG6lBdmVrr2brAy4i5atmiM+4sXCE4pzamyRou9a2izWt
-	 1gKTF7IFQ6ez+NqItBxcSbZ9lFCzk/wmuHE9YRFrJcijTUag6F08uIlDle8P1fMMOU
-	 +naPsw+VTvORrZ93ujPN8krJKyIL7XapyEx9868EnbA78ubsDdJDV7yrzGl/iVy7vw
-	 vkNK730Ir8W4L8YtoEynIHYQD8/Glt5GvaR26s+rQB7y6vebZKiifieCcXEpd/BhVu
-	 wM5VBUhVvk+fg==
-Date: Mon, 4 Aug 2025 08:08:38 -0600
-From: Keith Busch <kbusch@kernel.org>
-To: Hannes Reinecke <hare@suse.de>
-Cc: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-	snitzer@kernel.org, axboe@kernel.dk, dw@davidwei.uk,
-	brauner@kernel.org
-Subject: Re: [PATCH 2/7] block: align the bio after building it
-Message-ID: <aJC-5qTTVDNjp0uk@kbusch-mbp>
-References: <20250801234736.1913170-1-kbusch@meta.com>
- <20250801234736.1913170-3-kbusch@meta.com>
- <14c5a629-2169-4271-97b8-a1aba45a6e54@suse.de>
+	s=arc-20240116; t=1754316640; c=relaxed/simple;
+	bh=PAva6HWFhzF5FDISaUn14VPngMQ/Xi5WhXW9wpYIysw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Mime-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EpRiTXIOSRep/fzTSEzG3j5xuqcP/9fE2eTKkzXPDrEYkKYPQQeBgK+UQ8Nzkt5yFjBc7MECR9Ue2zH/jv+ZkdVrm5wpty64SJiqFqOMREMkamHnPUJaHPvCFUNeG4matP8dQ+BRMVlo6bZNKZgsxPGsEXfqBFqiy0VOFJrOnu4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kvack.org; spf=pass smtp.mailfrom=kvack.org; arc=none smtp.client-ip=205.233.56.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kvack.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kvack.org
+Received: by kanga.kvack.org (Postfix, from userid 63042)
+	id 8AB4F6B009F; Mon,  4 Aug 2025 10:10:32 -0400 (EDT)
+Date: Mon, 4 Aug 2025 10:10:32 -0400
+From: Benjamin LaHaise <bcrl@kvack.org>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Alex Williamson <alex.williamson@redhat.com>,
+	Jason Gunthorpe <jgg@nvidia.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	Christoph Hellwig <hch@lst.de>, dri-devel@lists.freedesktop.org,
+	iommu@lists.linux.dev, Jens Axboe <axboe@kernel.dk>,
+	Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+	linaro-mm-sig@lists.linaro.org, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
+	linux-mm@kvack.org, linux-pci@vger.kernel.org,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Vivek Kasireddy <vivek.kasireddy@intel.com>,
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v1 00/10] vfio/pci: Allow MMIO regions to be exported through dma-buf
+Message-ID: <20250804141032.GA30056@kvack.org>
+References: <cover.1754311439.git.leon@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <14c5a629-2169-4271-97b8-a1aba45a6e54@suse.de>
+In-Reply-To: <cover.1754311439.git.leon@kernel.org>
+User-Agent: Mutt/1.4.2.2i
 
-On Mon, Aug 04, 2025 at 08:54:00AM +0200, Hannes Reinecke wrote:
-> On 8/2/25 01:47, Keith Busch wrote:
-> > +static int bio_align_to_lbs(struct bio *bio, struct iov_iter *iter)
-> > +{
-> > +	struct block_device *bdev = bio->bi_bdev;
-> > +	size_t nbytes;
-> > +
-> > +	if (!bdev)
-> > +		return 0;
-> > +
-> > +	nbytes = bio->bi_iter.bi_size & (bdev_logical_block_size(bdev) - 1);
-> > +	if (!nbytes)
-> > +		return 0;
-> > +
-> > +	bio_revert(bio, nbytes);
-> > +	iov_iter_revert(iter, nbytes);
-> > +	if (!bio->bi_iter.bi_size)
-> > +		return -EFAULT;
-> > +
-> > +	return 0;
-> > +}
-> > +
-> >   /**
-> >    * bio_iov_iter_get_pages - add user or kernel pages to a bio
-> >    * @bio: bio to add pages to
-> > @@ -1336,6 +1355,7 @@ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
-> >   		ret = __bio_iov_iter_get_pages(bio, iter);
-> >   	} while (!ret && iov_iter_count(iter) && !bio_full(bio, 0));
-> > +	ret = bio_align_to_lbs(bio, iter);
-> >   	return bio->bi_vcnt ? 0 : ret;
+FYI: this entire patch series was rejected as spam by large numbers of
+linux-mm subscribers using @gmail.com email addresses.
+
+		-ben (owner-linux-mm)
+
+On Mon, Aug 04, 2025 at 04:00:35PM +0300, Leon Romanovsky wrote:
+> Changelog:
+> v1:
+>  * Changed commit messages.
+>  * Reused DMA_ATTR_MMIO attribute.
+>  * Returned support for multiple DMA ranges per-dMABUF.
+> v0: https://lore.kernel.org/all/cover.1753274085.git.leonro@nvidia.com
 > 
-> Wouldn't that cause the error from bio_align_to_lba() to be ignored
-> if bio->bi_vcnt is greater than 0?
+> ---------------------------------------------------------------------------
+> Based on "[PATCH v1 00/16] dma-mapping: migrate to physical address-based API"
+> https://lore.kernel.org/all/cover.1754292567.git.leon@kernel.org series.
+> ---------------------------------------------------------------------------
+> 
+> This series extends the VFIO PCI subsystem to support exporting MMIO regions
+> from PCI device BARs as dma-buf objects, enabling safe sharing of non-struct
+> page memory with controlled lifetime management. This allows RDMA and other
+> subsystems to import dma-buf FDs and build them into memory regions for PCI
+> P2P operations.
+> 
+> The series supports a use case for SPDK where a NVMe device will be owned
+> by SPDK through VFIO but interacting with a RDMA device. The RDMA device
+> may directly access the NVMe CMB or directly manipulate the NVMe device's
+> doorbell using PCI P2P.
+> 
+> However, as a general mechanism, it can support many other scenarios with
+> VFIO. This dmabuf approach can be usable by iommufd as well for generic
+> and safe P2P mappings.
+> 
+> In addition to the SPDK use-case mentioned above, the capability added
+> in this patch series can also be useful when a buffer (located in device
+> memory such as VRAM) needs to be shared between any two dGPU devices or
+> instances (assuming one of them is bound to VFIO PCI) as long as they
+> are P2P DMA compatible.
+> 
+> The implementation provides a revocable attachment mechanism using dma-buf
+> move operations. MMIO regions are normally pinned as BARs don't change
+> physical addresses, but access is revoked when the VFIO device is closed
+> or a PCI reset is issued. This ensures kernel self-defense against
+> potentially hostile userspace.
+> 
+> The series includes significant refactoring of the PCI P2PDMA subsystem
+> to separate core P2P functionality from memory allocation features,
+> making it more modular and suitable for VFIO use cases that don't need
+> struct page support.
+> 
+> -----------------------------------------------------------------------
+> The series is based originally on
+> https://lore.kernel.org/all/20250307052248.405803-1-vivek.kasireddy@intel.com/
+> but heavily rewritten to be based on DMA physical API.
+> -----------------------------------------------------------------------
+> The WIP branch can be found here:
+> https://git.kernel.org/pub/scm/linux/kernel/git/leon/linux-rdma.git/log/?h=dmabuf-vfio-v1
+> 
+> Thanks
+> 
+> Leon Romanovsky (8):
+>   PCI/P2PDMA: Remove redundant bus_offset from map state
+>   PCI/P2PDMA: Separate the mmap() support from the core logic
+>   PCI/P2PDMA: Simplify bus address mapping API
+>   PCI/P2PDMA: Refactor to separate core P2P functionality from memory
+>     allocation
+>   PCI/P2PDMA: Export pci_p2pdma_map_type() function
+>   types: move phys_vec definition to common header
+>   vfio/pci: Enable peer-to-peer DMA transactions by default
+>   vfio/pci: Add dma-buf export support for MMIO regions
+> 
+> Vivek Kasireddy (2):
+>   vfio: Export vfio device get and put registration helpers
+>   vfio/pci: Share the core device pointer while invoking feature
+>     functions
+> 
+>  block/blk-mq-dma.c                 |   7 +-
+>  drivers/iommu/dma-iommu.c          |   4 +-
+>  drivers/pci/p2pdma.c               | 154 ++++++++----
+>  drivers/vfio/pci/Kconfig           |  20 ++
+>  drivers/vfio/pci/Makefile          |   2 +
+>  drivers/vfio/pci/vfio_pci_config.c |  22 +-
+>  drivers/vfio/pci/vfio_pci_core.c   |  59 +++--
+>  drivers/vfio/pci/vfio_pci_dmabuf.c | 390 +++++++++++++++++++++++++++++
+>  drivers/vfio/pci/vfio_pci_priv.h   |  23 ++
+>  drivers/vfio/vfio_main.c           |   2 +
+>  include/linux/dma-buf.h            |   1 +
+>  include/linux/pci-p2pdma.h         | 114 +++++----
+>  include/linux/types.h              |   5 +
+>  include/linux/vfio.h               |   2 +
+>  include/linux/vfio_pci_core.h      |   4 +
+>  include/uapi/linux/vfio.h          |  25 ++
+>  kernel/dma/direct.c                |   4 +-
+>  mm/hmm.c                           |   2 +-
+>  18 files changed, 715 insertions(+), 125 deletions(-)
+>  create mode 100644 drivers/vfio/pci/vfio_pci_dmabuf.c
+> 
+> -- 
+> 2.50.1
+> 
 
-That returns an error only if the alignment reduces the size to 0, so
-there would be a bug somewhere if bi_vcnt is not also 0 in that case.
+-- 
+"Thought is the essence of where you are now."
