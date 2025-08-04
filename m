@@ -1,297 +1,185 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF30E257AEE
-	for <linux-block@vger.kernel.org>; Mon,  4 Aug 2025 12:21:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD5EF2580FB
+	for <linux-block@vger.kernel.org>; Mon,  4 Aug 2025 12:28:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754310104; cv=none; b=ChIkhbHcUwsjZZalbRWI5d1yonM2taqTQXF3l3xpZI43yYELfNqx3Nl734dPbuI5tHrcYZrmh3k1g/KkMeLWqTqu4S8RaUGNMsz1gUFGGOwmut1AeD5RKe+PonY9nTelShY3zJ45Lqs6u/Lxzq+RF0wOu4+mQohbiZ4BUQ9C36o=
+	t=1754310510; cv=none; b=aetKvOnJATGzw8udnqePhPlWKPFyW7NRhfB7lzYniWzUXArQxwnn/41LlVkTBBlnw2QQAghs/rVdALn0sBaVHFy6/LEik21Xm/vhSkmVA/up3wH6pBwTcg9OkAb6ionryKZ8iUjkkV2LXXdcl2B1iqt9+NaYX8LdkjkeQ0ZY5DQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754310104; c=relaxed/simple;
-	bh=qihhYwXDdEtH3wcpsuL5tLG5f9Gxlfpim1LPqSUuwlE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ApAOe8rhDZYrcPg4Ifr35tSF1D2uSwLffhdBfGe2H/37JZP9XintUNC6ptvWKnieJCtHVaJX5yJ4bx3QJAQmOw/JawClHaMr0eXlpEpi51tLhHBA5pIcUenrzqmi8rCg5x3Bljxz/uy1S/2YtzKqdT+Z8GY67pikkmjpvkJ85eY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=M3V0OM3+; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="M3V0OM3+"
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 574A3Et2014258;
-	Mon, 4 Aug 2025 12:21:33 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=zAnEWSSb0FGTC6D9C
-	Ed7XDctfdK8EfdcM99Us2uN/yM=; b=M3V0OM3+BI8cnv7U+XHL9tQv4UL8g4ZeG
-	e1mQYLl4g1k9CxkXnDCITvt7z+Y035IkM3FEyssEaalsybzWfrlnZ59NS8HNb1rX
-	ZehR1Ub+XydzTIjnmmKrh4uL4uaR8jC2X7IRvk9FNZ1rtpILa7ydhjUCsfwpjX1a
-	QAnnfDRoxPmWFdpr8Yxh9hjE6ulO1wbWeb/6jQbAOySJjPsfoGePW1nKcMDgYwau
-	uwZ8AQaXQvc68+HJXgFKG7DtepxY3f5H0Gnj4RYQH/ew43JwISszU1IXGKpeDHcz
-	2ljR0P0//e5bxJR7rhPIFU0DiNvYXMuJsK+t4cHqfeJR5+aTq42IA==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 489a6d8vp6-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 04 Aug 2025 12:21:32 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5749dNtX001855;
-	Mon, 4 Aug 2025 12:21:31 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 489wcywwkf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 04 Aug 2025 12:21:31 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 574CLTfA47710512
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 4 Aug 2025 12:21:29 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 90FDE20043;
-	Mon,  4 Aug 2025 12:21:29 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id DE6DA20040;
-	Mon,  4 Aug 2025 12:21:27 +0000 (GMT)
-Received: from li-c9696b4c-3419-11b2-a85c-f9edc3bf8a84.in.ibm.com (unknown [9.109.198.209])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon,  4 Aug 2025 12:21:27 +0000 (GMT)
-From: Nilay Shroff <nilay@linux.ibm.com>
-To: linux-block@vger.kernel.org
-Cc: axboe@kernel.dk, kch@nvidia.com, shinichiro.kawasaki@wdc.com, hch@lst.de,
-        ming.lei@redhat.com, gjoyce@ibm.com
-Subject: [PATCH 1/2] block: avoid cpu_hotplug_lock depedency on freeze_lock
-Date: Mon,  4 Aug 2025 17:51:10 +0530
-Message-ID: <20250804122125.3271397-2-nilay@linux.ibm.com>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20250804122125.3271397-1-nilay@linux.ibm.com>
-References: <20250804122125.3271397-1-nilay@linux.ibm.com>
+	s=arc-20240116; t=1754310510; c=relaxed/simple;
+	bh=dg9MHfSL1mqm2jlem/FZ5DA6tExDDneAVHkzXPvORPM=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=kDzZcoBNX1WOm6DTZxZeZnMdy3PDx1B9xe7Z8kn+8YC10h9ODypbyk3ab+NRuZqv3qkJoOPmyxc5H4DdrMDM83xochuMVzv6SUEPbU0wglhWZSUIgAR600G7FHG/qpnqN02RlEkJ7ry0X9SWdXAwjYQxrmFYc8+K88IqrguRv9g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-3e3e69b2951so39290745ab.0
+        for <linux-block@vger.kernel.org>; Mon, 04 Aug 2025 05:28:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754310508; x=1754915308;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=bIv8jQfYkJ/obO9NaYRXD+nFUDYKwhETeJ/3UnKt9RU=;
+        b=WnepH7vGabr40uS/qG9tP/BOGNSmB13k3/4uBx6RhweGriciSGjNkhLb8eBT53e4Nn
+         L64BBxW6Q/y/5t283CDqjJbOx2d5mivjGcjukpONoyeugxUzgbtZCkqcfDnEG8CGWBKe
+         Qgg7sHWEpsCz2OSwB4qrnEvYBpeRm27h3miSxfWvh/2Ab8yZAzw9vXP8+dAW6Lr7y1u1
+         euOFvupsisKi8k6T56jlXTARPdISRs2wjvP4oG3tEimq0xdfw6rEYnehso5sg32H80yb
+         X/eQLnVKAQVY1+vpXGkgjKDTu5l0vnaZ8TL0Bcox7LLQq4cdURayaV5ajgKjwGs9T8PF
+         C0mw==
+X-Forwarded-Encrypted: i=1; AJvYcCXnjKipatXgnGFwrBq0y5dmQY6ulgy8MudBrBTuspcXj7moDkN08y0PYXWHMoQsUfYGTFby3qD+t6XnXw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwQyTEDgr6JSwxPLdKDnbj7OzuTIQSXOzUpySF4O84j1Tq5xVH2
+	Ccwo9gfJyHuycDJBSHkk9Mczvj0to/GdxG4npd8cb1UN2yNSYxrnf2aZGbxaLK20loU1wRtDPoi
+	tEI+V++1RyqY0wUnCz8UsrczCGxeAC/5bFDO4J570uByHJXF7LRib5ZhrkZg=
+X-Google-Smtp-Source: AGHT+IFFweYJjxxi9b3tNr12OISP41q+OuF27ZU+oPT1vgViH2n67tV75P3e2mxiM9Ogyl2U0s6ESjT6hnz48c9uJwdfmZ541wos
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODA0MDA2OCBTYWx0ZWRfXyxeH0v17MoE1
- zZHpvzrWW/a1L9uWeSHwTcGUvap8KPij+gks2JKyua8Wxj/JEeIlug7PBhrsKe/Vh4xog37HxaM
- WmgL4mcUspC4YIdgrrvSjNJt+1eQSm82n5x9gNAhnDPPBqnqs6eioS5IY3tekBQXZaF1WpGIxMX
- rzX27/YtydBbzQYsVg8QnxtMCCZ7jLHTOv7tnOdYnzeoFbqrnYwJ9UUqlUf1VAD4AMavrNu5vh0
- BtzxIom5csdh59agN8Vah699P1wewtMdJyZ/CzaWH0wYUFqmaIJX8frDTAUaTF1ZkqpgtEHO0Ew
- TrcMGXm9jbRoKFe+I949f+QcgsJeBKBY0w/A7Spxt7IbNXYdJecmR0uyZjjmlg+29IkWnwwxaIf
- 5CPZ31Xu0BxrOdrcpbakIIAJ7GQZT4ImfHrlTjRCz7VmiQivuS46yXlLv7Z4HNBVQkrQIQRD
-X-Authority-Analysis: v=2.4 cv=Qp9e3Uyd c=1 sm=1 tr=0 ts=6890a5cc cx=c_pps
- a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
- a=2OwXVqhp2XgA:10 a=VwQbUJbxAAAA:8 a=VnNF1IyMAAAA:8 a=twLY2_itOEWcE9j9UWoA:9
-X-Proofpoint-ORIG-GUID: yFr-h9aDthKTA81wgHRt5gDE2MdZHm_m
-X-Proofpoint-GUID: yFr-h9aDthKTA81wgHRt5gDE2MdZHm_m
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-08-04_05,2025-08-04_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- mlxscore=0 phishscore=0 malwarescore=0 adultscore=0 clxscore=1015
- priorityscore=1501 mlxlogscore=999 spamscore=0 bulkscore=0 lowpriorityscore=0
- suspectscore=0 impostorscore=0 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
- definitions=main-2508040068
+X-Received: by 2002:a05:6e02:370c:b0:3e2:c21d:ea12 with SMTP id
+ e9e14a558f8ab-3e415e1a2ffmr150916335ab.7.1754310507813; Mon, 04 Aug 2025
+ 05:28:27 -0700 (PDT)
+Date: Mon, 04 Aug 2025 05:28:27 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6890a76b.050a0220.7f033.0009.GAE@google.com>
+Subject: [syzbot] [block?] INFO: rcu detected stall in blkdev_release (3)
+From: syzbot <syzbot+07d6f9c5d7633ed4a5c8@syzkaller.appspotmail.com>
+To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-A recent lockdep[1] splat observed while running blktest block/005
-reveals a potential deadlock caused by the cpu_hotplug_lock dependency
-on ->freeze_lock. This dependency was introduced by commit 033b667a823e
-("block: blk-rq-qos: guard rq-qos helpers by static key").
+Hello,
 
-That change added a static key to avoid fetching q->rq_qos when neither
-blk-wbt nor blk-iolatency is configured. The static key dynamically
-patches kernel text to a NOP when disabled, eliminating overhead of
-fetching q->rq_qos in the I/O hot path. However, enabling a static key
-at runtime requires acquiring both cpu_hotplug_lock and jump_label_mutex.
-When this happens after the queue has already been frozen (i.e., while
-holding ->freeze_lock), it creates a locking dependency from cpu_hotplug_
-lock/jump_label_mutex to ->freeze_lock, which leads to a potential deadlock
-reported by lockdep[1].
+syzbot found the following issue on:
 
-To resolve this, replace the static key mechanism with q->queue_flags:
-QUEUE_FLAG_QOS_ENABLED. This flag is evaluated in the fast path before
-accessing q->rq_qos. If the flag is set, we proceed to fetch q->rq_qos;
-otherwise, the access is skipped.
+HEAD commit:    a6923c06a3b2 Merge tag 'bpf-fixes' of git://git.kernel.org..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=12cc9f82580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=6f81cd75c44834c1
+dashboard link: https://syzkaller.appspot.com/bug?extid=07d6f9c5d7633ed4a5c8
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
 
-Since q->queue_flags is commonly accessed in IO hotpath and resides in
-the first cacheline of struct request_queue, checking it imposes minimal
-overhead while eliminating the deadlock risk.
+Unfortunately, I don't have any reproducer for this issue yet.
 
-This change avoids the lockdep splat without introducing performance
-regressions.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/2a74fc5b80ca/disk-a6923c06.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/9a2267e0785c/vmlinux-a6923c06.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/4dbddcb2f621/bzImage-a6923c06.xz
 
-[1] https://lore.kernel.org/linux-block/4fdm37so3o4xricdgfosgmohn63aa7wj3ua4e5vpihoamwg3ui@fq42f5q5t5ic/
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+07d6f9c5d7633ed4a5c8@syzkaller.appspotmail.com
 
-Fixes: 033b667a823e ("block: blk-rq-qos: guard rq-qos helpers by static key")
-Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
+bridge0: received packet on veth0_to_bridge with own address as source address (addr:aa:ee:f7:1c:32:6f, vlan:0)
+rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
+rcu: 	Tasks blocked on level-0 rcu_node (CPUs 0-1): P6214/1:b..l
+rcu: 	(detected by 0, t=10503 jiffies, g=15065, q=4570 ncpus=2)
+task:syz.3.57        state:R  running task     stack:24424 pid:6214  tgid:6206  ppid:5858   task_flags:0x20400140 flags:0x00004006
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5357 [inline]
+ __schedule+0x1190/0x5de0 kernel/sched/core.c:6961
+ preempt_schedule_irq+0x51/0x90 kernel/sched/core.c:7288
+ irqentry_exit+0x36/0x90 kernel/entry/common.c:197
+ asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
+RIP: 0010:arch_stack_walk+0x85/0x100 arch/x86/kernel/stacktrace.c:27
+Code: c0 74 50 49 8b 8e 98 00 00 00 4c 89 f2 4c 89 fe 48 89 df e8 5d 20 09 00 8b 95 70 ff ff ff 85 d2 75 21 eb 2f 4c 89 ef 41 ff d4 <0f> 1f 00 84 c0 74 22 48 89 df e8 8c ff 08 00 8b 85 70 ff ff ff 85
+RSP: 0018:ffffc9000b376ac8 EFLAGS: 00000292
+RAX: 0000000000000001 RBX: ffffc9000b376ac8 RCX: ffffc9000b376a1c
+RDX: 1ffff9200166ed95 RSI: ffffffff81f4541a RDI: ffffc9000b376b94
+RBP: ffffc9000b376b58 R08: 0000000000000001 R09: 0000000000000000
+R10: 0000000000000001 R11: 000000000003b941 R12: ffffffff81a672b0
+R13: ffffc9000b376b88 R14: 0000000000000000 R15: ffff8880287c5a00
+ stack_trace_save+0x8e/0xc0 kernel/stacktrace.c:122
+ kasan_save_stack+0x33/0x60 mm/kasan/common.c:47
+ kasan_record_aux_stack+0xa7/0xc0 mm/kasan/generic.c:548
+ slab_free_hook mm/slub.c:2378 [inline]
+ slab_free mm/slub.c:4680 [inline]
+ kmem_cache_free+0x15a/0x4d0 mm/slub.c:4782
+ mempool_free+0x102/0x710 mm/mempool.c:580
+ bio_put_percpu_cache block/bio.c:801 [inline]
+ bio_put+0x355/0x5b0 block/bio.c:820
+ bio_endio+0x70d/0x850 block/bio.c:1651
+ blk_update_request+0x93e/0x15f0 block/blk-mq.c:989
+ blk_mq_end_request+0x5b/0x630 block/blk-mq.c:1151
+ blk_mq_complete_request block/blk-mq.c:1329 [inline]
+ blk_mq_complete_request+0x8b/0xb0 block/blk-mq.c:1326
+ nullb_complete_cmd drivers/block/null_blk/main.c:1402 [inline]
+ null_handle_cmd drivers/block/null_blk/main.c:1454 [inline]
+ null_queue_rq+0xb69/0xfd0 drivers/block/null_blk/main.c:1693
+ null_queue_rqs+0xe9/0x2f0 drivers/block/null_blk/main.c:1707
+ __blk_mq_flush_list block/blk-mq.c:2828 [inline]
+ __blk_mq_flush_list+0x97/0xc0 block/blk-mq.c:2824
+ blk_mq_dispatch_queue_requests+0x184/0x7b0 block/blk-mq.c:2873
+ blk_mq_flush_plug_list+0x1f2/0x600 block/blk-mq.c:2961
+ blk_add_rq_to_plug+0x1ca/0x540 block/blk-mq.c:1390
+ blk_mq_submit_bio+0x1a1c/0x2880 block/blk-mq.c:3212
+ __submit_bio+0x3cf/0x690 block/blk-core.c:635
+ __submit_bio_noacct_mq block/blk-core.c:722 [inline]
+ submit_bio_noacct_nocheck+0x660/0xd30 block/blk-core.c:751
+ submit_bio_noacct+0xb49/0x1eb0 block/blk-core.c:874
+ __block_write_full_folio+0x735/0xe00 fs/buffer.c:1933
+ block_write_full_folio+0x341/0x400 fs/buffer.c:2753
+ blkdev_writepages+0xb8/0x140 block/fops.c:483
+ do_writepages+0x27a/0x600 mm/page-writeback.c:2634
+ filemap_fdatawrite_wbc mm/filemap.c:386 [inline]
+ filemap_fdatawrite_wbc+0x104/0x160 mm/filemap.c:376
+ __filemap_fdatawrite_range+0xb9/0x100 mm/filemap.c:419
+ filemap_write_and_wait_range mm/filemap.c:691 [inline]
+ filemap_write_and_wait_range+0xa3/0x130 mm/filemap.c:682
+ filemap_write_and_wait include/linux/pagemap.h:68 [inline]
+ sync_blockdev block/bdev.c:260 [inline]
+ sync_blockdev block/bdev.c:256 [inline]
+ bdev_release+0x4d3/0x6d0 block/bdev.c:1126
+ blkdev_release+0x15/0x20 block/fops.c:699
+ __fput+0x3ff/0xb70 fs/file_table.c:468
+ task_work_run+0x14d/0x240 kernel/task_work.c:227
+ get_signal+0x1d1/0x26d0 kernel/signal.c:2807
+ arch_do_signal_or_restart+0x8f/0x790 arch/x86/kernel/signal.c:337
+ exit_to_user_mode_loop+0x84/0x110 kernel/entry/common.c:40
+ exit_to_user_mode_prepare include/linux/irq-entry-common.h:225 [inline]
+ syscall_exit_to_user_mode_work include/linux/entry-common.h:175 [inline]
+ syscall_exit_to_user_mode include/linux/entry-common.h:210 [inline]
+ do_syscall_64+0x3f6/0x490 arch/x86/entry/syscall_64.c:100
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f9f23f8eb69
+RSP: 002b:00007f9f24d3e038 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
+RAX: 0000000000c00000 RBX: 00007f9f241b6080 RCX: 00007f9f23f8eb69
+RDX: 0000000080000000 RSI: 0000200000000000 RDI: 0000000000000008
+RBP: 00007f9f24011df1 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 0000000000000000 R14: 00007f9f241b6080 R15: 00007ffd71e55dc8
+ </TASK>
+bridge0: received packet on veth0_to_bridge with own address as source address (addr:aa:ee:f7:1c:32:6f, vlan:0)
+bridge0: received packet on veth0_to_bridge with own address as source address (addr:aa:ee:f7:1c:32:6f, vlan:0)
+bridge0: received packet on veth0_to_bridge with own address as source address (addr:aa:ee:f7:1c:32:6f, vlan:0)
+bridge0: received packet on veth0_to_bridge with own address as source address (addr:aa:ee:f7:1c:32:6f, vlan:0)
+bridge0: received packet on veth0_to_bridge with own address as source address (addr:aa:ee:f7:1c:32:6f, vlan:0)
+bridge0: received packet on veth0_to_bridge with own address as source address (addr:aa:ee:f7:1c:32:6f, vlan:0)
+bridge0: received packet on veth0_to_bridge with own address as source address (addr:aa:ee:f7:1c:32:6f, vlan:0)
+bridge0: received packet on veth0_to_bridge with own address as source address (addr:aa:ee:f7:1c:32:6f, vlan:0)
+bridge0: received packet on veth0_to_bridge with own address as source address (addr:aa:ee:f7:1c:32:6f, vlan:0)
+bridge0: received packet on veth0_to_bridge with own address as source address (addr:aa:ee:f7:1c:32:6f, vlan:0)
+
+
 ---
- block/blk-mq-debugfs.c |  1 +
- block/blk-rq-qos.c     |  6 ++----
- block/blk-rq-qos.h     | 45 +++++++++++++++++++++++++-----------------
- include/linux/blkdev.h |  1 +
- 4 files changed, 31 insertions(+), 22 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 7ed3e71f2fc0..32c65efdda46 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -95,6 +95,7 @@ static const char *const blk_queue_flag_name[] = {
- 	QUEUE_FLAG_NAME(SQ_SCHED),
- 	QUEUE_FLAG_NAME(DISABLE_WBT_DEF),
- 	QUEUE_FLAG_NAME(NO_ELV_SWITCH),
-+	QUEUE_FLAG_NAME(QOS_ENABLED),
- };
- #undef QUEUE_FLAG_NAME
- 
-diff --git a/block/blk-rq-qos.c b/block/blk-rq-qos.c
-index 848591fb3c57..460c04715321 100644
---- a/block/blk-rq-qos.c
-+++ b/block/blk-rq-qos.c
-@@ -2,8 +2,6 @@
- 
- #include "blk-rq-qos.h"
- 
--__read_mostly DEFINE_STATIC_KEY_FALSE(block_rq_qos);
--
- /*
-  * Increment 'v', if 'v' is below 'below'. Returns true if we succeeded,
-  * false if 'v' + 1 would be bigger than 'below'.
-@@ -319,8 +317,8 @@ void rq_qos_exit(struct request_queue *q)
- 		struct rq_qos *rqos = q->rq_qos;
- 		q->rq_qos = rqos->next;
- 		rqos->ops->exit(rqos);
--		static_branch_dec(&block_rq_qos);
- 	}
-+	blk_queue_flag_clear(QUEUE_FLAG_QOS_ENABLED, q);
- 	mutex_unlock(&q->rq_qos_mutex);
- }
- 
-@@ -346,7 +344,7 @@ int rq_qos_add(struct rq_qos *rqos, struct gendisk *disk, enum rq_qos_id id,
- 		goto ebusy;
- 	rqos->next = q->rq_qos;
- 	q->rq_qos = rqos;
--	static_branch_inc(&block_rq_qos);
-+	blk_queue_flag_set(QUEUE_FLAG_QOS_ENABLED, q);
- 
- 	blk_mq_unfreeze_queue(q, memflags);
- 
-diff --git a/block/blk-rq-qos.h b/block/blk-rq-qos.h
-index 39749f4066fb..0eeb5beb1f4d 100644
---- a/block/blk-rq-qos.h
-+++ b/block/blk-rq-qos.h
-@@ -12,7 +12,6 @@
- #include "blk-mq-debugfs.h"
- 
- struct blk_mq_debugfs_attr;
--extern struct static_key_false block_rq_qos;
- 
- enum rq_qos_id {
- 	RQ_QOS_WBT,
-@@ -113,43 +112,50 @@ void __rq_qos_queue_depth_changed(struct rq_qos *rqos);
- 
- static inline void rq_qos_cleanup(struct request_queue *q, struct bio *bio)
- {
--	if (static_branch_unlikely(&block_rq_qos) && q->rq_qos)
-+	if (unlikely(test_bit(QUEUE_FLAG_QOS_ENABLED, &q->queue_flags)) &&
-+			q->rq_qos)
- 		__rq_qos_cleanup(q->rq_qos, bio);
- }
- 
- static inline void rq_qos_done(struct request_queue *q, struct request *rq)
- {
--	if (static_branch_unlikely(&block_rq_qos) && q->rq_qos &&
--	    !blk_rq_is_passthrough(rq))
-+	if (unlikely(test_bit(QUEUE_FLAG_QOS_ENABLED, &q->queue_flags)) &&
-+			q->rq_qos && !blk_rq_is_passthrough(rq))
- 		__rq_qos_done(q->rq_qos, rq);
- }
- 
--static inline void rq_qos_issue(struct request_queue *q, struct request *rq)
-+static __maybe_unused noinline void rq_qos_issue(struct request_queue *q, struct request *rq)
- {
--	if (static_branch_unlikely(&block_rq_qos) && q->rq_qos)
-+	if (unlikely(test_bit(QUEUE_FLAG_QOS_ENABLED, &q->queue_flags)) &&
-+			q->rq_qos)
- 		__rq_qos_issue(q->rq_qos, rq);
- }
- 
- static inline void rq_qos_requeue(struct request_queue *q, struct request *rq)
- {
--	if (static_branch_unlikely(&block_rq_qos) && q->rq_qos)
-+	if (unlikely(test_bit(QUEUE_FLAG_QOS_ENABLED, &q->queue_flags)) &&
-+			q->rq_qos)
- 		__rq_qos_requeue(q->rq_qos, rq);
- }
- 
- static inline void rq_qos_done_bio(struct bio *bio)
- {
--	if (static_branch_unlikely(&block_rq_qos) &&
--	    bio->bi_bdev && (bio_flagged(bio, BIO_QOS_THROTTLED) ||
--			     bio_flagged(bio, BIO_QOS_MERGED))) {
--		struct request_queue *q = bdev_get_queue(bio->bi_bdev);
--		if (q->rq_qos)
--			__rq_qos_done_bio(q->rq_qos, bio);
--	}
-+	struct request_queue *q;
-+
-+	if (!bio->bi_bdev || (!bio_flagged(bio, BIO_QOS_THROTTLED) &&
-+			     !bio_flagged(bio, BIO_QOS_MERGED)))
-+		return;
-+
-+	q = bdev_get_queue(bio->bi_bdev);
-+	if (unlikely(test_bit(QUEUE_FLAG_QOS_ENABLED, &q->queue_flags)) &&
-+			q->rq_qos)
-+		__rq_qos_done_bio(q->rq_qos, bio);
- }
- 
- static inline void rq_qos_throttle(struct request_queue *q, struct bio *bio)
- {
--	if (static_branch_unlikely(&block_rq_qos) && q->rq_qos) {
-+	if (unlikely(test_bit(QUEUE_FLAG_QOS_ENABLED, &q->queue_flags)) &&
-+			q->rq_qos) {
- 		bio_set_flag(bio, BIO_QOS_THROTTLED);
- 		__rq_qos_throttle(q->rq_qos, bio);
- 	}
-@@ -158,14 +164,16 @@ static inline void rq_qos_throttle(struct request_queue *q, struct bio *bio)
- static inline void rq_qos_track(struct request_queue *q, struct request *rq,
- 				struct bio *bio)
- {
--	if (static_branch_unlikely(&block_rq_qos) && q->rq_qos)
-+	if (unlikely(test_bit(QUEUE_FLAG_QOS_ENABLED, &q->queue_flags)) &&
-+			q->rq_qos)
- 		__rq_qos_track(q->rq_qos, rq, bio);
- }
- 
- static inline void rq_qos_merge(struct request_queue *q, struct request *rq,
- 				struct bio *bio)
- {
--	if (static_branch_unlikely(&block_rq_qos) && q->rq_qos) {
-+	if (unlikely(test_bit(QUEUE_FLAG_QOS_ENABLED, &q->queue_flags)) &&
-+			q->rq_qos) {
- 		bio_set_flag(bio, BIO_QOS_MERGED);
- 		__rq_qos_merge(q->rq_qos, rq, bio);
- 	}
-@@ -173,7 +181,8 @@ static inline void rq_qos_merge(struct request_queue *q, struct request *rq,
- 
- static inline void rq_qos_queue_depth_changed(struct request_queue *q)
- {
--	if (static_branch_unlikely(&block_rq_qos) && q->rq_qos)
-+	if (unlikely(test_bit(QUEUE_FLAG_QOS_ENABLED, &q->queue_flags)) &&
-+			q->rq_qos)
- 		__rq_qos_queue_depth_changed(q->rq_qos);
- }
- 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 95886b404b16..fe1797bbec42 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -656,6 +656,7 @@ enum {
- 	QUEUE_FLAG_SQ_SCHED,		/* single queue style io dispatch */
- 	QUEUE_FLAG_DISABLE_WBT_DEF,	/* for sched to disable/enable wbt */
- 	QUEUE_FLAG_NO_ELV_SWITCH,	/* can't switch elevator any more */
-+	QUEUE_FLAG_QOS_ENABLED,		/* qos is enabled */
- 	QUEUE_FLAG_MAX
- };
- 
--- 
-2.50.1
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
