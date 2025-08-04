@@ -1,145 +1,93 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+Received: from mout-p-202.mailbox.org (mout-p-202.mailbox.org [80.241.56.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F3DE17A2FA;
-	Mon,  4 Aug 2025 07:51:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09D4A1E9B22;
+	Mon,  4 Aug 2025 08:37:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754293916; cv=none; b=kuOXvOtBlOVI2RbnSIhstWzoHL3V8+PnbrqXrPQu2WsI/zzYy7jRl4/0X7jU7niGQgM0be+GwvbsRRtfmWYuyUgdE5YhPo4H3Fq8W6DBUrcUno5imNyAMPkvkzvMdCM0euLtdyH7yd+E77X8rDOa4UyG1mmYiIxLrPasdBM8etQ=
+	t=1754296642; cv=none; b=IY0zYLsQ5KBb07qcjMuqexfzr6eUpEZaKLbrlp1lwUvZRGuMPBFGVDAxB6+i93wOlCLEZ4G1sTruJie1mXePZ8a83K2likRaqY5oRJ5Nic3PMrDcsthns7z2gnOXdIFkDn77x8krJEPyLRE11ye1aqeONTfJd9BP3LSYUfHML7I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754293916; c=relaxed/simple;
-	bh=LrG+/tvtivwg0ZcBSe2od2nC/VpaBwV8LhuTSc+IHkI=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=C1eSMMr/0ItUmtuabku6ubeZ4jjHbDi0Eb2Dd6qBEPeSchE1p0Ni/F/uGAWeYqrH/vcmxsxeWJafgcl+Uw8qfyRlLDyw5aXp9JCgVVkgJRSSXAApnWXBaDGWsvlisg0i7oftJnLr70nhedMqaHhHJp3JeUplGiRxeCzGL8JbT+c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4bwTKM3Ts2zKHMSj;
-	Mon,  4 Aug 2025 15:51:51 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 7C10A1A0359;
-	Mon,  4 Aug 2025 15:51:50 +0800 (CST)
-Received: from [10.174.179.143] (unknown [10.174.179.143])
-	by APP4 (Coremail) with SMTP id gCh0CgBXIBGUZpBoQBoXCg--.28613S3;
-	Mon, 04 Aug 2025 15:51:50 +0800 (CST)
-Subject: Re: [PATCH] block: prevent deadlock in del_gendisk()
-To: Ujwal Kundur <ujwal.kundur@gmail.com>, axboe@kernel.dk
-Cc: ming.lei@redhat.com, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org,
- syzbot+2e9e529ac0b319316453@syzkaller.appspotmail.com,
- "yukuai (C)" <yukuai3@huawei.com>
-References: <20250803134114.2707-1-ujwal.kundur@gmail.com>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <e312219e-aa6c-a9a6-fa01-cf38435010be@huaweicloud.com>
-Date: Mon, 4 Aug 2025 15:51:48 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.1
+	s=arc-20240116; t=1754296642; c=relaxed/simple;
+	bh=HIXk4+TAbrKiQuY/qIcBcH+nKJgvbBjd1RaFeR0UKwI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=alW1VrhioigaEm2fAFVjVn9j6CGmvYYdZA4UdmU/ltKqUvCbKLh3vIfhiL+2E4ONXxo1U/jxN9zn3L7QChitM063am6L0Z83JHkC355+GprJ0DSlRlt3FhzguMnzDwmskaolpfZ7Mc/JBtF3CMNn2qccSnmzheM5ODEWknL5RP4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pankajraghav.com; spf=pass smtp.mailfrom=pankajraghav.com; dkim=pass (2048-bit key) header.d=pankajraghav.com header.i=@pankajraghav.com header.b=tQIosnnf; arc=none smtp.client-ip=80.241.56.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pankajraghav.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pankajraghav.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=pankajraghav.com header.i=@pankajraghav.com header.b="tQIosnnf"
+Received: from smtp2.mailbox.org (smtp2.mailbox.org [IPv6:2001:67c:2050:b231:465::2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-202.mailbox.org (Postfix) with ESMTPS id 4bwVKf31nCz9sxm;
+	Mon,  4 Aug 2025 10:37:10 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pankajraghav.com;
+	s=MBO0001; t=1754296630;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4wPJnPv1bn5Li9I/0MOxjuiNX4rqaManwCgRKuRDtlQ=;
+	b=tQIosnnfJQ37NBK6nScKmwmL/r2DsnOlMH8NmKwU/1J+eiAE8TIF/z/4vRRMBiXWL9OhAs
+	Ev3sNf1iILxDYEV27e320oPn8umOlMIt6ywe0tFVSMBmakfOSZkEOotKPLOxsWsnsDZ1VB
+	CsQshtiJmUg9dq7RvfYFsVH9rZMVlC3u15dB1eolZJrLOASd2fFncxcTgJrGAfigKokZDo
+	gys9bNHNBOlK+176OkV886HR7vQF2uqIrJVNyLf8ECIQfGBcJgg1kQOo9Ok5CKz6z/C8Iu
+	xVAa/fv1eyE1jqdOng8qoE26TuCp4oqzCYXRIIWObZ+G/nyeN54b8uJufuVUmw==
+Authentication-Results: outgoing_mbo_mout;
+	dkim=none;
+	spf=pass (outgoing_mbo_mout: domain of kernel@pankajraghav.com designates 2001:67c:2050:b231:465::2 as permitted sender) smtp.mailfrom=kernel@pankajraghav.com
+Date: Mon, 4 Aug 2025 10:36:57 +0200
+From: "Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: "Ritesh Harjani (IBM)" <ritesh.list@gmail.com>, 
+	Suren Baghdasaryan <surenb@google.com>, Ryan Roberts <ryan.roberts@arm.com>, 
+	Baolin Wang <baolin.wang@linux.alibaba.com>, Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>, 
+	"H . Peter Anvin" <hpa@zytor.com>, Vlastimil Babka <vbabka@suse.cz>, Zi Yan <ziy@nvidia.com>, 
+	Mike Rapoport <rppt@kernel.org>, Dave Hansen <dave.hansen@linux.intel.com>, 
+	Michal Hocko <mhocko@suse.com>, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, 
+	Andrew Morton <akpm@linux-foundation.org>, Thomas Gleixner <tglx@linutronix.de>, 
+	Nico Pache <npache@redhat.com>, Dev Jain <dev.jain@arm.com>, 
+	"Liam R . Howlett" <Liam.Howlett@oracle.com>, Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org, 
+	willy@infradead.org, linux-mm@kvack.org, x86@kernel.org, linux-block@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, "Darrick J . Wong" <djwong@kernel.org>, mcgrof@kernel.org, 
+	gost.dev@samsung.com, hch@lst.de, Pankaj Raghav <p.raghav@samsung.com>
+Subject: Re: [RFC v2 1/4] mm: rename huge_zero_page_shrinker to
+ huge_zero_folio_shrinker
+Message-ID: <arhm7vlux7xl627zvlexwziq6gpgxueeslxvjrzhofld7xgvul@uvlyngrizze3>
+References: <20250724145001.487878-1-kernel@pankajraghav.com>
+ <20250724145001.487878-2-kernel@pankajraghav.com>
+ <87v7n7r7xx.fsf@gmail.com>
+ <88296851-3bbe-44fc-a507-70964c0bea8c@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20250803134114.2707-1-ujwal.kundur@gmail.com>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgBXIBGUZpBoQBoXCg--.28613S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7tF13CrWDAFyUZryDWFy5XFb_yoW8KFyDpF
-	ZxWFs0k340vr1v93WUta47GF18Gw1DWFyIkryxJFy2vrnFyr9rtr18KFyxurW0yrZ7urs2
-	qa1qqFsxur48AFDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvjb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-	6I80ewAv7VC0I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AF
-	wI0_JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
-	xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1D
-	MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
-	0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWU
-	JVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUot
-	CzDUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <88296851-3bbe-44fc-a507-70964c0bea8c@redhat.com>
+X-Rspamd-Queue-Id: 4bwVKf31nCz9sxm
 
-Hi,
+On Fri, Aug 01, 2025 at 05:30:46PM +0200, David Hildenbrand wrote:
+> On 01.08.25 06:18, Ritesh Harjani (IBM) wrote:
+> > "Pankaj Raghav (Samsung)" <kernel@pankajraghav.com> writes:
+> > 
+> > > From: Pankaj Raghav <p.raghav@samsung.com>
+> > > 
+> > > As we already moved from exposing huge_zero_page to huge_zero_folio,
+> > > change the name of the shrinker to reflect that.
+> > > 
+> > 
+> > Why not change get_huge_zero_page() to get_huge_zero_folio() too, for
+> > consistent naming?
+> 
+> Then we should also rename put_huge_zero_folio(). Renaming
+> MMF_HUGE_ZERO_PAGE should probably be done separately.
 
-ÔÚ 2025/08/03 21:41, Ujwal Kundur Ð´µÀ:
-> A potential unsafe locking scenario presents itself when
-> mutex_lock(&disk->open_mutex) is called with reader's lock held on
-> update_nr_hwq_lock:
->         CPU0                    CPU1
->         ----                    ----
-> rlock(&set->update_nr_hwq_lock)
->                                 lock(&nbd->config_lock);
->                                 lock(&set->update_nr_hwq_lock);
-> lock(&disk->open_mutex)
-> 
-This problem is already fixed inside nbd by:
-8b428f42f3ed ("nbd: fix lockdep deadlock warning")
+Thanks Ritesh and David.
 
-Thanks,
-Kuai
-> When the gendisk is added back concurrently, a writer's lock is
-> attempted to be held on update_nr_hwq_lock while holding other locks in
-> the call-path, becoming a potential source of deadlock(s).
-> 
-> Scope read-critical section to blk_unregister_queue, which is the only
-> function that interacts with switching elevator and requires
-> synchronization with update_nr_hwq_lock.
-> 
-> Reported-by: syzbot+2e9e529ac0b319316453@syzkaller.appspotmail.com
-> Signed-off-by: Ujwal Kundur <ujwal.kundur@gmail.com>
-> ---
->   block/genhd.c | 8 +++-----
->   1 file changed, 3 insertions(+), 5 deletions(-)
->   mode change 100644 => 100755 block/genhd.c
-> 
-> diff --git a/block/genhd.c b/block/genhd.c
-> old mode 100644
-> new mode 100755
-> index c26733f6324b..b56f09f5699b
-> --- a/block/genhd.c
-> +++ b/block/genhd.c
-> @@ -696,6 +696,7 @@ static void __del_gendisk(struct gendisk *disk)
->   	struct block_device *part;
->   	unsigned long idx;
->   	bool start_drain;
-> +	struct blk_mq_tag_set *set = q->tag_set;
->   
->   	might_sleep();
->   
-> @@ -740,7 +741,9 @@ static void __del_gendisk(struct gendisk *disk)
->   		bdi_unregister(disk->bdi);
->   	}
->   
-> +	down_read(&set->update_nr_hwq_lock);
->   	blk_unregister_queue(disk);
-> +	up_read(&set->update_nr_hwq_lock);
->   
->   	kobject_put(disk->part0->bd_holder_dir);
->   	kobject_put(disk->slave_dir);
-> @@ -808,20 +811,15 @@ static void disable_elv_switch(struct request_queue *q)
->    */
->   void del_gendisk(struct gendisk *disk)
->   {
-> -	struct blk_mq_tag_set *set;
->   	unsigned int memflags;
->   
->   	if (!queue_is_mq(disk->queue)) {
->   		__del_gendisk(disk);
->   	} else {
-> -		set = disk->queue->tag_set;
-> -
->   		disable_elv_switch(disk->queue);
->   
->   		memflags = memalloc_noio_save();
-> -		down_read(&set->update_nr_hwq_lock);
->   		__del_gendisk(disk);
-> -		up_read(&set->update_nr_hwq_lock);
->   		memalloc_noio_restore(memflags);
->   	}
->   }
-> 
+I will change them in the next version! :)
 
+--
+Pankaj
