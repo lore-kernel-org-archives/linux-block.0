@@ -1,139 +1,162 @@
-Received: from mout-p-103.mailbox.org (mout-p-103.mailbox.org [80.241.56.161])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5096E257AF9;
-	Mon,  4 Aug 2025 12:14:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.161
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E23FE2571B3
+	for <linux-block@vger.kernel.org>; Mon,  4 Aug 2025 12:21:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754309693; cv=none; b=tym/SRULQ+bJt4PQzV6L765aZ6dfpfdQUFAUz7WypRBoh35qR8iCS7zPadZ0qwUadFG8+TFL7VuHrWiBcN4PxyJwtVh23Im7RS1pwWmhp4jkWfRoj3gRtf5HkI0DpFQf3uWCP0oXCWVdtroLiDiu1JxPHaVAgv2lIJvadrUuGDI=
+	t=1754310101; cv=none; b=sKCieVwd8BPtqLAKd2Ii+bmrWa+t51QE2HwYsEWefuOdexTRoF56sBclqBwJN0vkbjAsuRlDviggN0hbgPqkyqE3XP/cmlSYQvd/W50/EJcPSCgN7jYd2SYRSnMZPTfYcC5cq6FHqD1PIOfj/ob53ekgJ1GoEjbyC4Q4LF5mcW0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754309693; c=relaxed/simple;
-	bh=cE5HF3Q/pCpPUC8URCS1OOHU8K26yfnjKDLE9CXvFJg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZYbtmngLAdmc0/6+BKoJGrGbNLM52iOzGumEgUx4XxpZkbjbxcc1IhUAwYlL5YIgWaLQejbkyoRXHZWclvOZ5tKzdK1Wn9NvkuE8dLIK8YQtZbb1DenDdtfuj+ZuMYNwQT3Dc2TdLcGU+NM4Nq6USECAa7jyCCIh/EeuXGPquD8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pankajraghav.com; spf=pass smtp.mailfrom=pankajraghav.com; dkim=pass (2048-bit key) header.d=pankajraghav.com header.i=@pankajraghav.com header.b=y4Rv0tCm; arc=none smtp.client-ip=80.241.56.161
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pankajraghav.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pankajraghav.com
+	s=arc-20240116; t=1754310101; c=relaxed/simple;
+	bh=ZQBMm6leTkwtzrKWhKYvBb2lK7oRxiQKb9bXy2ijlkk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=KI05D1KVTnS6F9Qz9hjbRoQY2PZ75e4zndL5Eu412Snwb65iMxUS1C+8x6hfocENMbNgFQ5QabrpbPPNTLXyvG4zXqtm3AKRy+mDCUOC4LzDMmUR8vHCYhZWVxU0iDrwJbWO96B1Re6YQfPt7G9V9le74GQDPnaj5/8nKZdEmTs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=o1PjerVv; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=pankajraghav.com header.i=@pankajraghav.com header.b="y4Rv0tCm"
-Received: from smtp1.mailbox.org (smtp1.mailbox.org [IPv6:2001:67c:2050:b231:465::1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-103.mailbox.org (Postfix) with ESMTPS id 4bwb8l4PMTz9shb;
-	Mon,  4 Aug 2025 14:14:47 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pankajraghav.com;
-	s=MBO0001; t=1754309687;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=aUm65lZP53PD6UFdCNM0FQrwo2MXNsuP3026Ad+nKaE=;
-	b=y4Rv0tCmaVgD31H5miqrX3K20uYG9fm+wdi+/Sy2amT1kSzTYClOtvSxRGbWkTh7kFtx0g
-	HHt8oVU3das9R/nUe4juc6tSW/A/5Tyg/Vyhd8pMoPLi4fWGep6y2mdWg4ywbdETFHVqg9
-	eEeU3Ir4814EluMrwjX9DdiMn5Ts3LaS58zGSQ5/OEvLKgZvlm+jqdCANukxTaEsK3vYJ3
-	z/gam7TBBVKILGDRxrO2D3XuJoQIGggS9XlZArNyWQwqwCEz69FZagUgzrkIbqSBzZ5cd7
-	Klh+d92S00osdmGx6fJ4NMhLIKrjKEe4+/GEXYY1UMII3FMMP4qCuF2mc2goBg==
-Authentication-Results: outgoing_mbo_mout;
-	dkim=none;
-	spf=pass (outgoing_mbo_mout: domain of kernel@pankajraghav.com designates 2001:67c:2050:b231:465::1 as permitted sender) smtp.mailfrom=kernel@pankajraghav.com
-From: "Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>
-To: Suren Baghdasaryan <surenb@google.com>,
-	Ryan Roberts <ryan.roberts@arm.com>,
-	Baolin Wang <baolin.wang@linux.alibaba.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	"H . Peter Anvin" <hpa@zytor.com>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	Zi Yan <ziy@nvidia.com>,
-	Mike Rapoport <rppt@kernel.org>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Michal Hocko <mhocko@suse.com>,
-	David Hildenbrand <david@redhat.com>,
-	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Nico Pache <npache@redhat.com>,
-	Dev Jain <dev.jain@arm.com>,
-	"Liam R . Howlett" <Liam.Howlett@oracle.com>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org,
-	willy@infradead.org,
-	x86@kernel.org,
-	linux-block@vger.kernel.org,
-	Ritesh Harjani <ritesh.list@gmail.com>,
-	linux-fsdevel@vger.kernel.org,
-	"Darrick J . Wong" <djwong@kernel.org>,
-	mcgrof@kernel.org,
-	gost.dev@samsung.com,
-	kernel@pankajraghav.com,
-	hch@lst.de,
-	Pankaj Raghav <p.raghav@samsung.com>
-Subject: [PATCH 5/5] block: use largest_zero_folio in __blkdev_issue_zero_pages()
-Date: Mon,  4 Aug 2025 14:13:56 +0200
-Message-ID: <20250804121356.572917-6-kernel@pankajraghav.com>
-In-Reply-To: <20250804121356.572917-1-kernel@pankajraghav.com>
-References: <20250804121356.572917-1-kernel@pankajraghav.com>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="o1PjerVv"
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5745V0A3005693;
+	Mon, 4 Aug 2025 12:21:30 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pp1; bh=X/mHxUfJ+4XVj66WWYqv/oT6Y1M2
+	gy9AwFR8ZfFeHjU=; b=o1PjerVv2qvokhc2x4pGSScmk1s6YLFNVQ1TGwsJhsuf
+	A3E7uEjrHg5nAKpFsA8Oq5yaR9SV/XyBVEnUoLF2tPwieY5pEJYODq4IpRAZuYdT
+	JMWrWb4Na0aumzeXNYm1lkc3uKPubtXnNQhIK0WIb6IUWgW+Mkegi2Y0Av0zeYMD
+	GZmRorLCGtLDvJ+lqpZG9M192RcJ1IPAmpCZlxW+OQqnMJwgm+7XDQEVJHmGZK7D
+	oYSl/LvCwD7PQJQjbaZv1euNIfIhJy8Sc4cEYKuouuDttvssKSK0OEtGbd5Za3BU
+	hBzIa+Y7oHiT6nR0H3XBUIWCb9jlN47MB7CphrI8Lw==
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 489ab3gv4x-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 04 Aug 2025 12:21:30 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 574B5CD6004558;
+	Mon, 4 Aug 2025 12:21:29 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 489yq2dh92-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 04 Aug 2025 12:21:29 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 574CLReg53412328
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 4 Aug 2025 12:21:27 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 751D42004B;
+	Mon,  4 Aug 2025 12:21:27 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 1099020040;
+	Mon,  4 Aug 2025 12:21:26 +0000 (GMT)
+Received: from li-c9696b4c-3419-11b2-a85c-f9edc3bf8a84.in.ibm.com (unknown [9.109.198.209])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon,  4 Aug 2025 12:21:25 +0000 (GMT)
+From: Nilay Shroff <nilay@linux.ibm.com>
+To: linux-block@vger.kernel.org
+Cc: axboe@kernel.dk, kch@nvidia.com, shinichiro.kawasaki@wdc.com, hch@lst.de,
+        ming.lei@redhat.com, gjoyce@ibm.com
+Subject: [PATCH 0/2] block: blk-rq-qos: replace static key with atomic bitop
+Date: Mon,  4 Aug 2025 17:51:09 +0530
+Message-ID: <20250804122125.3271397-1-nilay@linux.ibm.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 4bwb8l4PMTz9shb
+X-TM-AS-GCONF: 00
+X-Authority-Analysis: v=2.4 cv=Z+jsHGRA c=1 sm=1 tr=0 ts=6890a5ca cx=c_pps
+ a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
+ a=IkcTkHD0fZMA:10 a=2OwXVqhp2XgA:10 a=VwQbUJbxAAAA:8 a=vvz3QAfDn3xu6RP1wAUA:9
+ a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+X-Proofpoint-ORIG-GUID: DXxVMMAwZmLpWqmJaeQS9QX02etvx9eD
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODA0MDA2OCBTYWx0ZWRfXzgEtpmDG2mCE
+ NEG25Z3fMV45Bpp82e80mhEMkl+UeD2HCtfQkGGX+mzynrdSgdmsf8UKPFW83aZ9uuTTma/WLIF
+ u2X/hkS/aDT+6AaAyRcNo+k4Yz07kQ5h8kri/wYXJAicNtAFXhniShtTzPLeS5eAKEqd70RRrSA
+ U48qHLH0kzFlYjXemMxc+0mXlAA7bwuSQVdc/zcEWIWh7yGRyqdTciJTj1Ogd+5/rJuE5d09/B0
+ MICiDNuBaEQbDvtgP6sV0JyP4U8JTeq50neApzL87h51npAlYVBP/GmLm1wGskwWBYQsLCu3nxW
+ oVPRiDAY4yV3ibuZEwtH+HHUghlWrh/8n5p1DZgIZ+ULPCn5fHgk1cUu67iTXdEZ+gcdWTVaNHy
+ t4YjbJIXD22yRT5LK6WULHuPS1Ugqx8wb6lWDIGzb5WYLIoQORZg+3JpDBN3YcCTpgQXEcyz
+X-Proofpoint-GUID: DXxVMMAwZmLpWqmJaeQS9QX02etvx9eD
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-08-04_05,2025-08-04_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ lowpriorityscore=0 spamscore=0 malwarescore=0 clxscore=1015 suspectscore=0
+ priorityscore=1501 mlxlogscore=908 adultscore=0 phishscore=0 mlxscore=0
+ bulkscore=0 impostorscore=0 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
+ definitions=main-2508040068
 
-From: Pankaj Raghav <p.raghav@samsung.com>
+This patchset replaces the use of a static key in the I/O path (rq_qos_
+xxx()) with an atomic queue flag (QUEUE_FLAG_QOS_ENABLED). This change
+is made to eliminate a potential deadlock introduced by the use of static
+keys in the blk-rq-qos infrastructure, as reported by lockdep during 
+blktests block/005[1].
 
-Use largest_zero_folio() in __blkdev_issue_zero_pages().
-On systems with CONFIG_STATIC_HUGE_ZERO_FOLIO enabled, we will end up
-sending larger bvecs instead of multiple small ones.
+The original static key approach was introduced to avoid unnecessary
+dereferencing of q->rq_qos when no blk-rq-qos module (e.g., blk-wbt or
+blk-iolatency) is configured. While efficient, enabling a static key at
+runtime requires taking cpu_hotplug_lock and jump_label_mutex, which 
+becomes problematic if the queue is already frozen — causing a reverse
+dependency on ->freeze_lock. This results in a lockdep splat indicating
+a potential deadlock.
 
-Noticed a 4% increase in performance on a commercial NVMe SSD which does
-not support OP_WRITE_ZEROES. The device's MDTS was 128K. The performance
-gains might be bigger if the device supports bigger MDTS.
+To resolve this, we now gate q->rq_qos access with a q->queue_flags
+bitop (QUEUE_FLAG_QOS_ENABLED), avoiding the static key and the associated
+locking altogether.
 
-Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
----
- block/blk-lib.c | 15 ++++++++-------
- 1 file changed, 8 insertions(+), 7 deletions(-)
+I compared both static key and atomic bitop implementations using ftrace
+function graph tracer over ~50 invocations of rq_qos_issue() while ensuring
+blk-wbt/blk-iolatency were disabled (i.e., no QoS functionality). For
+easy comparision, I made rq_qos_issue() noinline. The comparision was
+made on PowerPC machine.
 
-diff --git a/block/blk-lib.c b/block/blk-lib.c
-index 4c9f20a689f7..3030a772d3aa 100644
---- a/block/blk-lib.c
-+++ b/block/blk-lib.c
-@@ -196,6 +196,8 @@ static void __blkdev_issue_zero_pages(struct block_device *bdev,
- 		sector_t sector, sector_t nr_sects, gfp_t gfp_mask,
- 		struct bio **biop, unsigned int flags)
- {
-+	struct folio *zero_folio = largest_zero_folio();
-+
- 	while (nr_sects) {
- 		unsigned int nr_vecs = __blkdev_sectors_to_bio_pages(nr_sects);
- 		struct bio *bio;
-@@ -208,15 +210,14 @@ static void __blkdev_issue_zero_pages(struct block_device *bdev,
- 			break;
- 
- 		do {
--			unsigned int len, added;
-+			unsigned int len;
- 
--			len = min_t(sector_t,
--				PAGE_SIZE, nr_sects << SECTOR_SHIFT);
--			added = bio_add_page(bio, ZERO_PAGE(0), len, 0);
--			if (added < len)
-+			len = min_t(sector_t, folio_size(zero_folio),
-+				    nr_sects << SECTOR_SHIFT);
-+			if (!bio_add_folio(bio, zero_folio, len, 0))
- 				break;
--			nr_sects -= added >> SECTOR_SHIFT;
--			sector += added >> SECTOR_SHIFT;
-+			nr_sects -= len >> SECTOR_SHIFT;
-+			sector += len >> SECTOR_SHIFT;
- 		} while (nr_sects);
- 
- 		*biop = bio_chain_and_submit(*biop, bio);
+Static Key (disabled : QoS is not configured):
+5d0: 00 00 00 60     nop    # patched in by static key framework (not taken)
+5d4: 20 00 80 4e     blr    # return (branch to link register)
+
+Only a nop and blr (branch to link register) are executed — very lightweight.
+
+atomic bitop (QoS is not configured):
+5d0: 20 00 23 e9     ld      r9,32(r3)     # load q->queue_flags
+5d4: 00 80 29 71     andi.   r9,r9,32768   # check QUEUE_FLAG_QOS_ENABLED (bit 15)
+5d8: 20 00 82 4d     beqlr                 # return if bit not set
+
+This performs an ld and and andi. before returning. Slightly more work, 
+but q->queue_flags is typically hot in cache during I/O submission.
+
+With Static Key (disabled):
+Duration (us): min=0.668 max=0.816 avg≈0.750
+
+With atomic bitop QUEUE_FLAG_QOS_ENABLED (bit not set):
+Duration (us): min=0.684 max=0.834 avg≈0.759
+
+As expected, both versions are almost similar in cost. The added latency
+from an extra ld and andi. is in the range of ~9ns.
+
+There're two patches in the series. The first patch replaces static key
+with QUEUE_FLAG_QOS_ENABLED. The second patch ensures that we disable
+the QUEUE_FLAG_QOS_ENABLED when the queue no longer has any associated
+rq_qos policies.
+
+As usual, feedback and review comments are welcome!
+
+[1] https://lore.kernel.org/linux-block/4fdm37so3o4xricdgfosgmohn63aa7wj3ua4e5vpihoamwg3ui@fq42f5q5t5ic/
+
+Nilay Shroff (2):
+  block: avoid cpu_hotplug_lock depedency on freeze_lock
+  block: clear QUEUE_FLAG_QOS_ENABLED in rq_qos_del()
+
+ block/blk-mq-debugfs.c |  1 +
+ block/blk-rq-qos.c     |  8 ++++----
+ block/blk-rq-qos.h     | 45 +++++++++++++++++++++++++-----------------
+ include/linux/blkdev.h |  1 +
+ 4 files changed, 33 insertions(+), 22 deletions(-)
+
 -- 
-2.49.0
+2.50.1
 
