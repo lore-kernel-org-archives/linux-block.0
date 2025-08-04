@@ -1,233 +1,245 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E9F4EC2
-	for <linux-block@vger.kernel.org>; Mon,  4 Aug 2025 06:30:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A1022288CB
+	for <linux-block@vger.kernel.org>; Mon,  4 Aug 2025 06:54:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754289058; cv=none; b=UnIkBfr4qrvR2SUgnWeQZCTMyOvPSNRQi3+UMhQa3a4zy7xwwJBqHBv+4KhunCKVcUEIshDsjtWaoWMc2RCp+RRTJa02LcE4oS7MlSm/ffZav6n6/TObGn6md2I4RYku/BMebcKPnFATjMonA3x4hEHzRrtrY+UZ7uWDkgt7ms8=
+	t=1754290444; cv=none; b=Sew/mp+TMRPB5TYizcn44I4hawTlQA54iqjH4h+iEaDl+f62fPn+ZkZ66Kgx7L042vYhrnSB2iwvxBjndJTQNH+5XBDi2UDADIkfUKM75N0XpkrgZ6py/9vJzjBxmTOfjzYjHZmUMyGUqPSjUJNd9i2+GQ9Ha9xFlI24UfPM5rY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754289058; c=relaxed/simple;
-	bh=4zlnMiNfH5rJdvPBMJJwXjvmspoaqVbWWS4Qk86KPx4=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=ttcTJSFMroVe+GAD7TtsZfmfEVztbGuNumH+G0GqrafaHAYmjPFXP63QJnKaoooz1BdEE8U2yhBMRiisQ8hv5NEQkMd99BBQbklagSA/FRo8bqWrntwKhqPPME8GAc8WTJGCRx556H1J9pVszMqOLc9YNxgOZwiPcMxM6pJCsUM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4bwRWw4B9DzYQvFB
-	for <linux-block@vger.kernel.org>; Mon,  4 Aug 2025 14:30:52 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 3D8051A07BB
-	for <linux-block@vger.kernel.org>; Mon,  4 Aug 2025 14:30:51 +0800 (CST)
-Received: from [10.174.179.143] (unknown [10.174.179.143])
-	by APP4 (Coremail) with SMTP id gCh0CgDnYhOTU5Bo97IQCg--.1014S3;
-	Mon, 04 Aug 2025 14:30:45 +0800 (CST)
-Subject: Re: [PATCH 5/5] blk-mq: Replace tags->lock with SRCU for tag
- iterators
-To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
- linux-block@vger.kernel.org
-Cc: John Garry <john.garry@huawei.com>,
- Sathya Prakash Veerichetty <sathya.prakash@broadcom.com>,
- "yukuai (C)" <yukuai3@huawei.com>
-References: <20250801114440.722286-1-ming.lei@redhat.com>
- <20250801114440.722286-6-ming.lei@redhat.com>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <b86b9098-fb76-bdfe-bdf0-1344386d067a@huaweicloud.com>
-Date: Mon, 4 Aug 2025 14:30:43 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.1
+	s=arc-20240116; t=1754290444; c=relaxed/simple;
+	bh=fi6qkVgdTVg4FvJ7ah4M8mtfDEkXAskvaMKmWQ6DRF8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=d+Y54BeSRkrP7ldmXcKiyiBl4MqlRDNfdYQwNwJ8dOawPA6V3v9YbSTt/rZhLr5p6C1Mh+WrYXfa/VKW+G7K2ZfaPh8dwvHHpd0p2oWQMtRhBQDPUhkjBP2yvugt7Ppz/ATFaAKt7LJNu6oYod1B6RYkFbHFwJ/Dff3gOzkobvc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=dvJvOBaY; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=320s1qyN; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=dvJvOBaY; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=320s1qyN; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="dvJvOBaY";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="320s1qyN";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="dvJvOBaY";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="320s1qyN"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 236B21F387;
+	Mon,  4 Aug 2025 06:54:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1754290441; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gmMwva8sV0SbudeV1/yoQROf0pxeqH9DzddikxFTlgg=;
+	b=dvJvOBaY9y0J3Mxp4Ls4zWMlHFTie8F37ywuPofKVy1B7P0Wp2iDqABSkHNxLJRSYOhBG3
+	W6Zu+GJTBui+gy9bYUdKSDZoSxAkccw/iLURV5TwQObclro3XS2ChHaf5mAMm7ZiE4hLDT
+	MzAewMFLgnhoXbMRTZ+Nulu9g2n3eSo=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1754290441;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gmMwva8sV0SbudeV1/yoQROf0pxeqH9DzddikxFTlgg=;
+	b=320s1qyNbVRh8wJjmV5L7Pj8pFXNNcdmupFEE5bRghqM0DKMAjkn0C3k2F0wgTGblj50Bb
+	pCpNff+iKa2sBpAw==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=dvJvOBaY;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=320s1qyN
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1754290441; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gmMwva8sV0SbudeV1/yoQROf0pxeqH9DzddikxFTlgg=;
+	b=dvJvOBaY9y0J3Mxp4Ls4zWMlHFTie8F37ywuPofKVy1B7P0Wp2iDqABSkHNxLJRSYOhBG3
+	W6Zu+GJTBui+gy9bYUdKSDZoSxAkccw/iLURV5TwQObclro3XS2ChHaf5mAMm7ZiE4hLDT
+	MzAewMFLgnhoXbMRTZ+Nulu9g2n3eSo=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1754290441;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gmMwva8sV0SbudeV1/yoQROf0pxeqH9DzddikxFTlgg=;
+	b=320s1qyNbVRh8wJjmV5L7Pj8pFXNNcdmupFEE5bRghqM0DKMAjkn0C3k2F0wgTGblj50Bb
+	pCpNff+iKa2sBpAw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id C74DD133D1;
+	Mon,  4 Aug 2025 06:54:00 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 5PILLwhZkGikTwAAD6G6ig
+	(envelope-from <hare@suse.de>); Mon, 04 Aug 2025 06:54:00 +0000
+Message-ID: <14c5a629-2169-4271-97b8-a1aba45a6e54@suse.de>
+Date: Mon, 4 Aug 2025 08:54:00 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20250801114440.722286-6-ming.lei@redhat.com>
-Content-Type: text/plain; charset=gbk; format=flowed
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/7] block: align the bio after building it
+To: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: snitzer@kernel.org, axboe@kernel.dk, dw@davidwei.uk, brauner@kernel.org,
+ Keith Busch <kbusch@kernel.org>
+References: <20250801234736.1913170-1-kbusch@meta.com>
+ <20250801234736.1913170-3-kbusch@meta.com>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20250801234736.1913170-3-kbusch@meta.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgDnYhOTU5Bo97IQCg--.1014S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxKFW7JrW7Gr17Jw43Cw1rZwb_yoW7AF1UpF
-	W7GanIkwsYqr10qrsrt39Fkrsa9wsYgF1xGF9aq34Yvr1qkr93JF10yr1UZrW8trZ7Cr4f
-	uF4jkrWkAF4kXrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvjb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AF
-	wI0_JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
-	xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1D
-	MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
-	0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWU
-	JVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUwx
-	hLUUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Rspamd-Queue-Id: 236B21F387
+X-Rspamd-Action: no action
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spamd-Result: default: False [-4.51 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	ARC_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	TO_DN_SOME(0.00)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	MID_RHS_MATCH_FROM(0.00)[];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,suse.de:dkim,suse.de:mid,suse.de:email];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	DKIM_TRACE(0.00)[suse.de:+]
+X-Spam-Score: -4.51
 
-Hi,
-
-ÔÚ 2025/08/01 19:44, Ming Lei Ð´µÀ:
-> Replace the spinlock in blk_mq_find_and_get_req() with an SRCU read lock
-> around the tag iterators.
+On 8/2/25 01:47, Keith Busch wrote:
+> From: Keith Busch <kbusch@kernel.org>
 > 
-> This is done by:
+> Ensure the entire size is aligned after it's built instead of ensuring
+> each vector is block size aligned while constructing it. This makes it
+> more flexible to accepting device valid vectors that would otherwise get
+> rejected by overzealous alignment checks.
 > 
-> - Holding the SRCU read lock in blk_mq_queue_tag_busy_iter(),
-> blk_mq_tagset_busy_iter(), and blk_mq_hctx_has_requests().
-> 
-> - Removing the now-redundant tags->lock from blk_mq_find_and_get_req().
-> 
-> This change improves performance by replacing a spinlock with a more
-> scalable SRCU lock, and fixes lockup issue in scsi_host_busy() in case of
-> shost->host_blocked.
-> 
-> Meantime it becomes possible to use blk_mq_in_driver_rw() for io
-> accounting.
-> 
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> Signed-off-by: Keith Busch <kbusch@kernel.org>
 > ---
->   block/blk-mq-tag.c | 12 ++++++++----
->   block/blk-mq.c     | 24 ++++--------------------
->   2 files changed, 12 insertions(+), 24 deletions(-)
+>   block/bio.c | 58 +++++++++++++++++++++++++++++++++++------------------
+>   1 file changed, 39 insertions(+), 19 deletions(-)
 > 
-> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-> index 6c2f5881e0de..7ae431077a32 100644
-> --- a/block/blk-mq-tag.c
-> +++ b/block/blk-mq-tag.c
-> @@ -256,13 +256,10 @@ static struct request *blk_mq_find_and_get_req(struct blk_mq_tags *tags,
->   		unsigned int bitnr)
->   {
->   	struct request *rq;
-> -	unsigned long flags;
+> diff --git a/block/bio.c b/block/bio.c
+> index 92c512e876c8d..c050903e1be0c 100644
+> --- a/block/bio.c
+> +++ b/block/bio.c
+> @@ -1227,13 +1227,6 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+>   	if (bio->bi_bdev && blk_queue_pci_p2pdma(bio->bi_bdev->bd_disk->queue))
+>   		extraction_flags |= ITER_ALLOW_P2PDMA;
 >   
-> -	spin_lock_irqsave(&tags->lock, flags);
->   	rq = tags->rqs[bitnr];
->   	if (!rq || rq->tag != bitnr || !req_ref_inc_not_zero(rq))
->   		rq = NULL;
-> -	spin_unlock_irqrestore(&tags->lock, flags);
->   	return rq;
->   }
->
-Just wonder, does the lockup problem due to the tags->lock contention by
-concurrent scsi_host_busy?
-
-> @@ -440,7 +437,9 @@ void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
->   		busy_tag_iter_fn *fn, void *priv)
->   {
->   	unsigned int flags = tagset->flags;
-> -	int i, nr_tags;
-> +	int i, nr_tags, srcu_idx;
-> +
-> +	srcu_idx = srcu_read_lock(&tagset->tags_srcu);
->   
->   	nr_tags = blk_mq_is_shared_tags(flags) ? 1 : tagset->nr_hw_queues;
->   
-> @@ -449,6 +448,7 @@ void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
->   			__blk_mq_all_tag_iter(tagset->tags[i], fn, priv,
->   					      BT_TAG_ITER_STARTED);
->   	}
-> +	srcu_read_unlock(&tagset->tags_srcu, srcu_idx);
-
-And should we add cond_resched() after finish interating one tags, even
-with the srcu change, looks like it's still possible to lockup with
-big cpu cores & deep queue depth.
-
-Thanks,
-Kuai
-
->   }
->   EXPORT_SYMBOL(blk_mq_tagset_busy_iter);
->   
-> @@ -499,6 +499,8 @@ EXPORT_SYMBOL(blk_mq_tagset_wait_completed_request);
->   void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_tag_iter_fn *fn,
->   		void *priv)
->   {
-> +	int srcu_idx;
-> +
->   	/*
->   	 * __blk_mq_update_nr_hw_queues() updates nr_hw_queues and hctx_table
->   	 * while the queue is frozen. So we can use q_usage_counter to avoid
-> @@ -507,6 +509,7 @@ void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_tag_iter_fn *fn,
->   	if (!percpu_ref_tryget(&q->q_usage_counter))
->   		return;
->   
-> +	srcu_idx = srcu_read_lock(&q->tag_set->tags_srcu);
->   	if (blk_mq_is_shared_tags(q->tag_set->flags)) {
->   		struct blk_mq_tags *tags = q->tag_set->shared_tags;
->   		struct sbitmap_queue *bresv = &tags->breserved_tags;
-> @@ -536,6 +539,7 @@ void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_tag_iter_fn *fn,
->   			bt_for_each(hctx, q, btags, fn, priv, false);
->   		}
->   	}
-> +	srcu_read_unlock(&q->tag_set->tags_srcu, srcu_idx);
->   	blk_queue_exit(q);
->   }
->   
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 7b4ab8e398b6..43b15e58ffe1 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -3415,7 +3415,6 @@ static void blk_mq_clear_rq_mapping(struct blk_mq_tags *drv_tags,
->   				    struct blk_mq_tags *tags)
->   {
->   	struct page *page;
-> -	unsigned long flags;
->   
->   	/*
->   	 * There is no need to clear mapping if driver tags is not initialized
-> @@ -3439,15 +3438,6 @@ static void blk_mq_clear_rq_mapping(struct blk_mq_tags *drv_tags,
->   			}
->   		}
->   	}
-> -
 > -	/*
-> -	 * Wait until all pending iteration is done.
-> -	 *
-> -	 * Request reference is cleared and it is guaranteed to be observed
-> -	 * after the ->lock is released.
+> -	 * Each segment in the iov is required to be a block size multiple.
+> -	 * However, we may not be able to get the entire segment if it spans
+> -	 * more pages than bi_max_vecs allows, so we have to ALIGN_DOWN the
+> -	 * result to ensure the bio's total size is correct. The remainder of
+> -	 * the iov data will be picked up in the next bio iteration.
 > -	 */
-> -	spin_lock_irqsave(&drv_tags->lock, flags);
-> -	spin_unlock_irqrestore(&drv_tags->lock, flags);
->   }
+>   	size = iov_iter_extract_pages(iter, &pages,
+>   				      UINT_MAX - bio->bi_iter.bi_size,
+>   				      nr_pages, extraction_flags, &offset);
+> @@ -1241,18 +1234,6 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+>   		return size ? size : -EFAULT;
 >   
->   void blk_mq_free_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
-> @@ -3670,8 +3660,12 @@ static bool blk_mq_hctx_has_requests(struct blk_mq_hw_ctx *hctx)
->   	struct rq_iter_data data = {
->   		.hctx	= hctx,
->   	};
-> +	int srcu_idx;
->   
-> +	srcu_idx = srcu_read_lock(&hctx->queue->tag_set->tags_srcu);
->   	blk_mq_all_tag_iter(tags, blk_mq_has_request, &data);
-> +	srcu_read_unlock(&hctx->queue->tag_set->tags_srcu, srcu_idx);
-> +
->   	return data.has_rq;
->   }
->   
-> @@ -3891,7 +3885,6 @@ static void blk_mq_clear_flush_rq_mapping(struct blk_mq_tags *tags,
->   		unsigned int queue_depth, struct request *flush_rq)
->   {
->   	int i;
-> -	unsigned long flags;
->   
->   	/* The hw queue may not be mapped yet */
->   	if (!tags)
-> @@ -3901,15 +3894,6 @@ static void blk_mq_clear_flush_rq_mapping(struct blk_mq_tags *tags,
->   
->   	for (i = 0; i < queue_depth; i++)
->   		cmpxchg(&tags->rqs[i], flush_rq, NULL);
+>   	nr_pages = DIV_ROUND_UP(offset + size, PAGE_SIZE);
 > -
-> -	/*
-> -	 * Wait until all pending iteration is done.
-> -	 *
-> -	 * Request reference is cleared and it is guaranteed to be observed
-> -	 * after the ->lock is released.
-> -	 */
-> -	spin_lock_irqsave(&tags->lock, flags);
-> -	spin_unlock_irqrestore(&tags->lock, flags);
+> -	if (bio->bi_bdev) {
+> -		size_t trim = size & (bdev_logical_block_size(bio->bi_bdev) - 1);
+> -		iov_iter_revert(iter, trim);
+> -		size -= trim;
+> -	}
+> -
+> -	if (unlikely(!size)) {
+> -		ret = -EFAULT;
+> -		goto out;
+> -	}
+> -
+>   	for (left = size, i = 0; left > 0; left -= len, i += num_pages) {
+>   		struct page *page = pages[i];
+>   		struct folio *folio = page_folio(page);
+> @@ -1297,6 +1278,44 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+>   	return ret;
 >   }
 >   
->   static void blk_free_flush_queue_callback(struct rcu_head *head)
-> 
+> +static inline void bio_revert(struct bio *bio, unsigned int nbytes)
+> +{
+> +	bio->bi_iter.bi_size -= nbytes;
+> +
+> +	while (nbytes) {
+> +		struct bio_vec *bv = &bio->bi_io_vec[bio->bi_vcnt - 1];
+> +
+> +		if (nbytes < bv->bv_len) {
+> +			bv->bv_len -= nbytes;
+> +			return;
+> +		}
+> +
+> +		bio_release_page(bio, bv->bv_page);
+> +		bio->bi_vcnt--;
+> +		nbytes -= bv->bv_len;
+> +       }
+> +}
+> +
+> +static int bio_align_to_lbs(struct bio *bio, struct iov_iter *iter)
+> +{
+> +	struct block_device *bdev = bio->bi_bdev;
+> +	size_t nbytes;
+> +
+> +	if (!bdev)
+> +		return 0;
+> +
+> +	nbytes = bio->bi_iter.bi_size & (bdev_logical_block_size(bdev) - 1);
+> +	if (!nbytes)
+> +		return 0;
+> +
+> +	bio_revert(bio, nbytes);
+> +	iov_iter_revert(iter, nbytes);
+> +	if (!bio->bi_iter.bi_size)
+> +		return -EFAULT;
+> +
+> +	return 0;
+> +}
+> +
+>   /**
+>    * bio_iov_iter_get_pages - add user or kernel pages to a bio
+>    * @bio: bio to add pages to
+> @@ -1336,6 +1355,7 @@ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+>   		ret = __bio_iov_iter_get_pages(bio, iter);
+>   	} while (!ret && iov_iter_count(iter) && !bio_full(bio, 0));
+>   
+> +	ret = bio_align_to_lbs(bio, iter);
+>   	return bio->bi_vcnt ? 0 : ret;
 
+Wouldn't that cause the error from bio_align_to_lba() to be ignored
+if bio->bi_vcnt is greater than 0?
+
+>   }
+>   EXPORT_SYMBOL_GPL(bio_iov_iter_get_pages);
+
+Cheers,
+
+Hsnnes
+-- 
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 NÃ¼rnberg
+HRB 36809 (AG NÃ¼rnberg), GF: I. Totev, A. McDonald, W. Knoblich
