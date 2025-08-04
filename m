@@ -1,37 +1,40 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD5834C8F;
-	Mon,  4 Aug 2025 00:47:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 073D32E36F4
+	for <linux-block@vger.kernel.org>; Mon,  4 Aug 2025 06:06:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754268454; cv=none; b=XAPHzKklY5ohZGy3FKTbNK/5hXxdRG5a5m2Hf2PsFJ9KaKU+9gEw093eMnHSYigg5E5WI1ArdhZ1pbIW32/rnufBjA0P+nIkZS/jIjujW6JMLyTUo0UJ86fJgqCFagVu70xjbnS2+9iJ+QaY+d5kM30ok3Qj/J5kX8IJvaLPhUQ=
+	t=1754287621; cv=none; b=sDxlUT1ssRUPozz0IgkXBKJ0aRDuY7bZ1jXkmUPIzbAYCtcOtArttMpEakp4TG/0v/GcQCr8KzpvIS2zW3BcBXJsfIPBFMV+jRf2o3wuxaom1URVdiFtlRoaGisBXiMjXwZebiLFYlkLZmrs3agOlAg2c6CchfHiQTEd98tu94Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754268454; c=relaxed/simple;
-	bh=+/W9CYW0Yh+ewesGTTpIaOLJacb/3YZsvGB7zJPqPJ8=;
+	s=arc-20240116; t=1754287621; c=relaxed/simple;
+	bh=6mnJ+7Q9WbjQDwZzgiCd0osP2ylraq/FvBJtr+Jf8Sw=;
 	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=sCvqyMM2rSLjqkK6VjKjOl87y1zuEnO05kkkNe4to+lLIvmmiNYe9VcErgv3fAdmRBLfZ/QSsSn8+AT8rONSeM/Ee1q2Ygy6hkAaK1yqE0oZOgLSNHv1TC8bhR2fbtM6HyS1zEsG3BKk+39jqFW8Znb21R8ARAevzRNSuHiUpTY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+	 In-Reply-To:Content-Type; b=X/4b6799Vwnw97Uqt5DFU85k8ilm8rgriTTjPq9cMHnWvkMbdXtIBVyNLOAA4s/V3eyrsJof51aFhpxrfFOakByUHbNEvhf9Bf/jVTvdUJvoNfbUW7O7jjV7cdV/iK4ZMzUl+ohg0il8IrpvDdz0NrWFlqEtvLeNQmTbxq/R8O8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4bwHvZ5rHfzKHMrx;
-	Mon,  4 Aug 2025 08:47:22 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4bwR0J0MY5zYQts9
+	for <linux-block@vger.kernel.org>; Mon,  4 Aug 2025 14:06:56 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id C9B411A0A26;
-	Mon,  4 Aug 2025 08:47:21 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTP id B10AA1A1CFA
+	for <linux-block@vger.kernel.org>; Mon,  4 Aug 2025 14:06:54 +0800 (CST)
 Received: from [10.174.179.143] (unknown [10.174.179.143])
-	by APP4 (Coremail) with SMTP id gCh0CgBHERIYA5BouVP1CQ--.49366S3;
-	Mon, 04 Aug 2025 08:47:21 +0800 (CST)
-Subject: Re: [PATCH] block, bfq: Reorder struct bfq_iocq_bfqq_data
-To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
- Jens Axboe <axboe@kernel.dk>
-Cc: linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
- linux-block@vger.kernel.org, "yukuai (C)" <yukuai3@huawei.com>
-References: <79394db1befaa658e8066b8e3348073ce27d9d26.1754119538.git.christophe.jaillet@wanadoo.fr>
+	by APP4 (Coremail) with SMTP id gCh0CgAXkxP9TZBo9M4OCg--.65022S3;
+	Mon, 04 Aug 2025 14:06:54 +0800 (CST)
+Subject: Re: [PATCH 1/5] blk-mq: Move flush queue allocation into
+ blk_mq_init_hctx()
+To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org
+Cc: John Garry <john.garry@huawei.com>,
+ Sathya Prakash Veerichetty <sathya.prakash@broadcom.com>,
+ "yukuai (C)" <yukuai3@huawei.com>
+References: <20250801114440.722286-1-ming.lei@redhat.com>
+ <20250801114440.722286-2-ming.lei@redhat.com>
 From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <ac0e993a-3e6d-6616-ce6c-03f0aa2429da@huaweicloud.com>
-Date: Mon, 4 Aug 2025 08:47:20 +0800
+Message-ID: <75912c06-a380-f6e8-e36e-2428b176939d@huaweicloud.com>
+Date: Mon, 4 Aug 2025 14:06:52 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.1
 Precedence: bulk
@@ -40,99 +43,122 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <79394db1befaa658e8066b8e3348073ce27d9d26.1754119538.git.christophe.jaillet@wanadoo.fr>
+In-Reply-To: <20250801114440.722286-2-ming.lei@redhat.com>
 Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgBHERIYA5BouVP1CQ--.49366S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7tr45XFy3uw1UXF15CFyUJrb_yoW8tr17pa
-	n3Kw4j9FW8tw13Kr18ua1DXr93twnxXry7KFsrXryYyw1UGFnF9rn0ka4FvFy29rWkCFnr
-	ZFyj9FyDWrsrKaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUkKb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+X-CM-TRANSID:gCh0CgAXkxP9TZBo9M4OCg--.65022S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxAFy8ZFyktw4DKr4xXr1UJrb_yoW5Zw1DpF
+	WUJay5KrWSqr1DuFWDJ39rJ34aqwsxKr92krsayFWFvw129r1ftr4xGry8ZFyIkr4kCFs7
+	Gr4DK398Zr1Fq37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvjb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
 	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
 	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
-	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
-	x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
-	0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AK
-	xVWUAVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F4
-	0E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1l
-	IxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxV
-	AFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j
-	6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU1veHD
-	UUUUU==
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AF
+	wI0_JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
+	xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1D
+	MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
+	0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWU
+	JVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUwx
+	hLUUUUU
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-在 2025/08/02 15:25, Christophe JAILLET 写道:
-> The size of struct bfq_iocq_bfqq_data can be reduced by moving a few fields
-> around.
+在 2025/08/01 19:44, Ming Lei 写道:
+> Move flush queue allocation into blk_mq_init_hctx() and its release into
+> blk_mq_exit_hctx(), and prepare for replacing tags->lock with SRCU to
+> draining inflight request walking. blk_mq_exit_hctx() is the last chance
+> for us to get valid `tag_set` reference, and we need to add one SRCU to
+> `tag_set` for freeing flush request via call_srcu().
 > 
-> On a x86_64, with allmodconfig, this shrinks the size from 144 to 128
-> bytes.
-> The main benefit is to reduce the size of struct bfq_io_cq from 1360 to
-> 1232.
+> It is safe to move flush queue & request release into blk_mq_exit_hctx(),
+> because blk_mq_clear_flush_rq_mapping() clears the flush request
+> reference int driver tags inflight request table, meantime inflight
+> request walking is drained.
 > 
-> This structure is stored in a dedicated slab cache. So reducing its size
-> improves cache usage.
-> 
-> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
 > ---
-> Compile tested only.
+>   block/blk-mq-sysfs.c |  1 -
+>   block/blk-mq.c       | 20 +++++++++++++-------
+>   2 files changed, 13 insertions(+), 8 deletions(-)
 > 
-> On my system, struct bfq_io_cq are stored in 8 pages slab. Each of these
-> slabs hold 24 entries.
-> 
-> $ sudo cat /proc/slabinfo | grep bfq_io
-> bfq_io_cq            378    384   1360   24    8 : tunables    0    0    0 : slabdata     16     16      0
-> 
-> With the new layout, we should store 26 entries.
-> (8 * 4096 / 1232 = 26.60)
-> ---
->   block/bfq-iosched.h | 10 +++++-----
->   1 file changed, 5 insertions(+), 5 deletions(-)
-> 
-
 LGTM
 Reviewed-by: Yu Kuai <yukuai3@huawei.com>
 
-> diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
-> index 687a3a7ba784..0b4704932d72 100644
-> --- a/block/bfq-iosched.h
-> +++ b/block/bfq-iosched.h
-> @@ -427,9 +427,6 @@ struct bfq_iocq_bfqq_data {
->   	 */
->   	bool saved_IO_bound;
+> diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
+> index 24656980f443..c8dfed6c1c96 100644
+> --- a/block/blk-mq-sysfs.c
+> +++ b/block/blk-mq-sysfs.c
+> @@ -34,7 +34,6 @@ static void blk_mq_hw_sysfs_release(struct kobject *kobj)
+>   	struct blk_mq_hw_ctx *hctx = container_of(kobj, struct blk_mq_hw_ctx,
+>   						  kobj);
 >   
-> -	u64 saved_io_start_time;
-> -	u64 saved_tot_idle_time;
-> -
->   	/*
->   	 * Same purpose as the previous fields for the values of the
->   	 * field keeping the queue's belonging to a large burst
-> @@ -450,6 +447,9 @@ struct bfq_iocq_bfqq_data {
->   	 */
->   	unsigned int saved_weight;
+> -	blk_free_flush_queue(hctx->fq);
+>   	sbitmap_free(&hctx->ctx_map);
+>   	free_cpumask_var(hctx->cpumask);
+>   	kfree(hctx->ctxs);
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 9692fa4c3ef2..c6a1366dbe77 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -3939,6 +3939,9 @@ static void blk_mq_exit_hctx(struct request_queue *q,
+>   	if (set->ops->exit_hctx)
+>   		set->ops->exit_hctx(hctx, hctx_idx);
 >   
-> +	u64 saved_io_start_time;
-> +	u64 saved_tot_idle_time;
+> +	blk_free_flush_queue(hctx->fq);
+> +	hctx->fq = NULL;
 > +
->   	/*
->   	 * Similar to previous fields: save wr information.
->   	 */
-> @@ -457,13 +457,13 @@ struct bfq_iocq_bfqq_data {
->   	unsigned long saved_last_wr_start_finish;
->   	unsigned long saved_service_from_wr;
->   	unsigned long saved_wr_start_at_switch_to_srt;
-> -	unsigned int saved_wr_cur_max_time;
->   	struct bfq_ttime saved_ttime;
-> +	unsigned int saved_wr_cur_max_time;
+>   	xa_erase(&q->hctx_table, hctx_idx);
 >   
->   	/* Save also injection state */
-> -	u64 saved_last_serv_time_ns;
->   	unsigned int saved_inject_limit;
->   	unsigned long saved_decrease_time_jif;
-> +	u64 saved_last_serv_time_ns;
+>   	spin_lock(&q->unused_hctx_lock);
+> @@ -3964,13 +3967,19 @@ static int blk_mq_init_hctx(struct request_queue *q,
+>   		struct blk_mq_tag_set *set,
+>   		struct blk_mq_hw_ctx *hctx, unsigned hctx_idx)
+>   {
+> +	gfp_t gfp = GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY;
+> +
+> +	hctx->fq = blk_alloc_flush_queue(hctx->numa_node, set->cmd_size, gfp);
+> +	if (!hctx->fq)
+> +		goto fail;
+> +
+>   	hctx->queue_num = hctx_idx;
 >   
->   	/* candidate queue for a stable merge (due to close creation time) */
->   	struct bfq_queue *stable_merge_bfqq;
+>   	hctx->tags = set->tags[hctx_idx];
+>   
+>   	if (set->ops->init_hctx &&
+>   	    set->ops->init_hctx(hctx, set->driver_data, hctx_idx))
+> -		goto fail;
+> +		goto fail_free_fq;
+>   
+>   	if (blk_mq_init_request(set, hctx->fq->flush_rq, hctx_idx,
+>   				hctx->numa_node))
+> @@ -3987,6 +3996,9 @@ static int blk_mq_init_hctx(struct request_queue *q,
+>    exit_hctx:
+>   	if (set->ops->exit_hctx)
+>   		set->ops->exit_hctx(hctx, hctx_idx);
+> + fail_free_fq:
+> +	blk_free_flush_queue(hctx->fq);
+> +	hctx->fq = NULL;
+>    fail:
+>   	return -1;
+>   }
+> @@ -4038,16 +4050,10 @@ blk_mq_alloc_hctx(struct request_queue *q, struct blk_mq_tag_set *set,
+>   	init_waitqueue_func_entry(&hctx->dispatch_wait, blk_mq_dispatch_wake);
+>   	INIT_LIST_HEAD(&hctx->dispatch_wait.entry);
+>   
+> -	hctx->fq = blk_alloc_flush_queue(hctx->numa_node, set->cmd_size, gfp);
+> -	if (!hctx->fq)
+> -		goto free_bitmap;
+> -
+>   	blk_mq_hctx_kobj_init(hctx);
+>   
+>   	return hctx;
+>   
+> - free_bitmap:
+> -	sbitmap_free(&hctx->ctx_map);
+>    free_ctxs:
+>   	kfree(hctx->ctxs);
+>    free_cpumask:
 > 
 
