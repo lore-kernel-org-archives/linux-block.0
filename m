@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73F0225F97D;
-	Mon,  4 Aug 2025 12:43:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A27802550A4;
+	Mon,  4 Aug 2025 12:43:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754311409; cv=none; b=hMPMBIumTj4qNXvzwgWt6rdNJQOFC+64xJCGewjwCH9aKb3iSb/cDX+Z+b6NA8RYyldU9sxZScPDCGTZL/t6S9gp8SAMo8mgusnR288ccVRIgC5CHv/sgNNJmRqrjJBv2NPqpA/meX7bf1O2HFO+10baGZ2prKGNHyuZ0EJzzTo=
+	t=1754311417; cv=none; b=AP1tOngeamYvoj2SqMSxAh09wgRNVDMYCOG2RAYHSWS9FUUo+59gp/7b5dKvfiuBUcUZ1k0f7WXLE+0HOUx1m3Z997IcCMwHbZmpftfP2S3qX03tb0AhUE7OdjiQ3wfZwt969zsdei8IW0MUIdg5ibVF9urfqPfGGzx/zmmJoEA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754311409; c=relaxed/simple;
-	bh=B6ggJVOQfTYMCOE/nJsgZM614saTj7Qtn55LwfqKBMA=;
+	s=arc-20240116; t=1754311417; c=relaxed/simple;
+	bh=gXQfTddyrmH8Ixen8MMOQFcSDtf75ytBbFmEnbpkIK0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rBSSvvYMFeiK+9PDlN1UMIK0n+YO00G/DVdD2mxIkmoKwjurlRiFnyPn1ZeoYw4/MIy02tQ/xOSpZpJ24wGc/tCxlj7b8ZaIHN/a7x8VfLF1p323VTLYlxiANsZDq6YSbCNSY0EPaiT1MDkzI/Zg0PG2E9S2eBA2Zpw4Xknwhak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mACwCJwn; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=p4t6E7Fpdg+Hcl79ay+BkpfwrTVF4gmzJhOjuApBEGCsCodCljFOpPyaQV7aPEX0FtRFDol86gEWwglsjOfmCK558AJwbPALi3hXJX//ZN6P26kms1WjJQskWhduB4JD305gv9UcjN/W867y4VK5LYVp/3RcE9/LvsaQmIW3EWg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WRgsvRlF; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mACwCJwn"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96668C4CEF8;
-	Mon,  4 Aug 2025 12:43:27 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WRgsvRlF"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7673FC4CEE7;
+	Mon,  4 Aug 2025 12:43:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754311409;
-	bh=B6ggJVOQfTYMCOE/nJsgZM614saTj7Qtn55LwfqKBMA=;
+	s=k20201202; t=1754311414;
+	bh=gXQfTddyrmH8Ixen8MMOQFcSDtf75ytBbFmEnbpkIK0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=mACwCJwnciJCEbZnCrkOPhfxhxsK8nNGbFRTcuF/UprHjNhigkEBz4Qjo6q3nOYnE
-	 NNEuUiRwpxiJJ+5+lJPFbBh1pz1NHdaolrAAyyFd/BDEth7WPdBMjVzrlmdIaxA3Qb
-	 2RsWBm5LtpycB6Eoe6pJbVmXbTVoQjyF0BJrKzZPE5F7UARnqwUUZNfC3023xQAdCk
-	 GMv+SVJ7lY8MSINtMTSQNgemwlQgadSRLsUt+7E2s6eroO/rhcn1uAVTTMaXvcyAt7
-	 AFjFAFTQV2Ju8uDUJFNXpQWgxbDaQrFpkFb9ltCXITe4mMxj1t62jvARy38KRhJWAk
-	 x4Lll22SY+E5Q==
+	b=WRgsvRlFW0e77jc7NIsyBW2keN26coVZrkVCiSkqs4aw+XPWcg7vc+V1XlKoIcE88
+	 IOIbPQelgEDLheM/qg7mVhJZzAqXm7CUjMAMKNzC+umg0g7DwYC9YBLyHXL0I66FCh
+	 IFbMO71xVEUgxdJl2+IupUgaBpdkpCp+VfiDgWnzz0MMd73xSf4ctXSScspzbf7J4C
+	 MQm70SnKxDBQEq6Qi5EQDhrkAfT+WwzTZQfsthVUSLn1pLEnK9pcRGmBAGcQOXI3DR
+	 pSMdvMXvMDulNitg5dtAwYyxJ7hDxcGMKpGt6kEpCAlccx1SJGPya+SDEHg8s11i4i
+	 u8QgrR2e/DTYQ==
 From: Leon Romanovsky <leon@kernel.org>
 To: Marek Szyprowski <m.szyprowski@samsung.com>
 Cc: Leon Romanovsky <leonro@nvidia.com>,
@@ -64,9 +64,9 @@ Cc: Leon Romanovsky <leonro@nvidia.com>,
 	virtualization@lists.linux.dev,
 	Will Deacon <will@kernel.org>,
 	xen-devel@lists.xenproject.org
-Subject: [PATCH v1 01/16] dma-mapping: introduce new DMA attribute to indicate MMIO memory
-Date: Mon,  4 Aug 2025 15:42:35 +0300
-Message-ID: <f749c597980592ecc7aeb5ecca974c8dfb76f834.1754292567.git.leon@kernel.org>
+Subject: [PATCH v1 04/16] dma-mapping: rename trace_dma_*map_page to trace_dma_*map_phys
+Date: Mon,  4 Aug 2025 15:42:38 +0300
+Message-ID: <7e10dcba2f3108efc6af13bfdbe8f09073835838.1754292567.git.leon@kernel.org>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <cover.1754292567.git.leon@kernel.org>
 References: <cover.1754292567.git.leon@kernel.org>
@@ -80,91 +80,59 @@ Content-Transfer-Encoding: 8bit
 
 From: Leon Romanovsky <leonro@nvidia.com>
 
-This patch introduces the DMA_ATTR_MMIO attribute to mark DMA buffers
-that reside in memory-mapped I/O (MMIO) regions, such as device BARs
-exposed through the host bridge, which are accessible for peer-to-peer
-(P2P) DMA.
-
-This attribute is especially useful for exporting device memory to other
-devices for DMA without CPU involvement, and avoids unnecessary or
-potentially detrimental CPU cache maintenance calls.
+As a preparation for following map_page -> map_phys API conversion,
+let's rename trace_dma_*map_page() to be trace_dma_*map_phys().
 
 Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
 ---
- Documentation/core-api/dma-attributes.rst |  7 +++++++
- include/linux/dma-mapping.h               | 14 ++++++++++++++
- include/trace/events/dma.h                |  3 ++-
- rust/kernel/dma.rs                        |  3 +++
- 4 files changed, 26 insertions(+), 1 deletion(-)
+ include/trace/events/dma.h | 4 ++--
+ kernel/dma/mapping.c       | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/Documentation/core-api/dma-attributes.rst b/Documentation/core-api/dma-attributes.rst
-index 1887d92e8e926..91acd2684e506 100644
---- a/Documentation/core-api/dma-attributes.rst
-+++ b/Documentation/core-api/dma-attributes.rst
-@@ -130,3 +130,10 @@ accesses to DMA buffers in both privileged "supervisor" and unprivileged
- subsystem that the buffer is fully accessible at the elevated privilege
- level (and ideally inaccessible or at least read-only at the
- lesser-privileged levels).
-+
-+DMA_ATTR_MMIO
-+-------------
-+
-+This attribute is especially useful for exporting device memory to other
-+devices for DMA without CPU involvement, and avoids unnecessary or
-+potentially detrimental CPU cache maintenance calls.
-diff --git a/include/linux/dma-mapping.h b/include/linux/dma-mapping.h
-index 55c03e5fe8cb3..afc89835c7457 100644
---- a/include/linux/dma-mapping.h
-+++ b/include/linux/dma-mapping.h
-@@ -58,6 +58,20 @@
-  */
- #define DMA_ATTR_PRIVILEGED		(1UL << 9)
- 
-+/*
-+ * DMA_ATTR_MMIO - Indicates memory-mapped I/O (MMIO) region for DMA mapping
-+ *
-+ * This attribute is used for MMIO memory regions that are exposed through
-+ * the host bridge and are accessible for peer-to-peer (P2P) DMA. Memory
-+ * marked with this attribute is not system RAM and may represent device
-+ * BAR windows or peer-exposed memory.
-+ *
-+ * Typical usage is for mapping hardware memory BARs or exporting device
-+ * memory to other devices for DMA without involving main system RAM.
-+ * The attribute guarantees no CPU cache maintenance calls will be made.
-+ */
-+#define DMA_ATTR_MMIO		(1UL << 10)
-+
- /*
-  * A dma_addr_t can hold any valid DMA or bus address for the platform.  It can
-  * be given to a device to use as a DMA source or target.  It is specific to a
 diff --git a/include/trace/events/dma.h b/include/trace/events/dma.h
-index d8ddc27b6a7c8..ee90d6f1dcf35 100644
+index ee90d6f1dcf35..84416c7d6bfaa 100644
 --- a/include/trace/events/dma.h
 +++ b/include/trace/events/dma.h
-@@ -31,7 +31,8 @@ TRACE_DEFINE_ENUM(DMA_NONE);
- 		{ DMA_ATTR_FORCE_CONTIGUOUS, "FORCE_CONTIGUOUS" }, \
- 		{ DMA_ATTR_ALLOC_SINGLE_PAGES, "ALLOC_SINGLE_PAGES" }, \
- 		{ DMA_ATTR_NO_WARN, "NO_WARN" }, \
--		{ DMA_ATTR_PRIVILEGED, "PRIVILEGED" })
-+		{ DMA_ATTR_PRIVILEGED, "PRIVILEGED" }, \
-+		{ DMA_ATTR_MMIO, "MMIO" })
+@@ -72,7 +72,7 @@ DEFINE_EVENT(dma_map, name, \
+ 		 size_t size, enum dma_data_direction dir, unsigned long attrs), \
+ 	TP_ARGS(dev, phys_addr, dma_addr, size, dir, attrs))
  
- DECLARE_EVENT_CLASS(dma_map,
- 	TP_PROTO(struct device *dev, phys_addr_t phys_addr, dma_addr_t dma_addr,
-diff --git a/rust/kernel/dma.rs b/rust/kernel/dma.rs
-index 2bc8ab51ec280..61d9eed7a786e 100644
---- a/rust/kernel/dma.rs
-+++ b/rust/kernel/dma.rs
-@@ -242,6 +242,9 @@ pub mod attrs {
-     /// Indicates that the buffer is fully accessible at an elevated privilege level (and
-     /// ideally inaccessible or at least read-only at lesser-privileged levels).
-     pub const DMA_ATTR_PRIVILEGED: Attrs = Attrs(bindings::DMA_ATTR_PRIVILEGED);
-+
-+    /// Indicates that the buffer is MMIO memory.
-+    pub const DMA_ATTR_MMIO: Attrs = Attrs(bindings::DMA_ATTR_MMIO);
+-DEFINE_MAP_EVENT(dma_map_page);
++DEFINE_MAP_EVENT(dma_map_phys);
+ DEFINE_MAP_EVENT(dma_map_resource);
+ 
+ DECLARE_EVENT_CLASS(dma_unmap,
+@@ -110,7 +110,7 @@ DEFINE_EVENT(dma_unmap, name, \
+ 		 enum dma_data_direction dir, unsigned long attrs), \
+ 	TP_ARGS(dev, addr, size, dir, attrs))
+ 
+-DEFINE_UNMAP_EVENT(dma_unmap_page);
++DEFINE_UNMAP_EVENT(dma_unmap_phys);
+ DEFINE_UNMAP_EVENT(dma_unmap_resource);
+ 
+ DECLARE_EVENT_CLASS(dma_alloc_class,
+diff --git a/kernel/dma/mapping.c b/kernel/dma/mapping.c
+index 4c1dfbabb8ae5..fe1f0da6dc507 100644
+--- a/kernel/dma/mapping.c
++++ b/kernel/dma/mapping.c
+@@ -173,7 +173,7 @@ dma_addr_t dma_map_page_attrs(struct device *dev, struct page *page,
+ 	else
+ 		addr = ops->map_page(dev, page, offset, size, dir, attrs);
+ 	kmsan_handle_dma(page, offset, size, dir);
+-	trace_dma_map_page(dev, phys, addr, size, dir, attrs);
++	trace_dma_map_phys(dev, phys, addr, size, dir, attrs);
+ 	debug_dma_map_phys(dev, phys, size, dir, addr, attrs);
+ 
+ 	return addr;
+@@ -193,7 +193,7 @@ void dma_unmap_page_attrs(struct device *dev, dma_addr_t addr, size_t size,
+ 		iommu_dma_unmap_page(dev, addr, size, dir, attrs);
+ 	else
+ 		ops->unmap_page(dev, addr, size, dir, attrs);
+-	trace_dma_unmap_page(dev, addr, size, dir, attrs);
++	trace_dma_unmap_phys(dev, addr, size, dir, attrs);
+ 	debug_dma_unmap_phys(dev, addr, size, dir);
  }
- 
- /// An abstraction of the `dma_alloc_coherent` API.
+ EXPORT_SYMBOL(dma_unmap_page_attrs);
 -- 
 2.50.1
 
