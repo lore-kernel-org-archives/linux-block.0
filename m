@@ -1,279 +1,171 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout-p-102.mailbox.org (mout-p-102.mailbox.org [80.241.56.152])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BA1521D018
-	for <linux-block@vger.kernel.org>; Mon,  4 Aug 2025 11:45:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D606314EC62;
+	Mon,  4 Aug 2025 12:14:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754307916; cv=none; b=rs0cLG58+MTOf4fAuSCfcgP7XFFP+JhEZgpsnYgPFvWyPLEGzPSKLYv9jHmpIyNx+KFSD2JOWkhWw1zmhxbyFvFe6D/IaL5XkCo1ZXNuwrbA8tdpERitTVvOKpeDPy6V9ZI4vh6u1TNaa15y8PW2h4WQh1Xjo6KN6dBiYGD53gQ=
+	t=1754309655; cv=none; b=biJ24eCQPkMAldwq7MR6RcjwnI5yLFeB3yoeIql+P+eSUlY+Y44g+/cdKoJzKucHmKrRCK8LXDm5PYS4aHTr71eWIjfkkT6bZt5qcBX+9Cw5oWztMqQfsd+yd/yIlhkzqJ1QOQJHBzP2r8eVK1XE/YZJievY+C9cMegtnVDWXTs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754307916; c=relaxed/simple;
-	bh=fETMESDzAoVfu2SLD6IVe/F3MUQU31EsbLeTf0nFsvw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jtxWNJqcR4GGx+sDCOY1lCKE80wn8f1Oo9A/9LxIO3vShm80Z3/3b+2s/jBjyQt5zH/X1aekSnVwFe9jlTO9LJRmMJ6yh79ilgE/sXcWCYsmPT+9KeGgE+Snq8teeSANrXIwvOIa2xLLxfPZbWcghO2nBm0Ewv14gqp1FIoKuU8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=jENaJVti; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=G872jB71; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=jENaJVti; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=G872jB71; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1754309655; c=relaxed/simple;
+	bh=GZHbkGbaE11j7U/BUeIH+q8MWqWSg7w15TZc2hCrpGc=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=fVQ8v9rvqLbBmWv/5tJzm0+uSvGZqOuCP3nOeb0sPN4PUAZDDRxOQeWvocEUcgVuuBYLOqbyVO/3LPCc/Inu0qUJ+NPuoGolANQXAf5I9kKEEspgb/JHGCxzSFadXixt3lMp3KePT3Yr7Ba0/1HVtgGMeC4Kl4cDx5fma4jp8Bs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pankajraghav.com; spf=pass smtp.mailfrom=pankajraghav.com; dkim=pass (2048-bit key) header.d=pankajraghav.com header.i=@pankajraghav.com header.b=PTbn/7XK; arc=none smtp.client-ip=80.241.56.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pankajraghav.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pankajraghav.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="jENaJVti";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="G872jB71";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="jENaJVti";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="G872jB71"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	dkim=pass (2048-bit key) header.d=pankajraghav.com header.i=@pankajraghav.com header.b="PTbn/7XK"
+Received: from smtp2.mailbox.org (smtp2.mailbox.org [IPv6:2001:67c:2050:b231:465::2])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id B9D022117A;
-	Mon,  4 Aug 2025 11:45:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1754307912; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Csr9JcaN6pFCQ2VGwH0kse/xsov/LlHqEAG1UADjVuI=;
-	b=jENaJVti40m7UzTJHRsde+nZx2QZaMnbw8/9ntak/dHq8QvDknWDnoLIMWjDnC706P8gON
-	mCtKjRaLPwpQYfb0XN9OxRjVqZxna8QFw1jyqDlNV4Irt1UcaIQ3DAmFpTtlRAIv74uqTZ
-	c1hVrLuL9F2px1SNSElW1JfkxmGfE/4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1754307912;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Csr9JcaN6pFCQ2VGwH0kse/xsov/LlHqEAG1UADjVuI=;
-	b=G872jB71i6Ad10hQ0hew7+1RDCCb04OHJVBD1kAH6MhxksfURc53OnShz9fC3TvFVSE7EN
-	tBO+F/FjL2FIoJDQ==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1754307912; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Csr9JcaN6pFCQ2VGwH0kse/xsov/LlHqEAG1UADjVuI=;
-	b=jENaJVti40m7UzTJHRsde+nZx2QZaMnbw8/9ntak/dHq8QvDknWDnoLIMWjDnC706P8gON
-	mCtKjRaLPwpQYfb0XN9OxRjVqZxna8QFw1jyqDlNV4Irt1UcaIQ3DAmFpTtlRAIv74uqTZ
-	c1hVrLuL9F2px1SNSElW1JfkxmGfE/4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1754307912;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Csr9JcaN6pFCQ2VGwH0kse/xsov/LlHqEAG1UADjVuI=;
-	b=G872jB71i6Ad10hQ0hew7+1RDCCb04OHJVBD1kAH6MhxksfURc53OnShz9fC3TvFVSE7EN
-	tBO+F/FjL2FIoJDQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id A4B5E13695;
-	Mon,  4 Aug 2025 11:45:12 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 1Ff/JkidkGicLgAAD6G6ig
-	(envelope-from <hare@suse.de>); Mon, 04 Aug 2025 11:45:12 +0000
-Message-ID: <bfdb0c03-42fc-4ab7-875d-20a65b792b8c@suse.de>
-Date: Mon, 4 Aug 2025 13:45:12 +0200
+	by mout-p-102.mailbox.org (Postfix) with ESMTPS id 4bwb7z3hgkz9tFL;
+	Mon,  4 Aug 2025 14:14:07 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pankajraghav.com;
+	s=MBO0001; t=1754309647;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=80SiyYCvOTGynbWdEDIlGpTbPo36gMMHdma7I3Bjcno=;
+	b=PTbn/7XKLbSA21l+wNOWj6V3OW0uE7tX20T4O5uEpLTpYrYZxVUcwfyVvfhjaA7Gx7bFSI
+	N6WRTKoknHFtmw/C9D2eoMOakgvFcsn6pHbFbrLGnBHBRJ6WVFVwqqPdCXfrUE+ZcBuTvn
+	7zNBdPZFcLXLkmAAOUdNVLdfD1Z4XPgesg0OY2Dfga57zZ53Xb1lo3vw+HhYFu7llqmYkl
+	uoJuMm7IxQbfmTyJXZ2vp90OCENuqF8FjBA6A9tlY0qDe2pEbS94T5LZKmV4udcfGrQ3j6
+	IyYAIRRVc8JVzf8BtNBhk5XrXbd1W1WlMRQZ05mHKTFm7SULsO6H/nwP1GXDuA==
+Authentication-Results: outgoing_mbo_mout;
+	dkim=none;
+	spf=pass (outgoing_mbo_mout: domain of kernel@pankajraghav.com designates 2001:67c:2050:b231:465::2 as permitted sender) smtp.mailfrom=kernel@pankajraghav.com
+From: "Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>
+To: Suren Baghdasaryan <surenb@google.com>,
+	Ryan Roberts <ryan.roberts@arm.com>,
+	Baolin Wang <baolin.wang@linux.alibaba.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	"H . Peter Anvin" <hpa@zytor.com>,
+	Vlastimil Babka <vbabka@suse.cz>,
+	Zi Yan <ziy@nvidia.com>,
+	Mike Rapoport <rppt@kernel.org>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Michal Hocko <mhocko@suse.com>,
+	David Hildenbrand <david@redhat.com>,
+	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Nico Pache <npache@redhat.com>,
+	Dev Jain <dev.jain@arm.com>,
+	"Liam R . Howlett" <Liam.Howlett@oracle.com>,
+	Jens Axboe <axboe@kernel.dk>
+Cc: linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org,
+	willy@infradead.org,
+	x86@kernel.org,
+	linux-block@vger.kernel.org,
+	Ritesh Harjani <ritesh.list@gmail.com>,
+	linux-fsdevel@vger.kernel.org,
+	"Darrick J . Wong" <djwong@kernel.org>,
+	mcgrof@kernel.org,
+	gost.dev@samsung.com,
+	kernel@pankajraghav.com,
+	hch@lst.de,
+	Pankaj Raghav <p.raghav@samsung.com>
+Subject: [PATCH 0/5] add static huge zero folio support
+Date: Mon,  4 Aug 2025 14:13:51 +0200
+Message-ID: <20250804121356.572917-1-kernel@pankajraghav.com>
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 5/5] blk-mq: Replace tags->lock with SRCU for tag
- iterators
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
- Yu Kuai <yukuai3@huawei.com>,
- Sathya Prakash Veerichetty <sathya.prakash@broadcom.com>
-References: <20250801114440.722286-1-ming.lei@redhat.com>
- <20250801114440.722286-6-ming.lei@redhat.com>
- <028ba177-da0c-465e-ab34-ec18039395e8@suse.de> <aJCa_Ef6U00CZbpf@fedora>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <aJCa_Ef6U00CZbpf@fedora>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-4.30 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-0.998];
-	MIME_GOOD(-0.10)[text/plain];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	RCPT_COUNT_FIVE(0.00)[5]
-X-Spam-Flag: NO
-X-Spam-Level: 
-X-Spam-Score: -4.30
+X-Rspamd-Queue-Id: 4bwb7z3hgkz9tFL
 
-On 8/4/25 13:35, Ming Lei wrote:
-> On Mon, Aug 04, 2025 at 09:13:08AM +0200, Hannes Reinecke wrote:
->> On 8/1/25 13:44, Ming Lei wrote:
->>> Replace the spinlock in blk_mq_find_and_get_req() with an SRCU read lock
->>> around the tag iterators.
->>>
->>> This is done by:
->>>
->>> - Holding the SRCU read lock in blk_mq_queue_tag_busy_iter(),
->>> blk_mq_tagset_busy_iter(), and blk_mq_hctx_has_requests().
->>>
->>> - Removing the now-redundant tags->lock from blk_mq_find_and_get_req().
->>>
->>> This change improves performance by replacing a spinlock with a more
->>> scalable SRCU lock, and fixes lockup issue in scsi_host_busy() in case of
->>> shost->host_blocked.
->>>
->>> Meantime it becomes possible to use blk_mq_in_driver_rw() for io
->>> accounting.
->>>
->>> Signed-off-by: Ming Lei <ming.lei@redhat.com>
->>> ---
->>>    block/blk-mq-tag.c | 12 ++++++++----
->>>    block/blk-mq.c     | 24 ++++--------------------
->>>    2 files changed, 12 insertions(+), 24 deletions(-)
->>>
->>> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
->>> index 6c2f5881e0de..7ae431077a32 100644
->>> --- a/block/blk-mq-tag.c
->>> +++ b/block/blk-mq-tag.c
->>> @@ -256,13 +256,10 @@ static struct request *blk_mq_find_and_get_req(struct blk_mq_tags *tags,
->>>    		unsigned int bitnr)
->>>    {
->>>    	struct request *rq;
->>> -	unsigned long flags;
->>> -	spin_lock_irqsave(&tags->lock, flags);
->>>    	rq = tags->rqs[bitnr];
->>>    	if (!rq || rq->tag != bitnr || !req_ref_inc_not_zero(rq))
->>>    		rq = NULL;
->>> -	spin_unlock_irqrestore(&tags->lock, flags);
->>>    	return rq;
->>>    }
->>> @@ -440,7 +437,9 @@ void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
->>>    		busy_tag_iter_fn *fn, void *priv)
->>>    {
->>>    	unsigned int flags = tagset->flags;
->>> -	int i, nr_tags;
->>> +	int i, nr_tags, srcu_idx;
->>> +
->>> +	srcu_idx = srcu_read_lock(&tagset->tags_srcu);
->>>    	nr_tags = blk_mq_is_shared_tags(flags) ? 1 : tagset->nr_hw_queues;
->>> @@ -449,6 +448,7 @@ void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
->>>    			__blk_mq_all_tag_iter(tagset->tags[i], fn, priv,
->>>    					      BT_TAG_ITER_STARTED);
->>>    	}
->>> +	srcu_read_unlock(&tagset->tags_srcu, srcu_idx);
->>>    }
->>>    EXPORT_SYMBOL(blk_mq_tagset_busy_iter);
->>> @@ -499,6 +499,8 @@ EXPORT_SYMBOL(blk_mq_tagset_wait_completed_request);
->>>    void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_tag_iter_fn *fn,
->>>    		void *priv)
->>>    {
->>> +	int srcu_idx;
->>> +
->>>    	/*
->>>    	 * __blk_mq_update_nr_hw_queues() updates nr_hw_queues and hctx_table
->>>    	 * while the queue is frozen. So we can use q_usage_counter to avoid
->>> @@ -507,6 +509,7 @@ void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_tag_iter_fn *fn,
->>>    	if (!percpu_ref_tryget(&q->q_usage_counter))
->>>    		return;
->>> +	srcu_idx = srcu_read_lock(&q->tag_set->tags_srcu);
->>>    	if (blk_mq_is_shared_tags(q->tag_set->flags)) {
->>>    		struct blk_mq_tags *tags = q->tag_set->shared_tags;
->>>    		struct sbitmap_queue *bresv = &tags->breserved_tags;
->>> @@ -536,6 +539,7 @@ void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_tag_iter_fn *fn,
->>>    			bt_for_each(hctx, q, btags, fn, priv, false);
->>>    		}
->>>    	}
->>> +	srcu_read_unlock(&q->tag_set->tags_srcu, srcu_idx);
->>>    	blk_queue_exit(q);
->>>    }
->>> diff --git a/block/blk-mq.c b/block/blk-mq.c
->>> index 7b4ab8e398b6..43b15e58ffe1 100644
->>> --- a/block/blk-mq.c
->>> +++ b/block/blk-mq.c
->>> @@ -3415,7 +3415,6 @@ static void blk_mq_clear_rq_mapping(struct blk_mq_tags *drv_tags,
->>>    				    struct blk_mq_tags *tags)
->>>    {
->>>    	struct page *page;
->>> -	unsigned long flags;
->>>    	/*
->>>    	 * There is no need to clear mapping if driver tags is not initialized
->>> @@ -3439,15 +3438,6 @@ static void blk_mq_clear_rq_mapping(struct blk_mq_tags *drv_tags,
->>>    			}
->>>    		}
->>>    	}
->>> -
->>> -	/*
->>> -	 * Wait until all pending iteration is done.
->>> -	 *
->>> -	 * Request reference is cleared and it is guaranteed to be observed
->>> -	 * after the ->lock is released.
->>> -	 */
->>> -	spin_lock_irqsave(&drv_tags->lock, flags);
->>> -	spin_unlock_irqrestore(&drv_tags->lock, flags);
->>>    }
->>>    void blk_mq_free_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
->>> @@ -3670,8 +3660,12 @@ static bool blk_mq_hctx_has_requests(struct blk_mq_hw_ctx *hctx)
->>>    	struct rq_iter_data data = {
->>>    		.hctx	= hctx,
->>>    	};
->>> +	int srcu_idx;
->>> +	srcu_idx = srcu_read_lock(&hctx->queue->tag_set->tags_srcu);
->>>    	blk_mq_all_tag_iter(tags, blk_mq_has_request, &data);
->>> +	srcu_read_unlock(&hctx->queue->tag_set->tags_srcu, srcu_idx);
->>> +
->>>    	return data.has_rq;
->>>    }
->>> @@ -3891,7 +3885,6 @@ static void blk_mq_clear_flush_rq_mapping(struct blk_mq_tags *tags,
->>>    		unsigned int queue_depth, struct request *flush_rq)
->>>    {
->>>    	int i;
->>> -	unsigned long flags;
->>>    	/* The hw queue may not be mapped yet */
->>>    	if (!tags)
->>> @@ -3901,15 +3894,6 @@ static void blk_mq_clear_flush_rq_mapping(struct blk_mq_tags *tags,
->>>    	for (i = 0; i < queue_depth; i++)
->>>    		cmpxchg(&tags->rqs[i], flush_rq, NULL);
->>> -
->>> -	/*
->>> -	 * Wait until all pending iteration is done.
->>> -	 *
->>> -	 * Request reference is cleared and it is guaranteed to be observed
->>> -	 * after the ->lock is released.
->>> -	 */
->>> -	spin_lock_irqsave(&tags->lock, flags);
->>> -	spin_unlock_irqrestore(&tags->lock, flags);
->>>    }
->>>    static void blk_free_flush_queue_callback(struct rcu_head *head)
->>
->> While this looks good, I do wonder what happened to the 'fq' srcu.
->> Don't we need to insert an srcu_read_lock() when we're trying to
->> access it?
-> 
-> That is exactly the srcu read lock added in this patch.
-> 
+From: Pankaj Raghav <p.raghav@samsung.com>
 
-Ah, indeed. Misread the patch.
+There are many places in the kernel where we need to zeroout larger
+chunks but the maximum segment we can zeroout at a time by ZERO_PAGE
+is limited by PAGE_SIZE.
 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+This concern was raised during the review of adding Large Block Size support
+to XFS[2][3].
 
-Cheers,
+This is especially annoying in block devices and filesystems where we
+attach multiple ZERO_PAGEs to the bio in different bvecs. With multipage
+bvec support in block layer, it is much more efficient to send out
+larger zero pages as a part of a single bvec.
 
-Hannes
+Some examples of places in the kernel where this could be useful:
+- blkdev_issue_zero_pages()
+- iomap_dio_zero()
+- vmalloc.c:zero_iter()
+- rxperf_process_call()
+- fscrypt_zeroout_range_inline_crypt()
+- bch2_checksum_update()
+...
+
+Usually huge_zero_folio is allocated on demand, and it will be
+deallocated by the shrinker if there are no users of it left. At the moment,
+huge_zero_folio infrastructure refcount is tied to the process lifetime
+that created it. This might not work for bio layer as the completions
+can be async and the process that created the huge_zero_folio might no
+longer be alive. And, one of the main point that came during discussion
+is to have something bigger than zero page as a drop-in replacement.
+
+Add a config option STATIC_HUGE_ZERO_FOLIO that will always allocate
+the huge_zero_folio, and it will never drop the reference. This makes
+using the huge_zero_folio without having to pass any mm struct and does
+not tie the lifetime of the zero folio to anything, making it a drop-in
+replacement for ZERO_PAGE.
+
+I have converted blkdev_issue_zero_pages() as an example as a part of
+this series. I also noticed close to 4% performance improvement just by
+replacing ZERO_PAGE with static huge_zero_folio.
+
+I will send patches to individual subsystems using the huge_zero_folio
+once this gets upstreamed.
+
+Looking forward to some feedback.
+
+[1] https://lore.kernel.org/linux-mm/20250707142319.319642-1-kernel@pankajraghav.com/
+[2] https://lore.kernel.org/linux-xfs/20231027051847.GA7885@lst.de/
+[3] https://lore.kernel.org/linux-xfs/ZitIK5OnR7ZNY0IG@infradead.org/
+
+Changes since RFC v2:
+- Convert get_huge_zero_page and put_huge_zero_page to *_folio.
+- Convert MMF_HUGE_ZERO_PAGE to MMF_HUGE_ZERO_FOLIO.
+- Make the retry for huge_zero_folio from 2 to 1.
+- Add an extra sanity check in shrinker scan for static huge_zero_folio
+  case.
+
+Changes since v1:
+- Fixed all warnings.
+- Added a retry feature after a particular time.
+- Added Acked-by and Signed-off-by from David.
+
+Changes since last series[1]:
+- Instead of allocating a new page through memblock, use the same
+  infrastructure as huge_zero_folio but raise the reference and never
+  drop it. (David)
+- And some minor cleanups based on Lorenzo's feedback.
+
+Pankaj Raghav (5):
+  mm: rename huge_zero_page to huge_zero_folio
+  mm: rename MMF_HUGE_ZERO_PAGE to MMF_HUGE_ZERO_FOLIO
+  mm: add static huge zero folio
+  mm: add largest_zero_folio() routine
+  block: use largest_zero_folio in __blkdev_issue_zero_pages()
+
+ arch/x86/Kconfig         |  1 +
+ block/blk-lib.c          | 15 +++----
+ include/linux/huge_mm.h  | 35 ++++++++++++++++
+ include/linux/mm_types.h |  2 +-
+ mm/Kconfig               | 21 ++++++++++
+ mm/huge_memory.c         | 86 ++++++++++++++++++++++++++++++----------
+ 6 files changed, 131 insertions(+), 29 deletions(-)
+
+
+base-commit: df01d1162a83194a036f0d648ae41e6ad8adbe1a
 -- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+2.49.0
+
