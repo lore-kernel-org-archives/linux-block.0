@@ -1,75 +1,58 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D216925CC58;
-	Mon,  4 Aug 2025 12:44:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1B1F38D;
+	Mon,  4 Aug 2025 13:00:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754311473; cv=none; b=A4FcNvSXiqS3zPIaSOaRchkNJVWlOSj+FGdWcCx9AvBP7U+zJm0ZaOcymg4pQIa+RvxzNy1XvVDnfWxcJ0wShOw3mxMJLGyk1sn+5iV9k4aXQrC/wQwp/NxMpa7Kdmkn58FxbmsEe7yVNRT2XBNbOw10s/EQfVxhKhsZ6Ki4t6M=
+	t=1754312457; cv=none; b=ATmRuTRRCO/bWleB1HeFjNMFWke7i8ONGjGl8qPmRp5KPBTB4oqI/c7nyEap/fLFiytjUQ4tOolKJtrgM3zY1iN5dL3G0OvXpQwmtlWGO2+ubljAeEuYgIdIHvBXHm4lYrKNrNaaNWc2FJB6DtByUQ6SaVWhKsHbo09acvsW+CQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754311473; c=relaxed/simple;
-	bh=Aje2MY5jLtJJ+XC6L21HodqK1MreNzlcX3KM+Qptt24=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jZ7FgbWb/jBl5cBigfrNN5DB66Jna5hzxtW4tCDMIIfv7Jfl1QfRDksP1UBJzhBDYekKGA1MskTDINatba5gutgzhAO17bMf19jlVJqRt5J7Bl85K7YGWYCK4oVYeNz90E5sQSUfPksJYAdgjuP0jY8/JpBN9357EEL3rsrGVmM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D+O9BFW9; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1754312457; c=relaxed/simple;
+	bh=L+bDZNrpRD6+NWnAqrJEaGTijfdyb7IbO9utRG6Adzo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fs3M7VRVuD7ssved1PbfzxszsrazZ1P2MVB3H7MF5zlQkMY47CvU+yKGmVUg/u8g2EMfWLhHhFgt6970qlE9ywxkIJSYPlRekurd2SnwauOIZURLZ2yUIgAixtp60l8jcOupbc0Syy/o959Kx0JDYuYUDtmwc9S+XEX1FGK4DFI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=snB5SB/e; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D+O9BFW9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DBBA4C4CEE7;
-	Mon,  4 Aug 2025 12:44:31 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="snB5SB/e"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4D16C4CEE7;
+	Mon,  4 Aug 2025 13:00:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754311472;
-	bh=Aje2MY5jLtJJ+XC6L21HodqK1MreNzlcX3KM+Qptt24=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=D+O9BFW9G3EUN02UNr+9W1wRCdRDfRkf0x3nKVoSKF3qgFSYQkjSJdutDyO+/GaXc
-	 LGLcj33SDyJqVULCEM37MXdFVYsGALxSAZY0nHbzSQZTnFerxjcv8C6TboBXWH4naX
-	 6ZVZnkDzbfO3eKo22J8zcBZLzmo4T9kxSkmi7f07Z+UGaRwrQIMopajJOg4vYfLx6+
-	 jnSQUAfHfWhVCjNaPp3bPAtogKMoVHj2Hvn4dfigZthAzfffhOXJp1Yoe3nvVjUnC/
-	 ShnNJR9ewOfC+QlOtWiwtM5Xx2GVbLWurX258r+SmOzIeAJTmd4uYs98RHNcdlwqdj
-	 Y4q80UzvzmD6g==
+	s=k20201202; t=1754312456;
+	bh=L+bDZNrpRD6+NWnAqrJEaGTijfdyb7IbO9utRG6Adzo=;
+	h=From:To:Cc:Subject:Date:From;
+	b=snB5SB/ehi27xLbb8aXhBb2ZiyhJ9e2m9WSnuYjDNUxyhSq9Re9sx8WnUosm/3yxL
+	 SN+3fMWL37eSzIUuNZEpqvSRbpU4PmQ9ZQZ/z/4VzZJKU+kN7HvBN/F1h/BSrkWO4H
+	 eehopP6+SZUepq07StYSJKXP/s6hK7iUlUNz/zLE1wzKs99j9fG2ZEivbECfeIUph9
+	 mrTs+HP3dr/zmRQ7l+QB7kp63HpOLpvFMfwujRo8eiMA/fuNXqD90jHbTmSImsSBka
+	 U9Vy29jyCkt6W0MVTKUgd+gmftF40ONXFbnqj01gMf7pyAukD8MzMoYkOvBk/LgfIf
+	 0LjjJU3m+NNxQ==
 From: Leon Romanovsky <leon@kernel.org>
-To: Marek Szyprowski <m.szyprowski@samsung.com>
-Cc: Leon Romanovsky <leonro@nvidia.com>,
-	Jason Gunthorpe <jgg@nvidia.com>,
-	Abdiel Janulgue <abdiel.janulgue@gmail.com>,
-	Alexander Potapenko <glider@google.com>,
-	Alex Gaynor <alex.gaynor@gmail.com>,
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Jason Gunthorpe <jgg@nvidia.com>,
 	Andrew Morton <akpm@linux-foundation.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	=?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
 	Christoph Hellwig <hch@lst.de>,
-	Danilo Krummrich <dakr@kernel.org>,
+	dri-devel@lists.freedesktop.org,
 	iommu@lists.linux.dev,
-	Jason Wang <jasowang@redhat.com>,
 	Jens Axboe <axboe@kernel.dk>,
 	Joerg Roedel <joro@8bytes.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Juergen Gross <jgross@suse.com>,
-	kasan-dev@googlegroups.com,
-	Keith Busch <kbusch@kernel.org>,
+	kvm@vger.kernel.org,
+	linaro-mm-sig@lists.linaro.org,
 	linux-block@vger.kernel.org,
-	linux-doc@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
+	linux-media@vger.kernel.org,
 	linux-mm@kvack.org,
-	linux-nvme@lists.infradead.org,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-trace-kernel@vger.kernel.org,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Miguel Ojeda <ojeda@kernel.org>,
+	linux-pci@vger.kernel.org,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
 	Robin Murphy <robin.murphy@arm.com>,
-	rust-for-linux@vger.kernel.org,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Stefano Stabellini <sstabellini@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	virtualization@lists.linux.dev,
-	Will Deacon <will@kernel.org>,
-	xen-devel@lists.xenproject.org
-Subject: [PATCH v1 15/16] block-dma: properly take MMIO path
-Date: Mon,  4 Aug 2025 15:42:49 +0300
-Message-ID: <d9b092cde0f42bc6a8a1cb36ffee3478c46a3599.1754292567.git.leon@kernel.org>
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Vivek Kasireddy <vivek.kasireddy@intel.com>,
+	Will Deacon <will@kernel.org>
+Subject: [PATCH v1 00/10] vfio/pci: Allow MMIO regions to be exported through dma-buf
+Date: Mon,  4 Aug 2025 16:00:35 +0300
+Message-ID: <cover.1754311439.git.leon@kernel.org>
 X-Mailer: git-send-email 2.50.1
-In-Reply-To: <cover.1754292567.git.leon@kernel.org>
-References: <cover.1754292567.git.leon@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -78,106 +61,97 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Leon Romanovsky <leonro@nvidia.com>
+Changelog:
+v1:
+ * Changed commit messages.
+ * Reused DMA_ATTR_MMIO attribute.
+ * Returned support for multiple DMA ranges per-dMABUF.
+v0: https://lore.kernel.org/all/cover.1753274085.git.leonro@nvidia.com
 
-Make sure that CPU is not synced and IOMMU is configured to take
-MMIO path by providing newly introduced DMA_ATTR_MMIO attribute.
+---------------------------------------------------------------------------
+Based on "[PATCH v1 00/16] dma-mapping: migrate to physical address-based API"
+https://lore.kernel.org/all/cover.1754292567.git.leon@kernel.org series.
+---------------------------------------------------------------------------
 
-Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
----
- block/blk-mq-dma.c         | 13 +++++++++++--
- include/linux/blk-mq-dma.h |  6 +++++-
- include/linux/blk_types.h  |  2 ++
- 3 files changed, 18 insertions(+), 3 deletions(-)
+This series extends the VFIO PCI subsystem to support exporting MMIO regions
+from PCI device BARs as dma-buf objects, enabling safe sharing of non-struct
+page memory with controlled lifetime management. This allows RDMA and other
+subsystems to import dma-buf FDs and build them into memory regions for PCI
+P2P operations.
 
-diff --git a/block/blk-mq-dma.c b/block/blk-mq-dma.c
-index 37e2142be4f7d..d415088ed9fd2 100644
---- a/block/blk-mq-dma.c
-+++ b/block/blk-mq-dma.c
-@@ -87,8 +87,13 @@ static bool blk_dma_map_bus(struct blk_dma_iter *iter, struct phys_vec *vec)
- static bool blk_dma_map_direct(struct request *req, struct device *dma_dev,
- 		struct blk_dma_iter *iter, struct phys_vec *vec)
- {
-+	unsigned int attrs = 0;
-+
-+	if (req->cmd_flags & REQ_MMIO)
-+		attrs = DMA_ATTR_MMIO;
-+
- 	iter->addr = dma_map_phys(dma_dev, vec->paddr, vec->len,
--			rq_dma_dir(req), 0);
-+			rq_dma_dir(req), attrs);
- 	if (dma_mapping_error(dma_dev, iter->addr)) {
- 		iter->status = BLK_STS_RESOURCE;
- 		return false;
-@@ -103,14 +108,17 @@ static bool blk_rq_dma_map_iova(struct request *req, struct device *dma_dev,
- {
- 	enum dma_data_direction dir = rq_dma_dir(req);
- 	unsigned int mapped = 0;
-+	unsigned int attrs = 0;
- 	int error;
- 
- 	iter->addr = state->addr;
- 	iter->len = dma_iova_size(state);
-+	if (req->cmd_flags & REQ_MMIO)
-+		attrs = DMA_ATTR_MMIO;
- 
- 	do {
- 		error = dma_iova_link(dma_dev, state, vec->paddr, mapped,
--				vec->len, dir, 0);
-+				vec->len, dir, attrs);
- 		if (error)
- 			break;
- 		mapped += vec->len;
-@@ -176,6 +184,7 @@ bool blk_rq_dma_map_iter_start(struct request *req, struct device *dma_dev,
- 			 * same as non-P2P transfers below and during unmap.
- 			 */
- 			req->cmd_flags &= ~REQ_P2PDMA;
-+			req->cmd_flags |= REQ_MMIO;
- 			break;
- 		default:
- 			iter->status = BLK_STS_INVAL;
-diff --git a/include/linux/blk-mq-dma.h b/include/linux/blk-mq-dma.h
-index c26a01aeae006..6c55f5e585116 100644
---- a/include/linux/blk-mq-dma.h
-+++ b/include/linux/blk-mq-dma.h
-@@ -48,12 +48,16 @@ static inline bool blk_rq_dma_map_coalesce(struct dma_iova_state *state)
- static inline bool blk_rq_dma_unmap(struct request *req, struct device *dma_dev,
- 		struct dma_iova_state *state, size_t mapped_len)
- {
-+	unsigned int attrs = 0;
-+
- 	if (req->cmd_flags & REQ_P2PDMA)
- 		return true;
- 
- 	if (dma_use_iova(state)) {
-+		if (req->cmd_flags & REQ_MMIO)
-+			attrs = DMA_ATTR_MMIO;
- 		dma_iova_destroy(dma_dev, state, mapped_len, rq_dma_dir(req),
--				 0);
-+				 attrs);
- 		return true;
- 	}
- 
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 09b99d52fd365..283058bcb5b14 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -387,6 +387,7 @@ enum req_flag_bits {
- 	__REQ_FS_PRIVATE,	/* for file system (submitter) use */
- 	__REQ_ATOMIC,		/* for atomic write operations */
- 	__REQ_P2PDMA,		/* contains P2P DMA pages */
-+	__REQ_MMIO,		/* contains MMIO memory */
- 	/*
- 	 * Command specific flags, keep last:
- 	 */
-@@ -420,6 +421,7 @@ enum req_flag_bits {
- #define REQ_FS_PRIVATE	(__force blk_opf_t)(1ULL << __REQ_FS_PRIVATE)
- #define REQ_ATOMIC	(__force blk_opf_t)(1ULL << __REQ_ATOMIC)
- #define REQ_P2PDMA	(__force blk_opf_t)(1ULL << __REQ_P2PDMA)
-+#define REQ_MMIO	(__force blk_opf_t)(1ULL << __REQ_MMIO)
- 
- #define REQ_NOUNMAP	(__force blk_opf_t)(1ULL << __REQ_NOUNMAP)
- 
+The series supports a use case for SPDK where a NVMe device will be owned
+by SPDK through VFIO but interacting with a RDMA device. The RDMA device
+may directly access the NVMe CMB or directly manipulate the NVMe device's
+doorbell using PCI P2P.
+
+However, as a general mechanism, it can support many other scenarios with
+VFIO. This dmabuf approach can be usable by iommufd as well for generic
+and safe P2P mappings.
+
+In addition to the SPDK use-case mentioned above, the capability added
+in this patch series can also be useful when a buffer (located in device
+memory such as VRAM) needs to be shared between any two dGPU devices or
+instances (assuming one of them is bound to VFIO PCI) as long as they
+are P2P DMA compatible.
+
+The implementation provides a revocable attachment mechanism using dma-buf
+move operations. MMIO regions are normally pinned as BARs don't change
+physical addresses, but access is revoked when the VFIO device is closed
+or a PCI reset is issued. This ensures kernel self-defense against
+potentially hostile userspace.
+
+The series includes significant refactoring of the PCI P2PDMA subsystem
+to separate core P2P functionality from memory allocation features,
+making it more modular and suitable for VFIO use cases that don't need
+struct page support.
+
+-----------------------------------------------------------------------
+The series is based originally on
+https://lore.kernel.org/all/20250307052248.405803-1-vivek.kasireddy@intel.com/
+but heavily rewritten to be based on DMA physical API.
+-----------------------------------------------------------------------
+The WIP branch can be found here:
+https://git.kernel.org/pub/scm/linux/kernel/git/leon/linux-rdma.git/log/?h=dmabuf-vfio-v1
+
+Thanks
+
+Leon Romanovsky (8):
+  PCI/P2PDMA: Remove redundant bus_offset from map state
+  PCI/P2PDMA: Separate the mmap() support from the core logic
+  PCI/P2PDMA: Simplify bus address mapping API
+  PCI/P2PDMA: Refactor to separate core P2P functionality from memory
+    allocation
+  PCI/P2PDMA: Export pci_p2pdma_map_type() function
+  types: move phys_vec definition to common header
+  vfio/pci: Enable peer-to-peer DMA transactions by default
+  vfio/pci: Add dma-buf export support for MMIO regions
+
+Vivek Kasireddy (2):
+  vfio: Export vfio device get and put registration helpers
+  vfio/pci: Share the core device pointer while invoking feature
+    functions
+
+ block/blk-mq-dma.c                 |   7 +-
+ drivers/iommu/dma-iommu.c          |   4 +-
+ drivers/pci/p2pdma.c               | 154 ++++++++----
+ drivers/vfio/pci/Kconfig           |  20 ++
+ drivers/vfio/pci/Makefile          |   2 +
+ drivers/vfio/pci/vfio_pci_config.c |  22 +-
+ drivers/vfio/pci/vfio_pci_core.c   |  59 +++--
+ drivers/vfio/pci/vfio_pci_dmabuf.c | 390 +++++++++++++++++++++++++++++
+ drivers/vfio/pci/vfio_pci_priv.h   |  23 ++
+ drivers/vfio/vfio_main.c           |   2 +
+ include/linux/dma-buf.h            |   1 +
+ include/linux/pci-p2pdma.h         | 114 +++++----
+ include/linux/types.h              |   5 +
+ include/linux/vfio.h               |   2 +
+ include/linux/vfio_pci_core.h      |   4 +
+ include/uapi/linux/vfio.h          |  25 ++
+ kernel/dma/direct.c                |   4 +-
+ mm/hmm.c                           |   2 +-
+ 18 files changed, 715 insertions(+), 125 deletions(-)
+ create mode 100644 drivers/vfio/pci/vfio_pci_dmabuf.c
+
 -- 
 2.50.1
 
