@@ -1,220 +1,138 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 166A9204090;
-	Sun,  3 Aug 2025 21:20:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD5834C8F;
+	Mon,  4 Aug 2025 00:47:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754256059; cv=none; b=QH8W1zJM9gydjp+sl+Bi8lI79wD06CF13ZISF8nUk5F7M3ccdkkF2ymtGs5qBGZ/J/ufvieTYA7tCOhaqWk/vxx74y9y+g4E8wHWeXh5wSmZ27o/5pTLImAeY3tGvv6LH5pgh/hsm/UW63tYToX6m01ZO9kVnidg1f3UvI88I0s=
+	t=1754268454; cv=none; b=XAPHzKklY5ohZGy3FKTbNK/5hXxdRG5a5m2Hf2PsFJ9KaKU+9gEw093eMnHSYigg5E5WI1ArdhZ1pbIW32/rnufBjA0P+nIkZS/jIjujW6JMLyTUo0UJ86fJgqCFagVu70xjbnS2+9iJ+QaY+d5kM30ok3Qj/J5kX8IJvaLPhUQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754256059; c=relaxed/simple;
-	bh=viDu2b2CYPIvGoB2Lu6XkE5fMl4FtaT3CL0xDD9G23w=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=A6RF8TM0ZzsV+ssSis1uSH5urgCBodkaUS2ZpRUQ+uimPcYPTWUjvr5u+GtMOhAqjArgLE3keZjt2wtLdZIyBhBom44I4Gysy9RpnV/+gKfRMnIi33X1sHA/sPwRtHmVFlj2LfCTjvyD8QKNs5Ni+E3YuOK1xIK1wQqnPPbPsgs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jNxwY+nq; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jNxwY+nq"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71255C4CEFA;
-	Sun,  3 Aug 2025 21:20:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754256059;
-	bh=viDu2b2CYPIvGoB2Lu6XkE5fMl4FtaT3CL0xDD9G23w=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=jNxwY+nqboDFrFhK17eLwS6hye28x8Pmt+fdB+O30/XXF6P8t+zsyi1bj5RAKMPg/
-	 be6wJWniKkhpBSr0HRtgViAw6rnt+BTdBY+msg1gQOJs0MyC2vX+Zto7OaZsgYzN/z
-	 YX4UsOXniTTit7JtMRV8Jnn6j48cOCueLSc96Lk9nkFES3z+I6l9PHG/XGyaq8NCbY
-	 avhENEF5kEk+bT3srFlME4NBLbPqx7hCNAh76vDdp0LMandCbvl64YFVEUlMLeUo59
-	 e79MvgnMQVnsiDlp2f8/Qv+rJqzQE0Wey63wXsvTRo7pIkm6VoLotxRCZAt2O+Y+8i
-	 jGEunWT0lKykA==
-From: Sasha Levin <sashal@kernel.org>
-To: patches@lists.linux.dev,
-	stable@vger.kernel.org
-Cc: Jan Kara <jack@suse.cz>,
-	syzbot+01ef7a8da81a975e1ccd@syzkaller.appspotmail.com,
-	Jens Axboe <axboe@kernel.dk>,
-	Sasha Levin <sashal@kernel.org>,
-	linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 11/23] loop: Avoid updating block size under exclusive owner
-Date: Sun,  3 Aug 2025 17:20:18 -0400
-Message-Id: <20250803212031.3547641-11-sashal@kernel.org>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250803212031.3547641-1-sashal@kernel.org>
-References: <20250803212031.3547641-1-sashal@kernel.org>
+	s=arc-20240116; t=1754268454; c=relaxed/simple;
+	bh=+/W9CYW0Yh+ewesGTTpIaOLJacb/3YZsvGB7zJPqPJ8=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=sCvqyMM2rSLjqkK6VjKjOl87y1zuEnO05kkkNe4to+lLIvmmiNYe9VcErgv3fAdmRBLfZ/QSsSn8+AT8rONSeM/Ee1q2Ygy6hkAaK1yqE0oZOgLSNHv1TC8bhR2fbtM6HyS1zEsG3BKk+39jqFW8Znb21R8ARAevzRNSuHiUpTY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4bwHvZ5rHfzKHMrx;
+	Mon,  4 Aug 2025 08:47:22 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id C9B411A0A26;
+	Mon,  4 Aug 2025 08:47:21 +0800 (CST)
+Received: from [10.174.179.143] (unknown [10.174.179.143])
+	by APP4 (Coremail) with SMTP id gCh0CgBHERIYA5BouVP1CQ--.49366S3;
+	Mon, 04 Aug 2025 08:47:21 +0800 (CST)
+Subject: Re: [PATCH] block, bfq: Reorder struct bfq_iocq_bfqq_data
+To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+ Jens Axboe <axboe@kernel.dk>
+Cc: linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
+ linux-block@vger.kernel.org, "yukuai (C)" <yukuai3@huawei.com>
+References: <79394db1befaa658e8066b8e3348073ce27d9d26.1754119538.git.christophe.jaillet@wanadoo.fr>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <ac0e993a-3e6d-6616-ce6c-03f0aa2429da@huaweicloud.com>
+Date: Mon, 4 Aug 2025 08:47:20 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.6.101
+In-Reply-To: <79394db1befaa658e8066b8e3348073ce27d9d26.1754119538.git.christophe.jaillet@wanadoo.fr>
+Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgBHERIYA5BouVP1CQ--.49366S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7tr45XFy3uw1UXF15CFyUJrb_yoW8tr17pa
+	n3Kw4j9FW8tw13Kr18ua1DXr93twnxXry7KFsrXryYyw1UGFnF9rn0ka4FvFy29rWkCFnr
+	ZFyj9FyDWrsrKaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUkKb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
+	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
+	x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
+	0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AK
+	xVWUAVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F4
+	0E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1l
+	IxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxV
+	AFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j
+	6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU1veHD
+	UUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-From: Jan Kara <jack@suse.cz>
+ÔÚ 2025/08/02 15:25, Christophe JAILLET Ð´µÀ:
+> The size of struct bfq_iocq_bfqq_data can be reduced by moving a few fields
+> around.
+> 
+> On a x86_64, with allmodconfig, this shrinks the size from 144 to 128
+> bytes.
+> The main benefit is to reduce the size of struct bfq_io_cq from 1360 to
+> 1232.
+> 
+> This structure is stored in a dedicated slab cache. So reducing its size
+> improves cache usage.
+> 
+> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+> ---
+> Compile tested only.
+> 
+> On my system, struct bfq_io_cq are stored in 8 pages slab. Each of these
+> slabs hold 24 entries.
+> 
+> $ sudo cat /proc/slabinfo | grep bfq_io
+> bfq_io_cq            378    384   1360   24    8 : tunables    0    0    0 : slabdata     16     16      0
+> 
+> With the new layout, we should store 26 entries.
+> (8 * 4096 / 1232 = 26.60)
+> ---
+>   block/bfq-iosched.h | 10 +++++-----
+>   1 file changed, 5 insertions(+), 5 deletions(-)
+> 
 
-[ Upstream commit 7e49538288e523427beedd26993d446afef1a6fb ]
+LGTM
+Reviewed-by: Yu Kuai <yukuai3@huawei.com>
 
-Syzbot came up with a reproducer where a loop device block size is
-changed underneath a mounted filesystem. This causes a mismatch between
-the block device block size and the block size stored in the superblock
-causing confusion in various places such as fs/buffer.c. The particular
-issue triggered by syzbot was a warning in __getblk_slow() due to
-requested buffer size not matching block device block size.
-
-Fix the problem by getting exclusive hold of the loop device to change
-its block size. This fails if somebody (such as filesystem) has already
-an exclusive ownership of the block device and thus prevents modifying
-the loop device under some exclusive owner which doesn't expect it.
-
-Reported-by: syzbot+01ef7a8da81a975e1ccd@syzkaller.appspotmail.com
-Signed-off-by: Jan Kara <jack@suse.cz>
-Tested-by: syzbot+01ef7a8da81a975e1ccd@syzkaller.appspotmail.com
-Link: https://lore.kernel.org/r/20250711163202.19623-2-jack@suse.cz
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
-
-LLM Generated explanations, may be completely bogus:
-
-**Backport Status: YES**
-
-This commit is a strong candidate for stable backporting based on the
-following analysis:
-
-1. **Fixes a Real User-Impacting Bug**: The commit addresses a syzbot-
-   reported issue where changing a loop device's block size while it's
-   mounted can cause filesystem corruption and warnings. The specific
-   issue is a warning in `__getblk_slow()` in fs/buffer.c due to
-   mismatched buffer and block device sizes.
-
-2. **Security and Data Integrity Issue**: This bug can lead to
-   filesystem corruption when the block size is changed underneath a
-   mounted filesystem, which is a serious data integrity concern that
-   affects users in production environments.
-
-3. **Small and Contained Fix**: The changes are limited to the loop
-   driver (drivers/block/loop.c) and specifically to the
-   `loop_set_block_size()` function. The fix adds proper exclusive
-   ownership checks before allowing block size changes.
-
-4. **Clear Fix Strategy**: The solution is straightforward - it uses
-   existing kernel mechanisms (`bd_prepare_to_claim()` and
-   `bd_abort_claiming()`) to ensure exclusive access before modifying
-   the block size. This prevents concurrent modifications when the
-   device is already exclusively owned (e.g., by a mounted filesystem).
-
-5. **Minimal Risk of Regression**: The change only affects the
-   LOOP_SET_BLOCK_SIZE ioctl path and adds additional safety checks. It
-   doesn't modify the core functionality but rather adds protection
-   against an unsafe operation.
-
-6. **Follows Stable Rules**: The commit:
-   - Fixes a real bug (filesystem corruption/warnings)
-   - Is small and self-contained
-   - Has been tested (confirmed by syzbot)
-   - Doesn't introduce new features
-   - Has minimal performance impact
-
-The key code changes show the fix properly handles the exclusive
-ownership by:
-- Checking if the caller already has exclusive access (`!(mode &
-  BLK_OPEN_EXCL)`)
-- If not, attempting to claim exclusive access via
-  `bd_prepare_to_claim()`
-- Properly releasing the claim with `bd_abort_claiming()` if the
-  operation completes without exclusive mode
-- Moving the operation out of `lo_simple_ioctl()` to handle the block
-  device parameter
-
-This is exactly the type of bug fix that stable kernels should receive -
-it prevents data corruption with minimal code changes and low regression
-risk.
-
- drivers/block/loop.c | 38 ++++++++++++++++++++++++++++++--------
- 1 file changed, 30 insertions(+), 8 deletions(-)
-
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 455e2a2b149f..ed004e1610dd 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -1472,19 +1472,36 @@ static int loop_set_dio(struct loop_device *lo, unsigned long arg)
- 	return error;
- }
- 
--static int loop_set_block_size(struct loop_device *lo, unsigned long arg)
-+static int loop_set_block_size(struct loop_device *lo, blk_mode_t mode,
-+			       struct block_device *bdev, unsigned long arg)
- {
- 	int err = 0;
- 
--	if (lo->lo_state != Lo_bound)
--		return -ENXIO;
-+	/*
-+	 * If we don't hold exclusive handle for the device, upgrade to it
-+	 * here to avoid changing device under exclusive owner.
-+	 */
-+	if (!(mode & BLK_OPEN_EXCL)) {
-+		err = bd_prepare_to_claim(bdev, loop_set_block_size, NULL);
-+		if (err)
-+			return err;
-+	}
-+
-+	err = mutex_lock_killable(&lo->lo_mutex);
-+	if (err)
-+		goto abort_claim;
-+
-+	if (lo->lo_state != Lo_bound) {
-+		err = -ENXIO;
-+		goto unlock;
-+	}
- 
- 	err = blk_validate_block_size(arg);
- 	if (err)
- 		return err;
- 
- 	if (lo->lo_queue->limits.logical_block_size == arg)
--		return 0;
-+		goto unlock;
- 
- 	sync_blockdev(lo->lo_device);
- 	invalidate_bdev(lo->lo_device);
-@@ -1496,6 +1513,11 @@ static int loop_set_block_size(struct loop_device *lo, unsigned long arg)
- 	loop_update_dio(lo);
- 	blk_mq_unfreeze_queue(lo->lo_queue);
- 
-+unlock:
-+	mutex_unlock(&lo->lo_mutex);
-+abort_claim:
-+	if (!(mode & BLK_OPEN_EXCL))
-+		bd_abort_claiming(bdev, loop_set_block_size);
- 	return err;
- }
- 
-@@ -1514,9 +1536,6 @@ static int lo_simple_ioctl(struct loop_device *lo, unsigned int cmd,
- 	case LOOP_SET_DIRECT_IO:
- 		err = loop_set_dio(lo, arg);
- 		break;
--	case LOOP_SET_BLOCK_SIZE:
--		err = loop_set_block_size(lo, arg);
--		break;
- 	default:
- 		err = -EINVAL;
- 	}
-@@ -1571,9 +1590,12 @@ static int lo_ioctl(struct block_device *bdev, blk_mode_t mode,
- 		break;
- 	case LOOP_GET_STATUS64:
- 		return loop_get_status64(lo, argp);
-+	case LOOP_SET_BLOCK_SIZE:
-+		if (!(mode & BLK_OPEN_WRITE) && !capable(CAP_SYS_ADMIN))
-+			return -EPERM;
-+		return loop_set_block_size(lo, mode, bdev, arg);
- 	case LOOP_SET_CAPACITY:
- 	case LOOP_SET_DIRECT_IO:
--	case LOOP_SET_BLOCK_SIZE:
- 		if (!(mode & BLK_OPEN_WRITE) && !capable(CAP_SYS_ADMIN))
- 			return -EPERM;
- 		fallthrough;
--- 
-2.39.5
+> diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
+> index 687a3a7ba784..0b4704932d72 100644
+> --- a/block/bfq-iosched.h
+> +++ b/block/bfq-iosched.h
+> @@ -427,9 +427,6 @@ struct bfq_iocq_bfqq_data {
+>   	 */
+>   	bool saved_IO_bound;
+>   
+> -	u64 saved_io_start_time;
+> -	u64 saved_tot_idle_time;
+> -
+>   	/*
+>   	 * Same purpose as the previous fields for the values of the
+>   	 * field keeping the queue's belonging to a large burst
+> @@ -450,6 +447,9 @@ struct bfq_iocq_bfqq_data {
+>   	 */
+>   	unsigned int saved_weight;
+>   
+> +	u64 saved_io_start_time;
+> +	u64 saved_tot_idle_time;
+> +
+>   	/*
+>   	 * Similar to previous fields: save wr information.
+>   	 */
+> @@ -457,13 +457,13 @@ struct bfq_iocq_bfqq_data {
+>   	unsigned long saved_last_wr_start_finish;
+>   	unsigned long saved_service_from_wr;
+>   	unsigned long saved_wr_start_at_switch_to_srt;
+> -	unsigned int saved_wr_cur_max_time;
+>   	struct bfq_ttime saved_ttime;
+> +	unsigned int saved_wr_cur_max_time;
+>   
+>   	/* Save also injection state */
+> -	u64 saved_last_serv_time_ns;
+>   	unsigned int saved_inject_limit;
+>   	unsigned long saved_decrease_time_jif;
+> +	u64 saved_last_serv_time_ns;
+>   
+>   	/* candidate queue for a stable merge (due to close creation time) */
+>   	struct bfq_queue *stable_merge_bfqq;
+> 
 
