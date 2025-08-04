@@ -1,294 +1,165 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FA5D8F4A
-	for <linux-block@vger.kernel.org>; Mon,  4 Aug 2025 07:13:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFDEB239086;
+	Mon,  4 Aug 2025 07:38:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754291593; cv=none; b=gJHxVfMWr2b9+VTabZIbmHZm2lMZa2Ygn2GbRNZZja1Oobsb4e0CrIFv/IeBSs950IGjA7h4vpJABmhSbPIWCkMLf/F8FH04Excm/8leC+PgdW38paE98hWKY3JmCvWV8009CkVbISiFC/eWNEae7iw26//GV8J4WMwRbrGzinU=
+	t=1754293107; cv=none; b=M5VtfeUe7bVQoV4cnZgp0wZnUYvnjGNCF8PSRVCZXUf9dTKFx5bHPUysV5HQdicGjEyHx2w4u0xbRIWkipPT8s6IOt1Pj3fdcl0OWQRJNdc/Z9lDBD7gxfAKxEXhMJpssq+BKDuhlU993z6qBBTbfXJYvYxeeoCveG2FLdkuulU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754291593; c=relaxed/simple;
-	bh=Y2jcDDGPpXhb+etvrqDfIrtFYWOKQ2XdKFZ7/0SM+o4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=d/UCfrtsUzd3r/Rg7AfbOqzkAhBlqozapyrRjruwGsSk1mNlXSYj1dThrRlIFN8Gs/w1aDRVnIMC+1exfjT07owSKpnbw7+54D7mlo+RPUsYRZt6k8T+hf++6fJG7JJrdNCvkq85zieJbBepGYQWxjAtO8c7FM/gP4JcITS0YTk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=bQ7xaq0R; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=YxSQYa4x; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=bQ7xaq0R; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=YxSQYa4x; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="bQ7xaq0R";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="YxSQYa4x";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="bQ7xaq0R";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="YxSQYa4x"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 995921F443;
-	Mon,  4 Aug 2025 07:13:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1754291589; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=l6LmZ5rw6fXFp43lSmbzKCWs32p3Z1C7P4QCkgaUi4E=;
-	b=bQ7xaq0Rza0jgq6DNMqVUieBG6G037xl1Q1DIAgI6A2cekGXoD+4OciWBQOnq4sofpPID7
-	k7q6S+2fEL4TfVwDPePdXiic54yOAMEvpJyLFi2PqrrrDlZTaUERuyUmxJXb3ektHGRV6q
-	TtQ4w9OKYZAym+dl4ervFuayzDBfcgg=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1754291589;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=l6LmZ5rw6fXFp43lSmbzKCWs32p3Z1C7P4QCkgaUi4E=;
-	b=YxSQYa4x5AjVi3b4SHSl8UWvak5g3qeJ4YQRT1ZBOnp0rMCckOhXCEBvFZjisq2nRKPf9r
-	XDFXEhOPNUmcyKBQ==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=bQ7xaq0R;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=YxSQYa4x
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1754291589; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=l6LmZ5rw6fXFp43lSmbzKCWs32p3Z1C7P4QCkgaUi4E=;
-	b=bQ7xaq0Rza0jgq6DNMqVUieBG6G037xl1Q1DIAgI6A2cekGXoD+4OciWBQOnq4sofpPID7
-	k7q6S+2fEL4TfVwDPePdXiic54yOAMEvpJyLFi2PqrrrDlZTaUERuyUmxJXb3ektHGRV6q
-	TtQ4w9OKYZAym+dl4ervFuayzDBfcgg=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1754291589;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=l6LmZ5rw6fXFp43lSmbzKCWs32p3Z1C7P4QCkgaUi4E=;
-	b=YxSQYa4x5AjVi3b4SHSl8UWvak5g3qeJ4YQRT1ZBOnp0rMCckOhXCEBvFZjisq2nRKPf9r
-	XDFXEhOPNUmcyKBQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 59E7E13A7E;
-	Mon,  4 Aug 2025 07:13:09 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 6sIhFIVdkGgLVgAAD6G6ig
-	(envelope-from <hare@suse.de>); Mon, 04 Aug 2025 07:13:09 +0000
-Message-ID: <028ba177-da0c-465e-ab34-ec18039395e8@suse.de>
-Date: Mon, 4 Aug 2025 09:13:08 +0200
+	s=arc-20240116; t=1754293107; c=relaxed/simple;
+	bh=yMJkuWx7IPtk3aMt74ArgnutRpKX8Fl2ge2xGdoEmBI=;
+	h=Subject:To:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=mz76h+vGU5a9iqleHPTKXh7FW/dVPBjHK3qX6xjOzf8lY9Rg+XpvPhWgqXRDzzWhYPeH0zOxHQeJ0sHvjpRbJEwDvL298NPGMHMKEjz9VwyO4PhClG1QI3Pyof+V/6JaBvH+Xr0BGN9uY8N2dY4mmow9QIHMN106hH72shdqaPs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4bwT1p4df9zYQvHX;
+	Mon,  4 Aug 2025 15:38:22 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 4E1F91A0DEF;
+	Mon,  4 Aug 2025 15:38:21 +0800 (CST)
+Received: from [10.174.179.143] (unknown [10.174.179.143])
+	by APP4 (Coremail) with SMTP id gCh0CgBn4hJoY5BoogMWCg--.25925S3;
+	Mon, 04 Aug 2025 15:38:17 +0800 (CST)
+Subject: Re: [syzbot] [block?] WARNING: ODEBUG bug in disk_release
+To: syzbot <syzbot+1fe2f3ddc7f8f83fb196@syzkaller.appspotmail.com>,
+ axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ syzkaller-bugs@googlegroups.com, "yukuai (C)" <yukuai3@huawei.com>
+References: <688d8708.050a0220.f0410.0135.GAE@google.com>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <5a2f36d8-763d-68fe-1687-fe1a4854df34@huaweicloud.com>
+Date: Mon, 4 Aug 2025 15:38:16 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 5/5] blk-mq: Replace tags->lock with SRCU for tag
- iterators
-To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
- linux-block@vger.kernel.org
-Cc: Yu Kuai <yukuai3@huawei.com>, John Garry <john.garry@huawei.com>,
- Sathya Prakash Veerichetty <sathya.prakash@broadcom.com>
-References: <20250801114440.722286-1-ming.lei@redhat.com>
- <20250801114440.722286-6-ming.lei@redhat.com>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20250801114440.722286-6-ming.lei@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+In-Reply-To: <688d8708.050a0220.f0410.0135.GAE@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Level: 
-X-Spam-Flag: NO
-X-Rspamd-Queue-Id: 995921F443
-X-Rspamd-Action: no action
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Spamd-Result: default: False [-4.51 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	ARC_NA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,suse.de:dkim,suse.de:mid,suse.de:email];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	DKIM_TRACE(0.00)[suse.de:+]
-X-Spam-Score: -4.51
+X-CM-TRANSID:gCh0CgBn4hJoY5BoogMWCg--.25925S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxKw17KFW5Xr1Dtr1kAryUtrb_yoW7AFWkpr
+	W5tr42krW8XFyUAF18X3WUZr1jgFZ8AF1UGry7Xr1kAFsxCF1UJr18trWDWrWDJrW0qF17
+	t3Z8Ca95tr1UXaUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvjb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AF
+	wI0_JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
+	xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1D
+	MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
+	0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWU
+	JVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUwx
+	hLUUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On 8/1/25 13:44, Ming Lei wrote:
-> Replace the spinlock in blk_mq_find_and_get_req() with an SRCU read lock
-> around the tag iterators.
+#syz dup: [syzbot] [fuse?] WARNING: refcount bug in process_scheduled_works
+
+在 2025/08/02 11:33, syzbot 写道:
+> Hello,
 > 
-> This is done by:
+> syzbot found the following issue on:
 > 
-> - Holding the SRCU read lock in blk_mq_queue_tag_busy_iter(),
-> blk_mq_tagset_busy_iter(), and blk_mq_hctx_has_requests().
+> HEAD commit:    89748acdf226 Merge tag 'drm-next-2025-08-01' of https://gi..
+> git tree:       upstream
+> console output: https://syzkaller.appspot.com/x/log.txt?x=151c12a2580000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=ff858d5d4508232d
+> dashboard link: https://syzkaller.appspot.com/bug?extid=1fe2f3ddc7f8f83fb196
+> compiler:       gcc (Debian 12.2.0-14+deb12u1) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
 > 
-> - Removing the now-redundant tags->lock from blk_mq_find_and_get_req().
+> Unfortunately, I don't have any reproducer for this issue yet.
 > 
-> This change improves performance by replacing a spinlock with a more
-> scalable SRCU lock, and fixes lockup issue in scsi_host_busy() in case of
-> shost->host_blocked.
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/4f34b67c9cfc/disk-89748acd.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/2f11bb9a095b/vmlinux-89748acd.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/3e15dbd303fb/bzImage-89748acd.xz
 > 
-> Meantime it becomes possible to use blk_mq_in_driver_rw() for io
-> accounting.
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+1fe2f3ddc7f8f83fb196@syzkaller.appspotmail.com
 > 
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> md: md2 stopped.
+> ------------[ cut here ]------------
+> ODEBUG: free active (active state 0) object: ffff88801f3b4448 object type: work_struct hint: mddev_delayed_delete+0x0/0x20 drivers/md/md.c:721
+> WARNING: CPU: 0 PID: 11789 at lib/debugobjects.c:612 debug_print_object+0x1a2/0x2b0 lib/debugobjects.c:612
+> Modules linked in:
+> CPU: 0 UID: 0 PID: 11789 Comm: syz.5.1495 Not tainted 6.16.0-syzkaller-10499-g89748acdf226 #0 PREEMPT(full)
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/12/2025
+> RIP: 0010:debug_print_object+0x1a2/0x2b0 lib/debugobjects.c:612
+> Code: fc ff df 48 89 fa 48 c1 ea 03 80 3c 02 00 75 54 41 56 48 8b 14 dd e0 0a 16 8c 4c 89 e6 48 c7 c7 60 ff 15 8c e8 bf 92 90 fc 90 <0f> 0b 90 90 58 83 05 b6 a5 bf 0b 01 48 83 c4 18 5b 5d 41 5c 41 5d
+> RSP: 0018:ffffc90004a6f928 EFLAGS: 00010286
+> RAX: 0000000000000000 RBX: 0000000000000003 RCX: ffffc9001b884000
+> RDX: 0000000000080000 RSI: ffffffff817a2815 RDI: 0000000000000001
+> RBP: 0000000000000001 R08: 0000000000000001 R09: 0000000000000000
+> R10: 0000000000000000 R11: 0000000000000001 R12: ffffffff8c160600
+> R13: ffffffff8bac16a0 R14: ffffffff8856a0a0 R15: ffffc90004a6fa28
+> FS:  00007f777160f6c0(0000) GS:ffff8881246fb000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 000020000011a000 CR3: 000000005441a000 CR4: 00000000003526f0
+> Call Trace:
+>   <TASK>
+>   __debug_check_no_obj_freed lib/debugobjects.c:1099 [inline]
+>   debug_check_no_obj_freed+0x4b7/0x600 lib/debugobjects.c:1129
+>   slab_free_hook mm/slub.c:2348 [inline]
+>   slab_free mm/slub.c:4680 [inline]
+>   kfree+0x28f/0x4d0 mm/slub.c:4879
+>   disk_release+0x2a1/0x410 block/genhd.c:1310
+>   device_release+0xa4/0x240 drivers/base/core.c:2565
+>   kobject_cleanup lib/kobject.c:689 [inline]
+>   kobject_release lib/kobject.c:720 [inline]
+>   kref_put include/linux/kref.h:65 [inline]
+>   kobject_put+0x1e7/0x5a0 lib/kobject.c:737
+>   put_device+0x1f/0x30 drivers/base/core.c:3797
+>   blkdev_release+0x15/0x20 block/fops.c:699
+>   __fput+0x3ff/0xb70 fs/file_table.c:468
+>   task_work_run+0x14d/0x240 kernel/task_work.c:227
+>   get_signal+0x1d1/0x26d0 kernel/signal.c:2807
+>   arch_do_signal_or_restart+0x8f/0x7d0 arch/x86/kernel/signal.c:337
+>   exit_to_user_mode_loop+0x84/0x110 kernel/entry/common.c:40
+>   exit_to_user_mode_prepare include/linux/irq-entry-common.h:224 [inline]
+>   syscall_exit_to_user_mode_work include/linux/entry-common.h:175 [inline]
+>   syscall_exit_to_user_mode include/linux/entry-common.h:210 [inline]
+>   do_syscall_64+0x3f6/0x4c0 arch/x86/entry/syscall_64.c:100
+>   entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> RIP: 0033:0x7f777078eb69
+> Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+> RSP: 002b:00007f777160f038 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+> RAX: 0000000000000000 RBX: 00007f77709b6160 RCX: 00007f777078eb69
+> RDX: 0000000000000007 RSI: 0000000000000932 RDI: 0000000000000007
+> RBP: 00007f7770811df1 R08: 0000000000000000 R09: 0000000000000000
+> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+> R13: 0000000000000000 R14: 00007f77709b6160 R15: 00007ffcb194e248
+>   </TASK>
+> 
+> 
 > ---
->   block/blk-mq-tag.c | 12 ++++++++----
->   block/blk-mq.c     | 24 ++++--------------------
->   2 files changed, 12 insertions(+), 24 deletions(-)
+> This report is generated by a bot. It may contain errors.
+> See https://goo.gl/tpsmEJ for more information about syzbot.
+> syzbot engineers can be reached at syzkaller@googlegroups.com.
 > 
-> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-> index 6c2f5881e0de..7ae431077a32 100644
-> --- a/block/blk-mq-tag.c
-> +++ b/block/blk-mq-tag.c
-> @@ -256,13 +256,10 @@ static struct request *blk_mq_find_and_get_req(struct blk_mq_tags *tags,
->   		unsigned int bitnr)
->   {
->   	struct request *rq;
-> -	unsigned long flags;
->   
-> -	spin_lock_irqsave(&tags->lock, flags);
->   	rq = tags->rqs[bitnr];
->   	if (!rq || rq->tag != bitnr || !req_ref_inc_not_zero(rq))
->   		rq = NULL;
-> -	spin_unlock_irqrestore(&tags->lock, flags);
->   	return rq;
->   }
->   
-> @@ -440,7 +437,9 @@ void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
->   		busy_tag_iter_fn *fn, void *priv)
->   {
->   	unsigned int flags = tagset->flags;
-> -	int i, nr_tags;
-> +	int i, nr_tags, srcu_idx;
-> +
-> +	srcu_idx = srcu_read_lock(&tagset->tags_srcu);
->   
->   	nr_tags = blk_mq_is_shared_tags(flags) ? 1 : tagset->nr_hw_queues;
->   
-> @@ -449,6 +448,7 @@ void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
->   			__blk_mq_all_tag_iter(tagset->tags[i], fn, priv,
->   					      BT_TAG_ITER_STARTED);
->   	}
-> +	srcu_read_unlock(&tagset->tags_srcu, srcu_idx);
->   }
->   EXPORT_SYMBOL(blk_mq_tagset_busy_iter);
->   
-> @@ -499,6 +499,8 @@ EXPORT_SYMBOL(blk_mq_tagset_wait_completed_request);
->   void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_tag_iter_fn *fn,
->   		void *priv)
->   {
-> +	int srcu_idx;
-> +
->   	/*
->   	 * __blk_mq_update_nr_hw_queues() updates nr_hw_queues and hctx_table
->   	 * while the queue is frozen. So we can use q_usage_counter to avoid
-> @@ -507,6 +509,7 @@ void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_tag_iter_fn *fn,
->   	if (!percpu_ref_tryget(&q->q_usage_counter))
->   		return;
->   
-> +	srcu_idx = srcu_read_lock(&q->tag_set->tags_srcu);
->   	if (blk_mq_is_shared_tags(q->tag_set->flags)) {
->   		struct blk_mq_tags *tags = q->tag_set->shared_tags;
->   		struct sbitmap_queue *bresv = &tags->breserved_tags;
-> @@ -536,6 +539,7 @@ void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_tag_iter_fn *fn,
->   			bt_for_each(hctx, q, btags, fn, priv, false);
->   		}
->   	}
-> +	srcu_read_unlock(&q->tag_set->tags_srcu, srcu_idx);
->   	blk_queue_exit(q);
->   }
->   
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 7b4ab8e398b6..43b15e58ffe1 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -3415,7 +3415,6 @@ static void blk_mq_clear_rq_mapping(struct blk_mq_tags *drv_tags,
->   				    struct blk_mq_tags *tags)
->   {
->   	struct page *page;
-> -	unsigned long flags;
->   
->   	/*
->   	 * There is no need to clear mapping if driver tags is not initialized
-> @@ -3439,15 +3438,6 @@ static void blk_mq_clear_rq_mapping(struct blk_mq_tags *drv_tags,
->   			}
->   		}
->   	}
-> -
-> -	/*
-> -	 * Wait until all pending iteration is done.
-> -	 *
-> -	 * Request reference is cleared and it is guaranteed to be observed
-> -	 * after the ->lock is released.
-> -	 */
-> -	spin_lock_irqsave(&drv_tags->lock, flags);
-> -	spin_unlock_irqrestore(&drv_tags->lock, flags);
->   }
->   
->   void blk_mq_free_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
-> @@ -3670,8 +3660,12 @@ static bool blk_mq_hctx_has_requests(struct blk_mq_hw_ctx *hctx)
->   	struct rq_iter_data data = {
->   		.hctx	= hctx,
->   	};
-> +	int srcu_idx;
->   
-> +	srcu_idx = srcu_read_lock(&hctx->queue->tag_set->tags_srcu);
->   	blk_mq_all_tag_iter(tags, blk_mq_has_request, &data);
-> +	srcu_read_unlock(&hctx->queue->tag_set->tags_srcu, srcu_idx);
-> +
->   	return data.has_rq;
->   }
->   
-> @@ -3891,7 +3885,6 @@ static void blk_mq_clear_flush_rq_mapping(struct blk_mq_tags *tags,
->   		unsigned int queue_depth, struct request *flush_rq)
->   {
->   	int i;
-> -	unsigned long flags;
->   
->   	/* The hw queue may not be mapped yet */
->   	if (!tags)
-> @@ -3901,15 +3894,6 @@ static void blk_mq_clear_flush_rq_mapping(struct blk_mq_tags *tags,
->   
->   	for (i = 0; i < queue_depth; i++)
->   		cmpxchg(&tags->rqs[i], flush_rq, NULL);
-> -
-> -	/*
-> -	 * Wait until all pending iteration is done.
-> -	 *
-> -	 * Request reference is cleared and it is guaranteed to be observed
-> -	 * after the ->lock is released.
-> -	 */
-> -	spin_lock_irqsave(&tags->lock, flags);
-> -	spin_unlock_irqrestore(&tags->lock, flags);
->   }
->   
->   static void blk_free_flush_queue_callback(struct rcu_head *head)
+> syzbot will keep track of this issue. See:
+> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+> 
+> If the report is already addressed, let syzbot know by replying with:
+> #syz fix: exact-commit-title
+> 
+> If you want to overwrite report's subsystems, reply with:
+> #syz set subsystems: new-subsystem
+> (See the list of subsystem names on the web dashboard)
+> 
+> If the report is a duplicate of another one, reply with:
+> #syz dup: exact-subject-of-another-report
+> 
+> If you want to undo deduplication, reply with:
+> #syz undup
+> 
+> .
+> 
 
-While this looks good, I do wonder what happened to the 'fq' srcu.
-Don't we need to insert an srcu_read_lock() when we're trying to
-access it?
-
-Cheers,
-
-Hannes
--- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
