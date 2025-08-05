@@ -1,143 +1,155 @@
-Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86653259CAF
-	for <linux-block@vger.kernel.org>; Tue,  5 Aug 2025 09:08:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0AF8262FE9
+	for <linux-block@vger.kernel.org>; Tue,  5 Aug 2025 09:28:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754384940; cv=none; b=pksOH8OYUokmo4cJbBngC+Iq3Ne8MSaElF6r4AGNnFe3s2740jpIU79Z/57mskNVAMeyIg9BcMX3zF93VhEAp6gs2T6Fws4Hz204ZB1fEkZ4Ct4tEbCzyGnk9W0Z+wtJy1laXoeKxbESXBQ5RzuqpTYdYg8p9s0ivnd0wynLRjs=
+	t=1754386102; cv=none; b=SmQ691wb/0oyHkPhsV42EjrsJlpJ2LoNcC61tUkBztk0H9o6aWvGI67NNaiaHdblhvq3U4eZQdBjhgDluNFsrhbdXt5uJgph4AUb76tXFsazAii2UM7A0fs7qgYus2hpIhWkMRCdO2SMv2kCEmqWC23LwJCOlCoyl3iLSiTQhN4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754384940; c=relaxed/simple;
-	bh=8p6C4aYe2SKh+tq5i+Vi9J40BRHT4dPQN0Bdhbrv0GU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fTy83lnpNuY4dug6SaSAK0+fqY8fKdMKECKIRxxLl4fzbqK0TtHDlQGO8Wb7R0DqusuL+kIOr1YYAS/z8ADXspy50DiXOx2anvSYohFwLdwoFe2UUP5gM89sznGzv79KVm5vjxTwE7FmvqK6IvVuMA5uT7g4oXC0SfIywdzvkRk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=NQbG6Nhn; arc=none smtp.client-ip=209.85.216.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="NQbG6Nhn"
-Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-31effad130bso3225320a91.3
-        for <linux-block@vger.kernel.org>; Tue, 05 Aug 2025 02:08:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1754384939; x=1754989739; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ig3ejo4wL4oEVtv/WkueYSUf7qCSryypCGes3HapAjU=;
-        b=NQbG6NhnAa/lq2HyHhHqOGFEJi4CgEAFCr0argLKm90trPtXpWmKP1fEIscPtMPt//
-         cq5COK4lRAfCjzHSefRA2lsWAuKO8SG5Nw7BnGtcbzfi/CoTZL6VB27Df0xc6gsy99mJ
-         k6eSzOCQFJU8iHntSoFe/b7lb5jZDheQ3tpM4=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754384939; x=1754989739;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ig3ejo4wL4oEVtv/WkueYSUf7qCSryypCGes3HapAjU=;
-        b=tyNHHLZyc0dtIZGTJNoimtWznnym+BsrQJQjT2JcyLDATLkbw/41CP5efhOeZVBEgC
-         J/uxFb4fdLet8vKCHxG7+CsJcM4INEB3oDcEzuwUDH/gJzNmKB8X7BVWn7gFrQxYldlu
-         gHoRLDtOa1ju49DZURVkIKvO5fXtxs+pZQXGKEX4q2Cm6FlmxR3oK2WmndEHuIbNJk5E
-         ao9ysF7DT2ZB7DLcGiJZ6iSRYoS9u60sPuF8hLbKHW3vyw0nh8hK1q9FfH14j5nHS9OC
-         BnOZH2hcAMZE+u8WhO/8sawijdCYu+yU5apC7N/AIg2TlvgcTmHD1j0w6C1pSTVzT5zh
-         nMLA==
-X-Forwarded-Encrypted: i=1; AJvYcCVx0HPsCl7ApV8gBJOioiGSJPA9lnYBMAQJFfY7ueFmGS7VHxBFtWgDuBQ+D0SFTyCA5XE1ByDUl9bnMw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwLVp8mjyqZk0YQSFyD7JLyHJvS23CnG2wcBDJE19VnSE9ER5mj
-	PKB7zKUpFqN5P5bp+iCwCL5FARC+0rM53Qg6IQHsbCqRx0pkcb2uyxg4JfXINkDn+A==
-X-Gm-Gg: ASbGnctyEe4vjTO/dddvbg7GTC4v86AKxp7Lo/LIARlh4YCxcUql3tzUk7LYKYGpjm/
-	g+zzcpT6Cu3F6yEYcBbZ+7DNZn17ECQrQyKshE8KbMuB/+STplCkvn7jZ3aKw6ei2F/hwEuXVQu
-	40/xNs57MtJ/vbKrRpSNJLIXD4Ax+RvuWTB3jpBsMGvjGLx+/qjkQGVuD0TXxolfNUjo0Kp04uN
-	XBwr9NF+60mH5o8qmqdMBXNT6ccJoYse3olvlryrjlPbN1FtFj6YBDs491xyS3ea4VAxJAswSMO
-	Ijh4JSCEUjTTAXBBNa1nYbN8TK2GYy0/95vgxC2BoWvThPGjHT+mexAoXEj6LHi/cwv48T7gjQI
-	iU+6fIxVDv4s5yatM+Y9D3Qc=
-X-Google-Smtp-Source: AGHT+IEC0CkarFCC9tbObUgl96lF1pEq0czMe/WEVpF3KDzV5+OA8lKXxlxpIlMyZQd9QbqWO8ckzw==
-X-Received: by 2002:a17:90b:3ec8:b0:31e:f3b7:49c6 with SMTP id 98e67ed59e1d1-321162143d0mr18939390a91.15.1754384938585;
-        Tue, 05 Aug 2025 02:08:58 -0700 (PDT)
-Received: from google.com ([2401:fa00:8f:203:5a2c:a3e:b88a:14d])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-31f63dc1688sm16690050a91.9.2025.08.05.02.08.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Aug 2025 02:08:58 -0700 (PDT)
-Date: Tue, 5 Aug 2025 18:08:52 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Seyediman Seyedarab <imandevel@gmail.com>
-Cc: minchan@kernel.org, senozhatsky@chromium.org, axboe@kernel.dk, 
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
-	syzbot+1a281a451fd8c0945d07@syzkaller.appspotmail.com
-Subject: Re: [PATCH] zram: fix NULL pointer dereference in
- zcomp_available_show()
-Message-ID: <ovw53m3yjcqrp334wcrlukcsusqkhxjbkbngpgjqn35cb2ay2t@vjopd6ksszxc>
-References: <20250803062519.35712-1-ImanDevel@gmail.com>
+	s=arc-20240116; t=1754386102; c=relaxed/simple;
+	bh=0zJFFJfAGj4e7Ir2mFoMQJudR+6C12uTs9IyUbZk2ao=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=sHA1B7RZNCXeNezNnq3J9/WioOn3iY9I7SXB2u0f4C0/FDX3ve/O21LTMtCjKiySFnPvkvLcpWIcmnjNgDlQwqP8dbU7QypmKvF0XpPTokzDG4d0igAvthLEooq//o+YoIgnCL5uyx+WK340zmAn+rT25XwDnim1IufJ9eS0OXE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4bx7Q82WxNzYQvKQ
+	for <linux-block@vger.kernel.org>; Tue,  5 Aug 2025 17:28:16 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 042E71A0E89
+	for <linux-block@vger.kernel.org>; Tue,  5 Aug 2025 17:28:15 +0800 (CST)
+Received: from [10.174.179.143] (unknown [10.174.179.143])
+	by APP4 (Coremail) with SMTP id gCh0CgBHwhKrzpFoFRuRCg--.51276S3;
+	Tue, 05 Aug 2025 17:28:12 +0800 (CST)
+Subject: Re: [PATCH 0/2] block: blk-rq-qos: replace static key with atomic
+ bitop
+To: Nilay Shroff <nilay@linux.ibm.com>, linux-block@vger.kernel.org
+Cc: axboe@kernel.dk, kch@nvidia.com, shinichiro.kawasaki@wdc.com, hch@lst.de,
+ ming.lei@redhat.com, gjoyce@ibm.com, "yukuai (C)" <yukuai3@huawei.com>
+References: <20250804122125.3271397-1-nilay@linux.ibm.com>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <7102df92-1326-dbe7-d0cc-95bd2e44e9ad@huaweicloud.com>
+Date: Tue, 5 Aug 2025 17:28:10 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250803062519.35712-1-ImanDevel@gmail.com>
+In-Reply-To: <20250804122125.3271397-1-nilay@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgBHwhKrzpFoFRuRCg--.51276S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxCF15Wr1UCr4xtFWUXFW5Jrb_yoWrGryDpa
+	93t343Aw4UWFsaqFZ7tw48AaySkws5CFy7Jr1rG34Svas09r1jqry0yF4YkF95urZ7AF92
+	qr45AF4qkr15C37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvjb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AF
+	wI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
+	xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43
+	MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
+	0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWU
+	JVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUF1
+	v3UUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On (25/08/03 02:25), Seyediman Seyedarab wrote:
-> During zram_reset_device(), comp_algs[prio] is set to NULL by
-> zram_destroy_comps() before being reinitialized to the default algorithm.
-> A concurrent sysfs read can occur between these operations, passing NULL
-> to strcmp() and causing a crash.
+Hi,
 
-zram_reset_device() is called under down_write(&zram->init_lock),
-while sysfs reads are called under down_read(&zram->init_lock).
-zram_reset_device() doesn't release the write ->init_lock until
-default_compressor is set.
+在 2025/08/04 20:21, Nilay Shroff 写道:
+> This patchset replaces the use of a static key in the I/O path (rq_qos_
+> xxx()) with an atomic queue flag (QUEUE_FLAG_QOS_ENABLED). This change
+> is made to eliminate a potential deadlock introduced by the use of static
+> keys in the blk-rq-qos infrastructure, as reported by lockdep during
+> blktests block/005[1].
+> 
+> The original static key approach was introduced to avoid unnecessary
+> dereferencing of q->rq_qos when no blk-rq-qos module (e.g., blk-wbt or
+> blk-iolatency) is configured. While efficient, enabling a static key at
+> runtime requires taking cpu_hotplug_lock and jump_label_mutex, which
+> becomes problematic if the queue is already frozen — causing a reverse
+> dependency on ->freeze_lock. This results in a lockdep splat indicating
+> a potential deadlock.
 
-I think it may make sense to make sure that show() handlers don't
-release the read ->init_lock somewhere in between. I only see one
-that does so: recomp_algorithm_show().
+Take a look at the report, the static key is from:
 
----
+elevator_change_done
+  wbt_init
 
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index 8acad3cc6e6e..ee3aa9cc8595 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -1228,13 +1228,7 @@ static void comp_algorithm_set(struct zram *zram, u32 prio, const char *alg)
- static ssize_t __comp_algorithm_show(struct zram *zram, u32 prio,
- 				     char *buf, ssize_t at)
- {
--	ssize_t sz;
--
--	down_read(&zram->init_lock);
--	sz = zcomp_available_show(zram->comp_algs[prio], buf, at);
--	up_read(&zram->init_lock);
--
--	return sz;
-+	return zcomp_available_show(zram->comp_algs[prio], buf, at);
- }
- 
- static int __comp_algorithm_store(struct zram *zram, u32 prio, const char *buf)
-@@ -1387,8 +1381,12 @@ static ssize_t comp_algorithm_show(struct device *dev,
- 				   char *buf)
- {
- 	struct zram *zram = dev_to_zram(dev);
-+	ssize_t sz;
- 
--	return __comp_algorithm_show(zram, ZRAM_PRIMARY_COMP, buf, 0);
-+	down_read(&zram->init_lock);
-+	sz = __comp_algorithm_show(zram, ZRAM_PRIMARY_COMP, buf, 0);
-+	up_read(&zram->init_lock);
-+	return sz;
- }
- 
- static ssize_t comp_algorithm_store(struct device *dev,
-@@ -1412,6 +1410,7 @@ static ssize_t recomp_algorithm_show(struct device *dev,
- 	ssize_t sz = 0;
- 	u32 prio;
- 
-+	down_read(&zram->init_lock);
- 	for (prio = ZRAM_SECONDARY_COMP; prio < ZRAM_MAX_COMPS; prio++) {
- 		if (!zram->comp_algs[prio])
- 			continue;
-@@ -1419,7 +1418,7 @@ static ssize_t recomp_algorithm_show(struct device *dev,
- 		sz += sysfs_emit_at(buf, sz, "#%d: ", prio);
- 		sz += __comp_algorithm_show(zram, prio, buf, sz);
- 	}
--
-+	up_read(&zram->init_lock);
- 	return sz;
- }
- 
+And looks like the queue is not frozen in this context, am I missing
+something?
+
+However, wbt_init() from queue_wb_lat_store() is indeed under
+blk_mq_freeze_queue(), I understand the deadlock here, however, I'm
+still confused about the report.
+
+And for the deadlock, looks like blk-iocost and blk-iolatency, that
+rq_qos_add is called from cgroupfs path, where queue is not freezed,
+is it better to fix it from wbt, by calling rq_qos_add() first and
+set rwb->enable_state to WBT_STATE_OFF_DEFAULT in wbt_init(), later
+change this to WBT_STATE_ON_DEFAULT while queue is freezed.
+
+Thanks,
+Kuai
+> 
+> To resolve this, we now gate q->rq_qos access with a q->queue_flags
+> bitop (QUEUE_FLAG_QOS_ENABLED), avoiding the static key and the associated
+> locking altogether.
+> 
+> I compared both static key and atomic bitop implementations using ftrace
+> function graph tracer over ~50 invocations of rq_qos_issue() while ensuring
+> blk-wbt/blk-iolatency were disabled (i.e., no QoS functionality). For
+> easy comparision, I made rq_qos_issue() noinline. The comparision was
+> made on PowerPC machine.
+> 
+> Static Key (disabled : QoS is not configured):
+> 5d0: 00 00 00 60     nop    # patched in by static key framework (not taken)
+> 5d4: 20 00 80 4e     blr    # return (branch to link register)
+> 
+> Only a nop and blr (branch to link register) are executed — very lightweight.
+> 
+> atomic bitop (QoS is not configured):
+> 5d0: 20 00 23 e9     ld      r9,32(r3)     # load q->queue_flags
+> 5d4: 00 80 29 71     andi.   r9,r9,32768   # check QUEUE_FLAG_QOS_ENABLED (bit 15)
+> 5d8: 20 00 82 4d     beqlr                 # return if bit not set
+> 
+> This performs an ld and and andi. before returning. Slightly more work,
+> but q->queue_flags is typically hot in cache during I/O submission.
+> 
+> With Static Key (disabled):
+> Duration (us): min=0.668 max=0.816 avg≈0.750
+> 
+> With atomic bitop QUEUE_FLAG_QOS_ENABLED (bit not set):
+> Duration (us): min=0.684 max=0.834 avg≈0.759
+> 
+> As expected, both versions are almost similar in cost. The added latency
+> from an extra ld and andi. is in the range of ~9ns.
+> 
+> There're two patches in the series. The first patch replaces static key
+> with QUEUE_FLAG_QOS_ENABLED. The second patch ensures that we disable
+> the QUEUE_FLAG_QOS_ENABLED when the queue no longer has any associated
+> rq_qos policies.
+> 
+> As usual, feedback and review comments are welcome!
+> 
+> [1] https://lore.kernel.org/linux-block/4fdm37so3o4xricdgfosgmohn63aa7wj3ua4e5vpihoamwg3ui@fq42f5q5t5ic/
+> 
+> Nilay Shroff (2):
+>    block: avoid cpu_hotplug_lock depedency on freeze_lock
+>    block: clear QUEUE_FLAG_QOS_ENABLED in rq_qos_del()
+> 
+>   block/blk-mq-debugfs.c |  1 +
+>   block/blk-rq-qos.c     |  8 ++++----
+>   block/blk-rq-qos.h     | 45 +++++++++++++++++++++++++-----------------
+>   include/linux/blkdev.h |  1 +
+>   4 files changed, 33 insertions(+), 22 deletions(-)
+> 
+
