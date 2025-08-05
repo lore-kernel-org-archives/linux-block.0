@@ -1,212 +1,143 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A2882B2D7
-	for <linux-block@vger.kernel.org>; Tue,  5 Aug 2025 08:48:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86653259CAF
+	for <linux-block@vger.kernel.org>; Tue,  5 Aug 2025 09:08:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754383729; cv=none; b=heW5DmVcNT2ZqNZtsc6lcb4iGQTGZqCgldLTGqkIISzDpe+2CSZ8w/bi9XnJ3RASBokAjTNjtXgqDhxOjvrz3xIFBA6Poi4h78kBmPclEHwBoG3h0jGz1X1Ry1GIjiL5Ayc1OIW4qIkm5TNYpuoBCGH139w6ESJtNZ8sZWAMJ8c=
+	t=1754384940; cv=none; b=pksOH8OYUokmo4cJbBngC+Iq3Ne8MSaElF6r4AGNnFe3s2740jpIU79Z/57mskNVAMeyIg9BcMX3zF93VhEAp6gs2T6Fws4Hz204ZB1fEkZ4Ct4tEbCzyGnk9W0Z+wtJy1laXoeKxbESXBQ5RzuqpTYdYg8p9s0ivnd0wynLRjs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754383729; c=relaxed/simple;
-	bh=H811KyOpFH+ZdqDTbkaFS4WdxGHksWmx7BGPMUBNrdc=;
+	s=arc-20240116; t=1754384940; c=relaxed/simple;
+	bh=8p6C4aYe2SKh+tq5i+Vi9J40BRHT4dPQN0Bdhbrv0GU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=P6At5Gt3/IYoz4SELjBIjvtIbFHfyUHo3PIUuuaDYTKdA3DyaTG5G/mgPmQvNSUmH1FguA3dPVL4as37oKFrHzeI4uHyiQwsWvKSspWndnIWDNapuypwRemtulHfBY+z7qf/jWqM7DfGYmvqsdJqG84p/11igAQVdmo+qloKBQg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YcYzDSAF; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=fTy83lnpNuY4dug6SaSAK0+fqY8fKdMKECKIRxxLl4fzbqK0TtHDlQGO8Wb7R0DqusuL+kIOr1YYAS/z8ADXspy50DiXOx2anvSYohFwLdwoFe2UUP5gM89sznGzv79KVm5vjxTwE7FmvqK6IvVuMA5uT7g4oXC0SfIywdzvkRk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=NQbG6Nhn; arc=none smtp.client-ip=209.85.216.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YcYzDSAF"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1754383726;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=UJslM69vDx/hTuSQyA9pU3SIfzjtU4RF6cTL82rm5wU=;
-	b=YcYzDSAFLWPMhad0bKDpIO53wkkoCfi5wFYBBMMKQvvU/q7Oz1OIEHN0vtEZElNBjz2mXt
-	QDhG0Igl0G2xduQdrB05+G84hEDAW0BZZ+DPVgOaFTKa6Sdjs4ahqHu6uK0KHnNzth1xP5
-	fPc1BWSoGj/xwxEjU+LcxQ1TmsQe3Dw=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-450-1hW7QE4zN2-_UK7vas6_PA-1; Tue,
- 05 Aug 2025 04:48:41 -0400
-X-MC-Unique: 1hW7QE4zN2-_UK7vas6_PA-1
-X-Mimecast-MFC-AGG-ID: 1hW7QE4zN2-_UK7vas6_PA_1754383719
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E173519560BB;
-	Tue,  5 Aug 2025 08:48:38 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.20])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AA2451800D82;
-	Tue,  5 Aug 2025 08:48:33 +0000 (UTC)
-Date: Tue, 5 Aug 2025 16:48:21 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Yu Kuai <yukuai1@huaweicloud.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	John Garry <john.garry@huawei.com>,
-	Sathya Prakash Veerichetty <sathya.prakash@broadcom.com>,
-	"yukuai (C)" <yukuai3@huawei.com>
-Subject: Re: [PATCH 5/5] blk-mq: Replace tags->lock with SRCU for tag
- iterators
-Message-ID: <aJHFVdqDs5KKKuM8@fedora>
-References: <20250801114440.722286-1-ming.lei@redhat.com>
- <20250801114440.722286-6-ming.lei@redhat.com>
- <b86b9098-fb76-bdfe-bdf0-1344386d067a@huaweicloud.com>
- <aJCaWLgfB_oMMdrC@fedora>
- <88ad7326-b55f-7e33-fa81-0317843fc15b@huaweicloud.com>
- <700bd14f-74da-9c10-9917-d5d56ecd2921@huaweicloud.com>
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="NQbG6Nhn"
+Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-31effad130bso3225320a91.3
+        for <linux-block@vger.kernel.org>; Tue, 05 Aug 2025 02:08:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1754384939; x=1754989739; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ig3ejo4wL4oEVtv/WkueYSUf7qCSryypCGes3HapAjU=;
+        b=NQbG6NhnAa/lq2HyHhHqOGFEJi4CgEAFCr0argLKm90trPtXpWmKP1fEIscPtMPt//
+         cq5COK4lRAfCjzHSefRA2lsWAuKO8SG5Nw7BnGtcbzfi/CoTZL6VB27Df0xc6gsy99mJ
+         k6eSzOCQFJU8iHntSoFe/b7lb5jZDheQ3tpM4=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754384939; x=1754989739;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ig3ejo4wL4oEVtv/WkueYSUf7qCSryypCGes3HapAjU=;
+        b=tyNHHLZyc0dtIZGTJNoimtWznnym+BsrQJQjT2JcyLDATLkbw/41CP5efhOeZVBEgC
+         J/uxFb4fdLet8vKCHxG7+CsJcM4INEB3oDcEzuwUDH/gJzNmKB8X7BVWn7gFrQxYldlu
+         gHoRLDtOa1ju49DZURVkIKvO5fXtxs+pZQXGKEX4q2Cm6FlmxR3oK2WmndEHuIbNJk5E
+         ao9ysF7DT2ZB7DLcGiJZ6iSRYoS9u60sPuF8hLbKHW3vyw0nh8hK1q9FfH14j5nHS9OC
+         BnOZH2hcAMZE+u8WhO/8sawijdCYu+yU5apC7N/AIg2TlvgcTmHD1j0w6C1pSTVzT5zh
+         nMLA==
+X-Forwarded-Encrypted: i=1; AJvYcCVx0HPsCl7ApV8gBJOioiGSJPA9lnYBMAQJFfY7ueFmGS7VHxBFtWgDuBQ+D0SFTyCA5XE1ByDUl9bnMw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwLVp8mjyqZk0YQSFyD7JLyHJvS23CnG2wcBDJE19VnSE9ER5mj
+	PKB7zKUpFqN5P5bp+iCwCL5FARC+0rM53Qg6IQHsbCqRx0pkcb2uyxg4JfXINkDn+A==
+X-Gm-Gg: ASbGnctyEe4vjTO/dddvbg7GTC4v86AKxp7Lo/LIARlh4YCxcUql3tzUk7LYKYGpjm/
+	g+zzcpT6Cu3F6yEYcBbZ+7DNZn17ECQrQyKshE8KbMuB/+STplCkvn7jZ3aKw6ei2F/hwEuXVQu
+	40/xNs57MtJ/vbKrRpSNJLIXD4Ax+RvuWTB3jpBsMGvjGLx+/qjkQGVuD0TXxolfNUjo0Kp04uN
+	XBwr9NF+60mH5o8qmqdMBXNT6ccJoYse3olvlryrjlPbN1FtFj6YBDs491xyS3ea4VAxJAswSMO
+	Ijh4JSCEUjTTAXBBNa1nYbN8TK2GYy0/95vgxC2BoWvThPGjHT+mexAoXEj6LHi/cwv48T7gjQI
+	iU+6fIxVDv4s5yatM+Y9D3Qc=
+X-Google-Smtp-Source: AGHT+IEC0CkarFCC9tbObUgl96lF1pEq0czMe/WEVpF3KDzV5+OA8lKXxlxpIlMyZQd9QbqWO8ckzw==
+X-Received: by 2002:a17:90b:3ec8:b0:31e:f3b7:49c6 with SMTP id 98e67ed59e1d1-321162143d0mr18939390a91.15.1754384938585;
+        Tue, 05 Aug 2025 02:08:58 -0700 (PDT)
+Received: from google.com ([2401:fa00:8f:203:5a2c:a3e:b88a:14d])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-31f63dc1688sm16690050a91.9.2025.08.05.02.08.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Aug 2025 02:08:58 -0700 (PDT)
+Date: Tue, 5 Aug 2025 18:08:52 +0900
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Seyediman Seyedarab <imandevel@gmail.com>
+Cc: minchan@kernel.org, senozhatsky@chromium.org, axboe@kernel.dk, 
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
+	syzbot+1a281a451fd8c0945d07@syzkaller.appspotmail.com
+Subject: Re: [PATCH] zram: fix NULL pointer dereference in
+ zcomp_available_show()
+Message-ID: <ovw53m3yjcqrp334wcrlukcsusqkhxjbkbngpgjqn35cb2ay2t@vjopd6ksszxc>
+References: <20250803062519.35712-1-ImanDevel@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <700bd14f-74da-9c10-9917-d5d56ecd2921@huaweicloud.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+In-Reply-To: <20250803062519.35712-1-ImanDevel@gmail.com>
 
-On Tue, Aug 05, 2025 at 04:38:56PM +0800, Yu Kuai wrote:
-> Hi,
-> 
-> 在 2025/08/05 16:33, Yu Kuai 写道:
-> > Hi,
-> > 
-> > 在 2025/08/04 19:32, Ming Lei 写道:
-> > > On Mon, Aug 04, 2025 at 02:30:43PM +0800, Yu Kuai wrote:
-> > > > Hi,
-> > > > 
-> > > > 在 2025/08/01 19:44, Ming Lei 写道:
-> > > > > Replace the spinlock in blk_mq_find_and_get_req() with an
-> > > > > SRCU read lock
-> > > > > around the tag iterators.
-> > > > > 
-> > > > > This is done by:
-> > > > > 
-> > > > > - Holding the SRCU read lock in blk_mq_queue_tag_busy_iter(),
-> > > > > blk_mq_tagset_busy_iter(), and blk_mq_hctx_has_requests().
-> > > > > 
-> > > > > - Removing the now-redundant tags->lock from blk_mq_find_and_get_req().
-> > > > > 
-> > > > > This change improves performance by replacing a spinlock with a more
-> > > > > scalable SRCU lock, and fixes lockup issue in
-> > > > > scsi_host_busy() in case of
-> > > > > shost->host_blocked.
-> > > > > 
-> > > > > Meantime it becomes possible to use blk_mq_in_driver_rw() for io
-> > > > > accounting.
-> > > > > 
-> > > > > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > > > > ---
-> > > > >    block/blk-mq-tag.c | 12 ++++++++----
-> > > > >    block/blk-mq.c     | 24 ++++--------------------
-> > > > >    2 files changed, 12 insertions(+), 24 deletions(-)
-> > > > > 
-> > > > > diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-> > > > > index 6c2f5881e0de..7ae431077a32 100644
-> > > > > --- a/block/blk-mq-tag.c
-> > > > > +++ b/block/blk-mq-tag.c
-> > > > > @@ -256,13 +256,10 @@ static struct request
-> > > > > *blk_mq_find_and_get_req(struct blk_mq_tags *tags,
-> > > > >            unsigned int bitnr)
-> > > > >    {
-> > > > >        struct request *rq;
-> > > > > -    unsigned long flags;
-> > > > > -    spin_lock_irqsave(&tags->lock, flags);
-> > > > >        rq = tags->rqs[bitnr];
-> > > > >        if (!rq || rq->tag != bitnr || !req_ref_inc_not_zero(rq))
-> > > > >            rq = NULL;
-> > > > > -    spin_unlock_irqrestore(&tags->lock, flags);
-> > > > >        return rq;
-> > > > >    }
-> > > > > 
-> > > > Just wonder, does the lockup problem due to the tags->lock contention by
-> > > > concurrent scsi_host_busy?
-> > > 
-> > > Yes.
-> > > 
-> > > > 
-> > > > > @@ -440,7 +437,9 @@ void blk_mq_tagset_busy_iter(struct
-> > > > > blk_mq_tag_set *tagset,
-> > > > >            busy_tag_iter_fn *fn, void *priv)
-> > > > >    {
-> > > > >        unsigned int flags = tagset->flags;
-> > > > > -    int i, nr_tags;
-> > > > > +    int i, nr_tags, srcu_idx;
-> > > > > +
-> > > > > +    srcu_idx = srcu_read_lock(&tagset->tags_srcu);
-> > > > >        nr_tags = blk_mq_is_shared_tags(flags) ? 1 :
-> > > > > tagset->nr_hw_queues;
-> > > > > @@ -449,6 +448,7 @@ void blk_mq_tagset_busy_iter(struct
-> > > > > blk_mq_tag_set *tagset,
-> > > > >                __blk_mq_all_tag_iter(tagset->tags[i], fn, priv,
-> > > > >                              BT_TAG_ITER_STARTED);
-> > > > >        }
-> > > > > +    srcu_read_unlock(&tagset->tags_srcu, srcu_idx);
-> > > > 
-> > > > And should we add cond_resched() after finish interating one tags, even
-> > > > with the srcu change, looks like it's still possible to lockup with
-> > > > big cpu cores & deep queue depth.
-> > > 
-> > > The main trouble is from the big tags->lock.
-> > > 
-> > > IMO it isn't needed, because max queue depth is just 10K, which is much
-> > > bigger than actual queue depth. We can add it when someone shows it is
-> > > really needed.
-> > 
-> > If we don't want this, why not using srcu here? Looks like just use
-> > rcu_read_lock and rcu_read_unlock to protect blk_mq_find_and_get_req()
-> > will be enough.
-> 
-> Like following patch:
-> 
-> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-> index d880c50629d6..e2381ee9747d 100644
-> --- a/block/blk-mq-tag.c
-> +++ b/block/blk-mq-tag.c
-> @@ -255,11 +255,11 @@ static struct request *blk_mq_find_and_get_req(struct
-> blk_mq_tags *tags,
->         struct request *rq;
->         unsigned long flags;
-> 
-> -       spin_lock_irqsave(&tags->lock, flags);
-> +       rcu_read_lock();
->         rq = tags->rqs[bitnr];
->         if (!rq || rq->tag != bitnr || !req_ref_inc_not_zero(rq))
->                 rq = NULL;
-> -       spin_unlock_irqrestore(&tags->lock, flags);
-> +       rcu_read_unlock();
->         return rq;
->  }
+On (25/08/03 02:25), Seyediman Seyedarab wrote:
+> During zram_reset_device(), comp_algs[prio] is set to NULL by
+> zram_destroy_comps() before being reinitialized to the default algorithm.
+> A concurrent sysfs read can occur between these operations, passing NULL
+> to strcmp() and causing a crash.
 
-srcu read lock has to be grabbed when request reference is being accessed,
-so the above change is wrong, otherwise plain rcu is enough.
+zram_reset_device() is called under down_write(&zram->init_lock),
+while sysfs reads are called under down_read(&zram->init_lock).
+zram_reset_device() doesn't release the write ->init_lock until
+default_compressor is set.
 
-> 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index b1d81839679f..a70959cad692 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -3442,12 +3442,8 @@ static void blk_mq_clear_rq_mapping(struct
-> blk_mq_tags *drv_tags,
-> 
->         /*
->          * Wait until all pending iteration is done.
-> -        *
-> -        * Request reference is cleared and it is guaranteed to be observed
-> -        * after the ->lock is released.
->          */
-> -       spin_lock_irqsave(&drv_tags->lock, flags);
-> -       spin_unlock_irqrestore(&drv_tags->lock, flags);
-> +       synchronize_rcu();
+I think it may make sense to make sure that show() handlers don't
+release the read ->init_lock somewhere in between. I only see one
+that does so: recomp_algorithm_show().
 
-We do want to avoid big delay in this code path, so call_srcu() is much
-better.
+---
 
-Thanks,
-Ming
-
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index 8acad3cc6e6e..ee3aa9cc8595 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -1228,13 +1228,7 @@ static void comp_algorithm_set(struct zram *zram, u32 prio, const char *alg)
+ static ssize_t __comp_algorithm_show(struct zram *zram, u32 prio,
+ 				     char *buf, ssize_t at)
+ {
+-	ssize_t sz;
+-
+-	down_read(&zram->init_lock);
+-	sz = zcomp_available_show(zram->comp_algs[prio], buf, at);
+-	up_read(&zram->init_lock);
+-
+-	return sz;
++	return zcomp_available_show(zram->comp_algs[prio], buf, at);
+ }
+ 
+ static int __comp_algorithm_store(struct zram *zram, u32 prio, const char *buf)
+@@ -1387,8 +1381,12 @@ static ssize_t comp_algorithm_show(struct device *dev,
+ 				   char *buf)
+ {
+ 	struct zram *zram = dev_to_zram(dev);
++	ssize_t sz;
+ 
+-	return __comp_algorithm_show(zram, ZRAM_PRIMARY_COMP, buf, 0);
++	down_read(&zram->init_lock);
++	sz = __comp_algorithm_show(zram, ZRAM_PRIMARY_COMP, buf, 0);
++	up_read(&zram->init_lock);
++	return sz;
+ }
+ 
+ static ssize_t comp_algorithm_store(struct device *dev,
+@@ -1412,6 +1410,7 @@ static ssize_t recomp_algorithm_show(struct device *dev,
+ 	ssize_t sz = 0;
+ 	u32 prio;
+ 
++	down_read(&zram->init_lock);
+ 	for (prio = ZRAM_SECONDARY_COMP; prio < ZRAM_MAX_COMPS; prio++) {
+ 		if (!zram->comp_algs[prio])
+ 			continue;
+@@ -1419,7 +1418,7 @@ static ssize_t recomp_algorithm_show(struct device *dev,
+ 		sz += sysfs_emit_at(buf, sz, "#%d: ", prio);
+ 		sz += __comp_algorithm_show(zram, prio, buf, sz);
+ 	}
+-
++	up_read(&zram->init_lock);
+ 	return sz;
+ }
+ 
