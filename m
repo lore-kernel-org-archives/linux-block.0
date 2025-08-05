@@ -1,154 +1,124 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B4511D5CEA
-	for <linux-block@vger.kernel.org>; Tue,  5 Aug 2025 12:44:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E1B7188580;
+	Tue,  5 Aug 2025 13:38:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754397891; cv=none; b=BQrJGrrL/HHIzXQZ2tIlNJS2pghv4/sLWr45FEzyhGPiIQ3VIWpEWYjohO+BY2qyyo1YSXVgC4TGbOjF/c/z12xj8uBZ1WRRMJp9/JyiI+wx6WQK3HgNNj2CwvQZgW8qVoFtTlwuOK27j78AHqPllOAyk+6gkbrg9rH+K45Vli8=
+	t=1754401128; cv=none; b=UhWCHrvtqbPHvAeBck0osk1Pd6o2/+3RrZwLjAYcV1Byj7rEdnzkR5CGp60dwt1DsDngiOWt17XaB9Nkyv6FWWdZSeAjyvcDFV63kBaSgQ3h8FL3R3E8Tsi9of/lQRjLaeRjWXSCTpLpiVpuprJ/KEGoMP/hph6AyTyK4cgje/M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754397891; c=relaxed/simple;
-	bh=Si6MReIrTk1/rh8ENRbKAplQGUzXxcK5ZPZD845rZrs=;
+	s=arc-20240116; t=1754401128; c=relaxed/simple;
+	bh=+7/ByOKxDDWiv30LoFE8yfggFhVUZwypBp8AFXeN1eI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RpJMuTvU3KWhoUMOEpI5wiXDsjbn4TZKj852qz17NGPeXHF+vNCDKfVmFJpGuBGRk73M0Py0QJIoW67B9eFMnU9wdgdBDHQtUH9KNaiXASyG/W51lrj+VL7+TiIbrDIjQ5JVCIStnIxEILN5LZomXz1lPv0VPhnMG/9AnrjNOIM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=B1PJmNfC; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=M2T5FOTyDqcyrPouWeAftJmjIAznJW5mZ8+SI2/5sRG6VEI6i7ZhV/tB8UzedwQbYdogNRleZIIMdJlyBJFoCuR1cxHqlrR44BQPv0+HR2rpKZAS3wi6bEnKgY9HjDuRv+nwj9fuSTBlAsTJrLt6j4vFvkAUHWQO8ljf8Yoj2Yk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Mu2k3j53; arc=none smtp.client-ip=209.85.222.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B1PJmNfC"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1754397888;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=BF1RUyoME7iGL8y4OTbb+xtfAVb+8hSzDJ3hc266uHI=;
-	b=B1PJmNfCK0vDF3OkBrejja+GpQe+n+s6+jJRzjO349/ewFG+Oig+gRDuKrx+8s1yO2tehh
-	sP73Lhs5q/S0/PlM1WLBkgu+CgqpsEGG7SBRRX1YFQ0JvTs08vG/1U87PtkW9tLu93DP4f
-	+/gAmPM9OOeRe5A9CUdMyS66q4k5Tus=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-110-Fz0r2K1QNyyX1ACUJqYXKw-1; Tue,
- 05 Aug 2025 08:44:45 -0400
-X-MC-Unique: Fz0r2K1QNyyX1ACUJqYXKw-1
-X-Mimecast-MFC-AGG-ID: Fz0r2K1QNyyX1ACUJqYXKw_1754397884
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 808BC195D020;
-	Tue,  5 Aug 2025 12:44:43 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.20])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 880E81954B0C;
-	Tue,  5 Aug 2025 12:44:34 +0000 (UTC)
-Date: Tue, 5 Aug 2025 20:44:24 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Nilay Shroff <nilay@linux.ibm.com>
-Cc: linux-block@vger.kernel.org, axboe@kernel.dk, kch@nvidia.com,
-	shinichiro.kawasaki@wdc.com, hch@lst.de, gjoyce@ibm.com
-Subject: Re: [PATCH 0/2] block: blk-rq-qos: replace static key with atomic
- bitop
-Message-ID: <aJH8qDEzV4tiG2wE@fedora>
-References: <20250804122125.3271397-1-nilay@linux.ibm.com>
- <aJC4tDUsk42Nb9Df@fedora>
- <682f0f43-733a-4c04-91ed-5665815128bc@linux.ibm.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mu2k3j53"
+Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-7e2c1dc6567so270736085a.1;
+        Tue, 05 Aug 2025 06:38:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1754401126; x=1755005926; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Z7sx6UhdwFf/XGs44w0LtzcSKpKLbsrW90CtjKNe1K4=;
+        b=Mu2k3j53VQOzjpIKgBdIdvSjA1hsb+6AxypdSHFD2Ou5gRML0BO+rmIDJ0c75qQHLf
+         ne7iiabsxMnHNgJkEY1E69G0s9OdS5QxF6C6YmxP51gp89qsIETzZFzLofleObl4kIpm
+         4iVS8eOhfLaNcfbu8vj4E/28W6if5RfGaPQQ6kWm84RpWNAfjie44Zom+atIJ7A47wop
+         P2VWb21tJSpY6Eon9mIYAvXEA7qSjC/E86gnaH0WAxZOVgfoTDIyJaImq3etcv3+tbGo
+         9uc6MB3xnlSnxeXiQkT8A4w59A0TUmZtcHjlso5x1bgusYRsnNIJt1qOIQZZJAJ6yOt1
+         yQIg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754401126; x=1755005926;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Z7sx6UhdwFf/XGs44w0LtzcSKpKLbsrW90CtjKNe1K4=;
+        b=ckg7pj4wZiCuq1MZ+LgGzVKaybPIfJESpfPiK2wvi4FsSzzbicejVjkOevOEr3jb91
+         TkDD/6tfuwRWB6t0wlKm2ZL1uDm5+zBhIGsTx3GRHg3r5ZlVSHHmINCnbpvmyAGSRo9Y
+         6jCYO4OYq2Mb+c280EQd9kk9906Zil+r2qP2e0GhUH+kAyLeK2o6CzrCrknc+y5F7WON
+         JQEj+2pw2TAs9Jsgyewrvlyl4QNO9yJtDDHIZUucRI3OMtuKNs0zqU7Dw/+Mwt01jk3p
+         HonYIdWaiSjsb/VponMKY6v8HVp6RzsWPWw3VRc6XtVItkQkshn+CjR7JtxUpADukeB1
+         oLCQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXF4JgpAITlVpCg3jskm2m91++A+PVIyn2bhsOpW7DSlL43c2yljQp8n3CPqqprCZTUirSE3W9505bPq0QJ@vger.kernel.org, AJvYcCXli0g815BDh02zRFgiyvd123gDv/iELg7e8oW8OuB68BbsHQv6V+/iIudbwp2b43YK/EEOuXLQo6EgBw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwMRA3KZGd13uZQJKw1J8gdfYNcsO59UtDkI1JIyg+LUhVsavDo
+	HHiwxq00kapag0x+x0iZQeD9D39uHFog3vIckfB0FtPNsyKXF+UaDLZU
+X-Gm-Gg: ASbGnctSS845WM1d1cm5zFMm9CEGRWm9MaMGANLhmqab/PU6/ee3usE4DodZ9qKu2gw
+	NwlRKpfdNjwRNJktYmWIbScUh+oOL2RUDEsdjAKaU2rwP0NpSSbpEsrongQUhE13UcWuOX5Cyib
+	KV5RjbzwqxyGLSbdh8a7lNtFdTnOxZATeekJQvsnd25K4vE8U59dTaSzsNbkoWRI3Bbkw8jtgl6
+	cI5A1i/SAbNlxxOq+dJL64FDSa8Bqni4Ja5ZoYNb1B7mKxBl4Gy7FczIv5gf98mec/Gj6SfBJfL
+	dmyPgp2FdnhZeNJYTPu/+es1McyOYBaLz0NmwUId1SgXbCvFfpW5eBdvILrlbN8k5iJj5Piw9qJ
+	DzvCp0RGXYdpTy4q+TQ==
+X-Google-Smtp-Source: AGHT+IHe/oe0zY4+yYJwTiGmWWmGZRBDTEEyCDbeD1Lc63F0pgqbtmUw5hk9yo87sF0JWRa+SalrIA==
+X-Received: by 2002:a05:620a:1706:b0:7e8:b6:ceac with SMTP id af79cd13be357-7e800b6cf45mr1153789685a.53.1754401125936;
+        Tue, 05 Aug 2025 06:38:45 -0700 (PDT)
+Received: from localhost ([142.186.9.88])
+        by smtp.gmail.com with UTF8SMTPSA id af79cd13be357-7e8050b6101sm194923585a.26.2025.08.05.06.38.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Aug 2025 06:38:45 -0700 (PDT)
+Date: Tue, 5 Aug 2025 09:38:28 -0400
+From: Seyediman Seyedarab <imandevel@gmail.com>
+To: Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc: minchan@kernel.org, axboe@kernel.dk, linux-kernel@vger.kernel.org, 
+	linux-block@vger.kernel.org, syzbot+1a281a451fd8c0945d07@syzkaller.appspotmail.com
+Subject: Re: [PATCH] zram: fix NULL pointer dereference in
+ zcomp_available_show()
+Message-ID: <6hs2ou3giemh2j7lvaldr7akpmrwt56gdh3gjs7i5ouexljggp@2fpes7wzdu6l>
+References: <20250803062519.35712-1-ImanDevel@gmail.com>
+ <d7gutildolj5jtx53l2tfkymxdctga3adabgn2cfqu3makx4le@3lfmk67haipn>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <682f0f43-733a-4c04-91ed-5665815128bc@linux.ibm.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+In-Reply-To: <d7gutildolj5jtx53l2tfkymxdctga3adabgn2cfqu3makx4le@3lfmk67haipn>
 
-On Tue, Aug 05, 2025 at 10:28:14AM +0530, Nilay Shroff wrote:
+On 25/08/05 07:22PM, Sergey Senozhatsky wrote:
+> On (25/08/03 02:25), Seyediman Seyedarab wrote:
+> > Temporarily add a NULL check in zcomp_available_show() to prevent the
+> > crash. The use-after-free issue requires a more comprehensive fix using
+> > proper reference counting to ensure the zram structure isn't freed while
+> > still in use.
 > 
-> 
-> On 8/4/25 7:12 PM, Ming Lei wrote:
-> > On Mon, Aug 04, 2025 at 05:51:09PM +0530, Nilay Shroff wrote:
-> >> This patchset replaces the use of a static key in the I/O path (rq_qos_
-> >> xxx()) with an atomic queue flag (QUEUE_FLAG_QOS_ENABLED). This change
-> >> is made to eliminate a potential deadlock introduced by the use of static
-> >> keys in the blk-rq-qos infrastructure, as reported by lockdep during 
-> >> blktests block/005[1].
-> >>
-> >> The original static key approach was introduced to avoid unnecessary
-> >> dereferencing of q->rq_qos when no blk-rq-qos module (e.g., blk-wbt or
-> >> blk-iolatency) is configured. While efficient, enabling a static key at
-> >> runtime requires taking cpu_hotplug_lock and jump_label_mutex, which 
-> >> becomes problematic if the queue is already frozen — causing a reverse
-> >> dependency on ->freeze_lock. This results in a lockdep splat indicating
-> >> a potential deadlock.
-> >>
-> >> To resolve this, we now gate q->rq_qos access with a q->queue_flags
-> >> bitop (QUEUE_FLAG_QOS_ENABLED), avoiding the static key and the associated
-> >> locking altogether.
-> >>
-> >> I compared both static key and atomic bitop implementations using ftrace
-> >> function graph tracer over ~50 invocations of rq_qos_issue() while ensuring
-> >> blk-wbt/blk-iolatency were disabled (i.e., no QoS functionality). For
-> >> easy comparision, I made rq_qos_issue() noinline. The comparision was
-> >> made on PowerPC machine.
-> >>
-> >> Static Key (disabled : QoS is not configured):
-> >> 5d0: 00 00 00 60     nop    # patched in by static key framework (not taken)
-> >> 5d4: 20 00 80 4e     blr    # return (branch to link register)
-> >>
-> >> Only a nop and blr (branch to link register) are executed — very lightweight.
-> >>
-> >> atomic bitop (QoS is not configured):
-> >> 5d0: 20 00 23 e9     ld      r9,32(r3)     # load q->queue_flags
-> >> 5d4: 00 80 29 71     andi.   r9,r9,32768   # check QUEUE_FLAG_QOS_ENABLED (bit 15)
-> >> 5d8: 20 00 82 4d     beqlr                 # return if bit not set
-> >>
-> >> This performs an ld and and andi. before returning. Slightly more work, 
-> >> but q->queue_flags is typically hot in cache during I/O submission.
-> >>
-> >> With Static Key (disabled):
-> >> Duration (us): min=0.668 max=0.816 avg≈0.750
-> >>
-> >> With atomic bitop QUEUE_FLAG_QOS_ENABLED (bit not set):
-> >> Duration (us): min=0.684 max=0.834 avg≈0.759
-> >>
-> >> As expected, both versions are almost similar in cost. The added latency
-> >> from an extra ld and andi. is in the range of ~9ns.
-> >>
-> >> There're two patches in the series. The first patch replaces static key
-> >> with QUEUE_FLAG_QOS_ENABLED. The second patch ensures that we disable
-> >> the QUEUE_FLAG_QOS_ENABLED when the queue no longer has any associated
-> >> rq_qos policies.
-> >>
-> >> As usual, feedback and review comments are welcome!
-> >>
-> >> [1] https://lore.kernel.org/linux-block/4fdm37so3o4xricdgfosgmohn63aa7wj3ua4e5vpihoamwg3ui@fq42f5q5t5ic/
-> > 
-> > 
-> > Another approach is to call memalloc_noio_save() in cpu hotplug code...
-> > 
-> Yes that would help fix this. However per the general usage of GFP_NOIO scope in 
-> kernel, it is used when we're performing memory allocations in a context where I/O
-> must not be initiated, because doing so could cause deadlocks or recursion. 
-> 
-> So we typically, use GFP_NOIO in a code path that is already doing I/O, such as:
-> - In block layer context: during request submission 
-> - Filesystem writeback, or swap-out.
-> - Memory reclaim or writeback triggered by memory pressure.
+> Not without a reproducer, sorry.  Per my limited experience, attempts
+> to fix syzkaller reports w/o reproducers often lead to regressions or
+> just more problems.
 
-If you grep blk_mq_freeze_queue, you will see the above list is far from
-enough, :-)
+It can be reproduced with the following code:
+#include <stdlib.h>
+#include <stdio.h>
+#include <fcntl.h>
+#include <unistd.h>
 
-> 
-> The cpu hotplug code may not be running in any of the above context. So
-> IMO, adding memalloc_noio_save() in the cpu hotplug code would not be 
-> a good idea, isn't it?
+int main()
+{
+    int hot_remove_fd, comp_alg_fd, disksize_fd;
+    char buf[256];
+    
+    system("modprobe -r zram");
+    system("modprobe zram");
+    
+    disksize_fd = open("/sys/block/zram0/disksize", O_WRONLY);
+    if (disksize_fd >= 0) {
+        write(disksize_fd, "1073741824", 10);
+        close(disksize_fd);
+    }
 
-The reasoning(A -> B) looks correct, but the condition A is obviously not.
+    hot_remove_fd = open("/sys/class/zram-control/hot_remove", O_WRONLY);
+    comp_alg_fd = open("/sys/block/zram0/comp_algorithm", O_RDONLY);
+    
+    write(hot_remove_fd, "0", 1);
+    
+    for (int i = 0; i < 1000000; i++) {
+        lseek(comp_alg_fd, 0, SEEK_SET);
+        read(comp_alg_fd, buf, sizeof(buf));
+        printf("comp_algorithm: %s", buf);
+    }
+}
 
-
-Thanks,
-Ming
-
+Which produces corrupted output sometimes. (it's a race condition, so it
+doesn't happen all the time...)
