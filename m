@@ -1,105 +1,384 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83FF1433C8;
-	Wed,  6 Aug 2025 10:39:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CCCB1F874C
+	for <linux-block@vger.kernel.org>; Wed,  6 Aug 2025 10:52:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754476794; cv=none; b=EhYHMSZ1sq4svF28i0JG3AGgLoG7OKuJ3TzB3R9HqErz55MjzB1nnJ6geBaBhhjECnvtHJzDHK5lcamf7XJPILx2Xqr2yXB4f5BRJXWLUtHrFnfu5hUecGIivyRhUAHDFMbSQ4xu4TjNF3GlyEy9v0Mp6q8x+G+jGMC6ndm1yLs=
+	t=1754477547; cv=none; b=LkD2QdnzU2pBX+xPbmxemx7dNkkDVR1mCeQOBzzU8CrCx8nvpW2IhlrFUGeEIIybXYvTznj/ykXoa/8ddQUTwVE7enHO8lm3uYnK0eZJUZUE4mx6SOGC6P0wDgbtYEq3rfDueWCx7JiJDwJX3vLAygmlYPvnYLyQ09epUhFx+Tg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754476794; c=relaxed/simple;
-	bh=prVC3lxppRrhOCtUCxmwBpaVitYSrJeH5aa/qfTq7qw=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=bA9HcVgXOzWTHLM0PkD1m+xZr9C7arjgx1zo1Gpn0Hzpsy4E3Mc3KkSl+km1ha3DET+248PnOG229hPnUc1SNdhXmgCA4bHmCIaY4hZTYeiDaA/OnV8CeU7mc3BxaMy+eaz8LgDvfznVZh0B5gmnmj5U4z1F6RO9t8euCdqqkX0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sx9Ir5n4; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1754477547; c=relaxed/simple;
+	bh=oDjkmEC9WH8r8XLZgESYvVTn7Hy3UpJldmA1Ukg3+JA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mF6M04603E5nVJkC0y2cZ9XhRgbtK0qkNW2jk5zVdhWlFpaWV5/z9B0KMUZE+JPbLYUPBHkhI4XN5TNkuUvvvX6BCUkf6ztm/lzrwAfiR6F3LyIYo5LgVe6yhboeJ/Sfs7awnURO1bQ1IG74oLvraHxhmAnR8ePxRRY5Lczzzzg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=TdrLXrnC; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=TCPH4HEl; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=zHlG+5Bo; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=6Kan1Lal; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sx9Ir5n4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A58AC4CEE7;
-	Wed,  6 Aug 2025 10:39:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754476794;
-	bh=prVC3lxppRrhOCtUCxmwBpaVitYSrJeH5aa/qfTq7qw=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=sx9Ir5n4UaugNe7R6F49AobZrroStIGqDxaA8Ax7Y4AfSBCb1z72lD60N+CenmYwG
-	 AMjQismZkwC+F/b5S1F2KQEvX5kuoSdlTrStmn2Q/NeaetSWhEP7zx/7Yixu7+IzUC
-	 oleNfHI5P4mBGM6UoO/niHk5u1FWTPOu+4GVIgZ6ic7ZBOzHivm5kdBWewZa3p2D2O
-	 K2Sl93MUc10VRWFGjOByECnwuqML1h9gbVbUqZi+ofyckPjeUhnJ240pbBeDf3CcJf
-	 tW950k7sDgpIgtBcJeGznBuGKX9H8v9eDCYdOrz6kw3lDNDdySZln2ocJEeopwMRPW
-	 8NZkpwmwOSwDQ==
-From: Andreas Hindborg <a.hindborg@kernel.org>
-To: Alice Ryhl <aliceryhl@google.com>
-Cc: Boqun Feng <boqun.feng@gmail.com>, Miguel Ojeda <ojeda@kernel.org>, Alex
- Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>, =?utf-8?Q?Bj?=
- =?utf-8?Q?=C3=B6rn?= Roy
- Baron <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>, Trevor
- Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, Jens Axboe
- <axboe@kernel.dk>, linux-block@vger.kernel.org,
- rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 10/16] rust: block: add block related constants
-In-Reply-To: <aHYi-PRsEQ-YpeYm@google.com>
-References: <20250711-rnull-up-v6-16-v3-0-3a262b4e2921@kernel.org>
- <20250711-rnull-up-v6-16-v3-10-3a262b4e2921@kernel.org>
- <hCVxhbCxZksAYFB75R-sGCzmJWrbFU_dP4ABVoqVebSiLPiO-rC3MnJVN4vZRLiUO3io-p2wJM-rxjxK-AX4uA==@protonmail.internalid>
- <aHYi-PRsEQ-YpeYm@google.com>
-Date: Wed, 06 Aug 2025 12:28:47 +0200
-Message-ID: <87fre4921s.fsf@kernel.org>
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="TdrLXrnC";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="TCPH4HEl";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="zHlG+5Bo";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="6Kan1Lal"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 80FF61F7EB;
+	Wed,  6 Aug 2025 10:52:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1754477542; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=de64bYKHoVzkYilqbod/ZGEQaDAcZbaTJRU1TxQmSek=;
+	b=TdrLXrnCsreFet5/Y2s7pHyjusA5u6/O4nEP9t4Vo5LRAokf1G45eGW5KWMDspZMz09eeR
+	DRJRls35bWZTDKer7ZzwkLA5IcyoCEkmoJgY3gr+EDL6IGAwhPWwpXAHe9aDePVcBjHnnU
+	xN9AAH/QppgR+jyriGYcGzAVzC7q65Y=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1754477542;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=de64bYKHoVzkYilqbod/ZGEQaDAcZbaTJRU1TxQmSek=;
+	b=TCPH4HElAwnHXwSW0P3OF3ujYnMZemQii+79kF1osqfQy3mAdDH9Go1NmDfH12v9TfeX6v
+	2bM//6KJfdes5FDQ==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1754477541; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=de64bYKHoVzkYilqbod/ZGEQaDAcZbaTJRU1TxQmSek=;
+	b=zHlG+5BotJBYzK1tQqF4lqb9g0bJnE1ZCutXaxcymPogvG9pr9VSuUCF1RXsx+3JWxdTOE
+	6SDgbx/AKgbQbaHZMcXU1jVlG4fb/rTcXhYpKzLvUMZRcyJQPWbrMzoNvG1sGf7oVfVjky
+	wB1gFmOiUTlCRX5md3XfB7i1h8wtaZs=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1754477541;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=de64bYKHoVzkYilqbod/ZGEQaDAcZbaTJRU1TxQmSek=;
+	b=6Kan1LalZtaXhbzs9epWw3tupVSqGSYFYBO0MXkO5ebj8PGEzdBWeEK5vZSfBBflX3XsCY
+	T8P0joBHo0r6UACQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 46F1213AA8;
+	Wed,  6 Aug 2025 10:52:21 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 5c0hD+Uzk2jFOgAAD6G6ig
+	(envelope-from <hare@suse.de>); Wed, 06 Aug 2025 10:52:21 +0000
+Message-ID: <a2aac6f2-9389-404e-9f5d-b71ead2af0fe@suse.de>
+Date: Wed, 6 Aug 2025 12:52:20 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [bug report] blktests nvme/tcp nvme/060 hang
+To: Yi Zhang <yi.zhang@redhat.com>, linux-block
+ <linux-block@vger.kernel.org>,
+ "open list:NVM EXPRESS DRIVER" <linux-nvme@lists.infradead.org>
+Cc: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+ Maurizio Lombardi <mlombard@redhat.com>
+References: <CAHj4cs-zu7eVB78yUpFjVe2UqMWFkLk8p+DaS3qj+uiGCXBAoA@mail.gmail.com>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <CAHj4cs-zu7eVB78yUpFjVe2UqMWFkLk8p+DaS3qj+uiGCXBAoA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-4.30 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-0.998];
+	MIME_GOOD(-0.10)[text/plain];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	ARC_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	TO_DN_ALL(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid,suse.de:email,imap1.dmz-prg2.suse.org:helo]
+X-Spam-Flag: NO
+X-Spam-Level: 
+X-Spam-Score: -4.30
 
-"Alice Ryhl" <aliceryhl@google.com> writes:
+On 8/6/25 03:57, Yi Zhang wrote:
+> Hello
+> I hit this issue when I was running blktests nvme/tcp nvme/060 on the
+> latest linux-block/for-next with rt enabled, please help check it and
+> let me know if you need any info/testing for it, thanks.
+> 
+> [  195.356104] run blktests nvme/060 at 2025-08-06 01:50:45
+> [  195.578659] loop0: detected capacity change from 0 to 2097152
+> [  195.620986] nvmet: adding nsid 1 to subsystem blktests-subsystem-1
+> [  195.681508] nvmet_tcp: enabling port 0 (127.0.0.1:4420)
+> [  195.904991] nvmet: Created nvm controller 1 for subsystem
+> blktests-subsystem-1 for NQN
+> nqn.2014-08.org.nvmexpress:uuid:0f01fb42-9f7f-4856-b0b3-51e60b8de349.
+> [  195.919199] nvme nvme1: creating 80 I/O queues.
+> [  196.035295] nvme nvme1: mapped 80/0/0 default/read/poll queues.
+> [  196.175655] nvme nvme1: new ctrl: NQN "blktests-subsystem-1", addr
+> 127.0.0.1:4420, hostnqn:
+> nqn.2014-08.org.nvmexpress:uuid:0f01fb42-9f7f-4856-b0b3-51e60b8de349
+> [  196.195731] nvme (3558) used greatest stack depth: 19248 bytes left
+> [  197.786460] nvmet: ctrl 1 fatal error occurred!
+> [  197.789337] nvme nvme1: starting error recovery
+> [  197.932751] nvme nvme1: Reconnecting in 1 seconds...
+> [  198.980348] nvmet: Created nvm controller 1 for subsystem
+> blktests-subsystem-1 for NQN
+> nqn.2014-08.org.nvmexpress:uuid:0f01fb42-9f7f-4856-b0b3-51e60b8de349.
+> [  198.985848] nvme nvme1: creating 80 I/O queues.
+> [  199.318924] nvme nvme1: mapped 80/0/0 default/read/poll queues.
+> [  199.423818] nvme nvme1: Removing ctrl: NQN "blktests-subsystem-1"
+> [  199.556572] nvme nvme1: Failed reconnect attempt 1/600
+> [  200.075342] systemd-udevd (3501) used greatest stack depth: 17888 bytes left
+> [  200.496781] nvme nvme1: Property Set error: 880, offset 0x14
+> [  200.977968] nvmet: Created nvm controller 1 for subsystem
+> blktests-subsystem-1 for NQN
+> nqn.2014-08.org.nvmexpress:uuid:0f01fb42-9f7f-4856-b0b3-51e60b8de349.
+> [  200.985964] nvme nvme1: creating 80 I/O queues.
+> [  201.076602] nvme nvme1: mapped 80/0/0 default/read/poll queues.
+> [  201.189249] nvme nvme1: new ctrl: NQN "blktests-subsystem-1", addr
+> 127.0.0.1:4420, hostnqn:
+> nqn.2014-08.org.nvmexpress:uuid:0f01fb42-9f7f-4856-b0b3-51e60b8de349
+> [  201.206511] nvme (3741) used greatest stack depth: 17712 bytes left
+> [  201.867978] nvmet: ctrl 1 fatal error occurred!
+> [  201.868127] nvme nvme1: starting error recovery
+> [  201.986566] nvme nvme1: Reconnecting in 1 seconds...
+> [  203.049519] nvmet: Created nvm controller 1 for subsystem
+> blktests-subsystem-1 for NQN
+> nqn.2014-08.org.nvmexpress:uuid:0f01fb42-9f7f-4856-b0b3-51e60b8de349.
+> [  203.056878] nvme nvme1: creating 80 I/O queues.
+> [  203.399239] nvme nvme1: mapped 80/0/0 default/read/poll queues.
+> [  203.569429] nvme nvme1: Successfully reconnected (attempt 1/600)
+> [  203.918129] nvmet: ctrl 1 fatal error occurred!
+> [  203.918261] nvme nvme1: starting error recovery
+> [  204.026795] nvme nvme1: Reconnecting in 1 seconds...
+> [  204.423104] nvme nvme1: Removing ctrl: NQN "blktests-subsystem-1"
+> [  205.336507] nvme nvme1: Property Set error: 880, offset 0x14
+> [  205.855722] nvmet: Created nvm controller 1 for subsystem
+> blktests-subsystem-1 for NQN
+> nqn.2014-08.org.nvmexpress:uuid:0f01fb42-9f7f-4856-b0b3-51e60b8de349.
+> [  205.861038] nvme nvme1: creating 80 I/O queues.
+> [  205.944537] nvme nvme1: mapped 80/0/0 default/read/poll queues.
+> [  205.965862] nvmet: ctrl 1 fatal error occurred!
+> [  206.053046] nvme nvme1: starting error recovery
+> [  206.147337] nvme nvme1: Failed to configure AEN (cfg 900)
+> [  206.147495] nvme nvme1: new ctrl: NQN "blktests-subsystem-1", addr
+> 127.0.0.1:4420, hostnqn:
+> nqn.2014-08.org.nvmexpress:uuid:0f01fb42-9f7f-4856-b0b3-51e60b8de349
+> [  206.176163] nvme nvme1: Reconnecting in 1 seconds...
+> [  207.208170] nvmet: Created nvm controller 1 for subsystem
+> blktests-subsystem-1 for NQN
+> nqn.2014-08.org.nvmexpress:uuid:0f01fb42-9f7f-4856-b0b3-51e60b8de349.
+> [  207.211901] nvme nvme1: creating 80 I/O queues.
+> [  207.336799] nvme nvme1: mapped 80/0/0 default/read/poll queues.
+> [  207.349663] nvme nvme1: Successfully reconnected (attempt 1/600)
+> [  208.017068] nvmet: ctrl 1 fatal error occurred!
+> [  208.017201] nvme nvme1: starting error recovery
+> [  208.126889] nvme nvme1: Reconnecting in 1 seconds...
+> [  209.199440] nvmet: Created nvm controller 1 for subsystem
+> blktests-subsystem-1 for NQN
+> nqn.2014-08.org.nvmexpress:uuid:0f01fb42-9f7f-4856-b0b3-51e60b8de349.
+> [  209.203685] nvme nvme1: creating 80 I/O queues.
+> [  209.382909] nvme nvme1: Removing ctrl: NQN "blktests-subsystem-1"
+> [  209.503420] nvme nvme1: mapped 80/0/0 default/read/poll queues.
+> [  209.706412] nvme nvme1: Failed reconnect attempt 1/600
+> [  210.617622] nvme nvme1: Property Set error: 880, offset 0x14
+> [  211.158138] nvmet: Created nvm controller 1 for subsystem
+> blktests-subsystem-1 for NQN
+> nqn.2014-08.org.nvmexpress:uuid:0f01fb42-9f7f-4856-b0b3-51e60b8de349.
+> [  211.163794] nvme nvme1: creating 80 I/O queues.
+> [  211.245927] nvme nvme1: mapped 80/0/0 default/read/poll queues.
+> [  211.350477] nvme nvme1: new ctrl: NQN "blktests-subsystem-1", addr
+> 127.0.0.1:4420, hostnqn:
+> nqn.2014-08.org.nvmexpress:uuid:0f01fb42-9f7f-4856-b0b3-51e60b8de349
+> [  212.097987] nvmet: ctrl 1 fatal error occurred!
+> [  212.098122] nvme nvme1: starting error recovery
+> [  212.217345] nvme nvme1: Reconnecting in 1 seconds...
+> [  213.280774] nvmet: Created nvm controller 1 for subsystem
+> blktests-subsystem-1 for NQN
+> nqn.2014-08.org.nvmexpress:uuid:0f01fb42-9f7f-4856-b0b3-51e60b8de349.
+> [  213.284617] nvme nvme1: creating 80 I/O queues.
+> [  213.625320] nvme nvme1: mapped 80/0/0 default/read/poll queues.
+> [  213.787167] nvme nvme1: Successfully reconnected (attempt 1/600)
+> [  214.147984] nvmet: ctrl 1 fatal error occurred!
+> [  214.148113] nvme nvme1: starting error recovery
+> [  214.248455] nvme nvme1: Reconnecting in 1 seconds...
+> [  214.604818] nvme nvme1: Removing ctrl: NQN "blktests-subsystem-1"
+> [  215.431717] nvme nvme1: Property Set error: 880, offset 0x14
+> [  216.014626] nvmet: Created nvm controller 1 for subsystem
+> blktests-subsystem-1 for NQN
+> nqn.2014-08.org.nvmexpress:uuid:0f01fb42-9f7f-4856-b0b3-51e60b8de349.
+> [  216.020186] nvme nvme1: creating 80 I/O queues.
+> [  216.101613] nvme nvme1: mapped 80/0/0 default/read/poll queues.
+> [  216.195783] nvmet: ctrl 1 fatal error occurred!
+> [  216.536582] nvme nvme1: failed to send request -32
+> [  216.537991] nvme nvme1: failed nvme_keep_alive_end_io error=4
+> [  280.196270] nvme nvme1: I/O tag 0 (0000) type 4 opcode 0x7f
+> (Fabrics Cmd) QID 80 timeout
+> [  280.198058] nvme nvme1: Connect command failed, error wo/DNR bit: 881
+> [  280.198353] nvme nvme1: failed to connect queue: 80 ret=881
+> [  285.369827] nvmet: Created nvm controller 1 for subsystem
+> blktests-subsystem-1 for NQN
+> nqn.2014-08.org.nvmexpress:uuid:0f01fb42-9f7f-4856-b0b3-51e60b8de349.
+> [  285.375603] nvme nvme1: creating 80 I/O queues.
+> [  285.449676] nvme nvme1: mapped 80/0/0 default/read/poll queues.
+> [  285.554119] nvme nvme1: new ctrl: NQN "blktests-subsystem-1", addr
+> 127.0.0.1:4420, hostnqn:
+> nqn.2014-08.org.nvmexpress:uuid:0f01fb42-9f7f-4856-b0b3-51e60b8de349
+> [  287.344206] nvmet: ctrl 1 fatal error occurred!
+> [  287.344349] nvme nvme1: starting error recovery
+> [  287.466244] nvme nvme1: Reconnecting in 1 seconds...
+> [  288.479300] nvmet: Created nvm controller 1 for subsystem
+> blktests-subsystem-1 for NQN
+> nqn.2014-08.org.nvmexpress:uuid:0f01fb42-9f7f-4856-b0b3-51e60b8de349.
+> [  288.483283] nvme nvme1: creating 80 I/O queues.
+> [  288.785415] nvme nvme1: Removing ctrl: NQN "blktests-subsystem-1"
+> [  288.856766] nvme nvme1: mapped 80/0/0 default/read/poll queues.
+> [  289.066215] nvme nvme1: Failed reconnect attempt 1/600
+> [  290.116265] nvme nvme1: Property Set error: 880, offset 0x14
+> [  320.802045] loop: module loaded
+> [  321.017366] run blktests nvme/060 at 2025-08-06 01:52:51
+> [  321.220243] loop0: detected capacity change from 0 to 2097152
+> [  321.262034] nvmet: adding nsid 1 to subsystem blktests-subsystem-1
+> [  321.322296] nvmet_tcp: enabling port 0 (127.0.0.1:4420)
+> [  321.511316] nvmet: Created nvm controller 1 for subsystem
+> blktests-subsystem-1 for NQN
+> nqn.2014-08.org.nvmexpress:uuid:0f01fb42-9f7f-4856-b0b3-51e60b8de349.
+> [  321.524993] nvme nvme1: creating 80 I/O queues.
+> [  321.636336] nvme nvme1: mapped 80/0/0 default/read/poll queues.
+> [  321.754764] nvme nvme1: new ctrl: NQN "blktests-subsystem-1", addr
+> 127.0.0.1:4420, hostnqn:
+> nqn.2014-08.org.nvmexpress:uuid:0f01fb42-9f7f-4856-b0b3-51e60b8de349
+> [  323.431491] nvmet: ctrl 1 fatal error occurred!
+> [  323.434219] nvme nvme1: starting error recovery
+> [  323.566948] nvme nvme1: Reconnecting in 1 seconds...
+> [  324.653738] nvmet: Created nvm controller 1 for subsystem
+> blktests-subsystem-1 for NQN
+> nqn.2014-08.org.nvmexpress:uuid:0f01fb42-9f7f-4856-b0b3-51e60b8de349.
+> [  324.662270] nvme nvme1: creating 80 I/O queues.
+> [  324.993712] nvme nvme1: Removing ctrl: NQN "blktests-subsystem-1"
+> [  325.052085] nvme nvme1: mapped 80/0/0 default/read/poll queues.
+> [  325.481710] nvmet: ctrl 1 fatal error occurred!
+> [  327.286111] nvmet: ctrl 1 keep-alive timer (1 seconds) expired!
+> [  390.435380] rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
+> [  390.441500] rcu: Tasks blocked on level-1 rcu_node (CPUs 0-15):
+> P4784/2:b..l P1049/8:b..l
+> [  390.449771] rcu: (detected by 13, t=6503 jiffies, g=8845, q=2243 ncpus=80)
+> [  390.456724] task:kworker/u329:1  state:D stack:19264 pid:1049
+> tgid:1049  ppid:2      task_flags:0x4208060 flags:0x00000010
+> [  390.467850] Workqueue: nvme-wq nvme_tcp_reconnect_ctrl_work [nvme_tcp]
+> [  390.474378] Call trace:
+> [  390.476813]  __switch_to+0x1d8/0x330 (T)
+> [  390.480731]  __schedule+0x860/0x1c30
+> [  390.484297]  schedule_rtlock+0x30/0x70
+> [  390.488037]  rtlock_slowlock_locked+0x464/0xf60
+> [  390.492559]  rt_read_lock+0x2bc/0x3e0
+> [  390.496211]  nvmet_tcp_listen_data_ready+0x3c/0x118 [nvmet_tcp]
+> [  390.502125]  nvmet_tcp_data_ready+0x88/0x198 [nvmet_tcp]
+> [  390.507429]  tcp_data_ready+0xdc/0x3e0
+> [  390.511171]  tcp_data_queue+0xe30/0x1e08
+> [  390.515084]  tcp_rcv_established+0x710/0x2328
+> [  390.519432]  tcp_v4_do_rcv+0x554/0x940
+> [  390.523172]  tcp_v4_rcv+0x1ec4/0x3078
+> [  390.526825]  ip_protocol_deliver_rcu+0xc0/0x3f0
+> [  390.531347]  ip_local_deliver_finish+0x2d4/0x5c0
+> [  390.535954]  ip_local_deliver+0x17c/0x3c0
+> [  390.539953]  ip_rcv_finish+0x148/0x238
+> [  390.543693]  ip_rcv+0xd0/0x2e0
+> [  390.546737]  __netif_receive_skb_one_core+0x100/0x180
+> [  390.551780]  __netif_receive_skb+0x2c/0x160
+> [  390.555953]  process_backlog+0x230/0x6f8
+> [  390.559866]  __napi_poll.constprop.0+0x9c/0x3e8
+> [  390.564386]  net_rx_action+0x808/0xb50
+> [  390.568125]  handle_softirqs.constprop.0+0x23c/0xca0
+> [  390.573082]  __local_bh_enable_ip+0x260/0x4f0
+> [  390.577429]  __dev_queue_xmit+0x6f4/0x1bd8
+> [  390.581515]  neigh_hh_output+0x190/0x2c0
+> [  390.585429]  ip_finish_output2+0x7c8/0x1788
+> [  390.589602]  __ip_finish_output+0x2c4/0x4f8
+> [  390.593776]  ip_finish_output+0x3c/0x2a8
+> [  390.597689]  ip_output+0x154/0x418
+> [  390.601081]  __ip_queue_xmit+0x580/0x1108
+> [  390.605081]  ip_queue_xmit+0x4c/0x78
+> [  390.608647]  __tcp_transmit_skb+0xfac/0x24e8
+> [  390.612908]  tcp_write_xmit+0xbec/0x3078
+> [  390.616821]  __tcp_push_pending_frames+0x90/0x2b8
+> [  390.621515]  tcp_send_fin+0x108/0x9a8
+> [  390.625167]  tcp_shutdown+0xd8/0xf8
+> [  390.628646]  inet_shutdown+0x14c/0x2e8
+> [  390.632385]  kernel_sock_shutdown+0x5c/0x98
+> [  390.636560]  __nvme_tcp_stop_queue+0x44/0x220 [nvme_tcp]
+> [  390.641865]  nvme_tcp_stop_queue_nowait+0x130/0x200 [nvme_tcp]
+> [  390.647691]  nvme_tcp_setup_ctrl+0x3bc/0x728 [nvme_tcp]
+> [  390.652909]  nvme_tcp_reconnect_ctrl_work+0x78/0x290 [nvme_tcp]
+> [  390.658822]  process_one_work+0x80c/0x1a78
+> [  390.662910]  worker_thread+0x6d0/0xaa8
+> [  390.666650]  kthread+0x304/0x3a0
+> [  390.669869]  ret_from_fork+0x10/0x20
+> [  390.673437] task:kworker/u322:77 state:D stack:27184 pid:4784
+> tgid:4784  ppid:2      task_flags:0x4208060 flags:0x00000210
+> [  390.684562] Workqueue: nvmet-wq nvmet_tcp_release_queue_work [nvmet_tcp]
+> [  390.691256] Call trace:
+> [  390.693692]  __switch_to+0x1d8/0x330 (T)
+> [  390.697605]  __schedule+0x860/0x1c30
+> [  390.701171]  schedule_rtlock+0x30/0x70
+> [  390.704911]  rwbase_write_lock.constprop.0.isra.0+0x2fc/0xb30
+> [  390.710646]  rt_write_lock+0x9c/0x138
+> [  390.714299]  nvmet_tcp_release_queue_work+0x168/0xb48 [nvmet_tcp]
+> [  390.720384]  process_one_work+0x80c/0x1a78
+> [  390.724470]  worker_thread+0x6d0/0xaa8
+> [  390.728210]  kthread+0x304/0x3a0
+> [  390.731428]  ret_from_fork+0x10/0x20
+> 
+> 
+Can you check if this fixes the problem?
 
-> On Fri, Jul 11, 2025 at 01:43:11PM +0200, Andreas Hindborg wrote:
->> Add a few block subsystem constants to the rust `kernel::block` name space.
->> This makes it easier to access the constants from rust code.
->>
->> Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
->> ---
->>  rust/kernel/block.rs | 12 ++++++++++++
->>  1 file changed, 12 insertions(+)
->>
->> diff --git a/rust/kernel/block.rs b/rust/kernel/block.rs
->> index 150f710efe5b..7461adf4d7e0 100644
->> --- a/rust/kernel/block.rs
->> +++ b/rust/kernel/block.rs
->> @@ -3,3 +3,15 @@
->>  //! Types for working with the block layer.
->>
->>  pub mod mq;
->> +
->> +/// Bit mask for masking out [`SECTOR_SIZE`]
->> +pub const SECTOR_MASK: u32 = bindings::SECTOR_MASK;
->> +
->> +/// Sectors are size `1 << SECTOR_SHIFT`.
->> +pub const SECTOR_SHIFT: u32 = bindings::SECTOR_SHIFT;
->> +
->> +/// Size of a sector.
->> +pub const SECTOR_SIZE: u32 = bindings::SECTOR_SIZE;
->> +
->> +/// Power of two difference in size of a page and size of a sector.
->> +pub const PAGE_SECTORS_SHIFT: u32 = bindings::PAGE_SECTORS_SHIFT;
->
-> I was looking for the user to double-check whether u32 was the right
-> choice, but I can't find it. It looks like you don't use these yet?
+diff --git a/drivers/nvme/target/tcp.c b/drivers/nvme/target/tcp.c
+index 688033b88d38..23bdce8dcdf0 100644
+--- a/drivers/nvme/target/tcp.c
++++ b/drivers/nvme/target/tcp.c
+@@ -1991,15 +1991,13 @@ static void nvmet_tcp_listen_data_ready(struct 
+sock *sk)
+         struct nvmet_tcp_port *port;
 
-Only `SECTOR_SHIFT` is used in this series, the rest will be used in the
-future. They are used for memory backing rnull, still out of tree [1].
-Do you want me to split the patch and delay the rest of the constants? I
-fully intend to upstream the user as soon as I can.
+         trace_sk_data_ready(sk);
++       if (sk->sk_state != TCP_LISTEN)
++               return;
 
-It is a #define on C side used as a shift operator on usize in Rust code
-like so:
+         read_lock_bh(&sk->sk_callback_lock);
+         port = sk->sk_user_data;
+-       if (!port)
+-               goto out;
+-
+-       if (sk->sk_state == TCP_LISTEN)
++       if (port)
+                 queue_work(nvmet_wq, &port->accept_work);
+-out:
+         read_unlock_bh(&sk->sk_callback_lock);
+  }
 
-  let sector: usize = something;
-  let page_offset = (sector & block::SECTOR_MASK as usize) << block::SECTOR_SHIFT;
+Cheers,
 
-Best regards,
-Andreas Hindborg
-
-
-[1] https://git.kernel.org/pub/scm/linux/kernel/git/a.hindborg/linux.git/tree/drivers/block/rnull/rnull.rs?h=rnull-v6.15#n211
-
+Hannes
+-- 
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
