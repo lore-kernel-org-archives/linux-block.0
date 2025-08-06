@@ -1,119 +1,67 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 696CF38FB9
-	for <linux-block@vger.kernel.org>; Wed,  6 Aug 2025 13:29:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EEC4944F;
+	Wed,  6 Aug 2025 14:51:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754486959; cv=none; b=Za5bzcA5RWgeeVMPfOoqwVQ6YGDEjG39Mzy0sI68+4JocwQtJfv9zCQmOMHRrlAiUrco9P+xAij0QA9p1KGihh1xI2gkGmh78kGxJp0+64V4sPKHu+BJ70xqi+odTDFfSOoi2ka+VHdYQSZOPhUGHBOZ+K5oHtx9aq7rE3vYXDM=
+	t=1754491903; cv=none; b=uzSd4gMQGidYxI22kcbP5yXWKqo4bRvs/JftEKUzPP02rv/9IiAqmdoKp3JxmDoHNt6fmrKsV0bmOo7JiHlWYBG+Mt4h+M4NWYByIG5yhrDoxbCiM/vxMPChrgyk8RF/Rp3RFaQLe9fF119+uYjln62vx87EQYWLaKQ1/u6CFho=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754486959; c=relaxed/simple;
-	bh=izgjM9nVwRqZoAfp3GuLDtbbPs/P0xvLQWzM+uPiSuk=;
+	s=arc-20240116; t=1754491903; c=relaxed/simple;
+	bh=uvBDByLweRe4L0+0bNxfGe3e9GlYbMP9yIrYw/RwM24=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lBucSesioCF/s5ZyYAqhsxGZtIWOAgFdNEaYJ4MxYlSJWEBX5xMoZbkly3As2HC99OQjJ9FQdfLz3CX+JYW1pF8D6f0bjNMztXw/CHC+kH1GYCJDAdMRO5MQxYWun3RMS06UcB2ysHmqbvI/HF/bqWFW60IxHytI0VkKAaB4+gY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JjjPkIwX; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=oZeyW6W5kXIRiswQjUxUluuX7cyp8VdrdVV/V5OJzJVFOHcfLJ3ni7PdioE4dWL4g8imdH+g4YnlhUJAIy8QUm+ZVnrpUyzOUJRHcGlStl6oFAMJuzQBmFMA4LgT4mfwMt6f2Wp20bCBTi+0XX9dLVWMiaMoFNeJwZbvZ84V3GE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Keyo+QW4; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JjjPkIwX"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1754486956;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gR+qI/Ob38VIe7wgkbk8/TXE1kJroPqMw/pbEOZbtVU=;
-	b=JjjPkIwXbjKr2A+hDmELbsqCgXedfD6u/N9PrasAJihftYdbq8VqI17QWwojL9a5pqCtAJ
-	9VeK1E57Darf7hIc2M3a7piRmBgEV3oiN2fVaRquV+82Pwf40xXRKI4+NaB9WtMuSjue67
-	xhZxVxjR2lIvDD4CcJ1MNfH0asQbjxk=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-629-Gj6Oyni_MDGmmQBNWum8WA-1; Wed,
- 06 Aug 2025 09:29:13 -0400
-X-MC-Unique: Gj6Oyni_MDGmmQBNWum8WA-1
-X-Mimecast-MFC-AGG-ID: Gj6Oyni_MDGmmQBNWum8WA_1754486951
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id F15F319560A6;
-	Wed,  6 Aug 2025 13:29:10 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.35])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4112E180035C;
-	Wed,  6 Aug 2025 13:29:05 +0000 (UTC)
-Date: Wed, 6 Aug 2025 21:28:58 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Yu Kuai <yukuai1@huaweicloud.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	John Garry <john.garry@huawei.com>,
-	Sathya Prakash Veerichetty <sathya.prakash@broadcom.com>,
-	"yukuai (C)" <yukuai3@huawei.com>
-Subject: Re: [PATCH 5/5] blk-mq: Replace tags->lock with SRCU for tag
- iterators
-Message-ID: <aJNYmjoJsarvObBy@fedora>
-References: <20250801114440.722286-1-ming.lei@redhat.com>
- <20250801114440.722286-6-ming.lei@redhat.com>
- <c86b6974-fcd6-0a96-a69a-1831f6c6d8d8@huaweicloud.com>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Keyo+QW4"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=S3wdBIOLGEb/dP4L+k9B4Zn54dlvDvbbF5Vrp6IEWAE=; b=Keyo+QW4qD4sSKo5MwOJ7rpWON
+	AzJ8xbNru1fyVHVJV2lDT/G3tmHeYXHQzk63MQDCl8JO/TkJVTarNd5KHWeDuQGez9IAsTQj6AdkA
+	mEg88q7La1upTIhV+/PHr7WqceDh6/fxq57CdNZKlIZdUHX3PAoDHL74NqCtpxUeeDI/pfKM8YDBz
+	jVk3cFqde6eNnnVRCZS519HiUTynHZBfgrneKVlba9R7jsF1+HMRP44a1wjsBRofqx6WCo5PfMaU+
+	J+0Q8P9OP4Tf19hJvpr/hr0xv0YY89Yc++Cie1o4KuVwOYnHCImZ7hNaf+iSX+aKGCqGYPEEPbJZZ
+	bQiRZMsA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1ujfUM-0000000FUPY-0hUG;
+	Wed, 06 Aug 2025 14:51:34 +0000
+Date: Wed, 6 Aug 2025 07:51:34 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Keith Busch <kbusch@meta.com>
+Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org, snitzer@kernel.org, axboe@kernel.dk,
+	dw@davidwei.uk, brauner@kernel.org, Keith Busch <kbusch@kernel.org>
+Subject: Re: [PATCHv2 0/7] direct-io: even more flexible io vectors
+Message-ID: <aJNr9svJav0DgZ-E@infradead.org>
+References: <20250805141123.332298-1-kbusch@meta.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <c86b6974-fcd6-0a96-a69a-1831f6c6d8d8@huaweicloud.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+In-Reply-To: <20250805141123.332298-1-kbusch@meta.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Wed, Aug 06, 2025 at 05:21:32PM +0800, Yu Kuai wrote:
-> Hi,
-> 
-> 在 2025/08/01 19:44, Ming Lei 写道:
-> > Replace the spinlock in blk_mq_find_and_get_req() with an SRCU read lock
-> > around the tag iterators.
-> > 
-> > This is done by:
-> > 
-> > - Holding the SRCU read lock in blk_mq_queue_tag_busy_iter(),
-> > blk_mq_tagset_busy_iter(), and blk_mq_hctx_has_requests().
-> > 
-> > - Removing the now-redundant tags->lock from blk_mq_find_and_get_req().
-> > 
-> > This change improves performance by replacing a spinlock with a more
-> > scalable SRCU lock, and fixes lockup issue in scsi_host_busy() in case of
-> > shost->host_blocked.
-> > 
-> > Meantime it becomes possible to use blk_mq_in_driver_rw() for io
-> > accounting.
-> > 
-> > Signed-off-by: Ming Lei<ming.lei@redhat.com>
-> > ---
-> >   block/blk-mq-tag.c | 12 ++++++++----
-> >   block/blk-mq.c     | 24 ++++--------------------
-> >   2 files changed, 12 insertions(+), 24 deletions(-)
-> 
-> I think it's not good to use blk_mq_in_driver_rw() for io accounting, we
-> start io accounting from blk_account_io_start(), where such io is not in
-> driver yet.
+Just jumping in while travelling with almost time available:  I like the
+idea, but you have to be really, really careful for writes through file
+systems with this.  Deferred errors happening after bio submission are
+nasty and we tend to get things wrong there too often.
 
-In blk_account_io_start(), the current IO is _not_ taken into account in
-update_io_ticks() yet.
+So this needs to come with an xfstests to actually hit the alignment
+errors, including something that is not the first bio submitted.
 
-Also please look at 'man iostat':
+Even with that it will change behavior quite a bit, e.g. for file
+systems that can do direct I/O write without the exclusive i_rwsem will
+leak newly allocated space on errors asynchronously reported through bio
+completions, so you'll need to get fs maintainer buy in for that.
 
-    %util  Percentage  of  elapsed time during which I/O requests were issued to the device (bandwidth utilization for the device). Device
-           saturation occurs when this value is close to 100% for devices serving requests serially.  But for devices serving requests  in
-           parallel, such as RAID arrays and modern SSDs, this number does not reflect their performance limits.
-
-which shows %util in device level, not from queuing IO to complete io from device.
-
-That said the current approach for counting inflight IO via percpu counter
-from blk_account_io_start() is not correct from %util viewpoint from
-request based driver.
-
-
-Thanks, 
-Ming
-
+Given all that I'm not sure converting the legacy fs/direct-io.c path
+is such a good idea as the only file systems left using it are those
+that are more less unmaintained (or at least severely undermaintained).
