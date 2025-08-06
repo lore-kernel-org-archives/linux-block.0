@@ -1,39 +1,41 @@
 Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A85E72622
-	for <linux-block@vger.kernel.org>; Wed,  6 Aug 2025 01:35:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 784051FB3
+	for <linux-block@vger.kernel.org>; Wed,  6 Aug 2025 01:44:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754444158; cv=none; b=nvDeTHKn+x41KPyXSAoj9mz/h9kshEV2an8x+zejfG+dYeE0MpAYF1ymoV11AdIqCiPoesH8CYvB4vVSy45XaymRE0AzBoxVVO+gAKaZ7iFwLIg5DPcj4IsvKEIY1d2pSCJDdvxuZ3FIMmc6IK7wWUmmZh3td1UoFcNhq975Zps=
+	t=1754444683; cv=none; b=ccqGIUzrpljpP6BLwSkgIHyFQAh+kORUM/TEfbjdDr2xN5NsybhLPMOKjNIVVdtr/2lpkdy/zted2gAusl24Am5Hr9WdEPK56+b+yJQU4iWuiZD8x8DS2/H5ZDoIMJUWYmmmkAmH5FfQbtkvUEYzL9i2VXrDKlJvfZbIKlEFmOU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754444158; c=relaxed/simple;
-	bh=y5mHdXQPv6xTsq/yQ2L3PL1fNpaVaLldJOoQXM9wIa4=;
+	s=arc-20240116; t=1754444683; c=relaxed/simple;
+	bh=FlyYC6nsVpTvNRX52SXy2/NJQfiFwxsYFyLHp9lEflQ=;
 	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=nYZ/rD98sncpsaMGN2NeSZxsGV71Dxzrqfv9mZ/wMhEVLVs+vgbCMmsrgHJYPQyZc7N4QX5s8pMieXpslGKTIbeJCaZXFR2vIbKKdyq6BxWEy7DB74dAevdAKF+EQGDZucN7R5az4giSzh5Caemzdi2Parbt9FbVJihhoNXRmEE=
+	 In-Reply-To:Content-Type; b=hAcd4CzHjaCPjro2a3uAOI4hCv1BrDZz/6JqNj66IFq8XKziN2S5PrOqGWybJTvPp/Vp2q73hSkk4FQUsRIwK8zS1H14Fgm7Mw5DsPL3cTwRdF9HX/so1OXtdqoYU7RM12ehcIDJh1TLRAjJn6qlDDL8m0/fgSYu5P+z1ofS3ZE=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4bxXW41rPvzYQtyw
-	for <linux-block@vger.kernel.org>; Wed,  6 Aug 2025 09:18:56 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4bxY4l4cH4zYQv7R
+	for <linux-block@vger.kernel.org>; Wed,  6 Aug 2025 09:44:39 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id DF52B1A07BB
-	for <linux-block@vger.kernel.org>; Wed,  6 Aug 2025 09:18:54 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTP id 4F9DF1A17C0
+	for <linux-block@vger.kernel.org>; Wed,  6 Aug 2025 09:44:38 +0800 (CST)
 Received: from [10.174.179.143] (unknown [10.174.179.143])
-	by APP4 (Coremail) with SMTP id gCh0CgBHwhJ7rZJotxzeCg--.6374S3;
-	Wed, 06 Aug 2025 09:18:53 +0800 (CST)
-Subject: Re: [PATCHv2 1/2] block: avoid cpu_hotplug_lock depedency on
- freeze_lock
-To: Nilay Shroff <nilay@linux.ibm.com>, linux-block@vger.kernel.org
-Cc: ming.lei@redhat.com, yukuai1@huaweicloud.com, axboe@kernel.dk,
- hch@lst.de, kch@nvidia.com, shinichiro.kawasaki@wdc.com, gjoyce@ibm.com,
- "yukuai (C)" <yukuai3@huawei.com>
-References: <20250805171749.3448694-1-nilay@linux.ibm.com>
- <20250805171749.3448694-2-nilay@linux.ibm.com>
+	by APP4 (Coremail) with SMTP id gCh0CgAHgxODs5Jo4i7gCg--.49106S3;
+	Wed, 06 Aug 2025 09:44:37 +0800 (CST)
+Subject: Re: [PATCH 0/2] block: blk-rq-qos: replace static key with atomic
+ bitop
+To: Jens Axboe <axboe@kernel.dk>, Nilay Shroff <nilay@linux.ibm.com>,
+ Ming Lei <ming.lei@redhat.com>
+Cc: linux-block@vger.kernel.org, kch@nvidia.com, shinichiro.kawasaki@wdc.com,
+ hch@lst.de, gjoyce@ibm.com, "yukuai (C)" <yukuai3@huawei.com>
+References: <20250804122125.3271397-1-nilay@linux.ibm.com>
+ <aJC4tDUsk42Nb9Df@fedora>
+ <682f0f43-733a-4c04-91ed-5665815128bc@linux.ibm.com>
+ <d4d21177-e49e-4959-b68c-707a15dccf73@kernel.dk>
 From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <5820a0d3-3035-6d4e-8c96-45154d8a1cd5@huaweicloud.com>
-Date: Wed, 6 Aug 2025 09:18:51 +0800
+Message-ID: <e00a3951-2cc8-3634-788e-8a174bdc6a8f@huaweicloud.com>
+Date: Wed, 6 Aug 2025 09:44:35 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.1
 Precedence: bulk
@@ -42,242 +44,120 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20250805171749.3448694-2-nilay@linux.ibm.com>
-Content-Type: text/plain; charset=gbk; format=flowed
+In-Reply-To: <d4d21177-e49e-4959-b68c-707a15dccf73@kernel.dk>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgBHwhJ7rZJotxzeCg--.6374S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxKw17JFW5Gr4kWr1xuw4fGrg_yoW3tr45pa
-	yvgF4xCayUGF4kWaykGw4ku3y3GrnYkry7Ar13K34fAFn8Ar12vF10yFy0yrZ7ZrZ7Ar40
-	qr4UtrsxJ34Yg37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBF14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
-	0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x
-	0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E
-	7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcV
-	C0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF
-	04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7
-	CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUZYFZUUUUU=
+X-CM-TRANSID:gCh0CgAHgxODs5Jo4i7gCg--.49106S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxAr18CFyUur4DKryfKw1kuFg_yoWrAFWkpa
+	yxta42ya18XF4vvFs7tws5C3yUKwsrAFW3Xr15G34fZa4qvr1jyFW0yFyY9F98urs2k3WI
+	vr4FvF9rXw15C3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvjb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AF
+	wI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
+	xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43
+	MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
+	0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWU
+	JVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUF1
+	v3UUUUU
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
 Hi,
 
-�� 2025/08/06 1:17, Nilay Shroff д��:
-> A recent lockdep[1] splat observed while running blktest block/005
-> reveals a potential deadlock caused by the cpu_hotplug_lock dependency
-> on ->freeze_lock. This dependency was introduced by commit 033b667a823e
-> ("block: blk-rq-qos: guard rq-qos helpers by static key").
+在 2025/08/06 9:28, Jens Axboe 写道:
+> On 8/4/25 10:58 PM, Nilay Shroff wrote:
+>>
+>>
+>> On 8/4/25 7:12 PM, Ming Lei wrote:
+>>> On Mon, Aug 04, 2025 at 05:51:09PM +0530, Nilay Shroff wrote:
+>>>> This patchset replaces the use of a static key in the I/O path (rq_qos_
+>>>> xxx()) with an atomic queue flag (QUEUE_FLAG_QOS_ENABLED). This change
+>>>> is made to eliminate a potential deadlock introduced by the use of static
+>>>> keys in the blk-rq-qos infrastructure, as reported by lockdep during
+>>>> blktests block/005[1].
+>>>>
+>>>> The original static key approach was introduced to avoid unnecessary
+>>>> dereferencing of q->rq_qos when no blk-rq-qos module (e.g., blk-wbt or
+>>>> blk-iolatency) is configured. While efficient, enabling a static key at
+>>>> runtime requires taking cpu_hotplug_lock and jump_label_mutex, which
+>>>> becomes problematic if the queue is already frozen — causing a reverse
+>>>> dependency on ->freeze_lock. This results in a lockdep splat indicating
+>>>> a potential deadlock.
+>>>>
+>>>> To resolve this, we now gate q->rq_qos access with a q->queue_flags
+>>>> bitop (QUEUE_FLAG_QOS_ENABLED), avoiding the static key and the associated
+>>>> locking altogether.
+>>>>
+>>>> I compared both static key and atomic bitop implementations using ftrace
+>>>> function graph tracer over ~50 invocations of rq_qos_issue() while ensuring
+>>>> blk-wbt/blk-iolatency were disabled (i.e., no QoS functionality). For
+>>>> easy comparision, I made rq_qos_issue() noinline. The comparision was
+>>>> made on PowerPC machine.
+>>>>
+>>>> Static Key (disabled : QoS is not configured):
+>>>> 5d0: 00 00 00 60     nop    # patched in by static key framework (not taken)
+>>>> 5d4: 20 00 80 4e     blr    # return (branch to link register)
+>>>>
+>>>> Only a nop and blr (branch to link register) are executed — very lightweight.
+>>>>
+>>>> atomic bitop (QoS is not configured):
+>>>> 5d0: 20 00 23 e9     ld      r9,32(r3)     # load q->queue_flags
+>>>> 5d4: 00 80 29 71     andi.   r9,r9,32768   # check QUEUE_FLAG_QOS_ENABLED (bit 15)
+>>>> 5d8: 20 00 82 4d     beqlr                 # return if bit not set
+>>>>
+>>>> This performs an ld and and andi. before returning. Slightly more work,
+>>>> but q->queue_flags is typically hot in cache during I/O submission.
+>>>>
+>>>> With Static Key (disabled):
+>>>> Duration (us): min=0.668 max=0.816 avg≈0.750
+>>>>
+>>>> With atomic bitop QUEUE_FLAG_QOS_ENABLED (bit not set):
+>>>> Duration (us): min=0.684 max=0.834 avg≈0.759
+>>>>
+>>>> As expected, both versions are almost similar in cost. The added latency
+>>>> from an extra ld and andi. is in the range of ~9ns.
+>>>>
+>>>> There're two patches in the series. The first patch replaces static key
+>>>> with QUEUE_FLAG_QOS_ENABLED. The second patch ensures that we disable
+>>>> the QUEUE_FLAG_QOS_ENABLED when the queue no longer has any associated
+>>>> rq_qos policies.
+>>>>
+>>>> As usual, feedback and review comments are welcome!
+>>>>
+>>>> [1] https://lore.kernel.org/linux-block/4fdm37so3o4xricdgfosgmohn63aa7wj3ua4e5vpihoamwg3ui@fq42f5q5t5ic/
+>>>
+>>>
+>>> Another approach is to call memalloc_noio_save() in cpu hotplug code...
+>>>
+>> Yes that would help fix this. However per the general usage of GFP_NOIO scope in
+>> kernel, it is used when we're performing memory allocations in a context where I/O
+>> must not be initiated, because doing so could cause deadlocks or recursion.
+>>
+>> So we typically, use GFP_NOIO in a code path that is already doing I/O, such as:
+>> - In block layer context: during request submission
+>> - Filesystem writeback, or swap-out.
+>> - Memory reclaim or writeback triggered by memory pressure.
+>>
+>> The cpu hotplug code may not be running in any of the above context. So
+>> IMO, adding memalloc_noio_save() in the cpu hotplug code would not be
+>> a good idea, isn't it?
 > 
-> That change added a static key to avoid fetching q->rq_qos when neither
-> blk-wbt nor blk-iolatency is configured. The static key dynamically
-> patches kernel text to a NOP when disabled, eliminating overhead of
-> fetching q->rq_qos in the I/O hot path. However, enabling a static key
-> at runtime requires acquiring both cpu_hotplug_lock and jump_label_mutex.
-> When this happens after the queue has already been frozen (i.e., while
-> holding ->freeze_lock), it creates a locking dependency from cpu_hotplug_
-> lock to ->freeze_lock, which leads to a potential deadlock reported by
-> lockdep [1].
-> 
-> To resolve this, replace the static key mechanism with q->queue_flags:
-> QUEUE_FLAG_QOS_ENABLED. This flag is evaluated in the fast path before
-> accessing q->rq_qos. If the flag is set, we proceed to fetch q->rq_qos;
-> otherwise, the access is skipped.
-> 
-> Since q->queue_flags is commonly accessed in IO hotpath and resides in
-> the first cacheline of struct request_queue, checking it imposes minimal
-> overhead while eliminating the deadlock risk.
-> 
-> This change avoids the lockdep splat without introducing performance
-> regressions.
-> 
-> [1] https://lore.kernel.org/linux-block/4fdm37so3o4xricdgfosgmohn63aa7wj3ua4e5vpihoamwg3ui@fq42f5q5t5ic/
-> 
-> Reported-by: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-> Closes: https://lore.kernel.org/linux-block/4fdm37so3o4xricdgfosgmohn63aa7wj3ua4e5vpihoamwg3ui@fq42f5q5t5ic/
-> Fixes: 033b667a823e ("block: blk-rq-qos: guard rq-qos helpers by static key")
-> Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
-> ---
->   block/blk-mq-debugfs.c |  1 +
->   block/blk-rq-qos.c     |  6 ++----
->   block/blk-rq-qos.h     | 43 +++++++++++++++++++++++++-----------------
->   include/linux/blkdev.h |  1 +
->   4 files changed, 30 insertions(+), 21 deletions(-)
-> 
-This patch LGTM, just one nit below.
+> Please heed Ming's advice, moving this from a static key to an atomic
+> queue flags ops is pointless, may as well kill it at that point.
 
-> diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-> index 7ed3e71f2fc0..32c65efdda46 100644
-> --- a/block/blk-mq-debugfs.c
-> +++ b/block/blk-mq-debugfs.c
-> @@ -95,6 +95,7 @@ static const char *const blk_queue_flag_name[] = {
->   	QUEUE_FLAG_NAME(SQ_SCHED),
->   	QUEUE_FLAG_NAME(DISABLE_WBT_DEF),
->   	QUEUE_FLAG_NAME(NO_ELV_SWITCH),
-> +	QUEUE_FLAG_NAME(QOS_ENABLED),
->   };
->   #undef QUEUE_FLAG_NAME
->   
-> diff --git a/block/blk-rq-qos.c b/block/blk-rq-qos.c
-> index 848591fb3c57..460c04715321 100644
-> --- a/block/blk-rq-qos.c
-> +++ b/block/blk-rq-qos.c
-> @@ -2,8 +2,6 @@
->   
->   #include "blk-rq-qos.h"
->   
-> -__read_mostly DEFINE_STATIC_KEY_FALSE(block_rq_qos);
-> -
->   /*
->    * Increment 'v', if 'v' is below 'below'. Returns true if we succeeded,
->    * false if 'v' + 1 would be bigger than 'below'.
-> @@ -319,8 +317,8 @@ void rq_qos_exit(struct request_queue *q)
->   		struct rq_qos *rqos = q->rq_qos;
->   		q->rq_qos = rqos->next;
->   		rqos->ops->exit(rqos);
-> -		static_branch_dec(&block_rq_qos);
->   	}
-> +	blk_queue_flag_clear(QUEUE_FLAG_QOS_ENABLED, q);
->   	mutex_unlock(&q->rq_qos_mutex);
->   }
->   
-> @@ -346,7 +344,7 @@ int rq_qos_add(struct rq_qos *rqos, struct gendisk *disk, enum rq_qos_id id,
->   		goto ebusy;
->   	rqos->next = q->rq_qos;
->   	q->rq_qos = rqos;
-> -	static_branch_inc(&block_rq_qos);
-> +	blk_queue_flag_set(QUEUE_FLAG_QOS_ENABLED, q);
->   
->   	blk_mq_unfreeze_queue(q, memflags);
->   
-> diff --git a/block/blk-rq-qos.h b/block/blk-rq-qos.h
-> index 39749f4066fb..c4242508fa5e 100644
-> --- a/block/blk-rq-qos.h
-> +++ b/block/blk-rq-qos.h
-> @@ -12,7 +12,6 @@
->   #include "blk-mq-debugfs.h"
->   
->   struct blk_mq_debugfs_attr;
-> -extern struct static_key_false block_rq_qos;
->   
->   enum rq_qos_id {
->   	RQ_QOS_WBT,
-> @@ -113,43 +112,50 @@ void __rq_qos_queue_depth_changed(struct rq_qos *rqos);
->   
->   static inline void rq_qos_cleanup(struct request_queue *q, struct bio *bio)
->   {
-> -	if (static_branch_unlikely(&block_rq_qos) && q->rq_qos)
-> +	if (unlikely(test_bit(QUEUE_FLAG_QOS_ENABLED, &q->queue_flags)) &&
-> +			q->rq_qos)
->   		__rq_qos_cleanup(q->rq_qos, bio);
->   }
->   
->   static inline void rq_qos_done(struct request_queue *q, struct request *rq)
->   {
-> -	if (static_branch_unlikely(&block_rq_qos) && q->rq_qos &&
-> -	    !blk_rq_is_passthrough(rq))
-> +	if (unlikely(test_bit(QUEUE_FLAG_QOS_ENABLED, &q->queue_flags)) &&
-> +			q->rq_qos && !blk_rq_is_passthrough(rq))
->   		__rq_qos_done(q->rq_qos, rq);
->   }
->   
->   static inline void rq_qos_issue(struct request_queue *q, struct request *rq)
->   {
-> -	if (static_branch_unlikely(&block_rq_qos) && q->rq_qos)
-> +	if (unlikely(test_bit(QUEUE_FLAG_QOS_ENABLED, &q->queue_flags)) &&
-> +			q->rq_qos)
->   		__rq_qos_issue(q->rq_qos, rq);
->   }
->   
->   static inline void rq_qos_requeue(struct request_queue *q, struct request *rq)
->   {
-> -	if (static_branch_unlikely(&block_rq_qos) && q->rq_qos)
-> +	if (unlikely(test_bit(QUEUE_FLAG_QOS_ENABLED, &q->queue_flags)) &&
-> +			q->rq_qos)
->   		__rq_qos_requeue(q->rq_qos, rq);
->   }
->   
->   static inline void rq_qos_done_bio(struct bio *bio)
->   {
-> -	if (static_branch_unlikely(&block_rq_qos) &&
-> -	    bio->bi_bdev && (bio_flagged(bio, BIO_QOS_THROTTLED) ||
-> -			     bio_flagged(bio, BIO_QOS_MERGED))) {
-> -		struct request_queue *q = bdev_get_queue(bio->bi_bdev);
-> -		if (q->rq_qos)
-> -			__rq_qos_done_bio(q->rq_qos, bio);
-> -	}
-> +	struct request_queue *q;
-> +
-> +	if (!bio->bi_bdev || (!bio_flagged(bio, BIO_QOS_THROTTLED) &&
-> +			     !bio_flagged(bio, BIO_QOS_MERGED)))
-> +		return;
-> +
-> +	q = bdev_get_queue(bio->bi_bdev);
-> +	if (unlikely(test_bit(QUEUE_FLAG_QOS_ENABLED, &q->queue_flags)) &&
-> +			q->rq_qos)
-This unlinkey doesn't make sense, BIO_QOS_THROTTLED or BIO_QOS_MERGED
-already indicates rq_qos is enabled while issuing IO, and rq_qos should
-still be valid until this IO is done.
+Nilay already tested and replied this is a dead end :(
 
-Perhaps a prep cleanup patch to remove this checking?
+I don't quite understand why it's pointless, if rq_qos is never enabled,
+an atmoic queue_flag is still minor optimization, isn't it?
 
 Thanks,
 Kuai
 
-> +		__rq_qos_done_bio(q->rq_qos, bio);
->   }
->   
->   static inline void rq_qos_throttle(struct request_queue *q, struct bio *bio)
->   {
-> -	if (static_branch_unlikely(&block_rq_qos) && q->rq_qos) {
-> +	if (unlikely(test_bit(QUEUE_FLAG_QOS_ENABLED, &q->queue_flags)) &&
-> +			q->rq_qos) {
->   		bio_set_flag(bio, BIO_QOS_THROTTLED);
->   		__rq_qos_throttle(q->rq_qos, bio);
->   	}
-> @@ -158,14 +164,16 @@ static inline void rq_qos_throttle(struct request_queue *q, struct bio *bio)
->   static inline void rq_qos_track(struct request_queue *q, struct request *rq,
->   				struct bio *bio)
->   {
-> -	if (static_branch_unlikely(&block_rq_qos) && q->rq_qos)
-> +	if (unlikely(test_bit(QUEUE_FLAG_QOS_ENABLED, &q->queue_flags)) &&
-> +			q->rq_qos)
->   		__rq_qos_track(q->rq_qos, rq, bio);
->   }
->   
->   static inline void rq_qos_merge(struct request_queue *q, struct request *rq,
->   				struct bio *bio)
->   {
-> -	if (static_branch_unlikely(&block_rq_qos) && q->rq_qos) {
-> +	if (unlikely(test_bit(QUEUE_FLAG_QOS_ENABLED, &q->queue_flags)) &&
-> +			q->rq_qos) {
->   		bio_set_flag(bio, BIO_QOS_MERGED);
->   		__rq_qos_merge(q->rq_qos, rq, bio);
->   	}
-> @@ -173,7 +181,8 @@ static inline void rq_qos_merge(struct request_queue *q, struct request *rq,
->   
->   static inline void rq_qos_queue_depth_changed(struct request_queue *q)
->   {
-> -	if (static_branch_unlikely(&block_rq_qos) && q->rq_qos)
-> +	if (unlikely(test_bit(QUEUE_FLAG_QOS_ENABLED, &q->queue_flags)) &&
-> +			q->rq_qos)
->   		__rq_qos_queue_depth_changed(q->rq_qos);
->   }
->   
-> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-> index 95886b404b16..fe1797bbec42 100644
-> --- a/include/linux/blkdev.h
-> +++ b/include/linux/blkdev.h
-> @@ -656,6 +656,7 @@ enum {
->   	QUEUE_FLAG_SQ_SCHED,		/* single queue style io dispatch */
->   	QUEUE_FLAG_DISABLE_WBT_DEF,	/* for sched to disable/enable wbt */
->   	QUEUE_FLAG_NO_ELV_SWITCH,	/* can't switch elevator any more */
-> +	QUEUE_FLAG_QOS_ENABLED,		/* qos is enabled */
->   	QUEUE_FLAG_MAX
->   };
->   
+> 
+> I see v2 is out now with the exact same approach.
 > 
 
