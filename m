@@ -1,141 +1,70 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bsdbackstore.eu (128-116-240-228.dyn.eolo.it [128.116.240.228])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFCF82BCF5
-	for <linux-block@vger.kernel.org>; Wed,  6 Aug 2025 06:08:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 966581DAC95
+	for <linux-block@vger.kernel.org>; Wed,  6 Aug 2025 06:22:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=128.116.240.228
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754460508; cv=none; b=X9Y5VtXjQbEQ82dvBiSwz/Q7jivHoF6hU52Sivx3WUUU9Op1elgWxm23DimJsZaJrhxukG2g8s48Yq3zTpS8koWUXiURJqV2uiWiI7pDnkZcqVzwFTvUpcZ8SkHd+2AosC6/7FSQdrFaOnsTpEfI9jhMCv9YeXyV1Jw30bDQK70=
+	t=1754461368; cv=none; b=l2j2X2lYesnmbAHY1WVzl+YtZ0m1exnSMExKmLiOfxh5lE7pxCLluy0tA9m4tU/hgBs/njhl+SFMtWoy6j/s6O5qC2rgu3BqOQNMlxnBzKONid1E/blJb4PWe1enV2SkmUvSli9UUKJs6MoTSsbvRBj9+ui5WMJDk6P58xN8GK0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754460508; c=relaxed/simple;
-	bh=6/YFONmESefuzRDaOczVWNxTaeujlq4PdFb6ngHj+lg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=L9GlPTVfwqUszND/Yvo4wmhkVxgHtrV8Xv0E+Fy4R3ViJslY46QwbR/0fKzgC5RpMIyRJ1zpGDfY6NUjTZ6pzcGsba46UZsq8czwyTE7YOn3Kzclkqix9Qh5b4756SoKE63p6KTL4inIcvj6lxapZrkwxydyOCMaX0NdivCFTOc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=F+puW178; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=WaaXPpGl; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=F+puW178; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=WaaXPpGl; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="F+puW178";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="WaaXPpGl";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="F+puW178";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="WaaXPpGl"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 5BCB11F393;
-	Wed,  6 Aug 2025 06:08:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1754460505; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xlj31V+I2rhAc2cuvPugTV5kP/JYxKPyx1/hsFGXsPg=;
-	b=F+puW178aDq2ymOn5lTpg9gZQ9w1URg9MxHA6WFH8OwuXwHTh/7rVhUmp2Sytp+7JsmtHp
-	TRhalZUDico0qYJfNI+wu7tnckyH4+aceeQpSY5Ux+20UANdRshMbLtgR3y77bvfJmMlph
-	3KP78LLmYevhanPMxZYIYaFvGDMoiVg=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1754460505;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xlj31V+I2rhAc2cuvPugTV5kP/JYxKPyx1/hsFGXsPg=;
-	b=WaaXPpGlI8Wew8ZYzas/Q78zAIAQ5htEUUDwJr0zZLk88fRbhY0A7zelambiV6fKp57DWg
-	uR728BXEcgYGAdCA==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1754460505; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xlj31V+I2rhAc2cuvPugTV5kP/JYxKPyx1/hsFGXsPg=;
-	b=F+puW178aDq2ymOn5lTpg9gZQ9w1URg9MxHA6WFH8OwuXwHTh/7rVhUmp2Sytp+7JsmtHp
-	TRhalZUDico0qYJfNI+wu7tnckyH4+aceeQpSY5Ux+20UANdRshMbLtgR3y77bvfJmMlph
-	3KP78LLmYevhanPMxZYIYaFvGDMoiVg=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1754460505;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xlj31V+I2rhAc2cuvPugTV5kP/JYxKPyx1/hsFGXsPg=;
-	b=WaaXPpGlI8Wew8ZYzas/Q78zAIAQ5htEUUDwJr0zZLk88fRbhY0A7zelambiV6fKp57DWg
-	uR728BXEcgYGAdCA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id DBD6113AB5;
-	Wed,  6 Aug 2025 06:08:24 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id qtLuM1jxkmivXAAAD6G6ig
-	(envelope-from <hare@suse.de>); Wed, 06 Aug 2025 06:08:24 +0000
-Message-ID: <37289ec1-998f-470e-b250-a507266db96e@suse.de>
-Date: Wed, 6 Aug 2025 08:08:24 +0200
+	s=arc-20240116; t=1754461368; c=relaxed/simple;
+	bh=dJhCdKHnurkzRS0AMGKfS7ybvZNz0tTnvAE+vUuyMYU=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=LmF5k7+5WPNZ+qVhILDrpUzTorS0i+1oEQxzmpA7uUOszgq1tz8dDrv9HbulLuc5O9CYicWa4ZOKqlAyWthJZtgtuldjf4LYJmAk0M97iYPC4Vq6uN3SCSo9rHjBxs9Sg6UChuDkFe9u5tkfI3Yv0ti2yOdPY+xuHWKaU2TYTZ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bsdbackstore.eu; spf=pass smtp.mailfrom=bsdbackstore.eu; arc=none smtp.client-ip=128.116.240.228
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bsdbackstore.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bsdbackstore.eu
+Received: from localhost (25.205.forpsi.net [80.211.205.25])
+	by bsdbackstore.eu (OpenSMTPD) with ESMTPSA id 2eb86fed (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+	Wed, 6 Aug 2025 08:22:43 +0200 (CEST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv2 7/7] iov_iter: remove iov_iter_is_aligned
-To: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: snitzer@kernel.org, axboe@kernel.dk, dw@davidwei.uk, brauner@kernel.org,
- Keith Busch <kbusch@kernel.org>
-References: <20250805141123.332298-1-kbusch@meta.com>
- <20250805141123.332298-8-kbusch@meta.com>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20250805141123.332298-8-kbusch@meta.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Level: 
-X-Spamd-Result: default: False [-4.30 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-0.997];
-	MIME_GOOD(-0.10)[text/plain];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	ARC_NA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.de:email,suse.de:mid]
-X-Spam-Flag: NO
-X-Spam-Score: -4.30
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Wed, 06 Aug 2025 08:22:41 +0200
+Message-Id: <DBV4NAR2A6N2.1LFJCYHLTHUN2@bsdbackstore.eu>
+Cc: "Shinichiro Kawasaki" <shinichiro.kawasaki@wdc.com>, "Maurizio Lombardi"
+ <mlombard@redhat.com>
+Subject: Re: [bug report] blktests nvme/tcp nvme/060 hang
+From: "Maurizio Lombardi" <mlombard@bsdbackstore.eu>
+To: "Maurizio Lombardi" <mlombard@bsdbackstore.eu>, "Yi Zhang"
+ <yi.zhang@redhat.com>, "linux-block" <linux-block@vger.kernel.org>, "open
+ list:NVM EXPRESS DRIVER" <linux-nvme@lists.infradead.org>
+X-Mailer: aerc
+References: <CAHj4cs-zu7eVB78yUpFjVe2UqMWFkLk8p+DaS3qj+uiGCXBAoA@mail.gmail.com> <DBV4IHEMUOQ8.28P7LBNP9EHVK@bsdbackstore.eu>
+In-Reply-To: <DBV4IHEMUOQ8.28P7LBNP9EHVK@bsdbackstore.eu>
 
-On 8/5/25 16:11, Keith Busch wrote:
-> From: Keith Busch <kbusch@kernel.org>
-> 
-> No more callers.
-> 
-> Signed-off-by: Keith Busch <kbusch@kernel.org>
-> Reviewed-by: Mike Snitzer <snitzer@kernel.org>
-> ---
->   include/linux/uio.h |  2 -
->   lib/iov_iter.c      | 95 ---------------------------------------------
->   2 files changed, 97 deletions(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+On Wed Aug 6, 2025 at 8:16 AM CEST, Maurizio Lombardi wrote:
+> On Wed Aug 6, 2025 at 3:57 AM CEST, Yi Zhang wrote:
+>> Hello
+>> I hit this issue when I was running blktests nvme/tcp nvme/060 on the
+>> latest linux-block/for-next with rt enabled, please help check it and
+>> let me know if you need any info/testing for it, thanks.
+>>
+>> [  390.474378] Call trace:
+>> [  390.476813]  __switch_to+0x1d8/0x330 (T)
+>> [  390.480731]  __schedule+0x860/0x1c30
+>> [  390.484297]  schedule_rtlock+0x30/0x70
+>> [  390.488037]  rtlock_slowlock_locked+0x464/0xf60
+>> [  390.492559]  rt_read_lock+0x2bc/0x3e0
+>> [  390.496211]  nvmet_tcp_listen_data_ready+0x3c/0x118 [nvmet_tcp]
+>> [  390.502125]  nvmet_tcp_data_ready+0x88/0x198 [nvmet_tcp]
+>
+> I think that the problem is due to the fact that nvmet_tcp_data_ready()
+> calls the queue->data_ready() callback with the sk_callback_lock
+> locked.
+> The data_ready callback points to nvmet_tcp_listen_data_ready()
+> which tries to lock the same sk_callback_lock, hence the deadlock.
+>
+> Maybe it can be fixed by deferring the call to queue->data_ready() by
+> using a workqueue.
+>
 
-Cheers,
+Ops sorry they are two read locks, the real problem then is that
+something is holding the write lock.
 
-Hannes
--- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+Maurizio
