@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C189E291891;
-	Wed,  6 Aug 2025 15:01:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0E1128E607;
+	Wed,  6 Aug 2025 15:01:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754492472; cv=none; b=ic3mny06y/ia0/tuUBlbkMG2PVVQd3s3R6aOttabVA/cwghiyuKnAAHukXpXg4bUkI4jCz73jBi/Fkrz+NDmsfNisxgw0lSHkh4/Us6iWHbCtoVCmzD7sK53XeLCM4VaG5ifUOpM4HP39yKffZbYotR+YAPIFQ+rygzEd/M1k3s=
+	t=1754492478; cv=none; b=PCF4Fuh3AAgctT3sgvvhV7RTIf4Dq+xBaweTI1gCu0Ban5BWDzxMlvYX9SgPRkB8BLZRf6g4IteIAf43Qh7FsupjAAzgvkRbtcvQZ8e4pyf7yZfWZtLrpzT+ksmxv9UY56ShjZIgu2Q3+Cy81gFHQsUQD2XT3iRQ+URENIjtmZ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754492472; c=relaxed/simple;
-	bh=mnWYMh0PdBIo9wnkX/skX4J305rjw8krePIvdGdb3So=;
+	s=arc-20240116; t=1754492478; c=relaxed/simple;
+	bh=hj/L89TTZq/55Xjg9EGPY06V2sClDfmrX6hHP9UOD9A=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=Q3H/y7xvJSad0oL2ga2RJH+WD7GPaciVOHbvkewq7Cutu1rt3+/vn/uf6/lqLbcXar+DBgmBICzn4NqaLpU3cWDBns6E48G8quQUO4M7vMf48F+VP9SDF12deFU0OeYwu80eXgHNzGYUD87+1r+nZsEXDoDm+9yA0zZhLB4BYa4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PX7fS+/t; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=cp2FHiAUpnpZlhh+g41vOyA/oOv+PBplu7c3Nzjh4iHe+4rFfq5kWv+yU2+MNi7QUfEH51+teAx2W0y7Ra0Fes1hEcfBNSktX5uFIY8zwtgfGgz/NNhhw4KI3BvR8g9By1IU+7b4p3kee7XMTn2XGdHbseXKrRdrgVYYTy0ghbc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vFVLWdeb; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PX7fS+/t"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6C0AC4CEED;
-	Wed,  6 Aug 2025 15:01:09 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vFVLWdeb"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 406B5C4CEEB;
+	Wed,  6 Aug 2025 15:01:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754492472;
-	bh=mnWYMh0PdBIo9wnkX/skX4J305rjw8krePIvdGdb3So=;
+	s=k20201202; t=1754492477;
+	bh=hj/L89TTZq/55Xjg9EGPY06V2sClDfmrX6hHP9UOD9A=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=PX7fS+/t+d9ZNyU490Wss0uC80/8LydurEUkKhVRWz/B9zcypuBWOKGyAZOfLViRW
-	 z4Eix/VQFJvBn9fnlP8MA40TnxvVXaD53L0BHiMEDUJ+oAZKProy3he15nlpYZn0y/
-	 CgX5FcQri5dC/Ju94MHGsR9UlziTFGh9yvFTKS58qWlIBZkxZ34lj92C9debGUW139
-	 hU1djZqq59nhr5BH56Jj4nBXP7JgKv8S2bzNWrezxDCpjfwjbyinS084O5aVMeHDRz
-	 4sb7ayLyqo+n9juPGkVSico6J0iW8C1dxf5cU3OWQBdtv+M7akYtXfbZ3eNgPIfqiF
-	 rnnxls7xfatGQ==
+	b=vFVLWdeb3AUPCoSEqsHZBiRtU2abybfKsKRfwQbP0N16hQRBR3mSt/i/ABgCENm6g
+	 pxLBjMCSLd1AjkQt9yYQksS471NH+2g2dTFWJV7nW0OD4GswdYNZlyUdiJAaBrNls4
+	 LBtCy7I1vTMqIjINOPEOMuGjRVMoCzXGS/hC+BAdBUmwtbQQ+RYEeGb6Dhu3kIOwt0
+	 qMNNFHsjFWpv6V0FoWmbV/q65bhOUpNSFU63jJlCxoC3BYwZuKoho3blpHfBuYGypv
+	 CpZgehDPVFmXx6wZfVJ4oh/uwelOscHqgzFJDuHRcDukt91BsAMILq+tkQeYMQ+iTa
+	 /X91Q+czhtGHw==
 From: Andreas Hindborg <a.hindborg@kernel.org>
 To: Daniel Almeida <daniel.almeida@collabora.com>
 Cc: Boqun Feng <boqun.feng@gmail.com>, Miguel Ojeda <ojeda@kernel.org>, Alex
@@ -36,87 +36,75 @@ Cc: Boqun Feng <boqun.feng@gmail.com>, Miguel Ojeda <ojeda@kernel.org>, Alex
  Krummrich <dakr@kernel.org>, Jens Axboe <axboe@kernel.dk>,
  linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org,
  linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 02/16] rust: str: allow `str::Formatter` to format
- into `&mut [u8]`.
-In-Reply-To: <37C6B308-202A-48A3-9DD2-5997E0EE73C1@collabora.com>
+Subject: Re: [PATCH v3 06/16] rust: block: normalize imports for `gen_disk.rs`
+In-Reply-To: <F5A3232C-50E8-4615-929A-80F3ED4EFEBA@collabora.com>
 References: <20250711-rnull-up-v6-16-v3-0-3a262b4e2921@kernel.org>
- <20250711-rnull-up-v6-16-v3-2-3a262b4e2921@kernel.org>
- <WW8rvpPmL4xHgDorFAQ5UrdGMUWXYOH_h1c3uzXhne_7E-l_Sbe8npJDfwE6fAcLWShbTjn5Oxn-dqxC4ZLW4Q==@protonmail.internalid>
- <37C6B308-202A-48A3-9DD2-5997E0EE73C1@collabora.com>
-Date: Wed, 06 Aug 2025 16:32:49 +0200
-Message-ID: <87cy988qr2.fsf@kernel.org>
+ <20250711-rnull-up-v6-16-v3-6-3a262b4e2921@kernel.org>
+ <1YjnBHBMF7DAKjkQrfW9goplGCUynLmjrUnLo3PrN5qMYx6uUcolbOtjWPNyVQEwyehPW8Xk7B1oeBAffoYr9A==@protonmail.internalid>
+ <F5A3232C-50E8-4615-929A-80F3ED4EFEBA@collabora.com>
+Date: Wed, 06 Aug 2025 16:51:38 +0200
+Message-ID: <877bzg8pvp.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
 "Daniel Almeida" <daniel.almeida@collabora.com> writes:
 
-> Hi Andreas,
->
 >> On 11 Jul 2025, at 08:43, Andreas Hindborg <a.hindborg@kernel.org> wrote:
 >>
->> Improve `Formatter` so that it can write to an array or slice buffer.
+>> Clean up the import statements in `gen_disk.rs` to make the code easier =
+to
+>> maintain.
 >>
+>> Reviewed-by: Alice Ryhl <aliceryhl@google.com>
 >> Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
 >> ---
->> rust/kernel/str.rs | 19 ++++++++++++++-----
->> 1 file changed, 14 insertions(+), 5 deletions(-)
+>> rust/kernel/block/mq/gen_disk.rs | 10 +++++++---
+>> 1 file changed, 7 insertions(+), 3 deletions(-)
 >>
->> diff --git a/rust/kernel/str.rs b/rust/kernel/str.rs
->> index 488b0e97004e..41af456a46c8 100644
->> --- a/rust/kernel/str.rs
->> +++ b/rust/kernel/str.rs
->> @@ -6,6 +6,7 @@
->> use crate::prelude::*;
->> use core::{
->>     fmt::{self, Write},
->> +    marker::PhantomData,
->>     ops::{self, Deref, DerefMut, Index},
->> };
+>> diff --git a/rust/kernel/block/mq/gen_disk.rs b/rust/kernel/block/mq/gen=
+_disk.rs
+>> index cd54cd64ea88..679ee1bb2195 100644
+>> --- a/rust/kernel/block/mq/gen_disk.rs
+>> +++ b/rust/kernel/block/mq/gen_disk.rs
+>> @@ -5,9 +5,13 @@
+>> //! C header: [`include/linux/blkdev.h`](srctree/include/linux/blkdev.h)
+>> //! C header: [`include/linux/blk_mq.h`](srctree/include/linux/blk_mq.h)
 >>
->> @@ -794,9 +795,9 @@ fn write_str(&mut self, s: &str) -> fmt::Result {
->> /// Allows formatting of [`fmt::Arguments`] into a raw buffer.
->> ///
->> /// Fails if callers attempt to write more than will fit in the buffer.
->> -pub(crate) struct Formatter(RawFormatter);
->> +pub(crate) struct Formatter<'a>(RawFormatter, PhantomData<&'a mut ()>);
+>> -use crate::block::mq::{raw_writer::RawWriter, Operations, TagSet};
+>> -use crate::{bindings, error::from_err_ptr, error::Result, sync::Arc};
+>> -use crate::{error, static_lock_class};
+>> +use crate::{
+>> +    bindings,
+>> +    block::mq::{raw_writer::RawWriter, Operations, TagSet},
+>> +    error::{self, from_err_ptr, Result},
+>> +    static_lock_class,
+>> +    sync::Arc,
+>> +};
+>> use core::fmt::{self, Write};
 >>
->> -impl Formatter {
->> +impl Formatter<'_> {
->>     /// Creates a new instance of [`Formatter`] with the given buffer.
->>     ///
->>     /// # Safety
->> @@ -805,11 +806,19 @@ impl Formatter {
->>     /// for the lifetime of the returned [`Formatter`].
->>     pub(crate) unsafe fn from_buffer(buf: *mut u8, len: usize) -> Self {
->>         // SAFETY: The safety requirements of this function satisfy those of the callee.
->> -        Self(unsafe { RawFormatter::from_buffer(buf, len) })
->> +        Self(unsafe { RawFormatter::from_buffer(buf, len) }, PhantomData)
->> +    }
->> +
->> +    /// Create a new [`Self`] instance.
->> +    #[expect(dead_code)]
->> +    pub(crate) fn new<'a>(buffer: &'a mut [u8]) -> Formatter<'a> {
+>> /// A builder for [`GenDisk`].
+>>
+>> --
+>> 2.47.2
+>>
+>>
+>>
 >
-> nit: the function above this one returns Self, and this one returns Formatter.
-> Perhaps this one should also return Self for consistency?
+> Same comment as the preceding =E2=80=9Cimport=E2=80=9D patch: this is syn=
+tax is problematic.
 
-Thanks. Not sure about the explicit lifetime either, I'll
-reformat:
+I used to share your viewpoint, but I changed my opinion and now prefer
+"normalized" imports (the combined form).
 
-@@ -844,7 +844,7 @@ pub(crate) unsafe fn from_buffer(buf: *mut u8, len: usize) -> Self {
- 
-     /// Create a new [`Self`] instance.
-     #[expect(dead_code)]
--    pub(crate) fn new<'a>(buffer: &'a mut [u8]) -> Formatter<'a> {
-+    pub(crate) fn new(buffer: &mut [u8]) -> Self {
-         // SAFETY: `buffer` is valid for writes for the entire length for
-         // the lifetime of `Self`.
-         unsafe { Formatter::from_buffer(buffer.as_mut_ptr(), buffer.len()) }
+Now I can just blindly merge all the imports, remove duplicates and then
+ask rust-analyzer to normalize imports again, and then format with
+rustfmt. I find that this workflow is very low overhead.
 
 
 Best regards,
