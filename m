@@ -1,333 +1,244 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E2F71FECD4;
-	Wed,  6 Aug 2025 09:04:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEFFF28A70C
+	for <linux-block@vger.kernel.org>; Wed,  6 Aug 2025 09:06:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754471085; cv=none; b=Kp6HXx7sS7tt7+B5J5ld+M3nQZEKKDB21i3SrUM30YMBGuEqSHJmLKn8T+fRZjOoyRDrN2L+91zstdHutkPXFQ7HCZHAzPkCYfQoUqrI1LpokBfvqs237CyOd5F3Ic/Bnw7HuUA3X+CPytMCGpd6zSRb+L+i5Y+UtRcgnBYttS0=
+	t=1754471178; cv=none; b=f40wELNQBzRjNByuCbhIPf8tG+x7i2dpDtqFe6oF0jRJvh25BJaruRYSfE2O89GpsaGj0UbBD6mexOHGTsEWeXLOAyArv02pvaJO7C2aK9d+04Oa20FwgfDbaYQeiYtoOKG2jErfiLXgzm4F8Pw5u+RUaAAqPUFs43LU4doh6ag=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754471085; c=relaxed/simple;
-	bh=14fYgX2WJRr/mVkSe0WdtLf6SIyj3zlzPzoLHkLq6lY=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=X9YZzwfUrvcFDVIUgOnFoh/GeEWSg+po6SguoylN2XCJngfJ4Ul5R8lKkYL/1yxOF7Du2vcphDIRk4F//s6zvD0gt8MtNkDLQh1z5Lha3a6ZBY3Fqj0hto9iS6F/MJIJX0HmVepanrdE91E7NwsX1xz8Xzfc3NkSKEc0g6dUt7g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=none smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+	s=arc-20240116; t=1754471178; c=relaxed/simple;
+	bh=eAn8hl1Q+zNzkST7g/ue5uxAVSIHWo8WyRs/m2Db9vc=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=WGmuw69fljymtpGeIO5jqvpIxHuFen5j6Js4sIiU3e/spTVFOgpUm8a95CxaqPqN+FXEa5peEljHo1x9n44R8xTbUOAjWgb5d152zhNgsozBdCG2dZL7w9rZYE29Iqh8wzRImzMBqiWJisvoB/5JhOU1PHF9xt08xiRWJ9u7YAg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4bxkrT2vq4zKHMy8;
-	Wed,  6 Aug 2025 17:04:41 +0800 (CST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4bxktG6mdczYQtv1
+	for <linux-block@vger.kernel.org>; Wed,  6 Aug 2025 17:06:14 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 758721A0C12;
-	Wed,  6 Aug 2025 17:04:40 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.104.67])
-	by APP4 (Coremail) with SMTP id gCh0CgA3sxOjGpNowBAGCw--.58870S8;
-	Wed, 06 Aug 2025 17:04:40 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTP id 940451A0BD0
+	for <linux-block@vger.kernel.org>; Wed,  6 Aug 2025 17:06:13 +0800 (CST)
+Received: from [10.174.179.143] (unknown [10.174.179.143])
+	by APP4 (Coremail) with SMTP id gCh0CgA3sxMDG5NoAzEGCw--.58891S3;
+	Wed, 06 Aug 2025 17:06:13 +0800 (CST)
+Subject: Re: [PATCH 5/5] blk-mq: Replace tags->lock with SRCU for tag
+ iterators
+To: Ming Lei <ming.lei@redhat.com>, Yu Kuai <yukuai1@huaweicloud.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+ John Garry <john.garry@huawei.com>,
+ Sathya Prakash Veerichetty <sathya.prakash@broadcom.com>,
+ "yukuai (C)" <yukuai3@huawei.com>
+References: <20250801114440.722286-1-ming.lei@redhat.com>
+ <20250801114440.722286-6-ming.lei@redhat.com>
+ <b86b9098-fb76-bdfe-bdf0-1344386d067a@huaweicloud.com>
+ <aJCaWLgfB_oMMdrC@fedora>
+ <88ad7326-b55f-7e33-fa81-0317843fc15b@huaweicloud.com>
+ <700bd14f-74da-9c10-9917-d5d56ecd2921@huaweicloud.com>
+ <aJHFVdqDs5KKKuM8@fedora>
+ <383cb150-9a46-8377-79df-66e8eafc7eb5@huaweicloud.com>
+ <aJMZYvCwsR8f3cJZ@fedora>
 From: Yu Kuai <yukuai1@huaweicloud.com>
-To: dlemoal@kernel.org,
-	hare@suse.de,
-	jack@suse.cz,
-	bvanassche@acm.org,
-	tj@kernel.org,
-	josef@toxicpanda.com,
-	axboe@kernel.dk,
-	yukuai3@huawei.com
-Cc: cgroups@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	yukuai1@huaweicloud.com,
-	yi.zhang@huawei.com,
-	yangerkun@huawei.com,
-	johnny.chenyi@huawei.com
-Subject: [PATCH v3 4/5] blk-mq-sched: refactor __blk_mq_do_dispatch_sched()
-Date: Wed,  6 Aug 2025 16:57:19 +0800
-Message-Id: <20250806085720.4040507-5-yukuai1@huaweicloud.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20250806085720.4040507-1-yukuai1@huaweicloud.com>
-References: <20250806085720.4040507-1-yukuai1@huaweicloud.com>
+Message-ID: <14ea1968-8087-6e5a-1e6f-6a02696fcdda@huaweicloud.com>
+Date: Wed, 6 Aug 2025 17:06:11 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+In-Reply-To: <aJMZYvCwsR8f3cJZ@fedora>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgA3sxOjGpNowBAGCw--.58870S8
-X-Coremail-Antispam: 1UD129KBjvJXoWxuw4UuFy5GFWrAw1UGFyDKFg_yoW3Gw43pF
-	4fGF4ay395XF4jqFyIvw43Jw1fA34fuasrJryrKrW3twn0qrs8Grn5JFyUAF4xtrZ5uFZF
-	9r4DWrZ8CFs2vrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUma14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_JF0E3s1l82xGYI
-	kIc2x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2
-	z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F
-	4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq
-	3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7
-	IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4U
-	M4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2
-	kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkE
-	bVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67
-	AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI
-	42IY6xIIjxv20xvEc7CjxVAFwI0_Cr0_Gr1UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCw
-	CI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4UJVWxJrUvcSsG
-	vfC2KfnxnUUI43ZEXa7VUbPC7UUUUUU==
+X-CM-TRANSID:gCh0CgA3sxMDG5NoAzEGCw--.58891S3
+X-Coremail-Antispam: 1UD129KBjvJXoW3ArWrKryDtF48JFWDXF18Xwb_yoWxXF4rpr
+	W8JF4jkrW5Xr18Jr42qw45Jryktw1Dtw18Xrn5JFyrXr1qkrnIqr18Xr1j9r18Jr4xAr48
+	Xr1UtrW3ZF1UJr7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9j14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7I2V7IY0VAS07AlzVAY
+	IcxG8wCY1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbV
+	WUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF
+	67kF1VAFwI0_JF0_Jw1lIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUCVW8JwCI42
+	IY6xIIjxv20xvEc7CjxVAFwI0_Cr0_Gr1UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI
+	42IY6I8E87Iv67AKxVW8JVWxJwCI42IY6I8E87Iv6xkF7I0E14v26r4UJVWxJrUvcSsGvf
+	C2KfnxnUUI43ZEXa7VUbSfO7UUUUU==
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-From: Yu Kuai <yukuai3@huawei.com>
+Hi,
 
-Introduce struct sched_dispatch_ctx, and split the helper into
-blk_mq_dispatch_one_request() and blk_mq_finish_dispatch(). Also
-add comments about the non-error return value.
+在 2025/08/06 16:59, Ming Lei 写道:
+> On Wed, Aug 06, 2025 at 09:06:28AM +0800, Yu Kuai wrote:
+>> Hi,
+>>
+>> 在 2025/08/05 16:48, Ming Lei 写道:
+>>> On Tue, Aug 05, 2025 at 04:38:56PM +0800, Yu Kuai wrote:
+>>>> Hi,
+>>>>
+>>>> 在 2025/08/05 16:33, Yu Kuai 写道:
+>>>>> Hi,
+>>>>>
+>>>>> 在 2025/08/04 19:32, Ming Lei 写道:
+>>>>>> On Mon, Aug 04, 2025 at 02:30:43PM +0800, Yu Kuai wrote:
+>>>>>>> Hi,
+>>>>>>>
+>>>>>>> 在 2025/08/01 19:44, Ming Lei 写道:
+>>>>>>>> Replace the spinlock in blk_mq_find_and_get_req() with an
+>>>>>>>> SRCU read lock
+>>>>>>>> around the tag iterators.
+>>>>>>>>
+>>>>>>>> This is done by:
+>>>>>>>>
+>>>>>>>> - Holding the SRCU read lock in blk_mq_queue_tag_busy_iter(),
+>>>>>>>> blk_mq_tagset_busy_iter(), and blk_mq_hctx_has_requests().
+>>>>>>>>
+>>>>>>>> - Removing the now-redundant tags->lock from blk_mq_find_and_get_req().
+>>>>>>>>
+>>>>>>>> This change improves performance by replacing a spinlock with a more
+>>>>>>>> scalable SRCU lock, and fixes lockup issue in
+>>>>>>>> scsi_host_busy() in case of
+>>>>>>>> shost->host_blocked.
+>>>>>>>>
+>>>>>>>> Meantime it becomes possible to use blk_mq_in_driver_rw() for io
+>>>>>>>> accounting.
+>>>>>>>>
+>>>>>>>> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+>>>>>>>> ---
+>>>>>>>>      block/blk-mq-tag.c | 12 ++++++++----
+>>>>>>>>      block/blk-mq.c     | 24 ++++--------------------
+>>>>>>>>      2 files changed, 12 insertions(+), 24 deletions(-)
+>>>>>>>>
+>>>>>>>> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+>>>>>>>> index 6c2f5881e0de..7ae431077a32 100644
+>>>>>>>> --- a/block/blk-mq-tag.c
+>>>>>>>> +++ b/block/blk-mq-tag.c
+>>>>>>>> @@ -256,13 +256,10 @@ static struct request
+>>>>>>>> *blk_mq_find_and_get_req(struct blk_mq_tags *tags,
+>>>>>>>>              unsigned int bitnr)
+>>>>>>>>      {
+>>>>>>>>          struct request *rq;
+>>>>>>>> -    unsigned long flags;
+>>>>>>>> -    spin_lock_irqsave(&tags->lock, flags);
+>>>>>>>>          rq = tags->rqs[bitnr];
+>>>>>>>>          if (!rq || rq->tag != bitnr || !req_ref_inc_not_zero(rq))
+>>>>>>>>              rq = NULL;
+>>>>>>>> -    spin_unlock_irqrestore(&tags->lock, flags);
+>>>>>>>>          return rq;
+>>>>>>>>      }
+>>>>>>>>
+>>>>>>> Just wonder, does the lockup problem due to the tags->lock contention by
+>>>>>>> concurrent scsi_host_busy?
+>>>>>>
+>>>>>> Yes.
+>>>>>>
+>>>>>>>
+>>>>>>>> @@ -440,7 +437,9 @@ void blk_mq_tagset_busy_iter(struct
+>>>>>>>> blk_mq_tag_set *tagset,
+>>>>>>>>              busy_tag_iter_fn *fn, void *priv)
+>>>>>>>>      {
+>>>>>>>>          unsigned int flags = tagset->flags;
+>>>>>>>> -    int i, nr_tags;
+>>>>>>>> +    int i, nr_tags, srcu_idx;
+>>>>>>>> +
+>>>>>>>> +    srcu_idx = srcu_read_lock(&tagset->tags_srcu);
+>>>>>>>>          nr_tags = blk_mq_is_shared_tags(flags) ? 1 :
+>>>>>>>> tagset->nr_hw_queues;
+>>>>>>>> @@ -449,6 +448,7 @@ void blk_mq_tagset_busy_iter(struct
+>>>>>>>> blk_mq_tag_set *tagset,
+>>>>>>>>                  __blk_mq_all_tag_iter(tagset->tags[i], fn, priv,
+>>>>>>>>                                BT_TAG_ITER_STARTED);
+>>>>>>>>          }
+>>>>>>>> +    srcu_read_unlock(&tagset->tags_srcu, srcu_idx);
+>>>>>>>
+>>>>>>> And should we add cond_resched() after finish interating one tags, even
+>>>>>>> with the srcu change, looks like it's still possible to lockup with
+>>>>>>> big cpu cores & deep queue depth.
+>>>>>>
+>>>>>> The main trouble is from the big tags->lock.
+>>>>>>
+>>>>>> IMO it isn't needed, because max queue depth is just 10K, which is much
+>>>>>> bigger than actual queue depth. We can add it when someone shows it is
+>>>>>> really needed.
+>>>>>
+>>>>> If we don't want this, why not using srcu here? Looks like just use
+>>>>> rcu_read_lock and rcu_read_unlock to protect blk_mq_find_and_get_req()
+>>>>> will be enough.
+>>>>
+>>>> Like following patch:
+>>>>
+>>>> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+>>>> index d880c50629d6..e2381ee9747d 100644
+>>>> --- a/block/blk-mq-tag.c
+>>>> +++ b/block/blk-mq-tag.c
+>>>> @@ -255,11 +255,11 @@ static struct request *blk_mq_find_and_get_req(struct
+>>>> blk_mq_tags *tags,
+>>>>           struct request *rq;
+>>>>           unsigned long flags;
+>>>>
+>>>> -       spin_lock_irqsave(&tags->lock, flags);
+>>>> +       rcu_read_lock();
+>>>>           rq = tags->rqs[bitnr];
+>>>>           if (!rq || rq->tag != bitnr || !req_ref_inc_not_zero(rq))
+>>>>                   rq = NULL;
+>>>> -       spin_unlock_irqrestore(&tags->lock, flags);
+>>>> +       rcu_read_unlock();
+>>>>           return rq;
+>>>>    }
+>>>
+>>> srcu read lock has to be grabbed when request reference is being accessed,
+>>> so the above change is wrong, otherwise plain rcu is enough.
+>>>
+>> I don't quite understand, I think it's enough to protect grabbing req
+>> reference, because IO issue path grab q_usage_counter before setting
+>> req reference to 1, and IO complete path decrease req reference to 0
+>> before dropping q_usage_counter.
+> 
+> In theory it is true, but the implementation is pretty fragile, because the
+> correctness replies on the implied memory barrier(un-documented) in blk_mq_get_tag()
+> between blk_try_enter_queue() and req_ref_set(rq, 1).
+> 
+>>
+>>>>
+>>>> diff --git a/block/blk-mq.c b/block/blk-mq.c
+>>>> index b1d81839679f..a70959cad692 100644
+>>>> --- a/block/blk-mq.c
+>>>> +++ b/block/blk-mq.c
+>>>> @@ -3442,12 +3442,8 @@ static void blk_mq_clear_rq_mapping(struct
+>>>> blk_mq_tags *drv_tags,
+>>>>
+>>>>           /*
+>>>>            * Wait until all pending iteration is done.
+>>>> -        *
+>>>> -        * Request reference is cleared and it is guaranteed to be observed
+>>>> -        * after the ->lock is released.
+>>>>            */
+>>>> -       spin_lock_irqsave(&drv_tags->lock, flags);
+>>>> -       spin_unlock_irqrestore(&drv_tags->lock, flags);
+>>>> +       synchronize_rcu();
+>>>
+>>> We do want to avoid big delay in this code path, so call_srcu() is much
+>>> better.
+>>
+>> Agreed, however, there is rcu verion helper as well, call_rcu().
+> 
+> I prefer to srcu, which is simple & straight-forward, especially the background
+> of this issue has been tough enough.
+> 
+Thanks for the explanation, I'm good with srcu now :)
+Kuai
 
-Make code cleaner, and make it easier to add a new branch to dispatch
-a batch of requests at a time in the next patch.
-
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
- block/blk-mq-sched.c | 196 ++++++++++++++++++++++++++-----------------
- 1 file changed, 118 insertions(+), 78 deletions(-)
-
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index 42e3ec06c072..7b77cdb9395d 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -16,6 +16,16 @@
- #include "blk-mq-sched.h"
- #include "blk-wbt.h"
- 
-+struct sched_dispatch_ctx {
-+	struct blk_mq_hw_ctx *hctx;
-+	struct list_head rq_list;
-+
-+	int count;
-+	bool multi_hctxs;
-+	bool run_queue;
-+	bool busy;
-+};
-+
- /*
-  * Mark a hardware queue as needing a restart.
-  */
-@@ -74,92 +84,92 @@ static bool blk_mq_dispatch_hctx_list(struct list_head *rq_list)
- 
- #define BLK_MQ_BUDGET_DELAY	3		/* ms units */
- 
--/*
-- * Only SCSI implements .get_budget and .put_budget, and SCSI restarts
-- * its queue by itself in its completion handler, so we don't need to
-- * restart queue if .get_budget() fails to get the budget.
-- *
-- * Returns -EAGAIN if hctx->dispatch was found non-empty and run_work has to
-- * be run again.  This is necessary to avoid starving flushes.
-- */
--static int __blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
-+static bool blk_mq_should_dispatch(struct sched_dispatch_ctx *ctx)
- {
--	struct request_queue *q = hctx->queue;
--	struct elevator_queue *e = q->elevator;
--	bool multi_hctxs = false, run_queue = false;
--	bool dispatched = false, busy = false;
--	unsigned int max_dispatch;
--	LIST_HEAD(rq_list);
--	int count = 0;
-+	struct elevator_queue *e = ctx->hctx->queue->elevator;
- 
--	if (hctx->dispatch_busy)
--		max_dispatch = 1;
--	else
--		max_dispatch = hctx->queue->nr_requests;
-+	if (e->type->ops.has_work && !e->type->ops.has_work(ctx->hctx))
-+		return false;
- 
--	do {
--		struct request *rq;
--		int budget_token;
-+	if (!list_empty_careful(&ctx->hctx->dispatch)) {
-+		ctx->busy = true;
-+		return false;
-+	}
- 
--		if (e->type->ops.has_work && !e->type->ops.has_work(hctx))
--			break;
-+	return true;
-+}
- 
--		if (!list_empty_careful(&hctx->dispatch)) {
--			busy = true;
--			break;
--		}
-+static bool blk_mq_dispatch_one_request(struct sched_dispatch_ctx *ctx)
-+{
-+	struct request_queue *q = ctx->hctx->queue;
-+	struct elevator_queue *e = q->elevator;
-+	struct request *rq;
-+	int budget_token;
- 
--		budget_token = blk_mq_get_dispatch_budget(q);
--		if (budget_token < 0)
--			break;
-+	if (!blk_mq_should_dispatch(ctx))
-+		return false;
- 
--		if (blk_queue_sq_sched(q)) {
--			elevator_lock_irq(e);
--			rq = e->type->ops.dispatch_request(hctx);
--			elevator_unlock_irq(e);
--		} else {
--			rq = e->type->ops.dispatch_request(hctx);
--		}
-+	budget_token = blk_mq_get_dispatch_budget(q);
-+	if (budget_token < 0)
-+		return false;
- 
--		if (!rq) {
--			blk_mq_put_dispatch_budget(q, budget_token);
--			/*
--			 * We're releasing without dispatching. Holding the
--			 * budget could have blocked any "hctx"s with the
--			 * same queue and if we didn't dispatch then there's
--			 * no guarantee anyone will kick the queue.  Kick it
--			 * ourselves.
--			 */
--			run_queue = true;
--			break;
--		}
--
--		blk_mq_set_rq_budget_token(rq, budget_token);
-+	if (blk_queue_sq_sched(q)) {
-+		elevator_lock_irq(e);
-+		rq = e->type->ops.dispatch_request(ctx->hctx);
-+		elevator_unlock_irq(e);
-+	} else {
-+		rq = e->type->ops.dispatch_request(ctx->hctx);
-+	}
- 
-+	if (!rq) {
-+		blk_mq_put_dispatch_budget(q, budget_token);
- 		/*
--		 * Now this rq owns the budget which has to be released
--		 * if this rq won't be queued to driver via .queue_rq()
--		 * in blk_mq_dispatch_rq_list().
-+		 * We're releasing without dispatching. Holding the
-+		 * budget could have blocked any "hctx"s with the
-+		 * same queue and if we didn't dispatch then there's
-+		 * no guarantee anyone will kick the queue.  Kick it
-+		 * ourselves.
- 		 */
--		list_add_tail(&rq->queuelist, &rq_list);
--		count++;
--		if (rq->mq_hctx != hctx)
--			multi_hctxs = true;
-+		ctx->run_queue = true;
-+		return false;
-+	}
- 
--		/*
--		 * If we cannot get tag for the request, stop dequeueing
--		 * requests from the IO scheduler. We are unlikely to be able
--		 * to submit them anyway and it creates false impression for
--		 * scheduling heuristics that the device can take more IO.
--		 */
--		if (!blk_mq_get_driver_tag(rq))
--			break;
--	} while (count < max_dispatch);
-+	blk_mq_set_rq_budget_token(rq, budget_token);
- 
--	if (!count) {
--		if (run_queue)
--			blk_mq_delay_run_hw_queues(q, BLK_MQ_BUDGET_DELAY);
--	} else if (multi_hctxs) {
-+	/*
-+	 * Now this rq owns the budget which has to be released
-+	 * if this rq won't be queued to driver via .queue_rq()
-+	 * in blk_mq_dispatch_rq_list().
-+	 */
-+	list_add_tail(&rq->queuelist, &ctx->rq_list);
-+	ctx->count++;
-+	if (rq->mq_hctx != ctx->hctx)
-+		ctx->multi_hctxs = true;
-+
-+	/*
-+	 * If we cannot get tag for the request, stop dequeueing
-+	 * requests from the IO scheduler. We are unlikely to be able
-+	 * to submit them anyway and it creates false impression for
-+	 * scheduling heuristics that the device can take more IO.
-+	 */
-+	return blk_mq_get_driver_tag(rq);
-+}
-+
-+/*
-+ * Returns -EAGAIN if hctx->dispatch was found non-empty and run_work has to
-+ * be run again. This is necessary to avoid starving flushes.
-+ * Return 0 if no request is dispatched.
-+ * Return 1 if at least one request is dispatched.
-+ */
-+static int blk_mq_finish_dispatch(struct sched_dispatch_ctx *ctx)
-+{
-+	bool dispatched = false;
-+
-+	if (!ctx->count) {
-+		if (ctx->run_queue)
-+			blk_mq_delay_run_hw_queues(ctx->hctx->queue,
-+						   BLK_MQ_BUDGET_DELAY);
-+	} else if (ctx->multi_hctxs) {
- 		/*
- 		 * Requests from different hctx may be dequeued from some
- 		 * schedulers, such as bfq and deadline.
-@@ -167,19 +177,49 @@ static int __blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
- 		 * Sort the requests in the list according to their hctx,
- 		 * dispatch batching requests from same hctx at a time.
- 		 */
--		list_sort(NULL, &rq_list, sched_rq_cmp);
-+		list_sort(NULL, &ctx->rq_list, sched_rq_cmp);
- 		do {
--			dispatched |= blk_mq_dispatch_hctx_list(&rq_list);
--		} while (!list_empty(&rq_list));
-+			dispatched |= blk_mq_dispatch_hctx_list(&ctx->rq_list);
-+		} while (!list_empty(&ctx->rq_list));
- 	} else {
--		dispatched = blk_mq_dispatch_rq_list(hctx, &rq_list, false);
-+		dispatched = blk_mq_dispatch_rq_list(ctx->hctx, &ctx->rq_list,
-+						     false);
- 	}
- 
--	if (busy)
-+	if (ctx->busy)
- 		return -EAGAIN;
-+
- 	return !!dispatched;
- }
- 
-+/*
-+ * Only SCSI implements .get_budget and .put_budget, and SCSI restarts
-+ * its queue by itself in its completion handler, so we don't need to
-+ * restart queue if .get_budget() fails to get the budget.
-+ *
-+ * See blk_mq_finish_dispatch() for return values.
-+ */
-+static int __blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
-+{
-+	unsigned int max_dispatch;
-+	struct sched_dispatch_ctx ctx = {
-+		.hctx	= hctx,
-+		.rq_list = LIST_HEAD_INIT(ctx.rq_list),
-+	};
-+
-+	if (hctx->dispatch_busy)
-+		max_dispatch = 1;
-+	else
-+		max_dispatch = hctx->queue->nr_requests;
-+
-+	do {
-+		if (!blk_mq_dispatch_one_request(&ctx))
-+			break;
-+	} while (ctx.count < max_dispatch);
-+
-+	return blk_mq_finish_dispatch(&ctx);
-+}
-+
- static int blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
- {
- 	unsigned long end = jiffies + HZ;
--- 
-2.39.2
+> 
+> Thanks,
+> Ming
+> 
+> 
+> .
+> 
 
