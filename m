@@ -1,204 +1,535 @@
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2043.outbound.protection.outlook.com [40.107.94.43])
+Received: from sender4-pp-f112.zoho.com (sender4-pp-f112.zoho.com [136.143.188.112])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F370E29CB48;
-	Wed,  6 Aug 2025 18:44:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDEBD1FF1B5;
+	Wed,  6 Aug 2025 19:36:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.112
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754505889; cv=fail; b=ZR1mBhFj4xF2FwR4mAm9bEDeYErkh8b+tuYprurKg6vnwaBYfGL9wrDFKg8gV6/YQiSQCh1gPOp7BFvXXYa1MEAkfcaleOylbULuIgU0WUOOfEbQjtbqDNrzoRrSj3rSnewttnhfLEP/a6lmvGZ1pHxPFNpHj40TOJHf29qRvmg=
+	t=1754508993; cv=pass; b=KLtpFbf7ml32eE4JDPRYNMACuGMYFnJ2FYQ+RQVHX+LtmZL6+xG0mDcQEF0oFDpoUdE/I0UBY7ARRSEJkrHMnbvHSTGL8xXerT/4uK9qg6wFGYbIcbCRcd1+WO9J0ai59RNtT9OYdeuCfLBJjs21WwYm3hlKYHikEP2wBjyKoow=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754505889; c=relaxed/simple;
-	bh=xYf+k7Iaj0957awcWB+XNbmWhAO46t1jzeVZWlhFq3g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=XR319bza7FoSPT5wDDOYb5W7PyaoCdZ10wmACzwplNIhcVbA4bHg7vWEKEwCkF21vJthYewN0+LeqOgtSXFrBZmcsJprSRnh+FCSXA4GBL1wE1YGBs1JSS1Nabs9rZzSwjKtX3yTC0GuYcv26ptPthFc5BEoddwlgKtrHBW0bpo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=gi6vwpK5; arc=fail smtp.client-ip=40.107.94.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	s=arc-20240116; t=1754508993; c=relaxed/simple;
+	bh=1cOkmZJkB0uHYNjR5I9uMLGbyaJg6tg2a+VXSC/TTUs=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=nVcvqFnII3a8tFQmoRDoom/F8FuRQyI4X3djcNUK2ChjCvR+Txun/Nay9xzCeSrWQlmrtKD/1Yk5OJMUw5AROE/cXyIkcR511yp/vReitZ1uTjVTqb1Rg9Xng6RQUKzmHiMQSSpHOok84T6mKsRi14Xkh9eGPmVEtSgqVlzP3xQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=daniel.almeida@collabora.com header.b=jCM04/sE; arc=pass smtp.client-ip=136.143.188.112
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="gi6vwpK5"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=IOauFcSkTIcu6PD7QaXL2Z0ekh+G12NbVdlqxqSUF329YDRGdMpJsGxQ6P4fut1tX1Ygpb2vcf9dUG0A0MElFOeAQVNP/mC5F81GfWDQgksWCKY3exzISuXthAjUdgIYtHFTj0Owe+9QXSzhnS3Y1Z0hdtVKu1b5yWNh1+UPlVGYgFopNcqoI1Uq2qcC5mCuSNmu76shE9RpAgnwh2k89srZg30ukYjhzkwSwExmvQJIQTZ8T9PTwPhjvA5QuXHLEBQ0RY1nsssiq6+hp7UYpZSSgUxBd/u4jVF4EY/YUnZ2Z4HL7m1UCCzjYywsq+gxEqMOgHHxs+CkjwjL2f0EHQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=XsnX/855VPl+V555Ssmgek9Y1s47JtlT+wpnIJ5f4UM=;
- b=LQ6Jyo8G+G6ShACF49yYeqmyidGB0PDIIqMDs0nKLWlkVU/UmfgLc7T4MJY7TDU1yh8MXPDbtGY20MFTe09zB4nTAV65ukkxyTBPT3tcGVzajUAClpnO+YcvyqJDL7zewB/NQZ1KnCJswCw5Qj0D+5Rrg+EMO/moi7PeQkeV18W3gTe0RKU7fTud9aHwjkkKZMCK615a22skSiCkRjigdQ//IwUVPvF23/WEP+FJ5osRc5NK9c2TfOx49oXxg2vuZwwZBToXedmTA/suZVsxI3Xg2ybxN2iF0LD0baRTaDtd3vQWX/drHxUHP4kHdsnQqefLNOSiML9EABsYRRxRiw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=XsnX/855VPl+V555Ssmgek9Y1s47JtlT+wpnIJ5f4UM=;
- b=gi6vwpK5i9Jx4O9Pk6cIfi9UBlgeHFY5Hf4CRLGXdYp/1NAtrsXAhN/5hLWkN143xMrb1UAUDqxZJUdgN9ZSnTEO1d9Rokd4vDp5ZbhHTfZTyd/WEhNSqkWisD71CJuUAzkVwU9fvS8NL7ZgiZx6cqgGB8p18ccgPwUfZa72/0Vvip0apOrLU8CjtBJzPchTVgnz74mn6tB+wIO1TPha9NpyIkzXKWoZCn5+t9/Rydd308vn/NYmjJZYYyB66ZvPfBShdDHToalZKv4wz5ARxu9ZTe6wxKLN5OoXm119nzoLrxPPIC09n73TdVYV6oxW1x/KVUYVVvdVyMtUKCxqiQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
- by DM3PR12MB9389.namprd12.prod.outlook.com (2603:10b6:0:46::9) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8989.20; Wed, 6 Aug 2025 18:44:44 +0000
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732%4]) with mapi id 15.20.9009.013; Wed, 6 Aug 2025
- 18:44:44 +0000
-Date: Wed, 6 Aug 2025 15:44:43 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Marek Szyprowski <m.szyprowski@samsung.com>,
-	Leon Romanovsky <leonro@nvidia.com>,
-	Abdiel Janulgue <abdiel.janulgue@gmail.com>,
-	Alexander Potapenko <glider@google.com>,
-	Alex Gaynor <alex.gaynor@gmail.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Christoph Hellwig <hch@lst.de>, Danilo Krummrich <dakr@kernel.org>,
-	iommu@lists.linux.dev, Jason Wang <jasowang@redhat.com>,
-	Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>,
-	Jonathan Corbet <corbet@lwn.net>, Juergen Gross <jgross@suse.com>,
-	kasan-dev@googlegroups.com, Keith Busch <kbusch@kernel.org>,
-	linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	linux-nvme@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
-	linux-trace-kernel@vger.kernel.org,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Robin Murphy <robin.murphy@arm.com>, rust-for-linux@vger.kernel.org,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Stefano Stabellini <sstabellini@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	virtualization@lists.linux.dev, Will Deacon <will@kernel.org>,
-	xen-devel@lists.xenproject.org
-Subject: Re: [PATCH v1 05/16] iommu/dma: rename iommu_dma_*map_page to
- iommu_dma_*map_phys
-Message-ID: <20250806184443.GD184255@nvidia.com>
-References: <cover.1754292567.git.leon@kernel.org>
- <9186ccefda5ea97b56ec006900127650f9e324b5.1754292567.git.leon@kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9186ccefda5ea97b56ec006900127650f9e324b5.1754292567.git.leon@kernel.org>
-X-ClientProxiedBy: YT4PR01CA0189.CANPRD01.PROD.OUTLOOK.COM
- (2603:10b6:b01:110::7) To CH3PR12MB8659.namprd12.prod.outlook.com
- (2603:10b6:610:17c::13)
+	dkim=pass (1024-bit key) header.d=collabora.com header.i=daniel.almeida@collabora.com header.b="jCM04/sE"
+ARC-Seal: i=1; a=rsa-sha256; t=1754508973; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=dlIc3qcQhKiUlm5a0yCRbhrlYuFAWymDypWbT6Ip2LtuuDirvVAcng9VbcSPPy+hFKjH74tFmnO9V3VcQdOnOThKpRahN89+ozGzQgX9sIB8cfMLxgIsbBrwBqCaWRn+JOcrHW2J58k6lbq19ju1KXePqw8q4Rwa97aDS/o6cEE=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1754508973; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=o5Z5QH9Q2M8oNoEfEvJfM14eQoMIrZAJ2fEy/12QmyQ=; 
+	b=L4awVM2YyHr4pBkJlPT4lkoPFcPDwxD6EGyGBbZpjEZuXgUlj8NojDwhAstuMrMRmRZGzVzr6pOt1ze+AM4EnCHUn3rTTnSpKmyrQHW8uD32uHZ54+WUqQlrexgjIHLFdeJKbJh4oHSWZ5ZvNS2Vk54W7i+Evoc8dy9Vb/VfHyY=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=collabora.com;
+	spf=pass  smtp.mailfrom=daniel.almeida@collabora.com;
+	dmarc=pass header.from=<daniel.almeida@collabora.com>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1754508973;
+	s=zohomail; d=collabora.com; i=daniel.almeida@collabora.com;
+	h=Content-Type:Mime-Version:Subject:Subject:From:From:In-Reply-To:Date:Date:Cc:Cc:Content-Transfer-Encoding:Message-Id:Message-Id:References:To:To:Reply-To;
+	bh=o5Z5QH9Q2M8oNoEfEvJfM14eQoMIrZAJ2fEy/12QmyQ=;
+	b=jCM04/sE5U0Zy58VpT+3TlFr7Yr7irmohiL6M2N7vcSeUdR/m3S+C9AMhgRxo1Uj
+	vdhW9btgq6wsmEmfU9bcfFBRz/CkGzcGdpFtkYP+EEVcViQ+Yge2FrDmrpMi5usMdSG
+	3ZWpY36Vfrdn1tZCoSwlYCfV/RN7kpyZcgXWgROM=
+Received: by mx.zohomail.com with SMTPS id 1754508970819867.341545264823;
+	Wed, 6 Aug 2025 12:36:10 -0700 (PDT)
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|DM3PR12MB9389:EE_
-X-MS-Office365-Filtering-Correlation-Id: b540726a-1087-4405-7c29-08ddd5194fa3
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7416014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?DVKK7m2kwbrFdFZ5CLqlkp3pCfT0gAPJfkqrhOJzBqvcXtAOkkMPkBXU7sc2?=
- =?us-ascii?Q?HlPv8+ODQt8Q5OlIqzIGrgF1p47orRrCOtS8kcyGubzJCJWHSvgXFfbNgzrw?=
- =?us-ascii?Q?/hbV1f0thZ7bBK1+ra1Aq/S4ghWekXsp1lWa5ZxaEgJoM6cjrxFNxViHVCTx?=
- =?us-ascii?Q?TFLHB25mCEIL35Hl32dvuQWzbEU0GAEIVAXeJcPoCROymPkl0kkmjQDuHvBq?=
- =?us-ascii?Q?RkZnbgMNgQDJ5hVraqmr3DqGxwMzxY5CuzgTXC97OTldBsMrUA48sPfSRdID?=
- =?us-ascii?Q?tqSf1yn9ePjr7Hy3vLsEgX3F0fYDVHBJtKI9SaZ5L0p+cu7Uc8LFfr3KenOK?=
- =?us-ascii?Q?veB8r0oF8RmSDkboVZYVJ4LxD8KpGeCBlI1IJSOkSZhp4XGn7VEzxR5UaicJ?=
- =?us-ascii?Q?p+DZqdQDosr9FvrmtVsyYhFNf0Y2CCMgoyKiHR0xD9ROFjvV+cl1RfBE0BOa?=
- =?us-ascii?Q?YvmN68/7ccmDS1DD4nBhm8zR6JmvobuG2WYZkzk6+yrKS9xauJWj3D8vvJSG?=
- =?us-ascii?Q?ii403ZJLIjngZYo/rzax6f8v2jfN4Jz1HtN3ZTqbZg0NQCTu85kWr/XhusG8?=
- =?us-ascii?Q?F5hs0NGzJY4IEmIJhJmvxnvKn1HNsXTHNXCHtLh71RhGP8n9SKXQYRLtxCkv?=
- =?us-ascii?Q?8pavmU/3d5KiWUm9ny/KjITJYthuwGGpygrPizbHaBrHquUx3GGBYbggfwoa?=
- =?us-ascii?Q?LMi66WtjB3AYwHRmXlIVUPirRtnF0O2CjHopmmjRrUKzu4uclUBDvVYN8x4X?=
- =?us-ascii?Q?2ROpvPSIJNfSYsU3AAEHC3YyOxDvvBLXnyJqCcf88hehfvMBMBVH0P2drFon?=
- =?us-ascii?Q?+XfyYtM6hVF4OPxaIeAh9YPKm0WxFl2Np8kW/tUzqJewVNeQ/WUIsU4Hizuc?=
- =?us-ascii?Q?277SUZf3nJE1rAykfN8m3DpJw5Jlp7asNbwBPEsJ2BKh7AJdAs8cicqZ+vrG?=
- =?us-ascii?Q?b/jL7tNZV/kmFGInFAGBeRXEhEba3f9GEefwbC9P1BqjLhB2EO7yvQO1WTnF?=
- =?us-ascii?Q?6sddW5eTpyKv0H2raRyInjVjvpPWDDoxfKR0rUXlY9ChanIcCnXTn85sYUKR?=
- =?us-ascii?Q?DrzR2KaplMd0BKRatDtIcigFzcesXkNSQtOAzG1HsKQ7txmWKoQBE1FhduWp?=
- =?us-ascii?Q?hdFKFriNDZB38pm6yKLTLlA1be01LI3JCWrLA42f+bdGiIxnHudbioh7FR5c?=
- =?us-ascii?Q?dnZi+Yl6hOwt5XWRfEzWN9lFDY/Cv7paTTfwrzYaFmCUDkmuGl6P3lTqXmXt?=
- =?us-ascii?Q?W+d+zHryLrLJG5nW9l7UEflk6LbaYe2nqjW7GsuAMzjd7oJm60dj8MZRJM7y?=
- =?us-ascii?Q?QD7MjGm5CTHLyX0co1pLB+az+/asfUfJo2+DFm1tG8cFiM1C2Xx3v1Qr3tM9?=
- =?us-ascii?Q?qNJRj6rUu1FVWh3IOwVptrTBgkcqwQwkFY1H2p9ZJUSixRrIEJPB8s6E+XmY?=
- =?us-ascii?Q?ttj2uhMec8w=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?H5EEEmksxB5nY2IizxojE35HXRRm8/DB/1QSzYsVyyVgI96BpLxbIuv5TDkx?=
- =?us-ascii?Q?nUGpwu2dJU6+r3X915pb8KC9O5dreCxHz158+pG2Fj6dAGBEledNoRSGoX0R?=
- =?us-ascii?Q?hbO65fGcbNBhmktBgZ2vmYBPQBsB0lY2syDGxqUeE0cUd2r9ARBLOsowZs6r?=
- =?us-ascii?Q?TGvou3G03c+uNESEZFI58JjOQ60EdRFWaha/si8J3haXH+axt49E95RcDf57?=
- =?us-ascii?Q?vbmEin9T70GxM/I6kKe9bMKickVzch2GwVucyBZhjx2WYVrYch1nj9TyCpRH?=
- =?us-ascii?Q?D3j0bTzOuFiIpRkZxysQpHON+YOkT3Jo4gWIHSNf6RlgD1bA3wE7ONa3dLnN?=
- =?us-ascii?Q?MQ27zykqOoiFAJf+LhCVKLhRVr7yMezgpp1DhO3HeIzs4+BjizAZMMzRyBE5?=
- =?us-ascii?Q?4VQ5IMsQ2ve0tfUGNIFgDJAzGSmNJBp+nmNckIuz4+Y4UeV9wxAaC6k85kEJ?=
- =?us-ascii?Q?ZyTnGNZMgxjCp2kn9yXy3d3gcYf7k25G7xfdo5+J8yTjS66m8YMMuDBZKLhd?=
- =?us-ascii?Q?+oA4Zz484q0UmlLvbDJWR2YZRO9C5wu4qCvVQyo/cV6Xf23MW47rmjSOSt4i?=
- =?us-ascii?Q?8gyIzgAUlSqrYizSHaM5cTpNNalJdBGbGHEAuZSnUZJPabrYVD8zYlVofvMA?=
- =?us-ascii?Q?5jQ2gxzhomsXJI4XpWFcLHjkPZbl3ReZV2Iv4UV816nGs7RtY9ywpvEEH3M6?=
- =?us-ascii?Q?d37UY82AQkgHJ389AJxpqATWo+7813trld15qO08wOP7wptlSKTBtLxFqyp1?=
- =?us-ascii?Q?p5K5mq4BDwrw4ErAxSXgmqHMJmwrMkBiODHeMV/7BRLuY36DMVyv844QXfcN?=
- =?us-ascii?Q?5JXYB6b0PeVylkrKNvdTrz1aNY3GOeyDWYzbbsnDYKyAO8mjTrOVj0ZCSdxd?=
- =?us-ascii?Q?V1l1olpKmeAMJEJZSxoT4NugVaKwxOfUKz8aTEG8cK7rLgBGKNzwSZvC6E+r?=
- =?us-ascii?Q?TZ60eqsirzXmat2EcjPl25ppMdHGy3IbMnQ/J9sgxmY/z9E9OuwHJWp7bA6X?=
- =?us-ascii?Q?zvjg8HBBbOwzT0WPfDsVKH7X4LiJmimUfgZZmgn0zuXLHlidtJWJeQa8fqgv?=
- =?us-ascii?Q?bqEHDo6ZVh+k/D9MdKr+ZDNQXkGO5ny9caMPWLw42d5z3DncVGuDbtgJ7wUg?=
- =?us-ascii?Q?1GLNNvORRle4a8/329sxw5VCmtaA+NcMj0xHlOg8OkHs+zBaTfknUMZ1S11e?=
- =?us-ascii?Q?Il92mJk32OizprAwz+I6hfDG+f5USQm3BrAz3Fe5DKhO3+Rq+fHW4Updrapg?=
- =?us-ascii?Q?xWKhNg7TXgqka6KKCknRW16XrkrH9wbo07ZPDyRvtjmSI0Kz8389jwNNrVOf?=
- =?us-ascii?Q?OUwZQImlpAEA11s3KKAs/HNdN9uURSwzJkCT55r6laWcFrnQtmKmNQNXh1bb?=
- =?us-ascii?Q?DWShheY2RnxJzO+KOAGR3f97vhXpXHJ+Ku9Wu0v9i+qRbybf1HLv8bXf27LJ?=
- =?us-ascii?Q?oCEXhhTsPvH0NVJ6P73+0jAj/p0R/zyWNg3RaqPhpJO1OCqeXbABd26YLLMw?=
- =?us-ascii?Q?jIP6a6G7UJYSNhOAYVZHG104pJg0qJOHmW7DkhK7vFiCR7az3SJsxBwlslee?=
- =?us-ascii?Q?9D1Cn5vtkBFmiLwdXkc=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b540726a-1087-4405-7c29-08ddd5194fa3
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Aug 2025 18:44:44.5493
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 0L4SPqUDcaxxJuMXBA+m3YBuJJPuxs4NsJn9UIVDrRqDkc08va7Gss0v4bBIJNIw
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM3PR12MB9389
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.600.51.1.1\))
+Subject: Re: [PATCH v3 12/16] rnull: enable configuration via `configfs`
+From: Daniel Almeida <daniel.almeida@collabora.com>
+In-Reply-To: <20250711-rnull-up-v6-16-v3-12-3a262b4e2921@kernel.org>
+Date: Wed, 6 Aug 2025 16:35:55 -0300
+Cc: Boqun Feng <boqun.feng@gmail.com>,
+ Miguel Ojeda <ojeda@kernel.org>,
+ Alex Gaynor <alex.gaynor@gmail.com>,
+ Gary Guo <gary@garyguo.net>,
+ =?utf-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>,
+ Benno Lossin <lossin@kernel.org>,
+ Alice Ryhl <aliceryhl@google.com>,
+ Trevor Gross <tmgross@umich.edu>,
+ Danilo Krummrich <dakr@kernel.org>,
+ Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org,
+ rust-for-linux@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <03D084B5-5844-4BC5-902C-14E53AC13DC9@collabora.com>
+References: <20250711-rnull-up-v6-16-v3-0-3a262b4e2921@kernel.org>
+ <20250711-rnull-up-v6-16-v3-12-3a262b4e2921@kernel.org>
+To: Andreas Hindborg <a.hindborg@kernel.org>
+X-Mailer: Apple Mail (2.3826.600.51.1.1)
+X-ZohoMailClient: External
 
-On Mon, Aug 04, 2025 at 03:42:39PM +0300, Leon Romanovsky wrote:
-> diff --git a/drivers/iommu/dma-iommu.c b/drivers/iommu/dma-iommu.c
-> index 399838c17b705..11c5d5f8c0981 100644
-> --- a/drivers/iommu/dma-iommu.c
-> +++ b/drivers/iommu/dma-iommu.c
-> @@ -1190,11 +1190,9 @@ static inline size_t iova_unaligned(struct iova_domain *iovad, phys_addr_t phys,
->  	return iova_offset(iovad, phys | size);
->  }
->  
-> -dma_addr_t iommu_dma_map_page(struct device *dev, struct page *page,
-> -	      unsigned long offset, size_t size, enum dma_data_direction dir,
-> -	      unsigned long attrs)
-> +dma_addr_t iommu_dma_map_phys(struct device *dev, phys_addr_t phys, size_t size,
-> +		enum dma_data_direction dir, unsigned long attrs)
->  {
-> -	phys_addr_t phys = page_to_phys(page) + offset;
->  	bool coherent = dev_is_dma_coherent(dev);
->  	int prot = dma_info_to_prot(dir, coherent, attrs);
->  	struct iommu_domain *domain = iommu_get_dma_domain(dev);
 
-No issue with pushing the page_to_phys to the looks like two callers..
 
-It is worth pointing though that today if the page * was a
-MEMORY_DEVICE_PCI_P2PDMA page then it is illegal to call the swiotlb
-functions a few lines below this:
+> On 11 Jul 2025, at 08:43, Andreas Hindborg <a.hindborg@kernel.org> =
+wrote:
+>=20
+> Allow rust null block devices to be configured and instantiated via
+> `configfs`.
+>=20
+> Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
+> ---
+> drivers/block/rnull/Kconfig      |   2 +-
+> drivers/block/rnull/configfs.rs  | 220 =
++++++++++++++++++++++++++++++++++++++++
+> drivers/block/rnull/rnull.rs     |  58 ++++++-----
+> rust/kernel/block/mq/gen_disk.rs |   2 +-
+> 4 files changed, 253 insertions(+), 29 deletions(-)
+>=20
+> diff --git a/drivers/block/rnull/Kconfig b/drivers/block/rnull/Kconfig
+> index 6dc5aff96bf4..7bc5b376c128 100644
+> --- a/drivers/block/rnull/Kconfig
+> +++ b/drivers/block/rnull/Kconfig
+> @@ -4,7 +4,7 @@
+>=20
+> config BLK_DEV_RUST_NULL
+> tristate "Rust null block driver (Experimental)"
+> - depends on RUST
+> + depends on RUST && CONFIGFS_FS
 
-                phys = iommu_dma_map_swiotlb(dev, phys, size, dir, attrs);
+Should this really be a dependency? IIUC, the driver still works with =
+this
+unset, it just doesn=E2=80=99t have this feature?
 
-ie struct page alone as a type is not sufficient to make this function
-safe for a long time now.
+> help
+>  This is the Rust implementation of the null block driver. Like
+>  the C version, the driver allows the user to create virutal block
+> diff --git a/drivers/block/rnull/configfs.rs =
+b/drivers/block/rnull/configfs.rs
+> new file mode 100644
+> index 000000000000..6c0e3bbb36ec
+> --- /dev/null
+> +++ b/drivers/block/rnull/configfs.rs
+> @@ -0,0 +1,220 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +
+> +use super::{NullBlkDevice, THIS_MODULE};
+> +use core::fmt::Write;
+> +use kernel::{
+> +    block::mq::gen_disk::{GenDisk, GenDiskBuilder},
+> +    c_str,
+> +    configfs::{self, AttributeOperations},
+> +    configfs_attrs, new_mutex,
+> +    page::PAGE_SIZE,
+> +    prelude::*,
+> +    str::CString,
+> +    sync::Mutex,
+> +};
+> +use pin_init::PinInit;
+> +
+> +pub(crate) fn subsystem() -> impl =
+PinInit<kernel::configfs::Subsystem<Config>, Error> {
+> +    let item_type =3D configfs_attrs! {
+> +        container: configfs::Subsystem<Config>,
+> +        data: Config,
+> +        child: DeviceConfig,
+> +        attributes: [
+> +            features: 0,
+> +        ],
+> +    };
+> +
+> +    kernel::configfs::Subsystem::new(c_str!("rnull"), item_type, =
+try_pin_init!(Config {}))
+> +}
+> +
+> +#[pin_data]
+> +pub(crate) struct Config {}
 
-So I would add some explanation in the commit message how this will be
-situated in the final call chains, and maybe leave behind a comment
-that attrs may not have ATTR_MMIO in this function.
+This still builds:
 
-I think the answer is iommu_dma_map_phys() is only called for
-!ATTR_MMIO addresses, and that iommu_dma_map_resource() will be called
-for ATTR_MMIO?
+diff --git a/drivers/block/rnull/configfs.rs =
+b/drivers/block/rnull/configfs.rs
+index 3ae84dfc8d62..2e5ffa82e679 100644
+--- a/drivers/block/rnull/configfs.rs
++++ b/drivers/block/rnull/configfs.rs
+@@ -24,10 +24,9 @@ pub(crate) fn subsystem() -> impl =
+PinInit<kernel::configfs::Subsystem<Config>, E
+         ],
+     };
+=20
+-    kernel::configfs::Subsystem::new(c_str!("rnull"), item_type, =
+try_pin_init!(Config {}))
++    kernel::configfs::Subsystem::new(c_str!("rnull"), item_type, Config =
+{})
+ }
+=20
+-#[pin_data]
+ pub(crate) struct Config {}
 
-Jason
+Perhaps due to:
+
+// SAFETY: the `__pinned_init` function always returns `Ok(())` and =
+initializes every field of
+// `slot`. Additionally, all pinning invariants of `T` are upheld.
+unsafe impl<T> PinInit<T> for T {
+    unsafe fn __pinned_init(self, slot: *mut T) -> Result<(), =
+Infallible> {
+        // SAFETY: `slot` is valid for writes by the safety requirements =
+of this function.
+        unsafe { slot.write(self) };
+        Ok(())
+    }
+}
+
+
+> +
+> +#[vtable]
+> +impl AttributeOperations<0> for Config {
+> +    type Data =3D Config;
+> +
+> +    fn show(_this: &Config, page: &mut [u8; PAGE_SIZE]) -> =
+Result<usize> {
+> +        let mut writer =3D kernel::str::Formatter::new(page);
+> +        writer.write_str("blocksize,size,rotational\n")?;
+> +        Ok(writer.bytes_written())
+> +    }
+> +}
+> +
+> +#[vtable]
+> +impl configfs::GroupOperations for Config {
+> +    type Child =3D DeviceConfig;
+> +
+> +    fn make_group(
+> +        &self,
+> +        name: &CStr,
+> +    ) -> Result<impl PinInit<configfs::Group<DeviceConfig>, Error>> {
+> +        let item_type =3D configfs_attrs! {
+> +            container: configfs::Group<DeviceConfig>,
+> +            data: DeviceConfig,
+> +            attributes: [
+> +                // Named for compatibility with C null_blk
+> +                power: 0,
+> +                blocksize: 1,
+> +                rotational: 2,
+> +                size: 3,
+> +            ],
+> +        };
+> +
+> +        Ok(configfs::Group::new(
+> +            name.try_into()?,
+> +            item_type,
+> +            // TODO: cannot coerce new_mutex!() to impl PinInit<_, =
+Error>, so put mutex inside
+
+Isn=E2=80=99t this related to [0] ?
+
+
+> +            try_pin_init!( DeviceConfig {
+> +                data <- new_mutex!( DeviceConfigInner {
+> +                    powered: false,
+> +                    block_size: 4096,
+> +                    rotational: false,
+> +                    disk: None,
+> +                    capacity_mib: 4096,
+> +                    name: name.try_into()?,
+> +                }),
+> +            }),
+> +        ))
+> +    }
+> +}
+> +
+> +#[pin_data]
+> +pub(crate) struct DeviceConfig {
+> +    #[pin]
+> +    data: Mutex<DeviceConfigInner>,
+> +}
+> +
+> +#[pin_data]
+> +struct DeviceConfigInner {
+> +    powered: bool,
+> +    name: CString,
+> +    block_size: u32,
+> +    rotational: bool,
+> +    capacity_mib: u64,
+> +    disk: Option<GenDisk<NullBlkDevice>>,
+> +}
+> +
+> +#[vtable]
+> +impl configfs::AttributeOperations<0> for DeviceConfig {
+> +    type Data =3D DeviceConfig;
+> +
+> +    fn show(this: &DeviceConfig, page: &mut [u8; PAGE_SIZE]) -> =
+Result<usize> {
+> +        let mut writer =3D kernel::str::Formatter::new(page);
+> +
+> +        if this.data.lock().powered {
+> +            writer.write_fmt(fmt!("1\n"))?;
+> +        } else {
+> +            writer.write_fmt(fmt!("0\n"))?;
+> +        }
+> +
+> +        Ok(writer.bytes_written())
+> +    }
+> +
+> +    fn store(this: &DeviceConfig, page: &[u8]) -> Result {
+> +        let power_op: bool =3D core::str::from_utf8(page)?
+> +            .trim()
+> +            .parse::<u8>()
+> +            .map_err(|_| kernel::error::code::EINVAL)?
+
+nit: I=E2=80=99d import that if I were you, but it=E2=80=99s your call.
+
+> +            !=3D 0;
+> +
+> +        let mut guard =3D this.data.lock();=20
+> +
+> +        if !guard.powered && power_op {
+> +            guard.disk =3D Some(NullBlkDevice::new(
+> +                &guard.name,
+> +                guard.block_size,
+> +                guard.rotational,
+> +                guard.capacity_mib,
+> +            )?);
+> +            guard.powered =3D true;
+> +        } else if guard.powered && !power_op {
+> +            drop(guard.disk.take());
+> +            guard.powered =3D false;
+> +        }
+
+nit: the guard is not used here, but it is still alive. This is harmless =
+in
+this case, but as I general pattern, I find that using closures cuts =
+back on
+the scope, i.e.:
+
+this.with_locked_data(|data| {
+    // use the guard
+});
+
+// Guard is already free here, no surprises.=20
+=20
+> +
+> +        Ok(())
+> +    }
+> +}
+> +
+> +#[vtable]
+> +impl configfs::AttributeOperations<1> for DeviceConfig {
+> +    type Data =3D DeviceConfig;
+> +
+> +    fn show(this: &DeviceConfig, page: &mut [u8; PAGE_SIZE]) -> =
+Result<usize> {
+> +        let mut writer =3D kernel::str::Formatter::new(page);
+> +        writer.write_fmt(fmt!("{}\n", this.data.lock().block_size))?;
+> +        Ok(writer.bytes_written())
+> +    }
+> +
+> +    fn store(this: &DeviceConfig, page: &[u8]) -> Result {
+> +        if this.data.lock().powered {
+> +            return Err(EBUSY);
+> +        }
+> +
+> +        let text =3D core::str::from_utf8(page)?.trim();
+> +        let value =3D text
+> +            .parse::<u32>()
+> +            .map_err(|_| kernel::error::code::EINVAL)?;
+> +
+> +        GenDiskBuilder::validate_block_size(value)?;
+> +        this.data.lock().block_size =3D value;
+> +        Ok(())
+> +    }
+> +}
+> +
+> +#[vtable]
+> +impl configfs::AttributeOperations<2> for DeviceConfig {
+> +    type Data =3D DeviceConfig;
+> +
+> +    fn show(this: &DeviceConfig, page: &mut [u8; PAGE_SIZE]) -> =
+Result<usize> {
+> +        let mut writer =3D kernel::str::Formatter::new(page);
+> +
+> +        if this.data.lock().rotational {
+> +            writer.write_fmt(fmt!("1\n"))?;
+> +        } else {
+> +            writer.write_fmt(fmt!("0\n"))?;
+> +        }
+> +
+> +        Ok(writer.bytes_written())
+> +    }
+> +
+> +    fn store(this: &DeviceConfig, page: &[u8]) -> Result {
+> +        if this.data.lock().powered {
+> +            return Err(EBUSY);
+> +        }
+> +
+> +        this.data.lock().rotational =3D core::str::from_utf8(page)?
+> +            .trim()
+> +            .parse::<u8>()
+> +            .map_err(|_| kernel::error::code::EINVAL)?
+> +            !=3D 0;
+> +
+> +        Ok(())
+> +    }
+> +}
+> +
+> +#[vtable]
+> +impl configfs::AttributeOperations<3> for DeviceConfig {
+> +    type Data =3D DeviceConfig;
+> +
+> +    fn show(this: &DeviceConfig, page: &mut [u8; PAGE_SIZE]) -> =
+Result<usize> {
+> +        let mut writer =3D kernel::str::Formatter::new(page);
+> +        writer.write_fmt(fmt!("{}\n", =
+this.data.lock().capacity_mib))?;
+> +        Ok(writer.bytes_written())
+> +    }
+> +
+> +    fn store(this: &DeviceConfig, page: &[u8]) -> Result {
+> +        if this.data.lock().powered {
+> +            return Err(EBUSY);
+> +        }
+> +
+> +        let text =3D core::str::from_utf8(page)?.trim();
+> +        let value =3D text
+> +            .parse::<u64>()
+> +            .map_err(|_| kernel::error::code::EINVAL)?;
+> +
+> +        this.data.lock().capacity_mib =3D value;
+> +        Ok(())
+> +    }
+> +}
+> diff --git a/drivers/block/rnull/rnull.rs =
+b/drivers/block/rnull/rnull.rs
+> index d07e76ae2c13..d09bc77861e4 100644
+> --- a/drivers/block/rnull/rnull.rs
+> +++ b/drivers/block/rnull/rnull.rs
+> @@ -1,28 +1,26 @@
+> // SPDX-License-Identifier: GPL-2.0
+>=20
+> //! This is a Rust implementation of the C null block driver.
+> -//!
+> -//! Supported features:
+> -//!
+> -//! - blk-mq interface
+> -//! - direct completion
+> -//! - block size 4k
+
+Why are these three removed?
+
+> -//!
+> -//! The driver is not configurable.
+> +
+> +mod configfs;
+>=20
+> use kernel::{
+>     alloc::flags,
+> -    block::mq::{
+> +    block::{
+>         self,
+> -        gen_disk::{self, GenDisk},
+> -        Operations, TagSet,
+> +        mq::{
+> +            self,
+> +            gen_disk::{self, GenDisk},
+> +            Operations, TagSet,
+> +        },
+>     },
+>     error::Result,
+> -    new_mutex, pr_info,
+> +    pr_info,
+>     prelude::*,
+> -    sync::{Arc, Mutex},
+> +    sync::Arc,
+>     types::ARef,
+> };
+> +use pin_init::PinInit;
+>=20
+> module! {
+>     type: NullBlkModule,
+> @@ -35,33 +33,39 @@
+> #[pin_data]
+> struct NullBlkModule {
+>     #[pin]
+> -    _disk: Mutex<GenDisk<NullBlkDevice>>,
+> +    configfs_subsystem: =
+kernel::configfs::Subsystem<configfs::Config>,
+> }
+>=20
+> impl kernel::InPlaceModule for NullBlkModule {
+>     fn init(_module: &'static ThisModule) -> impl PinInit<Self, Error> =
+{
+>         pr_info!("Rust null_blk loaded\n");
+>=20
+> -        // Use a immediately-called closure as a stable `try` block
+> -        let disk =3D /* try */ (|| {
+> -            let tagset =3D Arc::pin_init(TagSet::new(1, 256, 1), =
+flags::GFP_KERNEL)?;
+> -
+> -            gen_disk::GenDiskBuilder::new()
+> -                .capacity_sectors(4096 << 11)
+> -                .logical_block_size(4096)?
+> -                .physical_block_size(4096)?
+> -                .rotational(false)
+> -                .build(format_args!("rnullb{}", 0), tagset)
+> -        })();
+> -
+>         try_pin_init!(Self {
+> -            _disk <- new_mutex!(disk?, "nullb:disk"),
+> +            configfs_subsystem <- configfs::subsystem(),
+>         })
+>     }
+> }
+>=20
+> struct NullBlkDevice;
+>=20
+> +impl NullBlkDevice {
+> +    fn new(
+> +        name: &CStr,
+> +        block_size: u32,
+> +        rotational: bool,
+> +        capacity_mib: u64,
+> +    ) -> Result<GenDisk<Self>> {
+> +        let tagset =3D Arc::pin_init(TagSet::new(1, 256, 1), =
+flags::GFP_KERNEL)?;
+> +
+> +        gen_disk::GenDiskBuilder::new()
+> +            .capacity_sectors(capacity_mib << (20 - =
+block::SECTOR_SHIFT))
+> +            .logical_block_size(block_size)?
+> +            .physical_block_size(block_size)?
+> +            .rotational(rotational)
+> +            .build(fmt!("{}", name.to_str()?), tagset)
+> +    }
+> +}
+> +
+> #[vtable]
+> impl Operations for NullBlkDevice {
+>     #[inline(always)]
+> diff --git a/rust/kernel/block/mq/gen_disk.rs =
+b/rust/kernel/block/mq/gen_disk.rs
+> index 39be2a31337f..7ab049ec591b 100644
+> --- a/rust/kernel/block/mq/gen_disk.rs
+> +++ b/rust/kernel/block/mq/gen_disk.rs
+> @@ -50,7 +50,7 @@ pub fn rotational(mut self, rotational: bool) -> =
+Self {
+>=20
+>     /// Validate block size by verifying that it is between 512 and =
+`PAGE_SIZE`,
+>     /// and that it is a power of two.
+> -    fn validate_block_size(size: u32) -> Result {
+> +    pub fn validate_block_size(size: u32) -> Result {
+>         if !(512..=3Dbindings::PAGE_SIZE as u32).contains(&size) || =
+!size.is_power_of_two() {
+>             Err(error::code::EINVAL)
+>         } else {
+>=20
+> --=20
+> 2.47.2
+>=20
+>=20
+>=20
+
+=E2=80=94 Daniel
+
+[0]: https://github.com/Rust-for-Linux/linux/issues/1181
+
