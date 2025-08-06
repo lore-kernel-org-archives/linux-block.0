@@ -1,118 +1,196 @@
-Received: from bsdbackstore.eu (128-116-240-228.dyn.eolo.it [128.116.240.228])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 713EF20010C
-	for <linux-block@vger.kernel.org>; Wed,  6 Aug 2025 09:30:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=128.116.240.228
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEF741C3027;
+	Wed,  6 Aug 2025 09:42:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754472634; cv=none; b=BWYwK0+fxV7/+klIV1PEnvrxSBKo/lksc0LV5iI4QCYuKDmJULq/IMIUrkOeDe0VYbj1hNiBGMR1XSuuKj0QAxEcRkW4Ey+0EUeV9sWSRqYWHstmIXir3hS1PCH+HVpAoxHp8L2LVwX56661iASp/c1abe2lkuoKgsMG5uALDK4=
+	t=1754473327; cv=none; b=PqBMqditraHHDL9RJK2cWXIonGZIWD771MGj0Pc58NAY/S1EmZJSYWyEf89BT5fdaqDtgOZW+2dpYYAnVioojd2FBKWKRIW+ddJKe/OhEZmDhmWBowK63IiA23sfpFbx4eTWeP67VfJVzzOx+9l5eriqP8G/2MIT4jeV13fL4uo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754472634; c=relaxed/simple;
-	bh=8S4xk3UNc30oO/ZC+rmu2KXHHe6BdyCG9OqISMyVig0=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=nMEJXMZ/sRnCRN6YudY4gFcIyEojgNY5pe1AwCcEkuna97oVrIajiz4BevAEtz9YX+Q+q0BJCxnavNRz1mECSHpu8KUrX7//2yga2MMYi6JIxt3NJh69kvw6Do8UhXF9O5NySNv64mKiDDF+jEjJbeMWiYA9gaiRQN+H7AcX7No=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bsdbackstore.eu; spf=pass smtp.mailfrom=bsdbackstore.eu; arc=none smtp.client-ip=128.116.240.228
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bsdbackstore.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bsdbackstore.eu
-Received: from localhost (25.205.forpsi.net [80.211.205.25])
-	by bsdbackstore.eu (OpenSMTPD) with ESMTPSA id 7ac53805 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-	Wed, 6 Aug 2025 11:30:29 +0200 (CEST)
+	s=arc-20240116; t=1754473327; c=relaxed/simple;
+	bh=EP/2nbnxkVQbVU2omhh0DFzLJaZBfDQ/1aC8njt6IuQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bsM7DqMcbF7Kw3gIC0pKoU4XjcxErEMsP9EJgf6bP6qjLPPqT2jCkf5v45jZtcSkJXloCySyfTM1XD7hjWFfwXSG/RodRRruHfpsNyNoEhQpoJsKyEBo3rAiFjsQ9iYmxgmC+rvp7yoSpWAbf2M42D4IDG3dw5cxvTrgvHg0FaE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BcWPGh9A; arc=none smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BcWPGh9A"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1754473326; x=1786009326;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=EP/2nbnxkVQbVU2omhh0DFzLJaZBfDQ/1aC8njt6IuQ=;
+  b=BcWPGh9ARFEAeZeavTj65ZAkE0EaijhtDQbjuI1N1Yc3BlcAY8zn9yTR
+   zHluwMNGsHoFbmGzNrKHUytOZXVi2Jz56K49+LJ99jM5ldlhm09N8+jDa
+   SNW3rXXk/jwmNUVkD54fIStuWcBWM32VgzyBmlJ4Fp6ZsKY9LB/9WsSas
+   7RZ2oVit8K+xnZ7aLOQT3HwZ8nyLF93IqUolJl6T05J2yVw559uH8SN3r
+   VUAs1e6lVxl+rRYJwWFNC3plHNpr7ogn7Ps/mZ6jPdJYtxrj91KRVfl19
+   /7Zo8PSBYmnxr0ROH99LlQC6K8jz6I1TUvlW5WQDCd9T3boofJSl8ku0p
+   g==;
+X-CSE-ConnectionGUID: aQZ0uHwrSZmZBB3n5zSgtQ==
+X-CSE-MsgGUID: f6M9eK/8QQGfxBH4iS/yWA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11513"; a="67862281"
+X-IronPort-AV: E=Sophos;i="6.17,268,1747724400"; 
+   d="scan'208";a="67862281"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Aug 2025 02:42:05 -0700
+X-CSE-ConnectionGUID: wqJnxfUNR3e2Nnv3NYwAZg==
+X-CSE-MsgGUID: nHxQ1/O0TCac0jLf/m1d5g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.17,268,1747724400"; 
+   d="scan'208";a="170003161"
+Received: from lkp-server02.sh.intel.com (HELO 4ea60e6ab079) ([10.239.97.151])
+  by fmviesa004.fm.intel.com with ESMTP; 06 Aug 2025 02:42:02 -0700
+Received: from kbuild by 4ea60e6ab079 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1ujaed-0001U6-0p;
+	Wed, 06 Aug 2025 09:41:58 +0000
+Date: Wed, 6 Aug 2025 17:41:44 +0800
+From: kernel test robot <lkp@intel.com>
+To: Yu Kuai <yukuai1@huaweicloud.com>, yukuai3@huawei.com, axboe@kernel.dk,
+	akpm@linux-foundation.org, ming.lei@redhat.com, dlemoal@kernel.org,
+	jack@suse.cz
+Cc: oe-kbuild-all@lists.linux.dev, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, yukuai1@huaweicloud.com,
+	yi.zhang@huawei.com, yangerkun@huawei.com, johnny.chenyi@huawei.com
+Subject: Re: [PATCH v3 1/2] lib/sbitmap: convert shallow_depth from one word
+ to the whole sbitmap
+Message-ID: <202508061722.0vTVFHLe-lkp@intel.com>
+References: <20250805073748.606294-2-yukuai1@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Wed, 06 Aug 2025 11:30:27 +0200
-Message-Id: <DBV8N24PJJZG.1Z9C2I6RSKFIK@bsdbackstore.eu>
-Cc: "Shinichiro Kawasaki" <shinichiro.kawasaki@wdc.com>, "Maurizio Lombardi"
- <mlombard@redhat.com>
-Subject: Re: [bug report] blktests nvme/tcp nvme/060 hang
-From: "Maurizio Lombardi" <mlombard@bsdbackstore.eu>
-To: "Maurizio Lombardi" <mlombard@bsdbackstore.eu>, "Yi Zhang"
- <yi.zhang@redhat.com>, "linux-block" <linux-block@vger.kernel.org>, "open
- list:NVM EXPRESS DRIVER" <linux-nvme@lists.infradead.org>
-X-Mailer: aerc
-References: <CAHj4cs-zu7eVB78yUpFjVe2UqMWFkLk8p+DaS3qj+uiGCXBAoA@mail.gmail.com> <DBV4IHEMUOQ8.28P7LBNP9EHVK@bsdbackstore.eu> <DBV4NAR2A6N2.1LFJCYHLTHUN2@bsdbackstore.eu> <DBV53ULYUBX6.1ZBU5KFWA2SHH@bsdbackstore.eu>
-In-Reply-To: <DBV53ULYUBX6.1ZBU5KFWA2SHH@bsdbackstore.eu>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250805073748.606294-2-yukuai1@huaweicloud.com>
 
-On Wed Aug 6, 2025 at 8:44 AM CEST, Maurizio Lombardi wrote:
-> On Wed Aug 6, 2025 at 8:22 AM CEST, Maurizio Lombardi wrote:
->>
->> Ops sorry they are two read locks, the real problem then is that
->> something is holding the write lock.
->
-> Ok, I think I get what happens now.
->
-> The threads that call nvmet_tcp_data_ready() (takes the read lock 2
-> times) and
-> nvmet_tcp_release_queue_work() (tries to take the write lock)
-> are blocking each other.
-> So I still think that deferring the call to queue->data_ready() by
-> using a workqueue should fix it.
->
+Hi Yu,
 
-I reproduced the issue by creating a reader thread that tries to take
-the lock twice and a writer thread that takes the write lock
-between the two calls to read_lock()
+kernel test robot noticed the following build errors:
 
-[   33.398311] [Reader] Thread started.
-[   33.398410] [Writer] Thread started, waiting for reader to get lock...
-[   33.398577] [Reader] Acquired read_lock successfully.
-[   33.399391] [Reader] Sleeping for a while to allow writer to block...
-[   33.418697] [Writer] Reader has the lock. Attempting to acquire write_lo=
-ck... THIS SHOULD BLOCK.
-[   41.288105] [Reader] Attempting to acquire a second read_lock... THIS SH=
-OULD BLOCK.
-[   93.388349] rcu: INFO: rcu_preempt self-detected stall on CPU
-[   93.388758] rcu:     7-....: (5999 ticks this GP) idle=3D9db4/1/0x400000=
-0000000000 softirq=3D1846/1846 fqs=3D2444
-[   93.389390] rcu:     (t=3D6001 jiffies g=3D1917 q=3D4319 ncpus=3D8)
-[   93.389745] CPU: 7 UID: 0 PID: 1784 Comm: reader_thread Kdump: loaded Ta=
-inted: G           OEL    -------  ---  6.12.0-116.el10.aarch64 #1 PREEMPT(=
-voluntary)
-[   93.389749] Tainted: [O]=3DOOT_MODULE, [E]=3DUNSIGNED_MODULE, [L]=3DSOFT=
-LOCKUP
-[   93.389749] Hardware name: QEMU KVM Virtual Machine, BIOS 0.0.0 02/06/20=
-15
-[   93.389750] pstate: 00400005 (nzcv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=
-=3D--)
-[   93.389752] pc : queued_spin_lock_slowpath+0x78/0x460
-[   93.389757] lr : queued_read_lock_slowpath+0x21c/0x228
-[   93.389759] sp : ffff80008bd6bdd0
-[   93.389760] x29: ffff80008bd6bdd0 x28: 0000000000000000 x27: 00000000000=
-00000
-[   93.389762] x26: 0000000000000000 x25: 0000000000000000 x24: 00000000000=
-00000
-[   93.389764] x23: ffffb1c374605008 x22: ffff0000ca9342c0 x21: ffff80008ba=
-fb960
-[   93.389766] x20: ffff0000c4735e40 x19: ffffb1c37460701c x18: 00000000000=
-00006
-[   93.389767] x17: 444c554f48532053 x16: ffffb1c3ee73ab48 x15: 636f6c5f646=
-16572
-[   93.389769] x14: 20646e6f63657320 x13: 2e4b434f4c422044 x12: ffffb1c3eff=
-5ec10
-[   93.389771] x11: ffffb1c3efc9ec68 x10: ffffb1c3eff5ec68 x9 : ffffb1c3ee7=
-3b4c4
-[   93.389772] x8 : 0000000000000001 x7 : 00000000000bffe8 x6 : c0000000fff=
-f7fff
-[   93.389774] x5 : ffff00112ebe05c8 x4 : 0000000000000000 x3 : 00000000000=
-00000
-[   93.389776] x2 : 0000000000000001 x1 : 0000000000000000 x0 : 00000000000=
-00001
-[   93.389778] Call trace:
-[   93.389779]  queued_spin_lock_slowpath+0x78/0x460 (P)
-[   93.389782]  queued_read_lock_slowpath+0x21c/0x228
-[   93.389785]  _raw_read_lock+0x60/0x80
-[   93.389787]  reader_thread_fn+0x7c/0xc0 [dead]
-[   93.389791]  kthread+0x110/0x130
-[   93.389794]  ret_from_fork+0x10/0x20
+[auto build test ERROR on axboe-block/for-next]
+[also build test ERROR on linus/master v6.16 next-20250806]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Yu-Kuai/lib-sbitmap-convert-shallow_depth-from-one-word-to-the-whole-sbitmap/20250806-100430
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
+patch link:    https://lore.kernel.org/r/20250805073748.606294-2-yukuai1%40huaweicloud.com
+patch subject: [PATCH v3 1/2] lib/sbitmap: convert shallow_depth from one word to the whole sbitmap
+config: sparc-randconfig-001-20250806 (https://download.01.org/0day-ci/archive/20250806/202508061722.0vTVFHLe-lkp@intel.com/config)
+compiler: sparc-linux-gcc (GCC) 11.5.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250806/202508061722.0vTVFHLe-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202508061722.0vTVFHLe-lkp@intel.com/
+
+All error/warnings (new ones prefixed by >>):
+
+   In file included from ./arch/sparc/include/generated/asm/div64.h:1,
+                    from include/linux/math.h:6,
+                    from include/linux/kernel.h:27,
+                    from include/linux/cpumask.h:11,
+                    from arch/sparc/include/asm/smp_32.h:15,
+                    from arch/sparc/include/asm/smp.h:7,
+                    from arch/sparc/include/asm/switch_to_32.h:5,
+                    from arch/sparc/include/asm/switch_to.h:7,
+                    from arch/sparc/include/asm/ptrace.h:120,
+                    from arch/sparc/include/asm/thread_info_32.h:19,
+                    from arch/sparc/include/asm/thread_info.h:7,
+                    from include/linux/thread_info.h:60,
+                    from arch/sparc/include/asm/current.h:15,
+                    from include/linux/sched.h:12,
+                    from lib/sbitmap.c:7:
+   lib/sbitmap.c: In function '__map_depth_with_shallow':
+   include/asm-generic/div64.h:183:35: warning: comparison of distinct pointer types lacks a cast
+     183 |         (void)(((typeof((n)) *)0) == ((uint64_t *)0));  \
+         |                                   ^~
+   lib/sbitmap.c:222:20: note: in expansion of macro 'do_div'
+     222 |         reminder = do_div(shallow_word_depth, sb->depth);
+         |                    ^~~~~~
+   In file included from arch/sparc/include/asm/bug.h:6,
+                    from include/linux/bug.h:5,
+                    from include/linux/thread_info.h:13,
+                    from arch/sparc/include/asm/current.h:15,
+                    from include/linux/sched.h:12,
+                    from lib/sbitmap.c:7:
+>> include/asm-generic/div64.h:195:32: warning: right shift count >= width of type [-Wshift-count-overflow]
+     195 |         } else if (likely(((n) >> 32) == 0)) {          \
+         |                                ^~
+   include/linux/compiler.h:76:45: note: in definition of macro 'likely'
+      76 | # define likely(x)      __builtin_expect(!!(x), 1)
+         |                                             ^
+   lib/sbitmap.c:222:20: note: in expansion of macro 'do_div'
+     222 |         reminder = do_div(shallow_word_depth, sb->depth);
+         |                    ^~~~~~
+   In file included from ./arch/sparc/include/generated/asm/div64.h:1,
+                    from include/linux/math.h:6,
+                    from include/linux/kernel.h:27,
+                    from include/linux/cpumask.h:11,
+                    from arch/sparc/include/asm/smp_32.h:15,
+                    from arch/sparc/include/asm/smp.h:7,
+                    from arch/sparc/include/asm/switch_to_32.h:5,
+                    from arch/sparc/include/asm/switch_to.h:7,
+                    from arch/sparc/include/asm/ptrace.h:120,
+                    from arch/sparc/include/asm/thread_info_32.h:19,
+                    from arch/sparc/include/asm/thread_info.h:7,
+                    from include/linux/thread_info.h:60,
+                    from arch/sparc/include/asm/current.h:15,
+                    from include/linux/sched.h:12,
+                    from lib/sbitmap.c:7:
+>> include/asm-generic/div64.h:199:36: error: passing argument 1 of '__div64_32' from incompatible pointer type [-Werror=incompatible-pointer-types]
+     199 |                 __rem = __div64_32(&(n), __base);       \
+         |                                    ^~~~
+         |                                    |
+         |                                    unsigned int *
+   lib/sbitmap.c:222:20: note: in expansion of macro 'do_div'
+     222 |         reminder = do_div(shallow_word_depth, sb->depth);
+         |                    ^~~~~~
+   include/asm-generic/div64.h:174:38: note: expected 'uint64_t *' {aka 'long long unsigned int *'} but argument is of type 'unsigned int *'
+     174 | extern uint32_t __div64_32(uint64_t *dividend, uint32_t divisor);
+         |                            ~~~~~~~~~~^~~~~~~~
+   cc1: some warnings being treated as errors
 
 
-So apparently in case of contention writers have the precedence.
+vim +/__div64_32 +199 include/asm-generic/div64.h
 
-Note that the same problem may also affect nvmet_tcp_write_space()
+^1da177e4c3f415 Linus Torvalds     2005-04-16  176  
+^1da177e4c3f415 Linus Torvalds     2005-04-16  177  /* The unnecessary pointer compare is there
+^1da177e4c3f415 Linus Torvalds     2005-04-16  178   * to check for type safety (n must be 64bit)
+^1da177e4c3f415 Linus Torvalds     2005-04-16  179   */
+^1da177e4c3f415 Linus Torvalds     2005-04-16  180  # define do_div(n,base) ({				\
+^1da177e4c3f415 Linus Torvalds     2005-04-16  181  	uint32_t __base = (base);			\
+^1da177e4c3f415 Linus Torvalds     2005-04-16  182  	uint32_t __rem;					\
+^1da177e4c3f415 Linus Torvalds     2005-04-16  183  	(void)(((typeof((n)) *)0) == ((uint64_t *)0));	\
+911918aa7ef6f86 Nicolas Pitre      2015-11-02  184  	if (__builtin_constant_p(__base) &&		\
+911918aa7ef6f86 Nicolas Pitre      2015-11-02  185  	    is_power_of_2(__base)) {			\
+911918aa7ef6f86 Nicolas Pitre      2015-11-02  186  		__rem = (n) & (__base - 1);		\
+911918aa7ef6f86 Nicolas Pitre      2015-11-02  187  		(n) >>= ilog2(__base);			\
+c747ce4706190ef Geert Uytterhoeven 2021-08-11  188  	} else if (__builtin_constant_p(__base) &&	\
+461a5e51060c93f Nicolas Pitre      2015-10-30  189  		   __base != 0) {			\
+461a5e51060c93f Nicolas Pitre      2015-10-30  190  		uint32_t __res_lo, __n_lo = (n);	\
+461a5e51060c93f Nicolas Pitre      2015-10-30  191  		(n) = __div64_const32(n, __base);	\
+461a5e51060c93f Nicolas Pitre      2015-10-30  192  		/* the remainder can be computed with 32-bit regs */ \
+461a5e51060c93f Nicolas Pitre      2015-10-30  193  		__res_lo = (n);				\
+461a5e51060c93f Nicolas Pitre      2015-10-30  194  		__rem = __n_lo - __res_lo * __base;	\
+911918aa7ef6f86 Nicolas Pitre      2015-11-02 @195  	} else if (likely(((n) >> 32) == 0)) {		\
+^1da177e4c3f415 Linus Torvalds     2005-04-16  196  		__rem = (uint32_t)(n) % __base;		\
+^1da177e4c3f415 Linus Torvalds     2005-04-16  197  		(n) = (uint32_t)(n) / __base;		\
+c747ce4706190ef Geert Uytterhoeven 2021-08-11  198  	} else {					\
+^1da177e4c3f415 Linus Torvalds     2005-04-16 @199  		__rem = __div64_32(&(n), __base);	\
+c747ce4706190ef Geert Uytterhoeven 2021-08-11  200  	}						\
+^1da177e4c3f415 Linus Torvalds     2005-04-16  201  	__rem;						\
+^1da177e4c3f415 Linus Torvalds     2005-04-16  202   })
+^1da177e4c3f415 Linus Torvalds     2005-04-16  203  
 
-Maurizio
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
