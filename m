@@ -1,92 +1,206 @@
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10A9C155333
-	for <linux-block@vger.kernel.org>; Wed,  6 Aug 2025 03:04:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6837635959
+	for <linux-block@vger.kernel.org>; Wed,  6 Aug 2025 05:14:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754449482; cv=none; b=n6OJVseZh1DW2WMqY0y5BAdt7vxQLDoEyJ/L9r40EC2FFrA27++qMoYmX4E2seusz84skZuJXiYXTkglVT2xkYbv0hPi0zxTkPEJKIchIJrdVp9Az59eCe/Nqcn4m/Ddrc7aMApxxOaGvuLEhMDmt0a6PapWOhgsX6K6tR9meMk=
+	t=1754457247; cv=none; b=bGHpu528eRlMWjLRANJhufDowG/gr+qV+AvdsvhZhfpSIZmMRLWULQBit7rjBs0YMrP8h2Dl+zdtv1Zv2QFrYqgri8+xYbtS9d57HJAxtd7tz1z5ljQm4zsdcH7kuRiwW+5Yd9af3cu7u0IWkGkWDSkx3NoJOpd7SLCFxL/avdU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754449482; c=relaxed/simple;
-	bh=hZGypJa+0gC0Pd2rNeu26LZsUEfunosrIkjMfNWiLZI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=biLbS+jQN+qMT7ugqB4mLNdmrSF8N9UIOU8j8eKtCNw5XPQEDeHO8/hZ4P+Zkaudh0dxkooiC9ZWYz0t/ACxLL4jZHOX79roe9ghNMRsZ4UKBhByB5p4p+XOSyl3udiKNH9nS+/O8uZW7fDtkAFpZkI7IP5KY/JsVPXu/ZTbiXw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=j6j3aFpQ; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	s=arc-20240116; t=1754457247; c=relaxed/simple;
+	bh=gWXhbzaPGV5nMYs1ci3bLRwBrwb69ACiwafzD/3Fmu8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=iHd2i1IMxGplcF3yVN0OYM1G9v/k9yd7A263EDk4m8Wqis87ds2VjZnvDac7TZZPL2NXZlplx2Y0VMHERd8wdgiCLOdDkdaF5j4T4ALdVqcVhAj35L+3EKyCNRnAzk/Mm7dv8UDQiKHenn5Jh/yM9ipzBjnZCmTDcTR2Fg8J53A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Z3zH+t3l; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="j6j3aFpQ"
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-24014cd385bso62313765ad.0
-        for <linux-block@vger.kernel.org>; Tue, 05 Aug 2025 20:04:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1754449480; x=1755054280; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=bTFIJh5IdYRfmXRrV/kBcUsFP1nFJtd9YZ0qDXPL8CU=;
-        b=j6j3aFpQLDhSd2h0qJgA3WMFO0FU1u6CGBDWKQIVY6atMGZiAlNe87E9e+oQYEkiCT
-         kpj+9ctNp0QgiqtlS03HSKL2wBCfaoNpEIHDCYfUGsxox4plIKjvC2rAWAIGgYHRaOw5
-         jv57skvhWvwmQeteys2hO1owIIBbuiHDZxdZY=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754449480; x=1755054280;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bTFIJh5IdYRfmXRrV/kBcUsFP1nFJtd9YZ0qDXPL8CU=;
-        b=aLxJL2Dvqc08ZjKa+ftzdswpvOntIoWEOraSG6aq/LW2lcELrdcbeF4PjnTfH8MIll
-         1MZomJrqBJlVLWMDaJLQXz+j3FC8xq800QAJWENpKUkZHJY7N4iIr+DxcAuyAPt4btWy
-         KZ9b1/cEKDpBMvNnh+SZCf/C+X+Z/1EmL8HcogbjQXyk3Cxkgy5lSgNgg0YOEd6kD+Xu
-         jEzRYTCdH/ne2+MtCGlipatBf8dlgt2YL4KrBcY9OJywafjKkCJfkliu/z0ry5q57/AJ
-         yMRy0r9tkH8Sg1L72P6yxS0ThIdO2MV+mj9qjhj8YovCW0OewhLMW/DJAZb4K+gLd2CH
-         qN+w==
-X-Forwarded-Encrypted: i=1; AJvYcCVkKIC18ILMGc5bbWZ5pu9oGf4cHgvUxZum2pKpV8ReGjdmxw2k/MYNzfJIg6b+YQ7ImhohUwh41SpL6Q==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzlyViEOpGolOeQ8SgTst5IOxNlJueLiLj0Nf//Itis1sHS9KtN
-	ZOel70m7y+AmXJwZhBKr9sO+YN6vUSYL8U6S1c7+oiPyaFqNmPjFPZXJBy/zOzCQcg==
-X-Gm-Gg: ASbGncuHaIRSR/mhL2TKFLmVfXU8k0d0lpKEH/3Q6hq6IghiLCHUAFhUVzTfa4mtbC2
-	A1ppUUjYCc6WmMNJel76kD80QY0TuWfqpiCj9mKYV2N3Kp/87Y/jRcKrL2fND6qvPTyOb7VGzTD
-	DYbwmQkO0gw1GX9ma1v5QJmKEC5ZUw+m8JJ1nCtAuQqGZjTgn8uiPuN+v1Ny4JLgTMFnsptRSig
-	a+J2lbr62oZ93TmoWwNUd0R4WKp5FWF22pEbfPmmcP32qOSB2ywMhJWn2OJUDyDFfamc+OUWKP6
-	L5zjHc7MAZ8vEXM6jWg+xH2Yc49yZ4t3+Yx78HROZy70b16zxfaPHrS9AVdxt/crHaPcbj+eVNP
-	id10xE222NufDQhQosG2xvUE=
-X-Google-Smtp-Source: AGHT+IF1L7Q+LwjpClF7GXDoVkELUC8g+IiurmJj34+qJEJNN9hK8LfT1l4Yu4vqTUn7fr+mkOUoOg==
-X-Received: by 2002:a17:903:1a6b:b0:240:8cda:9ca1 with SMTP id d9443c01a7336-242a0bc8284mr14055655ad.50.1754449480245;
-        Tue, 05 Aug 2025 20:04:40 -0700 (PDT)
-Received: from google.com ([2401:fa00:8f:203:5a2c:a3e:b88a:14d])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-241e8aab0b3sm145806125ad.161.2025.08.05.20.04.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Aug 2025 20:04:39 -0700 (PDT)
-Date: Wed, 6 Aug 2025 12:04:35 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Seyediman Seyedarab <imandevel@gmail.com>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, minchan@kernel.org, 
-	axboe@kernel.dk, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
-	syzbot+1a281a451fd8c0945d07@syzkaller.appspotmail.com
-Subject: Re: [PATCH] zram: fix NULL pointer dereference in
- zcomp_available_show()
-Message-ID: <5ydfoytbfcvgkxxvc4s6e7rjqzldldjanq3jgwlonm3pczpysh@gtf3u6hibkri>
-References: <20250803062519.35712-1-ImanDevel@gmail.com>
- <d7gutildolj5jtx53l2tfkymxdctga3adabgn2cfqu3makx4le@3lfmk67haipn>
- <6hs2ou3giemh2j7lvaldr7akpmrwt56gdh3gjs7i5ouexljggp@2fpes7wzdu6l>
- <edvzxvoparhuqppuic5amgz5smfar54zmli73nhyojnj63nom4@kmqnjdl2af7u>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Z3zH+t3l"
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 575Io2ju018750;
+	Wed, 6 Aug 2025 05:13:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=wkhMos
+	w8sJkQwvxEa0+ILtV9oKJ8AQ9Gmo0jLmSQXAA=; b=Z3zH+t3lWIBM63dKS3oxA3
+	/BVCOabOgRQ4aLIWkywA0oeMJHa81uCLgLu9Y2JAuWVc/ik9ThKD21jqRyR4myKa
+	SxnxS5946zlAB+A2a2zmB/2iinbzDjgA9/ykC2W2dksTW99WunsqvJiAvinTF3Ts
+	0szymXkjom3e3ih5GzemNgtFFjBtrKV4kuBLvmzoizHJxGSGSvUTnPlc5FAVTleY
+	/oBJGrerIIhu0ZntJKJ8XSg7JCU3/tG+yw0wOQ0eZEh8nH2zr75u055bHKGux8fi
+	Fm9q26oPkVkQamZR9xYBxohdx5W/W36zN05JipWWTbAAltG7fl5ybU3JTT9GGO+Q
+	==
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48bq6326j1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 06 Aug 2025 05:13:56 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5763R7LJ025959;
+	Wed, 6 Aug 2025 05:13:55 GMT
+Received: from smtprelay06.wdc07v.mail.ibm.com ([172.16.1.73])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 48bpwn240b-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 06 Aug 2025 05:13:55 +0000
+Received: from smtpav05.wdc07v.mail.ibm.com (smtpav05.wdc07v.mail.ibm.com [10.39.53.232])
+	by smtprelay06.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5765DtYk30016218
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 6 Aug 2025 05:13:55 GMT
+Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 07CE058053;
+	Wed,  6 Aug 2025 05:13:55 +0000 (GMT)
+Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id C383D5805F;
+	Wed,  6 Aug 2025 05:13:51 +0000 (GMT)
+Received: from [9.43.92.22] (unknown [9.43.92.22])
+	by smtpav05.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Wed,  6 Aug 2025 05:13:51 +0000 (GMT)
+Message-ID: <cfe709a6-1122-4ea9-875f-aa2a34ab1477@linux.ibm.com>
+Date: Wed, 6 Aug 2025 10:43:49 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <edvzxvoparhuqppuic5amgz5smfar54zmli73nhyojnj63nom4@kmqnjdl2af7u>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/2] block: blk-rq-qos: replace static key with atomic
+ bitop
+To: Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>
+Cc: linux-block@vger.kernel.org, kch@nvidia.com, shinichiro.kawasaki@wdc.com,
+        hch@lst.de, gjoyce@ibm.com
+References: <20250804122125.3271397-1-nilay@linux.ibm.com>
+ <aJC4tDUsk42Nb9Df@fedora>
+ <682f0f43-733a-4c04-91ed-5665815128bc@linux.ibm.com>
+ <d4d21177-e49e-4959-b68c-707a15dccf73@kernel.dk>
+Content-Language: en-US
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <d4d21177-e49e-4959-b68c-707a15dccf73@kernel.dk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Authority-Analysis: v=2.4 cv=NInV+16g c=1 sm=1 tr=0 ts=6892e494 cx=c_pps
+ a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
+ a=IkcTkHD0fZMA:10 a=2OwXVqhp2XgA:10 a=VwQbUJbxAAAA:8 a=VnNF1IyMAAAA:8
+ a=ymlgizzNRXlfm_1EKkMA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+X-Proofpoint-GUID: q6mjMemOzLkaliYCstqyZqdqZS6iM0QC
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODA2MDAzMCBTYWx0ZWRfX+922zHPOOHXT
+ cpPCEOc92L8Ep6YNwfBWbGVHaF4jQ8Gtg7atl/mO6LBlCBALVCkV1ICmaxiOmw1OJkT0BWjWCs7
+ KtWPD0b27LR4t3eJoMJuCUJncfRajKBqvGjd6vD7Aq8OFvZxn2C15zgAfg/u5nG/AxMgYA2EQCf
+ hiZ4VzKuVbVo0ObSuaiLHa2vHzbPRVmvconFUYJJaV9naTP8bQHAxB9oFuzvJOXCseDMeH+qLd0
+ kC+evnRiMmikZKGY7pQUr92Dbd4Xy+fzHpeaHjRWJGfDx1N5OZE885144TWLh3omxKMF2CPzc5G
+ rVm7vNqyctqvEJABYtnXOUtoV8E47LuMn6HMHZWKxacKq2C8h5vmdna2bvgx0iwotianXTq7/lf
+ 3+fzAUZy0SdM5rNLf8RVfXHIrdL1a0Tm/OgOHGwW82Pj6OBBacctYDctazSxBfDJZpxNORcs
+X-Proofpoint-ORIG-GUID: q6mjMemOzLkaliYCstqyZqdqZS6iM0QC
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-08-05_05,2025-08-04_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 suspectscore=0 impostorscore=0 mlxlogscore=999
+ lowpriorityscore=0 malwarescore=0 clxscore=1015 adultscore=0 mlxscore=0
+ bulkscore=0 priorityscore=1501 spamscore=0 classifier=spam authscore=0
+ authtc=n/a authcc= route=outbound adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2507300000 definitions=main-2508060030
 
-On (25/08/05 10:43), Seyediman Seyedarab wrote:
-> The NULL dereference (which syzbot reported) has a much tighter race 
-> window: it requires catching the brief moment during zram_reset_device() 
-> where comp_algs[prio] is NULL between zram_destroy_comps() and 
-> comp_algorithm_set(). This 'can' be triggered by racing concurrent:
-> - writes to /sys/block/zram0/reset 
-> - reads from /sys/block/zram0/comp_algorithm
-> The window is only a few instructions wide under write lock, so it is 
-> significantly harder to reproduce than the use-after-free.
 
-I honestly don't understand how this is possible.  comp_algorithm_set()
-calls are done under writer ->init_lock, which is mutual exclusive:
-neither concurrent writes no concurrent reads can occur in the meantime.
+
+On 8/6/25 6:58 AM, Jens Axboe wrote:
+> On 8/4/25 10:58 PM, Nilay Shroff wrote:
+>>
+>>
+>> On 8/4/25 7:12 PM, Ming Lei wrote:
+>>> On Mon, Aug 04, 2025 at 05:51:09PM +0530, Nilay Shroff wrote:
+>>>> This patchset replaces the use of a static key in the I/O path (rq_qos_
+>>>> xxx()) with an atomic queue flag (QUEUE_FLAG_QOS_ENABLED). This change
+>>>> is made to eliminate a potential deadlock introduced by the use of static
+>>>> keys in the blk-rq-qos infrastructure, as reported by lockdep during 
+>>>> blktests block/005[1].
+>>>>
+>>>> The original static key approach was introduced to avoid unnecessary
+>>>> dereferencing of q->rq_qos when no blk-rq-qos module (e.g., blk-wbt or
+>>>> blk-iolatency) is configured. While efficient, enabling a static key at
+>>>> runtime requires taking cpu_hotplug_lock and jump_label_mutex, which 
+>>>> becomes problematic if the queue is already frozen — causing a reverse
+>>>> dependency on ->freeze_lock. This results in a lockdep splat indicating
+>>>> a potential deadlock.
+>>>>
+>>>> To resolve this, we now gate q->rq_qos access with a q->queue_flags
+>>>> bitop (QUEUE_FLAG_QOS_ENABLED), avoiding the static key and the associated
+>>>> locking altogether.
+>>>>
+>>>> I compared both static key and atomic bitop implementations using ftrace
+>>>> function graph tracer over ~50 invocations of rq_qos_issue() while ensuring
+>>>> blk-wbt/blk-iolatency were disabled (i.e., no QoS functionality). For
+>>>> easy comparision, I made rq_qos_issue() noinline. The comparision was
+>>>> made on PowerPC machine.
+>>>>
+>>>> Static Key (disabled : QoS is not configured):
+>>>> 5d0: 00 00 00 60     nop    # patched in by static key framework (not taken)
+>>>> 5d4: 20 00 80 4e     blr    # return (branch to link register)
+>>>>
+>>>> Only a nop and blr (branch to link register) are executed — very lightweight.
+>>>>
+>>>> atomic bitop (QoS is not configured):
+>>>> 5d0: 20 00 23 e9     ld      r9,32(r3)     # load q->queue_flags
+>>>> 5d4: 00 80 29 71     andi.   r9,r9,32768   # check QUEUE_FLAG_QOS_ENABLED (bit 15)
+>>>> 5d8: 20 00 82 4d     beqlr                 # return if bit not set
+>>>>
+>>>> This performs an ld and and andi. before returning. Slightly more work, 
+>>>> but q->queue_flags is typically hot in cache during I/O submission.
+>>>>
+>>>> With Static Key (disabled):
+>>>> Duration (us): min=0.668 max=0.816 avg≈0.750
+>>>>
+>>>> With atomic bitop QUEUE_FLAG_QOS_ENABLED (bit not set):
+>>>> Duration (us): min=0.684 max=0.834 avg≈0.759
+>>>>
+>>>> As expected, both versions are almost similar in cost. The added latency
+>>>> from an extra ld and andi. is in the range of ~9ns.
+>>>>
+>>>> There're two patches in the series. The first patch replaces static key
+>>>> with QUEUE_FLAG_QOS_ENABLED. The second patch ensures that we disable
+>>>> the QUEUE_FLAG_QOS_ENABLED when the queue no longer has any associated
+>>>> rq_qos policies.
+>>>>
+>>>> As usual, feedback and review comments are welcome!
+>>>>
+>>>> [1] https://lore.kernel.org/linux-block/4fdm37so3o4xricdgfosgmohn63aa7wj3ua4e5vpihoamwg3ui@fq42f5q5t5ic/
+>>>
+>>>
+>>> Another approach is to call memalloc_noio_save() in cpu hotplug code...
+>>>
+>> Yes that would help fix this. However per the general usage of GFP_NOIO scope in 
+>> kernel, it is used when we're performing memory allocations in a context where I/O
+>> must not be initiated, because doing so could cause deadlocks or recursion. 
+>>
+>> So we typically, use GFP_NOIO in a code path that is already doing I/O, such as:
+>> - In block layer context: during request submission 
+>> - Filesystem writeback, or swap-out.
+>> - Memory reclaim or writeback triggered by memory pressure.
+>>
+>> The cpu hotplug code may not be running in any of the above context. So
+>> IMO, adding memalloc_noio_save() in the cpu hotplug code would not be 
+>> a good idea, isn't it?
+> 
+> Please heed Ming's advice, moving this from a static key to an atomic
+> queue flags ops is pointless, may as well kill it at that point.
+> 
+Yes I agree and personally I like static key very much as it's lightweight. 
+And I also liked the way you used it in IO hotpath so that we avoid cost of
+fetching q->rq_qos when not needed. 
+Having said that, I also tried Ming's suggestion but that didn't work out
+due to the fact that "cpu_hotplug_lock is widely used across various kernel
+subsystems— not just in CPU hotplug-specific paths. There are several code
+paths outside of the hotplug core that acquire cpu_hotplug_lock and subsequently
+perform memory allocations using GFP_KERNEL". So essentially adopting to use
+GFP_NOIO in cpu hotplug code may not help. You might have missed my reply to
+Ming's suggestion, you may refer it here:
+https://lore.kernel.org/all/897eaaa4-31c7-4661-b5d4-3e2bef1fca1e@linux.ibm.com/#t
+
+> I see v2 is out now with the exact same approach.
+> 
+Yes I sent out v2 just for fixing minor things in the original patch as I
+outlined it in the v2 changelog.
+
+
+Thanks,
+--Nilay
+
