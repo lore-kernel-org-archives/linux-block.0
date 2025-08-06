@@ -1,47 +1,40 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEFFF28A70C
-	for <linux-block@vger.kernel.org>; Wed,  6 Aug 2025 09:06:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C4F014A8B
+	for <linux-block@vger.kernel.org>; Wed,  6 Aug 2025 09:15:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754471178; cv=none; b=f40wELNQBzRjNByuCbhIPf8tG+x7i2dpDtqFe6oF0jRJvh25BJaruRYSfE2O89GpsaGj0UbBD6mexOHGTsEWeXLOAyArv02pvaJO7C2aK9d+04Oa20FwgfDbaYQeiYtoOKG2jErfiLXgzm4F8Pw5u+RUaAAqPUFs43LU4doh6ag=
+	t=1754471758; cv=none; b=hLjMJjHoR94B+REbQNZNzU5CAyQ7jBpDW9L/bCI4dvzk35q1QqR9gfHs1Gjjj66GZiiF2j1XQVD5XWCU5xYODbjYjjWgOMzihxJpxNm5KCqnIjbOYnLZ7nu698XG29W1qniYWw2ausS3pqwepOJRVSETVwVDQVzVRQTOhh6wVgw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754471178; c=relaxed/simple;
-	bh=eAn8hl1Q+zNzkST7g/ue5uxAVSIHWo8WyRs/m2Db9vc=;
+	s=arc-20240116; t=1754471758; c=relaxed/simple;
+	bh=Tg1i6wcvV6xO6GxWiqDTQYJu2lQYPsYIchneTJVnY4E=;
 	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=WGmuw69fljymtpGeIO5jqvpIxHuFen5j6Js4sIiU3e/spTVFOgpUm8a95CxaqPqN+FXEa5peEljHo1x9n44R8xTbUOAjWgb5d152zhNgsozBdCG2dZL7w9rZYE29Iqh8wzRImzMBqiWJisvoB/5JhOU1PHF9xt08xiRWJ9u7YAg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+	 In-Reply-To:Content-Type; b=teOATEpD7C0aKF1+tb5ByrikbAA4fR6aGKyfDWDRwPcGzkwDS4PhnoEypSxyud2TiC/0GqV1kn2rBiXzknE1vedadB8RHhhgV3Vy6iRD1RwHdVgreauth/p15cqmcmVb+F65dVhcsj5DQcT2rHF0F4YTEvt24kkwZCcdfXVX93o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4bxktG6mdczYQtv1
-	for <linux-block@vger.kernel.org>; Wed,  6 Aug 2025 17:06:14 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4bxl5P6vVWzKHLsn
+	for <linux-block@vger.kernel.org>; Wed,  6 Aug 2025 17:15:53 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 940451A0BD0
-	for <linux-block@vger.kernel.org>; Wed,  6 Aug 2025 17:06:13 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTP id 033EA1A13FA
+	for <linux-block@vger.kernel.org>; Wed,  6 Aug 2025 17:15:53 +0800 (CST)
 Received: from [10.174.179.143] (unknown [10.174.179.143])
-	by APP4 (Coremail) with SMTP id gCh0CgA3sxMDG5NoAzEGCw--.58891S3;
-	Wed, 06 Aug 2025 17:06:13 +0800 (CST)
-Subject: Re: [PATCH 5/5] blk-mq: Replace tags->lock with SRCU for tag
- iterators
-To: Ming Lei <ming.lei@redhat.com>, Yu Kuai <yukuai1@huaweicloud.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
- John Garry <john.garry@huawei.com>,
+	by APP4 (Coremail) with SMTP id gCh0CgAHzw9IHZNofPMGCw--.32705S3;
+	Wed, 06 Aug 2025 17:15:52 +0800 (CST)
+Subject: Re: [PATCH 3/5] blk-mq: Defer freeing of tags page_list to SRCU
+ callback
+To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org
+Cc: John Garry <john.garry@huawei.com>,
  Sathya Prakash Veerichetty <sathya.prakash@broadcom.com>,
  "yukuai (C)" <yukuai3@huawei.com>
 References: <20250801114440.722286-1-ming.lei@redhat.com>
- <20250801114440.722286-6-ming.lei@redhat.com>
- <b86b9098-fb76-bdfe-bdf0-1344386d067a@huaweicloud.com>
- <aJCaWLgfB_oMMdrC@fedora>
- <88ad7326-b55f-7e33-fa81-0317843fc15b@huaweicloud.com>
- <700bd14f-74da-9c10-9917-d5d56ecd2921@huaweicloud.com>
- <aJHFVdqDs5KKKuM8@fedora>
- <383cb150-9a46-8377-79df-66e8eafc7eb5@huaweicloud.com>
- <aJMZYvCwsR8f3cJZ@fedora>
+ <20250801114440.722286-4-ming.lei@redhat.com>
 From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <14ea1968-8087-6e5a-1e6f-6a02696fcdda@huaweicloud.com>
-Date: Wed, 6 Aug 2025 17:06:11 +0800
+Message-ID: <c4fc58cd-3f42-604a-0d2d-19a638603727@huaweicloud.com>
+Date: Wed, 6 Aug 2025 17:15:52 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.1
 Precedence: bulk
@@ -50,195 +43,58 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <aJMZYvCwsR8f3cJZ@fedora>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20250801114440.722286-4-ming.lei@redhat.com>
+Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgA3sxMDG5NoAzEGCw--.58891S3
-X-Coremail-Antispam: 1UD129KBjvJXoW3ArWrKryDtF48JFWDXF18Xwb_yoWxXF4rpr
-	W8JF4jkrW5Xr18Jr42qw45Jryktw1Dtw18Xrn5JFyrXr1qkrnIqr18Xr1j9r18Jr4xAr48
-	Xr1UtrW3ZF1UJr7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9j14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7I2V7IY0VAS07AlzVAY
-	IcxG8wCY1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbV
-	WUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF
-	67kF1VAFwI0_JF0_Jw1lIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUCVW8JwCI42
-	IY6xIIjxv20xvEc7CjxVAFwI0_Cr0_Gr1UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI
-	42IY6I8E87Iv67AKxVW8JVWxJwCI42IY6I8E87Iv6xkF7I0E14v26r4UJVWxJrUvcSsGvf
-	C2KfnxnUUI43ZEXa7VUbSfO7UUUUU==
+X-CM-TRANSID:gCh0CgAHzw9IHZNofPMGCw--.32705S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7KFWkZw1UZw47CF17ury8Krg_yoW8Jw45pF
+	WfKa13Crn5Jrn3ZrsxJws7Ga4Sqws3Xr45Gr9rGa4rCrn8CryxtryIyws5ua4kX3ykAF4a
+	qF1jkryUCF1UA3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvFb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AF
+	wI0_JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
+	xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1D
+	MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_JFI_Gr1lIxAIcVC0I7IYx2IY6xkF7I
+	0E14v26r4UJVWxJr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v2
+	6r4j6F4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr1j6F4UJbIYCTnIWIevJa73UjIFyTuYvj
+	xUotCzDUUUU
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-Hi,
+�� 2025/08/01 19:44, Ming Lei д��:
+> Tag iterators can race with the freeing of the request pages(tags->page_list),
+> potentially leading to use-after-free issues.
+> 
+> Defer the freeing of the page list and the tags structure itself until
+> after an SRCU grace period has passed. This ensures that any concurrent
+> tag iterators have completed before the memory is released. With this
+> way, we can replace the big tags->lock in tags iterator code path with
+> srcu for solving the issue.
+> 
+> This is achieved by:
+> - Adding a new `srcu_struct tags_srcu` to `blk_mq_tag_set` to protect
+>    tag map iteration.
+> - Adding an `rcu_head` to `struct blk_mq_tags` to be used with
+>    `call_srcu`.
+> - Moving the page list freeing logic and the `kfree(tags)` call into a
+>    new callback function, `blk_mq_free_tags_callback`.
+> - In `blk_mq_free_tags`, invoking `call_srcu` to schedule the new
+>    callback for deferred execution.
+> 
+> The read-side protection for the tag iterators will be added in a
+> subsequent patch.
+> 
+> Signed-off-by: Ming Lei<ming.lei@redhat.com>
+> ---
+>   block/blk-mq-tag.c     | 24 +++++++++++++++++++++++-
+>   block/blk-mq.c         | 26 +++++++++++++-------------
+>   include/linux/blk-mq.h |  2 ++
+>   3 files changed, 38 insertions(+), 14 deletions(-)
 
-在 2025/08/06 16:59, Ming Lei 写道:
-> On Wed, Aug 06, 2025 at 09:06:28AM +0800, Yu Kuai wrote:
->> Hi,
->>
->> 在 2025/08/05 16:48, Ming Lei 写道:
->>> On Tue, Aug 05, 2025 at 04:38:56PM +0800, Yu Kuai wrote:
->>>> Hi,
->>>>
->>>> 在 2025/08/05 16:33, Yu Kuai 写道:
->>>>> Hi,
->>>>>
->>>>> 在 2025/08/04 19:32, Ming Lei 写道:
->>>>>> On Mon, Aug 04, 2025 at 02:30:43PM +0800, Yu Kuai wrote:
->>>>>>> Hi,
->>>>>>>
->>>>>>> 在 2025/08/01 19:44, Ming Lei 写道:
->>>>>>>> Replace the spinlock in blk_mq_find_and_get_req() with an
->>>>>>>> SRCU read lock
->>>>>>>> around the tag iterators.
->>>>>>>>
->>>>>>>> This is done by:
->>>>>>>>
->>>>>>>> - Holding the SRCU read lock in blk_mq_queue_tag_busy_iter(),
->>>>>>>> blk_mq_tagset_busy_iter(), and blk_mq_hctx_has_requests().
->>>>>>>>
->>>>>>>> - Removing the now-redundant tags->lock from blk_mq_find_and_get_req().
->>>>>>>>
->>>>>>>> This change improves performance by replacing a spinlock with a more
->>>>>>>> scalable SRCU lock, and fixes lockup issue in
->>>>>>>> scsi_host_busy() in case of
->>>>>>>> shost->host_blocked.
->>>>>>>>
->>>>>>>> Meantime it becomes possible to use blk_mq_in_driver_rw() for io
->>>>>>>> accounting.
->>>>>>>>
->>>>>>>> Signed-off-by: Ming Lei <ming.lei@redhat.com>
->>>>>>>> ---
->>>>>>>>      block/blk-mq-tag.c | 12 ++++++++----
->>>>>>>>      block/blk-mq.c     | 24 ++++--------------------
->>>>>>>>      2 files changed, 12 insertions(+), 24 deletions(-)
->>>>>>>>
->>>>>>>> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
->>>>>>>> index 6c2f5881e0de..7ae431077a32 100644
->>>>>>>> --- a/block/blk-mq-tag.c
->>>>>>>> +++ b/block/blk-mq-tag.c
->>>>>>>> @@ -256,13 +256,10 @@ static struct request
->>>>>>>> *blk_mq_find_and_get_req(struct blk_mq_tags *tags,
->>>>>>>>              unsigned int bitnr)
->>>>>>>>      {
->>>>>>>>          struct request *rq;
->>>>>>>> -    unsigned long flags;
->>>>>>>> -    spin_lock_irqsave(&tags->lock, flags);
->>>>>>>>          rq = tags->rqs[bitnr];
->>>>>>>>          if (!rq || rq->tag != bitnr || !req_ref_inc_not_zero(rq))
->>>>>>>>              rq = NULL;
->>>>>>>> -    spin_unlock_irqrestore(&tags->lock, flags);
->>>>>>>>          return rq;
->>>>>>>>      }
->>>>>>>>
->>>>>>> Just wonder, does the lockup problem due to the tags->lock contention by
->>>>>>> concurrent scsi_host_busy?
->>>>>>
->>>>>> Yes.
->>>>>>
->>>>>>>
->>>>>>>> @@ -440,7 +437,9 @@ void blk_mq_tagset_busy_iter(struct
->>>>>>>> blk_mq_tag_set *tagset,
->>>>>>>>              busy_tag_iter_fn *fn, void *priv)
->>>>>>>>      {
->>>>>>>>          unsigned int flags = tagset->flags;
->>>>>>>> -    int i, nr_tags;
->>>>>>>> +    int i, nr_tags, srcu_idx;
->>>>>>>> +
->>>>>>>> +    srcu_idx = srcu_read_lock(&tagset->tags_srcu);
->>>>>>>>          nr_tags = blk_mq_is_shared_tags(flags) ? 1 :
->>>>>>>> tagset->nr_hw_queues;
->>>>>>>> @@ -449,6 +448,7 @@ void blk_mq_tagset_busy_iter(struct
->>>>>>>> blk_mq_tag_set *tagset,
->>>>>>>>                  __blk_mq_all_tag_iter(tagset->tags[i], fn, priv,
->>>>>>>>                                BT_TAG_ITER_STARTED);
->>>>>>>>          }
->>>>>>>> +    srcu_read_unlock(&tagset->tags_srcu, srcu_idx);
->>>>>>>
->>>>>>> And should we add cond_resched() after finish interating one tags, even
->>>>>>> with the srcu change, looks like it's still possible to lockup with
->>>>>>> big cpu cores & deep queue depth.
->>>>>>
->>>>>> The main trouble is from the big tags->lock.
->>>>>>
->>>>>> IMO it isn't needed, because max queue depth is just 10K, which is much
->>>>>> bigger than actual queue depth. We can add it when someone shows it is
->>>>>> really needed.
->>>>>
->>>>> If we don't want this, why not using srcu here? Looks like just use
->>>>> rcu_read_lock and rcu_read_unlock to protect blk_mq_find_and_get_req()
->>>>> will be enough.
->>>>
->>>> Like following patch:
->>>>
->>>> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
->>>> index d880c50629d6..e2381ee9747d 100644
->>>> --- a/block/blk-mq-tag.c
->>>> +++ b/block/blk-mq-tag.c
->>>> @@ -255,11 +255,11 @@ static struct request *blk_mq_find_and_get_req(struct
->>>> blk_mq_tags *tags,
->>>>           struct request *rq;
->>>>           unsigned long flags;
->>>>
->>>> -       spin_lock_irqsave(&tags->lock, flags);
->>>> +       rcu_read_lock();
->>>>           rq = tags->rqs[bitnr];
->>>>           if (!rq || rq->tag != bitnr || !req_ref_inc_not_zero(rq))
->>>>                   rq = NULL;
->>>> -       spin_unlock_irqrestore(&tags->lock, flags);
->>>> +       rcu_read_unlock();
->>>>           return rq;
->>>>    }
->>>
->>> srcu read lock has to be grabbed when request reference is being accessed,
->>> so the above change is wrong, otherwise plain rcu is enough.
->>>
->> I don't quite understand, I think it's enough to protect grabbing req
->> reference, because IO issue path grab q_usage_counter before setting
->> req reference to 1, and IO complete path decrease req reference to 0
->> before dropping q_usage_counter.
-> 
-> In theory it is true, but the implementation is pretty fragile, because the
-> correctness replies on the implied memory barrier(un-documented) in blk_mq_get_tag()
-> between blk_try_enter_queue() and req_ref_set(rq, 1).
-> 
->>
->>>>
->>>> diff --git a/block/blk-mq.c b/block/blk-mq.c
->>>> index b1d81839679f..a70959cad692 100644
->>>> --- a/block/blk-mq.c
->>>> +++ b/block/blk-mq.c
->>>> @@ -3442,12 +3442,8 @@ static void blk_mq_clear_rq_mapping(struct
->>>> blk_mq_tags *drv_tags,
->>>>
->>>>           /*
->>>>            * Wait until all pending iteration is done.
->>>> -        *
->>>> -        * Request reference is cleared and it is guaranteed to be observed
->>>> -        * after the ->lock is released.
->>>>            */
->>>> -       spin_lock_irqsave(&drv_tags->lock, flags);
->>>> -       spin_unlock_irqrestore(&drv_tags->lock, flags);
->>>> +       synchronize_rcu();
->>>
->>> We do want to avoid big delay in this code path, so call_srcu() is much
->>> better.
->>
->> Agreed, however, there is rcu verion helper as well, call_rcu().
-> 
-> I prefer to srcu, which is simple & straight-forward, especially the background
-> of this issue has been tough enough.
-> 
-Thanks for the explanation, I'm good with srcu now :)
-Kuai
-
-> 
-> Thanks,
-> Ming
-> 
-> 
-> .
-> 
+LGTM
+Reviewed-by: Yu Kuai <yukuai3@huawei.com>
 
