@@ -1,238 +1,260 @@
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2077.outbound.protection.outlook.com [40.107.220.77])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 953A9145B3E;
-	Thu,  7 Aug 2025 14:19:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.77
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754576377; cv=fail; b=kmuMuEA9X/im/Pos/jF/W9EpwYPIOm8I62rkiYJtUSkzTWOIkpuE9eKjs4zUA8RtsFuExUMv69vOslPzSBpY3rEn248wUF2+dmOUq1wWtfX/lit5YqQvAIQZD12pNPFAC2reoxsmaeh4dWfEM5igLm5FGC+ClTqk68ejiWRP1YA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754576377; c=relaxed/simple;
-	bh=f4p1eKjSK6wOec39okmmfLtmk6RNIRZUQ5/iqifs/SU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=ZNwVR2OZFsfXGgtXIzzlRmvajGJnxqmJyTQ44lXyd96/a1MxF+g7KJRsL5vRac/1c7Mc39PuBQjKsbhVRqzQ5PEi3k2pj14nx31vQtnwQJNTCQvKK103UPCSfJjWxqeAAqraAQ8iKUgt2U334xP2Gj29i+TY/8IVxE7ANRmN4bs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=UvWxmJcX; arc=fail smtp.client-ip=40.107.220.77
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1285A263F52
+	for <linux-block@vger.kernel.org>; Thu,  7 Aug 2025 14:40:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1754577661; cv=none; b=qt+T4PBNR/lZsxKIMRNjKt9TlZl+Uu9r5TsOk+U+2j9blC65Q83o4q42lssIic1/iJ0EsI7efZKGxPVaOqHmZuHNSpQhuIUg5ysqo6AACXkFH16ov9yaGblc3KHQgEgC5jqNVF3J3fJONzabodhwrdhtWvWkOAIUFf9FiPiVoyg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1754577661; c=relaxed/simple;
+	bh=UNvtAxmLROgNUzbc11bBNIMDhX3I5pMyJHrrae5iWIY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=h9it6cAKJmjskwXkPsToMeMpPQTtepSzKHY0JvhJHyqeLcDDqRg5aFuEOPeRjveOJbZtN4M1Pv76+QJ/CL/hc4+ynF9GXDAMyosn9fcuU6wB5rFl4rgck/6bQR+b3jSqSnP5jnpEii4RSFCfDBYTgK3DeJXsO9sYbXJq5Pz6OU8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=JPpwwbEo; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="UvWxmJcX"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Ux/HYFV3SrMs+NkvAGWaBPvM8dPG+iYroa33c0PdCqfPrAoG0ZRgrGME385hE4yAA1k7fv0fA9zHUzG3M6GMaWwSZNjdsLQs/Bnc1Qyr9HVWXoun+kpz5R6qHBeJqmJZUhhG5VTp0TyqI/X0tosUuUfRu+ietnHG5YdkrEQNsZ8x57bzleIvnjcntYu/Zg/rJdEhJBXAAPwOgXkzxVXVXHdVXzQaormdnei/p136nRj+7JltuFTHc8NSXWPD5bLvWQMZSwHVDF8Xzb46T5dCCmMBDRzxayy+pIj8Ekdc3l5iwN/MbJwOM63CF4iS0aRW0h6v2Qmduc8xwq/S+A7NPg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=V4HzQPlBoiRj3TiTMS/fKOC7xLbLGVXzngTW/oiL3VM=;
- b=Pxnf4cfrY/mfaH5i1PlrKlv0lgqq+NICjmiOL+s5flU99eGje3dcKGfsMCklWXvaJipe2UtNSQwj8fFDb4a+eRyZtCI1WhaSy5U1/MLk+kPNnFx2ZsdZDqEYsUG4VLoykEJqKfnV7YvPkghSqkm9Pd/va5qfXmiFP5cRHMXxGzWP9wk5QRHltHq0FN4X7jEnBDUKjjvU0EZsBtbWza1Na9r3p4lLtDr27eoWAFm6LzuscpF29UO7O/l/y/VJyTO/0T7oIUz2zdxR8DjCCRhIiunG9N7N+S2k3nNxvTV1jWNF6HbpFh1u9fQqsWErYwoeSbYb1aJ4g3R68R7InzIs+w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=V4HzQPlBoiRj3TiTMS/fKOC7xLbLGVXzngTW/oiL3VM=;
- b=UvWxmJcXt5NCpifzR9GlYyrGKCU0K0TdOCc/fc34AkyQG/07h8Ud7hIwkRMB2KJ41PDnjYRjCf7ILKNiQaIfLJSgl1YkJWLnzrt7aQLsdEYSsIq6e7WKf9ltlPlY+BwxAoKf6b0bUgA7+pZBWu8DkPx+sqNm4hSz9CspwMmVmohAK307/le+YJplhcfFcWVMOJTG0YzGNZj+Z/p641UdRdlIcMy/ztEpMoupmNbXDO3Rh48u8D9VHCBv0jhoXz36CwZqCimiK3MS1ih1p9N5mvU2CgKzSMXQML0sGacrezsSbBvbx6kFLDeUPHU1oVJwWmbVUO3fpwF1lAWDkiUpew==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
- by PH7PR12MB6588.namprd12.prod.outlook.com (2603:10b6:510:210::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9009.13; Thu, 7 Aug
- 2025 14:19:31 +0000
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732%4]) with mapi id 15.20.9009.017; Thu, 7 Aug 2025
- 14:19:31 +0000
-Date: Thu, 7 Aug 2025 11:19:29 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Marek Szyprowski <m.szyprowski@samsung.com>,
-	Abdiel Janulgue <abdiel.janulgue@gmail.com>,
-	Alexander Potapenko <glider@google.com>,
-	Alex Gaynor <alex.gaynor@gmail.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Christoph Hellwig <hch@lst.de>, Danilo Krummrich <dakr@kernel.org>,
-	iommu@lists.linux.dev, Jason Wang <jasowang@redhat.com>,
-	Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>,
-	Jonathan Corbet <corbet@lwn.net>, Juergen Gross <jgross@suse.com>,
-	kasan-dev@googlegroups.com, Keith Busch <kbusch@kernel.org>,
-	linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	linux-nvme@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
-	linux-trace-kernel@vger.kernel.org,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Robin Murphy <robin.murphy@arm.com>, rust-for-linux@vger.kernel.org,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Stefano Stabellini <sstabellini@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	virtualization@lists.linux.dev, Will Deacon <will@kernel.org>,
-	xen-devel@lists.xenproject.org
-Subject: Re: [PATCH v1 00/16] dma-mapping: migrate to physical address-based
- API
-Message-ID: <20250807141929.GN184255@nvidia.com>
-References: <cover.1754292567.git.leon@kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1754292567.git.leon@kernel.org>
-X-ClientProxiedBy: YT4P288CA0083.CANP288.PROD.OUTLOOK.COM
- (2603:10b6:b01:d0::19) To CH3PR12MB8659.namprd12.prod.outlook.com
- (2603:10b6:610:17c::13)
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="JPpwwbEo"
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-459ddf8acf1so10124715e9.0
+        for <linux-block@vger.kernel.org>; Thu, 07 Aug 2025 07:40:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1754577657; x=1755182457; darn=vger.kernel.org;
+        h=in-reply-to:autocrypt:from:content-language:references:cc:to
+         :subject:user-agent:mime-version:date:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=UNvtAxmLROgNUzbc11bBNIMDhX3I5pMyJHrrae5iWIY=;
+        b=JPpwwbEoIx6E+2AL182tazxJwgfOXeFEmx+X/T8x1B+amTezQ7ZAuh8LFvCaylSOP2
+         Aez4r0MdWrHgdXGjdkdXgwcRop75HBT7yZKlTEK9cHbupwSUXR6xvRRbHHbHO/FCQHTW
+         ltvSLuBXGegJZpoG3f5o3iJ6IDAf7xs8fySe+oeLVnL+wiOFCf+e/D4hitkD/iG5jEYo
+         DBgPyB65c9XVfUjl/0jcp/WnO2lJyPw0fCpu5atqmNJpykmJfAXsfehkaih6sb3YIxQz
+         lqtBlouFmACz4XZxnMt7CMO5YqcdZseQhA75Qbu/Bn+DUzzmPYO2ol+2rzh5Br4a/a6R
+         u5bw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754577657; x=1755182457;
+        h=in-reply-to:autocrypt:from:content-language:references:cc:to
+         :subject:user-agent:mime-version:date:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=UNvtAxmLROgNUzbc11bBNIMDhX3I5pMyJHrrae5iWIY=;
+        b=jXhxPkaW+wt3bcmUq34YdQ9trBaXVYbyT6lblYAva8nbitejjieepVY4HsuXGpHYJU
+         85A5CMc9t7XTGqrgtcbbT/C+KKlnUJymsO4h2MONFq7TxAfpLeNXopN+kIn7eJWhOsyI
+         aR08WmPgORlQi8M2FtFlSCGD70GJNSOudh8a1CnacALsgZssAWRliRE2zaakxa5lXYE6
+         R4ApU/JET2tnp1QFysONXP5o4DYSZ0OMCUP7O6QJ0KQyuQ+7RiDi7WrfWmv8EU8+4zut
+         dBUwxnI7jUk7IHxrl9bvdv0uWs1hUbprrEPUZplFNwn3UGAaH/8eoHPYnQqAtXSi3wF8
+         X26Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVrf2R5t2yjgE14bencyqoXIn5jM6uc7TvZGMOJ37ssHzseG4P93uV2WTkagPAfWTXTEXNp/d4npN7u4g==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyrN9Zp1obpibRl4UR77BCkq9D3wcwQv8NmELrZvDRvAnpQlllX
+	C3QN5kavNajxOEM5DJ+bid4r4XPYxcqYswwiTxtlRc/ez2SH90/Q4zB40gebenwy1oI=
+X-Gm-Gg: ASbGncupbc9E+eVRV3eYhOyIr/D3KNpqSXvZ9G6toWpOET2NQBIKlCO1j6ybJPxGLVx
+	Jb2oQx0NTHytED5x3/CYHuFICAQOqA4gbrVC6hmfciQwnSYJPb5neWFrcuTk0GOTJKs6cwWjaxe
+	Iv6+9r5dGOad06T5nHRziKorKCzTbbCdRYx9WKL2/6uTUsXDuGPwXG5WEljE3XqmEGw94tcuxWK
+	nn/WC4h55pYGg+RrZAPj9Oi+pPJhXrzIEhQ49sovG6FtOBRMzQBLZpd93amVaL/jyDRm6aXCofw
+	YNTdXV+Ne3B0Vah6XhBfZ4Sm0HIBp9nVcxAJfYKEYY5LjWMIudo30FlytWB1nOyIJjPXiM0qDM9
+	ku9nn6T5W/aoNO3idzQ/CAv0CprX7pUvKf+CfzmwZTAQMvRgbQ3ST0dgD2zEQlkN5F2iIKpP9dI
+	j4cHFWuTKZhzIuagRBocHN0BXmR15+AeSrFUj7bWP3Vbof0mEFDfFS
+X-Google-Smtp-Source: AGHT+IEdsq/70nzbECt2XZv20aIclJJnJG4WOaVhcMt6Kol5NiFtvhP7+awwyCp70aSiqlFjENFKWA==
+X-Received: by 2002:a05:600c:840f:b0:459:d709:e5d4 with SMTP id 5b1f17b1804b1-459e6fb8315mr72888315e9.0.1754577657329;
+        Thu, 07 Aug 2025 07:40:57 -0700 (PDT)
+Received: from ?IPV6:2003:e5:872d:3c00:27e3:fc0:fb5:67a3? (p200300e5872d3c0027e30fc00fb567a3.dip0.t-ipconnect.de. [2003:e5:872d:3c00:27e3:fc0:fb5:67a3])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b79c3ac158sm27487389f8f.4.2025.08.07.07.40.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 07 Aug 2025 07:40:57 -0700 (PDT)
+Message-ID: <e52e54f9-5f46-4d52-b02b-3ddb497d5ed9@suse.com>
+Date: Thu, 7 Aug 2025 16:40:55 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|PH7PR12MB6588:EE_
-X-MS-Office365-Filtering-Correlation-Id: ae70dbcf-4d4f-440e-182f-08ddd5bd6d0d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|376014|366016|1800799024|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?B9tNliylgIkVWzk+gttBK52S8uyZSnBPrdlqMANarwihh1iz5HDw9DuT0/hz?=
- =?us-ascii?Q?pPBvqHEDsFN1CcZA780EFUfOwQsxZf6+SovYZmu5SFpEdEKOqhzE7ccvwPXB?=
- =?us-ascii?Q?d9fhcq4vqA7B3VHHEr2QwNktuaHgZBg0mfXUO27IJQksn1GUv467eV9m3kYp?=
- =?us-ascii?Q?zeRZjufwMXBqEmp9lSxyAtI/FYEOwl/OTRaqLd4eUkBmR9iR11+zVCTyjqJX?=
- =?us-ascii?Q?FyiKBpgUCod6UknHqNUjeSk7xpamNtDPyQQXQJE5gyLHgII/gtRgwMPLs9rl?=
- =?us-ascii?Q?VJYaoI4XHo9LXlfjPNp1b4xV8dIR0P4LFtblPVPnGJ2pu6pUa0nXMZMAEPZL?=
- =?us-ascii?Q?txAR349UNH9JDuLSeOsF/6Am9TLe2PDjhcUZbrVMiFPCKVnrC83/BkwFkjbs?=
- =?us-ascii?Q?rhlDU0anUP7S72xxxONN7M111WE3/FEe6sz5sz/sNAXEPsxnacAsv08auES4?=
- =?us-ascii?Q?xzXTWb4AKhEn+At91sgj1F10XViQgPYlyGlYBkD56hicheFWE7MFTM2u0brm?=
- =?us-ascii?Q?29DmF0LPvmGbUa5rh179BXi2MJhDLHxxB2efSrDClnB7SakzahAsv5Rwg1Ow?=
- =?us-ascii?Q?7XegQvTCTKmpr10T9O7pN6miwGjQKLZOPameOzZBL6XiatNnuG1zuG+Sectp?=
- =?us-ascii?Q?GZ+AsVklJT5rwto+1nrg/44LcA+ZyVWOaJgkRawWO+XcVfjKF1Xit2S+S9Du?=
- =?us-ascii?Q?A1SitDf/YwAA09E/FJoMsAUplJo+yJVwgXAmEhp0FguJY/87BrkrEilXUZFs?=
- =?us-ascii?Q?AieS+FH/9jm/nwhq+ZKNyAaz+g9HOB5bzB/5v/HoWPc2qEnGs3uvA855ekvw?=
- =?us-ascii?Q?UEEBZWKzIgzhEdtspN/8cEa7pL7k5TbuELLLA3M2UsUMuP4yH9QqD44PXnlk?=
- =?us-ascii?Q?le02wZa+SROyxt1IvH+0ijUe0orkCw/zx8gNVNfGD0Z6979NDYnLMkJt4bBo?=
- =?us-ascii?Q?W8iuYrdHd3iqY+yDjKvVuHatC68t9hy4ypADpVdUGGmaQiDbIj5s9R+0An3T?=
- =?us-ascii?Q?zdeiuGpEGlDnXnEKq1V5moJfMcrDIUhZkYa6iUTwi2Tc1OQRAGIDSpWA5GUv?=
- =?us-ascii?Q?UjuyoQyWRTwKUkyvL3wnYpaDirtZ31ipYZuXbcpO4M1VTVRX+vK2aizHG5a9?=
- =?us-ascii?Q?IHJPSag0KP9F34ghLBieq3CcgYiXrGCOvca3LQtQupfiyI4YdOGx7fslTLEV?=
- =?us-ascii?Q?kNJL+GjtvJGIsltRq5oZMzq11CbPr7lnuV2a6DAB4zYGiztXp5fUlC3Mri28?=
- =?us-ascii?Q?X7CCp200e/89Izyr0VXRbjylVbzandsTLZxl2kR0on2rFyYuPn5t452MNVOE?=
- =?us-ascii?Q?R7H2RPUiB9YPz/+ryYJPDjM+63qObob1RQ4SnjRIM19oCho5cIbByzr1uDeb?=
- =?us-ascii?Q?MB2xgadEOpgIB6FlWic93IL0kZw5lZR24NBphD8wRZjdcYeNLkqOCW1/Sy7j?=
- =?us-ascii?Q?bmMRergMvaM=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?7m6qQrIZoL6i8N1g3znV2tQ4KvfciEiqOZZQJRQTWtnU7WjHOMjde+QydDME?=
- =?us-ascii?Q?mUDUrpS9390oTKIfGFcT1mK7xvkdka8xIq1GJ3tKVpq9AOXSJgip45vUgFVg?=
- =?us-ascii?Q?9Ap3Ju3KeNAui+8i5KuxBd9n0HVmsQOgGrjXMt1tthaQKqWfHX0hlsD2n0Lu?=
- =?us-ascii?Q?UYsoG/7OfcfDropPkCiO5jJIt8eQr16Y0qeLUfiaDKEev6Gfk4lCeTlkOc25?=
- =?us-ascii?Q?rloak9Msam4Zb/dD+/0xh85vsH1j2wWzl8WiTczYETvD4G4n5fTge+xlBGCr?=
- =?us-ascii?Q?kSxmPgaA9/FNrdgmYMBR7/uiJPFEVnj/uGGrcAUDb/DF57Xda1NjRUK85nMv?=
- =?us-ascii?Q?UzNmzIFE7q84UO1TwMPdwsfbNAHGnupCl6H4I9K/C1GX/eONUBTaRh4vqZaK?=
- =?us-ascii?Q?yB2G3zjrBMcBepTPvHWFibWD+IBiBaIEzIcc/vBWeJfzzOjQ4hEBkVByM+6j?=
- =?us-ascii?Q?r5qPqXrzooA2DznqgbZ8TAkI2PCHxHxssmHkUgZD8HPBT3QoKAhNrzB+o7vS?=
- =?us-ascii?Q?2TW8eQxB1m5+1cN1Bf91i593KBtbwCDpBoXuOkncHgGROWmXG2eJMEKs7cnU?=
- =?us-ascii?Q?sYj0zrV22wFh5bY8svayBlI0rvc5EMS+iYgk5HOpUGdYnLk3korFArvyKmk7?=
- =?us-ascii?Q?22reQMNtSb50vHSCfcqHSoNFJ+vs+K7Ys7jrs34BxjHy0vMdfBvc4KmcKl4y?=
- =?us-ascii?Q?mE0i7FauCtty4ncc2WgEgmFQQvdFX7UwJcJR6S+qE7u+IBIt5D7NYEYGWj40?=
- =?us-ascii?Q?recr6cmcvAqLxSVHgQDFKyKRsldvR7oVH4m6GeAYeOtbuTMu2nq8krRSqMtB?=
- =?us-ascii?Q?EQb4HCJKcBUKWVPH8HLAmxoZ5ROfTcHBfZAeVcgNHsicFUNzwQ3JMkPmSSu0?=
- =?us-ascii?Q?aaOHUzcGSqlNQ5twDziT3rbncFCDiMP8P5gSqUxNn/BGjVAPOGwvd3PM7jIx?=
- =?us-ascii?Q?SLcHnkVuvcwWUBNV5D8O66rCSjufmnPQM4jcKJ2Rxhk1hdsbUUtuQQkQb8Mx?=
- =?us-ascii?Q?mmMVDauvokCEO6PZXd/HBz2i/Kr02SlhFRYMGFxwSgJTO+sXJSaW+KJ65n3I?=
- =?us-ascii?Q?grd1YaWpy2pakSEIU2G9sntmYLb5l0KFETaWtV8JwnOgkchkV79twXudlNJk?=
- =?us-ascii?Q?bTbogLkAO5iSod5dvtCNVRvjrkzVjgpmkYMmpdGn6uWgEAPm/UeEz/VG3qJz?=
- =?us-ascii?Q?bg3s3HfFw1uns8n9bOMufjcok4uhvPyMtNRoIep3oMqjZx4Psy4R9syf8+hi?=
- =?us-ascii?Q?tUfHmEfaQ+Z5H0POkQ+MBujb3hmZxmlxRxLOAz0l3Y8o2WOKksiLE+0RJIPH?=
- =?us-ascii?Q?s/1Vqg0OAmeKE5T4aFFjEY7EeFCc5Ugc0k58pmMIsy7I8QQ8Xo6esmGMaoMV?=
- =?us-ascii?Q?VOpJqS9TBJjsX/1bPmmyt9pSqM2b1e27HUPvpB0T6VFRm083/mlNeVJEjqrm?=
- =?us-ascii?Q?jbtAii7eZV9BuHSzPWMywLvWewoicgmdNDQ9EsSG24u64A/PxV7Nxg7WMfll?=
- =?us-ascii?Q?T//RyKhtL5IDDp+sHf+4frB50biC1Z1Asn9WPfG0tIa6QIWfIpTYkm0JRK0U?=
- =?us-ascii?Q?3TrdqWdPk8GkiiaYfAc=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ae70dbcf-4d4f-440e-182f-08ddd5bd6d0d
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Aug 2025 14:19:31.4180
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: +coMWha09t2B/DL2OsRf4sc3LI4FnlUef4SJgqADc5IZdZrEaYGExrUCxRibJwt7
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB6588
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 10/16] xen: swiotlb: Open code map_resource callback
+To: Leon Romanovsky <leon@kernel.org>,
+ Marek Szyprowski <m.szyprowski@samsung.com>
+Cc: Leon Romanovsky <leonro@nvidia.com>, Jason Gunthorpe <jgg@nvidia.com>,
+ Abdiel Janulgue <abdiel.janulgue@gmail.com>,
+ Alexander Potapenko <glider@google.com>, Alex Gaynor
+ <alex.gaynor@gmail.com>, Andrew Morton <akpm@linux-foundation.org>,
+ Christoph Hellwig <hch@lst.de>, Danilo Krummrich <dakr@kernel.org>,
+ iommu@lists.linux.dev, Jason Wang <jasowang@redhat.com>,
+ Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>,
+ Jonathan Corbet <corbet@lwn.net>, kasan-dev@googlegroups.com,
+ Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+ linux-nvme@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
+ linux-trace-kernel@vger.kernel.org, Madhavan Srinivasan
+ <maddy@linux.ibm.com>, Masami Hiramatsu <mhiramat@kernel.org>,
+ Michael Ellerman <mpe@ellerman.id.au>, "Michael S. Tsirkin"
+ <mst@redhat.com>, Miguel Ojeda <ojeda@kernel.org>,
+ Robin Murphy <robin.murphy@arm.com>, rust-for-linux@vger.kernel.org,
+ Sagi Grimberg <sagi@grimberg.me>, Stefano Stabellini
+ <sstabellini@kernel.org>, Steven Rostedt <rostedt@goodmis.org>,
+ virtualization@lists.linux.dev, Will Deacon <will@kernel.org>,
+ xen-devel@lists.xenproject.org
+References: <cover.1754292567.git.leon@kernel.org>
+ <e69e9510d9024d664133dc788f5186aac414318e.1754292567.git.leon@kernel.org>
+Content-Language: en-US
+From: =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>
+Autocrypt: addr=jgross@suse.com; keydata=
+ xsBNBFOMcBYBCACgGjqjoGvbEouQZw/ToiBg9W98AlM2QHV+iNHsEs7kxWhKMjrioyspZKOB
+ ycWxw3ie3j9uvg9EOB3aN4xiTv4qbnGiTr3oJhkB1gsb6ToJQZ8uxGq2kaV2KL9650I1SJve
+ dYm8Of8Zd621lSmoKOwlNClALZNew72NjJLEzTalU1OdT7/i1TXkH09XSSI8mEQ/ouNcMvIJ
+ NwQpd369y9bfIhWUiVXEK7MlRgUG6MvIj6Y3Am/BBLUVbDa4+gmzDC9ezlZkTZG2t14zWPvx
+ XP3FAp2pkW0xqG7/377qptDmrk42GlSKN4z76ELnLxussxc7I2hx18NUcbP8+uty4bMxABEB
+ AAHNH0p1ZXJnZW4gR3Jvc3MgPGpncm9zc0BzdXNlLmNvbT7CwHkEEwECACMFAlOMcK8CGwMH
+ CwkIBwMCAQYVCAIJCgsEFgIDAQIeAQIXgAAKCRCw3p3WKL8TL8eZB/9G0juS/kDY9LhEXseh
+ mE9U+iA1VsLhgDqVbsOtZ/S14LRFHczNd/Lqkn7souCSoyWsBs3/wO+OjPvxf7m+Ef+sMtr0
+ G5lCWEWa9wa0IXx5HRPW/ScL+e4AVUbL7rurYMfwCzco+7TfjhMEOkC+va5gzi1KrErgNRHH
+ kg3PhlnRY0Udyqx++UYkAsN4TQuEhNN32MvN0Np3WlBJOgKcuXpIElmMM5f1BBzJSKBkW0Jc
+ Wy3h2Wy912vHKpPV/Xv7ZwVJ27v7KcuZcErtptDevAljxJtE7aJG6WiBzm+v9EswyWxwMCIO
+ RoVBYuiocc51872tRGywc03xaQydB+9R7BHPzsBNBFOMcBYBCADLMfoA44MwGOB9YT1V4KCy
+ vAfd7E0BTfaAurbG+Olacciz3yd09QOmejFZC6AnoykydyvTFLAWYcSCdISMr88COmmCbJzn
+ sHAogjexXiif6ANUUlHpjxlHCCcELmZUzomNDnEOTxZFeWMTFF9Rf2k2F0Tl4E5kmsNGgtSa
+ aMO0rNZoOEiD/7UfPP3dfh8JCQ1VtUUsQtT1sxos8Eb/HmriJhnaTZ7Hp3jtgTVkV0ybpgFg
+ w6WMaRkrBh17mV0z2ajjmabB7SJxcouSkR0hcpNl4oM74d2/VqoW4BxxxOD1FcNCObCELfIS
+ auZx+XT6s+CE7Qi/c44ibBMR7hyjdzWbABEBAAHCwF8EGAECAAkFAlOMcBYCGwwACgkQsN6d
+ 1ii/Ey9D+Af/WFr3q+bg/8v5tCknCtn92d5lyYTBNt7xgWzDZX8G6/pngzKyWfedArllp0Pn
+ fgIXtMNV+3t8Li1Tg843EXkP7+2+CQ98MB8XvvPLYAfW8nNDV85TyVgWlldNcgdv7nn1Sq8g
+ HwB2BHdIAkYce3hEoDQXt/mKlgEGsLpzJcnLKimtPXQQy9TxUaLBe9PInPd+Ohix0XOlY+Uk
+ QFEx50Ki3rSDl2Zt2tnkNYKUCvTJq7jvOlaPd6d/W0tZqpyy7KVay+K4aMobDsodB3dvEAs6
+ ScCnh03dDAFgIq5nsB11j3KPKdVoPlfucX2c7kGNH+LUMbzqV6beIENfNexkOfxHfw==
+In-Reply-To: <e69e9510d9024d664133dc788f5186aac414318e.1754292567.git.leon@kernel.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------zbc1rtf2MP4v0hwBljje0R4r"
 
-On Mon, Aug 04, 2025 at 03:42:34PM +0300, Leon Romanovsky wrote:
-> Changelog:
-> v1:
->  * Added new DMA_ATTR_MMIO attribute to indicate
->    PCI_P2PDMA_MAP_THRU_HOST_BRIDGE path.
->  * Rewrote dma_map_* functions to use thus new attribute
-> v0: https://lore.kernel.org/all/cover.1750854543.git.leon@kernel.org/
-> ------------------------------------------------------------------------
-> 
-> This series refactors the DMA mapping to use physical addresses
-> as the primary interface instead of page+offset parameters. This
-> change aligns the DMA API with the underlying hardware reality where
-> DMA operations work with physical addresses, not page structures.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------zbc1rtf2MP4v0hwBljje0R4r
+Content-Type: multipart/mixed; boundary="------------9ZSgHGkw4I0gfARYLaBix7N0";
+ protected-headers="v1"
+From: =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>
+To: Leon Romanovsky <leon@kernel.org>,
+ Marek Szyprowski <m.szyprowski@samsung.com>
+Cc: Leon Romanovsky <leonro@nvidia.com>, Jason Gunthorpe <jgg@nvidia.com>,
+ Abdiel Janulgue <abdiel.janulgue@gmail.com>,
+ Alexander Potapenko <glider@google.com>, Alex Gaynor
+ <alex.gaynor@gmail.com>, Andrew Morton <akpm@linux-foundation.org>,
+ Christoph Hellwig <hch@lst.de>, Danilo Krummrich <dakr@kernel.org>,
+ iommu@lists.linux.dev, Jason Wang <jasowang@redhat.com>,
+ Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>,
+ Jonathan Corbet <corbet@lwn.net>, kasan-dev@googlegroups.com,
+ Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+ linux-nvme@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
+ linux-trace-kernel@vger.kernel.org, Madhavan Srinivasan
+ <maddy@linux.ibm.com>, Masami Hiramatsu <mhiramat@kernel.org>,
+ Michael Ellerman <mpe@ellerman.id.au>, "Michael S. Tsirkin"
+ <mst@redhat.com>, Miguel Ojeda <ojeda@kernel.org>,
+ Robin Murphy <robin.murphy@arm.com>, rust-for-linux@vger.kernel.org,
+ Sagi Grimberg <sagi@grimberg.me>, Stefano Stabellini
+ <sstabellini@kernel.org>, Steven Rostedt <rostedt@goodmis.org>,
+ virtualization@lists.linux.dev, Will Deacon <will@kernel.org>,
+ xen-devel@lists.xenproject.org
+Message-ID: <e52e54f9-5f46-4d52-b02b-3ddb497d5ed9@suse.com>
+Subject: Re: [PATCH v1 10/16] xen: swiotlb: Open code map_resource callback
+References: <cover.1754292567.git.leon@kernel.org>
+ <e69e9510d9024d664133dc788f5186aac414318e.1754292567.git.leon@kernel.org>
+In-Reply-To: <e69e9510d9024d664133dc788f5186aac414318e.1754292567.git.leon@kernel.org>
 
-Lets elaborate this as Robin asked:
+--------------9ZSgHGkw4I0gfARYLaBix7N0
+Content-Type: multipart/mixed; boundary="------------MyLdgWVjx6doOE9CX8bqeBuf"
 
-This series refactors the DMA mapping API to provide a phys_addr_t
-based, and struct-page free, external API that can handle all the
-mapping cases we want in modern systems:
+--------------MyLdgWVjx6doOE9CX8bqeBuf
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
 
- - struct page based cachable DRAM
- - struct page MEMORY_DEVICE_PCI_P2PDMA PCI peer to peer non-cachable MMIO
- - struct page-less PCI peer to peer non-cachable MMIO
- - struct page-less "resource" MMIO
+T24gMDQuMDguMjUgMTQ6NDIsIExlb24gUm9tYW5vdnNreSB3cm90ZToNCj4gRnJvbTogTGVv
+biBSb21hbm92c2t5IDxsZW9ucm9AbnZpZGlhLmNvbT4NCj4gDQo+IEdlbmVyYWwgZG1hX2Rp
+cmVjdF9tYXBfcmVzb3VyY2UoKSBpcyBnb2luZyB0byBiZSByZW1vdmVkDQo+IGluIG5leHQg
+cGF0Y2gsIHNvIHNpbXBseSBvcGVuLWNvZGUgaXQgaW4geGVuIGRyaXZlci4NCj4gDQo+IFNp
+Z25lZC1vZmYtYnk6IExlb24gUm9tYW5vdnNreSA8bGVvbnJvQG52aWRpYS5jb20+DQoNClJl
+dmlld2VkLWJ5OiBKdWVyZ2VuIEdyb3NzIDxqZ3Jvc3NAc3VzZS5jb20+DQoNCg0KSnVlcmdl
+bg0K
+--------------MyLdgWVjx6doOE9CX8bqeBuf
+Content-Type: application/pgp-keys; name="OpenPGP_0xB0DE9DD628BF132F.asc"
+Content-Disposition: attachment; filename="OpenPGP_0xB0DE9DD628BF132F.asc"
+Content-Description: OpenPGP public key
+Content-Transfer-Encoding: quoted-printable
 
-Overall this gets much closer to Matthew's long term wish for
-struct-pageless IO to cachable DRAM. The remaining primary work would
-be in the mm side to allow kmap_local_pfn()/phys_to_virt() to work on
-phys_addr_t without a struct page.
+-----BEGIN PGP PUBLIC KEY BLOCK-----
 
-The general design is to remove struct page usage entirely from the
-DMA API inner layers. For flows that need to have a KVA for the
-physical address they can use kmap_local_pfn() or phys_to_virt(). This
-isolates the struct page requirements to MM code only. Long term all
-removals of struct page usage are supporting Matthew's memdesc
-project which seeks to substantially transform how struct page works.
+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
+kt+z4drzFUyEjLM1vVvIMjkUoJs=3D
+=3DeeAB
+-----END PGP PUBLIC KEY BLOCK-----
 
-Instead make the DMA API internals work on phys_addr_t. Internally
-there are still dedicated 'page' and 'resource' flows, except they are
-now distinguished by a new DMA_ATTR_MMIO instead of by callchain. Both
-flows use the same phys_addr_t.
+--------------MyLdgWVjx6doOE9CX8bqeBuf--
 
-When DMA_ATTR_MMIO is specified things work similar to the existing
-'resource' flow. kmap_local_pfn(), phys_to_virt(), phys_to_page(),
-pfn_valid(), etc are never called on the phys_addr_t. This requires
-rejecting any configuration that would need swiotlb. CPU cache
-flushing is not required, and avoided, as ATTR_MMIO also indicates the
-address have no cachable mappings. This effectively removes any
-DMA API side requirement to have struct page when DMA_ATTR_MMIO is
-used.
+--------------9ZSgHGkw4I0gfARYLaBix7N0--
 
-In the !DMA_ATTR_MMIO mode things work similarly to the 'page' flow,
-except on the common path of no cache flush, no swiotlb it never
-touches a struct page. When cache flushing or swiotlb copying
-kmap_local_pfn()/phys_to_virt() are used to get a KVA for CPU
-usage. This was already the case on the unmap side, now the map side
-is symmetric.
+--------------zbc1rtf2MP4v0hwBljje0R4r
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
 
-Callers are adjusted to set DMA_ATTR_MMIO. Existing 'resource' users
-must set it. The existing struct page based MEMORY_DEVICE_PCI_P2PDMA
-path must also set it. This corrects some existing bugs where iommu
-mappings for P2P MMIO were improperly marked IOMMU_CACHE.
+-----BEGIN PGP SIGNATURE-----
 
-Since ATTR_MMIO is made to work with all the existing DMA map entry
-points, particularly dma_iova_link(), this finally allows a way to use
-the new DMA API to map PCI P2P MMIO without creating struct page. The
-VFIO DMABUF series demonstrates how this works. This is intended to
-replace the incorrect driver use of dma_map_resource() on PCI BAR
-addresses.
+wsB5BAABCAAjFiEEhRJncuj2BJSl0Jf3sN6d1ii/Ey8FAmiUuvcFAwAAAAAACgkQsN6d1ii/Ey8T
+2gf9Fig/dfNm6Pc7N5CfTbfrvQeHxFrx0A+Lbz3wE1LBralSuURdjPw+wrBAGuNq/agCOFH7OBqC
+ayEkBjEdcL5kEblmVCgSWfcKQRq0vW5y0zkrzYglQyfuWhihBm/d56LwWxjbGku6QYLMnb5dGvHG
+wtjPE58yPWlaVaZa/NiWJLKtHyLc9Ep3+vhGNksayAXIsaRoqhk6g0dlVfOZUhQB2CTSQmBN8Cjo
+yhy4qsUiY26xJ0qhoNBaBahj9XRBQX5jz0z6IXT0xVJOTx5MoVU/ciBTMU97RmC1WbR0D5dAFfaA
+bgpP4QE+654uwyPjna/thpNWrTTm0kf3W+lFK/6fTQ==
+=Fe2s
+-----END PGP SIGNATURE-----
 
-This series does the core code and modern flows. A followup series
-will give the same treatement to the legacy dma_ops implementation.
-
-Jason
+--------------zbc1rtf2MP4v0hwBljje0R4r--
