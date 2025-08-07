@@ -1,158 +1,192 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23AF221B9C0;
-	Thu,  7 Aug 2025 10:20:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3DA9223DE8;
+	Thu,  7 Aug 2025 11:52:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754562001; cv=none; b=bndP9Quz2o5JBVAKkHfiHbaKl+8DPbBZcTfMXYoXlIDZFB5+KfLddf83+pQDIUIS0uiudLkQhEOI32L5QKg4TW9L2bCo5MMToow8G+TbebY2MLh5TUtmZV+fgw1Wn4FCGLYcEFqI3DZIt1dLjQmLIzdFJgWZr82EYyz1d8m/t+M=
+	t=1754567559; cv=none; b=cAlMUa5anBWt8D4mZXy5xuumffkyIxEHwWYwe5ltz7ixLeKb+jlpq+zRnhyu3m2KaIA4rI2rY2q5HlxciJ+Rx3u3Zq+Dgo3if6txKuDniynW9aneX6y5O6p6SlHMnRUjydhXdeIUz4AkYvgpUk2Z8DB3e81xrS+W/4p4hpVUzKo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754562001; c=relaxed/simple;
-	bh=g5fMARJkStIZRukybN28ZxPDEiWlSxFkOz8YjlHIsXo=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=dwnVXT5oZha9wEuqeCDtfRA/6TDUFtaVxsPuHNRt8acxnyspQGsR7szXVawro63JHWqaVpee8SzTf3Ri1rkSVVpBdKpTJAf3VoIW38ECbUirr1TvPi+uFDSXP5owj+/mrvLq+dJCi8sAzTta70OppBYP55HSKDP27t2kJgj2kWc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KKnROJao; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1754567559; c=relaxed/simple;
+	bh=O+Gp1WDPR1zKNL2eACyYRIa65npWpWeI2RQg5Kl7t88=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jgH57FbkcZhc6LKl0Iy5PJ75JjIRW8fqwwR67RyJRJxxVyElcOFMvaZ/CpBMjfW4UOAL4UZQMrGdxSeo2p6XY/T8SAqTCQRfjICgSLz6Q6k28Dv9jaqW90y428lnMM1p6y2Wd3H0iorXgcZTKNPiE3hUQnD3NnAWlefERNpxG40=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=KELnS1FR; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KKnROJao"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B87FC4CEED;
-	Thu,  7 Aug 2025 10:19:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754562000;
-	bh=g5fMARJkStIZRukybN28ZxPDEiWlSxFkOz8YjlHIsXo=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=KKnROJaoYnTv0vN9keIPCURYfrwib0IuDIfzzzkAt8wCfBvvALzXxjPFjwWZhMhOb
-	 BdwTesh+o+tQp+8XvYNchveaHMmHdkQ5e4gCtYJ0SKqJ7Y5cwe+OLik/lPBje+9tJv
-	 1rDzZDxV4FuxjDfQlnnNUDW+V3YYploYNVAUjPtniHH39fHSjrDMvFeiMe+rAAUX17
-	 mvOi2/6o1dVNbDUuihsBusu1z8JtBoC5rVlfYw9Fz7t96QngdMqbJ8+akA44gzR6he
-	 D8bIeBbthjU3GcEy334jQqo1Qzf/4llTGxhZyoDxRXIbhEQPQAgddB5eUQS4kPKHEu
-	 CXbWXQPTJLQow==
-From: Andreas Hindborg <a.hindborg@kernel.org>
-To: Alice Ryhl <aliceryhl@google.com>
-Cc: Boqun Feng <boqun.feng@gmail.com>, Miguel Ojeda <ojeda@kernel.org>, Alex
- Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>, =?utf-8?Q?Bj?=
- =?utf-8?Q?=C3=B6rn?= Roy
- Baron <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>, Trevor
- Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, Jens Axboe
- <axboe@kernel.dk>, linux-block@vger.kernel.org,
- rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 13/16] rust: block: add `GenDisk` private data support
-In-Reply-To: <aHYkkQpFOIcKuK-v@google.com>
-References: <20250711-rnull-up-v6-16-v3-0-3a262b4e2921@kernel.org>
- <20250711-rnull-up-v6-16-v3-13-3a262b4e2921@kernel.org>
- <-KgJHntx-n5a5umJjT0FGpcfzzMW3y5_vQAbYz3taMckXoUccILBz4xT9ZVzkRZS98UDGX4KXm7qdGK9713Iig==@protonmail.internalid>
- <aHYkkQpFOIcKuK-v@google.com>
-Date: Thu, 07 Aug 2025 11:57:49 +0200
-Message-ID: <87pld778te.fsf@kernel.org>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="KELnS1FR"
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5770Rh66021506;
+	Thu, 7 Aug 2025 11:47:12 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=BTQHC2
+	aC2tbH1wEMSIkNmofgsFKydHAcYdDRMTIS3gI=; b=KELnS1FRFy1qDUCVKhVOWv
+	ZzK1ntN6uoQp2Jxn/SlRHeWHPQ/oHTkFBeP7lSkwz5jx0OaHS/xsnCAMHwaiAkVZ
+	kwNvecb38Qyauaum4GF7uILxu08pFPES/XeZ329i3t6kPELpMOxsaffuZSKGhnCG
+	U5fvOEg+IROBx5nvJdwSVZt70LT7cyDvvCEB0o8PwZ6Z+JT2vCg9Nrye6T3RF75q
+	3MXsWAMVoy0Eb8CdMCYtuBbjeMJKnApMdhG6CFFvr/uzt0PqXA9sPSf2lC84uXO7
+	N433iMWmayXNbDkiXgJIt3d7dynRf0fF59vu8x9pJJ65LiaVGeUmLmsTHGy9dT/g
+	==
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48bq621ubp-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 07 Aug 2025 11:47:11 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5779eeZR022647;
+	Thu, 7 Aug 2025 11:47:10 GMT
+Received: from smtprelay04.wdc07v.mail.ibm.com ([172.16.1.71])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 48bpwqgdqd-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 07 Aug 2025 11:47:10 +0000
+Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
+	by smtprelay04.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 577Bl9VJ60359118
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 7 Aug 2025 11:47:10 GMT
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id AD14258066;
+	Thu,  7 Aug 2025 11:47:09 +0000 (GMT)
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A044958057;
+	Thu,  7 Aug 2025 11:47:06 +0000 (GMT)
+Received: from [9.109.198.214] (unknown [9.109.198.214])
+	by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Thu,  7 Aug 2025 11:47:06 +0000 (GMT)
+Message-ID: <470ab442-e5eb-4fa8-bde7-d6d2d1115a5a@linux.ibm.com>
+Date: Thu, 7 Aug 2025 17:17:05 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-
-"Alice Ryhl" <aliceryhl@google.com> writes:
-
-> On Fri, Jul 11, 2025 at 01:43:14PM +0200, Andreas Hindborg wrote:
-
-..
-
->> @@ -97,7 +98,14 @@ pub fn build<T: Operations>(
->>          self,
->>          name: fmt::Arguments<'_>,
->>          tagset: Arc<TagSet<T>>,
->> +        queue_data: T::QueueData,
->>      ) -> Result<GenDisk<T>> {
->> +        let data = queue_data.into_foreign();
->> +        let recover_data = ScopeGuard::new(|| {
->> +            // SAFETY: T::QueueData was created by the call to `into_foreign()` above
->> +            unsafe { T::QueueData::from_foreign(data) };
->
-> I think this is clearer to read as
->
-> drop(unsafe { T::QueueData::from_foreign(data) });
-
-OK.
-
->
->> +        });
->> +
->>          // SAFETY: `bindings::queue_limits` contain only fields that are valid when zeroed.
->>          let mut lim: bindings::queue_limits = unsafe { core::mem::zeroed() };
->>
->> @@ -112,7 +120,7 @@ pub fn build<T: Operations>(
->>              bindings::__blk_mq_alloc_disk(
->>                  tagset.raw_tag_set(),
->>                  &mut lim,
->> -                core::ptr::null_mut(),
->> +                data.cast(),
->>                  static_lock_class!().as_ptr(),
->>              )
->>          })?;
->> @@ -166,8 +174,12 @@ pub fn build<T: Operations>(
->>              },
->>          )?;
->>
->> +        recover_data.dismiss();
->> +
->>          // INVARIANT: `gendisk` was initialized above.
->>          // INVARIANT: `gendisk` was added to the VFS via `device_add_disk` above.
->> +        // INVARIANT: `gendisk.queue.queue_data` is set to `data` in the call to
->> +        // `__blk_mq_alloc_disk` above.
->>          Ok(GenDisk {
->>              _tagset: tagset,
->>              gendisk,
->> @@ -179,9 +191,10 @@ pub fn build<T: Operations>(
->>  ///
->>  /// # Invariants
->>  ///
->> -/// - `gendisk` must always point to an initialized and valid `struct gendisk`.
->> -/// - `gendisk` was added to the VFS through a call to
->> -///   `bindings::device_add_disk`.
->> +///  - `gendisk` must always point to an initialized and valid `struct gendisk`.
->> +///  - `gendisk` was added to the VFS through a call to
->> +///    `bindings::device_add_disk`.
->> +///  - `self.gendisk.queue.queuedata` is initialized by a call to `ForeignOwnable::into_foreign`.
->>  pub struct GenDisk<T: Operations> {
->>      _tagset: Arc<TagSet<T>>,
->>      gendisk: *mut bindings::gendisk,
->> @@ -193,9 +206,20 @@ unsafe impl<T: Operations + Send> Send for GenDisk<T> {}
->>
->>  impl<T: Operations> Drop for GenDisk<T> {
->>      fn drop(&mut self) {
->> +        // SAFETY: By type invariant of `Self`, `self.gendisk` points to a valid
->> +        // and initialized instance of `struct gendisk`, and, `queuedata` was
->> +        // initialized with the result of a call to
->> +        // `ForeignOwnable::into_foreign`.
->> +        let queue_data = unsafe { (*(*self.gendisk).queue).queuedata };
->> +
->>          // SAFETY: By type invariant, `self.gendisk` points to a valid and
->>          // initialized instance of `struct gendisk`, and it was previously added
->>          // to the VFS.
->>          unsafe { bindings::del_gendisk(self.gendisk) };
->> +
->> +        // SAFETY: `queue.queuedata` was created by `GenDiskBuilder::build` with
->> +        // a call to `ForeignOwnable::into_foreign` to create `queuedata`.
->> +        // `ForeignOwnable::from_foreign` is only called here.
->> +        let _queue_data = unsafe { T::QueueData::from_foreign(queue_data.cast()) };
->
-> Ditto here.
->
-> drop(unsafe { T::QueueData::from_foreign(queue_data.cast()) });
-
-Thanks, I agree.
-
->
-> Also, is this cast necessary as of
-> https://lore.kernel.org/all/20250711-rnull-up-v6-16-v3-13-3a262b4e2921@kernel.org/
-> ?
-
-I think you have the wrong link, you probably refer to the recent
-`ForeignOwnable` change. And yes, the cast is redundant.
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] block: fix kobject double initialization in add_disk
+To: Zheng Qixing <zhengqixing@huaweicloud.com>, axboe@kernel.dk
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yukuai3@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com,
+        houtao1@huawei.com, zhengqixing@huawei.com
+References: <20250807072056.2627592-1-zhengqixing@huaweicloud.com>
+Content-Language: en-US
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <20250807072056.2627592-1-zhengqixing@huaweicloud.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODA3MDA5MCBTYWx0ZWRfX0KtKCmJ/SIJ0
+ hoPkHabkBmXTAiJ6wnDfbj4JnyMCQ2klEbQ7eAemZjijHU6YI8eWmH5I0UvVSs8nMoSi35gQm0q
+ /6U7O6C6MjX2LGyjqwke3VWfiCIbeyc+voKscU9+P+4ABtWvxmO7GWZ3Ctfvk6mtJw1mkT67PVo
+ HToeiIDrm5qvxP7DJwKu2vZO5Xf+trKWmLZW39P7ju0XbMNAU4wD9IbKOcjVihIWKcR0gcYOcQ9
+ CeuflSMtxQqnUpJfv5npxFt1rJihrK0Oya4CcNhi8aMvAYyyXMyho8CLT1kwraJiTzpAdffpghX
+ v6yYY7EDxBrVbfDqZFJT4eCBKVMVX/LgIMNQWye8kF3i3VgZ0MxnvYyS6HtB2Jhtx2xewQ/1Zde
+ hzMjuEUTUrp2hjgeGYQIeUFNQl6wNasxyR+ELoUHLdcvpAZmavpupotGa59XjEAIOS2uZZvY
+X-Proofpoint-GUID: tQupf28WFtjmVrYyJRnYp1eBwVucnonL
+X-Authority-Analysis: v=2.4 cv=BIuzrEQG c=1 sm=1 tr=0 ts=6894923f cx=c_pps
+ a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
+ a=IkcTkHD0fZMA:10 a=2OwXVqhp2XgA:10 a=VwQbUJbxAAAA:8 a=i0EeH86SAAAA:8
+ a=FUuygD7Wb4d3zBr_g5QA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+X-Proofpoint-ORIG-GUID: tQupf28WFtjmVrYyJRnYp1eBwVucnonL
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-08-07_02,2025-08-06_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ mlxscore=0 impostorscore=0 priorityscore=1501 lowpriorityscore=0
+ suspectscore=0 spamscore=0 mlxlogscore=999 adultscore=0 clxscore=1011
+ malwarescore=0 phishscore=0 bulkscore=0 classifier=spam authscore=0
+ authtc=n/a authcc= route=outbound adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2507300000 definitions=main-2508070090
 
 
-Best regards,
-Andreas Hindborg
 
+On 8/7/25 12:50 PM, Zheng Qixing wrote:
+> From: Zheng Qixing <zhengqixing@huawei.com>
+> 
+> Device-mapper can call add_disk() multiple times for the same gendisk
+> due to its two-phase creation process (dm create + dm load). This leads
+> to kobject double initialization errors when the underlying iSCSI devices
+> become temporarily unavailable and then reappear.
+> 
+> However, if the first add_disk() call fails and is retried, the queue_kobj
+> gets initialized twice, causing:
+> 
+> kobject: kobject (ffff88810c27bb90): tried to init an initialized object,
+> something is seriously wrong.
+>  Call Trace:
+>   <TASK>
+>   dump_stack_lvl+0x5b/0x80
+>   kobject_init.cold+0x43/0x51
+>   blk_register_queue+0x46/0x280
+>   add_disk_fwnode+0xb5/0x280
+>   dm_setup_md_queue+0x194/0x1c0
+>   table_load+0x297/0x2d0
+>   ctl_ioctl+0x2a2/0x480
+>   dm_ctl_ioctl+0xe/0x20
+>   __x64_sys_ioctl+0xc7/0x110
+>   do_syscall_64+0x72/0x390
+>   entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> 
+> Fix this by separating kobject initialization from sysfs registration:
+>  - Initialize queue_kobj early during gendisk allocation
+>  - add_disk() only adds the already-initialized kobject to sysfs
+>  - del_gendisk() removes from sysfs but doesn't destroy the kobject
+>  - Final cleanup happens when the disk is released
+> 
+> Fixes: 2bd85221a625 ("block: untangle request_queue refcounting from sysfs")
+> Reported-by: Li Lingfeng <lilingfeng3@huawei.com>
+> Closes: https://lore.kernel.org/all/83591d0b-2467-433c-bce0-5581298eb161@huawei.com/
+> Signed-off-by: Zheng Qixing <zhengqixing@huawei.com>
+> ---
+>  block/blk-sysfs.c | 4 +---
+>  block/blk.h       | 1 +
+>  block/genhd.c     | 2 ++
+>  3 files changed, 4 insertions(+), 3 deletions(-)
+> 
+> diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+> index 396cded255ea..37d8654faff9 100644
+> --- a/block/blk-sysfs.c
+> +++ b/block/blk-sysfs.c
+> @@ -847,7 +847,7 @@ static void blk_queue_release(struct kobject *kobj)
+>  	/* nothing to do here, all data is associated with the parent gendisk */
+>  }
+>  
+> -static const struct kobj_type blk_queue_ktype = {
+> +const struct kobj_type blk_queue_ktype = {
+>  	.default_groups = blk_queue_attr_groups,
+>  	.sysfs_ops	= &queue_sysfs_ops,
+>  	.release	= blk_queue_release,
+> @@ -875,7 +875,6 @@ int blk_register_queue(struct gendisk *disk)
+>  	struct request_queue *q = disk->queue;
+>  	int ret;
+>  
+> -	kobject_init(&disk->queue_kobj, &blk_queue_ktype);
+>  	ret = kobject_add(&disk->queue_kobj, &disk_to_dev(disk)->kobj, "queue");
+>  	if (ret < 0)
+>  		goto out_put_queue_kobj;
 
+If the kobject_add() fails here, then we jump to the label out_put_queue_kobj,
+where we release/put disk->queue_kobj. That would decrement the kref of 
+disk->queue_kobj and possibly bring it to zero. 
+Next time, when we call add_disk() again without invoking kobject_init() 
+(because the initialization is now moved outside add_disk()), the refcount
+of disk->queue_kobj — which was previously released — would now go for a
+toss. Wouldn't that lead to use-after-free or inconsistent state?
+
+> @@ -986,5 +985,4 @@ void blk_unregister_queue(struct gendisk *disk)
+>  		elevator_set_none(q);
+>  
+>  	blk_debugfs_remove(disk);
+> -	kobject_put(&disk->queue_kobj);
+>  }
+
+I'm thinking a case where add_disk() fails after the queue is registered. 
+In that case, we call blk_unregister_queue() — which would ideally put()
+the disk->queue_kobj.
+But if we skip that put() in blk_unregister_queue() (and that's what we do
+above), and then later retry add_disk(), wouldn’t kobject_add() from 
+blk_register_queue() complain loudly — since we’re trying to add a kobject
+that was already added previously?
+
+Thanks,
+--Nilay
 
