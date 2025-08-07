@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E60B021B9C0;
-	Thu,  7 Aug 2025 10:19:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23AF221B9C0;
+	Thu,  7 Aug 2025 10:20:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754561998; cv=none; b=j4jQvlg5A7F+m9qdUDLMLUjgWjQrN7oBdUIAtMwP0/TD2NOTY0v55AX3htx0447etfpHUtCRBVnLXIcs4BKtzvhfWZM1qTEYqFPt5PrnVkt8BOCQK9HrjXRJpAJ2MLSnoTW82r6vgif9lMlBe4+YXiJrazdLmO+pKhBRf7TNsvY=
+	t=1754562001; cv=none; b=bndP9Quz2o5JBVAKkHfiHbaKl+8DPbBZcTfMXYoXlIDZFB5+KfLddf83+pQDIUIS0uiudLkQhEOI32L5QKg4TW9L2bCo5MMToow8G+TbebY2MLh5TUtmZV+fgw1Wn4FCGLYcEFqI3DZIt1dLjQmLIzdFJgWZr82EYyz1d8m/t+M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754561998; c=relaxed/simple;
-	bh=o57OTN8voB01Hp41OLxEq3ScLYkJIwrFSDKarCQu7Lw=;
+	s=arc-20240116; t=1754562001; c=relaxed/simple;
+	bh=g5fMARJkStIZRukybN28ZxPDEiWlSxFkOz8YjlHIsXo=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=esoy7lv4x8rtYcOtpuHpWqBKzBlVpwpY0GR0LGEfW96DdU3Hm0XqgStm+O0nVPs2fVpyUxbTMWXSyxCZwpob3Slimz5DaCXLvmlEnXPxBH7I9WfRCjRH/U9JMMmiVgkZQ4RaA5/B1lfL7KnRwy9ddssx9UKAUlEAgur7qL45lDw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RsWbMsVI; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=dwnVXT5oZha9wEuqeCDtfRA/6TDUFtaVxsPuHNRt8acxnyspQGsR7szXVawro63JHWqaVpee8SzTf3Ri1rkSVVpBdKpTJAf3VoIW38ECbUirr1TvPi+uFDSXP5owj+/mrvLq+dJCi8sAzTta70OppBYP55HSKDP27t2kJgj2kWc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KKnROJao; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RsWbMsVI"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B86E4C4CEEB;
-	Thu,  7 Aug 2025 10:19:54 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KKnROJao"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B87FC4CEED;
+	Thu,  7 Aug 2025 10:19:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754561997;
-	bh=o57OTN8voB01Hp41OLxEq3ScLYkJIwrFSDKarCQu7Lw=;
+	s=k20201202; t=1754562000;
+	bh=g5fMARJkStIZRukybN28ZxPDEiWlSxFkOz8YjlHIsXo=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=RsWbMsVIh3tfS4xxrmcLQqCRhOJMCOJ7AwoJ19vPjC0CiOMSQdHZQJtglDojxJ6yc
-	 PfFymuYnorwHwo7RnTSNXr7oln5zhRM8T/e7fEGx3o8CQzZYnVZ6nVMFq08k1stxxK
-	 EQtn4mTeHndEJyi+4/JxfyPygy+vVhY1XfXwSlsq6VAipRzYSF7kckePpq+IHL/rs/
-	 iYAXqh4QOUFKArF+h2bgt1gROWytDBXXTMAWcOqPoB1QzVZD5xZt7PYPA6GXkve8Fp
-	 +0Q2oxWJ0NsEG6WYlDexmpu+zDmPInMDjzJ8ExshSYJ6sMb1+jKscmtE4kxgTK/OWj
-	 BISAJb1Ko9VLA==
+	b=KKnROJaoYnTv0vN9keIPCURYfrwib0IuDIfzzzkAt8wCfBvvALzXxjPFjwWZhMhOb
+	 BdwTesh+o+tQp+8XvYNchveaHMmHdkQ5e4gCtYJ0SKqJ7Y5cwe+OLik/lPBje+9tJv
+	 1rDzZDxV4FuxjDfQlnnNUDW+V3YYploYNVAUjPtniHH39fHSjrDMvFeiMe+rAAUX17
+	 mvOi2/6o1dVNbDUuihsBusu1z8JtBoC5rVlfYw9Fz7t96QngdMqbJ8+akA44gzR6he
+	 D8bIeBbthjU3GcEy334jQqo1Qzf/4llTGxhZyoDxRXIbhEQPQAgddB5eUQS4kPKHEu
+	 CXbWXQPTJLQow==
 From: Andreas Hindborg <a.hindborg@kernel.org>
 To: Alice Ryhl <aliceryhl@google.com>
 Cc: Boqun Feng <boqun.feng@gmail.com>, Miguel Ojeda <ojeda@kernel.org>, Alex
@@ -35,77 +35,124 @@ Cc: Boqun Feng <boqun.feng@gmail.com>, Miguel Ojeda <ojeda@kernel.org>, Alex
  Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, Jens Axboe
  <axboe@kernel.dk>, linux-block@vger.kernel.org,
  rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 12/16] rnull: enable configuration via `configfs`
-In-Reply-To: <aHYjrSPttj0VQ7sg@google.com>
+Subject: Re: [PATCH v3 13/16] rust: block: add `GenDisk` private data support
+In-Reply-To: <aHYkkQpFOIcKuK-v@google.com>
 References: <20250711-rnull-up-v6-16-v3-0-3a262b4e2921@kernel.org>
- <20250711-rnull-up-v6-16-v3-12-3a262b4e2921@kernel.org>
- <N2Ih-wujcPdEPSMN_mzEqqmUTRQruN5KIEfIm7o2L7czU7sc2jBcv5vR5nHeHYg8nbWs8ViJcEvdS78Ccv2Euw==@protonmail.internalid>
- <aHYjrSPttj0VQ7sg@google.com>
-Date: Thu, 07 Aug 2025 11:50:37 +0200
-Message-ID: <87sei3795e.fsf@kernel.org>
+ <20250711-rnull-up-v6-16-v3-13-3a262b4e2921@kernel.org>
+ <-KgJHntx-n5a5umJjT0FGpcfzzMW3y5_vQAbYz3taMckXoUccILBz4xT9ZVzkRZS98UDGX4KXm7qdGK9713Iig==@protonmail.internalid>
+ <aHYkkQpFOIcKuK-v@google.com>
+Date: Thu, 07 Aug 2025 11:57:49 +0200
+Message-ID: <87pld778te.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 
 "Alice Ryhl" <aliceryhl@google.com> writes:
 
-> On Fri, Jul 11, 2025 at 01:43:13PM +0200, Andreas Hindborg wrote:
+> On Fri, Jul 11, 2025 at 01:43:14PM +0200, Andreas Hindborg wrote:
 
 ..
 
->> +#[vtable]
->> +impl configfs::AttributeOperations<0> for DeviceConfig {
->> +    type Data =3D DeviceConfig;
->> +
->> +    fn show(this: &DeviceConfig, page: &mut [u8; PAGE_SIZE]) -> Result<=
-usize> {
->> +        let mut writer =3D kernel::str::Formatter::new(page);
->> +
->> +        if this.data.lock().powered {
->> +            writer.write_fmt(fmt!("1\n"))?;
->> +        } else {
->> +            writer.write_fmt(fmt!("0\n"))?;
+>> @@ -97,7 +98,14 @@ pub fn build<T: Operations>(
+>>          self,
+>>          name: fmt::Arguments<'_>,
+>>          tagset: Arc<TagSet<T>>,
+>> +        queue_data: T::QueueData,
+>>      ) -> Result<GenDisk<T>> {
+>> +        let data = queue_data.into_foreign();
+>> +        let recover_data = ScopeGuard::new(|| {
+>> +            // SAFETY: T::QueueData was created by the call to `into_foreign()` above
+>> +            unsafe { T::QueueData::from_foreign(data) };
 >
-> I think these can just be
-> writer.write_str("1\n")?;
+> I think this is clearer to read as
+>
+> drop(unsafe { T::QueueData::from_foreign(data) });
 
-Cool =F0=9F=91=8D
+OK.
 
 >
->> +        }
+>> +        });
 >> +
->> +        Ok(writer.bytes_written())
->> +    }
+>>          // SAFETY: `bindings::queue_limits` contain only fields that are valid when zeroed.
+>>          let mut lim: bindings::queue_limits = unsafe { core::mem::zeroed() };
+>>
+>> @@ -112,7 +120,7 @@ pub fn build<T: Operations>(
+>>              bindings::__blk_mq_alloc_disk(
+>>                  tagset.raw_tag_set(),
+>>                  &mut lim,
+>> -                core::ptr::null_mut(),
+>> +                data.cast(),
+>>                  static_lock_class!().as_ptr(),
+>>              )
+>>          })?;
+>> @@ -166,8 +174,12 @@ pub fn build<T: Operations>(
+>>              },
+>>          )?;
+>>
+>> +        recover_data.dismiss();
 >> +
->> +    fn store(this: &DeviceConfig, page: &[u8]) -> Result {
->> +        let power_op: bool =3D core::str::from_utf8(page)?
->> +            .trim()
->> +            .parse::<u8>()
->> +            .map_err(|_| kernel::error::code::EINVAL)?
->> +            !=3D 0;
+>>          // INVARIANT: `gendisk` was initialized above.
+>>          // INVARIANT: `gendisk` was added to the VFS via `device_add_disk` above.
+>> +        // INVARIANT: `gendisk.queue.queue_data` is set to `data` in the call to
+>> +        // `__blk_mq_alloc_disk` above.
+>>          Ok(GenDisk {
+>>              _tagset: tagset,
+>>              gendisk,
+>> @@ -179,9 +191,10 @@ pub fn build<T: Operations>(
+>>  ///
+>>  /// # Invariants
+>>  ///
+>> -/// - `gendisk` must always point to an initialized and valid `struct gendisk`.
+>> -/// - `gendisk` was added to the VFS through a call to
+>> -///   `bindings::device_add_disk`.
+>> +///  - `gendisk` must always point to an initialized and valid `struct gendisk`.
+>> +///  - `gendisk` was added to the VFS through a call to
+>> +///    `bindings::device_add_disk`.
+>> +///  - `self.gendisk.queue.queuedata` is initialized by a call to `ForeignOwnable::into_foreign`.
+>>  pub struct GenDisk<T: Operations> {
+>>      _tagset: Arc<TagSet<T>>,
+>>      gendisk: *mut bindings::gendisk,
+>> @@ -193,9 +206,20 @@ unsafe impl<T: Operations + Send> Send for GenDisk<T> {}
+>>
+>>  impl<T: Operations> Drop for GenDisk<T> {
+>>      fn drop(&mut self) {
+>> +        // SAFETY: By type invariant of `Self`, `self.gendisk` points to a valid
+>> +        // and initialized instance of `struct gendisk`, and, `queuedata` was
+>> +        // initialized with the result of a call to
+>> +        // `ForeignOwnable::into_foreign`.
+>> +        let queue_data = unsafe { (*(*self.gendisk).queue).queuedata };
+>> +
+>>          // SAFETY: By type invariant, `self.gendisk` points to a valid and
+>>          // initialized instance of `struct gendisk`, and it was previously added
+>>          // to the VFS.
+>>          unsafe { bindings::del_gendisk(self.gendisk) };
+>> +
+>> +        // SAFETY: `queue.queuedata` was created by `GenDiskBuilder::build` with
+>> +        // a call to `ForeignOwnable::into_foreign` to create `queuedata`.
+>> +        // `ForeignOwnable::from_foreign` is only called here.
+>> +        let _queue_data = unsafe { T::QueueData::from_foreign(queue_data.cast()) };
 >
-> So if I write 27, that's treated as true, but if I write 300, that's an
-> EINVAL?
+> Ditto here.
+>
+> drop(unsafe { T::QueueData::from_foreign(queue_data.cast()) });
 
-Yea. Let's do this instead:
+Thanks, I agree.
 
-        let power_op_str =3D core::str::from_utf8(page)?.trim();
+>
+> Also, is this cast necessary as of
+> https://lore.kernel.org/all/20250711-rnull-up-v6-16-v3-13-3a262b4e2921@kernel.org/
+> ?
 
-        let power_op =3D match power_op_str {
-            "0" =3D> Ok(false),
-            "1" =3D> Ok(true),
-            _ =3D> Err(EINVAL),
-        }?;
-
-It is closer to `kstrtobool`.
+I think you have the wrong link, you probably refer to the recent
+`ForeignOwnable` change. And yes, the cast is redundant.
 
 
 Best regards,
 Andreas Hindborg
+
 
 
