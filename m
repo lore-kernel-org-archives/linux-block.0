@@ -1,112 +1,111 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D35E0233136;
-	Thu,  7 Aug 2025 08:42:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E60B021B9C0;
+	Thu,  7 Aug 2025 10:19:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754556134; cv=none; b=hmEccP75gIEeGoDMElptySTwsPlbmKqT3fmfs3tPhXSRvnMDGPPfNjJ47w1DbL4jYuGj1ArwmmoM3LnDSI0lumWnfFuC2S9IG6qv5U8Z6ZWiQ2fjcep21lIee85+v0AN5GRgwnftwxyzluW9ZdJoQChzQ3AEQg0ROjhEwAVYl7U=
+	t=1754561998; cv=none; b=j4jQvlg5A7F+m9qdUDLMLUjgWjQrN7oBdUIAtMwP0/TD2NOTY0v55AX3htx0447etfpHUtCRBVnLXIcs4BKtzvhfWZM1qTEYqFPt5PrnVkt8BOCQK9HrjXRJpAJ2MLSnoTW82r6vgif9lMlBe4+YXiJrazdLmO+pKhBRf7TNsvY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754556134; c=relaxed/simple;
-	bh=ceE4sp7dfGFQHp6xj4DqCN/j5IW3NjDsuR8JWwW4VS4=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=T7GE34gb1YcHq9lycWrgYWTqyCv6Y48fyWOHdrbgsbCq2xrWFqhUYcAS1gQV5H2geDW5wqIIBgVPqdUn7kilEGBDJURyUSxwWQgJ6hSRqQrvitLhVzlcpjmjafAnofB0eCp1kQ6ekFYqZMNA/t7+gO0fKDiO2TZp4cPtTfNkETc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4byLJ11Cj7zKHMnF;
-	Thu,  7 Aug 2025 16:42:09 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 40CC71A018D;
-	Thu,  7 Aug 2025 16:42:08 +0800 (CST)
-Received: from [10.174.179.143] (unknown [10.174.179.143])
-	by APP4 (Coremail) with SMTP id gCh0CgDnYhPaZpRofnN1Cw--.19038S3;
-	Thu, 07 Aug 2025 16:42:04 +0800 (CST)
-Subject: Re: [PATCH] block: fix kobject double initialization in add_disk
-To: Zheng Qixing <zhengqixing@huaweicloud.com>, axboe@kernel.dk
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- yi.zhang@huawei.com, yangerkun@huawei.com, houtao1@huawei.com,
- zhengqixing@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
-References: <20250807072056.2627592-1-zhengqixing@huaweicloud.com>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <6b63027c-cdbb-5878-28ea-ef58de37fe03@huaweicloud.com>
-Date: Thu, 7 Aug 2025 16:42:02 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.1
+	s=arc-20240116; t=1754561998; c=relaxed/simple;
+	bh=o57OTN8voB01Hp41OLxEq3ScLYkJIwrFSDKarCQu7Lw=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=esoy7lv4x8rtYcOtpuHpWqBKzBlVpwpY0GR0LGEfW96DdU3Hm0XqgStm+O0nVPs2fVpyUxbTMWXSyxCZwpob3Slimz5DaCXLvmlEnXPxBH7I9WfRCjRH/U9JMMmiVgkZQ4RaA5/B1lfL7KnRwy9ddssx9UKAUlEAgur7qL45lDw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RsWbMsVI; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RsWbMsVI"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B86E4C4CEEB;
+	Thu,  7 Aug 2025 10:19:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1754561997;
+	bh=o57OTN8voB01Hp41OLxEq3ScLYkJIwrFSDKarCQu7Lw=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=RsWbMsVIh3tfS4xxrmcLQqCRhOJMCOJ7AwoJ19vPjC0CiOMSQdHZQJtglDojxJ6yc
+	 PfFymuYnorwHwo7RnTSNXr7oln5zhRM8T/e7fEGx3o8CQzZYnVZ6nVMFq08k1stxxK
+	 EQtn4mTeHndEJyi+4/JxfyPygy+vVhY1XfXwSlsq6VAipRzYSF7kckePpq+IHL/rs/
+	 iYAXqh4QOUFKArF+h2bgt1gROWytDBXXTMAWcOqPoB1QzVZD5xZt7PYPA6GXkve8Fp
+	 +0Q2oxWJ0NsEG6WYlDexmpu+zDmPInMDjzJ8ExshSYJ6sMb1+jKscmtE4kxgTK/OWj
+	 BISAJb1Ko9VLA==
+From: Andreas Hindborg <a.hindborg@kernel.org>
+To: Alice Ryhl <aliceryhl@google.com>
+Cc: Boqun Feng <boqun.feng@gmail.com>, Miguel Ojeda <ojeda@kernel.org>, Alex
+ Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>, =?utf-8?Q?Bj?=
+ =?utf-8?Q?=C3=B6rn?= Roy
+ Baron <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>, Trevor
+ Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, Jens Axboe
+ <axboe@kernel.dk>, linux-block@vger.kernel.org,
+ rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 12/16] rnull: enable configuration via `configfs`
+In-Reply-To: <aHYjrSPttj0VQ7sg@google.com>
+References: <20250711-rnull-up-v6-16-v3-0-3a262b4e2921@kernel.org>
+ <20250711-rnull-up-v6-16-v3-12-3a262b4e2921@kernel.org>
+ <N2Ih-wujcPdEPSMN_mzEqqmUTRQruN5KIEfIm7o2L7czU7sc2jBcv5vR5nHeHYg8nbWs8ViJcEvdS78Ccv2Euw==@protonmail.internalid>
+ <aHYjrSPttj0VQ7sg@google.com>
+Date: Thu, 07 Aug 2025 11:50:37 +0200
+Message-ID: <87sei3795e.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20250807072056.2627592-1-zhengqixing@huaweicloud.com>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgDnYhPaZpRofnN1Cw--.19038S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7ZFy8trWxtF15ZF48Ary5urg_yoW8CF1fpw
-	4agwnrGryvgrWxCwsrC3W7GFy8Wws5Wrs7Ars3Kr1FvrWxAr1qgF4DKwsFvFyDJr4I9F4S
-	qF12va13tw15CrJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvK14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7I2V7IY0VAS07AlzVAY
-	IcxG8wCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbV
-	WUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF
-	67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42
-	IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF
-	0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxh
-	VjvjDU0xZFpf9x0JUd-B_UUUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-ÔÚ 2025/08/07 15:20, Zheng Qixing Ð´µÀ:
-> From: Zheng Qixing<zhengqixing@huawei.com>
-> 
-> Device-mapper can call add_disk() multiple times for the same gendisk
-> due to its two-phase creation process (dm create + dm load). This leads
-> to kobject double initialization errors when the underlying iSCSI devices
-> become temporarily unavailable and then reappear.
-> 
-> However, if the first add_disk() call fails and is retried, the queue_kobj
-> gets initialized twice, causing:
-> 
-> kobject: kobject (ffff88810c27bb90): tried to init an initialized object,
-> something is seriously wrong.
->   Call Trace:
->    <TASK>
->    dump_stack_lvl+0x5b/0x80
->    kobject_init.cold+0x43/0x51
->    blk_register_queue+0x46/0x280
->    add_disk_fwnode+0xb5/0x280
->    dm_setup_md_queue+0x194/0x1c0
->    table_load+0x297/0x2d0
->    ctl_ioctl+0x2a2/0x480
->    dm_ctl_ioctl+0xe/0x20
->    __x64_sys_ioctl+0xc7/0x110
->    do_syscall_64+0x72/0x390
->    entry_SYSCALL_64_after_hwframe+0x76/0x7e
-> 
-> Fix this by separating kobject initialization from sysfs registration:
->   - Initialize queue_kobj early during gendisk allocation
->   - add_disk() only adds the already-initialized kobject to sysfs
->   - del_gendisk() removes from sysfs but doesn't destroy the kobject
->   - Final cleanup happens when the disk is released
-> 
-> Fixes: 2bd85221a625 ("block: untangle request_queue refcounting from sysfs")
-> Reported-by: Li Lingfeng<lilingfeng3@huawei.com>
-> Closes:https://lore.kernel.org/all/83591d0b-2467-433c-bce0-5581298eb161@huawei.com/
-> Signed-off-by: Zheng Qixing<zhengqixing@huawei.com>
-> ---
->   block/blk-sysfs.c | 4 +---
->   block/blk.h       | 1 +
->   block/genhd.c     | 2 ++
->   3 files changed, 4 insertions(+), 3 deletions(-)
+"Alice Ryhl" <aliceryhl@google.com> writes:
 
-LGTM, the kobject_init() is called when queue is allocated before the
-fix tag.
+> On Fri, Jul 11, 2025 at 01:43:13PM +0200, Andreas Hindborg wrote:
 
-Reviewed-by: Yu Kuai <yukuai3@huawei.com>
+..
+
+>> +#[vtable]
+>> +impl configfs::AttributeOperations<0> for DeviceConfig {
+>> +    type Data =3D DeviceConfig;
+>> +
+>> +    fn show(this: &DeviceConfig, page: &mut [u8; PAGE_SIZE]) -> Result<=
+usize> {
+>> +        let mut writer =3D kernel::str::Formatter::new(page);
+>> +
+>> +        if this.data.lock().powered {
+>> +            writer.write_fmt(fmt!("1\n"))?;
+>> +        } else {
+>> +            writer.write_fmt(fmt!("0\n"))?;
+>
+> I think these can just be
+> writer.write_str("1\n")?;
+
+Cool =F0=9F=91=8D
+
+>
+>> +        }
+>> +
+>> +        Ok(writer.bytes_written())
+>> +    }
+>> +
+>> +    fn store(this: &DeviceConfig, page: &[u8]) -> Result {
+>> +        let power_op: bool =3D core::str::from_utf8(page)?
+>> +            .trim()
+>> +            .parse::<u8>()
+>> +            .map_err(|_| kernel::error::code::EINVAL)?
+>> +            !=3D 0;
+>
+> So if I write 27, that's treated as true, but if I write 300, that's an
+> EINVAL?
+
+Yea. Let's do this instead:
+
+        let power_op_str =3D core::str::from_utf8(page)?.trim();
+
+        let power_op =3D match power_op_str {
+            "0" =3D> Ok(false),
+            "1" =3D> Ok(true),
+            _ =3D> Err(EINVAL),
+        }?;
+
+It is closer to `kstrtobool`.
+
+
+Best regards,
+Andreas Hindborg
+
 
