@@ -1,166 +1,112 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EE742222D6
-	for <linux-block@vger.kernel.org>; Thu,  7 Aug 2025 08:23:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D35E0233136;
+	Thu,  7 Aug 2025 08:42:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754554993; cv=none; b=UPqPE3EEpLXA2zhpPR+DD8BSpq6nBQnqa3RMS5XvDpFsLKvbHXT72T42TkYYz3l+1SEw4UAF6knIgliQdv8B27PKInGmFCUKB0l2ezipQknEEGfB1YYlcY7sbwSp2wES+vL6XH9S9lOVBk0V2Mfuii3E538DS84uGiBUTy+aVZM=
+	t=1754556134; cv=none; b=hmEccP75gIEeGoDMElptySTwsPlbmKqT3fmfs3tPhXSRvnMDGPPfNjJ47w1DbL4jYuGj1ArwmmoM3LnDSI0lumWnfFuC2S9IG6qv5U8Z6ZWiQ2fjcep21lIee85+v0AN5GRgwnftwxyzluW9ZdJoQChzQ3AEQg0ROjhEwAVYl7U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754554993; c=relaxed/simple;
-	bh=QEqg73s6sFYnqMqGBE1SH2IlzCEUFgrHzIxne7HMXSw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=engwwRHCr15JH6Pc+K3kG0XPBwGvyUrHTtbCU7LKVvlR0gU0PE307FNsTYc719pUUyxHCtzCs5U7vrqx/IhWjnQe4aMp/ph7TXqL5qNtJMoX/gGP2r0kOyuTGli+yeZ5ZjflMf+ufwL7GFc3xUOe8IUs4FVTZf5Od44QTr9TOJA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=SNy/cDep; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=ChiITLvC; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=SNy/cDep; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=ChiITLvC; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="SNy/cDep";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="ChiITLvC";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="SNy/cDep";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="ChiITLvC"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id B46EB1F7F4;
-	Thu,  7 Aug 2025 08:23:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1754554989; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QGEAN017bliOyl2SdA5tKF8ug9wKFUQ4OjKLerQ0lic=;
-	b=SNy/cDepnjs8OmfRS4x9JUz+KxkAyY81771ANu+iQC/tK8fx/jaJkpneLBgUvqyxxyl/wL
-	gWMlUGAqvYFv8RuyoUUFnpq3vZfA3BNTna8PZ0yXZjDf9UICBSLXWN859cKuvQilrlWsEW
-	6dKaUe/LAKoJyui2+p544rqciT/WuHA=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1754554989;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QGEAN017bliOyl2SdA5tKF8ug9wKFUQ4OjKLerQ0lic=;
-	b=ChiITLvCoN9YdHUeqa6ZiodBVXelh6pGawj/WmENOPW4R/UMevizIcnwVLOx1QYy9p76uy
-	PQf6d/fi/WeYjDBg==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1754554989; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QGEAN017bliOyl2SdA5tKF8ug9wKFUQ4OjKLerQ0lic=;
-	b=SNy/cDepnjs8OmfRS4x9JUz+KxkAyY81771ANu+iQC/tK8fx/jaJkpneLBgUvqyxxyl/wL
-	gWMlUGAqvYFv8RuyoUUFnpq3vZfA3BNTna8PZ0yXZjDf9UICBSLXWN859cKuvQilrlWsEW
-	6dKaUe/LAKoJyui2+p544rqciT/WuHA=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1754554989;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QGEAN017bliOyl2SdA5tKF8ug9wKFUQ4OjKLerQ0lic=;
-	b=ChiITLvCoN9YdHUeqa6ZiodBVXelh6pGawj/WmENOPW4R/UMevizIcnwVLOx1QYy9p76uy
-	PQf6d/fi/WeYjDBg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 4B586136DC;
-	Thu,  7 Aug 2025 08:23:09 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id GXPBEG1ilGgBKAAAD6G6ig
-	(envelope-from <hare@suse.de>); Thu, 07 Aug 2025 08:23:09 +0000
-Message-ID: <3b2765ff-4a7d-4bf7-b390-b392b695c675@suse.de>
-Date: Thu, 7 Aug 2025 10:23:08 +0200
+	s=arc-20240116; t=1754556134; c=relaxed/simple;
+	bh=ceE4sp7dfGFQHp6xj4DqCN/j5IW3NjDsuR8JWwW4VS4=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=T7GE34gb1YcHq9lycWrgYWTqyCv6Y48fyWOHdrbgsbCq2xrWFqhUYcAS1gQV5H2geDW5wqIIBgVPqdUn7kilEGBDJURyUSxwWQgJ6hSRqQrvitLhVzlcpjmjafAnofB0eCp1kQ6ekFYqZMNA/t7+gO0fKDiO2TZp4cPtTfNkETc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.93.142])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4byLJ11Cj7zKHMnF;
+	Thu,  7 Aug 2025 16:42:09 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 40CC71A018D;
+	Thu,  7 Aug 2025 16:42:08 +0800 (CST)
+Received: from [10.174.179.143] (unknown [10.174.179.143])
+	by APP4 (Coremail) with SMTP id gCh0CgDnYhPaZpRofnN1Cw--.19038S3;
+	Thu, 07 Aug 2025 16:42:04 +0800 (CST)
+Subject: Re: [PATCH] block: fix kobject double initialization in add_disk
+To: Zheng Qixing <zhengqixing@huaweicloud.com>, axboe@kernel.dk
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ yi.zhang@huawei.com, yangerkun@huawei.com, houtao1@huawei.com,
+ zhengqixing@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
+References: <20250807072056.2627592-1-zhengqixing@huaweicloud.com>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <6b63027c-cdbb-5878-28ea-ef58de37fe03@huaweicloud.com>
+Date: Thu, 7 Aug 2025 16:42:02 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] nvmet: exit debugfs after discovery subsystem exits
-To: Mohamed Khalfella <mkhalfella@purestorage.com>,
- Yi Zhang <yi.zhang@redhat.com>, Christoph Hellwig <hch@lst.de>,
- Sagi Grimberg <sagi@grimberg.me>, Chaitanya Kulkarni <kch@nvidia.com>,
- Keith Busch <kbusch@kernel.org>
-Cc: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
- Hannes Reinecke <hare@kernel.org>, Daniel Wagner <dwagner@suse.de>,
- Maurizio Lombardi <mlombard@redhat.com>, Jens Axboe <axboe@kernel.dk>,
- Randy Jennings <randyj@purestorage.com>, linux-nvme@lists.infradead.org,
- linux-block <linux-block@vger.kernel.org>, linux-kernel@vger.kernel.org
-References: <20250807053507.2794335-1-mkhalfella@purestorage.com>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20250807053507.2794335-1-mkhalfella@purestorage.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+In-Reply-To: <20250807072056.2627592-1-zhengqixing@huaweicloud.com>
+Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Level: 
-X-Spamd-Result: default: False [-4.30 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-0.999];
-	MIME_GOOD(-0.10)[text/plain];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,suse.de:mid,imap1.dmz-prg2.suse.org:helo,purestorage.com:email]
-X-Spam-Flag: NO
-X-Spam-Score: -4.30
+X-CM-TRANSID:gCh0CgDnYhPaZpRofnN1Cw--.19038S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7ZFy8trWxtF15ZF48Ary5urg_yoW8CF1fpw
+	4agwnrGryvgrWxCwsrC3W7GFy8Wws5Wrs7Ars3Kr1FvrWxAr1qgF4DKwsFvFyDJr4I9F4S
+	qF12va13tw15CrJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvK14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7I2V7IY0VAS07AlzVAY
+	IcxG8wCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbV
+	WUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF
+	67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42
+	IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF
+	0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxh
+	VjvjDU0xZFpf9x0JUd-B_UUUUU=
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On 8/7/25 07:35, Mohamed Khalfella wrote:
-> Commit 528589947c180 ("nvmet: initialize discovery subsys after debugfs
-> is initialized") changed nvmet_init() to initialize nvme discovery after
-> "nvmet" debugfs directory is initialized. The change broke nvmet_exit()
-> because discovery subsystem now depends on debugfs. Debugfs should be
-> destroyed after discovery subsystem. Fix nvmet_exit() to do that.
+ÔÚ 2025/08/07 15:20, Zheng Qixing Ð´µÀ:
+> From: Zheng Qixing<zhengqixing@huawei.com>
 > 
-> Reported-by: Yi Zhang <yi.zhang@redhat.com>
-> Closes: https://lore.kernel.org/all/CAHj4cs96AfFQpyDKF_MdfJsnOEo=2V7dQgqjFv+k3t7H-=yGhA@mail.gmail.com/
-> Fixes: 528589947c180 ("nvmet: initialize discovery subsys after debugfs is initialized")
-> Signed-off-by: Mohamed Khalfella <mkhalfella@purestorage.com>
+> Device-mapper can call add_disk() multiple times for the same gendisk
+> due to its two-phase creation process (dm create + dm load). This leads
+> to kobject double initialization errors when the underlying iSCSI devices
+> become temporarily unavailable and then reappear.
+> 
+> However, if the first add_disk() call fails and is retried, the queue_kobj
+> gets initialized twice, causing:
+> 
+> kobject: kobject (ffff88810c27bb90): tried to init an initialized object,
+> something is seriously wrong.
+>   Call Trace:
+>    <TASK>
+>    dump_stack_lvl+0x5b/0x80
+>    kobject_init.cold+0x43/0x51
+>    blk_register_queue+0x46/0x280
+>    add_disk_fwnode+0xb5/0x280
+>    dm_setup_md_queue+0x194/0x1c0
+>    table_load+0x297/0x2d0
+>    ctl_ioctl+0x2a2/0x480
+>    dm_ctl_ioctl+0xe/0x20
+>    __x64_sys_ioctl+0xc7/0x110
+>    do_syscall_64+0x72/0x390
+>    entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> 
+> Fix this by separating kobject initialization from sysfs registration:
+>   - Initialize queue_kobj early during gendisk allocation
+>   - add_disk() only adds the already-initialized kobject to sysfs
+>   - del_gendisk() removes from sysfs but doesn't destroy the kobject
+>   - Final cleanup happens when the disk is released
+> 
+> Fixes: 2bd85221a625 ("block: untangle request_queue refcounting from sysfs")
+> Reported-by: Li Lingfeng<lilingfeng3@huawei.com>
+> Closes:https://lore.kernel.org/all/83591d0b-2467-433c-bce0-5581298eb161@huawei.com/
+> Signed-off-by: Zheng Qixing<zhengqixing@huawei.com>
 > ---
->   drivers/nvme/target/core.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/nvme/target/core.c b/drivers/nvme/target/core.c
-> index 83f3d2f8ef2d0..0dd7bd99afa32 100644
-> --- a/drivers/nvme/target/core.c
-> +++ b/drivers/nvme/target/core.c
-> @@ -1992,8 +1992,8 @@ static int __init nvmet_init(void)
->   static void __exit nvmet_exit(void)
->   {
->   	nvmet_exit_configfs();
-> -	nvmet_exit_debugfs();
->   	nvmet_exit_discovery();
-> +	nvmet_exit_debugfs();
->   	ida_destroy(&cntlid_ida);
->   	destroy_workqueue(nvmet_wq);
->   	destroy_workqueue(buffered_io_wq);
+>   block/blk-sysfs.c | 4 +---
+>   block/blk.h       | 1 +
+>   block/genhd.c     | 2 ++
+>   3 files changed, 4 insertions(+), 3 deletions(-)
 
-Hehe. I knew this would've been the case once I've seen the latest
-blktest failure. Thanks for fixing it.
+LGTM, the kobject_init() is called when queue is allocated before the
+fix tag.
 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+Reviewed-by: Yu Kuai <yukuai3@huawei.com>
 
-Cheers,
-
-Hannes
--- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 NÃ¼rnberg
-HRB 36809 (AG NÃ¼rnberg), GF: I. Totev, A. McDonald, W. Knoblich
