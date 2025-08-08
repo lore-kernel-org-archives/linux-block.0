@@ -1,136 +1,96 @@
-Received: from mout-p-101.mailbox.org (mout-p-101.mailbox.org [80.241.56.151])
+Received: from smtp1.iitb.ac.in (smtpd9.iitb.ac.in [103.21.126.64])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D9EA277C80;
-	Fri,  8 Aug 2025 12:12:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4D0C277CAF
+	for <linux-block@vger.kernel.org>; Fri,  8 Aug 2025 12:28:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.21.126.64
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754655161; cv=none; b=c0URBBckYE/BdrzNv00OJ0C++1wcqTMTPzrrxMPjWC0CJ0mEKAxENA51Di3wX3+xvaTkmSGWNou5mHnFvoYB3iNCX9or7YDSHAZqVS6JV3InZeLzzn2QLnuSwZ/PwDCGMDeUqRNnFLhn4MRX1/BADOK0d9fIvC3sNEENZ+/hSaI=
+	t=1754656135; cv=none; b=RXNkRMaRb+mtiwfb8XBPf9xfhkVBWnL40gFo5d6kV5RN0fCrG3hK6qnuAowN4XBZzEVUXkClu1+I1wmCx2Hdyj9CS3o1Uc/xQz9xf3In8D4Fia+e52PIFBQtbctr8ts/njRCfx65HfxennIvxt/insTR1GiSXlsoe85cSdC1VZM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754655161; c=relaxed/simple;
-	bh=fFzN46s8fI+jPXzBN2wRyau0XR7zJopdfaevTTLhQwQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=W/CkqG+eTUOonpZSgV+wbyLW/AUPY/rgGYZDGx+AqwXyCmA0p2NaQ3uLRKtLnkXC9hbQB87rsbkvOBiQ6nm237TnThtjfK+T/k9yDkeaf/Pqkh43j/M2Mhc1bQSupFcQ6HqUl5HpfiVpqLEsvszU3/TT5jyRNHeUYjHNTlq/wj0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pankajraghav.com; spf=pass smtp.mailfrom=pankajraghav.com; dkim=pass (2048-bit key) header.d=pankajraghav.com header.i=@pankajraghav.com header.b=ZaGJdeS8; arc=none smtp.client-ip=80.241.56.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pankajraghav.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pankajraghav.com
+	s=arc-20240116; t=1754656135; c=relaxed/simple;
+	bh=AwqI2ate9xOTmJrt9TYMHJbOytgp965hWnkzbeK8RHw=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=fKeOGE1SFfb+jm3iXRQEelVcC+yMYSgAlBdOzV9FRomLZqMlyGFOtU1k0QAN45NhUXgj7hB4e6QwZg97zxfwCXPDmq2Yhz84bdKckPip7TnfORb6uNfIhV+8/KsMmz1km5fd251Q5o8HxM4cnc12JTArTH3m8Oji7pFnQgvhQa8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ee.iitb.ac.in; spf=pass smtp.mailfrom=ee.iitb.ac.in; dkim=pass (1024-bit key) header.d=iitb.ac.in header.i=@iitb.ac.in header.b=KgoEk+cS; arc=none smtp.client-ip=103.21.126.64
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ee.iitb.ac.in
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ee.iitb.ac.in
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=pankajraghav.com header.i=@pankajraghav.com header.b="ZaGJdeS8"
-Received: from smtp1.mailbox.org (smtp1.mailbox.org [IPv6:2001:67c:2050:b231:465::1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-101.mailbox.org (Postfix) with ESMTPS id 4bz2wN3TVnz9tLL;
-	Fri,  8 Aug 2025 14:12:36 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pankajraghav.com;
-	s=MBO0001; t=1754655156;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=hl5pR6KEXqqmRKm0XQhFRqtMBlaQMUsVvgjCapFINjk=;
-	b=ZaGJdeS88MWI5NXG3Fy0kv05JzmFrCMryJvIIsk5SlxRa/OALrQpqUbO7OG/n/G7Yr4Sda
-	dC51E4KZ2b2T2b4idAP7ty61iehCdDdUhNOLDSNhW1AF2IVMbXYgYSWs+s4UbOZupjCiQQ
-	CrMfrkJTIZ6UhFu+zYI7Spvlm4qnjI34BohLV+Vnri7LWcR1fXSnQ3t/Qf/irCwFmBkh7d
-	hbvaESdPDVdP+WiXUHeLXGApaEIyCK7tRLfTRQ4WfL3gZ9UmLIjst16rr58es4oLMunmUK
-	J0tWLUSDz85HNspTwwtHPZN/P5PNBzW3xm7K3eSDeHBU2sWkWZ+zVs3Re+/L3Q==
-Authentication-Results: outgoing_mbo_mout;
-	dkim=none;
-	spf=pass (outgoing_mbo_mout: domain of kernel@pankajraghav.com designates 2001:67c:2050:b231:465::1 as permitted sender) smtp.mailfrom=kernel@pankajraghav.com
-From: "Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>
-To: Suren Baghdasaryan <surenb@google.com>,
-	Ryan Roberts <ryan.roberts@arm.com>,
-	Baolin Wang <baolin.wang@linux.alibaba.com>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	Zi Yan <ziy@nvidia.com>,
-	Mike Rapoport <rppt@kernel.org>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Michal Hocko <mhocko@suse.com>,
-	David Hildenbrand <david@redhat.com>,
-	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Nico Pache <npache@redhat.com>,
-	Dev Jain <dev.jain@arm.com>,
-	"Liam R . Howlett" <Liam.Howlett@oracle.com>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: linux-kernel@vger.kernel.org,
-	willy@infradead.org,
-	linux-mm@kvack.org,
-	Ritesh Harjani <ritesh.list@gmail.com>,
-	linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	"Darrick J . Wong" <djwong@kernel.org>,
-	mcgrof@kernel.org,
-	gost.dev@samsung.com,
-	kernel@pankajraghav.com,
-	hch@lst.de,
-	Pankaj Raghav <p.raghav@samsung.com>
-Subject: [PATCH v2 5/5] block: use largest_zero_folio in __blkdev_issue_zero_pages()
-Date: Fri,  8 Aug 2025 14:11:41 +0200
-Message-ID: <20250808121141.624469-6-kernel@pankajraghav.com>
-In-Reply-To: <20250808121141.624469-1-kernel@pankajraghav.com>
-References: <20250808121141.624469-1-kernel@pankajraghav.com>
+	dkim=pass (1024-bit key) header.d=iitb.ac.in header.i=@iitb.ac.in header.b="KgoEk+cS"
+Received: from ldns2.iitb.ac.in (ldns2.iitb.ac.in [10.200.12.2])
+	by smtp1.iitb.ac.in (Postfix) with SMTP id BFA8B1018FD1
+	for <linux-block@vger.kernel.org>; Fri,  8 Aug 2025 17:58:45 +0530 (IST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 smtp1.iitb.ac.in BFA8B1018FD1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=iitb.ac.in; s=mail;
+	t=1754656125; bh=AwqI2ate9xOTmJrt9TYMHJbOytgp965hWnkzbeK8RHw=;
+	h=Date:From:To:Cc:Subject:From;
+	b=KgoEk+cS8U5V1PbpDznWHyvWLRvIDqniNrVf/GkDX4BYaJUmbVM9Xd2bZKbGau2xf
+	 tZfw6hKvV+q7jkJucTLH8jDlEH+6SQxAPLkDJTmaDUGSaaLBTUdLeO1JbtigAeyX26
+	 XphgiwjyfH/uwySyTCcOaZqCCoKlEoce2mrXT2yg=
+Received: (qmail 26809 invoked by uid 510); 8 Aug 2025 17:58:45 +0530
+X-Qmail-Scanner-Diagnostics: from 10.200.1.25 by ldns2 (envelope-from <akhilesh@ee.iitb.ac.in>, uid 501) with qmail-scanner-2.11
+ spamassassin: 3.4.1. mhr: 1.0. {clamdscan: 0.100.0/26337} 
+ Clear:RC:1(10.200.1.25):SA:0(0.0/7.0):. Processed in 4.326992 secs; 08 Aug 2025 17:58:45 +0530
+X-Spam-Level: 
+X-Spam-Pyzor: Reported 0 times.
+X-Envelope-From: akhilesh@ee.iitb.ac.in
+X-Qmail-Scanner-Mime-Attachments: |
+X-Qmail-Scanner-Zip-Files: |
+Received: from unknown (HELO ldns2.iitb.ac.in) (10.200.1.25)
+  by ldns2.iitb.ac.in with SMTP; 8 Aug 2025 17:58:41 +0530
+Received: from bhairav.ee.iitb.ac.in (bhairav.ee.iitb.ac.in [10.107.1.1])
+	by ldns2.iitb.ac.in (Postfix) with ESMTP id 93882341550;
+	Fri,  8 Aug 2025 17:58:40 +0530 (IST)
+Received: from bhairav-test.ee.iitb.ac.in (bhairav.ee.iitb.ac.in [10.107.1.1])
+	(Authenticated sender: akhilesh)
+	by bhairav.ee.iitb.ac.in (Postfix) with ESMTPSA id 3B5301E814CA;
+	Fri,  8 Aug 2025 17:58:40 +0530 (IST)
+Date: Fri, 8 Aug 2025 17:58:34 +0530
+From: Akhilesh Patil <akhilesh@ee.iitb.ac.in>
+To: axboe@kernel.dk, hare@suse.de, hch@infradead.org,
+	john.g.garry@oracle.com, yukuai3@huawei.com
+Cc: yi.zhang@redhat.com, calvin@wbinvd.org, david@fromorbit.com,
+	yukuai1@huaweicloud.com, yi.zhang@huawei.com, yangerkun@huawei.com,
+	johnny.chenyi@huawei.com, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, akhileshpatilvnit@gmail.com,
+	skhan@linuxfoundation.org
+Subject: [PATCH] block: genhd: use max() to improve inflight IO counting code
+Message-ID: <aJXtctgVs6Md6vb1@bhairav-test.ee.iitb.ac.in>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 4bz2wN3TVnz9tLL
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-From: Pankaj Raghav <p.raghav@samsung.com>
+Use max() macro in bdev_count_inflight_rw() while populating buffer of
+read/write inflight block IO count. Use standard macro to
+simplify the code without impacting functionality.
 
-Use largest_zero_folio() in __blkdev_issue_zero_pages().
-On systems with CONFIG_PERSISTENT_HUGE_ZERO_FOLIO enabled, we will end up
-sending larger bvecs instead of multiple small ones.
-
-Noticed a 4% increase in performance on a commercial NVMe SSD which does
-not support OP_WRITE_ZEROES. The device's MDTS was 128K. The performance
-gains might be bigger if the device supports bigger MDTS.
-
-Acked-by: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
-Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
+Fixes: c007062188d8 ("block: fix false warning in bdev_count_inflight_rw()")
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/r/202506272336.CvAqaAxB-lkp@intel.com/
+Signed-off-by: Akhilesh Patil <akhilesh@ee.iitb.ac.in>
 ---
- block/blk-lib.c | 15 ++++++++-------
- 1 file changed, 8 insertions(+), 7 deletions(-)
+ block/genhd.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/block/blk-lib.c b/block/blk-lib.c
-index 4c9f20a689f7..3030a772d3aa 100644
---- a/block/blk-lib.c
-+++ b/block/blk-lib.c
-@@ -196,6 +196,8 @@ static void __blkdev_issue_zero_pages(struct block_device *bdev,
- 		sector_t sector, sector_t nr_sects, gfp_t gfp_mask,
- 		struct bio **biop, unsigned int flags)
- {
-+	struct folio *zero_folio = largest_zero_folio();
-+
- 	while (nr_sects) {
- 		unsigned int nr_vecs = __blkdev_sectors_to_bio_pages(nr_sects);
- 		struct bio *bio;
-@@ -208,15 +210,14 @@ static void __blkdev_issue_zero_pages(struct block_device *bdev,
- 			break;
+diff --git a/block/genhd.c b/block/genhd.c
+index c26733f6324b..af74cb80eadb 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -147,8 +147,8 @@ static void bdev_count_inflight_rw(struct block_device *part,
+ 	 * traversed and complete on a CPU that has not yet been traversed,
+ 	 * causing the inflight number to be negative.
+ 	 */
+-	inflight[READ] = read > 0 ? read : 0;
+-	inflight[WRITE] = write > 0 ? write : 0;
++	inflight[READ] = max(read, 0);
++	inflight[WRITE] = max(write, 0);
+ }
  
- 		do {
--			unsigned int len, added;
-+			unsigned int len;
- 
--			len = min_t(sector_t,
--				PAGE_SIZE, nr_sects << SECTOR_SHIFT);
--			added = bio_add_page(bio, ZERO_PAGE(0), len, 0);
--			if (added < len)
-+			len = min_t(sector_t, folio_size(zero_folio),
-+				    nr_sects << SECTOR_SHIFT);
-+			if (!bio_add_folio(bio, zero_folio, len, 0))
- 				break;
--			nr_sects -= added >> SECTOR_SHIFT;
--			sector += added >> SECTOR_SHIFT;
-+			nr_sects -= len >> SECTOR_SHIFT;
-+			sector += len >> SECTOR_SHIFT;
- 		} while (nr_sects);
- 
- 		*biop = bio_chain_and_submit(*biop, bio);
+ /**
 -- 
-2.49.0
+2.34.1
 
