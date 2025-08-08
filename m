@@ -1,245 +1,174 @@
-Received: from mail-il1-f174.google.com (mail-il1-f174.google.com [209.85.166.174])
+Received: from mail-yb1-f225.google.com (mail-yb1-f225.google.com [209.85.219.225])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFCE91DF97F
-	for <linux-block@vger.kernel.org>; Fri,  8 Aug 2025 17:20:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 076061DA3D
+	for <linux-block@vger.kernel.org>; Fri,  8 Aug 2025 18:01:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.225
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754673638; cv=none; b=lK7dYNQ/Z0TiUngJfUkmdoV2I5YmUU30vi7bGOO1pb2SIY1h2+xhIJQ78zjQ/43OONpuked33u/6m/1iy9/iUHDDMsIMTB2mXEs9qvqTYYdCAkNM6w36DEzvmEAYybWGv7DIHgLKpxkmbtYWg5tMr4Gpc8NOEuEtaoLhT6XKobQ=
+	t=1754676097; cv=none; b=MitxBcRT8UpHMfRDKLHwEzfo+wF2RtdSM7Yd1df+NsztwroS2wn3mXuMzurX2mFyjxRXwAks9ltcITxF8IO0T2Rkh/+hF+3E1x9PaGrevG3+zdUBuDJvkzci040+T1enoIGdaTrY05WMKfs2soNl3kQBb47rmf4grut6zOP3/zo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754673638; c=relaxed/simple;
-	bh=AyEYnFn6MXnJyfR42LoNmclURq4hzJqQu7YpzXlgmfE=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=nY0aUE7yAz0G3vOZ9Sg3AJ5EqDKIkNr2+bXfIrgDQI3jEIuOFTsmyxX1A7OlqOUdwDX5qvPXNrHUSSOvS4aZmndDOPmsjbILcuvqUK9FSPmR7zHDrgrC3jCqhBfx2Xhgf98hXgpht6hTiWPJIlCRaUBwrsgMqwc9IgX3DzELERw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=hV+b7azC; arc=none smtp.client-ip=209.85.166.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1754676097; c=relaxed/simple;
+	bh=SsyPPJMmvaysp22qpQse6GPIGFPyPofA986E/cuuBEg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=E0hDPTDJ0aGdj5aFmCBAx3HeoPOW2kgSrSjYsdg0w57k0Y5N7+L4JfBlzqz7EqaL2PKycvj8rGw6K6ismTkSIzb8KI+bpA+7/7Y7fRXG0HwqpiGsnyU9zeGLiWcdxNKXCY9fyR9J8lAVh93n48w949H9MnStJcacx2rTAoP/W4k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=MbVenKpN; arc=none smtp.client-ip=209.85.219.225
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="hV+b7azC"
-Received: by mail-il1-f174.google.com with SMTP id e9e14a558f8ab-3e406ca2d22so11560755ab.1
-        for <linux-block@vger.kernel.org>; Fri, 08 Aug 2025 10:20:35 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="MbVenKpN"
+Received: by mail-yb1-f225.google.com with SMTP id 3f1490d57ef6-e8e11af0f54so1820064276.2
+        for <linux-block@vger.kernel.org>; Fri, 08 Aug 2025 11:01:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1754673635; x=1755278435; darn=vger.kernel.org;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XjWEHV+aTRzk3h1duw/mzD0viGRoiEC3DH+jZmSSz1s=;
-        b=hV+b7azCeeCZ3Xj3rOzpuAgWyIhK0UbTVeiZ5T2FyJoUX9RCR7PR4xo0z8a+mXBoXU
-         DnFeUdTSsfqfYSD4MSFcCs9UaVO+ieudgrWA0I/r7iwBhpGi1ufcZJoJy9B0MuxgLD/A
-         p9Nq6uyDEaGpISx9TjLJJkSQmxR923qPIaAFLMSsdSVcjn8ilN5Bl0NoaLeHsmck+BeU
-         luEFLMC12/5RFuliQrcXQkKIk8Ol/s8asebITXtKc6XJhvBRh03PB9sCtaJioNczpoVz
-         s063V6iGCIx4HcAuEM3buFJPMT2wksjeZy34O6EMWIlbLkx937EDqEw3ZRiXOpmUd+Ur
-         tLag==
+        d=purestorage.com; s=google2022; t=1754676094; x=1755280894; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=mTXWcQ/ORdy560KGcCDZgpcNl80jMFH9ifZEN0ULtpw=;
+        b=MbVenKpNubDWXeepj6CHnI4ozTJXBx3Cc82B92KS1DG6XpBKqyKAJwZE2/6UDRNOAl
+         d5liW3ELvqByDt+j7v3t8jho3OkFnL3Llg2u2hl3Wx2jDLbbXFDoeUsm1eqzrQClUm2G
+         5d53N2+j3WijY9m/68gKEWSxmQ5L3JihaLJmXgFhJqcn9Z12QAtQPuAN/HXLSBvrnD5v
+         KaIeKgClt/PoscLgHTcNp8Z1KoFrj6sXM0mfX5AYx+TVpKuLAbN/jXfIU6dJ3wfL30cT
+         8X/wzzEpg1IEgOOuttkM0aePHp7LJy77dfPARKXU+53zmuN2Buk86JL+5YE/kUVdpesE
+         836A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754673635; x=1755278435;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=XjWEHV+aTRzk3h1duw/mzD0viGRoiEC3DH+jZmSSz1s=;
-        b=e8PuOfX9xwTI+ahnlRG1VQUj6924BjRPSI2ex2SZVSO14A2mc0X0Cy/ivteSNCXjQ+
-         ig7oGRYBbid1hvjiqR69H1PoZnT/NIHBlflv5Pzk9FiBRto84/pitrSjJnX2N5XN1Bwq
-         jJ/Y0tL/sAAHwrwHv+des8bcYr0/izkWRE3kJQSYFvNFD0l635EqjqF9cm6/4vlhoOZI
-         Nj/IjdSOkIDdAkE7ob2ADYpQo06g8w4m3FKwqDY1NEVTLfxtlSPHWNV/mHpNFZcJxCqT
-         4K6xzGHWgUY26BFJ8HcJVnrwHvd5MLsd+2wIg962TBbWpC/7ydSSLl9xz3hqfECAXtvT
-         hFKA==
-X-Gm-Message-State: AOJu0YzhNVti096/IDcmHRKPwDn1OLU975oNBus7HJfgwm/guzlK+JQT
-	OP2/y3zsmKtzJOcodl/0fcuP4UBOgrGFZbZzKMpoOv+ADPxk5+2o9KiEk0JHQsj6CRfhwgfZCQS
-	up4ca
-X-Gm-Gg: ASbGncvccwbNNBJnuwsaM+Q8bgYMLtoHLgviDNaWjGTVmP6odXVXc+DdrJVloL1SyMO
-	OlmhqMFv4dfLf/G9KAOsdc258weNvuiDgeWyTVqFCRmW4WXvP1ZdHq01olGGlaTQDRH5N26vLQr
-	od9kwQfTgdqLcQaDHIXuU9ol8f3cbrRPyn/d9H4baQ/Jvs6xElNNO4tXWeuIaaloxhzntWi3W+k
-	I10RR0L+vqfVmnj19uTkN9evrjD+KfY+BCtux7lXy+YeUv1hFTF4OXd/TpW91L+5H6XV7vYkYuh
-	Xnt6hmVjbCOr9Bd7mW+Bz+MNXauH+3DjZMzkwxEay9vT/7n/xE75dP6DzT/tUztjX+WkOWYlpZp
-	TWDboUE0LheU6rGaH/8vI/izKOsYXtg==
-X-Google-Smtp-Source: AGHT+IHPLUXjGDjqL5oaUIQGavB62UuZm1CFPYVAm1JQk/sXpHwTX7etknT+UEUGjLaC0IBo63ONSA==
-X-Received: by 2002:a05:6e02:1fc4:b0:3e5:2ad8:32d with SMTP id e9e14a558f8ab-3e5330aae2cmr67049165ab.8.1754673634695;
-        Fri, 08 Aug 2025 10:20:34 -0700 (PDT)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3e533bfe753sm9325825ab.17.2025.08.08.10.20.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 08 Aug 2025 10:20:33 -0700 (PDT)
-Message-ID: <3c66a9e3-ed41-4f9a-bf19-e6e5a6a38693@kernel.dk>
-Date: Fri, 8 Aug 2025 11:20:33 -0600
+        d=1e100.net; s=20230601; t=1754676094; x=1755280894;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mTXWcQ/ORdy560KGcCDZgpcNl80jMFH9ifZEN0ULtpw=;
+        b=D+24wO+U3L7Ls94w7SBTN/zKJpSlsPwlvONGdD08Z0n8YPCP4Iz2WY/WWMRXv1We5o
+         L5oVf27Q71GHjviWuDw3WeF1MfOXWFPuRcKENXczr1V8dblHd8ifzEMCurK3TSCLpvmk
+         INPfX/Cm7zYN6jew5zdzqY084xknB+F55F9z7wAVF54qVFhfGlf/w+O+njGLqaswjXmT
+         vFovbs6vSn6qUXthVgEHm7beIZWTmEoYsiPY8UKEnimMQ2fe8TxIUxkP+fMlu4Fgt/Xc
+         C0ljLJoDNsdopQJ7uboYbf0TRsA+ORdn5G2HVl2cGrRC6FR+Lez2bydmJjlO99ALqwgQ
+         /yog==
+X-Forwarded-Encrypted: i=1; AJvYcCWgFjvdGltKsHgzgpf+qIezbd6OvEI/AyKmipMYBjjsNsFfgE2/VRtmmCqnsyzkLgZzxAfBJHIjzbfPFQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzJVH2W4AkTRe87gwznE1eg6q+AUyjLvPEZJxWk5Rkh6bOHHmnz
+	tRekYfxRmG5mH9F0YLLpTTwa6QgM3Dg386qT0JuiDsI7T635W+6+XMrzx1oypd17Q2/3KNC1vNO
+	uzCsU6CTzAjSedJ+HLd4CuOX9/XSOHL9z7W4Rwczvh2qrmrl6q1V/
+X-Gm-Gg: ASbGncuHCWxFHze5l5eZXL2i3L5lfxN95mkgNZ1SJGXt9OgA7cmBKvHe+2V8cuLThAW
+	7iIinc6aCv5tMOR1L58IyMlvNw+dlh7cuA4nCsFoGPHJSe+4KlRCUUHvp4WA2w8xMxgzoElQmvg
+	p4aTmQiZv88Rm0YSslnxg5LgkQm4Nol4HGZ5o0tzBeo5BxMIAi7fz6jTyAaHSlo664j+zlu+9AS
+	0hdcYXJl5bvuIWMauIVByf9X9t7pXtfl4BHKSZDSDOGWAXGr33N+zrbBZjARUWhaZNODl5Jolzi
+	vT5Ap5Lv1iMe65PQIv6k8pn4gaJefoK2+zwJDwIh/27MHAiZW/UBHqSKqCU=
+X-Google-Smtp-Source: AGHT+IGpEJmA8wuiu7bHyM3anAmskWUJ+YGhc4UBossIDwMrUMtN/7LChpLKm0Ze705fw0cHnpIVIV1tP4Tt
+X-Received: by 2002:a05:6902:114c:b0:e8e:120b:acc7 with SMTP id 3f1490d57ef6-e904b127023mr4685967276.0.1754676093522;
+        Fri, 08 Aug 2025 11:01:33 -0700 (PDT)
+Received: from c7-smtp-2023.dev.purestorage.com ([2620:125:9017:12:36:3:5:0])
+        by smtp-relay.gmail.com with ESMTPS id 3f1490d57ef6-e8fea65c517sm1190001276.21.2025.08.08.11.01.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 08 Aug 2025 11:01:33 -0700 (PDT)
+X-Relaying-Domain: purestorage.com
+Received: from dev-ushankar.dev.purestorage.com (dev-ushankar.dev.purestorage.com [10.7.70.36])
+	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 66C8E340235;
+	Fri,  8 Aug 2025 12:01:32 -0600 (MDT)
+Received: by dev-ushankar.dev.purestorage.com (Postfix, from userid 1557716368)
+	id 57299E4018A; Fri,  8 Aug 2025 12:01:32 -0600 (MDT)
+Date: Fri, 8 Aug 2025 12:01:32 -0600
+From: Uday Shankar <ushankar@purestorage.com>
+To: Caleb Sander Mateos <csander@purestorage.com>
+Cc: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] ublk: check for unprivileged daemon on each I/O fetch
+Message-ID: <aJY7fPmOLMe7T5A7@dev-ushankar.dev.purestorage.com>
+References: <20250808155216.296170-1-csander@purestorage.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block changes for 6.17-rc1
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250808155216.296170-1-csander@purestorage.com>
 
-Hi Linus,
+On Fri, Aug 08, 2025 at 09:52:15AM -0600, Caleb Sander Mateos wrote:
+> Commit ab03a61c6614 ("ublk: have a per-io daemon instead of a per-queue
+> daemon") allowed each ublk I/O to have an independent daemon task.
+> However, nr_privileged_daemon is only computed based on whether the last
+> I/O fetched in each ublk queue has an unprivileged daemon task.
+> Fix this by checking whether every fetched I/O's daemon is privileged.
+> Change nr_privileged_daemon from a count of queues to a boolean
+> indicating whether any I/Os have an unprivileged daemon.
+> 
+> Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
+> Fixes: ab03a61c6614 ("ublk: have a per-io daemon instead of a per-queue daemon")
 
-Set of changes and fixes that should go into the 6.17-rc1 release. Some
-are straight up fixes, few are just a bit delayed and hence missed the
-initial pull request when the merge window opens. However, nothing major
-or alarming in here. This pull request contains:
+Nice catch!
 
-- MD pull request via Yu
-	- mddev null-ptr-dereference fix, by Erkun
-	- md-cluster fail to remove the faulty disk regression fix,
-	  by Heming
-	- minor cleanup, by Li Nan and Jinchao
-	- mdadm lifetime regression fix reported by syzkaller,
-	  by Yu Kuai
+> ---
+>  drivers/block/ublk_drv.c | 16 +++++++---------
+>  1 file changed, 7 insertions(+), 9 deletions(-)
+> 
+> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> index 6561d2a561fa..a035070dd690 100644
+> --- a/drivers/block/ublk_drv.c
+> +++ b/drivers/block/ublk_drv.c
+> @@ -233,11 +233,11 @@ struct ublk_device {
+>  
+>  	struct ublk_params	params;
+>  
+>  	struct completion	completion;
+>  	unsigned int		nr_queues_ready;
+> -	unsigned int		nr_privileged_daemon;
+> +	bool 			unprivileged_daemons;
+>  	struct mutex cancel_mutex;
+>  	bool canceling;
+>  	pid_t 	ublksrv_tgid;
+>  };
+>  
+> @@ -1548,11 +1548,11 @@ static void ublk_reset_ch_dev(struct ublk_device *ub)
+>  		ublk_queue_reinit(ub, ublk_get_queue(ub, i));
+>  
+>  	/* set to NULL, otherwise new tasks cannot mmap io_cmd_buf */
+>  	ub->mm = NULL;
+>  	ub->nr_queues_ready = 0;
+> -	ub->nr_privileged_daemon = 0;
+> +	ub->unprivileged_daemons = false;
+>  	ub->ublksrv_tgid = -1;
+>  }
+>  
+>  static struct gendisk *ublk_get_disk(struct ublk_device *ub)
+>  {
+> @@ -1978,16 +1978,14 @@ static void ublk_reset_io_flags(struct ublk_device *ub)
+>  /* device can only be started after all IOs are ready */
+>  static void ublk_mark_io_ready(struct ublk_device *ub, struct ublk_queue *ubq)
+>  	__must_hold(&ub->mutex)
+>  {
+>  	ubq->nr_io_ready++;
+> -	if (ublk_queue_ready(ubq)) {
+> +	if (ublk_queue_ready(ubq))
+>  		ub->nr_queues_ready++;
+> -
+> -		if (capable(CAP_SYS_ADMIN))
+> -			ub->nr_privileged_daemon++;
+> -	}
+> +	if (!ub->unprivileged_daemons && !capable(CAP_SYS_ADMIN))
+> +		ub->unprivileged_daemons = true;
 
-- MD pull request via Christoph
-	- add support for getting the FDP featuee in fabrics passthru
-	  path (Nitesh Shetty)
-	- add capability to connect to an administrative controller
-	  (Kamaljit Singh)
-	- fix a leak on sgl setup error (Keith Busch)
-	- initialize discovery subsys after debugfs is initialized
-	  (Mohamed Khalfella)
-	- fix various comment typos (Bjorn Helgaas)
-	- remove unneeded semicolons (Jiapeng Chong)
+Shorter:
 
-- nvmet debugfs ordering issue fix
+ub->unprivileged_daemons |= !capable(CAP_SYS_ADMIN);
 
-- Fix UAF in the tag_set in zloop 
-
-- Ensure sbitmap shallow depth covers entire set
-
-- Reduce lock roundtrips in io context lookup
-
-- Move scheduler tags alloc/free out of elevator and freeze lock, to fix
-  some lockdep found issues
-
-- Improve robustness of queue limits checking
-
-- Fix a regression with IO priorities, if no io context exists
-
-Please pull!
-
-
-The following changes since commit 86aa721820952b793a12fc6e5a01734186c0c238:
-
-  Merge tag 'chrome-platform-v6.17' of git://git.kernel.org/pub/scm/linux/kernel/git/chrome-platform/linux (2025-07-28 23:26:07 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.dk/linux.git tags/block-6.17-20250808
-
-for you to fetch changes up to 45fa9f97e65231a9fd4f9429489cb74c10ccd0fd:
-
-  lib/sbitmap: make sbitmap_get_shallow() internal (2025-08-07 06:30:17 -0600)
-
-----------------------------------------------------------------
-block-6.17-20250808
-
-----------------------------------------------------------------
-Bjorn Helgaas (1):
-      nvme: fix various comment typos
-
-Christoph Hellwig (1):
-      block: ensure discard_granularity is zero when discard is not supported
-
-Christophe JAILLET (1):
-      block, bfq: Reorder struct bfq_iocq_bfqq_data
-
-Damien Le Moal (1):
-      block: Improve read ahead size for rotational devices
-
-Guenter Roeck (1):
-      block: Fix default IO priority if there is no IO context
-
-Heming Zhao (1):
-      md/md-cluster: handle REMOVE message earlier
-
-Jens Axboe (2):
-      Merge tag 'nvme-6.17-2025-07-31' of git://git.infradead.org/nvme into block-6.17
-      Merge tag 'md-6.17-20250803' of gitolite.kernel.org:pub/scm/linux/kernel/git/mdraid/linux into block-6.17
-
-Jiapeng Chong (1):
-      nvme-auth: remove unneeded semicolon
-
-John Garry (2):
-      block: avoid possible overflow for chunk_sectors check in blk_stack_limits()
-      block: Enforce power-of-2 physical block size
-
-Kamaljit Singh (1):
-      nvme: add capability to connect to an administrative controller
-
-Keith Busch (1):
-      nvme-pci: fix leak on sgl setup error
-
-Li Nan (1):
-      md: rename recovery_cp to resync_offset
-
-Mohamed Khalfella (2):
-      nvmet: initialize discovery subsys after debugfs is initialized
-      nvmet: exit debugfs after discovery subsystem exits
-
-Nilay Shroff (3):
-      block: move elevator queue allocation logic into blk_mq_init_sched
-      block: fix lockdep warning caused by lock dependency in elv_iosched_store
-      block: fix potential deadlock while running nr_hw_queue update
-
-Nitesh Shetty (1):
-      nvmet: add support for FDP in fabrics passthru path
-
-Shin'ichiro Kawasaki (1):
-      zloop: fix KASAN use-after-free of tag set
-
-Wang Jinchao (2):
-      md/raid1: change r1conf->r1bio_pool to a pointer type
-      md/raid1: remove struct pool_info and related code
-
-Yang Erkun (1):
-      md: make rdev_addable usable for rcu mode
-
-Yu Kuai (4):
-      blk-ioc: don't hold queue_lock for ioc_lookup_icq()
-      md: fix create on open mddev lifetime regression
-      lib/sbitmap: convert shallow_depth from one word to the whole sbitmap
-      lib/sbitmap: make sbitmap_get_shallow() internal
-
- block/bfq-iosched.c            |  66 ++++--------
- block/bfq-iosched.h            |  13 ++-
- block/blk-ioc.c                |  16 ++-
- block/blk-mq-sched.c           | 223 ++++++++++++++++++++++++++++-------------
- block/blk-mq-sched.h           |  12 ++-
- block/blk-mq.c                 |  16 ++-
- block/blk-settings.c           |  33 ++++--
- block/blk.h                    |   4 +-
- block/elevator.c               |  38 +++++--
- block/elevator.h               |  16 ++-
- block/kyber-iosched.c          |  20 +---
- block/mq-deadline.c            |  30 +-----
- drivers/block/zloop.c          |   3 +-
- drivers/md/dm-raid.c           |  42 ++++----
- drivers/md/md-bitmap.c         |   8 +-
- drivers/md/md-cluster.c        |  16 +--
- drivers/md/md.c                |  73 ++++++++------
- drivers/md/md.h                |   2 +-
- drivers/md/raid0.c             |   6 +-
- drivers/md/raid1-10.c          |   2 +-
- drivers/md/raid1.c             |  94 +++++++----------
- drivers/md/raid1.h             |  22 +---
- drivers/md/raid10.c            |  16 +--
- drivers/md/raid5-ppl.c         |   6 +-
- drivers/md/raid5.c             |  30 +++---
- drivers/nvme/host/auth.c       |   4 +-
- drivers/nvme/host/core.c       |  16 +++
- drivers/nvme/host/fc.c         |   4 +-
- drivers/nvme/host/pci.c        |   2 +-
- drivers/nvme/host/tcp.c        |   2 +-
- drivers/nvme/target/core.c     |  14 +--
- drivers/nvme/target/fc.c       |   6 +-
- drivers/nvme/target/passthru.c |   2 +
- drivers/nvme/target/rdma.c     |   6 +-
- include/linux/ioprio.h         |   3 +-
- include/linux/sbitmap.h        |  19 +---
- include/uapi/linux/raid/md_p.h |   2 +-
- lib/sbitmap.c                  |  74 ++++++++------
- 38 files changed, 519 insertions(+), 442 deletions(-)
-
--- 
-Jens Axboe
-
+>  
+>  	if (ub->nr_queues_ready == ub->dev_info.nr_hw_queues) {
+>  		/* now we are ready for handling ublk io request */
+>  		ublk_reset_io_flags(ub);
+>  		complete_all(&ub->completion);
+> @@ -2878,12 +2876,12 @@ static int ublk_ctrl_start_dev(struct ublk_device *ub,
+>  	ub->dev_info.ublksrv_pid = ublksrv_pid;
+>  	ub->ub_disk = disk;
+>  
+>  	ublk_apply_params(ub);
+>  
+> -	/* don't probe partitions if any one ubq daemon is un-trusted */
+> -	if (ub->nr_privileged_daemon != ub->nr_queues_ready)
+> +	/* don't probe partitions if any daemon task is un-trusted */
+> +	if (ub->unprivileged_daemons)
+>  		set_bit(GD_SUPPRESS_PART_SCAN, &disk->state);
+>  
+>  	ublk_get_device(ub);
+>  	ub->dev_info.state = UBLK_S_DEV_LIVE;
+>  
+> -- 
+> 2.45.2
+> 
