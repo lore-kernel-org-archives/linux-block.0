@@ -1,50 +1,50 @@
-Received: from mx0b-002e3701.pphosted.com (mx0b-002e3701.pphosted.com [148.163.143.35])
+Received: from mx0a-002e3701.pphosted.com (mx0a-002e3701.pphosted.com [148.163.147.86])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB9BF1F4289;
-	Fri,  8 Aug 2025 19:09:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.143.35
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC3DA26463B;
+	Fri,  8 Aug 2025 19:12:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.147.86
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754680155; cv=none; b=Pd6702k28s98lp7bA+ul5QoN4LvitR/8qFVoDlNksyANbNKwx5fyXZjrgVVCZOVM+OpqjyqUoaL/IzoLhx2whBKR9D2EsQYEGIHBtlEQ5HgFNMzzoRM6KYXmbnx7X7RsFMPnm8omAppjPxX5V5y2ogi9TS5FFtA1FpxWeSQVSwk=
+	t=1754680352; cv=none; b=X/8G02ZyWvWeazzUTxdZDFIeh4Q4G4apXJGyO7IwI6ngNWzuwLZq3xjpU9+eXXQkBNkI6uBkP1qx4b2uQBJ6LDCWUXz+lApL5wLzQQdwQ7GR5YKOGK8eyQay9KZzjwuJsucd3DOqYp8wNAtvxvJsBvtZ62CQkoafJJl8r0UPGoQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754680155; c=relaxed/simple;
+	s=arc-20240116; t=1754680352; c=relaxed/simple;
 	bh=AuopC4jchsoBGwjeSawr7SKwoz70Y5DvaUCOAFpKArU=;
-	h=Date:To:Subject:MIME-Version:Content-Type:Message-Id:From; b=WzuSQBEZbf3KSFXF9TOiv97a8DRWZhT9TRgHqYOwMr3PYCxZJQHTAQg2YFRNHU3LjxAub8p1Bf5bceEZWEB0d6Opf/icbxNdLS1xKeFASquRFmHuRDE5gAEiqafU/3apDqhuTEtTZpL3XrpoJFy0AxAWClF4+X/vCVVNo8gBh8I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hpe.com; spf=pass smtp.mailfrom=hpe.com; dkim=pass (2048-bit key) header.d=hpe.com header.i=@hpe.com header.b=XTiw6mHJ; arc=none smtp.client-ip=148.163.143.35
+	h=Date:To:Subject:Cc:MIME-Version:Content-Type:Message-Id:From; b=W6l2wtbZh3IGstG+4i0CciPqPWUF0hCGZP6OxUphkMz5UJca+v5UpIJOHXgAgyYYTjl946Tv3QsMAT7NuAdtZ9yItIjwqg5E17SmXevUZgzZIHC6G0ah/x4QTcWk+0TXuCPBzpiYz85E9eoRmPYtA15CRXCScIzotNiwBM46IL4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hpe.com; spf=pass smtp.mailfrom=hpe.com; dkim=pass (2048-bit key) header.d=hpe.com header.i=@hpe.com header.b=o/ZN5vJI; arc=none smtp.client-ip=148.163.147.86
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hpe.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hpe.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hpe.com header.i=@hpe.com header.b="XTiw6mHJ"
-Received: from pps.filterd (m0150245.ppops.net [127.0.0.1])
-	by mx0b-002e3701.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 578HWL65020432;
-	Fri, 8 Aug 2025 19:08:44 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=
-	content-transfer-encoding:content-type:date:from:message-id
+	dkim=pass (2048-bit key) header.d=hpe.com header.i=@hpe.com header.b="o/ZN5vJI"
+Received: from pps.filterd (m0150242.ppops.net [127.0.0.1])
+	by mx0a-002e3701.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 578G2eKe009195;
+	Fri, 8 Aug 2025 19:12:15 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
 	:mime-version:subject:to; s=pps0720; bh=5gIYayUr0BtCcIvar4Jy0y0P
-	rJEmZ99nwodw23zUavE=; b=XTiw6mHJF0A3qlsJe+/exH49ADJiT4Be217alLCp
-	DLR06fJFDM4TStOZoVbf20ZPKne7HbZb9SB70VzGMUMnlrJkd4OPrJogglTEXdHY
-	177QPur9ONMnIcGOfioXUmYeYS02HIBxDw2oX9uRoCbRrtBTKYawI5iuwNJ5tALd
-	oyW8DGKpSZGyvC12NY0QuXn72gFKuHwGqpX6t3dABnV5AeGTBKjz4Un0N1uR1S72
-	TbGXovdjCYSirDF5UusHUWkzPMckoK3hYKc4BYXz/zKojnRE2+cAEnBZCg36zT4w
-	GKtpK8NLiVaZHRmM4QhehBFjOxYbeMoEa7b0uOznJW4luQ==
-Received: from p1lg14879.it.hpe.com ([16.230.97.200])
-	by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 48dej3vwhy-1
+	rJEmZ99nwodw23zUavE=; b=o/ZN5vJIOxXVskxERb14QHQ+XKxLKN+tbBUkhNaP
+	lLBHf2uKuUo2YEOapgYPq7WI4NVIUn3E4GkhT2t61hZgHwKA9qrFcCt7AeOo7nT/
+	H920StRH6l4nu/yfx9oOj9h3oMtV0VICHoyghXWVhzr2Wi5FyHb/kXptGUcJaUr0
+	+3rFjgQGX0i+YithMLqm8DmcMbdJuhcmpHsGtq9oDepCA1mCf5hsl98ih50A0Dhd
+	wXj7x8AjWLVPqNYplGyJR/82SNjhqa3+0gBJka5t9PZ0c09bUIvEm1yfjwNqZhAc
+	z/NEsKoCA2sBB5Rt000TmIZ6dGPugNhnIjZrXRHQagsbyw==
+Received: from p1lg14880.it.hpe.com ([16.230.97.201])
+	by mx0a-002e3701.pphosted.com (PPS) with ESMTPS id 48cxa85vsr-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 08 Aug 2025 19:08:44 +0000 (GMT)
+	Fri, 08 Aug 2025 19:12:15 +0000 (GMT)
 Received: from test-build-fcntl.hpe.com (unknown [192.58.206.35])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by p1lg14879.it.hpe.com (Postfix) with ESMTPS id 8700E132C4;
-	Fri,  8 Aug 2025 19:08:43 +0000 (UTC)
+	by p1lg14880.it.hpe.com (Postfix) with ESMTPS id 28B12800342;
+	Fri,  8 Aug 2025 19:12:13 +0000 (UTC)
 Received: by test-build-fcntl.hpe.com (Postfix, from userid 1000)
-	id E0A718800130; Fri,  8 Aug 2025 18:59:59 +0000 (UTC)
-Date: Fri, 08 Aug 2025 18:59:59 +0000
-To: yukuai3@huawei.com, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, -c@test-build-fcntl.hpe.com,
-        yukuai1@huaweicloud.com
+	id C66C58800130; Fri,  8 Aug 2025 19:03:24 +0000 (UTC)
+Date: Fri, 08 Aug 2025 19:03:24 +0000
+To: yukuai1@huaweicloud.com
 Subject: Re: [PATCH 1/1] loop: sync filesystem cache before getting file size
  in get_size()
+Cc: yukuai3@huawei.com, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org
 User-Agent: Heirloom mailx 12.5 7/5/10
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -54,32 +54,32 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Message-Id: <20250808185959.E0A718800130@test-build-fcntl.hpe.com>
+Message-Id: <20250808190324.C66C58800130@test-build-fcntl.hpe.com>
 From: Cloud User <rajeevm@hpe.com>
-X-Proofpoint-ORIG-GUID: YGTmQ3HGoe8hici8uNxxPIfPx3A4Wrji
-X-Authority-Analysis: v=2.4 cv=T/uMT+KQ c=1 sm=1 tr=0 ts=68964b3c cx=c_pps
- a=5jkVtQsCUlC8zk5UhkBgHg==:117 a=5jkVtQsCUlC8zk5UhkBgHg==:17
+X-Proofpoint-ORIG-GUID: uYUQEmc05IA664PfeKGAahhuogg87Ke3
+X-Proofpoint-GUID: uYUQEmc05IA664PfeKGAahhuogg87Ke3
+X-Authority-Analysis: v=2.4 cv=RZ+QC0tv c=1 sm=1 tr=0 ts=68964c0f cx=c_pps
+ a=A+SOMQ4XYIH4HgQ50p3F5Q==:117 a=A+SOMQ4XYIH4HgQ50p3F5Q==:17
  a=IkcTkHD0fZMA:10 a=2OwXVqhp2XgA:10 a=AiHppB-aAAAA:8 a=MvuuwTCpAAAA:8
  a=VwQbUJbxAAAA:8 a=i0EeH86SAAAA:8 a=ZV1I0oPp85mWpSob3hMA:9 a=3ZKOabzyN94A:10
  a=QEXdDO2ut3YA:10
-X-Proofpoint-GUID: YGTmQ3HGoe8hici8uNxxPIfPx3A4Wrji
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODA4MDE1NSBTYWx0ZWRfX/9ouRYd0kx14
- 5B9DzLXD2nfOsUegjJm5SK+QDTl04O9vKiS0EJxDAWNBJUMwcJvslZUQGNfKsJWOF9ti9nS9IaP
- /auc+R2ywPNLBlIZ9suryYKJPNFDZAMtY5N+txdwj1Rs/owKk05yCck7SgDdqfkXKrCis25QWN3
- QJyVvRWFk9TwQXcHwhRbdIjuFA1xEpfcW4v3ha+juijGZIZC/UD5ZmIscsyn498vUaBg+EriAAk
- vCTFQEJAPZQFdW92imQzvupvVOu/+0P+Cn9Kk3esx7wqMzVTx/unLP44ZZM14N5XHa55uPl9bLb
- oshYXZ8WIAXMEBCg1RXTy/ipMKArBDMYHwEHneG+rWNuS+9NpQGWmJLpjplbnghyD28uSkPrwSO
- idiNf4oZJRQzj0O3jxcUvZxUCPGXxiAorAgYWJxUPCtdf82MMNpJzwM65ZQAZF628NlHm8zI
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODA4MDE1NiBTYWx0ZWRfX+igXJsjpFP/A
+ 48KimB85cnoC00cQkqAY34yNpcegQ4Z99Q5bAc2MblZkCBCDlVSAE813DKCqB6hj5T2BxYRcnB8
+ ms6AhRdYW2HU9lz3iT+8Amym4nNEcSVqq6kIH0XbNqpcgwrDi2olK2FXXKPjekIFeMpt20dtQYT
+ pp+C2VmNjYnsEw7JvWBGCRYLZsjaQIzlbNDlulQvM4My0aIsU0YN2d8WhPf+Yoj3rSv+9iUCCaw
+ a/uOefNl8uyZAKyIebwdQqrWpNJZm8rrVx+SeznX25dXztV+oM5L3oGgaAdMioT/jO/VmqDq3Ad
+ B02U6kQZ3TSWHaWj9dfkd6VQPvmIG2baT7+B1/5Ks9dzQkd2Bn/Ely+8GHSYqdd6YeLOBF7M8ut
+ qMSHR7YMC9FErpdBxql6z5jg3JzWZglzPe1DF+4INTmWUkPsYbWbVPrz8TkFTz40hsyWDl0H
 X-HPE-SCL: -1
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
  definitions=2025-08-08_06,2025-08-06_01,2025-03-28_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 bulkscore=0 mlxscore=0 lowpriorityscore=0 adultscore=0
- impostorscore=0 spamscore=0 malwarescore=0 clxscore=1015 suspectscore=0
- mlxlogscore=999 phishscore=0 classifier=spam authscore=0 authtc=n/a authcc=
+ clxscore=1015 mlxscore=0 priorityscore=1501 lowpriorityscore=0 spamscore=0
+ impostorscore=0 malwarescore=0 phishscore=0 mlxlogscore=999 suspectscore=0
+ bulkscore=0 adultscore=0 classifier=spam authscore=0 authtc=n/a authcc=
  route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2507300000
- definitions=main-2508080155
+ definitions=main-2508080156
 
 Thanks, Kuai, for the quick review—I really appreciate it.
 Please feel free to reach out if you have any questions or
