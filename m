@@ -1,162 +1,187 @@
-Received: from mail-il1-f182.google.com (mail-il1-f182.google.com [209.85.166.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BCE1218EBF
-	for <linux-block@vger.kernel.org>; Fri,  8 Aug 2025 18:22:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A79821F1317;
+	Fri,  8 Aug 2025 18:51:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754677382; cv=none; b=k+ori18u32QeNtNlXQD5kL8U0JOBtsHI0nFURePr6Ko9qoT4xvuj889qHeyReAqaqyMkrKZqRhbD6AIcOgGHWE2bOgP9/2DvSDL0tJrL5QnrwacXdUD83ReswYRm7niubm3RvVam4niiACEfZVjhOSXVNBcwvZmy74ixPTkvv6w=
+	t=1754679083; cv=none; b=jOkNpt7YkQ1LVc6nvp/gie3qsf3niB45UqJh3O6LN4Mnv2/ZWMjkJWhN1VEoojye9wka8sOu99hOdBhPeYp2ZmTEg3JH51k3iXYTnrXj4lqoo8YghUvPZDq93fKY7IJWA77q2U9ptBNME6BSSlhuIhtPeZ9P8DuUOAe0q1aqmIA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754677382; c=relaxed/simple;
-	bh=6DJGxIZNB0MbLYPgS7uPnOFj4xUSHRfa44MOaAcBXVE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Kloyp5jaJVz2MYofGTnxU+sA/Ze7b57mQk6MGdJG1FeD/03AHz1E0+SP5od3JnC2QE0uNba8ZESdPemW63DFC5lG9HlKzsQohHKUK9HIjoBGd0fxV1VCmqrKc2CO7OSL09nrDJXtcmJ1/YJKXZv1mPOt0vYA7qKYNLCDRV+SUj0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=VlRrncev; arc=none smtp.client-ip=209.85.166.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1754679083; c=relaxed/simple;
+	bh=Xw71vlQN+dR5IVF6R7vT9L4ieXN7VDvTeRfHYilMwow=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
+	 Content-Type:References; b=kwZjMcScv69vNjmMKZ9MF/xbtWBSFFQqvprobV6pXrcwv3W+n4ELgnuSV9v+Ngfp9/zabAvUuiljDbiguIcJJCmmxHTO+5ECUNBh/x78SA3zTjn3hkKpC/hCLlv6aVCjJwO6gt2O6/RYeP0yJVxcjvdJ4sKkHQ9QHuz2+s9n97U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=WGyqUFMD; arc=none smtp.client-ip=210.118.77.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="VlRrncev"
-Received: by mail-il1-f182.google.com with SMTP id e9e14a558f8ab-3e52571cacfso9723625ab.3
-        for <linux-block@vger.kernel.org>; Fri, 08 Aug 2025 11:22:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1754677377; x=1755282177; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=JZH9CfwqA0hE9fcGIfSzdamQXb+OlOwdY/lyO0/9wlA=;
-        b=VlRrncevT9yfPnvBR/5RmNz8Ns4Tx/jSG5RCkYz/QWGZn+SRUQo2AiLPKjaB9OIuU4
-         IHOHh41tvSKKYsiSwjIaRy4KXBspNTZFj2u14mshE53Y4d1FA6bydyvIIiLowo6rZ4C5
-         wEJh/ftCxIV8cPone+wCA2EMbyNELNWuNYeWPx9G0WKJYxJ++xNzbnCccVGufMMEygCD
-         J/m2vTG3bV/PogjjtIdXndX4xn5cAiVFXwyVcaqIo7xCUyICnkjfWBu0Ghq+UqsXMF62
-         TnnCMLnyQMf4Pnx3CeHDaSJD/lfU+4QxnYSfOCMBGCFUKCFtNERwVk422KEbmuJhjfI9
-         KL6A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754677377; x=1755282177;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JZH9CfwqA0hE9fcGIfSzdamQXb+OlOwdY/lyO0/9wlA=;
-        b=ZuYhP4xyljBakUVZhweC2CCrWWRBAjlTmB9/dkuY235B91WMVYoNuILs39f7X8WZ7o
-         J4RPYEES+3Gp4nIM45DNO1Fz5BMlH0ydGTRQT22NmhzeyS8Jx+nuNDvweYqasgeCDwf2
-         VhDR1lUhskCplYzsDjod14siQ3nDbeuoCIbB/BHs/F0HKHbCcTEdxzIY4biuSsdOcowz
-         SMAbhMKw/qqwRUshe4I5T41kq3e7vTrgzEcoZrZGRq7o62pyl3Cs54L6LWtIZTXWM82B
-         sbcCqbj8T732pnWNFpCtZYTFXDwlb0abnCbNSEO/K323zoYCY9Vd6eyNcn1izu0hrAet
-         bs/g==
-X-Forwarded-Encrypted: i=1; AJvYcCVm3jZA5z3FlCNH5oUrdgiqvrPAk8muNhJ3lI26phXxof922MgnG/rTu/I5Tpwv9amBs97yZ8QBMGZYsA==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz7kh3VRvsS12el4dTklKCHen9wEiOJtILRZjIoPJ4SzxFrVOXC
-	Sn/KY9FMQDPX6uBy/h5tMPIeMX58T1TmBTrAs8gc3zHW+fkxdQdm+bLUN+5S6cPDKcw=
-X-Gm-Gg: ASbGncsGvB8Ihqbmcx7h14M+G/Uajj77gU81IDTyQ3l2mIu3rcE2eectogTAKXSQx9g
-	KyFR2AVA7bpdCLh0Wa0Kbj6JrfvAgehVPJ9gGwLIO5JeHjz8QTY9X4TMrlV8UmR6/NwDfAcdkJm
-	HQk+lcwRYia2mVLV7j6GcQEuLhFBuFEzp6Dc5SWjXjDrHnYPudSPTJJy2EnS5Yk47vEtui0lJuZ
-	v93C6ABilJGPBIY/sdiwrvKSJT7JfONzHOvaFj13XVKdhojvKA4ca0mdiOwNdssCw4ZotxdHQbz
-	DGk9CzZ22ApVr4PEmBKPJOoHnzYY36F9CTaLPx6ujkEAnNgs4Uc0GGN2mX8vUplfpARvvdAOMWc
-	FxLSoxIkecLrezz1JN5g=
-X-Google-Smtp-Source: AGHT+IG7sqPk4NgexsHEwfKSDUgxoaY6sX4HssO4A1bOwvoI1qk3OSnmTHvN1PpR3P1Fa+fxWX7d6w==
-X-Received: by 2002:a05:6e02:188f:b0:3e5:29a3:b552 with SMTP id e9e14a558f8ab-3e5330b606cmr75359305ab.3.1754677377222;
-        Fri, 08 Aug 2025 11:22:57 -0700 (PDT)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-50ae9cbb6dasm631298173.95.2025.08.08.11.22.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 08 Aug 2025 11:22:56 -0700 (PDT)
-Message-ID: <c43ad3c8-0a4c-41c5-9d28-d138b012863b@kernel.dk>
-Date: Fri, 8 Aug 2025 12:22:55 -0600
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="WGyqUFMD"
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+	by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20250808185114euoutp0162c911292defe8bfee54f2309b1e8171~Z31I7WGpl0720707207euoutp01Y;
+	Fri,  8 Aug 2025 18:51:14 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20250808185114euoutp0162c911292defe8bfee54f2309b1e8171~Z31I7WGpl0720707207euoutp01Y
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1754679074;
+	bh=eZMpLLPpWLfEcYOqjTqa6+eB/bqRZJ+BbYqsgnnPbkY=;
+	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
+	b=WGyqUFMDFBBsAtsI8xiD1Ayr7WYuZYdyBJMCoPCRGfrVxwAdMcl3GCV7Qwkcc4nI/
+	 gnDfUeRP8iiJIUgEStFM4TfVVnoq/LDogKUpBA2D+NmwrtJRryBOG1ru2ITf74oehS
+	 IO287BU42jFk8ZARXzvIDO/cRSfPjtUJVNlWylGo=
+Received: from eusmtip1.samsung.com (unknown [203.254.199.221]) by
+	eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
+	20250808185112eucas1p285bfbeb3352a16df0b5c8f262fadbf2f~Z31Hzuzfc1555715557eucas1p2H;
+	Fri,  8 Aug 2025 18:51:12 +0000 (GMT)
+Received: from [106.210.134.192] (unknown [106.210.134.192]) by
+	eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20250808185109eusmtip1cf791168d581e5b5b824a27d8cdd9069~Z31ElK-rK1126511265eusmtip1F;
+	Fri,  8 Aug 2025 18:51:09 +0000 (GMT)
+Message-ID: <a154e058-c0e6-4208-9f52-57cec22eaf7d@samsung.com>
+Date: Fri, 8 Aug 2025 20:51:08 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] ublk: check for unprivileged daemon on each I/O fetch
-To: Caleb Sander Mateos <csander@purestorage.com>,
- Uday Shankar <ushankar@purestorage.com>
-Cc: Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250808155216.296170-1-csander@purestorage.com>
- <aJY7fPmOLMe7T5A7@dev-ushankar.dev.purestorage.com>
- <CADUfDZqz1R=aTuyRhsVjpJnoUgXBgsf1Jkg4qX_sn+NtP4TPeQ@mail.gmail.com>
+User-Agent: Betterbird (Windows)
+Subject: Re: [PATCH v1 00/16] dma-mapping: migrate to physical address-based
+ API
+To: Jason Gunthorpe <jgg@nvidia.com>, Leon Romanovsky <leon@kernel.org>
+Cc: Abdiel Janulgue <abdiel.janulgue@gmail.com>, Alexander Potapenko
+	<glider@google.com>, Alex Gaynor <alex.gaynor@gmail.com>, Andrew Morton
+	<akpm@linux-foundation.org>, Christoph Hellwig <hch@lst.de>, Danilo
+	Krummrich <dakr@kernel.org>, iommu@lists.linux.dev, Jason Wang
+	<jasowang@redhat.com>, Jens Axboe <axboe@kernel.dk>, Joerg Roedel
+	<joro@8bytes.org>, Jonathan Corbet <corbet@lwn.net>, Juergen Gross
+	<jgross@suse.com>, kasan-dev@googlegroups.com, Keith Busch
+	<kbusch@kernel.org>, linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+	linux-nvme@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
+	linux-trace-kernel@vger.kernel.org, Madhavan Srinivasan
+	<maddy@linux.ibm.com>, Masami Hiramatsu <mhiramat@kernel.org>, Michael
+	Ellerman <mpe@ellerman.id.au>, "Michael S. Tsirkin" <mst@redhat.com>, Miguel
+	Ojeda <ojeda@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
+	rust-for-linux@vger.kernel.org, Sagi Grimberg <sagi@grimberg.me>, Stefano
+	Stabellini <sstabellini@kernel.org>, Steven Rostedt <rostedt@goodmis.org>,
+	virtualization@lists.linux.dev, Will Deacon <will@kernel.org>,
+	xen-devel@lists.xenproject.org
 Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <CADUfDZqz1R=aTuyRhsVjpJnoUgXBgsf1Jkg4qX_sn+NtP4TPeQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+From: Marek Szyprowski <m.szyprowski@samsung.com>
+In-Reply-To: <20250807141929.GN184255@nvidia.com>
+Content-Transfer-Encoding: 8bit
+X-CMS-MailID: 20250808185112eucas1p285bfbeb3352a16df0b5c8f262fadbf2f
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-RootMTR: 20250807141938eucas1p2319a0526b25db120b3c9aeb49f69cce1
+X-EPHeader: CA
+X-CMS-RootMailID: 20250807141938eucas1p2319a0526b25db120b3c9aeb49f69cce1
+References: <cover.1754292567.git.leon@kernel.org>
+	<CGME20250807141938eucas1p2319a0526b25db120b3c9aeb49f69cce1@eucas1p2.samsung.com>
+	<20250807141929.GN184255@nvidia.com>
 
-On 8/8/25 12:03 PM, Caleb Sander Mateos wrote:
-> On Fri, Aug 8, 2025 at 2:01?PM Uday Shankar <ushankar@purestorage.com> wrote:
+On 07.08.2025 16:19, Jason Gunthorpe wrote:
+> On Mon, Aug 04, 2025 at 03:42:34PM +0300, Leon Romanovsky wrote:
+>> Changelog:
+>> v1:
+>>   * Added new DMA_ATTR_MMIO attribute to indicate
+>>     PCI_P2PDMA_MAP_THRU_HOST_BRIDGE path.
+>>   * Rewrote dma_map_* functions to use thus new attribute
+>> v0: https://lore.kernel.org/all/cover.1750854543.git.leon@kernel.org/
+>> ------------------------------------------------------------------------
 >>
->> On Fri, Aug 08, 2025 at 09:52:15AM -0600, Caleb Sander Mateos wrote:
->>> Commit ab03a61c6614 ("ublk: have a per-io daemon instead of a per-queue
->>> daemon") allowed each ublk I/O to have an independent daemon task.
->>> However, nr_privileged_daemon is only computed based on whether the last
->>> I/O fetched in each ublk queue has an unprivileged daemon task.
->>> Fix this by checking whether every fetched I/O's daemon is privileged.
->>> Change nr_privileged_daemon from a count of queues to a boolean
->>> indicating whether any I/Os have an unprivileged daemon.
->>>
->>> Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
->>> Fixes: ab03a61c6614 ("ublk: have a per-io daemon instead of a per-queue daemon")
->>
->> Nice catch!
->>
->>> ---
->>>  drivers/block/ublk_drv.c | 16 +++++++---------
->>>  1 file changed, 7 insertions(+), 9 deletions(-)
->>>
->>> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
->>> index 6561d2a561fa..a035070dd690 100644
->>> --- a/drivers/block/ublk_drv.c
->>> +++ b/drivers/block/ublk_drv.c
->>> @@ -233,11 +233,11 @@ struct ublk_device {
->>>
->>>       struct ublk_params      params;
->>>
->>>       struct completion       completion;
->>>       unsigned int            nr_queues_ready;
->>> -     unsigned int            nr_privileged_daemon;
->>> +     bool                    unprivileged_daemons;
->>>       struct mutex cancel_mutex;
->>>       bool canceling;
->>>       pid_t   ublksrv_tgid;
->>>  };
->>>
->>> @@ -1548,11 +1548,11 @@ static void ublk_reset_ch_dev(struct ublk_device *ub)
->>>               ublk_queue_reinit(ub, ublk_get_queue(ub, i));
->>>
->>>       /* set to NULL, otherwise new tasks cannot mmap io_cmd_buf */
->>>       ub->mm = NULL;
->>>       ub->nr_queues_ready = 0;
->>> -     ub->nr_privileged_daemon = 0;
->>> +     ub->unprivileged_daemons = false;
->>>       ub->ublksrv_tgid = -1;
->>>  }
->>>
->>>  static struct gendisk *ublk_get_disk(struct ublk_device *ub)
->>>  {
->>> @@ -1978,16 +1978,14 @@ static void ublk_reset_io_flags(struct ublk_device *ub)
->>>  /* device can only be started after all IOs are ready */
->>>  static void ublk_mark_io_ready(struct ublk_device *ub, struct ublk_queue *ubq)
->>>       __must_hold(&ub->mutex)
->>>  {
->>>       ubq->nr_io_ready++;
->>> -     if (ublk_queue_ready(ubq)) {
->>> +     if (ublk_queue_ready(ubq))
->>>               ub->nr_queues_ready++;
->>> -
->>> -             if (capable(CAP_SYS_ADMIN))
->>> -                     ub->nr_privileged_daemon++;
->>> -     }
->>> +     if (!ub->unprivileged_daemons && !capable(CAP_SYS_ADMIN))
->>> +             ub->unprivileged_daemons = true;
->>
->> Shorter:
->>
->> ub->unprivileged_daemons |= !capable(CAP_SYS_ADMIN);
-> 
-> I was trying to avoid the capable() call if unprivileged_daemons was
-> already set. But maybe that's not a common case and it's not worth
-> optimizing?
+>> This series refactors the DMA mapping to use physical addresses
+>> as the primary interface instead of page+offset parameters. This
+>> change aligns the DMA API with the underlying hardware reality where
+>> DMA operations work with physical addresses, not page structures.
+> Lets elaborate this as Robin asked:
+>
+> This series refactors the DMA mapping API to provide a phys_addr_t
+> based, and struct-page free, external API that can handle all the
+> mapping cases we want in modern systems:
+>
+>   - struct page based cachable DRAM
+>   - struct page MEMORY_DEVICE_PCI_P2PDMA PCI peer to peer non-cachable MMIO
+>   - struct page-less PCI peer to peer non-cachable MMIO
+>   - struct page-less "resource" MMIO
+>
+> Overall this gets much closer to Matthew's long term wish for
+> struct-pageless IO to cachable DRAM. The remaining primary work would
+> be in the mm side to allow kmap_local_pfn()/phys_to_virt() to work on
+> phys_addr_t without a struct page.
+>
+> The general design is to remove struct page usage entirely from the
+> DMA API inner layers. For flows that need to have a KVA for the
+> physical address they can use kmap_local_pfn() or phys_to_virt(). This
+> isolates the struct page requirements to MM code only. Long term all
+> removals of struct page usage are supporting Matthew's memdesc
+> project which seeks to substantially transform how struct page works.
+>
+> Instead make the DMA API internals work on phys_addr_t. Internally
+> there are still dedicated 'page' and 'resource' flows, except they are
+> now distinguished by a new DMA_ATTR_MMIO instead of by callchain. Both
+> flows use the same phys_addr_t.
+>
+> When DMA_ATTR_MMIO is specified things work similar to the existing
+> 'resource' flow. kmap_local_pfn(), phys_to_virt(), phys_to_page(),
+> pfn_valid(), etc are never called on the phys_addr_t. This requires
+> rejecting any configuration that would need swiotlb. CPU cache
+> flushing is not required, and avoided, as ATTR_MMIO also indicates the
+> address have no cachable mappings. This effectively removes any
+> DMA API side requirement to have struct page when DMA_ATTR_MMIO is
+> used.
+>
+> In the !DMA_ATTR_MMIO mode things work similarly to the 'page' flow,
+> except on the common path of no cache flush, no swiotlb it never
+> touches a struct page. When cache flushing or swiotlb copying
+> kmap_local_pfn()/phys_to_virt() are used to get a KVA for CPU
+> usage. This was already the case on the unmap side, now the map side
+> is symmetric.
+>
+> Callers are adjusted to set DMA_ATTR_MMIO. Existing 'resource' users
+> must set it. The existing struct page based MEMORY_DEVICE_PCI_P2PDMA
+> path must also set it. This corrects some existing bugs where iommu
+> mappings for P2P MMIO were improperly marked IOMMU_CACHE.
+>
+> Since ATTR_MMIO is made to work with all the existing DMA map entry
+> points, particularly dma_iova_link(), this finally allows a way to use
+> the new DMA API to map PCI P2P MMIO without creating struct page. The
+> VFIO DMABUF series demonstrates how this works. This is intended to
+> replace the incorrect driver use of dma_map_resource() on PCI BAR
+> addresses.
+>
+> This series does the core code and modern flows. A followup series
+> will give the same treatement to the legacy dma_ops implementation.
 
-Definitely worth it, you did the right thing.
+Thanks for the elaborate description, that's something that was missing 
+in the previous attempt. I read again all the previous discussion and 
+this explanation and there are still two things that imho needs more 
+clarification.
 
+
+First - basing the API on the phys_addr_t.
+
+Page based API had the advantage that it was really hard to abuse it and 
+call for something that is not 'a normal RAM'. I initially though that 
+phys_addr_t based API will somehow simplify arch specific 
+implementation, as some of them indeed rely on phys_addr_t internally, 
+but I missed other things pointed by Robin. Do we have here any 
+alternative?
+
+
+Second - making dma_map_phys() a single API to handle all cases.
+
+Do we really need such single function to handle all cases? To handle 
+P2P case, the caller already must pass DMA_ATTR_MMIO, so it must somehow 
+keep such information internally. Cannot it just call existing 
+dma_map_resource(), so there will be clear distinction between these 2 
+cases (DMA to RAM and P2P DMA)? Do we need additional check for 
+DMA_ATTR_MMIO for every typical DMA user? I know that branching is 
+cheap, but this will probably increase code size for most of the typical 
+users for no reason.
+
+
+Best regards
 -- 
-Jens Axboe
+Marek Szyprowski, PhD
+Samsung R&D Institute Poland
+
