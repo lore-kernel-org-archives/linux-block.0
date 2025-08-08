@@ -1,145 +1,245 @@
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f174.google.com (mail-il1-f174.google.com [209.85.166.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F209286422
-	for <linux-block@vger.kernel.org>; Fri,  8 Aug 2025 15:58:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFCE91DF97F
+	for <linux-block@vger.kernel.org>; Fri,  8 Aug 2025 17:20:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754668729; cv=none; b=Iz0HpQlmfUpKicSq1RLANJ+JGDXccnAJgZib2ICVkTFZDkhpF4unmzQ1xPZLy7VJFEWL1jD9aTLfUB8sUfCSohn4Fo8tF3BlQD/WmnTjw6MUMBJv/mIbJlJ1uPI5I4B9iYcUbumGhU6Zn8zovpvjBsFmlqz16Yxxn5raX3JclpM=
+	t=1754673638; cv=none; b=lK7dYNQ/Z0TiUngJfUkmdoV2I5YmUU30vi7bGOO1pb2SIY1h2+xhIJQ78zjQ/43OONpuked33u/6m/1iy9/iUHDDMsIMTB2mXEs9qvqTYYdCAkNM6w36DEzvmEAYybWGv7DIHgLKpxkmbtYWg5tMr4Gpc8NOEuEtaoLhT6XKobQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754668729; c=relaxed/simple;
-	bh=50Bpk3z8FTM0rsQZJBadF/Vb1F4zTedXyHvRMzJvauA=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DFg3EVBip+E1qhouf72/NQrwl2RNtEbK7pVpCyV1MsgzHFliTLqOlv461VIw9G6HIpu2r3GYsTr5pqbE40oMz8htuBT6AmZs4YrMHBo7/roB5YWLgWPvVOKdNtQWWpKP71HCEt6nV/+zmfiOCdSXa5+9sNre9ba2DQHVXpyDSks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=rBY/Upjs; arc=none smtp.client-ip=67.231.145.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+	s=arc-20240116; t=1754673638; c=relaxed/simple;
+	bh=AyEYnFn6MXnJyfR42LoNmclURq4hzJqQu7YpzXlgmfE=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=nY0aUE7yAz0G3vOZ9Sg3AJ5EqDKIkNr2+bXfIrgDQI3jEIuOFTsmyxX1A7OlqOUdwDX5qvPXNrHUSSOvS4aZmndDOPmsjbILcuvqUK9FSPmR7zHDrgrC3jCqhBfx2Xhgf98hXgpht6hTiWPJIlCRaUBwrsgMqwc9IgX3DzELERw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=hV+b7azC; arc=none smtp.client-ip=209.85.166.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="rBY/Upjs"
-Received: from pps.filterd (m0044012.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 578FJ2Vq027029
-	for <linux-block@vger.kernel.org>; Fri, 8 Aug 2025 08:58:46 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=s2048-2025-q2;
-	 bh=dsr5x8qJZFXEH7GdyeAHRaxjQOPGX3vWdY3mJjxt6+4=; b=rBY/Upjs+n/g
-	xkZkXI6svOsqLBAlBcXypDTuVuVK6l5HEByer53KWxq5+RTrqkXlq4QnMK9FPkft
-	RgWHW+HFPSRhrurgUBYeKKMOgWvcQyufAdi207pLW+K9upeaOQBCjp1dR1nRasDx
-	6h1ZYnVQvf5Il92D8cmhAatVHj8gN7m4mLz+eHoR/VEO1dKHmyTNS0t7hfHnXRUj
-	7ox0BqCfhYfvufDu6s5BtmB7j70WHWmnmZVjq91knCNkaks85ka6NbCnWGd5rW8j
-	PxXAygdMgpWM8EqjbikacRZA3ZV/9zxF8pH+N790JtNQhbCQDkJNP1sK1NlPv/xH
-	bCbc03krLw==
-Received: from maileast.thefacebook.com ([163.114.135.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 48d8mybvnm-20
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Fri, 08 Aug 2025 08:58:46 -0700 (PDT)
-Received: from twshared60001.02.ash8.facebook.com (2620:10d:c0a8:1b::8e35) by
- mail.thefacebook.com (2620:10d:c0a9:6f::8fd4) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.17; Fri, 8 Aug 2025 15:58:36 +0000
-Received: by devbig197.nha3.facebook.com (Postfix, from userid 544533)
-	id 4FC346C76C1; Fri,  8 Aug 2025 08:58:27 -0700 (PDT)
-From: Keith Busch <kbusch@meta.com>
-To: <linux-block@vger.kernel.org>, <linux-nvme@lists.infradead.org>
-CC: <hch@lst.de>, <axboe@kernel.dk>, <joshi.k@samsung.com>,
-        Keith Busch
-	<kbusch@kernel.org>
-Subject: [PATCHv5 3/8] blk-mq-dma: require unmap caller provide p2p map type
-Date: Fri, 8 Aug 2025 08:58:21 -0700
-Message-ID: <20250808155826.1864803-4-kbusch@meta.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20250808155826.1864803-1-kbusch@meta.com>
-References: <20250808155826.1864803-1-kbusch@meta.com>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="hV+b7azC"
+Received: by mail-il1-f174.google.com with SMTP id e9e14a558f8ab-3e406ca2d22so11560755ab.1
+        for <linux-block@vger.kernel.org>; Fri, 08 Aug 2025 10:20:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1754673635; x=1755278435; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XjWEHV+aTRzk3h1duw/mzD0viGRoiEC3DH+jZmSSz1s=;
+        b=hV+b7azCeeCZ3Xj3rOzpuAgWyIhK0UbTVeiZ5T2FyJoUX9RCR7PR4xo0z8a+mXBoXU
+         DnFeUdTSsfqfYSD4MSFcCs9UaVO+ieudgrWA0I/r7iwBhpGi1ufcZJoJy9B0MuxgLD/A
+         p9Nq6uyDEaGpISx9TjLJJkSQmxR923qPIaAFLMSsdSVcjn8ilN5Bl0NoaLeHsmck+BeU
+         luEFLMC12/5RFuliQrcXQkKIk8Ol/s8asebITXtKc6XJhvBRh03PB9sCtaJioNczpoVz
+         s063V6iGCIx4HcAuEM3buFJPMT2wksjeZy34O6EMWIlbLkx937EDqEw3ZRiXOpmUd+Ur
+         tLag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754673635; x=1755278435;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=XjWEHV+aTRzk3h1duw/mzD0viGRoiEC3DH+jZmSSz1s=;
+        b=e8PuOfX9xwTI+ahnlRG1VQUj6924BjRPSI2ex2SZVSO14A2mc0X0Cy/ivteSNCXjQ+
+         ig7oGRYBbid1hvjiqR69H1PoZnT/NIHBlflv5Pzk9FiBRto84/pitrSjJnX2N5XN1Bwq
+         jJ/Y0tL/sAAHwrwHv+des8bcYr0/izkWRE3kJQSYFvNFD0l635EqjqF9cm6/4vlhoOZI
+         Nj/IjdSOkIDdAkE7ob2ADYpQo06g8w4m3FKwqDY1NEVTLfxtlSPHWNV/mHpNFZcJxCqT
+         4K6xzGHWgUY26BFJ8HcJVnrwHvd5MLsd+2wIg962TBbWpC/7ydSSLl9xz3hqfECAXtvT
+         hFKA==
+X-Gm-Message-State: AOJu0YzhNVti096/IDcmHRKPwDn1OLU975oNBus7HJfgwm/guzlK+JQT
+	OP2/y3zsmKtzJOcodl/0fcuP4UBOgrGFZbZzKMpoOv+ADPxk5+2o9KiEk0JHQsj6CRfhwgfZCQS
+	up4ca
+X-Gm-Gg: ASbGncvccwbNNBJnuwsaM+Q8bgYMLtoHLgviDNaWjGTVmP6odXVXc+DdrJVloL1SyMO
+	OlmhqMFv4dfLf/G9KAOsdc258weNvuiDgeWyTVqFCRmW4WXvP1ZdHq01olGGlaTQDRH5N26vLQr
+	od9kwQfTgdqLcQaDHIXuU9ol8f3cbrRPyn/d9H4baQ/Jvs6xElNNO4tXWeuIaaloxhzntWi3W+k
+	I10RR0L+vqfVmnj19uTkN9evrjD+KfY+BCtux7lXy+YeUv1hFTF4OXd/TpW91L+5H6XV7vYkYuh
+	Xnt6hmVjbCOr9Bd7mW+Bz+MNXauH+3DjZMzkwxEay9vT/7n/xE75dP6DzT/tUztjX+WkOWYlpZp
+	TWDboUE0LheU6rGaH/8vI/izKOsYXtg==
+X-Google-Smtp-Source: AGHT+IHPLUXjGDjqL5oaUIQGavB62UuZm1CFPYVAm1JQk/sXpHwTX7etknT+UEUGjLaC0IBo63ONSA==
+X-Received: by 2002:a05:6e02:1fc4:b0:3e5:2ad8:32d with SMTP id e9e14a558f8ab-3e5330aae2cmr67049165ab.8.1754673634695;
+        Fri, 08 Aug 2025 10:20:34 -0700 (PDT)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3e533bfe753sm9325825ab.17.2025.08.08.10.20.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 08 Aug 2025 10:20:33 -0700 (PDT)
+Message-ID: <3c66a9e3-ed41-4f9a-bf19-e6e5a6a38693@kernel.dk>
+Date: Fri, 8 Aug 2025 11:20:33 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-FB-Internal: Safe
-Content-Type: text/plain
-X-Authority-Analysis: v=2.4 cv=I5BlRMgg c=1 sm=1 tr=0 ts=68961eb6 cx=c_pps a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17 a=2OwXVqhp2XgA:10 a=VwQbUJbxAAAA:8 a=lg-0pX42I_tHtCv8E8UA:9
-X-Proofpoint-ORIG-GUID: Y9XIJ8WtiAsGoxKcrviB_V3b5rhFzqy8
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODA4MDEyOSBTYWx0ZWRfX85XVp7Pjwm5/ o5rWqxyVHCJWgnQjiRQMKCJhw3XE9zNYSNvO8W9DUnhHP4P1UScMk+Uulm97AKRHyNhthGE19VZ R8ayqkYmL0P/yR3PXTdHMS/qxvR2yI5GG0F3OD2u9dsgLv1hwnCS5Y4p3BO31DUOm6m+crSQjUi
- lZwZK4Hgyjez7+kzqoxcwOn6+unSfFR28yfx5hSr+oKO2CxEBaj1s9yO9TMVopDH5IxcbnEPPj8 2AaqMqe0HBo0Rak/fcYLSJANj5iSKtrznomQ+U/BxZHt8f8/MAMb+Rmfemun05kC5IXZanNv3Gn GakndYRgTusvl72KR8jqb0Eh0SwpE6nbaW77MihoBkBDamqDDqoZ97/DYFvLBtdNTKsYaerofXC
- jg0zeD8MRMmqjYKWPHUkV4HEgu4V1rktZkL8W/xq7HCjMkqvezS1t7JZjgjF7yXDiANZ62vO
-X-Proofpoint-GUID: Y9XIJ8WtiAsGoxKcrviB_V3b5rhFzqy8
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-08-08_05,2025-08-06_01,2025-03-28_01
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block changes for 6.17-rc1
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Keith Busch <kbusch@kernel.org>
+Hi Linus,
 
-In preparing for integrity dma mappings, we can't rely on the request
-flag because data and metadata may have different mapping types.
+Set of changes and fixes that should go into the 6.17-rc1 release. Some
+are straight up fixes, few are just a bit delayed and hence missed the
+initial pull request when the merge window opens. However, nothing major
+or alarming in here. This pull request contains:
 
-Signed-off-by: Keith Busch <kbusch@kernel.org>
----
- drivers/nvme/host/pci.c    | 9 ++++++++-
- include/linux/blk-mq-dma.h | 5 +++--
- 2 files changed, 11 insertions(+), 3 deletions(-)
+- MD pull request via Yu
+	- mddev null-ptr-dereference fix, by Erkun
+	- md-cluster fail to remove the faulty disk regression fix,
+	  by Heming
+	- minor cleanup, by Li Nan and Jinchao
+	- mdadm lifetime regression fix reported by syzkaller,
+	  by Yu Kuai
 
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index 2c6d9506b1725..111b6bc6c93eb 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -261,6 +261,9 @@ enum nvme_iod_flags {
-=20
- 	/* single segment dma mapping */
- 	IOD_SINGLE_SEGMENT	=3D 1U << 2,
-+
-+	/* DMA mapped with PCI_P2PDMA_MAP_BUS_ADDR */
-+	IOD_P2P_BUS_ADDR	=3D 1U << 3,
- };
-=20
- struct nvme_dma_vec {
-@@ -725,7 +728,8 @@ static void nvme_unmap_data(struct request *req)
- 		return;
- 	}
-=20
--	if (!blk_rq_dma_unmap(req, dma_dev, &iod->dma_state, iod->total_len)) {
-+	if (!blk_rq_dma_unmap(req, dma_dev, &iod->dma_state, iod->total_len,
-+				iod->flags & IOD_P2P_BUS_ADDR)) {
- 		if (nvme_pci_cmd_use_sgl(&iod->cmd))
- 			nvme_free_sgls(req);
- 		else
-@@ -1000,6 +1004,9 @@ static blk_status_t nvme_map_data(struct request *r=
-eq)
- 	if (!blk_rq_dma_map_iter_start(req, dev->dev, &iod->dma_state, &iter))
- 		return iter.status;
-=20
-+	if (iter.p2pdma.map =3D=3D PCI_P2PDMA_MAP_BUS_ADDR)
-+		iod->flags |=3D IOD_P2P_BUS_ADDR;
-+
- 	if (use_sgl =3D=3D SGL_FORCED ||
- 	    (use_sgl =3D=3D SGL_SUPPORTED &&
- 	     (sgl_threshold && nvme_pci_avg_seg_size(req) >=3D sgl_threshold)))
-diff --git a/include/linux/blk-mq-dma.h b/include/linux/blk-mq-dma.h
-index c82f880dee914..aef8d784952ff 100644
---- a/include/linux/blk-mq-dma.h
-+++ b/include/linux/blk-mq-dma.h
-@@ -49,14 +49,15 @@ static inline bool blk_rq_dma_map_coalesce(struct dma=
-_iova_state *state)
-  * @dma_dev:	device to unmap from
-  * @state:	DMA IOVA state
-  * @mapped_len: number of bytes to unmap
-+ * @is_p2p:	true if mapped with PCI_P2PDMA_MAP_BUS_ADDR
-  *
-  * Returns %false if the callers need to manually unmap every DMA segmen=
-t
-  * mapped using @iter or %true if no work is left to be done.
-  */
- static inline bool blk_rq_dma_unmap(struct request *req, struct device *=
-dma_dev,
--		struct dma_iova_state *state, size_t mapped_len)
-+		struct dma_iova_state *state, size_t mapped_len, bool is_p2p)
- {
--	if (req->cmd_flags & REQ_P2PDMA)
-+	if (is_p2p)
- 		return true;
-=20
- 	if (dma_use_iova(state)) {
---=20
-2.47.3
+- MD pull request via Christoph
+	- add support for getting the FDP featuee in fabrics passthru
+	  path (Nitesh Shetty)
+	- add capability to connect to an administrative controller
+	  (Kamaljit Singh)
+	- fix a leak on sgl setup error (Keith Busch)
+	- initialize discovery subsys after debugfs is initialized
+	  (Mohamed Khalfella)
+	- fix various comment typos (Bjorn Helgaas)
+	- remove unneeded semicolons (Jiapeng Chong)
+
+- nvmet debugfs ordering issue fix
+
+- Fix UAF in the tag_set in zloop 
+
+- Ensure sbitmap shallow depth covers entire set
+
+- Reduce lock roundtrips in io context lookup
+
+- Move scheduler tags alloc/free out of elevator and freeze lock, to fix
+  some lockdep found issues
+
+- Improve robustness of queue limits checking
+
+- Fix a regression with IO priorities, if no io context exists
+
+Please pull!
+
+
+The following changes since commit 86aa721820952b793a12fc6e5a01734186c0c238:
+
+  Merge tag 'chrome-platform-v6.17' of git://git.kernel.org/pub/scm/linux/kernel/git/chrome-platform/linux (2025-07-28 23:26:07 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.dk/linux.git tags/block-6.17-20250808
+
+for you to fetch changes up to 45fa9f97e65231a9fd4f9429489cb74c10ccd0fd:
+
+  lib/sbitmap: make sbitmap_get_shallow() internal (2025-08-07 06:30:17 -0600)
+
+----------------------------------------------------------------
+block-6.17-20250808
+
+----------------------------------------------------------------
+Bjorn Helgaas (1):
+      nvme: fix various comment typos
+
+Christoph Hellwig (1):
+      block: ensure discard_granularity is zero when discard is not supported
+
+Christophe JAILLET (1):
+      block, bfq: Reorder struct bfq_iocq_bfqq_data
+
+Damien Le Moal (1):
+      block: Improve read ahead size for rotational devices
+
+Guenter Roeck (1):
+      block: Fix default IO priority if there is no IO context
+
+Heming Zhao (1):
+      md/md-cluster: handle REMOVE message earlier
+
+Jens Axboe (2):
+      Merge tag 'nvme-6.17-2025-07-31' of git://git.infradead.org/nvme into block-6.17
+      Merge tag 'md-6.17-20250803' of gitolite.kernel.org:pub/scm/linux/kernel/git/mdraid/linux into block-6.17
+
+Jiapeng Chong (1):
+      nvme-auth: remove unneeded semicolon
+
+John Garry (2):
+      block: avoid possible overflow for chunk_sectors check in blk_stack_limits()
+      block: Enforce power-of-2 physical block size
+
+Kamaljit Singh (1):
+      nvme: add capability to connect to an administrative controller
+
+Keith Busch (1):
+      nvme-pci: fix leak on sgl setup error
+
+Li Nan (1):
+      md: rename recovery_cp to resync_offset
+
+Mohamed Khalfella (2):
+      nvmet: initialize discovery subsys after debugfs is initialized
+      nvmet: exit debugfs after discovery subsystem exits
+
+Nilay Shroff (3):
+      block: move elevator queue allocation logic into blk_mq_init_sched
+      block: fix lockdep warning caused by lock dependency in elv_iosched_store
+      block: fix potential deadlock while running nr_hw_queue update
+
+Nitesh Shetty (1):
+      nvmet: add support for FDP in fabrics passthru path
+
+Shin'ichiro Kawasaki (1):
+      zloop: fix KASAN use-after-free of tag set
+
+Wang Jinchao (2):
+      md/raid1: change r1conf->r1bio_pool to a pointer type
+      md/raid1: remove struct pool_info and related code
+
+Yang Erkun (1):
+      md: make rdev_addable usable for rcu mode
+
+Yu Kuai (4):
+      blk-ioc: don't hold queue_lock for ioc_lookup_icq()
+      md: fix create on open mddev lifetime regression
+      lib/sbitmap: convert shallow_depth from one word to the whole sbitmap
+      lib/sbitmap: make sbitmap_get_shallow() internal
+
+ block/bfq-iosched.c            |  66 ++++--------
+ block/bfq-iosched.h            |  13 ++-
+ block/blk-ioc.c                |  16 ++-
+ block/blk-mq-sched.c           | 223 ++++++++++++++++++++++++++++-------------
+ block/blk-mq-sched.h           |  12 ++-
+ block/blk-mq.c                 |  16 ++-
+ block/blk-settings.c           |  33 ++++--
+ block/blk.h                    |   4 +-
+ block/elevator.c               |  38 +++++--
+ block/elevator.h               |  16 ++-
+ block/kyber-iosched.c          |  20 +---
+ block/mq-deadline.c            |  30 +-----
+ drivers/block/zloop.c          |   3 +-
+ drivers/md/dm-raid.c           |  42 ++++----
+ drivers/md/md-bitmap.c         |   8 +-
+ drivers/md/md-cluster.c        |  16 +--
+ drivers/md/md.c                |  73 ++++++++------
+ drivers/md/md.h                |   2 +-
+ drivers/md/raid0.c             |   6 +-
+ drivers/md/raid1-10.c          |   2 +-
+ drivers/md/raid1.c             |  94 +++++++----------
+ drivers/md/raid1.h             |  22 +---
+ drivers/md/raid10.c            |  16 +--
+ drivers/md/raid5-ppl.c         |   6 +-
+ drivers/md/raid5.c             |  30 +++---
+ drivers/nvme/host/auth.c       |   4 +-
+ drivers/nvme/host/core.c       |  16 +++
+ drivers/nvme/host/fc.c         |   4 +-
+ drivers/nvme/host/pci.c        |   2 +-
+ drivers/nvme/host/tcp.c        |   2 +-
+ drivers/nvme/target/core.c     |  14 +--
+ drivers/nvme/target/fc.c       |   6 +-
+ drivers/nvme/target/passthru.c |   2 +
+ drivers/nvme/target/rdma.c     |   6 +-
+ include/linux/ioprio.h         |   3 +-
+ include/linux/sbitmap.h        |  19 +---
+ include/uapi/linux/raid/md_p.h |   2 +-
+ lib/sbitmap.c                  |  74 ++++++++------
+ 38 files changed, 519 insertions(+), 442 deletions(-)
+
+-- 
+Jens Axboe
 
