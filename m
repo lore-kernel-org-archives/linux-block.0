@@ -1,164 +1,182 @@
-Received: from mail-io1-f100.google.com (mail-io1-f100.google.com [209.85.166.100])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 223B3285CBD
-	for <linux-block@vger.kernel.org>; Fri,  8 Aug 2025 15:52:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8024286422
+	for <linux-block@vger.kernel.org>; Fri,  8 Aug 2025 15:58:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754668352; cv=none; b=NSWyGtQ4CzOC9Dk8CtqBUj14r/WVNoYyUX9+ztPZ/I2uORodoPRSWaDKT/G6HEuxkHT326vHX1uVlMQvpRxl2qaykMpjc9zUlgHb8Dds535ETHjrSqt7FsY9uoagBtjyjhwvEzpaVx1KeQa/y3sOqokgzXZgIomiptkD2/fQDsY=
+	t=1754668715; cv=none; b=i/j2+d7dH0CIoTBKzUBJTAZpUvsMFMjYd5qiv8yn5DaFN3bX5qlEsrx8zN0+aaTgQZVTlagWbfZOfY9EfSbVPINR/JpXg8xc5IKdExMVDzifDpKbkQZusImM84GleLV0tdA2dqPd/Mx1K6S9LnZngoNC0aIN/tF7tN9OJzmTXa0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754668352; c=relaxed/simple;
-	bh=rwY+6H6u80joBsrhEhKEXk0cucLQiP1e1Ud9NkfJ2mk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Q5hRCOrfULj66x/9ktDyE/+lOFjHPfgVW97YPmlvZkeXMOLg6QxwqAibo32QYw8ODB7AVX4G4Av3HKGgVDnyWzXvKR2zbUTSFTxMtyJ91nZhuj6kZh0He9kugekpCujyN9CJsFc4aGZSku6lBnnmo70IAIId1GI1cJ0v7A8jMtg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=b3WhRZIz; arc=none smtp.client-ip=209.85.166.100
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	s=arc-20240116; t=1754668715; c=relaxed/simple;
+	bh=LNovEpmdBuAJVhQM5dgP9MtRGzsCjsrgUCjLGOfPjD4=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=qb7gdpHiO//6vCDUw1DMw9VTXL12slp3A5GA7yid9au6zhOOpdPFzKPz8jh3LMvxxhp8FwxtaAeydK8Rl4rJuALeY2c9wYMCRAtuEwZ2RmTxKxBwVHwSWLZwGYapfOvf4vyIEFW9UPhOO4HtDuAY303FwnYQoXAOKERvnrlVcd0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=csFkBI1+; arc=none smtp.client-ip=67.231.145.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="b3WhRZIz"
-Received: by mail-io1-f100.google.com with SMTP id ca18e2360f4ac-875c1f8793aso7585539f.2
-        for <linux-block@vger.kernel.org>; Fri, 08 Aug 2025 08:52:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1754668349; x=1755273149; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=WDnFLQYE/9gqtmsTbT/ho+kOSDoyfUwk9gt7yBIm8Gk=;
-        b=b3WhRZIzCxE78fbKuhGfCrSHOuXdj+SjQwlmmPcQxBs0FZw1LVjkkgcQsRb/j6AMhp
-         HG5bqW/pDPS1JgvcPx1hrJcs4loVobRl/76uANt+IoUc4f39N9dMBQj3TqnqrF11UGuH
-         puoMm9o/SMUP2yxWx9d87D6lmmK2erZM95nCDNAjyTWOgMHff+fkSZcAz1FKpRtd68uZ
-         EwiraqzXBFW1MwynNzJ5NBGNcrnZ/pKcUNZYZB8cjIAU0ETEesf2PdXuf/Z7dtmfAndd
-         GcPfwCgsDhpZWP0v7GTVVoTLJ3Zr+dxTtMlO1WjCjjKQxBNT5CKJ+bCssBsuOsW/0ACK
-         3kIw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754668349; x=1755273149;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=WDnFLQYE/9gqtmsTbT/ho+kOSDoyfUwk9gt7yBIm8Gk=;
-        b=PViGJZiNipznHZxD5Gr70xOzPd7cAO90BSyi+HnkTP8f96Hy2/0Z6GzUXMeswCuQ91
-         x5kmdXLJ1zLVG2ghmF3XNHemZskj6/tubbRMxQpasACguqwnlte1asb7GY1S+5o3iDQC
-         mH1g16NasQtGrlGcH6UC1bAzefJiX4nnoRomBuvp22v4ffMEIOjNGHyachzGktbT5Zxz
-         dhmt/wKZoFOkzDfBVOZx7KzO88g1pR+uPecslcQBihQPTCfInhRv+b2kO1b60iBap+0a
-         idbV9OixdzSmqZ+wQiCfCzNxlfSbBHZxX6n+gRhIiBKlJu4CCsXyobrlsdnsP6lhJE5Z
-         bawQ==
-X-Gm-Message-State: AOJu0YxsQDn3SCK0U2wpI+VwiRDxqysQz7Su2vfYVzNaV54qfm1bv5z9
-	p2+sNorUnbGS9n7GMp0FoLVk1OBNcInp/ms48+5RGekrpnfmAPXEPzkojYsKivU3TBNl9quzrFT
-	4l5l52PaoxOgx6UvXCxJ5onRBkQy3Q/bR298l
-X-Gm-Gg: ASbGncsVfb+MOUOvPAAb8LQbRRE4ZWf1AvOmZx5vXHrzopaExBwLk1iGD5fuLgQA+5X
-	P6qtSQqVdGgrNlMzn3+HnWjuFty62hrFrVjeaL4yd91W4SOaZ2+QBrGV5xphgjJk/GheImqcA7O
-	6zpPweknXp7Z8HyEXWlOBA1E1Hz7tasyXyBUqjMW6/lk9mzBb7WpqTrFDU+kIO2GldijJ4+l/Br
-	OQ4qHfAbLPzaumzRMG8il21g/bZH4cMBUQH0mMHRitWoIQaIIq+hmEYsoE7eOX1XutZRl/LsCqG
-	uHxor1JZjYJQbsBogRl/7hrqPKQdy60BbkwTPUO/OAMwW+J2Rb9J4UgG2OwLEE5nu7VryXxF
-X-Google-Smtp-Source: AGHT+IHsEIHvzKEqwfGGH06NchR3RnM7OZwvoi0OVdp5Y0s9Go/QPEu1k6+RlpB3kq/7NyAS23S5mk4VQRpa
-X-Received: by 2002:a05:6602:3fc4:b0:87c:46f2:7075 with SMTP id ca18e2360f4ac-883f12ac4f6mr160145439f.5.1754668349110;
-        Fri, 08 Aug 2025 08:52:29 -0700 (PDT)
-Received: from c7-smtp-2023.dev.purestorage.com ([208.88.159.128])
-        by smtp-relay.gmail.com with ESMTPS id 8926c6da1cb9f-50ae9bb6bbfsm160766173.32.2025.08.08.08.52.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Aug 2025 08:52:29 -0700 (PDT)
-X-Relaying-Domain: purestorage.com
-Received: from dev-csander.dev.purestorage.com (unknown [IPv6:2620:125:9007:640:ffff::1199])
-	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 821D4340237;
-	Fri,  8 Aug 2025 09:52:28 -0600 (MDT)
-Received: by dev-csander.dev.purestorage.com (Postfix, from userid 1557716354)
-	id 7C621E489B5; Fri,  8 Aug 2025 09:52:28 -0600 (MDT)
-From: Caleb Sander Mateos <csander@purestorage.com>
-To: Ming Lei <ming.lei@redhat.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Caleb Sander Mateos <csander@purestorage.com>,
-	Uday Shankar <ushankar@purestorage.com>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] ublk: check for unprivileged daemon on each I/O fetch
-Date: Fri,  8 Aug 2025 09:52:15 -0600
-Message-ID: <20250808155216.296170-1-csander@purestorage.com>
-X-Mailer: git-send-email 2.45.2
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="csFkBI1+"
+Received: from pps.filterd (m0109333.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 578FKBb6021638
+	for <linux-block@vger.kernel.org>; Fri, 8 Aug 2025 08:58:33 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=s2048-2025-q2;
+	 bh=Kb4ack9vXfOSkVGDHJdpxKswW0fz+d5LtDVd0jctGeE=; b=csFkBI1+fT9S
+	jT8enHvgiuYhvaFkvQpOj1qbFEAWWd6Fqr7jxTGHp9qp3sbuUkUbKZXYFDqSmSsd
+	i7BhPLh9pVZssE/ufcA6oOi4ROTLQMds00piI10+VMXByFclowA6FwqzdUhsU0Mw
+	QOs6Zh/m5/pHDb8GW0O7Oac8NzzFTG1vaoUFL4n+bOWamdy9hKCi2Z6wLGch7Kuh
+	ofLoL1UWy8vb1E053t4f4DrskD0bZo4gdMu6IxKQpmHDGXPXyvqqtou3hntgKYh/
+	ADnD5SXyiOaOQX1YNlQBcMPp57KS/A7Nw6W1XMiNbtycjS/l6n8RmxKicKGR5nVH
+	U2CBgWdsRQ==
+Received: from maileast.thefacebook.com ([163.114.135.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 48dbwck3f3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <linux-block@vger.kernel.org>; Fri, 08 Aug 2025 08:58:32 -0700 (PDT)
+Received: from twshared10560.01.ash9.facebook.com (2620:10d:c0a8:1c::1b) by
+ mail.thefacebook.com (2620:10d:c0a9:6f::237c) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.17; Fri, 8 Aug 2025 15:58:31 +0000
+Received: by devbig197.nha3.facebook.com (Postfix, from userid 544533)
+	id DB4976C76C5; Fri,  8 Aug 2025 08:58:27 -0700 (PDT)
+From: Keith Busch <kbusch@meta.com>
+To: <linux-block@vger.kernel.org>, <linux-nvme@lists.infradead.org>
+CC: <hch@lst.de>, <axboe@kernel.dk>, <joshi.k@samsung.com>,
+        Keith Busch
+	<kbusch@kernel.org>
+Subject: [PATCHv5 5/8] blk-mq-dma: move common dma start code to a helper
+Date: Fri, 8 Aug 2025 08:58:23 -0700
+Message-ID: <20250808155826.1864803-6-kbusch@meta.com>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20250808155826.1864803-1-kbusch@meta.com>
+References: <20250808155826.1864803-1-kbusch@meta.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+Content-Type: text/plain
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODA4MDEyOSBTYWx0ZWRfX+eYSTGOeTU5H 0Q53AyrcN7jUa32sBxpQSzRqZqLqOR4mnVw3+9cb96oQ0XRAtRhm4o91DYlzWwjNDgj26CQ4+Gl +0kuaGREWzGkBgqyBnGmCpDXfMpWJWp8Cg6Fb5yULfccuasp9sq7PqGNEwkwDY3pvxNkGwv6hH6
+ FI/oEbgmAZoBM21wFA/pZZzGfpCF9OVdTYvScI8ATnyxeGcUryE7wn59l+FFD/ktXAEhG+VONFy HEGApsuQDOBBXMWzjQBrgxi5l77/D0GtK1fZEq3L3jl+kmNTLilfQNMPe+sgizx3HA24+ulypKB YaktGh5Gl0azCLUEdFTjIN6MOPR3gQ92L99+SIFrAP4xiy+qeC5xtdxx9PvTXVOXXubpvLYikCH
+ Lj/wEkhP7J48Z0OrOyuF4Jvyhorzt80J9qW2ukajqmOBJKNhX64O4I/CaJCI4rW2cNzJZGak
+X-Proofpoint-GUID: vYFFWMFADsHiERQE8Aoj0pjJczYBa4nK
+X-Authority-Analysis: v=2.4 cv=DthW+H/+ c=1 sm=1 tr=0 ts=68961ea8 cx=c_pps a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17 a=2OwXVqhp2XgA:10 a=VwQbUJbxAAAA:8 a=Udg8XZZ2YZ10bUHcV_QA:9
+X-Proofpoint-ORIG-GUID: vYFFWMFADsHiERQE8Aoj0pjJczYBa4nK
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-08-08_05,2025-08-06_01,2025-03-28_01
 
-Commit ab03a61c6614 ("ublk: have a per-io daemon instead of a per-queue
-daemon") allowed each ublk I/O to have an independent daemon task.
-However, nr_privileged_daemon is only computed based on whether the last
-I/O fetched in each ublk queue has an unprivileged daemon task.
-Fix this by checking whether every fetched I/O's daemon is privileged.
-Change nr_privileged_daemon from a count of queues to a boolean
-indicating whether any I/Os have an unprivileged daemon.
+From: Keith Busch <kbusch@kernel.org>
 
-Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
-Fixes: ab03a61c6614 ("ublk: have a per-io daemon instead of a per-queue daemon")
+In preparing for dma mapping integrity metadata, move the common dma
+setup to a helper.
+
+Signed-off-by: Keith Busch <kbusch@kernel.org>
 ---
- drivers/block/ublk_drv.c | 16 +++++++---------
- 1 file changed, 7 insertions(+), 9 deletions(-)
+ block/blk-mq-dma.c | 60 +++++++++++++++++++++++++---------------------
+ 1 file changed, 33 insertions(+), 27 deletions(-)
 
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 6561d2a561fa..a035070dd690 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -233,11 +233,11 @@ struct ublk_device {
- 
- 	struct ublk_params	params;
- 
- 	struct completion	completion;
- 	unsigned int		nr_queues_ready;
--	unsigned int		nr_privileged_daemon;
-+	bool 			unprivileged_daemons;
- 	struct mutex cancel_mutex;
- 	bool canceling;
- 	pid_t 	ublksrv_tgid;
- };
- 
-@@ -1548,11 +1548,11 @@ static void ublk_reset_ch_dev(struct ublk_device *ub)
- 		ublk_queue_reinit(ub, ublk_get_queue(ub, i));
- 
- 	/* set to NULL, otherwise new tasks cannot mmap io_cmd_buf */
- 	ub->mm = NULL;
- 	ub->nr_queues_ready = 0;
--	ub->nr_privileged_daemon = 0;
-+	ub->unprivileged_daemons = false;
- 	ub->ublksrv_tgid = -1;
+diff --git a/block/blk-mq-dma.c b/block/blk-mq-dma.c
+index 988c27667df67..bc694fecb39dc 100644
+--- a/block/blk-mq-dma.c
++++ b/block/blk-mq-dma.c
+@@ -135,36 +135,12 @@ static struct blk_map_iter blk_rq_map_iter(struct r=
+equest *rq)
+ 	};
  }
- 
- static struct gendisk *ublk_get_disk(struct ublk_device *ub)
+=20
+-/**
+- * blk_rq_dma_map_iter_start - map the first DMA segment for a request
+- * @req:	request to map
+- * @dma_dev:	device to map to
+- * @state:	DMA IOVA state
+- * @iter:	block layer DMA iterator
+- *
+- * Start DMA mapping @req to @dma_dev.  @state and @iter are provided by=
+ the
+- * caller and don't need to be initialized.  @state needs to be stored f=
+or use
+- * at unmap time, @iter is only needed at map time.
+- *
+- * Returns %false if there is no segment to map, including due to an err=
+or, or
+- * %true ft it did map a segment.
+- *
+- * If a segment was mapped, the DMA address for it is returned in @iter.=
+addr and
+- * the length in @iter.len.  If no segment was mapped the status code is
+- * returned in @iter.status.
+- *
+- * The caller can call blk_rq_dma_map_coalesce() to check if further seg=
+ments
+- * need to be mapped after this, or go straight to blk_rq_dma_map_iter_n=
+ext()
+- * to try to map the following segments.
+- */
+-bool blk_rq_dma_map_iter_start(struct request *req, struct device *dma_d=
+ev,
+-		struct dma_iova_state *state, struct blk_dma_iter *iter)
++static bool blk_dma_map_iter_start(struct request *req, struct device *d=
+ma_dev,
++		struct dma_iova_state *state, struct blk_dma_iter *iter,
++		unsigned int total_len)
  {
-@@ -1978,16 +1978,14 @@ static void ublk_reset_io_flags(struct ublk_device *ub)
- /* device can only be started after all IOs are ready */
- static void ublk_mark_io_ready(struct ublk_device *ub, struct ublk_queue *ubq)
- 	__must_hold(&ub->mutex)
- {
- 	ubq->nr_io_ready++;
--	if (ublk_queue_ready(ubq)) {
-+	if (ublk_queue_ready(ubq))
- 		ub->nr_queues_ready++;
+-	unsigned int total_len =3D blk_rq_payload_bytes(req);
 -
--		if (capable(CAP_SYS_ADMIN))
--			ub->nr_privileged_daemon++;
--	}
-+	if (!ub->unprivileged_daemons && !capable(CAP_SYS_ADMIN))
-+		ub->unprivileged_daemons = true;
- 
- 	if (ub->nr_queues_ready == ub->dev_info.nr_hw_queues) {
- 		/* now we are ready for handling ublk io request */
- 		ublk_reset_io_flags(ub);
- 		complete_all(&ub->completion);
-@@ -2878,12 +2876,12 @@ static int ublk_ctrl_start_dev(struct ublk_device *ub,
- 	ub->dev_info.ublksrv_pid = ublksrv_pid;
- 	ub->ub_disk = disk;
- 
- 	ublk_apply_params(ub);
- 
--	/* don't probe partitions if any one ubq daemon is un-trusted */
--	if (ub->nr_privileged_daemon != ub->nr_queues_ready)
-+	/* don't probe partitions if any daemon task is un-trusted */
-+	if (ub->unprivileged_daemons)
- 		set_bit(GD_SUPPRESS_PART_SCAN, &disk->state);
- 
- 	ublk_get_device(ub);
- 	ub->dev_info.state = UBLK_S_DEV_LIVE;
- 
--- 
-2.45.2
+ 	memset(&iter->p2pdma, 0, sizeof(iter->p2pdma));
+ 	iter->status =3D BLK_STS_OK;
+-	iter->iter =3D blk_rq_map_iter(req);
+=20
+ 	/*
+ 	 * Grab the first segment ASAP because we'll need it to check for P2P
+@@ -194,6 +170,36 @@ bool blk_rq_dma_map_iter_start(struct request *req, =
+struct device *dma_dev,
+ 		return blk_rq_dma_map_iova(req, dma_dev, state, iter);
+ 	return blk_dma_map_direct(req, dma_dev, iter);
+ }
++
++/**
++ * blk_rq_dma_map_iter_start - map the first DMA segment for a request
++ * @req:	request to map
++ * @dma_dev:	device to map to
++ * @state:	DMA IOVA state
++ * @iter:	block layer DMA iterator
++ *
++ * Start DMA mapping @req to @dma_dev.  @state and @iter are provided by=
+ the
++ * caller and don't need to be initialized.  @state needs to be stored f=
+or use
++ * at unmap time, @iter is only needed at map time.
++ *
++ * Returns %false if there is no segment to map, including due to an err=
+or, or
++ * %true ft it did map a segment.
++ *
++ * If a segment was mapped, the DMA address for it is returned in @iter.=
+addr and
++ * the length in @iter.len.  If no segment was mapped the status code is
++ * returned in @iter.status.
++ *
++ * The caller can call blk_rq_dma_map_coalesce() to check if further seg=
+ments
++ * need to be mapped after this, or go straight to blk_rq_dma_map_iter_n=
+ext()
++ * to try to map the following segments.
++ */
++bool blk_rq_dma_map_iter_start(struct request *req, struct device *dma_d=
+ev,
++		struct dma_iova_state *state, struct blk_dma_iter *iter)
++{
++	iter->iter =3D blk_rq_map_iter(req);
++	return blk_dma_map_iter_start(req, dma_dev, state, iter,
++				      blk_rq_payload_bytes(req));
++}
+ EXPORT_SYMBOL_GPL(blk_rq_dma_map_iter_start);
+=20
+ /**
+--=20
+2.47.3
 
