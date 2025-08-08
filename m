@@ -1,60 +1,56 @@
-Received: from smtp1.iitb.ac.in (smtpd9.iitb.ac.in [103.21.126.64])
+Received: from mout-p-101.mailbox.org (mout-p-101.mailbox.org [80.241.56.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4D0C277CAF
-	for <linux-block@vger.kernel.org>; Fri,  8 Aug 2025 12:28:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.21.126.64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34EAA2110;
+	Fri,  8 Aug 2025 12:48:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754656135; cv=none; b=RXNkRMaRb+mtiwfb8XBPf9xfhkVBWnL40gFo5d6kV5RN0fCrG3hK6qnuAowN4XBZzEVUXkClu1+I1wmCx2Hdyj9CS3o1Uc/xQz9xf3In8D4Fia+e52PIFBQtbctr8ts/njRCfx65HfxennIvxt/insTR1GiSXlsoe85cSdC1VZM=
+	t=1754657283; cv=none; b=Hq7s5KA72gurqs9r0DOSfdzEVGXgUOOT65S26hd5y7OivGN7GonbCo7ydmqkSxpPppZajiEO2waYQqotkyRKUfAxHOQAV22s+/pnYAh7vapmVjld0PZsYFoaxetVbOhjQxlFgNycp3cCW36KPTUq1CczUDSt0YkznrwksP4SC/g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754656135; c=relaxed/simple;
-	bh=AwqI2ate9xOTmJrt9TYMHJbOytgp965hWnkzbeK8RHw=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=fKeOGE1SFfb+jm3iXRQEelVcC+yMYSgAlBdOzV9FRomLZqMlyGFOtU1k0QAN45NhUXgj7hB4e6QwZg97zxfwCXPDmq2Yhz84bdKckPip7TnfORb6uNfIhV+8/KsMmz1km5fd251Q5o8HxM4cnc12JTArTH3m8Oji7pFnQgvhQa8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ee.iitb.ac.in; spf=pass smtp.mailfrom=ee.iitb.ac.in; dkim=pass (1024-bit key) header.d=iitb.ac.in header.i=@iitb.ac.in header.b=KgoEk+cS; arc=none smtp.client-ip=103.21.126.64
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ee.iitb.ac.in
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ee.iitb.ac.in
+	s=arc-20240116; t=1754657283; c=relaxed/simple;
+	bh=ZGFdbRGwejrzDcHR/X3MgPRKwNwztzI4nbgHvvSToFg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GsQxTXNwApxcJ9OUvwnc25drtL0nUz1fWaoCHPtKwkhI01lMYOJ7zIwIzOMSBKCH8jDTuxcyx5NtU2yaHjWTKtUH6Nkl0JjZ113+PAsL9941ULDODtguBAA4SS7mTRK/jsa1QWWq373H6D0kPWegmccmjOCnD9Y+efKNoDXcVLQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pankajraghav.com; spf=pass smtp.mailfrom=pankajraghav.com; dkim=pass (2048-bit key) header.d=pankajraghav.com header.i=@pankajraghav.com header.b=AWHt8fvS; arc=none smtp.client-ip=80.241.56.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pankajraghav.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pankajraghav.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iitb.ac.in header.i=@iitb.ac.in header.b="KgoEk+cS"
-Received: from ldns2.iitb.ac.in (ldns2.iitb.ac.in [10.200.12.2])
-	by smtp1.iitb.ac.in (Postfix) with SMTP id BFA8B1018FD1
-	for <linux-block@vger.kernel.org>; Fri,  8 Aug 2025 17:58:45 +0530 (IST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 smtp1.iitb.ac.in BFA8B1018FD1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=iitb.ac.in; s=mail;
-	t=1754656125; bh=AwqI2ate9xOTmJrt9TYMHJbOytgp965hWnkzbeK8RHw=;
-	h=Date:From:To:Cc:Subject:From;
-	b=KgoEk+cS8U5V1PbpDznWHyvWLRvIDqniNrVf/GkDX4BYaJUmbVM9Xd2bZKbGau2xf
-	 tZfw6hKvV+q7jkJucTLH8jDlEH+6SQxAPLkDJTmaDUGSaaLBTUdLeO1JbtigAeyX26
-	 XphgiwjyfH/uwySyTCcOaZqCCoKlEoce2mrXT2yg=
-Received: (qmail 26809 invoked by uid 510); 8 Aug 2025 17:58:45 +0530
-X-Qmail-Scanner-Diagnostics: from 10.200.1.25 by ldns2 (envelope-from <akhilesh@ee.iitb.ac.in>, uid 501) with qmail-scanner-2.11
- spamassassin: 3.4.1. mhr: 1.0. {clamdscan: 0.100.0/26337} 
- Clear:RC:1(10.200.1.25):SA:0(0.0/7.0):. Processed in 4.326992 secs; 08 Aug 2025 17:58:45 +0530
-X-Spam-Level: 
-X-Spam-Pyzor: Reported 0 times.
-X-Envelope-From: akhilesh@ee.iitb.ac.in
-X-Qmail-Scanner-Mime-Attachments: |
-X-Qmail-Scanner-Zip-Files: |
-Received: from unknown (HELO ldns2.iitb.ac.in) (10.200.1.25)
-  by ldns2.iitb.ac.in with SMTP; 8 Aug 2025 17:58:41 +0530
-Received: from bhairav.ee.iitb.ac.in (bhairav.ee.iitb.ac.in [10.107.1.1])
-	by ldns2.iitb.ac.in (Postfix) with ESMTP id 93882341550;
-	Fri,  8 Aug 2025 17:58:40 +0530 (IST)
-Received: from bhairav-test.ee.iitb.ac.in (bhairav.ee.iitb.ac.in [10.107.1.1])
-	(Authenticated sender: akhilesh)
-	by bhairav.ee.iitb.ac.in (Postfix) with ESMTPSA id 3B5301E814CA;
-	Fri,  8 Aug 2025 17:58:40 +0530 (IST)
-Date: Fri, 8 Aug 2025 17:58:34 +0530
-From: Akhilesh Patil <akhilesh@ee.iitb.ac.in>
-To: axboe@kernel.dk, hare@suse.de, hch@infradead.org,
-	john.g.garry@oracle.com, yukuai3@huawei.com
-Cc: yi.zhang@redhat.com, calvin@wbinvd.org, david@fromorbit.com,
-	yukuai1@huaweicloud.com, yi.zhang@huawei.com, yangerkun@huawei.com,
-	johnny.chenyi@huawei.com, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, akhileshpatilvnit@gmail.com,
-	skhan@linuxfoundation.org
-Subject: [PATCH] block: genhd: use max() to improve inflight IO counting code
-Message-ID: <aJXtctgVs6Md6vb1@bhairav-test.ee.iitb.ac.in>
+	dkim=pass (2048-bit key) header.d=pankajraghav.com header.i=@pankajraghav.com header.b="AWHt8fvS"
+Received: from smtp202.mailbox.org (smtp202.mailbox.org [10.196.197.202])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-101.mailbox.org (Postfix) with ESMTPS id 4bz3j93hX9z9tHh;
+	Fri,  8 Aug 2025 14:47:57 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pankajraghav.com;
+	s=MBO0001; t=1754657277;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pkMYJ2o4F1aHWTWOscA3VXFDMI9SeAOXtPgcMzAcYs8=;
+	b=AWHt8fvS0AlKB3qZ9GpjYc0BYsf9nEejwvWvkSXOYHgvNHxfmBHZbANDdmbDY4R+x4oxx4
+	wn/8KiYDOD9RPkpwsTOTfxHHbnVR8fdu49EvKFLWpC84XXP4//tzmgPx3oDCAds2B/Tqyc
+	VA/urPVj9d1rqLEY55/S2NaQiq9x0e8chaRU1WvQw1TFJONvhiJEl4m6sxwX4nqAo2xNPk
+	Zwjz1G41FuBkw83SV4E+v9n8lpWaZJrUkpiv3BvdT0QYReq6+ssdiJtHrH0GuQKBiy3a6e
+	DrNaQOP8fHx/w1BVRSpG6arLYRvIzXl9kS6GKhH+athZYNb4KdZCBu5NcTiNXw==
+Date: Fri, 8 Aug 2025 14:47:42 +0200
+From: "Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>
+To: Suren Baghdasaryan <surenb@google.com>, 
+	Ryan Roberts <ryan.roberts@arm.com>, Baolin Wang <baolin.wang@linux.alibaba.com>, 
+	Vlastimil Babka <vbabka@suse.cz>, Zi Yan <ziy@nvidia.com>, Mike Rapoport <rppt@kernel.org>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, Michal Hocko <mhocko@suse.com>, 
+	David Hildenbrand <david@redhat.com>, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, 
+	Andrew Morton <akpm@linux-foundation.org>, Thomas Gleixner <tglx@linutronix.de>, 
+	Nico Pache <npache@redhat.com>, Dev Jain <dev.jain@arm.com>, 
+	"Liam R . Howlett" <Liam.Howlett@oracle.com>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-kernel@vger.kernel.org, willy@infradead.org, linux-mm@kvack.org, 
+	Ritesh Harjani <ritesh.list@gmail.com>, linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	"Darrick J . Wong" <djwong@kernel.org>, mcgrof@kernel.org, gost.dev@samsung.com, hch@lst.de, 
+	Pankaj Raghav <p.raghav@samsung.com>
+Subject: Re: [PATCH v2 3/5] mm: add persistent huge zero folio
+Message-ID: <jd6qvb6erqjmsn6b7imwcsktthbvn6tefwdgfsseakra62t7yh@w5ju2gvvp2mj>
+References: <20250808121141.624469-1-kernel@pankajraghav.com>
+ <20250808121141.624469-4-kernel@pankajraghav.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -63,34 +59,11 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20250808121141.624469-4-kernel@pankajraghav.com>
 
-Use max() macro in bdev_count_inflight_rw() while populating buffer of
-read/write inflight block IO count. Use standard macro to
-simplify the code without impacting functionality.
+> +		if (!get_huge_zero_folio())
+> +			pr_warn("Allocating static huge zero folio failed\n");
 
-Fixes: c007062188d8 ("block: fix false warning in bdev_count_inflight_rw()")
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/r/202506272336.CvAqaAxB-lkp@intel.com/
-Signed-off-by: Akhilesh Patil <akhilesh@ee.iitb.ac.in>
----
- block/genhd.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Oops, forgot to do s/static/persistent/ here.
 
-diff --git a/block/genhd.c b/block/genhd.c
-index c26733f6324b..af74cb80eadb 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -147,8 +147,8 @@ static void bdev_count_inflight_rw(struct block_device *part,
- 	 * traversed and complete on a CPU that has not yet been traversed,
- 	 * causing the inflight number to be negative.
- 	 */
--	inflight[READ] = read > 0 ? read : 0;
--	inflight[WRITE] = write > 0 ? write : 0;
-+	inflight[READ] = max(read, 0);
-+	inflight[WRITE] = max(write, 0);
- }
- 
- /**
--- 
-2.34.1
-
+I can fold this in the next version after receiving the comments.
