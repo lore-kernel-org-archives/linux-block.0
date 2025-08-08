@@ -1,55 +1,51 @@
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
+Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F2C3286894
-	for <linux-block@vger.kernel.org>; Fri,  8 Aug 2025 15:58:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0386528689C
+	for <linux-block@vger.kernel.org>; Fri,  8 Aug 2025 15:58:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754668726; cv=none; b=SPwc+1bszeOXXurGNr3RFzeIaCGQM7jiHGD208zt6ISvd/AefR2dPpICAzjhhIt0okOP71kDu+VMz4O3PPj2I+a/2EeFj4sXwmeJKHihmqwvFbVIWrV5iqDSd/GoGW3rns7nVNVcm/IBGhvR0HGJcc7gRUsel7lhevEGmgJ/11E=
+	t=1754668729; cv=none; b=oDfqwc0XSJbz23DdB6Vh+hJvNMRzScWUyLiVcADwffcwNpWMlIbsZ47bzVGBWte9IQsfdXS+juQ76I7bhUsPvv5JD45HWSR11gHDiQesItErd8iEnUq4Mpy9qX1U/jgclBS/077X37V4GQEzcqL3dIMAdAV0Tai3T3tbBaofgZU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754668726; c=relaxed/simple;
-	bh=SulBtO2WLEB8yiWxu8UJufeMcebtOml0MbwG57EqkZE=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CrEfOlIytsT63AoieiHL7DJIQqGQBqwGPrEYHsSY8+ABOytMvFVDIk8UFcWj5lqcOmLL7AgiMDF8wlTchY05SMOq/W8rjEzSy0nBerksb4iyjdmKDPdObcUxC7EW4HFrLmCToUDbfphdnjUXQkn5E26UKxpwkHhfnnZoTC2zun8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=PF4dCi34; arc=none smtp.client-ip=67.231.145.42
+	s=arc-20240116; t=1754668729; c=relaxed/simple;
+	bh=sIgBT7Vu1/n/e5EBmWiSawKpVS8eCmKmh8QU8V3hv0g=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=JtSdzc9uHEsBbWP/2kF6Y7lBlJkafiqPPkc0hXpLzLKMLh2liHV4QKwtE9tttNTcUv6yj4PsOXAioMozBHBPfXVPXb+l8eONsNMCIkSfmcHkouxg371JjC69VA1eLVsn8/qTg9KfX1g/gtBJMF4dd33wGZHXPF9tQk0sTlo8j7Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=R1m+Mrbx; arc=none smtp.client-ip=67.231.153.30
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="PF4dCi34"
-Received: from pps.filterd (m0109333.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 578FKBbO021638
-	for <linux-block@vger.kernel.org>; Fri, 8 Aug 2025 08:58:44 -0700
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="R1m+Mrbx"
+Received: from pps.filterd (m0089730.ppops.net [127.0.0.1])
+	by m0089730.ppops.net (8.18.1.2/8.18.1.2) with ESMTP id 578FIqju012510
+	for <linux-block@vger.kernel.org>; Fri, 8 Aug 2025 08:58:47 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=s2048-2025-q2;
-	 bh=ut48uWJtSD/GPhmg0N8X2KhVkgcEnwTLCf0dr8KqeYs=; b=PF4dCi34NY3M
-	3tBLEaduklOMj6PpW70+ioKg4hR/Da/syL7aE6Vzts9WCzPHiEJ5+Y1paBj4nDJc
-	JLanF1uzXhAqbkadt2D2Xq6C5/5agokXAMue7zHkYlt8I2s+vQsPkb7+u9pf7gcB
-	6x2chywrxU69TjbGX7o0tpSJDZPXQoZZ4lReYEcdOAszdVLzcNxrDtz1pcTMGK7o
-	ytxlHswOzSX0975M8linJkgVnAMjODkT3tZi8HIVketofseTMVbIxGhh0mG4BC4e
-	ZvrA/FX99IBBO/woiRoSY6uqitkgrSlNsw9EQ2WlCf83modLIDeoNsMIJm9OkCrk
-	afW2RHfZ3Q==
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=s2048-2025-q2; bh=jFORdkuYpnBcFvG1gO
+	x/i+B5cKvoQ9+xtADPU12ZRbM=; b=R1m+MrbxW/Iv0KVBdZiLhIFe4dX7FglyQp
+	mrsoKDwYyGtuzyJ4xUrgDcmoMeAfoGWOsQoMPaInleEshwsgZ1mGxu2himhhOHf5
+	8XE+h67PNej2L4wl79C6UNhqfyezFUxSS4V+axYZlYAd/rbpgGfXnOvoFjVoleXC
+	WdhLsqr5VOyVNpj6yBRCS2VNrFkUdUs+5/1uVxLhhny9M1YKtmNDXOx8HKYL6mwU
+	prASPf+HAxJhtdPOQyqx/wX9Ki8101xhmGveBFjoXxic2hy6yB2cAOdBeoes/yXY
+	aiPpU0jyuqmaGIYjtA048YHegB6Zwefzr0C05FLzIwV0iCLQDtWQ==
 Received: from maileast.thefacebook.com ([163.114.135.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 48dbwck3f3-19
+	by m0089730.ppops.net (PPS) with ESMTPS id 48d1x5xjtu-3
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Fri, 08 Aug 2025 08:58:44 -0700 (PDT)
-Received: from twshared60001.02.ash8.facebook.com (2620:10d:c0a8:1b::8e35) by
+	for <linux-block@vger.kernel.org>; Fri, 08 Aug 2025 08:58:46 -0700 (PDT)
+Received: from twshared21625.15.frc2.facebook.com (2620:10d:c0a8:1c::11) by
  mail.thefacebook.com (2620:10d:c0a9:6f::237c) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.17; Fri, 8 Aug 2025 15:58:36 +0000
+ 15.2.2562.17; Fri, 8 Aug 2025 15:58:39 +0000
 Received: by devbig197.nha3.facebook.com (Postfix, from userid 544533)
-	id 422316C76CC; Fri,  8 Aug 2025 08:58:27 -0700 (PDT)
+	id 19B556C76BB; Fri,  8 Aug 2025 08:58:27 -0700 (PDT)
 From: Keith Busch <kbusch@meta.com>
 To: <linux-block@vger.kernel.org>, <linux-nvme@lists.infradead.org>
 CC: <hch@lst.de>, <axboe@kernel.dk>, <joshi.k@samsung.com>,
         Keith Busch
 	<kbusch@kernel.org>
-Subject: [PATCHv5 7/8] nvme-pci: create common sgl unmapping helper
-Date: Fri, 8 Aug 2025 08:58:25 -0700
-Message-ID: <20250808155826.1864803-8-kbusch@meta.com>
+Subject: [PATCHv5 0/8] blk dma iter for integrity metadata
+Date: Fri, 8 Aug 2025 08:58:18 -0700
+Message-ID: <20250808155826.1864803-1-kbusch@meta.com>
 X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20250808155826.1864803-1-kbusch@meta.com>
-References: <20250808155826.1864803-1-kbusch@meta.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -59,78 +55,49 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 X-FB-Internal: Safe
 Content-Type: text/plain
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODA4MDEyOSBTYWx0ZWRfX94H+IekrtFbw NWe7nnntXKB5ru5aa9A4mgYX+AuQt8rL7Cz0Q2vlrs+Pp4T9/ozAkZbiDlq7rhoSfrvrjBZLERb 5Wq5nIMGoONkVeAu+l3qCxgSDj26nEbR0tQ5p+id+gnVpVWMg5v4gcmpQmqqpZKI0NVDeInIZQz
- itxo1hrW+LpEQ9lgM/z1M8uPJ3Is/NBxnJopZjjq/aaXDnHZ7wZnVtKSEyrUBa0ma4QbTjBwUYW Hm9Oljj/LOiDam6/DNQJ4L6smLXr4q8SD606lQwNGpygkXBMkuSj18a/FAIW1zh3ogi5b0yXZGe Kp9G5CipPJJFzpeR4cSpA7A9T7UsP3idRMgTbLt5GjGQNe0S5amjhaOEdS/YLLT6qQ/0JvFb8OY
- q354wfhxmolO+Oz5MZyh6dOK0ENNvAIWwYn0RwB6INooMW1ht9rk0MdZVaWmOKYJs4hFT636
-X-Proofpoint-GUID: o6am4UR5hfZeHt49Fr7BO6rzXlD11YAY
-X-Authority-Analysis: v=2.4 cv=DthW+H/+ c=1 sm=1 tr=0 ts=68961eb4 cx=c_pps a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17 a=2OwXVqhp2XgA:10 a=VwQbUJbxAAAA:8 a=Duz19Zw78js5DzQJfkIA:9
-X-Proofpoint-ORIG-GUID: o6am4UR5hfZeHt49Fr7BO6rzXlD11YAY
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODA4MDEyOSBTYWx0ZWRfXxK96nNYIwStF a5HBv15gUaaTt6glzhAt06pG9mRndpkaeMhh5gl3e4mOV+4YU2r8FKu2of41PYxkzTUvJrAB0dt kWBTswzFFqspCbkGgJX8lpRQOF4aiCvHHgbGSOWzaiW1sDQJ6qc26bnYTjbrUh3yQJ2O+ygKpk6
+ S4phD9/msdyuzX01zQICkWqzriqQxAF2ApCVny6UxFL9TYiQnrpkIct6TZK7TudIWVx18GnGZlj YSgP9yNG8yI11BWuPnhiM4W2cSOm/VgCtHBGQWFcwieYzciNGRQEZBaSV4hX2XHK0dL5EcRQSsc GLW6Y3TvwT+bcp9kzANDgA42wvHlEW0WcURQC7N7OM6dxsQfSoOTN3YU0HPYcH5OfBHHWIvB63a
+ Qz1W8vwphSonmdbOw6hujcYqz4X9dBK5TJk9ingluUWvCRu/Ea28eb0XwRz6KQnWlJuDva0S
+X-Proofpoint-GUID: 4IoQhj4YycsUCXAX-cm0EwtB23cIZ19o
+X-Proofpoint-ORIG-GUID: 4IoQhj4YycsUCXAX-cm0EwtB23cIZ19o
+X-Authority-Analysis: v=2.4 cv=R4sDGcRX c=1 sm=1 tr=0 ts=68961eb6 cx=c_pps a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17 a=2OwXVqhp2XgA:10 a=VwQbUJbxAAAA:8 a=VabnemYjAAAA:8 a=QyXUC8HyAAAA:8 a=agJ6Vr9HkWBsIA0g1xEA:9 a=gKebqoRLp9LExxC7YDUY:22
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
  definitions=2025-08-08_05,2025-08-06_01,2025-03-28_01
 
 From: Keith Busch <kbusch@kernel.org>
 
-This can be reused by metadata sgls once that starts using the blk-mq
-dma api.
+Previous version:
 
-Signed-off-by: Keith Busch <kbusch@kernel.org>
----
- drivers/nvme/host/pci.c | 31 ++++++++++++++++++++-----------
- 1 file changed, 20 insertions(+), 11 deletions(-)
+  https://lore.kernel.org/linux-block/20250731150513.220395-1-kbusch@meta=
+.com/
 
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index 111b6bc6c93eb..decb3ad1508a7 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -693,25 +693,34 @@ static void nvme_free_prps(struct request *req)
- 	mempool_free(iod->dma_vecs, nvmeq->dev->dmavec_mempool);
- }
-=20
-+
-+static void __nvme_free_sgls(struct device *dma_dev, struct nvme_sgl_des=
-c *sge,
-+		struct nvme_sgl_desc *sg_list, enum dma_data_direction dir)
-+{
-+	unsigned int len =3D le32_to_cpu(sge->length);
-+	unsigned int i, nr_entries;
-+
-+	if (sge->type =3D=3D (NVME_SGL_FMT_DATA_DESC << 4)) {
-+		dma_unmap_page(dma_dev, le64_to_cpu(sge->addr), len, dir);
-+		return;
-+	}
-+
-+	nr_entries =3D len / sizeof(*sg_list);
-+	for (i =3D 0; i < nr_entries; i++)
-+		dma_unmap_page(dma_dev, le64_to_cpu(sg_list[i].addr),
-+			le32_to_cpu(sg_list[i].length), dir);
-+}
-+
- static void nvme_free_sgls(struct request *req)
- {
- 	struct nvme_iod *iod =3D blk_mq_rq_to_pdu(req);
- 	struct nvme_queue *nvmeq =3D req->mq_hctx->driver_data;
- 	struct device *dma_dev =3D nvmeq->dev->dev;
--	dma_addr_t sqe_dma_addr =3D le64_to_cpu(iod->cmd.common.dptr.sgl.addr);
--	unsigned int sqe_dma_len =3D le32_to_cpu(iod->cmd.common.dptr.sgl.lengt=
-h);
- 	struct nvme_sgl_desc *sg_list =3D iod->descriptors[0];
-+	struct nvme_sgl_desc *sge =3D &iod->cmd.common.dptr.sgl;
- 	enum dma_data_direction dir =3D rq_dma_dir(req);
-=20
--	if (iod->nr_descriptors) {
--		unsigned int nr_entries =3D sqe_dma_len / sizeof(*sg_list), i;
--
--		for (i =3D 0; i < nr_entries; i++)
--			dma_unmap_page(dma_dev, le64_to_cpu(sg_list[i].addr),
--				le32_to_cpu(sg_list[i].length), dir);
--	} else {
--		dma_unmap_page(dma_dev, sqe_dma_addr, sqe_dma_len, dir);
--	}
-+	__nvme_free_sgls(dma_dev, sge, sg_list, dir);
- }
-=20
- static void nvme_unmap_data(struct request *req)
+Changes since v4:
+
+ - Fixed nvme initialization for metadata total length (Kanchan)
+
+ - Removed the now unused __REQ_FLAG_P2PDMA (Kanchan)
+
+ - Fixed checks with CONFIG_BLK_DEV_INTEGRITY is not set (lkp@intel.com)
+
+Keith Busch (8):
+  blk-mq-dma: introduce blk_map_iter
+  blk-mq-dma: provide the bio_vec list being iterated
+  blk-mq-dma: require unmap caller provide p2p map type
+  blk-mq: remove REQ_P2PDMA flag
+  blk-mq-dma: move common dma start code to a helper
+  blk-mq-dma: add support for mapping integrity metadata
+  nvme-pci: create common sgl unmapping helper
+  nvme-pci: convert metadata mapping to dma iter
+
+ block/bio.c                   |   2 +-
+ block/blk-mq-dma.c            | 239 +++++++++++++++++++++-------------
+ drivers/nvme/host/pci.c       | 197 +++++++++++++++-------------
+ include/linux/blk-integrity.h |  17 +++
+ include/linux/blk-mq-dma.h    |  18 ++-
+ include/linux/blk_types.h     |   2 -
+ 6 files changed, 287 insertions(+), 188 deletions(-)
+
 --=20
 2.47.3
 
