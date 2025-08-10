@@ -1,43 +1,43 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F032026B2CE;
-	Sun, 10 Aug 2025 15:15:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1386FC0B;
+	Sun, 10 Aug 2025 15:39:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754838910; cv=none; b=WgHMz45GAIBF4UG1GI25CNIYCU1SZrDpcDxFZZrziABZ0CoQ1PHMFIzE5bmVLHqtRBvDfV2xRlHNoUAJeNL5kTxqaq+tizrjeqyBoyB/p/B8ZbErmUuMHK0hpQkpWH+N3vTLaIkC2IztB8cbjtzik1z4yFcsKJYGTE86Yn3Biio=
+	t=1754840392; cv=none; b=kPrn7K4t9FFpsGSDpq80leK37ZwOc3dKfsrUaGvlnKvMdFPedz+VTHeTIcVEPQI3SiX/d/5ODi7Os/CO1ly9Rjw+hrXIZdIYLzsY8pxW95PASge7hqh+nX3iscrwu2bvPScn+G1Ml7puiM3YZ32OW/5Cd1mg4uAbr6RbtobJnHI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754838910; c=relaxed/simple;
-	bh=4py5CiaEqZCxsBjzLqsWWptAKmnXu0QuOgMZZwuHK7A=;
+	s=arc-20240116; t=1754840392; c=relaxed/simple;
+	bh=+j1Bp9s9rjELiXx3hwgwck5ohy+WjMZZHHd17dhpuB4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HkFh6Pc7F5BzIgtA+kZ/iAxHVocHlSt0UlKjQNyjty1gOLyYWdJA41NwySPHsdpw+aJuun9O5BuuxSkf87WEQ790hqpzAiYNFqZQsCds2hgfIXzxIMJRJPtyd5cywoL/wnZY9TcEMubQTgnXh97n/8FKj1kSlqPfxFxcWvQ8s0s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=3kRrcm9o; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=YaKeCkHIiFAFRW9Dyq4sgMxQCkO8YYkCgraAqoJxe7xx/TJIfxyEmb7t9/oU47vUHmJv7v+DZtNNHJ0W0HUUZwHS/uJ3oZ5akMiGjrxG/0UtPP1+lFodi/xzb/55pXrx6q28N90vUXEuteqIvPpB3i1rG3hs+fYwXlJqgzPf2KU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lB2zdLGg; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="3kRrcm9o"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=KCZ5r6bLjXiaZzh+JC2eqEL4QryolyvFac905CpBFhY=; b=3kRrcm9ois4tc4AmmgL8vGPwAT
-	jUtJBK1VKIQVZeuuBEOQLPQUijfLJhl7u2K3LtTGjAr4OHb5hAboE1y4eauF9qIIUQ6CPyWxbGbl4
-	yS0MUb+sKAwkQAc8k86Rz2u8LVaqwc5qLV/yyE5e4O6IphgNWf3+WXr+ZUxwLnVW65ejLtm61d3Os
-	mVBHHDOmlW2WORHsbBLCIchtnMCjcdlZCLnmdfuZKSUmpEGi97gjKgltX/eNzYbw0JUPSImDtEeZn
-	MQ9Z9Hoi9s6mlaY7RmCvLzyI4DJc6gqOMFvY2ulL7ucskZlGtKjMzFctziahr1GBtBI4ND3ycNE2x
-	qGXjhf9g==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1ul7lM-00000005joe-19Z7;
-	Sun, 10 Aug 2025 15:15:08 +0000
-Date: Sun, 10 Aug 2025 08:15:08 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Rajeev Mishra <rajeevm@hpe.com>
-Cc: axboe@kernel.dk, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/1] loop: sync filesystem cache before getting file size
- in get_size()
-Message-ID: <aJi3fFwlqb-SfHGg@infradead.org>
-References: <20250807232522.192898-1-rajeevm@hpe.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lB2zdLGg"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5E7AC4CEEB;
+	Sun, 10 Aug 2025 15:39:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1754840392;
+	bh=+j1Bp9s9rjELiXx3hwgwck5ohy+WjMZZHHd17dhpuB4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=lB2zdLGghuvCm4jhOTpUwNyIHAMXiz8KbNdPmjh+BqWTL2lmjMJlgcmWDzPj8Ao7L
+	 MkvbqMvedvGFL7mAEnL5T4J8f+BLKBn9NN6LtaY4vFUC+9wUjjK4kEDR7MxIeEyVa4
+	 8ABQ5y5lOOSK52C/BiJL8K82Wkmx2izLu6NKg39dMu6BwUznpPTXfgdFe40ZKIcjGU
+	 PWzrB7xNJ+6KoaRrOADBhr9cQ171iVunpVVljdvvimpdUjnW5xzncpanuCv+JNnoIR
+	 /y2WmbXOszvDQ9WJF8QWkUahLwoE/Apd0HXIBHPCh85gsy2jCno5ZxKXur9qXKZRfw
+	 5g22Atux9A/lw==
+Date: Sun, 10 Aug 2025 09:39:50 -0600
+From: Keith Busch <kbusch@kernel.org>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+	snitzer@kernel.org, axboe@kernel.dk, dw@davidwei.uk,
+	brauner@kernel.org, Hannes Reinecke <hare@suse.de>
+Subject: Re: [PATCHv2 1/7] block: check for valid bio while splitting
+Message-ID: <aJi9RgOAjXm8Hwlo@kbusch-mbp>
+References: <20250805141123.332298-1-kbusch@meta.com>
+ <20250805141123.332298-2-kbusch@meta.com>
+ <aJiusAtZ-CsnPTOR@infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -46,82 +46,25 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250807232522.192898-1-rajeevm@hpe.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <aJiusAtZ-CsnPTOR@infradead.org>
 
-On Thu, Aug 07, 2025 at 11:25:22PM +0000, Rajeev Mishra wrote:
-> The get_size() function now uses vfs_getattr_nosec() with AT_STATX_SYNC_AS_STAT
-> to ensure filesystem cache is synchronized before retrieving file size. This
-> provides more accurate size information, especially when:
+On Sun, Aug 10, 2025 at 07:37:36AM -0700, Christoph Hellwig wrote:
+> On Tue, Aug 05, 2025 at 07:11:17AM -0700, Keith Busch wrote:
+> > @@ -341,6 +344,8 @@ int bio_split_rw_at(struct bio *bio, const struct queue_limits *lim,
+> >  	 * we do not use the full hardware limits.
+> >  	 */
+> >  	bytes = ALIGN_DOWN(bytes, bio_split_alignment(bio, lim));
+> > +	if (!bytes)
+> > +		return -EINVAL;
 > 
-> - The backing file size has been changed by another process
-> - The file is on a network filesystem (NFS, CIFS, etc.)
-> - The file is being modified concurrently
-> - The most accurate size is needed for loop device setup
-> 
+> How is this related to the other hunk and the patch description?
 
-Please wrap your commit messages at 73 (or apparently 75) lines.
+The patchset allows you to submit an io with vectors that are partial
+logical blocks. Misuse could create a bio that exceeds the device max
+vectors or introduces virtual boundary gaps, requiring a split into
+something that is smaller than a block size. This check catches that.
 
-Also 'syncing the cache' (what cache?) is at best an implementation
-detail.  The VFS semantics simply are that you need a getattr to
-retrieve the inode size, and the loop code fails to do this correctly.
-
-> The implementation gracefully falls back to i_size_read() if vfs_getattr_nosec()
-> fails, maintaining backward compatibility.
-
-No need to fall back.  If vfs_getattr faills the file systems is
-completely toast.
-
->  static int part_shift;
->  
-> +/**
-> + * get_size - calculate the effective size of a loop device
-> + * @offset: offset into the backing file
-> + * @sizelimit: user-specified size limit
-> + * @file: the backing file
-> + *
-> + * Calculate the effective size of the loop device
-> + *
-> + * Returns: size in 512-byte sectors, or 0 if invalid
-> + */
-
-We don't really need a verbose kerneldoc for a static helper with 2
-callers.
-
->  static loff_t get_size(loff_t offset, loff_t sizelimit, struct file *file)
->  {
-> +	struct kstat stat;
->  	loff_t loopsize;
-> +	int ret;
-> +
-> +	/*
-> +	 * Get file attributes for validation. We use vfs_getattr() to ensure
-> +	 * we have up-to-date file size information.
-> +	 */
-
-The comment seems a bit misleading or at least not to the point.
-
-I'd say:
-
-	/*
-	 * File systems don't have to keep i_size in sync.  While local file
-	 * systems typically keep it in sync, remote file system often do not.
-	 * Go through ->getattr to retrieve the current value.
-	 */
-
-> +	ret = vfs_getattr_nosec(&file->f_path, &stat, STATX_SIZE, 
-> +			        AT_STATX_SYNC_AS_STAT);
-
-Most kernel callers just pass 0 instead of AT_STATX_SYNC_AS_STAT here,
-which honestly is less confusing as I had to look up
-AT_STATX_SYNC_AS_STAT first.
-
-> +	if (ret) {
-> +		/*
-> +		 * If we can't get attributes, fall back to i_size_read()
-> +		 * which should work for most cases.
-> +		 */
-
-As said above, there is no need to do this.  Adding a proper error
-return chain here is better.
-
+Quick example: nvme with a 4k logical block size, and the usual 4k
+virtual boundary. Send an io with four vectors iov_len=1k. The total
+size is block sized, but there's no way that could split into a valid
+io. There's a test specifically for this in my reply about xfstests.
