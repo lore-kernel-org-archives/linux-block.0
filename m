@@ -1,44 +1,29 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF1FB27462;
-	Sun, 10 Aug 2025 14:43:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9D3623958F
+	for <linux-block@vger.kernel.org>; Sun, 10 Aug 2025 14:55:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754837028; cv=none; b=O5WFhxEYWx73gHSXhqZEwF8eUz7XVFydpNs9EMCBWsaKwCuxgeTO0e5Dko6KRM31Zqidxm0G3rfx5vbEX1HVMh/U2CiBf1P50iLKQ7MB21jqscLN4yzHDmtbDnIg8sPipu1I5WE4POdGOBhgms/nW5X2MaMiYG+gqwyCmwwVeEU=
+	t=1754837715; cv=none; b=rI/F/+NpZ8VM661YAgMLdyYg5f3pG6foYEV8ISgRlppngx717aTe7qLrJkQIimPZd9WIY+kqIc1iyQkv/HokjexkO3Hfrq6ff2cMnt0yqhPHybMk0+YJXnfh85/T2X2WdC3mrMJZR+q30hPl8lqPdqWqFQfe9syK1PEKS9ITlCM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754837028; c=relaxed/simple;
-	bh=/2hkWykdN5SGC949fKWLSJv0MD92nI/TP0V4jimqPf0=;
+	s=arc-20240116; t=1754837715; c=relaxed/simple;
+	bh=SfA8TwiSSpFZl9fG7y5OH9V9S9D3/RMMZ0JVlZZWbIs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BnMCmfjYz8ryzHQ86bMun3IcpVVwolBMaYHTST3Tij579T4oHGkNCYd6CdgipW2DojA3mr5hyoF4TG3Jbwx5+89vP6dGZE3/nHvUHlIXkeqTP0ef5Gz4nVmjEw2W5tDA1/Xo8Mk9HSpIJSoCq2UQhCnQyqDhCHmnxpFT63NIMvA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=RH0e3XXe; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="RH0e3XXe"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=S/EEJenBN5OfCRJ1aaN/UO5YQygmLrn7WRn6fy2hpQ4=; b=RH0e3XXenEZ5QCZMpJn4UshNmg
-	oH+wcv1djJL0fSOsQWfOSzJQHQJ4/RLMsZt+S5p2qJhAKFsG32PoSZsmzJV7sCaeerfL0C6hvGAs/
-	tWNY9mGREiEpLqo1tuooNGJuiZsXAIs6kULpOuINHeSm2uZxBTSCWa5vvop2doc78T0tGVLacpbPh
-	QBavYDGo6FglgtwXN0diqTYv2WGj9Poc8iC7t4J+Eth18u9R++BW2p4ZDfhyN0Zq6SPc0vphkWUX3
-	TsyZz67B5zU6yoiWJlHrq5z017gEK3Zfme99eokNXw/qj7jz8Ke+apxAajKMp9FdolkpekGE9suak
-	aOim7V8g==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1ul7H0-00000005i4h-1eW2;
-	Sun, 10 Aug 2025 14:43:46 +0000
-Date: Sun, 10 Aug 2025 07:43:46 -0700
-From: Christoph Hellwig <hch@infradead.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=cHAcagK0gmBjYIfi5lnx5NyiMvWzZeUDOAi825Sfg6oUHj82hSA0O/CNIielmPgZKv/8SOflwx9aWqy9KN0Q6WSRFNzyw9SR+bl+YgLVRnNejJtxpBvLF71iv+zS/Q0/AaAp5p//MjcPu/T4XtqBjoKQM9qGpVTQewCpgzIGLPw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 5BF5E227A87; Sun, 10 Aug 2025 16:55:09 +0200 (CEST)
+Date: Sun, 10 Aug 2025 16:55:09 +0200
+From: Christoph Hellwig <hch@lst.de>
 To: Keith Busch <kbusch@meta.com>
-Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org, snitzer@kernel.org, axboe@kernel.dk,
-	dw@davidwei.uk, brauner@kernel.org, Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCHv2 2/7] block: align the bio after building it
-Message-ID: <aJiwIgotNmmJvtjP@infradead.org>
-References: <20250805141123.332298-1-kbusch@meta.com>
- <20250805141123.332298-3-kbusch@meta.com>
+Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, hch@lst.de,
+	axboe@kernel.dk, Keith Busch <kbusch@kernel.org>
+Subject: Re: [PATCHv2 1/2] block: accumulate segment page gaps per bio
+Message-ID: <20250810145509.GA5444@lst.de>
+References: <20250806145136.3573196-1-kbusch@meta.com> <20250806145136.3573196-2-kbusch@meta.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -47,46 +32,38 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250805141123.332298-3-kbusch@meta.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20250806145136.3573196-2-kbusch@meta.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Tue, Aug 05, 2025 at 07:11:18AM -0700, Keith Busch wrote:
-> +static inline void bio_revert(struct bio *bio, unsigned int nbytes)
-
-Can you add a little comment explaining what this code does?  The name
-suggast it is similar to iov_iter_revert, but I'm not sure how similar
-it is intended to be.  The direct poking into bi_io_vec suggest it
-can only be used by the I/O submitter, and the use of bio_release_page
-suggests it is closely tied to to bio_iov_iter_get_pages despite the
-very generic name.
-
-> +static int bio_align_to_lbs(struct bio *bio, struct iov_iter *iter)
+On Wed, Aug 06, 2025 at 07:51:35AM -0700, Keith Busch wrote:
+> +static inline unsigned int bvec_seg_gap(struct bio_vec bv, struct bio_vec bp)
 > +{
-> +	struct block_device *bdev = bio->bi_bdev;
-> +	size_t nbytes;
-> +
-> +	if (!bdev)
-> +		return 0;
+> +	return bv.bv_offset | ((bp.bv_offset + bp.bv_len) & (PAGE_SIZE - 1));
+> +}
 
-So this is something horribly Kent put in where he failed to deal with
-review feedback and just fed his stuff to Linus, and I think we need
-to fix it when touching this code again.  Assuming we want to support
-bio_iov_iter_get_pages on bios without bi_bdev set we simplify can't
-rely in looking at bdev_logical_block_size here, but instead need to
-pass it explicitly.  Which honestly doesn't sound to bad, just add an
-explicit argument for the required alignment to bio_iov_iter_get_pages
-instead of trying to derive it.  Which is actually going to be useful
-to reduce duplicate checks for file systems the require > LBA size
-alignment as well.
+Can you just pass a pointer to the bio_vec even if the compiler
+is probably optimizing away the function either way?
 
-> -	return bio->bi_vcnt ? 0 : ret;
-> +	if (bio->bi_vcnt)
-> +		return bio_align_to_lbs(bio, iter);
-> +	return ret;
+Also bp is a bit of an odd name for a bio_vec.  Note that bvprv flows
+well, but it is what the caller uses, so mahybe stick to it?
 
-Nit, this would flow a little more easily by moving the error /
-exceptional case into the branch, i.e.
+>  	/* the following two fields are internal, NEVER access directly */
+>  	unsigned int __data_len;	/* total data len */
+> +	unsigned int __page_gaps;	/* a mask of all the segment gaps */
+>  	sector_t __sector;		/* sector cursor */
+>  
+>  	struct bio *bio;
+> @@ -1080,6 +1081,11 @@ static inline sector_t blk_rq_pos(const struct request *rq)
+>  	return rq->__sector;
+>  }
+>  
+> +static inline unsigned int blk_rq_page_gaps(const struct request *rq)
+> +{
+> +	return rq->__page_gaps;
+> +}
 
-	if (!bio->bi_vcnt)
-		return ret;
-	return bio_align_to_lbs(bio, iter);
+I don't think we really need the __ and the access helper here.  This was
+mostly done for fields where historically drivers accessed the field
+directly, but it subtly changed semantics making these direct accesses
+unsafe.  
+
