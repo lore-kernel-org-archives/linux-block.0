@@ -1,70 +1,158 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1386FC0B;
-	Sun, 10 Aug 2025 15:39:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 630E318C933;
+	Sun, 10 Aug 2025 16:52:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754840392; cv=none; b=kPrn7K4t9FFpsGSDpq80leK37ZwOc3dKfsrUaGvlnKvMdFPedz+VTHeTIcVEPQI3SiX/d/5ODi7Os/CO1ly9Rjw+hrXIZdIYLzsY8pxW95PASge7hqh+nX3iscrwu2bvPScn+G1Ml7puiM3YZ32OW/5Cd1mg4uAbr6RbtobJnHI=
+	t=1754844722; cv=none; b=YT6jpJtbJY+p8ay63QwlVRo2/cGQofXaqNVAAad+ph4D/lDwFyChhkbuEiD09T00d1/aaqxM1N1ENMqs/93XnJrFDAqU791aqityLhRaeqVmHuvkLUATm0+lwJPcZkVKVShv6Ft+jGcZN+PLARamA3hJqWgVn6yJgUkGQJRB7t8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754840392; c=relaxed/simple;
-	bh=+j1Bp9s9rjELiXx3hwgwck5ohy+WjMZZHHd17dhpuB4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YaKeCkHIiFAFRW9Dyq4sgMxQCkO8YYkCgraAqoJxe7xx/TJIfxyEmb7t9/oU47vUHmJv7v+DZtNNHJ0W0HUUZwHS/uJ3oZ5akMiGjrxG/0UtPP1+lFodi/xzb/55pXrx6q28N90vUXEuteqIvPpB3i1rG3hs+fYwXlJqgzPf2KU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lB2zdLGg; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1754844722; c=relaxed/simple;
+	bh=5+1OgXBWikGfNfHsB4wmJv6tgGDqZu9/PnzXxMeunkQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=unuq+xR3BhdpZiitIeZZoEbVfBtfjF9xc/7vAr/aCO2+WrgvTQj35t9OTcsTLFCqL+nZMVilh3yn5f2Mk+JvMmix30ZwaIVavWRSb91PjpbdfnIqYNRhCGRhVxtMRisiuTKb7hzJbacDtuiOFR/eDFb7OFwrVnln/UCh6a5CIDY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NlQYaWMl; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lB2zdLGg"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5E7AC4CEEB;
-	Sun, 10 Aug 2025 15:39:51 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NlQYaWMl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9445C4CEEB;
+	Sun, 10 Aug 2025 16:52:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754840392;
-	bh=+j1Bp9s9rjELiXx3hwgwck5ohy+WjMZZHHd17dhpuB4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=lB2zdLGghuvCm4jhOTpUwNyIHAMXiz8KbNdPmjh+BqWTL2lmjMJlgcmWDzPj8Ao7L
-	 MkvbqMvedvGFL7mAEnL5T4J8f+BLKBn9NN6LtaY4vFUC+9wUjjK4kEDR7MxIeEyVa4
-	 8ABQ5y5lOOSK52C/BiJL8K82Wkmx2izLu6NKg39dMu6BwUznpPTXfgdFe40ZKIcjGU
-	 PWzrB7xNJ+6KoaRrOADBhr9cQ171iVunpVVljdvvimpdUjnW5xzncpanuCv+JNnoIR
-	 /y2WmbXOszvDQ9WJF8QWkUahLwoE/Apd0HXIBHPCh85gsy2jCno5ZxKXur9qXKZRfw
-	 5g22Atux9A/lw==
-Date: Sun, 10 Aug 2025 09:39:50 -0600
-From: Keith Busch <kbusch@kernel.org>
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-	snitzer@kernel.org, axboe@kernel.dk, dw@davidwei.uk,
-	brauner@kernel.org, Hannes Reinecke <hare@suse.de>
-Subject: Re: [PATCHv2 1/7] block: check for valid bio while splitting
-Message-ID: <aJi9RgOAjXm8Hwlo@kbusch-mbp>
-References: <20250805141123.332298-1-kbusch@meta.com>
- <20250805141123.332298-2-kbusch@meta.com>
- <aJiusAtZ-CsnPTOR@infradead.org>
+	s=k20201202; t=1754844722;
+	bh=5+1OgXBWikGfNfHsB4wmJv6tgGDqZu9/PnzXxMeunkQ=;
+	h=From:To:Cc:Subject:Date:From;
+	b=NlQYaWMlmFpolWHrnZ1R2FFoqoRoIb6qh7OqItMjD5vlwKa1B6FFdZXRsueEULYT5
+	 VOHHs3+8zKeW6dsigo7A3T1l3Mj5bz2D8hooI6qKMFq9d3P5f8W5pgTYzHwBL/Nssh
+	 HaSU7Pr1F28ARpsTaoisjDKCtiSpGo3SlpLDFkT+gd2+o5N9qEwurZ/9hF8qCw8/Wl
+	 WFkwpY9kEUCUl/QGapnJC2AWyPqXzF9GToBdu6aMW8YiHroxctIg9bnm3jtSAaD+ge
+	 DeUMrioaw/MLMDTKP9l/zDLK2NWWE6zuw1R5TBWsELJCoq2h33OuF+l8pVQbVO+DHk
+	 A2PoAGpnEDjNA==
+From: Sasha Levin <sashal@kernel.org>
+To: patches@lists.linux.dev,
+	stable@vger.kernel.org
+Cc: John Garry <john.g.garry@oracle.com>,
+	Hannes Reinecke <hare@suse.de>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	Sasha Levin <sashal@kernel.org>,
+	linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.16-5.10] block: avoid possible overflow for chunk_sectors check in blk_stack_limits()
+Date: Sun, 10 Aug 2025 12:51:43 -0400
+Message-Id: <20250810165158.1888206-1-sashal@kernel.org>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aJiusAtZ-CsnPTOR@infradead.org>
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.16
+Content-Transfer-Encoding: 8bit
 
-On Sun, Aug 10, 2025 at 07:37:36AM -0700, Christoph Hellwig wrote:
-> On Tue, Aug 05, 2025 at 07:11:17AM -0700, Keith Busch wrote:
-> > @@ -341,6 +344,8 @@ int bio_split_rw_at(struct bio *bio, const struct queue_limits *lim,
-> >  	 * we do not use the full hardware limits.
-> >  	 */
-> >  	bytes = ALIGN_DOWN(bytes, bio_split_alignment(bio, lim));
-> > +	if (!bytes)
-> > +		return -EINVAL;
-> 
-> How is this related to the other hunk and the patch description?
+From: John Garry <john.g.garry@oracle.com>
 
-The patchset allows you to submit an io with vectors that are partial
-logical blocks. Misuse could create a bio that exceeds the device max
-vectors or introduces virtual boundary gaps, requiring a split into
-something that is smaller than a block size. This check catches that.
+[ Upstream commit 448dfecc7ff807822ecd47a5c052acedca7d09e8 ]
 
-Quick example: nvme with a 4k logical block size, and the usual 4k
-virtual boundary. Send an io with four vectors iov_len=1k. The total
-size is block sized, but there's no way that could split into a valid
-io. There's a test specifically for this in my reply about xfstests.
+In blk_stack_limits(), we check that the t->chunk_sectors value is a
+multiple of the t->physical_block_size value.
+
+However, by finding the chunk_sectors value in bytes, we may overflow
+the unsigned int which holds chunk_sectors, so change the check to be
+based on sectors.
+
+Reviewed-by: Hannes Reinecke <hare@suse.de>
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+Signed-off-by: John Garry <john.g.garry@oracle.com>
+Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
+Link: https://lore.kernel.org/r/20250729091448.1691334-2-john.g.garry@oracle.com
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+
+LLM Generated explanations, may be completely bogus:
+
+**Backport Status: YES**
+
+## Extensive Analysis
+
+This commit should be backported to stable kernel trees for the
+following reasons:
+
+### 1. **It fixes a real integer overflow bug**
+The original code performs `(t->chunk_sectors << 9)` which can cause an
+integer overflow. Since both `chunk_sectors` and `physical_block_size`
+are `unsigned int` (32-bit), when `chunk_sectors` is larger than
+8,388,607 (2^23 - 1), shifting it left by 9 bits (multiplying by 512)
+will overflow the 32-bit unsigned integer. This overflow can lead to
+incorrect alignment checks.
+
+### 2. **The fix is minimal and contained**
+The change is a single-line modification that replaces:
+```c
+if ((t->chunk_sectors << 9) & (t->physical_block_size - 1))
+```
+with:
+```c
+if (t->chunk_sectors % (t->physical_block_size >> SECTOR_SHIFT))
+```
+
+This mathematically equivalent check avoids the overflow by dividing
+`physical_block_size` by the sector size (512 bytes) instead of
+multiplying `chunk_sectors` by 512.
+
+### 3. **It's a correctness issue in critical block layer code**
+The `blk_stack_limits()` function is fundamental to the block layer's
+device stacking functionality, used by MD, DM, and other stacked block
+devices. An overflow here could lead to:
+- Incorrect alignment detection
+- Improper chunk_sectors being cleared when it shouldn't be
+- Potential data corruption or I/O errors in stacked block devices
+
+### 4. **The fix has low regression risk**
+- The new calculation is mathematically equivalent to the intended check
+- It only changes how the comparison is performed, not the logic
+- The fix has been reviewed by multiple maintainers (Hannes Reinecke,
+  Martin K. Petersen, Damien Le Moal)
+- No new features or architectural changes are introduced
+
+### 5. **Real-world impact potential**
+Modern storage devices can have large chunk sizes. For example:
+- NVMe devices with large zones could have chunk_sectors approaching or
+  exceeding the overflow threshold
+- RAID configurations with large stripe sizes
+- This becomes more likely as storage devices grow in capacity and
+  complexity
+
+### 6. **Follows stable kernel criteria**
+According to stable kernel rules, this qualifies because it:
+- Fixes a bug that users can potentially hit
+- Is obviously correct and tested
+- Is small (single line change)
+- Fixes only one thing
+- Has no dependencies on other patches
+
+The commit message clearly describes the problem (overflow in unsigned
+int) and the solution (changing the check to avoid overflow). The fix
+maintains the same semantic meaning while being overflow-safe, making it
+an ideal candidate for stable backporting.
+
+ block/blk-settings.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/block/blk-settings.c b/block/blk-settings.c
+index a000daafbfb4..88890e904320 100644
+--- a/block/blk-settings.c
++++ b/block/blk-settings.c
+@@ -779,7 +779,7 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
+ 	}
+ 
+ 	/* chunk_sectors a multiple of the physical block size? */
+-	if ((t->chunk_sectors << 9) & (t->physical_block_size - 1)) {
++	if (t->chunk_sectors % (t->physical_block_size >> SECTOR_SHIFT)) {
+ 		t->chunk_sectors = 0;
+ 		t->flags |= BLK_FLAG_MISALIGNED;
+ 		ret = -1;
+-- 
+2.39.5
+
