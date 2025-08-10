@@ -1,30 +1,45 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EF4927462
-	for <linux-block@vger.kernel.org>; Sun, 10 Aug 2025 14:31:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EF0B2E3702;
+	Sun, 10 Aug 2025 14:37:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754836281; cv=none; b=biza5q0gOYPWBsI2v8LflDPN9Gg14MdREJUqoBu0txQ65QgezkZ5H8C1eerpuY8OlvfxlOxtpd9orQvEASJZaGakX5hlKWnVXnQsV4BDZ1C9ajzBGSawb7FLFE0LP5T+z3vGek2Y1A4Q1OX2SNrL31OIwn0QWhHs0lK7OhdOUok=
+	t=1754836663; cv=none; b=XNS7Skg7imG22rhVTSrQSdJQXYiAt/Faa0iJrgJVNUu0YNNBKOy/uHqE9Ru0kmfaHRrx2WzCJNAyKTD8N2TkeFfltxYkoCQK9KlOccx3at7Gfk2ENYGpg+hkxJ9gKsy1SGyR7fQ6l6GKazhBg5LLPiYAHvP+lBrn53QrSE11T4k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754836281; c=relaxed/simple;
-	bh=YpQP11Aat9V89c4cN9GxPMRquH21hnVnI1YUk1SVhp0=;
+	s=arc-20240116; t=1754836663; c=relaxed/simple;
+	bh=IxAxzw5kkdQJ03Mopc1VqfjQUYdRD1B5ji6NLutB1tg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=G1AjEb6yGWHXYTytlXO0s0Y8TdlLDnfijm2K3vU8zIg009p8WN0lCdPgan8EHAxSca61zeoTnsxpj8ARFOR7Wh2hrzEAhWIFIEnn5PoR2I0Zxt09FIbiyQjpG1D/YOydSX21+PM7njZfIt79qy5QytZLNmZ9LIPKaoXyHwKy2ZU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id F0A0968BEB; Sun, 10 Aug 2025 16:31:12 +0200 (CEST)
-Date: Sun, 10 Aug 2025 16:31:12 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Keith Busch <kbusch@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@meta.com>,
-	linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-	axboe@kernel.dk
-Subject: Re: [PATCH 1/2] block: accumulate segment page gaps per bio
-Message-ID: <20250810143112.GA4860@lst.de>
-References: <20250805195608.2379107-1-kbusch@meta.com> <20250806145621.GC20102@lst.de> <aJN4b6GS30eJdQLd@kbusch-mbp>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ibovmz74TGWcKErobP5/FNzE6CRuZ1xiQpK66IlPNc9BcJAUs7tPAZbz/hSV4HUwVDSL69eFtnZbzuVKbm4JNlo0xoaA00G+HNF+wTACvdfD81hoyMEY+g864IpOQxQqoGF2y4ifIiAx9LAGwacO56b9YA4e96Qwqx1aoAyigQ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=smDhgsk6; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="smDhgsk6"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=rC0/MyEJFfsNrbJCBEWzCqib5fE9JZLKVZpwjQH0ewA=; b=smDhgsk6XIvrYy+XhWieKJKQcZ
+	ncECLq7Cy24P5MVUJeUYT4eN1n0OddH56m+G7QwnZbrOoh//XTCHWZTGDUB8NLpvk7Ih6fGNGyXAD
+	WCXMbzVANzPelgMlCv2yk7w2BMFiY0Xf1EPk7WfjboByvaRNy8I2Z9BwICNseYVr69JkAfLK9BbO9
+	pOie0cx77MyAnnnFicHSoli+RRQVNqC8BdG4iLnxmKZLnORoWTBP+UpIP4Ng4EpkGG8gRCRzxbamc
+	o1AVx0GjvjkojxXbSKcMWOr9CaJdcFd/i5p2yaNc8xefKRTzHwDTB+7dFERfSuGvdkpL5qD2T+FOD
+	cPtTqpfg==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1ul7B2-00000005hbi-1PqT;
+	Sun, 10 Aug 2025 14:37:36 +0000
+Date: Sun, 10 Aug 2025 07:37:36 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Keith Busch <kbusch@meta.com>
+Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org, snitzer@kernel.org, axboe@kernel.dk,
+	dw@davidwei.uk, brauner@kernel.org, Keith Busch <kbusch@kernel.org>,
+	Hannes Reinecke <hare@suse.de>
+Subject: Re: [PATCHv2 1/7] block: check for valid bio while splitting
+Message-ID: <aJiusAtZ-CsnPTOR@infradead.org>
+References: <20250805141123.332298-1-kbusch@meta.com>
+ <20250805141123.332298-2-kbusch@meta.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -33,31 +48,16 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aJN4b6GS30eJdQLd@kbusch-mbp>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20250805141123.332298-2-kbusch@meta.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Wed, Aug 06, 2025 at 09:44:47AM -0600, Keith Busch wrote:
-> On Wed, Aug 06, 2025 at 04:56:21PM +0200, Christoph Hellwig wrote:
-> > > index 0a29b20939d17..d0ed28d40fe02 100644
-> > > --- a/include/linux/blk_types.h
-> > > +++ b/include/linux/blk_types.h
-> > > @@ -264,6 +264,8 @@ struct bio {
-> > >  
-> > >  	unsigned short		bi_max_vecs;	/* max bvl_vecs we can hold */
-> > >  
-> > > +	unsigned int		page_gaps;	/* a mask of all the vector gaps */
-> > 
-> > Bloating the bio for the gaps, especially as the bio is otherwise not
-> > built to hardware limits at all seems like an odd tradeoff.
-> 
-> Maybe, but I don't have anywhere else to put this. We split the bio to
-> its hardware limits at some point, which is where this field gets
-> initially set.
+On Tue, Aug 05, 2025 at 07:11:17AM -0700, Keith Busch wrote:
+> @@ -341,6 +344,8 @@ int bio_split_rw_at(struct bio *bio, const struct queue_limits *lim,
+>  	 * we do not use the full hardware limits.
+>  	 */
+>  	bytes = ALIGN_DOWN(bytes, bio_split_alignment(bio, lim));
+> +	if (!bytes)
+> +		return -EINVAL;
 
-What we do for nr_segs is to just do it on stack while splitting,
-and then only record it in the request.  I think you could do the same
-here, i.e. replace the nr_segs output parameter to __bio_split_to_limits
-and it's helpers with a new struct bio_split_info that in the first
-version just contains nr_segs, but can be extended to other easily
-derived information like the page gaps.
+How is this related to the other hunk and the patch description?
 
