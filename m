@@ -1,81 +1,87 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E538B1EA91
-	for <linux-block@vger.kernel.org>; Sun, 10 Aug 2025 02:20:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29F40238C2A;
+	Sun, 10 Aug 2025 07:21:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754792436; cv=none; b=UenVb4LcG1f1GfiITSLki2juCs+6ZwxGb/GV66ZNmLoxgT/w+BKIcjXK63bxZqcN6bg6Ri7mQVG1m4U9d+vtSw8LsTdnH3X/yZ42Fb9tB8B7TpptllzScYgML/BFyrbME6TJdz3BNW29eCCn5x1dJffjMfCf1AkyUIWUElIL7EM=
+	t=1754810474; cv=none; b=XsWPZulguAfwanJRLQdehK8Wit6rd9Z+g5Eshed2ri0DKjYYD28QaR1FxT6UnH8hVFdvLZsZFVjUma5Q0iy/3lOKETaKNY4EwYBKZ9aT0ynpRaJWSJWclA2mbV06iUHv/Ob3b1+zjeW6t+hz2p0kbJ4kALp/jE/ceevmrIOxUKA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754792436; c=relaxed/simple;
-	bh=6Pew7s0WnTitAKxA8XpQ2w+u6BlQ+0z6G46rhCW4oYs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=msD/SrxhOv3NaMErpjnV5AVOFBR5qBOMENYoVmI3kP441dC+kPs3J3PTQj6WcDpTkyBtyx0c4VM0M7ii7GLCOu4sqVMHKv7Thm67nO5VuPhcZmK5TTjNclr3decxzoWIwTEsn+vJswM5Lu6m0d1nvj9anFKn1PQeuS6B2v4CCNw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BExHI8Aj; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1754810474; c=relaxed/simple;
+	bh=RUDthSGl1MKPcrT7uoeIfZPY6P/+5lVlzzR7S8uN2hM=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=qsP1BKC+Br4ccN3irVPs4JTr4h3gEZ4uyL+FcxsOF7GzV2d5siTXqZjViaRYZZTQnlRwmdZMXu1rRq9aevvYQV3J7tFYL8JFkpzULcIeuIxKfz/exFqH8nUHMsiKMbWNG8INql/TyNeARkDabfAb6cI6U3RFJqVxmVC/uCePxFY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tvLVZbk0; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BExHI8Aj"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1754792431;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YnRMiAU3tPcWF7dW1OEzm3VNFxTkrF27m8b5qJprNOA=;
-	b=BExHI8Ajs+DC1KpKR7lLINvm9zlAjTZtQGpu1SdP5EXjbuaPqLZiOwszVYuG+2jEo++Kb7
-	nW0BDyoZjz34iQijQlpp8HgtB8INb6/tWBYGZ39G95NyAlI0dMEgPmZEiDTsVC4gbdECpc
-	fDf8u9FPG/DvPBd9GRvtJlGwXo9D1fs=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-583-_Wum_dUKN7meicn7rY64dg-1; Sat,
- 09 Aug 2025 22:20:28 -0400
-X-MC-Unique: _Wum_dUKN7meicn7rY64dg-1
-X-Mimecast-MFC-AGG-ID: _Wum_dUKN7meicn7rY64dg_1754792427
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 47F9B19560AA;
-	Sun, 10 Aug 2025 02:20:27 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.24])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5FC751955F16;
-	Sun, 10 Aug 2025 02:20:22 +0000 (UTC)
-Date: Sun, 10 Aug 2025 10:20:18 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Caleb Sander Mateos <csander@purestorage.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Uday Shankar <ushankar@purestorage.com>,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] ublk: check for unprivileged daemon on each I/O fetch
-Message-ID: <aJgB4q0qJ5wFf_Fh@fedora>
-References: <20250808155216.296170-1-csander@purestorage.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tvLVZbk0"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38A11C4CEF0;
+	Sun, 10 Aug 2025 07:21:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1754810473;
+	bh=RUDthSGl1MKPcrT7uoeIfZPY6P/+5lVlzzR7S8uN2hM=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=tvLVZbk0usREInDbPZ21ebu08cJKtPWuyWuuLiGR/2Heajam2Se3XqbFmIhL6TobB
+	 nZEEfdwXMtx/bh1N3NZKpn7k5/n/Q94Gt3WpGAg25SI+ArgRn3R+eXdLmPaZ7TAGa6
+	 odUzQk/O1H30aThLwiRpT/y+zz5018V/Y+0nFJc9Q69UdkpxQlH2FsQu0ZkgHauv5X
+	 1CLZi5+hCfTrivU7JPVzm13hwe51ycVHZYVqyHC4x/xXPs/PZp5AV0/nnl7mTz4Bzq
+	 pNGPOklXeq/SlR1rNbRFOWrWauLBeflb4KBR0XYGlvb3sifZWts75hnBG4AhuhKodl
+	 yM9tUKYf42Z8g==
+From: Andreas Hindborg <a.hindborg@kernel.org>
+To: Benno Lossin <lossin@kernel.org>, Boqun Feng <boqun.feng@gmail.com>,
+ Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, Gary
+ Guo <gary@garyguo.net>, =?utf-8?Q?Bj=C3=B6rn?= Roy Baron
+ <bjorn3_gh@protonmail.com>, Alice
+ Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, Danilo
+ Krummrich <dakr@kernel.org>, Jens Axboe <axboe@kernel.dk>, Yutaro Ohno
+ <yutaro.ono.418@gmail.com>, Xizhe Yin <xizheyin@smail.nju.edu.cn>, Manas
+ <manas18244@iiitd.ac.in>, Fiona Behrens <me@kloenk.dev>
+Cc: Lyude Paul <lyude@redhat.com>, linux-block@vger.kernel.org,
+ rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 11/13] rust: block: replace `core::mem::zeroed` with
+ `pin_init::zeroed`
+In-Reply-To: <DBXC9DNUC9F0.2WUOVY87GAA4X@kernel.org>
+References: <20250523145125.523275-1-lossin@kernel.org>
+ <ygVv2TD4X8QxR1siVW36cSGzeG722j-diB-TA2u1vdX6T_J-hb_dKDiU5vqAhccX3PrLw8yIbuHrgoz2aH-dbw==@protonmail.internalid>
+ <20250523145125.523275-12-lossin@kernel.org> <87ms8a5f7b.fsf@kernel.org>
+ <2yeRfzu6TlmaFLopKKmkgCjPM8Q1zo-YY5zgWjrbr00Bd8EwX2husSNSthkSujwznGxXmqteH00Apemot4z77w==@protonmail.internalid>
+ <DBXC9DNUC9F0.2WUOVY87GAA4X@kernel.org>
+Date: Sun, 10 Aug 2025 09:21:03 +0200
+Message-ID: <87frdzhcbk.fsf@t14s.mail-host-address-is-not-set>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250808155216.296170-1-csander@purestorage.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+Content-Type: text/plain
 
-On Fri, Aug 08, 2025 at 09:52:15AM -0600, Caleb Sander Mateos wrote:
-> Commit ab03a61c6614 ("ublk: have a per-io daemon instead of a per-queue
-> daemon") allowed each ublk I/O to have an independent daemon task.
-> However, nr_privileged_daemon is only computed based on whether the last
-> I/O fetched in each ublk queue has an unprivileged daemon task.
-> Fix this by checking whether every fetched I/O's daemon is privileged.
-> Change nr_privileged_daemon from a count of queues to a boolean
-> indicating whether any I/Os have an unprivileged daemon.
-> 
-> Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
-> Fixes: ab03a61c6614 ("ublk: have a per-io daemon instead of a per-queue daemon")
+"Benno Lossin" <lossin@kernel.org> writes:
 
-Looks fine,
+> On Fri Aug 8, 2025 at 11:35 AM CEST, Andreas Hindborg wrote:
+>> "Benno Lossin" <lossin@kernel.org> writes:
+>>
+>>> All types in `bindings` implement `Zeroable` if they can, so use
+>>> `pin_init::zeroed` instead of relying on `unsafe` code.
+>>>
+>>> If this ends up not compiling in the future, something in bindgen or on
+>>> the C side changed and is most likely incorrect.
+>>>
+>>> Signed-off-by: Benno Lossin <lossin@kernel.org>
+>>> ---
+>>
+>> Acked-by: Andreas Hindborg <a.hindborg@kernel.org>
+>
+> Thanks, this one was already picked & the PR that included it contains
+> your Acked-by (it couldn't be rebased since I noticed it too late). Let
+> me know if you need any pointers.
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Right, I remember now that you point it out. It's just because I got a
+new fancy email filter (lei q dfn:...). Hopefully I will miss fewer of
+these in the future.
 
-Thanks,
-Ming
+
+Best regards,
+Andreas Hindborg
+
+
 
