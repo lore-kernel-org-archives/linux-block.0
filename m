@@ -1,79 +1,107 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99F791F76A5;
-	Mon, 11 Aug 2025 07:49:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D0DB197A76
+	for <linux-block@vger.kernel.org>; Mon, 11 Aug 2025 08:00:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754898579; cv=none; b=kSH36nwpsbMHhghNoc/DVxfMPqIoyeAC7TLwEc8GdQ4cJjJwHXM+bOGI+tX0+jKN2uxREiPhd0oIwZmAKXqqkVEyQ3xaUv9rShDhct2rsi80qmNlsfkKaY21f+YjS7+iLVEqYy81lqz01Wjaxk1yVw1AdvHeOcFm/l1vKtQTAIA=
+	t=1754899252; cv=none; b=HJ6MQZVYGcQqIWhtScOkoyPTaWxxg9s62M34giAjOyajZPH3ET3gUB3PJHBfCa87etVX5/AbHz5hvLsvqvPlT//4QOhbCMqpihKYcmcgZ0paWf9fXTWpek3gA9PCSZ76vDvAbmFWH1jdbIGgzlvovqZZ/juoK2Zxgrwoh2LDAoU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754898579; c=relaxed/simple;
-	bh=obXcfu770nMVidxk73qNra/bKfWCOjeYA+F0vhuy/Iw=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=ngR2MvK+cTsbak5CfMScvgvHFhx0pEHjGm4iS1R97kiK+Ho2ekitHOwgpNRd04wPKPg+ImJUPYWlG7i3TFa2vooekyYDJFk3KWH5fU6kG606TDNFplxrM7vKrWnTjHiJRpsjuwMH1eo68ey/6DZtL99RmIOCdqBkzdGPPt5Dxl4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EOuKRCCm; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1754899252; c=relaxed/simple;
+	bh=cjZtRu5OXf9JXKnHATVcX5fDwbKbX0uvLSrZsQCQxvI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kJef+edsnVnZVF+BCICcH8bt9yncYLHDObJl7F3gs9pnOzZ7UeWE6hGLdpCT4ZIdkcl3FVyG5gecB0ON8NAYIPO+6oSlysHoLcdvwKCM+32yKHzA6KiHjXuVdBdvKWXCeF72bq5/TQZThkzgonlRKs5FKkPPnavpKcw2Lhorn00=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NLO+LuoO; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EOuKRCCm"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B3C8C4CEED;
-	Mon, 11 Aug 2025 07:49:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754898579;
-	bh=obXcfu770nMVidxk73qNra/bKfWCOjeYA+F0vhuy/Iw=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=EOuKRCCm2LlEvfMg72vKt8Que7zNQvjwjILf7+0Lz3OtPmi+Zw39fOAOBPGWKjhPl
-	 lHI12YSShHuUkFvtZYI29FuEQuCPYujI8z0VRre080ovzo3VTIkNzNluyK0NG7zsfR
-	 NBqmL2nIU+67H+UiJNhDlo3yy1Ca+f3b7o9Kz5y6rsko6ltYSRW0X8PLX9IUc1w9Lu
-	 XvO8NZBVIga0LEe0c7c66bsbER7QieyOHWhERLJ1rNxcaLevD6lUj4q7ZDmbKFLyog
-	 7iI9O3HwnVC/MxoXH+0/iUb02h9aOxypmkTGkEhdzS3NuYrZHrp5Iv3tZuXNXoLejr
-	 fWQkwyFV01qmw==
-From: Andreas Hindborg <a.hindborg@kernel.org>
-To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>, Jens Axboe
- <axboe@kernel.dk>
-Cc: Shankari Anand <shankari.ak0208@gmail.com>, Miguel Ojeda
- <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>,
- linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org,
- linux-kernel@vger.kernel.org, Boqun
- Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, =?utf-8?Q?Bj?=
- =?utf-8?Q?=C3=B6rn?= Roy Baron
- <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>, Alice Ryhl
- <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, Danilo Krummrich
- <dakr@kernel.org>
-Subject: Re: [PATCH 1/7] rust: block: update ARef and AlwaysRefCounted
- imports from sync::aref
-In-Reply-To: <CANiq72=Yb=APVFiJbdveVD45=fwmAbXR3vUXLTBfqu_n-BpcOA@mail.gmail.com>
-References: <KnSfzGK6OiA0mL5BZ32IZgEYWCuETu6ggzSHiqnzsYBLsUHWR5GcVRzt-FSa8sCXmYXz_jOKWGZ6B_QyeTZS2w==@protonmail.internalid>
- <20250716090712.809750-1-shankari.ak0208@gmail.com>
- <87cy965edf.fsf@kernel.org>
- <iuNf4uKy1tAU76PDHMl0imyutwtKX6ih6M-JYDuYoQFmEx6VPeRH-YmY7Y76fWS6ORuhrquUVGELY7dj0r1MkA==@protonmail.internalid>
- <CANiq72=Yb=APVFiJbdveVD45=fwmAbXR3vUXLTBfqu_n-BpcOA@mail.gmail.com>
-Date: Mon, 11 Aug 2025 09:49:30 +0200
-Message-ID: <87bjomguwl.fsf@t14s.mail-host-address-is-not-set>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NLO+LuoO"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1754899248;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=M05mA5/Cn/fNMaklkCPAr949XgPrcsIP2UFNbyCPgnk=;
+	b=NLO+LuoOBjrj2ABT7qyVnRtUqoiSEHUXxSi0tPJLSWTuEvOumq5ptOcifI4L6rP7Pbqrcl
+	oIe18QGQkK1OWr77i6TETYhgClDvMBQHVJh0COVqAMRSDlsYJv1Kr6sHvNfZgxfp1pNi4s
+	GeXrWqwB2eyfakTqtvyC+9hc1jWdaM4=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-650-h86qnwARO5CHbDkC1CS7QQ-1; Mon,
+ 11 Aug 2025 04:00:43 -0400
+X-MC-Unique: h86qnwARO5CHbDkC1CS7QQ-1
+X-Mimecast-MFC-AGG-ID: h86qnwARO5CHbDkC1CS7QQ_1754899242
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A4CC51800451;
+	Mon, 11 Aug 2025 08:00:41 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.98])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id EC4D019560AD;
+	Mon, 11 Aug 2025 08:00:31 +0000 (UTC)
+Date: Mon, 11 Aug 2025 16:00:19 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Zheng Qixing <zhengqixing@huaweicloud.com>
+Cc: axboe@kernel.dk, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, yukuai3@huawei.com,
+	yi.zhang@huawei.com, yangerkun@huawei.com, houtao1@huawei.com,
+	zhengqixing@huawei.com, lilingfeng3@huawei.com, nilay@linux.ibm.com
+Subject: Re: [PATCH v2] block: fix kobject double initialization in add_disk
+Message-ID: <aJmjE6QvRrVyQwgi@fedora>
+References: <20250808053609.3237836-1-zhengqixing@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250808053609.3237836-1-zhengqixing@huaweicloud.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-"Miguel Ojeda" <miguel.ojeda.sandonis@gmail.com> writes:
+On Fri, Aug 08, 2025 at 01:36:09PM +0800, Zheng Qixing wrote:
+> From: Zheng Qixing <zhengqixing@huawei.com>
+> 
+> Device-mapper can call add_disk() multiple times for the same gendisk
+> due to its two-phase creation process (dm create + dm load). This leads
+> to kobject double initialization errors when the underlying iSCSI devices
+> become temporarily unavailable and then reappear.
+> 
+> However, if the first add_disk() call fails and is retried, the queue_kobj
+> gets initialized twice, causing:
+> 
+> kobject: kobject (ffff88810c27bb90): tried to init an initialized object,
+> something is seriously wrong.
+>  Call Trace:
+>   <TASK>
+>   dump_stack_lvl+0x5b/0x80
+>   kobject_init.cold+0x43/0x51
+>   blk_register_queue+0x46/0x280
+>   add_disk_fwnode+0xb5/0x280
+>   dm_setup_md_queue+0x194/0x1c0
+>   table_load+0x297/0x2d0
+>   ctl_ioctl+0x2a2/0x480
+>   dm_ctl_ioctl+0xe/0x20
+>   __x64_sys_ioctl+0xc7/0x110
+>   do_syscall_64+0x72/0x390
+>   entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> 
+> Fix this by separating kobject initialization from sysfs registration:
+>  - Initialize queue_kobj early during gendisk allocation
+>  - add_disk() only adds the already-initialized kobject to sysfs
+>  - del_gendisk() removes from sysfs but doesn't destroy the kobject
+>  - Final cleanup happens when the disk is released
+> 
+> Fixes: 2bd85221a625 ("block: untangle request_queue refcounting from sysfs")
+> Reported-by: Li Lingfeng <lilingfeng3@huawei.com>
+> Closes: https://lore.kernel.org/all/83591d0b-2467-433c-bce0-5581298eb161@huawei.com/
+> Signed-off-by: Zheng Qixing <zhengqixing@huawei.com>
 
-> On Fri, Aug 8, 2025 at 11:53=E2=80=AFAM Andreas Hindborg <a.hindborg@kern=
-el.org> wrote:
->>
->> Acked-by: Andreas Hindborg <a.hindborg@kernel.org>
->
-> I think you can pick this one, i.e. the idea was to allow changes to
-> be picked independently.
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
-Jens is picking the block patches directly from list. I would prefer
-sending a PR, but that is not the way we agreed on doing it.
-
-@Jens, do you still prefer to pick the rust block patches directly?
-
-Best regards,
-Andreas Hindborg
-
-
+Thanks,
+Ming
 
