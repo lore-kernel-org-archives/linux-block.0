@@ -1,146 +1,110 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 884E42E3373;
-	Mon, 11 Aug 2025 21:28:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from submarine.notk.org (submarine.notk.org [62.210.214.84])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 482C6311C0E;
+	Mon, 11 Aug 2025 21:38:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.210.214.84
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754947703; cv=none; b=TkHtcHh0FI244p1IyPer/azcmQ3B8i4I4c4nJL+4/eK7NXYtV1fe43VqsQpEsbouzi/gR+I0QhGO1YP+B87fysNPyZG8QqpmRSpkF6AHIPKSasnPxGjsfdPW3Hp5/u9cRej2RI3ThoJyieUun/3QcVujltxT8KyOJRueuv4tcFk=
+	t=1754948287; cv=none; b=tbP+JMCWRt8lJvaUSZjcFVqHcB9un5A2mzXtXT2gkjPvDS/pgtaZVr46fnNv4Sq62wX6VATqKV0e/X+Uya6Ra+ueEeEgjJQAWFQ4Q7oqF3KK/3WT10pzM1OTqN9C7n/ez40YGZ0SV7JMX3mLRw5MMsTUtHlxKNv77LIkDs4MAaU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754947703; c=relaxed/simple;
-	bh=aGj3XqwjGdLu6r33y+ZNJAPZgl6QITxzkri3NhqeYk8=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=hb6NElHSjbFtjo8jy9cQbOEO2Z0VFpsRcRW0S1ic0M4Pf8ogeq5NP6fpk2fGUygFOmYPCW4dUtsz5nkhBKYeY6liEhP/KtLass2PpHbWtjRPCTtc/PjJF/nfHZBixb17/KY+7mCs7LrrjyfkukGPC6xgiLaoGxoFO2re/Dw8eM8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Nt44w8R1; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1754948287; c=relaxed/simple;
+	bh=HjyGdOGLYqC7ab18LfpaxPJTKS3Yx7XdT8RLH/XbFKM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nnUUPoNM2xe02Oir28hVAyzH8t/J1MvDCBYkVFnGcAdRHyR2umATI7McRVPqCfYLOALx29xxqKxyvH+t6dCniEXTph0RyHp/dWlH0Mm2uZxECBR3AtLeCTpo4QKcxZ1Id0e9cRiM14zS18Q1LEcNRYpWOPczRbKEL6YThZ4hE+k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codewreck.org; spf=pass smtp.mailfrom=codewreck.org; dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b=EKqL0vot; arc=none smtp.client-ip=62.210.214.84
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codewreck.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codewreck.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Nt44w8R1"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 17461C4CEF7;
-	Mon, 11 Aug 2025 21:28:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754947703;
-	bh=aGj3XqwjGdLu6r33y+ZNJAPZgl6QITxzkri3NhqeYk8=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=Nt44w8R1G9aDCuse92f8mFJkc6v+Obn0hmVtbzjPqb6cnAv2V/PDStRi4MCgZbhOl
-	 1nevmN2eogGnxRDJZYg/tFg7KbUlTpW8A7l+DrpAMBc5W8PWvazNb/Wnoq3dXuQrBK
-	 bdqG68KeB1Cp1XXSEwPnn+4WAkSG6YckTNAJ+a5DBbkIBehTExkL4OnbteSdRZjePS
-	 dyN8ct4RpMa+H3+iOdpCN/VG8vpQwqPYsL+emo2b7y9IcrVP4QXMQyzubYd+FhGN67
-	 OxH7I6UGvo4zNLDG5GYBZ8N3E/yK6sdGf1ymKM8dVtwjeWaGq+WY4mEDd1zOWnhPR/
-	 rZJMFUbtvRP4g==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 039D1CA0EC4;
-	Mon, 11 Aug 2025 21:28:23 +0000 (UTC)
-From: Dominique Martinet via B4 Relay <devnull+asmadeus.codewreck.org@kernel.org>
-Date: Tue, 12 Aug 2025 06:28:01 +0900
-Subject: [PATCH v2 1/2] iov_iter: iterate_folioq: fix handling of offset >=
+	dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b="EKqL0vot"
+Received: from gaia.codewreck.org (localhost [127.0.0.1])
+	by submarine.notk.org (Postfix) with ESMTPS id 3155F14C2D3;
+	Mon, 11 Aug 2025 23:37:58 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=codewreck.org;
+	s=2; t=1754948282;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0KuxWLbpcJT3VlmZVqc2OQpXyttswEbc/sHxkepGM9E=;
+	b=EKqL0votUNnCF6qo5E8bBmNRyJd+MBtp61wniZY0+tazDObV62wwWmH7rAgLJoxoE9WJ2Q
+	Dx5sKNQt+YN3xbunO809CS4xhHpBVgyleAbiZQNf7sDAu/gPw2SuovDGaPfE4sH4R0kEgE
+	z9O8O4DK1BvosELxyLVFIfg3k8fjtCtjz1yrmeIsV5uJ2Af6E+xI/ZtW3t9otjeOQqLXIY
+	Bxx3zU8mn9CG9ZCh/xkA0hH0EcgFGpqqbwvKA8/LPo4MHv9szIIN7bVyLRK+lETWgUhJjU
+	CT5gZ7YnwA6Lla+5S/CswMDOOTp06yPMjzf6DL6Es13PnP/xdcqkZTZUP2Iy2A==
+Received: from localhost (gaia.codewreck.org [local])
+	by gaia.codewreck.org (OpenSMTPD) with ESMTPA id d8bc4c7b;
+	Mon, 11 Aug 2025 21:37:57 +0000 (UTC)
+Date: Tue, 12 Aug 2025 06:37:42 +0900
+From: asmadeus@codewreck.org
+To: David Howells <dhowells@redhat.com>
+Cc: "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+	Christian Brauner <brauner@kernel.org>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Maximilian Bosch <maximilian@mbosch.me>,
+	Ryan Lahfa <ryan@lahfa.xyz>, Christian Theune <ct@flyingcircus.io>,
+	Arnout Engelen <arnout@bzzt.net>, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH 1/2] iov_iter: iterate_folioq: fix handling of offset >=
  folio size
+Message-ID: <aJpipiVk0zneTxXl@codewreck.org>
+References: <20250811-iot_iter_folio-v1-1-d9c223adf93c@codewreck.org>
+ <20250811-iot_iter_folio-v1-0-d9c223adf93c@codewreck.org>
+ <385673.1754923063@warthog.procyon.org.uk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250812-iot_iter_folio-v2-1-f99423309478@codewreck.org>
-References: <20250812-iot_iter_folio-v2-0-f99423309478@codewreck.org>
-In-Reply-To: <20250812-iot_iter_folio-v2-0-f99423309478@codewreck.org>
-To: "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
- Christian Brauner <brauner@kernel.org>, David Howells <dhowells@redhat.com>, 
- Alexander Viro <viro@zeniv.linux.org.uk>, 
- Andrew Morton <akpm@linux-foundation.org>
-Cc: Maximilian Bosch <maximilian@mbosch.me>, Ryan Lahfa <ryan@lahfa.xyz>, 
- Christian Theune <ct@flyingcircus.io>, Arnout Engelen <arnout@bzzt.net>, 
- linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
- linux-fsdevel@vger.kernel.org, Dominique Martinet <asmadeus@codewreck.org>, 
- stable@vger.kernel.org
-X-Mailer: b4 0.15-dev-7be4f
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2705;
- i=asmadeus@codewreck.org; h=from:subject:message-id;
- bh=3BbpsQC1gAY33hqHbW6Vvzvllp5rOUEkHQ1XHsiSrr8=;
- b=owEBbQKS/ZANAwAKAatOm+xqmOZwAcsmYgBommB10IN5egx+Rr8UloHGfJcqXTMA8D0uoVhkF
- e1c6hRMWz6JAjMEAAEKAB0WIQT8g9txgG5a3TOhiE6rTpvsapjmcAUCaJpgdQAKCRCrTpvsapjm
- cMHPEACEFnAwm1R1HodQQdkzlwTFQ0MGKBvJAeqjwOiixo9963tY8KbCdqavltbusRuAQCRxR7t
- CWweWhzyqDJz0RIinEgkliq4HsEq9QG4CuzHGR1uPTUL2/wB7ZnQeAjBdyRfJPtZadoF35etC+e
- TyW73BUxYYr+gS8PN9Tr71Hf5bFsg3hXOSIeg+o5wthn1vQYbW9LVhGs878pOqSSeoUdUbr1xTD
- Ng0A+tTGvRp4BSPbcIucPBcPJT3nSkNEvoeDN+ol37BhVQZJEUrvh33jy+DOLTRBKUynysZIAzP
- m+DbjdGS05D/Slb+WXlA0TRfaLmpUV7+y0odcRLI7cLv+Qu7XLwsxhTXpcsWZ8LqnTq09AIPj3N
- PBpVGO/r1ItRRFLA8MTv04/pbwP68j+I1a2NuMqHeq+Ohm+P0Uvv7pj4z37FmolaNhcZe3huzgH
- 034yobtZnIMzmAjQmspsFbKbAACHa+Ix+rWx3GKi1LEPo2vsV50q80Mf9PD8qfhNAgUUNteVxPB
- 2EziFjTgVy1eNobf4zu9EdPhQuU80KzpwRABysmq3FT43ZjwGhsh4UUIzcHS8rFIMcZE6LOuL/J
- GAfdXuWnmRW/lFuLqJSI31r8+x1xezz8m4yvBJB2H13ol0c/QtjIZFzSTBmAcJsrYoO0bXUZqJp
- sp+Qn7+lV3IFD/w==
-X-Developer-Key: i=asmadeus@codewreck.org; a=openpgp;
- fpr=B894379F662089525B3FB1B9333F1F391BBBB00A
-X-Endpoint-Received: by B4 Relay for asmadeus@codewreck.org/default with
- auth_id=435
-X-Original-From: Dominique Martinet <asmadeus@codewreck.org>
-Reply-To: asmadeus@codewreck.org
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <385673.1754923063@warthog.procyon.org.uk>
 
-From: Dominique Martinet <asmadeus@codewreck.org>
+David Howells wrote on Mon, Aug 11, 2025 at 03:37:43PM +0100:
+> Dominique Martinet via B4 Relay wrote:
+> > It's apparently possible to get an iov forwarded all the way up to the
+> 
+> By "forwarded" I presume you mean "advanced"?
 
-It's apparently possible to get an iov advanced all the way up to the
-end of the current page we're looking at, e.g.
+Thanks, swapped words in v2
 
-(gdb) p *iter
-$24 = {iter_type = 4 '\004', nofault = false, data_source = false, iov_offset = 4096, {__ubuf_iovec = {
-      iov_base = 0xffff88800f5bc000, iov_len = 655}, {{__iov = 0xffff88800f5bc000, kvec = 0xffff88800f5bc000,
-        bvec = 0xffff88800f5bc000, folioq = 0xffff88800f5bc000, xarray = 0xffff88800f5bc000,
-        ubuf = 0xffff88800f5bc000}, count = 655}}, {nr_segs = 2, folioq_slot = 2 '\002', xarray_start = 2}}
+> > This should have been because we're only in the 2nd slot and there's
+> > another one after this, but iterate_folioq should not try to map a
+> > folio that skips the whole size, and more importantly part here does
+> > not end up zero (because 'PAGE_SIZE - skip % PAGE_SIZE' ends up
+> > PAGE_SIZE and not zero..), so skip forward to the "advance to next
+> > folio" code.
+> 
+> Note that things get complicated because folioqs form a segmented list that
+> can be under construction as it advances.  So if there's no next folioq
+> segment at the time you advance to the end of the current one, it will end up
+> parked at the end of the last folio or with slot==nr_slots because there's
+> nowhere for it to advance to.
 
-Where iov_offset is 4k with 4k-sized folios
+Hmm, I've already sent a v2 with other things fixed but now you made me
+look at the "we're at the end of the iov_iter" case I think this won't
+work well either?
+folioq_folio() always returns something, and the advance code only
+advances if folioq->next is set and doesn't bail out if it's unset.
 
-This should have been because we're only in the 2nd slot and there's
-another one after this, but iterate_folioq should not try to map a
-folio that skips the whole size, and more importantly part here does
-not end up zero (because 'PAGE_SIZE - skip % PAGE_SIZE' ends up
-PAGE_SIZE and not zero..), so skip forward to the "advance to next
-folio" code
+There should be a `if (slot == folioq_nr_slots(folioq)) break` check
+somewhere as well? Or is the iov_iter guaranteed to always 1/ have some
+data and 2/ either be big enough or have remaining data in a step?
 
-Reported-by: Maximilian Bosch <maximilian@mbosch.me>
-Reported-by: Ryan Lahfa <ryan@lahfa.xyz>
-Reported-by: Christian Theune <ct@flyingcircus.io>
-Reported-by: Arnout Engelen <arnout@bzzt.net>
-Link: https://lkml.kernel.org/r/D4LHHUNLG79Y.12PI0X6BEHRHW@mbosch.me/
-Fixes: db0aa2e9566f ("mm: Define struct folio_queue and ITER_FOLIOQ to handle a sequence of folios")
-Cc: stable@vger.kernel.org # v6.12+
-Acked-by: David Howells <dhowells@redhat.com>
-Signed-off-by: Dominique Martinet <asmadeus@codewreck.org>
----
- include/linux/iov_iter.h | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+I can believe the former but wouldn't trust the later...
 
-diff --git a/include/linux/iov_iter.h b/include/linux/iov_iter.h
-index c4aa58032faf874ee5b29bd37f9e23c479741bef..a77ff9c7e4b21eacd166adb506b79e7ddd723aa1 100644
---- a/include/linux/iov_iter.h
-+++ b/include/linux/iov_iter.h
-@@ -160,7 +160,7 @@ size_t iterate_folioq(struct iov_iter *iter, size_t len, void *priv, void *priv2
- 
- 	do {
- 		struct folio *folio = folioq_folio(folioq, slot);
--		size_t part, remain, consumed;
-+		size_t part, remain = 0, consumed;
- 		size_t fsize;
- 		void *base;
- 
-@@ -168,6 +168,8 @@ size_t iterate_folioq(struct iov_iter *iter, size_t len, void *priv, void *priv2
- 			break;
- 
- 		fsize = folioq_folio_size(folioq, slot);
-+		if (skip >= fsize)
-+			goto next;
- 		base = kmap_local_folio(folio, skip);
- 		part = umin(len, PAGE_SIZE - skip % PAGE_SIZE);
- 		remain = step(base, progress, part, priv, priv2);
-@@ -177,6 +179,7 @@ size_t iterate_folioq(struct iov_iter *iter, size_t len, void *priv, void *priv2
- 		progress += consumed;
- 		skip += consumed;
- 		if (skip >= fsize) {
-+next:
- 			skip = 0;
- 			slot++;
- 			if (slot == folioq_nr_slots(folioq) && folioq->next) {
+> Note that extract_folioq_to_sg() already does this as does
+> iov_iter_extract_folioq_pages().
 
+Yes we're not quite consistent here, some functions like the plain
+iov_iter_advance will get you on an invalid slot to check for
+folioq->next on next invocations while others point at the end of the
+last folio in the queue (like iov_iter_extract_folioq_pages(), and
+iov_folioq_get_pages() before patch 2);
+I think either pattern is valid; I've changed iov_folioq_get_pages()
+because it was a bit weird to have an iov_iter with offset > count and
+iov_iter_advance wouldn't do this, but I agree either should work, we
+just probably want to be more consistent.
+
+Thanks,
 -- 
-2.50.1
-
-
+Dominique Martinet | Asmadeus
