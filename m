@@ -1,182 +1,132 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from mx0b-002e3701.pphosted.com (mx0b-002e3701.pphosted.com [148.163.143.35])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B915C72600;
-	Mon, 11 Aug 2025 18:56:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1CE02D47F6;
+	Mon, 11 Aug 2025 19:12:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.143.35
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754938620; cv=none; b=kDN58pbFM48wD6WFVXCb9dGfyYX5GTAGWLOGFuO3nBpRPTq5O3hjSgpV8w4VAtKVsEVXGqlzeYHOiI93Ty6gkFtiG67TEcZn8YhAUw68Cylck/weQPS965r17aHVz5Rpx7iMyWrQK35WoKV0O6dEfKGi59xjKB67lh4AORrrrPY=
+	t=1754939548; cv=none; b=ZqOgj40fEOP5B5vw6EdL7pMtbp/jg2EhJ7TQCKArz0tpA0MzJpAAcPKG7lOcOfhBQuxNUKRsTLg9kztSP6/70Hfy7sYMp3YiaEHcIM3yO8x+CYgzUI8zDStIe7c+udEWavkRzi+I0CHPLSx5i5Skz0EjDPTqTaIj6lDzW6Xz4kE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754938620; c=relaxed/simple;
-	bh=/1h1FXQ8wlbSgFHXbQzagekP6WBsykBAbMExF88232A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=M8kdyZtotZhaNpaVc6UvjFN2dqzgn0PXkO2Z3BOAOSbpE4nXrgGOG3GozpvkaTpV+cXh5FJuVLtbLAAE/zov2I52N4fZ9Rs87HgArJYwCg1/dxgTvpXgTab31W5f7XeywycUWqTzqZN2JmUGkmIABFu7PKpnjQSyRtOnnFdW9/k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Pnnj7TI2; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1754939548; c=relaxed/simple;
+	bh=HskehVgjdSLwwTYYXOvinbmzxR4Mrp3ONxhO6Ip+YzA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cVoUVnEqynhKf0CpgMJajK+x748DB+BA4IinWMwIf/6/rUazyZjCHfW09zKYfMICviC4cCZQguujM0666FQubBrJWUzSy+IOS2mFe6zcbu21zUx79tjp7oMqiLL+Mh7pxWiuYlISuhP/Yjz5mlreVlv2CYmiGZSzZhP2yibfrqw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hpe.com; spf=pass smtp.mailfrom=hpe.com; dkim=pass (2048-bit key) header.d=hpe.com header.i=@hpe.com header.b=Kvz//tsq; arc=none smtp.client-ip=148.163.143.35
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hpe.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hpe.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Pnnj7TI2"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1754938619; x=1786474619;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=/1h1FXQ8wlbSgFHXbQzagekP6WBsykBAbMExF88232A=;
-  b=Pnnj7TI22M/wvUQDA78sBsJeug6tdbnzc6tMcoEMXCDeXuZ+/1PX66TL
-   nt95+jNkA1Cpq9bO3VPBo8c6nSHglAJfv9ynUxQ2x0SL+lGfZeH1+ClFZ
-   WH1Y+mJEuF+AVYPA94khQZJSKKDHdj42M+3Z+gHdhHFBYQTLfNYzch+zA
-   lL7GsI2mjIHmk3Gk8ItKBa1ZGF48M5dQt3sNCryzJebeaEC10dYrs9ld9
-   CQNDL6WG0bIY4JQ0pEk+tv69Xwwr4CytfMXEE0gDjbE0KgPAI7fW0WFUU
-   gMSKZ6INDw43vm6bl8Hy8G6GX2Ljik8ejShDnWjNaHGD9yJJPbLzyhhAF
-   Q==;
-X-CSE-ConnectionGUID: Je30W+SHQEu6DShDcy1vkQ==
-X-CSE-MsgGUID: GMyWzhJfQsC7si7eDViI3w==
-X-IronPort-AV: E=McAfee;i="6800,10657,11518"; a="57344995"
-X-IronPort-AV: E=Sophos;i="6.17,278,1747724400"; 
-   d="scan'208";a="57344995"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Aug 2025 11:56:58 -0700
-X-CSE-ConnectionGUID: vpWZx5ZjTIuthikuHuwiLg==
-X-CSE-MsgGUID: gJZTJWVSR5qvoV1h6E7NgA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.17,278,1747724400"; 
-   d="scan'208";a="165192786"
-Received: from lkp-server02.sh.intel.com (HELO 4ea60e6ab079) ([10.239.97.151])
-  by orviesa006.jf.intel.com with ESMTP; 11 Aug 2025 11:56:53 -0700
-Received: from kbuild by 4ea60e6ab079 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1ulXhL-00069Y-0y;
-	Mon, 11 Aug 2025 18:56:44 +0000
-Date: Tue, 12 Aug 2025 02:55:55 +0800
-From: kernel test robot <lkp@intel.com>
-To: Dominique Martinet via B4 Relay <devnull+asmadeus.codewreck.org@kernel.org>,
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
-	Christian Brauner <brauner@kernel.org>,
-	David Howells <dhowells@redhat.com>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Andrew Morton <akpm@linux-foundation.org>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	Linux Memory Management List <linux-mm@kvack.org>,
-	Maximilian Bosch <maximilian@mbosch.me>,
-	Ryan Lahfa <ryan@lahfa.xyz>, Christian Theune <ct@flyingcircus.io>,
-	Arnout Engelen <arnout@bzzt.net>, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	Dominique Martinet <asmadeus@codewreck.org>, stable@vger.kernel.org
-Subject: Re: [PATCH 1/2] iov_iter: iterate_folioq: fix handling of offset >=
- folio size
-Message-ID: <202508120250.Eooq2ydr-lkp@intel.com>
-References: <20250811-iot_iter_folio-v1-1-d9c223adf93c@codewreck.org>
+	dkim=pass (2048-bit key) header.d=hpe.com header.i=@hpe.com header.b="Kvz//tsq"
+Received: from pps.filterd (m0134424.ppops.net [127.0.0.1])
+	by mx0b-002e3701.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57BH2W3G002363;
+	Mon, 11 Aug 2025 19:12:03 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pps0720; bh=XBvJI1ynONURvoNh6sropnbGepLrGU14xY20c
+	ME2H98=; b=Kvz//tsqn78GqSYVUk2r8INkfHcrR/r3pHaeJojqtfLj6J7X+6H2c
+	kHW8sHOw5JkSdz+a/fXyEIryewNevrZTo0KW9a5eiNeDJSg+wAo7T2AEZa2hfbsm
+	5JLJwj0qos6ZymEK+NzTU7VoEeKS3MiOR8CBrDYHKJkYTY5o55YwRvMuWoVz8BUv
+	049VW7r0P8fqkxyD22tZgFpc2VZ9VyBfCaSqNHO/oMJXTJwdbglyntOd7MeahJuF
+	Cx/DV0S1TxOxbOHOsW99Y4tM620sz/oOkUESeimZx0yhH0MGV0e6Op7IYQ1izudA
+	XseaJwq24kLbT5SlZoBzs7N62PvOjtllA==
+Received: from p1lg14879.it.hpe.com ([16.230.97.200])
+	by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 48fkw018qp-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 11 Aug 2025 19:12:03 +0000 (GMT)
+Received: from test-build-fcntl.hpe.com (unknown [192.58.206.35])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by p1lg14879.it.hpe.com (Postfix) with ESMTPS id 663C213154;
+	Mon, 11 Aug 2025 19:12:02 +0000 (UTC)
+Received: by test-build-fcntl.hpe.com (Postfix, from userid 1000)
+	id 25CED8800130; Mon, 11 Aug 2025 19:03:06 +0000 (UTC)
+From: Rajeev Mishra <rajeevm@hpe.com>
+To: axboe@kernel.dk, yukuai1@huaweicloud.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Rajeev Mishra <rajeevm@hpe.com>
+Subject: [PATCH v2] loop: use vfs_getattr_nosec() for accurate file size
+Date: Mon, 11 Aug 2025 19:03:03 +0000
+Message-ID: <20250811190303.222802-1-rajeevm@hpe.com>
+X-Mailer: git-send-email 2.43.7
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250811-iot_iter_folio-v1-1-d9c223adf93c@codewreck.org>
+Content-Transfer-Encoding: 8bit
+X-Authority-Analysis: v=2.4 cv=YZu95xRf c=1 sm=1 tr=0 ts=689a4083 cx=c_pps
+ a=5jkVtQsCUlC8zk5UhkBgHg==:117 a=5jkVtQsCUlC8zk5UhkBgHg==:17
+ a=2OwXVqhp2XgA:10 a=MvuuwTCpAAAA:8 a=5jyyRg2iGYzsEeqDovkA:9
+X-Proofpoint-GUID: yL4NFB7u7mdqlEjyiGlFvFqSKptdNxI5
+X-Proofpoint-ORIG-GUID: yL4NFB7u7mdqlEjyiGlFvFqSKptdNxI5
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODExMDEyNyBTYWx0ZWRfX+qdv0drVJRK9
+ xMDnNmZHSKAsMo9lnQ1mPfZFhILqCX1Gr9BOpzmvO3u+kLF79SJ6zSTdA15xAbBt60W/EBR+2du
+ kG5u3hbeLK47yJv/0R2uV0JG4+m1LluJRPhdXRInejz9hJ84pwmz2qOTjqt3p7MJ4npQVBoJN/o
+ nfYUZqRYrZQw5uUROoGRsMKfzeIvqF7hcSmsn3SVMEc7kG666P0lRe0NC6uw7O1L9v+wEPwfwIX
+ HiQSHzel9fRdZ3ykxj9Q3ChPJ14N9bgWCeWHBA/JuAcb+M9+csPvHKIMe1hJaRkVTJPj1dN11Ub
+ l033yW9YgwEQSEg/cEqr0a37+BZgZh8JHzuQT8KZE1pwV1nAp/fTKWMVOuSk6WVLM5TPXjsKOXf
+ Ms1RhtYrFPlSTl5q+aCwH3+jY8rmkkj/OX2oz4wxXEm53K/abLK9KVyztNt+OQuhKAcakDX7
+X-HPE-SCL: -1
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-08-11_03,2025-08-11_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1015 malwarescore=0 spamscore=0 mlxlogscore=999 adultscore=0
+ impostorscore=0 bulkscore=0 lowpriorityscore=0 phishscore=0 suspectscore=0
+ mlxscore=0 priorityscore=1501 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2507300000
+ definitions=main-2508110127
 
-Hi Dominique,
+The get_size() function now uses vfs_getattr_nosec() instead of
+i_size_read() to obtain file size information. This provides more
+accurate results for network filesystems where cached metadata
+may be stale, ensuring the loop device reflects the current file
+size rather than potentially outdated cached values.
 
-kernel test robot noticed the following build warnings:
+Signed-off-by: Rajeev Mishra <rajeevm@hpe.com>
+---
+ drivers/block/loop.c | 24 ++++++++++++++++++++++--
+ 1 file changed, 22 insertions(+), 2 deletions(-)
 
-[auto build test WARNING on 8f5ae30d69d7543eee0d70083daf4de8fe15d585]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Dominique-Martinet-via-B4-Relay/iov_iter-iterate_folioq-fix-handling-of-offset-folio-size/20250811-154319
-base:   8f5ae30d69d7543eee0d70083daf4de8fe15d585
-patch link:    https://lore.kernel.org/r/20250811-iot_iter_folio-v1-1-d9c223adf93c%40codewreck.org
-patch subject: [PATCH 1/2] iov_iter: iterate_folioq: fix handling of offset >= folio size
-config: i386-buildonly-randconfig-002-20250811 (https://download.01.org/0day-ci/archive/20250812/202508120250.Eooq2ydr-lkp@intel.com/config)
-compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250812/202508120250.Eooq2ydr-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202508120250.Eooq2ydr-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
-   In file included from lib/iov_iter.c:14:
->> include/linux/iov_iter.h:171:7: warning: variable 'remain' is used uninitialized whenever 'if' condition is true [-Wsometimes-uninitialized]
-     171 |                 if (skip >= fsize)
-         |                     ^~~~~~~~~~~~~
-   include/linux/iov_iter.h:190:7: note: uninitialized use occurs here
-     190 |                 if (remain)
-         |                     ^~~~~~
-   include/linux/iov_iter.h:171:3: note: remove the 'if' if its condition is always false
-     171 |                 if (skip >= fsize)
-         |                 ^~~~~~~~~~~~~~~~~~
-     172 |                         goto next;
-         |                         ~~~~~~~~~
-   include/linux/iov_iter.h:163:22: note: initialize the variable 'remain' to silence this warning
-     163 |                 size_t part, remain, consumed;
-         |                                    ^
-         |                                     = 0
-   1 warning generated.
-
-
-vim +171 include/linux/iov_iter.h
-
-   143	
-   144	/*
-   145	 * Handle ITER_FOLIOQ.
-   146	 */
-   147	static __always_inline
-   148	size_t iterate_folioq(struct iov_iter *iter, size_t len, void *priv, void *priv2,
-   149			      iov_step_f step)
-   150	{
-   151		const struct folio_queue *folioq = iter->folioq;
-   152		unsigned int slot = iter->folioq_slot;
-   153		size_t progress = 0, skip = iter->iov_offset;
-   154	
-   155		if (slot == folioq_nr_slots(folioq)) {
-   156			/* The iterator may have been extended. */
-   157			folioq = folioq->next;
-   158			slot = 0;
-   159		}
-   160	
-   161		do {
-   162			struct folio *folio = folioq_folio(folioq, slot);
-   163			size_t part, remain, consumed;
-   164			size_t fsize;
-   165			void *base;
-   166	
-   167			if (!folio)
-   168				break;
-   169	
-   170			fsize = folioq_folio_size(folioq, slot);
- > 171			if (skip >= fsize)
-   172				goto next;
-   173			base = kmap_local_folio(folio, skip);
-   174			part = umin(len, PAGE_SIZE - skip % PAGE_SIZE);
-   175			remain = step(base, progress, part, priv, priv2);
-   176			kunmap_local(base);
-   177			consumed = part - remain;
-   178			len -= consumed;
-   179			progress += consumed;
-   180			skip += consumed;
-   181			if (skip >= fsize) {
-   182	next:
-   183				skip = 0;
-   184				slot++;
-   185				if (slot == folioq_nr_slots(folioq) && folioq->next) {
-   186					folioq = folioq->next;
-   187					slot = 0;
-   188				}
-   189			}
-   190			if (remain)
-   191				break;
-   192		} while (len);
-   193	
-   194		iter->folioq_slot = slot;
-   195		iter->folioq = folioq;
-   196		iter->iov_offset = skip;
-   197		iter->count -= progress;
-   198		return progress;
-   199	}
-   200	
-
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 1b6ee91f8eb9..c418c47db76e 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -137,12 +137,32 @@ static void loop_global_unlock(struct loop_device *lo, bool global)
+ static int max_part;
+ static int part_shift;
+ 
++/**
++ * get_size - calculate the effective size of a loop device
++ * @offset: offset into the backing file
++ * @sizelimit: user-specified size limit
++ * @file: the backing file
++ *
++ * Calculate the effective size of the loop device
++ *
++ * Returns: size in 512-byte sectors, or 0 if invalid
++ */
+ static loff_t get_size(loff_t offset, loff_t sizelimit, struct file *file)
+ {
++	struct kstat stat;
+ 	loff_t loopsize;
++	int ret;
++
++	/*
++	 * Get the accurate file size. This will prevent caching
++	 * issue that occurs at filesystem layer.
++	 */
++	ret = vfs_getattr_nosec(&file->f_path, &stat, STATX_SIZE, 0);
++	if (ret)
++		return 0;
++
++	loopsize = stat.size;
+ 
+-	/* Compute loopsize in bytes */
+-	loopsize = i_size_read(file->f_mapping->host);
+ 	if (offset > 0)
+ 		loopsize -= offset;
+ 	/* offset is beyond i_size, weird but possible */
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.43.7
+
