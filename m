@@ -1,73 +1,156 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85A4A1E32B9;
-	Sun, 10 Aug 2025 17:14:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A63D9BE4A;
+	Mon, 11 Aug 2025 00:44:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754846086; cv=none; b=NaBwCF0xdxsOq5wbaBNkRtu6opccrHfs7cQehHRb2x1EZm/23V6oA7hTTe7PE0/ruKWRIFnivlnzTT/rnOAlfMWFZD9R5Q24xqf2vKstjsDeEF5e+AOWatnEfpcWiWKB8uJKENIyLTvE79iRHVa33Fcn/NGlHn3A52Dzhe5vcXo=
+	t=1754873064; cv=none; b=m9JEjPPXcPJsZujHG1yfvt+f4OpSSocA6giQSJUzC054C4cuOp5KbEJ0NAPRHLSpgRRU3xQPoy3eKRVPAmncPoxCxPPOirX6e+6KbJblA8fLo7fGO1kWhLqgUYnGdvQs+FrG7HFoiCFAHMoPtM1ht/CgdZ3IcZXJ8LuYU4W355Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754846086; c=relaxed/simple;
-	bh=nuaEZLqaF29jbcZjusnG+UIwzzIyCEAkmwA0hD0A+NE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rOkID+0vNCcoxz816858nTJGGXO4/yuBAqOvfuWPsjHAanCeZVvTAIn1IICK3HKkwc2hyfI5T1z+W+/fnmijl3PWIOFH8aEceBRW4kdybEViwpxbROZTws0S0RRFKer6NOaV76ZPzzf2CVprSijIOvSfOUB4cuEJ2FzUBagRdSQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=O5OpqBNY; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1754873064; c=relaxed/simple;
+	bh=1as2kD96sNTyYgilE9+g6MklfG5bSXNOg8XM3OwPXmo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=meccbJu9/7ky0mBR8f0K+eAmnEU/z2CsF4NlP2RWwniPBQEoVzfyI+KbknaT+Y+GfrXbBbW/Gx6kkkHdXU4s8jKMgiVpPXYu+2fSkNO4Eh3j2cN2fwNtBMQLy5kcNFjckSrPCWi52genOeiGipQP9ZGHEXx7BfoDCPN7xLeVLUQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=inH30HWB; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="O5OpqBNY"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=734sXD+FLPX9G5Q8Oqch+kt66rWLcQSQY+YqBCv5MGg=; b=O5OpqBNYJSUMetRlR4jEskXQCN
-	p0+KJD3k7NUy8opYDwsSzZ1IaZDuMqyQI6En116okXyuW0XET4zbRant55Iks08ShvPzMSNSpMeMM
-	lOAdpVJfM04sxRwVr+/d+28BgU3EgOxQtJIxUN2bGbRD9x7d0N+yQU2cMJX5zLxLg/WnKgpIeXvJ3
-	2ijHiJ4PiD+eQ/LDNMiilBMgpqIev6sdltpcKDAYLOZOJn7NWM9whFgE41y8tL6iwzDd2ScKTjhjS
-	p2RHkMv56Xjnmtt3Lrdf/73jsOiIuoPkQcILi4SysCC0IkZcSV/pBg1IxCJpfmHjoy/XNk+1aD96g
-	BpX5Xe5A==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1ul9d6-00000005pZm-48Yh;
-	Sun, 10 Aug 2025 17:14:44 +0000
-Date: Sun, 10 Aug 2025 10:14:44 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Keith Busch <kbusch@kernel.org>
-Cc: Christoph Hellwig <hch@infradead.org>, Keith Busch <kbusch@meta.com>,
-	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org, snitzer@kernel.org, axboe@kernel.dk,
-	dw@davidwei.uk, brauner@kernel.org, Hannes Reinecke <hare@suse.de>
-Subject: Re: [PATCHv2 1/7] block: check for valid bio while splitting
-Message-ID: <aJjThNwGsrjFtWlg@infradead.org>
-References: <20250805141123.332298-1-kbusch@meta.com>
- <20250805141123.332298-2-kbusch@meta.com>
- <aJiusAtZ-CsnPTOR@infradead.org>
- <aJi9RgOAjXm8Hwlo@kbusch-mbp>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="inH30HWB"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0841C4CEEB;
+	Mon, 11 Aug 2025 00:44:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1754873064;
+	bh=1as2kD96sNTyYgilE9+g6MklfG5bSXNOg8XM3OwPXmo=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=inH30HWBE06PRfy8e50/GzScsVTcL91dQbXf/+HlTPoyOkC8q7cMRduuWCLMQ2+ur
+	 qZ5OLgVJHj3mdSP21TKJQxfzvP6B0UtGDjnWtPOqhTMkNp3nFkRpf0nLa1lD56H57i
+	 KxxpmakydRGDz+OZk+Wamu3JISJxxEIbOwaEBo3581sKtOHmgP2Ycf/RB3nVaNDI+R
+	 8yrBXnCSMMuND8MpyTmUJ0z4cLxDfHGu1VAkhxPnKiwoMhsBRaCuVvE3B6fx4+uQwU
+	 3cWfRMOvabCmuDOTWSaiPLopvsUaQeVBn25wFIGHCYxv0rf3Y18ly0wA2L7pMV+W9e
+	 emyTilGxRYKsw==
+Message-ID: <61c62ef0-4dde-4c14-8039-213258d3c6ae@kernel.org>
+Date: Mon, 11 Aug 2025 09:44:20 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aJi9RgOAjXm8Hwlo@kbusch-mbp>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 1/5] blk-mq-sched: introduce high level elevator lock
+To: Yu Kuai <yukuai1@huaweicloud.com>, hare@suse.de, jack@suse.cz,
+ bvanassche@acm.org, tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk,
+ yukuai3@huawei.com
+Cc: cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, yi.zhang@huawei.com, yangerkun@huawei.com,
+ johnny.chenyi@huawei.com
+References: <20250806085720.4040507-1-yukuai1@huaweicloud.com>
+ <20250806085720.4040507-2-yukuai1@huaweicloud.com>
+Content-Language: en-US
+From: Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <20250806085720.4040507-2-yukuai1@huaweicloud.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Sun, Aug 10, 2025 at 09:39:50AM -0600, Keith Busch wrote:
-> > >  	bytes = ALIGN_DOWN(bytes, bio_split_alignment(bio, lim));
-> > > +	if (!bytes)
-> > > +		return -EINVAL;
-> > 
-> > How is this related to the other hunk and the patch description?
+On 8/6/25 17:57, Yu Kuai wrote:
+> From: Yu Kuai <yukuai3@huawei.com>
 > 
-> The patchset allows you to submit an io with vectors that are partial
-> logical blocks. Misuse could create a bio that exceeds the device max
-> vectors or introduces virtual boundary gaps, requiring a split into
-> something that is smaller than a block size. This check catches that.
+> Currently, both mq-deadline and bfq have global spin lock that will be
+> grabbed inside elevator methods like dispatch_request, insert_requests,
+> and bio_merge. And the global lock is the main reason mq-deadline and
+> bfq can't scale very well.
 > 
-> Quick example: nvme with a 4k logical block size, and the usual 4k
-> virtual boundary. Send an io with four vectors iov_len=1k. The total
-> size is block sized, but there's no way that could split into a valid
-> io. There's a test specifically for this in my reply about xfstests.
+> While dispatching request, blk_mq_get_disatpch_budget() and
+> blk_mq_get_driver_tag() must be called, and they are not ready to be called
+> inside elevator methods, hence introduce a new method like
+> dispatch_requests is not possible.
+> 
+> Hence introduce a new high level elevator lock, currently it is protecting
+> dispatch_request only. Following patches will convert mq-deadline and bfq
+> to use this lock and finally support request batch dispatching by calling
+> the method multiple time while holding the lock.
+> 
+> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+> ---
+>  block/blk-mq-sched.c |  9 ++++++++-
+>  block/elevator.c     |  1 +
+>  block/elevator.h     | 14 ++++++++++++--
+>  3 files changed, 21 insertions(+), 3 deletions(-)
+> 
+> diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+> index 55a0fd105147..1a2da5edbe13 100644
+> --- a/block/blk-mq-sched.c
+> +++ b/block/blk-mq-sched.c
+> @@ -113,7 +113,14 @@ static int __blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
+>  		if (budget_token < 0)
+>  			break;
+>  
+> -		rq = e->type->ops.dispatch_request(hctx);
+> +		if (blk_queue_sq_sched(q)) {
+> +			elevator_lock(e);
+> +			rq = e->type->ops.dispatch_request(hctx);
+> +			elevator_unlock(e);
 
-Can you turn the above into a comment explaining the check?
+I do not think this is safe for bfq since bfq uses the irqsave/irqrestore spin
+lock variant. If it is safe, this needs a big comment block explaining why
+and/or the rules regarding the scheduler use of this lock.
+
+> +		} else {
+> +			rq = e->type->ops.dispatch_request(hctx);
+> +		}
+> +
+>  		if (!rq) {
+>  			blk_mq_put_dispatch_budget(q, budget_token);
+>  			/*
+> diff --git a/block/elevator.c b/block/elevator.c
+> index 88f8f36bed98..45303af0ca73 100644
+> --- a/block/elevator.c
+> +++ b/block/elevator.c
+> @@ -144,6 +144,7 @@ struct elevator_queue *elevator_alloc(struct request_queue *q,
+>  	eq->type = e;
+>  	kobject_init(&eq->kobj, &elv_ktype);
+>  	mutex_init(&eq->sysfs_lock);
+> +	spin_lock_init(&eq->lock);
+>  	hash_init(eq->hash);
+>  
+>  	return eq;
+> diff --git a/block/elevator.h b/block/elevator.h
+> index a07ce773a38f..81f7700b0339 100644
+> --- a/block/elevator.h
+> +++ b/block/elevator.h
+> @@ -110,12 +110,12 @@ struct request *elv_rqhash_find(struct request_queue *q, sector_t offset);
+>  /*
+>   * each queue has an elevator_queue associated with it
+>   */
+> -struct elevator_queue
+> -{
+> +struct elevator_queue {
+>  	struct elevator_type *type;
+>  	void *elevator_data;
+>  	struct kobject kobj;
+>  	struct mutex sysfs_lock;
+> +	spinlock_t lock;
+>  	unsigned long flags;
+>  	DECLARE_HASHTABLE(hash, ELV_HASH_BITS);
+>  };
+> @@ -124,6 +124,16 @@ struct elevator_queue
+>  #define ELEVATOR_FLAG_DYING		1
+>  #define ELEVATOR_FLAG_ENABLE_WBT_ON_EXIT	2
+>  
+> +#define elevator_lock(e)		spin_lock(&(e)->lock)
+> +#define elevator_unlock(e)		spin_unlock(&(e)->lock)
+> +#define elevator_lock_irq(e)		spin_lock_irq(&(e)->lock)
+> +#define elevator_unlock_irq(e)		spin_unlock_irq(&(e)->lock)
+> +#define elevator_lock_irqsave(e, flags) \
+> +	spin_lock_irqsave(&(e)->lock, flags)
+> +#define elevator_unlock_irqrestore(e, flags) \
+> +	spin_unlock_irqrestore(&(e)->lock, flags)
+> +#define elevator_lock_assert_held(e)	lockdep_assert_held(&(e)->lock)
+> +
+>  /*
+>   * block elevator interface
+>   */
+
+
+-- 
+Damien Le Moal
+Western Digital Research
