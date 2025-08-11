@@ -1,123 +1,113 @@
-Received: from prime.voidband.net (prime.voidband.net [199.247.17.104])
+Received: from 004.mia.mailroute.net (004.mia.mailroute.net [199.89.3.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50D88296BA2;
-	Mon, 11 Aug 2025 15:55:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.247.17.104
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2809F2D47F9
+	for <linux-block@vger.kernel.org>; Mon, 11 Aug 2025 15:57:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754927744; cv=none; b=eeNURS5p9kc6g5fMeR8ddX5ExFBRVd5j8O6zAwQ1soy7feXlHHJvGHX5Ruj+wa5Qzq6udz3MxDl7DgYn3xwdoattbN55UkQ91jrWMWjIRRLS9abxzfu5rGeBkrsPOE2tLRQbCiRJl+n5Xc4RSDaM7mdYMSAPAhufxlOOqYwgVE4=
+	t=1754927846; cv=none; b=K6uUOko/WO3XhbDoSHxoB79bsDLBqZkkHiuG2NXyBnWO4vOXRNL3oArO3c+OUoas+d+jnqIwpHSWi2Qf1dHnQR0TVNxEopqYK9RArsq+LiB/LLw9sfHpw2GsPIAis56srTGP0LivfgUKB1CV4ovQFJrKYrTXwBNcTd5m69JhAQM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754927744; c=relaxed/simple;
-	bh=ElJ/T/tRj+7GGPhvILF3z+61P6Tjni3YzNxIaUm1aBw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=B/Ppws2R4aZKPd+W0yYqO5Y3V5qcKLcb4GQ4swH5x0HG3+l+ilp4myKXmXLiZGUOcI/o9U9/OhFDKQJhlvEWDAZWkuiw0TR/S6IAXuf4P82OrRqrLs3PBEdq0ehHiqm+Sb9BrblHs9rG+WKD+/iR9/dtZW0wTgohAT1g6g7hRME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=natalenko.name; spf=pass smtp.mailfrom=natalenko.name; dkim=pass (1024-bit key) header.d=natalenko.name header.i=@natalenko.name header.b=wL+LGZSW; arc=none smtp.client-ip=199.247.17.104
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=natalenko.name
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=natalenko.name
+	s=arc-20240116; t=1754927846; c=relaxed/simple;
+	bh=/7vAfKQ21uVJX4bb9D7qxgBPhUd6eFOUYku5Ybm8oLk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=UvVOHAC0aXDyCMsK05kVwuqvzvW0yqV3ft3d6Jmr1XBfWnCVKerQ91Ftlsd3FWneE6rp4icUAipR4/I1KqLQ10G9My0UIJgqsFb9nvpcGvrw6i69RLm9tKAZCFvXCNx4OVQSzu8cwKS1BjW1gN+WXEvHKZv008R5ABbXonxaJxg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=OYETX48H; arc=none smtp.client-ip=199.89.3.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=natalenko.name header.i=@natalenko.name header.b="wL+LGZSW"
-Received: from spock.localnet (unknown [212.20.115.26])
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="OYETX48H"
+Received: from localhost (localhost [127.0.0.1])
+	by 004.mia.mailroute.net (Postfix) with ESMTP id 4c0zmN1Zjqzm0ySS;
+	Mon, 11 Aug 2025 15:57:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:mime-version:references:in-reply-to
+	:x-mailer:message-id:date:date:subject:subject:from:from
+	:received:received; s=mr01; t=1754927843; x=1757519844; bh=bI/jD
+	0v++vk3p8+M7vNJ00gGanHhZeMPR8pRZJOELlY=; b=OYETX48H2TXCM3ufm2Vsq
+	bIfGp6HijVygDeWfAMR/QUd857B1hOauZERIcX5iVybw0ysiv+sAcSNzLntS1OHM
+	cm7HGsKFlulaiajda3NcgnVcqg8SINguB68V0tVzeBFUO239bVEu2kakeYDfBgZE
+	h1MLGbdYu5wFXhr7KuQLxneMuFac/50ly80nWRi52LBulFletSNbOZK85fIoupiP
+	wICaPtVhWPdylZsagdjQnfdrMopD3PVGoxD4rnSo7SbCiMNnNuvOFsNqIgVNe60W
+	sfJxMS7miVXnP3kcPdzXsD13Y1xz3Xdg4o2QoGcY8bqbJdbtAU0Oe9rm99ZOZcG/
+	g==
+X-Virus-Scanned: by MailRoute
+Received: from 004.mia.mailroute.net ([127.0.0.1])
+ by localhost (004.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id QAEk7IeNP8e6; Mon, 11 Aug 2025 15:57:23 +0000 (UTC)
+Received: from bvanassche.mtv.corp.google.com (unknown [104.135.204.82])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by prime.voidband.net (Postfix) with ESMTPSA id 986B3635B040;
-	Mon, 11 Aug 2025 17:48:22 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=natalenko.name;
-	s=dkim-20170712; t=1754927302;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=1L9wHhKVuXZQmzSOEtmhCm41l8tFu1qnDWrexhilFd8=;
-	b=wL+LGZSWocUdhgr4uDnJkqv/zrJDjGwZO0DZ5R+3skpojeX9/PCnPdJb8dmZRkEGkhxQwm
-	fZlDnWEpL9uNRlPOF54P6RoNCeCYp1wG2BTGWGuhhQwXcg4qbGAtqFYW7khRm9CzynxQm9
-	KkqaxakLAtnJyncaLQ2jBvjGKFju27U=
-From: Oleksandr Natalenko <oleksandr@natalenko.name>
-To: linux-kernel@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
- Damien Le Moal <dlemoal@kernel.org>, John Garry <john.g.garry@oracle.com>,
- Christoph Hellwig <hch@lst.de>,
- "Martin K. Petersen" <martin.petersen@oracle.com>, linux-mm@kvack.org,
- Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
- Shakeel Butt <shakeel.butt@linux.dev>, Qi Zheng <zhengqi.arch@bytedance.com>,
- Michal Hocko <mhocko@kernel.org>, David Hildenbrand <david@redhat.com>,
- Johannes Weiner <hannes@cmpxchg.org>,
- Andrew Morton <akpm@linux-foundation.org>
-Subject:
- [REGRESSION][BISECTED] Unexpected OOM instead of reclaiming inactive file
- pages
-Date: Mon, 11 Aug 2025 17:48:08 +0200
-Message-ID: <5905724.LvFx2qVVIh@natalenko.name>
+	(Authenticated sender: bvanassche@acm.org)
+	by 004.mia.mailroute.net (Postfix) with ESMTPSA id 4c0zmH3rMrzm0yVT;
+	Mon, 11 Aug 2025 15:57:18 +0000 (UTC)
+From: Bart Van Assche <bvanassche@acm.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Chaitanya Kulkarni <kch@nvidia.com>
+Subject: [PATCH v2 2/5] block, genhd: Remove disk_stats.sectors casts
+Date: Mon, 11 Aug 2025 08:56:49 -0700
+Message-ID: <20250811155702.401150-3-bvanassche@acm.org>
+X-Mailer: git-send-email 2.50.1.703.g449372360f-goog
+In-Reply-To: <20250811155702.401150-1-bvanassche@acm.org>
+References: <20250811155702.401150-1-bvanassche@acm.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="nextPart3613097.ElGaqSPkdT";
- micalg="pgp-sha512"; protocol="application/pgp-signature"
+Content-Transfer-Encoding: quoted-printable
 
---nextPart3613097.ElGaqSPkdT
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="utf-8"; protected-headers="v1"
-From: Oleksandr Natalenko <oleksandr@natalenko.name>
-To: linux-kernel@vger.kernel.org
-Date: Mon, 11 Aug 2025 17:48:08 +0200
-Message-ID: <5905724.LvFx2qVVIh@natalenko.name>
-MIME-Version: 1.0
+In include/linux/part_stat.h, disk_stats.sectors is declared as
+unsigned long[]. Instead of casting disk_stats.sectors to unsigned long
+long and formatting it with %llu, remove the cast and format these number=
+s
+with %lu. No functionality has been changed.
 
-Hello Damien.
+Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+---
+ block/genhd.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-I'm fairly confident that the following commit
-
-459779d04ae8d block: Improve read ahead size for rotational devices
-
-caused a regression in my test bench.
-
-I'm running v6.17-rc1 in a small QEMU VM with virtio-scsi disk. It has got 1 GiB of RAM, so I can saturate it easily causing reclaiming mechanism to kick in.
-
-If MGLRU is enabled:
-
-$ echo 1000 | sudo tee /sys/kernel/mm/lru_gen/min_ttl_ms
-
-then, once page cache builds up, an OOM happens without reclaiming inactive file pages: [1]. Note that inactive_file:506952kB, I'd expect these to be reclaimed instead, like how it happens with v6.16.
-
-If MGLRU is disabled:
-
-$ echo 0 | sudo tee /sys/kernel/mm/lru_gen/min_ttl_ms
-
-then OOM doesn't occur, and things seem to work as usual.
-
-If MGLRU is enabled, and 459779d04ae8d is reverted on top of v6.17-rc1, the OOM doesn't happen either.
-
-Could you please check this?
-
-Thank you.
-
--- 
-Oleksandr Natalenko, MSE
-
-[1]: https://paste.voidband.net/TG5OiZ29.log
---nextPart3613097.ElGaqSPkdT
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part.
-Content-Transfer-Encoding: 7Bit
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEEZUOOw5ESFLHZZtOKil/iNcg8M0sFAmiaELgACgkQil/iNcg8
-M0vbWRAA1sWIe8mVt6d0YmxKVEnYTYmMS1xatrN0wE+v1F22bp2RIiILZ5N1jlYM
-s7mU4zQPn+K3KGeskURO7fI+Pkxqhas8UeN4p2GXkDGxSW3/N+eglmgbn0ICCE1w
-I+fsBRbF7u5AI1xwUrDl4QDs+3YwW+v5RQbwFTwQYLu1oz9cARZD4tn4P80x7RIl
-ct/TtcUvkHWjs0JEKXxfCqDQfEe36dD5TD2hFk5Fo1tIrSQfMojmoJ+gMXPCtXsh
-tfPuXFeenpcySoLvu6PS5AayzqPCle4t2WOuVigE5KMhPkpNG22Of7PM4FbueRQa
-O4QECIWlzQNs0n5VVrCNlAWC5dCtzGHvV/HI2tOmEGIUjdpU39JmibrQa9OsK3TA
-lqMgmD8rgMT4r7TLgM0f4F48q5enU8nfSiuL3PVxeEWDJUlz2cCyb9cFp8u6ybI8
-NI9n/1l+G8rV24E4eWuB7+vWMdpcio+/C1xxB0KZS8tdSdB1vQJqFhv4o0TqJshS
-PurH9SL9ZoRz9s+JequLlnz5vZCULAHMD8pwcZ9KbjhuohA5BePtDt26IoH+0KoM
-ph1zjJobDbwNCLvGi+xXorBKXjytESPDJEyBfQK77T5HeEGiFgzF5OG+Nt/9V085
-ReA9mxcKPcpe1VXz4Hl3LHaPBUkg6ATQ9r0m+FTF6WIowpomIG0=
-=guvX
------END PGP SIGNATURE-----
-
---nextPart3613097.ElGaqSPkdT--
-
-
-
+diff --git a/block/genhd.c b/block/genhd.c
+index 9bbc38d12792..31cff7980f70 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -1074,19 +1074,19 @@ ssize_t part_stat_show(struct device *dev,
+ 	}
+ 	part_stat_read_all(bdev, &stat);
+ 	return sysfs_emit(buf,
+-		"%8lu %8lu %8llu %8u "
+-		"%8lu %8lu %8llu %8u "
++		"%8lu %8lu %8lu %8u "
++		"%8lu %8lu %8lu %8u "
+ 		"%8u %8u %8u "
+-		"%8lu %8lu %8llu %8u "
++		"%8lu %8lu %8lu %8u "
+ 		"%8lu %8u"
+ 		"\n",
+ 		stat.ios[STAT_READ],
+ 		stat.merges[STAT_READ],
+-		(unsigned long long)stat.sectors[STAT_READ],
++		stat.sectors[STAT_READ],
+ 		(unsigned int)div_u64(stat.nsecs[STAT_READ], NSEC_PER_MSEC),
+ 		stat.ios[STAT_WRITE],
+ 		stat.merges[STAT_WRITE],
+-		(unsigned long long)stat.sectors[STAT_WRITE],
++		stat.sectors[STAT_WRITE],
+ 		(unsigned int)div_u64(stat.nsecs[STAT_WRITE], NSEC_PER_MSEC),
+ 		inflight,
+ 		jiffies_to_msecs(stat.io_ticks),
+@@ -1097,7 +1097,7 @@ ssize_t part_stat_show(struct device *dev,
+ 						NSEC_PER_MSEC),
+ 		stat.ios[STAT_DISCARD],
+ 		stat.merges[STAT_DISCARD],
+-		(unsigned long long)stat.sectors[STAT_DISCARD],
++		stat.sectors[STAT_DISCARD],
+ 		(unsigned int)div_u64(stat.nsecs[STAT_DISCARD], NSEC_PER_MSEC),
+ 		stat.ios[STAT_FLUSH],
+ 		(unsigned int)div_u64(stat.nsecs[STAT_FLUSH], NSEC_PER_MSEC));
