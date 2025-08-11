@@ -1,73 +1,73 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1477F2DAFB3
-	for <linux-block@vger.kernel.org>; Mon, 11 Aug 2025 09:44:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CE372206A9
+	for <linux-block@vger.kernel.org>; Mon, 11 Aug 2025 09:49:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754905466; cv=none; b=WLEaZTx0P09wldD+FMP6vFGd8aU8GpORbxxJYz9Yy7sx7ZzpGqHlWWRZIk82frMdjb9j5o1K2STIQOVP92Gg0U0kaSr6TJr0tCCugdmNER0j0wzfV4F5jYs+xdW5zYkfneQ/CSoV15MWfeJXKEy0+AxCn/3qONiSb3DHRp3w2o8=
+	t=1754905771; cv=none; b=XXedWUcvTo7huGf2KczrGM1Zkh4wXu1+d3bW+FdGvG76F+qUFK59AyQ2K/zxxeOyyywqiECHFIZ1fzXFejw0Dq7wVh3g1HrLLF+ejFuU18AQ+hIe6J2rXv2ITW8cIvv7uLcvNnJWtwi3WcyAz/j91yj98j7YONF5aSvjBNSG3xA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754905466; c=relaxed/simple;
-	bh=pXgtTY/DhDSULjVl/qXE+c45k2tUzgiWpGDO1dVfK2U=;
+	s=arc-20240116; t=1754905771; c=relaxed/simple;
+	bh=YSH8u5PGqlODmLctM5GhdiruLiZoyKvrWvgnlKQlSMc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=T624kjgxTXtpviSyCIc1XGUNpeKYq0oCiZBCzBQLEbzSFa57xis/ZY3mnL2kMQ9bP0U4hEaA8+9Qp4SnsFlGjBELpQEQu+d3K7xaCV9pII0+rc4OPfu11GubjC7R06zzRNCuZt/28ra9yUS4O7Jsqa5zFqXVI3GUomOuoqo2GF0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gY1pxwBp; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=h0QjQ5YMve2DEsmTPpdjlDBEYqRURumofNbAla8jQ1TcNtUaRdMXmozh311cx70jdP2n/WOo1CkFwjm12dHPKv+8pnbqK5I7ITEwdxbiESRS+179u/0sDHZN1lNzRu6llK9KB/KpLa9Y1WqcW5kkL4REl+oMlIvKtgVbPRGXSwQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HFqldyWu; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gY1pxwBp"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HFqldyWu"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1754905463;
+	s=mimecast20190719; t=1754905767;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=F18giMtXeSOsJoxjGEWjUq9c9uihGO30W7aY2sZTIr0=;
-	b=gY1pxwBpwPntS49Exa5wFZWyJi+UxOqAdBwa7SlWTWNij0E4OD2uUEW8I/wdawqgZzL5/6
-	DcVYulV/OdKL/y9+K8KXxdyek52+hi2EOtpSVY2mls3DAmuKR59yuN/m/IoaRuQ3h4uZ7H
-	5kEGPjg3OB+PA1R7tFTKtbzPkhK3pZE=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=zy7zoeBHdfB1I6ns8dWDx/bnOQrMxjU4C6kURFFGtA8=;
+	b=HFqldyWujbK8CCRRy2ZivPZMTj+CY3Xi6/vycOFTQHjvutHlKLvEKOGp+AbA3tnO2KOVuS
+	KxTL6vhovZORQVVBJ/YDmrGicMaxY3AVcxGYVKDTbd+P8SSORFBk7DgKjWGs8uXmC3n/26
+	rxOJ2ANMK7EEABKcrXHkHhV9i32LUT0=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-510-hlM3Uw3NNY-AzVDmIQgVEw-1; Mon, 11 Aug 2025 05:44:22 -0400
-X-MC-Unique: hlM3Uw3NNY-AzVDmIQgVEw-1
-X-Mimecast-MFC-AGG-ID: hlM3Uw3NNY-AzVDmIQgVEw_1754905461
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-459d7ed90baso32569905e9.2
-        for <linux-block@vger.kernel.org>; Mon, 11 Aug 2025 02:44:22 -0700 (PDT)
+ us-mta-679-USW40IMsNK2o6F_u_gOdpw-1; Mon, 11 Aug 2025 05:49:25 -0400
+X-MC-Unique: USW40IMsNK2o6F_u_gOdpw-1
+X-Mimecast-MFC-AGG-ID: USW40IMsNK2o6F_u_gOdpw_1754905763
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4538f375e86so31675275e9.3
+        for <linux-block@vger.kernel.org>; Mon, 11 Aug 2025 02:49:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754905461; x=1755510261;
+        d=1e100.net; s=20230601; t=1754905763; x=1755510563;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt
          :content-language:from:references:cc:to:subject:user-agent
          :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=F18giMtXeSOsJoxjGEWjUq9c9uihGO30W7aY2sZTIr0=;
-        b=SA4cm5o6fGyJcHI/RqSUyWMeVlAM0AvghWW/d4Br9SkKnt/7aNm67fagI12968EnKQ
-         MGLG94Chbe0JAaNMvln3sab2Tbys3bTozX2tJstWd868fyyNQTjpHx3yGwO5Ut6d5h/w
-         S8B6yaB2oyqQV4+PyiM2ji/CSyE4l8JAWK5il3Iuxl2U3RVbgDo53pgnQTIAH6fs9HaP
-         iXrTZ8OemaQL/3mmN0g1IXWqcwTbei47Mlmx5ZbJP2R+udXvySCXgyIBrNua0knmKKis
-         /tiIgz4BWU2m/aM3dtDErE5bgwHuO9p46NwatpzG4FJH/Jr4ILcP2Y4W6mZfPawnGJZm
-         vfHA==
-X-Forwarded-Encrypted: i=1; AJvYcCVU47OaZrEGncCsIWjyTTf5ROT8JWB5poadGqH5j/gXFauDZpplgUUXoi3/Ka14XM6B9A+7rBhW+ET0gA==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyo9h8zqLlRNZKvHkMPR1DfgTMjB5kSIrcaeu3Qg+EbMXutPcEj
-	WT42o6OaXo7OWQDOHMG1X5hq67Es7/XYwciUOjxuH70cPYW2mel+X2SiOKHWYOggStWZMin93Yw
-	AjY+36PRMUkby2VHnjM0m1DWziho12og5Qry7FD2nmsP5QLrBtpazVERHisYzs+t4
-X-Gm-Gg: ASbGncsEVq1N+OJJV3Mr4Gih8ZPnSJKVbhQSQVs5InL+6bkKoBl4xmC1ly34FxCecc1
-	Ur1cEwHgfcsntJeb8PQth34ZxzlXjmVPq78+YTRTAlQLiQL/rrE1XO6ra4T1lpIgWKUO61W0TIN
-	XOa94K3FdToumbHcWrc7cwEogQ+LLU3KkADuRQFTeD6zBQ2LhlMUEqefd62hziSSdF3cLOr8mzt
-	QleK+xuTPEvO1cLURXf8mwyFu7FjPZbWpezVcbgx42oytGjlCPwie/9Cgu/6EbebmqICtHV3kip
-	we520IEVOqfVkvqA/S9AerfC7Ltj2OdNLKLa8nWJyn67+yrlcfhNc8TLK2BvfR/aSAWlwNofnVX
-	PYeS/Ig4E6HLRZ2mvXDas1HhfIYybZ0fqHQgnAtu6M2wRX2ca45Z6DxSAJZR2JAuboqY=
-X-Received: by 2002:a05:6000:310b:b0:3a4:fea6:d49f with SMTP id ffacd0b85a97d-3b900b7a325mr9729234f8f.49.1754905461110;
-        Mon, 11 Aug 2025 02:44:21 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGDnyT7w5uW8Z0cRPw8tOSrEfeGU//7NUygBZUK+G4oAhA4mCMSvoBXSssgH+X+wFwiUycmJw==
-X-Received: by 2002:a05:6000:310b:b0:3a4:fea6:d49f with SMTP id ffacd0b85a97d-3b900b7a325mr9729207f8f.49.1754905460669;
-        Mon, 11 Aug 2025 02:44:20 -0700 (PDT)
+        bh=zy7zoeBHdfB1I6ns8dWDx/bnOQrMxjU4C6kURFFGtA8=;
+        b=rU+R5q5s4Vm+b8Sb0gVp/x/HTDBNMo+PAF2OXHdxEeytscGmsJVA5SFbub9wRRkENa
+         um7N4cqP+plH48CLSyVFxMqYlzUHgAz5R7aK2lEJzyZkduScQCuNtsb9qKQfREVsHoRR
+         Zztlocnmdkx0liOdYkMbFheQMeYvSN8N4SVAcXEmZX/X3HADtT/ygJHti0+vuQOszrcT
+         86lIpK4TfxnzRGZhbxZNIBAnx194YM03KJ28MgC7VhTG8mJ8doFz/1vzCQskR4ykMq6m
+         nMjqihd+Dw6GAqFNiV97R8W3nbotbQbqDe3o5uIOOoNlwGNrACLwxMwIEBEP1T5dCfuU
+         KLhw==
+X-Forwarded-Encrypted: i=1; AJvYcCWt9uinYYROuHbqgA7VJCrhVOuQWMGh0BdZWyU/u+mYf2GVJ9iO1eve+4hBkprqbqItS4/MTwdW5+xo4Q==@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywz4fjBzcVOs6YNcwD+SGnWm5Qeeqt1DIuZ2vD9h4q0VRhi8uDe
+	g4GBjKbXRhDd6QW29Zw09NeD2NbCmwEuLVrkRxdTFA4NRhH9Uj8D7tioZoFXEHHhkFIYyjs5mbH
+	qgIqAO6XpauSo51FzAimc/kqWtddKR5JKc7KhSvv2Ycc6fC+rVv/Iz1tYsCXqiqEA
+X-Gm-Gg: ASbGncv1AbOgje2rVMAI4/4GYcU4tSwZ2pDkuXUmTGoKr9IheulBjVpKdjp7ZVYU9YF
+	NJCF1WMlOvllYy4yHUd054BngoTnXbCZSRDLjruBqEEqYjznvX78g//qmpXOwdaOWkS9+L5DWHI
+	3MrU8PZy+Eiy6nnK2PRba77aqzcBQ2EIljx63wtezJYctPVUKHXOHXA2rFNODvjiZUjz6z6gylN
+	tTCQrxl3F4XT0aHqLFxfUw8GnzAZBNHhKOGatgCv4/aFSP6yTKnVXa18dv/YHcplTaixTZ3bc+a
+	lUdju34OokuZ0+RrQ3vyoRY309HHNG/RgZTinEzWcY8JE9M3MkGnBIaWZ2bNcwylgElMnL9gtyZ
+	o0CAAdkRzAiUxrj324hbMavp3vJtw9MA/30Oamic0gNtJkITdjbB5hP/unGT4yjjH0Nk=
+X-Received: by 2002:a05:600c:8207:b0:459:dc81:b189 with SMTP id 5b1f17b1804b1-459f4fc40e3mr130800365e9.31.1754905762845;
+        Mon, 11 Aug 2025 02:49:22 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGEa+lMPdCvEQQa/1iCFQjPws3MuVXvht3etKiuOL4kCcQ5Vr73iEgsX0YCT2GWYa35XBoE9g==
+X-Received: by 2002:a05:600c:8207:b0:459:dc81:b189 with SMTP id 5b1f17b1804b1-459f4fc40e3mr130800075e9.31.1754905762394;
+        Mon, 11 Aug 2025 02:49:22 -0700 (PDT)
 Received: from ?IPV6:2003:d8:2f06:a600:a397:de1d:2f8b:b66f? (p200300d82f06a600a397de1d2f8bb66f.dip0.t-ipconnect.de. [2003:d8:2f06:a600:a397:de1d:2f8b:b66f])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b79c4a2187sm41328501f8f.70.2025.08.11.02.44.19
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b79c3b9386sm40066956f8f.18.2025.08.11.02.49.20
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 11 Aug 2025 02:44:20 -0700 (PDT)
-Message-ID: <f7f9e444-1739-4b5e-85e1-3a9f86b7e50a@redhat.com>
-Date: Mon, 11 Aug 2025 11:44:18 +0200
+        Mon, 11 Aug 2025 02:49:21 -0700 (PDT)
+Message-ID: <dfb01243-7251-444c-8ac6-d76666742aa9@redhat.com>
+Date: Mon, 11 Aug 2025 11:49:19 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -75,10 +75,11 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 5/5] block: use largest_zero_folio in
- __blkdev_issue_zero_pages()
-To: "Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>,
- Suren Baghdasaryan <surenb@google.com>, Ryan Roberts <ryan.roberts@arm.com>,
+Subject: Re: [PATCH v3 0/5] add persistent huge zero folio support
+To: Kiryl Shutsemau <kirill@shutemov.name>,
+ "Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>
+Cc: Suren Baghdasaryan <surenb@google.com>,
+ Ryan Roberts <ryan.roberts@arm.com>,
  Baolin Wang <baolin.wang@linux.alibaba.com>, Vlastimil Babka
  <vbabka@suse.cz>, Zi Yan <ziy@nvidia.com>, Mike Rapoport <rppt@kernel.org>,
  Dave Hansen <dave.hansen@linux.intel.com>, Michal Hocko <mhocko@suse.com>,
@@ -86,14 +87,14 @@ To: "Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>,
  Andrew Morton <akpm@linux-foundation.org>,
  Thomas Gleixner <tglx@linutronix.de>, Nico Pache <npache@redhat.com>,
  Dev Jain <dev.jain@arm.com>, "Liam R . Howlett" <Liam.Howlett@oracle.com>,
- Jens Axboe <axboe@kernel.dk>
-Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org, willy@infradead.org,
+ Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
+ linux-mm@kvack.org, willy@infradead.org,
  Ritesh Harjani <ritesh.list@gmail.com>, linux-block@vger.kernel.org,
  linux-fsdevel@vger.kernel.org, "Darrick J . Wong" <djwong@kernel.org>,
  mcgrof@kernel.org, gost.dev@samsung.com, hch@lst.de,
  Pankaj Raghav <p.raghav@samsung.com>
 References: <20250811084113.647267-1-kernel@pankajraghav.com>
- <20250811084113.647267-6-kernel@pankajraghav.com>
+ <hzk7e52sfhfqvo5bh7btthtyyo2tf4rwe24jxtp3fqd62vxo7k@cylwrbxqj47b>
 From: David Hildenbrand <david@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=david@redhat.com; keydata=
@@ -141,26 +142,64 @@ Autocrypt: addr=david@redhat.com; keydata=
  WBe5lqcozu9LpNDH/brVSzHCSb7vjNGvvSVESDuoiHK8gNlf0v+epy5WYd7CGAgODPvDShGN
  g3eXuA==
 Organization: Red Hat
-In-Reply-To: <20250811084113.647267-6-kernel@pankajraghav.com>
+In-Reply-To: <hzk7e52sfhfqvo5bh7btthtyyo2tf4rwe24jxtp3fqd62vxo7k@cylwrbxqj47b>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 11.08.25 10:41, Pankaj Raghav (Samsung) wrote:
-> From: Pankaj Raghav <p.raghav@samsung.com>
+On 11.08.25 11:43, Kiryl Shutsemau wrote:
+> On Mon, Aug 11, 2025 at 10:41:08AM +0200, Pankaj Raghav (Samsung) wrote:
+>> From: Pankaj Raghav <p.raghav@samsung.com>
+>>
+>> Many places in the kernel need to zero out larger chunks, but the
+>> maximum segment we can zero out at a time by ZERO_PAGE is limited by
+>> PAGE_SIZE.
+>>
+>> This concern was raised during the review of adding Large Block Size support
+>> to XFS[2][3].
+>>
+>> This is especially annoying in block devices and filesystems where
+>> multiple ZERO_PAGEs are attached to the bio in different bvecs. With multipage
+>> bvec support in block layer, it is much more efficient to send out
+>> larger zero pages as a part of single bvec.
+>>
+>> Some examples of places in the kernel where this could be useful:
+>> - blkdev_issue_zero_pages()
+>> - iomap_dio_zero()
+>> - vmalloc.c:zero_iter()
+>> - rxperf_process_call()
+>> - fscrypt_zeroout_range_inline_crypt()
+>> - bch2_checksum_update()
+>> ...
+>>
+>> Usually huge_zero_folio is allocated on demand, and it will be
+>> deallocated by the shrinker if there are no users of it left. At the moment,
+>> huge_zero_folio infrastructure refcount is tied to the process lifetime
+>> that created it. This might not work for bio layer as the completions
+>> can be async and the process that created the huge_zero_folio might no
+>> longer be alive. And, one of the main point that came during discussion
+>> is to have something bigger than zero page as a drop-in replacement.
+>>
+>> Add a config option PERSISTENT_HUGE_ZERO_FOLIO that will always allocate
+>> the huge_zero_folio, and disable the shrinker so that huge_zero_folio is
+>> never freed.
+>> This makes using the huge_zero_folio without having to pass any mm struct and does
+>> not tie the lifetime of the zero folio to anything, making it a drop-in
+>> replacement for ZERO_PAGE.
+>>
+>> I have converted blkdev_issue_zero_pages() as an example as a part of
+>> this series. I also noticed close to 4% performance improvement just by
+>> replacing ZERO_PAGE with persistent huge_zero_folio.
+>>
+>> I will send patches to individual subsystems using the huge_zero_folio
+>> once this gets upstreamed.
+>>
+>> Looking forward to some feedback.
 > 
-> Use largest_zero_folio() in __blkdev_issue_zero_pages().
-> On systems with CONFIG_PERSISTENT_HUGE_ZERO_FOLIO enabled, we will end up
-> sending larger bvecs instead of multiple small ones.
-> 
-> Noticed a 4% increase in performance on a commercial NVMe SSD which does
-> not support OP_WRITE_ZEROES. The device's MDTS was 128K. The performance
-> gains might be bigger if the device supports bigger MDTS.
-> 
-> Acked-by: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
-> Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
-> ---
+> Why does it need to be compile-time? Maybe whoever needs huge zero page
+> would just call get_huge_zero_page()/folio() on initialization to get it
+> pinned?
 
-Acked-by: David Hildenbrand <david@redhat.com>
+That's what v2 did, and this way here is cleaner.
 
 -- 
 Cheers,
