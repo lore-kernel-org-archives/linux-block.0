@@ -1,136 +1,131 @@
-Received: from mout-p-101.mailbox.org (mout-p-101.mailbox.org [80.241.56.151])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f182.google.com (mail-vk1-f182.google.com [209.85.221.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD8682DC355;
-	Mon, 11 Aug 2025 08:42:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D53D1991DD;
+	Mon, 11 Aug 2025 08:55:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754901738; cv=none; b=BlLmLAsZZOyuJx0KMxRDD1VKY5ZwxRh5xTudGLdOsVHlVlA/GgRmX+zkXoX+VDS9K6uZV2EOh5xlqiE3n5RSqdwu93vsrV6qzDypTpSwMJeOcYQgnqyWAcUQJi2Kwf6J5Vi9pxO2pJ4KuLxcEPbjb1PCiPKx97kkFsKaIdbMb10=
+	t=1754902519; cv=none; b=qVD/0qt5GzfDNXYNzrGGqVhzgMILpqm4ukda1GwGFFhSSHuCk38miPSca6XgR7FBgNryL7feddOtpGFIXEjZC1dAHJEimLUW8inCruUDBXewJI3HdinUQBkEsoEZqzzz/WPcccSVBCXd/C/GszTxsj431zI59Hc6UISyGBHfT6E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754901738; c=relaxed/simple;
-	bh=fFzN46s8fI+jPXzBN2wRyau0XR7zJopdfaevTTLhQwQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Z1ZSVE2Z/Ls4yYJC3nsnmtvG8w3Wk1QIEP103yMrqC22DNqFmZPH17Nfn8vbco4sLvktqMTCci92tcnAExvXJeSjeTt872zGArGGJkD7lGcZ/i8tUtRKCLagNU2wUfoZ1XIyBofDas+7Y7haYjwgRlUMgC/MMWkf8yafQ8FbP0U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pankajraghav.com; spf=pass smtp.mailfrom=pankajraghav.com; dkim=pass (2048-bit key) header.d=pankajraghav.com header.i=@pankajraghav.com header.b=rGm1QFmz; arc=none smtp.client-ip=80.241.56.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pankajraghav.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pankajraghav.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=pankajraghav.com header.i=@pankajraghav.com header.b="rGm1QFmz"
-Received: from smtp202.mailbox.org (smtp202.mailbox.org [IPv6:2001:67c:2050:b231:465::202])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-101.mailbox.org (Postfix) with ESMTPS id 4c0p6F0pJfz9stX;
-	Mon, 11 Aug 2025 10:42:13 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pankajraghav.com;
-	s=MBO0001; t=1754901733;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=hl5pR6KEXqqmRKm0XQhFRqtMBlaQMUsVvgjCapFINjk=;
-	b=rGm1QFmz51ShKNaeGL34QTmDDcDaTUPtXgDxX299EO84u8rhHXjtzpqUs8/3HQwAYYSULU
-	qCRkrj9m7aIpWSquYSC0fDON72jTE4y6bFSEn7q/yw9Phr6z7w7v0lnAp2SooRC+qsgjiz
-	fqgsO49XTmXAqE8lKgJN7lIY28fMc5kUT68++lKECB1z06gUhZevCMd4lnDW05FrPtaYyC
-	VTk9gpio0Sl47tLZspolgNhZNKeNrk/8xSpMarUOjh7i48wT8+CZTjsMGvdC1WlwvfMU1V
-	fA/uU/YJPVXL+tBbfJRi0yC54rqyc+ICu+I/tHg7P25mCPm6g73/CZl6OtkxIw==
-Authentication-Results: outgoing_mbo_mout;
-	dkim=none;
-	spf=pass (outgoing_mbo_mout: domain of kernel@pankajraghav.com designates 2001:67c:2050:b231:465::202 as permitted sender) smtp.mailfrom=kernel@pankajraghav.com
-From: "Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>
-To: Suren Baghdasaryan <surenb@google.com>,
-	Ryan Roberts <ryan.roberts@arm.com>,
-	Baolin Wang <baolin.wang@linux.alibaba.com>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	Zi Yan <ziy@nvidia.com>,
-	Mike Rapoport <rppt@kernel.org>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Michal Hocko <mhocko@suse.com>,
-	David Hildenbrand <david@redhat.com>,
-	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Nico Pache <npache@redhat.com>,
-	Dev Jain <dev.jain@arm.com>,
-	"Liam R . Howlett" <Liam.Howlett@oracle.com>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org,
-	willy@infradead.org,
-	Ritesh Harjani <ritesh.list@gmail.com>,
-	linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	"Darrick J . Wong" <djwong@kernel.org>,
-	mcgrof@kernel.org,
-	gost.dev@samsung.com,
-	kernel@pankajraghav.com,
-	hch@lst.de,
-	Pankaj Raghav <p.raghav@samsung.com>
-Subject: [PATCH v3 5/5] block: use largest_zero_folio in __blkdev_issue_zero_pages()
-Date: Mon, 11 Aug 2025 10:41:13 +0200
-Message-ID: <20250811084113.647267-6-kernel@pankajraghav.com>
-In-Reply-To: <20250811084113.647267-1-kernel@pankajraghav.com>
-References: <20250811084113.647267-1-kernel@pankajraghav.com>
+	s=arc-20240116; t=1754902519; c=relaxed/simple;
+	bh=9TpHCUtQbpYeE5hC40i0PLb1CG+a9lfcbDOK9kxG3Eg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=LebBO32JyZLnjafzewpKE4JGSVGlT2KrrBBlGxVV7GZnmtHTtiN31VM3ricXqm/7k+GyfkNvju6b8GgKPPmGcvnDkzS986WEcuxqlTh3cYTORcjNTuR0E0qgrXlpiPXmQ+AsREcFvz+TlCXT4MXl2kktiSiZNojhMvJMFlGJ6B8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vk1-f182.google.com with SMTP id 71dfb90a1353d-5392bf8b590so2794503e0c.3;
+        Mon, 11 Aug 2025 01:55:17 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754902517; x=1755507317;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=CK1AgXEDVnnCjp/WETSt1mjlEj20pRVnTyOEAVLwD9Y=;
+        b=XEKu0/YZXvNAG/zbYZ5ROAASftqaJxv61/P/O0G2bcrRy0rSHprq8CriTzGcraV1sw
+         UAFGclj5mEXo1el4Xb8CmN8AFPe5sZYTIe8fhPtxOv2kB8mU9Hdye7hU4l7dSMPUOgxZ
+         yIZWDGqmBthSU6Gw6cfm3N41TiBPwduwheM2Tse4vtcHDzRpsG3spNlzxfoEA/kAQEmg
+         C9FPUX11FwfaGkJFrqqdoL8bsnEzBmO7QSMu0rPNUch3YedNdGUoYbGszY5tcUvDf4IZ
+         jobSTfZ0k2AP8u4CQNkyjOz9fWzvd3eHHwm+drPEOEV0RZXMlxeU7ALbea5k5Vmr5XRt
+         HKgw==
+X-Forwarded-Encrypted: i=1; AJvYcCUS/lFQ5/zJI8QFdNbTMhkAuIoG9t365rO2JVwfwP5XXgUhqGAXFhv8n4MGghR69oJEN0EEzpFT107+qA==@vger.kernel.org, AJvYcCVcdUBJOcog2yqCWOYxa/6rkgUCYYaUehZ9DbWx8ibKZgbtl5AOvO3vOGmX0A12XqVc4o50ww/wXPGLcyVR@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy+bZr4b31veW6kivkP2stjngM0s7kqYwpnVnRHixOA4zmkRDrx
+	qU0W4ZbnQNZdsr23EvqoBS9hmoRzycQuFL8+/rcnSOYHa9sQHND/ZtEt0X6uoMHE
+X-Gm-Gg: ASbGncu6c+BaFZG9GCyi6TFgRKbFubi1eMWhwFTLiN+TaYdX6mz8Rdb9KE1bbKldkUG
+	z7UNR6f5iyFFjktBj/CbCM9w0eJUQSoJKfmtgptbw4pzVYJAQJTOI0MW1ZoF/6oKkT5TE9VVMfv
+	M9HKoLB5YuwZPRKaICRJnmrNqylT9rjPPW6kNS/XeupdaGFWT38TLcAxrLmiUI+TokR01DYI+o/
+	s39Wc5XUB9K9H9RItLkBP5lB+yb6qS05QArRpnZzCkV/nnqYgzSp2RhqvAh8R1POTR03hBSNtr+
+	NgVO0BGixJ8JMudh+L8Avu4jtPKq1J6L3aIMqibnT5lAadO0+munl2zwrUhGewn+ReSZ2VBzHY2
+	DHAaMohot6v8kxKGMmkcSW8PRpxI5jbZ6RuoaUf0RJa+0OPYazjNJRPDV25sE
+X-Google-Smtp-Source: AGHT+IFs10R8BvcGPhJLYVXhvid+FGzirfrsq34GwGokOIXw6xPwUUE5zSx7EjzSGLaM8v7kzNMHLw==
+X-Received: by 2002:a05:6102:512a:b0:4e2:82b9:b377 with SMTP id ada2fe7eead31-5060eed10b5mr4333757137.18.1754902516634;
+        Mon, 11 Aug 2025 01:55:16 -0700 (PDT)
+Received: from mail-ua1-f41.google.com (mail-ua1-f41.google.com. [209.85.222.41])
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-509aee2556asm524809137.22.2025.08.11.01.55.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 11 Aug 2025 01:55:16 -0700 (PDT)
+Received: by mail-ua1-f41.google.com with SMTP id a1e0cc1a2514c-88bc6f023edso2126422241.2;
+        Mon, 11 Aug 2025 01:55:16 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCUEHr0AkmcwyXmplbJHBqJU+uBW4vsUnYKwKxUVmuiqXmnv2jOi9x5nXTDHtpAketIGZ7YmdgiCNR0X0hG5@vger.kernel.org, AJvYcCXsGXsuNJW/9zGeswTDW6bILlmOSJxD+0BOfy8L7eFwTGrU8TbINhxg4iLpEg+ZVt4sw6+/Q7r2cCTeLQ==@vger.kernel.org
+X-Received: by 2002:a05:6102:160a:b0:4fc:1987:fc84 with SMTP id
+ ada2fe7eead31-5060f4b66f2mr4026964137.21.1754902515854; Mon, 11 Aug 2025
+ 01:55:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 4c0p6F0pJfz9stX
+References: <20250805073748.606294-2-yukuai1@huaweicloud.com>
+ <202508061722.0vTVFHLe-lkp@intel.com> <7d2b0108-4d16-97fb-5de9-7438414d9ca4@huaweicloud.com>
+In-Reply-To: <7d2b0108-4d16-97fb-5de9-7438414d9ca4@huaweicloud.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Mon, 11 Aug 2025 10:55:04 +0200
+X-Gmail-Original-Message-ID: <CAMuHMdWieP=Tk=Qgii=6mrpZNd5Mp4epSGufs5QD26tLg4joMA@mail.gmail.com>
+X-Gm-Features: Ac12FXwhwvPoKhEjbebgA6PlT3FuvJCiQC1n7jaXfuYXxfXS72nh_AEZ8FaZLf0
+Message-ID: <CAMuHMdWieP=Tk=Qgii=6mrpZNd5Mp4epSGufs5QD26tLg4joMA@mail.gmail.com>
+Subject: Re: [PATCH v3 1/2] lib/sbitmap: convert shallow_depth from one word
+ to the whole sbitmap
+To: Yu Kuai <yukuai1@huaweicloud.com>
+Cc: kernel test robot <lkp@intel.com>, axboe@kernel.dk, akpm@linux-foundation.org, 
+	ming.lei@redhat.com, dlemoal@kernel.org, jack@suse.cz, 
+	oe-kbuild-all@lists.linux.dev, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, yi.zhang@huawei.com, yangerkun@huawei.com, 
+	johnny.chenyi@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Pankaj Raghav <p.raghav@samsung.com>
+Hi Kuai,
 
-Use largest_zero_folio() in __blkdev_issue_zero_pages().
-On systems with CONFIG_PERSISTENT_HUGE_ZERO_FOLIO enabled, we will end up
-sending larger bvecs instead of multiple small ones.
+On Thu, 7 Aug 2025 at 23:37, Yu Kuai <yukuai1@huaweicloud.com> wrote:
+> =E5=9C=A8 2025/08/06 17:41, kernel test robot =E5=86=99=E9=81=93:
+> > All error/warnings (new ones prefixed by >>):
+> >
+> >     In file included from ./arch/sparc/include/generated/asm/div64.h:1,
+> >                      from include/linux/math.h:6,
+> >                      from include/linux/kernel.h:27,
+> >                      from include/linux/cpumask.h:11,
+> >                      from arch/sparc/include/asm/smp_32.h:15,
+> >                      from arch/sparc/include/asm/smp.h:7,
+> >                      from arch/sparc/include/asm/switch_to_32.h:5,
+> >                      from arch/sparc/include/asm/switch_to.h:7,
+> >                      from arch/sparc/include/asm/ptrace.h:120,
+> >                      from arch/sparc/include/asm/thread_info_32.h:19,
+> >                      from arch/sparc/include/asm/thread_info.h:7,
+> >                      from include/linux/thread_info.h:60,
+> >                      from arch/sparc/include/asm/current.h:15,
+> >                      from include/linux/sched.h:12,
+> >                      from lib/sbitmap.c:7:
+> >     lib/sbitmap.c: In function '__map_depth_with_shallow':
+> >     include/asm-generic/div64.h:183:35: warning: comparison of distinct=
+ pointer types lacks a cast
+> >       183 |         (void)(((typeof((n)) *)0) =3D=3D ((uint64_t *)0)); =
+ \
+> >           |                                   ^~
+> >     lib/sbitmap.c:222:20: note: in expansion of macro 'do_div'
+> >       222 |         reminder =3D do_div(shallow_word_depth, sb->depth);
+> >           |                    ^~~~~~
+>
+> /* The unnecessary pointer compare is there
+>   * to check for type safety (n must be 64bit)
+>   */
+> # define do_div(n,base) ({
+>
+> I didn't notice that under specific arch, do_div() will require the fist
+> paramater to be 64bit.
 
-Noticed a 4% increase in performance on a commercial NVMe SSD which does
-not support OP_WRITE_ZEROES. The device's MDTS was 128K. The performance
-gains might be bigger if the device supports bigger MDTS.
+do_div() is strictly meant for a 64-by-32 div/mod operation.
 
-Acked-by: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
-Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
----
- block/blk-lib.c | 15 ++++++++-------
- 1 file changed, 8 insertions(+), 7 deletions(-)
+Gr{oetje,eeting}s,
 
-diff --git a/block/blk-lib.c b/block/blk-lib.c
-index 4c9f20a689f7..3030a772d3aa 100644
---- a/block/blk-lib.c
-+++ b/block/blk-lib.c
-@@ -196,6 +196,8 @@ static void __blkdev_issue_zero_pages(struct block_device *bdev,
- 		sector_t sector, sector_t nr_sects, gfp_t gfp_mask,
- 		struct bio **biop, unsigned int flags)
- {
-+	struct folio *zero_folio = largest_zero_folio();
-+
- 	while (nr_sects) {
- 		unsigned int nr_vecs = __blkdev_sectors_to_bio_pages(nr_sects);
- 		struct bio *bio;
-@@ -208,15 +210,14 @@ static void __blkdev_issue_zero_pages(struct block_device *bdev,
- 			break;
- 
- 		do {
--			unsigned int len, added;
-+			unsigned int len;
- 
--			len = min_t(sector_t,
--				PAGE_SIZE, nr_sects << SECTOR_SHIFT);
--			added = bio_add_page(bio, ZERO_PAGE(0), len, 0);
--			if (added < len)
-+			len = min_t(sector_t, folio_size(zero_folio),
-+				    nr_sects << SECTOR_SHIFT);
-+			if (!bio_add_folio(bio, zero_folio, len, 0))
- 				break;
--			nr_sects -= added >> SECTOR_SHIFT;
--			sector += added >> SECTOR_SHIFT;
-+			nr_sects -= len >> SECTOR_SHIFT;
-+			sector += len >> SECTOR_SHIFT;
- 		} while (nr_sects);
- 
- 		*biop = bio_chain_and_submit(*biop, bio);
--- 
-2.49.0
+                        Geert
 
+--=20
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
+.org
+
+In personal conversations with technical people, I call myself a hacker. Bu=
+t
+when I'm talking to journalists I just say "programmer" or something like t=
+hat.
+                                -- Linus Torvalds
