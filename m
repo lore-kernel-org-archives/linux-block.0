@@ -1,38 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 789B0AD23;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A4651BFE00;
 	Mon, 11 Aug 2025 07:39:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754897957; cv=none; b=f4qIngeglYNeOsHsq50qLiTPWpZwj4mxJMu+g+LTHuidNd50u+qQ8mhSILMfdIa/KCqhGc4JVXTtbsGdhUVntzDWX5wL2rgBbpY0Mv5FZSNNYBYMT5zW06fSSmAFVo5l95v0wDFa7nOpypNGS4Po3GbEYTKeLre+0tSZJhfZgLw=
+	t=1754897957; cv=none; b=rZV7iQj0hrh1SSGLNaaFG3aKdfiLQozKCLNzqmgqdKuRhrbKE72F/VxKnDTGDI7G1y16Mest6CMj/XLWKlcHuiIPmBmhE/Jhm6PC+6V+wosKeZSiSva3pQLqRmzF8h+FXtgUpzN5akcTZgfpzWjN9blO0a6qyn3DZAyGQtm9gCM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1754897957; c=relaxed/simple;
-	bh=ipGMq/vUm0CtgMWRd44Gtz/SgcI6pGWNAOXKFk5bLTA=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=ooikUyG/fXd8t04Kn03J9QmPLO1Y26iYlJPLgcileeuR7P0Ed1TIEE/gqpLpJxYqd57Q/FWSoqwSUzPw4uCF1alCF7v/iQPfwBG/n8IHI8YreHjpdgUIqRlrQCoXK+sJV0WsUZNuNLE4yHAGpF457zU1aajrErORQsXVw7x7Lag=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dHBr8vYO; arc=none smtp.client-ip=10.30.226.201
+	bh=OiKe40GZglghieSU5PgnFpjyLGbBmPgEA6lc+Og5PKY=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=lAx5nb20dkDkHpkmbDfea1G7MO0HA9uS/sxomdvu10DrhH22cTIMbC3o+4w3YUlar6ArjzeL4PG/z1/FUce0Or7EuBR15jF/dgfBfYbNbee6YFs531LNMXAolK4Y9UImSeV2WMVF1eV/Md3NQTHHaB9QL1IloXjVtXO8b2Uu/Z0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S2oFKiqT; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dHBr8vYO"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 0D769C4CEED;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S2oFKiqT"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 2AA4DC4CEF1;
 	Mon, 11 Aug 2025 07:39:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1754897957;
-	bh=ipGMq/vUm0CtgMWRd44Gtz/SgcI6pGWNAOXKFk5bLTA=;
-	h=From:Subject:Date:To:Cc:Reply-To:From;
-	b=dHBr8vYOzOLBYeM4qWtjWdeo5hXwQXTMEvC7rHZyryICKNaGgqocXyZE2PkTFd02o
-	 pbpyxwKklwksDFeBqQ3/jJG7EcR6buZ7QB16bbNrw6cRPJab3Pg+gSqYzGFLcQQDNv
-	 kRnvPVyKsGYDdWMsSLXtcuP5LKVI5JWd79KN9cLUpUMKEQjJAAocc6eCzQ4M+rlsEE
-	 LP5pGFsLYM7n8XlAztgXQZfKA8iUJTCsO7i+y+HDcokDZRxoie+scUDgmirO5q7MbO
-	 BS2A2sZUVSZMAh3yC0KF4hdn/ALbTerFEbLxHYZXQp98D31YUGRVJjoD2ol5d6r57v
-	 bTAWwH/z0gcTg==
+	bh=OiKe40GZglghieSU5PgnFpjyLGbBmPgEA6lc+Og5PKY=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
+	b=S2oFKiqTCgAf9lHfu+ZPOBGjKFkwcwbEHKt6mtXsCEAyb7mBU9xbGqzP0rzAO/OJe
+	 mKs6KcXvEAQSUesuFuYucdrsPDakfGk0rmg8ghrUeWh5/ThnEC0r3WErNu0vMfQvcr
+	 3ITgi6BXY00pjz1B5xsF9PCRQ2+7XNtSiM4b656u7c0mNc9LQweDk8vuW36XNyJ3rf
+	 Shu/gTH9K/zICnG+9sAHuSBGxnV5NYDadbe9XqFWx4qS8cJ2PYsAvHNhk4VERBwxgC
+	 30ruy3bwEwWwOXUXQRs2dIKvMXZpkqHg3nJgUTnoGJLOX3+ze8KK92w3U5Tfl38uJv
+	 ZUcSgMUyuRdqA==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 009E5CA0EC0;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F17DCA0EC1;
 	Mon, 11 Aug 2025 07:39:17 +0000 (UTC)
 From: Dominique Martinet via B4 Relay <devnull+asmadeus.codewreck.org@kernel.org>
-Subject: [PATCH 0/2] iterate_folioq bug when offset==size (Was:
- [REGRESSION] 9pfs issues on 6.12-rc1)
-Date: Mon, 11 Aug 2025 16:39:04 +0900
-Message-Id: <20250811-iot_iter_folio-v1-0-d9c223adf93c@codewreck.org>
+Date: Mon, 11 Aug 2025 16:39:06 +0900
+Subject: [PATCH 2/2] iov_iter: iov_folioq_get_pages: don't leave empty slot
+ behind
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -41,10 +41,9 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIABiemWgC/x3MQQqAIBBA0avIrBM0iqyrREjlWAOhoRKBePek5
- Vv8nyFiIIwwsQwBH4rkXYVsGOzn6g7kZKqhFW0vlJScfNKUMGjrL/JcboPqRquURQM1ugNaev/
- hvJTyATwG9KNgAAAA
-X-Change-ID: 20250811-iot_iter_folio-1b7849f88fed
+Message-Id: <20250811-iot_iter_folio-v1-2-d9c223adf93c@codewreck.org>
+References: <20250811-iot_iter_folio-v1-0-d9c223adf93c@codewreck.org>
+In-Reply-To: <20250811-iot_iter_folio-v1-0-d9c223adf93c@codewreck.org>
 To: "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
  Christian Brauner <brauner@kernel.org>, David Howells <dhowells@redhat.com>, 
  Alexander Viro <viro@zeniv.linux.org.uk>, 
@@ -52,24 +51,23 @@ To: "Matthew Wilcox (Oracle)" <willy@infradead.org>,
 Cc: Maximilian Bosch <maximilian@mbosch.me>, Ryan Lahfa <ryan@lahfa.xyz>, 
  Christian Theune <ct@flyingcircus.io>, Arnout Engelen <arnout@bzzt.net>, 
  linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
- linux-fsdevel@vger.kernel.org, Dominique Martinet <asmadeus@codewreck.org>, 
- stable@vger.kernel.org
+ linux-fsdevel@vger.kernel.org, Dominique Martinet <asmadeus@codewreck.org>
 X-Mailer: b4 0.15-dev-7be4f
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1234;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1037;
  i=asmadeus@codewreck.org; h=from:subject:message-id;
- bh=ipGMq/vUm0CtgMWRd44Gtz/SgcI6pGWNAOXKFk5bLTA=;
- b=owEBbQKS/ZANAwAKAatOm+xqmOZwAcsmYgBomZ4hs5Cp30hXcHbfl4l0JlgzG35PORBEfIRMI
- LewI8aNKVGJAjMEAAEKAB0WIQT8g9txgG5a3TOhiE6rTpvsapjmcAUCaJmeIQAKCRCrTpvsapjm
- cOhkD/wNlX4zh1L+5pTsjOFXHjNsMe1txBnzozO2Or1c2qrE4UOFnjzyEYO6Lpk3st80K79GqZB
- FEhktLF0zrjIKbPexnvuhlEHqEpqQyHfQRfruC6FAgWX9BPIHolbuzw2YRgkqQ+4gpVIA8CWvrT
- 4d9D7+1miPzj0p+vqHVtqb4naANkMoPEjdcikIIsYPZIoVFGhFrs6eb+x86MlbzoMCZdMI7dhSC
- zJqAJL1k7F0F0UYAJg/LXlcZLSVqanZOfXapZ+Rd13VcN/rJOleJX7ucIahdqJgIFsPbt5VNvH4
- 2h81vEUr9aCu0iu6GkHA06QOHdjdxdUC9Eb55yie9jyKBbxvgm14lcsl63SqkJ65BSqa5wTH4Zb
- xZpewpcMeKqq4FksdlFbnqZrA3jIwtx5zLCzOyIRyfUuV95WT+LkW2kbXQN4FwEG89/PSH4qzM2
- ITl9eEzjNHD3dTQe3UyB6jZqgTUcE+06cJbQkAWdwzIOmGKHTInV8BbeqZFIvRLjpQU1ju9WdRX
- fI2rVzPb6PIquM7+l0A7sbeunEBAzPBgG+1ZyIl0eTKexPomedZK7xSqQGSOANl8WMbx/amUj6V
- 7bTbHBInmALTG6nvgTPrFt9Wup7iPFVdxdHxNKVT3Rf0Ro/mnrGYMo/v34WlYkMXjpa2m75Qw3V
- 7BE1Y9iD6woOWCw==
+ bh=Gnweznn9Yf2tL9n/TItIqJV0L8m6ff7ta3Y3p0JUXrk=;
+ b=owEBbQKS/ZANAwAKAatOm+xqmOZwAcsmYgBomZ4juLVGBQDWHE7zCanhXyXfjVv5/SO1+HqYv
+ UGZFo18LJeJAjMEAAEKAB0WIQT8g9txgG5a3TOhiE6rTpvsapjmcAUCaJmeIwAKCRCrTpvsapjm
+ cCe2D/9AMYNS6PUmG3VauQsdgyu9ikb3/E+f/a2g0lbGg83sq4XtDxWh83GsQXmHgPrlNyDUsCa
+ +1cyM7QTyN8k15Pkt83L6noZ14CQIGBnT6ZWcBop0tK+qen0/+WV11y81L26gk8u0CIOoWzLZUz
+ HZlLivDANjbXZnx0UipBnWncTwH4yyhcp3jVhpwEeOWqzYlkB+MF8q7sn8KTf3/sjHY6Nf+9Fxx
+ fsvZ34ZcuC1GSySo+HSgCQviOwdt3HsbxKiGSTrHnvZjdDrLXECECHh3l6MsAnmZIE36dvRdZ+X
+ raXvmlP3fdEIXQp3+ty0DrAswPxvcVIGK+P+TOMc1eLJ4qBhGtppcUJTkCKjP+2nrxeXTJS2IKW
+ bXCV1/0hhc7aJS+ReVWbxyMtOWck0ATemIdSU2pwbL5fUcv2Uuc9wL7LFw91H2diUKm9IOQvDLB
+ UH4QS3Kg7mxjZSI4MvFnbrNk9oDWAMUEEEaSWfEFNSOlZy0dcpqD27U3h680r0PnVbmh6ljktQy
+ O+pCQza+b8RV70SfbHEZp87bGvNi2sc2uApzkuX2eprO7zmaKHHmXXxC6CzLfjAK5UMj4UTHLTN
+ lCCM9HjJ+9QAU2GA3MC9YDRnDd9/wVsUq3eAK946tgu5OwU8wEOKSOL2pndP3s9LSCmacgmhcE6
+ Gt+u8IJlxOLwKow==
 X-Developer-Key: i=asmadeus@codewreck.org; a=openpgp;
  fpr=B894379F662089525B3FB1B9333F1F391BBBB00A
 X-Endpoint-Received: by B4 Relay for asmadeus@codewreck.org/default with
@@ -77,36 +75,44 @@ X-Endpoint-Received: by B4 Relay for asmadeus@codewreck.org/default with
 X-Original-From: Dominique Martinet <asmadeus@codewreck.org>
 Reply-To: asmadeus@codewreck.org
 
-So we've had this regression in 9p for.. almost a year, which is way too
-long, but there was no "easy" reproducer until yesterday (thank you
-again!!)
+From: Dominique Martinet <asmadeus@codewreck.org>
 
-It turned out to be a bug with iov_iter on folios,
-iov_iter_get_pages_alloc2() would advance the iov_iter correctly up to
-the end edge of a folio and the later copy_to_iter() fails on the
-iterate_folioq() bug.
-
-Happy to consider alternative ways of fixing this, now there's a
-reproducer it's all much clearer; for the bug to be visible we basically
-need to make and IO with non-contiguous folios in the iov_iter which is
-not obvious to test with synthetic VMs, with size that triggers a
-zero-copy read followed by a non-zero-copy read.
+After advancing into a folioq it makes more sense to point to the next
+slot than at the end of the current slot.
+This should not be needed for correctness, but this also happens to
+"fix" the 9p bug with iterate_folioq() not copying properly.
 
 Signed-off-by: Dominique Martinet <asmadeus@codewreck.org>
 ---
-Dominique Martinet (2):
-      iov_iter: iterate_folioq: fix handling of offset >= folio size
-      iov_iter: iov_folioq_get_pages: don't leave empty slot behind
+ lib/iov_iter.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
- include/linux/iov_iter.h | 3 +++
- lib/iov_iter.c           | 6 +++---
- 2 files changed, 6 insertions(+), 3 deletions(-)
----
-base-commit: 8f5ae30d69d7543eee0d70083daf4de8fe15d585
-change-id: 20250811-iot_iter_folio-1b7849f88fed
+diff --git a/lib/iov_iter.c b/lib/iov_iter.c
+index f9193f952f49945297479483755d68a34c6d4ffe..65c05134ab934e1e0bf5d010fff22983bfe9c680 100644
+--- a/lib/iov_iter.c
++++ b/lib/iov_iter.c
+@@ -1032,9 +1032,6 @@ static ssize_t iter_folioq_get_pages(struct iov_iter *iter,
+ 			maxpages--;
+ 		}
+ 
+-		if (maxpages == 0 || extracted >= maxsize)
+-			break;
+-
+ 		if (iov_offset >= fsize) {
+ 			iov_offset = 0;
+ 			slot++;
+@@ -1043,6 +1040,9 @@ static ssize_t iter_folioq_get_pages(struct iov_iter *iter,
+ 				slot = 0;
+ 			}
+ 		}
++
++		if (maxpages == 0 || extracted >= maxsize)
++			break;
+ 	}
+ 
+ 	iter->count = count;
 
-Best regards,
 -- 
-Dominique Martinet <asmadeus@codewreck.org>
+2.50.1
 
 
