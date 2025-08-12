@@ -1,31 +1,31 @@
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 853542E283B;
-	Tue, 12 Aug 2025 08:23:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C2B91B0437;
+	Tue, 12 Aug 2025 08:24:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754987005; cv=none; b=Zc6gn+u+ePASxBhPwoqr+wfqMNbv1e8iXfpoljzx8SLtz/dhA6iF8OQ3qSebc0Y5GNllFvAF+Q9ixUlaOtsdA62peafQNcq9pYqYBv/pPer1uukx/aZroI1ZEpUSi5I1s3AM+pPncxBvdSpAtC+k640MYzRUCmE7z0ShTGFt5q0=
+	t=1754987049; cv=none; b=ofCL9VtokV7gyQUEvTbW2STFgYavrx6shi71FjLz+CdeVF2a6MUT3JQNPRAgOphyaVUAn4HfcRpUlJkNi0LMjUj64DCMQVGqb5KwTtw8/EQi9lkaPQ/3aDs/dG0kcZLMy3DM4O/TuOI7dv6E8mIVWJMU4lkELnCx9AES+4ddgYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754987005; c=relaxed/simple;
-	bh=2KzEGCUEwrPGHD/YB77+JU7mNMn0Ulr3v2K8yrlNPsk=;
+	s=arc-20240116; t=1754987049; c=relaxed/simple;
+	bh=VXTZQBNeZtxlmE48uuJB2Sjio5NEkJ+S1UmMlzPLsUI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WT+jkg66TFcEmx+jdIhmtluxoc9tKWWbBDUYgHsksq7yyMK2ie8bsTUlGojzPvb84+jooGoB3t6LSCIcTBsm39ojRCtqc7/7/EI3lSa3kAMvWaPDPHg3bW6N4hDH1s1bVxQ0Ia68OC3W/MPBceR+xl+GaxUv1SCDsGOv/qP3Ifg=
+	 Content-Type:Content-Disposition:In-Reply-To; b=JmYpprNT8PckNqbYMGxPI6yv8JXsB0rfyKGiq257Ohnwoq7Tu9OvK3cNjweNa8zKAf/FmtBUUHT592FLr9gcPSBasw7MtYMPxrnLqSz7jVwQ1RVWHpxybfg9UYwmhCO6oHZtJe97T+P5/qm/EKYoKc8uGPatUz4UZmlaORRv4kQ=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
 Received: by verein.lst.de (Postfix, from userid 2407)
-	id BBF7068AA6; Tue, 12 Aug 2025 10:23:20 +0200 (CEST)
-Date: Tue, 12 Aug 2025 10:23:20 +0200
+	id 61DA668AA6; Tue, 12 Aug 2025 10:24:04 +0200 (CEST)
+Date: Tue, 12 Aug 2025 10:24:04 +0200
 From: Christoph Hellwig <hch@lst.de>
 To: Kanchan Joshi <joshi.k@samsung.com>
 Cc: kbusch@kernel.org, hch@lst.de, axboe@kernel.dk, brauner@kernel.org,
 	josef@toxicpanda.com, jack@suse.cz, jlayton@kernel.org,
 	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
 	gost.dev@samsung.com
-Subject: Re: [RFC PATCH 3/5] fs: add a write stream field to the inode
-Message-ID: <20250812082320.GC22212@lst.de>
-References: <20250729145135.12463-1-joshi.k@samsung.com> <CGME20250729145337epcas5p42503c4faf59756ac1f3d23423821f73b@epcas5p4.samsung.com> <20250729145135.12463-4-joshi.k@samsung.com>
+Subject: Re: [RFC PATCH 4/5] fs: propagate write stream
+Message-ID: <20250812082404.GD22212@lst.de>
+References: <20250729145135.12463-1-joshi.k@samsung.com> <CGME20250729145338epcas5p4da42906a341577997f39aa8453252ea3@epcas5p4.samsung.com> <20250729145135.12463-5-joshi.k@samsung.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -34,14 +34,15 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250729145135.12463-4-joshi.k@samsung.com>
+In-Reply-To: <20250729145135.12463-5-joshi.k@samsung.com>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Tue, Jul 29, 2025 at 08:21:33PM +0530, Kanchan Joshi wrote:
-> Prepare for supporting per-inode write streams.
-> Part of the existing 32-bit hole is used for the new field.
+On Tue, Jul 29, 2025 at 08:21:34PM +0530, Kanchan Joshi wrote:
+> bio->bi_write_stream is not set by the filesystem code.
+> Use inode's write stream value to do that.
 
-Bloating the inode for everyone for this is probably not a good idea.
-I.e. you'd probably want this in the file system specific inodes for
-file systems that can just do data placement.
+Just passing it through is going to create problems.  i.e. when
+the file system does it's own placement or reserves ids.  We'll need
+an explicit intercept point between the user write stream and what
+does into the bio.
 
