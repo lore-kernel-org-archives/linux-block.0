@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 277B720D517;
-	Tue, 12 Aug 2025 00:47:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B062D278E42;
+	Tue, 12 Aug 2025 01:43:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754959667; cv=none; b=ID46QpiYCSW1pzcAefNi0YApYZ70iPOLEgqzluiHki605thijCeR/jAscZvr0YT9fRaJLbfr/844AXddhJ2Zz4M3IN8juWBRcOr8KxcaqgiMz8F597VZsoMdJT+9nI3n6lkazozvs89F9SCRSZ4F6xTm4bHR1RMABwGgS8hM2qU=
+	t=1754962984; cv=none; b=TChog4/iW6ZP9q0suTR4oEun14YBG3PIHjRoo4DqawXbffF9p//sEQc2g5lm7qBoQ/Tpy+S5TgihUZVkp2nP96GfEiwZE0+gbhopgcKn+yHJZSH4upU1fXHzVCRcTrgWubaOkGEWDyCr5kNyzsP3+pUGXJkdgyHp05qpiuX8u1g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754959667; c=relaxed/simple;
-	bh=MiSIs1rnDHHU/+k/Z0JgED1xlZ7cCjxh1VZ0AZ2BDT8=;
+	s=arc-20240116; t=1754962984; c=relaxed/simple;
+	bh=QNYaXJ3BSUGnVQ38MaOSNWQKXtQmrXZZNRH5KU1m+9w=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TdrfqUUdvOlMuNbWHiQK08H8apnZ7cbKBc/sFpCJLUt9Dk+aPwwmz9B0wMhBJaovkNczuUEW/HYIfTQfyUxpdfRGUtISmLZnUS3V2kdd4uBtLJ1gjFLqEB8Nuy9VU+OSUTLuL+OsVarr/IrevnFGxGEcqgpgiNnX9AA3OfT+Y3c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uRIxrjnA; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:Content-Type; b=srj0nosHNZErNgoMMQWyr7mn4c4EIWWZn1vK9aWd7H15ViLyNMbGrvHaycaEfZ+GfVrlKtr+4a0Csxdw0nvMyf0D5P/wmeDiP759km8lGbFM4lJiuGb7AVcpJzFkpQ/siXXMOUIb6/7cZCzppLC+qQpk+erWOuW4Inny2rxD9/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rsIX3UjJ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uRIxrjnA"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A91C5C4CEED;
-	Tue, 12 Aug 2025 00:47:44 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rsIX3UjJ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92E91C4CEED;
+	Tue, 12 Aug 2025 01:43:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754959666;
-	bh=MiSIs1rnDHHU/+k/Z0JgED1xlZ7cCjxh1VZ0AZ2BDT8=;
+	s=k20201202; t=1754962984;
+	bh=QNYaXJ3BSUGnVQ38MaOSNWQKXtQmrXZZNRH5KU1m+9w=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=uRIxrjnA3BXLDmoa/+xkrvzFkUSvGstXPnHQMBeyCTbbsPm2yOho/HshYUtjiT3nh
-	 Rp7qhKMW/N4SboRZxJQy8pMaZJihOn+k8pl0p8hoiBVTRYL/fFzcU1DE1lR0R78FxE
-	 8d7FNucqi/vstujZJP2tHn182Wf51rcykaLMck3vrB4kawhydoj/AVOcIIgooT6C3O
-	 80mAEoNAW2Lp0j2ka+qYHnITX0w217G6MAlKyUthaqkkNOdD7F32YjK5GyJl5l8hlW
-	 fcaBRyBfPRlulaFal+WGHFr1iRueER3xzFnbu4rLx+3Xmx/o7BgPaDjb6XdZ8Dbqcb
-	 bllYFPQvP4vkg==
-Message-ID: <33b6c9a3-3165-4ce8-9667-afdbaff2c3ae@kernel.org>
-Date: Tue, 12 Aug 2025 09:45:02 +0900
+	b=rsIX3UjJ7JR7/dDVlwN9gxS+2zW7J7Qm9FCC7x0y1CNvTSP9KNZyBZizyfSqolelv
+	 D7pJAHx589yHUZANNceRXYtUGkw72Nk+oR0ZSN+cEMsG4TT0ix6cztMsbRKA3QWxK0
+	 AbfBZ0STsnDxsCpbNDf86P/GPVR+P9U7dt4dVz8yqZA+4LZ3jcbCIUsh5MN/7PzguI
+	 tnrrU4YzclQEwpdc7o3eAmykzZXVlf+HrsU2stsRuKNFRxR/ZubLJW1ygHm6nccHTu
+	 ySppy1wqKqXMrvmW6+/kNRfBWZVXz+nhiPlSUKyQqEFoPSywbdi+mJNwXvLsQusLXQ
+	 ucTjJ+e5WTJyg==
+Message-ID: <45b33232-9089-4df4-b9f8-c843cb3d2d07@kernel.org>
+Date: Tue, 12 Aug 2025 10:40:21 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -35,136 +35,73 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [REGRESSION][BISECTED] Unexpected OOM instead of reclaiming
- inactive file pages
-To: Oleksandr Natalenko <oleksandr@natalenko.name>,
- David Rientjes <rientjes@google.com>
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
- Jens Axboe <axboe@kernel.dk>, John Garry <john.g.garry@oracle.com>,
- Christoph Hellwig <hch@lst.de>,
- "Martin K. Petersen" <martin.petersen@oracle.com>, linux-mm@kvack.org,
- Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
- Shakeel Butt <shakeel.butt@linux.dev>, Qi Zheng
- <zhengqi.arch@bytedance.com>, Michal Hocko <mhocko@kernel.org>,
- David Hildenbrand <david@redhat.com>, Johannes Weiner <hannes@cmpxchg.org>,
- Andrew Morton <akpm@linux-foundation.org>
-References: <5905724.LvFx2qVVIh@natalenko.name>
- <199fb020-19ee-89d1-6373-7cc7f5babab8@google.com>
- <15056829.uLZWGnKmhe@natalenko.name>
+Subject: Re: [PATCH v2] loop: use vfs_getattr_nosec() for accurate file size
+To: Rajeev Mishra <rajeevm@hpe.com>, axboe@kernel.dk, yukuai1@huaweicloud.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250811190303.222802-1-rajeevm@hpe.com>
 From: Damien Le Moal <dlemoal@kernel.org>
 Content-Language: en-US
 Organization: Western Digital Research
-In-Reply-To: <15056829.uLZWGnKmhe@natalenko.name>
+In-Reply-To: <20250811190303.222802-1-rajeevm@hpe.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-On 8/12/25 5:42 AM, Oleksandr Natalenko wrote:
-> Hello.
+On 8/12/25 4:03 AM, Rajeev Mishra wrote:
+> The get_size() function now uses vfs_getattr_nosec() instead of
+> i_size_read() to obtain file size information. This provides more
+> accurate results for network filesystems where cached metadata
+> may be stale, ensuring the loop device reflects the current file
+> size rather than potentially outdated cached values.
 > 
-> On pondělí 11. srpna 2025 18:06:16, středoevropský letní čas David Rientjes wrote:
->> On Mon, 11 Aug 2025, Oleksandr Natalenko wrote:
->>
->>> Hello Damien.
->>>
->>> I'm fairly confident that the following commit
->>>
->>> 459779d04ae8d block: Improve read ahead size for rotational devices
->>>
->>> caused a regression in my test bench.
->>>
->>> I'm running v6.17-rc1 in a small QEMU VM with virtio-scsi disk. It has got 1 GiB of RAM, so I can saturate it easily causing reclaiming mechanism to kick in.
->>>
->>> If MGLRU is enabled:
->>>
->>> $ echo 1000 | sudo tee /sys/kernel/mm/lru_gen/min_ttl_ms
->>>
->>> then, once page cache builds up, an OOM happens without reclaiming inactive file pages: [1]. Note that inactive_file:506952kB, I'd expect these to be reclaimed instead, like how it happens with v6.16.
->>>
->>> If MGLRU is disabled:
->>>
->>> $ echo 0 | sudo tee /sys/kernel/mm/lru_gen/min_ttl_ms
->>>
->>> then OOM doesn't occur, and things seem to work as usual.
->>>
->>> If MGLRU is enabled, and 459779d04ae8d is reverted on top of v6.17-rc1, the OOM doesn't happen either.
->>>
->>> Could you please check this?
->>>
->>
->> This looks to be an MGLRU policy decision rather than a readahead 
->> regression, correct?
->>
->> Mem-Info:
->> active_anon:388 inactive_anon:5382 isolated_anon:0
->>  active_file:9638 inactive_file:126738 isolated_file:0
->>
->> Setting min_ttl_ms to 1000 is preserving the working set and triggering 
->> the oom kill is the only alternative to free memory in that configuration.  
->> The oom kill is being triggered by kswapd for this purpose.
->>
->> So additional readahead would certainly increase that working set.  This 
->> looks working as intended.
+> Signed-off-by: Rajeev Mishra <rajeevm@hpe.com>
+> ---
+>  drivers/block/loop.c | 24 ++++++++++++++++++++++--
+>  1 file changed, 22 insertions(+), 2 deletions(-)
 > 
-> OK, this makes sense indeed, thanks for the explanation. But is inactive_file explosion expected and justified?
-> 
-> Without revert:
-> 
-> $ echo 3 | sudo tee /proc/sys/vm/drop_caches; free -m; sudo journalctl -kb >/dev/null; free -m
-> 3
->                total        used        free      shared  buff/cache   available
-> Mem:             690         179         536           3          57         510
-> Swap:           1379          12        1367
-> /* OOM happens here */
->                total        used        free      shared  buff/cache   available
-> Mem:             690         177          52           3         561         513
-> Swap:           1379          17        1362 
-> 
-> With revert:
-> 
-> $ echo 3 | sudo tee /proc/sys/vm/drop_caches; free -m; sudo journalctl -kb >/dev/null; free -m
-> 3
->                total        used        free      shared  buff/cache   available
-> Mem:             690         214         498           4          64         476
-> Swap:           1379           0        1379
-> /* no OOM */
->                total        used        free      shared  buff/cache   available
-> Mem:             690         209         462           4         119         481
-> Swap:           1379           0        1379
-> 
-> The journal folder size is:
-> 
-> $ sudo du -hs /var/log/journal
-> 575M    /var/log/journal
-> 
-> It looks like this readahead change causes far more data to be read than actually needed?
+> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> index 1b6ee91f8eb9..c418c47db76e 100644
+> --- a/drivers/block/loop.c
+> +++ b/drivers/block/loop.c
+> @@ -137,12 +137,32 @@ static void loop_global_unlock(struct loop_device *lo, bool global)
+>  static int max_part;
+>  static int part_shift;
+>  
+> +/**
+> + * get_size - calculate the effective size of a loop device
+> + * @offset: offset into the backing file
+> + * @sizelimit: user-specified size limit
+> + * @file: the backing file
+> + *
+> + * Calculate the effective size of the loop device
+> + *
+> + * Returns: size in 512-byte sectors, or 0 if invalid
+> + */
+>  static loff_t get_size(loff_t offset, loff_t sizelimit, struct file *file)
+>  {
+> +	struct kstat stat;
+>  	loff_t loopsize;
+> +	int ret;
+> +
+> +	/*
+> +	 * Get the accurate file size. This will prevent caching
+> +	 * issue that occurs at filesystem layer.
+> +	 */
+> +	ret = vfs_getattr_nosec(&file->f_path, &stat, STATX_SIZE, 0);
+> +	if (ret)
+> +		return 0;
 
-For your drive as seen by the VM, what is the value of
-/sys/block/sdX/queue/optimal_io_size ?
+return 0 here is odd. Why not "return ret;" to propagate the error if any ?
+An error may come from the underlying FS inode->i_op->getattr().
 
-I guess it is "0", as I see on my VM.
-So before 459779d04ae8d, the block device read_ahead_kb was 128KB only, and
-459779d04ae8d switched it to be 2 times the max_sectors_kb, so 8MB. This change
-significantly improves file buffered read performance on HDDs, and HDDs only.
+> +
+> +	loopsize = stat.size;
+>  
+> -	/* Compute loopsize in bytes */
+> -	loopsize = i_size_read(file->f_mapping->host);
+>  	if (offset > 0)
+>  		loopsize -= offset;
+>  	/* offset is beyond i_size, weird but possible */
 
-This means that your VM device is probably being reported as a rotational one
-(/sys/block/sdX/queue/rotational is 1), which is normal if you attached an
-actual HDD. If you are using a qcow2 image for that disk, then having
-rotational==1 is questionable...
-
-The other issue is the device driver for the device reporting 0 for the optimal
-IO size, which normally happens only for SATA drives. I see the same with
-virtio-scsi, which is also questionable given that the maximum IO size with it
-is fairly limited. So virtio-scsi may need some tweaking.
-
-The other thing to question, I think, is setting read_ahead_kb using the
-optimal_io_size limit (io_opt), which can be *very large*. For most SCSI
-devices, it is 16MB, so you will see a read_ahead_kb of 32 MB. But for SCSI
-devices, optimal_io_size indicates a *maximum* IO size beyond which performance
-may degrade. So using any value lower than this, but still reasonably large,
-would be better in general I think. Note that lim->io_opt for RAID arrays
-actually indicates the stripe size, so generally a lot smaller than the
-component drives io_opt. And this use changes the meaning of that queue limit,
-which makes things even more confusing and finding an adequate default harder.
 
 -- 
 Damien Le Moal
