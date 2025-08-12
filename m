@@ -1,137 +1,195 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E4FB2CA9;
-	Tue, 12 Aug 2025 02:06:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AFD4E555;
+	Tue, 12 Aug 2025 02:15:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754964364; cv=none; b=HPvYHvX/TTtskuMnj6jgUavmULcc0XZ3C+tRcQUGaUtexMNAQH/O8Q9P5pOoPS5S5xkITXiTfvOfnEuMyWxw8fDj1y+u6NgJqD23PC3RKcGow9NI7OR+2lM9C3zgYre1I1+yNEAyruGULM21d5E7FoeSbi2xMSSzV/ppxDPVsUA=
+	t=1754964927; cv=none; b=LTOnIa4TnESMFPjMIgiJkHGp/kj+28zNCwJDw+xX+PXHSXZYXT8CwZXguD/5NrKpMlFhZ0x8HXwv/sRZvdtycRgPO+OqWbIcdOm7xPrBp86lvEYdFTbz/SEHf5ZA/gtVUe+uk5T1evo+sRTHy1x/vEZW/zdIKqAaUQqsTdPszVs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754964364; c=relaxed/simple;
-	bh=tdlTKcqBSGbRchsC3CdAHsNL98oa72v0PDwWqtsHXHI=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=NA15rAJeOMYj3KMTz6w8FRX6KwFgBp73UXXc3DoqE0OjdAxpM2TDblUzPjmYd6n89eKLwfyGAGqCzY1MwDCvjyBCaF48rzKVHTGwASU/YUG5iOetUlfSZWRC9fCdFtxxS+b7gIK+njyYvcxVyQPh3bhZnt4HQ75nWT+9JoDEzFk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4c1FGV0v3MzYQtwt;
-	Tue, 12 Aug 2025 10:05:54 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id B79BA1A0E5E;
-	Tue, 12 Aug 2025 10:05:52 +0800 (CST)
-Received: from [10.174.179.143] (unknown [10.174.179.143])
-	by APP4 (Coremail) with SMTP id gCh0CgDXUxR+oZpoyeCMDQ--.40233S3;
-	Tue, 12 Aug 2025 10:05:52 +0800 (CST)
-Subject: Re: [PATCH v2] loop: use vfs_getattr_nosec() for accurate file size
-To: Damien Le Moal <dlemoal@kernel.org>, Rajeev Mishra <rajeevm@hpe.com>,
- axboe@kernel.dk, yukuai1@huaweicloud.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- "yukuai (C)" <yukuai3@huawei.com>
-References: <20250811190303.222802-1-rajeevm@hpe.com>
- <45b33232-9089-4df4-b9f8-c843cb3d2d07@kernel.org>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <a8041180-03f2-3342-b568-867b3f295239@huaweicloud.com>
-Date: Tue, 12 Aug 2025 10:05:50 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.1
+	s=arc-20240116; t=1754964927; c=relaxed/simple;
+	bh=PjVELmDzYaMLkBp10XWSYXeAtvViFlQaJPa5dzLJuMk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=E9rBtQqfSRFiKgrh7LhSTNAuFZpPqJ5eeq4K954xQstrYWi6274LDd8dEtfj9YV9FIYrtc1rDuXKA3iBzp1EGC5TAQ8jDLu+/MBuo8Rvit2b3cyBxJ5Ue7/5y0a1c8C18ijVxYEjUPfZVN326knnwmjMGeWMM05ixCNkKzwL2ls=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uDob5GWn; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uDob5GWn"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2D1DC4CEED;
+	Tue, 12 Aug 2025 02:15:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1754964926;
+	bh=PjVELmDzYaMLkBp10XWSYXeAtvViFlQaJPa5dzLJuMk=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=uDob5GWnEa5Hkc2pEjI68lfRGCT/9MdLQ4vphtoXQ5Q25AqxmULNGCVZBJcDwi/9c
+	 pF2B2M3hqdfQxKcytyQcB4L8cksau6bs/EeQYRLZX/F4B1seO5JO/Q4Hix7zQKksL5
+	 m5xEBeYzA23vrE2Jsja1Z+uoc7dciAqTzRjm0XGVanpZapWMmowxaiiHPnWcqDKpjA
+	 jL4qazc1SLmrwOCiw4vmURqykrokpxRKD/Kf5vjZZZCZR+ojhs6Uzx42mev7qWTvnH
+	 lsCLBkMl/T463uLyzzk26N9/bMKJj5OWhS2skqbFEEtjs8D4atx4AcYrEpu2naqhSJ
+	 Iz8h7rLUQwuEQ==
+Message-ID: <7570f60f-932b-4b76-a87d-8f3f0760c44f@kernel.org>
+Date: Tue, 12 Aug 2025 11:12:44 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <45b33232-9089-4df4-b9f8-c843cb3d2d07@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgDXUxR+oZpoyeCMDQ--.40233S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7ur4UGr4fGFWktry7GF48JFb_yoW8tw17pF
-	W3tFWYyF1jgFy7CFsrAw47X3yFvan3uryUury7Ca17AFn0yr9xuF97GFWY934UXry5Ar1r
-	XF4DtrW7uFyDArJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvC14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7I2V7IY0VAS07AlzVAY
-	IcxG8wCY1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbV
-	WUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF
-	67kF1VAFwI0_JF0_Jw1lIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42
-	IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF
-	0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2Kf
-	nxnUUI43ZEXa7VUbSfO7UUUUU==
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v23 01/16] block: Support block devices that preserve the
+ order of write requests
+To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+ Christoph Hellwig <hch@lst.de>
+References: <20250811200851.626402-1-bvanassche@acm.org>
+ <20250811200851.626402-2-bvanassche@acm.org>
+From: Damien Le Moal <dlemoal@kernel.org>
+Content-Language: en-US
+Organization: Western Digital Research
+In-Reply-To: <20250811200851.626402-2-bvanassche@acm.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi,
+On 8/12/25 5:08 AM, Bart Van Assche wrote:
+> Some storage controllers preserve the request order per hardware queue.
+> Some but not all device mapper drivers preserve the bio order. Introduce
+> the feature flag BLK_FEAT_ORDERED_HWQ to allow block drivers and stacked
+> drivers to indicate that the order of write commands is preserved per
+> hardware queue and hence that serialization of writes per zone is not
+> required if all pending writes are submitted to the same hardware queue.
+> Add a sysfs attribute for controlling write pipelining support.
 
-在 2025/08/12 9:40, Damien Le Moal 写道:
-> On 8/12/25 4:03 AM, Rajeev Mishra wrote:
->> The get_size() function now uses vfs_getattr_nosec() instead of
->> i_size_read() to obtain file size information. This provides more
->> accurate results for network filesystems where cached metadata
->> may be stale, ensuring the loop device reflects the current file
->> size rather than potentially outdated cached values.
->>
->> Signed-off-by: Rajeev Mishra <rajeevm@hpe.com>
->> ---
->>   drivers/block/loop.c | 24 ++++++++++++++++++++++--
->>   1 file changed, 22 insertions(+), 2 deletions(-)
->>
->> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
->> index 1b6ee91f8eb9..c418c47db76e 100644
->> --- a/drivers/block/loop.c
->> +++ b/drivers/block/loop.c
->> @@ -137,12 +137,32 @@ static void loop_global_unlock(struct loop_device *lo, bool global)
->>   static int max_part;
->>   static int part_shift;
->>   
->> +/**
->> + * get_size - calculate the effective size of a loop device
->> + * @offset: offset into the backing file
->> + * @sizelimit: user-specified size limit
->> + * @file: the backing file
->> + *
->> + * Calculate the effective size of the loop device
->> + *
->> + * Returns: size in 512-byte sectors, or 0 if invalid
->> + */
->>   static loff_t get_size(loff_t offset, loff_t sizelimit, struct file *file)
->>   {
->> +	struct kstat stat;
->>   	loff_t loopsize;
->> +	int ret;
->> +
->> +	/*
->> +	 * Get the accurate file size. This will prevent caching
->> +	 * issue that occurs at filesystem layer.
->> +	 */
->> +	ret = vfs_getattr_nosec(&file->f_path, &stat, STATX_SIZE, 0);
->> +	if (ret)
->> +		return 0;
-> 
-> return 0 here is odd. Why not "return ret;" to propagate the error if any ?
-> An error may come from the underlying FS inode->i_op->getattr().
+Why ? Why would you want to disable write pipelining since it give better
+performance ?
 
-This helper is supposed to return the size, all the callers don't
-hanldle error value for now.
-
-However, I agree return error value instead of set disk size to 0 will
-make more sense, at least from ioctl path. Perhaps go through all the
-callers and see, if we want to handle errors or set disk size to 0.
-
-Thanks,
-Kuai
+The commit message also does not describe BLK_FEAT_PIPELINE_ZWR, but I think
+this enable/disable flag is not needed.
 
 > 
->> +
->> +	loopsize = stat.size;
->>   
->> -	/* Compute loopsize in bytes */
->> -	loopsize = i_size_read(file->f_mapping->host);
->>   	if (offset > 0)
->>   		loopsize -= offset;
->>   	/* offset is beyond i_size, weird but possible */
+> Cc: Damien Le Moal <dlemoal@kernel.org>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+> ---
+>  Documentation/ABI/stable/sysfs-block | 15 +++++++++++++++
+>  block/blk-settings.c                 | 10 ++++++++++
+>  block/blk-sysfs.c                    |  7 +++++++
+>  include/linux/blkdev.h               |  9 +++++++++
+>  4 files changed, 41 insertions(+)
 > 
-> 
+> diff --git a/Documentation/ABI/stable/sysfs-block b/Documentation/ABI/stable/sysfs-block
+> index 803f578dc023..5a42d99cf39a 100644
+> --- a/Documentation/ABI/stable/sysfs-block
+> +++ b/Documentation/ABI/stable/sysfs-block
+> @@ -637,6 +637,21 @@ Description:
+>  		I/O size is reported this file contains 0.
+>  
+>  
+> +What:		/sys/block/<disk>/queue/pipeline_zoned_writes
+> +Date:		August 2025
+> +Contact:	Bart Van Assche <bvanassche@acm.org>
+> +Description:
+> +		[RW] If this attribute is present it means that the block driver
+> +		and the storage controller both support preserving the order of
+> +		zoned writes per hardware queue. This attribute controls whether
+> +		or not pipelining zoned writes is enabled. If the value of this
+> +		attribute is zero, the block layer restricts the queue depth for
+> +		sequential writes per zone to one (zone append operations are
+> +		not affected). If the value of this attribute is one, the block
+> +		layer does not restrict the queue depth of sequential writes per
+> +		zone to one.
+> +
+> +
+>  What:		/sys/block/<disk>/queue/physical_block_size
+>  Date:		May 2009
+>  Contact:	Martin K. Petersen <martin.petersen@oracle.com>
+> diff --git a/block/blk-settings.c b/block/blk-settings.c
+> index 07874e9b609f..01c0edf2308a 100644
+> --- a/block/blk-settings.c
+> +++ b/block/blk-settings.c
+> @@ -119,6 +119,14 @@ static int blk_validate_zoned_limits(struct queue_limits *lim)
+>  	lim->max_zone_append_sectors =
+>  		min_not_zero(lim->max_hw_zone_append_sectors,
+>  			min(lim->chunk_sectors, lim->max_hw_sectors));
+> +
+> +	/*
+> +	 * If both the block driver and the block device preserve the write
+> +	 * order per hwq, enable zoned write pipelining.
+> +	 */
+> +	if (lim->features & BLK_FEAT_ORDERED_HWQ)
+> +		lim->features |= BLK_FEAT_PIPELINE_ZWR;
+> +
+>  	return 0;
+>  }
+>  
+> @@ -780,6 +788,8 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
+>  		t->features &= ~BLK_FEAT_NOWAIT;
+>  	if (!(b->features & BLK_FEAT_POLL))
+>  		t->features &= ~BLK_FEAT_POLL;
+> +	if (!(b->features & BLK_FEAT_ORDERED_HWQ))
+> +		t->features &= ~BLK_FEAT_ORDERED_HWQ;
+>  
+>  	t->flags |= (b->flags & BLK_FLAG_MISALIGNED);
+>  
+> diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+> index 78ee8d324c7f..4bf0b663f25d 100644
+> --- a/block/blk-sysfs.c
+> +++ b/block/blk-sysfs.c
+> @@ -270,6 +270,7 @@ QUEUE_SYSFS_FEATURE(rotational, BLK_FEAT_ROTATIONAL)
+>  QUEUE_SYSFS_FEATURE(add_random, BLK_FEAT_ADD_RANDOM)
+>  QUEUE_SYSFS_FEATURE(iostats, BLK_FEAT_IO_STAT)
+>  QUEUE_SYSFS_FEATURE(stable_writes, BLK_FEAT_STABLE_WRITES);
+> +QUEUE_SYSFS_FEATURE(pipeline_zwr, BLK_FEAT_PIPELINE_ZWR);
+>  
+>  #define QUEUE_SYSFS_FEATURE_SHOW(_name, _feature)			\
+>  static ssize_t queue_##_name##_show(struct gendisk *disk, char *page)	\
+> @@ -554,6 +555,7 @@ QUEUE_LIM_RO_ENTRY(queue_dax, "dax");
+>  QUEUE_RW_ENTRY(queue_io_timeout, "io_timeout");
+>  QUEUE_LIM_RO_ENTRY(queue_virt_boundary_mask, "virt_boundary_mask");
+>  QUEUE_LIM_RO_ENTRY(queue_dma_alignment, "dma_alignment");
+> +QUEUE_LIM_RW_ENTRY(queue_pipeline_zwr, "pipeline_zoned_writes");
+>  
+>  /* legacy alias for logical_block_size: */
+>  static struct queue_sysfs_entry queue_hw_sector_size_entry = {
+> @@ -700,6 +702,7 @@ static struct attribute *queue_attrs[] = {
+>  	&queue_dax_entry.attr,
+>  	&queue_virt_boundary_mask_entry.attr,
+>  	&queue_dma_alignment_entry.attr,
+> +	&queue_pipeline_zwr_entry.attr,
+>  	&queue_ra_entry.attr,
+>  
+>  	/*
+> @@ -746,6 +749,10 @@ static umode_t queue_attr_visible(struct kobject *kobj, struct attribute *attr,
+>  	    !blk_queue_is_zoned(q))
+>  		return 0;
+>  
+> +	if (attr == &queue_pipeline_zwr_entry.attr &&
+> +	    !(q->limits.features & BLK_FEAT_ORDERED_HWQ))
+> +		return 0;
+> +
+>  	return attr->mode;
+>  }
+>  
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index 95886b404b16..79d14b3d3309 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -338,6 +338,15 @@ typedef unsigned int __bitwise blk_features_t;
+>  /* skip this queue in blk_mq_(un)quiesce_tagset */
+>  #define BLK_FEAT_SKIP_TAGSET_QUIESCE	((__force blk_features_t)(1u << 13))
+>  
+> +/*
+> + * The request order is preserved per hardware queue by the block driver and by
+> + * the block device. Set by the block driver.
+> + */
+> +#define BLK_FEAT_ORDERED_HWQ		((__force blk_features_t)(1u << 14))
+> +
+> +/* Whether to pipeline zoned writes. Controlled by the block layer. */
+> +#define BLK_FEAT_PIPELINE_ZWR		((__force blk_features_t)(1u << 15))
+> +
+>  /* undocumented magic for bcache */
+>  #define BLK_FEAT_RAID_PARTIAL_STRIPES_EXPENSIVE \
+>  	((__force blk_features_t)(1u << 15))
 
+
+-- 
+Damien Le Moal
+Western Digital Research
