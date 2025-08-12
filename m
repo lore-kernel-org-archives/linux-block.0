@@ -1,110 +1,171 @@
-Received: from submarine.notk.org (submarine.notk.org [62.210.214.84])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 482C6311C0E;
-	Mon, 11 Aug 2025 21:38:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.210.214.84
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 277B720D517;
+	Tue, 12 Aug 2025 00:47:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754948287; cv=none; b=tbP+JMCWRt8lJvaUSZjcFVqHcB9un5A2mzXtXT2gkjPvDS/pgtaZVr46fnNv4Sq62wX6VATqKV0e/X+Uya6Ra+ueEeEgjJQAWFQ4Q7oqF3KK/3WT10pzM1OTqN9C7n/ez40YGZ0SV7JMX3mLRw5MMsTUtHlxKNv77LIkDs4MAaU=
+	t=1754959667; cv=none; b=ID46QpiYCSW1pzcAefNi0YApYZ70iPOLEgqzluiHki605thijCeR/jAscZvr0YT9fRaJLbfr/844AXddhJ2Zz4M3IN8juWBRcOr8KxcaqgiMz8F597VZsoMdJT+9nI3n6lkazozvs89F9SCRSZ4F6xTm4bHR1RMABwGgS8hM2qU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754948287; c=relaxed/simple;
-	bh=HjyGdOGLYqC7ab18LfpaxPJTKS3Yx7XdT8RLH/XbFKM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nnUUPoNM2xe02Oir28hVAyzH8t/J1MvDCBYkVFnGcAdRHyR2umATI7McRVPqCfYLOALx29xxqKxyvH+t6dCniEXTph0RyHp/dWlH0Mm2uZxECBR3AtLeCTpo4QKcxZ1Id0e9cRiM14zS18Q1LEcNRYpWOPczRbKEL6YThZ4hE+k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codewreck.org; spf=pass smtp.mailfrom=codewreck.org; dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b=EKqL0vot; arc=none smtp.client-ip=62.210.214.84
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codewreck.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codewreck.org
+	s=arc-20240116; t=1754959667; c=relaxed/simple;
+	bh=MiSIs1rnDHHU/+k/Z0JgED1xlZ7cCjxh1VZ0AZ2BDT8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TdrfqUUdvOlMuNbWHiQK08H8apnZ7cbKBc/sFpCJLUt9Dk+aPwwmz9B0wMhBJaovkNczuUEW/HYIfTQfyUxpdfRGUtISmLZnUS3V2kdd4uBtLJ1gjFLqEB8Nuy9VU+OSUTLuL+OsVarr/IrevnFGxGEcqgpgiNnX9AA3OfT+Y3c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uRIxrjnA; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b="EKqL0vot"
-Received: from gaia.codewreck.org (localhost [127.0.0.1])
-	by submarine.notk.org (Postfix) with ESMTPS id 3155F14C2D3;
-	Mon, 11 Aug 2025 23:37:58 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=codewreck.org;
-	s=2; t=1754948282;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0KuxWLbpcJT3VlmZVqc2OQpXyttswEbc/sHxkepGM9E=;
-	b=EKqL0votUNnCF6qo5E8bBmNRyJd+MBtp61wniZY0+tazDObV62wwWmH7rAgLJoxoE9WJ2Q
-	Dx5sKNQt+YN3xbunO809CS4xhHpBVgyleAbiZQNf7sDAu/gPw2SuovDGaPfE4sH4R0kEgE
-	z9O8O4DK1BvosELxyLVFIfg3k8fjtCtjz1yrmeIsV5uJ2Af6E+xI/ZtW3t9otjeOQqLXIY
-	Bxx3zU8mn9CG9ZCh/xkA0hH0EcgFGpqqbwvKA8/LPo4MHv9szIIN7bVyLRK+lETWgUhJjU
-	CT5gZ7YnwA6Lla+5S/CswMDOOTp06yPMjzf6DL6Es13PnP/xdcqkZTZUP2Iy2A==
-Received: from localhost (gaia.codewreck.org [local])
-	by gaia.codewreck.org (OpenSMTPD) with ESMTPA id d8bc4c7b;
-	Mon, 11 Aug 2025 21:37:57 +0000 (UTC)
-Date: Tue, 12 Aug 2025 06:37:42 +0900
-From: asmadeus@codewreck.org
-To: David Howells <dhowells@redhat.com>
-Cc: "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-	Christian Brauner <brauner@kernel.org>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Maximilian Bosch <maximilian@mbosch.me>,
-	Ryan Lahfa <ryan@lahfa.xyz>, Christian Theune <ct@flyingcircus.io>,
-	Arnout Engelen <arnout@bzzt.net>, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH 1/2] iov_iter: iterate_folioq: fix handling of offset >=
- folio size
-Message-ID: <aJpipiVk0zneTxXl@codewreck.org>
-References: <20250811-iot_iter_folio-v1-1-d9c223adf93c@codewreck.org>
- <20250811-iot_iter_folio-v1-0-d9c223adf93c@codewreck.org>
- <385673.1754923063@warthog.procyon.org.uk>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uRIxrjnA"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A91C5C4CEED;
+	Tue, 12 Aug 2025 00:47:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1754959666;
+	bh=MiSIs1rnDHHU/+k/Z0JgED1xlZ7cCjxh1VZ0AZ2BDT8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=uRIxrjnA3BXLDmoa/+xkrvzFkUSvGstXPnHQMBeyCTbbsPm2yOho/HshYUtjiT3nh
+	 Rp7qhKMW/N4SboRZxJQy8pMaZJihOn+k8pl0p8hoiBVTRYL/fFzcU1DE1lR0R78FxE
+	 8d7FNucqi/vstujZJP2tHn182Wf51rcykaLMck3vrB4kawhydoj/AVOcIIgooT6C3O
+	 80mAEoNAW2Lp0j2ka+qYHnITX0w217G6MAlKyUthaqkkNOdD7F32YjK5GyJl5l8hlW
+	 fcaBRyBfPRlulaFal+WGHFr1iRueER3xzFnbu4rLx+3Xmx/o7BgPaDjb6XdZ8Dbqcb
+	 bllYFPQvP4vkg==
+Message-ID: <33b6c9a3-3165-4ce8-9667-afdbaff2c3ae@kernel.org>
+Date: Tue, 12 Aug 2025 09:45:02 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <385673.1754923063@warthog.procyon.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [REGRESSION][BISECTED] Unexpected OOM instead of reclaiming
+ inactive file pages
+To: Oleksandr Natalenko <oleksandr@natalenko.name>,
+ David Rientjes <rientjes@google.com>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+ Jens Axboe <axboe@kernel.dk>, John Garry <john.g.garry@oracle.com>,
+ Christoph Hellwig <hch@lst.de>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>, linux-mm@kvack.org,
+ Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+ Shakeel Butt <shakeel.butt@linux.dev>, Qi Zheng
+ <zhengqi.arch@bytedance.com>, Michal Hocko <mhocko@kernel.org>,
+ David Hildenbrand <david@redhat.com>, Johannes Weiner <hannes@cmpxchg.org>,
+ Andrew Morton <akpm@linux-foundation.org>
+References: <5905724.LvFx2qVVIh@natalenko.name>
+ <199fb020-19ee-89d1-6373-7cc7f5babab8@google.com>
+ <15056829.uLZWGnKmhe@natalenko.name>
+From: Damien Le Moal <dlemoal@kernel.org>
+Content-Language: en-US
+Organization: Western Digital Research
+In-Reply-To: <15056829.uLZWGnKmhe@natalenko.name>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-David Howells wrote on Mon, Aug 11, 2025 at 03:37:43PM +0100:
-> Dominique Martinet via B4 Relay wrote:
-> > It's apparently possible to get an iov forwarded all the way up to the
+On 8/12/25 5:42 AM, Oleksandr Natalenko wrote:
+> Hello.
 > 
-> By "forwarded" I presume you mean "advanced"?
-
-Thanks, swapped words in v2
-
-> > This should have been because we're only in the 2nd slot and there's
-> > another one after this, but iterate_folioq should not try to map a
-> > folio that skips the whole size, and more importantly part here does
-> > not end up zero (because 'PAGE_SIZE - skip % PAGE_SIZE' ends up
-> > PAGE_SIZE and not zero..), so skip forward to the "advance to next
-> > folio" code.
+> On pondělí 11. srpna 2025 18:06:16, středoevropský letní čas David Rientjes wrote:
+>> On Mon, 11 Aug 2025, Oleksandr Natalenko wrote:
+>>
+>>> Hello Damien.
+>>>
+>>> I'm fairly confident that the following commit
+>>>
+>>> 459779d04ae8d block: Improve read ahead size for rotational devices
+>>>
+>>> caused a regression in my test bench.
+>>>
+>>> I'm running v6.17-rc1 in a small QEMU VM with virtio-scsi disk. It has got 1 GiB of RAM, so I can saturate it easily causing reclaiming mechanism to kick in.
+>>>
+>>> If MGLRU is enabled:
+>>>
+>>> $ echo 1000 | sudo tee /sys/kernel/mm/lru_gen/min_ttl_ms
+>>>
+>>> then, once page cache builds up, an OOM happens without reclaiming inactive file pages: [1]. Note that inactive_file:506952kB, I'd expect these to be reclaimed instead, like how it happens with v6.16.
+>>>
+>>> If MGLRU is disabled:
+>>>
+>>> $ echo 0 | sudo tee /sys/kernel/mm/lru_gen/min_ttl_ms
+>>>
+>>> then OOM doesn't occur, and things seem to work as usual.
+>>>
+>>> If MGLRU is enabled, and 459779d04ae8d is reverted on top of v6.17-rc1, the OOM doesn't happen either.
+>>>
+>>> Could you please check this?
+>>>
+>>
+>> This looks to be an MGLRU policy decision rather than a readahead 
+>> regression, correct?
+>>
+>> Mem-Info:
+>> active_anon:388 inactive_anon:5382 isolated_anon:0
+>>  active_file:9638 inactive_file:126738 isolated_file:0
+>>
+>> Setting min_ttl_ms to 1000 is preserving the working set and triggering 
+>> the oom kill is the only alternative to free memory in that configuration.  
+>> The oom kill is being triggered by kswapd for this purpose.
+>>
+>> So additional readahead would certainly increase that working set.  This 
+>> looks working as intended.
 > 
-> Note that things get complicated because folioqs form a segmented list that
-> can be under construction as it advances.  So if there's no next folioq
-> segment at the time you advance to the end of the current one, it will end up
-> parked at the end of the last folio or with slot==nr_slots because there's
-> nowhere for it to advance to.
+> OK, this makes sense indeed, thanks for the explanation. But is inactive_file explosion expected and justified?
+> 
+> Without revert:
+> 
+> $ echo 3 | sudo tee /proc/sys/vm/drop_caches; free -m; sudo journalctl -kb >/dev/null; free -m
+> 3
+>                total        used        free      shared  buff/cache   available
+> Mem:             690         179         536           3          57         510
+> Swap:           1379          12        1367
+> /* OOM happens here */
+>                total        used        free      shared  buff/cache   available
+> Mem:             690         177          52           3         561         513
+> Swap:           1379          17        1362 
+> 
+> With revert:
+> 
+> $ echo 3 | sudo tee /proc/sys/vm/drop_caches; free -m; sudo journalctl -kb >/dev/null; free -m
+> 3
+>                total        used        free      shared  buff/cache   available
+> Mem:             690         214         498           4          64         476
+> Swap:           1379           0        1379
+> /* no OOM */
+>                total        used        free      shared  buff/cache   available
+> Mem:             690         209         462           4         119         481
+> Swap:           1379           0        1379
+> 
+> The journal folder size is:
+> 
+> $ sudo du -hs /var/log/journal
+> 575M    /var/log/journal
+> 
+> It looks like this readahead change causes far more data to be read than actually needed?
 
-Hmm, I've already sent a v2 with other things fixed but now you made me
-look at the "we're at the end of the iov_iter" case I think this won't
-work well either?
-folioq_folio() always returns something, and the advance code only
-advances if folioq->next is set and doesn't bail out if it's unset.
+For your drive as seen by the VM, what is the value of
+/sys/block/sdX/queue/optimal_io_size ?
 
-There should be a `if (slot == folioq_nr_slots(folioq)) break` check
-somewhere as well? Or is the iov_iter guaranteed to always 1/ have some
-data and 2/ either be big enough or have remaining data in a step?
+I guess it is "0", as I see on my VM.
+So before 459779d04ae8d, the block device read_ahead_kb was 128KB only, and
+459779d04ae8d switched it to be 2 times the max_sectors_kb, so 8MB. This change
+significantly improves file buffered read performance on HDDs, and HDDs only.
 
-I can believe the former but wouldn't trust the later...
+This means that your VM device is probably being reported as a rotational one
+(/sys/block/sdX/queue/rotational is 1), which is normal if you attached an
+actual HDD. If you are using a qcow2 image for that disk, then having
+rotational==1 is questionable...
 
-> Note that extract_folioq_to_sg() already does this as does
-> iov_iter_extract_folioq_pages().
+The other issue is the device driver for the device reporting 0 for the optimal
+IO size, which normally happens only for SATA drives. I see the same with
+virtio-scsi, which is also questionable given that the maximum IO size with it
+is fairly limited. So virtio-scsi may need some tweaking.
 
-Yes we're not quite consistent here, some functions like the plain
-iov_iter_advance will get you on an invalid slot to check for
-folioq->next on next invocations while others point at the end of the
-last folio in the queue (like iov_iter_extract_folioq_pages(), and
-iov_folioq_get_pages() before patch 2);
-I think either pattern is valid; I've changed iov_folioq_get_pages()
-because it was a bit weird to have an iov_iter with offset > count and
-iov_iter_advance wouldn't do this, but I agree either should work, we
-just probably want to be more consistent.
+The other thing to question, I think, is setting read_ahead_kb using the
+optimal_io_size limit (io_opt), which can be *very large*. For most SCSI
+devices, it is 16MB, so you will see a read_ahead_kb of 32 MB. But for SCSI
+devices, optimal_io_size indicates a *maximum* IO size beyond which performance
+may degrade. So using any value lower than this, but still reasonably large,
+would be better in general I think. Note that lim->io_opt for RAID arrays
+actually indicates the stripe size, so generally a lot smaller than the
+component drives io_opt. And this use changes the meaning of that queue limit,
+which makes things even more confusing and finding an adequate default harder.
 
-Thanks,
 -- 
-Dominique Martinet | Asmadeus
+Damien Le Moal
+Western Digital Research
