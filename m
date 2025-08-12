@@ -1,94 +1,102 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17F8A2E7BB1
-	for <linux-block@vger.kernel.org>; Tue, 12 Aug 2025 09:34:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 015BB1388;
+	Tue, 12 Aug 2025 09:35:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754991275; cv=none; b=ikB/ku7QAomFMBGlxkecj4U/rPFqKj6LczL9neO7/WvGvBam/ueuv0AxsEvxPeOgsnSTw2zDAsVO+ylSKHJ2Wofrtng0pCaFUrTjFybv2sk2EHQZeHJzmGS6rXsX3YuG08zIw0Skl7wOtiinnszOALgSkhwmE5qeUJGnly3EYhs=
+	t=1754991304; cv=none; b=GgSqStRIK9qucyKDW2OGwlSDZAFgyc6arzBp4z9LgHoPzoOcM7EIepQO9pW51ZfjDonh1K0OV/liZ1L7qO2FipLj232gUznm6XnKhO/dgQ7q5igkU+q2fwRou8sDb0fqiMlBad4lzWKlMztW3Q43BapofH/GhvF4UMzeYB9CHFA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754991275; c=relaxed/simple;
-	bh=rNnsFwnGuu3gIqHdcbwoQsioWMOhv8l1bRy1GjfYvg0=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=ZVMgSOUR62hXXYXjhiWYHRFCELg2v+FsHOgKGnjnu/ySniY3sl/XH2/KzGcbPGxZb6empw2DozCqihJSp0Mkr2m+Rx61Z2j3VXXOB3nWeYwBPiwPOEuqmD8RJjumC8XOwXWy7w1VvgNjVLnSLp6rhoJkevvtV6F03hIeuWZcRmM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OuiuK4aK; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OuiuK4aK"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1754991273;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Kx0dhTCfyhMeyKByQPSUuP5rLf1cHUcwMzM5kaQhu9E=;
-	b=OuiuK4aKCCrcv4OJA9CQNAb4QWzZIOkiEUxyEsaTuMfug1x9AcTxddM9mmM9Hj51EK2M5F
-	rPoQRjrY582hiuF3aESSlipiIWYqSTQQr4jvDm+QfTygmN01fje+Ailig3VN9x+/Ae12nj
-	VMLXg2dVpIn8F7lDmXRNTgGJLe9wpOc=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-396-7TGlF5EEN_6FfCwsb3F6Bw-1; Tue,
- 12 Aug 2025 05:34:32 -0400
-X-MC-Unique: 7TGlF5EEN_6FfCwsb3F6Bw-1
-X-Mimecast-MFC-AGG-ID: 7TGlF5EEN_6FfCwsb3F6Bw_1754991270
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A6CAA19560AA;
-	Tue, 12 Aug 2025 09:34:28 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.21])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 19283180028A;
-	Tue, 12 Aug 2025 09:34:18 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <aJpipiVk0zneTxXl@codewreck.org>
-References: <aJpipiVk0zneTxXl@codewreck.org> <20250811-iot_iter_folio-v1-1-d9c223adf93c@codewreck.org> <20250811-iot_iter_folio-v1-0-d9c223adf93c@codewreck.org> <385673.1754923063@warthog.procyon.org.uk>
-To: asmadeus@codewreck.org
-Cc: dhowells@redhat.com, "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-    Christian Brauner <brauner@kernel.org>,
-    Alexander Viro <viro@zeniv.linux.org.uk>,
-    Andrew Morton <akpm@linux-foundation.org>,
-    Maximilian Bosch <maximilian@mbosch.me>, Ryan Lahfa <ryan@lahfa.xyz>,
-    Christian Theune <ct@flyingcircus.io>,
-    Arnout Engelen <arnout@bzzt.net>, linux-kernel@vger.kernel.org,
-    linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-    stable@vger.kernel.org
-Subject: Re: [PATCH 1/2] iov_iter: iterate_folioq: fix handling of offset >= folio size
+	s=arc-20240116; t=1754991304; c=relaxed/simple;
+	bh=XzVQikg6eVnr6+fdjiHmLEY2s0a2gcTyAxBsjBwO6AE=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=f8EpHi/GQDF3OxWQebsQ4Ugo31QCBzTRSv/XEA9VsKkP0s4ltrRc3ZqDx1FAZ/yhkXLoqxzmj62xgXud/nSxGrjr4KjXqrqNf4PhkkRnv4mDO35CGdaS96mdMgxR/WU9s4gvh4BBq7Zwatn9riw9hNRD1Vq+F8EHMFZ0RgwRtuE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4c1RDh0BsqzKHMwg;
+	Tue, 12 Aug 2025 17:35:00 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 417DE1A06E6;
+	Tue, 12 Aug 2025 17:34:59 +0800 (CST)
+Received: from [10.174.179.143] (unknown [10.174.179.143])
+	by APP4 (Coremail) with SMTP id gCh0CgBXIBHBCptoJTywDQ--.7024S3;
+	Tue, 12 Aug 2025 17:34:59 +0800 (CST)
+Subject: Re: [PATCH v2] loop: use vfs_getattr_nosec() for accurate file size
+To: Christoph Hellwig <hch@infradead.org>, Damien Le Moal <dlemoal@kernel.org>
+Cc: Al Viro <viro@zeniv.linux.org.uk>, Rajeev Mishra <rajeevm@hpe.com>,
+ axboe@kernel.dk, yukuai1@huaweicloud.com, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, "yukuai (C)" <yukuai3@huawei.com>
+References: <a8041180-03f2-3342-b568-867b3f295239@huaweicloud.com>
+ <20250812033201.225425-1-rajeevm@hpe.com>
+ <34624336-331d-4047-822f-8091098eeebc@kernel.org>
+ <20250812042826.GU222315@ZenIV>
+ <a7cb5d59-8af5-47b2-8549-05c9322971e5@kernel.org>
+ <aJr9UKtIJ74XExf-@infradead.org>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <e2a5550d-fb55-99c1-82b1-5b6c174f7cfc@huaweicloud.com>
+Date: Tue, 12 Aug 2025 17:34:57 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <650268.1754991257.1@warthog.procyon.org.uk>
-Date: Tue, 12 Aug 2025 10:34:17 +0100
-Message-ID: <650269.1754991257@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+In-Reply-To: <aJr9UKtIJ74XExf-@infradead.org>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgBXIBHBCptoJTywDQ--.7024S3
+X-Coremail-Antispam: 1UD129KBjvdXoW7JF4fZF1DWFyrZr47try5Arb_yoW3KFbE9r
+	Wavr4qywnruw4rtF4Utr4Yvr95trZxtr18X393KFsrJw18XFWDCFW09r95urs3Jw1rJwsa
+	9w12kw4DGay3ujkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUbVkFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+	A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
+	6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCYjI0SjxkI62AI1cAE67vI
+	Y487MxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r
+	1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CE
+	b7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0x
+	vE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAI
+	cVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2Kf
+	nxnUUI43ZEXa7VUbGQ6JUUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-asmadeus@codewreck.org wrote:
+Hi,
 
-> There should be a `if (slot == folioq_nr_slots(folioq)) break` check
-> somewhere as well? Or is the iov_iter guaranteed to always 1/ have some
-> data and 2/ either be big enough or have remaining data in a step?
+ÔÚ 2025/08/12 16:37, Christoph Hellwig Ð´µÀ:
+> On Tue, Aug 12, 2025 at 02:17:01PM +0900, Damien Le Moal wrote:
+>> And indeed, that:
+>>
+>> 	/* size of the new backing store needs to be the same */
+>>          if (get_loop_size(lo, file) != get_loop_size(lo, old_file))
+>>                  goto out_err;
+>>
+>> Will need some massaging.
+> 
+> Why?  get_loop_size just derives the first arguments to get_size
+> from the passed in loop device in the same way the only other caller
+> to get_size does.  So we can just:
+> 
+>    1) convert loop_set_status to use get_loop_size
+>    2) Fold get_size into get_loop_size
+>    3) Maye rename get_size to lo_calculate_size to have a descriptive
+>       name while we're touching it?
+>    4) switch to vfs_getattr
 
-We should handle both cases.  I think the other iteration functions
-will. iov_iter_extractg_folioq_pages(), for example, wraps it in a
-conditional:
+This looks good, it's better to refactor a bit before switch to getattr,
+and I agree still return 0 on failue is fine.
 
-		if (offset < fsize) {
-			part = umin(part, umin(maxsize - extracted, fsize - offset));
-			i->count -= part;
-			i->iov_offset += part;
-			extracted += part;
+Thanks,
+Kuai
 
-			p[nr++] = folio_page(folio, offset / PAGE_SIZE);
-		}
-
-David
+> 
+> 
+> .
+> 
 
