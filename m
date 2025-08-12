@@ -1,91 +1,102 @@
-Received: from submarine.notk.org (submarine.notk.org [62.210.214.84])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 585FE20C469;
-	Tue, 12 Aug 2025 21:13:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.210.214.84
+Received: from 003.mia.mailroute.net (003.mia.mailroute.net [199.89.3.6])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E25C92D0636;
+	Tue, 12 Aug 2025 23:57:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.6
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755033239; cv=none; b=H/ZAf82y7U48Cdf/9cO+OZoMUIFRFh5CVW58QIuFQrbC86dS6wBt0NLeKBS8FRFQ5JnOV0NB7UuxZL9tRDP0nWPEg6h0lMUjLrz0Ez4X22gtx0iFf6Ql9xHSd6zWqVL7Oamm6Txp6K0dNAkyNAWEYv9RoFGanoOu0B4/4tGCQII=
+	t=1755043053; cv=none; b=UkJV4HcxuGrjdUBAJRZTn5eRXpkMgXU3a+4y0BjtFi0eeIcSaoX8rr+pnd4FMy1x1hybciEfsZKhUf++0P2UI52gWE7Ccdhdw1QFuelnPj/xc65wTDQhC/oMf5bkrjOtGdehZGxFaIe4Xyhhp0xQCsH6AAHmZANC0MTt8fSZZoI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755033239; c=relaxed/simple;
-	bh=JNu3fq2i05e3xoWR4mijUk+DXGjiS713oczepK0Ut7I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FGN4QsKKTZXWQsTD8SWElutlfF7SBS+e+U58cVRP0zbH1zi6PfrFPPOARTTpq3ve08FPv3wCq3NtQHOKVxazJ71XWxbbEgmKeuT8l4bVcIXkpRI0D3hCb//EZFSUyke9COVM8+gvnAlp1MBoiRCBcFKT/WOAq0rjoDb26WB1Xlo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codewreck.org; spf=pass smtp.mailfrom=codewreck.org; dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b=rjmk1hcG; arc=none smtp.client-ip=62.210.214.84
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codewreck.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codewreck.org
+	s=arc-20240116; t=1755043053; c=relaxed/simple;
+	bh=GGJfHCS1Y79aXwZEvamO03h73lyHIOOftgkTQcMTVyE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jYatJLl+7vc9bt+Cq4vnbnNE/D18u7zXJhHid78I8YHBeU/lXQUqu4WZXM3tb8Qb2crTY/4j1CMngnDz4YzC5tL6smLs4RXPVMkQZYelcGJDjDG5+31hQvfVYwgc+34Cl2ekg3RA6sudzCiEUjOb0wOqJuX1iZYUA++FMSDTgxo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=Fw1+WWFr; arc=none smtp.client-ip=199.89.3.6
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b="rjmk1hcG"
-Received: from gaia.codewreck.org (localhost [127.0.0.1])
-	by submarine.notk.org (Postfix) with ESMTPS id D2C8814C2D3;
-	Tue, 12 Aug 2025 23:13:43 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=codewreck.org;
-	s=2; t=1755033227;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=h7VgV8GRNyIyaEcTOqPVBDWztfCX/1VXfxFaCGnsthU=;
-	b=rjmk1hcGLaLckCU53YbczHK8umSF0GUgVQTk+VmjeFdHTZRaiLcCYMJQGk2SPrAVcI1DXE
-	dO3QJU48U+23jurGpM3DBAB2DGSoFZg5zx9qk6b5fgrOm66LqDJstPeV063OBHWC4rdVRX
-	BmbYRjL7cTDWaC84AmwAy8LL80aefu+tQZ3kLPSIiUUPEFQmSc0clGCaUG2Q2k4K6XQWiC
-	YLkrdewp5dcpssj6bxNrUbKf/upzYtd5j/CqcAcpfGySzSYKDxb68G8OCbaOyYPn7c+RSU
-	5CT6uR0pgFVU02AaO2ClVdeMlR2ss/knHWoqbWZfFlV+dE46uqNFyk6URQ7tNg==
-Received: from localhost (gaia.codewreck.org [local])
-	by gaia.codewreck.org (OpenSMTPD) with ESMTPA id c50da482;
-	Tue, 12 Aug 2025 21:13:42 +0000 (UTC)
-Date: Wed, 13 Aug 2025 06:13:27 +0900
-From: asmadeus@codewreck.org
-To: David Howells <dhowells@redhat.com>
-Cc: "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-	Christian Brauner <brauner@kernel.org>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Maximilian Bosch <maximilian@mbosch.me>,
-	Ryan Lahfa <ryan@lahfa.xyz>, Christian Theune <ct@flyingcircus.io>,
-	Arnout Engelen <arnout@bzzt.net>, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH 1/2] iov_iter: iterate_folioq: fix handling of offset >=
- folio size
-Message-ID: <aJuudyp8VUPvIbjF@codewreck.org>
-References: <aJpipiVk0zneTxXl@codewreck.org>
- <20250811-iot_iter_folio-v1-1-d9c223adf93c@codewreck.org>
- <20250811-iot_iter_folio-v1-0-d9c223adf93c@codewreck.org>
- <385673.1754923063@warthog.procyon.org.uk>
- <650269.1754991257@warthog.procyon.org.uk>
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="Fw1+WWFr"
+Received: from localhost (localhost [127.0.0.1])
+	by 003.mia.mailroute.net (Postfix) with ESMTP id 4c1pMt52TrzlgqyY;
+	Tue, 12 Aug 2025 23:57:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1755043049; x=1757635050; bh=KvXXGnQ5MoPMBp5T9DHr4a9c
+	jIUnuCTQFIAzi8COOVA=; b=Fw1+WWFrdwd7v8GvGNpZDfFL5rByCVSw6K1GG9rL
+	MXmaMdrl4WVoh6Vj2PwCa8+pueif264Q11WIIwYTDgGh7S0GHxoOB0ZbGDgaUA9c
+	xnNqZft2Ra+1xw0lGu2tXjTABJ6IE0YT+iw1Lph9tfk/aXHxZzdALfNmf5Ciorqy
+	tcyStF3UirfcoZlhlskOSY1KwQZ28UAwye5G/ANGCJ76veK75pqodiwEvKO/AATQ
+	6n3bfWWRfZyzt2kPhcct1REqpIdlS5pH1b6cgtCwwtKGDlDWA8TsEGt17qXcZk+e
+	swkrkwyABt52sMJVli/G5NHuA0H3MYv+0TE18ixm8EaG6g==
+X-Virus-Scanned: by MailRoute
+Received: from 003.mia.mailroute.net ([127.0.0.1])
+ by localhost (003.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id 3NLawijAN5EK; Tue, 12 Aug 2025 23:57:29 +0000 (UTC)
+Received: from [192.168.51.14] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4c1pMn2YRhzlv4Tt;
+	Tue, 12 Aug 2025 23:57:24 +0000 (UTC)
+Message-ID: <6b56a20a-3ff6-40c3-b165-2f3e4dfda45a@acm.org>
+Date: Tue, 12 Aug 2025 16:57:17 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <650269.1754991257@warthog.procyon.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v23 01/16] block: Support block devices that preserve the
+ order of write requests
+To: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+ Christoph Hellwig <hch@lst.de>
+References: <20250811200851.626402-1-bvanassche@acm.org>
+ <20250811200851.626402-2-bvanassche@acm.org>
+ <7570f60f-932b-4b76-a87d-8f3f0760c44f@kernel.org>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <7570f60f-932b-4b76-a87d-8f3f0760c44f@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-David Howells wrote on Tue, Aug 12, 2025 at 10:34:17AM +0100:
-> asmadeus@codewreck.org wrote:
+On 8/11/25 7:12 PM, Damien Le Moal wrote:
+> On 8/12/25 5:08 AM, Bart Van Assche wrote:
+>> Some storage controllers preserve the request order per hardware queue.
+>> Some but not all device mapper drivers preserve the bio order. Introduce
+>> the feature flag BLK_FEAT_ORDERED_HWQ to allow block drivers and stacked
+>> drivers to indicate that the order of write commands is preserved per
+>> hardware queue and hence that serialization of writes per zone is not
+>> required if all pending writes are submitted to the same hardware queue.
+>> Add a sysfs attribute for controlling write pipelining support.
 > 
-> > There should be a `if (slot == folioq_nr_slots(folioq)) break` check
-> > somewhere as well? Or is the iov_iter guaranteed to always 1/ have some
-> > data and 2/ either be big enough or have remaining data in a step?
+> Why ? Why would you want to disable write pipelining since it give better
+> performance ?
 > 
-> We should handle both cases.  I think the other iteration functions
-> will. iov_iter_extractg_folioq_pages(), for example, wraps it in a
-> conditional:
-> 
-> 		if (offset < fsize) {
-> 			part = umin(part, umin(maxsize - extracted, fsize - offset));
-> 			i->count -= part;
-> 			i->iov_offset += part;
-> 			extracted += part;
-> 
-> 			p[nr++] = folio_page(folio, offset / PAGE_SIZE);
-> 		}
+> The commit message also does not describe BLK_FEAT_PIPELINE_ZWR, but I think
+> this enable/disable flag is not needed.
 
-That's not what I pointed out just now; it doesn't check either if there
-is no slot left
-For example, an iov_iter with nr_slots = 4, slot = 4, folioq->next =
-NULL will happily trod on folioq->vec.folios[4] (folioq_folio(folioq,
-slot)) which is invalid
+Hi Damien,
 
--- 
-Dominique Martinet | Asmadeus
+Having a control in sysfs for enabling and disabling write pipelining is
+very convenient when measuring the performance impact of write
+pipelining. Adding such a control in each block driver would be
+cumbersome because it would require to add the following sequence in
+every block driver:
+* Freeze the request queue.
+* Call queue_limits_start_update().
+* Toggle the BLK_FEAT_ORDERED_HWQ flag.
+* Call queue_limits_commit_update_frozen().
+* Unfreeze the request queue.
+
+Do you agree that this the "pipeline_zoned_writes" sysfs attribute is
+useful? If not, I will drop the newly introduced sysfs attribute and 
+also the BLK_FEAT_PIPELINE_ZWR flag.
+
+Thanks,
+
+Bart.
