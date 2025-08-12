@@ -1,195 +1,173 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-002e3701.pphosted.com (mx0a-002e3701.pphosted.com [148.163.147.86])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AFD4E555;
-	Tue, 12 Aug 2025 02:15:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 154B2C2E0;
+	Tue, 12 Aug 2025 03:41:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.147.86
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754964927; cv=none; b=LTOnIa4TnESMFPjMIgiJkHGp/kj+28zNCwJDw+xX+PXHSXZYXT8CwZXguD/5NrKpMlFhZ0x8HXwv/sRZvdtycRgPO+OqWbIcdOm7xPrBp86lvEYdFTbz/SEHf5ZA/gtVUe+uk5T1evo+sRTHy1x/vEZW/zdIKqAaUQqsTdPszVs=
+	t=1754970095; cv=none; b=Q1oyoARY6h+fcR15FOjRKQgmNpbCtDETEIrXymHRxBBe4dGZsakC/VM2HUPboddmzSKUBJXrWTv7Oocy4SZ1AOT1enZlY65jShNW4uNWuCRT0FouB3/xn27G3Ppn5G9KnhAszWCXVECDnLr/yP8oUuBb0n4Cw/GZoHOdRmk/9no=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754964927; c=relaxed/simple;
-	bh=PjVELmDzYaMLkBp10XWSYXeAtvViFlQaJPa5dzLJuMk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=E9rBtQqfSRFiKgrh7LhSTNAuFZpPqJ5eeq4K954xQstrYWi6274LDd8dEtfj9YV9FIYrtc1rDuXKA3iBzp1EGC5TAQ8jDLu+/MBuo8Rvit2b3cyBxJ5Ue7/5y0a1c8C18ijVxYEjUPfZVN326knnwmjMGeWMM05ixCNkKzwL2ls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uDob5GWn; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1754970095; c=relaxed/simple;
+	bh=QgvHaxSeDbIVQUHk12TJMQ6so4DmVH6KtnZCKhWLR8M=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=C9CnJs1HtDVLOeB1vwsv5IGKADhdbP/BAa+lHPrSDQ6e4ceA+QpKvvFlJyXTQ8cPje2tYwJyHapmK2iFKiaczZ0g75xs6GqI6ZwZ9nJ28J+mF5Jtza9z8wVfB8JEKNEXew3bmQUseKLug8GzXMEo+bVRhf0GlAj3wsaHvmP13F4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hpe.com; spf=pass smtp.mailfrom=hpe.com; dkim=pass (2048-bit key) header.d=hpe.com header.i=@hpe.com header.b=KSl2CexN; arc=none smtp.client-ip=148.163.147.86
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hpe.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hpe.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uDob5GWn"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2D1DC4CEED;
-	Tue, 12 Aug 2025 02:15:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754964926;
-	bh=PjVELmDzYaMLkBp10XWSYXeAtvViFlQaJPa5dzLJuMk=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=uDob5GWnEa5Hkc2pEjI68lfRGCT/9MdLQ4vphtoXQ5Q25AqxmULNGCVZBJcDwi/9c
-	 pF2B2M3hqdfQxKcytyQcB4L8cksau6bs/EeQYRLZX/F4B1seO5JO/Q4Hix7zQKksL5
-	 m5xEBeYzA23vrE2Jsja1Z+uoc7dciAqTzRjm0XGVanpZapWMmowxaiiHPnWcqDKpjA
-	 jL4qazc1SLmrwOCiw4vmURqykrokpxRKD/Kf5vjZZZCZR+ojhs6Uzx42mev7qWTvnH
-	 lsCLBkMl/T463uLyzzk26N9/bMKJj5OWhS2skqbFEEtjs8D4atx4AcYrEpu2naqhSJ
-	 Iz8h7rLUQwuEQ==
-Message-ID: <7570f60f-932b-4b76-a87d-8f3f0760c44f@kernel.org>
-Date: Tue, 12 Aug 2025 11:12:44 +0900
+	dkim=pass (2048-bit key) header.d=hpe.com header.i=@hpe.com header.b="KSl2CexN"
+Received: from pps.filterd (m0148663.ppops.net [127.0.0.1])
+	by mx0a-002e3701.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57C3Wmeo000846;
+	Tue, 12 Aug 2025 03:41:04 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=cc
+	:content-transfer-encoding:date:from:in-reply-to:message-id
+	:mime-version:references:subject:to; s=pps0720; bh=MnGBmYgqbRUxk
+	pdO5d15KMIfStl62/cGlh7Nl6XccLU=; b=KSl2CexNxcIULiWRD3y6CT5a+C2YO
+	7DmtuwCR69S16aGrxs6T55AmkPy9btdHgNRjknsKaHi/xhnHNLaf1eSNDIW0bdfE
+	ANuYlKAJfJZMwswrBq6t0X8OqZDZ5NsXIPDDC7ERpAtS8zJuGf5EPmiJrvxzCXCz
+	2YFFtFwwtIZSlY0TthCN1jF7reXWIEzQkW5eeXE94wY21PLpzyFXME4YF54yOKEY
+	ZULhLCxzvI3Tys8UGA8Rn76tje8Gobm19NOn89E88dNvs+hWR2IEfi6ssFC0e5/7
+	SPn4WGKNvdkH4mEB9Lkgu9jaJK40hH7CaaUmmVIqmQD8WCVK0HeHliXUA==
+Received: from p1lg14881.it.hpe.com ([16.230.97.202])
+	by mx0a-002e3701.pphosted.com (PPS) with ESMTPS id 48ewkrwxb8-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 12 Aug 2025 03:41:04 +0000 (GMT)
+Received: from test-build-fcntl.hpe.com (unknown [192.58.206.38])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by p1lg14881.it.hpe.com (Postfix) with ESMTPS id 7E270805E2C;
+	Tue, 12 Aug 2025 03:41:02 +0000 (UTC)
+Received: by test-build-fcntl.hpe.com (Postfix, from userid 1000)
+	id 17C178800130; Tue, 12 Aug 2025 03:32:02 +0000 (UTC)
+From: Rajeev Mishra <rajeevm@hpe.com>
+To: axboe@kernel.dk, yukuai1@huaweicloud.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        dlemoal@kernel.org
+Subject: Re: [PATCH v2] loop: use vfs_getattr_nosec() for accurate file size
+Date: Tue, 12 Aug 2025 03:32:01 +0000
+Message-ID: <20250812033201.225425-1-rajeevm@hpe.com>
+X-Mailer: git-send-email 2.43.7
+In-Reply-To: <a8041180-03f2-3342-b568-867b3f295239@huaweicloud.com>
+References: <a8041180-03f2-3342-b568-867b3f295239@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v23 01/16] block: Support block devices that preserve the
- order of write requests
-To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
- Christoph Hellwig <hch@lst.de>
-References: <20250811200851.626402-1-bvanassche@acm.org>
- <20250811200851.626402-2-bvanassche@acm.org>
-From: Damien Le Moal <dlemoal@kernel.org>
-Content-Language: en-US
-Organization: Western Digital Research
-In-Reply-To: <20250811200851.626402-2-bvanassche@acm.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODEyMDAzMSBTYWx0ZWRfX80kH5S3ZBHZn
+ LH+sCWpao2Dw5Qxy21GSNbuaXDO65cMYfxRKGt2L+1NRQnORTQRIrVqXXz8w34Osz3Wl61NisPm
+ U9KcZ7DuOV3DqMeIpPRmY3DTDmm7gOQI+cSbhe86R+gkbcRMXs87ksNv91PthCcLstpfTqySQCB
+ Y3VQEsCzGE22c9bS/iCqIvPZmmkY0kToJFPeC6n+tETNE9HDn0Tv9xysETiQKGxMPMp7bu+L4q7
+ ERGabHanB+3esNQSDZ0vFMciV8TgjuGWRsRbxmdK4RRV1X/miZQnuVgtiv3S3pnJ+bPiO4x1Km5
+ prFzjp9t8JlTOKNn4t4Kr7/mfTX5xtefNfTvTN7Z6mblyfMxbh/rb2siadIBnylEczKrgUXZF5e
+ qwJsJr9L1jdq1v9HR1sYC37g/TggKknXrg1fQc1uqYHJ0dB4o4jBpoqxbnSu0leofeThR1gM
+X-Authority-Analysis: v=2.4 cv=aelhnQot c=1 sm=1 tr=0 ts=689ab7d0 cx=c_pps
+ a=FAnPgvRYq/vnBSvlTDCQOQ==:117 a=FAnPgvRYq/vnBSvlTDCQOQ==:17
+ a=2OwXVqhp2XgA:10 a=zVteXimfv2qfp4qxOFMA:9
+X-Proofpoint-GUID: 5dok6cb-zcoeWRy9zEgEn7KtNYpnkmJu
+X-Proofpoint-ORIG-GUID: 5dok6cb-zcoeWRy9zEgEn7KtNYpnkmJu
+X-HPE-SCL: -1
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-08-12_01,2025-08-11_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 suspectscore=0 adultscore=0 spamscore=0 mlxlogscore=977
+ bulkscore=0 priorityscore=1501 lowpriorityscore=0 mlxscore=0 clxscore=1011
+ impostorscore=0 phishscore=0 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2507300000
+ definitions=main-2508120031
 
-On 8/12/25 5:08 AM, Bart Van Assche wrote:
-> Some storage controllers preserve the request order per hardware queue.
-> Some but not all device mapper drivers preserve the bio order. Introduce
-> the feature flag BLK_FEAT_ORDERED_HWQ to allow block drivers and stacked
-> drivers to indicate that the order of write commands is preserved per
-> hardware queue and hence that serialization of writes per zone is not
-> required if all pending writes are submitted to the same hardware queue.
-> Add a sysfs attribute for controlling write pipelining support.
+Hi Kuai,
 
-Why ? Why would you want to disable write pipelining since it give better
-performance ?
+Thank you for the feedback on the v2 patch regarding error handling.
 
-The commit message also does not describe BLK_FEAT_PIPELINE_ZWR, but I think
-this enable/disable flag is not needed.
+Yu mentioned:
+> return 0 here is odd. Why not "return ret;" to propagate the error if any ?
 
-> 
-> Cc: Damien Le Moal <dlemoal@kernel.org>
-> Cc: Christoph Hellwig <hch@lst.de>
-> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-> ---
->  Documentation/ABI/stable/sysfs-block | 15 +++++++++++++++
->  block/blk-settings.c                 | 10 ++++++++++
->  block/blk-sysfs.c                    |  7 +++++++
->  include/linux/blkdev.h               |  9 +++++++++
->  4 files changed, 41 insertions(+)
-> 
-> diff --git a/Documentation/ABI/stable/sysfs-block b/Documentation/ABI/stable/sysfs-block
-> index 803f578dc023..5a42d99cf39a 100644
-> --- a/Documentation/ABI/stable/sysfs-block
-> +++ b/Documentation/ABI/stable/sysfs-block
-> @@ -637,6 +637,21 @@ Description:
->  		I/O size is reported this file contains 0.
->  
->  
-> +What:		/sys/block/<disk>/queue/pipeline_zoned_writes
-> +Date:		August 2025
-> +Contact:	Bart Van Assche <bvanassche@acm.org>
-> +Description:
-> +		[RW] If this attribute is present it means that the block driver
-> +		and the storage controller both support preserving the order of
-> +		zoned writes per hardware queue. This attribute controls whether
-> +		or not pipelining zoned writes is enabled. If the value of this
-> +		attribute is zero, the block layer restricts the queue depth for
-> +		sequential writes per zone to one (zone append operations are
-> +		not affected). If the value of this attribute is one, the block
-> +		layer does not restrict the queue depth of sequential writes per
-> +		zone to one.
-> +
-> +
->  What:		/sys/block/<disk>/queue/physical_block_size
->  Date:		May 2009
->  Contact:	Martin K. Petersen <martin.petersen@oracle.com>
-> diff --git a/block/blk-settings.c b/block/blk-settings.c
-> index 07874e9b609f..01c0edf2308a 100644
-> --- a/block/blk-settings.c
-> +++ b/block/blk-settings.c
-> @@ -119,6 +119,14 @@ static int blk_validate_zoned_limits(struct queue_limits *lim)
->  	lim->max_zone_append_sectors =
->  		min_not_zero(lim->max_hw_zone_append_sectors,
->  			min(lim->chunk_sectors, lim->max_hw_sectors));
-> +
-> +	/*
-> +	 * If both the block driver and the block device preserve the write
-> +	 * order per hwq, enable zoned write pipelining.
-> +	 */
-> +	if (lim->features & BLK_FEAT_ORDERED_HWQ)
-> +		lim->features |= BLK_FEAT_PIPELINE_ZWR;
-> +
->  	return 0;
->  }
->  
-> @@ -780,6 +788,8 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
->  		t->features &= ~BLK_FEAT_NOWAIT;
->  	if (!(b->features & BLK_FEAT_POLL))
->  		t->features &= ~BLK_FEAT_POLL;
-> +	if (!(b->features & BLK_FEAT_ORDERED_HWQ))
-> +		t->features &= ~BLK_FEAT_ORDERED_HWQ;
->  
->  	t->flags |= (b->flags & BLK_FLAG_MISALIGNED);
->  
-> diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-> index 78ee8d324c7f..4bf0b663f25d 100644
-> --- a/block/blk-sysfs.c
-> +++ b/block/blk-sysfs.c
-> @@ -270,6 +270,7 @@ QUEUE_SYSFS_FEATURE(rotational, BLK_FEAT_ROTATIONAL)
->  QUEUE_SYSFS_FEATURE(add_random, BLK_FEAT_ADD_RANDOM)
->  QUEUE_SYSFS_FEATURE(iostats, BLK_FEAT_IO_STAT)
->  QUEUE_SYSFS_FEATURE(stable_writes, BLK_FEAT_STABLE_WRITES);
-> +QUEUE_SYSFS_FEATURE(pipeline_zwr, BLK_FEAT_PIPELINE_ZWR);
->  
->  #define QUEUE_SYSFS_FEATURE_SHOW(_name, _feature)			\
->  static ssize_t queue_##_name##_show(struct gendisk *disk, char *page)	\
-> @@ -554,6 +555,7 @@ QUEUE_LIM_RO_ENTRY(queue_dax, "dax");
->  QUEUE_RW_ENTRY(queue_io_timeout, "io_timeout");
->  QUEUE_LIM_RO_ENTRY(queue_virt_boundary_mask, "virt_boundary_mask");
->  QUEUE_LIM_RO_ENTRY(queue_dma_alignment, "dma_alignment");
-> +QUEUE_LIM_RW_ENTRY(queue_pipeline_zwr, "pipeline_zoned_writes");
->  
->  /* legacy alias for logical_block_size: */
->  static struct queue_sysfs_entry queue_hw_sector_size_entry = {
-> @@ -700,6 +702,7 @@ static struct attribute *queue_attrs[] = {
->  	&queue_dax_entry.attr,
->  	&queue_virt_boundary_mask_entry.attr,
->  	&queue_dma_alignment_entry.attr,
-> +	&queue_pipeline_zwr_entry.attr,
->  	&queue_ra_entry.attr,
->  
->  	/*
-> @@ -746,6 +749,10 @@ static umode_t queue_attr_visible(struct kobject *kobj, struct attribute *attr,
->  	    !blk_queue_is_zoned(q))
->  		return 0;
->  
-> +	if (attr == &queue_pipeline_zwr_entry.attr &&
-> +	    !(q->limits.features & BLK_FEAT_ORDERED_HWQ))
-> +		return 0;
-> +
->  	return attr->mode;
->  }
->  
-> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-> index 95886b404b16..79d14b3d3309 100644
-> --- a/include/linux/blkdev.h
-> +++ b/include/linux/blkdev.h
-> @@ -338,6 +338,15 @@ typedef unsigned int __bitwise blk_features_t;
->  /* skip this queue in blk_mq_(un)quiesce_tagset */
->  #define BLK_FEAT_SKIP_TAGSET_QUIESCE	((__force blk_features_t)(1u << 13))
->  
-> +/*
-> + * The request order is preserved per hardware queue by the block driver and by
-> + * the block device. Set by the block driver.
-> + */
-> +#define BLK_FEAT_ORDERED_HWQ		((__force blk_features_t)(1u << 14))
-> +
-> +/* Whether to pipeline zoned writes. Controlled by the block layer. */
-> +#define BLK_FEAT_PIPELINE_ZWR		((__force blk_features_t)(1u << 15))
-> +
->  /* undocumented magic for bcache */
->  #define BLK_FEAT_RAID_PARTIAL_STRIPES_EXPENSIVE \
->  	((__force blk_features_t)(1u << 15))
+I understand the concern about proper error propagation. However, there's a 
+type compatibility issue I'd like to discuss before implementing v3:
+
+1. Current function signature: `static loff_t get_size(...)` 
+   - Returns size as positive loff_t (unsigned 64-bit)  
+   - All callers expect non-negative size values
+
+2. vfs_getattr_nosec() error codes are negative integers (-ENOENT, -EIO, etc.)
+   - Returning `ret` would cast negative errors to huge positive numbers
+   - This could cause loop devices to appear as exabyte-sized
+
+3. Current callers like loop_set_size() don't handle error checking
+
+Would you prefer for v3:
+a) Change function signature to `int get_size(..., loff_t *size)` and update all callers  
+b) Different approach?
+
+diff with ret approach
+
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index c418c47db76e..15117630c6c1 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -142,12 +142,13 @@ static int part_shift;
+  * @offset: offset into the backing file
+  * @sizelimit: user-specified size limit
+  * @file: the backing file
++ * @size: pointer to store the calculated size
+  *
+  * Calculate the effective size of the loop device
+  *
+- * Returns: size in 512-byte sectors, or 0 if invalid
++ * Returns: 0 on success, negative error code on failure
+  */
+-static loff_t get_size(loff_t offset, loff_t sizelimit, struct file *file)
++static int get_size(loff_t offset, loff_t sizelimit, struct file *file, loff_t *size)
+ {
+        struct kstat stat;
+        loff_t loopsize;
+@@ -159,7 +160,7 @@ static loff_t get_size(loff_t offset, loff_t sizelimit, struct file *file)
+         */
+        ret = vfs_getattr_nosec(&file->f_path, &stat, STATX_SIZE, 0);
+        if (ret)
+-               return 0;
++               return ret;
+
+        loopsize = stat.size;
+
+@@ -167,7 +168,7 @@ static loff_t get_size(loff_t offset, loff_t sizelimit, struct file *file)
+                loopsize -= offset;
+        /* offset is beyond i_size, weird but possible */
+        if (loopsize < 0)
+-               return 0;
++               return -EINVAL;
+
+        if (sizelimit > 0 && sizelimit < loopsize)
+                loopsize = sizelimit;
+@@ -175,12 +176,20 @@ static loff_t get_size(loff_t offset, loff_t sizelimit, struct file *file)
+         * Unfortunately, if we want to do I/O on the device,
+         * the number of 512-byte sectors has to fit into a sector_t.
+         */
+-       return loopsize >> 9;
++       *size = loopsize >> 9;
++       return 0;
+ }
+
+ static loff_t get_loop_size(struct loop_device *lo, struct file *file)
+ {
+-       return get_size(lo->lo_offset, lo->lo_sizelimit, file);
++       loff_t size;
++       int ret;
++
++       ret = get_size(lo->lo_offset, lo->lo_sizelimit, file, &size);
++       if (ret)
++               return 0;  /* Fallback to 0 on error for backward compatibility */
++
++       return size;
+ }
 
 
--- 
-Damien Le Moal
-Western Digital Research
+I am happy to implement whichever direction you think is best.
+
+Thanks,
+Rajeev
