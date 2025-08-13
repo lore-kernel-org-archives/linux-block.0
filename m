@@ -1,70 +1,110 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2DDE1C860B;
-	Wed, 13 Aug 2025 03:27:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6234D1CEAA3;
+	Wed, 13 Aug 2025 05:03:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755055670; cv=none; b=q2mTnc1EurG85mcB29vfPi5ZrONet1wUbEvxZohCS26zOyk1x9KkwIaOZvRtRJsnMK6vUUnqEXl7nKIE4Xarb4SqdVvI+K3ZIlli+eja84uD8u22ZlUeoXj7sp67i4w3Y1PCwnpGRBJJVlOECo6Dq5h8QO9fie6H1vrHs6Cy16c=
+	t=1755061409; cv=none; b=CebnsCLTOHsAVNhCgBv3Vv6EvEAnXFk/UDfWKXYwlxEzEw2U+4bdxF33XL5E1gqe38ytfpd7RVJwBs1Yy6BBpbzny+ok3BTtVsa8m+ASO8FDNmGb7H3/IygACskdP6a/By3YH1H0ff7cdmE1vL0x2hXJS3e2Tu5zLOFLciRmszA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755055670; c=relaxed/simple;
-	bh=+LyA6zR1lhskcssggkrVNKAvL4doi16EDP09/N5iP3I=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=unIBn2KLbHTIs5/GO9/sJUO11lxhOBx/vQdswJrdySi1/J0PXM3vKDVZIUkGq+HehuqxQyxZDprA2KAsSmMU6GQiS0aJvmXCWpVWJOaMThG8BJWIgwaXtW2Q9AXNeXPemmljMdFccFAYzNWNXA68kuqhDyvx/vWtnUkvJaZ1Njg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4c1v2T39zwzKHMcS;
-	Wed, 13 Aug 2025 11:27:45 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id AE18F1A0B39;
-	Wed, 13 Aug 2025 11:27:44 +0800 (CST)
-Received: from [10.174.179.143] (unknown [10.174.179.143])
-	by APP4 (Coremail) with SMTP id gCh0CgAXkxMuBpxo350EDg--.56379S3;
-	Wed, 13 Aug 2025 11:27:44 +0800 (CST)
-Subject: Re: [PATCH v2] block: restore default wbt enablement
-To: Julian Sun <sunjunchao2870@gmail.com>, linux-block@vger.kernel.org
-Cc: axboe@kernel.dk, nilay@linux.ibm.com, ming.lei@redhat.com,
- Julian Sun <sunjunchao@bytedance.com>, stable@vger.kernel.org,
- "yukuai (C)" <yukuai3@huawei.com>
-References: <20250812154257.57540-1-sunjunchao@bytedance.com>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <b8481fcc-07dc-d16e-9a2a-ab8e19f64c97@huaweicloud.com>
-Date: Wed, 13 Aug 2025 11:27:42 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.1
+	s=arc-20240116; t=1755061409; c=relaxed/simple;
+	bh=tGLCXaL5vF+LCtUsKT7SsgJORseZhc8FqciBJ0dqgxY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=EwLvn9yHjQTM/kbLnnOEclNzc3CX9Wivw18R2jbj5qGP7MABsATUUHtK3KV6QyizavhVlfAiv/Sc8cWLWffVbWggnrR4F/9ExrLuqTQUd+GTh0cxeNIWosGXE3R06Oa9g17rCWYu3kaRYMk7MxwKWtvoAHni02PAntfbHDxa6C8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=h7oPEyh5; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="h7oPEyh5"
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57CNQNGT030080;
+	Wed, 13 Aug 2025 05:03:12 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=v2yJLc
+	JwV0DvmeGnG0NJR2ILb4sP3qpRQ/zNjH1IqBA=; b=h7oPEyh5ibEjooU63PjEs0
+	iIPDhOw+8QC9cCVNVeYsxwjXhgkiW1Og9tBO4BFGlnKQyUOxqMRV2KLhwFsU0W1t
+	LVnBjRuNsINVVMv7t/+f8xcHjljzFwnzA59ZuGtbfXct9fYmLBqgI6rP7OGYk8y5
+	8/M1pll+S1sOnIFPDuGZDYau3R89YBuURRpNbhR8WiGwhfSIgA744SRSw4Fa8ixQ
+	LppceA+Oqrh6wcMzepQfQrD3skf0YoEi5Trjm/oJepfm5+EA1+TvlbsjImiNtKaf
+	MXQIbtYUbW2hZ35GvMIRxaPfjn5r6BmZefDSEfh+JfQXxTN0nabMGwslxWRj8aqw
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48dwudams7-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 13 Aug 2025 05:03:12 +0000 (GMT)
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 57D53BbU004484;
+	Wed, 13 Aug 2025 05:03:11 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48dwudams4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 13 Aug 2025 05:03:11 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 57D41siq025667;
+	Wed, 13 Aug 2025 05:03:10 GMT
+Received: from smtprelay07.wdc07v.mail.ibm.com ([172.16.1.74])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 48ejvmdggw-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 13 Aug 2025 05:03:10 +0000
+Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
+	by smtprelay07.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 57D53AB231457862
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 13 Aug 2025 05:03:10 GMT
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 2D76958059;
+	Wed, 13 Aug 2025 05:03:10 +0000 (GMT)
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A6B3A58058;
+	Wed, 13 Aug 2025 05:03:07 +0000 (GMT)
+Received: from [9.61.63.67] (unknown [9.61.63.67])
+	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 13 Aug 2025 05:03:07 +0000 (GMT)
+Message-ID: <c6881897-e824-4978-bb27-3cf0be0303eb@linux.ibm.com>
+Date: Wed, 13 Aug 2025 10:33:00 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] block: restore default wbt enablement
+To: Julian Sun <sunjunchao2870@gmail.com>, linux-block@vger.kernel.org
+Cc: axboe@kernel.dk, ming.lei@redhat.com,
+        Julian Sun <sunjunchao@bytedance.com>, stable@vger.kernel.org
+References: <20250812154257.57540-1-sunjunchao@bytedance.com>
+Content-Language: en-US
+From: Nilay Shroff <nilay@linux.ibm.com>
 In-Reply-To: <20250812154257.57540-1-sunjunchao@bytedance.com>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgAXkxMuBpxo350EDg--.56379S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7WF15Wr17Kr43ZF18WFWktFb_yoW8XF4xpw
-	1fGr1YkFZrGFWxCw17Aan7Zayjq3yDWr1UWry8u34Yv34UCwnaqayI9ryaqFWqvas3C3Z0
-	vw4xtFWrtryUA37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvjb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AF
-	wI0_JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
-	xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43
-	MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
-	0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWU
-	JVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUwx
-	hLUUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODEyMDIyNCBTYWx0ZWRfX5V2ue0HMwuR5
+ PFS9jnAN56WMniPy0imsi3vgQc8fir4qojnXjOjrJef7PdutCkOGLUDtmLIGvxSJgJnmrIE2Rlh
+ jdbSL4OViGr8HP+GVVne0D6Gr3rV+czKSjxTZAGsjGy50YS45nunKX9xH0Bsv2+enwWiHoPfYMs
+ 8AuKAaRasyaMgY/G6WYTBwnekFirnfoXsfvIdaFLz/GDc0Jd+frvJFddQWtWo2GSyiUvgDzllSz
+ l3vn3q++HZ1yCewWKSFTS86Nf+OXzMHtxsF0o70I744Wrd5KA4MhYVuymUF14twiW4fUJMr6DPU
+ k6DQn4RXViJ80N8SbhMbW7al/YR8JUisEyXZiMigMq/nv2XU0xP4nl3qI2F+AAeSdspo3zEQF1s
+ otN2T8s8
+X-Authority-Analysis: v=2.4 cv=d/31yQjE c=1 sm=1 tr=0 ts=689c1c90 cx=c_pps
+ a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
+ a=IkcTkHD0fZMA:10 a=2OwXVqhp2XgA:10 a=968KyxNXAAAA:8 a=VwQbUJbxAAAA:8
+ a=VnNF1IyMAAAA:8 a=qyw61lXL-B-xqPK-4asA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-GUID: xR-kUKshz68yBRlOtG81zVrFMIdN_khy
+X-Proofpoint-ORIG-GUID: HHK6-3W_pvTH_4gJNl6C7EelEolvZwKa
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-08-12_08,2025-08-11_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1015 suspectscore=0 impostorscore=0 priorityscore=1501 phishscore=0
+ spamscore=0 adultscore=0 bulkscore=0 malwarescore=0 classifier=typeunknown
+ authscore=0 authtc= authcc= route=outbound adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2507300000 definitions=main-2508120224
 
-Hi,
 
-ÔÚ 2025/08/12 23:42, Julian Sun Ð´µÀ:
+
+On 8/12/25 9:12 PM, Julian Sun wrote:
 > The commit 245618f8e45f ("block: protect wbt_lat_usec using
 > q->elevator_lock") protected wbt_enable_default() with
 > q->elevator_lock; however, it also placed wbt_enable_default()
@@ -91,13 +131,9 @@ Hi,
 > 
 > After testing with this patch, wbt can be enabled normally.
 > 
-> Signed-off-by: Julian Sun<sunjunchao@bytedance.com>
-> Cc:stable@vger.kernel.org
+> Signed-off-by: Julian Sun <sunjunchao@bytedance.com>
+> Cc: stable@vger.kernel.org
 > Fixes: 245618f8e45f ("block: protect wbt_lat_usec using q->elevator_lock")
-> ---
 
-Usually we put the fix tag before Signed-off-by, however, this is
-negligible.
-
-Reviewed-by: Yu Kuai <yukuai3@huawei.com>
-
+Looks good to me:
+Reviewed-by: Nilay Shroff <nilay@linux.ibm.com>
