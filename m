@@ -1,128 +1,110 @@
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F2862ECEBB
-	for <linux-block@vger.kernel.org>; Wed, 13 Aug 2025 13:50:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CCBF2EAB68;
+	Wed, 13 Aug 2025 13:52:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755093041; cv=none; b=cov8BpC8a5gSf75+POicFn8/Xy8xVtxi9+5HFfoF6bktW31w3oqIf3blRWY7ummMqGPf/aCRGfx4v/C7uiBajGG9Zn4TZKwPdoTlYoMgr095ZtTtlqWVMaIgBBC3KyeSumG/ZjfQNcRZU2JtWR0LcFs+TuD2Usmv+WsrRe42ZuY=
+	t=1755093170; cv=none; b=QgHIHTLppQ17kxyZJzhLZbWTPzCM0hRYVJ9D+nnM5haKednXYJiQFqXbgWoGSDTD4gBUYbY/MZjRvpsRwXQ45qKohY5ESmuYoS8KRv6xlH6B8+02jEVn4sZ/RpNwmHOttdTJrI7x3f0Zk9PEkLSDshqWNNDIiysf/zW3yJMahAM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755093041; c=relaxed/simple;
-	bh=Th4SgWJ7uOrhbJgJsJ1OslYEWLKNV+cmdvYGwrA7T+E=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=t8+UGrDeWogBp5nLGoySlMqcqINFI3hGhQXiplxmXs6oVKkfmLmSz1SZY2vkV4siX9v1kTctaF0vay5bcrtVAxAs/aO9xYZMK/vTM5djK3vuZVFBM3oafQ5dRIqzSHL0gZHn/TcCR5GTmpyB5vzftrpQ+pffisH/+rOuOYMGR6A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=I+4Fmtxn; arc=none smtp.client-ip=209.85.221.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1755093170; c=relaxed/simple;
+	bh=yRzIBpcwo03V92Cu9B8zeqXJTartIC1MviVhaIBxQdM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=j9YUhWaLzKBnG66U/zaEyxT6yN/eOt9KJWc4q5a6PGOAxp4rXQJFY7Gi8mHTuGpsZaqmXTqXadelceGFwUjRsoearY2pb9MZULTuAfLmRzOP7CNWpno9X5jhYV4rGeL4qvBiosWM3RBNKtE+7ZG/vk22Yiftb2wan/WKk05GHaE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZAwj9hMe; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="I+4Fmtxn"
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-3b7920354f9so5434576f8f.2
-        for <linux-block@vger.kernel.org>; Wed, 13 Aug 2025 06:50:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1755093038; x=1755697838; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MX7HsBZ1OSxtuZpt+0fUOkrMNSmDcBAX1JrxfwqVFSE=;
-        b=I+4FmtxnFZLEaXk8+qCr4cn8GcUsrpVhl4TiAG+MPNs8IX57z/AcyQEpg00hcDrFbL
-         6QN1Td2nkXBXLhfbpumDzK+Kudldg8zC7QeyMPl0mybfOQo1qs+HSVrs7Y78+JvIe91D
-         TtSkW7BvWI+FeHcne4eHWKHCcS2wkuFi7yVQJv5erTVQuoAWr4xIK8p7/r/QSgsa/UlK
-         x+X0vb6wjhl5DQPSGnuTXbnMt8QQrTDvDRPGCiZr1QhAUZdwK67p6ILt/08l4XHmWIwy
-         nq1DL4C3Tn7AIevyMll1XsvZLbe3EVetsdPeKPcmwEA2MIDwyDTjnFcdqnO5ltwqUDTh
-         YpCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755093038; x=1755697838;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MX7HsBZ1OSxtuZpt+0fUOkrMNSmDcBAX1JrxfwqVFSE=;
-        b=u6I9XyhmpkisqRyLTnlp5pYImac3I5pT0ucCLSwO4Ie8i94ZcTLpxPK1idJeA/fUFE
-         NluC4H5gQ3+RQdNUL5R1Avnwe5XvohcfD8Glm/YlEoLgXi55U4brfm1Bfca+D1N6jgnn
-         BkY2tHiLshB0lBfDS8Tdg5IJ8Nr7gKE9tJZseKpfqshwVpKGnoAiDlmZ/KOLyxs/cl1l
-         1TUuTpaTREhDEUIH2JCpjhcvNfVsu4U+WGGIkEe6ix8+VUTdEfmIlha/Hthp/DcNP8Zj
-         WJRkHnIw3qXc9bjeAsh4SW2EKZHGlSbyyryqq1ITIJ9wI2coDiBHvC+aX0Wr5cItc4Vd
-         CJ5A==
-X-Forwarded-Encrypted: i=1; AJvYcCX+MTgHjvioD9RJEbqpd1IhZjyBKKaXzia57wkkO3zjT3iYGhRAzt9U890rFGJLGvCF63ZRYWoHYF+iJA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzBB0RW+g01rrAziufMGFwborQYQUo1leJ9ehBrxP2InwRLBB0X
-	qbcXVviXtbP+5g2u7dx/3Jpipl/qZoQ9UdMZS0AIuTsB1DwJa8p4PH3UnJBkk1Lt4gKXvAQIA3s
-	TWpcK8FPFiFUhUxtue+viZ0QNj+4OYVaNB8mFvr+Y
-X-Gm-Gg: ASbGncsGm7lw0AhxuwVdQslSbQnoNNxv2WL8pyuaYJ9DaK+C//ilckiWC+tnMYCTrrX
-	2/bHds4NkslNHyFEBM5OcYWoPDZV9OBTMXzGwfROQ81YLyh5mhzxWt257S8FQYENgyUdbdZKeAe
-	f4tNF/I3runs84RlD/BzoqC06Fytg4L4E5coBjB5yPLLOePf1Zp4/pv2GdBRBRKmORd5/OUVBqT
-	7DfMoiOLU777mu0JR7mnQUS93H+6qAGHo3Gj3dRWd275Nfi
-X-Google-Smtp-Source: AGHT+IHh+vA/07eWR9Ebta9w7V6pVGfOotLmHgLP9XCK0PEzsGlKp04MKCCBaqBhhNesoViqmXpEfMe6W8DHSs+xG04=
-X-Received: by 2002:a05:6000:2005:b0:3b8:f358:28b0 with SMTP id
- ffacd0b85a97d-3b917e4ee33mr2691536f8f.25.1755093037572; Wed, 13 Aug 2025
- 06:50:37 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZAwj9hMe"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1755093170; x=1786629170;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=yRzIBpcwo03V92Cu9B8zeqXJTartIC1MviVhaIBxQdM=;
+  b=ZAwj9hMeBbrlCEqTO1etqD52Ib7zYRuFfbkqzsVrMfKiNpQRlEPFCXGn
+   3nIOvMchcMhGBsxiAH9Kt2iX4/9H4G4RYXE434AsGeKcuAtwy3PXYGnwy
+   4bgJHzoYiEp+cb2DvpmEGtkiaPy+nVyQ5hoRntie97P9KMoNSj48OlRGk
+   L4CDHVaLEm2HXbZt4KZdTbdXR3E7ncapUlFhlRmJXRWTqrQKKcGDI2iTW
+   Y/MCDxfioY4Ut6THrPCEElSadYsntHEeh+e+DH+B8DJaIXnXKsfxVwhSp
+   bt9MNyzoC8EusmhT6ok2Sw4zXOxoSd8fgNV58Fkl3uzYTGOvPouGm+eUI
+   w==;
+X-CSE-ConnectionGUID: WxwWpv4/SxeMt2n2Nl4x+A==
+X-CSE-MsgGUID: mwuitVOTTWymQsL1rl8Vqg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11520"; a="57289139"
+X-IronPort-AV: E=Sophos;i="6.17,285,1747724400"; 
+   d="scan'208";a="57289139"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2025 06:52:49 -0700
+X-CSE-ConnectionGUID: a6XmckWnTmOaZ0W7wn/o/A==
+X-CSE-MsgGUID: 9CE9RbIqTnCtSYCj/rZ3aA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.17,285,1747724400"; 
+   d="scan'208";a="170928900"
+Received: from smile.fi.intel.com ([10.237.72.52])
+  by orviesa004.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2025 06:52:44 -0700
+Received: from andy by smile.fi.intel.com with local (Exim 4.98.2)
+	(envelope-from <andriy.shevchenko@intel.com>)
+	id 1umBuB-00000005RqB-41aP;
+	Wed, 13 Aug 2025 16:52:39 +0300
+Date: Wed, 13 Aug 2025 16:52:39 +0300
+From: Andy Shevchenko <andriy.shevchenko@intel.com>
+To: Dominique Martinet <asmadeus@codewreck.org>
+Cc: Nathan Chancellor <nathan@kernel.org>,
+	kernel test robot <lkp@intel.com>,
+	Dominique Martinet via B4 Relay <devnull+asmadeus.codewreck.org@kernel.org>,
+	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
+	Christian Brauner <brauner@kernel.org>,
+	David Howells <dhowells@redhat.com>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Andrew Morton <akpm@linux-foundation.org>, llvm@lists.linux.dev,
+	oe-kbuild-all@lists.linux.dev,
+	Linux Memory Management List <linux-mm@kvack.org>,
+	Maximilian Bosch <maximilian@mbosch.me>,
+	Ryan Lahfa <ryan@lahfa.xyz>, Christian Theune <ct@flyingcircus.io>,
+	Arnout Engelen <arnout@bzzt.net>, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH 1/2] iov_iter: iterate_folioq: fix handling of offset >=
+ folio size
+Message-ID: <aJyYp-3VA9kJ5YMd@smile.fi.intel.com>
+References: <20250811-iot_iter_folio-v1-1-d9c223adf93c@codewreck.org>
+ <202508120250.Eooq2ydr-lkp@intel.com>
+ <20250813051633.GA3895812@ax162>
+ <aJwj4dQ3b599qKHn@codewreck.org>
+ <aJyVfWKX2eSMsfrb@black.igk.intel.com>
+ <aJyW_QNI8vIdr03O@codewreck.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250812-rnull-up-v6-16-v4-0-ed801dd3ba5c@kernel.org>
- <20250812-rnull-up-v6-16-v4-12-ed801dd3ba5c@kernel.org> <I-QXOGdDtTAVOcFvHZksoPqkYUZThmxrTUNw1h_MEGXdk_X_dc2txQdKJPMLz-yPmqL956iydAqVD9D5aL2SDQ==@protonmail.internalid>
- <aJw_I-YQUfupWCXL@google.com> <87a543fkh1.fsf@t14s.mail-host-address-is-not-set>
-In-Reply-To: <87a543fkh1.fsf@t14s.mail-host-address-is-not-set>
-From: Alice Ryhl <aliceryhl@google.com>
-Date: Wed, 13 Aug 2025 15:50:25 +0200
-X-Gm-Features: Ac12FXyzo-eVyDXufLE9G-NGeZ0mHM_6CqrztsTkjyFXCp398EsRl9GEXjBkjqs
-Message-ID: <CAH5fLgjezWnFLaEKZkfvb9ko0RHG-c5g6yO0KvOJ8nyennEXOQ@mail.gmail.com>
-Subject: Re: [PATCH v4 12/15] rust: block: add `GenDisk` private data support
-To: Andreas Hindborg <a.hindborg@kernel.org>
-Cc: Boqun Feng <boqun.feng@gmail.com>, Miguel Ojeda <ojeda@kernel.org>, 
-	Alex Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>, 
-	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <lossin@kernel.org>, Trevor Gross <tmgross@umich.edu>, 
-	Danilo Krummrich <dakr@kernel.org>, Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
-	rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aJyW_QNI8vIdr03O@codewreck.org>
+Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
+ krs, Bertel Jungin Aukio 5, 02600 Espoo
 
-On Wed, Aug 13, 2025 at 3:47=E2=80=AFPM Andreas Hindborg <a.hindborg@kernel=
-.org> wrote:
->
-> "Alice Ryhl" <aliceryhl@google.com> writes:
->
-> > On Tue, Aug 12, 2025 at 10:44:30AM +0200, Andreas Hindborg wrote:
-> >> Allow users of the rust block device driver API to install private dat=
-a in
-> >> the `GenDisk` structure.
-> >>
-> >> Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
-> >
-> > Overall LGTM.
-> > Reviewed-by: Alice Ryhl <aliceryhl@google.com>
-> >
-> >>          self,
-> >>          name: fmt::Arguments<'_>,
-> >>          tagset: Arc<TagSet<T>>,
-> >> +        queue_data: T::QueueData,
-> >>      ) -> Result<GenDisk<T>> {
-> >> +        let data =3D queue_data.into_foreign();
-> >> +        let recover_data =3D ScopeGuard::new(|| {
-> >> +            drop(
-> >> +                // SAFETY: T::QueueData was created by the call to `i=
-nto_foreign()` above
-> >> +                unsafe { T::QueueData::from_foreign(data) },
-> >> +            );
-> >
-> > This is usually formatted as:
-> >
-> > // SAFETY: T::QueueData was created by the call to `into_foreign()` abo=
-ve
-> > drop(unsafe { T::QueueData::from_foreign(data) });
->
-> I don't really have a preference, my optimization function was to
-> minimize distance to the unsafe block. Are there any rust guidelines on t=
-his?
+On Wed, Aug 13, 2025 at 10:45:33PM +0900, Dominique Martinet wrote:
+> Andy Shevchenko wrote on Wed, Aug 13, 2025 at 03:39:09PM +0200:
+> > > I assume Andrew will pick it up eventually?
+> > 
+> > I hope this to happen sooner as it broke my builds too (I always do now `make W=1`
+> > and suggest all developers should follow).
+> 
+> I actually test with W=1 too, but somehow this warning doesn't show up
+> in my build, I'm not quite sure why :/
+> (even if I try clang like the test robot... But there's plenty of
+> other warnings all around everywhere else, so I agree this is all way
+> too manual)
 
-I would say that the unsafe keyword just has to be on the next line
-from the safety comment. Optimizing further than that leads to wonky
-formatting. A similar example that I also think is going too far:
+Depends on your config, last few releases I was specifically targetting x86
+defconfigs (32- and 64-bit) to be build with `make W=1`. There are a couple of
+changes that are still pending, but otherwise it builds with GCC and clang.
 
-let var =3D
-    // SAFETY: bla bla
-    unsafe { value };
+-- 
+With Best Regards,
+Andy Shevchenko
 
-Alice
+
