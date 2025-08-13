@@ -1,84 +1,78 @@
-Received: from submarine.notk.org (submarine.notk.org [62.210.214.84])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DD7B72612;
-	Wed, 13 Aug 2025 13:45:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.210.214.84
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48CC62EACE0;
+	Wed, 13 Aug 2025 13:46:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755092759; cv=none; b=a4AZIe3YPBX+e3pgBB0cc5zD6cY961wgQy9tMaEWwr+XbDuvfOI6Pn2Szf+uhorxapjy5O3hETDRC8oPCrcFkGuLkdYLqhFarT5p1folhgj/9mgDgSLvaR1k8RV2qG5zSadwd55cU+9l9EHaPgr1nRyxjtTzGLb6wMKEH4xDZYg=
+	t=1755092818; cv=none; b=Y6axaw5iot/dumr7cHQQ5egPffo7TK58BH0HBdAA2zZick0yXGwk+i5uOb7n3Xu2tjZiJzFd7jza2mR9zxfbFwtvw96vD3fYjrh0cSEA14UX9kh7DMRHe9/n9W2nUHov/746fw11G19orvaXpIUlAXc9RDLncbY8XsRwQQXnaiM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755092759; c=relaxed/simple;
-	bh=/moHEU+jrzpSY24+lzEDBteKQ7bkZsCMo6ltlWZ5QxQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KUrvx1POMdhJiouMMZhNpukEZBgSkhUdgPBUshfCxFTk/YzCGVbrzfx+KutCWViCwVZg7DAEaKm7ZYCOmQQuprB3ZDjojuUM2US8ZcuTZtLTmTixIW6+c26ryZ/A8K5poMG7mOF001pcgObPvZuZEKf5C9gb3YEuL2fd7O86JW8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codewreck.org; spf=pass smtp.mailfrom=codewreck.org; dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b=iVDqdWfO; arc=none smtp.client-ip=62.210.214.84
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codewreck.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codewreck.org
+	s=arc-20240116; t=1755092818; c=relaxed/simple;
+	bh=UAO9FvzDnoYfoDrmrGeQdcrb/Ul+p/dFDaH44bIxgT4=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=S0LZbyXNgn6ls5T+0VaGRyLgl10oImRpDcDR72wHhkQ4ewfWCo98EzZuTKDkwj7A+d76e2RVLsrnuM2RSEqQEir+wPgOPbU5iENHSgaLr7QKp/ndXI9FpfNqZmvLQ17yYCc1FuCTLBwR3VWWhnK2YfGEpwjDArK/L9U9K3Pv0ew=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d/cHBPZk; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b="iVDqdWfO"
-Received: from gaia.codewreck.org (localhost [127.0.0.1])
-	by submarine.notk.org (Postfix) with ESMTPS id 67C9814C2D3;
-	Wed, 13 Aug 2025 15:45:50 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=codewreck.org;
-	s=2; t=1755092755;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=O7DIiSFTU0d+SOR8smmh+GVaLhshEu060AgzuYvrVMU=;
-	b=iVDqdWfOqfC7zGw5pMTbF0uOkQf840TCcqccC6MfX+jhl/kiESHTstDOEoMxRS/nUQ9Ds6
-	MEBHYWhy9RuQ9+cBA7nglc0sbtNAHjYVZFMvMLj68pFX5tUfEPka2mGiIJnWGOiM4o41Ev
-	RXYM4F8f9Vf8HclTLyjFnK9m7Xpd5+U3HFc6PF7bxgoB9V92C8LJVZzsDiEyLF6qf91di+
-	jAMaVx8cMTp864nf7WcPFtLDEap6afRs5PkVVA+IFVsk+0LOIdoAJW+vqTSf9bez9wh6Sq
-	RbmWS4DMcXMNdHulvj+iLRTjLlw3/C0a/tirBD8qwJsBJfG6dkgbK2ZK54YhbA==
-Received: from localhost (gaia.codewreck.org [local])
-	by gaia.codewreck.org (OpenSMTPD) with ESMTPA id 8a7ce430;
-	Wed, 13 Aug 2025 13:45:48 +0000 (UTC)
-Date: Wed, 13 Aug 2025 22:45:33 +0900
-From: Dominique Martinet <asmadeus@codewreck.org>
-To: Andy Shevchenko <andriy.shevchenko@intel.com>
-Cc: Nathan Chancellor <nathan@kernel.org>,
-	kernel test robot <lkp@intel.com>,
-	Dominique Martinet via B4 Relay <devnull+asmadeus.codewreck.org@kernel.org>,
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
-	Christian Brauner <brauner@kernel.org>,
-	David Howells <dhowells@redhat.com>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Andrew Morton <akpm@linux-foundation.org>, llvm@lists.linux.dev,
-	oe-kbuild-all@lists.linux.dev,
-	Linux Memory Management List <linux-mm@kvack.org>,
-	Maximilian Bosch <maximilian@mbosch.me>,
-	Ryan Lahfa <ryan@lahfa.xyz>, Christian Theune <ct@flyingcircus.io>,
-	Arnout Engelen <arnout@bzzt.net>, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH 1/2] iov_iter: iterate_folioq: fix handling of offset >=
- folio size
-Message-ID: <aJyW_QNI8vIdr03O@codewreck.org>
-References: <20250811-iot_iter_folio-v1-1-d9c223adf93c@codewreck.org>
- <202508120250.Eooq2ydr-lkp@intel.com>
- <20250813051633.GA3895812@ax162>
- <aJwj4dQ3b599qKHn@codewreck.org>
- <aJyVfWKX2eSMsfrb@black.igk.intel.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d/cHBPZk"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 332B3C4CEEB;
+	Wed, 13 Aug 2025 13:46:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755092817;
+	bh=UAO9FvzDnoYfoDrmrGeQdcrb/Ul+p/dFDaH44bIxgT4=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=d/cHBPZkrPeHH4eUrpq8GM07OApm1BfM5L1mK27jh1X4278IaHMdpzE+qr9TxzjTr
+	 L8TpgaEWHxcihTfRbBhMCHTeejJpHafcq6GmksAxlvVxNDOfQNMCbY+q47pPRgjXTE
+	 nd//EOi/PQptWdkO5j94smJX5ErkSpXfzSLTlbYgmiPLZ761Inb4cLWFp9+s8GdufM
+	 I8oPYBUDhY7ZbObOZ+KcogQyYqcuKw52tTp13O0RwVUes+VU5Z4/5p+jP7gVow7u/g
+	 Pn8EDU6iVOIhfZpp4qCbugMY7BvERMdVmT9S7LtLSXmQ5hRnc+SZ0CpAS91CpzPR+6
+	 3q+7Q+iQzUF5A==
+From: Andreas Hindborg <a.hindborg@kernel.org>
+To: Alice Ryhl <aliceryhl@google.com>
+Cc: Boqun Feng <boqun.feng@gmail.com>, Miguel Ojeda <ojeda@kernel.org>, Alex
+ Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>, =?utf-8?Q?Bj?=
+ =?utf-8?Q?=C3=B6rn?= Roy
+ Baron <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>, Trevor
+ Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, Jens Axboe
+ <axboe@kernel.dk>, linux-block@vger.kernel.org,
+ rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 04/15] rust: str: introduce `NullTerminatedFormatter`
+In-Reply-To: <aJw88P7K_6GFmWvW@google.com>
+References: <20250812-rnull-up-v6-16-v4-0-ed801dd3ba5c@kernel.org>
+ <20250812-rnull-up-v6-16-v4-4-ed801dd3ba5c@kernel.org>
+ <vtPB4JcsqY753m500Pb4NVZEAxlKfEEzsrWBWUcEJcxqmhWrWYNqJDH8PFVm03IUm9nEweDNcYeaY2SbKHUOOA==@protonmail.internalid>
+ <aJw88P7K_6GFmWvW@google.com>
+Date: Wed, 13 Aug 2025 14:34:20 +0200
+Message-ID: <87frdvflir.fsf@t14s.mail-host-address-is-not-set>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <aJyVfWKX2eSMsfrb@black.igk.intel.com>
+Content-Type: text/plain
 
-Andy Shevchenko wrote on Wed, Aug 13, 2025 at 03:39:09PM +0200:
-> > I assume Andrew will pick it up eventually?
-> 
-> I hope this to happen sooner as it broke my builds too (I always do now `make W=1`
-> and suggest all developers should follow).
+"Alice Ryhl" <aliceryhl@google.com> writes:
 
-I actually test with W=1 too, but somehow this warning doesn't show up
-in my build, I'm not quite sure why :/
-(even if I try clang like the test robot... But there's plenty of
-other warnings all around everywhere else, so I agree this is all way
-too manual)
+> On Tue, Aug 12, 2025 at 10:44:22AM +0200, Andreas Hindborg wrote:
+>> Add `NullTerminatedFormatter`, a formatter that writes a null terminated
+>> string to an array or slice buffer. Because this type needs to manage the
+>> trailing null marker, the existing formatters cannot be used to implement
+>> this type.
+>>
+>> Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
+>
+> Reviewed-by: Alice Ryhl <aliceryhl@google.com>
+>
+>> +    #[expect(dead_code)]
+>> +    pub(crate) fn from_array<const N: usize>(
+>
+> Don't you delete this function in the next patch?
 
-Anyway, sorry about it...
--- 
-Dominique
+It slipped through the cracks. I'll remove it and respin. Thanks.
+
+
+Best regards,
+Andreas Hindborg
+
+
+
