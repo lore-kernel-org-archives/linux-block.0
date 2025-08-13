@@ -1,171 +1,120 @@
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-002e3701.pphosted.com (mx0b-002e3701.pphosted.com [148.163.143.35])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA2A7244673
-	for <linux-block@vger.kernel.org>; Wed, 13 Aug 2025 18:05:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74F9D265CB3;
+	Wed, 13 Aug 2025 19:52:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.143.35
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755108319; cv=none; b=NE/CvkIXN2Gtw68sK0a61/bgMHEAaqMrl5/oboTlARqcrDe0NJJvvoEX8Q2at/z9eseL/Z/Wt2iEoqnVg4fx1le7S5KDQrPQ5fy1qmHt/iTwo1VEovitj9RpgW9cYGpw8znxgybVGV0ZXQaSnMT5klNkn/p4kNc0jX4xFT1DIDk=
+	t=1755114774; cv=none; b=ieN7lkYXmjdE6+XiMK7D2lMYoU78tahcU24PHbrKFeol7R3mXVgFOPDShR6bYxomPw8I+F9cCLZKXqF2EU0e0LMXeGqxWsr9brsMN/N8tqB/igEfSZBDJA7daN2eIBl5ztwfLF++xd2Wy9j3TWDxrzYpmY9d6V+TnOgHgr8AJGY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755108319; c=relaxed/simple;
-	bh=Vg7gh9cfy51BXM2JMJDjES6VAxhOmu+e+zQgq91e+7Q=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=i4SiTtzjjTZKzq7MqGCLDluwFvPE/pKfmZ0LUMAemmI05mE8jShlBqu818oLMU/WS7uC4vUxF4qCzil/5Bna4IqNMJOGdKfxZwAHxnlXm4xiIryN/FnTh0bi+C6lF1tNn8SKQcf0lPNwrF2zm2SXNWXTr5deVzHuBZxht12RdSg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RJDJwV/L; arc=none smtp.client-ip=209.85.221.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1755114774; c=relaxed/simple;
+	bh=KWoFY6hKsBugkcDcgRdJIXTH0AoFPAeDBMu20QBlw9I=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=sSGGpbMxdEbN+GXZHtcn9lNILLJmDCDUuayUKd8CQ7lGRHdMaTdoIXSfAuvSVuAQ5su+I4Yr4JVtXZR6dVtiLSKBY+RfKgs52dFuN8zU2HBiyeBTseEv46H28bGiotCux8DybH8F5kuVgdEnyr8m8GTj4/wzcGRhOQeq91GPGtY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hpe.com; spf=pass smtp.mailfrom=hpe.com; dkim=pass (2048-bit key) header.d=hpe.com header.i=@hpe.com header.b=Ufmt6c8I; arc=none smtp.client-ip=148.163.143.35
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hpe.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hpe.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RJDJwV/L"
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-3b9e414252dso57481f8f.3
-        for <linux-block@vger.kernel.org>; Wed, 13 Aug 2025 11:05:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1755108315; x=1755713115; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tZhIj1HIBrkAfuxlxrCJHN84IlcctzUEsdAGx6WHyfc=;
-        b=RJDJwV/LeLboJG6zJ1QJ3HkuKwsinxrfP/CMzgxK62TZgm6hbVua0hMxWWFJ5NhUk+
-         /1YFjvmg0ZCxOhkf8KmWAGEzq0bfMImpjbd+ggr+2Ch+lYFPADFQKpxLnXCflvODvNXf
-         XGScLq34OSxy3kZBdjHEWhKpU4BPcdQv6owLRGqNUo/PA+Q0ae7HLEmCAvYxtJ2kvaKO
-         7VFBWPmr7ej/jgT7+KTwXqCnbJB93rXvFeErGnju6bMDnDMCKdLMbXyMwqfZ4o/FEDs7
-         QN8p03bfmIsD1NaZ5o/efkO0+Bz94z4jI89XUo0nsJBPaYYudYFWKcqNm+vIb1/wX41x
-         Uc4A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755108315; x=1755713115;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tZhIj1HIBrkAfuxlxrCJHN84IlcctzUEsdAGx6WHyfc=;
-        b=awK7InGFvtAH/Ow56w4H4Sn5hp19osJHHvfmyEnXXPgwgas2eCrg63z7AR3lukElfm
-         Xe0Fhn33usgsWJjmHaA0J/kzUF6B3ES3H8lKNyMLRj2eJJpHlmZa4u9Q5ofHc5ibIo1y
-         HL7ed0cbd7rE0THnyeQfcbF/UiYWavpK3rS4YFgBTxPbffM/LBaZplSFlzZxKWr0yDcl
-         EA7VcxQBEtGA0efcqwp8Knt1PgBOtKmz/wp9yPp/aLQ4ni/7ePFg4i9EdJmIssAPH9b9
-         vXWOOSOO8VKplRLhTmeiugt6+mg4Xo9zjqGwN7cWccqoTjnvABpW8+P8+uAU74YHltXf
-         VSkQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVHRP/APk4m7PxN8+g0SupiDaB1D5rzkorpxQBzPT+KB7Rg+LmmH48QFgFfgobNo3ukTgUYB7Pn8Y7hug==@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywhtdd8irD8bzh3tqi4kqVr3BFTM4lUMGy1vIV5U8cBW34F/YJE
-	2igWSHCwPNrNVwhXyXD+ByyqnFHHSCmf/+oJyIOblYuRhv46d8xQFCGMCesS4bJgpp3csvphIal
-	ji0QCwZ8Oj9NNIPex6wimxLfX0CwwvlTDge+pG3/g
-X-Gm-Gg: ASbGnctHHMIZ1I6Qpp6CKc0eLksj6eOk0siDyylty/4nayTzBFHHO+LWGxEGaGWPY2U
-	XQfKpcegiwIhESjy/Fts0hfXXg2CrmwFcczU4YCetAExRMmrPjbN707pkq71laqwAwwb2zc2ekO
-	mDGkj/sR8YaUECSLCgpLLmta6w3IKBAfXsCKLXk2V9JnyKjBA52Z15shKukQWlvDM/HE4nhJk7Y
-	nxZgT4+
-X-Google-Smtp-Source: AGHT+IEXxPpWP/dtV2YRycGfty4buirPPVySHBnKiGkqMEsgvMURnxPmxX4fTm9QuMVyENgF0pJocmO64hiRDd19eKg=
-X-Received: by 2002:a05:6000:238a:b0:3b8:fb31:a426 with SMTP id
- ffacd0b85a97d-3b9fc383fccmr150346f8f.57.1755108314922; Wed, 13 Aug 2025
- 11:05:14 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=hpe.com header.i=@hpe.com header.b="Ufmt6c8I"
+Received: from pps.filterd (m0134425.ppops.net [127.0.0.1])
+	by mx0b-002e3701.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57DHkLYu026928;
+	Wed, 13 Aug 2025 19:52:40 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=cc
+	:content-transfer-encoding:date:from:in-reply-to:message-id
+	:mime-version:references:subject:to; s=pps0720; bh=CFGm6yD2o11Im
+	kGZsL2WnWsgd3JghffpkrjurmFusrk=; b=Ufmt6c8IlAH024q9TBqUk8Xr/X4Yu
+	64ANAcVOYQ4BS97+eUJVmndgOMDUKMb8ssuuY9u9ngRHaIGpFLK5a2RnqdBMTUDK
+	Y29vpjgEeHkG7WTK//+Te0Zdjq/Er/FM5IAql2dL5a1efvPyFjIZu9AjYDhHDklg
+	2Fr4fuY5EoGsYE2Qh0jefCtA/7C/WqmVOUfgeXu4qrpdsLsky/pWeIdeJ0D5c02j
+	3wfjSXShUVfz3i7rc0XxjVIq7VMzmyM9Qt+Zcm8essefXf4cIT3LIVJwUeMxAn5q
+	TGEBq6mjokHbq3hDHpN8wwm0qBHoOb4VId/n7FtiDlTCDiMN1hoMqXVIg==
+Received: from p1lg14881.it.hpe.com ([16.230.97.202])
+	by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 48g985vqss-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 13 Aug 2025 19:52:40 +0000 (GMT)
+Received: from test-build-fcntl.hpe.com (unknown [192.58.206.38])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by p1lg14881.it.hpe.com (Postfix) with ESMTPS id 8C7C7805E7F;
+	Wed, 13 Aug 2025 19:52:39 +0000 (UTC)
+Received: by test-build-fcntl.hpe.com (Postfix, from userid 1000)
+	id 691CC89CCED7; Wed, 13 Aug 2025 19:52:36 +0000 (UTC)
+From: Rajeev Mishra <rajeevm@hpe.com>
+To: axboe@kernel.dk, yukuai1@huaweicloud.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Rajeev Mishra <rajeevm@hpe.com>
+Subject: [PATCH v4 2/2] loop: use vfs_getattr_nosec for accurate file size
+Date: Wed, 13 Aug 2025 19:52:27 +0000
+Message-ID: <20250813195228.12021-3-rajeevm@hpe.com>
+X-Mailer: git-send-email 2.43.7
+In-Reply-To: <20250813195228.12021-1-rajeevm@hpe.com>
+References: <20250813195228.12021-1-rajeevm@hpe.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250812-rnull-up-v6-16-v4-0-ed801dd3ba5c@kernel.org>
- <20250812-rnull-up-v6-16-v4-11-ed801dd3ba5c@kernel.org> <mACGre8-fNXj9Z2EpuE3yez_o2T-TtqrdB6HB-VkO0cuvhXsqzECKWMhsz_c43NJUxpsnVpO_U0oLbaaNhXqRQ==@protonmail.internalid>
- <aJw-XWhDahVeejl3@google.com> <87cy8zfkw5.fsf@t14s.mail-host-address-is-not-set>
- <WporCpRrDB_e8ocWi63px_bwtPWqRjDL4kVPNNXFNoI6H-4bgk5P_n4iO0E4m-ElwkiNTyBITwgdMXjREE8VXQ==@protonmail.internalid>
- <CAH5fLggraEP7bwzJ+4ww8-7Ku-Z+d0Em3=NDUpa7r8oTLQy81A@mail.gmail.com> <877bz7f7jg.fsf@t14s.mail-host-address-is-not-set>
-In-Reply-To: <877bz7f7jg.fsf@t14s.mail-host-address-is-not-set>
-From: Alice Ryhl <aliceryhl@google.com>
-Date: Wed, 13 Aug 2025 20:05:02 +0200
-X-Gm-Features: Ac12FXz5FhnA2ZFwHRbSUpKHD0xBzeC_yFvarbuLcF5iab4q_93gsNFoSEqE4nw
-Message-ID: <CAH5fLgi+R=ZW2bFnZP2=231vV6JAHTZJ0UBYkdojG=HjBYR3MA@mail.gmail.com>
-Subject: Re: [PATCH v4 11/15] rnull: enable configuration via `configfs`
-To: Andreas Hindborg <a.hindborg@kernel.org>
-Cc: Boqun Feng <boqun.feng@gmail.com>, Miguel Ojeda <ojeda@kernel.org>, 
-	Alex Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>, 
-	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <lossin@kernel.org>, Trevor Gross <tmgross@umich.edu>, 
-	Danilo Krummrich <dakr@kernel.org>, Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
-	rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-GUID: RJoo7DabdOTxvgMRW9RH14PWcOTwbIqY
+X-Proofpoint-ORIG-GUID: RJoo7DabdOTxvgMRW9RH14PWcOTwbIqY
+X-Authority-Analysis: v=2.4 cv=C87pyRP+ c=1 sm=1 tr=0 ts=689ced08 cx=c_pps
+ a=FAnPgvRYq/vnBSvlTDCQOQ==:117 a=FAnPgvRYq/vnBSvlTDCQOQ==:17
+ a=2OwXVqhp2XgA:10 a=MvuuwTCpAAAA:8 a=xJvGO-ZEL5em5uvXGr0A:9
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODEzMDE4MyBTYWx0ZWRfX2z7qXYRCFi9L
+ JrI9k0q0gVszvReUe/xEkpY+zSpsjpL6Eerepia3bAjX0cJ6YpdeOAbHgFEP1vYcqZTkXiRRFEa
+ P4wTEeudfVQOLUMK/BQuGDtodobb9I7IwNSZiUfg1gZpVeBDZ0YT6oh1l7NfZiaYIEuRwg3B/GN
+ +IqgDBlWeQeoeXp8CXks/0AlvHn3VAJA3Qad1vmjfYPHGeePwMuR8OZK0mxN8mRYY0ycL7eEo/1
+ l1GUQZzoPzSKNKS0oPGhADKnnpZzG+D2XLxtREBsTGPPsY7LVjDXRbeMNPvswPheIGAovp3wfrx
+ p8nKhOppV8NeHFbVtptzaax1iDRBO7uUUyEf4z6rwkThc38zX/EqDe7LsFjRre5HNny8b9vJ0+n
+ M5UN9TSQCscon2Hdmq9Nsex346fREbjOKM5WKz0hqycA9sUwMS9DPi048hUDuRZVN/sF4gqv
+X-HPE-SCL: -1
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-08-13_01,2025-08-11_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501 clxscore=1015 phishscore=0 impostorscore=0 bulkscore=0
+ lowpriorityscore=0 mlxlogscore=971 malwarescore=0 adultscore=0 spamscore=0
+ mlxscore=0 suspectscore=0 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2507300000
+ definitions=main-2508130183
 
-On Wed, Aug 13, 2025 at 7:36=E2=80=AFPM Andreas Hindborg <a.hindborg@kernel=
-.org> wrote:
->
-> "Alice Ryhl" <aliceryhl@google.com> writes:
->
-> > For your convenience, I already wrote a safe wrapper of kstrtobool for
-> > an out-of-tree driver. You're welcome to copy-paste this:
-> >
-> > fn kstrtobool(kstr: &CStr) -> Result<bool> {
-> >     let mut res =3D false;
-> >     to_result(unsafe {
-> > kernel::bindings::kstrtobool(kstr.as_char_ptr(), &mut res) })?;
-> >     Ok(res)
-> > }
->
-> Thanks, I did one as well today, accepting `&str` instead. The examples
-> highlight why it is not great:
+- Use vfs_getattr_nosec() instead of i_size_read() in lo_calculate_size.
+- Improves accuracy for network/distributed filesystems.
 
-Yeah, well, I think we should still use it for consistency.
+Signed-off-by: Rajeev Mishra <rajeevm@hpe.com>
+---
+ drivers/block/loop.c | 15 +++++++++++++--
+ 1 file changed, 13 insertions(+), 2 deletions(-)
 
->   /// Convert common user inputs into boolean values using the kernel's `=
-kstrtobool` function.
->   ///
->   /// This routine returns `Ok(bool)` if the first character is one of 'Y=
-yTt1NnFf0', or
->   /// [oO][NnFf] for "on" and "off". Otherwise it will return `Err(EINVAL=
-)`.
->   ///
->   /// # Examples
->   ///
->   /// ```
->   /// # use kernel::str::kstrtobool;
->   ///
->   /// // Lowercase
->   /// assert_eq!(kstrtobool("true"), Ok(true));
->   /// assert_eq!(kstrtobool("tr"), Ok(true));
->   /// assert_eq!(kstrtobool("t"), Ok(true));
->   /// assert_eq!(kstrtobool("twrong"), Ok(true)); // <-- =F0=9F=A4=B7
->   /// assert_eq!(kstrtobool("false"), Ok(false));
->   /// assert_eq!(kstrtobool("f"), Ok(false));
->   /// assert_eq!(kstrtobool("yes"), Ok(true));
->   /// assert_eq!(kstrtobool("no"), Ok(false));
->   /// assert_eq!(kstrtobool("on"), Ok(true));
->   /// assert_eq!(kstrtobool("off"), Ok(false));
->   ///
->   /// // Camel case
->   /// assert_eq!(kstrtobool("True"), Ok(true));
->   /// assert_eq!(kstrtobool("False"), Ok(false));
->   /// assert_eq!(kstrtobool("Yes"), Ok(true));
->   /// assert_eq!(kstrtobool("No"), Ok(false));
->   /// assert_eq!(kstrtobool("On"), Ok(true));
->   /// assert_eq!(kstrtobool("Off"), Ok(false));
->   ///
->   /// // All caps
->   /// assert_eq!(kstrtobool("TRUE"), Ok(true));
->   /// assert_eq!(kstrtobool("FALSE"), Ok(false));
->   /// assert_eq!(kstrtobool("YES"), Ok(true));
->   /// assert_eq!(kstrtobool("NO"), Ok(false));
->   /// assert_eq!(kstrtobool("ON"), Ok(true));
->   /// assert_eq!(kstrtobool("OFF"), Ok(false));
->   ///
->   /// // Numeric
->   /// assert_eq!(kstrtobool("1"), Ok(true));
->   /// assert_eq!(kstrtobool("0"), Ok(false));
->   ///
->   /// // Invalid input
->   /// assert_eq!(kstrtobool("invalid"), Err(EINVAL));
->   /// assert_eq!(kstrtobool("2"), Err(EINVAL));
->   /// ```
->   pub fn kstrtobool(input: &str) -> Result<bool> {
->       let mut result: bool =3D false;
->       let c_str =3D CString::try_from_fmt(fmt!("{input}"))?;
->
->       // SAFETY: `c_str` points to a valid null-terminated C string, and =
-`result` is a valid
->       // pointer to a bool that we own.
->       let ret =3D unsafe { bindings::kstrtobool(c_str.as_char_ptr(), &mut=
- result as *mut bool) };
->
->       kernel::error::to_result(ret).map(|_| result)
->   }
->
-> Not sure if we should take `CStr` or `str`, what do you think?
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 5faf8607dfb2..0a2703eda2c2 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -139,9 +139,20 @@ static int part_shift;
+ 
+ static loff_t lo_calculate_size(struct loop_device *lo, struct file *file)
+ {
++       struct kstat stat;
+        loff_t loopsize;
+-       /* Compute loopsize in bytes */
+-       loopsize = i_size_read(file->f_mapping->host);
++       int ret;
++
++       /*
++	* Get the accurate file size. This provides better results than
++	* cached inode data, particularly for network filesystems where
++	* metadata may be stale.
++	*/
++       ret = vfs_getattr_nosec(&file->f_path, &stat, STATX_SIZE, 0);
++       if (ret)
++	       return 0;
++
++       loopsize = stat.size;
+        if (lo->lo_offset > 0)
+ 	       loopsize -= lo->lo_offset;
+        /* offset is beyond i_size, weird but possible */
+-- 
+2.43.7
 
-Using CStr makes sense, since it avoids having the caller perform a
-useless utf-8 check.
-
-Alice
