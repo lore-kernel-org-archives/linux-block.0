@@ -1,139 +1,166 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6234D1CEAA3;
-	Wed, 13 Aug 2025 05:03:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8579322A;
+	Wed, 13 Aug 2025 05:16:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755061409; cv=none; b=CebnsCLTOHsAVNhCgBv3Vv6EvEAnXFk/UDfWKXYwlxEzEw2U+4bdxF33XL5E1gqe38ytfpd7RVJwBs1Yy6BBpbzny+ok3BTtVsa8m+ASO8FDNmGb7H3/IygACskdP6a/By3YH1H0ff7cdmE1vL0x2hXJS3e2Tu5zLOFLciRmszA=
+	t=1755062200; cv=none; b=lEVFX6uF2deMs5mairvZ0xllAnIU0qp5rgS19gmHuEzrUvKgfO1IxepOSg5/i0r1g4qdKTrV7DQaI0rmkOkJoRKsvcEEe29AYeM9YnGCRLvhZ1w1B/TRS3K/f3FRscgMGDB0JzzQ7nXU1Uo0Rh7AOsObjUBGCXGQsWWF0K48yYw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755061409; c=relaxed/simple;
-	bh=tGLCXaL5vF+LCtUsKT7SsgJORseZhc8FqciBJ0dqgxY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EwLvn9yHjQTM/kbLnnOEclNzc3CX9Wivw18R2jbj5qGP7MABsATUUHtK3KV6QyizavhVlfAiv/Sc8cWLWffVbWggnrR4F/9ExrLuqTQUd+GTh0cxeNIWosGXE3R06Oa9g17rCWYu3kaRYMk7MxwKWtvoAHni02PAntfbHDxa6C8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=h7oPEyh5; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1755062200; c=relaxed/simple;
+	bh=QHGINcBtgZyN5lwSuC4ihOdgAfkWxrXCvNILJWMOBVA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oRAr/liuJBgbCWoTtOzh6VmszzSvvCVb84t4bQFInCSAfRN3xJWlvlwCx65xLqUc99E2Wij1b6A7Dq5v47XAabHwJwU1++GBl0Jg05enz9JR4+aN0HTZjlHMAO5NHdfEzCdQuQw9A9ZR3b4u12RX18X8qdaRXiDSJh/HWLTB5Yc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NJ8kdtSm; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="h7oPEyh5"
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57CNQNGT030080;
-	Wed, 13 Aug 2025 05:03:12 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=v2yJLc
-	JwV0DvmeGnG0NJR2ILb4sP3qpRQ/zNjH1IqBA=; b=h7oPEyh5ibEjooU63PjEs0
-	iIPDhOw+8QC9cCVNVeYsxwjXhgkiW1Og9tBO4BFGlnKQyUOxqMRV2KLhwFsU0W1t
-	LVnBjRuNsINVVMv7t/+f8xcHjljzFwnzA59ZuGtbfXct9fYmLBqgI6rP7OGYk8y5
-	8/M1pll+S1sOnIFPDuGZDYau3R89YBuURRpNbhR8WiGwhfSIgA744SRSw4Fa8ixQ
-	LppceA+Oqrh6wcMzepQfQrD3skf0YoEi5Trjm/oJepfm5+EA1+TvlbsjImiNtKaf
-	MXQIbtYUbW2hZ35GvMIRxaPfjn5r6BmZefDSEfh+JfQXxTN0nabMGwslxWRj8aqw
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48dwudams7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 13 Aug 2025 05:03:12 +0000 (GMT)
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 57D53BbU004484;
-	Wed, 13 Aug 2025 05:03:11 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48dwudams4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 13 Aug 2025 05:03:11 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 57D41siq025667;
-	Wed, 13 Aug 2025 05:03:10 GMT
-Received: from smtprelay07.wdc07v.mail.ibm.com ([172.16.1.74])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 48ejvmdggw-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 13 Aug 2025 05:03:10 +0000
-Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
-	by smtprelay07.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 57D53AB231457862
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 13 Aug 2025 05:03:10 GMT
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2D76958059;
-	Wed, 13 Aug 2025 05:03:10 +0000 (GMT)
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A6B3A58058;
-	Wed, 13 Aug 2025 05:03:07 +0000 (GMT)
-Received: from [9.61.63.67] (unknown [9.61.63.67])
-	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 13 Aug 2025 05:03:07 +0000 (GMT)
-Message-ID: <c6881897-e824-4978-bb27-3cf0be0303eb@linux.ibm.com>
-Date: Wed, 13 Aug 2025 10:33:00 +0530
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NJ8kdtSm"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6485C4CEEB;
+	Wed, 13 Aug 2025 05:16:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755062199;
+	bh=QHGINcBtgZyN5lwSuC4ihOdgAfkWxrXCvNILJWMOBVA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=NJ8kdtSmVYuDmZ9UTC9uyVZDWkHKpE44JmKlAUuCa7NZxop2ZK8q7CC++ZZVKGYqf
+	 2FtFO5vBHtDjYhIFJTJjQSsJRbxUaf0a5k9GCO/vI0kEc2Amu0RlAFK5LI+90qUwE8
+	 Wt/HmHsp350LKxT3V5edx5EIk5k5/dHroc1gWPsZBPQTy3e4Ep/IgKDgKWQmnFs0sw
+	 6cqFtidy2jtFeD3RQfgLFaCCGVcqzgmOXefeTkU64Ioo3+VbGhOKm4ArnHUoBv87xd
+	 3Pvm2U1X+nJMrmwtp/okmHBkuSQR3Yb1oCRfS+C3ip0SypefYd4i8fT0xp5j3V9lPt
+	 9tySUkpa34FBg==
+Date: Tue, 12 Aug 2025 22:16:33 -0700
+From: Nathan Chancellor <nathan@kernel.org>
+To: kernel test robot <lkp@intel.com>
+Cc: Dominique Martinet via B4 Relay <devnull+asmadeus.codewreck.org@kernel.org>,
+	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
+	Christian Brauner <brauner@kernel.org>,
+	David Howells <dhowells@redhat.com>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Andrew Morton <akpm@linux-foundation.org>, llvm@lists.linux.dev,
+	oe-kbuild-all@lists.linux.dev,
+	Linux Memory Management List <linux-mm@kvack.org>,
+	Maximilian Bosch <maximilian@mbosch.me>,
+	Ryan Lahfa <ryan@lahfa.xyz>, Christian Theune <ct@flyingcircus.io>,
+	Arnout Engelen <arnout@bzzt.net>, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	Dominique Martinet <asmadeus@codewreck.org>, stable@vger.kernel.org
+Subject: Re: [PATCH 1/2] iov_iter: iterate_folioq: fix handling of offset >=
+ folio size
+Message-ID: <20250813051633.GA3895812@ax162>
+References: <20250811-iot_iter_folio-v1-1-d9c223adf93c@codewreck.org>
+ <202508120250.Eooq2ydr-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] block: restore default wbt enablement
-To: Julian Sun <sunjunchao2870@gmail.com>, linux-block@vger.kernel.org
-Cc: axboe@kernel.dk, ming.lei@redhat.com,
-        Julian Sun <sunjunchao@bytedance.com>, stable@vger.kernel.org
-References: <20250812154257.57540-1-sunjunchao@bytedance.com>
-Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <20250812154257.57540-1-sunjunchao@bytedance.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODEyMDIyNCBTYWx0ZWRfX5V2ue0HMwuR5
- PFS9jnAN56WMniPy0imsi3vgQc8fir4qojnXjOjrJef7PdutCkOGLUDtmLIGvxSJgJnmrIE2Rlh
- jdbSL4OViGr8HP+GVVne0D6Gr3rV+czKSjxTZAGsjGy50YS45nunKX9xH0Bsv2+enwWiHoPfYMs
- 8AuKAaRasyaMgY/G6WYTBwnekFirnfoXsfvIdaFLz/GDc0Jd+frvJFddQWtWo2GSyiUvgDzllSz
- l3vn3q++HZ1yCewWKSFTS86Nf+OXzMHtxsF0o70I744Wrd5KA4MhYVuymUF14twiW4fUJMr6DPU
- k6DQn4RXViJ80N8SbhMbW7al/YR8JUisEyXZiMigMq/nv2XU0xP4nl3qI2F+AAeSdspo3zEQF1s
- otN2T8s8
-X-Authority-Analysis: v=2.4 cv=d/31yQjE c=1 sm=1 tr=0 ts=689c1c90 cx=c_pps
- a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
- a=IkcTkHD0fZMA:10 a=2OwXVqhp2XgA:10 a=968KyxNXAAAA:8 a=VwQbUJbxAAAA:8
- a=VnNF1IyMAAAA:8 a=qyw61lXL-B-xqPK-4asA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-GUID: xR-kUKshz68yBRlOtG81zVrFMIdN_khy
-X-Proofpoint-ORIG-GUID: HHK6-3W_pvTH_4gJNl6C7EelEolvZwKa
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-08-12_08,2025-08-11_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 suspectscore=0 impostorscore=0 priorityscore=1501 phishscore=0
- spamscore=0 adultscore=0 bulkscore=0 malwarescore=0 classifier=typeunknown
- authscore=0 authtc= authcc= route=outbound adjust=0 reason=mlx scancount=1
- engine=8.19.0-2507300000 definitions=main-2508120224
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <202508120250.Eooq2ydr-lkp@intel.com>
 
+On Tue, Aug 12, 2025 at 02:55:55AM +0800, kernel test robot wrote:
+> Hi Dominique,
+> 
+> kernel test robot noticed the following build warnings:
+> 
+> [auto build test WARNING on 8f5ae30d69d7543eee0d70083daf4de8fe15d585]
+> 
+> url:    https://github.com/intel-lab-lkp/linux/commits/Dominique-Martinet-via-B4-Relay/iov_iter-iterate_folioq-fix-handling-of-offset-folio-size/20250811-154319
+> base:   8f5ae30d69d7543eee0d70083daf4de8fe15d585
+> patch link:    https://lore.kernel.org/r/20250811-iot_iter_folio-v1-1-d9c223adf93c%40codewreck.org
+> patch subject: [PATCH 1/2] iov_iter: iterate_folioq: fix handling of offset >= folio size
+> config: i386-buildonly-randconfig-002-20250811 (https://download.01.org/0day-ci/archive/20250812/202508120250.Eooq2ydr-lkp@intel.com/config)
+> compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
+> reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250812/202508120250.Eooq2ydr-lkp@intel.com/reproduce)
+> 
+> If you fix the issue in a separate patch/commit (i.e. not just a new version of
+> the same patch/commit), kindly add following tags
+> | Reported-by: kernel test robot <lkp@intel.com>
+> | Closes: https://lore.kernel.org/oe-kbuild-all/202508120250.Eooq2ydr-lkp@intel.com/
+> 
+> All warnings (new ones prefixed by >>):
+> 
+>    In file included from lib/iov_iter.c:14:
+> >> include/linux/iov_iter.h:171:7: warning: variable 'remain' is used uninitialized whenever 'if' condition is true [-Wsometimes-uninitialized]
+>      171 |                 if (skip >= fsize)
+>          |                     ^~~~~~~~~~~~~
+>    include/linux/iov_iter.h:190:7: note: uninitialized use occurs here
+>      190 |                 if (remain)
+>          |                     ^~~~~~
+>    include/linux/iov_iter.h:171:3: note: remove the 'if' if its condition is always false
+>      171 |                 if (skip >= fsize)
+>          |                 ^~~~~~~~~~~~~~~~~~
+>      172 |                         goto next;
+>          |                         ~~~~~~~~~
+>    include/linux/iov_iter.h:163:22: note: initialize the variable 'remain' to silence this warning
+>      163 |                 size_t part, remain, consumed;
+>          |                                    ^
+>          |                                     = 0
+>    1 warning generated.
 
+I see this in -next now, should remain be zero initialized or is there
+some other fix that is needed?
 
-On 8/12/25 9:12 PM, Julian Sun wrote:
-> The commit 245618f8e45f ("block: protect wbt_lat_usec using
-> q->elevator_lock") protected wbt_enable_default() with
-> q->elevator_lock; however, it also placed wbt_enable_default()
-> before blk_queue_flag_set(QUEUE_FLAG_REGISTERED, q);, resulting
-> in wbt failing to be enabled.
+> vim +171 include/linux/iov_iter.h
 > 
-> Moreover, the protection of wbt_enable_default() by q->elevator_lock
-> was removed in commit 78c271344b6f ("block: move wbt_enable_default()
-> out of queue freezing from sched ->exit()"), so we can directly fix
-> this issue by placing wbt_enable_default() after
-> blk_queue_flag_set(QUEUE_FLAG_REGISTERED, q);.
+>    143	
+>    144	/*
+>    145	 * Handle ITER_FOLIOQ.
+>    146	 */
+>    147	static __always_inline
+>    148	size_t iterate_folioq(struct iov_iter *iter, size_t len, void *priv, void *priv2,
+>    149			      iov_step_f step)
+>    150	{
+>    151		const struct folio_queue *folioq = iter->folioq;
+>    152		unsigned int slot = iter->folioq_slot;
+>    153		size_t progress = 0, skip = iter->iov_offset;
+>    154	
+>    155		if (slot == folioq_nr_slots(folioq)) {
+>    156			/* The iterator may have been extended. */
+>    157			folioq = folioq->next;
+>    158			slot = 0;
+>    159		}
+>    160	
+>    161		do {
+>    162			struct folio *folio = folioq_folio(folioq, slot);
+>    163			size_t part, remain, consumed;
+>    164			size_t fsize;
+>    165			void *base;
+>    166	
+>    167			if (!folio)
+>    168				break;
+>    169	
+>    170			fsize = folioq_folio_size(folioq, slot);
+>  > 171			if (skip >= fsize)
+>    172				goto next;
+>    173			base = kmap_local_folio(folio, skip);
+>    174			part = umin(len, PAGE_SIZE - skip % PAGE_SIZE);
+>    175			remain = step(base, progress, part, priv, priv2);
+>    176			kunmap_local(base);
+>    177			consumed = part - remain;
+>    178			len -= consumed;
+>    179			progress += consumed;
+>    180			skip += consumed;
+>    181			if (skip >= fsize) {
+>    182	next:
+>    183				skip = 0;
+>    184				slot++;
+>    185				if (slot == folioq_nr_slots(folioq) && folioq->next) {
+>    186					folioq = folioq->next;
+>    187					slot = 0;
+>    188				}
+>    189			}
+>    190			if (remain)
+>    191				break;
+>    192		} while (len);
+>    193	
+>    194		iter->folioq_slot = slot;
+>    195		iter->folioq = folioq;
+>    196		iter->iov_offset = skip;
+>    197		iter->count -= progress;
+>    198		return progress;
+>    199	}
+>    200	
 > 
-> Additionally, this issue also causes the inability to read the
-> wbt_lat_usec file, and the scenario is as follows:
-> 
-> root@q:/sys/block/sda/queue# cat wbt_lat_usec
-> cat: wbt_lat_usec: Invalid argument
-> 
-> root@q:/data00/sjc/linux# ls /sys/kernel/debug/block/sda/rqos
-> cannot access '/sys/kernel/debug/block/sda/rqos': No such file or directory
-> 
-> root@q:/data00/sjc/linux# find /sys -name wbt
-> /sys/kernel/debug/tracing/events/wbt
-> 
-> After testing with this patch, wbt can be enabled normally.
-> 
-> Signed-off-by: Julian Sun <sunjunchao@bytedance.com>
-> Cc: stable@vger.kernel.org
-> Fixes: 245618f8e45f ("block: protect wbt_lat_usec using q->elevator_lock")
-
-Looks good to me:
-Reviewed-by: Nilay Shroff <nilay@linux.ibm.com>
+> -- 
+> 0-DAY CI Kernel Test Service
+> https://github.com/intel/lkp-tests/wiki
