@@ -1,121 +1,86 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BBE472612;
-	Wed, 13 Aug 2025 13:47:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4878A2EA74B
+	for <linux-block@vger.kernel.org>; Wed, 13 Aug 2025 13:49:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755092824; cv=none; b=kJpylb+WQLP5103vgoCsB58i0Jl6os8Pe2LJda3Rn8CGELSZylSFnBEnOmO6UjCHlfITpQrbqNfXpUpVPZRh4lvcM8aHR1ikli1fLyekLMzZ3dN33WTIDehHFll2ZiNcKxV+89fgg28xwf7/LGYWG2EqhNfZDDSws50QdJXGato=
+	t=1755092971; cv=none; b=F6KUL6SYEqp4TIx9NSXShFzX4nJHTCowpAXFNJ3GBqAk1XNxt5gl0kl8rwZ2XMBJKPPLz7/cn3okCnH8/4daNc47MObOUso/AjntuJXpTXM1ChUTWeG+So8OMe2AystnsJlttkBSjyeUY3alpcAJ1ftyAaUpq0/kZajKe2BpHkk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755092824; c=relaxed/simple;
-	bh=skTD0SI9AspNlQ8bU333//dSbcnveCgVWNlXOLVrO7c=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=BnrNzdLcQb6ZjK/gjHWnaLjrc5Fg/uWeSsQoAgmXdWH9GStEg2Xzgs+8OIpU0xSByrC2B1OzJKPZXyq1FaWri5JvgQVu/JkWxhRDWiUVy3UB4BmxT+8UXp8v9G/ZO+ewI34nv/fE+ktGjNm/AszNskIN4170OW9IhA1JReUOBjA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M18xxNYe; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1755092971; c=relaxed/simple;
+	bh=ngX7KqakvaHrr7jdbnboB1CiS7jx0blLv4FZ9WlGS6Y=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=eAPPcNkBIl6fmsazNXSeKSOfWX8twdR40HZ8SnFnhq0cl4E87AaAOllVJD+rnXqRRZz9qTCOiskxOwSVFU5UHZckn3YRYY1d0ygYUPxeGJS111/+QQ+8pSl80Ka/qFm3lQhZOaP3tFnbhPGSSfYRfhTSRqQaERIgU9w2Z57jRjE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RQpLU5gK; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M18xxNYe"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87871C4CEF5;
-	Wed, 13 Aug 2025 13:47:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755092824;
-	bh=skTD0SI9AspNlQ8bU333//dSbcnveCgVWNlXOLVrO7c=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=M18xxNYePA2ppj61JQedKnSEcULx0Cbsb6JDG4xh6cNaw077TVzJgecCyFohttpHj
-	 1tPTL5MS9fQYth99e+6CXxPlLpgA/0jiskAJrzIcMFEruapXaSMwb/Y1oXNdFwiSb1
-	 j07UINH4E6YUZFwuRAYyizwo1GtaRIMttrupNVEFOot+hm8FmRSAjeu1Wan/mrVlU9
-	 YqHRPpNiRb/xzR8qmIkB+p0SujAnXbfRzVlxzIdLBAOVCqUmxcRAzv4jm1P9OJU8Fs
-	 ehF9OE/OMdJ7riJOxadaIU/NksaVWKJl0qXeV1aZKAQPBnFjTkaz9u67muFDWOv4ms
-	 +8+MV+bUznEFw==
-From: Andreas Hindborg <a.hindborg@kernel.org>
-To: Alice Ryhl <aliceryhl@google.com>
-Cc: Boqun Feng <boqun.feng@gmail.com>, Miguel Ojeda <ojeda@kernel.org>, Alex
- Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>, =?utf-8?Q?Bj?=
- =?utf-8?Q?=C3=B6rn?= Roy
- Baron <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>, Trevor
- Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, Jens Axboe
- <axboe@kernel.dk>, linux-block@vger.kernel.org,
- rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 11/15] rnull: enable configuration via `configfs`
-In-Reply-To: <aJw-XWhDahVeejl3@google.com>
-References: <20250812-rnull-up-v6-16-v4-0-ed801dd3ba5c@kernel.org>
- <20250812-rnull-up-v6-16-v4-11-ed801dd3ba5c@kernel.org>
- <mACGre8-fNXj9Z2EpuE3yez_o2T-TtqrdB6HB-VkO0cuvhXsqzECKWMhsz_c43NJUxpsnVpO_U0oLbaaNhXqRQ==@protonmail.internalid>
- <aJw-XWhDahVeejl3@google.com>
-Date: Wed, 13 Aug 2025 14:47:54 +0200
-Message-ID: <87cy8zfkw5.fsf@t14s.mail-host-address-is-not-set>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RQpLU5gK"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1755092968;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ngX7KqakvaHrr7jdbnboB1CiS7jx0blLv4FZ9WlGS6Y=;
+	b=RQpLU5gKqAQmlPqTTWU06eTp7WVhLv3Vnl4g51hLES5izZjnBGAH2eCxdM8ZL0khQVKRt1
+	AtfNiUcgpOHAwHnSg38LDq8hjUbBN87OQHr+qJ2IWlQq3jmeXfIs/mICKHioPYJ3Ch5MUX
+	cP83/PuVPFzdNG3hDphW/vCyaYsQxvU=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-85-7Vo1U-J3ONyy5NFUj1oonA-1; Wed,
+ 13 Aug 2025 09:49:25 -0400
+X-MC-Unique: 7Vo1U-J3ONyy5NFUj1oonA-1
+X-Mimecast-MFC-AGG-ID: 7Vo1U-J3ONyy5NFUj1oonA_1755092957
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2ACA2195609F;
+	Wed, 13 Aug 2025 13:49:16 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.21])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1AE64300145D;
+	Wed, 13 Aug 2025 13:49:08 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <aJwj4dQ3b599qKHn@codewreck.org>
+References: <aJwj4dQ3b599qKHn@codewreck.org> <20250811-iot_iter_folio-v1-1-d9c223adf93c@codewreck.org> <202508120250.Eooq2ydr-lkp@intel.com> <20250813051633.GA3895812@ax162>
+To: Dominique Martinet <asmadeus@codewreck.org>,
+    Christian Brauner <brauner@kernel.org>
+Cc: dhowells@redhat.com, Nathan Chancellor <nathan@kernel.org>,
+    kernel test robot <lkp@intel.com>,
+    Dominique Martinet via B4 Relay <devnull+asmadeus.codewreck.org@kernel.org>,
+    "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+    Alexander Viro <viro@zeniv.linux.org.uk>,
+    Andrew Morton <akpm@linux-foundation.org>, llvm@lists.linux.dev,
+    oe-kbuild-all@lists.linux.dev,
+    Linux Memory Management List <linux-mm@kvack.org>,
+    Maximilian Bosch <maximilian@mbosch.me>, Ryan Lahfa <ryan@lahfa.xyz>,
+    Christian Theune <ct@flyingcircus.io>,
+    Arnout Engelen <arnout@bzzt.net>, linux-kernel@vger.kernel.org,
+    linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+    stable@vger.kernel.org
+Subject: Re: [PATCH 1/2] iov_iter: iterate_folioq: fix handling of offset >= folio size
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <758962.1755092947.1@warthog.procyon.org.uk>
+Date: Wed, 13 Aug 2025 14:49:07 +0100
+Message-ID: <758963.1755092947@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-"Alice Ryhl" <aliceryhl@google.com> writes:
+Dominique Martinet <asmadeus@codewreck.org> wrote:
 
-> On Tue, Aug 12, 2025 at 10:44:29AM +0200, Andreas Hindborg wrote:
->> Allow rust null block devices to be configured and instantiated via
->> `configfs`.
->>
->> Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
->
-> Overall LGTM, but a few comments below:
->
->> diff --git a/drivers/block/rnull/configfs.rs b/drivers/block/rnull/configfs.rs
->> new file mode 100644
->> index 000000000000..8d469c046a39
->> --- /dev/null
->> +++ b/drivers/block/rnull/configfs.rs
->> @@ -0,0 +1,218 @@
->> +// SPDX-License-Identifier: GPL-2.0
->> +
->> +use super::{NullBlkDevice, THIS_MODULE};
->> +use core::fmt::Write;
->> +use kernel::{
->> +    block::mq::gen_disk::{GenDisk, GenDiskBuilder},
->> +    c_str,
->> +    configfs::{self, AttributeOperations},
->> +    configfs_attrs, new_mutex,
->
-> It would be nice to add
->
-> 	pub use configfs_attrs;
->
-> to the configfs module so that you can import the macro from the
-> configfs module instead of the root.
+> I assume Andrew will pick it up eventually?
 
-OK, I'll do that.
+These might be more a Christian/VFS thing.
 
->
->> +            try_pin_init!( DeviceConfig {
->> +                data <- new_mutex!( DeviceConfigInner {
->
-> Extra spaces in these macros.
-
-Thanks. I subconsciously like the space in that location, so when
-rustfmt is bailing, I get these things in my code.
-
->> +        let power_op_str = core::str::from_utf8(page)?.trim();
->> +
->> +        let power_op = match power_op_str {
->> +            "0" => Ok(false),
->> +            "1" => Ok(true),
->> +            _ => Err(EINVAL),
->> +        }?;
->
-> We probably want kstrtobool here instead of manually parsing the
-> boolean.
-
-Yea, I was debating on this a bit. I did want to consolidate this code,
-but I don't particularly like ktostrbool. But I guess in the name of
-consistency across the kernel it is the right choice.
-
-I'll add it to next spin.
-
-
-Best regards,
-Andreas Hindborg
-
-
-
+David
 
