@@ -1,205 +1,104 @@
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28E22381BA
-	for <linux-block@vger.kernel.org>; Wed, 13 Aug 2025 12:16:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A8DF39FF3
+	for <linux-block@vger.kernel.org>; Wed, 13 Aug 2025 12:32:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755087413; cv=none; b=VKGhuTr4t4F61vHPp/FBg678AWAmgWvH5gsJHS7WReWIGrB2CbEHGzlAHQ6in9k1uybJnhnMSEHSbW2ylkbaCo3pV3TDSIr6ywx+4Ksbz0Lod1Havkid1V+ZNHoMZQY+g44ZggRMhINW9Rui5E/hO3JK5tHx5W4m4LxUvce3WVU=
+	t=1755088340; cv=none; b=tmZEu0B7h4H8Rxf0Bm4nbW0SGSSazPRW62XduxuC2E8h/Y4zfxMq0Vo32F3tq7JvSXrb5/ioMLcMOXHRFr/RIETuA7BdshT5vKzz4ohi0w058H6r8u8q1M8GAWWJnlBSEtJf02t9m/8cPGQ8pn6liC0S+TzzPLiTYaVQazxFjcM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755087413; c=relaxed/simple;
-	bh=79lvpZfIhzD8D4GxnvWIrfr/GVRDTL3NgA6kaY82knI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Ra4R310uarYfrq1MZXFumOOa03fmk8ri7/JI21pWNx1q5p62mfvLcmbSrkPCw6ZfBBsbPfENyS2OzTBO2CoQ8RCCGITDINpv8PfKx05QiFjeIjg8vfbRL6l2j6z3f43Apqc8xywBt+YXun7hAvVPQ1TPR9lFj/nyT1BTzfur14Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=TN46G+Lg; arc=none smtp.client-ip=209.85.210.169
+	s=arc-20240116; t=1755088340; c=relaxed/simple;
+	bh=78VP5p10Jg8NcnMtDmrrGCJeg8umSedtsXpZInRySm8=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=b3k9C3AJorU6p54cxZuPkfxh6ajp/9ze9GaiqEDM5J87Rxx8JQC7UCns/lo/wMROF9Ip2w0CQLw4CX5RVm18SDylJxMD2rWSzR6sm2HRyfbTJ3VbGodFbN25kKob/HP86MV4psPlMxpclBI1hocpgsG6z9eZ0ORflJ+PmjnexKE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=TBburqiv; arc=none smtp.client-ip=209.85.216.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="TN46G+Lg"
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-76bd6e84eddso7850977b3a.0
-        for <linux-block@vger.kernel.org>; Wed, 13 Aug 2025 05:16:49 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="TBburqiv"
+Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-3215b37c75eso5570868a91.2
+        for <linux-block@vger.kernel.org>; Wed, 13 Aug 2025 05:32:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1755087409; x=1755692209; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=T9HuHfAVojkKpHl/ZLpljLYmGL6VjE+WgaCEQ9lAUc4=;
-        b=TN46G+Lg1Wcq/WRdzEWxX/xZ8+iwXMgw6Qlysp/GwA/IHfO1TAw17IBmViaMJw7Wet
-         ngP7NywcKYDglHk1b7cibafiboFwHFZhnry+g+kIHctjNZDUBPWmlMW/mSHAINx0roRD
-         wj9IbqTmL/bNaDV+XTodbV7mEfQ5q2wuMmK61hKd9aWgf7AD8+LtHdrHBC3GxsYDEwSU
-         58jC4Fu6YwvRnHfwiTaQGwqYqD5QGwmyf7zDZv4X3PpcEgD6KoJnVWS3l1oxfpyh+jt1
-         csgWocDOZazTLpdNFTBOi2O23wyjXFp6GN/dDDWdTKOjfdzv79ZTucOTFOghsasnoPX3
-         SDhw==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1755088339; x=1755693139; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BNG3CwDZnVq+LlYCqJlDgz0JDJC7ub+N0Uk1MeSzHuI=;
+        b=TBburqivT3KjGd0sx1ZE6gaEt9UKi92w5ljhr5HpeOgmGTfeV00sTQqV6m+oQc1rCB
+         7SI1lcCNGSVz+igOdgKYUClWd8J03WLMVFB4WjtUFeNgj5EZSmlkTMYIXaAw5yfgF15y
+         uDUzhqE0hDyZ0ZMeTXouW1i4VvZlaa5rZaMqQm1ubEIMaqfANh24AbH8yoXTZDW8vMxG
+         2wI8i0YpypuV8oo3KUyAufbN/k9Ir64dB7/S8b7I1Lbc7UcSXv+gOdWyciMvbzcXvEbW
+         PaM4Wj8p+8cuNF6PjHcD7Wd8XJslZoj0HxBuq1lSYLaEsUnYA2VMo8Ni9MyivVrZE+F7
+         Xmmg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755087409; x=1755692209;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=T9HuHfAVojkKpHl/ZLpljLYmGL6VjE+WgaCEQ9lAUc4=;
-        b=mcqzP5F0J3I4xh1zltlSqNZ9cLDlnqV6wKeSCMMJ1iR8h5WlrqTwluGSaLL1QbOodV
-         3HBtzlaPKdmoyNKVaf1DXb35kZ4iqaw0x7Mo+KEAwNPGqmVpnYC+1P7XpEmDqUFSFFto
-         h11eIHEqVkwbx2O5lUeaDeZ2VcUC6yebIWDOo+EPO6fSfSZdAlwC47TUlbbz0Fmd8tr7
-         3fuqRtNl7DdWWglvav07sDZVbTH9OcmdBGrMaOMFfz7QaoW/Tq3uO4ZWYVtevVeaYxuh
-         F5eSREVkMlz3zqLjXVXYBUYjv3/9OHQM1d0OR/ZkgrTiSD7bXusnjjQSgMclFsFYenTM
-         1uvg==
-X-Gm-Message-State: AOJu0Yw1oiNGACl9b9LPLYu5a+P4wpWw3/ZwBSI8WZQC1Zg2LZrshMqh
-	7KWp6/AAJAYJU6UKIR3bzTsD051fH04hI9Q/bQhnfE0hSAiCV6DJ6NHK2loGmHbiahU=
-X-Gm-Gg: ASbGnctQhogKQpoUcY8OYwEtay/nRWmb8FsZ613IaYekUXLn05VvQamHi4/wX9rG2uj
-	iuxOpSpMJCa4vuChUqJa3WpnNQRcAYThAExSmOdSuxl0PaQi+oRlTVdfg64zw9k1WCtBvyHHeUJ
-	vAfHz0C/6yvUFKGCu+3SuF3esptUXfX6em7TUhYHH9xV5aOp0S2FDr8Pav0zSpqoO1UIU8SewvA
-	uY14+qkgMIXN5Tr1GYPa69IihaEJEIohvEnW03uwgy4QbRZxRornoWq33sPShnggvhFf63+Q0MZ
-	GuukQXkNmNQLddfHsn3gvTEHnjngP/lDYP/EvskccH8RBGrnLKTHyPD+i5+T/xXy6usFM5BuUrN
-	6ZiKteJ+2mYmZN6wk/quI
-X-Google-Smtp-Source: AGHT+IGpiNyXbIeUJXQ0nkGsBoO5jb6UJe8lAO5yRDp+yo5rw0L6traVCY85hTRH2GKKsJLJxPN/iw==
-X-Received: by 2002:a05:6a00:1301:b0:736:2a73:6756 with SMTP id d2e1a72fcca58-76e20fcfc0emr3796268b3a.21.1755087409278;
-        Wed, 13 Aug 2025 05:16:49 -0700 (PDT)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-76e10282114sm4432115b3a.75.2025.08.13.05.16.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 Aug 2025 05:16:47 -0700 (PDT)
-Message-ID: <d8fcf9bf-6b90-444a-8a26-658cee9e7f58@kernel.dk>
-Date: Wed, 13 Aug 2025 06:16:46 -0600
+        d=1e100.net; s=20230601; t=1755088339; x=1755693139;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=BNG3CwDZnVq+LlYCqJlDgz0JDJC7ub+N0Uk1MeSzHuI=;
+        b=jrSJay5XT20N8yDVDDNVGBBvZSBCAzmBtA7v/pkiggVs1L4c9PK99bBZSu/4J/D7SH
+         r9DmVpUJRMZqXLx8KweSuYG/tkPdN2kpRhq7TCh/TE5q01Gmrux8fUOZLUIg5v7AT7hD
+         RPY/wP2xvogXqbtagGVh3garTsczroUJUNveruyyITea0ADm2U97gNvtCITtKvAXUeZc
+         38PxqKPaRab6LSCeXLw9Kf0jFK8YdoATz1Ytpog2fugZrLl1y4jp0LiuddRVoq1xNM83
+         ixMZ+Wnsk7YraKWwRo6mJaOWEIMjG5wi+5cNt63pKz6x9Ktt4W2WWCtPAQWEaVWb1SnJ
+         GgGA==
+X-Forwarded-Encrypted: i=1; AJvYcCWkASydvaxJAyyQ4aRfUnNliTrW7KiXTzdC2VjxCdva8vfwbedtah2c0n+9QSkmQlJ9siGB0PlhKJN7sg==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx+OfqXZva74hB2PtHYGJCIPOoUtCDMR/aoQajEdKAlxCg5Pegd
+	kk0Qqi+rrF0zysneVIn0a0Yzdg8pWNzlx/c19y7h5LI4wjd+IAC1y/0M7J3q9Naykj0=
+X-Gm-Gg: ASbGncvSr5pRVTuKPOmBQiLUXdPjUl/sTdG3rHplBCp/ZbeomgYVXkjmxLkzSLo6HD+
+	Ew2FW2N8oY0WevnPNGhaYJILwkn2eKvK9AQORYYQTx5FJFA0hjUggeZtY22ZUJi7nwR0y+xZ6IA
+	OK7UQGFZ4eckdHkWVx2b88UoKprlc8ZFOCe3l60Gkw47I1ushG3x8W4cNb4IvAvYgwxMVQZ/WRX
+	yDjKSOhn5sCGe9bi70quVKqgc4Nv2G1Uz0FAdBgL6QFTuwfgXUBYuFCIOidw27o6Rtl9xBDGKI1
+	oAA1OCSNGXc7sGsfNIXlRrbu/NaV9HzzSbhEpBkJWV8hsVPARqj9g9ZwzZ8NEbDafn1wQQ9YBM/
+	0RRUQu78FEffSVI8=
+X-Google-Smtp-Source: AGHT+IH45G27XmEuq78X8gxw6G2P5IIWEUKaJJDkJWCvlT9IOAHkUHlLvMF5cfFKCUbmxNPSZShPMA==
+X-Received: by 2002:a17:90b:5211:b0:31e:fe18:c6df with SMTP id 98e67ed59e1d1-321d0e5cdc3mr4379625a91.16.1755088338731;
+        Wed, 13 Aug 2025 05:32:18 -0700 (PDT)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3232553e4a2sm82418a91.4.2025.08.13.05.32.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Aug 2025 05:32:18 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: Damien Le Moal <dlemoal@kernel.org>, 
+ Philipp Reisner <philipp.reisner@linbit.com>, 
+ Lars Ellenberg <lars.ellenberg@linbit.com>, 
+ Jonathan Corbet <corbet@lwn.net>, Erick Karanja <karanja99erick@gmail.com>
+Cc: Christoph Hellwig <hch@lst.de>, 
+ =?utf-8?q?Christoph_B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>, 
+ linux-block@vger.kernel.org, drbd-dev@lists.linbit.com, 
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ skhan@linuxfoundation.org, linux-kernel-mentees@lists.linuxfoundation.org
+In-Reply-To: <20250813071837.668613-1-karanja99erick@gmail.com>
+References: <20250813071837.668613-1-karanja99erick@gmail.com>
+Subject: Re: [PATCH] Docs: admin-guide: Correct spelling mistake
+Message-Id: <175508833758.953995.10420055026430792302.b4-ty@kernel.dk>
+Date: Wed, 13 Aug 2025 06:32:17 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/2] block: blk-rq-qos: replace static key with atomic
- bitop
-To: Nilay Shroff <nilay@linux.ibm.com>, Yu Kuai <yukuai1@huaweicloud.com>,
- Ming Lei <ming.lei@redhat.com>
-Cc: linux-block@vger.kernel.org, kch@nvidia.com, shinichiro.kawasaki@wdc.com,
- hch@lst.de, gjoyce@ibm.com, "yukuai (C)" <yukuai3@huawei.com>
-References: <20250804122125.3271397-1-nilay@linux.ibm.com>
- <aJC4tDUsk42Nb9Df@fedora>
- <682f0f43-733a-4c04-91ed-5665815128bc@linux.ibm.com>
- <d4d21177-e49e-4959-b68c-707a15dccf73@kernel.dk>
- <e00a3951-2cc8-3634-788e-8a174bdc6a8f@huaweicloud.com>
- <06b0f3f6-1419-4b01-85a5-fe3bb38a6c63@linux.ibm.com>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <06b0f3f6-1419-4b01-85a5-fe3bb38a6c63@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3-dev-2ce6c
 
-On 8/13/25 5:20 AM, Nilay Shroff wrote:
-> Hi Jens,
+
+On Wed, 13 Aug 2025 10:18:36 +0300, Erick Karanja wrote:
+> Fix spelling mistake directoy to directory
 > 
-> On 8/6/25 7:14 AM, Yu Kuai wrote:
->> Hi,
->>
->> ? 2025/08/06 9:28, Jens Axboe ??:
->>> On 8/4/25 10:58 PM, Nilay Shroff wrote:
->>>>
->>>>
->>>> On 8/4/25 7:12 PM, Ming Lei wrote:
->>>>> On Mon, Aug 04, 2025 at 05:51:09PM +0530, Nilay Shroff wrote:
->>>>>> This patchset replaces the use of a static key in the I/O path (rq_qos_
->>>>>> xxx()) with an atomic queue flag (QUEUE_FLAG_QOS_ENABLED). This change
->>>>>> is made to eliminate a potential deadlock introduced by the use of static
->>>>>> keys in the blk-rq-qos infrastructure, as reported by lockdep during
->>>>>> blktests block/005[1].
->>>>>>
->>>>>> The original static key approach was introduced to avoid unnecessary
->>>>>> dereferencing of q->rq_qos when no blk-rq-qos module (e.g., blk-wbt or
->>>>>> blk-iolatency) is configured. While efficient, enabling a static key at
->>>>>> runtime requires taking cpu_hotplug_lock and jump_label_mutex, which
->>>>>> becomes problematic if the queue is already frozen ? causing a reverse
->>>>>> dependency on ->freeze_lock. This results in a lockdep splat indicating
->>>>>> a potential deadlock.
->>>>>>
->>>>>> To resolve this, we now gate q->rq_qos access with a q->queue_flags
->>>>>> bitop (QUEUE_FLAG_QOS_ENABLED), avoiding the static key and the associated
->>>>>> locking altogether.
->>>>>>
->>>>>> I compared both static key and atomic bitop implementations using ftrace
->>>>>> function graph tracer over ~50 invocations of rq_qos_issue() while ensuring
->>>>>> blk-wbt/blk-iolatency were disabled (i.e., no QoS functionality). For
->>>>>> easy comparision, I made rq_qos_issue() noinline. The comparision was
->>>>>> made on PowerPC machine.
->>>>>>
->>>>>> Static Key (disabled : QoS is not configured):
->>>>>> 5d0: 00 00 00 60     nop    # patched in by static key framework (not taken)
->>>>>> 5d4: 20 00 80 4e     blr    # return (branch to link register)
->>>>>>
->>>>>> Only a nop and blr (branch to link register) are executed ? very lightweight.
->>>>>>
->>>>>> atomic bitop (QoS is not configured):
->>>>>> 5d0: 20 00 23 e9     ld      r9,32(r3)     # load q->queue_flags
->>>>>> 5d4: 00 80 29 71     andi.   r9,r9,32768   # check QUEUE_FLAG_QOS_ENABLED (bit 15)
->>>>>> 5d8: 20 00 82 4d     beqlr                 # return if bit not set
->>>>>>
->>>>>> This performs an ld and and andi. before returning. Slightly more work,
->>>>>> but q->queue_flags is typically hot in cache during I/O submission.
->>>>>>
->>>>>> With Static Key (disabled):
->>>>>> Duration (us): min=0.668 max=0.816 avg?0.750
->>>>>>
->>>>>> With atomic bitop QUEUE_FLAG_QOS_ENABLED (bit not set):
->>>>>> Duration (us): min=0.684 max=0.834 avg?0.759
->>>>>>
->>>>>> As expected, both versions are almost similar in cost. The added latency
->>>>>> from an extra ld and andi. is in the range of ~9ns.
->>>>>>
->>>>>> There're two patches in the series. The first patch replaces static key
->>>>>> with QUEUE_FLAG_QOS_ENABLED. The second patch ensures that we disable
->>>>>> the QUEUE_FLAG_QOS_ENABLED when the queue no longer has any associated
->>>>>> rq_qos policies.
->>>>>>
->>>>>> As usual, feedback and review comments are welcome!
->>>>>>
->>>>>> [1] https://lore.kernel.org/linux-block/4fdm37so3o4xricdgfosgmohn63aa7wj3ua4e5vpihoamwg3ui@fq42f5q5t5ic/
->>>>>
->>>>>
->>>>> Another approach is to call memalloc_noio_save() in cpu hotplug code...
->>>>>
->>>> Yes that would help fix this. However per the general usage of GFP_NOIO scope in
->>>> kernel, it is used when we're performing memory allocations in a context where I/O
->>>> must not be initiated, because doing so could cause deadlocks or recursion.
->>>>
->>>> So we typically, use GFP_NOIO in a code path that is already doing I/O, such as:
->>>> - In block layer context: during request submission
->>>> - Filesystem writeback, or swap-out.
->>>> - Memory reclaim or writeback triggered by memory pressure.
->>>>
->>>> The cpu hotplug code may not be running in any of the above context. So
->>>> IMO, adding memalloc_noio_save() in the cpu hotplug code would not be
->>>> a good idea, isn't it?
->>>
->>> Please heed Ming's advice, moving this from a static key to an atomic
->>> queue flags ops is pointless, may as well kill it at that point.
->>
->> Nilay already tested and replied this is a dead end :(
->>
->> I don't quite understand why it's pointless, if rq_qos is never enabled,
->> an atmoic queue_flag is still minor optimization, isn't it?
->>
->>>
->>> I see v2 is out now with the exact same approach.
->>>
-> As mentioned earlier, I tried Ming's original recommendation, but it didn?t
-> resolve the issue. In a separate thread, Ming agreed that using an atomic queue
-> flag is a reasonable approach and would avoid the lockdep problem while still
-> keeping a minor fast-path optimization.
+> Reported-by: codespell
 > 
-> That leaves us with two options:
-> - Use an atomic queue flag, or
-> - Remove the static key entirely.
 > 
-> So before I send v3, do you prefer the atomic queue flag approach, or
-> would you rather see the static key removed altogether? My preference
-> is for the atomic queue flag, as it maintains a lightweight check
-> without the static key?s locking concerns. 
 
-Atomic test is still going to be better than pointless calls into
-rq-qos, so that's still a win. Hence retaining it is better than simply
-killing it off entirely.
+Applied, thanks!
 
-I wonder if it makes sense to combine with IS_ENABLED() as well. Though
-with how distros enable everything under the sun, probably not going to
-be that useful.
+[1/1] Docs: admin-guide: Correct spelling mistake
+      commit: f7a2e1c08727384cde1c686dd57172f99b5f2e6e
 
+Best regards,
 -- 
 Jens Axboe
+
+
+
