@@ -1,35 +1,41 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8579322A;
-	Wed, 13 Aug 2025 05:16:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from submarine.notk.org (submarine.notk.org [62.210.214.84])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A9062BDC3E;
+	Wed, 13 Aug 2025 05:34:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.210.214.84
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755062200; cv=none; b=lEVFX6uF2deMs5mairvZ0xllAnIU0qp5rgS19gmHuEzrUvKgfO1IxepOSg5/i0r1g4qdKTrV7DQaI0rmkOkJoRKsvcEEe29AYeM9YnGCRLvhZ1w1B/TRS3K/f3FRscgMGDB0JzzQ7nXU1Uo0Rh7AOsObjUBGCXGQsWWF0K48yYw=
+	t=1755063289; cv=none; b=pKEfZvimQKHdLRhQ9M19R5icGFlwJ2eORG+1K3p/1hpwavC5CzKpv4eRnq4lBOybM9KR2a00qtPQN7DE2Q+vgr6PiVUvvrKeFconSbTtZqRwyMwxcK+JdgrVJW+Oiurf1tu78HfrS5CFClox521f6Z1mA4LwgDhbDltrfLpBx9M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755062200; c=relaxed/simple;
-	bh=QHGINcBtgZyN5lwSuC4ihOdgAfkWxrXCvNILJWMOBVA=;
+	s=arc-20240116; t=1755063289; c=relaxed/simple;
+	bh=FDQ2bMLRusEapD25iBwCb7gdZGFnPUtA5/Dgwn3dckg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oRAr/liuJBgbCWoTtOzh6VmszzSvvCVb84t4bQFInCSAfRN3xJWlvlwCx65xLqUc99E2Wij1b6A7Dq5v47XAabHwJwU1++GBl0Jg05enz9JR4+aN0HTZjlHMAO5NHdfEzCdQuQw9A9ZR3b4u12RX18X8qdaRXiDSJh/HWLTB5Yc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NJ8kdtSm; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=s79BqjhmUI4UPooyBzt9NO3Vz8BWSEjPDECZcVBYiPKFTEoelUdU0uG4PeLLfnRVHNOzNEUPuzf4ZS7Y7j0xFepnJETmzNVVaV/NTsb0CVk7TQN1Mq0A3OIWqaz04mlc1cxSvvlAHNa4w10HGpfWdV1ys3w/0nHHQ5gEVwxleqk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codewreck.org; spf=pass smtp.mailfrom=codewreck.org; dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b=egPHiuC/; arc=none smtp.client-ip=62.210.214.84
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codewreck.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codewreck.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NJ8kdtSm"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6485C4CEEB;
-	Wed, 13 Aug 2025 05:16:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755062199;
-	bh=QHGINcBtgZyN5lwSuC4ihOdgAfkWxrXCvNILJWMOBVA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=NJ8kdtSmVYuDmZ9UTC9uyVZDWkHKpE44JmKlAUuCa7NZxop2ZK8q7CC++ZZVKGYqf
-	 2FtFO5vBHtDjYhIFJTJjQSsJRbxUaf0a5k9GCO/vI0kEc2Amu0RlAFK5LI+90qUwE8
-	 Wt/HmHsp350LKxT3V5edx5EIk5k5/dHroc1gWPsZBPQTy3e4Ep/IgKDgKWQmnFs0sw
-	 6cqFtidy2jtFeD3RQfgLFaCCGVcqzgmOXefeTkU64Ioo3+VbGhOKm4ArnHUoBv87xd
-	 3Pvm2U1X+nJMrmwtp/okmHBkuSQR3Yb1oCRfS+C3ip0SypefYd4i8fT0xp5j3V9lPt
-	 9tySUkpa34FBg==
-Date: Tue, 12 Aug 2025 22:16:33 -0700
-From: Nathan Chancellor <nathan@kernel.org>
-To: kernel test robot <lkp@intel.com>
-Cc: Dominique Martinet via B4 Relay <devnull+asmadeus.codewreck.org@kernel.org>,
+	dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b="egPHiuC/"
+Received: from gaia.codewreck.org (localhost [127.0.0.1])
+	by submarine.notk.org (Postfix) with ESMTPS id 1CB7814C2D3;
+	Wed, 13 Aug 2025 07:34:41 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=codewreck.org;
+	s=2; t=1755063287;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XjWBHGXAcgSV563xYk+j+40WjifMEzSXGjNe9KQBgLk=;
+	b=egPHiuC/UC4UD4nFojr3h+78xh94q0eLp3Zq21uBe8/LCpwZK5VBHhPh9biDCwsjmCVJnC
+	CFyJ0T1fh3cJfPengyIw1VXIKESumJNM2n9UFWGwG0KkXgd34hp2B/yF1MQZjSAYiQ/d60
+	8PWe6PSIJFyJHf2TRZISebDIzWprvPBpvm55mgMY+d3Ib8JIirsbnKbO7ECSm+j9b5DenO
+	NJa+UHGLhlCaA8/WWL7kOYYRzgNKmLAq/YaBH5oieeCCQGoPB7YE+okWPLuEmWJhY6T4Rj
+	zmwT6YJssNSgb9Sb+7caUlK2ahGNWZaFZgv6Trd5sguwsYKpqxLITSfw0KCw1g==
+Received: from localhost (gaia.codewreck.org [local])
+	by gaia.codewreck.org (OpenSMTPD) with ESMTPA id 2a270480;
+	Wed, 13 Aug 2025 05:34:40 +0000 (UTC)
+Date: Wed, 13 Aug 2025 14:34:25 +0900
+From: Dominique Martinet <asmadeus@codewreck.org>
+To: Nathan Chancellor <nathan@kernel.org>
+Cc: kernel test robot <lkp@intel.com>,
+	Dominique Martinet via B4 Relay <devnull+asmadeus.codewreck.org@kernel.org>,
 	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
 	Christian Brauner <brauner@kernel.org>,
 	David Howells <dhowells@redhat.com>,
@@ -41,126 +47,36 @@ Cc: Dominique Martinet via B4 Relay <devnull+asmadeus.codewreck.org@kernel.org>,
 	Ryan Lahfa <ryan@lahfa.xyz>, Christian Theune <ct@flyingcircus.io>,
 	Arnout Engelen <arnout@bzzt.net>, linux-kernel@vger.kernel.org,
 	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	Dominique Martinet <asmadeus@codewreck.org>, stable@vger.kernel.org
+	stable@vger.kernel.org
 Subject: Re: [PATCH 1/2] iov_iter: iterate_folioq: fix handling of offset >=
  folio size
-Message-ID: <20250813051633.GA3895812@ax162>
+Message-ID: <aJwj4dQ3b599qKHn@codewreck.org>
 References: <20250811-iot_iter_folio-v1-1-d9c223adf93c@codewreck.org>
  <202508120250.Eooq2ydr-lkp@intel.com>
+ <20250813051633.GA3895812@ax162>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <202508120250.Eooq2ydr-lkp@intel.com>
+In-Reply-To: <20250813051633.GA3895812@ax162>
 
-On Tue, Aug 12, 2025 at 02:55:55AM +0800, kernel test robot wrote:
-> Hi Dominique,
+Nathan Chancellor wrote on Tue, Aug 12, 2025 at 10:16:33PM -0700:
+> >    1 warning generated.
 > 
-> kernel test robot noticed the following build warnings:
-> 
-> [auto build test WARNING on 8f5ae30d69d7543eee0d70083daf4de8fe15d585]
-> 
-> url:    https://github.com/intel-lab-lkp/linux/commits/Dominique-Martinet-via-B4-Relay/iov_iter-iterate_folioq-fix-handling-of-offset-folio-size/20250811-154319
-> base:   8f5ae30d69d7543eee0d70083daf4de8fe15d585
-> patch link:    https://lore.kernel.org/r/20250811-iot_iter_folio-v1-1-d9c223adf93c%40codewreck.org
-> patch subject: [PATCH 1/2] iov_iter: iterate_folioq: fix handling of offset >= folio size
-> config: i386-buildonly-randconfig-002-20250811 (https://download.01.org/0day-ci/archive/20250812/202508120250.Eooq2ydr-lkp@intel.com/config)
-> compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
-> reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250812/202508120250.Eooq2ydr-lkp@intel.com/reproduce)
-> 
-> If you fix the issue in a separate patch/commit (i.e. not just a new version of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Closes: https://lore.kernel.org/oe-kbuild-all/202508120250.Eooq2ydr-lkp@intel.com/
-> 
-> All warnings (new ones prefixed by >>):
-> 
->    In file included from lib/iov_iter.c:14:
-> >> include/linux/iov_iter.h:171:7: warning: variable 'remain' is used uninitialized whenever 'if' condition is true [-Wsometimes-uninitialized]
->      171 |                 if (skip >= fsize)
->          |                     ^~~~~~~~~~~~~
->    include/linux/iov_iter.h:190:7: note: uninitialized use occurs here
->      190 |                 if (remain)
->          |                     ^~~~~~
->    include/linux/iov_iter.h:171:3: note: remove the 'if' if its condition is always false
->      171 |                 if (skip >= fsize)
->          |                 ^~~~~~~~~~~~~~~~~~
->      172 |                         goto next;
->          |                         ~~~~~~~~~
->    include/linux/iov_iter.h:163:22: note: initialize the variable 'remain' to silence this warning
->      163 |                 size_t part, remain, consumed;
->          |                                    ^
->          |                                     = 0
->    1 warning generated.
+> I see this in -next now, should remain be zero initialized or is there
+> some other fix that is needed?
 
-I see this in -next now, should remain be zero initialized or is there
-some other fix that is needed?
+A zero-initialization is fine, I sent a v2 with zero-initialization
+fixed yesterday:
+https://lkml.kernel.org/r/20250812-iot_iter_folio-v2-1-f99423309478@codewreck.org
 
-> vim +171 include/linux/iov_iter.h
-> 
->    143	
->    144	/*
->    145	 * Handle ITER_FOLIOQ.
->    146	 */
->    147	static __always_inline
->    148	size_t iterate_folioq(struct iov_iter *iter, size_t len, void *priv, void *priv2,
->    149			      iov_step_f step)
->    150	{
->    151		const struct folio_queue *folioq = iter->folioq;
->    152		unsigned int slot = iter->folioq_slot;
->    153		size_t progress = 0, skip = iter->iov_offset;
->    154	
->    155		if (slot == folioq_nr_slots(folioq)) {
->    156			/* The iterator may have been extended. */
->    157			folioq = folioq->next;
->    158			slot = 0;
->    159		}
->    160	
->    161		do {
->    162			struct folio *folio = folioq_folio(folioq, slot);
->    163			size_t part, remain, consumed;
->    164			size_t fsize;
->    165			void *base;
->    166	
->    167			if (!folio)
->    168				break;
->    169	
->    170			fsize = folioq_folio_size(folioq, slot);
->  > 171			if (skip >= fsize)
->    172				goto next;
->    173			base = kmap_local_folio(folio, skip);
->    174			part = umin(len, PAGE_SIZE - skip % PAGE_SIZE);
->    175			remain = step(base, progress, part, priv, priv2);
->    176			kunmap_local(base);
->    177			consumed = part - remain;
->    178			len -= consumed;
->    179			progress += consumed;
->    180			skip += consumed;
->    181			if (skip >= fsize) {
->    182	next:
->    183				skip = 0;
->    184				slot++;
->    185				if (slot == folioq_nr_slots(folioq) && folioq->next) {
->    186					folioq = folioq->next;
->    187					slot = 0;
->    188				}
->    189			}
->    190			if (remain)
->    191				break;
->    192		} while (len);
->    193	
->    194		iter->folioq_slot = slot;
->    195		iter->folioq = folioq;
->    196		iter->iov_offset = skip;
->    197		iter->count -= progress;
->    198		return progress;
->    199	}
->    200	
-> 
-> -- 
-> 0-DAY CI Kernel Test Service
-> https://github.com/intel/lkp-tests/wiki
+(and I'll send a v3 with the goto replaced with a bigger if later today
+as per David's request)
+
+I assume Andrew will pick it up eventually?
+-- 
+Dominique Martinet | Asmadeus
