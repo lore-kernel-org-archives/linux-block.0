@@ -1,28 +1,28 @@
 Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83A4D2609FD;
-	Thu, 14 Aug 2025 03:43:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C434B26CE0A;
+	Thu, 14 Aug 2025 03:43:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755142997; cv=none; b=bKRsjxJwoMgBGQVHV4LRpe6O7vMR79G0d4FBbjYL+HhSHdBUReSXejvZFtCoXfvsmtX3JGr8S9NqzuQAOQKItJiJX09E38PIimCANNaw7UXiEUvyKc7922i+DrdNHTBigfXdUs8xphQ7uaSAtc0SBSrgHSARJIGUnXaMca0Tljw=
+	t=1755142998; cv=none; b=nSkb5xShdyXhjVE8IxPTQRX9qlIZxtZtC65sbV6ZI4sfHGij87gko7TaCkK8UFGDFOhXPRcrkr41kokoxyvkH/mEunen+XD6pfH2AAHcI3GuOacgY7h4pQ7RBrl859OPY/rwOZftoxf5UdmeCjYs+hR+zeKnSyM2Ic0Hejai7pw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755142997; c=relaxed/simple;
-	bh=5Z3kjnyI5tTIJkojp9LQTJHdQ/0EqGDz+asxv2zVa90=;
+	s=arc-20240116; t=1755142998; c=relaxed/simple;
+	bh=24T5+g8WMOUYYSAoco/LftJ3y+twWAskhfuDyz4/5jI=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=CxTdkC6rUy6JhMBEKvSm0fQcGXQGZYouYgeUMLm7SOHcXKfF4FKUMnn372B5OkkChqkEX2UOgLFoSgTqDBAlyld+Aqyfxeppf1AvlfKpPMD+eN0M2hZvvx3RzIi8hFVEsiyMdDEzMYGLhrCKSxIFBf0UlvHvTR+37oAZH4CK/o4=
+	 MIME-Version; b=dW2l2kEjpTyoIUMx1J5JcLI+nP1dvcXzQ+EbnXtgs4P4D7qKwi00+a80Efr0Q9vr5i/bBSNB8BPEZpQ9lnY++AauOd+z+WGf2tRjo9Xng9TYIBnWKUjHxJyPab+VXeMhunBKSeF8kN0Kc9ZNvmE994MnH2F+DAo7zwiVEHfbQJs=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
 Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4c2WKt2qH8zKHLwq;
-	Thu, 14 Aug 2025 11:43:14 +0800 (CST)
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4c2WKv63ywzKHMhx;
+	Thu, 14 Aug 2025 11:43:15 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id A997C1A01A3;
-	Thu, 14 Aug 2025 11:43:13 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTP id 24C601A01A3;
+	Thu, 14 Aug 2025 11:43:15 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.104.67])
-	by APP4 (Coremail) with SMTP id gCh0CgCnIxRKW51ogs93Dg--.15627S15;
-	Thu, 14 Aug 2025 11:43:13 +0800 (CST)
+	by APP4 (Coremail) with SMTP id gCh0CgCnIxRKW51ogs93Dg--.15627S18;
+	Thu, 14 Aug 2025 11:43:14 +0800 (CST)
 From: Yu Kuai <yukuai1@huaweicloud.com>
 To: axboe@kernel.dk,
 	yukuai3@huawei.com,
@@ -36,9 +36,9 @@ Cc: linux-block@vger.kernel.org,
 	yi.zhang@huawei.com,
 	yangerkun@huawei.com,
 	johnny.chenyi@huawei.com
-Subject: [PATCH 11/16] blk-mq: add a new queue sysfs attribute async_depth
-Date: Thu, 14 Aug 2025 11:35:17 +0800
-Message-Id: <20250814033522.770575-12-yukuai1@huaweicloud.com>
+Subject: [PATCH 14/16] block, bfq: convert to use request_queue->async_depth
+Date: Thu, 14 Aug 2025 11:35:20 +0800
+Message-Id: <20250814033522.770575-15-yukuai1@huaweicloud.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20250814033522.770575-1-yukuai1@huaweicloud.com>
 References: <20250814033522.770575-1-yukuai1@huaweicloud.com>
@@ -49,10 +49,10 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgCnIxRKW51ogs93Dg--.15627S15
-X-Coremail-Antispam: 1UD129KBjvJXoW3JFy5KFWrCF4DKw4UCF1rWFg_yoW7Zr43pr
-	45Ja1Ykw10qF4xW34ftw13Xw43J3sagr1xJF4ay34akry7trs7XF1rCFyUXFZ2yrZ5CFsr
-	Wr4DJFZ8uFy2q3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+X-CM-TRANSID:gCh0CgCnIxRKW51ogs93Dg--.15627S18
+X-Coremail-Antispam: 1UD129KBjvJXoWxJF48trWDGF4UtFW8Cw45KFg_yoW5Ar4xp3
+	y3tanxKr18JF429w1rAw1a9ryrKwn5uryfJF1ftryxJrZ8ZFn7ZF1YqFyrXr97Xr93Aw4U
+	XrWDZa95W3WIqF7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
 	9KBjDU0xBIdaVrnRJUUUmS14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
 	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_JF0E3s1l82xGYI
 	kIc2x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2
@@ -71,183 +71,81 @@ X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
 From: Yu Kuai <yukuai3@huawei.com>
 
-Add a new field async_depth to request_queue and related APIs, this is
-currently not used, following patches will convert elevators to use
-this instead of internal async_depth.
+The default limits is unchanged, and user can configure async_depth now.
 
 Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 ---
- block/blk-core.c       |  1 +
- block/blk-mq.c         | 24 ++++++++++++++++++---
- block/blk-sysfs.c      | 47 ++++++++++++++++++++++++++++++++++++++++++
- block/elevator.c       |  1 +
- include/linux/blkdev.h |  1 +
- 5 files changed, 71 insertions(+), 3 deletions(-)
+ block/bfq-iosched.c | 43 +++++++++++++++++--------------------------
+ 1 file changed, 17 insertions(+), 26 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index fdac48aec5ef..443056be1c4c 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -463,6 +463,7 @@ struct request_queue *blk_alloc_queue(struct queue_limits *lim, int node_id)
- 	fs_reclaim_release(GFP_KERNEL);
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index de0dee255ccf..46520e50f584 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -7112,39 +7112,29 @@ void bfq_put_async_queues(struct bfq_data *bfqd, struct bfq_group *bfqg)
+ static void bfq_depth_updated(struct request_queue *q)
+ {
+ 	struct bfq_data *bfqd = q->elevator->elevator_data;
+-	unsigned int nr_requests = q->nr_requests;
++	unsigned int async_depth = q->async_depth;
  
- 	q->nr_requests = BLKDEV_DEFAULT_RQ;
-+	q->async_depth = BLKDEV_DEFAULT_RQ;
+ 	/*
+-	 * In-word depths if no bfq_queue is being weight-raised:
+-	 * leaving 25% of tags only for sync reads.
++	 * By default:
++	 *  - sync reads are not limited
++	 * If bfqq is not being weight-raised:
++	 *  - sync writes are limited to 75%(async depth default value)
++	 *  - async IO are limited to 50%
++	 * If bfqq is being weight-raised:
++	 *  - sync writes are limited to ~37%
++	 *  - async IO are limited to ~18
+ 	 *
+-	 * In next formulas, right-shift the value
+-	 * (1U<<bt->sb.shift), instead of computing directly
+-	 * (1U<<(bt->sb.shift - something)), to be robust against
+-	 * any possible value of bt->sb.shift, without having to
+-	 * limit 'something'.
++	 * If request_queue->async_depth is updated by user, all limit are
++	 * updated relatively.
+ 	 */
+-	/* no more than 50% of tags for async I/O */
+-	bfqd->async_depths[0][0] = max(nr_requests >> 1, 1U);
+-	/*
+-	 * no more than 75% of tags for sync writes (25% extra tags
+-	 * w.r.t. async I/O, to prevent async I/O from starving sync
+-	 * writes)
+-	 */
+-	bfqd->async_depths[0][1] = max((nr_requests * 3) >> 2, 1U);
++	bfqd->async_depths[0][1] = async_depth;
++	bfqd->async_depths[0][0] = max(async_depth * 2 / 3, 1U);
++	bfqd->async_depths[1][1] = max(async_depth >> 1, 1U);
++	bfqd->async_depths[1][0] = max(async_depth >> 2, 1U);
  
- 	return q;
+ 	/*
+-	 * In-word depths in case some bfq_queue is being weight-
+-	 * raised: leaving ~63% of tags for sync reads. This is the
+-	 * highest percentage for which, in our tests, application
+-	 * start-up times didn't suffer from any regression due to tag
+-	 * shortage.
++	 * Due to cgroup qos, the allowed request for bfqq might be 1
+ 	 */
+-	/* no more than ~18% of tags for async I/O */
+-	bfqd->async_depths[1][0] = max((nr_requests * 3) >> 4, 1U);
+-	/* no more than ~37% of tags for sync writes (~20% extra tags) */
+-	bfqd->async_depths[1][1] = max((nr_requests * 6) >> 4, 1U);
+-
+ 	blk_mq_set_min_shallow_depth(q, 1);
+ }
  
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index f1c11f591c27..699f7a2a36e5 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -520,6 +520,8 @@ static struct request *__blk_mq_alloc_requests(struct blk_mq_alloc_data *data)
- 			data->rq_flags |= RQF_USE_SCHED;
- 			if (ops->limit_depth)
- 				ops->limit_depth(data->cmd_flags, data);
-+			else if (!blk_mq_sched_sync_request(data->cmd_flags))
-+				data->shallow_depth = q->async_depth;
- 		}
- 	} else {
- 		blk_mq_tag_busy(data->hctx);
-@@ -4606,6 +4608,7 @@ int blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
- 	spin_lock_init(&q->requeue_lock);
+@@ -7364,6 +7354,7 @@ static int bfq_init_queue(struct request_queue *q, struct elevator_queue *eq)
+ 	blk_queue_flag_set(QUEUE_FLAG_DISABLE_WBT_DEF, q);
+ 	wbt_disable_default(q->disk);
+ 	blk_stat_enable_accounting(q);
++	q->async_depth = (q->nr_requests * 3) >> 2;
  
- 	q->nr_requests = set->queue_depth;
-+	q->async_depth = set->queue_depth;
- 
- 	blk_mq_init_cpu_queues(q, set->nr_hw_queues);
- 	blk_mq_map_swqueue(q);
-@@ -4934,6 +4937,23 @@ static int blk_mq_sched_grow_tags(struct request_queue *q, unsigned int nr)
  	return 0;
- }
  
-+static void __blk_mq_update_nr_requests(struct request_queue *q,
-+					unsigned int nr)
-+{
-+	unsigned int old_nr = q->nr_requests;
-+
-+	q->nr_requests = nr;
-+	if (!q->elevator) {
-+		q->async_depth = nr;
-+		return;
-+	}
-+
-+	/* keep the percentage of async requests */
-+	q->async_depth = max(q->async_depth * nr / old_nr, 1);
-+	if (q->elevator->type->ops.depth_updated)
-+		q->elevator->type->ops.depth_updated(q);
-+}
-+
- int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
- {
- 	struct blk_mq_tag_set *set = q->tag_set;
-@@ -4962,9 +4982,7 @@ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
- 			goto out;
- 	}
- 
--	q->nr_requests = nr;
--	if (q->elevator && q->elevator->type->ops.depth_updated)
--		q->elevator->type->ops.depth_updated(q);
-+	__blk_mq_update_nr_requests(q, nr);
- 
- out:
- 	blk_mq_unquiesce_queue(q);
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index f3d08edcc34f..8f55730f06c6 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -99,6 +99,51 @@ queue_requests_store(struct gendisk *disk, const char *page, size_t count)
- 	return ret;
- }
- 
-+static ssize_t queue_async_depth_show(struct gendisk *disk, char *page)
-+{
-+	ssize_t ret;
-+
-+	mutex_lock(&disk->queue->elevator_lock);
-+	ret = queue_var_show(disk->queue->async_depth, page);
-+	mutex_unlock(&disk->queue->elevator_lock);
-+	return ret;
-+}
-+
-+static ssize_t
-+queue_async_depth_store(struct gendisk *disk, const char *page, size_t count)
-+{
-+	struct request_queue *q = disk->queue;
-+	unsigned int memflags;
-+	unsigned long nr;
-+	int ret;
-+
-+	if (!queue_is_mq(q))
-+		return -EINVAL;
-+
-+	ret = queue_var_store(&nr, page, count);
-+	if (ret < 0)
-+		return ret;
-+
-+	if (nr == 0)
-+		return -EINVAL;
-+
-+	memflags = blk_mq_freeze_queue(q);
-+	mutex_lock(&q->elevator_lock);
-+
-+	if (q->elevator) {
-+		q->async_depth = min(q->nr_requests, nr);
-+		if (q->elevator->type->ops.depth_updated)
-+			q->elevator->type->ops.depth_updated(q);
-+	} else {
-+		ret = -EINVAL;
-+	}
-+
-+	mutex_unlock(&q->elevator_lock);
-+	blk_mq_unfreeze_queue(q, memflags);
-+
-+	return ret;
-+}
-+
- static ssize_t queue_ra_show(struct gendisk *disk, char *page)
- {
- 	ssize_t ret;
-@@ -514,6 +559,7 @@ static struct queue_sysfs_entry _prefix##_entry = {	\
- }
- 
- QUEUE_RW_ENTRY(queue_requests, "nr_requests");
-+QUEUE_RW_ENTRY(queue_async_depth, "async_depth");
- QUEUE_RW_ENTRY(queue_ra, "read_ahead_kb");
- QUEUE_LIM_RW_ENTRY(queue_max_sectors, "max_sectors_kb");
- QUEUE_LIM_RO_ENTRY(queue_max_hw_sectors, "max_hw_sectors_kb");
-@@ -736,6 +782,7 @@ static struct attribute *blk_mq_queue_attrs[] = {
- 	 */
- 	&elv_iosched_entry.attr,
- 	&queue_requests_entry.attr,
-+	&queue_async_depth_entry.attr,
- #ifdef CONFIG_BLK_WBT
- 	&queue_wb_lat_entry.attr,
- #endif
-diff --git a/block/elevator.c b/block/elevator.c
-index f8a04f32cbcf..6bdb05d2500d 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -601,6 +601,7 @@ static int elevator_switch(struct request_queue *q, struct elv_change_ctx *ctx)
- 		blk_queue_flag_clear(QUEUE_FLAG_SQ_SCHED, q);
- 		q->elevator = NULL;
- 		q->nr_requests = q->tag_set->queue_depth;
-+		q->async_depth = q->tag_set->queue_depth;
- 	}
- 	blk_add_trace_msg(q, "elv switch: %s", ctx->name);
- 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index ad5087d5cade..2e33298fcc15 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -542,6 +542,7 @@ struct request_queue {
- 	 * queue settings
- 	 */
- 	unsigned int		nr_requests;	/* Max # of requests */
-+	unsigned int		async_depth;	/* Max # of async requests */
- 
- #ifdef CONFIG_BLK_INLINE_ENCRYPTION
- 	struct blk_crypto_profile *crypto_profile;
 -- 
 2.39.2
 
