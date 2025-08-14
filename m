@@ -1,233 +1,160 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B632C235341;
-	Thu, 14 Aug 2025 06:38:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F42A270559;
+	Thu, 14 Aug 2025 07:40:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755153521; cv=none; b=aMTH+6xhfdtkNp4cKpwSFkMpPGL6o8dK5rLDce0kxRGAd561xKNJVEoZOsczur7UEI+IFjbKVfRcaRPcT9YXln6csUeMOkRyAfmsD+8dwePtrTPG+6OBE4oXbFMb29F3HFHJhq9amrHBBaFcD0qedNPX7cu+iZnIL3aUHZj74tI=
+	t=1755157227; cv=none; b=ksMmEkpw5ivVw2MR2BNKCxuIU9/T2IHCdCdCWwLt3g+OnOUGnpWsmyDv/8/wZvCIsaMhIZJf69skzEx8KaIUmdXZhspXDrIKlXelg7Y3rM58GXL7593kAgS4TFGleS8gX7+twzDhTOJUPnK/Mh5+Y9krXg259bDDXzyHrF1lsH4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755153521; c=relaxed/simple;
-	bh=W6z6qVkPhFJfIZeybYAsLN9vl8e4DqJY47PuPx8Q9aM=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=EiLinUgMRT4WqoTifhz28YEE6z3wM3pHv364PEAVFRG46dfEGGWpAyRs6qSDj9Zfquh7R8wQbb80DyK+vd60WnjadmMC/OyGmnA6Z0FT2+sTjluClmFnzd9dSXIr7wNrrVbZb3I0BFACz91mpH/B+uVorPrqmv4EWkQ7oUNOZAU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4c2bDB2kxLzYQvBp;
-	Thu, 14 Aug 2025 14:38:34 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 01AF61A1ABB;
-	Thu, 14 Aug 2025 14:38:33 +0800 (CST)
-Received: from [10.174.179.143] (unknown [10.174.179.143])
-	by APP4 (Coremail) with SMTP id gCh0CgCnIxRnhJ1ops2FDg--.17931S3;
-	Thu, 14 Aug 2025 14:38:32 +0800 (CST)
-Subject: Re: [PATCH v4 1/2] loop: Rename and merge get_size/get_loop_size to
- lo_calculate_size
-To: Rajeev Mishra <rajeevm@hpe.com>, axboe@kernel.dk, yukuai1@huaweicloud.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- "yukuai (C)" <yukuai3@huawei.com>
-References: <20250813195228.12021-1-rajeevm@hpe.com>
- <20250813195228.12021-2-rajeevm@hpe.com>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <43c58aed-3fff-564b-e658-ebe3f7735fb9@huaweicloud.com>
-Date: Thu, 14 Aug 2025 14:38:31 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.1
+	s=arc-20240116; t=1755157227; c=relaxed/simple;
+	bh=+Gb5lCMHMsLqlAIttH2PAfl6IketLup6dYf05JSPbnQ=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=uWvUNUB7hWuMqZ78SeufWnnGbWRjezUBy+k9grIi7AFfihxlNAjIWICyGP5P+Z767Y6mrWW4uQ5JgdGaqQ/L8vtrAak31s3zjlSTjQgY5FF4RtpRWLqK7jZXUrA2T5+gjODIwxprPkRQa8WwVvgY794yGw+y375vTrfln0kStbQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o2IxNEFy; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o2IxNEFy"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90D74C4CEF7;
+	Thu, 14 Aug 2025 07:40:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755157227;
+	bh=+Gb5lCMHMsLqlAIttH2PAfl6IketLup6dYf05JSPbnQ=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=o2IxNEFym0JKWZP1M9HsvDC6WtVQAsOM2aPJBT4qe5+jzI4zxNthfTZ9Nv98AsO/5
+	 cVn1uNfeQFg2pEgu+vl732JUypCdFXM9ZAVQ4fgXsaWQPaClqz7p5fKClYd5mn+y7O
+	 8hTG+flMW5l1TeBD38KBxagZwqWRCkJH46hApXnYa9TH309elY2tJQm7tddeTOYy+O
+	 8uf44Vt0HyV/NlVizPCi6ltE43ylFF4KfvWaNJdnZIZ3R8nXshmdtrIbQsc3f/AP32
+	 U28xHqSzSr8vu8jn/GBGxtMal4aA8Nm8QR7l28fNkHMClxP0P7uBc7zvYukzTBp3AX
+	 W9ySJwuTAJUEw==
+From: Andreas Hindborg <a.hindborg@kernel.org>
+To: Alice Ryhl <aliceryhl@google.com>
+Cc: Boqun Feng <boqun.feng@gmail.com>, Miguel Ojeda <ojeda@kernel.org>, Alex
+ Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>, =?utf-8?Q?Bj?=
+ =?utf-8?Q?=C3=B6rn?= Roy
+ Baron <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>, Trevor
+ Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, Jens Axboe
+ <axboe@kernel.dk>, linux-block@vger.kernel.org,
+ rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 11/15] rnull: enable configuration via `configfs`
+In-Reply-To: <CAH5fLgi+R=ZW2bFnZP2=231vV6JAHTZJ0UBYkdojG=HjBYR3MA@mail.gmail.com>
+References: <20250812-rnull-up-v6-16-v4-0-ed801dd3ba5c@kernel.org>
+ <20250812-rnull-up-v6-16-v4-11-ed801dd3ba5c@kernel.org>
+ <mACGre8-fNXj9Z2EpuE3yez_o2T-TtqrdB6HB-VkO0cuvhXsqzECKWMhsz_c43NJUxpsnVpO_U0oLbaaNhXqRQ==@protonmail.internalid>
+ <aJw-XWhDahVeejl3@google.com>
+ <87cy8zfkw5.fsf@t14s.mail-host-address-is-not-set>
+ <WporCpRrDB_e8ocWi63px_bwtPWqRjDL4kVPNNXFNoI6H-4bgk5P_n4iO0E4m-ElwkiNTyBITwgdMXjREE8VXQ==@protonmail.internalid>
+ <CAH5fLggraEP7bwzJ+4ww8-7Ku-Z+d0Em3=NDUpa7r8oTLQy81A@mail.gmail.com>
+ <877bz7f7jg.fsf@t14s.mail-host-address-is-not-set>
+ <wKjTynzVeXix56T1eCrpF4Y7zM7dJVumIB3DljSJeXkHx7Vyb4jKR5X5c5B2yV0DFKItLrncGLWxcTkVynD12g==@protonmail.internalid>
+ <CAH5fLgi+R=ZW2bFnZP2=231vV6JAHTZJ0UBYkdojG=HjBYR3MA@mail.gmail.com>
+Date: Thu, 14 Aug 2025 09:40:13 +0200
+Message-ID: <87zfc2e4gy.fsf@t14s.mail-host-address-is-not-set>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20250813195228.12021-2-rajeevm@hpe.com>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgCnIxRnhJ1ops2FDg--.17931S3
-X-Coremail-Antispam: 1UD129KBjvJXoW3XFW5Gw18XryUWF15WFW7Arb_yoW7AFW3pF
-	15Za4FyrWrKF9rGFsrtwn7XF1Fqa1vg347Z34DZa40kwnavr9IkFyfCFWF9rW7Jr9xAFyF
-	q3WDJFykAr1jqr7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvE14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7I2V7IY0VAS07AlzVAY
-	IcxG8wCY1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbV
-	WUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF
-	67kF1VAFwI0_JF0_Jw1lIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42
-	IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF
-	0xvEx4A2jsIE14v26r4j6F4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr1j6F4UJbIYCTnIWI
-	evJa73UjIFyTuYvjfUYCJmUUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Hi,
+"Alice Ryhl" <aliceryhl@google.com> writes:
 
-ÔÚ 2025/08/14 3:52, Rajeev Mishra Ð´µÀ:
-> - Renamed get_size to lo_calculate_size.
-> - Merged get_size and get_loop_size logic into lo_calculate_size.
-> - Updated all callers to use lo_calculate_size.
-> - Added header to lo_calculate_size.
-> 
-> Signed-off-by: Rajeev Mishra <rajeevm@hpe.com>
-> ---
->   drivers/block/loop.c | 50 +++++++++++++++++++-------------------------
->   1 file changed, 21 insertions(+), 29 deletions(-)
-> 
+> On Wed, Aug 13, 2025 at 7:36=E2=80=AFPM Andreas Hindborg <a.hindborg@kern=
+el.org> wrote:
+>>
+>> "Alice Ryhl" <aliceryhl@google.com> writes:
+>>
+>> > For your convenience, I already wrote a safe wrapper of kstrtobool for
+>> > an out-of-tree driver. You're welcome to copy-paste this:
+>> >
+>> > fn kstrtobool(kstr: &CStr) -> Result<bool> {
+>> >     let mut res =3D false;
+>> >     to_result(unsafe {
+>> > kernel::bindings::kstrtobool(kstr.as_char_ptr(), &mut res) })?;
+>> >     Ok(res)
+>> > }
+>>
+>> Thanks, I did one as well today, accepting `&str` instead. The examples
+>> highlight why it is not great:
+>
+> Yeah, well, I think we should still use it for consistency.
+>
+>>   /// Convert common user inputs into boolean values using the kernel's =
+`kstrtobool` function.
+>>   ///
+>>   /// This routine returns `Ok(bool)` if the first character is one of '=
+YyTt1NnFf0', or
+>>   /// [oO][NnFf] for "on" and "off". Otherwise it will return `Err(EINVA=
+L)`.
+>>   ///
+>>   /// # Examples
+>>   ///
+>>   /// ```
+>>   /// # use kernel::str::kstrtobool;
+>>   ///
+>>   /// // Lowercase
+>>   /// assert_eq!(kstrtobool("true"), Ok(true));
+>>   /// assert_eq!(kstrtobool("tr"), Ok(true));
+>>   /// assert_eq!(kstrtobool("t"), Ok(true));
+>>   /// assert_eq!(kstrtobool("twrong"), Ok(true)); // <-- =F0=9F=A4=B7
+>>   /// assert_eq!(kstrtobool("false"), Ok(false));
+>>   /// assert_eq!(kstrtobool("f"), Ok(false));
+>>   /// assert_eq!(kstrtobool("yes"), Ok(true));
+>>   /// assert_eq!(kstrtobool("no"), Ok(false));
+>>   /// assert_eq!(kstrtobool("on"), Ok(true));
+>>   /// assert_eq!(kstrtobool("off"), Ok(false));
+>>   ///
+>>   /// // Camel case
+>>   /// assert_eq!(kstrtobool("True"), Ok(true));
+>>   /// assert_eq!(kstrtobool("False"), Ok(false));
+>>   /// assert_eq!(kstrtobool("Yes"), Ok(true));
+>>   /// assert_eq!(kstrtobool("No"), Ok(false));
+>>   /// assert_eq!(kstrtobool("On"), Ok(true));
+>>   /// assert_eq!(kstrtobool("Off"), Ok(false));
+>>   ///
+>>   /// // All caps
+>>   /// assert_eq!(kstrtobool("TRUE"), Ok(true));
+>>   /// assert_eq!(kstrtobool("FALSE"), Ok(false));
+>>   /// assert_eq!(kstrtobool("YES"), Ok(true));
+>>   /// assert_eq!(kstrtobool("NO"), Ok(false));
+>>   /// assert_eq!(kstrtobool("ON"), Ok(true));
+>>   /// assert_eq!(kstrtobool("OFF"), Ok(false));
+>>   ///
+>>   /// // Numeric
+>>   /// assert_eq!(kstrtobool("1"), Ok(true));
+>>   /// assert_eq!(kstrtobool("0"), Ok(false));
+>>   ///
+>>   /// // Invalid input
+>>   /// assert_eq!(kstrtobool("invalid"), Err(EINVAL));
+>>   /// assert_eq!(kstrtobool("2"), Err(EINVAL));
+>>   /// ```
+>>   pub fn kstrtobool(input: &str) -> Result<bool> {
+>>       let mut result: bool =3D false;
+>>       let c_str =3D CString::try_from_fmt(fmt!("{input}"))?;
+>>
+>>       // SAFETY: `c_str` points to a valid null-terminated C string, and=
+ `result` is a valid
+>>       // pointer to a bool that we own.
+>>       let ret =3D unsafe { bindings::kstrtobool(c_str.as_char_ptr(), &mu=
+t result as *mut bool) };
+>>
+>>       kernel::error::to_result(ret).map(|_| result)
+>>   }
+>>
+>> Not sure if we should take `CStr` or `str`, what do you think?
+>
+> Using CStr makes sense, since it avoids having the caller perform a
+> useless utf-8 check.
 
-This patch has lots of style issues, please run checkpatch and fix
-the warnings first.
+If we re-implement the entire function in rust, we can do the processing
+on a `&str`. That way, we can skip the allocation to enforce null
+termination. At least for this use case. I would rather do a utf8 check
+than allocate and copy.
 
-Thanks,
-Kuai
 
-./scripts/checkpatch.pl 
-0001-loop-Rename-and-merge-get_size-get_loop_size-to-lo_c.patch
-WARNING: please, no spaces at the start of a line
-#52: FILE: drivers/block/loop.c:142:
-+       loff_t loopsize;$
+Best regards,
+Andreas Hindborg
 
-WARNING: please, no spaces at the start of a line
-#54: FILE: drivers/block/loop.c:144:
-+       loopsize = i_size_read(file->f_mapping->host);$
 
-WARNING: please, no spaces at the start of a line
-#55: FILE: drivers/block/loop.c:145:
-+       if (lo->lo_offset > 0)$
-
-WARNING: suspect code indent for conditional statements (7, 15)
-#55: FILE: drivers/block/loop.c:145:
-+       if (lo->lo_offset > 0)
-+              loopsize -= lo->lo_offset;
-
-WARNING: please, no spaces at the start of a line
-#58: FILE: drivers/block/loop.c:148:
-+       if (loopsize < 0)$
-
-WARNING: suspect code indent for conditional statements (7, 15)
-#58: FILE: drivers/block/loop.c:148:
-+       if (loopsize < 0)
-+              return 0;
-
-WARNING: Statements should start on a tabstop
-#59: FILE: drivers/block/loop.c:149:
-+              return 0;
-
-WARNING: please, no spaces at the start of a line
-#60: FILE: drivers/block/loop.c:150:
-+       if (lo->lo_sizelimit > 0 && lo->lo_sizelimit < loopsize)$
-
-WARNING: suspect code indent for conditional statements (7, 15)
-#60: FILE: drivers/block/loop.c:150:
-+       if (lo->lo_sizelimit > 0 && lo->lo_sizelimit < loopsize)
-+              loopsize = lo->lo_sizelimit;
-
-WARNING: please, no spaces at the start of a line
-#66: FILE: drivers/block/loop.c:156:
-+       return loopsize >> 9;$
-
-total: 0 errors, 10 warnings, 80 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-       mechanically convert to the typical style using --fix or 
---fix-inplace.
-
-0001-loop-Rename-and-merge-get_size-get_loop_size-to-lo_c.patch has 
-style problems, please review.
-
-NOTE: If any of the errors are false positives, please report
-       them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-> index 1b6ee91f8eb9..5faf8607dfb2 100644
-> --- a/drivers/block/loop.c
-> +++ b/drivers/block/loop.c
-> @@ -137,30 +137,23 @@ static void loop_global_unlock(struct loop_device *lo, bool global)
->   static int max_part;
->   static int part_shift;
->   
-> -static loff_t get_size(loff_t offset, loff_t sizelimit, struct file *file)
-> -{
-> -	loff_t loopsize;
-> -
-> -	/* Compute loopsize in bytes */
-> -	loopsize = i_size_read(file->f_mapping->host);
-> -	if (offset > 0)
-> -		loopsize -= offset;
-> -	/* offset is beyond i_size, weird but possible */
-> -	if (loopsize < 0)
-> -		return 0;
-> -
-> -	if (sizelimit > 0 && sizelimit < loopsize)
-> -		loopsize = sizelimit;
-> -	/*
-> -	 * Unfortunately, if we want to do I/O on the device,
-> -	 * the number of 512-byte sectors has to fit into a sector_t.
-> -	 */
-> -	return loopsize >> 9;
-> -}
-> -
-> -static loff_t get_loop_size(struct loop_device *lo, struct file *file)
-> -{
-> -	return get_size(lo->lo_offset, lo->lo_sizelimit, file);
-> +static loff_t lo_calculate_size(struct loop_device *lo, struct file *file)
-> +{
-> +       loff_t loopsize;
-> +       /* Compute loopsize in bytes */
-> +       loopsize = i_size_read(file->f_mapping->host);
-> +       if (lo->lo_offset > 0)
-> +	       loopsize -= lo->lo_offset;
-> +       /* offset is beyond i_size, weird but possible */
-> +       if (loopsize < 0)
-> +	       return 0;
-> +       if (lo->lo_sizelimit > 0 && lo->lo_sizelimit < loopsize)
-> +	       loopsize = lo->lo_sizelimit;
-> +       /*
-> +	* Unfortunately, if we want to do I/O on the device,
-> +	* the number of 512-byte sectors has to fit into a sector_t.
-> +	*/
-> +       return loopsize >> 9;
->   }
->   
->   /*
-> @@ -569,7 +562,7 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
->   	error = -EINVAL;
->   
->   	/* size of the new backing store needs to be the same */
-> -	if (get_loop_size(lo, file) != get_loop_size(lo, old_file))
-> +	if (lo_calculate_size(lo, file) != lo_calculate_size(lo, old_file))
->   		goto out_err;
->   
->   	/*
-> @@ -1063,7 +1056,7 @@ static int loop_configure(struct loop_device *lo, blk_mode_t mode,
->   	loop_update_dio(lo);
->   	loop_sysfs_init(lo);
->   
-> -	size = get_loop_size(lo, file);
-> +	size = lo_calculate_size(lo, file);
->   	loop_set_size(lo, size);
->   
->   	/* Order wrt reading lo_state in loop_validate_file(). */
-> @@ -1255,8 +1248,7 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
->   	if (partscan)
->   		clear_bit(GD_SUPPRESS_PART_SCAN, &lo->lo_disk->state);
->   	if (!err && size_changed) {
-> -		loff_t new_size = get_size(lo->lo_offset, lo->lo_sizelimit,
-> -					   lo->lo_backing_file);
-> +		loff_t new_size = lo_calculate_size(lo, lo->lo_backing_file);
->   		loop_set_size(lo, new_size);
->   	}
->   out_unlock:
-> @@ -1399,7 +1391,7 @@ static int loop_set_capacity(struct loop_device *lo)
->   	if (unlikely(lo->lo_state != Lo_bound))
->   		return -ENXIO;
->   
-> -	size = get_loop_size(lo, lo->lo_backing_file);
-> +	size = lo_calculate_size(lo, lo->lo_backing_file);
->   	loop_set_size(lo, size);
->   
->   	return 0;
-> 
 
