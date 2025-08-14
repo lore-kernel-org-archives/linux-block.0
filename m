@@ -1,125 +1,111 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 252552E765D
-	for <linux-block@vger.kernel.org>; Thu, 14 Aug 2025 08:26:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57DEE2580D7
+	for <linux-block@vger.kernel.org>; Thu, 14 Aug 2025 08:27:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755160004; cv=none; b=UNWghnPqkTgNp9KLNr0v7vNjKs+hEY4yDhItnZ4g9/n8MwyHQfMg6TNp0eVsBQ8IlbMH1wU7P4v2OTkwmgqimkJpnyA9Jj+qkEgHO+sp0N3G74jSiwvEyNKWwdc/KX1GnAyKhMibLxB4N6asVWMifkv6F++WNgKa54yDWuqawQQ=
+	t=1755160054; cv=none; b=jsiHZ4FhjZqWVzKe+24QtsWDbQ8T6B487turCkBgx5Lrap5m/YR2oWEbfOTHOiPTZlvxaNGrkRFv2+P2VFJa2P9erI+8pqznUU0h9JR4YcziqWVyfKVezdH/EzLeDUwj2rjEFP/4mA8OJCtNAQcy5lqv6ArVO7lQviDgOr7cpc8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755160004; c=relaxed/simple;
-	bh=v0xA2sz1ktDmZGmQ0w/CH3OqTXvCYsqh3+oTcUWEtFk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gqUs781DHMlQx4X4xAcipRNV0SGXzjVFXss7UngjUoWsYZKOf+DVD8Lk1MAmoy6TXphJwpPAeBUQfAN+k6n0VZcPhv8VwUqqOcM1PTXwFNul8bCpZo2h4QuVxMdGOXo6ACPkB3m+w29iync7WmJDhRDYc1IoiHg5JOnCoyUmCS4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Ux6cA2hL; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1755160054; c=relaxed/simple;
+	bh=wMcnPdUCFx40hqyageRaHybYN+Tt7ybSqt6EnoIQKLQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mtkzO2E/2+6z811QqZsrJNuZXvf7hvnpzIYiMe7f2hR+0RszRd0h1Xo58uGwNz2yV2D20+tM1kDktCvNsDg3QORdmBAT0onClFURLJIi4aYCdaPfo3uGbFCfsN7uYU0Zgk0kfrF+iQk+U3uBfbXkDDGkgSOa75eXR0zVz/b8RcI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VdzzmLTl; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Ux6cA2hL"
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57DM7Dsh026626;
-	Thu, 14 Aug 2025 08:26:23 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=1GgtySJaTUVduGkkH
-	bbdDXac8GLA3X/yTN6CVwqn/ZI=; b=Ux6cA2hLIo9Ph1caoRWtuOxcaauDxYh3v
-	e3fXzWuT5uojSXceK2tni4Z7enbpHY70JQjzeoe7vWiimWk+Nj/ZaNVWEMow3KYv
-	yXg4K01xUMW4N2Jdypd9TKUvccxzQH2TIVWPFb2Si1Yu/bDY+OB0OxIVEZBpmX7c
-	mVJNENyKMse83o4rk9e+IEikLFrBypdjki1Xk9TF1Sz45v1hi9BAiCm/LXNGHRxu
-	pabpeI8M+5lTRWV7B/GGjHt4nTeGydUXkBsD/TnYxiaH3+5+ORqlWbMIqlTBSxJX
-	SNY0m/+oVJC/6Znb6GY+1dYFvFILMApzl1ejQ3GQzhW9IQJPzE9Kw==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48ehaad8ku-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 14 Aug 2025 08:26:22 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 57E8KAXL026279;
-	Thu, 14 Aug 2025 08:26:22 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 48eh21bgba-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 14 Aug 2025 08:26:22 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 57E8QKOq49414642
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 14 Aug 2025 08:26:20 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3981020040;
-	Thu, 14 Aug 2025 08:26:20 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 4925E2004B;
-	Thu, 14 Aug 2025 08:26:18 +0000 (GMT)
-Received: from li-c9696b4c-3419-11b2-a85c-f9edc3bf8a84.in.ibm.com (unknown [9.109.198.214])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 14 Aug 2025 08:26:18 +0000 (GMT)
-From: Nilay Shroff <nilay@linux.ibm.com>
-To: linux-block@vger.kernel.org
-Cc: axboe@kernel.dk, ming.lei@redhat.com, yukuai1@huaweicloud.com, hch@lst.de,
-        shinichiro.kawasaki@wdc.com, kch@nvidia.com, gjoyce@ibm.com
-Subject: [PATCHv3 2/3] block: decrement block_rq_qos static key in rq_qos_del()
-Date: Thu, 14 Aug 2025 13:54:58 +0530
-Message-ID: <20250814082612.500845-3-nilay@linux.ibm.com>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20250814082612.500845-1-nilay@linux.ibm.com>
-References: <20250814082612.500845-1-nilay@linux.ibm.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VdzzmLTl"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1755160051;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=VCtxsI2k9h9lYGDNgah1NdymPgILTjH6myt1fejzWfc=;
+	b=VdzzmLTlhNFLIUIJCDI2W+tTOKtEYe4EmdKp8smUUxjQC1E+c1q3ZFzTjDaE/UUJRJ+I02
+	bZj3Wf/RH2v1y5GtjIx0PBe0nXTfzzptErwGekU37K5SXCMfs7J5lEx34LARQ410CBvGQf
+	J3tQtiUVhKebpfGFpXoZnwY9dD7ta7E=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-687-n5-3eCyoNMWweKpsJ1vVJw-1; Thu,
+ 14 Aug 2025 04:27:30 -0400
+X-MC-Unique: n5-3eCyoNMWweKpsJ1vVJw-1
+X-Mimecast-MFC-AGG-ID: n5-3eCyoNMWweKpsJ1vVJw_1755160048
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4B9E218004D4;
+	Thu, 14 Aug 2025 08:27:28 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.148])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 06B4A1955E89;
+	Thu, 14 Aug 2025 08:27:16 +0000 (UTC)
+Date: Thu, 14 Aug 2025 16:27:10 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Yu Kuai <yukuai1@huaweicloud.com>
+Cc: axboe@kernel.dk, bvanassche@acm.org, nilay@linux.ibm.com, hare@suse.de,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	yi.zhang@huawei.com, yangerkun@huawei.com, johnny.chenyi@huawei.com,
+	"yukuai (C)" <yukuai3@huawei.com>
+Subject: Re: [PATCH 00/16] blk-mq: introduce new queue attribute asyc_dpeth
+Message-ID: <aJ2d3gtfi0aEaeEc@fedora>
+References: <20250814033522.770575-1-yukuai1@huaweicloud.com>
+ <aJ2WH_RAMPQ9sd6r@fedora>
+ <b6587204-9798-fcb0-c4b7-f00d5979d243@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=KPRaDEFo c=1 sm=1 tr=0 ts=689d9daf cx=c_pps
- a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
- a=2OwXVqhp2XgA:10 a=VnNF1IyMAAAA:8 a=SYFAYIXRm5ESkqApvb4A:9
-X-Proofpoint-ORIG-GUID: EwCDCbU5Xzid4rL0FKr10s6ENUPLBsp1
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODEyMDIyNCBTYWx0ZWRfX2f+Ceo4yA4qD
- +FDqUorqwpax7Pejz9dtcUHqAV9ZPxbXjYvFtoh4jS5oO0rji+e0fZYrbBWbMSLGzL7dfwUx7KM
- C8aFbJ9gWoQsp/KKrswnr0wp+Jwj0zj2qitR8+EiOGx4X8SQXpdr98x4lILHPynCjS9waPh6xTe
- tSG2nxm3JZjrurvj8jEsDIUYnGOp4AO48dJ565+6pvYHq/N1OJlbJ9pl1y//p3k9OBbN1mHKtTt
- H05piUBE+1Xo5MEvE4z8J/QugjuWIeLU6cuaW2okae6R2+VNw72q9ZHitjMPu46T4bg/lpQB608
- w6s4/U+757SRFmH9VImls9eCRka8se/j15ZQDjcW8uJb4CiGO4/1IE64KkZIgCAmvU7CVlwc6Px
- SU1ovMB/
-X-Proofpoint-GUID: EwCDCbU5Xzid4rL0FKr10s6ENUPLBsp1
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-08-13_02,2025-08-11_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 impostorscore=0 bulkscore=0 adultscore=0 priorityscore=1501
- malwarescore=0 spamscore=0 clxscore=1015 suspectscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2508120224
+In-Reply-To: <b6587204-9798-fcb0-c4b7-f00d5979d243@huaweicloud.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-rq_qos_add() increments the block_rq_qos static key when a QoS
-policy is attached. When a QoS policy is removed via rq_qos_del(),
-we must symmetrically decrement the static key. If this removal drops
-the last QoS policy from the queue (q->rq_qos becomes NULL), the
-static branch can be disabled and the jump label patched to a NOP,
-avoiding overhead on the hot path.
+On Thu, Aug 14, 2025 at 04:22:27PM +0800, Yu Kuai wrote:
+> Hi,
+> 
+> 在 2025/08/14 15:54, Ming Lei 写道:
+> > On Thu, Aug 14, 2025 at 11:35:06AM +0800, Yu Kuai wrote:
+> > > From: Yu Kuai <yukuai3@huawei.com>
+> > > 
+> > > Backgroud and motivation:
+> > > 
+> > > At first, we test a performance regression from 5.10 to 6.6 in
+> > > downstream kernel(described in patch 13), the regression is related to
+> > > async_depth in mq-dealine.
+> > > 
+> > > While trying to fix this regression, Bart suggests add a new attribute
+> > > to request_queue, and I think this is a good idea because all elevators
+> > > have similar logical, however only mq-deadline allow user to configure
+> > > async_depth. And this is patch 9-16, where the performance problem is
+> > > fixed in patch 13;
+> > > 
+> > > Because async_depth is related to nr_requests, while reviewing related
+> > > code, patch 2-7 are cleanups and fixes to nr_reqeusts.
+> > > 
+> > > I was planning to send this set for the next merge window, however,
+> > > during test I found the last block pr(6.17-rc1) introduce a regression
+> > > if nr_reqeusts grows, exit elevator will panic, and I fix this by
+> > > patch 1,8.
+> > 
+> > Please split the patchset into two:
+> > 
+> > - one is for fixing recent regression on updating 'nr_requests', so this
+> >    can be merged to v6.17, and be backport easily for stable & downstream
+> 
+> There are actually two regressions, as fixed by patch 5 and patch 8, how
+> about the first patchset for patch 1-8? Are you good with those minor
+> prep cleanup patches?
 
-This change ensures rq_qos_add()/rq_qos_del() keep the
-block_rq_qos static key balanced and prevents leaving the branch
-permanently enabled after the last policy is removed.
+Then probably you need to make it into three by adding one extra bug fix for
+`fix elevator depth_updated method`, which follows the philosophy of
+"do one thing, do it better", also helps people to review.
 
-Fixes: 033b667a823e ("block: blk-rq-qos: guard rq-qos helpers by static key")
-Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
----
- block/blk-rq-qos.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/block/blk-rq-qos.c b/block/blk-rq-qos.c
-index 848591fb3c57..b1e24bb85ad2 100644
---- a/block/blk-rq-qos.c
-+++ b/block/blk-rq-qos.c
-@@ -374,6 +374,7 @@ void rq_qos_del(struct rq_qos *rqos)
- 	for (cur = &q->rq_qos; *cur; cur = &(*cur)->next) {
- 		if (*cur == rqos) {
- 			*cur = rqos->next;
-+			static_branch_dec(&block_rq_qos);
- 			break;
- 		}
- 	}
--- 
-2.50.1
+Thanks, 
+Ming
 
