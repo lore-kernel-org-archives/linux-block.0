@@ -1,227 +1,138 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1420D238C0D;
-	Thu, 14 Aug 2025 03:43:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85C7C1EB195
+	for <linux-block@vger.kernel.org>; Thu, 14 Aug 2025 04:15:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755143003; cv=none; b=jgplzgqwceWqLsTMWkfH1t/Xj0Sa2APlZcsTvw8FrZzYGJshfRFDTODDVCSblCnLYqYZWUFq6ha9dZhYa1XanZ4QcGj2Dxp8gHyudsF2UYaepU0EYhEIRE7UwwGuMtCAZyvS61RK6HN4pRzdQ06ekAzK3AWyHo0Jw5yoQxMqq90=
+	t=1755144915; cv=none; b=Ef/bXSbUiOq6jt/KjvtmTrgtClhSNEotKqGEnClEpCOLt+iCmVA4uL2ObrY+deg/EOSfgXpwQI/1JdAVeswpHeSUtRWWYIzCtSLUrgbbqpItUz3Ji+alpU5HRbke5y6HSZWqWyzAHCo5DqTB4ZpbwVyXwPCXIP8CwDJJMkpkBpc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755143003; c=relaxed/simple;
-	bh=cC14FkZGZjFZZFqnFpTKNL9aUyjZkBSlQU3VZfQUWqg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=lDeg5eMLJsS7IUngFKI5lwoQO1KbTIdXILLxdVSY9QTKfP1mpMDCFS8l2xBVATPlINU7xUl1yGBk3tpgcJNtfCuR5lY80agUJ4LgDe9uiEqqkWW6XKrfbiTVlQ27EQ/VR1b6RLiQGnv77EO/PksZVbr6a1/kKphj8jwMiXuJZtU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=none smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4c2WKw0M5SzYQtwj;
-	Thu, 14 Aug 2025 11:43:16 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id A3D8A1A1672;
-	Thu, 14 Aug 2025 11:43:14 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.104.67])
-	by APP4 (Coremail) with SMTP id gCh0CgCnIxRKW51ogs93Dg--.15627S17;
-	Thu, 14 Aug 2025 11:43:14 +0800 (CST)
-From: Yu Kuai <yukuai1@huaweicloud.com>
-To: axboe@kernel.dk,
-	yukuai3@huawei.com,
-	bvanassche@acm.org,
-	nilay@linux.ibm.com,
-	hare@suse.de,
-	ming.lei@redhat.com
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	yukuai1@huaweicloud.com,
-	yi.zhang@huawei.com,
-	yangerkun@huawei.com,
-	johnny.chenyi@huawei.com
-Subject: [PATCH 13/16] mq-deadline: covert to use request_queue->async_depth
-Date: Thu, 14 Aug 2025 11:35:19 +0800
-Message-Id: <20250814033522.770575-14-yukuai1@huaweicloud.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20250814033522.770575-1-yukuai1@huaweicloud.com>
-References: <20250814033522.770575-1-yukuai1@huaweicloud.com>
+	s=arc-20240116; t=1755144915; c=relaxed/simple;
+	bh=iHbUtFxOXhf7il6cDn7qoU0zrfBE97XzO4Li8Mythgc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aDC2xXpI8CePBUBG44+D/o1CF6/azinY4AycDcw14jP3TsUaYoNOSMil+wSLYgj9IJJb4oSXOYieWVsd+p9BKUEyh2+I+Wf8Yz7RG+knWkQ2NPJVu/PPKpbK1ZATbeHvQBc1M5qkZhfEfU2TR8oYuynV5y7Jfyg6EnQTqeqco+c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=pNbGFJM3; arc=none smtp.client-ip=209.85.215.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pNbGFJM3"
+Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-b4716f46a2eso316319a12.0
+        for <linux-block@vger.kernel.org>; Wed, 13 Aug 2025 21:15:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1755144911; x=1755749711; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=sWxfCtON1zed9A8C3GYhEYa8VInQ0SpyFdE2rQUbX1c=;
+        b=pNbGFJM3r7Fp0rL4gKREFbOHswsDoHAePNGJ1kmjZ2X87eguaDnER+nTNt6Tn+kqYz
+         TyHMKRLOPUsJwPAdUBWddF/nxreZkEBsgmoQXpel7GnXjJKoFhDi1NeX+XK4zu7jPMFj
+         4N13aNme+MJgNqk5t5VcXxgz6eomieRPrZB9uS7npzTK/SgaTuYXbm48+kTI9G9aBuWP
+         SAgeMgcEY54Wl0rTqoL9W8/xKSAEw5orXW1ZiAFIMA8qjPfRrg9BW3fiPrrgVOEV4PqR
+         w288Q1XscVAC6jaQmOW67EyZ4+TyGSJ75vZODf3CKh1jJd8PeJ0PrFb/ZXCSEU/IjsCi
+         bJ1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755144911; x=1755749711;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sWxfCtON1zed9A8C3GYhEYa8VInQ0SpyFdE2rQUbX1c=;
+        b=eipRaBgBq3sxf358AbQExbYgdYwgC/8bPhYiFCKe9Tyh6Blqq6IiIew4VLIFxMyDNK
+         Nwa6LWdG/WNnxuHvyOqEPKM08TJI3YQm7/B/2OLOKi4AEZ/ISGSEjcxmgg5VoDz7Fwym
+         OaXdR7qb6gHH/AG3PP8DzbVS1vR02ZOd2wFahN4DLYyNt0/aKU89jaVHx91RRgmCPW5t
+         a6dU++jS/ZoGhwXnj/Ilrdffb/mx7JWRfxLjOm8IIqmnryaw86a6CHvRvpMFzBaDj0qC
+         MWPp1zAPSz2NCfzZxmOKzseFdUAqsZsoTBqSv5UB/pAEh8giVJmf/vYpATWh2+6QJ/TS
+         diQA==
+X-Forwarded-Encrypted: i=1; AJvYcCXPIAhC9BELgDaFHyDFWIaN3/BeWzVUp0gW+h+uPkU1t4sT2+k09PxnuhgxQl2hH3x6lPtNQMXdM+BHow==@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywl0ZuNjNAhbQYTFo4tiPLRW9QFXK/fGgOVGjma6mGUnH7MBhCk
+	/sC65PqCXhNTAuB9WJU4cLfVMx4NSmjZG/jRQ9Br6JeAx0A6+3L949/Lnxg384LoBK8=
+X-Gm-Gg: ASbGncsE2trVw1pWiqWhnEipDIhHtCWeuDOglBJs4XtQhhuBh1DW5CJ4pTeMlCKJbn2
+	OWZb1dYrakWeeB73QWJLCUe3misrvTZ0G/46aJWvA4ydvA7seuG1jZHGJYTndApT4N7ovYoFx2K
+	0vwwlDxyfTfnGepeMMNkA34rWkurFc40HLAXdyKn1ArXVhr75QCvpdvb5XJL9aS0d5EFMU35lv4
+	cMeTe3Pbshs8+EMLFeMZqRfaTfA2tg4aJZxXRvYi1oTfgrUSDjLO4gRYpS8rCPEI1ByVqsAeahW
+	rp+2q++CnRCJRqIOcWNemvYGqqFIO5KETpKP7/jkrMGUrmxL7zOk0J40WGOmgXX4T9L+J83aUhu
+	+QJB1lemkFn6daveFon+rkB61
+X-Google-Smtp-Source: AGHT+IHt40bX0FwSrzcBQt9NOrie8YIvE0Bd/aZbf1eDUrCgWfF/cOlo6cUv942myCO6XkFRZpWJjg==
+X-Received: by 2002:a17:902:ef46:b0:243:80d:c513 with SMTP id d9443c01a7336-244584c278amr22862505ad.4.1755144910690;
+        Wed, 13 Aug 2025 21:15:10 -0700 (PDT)
+Received: from localhost ([122.172.87.165])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-241d1ef6e45sm337724835ad.22.2025.08.13.21.15.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Aug 2025 21:15:09 -0700 (PDT)
+Date: Thu, 14 Aug 2025 09:45:07 +0530
+From: Viresh Kumar <viresh.kumar@linaro.org>
+To: Tamir Duberstein <tamird@gmail.com>
+Cc: "Rafael J. Wysocki" <rafael@kernel.org>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	Alex Gaynor <alex.gaynor@gmail.com>,
+	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>,
+	=?utf-8?B?QmrDtnJu?= Roy Baron <bjorn3_gh@protonmail.com>,
+	Benno Lossin <lossin@kernel.org>,
+	Andreas Hindborg <a.hindborg@kernel.org>,
+	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+	FUJITA Tomonori <fujita.tomonori@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Michael Turquette <mturquette@baylibre.com>,
+	Stephen Boyd <sboyd@kernel.org>, Breno Leitao <leitao@debian.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Russ Weight <russ.weight@linux.dev>,
+	Dave Ertman <david.m.ertman@intel.com>,
+	Ira Weiny <ira.weiny@intel.com>, Leon Romanovsky <leon@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Brendan Higgins <brendan.higgins@linux.dev>,
+	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Alexandre Courbot <acourbot@nvidia.com>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+	Liam Girdwood <lgirdwood@gmail.com>,
+	Mark Brown <broonie@kernel.org>, linux-pm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org,
+	nouveau@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+	netdev@vger.kernel.org, linux-clk@vger.kernel.org,
+	linux-pci@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	kunit-dev@googlegroups.com, linux-block@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH v2 06/19] rust: cpufreq: replace `kernel::c_str!` with
+ C-Strings
+Message-ID: <20250814041507.sqkdumgaxfcalkhb@vireshk-i7>
+References: <20250813-core-cstr-cstrings-v2-0-00be80fc541b@gmail.com>
+ <20250813-core-cstr-cstrings-v2-6-00be80fc541b@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgCnIxRKW51ogs93Dg--.15627S17
-X-Coremail-Antispam: 1UD129KBjvJXoW3JF1UJw47CF15JF1fCr48JFb_yoW7uFWUpF
-	W3Janrtr1UtF4UurW8Aw43Zr1xWw4fC3sxKFyrKw4fGFn0yFsxtFyFyF1fZF93JrWfCw47
-	Kr1ktas5X347taDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUmS14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_JF0E3s1l82xGYI
-	kIc2x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2
-	z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F
-	4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq
-	3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7
-	IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4U
-	M4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2
-	kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkE
-	bVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67
-	AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVW8JVW5JwCI
-	42IY6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF
-	4lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aVCY1x0267AKxVW8Jr0_Cr1UYxBI
-	daVFxhVjvjDU0xZFpf9x0JUQFxUUUUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250813-core-cstr-cstrings-v2-6-00be80fc541b@gmail.com>
 
-From: Yu Kuai <yukuai3@huawei.com>
+On 13-08-25, 11:59, Tamir Duberstein wrote:
+> C-String literals were added in Rust 1.77. Replace instances of
+> `kernel::c_str!` with C-String literals where possible.
+> 
+> Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> Reviewed-by: Alice Ryhl <aliceryhl@google.com>
+> Reviewed-by: Benno Lossin <lossin@kernel.org>
+> Signed-off-by: Tamir Duberstein <tamird@gmail.com>
+> ---
+>  drivers/cpufreq/rcpufreq_dt.rs | 5 ++---
+>  rust/kernel/cpufreq.rs         | 3 +--
+>  2 files changed, 3 insertions(+), 5 deletions(-)
 
-In downstream kernel, we test with mq-deadline with many fio workloads, and
-we found a performance regression after commit 39823b47bbd4
-("block/mq-deadline: Fix the tag reservation code") with following test:
+Acked-by: Viresh Kumar <viresh.kumar@linaro.org>
 
-[global]
-rw=randread
-direct=1
-ramp_time=1
-ioengine=libaio
-iodepth=1024
-numjobs=24
-bs=1024k
-group_reporting=1
-runtime=60
-
-[job1]
-filename=/dev/sda
-
-Root cause is that mq-deadline now support configuring async_depth,
-although the default value is nr_request, however the minimal value is
-1, hence min_shallow_depth is set to 1, causing wake_batch to be 1. For
-consequence, sbitmap_queue will be waken up after each IO instead of
-8 IO.
-
-In this test case, sda is HDD and max_sectors is 128k, hence each
-submitted 1M io will be splited into 8 sequential 128k requests, however
-due to there are 24 jobs and total tags are exhausted, the 8 requests are
-unlikely to be dispatched sequentially, and changing wake_batch to 1
-will make this much worse, accounting blktrace D stage, the percentage
-of sequential io is decreased from 8% to 0.8%.
-
-Fix this problem by converting to request_queue->async_depth, where
-min_shallow_depth is set each time async_depth is updated.
-
-Fixes: 39823b47bbd4 ("block/mq-deadline: Fix the tag reservation code")
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
- block/mq-deadline.c | 42 +++---------------------------------------
- 1 file changed, 3 insertions(+), 39 deletions(-)
-
-diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-index 1825173d82a6..970e1541b7b7 100644
---- a/block/mq-deadline.c
-+++ b/block/mq-deadline.c
-@@ -98,7 +98,6 @@ struct deadline_data {
- 	int fifo_batch;
- 	int writes_starved;
- 	int front_merges;
--	u32 async_depth;
- 	int prio_aging_expire;
- 
- 	spinlock_t lock;
-@@ -487,32 +486,10 @@ static struct request *dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
- 	return rq;
- }
- 
--/*
-- * Called by __blk_mq_alloc_request(). The shallow_depth value set by this
-- * function is used by __blk_mq_get_tag().
-- */
--static void dd_limit_depth(blk_opf_t opf, struct blk_mq_alloc_data *data)
--{
--	struct deadline_data *dd = data->q->elevator->elevator_data;
--
--	/* Do not throttle synchronous reads. */
--	if (blk_mq_sched_sync_request(opf))
--		return;
--
--	/*
--	 * Throttle asynchronous requests and writes such that these requests
--	 * do not block the allocation of synchronous requests.
--	 */
--	data->shallow_depth = dd->async_depth;
--}
--
--/* Called by blk_mq_update_nr_requests(). */
-+/* Called by blk_mq_init_sched() and blk_mq_update_nr_requests(). */
- static void dd_depth_updated(struct request_queue *q)
- {
--	struct deadline_data *dd = q->elevator->elevator_data;
--
--	dd->async_depth = q->nr_requests;
--	blk_mq_set_min_shallow_depth(q, 1);
-+	blk_mq_set_min_shallow_depth(q, q->async_depth);
- }
- 
- static void dd_exit_sched(struct elevator_queue *e)
-@@ -577,6 +554,7 @@ static int dd_init_sched(struct request_queue *q, struct elevator_queue *eq)
- 	blk_queue_flag_set(QUEUE_FLAG_SQ_SCHED, q);
- 
- 	q->elevator = eq;
-+	q->async_depth = q->nr_requests;
- 	return 0;
- }
- 
-@@ -761,7 +739,6 @@ SHOW_JIFFIES(deadline_write_expire_show, dd->fifo_expire[DD_WRITE]);
- SHOW_JIFFIES(deadline_prio_aging_expire_show, dd->prio_aging_expire);
- SHOW_INT(deadline_writes_starved_show, dd->writes_starved);
- SHOW_INT(deadline_front_merges_show, dd->front_merges);
--SHOW_INT(deadline_async_depth_show, dd->async_depth);
- SHOW_INT(deadline_fifo_batch_show, dd->fifo_batch);
- #undef SHOW_INT
- #undef SHOW_JIFFIES
-@@ -791,7 +768,6 @@ STORE_JIFFIES(deadline_write_expire_store, &dd->fifo_expire[DD_WRITE], 0, INT_MA
- STORE_JIFFIES(deadline_prio_aging_expire_store, &dd->prio_aging_expire, 0, INT_MAX);
- STORE_INT(deadline_writes_starved_store, &dd->writes_starved, INT_MIN, INT_MAX);
- STORE_INT(deadline_front_merges_store, &dd->front_merges, 0, 1);
--STORE_INT(deadline_async_depth_store, &dd->async_depth, 1, INT_MAX);
- STORE_INT(deadline_fifo_batch_store, &dd->fifo_batch, 0, INT_MAX);
- #undef STORE_FUNCTION
- #undef STORE_INT
-@@ -805,7 +781,6 @@ static const struct elv_fs_entry deadline_attrs[] = {
- 	DD_ATTR(write_expire),
- 	DD_ATTR(writes_starved),
- 	DD_ATTR(front_merges),
--	DD_ATTR(async_depth),
- 	DD_ATTR(fifo_batch),
- 	DD_ATTR(prio_aging_expire),
- 	__ATTR_NULL
-@@ -892,15 +867,6 @@ static int deadline_starved_show(void *data, struct seq_file *m)
- 	return 0;
- }
- 
--static int dd_async_depth_show(void *data, struct seq_file *m)
--{
--	struct request_queue *q = data;
--	struct deadline_data *dd = q->elevator->elevator_data;
--
--	seq_printf(m, "%u\n", dd->async_depth);
--	return 0;
--}
--
- static int dd_queued_show(void *data, struct seq_file *m)
- {
- 	struct request_queue *q = data;
-@@ -1010,7 +976,6 @@ static const struct blk_mq_debugfs_attr deadline_queue_debugfs_attrs[] = {
- 	DEADLINE_NEXT_RQ_ATTR(write2),
- 	{"batching", 0400, deadline_batching_show},
- 	{"starved", 0400, deadline_starved_show},
--	{"async_depth", 0400, dd_async_depth_show},
- 	{"dispatch0", 0400, .seq_ops = &deadline_dispatch0_seq_ops},
- 	{"dispatch1", 0400, .seq_ops = &deadline_dispatch1_seq_ops},
- 	{"dispatch2", 0400, .seq_ops = &deadline_dispatch2_seq_ops},
-@@ -1024,7 +989,6 @@ static const struct blk_mq_debugfs_attr deadline_queue_debugfs_attrs[] = {
- static struct elevator_type mq_deadline = {
- 	.ops = {
- 		.depth_updated		= dd_depth_updated,
--		.limit_depth		= dd_limit_depth,
- 		.insert_requests	= dd_insert_requests,
- 		.dispatch_request	= dd_dispatch_request,
- 		.prepare_request	= dd_prepare_request,
 -- 
-2.39.2
-
+viresh
