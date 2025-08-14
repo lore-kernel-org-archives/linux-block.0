@@ -1,100 +1,132 @@
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF4531D5151
-	for <linux-block@vger.kernel.org>; Thu, 14 Aug 2025 05:14:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEBB024EAA7;
+	Thu, 14 Aug 2025 06:37:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755148481; cv=none; b=fVJDGxeG7ITH02KRjLACZX6BYmDUSY5HHJ/a2ThKvT653Udn9JIQUw1LAGf9cXeAre9FkU14m4NjoIKELB2zDh7y73vCKPrFVhcV86yTmiGusWq5+yjLMUKN/J/+aQCKyXtKuWMym40gNBVP07H5tFaRIT1BXhCHoDKlMNLJ7qk=
+	t=1755153448; cv=none; b=WQgfidOZpXBvGxgwY5kZYZPEkkC8jSR4+NCN3OFkMklqxiPp1i3o2FeqPdryDw8TEmoJnB4Ab5ckmWSDjgaDSR70/lIz+C4apvBhFJV/NwpvHzUE/MPsvDs1TM/ZdYAfZMV9ZBNB6qTPy6MO5QBCCrjoRkqxZBxDvO3watx4Hpk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755148481; c=relaxed/simple;
-	bh=J0wlzG2blZCeTmTiWa0IPgMiQWx4MedEXGLbkPJW+l8=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=AytT+oQ4lM/qUcpqHInCT0XPC7B95YhjX6HutK9yk4fsQUSF60oST45K6ODL8BrkDML9hDjgw5fC79Tg4N1XkW1Ktmb00Q1EQ1MuV8lezjlqGlFdrWIu3ATUgWrB1HgWHguUeg/7svpabCSg7PB4e2KJ6OqWKkzqs1zo0Avdh2k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EhDzHSnY; arc=none smtp.client-ip=209.85.218.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1755153448; c=relaxed/simple;
+	bh=EvdQ6Bg8OnlITVamBcloGQkXv3LWJan23b0GY22b9ZE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=nXNCOXjACPjYaCN62jMA7Hg6ms7KqiWfR3tDeDfnKMmxhNwsKScM3sib3gyajzmqtt3iDwf3X3iTMOoz6a74r8Rhcw/SZ0f78DdmJG2UHQ+6+vhZvTqdyoZxuFCh850rM1lp+OqFRdOjb2MCYS6lPVcN50Tmw9EV9fbyUir5xtI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=liK/K+Vs; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EhDzHSnY"
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-afcb79db329so70603666b.2
-        for <linux-block@vger.kernel.org>; Wed, 13 Aug 2025 22:14:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755148478; x=1755753278; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=uGsl3pnIyWXTWmUAjKXVJmJrasAdmvyqWB4GlgpgknE=;
-        b=EhDzHSnYX6Hpf81d2XCpC6XhS76dwOfzwWP5uBOkFTTyJTbGPPQiFFVj/pdHETtdM8
-         CEg7CabsrpnIH0inpRmSPGlY75m43syl8M2OOpcFzhLhAMc7O/LiXUpX4S95ghLSgXBN
-         CSpnzXsHfODpgmCU9iRcw9FtBNslCAkVCAds1ei+WHu4XQH1MDI79vwuu0c/5T65ybr+
-         v69+13YjXmCbBX7siYmN0ZBCR8oqoMEG0ZVoDdEimeWnA4tpYbq6/BUvoqHsi68CgD71
-         Wyn4Ac2mlyuTz16RsAL3B0hqOrpG6yKAKe6zRvYW89DGPPq5poZYkD1bK4Q2+cG4EPQO
-         gGyg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755148478; x=1755753278;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=uGsl3pnIyWXTWmUAjKXVJmJrasAdmvyqWB4GlgpgknE=;
-        b=eU6tMZrUIUbP1M1Na31ettnuvhVpxtwk4kNqlwRqcGilCkoIFMN034S8KhFDSPVgvT
-         1/s9svqMv9Y3VXzqPT05uErMyyiB7X8+EWvNfgD/+/m2NawSyPYfpCnumKJhk0/nzCIc
-         GPPgzSyb5tiRckeB/SKzJeACWfxGvF4k48wDMpkB4kkXKeNaYXYg5/AYPlT8pWaM6ANN
-         C3GQNmjec310q4ELTRSe/grGxSNi1azi1/WFM8PoV4er1AIIaJS0bBVukykjvQ0ljyDE
-         ZwUXmtZb+3U+EbrgKJVBwXTgG9kVxIPA3obJHQuax+BIrt7CNLkOLUqmnBf4M2690ZJb
-         l2Xg==
-X-Gm-Message-State: AOJu0YxSNfk/ISho41+ApreJD+fk0udhB17tznLsoe2rvs/ISHxxx1ZJ
-	QNPv6gACQIIaPKpIVARt1Z5W9eMIu6KsWxzIWbhxXNfDEdlZehsRAGURMyJvnEQwq8OJWYJDSPM
-	DDXXi0Mm8njWeE886afQ6yByjELGDx2h5a3zc
-X-Gm-Gg: ASbGncu+E0oBvAtsfKnnLPVpEWmyWcv71cVD6tLNjvfn4lYSKtM6KCgMnAwsn9WIUED
-	Covhd/V6cGvDXhAsqFWkXdBQ1g27G5wiX4Ea6owvu0hnbmCrHq33tQZmOb/PLbWHD78tN5NV9er
-	nupfLTmOV/x/SPCHDmX2ZYVkRnnrBLRVH9tSB5YoEJm8RSgFjRBUboeCRBoXWT1+s9FHZS35bTE
-	IciBQQe
-X-Google-Smtp-Source: AGHT+IGALsMaupQw9S0qNVZ+0oLz0FQiLZsgHRri+k/J1bv5hppxqu0GISgCgYrVEbGvIEVU669Ul4syTu5spkGL/gw=
-X-Received: by 2002:a17:907:3e1d:b0:af9:5ca0:e4fe with SMTP id
- a640c23a62f3a-afcb999f066mr148069566b.56.1755148477774; Wed, 13 Aug 2025
- 22:14:37 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="liK/K+Vs"
+Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57DM8Erw011435;
+	Thu, 14 Aug 2025 06:37:21 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=yYUb25VbWnegftuQMWLMgm
+	Nh1P2XLmEoohNyE4+Czww=; b=liK/K+VsHR4iAEkXsqzxG2bArLZQn9r8cjWNSg
+	6WjsEMU3MqmaMpDGQEEIwjIF4+a+807GdBaLygHEARCQA49u/7psYmIDIMKcaOrL
+	ikqVqyyKwkp2fFveysOT3P0UNW9sALgS8s/k5gwNlofO8g2REVt2kYc3xtbx7nHR
+	b/gzEGC7NPYp5D3Q+Hj30/Ph8KYKkm8SGooXVNqdECC2mv0L6K16crfgrb/64ThW
+	ipKuikfZqRinkbtYo3Siv6o+c5Rk28TMXhFKoysetVXgiuJVnSBfA4Z8/aByY9za
+	Tykycol2XzbWfVOc2ZC+bpJK6FVHvvVLsep02F20mzH3ylvg==
+Received: from apblrppmta01.qualcomm.com (blr-bdr-fw-01_GlobalNAT_AllZones-Outside.qualcomm.com [103.229.18.19])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 48g9q9wpem-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 14 Aug 2025 06:37:20 +0000 (GMT)
+Received: from pps.filterd (APBLRPPMTA01.qualcomm.com [127.0.0.1])
+	by APBLRPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTP id 57E6bGVO015595;
+	Thu, 14 Aug 2025 06:37:16 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by APBLRPPMTA01.qualcomm.com (PPS) with ESMTPS id 48dydm4gex-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 14 Aug 2025 06:37:16 +0000
+Received: from APBLRPPMTA01.qualcomm.com (APBLRPPMTA01.qualcomm.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 57E6bGHT015590;
+	Thu, 14 Aug 2025 06:37:16 GMT
+Received: from hu-devc-blr-u20-c-new.qualcomm.com (hu-hardshar-blr.qualcomm.com [10.190.104.221])
+	by APBLRPPMTA01.qualcomm.com (PPS) with ESMTPS id 57E6bGvd015589
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 14 Aug 2025 06:37:16 +0000
+Received: by hu-devc-blr-u20-c-new.qualcomm.com (Postfix, from userid 3848816)
+	id AAC1420A07; Thu, 14 Aug 2025 12:07:14 +0530 (+0530)
+From: Hardeep Sharma <quic_hardshar@quicinc.com>
+To: Jens Axboe <axboe@kernel.dk>, Hannes Reinecke <hare@suse.de>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        stable@vger.kernel.org, Hardeep Sharma <quic_hardshar@quicinc.com>
+Subject: [PATCH 6.6.y v2 1/1] block: Fix bounce check logic in blk_queue_may_bounce()
+Date: Thu, 14 Aug 2025 12:06:55 +0530
+Message-Id: <20250814063655.1902688-1-quic_hardshar@quicinc.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Teng Qin <palmtenor@gmail.com>
-Date: Thu, 14 Aug 2025 01:14:27 -0400
-X-Gm-Features: Ac12FXzzHFvWXMHDM_QM9EWcU-sPU8GS9ZOK4bDaOBMfqXYO_LQaHBmOMMFPqtg
-Message-ID: <CAHumS0BE_28D47d3Ls5PJBONTzVUCA54QwTV5UhJdDhnfCEi4A@mail.gmail.com>
-Subject: Question on setting IO polling behavior and documentations
-To: linux-block@vger.kernel.org, hch@lst.de
-Cc: inux-nvme@lists.infradead.org, axboe@kernel.dk, sagi@grimberg.me
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-QCInternal: smtphost
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Authority-Analysis: v=2.4 cv=CNMqXQrD c=1 sm=1 tr=0 ts=689d8420 cx=c_pps
+ a=Ou0eQOY4+eZoSc0qltEV5Q==:117 a=Ou0eQOY4+eZoSc0qltEV5Q==:17
+ a=IkcTkHD0fZMA:10 a=2OwXVqhp2XgA:10 a=VwQbUJbxAAAA:8 a=COk6AnOGAAAA:8
+ a=aRHBprkQ1X53iwqQ5hAA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+ a=TjNXssC_j7lpFel5tvFf:22
+X-Proofpoint-GUID: -aOy7J7bLtS5wTFA6AJRsMHqcXjgTXKm
+X-Proofpoint-ORIG-GUID: -aOy7J7bLtS5wTFA6AJRsMHqcXjgTXKm
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODEyMDE2NCBTYWx0ZWRfXw/7ZR4OgbAko
+ 4RzDSzoX+n17nLV7RUakqOfSpcgzdkmCy/v5/0ssEjpZT82aKjMY8ggXB2SpMudFt5TkE2Lt9a9
+ chWWGdTeaYilrEkfBYbLIjxmtXnd/S3aAx951QfkwNYCzjKxfV49b2HFmhDG1aH2bG10ys1crs/
+ /z6hq3K2jLRquuwVaP66pyH6TR6sZRBHM6d9eXf66uHzYP5yc4kxlGowr9If0OqPyujl/YTslNP
+ PMdp7sbud2uG2ABzvIbJ3V9GMArA2/Pgz3FlJODnRcpICqfojfJRWUlQnsZ96UWAYAhC/jeu3uz
+ R7EyhJ3w7yr64Wmm9pSLKjnGHjiu6c+wFB5uMnFc+fel7w7P8G4nyF6Hw0FB5pNXBJGKHT4K78c
+ UqOgo2S5
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-08-13_02,2025-08-11_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 adultscore=0 phishscore=0 bulkscore=0 clxscore=1015
+ malwarescore=0 impostorscore=0 priorityscore=1501 suspectscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2508120164
 
-Hello maintainers,
-I'm trying to explore and test IO polling behavior of block devices
-in my system, NVMe drives to be specific. Upon trying, I noticed the
-legacy /sys/block/<disk>/queue/io_poll no longer changes the polling
-behavior of the device correctly.
+Buffer bouncing is needed only when memory exists above the lowmem region,
+i.e., when max_low_pfn < max_pfn. The previous check (max_low_pfn >=
+max_pfn) was inverted and prevented bouncing when it could actually be
+required.
 
-I found out the change from
-  a614dd228035 block: don't allow writing to the poll queue attribute
-(https://lore.kernel.org/all/20211012111226.760968-16-hch@lst.de/)
-The dmesg prompts user to use driver specific parameters, but for this
-case, I can not find, either from code or documentation, parameter
-from the nvme driver to set polling behavior for the drive similar to
-the legacy io_poll sysfs interface.
-I realized I can use flags from either io_uring or the nvme passthrough
-commands to specify polling behavior. But are there still some configs
-I can make to change the entire drive's IO to polling, so that legacy
-applications not using io_uring can still have it?
-Upon reading the entire patch set, it feels to me that since we are
-changing the polling control to a per-bio flag, is drive-wide control
-of polling behavior just straight-out impossible now?
+Note that bouncing depends on CONFIG_HIGHMEM, which is typically enabled
+on 32-bit ARM where not all memory is permanently mapped into the kernel’s
+lowmem region.
 
-Moreover, the block layer documentation at
-  Documentation/ABI/stable/sysfs-block
-still documents the legacy behavior of the io_poll sysfs file. This is
-confusing for users trying to figure out reason of the failed or
-unexpected behavior after writing to the file and seeing the dmesg,
-particularly because there are many articles on the Internet describing
-the legacy behavior.
-If the maintainers agree, I can help update these documentations.
+Branch-Specific Note:
 
-Thanks a lot for your kind help!
+This fix is specific to this branch (6.6.y) only.
+In the upstream “tip” kernel, bounce buffer support for highmem pages
+was completely removed after kernel version 6.12. Therefore, this
+modification is not possible or relevant in the tip branch.
 
-Teng Qin
+Fixes: 9bb33f24abbd0 ("block: refactor the bounce buffering code")
+Cc: stable@vger.kernel.org
+Signed-off-by: Hardeep Sharma <quic_hardshar@quicinc.com>
+---
+ block/blk.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/block/blk.h b/block/blk.h
+index 67915b04b3c1..f8a1d64be5a2 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -383,7 +383,7 @@ static inline bool blk_queue_may_bounce(struct request_queue *q)
+ {
+ 	return IS_ENABLED(CONFIG_BOUNCE) &&
+ 		q->limits.bounce == BLK_BOUNCE_HIGH &&
+-		max_low_pfn >= max_pfn;
++		max_low_pfn < max_pfn;
+ }
+ 
+ static inline struct bio *blk_queue_bounce(struct bio *bio,
+-- 
+2.25.1
+
