@@ -1,48 +1,48 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFE062FFDEC;
-	Thu, 14 Aug 2025 13:06:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CCA72FF660;
+	Thu, 14 Aug 2025 13:11:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755176809; cv=none; b=lXnKMOLlDTStqZVteuwEn4aqxK0l/J92/PqpHRijzhkwyx/Y2qH7UBmAIndGXWBdJYreuHk3fAkhHxzj3GtYnPM3M1IdwC46N8u9UpHzLcm1yqGMZpBN0CCjIAxQIvqvw0UsZx1UBiY1MmHOOrt0jqf390CxzkPJHPDcoCqJ3Q8=
+	t=1755177107; cv=none; b=Wj16W3tZZH7ST8T+BW7UI0p/WHr6KZ46wZbXc1+WEG04Pxyc6eQRzAS3XwBbb63oh0ucitKLyJa2WMQbAgKVnePObyquX6JyKj1UcCBN08A6LSZJzhf1I/8IyN+GNSDY//8ySUY2DR3V+FHZ3yxt+NFoSAG6m33KxB/cVU0K8uM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755176809; c=relaxed/simple;
-	bh=jOAqWxiriywVpdi5TvvVzAUwFdL9W9fDqxh9mmGsPOY=;
+	s=arc-20240116; t=1755177107; c=relaxed/simple;
+	bh=z/xGJsQ2CfXvIHM9FfR/NKQ4P053nD9Gix+aHo9THdE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=kBTDpmZD553ZbmCJPMdiApxo+BHFel73Xru6piCpOpgIavNnraSIc4HRhQgSY8ivyrbf7EWis/CNNLBskEiqATTrbvKCjxn3bu4NaTW4iG+Kr2sDpOkKhvE5h6z0bWQ0wnZG9h3KIjBS7yIEvfZlkVtBeg4xnp8sSVnj90fZRlI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=TDgXKLmO; arc=none smtp.client-ip=205.220.180.131
+	 In-Reply-To:Content-Type; b=IDzhyMVfUx9j06ZL6IEwZUGCiKCqlHUIiQH/oYQNkfVvohOHEzpm4TAZRPtp0h7BQoF52cfbH3kZCk3SbTAX3Kc8dE7R0P1bhSJRgq4LfFiBc5UHJGE0FPvNJaoyTcjcFsa1/xTKIqh+a7xr/NxPgoo0lb0/ydwWF0+6RY5RfI8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=k4LQGzO+; arc=none smtp.client-ip=205.220.168.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="TDgXKLmO"
-Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57E9FKSE027000;
-	Thu, 14 Aug 2025 13:06:36 GMT
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="k4LQGzO+"
+Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57E9NBtv029571;
+	Thu, 14 Aug 2025 13:11:39 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
 	cc:content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	krCmXFTYeP7XPxF+yvCB610msvOX8qDJ7ylNRn64itE=; b=TDgXKLmOy6cQtKS7
-	bQlVryepSBECdEiPJgutVSSdfJiH51n/3j2IzTAat/wzJ459HeLvlTTOGQTeGBmX
-	dKBc1tHEKb9VKjCqwP5kEe80Lx0raXBhg1GzWeu+hGbAA5J0f6LAYwdIAY7N76xp
-	aw4XnwNunsOTqnTiXk602sSKBCgozPoy2zz8RnIHJjzQ4vWYAGd/72w/697MAK6p
-	iTWb1a6lujBLR51M9+z3X4EryTfPZPtqGYMQi5k0i37G5jbfC3UdsbFwbDsITc07
-	katUi9kzYk2sKrcURepF2ce1b/PeAzm4nDBM/BY7V9p0k2RlRZ3ErumdpzVhOy+B
-	bj6Rkg==
-Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 48ffhjukd2-1
+	t+oDBlYzoKHa2mJpnSU97tBzxngB1r509j9FMCo5vnw=; b=k4LQGzO+6A2vDz2e
+	CzDHJ+PjiZBOBuY39tG4wnmpeyIfXAsvXHpJSkiFWgUwc5IHWrCwKnR8nH2RAmuG
+	s/96iPZejJ52BGeLbL/jGTzjp9J4JssPsBzII9ukvcoGgwg5OWLfFZ3UMA4cU3A3
+	WDo3cgVRlzVwGOGv6vncHlC0MLLuIkGr+GAmZBzyvcxBngxTd4sZQAc/s0u+IN3p
+	xJ7JC0+OpXAwzRNvrrwEFbVF5gh9ITIcTucFfcDufHRX5ivzh2oEGcK/wn4zAnXO
+	w5j0JkDk8W1e5tK5qzPYRhgvft2CTnh+t7mXlLRFrp9khXddRxkdfSYOsMrhV0ry
+	l3iTIA==
+Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 48g9q9xtmj-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 14 Aug 2025 13:06:35 +0000 (GMT)
+	Thu, 14 Aug 2025 13:11:39 +0000 (GMT)
 Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 57ED6YmD008250
+	by NALASPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 57EDBcam004810
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 14 Aug 2025 13:06:34 GMT
+	Thu, 14 Aug 2025 13:11:38 GMT
 Received: from [10.50.4.137] (10.80.80.8) by nalasex01a.na.qualcomm.com
  (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1748.10; Thu, 14 Aug
- 2025 06:06:32 -0700
-Message-ID: <4a898590-e1ca-41dc-b8b7-a5884d10db5d@quicinc.com>
-Date: Thu, 14 Aug 2025 18:36:29 +0530
+ 2025 06:11:36 -0700
+Message-ID: <8c2d6c89-88ce-43ce-baef-0f00fa74c0bc@quicinc.com>
+Date: Thu, 14 Aug 2025 18:41:32 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -71,36 +71,38 @@ X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
  nalasex01a.na.qualcomm.com (10.47.209.196)
 X-QCInternal: smtphost
 X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODExMDA3NCBTYWx0ZWRfX3bnogNWKfMR/
- pkUGFbI4Fa+HiSzuLOUc57yXJKys4ffNs0rDVEbdAe+5THN8SKzL1GdE0LrqQeLMW1KZ4ChpsxF
- jTwkknavvpsZr1QyDy0E2m0rAMVbB+49LcSHA4bwJ2LxWVNq/CaKbUkZCaYZMQDEJAKU0lRI/rc
- c2l6sOfzis06Tn9wTY60SjZ59w/bfbKyhcYlpEi8hPcDkwqJVRfiYh/L2lh7mBNFJB7jNNeNaik
- yL7Zp1d/8jV3Al0f8wdSc36x9qOq002vQtYuLK2wbVXhBa8QqYl2BR9YKgLcXFuKSgILaKhQB+T
- mmx9IueSqHnSylVrVn760RGV7Mjf/JAtAn2UJU/rX1OOtNnqB8gXi+KW4Rv29M1d5bhFwtFi/0F
- XDP1AHek
-X-Proofpoint-GUID: bNKjm28c2Joohus3FoSjco54BNTGQihO
-X-Authority-Analysis: v=2.4 cv=TJFFS0la c=1 sm=1 tr=0 ts=689ddf5b cx=c_pps
+X-Authority-Analysis: v=2.4 cv=CNMqXQrD c=1 sm=1 tr=0 ts=689de08b cx=c_pps
  a=ouPCqIW2jiPt+lZRy3xVPw==:117 a=ouPCqIW2jiPt+lZRy3xVPw==:17
  a=GEpy-HfZoHoA:10 a=IkcTkHD0fZMA:10 a=2OwXVqhp2XgA:10 a=VwQbUJbxAAAA:8
  a=COk6AnOGAAAA:8 a=8iWu0OXfL7HOh5h_90kA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
  a=TjNXssC_j7lpFel5tvFf:22
-X-Proofpoint-ORIG-GUID: bNKjm28c2Joohus3FoSjco54BNTGQihO
+X-Proofpoint-GUID: PNKuSBmbbeCSrZEueUTAq3cewJA55O5T
+X-Proofpoint-ORIG-GUID: PNKuSBmbbeCSrZEueUTAq3cewJA55O5T
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODEyMDE2NCBTYWx0ZWRfX77BpFuEgeoKh
+ ecwQtqcARQozhtuGF4yE9ATOeVEE2Wrxys3nFntH4sPdC7dLB/hvzBEW5osahzd5qoWJWZnP0Fh
+ e+beMf+gEOhI5FHddSMJLfPw1VMThFjRv1MSmMAnTl3JvYoS9tFpOG9g3J3f7PUjV3wrAdxYQ4q
+ NWHK62lK1EFMNraCbPZG1WKsC0M/vS23OKVg096zg0aSn+AwT4wbciwSzjWEfTTxzzcGWgx6yw5
+ xkTvv/c0sYJaGXTU9DDIx8PgojWP6nr23Bp9y3mbn//0ylV4r4Mdy0l6ef0u3eEG219UZJQhBYO
+ P9LBNqJomjLP1BMqesIsXoMUe40UNtZc8a2ZGjSmIbVBb0qEwiLGverQmvNW2LCepu0hqeFPA/e
+ H24VMEL6
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
  definitions=2025-08-13_02,2025-08-14_01,2025-03-28_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 suspectscore=0 adultscore=0 impostorscore=0 malwarescore=0
- phishscore=0 clxscore=1015 spamscore=0 bulkscore=0 classifier=typeunknown
- authscore=0 authtc= authcc= route=outbound adjust=0 reason=mlx scancount=1
- engine=8.19.0-2507300000 definitions=main-2508110074
+ spamscore=0 adultscore=0 phishscore=0 bulkscore=0 clxscore=1015
+ malwarescore=0 impostorscore=0 priorityscore=1501 suspectscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2508120164
 
 This change to blk_queue_may_bounce() in block/blk.h will only affect 
 systems with the following configuration:
 
 1. 32-bit ARM architecture
-2. Physical DDR memory greater than 1GB
+2. Physical DDR memory greater than or equal to 1GB (greater than lowmem 
+region )
 3. CONFIG_HIGHMEM enabled
-4. Virtual memory split of 1GB for kernel and 3GB for userspace
+4. Virtual memory split of 1GB for kernel and 3GB for userspace OR when 
+we cannot map all physical address in lowmem region
 
 Under these conditions, the logic for buffer bouncing is relevant 
 because the kernel may need to handle memory above the low memory 
