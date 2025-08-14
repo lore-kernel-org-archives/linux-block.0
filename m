@@ -1,160 +1,100 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F42A270559;
-	Thu, 14 Aug 2025 07:40:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9B67192D97;
+	Thu, 14 Aug 2025 07:54:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755157227; cv=none; b=ksMmEkpw5ivVw2MR2BNKCxuIU9/T2IHCdCdCWwLt3g+OnOUGnpWsmyDv/8/wZvCIsaMhIZJf69skzEx8KaIUmdXZhspXDrIKlXelg7Y3rM58GXL7593kAgS4TFGleS8gX7+twzDhTOJUPnK/Mh5+Y9krXg259bDDXzyHrF1lsH4=
+	t=1755158059; cv=none; b=f8tY2XnyihZRuthgQKVZlZT8BAXw4VmUcrdtpGE6fwNaJVHbEJDlyLEa87yEjbPhLwjnscKK3t1KJWYXxQDHYeFl2aeHmCjh7TnbGklFP/r97Nq/S0Ea3HETvTlxrkukm/I15m2S2OtFRhVrLFWaBjqGfWWIvUr/2V971l1vWBc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755157227; c=relaxed/simple;
-	bh=+Gb5lCMHMsLqlAIttH2PAfl6IketLup6dYf05JSPbnQ=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=uWvUNUB7hWuMqZ78SeufWnnGbWRjezUBy+k9grIi7AFfihxlNAjIWICyGP5P+Z767Y6mrWW4uQ5JgdGaqQ/L8vtrAak31s3zjlSTjQgY5FF4RtpRWLqK7jZXUrA2T5+gjODIwxprPkRQa8WwVvgY794yGw+y375vTrfln0kStbQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o2IxNEFy; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1755158059; c=relaxed/simple;
+	bh=8n2URVW1zH35PTkcFhfdDY6JdVB2waPtDBeuhXieSmc=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=ohqebMix+NuvGeK4kyIXHCy556VGh9XM2XSZ34wAb7/aLm4FfDk5pFoCVAJ32IGQEiRjAnfn6PbGv8/2e++0jsBC41bP53uaU3lsBltPXFLlWfCGVPdaorZySA9c2CZlUfCx/R7Hz5og8b8LrY4c0ENTJV9xs9Nc8ybsrgqhAB8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XwG6sxcS; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o2IxNEFy"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90D74C4CEF7;
-	Thu, 14 Aug 2025 07:40:24 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XwG6sxcS"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3FD96C4CEEF;
+	Thu, 14 Aug 2025 07:54:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755157227;
-	bh=+Gb5lCMHMsLqlAIttH2PAfl6IketLup6dYf05JSPbnQ=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=o2IxNEFym0JKWZP1M9HsvDC6WtVQAsOM2aPJBT4qe5+jzI4zxNthfTZ9Nv98AsO/5
-	 cVn1uNfeQFg2pEgu+vl732JUypCdFXM9ZAVQ4fgXsaWQPaClqz7p5fKClYd5mn+y7O
-	 8hTG+flMW5l1TeBD38KBxagZwqWRCkJH46hApXnYa9TH309elY2tJQm7tddeTOYy+O
-	 8uf44Vt0HyV/NlVizPCi6ltE43ylFF4KfvWaNJdnZIZ3R8nXshmdtrIbQsc3f/AP32
-	 U28xHqSzSr8vu8jn/GBGxtMal4aA8Nm8QR7l28fNkHMClxP0P7uBc7zvYukzTBp3AX
-	 W9ySJwuTAJUEw==
-From: Andreas Hindborg <a.hindborg@kernel.org>
-To: Alice Ryhl <aliceryhl@google.com>
-Cc: Boqun Feng <boqun.feng@gmail.com>, Miguel Ojeda <ojeda@kernel.org>, Alex
- Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>, =?utf-8?Q?Bj?=
- =?utf-8?Q?=C3=B6rn?= Roy
- Baron <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>, Trevor
- Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, Jens Axboe
- <axboe@kernel.dk>, linux-block@vger.kernel.org,
- rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 11/15] rnull: enable configuration via `configfs`
-In-Reply-To: <CAH5fLgi+R=ZW2bFnZP2=231vV6JAHTZJ0UBYkdojG=HjBYR3MA@mail.gmail.com>
-References: <20250812-rnull-up-v6-16-v4-0-ed801dd3ba5c@kernel.org>
- <20250812-rnull-up-v6-16-v4-11-ed801dd3ba5c@kernel.org>
- <mACGre8-fNXj9Z2EpuE3yez_o2T-TtqrdB6HB-VkO0cuvhXsqzECKWMhsz_c43NJUxpsnVpO_U0oLbaaNhXqRQ==@protonmail.internalid>
- <aJw-XWhDahVeejl3@google.com>
- <87cy8zfkw5.fsf@t14s.mail-host-address-is-not-set>
- <WporCpRrDB_e8ocWi63px_bwtPWqRjDL4kVPNNXFNoI6H-4bgk5P_n4iO0E4m-ElwkiNTyBITwgdMXjREE8VXQ==@protonmail.internalid>
- <CAH5fLggraEP7bwzJ+4ww8-7Ku-Z+d0Em3=NDUpa7r8oTLQy81A@mail.gmail.com>
- <877bz7f7jg.fsf@t14s.mail-host-address-is-not-set>
- <wKjTynzVeXix56T1eCrpF4Y7zM7dJVumIB3DljSJeXkHx7Vyb4jKR5X5c5B2yV0DFKItLrncGLWxcTkVynD12g==@protonmail.internalid>
- <CAH5fLgi+R=ZW2bFnZP2=231vV6JAHTZJ0UBYkdojG=HjBYR3MA@mail.gmail.com>
-Date: Thu, 14 Aug 2025 09:40:13 +0200
-Message-ID: <87zfc2e4gy.fsf@t14s.mail-host-address-is-not-set>
+	s=k20201202; t=1755158058;
+	bh=8n2URVW1zH35PTkcFhfdDY6JdVB2waPtDBeuhXieSmc=;
+	h=Date:Cc:Subject:From:To:References:In-Reply-To:From;
+	b=XwG6sxcSZ4e7RBPNZDqVWlc3ShcGu5AG24wQYLVS5LuPGPuFBTFuMUCfAU9DlDul3
+	 YqAuR5TsBysOtbQlj172ZmkZPYKd/7ItYBX8xn88aB0G/Z+kY515VurN2zAL9MK+aP
+	 2MG1rFQwZ3KyVb4cEWKd1tWhVQdukyPiHI8Yh3wLIVATqkFlhbQQImhS5e/7yMLNHR
+	 g4k8WyYDr386xoOcjRyzRjEC8hppnuQiX2NLbtUlHHCbwZ5ifMdulAfJM2VT+XMC7r
+	 c3m+hh/ldIFcj/wcOXssueSZ7r00TCMS+BmzLqghaiMWPzbkWNstIT4NASnh2yY2Pt
+	 VKLxy8v3XucDg==
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Mime-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Thu, 14 Aug 2025 09:54:10 +0200
+Message-Id: <DC1ZLP61HJAL.3I2YF82Y4T7L9@kernel.org>
+Cc: <nouveau@lists.freedesktop.org>, <dri-devel@lists.freedesktop.org>,
+ <linux-kernel@vger.kernel.org>, <rust-for-linux@vger.kernel.org>,
+ <linux-block@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+ <kunit-dev@googlegroups.com>, <linux-fsdevel@vger.kernel.org>
+Subject: Re: [PATCH v3 9/9] rust: device: use `kernel::{fmt,prelude::fmt!}`
+From: "Benno Lossin" <lossin@kernel.org>
+To: "Tamir Duberstein" <tamird@gmail.com>, "Danilo Krummrich"
+ <dakr@kernel.org>, "David Airlie" <airlied@gmail.com>, "Simona Vetter"
+ <simona@ffwll.ch>, "Miguel Ojeda" <ojeda@kernel.org>, "Alex Gaynor"
+ <alex.gaynor@gmail.com>, "Boqun Feng" <boqun.feng@gmail.com>, "Gary Guo"
+ <gary@garyguo.net>, =?utf-8?q?Bj=C3=B6rn_Roy_Baron?=
+ <bjorn3_gh@protonmail.com>, "Andreas Hindborg" <a.hindborg@kernel.org>,
+ "Alice Ryhl" <aliceryhl@google.com>, "Trevor Gross" <tmgross@umich.edu>,
+ "Jens Axboe" <axboe@kernel.dk>, "Greg Kroah-Hartman"
+ <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>,
+ "Brendan Higgins" <brendan.higgins@linux.dev>, "David Gow"
+ <davidgow@google.com>, "Rae Moar" <rmoar@google.com>, "Lorenzo Stoakes"
+ <lorenzo.stoakes@oracle.com>, "Vlastimil Babka" <vbabka@suse.cz>, "Liam R.
+ Howlett" <Liam.Howlett@oracle.com>, "Uladzislau Rezki" <urezki@gmail.com>,
+ "Alexandre Courbot" <acourbot@nvidia.com>, "Alexander Viro"
+ <viro@zeniv.linux.org.uk>, "Christian Brauner" <brauner@kernel.org>, "Jan
+ Kara" <jack@suse.cz>
+X-Mailer: aerc 0.20.1
+References: <20250813-core-cstr-fanout-1-v3-0-a15eca059c51@gmail.com>
+ <20250813-core-cstr-fanout-1-v3-9-a15eca059c51@gmail.com>
+In-Reply-To: <20250813-core-cstr-fanout-1-v3-9-a15eca059c51@gmail.com>
 
-"Alice Ryhl" <aliceryhl@google.com> writes:
-
-> On Wed, Aug 13, 2025 at 7:36=E2=80=AFPM Andreas Hindborg <a.hindborg@kern=
-el.org> wrote:
->>
->> "Alice Ryhl" <aliceryhl@google.com> writes:
->>
->> > For your convenience, I already wrote a safe wrapper of kstrtobool for
->> > an out-of-tree driver. You're welcome to copy-paste this:
->> >
->> > fn kstrtobool(kstr: &CStr) -> Result<bool> {
->> >     let mut res =3D false;
->> >     to_result(unsafe {
->> > kernel::bindings::kstrtobool(kstr.as_char_ptr(), &mut res) })?;
->> >     Ok(res)
->> > }
->>
->> Thanks, I did one as well today, accepting `&str` instead. The examples
->> highlight why it is not great:
+On Wed Aug 13, 2025 at 5:39 PM CEST, Tamir Duberstein wrote:
+> Reduce coupling to implementation details of the formatting machinery by
+> avoiding direct use for `core`'s formatting traits and macros.
 >
-> Yeah, well, I think we should still use it for consistency.
->
->>   /// Convert common user inputs into boolean values using the kernel's =
-`kstrtobool` function.
->>   ///
->>   /// This routine returns `Ok(bool)` if the first character is one of '=
-YyTt1NnFf0', or
->>   /// [oO][NnFf] for "on" and "off". Otherwise it will return `Err(EINVA=
-L)`.
->>   ///
->>   /// # Examples
->>   ///
->>   /// ```
->>   /// # use kernel::str::kstrtobool;
->>   ///
->>   /// // Lowercase
->>   /// assert_eq!(kstrtobool("true"), Ok(true));
->>   /// assert_eq!(kstrtobool("tr"), Ok(true));
->>   /// assert_eq!(kstrtobool("t"), Ok(true));
->>   /// assert_eq!(kstrtobool("twrong"), Ok(true)); // <-- =F0=9F=A4=B7
->>   /// assert_eq!(kstrtobool("false"), Ok(false));
->>   /// assert_eq!(kstrtobool("f"), Ok(false));
->>   /// assert_eq!(kstrtobool("yes"), Ok(true));
->>   /// assert_eq!(kstrtobool("no"), Ok(false));
->>   /// assert_eq!(kstrtobool("on"), Ok(true));
->>   /// assert_eq!(kstrtobool("off"), Ok(false));
->>   ///
->>   /// // Camel case
->>   /// assert_eq!(kstrtobool("True"), Ok(true));
->>   /// assert_eq!(kstrtobool("False"), Ok(false));
->>   /// assert_eq!(kstrtobool("Yes"), Ok(true));
->>   /// assert_eq!(kstrtobool("No"), Ok(false));
->>   /// assert_eq!(kstrtobool("On"), Ok(true));
->>   /// assert_eq!(kstrtobool("Off"), Ok(false));
->>   ///
->>   /// // All caps
->>   /// assert_eq!(kstrtobool("TRUE"), Ok(true));
->>   /// assert_eq!(kstrtobool("FALSE"), Ok(false));
->>   /// assert_eq!(kstrtobool("YES"), Ok(true));
->>   /// assert_eq!(kstrtobool("NO"), Ok(false));
->>   /// assert_eq!(kstrtobool("ON"), Ok(true));
->>   /// assert_eq!(kstrtobool("OFF"), Ok(false));
->>   ///
->>   /// // Numeric
->>   /// assert_eq!(kstrtobool("1"), Ok(true));
->>   /// assert_eq!(kstrtobool("0"), Ok(false));
->>   ///
->>   /// // Invalid input
->>   /// assert_eq!(kstrtobool("invalid"), Err(EINVAL));
->>   /// assert_eq!(kstrtobool("2"), Err(EINVAL));
->>   /// ```
->>   pub fn kstrtobool(input: &str) -> Result<bool> {
->>       let mut result: bool =3D false;
->>       let c_str =3D CString::try_from_fmt(fmt!("{input}"))?;
->>
->>       // SAFETY: `c_str` points to a valid null-terminated C string, and=
- `result` is a valid
->>       // pointer to a bool that we own.
->>       let ret =3D unsafe { bindings::kstrtobool(c_str.as_char_ptr(), &mu=
-t result as *mut bool) };
->>
->>       kernel::error::to_result(ret).map(|_| result)
->>   }
->>
->> Not sure if we should take `CStr` or `str`, what do you think?
->
-> Using CStr makes sense, since it avoids having the caller perform a
-> useless utf-8 check.
+> Signed-off-by: Tamir Duberstein <tamird@gmail.com>
 
-If we re-implement the entire function in rust, we can do the processing
-on a `&str`. That way, we can skip the allocation to enforce null
-termination. At least for this use case. I would rather do a utf8 check
-than allocate and copy.
+Reviewed-by: Benno Lossin <lossin@kernel.org>
 
+> ---
+>  rust/kernel/device/property.rs | 23 ++++++++++++-----------
+>  1 file changed, 12 insertions(+), 11 deletions(-)
+   =20
+> @@ -413,9 +414,9 @@ fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> co=
+re::fmt::Result {
+>                  // SAFETY: `fwnode_get_name_prefix` returns null or a
+>                  // valid C string.
+>                  let prefix =3D unsafe { CStr::from_char_ptr(prefix) };
+> -                write!(f, "{prefix}")?;
+> +                fmt::Display::fmt(prefix, f)?;
+>              }
+> -            write!(f, "{}", fwnode.display_name())?;
 
-Best regards,
-Andreas Hindborg
+So we're not able to use `write!` with our `Display` or did you also
+write a `FmtAdapter` wrapper for that? (don't think we need it now, just
+wanted to know if we have this issue possibly in the future)
 
+---
+Cheers,
+Benno
 
+> +            fmt::Display::fmt(&fwnode.display_name(), f)?;
+>          }
+> =20
+>          Ok(())
 
