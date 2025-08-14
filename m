@@ -1,218 +1,230 @@
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2046.outbound.protection.outlook.com [40.107.95.46])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F65232142C;
-	Thu, 14 Aug 2025 14:14:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.95.46
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755180885; cv=fail; b=SzIHvrW1WVkJBPZlC4Jip9FykAiTOfTNfcOPHf5EJHVRmMvxKUfR9R8c6cFX7G/Cj+2HFeMJaLbAoSwyn4OQWikiTe23svRLeMka7FOgSS/HRaL42DaQhpZEPLteytgynXonhtCwY20caXpq/LX1H/LWMe0j25LIeeNH/+tNgW0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755180885; c=relaxed/simple;
-	bh=50SRQ8EBgldjuzdze1oKRxEHM8mNSrnH09QXFQ2Ohq0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=lkEm3nyniGNZneikdzUwORN2hQh3vKU9yqj28YzA1Yxc/jTJia9x3TYqkY3APWkYTrBfgKVmUwbWJ/6gq4rWCXNLhkcjoHOU5De0QsKfCquRJjz4P73GrKmc6HtFa5dST8fMZWjve2IZz4B+6DkQjq4yqMTfKMs12HYEvsKQFjs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=EiAYv4Ep; arc=fail smtp.client-ip=40.107.95.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D1783B1AB
+	for <linux-block@vger.kernel.org>; Thu, 14 Aug 2025 14:31:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1755181905; cv=none; b=AqnBJmQxVQuV2RwFyo7HQ34L18dDAOreVvxxNA+Xz1PqtYhxvI6M3tnYLoIMCxoTyWJzhflNwevOmJRGQaT/vSTKXzgFMudI3spT5QbBZB8fpIuGtboZGmvidaFc/fkQfsQjxQrhaMN7HFUiZU0MrJjO1sMDXhLcVVdQxKTYrLc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1755181905; c=relaxed/simple;
+	bh=WgITpGmVnaJ+Hfld5YO9YqBzinaPu/JejrUyL54DzHQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KHgmbJk5GHvUkMUrHRpSEU4dJGLY8loaWPwTuZ7hNQBj3/8ECye6aBGLUyODMHRkrdG45O5bLweHPJ7CvzeHpydT0ugQMA/3FRoMvZTHSGhR5e25Il89rbM5l/Bp6L2gUQojfiQ+XVxgwGM8haq5bwbRYPlEaHAae1N0fyo0wC0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=dA/5/dhz; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="EiAYv4Ep"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=GU/BvIQz3DTXmYOdGLkh+HDcnJ9GH6Ik0rR2UlhlkjgtsQw8N4vsmdx5kcxRf1WgiDTFsBFEFGCSOko8OFp8bcXwF0hLK8E2XfhX0cfhH5I7AKTc8bfK1oCZNB8hOUrPCxA7JqoaNyFbWZOU4PSR5v5zcdbb4Pi6IAJqPlmwtwt5n+8ppswVwPBEj5hbML3avj0BGinez1mF0WlYA/xUIcuC+4Yz/6i7lBq+K4ELNOTPkl/WJwqYJChB1021V9OXylSalQvRZo5fOoOymQUM9CxZOWx/1sXx2apLf+xlqGlUEg5dgzC29XiWSlL4YTx3cGe4DCq4i9yO3m3emvrROw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ruO6zNzO4KB71Lkb6cSwWsEi4wP8AIx5i5wd80Kfkcs=;
- b=yxXRDrAQc+7mUCPP3py13VkcS1bDJC/YtuPGqof3Dbi6jopCxGFfEmfXcscFobyNUqwyETyivD//2ExukT43zMU8DPwYweB66AXZvSW7ljhlr0o2/vukDatbk8XWea1IGCog2XUGb965zuON7Oi1oFRqgR/e5OGcC3T/24M3R2Jr8zGu7JUkfEmu/hSPmdnVDr1nrxc6Sv6eno/kHxyPD1iRzFQge7UqXIVIztrZq1sa2bpY5GJnhkzCLe3nTqMbnQxdBuWrjLPMcZpoJAQ+lzldYMFFiqton8T/2g+c7RazWm2M8DRfrfjZtFQlr8XAR0JE5uKUGS8qMHAMaeuh1w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ruO6zNzO4KB71Lkb6cSwWsEi4wP8AIx5i5wd80Kfkcs=;
- b=EiAYv4Epcj8RrMO6/lmFl5X0ZqQ0yWhj19Yc3cOkghZpr4a1bbc5yMdbT1f0vEPcgbNCsQAgCHa7U3LhYuZ2jA6OuLoHt0l3aNOOcRKggQiYDbY9m/dhtGEg2z702BeZKdwnrZPLRAvHrOOjGd32buyV/OPmF9MN5ZEVSb6qVP0E4ZTjl/cTiBDg4s268TtVbm4e05g1mZYPEdzALI4QDba7IXBgt5LP3IIAN2GSdJCmZKDqCmihxrUJocW9FnMDtcI5LPQQA5kYxifJpOMGXkhBO3C6faR18kGIZvtz3eWdiF80hllGZZm7PRUiB7Ga6i1QdJmTse+JWnvkMxGBEw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
- by MN2PR12MB4111.namprd12.prod.outlook.com (2603:10b6:208:1de::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9031.16; Thu, 14 Aug
- 2025 14:14:38 +0000
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732%4]) with mapi id 15.20.9031.012; Thu, 14 Aug 2025
- 14:14:38 +0000
-Date: Thu, 14 Aug 2025 11:14:37 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Marek Szyprowski <m.szyprowski@samsung.com>,
-	Abdiel Janulgue <abdiel.janulgue@gmail.com>,
-	Alexander Potapenko <glider@google.com>,
-	Alex Gaynor <alex.gaynor@gmail.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Christoph Hellwig <hch@lst.de>, Danilo Krummrich <dakr@kernel.org>,
-	iommu@lists.linux.dev, Jason Wang <jasowang@redhat.com>,
-	Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>,
-	Jonathan Corbet <corbet@lwn.net>, Juergen Gross <jgross@suse.com>,
-	kasan-dev@googlegroups.com, Keith Busch <kbusch@kernel.org>,
-	linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	linux-nvme@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
-	linux-trace-kernel@vger.kernel.org,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Robin Murphy <robin.murphy@arm.com>, rust-for-linux@vger.kernel.org,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Stefano Stabellini <sstabellini@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	virtualization@lists.linux.dev, Will Deacon <will@kernel.org>,
-	xen-devel@lists.xenproject.org
-Subject: Re: [PATCH v1 08/16] kmsan: convert kmsan_handle_dma to use physical
- addresses
-Message-ID: <20250814141437.GH802098@nvidia.com>
-References: <cover.1754292567.git.leon@kernel.org>
- <5b40377b621e49ff4107fa10646c828ccc94e53e.1754292567.git.leon@kernel.org>
- <20250807122115.GH184255@nvidia.com>
- <20250813150718.GB310013@unreal>
- <20250814121316.GC699432@nvidia.com>
- <20250814123506.GD310013@unreal>
- <20250814124448.GE699432@nvidia.com>
- <20250814133106.GE310013@unreal>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250814133106.GE310013@unreal>
-X-ClientProxiedBy: BL0PR02CA0137.namprd02.prod.outlook.com
- (2603:10b6:208:35::42) To CH3PR12MB8659.namprd12.prod.outlook.com
- (2603:10b6:610:17c::13)
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="dA/5/dhz"
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57EEVWVG011950;
+	Thu, 14 Aug 2025 14:31:32 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=EgCA9T
+	CqK8beIHpQTND5WSEyHvh6WdF4yuxfMgOdNKY=; b=dA/5/dhzPvAa7j5XOOSSxF
+	NwMfOIrPmG1qnVgt2F3F6LD9SlYCXWI67Iytvv8SvunatXLWGtLFpXX3GIyitcto
+	5W0KIcJ9ZCWOdvVouAd2JZS/PIbwcHFmDdXjdS29MzdNVaB4DJQvDTS6jZaCxkfl
+	rpJwET5fh/Od2rP6janyk2grf6hhzW7KyLEqa7y7/hDiMLw7r+wnqrdQYe47YE6G
+	PZ+1qXmiE0UIwNi+zYkOig5SV3R7jFG6t18mvc90IQ3ztVoCz0t01qPxfz+8PLnI
+	tau1IrKyMbCSweurbv4ChoYCpxsiMddreKy+lGaip2m37fwLNBe9OO5QNOVwo2Sw
+	==
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48durujjte-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 14 Aug 2025 14:31:32 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 57EEIggH025643;
+	Thu, 14 Aug 2025 14:31:16 GMT
+Received: from smtprelay02.wdc07v.mail.ibm.com ([172.16.1.69])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 48ejvmmbce-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 14 Aug 2025 14:31:16 +0000
+Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
+	by smtprelay02.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 57EEVF5H21627530
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 14 Aug 2025 14:31:15 GMT
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 3FEFE58059;
+	Thu, 14 Aug 2025 14:31:15 +0000 (GMT)
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id AA17758057;
+	Thu, 14 Aug 2025 14:31:12 +0000 (GMT)
+Received: from [9.109.198.214] (unknown [9.109.198.214])
+	by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 14 Aug 2025 14:31:12 +0000 (GMT)
+Message-ID: <e33e97f7-0c12-4f70-81d0-4fea05557579@linux.ibm.com>
+Date: Thu, 14 Aug 2025 20:01:11 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|MN2PR12MB4111:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6e3ba93d-4319-4e2a-c39d-08dddb3ce778
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024|7416014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?WgfRGDEKKHuNso3gGtoTuh6waQ9PCACwW3Xer9wmxp9cTa3pI6GwFYV/fJwL?=
- =?us-ascii?Q?uMkVfKCSxkLu46+hc29ievexAGINSRbhu7JYwTU0XfwC3xuq+YaufFGnn3Vn?=
- =?us-ascii?Q?cpMOGqWuXDbpmMy1LmmxLX4aDD9c/RqOmAZJpv5mfDHm2clHXS4UgOzngTmD?=
- =?us-ascii?Q?pbnofH4YtXT0ZgTGt6BiOFvtENoyZJKCby7Mjhgffi7jeZkXgNkkuF7vGmDh?=
- =?us-ascii?Q?khvbdocQDP08VF8PzLtV9eIf8x5rWeQfu6y+bnEf80Xy+CimU6ZVs1mHDn8M?=
- =?us-ascii?Q?Va20NUjK0kGA2V9cveBWcp/bdylGfAuil7IpGcakYsc2DunpQ+m0adkeTAZu?=
- =?us-ascii?Q?pt97X1t1VXWEBN7qg11nJjbx87HF0c35kmDZeoane30eKI1Bwgqzk4KxsN0k?=
- =?us-ascii?Q?z2GHRAf+JSgcqz0hbOjiQq+F9anqyTVIQdz+aJh1ukalLlr/564G3PicNHbt?=
- =?us-ascii?Q?LPr49wr+78ylFSDEfISFwIgF+JSVYmhqvuofMjkbjsA2VuQjCYrOBrsJSYKf?=
- =?us-ascii?Q?wMjG6p7RvK/pfthf9CtYkKkCAiTp8ebvlOWY8iJxJxT8mucsIvDTNZU4NkDb?=
- =?us-ascii?Q?v0z/o73VHfPBC27fiQ7o+HO5EAktvti/ZcKDRf08rN7aiM8orpyNVQjVcAE5?=
- =?us-ascii?Q?VqHSsE83Ap2qOC4Wx7MWNvrlIahR76FdEunsArmKGx+5oAodiWNfvS0YGRN2?=
- =?us-ascii?Q?VrwJ3wryf4khSFgTIn+gN6nhx0u6l5XkEYHm7FDjqJl4vRLw4hASIP8RPhdg?=
- =?us-ascii?Q?FUVWaoCQo/loIiSItLdVI/vuuhQeMh4Pd3UBiEK+RdifW819zm9snPMqmXPd?=
- =?us-ascii?Q?yzLK5bGg6d9o7ql2oRHHkDSuSxqkaRfTpIPOj+3Ik6+IdkEH819IP0T984MB?=
- =?us-ascii?Q?GERjJw8I3qTw4+P9ABEaHpJZMCGPKunnLkCiBknbFemf3qrgbnlF4PYGUlEf?=
- =?us-ascii?Q?R9s9oEj6fb7pdgt3Z7D/tAq4XuVinG6vE9c0bI6Oie9pipyRh4zv9StX+RUC?=
- =?us-ascii?Q?RGoziCckT/sAPKLn5kmwdLJ2Bkrg6FP8q2mAIgX3tkXxcQyI5/yb17j9TwAC?=
- =?us-ascii?Q?lpzSIu+TbmEYvn8q5IdYZyx5DES0g/s71DK8Ti7Ec6jOzGc6oio27eoJysym?=
- =?us-ascii?Q?nGN83B0XBGN+5RqszR5hWf9HIdGLIWbj5T/HjUYiuiv9XOsIw9JalLguZMxu?=
- =?us-ascii?Q?Hf0Ft6F9d+Wvak/bdzCaK099hIAZdCOQOMhLaduD5CPwfLnd28P1Bhq7q0oy?=
- =?us-ascii?Q?zB5CNRS3xpulZ+kuvwZqEWJlgn3X7IkhLKPVXqqsSy7EdOFAsB5mpKbBM6jY?=
- =?us-ascii?Q?xXn942Pbh5gEZhdr6pQyBJvhkJWKgRDJ2qcsJ9lk/aMqe9n2ldHihoCyfuvk?=
- =?us-ascii?Q?LbSAMpXbaPP9O8ofI1/42MZWsfBTk9ZAceTNxZbfU7nYlIeRaEzyLAZLLkDf?=
- =?us-ascii?Q?PugFFIpY5EA=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(7416014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?Ms6U7vBXPCNXfF0GBhVl67iuvMBy5svsyOMzkXNcqhzlYf1dmYfKq2Nmij66?=
- =?us-ascii?Q?OVFGvrCOTzbOh059BMs8Tv9pRrZyWfT6AoFkl6pqlLn1AwuNLIUBcjypj9Si?=
- =?us-ascii?Q?DisYDAzEuEmEY8ycUcNzX50mNwZqWctD3qkLmCe6DfDlcBmbBuzMI+ce+KUB?=
- =?us-ascii?Q?6B2e7Wgunr8p4yJYBk5XBHGix/CkyA6NI+7rhX+6KxvyJcboBaP7kGqSLNmq?=
- =?us-ascii?Q?+KxNz7lYKeI2HFVQ8imPYyMAANP6ep7ViJxkO7OUDseBi9qt/ce7kSCoalyF?=
- =?us-ascii?Q?wo/ef9acXkJMbu5DDF0AXieNFw7wQYWAjfko1OFeF1fe/cQw0JoTSj5MZzhm?=
- =?us-ascii?Q?LxPUPWHGEPd9ipfz3oTPSl5tb1ts4zqUOGB4W7PRmEsS1PQryPt1Auy+kCoo?=
- =?us-ascii?Q?x5HrqWo3yCR6xYlpJ2CKzWgAzDzJFjn3lA4RRzZW/5Rmja+E8m57KY2u1CPX?=
- =?us-ascii?Q?w00gf6QzDLL6kxLCEUGqHWvYlhF+TAVPT45UaBUe7+zAvpXZJWT4qK3BB+fu?=
- =?us-ascii?Q?nsiuwGIKa+U+yHvfI/3QxGP1J5OWvjcX1f8OmTtQxj7heNGEf2nYwiVKqRwA?=
- =?us-ascii?Q?zFpBrMRMlp4V2p+m7y4272Rvs+6mXdf35v1RIb1GwREMyrZXXTTEKFc/qesT?=
- =?us-ascii?Q?/eyXLujUQ7citeil4d8XUsdbwnea7L8Ng5Lj35chGwPoAAU73YMaupxQ4DJV?=
- =?us-ascii?Q?sDA3RpAfP+C/qKCvYjs+uDSQfg19c9GPIvAzL2mB5choh3ThGojNaTxt21wz?=
- =?us-ascii?Q?2OWWSQbqxheAY2Ie/XZUrM+fulMsQgneFpJfX1uCK3BYY3REG8qiHcYQcIDv?=
- =?us-ascii?Q?Mp/HyTJ+r5eeOqgN3rwUK2nEKoSXN6xcSN1K9PWZvCVVXw4D3bNH7L6s0+s9?=
- =?us-ascii?Q?wkySC5pM60VQHd8f/+hCv+tlHvaP2MPRTKmhKAkbobGb4WhBzQqSYZA7TY73?=
- =?us-ascii?Q?yukjLnK/vX0ZRyl/TVGMVuZ2lSdjNfFhBIQ7MG9eZi1o3TLQ4QDCFlR+ZiYT?=
- =?us-ascii?Q?Dfnv3T2LSKCksXjW69M239HzwkibI36EpyYyjfzZLrrnBWMQbRVqNKj4oA56?=
- =?us-ascii?Q?EYklt+EqszRlpS/LmjnVgif78n3Eb3RdRH8bYqx7oLD5mr01Hd6hGMo1fkhw?=
- =?us-ascii?Q?ALOjdVyv93NltYqgqO/AWdryKewXkFSpcQUI8SbO4EAlSL57X/PVnw3ixwyE?=
- =?us-ascii?Q?VnAcBOD10mUTQ4fztbJXcAmZWihBN+Dm1OKQmzHrXrOPblHtKgpos4Hcijne?=
- =?us-ascii?Q?yGBu3B1ET17jPIbAMJ/YiMb0MS6Ajq4RYxkfYfklDymLw4v697LNdTEA/e8T?=
- =?us-ascii?Q?S61phmSvM8ieJ7/mxeLujIRjQ+wkqDdszaaxQaOHVb9X/kh5Bzhcg3E1d+Yt?=
- =?us-ascii?Q?vmZ0WOYbT7opDnmYKQryUIbKXFxeYevn7YRSnKElJmwTNScKbhq8DcsdNnkl?=
- =?us-ascii?Q?exe1kSYhiadVK8Va5w7vBTB2ics02mUjfwdQQf2YkuOBJUcaaJFjCoPnyw/9?=
- =?us-ascii?Q?ZZgPIjMlMGxv5RQJU1oOs/y+Q35UxqyCbBx7IXQBVCRn464QWGHBBiSMnUCU?=
- =?us-ascii?Q?Wej8KLKb55TFSByZORY=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6e3ba93d-4319-4e2a-c39d-08dddb3ce778
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Aug 2025 14:14:38.6057
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 7kxcnpRJdzkjJSknvpZS0FJdfGyvwWOi0/OrxCvD+JZOt7jnM+9F/HzOjYt2sbRA
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4111
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCHv3 3/3] block: avoid cpu_hotplug_lock depedency on
+ freeze_lock
+To: Ming Lei <ming.lei@redhat.com>
+Cc: linux-block@vger.kernel.org, axboe@kernel.dk, yukuai1@huaweicloud.com,
+        hch@lst.de, shinichiro.kawasaki@wdc.com, kch@nvidia.com,
+        gjoyce@ibm.com
+References: <20250814082612.500845-1-nilay@linux.ibm.com>
+ <20250814082612.500845-4-nilay@linux.ibm.com> <aJ3aR2JodRrAqVcO@fedora>
+ <e125025b-d576-4919-b00e-5d9b640bed77@linux.ibm.com>
+ <aJ3myQW2A8HtteBC@fedora>
+Content-Language: en-US
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <aJ3myQW2A8HtteBC@fedora>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: IZAWhSs9WvMjc9eyUsRMXRFFWEA8U08i
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODEyMDIyNCBTYWx0ZWRfX5nzl9fcPpgAZ
+ So43rzPdZcmp9PUCrUB0xsCfbQyXo9o9NgI8VtFemNEjMEGJ6RsAn2Rm8lry0n+O8tfU087Vtfv
+ a7t2PLJW3TNEK7nILG47y4Kn2eDO81/I4nOy7s7Y4TyoxKO1r2+2p1Y6RcN8Ul53RRvLS+Md/Hz
+ 25opZoo5FpqeBcFOobBjuvKY5F/dt6pdR03fnosQS7YBXaBEIGCRnvoLHjWAE7GXDPlvVmLfkiw
+ Gd6nqNN2amG7zCWddIGK1ElYl5Mv9FraMxRq78EAq9Hyz3Wl+ypdXorGZyZ04Jgji/k3Xz86f0u
+ i7gafoPn5HMC8rP2yLA6RAzI+VlKqm18CN0w1vfw58JqWLmUXywzqGOv9CKT3GiJY9XE9eakIp/
+ UpzNlaBY
+X-Authority-Analysis: v=2.4 cv=QtNe3Uyd c=1 sm=1 tr=0 ts=689df344 cx=c_pps
+ a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
+ a=IkcTkHD0fZMA:10 a=2OwXVqhp2XgA:10 a=VwQbUJbxAAAA:8 a=JF9118EUAAAA:8
+ a=VnNF1IyMAAAA:8 a=6tXiPXw5URFcH89598kA:9 a=QEXdDO2ut3YA:10
+ a=xVlTc564ipvMDusKsbsT:22
+X-Proofpoint-ORIG-GUID: IZAWhSs9WvMjc9eyUsRMXRFFWEA8U08i
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-08-13_02,2025-08-14_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ adultscore=0 priorityscore=1501 phishscore=0 clxscore=1015 malwarescore=0
+ spamscore=0 suspectscore=0 impostorscore=0 bulkscore=0 classifier=typeunknown
+ authscore=0 authtc= authcc= route=outbound adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2507300000 definitions=main-2508120224
 
-On Thu, Aug 14, 2025 at 04:31:06PM +0300, Leon Romanovsky wrote:
-> On Thu, Aug 14, 2025 at 09:44:48AM -0300, Jason Gunthorpe wrote:
-> > On Thu, Aug 14, 2025 at 03:35:06PM +0300, Leon Romanovsky wrote:
-> > > > Then check attrs here, not pfn_valid.
-> > > 
-> > > attrs are not available in kmsan_handle_dma(). I can add it if you prefer.
-> > 
-> > That makes more sense to the overall design. The comments I gave
-> > before were driving at a promise to never try to touch a struct page
-> > for ATTR_MMIO and think this should be comphrensive to never touching
-> > a struct page even if pfnvalid.
-> > 
-> > > > > So let's keep this patch as is.
-> > > > 
-> > > > Still need to fix the remarks you clipped, do not check PageHighMem
-> > > > just call kmap_local_pfn(). All thie PageHighMem stuff is new to this
-> > > > patch and should not be here, it is the wrong way to use highmem.
-> > > 
-> > > Sure, thanks
-> > 
-> > I am wondering if there is some reason it was written like this in the
-> > first place. Maybe we can't even do kmap here.. So perhaps if there is
-> > not a strong reason to change it just continue to check pagehighmem
-> > and fail.
-> > 
-> > if (!(attrs & ATTR_MMIO) && PageHighMem(phys_to_page(phys)))
-> >    return;
+
+
+On 8/14/25 7:08 PM, Ming Lei wrote:
+> On Thu, Aug 14, 2025 at 06:27:08PM +0530, Nilay Shroff wrote:
+>>
+>>
+>> On 8/14/25 6:14 PM, Ming Lei wrote:
+>>> On Thu, Aug 14, 2025 at 01:54:59PM +0530, Nilay Shroff wrote:
+>>>> A recent lockdep[1] splat observed while running blktest block/005
+>>>> reveals a potential deadlock caused by the cpu_hotplug_lock dependency
+>>>> on ->freeze_lock. This dependency was introduced by commit 033b667a823e
+>>>> ("block: blk-rq-qos: guard rq-qos helpers by static key").
+>>>>
+>>>> That change added a static key to avoid fetching q->rq_qos when
+>>>> neither blk-wbt nor blk-iolatency is configured. The static key
+>>>> dynamically patches kernel text to a NOP when disabled, eliminating
+>>>> overhead of fetching q->rq_qos in the I/O hot path. However, enabling
+>>>> a static key at runtime requires acquiring both cpu_hotplug_lock and
+>>>> jump_label_mutex. When this happens after the queue has already been
+>>>> frozen (i.e., while holding ->freeze_lock), it creates a locking
+>>>> dependency from cpu_hotplug_lock to ->freeze_lock, which leads to a
+>>>> potential deadlock reported by lockdep [1].
+>>>>
+>>>> To resolve this, replace the static key mechanism with q->queue_flags:
+>>>> QUEUE_FLAG_QOS_ENABLED. This flag is evaluated in the fast path before
+>>>> accessing q->rq_qos. If the flag is set, we proceed to fetch q->rq_qos;
+>>>> otherwise, the access is skipped.
+>>>>
+>>>> Since q->queue_flags is commonly accessed in IO hotpath and resides in
+>>>> the first cacheline of struct request_queue, checking it imposes minimal
+>>>> overhead while eliminating the deadlock risk.
+>>>>
+>>>> This change avoids the lockdep splat without introducing performance
+>>>> regressions.
+>>>>
+>>>> [1] https://lore.kernel.org/linux-block/4fdm37so3o4xricdgfosgmohn63aa7wj3ua4e5vpihoamwg3ui@fq42f5q5t5ic/
+>>>>
+>>>> Reported-by: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+>>>> Closes: https://lore.kernel.org/linux-block/4fdm37so3o4xricdgfosgmohn63aa7wj3ua4e5vpihoamwg3ui@fq42f5q5t5ic/
+>>>> Fixes: 033b667a823e ("block: blk-rq-qos: guard rq-qos helpers by static key")
+>>>> Tested-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+>>>> Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
+>>>> ---
+>>>>  block/blk-mq-debugfs.c |  1 +
+>>>>  block/blk-rq-qos.c     |  9 ++++---
+>>>>  block/blk-rq-qos.h     | 54 ++++++++++++++++++++++++------------------
+>>>>  include/linux/blkdev.h |  1 +
+>>>>  4 files changed, 37 insertions(+), 28 deletions(-)
+>>>>
+>>>> diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+>>>> index 7ed3e71f2fc0..32c65efdda46 100644
+>>>> --- a/block/blk-mq-debugfs.c
+>>>> +++ b/block/blk-mq-debugfs.c
+>>>> @@ -95,6 +95,7 @@ static const char *const blk_queue_flag_name[] = {
+>>>>  	QUEUE_FLAG_NAME(SQ_SCHED),
+>>>>  	QUEUE_FLAG_NAME(DISABLE_WBT_DEF),
+>>>>  	QUEUE_FLAG_NAME(NO_ELV_SWITCH),
+>>>> +	QUEUE_FLAG_NAME(QOS_ENABLED),
+>>>>  };
+>>>>  #undef QUEUE_FLAG_NAME
+>>>>  
+>>>> diff --git a/block/blk-rq-qos.c b/block/blk-rq-qos.c
+>>>> index b1e24bb85ad2..654478dfbc20 100644
+>>>> --- a/block/blk-rq-qos.c
+>>>> +++ b/block/blk-rq-qos.c
+>>>> @@ -2,8 +2,6 @@
+>>>>  
+>>>>  #include "blk-rq-qos.h"
+>>>>  
+>>>> -__read_mostly DEFINE_STATIC_KEY_FALSE(block_rq_qos);
+>>>> -
+>>>>  /*
+>>>>   * Increment 'v', if 'v' is below 'below'. Returns true if we succeeded,
+>>>>   * false if 'v' + 1 would be bigger than 'below'.
+>>>> @@ -319,8 +317,8 @@ void rq_qos_exit(struct request_queue *q)
+>>>>  		struct rq_qos *rqos = q->rq_qos;
+>>>>  		q->rq_qos = rqos->next;
+>>>>  		rqos->ops->exit(rqos);
+>>>> -		static_branch_dec(&block_rq_qos);
+>>>>  	}
+>>>> +	blk_queue_flag_clear(QUEUE_FLAG_QOS_ENABLED, q);
+>>>>  	mutex_unlock(&q->rq_qos_mutex);
+>>>>  }
+>>>>  
+>>>> @@ -346,7 +344,7 @@ int rq_qos_add(struct rq_qos *rqos, struct gendisk *disk, enum rq_qos_id id,
+>>>>  		goto ebusy;
+>>>>  	rqos->next = q->rq_qos;
+>>>>  	q->rq_qos = rqos;
+>>>> -	static_branch_inc(&block_rq_qos);
+>>>> +	blk_queue_flag_set(QUEUE_FLAG_QOS_ENABLED, q);
+>>>
+>>> One stupid question: can we simply move static_branch_inc(&block_rq_qos)
+>>> out of queue freeze in rq_qos_add()?
+>>>
+>>> What matters is just the 1st static_branch_inc() which switches the counter
+>>> from 0 to 1, when blk_mq_freeze_queue() guarantees that all in-progress code
+>>> paths observe q->rq_qos as NULL. That means static_branch_inc(&block_rq_qos)
+>>> needn't queue freeze protection.
+>>>
+>> I thought about it earlier but that won't work because we have 
+>> code paths freezing queue before it reaches upto rq_qos_add(),
+>> For instance:
+>>
+>> We have following code paths from where we invoke
+>> rq_qos_add() APIs with queue already frozen:
+>>
+>> ioc_qos_write()
+>>  -> blkg_conf_open_bdev_frozen() => freezes queue
+>>  -> blk_iocost_init()
+>>    -> rq_qos_add()
+>>
+>> queue_wb_lat_store()  => freezes queue
+>>  -> wbt_init()
+>>   -> rq_qos_add() 
 > 
-> Does this version good enough? There is no need to call to
-> kmap_local_pfn() if we prevent PageHighMem pages.
+> The above two shouldn't be hard to solve, such as, add helper
+> rq_qos_prep_add() for increasing the static branch counter.
+> 
+Yes but then it means that IOs which would be in flight 
+would take a hit in hotpath: In hotpath those IOs
+would evaluate static key branch to true and then fetch 
+q->rq_qos (which probably would not be in the first
+cacheline). So are we okay to take hat hit in IO 
+hotpath?
 
-Why make the rest of the changes though, isn't it just:
-
-        if (PageHighMem(page))
-                return;
-
-Becomes:
-
-        if (attrs & ATTR_MMIO))
-                return;
-
-	page = phys_to_page(phys);
-	if (PageHighMem(page))
-                 return;
-
-Leave the rest as is?
-
-Jason
+Thanks,
+--Nilay
