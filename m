@@ -1,40 +1,41 @@
 Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 841E12F60A1;
-	Thu, 14 Aug 2025 08:55:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 060CE2FD7C8;
+	Thu, 14 Aug 2025 08:57:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755161729; cv=none; b=i8u2rBWU/I3gDrHsfM3qvXNd5zFPpGp/fEALYk1x9GOT3rJv0l4Kh4ZoYIgW5SIYj6ppnGKDy5kPYX/hI1mykKxSfNdg4PeHjpKILyx/L7AN/Xr1tFjvUCkgNH+v8Dw0AxTa7xWnnc9g2TlDMvltCL8+Y1Luaa8ho2yNr+97rjw=
+	t=1755161848; cv=none; b=rZ0UOLG0wlPpP+CQWZYVMC3wOO4pxKiekI7vW4D+LLkcsDjRiGsazuc2dZIP6WdwS7qG4NgRiKcIrnaKNm/i019CEWC7A283jZ2oBwLYtOus3Lz2P1vsUztXbbF6fqmYz4p7+p8UsHTdM3GGZcD0ZGx1abTBCxfPv8ezUSEeldI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755161729; c=relaxed/simple;
-	bh=Q1Ezmr8xBNBJbp0yiqf+2cpES60qrJG5Q9MDk0b1NDg=;
+	s=arc-20240116; t=1755161848; c=relaxed/simple;
+	bh=IyKSZjc3st7LAyMi4A/QhQBQYrwsTS/FsLwk99CX1e0=;
 	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=aQqez3hHCFm8p+6Z/u/miw1llOTQyFG3Knsq/cKAVxION9cfPOhl1X1+wWYp4aVXlQyAn/nICYMmUxyBe4E5mavDi6sv+niI6jGqsWZ0U+6rXFVwb1/wxizVzsa9Z8Tc6BOOyh/eZKZCYFXVM9DmKRqtaHV9PE58UqC49S1tpLc=
+	 In-Reply-To:Content-Type; b=CW9C2rZs2vqkC7r+FB1+nYQ4MnJRyBVbihSCcMxTP3hi80nw4IcKrKBpkoG0DmLkrtPpa7ezd2cumtySp9luSWrOhGEKB+ttz7uL4bEFMofPbjnnu6y6eR4DMA9RCyw5QAvJJB3qycB9nYZ06mFdWanW9mytEv3h7AWB5c7aykQ=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
 Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4c2fG52Nn1zYQvHd;
-	Thu, 14 Aug 2025 16:55:25 +0800 (CST)
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4c2fJM6YD9zYQtHc;
+	Thu, 14 Aug 2025 16:57:23 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id E96151A0B2B;
-	Thu, 14 Aug 2025 16:55:23 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTP id 83CC51A0842;
+	Thu, 14 Aug 2025 16:57:22 +0800 (CST)
 Received: from [10.174.179.143] (unknown [10.174.179.143])
-	by APP4 (Coremail) with SMTP id gCh0CgBXIBF6pJ1ot8SQDg--.42923S3;
-	Thu, 14 Aug 2025 16:55:23 +0800 (CST)
-Subject: Re: [PATCH 01/16] blk-mq-sched: add new parameter nr_requests in
- blk_mq_alloc_sched_tags()
+	by APP4 (Coremail) with SMTP id gCh0CgCnIxTxpJ1oI+6QDg--.19948S3;
+	Thu, 14 Aug 2025 16:57:22 +0800 (CST)
+Subject: Re: [PATCH 00/16] blk-mq: introduce new queue attribute asyc_dpeth
 To: Ming Lei <ming.lei@redhat.com>, Yu Kuai <yukuai1@huaweicloud.com>
 Cc: axboe@kernel.dk, bvanassche@acm.org, nilay@linux.ibm.com, hare@suse.de,
  linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
  yi.zhang@huawei.com, yangerkun@huawei.com, johnny.chenyi@huawei.com,
  "yukuai (C)" <yukuai3@huawei.com>
 References: <20250814033522.770575-1-yukuai1@huaweicloud.com>
- <20250814033522.770575-2-yukuai1@huaweicloud.com> <aJ2bWqQCMtjT3NZh@fedora>
+ <aJ2WH_RAMPQ9sd6r@fedora>
+ <b6587204-9798-fcb0-c4b7-f00d5979d243@huaweicloud.com>
+ <aJ2d3gtfi0aEaeEc@fedora>
 From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <16924973-c18e-6b1c-8271-1ff1954854de@huaweicloud.com>
-Date: Thu, 14 Aug 2025 16:55:21 +0800
+Message-ID: <8ff85b30-27c5-c980-a1fb-fdbe18329594@huaweicloud.com>
+Date: Thu, 14 Aug 2025 16:57:21 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.1
 Precedence: bulk
@@ -43,54 +44,82 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <aJ2bWqQCMtjT3NZh@fedora>
-Content-Type: text/plain; charset=gbk; format=flowed
+In-Reply-To: <aJ2d3gtfi0aEaeEc@fedora>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgBXIBF6pJ1ot8SQDg--.42923S3
-X-Coremail-Antispam: 1UD129KBjvdXoW7GrykZr1ruFy5uFWfKFy3Jwb_yoWDJFg_Gr
-	WjkFn7K34DArsaqr47WFW3ArWkGFnayF47GFyqqFnrXwnIka98JFZ5Wr98Wan7Aw4xArsr
-	Ww15K343G3Z8ujkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUbS8FF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-	A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
-	6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-	4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
-	c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7V
-	AKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCj
-	r7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6x
-	IIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAI
-	w20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aVCY1x
-	0267AKxVW8Jr0_Cr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUd-B_UUUUU=
+X-CM-TRANSID:gCh0CgCnIxTxpJ1oI+6QDg--.19948S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7ZrWkuFyrCry7Cw43urW3Jrb_yoW8Zr1Up3
+	y3t3WSyr4DJry8Cw4xt3WrXry0kw1vgrZxXrs0gr17Gas0q3W0vF1fGF1F9F9rWrn8Gr4a
+	gF4qqa93Xa1qyaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUB214x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
+	0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x
+	0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E
+	7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcV
+	C0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF
+	04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r4j6F4UMIIF0xvEx4A2jsIEc7
+	CjxVAFwI0_Gr1j6F4UJbIYCTnIWIevJa73UjIFyTuYvjfUFg4SDUUUU
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
 Hi,
 
-ÔÚ 2025/08/14 16:16, Ming Lei Ð´µÀ:
->>   struct elevator_tags *blk_mq_alloc_sched_tags(struct blk_mq_tag_set *set,
->> -		unsigned int nr_hw_queues)
->> +		unsigned int nr_hw_queues, unsigned int nr_requests)
->>   {
->>   	unsigned int nr_tags;
->>   	int i;
->> @@ -475,8 +475,11 @@ struct elevator_tags *blk_mq_alloc_sched_tags(struct blk_mq_tag_set *set,
->>   	 * 128, since we don't split into sync/async like the old code
->>   	 * did. Additionally, this is a per-hw queue depth.
->>   	 */
->> -	et->nr_requests = 2 * min_t(unsigned int, set->queue_depth,
->> -			BLKDEV_DEFAULT_RQ);
->> +	if (nr_requests)
->> +		et->nr_requests = nr_requests;
->> +	else
->> +		et->nr_requests = 2 * min_t(unsigned int, set->queue_depth,
->> +				BLKDEV_DEFAULT_RQ);
-> It looks more readable to add helper blk_mq_default_nr_requests(),
-> and pass it from call sites directly, then people won't be confused
-> with the passed zero `nr_requests`.
+åœ¨ 2025/08/14 16:27, Ming Lei å†™é“:
+> On Thu, Aug 14, 2025 at 04:22:27PM +0800, Yu Kuai wrote:
+>> Hi,
+>>
+>> åœ¨ 2025/08/14 15:54, Ming Lei å†™é“:
+>>> On Thu, Aug 14, 2025 at 11:35:06AM +0800, Yu Kuai wrote:
+>>>> From: Yu Kuai <yukuai3@huawei.com>
+>>>>
+>>>> Backgroud and motivation:
+>>>>
+>>>> At first, we test a performance regression from 5.10 to 6.6 in
+>>>> downstream kernel(described in patch 13), the regression is related to
+>>>> async_depth in mq-dealine.
+>>>>
+>>>> While trying to fix this regression, Bart suggests add a new attribute
+>>>> to request_queue, and I think this is a good idea because all elevators
+>>>> have similar logical, however only mq-deadline allow user to configure
+>>>> async_depth. And this is patch 9-16, where the performance problem is
+>>>> fixed in patch 13;
+>>>>
+>>>> Because async_depth is related to nr_requests, while reviewing related
+>>>> code, patch 2-7 are cleanups and fixes to nr_reqeusts.
+>>>>
+>>>> I was planning to send this set for the next merge window, however,
+>>>> during test I found the last block pr(6.17-rc1) introduce a regression
+>>>> if nr_reqeusts grows, exit elevator will panic, and I fix this by
+>>>> patch 1,8.
+>>>
+>>> Please split the patchset into two:
+>>>
+>>> - one is for fixing recent regression on updating 'nr_requests', so this
+>>>     can be merged to v6.17, and be backport easily for stable & downstream
+>>
+>> There are actually two regressions, as fixed by patch 5 and patch 8, how
+>> about the first patchset for patch 1-8? Are you good with those minor
+>> prep cleanup patches?
+> 
+> Then probably you need to make it into three by adding one extra bug fix for
+> `fix elevator depth_updated method`, which follows the philosophy of
+> "do one thing, do it better", also helps people to review.
 
-Yes, this sounds good.
+Ok, I'll send patch 5 seperatly since it can solve problem
+independently, and then a patchset for nr_requests regression.
 
-Thanks for the review,
+Thanks,
 Kuai
+
+> 
+> Thanks,
+> Ming
+> 
+> 
+> .
+> 
 
