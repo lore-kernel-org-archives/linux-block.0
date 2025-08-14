@@ -1,81 +1,98 @@
-Received: from 003.mia.mailroute.net (003.mia.mailroute.net [199.89.3.6])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FDEA301462;
-	Wed, 13 Aug 2025 23:18:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.6
+Received: from submarine.notk.org (submarine.notk.org [62.210.214.84])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B1AF188000;
+	Thu, 14 Aug 2025 01:15:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.210.214.84
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755127086; cv=none; b=ltdpxXMdbyv42ce46nIH+tq5QOy/clR5WpqKZ5gufSyiz3r13s0VxkLGcL6uKrNHIGs8waJVlGCGUaWPerHnaEpKFBS0FrPAPsFO1Uqyytws/h8/J6Hem5YOgKuAD6q+aRGDnBqF2Vl/bynrZS75kzD+DTr8y4/IBc3jUxpwWoo=
+	t=1755134107; cv=none; b=t7Rhzg9ZA1cDuGZ0mfJhW27FM4BmLRGjinQ0trunmAPOrWd51Csz9tWf1NMnfoH1muvqgCZRELCJB9DjuSRlP27TOtnlDx7gmvfDtuxuaJMzS50QoCUPTKt2248qD89srGL9IIPe2RU68SQ8QFQbfSI7WebxPJggjNf8FxnCVoA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755127086; c=relaxed/simple;
-	bh=XcpIxI3Kza+KlS7nav08N2XpPAC2+IEz61rOMpvZXxA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=vCKTfocF85+rk6dcrftoAq11J4QJRdzqBdZrGOzi6PbSJZwz1bfBG92UlSZBTnAQQU/CiIDZXJhMOdAxjBCyhWCfXNmAVw6GrnDcShmGxqTZs4S2vbyOswK4F9BYb5+4mi7J9n//Got37FQrNbvNDTAug7DH5F2CFJf1/Dpih8E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=nqVXzWar; arc=none smtp.client-ip=199.89.3.6
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1755134107; c=relaxed/simple;
+	bh=y9PO2PO6nPeVBRQUafPLj9FIxNajLXqS18P2UUJjTFc=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=T7F1Nc4HqLhv0lVl1eNXtwRVAWgXZuZ0w2rrtzmIXm87pJlyrjPor31HKVWbU/1aONuMgS5dOz3pbEs54YRtLu/GHE6DdU6XpJUybC/QEDw8oOA+npS6Rz6L84xmZQkcQLb5E65gacCWEbBJahRsgAijavvbqV43GrFWChOQa4I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codewreck.org; spf=pass smtp.mailfrom=codewreck.org; dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b=tPycMhMr; arc=none smtp.client-ip=62.210.214.84
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codewreck.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codewreck.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="nqVXzWar"
-Received: from localhost (localhost [127.0.0.1])
-	by 003.mia.mailroute.net (Postfix) with ESMTP id 4c2PRv0lpQzlvX7x;
-	Wed, 13 Aug 2025 23:18:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1755127081; x=1757719082; bh=AEV57I4CJV4Mttizx6a8pEEt
-	tPypHfB0/YPycEt6mc4=; b=nqVXzWarOX4zMSFucbW7ffFZxP9HO34B9aWBnKKA
-	Zm32DijgAgoCKh8LlL25ZxnKuHqjo51nYlgYYtjVc1TfyKLQIiB2xjbtHf/+dFTr
-	Q3dViL6GZtDFQKDmx3NwOxt1zpAhvspLViCJ3c5A8Odbi5285cUhVv1wG3rBpuM0
-	ry2QttQIgR5bVnkXxidmgHOxyoCchz34oSKbcF6mDgjtcjxH/43vN/jXJEZVfcgp
-	dsrLy7oQo5BCFlP7rvuazuU/d7YnBGfhV3yfN7DvpCgLIpRForgeQlpePgGcBs9E
-	qCG0SSXtbAdQ90mOSmKtCjAJgn7EcuiL1ur9Nk8GlADJRA==
-X-Virus-Scanned: by MailRoute
-Received: from 003.mia.mailroute.net ([127.0.0.1])
- by localhost (003.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id SH6xn7L3igvD; Wed, 13 Aug 2025 23:18:01 +0000 (UTC)
-Received: from [192.168.51.14] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4c2PRj11tVzlvbmy;
-	Wed, 13 Aug 2025 23:17:51 +0000 (UTC)
-Message-ID: <279bdc31-ee29-4156-ab5b-9592e8297ebb@acm.org>
-Date: Wed, 13 Aug 2025 16:17:49 -0700
+	dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b="tPycMhMr"
+Received: from gaia.codewreck.org (localhost [127.0.0.1])
+	by submarine.notk.org (Postfix) with ESMTPS id 468D714C2D3;
+	Thu, 14 Aug 2025 03:14:51 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=codewreck.org;
+	s=2; t=1755134096;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to; bh=VSS/GzTf7mRkzo4sO438c/imKZ2sgMqL0KjQB+0sB9s=;
+	b=tPycMhMr7X0wubaDHNZnMqB/VEiz0UUE8omXCbl8cVPraMQEqlPqNl3No+vWVKYafyfuSA
+	xhjW37XOoQV3q0j5uHaXh7YYbCRG3IZ+tEUlLhY8SaSBmV/WqNdlGIekaFWtvKennOmXOg
+	0jP8VHStgbUj1JeXRD4kB6OG5m1l26zOxuPZDjMXERijZSNrQI3moAFxCHhbi/gpYqBfCC
+	2bzC09Ecy/3pG2mjK78rVDFpscJKNFoOvRfr4bJcTgSUHhKrooXlVZISs1Qm35JZT+XjI1
+	2qZyXvNOntTkDnzLDvryfNjAjjTCBnXfmst23VvZ/ZElMoQUN43e9Adp+48JMQ==
+Received: from localhost (gaia.codewreck.org [local])
+	by gaia.codewreck.org (OpenSMTPD) with ESMTPA id 5e52dd40;
+	Thu, 14 Aug 2025 01:14:49 +0000 (UTC)
+Date: Thu, 14 Aug 2025 10:14:34 +0900
+From: Dominique Martinet <asmadeus@codewreck.org>
+To: Andy Shevchenko <andriy.shevchenko@intel.com>,
+	"Paul E. McKenney" <paulmck@kernel.org>
+Cc: Nathan Chancellor <nathan@kernel.org>,
+	kernel test robot <lkp@intel.com>,
+	Dominique Martinet via B4 Relay <devnull+asmadeus.codewreck.org@kernel.org>,
+	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
+	Christian Brauner <brauner@kernel.org>,
+	David Howells <dhowells@redhat.com>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Andrew Morton <akpm@linux-foundation.org>, llvm@lists.linux.dev,
+	oe-kbuild-all@lists.linux.dev,
+	Linux Memory Management List <linux-mm@kvack.org>,
+	Maximilian Bosch <maximilian@mbosch.me>,
+	Ryan Lahfa <ryan@lahfa.xyz>, Christian Theune <ct@flyingcircus.io>,
+	Arnout Engelen <arnout@bzzt.net>, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH 1/2] iov_iter: iterate_folioq: fix handling of offset >=
+ folio size
+Message-ID: <aJ04ej2P3ZXiBjOG@codewreck.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv2 1/7] block: check for valid bio while splitting
-To: Keith Busch <kbusch@kernel.org>
-Cc: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
- snitzer@kernel.org, axboe@kernel.dk, dw@davidwei.uk, brauner@kernel.org,
- Hannes Reinecke <hare@suse.de>
-References: <20250805141123.332298-1-kbusch@meta.com>
- <20250805141123.332298-2-kbusch@meta.com> <aJzwO9dYeBQAHnCC@kbusch-mbp>
- <d9116c88-4098-46a7-8cbc-c900576a5da3@acm.org> <aJz9EUxTutWLxQmk@kbusch-mbp>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <aJz9EUxTutWLxQmk@kbusch-mbp>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <f389ac0d-de77-4443-9302-3d8895e39daf@paulmck-laptop>
+ <aJyYp-3VA9kJ5YMd@smile.fi.intel.com>
 
-On 8/13/25 2:01 PM, Keith Busch wrote:
-> I'm using the AHCI driver. It looks like ata_scsi_dev_config() overrides
-> the dma_alignment to sector_size - 1, and that pattern goes way back,
-> almost 20 years ago, so maybe I can't change it.
+Andy Shevchenko wrote on Wed, Aug 13, 2025 at 04:52:39PM +0300:
+> > I actually test with W=1 too, but somehow this warning doesn't show up
+> > in my build, I'm not quite sure why :/
+> > (even if I try clang like the test robot... But there's plenty of
+> > other warnings all around everywhere else, so I agree this is all way
+> > too manual)
+> 
+> Depends on your config, last few releases I was specifically targetting x86
+> defconfigs (32- and 64-bit) to be build with `make W=1`. There are a couple of
+> changes that are still pending, but otherwise it builds with GCC and clang.
 
- From an AHCI specification
-(https://www.intel.com/content/dam/www/public/us/en/documents/technical-specifications/serial-ata-ahci-spec-rev1-3-1.pdf):
-"Data Base Address (DBA): Indicates the 32-bit physical address of the 
-data block. The block must be word aligned, indicated by bit 0 being 
-reserved."
+I meant it the other way around: the warning isn't showing up on master
++ these patches for my config.
 
-Please note that I have no experience with programming AHCI controllers.
+But now I double-checked, 'CC=clang make W=1' doesn't actually use
+clang, I should have tried 'make CC=clang W=1'...
+And, yeah, it just doesn't show up with gcc so I'll know it's better to
+check both compilers...
 
-Bart.
+Paul E. McKenney wrote on Wed, Aug 13, 2025 at 04:04:19PM -0700:
+> > I hope this to happen sooner as it broke my builds too (I always do now `make W=1`
+> > and suggest all developers should follow).
+> 
+> This build failure is showing up in my testing as well.
+> 
+> In the service of preventing bisection issues, would it be possible to
+> fold the fix into the original patch?
+
+Andrew just picked v3 up, so there won't be any such problem, and -next
+will stop failing after today's update
+
+-- 
+Dominique Martinet | Asmadeus
