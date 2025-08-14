@@ -1,28 +1,28 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1DDF273D6D;
-	Thu, 14 Aug 2025 03:43:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5615270572;
+	Thu, 14 Aug 2025 03:43:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755143000; cv=none; b=pvSLsGauY6OAo2nDhhGFXgGcosmcmIruxchlkchOeu/3ZubXsgBj+R9ZSDPag3gnfvYYIsKVkV8tDmCCLtaoJXV1YeJQNsunT6G6BF23tbG+VmN0oEyQHpBdkXqFA2050O8DEJGs7p/6vHliysgyPKeqVkobnQGW3JupRjrLD2o=
+	t=1755143001; cv=none; b=IIT9JB/THUAs1TQm47lTI5YnjPvL3hSzlmiiA/YJaw0dIKj/Dl6ZL/WTwI8HJlHApUj6GJegTGPinKC2ZnXvGXa2YA5U8I6hy77gvlYmy+ZjfH7ZfES15x2H4N0p5tWgGKv1Dgbl/UCobceh9wlxSnsTqNl3lX88UE56ShAM4Ys=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755143000; c=relaxed/simple;
-	bh=mRbI3tmkA/TYRsZDHdbsy7279ICniBUzF0QF8ydpZ9c=;
+	s=arc-20240116; t=1755143001; c=relaxed/simple;
+	bh=SJDQlr8kYnUVXlqjG3XTlvRhDl2Ax+wgpIYELK54IoE=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=F9G58ORc7r4s3E9mqzXpxMkrz8CUPLVjlR231R6w3eFmulD9hgXZq6GESzx1dkWuQ0JhbIBP4sl7UukJycqyOa653DORoXCTU4KHCFsI/erm8NaonXMAH7teIVf0FOOUDsQVnpjJ/mz+Zk1a8nT3ftb17qhA8kJd4vCBP/JtDQM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+	 MIME-Version; b=k1MXgQBbBt0mEGTeD0ZgDv2TGErxtyN9zFYi2fhBwjuxmq1JNF5yl2gTARyZUdYo2BSCYwqObrjqcEG+ec53HrKjFmnXVZOX44O97dnBky24cueLbaQ/GTCwzCHbFx1Zi4T116oPh013ME9iNHu1nqP3j+KcM1hJEzJpkedJzVc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4c2WKr4QhWzYQv7q;
-	Thu, 14 Aug 2025 11:43:12 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4c2WKw2FbVzKHMST;
+	Thu, 14 Aug 2025 11:43:16 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 3AA271A0BD8;
-	Thu, 14 Aug 2025 11:43:11 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTP id 963951A1679;
+	Thu, 14 Aug 2025 11:43:15 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.104.67])
-	by APP4 (Coremail) with SMTP id gCh0CgCnIxRKW51ogs93Dg--.15627S10;
-	Thu, 14 Aug 2025 11:43:11 +0800 (CST)
+	by APP4 (Coremail) with SMTP id gCh0CgCnIxRKW51ogs93Dg--.15627S19;
+	Thu, 14 Aug 2025 11:43:15 +0800 (CST)
 From: Yu Kuai <yukuai1@huaweicloud.com>
 To: axboe@kernel.dk,
 	yukuai3@huawei.com,
@@ -36,9 +36,9 @@ Cc: linux-block@vger.kernel.org,
 	yi.zhang@huawei.com,
 	yangerkun@huawei.com,
 	johnny.chenyi@huawei.com
-Subject: [PATCH 06/16] blk-mq: cleanup shared tags case in blk_mq_update_nr_requests()
-Date: Thu, 14 Aug 2025 11:35:12 +0800
-Message-Id: <20250814033522.770575-7-yukuai1@huaweicloud.com>
+Subject: [PATCH 15/16] blk-mq: fix stale nr_requests documentation
+Date: Thu, 14 Aug 2025 11:35:21 +0800
+Message-Id: <20250814033522.770575-16-yukuai1@huaweicloud.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20250814033522.770575-1-yukuai1@huaweicloud.com>
 References: <20250814033522.770575-1-yukuai1@huaweicloud.com>
@@ -49,11 +49,11 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgCnIxRKW51ogs93Dg--.15627S10
-X-Coremail-Antispam: 1UD129KBjvJXoW7Cr1rWrWUuF1xCr17tF45Awb_yoW5JrW8pr
-	W3Ka13K34Fqr1SvFWavw43Xw4Ygws3Wr1IkFsxJryFqr12kF4xGr4rWrn5XFW8trZ5AFsI
-	9F4DJFWUXr1kW37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUmI14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+X-CM-TRANSID:gCh0CgCnIxRKW51ogs93Dg--.15627S19
+X-Coremail-Antispam: 1UD129KBjvJXoW7KFWDCryfKr15Zw1xKFWfZrb_yoW8Xw1Dp3
+	yft39Fgwn5Zw18Wr10yay8tF13Aa95Aw43Jr4DKF1rtr98Awn29Fs2qr1rXF4xZrZ7AFWU
+	urZ29r98Aa1qva7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUmS14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
 	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_JF0E3s1l82xGYI
 	kIc2x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2
 	z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F
@@ -63,100 +63,47 @@ X-Coremail-Antispam: 1UD129KBjvJXoW7Cr1rWrWUuF1xCr17tF45Awb_yoW5JrW8pr
 	M4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2
 	kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkE
 	bVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67
-	AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUCVW8JwCI
-	42IY6xIIjxv20xvEc7CjxVAFwI0_Cr0_Gr1UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCw
-	CI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnI
-	WIevJa73UjIFyTuYvjfUOyIUUUUUU
+	AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVW8JVW5JwCI
+	42IY6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF
+	4lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aVCY1x0267AKxVW8Jr0_Cr1UYxBI
+	daVFxhVjvjDU0xZFpf9x0JUQFxUUUUUU=
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
 From: Yu Kuai <yukuai3@huawei.com>
 
-For shared tags case, all hctx->shared_tags/tags are the same, it
-doesn't make sense to call blk_mq_tag_update_depth() multiple times
-for the same tags.
+The nr_requests documentation is still the removed single queue, remove
+it and update to current blk-mq.
 
 Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 ---
- block/blk-mq-tag.c |  7 -------
- block/blk-mq.c     | 40 +++++++++++++++++++++-------------------
- 2 files changed, 21 insertions(+), 26 deletions(-)
+ Documentation/ABI/stable/sysfs-block | 14 ++++----------
+ 1 file changed, 4 insertions(+), 10 deletions(-)
 
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index 7613a9889eb1..84a452e708e4 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -596,13 +596,6 @@ int blk_mq_tag_update_depth(struct blk_mq_hw_ctx *hctx,
- 		struct blk_mq_tag_set *set = hctx->queue->tag_set;
- 		struct blk_mq_tags *new;
- 
--		/*
--		 * Only the sbitmap needs resizing since we allocated the max
--		 * initially.
--		 */
--		if (blk_mq_is_shared_tags(set->flags))
--			return 0;
+diff --git a/Documentation/ABI/stable/sysfs-block b/Documentation/ABI/stable/sysfs-block
+index 0ddffc9133d0..0ed10aeff86b 100644
+--- a/Documentation/ABI/stable/sysfs-block
++++ b/Documentation/ABI/stable/sysfs-block
+@@ -603,16 +603,10 @@ Date:		July 2003
+ Contact:	linux-block@vger.kernel.org
+ Description:
+ 		[RW] This controls how many requests may be allocated in the
+-		block layer for read or write requests. Note that the total
+-		allocated number may be twice this amount, since it applies only
+-		to reads or writes (not the accumulated sum).
 -
- 		new = blk_mq_alloc_map_and_rqs(set, hctx->queue_num, tdepth);
- 		if (!new)
- 			return -ENOMEM;
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 14446d3927dd..c29f98ec283d 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -4926,32 +4926,34 @@ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
+-		To avoid priority inversion through request starvation, a
+-		request queue maintains a separate request pool per each cgroup
+-		when CONFIG_BLK_CGROUP is enabled, and this parameter applies to
+-		each such per-block-cgroup request pool.  IOW, if there are N
+-		block cgroups, each request queue may have up to N request
+-		pools, each independently regulated by nr_requests.
++		block layer. Noted this value only represents the quantity for a
++		single blk_mq_tags instance. The actual number for the entire
++		device depends on the hardware queue count, whether elevator is
++		enabled, and whether tags are shared.
  
- 	blk_mq_quiesce_queue(q);
  
--	queue_for_each_hw_ctx(q, hctx, i) {
--		/*
--		 * If we're using an MQ scheduler, just update the scheduler
--		 * queue depth. This is similar to what the old code would do.
--		 */
--		if (hctx->sched_tags)
--			ret = blk_mq_tag_update_depth(hctx, &hctx->sched_tags,
--						      nr);
--		else
--			ret = blk_mq_tag_update_depth(hctx, &hctx->tags, nr);
--
--		if (ret)
--			goto out;
--	}
--
--	q->nr_requests = nr;
--	if (q->elevator && q->elevator->type->ops.depth_updated)
--		q->elevator->type->ops.depth_updated(q);
--
- 	if (blk_mq_is_shared_tags(set->flags)) {
- 		if (q->elevator)
- 			blk_mq_tag_update_sched_shared_tags(q);
- 		else
- 			blk_mq_tag_resize_shared_tags(set, nr);
-+	} else {
-+		queue_for_each_hw_ctx(q, hctx, i) {
-+			/*
-+			 * If we're using an MQ scheduler, just update the
-+			 * scheduler queue depth. This is similar to what the
-+			 * old code would do.
-+			 */
-+			if (hctx->sched_tags)
-+				ret = blk_mq_tag_update_depth(hctx,
-+						&hctx->sched_tags, nr);
-+			else
-+				ret = blk_mq_tag_update_depth(hctx,
-+						&hctx->tags, nr);
-+
-+			if (ret)
-+				goto out;
-+		}
- 	}
- 
-+	q->nr_requests = nr;
-+	if (q->elevator && q->elevator->type->ops.depth_updated)
-+		q->elevator->type->ops.depth_updated(q);
-+
- out:
- 	blk_mq_unquiesce_queue(q);
- 	return ret;
+ What:		/sys/block/<disk>/queue/nr_zones
 -- 
 2.39.2
 
