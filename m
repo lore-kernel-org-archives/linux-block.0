@@ -1,220 +1,113 @@
-Received: from pegase2.c-s.fr (pegase2.c-s.fr [93.17.235.10])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C26201C84B2;
-	Thu, 14 Aug 2025 19:20:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.235.10
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3CD11C9DE5
+	for <linux-block@vger.kernel.org>; Thu, 14 Aug 2025 22:35:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755199237; cv=none; b=hCQBX8dqxDcSRklEdwrWHo49s7BSo6oEkMoy1eZcW7/UsEMsgylBdv4PhOclnr1IdHPm1F5tHbqPJpqXd97ue4PS3hJN9KAPg8mW+OR/6WC5XNNo8Vz+BJI37uU0ADL96mvbXd+C2s9tIHCQlOZaea8lEPaKXcESQcWJQ+NWLXY=
+	t=1755210917; cv=none; b=FHybmAo7VYIhRq5BBhrcMZiOmfOttZWnotFmC5Y7Qo/cuVzgJQ3/OY/5wDt4988HDwKwjNY0bb0U9sjGZKIGcAxN51CqZGKyy7rI+MAi0H4b4Jnn2NY1Yehz1pc2yZKi9ciDfkYEuY1qs36bx78s+1UoVQm5yK3n+e4ObawqQQo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755199237; c=relaxed/simple;
-	bh=rD5JabdEJRljG8IExvrHN7NV5kOpcnQhHxBq2nt80PY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=L81okwSCj3rkG/5c8GHqLCtvldBn0OlxvG1eJe72n3de+vbH5uuAaFvd7u+Fsn5C+8BZZk2bLunLAJSbXS+bap/5oCjMTnvaPmlmvQsosQFZKiF7y5KSUhYG1iU3JWW6eclqy1ITe7GSdnqDvCjxv8g4m+4HReLcNfk3i0TUa24=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.235.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
-Received: from localhost (mailhub4.si.c-s.fr [172.26.127.67])
-	by localhost (Postfix) with ESMTP id 4c2vpK65M9z9sSH;
-	Thu, 14 Aug 2025 21:05:45 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from pegase2.c-s.fr ([172.26.127.65])
-	by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ZPu83EvDtL2B; Thu, 14 Aug 2025 21:05:45 +0200 (CEST)
-Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
-	by pegase2.c-s.fr (Postfix) with ESMTP id 4c2vpK3P9dz9sSC;
-	Thu, 14 Aug 2025 21:05:45 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id 16AD08B764;
-	Thu, 14 Aug 2025 21:05:45 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from messagerie.si.c-s.fr ([127.0.0.1])
-	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
-	with ESMTP id v81OkG88qzZ0; Thu, 14 Aug 2025 21:05:44 +0200 (CEST)
-Received: from [192.168.235.99] (unknown [192.168.235.99])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id 592BF8B763;
-	Thu, 14 Aug 2025 21:05:43 +0200 (CEST)
-Message-ID: <ccc8eeba-757a-440d-80d3-9158e80c19fe@csgroup.eu>
-Date: Thu, 14 Aug 2025 21:05:42 +0200
+	s=arc-20240116; t=1755210917; c=relaxed/simple;
+	bh=H+FEBbWNGCd3jMnbM9NhsMA2h2WcyoSYo+D0V1gMNZE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VWJb2jN9Zq3amODgD2lQGIPrhSnxDgkZFlDtS9In6jeFddEa5+T0NSybuixmTmUiXftw70vh3ZXZ2n4fCifSpeg7hj8igTNfJAZwYJ6WOYvVfNYJWsppbG2M+L3eBHm4MbAoIqjq8jnVQJZXS13wISoKtIpLGbfQXNPk48KWrUs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QxmoWyfR; arc=none smtp.client-ip=209.85.218.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QxmoWyfR"
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-afcb78d5e74so233873866b.1
+        for <linux-block@vger.kernel.org>; Thu, 14 Aug 2025 15:35:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1755210914; x=1755815714; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rd3k6sT8uXkZnf31+csOG+Akc2j0o8UNuxgVHaXqfGc=;
+        b=QxmoWyfR7TMwZgf3BdC+5iH9zmH6RMdPnwVCK+W+UyLS307F1hYehzxbCyL0UbHjyi
+         DJBreVVWVgBRhBMNtCZhZIuGNoYln8cPPllMxbUZku6qCyq/c01fpQPIIOHpFHSQBeD3
+         KRTHv5BI7NNDKBn1219QNMniln4Ve9p06S1EnpK1t6MVv/mk1nFldZob/dvlqGiiUK5W
+         zSy9FqqvHR7pLvO8erp7FahynmCrPY73nfUUj8BJN+zXHG9g/oi+1BggJFBSIYvoFwdY
+         +7jr5wS9SPbxTgf1d3T2O859QA6AUK1RL9ztBGuDSzRDfKYt6Tt6ZpIan7H6Z7XajfuT
+         z9Gg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755210914; x=1755815714;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=rd3k6sT8uXkZnf31+csOG+Akc2j0o8UNuxgVHaXqfGc=;
+        b=Lm07c1GbiMD4dYHQ95p1gkZgvKeVPF92ecGR/Bb5ES3rJf3CVsOblnOL3M/2pAl0h9
+         SH7mulw5Nd14NtwrFGU0sRK2wa9pjPSKtAQen06gdCYXJ5zIZULz6Fm/pnzRQJEgtmus
+         Rjx1CQrHQ2I+ZZ4l3JPwhCS1ly9X6o1I+lmtb2gr+pgB9N/651+galSO6PeL1EeXA7AR
+         pII8c4mwLYrBh7eV0HQMEUUArtJQt9QCpTWyROgtdgW+QM74TjyT6VNtz3GuabJdDPIL
+         sOqCjEKXlJDGaNM5ve9LjWQGrh2hcIspbMHzg3EFmpDiY/u+1TBn7/m0AQOT5RI62BKp
+         FbzA==
+X-Forwarded-Encrypted: i=1; AJvYcCWN+ZKJeN8Jl4qXHsfOEjQ3JSR6Q96mKkvMxhcggfg4YxZvp1gmH3EN0EX0lKTPgz5dzFnis/LNfhvEtw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzIsJWvJcKJlhKBTnIGoj5GkVM3pvZZ4IEvH47pbk3Qc56Tjm1K
+	zBvyyTR57xdJnugGVI4xJdvMRZA9607tFpTuHRVAaS391kM4HZWeVAoFjS2M4iwiY5cnc6fQURb
+	ECtag+nlojgJowFBYKomVr4P6BeRar80=
+X-Gm-Gg: ASbGncvBtozp3PnIem12vMeiqgqxGqXUN9sw3A1tx2vPu3ZXF8lgadyMVIiRBwSWv0q
+	4rBvvWu+H0BvIswhU7RieST+pP9hYfqeb3YBn1tJ9HMmr9mVriYjnvsQzBhhOUNJl/gTzur96BC
+	HkgaPSQnzWb5ssypEOGWfXSUIx8wcmN6KRc3yHQaEPt/zZlTkXqB0nYmZZOMmJamTBbqP9d3//J
+	rWYq9UR
+X-Google-Smtp-Source: AGHT+IHQJ0nZv9ZlUQM3huQCK3igjXe0i02mkwa3OlSyeMA7reFrWNI2gArWn4YPRDyZ2w4NsNDQcTmLkfRUBsuYk+Q=
+X-Received: by 2002:a17:907:1c14:b0:af9:709f:970b with SMTP id
+ a640c23a62f3a-afcbe24770emr432719966b.46.1755210913738; Thu, 14 Aug 2025
+ 15:35:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 00/16] dma-mapping: migrate to physical address-based
- API
-To: Leon Romanovsky <leon@kernel.org>,
- Marek Szyprowski <m.szyprowski@samsung.com>
-Cc: Jason Gunthorpe <jgg@nvidia.com>,
- Abdiel Janulgue <abdiel.janulgue@gmail.com>,
- Alexander Potapenko <glider@google.com>, Alex Gaynor
- <alex.gaynor@gmail.com>, Andrew Morton <akpm@linux-foundation.org>,
- Christoph Hellwig <hch@lst.de>, Danilo Krummrich <dakr@kernel.org>,
- iommu@lists.linux.dev, Jason Wang <jasowang@redhat.com>,
- Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>,
- Jonathan Corbet <corbet@lwn.net>, Juergen Gross <jgross@suse.com>,
- kasan-dev@googlegroups.com, Keith Busch <kbusch@kernel.org>,
- linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-mm@kvack.org,
- linux-nvme@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
- linux-trace-kernel@vger.kernel.org, Madhavan Srinivasan
- <maddy@linux.ibm.com>, Masami Hiramatsu <mhiramat@kernel.org>,
- Michael Ellerman <mpe@ellerman.id.au>, "Michael S. Tsirkin"
- <mst@redhat.com>, Miguel Ojeda <ojeda@kernel.org>,
- Robin Murphy <robin.murphy@arm.com>, rust-for-linux@vger.kernel.org,
- Sagi Grimberg <sagi@grimberg.me>, Stefano Stabellini
- <sstabellini@kernel.org>, Steven Rostedt <rostedt@goodmis.org>,
- virtualization@lists.linux.dev, Will Deacon <will@kernel.org>,
- xen-devel@lists.xenproject.org
-References: <cover.1755193625.git.leon@kernel.org>
-From: Christophe Leroy <christophe.leroy@csgroup.eu>
-Content-Language: fr-FR
-In-Reply-To: <cover.1755193625.git.leon@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <CAHumS0BE_28D47d3Ls5PJBONTzVUCA54QwTV5UhJdDhnfCEi4A@mail.gmail.com>
+ <36eb61d6-971a-4177-aa62-75197460c33d@huaweicloud.com>
+In-Reply-To: <36eb61d6-971a-4177-aa62-75197460c33d@huaweicloud.com>
+From: Teng Qin <palmtenor@gmail.com>
+Date: Thu, 14 Aug 2025 18:35:01 -0400
+X-Gm-Features: Ac12FXwmBQ08ugM8mSulymg8dreoWRsjeQahdrQvChtdZhcwE-1pTtG-Qg35eDo
+Message-ID: <CAHumS0Ddg7wj50jvoR1Z9dJrXeizz+=4k7Az0qB_9QH-tAhvQA@mail.gmail.com>
+Subject: Re: Question on setting IO polling behavior and documentations
+To: Yu Kuai <yukuai1@huaweicloud.com>, linux-block@vger.kernel.org
+Cc: hch@lst.de, axboe@kernel.dk, sagi@grimberg.me, 
+	"yukuai (C)" <yukuai3@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Thu, Aug 14, 2025 at 5:31=E2=80=AFAM Yu Kuai <yukuai1@huaweicloud.com> w=
+rote:
+>
+> Hi,
+>
+> =E5=9C=A8 2025/08/14 13:14, Teng Qin =E5=86=99=E9=81=93:
+>> Moreover, the block layer documentation at
+>>    Documentation/ABI/stable/sysfs-block
+>> still documents the legacy behavior of the io_poll sysfs file. This is
+>> confusing for users trying to figure out reason of the failed or
+>> unexpected behavior after writing to the file and seeing the dmesg,
+>> particularly because there are many articles on the Internet describing
+>> the legacy behavior.
+>> If the maintainers agree, I can help update these documentations.
+>
+> Feel free to update the documentations, AFAIK, there are some out of
+> date descriptions and it's welcome to fix them
 
+Thanks a lot for the information. Before writing anything, I just
+want to confirm there is indeed no more per-device control for
+polling behavior? Is io_uring and driver-specific features like
+nvme passthrough the only ways to go right now?
 
-Le 14/08/2025 à 19:53, Leon Romanovsky a écrit :
-> Changelog:
-> v3:
->   * Fixed typo in "cacheable" word
->   * Simplified kmsan patch a lot to be simple argument refactoring
+For users who have legacy applications that could benefit from
+polling but still make traditional IO calls, would it still
+make sense to add a per-device override? I can think of some
+ways of adding a config for a specific device so it would
+tag all bio-s for that device as polling (if queue capable).
+But I'm not sure if that has been discussed before or maybe
+that was intentionally discouraged? Would love to hear from
+the maintainers for opinion.
 
-v2 sent today at 12:13, v3 sent today at 19:53 .... for only that ?
-
-Have you read 
-https://docs.kernel.org//process/submitting-patches.html#don-t-get-discouraged-or-impatient 
-?
-
-Thanks
-Christophe
-
-> v2: https://lore.kernel.org/all/cover.1755153054.git.leon@kernel.org
->   * Used commit messages and cover letter from Jason
->   * Moved setting IOMMU_MMIO flag to dma_info_to_prot function
->   * Micro-optimized the code
->   * Rebased code on v6.17-rc1
-> v1: https://lore.kernel.org/all/cover.1754292567.git.leon@kernel.org
->   * Added new DMA_ATTR_MMIO attribute to indicate
->     PCI_P2PDMA_MAP_THRU_HOST_BRIDGE path.
->   * Rewrote dma_map_* functions to use thus new attribute
-> v0: https://lore.kernel.org/all/cover.1750854543.git.leon@kernel.org/
-> ------------------------------------------------------------------------
-> 
-> This series refactors the DMA mapping to use physical addresses
-> as the primary interface instead of page+offset parameters. This
-> change aligns the DMA API with the underlying hardware reality where
-> DMA operations work with physical addresses, not page structures.
-> 
-> The series maintains export symbol backward compatibility by keeping
-> the old page-based API as wrapper functions around the new physical
-> address-based implementations.
-> 
-> This series refactors the DMA mapping API to provide a phys_addr_t
-> based, and struct-page free, external API that can handle all the
-> mapping cases we want in modern systems:
-> 
->   - struct page based cachable DRAM
->   - struct page MEMORY_DEVICE_PCI_P2PDMA PCI peer to peer non-cachable
->     MMIO
->   - struct page-less PCI peer to peer non-cachable MMIO
->   - struct page-less "resource" MMIO
-> 
-> Overall this gets much closer to Matthew's long term wish for
-> struct-pageless IO to cachable DRAM. The remaining primary work would
-> be in the mm side to allow kmap_local_pfn()/phys_to_virt() to work on
-> phys_addr_t without a struct page.
-> 
-> The general design is to remove struct page usage entirely from the
-> DMA API inner layers. For flows that need to have a KVA for the
-> physical address they can use kmap_local_pfn() or phys_to_virt(). This
-> isolates the struct page requirements to MM code only. Long term all
-> removals of struct page usage are supporting Matthew's memdesc
-> project which seeks to substantially transform how struct page works.
-> 
-> Instead make the DMA API internals work on phys_addr_t. Internally
-> there are still dedicated 'page' and 'resource' flows, except they are
-> now distinguished by a new DMA_ATTR_MMIO instead of by callchain. Both
-> flows use the same phys_addr_t.
-> 
-> When DMA_ATTR_MMIO is specified things work similar to the existing
-> 'resource' flow. kmap_local_pfn(), phys_to_virt(), phys_to_page(),
-> pfn_valid(), etc are never called on the phys_addr_t. This requires
-> rejecting any configuration that would need swiotlb. CPU cache
-> flushing is not required, and avoided, as ATTR_MMIO also indicates the
-> address have no cachable mappings. This effectively removes any
-> DMA API side requirement to have struct page when DMA_ATTR_MMIO is
-> used.
-> 
-> In the !DMA_ATTR_MMIO mode things work similarly to the 'page' flow,
-> except on the common path of no cache flush, no swiotlb it never
-> touches a struct page. When cache flushing or swiotlb copying
-> kmap_local_pfn()/phys_to_virt() are used to get a KVA for CPU
-> usage. This was already the case on the unmap side, now the map side
-> is symmetric.
-> 
-> Callers are adjusted to set DMA_ATTR_MMIO. Existing 'resource' users
-> must set it. The existing struct page based MEMORY_DEVICE_PCI_P2PDMA
-> path must also set it. This corrects some existing bugs where iommu
-> mappings for P2P MMIO were improperly marked IOMMU_CACHE.
-> 
-> Since ATTR_MMIO is made to work with all the existing DMA map entry
-> points, particularly dma_iova_link(), this finally allows a way to use
-> the new DMA API to map PCI P2P MMIO without creating struct page. The
-> VFIO DMABUF series demonstrates how this works. This is intended to
-> replace the incorrect driver use of dma_map_resource() on PCI BAR
-> addresses.
-> 
-> This series does the core code and modern flows. A followup series
-> will give the same treatment to the legacy dma_ops implementation.
-> 
-> Thanks
-> 
-> Leon Romanovsky (16):
->    dma-mapping: introduce new DMA attribute to indicate MMIO memory
->    iommu/dma: implement DMA_ATTR_MMIO for dma_iova_link().
->    dma-debug: refactor to use physical addresses for page mapping
->    dma-mapping: rename trace_dma_*map_page to trace_dma_*map_phys
->    iommu/dma: rename iommu_dma_*map_page to iommu_dma_*map_phys
->    iommu/dma: extend iommu_dma_*map_phys API to handle MMIO memory
->    dma-mapping: convert dma_direct_*map_page to be phys_addr_t based
->    kmsan: convert kmsan_handle_dma to use physical addresses
->    dma-mapping: handle MMIO flow in dma_map|unmap_page
->    xen: swiotlb: Open code map_resource callback
->    dma-mapping: export new dma_*map_phys() interface
->    mm/hmm: migrate to physical address-based DMA mapping API
->    mm/hmm: properly take MMIO path
->    block-dma: migrate to dma_map_phys instead of map_page
->    block-dma: properly take MMIO path
->    nvme-pci: unmap MMIO pages with appropriate interface
-> 
->   Documentation/core-api/dma-api.rst        |   4 +-
->   Documentation/core-api/dma-attributes.rst |  18 ++++
->   arch/powerpc/kernel/dma-iommu.c           |   4 +-
->   block/blk-mq-dma.c                        |  15 ++-
->   drivers/iommu/dma-iommu.c                 |  61 +++++------
->   drivers/nvme/host/pci.c                   |  18 +++-
->   drivers/virtio/virtio_ring.c              |   4 +-
->   drivers/xen/swiotlb-xen.c                 |  21 +++-
->   include/linux/blk-mq-dma.h                |   6 +-
->   include/linux/blk_types.h                 |   2 +
->   include/linux/dma-direct.h                |   2 -
->   include/linux/dma-map-ops.h               |   8 +-
->   include/linux/dma-mapping.h               |  33 ++++++
->   include/linux/iommu-dma.h                 |  11 +-
->   include/linux/kmsan.h                     |   9 +-
->   include/trace/events/dma.h                |   9 +-
->   kernel/dma/debug.c                        |  71 ++++---------
->   kernel/dma/debug.h                        |  37 ++-----
->   kernel/dma/direct.c                       |  22 +---
->   kernel/dma/direct.h                       |  52 ++++++----
->   kernel/dma/mapping.c                      | 117 +++++++++++++---------
->   kernel/dma/ops_helpers.c                  |   6 +-
->   mm/hmm.c                                  |  19 ++--
->   mm/kmsan/hooks.c                          |   7 +-
->   rust/kernel/dma.rs                        |   3 +
->   tools/virtio/linux/kmsan.h                |   2 +-
->   26 files changed, 306 insertions(+), 255 deletions(-)
-> 
-
+>
+>
+> Thanks,
+> Kuai
+>
