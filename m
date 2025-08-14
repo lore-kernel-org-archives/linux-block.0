@@ -1,28 +1,28 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C434B26CE0A;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD15026CE1A;
 	Thu, 14 Aug 2025 03:43:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755142998; cv=none; b=nSkb5xShdyXhjVE8IxPTQRX9qlIZxtZtC65sbV6ZI4sfHGij87gko7TaCkK8UFGDFOhXPRcrkr41kokoxyvkH/mEunen+XD6pfH2AAHcI3GuOacgY7h4pQ7RBrl859OPY/rwOZftoxf5UdmeCjYs+hR+zeKnSyM2Ic0Hejai7pw=
+	t=1755142999; cv=none; b=sXxxOTU4l+grqC4nomtDpRBVpHpWN1u09TjD1r9yhBp9mRgWfEZ+q7BccM7AkrGjnQQ9wcbuZSOliWCCy15UahwznVdgADQscUmrqrY0fEXmuXok1elNUqaYtYJRt5637T/i88jRYsF8U0+kYXw8YW16oTWsqEVZE6t2vA1m8aw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755142998; c=relaxed/simple;
-	bh=24T5+g8WMOUYYSAoco/LftJ3y+twWAskhfuDyz4/5jI=;
+	s=arc-20240116; t=1755142999; c=relaxed/simple;
+	bh=49dd3k2uOhNsqUa1AxTb+jCQ1g7RZ+Wk2EQCin/MhFU=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=dW2l2kEjpTyoIUMx1J5JcLI+nP1dvcXzQ+EbnXtgs4P4D7qKwi00+a80Efr0Q9vr5i/bBSNB8BPEZpQ9lnY++AauOd+z+WGf2tRjo9Xng9TYIBnWKUjHxJyPab+VXeMhunBKSeF8kN0Kc9ZNvmE994MnH2F+DAo7zwiVEHfbQJs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+	 MIME-Version; b=Ez126COYaSEXY3/BeUEyZTIcbhXHTExG8+hcKXfE9KiJeeztOgPEcnul0CksgOw+GX7rtyWOzKZ2vdpFAIteG0JXoG3xQwgYIXM6kRKBdhfKmmnD9IMdBM/k9tebhwkx33UZt7DwwWuRitHWP7PauPcFoaD3PJl88ivNKEOYOqI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
 Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4c2WKv63ywzKHMhx;
-	Thu, 14 Aug 2025 11:43:15 +0800 (CST)
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4c2WKp0szQzYQv4t;
+	Thu, 14 Aug 2025 11:43:10 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 24C601A01A3;
-	Thu, 14 Aug 2025 11:43:15 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTP id B8D101A1A7C;
+	Thu, 14 Aug 2025 11:43:08 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.104.67])
-	by APP4 (Coremail) with SMTP id gCh0CgCnIxRKW51ogs93Dg--.15627S18;
-	Thu, 14 Aug 2025 11:43:14 +0800 (CST)
+	by APP4 (Coremail) with SMTP id gCh0CgCnIxRKW51ogs93Dg--.15627S5;
+	Thu, 14 Aug 2025 11:43:08 +0800 (CST)
 From: Yu Kuai <yukuai1@huaweicloud.com>
 To: axboe@kernel.dk,
 	yukuai3@huawei.com,
@@ -36,9 +36,9 @@ Cc: linux-block@vger.kernel.org,
 	yi.zhang@huawei.com,
 	yangerkun@huawei.com,
 	johnny.chenyi@huawei.com
-Subject: [PATCH 14/16] block, bfq: convert to use request_queue->async_depth
-Date: Thu, 14 Aug 2025 11:35:20 +0800
-Message-Id: <20250814033522.770575-15-yukuai1@huaweicloud.com>
+Subject: [PATCH 01/16] blk-mq-sched: add new parameter nr_requests in blk_mq_alloc_sched_tags()
+Date: Thu, 14 Aug 2025 11:35:07 +0800
+Message-Id: <20250814033522.770575-2-yukuai1@huaweicloud.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20250814033522.770575-1-yukuai1@huaweicloud.com>
 References: <20250814033522.770575-1-yukuai1@huaweicloud.com>
@@ -49,103 +49,103 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgCnIxRKW51ogs93Dg--.15627S18
-X-Coremail-Antispam: 1UD129KBjvJXoWxJF48trWDGF4UtFW8Cw45KFg_yoW5Ar4xp3
-	y3tanxKr18JF429w1rAw1a9ryrKwn5uryfJF1ftryxJrZ8ZFn7ZF1YqFyrXr97Xr93Aw4U
-	XrWDZa95W3WIqF7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUmS14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_JF0E3s1l82xGYI
-	kIc2x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2
-	z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F
-	4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq
-	3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7
-	IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4U
-	M4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2
-	kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkE
-	bVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67
-	AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVW8JVW5JwCI
-	42IY6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF
-	4lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aVCY1x0267AKxVW8Jr0_Cr1UYxBI
-	daVFxhVjvjDU0xZFpf9x0JUQFxUUUUUU=
+X-CM-TRANSID:gCh0CgCnIxRKW51ogs93Dg--.15627S5
+X-Coremail-Antispam: 1UD129KBjvJXoWxJw4UtFWUAw45Jr1rJF18Xwb_yoW5AFWDpF
+	s8Xa1qk3yYqr4kXay7A3yxZw17Kws29FyxJrWft3yYyr1vqws3u3W09r43XrW0yrs5AFsI
+	yr1Dtay5XrsFq3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUm014x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_Jr4l82xGYIkIc2
+	x26xkF7I0E14v26r4j6ryUM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0
+	Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJw
+	A2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS
+	0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2
+	IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0
+	Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kIc2
+	xKxwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWU
+	JVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67
+	kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY
+	6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0x
+	vEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVj
+	vjDU0xZFpf9x0JU4OJ5UUUUU=
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
 From: Yu Kuai <yukuai3@huawei.com>
 
-The default limits is unchanged, and user can configure async_depth now.
+This helper only support to iallocate the default number of requests,
+add a new parameter to support specific number of requests.
+
+Prepare to fix tags double free problem if nr_requests is grown by
+queue sysfs attribute nr_requests.
 
 Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 ---
- block/bfq-iosched.c | 43 +++++++++++++++++--------------------------
- 1 file changed, 17 insertions(+), 26 deletions(-)
+ block/blk-mq-sched.c | 11 +++++++----
+ block/blk-mq-sched.h |  2 +-
+ block/elevator.c     |  2 +-
+ 3 files changed, 9 insertions(+), 6 deletions(-)
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index de0dee255ccf..46520e50f584 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -7112,39 +7112,29 @@ void bfq_put_async_queues(struct bfq_data *bfqd, struct bfq_group *bfqg)
- static void bfq_depth_updated(struct request_queue *q)
- {
- 	struct bfq_data *bfqd = q->elevator->elevator_data;
--	unsigned int nr_requests = q->nr_requests;
-+	unsigned int async_depth = q->async_depth;
- 
- 	/*
--	 * In-word depths if no bfq_queue is being weight-raised:
--	 * leaving 25% of tags only for sync reads.
-+	 * By default:
-+	 *  - sync reads are not limited
-+	 * If bfqq is not being weight-raised:
-+	 *  - sync writes are limited to 75%(async depth default value)
-+	 *  - async IO are limited to 50%
-+	 * If bfqq is being weight-raised:
-+	 *  - sync writes are limited to ~37%
-+	 *  - async IO are limited to ~18
- 	 *
--	 * In next formulas, right-shift the value
--	 * (1U<<bt->sb.shift), instead of computing directly
--	 * (1U<<(bt->sb.shift - something)), to be robust against
--	 * any possible value of bt->sb.shift, without having to
--	 * limit 'something'.
-+	 * If request_queue->async_depth is updated by user, all limit are
-+	 * updated relatively.
- 	 */
--	/* no more than 50% of tags for async I/O */
--	bfqd->async_depths[0][0] = max(nr_requests >> 1, 1U);
--	/*
--	 * no more than 75% of tags for sync writes (25% extra tags
--	 * w.r.t. async I/O, to prevent async I/O from starving sync
--	 * writes)
--	 */
--	bfqd->async_depths[0][1] = max((nr_requests * 3) >> 2, 1U);
-+	bfqd->async_depths[0][1] = async_depth;
-+	bfqd->async_depths[0][0] = max(async_depth * 2 / 3, 1U);
-+	bfqd->async_depths[1][1] = max(async_depth >> 1, 1U);
-+	bfqd->async_depths[1][0] = max(async_depth >> 2, 1U);
- 
- 	/*
--	 * In-word depths in case some bfq_queue is being weight-
--	 * raised: leaving ~63% of tags for sync reads. This is the
--	 * highest percentage for which, in our tests, application
--	 * start-up times didn't suffer from any regression due to tag
--	 * shortage.
-+	 * Due to cgroup qos, the allowed request for bfqq might be 1
- 	 */
--	/* no more than ~18% of tags for async I/O */
--	bfqd->async_depths[1][0] = max((nr_requests * 3) >> 4, 1U);
--	/* no more than ~37% of tags for sync writes (~20% extra tags) */
--	bfqd->async_depths[1][1] = max((nr_requests * 6) >> 4, 1U);
--
- 	blk_mq_set_min_shallow_depth(q, 1);
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index e2ce4a28e6c9..9a8a0b5e04a9 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -454,7 +454,7 @@ void blk_mq_free_sched_tags_batch(struct xarray *et_table,
  }
  
-@@ -7364,6 +7354,7 @@ static int bfq_init_queue(struct request_queue *q, struct elevator_queue *eq)
- 	blk_queue_flag_set(QUEUE_FLAG_DISABLE_WBT_DEF, q);
- 	wbt_disable_default(q->disk);
- 	blk_stat_enable_accounting(q);
-+	q->async_depth = (q->nr_requests * 3) >> 2;
+ struct elevator_tags *blk_mq_alloc_sched_tags(struct blk_mq_tag_set *set,
+-		unsigned int nr_hw_queues)
++		unsigned int nr_hw_queues, unsigned int nr_requests)
+ {
+ 	unsigned int nr_tags;
+ 	int i;
+@@ -475,8 +475,11 @@ struct elevator_tags *blk_mq_alloc_sched_tags(struct blk_mq_tag_set *set,
+ 	 * 128, since we don't split into sync/async like the old code
+ 	 * did. Additionally, this is a per-hw queue depth.
+ 	 */
+-	et->nr_requests = 2 * min_t(unsigned int, set->queue_depth,
+-			BLKDEV_DEFAULT_RQ);
++	if (nr_requests)
++		et->nr_requests = nr_requests;
++	else
++		et->nr_requests = 2 * min_t(unsigned int, set->queue_depth,
++				BLKDEV_DEFAULT_RQ);
+ 	et->nr_hw_queues = nr_hw_queues;
  
- 	return 0;
+ 	if (blk_mq_is_shared_tags(set->flags)) {
+@@ -521,7 +524,7 @@ int blk_mq_alloc_sched_tags_batch(struct xarray *et_table,
+ 		 * concurrently.
+ 		 */
+ 		if (q->elevator) {
+-			et = blk_mq_alloc_sched_tags(set, nr_hw_queues);
++			et = blk_mq_alloc_sched_tags(set, nr_hw_queues, 0);
+ 			if (!et)
+ 				goto out_unwind;
+ 			if (xa_insert(et_table, q->id, et, gfp))
+diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
+index b554e1d55950..0582d4bc3987 100644
+--- a/block/blk-mq-sched.h
++++ b/block/blk-mq-sched.h
+@@ -24,7 +24,7 @@ void blk_mq_exit_sched(struct request_queue *q, struct elevator_queue *e);
+ void blk_mq_sched_free_rqs(struct request_queue *q);
  
+ struct elevator_tags *blk_mq_alloc_sched_tags(struct blk_mq_tag_set *set,
+-		unsigned int nr_hw_queues);
++		unsigned int nr_hw_queues, unsigned int nr_requests);
+ int blk_mq_alloc_sched_tags_batch(struct xarray *et_table,
+ 		struct blk_mq_tag_set *set, unsigned int nr_hw_queues);
+ void blk_mq_free_sched_tags(struct elevator_tags *et,
+diff --git a/block/elevator.c b/block/elevator.c
+index fe96c6f4753c..f8a04f32cbcf 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -669,7 +669,7 @@ static int elevator_change(struct request_queue *q, struct elv_change_ctx *ctx)
+ 	lockdep_assert_held(&set->update_nr_hwq_lock);
+ 
+ 	if (strncmp(ctx->name, "none", 4)) {
+-		ctx->et = blk_mq_alloc_sched_tags(set, set->nr_hw_queues);
++		ctx->et = blk_mq_alloc_sched_tags(set, set->nr_hw_queues, 0);
+ 		if (!ctx->et)
+ 			return -ENOMEM;
+ 	}
 -- 
 2.39.2
 
