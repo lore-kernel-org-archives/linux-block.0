@@ -1,81 +1,104 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A39332ED169
-	for <linux-block@vger.kernel.org>; Thu, 14 Aug 2025 09:31:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 242C72EAB95;
+	Thu, 14 Aug 2025 09:31:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755163872; cv=none; b=s8DENkatxjzjRxsD9mc2iwCMXJczdj9SyYod5+KfGDjZMmXk8ET0cEy8iLcjGXZSrL2rHIBxklxr3MiG2gZud+S/6Hr4Uhpqb2q/JgwZJZpzdligLYIiFcS4sO0V3eqJDHtFqJ+bLz0NVxUkyvC0wOlE4EWbah1O5isHfSlnR8M=
+	t=1755163884; cv=none; b=VQU/P9jzEy6tGF4QOLZjs8KJZQmNp0RjOyTfymRH1CBzzKY29efbiweIELA87c7oaL9rnWlq+rhLwtSUM11t2PYRFjwAmmuEwiSPa5LHSsY+o5hWZtrHpZxpyBwR+MNzGlMTIBBapFFH3a4dd3t2LaDSvxFUP+sWXYECPy9Km1w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755163872; c=relaxed/simple;
-	bh=/D1T9Juvk+zTF3bnIR9Ml5gvvd8FOX5anFoofKX12t8=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=O1S2LIbR6lZ9WJOy3nzA38pfSQJcvzdyDkapM74mYRgMmHtmIqyik/hcXSTB8yePg8tbo95NFQOgOkpy+EaNn+y3djdYgmGjsBklYILuIo/kQTkLIOKnQif3ytBPYx6O6uhikznkSMz4or3u/bFIO6HB9XEBmTnAiWnzyKLvdiU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4c2g3J5X2zzYQv0F
-	for <linux-block@vger.kernel.org>; Thu, 14 Aug 2025 17:31:08 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 625001A1B8B
-	for <linux-block@vger.kernel.org>; Thu, 14 Aug 2025 17:31:07 +0800 (CST)
-Received: from [10.174.179.143] (unknown [10.174.179.143])
-	by APP4 (Coremail) with SMTP id gCh0CgA3sxPZrJ1o3ZyTDg--.6291S3;
-	Thu, 14 Aug 2025 17:31:07 +0800 (CST)
-Subject: Re: Question on setting IO polling behavior and documentations
-To: Teng Qin <palmtenor@gmail.com>, linux-block@vger.kernel.org, hch@lst.de
-Cc: inux-nvme@lists.infradead.org, axboe@kernel.dk, sagi@grimberg.me,
- "yukuai (C)" <yukuai3@huawei.com>
-References: <CAHumS0BE_28D47d3Ls5PJBONTzVUCA54QwTV5UhJdDhnfCEi4A@mail.gmail.com>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <36eb61d6-971a-4177-aa62-75197460c33d@huaweicloud.com>
-Date: Thu, 14 Aug 2025 17:31:05 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.1
+	s=arc-20240116; t=1755163884; c=relaxed/simple;
+	bh=yKJUWm1zLKi1m/VPpREySff4bPrqQHo2VgSLpYvSluo=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Va+KAnr6IPobbXzGkJGkcJiegUdc9RRacX1dcoycG/No1eLAdmRlCjQYBs3MRqLyeIp90qIEspWLUOrX4iRMA1RF5IJUExOQYqcPt3dL7rK/BbEG7ozAVtpdd7dY0yYtcDmWcg/nYYnkhvtfFzgmEP6jL2Nbh34uw/HtZuYWzVM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kxSST9/E; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kxSST9/E"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A7DAC4CEED;
+	Thu, 14 Aug 2025 09:31:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755163884;
+	bh=yKJUWm1zLKi1m/VPpREySff4bPrqQHo2VgSLpYvSluo=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=kxSST9/E5SjL+n89YastPyvyzkDMOtJ5q7V6TqcUjFuLgzUbcauZQcC0M4PewJ9ln
+	 c0Nrc1goBx8OEwwt1C/0zEh6g6ULihnrut8r2Ck8ELDTi7NOtooZi2jA7kHhWaDOk0
+	 FCPNH42dMrlD25ILDTxCp/PaVcQyULspu4GDAr17IQe4KwhRUuko1hg9G/QqnNC+eF
+	 F6pHarsNFPsiA+LXo1qQw5EtkM046JYJn+wbla3iuETL0zK/iKwYtRtHWMzFrgt35r
+	 tUNY9S0ruMTmiy4lerhidIjUw88nN/S5rJQAm4yvdbEpbbKOzSWi0wjdAUWwfOtJug
+	 M7NjGr8sj4Zug==
+From: Benno Lossin <lossin@kernel.org>
+To: Andreas Hindborg <a.hindborg@kernel.org>,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	Alex Gaynor <alex.gaynor@gmail.com>,
+	Gary Guo <gary@garyguo.net>,
+	=?UTF-8?q?Bj=C3=B6rn=20Roy=20Baron?= <bjorn3_gh@protonmail.com>,
+	Benno Lossin <lossin@kernel.org>,
+	Alice Ryhl <aliceryhl@google.com>,
+	Trevor Gross <tmgross@umich.edu>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Yutaro Ohno <yutaro.ono.418@gmail.com>,
+	Manas <manas18244@iiitd.ac.in>,
+	Xizhe Yin <xizheyin@smail.nju.edu.cn>,
+	Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	rust-for-linux@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v3 05/11] rust: block: replace `core::mem::zeroed` with `pin_init::zeroed`
+Date: Thu, 14 Aug 2025 11:30:32 +0200
+Message-ID: <20250814093046.2071971-6-lossin@kernel.org>
+X-Mailer: git-send-email 2.50.1
+In-Reply-To: <20250814093046.2071971-1-lossin@kernel.org>
+References: <20250814093046.2071971-1-lossin@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAHumS0BE_28D47d3Ls5PJBONTzVUCA54QwTV5UhJdDhnfCEi4A@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgA3sxPZrJ1o3ZyTDg--.6291S3
-X-Coremail-Antispam: 1UD129KBjvdXoWrJF4kCr45GFWrJFyrJw1UKFg_yoWxWrbEkr
-	W2yFn7tayqyryIyr48CanxGryI9a18Gr17Ja4xJr1Yq34jyrWkCF9Iq3s8Zw1UW3y5Zry5
-	Crn2qFWSkF93ujkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUbxxYFVCjjxCrM7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E6xAIw20E
-	Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwV
-	A0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x02
-	67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
-	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
-	x7xfMcIj6xIIjxv20xvE14v26r106r15McIj6I8E87Iv67AKxVW8JVWxJwAm72CE4IkC6x
-	0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AK
-	xVWUAVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F4
-	0E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1l
-	IxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxV
-	AFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r4j
-	6F4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr1j6F4UJbIYCTnIWIevJa73UjIFyTuYvjxUwl
-	ksUUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-Hi,
+All types in `bindings` implement `Zeroable` if they can, so use
+`pin_init::zeroed` instead of relying on `unsafe` code.
 
-在 2025/08/14 13:14, Teng Qin 写道:
-> Moreover, the block layer documentation at
->    Documentation/ABI/stable/sysfs-block
-> still documents the legacy behavior of the io_poll sysfs file. This is
-> confusing for users trying to figure out reason of the failed or
-> unexpected behavior after writing to the file and seeing the dmesg,
-> particularly because there are many articles on the Internet describing
-> the legacy behavior.
-> If the maintainers agree, I can help update these documentations.
+If this ends up not compiling in the future, something in bindgen or on
+the C side changed and is most likely incorrect.
 
-Feel free to update the documentations, AFAIK, there are some out of
-date descriptions and it's welcome to fix them.
+Signed-off-by: Benno Lossin <lossin@kernel.org>
+---
+ rust/kernel/block/mq/gen_disk.rs | 3 +--
+ rust/kernel/block/mq/tag_set.rs  | 4 +---
+ 2 files changed, 2 insertions(+), 5 deletions(-)
 
-Thanks,
-Kuai
+diff --git a/rust/kernel/block/mq/gen_disk.rs b/rust/kernel/block/mq/gen_disk.rs
+index cd54cd64ea88..75b90fe20c7d 100644
+--- a/rust/kernel/block/mq/gen_disk.rs
++++ b/rust/kernel/block/mq/gen_disk.rs
+@@ -93,8 +93,7 @@ pub fn build<T: Operations>(
+         name: fmt::Arguments<'_>,
+         tagset: Arc<TagSet<T>>,
+     ) -> Result<GenDisk<T>> {
+-        // SAFETY: `bindings::queue_limits` contain only fields that are valid when zeroed.
+-        let mut lim: bindings::queue_limits = unsafe { core::mem::zeroed() };
++        let mut lim: bindings::queue_limits = pin_init::zeroed();
+ 
+         lim.logical_block_size = self.logical_block_size;
+         lim.physical_block_size = self.physical_block_size;
+diff --git a/rust/kernel/block/mq/tag_set.rs b/rust/kernel/block/mq/tag_set.rs
+index c3cf56d52bee..dae9df408a86 100644
+--- a/rust/kernel/block/mq/tag_set.rs
++++ b/rust/kernel/block/mq/tag_set.rs
+@@ -38,9 +38,7 @@ pub fn new(
+         num_tags: u32,
+         num_maps: u32,
+     ) -> impl PinInit<Self, error::Error> {
+-        // SAFETY: `blk_mq_tag_set` only contains integers and pointers, which
+-        // all are allowed to be 0.
+-        let tag_set: bindings::blk_mq_tag_set = unsafe { core::mem::zeroed() };
++        let tag_set: bindings::blk_mq_tag_set = pin_init::zeroed();
+         let tag_set: Result<_> = core::mem::size_of::<RequestDataWrapper>()
+             .try_into()
+             .map(|cmd_size| {
+-- 
+2.50.1
 
