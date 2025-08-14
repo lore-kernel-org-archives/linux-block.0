@@ -1,171 +1,220 @@
-Received: from mx0a-002e3701.pphosted.com (mx0a-002e3701.pphosted.com [148.163.147.86])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D8211E7C1C;
-	Thu, 14 Aug 2025 19:11:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.147.86
+Received: from pegase2.c-s.fr (pegase2.c-s.fr [93.17.235.10])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C26201C84B2;
+	Thu, 14 Aug 2025 19:20:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.235.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755198685; cv=none; b=KxkDmqxvpyKJ5Y+QlC3SYihKQofsc3J1MxeVPmDiOCnp7r3xByX2U1CjVxmgLj1fD+IOJPudelq1rZ+0UpvmgKL5neGf2lDhcwy0ZU8E+ZOkMGf1gLOCjuux0m++LCTPU1JfARZd1k9UBejk8x/XnFrTxn8b/9Dy0J5GO6e43uM=
+	t=1755199237; cv=none; b=hCQBX8dqxDcSRklEdwrWHo49s7BSo6oEkMoy1eZcW7/UsEMsgylBdv4PhOclnr1IdHPm1F5tHbqPJpqXd97ue4PS3hJN9KAPg8mW+OR/6WC5XNNo8Vz+BJI37uU0ADL96mvbXd+C2s9tIHCQlOZaea8lEPaKXcESQcWJQ+NWLXY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755198685; c=relaxed/simple;
-	bh=9XE4ZobYI/NqVdvC0uo3n87qyaQTaZUkjPKyqlP5wQM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QGRM2SF0W4S/11SpXWwCKI/molGQYQ/4ZlwrvjtcROXIl8XyjyDlkbW6VqN1CBOSibtZRnVdSoM8SqcZb06q7Rs2KtbEmSKm19OCC0dGSF5wTasLcSKHXarUM3uVwaSlJBwee2VWeg7EsIrrLluel+QnBEEm0Sh1diz9r5NseWc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hpe.com; spf=pass smtp.mailfrom=hpe.com; dkim=pass (2048-bit key) header.d=hpe.com header.i=@hpe.com header.b=CfHa/pCg; arc=none smtp.client-ip=148.163.147.86
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hpe.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hpe.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hpe.com header.i=@hpe.com header.b="CfHa/pCg"
-Received: from pps.filterd (m0148663.ppops.net [127.0.0.1])
-	by mx0a-002e3701.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57EFWJER009338;
-	Thu, 14 Aug 2025 19:11:10 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=pps0720; bh=XpGChlmrL4BcuJE2a2uUcO04sPQ2c1KFgPgTD
-	gpXhlk=; b=CfHa/pCgb5lE6AP0utkwsezycQDQ7q67r1mpBLT5K+eqmoqkI8t7I
-	7CphZgaCJzaNzYqykGQKnv5P4RtoA3gP7kPJrdrQJTewaiZTdL1+2sDTFWPxMmre
-	duDM1Z0DQtXm8LS5OAhARIZ9i29AWsjSUqVP6I0szAiuKrpy57PEu/jgEmZ3xWWs
-	5LKlvqK2M6Ctaoum6edjhYHdIQWm7NaEMpD6HJAXJ0OJejfun4UKRGLqrYhD6ADQ
-	Pfsu/fuLU76W3IRsXkOV8hAznYVRxo2dNvhH5o5Pg36hbMftjyuR5N2Zw7PP7/Fj
-	XkN5kPGJ57C/MPsF209giRFwkE6G9beWQ==
-Received: from p1lg14880.it.hpe.com ([16.230.97.201])
-	by mx0a-002e3701.pphosted.com (PPS) with ESMTPS id 48gxjk4phq-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 14 Aug 2025 19:11:10 +0000 (GMT)
-Received: from test-build-fcntl.hpe.com (unknown [192.58.206.38])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by p1lg14880.it.hpe.com (Postfix) with ESMTPS id 4E7F1800265;
-	Thu, 14 Aug 2025 19:10:11 +0000 (UTC)
-Received: by test-build-fcntl.hpe.com (Postfix, from userid 1000)
-	id B2A768800123; Thu, 14 Aug 2025 19:10:06 +0000 (UTC)
-From: Rajeev Mishra <rajeevm@hpe.com>
-To: axboe@kernel.dk, yukuai1@huaweicloud.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Rajeev Mishra <rajeevm@hpe.com>
-Subject: [PATCH v4 1/2] loop: Rename and merge get_size/get_loop_size to lo_calculate_size
-Date: Thu, 14 Aug 2025 19:10:03 +0000
-Message-ID: <20250814191004.60340-1-rajeevm@hpe.com>
-X-Mailer: git-send-email 2.43.7
+	s=arc-20240116; t=1755199237; c=relaxed/simple;
+	bh=rD5JabdEJRljG8IExvrHN7NV5kOpcnQhHxBq2nt80PY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=L81okwSCj3rkG/5c8GHqLCtvldBn0OlxvG1eJe72n3de+vbH5uuAaFvd7u+Fsn5C+8BZZk2bLunLAJSbXS+bap/5oCjMTnvaPmlmvQsosQFZKiF7y5KSUhYG1iU3JWW6eclqy1ITe7GSdnqDvCjxv8g4m+4HReLcNfk3i0TUa24=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.235.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
+Received: from localhost (mailhub4.si.c-s.fr [172.26.127.67])
+	by localhost (Postfix) with ESMTP id 4c2vpK65M9z9sSH;
+	Thu, 14 Aug 2025 21:05:45 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from pegase2.c-s.fr ([172.26.127.65])
+	by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id ZPu83EvDtL2B; Thu, 14 Aug 2025 21:05:45 +0200 (CEST)
+Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
+	by pegase2.c-s.fr (Postfix) with ESMTP id 4c2vpK3P9dz9sSC;
+	Thu, 14 Aug 2025 21:05:45 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id 16AD08B764;
+	Thu, 14 Aug 2025 21:05:45 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from messagerie.si.c-s.fr ([127.0.0.1])
+	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
+	with ESMTP id v81OkG88qzZ0; Thu, 14 Aug 2025 21:05:44 +0200 (CEST)
+Received: from [192.168.235.99] (unknown [192.168.235.99])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id 592BF8B763;
+	Thu, 14 Aug 2025 21:05:43 +0200 (CEST)
+Message-ID: <ccc8eeba-757a-440d-80d3-9158e80c19fe@csgroup.eu>
+Date: Thu, 14 Aug 2025 21:05:42 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 00/16] dma-mapping: migrate to physical address-based
+ API
+To: Leon Romanovsky <leon@kernel.org>,
+ Marek Szyprowski <m.szyprowski@samsung.com>
+Cc: Jason Gunthorpe <jgg@nvidia.com>,
+ Abdiel Janulgue <abdiel.janulgue@gmail.com>,
+ Alexander Potapenko <glider@google.com>, Alex Gaynor
+ <alex.gaynor@gmail.com>, Andrew Morton <akpm@linux-foundation.org>,
+ Christoph Hellwig <hch@lst.de>, Danilo Krummrich <dakr@kernel.org>,
+ iommu@lists.linux.dev, Jason Wang <jasowang@redhat.com>,
+ Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>,
+ Jonathan Corbet <corbet@lwn.net>, Juergen Gross <jgross@suse.com>,
+ kasan-dev@googlegroups.com, Keith Busch <kbusch@kernel.org>,
+ linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+ linux-nvme@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
+ linux-trace-kernel@vger.kernel.org, Madhavan Srinivasan
+ <maddy@linux.ibm.com>, Masami Hiramatsu <mhiramat@kernel.org>,
+ Michael Ellerman <mpe@ellerman.id.au>, "Michael S. Tsirkin"
+ <mst@redhat.com>, Miguel Ojeda <ojeda@kernel.org>,
+ Robin Murphy <robin.murphy@arm.com>, rust-for-linux@vger.kernel.org,
+ Sagi Grimberg <sagi@grimberg.me>, Stefano Stabellini
+ <sstabellini@kernel.org>, Steven Rostedt <rostedt@goodmis.org>,
+ virtualization@lists.linux.dev, Will Deacon <will@kernel.org>,
+ xen-devel@lists.xenproject.org
+References: <cover.1755193625.git.leon@kernel.org>
+From: Christophe Leroy <christophe.leroy@csgroup.eu>
+Content-Language: fr-FR
+In-Reply-To: <cover.1755193625.git.leon@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODE0MDE2MyBTYWx0ZWRfX15Rt5aVdb3uB
- XXcpVWuuTw7VTLbQxzVIVVYCWyKuNpj/nnlRkGG5pvTNLMznkztLVprMOsU3cdUXhRcQ5tlL89b
- Ywk60+8rKpe4Nz1J7NHX/rPb0xQ60AcSaEqyGoNb+R8Lms87b4MnPsb4PJkMnJNxC0HjCnXCBcR
- FnRMJqGwQdFw4AxSOcEu3uS1gPiQhyHWc+Lf2CyHABOZKcU6bZInb/22FNAUVQguvflXqfe729o
- pWYPJT+Qq99/qyKzJ+ZdhzIbJqZDB+JP+Ix0wu/zNU5CEkv96ZBE10mRqc7/Ji3DJL7Wz17xcmU
- 9/uxYyF76acsEBasjxeM6dIP/ZQtufAc1yOtLevN6CrbpLj2lnZASkAkHhTNHLpPAVi/cP/B41L
- cS7Il07AnnBEY1hZZX7qmvfPs0bO0rL3drm1XPiBuLfI40KjEY1bWNB8ZtqsC/H7dg6ADhiv
-X-Proofpoint-GUID: jVRynczNfY227vW2V0LqXoOLDcyzchjs
-X-Proofpoint-ORIG-GUID: jVRynczNfY227vW2V0LqXoOLDcyzchjs
-X-Authority-Analysis: v=2.4 cv=cJvgskeN c=1 sm=1 tr=0 ts=689e34ce cx=c_pps
- a=A+SOMQ4XYIH4HgQ50p3F5Q==:117 a=A+SOMQ4XYIH4HgQ50p3F5Q==:17
- a=2OwXVqhp2XgA:10 a=MvuuwTCpAAAA:8 a=SlmTxP4Kr1pQ6mi-SkUA:9
-X-HPE-SCL: -1
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-08-13_02,2025-08-14_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 suspectscore=0 priorityscore=1501 mlxlogscore=999 bulkscore=0
- mlxscore=0 adultscore=0 malwarescore=0 spamscore=0 lowpriorityscore=0
- phishscore=0 clxscore=1015 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2507300000
- definitions=main-2508140163
 
-- Renamed get_size to lo_calculate_size.
-- Merged get_size and get_loop_size logic into lo_calculate_size.
-- Updated all callers to use lo_calculate_size.
-- Added header to lo_calculate_size.
 
-Signed-off-by: Rajeev Mishra <rajeevm@hpe.com>
----
- drivers/block/loop.c | 26 +++++++++-----------------
- 1 file changed, 9 insertions(+), 17 deletions(-)
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 1b6ee91f8eb9..0e1b9eb9db10 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -137,20 +137,18 @@ static void loop_global_unlock(struct loop_device *lo, bool global)
- static int max_part;
- static int part_shift;
- 
--static loff_t get_size(loff_t offset, loff_t sizelimit, struct file *file)
-+static loff_t lo_calculate_size(struct loop_device *lo, struct file *file)
- {
- 	loff_t loopsize;
--
- 	/* Compute loopsize in bytes */
- 	loopsize = i_size_read(file->f_mapping->host);
--	if (offset > 0)
--		loopsize -= offset;
-+	if (lo->lo_offset > 0)
-+		loopsize -= lo->lo_offset;
- 	/* offset is beyond i_size, weird but possible */
- 	if (loopsize < 0)
- 		return 0;
--
--	if (sizelimit > 0 && sizelimit < loopsize)
--		loopsize = sizelimit;
-+	if (lo->lo_sizelimit > 0 && lo->lo_sizelimit < loopsize)
-+		loopsize = lo->lo_sizelimit;
- 	/*
- 	 * Unfortunately, if we want to do I/O on the device,
- 	 * the number of 512-byte sectors has to fit into a sector_t.
-@@ -158,11 +156,6 @@ static loff_t get_size(loff_t offset, loff_t sizelimit, struct file *file)
- 	return loopsize >> 9;
- }
- 
--static loff_t get_loop_size(struct loop_device *lo, struct file *file)
--{
--	return get_size(lo->lo_offset, lo->lo_sizelimit, file);
--}
--
- /*
-  * We support direct I/O only if lo_offset is aligned with the logical I/O size
-  * of backing device, and the logical block size of loop is bigger than that of
-@@ -569,7 +562,7 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
- 	error = -EINVAL;
- 
- 	/* size of the new backing store needs to be the same */
--	if (get_loop_size(lo, file) != get_loop_size(lo, old_file))
-+	if (lo_calculate_size(lo, file) != lo_calculate_size(lo, old_file))
- 		goto out_err;
- 
- 	/*
-@@ -1063,7 +1056,7 @@ static int loop_configure(struct loop_device *lo, blk_mode_t mode,
- 	loop_update_dio(lo);
- 	loop_sysfs_init(lo);
- 
--	size = get_loop_size(lo, file);
-+	size = lo_calculate_size(lo, file);
- 	loop_set_size(lo, size);
- 
- 	/* Order wrt reading lo_state in loop_validate_file(). */
-@@ -1255,8 +1248,7 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
- 	if (partscan)
- 		clear_bit(GD_SUPPRESS_PART_SCAN, &lo->lo_disk->state);
- 	if (!err && size_changed) {
--		loff_t new_size = get_size(lo->lo_offset, lo->lo_sizelimit,
--					   lo->lo_backing_file);
-+		loff_t new_size = lo_calculate_size(lo, lo->lo_backing_file);
- 		loop_set_size(lo, new_size);
- 	}
- out_unlock:
-@@ -1399,7 +1391,7 @@ static int loop_set_capacity(struct loop_device *lo)
- 	if (unlikely(lo->lo_state != Lo_bound))
- 		return -ENXIO;
- 
--	size = get_loop_size(lo, lo->lo_backing_file);
-+	size = lo_calculate_size(lo, lo->lo_backing_file);
- 	loop_set_size(lo, size);
- 
- 	return 0;
--- 
-2.43.7
+Le 14/08/2025 à 19:53, Leon Romanovsky a écrit :
+> Changelog:
+> v3:
+>   * Fixed typo in "cacheable" word
+>   * Simplified kmsan patch a lot to be simple argument refactoring
+
+v2 sent today at 12:13, v3 sent today at 19:53 .... for only that ?
+
+Have you read 
+https://docs.kernel.org//process/submitting-patches.html#don-t-get-discouraged-or-impatient 
+?
+
+Thanks
+Christophe
+
+> v2: https://lore.kernel.org/all/cover.1755153054.git.leon@kernel.org
+>   * Used commit messages and cover letter from Jason
+>   * Moved setting IOMMU_MMIO flag to dma_info_to_prot function
+>   * Micro-optimized the code
+>   * Rebased code on v6.17-rc1
+> v1: https://lore.kernel.org/all/cover.1754292567.git.leon@kernel.org
+>   * Added new DMA_ATTR_MMIO attribute to indicate
+>     PCI_P2PDMA_MAP_THRU_HOST_BRIDGE path.
+>   * Rewrote dma_map_* functions to use thus new attribute
+> v0: https://lore.kernel.org/all/cover.1750854543.git.leon@kernel.org/
+> ------------------------------------------------------------------------
+> 
+> This series refactors the DMA mapping to use physical addresses
+> as the primary interface instead of page+offset parameters. This
+> change aligns the DMA API with the underlying hardware reality where
+> DMA operations work with physical addresses, not page structures.
+> 
+> The series maintains export symbol backward compatibility by keeping
+> the old page-based API as wrapper functions around the new physical
+> address-based implementations.
+> 
+> This series refactors the DMA mapping API to provide a phys_addr_t
+> based, and struct-page free, external API that can handle all the
+> mapping cases we want in modern systems:
+> 
+>   - struct page based cachable DRAM
+>   - struct page MEMORY_DEVICE_PCI_P2PDMA PCI peer to peer non-cachable
+>     MMIO
+>   - struct page-less PCI peer to peer non-cachable MMIO
+>   - struct page-less "resource" MMIO
+> 
+> Overall this gets much closer to Matthew's long term wish for
+> struct-pageless IO to cachable DRAM. The remaining primary work would
+> be in the mm side to allow kmap_local_pfn()/phys_to_virt() to work on
+> phys_addr_t without a struct page.
+> 
+> The general design is to remove struct page usage entirely from the
+> DMA API inner layers. For flows that need to have a KVA for the
+> physical address they can use kmap_local_pfn() or phys_to_virt(). This
+> isolates the struct page requirements to MM code only. Long term all
+> removals of struct page usage are supporting Matthew's memdesc
+> project which seeks to substantially transform how struct page works.
+> 
+> Instead make the DMA API internals work on phys_addr_t. Internally
+> there are still dedicated 'page' and 'resource' flows, except they are
+> now distinguished by a new DMA_ATTR_MMIO instead of by callchain. Both
+> flows use the same phys_addr_t.
+> 
+> When DMA_ATTR_MMIO is specified things work similar to the existing
+> 'resource' flow. kmap_local_pfn(), phys_to_virt(), phys_to_page(),
+> pfn_valid(), etc are never called on the phys_addr_t. This requires
+> rejecting any configuration that would need swiotlb. CPU cache
+> flushing is not required, and avoided, as ATTR_MMIO also indicates the
+> address have no cachable mappings. This effectively removes any
+> DMA API side requirement to have struct page when DMA_ATTR_MMIO is
+> used.
+> 
+> In the !DMA_ATTR_MMIO mode things work similarly to the 'page' flow,
+> except on the common path of no cache flush, no swiotlb it never
+> touches a struct page. When cache flushing or swiotlb copying
+> kmap_local_pfn()/phys_to_virt() are used to get a KVA for CPU
+> usage. This was already the case on the unmap side, now the map side
+> is symmetric.
+> 
+> Callers are adjusted to set DMA_ATTR_MMIO. Existing 'resource' users
+> must set it. The existing struct page based MEMORY_DEVICE_PCI_P2PDMA
+> path must also set it. This corrects some existing bugs where iommu
+> mappings for P2P MMIO were improperly marked IOMMU_CACHE.
+> 
+> Since ATTR_MMIO is made to work with all the existing DMA map entry
+> points, particularly dma_iova_link(), this finally allows a way to use
+> the new DMA API to map PCI P2P MMIO without creating struct page. The
+> VFIO DMABUF series demonstrates how this works. This is intended to
+> replace the incorrect driver use of dma_map_resource() on PCI BAR
+> addresses.
+> 
+> This series does the core code and modern flows. A followup series
+> will give the same treatment to the legacy dma_ops implementation.
+> 
+> Thanks
+> 
+> Leon Romanovsky (16):
+>    dma-mapping: introduce new DMA attribute to indicate MMIO memory
+>    iommu/dma: implement DMA_ATTR_MMIO for dma_iova_link().
+>    dma-debug: refactor to use physical addresses for page mapping
+>    dma-mapping: rename trace_dma_*map_page to trace_dma_*map_phys
+>    iommu/dma: rename iommu_dma_*map_page to iommu_dma_*map_phys
+>    iommu/dma: extend iommu_dma_*map_phys API to handle MMIO memory
+>    dma-mapping: convert dma_direct_*map_page to be phys_addr_t based
+>    kmsan: convert kmsan_handle_dma to use physical addresses
+>    dma-mapping: handle MMIO flow in dma_map|unmap_page
+>    xen: swiotlb: Open code map_resource callback
+>    dma-mapping: export new dma_*map_phys() interface
+>    mm/hmm: migrate to physical address-based DMA mapping API
+>    mm/hmm: properly take MMIO path
+>    block-dma: migrate to dma_map_phys instead of map_page
+>    block-dma: properly take MMIO path
+>    nvme-pci: unmap MMIO pages with appropriate interface
+> 
+>   Documentation/core-api/dma-api.rst        |   4 +-
+>   Documentation/core-api/dma-attributes.rst |  18 ++++
+>   arch/powerpc/kernel/dma-iommu.c           |   4 +-
+>   block/blk-mq-dma.c                        |  15 ++-
+>   drivers/iommu/dma-iommu.c                 |  61 +++++------
+>   drivers/nvme/host/pci.c                   |  18 +++-
+>   drivers/virtio/virtio_ring.c              |   4 +-
+>   drivers/xen/swiotlb-xen.c                 |  21 +++-
+>   include/linux/blk-mq-dma.h                |   6 +-
+>   include/linux/blk_types.h                 |   2 +
+>   include/linux/dma-direct.h                |   2 -
+>   include/linux/dma-map-ops.h               |   8 +-
+>   include/linux/dma-mapping.h               |  33 ++++++
+>   include/linux/iommu-dma.h                 |  11 +-
+>   include/linux/kmsan.h                     |   9 +-
+>   include/trace/events/dma.h                |   9 +-
+>   kernel/dma/debug.c                        |  71 ++++---------
+>   kernel/dma/debug.h                        |  37 ++-----
+>   kernel/dma/direct.c                       |  22 +---
+>   kernel/dma/direct.h                       |  52 ++++++----
+>   kernel/dma/mapping.c                      | 117 +++++++++++++---------
+>   kernel/dma/ops_helpers.c                  |   6 +-
+>   mm/hmm.c                                  |  19 ++--
+>   mm/kmsan/hooks.c                          |   7 +-
+>   rust/kernel/dma.rs                        |   3 +
+>   tools/virtio/linux/kmsan.h                |   2 +-
+>   26 files changed, 306 insertions(+), 255 deletions(-)
+> 
 
