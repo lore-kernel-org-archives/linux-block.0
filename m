@@ -1,125 +1,193 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 060CE2FD7C8;
-	Thu, 14 Aug 2025 08:57:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 547C22E9EBD
+	for <linux-block@vger.kernel.org>; Thu, 14 Aug 2025 08:59:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755161848; cv=none; b=rZ0UOLG0wlPpP+CQWZYVMC3wOO4pxKiekI7vW4D+LLkcsDjRiGsazuc2dZIP6WdwS7qG4NgRiKcIrnaKNm/i019CEWC7A283jZ2oBwLYtOus3Lz2P1vsUztXbbF6fqmYz4p7+p8UsHTdM3GGZcD0ZGx1abTBCxfPv8ezUSEeldI=
+	t=1755161943; cv=none; b=G0ZJ0pc83MuyHlgpqhKpd3Hrqv8UZ2ZJStPrRbvynyJv+0yRjp3Y368vUy88bNQJgWnaCLaM0SCscyiblKZ5sBxXN3yW7M2VuSxmGFfwW2JyOHrc2gQYZSilyUxOEYjSuLsjZb4dxchOGtzb0cBQOB8jFoz7nxNo04zKvqapHnI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755161848; c=relaxed/simple;
-	bh=IyKSZjc3st7LAyMi4A/QhQBQYrwsTS/FsLwk99CX1e0=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=CW9C2rZs2vqkC7r+FB1+nYQ4MnJRyBVbihSCcMxTP3hi80nw4IcKrKBpkoG0DmLkrtPpa7ezd2cumtySp9luSWrOhGEKB+ttz7uL4bEFMofPbjnnu6y6eR4DMA9RCyw5QAvJJB3qycB9nYZ06mFdWanW9mytEv3h7AWB5c7aykQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4c2fJM6YD9zYQtHc;
-	Thu, 14 Aug 2025 16:57:23 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 83CC51A0842;
-	Thu, 14 Aug 2025 16:57:22 +0800 (CST)
-Received: from [10.174.179.143] (unknown [10.174.179.143])
-	by APP4 (Coremail) with SMTP id gCh0CgCnIxTxpJ1oI+6QDg--.19948S3;
-	Thu, 14 Aug 2025 16:57:22 +0800 (CST)
-Subject: Re: [PATCH 00/16] blk-mq: introduce new queue attribute asyc_dpeth
-To: Ming Lei <ming.lei@redhat.com>, Yu Kuai <yukuai1@huaweicloud.com>
-Cc: axboe@kernel.dk, bvanassche@acm.org, nilay@linux.ibm.com, hare@suse.de,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- yi.zhang@huawei.com, yangerkun@huawei.com, johnny.chenyi@huawei.com,
- "yukuai (C)" <yukuai3@huawei.com>
-References: <20250814033522.770575-1-yukuai1@huaweicloud.com>
- <aJ2WH_RAMPQ9sd6r@fedora>
- <b6587204-9798-fcb0-c4b7-f00d5979d243@huaweicloud.com>
- <aJ2d3gtfi0aEaeEc@fedora>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <8ff85b30-27c5-c980-a1fb-fdbe18329594@huaweicloud.com>
-Date: Thu, 14 Aug 2025 16:57:21 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.1
+	s=arc-20240116; t=1755161943; c=relaxed/simple;
+	bh=o1Szdoofusn4ja6J2Nq+EgTM/QeJljSbOzJBQYC5Xlc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=dmZCp1oh9NxaHb5+LoRah/qklBlpbHUvqDQoLSD2OISwNfsn7xchixJh0f8AC2wPZVUSYTR/dtWLY/9GBidqPySPOKtECsx12LqW5aqxeluwPoGOnMWeishZWUCKrnLLU7N7hNATgI5Cv8POB8bCMUGtGh3nY/ig5/tUggJLFmg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Y0/dIBtK; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Y0/dIBtK"
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-45a1b098f43so4668615e9.2
+        for <linux-block@vger.kernel.org>; Thu, 14 Aug 2025 01:59:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1755161940; x=1755766740; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=q2fToAB1Rcjn651wF/AF4BoAGXD5OP38Zu/DND4w8MA=;
+        b=Y0/dIBtKTmYifsnHoIBTCIVgap2xoV8Ns5E06zvmEzqpCNc+sDVKcsVIp4uBFr8cff
+         n1rJASrGfvqtB2frY7WhcqZqDgULq6pak42bw2Jjhns9euLdLg996QaqJF2RG9eQq1aE
+         I1gbeai0a7LihfaFeAuQop6eWYSI9Sd1rro8+EdV8t0ESw0WcEtgpJMYxenYtvelp9dT
+         b/P6bWjjvMR8rH1205dpExMfG/XbpLSCf1PxpmH1OpyRuoATVqKi94ZvUb5s/GI/IfDO
+         aYwfXzHuUzDGPYXCZXIr3h3NN+AkHF82AHmk1ckNRlFonj/25Jq7j3Hht2/Sfag5gpb5
+         T2KA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755161940; x=1755766740;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=q2fToAB1Rcjn651wF/AF4BoAGXD5OP38Zu/DND4w8MA=;
+        b=aEmgGiDdqyTYuuoRWnUGJuYevWnY2Rl6kvhxboQugYGDoOkf/yso+7+99kqtEzkVyf
+         u8GfL7xPhFS2Mnvygs/DG7rQzuOA2LzSZsPMEowioUywE0WcLEyf57NmCfJz4TROgyU3
+         KWzgvZXk9ifFQFZF2X0e27NzKK2QS+7qm3uIMktfxAygx7pWBZTiLv/pGRAXvGe54eWB
+         ed6IxLHKSVhS24nAHBfT/FnKDScCi+anbEJt5AGS/jLth41lFWbbV8Nx+LaMlt+gA69c
+         k5r5WkkH1oCmiRnP1Y2O+5/5+oA2tw9PAIdhrcZLeRpeKq1xRvu7agVpVLc6X6NE6TYg
+         qHvw==
+X-Forwarded-Encrypted: i=1; AJvYcCVYt5rDV5VAawNad+Dy3Ab5Vxng2JE6NdxLwAxJw8HRzrJUifQnIp5t2DzcQ/oDOW7ZQ7iaSuM9jTJ59g==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxpbAVx3B2Iqkxc7+gBHwv2YS2otXkRH0MySD8WbSNTdjPnuLD7
+	IdVz2HtvScaS1q4SRWOJZYVAatHIb2x9IRxJMB2xFayXko+G6NTB5YLJzx4EDnKqT82egIZgFnA
+	Up9V+p7USriGdjKfnVDDtna957GuOIrwFn0sWRvpx
+X-Gm-Gg: ASbGnctYOLuj9aPPqQB68kaTErNJiCHgcKCgaDJgfFEZqVKy4LKcbaqkBGXn9EdsdUw
+	fISmvbzcUDjUcdWxZGynldED0leiHfhcsMGooyPi7mw/z64zFRPF8jQkHJgl0eNhSIPHKWNOv3m
+	9YjIeZ3gjXjP43FtNqMQZk22DoDKhaSWdOctouLfyMDNYa27UjoiiGEQygQ0vXdby404InCC+WE
+	2Ar8/adWAyxyIieOIoFQwNqXQ==
+X-Google-Smtp-Source: AGHT+IEnok90zWddm6EeCa9vOgl+9GHdTol46JTh/NRAVk1/tIT9B8eSdrtVYMiMwwhqV9azFUftNTxZaAYRyPY4DVY=
+X-Received: by 2002:a05:600c:64c7:b0:459:e398:ed89 with SMTP id
+ 5b1f17b1804b1-45a1b61538fmr14062525e9.1.1755161939436; Thu, 14 Aug 2025
+ 01:58:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <aJ2d3gtfi0aEaeEc@fedora>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgCnIxTxpJ1oI+6QDg--.19948S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7ZrWkuFyrCry7Cw43urW3Jrb_yoW8Zr1Up3
-	y3t3WSyr4DJry8Cw4xt3WrXry0kw1vgrZxXrs0gr17Gas0q3W0vF1fGF1F9F9rWrn8Gr4a
-	gF4qqa93Xa1qyaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUB214x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
-	0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x
-	0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E
-	7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcV
-	C0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF
-	04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r4j6F4UMIIF0xvEx4A2jsIEc7
-	CjxVAFwI0_Gr1j6F4UJbIYCTnIWIevJa73UjIFyTuYvjfUFg4SDUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+References: <20250812-rnull-up-v6-16-v4-0-ed801dd3ba5c@kernel.org>
+ <20250812-rnull-up-v6-16-v4-11-ed801dd3ba5c@kernel.org> <mACGre8-fNXj9Z2EpuE3yez_o2T-TtqrdB6HB-VkO0cuvhXsqzECKWMhsz_c43NJUxpsnVpO_U0oLbaaNhXqRQ==@protonmail.internalid>
+ <aJw-XWhDahVeejl3@google.com> <87cy8zfkw5.fsf@t14s.mail-host-address-is-not-set>
+ <WporCpRrDB_e8ocWi63px_bwtPWqRjDL4kVPNNXFNoI6H-4bgk5P_n4iO0E4m-ElwkiNTyBITwgdMXjREE8VXQ==@protonmail.internalid>
+ <CAH5fLggraEP7bwzJ+4ww8-7Ku-Z+d0Em3=NDUpa7r8oTLQy81A@mail.gmail.com>
+ <877bz7f7jg.fsf@t14s.mail-host-address-is-not-set> <wKjTynzVeXix56T1eCrpF4Y7zM7dJVumIB3DljSJeXkHx7Vyb4jKR5X5c5B2yV0DFKItLrncGLWxcTkVynD12g==@protonmail.internalid>
+ <CAH5fLgi+R=ZW2bFnZP2=231vV6JAHTZJ0UBYkdojG=HjBYR3MA@mail.gmail.com> <87zfc2e4gy.fsf@t14s.mail-host-address-is-not-set>
+In-Reply-To: <87zfc2e4gy.fsf@t14s.mail-host-address-is-not-set>
+From: Alice Ryhl <aliceryhl@google.com>
+Date: Thu, 14 Aug 2025 10:58:47 +0200
+X-Gm-Features: Ac12FXzvl-VOlMNOzmyRS7iEzUNls9Gq8WBcmNjnQTA3yaE2PQLweZJ0Y0vj2qk
+Message-ID: <CAH5fLgjnYiAo3jfbyjZeRu5siMgoqYi1fbFaxrixGdqXxtZXcA@mail.gmail.com>
+Subject: Re: [PATCH v4 11/15] rnull: enable configuration via `configfs`
+To: Andreas Hindborg <a.hindborg@kernel.org>
+Cc: Boqun Feng <boqun.feng@gmail.com>, Miguel Ojeda <ojeda@kernel.org>, 
+	Alex Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>, 
+	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Benno Lossin <lossin@kernel.org>, Trevor Gross <tmgross@umich.edu>, 
+	Danilo Krummrich <dakr@kernel.org>, Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
+	rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi,
+On Thu, Aug 14, 2025 at 9:40=E2=80=AFAM Andreas Hindborg <a.hindborg@kernel=
+.org> wrote:
+>
+> "Alice Ryhl" <aliceryhl@google.com> writes:
+>
+> > On Wed, Aug 13, 2025 at 7:36=E2=80=AFPM Andreas Hindborg <a.hindborg@ke=
+rnel.org> wrote:
+> >>
+> >> "Alice Ryhl" <aliceryhl@google.com> writes:
+> >>
+> >> > For your convenience, I already wrote a safe wrapper of kstrtobool f=
+or
+> >> > an out-of-tree driver. You're welcome to copy-paste this:
+> >> >
+> >> > fn kstrtobool(kstr: &CStr) -> Result<bool> {
+> >> >     let mut res =3D false;
+> >> >     to_result(unsafe {
+> >> > kernel::bindings::kstrtobool(kstr.as_char_ptr(), &mut res) })?;
+> >> >     Ok(res)
+> >> > }
+> >>
+> >> Thanks, I did one as well today, accepting `&str` instead. The example=
+s
+> >> highlight why it is not great:
+> >
+> > Yeah, well, I think we should still use it for consistency.
+> >
+> >>   /// Convert common user inputs into boolean values using the kernel'=
+s `kstrtobool` function.
+> >>   ///
+> >>   /// This routine returns `Ok(bool)` if the first character is one of=
+ 'YyTt1NnFf0', or
+> >>   /// [oO][NnFf] for "on" and "off". Otherwise it will return `Err(EIN=
+VAL)`.
+> >>   ///
+> >>   /// # Examples
+> >>   ///
+> >>   /// ```
+> >>   /// # use kernel::str::kstrtobool;
+> >>   ///
+> >>   /// // Lowercase
+> >>   /// assert_eq!(kstrtobool("true"), Ok(true));
+> >>   /// assert_eq!(kstrtobool("tr"), Ok(true));
+> >>   /// assert_eq!(kstrtobool("t"), Ok(true));
+> >>   /// assert_eq!(kstrtobool("twrong"), Ok(true)); // <-- =F0=9F=A4=B7
+> >>   /// assert_eq!(kstrtobool("false"), Ok(false));
+> >>   /// assert_eq!(kstrtobool("f"), Ok(false));
+> >>   /// assert_eq!(kstrtobool("yes"), Ok(true));
+> >>   /// assert_eq!(kstrtobool("no"), Ok(false));
+> >>   /// assert_eq!(kstrtobool("on"), Ok(true));
+> >>   /// assert_eq!(kstrtobool("off"), Ok(false));
+> >>   ///
+> >>   /// // Camel case
+> >>   /// assert_eq!(kstrtobool("True"), Ok(true));
+> >>   /// assert_eq!(kstrtobool("False"), Ok(false));
+> >>   /// assert_eq!(kstrtobool("Yes"), Ok(true));
+> >>   /// assert_eq!(kstrtobool("No"), Ok(false));
+> >>   /// assert_eq!(kstrtobool("On"), Ok(true));
+> >>   /// assert_eq!(kstrtobool("Off"), Ok(false));
+> >>   ///
+> >>   /// // All caps
+> >>   /// assert_eq!(kstrtobool("TRUE"), Ok(true));
+> >>   /// assert_eq!(kstrtobool("FALSE"), Ok(false));
+> >>   /// assert_eq!(kstrtobool("YES"), Ok(true));
+> >>   /// assert_eq!(kstrtobool("NO"), Ok(false));
+> >>   /// assert_eq!(kstrtobool("ON"), Ok(true));
+> >>   /// assert_eq!(kstrtobool("OFF"), Ok(false));
+> >>   ///
+> >>   /// // Numeric
+> >>   /// assert_eq!(kstrtobool("1"), Ok(true));
+> >>   /// assert_eq!(kstrtobool("0"), Ok(false));
+> >>   ///
+> >>   /// // Invalid input
+> >>   /// assert_eq!(kstrtobool("invalid"), Err(EINVAL));
+> >>   /// assert_eq!(kstrtobool("2"), Err(EINVAL));
+> >>   /// ```
+> >>   pub fn kstrtobool(input: &str) -> Result<bool> {
+> >>       let mut result: bool =3D false;
+> >>       let c_str =3D CString::try_from_fmt(fmt!("{input}"))?;
+> >>
+> >>       // SAFETY: `c_str` points to a valid null-terminated C string, a=
+nd `result` is a valid
+> >>       // pointer to a bool that we own.
+> >>       let ret =3D unsafe { bindings::kstrtobool(c_str.as_char_ptr(), &=
+mut result as *mut bool) };
+> >>
+> >>       kernel::error::to_result(ret).map(|_| result)
+> >>   }
+> >>
+> >> Not sure if we should take `CStr` or `str`, what do you think?
+> >
+> > Using CStr makes sense, since it avoids having the caller perform a
+> > useless utf-8 check.
+>
+> If we re-implement the entire function in rust, we can do the processing
+> on a `&str`. That way, we can skip the allocation to enforce null
+> termination. At least for this use case. I would rather do a utf8 check
+> than allocate and copy.
 
-在 2025/08/14 16:27, Ming Lei 写道:
-> On Thu, Aug 14, 2025 at 04:22:27PM +0800, Yu Kuai wrote:
->> Hi,
->>
->> 在 2025/08/14 15:54, Ming Lei 写道:
->>> On Thu, Aug 14, 2025 at 11:35:06AM +0800, Yu Kuai wrote:
->>>> From: Yu Kuai <yukuai3@huawei.com>
->>>>
->>>> Backgroud and motivation:
->>>>
->>>> At first, we test a performance regression from 5.10 to 6.6 in
->>>> downstream kernel(described in patch 13), the regression is related to
->>>> async_depth in mq-dealine.
->>>>
->>>> While trying to fix this regression, Bart suggests add a new attribute
->>>> to request_queue, and I think this is a good idea because all elevators
->>>> have similar logical, however only mq-deadline allow user to configure
->>>> async_depth. And this is patch 9-16, where the performance problem is
->>>> fixed in patch 13;
->>>>
->>>> Because async_depth is related to nr_requests, while reviewing related
->>>> code, patch 2-7 are cleanups and fixes to nr_reqeusts.
->>>>
->>>> I was planning to send this set for the next merge window, however,
->>>> during test I found the last block pr(6.17-rc1) introduce a regression
->>>> if nr_reqeusts grows, exit elevator will panic, and I fix this by
->>>> patch 1,8.
->>>
->>> Please split the patchset into two:
->>>
->>> - one is for fixing recent regression on updating 'nr_requests', so this
->>>     can be merged to v6.17, and be backport easily for stable & downstream
->>
->> There are actually two regressions, as fixed by patch 5 and patch 8, how
->> about the first patchset for patch 1-8? Are you good with those minor
->> prep cleanup patches?
-> 
-> Then probably you need to make it into three by adding one extra bug fix for
-> `fix elevator depth_updated method`, which follows the philosophy of
-> "do one thing, do it better", also helps people to review.
+You can copy to an array on the stack, so allocations aren't necessary
+even if the string is not nul-terminated. I don't think we should
+duplicate this logic.
 
-Ok, I'll send patch 5 seperatly since it can solve problem
-independently, and then a patchset for nr_requests regression.
+And if we do add a Rust method that does not enforce a nul-check, then
+I'd say it should use &[u8] as the argument rather than &str. (Or
+possibly &Bstr.)
 
-Thanks,
-Kuai
-
-> 
-> Thanks,
-> Ming
-> 
-> 
-> .
-> 
-
+Alice
