@@ -1,127 +1,118 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E11342E7188
-	for <linux-block@vger.kernel.org>; Thu, 14 Aug 2025 08:21:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 075352749D9;
+	Thu, 14 Aug 2025 08:22:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755159687; cv=none; b=LdLLj1/vNPOhy/sLcG7hHUus2kCvozzeXxWiwSCITjhIrTrvo2PbBXQMtY70D5tesa/UueYR276fvtbF3J7H2bvlzfyMzGBgkKjFEKz3T7hq7iQ6pZu5eKxDVi8FYlH2GUYnk9uzrio/b1fUd5Y0QKnIrZlIdmAStDt4bEM4HU4=
+	t=1755159756; cv=none; b=b0M7LbbNAV90IGwjJcp9PVfzNb3b913KwROn8h9SEoXUPqJbkj81lrrjo8Azbx7oHR7Fke56HbqBpr+B/YLHEWiR0jMTMXXIm7Iwi27uYxdMqorUfH+m5fF8m1i4KydXxak1QIuXMR+lBRJk0qn8JjHlHDoOydCa6BVEj4FHk0g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755159687; c=relaxed/simple;
-	bh=HnBnHwpP5i7jq+xMSEgshYAyEEtYmu/pth0vrOmnpCQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QZ8JCI+XEoPSrSmAq90Reto4Lm1WuYnMQJffwmV8HHoweUwY9cg5oErGNfh8YDTdBd/Mwc3N03trAkHMe6/FSNZfg05OSaVwERISZ1ue98cKGfMGf2gaeERSxzfBR2Sc0+Eq20hYbXgl7gBbW8XhSCdndEMOJdOpHhW3GFpv46E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gILZRX2s; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gILZRX2s"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1755159684;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fqaib5LzYjLIdEGI0u5LX7r7Yg4ypsXH3pC6i5Z2Rog=;
-	b=gILZRX2svsoZyymmPHfoiyojDHytBfurFtR3wIHNBkwPf2A2Ju64Pdrtga4YhMyX1RBh7F
-	nCVs9Dszwu327fqs1QAgZ8a/s0hZ3EHKs+S6YiHg4SvjMYbU3FJwBIvCN2wGsI8CDu14ks
-	1zIZk1m1DE2bP7xjCkJQnkdAcidIGVE=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-492-ZYsI0mZsNQKkzbVbyIQmwA-1; Thu,
- 14 Aug 2025 04:21:20 -0400
-X-MC-Unique: ZYsI0mZsNQKkzbVbyIQmwA-1
-X-Mimecast-MFC-AGG-ID: ZYsI0mZsNQKkzbVbyIQmwA_1755159678
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4FA6419775DE;
-	Thu, 14 Aug 2025 08:21:17 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.148])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 808631955E89;
-	Thu, 14 Aug 2025 08:21:09 +0000 (UTC)
-Date: Thu, 14 Aug 2025 16:20:52 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Yu Kuai <yukuai1@huaweicloud.com>
-Cc: axboe@kernel.dk, yukuai3@huawei.com, bvanassche@acm.org,
-	nilay@linux.ibm.com, hare@suse.de, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
-	yangerkun@huawei.com, johnny.chenyi@huawei.com
-Subject: Re: [PATCH 08/16] blk-mq: fix blk_mq_tags double free while
- nr_requests grown
-Message-ID: <aJ2cZGAWvZ0XfNr4@fedora>
+	s=arc-20240116; t=1755159756; c=relaxed/simple;
+	bh=QptsBHffm0KH6p7+g8nJS4gOiQnquTBf7oewFglHkds=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=QxntmQSi8C3ZTnARQ8wZ5Ktlht0iSyObWd1rVTdQiX6IIWOspnhoJN8BUUS3YEbyF2+LaiRgEM/9GPH1IwSgG+ld6SrtNpq+Pdshsf0e6spnKXqNDZ45fMbxDyfcCfu4bW841zaUJSh51RWKSJUImSuy76LkIw/iQYCVhfvO0v4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4c2dX72kGnzYQv9Z;
+	Thu, 14 Aug 2025 16:22:31 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id F29F41A0E39;
+	Thu, 14 Aug 2025 16:22:29 +0800 (CST)
+Received: from [10.174.179.143] (unknown [10.174.179.143])
+	by APP4 (Coremail) with SMTP id gCh0CgBXIBHEnJ1oFBmODg--.42407S3;
+	Thu, 14 Aug 2025 16:22:29 +0800 (CST)
+Subject: Re: [PATCH 00/16] blk-mq: introduce new queue attribute asyc_dpeth
+To: Ming Lei <ming.lei@redhat.com>, Yu Kuai <yukuai1@huaweicloud.com>
+Cc: axboe@kernel.dk, bvanassche@acm.org, nilay@linux.ibm.com, hare@suse.de,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ yi.zhang@huawei.com, yangerkun@huawei.com, johnny.chenyi@huawei.com,
+ "yukuai (C)" <yukuai3@huawei.com>
 References: <20250814033522.770575-1-yukuai1@huaweicloud.com>
- <20250814033522.770575-9-yukuai1@huaweicloud.com>
+ <aJ2WH_RAMPQ9sd6r@fedora>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <b6587204-9798-fcb0-c4b7-f00d5979d243@huaweicloud.com>
+Date: Thu, 14 Aug 2025 16:22:27 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250814033522.770575-9-yukuai1@huaweicloud.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+In-Reply-To: <aJ2WH_RAMPQ9sd6r@fedora>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgBXIBHEnJ1oFBmODg--.42407S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7ZF1DuFy8XFWfGr48WrWkCrg_yoW8Xw4Up3
+	y3t3WSkw4DGry8Cw4xt3yrXry8C3ZYgrZ8JrW5Kr47GF98X3WjvFnagF1ruas7Wr15Gr4a
+	gF1qq3s3Xw4qyFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUB214x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
+	0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x
+	0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E
+	7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcV
+	C0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF
+	04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r4j6F4UMIIF0xvEx4A2jsIEc7
+	CjxVAFwI0_Gr1j6F4UJbIYCTnIWIevJa73UjIFyTuYvjfUonmRUUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On Thu, Aug 14, 2025 at 11:35:14AM +0800, Yu Kuai wrote:
-> From: Yu Kuai <yukuai3@huawei.com>
-> 
-> In the case user trigger tags grow by queue sysfs attribute nr_requests,
-> hctx->sched_tags will be freed directly and replaced with a new
-> allocated tags, see blk_mq_tag_update_depth().
-> 
-> The problem is that hctx->sched_tags is from elevator->et->tags, while
-> et->tags is still the freed tags, hence later elevator exist will try to
-> free the tags again, causing kernel panic.
-> 
-> Fix this problem by using new halper blk_mq_alloc_sched_tags() to
-> allocate a new sched_tags. Meanwhile, there is a longterm problem can be
-> fixed as well:
-> 
-> If blk_mq_tag_update_depth() succeed for previous hctx, then bitmap depth
-> is updated, however, if following hctx failed, q->nr_requests is not
-> updated and the previous hctx->sched_tags endup bigger than q->nr_requests.
-> 
-> Fixes: f5a6604f7a44 ("block: fix lockdep warning caused by lock dependency in elv_iosched_store")
-> Fixes: e3a2b3f931f5 ("blk-mq: allow changing of queue depth through sysfs")
-> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
-> ---
->  block/blk-mq.c | 31 ++++++++++++++++++++-----------
->  1 file changed, 20 insertions(+), 11 deletions(-)
-> 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index a7d6a20c1524..f1c11f591c27 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -4917,6 +4917,23 @@ void blk_mq_free_tag_set(struct blk_mq_tag_set *set)
->  }
->  EXPORT_SYMBOL(blk_mq_free_tag_set);
->  
-> +static int blk_mq_sched_grow_tags(struct request_queue *q, unsigned int nr)
-> +{
-> +	struct elevator_tags *et =
-> +		blk_mq_alloc_sched_tags(q->tag_set, q->nr_hw_queues, nr);
-> +	struct blk_mq_hw_ctx *hctx;
-> +	unsigned long i;
-> +
-> +	if (!et)
-> +		return -ENOMEM;
-> +
-> +	blk_mq_free_sched_tags(q->elevator->et, q->tag_set);
-> +	queue_for_each_hw_ctx(q, hctx, i)
-> +		hctx->sched_tags = et->tags[i];
-> +	q->elevator->et = et;
-> +	return 0;
-> +}
+Hi,
 
-It depends on protection from elevator_lock, so probably it is
-helpful by adding lockdep_assert_held(&q->elevator_lock), otherwise
-this fix looks fine:
+ÔÚ 2025/08/14 15:54, Ming Lei Ð´µÀ:
+> On Thu, Aug 14, 2025 at 11:35:06AM +0800, Yu Kuai wrote:
+>> From: Yu Kuai <yukuai3@huawei.com>
+>>
+>> Backgroud and motivation:
+>>
+>> At first, we test a performance regression from 5.10 to 6.6 in
+>> downstream kernel(described in patch 13), the regression is related to
+>> async_depth in mq-dealine.
+>>
+>> While trying to fix this regression, Bart suggests add a new attribute
+>> to request_queue, and I think this is a good idea because all elevators
+>> have similar logical, however only mq-deadline allow user to configure
+>> async_depth. And this is patch 9-16, where the performance problem is
+>> fixed in patch 13;
+>>
+>> Because async_depth is related to nr_requests, while reviewing related
+>> code, patch 2-7 are cleanups and fixes to nr_reqeusts.
+>>
+>> I was planning to send this set for the next merge window, however,
+>> during test I found the last block pr(6.17-rc1) introduce a regression
+>> if nr_reqeusts grows, exit elevator will panic, and I fix this by
+>> patch 1,8.
+> 
+> Please split the patchset into two:
+> 
+> - one is for fixing recent regression on updating 'nr_requests', so this
+>    can be merged to v6.17, and be backport easily for stable & downstream
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+There are actually two regressions, as fixed by patch 5 and patch 8, how
+about the first patchset for patch 1-8? Are you good with those minor
+prep cleanup patches?
 
+> 
+> - another one is for improving IO performance related with async_depth.
+
+Sure, although patch 9-16 is still a performance regression :)
 
 Thanks,
-Ming
+Kuai
+
+> 
+> 
+> Thanks,
+> Ming
+> 
+> 
+> .
+> 
 
