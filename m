@@ -1,103 +1,98 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5DC521B9D6;
-	Thu, 14 Aug 2025 01:45:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AFA011CA0;
+	Thu, 14 Aug 2025 03:43:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755135918; cv=none; b=duJu1ujakaMDFhmtuo/hkrWrHA2aqWkbQz72HeKzvrT5tKjSYQKS0PebncPtL92NShUtH4Rd7FREMC/FfWWY0aL9B/1MfEqOsoCo8zXMQRItVhgia+Ue6KEPFgcSr7KfW7YdVDzvm1lxRMh10ium4g25EUcjD7+QRPrrefyH7Dk=
+	t=1755142993; cv=none; b=ZVf4YwUeqY6+N0CQjUiag6npzRcFz+R/9a0VNoJDKlj2fB5k35BjD6YDULmcXfpXc/2LOXbcyQxJq5etWvBirMyuBhzNZX1nB3zlMYgN/60xwEFxnfIkkD9Xvh3XLeZ9gYMn7zLgotKKoi2b//nyFRG1QO10CtS7huZcmQIT7uQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755135918; c=relaxed/simple;
-	bh=i1y7qQa9SFhRvqFt20v8XEo9Q9dbavK0njZxN1E1hEw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QR0CiZCYxRyFtSBTcvvPfLwtRKtxqieXD6SQe+YnG49n3l8i8XXjDVRRrxLKXck+Eru6+/Aucp7dbNVXZZTTkZt80YEQ8+NllExpRUsiOnceIWgtzyr7Y1bsR+L6Uy0rdd5I8qtX6ln//GQ17g7fxlLw2r/cUo+WAjvVPehiWJY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YYALRBxU; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YYALRBxU"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0192C4CEED;
-	Thu, 14 Aug 2025 01:45:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755135918;
-	bh=i1y7qQa9SFhRvqFt20v8XEo9Q9dbavK0njZxN1E1hEw=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=YYALRBxUqMJ+a9O2DJA0OI+d8U2eVb4vghGmYmkHPuACCSxiAyNFcZN9CKtvACSnq
-	 JtBXiJAprlL8dieMg+YUqZenFdoYTMQM3qCM+sFvAfw0ZJKnbklA3b1CCl2sLivabS
-	 Jyq6QcJ/hMtxUC2Eg7vb0AQozFUM9UiuiGe9B4S/t6LZGASKEg85nJKT4oYSFQfhvZ
-	 Jj7SP53EACoQARdrD4OiletkRcQ2NAy0nPdYU63lTkQNSnyXo4zTd/5YA8SzP1SlTy
-	 9W5wuCcs94qevo8gdrhzjCK1E9zTB7stWmlDMvju/ewfItbTbiTzR2/uUz/AU5OQok
-	 ggHvEA8Ed32cw==
-Message-ID: <b6860c56-e91d-45c8-8d4c-05bcae97a2bb@kernel.org>
-Date: Thu, 14 Aug 2025 10:42:35 +0900
+	s=arc-20240116; t=1755142993; c=relaxed/simple;
+	bh=n6vReAJVtwzVAOe+TgrKwM2LSZah4lupyvFThnDLfB4=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=tOTVogZBFsjXCEGD+utV5L0h0OoegmmXrppeQx8nMT/0oTTjtQD5fPRGnUYntG+2vUbp1+SztzwoM9HkmKUSk8VTLOzkcaqpLZwvtC+BaA7U7dbJpI9cOsSP4d6v6rI4EYxmxkV8Z6PSKAdhlgSR2KV5KuS1J2WmTtcCNOvURQU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=none smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4c2WKn74HMzKHMdf;
+	Thu, 14 Aug 2025 11:43:09 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 481121A1A84;
+	Thu, 14 Aug 2025 11:43:09 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+	by APP4 (Coremail) with SMTP id gCh0CgCnIxRKW51ogs93Dg--.15627S6;
+	Thu, 14 Aug 2025 11:43:09 +0800 (CST)
+From: Yu Kuai <yukuai1@huaweicloud.com>
+To: axboe@kernel.dk,
+	yukuai3@huawei.com,
+	bvanassche@acm.org,
+	nilay@linux.ibm.com,
+	hare@suse.de,
+	ming.lei@redhat.com
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	yukuai1@huaweicloud.com,
+	yi.zhang@huawei.com,
+	yangerkun@huawei.com,
+	johnny.chenyi@huawei.com
+Subject: [PATCH 02/16] blk-mq: remove useless checking from queue_requests_store()
+Date: Thu, 14 Aug 2025 11:35:08 +0800
+Message-Id: <20250814033522.770575-3-yukuai1@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20250814033522.770575-1-yukuai1@huaweicloud.com>
+References: <20250814033522.770575-1-yukuai1@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv2 1/7] block: check for valid bio while splitting
-To: Keith Busch <kbusch@kernel.org>, Bart Van Assche <bvanassche@acm.org>
-Cc: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
- snitzer@kernel.org, axboe@kernel.dk, dw@davidwei.uk, brauner@kernel.org,
- Hannes Reinecke <hare@suse.de>
-References: <20250805141123.332298-1-kbusch@meta.com>
- <20250805141123.332298-2-kbusch@meta.com> <aJzwO9dYeBQAHnCC@kbusch-mbp>
- <d9116c88-4098-46a7-8cbc-c900576a5da3@acm.org> <aJz9EUxTutWLxQmk@kbusch-mbp>
-From: Damien Le Moal <dlemoal@kernel.org>
-Content-Language: en-US
-Organization: Western Digital Research
-In-Reply-To: <aJz9EUxTutWLxQmk@kbusch-mbp>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgCnIxRKW51ogs93Dg--.15627S6
+X-Coremail-Antispam: 1UD129KBjvdXoW7JrWxurW3KF13Aw47ZFy8Grg_yoWxtFg_GF
+	y8Kry2qrsakF48Zr47Ar10qF4Ikw1rGF45WFWDJas5AFyfJa4fKrWrXryrAr43ua9rGa1r
+	C3WxG34xGr40vjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUbkxFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUXwA2048vs2IY02
+	0Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xv
+	wVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UM2
+	8EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2AI
+	xVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20x
+	vE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xv
+	r2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxan2IY04
+	v7MxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j
+	6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7
+	AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE
+	2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcV
+	C2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2Kfnx
+	nUUI43ZEXa7VUbH5lUUUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On 8/14/25 6:01 AM, Keith Busch wrote:
-> On Wed, Aug 13, 2025 at 01:41:49PM -0700, Bart Van Assche wrote:
->> On 8/13/25 1:06 PM, Keith Busch wrote:
->>> But I can't make that change because many scsi devices don't set the dma
->>> alignment and get the default 511 value. This is fine for the memory
->>> address offset, but the lengths sent for various inquriy commands are
->>> much smaller, like 4 and 32 byte lengths. That length wouldn't pass the
->>> dma alignment granularity, so I think the default value is far too
->>> conservative. Does the address start size need to be a different limit
->>> than minimum length? I feel like they should be the same, but maybe
->>> that's just an nvme thing.
->>
->> Hi Keith,
->>
->> Maybe I misunderstood your question. It seems to me that the SCSI core
->> sets the DMA alignment by default to four bytes. From
->> drivers/scsi/hosts.c:
-> 
-> Thanks, I think you got my meaning. 
-> 
-> I'm using the AHCI driver. It looks like ata_scsi_dev_config() overrides
-> the dma_alignment to sector_size - 1, and that pattern goes way back,
-> almost 20 years ago, so maybe I can't change it.
+From: Yu Kuai <yukuai3@huawei.com>
 
-That is probably buggy now in the sense that the scsi layer should be able to
-send any command with a size not aligned to the LBA size or ATA sector (512 B)
-and libata-scsi SAT should do the translation using an internal 512B aligned
-command size.
+blk_mq_queue_attr_visible() already checked queue_is_mq(), no need to
+check this again in queue_requests_store().
 
-What makes a mess here is that SCSI allows having a media-access command
-specifying a transfer size that is not aligned on the LBA size. The transfer
-will be "short" in that case, which is perfectly fine with SCSI. But ATA does
-not allow that. It is all or nothing and the command size thus must always be
-aligned to the LBA size.
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+---
+ block/blk-sysfs.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-I think that dma_alignment was abused to check that. But I think it should not
-be too hard to check the alignment in libata-scsi when translating the command.
-SAS HBAs should be doing something similar too. Have never exactly tested that
-though, and I am afraid how many SAS HBAs will not like unaligned command to
-ATA devices...
-
-We also have the different alignment for management commands (most of which use
-512B sector size) and media access commands which use the actual device LBA
-size alignment.
-
-So it is a mess :)
-
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index c5cf79a20842..1086f7b9da28 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -69,9 +69,6 @@ queue_requests_store(struct gendisk *disk, const char *page, size_t count)
+ 	unsigned int memflags;
+ 	struct request_queue *q = disk->queue;
+ 
+-	if (!queue_is_mq(q))
+-		return -EINVAL;
+-
+ 	ret = queue_var_store(&nr, page, count);
+ 	if (ret < 0)
+ 		return ret;
 -- 
-Damien Le Moal
-Western Digital Research
+2.39.2
+
