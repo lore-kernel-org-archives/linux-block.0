@@ -1,138 +1,100 @@
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 557981F0E29
-	for <linux-block@vger.kernel.org>; Thu, 14 Aug 2025 04:15:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF4531D5151
+	for <linux-block@vger.kernel.org>; Thu, 14 Aug 2025 05:14:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755144941; cv=none; b=SlyScQ2y3B0/MBaTfUoBgw75lAb98jqz6zbqpIJVrp9FJum3YkYEqE/8bwJg3INFVBNgqt+h0PtBnxNsrAUneEC5EKRBr78UaJ+BYdv91FYg3P3e5SvRZXoy1kGkcEQBIEg0wuHs3XGGCCv7b7Hm19nKFjQtb51oASE89cHw7RQ=
+	t=1755148481; cv=none; b=fVJDGxeG7ITH02KRjLACZX6BYmDUSY5HHJ/a2ThKvT653Udn9JIQUw1LAGf9cXeAre9FkU14m4NjoIKELB2zDh7y73vCKPrFVhcV86yTmiGusWq5+yjLMUKN/J/+aQCKyXtKuWMym40gNBVP07H5tFaRIT1BXhCHoDKlMNLJ7qk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755144941; c=relaxed/simple;
-	bh=aINf4JQIOzGrbC8KNPOs49EQ27ER0B2fAmdlIOg6AJw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uef6hdS3M2A2OqOCBO9aQlkAvthem7EHAAuMwov2EGGkUOyjGaYPvaMrxV3og/+n0PQ42Ieh3gV8B0tfb36booeges9wpYfgmC3zlCMrvsJJHj1FbjXTVLTMUBIj1gPOfz3Hr1sn15aF5pgrVMKyIydVdd/nF0LY+WaBTHI9weo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=VFk8wODM; arc=none smtp.client-ip=209.85.210.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1755148481; c=relaxed/simple;
+	bh=J0wlzG2blZCeTmTiWa0IPgMiQWx4MedEXGLbkPJW+l8=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=AytT+oQ4lM/qUcpqHInCT0XPC7B95YhjX6HutK9yk4fsQUSF60oST45K6ODL8BrkDML9hDjgw5fC79Tg4N1XkW1Ktmb00Q1EQ1MuV8lezjlqGlFdrWIu3ATUgWrB1HgWHguUeg/7svpabCSg7PB4e2KJ6OqWKkzqs1zo0Avdh2k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EhDzHSnY; arc=none smtp.client-ip=209.85.218.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VFk8wODM"
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-76e2eb20a64so700776b3a.3
-        for <linux-block@vger.kernel.org>; Wed, 13 Aug 2025 21:15:39 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EhDzHSnY"
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-afcb79db329so70603666b.2
+        for <linux-block@vger.kernel.org>; Wed, 13 Aug 2025 22:14:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1755144938; x=1755749738; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=34KWmLyAieUzqtSrdM5jM6hi2YW8C3abPtgGolrQZzs=;
-        b=VFk8wODMCPp4sykRcxFNrGPwYPG/tsAGsdvjgE8c//5GEJgXop+PzeRQ86GIEnq+Jt
-         ASnKVOR4xGiZ4gw3PsRdnQIZmOaAliJXJMdIgmMpEIALEpSHT7cBRDzkwbzLoco5gInP
-         2Abkeoobct2tyzQw6OD8fUL7uatVHX+mJDw5ev5SBRFATouJVPxFd3u2MWeryMAoCQRa
-         OLz16rLSNbNZSh7wwfTHosg5H9wZjviaTXy8WCve6PISnwpN4KltPa/Polk9HYhhXvzH
-         /Gf67SHkyWDytV3RVGaHCQm7l7DWx7B1HC3m87leSgUlALZeAiB1gChgw4j7cMuET9Dk
-         xRWw==
+        d=gmail.com; s=20230601; t=1755148478; x=1755753278; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=uGsl3pnIyWXTWmUAjKXVJmJrasAdmvyqWB4GlgpgknE=;
+        b=EhDzHSnYX6Hpf81d2XCpC6XhS76dwOfzwWP5uBOkFTTyJTbGPPQiFFVj/pdHETtdM8
+         CEg7CabsrpnIH0inpRmSPGlY75m43syl8M2OOpcFzhLhAMc7O/LiXUpX4S95ghLSgXBN
+         CSpnzXsHfODpgmCU9iRcw9FtBNslCAkVCAds1ei+WHu4XQH1MDI79vwuu0c/5T65ybr+
+         v69+13YjXmCbBX7siYmN0ZBCR8oqoMEG0ZVoDdEimeWnA4tpYbq6/BUvoqHsi68CgD71
+         Wyn4Ac2mlyuTz16RsAL3B0hqOrpG6yKAKe6zRvYW89DGPPq5poZYkD1bK4Q2+cG4EPQO
+         gGyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755144938; x=1755749738;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=34KWmLyAieUzqtSrdM5jM6hi2YW8C3abPtgGolrQZzs=;
-        b=q6N3peUnZyJk5GCzZGCufVkzFM/xucd9DlYIo6pay7K0NYm4o70CXg2JW8r7xyUEZg
-         JvGZlwGBp+Do+Du+0HmJ3T+d8CKDXeHatSCkZeokUahOTzPik8uB2zvVvsqTZPZCE6ET
-         6qNvvezyQ7XeHsKgktj1NJRR+phuvL6WRa+Ub8gmhP6s1B/hrE2xPaRUHJM9/FnbC4DP
-         Kh+pL3JDLmGsY213epfSl6MGPUlfop9HYKam7mg1YgtY4ukT33vSl0iIaNN0esfrv6ji
-         SPWOd5iIuUPWCOp0WlKLao9i40fBzjKi+uGVPDcClbuNH7PY4j/owH9PPRLFl8DUxrt4
-         q3/A==
-X-Forwarded-Encrypted: i=1; AJvYcCWJBuHN3VLvT6ORH58Yw2m5FJPzRPyTaTt2CXSWYMKCCWtI3gKmXPj4Otd9uouqJYImgiivPsOeTbsSYg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxJB7SNF3otmhxINAjxpGLARJd+KP2tC3e7zQOsB0bCJQvHa9sk
-	BKPMYGxEIHp/Gu058yPuVO2Jz3ZSJq7ENc5sNCnJGmzH+Ho1JTuCm6i68jlvgeaauqU=
-X-Gm-Gg: ASbGncvfYwutziTKflgNSk9OjTP/hLUjosJOe2KBhqDy8yEXfrx1s2tuC+J+dqlp7b7
-	cROScrk3fNScpfC2pwODPJZ/j+QLujjg6P+wIKP6vpeH9wG0gmraPViyEOk3Vf6RYDSEEnNz/yT
-	Y+pFdjqJZyEJoBajlabs1bjwgKzLw/Yc8Qr7h11ayVxDyTQSvEtl5NSKhFCE58LFR9bBhVnixVR
-	8UhaHjOygHWsH7vCsk7lnhLb7fDIxNCC1dzstDUyRenkwpsxTjRC2xeid6Uhg2esB01G1NzumZf
-	lulDdOncslXWRVerRDAEemDrIQBPR+I5KyCZeZZFBbCJVf8OGfbw0r4TtV8w7cOkXC5M1q9g3BS
-	SeE92StJORRDm4G6PRrd6+9BzMiUQbzcrsrU=
-X-Google-Smtp-Source: AGHT+IFKmQVKtrRTGaZ8hTWhd7nE8H1E8AgUXml21TmSiOXRMbfiiTxpX/j+26/xYc1Zfc3ne6Vv/g==
-X-Received: by 2002:a05:6a20:7d8b:b0:240:1204:dd5 with SMTP id adf61e73a8af0-240bcfbba85mr2301691637.8.1755144938050;
-        Wed, 13 Aug 2025 21:15:38 -0700 (PDT)
-Received: from localhost ([122.172.87.165])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-76bd9795200sm31652911b3a.114.2025.08.13.21.15.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Aug 2025 21:15:37 -0700 (PDT)
-Date: Thu, 14 Aug 2025 09:45:35 +0530
-From: Viresh Kumar <viresh.kumar@linaro.org>
-To: Tamir Duberstein <tamird@gmail.com>
-Cc: "Rafael J. Wysocki" <rafael@kernel.org>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Alex Gaynor <alex.gaynor@gmail.com>,
-	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>,
-	=?utf-8?B?QmrDtnJu?= Roy Baron <bjorn3_gh@protonmail.com>,
-	Benno Lossin <lossin@kernel.org>,
-	Andreas Hindborg <a.hindborg@kernel.org>,
-	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>,
-	Danilo Krummrich <dakr@kernel.org>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-	FUJITA Tomonori <fujita.tomonori@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>, Breno Leitao <leitao@debian.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Russ Weight <russ.weight@linux.dev>,
-	Dave Ertman <david.m.ertman@intel.com>,
-	Ira Weiny <ira.weiny@intel.com>, Leon Romanovsky <leon@kernel.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Brendan Higgins <brendan.higgins@linux.dev>,
-	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Alexandre Courbot <acourbot@nvidia.com>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Mark Brown <broonie@kernel.org>, linux-pm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org,
-	nouveau@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-	netdev@vger.kernel.org, linux-clk@vger.kernel.org,
-	linux-pci@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	kunit-dev@googlegroups.com, linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH v2 04/19] rust: clk: replace `kernel::c_str!` with
- C-Strings
-Message-ID: <20250814041535.l7yj2wm4ae3l4k7p@vireshk-i7>
-References: <20250813-core-cstr-cstrings-v2-0-00be80fc541b@gmail.com>
- <20250813-core-cstr-cstrings-v2-4-00be80fc541b@gmail.com>
+        d=1e100.net; s=20230601; t=1755148478; x=1755753278;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=uGsl3pnIyWXTWmUAjKXVJmJrasAdmvyqWB4GlgpgknE=;
+        b=eU6tMZrUIUbP1M1Na31ettnuvhVpxtwk4kNqlwRqcGilCkoIFMN034S8KhFDSPVgvT
+         1/s9svqMv9Y3VXzqPT05uErMyyiB7X8+EWvNfgD/+/m2NawSyPYfpCnumKJhk0/nzCIc
+         GPPgzSyb5tiRckeB/SKzJeACWfxGvF4k48wDMpkB4kkXKeNaYXYg5/AYPlT8pWaM6ANN
+         C3GQNmjec310q4ELTRSe/grGxSNi1azi1/WFM8PoV4er1AIIaJS0bBVukykjvQ0ljyDE
+         ZwUXmtZb+3U+EbrgKJVBwXTgG9kVxIPA3obJHQuax+BIrt7CNLkOLUqmnBf4M2690ZJb
+         l2Xg==
+X-Gm-Message-State: AOJu0YxSNfk/ISho41+ApreJD+fk0udhB17tznLsoe2rvs/ISHxxx1ZJ
+	QNPv6gACQIIaPKpIVARt1Z5W9eMIu6KsWxzIWbhxXNfDEdlZehsRAGURMyJvnEQwq8OJWYJDSPM
+	DDXXi0Mm8njWeE886afQ6yByjELGDx2h5a3zc
+X-Gm-Gg: ASbGncu+E0oBvAtsfKnnLPVpEWmyWcv71cVD6tLNjvfn4lYSKtM6KCgMnAwsn9WIUED
+	Covhd/V6cGvDXhAsqFWkXdBQ1g27G5wiX4Ea6owvu0hnbmCrHq33tQZmOb/PLbWHD78tN5NV9er
+	nupfLTmOV/x/SPCHDmX2ZYVkRnnrBLRVH9tSB5YoEJm8RSgFjRBUboeCRBoXWT1+s9FHZS35bTE
+	IciBQQe
+X-Google-Smtp-Source: AGHT+IGALsMaupQw9S0qNVZ+0oLz0FQiLZsgHRri+k/J1bv5hppxqu0GISgCgYrVEbGvIEVU669Ul4syTu5spkGL/gw=
+X-Received: by 2002:a17:907:3e1d:b0:af9:5ca0:e4fe with SMTP id
+ a640c23a62f3a-afcb999f066mr148069566b.56.1755148477774; Wed, 13 Aug 2025
+ 22:14:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250813-core-cstr-cstrings-v2-4-00be80fc541b@gmail.com>
+From: Teng Qin <palmtenor@gmail.com>
+Date: Thu, 14 Aug 2025 01:14:27 -0400
+X-Gm-Features: Ac12FXzzHFvWXMHDM_QM9EWcU-sPU8GS9ZOK4bDaOBMfqXYO_LQaHBmOMMFPqtg
+Message-ID: <CAHumS0BE_28D47d3Ls5PJBONTzVUCA54QwTV5UhJdDhnfCEi4A@mail.gmail.com>
+Subject: Question on setting IO polling behavior and documentations
+To: linux-block@vger.kernel.org, hch@lst.de
+Cc: inux-nvme@lists.infradead.org, axboe@kernel.dk, sagi@grimberg.me
+Content-Type: text/plain; charset="UTF-8"
 
-On 13-08-25, 11:59, Tamir Duberstein wrote:
-> C-String literals were added in Rust 1.77. Replace instances of
-> `kernel::c_str!` with C-String literals where possible.
-> 
-> Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Reviewed-by: Alice Ryhl <aliceryhl@google.com>
-> Reviewed-by: Benno Lossin <lossin@kernel.org>
-> Signed-off-by: Tamir Duberstein <tamird@gmail.com>
-> Acked-by: Stephen Boyd <sboyd@kernel.org>
-> ---
->  rust/kernel/clk.rs | 6 ++----
->  1 file changed, 2 insertions(+), 4 deletions(-)
+Hello maintainers,
+I'm trying to explore and test IO polling behavior of block devices
+in my system, NVMe drives to be specific. Upon trying, I noticed the
+legacy /sys/block/<disk>/queue/io_poll no longer changes the polling
+behavior of the device correctly.
 
-Acked-by: Viresh Kumar <viresh.kumar@linaro.org>
+I found out the change from
+  a614dd228035 block: don't allow writing to the poll queue attribute
+(https://lore.kernel.org/all/20211012111226.760968-16-hch@lst.de/)
+The dmesg prompts user to use driver specific parameters, but for this
+case, I can not find, either from code or documentation, parameter
+from the nvme driver to set polling behavior for the drive similar to
+the legacy io_poll sysfs interface.
+I realized I can use flags from either io_uring or the nvme passthrough
+commands to specify polling behavior. But are there still some configs
+I can make to change the entire drive's IO to polling, so that legacy
+applications not using io_uring can still have it?
+Upon reading the entire patch set, it feels to me that since we are
+changing the polling control to a per-bio flag, is drive-wide control
+of polling behavior just straight-out impossible now?
 
--- 
-viresh
+Moreover, the block layer documentation at
+  Documentation/ABI/stable/sysfs-block
+still documents the legacy behavior of the io_poll sysfs file. This is
+confusing for users trying to figure out reason of the failed or
+unexpected behavior after writing to the file and seeing the dmesg,
+particularly because there are many articles on the Internet describing
+the legacy behavior.
+If the maintainers agree, I can help update these documentations.
+
+Thanks a lot for your kind help!
+
+Teng Qin
