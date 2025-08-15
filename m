@@ -1,92 +1,310 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFA7B1A2C06
-	for <linux-block@vger.kernel.org>; Fri, 15 Aug 2025 08:31:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52139248863
+	for <linux-block@vger.kernel.org>; Fri, 15 Aug 2025 08:39:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755246662; cv=none; b=D3U/J35u1Oc6Bjf2YZVCCVSElv3yrsGzVYm3B+pzR8SyLZKXwMSTwKEW746VCsdokgKK4TTvU1hAWLXDk3iN8CWbwCrD1mkun3avFjrNJHYKjnVgXBayZQnibyV0DMjJEh1JRDldx3txbUcEsCnmM0I+0UgmHMYfskjD7mYlt2c=
+	t=1755247186; cv=none; b=Rol3q5NTwFPREqK2mqFadOZLTsAbGmG5oufobiiz/fniRILKsNUFYI6JM3UBxrAiWSORfNSwYkxr/fkSkkx+cvH7isj6ld6Q2D1OjxIuFVboJs7IOvey91SRu+vlPGiYI2DxMz1ODQ5Zn4hJwQj1VK1HA3zzZowTFrJoOlWLUBQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755246662; c=relaxed/simple;
-	bh=UQcJChL1z6SPalX2fGTv92LMBnWLGK7AcpH+aKksyfM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qm474SYSPzzH1q2CEI6/IKwQ59m7dhql/u/UbyPlbH/Ml183gAYFwFL+EzBUxr6iFI0yjxhMd4KGCDnJsMpxsGHBg9OcP9XzLnvioyNyl11aukoiefAQVxHKelZoWY45wBUcrGh8sLlo/Js4DPDetwyMarIAG3IV+bh+/SVpZvI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Y5TAiuaL; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y5TAiuaL"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1755246659;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=n0hSepW5WjWx+taheJm8TbQB80RTQNqQPc4V+jMToCU=;
-	b=Y5TAiuaL+YNdnEDfa6lBt44WHl4Q7HRTAIXBu0xQL2Yr20500GOonbGwjv1r2a1W6i1PLY
-	la+TRhlY6Cg9cEIjt3fwOAsH+aWDhOuHDjQHYpBb3LoG5XiRU3Ce2pWv4zq4qh/Fq8phe/
-	JXID+eFMWMbp5sP3xT0eHdCk0Ap31r0=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-685-HsaJxG8tOzKH5gBR2XGoOA-1; Fri,
- 15 Aug 2025 04:30:54 -0400
-X-MC-Unique: HsaJxG8tOzKH5gBR2XGoOA-1
-X-Mimecast-MFC-AGG-ID: HsaJxG8tOzKH5gBR2XGoOA_1755246652
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CD73D1954228;
-	Fri, 15 Aug 2025 08:30:51 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.153])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A07EF1800447;
-	Fri, 15 Aug 2025 08:30:45 +0000 (UTC)
-Date: Fri, 15 Aug 2025 16:30:40 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Yu Kuai <yukuai1@huaweicloud.com>
-Cc: axboe@kernel.dk, hare@suse.de, nilay@linux.ibm.com,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	yukuai3@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com,
-	johnny.chenyi@huawei.com
-Subject: Re: [PATCH 00/10] blk-mq: fix blk_mq_tags double free while
- nr_requests grown
-Message-ID: <aJ7wMFkuTewlyx1P@fedora>
-References: <20250815080216.410665-1-yukuai1@huaweicloud.com>
+	s=arc-20240116; t=1755247186; c=relaxed/simple;
+	bh=3Pt511DJShmNLzOcfK/KyS7QctXtILx+ATnQUaupYQQ=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=F+KBrIdn9ElQxQB015ckR58aiugyYKBCWT3l8bWxJuagKyHdC3srvZ6WhxAackvrBt5sgsyYaJNCxWxsHn3VKL3nczQpxslIhffIa4YHLhXS+hqefoKTOeSxqZqDtnASegzB0YBszgVnRJVR+ZkgSA7zl3CPu7gPugtgXzX14ac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4c3FsS24VjzKHMmC
+	for <linux-block@vger.kernel.org>; Fri, 15 Aug 2025 16:39:40 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 975911A0A46
+	for <linux-block@vger.kernel.org>; Fri, 15 Aug 2025 16:39:39 +0800 (CST)
+Received: from [10.174.179.143] (unknown [10.174.179.143])
+	by APP4 (Coremail) with SMTP id gCh0CgBn4hJH8p5oL20BDw--.56165S3;
+	Fri, 15 Aug 2025 16:39:37 +0800 (CST)
+Subject: Re: [PATCHv3 3/3] block: avoid cpu_hotplug_lock depedency on
+ freeze_lock
+To: Ming Lei <ming.lei@redhat.com>, Yu Kuai <yukuai1@huaweicloud.com>
+Cc: Nilay Shroff <nilay@linux.ibm.com>, linux-block@vger.kernel.org,
+ axboe@kernel.dk, hch@lst.de, shinichiro.kawasaki@wdc.com, kch@nvidia.com,
+ gjoyce@ibm.com, "yukuai (C)" <yukuai3@huawei.com>
+References: <20250814082612.500845-1-nilay@linux.ibm.com>
+ <20250814082612.500845-4-nilay@linux.ibm.com> <aJ3aR2JodRrAqVcO@fedora>
+ <e125025b-d576-4919-b00e-5d9b640bed77@linux.ibm.com>
+ <aJ3myQW2A8HtteBC@fedora>
+ <e33e97f7-0c12-4f70-81d0-4fea05557579@linux.ibm.com>
+ <aJ57lZLhktXxaBoh@fedora>
+ <6d5949db-0df9-93d3-4397-966be5c2fac9@huaweicloud.com>
+ <aJ7ozolL_rKWkdS5@fedora>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <20c21ce3-ecb4-69e2-2594-89b55ac1fb0f@huaweicloud.com>
+Date: Fri, 15 Aug 2025 16:39:35 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250815080216.410665-1-yukuai1@huaweicloud.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+In-Reply-To: <aJ7ozolL_rKWkdS5@fedora>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgBn4hJH8p5oL20BDw--.56165S3
+X-Coremail-Antispam: 1UD129KBjvJXoW3AFy7Cr13Zr17try3CrW3KFg_yoWfur17pa
+	y8KF47AFWjqr1kZa48tw48Zr13t3s5Kr17Xr13JrySvr1qvr12yF18JFWUKFy8ZryxAr48
+	Xr48Jrn7Jr1YkwUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUB214x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
+	0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x
+	0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E
+	7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcV
+	C0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF
+	04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r4j6F4UMIIF0xvEx4A2jsIEc7
+	CjxVAFwI0_Gr1j6F4UJbIYCTnIWIevJa73UjIFyTuYvjfUonmRUUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On Fri, Aug 15, 2025 at 04:02:06PM +0800, Yu Kuai wrote:
-> From: Yu Kuai <yukuai3@huawei.com>
+Hi,
+
+在 2025/08/15 15:59, Ming Lei 写道:
+> On Fri, Aug 15, 2025 at 09:04:53AM +0800, Yu Kuai wrote:
+>> Hi,
+>>
+>> 在 2025/08/15 8:13, Ming Lei 写道:
+>>> On Thu, Aug 14, 2025 at 08:01:11PM +0530, Nilay Shroff wrote:
+>>>>
+>>>>
+>>>> On 8/14/25 7:08 PM, Ming Lei wrote:
+>>>>> On Thu, Aug 14, 2025 at 06:27:08PM +0530, Nilay Shroff wrote:
+>>>>>>
+>>>>>>
+>>>>>> On 8/14/25 6:14 PM, Ming Lei wrote:
+>>>>>>> On Thu, Aug 14, 2025 at 01:54:59PM +0530, Nilay Shroff wrote:
+>>>>>>>> A recent lockdep[1] splat observed while running blktest block/005
+>>>>>>>> reveals a potential deadlock caused by the cpu_hotplug_lock dependency
+>>>>>>>> on ->freeze_lock. This dependency was introduced by commit 033b667a823e
+>>>>>>>> ("block: blk-rq-qos: guard rq-qos helpers by static key").
+>>>>>>>>
+>>>>>>>> That change added a static key to avoid fetching q->rq_qos when
+>>>>>>>> neither blk-wbt nor blk-iolatency is configured. The static key
+>>>>>>>> dynamically patches kernel text to a NOP when disabled, eliminating
+>>>>>>>> overhead of fetching q->rq_qos in the I/O hot path. However, enabling
+>>>>>>>> a static key at runtime requires acquiring both cpu_hotplug_lock and
+>>>>>>>> jump_label_mutex. When this happens after the queue has already been
+>>>>>>>> frozen (i.e., while holding ->freeze_lock), it creates a locking
+>>>>>>>> dependency from cpu_hotplug_lock to ->freeze_lock, which leads to a
+>>>>>>>> potential deadlock reported by lockdep [1].
+>>>>>>>>
+>>>>>>>> To resolve this, replace the static key mechanism with q->queue_flags:
+>>>>>>>> QUEUE_FLAG_QOS_ENABLED. This flag is evaluated in the fast path before
+>>>>>>>> accessing q->rq_qos. If the flag is set, we proceed to fetch q->rq_qos;
+>>>>>>>> otherwise, the access is skipped.
+>>>>>>>>
+>>>>>>>> Since q->queue_flags is commonly accessed in IO hotpath and resides in
+>>>>>>>> the first cacheline of struct request_queue, checking it imposes minimal
+>>>>>>>> overhead while eliminating the deadlock risk.
+>>>>>>>>
+>>>>>>>> This change avoids the lockdep splat without introducing performance
+>>>>>>>> regressions.
+>>>>>>>>
+>>>>>>>> [1] https://lore.kernel.org/linux-block/4fdm37so3o4xricdgfosgmohn63aa7wj3ua4e5vpihoamwg3ui@fq42f5q5t5ic/
+>>>>>>>>
+>>>>>>>> Reported-by: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+>>>>>>>> Closes: https://lore.kernel.org/linux-block/4fdm37so3o4xricdgfosgmohn63aa7wj3ua4e5vpihoamwg3ui@fq42f5q5t5ic/
+>>>>>>>> Fixes: 033b667a823e ("block: blk-rq-qos: guard rq-qos helpers by static key")
+>>>>>>>> Tested-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+>>>>>>>> Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
+>>>>>>>> ---
+>>>>>>>>    block/blk-mq-debugfs.c |  1 +
+>>>>>>>>    block/blk-rq-qos.c     |  9 ++++---
+>>>>>>>>    block/blk-rq-qos.h     | 54 ++++++++++++++++++++++++------------------
+>>>>>>>>    include/linux/blkdev.h |  1 +
+>>>>>>>>    4 files changed, 37 insertions(+), 28 deletions(-)
+>>>>>>>>
+>>>>>>>> diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+>>>>>>>> index 7ed3e71f2fc0..32c65efdda46 100644
+>>>>>>>> --- a/block/blk-mq-debugfs.c
+>>>>>>>> +++ b/block/blk-mq-debugfs.c
+>>>>>>>> @@ -95,6 +95,7 @@ static const char *const blk_queue_flag_name[] = {
+>>>>>>>>    	QUEUE_FLAG_NAME(SQ_SCHED),
+>>>>>>>>    	QUEUE_FLAG_NAME(DISABLE_WBT_DEF),
+>>>>>>>>    	QUEUE_FLAG_NAME(NO_ELV_SWITCH),
+>>>>>>>> +	QUEUE_FLAG_NAME(QOS_ENABLED),
+>>>>>>>>    };
+>>>>>>>>    #undef QUEUE_FLAG_NAME
+>>>>>>>> diff --git a/block/blk-rq-qos.c b/block/blk-rq-qos.c
+>>>>>>>> index b1e24bb85ad2..654478dfbc20 100644
+>>>>>>>> --- a/block/blk-rq-qos.c
+>>>>>>>> +++ b/block/blk-rq-qos.c
+>>>>>>>> @@ -2,8 +2,6 @@
+>>>>>>>>    #include "blk-rq-qos.h"
+>>>>>>>> -__read_mostly DEFINE_STATIC_KEY_FALSE(block_rq_qos);
+>>>>>>>> -
+>>>>>>>>    /*
+>>>>>>>>     * Increment 'v', if 'v' is below 'below'. Returns true if we succeeded,
+>>>>>>>>     * false if 'v' + 1 would be bigger than 'below'.
+>>>>>>>> @@ -319,8 +317,8 @@ void rq_qos_exit(struct request_queue *q)
+>>>>>>>>    		struct rq_qos *rqos = q->rq_qos;
+>>>>>>>>    		q->rq_qos = rqos->next;
+>>>>>>>>    		rqos->ops->exit(rqos);
+>>>>>>>> -		static_branch_dec(&block_rq_qos);
+>>>>>>>>    	}
+>>>>>>>> +	blk_queue_flag_clear(QUEUE_FLAG_QOS_ENABLED, q);
+>>>>>>>>    	mutex_unlock(&q->rq_qos_mutex);
+>>>>>>>>    }
+>>>>>>>> @@ -346,7 +344,7 @@ int rq_qos_add(struct rq_qos *rqos, struct gendisk *disk, enum rq_qos_id id,
+>>>>>>>>    		goto ebusy;
+>>>>>>>>    	rqos->next = q->rq_qos;
+>>>>>>>>    	q->rq_qos = rqos;
+>>>>>>>> -	static_branch_inc(&block_rq_qos);
+>>>>>>>> +	blk_queue_flag_set(QUEUE_FLAG_QOS_ENABLED, q);
+>>>>>>>
+>>>>>>> One stupid question: can we simply move static_branch_inc(&block_rq_qos)
+>>>>>>> out of queue freeze in rq_qos_add()?
+>>>>>>>
+>>>>>>> What matters is just the 1st static_branch_inc() which switches the counter
+>>>>>>> from 0 to 1, when blk_mq_freeze_queue() guarantees that all in-progress code
+>>>>>>> paths observe q->rq_qos as NULL. That means static_branch_inc(&block_rq_qos)
+>>>>>>> needn't queue freeze protection.
+>>>>>>>
+>>>>>> I thought about it earlier but that won't work because we have
+>>>>>> code paths freezing queue before it reaches upto rq_qos_add(),
+>>>>>> For instance:
+>>>>>>
+>>>>>> We have following code paths from where we invoke
+>>>>>> rq_qos_add() APIs with queue already frozen:
+>>>>>>
+>>>>>> ioc_qos_write()
+>>>>>>    -> blkg_conf_open_bdev_frozen() => freezes queue
+>>>>>>    -> blk_iocost_init()
+>>>>>>      -> rq_qos_add()
+>>>>>>
+>>>>>> queue_wb_lat_store()  => freezes queue
+>>>>>>    -> wbt_init()
+>>>>>>     -> rq_qos_add()
+>>>>>
+>>>>> The above two shouldn't be hard to solve, such as, add helper
+>>>>> rq_qos_prep_add() for increasing the static branch counter.
+>>>>>
+>> I thought about this, we'll need some return value to know if rq_qos
+>> is really added and I feel code will be much complex. We'll need at
+>> least two different APIs for cgroup based policy iocost/iolatency and
+>> pure rq_qos policy wbt.
 > 
-> In the case user trigger tags grow by queue sysfs attribute nr_requests,
-> hctx->sched_tags will be freed directly and replaced with a new
-> allocated tags, see blk_mq_tag_update_depth().
+> Yes, but not too bad, such as:
 > 
-> The problem is that hctx->sched_tags is from elevator->et->tags, while
-> et->tags is still the freed tags, hence later elevator exist will try to
-> free the tags again, causing kernel panic.
 > 
-> patch 1-6 are prep cleanup and refactor patches for updating nr_requests
-> patch 7,8 are the fix patches for the regression
-> patch 9 is cleanup patch after patch 8
-> patch 10 fix the stale nr_requests documentation
+> diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+> index 5bfd70311359..05b13235ebb3 100644
+> --- a/block/blk-iocost.c
+> +++ b/block/blk-iocost.c
+> @@ -3227,6 +3227,8 @@ static ssize_t ioc_qos_write(struct kernfs_open_file *of, char *input,
+>   
+>   	blkg_conf_init(&ctx, input);
+>   
+> +	rq_qos_prep_add();
+> +
+>   	memflags = blkg_conf_open_bdev_frozen(&ctx);
+>   	if (IS_ERR_VALUE(memflags)) {
+>   		ret = memflags;
+> @@ -3344,7 +3346,7 @@ static ssize_t ioc_qos_write(struct kernfs_open_file *of, char *input,
+>   	if (enable)
+>   		wbt_disable_default(disk);
+>   	else
+> -		wbt_enable_default(disk);
+> +		wbt_enable_default(disk, false);
+>   
+>   	blk_mq_unquiesce_queue(disk->queue);
+>   
+> @@ -3356,6 +3358,7 @@ static ssize_t ioc_qos_write(struct kernfs_open_file *of, char *input,
+>   	ret = -EINVAL;
+>   err:
+>   	blkg_conf_exit_frozen(&ctx, memflags);
+> +	rq_qos_prep_del();
+>   	return ret;
+>   }
 
-Please do not mix bug(regression) fix with cleanup.
+This is not enough for iocost:
 
-The bug fix for updating nr_requests should have been simple enough in single
-or two patches, why do you make 10-patches for dealing with the regression?
+1) ioc_qos_write() can be called with iocost already registered, we need
+to call rq_qos_prep_del() in the succeed branch as well.
+2) ioc_cost_model_write() have to have the same treatment.
 
-Not mention this way is really unfriendly for stable tree backport.
+>   
+> diff --git a/block/blk-rq-qos.c b/block/blk-rq-qos.c
+> index 848591fb3c57..27047f661e3f 100644
+> --- a/block/blk-rq-qos.c
+> +++ b/block/blk-rq-qos.c
+> @@ -319,7 +319,7 @@ void rq_qos_exit(struct request_queue *q)
+>   		struct rq_qos *rqos = q->rq_qos;
+>   		q->rq_qos = rqos->next;
+>   		rqos->ops->exit(rqos);
+> -		static_branch_dec(&block_rq_qos);
+> +		rq_qos_prep_del();
+>   	}
+>   	mutex_unlock(&q->rq_qos_mutex);
+>   }
+> @@ -346,7 +346,6 @@ int rq_qos_add(struct rq_qos *rqos, struct gendisk *disk, enum rq_qos_id id,
+>   		goto ebusy;
+>   	rqos->next = q->rq_qos;
+>   	q->rq_qos = rqos;
+> -	static_branch_inc(&block_rq_qos);
+>   
+>   	blk_mq_unfreeze_queue(q, memflags);
+>   
+> diff --git a/block/blk-rq-qos.h b/block/blk-rq-qos.h
+> index 39749f4066fb..38572a7eb2b7 100644
+> --- a/block/blk-rq-qos.h
+> +++ b/block/blk-rq-qos.h
+> @@ -179,4 +179,14 @@ static inline void rq_qos_queue_depth_changed(struct request_queue *q)
+>   
+>   void rq_qos_exit(struct request_queue *);
+>   
+> +static inline void rq_qos_prep_add(void)
+> +{
+> +	static_branch_inc(&block_rq_qos);
+> +}
+> +
+> +static inline void rq_qos_prep_del(void)
+> +{
+> +	static_branch_dec(&block_rq_qos);
+> +}
+> +
+>   #endif
 
+Wonder can we simplify this, we already have a disk level lock
+rq_qos_mutex, that is held before freeze queue for iocost and iolatency,
+and we can grab it before freeze queue for wbt as well, then we can just
+do the static_branch_inc/dec with rq_qos_mutex held easily since
+everything is serialized.
 
-Thanks,
-Ming
++static inline bool rq_qos_prep_add(struct request_queue *q, enum 
+rq_qos_id id)
++{
++       lockdep_assert_held(q->rq_qos_mutex);
++
++       if (!rq_qos_id(q, id)) {
++               static_branch_inc(&block_rq_qos);
++               return true;
++       }
++
++       return false;
++}
++
++/* paired with rq_qos_prep_add */
++static inline bool rq_qos_prep_del(struct request_queue *q, enum 
+rq_qos_id id, bool prepared)
++{
++       lockdep_assert_held(q->rq_qos_mutex);
++
++       if (prepared && !rq_qos_id(q, id))
++               static_branch_dec(&block_rq_qos);
++}
++
 
