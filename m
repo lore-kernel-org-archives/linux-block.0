@@ -1,113 +1,203 @@
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3CD11C9DE5
-	for <linux-block@vger.kernel.org>; Thu, 14 Aug 2025 22:35:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E61ABA3F
+	for <linux-block@vger.kernel.org>; Fri, 15 Aug 2025 00:13:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755210917; cv=none; b=FHybmAo7VYIhRq5BBhrcMZiOmfOttZWnotFmC5Y7Qo/cuVzgJQ3/OY/5wDt4988HDwKwjNY0bb0U9sjGZKIGcAxN51CqZGKyy7rI+MAi0H4b4Jnn2NY1Yehz1pc2yZKi9ciDfkYEuY1qs36bx78s+1UoVQm5yK3n+e4ObawqQQo=
+	t=1755216809; cv=none; b=sJ87PNYGNh4240me/oF+SVLDDmrWGhS0yjuPxq1OUs4z5efPmFZo+QJLRbFvaio4ShxTBwhYoVI+OiuvDcCnZa3TWggWUVkgXKZa4WvJMi4xPMR+8RLC9kfwHr5habrz48JXQ8t+b2aMh3Osdu3GwFLeAB8L43GyXRuXSj9Zrvo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755210917; c=relaxed/simple;
-	bh=H+FEBbWNGCd3jMnbM9NhsMA2h2WcyoSYo+D0V1gMNZE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VWJb2jN9Zq3amODgD2lQGIPrhSnxDgkZFlDtS9In6jeFddEa5+T0NSybuixmTmUiXftw70vh3ZXZ2n4fCifSpeg7hj8igTNfJAZwYJ6WOYvVfNYJWsppbG2M+L3eBHm4MbAoIqjq8jnVQJZXS13wISoKtIpLGbfQXNPk48KWrUs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QxmoWyfR; arc=none smtp.client-ip=209.85.218.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1755216809; c=relaxed/simple;
+	bh=WJPD/bQ+kC1bq1fSC6Y1lafJ8qh7UoJTMbXulxNKR3A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AkXrYW/an5GhGB89HIIJK90KoYcUDh77zcU3zWVKuH13oCxkvjsfaNuFE5JyWJcrAUnOxqbu0xCmU/uv1c/TdNw8yEa9jrmPXJunxcfQnBO99xTFqzT09tCI4vggi9A4T10M1yapqgKmDn/pEcWXtUGnU/SojjoSDk5TffZ9gOk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JCpccCtz; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QxmoWyfR"
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-afcb78d5e74so233873866b.1
-        for <linux-block@vger.kernel.org>; Thu, 14 Aug 2025 15:35:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755210914; x=1755815714; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rd3k6sT8uXkZnf31+csOG+Akc2j0o8UNuxgVHaXqfGc=;
-        b=QxmoWyfR7TMwZgf3BdC+5iH9zmH6RMdPnwVCK+W+UyLS307F1hYehzxbCyL0UbHjyi
-         DJBreVVWVgBRhBMNtCZhZIuGNoYln8cPPllMxbUZku6qCyq/c01fpQPIIOHpFHSQBeD3
-         KRTHv5BI7NNDKBn1219QNMniln4Ve9p06S1EnpK1t6MVv/mk1nFldZob/dvlqGiiUK5W
-         zSy9FqqvHR7pLvO8erp7FahynmCrPY73nfUUj8BJN+zXHG9g/oi+1BggJFBSIYvoFwdY
-         +7jr5wS9SPbxTgf1d3T2O859QA6AUK1RL9ztBGuDSzRDfKYt6Tt6ZpIan7H6Z7XajfuT
-         z9Gg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755210914; x=1755815714;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rd3k6sT8uXkZnf31+csOG+Akc2j0o8UNuxgVHaXqfGc=;
-        b=Lm07c1GbiMD4dYHQ95p1gkZgvKeVPF92ecGR/Bb5ES3rJf3CVsOblnOL3M/2pAl0h9
-         SH7mulw5Nd14NtwrFGU0sRK2wa9pjPSKtAQen06gdCYXJ5zIZULz6Fm/pnzRQJEgtmus
-         Rjx1CQrHQ2I+ZZ4l3JPwhCS1ly9X6o1I+lmtb2gr+pgB9N/651+galSO6PeL1EeXA7AR
-         pII8c4mwLYrBh7eV0HQMEUUArtJQt9QCpTWyROgtdgW+QM74TjyT6VNtz3GuabJdDPIL
-         sOqCjEKXlJDGaNM5ve9LjWQGrh2hcIspbMHzg3EFmpDiY/u+1TBn7/m0AQOT5RI62BKp
-         FbzA==
-X-Forwarded-Encrypted: i=1; AJvYcCWN+ZKJeN8Jl4qXHsfOEjQ3JSR6Q96mKkvMxhcggfg4YxZvp1gmH3EN0EX0lKTPgz5dzFnis/LNfhvEtw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzIsJWvJcKJlhKBTnIGoj5GkVM3pvZZ4IEvH47pbk3Qc56Tjm1K
-	zBvyyTR57xdJnugGVI4xJdvMRZA9607tFpTuHRVAaS391kM4HZWeVAoFjS2M4iwiY5cnc6fQURb
-	ECtag+nlojgJowFBYKomVr4P6BeRar80=
-X-Gm-Gg: ASbGncvBtozp3PnIem12vMeiqgqxGqXUN9sw3A1tx2vPu3ZXF8lgadyMVIiRBwSWv0q
-	4rBvvWu+H0BvIswhU7RieST+pP9hYfqeb3YBn1tJ9HMmr9mVriYjnvsQzBhhOUNJl/gTzur96BC
-	HkgaPSQnzWb5ssypEOGWfXSUIx8wcmN6KRc3yHQaEPt/zZlTkXqB0nYmZZOMmJamTBbqP9d3//J
-	rWYq9UR
-X-Google-Smtp-Source: AGHT+IHQJ0nZv9ZlUQM3huQCK3igjXe0i02mkwa3OlSyeMA7reFrWNI2gArWn4YPRDyZ2w4NsNDQcTmLkfRUBsuYk+Q=
-X-Received: by 2002:a17:907:1c14:b0:af9:709f:970b with SMTP id
- a640c23a62f3a-afcbe24770emr432719966b.46.1755210913738; Thu, 14 Aug 2025
- 15:35:13 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JCpccCtz"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1755216806;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HQxbRmi0AU/COoRpKFXOqr509ngJcLkKmNPN1L42D40=;
+	b=JCpccCtzk2eSdcqiRCHQjqmR4L/LUzKeacUI2jr18JwMo+Sn5dk01+R9PPkzIc8H+R0u32
+	4CcuZALEe6uRcSWqHNnLTiW4O+ONoSpmaY/qbt0564J+Yr3FRw+FoGNq7KMzvE5Iw8K07y
+	MoY71xuGldTvI9lQWicNrr6/5kDXY70=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-641-csY3x4inNEO3bOt7lsCIog-1; Thu,
+ 14 Aug 2025 20:13:22 -0400
+X-MC-Unique: csY3x4inNEO3bOt7lsCIog-1
+X-Mimecast-MFC-AGG-ID: csY3x4inNEO3bOt7lsCIog_1755216801
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6C83C195422A;
+	Fri, 15 Aug 2025 00:13:20 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.148])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D2C9330001A2;
+	Fri, 15 Aug 2025 00:13:14 +0000 (UTC)
+Date: Fri, 15 Aug 2025 08:13:09 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Nilay Shroff <nilay@linux.ibm.com>
+Cc: linux-block@vger.kernel.org, axboe@kernel.dk, yukuai1@huaweicloud.com,
+	hch@lst.de, shinichiro.kawasaki@wdc.com, kch@nvidia.com,
+	gjoyce@ibm.com
+Subject: Re: [PATCHv3 3/3] block: avoid cpu_hotplug_lock depedency on
+ freeze_lock
+Message-ID: <aJ57lZLhktXxaBoh@fedora>
+References: <20250814082612.500845-1-nilay@linux.ibm.com>
+ <20250814082612.500845-4-nilay@linux.ibm.com>
+ <aJ3aR2JodRrAqVcO@fedora>
+ <e125025b-d576-4919-b00e-5d9b640bed77@linux.ibm.com>
+ <aJ3myQW2A8HtteBC@fedora>
+ <e33e97f7-0c12-4f70-81d0-4fea05557579@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAHumS0BE_28D47d3Ls5PJBONTzVUCA54QwTV5UhJdDhnfCEi4A@mail.gmail.com>
- <36eb61d6-971a-4177-aa62-75197460c33d@huaweicloud.com>
-In-Reply-To: <36eb61d6-971a-4177-aa62-75197460c33d@huaweicloud.com>
-From: Teng Qin <palmtenor@gmail.com>
-Date: Thu, 14 Aug 2025 18:35:01 -0400
-X-Gm-Features: Ac12FXwmBQ08ugM8mSulymg8dreoWRsjeQahdrQvChtdZhcwE-1pTtG-Qg35eDo
-Message-ID: <CAHumS0Ddg7wj50jvoR1Z9dJrXeizz+=4k7Az0qB_9QH-tAhvQA@mail.gmail.com>
-Subject: Re: Question on setting IO polling behavior and documentations
-To: Yu Kuai <yukuai1@huaweicloud.com>, linux-block@vger.kernel.org
-Cc: hch@lst.de, axboe@kernel.dk, sagi@grimberg.me, 
-	"yukuai (C)" <yukuai3@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e33e97f7-0c12-4f70-81d0-4fea05557579@linux.ibm.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Thu, Aug 14, 2025 at 5:31=E2=80=AFAM Yu Kuai <yukuai1@huaweicloud.com> w=
-rote:
->
-> Hi,
->
-> =E5=9C=A8 2025/08/14 13:14, Teng Qin =E5=86=99=E9=81=93:
->> Moreover, the block layer documentation at
->>    Documentation/ABI/stable/sysfs-block
->> still documents the legacy behavior of the io_poll sysfs file. This is
->> confusing for users trying to figure out reason of the failed or
->> unexpected behavior after writing to the file and seeing the dmesg,
->> particularly because there are many articles on the Internet describing
->> the legacy behavior.
->> If the maintainers agree, I can help update these documentations.
->
-> Feel free to update the documentations, AFAIK, there are some out of
-> date descriptions and it's welcome to fix them
+On Thu, Aug 14, 2025 at 08:01:11PM +0530, Nilay Shroff wrote:
+> 
+> 
+> On 8/14/25 7:08 PM, Ming Lei wrote:
+> > On Thu, Aug 14, 2025 at 06:27:08PM +0530, Nilay Shroff wrote:
+> >>
+> >>
+> >> On 8/14/25 6:14 PM, Ming Lei wrote:
+> >>> On Thu, Aug 14, 2025 at 01:54:59PM +0530, Nilay Shroff wrote:
+> >>>> A recent lockdep[1] splat observed while running blktest block/005
+> >>>> reveals a potential deadlock caused by the cpu_hotplug_lock dependency
+> >>>> on ->freeze_lock. This dependency was introduced by commit 033b667a823e
+> >>>> ("block: blk-rq-qos: guard rq-qos helpers by static key").
+> >>>>
+> >>>> That change added a static key to avoid fetching q->rq_qos when
+> >>>> neither blk-wbt nor blk-iolatency is configured. The static key
+> >>>> dynamically patches kernel text to a NOP when disabled, eliminating
+> >>>> overhead of fetching q->rq_qos in the I/O hot path. However, enabling
+> >>>> a static key at runtime requires acquiring both cpu_hotplug_lock and
+> >>>> jump_label_mutex. When this happens after the queue has already been
+> >>>> frozen (i.e., while holding ->freeze_lock), it creates a locking
+> >>>> dependency from cpu_hotplug_lock to ->freeze_lock, which leads to a
+> >>>> potential deadlock reported by lockdep [1].
+> >>>>
+> >>>> To resolve this, replace the static key mechanism with q->queue_flags:
+> >>>> QUEUE_FLAG_QOS_ENABLED. This flag is evaluated in the fast path before
+> >>>> accessing q->rq_qos. If the flag is set, we proceed to fetch q->rq_qos;
+> >>>> otherwise, the access is skipped.
+> >>>>
+> >>>> Since q->queue_flags is commonly accessed in IO hotpath and resides in
+> >>>> the first cacheline of struct request_queue, checking it imposes minimal
+> >>>> overhead while eliminating the deadlock risk.
+> >>>>
+> >>>> This change avoids the lockdep splat without introducing performance
+> >>>> regressions.
+> >>>>
+> >>>> [1] https://lore.kernel.org/linux-block/4fdm37so3o4xricdgfosgmohn63aa7wj3ua4e5vpihoamwg3ui@fq42f5q5t5ic/
+> >>>>
+> >>>> Reported-by: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+> >>>> Closes: https://lore.kernel.org/linux-block/4fdm37so3o4xricdgfosgmohn63aa7wj3ua4e5vpihoamwg3ui@fq42f5q5t5ic/
+> >>>> Fixes: 033b667a823e ("block: blk-rq-qos: guard rq-qos helpers by static key")
+> >>>> Tested-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+> >>>> Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
+> >>>> ---
+> >>>>  block/blk-mq-debugfs.c |  1 +
+> >>>>  block/blk-rq-qos.c     |  9 ++++---
+> >>>>  block/blk-rq-qos.h     | 54 ++++++++++++++++++++++++------------------
+> >>>>  include/linux/blkdev.h |  1 +
+> >>>>  4 files changed, 37 insertions(+), 28 deletions(-)
+> >>>>
+> >>>> diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+> >>>> index 7ed3e71f2fc0..32c65efdda46 100644
+> >>>> --- a/block/blk-mq-debugfs.c
+> >>>> +++ b/block/blk-mq-debugfs.c
+> >>>> @@ -95,6 +95,7 @@ static const char *const blk_queue_flag_name[] = {
+> >>>>  	QUEUE_FLAG_NAME(SQ_SCHED),
+> >>>>  	QUEUE_FLAG_NAME(DISABLE_WBT_DEF),
+> >>>>  	QUEUE_FLAG_NAME(NO_ELV_SWITCH),
+> >>>> +	QUEUE_FLAG_NAME(QOS_ENABLED),
+> >>>>  };
+> >>>>  #undef QUEUE_FLAG_NAME
+> >>>>  
+> >>>> diff --git a/block/blk-rq-qos.c b/block/blk-rq-qos.c
+> >>>> index b1e24bb85ad2..654478dfbc20 100644
+> >>>> --- a/block/blk-rq-qos.c
+> >>>> +++ b/block/blk-rq-qos.c
+> >>>> @@ -2,8 +2,6 @@
+> >>>>  
+> >>>>  #include "blk-rq-qos.h"
+> >>>>  
+> >>>> -__read_mostly DEFINE_STATIC_KEY_FALSE(block_rq_qos);
+> >>>> -
+> >>>>  /*
+> >>>>   * Increment 'v', if 'v' is below 'below'. Returns true if we succeeded,
+> >>>>   * false if 'v' + 1 would be bigger than 'below'.
+> >>>> @@ -319,8 +317,8 @@ void rq_qos_exit(struct request_queue *q)
+> >>>>  		struct rq_qos *rqos = q->rq_qos;
+> >>>>  		q->rq_qos = rqos->next;
+> >>>>  		rqos->ops->exit(rqos);
+> >>>> -		static_branch_dec(&block_rq_qos);
+> >>>>  	}
+> >>>> +	blk_queue_flag_clear(QUEUE_FLAG_QOS_ENABLED, q);
+> >>>>  	mutex_unlock(&q->rq_qos_mutex);
+> >>>>  }
+> >>>>  
+> >>>> @@ -346,7 +344,7 @@ int rq_qos_add(struct rq_qos *rqos, struct gendisk *disk, enum rq_qos_id id,
+> >>>>  		goto ebusy;
+> >>>>  	rqos->next = q->rq_qos;
+> >>>>  	q->rq_qos = rqos;
+> >>>> -	static_branch_inc(&block_rq_qos);
+> >>>> +	blk_queue_flag_set(QUEUE_FLAG_QOS_ENABLED, q);
+> >>>
+> >>> One stupid question: can we simply move static_branch_inc(&block_rq_qos)
+> >>> out of queue freeze in rq_qos_add()?
+> >>>
+> >>> What matters is just the 1st static_branch_inc() which switches the counter
+> >>> from 0 to 1, when blk_mq_freeze_queue() guarantees that all in-progress code
+> >>> paths observe q->rq_qos as NULL. That means static_branch_inc(&block_rq_qos)
+> >>> needn't queue freeze protection.
+> >>>
+> >> I thought about it earlier but that won't work because we have 
+> >> code paths freezing queue before it reaches upto rq_qos_add(),
+> >> For instance:
+> >>
+> >> We have following code paths from where we invoke
+> >> rq_qos_add() APIs with queue already frozen:
+> >>
+> >> ioc_qos_write()
+> >>  -> blkg_conf_open_bdev_frozen() => freezes queue
+> >>  -> blk_iocost_init()
+> >>    -> rq_qos_add()
+> >>
+> >> queue_wb_lat_store()  => freezes queue
+> >>  -> wbt_init()
+> >>   -> rq_qos_add() 
+> > 
+> > The above two shouldn't be hard to solve, such as, add helper
+> > rq_qos_prep_add() for increasing the static branch counter.
+> > 
+> Yes but then it means that IOs which would be in flight 
+> would take a hit in hotpath: In hotpath those IOs
+> would evaluate static key branch to true and then fetch 
+> q->rq_qos (which probably would not be in the first
+> cacheline). So are we okay to take hat hit in IO 
+> hotpath?
 
-Thanks a lot for the information. Before writing anything, I just
-want to confirm there is indeed no more per-device control for
-polling behavior? Is io_uring and driver-specific features like
-nvme passthrough the only ways to go right now?
+But it is that in-tree code is doing, isn't it?
 
-For users who have legacy applications that could benefit from
-polling but still make traditional IO calls, would it still
-make sense to add a per-device override? I can think of some
-ways of adding a config for a specific device so it would
-tag all bio-s for that device as polling (if queue capable).
-But I'm not sure if that has been discussed before or maybe
-that was intentionally discouraged? Would love to hear from
-the maintainers for opinion.
+`static branch` is only evaluated iff at least one rqos is added.
 
->
->
-> Thanks,
-> Kuai
->
+
+Thanks, 
+Ming
+
