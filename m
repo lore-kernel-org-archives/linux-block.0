@@ -1,212 +1,155 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 050742749DF
-	for <linux-block@vger.kernel.org>; Fri, 15 Aug 2025 09:15:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A76F2E7627;
+	Fri, 15 Aug 2025 09:29:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755249322; cv=none; b=tCFmzWDtrjObIivw15zWk+oTap23jghaQL5K6A5WHoZyWQBIuKoYd5JqECNF6gX6K0qeAepnElfcqbPDBrzA2gH7jLEu09Qq0qUP0EQ2nyrSz6eJ9oSsoiP5uZRzDymnLrch17Hbx2PxSETDwJRrH6gVs29FX49cSZBuNQ0YaOA=
+	t=1755250168; cv=none; b=pindTKzikUYFrX9AlXaROzKPUtJcA14ACHuuHW356d+8kwTnLSePO4+HBpSbwz+p7U0csJDX3OjC95+tsSAIpr+sO3cEYmVBbN0SfCGvO7qnf/BXhFUhdR+z+d/UwD/UJKQa4QJ586X7nqgUfjP5vCBe53pdJLEwiH7xTDkktOE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755249322; c=relaxed/simple;
-	bh=XW0gn0ZmzJyCnlim0ziC/JrGDuiDA6P+BwDUSHgjZD8=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=AbHuZt6JnOPEoKsaacITmqrPFEnBvgUeO5vsig7knopQetw8JxErnHrKVkQ+LIbfSCuQOPrgRddJvaREoncZn0zuQ9hZ2WK/KODF/LteIQgiC+WbahYpentvGk0Zc4DPmwpMhcojnidvcWci+AgfhjVJEiaKiHNj/Q6yGCCKauA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+	s=arc-20240116; t=1755250168; c=relaxed/simple;
+	bh=r4kBBAeTtHpjU3Hx+uyH4afcr1dE8EblvGZWI3m+Pgk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=p1HaOLGbEUBplmvVJYSYQ0nRicIKKNXdpuP1Q+mXvBGY0gPjo8i9nLj5EqZ7/mLumj2r7BnM+uDkXO8ZU0SzKDhqLlRI2VRwO5VMYyr4l6T+wRbT6ex/Y09f48C0Unoa0NTOdw2gN3KEi9ZJHu4X/a5t8O7QUSDcRlfC39wUEwQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4c3GfW5R0JzKHMpf
-	for <linux-block@vger.kernel.org>; Fri, 15 Aug 2025 17:15:15 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.93.142])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4c3Gyr4xjdzYQvFZ;
+	Fri, 15 Aug 2025 17:29:24 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 156161A0AC3
-	for <linux-block@vger.kernel.org>; Fri, 15 Aug 2025 17:15:15 +0800 (CST)
-Received: from [10.174.179.143] (unknown [10.174.179.143])
-	by APP4 (Coremail) with SMTP id gCh0CgCnIxSi+p5o70gEDw--.37412S3;
-	Fri, 15 Aug 2025 17:15:14 +0800 (CST)
-Subject: Re: [PATCH] blk-mq: fix lockdep warning in
- __blk_mq_update_nr_hw_queues
-To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
- linux-block@vger.kernel.org
-Cc: Nilay Shroff <nilay@linux.ibm.com>, "yukuai (C)" <yukuai3@huawei.com>
-References: <20250815075636.304660-1-ming.lei@redhat.com>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <ff5639d3-9a63-e26c-a062-cb8a23c0ed5d@huaweicloud.com>
-Date: Fri, 15 Aug 2025 17:15:14 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.1
+	by mail.maildlp.com (Postfix) with ESMTP id 482F01A0359;
+	Fri, 15 Aug 2025 17:29:23 +0800 (CST)
+Received: from [10.174.179.80] (unknown [10.174.179.80])
+	by APP4 (Coremail) with SMTP id gCh0CgBn4hLv_Z5o+WUFDw--.56836S3;
+	Fri, 15 Aug 2025 17:29:21 +0800 (CST)
+Message-ID: <a0eda581-ae6c-4b49-8b4f-7bb039b17487@huaweicloud.com>
+Date: Fri, 15 Aug 2025 17:29:19 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20250815075636.304660-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgCnIxSi+p5o70gEDw--.37412S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxKF4rKF15ZF1kAFW8ZF13urg_yoW7ur48pF
-	W5Gay2kw1vqr48Wa4UJw47W343WwsY9r17Wr1fJa4YkFn7KrZ7Zr18Gr12vFW0yrZ7Crsx
-	X3y8tFWkZFZrZrJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUv0b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k2
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH util-linux v2] fallocate: add FALLOC_FL_WRITE_ZEROES
+ support
+To: "Darrick J. Wong" <djwong@kernel.org>
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+ dm-devel@lists.linux.dev, linux-nvme@lists.infradead.org,
+ linux-scsi@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-api@vger.kernel.org, hch@lst.de, tytso@mit.edu, bmarzins@redhat.com,
+ chaitanyak@nvidia.com, shinichiro.kawasaki@wdc.com, brauner@kernel.org,
+ martin.petersen@oracle.com, yi.zhang@huawei.com, chengzhihao1@huawei.com,
+ yukuai3@huawei.com, yangerkun@huawei.com
+References: <20250813024015.2502234-1-yi.zhang@huaweicloud.com>
+ <20250814165218.GQ7942@frogsfrogsfrogs>
+Content-Language: en-US
+From: Zhang Yi <yi.zhang@huaweicloud.com>
+In-Reply-To: <20250814165218.GQ7942@frogsfrogsfrogs>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-CM-TRANSID:gCh0CgBn4hLv_Z5o+WUFDw--.56836S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxJF1fZw1kZF45Xr18tFW8WFg_yoW5CFWUpa
+	y5AF18tr48KF17G3s7Za1ku3WFyws2yrWxWrW0qr1kZrnxWF1UKF4DWr1FgF97Xr1kCa1j
+	vr4SvFya9F1UAFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUv0b4IE77IF4wAFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k2
 	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
 	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
 	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
 	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-	6I80ewAv7VC0I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AF
-	wI0_JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
-	xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1D
-	MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
-	0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8
-	JVWxJwCI42IY6I8E87Iv6xkF7I0E14v26r4UJVWxJrUvcSsGvfC2KfnxnUUI43ZEXa7IU1
-	yE_tUUUUU==
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0En4kS
+	14v26r4a6rW5MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I
+	8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWr
+	XwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x
+	0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_
+	Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU0
+	s2-5UUUUU==
+X-CM-SenderInfo: d1lo6xhdqjqx5xdzvxpfor3voofrz/
 
-Hi,
+Thank you for your review comments!
 
-ÔÚ 2025/08/15 15:56, Ming Lei Ð´µÀ:
-> Commit 5989bfe6ac6b ("block: restore two stage elevator switch while
-> running nr_hw_queue update") reintroduced a lockdep warning by calling
-> blk_mq_freeze_queue_nomemsave() before switching the I/O scheduler.
+On 2025/8/15 0:52, Darrick J. Wong wrote:
+> On Wed, Aug 13, 2025 at 10:40:15AM +0800, Zhang Yi wrote:
+>> From: Zhang Yi <yi.zhang@huawei.com>
+>>
+>> The Linux kernel (since version 6.17) supports FALLOC_FL_WRITE_ZEROES in
+>> fallocate(2). Add support for FALLOC_FL_WRITE_ZEROES to the fallocate
+>> utility by introducing a new option -w|--write-zeroes.
+>>
+>> Link: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=278c7d9b5e0c
+>> Signed-off-by: Zhang Yi <yi.zhang@huawei.com>
+>> ---
+>> v1->v2:
+>>  - Minor description modification to align with the kernel.
+>>
+>>  sys-utils/fallocate.1.adoc | 11 +++++++++--
+>>  sys-utils/fallocate.c      | 20 ++++++++++++++++----
+>>  2 files changed, 25 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/sys-utils/fallocate.1.adoc b/sys-utils/fallocate.1.adoc
+>> index 44ee0ef4c..0ec9ff9a9 100644
+>> --- a/sys-utils/fallocate.1.adoc
+>> +++ b/sys-utils/fallocate.1.adoc
+>> @@ -12,7 +12,7 @@ fallocate - preallocate or deallocate space to a file
 > 
-> The function blk_mq_elv_switch_none() calls elevator_change_done().
-> Running this while the queue is frozen causes a lockdep warning.
+> <snip all the long lines>
 > 
-> Fix this by reordering the operations: first, switch the I/O scheduler
-> to 'none', and then freeze the queue. This ensures that elevator_change_done()
-> is not called on an already frozen queue. And this way is safe because
-> elevator_set_none() does freeze queue before switching to none.
+>> +*-w*, *--write-zeroes*::
+>> +Zeroes space in the byte range starting at _offset_ and continuing
+>> for _length_ bytes. Within the specified range, blocks are
+>> preallocated for the regions that span the holes in the file. After a
+>> successful call, subsequent reads from this range will return zeroes,
+>> subsequent writes to that range do not require further changes to the
+>> file mapping metadata.
 > 
-> Also we still have to rely on blk_mq_elv_switch_back() for switching
-> back, and it has to cover unfrozen queue case.
+> "...will return zeroes and subsequent writes to that range..." ?
 > 
-> Cc: Nilay Shroff <nilay@linux.ibm.com>
-> Cc: Yu Kuai <yukuai3@huawei.com>
-> Fixes: 5989bfe6ac6b ("block: restore two stage elevator switch while running nr_hw_queue update")
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
->   block/blk-mq.c   | 13 +++++++------
->   block/blk.h      |  2 +-
->   block/elevator.c | 12 +++++++++---
->   3 files changed, 17 insertions(+), 10 deletions(-)
-> 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index b67d6c02eceb..9c62781c6b8c 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -4974,13 +4974,13 @@ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
->    * Switch back to the elevator type stored in the xarray.
->    */
->   static void blk_mq_elv_switch_back(struct request_queue *q,
-> -		struct xarray *elv_tbl, struct xarray *et_tbl)
-> +		struct xarray *elv_tbl, struct xarray *et_tbl, bool frozen)
->   {
->   	struct elevator_type *e = xa_load(elv_tbl, q->id);
->   	struct elevator_tags *t = xa_load(et_tbl, q->id);
->   
->   	/* The elv_update_nr_hw_queues unfreezes the queue. */
-> -	elv_update_nr_hw_queues(q, e, t);
-> +	elv_update_nr_hw_queues(q, e, t, frozen);
->   
->   	/* Drop the reference acquired in blk_mq_elv_switch_none. */
->   	if (e)
-> @@ -5033,6 +5033,7 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
->   	unsigned int memflags;
->   	int i;
->   	struct xarray elv_tbl, et_tbl;
-> +	bool queues_frozen = false;
->   
->   	lockdep_assert_held(&set->tag_list_lock);
->   
-> @@ -5056,9 +5057,6 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
->   		blk_mq_sysfs_unregister_hctxs(q);
->   	}
->   
-> -	list_for_each_entry(q, &set->tag_list, tag_set_list)
-> -		blk_mq_freeze_queue_nomemsave(q);
-> -
->   	/*
->   	 * Switch IO scheduler to 'none', cleaning up the data associated
->   	 * with the previous scheduler. We will switch back once we are done
-> @@ -5068,6 +5066,9 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
->   		if (blk_mq_elv_switch_none(q, &elv_tbl))
->   			goto switch_back;
->   
-> +	list_for_each_entry(q, &set->tag_list, tag_set_list)
-> +		blk_mq_freeze_queue_nomemsave(q);
-> +	queues_frozen = true;
->   	if (blk_mq_realloc_tag_set_tags(set, nr_hw_queues) < 0)
->   		goto switch_back;
->   
-Will it be simpler if we move blk_mq_freeze_queue_nomemsave() into
-blk_mq_elv_switch_none(), after elevator is succeed switching to none
-then freeze the queue.
 
-Later in blk_mq_elv_switch_back we'll know if xa_load() return valid
-elevator_type, related queue is already freezed.
+Yeah.
+
+>> ++
+>> +Zeroing is done within the filesystem by preferably submitting write
+> 
+> I think we should say less about what the filesystem actually does to
+> preserve some flexibility:
+> 
+> "Zeroing is done within the filesystem. The filesystem may use a
+> hardware accelerated zeroing command, or it may submit regular writes.
+> The behavior depends on the filesystem design and available hardware."
+> 
+
+Sure.
+
+>> zeores commands, the alternative way is submitting actual zeroed data,
+>> the specified range will be converted into written extents. The write
+>> zeroes command is typically faster than write actual data if the
+>> device supports unmap write zeroes, the specified range will not be
+>> physically zeroed out on the device.
+>> ++
+>> +Options *--keep-size* can not be specified for the write-zeroes
+>> operation.
+>> +
+>>  include::man-common/help-version.adoc[]
+>>  
+>>  == AUTHORS
+[..]
+>> @@ -429,6 +438,9 @@ int main(int argc, char **argv)
+>>  			else if (mode & FALLOC_FL_ZERO_RANGE)
+>>  				fprintf(stdout, _("%s: %s (%ju bytes) zeroed.\n"),
+>>  								filename, str, length);
+>> +			else if (mode & FALLOC_FL_WRITE_ZEROES)
+>> +				fprintf(stdout, _("%s: %s (%ju bytes) write zeroed.\n"),
+> 
+> "write zeroed" is a little strange, but I don't have a better
+> suggestion. :)
+> 
+
+Hmm... What about simply using "zeroed", the same to FALLOC_FL_ZERO_RANGE?
+Users should be aware of the parameters they have passed to fallocate(),
+so they should not use this print for further differentiation.
 
 Thanks,
-Kuai
-
-> @@ -5092,7 +5093,7 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
->   switch_back:
->   	/* The blk_mq_elv_switch_back unfreezes queue for us. */
->   	list_for_each_entry(q, &set->tag_list, tag_set_list)
-> -		blk_mq_elv_switch_back(q, &elv_tbl, &et_tbl);
-> +		blk_mq_elv_switch_back(q, &elv_tbl, &et_tbl, queues_frozen);
->   
->   	list_for_each_entry(q, &set->tag_list, tag_set_list) {
->   		blk_mq_sysfs_register_hctxs(q);
-> diff --git a/block/blk.h b/block/blk.h
-> index 0a2eccf28ca4..601db258c00d 100644
-> --- a/block/blk.h
-> +++ b/block/blk.h
-> @@ -332,7 +332,7 @@ bool blk_bio_list_merge(struct request_queue *q, struct list_head *list,
->   bool blk_insert_flush(struct request *rq);
->   
->   void elv_update_nr_hw_queues(struct request_queue *q, struct elevator_type *e,
-> -		struct elevator_tags *t);
-> +		struct elevator_tags *t, bool frozen);
->   void elevator_set_default(struct request_queue *q);
->   void elevator_set_none(struct request_queue *q);
->   
-> diff --git a/block/elevator.c b/block/elevator.c
-> index fe96c6f4753c..0644b2d35ecb 100644
-> --- a/block/elevator.c
-> +++ b/block/elevator.c
-> @@ -706,24 +706,30 @@ static int elevator_change(struct request_queue *q, struct elv_change_ctx *ctx)
->    * reattachment when nr_hw_queues changes.
->    */
->   void elv_update_nr_hw_queues(struct request_queue *q, struct elevator_type *e,
-> -		struct elevator_tags *t)
-> +		struct elevator_tags *t, bool frozen)
->   {
->   	struct blk_mq_tag_set *set = q->tag_set;
->   	struct elv_change_ctx ctx = {};
->   	int ret = -ENODEV;
->   
-> -	WARN_ON_ONCE(q->mq_freeze_depth == 0);
-> +	WARN_ON_ONCE(frozen == (q->mq_freeze_depth == 0));
->   
->   	if (e && !blk_queue_dying(q) && blk_queue_registered(q)) {
->   		ctx.name = e->elevator_name;
->   		ctx.et = t;
->   
-> +		/* elevator switch requires queue to be frozen */
-> +		if (!frozen) {
-> +			blk_mq_freeze_queue_nomemsave(q);
-> +			frozen = true;
-> +		}
->   		mutex_lock(&q->elevator_lock);
->   		/* force to reattach elevator after nr_hw_queue is updated */
->   		ret = elevator_switch(q, &ctx);
->   		mutex_unlock(&q->elevator_lock);
->   	}
-> -	blk_mq_unfreeze_queue_nomemrestore(q);
-> +	if (frozen)
-> +		blk_mq_unfreeze_queue_nomemrestore(q);
->   	if (!ret)
->   		WARN_ON_ONCE(elevator_change_done(q, &ctx));
->   	/*
-> 
+Yi.
 
