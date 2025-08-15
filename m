@@ -1,175 +1,304 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65D752D3726;
-	Fri, 15 Aug 2025 07:32:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E7ED10E0;
+	Fri, 15 Aug 2025 07:53:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755243163; cv=none; b=iPmfMBjG0WHC1EtbTt0knec1LjhJkWHzp+818Unl3DWNCzG/a67zpiiVmWTIyI0yFsOa5yO+BxdV3JQRrt8FcdwkGh7M2pzx92Gbyk1Qvk0uohc7DEwB+58awx2cQRHSRwSvT0c1O6djKKx9pE1Z6E6BTiIu2lho4LnT4zWNBUM=
+	t=1755244393; cv=none; b=hJtnrSYj9PjSX1WteElfDIwr9zsHLTfhkf8Nq1OnVbWffP1PJsJ43X6YJVaeDVpaPYKFGadG0yoJ0T+kW8rj9yGV4KKe8baospsq5qWVglPLedELN3kHDrbtwOMNeHRC6mR84loWx02NQvSYoRzQtgv89gVUFxVWlLf7tmMN90g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755243163; c=relaxed/simple;
-	bh=F1xlZDFgVWjBQKgbNEQcWRpep8ZD9QDUOW3xY4uARq4=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=YQ/w941RmbsqWQyanvGl8R7LqaQRddYWrWrzClGRvPaaJa76RTjEV+RZ11yqWN91k3Z36huQLbCD+IIVFnc2ByanFphzlo4IrHTgHqDbvLDlRE3qw59T2EqvX66V534FjwSc5i7CnETtz6ZJCVA1cMTOYrOXCH4pNc729yqDA6I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=asSbFfth; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="asSbFfth"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34309C4CEEB;
-	Fri, 15 Aug 2025 07:32:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755243162;
-	bh=F1xlZDFgVWjBQKgbNEQcWRpep8ZD9QDUOW3xY4uARq4=;
-	h=From:Subject:Date:To:Cc:From;
-	b=asSbFfthS68TeIWoRC0zNP1sVY3bwdNz+Mh0oejHmLogVfQeN6UrKcz3Ov67/S/co
-	 GR8jwtrgaAYQzL7MC+QgTnY8+JNFkKZ55MHs1yMlMnqRJUjXx1Qe4YqMF8ogRvgkQk
-	 7Swm+INomA3MSGMNkBjpkJHO42f5+APZHlxxZHnA0joAgzFoVMnhKyFSWnwkDGCxN1
-	 7ZcDXRSgb3oC5wkNBPU0W7rHKrCe/6eRBKa3EN1NHJE+nYd8njwSZWlvn/qkkJu64w
-	 oEEz/CAstE0moozShF+Qfoj+kVgYjOGGPpc1vdbzXub5Mjf/P0HcBoSRHpC2+FzE9o
-	 LsA5DwbGmhTMw==
-From: Andreas Hindborg <a.hindborg@kernel.org>
-Subject: [PATCH v5 00/18] rnull: add configfs, remote completion to rnull
-Date: Fri, 15 Aug 2025 09:30:35 +0200
-Message-Id: <20250815-rnull-up-v6-16-v5-0-581453124c15@kernel.org>
+	s=arc-20240116; t=1755244393; c=relaxed/simple;
+	bh=E/nbNwfWlTTVzsAK1l2kL2cE73vo/5eDQGqNnWJ1A7Q=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ZXdZkhRQ35l5xGt6SzCBPkbbBsXDD+BdrYRh6KTTNnhMqPOJBWR+AyXHujSeuQ6+/yrKw9CVSeMGh6lxPkuBfMaKpUbmSb+vyeGjlNtRYQ8rkRCXvutTGEV7Eyhr7klxcsXG5wDpfW/BelBBYGXu9cFaB3ype95JZX9u1mtoJXk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.93.142])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4c3Dqn0l9DzYQv7h;
+	Fri, 15 Aug 2025 15:53:09 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id A9A191A0359;
+	Fri, 15 Aug 2025 15:53:07 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+	by APP4 (Coremail) with SMTP id gCh0CgDnrxBh555oQLj9Dg--.33563S4;
+	Fri, 15 Aug 2025 15:53:07 +0800 (CST)
+From: Yu Kuai <yukuai1@huaweicloud.com>
+To: nilay@linux.ibm.com,
+	ming.lei@redhat.com,
+	axboe@kernel.dk,
+	bvanassche@acm.org
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	yukuai3@huawei.com,
+	yukuai1@huaweicloud.com,
+	yi.zhang@huawei.com,
+	yangerkun@huawei.com,
+	johnny.chenyi@huawei.com
+Subject: [PATCH] blk-mq: fix elevator depth_updated method
+Date: Fri, 15 Aug 2025 15:45:17 +0800
+Message-Id: <20250815074517.367896-1-yukuai1@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIABvinmgC/3XMQQ6CMBCF4auQrq3pTEsprryHcUFhkEYCpEijM
- dzd4kZN4/J/yfeebCbvaGaH7Mk8BTe7cYiR7zJWd9VwIe6a2AwF5kKD5n5Y+p4vEw+ax7QqL4D
- QtETEIpo8te7+PjydY3duvo3+8f4PsK1/rwJwwSsF2lhDhbZ4vJIfqN+P/sK2r4AfXwiTeNy8L
- WUt2lZhaRMvvzxA4mX0skKNVhGWCIlXH28AE6+ip8YIaBppq7z+8eu6vgBxOURVbQEAAA==
-X-Change-ID: 20250616-rnull-up-v6-16-b4571e28feee
-To: Boqun Feng <boqun.feng@gmail.com>, Miguel Ojeda <ojeda@kernel.org>, 
- Alex Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>, 
- =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
- Benno Lossin <lossin@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
- Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, 
- Jens Axboe <axboe@kernel.dk>, Breno Leitao <leitao@debian.org>
-Cc: linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Andreas Hindborg <a.hindborg@kernel.org>, 
- Daniel Almeida <daniel.almeida@collabora.com>
-X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4888; i=a.hindborg@kernel.org;
- h=from:subject:message-id; bh=F1xlZDFgVWjBQKgbNEQcWRpep8ZD9QDUOW3xY4uARq4=;
- b=owEBbQKS/ZANAwAIAeG4Gj55KGN3AcsmYgBonuIlCyzecOGtD2M8Yybbw+/inEXyHu0ulWyGI
- oUUjV6IbM6JAjMEAAEIAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaJ7iJQAKCRDhuBo+eShj
- d6BPD/9VW9Hx8fFdux/ml4XL9BUi8AzeBtjlJXEM8XOudopqNqZAYp6WqM8CkJzGcS4tm+wx51x
- K3VUHKjnPNd8b3ydAzRKpcAY46BgDwQ8ulmBM1OmCvgGAKLCM9vqoFUp6KwsmwR+Og9auCY0690
- K7vbzCI0Tx8bG+UoU0qjr3o1BbzxJ+p6hZ39wLfZyPKDW/Vf5kogsibx+2Z9cSk4fTDYJpEJLwG
- T0LHR1rNs2V/VFbF1IGXCV+N8LSHpTHSwWN7tKQyhwD7i8QH5jR1SIXIBcuh1oblFl02NZtmXwE
- TWMlLAWcnnWkh8tFnQUADuFSoIPCnFzkHla51LMjBb+hl7bIiXbrC6bute4m98ChntPdh2eHuhe
- xZ7fpHtmJ9vES8qOBBx6wONXJWmlnjlV276nqfM4ZguFDKyAit4SYKThwcZEIwq5CIHMB9ZAA4V
- kYXUT3Ijde3ndBrz3+MqKYxzWyYA/onjaENyeVv92s1+mRFdd/aTfr/TJ+X2xAxpqPVDRWmoh3o
- j7Z41hyGxcfSGpKloV9OqKcXPJmn83DUxnzRXhV29XUW2EXgrrGYTn2yB6E/oZmkka41KU6Pjv7
- ywunFFqLAjAwyJb69rJynjRFOEt4ohK9TB0a0UC3EkrMGIBTMgbXvbIzNDY9YGRlYxYiZku/9IR
- J2NUS33zB9k26Xg==
-X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
- fpr=3108C10F46872E248D1FB221376EB100563EF7A7
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgDnrxBh555oQLj9Dg--.33563S4
+X-Coremail-Antispam: 1UD129KBjvJXoW3AF4xWFyfGF4fZFyUKr17KFg_yoWfJr4UpF
+	W5tanrKryrtF4UuFWjy39xXw43K39agry2yFs3t34rKrZFgFs3XF1rGFyxXFWIqrZ5CFsr
+	Zr4kta4DXr1Iq3JanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9Y14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
+	Y2ka0xkIwI1lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x
+	0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2
+	zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF
+	4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWU
+	CwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCT
+	nIWIevJa73UjIFyTuYvjfUonmRUUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-This series adds configuration via configfs and remote completion to
-the rnull driver. The series also includes a set of changes to the
-rust block device driver API: a few cleanup patches, and a few features
-supporting the rnull changes.
+From: Yu Kuai <yukuai3@huawei.com>
 
-The series removes the raw buffer formatting logic from `kernel::block`
-and improves the logic available in `kernel::string` to support the same
-use as the removed logic.
+Current depth_updated has some problems:
 
-This series is a smaller subset of the patches available in the
-downstream rnull tree. I hope to minimize the delta between upstream
-and downstream over the next few kernel releases.
+1) depth_updated() will be called for each hctx, while all elevators
+will update async_depth for the disk level, this is not related to hctx;
+2) In blk_mq_update_nr_requests(), if previous hctx update succeed and
+this hctx update failed, q->nr_requests will not be updated, while
+async_depth is already updated with new nr_reqeuests in previous
+depth_updated();
+3) All elevators are using q->nr_requests to calculate async_depth now,
+however, q->nr_requests is still the old value when depth_updated() is
+called from blk_mq_update_nr_requests();
 
-Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
+Fix those problems by:
+
+- pass in request_queue instead of hctx;
+- move depth_updated() after q->nr_requests is updated in
+  blk_mq_update_nr_requests();
+- add depth_updated() call in blk_mq_init_sched();
+- remove init_hctx() method for mq-deadline and bfq that is useless now;
+
+Fixes: 77f1e0a52d26 ("bfq: update internal depth state when queue depth changes")
+Fixes: 39823b47bbd4 ("block/mq-deadline: Fix the tag reservation code")
+Fixes: 42e6c6ce03fd ("lib/sbitmap: convert shallow_depth from one word to the whole sbitmap")
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 ---
-Changes in v5:
-- Re-export `configfs_attrs` from the `configfs` module.
-- Remove transient stray dead code `NullTerminatedFormatter::from_array`.
-- Use `kstrtobool` when parsing boolean values through configfs.
-- Remove a stray space in `pin_init!` macro invocation.
-- Remove useless calls to `ptr::cast` when retrieving `queue_data`.
-- Rearrange positioning of safety comments.
-- Link to v4: https://lore.kernel.org/r/20250812-rnull-up-v6-16-v4-0-ed801dd3ba5c@kernel.org
+ block/bfq-iosched.c   | 21 ++++-----------------
+ block/blk-mq-sched.c  |  3 +++
+ block/blk-mq-sched.h  | 11 +++++++++++
+ block/blk-mq.c        | 23 ++++++++++++-----------
+ block/elevator.h      |  2 +-
+ block/kyber-iosched.c | 10 ++++------
+ block/mq-deadline.c   | 15 ++-------------
+ 7 files changed, 37 insertions(+), 48 deletions(-)
 
-Changes in v4:
-- Rebase on v6.17-rc1
-- Merge patches that expose `str::{Formatter, RawFormatter}` publicly.
-- Remove `NullTerminatedFormatter::from_array`.
-- Change signature of `Formatter::new`.
-- Change invariant wording for `NullTerminatedFormatter`.
-- Add missing period in comment for `SECTOR_MASK`.
-- Rephrase docstring for PAGE_SECTORS_SHIFT.
-- Use `write_str` rather than `write_fmt` where applicable.
-- Improve boolean parsing in rnull configfs interface.
-- Be explicit when intentionally dropping data (GenDisk::drop).
-- Add minimum size invariant to `NullTerminatedFormatter`.
-- Import `EINVAL` from the prelude.
-- Link to v3: https://lore.kernel.org/r/20250711-rnull-up-v6-16-v3-0-3a262b4e2921@kernel.org
-
-Changes in v3:
-- Rename `NullBorrowFormatter` as `NullTerminatedFormatter`.
-- Remove `pos` from `NullBorrowFormatter`.
-- Call into `Self::new` in `NullBorrowFormatter::from_array`.
-- Use `Option` return type in `NullBorrowFormatter::from_array`
-- Use `Option` return type in `NullBorrowFormatter::new`.
-- Remove `BorrowFormatter` and update `Formatter` with a generic lifetime.
-- Split visibility change of `str::Formatter` into separate patch.
-- Link to v2: https://lore.kernel.org/r/20250708-rnull-up-v6-16-v2-0-ab93c0ff429b@kernel.org
-
-Changes in v2:
-- Rework formatter logic. Add two new formatters that write to slices,
-  one of which adds a trailing null byte.
-- Reorder and split patches so that changes are more clear.
-- Fix a typo in soft-irq patch summary.
-- Link to v1: https://lore.kernel.org/r/20250616-rnull-up-v6-16-v1-0-a4168b8e76b2@kernel.org
-
----
-Andreas Hindborg (18):
-      rust: str: normalize imports in `str.rs`
-      rust: str: allow `str::Formatter` to format into `&mut [u8]`.
-      rust: str: expose `str::{Formatter, RawFormatter}` publicly.
-      rust: str: introduce `NullTerminatedFormatter`
-      rust: str: introduce `kstrtobool` function
-      rust: str: add `bytes_to_bool` helper function
-      rust: configfs: re-export `configfs_attrs` from `configfs` module
-      rust: block: normalize imports for `gen_disk.rs`
-      rust: block: use `NullTerminatedFormatter`
-      rust: block: remove `RawWriter`
-      rust: block: remove trait bound from `mq::Request` definition
-      rust: block: add block related constants
-      rnull: move driver to separate directory
-      rnull: enable configuration via `configfs`
-      rust: block: add `GenDisk` private data support
-      rust: block: mq: fix spelling in a safety comment
-      rust: block: add remote completion to `Request`
-      rnull: add soft-irq completion support
-
- MAINTAINERS                        |   2 +-
- drivers/block/Kconfig              |  10 +-
- drivers/block/Makefile             |   4 +-
- drivers/block/rnull.rs             |  80 -----------
- drivers/block/rnull/Kconfig        |  13 ++
- drivers/block/rnull/Makefile       |   3 +
- drivers/block/rnull/configfs.rs    | 262 +++++++++++++++++++++++++++++++++++++
- drivers/block/rnull/rnull.rs       | 105 +++++++++++++++
- rust/kernel/block.rs               |  13 ++
- rust/kernel/block/mq.rs            |  14 +-
- rust/kernel/block/mq/gen_disk.rs   |  54 ++++++--
- rust/kernel/block/mq/operations.rs |  65 +++++++--
- rust/kernel/block/mq/raw_writer.rs |  55 --------
- rust/kernel/block/mq/request.rs    |  21 ++-
- rust/kernel/configfs.rs            |   2 +
- rust/kernel/str.rs                 | 151 +++++++++++++++++++--
- samples/rust/rust_configfs.rs      |   2 +-
- 17 files changed, 664 insertions(+), 192 deletions(-)
----
-base-commit: 8f5ae30d69d7543eee0d70083daf4de8fe15d585
-change-id: 20250616-rnull-up-v6-16-b4571e28feee
-
-Best regards,
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index 50e51047e1fe..c0c398998aa1 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -7109,9 +7109,10 @@ void bfq_put_async_queues(struct bfq_data *bfqd, struct bfq_group *bfqg)
+  * See the comments on bfq_limit_depth for the purpose of
+  * the depths set in the function. Return minimum shallow depth we'll use.
+  */
+-static void bfq_update_depths(struct bfq_data *bfqd, struct sbitmap_queue *bt)
++static void bfq_depth_updated(struct request_queue *q)
+ {
+-	unsigned int nr_requests = bfqd->queue->nr_requests;
++	struct bfq_data *bfqd = q->elevator->elevator_data;
++	unsigned int nr_requests = q->nr_requests;
+ 
+ 	/*
+ 	 * In-word depths if no bfq_queue is being weight-raised:
+@@ -7143,21 +7144,8 @@ static void bfq_update_depths(struct bfq_data *bfqd, struct sbitmap_queue *bt)
+ 	bfqd->async_depths[1][0] = max((nr_requests * 3) >> 4, 1U);
+ 	/* no more than ~37% of tags for sync writes (~20% extra tags) */
+ 	bfqd->async_depths[1][1] = max((nr_requests * 6) >> 4, 1U);
+-}
+-
+-static void bfq_depth_updated(struct blk_mq_hw_ctx *hctx)
+-{
+-	struct bfq_data *bfqd = hctx->queue->elevator->elevator_data;
+-	struct blk_mq_tags *tags = hctx->sched_tags;
+ 
+-	bfq_update_depths(bfqd, &tags->bitmap_tags);
+-	sbitmap_queue_min_shallow_depth(&tags->bitmap_tags, 1);
+-}
+-
+-static int bfq_init_hctx(struct blk_mq_hw_ctx *hctx, unsigned int index)
+-{
+-	bfq_depth_updated(hctx);
+-	return 0;
++	blk_mq_set_min_shallow_depth(q, 1);
+ }
+ 
+ static void bfq_exit_queue(struct elevator_queue *e)
+@@ -7628,7 +7616,6 @@ static struct elevator_type iosched_bfq_mq = {
+ 		.request_merged		= bfq_request_merged,
+ 		.has_work		= bfq_has_work,
+ 		.depth_updated		= bfq_depth_updated,
+-		.init_hctx		= bfq_init_hctx,
+ 		.init_sched		= bfq_init_queue,
+ 		.exit_sched		= bfq_exit_queue,
+ 	},
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index e2ce4a28e6c9..bf7dd97422ec 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -585,6 +585,9 @@ int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e,
+ 			}
+ 		}
+ 	}
++
++	if (e->ops.depth_updated)
++		e->ops.depth_updated(q);
+ 	return 0;
+ 
+ out:
+diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
+index b554e1d55950..fe83187f41db 100644
+--- a/block/blk-mq-sched.h
++++ b/block/blk-mq-sched.h
+@@ -92,4 +92,15 @@ static inline bool blk_mq_sched_needs_restart(struct blk_mq_hw_ctx *hctx)
+ 	return test_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state);
+ }
+ 
++static inline void blk_mq_set_min_shallow_depth(struct request_queue *q,
++						unsigned int depth)
++{
++	struct blk_mq_hw_ctx *hctx;
++	unsigned long i;
++
++	queue_for_each_hw_ctx(q, hctx, i)
++		sbitmap_queue_min_shallow_depth(&hctx->sched_tags->bitmap_tags,
++						depth);
++}
++
+ #endif
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index b67d6c02eceb..9c68749124c6 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -4951,20 +4951,21 @@ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
+ 						      false);
+ 		}
+ 		if (ret)
+-			break;
+-		if (q->elevator && q->elevator->type->ops.depth_updated)
+-			q->elevator->type->ops.depth_updated(hctx);
++			goto out;
+ 	}
+-	if (!ret) {
+-		q->nr_requests = nr;
+-		if (blk_mq_is_shared_tags(set->flags)) {
+-			if (q->elevator)
+-				blk_mq_tag_update_sched_shared_tags(q);
+-			else
+-				blk_mq_tag_resize_shared_tags(set, nr);
+-		}
++
++	q->nr_requests = nr;
++	if (q->elevator && q->elevator->type->ops.depth_updated)
++		q->elevator->type->ops.depth_updated(q);
++
++	if (blk_mq_is_shared_tags(set->flags)) {
++		if (q->elevator)
++			blk_mq_tag_update_sched_shared_tags(q);
++		else
++			blk_mq_tag_resize_shared_tags(set, nr);
+ 	}
+ 
++out:
+ 	blk_mq_unquiesce_queue(q);
+ 
+ 	return ret;
+diff --git a/block/elevator.h b/block/elevator.h
+index adc5c157e17e..c4d20155065e 100644
+--- a/block/elevator.h
++++ b/block/elevator.h
+@@ -37,7 +37,7 @@ struct elevator_mq_ops {
+ 	void (*exit_sched)(struct elevator_queue *);
+ 	int (*init_hctx)(struct blk_mq_hw_ctx *, unsigned int);
+ 	void (*exit_hctx)(struct blk_mq_hw_ctx *, unsigned int);
+-	void (*depth_updated)(struct blk_mq_hw_ctx *);
++	void (*depth_updated)(struct request_queue *);
+ 
+ 	bool (*allow_merge)(struct request_queue *, struct request *, struct bio *);
+ 	bool (*bio_merge)(struct request_queue *, struct bio *, unsigned int);
+diff --git a/block/kyber-iosched.c b/block/kyber-iosched.c
+index 70cbc7b2deb4..49ae52aa20d9 100644
+--- a/block/kyber-iosched.c
++++ b/block/kyber-iosched.c
+@@ -440,13 +440,12 @@ static void kyber_ctx_queue_init(struct kyber_ctx_queue *kcq)
+ 		INIT_LIST_HEAD(&kcq->rq_list[i]);
+ }
+ 
+-static void kyber_depth_updated(struct blk_mq_hw_ctx *hctx)
++static void kyber_depth_updated(struct request_queue *q)
+ {
+-	struct kyber_queue_data *kqd = hctx->queue->elevator->elevator_data;
+-	struct blk_mq_tags *tags = hctx->sched_tags;
++	struct kyber_queue_data *kqd = q->elevator->elevator_data;
+ 
+-	kqd->async_depth = hctx->queue->nr_requests * KYBER_ASYNC_PERCENT / 100U;
+-	sbitmap_queue_min_shallow_depth(&tags->bitmap_tags, kqd->async_depth);
++	kqd->async_depth = q->nr_requests * KYBER_ASYNC_PERCENT / 100U;
++	blk_mq_set_min_shallow_depth(q, kqd->async_depth);
+ }
+ 
+ static int kyber_init_hctx(struct blk_mq_hw_ctx *hctx, unsigned int hctx_idx)
+@@ -493,7 +492,6 @@ static int kyber_init_hctx(struct blk_mq_hw_ctx *hctx, unsigned int hctx_idx)
+ 	khd->batching = 0;
+ 
+ 	hctx->sched_data = khd;
+-	kyber_depth_updated(hctx);
+ 
+ 	return 0;
+ 
+diff --git a/block/mq-deadline.c b/block/mq-deadline.c
+index b9b7cdf1d3c9..578bc79c5654 100644
+--- a/block/mq-deadline.c
++++ b/block/mq-deadline.c
+@@ -507,22 +507,12 @@ static void dd_limit_depth(blk_opf_t opf, struct blk_mq_alloc_data *data)
+ }
+ 
+ /* Called by blk_mq_update_nr_requests(). */
+-static void dd_depth_updated(struct blk_mq_hw_ctx *hctx)
++static void dd_depth_updated(struct request_queue *q)
+ {
+-	struct request_queue *q = hctx->queue;
+ 	struct deadline_data *dd = q->elevator->elevator_data;
+-	struct blk_mq_tags *tags = hctx->sched_tags;
+ 
+ 	dd->async_depth = q->nr_requests;
+-
+-	sbitmap_queue_min_shallow_depth(&tags->bitmap_tags, 1);
+-}
+-
+-/* Called by blk_mq_init_hctx() and blk_mq_init_sched(). */
+-static int dd_init_hctx(struct blk_mq_hw_ctx *hctx, unsigned int hctx_idx)
+-{
+-	dd_depth_updated(hctx);
+-	return 0;
++	blk_mq_set_min_shallow_depth(q, 1);
+ }
+ 
+ static void dd_exit_sched(struct elevator_queue *e)
+@@ -1048,7 +1038,6 @@ static struct elevator_type mq_deadline = {
+ 		.has_work		= dd_has_work,
+ 		.init_sched		= dd_init_sched,
+ 		.exit_sched		= dd_exit_sched,
+-		.init_hctx		= dd_init_hctx,
+ 	},
+ 
+ #ifdef CONFIG_BLK_DEBUG_FS
 -- 
-Andreas Hindborg <a.hindborg@kernel.org>
-
+2.39.2
 
