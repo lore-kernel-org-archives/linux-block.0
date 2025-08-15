@@ -1,196 +1,162 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAC8D2BF00D
-	for <linux-block@vger.kernel.org>; Fri, 15 Aug 2025 07:56:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1E672C324C
+	for <linux-block@vger.kernel.org>; Fri, 15 Aug 2025 07:57:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755244611; cv=none; b=h2BdsviYV9cVp1txiEcIE249/R59klcq4Zn4D39kOeXDEotTYCD7oDVm9EWuCI8WgH1TGSetsjxSsxLZHOcYuhgkNfncxHIhCfrI/g1VfKFIaq/+/7gfG+vNS25qhfzQIaiG7SLz/RkMxZsQHczn77+RoCkGeM0kJdRLFJTTjqw=
+	t=1755244647; cv=none; b=ebMGKzftLqcmmewFsdlCeus1+YQ9uVRSB5Ac28/SF64TxDWepE1QtMZ3L2S2tKAURlxHUOxv0wUC2oE2G2V9TggaXGzRRyJMSO6p/vw+9Y/MiXd6Vd8f5OHJtnfVC1PHGlJU/pzZCC7LPxRv7Eog5HrwFQSZaQkryyvw4pRsSqM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755244611; c=relaxed/simple;
-	bh=ej/G+JfUURwKhwbXMGuX/6ZSVouqwIMP5mPhvQx5ww0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Np2m+hYL4FwvJs6AjgHD+uBByauPl0apwgFsezPAlPxcuQDcJz4nB2zc7cH3Ow3Jp/wTrR+sCr+oCutu2nXNhkHloAxhcomI2aG/SqkhcT/LfUTGKMVqhggoit4qPhj6WEcmk0ukt03zp8DYdNyI6nnIRvdfNNFi3vgDeCijN9Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Yvnwog5v; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1755244647; c=relaxed/simple;
+	bh=S3PyHRya11+qZZoLBhC4j0hGymegURexx3ja0gfDP5k=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=X1V7T1pnszYtG82YgtBl3h0BvS3fZwVXpILO68q0iEpGSTuly3eKqc2D82HPmh0VqxBTzeslOBspYY0sBY8Qy4tld4dlcI+uWMC5d52as+bN2ZyHnnl3Mpal/SEvxfXa0UUk6cyLDnAGoGH4ma2euuNvS8Ws0JvHEDlWylbx52g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qj9AzmOc; arc=none smtp.client-ip=209.85.221.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Yvnwog5v"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1755244607;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=EWsDiF5vtRFCTtnGcJOw9iCTkMsbr+/TFWlpxyZYcng=;
-	b=Yvnwog5v2M6aIp/cWQP75qPbv36r5RiM66eAyOiL2T6mU8EBZ7n1ejFit4YN2W+80yQ6IT
-	a8m3JZevn1jDfXfe2CG58NWEj9A0dyPpSQrsFJN/4sF8ZoyLKzzNtf9WAhVWk3zX5Z4AU2
-	2n+dKnbt+ClR7E2pAGkdthtBfGSL+cg=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-656-GGN4v-dMP-S8NfMvDMS_wg-1; Fri,
- 15 Aug 2025 03:56:45 -0400
-X-MC-Unique: GGN4v-dMP-S8NfMvDMS_wg-1
-X-Mimecast-MFC-AGG-ID: GGN4v-dMP-S8NfMvDMS_wg_1755244604
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E39D419775A6;
-	Fri, 15 Aug 2025 07:56:43 +0000 (UTC)
-Received: from localhost (unknown [10.72.116.153])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id BF62130001A2;
-	Fri, 15 Aug 2025 07:56:41 +0000 (UTC)
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: Ming Lei <ming.lei@redhat.com>,
-	Nilay Shroff <nilay@linux.ibm.com>,
-	Yu Kuai <yukuai3@huawei.com>
-Subject: [PATCH] blk-mq: fix lockdep warning in __blk_mq_update_nr_hw_queues
-Date: Fri, 15 Aug 2025 15:56:36 +0800
-Message-ID: <20250815075636.304660-1-ming.lei@redhat.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qj9AzmOc"
+Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-3b9e40ffdffso1387722f8f.2
+        for <linux-block@vger.kernel.org>; Fri, 15 Aug 2025 00:57:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1755244644; x=1755849444; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=JliYzecp+8vx7iCZ9GJLeCQ8PS5q6wpUw4vUME/s30E=;
+        b=qj9AzmOcz3WUQgVM4tdjs3eex1wsrDoeEJjNl3xnmVMPb08wEluHqA++N9Fe7RHUdB
+         QR0b4yXBfF5tJAYpDB6hsjyDuZf3pCQeYscuguRifQSaarqsHpJRBANyLjoEqyWUhgbR
+         lhZdNA9lHGeod6htN/XYU+av0ljusDFLNfNDPkOhYbxOyd7yuXTi1H85sB8WZ9ywbT2Y
+         d8KjLBdBQXU2+Q1xSHWszHt6DrKyKktAjc5IYK1sf9KBMd+f1e9/XEKCDpQTVK1Emlxs
+         ezwn/XtSjmuYQwV0zkwVOjcEZj2rdyf6u8O3OrJzggQhl0M30WNnABVso9ChiDg8rjlN
+         QGXQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755244644; x=1755849444;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=JliYzecp+8vx7iCZ9GJLeCQ8PS5q6wpUw4vUME/s30E=;
+        b=EgcaxMJuv1AZj0mFQ6k4kG3rCm+ISpwt3boG+tb2U8vlYZiMIWUbC/9M7T6B8HaQkM
+         MjqHvH628Yrn6VBxNcw906ynf6PAdJjL9bX7nfST98bIc2tCrPzL/Xsiz/Yvas/q5Mf4
+         3KTEsjwFqAbxJMaRCSKtVXBDV7Uk/JpzD/rg7tglm1rOpUbiZ369a8xkvmJXhnNwz4qB
+         iXikHMWEI/lAIGg2PYl1oguOyZ/tF0yblAW4HEGZh21Mqb81KK5rSzPGzRgqmX+qhkpn
+         zZWzOHBJZh1b6Z0qCypIXxLbY2f0Z8Wdp6YFtsAqaeBSJUaNu5wGFDkU+TM7U1OLV7Yi
+         LKpw==
+X-Forwarded-Encrypted: i=1; AJvYcCVj5JcRl34XRlCkOpV0U4BLFHg0MWX+sabvMOoe5zYK+I3Q/fnSPkWo0DOBZEyw+p1EVPHvNpgmdNa0tA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzSABuiFbYBHPT/hMMx9bdwlltriyWPYneyREWT8Nihf28Naj7w
+	AkO0yzBjpEeO2zb9kUPGKwmnXsZdRzgLbx7kdlcTMcbsVDW1wMNrOCNA+mUkgUylGcBWxECsAt8
+	HgC3cfZti2H9ljFdVrg==
+X-Google-Smtp-Source: AGHT+IF4UAIGeGPcDCFJRIRqOWfB2t00wIC/GdVYBLo4fLARPgG9tdEIjrdMKNGCFc4KqwkU7tZqFWVeQcaemCw=
+X-Received: from wmbep25.prod.google.com ([2002:a05:600c:8419:b0:456:2003:32a5])
+ (user=aliceryhl job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a5d:5850:0:b0:3a4:e68e:d33c with SMTP id ffacd0b85a97d-3bb693b1d7dmr874644f8f.47.1755244644250;
+ Fri, 15 Aug 2025 00:57:24 -0700 (PDT)
+Date: Fri, 15 Aug 2025 07:57:23 +0000
+In-Reply-To: <20250815-rnull-up-v6-16-v5-5-581453124c15@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Mime-Version: 1.0
+References: <20250815-rnull-up-v6-16-v5-0-581453124c15@kernel.org> <20250815-rnull-up-v6-16-v5-5-581453124c15@kernel.org>
+Message-ID: <aJ7oY9pxlrnfAv8s@google.com>
+Subject: Re: [PATCH v5 05/18] rust: str: introduce `kstrtobool` function
+From: Alice Ryhl <aliceryhl@google.com>
+To: Andreas Hindborg <a.hindborg@kernel.org>
+Cc: Boqun Feng <boqun.feng@gmail.com>, Miguel Ojeda <ojeda@kernel.org>, 
+	Alex Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>, 
+	"=?utf-8?B?QmrDtnJu?= Roy Baron" <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>, 
+	Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
+	Breno Leitao <leitao@debian.org>, linux-block@vger.kernel.org, 
+	rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
 
-Commit 5989bfe6ac6b ("block: restore two stage elevator switch while
-running nr_hw_queue update") reintroduced a lockdep warning by calling
-blk_mq_freeze_queue_nomemsave() before switching the I/O scheduler.
+On Fri, Aug 15, 2025 at 09:30:40AM +0200, Andreas Hindborg wrote:
+> Add a Rust wrapper for the kernel's `kstrtobool` function that converts
+> common user inputs into boolean values.
+> 
+> Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
+> ---
+>  rust/kernel/str.rs | 58 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 58 insertions(+)
+> 
+> diff --git a/rust/kernel/str.rs b/rust/kernel/str.rs
+> index d8326f7bc9c1..5611f7846dc0 100644
+> --- a/rust/kernel/str.rs
+> +++ b/rust/kernel/str.rs
+> @@ -4,6 +4,7 @@
+>  
+>  use crate::{
+>      alloc::{flags::*, AllocError, KVec},
+> +    error::Result,
+>      fmt::{self, Write},
+>      prelude::*,
+>  };
+> @@ -920,6 +921,63 @@ fn write_str(&mut self, s: &str) -> fmt::Result {
+>      }
+>  }
+>  
+> +/// Convert common user inputs into boolean values using the kernel's `kstrtobool` function.
+> +///
+> +/// This routine returns `Ok(bool)` if the first character is one of 'YyTt1NnFf0', or
+> +/// \[oO\]\[NnFf\] for "on" and "off". Otherwise it will return `Err(EINVAL)`.
+> +///
+> +/// # Examples
+> +///
+> +/// ```
+> +/// # use kernel::{c_str, str::kstrtobool};
+> +///
+> +/// // Lowercase
+> +/// assert_eq!(kstrtobool(c_str!("true")), Ok(true));
+> +/// assert_eq!(kstrtobool(c_str!("tr")), Ok(true));
+> +/// assert_eq!(kstrtobool(c_str!("t")), Ok(true));
+> +/// assert_eq!(kstrtobool(c_str!("twrong")), Ok(true));
+> +/// assert_eq!(kstrtobool(c_str!("false")), Ok(false));
+> +/// assert_eq!(kstrtobool(c_str!("f")), Ok(false));
+> +/// assert_eq!(kstrtobool(c_str!("yes")), Ok(true));
+> +/// assert_eq!(kstrtobool(c_str!("no")), Ok(false));
+> +/// assert_eq!(kstrtobool(c_str!("on")), Ok(true));
+> +/// assert_eq!(kstrtobool(c_str!("off")), Ok(false));
+> +///
+> +/// // Camel case
+> +/// assert_eq!(kstrtobool(c_str!("True")), Ok(true));
+> +/// assert_eq!(kstrtobool(c_str!("False")), Ok(false));
+> +/// assert_eq!(kstrtobool(c_str!("Yes")), Ok(true));
+> +/// assert_eq!(kstrtobool(c_str!("No")), Ok(false));
+> +/// assert_eq!(kstrtobool(c_str!("On")), Ok(true));
+> +/// assert_eq!(kstrtobool(c_str!("Off")), Ok(false));
+> +///
+> +/// // All caps
+> +/// assert_eq!(kstrtobool(c_str!("TRUE")), Ok(true));
+> +/// assert_eq!(kstrtobool(c_str!("FALSE")), Ok(false));
+> +/// assert_eq!(kstrtobool(c_str!("YES")), Ok(true));
+> +/// assert_eq!(kstrtobool(c_str!("NO")), Ok(false));
+> +/// assert_eq!(kstrtobool(c_str!("ON")), Ok(true));
+> +/// assert_eq!(kstrtobool(c_str!("OFF")), Ok(false));
+> +///
+> +/// // Numeric
+> +/// assert_eq!(kstrtobool(c_str!("1")), Ok(true));
+> +/// assert_eq!(kstrtobool(c_str!("0")), Ok(false));
+> +///
+> +/// // Invalid input
+> +/// assert_eq!(kstrtobool(c_str!("invalid")), Err(EINVAL));
+> +/// assert_eq!(kstrtobool(c_str!("2")), Err(EINVAL));
+> +/// ```
+> +pub fn kstrtobool(string: &CStr) -> Result<bool> {
+> +    let mut result: bool = false;
+> +
+> +    // SAFETY: `string` is a valid null-terminated C string, and `result` is a valid
+> +    // pointer to a bool that we own.
+> +    let ret =
+> +        unsafe { bindings::kstrtobool(string.as_char_ptr(), core::ptr::from_mut(&mut result)) };
 
-The function blk_mq_elv_switch_none() calls elevator_change_done().
-Running this while the queue is frozen causes a lockdep warning.
+Using ptr::from_mut here seesm excessive IMO. I think that function
+makes sense when it replaces an explicit `as` cast, but now when it can
+be done by a coercion. This is perfectly readable:
 
-Fix this by reordering the operations: first, switch the I/O scheduler
-to 'none', and then freeze the queue. This ensures that elevator_change_done()
-is not called on an already frozen queue. And this way is safe because
-elevator_set_none() does freeze queue before switching to none.
+let ret = unsafe { bindings::kstrtobool(string.as_char_ptr(), &mut result) };
 
-Also we still have to rely on blk_mq_elv_switch_back() for switching
-back, and it has to cover unfrozen queue case.
+Or if you insist, you could directly create a raw pointer:
 
-Cc: Nilay Shroff <nilay@linux.ibm.com>
-Cc: Yu Kuai <yukuai3@huawei.com>
-Fixes: 5989bfe6ac6b ("block: restore two stage elevator switch while running nr_hw_queue update")
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq.c   | 13 +++++++------
- block/blk.h      |  2 +-
- block/elevator.c | 12 +++++++++---
- 3 files changed, 17 insertions(+), 10 deletions(-)
+let ret = unsafe { bindings::kstrtobool(string.as_char_ptr(), &raw mut result) };
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index b67d6c02eceb..9c62781c6b8c 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -4974,13 +4974,13 @@ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
-  * Switch back to the elevator type stored in the xarray.
-  */
- static void blk_mq_elv_switch_back(struct request_queue *q,
--		struct xarray *elv_tbl, struct xarray *et_tbl)
-+		struct xarray *elv_tbl, struct xarray *et_tbl, bool frozen)
- {
- 	struct elevator_type *e = xa_load(elv_tbl, q->id);
- 	struct elevator_tags *t = xa_load(et_tbl, q->id);
- 
- 	/* The elv_update_nr_hw_queues unfreezes the queue. */
--	elv_update_nr_hw_queues(q, e, t);
-+	elv_update_nr_hw_queues(q, e, t, frozen);
- 
- 	/* Drop the reference acquired in blk_mq_elv_switch_none. */
- 	if (e)
-@@ -5033,6 +5033,7 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
- 	unsigned int memflags;
- 	int i;
- 	struct xarray elv_tbl, et_tbl;
-+	bool queues_frozen = false;
- 
- 	lockdep_assert_held(&set->tag_list_lock);
- 
-@@ -5056,9 +5057,6 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
- 		blk_mq_sysfs_unregister_hctxs(q);
- 	}
- 
--	list_for_each_entry(q, &set->tag_list, tag_set_list)
--		blk_mq_freeze_queue_nomemsave(q);
--
- 	/*
- 	 * Switch IO scheduler to 'none', cleaning up the data associated
- 	 * with the previous scheduler. We will switch back once we are done
-@@ -5068,6 +5066,9 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
- 		if (blk_mq_elv_switch_none(q, &elv_tbl))
- 			goto switch_back;
- 
-+	list_for_each_entry(q, &set->tag_list, tag_set_list)
-+		blk_mq_freeze_queue_nomemsave(q);
-+	queues_frozen = true;
- 	if (blk_mq_realloc_tag_set_tags(set, nr_hw_queues) < 0)
- 		goto switch_back;
- 
-@@ -5092,7 +5093,7 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
- switch_back:
- 	/* The blk_mq_elv_switch_back unfreezes queue for us. */
- 	list_for_each_entry(q, &set->tag_list, tag_set_list)
--		blk_mq_elv_switch_back(q, &elv_tbl, &et_tbl);
-+		blk_mq_elv_switch_back(q, &elv_tbl, &et_tbl, queues_frozen);
- 
- 	list_for_each_entry(q, &set->tag_list, tag_set_list) {
- 		blk_mq_sysfs_register_hctxs(q);
-diff --git a/block/blk.h b/block/blk.h
-index 0a2eccf28ca4..601db258c00d 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -332,7 +332,7 @@ bool blk_bio_list_merge(struct request_queue *q, struct list_head *list,
- bool blk_insert_flush(struct request *rq);
- 
- void elv_update_nr_hw_queues(struct request_queue *q, struct elevator_type *e,
--		struct elevator_tags *t);
-+		struct elevator_tags *t, bool frozen);
- void elevator_set_default(struct request_queue *q);
- void elevator_set_none(struct request_queue *q);
- 
-diff --git a/block/elevator.c b/block/elevator.c
-index fe96c6f4753c..0644b2d35ecb 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -706,24 +706,30 @@ static int elevator_change(struct request_queue *q, struct elv_change_ctx *ctx)
-  * reattachment when nr_hw_queues changes.
-  */
- void elv_update_nr_hw_queues(struct request_queue *q, struct elevator_type *e,
--		struct elevator_tags *t)
-+		struct elevator_tags *t, bool frozen)
- {
- 	struct blk_mq_tag_set *set = q->tag_set;
- 	struct elv_change_ctx ctx = {};
- 	int ret = -ENODEV;
- 
--	WARN_ON_ONCE(q->mq_freeze_depth == 0);
-+	WARN_ON_ONCE(frozen == (q->mq_freeze_depth == 0));
- 
- 	if (e && !blk_queue_dying(q) && blk_queue_registered(q)) {
- 		ctx.name = e->elevator_name;
- 		ctx.et = t;
- 
-+		/* elevator switch requires queue to be frozen */
-+		if (!frozen) {
-+			blk_mq_freeze_queue_nomemsave(q);
-+			frozen = true;
-+		}
- 		mutex_lock(&q->elevator_lock);
- 		/* force to reattach elevator after nr_hw_queue is updated */
- 		ret = elevator_switch(q, &ctx);
- 		mutex_unlock(&q->elevator_lock);
- 	}
--	blk_mq_unfreeze_queue_nomemrestore(q);
-+	if (frozen)
-+		blk_mq_unfreeze_queue_nomemrestore(q);
- 	if (!ret)
- 		WARN_ON_ONCE(elevator_change_done(q, &ctx));
- 	/*
--- 
-2.50.1
-
+Alice
