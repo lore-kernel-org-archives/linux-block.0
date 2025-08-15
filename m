@@ -1,126 +1,105 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from m16.mail.126.com (m16.mail.126.com [117.135.210.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D8BA23A9A0;
-	Fri, 15 Aug 2025 09:05:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D271424E4BD;
+	Fri, 15 Aug 2025 09:08:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755248743; cv=none; b=rJEM+jo3TBIoXznLUinYK4kmETGOP5B0K12dfvpqEqkhu0mGxdQrWcDGrNtzfE5CzGaM6KNGetW+Mm0xa4jiIkHSh1lx+9UJaKHet1cZZyfMK2JVunu0wZAz3UadAf6OkIbksXojEAyFXjDGYYCydfaMavWLO8opkwI/OpUdwE8=
+	t=1755248941; cv=none; b=cFXCa/jF7d0UpP8Tx2BfqU6YqnZnDcZurG1I4cZq8O0c2Gpme94wXZ3Phr5of51q/kC2xbM0mYcqKq2/PscxMy41b7l7m/4WcdbXQ8t1H4CWZmLsaJiC4fNW4kaK0QWOmoHhqusmSKTQqsNeMlqv1x1FdiPoZT5I0PzojlcQBY0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755248743; c=relaxed/simple;
-	bh=mKc1P53XG+rCnhVoLPZgdTOwUUOpQ4S+OcCGACdQcfo=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=PCs3lRrE4tSB2nZrpyxZE9jYG6JLpNbR/sdmEs0w6MPQdiBCrIlmj0d4inarOhfOX3tSRLvDvixdLhvyLoCO7mG3au9FbEjMyDBoFlTZ676KIVCApVQWJEE7p5KtRr5vSGMYUh+qS4gXYPjB4pWCRKCpdRynN1h/821TLVEwseY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4c3GRP4dy4zYQvDL;
-	Fri, 15 Aug 2025 17:05:37 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 426D61A06D7;
-	Fri, 15 Aug 2025 17:05:36 +0800 (CST)
-Received: from [10.174.179.143] (unknown [10.174.179.143])
-	by APP4 (Coremail) with SMTP id gCh0CgBHwhJe+J5oBoQDDw--.54303S3;
-	Fri, 15 Aug 2025 17:05:36 +0800 (CST)
-Subject: Re: [PATCH 00/10] blk-mq: fix blk_mq_tags double free while
- nr_requests grown
-To: Ming Lei <ming.lei@redhat.com>, Yu Kuai <yukuai1@huaweicloud.com>
-Cc: axboe@kernel.dk, hare@suse.de, nilay@linux.ibm.com,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- yi.zhang@huawei.com, yangerkun@huawei.com, johnny.chenyi@huawei.com,
- "yukuai (C)" <yukuai3@huawei.com>
-References: <20250815080216.410665-1-yukuai1@huaweicloud.com>
- <aJ7wMFkuTewlyx1P@fedora>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <abde1955-d634-29d4-d229-df8c6ebdc582@huaweicloud.com>
-Date: Fri, 15 Aug 2025 17:05:34 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.1
+	s=arc-20240116; t=1755248941; c=relaxed/simple;
+	bh=Ib0rLmgRr75p5p+Us9QCh6/Rw0bcD0RjRsjyrx2Zh+Q=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=a5oohIU7n0oMM4+CL65TMuICopEhBkoOIlsVobDuXsbpuuwuP+b5nLnP6nRN51OVSWLdwDyhcMWdaK80GlF5V+J7oTiUrCa4tC9wpDRDJxtJppsJkh0u89IxOLx88Me9TKx7H/SNk4gnAne0IE5+pOVvLIthQgihKopgOKOG4LI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=126.com; spf=pass smtp.mailfrom=126.com; dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b=XeJrVWWw; arc=none smtp.client-ip=117.135.210.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=126.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=126.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b="XeJrVWWw"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=126.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=ny
+	5ii1rw2MF2Sep0fJUZ8uqET0SiKpLe8TvBVtoY/us=; b=XeJrVWWwdJqMuZIGV+
+	Ladviyyc1vu0WFBgyqP2hrVfXpmjKkn2rQwwyd6bCS9tzphU35+rCDJNyFryLnie
+	7tw2CdsobzcaR+uPfWL4nX2InZuA0npIEpox++Wwqr4B3n5N56Ksnjicm29AvIPD
+	tFsn9+4cFJM2XTDR4UejsAt3o=
+Received: from localhost.localdomain (unknown [])
+	by gzga-smtp-mtada-g1-3 (Coremail) with SMTP id _____wD3r1La+J5own4VCA--.56213S4;
+	Fri, 15 Aug 2025 17:07:57 +0800 (CST)
+From: Genjian <zhanggenjian@126.com>
+To: axboe@kernel.dk,
+	dlemoal@kernel.org,
+	shinichiro.kawasaki@wdc.com,
+	johannes.thumshirn@wdc.com,
+	kch@nvidia.com,
+	zhengqixing@huawei.com,
+	willy@infradead.org,
+	namcao@linutronix.de,
+	vincent.fu@samsung.com
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	zhanggenjian@126.com,
+	Genjian Zhang <zhanggenjian@kylinos.cn>
+Subject: [PATCH v2] null_blk: Fix the description of the cache_size module argument
+Date: Fri, 15 Aug 2025 17:07:32 +0800
+Message-Id: <20250815090732.1813343-1-zhanggenjian@126.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <aJ7wMFkuTewlyx1P@fedora>
-Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgBHwhJe+J5oBoQDDw--.54303S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7AF1kJr4fGF4fWr4rur4fuFg_yoW8ZrWUpw
-	4rWayakrs0qw18Jw4xJ34Fqw10yw4v9ryagryFyry8G3Z8XFWIvr4FqFsFqF97ur93GFsF
-	9FZ7Xan7ZFZrZFDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUB214x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
-	0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x
-	0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E
-	7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcV
-	C0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF
-	04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r4j6F4UMIIF0xvEx4A2jsIEc7
-	CjxVAFwI0_Gr1j6F4UJbIYCTnIWIevJa73UjIFyTuYvjfUonmRUUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CM-TRANSID:_____wD3r1La+J5own4VCA--.56213S4
+X-Coremail-Antispam: 1Uf129KBjvJXoW7ZFyUury7GFyrWrWrJw1kXwb_yoW8WryUpr
+	ZrAF18JrW29F109a1DGws3ZFy5Ja48JFWYg3yak34Yvr4fXryxAwnrtas8urWUJ347Ar4f
+	ZF9rXasagFyDCaUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0zEf-P5UUUUU=
+X-CM-SenderInfo: x2kd0wxjhqyxldq6ij2wof0z/1tbi5Qqqfmie920V5gAAsk
 
-Hi,
+From: Genjian Zhang <zhanggenjian@kylinos.cn>
 
-ÔÚ 2025/08/15 16:30, Ming Lei Ð´µÀ:
-> On Fri, Aug 15, 2025 at 04:02:06PM +0800, Yu Kuai wrote:
->> From: Yu Kuai <yukuai3@huawei.com>
->>
->> In the case user trigger tags grow by queue sysfs attribute nr_requests,
->> hctx->sched_tags will be freed directly and replaced with a new
->> allocated tags, see blk_mq_tag_update_depth().
->>
->> The problem is that hctx->sched_tags is from elevator->et->tags, while
->> et->tags is still the freed tags, hence later elevator exist will try to
->> free the tags again, causing kernel panic.
->>
->> patch 1-6 are prep cleanup and refactor patches for updating nr_requests
->> patch 7,8 are the fix patches for the regression
->> patch 9 is cleanup patch after patch 8
->> patch 10 fix the stale nr_requests documentation
-> 
-> Please do not mix bug(regression) fix with cleanup.
-> 
-> The bug fix for updating nr_requests should have been simple enough in single
-> or two patches, why do you make 10-patches for dealing with the regression?
+When executing modinfo null_blk, there is an error in the description
+of module parameter mbps, and the output information of cache_size is
+incomplete.The output of modinfo before and after applying this patch
+is as follows:
 
-Ok, in short, my solution is:
+Before:
+[...]
+parm:           cache_size:ulong
+[...]
+parm:           mbps:Cache size in MiB for memory-backed device.
+		Default: 0 (none) (uint)
+[...]
 
-- serialize switching elevator with updating nr_requests
-- check the case that nr_requests will grow and allocate elevator_tags
-before freezing the queue.
-- for the grow case, switch to new elevator_tags.
+After:
+[...]
+parm:           cache_size:Cache size in MiB for memory-backed device.
+		Default: 0 (none) (ulong)
+[...]
+parm:           mbps:Limit maximum bandwidth (in MiB/s).
+		Default: 0 (no limit) (uint)
+[...]
 
-I do tried and I can't find a easy way to fix this without making
-related code uncomfortable. Perhaps because I do the cleanups and
-refactor first and I can't think outside the box...
+Fixes: 058efe000b31 ("null_blk: add module parameters for 4 options")
+Signed-off-by: Genjian Zhang <zhanggenjian@kylinos.cn>
+Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
+---
+ drivers/block/null_blk/main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> 
-> Not mention this way is really unfriendly for stable tree backport.
-
-I checked the last time related code to queue_requests_store() was
-changed is commit 3efe7571c3ae ("block: protect nr_requests update using
-q->elevator_lock"), and I believe this is what the fixed patch relied
-on, so I think backport will not have much conflicts.
-
-Whatever stbale branch that f5a6604f7a44 ("block: fix lockdep warning
-caused by lock dependency in elv_iosched_store") is backported, I can
-make sure a proper fix is backported as well.
-
-Thanks,
-Kuai
-
-> 
-> 
-> Thanks,
-> Ming
-> 
-> 
-> .
-> 
+diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
+index 91642c9a3b29..f982027e8c85 100644
+--- a/drivers/block/null_blk/main.c
++++ b/drivers/block/null_blk/main.c
+@@ -223,7 +223,7 @@ MODULE_PARM_DESC(discard, "Support discard operations (requires memory-backed nu
+ 
+ static unsigned long g_cache_size;
+ module_param_named(cache_size, g_cache_size, ulong, 0444);
+-MODULE_PARM_DESC(mbps, "Cache size in MiB for memory-backed device. Default: 0 (none)");
++MODULE_PARM_DESC(cache_size, "Cache size in MiB for memory-backed device. Default: 0 (none)");
+ 
+ static bool g_fua = true;
+ module_param_named(fua, g_fua, bool, 0444);
+-- 
+2.25.1
 
