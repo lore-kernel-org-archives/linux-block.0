@@ -1,43 +1,54 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E7ED10E0;
-	Fri, 15 Aug 2025 07:53:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAC8D2BF00D
+	for <linux-block@vger.kernel.org>; Fri, 15 Aug 2025 07:56:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755244393; cv=none; b=hJtnrSYj9PjSX1WteElfDIwr9zsHLTfhkf8Nq1OnVbWffP1PJsJ43X6YJVaeDVpaPYKFGadG0yoJ0T+kW8rj9yGV4KKe8baospsq5qWVglPLedELN3kHDrbtwOMNeHRC6mR84loWx02NQvSYoRzQtgv89gVUFxVWlLf7tmMN90g=
+	t=1755244611; cv=none; b=h2BdsviYV9cVp1txiEcIE249/R59klcq4Zn4D39kOeXDEotTYCD7oDVm9EWuCI8WgH1TGSetsjxSsxLZHOcYuhgkNfncxHIhCfrI/g1VfKFIaq/+/7gfG+vNS25qhfzQIaiG7SLz/RkMxZsQHczn77+RoCkGeM0kJdRLFJTTjqw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755244393; c=relaxed/simple;
-	bh=E/nbNwfWlTTVzsAK1l2kL2cE73vo/5eDQGqNnWJ1A7Q=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ZXdZkhRQ35l5xGt6SzCBPkbbBsXDD+BdrYRh6KTTNnhMqPOJBWR+AyXHujSeuQ6+/yrKw9CVSeMGh6lxPkuBfMaKpUbmSb+vyeGjlNtRYQ8rkRCXvutTGEV7Eyhr7klxcsXG5wDpfW/BelBBYGXu9cFaB3ype95JZX9u1mtoJXk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4c3Dqn0l9DzYQv7h;
-	Fri, 15 Aug 2025 15:53:09 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id A9A191A0359;
-	Fri, 15 Aug 2025 15:53:07 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.104.67])
-	by APP4 (Coremail) with SMTP id gCh0CgDnrxBh555oQLj9Dg--.33563S4;
-	Fri, 15 Aug 2025 15:53:07 +0800 (CST)
-From: Yu Kuai <yukuai1@huaweicloud.com>
-To: nilay@linux.ibm.com,
-	ming.lei@redhat.com,
-	axboe@kernel.dk,
-	bvanassche@acm.org
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	yukuai3@huawei.com,
-	yukuai1@huaweicloud.com,
-	yi.zhang@huawei.com,
-	yangerkun@huawei.com,
-	johnny.chenyi@huawei.com
-Subject: [PATCH] blk-mq: fix elevator depth_updated method
-Date: Fri, 15 Aug 2025 15:45:17 +0800
-Message-Id: <20250815074517.367896-1-yukuai1@huaweicloud.com>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1755244611; c=relaxed/simple;
+	bh=ej/G+JfUURwKhwbXMGuX/6ZSVouqwIMP5mPhvQx5ww0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Np2m+hYL4FwvJs6AjgHD+uBByauPl0apwgFsezPAlPxcuQDcJz4nB2zc7cH3Ow3Jp/wTrR+sCr+oCutu2nXNhkHloAxhcomI2aG/SqkhcT/LfUTGKMVqhggoit4qPhj6WEcmk0ukt03zp8DYdNyI6nnIRvdfNNFi3vgDeCijN9Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Yvnwog5v; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Yvnwog5v"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1755244607;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=EWsDiF5vtRFCTtnGcJOw9iCTkMsbr+/TFWlpxyZYcng=;
+	b=Yvnwog5v2M6aIp/cWQP75qPbv36r5RiM66eAyOiL2T6mU8EBZ7n1ejFit4YN2W+80yQ6IT
+	a8m3JZevn1jDfXfe2CG58NWEj9A0dyPpSQrsFJN/4sF8ZoyLKzzNtf9WAhVWk3zX5Z4AU2
+	2n+dKnbt+ClR7E2pAGkdthtBfGSL+cg=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-656-GGN4v-dMP-S8NfMvDMS_wg-1; Fri,
+ 15 Aug 2025 03:56:45 -0400
+X-MC-Unique: GGN4v-dMP-S8NfMvDMS_wg-1
+X-Mimecast-MFC-AGG-ID: GGN4v-dMP-S8NfMvDMS_wg_1755244604
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E39D419775A6;
+	Fri, 15 Aug 2025 07:56:43 +0000 (UTC)
+Received: from localhost (unknown [10.72.116.153])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id BF62130001A2;
+	Fri, 15 Aug 2025 07:56:41 +0000 (UTC)
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: Ming Lei <ming.lei@redhat.com>,
+	Nilay Shroff <nilay@linux.ibm.com>,
+	Yu Kuai <yukuai3@huawei.com>
+Subject: [PATCH] blk-mq: fix lockdep warning in __blk_mq_update_nr_hw_queues
+Date: Fri, 15 Aug 2025 15:56:36 +0800
+Message-ID: <20250815075636.304660-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -45,260 +56,141 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgDnrxBh555oQLj9Dg--.33563S4
-X-Coremail-Antispam: 1UD129KBjvJXoW3AF4xWFyfGF4fZFyUKr17KFg_yoWfJr4UpF
-	W5tanrKryrtF4UuFWjy39xXw43K39agry2yFs3t34rKrZFgFs3XF1rGFyxXFWIqrZ5CFsr
-	Zr4kta4DXr1Iq3JanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9Y14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
-	Y2ka0xkIwI1lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x
-	0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2
-	zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF
-	4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWU
-	CwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCT
-	nIWIevJa73UjIFyTuYvjfUonmRUUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-From: Yu Kuai <yukuai3@huawei.com>
+Commit 5989bfe6ac6b ("block: restore two stage elevator switch while
+running nr_hw_queue update") reintroduced a lockdep warning by calling
+blk_mq_freeze_queue_nomemsave() before switching the I/O scheduler.
 
-Current depth_updated has some problems:
+The function blk_mq_elv_switch_none() calls elevator_change_done().
+Running this while the queue is frozen causes a lockdep warning.
 
-1) depth_updated() will be called for each hctx, while all elevators
-will update async_depth for the disk level, this is not related to hctx;
-2) In blk_mq_update_nr_requests(), if previous hctx update succeed and
-this hctx update failed, q->nr_requests will not be updated, while
-async_depth is already updated with new nr_reqeuests in previous
-depth_updated();
-3) All elevators are using q->nr_requests to calculate async_depth now,
-however, q->nr_requests is still the old value when depth_updated() is
-called from blk_mq_update_nr_requests();
+Fix this by reordering the operations: first, switch the I/O scheduler
+to 'none', and then freeze the queue. This ensures that elevator_change_done()
+is not called on an already frozen queue. And this way is safe because
+elevator_set_none() does freeze queue before switching to none.
 
-Fix those problems by:
+Also we still have to rely on blk_mq_elv_switch_back() for switching
+back, and it has to cover unfrozen queue case.
 
-- pass in request_queue instead of hctx;
-- move depth_updated() after q->nr_requests is updated in
-  blk_mq_update_nr_requests();
-- add depth_updated() call in blk_mq_init_sched();
-- remove init_hctx() method for mq-deadline and bfq that is useless now;
-
-Fixes: 77f1e0a52d26 ("bfq: update internal depth state when queue depth changes")
-Fixes: 39823b47bbd4 ("block/mq-deadline: Fix the tag reservation code")
-Fixes: 42e6c6ce03fd ("lib/sbitmap: convert shallow_depth from one word to the whole sbitmap")
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+Cc: Nilay Shroff <nilay@linux.ibm.com>
+Cc: Yu Kuai <yukuai3@huawei.com>
+Fixes: 5989bfe6ac6b ("block: restore two stage elevator switch while running nr_hw_queue update")
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/bfq-iosched.c   | 21 ++++-----------------
- block/blk-mq-sched.c  |  3 +++
- block/blk-mq-sched.h  | 11 +++++++++++
- block/blk-mq.c        | 23 ++++++++++++-----------
- block/elevator.h      |  2 +-
- block/kyber-iosched.c | 10 ++++------
- block/mq-deadline.c   | 15 ++-------------
- 7 files changed, 37 insertions(+), 48 deletions(-)
+ block/blk-mq.c   | 13 +++++++------
+ block/blk.h      |  2 +-
+ block/elevator.c | 12 +++++++++---
+ 3 files changed, 17 insertions(+), 10 deletions(-)
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 50e51047e1fe..c0c398998aa1 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -7109,9 +7109,10 @@ void bfq_put_async_queues(struct bfq_data *bfqd, struct bfq_group *bfqg)
-  * See the comments on bfq_limit_depth for the purpose of
-  * the depths set in the function. Return minimum shallow depth we'll use.
-  */
--static void bfq_update_depths(struct bfq_data *bfqd, struct sbitmap_queue *bt)
-+static void bfq_depth_updated(struct request_queue *q)
- {
--	unsigned int nr_requests = bfqd->queue->nr_requests;
-+	struct bfq_data *bfqd = q->elevator->elevator_data;
-+	unsigned int nr_requests = q->nr_requests;
- 
- 	/*
- 	 * In-word depths if no bfq_queue is being weight-raised:
-@@ -7143,21 +7144,8 @@ static void bfq_update_depths(struct bfq_data *bfqd, struct sbitmap_queue *bt)
- 	bfqd->async_depths[1][0] = max((nr_requests * 3) >> 4, 1U);
- 	/* no more than ~37% of tags for sync writes (~20% extra tags) */
- 	bfqd->async_depths[1][1] = max((nr_requests * 6) >> 4, 1U);
--}
--
--static void bfq_depth_updated(struct blk_mq_hw_ctx *hctx)
--{
--	struct bfq_data *bfqd = hctx->queue->elevator->elevator_data;
--	struct blk_mq_tags *tags = hctx->sched_tags;
- 
--	bfq_update_depths(bfqd, &tags->bitmap_tags);
--	sbitmap_queue_min_shallow_depth(&tags->bitmap_tags, 1);
--}
--
--static int bfq_init_hctx(struct blk_mq_hw_ctx *hctx, unsigned int index)
--{
--	bfq_depth_updated(hctx);
--	return 0;
-+	blk_mq_set_min_shallow_depth(q, 1);
- }
- 
- static void bfq_exit_queue(struct elevator_queue *e)
-@@ -7628,7 +7616,6 @@ static struct elevator_type iosched_bfq_mq = {
- 		.request_merged		= bfq_request_merged,
- 		.has_work		= bfq_has_work,
- 		.depth_updated		= bfq_depth_updated,
--		.init_hctx		= bfq_init_hctx,
- 		.init_sched		= bfq_init_queue,
- 		.exit_sched		= bfq_exit_queue,
- 	},
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index e2ce4a28e6c9..bf7dd97422ec 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -585,6 +585,9 @@ int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e,
- 			}
- 		}
- 	}
-+
-+	if (e->ops.depth_updated)
-+		e->ops.depth_updated(q);
- 	return 0;
- 
- out:
-diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
-index b554e1d55950..fe83187f41db 100644
---- a/block/blk-mq-sched.h
-+++ b/block/blk-mq-sched.h
-@@ -92,4 +92,15 @@ static inline bool blk_mq_sched_needs_restart(struct blk_mq_hw_ctx *hctx)
- 	return test_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state);
- }
- 
-+static inline void blk_mq_set_min_shallow_depth(struct request_queue *q,
-+						unsigned int depth)
-+{
-+	struct blk_mq_hw_ctx *hctx;
-+	unsigned long i;
-+
-+	queue_for_each_hw_ctx(q, hctx, i)
-+		sbitmap_queue_min_shallow_depth(&hctx->sched_tags->bitmap_tags,
-+						depth);
-+}
-+
- #endif
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index b67d6c02eceb..9c68749124c6 100644
+index b67d6c02eceb..9c62781c6b8c 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -4951,20 +4951,21 @@ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
- 						      false);
- 		}
- 		if (ret)
--			break;
--		if (q->elevator && q->elevator->type->ops.depth_updated)
--			q->elevator->type->ops.depth_updated(hctx);
-+			goto out;
- 	}
--	if (!ret) {
--		q->nr_requests = nr;
--		if (blk_mq_is_shared_tags(set->flags)) {
--			if (q->elevator)
--				blk_mq_tag_update_sched_shared_tags(q);
--			else
--				blk_mq_tag_resize_shared_tags(set, nr);
--		}
-+
-+	q->nr_requests = nr;
-+	if (q->elevator && q->elevator->type->ops.depth_updated)
-+		q->elevator->type->ops.depth_updated(q);
-+
-+	if (blk_mq_is_shared_tags(set->flags)) {
-+		if (q->elevator)
-+			blk_mq_tag_update_sched_shared_tags(q);
-+		else
-+			blk_mq_tag_resize_shared_tags(set, nr);
- 	}
- 
-+out:
- 	blk_mq_unquiesce_queue(q);
- 
- 	return ret;
-diff --git a/block/elevator.h b/block/elevator.h
-index adc5c157e17e..c4d20155065e 100644
---- a/block/elevator.h
-+++ b/block/elevator.h
-@@ -37,7 +37,7 @@ struct elevator_mq_ops {
- 	void (*exit_sched)(struct elevator_queue *);
- 	int (*init_hctx)(struct blk_mq_hw_ctx *, unsigned int);
- 	void (*exit_hctx)(struct blk_mq_hw_ctx *, unsigned int);
--	void (*depth_updated)(struct blk_mq_hw_ctx *);
-+	void (*depth_updated)(struct request_queue *);
- 
- 	bool (*allow_merge)(struct request_queue *, struct request *, struct bio *);
- 	bool (*bio_merge)(struct request_queue *, struct bio *, unsigned int);
-diff --git a/block/kyber-iosched.c b/block/kyber-iosched.c
-index 70cbc7b2deb4..49ae52aa20d9 100644
---- a/block/kyber-iosched.c
-+++ b/block/kyber-iosched.c
-@@ -440,13 +440,12 @@ static void kyber_ctx_queue_init(struct kyber_ctx_queue *kcq)
- 		INIT_LIST_HEAD(&kcq->rq_list[i]);
- }
- 
--static void kyber_depth_updated(struct blk_mq_hw_ctx *hctx)
-+static void kyber_depth_updated(struct request_queue *q)
+@@ -4974,13 +4974,13 @@ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
+  * Switch back to the elevator type stored in the xarray.
+  */
+ static void blk_mq_elv_switch_back(struct request_queue *q,
+-		struct xarray *elv_tbl, struct xarray *et_tbl)
++		struct xarray *elv_tbl, struct xarray *et_tbl, bool frozen)
  {
--	struct kyber_queue_data *kqd = hctx->queue->elevator->elevator_data;
--	struct blk_mq_tags *tags = hctx->sched_tags;
-+	struct kyber_queue_data *kqd = q->elevator->elevator_data;
+ 	struct elevator_type *e = xa_load(elv_tbl, q->id);
+ 	struct elevator_tags *t = xa_load(et_tbl, q->id);
  
--	kqd->async_depth = hctx->queue->nr_requests * KYBER_ASYNC_PERCENT / 100U;
--	sbitmap_queue_min_shallow_depth(&tags->bitmap_tags, kqd->async_depth);
-+	kqd->async_depth = q->nr_requests * KYBER_ASYNC_PERCENT / 100U;
-+	blk_mq_set_min_shallow_depth(q, kqd->async_depth);
- }
+ 	/* The elv_update_nr_hw_queues unfreezes the queue. */
+-	elv_update_nr_hw_queues(q, e, t);
++	elv_update_nr_hw_queues(q, e, t, frozen);
  
- static int kyber_init_hctx(struct blk_mq_hw_ctx *hctx, unsigned int hctx_idx)
-@@ -493,7 +492,6 @@ static int kyber_init_hctx(struct blk_mq_hw_ctx *hctx, unsigned int hctx_idx)
- 	khd->batching = 0;
+ 	/* Drop the reference acquired in blk_mq_elv_switch_none. */
+ 	if (e)
+@@ -5033,6 +5033,7 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
+ 	unsigned int memflags;
+ 	int i;
+ 	struct xarray elv_tbl, et_tbl;
++	bool queues_frozen = false;
  
- 	hctx->sched_data = khd;
--	kyber_depth_updated(hctx);
+ 	lockdep_assert_held(&set->tag_list_lock);
  
- 	return 0;
+@@ -5056,9 +5057,6 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
+ 		blk_mq_sysfs_unregister_hctxs(q);
+ 	}
  
-diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-index b9b7cdf1d3c9..578bc79c5654 100644
---- a/block/mq-deadline.c
-+++ b/block/mq-deadline.c
-@@ -507,22 +507,12 @@ static void dd_limit_depth(blk_opf_t opf, struct blk_mq_alloc_data *data)
- }
+-	list_for_each_entry(q, &set->tag_list, tag_set_list)
+-		blk_mq_freeze_queue_nomemsave(q);
+-
+ 	/*
+ 	 * Switch IO scheduler to 'none', cleaning up the data associated
+ 	 * with the previous scheduler. We will switch back once we are done
+@@ -5068,6 +5066,9 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
+ 		if (blk_mq_elv_switch_none(q, &elv_tbl))
+ 			goto switch_back;
  
- /* Called by blk_mq_update_nr_requests(). */
--static void dd_depth_updated(struct blk_mq_hw_ctx *hctx)
-+static void dd_depth_updated(struct request_queue *q)
++	list_for_each_entry(q, &set->tag_list, tag_set_list)
++		blk_mq_freeze_queue_nomemsave(q);
++	queues_frozen = true;
+ 	if (blk_mq_realloc_tag_set_tags(set, nr_hw_queues) < 0)
+ 		goto switch_back;
+ 
+@@ -5092,7 +5093,7 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
+ switch_back:
+ 	/* The blk_mq_elv_switch_back unfreezes queue for us. */
+ 	list_for_each_entry(q, &set->tag_list, tag_set_list)
+-		blk_mq_elv_switch_back(q, &elv_tbl, &et_tbl);
++		blk_mq_elv_switch_back(q, &elv_tbl, &et_tbl, queues_frozen);
+ 
+ 	list_for_each_entry(q, &set->tag_list, tag_set_list) {
+ 		blk_mq_sysfs_register_hctxs(q);
+diff --git a/block/blk.h b/block/blk.h
+index 0a2eccf28ca4..601db258c00d 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -332,7 +332,7 @@ bool blk_bio_list_merge(struct request_queue *q, struct list_head *list,
+ bool blk_insert_flush(struct request *rq);
+ 
+ void elv_update_nr_hw_queues(struct request_queue *q, struct elevator_type *e,
+-		struct elevator_tags *t);
++		struct elevator_tags *t, bool frozen);
+ void elevator_set_default(struct request_queue *q);
+ void elevator_set_none(struct request_queue *q);
+ 
+diff --git a/block/elevator.c b/block/elevator.c
+index fe96c6f4753c..0644b2d35ecb 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -706,24 +706,30 @@ static int elevator_change(struct request_queue *q, struct elv_change_ctx *ctx)
+  * reattachment when nr_hw_queues changes.
+  */
+ void elv_update_nr_hw_queues(struct request_queue *q, struct elevator_type *e,
+-		struct elevator_tags *t)
++		struct elevator_tags *t, bool frozen)
  {
--	struct request_queue *q = hctx->queue;
- 	struct deadline_data *dd = q->elevator->elevator_data;
--	struct blk_mq_tags *tags = hctx->sched_tags;
+ 	struct blk_mq_tag_set *set = q->tag_set;
+ 	struct elv_change_ctx ctx = {};
+ 	int ret = -ENODEV;
  
- 	dd->async_depth = q->nr_requests;
--
--	sbitmap_queue_min_shallow_depth(&tags->bitmap_tags, 1);
--}
--
--/* Called by blk_mq_init_hctx() and blk_mq_init_sched(). */
--static int dd_init_hctx(struct blk_mq_hw_ctx *hctx, unsigned int hctx_idx)
--{
--	dd_depth_updated(hctx);
--	return 0;
-+	blk_mq_set_min_shallow_depth(q, 1);
- }
+-	WARN_ON_ONCE(q->mq_freeze_depth == 0);
++	WARN_ON_ONCE(frozen == (q->mq_freeze_depth == 0));
  
- static void dd_exit_sched(struct elevator_queue *e)
-@@ -1048,7 +1038,6 @@ static struct elevator_type mq_deadline = {
- 		.has_work		= dd_has_work,
- 		.init_sched		= dd_init_sched,
- 		.exit_sched		= dd_exit_sched,
--		.init_hctx		= dd_init_hctx,
- 	},
+ 	if (e && !blk_queue_dying(q) && blk_queue_registered(q)) {
+ 		ctx.name = e->elevator_name;
+ 		ctx.et = t;
  
- #ifdef CONFIG_BLK_DEBUG_FS
++		/* elevator switch requires queue to be frozen */
++		if (!frozen) {
++			blk_mq_freeze_queue_nomemsave(q);
++			frozen = true;
++		}
+ 		mutex_lock(&q->elevator_lock);
+ 		/* force to reattach elevator after nr_hw_queue is updated */
+ 		ret = elevator_switch(q, &ctx);
+ 		mutex_unlock(&q->elevator_lock);
+ 	}
+-	blk_mq_unfreeze_queue_nomemrestore(q);
++	if (frozen)
++		blk_mq_unfreeze_queue_nomemrestore(q);
+ 	if (!ret)
+ 		WARN_ON_ONCE(elevator_change_done(q, &ctx));
+ 	/*
 -- 
-2.39.2
+2.50.1
 
