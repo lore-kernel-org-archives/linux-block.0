@@ -1,113 +1,145 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B0FB21FF5F
-	for <linux-block@vger.kernel.org>; Fri, 15 Aug 2025 14:21:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E931C1E230E;
+	Fri, 15 Aug 2025 14:29:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755267667; cv=none; b=X66NWWnQQIx+hh9qy5uLxNL/RNz2BHAhPZ/6q6e1XLKeByWJ4nZOY+J7k2L7iqpj7TpzS0vMMHdI0qmcAvVHA1BZx4gKU2YEaR8HNd4VgcL6KCBOGUw+JChwLvcxoow3Gx9qPmuJb8/gz0TZFfzSC5NXfG3jjxNpbsppxoM8/p4=
+	t=1755268149; cv=none; b=jMShbJBWOfUuXKYQ/JD5stk5qu1hBquKi7r6z+WfzpXudUXxl3duHhk1wc+6Qx0lzIKzoCq6VxBmYQoR94xbbNTgHU0MQ2RgOwwfiQ+339cxNn6C4yjzlDvaliS0Y2xt9EuQ900mXqmi9aHFXNp9orZpyxJQjD1aKDh8X/bW1C0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755267667; c=relaxed/simple;
-	bh=CPxucYIm7oasvzLoBrismDQsuh+/GmgJfPSHxJvJ6lE=;
+	s=arc-20240116; t=1755268149; c=relaxed/simple;
+	bh=H81prq1QS9ngg/A1qE6OG7MnMnv7zcnpHYeSRdGdZx8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=A6wX0JhmJf9AP1J7aiUfsuJPAiSbG2IjTb0yLy1DgPHeDG1lnsLkxnhzDtvnmKa5sDMQMuWBsU7rU4OQWhLB+eecUnZfq2SBGSCK7XOe0TkwV6yHXTk1jCgxRW6bubpdM87DZRyACVz9GWIDmHK753xEETVmpsI5Mz0amXHr6ys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Zf10nnMl; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=LmnZjzKB0I23fV3BZt96Gfxoq0Qw8o2OMJ5/Qq+T/xOola8VpZKY0ZPkPrCxRrySmKPwhIdQxCqhfHuVxdM0Bs3f/kWpOMgNMCgi5ilrFQ/5O/NOL7SgUelqK1xVfDuV9ZPQB/CV0mZp4/W7hoGc414K2xjUh+GKFuNSpFCw44I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s69DztBf; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zf10nnMl"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1755267664;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=saGqJBJfNTgDTptPjcuyScrXSOaQQQGEpnWQeRSkQd4=;
-	b=Zf10nnMleKi4+sQCCNBW1LpfqjBZRsCHkBlJasT86qnKNFZAz8PSatZbk9r8YpiUvlgbGF
-	8kdb7sn0Z4KWl2gwDoUb0dgH5TF6LGL7BjtAINgGBfI0ABOuIAq3X06APLasG/wP9s4WJF
-	O3C5gMr+kqI9dwmGlHKGE2ENTv7j5CA=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-280-7vDJsnrvPD-MtH5Nghf2jw-1; Fri,
- 15 Aug 2025 10:20:59 -0400
-X-MC-Unique: 7vDJsnrvPD-MtH5Nghf2jw-1
-X-Mimecast-MFC-AGG-ID: 7vDJsnrvPD-MtH5Nghf2jw_1755267657
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E533619560B3;
-	Fri, 15 Aug 2025 14:20:55 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.16])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 25AE71955E89;
-	Fri, 15 Aug 2025 14:20:46 +0000 (UTC)
-Date: Fri, 15 Aug 2025 22:20:39 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Yu Kuai <yukuai1@huaweicloud.com>
-Cc: axboe@kernel.dk, hare@suse.de, nilay@linux.ibm.com,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	yi.zhang@huawei.com, yangerkun@huawei.com, johnny.chenyi@huawei.com,
-	"yukuai (C)" <yukuai3@huawei.com>
-Subject: Re: [PATCH 00/10] blk-mq: fix blk_mq_tags double free while
- nr_requests grown
-Message-ID: <aJ9CN_oeQERVgAoW@fedora>
-References: <20250815080216.410665-1-yukuai1@huaweicloud.com>
- <aJ7wMFkuTewlyx1P@fedora>
- <abde1955-d634-29d4-d229-df8c6ebdc582@huaweicloud.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s69DztBf"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF939C4CEEB;
+	Fri, 15 Aug 2025 14:29:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755268148;
+	bh=H81prq1QS9ngg/A1qE6OG7MnMnv7zcnpHYeSRdGdZx8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=s69DztBfXres7T+IGhWSm85kpDCZD1LuzBjTqvlPeazZ2xDoT7onrcIjC0CaPq8bs
+	 iD6N/+Zk/GT+qO4Ph8IN5wbiy8vunaKBWLp5btluDma1LO0TQFm/UeTe7cUSECYDhd
+	 DzGkZQIC1cHW6+P9IxTaGO+r8/nCY+AvJObL29xsrIxfGfEOyqHTP+DnWzN90UVIUd
+	 0ARf0GxAJW30/LZPs4pIVYqqTtSAX2Mh5ft7njos/J8iAMdMypui9QR0elLt3ThP5j
+	 AZ66f2EC/SlK7IDOn1Q1JLgG6Iare8/Wc96BkubrlFWA+SyzHZClNs1G44Ht9zQ41y
+	 +aC7ReJZAkj3A==
+Date: Fri, 15 Aug 2025 07:29:08 -0700
+From: "Darrick J. Wong" <djwong@kernel.org>
+To: Zhang Yi <yi.zhang@huaweicloud.com>
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+	dm-devel@lists.linux.dev, linux-nvme@lists.infradead.org,
+	linux-scsi@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-api@vger.kernel.org, hch@lst.de, tytso@mit.edu,
+	bmarzins@redhat.com, chaitanyak@nvidia.com,
+	shinichiro.kawasaki@wdc.com, brauner@kernel.org,
+	martin.petersen@oracle.com, yi.zhang@huawei.com,
+	chengzhihao1@huawei.com, yukuai3@huawei.com, yangerkun@huawei.com
+Subject: Re: [PATCH util-linux v2] fallocate: add FALLOC_FL_WRITE_ZEROES
+ support
+Message-ID: <20250815142908.GG7981@frogsfrogsfrogs>
+References: <20250813024015.2502234-1-yi.zhang@huaweicloud.com>
+ <20250814165218.GQ7942@frogsfrogsfrogs>
+ <a0eda581-ae6c-4b49-8b4f-7bb039b17487@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <abde1955-d634-29d4-d229-df8c6ebdc582@huaweicloud.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+In-Reply-To: <a0eda581-ae6c-4b49-8b4f-7bb039b17487@huaweicloud.com>
 
-On Fri, Aug 15, 2025 at 05:05:34PM +0800, Yu Kuai wrote:
-> Hi,
+On Fri, Aug 15, 2025 at 05:29:19PM +0800, Zhang Yi wrote:
+> Thank you for your review comments!
 > 
-> 在 2025/08/15 16:30, Ming Lei 写道:
-> > On Fri, Aug 15, 2025 at 04:02:06PM +0800, Yu Kuai wrote:
-> > > From: Yu Kuai <yukuai3@huawei.com>
-> > > 
-> > > In the case user trigger tags grow by queue sysfs attribute nr_requests,
-> > > hctx->sched_tags will be freed directly and replaced with a new
-> > > allocated tags, see blk_mq_tag_update_depth().
-> > > 
-> > > The problem is that hctx->sched_tags is from elevator->et->tags, while
-> > > et->tags is still the freed tags, hence later elevator exist will try to
-> > > free the tags again, causing kernel panic.
-> > > 
-> > > patch 1-6 are prep cleanup and refactor patches for updating nr_requests
-> > > patch 7,8 are the fix patches for the regression
-> > > patch 9 is cleanup patch after patch 8
-> > > patch 10 fix the stale nr_requests documentation
+> On 2025/8/15 0:52, Darrick J. Wong wrote:
+> > On Wed, Aug 13, 2025 at 10:40:15AM +0800, Zhang Yi wrote:
+> >> From: Zhang Yi <yi.zhang@huawei.com>
+> >>
+> >> The Linux kernel (since version 6.17) supports FALLOC_FL_WRITE_ZEROES in
+> >> fallocate(2). Add support for FALLOC_FL_WRITE_ZEROES to the fallocate
+> >> utility by introducing a new option -w|--write-zeroes.
+> >>
+> >> Link: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=278c7d9b5e0c
+> >> Signed-off-by: Zhang Yi <yi.zhang@huawei.com>
+> >> ---
+> >> v1->v2:
+> >>  - Minor description modification to align with the kernel.
+> >>
+> >>  sys-utils/fallocate.1.adoc | 11 +++++++++--
+> >>  sys-utils/fallocate.c      | 20 ++++++++++++++++----
+> >>  2 files changed, 25 insertions(+), 6 deletions(-)
+> >>
+> >> diff --git a/sys-utils/fallocate.1.adoc b/sys-utils/fallocate.1.adoc
+> >> index 44ee0ef4c..0ec9ff9a9 100644
+> >> --- a/sys-utils/fallocate.1.adoc
+> >> +++ b/sys-utils/fallocate.1.adoc
+> >> @@ -12,7 +12,7 @@ fallocate - preallocate or deallocate space to a file
 > > 
-> > Please do not mix bug(regression) fix with cleanup.
+> > <snip all the long lines>
 > > 
-> > The bug fix for updating nr_requests should have been simple enough in single
-> > or two patches, why do you make 10-patches for dealing with the regression?
+> >> +*-w*, *--write-zeroes*::
+> >> +Zeroes space in the byte range starting at _offset_ and continuing
+> >> for _length_ bytes. Within the specified range, blocks are
+> >> preallocated for the regions that span the holes in the file. After a
+> >> successful call, subsequent reads from this range will return zeroes,
+> >> subsequent writes to that range do not require further changes to the
+> >> file mapping metadata.
+> > 
+> > "...will return zeroes and subsequent writes to that range..." ?
+> > 
 > 
-> Ok, in short, my solution is:
+> Yeah.
 > 
-> - serialize switching elevator with updating nr_requests
-> - check the case that nr_requests will grow and allocate elevator_tags
-> before freezing the queue.
-> - for the grow case, switch to new elevator_tags.
+> >> ++
+> >> +Zeroing is done within the filesystem by preferably submitting write
+> > 
+> > I think we should say less about what the filesystem actually does to
+> > preserve some flexibility:
+> > 
+> > "Zeroing is done within the filesystem. The filesystem may use a
+> > hardware accelerated zeroing command, or it may submit regular writes.
+> > The behavior depends on the filesystem design and available hardware."
+> > 
+> 
+> Sure.
+> 
+> >> zeores commands, the alternative way is submitting actual zeroed data,
+> >> the specified range will be converted into written extents. The write
+> >> zeroes command is typically faster than write actual data if the
+> >> device supports unmap write zeroes, the specified range will not be
+> >> physically zeroed out on the device.
+> >> ++
+> >> +Options *--keep-size* can not be specified for the write-zeroes
+> >> operation.
+> >> +
+> >>  include::man-common/help-version.adoc[]
+> >>  
+> >>  == AUTHORS
+> [..]
+> >> @@ -429,6 +438,9 @@ int main(int argc, char **argv)
+> >>  			else if (mode & FALLOC_FL_ZERO_RANGE)
+> >>  				fprintf(stdout, _("%s: %s (%ju bytes) zeroed.\n"),
+> >>  								filename, str, length);
+> >> +			else if (mode & FALLOC_FL_WRITE_ZEROES)
+> >> +				fprintf(stdout, _("%s: %s (%ju bytes) write zeroed.\n"),
+> > 
+> > "write zeroed" is a little strange, but I don't have a better
+> > suggestion. :)
+> > 
+> 
+> Hmm... What about simply using "zeroed", the same to FALLOC_FL_ZERO_RANGE?
+> Users should be aware of the parameters they have passed to fallocate(),
+> so they should not use this print for further differentiation.
 
-I'd suggest to make one or two commits to fix the recent regression
-f5a6604f7a44 ("block: fix lockdep warning caused by lock dependency in elv_iosched_store")
-first, because double free is one serious issue, and the fix should
-belong to v6.17.
+No thanks, different inputs should produce different outputs. :)
 
-For other long-term or less serious issue, it may be fine to delay to v6.18
-if the patchset is too big or complicated, which might imply new regression.
+--D
 
-
-Thanks, 
-Ming
-
+> Thanks,
+> Yi.
+> 
