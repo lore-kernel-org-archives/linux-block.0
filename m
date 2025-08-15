@@ -1,55 +1,59 @@
 Received: from 003.mia.mailroute.net (003.mia.mailroute.net [199.89.3.6])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D7212E5D3B
-	for <linux-block@vger.kernel.org>; Fri, 15 Aug 2025 16:55:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03B592E5D01
+	for <linux-block@vger.kernel.org>; Fri, 15 Aug 2025 16:55:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.6
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755276921; cv=none; b=MnXzq4dPQXLxUXi2mSDm44IQsEW/lUNs3HB5r5iCwZ83IZ8C8TAqQgc54Pgr3o0yxiOowprv4QItaW5iclxuX7DGbYNPbQmq/4ObxCQ396yX+iLgTOR9U4YuFyO5FgnDyAIsVh655Gw5ROABgjVTYpjm+YvpmUrdZpHRT8M9eJY=
+	t=1755276933; cv=none; b=eLTuFLGbUzMEzAg1wW2iE48j24uTRuWwEu34u9yYNgoulLoPbn8WhJQXNMuxkjZLYME8kfg6AOvm0nM1U2pN+Jq8Ug7g99WeOl9WoekggmqXH1KUCu1SqBx1gVdL2DEpsw6jO+r8mAIcr6AK6U3rnwNExDr1sZaZi8Ormy2Tfwc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755276921; c=relaxed/simple;
-	bh=/7vAfKQ21uVJX4bb9D7qxgBPhUd6eFOUYku5Ybm8oLk=;
+	s=arc-20240116; t=1755276933; c=relaxed/simple;
+	bh=WyujT6t8+wFo5KWA+dj87nmleNSyhfjHYeCEMBJe7jg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Lc6oEOBIXaYZKUcq9MWnljP/+UIxZyNO7+fLZpE3lucSWh2A5+bbkEDY7QqlhExI7Df5NAHsJMvr+Nyl278rvc3Lp8LT7Wv3CodukJHjJ9cuQH1iIPYv+GtnltG1SSi2CnlS+W0luCYWGK6LSCyVRDBaAa6tHf40wiJd7OkHdNw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=e16z9evx; arc=none smtp.client-ip=199.89.3.6
+	 MIME-Version; b=VDval+2laPbd9f5ofiJDaxPv9KzOQHeJB4z0WXb3PBrlEI+SLoAJTLw76pwLANJ/NcKoBmI4mYzaeDj+iq9LkOUHvvxuMahJoxHkc9yZNcyLuOovR5mGl2FgLbfsv0o1iNIPJjszB0cDg2t+2lkNcuIzlUU5UmpjEBTG1fxDEGI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=Zv8/Ez56; arc=none smtp.client-ip=199.89.3.6
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="e16z9evx"
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="Zv8/Ez56"
 Received: from localhost (localhost [127.0.0.1])
-	by 003.mia.mailroute.net (Postfix) with ESMTP id 4c3SsM2Q8Jzlssxn;
-	Fri, 15 Aug 2025 16:55:19 +0000 (UTC)
+	by 003.mia.mailroute.net (Postfix) with ESMTP id 4c3Ssb0BFczltBDb;
+	Fri, 15 Aug 2025 16:55:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
 	content-transfer-encoding:mime-version:references:in-reply-to
 	:x-mailer:message-id:date:date:subject:subject:from:from
-	:received:received; s=mr01; t=1755276918; x=1757868919; bh=bI/jD
-	0v++vk3p8+M7vNJ00gGanHhZeMPR8pRZJOELlY=; b=e16z9evxT9atKW15NKPge
-	LgoM3cScueFH2xoJemRFWFLgMubkwbz4HR3OM4RnZK6P1KcEZHIDV3PCpzFLjbRS
-	PXO8RlSkxGmO8n4TSu8dOjey/sIlNbhEyLCevYGdcnWPbSgqE8IpVAOPFvlSCKNL
-	XxfK8AzdYgPC3acAGZAYIsk7v89e2mXypSu5fV5nojO7H2IsJ7D0n6GLXkmGYXuN
-	PcRmqQ32mDpXk2thOkaV5qdZtbmHnRE6l61NhhF4/nJ3OFFlYwzxOv2wJYP9LMHM
-	q/6yuImJArdT1Inr62rZjjt5h9+ZYxq5s3RLVU/1+/4HPMrpH3fRgMRKBh2+l7v3
+	:received:received; s=mr01; t=1755276929; x=1757868930; bh=RoUfp
+	OLwiVarujsHUJikUOw5XcHTa9UCpbc188nlx8s=; b=Zv8/Ez56AM6QvRmHqkt0b
+	Sy1Q4qsuESURXdPsQxnQsLaBSg3Itx0BhHjrPQ70zVmGhwqmPGazNAZlTQdQ1Ixy
+	N/DDVDbiOiFSaqSb0u5RQAh6yi8GXUEkYVo76Bmwa3Qz2C+pvyESfiw+/DYx93q5
+	/9VTqXmeFkl3+vY62SQxnE2PJNjFuj5nkexF42zpMg5j1rYcM4TzhDKgOz2zRCa5
+	naJ/p71WMCcB4aOFxlxaZqfPwRBjBrKlg8MxDuZ3RKyRr3h6oazVMYVmri5YCwOt
+	dfg5djtRWJyY+8dE9m2gPA8xHffGiINBHgyPNiif5yYMrKPw4JLfnQLY/Tw2/W69
 	Q==
 X-Virus-Scanned: by MailRoute
 Received: from 003.mia.mailroute.net ([127.0.0.1])
  by localhost (003.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id xRaDGsbpzho9; Fri, 15 Aug 2025 16:55:18 +0000 (UTC)
+ id Gs_I6Dz6pXDC; Fri, 15 Aug 2025 16:55:29 +0000 (UTC)
 Received: from bvanassche.mtv.corp.google.com (unknown [104.135.204.82])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: bvanassche@acm.org)
-	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4c3SsG6j3kzlgqVX;
-	Fri, 15 Aug 2025 16:55:14 +0000 (UTC)
+	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4c3SsQ2VRhzltQmP;
+	Fri, 15 Aug 2025 16:55:21 +0000 (UTC)
 From: Bart Van Assche <bvanassche@acm.org>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org,
 	Christoph Hellwig <hch@lst.de>,
 	Bart Van Assche <bvanassche@acm.org>,
-	Chaitanya Kulkarni <kch@nvidia.com>
-Subject: [PATCH v3 2/5] block, genhd: Remove disk_stats.sectors casts
-Date: Fri, 15 Aug 2025 09:54:40 -0700
-Message-ID: <20250815165453.540741-3-bvanassche@acm.org>
+	Kent Overstreet <kent.overstreet@linux.dev>,
+	Coly Li <colyli@kernel.org>,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>
+Subject: [PATCH v3 3/5] bcache, tracing: Do not truncate orig_sector
+Date: Fri, 15 Aug 2025 09:54:41 -0700
+Message-ID: <20250815165453.540741-4-bvanassche@acm.org>
 X-Mailer: git-send-email 2.51.0.rc1.163.g2494970778-goog
 In-Reply-To: <20250815165453.540741-1-bvanassche@acm.org>
 References: <20250815165453.540741-1-bvanassche@acm.org>
@@ -61,53 +65,29 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-In include/linux/part_stat.h, disk_stats.sectors is declared as
-unsigned long[]. Instead of casting disk_stats.sectors to unsigned long
-long and formatting it with %llu, remove the cast and format these number=
-s
-with %lu. No functionality has been changed.
+Change the type of orig_sector from dev_t (unsigned int) into sector_t
+(u64) to prevent truncation of orig_sector by the tracing code.
 
+Cc: Kent Overstreet <kent.overstreet@linux.dev>
+Acked-by: Coly Li <colyli@kernel.org>
 Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
+Fixes: cafe56359144 ("bcache: A block layer cache")
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- block/genhd.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ include/trace/events/bcache.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/genhd.c b/block/genhd.c
-index 9bbc38d12792..31cff7980f70 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -1074,19 +1074,19 @@ ssize_t part_stat_show(struct device *dev,
- 	}
- 	part_stat_read_all(bdev, &stat);
- 	return sysfs_emit(buf,
--		"%8lu %8lu %8llu %8u "
--		"%8lu %8lu %8llu %8u "
-+		"%8lu %8lu %8lu %8u "
-+		"%8lu %8lu %8lu %8u "
- 		"%8u %8u %8u "
--		"%8lu %8lu %8llu %8u "
-+		"%8lu %8lu %8lu %8u "
- 		"%8lu %8u"
- 		"\n",
- 		stat.ios[STAT_READ],
- 		stat.merges[STAT_READ],
--		(unsigned long long)stat.sectors[STAT_READ],
-+		stat.sectors[STAT_READ],
- 		(unsigned int)div_u64(stat.nsecs[STAT_READ], NSEC_PER_MSEC),
- 		stat.ios[STAT_WRITE],
- 		stat.merges[STAT_WRITE],
--		(unsigned long long)stat.sectors[STAT_WRITE],
-+		stat.sectors[STAT_WRITE],
- 		(unsigned int)div_u64(stat.nsecs[STAT_WRITE], NSEC_PER_MSEC),
- 		inflight,
- 		jiffies_to_msecs(stat.io_ticks),
-@@ -1097,7 +1097,7 @@ ssize_t part_stat_show(struct device *dev,
- 						NSEC_PER_MSEC),
- 		stat.ios[STAT_DISCARD],
- 		stat.merges[STAT_DISCARD],
--		(unsigned long long)stat.sectors[STAT_DISCARD],
-+		stat.sectors[STAT_DISCARD],
- 		(unsigned int)div_u64(stat.nsecs[STAT_DISCARD], NSEC_PER_MSEC),
- 		stat.ios[STAT_FLUSH],
- 		(unsigned int)div_u64(stat.nsecs[STAT_FLUSH], NSEC_PER_MSEC));
+diff --git a/include/trace/events/bcache.h b/include/trace/events/bcache.=
+h
+index 899fdacf57b9..d0eee403dc15 100644
+--- a/include/trace/events/bcache.h
++++ b/include/trace/events/bcache.h
+@@ -16,7 +16,7 @@ DECLARE_EVENT_CLASS(bcache_request,
+ 		__field(unsigned int,	orig_major		)
+ 		__field(unsigned int,	orig_minor		)
+ 		__field(sector_t,	sector			)
+-		__field(dev_t,		orig_sector		)
++		__field(sector_t,	orig_sector		)
+ 		__field(unsigned int,	nr_sector		)
+ 		__array(char,		rwbs,	6		)
+ 	),
