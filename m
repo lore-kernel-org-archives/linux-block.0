@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80D6323AB8B;
-	Fri, 15 Aug 2025 09:10:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3EB2270553;
+	Fri, 15 Aug 2025 09:10:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755249033; cv=none; b=BSDSApyLk3ucCrNOtI5wYOEANEECBp1pjIisi9TzAHBKIGIqpChIOG4cIJtiiTDNISl62yO05t1O2q+qr8r+O4/HpBjbtun4cOao+E8xn4KeFKr52HizsXuecAuLaMkEh3CyeRBbvmE/6iIw5UcIwRM5TckiNghWgooQ/jURAco=
+	t=1755249038; cv=none; b=R4KwqP+0+RxnUjqS6WmmkbY6ssLXgQFZk9EglrzXJC6PComQh3/DJMReWF8uVCFtGP713vrLnwiGJt6h+JBebzS4S34YNH2ERnlCJfT6O1Kx69AK8YX2jX0lNWeb6HsMC+c1kYu1HMwylBfGGmtrI1a4Rm9UvAoVkXcslyGj090=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755249033; c=relaxed/simple;
-	bh=30vV9pXBRs2HMe5d6GPdXEani0gIO+FipecKZyNwFv8=;
+	s=arc-20240116; t=1755249038; c=relaxed/simple;
+	bh=1Ha9xTn3T01Z4w9TlI+3LodHQqvdp4I2XLyHH/S4Gkg=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=Cz6ykvEbfwVqfiQSvHnHjLf9AYbqQ1UPcYxdiOOCn4vL8m7cLrlml4DffswVUOuft0bheUaFyvemIkqDGLgOt5fVyvkHw6ZBZYXY3h8koW+9U2EfioZfgmwyp4Kg8Z+ng1ovTTGnn8GPdqvosaUINZCIu7iP1JLCBOy2AIBiF0Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kBGuIDA6; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=TkFhKubWy8VzxyvPwK8EUrt5AnT20c2aSx6t2/5ug9V1kydyVubPZMCDyPwkOdGD02oL4OUCtUkiOdfwXR8NvkJJsEyEXZK7fdesIe3HF5AOkoKTPsAE99Oat8AaR6g+31fe1hxAEQHVmpUKst7f9kz68JGf/4oAuYxhmeCGVk8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WkNesCAs; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kBGuIDA6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5BBA0C4CEEB;
-	Fri, 15 Aug 2025 09:10:30 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WkNesCAs"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99B89C4CEF4;
+	Fri, 15 Aug 2025 09:10:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755249033;
-	bh=30vV9pXBRs2HMe5d6GPdXEani0gIO+FipecKZyNwFv8=;
+	s=k20201202; t=1755249036;
+	bh=1Ha9xTn3T01Z4w9TlI+3LodHQqvdp4I2XLyHH/S4Gkg=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=kBGuIDA6F0jog95YtwShwZjNbtnHMv6V0gQfSdAD6dvoefE9kpcaYIxTrk1kOvKY4
-	 oqJjOe66RZ6hTd29WQeq86NhwRCtMqGQIrRxHlQLY9tLQx/+4ER1q6L0CdNtakanZ4
-	 1ooWlBJifUfc/rJBJrnm6i21Onc1EQ/pS0EUgr21cpApXzw6kPqhCrXfv6tYOBJ4nP
-	 uDLnDQbpV6A+MLDdQfCAtV4chQLGS0OP4AlWfJglD3kn5WtYsmN7joTSA0LnAApJz6
-	 t52zJBQHfwFtSzI6Wz69WJnvFLAVWh8kZPWh4EiUb63olT9hdeH/h9XGeF1G6tMBGw
-	 cmTMOSy6unB+Q==
+	b=WkNesCAskg/QW2w1/FQNss4Hvhyeo1cnDm4vhZ1e8fHwu5HbEu77kiCxKax7CVTWL
+	 SQqYQFFy/7REIced2yy5XNSP+8FkcOUHISBZJuOfikgXY4PL0sVw4IxQTRudC6WPIC
+	 ihFFSy669LVtWhnHeDzGfi8x1MMaqoG8t/5R2JKnfShIpr6FxjDXfaMhJ1oBneM/D3
+	 XsHvXZpgU82rs4Z1LUsQ+espPx+BUmvjBRzwcafMbLGq3otLPGFssSKaotaWoPi8KP
+	 lrNVDwW4TSCJmb68ZIpF4qkL89yNBw7gjtPhdkzcE+23B7SBPi2PXRkgYCBe6dUTiW
+	 eL2nSEGTQW+CQ==
 From: Andreas Hindborg <a.hindborg@kernel.org>
 To: Alice Ryhl <aliceryhl@google.com>
 Cc: Boqun Feng <boqun.feng@gmail.com>, Miguel Ojeda <ojeda@kernel.org>, Alex
@@ -36,14 +36,14 @@ Cc: Boqun Feng <boqun.feng@gmail.com>, Miguel Ojeda <ojeda@kernel.org>, Alex
  <axboe@kernel.dk>, Breno Leitao <leitao@debian.org>,
  linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org,
  linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v5 14/18] rnull: enable configuration via `configfs`
-In-Reply-To: <aJ7tFulqpuF481Wg@google.com>
+Subject: Re: [PATCH v5 15/18] rust: block: add `GenDisk` private data support
+In-Reply-To: <aJ7tcmOHfFmHgrY9@google.com>
 References: <20250815-rnull-up-v6-16-v5-0-581453124c15@kernel.org>
- <20250815-rnull-up-v6-16-v5-14-581453124c15@kernel.org>
- <PJhsfpOsp7EkWugCN65OhC9eUuui8Lt7SoAjHDCXqdUn59sTZrrZiopgyhYIVD5l5JamiZ8fXWRpM7E3dtORfA==@protonmail.internalid>
- <aJ7tFulqpuF481Wg@google.com>
-Date: Fri, 15 Aug 2025 11:04:09 +0200
-Message-ID: <87frdtdkhi.fsf@t14s.mail-host-address-is-not-set>
+ <20250815-rnull-up-v6-16-v5-15-581453124c15@kernel.org>
+ <Addn5RH8T6dPmcfVeF6HXK4Q3rVuAz-0N8es2JtgnRl3UhXIJhicxoB5Ns_F8aD2-sflnPXC6oeBQDLtCfXtLA==@protonmail.internalid>
+ <aJ7tcmOHfFmHgrY9@google.com>
+Date: Fri, 15 Aug 2025 11:08:59 +0200
+Message-ID: <87cy8xdk9g.fsf@t14s.mail-host-address-is-not-set>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -54,30 +54,41 @@ Content-Type: text/plain
 
 "Alice Ryhl" <aliceryhl@google.com> writes:
 
-> On Fri, Aug 15, 2025 at 09:30:49AM +0200, Andreas Hindborg wrote:
->> Allow rust null block devices to be configured and instantiated via
->> `configfs`.
+> On Fri, Aug 15, 2025 at 09:30:50AM +0200, Andreas Hindborg wrote:
+>> Allow users of the rust block device driver API to install private data in
+>> the `GenDisk` structure.
 >>
 >> Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
 >
 > Reviewed-by: Alice Ryhl <aliceryhl@google.com>
 >
->> +impl NullBlkDevice {
->> +    fn new(
->> +        name: &CStr,
->> +        block_size: u32,
->> +        rotational: bool,
->> +        capacity_mib: u64,
->> +    ) -> Result<GenDisk<Self>> {
->> +        let tagset = Arc::pin_init(TagSet::new(1, 256, 1), flags::GFP_KERNEL)?;
+>>          self,
+>>          name: fmt::Arguments<'_>,
+>>          tagset: Arc<TagSet<T>>,
+>> +        queue_data: T::QueueData,
+>>      ) -> Result<GenDisk<T>> {
+>> +        let data = queue_data.into_foreign();
+>> +        let recover_data = ScopeGuard::new(|| {
+>> +            // SAFETY: T::QueueData was created by the call to `into_foreign()` above
+>> +            drop(unsafe { T::QueueData::from_foreign(data) });
+>> +        });
+>> +
+>>          // SAFETY: `bindings::queue_limits` contain only fields that are valid when zeroed.
+>>          let mut lim: bindings::queue_limits = unsafe { core::mem::zeroed() };
+>>
+>> @@ -113,7 +121,7 @@ pub fn build<T: Operations>(
+>>              bindings::__blk_mq_alloc_disk(
+>>                  tagset.raw_tag_set(),
+>>                  &mut lim,
+>> -                core::ptr::null_mut(),
+>> +                data.cast(),
 >
-> GFP_KERNEL is in the prelude.
+> Is the cast necessary?
 
-OK, thanks.
+Not any longer, no.
 
 
 Best regards,
 Andreas Hindborg
-
 
 
