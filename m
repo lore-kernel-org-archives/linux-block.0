@@ -1,129 +1,92 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06F4924635E;
-	Fri, 15 Aug 2025 08:29:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFA7B1A2C06
+	for <linux-block@vger.kernel.org>; Fri, 15 Aug 2025 08:31:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755246578; cv=none; b=HXJwFV8camhG01AMbo9f+rwVd1kRAKwPTPRS+O0cZRNg3dILNsoQKuMJFhduiTCkFJO8Lie9orkgJYW9IjQ21b5H23nvJm0Mp5Zi/jPrTE20mcr5+T6UsaJ8H4Sn47FWhVBd4Nboed7fekkAwXkD28M8J5CownRpZ73RYbt9Cio=
+	t=1755246662; cv=none; b=D3U/J35u1Oc6Bjf2YZVCCVSElv3yrsGzVYm3B+pzR8SyLZKXwMSTwKEW746VCsdokgKK4TTvU1hAWLXDk3iN8CWbwCrD1mkun3avFjrNJHYKjnVgXBayZQnibyV0DMjJEh1JRDldx3txbUcEsCnmM0I+0UgmHMYfskjD7mYlt2c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755246578; c=relaxed/simple;
-	bh=Xyye2AF1wmSsP0D40BarzXd3YLVHTSI2Ehw/u8Z/TTg=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=jUs7DACyzZbChtFMxzWPKRVBUXFXtcLB0osEPwH5XjCfzEXctU4MIsNHYgiAjd5AxWKDt8IN96rJ2ptBASSptU15PAhRa6FOvCMpMIxO61OWrt2uz6qEBfhHqatvCCHIs2Q9G3GFueoIiiVBp0RpB+Kjlqp4sQKDZKvDAwQlnHI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CR/8qZrq; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1755246662; c=relaxed/simple;
+	bh=UQcJChL1z6SPalX2fGTv92LMBnWLGK7AcpH+aKksyfM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qm474SYSPzzH1q2CEI6/IKwQ59m7dhql/u/UbyPlbH/Ml183gAYFwFL+EzBUxr6iFI0yjxhMd4KGCDnJsMpxsGHBg9OcP9XzLnvioyNyl11aukoiefAQVxHKelZoWY45wBUcrGh8sLlo/Js4DPDetwyMarIAG3IV+bh+/SVpZvI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Y5TAiuaL; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CR/8qZrq"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0353FC4CEF4;
-	Fri, 15 Aug 2025 08:29:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755246574;
-	bh=Xyye2AF1wmSsP0D40BarzXd3YLVHTSI2Ehw/u8Z/TTg=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=CR/8qZrqwjQwjYJ0phriw9y4I1wwIB+XpdSacoRPLLaJoe3dvbg2UXioDbTd4f/2u
-	 ozX88f2vzdFFPy0FOaFC88ZxeQJjSw9VB2HysXyS9LPObXl6amgDdI8xipldKZBZti
-	 A+JHDPvspYPKp0RKc1O2coa1J5xA5Fg8Geh3lfUXnaJYLqi3+TbzUaeFfGlk0761jK
-	 fge08BleYeouq/bnYTswDhgmJsobxoO0LdjxGXxupNX/zVSqgpfYjbKDbEQ9WfoXO9
-	 M4IrKllrRKBjTgYp5B36hrTU0SzdyXQ3OJOtLRIOOfhs9lav8gUghRlWE3y3PUK5Bm
-	 HGZIKAakMtiIA==
-From: Andreas Hindborg <a.hindborg@kernel.org>
-To: Alice Ryhl <aliceryhl@google.com>
-Cc: Boqun Feng <boqun.feng@gmail.com>, Miguel Ojeda <ojeda@kernel.org>, Alex
- Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>, =?utf-8?Q?Bj?=
- =?utf-8?Q?=C3=B6rn?= Roy
- Baron <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>, Trevor
- Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, Jens Axboe
- <axboe@kernel.dk>, Breno Leitao <leitao@debian.org>,
- linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v5 06/18] rust: str: add `bytes_to_bool` helper function
-In-Reply-To: <aJ7r_W0BzdSYMfT6@google.com>
-References: <20250815-rnull-up-v6-16-v5-0-581453124c15@kernel.org>
- <20250815-rnull-up-v6-16-v5-6-581453124c15@kernel.org>
- <zsaOdCKnN1sVET34FMYvITPQpgAkfL_JPF6FtL4MUbyubgqSNo5PsO6bgIyzmMP2bhkEAbXEyui3iTqZEkrx0g==@protonmail.internalid>
- <aJ7r_W0BzdSYMfT6@google.com>
-Date: Fri, 15 Aug 2025 10:28:32 +0200
-Message-ID: <87ldnldm4v.fsf@t14s.mail-host-address-is-not-set>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y5TAiuaL"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1755246659;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=n0hSepW5WjWx+taheJm8TbQB80RTQNqQPc4V+jMToCU=;
+	b=Y5TAiuaL+YNdnEDfa6lBt44WHl4Q7HRTAIXBu0xQL2Yr20500GOonbGwjv1r2a1W6i1PLY
+	la+TRhlY6Cg9cEIjt3fwOAsH+aWDhOuHDjQHYpBb3LoG5XiRU3Ce2pWv4zq4qh/Fq8phe/
+	JXID+eFMWMbp5sP3xT0eHdCk0Ap31r0=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-685-HsaJxG8tOzKH5gBR2XGoOA-1; Fri,
+ 15 Aug 2025 04:30:54 -0400
+X-MC-Unique: HsaJxG8tOzKH5gBR2XGoOA-1
+X-Mimecast-MFC-AGG-ID: HsaJxG8tOzKH5gBR2XGoOA_1755246652
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CD73D1954228;
+	Fri, 15 Aug 2025 08:30:51 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.153])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A07EF1800447;
+	Fri, 15 Aug 2025 08:30:45 +0000 (UTC)
+Date: Fri, 15 Aug 2025 16:30:40 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Yu Kuai <yukuai1@huaweicloud.com>
+Cc: axboe@kernel.dk, hare@suse.de, nilay@linux.ibm.com,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	yukuai3@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com,
+	johnny.chenyi@huawei.com
+Subject: Re: [PATCH 00/10] blk-mq: fix blk_mq_tags double free while
+ nr_requests grown
+Message-ID: <aJ7wMFkuTewlyx1P@fedora>
+References: <20250815080216.410665-1-yukuai1@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250815080216.410665-1-yukuai1@huaweicloud.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-"Alice Ryhl" <aliceryhl@google.com> writes:
+On Fri, Aug 15, 2025 at 04:02:06PM +0800, Yu Kuai wrote:
+> From: Yu Kuai <yukuai3@huawei.com>
+> 
+> In the case user trigger tags grow by queue sysfs attribute nr_requests,
+> hctx->sched_tags will be freed directly and replaced with a new
+> allocated tags, see blk_mq_tag_update_depth().
+> 
+> The problem is that hctx->sched_tags is from elevator->et->tags, while
+> et->tags is still the freed tags, hence later elevator exist will try to
+> free the tags again, causing kernel panic.
+> 
+> patch 1-6 are prep cleanup and refactor patches for updating nr_requests
+> patch 7,8 are the fix patches for the regression
+> patch 9 is cleanup patch after patch 8
+> patch 10 fix the stale nr_requests documentation
 
-> On Fri, Aug 15, 2025 at 09:30:41AM +0200, Andreas Hindborg wrote:
->> Add a convenience function to convert byte slices to boolean values by
->> wrapping them in a null-terminated C string and delegating to the
->> existing `kstrtobool` function. Only considers the first two bytes of
->> the input slice, following the kernel's boolean parsing semantics.
->>
->> Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
->> ---
->>  rust/kernel/str.rs | 10 ++++++++++
->>  1 file changed, 10 insertions(+)
->>
->> diff --git a/rust/kernel/str.rs b/rust/kernel/str.rs
->> index 5611f7846dc0..ced1cb639efc 100644
->> --- a/rust/kernel/str.rs
->> +++ b/rust/kernel/str.rs
->> @@ -978,6 +978,16 @@ pub fn kstrtobool(string: &CStr) -> Result<bool> {
->>      kernel::error::to_result(ret).map(|()| result)
->>  }
->>
->> +/// Convert `&[u8]` to `bool` by deferring to [`kernel::str::kstrtobool`].
->> +///
->> +/// Only considers at most the first two bytes of `bytes`.
->> +pub fn bytes_to_bool(bytes: &[u8]) -> Result<bool> {
->> +    // `ktostrbool` only considers the first two bytes of the input.
->> +    let nbuffer = [*bytes.first().unwrap_or(&0), *bytes.get(1).unwrap_or(&0), 0];
->> +    let c_str = CStr::from_bytes_with_nul(nbuffer.split_inclusive(|c| *c == 0).next().unwrap())?;
->> +    kstrtobool(c_str)
->> +}
->
-> Ouch. That's unpleasant. I would probably suggest this instead to avoid
-> the length computation:
->
-> /// # Safety
-> /// `string` is a readable NUL-terminated string
-> unsafe fn kstrtobool_raw(string: *const c_char) -> Result<bool> {
->     let mut result: bool = false;
->     let ret = unsafe { bindings::kstrtobool(string, &raw mut result) };
->     kernel::error::to_result(ret).map(|()| result)
-> }
->
-> pub fn kstrtobool(string: &CStr) -> Result<bool> {
->     // SAFETY: Caller ensures that `string` is NUL-terminated.
->     unsafe { kstrtobool_cstr(string.as_char_ptr()) }
-> }
->
-> pub fn kstrtobool_bytes(string: &[u8]) -> Result<bool> {
->     let mut stack_string = [0u8; 3];
->
->     if let Some(first) = string.get(0) {
+Please do not mix bug(regression) fix with cleanup.
 
-Clippy will complain about `string.get(0)` suggesting `string.first()`.
+The bug fix for updating nr_requests should have been simple enough in single
+or two patches, why do you make 10-patches for dealing with the regression?
 
->         stack_string[0] = *first;
->     }
->     if let Some(second) = string.get(1) {
->         stack_string[1] = *second;
->     }
-
-I don't really think this procedural assignment is better or worse than assigning
-at declaration.
-
->
->     // SAFETY: stack_string[2] is zero, so the string is NUL-terminated.
->     unsafe { kstrtobool_cstr(stack_string.as_ptr()) }
-
-I'll split it up.
+Not mention this way is really unfriendly for stable tree backport.
 
 
-Best regards,
-Andreas Hindborg
-
-
+Thanks,
+Ming
 
