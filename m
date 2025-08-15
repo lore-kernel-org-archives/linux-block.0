@@ -1,91 +1,113 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC1E2199931;
-	Fri, 15 Aug 2025 14:16:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B0FB21FF5F
+	for <linux-block@vger.kernel.org>; Fri, 15 Aug 2025 14:21:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755267407; cv=none; b=Ob/zBpo24ihjs1FFiLGMkoiuemDN/Ej2Ct/Enh6otWi3AiupwVXzdtDbbcu4lic1ajRkvflk2LPIdudYb6unL7FGJcXQeuD6WedFjdSFKnv5L9OG6cI3TBSLbl624axjJxn1AA3U4bPJhmlYJAQ9Cokww4dOFhNgmfGMKB4BkdU=
+	t=1755267667; cv=none; b=X66NWWnQQIx+hh9qy5uLxNL/RNz2BHAhPZ/6q6e1XLKeByWJ4nZOY+J7k2L7iqpj7TpzS0vMMHdI0qmcAvVHA1BZx4gKU2YEaR8HNd4VgcL6KCBOGUw+JChwLvcxoow3Gx9qPmuJb8/gz0TZFfzSC5NXfG3jjxNpbsppxoM8/p4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755267407; c=relaxed/simple;
-	bh=K6/EXttm+nt5thkhDaytjTLjS99tqYgEMzqbiugO36Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KqZT0cLp3krr0v0pvfGUbLmhCsIjHmEHfC0WgJU8p6zHq6ycpQUOqNSeTSlNsIh3DxqeEY/oaDO7hGIp4r6fJdXGzTgKTAStnD52crYTfZAgkJoe9SEuuMTGmUQgQ5r8s0xRG7BLiRAxsftIprKQU7i2K0hC5whSH8wcJ/S7yf8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AU2V+XxE; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1755267667; c=relaxed/simple;
+	bh=CPxucYIm7oasvzLoBrismDQsuh+/GmgJfPSHxJvJ6lE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=A6wX0JhmJf9AP1J7aiUfsuJPAiSbG2IjTb0yLy1DgPHeDG1lnsLkxnhzDtvnmKa5sDMQMuWBsU7rU4OQWhLB+eecUnZfq2SBGSCK7XOe0TkwV6yHXTk1jCgxRW6bubpdM87DZRyACVz9GWIDmHK753xEETVmpsI5Mz0amXHr6ys=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Zf10nnMl; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AU2V+XxE"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 749DDC4CEEB;
-	Fri, 15 Aug 2025 14:16:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755267405;
-	bh=K6/EXttm+nt5thkhDaytjTLjS99tqYgEMzqbiugO36Q=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=AU2V+XxEIr27cYyPkH1gImqw5YNEsoNJ0csnCLhPGI3e0N1gJ8u62kqjmTJr1cXnp
-	 22lqwG68kCxlmI1UtZAl4P0/UtUpfu79YIflNT/dhnTyo2idRdXyS4E2JibRRpnASk
-	 KKOsWuJD/S/z+bs1Ypp1MhjG6OSJNls2EsCQWVM7m7ob/mHPU7taLvsvhcvizHTsox
-	 bOr4LjpXFeXFYO8v9IcTMkQJCHJEiV8DF3plcXCGy/JoHUmQ+xfMTEcAcm1BKRIgZe
-	 pXM0P4Lxz1Nsui5Ozk/YhMGFYoBkR5+4FIZl2neB9HpuosiLbYzRjKAqc8OcfWL66g
-	 gufiYxSa11BJw==
-From: Christian Brauner <brauner@kernel.org>
-To: Dominique Martinet <asmadeus@codewreck.org>
-Cc: Christian Brauner <brauner@kernel.org>,
-	Maximilian Bosch <maximilian@mbosch.me>,
-	Ryan Lahfa <ryan@lahfa.xyz>,
-	Christian Theune <ct@flyingcircus.io>,
-	Arnout Engelen <arnout@bzzt.net>,
-	linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	stable@vger.kernel.org,
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
-	David Howells <dhowells@redhat.com>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [PATCH v3 0/2] iterate_folioq bug when offset==size (Was: [REGRESSION] 9pfs issues on 6.12-rc1)
-Date: Fri, 15 Aug 2025 16:16:33 +0200
-Message-ID: <20250815-scheckig-depesche-5de55f7855d1@brauner>
-X-Mailer: git-send-email 2.47.2
-In-Reply-To: <20250813-iot_iter_folio-v3-0-a0ffad2b665a@codewreck.org>
-References: <20250813-iot_iter_folio-v3-0-a0ffad2b665a@codewreck.org>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zf10nnMl"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1755267664;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=saGqJBJfNTgDTptPjcuyScrXSOaQQQGEpnWQeRSkQd4=;
+	b=Zf10nnMleKi4+sQCCNBW1LpfqjBZRsCHkBlJasT86qnKNFZAz8PSatZbk9r8YpiUvlgbGF
+	8kdb7sn0Z4KWl2gwDoUb0dgH5TF6LGL7BjtAINgGBfI0ABOuIAq3X06APLasG/wP9s4WJF
+	O3C5gMr+kqI9dwmGlHKGE2ENTv7j5CA=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-280-7vDJsnrvPD-MtH5Nghf2jw-1; Fri,
+ 15 Aug 2025 10:20:59 -0400
+X-MC-Unique: 7vDJsnrvPD-MtH5Nghf2jw-1
+X-Mimecast-MFC-AGG-ID: 7vDJsnrvPD-MtH5Nghf2jw_1755267657
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E533619560B3;
+	Fri, 15 Aug 2025 14:20:55 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.16])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 25AE71955E89;
+	Fri, 15 Aug 2025 14:20:46 +0000 (UTC)
+Date: Fri, 15 Aug 2025 22:20:39 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Yu Kuai <yukuai1@huaweicloud.com>
+Cc: axboe@kernel.dk, hare@suse.de, nilay@linux.ibm.com,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	yi.zhang@huawei.com, yangerkun@huawei.com, johnny.chenyi@huawei.com,
+	"yukuai (C)" <yukuai3@huawei.com>
+Subject: Re: [PATCH 00/10] blk-mq: fix blk_mq_tags double free while
+ nr_requests grown
+Message-ID: <aJ9CN_oeQERVgAoW@fedora>
+References: <20250815080216.410665-1-yukuai1@huaweicloud.com>
+ <aJ7wMFkuTewlyx1P@fedora>
+ <abde1955-d634-29d4-d229-df8c6ebdc582@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1360; i=brauner@kernel.org; h=from:subject:message-id; bh=K6/EXttm+nt5thkhDaytjTLjS99tqYgEMzqbiugO36Q=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWTMd3Qv5kjp+24nyTv92sUpX3X9y/qj5H03Md6dZGa6c 9bBOYbtHaUsDGJcDLJiiiwO7Sbhcst5KjYbZWrAzGFlAhnCwMUpABP5EMHwP/F8UGqLavwV7wy/ yz+jrqydMmdZ9dxHf3l+N61w91t4t5ORobVu+oa5Ddv+Ots6sx46eS3rt0R1iuFBifehXi+v3xF v5QEA
-X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <abde1955-d634-29d4-d229-df8c6ebdc582@huaweicloud.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On Wed, 13 Aug 2025 15:04:54 +0900, Dominique Martinet wrote:
-> So we've had this regression in 9p for.. almost a year, which is way too
-> long, but there was no "easy" reproducer until yesterday (thank you
-> again!!)
+On Fri, Aug 15, 2025 at 05:05:34PM +0800, Yu Kuai wrote:
+> Hi,
 > 
-> It turned out to be a bug with iov_iter on folios,
-> iov_iter_get_pages_alloc2() would advance the iov_iter correctly up to
-> the end edge of a folio and the later copy_to_iter() fails on the
-> iterate_folioq() bug.
+> 在 2025/08/15 16:30, Ming Lei 写道:
+> > On Fri, Aug 15, 2025 at 04:02:06PM +0800, Yu Kuai wrote:
+> > > From: Yu Kuai <yukuai3@huawei.com>
+> > > 
+> > > In the case user trigger tags grow by queue sysfs attribute nr_requests,
+> > > hctx->sched_tags will be freed directly and replaced with a new
+> > > allocated tags, see blk_mq_tag_update_depth().
+> > > 
+> > > The problem is that hctx->sched_tags is from elevator->et->tags, while
+> > > et->tags is still the freed tags, hence later elevator exist will try to
+> > > free the tags again, causing kernel panic.
+> > > 
+> > > patch 1-6 are prep cleanup and refactor patches for updating nr_requests
+> > > patch 7,8 are the fix patches for the regression
+> > > patch 9 is cleanup patch after patch 8
+> > > patch 10 fix the stale nr_requests documentation
+> > 
+> > Please do not mix bug(regression) fix with cleanup.
+> > 
+> > The bug fix for updating nr_requests should have been simple enough in single
+> > or two patches, why do you make 10-patches for dealing with the regression?
 > 
-> [...]
+> Ok, in short, my solution is:
+> 
+> - serialize switching elevator with updating nr_requests
+> - check the case that nr_requests will grow and allocate elevator_tags
+> before freezing the queue.
+> - for the grow case, switch to new elevator_tags.
 
-Applied to the vfs.fixes branch of the vfs/vfs.git tree.
-Patches in the vfs.fixes branch should appear in linux-next soon.
+I'd suggest to make one or two commits to fix the recent regression
+f5a6604f7a44 ("block: fix lockdep warning caused by lock dependency in elv_iosched_store")
+first, because double free is one serious issue, and the fix should
+belong to v6.17.
 
-Please report any outstanding bugs that were missed during review in a
-new review to the original patch series allowing us to drop it.
+For other long-term or less serious issue, it may be fine to delay to v6.18
+if the patchset is too big or complicated, which might imply new regression.
 
-It's encouraged to provide Acked-bys and Reviewed-bys even though the
-patch has now been applied. If possible patch trailers will be updated.
 
-Note that commit hashes shown below are subject to change due to rebase,
-trailer updates or similar. If in doubt, please check the listed branch.
+Thanks, 
+Ming
 
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
-branch: vfs.fixes
-
-[1/2] iov_iter: iterate_folioq: fix handling of offset >= folio size
-      https://git.kernel.org/vfs/vfs/c/546a40359fd2
-[2/2] iov_iter: iov_folioq_get_pages: don't leave empty slot behind
-      https://git.kernel.org/vfs/vfs/c/334430b2d585
