@@ -1,173 +1,228 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7C80288C1A;
-	Fri, 15 Aug 2025 11:59:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E2C324395C
+	for <linux-block@vger.kernel.org>; Fri, 15 Aug 2025 12:58:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755259181; cv=none; b=WSKrnU+sIZrxJB76CmdDU6jvlTbTUu0nw+HYg7vuui5jrkiyREfXM1xtGGGkqmb06W6e0x4nRGpiLxNvsaIAghy3+BMJKBFZrJSRm2tEpxddKEvIuUtSbZ0QArHQceDYF6DBOMtNlcAxWWqK9ZluvvsWipI79lFCSV51r5p7gfE=
+	t=1755262733; cv=none; b=KCOKUlOzvF5XiiuM2l8Ysqv6ZwYDdfPxR5pILkVPznqnBq/LXjjXtP5smY4UZTc16//5HbVKK6FDxo4Yg6jfS+CbBjx2rSnccujuTHSeXZuHdBfVD9/x6qPkehpdwjUJx6cBFJOoKTr8I8rYvoDHwHxfEkKXv9JpkadmG4e4Rxw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755259181; c=relaxed/simple;
-	bh=AIycdL0Tk0Qnuzo+6UylC5XKgeoTWVpU71O7jN9JVlo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EAmJok+ZyDZn35QbDKkXE+GNdlIXBC0EQnsUylInX9XHlNK3YJr3HKIfdGaADZRq7LhJa+uAIplrN7n53EaLWYnTetq8CfEjAZicX0oYPnDOzoDPmNVPmwaoLlAOxIyiV8zsJ7u8YXLxf9cFvmOzmanAoeSb+kJDtTVBNMirCq8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=dKK1maa9; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1755262733; c=relaxed/simple;
+	bh=t3k75nQqH3V8jC6ZnJDhvZ8HSREGz7k0KQaQVIUKjcQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YgGNWFnk6rCTgZFw6pMFL3aSBfhFvDdLkUV8RhLru0mo950bBQJPwzTReAVd3nHRypdwtItXjgtpvYo8fvDOm5qS4K4bmEJQltghPykuKBXHWpoaDEfMDNdQGlRhVp1xfmKiMGG3T7c4SsYcySfQ3NBJp5yjfhqlnm81vMEce14=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ehwc0x8R; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="dKK1maa9"
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57F2VDQq004503;
-	Fri, 15 Aug 2025 11:59:09 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=nojUB+
-	GltUbSvYuAX7neLLtsgRhvOCrtHvrygasBGwQ=; b=dKK1maa9NOh5I1FvirSX7E
-	1pk6JUlJhGWl/8ZN+94b7NpDCix8r6QARK3YyOH4XN6rojIqu74lJrLgQRf93aiM
-	6+6vWl/hT9HWFYC/keNryljqwjpLLmytguLAmF0uGixwyDRqSQZY7JTspH0YbxVu
-	i5rBq7gbsOa0BfAUCgfGeIxeE8FBNTJ+VW2fejx4SC8cR5ar7DA6Hah0Km9cUpKs
-	SZgdqFpHG2LzPBO6pkuL3pOtqZBYP08OAjUX7iDKU4aNP/mltD5RjqEvVkY4r3oS
-	ZMm/drsGWsQfOFA7IKfjkofoF8mqxVOnu+usMM/01BQnTRX1v7sHskRRtzPzso3w
-	==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48ehaakcgs-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 15 Aug 2025 11:59:09 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 57F8o8GB025657;
-	Fri, 15 Aug 2025 11:59:08 GMT
-Received: from smtprelay07.dal12v.mail.ibm.com ([172.16.1.9])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 48ejvmrh3n-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 15 Aug 2025 11:59:08 +0000
-Received: from smtpav04.wdc07v.mail.ibm.com (smtpav04.wdc07v.mail.ibm.com [10.39.53.231])
-	by smtprelay07.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 57FBx7Z627722376
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 15 Aug 2025 11:59:08 GMT
-Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id AFAFE58045;
-	Fri, 15 Aug 2025 11:59:07 +0000 (GMT)
-Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B2BC058050;
-	Fri, 15 Aug 2025 11:59:03 +0000 (GMT)
-Received: from [9.61.133.254] (unknown [9.61.133.254])
-	by smtpav04.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 15 Aug 2025 11:59:03 +0000 (GMT)
-Message-ID: <bbbe1889-38e8-4ab9-bce5-a4371b976433@linux.ibm.com>
-Date: Fri, 15 Aug 2025 17:29:01 +0530
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ehwc0x8R"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1755262730;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3GRjMXyh5d0Cj94X7pGTWDz1SzFp/LlSjtAlVPy37uI=;
+	b=ehwc0x8RBK6cibB8OhPa1aNLNAmNNtyAq63gkbtqvBjieCxMMuCSsZtx29VbvL1BbZ3ZQE
+	7YQM/dl/L5nKNZ65rsMyfT3fPMPUtjI9Lw8tH6548DXidrq/Hi1l2/cSl9FVcTt0pUDkLd
+	PUcQnkRJ5JC1Jwqb3C8NLZbSMDpMhao=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-158-aUCleU-gNPyMkJuO0K6wVA-1; Fri,
+ 15 Aug 2025 08:58:46 -0400
+X-MC-Unique: aUCleU-gNPyMkJuO0K6wVA-1
+X-Mimecast-MFC-AGG-ID: aUCleU-gNPyMkJuO0K6wVA_1755262725
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0E130180035C;
+	Fri, 15 Aug 2025 12:58:45 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.16])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B373219327C0;
+	Fri, 15 Aug 2025 12:58:34 +0000 (UTC)
+Date: Fri, 15 Aug 2025 20:58:22 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Nilay Shroff <nilay@linux.ibm.com>
+Cc: Yu Kuai <yukuai1@huaweicloud.com>, Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org, "yukuai (C)" <yukuai3@huawei.com>
+Subject: Re: [PATCH] blk-mq: fix lockdep warning in
+ __blk_mq_update_nr_hw_queues
+Message-ID: <aJ8u7nI4GtyOECF9@fedora>
+References: <20250815075636.304660-1-ming.lei@redhat.com>
+ <ff5639d3-9a63-e26c-a062-cb8a23c0ed5d@huaweicloud.com>
+ <b4183646-a5cf-1f29-5451-c63fdda7c490@huaweicloud.com>
+ <aJ8AAiINKj-3c1Xw@fedora>
+ <5c57a6a5-d9a4-4c21-86cd-784e4f3876fd@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 03/16] blk-mq: remove useless checkings from
- blk_mq_update_nr_requests()
-To: Yu Kuai <yukuai1@huaweicloud.com>, axboe@kernel.dk, bvanassche@acm.org,
-        hare@suse.de, ming.lei@redhat.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yi.zhang@huawei.com, yangerkun@huawei.com, johnny.chenyi@huawei.com,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <20250814033522.770575-1-yukuai1@huaweicloud.com>
- <20250814033522.770575-4-yukuai1@huaweicloud.com>
- <97b63163-a122-48f0-805a-a06cf792903f@linux.ibm.com>
- <31a567ac-180a-b2de-2233-e758a9a977d8@huaweicloud.com>
-Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <31a567ac-180a-b2de-2233-e758a9a977d8@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=KPRaDEFo c=1 sm=1 tr=0 ts=689f210d cx=c_pps
- a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
- a=IkcTkHD0fZMA:10 a=2OwXVqhp2XgA:10 a=i0EeH86SAAAA:8 a=VscZIbB_9VdVsRj_TFIA:9
- a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
-X-Proofpoint-ORIG-GUID: 0fCxtM7oHzTFN32oKHJyyiqMvDQaccTe
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODEyMDIyNCBTYWx0ZWRfXxqBpMftCDyGu
- K3k5WZr4k88onQhls3jXyIjm9lttg/TAq+hysGLGSWG4Ksxei79Hzsh7BHk8YB1pbmG6YBtbYe5
- lxxw3ryhXen6QP5z9xF43b8hOnMfZXwk/yfrMiN+2vgJwwLLFDgjkHAKjVPsUASRffE64AT+Dn9
- 6et0iniUJb4N2yV8wLbDvwhWSK9ZN/lCIepMuuR7tykN9x7j0uXh8EoWVJT+Kw1HWznhXswCZAv
- IHoCqFNqpctgHba8thAxa8q+4IQWGGzub0E444joYzx5v8N4RR4TT/yaqVlJrQgjQvc0c5uQQ8S
- D30No18oEy0SPawbHVCvuML4ju6g0DO7YpfF2WMV5JCBAXfon7Yd0bJuXe6LXQdGQZRWDSDHjw3
- SoM5QqC6
-X-Proofpoint-GUID: 0fCxtM7oHzTFN32oKHJyyiqMvDQaccTe
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-08-15_04,2025-08-14_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 impostorscore=0 bulkscore=0 adultscore=0 priorityscore=1501
- malwarescore=0 spamscore=0 clxscore=1015 suspectscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2508120224
+In-Reply-To: <5c57a6a5-d9a4-4c21-86cd-784e4f3876fd@linux.ibm.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+
+On Fri, Aug 15, 2025 at 03:36:02PM +0530, Nilay Shroff wrote:
+> 
+> 
+> On 8/15/25 3:08 PM, Ming Lei wrote:
+> > On Fri, Aug 15, 2025 at 05:34:23PM +0800, Yu Kuai wrote:
+> >> Hi,
+> >>
+> >> 在 2025/08/15 17:15, Yu Kuai 写道:
+> >>> Will it be simpler if we move blk_mq_freeze_queue_nomemsave() into
+> >>> blk_mq_elv_switch_none(), after elevator is succeed switching to none
+> >>> then freeze the queue.
+> >>>
+> >>> Later in blk_mq_elv_switch_back we'll know if xa_load() return valid
+> >>> elevator_type, related queue is already freezed.
+> >>
+> >> Like following:
+> >>
+> >> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> >> index e9f037a25fe3..3640fae5707b 100644
+> >> --- a/block/blk-mq.c
+> >> +++ b/block/blk-mq.c
+> >> @@ -5010,7 +5010,13 @@ static int blk_mq_elv_switch_none(struct
+> >> request_queue *q,
+> >>                 __elevator_get(q->elevator->type);
+> >>
+> >>                 elevator_set_none(q);
+> >> +       } else {
+> >> +               ret = xa_insert(elv_tbl, q->id, xa_mk_value(1), GFP_KERNEL);
+> >> +               if (WARN_ON_ONCE(ret))
+> >> +                       return ret;
+> >>         }
+> >> +
+> >> +       blk_mq_freeze_queue_nomemsave(q);
+> >>         return ret;
+> >>  }
+> >>
+> >> @@ -5045,9 +5051,6 @@ static void __blk_mq_update_nr_hw_queues(struct
+> >> blk_mq_tag_set *set,
+> >>                 blk_mq_sysfs_unregister_hctxs(q);
+> >>         }
+> >>
+> >> -       list_for_each_entry(q, &set->tag_list, tag_set_list)
+> >> -               blk_mq_freeze_queue_nomemsave(q);
+> >> -
+> >>         /*
+> >>          * Switch IO scheduler to 'none', cleaning up the data associated
+> >>          * with the previous scheduler. We will switch back once we are done
+> >> diff --git a/block/elevator.c b/block/elevator.c
+> >> index e2ebfbf107b3..9400ea9ec024 100644
+> >> --- a/block/elevator.c
+> >> +++ b/block/elevator.c
+> >> @@ -715,16 +715,21 @@ void elv_update_nr_hw_queues(struct request_queue *q,
+> >> struct elevator_type *e,
+> >>
+> >>         WARN_ON_ONCE(q->mq_freeze_depth == 0);
+> >>
+> >> -       if (e && !blk_queue_dying(q) && blk_queue_registered(q)) {
+> >> -               ctx.name = e->elevator_name;
+> >> -               ctx.et = t;
+> >> -
+> >> -               mutex_lock(&q->elevator_lock);
+> >> -               /* force to reattach elevator after nr_hw_queue is updated
+> >> */
+> >> -               ret = elevator_switch(q, &ctx);
+> >> -               mutex_unlock(&q->elevator_lock);
+> >> +       if (e) {
+> >> +               if (!xa_is_value(e) && !blk_queue_dying(q) &&
+> >> +                   blk_queue_registered(q)) {
+> >> +                       ctx.name = e->elevator_name;
+> >> +                       ctx.et = t;
+> >> +
+> >> +                       mutex_lock(&q->elevator_lock);
+> >> +                       /* force to reattach elevator after nr_hw_queue is
+> >> updated */
+> >> +                       ret = elevator_switch(q, &ctx);
+> >> +                       mutex_unlock(&q->elevator_lock);
+> >> +               }
+> >> +
+> >> +               blk_mq_unfreeze_queue_nomemrestore(q);
+> >>         }
+> >> -       blk_mq_unfreeze_queue_nomemrestore(q);
+> >> +
+> > 
+> > I feel it doesn't become simpler, :-(
+> > 
+> > However we still can avoid the change in elv_update_nr_hw_queues() by moving
+> > freeze/unfree queue to blk_mq_elv_switch_back(), which looks more readable.
+> > 
+> I think yes that seems reasonable but then we also need to move 
+> elevator_change_done() and blk_mq_free_sched_tags() from 
+> elv_update_nr_hw_queues() to blk_mq_elv_switch_back(). As you know
+> both these functions (elevator_change_done and blk_mq_free_sched_tags)
+> have to be called after we unfreeze the queue.
+
+It can be done in easier way:
 
 
-
-On 8/15/25 7:02 AM, Yu Kuai wrote:
-> Hi,
-> 
-> 在 2025/08/14 20:23, Nilay Shroff 写道:
->>
->>
->> On 8/14/25 9:05 AM, Yu Kuai wrote:
->>> From: Yu Kuai <yukuai3@huawei.com>
->>>
->>> 1) queue_requests_store() is the only caller of
->>> blk_mq_update_nr_requests(), where queue is already freezed, no need to
->>> check mq_freeze_depth;
->>> 2) q->tag_set must be set for request_based device, and queue_is_mq() is
->>> already checked in blk_mq_queue_attr_visible(), no need to check
->>> q->tag_set.
->>> 3) During initialization, hctx->tags in initialized before queue
->>> kobject, and during del_gendisk, queue kobject is deleted before
->>> exiting hctx, hence checking hctx->tags is useless.
->>>
->>> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
->>> ---
->>>   block/blk-mq.c | 11 +----------
->>>   1 file changed, 1 insertion(+), 10 deletions(-)
->>>
->>> diff --git a/block/blk-mq.c b/block/blk-mq.c
->>> index b67d6c02eceb..3a219b7b3688 100644
->>> --- a/block/blk-mq.c
->>> +++ b/block/blk-mq.c
->>> @@ -4921,24 +4921,15 @@ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
->>>   {
->>>       struct blk_mq_tag_set *set = q->tag_set;
->>>       struct blk_mq_hw_ctx *hctx;
->>> -    int ret;
->>> +    int ret = 0;
->>>       unsigned long i;
->>>   -    if (WARN_ON_ONCE(!q->mq_freeze_depth))
->>> -        return -EINVAL;
->>> -
->>> -    if (!set)
->>> -        return -EINVAL;
->>> -
->>>       if (q->nr_requests == nr)
->>>           return 0;
->>>         blk_mq_quiesce_queue(q);
->>>   -    ret = 0;
->>>       queue_for_each_hw_ctx(q, hctx, i) {
->>> -        if (!hctx->tags)
->>> -            continue;
->> It's possible that hctx->tags is set to NULL in case no software
->> queues are mapped to the hardware queue. So it seems that this
->> check is valid. Please see blk_mq_map_swqueue().
-> 
-> Ok, thanks for the reviw.
-> 
-> I didn't notice this, just wonder how can this happen?
-> nr_hw_queues > NR_CPUS?
-> 
-I think typically having nr_hw_queues > NR_CPUS is not allowed. 
-But it's possible to have no software queues are mapped to hctx.
-Check this commit 4412efecf7fd ("Revert "blk-mq: remove code for
-dealing with remapping queue")
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index b67d6c02eceb..69949929dfbb 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -4974,11 +4974,15 @@ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
+  * Switch back to the elevator type stored in the xarray.
+  */
+ static void blk_mq_elv_switch_back(struct request_queue *q,
+-		struct xarray *elv_tbl, struct xarray *et_tbl)
++		struct xarray *elv_tbl, struct xarray *et_tbl, bool frozen)
+ {
+ 	struct elevator_type *e = xa_load(elv_tbl, q->id);
+ 	struct elevator_tags *t = xa_load(et_tbl, q->id);
+ 
++	/* elv_update_nr_hw_queues() expects queue to be frozen */
++	if (!frozen)
++		blk_mq_freeze_queue_nomemsave(q);
++
+ 	/* The elv_update_nr_hw_queues unfreezes the queue. */
+ 	elv_update_nr_hw_queues(q, e, t);
+ 
+@@ -5033,6 +5037,7 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
+ 	unsigned int memflags;
+ 	int i;
+ 	struct xarray elv_tbl, et_tbl;
++	bool queues_frozen = false;
+ 
+ 	lockdep_assert_held(&set->tag_list_lock);
+ 
+@@ -5056,9 +5061,6 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
+ 		blk_mq_sysfs_unregister_hctxs(q);
+ 	}
+ 
+-	list_for_each_entry(q, &set->tag_list, tag_set_list)
+-		blk_mq_freeze_queue_nomemsave(q);
+-
+ 	/*
+ 	 * Switch IO scheduler to 'none', cleaning up the data associated
+ 	 * with the previous scheduler. We will switch back once we are done
+@@ -5068,6 +5070,9 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
+ 		if (blk_mq_elv_switch_none(q, &elv_tbl))
+ 			goto switch_back;
+ 
++	list_for_each_entry(q, &set->tag_list, tag_set_list)
++		blk_mq_freeze_queue_nomemsave(q);
++	queues_frozen = true;
+ 	if (blk_mq_realloc_tag_set_tags(set, nr_hw_queues) < 0)
+ 		goto switch_back;
+ 
+@@ -5092,7 +5097,7 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
+ switch_back:
+ 	/* The blk_mq_elv_switch_back unfreezes queue for us. */
+ 	list_for_each_entry(q, &set->tag_list, tag_set_list)
+-		blk_mq_elv_switch_back(q, &elv_tbl, &et_tbl);
++		blk_mq_elv_switch_back(q, &elv_tbl, &et_tbl, queues_frozen);
+ 
+ 	list_for_each_entry(q, &set->tag_list, tag_set_list) {
+ 		blk_mq_sysfs_register_hctxs(q);
 
 Thanks,
---Nilay
-
-
-
+Ming
 
