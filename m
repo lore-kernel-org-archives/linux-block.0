@@ -1,59 +1,58 @@
 Received: from 003.mia.mailroute.net (003.mia.mailroute.net [199.89.3.6])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03B592E5D01
-	for <linux-block@vger.kernel.org>; Fri, 15 Aug 2025 16:55:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FC3E2E5D01
+	for <linux-block@vger.kernel.org>; Fri, 15 Aug 2025 16:55:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.6
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755276933; cv=none; b=eLTuFLGbUzMEzAg1wW2iE48j24uTRuWwEu34u9yYNgoulLoPbn8WhJQXNMuxkjZLYME8kfg6AOvm0nM1U2pN+Jq8Ug7g99WeOl9WoekggmqXH1KUCu1SqBx1gVdL2DEpsw6jO+r8mAIcr6AK6U3rnwNExDr1sZaZi8Ormy2Tfwc=
+	t=1755276944; cv=none; b=YJz4SH7v003XyBRa50LDsJtcM3XL4qnuJ/uZytenGwSATbmgyz+376Zajr5xrp2NjAFLks+5NX0toGs8TIFsDggp8wwsQVzZpEODpthGbSib6bY4UUABtfKgNzeP8pFm2hHso/M3HzP4xtNWSMteoGMNas2t6gpqMnKiChoypOg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755276933; c=relaxed/simple;
-	bh=WyujT6t8+wFo5KWA+dj87nmleNSyhfjHYeCEMBJe7jg=;
+	s=arc-20240116; t=1755276944; c=relaxed/simple;
+	bh=MeXOF3TcccyOBx/WsvKTF+TK93279F9HEDhU6npYkUE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VDval+2laPbd9f5ofiJDaxPv9KzOQHeJB4z0WXb3PBrlEI+SLoAJTLw76pwLANJ/NcKoBmI4mYzaeDj+iq9LkOUHvvxuMahJoxHkc9yZNcyLuOovR5mGl2FgLbfsv0o1iNIPJjszB0cDg2t+2lkNcuIzlUU5UmpjEBTG1fxDEGI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=Zv8/Ez56; arc=none smtp.client-ip=199.89.3.6
+	 MIME-Version; b=MbRtObSCfLDITIrN+A0b1MGB7ewrwzvINmZvHMhPuo8DamLVGO8t1iOZj7FIuVqLqiThazUouRVSFuY3TNeFfbbUsdNW2D5gZLF1Ux2xgimva7EjTNOJQTRa4Ba1y+3a7QIf4GOcMp1l6qWHSD4KjwC06QzVaq3tK9X6fQ97kzk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=jbRqN7a2; arc=none smtp.client-ip=199.89.3.6
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="Zv8/Ez56"
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="jbRqN7a2"
 Received: from localhost (localhost [127.0.0.1])
-	by 003.mia.mailroute.net (Postfix) with ESMTP id 4c3Ssb0BFczltBDb;
-	Fri, 15 Aug 2025 16:55:31 +0000 (UTC)
+	by 003.mia.mailroute.net (Postfix) with ESMTP id 4c3Ssn0VD6zltQmY;
+	Fri, 15 Aug 2025 16:55:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
 	content-transfer-encoding:mime-version:references:in-reply-to
 	:x-mailer:message-id:date:date:subject:subject:from:from
-	:received:received; s=mr01; t=1755276929; x=1757868930; bh=RoUfp
-	OLwiVarujsHUJikUOw5XcHTa9UCpbc188nlx8s=; b=Zv8/Ez56AM6QvRmHqkt0b
-	Sy1Q4qsuESURXdPsQxnQsLaBSg3Itx0BhHjrPQ70zVmGhwqmPGazNAZlTQdQ1Ixy
-	N/DDVDbiOiFSaqSb0u5RQAh6yi8GXUEkYVo76Bmwa3Qz2C+pvyESfiw+/DYx93q5
-	/9VTqXmeFkl3+vY62SQxnE2PJNjFuj5nkexF42zpMg5j1rYcM4TzhDKgOz2zRCa5
-	naJ/p71WMCcB4aOFxlxaZqfPwRBjBrKlg8MxDuZ3RKyRr3h6oazVMYVmri5YCwOt
-	dfg5djtRWJyY+8dE9m2gPA8xHffGiINBHgyPNiif5yYMrKPw4JLfnQLY/Tw2/W69
+	:received:received; s=mr01; t=1755276939; x=1757868940; bh=T3sZk
+	+79a0VOCY4hn3ahHJyl8TCL0dpPbMMAzytK35I=; b=jbRqN7a24xpPrUKZkfiES
+	7K2x9nr9iYuQYD9Pm2jXbQj70LX87YF4DIFzXYtyVVrYJBN/2JPsgjdpkQPtgovh
+	JTK0kDLcrNmung5MhPfLeOyDEIoecl9voH5U0NpeCapQ/hCNaeuAumvwOtg3ZdbO
+	BU7o4gLTgrgsbe/ksCqFohmjLCcLYn7gCm+ypgprKXrexyOL6uOj6THKKDOJ9r62
+	ZkeJ2s63y1UKQrYuvCJg4cU3Men860vQgdGA+NTjOY6lHVLzdId/7g71YsWVdr3R
+	E7klu9S/6rVrsJ3qXUQYrUi9iI99Kw0MZXxV6jLdF8K08n1eGh83cpwXM3HI4OKZ
 	Q==
 X-Virus-Scanned: by MailRoute
 Received: from 003.mia.mailroute.net ([127.0.0.1])
  by localhost (003.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id Gs_I6Dz6pXDC; Fri, 15 Aug 2025 16:55:29 +0000 (UTC)
+ id cun320OmHT4A; Fri, 15 Aug 2025 16:55:39 +0000 (UTC)
 Received: from bvanassche.mtv.corp.google.com (unknown [104.135.204.82])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: bvanassche@acm.org)
-	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4c3SsQ2VRhzltQmP;
-	Fri, 15 Aug 2025 16:55:21 +0000 (UTC)
+	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4c3Ssd2PgMzlgqVr;
+	Fri, 15 Aug 2025 16:55:32 +0000 (UTC)
 From: Bart Van Assche <bvanassche@acm.org>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org,
 	Christoph Hellwig <hch@lst.de>,
 	Bart Van Assche <bvanassche@acm.org>,
-	Kent Overstreet <kent.overstreet@linux.dev>,
 	Coly Li <colyli@kernel.org>,
 	Chaitanya Kulkarni <kch@nvidia.com>,
 	Steven Rostedt <rostedt@goodmis.org>,
 	Masami Hiramatsu <mhiramat@kernel.org>
-Subject: [PATCH v3 3/5] bcache, tracing: Do not truncate orig_sector
-Date: Fri, 15 Aug 2025 09:54:41 -0700
-Message-ID: <20250815165453.540741-4-bvanassche@acm.org>
+Subject: [PATCH v3 4/5] bcache, tracing: Remove superfluous casts
+Date: Fri, 15 Aug 2025 09:54:42 -0700
+Message-ID: <20250815165453.540741-5-bvanassche@acm.org>
 X-Mailer: git-send-email 2.51.0.rc1.163.g2494970778-goog
 In-Reply-To: <20250815165453.540741-1-bvanassche@acm.org>
 References: <20250815165453.540741-1-bvanassche@acm.org>
@@ -65,29 +64,70 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Change the type of orig_sector from dev_t (unsigned int) into sector_t
-(u64) to prevent truncation of orig_sector by the tracing code.
+sector_t is a synonym for u64 and all architectures define u64 as unsigne=
+d
+long long. Hence, it is not necessary to cast type sector_t to unsigned
+long long. Remove the superfluous casts to improve compile-time type
+checking.
 
-Cc: Kent Overstreet <kent.overstreet@linux.dev>
 Acked-by: Coly Li <colyli@kernel.org>
 Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
-Fixes: cafe56359144 ("bcache: A block layer cache")
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- include/trace/events/bcache.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ include/trace/events/bcache.h | 13 ++++++-------
+ 1 file changed, 6 insertions(+), 7 deletions(-)
 
 diff --git a/include/trace/events/bcache.h b/include/trace/events/bcache.=
 h
-index 899fdacf57b9..d0eee403dc15 100644
+index d0eee403dc15..697e0f80d17c 100644
 --- a/include/trace/events/bcache.h
 +++ b/include/trace/events/bcache.h
-@@ -16,7 +16,7 @@ DECLARE_EVENT_CLASS(bcache_request,
- 		__field(unsigned int,	orig_major		)
- 		__field(unsigned int,	orig_minor		)
- 		__field(sector_t,	sector			)
--		__field(dev_t,		orig_sector		)
-+		__field(sector_t,	orig_sector		)
- 		__field(unsigned int,	nr_sector		)
- 		__array(char,		rwbs,	6		)
- 	),
+@@ -33,9 +33,9 @@ DECLARE_EVENT_CLASS(bcache_request,
+=20
+ 	TP_printk("%d,%d %s %llu + %u (from %d,%d @ %llu)",
+ 		  MAJOR(__entry->dev), MINOR(__entry->dev),
+-		  __entry->rwbs, (unsigned long long)__entry->sector,
++		  __entry->rwbs, __entry->sector,
+ 		  __entry->nr_sector, __entry->orig_major, __entry->orig_minor,
+-		  (unsigned long long)__entry->orig_sector)
++		  __entry->orig_sector)
+ );
+=20
+ DECLARE_EVENT_CLASS(bkey,
+@@ -107,7 +107,7 @@ DECLARE_EVENT_CLASS(bcache_bio,
+=20
+ 	TP_printk("%d,%d  %s %llu + %u",
+ 		  MAJOR(__entry->dev), MINOR(__entry->dev), __entry->rwbs,
+-		  (unsigned long long)__entry->sector, __entry->nr_sector)
++		  __entry->sector, __entry->nr_sector)
+ );
+=20
+ DEFINE_EVENT(bcache_bio, bcache_bypass_sequential,
+@@ -144,7 +144,7 @@ TRACE_EVENT(bcache_read,
+=20
+ 	TP_printk("%d,%d  %s %llu + %u hit %u bypass %u",
+ 		  MAJOR(__entry->dev), MINOR(__entry->dev),
+-		  __entry->rwbs, (unsigned long long)__entry->sector,
++		  __entry->rwbs, __entry->sector,
+ 		  __entry->nr_sector, __entry->cache_hit, __entry->bypass)
+ );
+=20
+@@ -175,7 +175,7 @@ TRACE_EVENT(bcache_write,
+=20
+ 	TP_printk("%pU inode %llu  %s %llu + %u hit %u bypass %u",
+ 		  __entry->uuid, __entry->inode,
+-		  __entry->rwbs, (unsigned long long)__entry->sector,
++		  __entry->rwbs, __entry->sector,
+ 		  __entry->nr_sector, __entry->writeback, __entry->bypass)
+ );
+=20
+@@ -243,8 +243,7 @@ TRACE_EVENT(bcache_journal_write,
+=20
+ 	TP_printk("%d,%d  %s %llu + %u keys %u",
+ 		  MAJOR(__entry->dev), MINOR(__entry->dev), __entry->rwbs,
+-		  (unsigned long long)__entry->sector, __entry->nr_sector,
+-		  __entry->nr_keys)
++		  __entry->sector, __entry->nr_sector, __entry->nr_keys)
+ );
+=20
+ /* Btree */
