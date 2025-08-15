@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66BD52D3725;
-	Fri, 15 Aug 2025 07:31:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E0112D46BF;
+	Fri, 15 Aug 2025 07:31:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755243111; cv=none; b=sSNDpjYEC3mPHaPsWv431KJw6Mf7foJMOq55Ml3o9BYrN7gZd4TcY016jJDu4iPrkCtWPmTGb54UzWrcx3UVLDzhMG1OcxBMsN8BQoXOQ1tjZqSYw6Hg5wj+Jc7f7YgpftLX9mvzST4OXR5YODN7RPQqjRuZFprE3cy5D5soG1s=
+	t=1755243116; cv=none; b=nhg4Jb9la5xO0ZRFWny9f29hAlo6WZBVxXXq1NkPeIoXrQq8+PmqpUw5bwdExdSx6U5xDmS60PBFM39UlFlj7qCuDcVLwtLwL0Uf8bVviyBh8lvPcD5PCGP+oNgQjnOdTpjVJtLp5orOKpm1Q9f8qmgZyOWOtMmJNTOxyUYY1eQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755243111; c=relaxed/simple;
-	bh=Ccx5zgSLlbSIiXofZb52HFU6BY4bx1BMin6k8F+fBLU=;
+	s=arc-20240116; t=1755243116; c=relaxed/simple;
+	bh=WE0oYMKVocpeSumFth9LF4yM1uvggXOmT17lbIpdQMg=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=BJmlHlVG0Z7eRjmEiVLMyqxJHxxACO1JICdap7xwse2m9cg/ucAiHUHm3Pu3qLQ6tTzp/jA9tWYzFkRVYVeqg9VSfoekyOMol3BDLRdz+Q5cwh2KlrQ/7+UlN9bsCcujDQsz3lTdvmEuG/SH23oJrIidOH19mC20ZGzlqij7reo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VCi6hrM/; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=PDqHwhziNr4pYhhNE/sIA1xQxiEzGXBW30rkVlqh/S+mqHE52BXrAzNXYpio/CmjmHPyMn1vs9xtURC5FFUFQ7diU2p+mBPuAcESu2LXvrRWCnLIkthQ/kdfHvmcWTPJHk08RqwDC9BbIege921i1hu8vsJP5lPGWBN4unPk4Bo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZanBq7oI; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VCi6hrM/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68790C4CEF5;
-	Fri, 15 Aug 2025 07:31:48 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZanBq7oI"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD357C4CEEB;
+	Fri, 15 Aug 2025 07:31:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755243111;
-	bh=Ccx5zgSLlbSIiXofZb52HFU6BY4bx1BMin6k8F+fBLU=;
+	s=k20201202; t=1755243114;
+	bh=WE0oYMKVocpeSumFth9LF4yM1uvggXOmT17lbIpdQMg=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=VCi6hrM/NWYXHPrciG39yNdmLZPR5YDYNZlUFtZk8qAv8f1JmCMM/cyh0aPJo5ofV
-	 SWwQbtUQ/SJmHYMxn0FjdwC/EFhD3DWBStrD54lcccFVKQmnJBD8ToQB53x+iPhxtw
-	 S/bx4jXIqyFaZjcVtI+ug95RMi7hV2FGIEFdGSaOV4Yt9ApWDMIhtV8KXoaYLqUHl2
-	 824bZMbt5ppBXQn7kbXLtGqp0YPAjFhYUN1ZQr1OalI/+H7ll+E+xCh4he4kVTIvrX
-	 /itC+RvEX1VZyjCyFElkzLqWv+uqN5/B7JzDHIy2qRGEFztLGwVz4TtiX11M4Xgb4n
-	 KJkvX7vOk9abg==
+	b=ZanBq7oIOBy4VOHmzL1tqiOd+94t3PtGXHCEZVGx1Z1um3wGOTZtWWeaOVy+nDyaM
+	 U5334rPTHrS7oNpLdhWZ9GVvkWXyUt8KS812OslYKwjr2LNrlgPK7swKKG1NEbVII2
+	 u+L5iNmCJGwWXIH+RRui8WiPKM0SBqd0mcdNFOZ6xk4/VVF0x+cy4yP9yt8DnBRyf+
+	 eHHa0IvZD0HlnhGUHZr8I/71QIGzZ7mpfieULE0jof5K+TQN1636647kJc1gj+ebW7
+	 Fdoe3U5duJ99Z6HN8LMqhRY7zIDD06/DMpSPhBQJWVq3iBC1a8ZZHgJwhNtGfpt3N6
+	 vILDbUBawkDfw==
 From: Andreas Hindborg <a.hindborg@kernel.org>
-Date: Fri, 15 Aug 2025 09:30:45 +0200
-Subject: [PATCH v5 10/18] rust: block: remove `RawWriter`
+Date: Fri, 15 Aug 2025 09:30:36 +0200
+Subject: [PATCH v5 01/18] rust: str: normalize imports in `str.rs`
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -37,7 +37,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250815-rnull-up-v6-16-v5-10-581453124c15@kernel.org>
+Message-Id: <20250815-rnull-up-v6-16-v5-1-581453124c15@kernel.org>
 References: <20250815-rnull-up-v6-16-v5-0-581453124c15@kernel.org>
 In-Reply-To: <20250815-rnull-up-v6-16-v5-0-581453124c15@kernel.org>
 To: Boqun Feng <boqun.feng@gmail.com>, Miguel Ojeda <ojeda@kernel.org>, 
@@ -47,110 +47,56 @@ To: Boqun Feng <boqun.feng@gmail.com>, Miguel Ojeda <ojeda@kernel.org>,
  Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, 
  Jens Axboe <axboe@kernel.dk>, Breno Leitao <leitao@debian.org>
 Cc: linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Andreas Hindborg <a.hindborg@kernel.org>, 
- Daniel Almeida <daniel.almeida@collabora.com>
+ linux-kernel@vger.kernel.org, Andreas Hindborg <a.hindborg@kernel.org>
 X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2507; i=a.hindborg@kernel.org;
- h=from:subject:message-id; bh=Ccx5zgSLlbSIiXofZb52HFU6BY4bx1BMin6k8F+fBLU=;
- b=owEBbQKS/ZANAwAIAeG4Gj55KGN3AcsmYgBonuI88IWZ7fNLhL0M+W00aAZDcjP7iujh+g0i6
- ThQZ6OPhHaJAjMEAAEIAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaJ7iPAAKCRDhuBo+eShj
- d6EhEADF619stZYj6i5xxO6CmLRojhkTXGrwOWBatsaqHH782uAvz6pkM2dB6MZD2JLf/RR8eYr
- fTONHUNnf8/2djGrAbNF/DtL9o4PQn0/7rMKOLQ06XpdKk/qSuC0g+XYc2ROzBt55WorpbC0B8M
- HQGRbRFsSHvJ2y63x4s/3Vyc3NEJAvBc4ygOKlvnVeh/fTrhmhZ5GvGGA8v9NzJi7GZcQgseMM1
- 3j342DuxIC2KRH8I1bYGsX6eVLoXbqhuMJoFvp7ywf3F4o/CPH1l4WMX9TuHmNKGOd82zchuzSc
- Yner+FSZ3xJ71iHuikIFS65HeEZHvC+7XzlBN8Fds1BNeKTa0JhNK/4/2P6OJSMUZR+56+i09UH
- IWQ2q4GALjiWSkIJWM9HmY5mmcXWvNvglucexsQMB3LmMI1ZeSq70K/t0RoJtX5KAb3ji3k4cTK
- ELVibfziNnAMirMHQXWqdsx3qOzqhJ1P9FNuV2k2/ep+JE3cjQFxNr2tpB4lneNxGIZp+NMejC9
- GtvhCfPVxnufPW/FnP5INlEj5u4/hZKgX6EMfP2Pur3RY8qO//zV6F3WEtfQhKi7CChhLFN79Rb
- rFnitcP40afmfT+f/t4zjISZJqg05DCQi/Q91YYp+7sd252OlZQDYBGqjdMRDgfE7de3Elwrt0s
- 3s5huC8FqyJI65A==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=871; i=a.hindborg@kernel.org;
+ h=from:subject:message-id; bh=WE0oYMKVocpeSumFth9LF4yM1uvggXOmT17lbIpdQMg=;
+ b=owEBbQKS/ZANAwAIAeG4Gj55KGN3AcsmYgBonuI0A8GSO4ANhM15pKf4emp3CTOYA4EB+oVhK
+ LkSIUKwMnyJAjMEAAEIAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaJ7iNAAKCRDhuBo+eShj
+ d4DGEACpixzUudYAiCbLXXZZqjc+7blcvYyKLLcB8WDAxlvDW0CdD8j/LQMdKa90REOa4YYhKYM
+ NskUP+wcrAa1vRmzJQL/13Tr7/uQS7RinZP5yp+qMzlvUReFP5Y3WUpUGauaBMGaABT8853LS+K
+ yUwOi3HdzmWQFm4mN7LaL0ko9qR29lwGm2M/GPGcvZG5I0H3hydS6VqJIJI2rqglFiQIrWqkxjj
+ Zfn+Rfkuw4boanebtjhYi6KiRbX4d2gp1VkX+73EURWA/mibi23Fr1GRQYQ3nT+GzH7r9pgOR2u
+ l36AUOO4CaysmyPdZ0og0lR+Lb0QAIjMaaCLDbz6SBDRyXfNXbGy7J7N7ots4hP/Hosu8yOVUSk
+ H9QZHSBCLhE3wcnZJRV3xgMYSkmqjsZZOmAHnlriR1ABStY4D8yf4dHQ8jTqqGd0Qr1IskZhP2A
+ GBR+mLFrw2boK8sOqYd56iqOAp6Cpwm7Aun3NB8toC4KwOIiGamkIwf89XlBAtVB3XGFdUz4lyl
+ pQyfBsy9SAdDs6Cl9oN4zaRJ4D52qcFJxEg0SVSiwoqlwV2wj/Bzs4GTTaQrT3wHHo+X2djhu2j
+ 1tXN+xFDhx28nSZhc45JrIjyMCSRP8CS5OeCLyK6m6omKsbRdAxdSuqZnx1dzzbKyv+uwO4AhMk
+ BHNG0VdQ7npy5/A==
 X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
  fpr=3108C10F46872E248D1FB221376EB100563EF7A7
 
-`RawWriter` is now dead code, so remove it.
+Clean up imports in `str.rs`. This makes future code manipulation more
+manageable.
 
 Reviewed-by: Alice Ryhl <aliceryhl@google.com>
-Reviewed-by: Daniel Almeida <daniel.almeida@collabora.com>
 Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
 ---
- rust/kernel/block/mq.rs            |  1 -
- rust/kernel/block/mq/raw_writer.rs | 56 --------------------------------------
- 2 files changed, 57 deletions(-)
+ rust/kernel/str.rs | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-diff --git a/rust/kernel/block/mq.rs b/rust/kernel/block/mq.rs
-index 831445d37181..98fa0d6bc8f7 100644
---- a/rust/kernel/block/mq.rs
-+++ b/rust/kernel/block/mq.rs
-@@ -89,7 +89,6 @@
+diff --git a/rust/kernel/str.rs b/rust/kernel/str.rs
+index 6c892550c0ba..082790b7a621 100644
+--- a/rust/kernel/str.rs
++++ b/rust/kernel/str.rs
+@@ -2,12 +2,13 @@
  
- pub mod gen_disk;
- mod operations;
--mod raw_writer;
- mod request;
- mod tag_set;
+ //! String representations.
  
-diff --git a/rust/kernel/block/mq/raw_writer.rs b/rust/kernel/block/mq/raw_writer.rs
-deleted file mode 100644
-index 0aef55703e71..000000000000
---- a/rust/kernel/block/mq/raw_writer.rs
-+++ /dev/null
-@@ -1,56 +0,0 @@
--// SPDX-License-Identifier: GPL-2.0
+-use crate::alloc::{flags::*, AllocError, KVec};
+-use crate::fmt::{self, Write};
++use crate::{
++    alloc::{flags::*, AllocError, KVec},
++    fmt::{self, Write},
++    prelude::*,
++};
+ use core::ops::{self, Deref, DerefMut, Index};
+ 
+-use crate::prelude::*;
 -
--use core::fmt::{self, Write};
--
--use crate::error::Result;
--use crate::prelude::EINVAL;
--
--/// A mutable reference to a byte buffer where a string can be written into.
--///
--/// # Invariants
--///
--/// `buffer` is always null terminated.
--pub(crate) struct RawWriter<'a> {
--    buffer: &'a mut [u8],
--    pos: usize,
--}
--
--impl<'a> RawWriter<'a> {
--    /// Create a new `RawWriter` instance.
--    fn new(buffer: &'a mut [u8]) -> Result<RawWriter<'a>> {
--        *(buffer.last_mut().ok_or(EINVAL)?) = 0;
--
--        // INVARIANT: We null terminated the buffer above.
--        Ok(Self { buffer, pos: 0 })
--    }
--
--    #[expect(dead_code)]
--    pub(crate) fn from_array<const N: usize>(
--        a: &'a mut [crate::ffi::c_char; N],
--    ) -> Result<RawWriter<'a>> {
--        Self::new(
--            // SAFETY: the buffer of `a` is valid for read and write as `u8` for
--            // at least `N` bytes.
--            unsafe { core::slice::from_raw_parts_mut(a.as_mut_ptr().cast::<u8>(), N) },
--        )
--    }
--}
--
--impl Write for RawWriter<'_> {
--    fn write_str(&mut self, s: &str) -> fmt::Result {
--        let bytes = s.as_bytes();
--        let len = bytes.len();
--
--        // We do not want to overwrite our null terminator
--        if self.pos + len > self.buffer.len() - 1 {
--            return Err(fmt::Error);
--        }
--
--        // INVARIANT: We are not overwriting the last byte
--        self.buffer[self.pos..self.pos + len].copy_from_slice(bytes);
--
--        self.pos += len;
--
--        Ok(())
--    }
--}
+ /// Byte string without UTF-8 validity guarantee.
+ #[repr(transparent)]
+ pub struct BStr([u8]);
 
 -- 
 2.47.2
