@@ -1,60 +1,30 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B4B5274670
-	for <linux-block@vger.kernel.org>; Fri, 15 Aug 2025 09:43:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 777922FCBEC;
+	Fri, 15 Aug 2025 09:59:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755251023; cv=none; b=RYzs/XSwP+kjz9UCroJDTu1W9cEIcHY2yuKw4BKE/B4Pe17p3Atk3HL1AhJhhqqDhrrI8lOKl7dbCJbbb/N13PZV2sYSh5NGN3gWp/zRx8FWHWVp5twjP8oF49g8mR6SYAxG0sxlWHEnmxLcYFeqWZWJiLbPLbPx5WbR9QdUGXU=
+	t=1755251951; cv=none; b=ssJt6KgS570w+hF7B53+f5eY3uTvQXBoM4OWLfywehuk78wXzSb4RYfUX+6hhUtiw68h+Q1ZoSEPQCl0Yv6iqTk28eiIVEEn2DybLActnL7KPI6WGn0OPDUm7R5RbtxCMN0lfo5l8cRnv3nJoKmR01/MkELekgZfeWtfeWEYpL8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755251023; c=relaxed/simple;
-	bh=mmXrbhmz/+Q4taqtuJ6vF5svdNtiOVcg0qzAwui785k=;
+	s=arc-20240116; t=1755251951; c=relaxed/simple;
+	bh=BPj2WyclCZXem/yITttTFUz9oSCQhbl2IdcrQ+sLCf8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ozJoK21Rm8z3gCa9ZK2qEgCp3ORV66zCH6H7M9hdJxblFyyRyoVFG3YHIneu6eDzf1G5MTeEl2yZJz+01XxC4+vLquuAgBR7hBQD9IMuam2erdjIn8NClDjUQgjplBK66evACXzuuoSXDaD+2keHhUSPdN4cnqXBf1EwfIn/DL0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=UldcodPa; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="UldcodPa"
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57F3tH7F029882;
-	Fri, 15 Aug 2025 09:43:25 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=YMwM3e
-	DQoKc8RI3r5mj3mx2XYYGVTYOErMysR46DcLU=; b=UldcodPaIM3/YCwmhYdGx8
-	i6HC9y1DLKGAgf0lEOHAzwHVURqCJk3MKl7+bypal1OIASN3DR3cl6r3rqnr7KhN
-	5ViVcFKPYLBQA5IWwAsZ6ajV7qV770nf6JMIBCDLhvzq+LU/FzEYv8WOfBpKcA/U
-	+hDI/5a1eql4fDbD3OjGb2a/zgeC1jEwXKLUWyEFM9JH7WfNhDC9UeJ9s+j5ssF9
-	XMdF2/uJ7lTLIGtVrBqKXRMheZkfn6+y4k/fZGl6LiRDLotudAffqGAZLfCBgqQb
-	eizAaW3djXFF6gpc8djQ9ndvLohOrDjiwmLfCKVberP90uz39Ubsg5z6eIcNDBhw
-	==
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48dvrpegm8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 15 Aug 2025 09:43:25 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 57F94MBt017600;
-	Fri, 15 Aug 2025 09:43:24 GMT
-Received: from smtprelay07.wdc07v.mail.ibm.com ([172.16.1.74])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 48ekc400ja-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 15 Aug 2025 09:43:24 +0000
-Received: from smtpav03.wdc07v.mail.ibm.com (smtpav03.wdc07v.mail.ibm.com [10.39.53.230])
-	by smtprelay07.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 57F9hNFA29295280
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 15 Aug 2025 09:43:23 GMT
-Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B8EA55805F;
-	Fri, 15 Aug 2025 09:43:23 +0000 (GMT)
-Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E6D845805A;
-	Fri, 15 Aug 2025 09:43:20 +0000 (GMT)
-Received: from [9.61.133.254] (unknown [9.61.133.254])
-	by smtpav03.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 15 Aug 2025 09:43:20 +0000 (GMT)
-Message-ID: <16975629-4988-4841-86bb-d4f3f40cc849@linux.ibm.com>
-Date: Fri, 15 Aug 2025 15:13:19 +0530
+	 In-Reply-To:Content-Type; b=sdd421YGTHLAH5SrvKhNNAVSB23Zs9hRuWm5z8UTY1fbeRQFB4gvIv3pUT1lZNQMYc5XBZYiVPv3NLFMHzWb0RLv7ShpnCd6MJ5c4mz9ZM+Q9Dbj7h6NVH44/0Zy7Ksnw+lXjvNKBZqWmUVprdunBUGZk791tv49FrYEZWeFhO0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4c3Hd56804zKHMnb;
+	Fri, 15 Aug 2025 17:59:05 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 2707D1A0A8D;
+	Fri, 15 Aug 2025 17:59:05 +0800 (CST)
+Received: from [10.174.179.80] (unknown [10.174.179.80])
+	by APP4 (Coremail) with SMTP id gCh0CgDnrxDlBJ9or8EHDw--.35151S3;
+	Fri, 15 Aug 2025 17:59:03 +0800 (CST)
+Message-ID: <1428e3fe-ae7a-410d-97b5-7dd0249c41c0@huaweicloud.com>
+Date: Fri, 15 Aug 2025 17:59:01 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -62,206 +32,161 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv3 3/3] block: avoid cpu_hotplug_lock depedency on
- freeze_lock
-To: Ming Lei <ming.lei@redhat.com>
-Cc: linux-block@vger.kernel.org, axboe@kernel.dk, yukuai1@huaweicloud.com,
-        hch@lst.de, shinichiro.kawasaki@wdc.com, kch@nvidia.com,
-        gjoyce@ibm.com
-References: <20250814082612.500845-1-nilay@linux.ibm.com>
- <20250814082612.500845-4-nilay@linux.ibm.com> <aJ3aR2JodRrAqVcO@fedora>
- <e125025b-d576-4919-b00e-5d9b640bed77@linux.ibm.com>
- <aJ3myQW2A8HtteBC@fedora>
- <e33e97f7-0c12-4f70-81d0-4fea05557579@linux.ibm.com>
- <aJ57lZLhktXxaBoh@fedora>
+Subject: Re: [PATCH xfsprogs v2] xfs_io: add FALLOC_FL_WRITE_ZEROES support
+To: "Darrick J. Wong" <djwong@kernel.org>
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+ dm-devel@lists.linux.dev, linux-nvme@lists.infradead.org,
+ linux-scsi@vger.kernel.org, linux-xfs@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-api@vger.kernel.org, hch@lst.de,
+ tytso@mit.edu, bmarzins@redhat.com, chaitanyak@nvidia.com,
+ shinichiro.kawasaki@wdc.com, brauner@kernel.org, martin.petersen@oracle.com,
+ yi.zhang@huawei.com, chengzhihao1@huawei.com, yukuai3@huawei.com,
+ yangerkun@huawei.com
+References: <20250813024250.2504126-1-yi.zhang@huaweicloud.com>
+ <20250814165430.GR7942@frogsfrogsfrogs>
 Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <aJ57lZLhktXxaBoh@fedora>
+From: Zhang Yi <yi.zhang@huaweicloud.com>
+In-Reply-To: <20250814165430.GR7942@frogsfrogsfrogs>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODEyMDIxOSBTYWx0ZWRfX7vD0k22FeaYg
- rSL0oBZhJCalRpZE9jwydSQWca0MfN0V8DOIb1GjjcubipMfEUdZaDQW1V6gCuH5wJ58Btd+9+L
- m9ATXoltU13qgUfhc6cFYczxDsRuQKQNUY2uEsvYeoO1z+jrfDJKzgcqbxkQ8BtNYxIzu0D+d+y
- oX90AUa2hojWBM+4sRx7TuNGfKKvADiGeHCugkLUP8H9+rt8ykfadywjT5pBtungSr9siOo44Cf
- hWbVV2t8zXLmqjtLtZN6laILaQlvXQHqtHXfA7tlIKnNh9AxODpJsm5RmjXrlKXCheqQdZ9/zLm
- 4VK4j0R7rkDNzIOVHUW0QPyD6tTSJBDBqDBk1M5eGS+EbF6mKG1G23Ahlqc1RlwARoKTwYPuYzV
- xFHCloqT
-X-Authority-Analysis: v=2.4 cv=GrpC+l1C c=1 sm=1 tr=0 ts=689f013d cx=c_pps
- a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
- a=IkcTkHD0fZMA:10 a=2OwXVqhp2XgA:10 a=VwQbUJbxAAAA:8 a=JF9118EUAAAA:8
- a=VnNF1IyMAAAA:8 a=NZdxs53CIEgwjd5_7P4A:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
- a=xVlTc564ipvMDusKsbsT:22
-X-Proofpoint-GUID: vrYW6GS0eBTomsIzh-0_cmHBY6M63_wj
-X-Proofpoint-ORIG-GUID: vrYW6GS0eBTomsIzh-0_cmHBY6M63_wj
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-08-15_03,2025-08-14_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 adultscore=0 spamscore=0 impostorscore=0 suspectscore=0
- phishscore=0 bulkscore=0 priorityscore=1501 malwarescore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2508120219
+Content-Transfer-Encoding: 7bit
+X-CM-TRANSID:gCh0CgDnrxDlBJ9or8EHDw--.35151S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxAw4fKFyrGry8tFWkJF4UXFb_yoW5uF17pa
+	47XF1jkFW5Xry7uayfKw4kuF98Xws3tF43Gr4xWr10v3Z8ZF1fKF1DGwsY93s7ur1xCa10
+	qFn0gFy3C3WSy37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUv0b4IE77IF4wAFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0En4kS
+	14v26r4a6rW5MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I
+	8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWr
+	XwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x
+	0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_
+	Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU0
+	s2-5UUUUU==
+X-CM-SenderInfo: d1lo6xhdqjqx5xdzvxpfor3voofrz/
 
-
-
-On 8/15/25 5:43 AM, Ming Lei wrote:
-> On Thu, Aug 14, 2025 at 08:01:11PM +0530, Nilay Shroff wrote:
+On 2025/8/15 0:54, Darrick J. Wong wrote:
+> On Wed, Aug 13, 2025 at 10:42:50AM +0800, Zhang Yi wrote:
+>> From: Zhang Yi <yi.zhang@huawei.com>
 >>
+>> The Linux kernel (since version 6.17) supports FALLOC_FL_WRITE_ZEROES in
+>> fallocate(2). Add support for FALLOC_FL_WRITE_ZEROES support to the
+>> fallocate utility by introducing a new 'fwzero' command in the xfs_io
+>> tool.
 >>
->> On 8/14/25 7:08 PM, Ming Lei wrote:
->>> On Thu, Aug 14, 2025 at 06:27:08PM +0530, Nilay Shroff wrote:
->>>>
->>>>
->>>> On 8/14/25 6:14 PM, Ming Lei wrote:
->>>>> On Thu, Aug 14, 2025 at 01:54:59PM +0530, Nilay Shroff wrote:
->>>>>> A recent lockdep[1] splat observed while running blktest block/005
->>>>>> reveals a potential deadlock caused by the cpu_hotplug_lock dependency
->>>>>> on ->freeze_lock. This dependency was introduced by commit 033b667a823e
->>>>>> ("block: blk-rq-qos: guard rq-qos helpers by static key").
->>>>>>
->>>>>> That change added a static key to avoid fetching q->rq_qos when
->>>>>> neither blk-wbt nor blk-iolatency is configured. The static key
->>>>>> dynamically patches kernel text to a NOP when disabled, eliminating
->>>>>> overhead of fetching q->rq_qos in the I/O hot path. However, enabling
->>>>>> a static key at runtime requires acquiring both cpu_hotplug_lock and
->>>>>> jump_label_mutex. When this happens after the queue has already been
->>>>>> frozen (i.e., while holding ->freeze_lock), it creates a locking
->>>>>> dependency from cpu_hotplug_lock to ->freeze_lock, which leads to a
->>>>>> potential deadlock reported by lockdep [1].
->>>>>>
->>>>>> To resolve this, replace the static key mechanism with q->queue_flags:
->>>>>> QUEUE_FLAG_QOS_ENABLED. This flag is evaluated in the fast path before
->>>>>> accessing q->rq_qos. If the flag is set, we proceed to fetch q->rq_qos;
->>>>>> otherwise, the access is skipped.
->>>>>>
->>>>>> Since q->queue_flags is commonly accessed in IO hotpath and resides in
->>>>>> the first cacheline of struct request_queue, checking it imposes minimal
->>>>>> overhead while eliminating the deadlock risk.
->>>>>>
->>>>>> This change avoids the lockdep splat without introducing performance
->>>>>> regressions.
->>>>>>
->>>>>> [1] https://lore.kernel.org/linux-block/4fdm37so3o4xricdgfosgmohn63aa7wj3ua4e5vpihoamwg3ui@fq42f5q5t5ic/
->>>>>>
->>>>>> Reported-by: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
->>>>>> Closes: https://lore.kernel.org/linux-block/4fdm37so3o4xricdgfosgmohn63aa7wj3ua4e5vpihoamwg3ui@fq42f5q5t5ic/
->>>>>> Fixes: 033b667a823e ("block: blk-rq-qos: guard rq-qos helpers by static key")
->>>>>> Tested-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
->>>>>> Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
->>>>>> ---
->>>>>>  block/blk-mq-debugfs.c |  1 +
->>>>>>  block/blk-rq-qos.c     |  9 ++++---
->>>>>>  block/blk-rq-qos.h     | 54 ++++++++++++++++++++++++------------------
->>>>>>  include/linux/blkdev.h |  1 +
->>>>>>  4 files changed, 37 insertions(+), 28 deletions(-)
->>>>>>
->>>>>> diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
->>>>>> index 7ed3e71f2fc0..32c65efdda46 100644
->>>>>> --- a/block/blk-mq-debugfs.c
->>>>>> +++ b/block/blk-mq-debugfs.c
->>>>>> @@ -95,6 +95,7 @@ static const char *const blk_queue_flag_name[] = {
->>>>>>  	QUEUE_FLAG_NAME(SQ_SCHED),
->>>>>>  	QUEUE_FLAG_NAME(DISABLE_WBT_DEF),
->>>>>>  	QUEUE_FLAG_NAME(NO_ELV_SWITCH),
->>>>>> +	QUEUE_FLAG_NAME(QOS_ENABLED),
->>>>>>  };
->>>>>>  #undef QUEUE_FLAG_NAME
->>>>>>  
->>>>>> diff --git a/block/blk-rq-qos.c b/block/blk-rq-qos.c
->>>>>> index b1e24bb85ad2..654478dfbc20 100644
->>>>>> --- a/block/blk-rq-qos.c
->>>>>> +++ b/block/blk-rq-qos.c
->>>>>> @@ -2,8 +2,6 @@
->>>>>>  
->>>>>>  #include "blk-rq-qos.h"
->>>>>>  
->>>>>> -__read_mostly DEFINE_STATIC_KEY_FALSE(block_rq_qos);
->>>>>> -
->>>>>>  /*
->>>>>>   * Increment 'v', if 'v' is below 'below'. Returns true if we succeeded,
->>>>>>   * false if 'v' + 1 would be bigger than 'below'.
->>>>>> @@ -319,8 +317,8 @@ void rq_qos_exit(struct request_queue *q)
->>>>>>  		struct rq_qos *rqos = q->rq_qos;
->>>>>>  		q->rq_qos = rqos->next;
->>>>>>  		rqos->ops->exit(rqos);
->>>>>> -		static_branch_dec(&block_rq_qos);
->>>>>>  	}
->>>>>> +	blk_queue_flag_clear(QUEUE_FLAG_QOS_ENABLED, q);
->>>>>>  	mutex_unlock(&q->rq_qos_mutex);
->>>>>>  }
->>>>>>  
->>>>>> @@ -346,7 +344,7 @@ int rq_qos_add(struct rq_qos *rqos, struct gendisk *disk, enum rq_qos_id id,
->>>>>>  		goto ebusy;
->>>>>>  	rqos->next = q->rq_qos;
->>>>>>  	q->rq_qos = rqos;
->>>>>> -	static_branch_inc(&block_rq_qos);
->>>>>> +	blk_queue_flag_set(QUEUE_FLAG_QOS_ENABLED, q);
->>>>>
->>>>> One stupid question: can we simply move static_branch_inc(&block_rq_qos)
->>>>> out of queue freeze in rq_qos_add()?
->>>>>
->>>>> What matters is just the 1st static_branch_inc() which switches the counter
->>>>> from 0 to 1, when blk_mq_freeze_queue() guarantees that all in-progress code
->>>>> paths observe q->rq_qos as NULL. That means static_branch_inc(&block_rq_qos)
->>>>> needn't queue freeze protection.
->>>>>
->>>> I thought about it earlier but that won't work because we have 
->>>> code paths freezing queue before it reaches upto rq_qos_add(),
->>>> For instance:
->>>>
->>>> We have following code paths from where we invoke
->>>> rq_qos_add() APIs with queue already frozen:
->>>>
->>>> ioc_qos_write()
->>>>  -> blkg_conf_open_bdev_frozen() => freezes queue
->>>>  -> blk_iocost_init()
->>>>    -> rq_qos_add()
->>>>
->>>> queue_wb_lat_store()  => freezes queue
->>>>  -> wbt_init()
->>>>   -> rq_qos_add() 
->>>
->>> The above two shouldn't be hard to solve, such as, add helper
->>> rq_qos_prep_add() for increasing the static branch counter.
->>>
->> Yes but then it means that IOs which would be in flight 
->> would take a hit in hotpath: In hotpath those IOs
->> would evaluate static key branch to true and then fetch 
->> q->rq_qos (which probably would not be in the first
->> cacheline). So are we okay to take hat hit in IO 
->> hotpath?
+>> Link: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=278c7d9b5e0c
+>> Signed-off-by: Zhang Yi <yi.zhang@huawei.com>
+>> ---
+>> v1->v2:
+>>  - Minor description modification to align with the kernel.
+>>
+>>  io/prealloc.c     | 36 ++++++++++++++++++++++++++++++++++++
+>>  man/man8/xfs_io.8 |  6 ++++++
+>>  2 files changed, 42 insertions(+)
+>>
+>> diff --git a/io/prealloc.c b/io/prealloc.c
+>> index 8e968c9f..9a64bf53 100644
+>> --- a/io/prealloc.c
+>> +++ b/io/prealloc.c
+>> @@ -30,6 +30,10 @@
+>>  #define FALLOC_FL_UNSHARE_RANGE 0x40
+>>  #endif
+>>  
+>> +#ifndef FALLOC_FL_WRITE_ZEROES
+>> +#define FALLOC_FL_WRITE_ZEROES 0x80
+>> +#endif
+>> +
+>>  static cmdinfo_t allocsp_cmd;
+>>  static cmdinfo_t freesp_cmd;
+>>  static cmdinfo_t resvsp_cmd;
+>> @@ -41,6 +45,7 @@ static cmdinfo_t fcollapse_cmd;
+>>  static cmdinfo_t finsert_cmd;
+>>  static cmdinfo_t fzero_cmd;
+>>  static cmdinfo_t funshare_cmd;
+>> +static cmdinfo_t fwzero_cmd;
+>>  
+>>  static int
+>>  offset_length(
+>> @@ -377,6 +382,27 @@ funshare_f(
+>>  	return 0;
+>>  }
+>>  
+>> +static int
+>> +fwzero_f(
+>> +	int		argc,
+>> +	char		**argv)
+>> +{
+>> +	xfs_flock64_t	segment;
+>> +	int		mode = FALLOC_FL_WRITE_ZEROES;
 > 
-> But it is that in-tree code is doing, isn't it?
+> Shouldn't this take a -k to add FALLOC_FL_KEEP_SIZE like fzero?
 > 
-> `static branch` is only evaluated iff at least one rqos is added.
-> 
-In the current in-tree implementation, the static branch is evaluated
-only if at least one rq_qos is added.
 
-Per you suggested change, we would increment the static branch key before
-freezing the queue (and before attaching the QoS policy to the request queue).
-This means that any I/O already in flight would see the static branch key
-as enabled and would proceed to fetch q->rq_qos, even though q->rq_qos would
-still be NULL at that point since the QoS policy hasn’t yet been attached.
-This results in a performance penalty due to the additional q->rq_qos fetch.
-
-In contrast, the current tree avoids this penalty. The existing sequence is:
-- Freeze the queue.
-- Attach the QoS policy to the queue (q->rq_qos becomes non-NULL).
-- Increment the static branch key.
-- Unfreeze the queue.
-
-With this ordering, if the hotpath finds the static branch key enabled, it is
-guaranteed that q->rq_qos is non-NULL. Thus, we either:
-- Skip evaluating the static branch key (and q->rq_qos) entirely, or
-- If the static branch key is enabled, also have a valid q->rq_qos.
-
-In summary, it appears that your proposed ordering introduces a window where the
-static branch key is enabled but q->rq_qos is still NULL, incurring unnecessary
-fetch overhead in the I/O hotpath.
+Since allocating blocks with written extents beyond the inode size
+is not permitted, the FALLOC_FL_WRITE_ZEROES flag cannot be used
+together with the FALLOC_FL_KEEP_SIZE.
 
 Thanks,
---Nilay
+Yi.
 
+> (The code otherwise looks fine to me)
+> 
+> --D
+> 
+>> +
+>> +	if (!offset_length(argv[1], argv[2], &segment)) {
+>> +		exitcode = 1;
+>> +		return 0;
+>> +	}
+>> +
+>> +	if (fallocate(file->fd, mode, segment.l_start, segment.l_len)) {
+>> +		perror("fallocate");
+>> +		exitcode = 1;
+>> +		return 0;
+>> +	}
+>> +	return 0;
+>> +}
+>> +
+>>  void
+>>  prealloc_init(void)
+>>  {
+>> @@ -489,4 +515,14 @@ prealloc_init(void)
+>>  	funshare_cmd.oneline =
+>>  	_("unshares shared blocks within the range");
+>>  	add_command(&funshare_cmd);
+>> +
+>> +	fwzero_cmd.name = "fwzero";
+>> +	fwzero_cmd.cfunc = fwzero_f;
+>> +	fwzero_cmd.argmin = 2;
+>> +	fwzero_cmd.argmax = 2;
+>> +	fwzero_cmd.flags = CMD_NOMAP_OK | CMD_FOREIGN_OK;
+>> +	fwzero_cmd.args = _("off len");
+>> +	fwzero_cmd.oneline =
+>> +	_("zeroes space and eliminates holes by allocating and submitting write zeroes");
+>> +	add_command(&fwzero_cmd);
+>>  }
+>> diff --git a/man/man8/xfs_io.8 b/man/man8/xfs_io.8
+>> index b0dcfdb7..0a673322 100644
+>> --- a/man/man8/xfs_io.8
+>> +++ b/man/man8/xfs_io.8
+>> @@ -550,6 +550,12 @@ With the
+>>  .B -k
+>>  option, use the FALLOC_FL_KEEP_SIZE flag as well.
+>>  .TP
+>> +.BI fwzero " offset length"
+>> +Call fallocate with FALLOC_FL_WRITE_ZEROES flag as described in the
+>> +.BR fallocate (2)
+>> +manual page to allocate and zero blocks within the range by submitting write
+>> +zeroes.
+>> +.TP
+>>  .BI zero " offset length"
+>>  Call xfsctl with
+>>  .B XFS_IOC_ZERO_RANGE
+>> -- 
+>> 2.39.2
+>>
+>>
 
