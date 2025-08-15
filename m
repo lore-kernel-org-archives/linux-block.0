@@ -1,96 +1,80 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6331F2236F7;
-	Fri, 15 Aug 2025 05:23:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3EAA258CF0
+	for <linux-block@vger.kernel.org>; Fri, 15 Aug 2025 06:09:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755235433; cv=none; b=KKmHGxi1An+zqGG5kFNv4bLO5uzKTlskRRe4SmkCHE5VQTFrOw561DK3demeaNpFFhytIi8P6mhA5+utrbyqq8KqSifzzND9nQruoG0QfCmOUbBnLpQg8QwqrHc7y1uoCOL6XbQ3lCrdqnb4LYD8c8vDDCgmlieTdyC6YgTf48Q=
+	t=1755238149; cv=none; b=ju78Vz25M5X/2uuztLnlNBoneQQKaRwGspXez5glPWEkFIruN751owwxqZORWXtwVgsOqzMknzMI4wPGMQ6vdCWGcp0487N9Wgm/A1o+QsWc9HiuSSn4jE6+5DEp2ggMMB9Ffyc+n/CUtgeqg4NbOy9F2MluxiH1+4BmzgR5N9o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755235433; c=relaxed/simple;
-	bh=ym8nrH5PUKBlcRnup+OG13MgSMUvXGm6AMIZk/zzeB4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=vBOjnrhN8gtR9oIUmGGYJlmZsfPCTjdiq6rm05koy32Aiottc9EvG59WLyL+AkJqTDIqHQ5lY19nD+S8EnptgczZReXR9mHgtTGf6lssykdUfa1k4EmUVb+gT7LakrQ86eHMlm8V8VcGAYFxocPk0hQVtD7CmfjqD20qhQcoLmQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZnXYVp1X; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1755238149; c=relaxed/simple;
+	bh=mRn+1Pe0OUG5BtFAy3VwFP0Rk0qogNg0sXk/t/7nkvM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bOsIwcTCgLkYVECkm1ANV+Eemgs3a16o6aVn3z0WIPB8IXoVJ9MtaMbxebtbNfyAERabq4XGxyRQjbNvCV4H7RMP5DxNfzeT9MjMkdjFTjcjT/KbLsiLq07veI7mtC13b7h6PE7dZgT7NV+bq0Qd7C/mCrd1qnv6sS2vm91BDZo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CVtmMeUN; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZnXYVp1X"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7AF93C4CEF5;
-	Fri, 15 Aug 2025 05:23:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755235433;
-	bh=ym8nrH5PUKBlcRnup+OG13MgSMUvXGm6AMIZk/zzeB4=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=ZnXYVp1XqUnQAI+AMsoxessueKohz/tdVahh1Sm9QLzkQR8ni6Nu1LPlCB28JYgId
-	 7SELdFzqy38rM6th8r4Ad76dEsAs35LsZVtmbAvsSY7jdS4ZqgLcs2WVPkbm/zb2Ls
-	 ySVF5jG9/zagLIGsHNR59yh4Qm5vgB3fLu86rIHnTpShciwnWlOaf84qOraRVT+Lf8
-	 TE9zHZDExm83UPtCK7YJin1M+7OJIXHr5gZu8M1pOhoD1704NGc9N+nSNeA8LQwgBr
-	 zCB1y2/7pEVoL8y88KaQInaoZzt6ZK+yyXiWh/gEzMjCTzXk60lBysVHrsl0iF/OsL
-	 a1Npka6MM8/Nw==
-Message-ID: <d892eb87-6ee2-40a4-9b25-66c2f2e8befa@kernel.org>
-Date: Fri, 15 Aug 2025 14:23:50 +0900
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CVtmMeUN"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1755238146;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CeuGtP6oJ3ASX+epXJ2slnSpr56EeHAKpiiitD+NUT8=;
+	b=CVtmMeUNujaN46Ju6C+pjVmQEzh++W31msVOhtelg0yCN89Ycqnlsl5cggJSqlwISzAZtP
+	AjFpg8Js8mJ6XARBzSv9TlQv5yvXCZ6E1+No5C8/VAYcdN5KeC0zkWkqhVxuwx1HSVsdeA
+	pxnn+NOKzSDh4NCmMAJRIOBUwk6G7nM=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-653-47MEAmEaMX-2fN6VqUisUA-1; Fri,
+ 15 Aug 2025 02:09:03 -0400
+X-MC-Unique: 47MEAmEaMX-2fN6VqUisUA-1
+X-Mimecast-MFC-AGG-ID: 47MEAmEaMX-2fN6VqUisUA_1755238141
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 91B92195422A;
+	Fri, 15 Aug 2025 06:09:01 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.153])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D3D6B1955E89;
+	Fri, 15 Aug 2025 06:08:56 +0000 (UTC)
+Date: Fri, 15 Aug 2025 14:08:51 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Soham Metha <sohammetha01@gmail.com>
+Cc: linux-kselftest@vger.kernel.org, shuah@kernel.org,
+	skhan@linuxfoundation.org,
+	linux-kernel-mentees@lists.linuxfoundation.org,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH 3/6] selftests: ublk: fixed spelling mistake in output
+Message-ID: <aJ7O8_3_GEhc6Xq1@fedora>
+References: <20250815000859.112169-1-sohammetha01@gmail.com>
+ <20250815001803.112924-1-sohammetha01@gmail.com>
+ <20250815001803.112924-2-sohammetha01@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] null_blk: Fix correct parameter desc for the module
-To: Genjian <zhanggenjian@126.com>, axboe@kernel.dk,
- shinichiro.kawasaki@wdc.com, johannes.thumshirn@wdc.com, kch@nvidia.com,
- zhengqixing@huawei.com, willy@infradead.org, namcao@linutronix.de,
- vincent.fu@samsung.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- Genjian Zhang <zhanggenjian@kylinos.cn>
-References: <20250815043033.1534949-1-zhanggenjian@126.com>
-Content-Language: en-US
-From: Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <20250815043033.1534949-1-zhanggenjian@126.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250815001803.112924-2-sohammetha01@gmail.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On 8/15/25 13:30, Genjian wrote:
-> From: Genjian Zhang <zhanggenjian@kylinos.cn>
-
-The patch title is a little strange. What about:
-
-null_blk: Fix the description of the cache_size module argument
-
+On Fri, Aug 15, 2025 at 05:48:00AM +0530, Soham Metha wrote:
+> found/fixed following typos
 > 
-> When executing modinfo null_blk, there is an error in the description
-> of module parameter mbps, and the output information of cache_size is
-> incomplete.The output of modinfo before and after applying this patch
-> is as follows:
+> - faile -> failed
 > 
-> Before:
-> [...]
-> parm:           cache_size:ulong
-> [...]
-> parm:           mbps:Cache size in MiB for memory-backed device.
-> 		Default: 0 (none) (uint)
-> [...]
+> in `tools/testing/selftests/ublk/test_common.sh`
 > 
-> After:
-> [...]
-> parm:           cache_size:Cache size in MiB for memory-backed device.
-> 		Default: 0 (none) (ulong)
-> [...]
-> parm:           mbps:Limit maximum bandwidth (in MiB/s).
-> 		Default: 0 (no limit) (uint)
-> [...]
-> 
-> Fixes: 058efe000b31 ("null_blk: add module parameters for 4 options")
-> 
+> Signed-off-by: Soham Metha <sohammetha01@gmail.com>
 
-Remove the blank line here.
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
-> Signed-off-by: Genjian Zhang <zhanggenjian@kylinos.cn>
+Thanks,
+Ming
 
-With these fixed,
-
-Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
-
--- 
-Damien Le Moal
-Western Digital Research
