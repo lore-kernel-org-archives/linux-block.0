@@ -1,35 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0031A2E2853;
-	Fri, 15 Aug 2025 07:32:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8623207DFE;
+	Fri, 15 Aug 2025 07:32:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755243135; cv=none; b=m5SFfHE18hKY0n0bE06uNRi6lPogvSrykQQROPPLuN0igDKiTPJbKPdAO1guUWVw+S+C1mxMRLbroPVnQ5SXyb4jbcXC250t8RLC0Wk2QzsivHOQXV/ecWynOc1apUTirz2f/Y7l5sbp39cWQ/toED7X9Gh3a+KBXiujoyGtZkk=
+	t=1755243141; cv=none; b=BRIOx75ERKhKx4RfDtr0kj3NxcR0heiPuWG3qbSUUrqZ73vB62z/L07ZGIUKgX929wCggV7ltEmv3tXMJgKfXFvT03AZ5rEr0o6wcT++oyazyjvZ0039NxsvSLUH/FLVaF8O+Ox4CEFH4gmnt8N61Tk2ex0NoKyVegduLo911CI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755243135; c=relaxed/simple;
-	bh=0EwZ8Bosdo4P1PMrvkQ74N/d1HBPfa9SjJN+YgtIPJo=;
+	s=arc-20240116; t=1755243141; c=relaxed/simple;
+	bh=OtQddS6ZPwb9NsJVIHicx+JPypcp8+9DXNsP2q69rJk=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=nnJnBT17EWIL70sPEfGsD9ukejK9+xU/m2qSlL9oXSgfM+fYhdXIKNFwgECaNmn0gKL2UD+UVcNW3SBdQJfpEvsOuQ+D7Voak4PWufZIgf8q7kIKdKV5x5Dv4Vurn2C+ebWnsr27qMnz/Q9JhpMx8g/fFgwNYDAEqDun2MKzvcg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gER1V5hN; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=prPbvGhYIzQgACbwtCmCwcpHLh0B4aH+tB2t6OzarLRsygyAvVQTn35AcBwLYBVPNzDtmdoYjSYgiSrfi4JN3iUDH2l1g+xjey10k8bbnc9GjIuGxqMLTa+WvIBoGUkBBH5p/TApWltZ17QzXmDF9zlbX9csv89FrUOWvlg4FTM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qZgO7ZcU; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gER1V5hN"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24AA5C4CEEB;
-	Fri, 15 Aug 2025 07:32:11 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qZgO7ZcU"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 707BEC4CEEB;
+	Fri, 15 Aug 2025 07:32:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755243134;
-	bh=0EwZ8Bosdo4P1PMrvkQ74N/d1HBPfa9SjJN+YgtIPJo=;
+	s=k20201202; t=1755243138;
+	bh=OtQddS6ZPwb9NsJVIHicx+JPypcp8+9DXNsP2q69rJk=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=gER1V5hNMG5oecJuxGCVxwQ64bJnJNVuc3KTfgFDNHqa3aif7xeaiGxSS48+Wevqc
-	 1bWCdeTdq+Sl2pMu8tKjzmdZfyhej89Tzoru1YGOrtDqbstR7b6fVX9t9MK9t4ByD4
-	 iYf+f/f/N5uHY+ZFjUIEW8vNhigVaYVTYxfHf3hlGR8mzoA6Je7Y5e27Nu52UQYioX
-	 onskeIkM9M6NxIRYB4EiXUTNCYiO3okMRuJXaSpi1lf+5NRTGM/Vx6brBBxxDvdg+v
-	 i1zjzSiyweNKfP5TwSKVaBew+2kFhK/vO0fqIS1Wi+7qT/jWQbjxew36xtuZVHYO7G
-	 3NtV7/N9yMI7g==
+	b=qZgO7ZcUOShEL20wjOzsryQ3ygdF6qfuUgCBur6zonytmSQqSHSmZNJRpJE+x2o7N
+	 d1vf4dD0B0a7LSawyqY01xyvjUKWDwBViiYpmgEIHJRr1oFtrOMa6eWQcuAuJfxSIj
+	 t8mhcM7NgFyRp+vLnyTb1VPhqVOtcq+e9t6KFa/a0wpkQffo1cQrJIJ3ASim/j/flP
+	 nWXFYxcxXqf44VTYLr5rP6+ZqvVxBa83y5sbswBzK+y/TfOTpDK3lHa7zE0zGDbgaM
+	 fSvjZgJtiaSGYPY0nDgcSKiusHXy8ksE3KHgfsZXD6l90w1oF/Ck3/4VnWL4aaT69G
+	 PG5KbNoGygRsA==
 From: Andreas Hindborg <a.hindborg@kernel.org>
-Date: Fri, 15 Aug 2025 09:30:38 +0200
-Subject: [PATCH v5 03/18] rust: str: expose `str::{Formatter,
- RawFormatter}` publicly.
+Date: Fri, 15 Aug 2025 09:30:41 +0200
+Subject: [PATCH v5 06/18] rust: str: add `bytes_to_bool` helper function
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -38,7 +37,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250815-rnull-up-v6-16-v5-3-581453124c15@kernel.org>
+Message-Id: <20250815-rnull-up-v6-16-v5-6-581453124c15@kernel.org>
 References: <20250815-rnull-up-v6-16-v5-0-581453124c15@kernel.org>
 In-Reply-To: <20250815-rnull-up-v6-16-v5-0-581453124c15@kernel.org>
 To: Boqun Feng <boqun.feng@gmail.com>, Miguel Ojeda <ojeda@kernel.org>, 
@@ -50,73 +49,54 @@ To: Boqun Feng <boqun.feng@gmail.com>, Miguel Ojeda <ojeda@kernel.org>,
 Cc: linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org, 
  linux-kernel@vger.kernel.org, Andreas Hindborg <a.hindborg@kernel.org>
 X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2004; i=a.hindborg@kernel.org;
- h=from:subject:message-id; bh=0EwZ8Bosdo4P1PMrvkQ74N/d1HBPfa9SjJN+YgtIPJo=;
- b=owEBbQKS/ZANAwAIAeG4Gj55KGN3AcsmYgBonuI2hSO5+cQftJrpInWHKQMFvFjF5OjwYj0py
- eua0QDIG5+JAjMEAAEIAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaJ7iNgAKCRDhuBo+eShj
- dwELD/9cTjghKDWUtkViDnmdNNe2B7cwgasLZEVzMGhRCUVjX0VNhPaU3YflbBRRqhHDv4HAC9Y
- gb0IhsmdtcBqBhgmp9Z9wQ8/fR0zECWaNXh/p+wpKjI1iVpJmZyVnYMa2YQkPvBtMFgJWBy7JI4
- tfwNQhysauxk5ybhyaiQTBQb7xzxrxmfYI8OD03OssSTu6ahDk88cVE3zxemslExOY0QYqJ/tvG
- 538hAYJPqGUIMlmT5NgEI+D6zO/dXMIBDzOURjIv8YuIswg3btLQnwCb2fJLqWBs1379B1dT1L/
- st7LBQVznKqOd8iKTx2A94HnDC36b4MB8f5cqY8s+jCF6xnNYtqVMeWxiguasFvAC0dxp7EiqMp
- 8gA+OcCabd9VlVB9ybB5+aSUVFE+pe/wjabtRuuR1+szRTrOknIEhfbKWxcKK+xisEUxn8iA56V
- WRZ1XuMdkDKDqetL2VjGvDt6HuGFCCbYKx1sxFg8nIK3iQRY8u0pbGmuorG00nUMhtjstvGkIGV
- CJacumUVlZyJwJzn7bk0sK3KhCv/1jYyt50l0zciMy5cTbJ4weU7TjuKyAQYN88Rre5hIHDI4rx
- yte2xcpI7LejcPExKvlloteuL96bo5yiFGSFpqJryviWf0DOU2vnY3UM6dQfnWx+ubbqp8rNPf4
- Kajcpgvapr6pUhA==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1366; i=a.hindborg@kernel.org;
+ h=from:subject:message-id; bh=OtQddS6ZPwb9NsJVIHicx+JPypcp8+9DXNsP2q69rJk=;
+ b=owEBbQKS/ZANAwAIAeG4Gj55KGN3AcsmYgBonuI590lR6f8ZJYdslPPTOmFmX4I5TThmacgAR
+ 9fFdCr4UpqJAjMEAAEIAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaJ7iOQAKCRDhuBo+eShj
+ d5ooD/98J4AUaj99036/IMhZ092yldDZQGM/wznNZmm64EQPuMLGwx9BYaMMckEb8qLzr7v2/WM
+ zUSJpfKOpbOEDU78DHDNm2JZiEVUUB3WvlhhuYZlqauAae5MxSfxQgOXp2y78cFVoPeLCTG3txe
+ c64LtWAoAFPY5R7TEvOiDA/iYAE7CK52XFpWbbSLbrbVWw4EBo5f/sOS8RoRlRFaviYvCyvN2Ee
+ rptSENyTyRdOsUVl5f/81a7eqEfbMNbav+ionpwgetYQVvOtGHv6uoxFIQGT+bPdxaFyk2dp1M1
+ qJaoPphFU9AgiHYuadktVpUd9quYqSdHqv6pmoE/wm5+APT3f0QpCm6FtNxtPFVtIe/o/fG+q6i
+ AvF0d459YC0YtZeMRxee0YFEc5xBAiotlrmHSAbd5xkLqZ3cll5BwYoj/SIkf2RSu91pOVcigta
+ DohSVD5GznhqG49BHko43ShmJqrr1rAsBvqVlcrwqho0dEB6/giuuzOiqu+fx0LQRtQUaCPgEAU
+ ofwqBzb853b2u8W2nVfpvpExzUR9ANYYD9lo4geKCvjTXphaO9jPV/mq/xTH1EBuQ8vp62UtV1t
+ C8RciBdoFQY51jxRuqlrjDgSOiOaV0Ob1hAZ1wCc8AQS1jhl+O7RPCzkJ4Rj8kUAofAEf/lRZDA
+ bV3QkPnGsV0DoCQ==
 X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
  fpr=3108C10F46872E248D1FB221376EB100563EF7A7
 
-rnull is going to make use of `str::Formatter` and `str::RawFormatter`, so
-expose them with public visibility.
+Add a convenience function to convert byte slices to boolean values by
+wrapping them in a null-terminated C string and delegating to the
+existing `kstrtobool` function. Only considers the first two bytes of
+the input slice, following the kernel's boolean parsing semantics.
 
-Reviewed-by: Alice Ryhl <aliceryhl@google.com>
 Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
 ---
- rust/kernel/str.rs | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+ rust/kernel/str.rs | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
 diff --git a/rust/kernel/str.rs b/rust/kernel/str.rs
-index 76632da357a6..46cdc85dad63 100644
+index 5611f7846dc0..ced1cb639efc 100644
 --- a/rust/kernel/str.rs
 +++ b/rust/kernel/str.rs
-@@ -736,7 +736,7 @@ fn test_bstr_debug() -> Result {
- ///
- /// The memory region between `pos` (inclusive) and `end` (exclusive) is valid for writes if `pos`
- /// is less than `end`.
--pub(crate) struct RawFormatter {
-+pub struct RawFormatter {
-     // Use `usize` to use `saturating_*` functions.
-     beg: usize,
-     pos: usize,
-@@ -794,7 +794,7 @@ pub(crate) fn pos(&self) -> *mut u8 {
-     }
- 
-     /// Returns the number of bytes written to the formatter.
--    pub(crate) fn bytes_written(&self) -> usize {
-+    pub fn bytes_written(&self) -> usize {
-         self.pos - self.beg
-     }
+@@ -978,6 +978,16 @@ pub fn kstrtobool(string: &CStr) -> Result<bool> {
+     kernel::error::to_result(ret).map(|()| result)
  }
-@@ -828,7 +828,7 @@ fn write_str(&mut self, s: &str) -> fmt::Result {
- /// Allows formatting of [`fmt::Arguments`] into a raw buffer.
+ 
++/// Convert `&[u8]` to `bool` by deferring to [`kernel::str::kstrtobool`].
++///
++/// Only considers at most the first two bytes of `bytes`.
++pub fn bytes_to_bool(bytes: &[u8]) -> Result<bool> {
++    // `ktostrbool` only considers the first two bytes of the input.
++    let nbuffer = [*bytes.first().unwrap_or(&0), *bytes.get(1).unwrap_or(&0), 0];
++    let c_str = CStr::from_bytes_with_nul(nbuffer.split_inclusive(|c| *c == 0).next().unwrap())?;
++    kstrtobool(c_str)
++}
++
+ /// An owned string that is guaranteed to have exactly one `NUL` byte, which is at the end.
  ///
- /// Fails if callers attempt to write more than will fit in the buffer.
--pub(crate) struct Formatter<'a>(RawFormatter, PhantomData<&'a mut ()>);
-+pub struct Formatter<'a>(RawFormatter, PhantomData<&'a mut ()>);
- 
- impl Formatter<'_> {
-     /// Creates a new instance of [`Formatter`] with the given buffer.
-@@ -843,8 +843,7 @@ pub(crate) unsafe fn from_buffer(buf: *mut u8, len: usize) -> Self {
-     }
- 
-     /// Create a new [`Self`] instance.
--    #[expect(dead_code)]
--    pub(crate) fn new(buffer: &mut [u8]) -> Self {
-+    pub fn new(buffer: &mut [u8]) -> Self {
-         // SAFETY: `buffer` is valid for writes for the entire length for
-         // the lifetime of `Self`.
-         unsafe { Formatter::from_buffer(buffer.as_mut_ptr(), buffer.len()) }
+ /// Used for interoperability with kernel APIs that take C strings.
 
 -- 
 2.47.2
