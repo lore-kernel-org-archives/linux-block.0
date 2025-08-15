@@ -1,35 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E23272E92D7;
-	Fri, 15 Aug 2025 07:32:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFF1F2D3225;
+	Fri, 15 Aug 2025 07:32:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755243152; cv=none; b=oT5epJXS3FpO3RXUsRdL+/JAYvPZbZnoWzbnx4/16rRzBEGwAniw1Ryj+UXHkaFANp3ffXaN2LaDNB3LbDLYEPTBKku7114yEJP4Az02395typgeZN9WAljR3gtBGYr3pG3k1JS4U6wdCLz8BEfG1+WkJd0VnkH/PPrllKvLVcU=
+	t=1755243158; cv=none; b=kMzuZCMvyMIJRw2cdHpn9Dmug7RZm5XeGROl6hAh15Z5+EJdljaqJeAmYNaaYUXN1/WWH5IPZg862ymnAuggm5gjIiqIgoBukKpL5NUWKi9wpuY5wwrw29vC0lsQw6hCkCbhhQ3v/SAPosCR0IMaCjMeFKhpDu1HPSSr8ZKLeK8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755243152; c=relaxed/simple;
-	bh=OfpvNSrrUeZHTWGA2qHRRXa1nwQ1xGGBIsoZwm6M11A=;
+	s=arc-20240116; t=1755243158; c=relaxed/simple;
+	bh=hixYhOSo78Opw3JCXq3T7Ep1Lb7kHadQhoAfotnnjUc=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=CuBsVO6G0HXCyk5PmsU7lLq2Nh4uQZ36RXAxq0TSGxj8zJsrcO2S6U3WwcCANtzJbAj8GypHFgVkhY3kV0jIArz+dmr7ItjaZLfqQbipMqKMLsNvpSvz6Q/zFvjmi1tHK06jQb4LYNZ/JZC7KR6rXNiSWbizyGB64wkNQaOCNtg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gjENElwt; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=AR67Scki2vOSdPpC5IM0jBGXaKU3lfcTUllmdhKPNJ0qItTJ18uOm4cU+s6QyC4ROiY6qKlsk05Kqota4ll144eBoDKWa6oEvB7u1roRPunf2Tkt46KFWf7PH9/dM5r18fxAVXC+fdOfScI6Rm8AfYjgowaD2TVSuMpiiDRhTV4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e7ALk2rI; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gjENElwt"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC03AC4CEEB;
-	Fri, 15 Aug 2025 07:32:28 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e7ALk2rI"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5EABEC4CEEB;
+	Fri, 15 Aug 2025 07:32:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755243151;
-	bh=OfpvNSrrUeZHTWGA2qHRRXa1nwQ1xGGBIsoZwm6M11A=;
+	s=k20201202; t=1755243155;
+	bh=hixYhOSo78Opw3JCXq3T7Ep1Lb7kHadQhoAfotnnjUc=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=gjENElwtmJDtxbTFqY/YSgIyam/48XuoCV9bTeW36l4zDHW+EYUGFNKpNPHLbPeCw
-	 Cey4rIdvGy3+5BwzwTCIvsxcJOduJExGcCEtoZqHgORrpSoA7NWTNdh/1UkTlbqFJN
-	 mqAdDqBYjoLTKsMv4xDnJFmCGdQoPX8cDjc2WPLc/OBCqO4omOJsgjRn7+v1BKavhy
-	 FkaXNdIdBePWVI6BKOgCYGsUtHcFR/wW7UsaYP24Tku2VBsIPhuNsNCnWHb3BGCyBk
-	 sjSvDAg+tBUZJCWVMKYj/51M524pHaHyYjc1uqXmkHMOH0BMl4L3t55rEj7I1BFoYv
-	 sKzzY1VrwhjFg==
+	b=e7ALk2rIl0en5LLhKCdRB1UEYnrxlvodr13tF3QL0vApm9pmb+/Q6lmKAq5mpVxIk
+	 FwNG51Whdkh2Ex0EuHYO9eL+kV4fNzhwXaXhsKfI3CfsIxrdfp/jZHq71GUt3GYaF7
+	 0AFkjrmZfENiBjOVCm+31kaSYr5O9M0Tv095rb3+dv6G45Ym2o5JF1WzlkdJ0odVnl
+	 nKRMl6OOzkXiIqJ0tDT2P13qiTwJu84dztasi3maiITLCCLZxh6yqShfNLEzKNblrP
+	 X+mH5q8pmZxV8eJv7mHj4EGeE9p2BVd260xzr8Q2NUZ/ckcn/maMld0kPZwT4fdh44
+	 bnU1wdCftEkcQ==
 From: Andreas Hindborg <a.hindborg@kernel.org>
-Date: Fri, 15 Aug 2025 09:30:46 +0200
-Subject: [PATCH v5 11/18] rust: block: remove trait bound from
- `mq::Request` definition
+Date: Fri, 15 Aug 2025 09:30:51 +0200
+Subject: [PATCH v5 16/18] rust: block: mq: fix spelling in a safety comment
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -38,7 +37,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250815-rnull-up-v6-16-v5-11-581453124c15@kernel.org>
+Message-Id: <20250815-rnull-up-v6-16-v5-16-581453124c15@kernel.org>
 References: <20250815-rnull-up-v6-16-v5-0-581453124c15@kernel.org>
 In-Reply-To: <20250815-rnull-up-v6-16-v5-0-581453124c15@kernel.org>
 To: Boqun Feng <boqun.feng@gmail.com>, Miguel Ojeda <ojeda@kernel.org>, 
@@ -51,25 +50,24 @@ Cc: linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org,
  linux-kernel@vger.kernel.org, Andreas Hindborg <a.hindborg@kernel.org>, 
  Daniel Almeida <daniel.almeida@collabora.com>
 X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=963; i=a.hindborg@kernel.org;
- h=from:subject:message-id; bh=OfpvNSrrUeZHTWGA2qHRRXa1nwQ1xGGBIsoZwm6M11A=;
- b=owEBbQKS/ZANAwAIAeG4Gj55KGN3AcsmYgBonuI9pjtmLRwmoX/9a7niCXIWqdqwqVeO2nSf1
- hcJhyJmO5+JAjMEAAEIAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaJ7iPQAKCRDhuBo+eShj
- d/fFEACUwhkVewPjgePT9oEM5w6sLKE+pctmwFWP7VEg1Hmk8Qm7D1d1A0uf+6NlKq1aHayNcYr
- htpmuRZPasMpAgRXqGKEPoLSx6/R3ep2n0STDv4OmDpfpNn9fuf4Rtt11ZmG17ExsMIjErwqUJj
- omd9BPEm+tgMBm2Veq9R4fM3wtv9PHmOmJKIydmnVr6gvEakRdykSzdbt7taQSt8zYX1Pk1dpk5
- frpDDZavn6gEtdzYC0GI23Zp4L5fWfutat1tXrMAjJ+9Sm7PQOH4TKfpVjrsFQBzdqGlXBLbQKg
- bOLjkFQcqj46b0HQW/TEYW98eFaZakYcUjMTOmL5wuaY8+36s9B/zjqpnupPTF3Y6q/VAxYgrNp
- UJ3v/lFk2cay5Ms2WhBudOP2511Aq/qnIGk/URK/kFPQS4b7KznVWbUp3qvsLOtDA1gatuZDCXp
- Tak1lrkAmjYN2uyMDIEneHg70P+fr7hF0PvpQGJubIDmQdIT0o9XWiXhpRW38fNcnyQziwHD2lj
- idaXRsOS25kWE+yV6JqI3dC8kheUsF/DfYXnbXIBVfNVmUYcLF1OYZR5+W9XJBDpy76J8BoRd4n
- s6abFa9Jxk1cECa6BL4WtRU/bBblg0pexk0rGO91Yl7RT18JrxNSSAh1stbNvZFL5FYWa3Cuy6b
- KO2YqJszJEhIv1w==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1036; i=a.hindborg@kernel.org;
+ h=from:subject:message-id; bh=hixYhOSo78Opw3JCXq3T7Ep1Lb7kHadQhoAfotnnjUc=;
+ b=owEBbQKS/ZANAwAIAeG4Gj55KGN3AcsmYgBonuJCJxHe2wbjvtpom9FeQGv+WU7jKTJ1zJioN
+ 19G94REFbGJAjMEAAEIAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaJ7iQgAKCRDhuBo+eShj
+ d8UDEAClgJzpbwWJkeqPd/Xgvho4AvLt55cbsiEN7FeT/q0Wh0rkkO+RfxcT3ymWlC84tduQv8n
+ feeUkQZ3SUbs3svPb1muGnXG3YwRzi/rkk/2jeRn1foUFvqfkcwNhGOnhTJhmKEZcMP3QQkbQtR
+ 75cKWvnImWkTx84GBMkoin15MYHSIY9/H4P51c7uyj8Tw5xpvea+2rJCfPlbceAWkZP1LcnITPr
+ NO8D7o7DENBjzhE8BqDV/Dyg6eQXsItFrBn3o59nKS8WFN/hwmXpu4s5HhXKoGRfn1qZMRIkZy6
+ rDq8mgJPpmiw9FO6JBn9b+9GKotyLlADSysC6pBij2PVfXHzTm1HeooVQbtCrqeYJlJ+rPSxyXR
+ X3Gdrd1EJxCUifxVNBvhTmXnRBQ+Cme13y36srZsXLrUBE0oRYo15IV+6NwLbIzsD30y17U3JXS
+ GmLzaZp4rI0AuJx1oLqRq4hPObYs80LTW1r61A4i1uQ1pyk0TQW9wS8rq4QyQtD46xx0U5avHIW
+ qEEoZ8BV+pVoS1aIGYXNm5UDqOWHCMebKcL6KT3mgAJALKoQ5SbK3crGIzN51lYyJpwugC6WA1n
+ UBuIsUx/vuVrOSnyZ0IyXzH5TNn7wKiSQkcnGYZZA9SAGaPVAiuHsvLF1gZUfekCJy18BmjjASj
+ 92Fot6+n/FXcsXw==
 X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
  fpr=3108C10F46872E248D1FB221376EB100563EF7A7
 
-Remove the trait bound `T:Operations` from `mq::Request`. The bound is not
-required, so remove it to reduce complexity.
+Add code block quotes to a safety comment.
 
 Reviewed-by: Alice Ryhl <aliceryhl@google.com>
 Reviewed-by: Daniel Almeida <daniel.almeida@collabora.com>
@@ -79,18 +77,18 @@ Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/rust/kernel/block/mq/request.rs b/rust/kernel/block/mq/request.rs
-index fefd394f064a..f723d74091c1 100644
+index f723d74091c1..3848cfe63f77 100644
 --- a/rust/kernel/block/mq/request.rs
 +++ b/rust/kernel/block/mq/request.rs
-@@ -53,7 +53,7 @@
- /// [`struct request`]: srctree/include/linux/blk-mq.h
- ///
- #[repr(transparent)]
--pub struct Request<T: Operations>(Opaque<bindings::request>, PhantomData<T>);
-+pub struct Request<T>(Opaque<bindings::request>, PhantomData<T>);
- 
- impl<T: Operations> Request<T> {
-     /// Create an [`ARef<Request>`] from a [`struct request`] pointer.
+@@ -148,7 +148,7 @@ pub(crate) unsafe fn wrapper_ptr(this: *mut Self) -> NonNull<RequestDataWrapper>
+         // valid allocation.
+         let wrapper_ptr =
+             unsafe { bindings::blk_mq_rq_to_pdu(request_ptr).cast::<RequestDataWrapper>() };
+-        // SAFETY: By C API contract, wrapper_ptr points to a valid allocation
++        // SAFETY: By C API contract, `wrapper_ptr` points to a valid allocation
+         // and is not null.
+         unsafe { NonNull::new_unchecked(wrapper_ptr) }
+     }
 
 -- 
 2.47.2
