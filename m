@@ -1,65 +1,65 @@
-Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
+Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C54235979
-	for <linux-block@vger.kernel.org>; Fri, 15 Aug 2025 08:19:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0BC71FAC4D
+	for <linux-block@vger.kernel.org>; Fri, 15 Aug 2025 08:21:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755245942; cv=none; b=dMdrW5JUlct6J1HshLpc8t1aT8ztqBsNHwKqPmyYemmYxMYDiJA1wM8OmlBHlwJp/C/JaQyUPdNh0OQx6+hrfa3CS2yldJwUDsYLo+F7ARpMjst6pAfUtEuayzHASd7dtJeGZpbDKvnM2kCUr5Bqdm3sPtx8r6kdUh4Kr5lgO64=
+	t=1755246077; cv=none; b=q4shrAIElFGKO18VS81L51XXhTt+7e59bp+wra8frWGWe4imxYgTC5VPU+gcrbZNdulD/Ax+iI1wkkCoTs6hrR2u4XaOWjsREM048DETKjf8BcFp5zyNwa6QrOCbXy5GA+OOCiQXOJ4TcFbnQV9t2nlRpj4NeQHv7SRrPGI/ltA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755245942; c=relaxed/simple;
-	bh=qYNnASJXGgxVvYIwlxVKql8fQDStNuzDeqooYI3aAFg=;
+	s=arc-20240116; t=1755246077; c=relaxed/simple;
+	bh=hSfxyTbyhJVUsktaRzvTdGGxGaUMaidseyMOAWvH21E=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=qycD1CyJ6cxV3g8gdHs2sdwmhh2MosqM6E/8UH0dEImOU20k19Q92aiIfh726PTkJVe+bLp5GtOk6niukru45brb095wbcy/sJUKzV5GQEhlBeT111C8G1SUeQO4fT9LQw9Yyew/ISwyFTcA0hThU+Bt2RArIeMX2z1tytxVTuM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wOSQ28Bo; arc=none smtp.client-ip=209.85.221.74
+	 To:Cc:Content-Type; b=j5/8AOm+8puWHOzCNYep0yWeKVzhkgTATQd2v2RujLLQt4ygBL7oNEsxODI/HYgQ6y0lgphtSSilgrOihFtNMlSRWt9KdbMXevU292r1pOQ66cztPSB8eDNcVBtKbUVVdmDH1X9P679lpsHucThK96dtVOvB2DG1GPNpiiRtf1c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kEjJsjXD; arc=none smtp.client-ip=209.85.128.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wOSQ28Bo"
-Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-3b9edf34ad0so1032766f8f.3
-        for <linux-block@vger.kernel.org>; Fri, 15 Aug 2025 01:19:01 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kEjJsjXD"
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-45a1b05d251so8535885e9.1
+        for <linux-block@vger.kernel.org>; Fri, 15 Aug 2025 01:21:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1755245940; x=1755850740; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1755246074; x=1755850874; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=683V42xtEdd11uSq7e5NHFZBkZMDGTB8S0uZQebs/ak=;
-        b=wOSQ28Bo158IqBqy/pWlDlFsgtv9lfDvzorqDQKoth20vEcitXK+2wDnxfOALv7fHa
-         dUak24mcckjIEVFM9bPAPC022MTuZJ4EwkRnWUcpwZZT6OFgmlLjtuf6npzuc7nZwmE/
-         kQ7mwFi+d6erloD63Pe0pXsHkhftKzd+JYmu2JPW9WyOOO87valTu1DRAqvWUdTNO7hX
-         Dp5fSu8G1HNEmP/4D650Yo89oaUTs70BX9aAVdgZSe5lXVDC9GRrLGX25h2vOO7HU2eO
-         3YXDFHABpy/F4j0G47HQA4kcyAsWXL/7LP8QvJoMkWU3w2A14KcBj8YU0rojYWDpgkyC
-         Z4oA==
+        bh=vcSm1OtREGPb104alZ1yzuEUCvwCzNvElhs+/6tX29M=;
+        b=kEjJsjXDVSZ0XGKZIoPLMZ8Nd2o3r4RVuTUOTm35nzbBh43JW/HHonuatwlN2jTmck
+         t4Pbqy9j9Uxeuni2+Z0fQG7c1OjXJNfowze/AeFN0Nn0IeHJD2iqdeAdJuGKGwI2E+N5
+         zPcdKLPdDj0Mx5aZRh7lcI0aOfqEIH1AQYuPpY+/EyHUMOaoxJyTio3JjsbnXUuZ/zaF
+         pnpd+hdneYid3xeZWihPFJxoCak3a02djxo4gv387dO9kBley1gdESrJjRkICwpD12lQ
+         ZDQj8kpqXIynqkGbqcIFziwPR/S7Eh3w9juCNLq3526dGXouP+kyN82cBjDt5Jv22wyY
+         rJTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755245940; x=1755850740;
+        d=1e100.net; s=20230601; t=1755246074; x=1755850874;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=683V42xtEdd11uSq7e5NHFZBkZMDGTB8S0uZQebs/ak=;
-        b=ENSgEVOfOeMiOS+bY7JdgfD9Ue5oo0w4q89pLeMWnYDyGsMR/6R8YbB113r0yxzu/Z
-         lpe6RNrI4rh+pG7usTHyUuk9BlpdJUpEycy/jBQBjK2ZCI7xNom7bAF2hyFbTEpoCRzS
-         iBPvdXJvAOvGn3DjWdB46c9vJCdgG/gFX/aC4lSx88lXm6r7DLeXO6rCbY+6N56izrXk
-         i8bd2rxBQ1huh0/ko27vJGpzg2kx0OeWhCUZvrzJIk8tnap42CFvkO9D832tiZ/DxY1r
-         AszJYeqxciYJXrJYu7hc+VKp9SIbm6cOxUSPj6cqMura+zpG09x2a5vbNzW+CvXWtEia
-         VMZQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVyF4m2jEOCHvlOhS0Wz7LoBTx0oGzQXygdjFXYP2zvtu5+ooR49m3Fhv1eKA2tv/AWRmYqQU/WaMeHCQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzqLm5/aRT0ssxBrUKF9EPwevnSdqTVy4/5SaQG2mj7COZo/ig3
-	DGFtny/BNvoxqySsY/FzmhJh7D3jIKF4ym3GkoI220U0DGKVhb46zex8vrXuIjjzCtX7/TFSIVJ
-	j0g0sNyebODyQFhMkyg==
-X-Google-Smtp-Source: AGHT+IE+8bwfxGrPX5c+j72P+UldeW2lUoB6l/CiAAVFVMchFmuMTZGNT3nWFVg4Xnt+KARKO8gZ/bdkM0nin/4=
-X-Received: from wmsd12.prod.google.com ([2002:a05:600c:3acc:b0:459:eecf:e14e])
+        bh=vcSm1OtREGPb104alZ1yzuEUCvwCzNvElhs+/6tX29M=;
+        b=BVl4yaCnSWcFswkYZbvtyC8lnVFAyQthUzHPWHl5PviNOmrXYhVCCBYrP5ST37fkty
+         BGGGbpFSA2PuEGPcLh/P/kB/Cqhgms+8gE1urH2gkrfWHhKcYoL5keA8zrjeWiE2JF8Y
+         ubXHTGjKGZq3K1chkh3wUdlXdeVV+B0d6B/4/BcL9EsGNIArqctCQp1oaW+C1O7v4Act
+         Qhj/LMRm+GS6+UATu/78IKLOuGeO7ZHOfOesEkYwPckhKRitqiq9cxUvP5Xf/RQSe+qS
+         CDzgVhQNnTrTy7wvUG+95AZ5nQGE7M9pO3s2mtdBCQy2PfJ62LxJ30bByFsu3ovxlUXw
+         hoVg==
+X-Forwarded-Encrypted: i=1; AJvYcCUeOMf8PKHVw1N+jwg3LHCMwiKltRZBqtxcnKWmsVLnhegK3BlMu8j/ocPeiARsRZG+BP3JnjmZxI/deg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwuR0NIPJu+F1G/i6seuemYrhvSUhbsLF7GoSGOi45o9klcOBgq
+	Qmww3nnv2XdsPi77NeAkP2xCV0sMQlXxvf67035iJ1eLq/atSZWhtCc6D0ydyu8WnAZUaA09itd
+	ajCcW18lup5wPaSYQzA==
+X-Google-Smtp-Source: AGHT+IFutm5xxBBsC59USuggF9xEm41gGKiB1W5K+wZvTnUgdqDAaA6QwhiqihbNCQ9esv5k56Fiq6NBFva5rrc=
+X-Received: from wmbji1.prod.google.com ([2002:a05:600c:a341:b0:459:da33:b20c])
  (user=aliceryhl job=prod-delivery.src-stubby-dispatcher) by
- 2002:a5d:64e8:0:b0:3b7:89a2:bb8c with SMTP id ffacd0b85a97d-3bb671f5058mr803318f8f.16.1755245939593;
- Fri, 15 Aug 2025 01:18:59 -0700 (PDT)
-Date: Fri, 15 Aug 2025 08:18:58 +0000
-In-Reply-To: <20250815-rnull-up-v6-16-v5-15-581453124c15@kernel.org>
+ 2002:a05:600c:524b:b0:456:29da:bb25 with SMTP id 5b1f17b1804b1-45a2183a65bmr12532315e9.19.1755246073966;
+ Fri, 15 Aug 2025 01:21:13 -0700 (PDT)
+Date: Fri, 15 Aug 2025 08:21:13 +0000
+In-Reply-To: <20250815-rnull-up-v6-16-v5-18-581453124c15@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250815-rnull-up-v6-16-v5-0-581453124c15@kernel.org> <20250815-rnull-up-v6-16-v5-15-581453124c15@kernel.org>
-Message-ID: <aJ7tcmOHfFmHgrY9@google.com>
-Subject: Re: [PATCH v5 15/18] rust: block: add `GenDisk` private data support
+References: <20250815-rnull-up-v6-16-v5-0-581453124c15@kernel.org> <20250815-rnull-up-v6-16-v5-18-581453124c15@kernel.org>
+Message-ID: <aJ7t-XS2mXFc_Xc6@google.com>
+Subject: Re: [PATCH v5 18/18] rnull: add soft-irq completion support
 From: Alice Ryhl <aliceryhl@google.com>
 To: Andreas Hindborg <a.hindborg@kernel.org>
 Cc: Boqun Feng <boqun.feng@gmail.com>, Miguel Ojeda <ojeda@kernel.org>, 
@@ -70,35 +70,11 @@ Cc: Boqun Feng <boqun.feng@gmail.com>, Miguel Ojeda <ojeda@kernel.org>,
 	rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="utf-8"
 
-On Fri, Aug 15, 2025 at 09:30:50AM +0200, Andreas Hindborg wrote:
-> Allow users of the rust block device driver API to install private data in
-> the `GenDisk` structure.
+On Fri, Aug 15, 2025 at 09:30:53AM +0200, Andreas Hindborg wrote:
+> rnull currently only supports direct completion. Add option for completing
+> requests across CPU nodes via soft IRQ or IPI.
 > 
 > Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
 
 Reviewed-by: Alice Ryhl <aliceryhl@google.com>
 
->          self,
->          name: fmt::Arguments<'_>,
->          tagset: Arc<TagSet<T>>,
-> +        queue_data: T::QueueData,
->      ) -> Result<GenDisk<T>> {
-> +        let data = queue_data.into_foreign();
-> +        let recover_data = ScopeGuard::new(|| {
-> +            // SAFETY: T::QueueData was created by the call to `into_foreign()` above
-> +            drop(unsafe { T::QueueData::from_foreign(data) });
-> +        });
-> +
->          // SAFETY: `bindings::queue_limits` contain only fields that are valid when zeroed.
->          let mut lim: bindings::queue_limits = unsafe { core::mem::zeroed() };
->  
-> @@ -113,7 +121,7 @@ pub fn build<T: Operations>(
->              bindings::__blk_mq_alloc_disk(
->                  tagset.raw_tag_set(),
->                  &mut lim,
-> -                core::ptr::null_mut(),
-> +                data.cast(),
-
-Is the cast necessary?
-
-Alice
