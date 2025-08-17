@@ -1,177 +1,127 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 144D1220F32;
-	Sun, 17 Aug 2025 15:26:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E75E5304969;
+	Sun, 17 Aug 2025 18:38:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755444412; cv=none; b=NjW9GYjIQgg44eu8dZVQSpDFiJTVnNToT9vQ0hZd2jEdJn2XqFjyeG5BDzX3UVHyYwMdH+a637dSGdD8NmjUMvZJ2GaTwQMsd6mYpky8ycoIx4tHZ1VCuXi1gkGCk1kbH8aKycSeh8Ty3xiIk/cYErRcF07KklQqDTAMgc5YtI0=
+	t=1755455902; cv=none; b=egOP9RSxWvrMEJqhSys3frkb2qTIsjwyp50pmX82RlAK9Pwq77JEDo+J+/eRHTUgGbJOD5pYw19AkIJ9OYO/YBuODzHN+dKvEc7ZWFn2gDGhQgl5dY6BglhNRrplB2GVvCCx2HLlRTYs2xfpi0de4r5oRE5GuM89KJZ1MgHtNMc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755444412; c=relaxed/simple;
-	bh=SQeX92yVhw/9yM+up9fO+7MKjsKogrLYB8mAAiysl7w=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HHSvFXP2h2zUhyKjX4TRfeQp02XOAB8QFWTPmRQuZk0kcrPpuKXnNH3NmE/u+SUSTt+2d5KYzfIyOnFZ/As2MvpPhFfh0A1A+b6jFO0Iw3Z6HSMMsqWZ2dsa52eTl1cIz95sSuzCybAWYR8WpsPG8Ko5wAP8qwPhAmgaGaT/oX4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DRbSYJFa; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DRbSYJFa"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C288CC4CEF1;
-	Sun, 17 Aug 2025 15:26:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755444411;
-	bh=SQeX92yVhw/9yM+up9fO+7MKjsKogrLYB8mAAiysl7w=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=DRbSYJFaO7ioOLcyjWPxa6O+Yg5D3kvkizbvdpHhMdnFFRJ4L3pS+bkU4ZV6l/wM1
-	 xDq47fiaW3DolaKVFUzFW7bIWKE+1W/TRa0KA8spUBsFMUKR22HN4th/oxLqVq2qUv
-	 u0aS3HJxgS0Buu8Sq+EblELTiWP+xKrt7DKoiUwPDpNG44nGRJhtj6De3SUGMZIAhH
-	 w1ezm9NlyFqPlGR7n2KSKiasOmr6Myt8RyhAj8Cr1TMnDOrYdmkhFA1mO+cDjDrmHZ
-	 IjkFrPkUNFcru/HDJYblvyeV+Ms4VUbqpLqSEvl1AJDrZ2YqOxWa5GkE+E5Q3xBxvw
-	 aGWpJsi5Ah5VA==
-From: colyli@kernel.org
-To: linux-raid@vger.kernel.org
-Cc: linux-block@vger.kernel.org,
-	yukuai3@huawei.com,
-	Coly Li <colyli@kernel.org>
-Subject: [PATCH 2/2] md: split bio by io_opt size in md_submit_bio()
-Date: Sun, 17 Aug 2025 23:26:45 +0800
-Message-ID: <20250817152645.7115-2-colyli@kernel.org>
-X-Mailer: git-send-email 2.47.2
-In-Reply-To: <20250817152645.7115-1-colyli@kernel.org>
-References: <20250817152645.7115-1-colyli@kernel.org>
+	s=arc-20240116; t=1755455902; c=relaxed/simple;
+	bh=CQIEt+kc8zkHcTX+x0T3XWeAnJn2m+yVzHehaaPk3FA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SAqeQ4O3LnMtq1UlnCvHp0ArYyu20DJL1xB0wRkEuoPJfEGhVVybqhdN9gbaedG0JdKJaNvX2wRk+G8HkJ6f2XxWi7Xa33HsWTiTonz7EBdJ9cK+UEeq4YM5vEv2P7+PFqPOvtlWXQcurjRa6DRIiwIsHrNcTFqirA64VZGHDiQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [10.0.54.22] (unknown [62.214.191.67])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 741B261E647BB;
+	Sun, 17 Aug 2025 20:37:55 +0200 (CEST)
+Message-ID: <2c4755bf-6f64-45cd-b49e-37b37676ea40@molgen.mpg.de>
+Date: Sun, 17 Aug 2025 20:37:50 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] block: ignore underlying non-stack devices io_opt
+To: Coly Li <colyli@kernel.org>
+Cc: linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
+ yukuai3@huawei.com
+References: <20250817152645.7115-1-colyli@kernel.org>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20250817152645.7115-1-colyli@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-From: Coly Li <colyli@kernel.org>
+Dear Coly,
 
-Currently in md_submit_bio() the incoming request bio is split by
-bio_split_to_limits() which makes sure the bio won't exceed
-max_hw_sectors of a specific raid level before senting into its
-.make_request method.
 
-For raid level 4/5/6 such split method might be problematic and hurt
-large read/write perforamnce. Because limits.max_hw_sectors are not
-always aligned to limits.io_opt size, the split bio won't be full
-stripes covered on all data disks, and will introduce extra read-in I/O.
-Even the bio's bi_sector is aligned to limits.io_opt size and large
-enough, the resulted split bio is not size-friendly to corresponding
-raid456 level.
+Thank you for your patch.
 
-This patch introduces bio_split_by_io_opt() to solve the above issue,
-1, If the incoming bio is not limits.io_opt aligned, split the non-
-  aligned head part. Then the next one will be aligned.
-2, If the imcoming bio is limits.io_opt aligned, and split is necessary,
-  then try to split a by multiple of limits.io_opt but not exceed
-  limits.max_hw_sectors.
+Am 17.08.25 um 17:26 schrieb colyli@kernel.org:
+> From: Coly Li <colyli@kernel.org>
+> 
+> This patch adds a new BLK_FLAG_STACK_IO_OPT for stack block device. If a
+> stack block device like md raid5 declares its io_opt when don't want
+> blk_stack_limits() to change it with io_opt of underlying non-stack
+> block devices, BLK_FLAG_STACK_IO_OPT can be set on limits.flags. Then in
+> blk_stack_limits(), lcm_not_zero(t->io_opt, b->io_opt) will be avoided.
+> 
+> For md raid5, it is necessary to keep a proper io_opt size for better
+> I/O thoughput.
 
-Then for large bio, the sligned split part will be full-stripes covered
-to all data disks, no extra read-in I/Os when rmw_level is 0. And for
-rmw_level > 0 condistions, the limits.io_opt aligned bios are welcomed
-for performace as well.
+th*r*oughput
 
-This patch only tests on 8 disks raid5 array with 64KiB chunk size.
-By this patch, 64KiB chunk size for a 8 disks raid5 array, sequential
-write performance increases from 900MiB/s to 1.1GiB/s by fio bs=10M.
-If fio bs=488K (exact limits.io_opt size) the peak sequential write
-throughput can reach 1.51GiB/s.
+For performance claims, it’d be great if you added the benchmark and the 
+test system details and test results.
 
-Signed-off-by: Coly Li <colyli@kernel.org>
----
- drivers/md/md.c    | 51 +++++++++++++++++++++++++++++++++++++++++++++-
- drivers/md/raid5.c |  6 +++++-
- 2 files changed, 55 insertions(+), 2 deletions(-)
+> Signed-off-by: Coly Li <colyli@kernel.org>
+> ---
+>   block/blk-settings.c   | 6 +++++-
+>   drivers/md/raid5.c     | 1 +
+>   include/linux/blkdev.h | 3 +++
+>   3 files changed, 9 insertions(+), 1 deletion(-)
+> 
+> diff --git a/block/blk-settings.c b/block/blk-settings.c
+> index 07874e9b609f..46ee538b2be9 100644
+> --- a/block/blk-settings.c
+> +++ b/block/blk-settings.c
+> @@ -782,6 +782,7 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
+>   		t->features &= ~BLK_FEAT_POLL;
+>   
+>   	t->flags |= (b->flags & BLK_FLAG_MISALIGNED);
+> +	t->flags |= (b->flags & BLK_FLAG_STACK_IO_OPT);
+>   
+>   	t->max_sectors = min_not_zero(t->max_sectors, b->max_sectors);
+>   	t->max_user_sectors = min_not_zero(t->max_user_sectors,
+> @@ -839,7 +840,10 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
+>   				     b->physical_block_size);
+>   
+>   	t->io_min = max(t->io_min, b->io_min);
+> -	t->io_opt = lcm_not_zero(t->io_opt, b->io_opt);
+> +	if (!t->io_opt || !(t->flags & BLK_FLAG_STACK_IO_OPT) ||
+> +	    (b->flags & BLK_FLAG_STACK_IO_OPT))
+> +		t->io_opt = lcm_not_zero(t->io_opt, b->io_opt);
+> +
+>   	t->dma_alignment = max(t->dma_alignment, b->dma_alignment);
+>   
+>   	/* Set non-power-of-2 compatible chunk_sectors boundary */
+> diff --git a/drivers/md/raid5.c b/drivers/md/raid5.c
+> index 023649fe2476..989acd8abd98 100644
+> --- a/drivers/md/raid5.c
+> +++ b/drivers/md/raid5.c
+> @@ -7730,6 +7730,7 @@ static int raid5_set_limits(struct mddev *mddev)
+>   	lim.io_min = mddev->chunk_sectors << 9;
+>   	lim.io_opt = lim.io_min * (conf->raid_disks - conf->max_degraded);
+>   	lim.features |= BLK_FEAT_RAID_PARTIAL_STRIPES_EXPENSIVE;
+> +	lim.flags |= BLK_FLAG_STACK_IO_OPT;
+>   	lim.discard_granularity = stripe;
+>   	lim.max_write_zeroes_sectors = 0;
+>   	mddev_stack_rdev_limits(mddev, &lim, 0);
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index 95886b404b16..a22c7cea9836 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -366,6 +366,9 @@ typedef unsigned int __bitwise blk_flags_t;
+>   /* passthrough command IO accounting */
+>   #define BLK_FLAG_IOSTATS_PASSTHROUGH	((__force blk_flags_t)(1u << 2))
+>   
+> +/* ignore underlying non-stack devices io_opt */
+> +#define BLK_FLAG_STACK_IO_OPT		((__force blk_flags_t)(1u << 3))
+> +
+>   struct queue_limits {
+>   	blk_features_t		features;
+>   	blk_flags_t		flags;
 
-diff --git a/drivers/md/md.c b/drivers/md/md.c
-index ac85ec73a409..d0d4d05150fe 100644
---- a/drivers/md/md.c
-+++ b/drivers/md/md.c
-@@ -426,6 +426,55 @@ bool md_handle_request(struct mddev *mddev, struct bio *bio)
- }
- EXPORT_SYMBOL(md_handle_request);
- 
-+/**
-+ * For raid456 read/write request, if bio LBA isn't aligned tot io_opt,
-+ * split the non io_opt aligned header, to make the second part's LBA be
-+ * aligned to io_opt. Otherwise still call bio_split_to_limits() to
-+ * handle bio split with queue limits.
-+ */
-+static struct bio *bio_split_by_io_opt(struct bio *bio)
-+{
-+	sector_t io_opt_sectors, start, offset;
-+	struct queue_limits lim;
-+	struct mddev *mddev;
-+	struct bio *split;
-+	int level;
-+
-+	mddev = bio->bi_bdev->bd_disk->private_data;
-+	level = mddev->level;
-+
-+	/* Only handle read456 read/write requests */
-+	if (level == 1 || level == 10 || level == 0 || level == LEVEL_LINEAR ||
-+	    (bio_op(bio) != REQ_OP_READ && bio_op(bio) != REQ_OP_WRITE))
-+		return bio_split_to_limits(bio);
-+
-+	/* In case raid456 chunk size is too large */
-+	lim = mddev->gendisk->queue->limits;
-+	io_opt_sectors = lim.io_opt >> SECTOR_SHIFT;
-+	if (unlikely(io_opt_sectors > lim.max_hw_sectors))
-+		return bio_split_to_limits(bio);
-+
-+	/* Small request, no need to split */
-+	if (bio_sectors(bio) <= io_opt_sectors)
-+		return bio;
-+
-+	/* Only split the non-io-opt aligned header part */
-+	start = bio->bi_iter.bi_sector;
-+	offset = sector_div(start, io_opt_sectors);
-+	if (offset == 0)
-+		return bio_split_to_limits(bio);
-+
-+	split = bio_split(bio, (io_opt_sectors - offset), GFP_NOIO,
-+			  &bio->bi_bdev->bd_disk->bio_split);
-+	if (!split)
-+		return bio_split_to_limits(bio);
-+
-+	split->bi_opf |= REQ_NOMERGE;
-+	bio_chain(split, bio);
-+	submit_bio_noacct(bio);
-+	return split;
-+}
-+
- static void md_submit_bio(struct bio *bio)
- {
- 	const int rw = bio_data_dir(bio);
-@@ -441,7 +490,7 @@ static void md_submit_bio(struct bio *bio)
- 		return;
- 	}
- 
--	bio = bio_split_to_limits(bio);
-+	bio = bio_split_by_io_opt(bio);
- 	if (!bio)
- 		return;
- 
-diff --git a/drivers/md/raid5.c b/drivers/md/raid5.c
-index 989acd8abd98..985fabeeead5 100644
---- a/drivers/md/raid5.c
-+++ b/drivers/md/raid5.c
-@@ -7759,9 +7759,13 @@ static int raid5_set_limits(struct mddev *mddev)
- 
- 	/*
- 	 * Requests require having a bitmap for each stripe.
--	 * Limit the max sectors based on this.
-+	 * Limit the max sectors based on this. And being
-+	 * aligned to lim.io_opt for better I/O performance.
- 	 */
- 	lim.max_hw_sectors = RAID5_MAX_REQ_STRIPES << RAID5_STRIPE_SHIFT(conf);
-+	if (lim.max_hw_sectors > lim.io_opt >> SECTOR_SHIFT)
-+		lim.max_hw_sectors = rounddown(lim.max_hw_sectors,
-+			  lim.io_opt >> SECTOR_SHIFT);
- 
- 	/* No restrictions on the number of segments in the request */
- 	lim.max_segments = USHRT_MAX;
--- 
-2.47.2
 
+Kind regards,
+
+Paul
