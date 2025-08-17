@@ -1,106 +1,115 @@
-Received: from smtp1.iitb.ac.in (smtpd9.iitb.ac.in [103.21.126.64])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 619651D6BB
-	for <linux-block@vger.kernel.org>; Sun, 17 Aug 2025 09:36:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.21.126.64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5532220F32;
+	Sun, 17 Aug 2025 15:26:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755423389; cv=none; b=MGzvdDADqjjskai69d0haAAfRJD9qSHu7Az3OKmgjYkpQKwwGNN+dCagky9EJrtAgmRZv0Il9U5Ypse+pPgm05mrraS0X3J5ZUPJQDZy8Qij0eaEmVUjPzZb8qPTQGHBwaPhmOu/zibdT72uMe1TSsM18EbxmuEqgSNdTEDbZ1M=
+	t=1755444410; cv=none; b=sww74r3vsvX/s00Z/qRHTlcmPvzhVpyAdp+t0b9Z3bZUsiD66r1TGRSguqr0AJ7xYVMh6hdgnh0Lkt81ZZl79JI6dyUn96Mx1yT9dc0xw4wX+YkRWgwjAgBuR2MhWCihCWnUEbd5eYaQnYmLcDSKQ8u4xnghAAz4OiUBv7djYw0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755423389; c=relaxed/simple;
-	bh=QUVIStTkAQtgw3rORRQT/eO6z9COm4pxchQ0/kMZ11U=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=UslwIjv6cNxjDohcuHwOPPPGuH5ClS9pbd5ezew30v+GV3vWd2PXLyCp9L82cb8XwFJ4AENUPs0ESlEC4L5CFIeV/CfSnpA29Zhd2HhZwUlf5hJMag83N0+VXVKMaJ1AXM2RT1SuIPVRSbn1odU75K9lkCKZt4AiCSoR06d+k5w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ee.iitb.ac.in; spf=pass smtp.mailfrom=ee.iitb.ac.in; dkim=pass (1024-bit key) header.d=iitb.ac.in header.i=@iitb.ac.in header.b=KnWO6qx+; arc=none smtp.client-ip=103.21.126.64
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ee.iitb.ac.in
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ee.iitb.ac.in
+	s=arc-20240116; t=1755444410; c=relaxed/simple;
+	bh=5FojilEHVOyGFqyLozl5Yfp/KgFqqkGTgzbjJc21+Ak=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Yw2BV885rh4VxQ+HAaaIlw059WjeZPqndTkqtxqr3NgYeM4CqthK3Yd/yTHS5rbuGws0y02FGrdYeNr84IchcQjtE1kmeVdUlcjWFIYg8l2dp592JCIFGACcnc8U6kEhH+3gFZ7RWnX+Mt1OXupjAIEwS6iX35BHuXLFuOj5P50=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CvM3yEW/; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iitb.ac.in header.i=@iitb.ac.in header.b="KnWO6qx+"
-Received: from ldns1.iitb.ac.in (ldns1.iitb.ac.in [10.200.12.1])
-	by smtp1.iitb.ac.in (Postfix) with SMTP id EEB8D104C1C3
-	for <linux-block@vger.kernel.org>; Sun, 17 Aug 2025 15:06:13 +0530 (IST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 smtp1.iitb.ac.in EEB8D104C1C3
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=iitb.ac.in; s=mail;
-	t=1755423373; bh=QUVIStTkAQtgw3rORRQT/eO6z9COm4pxchQ0/kMZ11U=;
-	h=Date:From:To:Cc:Subject:From;
-	b=KnWO6qx+3Omav/kQlEIbycpae23KbLgMyA2EFv9K2qZ9vJAtFXy7YxgYqR/tXlik0
-	 Wqa4pnhpBPmE67nb+13+G8BdzF9Y3qJq6QMlrmWoOW2fZ1MaWfrJDN+KS2gbYGZo8n
-	 evRHblvmZl0u9LstCebco9g3mI6Q+Z5/sA5tH760=
-Received: (qmail 9060 invoked by uid 510); 17 Aug 2025 15:06:13 +0530
-X-Qmail-Scanner-Diagnostics: from 10.200.1.25 by ldns1 (envelope-from <akhilesh@ee.iitb.ac.in>, uid 501) with qmail-scanner-2.11
- spamassassin: 3.4.1. mhr: 1.0. {clamdscan: 0.101.4/26439} 
- Clear:RC:1(10.200.1.25):SA:0(0.0/7.0):. Processed in 2.131342 secs; 17 Aug 2025 15:06:13 +0530
-X-Spam-Level: 
-X-Spam-Pyzor: Reported 0 times.
-X-Envelope-From: akhilesh@ee.iitb.ac.in
-X-Qmail-Scanner-Mime-Attachments: |
-X-Qmail-Scanner-Zip-Files: |
-Received: from unknown (HELO ldns1.iitb.ac.in) (10.200.1.25)
-  by ldns1.iitb.ac.in with SMTP; 17 Aug 2025 15:06:11 +0530
-Received: from bhairav.ee.iitb.ac.in (bhairav.ee.iitb.ac.in [10.107.1.1])
-	by ldns1.iitb.ac.in (Postfix) with ESMTP id 5FC76360040;
-	Sun, 17 Aug 2025 15:06:11 +0530 (IST)
-Received: from bhairav-test.ee.iitb.ac.in (bhairav.ee.iitb.ac.in [10.107.1.1])
-	(Authenticated sender: akhilesh)
-	by bhairav.ee.iitb.ac.in (Postfix) with ESMTPSA id 4AF6E1E812D4;
-	Sun, 17 Aug 2025 15:06:11 +0530 (IST)
-Date: Sun, 17 Aug 2025 15:06:05 +0530
-From: Akhilesh Patil <akhilesh@ee.iitb.ac.in>
-To: ming.lei@redhat.com, shuah@kernel.org, axboe@kernel.dk
-Cc: linux-block@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org, akhileshpatilvnit@gmail.com
-Subject: [PATCH] selftests: ublk: Use ARRAY_SIZE() macro to improve code
-Message-ID: <aKGihYui6/Pcijbk@bhairav-test.ee.iitb.ac.in>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CvM3yEW/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B593C4CEEB;
+	Sun, 17 Aug 2025 15:26:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755444410;
+	bh=5FojilEHVOyGFqyLozl5Yfp/KgFqqkGTgzbjJc21+Ak=;
+	h=From:To:Cc:Subject:Date:From;
+	b=CvM3yEW/oGvQANsLJK8X54JoxEONAwmR55TpLoiJVZd+KDtIrQyUlMP2OHJ5zjEdp
+	 ej4bUU5fDa6D9Ie4IYiBIm5K0tAixxSAKeKtICEm9HvFSSmqQt+L65YxiRIhgskhcF
+	 XsGgLd46gWWN46B+4p36IqWdilo5ScRxIAfl3xD+DywHSjB00+JzyTDZeYJetzuh16
+	 ghkXDEnkjd7GCPUGwZMTC3bVk0XpWANBf1rBdvmXi0QORmS0+Txgq1Wg93VzBv5GB9
+	 Z3J7cNjgAiaLNs7FOqURhNBjE26RSXEKUOzmuB8CW0CQfnzVFh/kcAYDMEAUUArbBa
+	 Wl8WI23YHdb3A==
+From: colyli@kernel.org
+To: linux-raid@vger.kernel.org
+Cc: linux-block@vger.kernel.org,
+	yukuai3@huawei.com,
+	Coly Li <colyli@kernel.org>
+Subject: [PATCH 1/2] block: ignore underlying non-stack devices io_opt
+Date: Sun, 17 Aug 2025 23:26:44 +0800
+Message-ID: <20250817152645.7115-1-colyli@kernel.org>
+X-Mailer: git-send-email 2.47.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-Use ARRAY_SIZE() macro while calculating size of an array to improve
-code readability and reduce potential sizing errors.
-Implement this suggestion given by spatch tool by running
-coccinelle script - scripts/coccinelle/misc/array_size.cocci
-Follow ARRAY_SIZE() macro usage pattern in ublk.c introduced by,
-commit ec120093180b9 ("selftests: ublk: fix ublk_find_tgt()")
-wherever appropriate to maintain consistency.
+From: Coly Li <colyli@kernel.org>
 
-Signed-off-by: Akhilesh Patil <akhilesh@ee.iitb.ac.in>
+This patch adds a new BLK_FLAG_STACK_IO_OPT for stack block device. If a
+stack block device like md raid5 declares its io_opt when don't want
+blk_stack_limits() to change it with io_opt of underlying non-stack
+block devices, BLK_FLAG_STACK_IO_OPT can be set on limits.flags. Then in
+blk_stack_limits(), lcm_not_zero(t->io_opt, b->io_opt) will be avoided.
+
+For md raid5, it is necessary to keep a proper io_opt size for better
+I/O thoughput.
+
+Signed-off-by: Coly Li <colyli@kernel.org>
 ---
-Testing:
-* build checked for testing/selftests/ublk
-* tested by running 
-	$ ./kublk --help
-Which exercises the impacted code path.
+ block/blk-settings.c   | 6 +++++-
+ drivers/md/raid5.c     | 1 +
+ include/linux/blkdev.h | 3 +++
+ 3 files changed, 9 insertions(+), 1 deletion(-)
 
- tools/testing/selftests/ublk/kublk.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/tools/testing/selftests/ublk/kublk.c b/tools/testing/selftests/ublk/kublk.c
-index 95188065b2e9..6512dfbdbce3 100644
---- a/tools/testing/selftests/ublk/kublk.c
-+++ b/tools/testing/selftests/ublk/kublk.c
-@@ -1400,7 +1400,7 @@ static int cmd_dev_get_features(void)
+diff --git a/block/blk-settings.c b/block/blk-settings.c
+index 07874e9b609f..46ee538b2be9 100644
+--- a/block/blk-settings.c
++++ b/block/blk-settings.c
+@@ -782,6 +782,7 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
+ 		t->features &= ~BLK_FEAT_POLL;
  
- 			if (!((1ULL << i)  & features))
- 				continue;
--			if (i < sizeof(feat_map) / sizeof(feat_map[0]))
-+			if (i < ARRAY_SIZE(feat_map))
- 				feat = feat_map[i];
- 			else
- 				feat = "unknown";
-@@ -1477,7 +1477,7 @@ static void __cmd_create_help(char *exe, bool recovery)
- 	printf("\tdefault: nr_queues=2(max 32), depth=128(max 1024), dev_id=-1(auto allocation)\n");
- 	printf("\tdefault: nthreads=nr_queues");
+ 	t->flags |= (b->flags & BLK_FLAG_MISALIGNED);
++	t->flags |= (b->flags & BLK_FLAG_STACK_IO_OPT);
  
--	for (i = 0; i < sizeof(tgt_ops_list) / sizeof(tgt_ops_list[0]); i++) {
-+	for (i = 0; i < ARRAY_SIZE(tgt_ops_list); i++) {
- 		const struct ublk_tgt_ops *ops = tgt_ops_list[i];
+ 	t->max_sectors = min_not_zero(t->max_sectors, b->max_sectors);
+ 	t->max_user_sectors = min_not_zero(t->max_user_sectors,
+@@ -839,7 +840,10 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
+ 				     b->physical_block_size);
  
- 		if (ops->usage)
+ 	t->io_min = max(t->io_min, b->io_min);
+-	t->io_opt = lcm_not_zero(t->io_opt, b->io_opt);
++	if (!t->io_opt || !(t->flags & BLK_FLAG_STACK_IO_OPT) ||
++	    (b->flags & BLK_FLAG_STACK_IO_OPT))
++		t->io_opt = lcm_not_zero(t->io_opt, b->io_opt);
++
+ 	t->dma_alignment = max(t->dma_alignment, b->dma_alignment);
+ 
+ 	/* Set non-power-of-2 compatible chunk_sectors boundary */
+diff --git a/drivers/md/raid5.c b/drivers/md/raid5.c
+index 023649fe2476..989acd8abd98 100644
+--- a/drivers/md/raid5.c
++++ b/drivers/md/raid5.c
+@@ -7730,6 +7730,7 @@ static int raid5_set_limits(struct mddev *mddev)
+ 	lim.io_min = mddev->chunk_sectors << 9;
+ 	lim.io_opt = lim.io_min * (conf->raid_disks - conf->max_degraded);
+ 	lim.features |= BLK_FEAT_RAID_PARTIAL_STRIPES_EXPENSIVE;
++	lim.flags |= BLK_FLAG_STACK_IO_OPT;
+ 	lim.discard_granularity = stripe;
+ 	lim.max_write_zeroes_sectors = 0;
+ 	mddev_stack_rdev_limits(mddev, &lim, 0);
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 95886b404b16..a22c7cea9836 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -366,6 +366,9 @@ typedef unsigned int __bitwise blk_flags_t;
+ /* passthrough command IO accounting */
+ #define BLK_FLAG_IOSTATS_PASSTHROUGH	((__force blk_flags_t)(1u << 2))
+ 
++/* ignore underlying non-stack devices io_opt */
++#define BLK_FLAG_STACK_IO_OPT		((__force blk_flags_t)(1u << 3))
++
+ struct queue_limits {
+ 	blk_features_t		features;
+ 	blk_flags_t		flags;
 -- 
-2.34.1
+2.47.2
 
