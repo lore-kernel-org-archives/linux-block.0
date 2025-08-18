@@ -1,121 +1,92 @@
-Received: from mx0b-002e3701.pphosted.com (mx0b-002e3701.pphosted.com [148.163.143.35])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f179.google.com (mail-il1-f179.google.com [209.85.166.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0259E2737EF;
-	Mon, 18 Aug 2025 18:49:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.143.35
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 506BE277036
+	for <linux-block@vger.kernel.org>; Mon, 18 Aug 2025 19:07:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755542981; cv=none; b=eR0uFdF3Vnx7xKapNkkm6PDh/kmyJZKKSCmT/ZY30Sycec8aVSHfLg+8akPueXCnV9aDGAmYtyqvCMWQKIEWtmqePqRk4Jhr+SF5bq1EQmFlnNBAf/cXmz96HtNLXgbWM70Fo2dK4gU2yW0lEyqLZ3xTo4U5XeNYVFCe/RsfVr8=
+	t=1755544065; cv=none; b=u4XdwQt3FlzKdOa7EAiJVJspPmeYNayHKSsccK4Z8ZxC1S7xfRbfXQ9cDcy4VqATyt/1UV6GXiDzFU4IuCxl1q9HfMU/ptWY96UPt/6ogz10WAGFZDwjzyITSBj9ADiRtZbJExrqoNNTArShD4IN0qnC0ir8JkUXnrtOM/UD/Pg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755542981; c=relaxed/simple;
-	bh=rVceH7WgH8GnEORYZZ+4H0wG/EmxIJmj1SeQ3K/SX9U=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=sGS8IVXmsj513IhD2Mg809shyjl1JQZJPWTKVYzYdztktAOfUlCcLQwZ/ynTV8YYk4ZiU6KAyw1ElROotB8CQiBpR9AuSaotnfmhMve/DlPEU0Tr8FGpXYf6Xcfb2PL9LOTKznVYA7AJ1goRhpv+DGW9PJyjLMfSs2iLb8tBrRk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hpe.com; spf=pass smtp.mailfrom=hpe.com; dkim=pass (2048-bit key) header.d=hpe.com header.i=@hpe.com header.b=Pzzq2FfK; arc=none smtp.client-ip=148.163.143.35
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hpe.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hpe.com
+	s=arc-20240116; t=1755544065; c=relaxed/simple;
+	bh=Ski4TKxNewtrUZds8NDTJNTqJtmxfNhmPkAzaqLMFSw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YzVUnoSw/XUWddUkrvxpCrlyBeoD+lMcYHwFXyF9GranS7uxS/q2eofO4YqzeSM7SWwN2id0k0MDmHL/LerHqkrNdKC6MQRKi7oIYM+sd3wOq78U9PHhFdt5ooGsHeoIuR2vf/oDE7C6zeuuN/rS9bsi9RPMp1AcLybSOaGdI54=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=s1Pr1IAl; arc=none smtp.client-ip=209.85.166.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hpe.com header.i=@hpe.com header.b="Pzzq2FfK"
-Received: from pps.filterd (m0150244.ppops.net [127.0.0.1])
-	by mx0b-002e3701.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57IFM767019664;
-	Mon, 18 Aug 2025 18:49:21 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=cc
-	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pps0720; bh=ameLDw0BR3vTu
-	DkjRtRePwqEBLDRYpdpUNQ9YWBBFhU=; b=Pzzq2FfKxNIZVGigK3y3z3sBIZRZy
-	YWwkaPJEGVqSYeBXVfNFBXiTgy2tFAIqezVS+53NWP8BlKo5k4wPMGqFf02bbt5C
-	tOnnHNulCVv+psyt+vdsIbHSz6X7r1/rnhWI3ZGwht5c9Gvbj5Ngt4DjWhWDFBzu
-	LneEPXSBJQcX5hXdmD9epxsewQty3okKM/SP/rsgFO0bnRSeYV5nfpk9ybeAKrAH
-	+0NUDnRO91wg+VmprzqesnIiDMYrbnsa+XrV8+Lov8kFedLBi8wBSG24nXReeIJA
-	Ta27Sj6rCGHs/ojt9b/WbNTGaLvdYTUf9JoeloNJg26E6CQGytwMqZsUw==
-Received: from p1lg14881.it.hpe.com ([16.230.97.202])
-	by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 48m69f9yhe-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 18 Aug 2025 18:49:21 +0000 (GMT)
-Received: from test-build-fcntl.hpe.com (unknown [192.58.206.35])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by p1lg14881.it.hpe.com (Postfix) with ESMTPS id B3A18805E2F;
-	Mon, 18 Aug 2025 18:48:48 +0000 (UTC)
-Received: by test-build-fcntl.hpe.com (Postfix, from userid 1000)
-	id 45933883B910; Mon, 18 Aug 2025 18:48:28 +0000 (UTC)
-From: Rajeev Mishra <rajeevm@hpe.com>
-To: axboe@kernel.dk, yukuai1@huaweicloud.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Rajeev Mishra <rajeevm@hpe.com>
-Subject: [PATCH v4 2/2] loop: use vfs_getattr_nosec for accurate file size
-Date: Mon, 18 Aug 2025 18:48:21 +0000
-Message-ID: <20250818184821.115033-3-rajeevm@hpe.com>
-X-Mailer: git-send-email 2.43.7
-In-Reply-To: <20250818184821.115033-1-rajeevm@hpe.com>
-References: <20250818184821.115033-1-rajeevm@hpe.com>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="s1Pr1IAl"
+Received: by mail-il1-f179.google.com with SMTP id e9e14a558f8ab-3e668360ec7so6216895ab.1
+        for <linux-block@vger.kernel.org>; Mon, 18 Aug 2025 12:07:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1755544062; x=1756148862; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=uGRep3tF7KiNS0qSwtnPInQlsC4SL0Dlef048RIg/sI=;
+        b=s1Pr1IAlsKfuNxrzLr/JrOjvJyTQzIJyLgPSPqYIx67L2cu1O8ws3nY3SZ5InU1etV
+         J0wM5OK55+jnhxdnuRh7wAmYkGPJkXaFrnL2yw+aIsLY0MaCXRa59qS2HVFvOByMS8mK
+         duPm6KoLbkQBUZqpiyB7x2K2SQamyZDqLlzEf8TLDiIwXAtey3IznEtc7jpo7BW07Cb4
+         P1Hx1cSz63c4U1XlqeuvsV3JVR1ymt3say/FPNfPmAKwz/MwMOpKBG2Xf9YPYF7hII27
+         SqO+KUBWay4uKiYIlK1Es4sl5e1jUpI+hEFR89S8k0WDWO1ZUxpFY8eViuVPxxwGDHQP
+         qebA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755544062; x=1756148862;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=uGRep3tF7KiNS0qSwtnPInQlsC4SL0Dlef048RIg/sI=;
+        b=n44s1Ps412gegbkv767an1G1/D5p/Ub39f/0d2AySyWkoyF8OgdyCvuIqJJdC28pDB
+         a+PS/uTdC8q0+zUbckQWxkwzEWBTA7vOvnPFc90MoD5UqufSrqSjO5ZrqCf1a+vK8vae
+         sRdgvSednPR+Qs89w3jmlLTb0MvdSCvZH7WoggJhcNmtNT0t+dOqwPA8TkFv6bQynIqL
+         1cwc37bRHvNFvJrxBXRPge/+jd3iSpikr5IJ44yKG6AJ+x8u5w9TK3tylgcQc0NFq3GY
+         N2VObJ2dmJ9ET6JhLFOhdpok/OQ10ZmtE5vSwQXA13T4U6C/kG/t5N8mkF7b0u46b6vm
+         WdYg==
+X-Gm-Message-State: AOJu0YySaLLu8A5osp7N7w7PwHex/crEEKS7U5zJKcdl156NoRJo/h8p
+	ca5dAxiGg0AUnOj3Aq4MigLpjHylJz/sv5jvcBp4lUgnvSWj+22utHKVkTJhfolLYsusCl+vDlK
+	QdRCI
+X-Gm-Gg: ASbGncse+2C8BAoImUdrZFfwSSQbNJIlqrodW9WTDOXdb/wkneXfcXB8PrbSEC0jTOK
+	r0i6Y3qYW/tDSS7I90MByi5jwHBlLtQ8v92nS9ZvV6z6dFMRLSr+ekzgPZiAgiabeSIFAbLeNWf
+	FSAOrWCBb9kf+t/N75k17QIh1Ero/isibgHuQuAzsp1IS19D9nZilPRc2zujDM8rjQiC8ZdsV96
+	0Fpg3jww7/0NP4rRjT1H8oLs9aZRzYmRRrsWxYg7xKmKybF0qWTxrW3s9H9ntwh2nWRtF3ILxcu
+	W6kPrFEXh+r3VdUGzLJ6uAqkMsLc8htvtV6pV1M98TJVYpu4XuY4w++1/tff5FvpnKdbtoOChsB
+	U+ktWyGBmETpw4JyTS4kkFUNji0w5Sg==
+X-Google-Smtp-Source: AGHT+IE9tC9UJD6l6NoEtWg3LcOH74IqDydnHLY6xV/kxFHPSmv3CwLQR71mGVEOmsylQw71cEVvNQ==
+X-Received: by 2002:a05:6e02:5e02:b0:3e5:42aa:4c37 with SMTP id e9e14a558f8ab-3e674fb039fmr13629545ab.2.1755544062442;
+        Mon, 18 Aug 2025 12:07:42 -0700 (PDT)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3e57e6cef44sm36568985ab.48.2025.08.18.12.07.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 18 Aug 2025 12:07:41 -0700 (PDT)
+Message-ID: <a8097b4d-cbae-417b-9608-a3512d66f8d3@kernel.dk>
+Date: Mon, 18 Aug 2025 13:07:41 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODE4MDE3NiBTYWx0ZWRfX77RX9fNJQzhV
- yl5nePVcIIelNoUFqUjmK8+zZwdEIQej3txt/jvvnYOwP3v6wrX1a0VhAGzwTKLx4BkNu5mmLCa
- hG5jHrtvhfwI0Zn9GQgPDFvETIaJ6M2NIyyjlc4Q9BnOi9YnFVMXcBzhn46LT6R/M8YXHmjbkVF
- 7hkws8/wy5U0oug9x8ZMK8aSsiohyMsAE4iK5siXrg6Ata7uAj5zbnEZU4Ky1ww1XmUCKPBw9xt
- 4S8soYrbZEoVXmWcPQ+ko4pLs9QrbfK8ea7aBZcp95lgX34e9/KH3E+vCY1Yz1Nl17dwydSFs1Y
- NwAkERHTCLtHGqGa5p+i/ZVk3tEtALED57sMHpmcR55hKuYPSlDNFIFxO1B3D41spZCTyBdj1yC
- eao6Sjlfy9vy2n+en4bmSF/VBBIdgwbPTHhdbpQQDtcgYs3hAjfBZI5lohNdiBVNzHaGuOnJ
-X-Proofpoint-ORIG-GUID: RVY0BQg0QJVX-WlJTRXOuE34fIw80MJS
-X-Authority-Analysis: v=2.4 cv=Asfu3P9P c=1 sm=1 tr=0 ts=68a375b1 cx=c_pps
- a=FAnPgvRYq/vnBSvlTDCQOQ==:117 a=FAnPgvRYq/vnBSvlTDCQOQ==:17
- a=2OwXVqhp2XgA:10 a=MvuuwTCpAAAA:8 a=XZbkMGOcC_xTVlInkEgA:9
-X-Proofpoint-GUID: RVY0BQg0QJVX-WlJTRXOuE34fIw80MJS
-X-HPE-SCL: -1
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-08-18_05,2025-08-14_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 malwarescore=0 clxscore=1015 lowpriorityscore=0 spamscore=0
- bulkscore=0 mlxscore=0 adultscore=0 phishscore=0 mlxlogscore=999
- suspectscore=0 priorityscore=1501 classifier=spam authscore=0 authtc=n/a
- authcc= route=outbound adjust=0 reason=mlx scancount=1
- engine=8.19.0-2507300000 definitions=main-2508180176
+User-Agent: Mozilla Thunderbird
+Subject: Re: fixed commit message
+To: Rajeev Mishra <rajeevm@hpe.com>, yukuai1@huaweicloud.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250818184821.115033-1-rajeevm@hpe.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20250818184821.115033-1-rajeevm@hpe.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-In lo_calculate_size, use vfs_getattr_nosec() instead of
-i_size_read(), which improves accuracy for network and
-distributed filesystems.
+On 8/18/25 12:48 PM, Rajeev Mishra wrote:
+> fixed the commit message
 
-Signed-off-by: Rajeev Mishra <rajeevm@hpe.com>
----
- drivers/block/loop.c | 15 +++++++++++++--
- 1 file changed, 13 insertions(+), 2 deletions(-)
+Still leaves something to be desired - a nit is the line length,
+but most in terms of why the change is necessary. At least the
+comment in the code explains why this is a needed change, but
+the commit message is pretty vague.
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 0e1b9eb9db10..57263c273f0f 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -139,9 +139,20 @@ static int part_shift;
- 
- static loff_t lo_calculate_size(struct loop_device *lo, struct file *file)
- {
-+	struct kstat stat;
- 	loff_t loopsize;
--	/* Compute loopsize in bytes */
--	loopsize = i_size_read(file->f_mapping->host);
-+	int ret;
-+
-+	/*
-+	 * Get the accurate file size. This provides better results than
-+	 * cached inode data, particularly for network filesystems where
-+	 * metadata may be stale.
-+	 */
-+	ret = vfs_getattr_nosec(&file->f_path, &stat, STATX_SIZE, 0);
-+	if (ret)
-+		return 0;
-+
-+	loopsize = stat.size;
- 	if (lo->lo_offset > 0)
- 		loopsize -= lo->lo_offset;
- 	/* offset is beyond i_size, weird but possible */
+I'll fix them up and re-add Yu's review.
+
 -- 
-2.43.7
+Jens Axboe
 
