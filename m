@@ -1,93 +1,174 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23EE6274FFE;
-	Mon, 18 Aug 2025 06:31:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96C86275AF4
+	for <linux-block@vger.kernel.org>; Mon, 18 Aug 2025 06:38:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755498685; cv=none; b=hFxybc8juw492lGpGdV0ULDkHEeBs4WmHIxXYXFiglYD7S95QlX1Olv5NJsikosQzS6DRVbqbZkL8gmtSUZ/RsxYaKorIkzCzfWv1zj/PpqG/mhU0+A4inMphiaqkJGkvcCULZ2MGhKoiwR27Ki2a6EjhPRI2OWHOCYiDliyX8A=
+	t=1755499132; cv=none; b=S/OMeSxtiLIFZu2z6k0JwL4K2H1AVgq49DC0ihbI07D5fAg6IxGLUCzeFyu/JBSS2BJsY09oqWJR95LlXTNZkmOvclA5VkuCd8gmg1Gsd7Jjs0mnZ9TOj2r793sR5/eaTpXfiN4Lu+HptZmB3KbKQZ17LJsy61LrhxIvGTUsWvM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755498685; c=relaxed/simple;
-	bh=Hv9/f0wZtCpcceDkI2NPRxbr1R0294UCEI5JlP+H+Nw=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=tUH6t5+FyQY/bzZ6RYupoa4JmXAYahAzY9QBcWF+sKTrpC6KflpgTmt+dXMqDVag7MPVjyMTOIofy+Vwd/xKtMzbwt5BEsvO3jWsrBB1BUZCRQknfeE/UKWvdK2XgZcHaw4yvY+/QuMZtPRXY/xNpGRwOmfMPAJy0o7LrN016LI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4c52t13wPmzKHMZx;
-	Mon, 18 Aug 2025 14:31:21 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id EBC371A1356;
-	Mon, 18 Aug 2025 14:31:20 +0800 (CST)
-Received: from [10.174.179.143] (unknown [10.174.179.143])
-	by APP4 (Coremail) with SMTP id gCh0CgAHzw+4yKJo_NRMEA--.49863S3;
-	Mon, 18 Aug 2025 14:31:20 +0800 (CST)
-Subject: Re: [PATCH 1/2] block: ignore underlying non-stack devices io_opt
-To: Christoph Hellwig <hch@infradead.org>, Yu Kuai <yukuai1@huaweicloud.com>
-Cc: Damien Le Moal <dlemoal@kernel.org>, colyli@kernel.org,
- linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
- "yukuai (C)" <yukuai3@huawei.com>
-References: <20250817152645.7115-1-colyli@kernel.org>
- <756b587d-2a5c-4749-a03b-cfc786740684@kernel.org>
- <ffa13f8c-5dfe-20d4-f67d-e3ccd0c70b86@huaweicloud.com>
- <fd5c1916-936b-4253-a7b8-ba53591653f3@kernel.org>
- <4aa48545-7398-c346-5968-5d08f29748c4@huaweicloud.com>
- <aKLAhOxV1KViVw7w@infradead.org>
- <de4fd44c-f8be-e787-27f4-9e9e09921e12@huaweicloud.com>
- <aKLFuQX8ndDxLTVs@infradead.org>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <e00106ae-e373-9481-8377-5e69203f9de0@huaweicloud.com>
-Date: Mon, 18 Aug 2025 14:31:20 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.1
+	s=arc-20240116; t=1755499132; c=relaxed/simple;
+	bh=SIaGcMfKgDQSiqTxbPlJGulJ+RFrVEnWarOcKyCFWg0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CIYML8b1l7znzKOJ9d/DSshCDrCZF3369ZQACNm3rrT4pl2mPba4ZlBvrfTlKaoHUYTK3TjWHokxEsqgS7St/zaxpg+5ZoDdEe1pZZ676rM5Tjxuj2JRLLk+frXd2qx/yxQuT4iDNFi/3oqETt+p1DQKydRq+KLFg7tSpA9H2iU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=vNrZ5qvK; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=bcxpf1FF; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=XfryVcvv; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=eX8tHYxx; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="vNrZ5qvK";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="bcxpf1FF";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="XfryVcvv";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="eX8tHYxx"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id B1E49211A2;
+	Mon, 18 Aug 2025 06:38:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1755499128; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+1+7D85kOQ97EVvudAvVmc/NF5mfjwf/0sAeafgfM4Y=;
+	b=vNrZ5qvKXndkMLAoznbqyLSTFePX3kh6KnRZbHoB9C2zjNYPRlSZNqV1rs87VkIN/NFGA0
+	epO2K8Z7f0c9H8dsf/cWUbqIgfkSDfNRGRDND39rNvY8/xCfs/tNHRHV7tNN0+ADyD5VlJ
+	bdOli6rKzBHRDtEdMB6qsFlPXB5BZNo=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1755499128;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+1+7D85kOQ97EVvudAvVmc/NF5mfjwf/0sAeafgfM4Y=;
+	b=bcxpf1FF5NsMzd0krz+WQR2MFA9E1G0HxMmkiuXlc9+WUvsPrOT8Vm8rqnMZYOF+i+Rb/N
+	aHIjWw3qaa96IUCw==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=XfryVcvv;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=eX8tHYxx
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1755499127; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+1+7D85kOQ97EVvudAvVmc/NF5mfjwf/0sAeafgfM4Y=;
+	b=XfryVcvv/Xm/N5A4Mnz0Ajiv+Cf6ifBCBsKqFJtZs8dq+AT/GoxM9groiQMa4kcylxrOVz
+	/94/ult5O2fshQOyeuqzB/qaKTN9maaE/Th5IqJBkGyK8d4LsS7cE3058t21c4tAq1JhCX
+	G4TCi10TJ/pTuH29hHszkqfIeg52AYg=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1755499127;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+1+7D85kOQ97EVvudAvVmc/NF5mfjwf/0sAeafgfM4Y=;
+	b=eX8tHYxxj3BHjPj961nVeOjzv++ZbhA1I1wWTvkD1AwqIaG9B5HtDESZSwNrDDdPYl9phW
+	9jBS4Iek66isxuAQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 0DB6413686;
+	Mon, 18 Aug 2025 06:38:46 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id V01TAXbKomgdBAAAD6G6ig
+	(envelope-from <hare@suse.de>); Mon, 18 Aug 2025 06:38:46 +0000
+Message-ID: <bbf3759f-c337-4084-80f5-170e6f1ced34@suse.de>
+Date: Mon, 18 Aug 2025 08:38:45 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <aKLFuQX8ndDxLTVs@infradead.org>
-Content-Type: text/plain; charset=gbk; format=flowed
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/5] mm: rename huge_zero_page to huge_zero_folio
+To: "Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>,
+ Suren Baghdasaryan <surenb@google.com>, Ryan Roberts <ryan.roberts@arm.com>,
+ Baolin Wang <baolin.wang@linux.alibaba.com>, Vlastimil Babka
+ <vbabka@suse.cz>, Zi Yan <ziy@nvidia.com>, Mike Rapoport <rppt@kernel.org>,
+ Dave Hansen <dave.hansen@linux.intel.com>, Michal Hocko <mhocko@suse.com>,
+ David Hildenbrand <david@redhat.com>,
+ Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Thomas Gleixner <tglx@linutronix.de>, Nico Pache <npache@redhat.com>,
+ Dev Jain <dev.jain@arm.com>, "Liam R . Howlett" <Liam.Howlett@oracle.com>,
+ Jens Axboe <axboe@kernel.dk>
+Cc: linux-kernel@vger.kernel.org, willy@infradead.org, linux-mm@kvack.org,
+ Ritesh Harjani <ritesh.list@gmail.com>, linux-block@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, "Darrick J . Wong" <djwong@kernel.org>,
+ mcgrof@kernel.org, gost.dev@samsung.com, hch@lst.de,
+ Pankaj Raghav <p.raghav@samsung.com>
+References: <20250808121141.624469-1-kernel@pankajraghav.com>
+ <20250808121141.624469-2-kernel@pankajraghav.com>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20250808121141.624469-2-kernel@pankajraghav.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgAHzw+4yKJo_NRMEA--.49863S3
-X-Coremail-Antispam: 1UD129KBjvdXoWrWrykJF43Zr1xJw13uFyrCrg_yoWxGwbE93
-	yrCa48Aw17JFs2ya13Grn8JFZFg3y0qryDXr1UJa15J345Ar4vqryqk3s3Zw4DJF4xtrnI
-	vF43W3yIgry29jkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUbVkFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-	A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
-	6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-	I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r
-	4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCYjI0SjxkI62AI1cAE67vI
-	Y487MxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r
-	1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CE
-	b7AF67AKxVWUAVWUtwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0x
-	vE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAI
-	cVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2Kf
-	nxnUUI43ZEXa7VUbVOJ7UUUUU==
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-Spamd-Result: default: False [-3.01 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RCPT_COUNT_TWELVE(0.00)[28];
+	FREEMAIL_CC(0.00)[vger.kernel.org,infradead.org,kvack.org,gmail.com,kernel.org,samsung.com,lst.de];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_TRACE(0.00)[suse.de:+];
+	R_RATELIMIT(0.00)[to_ip_from(RLxigy8pr3gnoabpfzcidubger)];
+	RCVD_COUNT_TWO(0.00)[2];
+	DNSWL_BLOCKED(0.00)[2a07:de40:b281:104:10:150:64:97:from,2a07:de40:b281:106:10:150:64:167:received];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	DWL_DNSWL_BLOCKED(0.00)[suse.de:dkim];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.de:mid,suse.de:dkim,suse.de:email]
+X-Spam-Flag: NO
+X-Spam-Level: 
+X-Rspamd-Queue-Id: B1E49211A2
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Rspamd-Action: no action
+X-Spam-Score: -3.01
 
-Hi,
-
-ÔÚ 2025/08/18 14:18, Christoph Hellwig Ð´µÀ:
-> On Mon, Aug 18, 2025 at 02:14:06PM +0800, Yu Kuai wrote:
->> Please take a look at the first patch, nothing special, the new flag
->> will be passed to the top device.
+On 8/8/25 14:11, Pankaj Raghav (Samsung) wrote:
+> From: Pankaj Raghav <p.raghav@samsung.com>
 > 
-> But passing it on will be incorrect in many cases, e.g. for any
-> write caching solution.  And that is a much more common use case
-> than stacking different raid level using block layer stacking.
-
-I don't quite understand why it's incorrect for write caching solution,
-can you please explain in details? AFAIK, the behaviour is only changed
-for the first mdraid device is the stacking chain.
-
-Thanks,
-Kuai
-
+> As the transition already happened from exposing huge_zero_page to
+> huge_zero_folio, change the name of the shrinker and the other helper
+> function to reflect that.
 > 
-> .
+> No functional changes.
 > 
+> Reviewed-by: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
+> Reviewed-by: Zi Yan <ziy@nvidia.com>
+> Suggested-by: David Hildenbrand <david@redhat.com>
+> Acked-by: David Hildenbrand <david@redhat.com>
+> Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
+> ---
+>   mm/huge_memory.c | 34 +++++++++++++++++-----------------
+>   1 file changed, 17 insertions(+), 17 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 NÃ¼rnberg
+HRB 36809 (AG NÃ¼rnberg), GF: I. Totev, A. McDonald, W. Knoblich
