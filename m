@@ -1,130 +1,256 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AFDF2264B1;
-	Mon, 18 Aug 2025 01:43:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7391244EA1
+	for <linux-block@vger.kernel.org>; Mon, 18 Aug 2025 02:12:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755481386; cv=none; b=ctQEW1YCjkW2RAlKRRJ0ycLxKTikY+X0/qXoSwikPggBpOTfRuuS3/ekXwSq1PvSPjfL77DAkpRuYJVrmFy/rckmPYyACJqFE/NPtrU7GlGBFhbIZDycI7v2r10on+9nsC9KYLlWTlRN0/ZJKJ/O6RPBDdDHcFHtcgB0E8YyDAk=
+	t=1755483130; cv=none; b=MpFUVVz568Di7tqlHdnV/A4OJxsyWhT4aLmYszX+E7JMPpereYYs0UWEi9ASRwgC87Vn3Ia7hNGp4NrMjG7Fx2YCust4tr8nuR3TOiLJlcyOmg9MDBYCHNfuwQo4VCSaJmwOMYhICgZTPQ9isf1NuuYvKd08bS5e/3rBndk+dOM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755481386; c=relaxed/simple;
-	bh=3BrdEm9YWQ4b9T8dYVemL7Ff85aMXjPNNHmqsSoFDS4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rFuLyyJ63V4nRgl+Y2V8qKQmGQ56b88dudhjhvHwlBN7pMl+oOqbGQyaI3ny9p881epnPFs4S0vx4ImYfAUBuG5nXME+W357Efi41RfBW28vqgeXNOCinjAhZkhcxhbEdeN0LTa0I47fPh3FTwdgAYBBHoxEfDERO5hDkjXmwdc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4c4wTL0jTWzYQv8W;
-	Mon, 18 Aug 2025 09:43:02 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id A71FF1A018D;
-	Mon, 18 Aug 2025 09:43:00 +0800 (CST)
-Received: from [10.174.179.80] (unknown [10.174.179.80])
-	by APP4 (Coremail) with SMTP id gCh0CgAHgxMfhaJo6Ns1EA--.15154S3;
-	Mon, 18 Aug 2025 09:42:57 +0800 (CST)
-Message-ID: <95a4a94b-7aa0-4e3c-a386-7692dde66a4f@huaweicloud.com>
-Date: Mon, 18 Aug 2025 09:42:55 +0800
+	s=arc-20240116; t=1755483130; c=relaxed/simple;
+	bh=g6EpkcvxwypuvcqaVvQ/jri2Ix8bJ+hfN3ReO4gMVLg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=C2yb5qhk6KboD8CIuF3BfQPvD4mcZU8vh9oSApj/3nEGbGLlpxrj/C5q6einLY9VRazE4M4Fk0cxPuKDoCavsGy1LqZlsZAIKCpqeAklGaoXItu1eJg4oSGnJKC8GJFXGk3s8ccmcr3eIhfIT3sV1qTqcy0oRUK0WxHkusxk4GI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ak5AozVK; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ak5AozVK"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1755483127;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=alDJHar97uTUIzscnGEjDMX65jecx5QK/CNwmeLCaa8=;
+	b=Ak5AozVKighTTw404Bf65VSeHGTfmJj0ZHEIt7Rte9/MW1Dpp/F+iz4e+vtwycBxSQytqB
+	DcsQ98ujHn1LAGTvUMO0JKzkVhXF7b1V4WJpMJtEXfKz54xKLc6zeUYmlKBk4mXQ8QVQjt
+	PxUaYIl1cu+8RFEccnzS9371tNAbdqI=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-651-ugGD62AZNcSuHSawhgPOYg-1; Sun,
+ 17 Aug 2025 22:12:05 -0400
+X-MC-Unique: ugGD62AZNcSuHSawhgPOYg-1
+X-Mimecast-MFC-AGG-ID: ugGD62AZNcSuHSawhgPOYg_1755483123
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DF4CE18003FD;
+	Mon, 18 Aug 2025 02:12:02 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.112])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8858630001A5;
+	Mon, 18 Aug 2025 02:11:55 +0000 (UTC)
+Date: Mon, 18 Aug 2025 10:11:50 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: =?utf-8?B?5L2Z5b+r?= <yukuai1994@gmail.com>
+Cc: Yu Kuai <yukuai@kernel.org>, Nilay Shroff <nilay@linux.ibm.com>,
+	Yu Kuai <yukuai1@huaweicloud.com>, axboe@kernel.dk, hare@suse.de,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	yukuai3@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com,
+	johnny.chenyi@huawei.com
+Subject: Re: [PATCH 08/10] blk-mq: fix blk_mq_tags double free while
+ nr_requests grown
+Message-ID: <aKKL5nL4gf2bnXUd@fedora>
+References: <20250815080216.410665-1-yukuai1@huaweicloud.com>
+ <20250815080216.410665-9-yukuai1@huaweicloud.com>
+ <c5e63966-e7f6-4d82-9d66-3a0abccc9d17@linux.ibm.com>
+ <af40ef99-9b61-4725-ba77-c5d3741add99@kernel.org>
+ <aKADe9hNz99dQTfy@fedora>
+ <CAHW3DrjPEHX=XmPCQDBLJoXmnjz3GKsht33o-S6tH-tNb-_WQQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH blktests v2 0/3] blktest: add unmap write zeroes tests
-To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc: "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "dm-devel@lists.linux.dev" <dm-devel@lists.linux.dev>,
- "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
- "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- hch <hch@lst.de>, "tytso@mit.edu" <tytso@mit.edu>,
- "djwong@kernel.org" <djwong@kernel.org>,
- "bmarzins@redhat.com" <bmarzins@redhat.com>,
- "chaitanyak@nvidia.com" <chaitanyak@nvidia.com>,
- "brauner@kernel.org" <brauner@kernel.org>,
- "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
- "yi.zhang@huawei.com" <yi.zhang@huawei.com>,
- "chengzhihao1@huawei.com" <chengzhihao1@huawei.com>,
- "yukuai3@huawei.com" <yukuai3@huawei.com>,
- "yangerkun@huawei.com" <yangerkun@huawei.com>
-References: <20250813024421.2507446-1-yi.zhang@huaweicloud.com>
- <7dswufawxmyqblokjesulhdexqld3bx7sycgmylbaeqs43ougk@25rseyqm3beg>
-Content-Language: en-US
-From: Zhang Yi <yi.zhang@huaweicloud.com>
-In-Reply-To: <7dswufawxmyqblokjesulhdexqld3bx7sycgmylbaeqs43ougk@25rseyqm3beg>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-CM-TRANSID:gCh0CgAHgxMfhaJo6Ns1EA--.15154S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7WFy3tFy8uFWrXr15tr1rXrb_yoW8tw15pr
-	W5Xa4Dtws8GrWDJa4vvayq9Fy3Jws7Zry7A3Z5tr18Cr15ZFyfWrZ8Xw4aga17KrnxGw1I
-	v3W2gryS93WUJ3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUv0b4IE77IF4wAFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0En4kS
-	14v26r4a6rW5MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I
-	8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWr
-	XwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x
-	0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_
-	Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU0
-	s2-5UUUUU==
-X-CM-SenderInfo: d1lo6xhdqjqx5xdzvxpfor3voofrz/
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAHW3DrjPEHX=XmPCQDBLJoXmnjz3GKsht33o-S6tH-tNb-_WQQ@mail.gmail.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On 8/17/2025 2:14 PM, Shinichiro Kawasaki wrote:
-> On Aug 13, 2025 / 10:44, Zhang Yi wrote:
->> From: Zhang Yi <yi.zhang@huawei.com>
->>
->> Change since v2:
->>  - Modify the sysfs interfaces according to the kernel implementation.
->>  - Determine whether the kernel supports it by directly checking the
->>    existence of the sysfs interface, instead of using device_requries(). 
->>  - Drop _short_dev() helper and directly use _real_dev() to acquire dm
->>    path.
->>  - Check the return value of setup_test_device().
->>  - Fix the '"make check'" errors.
->>
->>
->> The Linux kernel (since version 6.17)[1] supports FALLOC_FL_WRITE_ZEROES
->> in fallocate(2) and add max_{hw|user}_wzeroes_unmap_sectors parameters
->> to the block device queue limit. These tests test those block device
->> unmap write zeroes sysfs interface
->>
->>         /sys/block/<disk>/queue/write_zeroes_max_bytes
->>         /sys/block/<disk>/queue/write_zeroes_unmap_max_hw_bytes
->>
->> with various SCSI/NVMe/device-mapper devices.
->>
->> The value of /sys/block//queue/write_zeroes_unmap_max_hw_bytes should be
->> equal to a nonzero value of /sys/block//queue/write_zeroes_max_bytes if
->> the block device supports the unmap write zeroes command; otherwise, it
->> should return 0. We can also disable unmap write zeroes command by
->> setting /sys/block/<disk>/queue/write_zeroes_max_bytes to 0.
->>
->>  - scsi/010 test SCSI devices.
->>  - dm/003 test device mapper stacked devices.
->>  - nvme/065 test NVMe devices.
->>
->> [1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=278c7d9b5e0c
+On Sat, Aug 16, 2025 at 04:05:30PM +0800, 余快 wrote:
+> Hi,
 > 
-> I applied this v2 series. Of note is that I amended the 2nd and 3rd patches to
-> fix the shellcheck warnings below. Anyway, thanks for the patches!
+> Ming Lei <ming.lei@redhat.com> 于2025年8月16日周六 12:05写道：
+> >
+> > On Sat, Aug 16, 2025 at 10:57:23AM +0800, Yu Kuai wrote:
+> > > Hi,
+> > >
+> > > 在 2025/8/16 3:30, Nilay Shroff 写道:
+> > > >
+> > > > On 8/15/25 1:32 PM, Yu Kuai wrote:
+> > > > > From: Yu Kuai <yukuai3@huawei.com>
+> > > > >
+> > > > > In the case user trigger tags grow by queue sysfs attribute nr_requests,
+> > > > > hctx->sched_tags will be freed directly and replaced with a new
+> > > > > allocated tags, see blk_mq_tag_update_depth().
+> > > > >
+> > > > > The problem is that hctx->sched_tags is from elevator->et->tags, while
+> > > > > et->tags is still the freed tags, hence later elevator exist will try to
+> > > > > free the tags again, causing kernel panic.
+> > > > >
+> > > > > Fix this problem by using new allocated elevator_tags, also convert
+> > > > > blk_mq_update_nr_requests to void since this helper will never fail now.
+> > > > >
+> > > > > Meanwhile, there is a longterm problem can be fixed as well:
+> > > > >
+> > > > > If blk_mq_tag_update_depth() succeed for previous hctx, then bitmap depth
+> > > > > is updated, however, if following hctx failed, q->nr_requests is not
+> > > > > updated and the previous hctx->sched_tags endup bigger than q->nr_requests.
+> > > > >
+> > > > > Fixes: f5a6604f7a44 ("block: fix lockdep warning caused by lock dependency in elv_iosched_store")
+> > > > > Fixes: e3a2b3f931f5 ("blk-mq: allow changing of queue depth through sysfs")
+> > > > > Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+> > > > > ---
+> > > > >   block/blk-mq.c    | 19 ++++++-------------
+> > > > >   block/blk-mq.h    |  4 +++-
+> > > > >   block/blk-sysfs.c | 21 ++++++++++++++-------
+> > > > >   3 files changed, 23 insertions(+), 21 deletions(-)
+> > > > >
+> > > > > diff --git a/block/blk-mq.c b/block/blk-mq.c
+> > > > > index 11c8baebb9a0..e9f037a25fe3 100644
+> > > > > --- a/block/blk-mq.c
+> > > > > +++ b/block/blk-mq.c
+> > > > > @@ -4917,12 +4917,12 @@ void blk_mq_free_tag_set(struct blk_mq_tag_set *set)
+> > > > >   }
+> > > > >   EXPORT_SYMBOL(blk_mq_free_tag_set);
+> > > > > -int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
+> > > > > +void blk_mq_update_nr_requests(struct request_queue *q,
+> > > > > +                        struct elevator_tags *et, unsigned int nr)
+> > > > >   {
+> > > > >           struct blk_mq_tag_set *set = q->tag_set;
+> > > > >           struct blk_mq_hw_ctx *hctx;
+> > > > >           unsigned long i;
+> > > > > - int ret = 0;
+> > > > >           blk_mq_quiesce_queue(q);
+> > > > > @@ -4946,24 +4946,17 @@ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
+> > > > >                                   nr - hctx->sched_tags->nr_reserved_tags);
+> > > > >                   }
+> > > > >           } else {
+> > > > > -         queue_for_each_hw_ctx(q, hctx, i) {
+> > > > > -                 if (!hctx->tags)
+> > > > > -                         continue;
+> > > > > -                 ret = blk_mq_tag_update_depth(hctx, &hctx->sched_tags,
+> > > > > -                                               nr);
+> > > > > -                 if (ret)
+> > > > > -                         goto out;
+> > > > > -         }
+> > > > > +         blk_mq_free_sched_tags(q->elevator->et, set);
+> > > > I think you also need to ensure that elevator tags are freed after we unfreeze
+> > > > queue and release ->elevator_lock otherwise we may get into the lockdep splat
+> > > > for pcpu_lock dependency on ->freeze_lock and/or ->elevator_lock. Please note
+> > > > that blk_mq_free_sched_tags internally invokes sbitmap_free which invokes
+> > > > free_percpu which acquires pcpu_lock.
+> > >
+> > > Ok, thanks for the notice. However, as Ming suggested, we might fix this
+> > > problem
+> > >
+> > > in the next merge window.
+> >
+> > There are two issues involved:
+> >
+> > - blk_mq_tags double free, introduced recently
+> >
+> > - long-term lock issue in queue_requests_store()
+> >
+> > IMO, the former is a bit serious, because kernel panic can be triggered,
+> > so suggest to make it to v6.17. The latter looks less serious and has
+> > existed for long time, but may need code refactor to get clean fix.
+> >
+> > > I'll send one patch to fix this regression by
+> > > replace
+> > >
+> > > st->tags with reallocated new sched_tags as well.
+> >
+> > Patch 7 in this patchset and patch 8 in your 1st post looks enough to
+> > fix this double free issue.
+> >
+> But without previous refactor, this looks hard. Can we consider the following
+
+I feel the following one should be enough:
+
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index b67d6c02eceb..021155bb64fc 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -4917,6 +4917,29 @@ void blk_mq_free_tag_set(struct blk_mq_tag_set *set)
+ }
+ EXPORT_SYMBOL(blk_mq_free_tag_set);
+ 
++static int blk_mq_sched_grow_tags(struct request_queue *q, unsigned int nr)
++{
++	struct blk_mq_hw_ctx *hctx;
++	struct elevator_tags *et;
++	unsigned long i;
++
++	if (nr > MAX_SCHED_RQ)
++		return -EINVAL;
++
++	et = blk_mq_alloc_sched_tags(q->tag_set, q->nr_hw_queues, nr);
++	if (!et)
++		return -ENOMEM;
++
++	blk_mq_free_sched_tags(q->elevator->et, q->tag_set);
++	queue_for_each_hw_ctx(q, hctx, i) {
++		hctx->sched_tags = et->tags[i];
++		if (q->elevator->type->ops.depth_updated)
++			q->elevator->type->ops.depth_updated(hctx);
++	}
++	q->elevator->et = et;
++	return 0;
++}
++
+ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
+ {
+ 	struct blk_mq_tag_set *set = q->tag_set;
+@@ -4936,6 +4959,12 @@ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
+ 	blk_mq_quiesce_queue(q);
+ 
+ 	ret = 0;
++
++	if (q->elevator && nr > q->elevator->et->nr_requests) {
++		ret = blk_mq_sched_grow_tags(q, nr);
++		goto update_nr_requests;
++	}
++
+ 	queue_for_each_hw_ctx(q, hctx, i) {
+ 		if (!hctx->tags)
+ 			continue;
+@@ -4955,6 +4984,7 @@ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
+ 		if (q->elevator && q->elevator->type->ops.depth_updated)
+ 			q->elevator->type->ops.depth_updated(hctx);
+ 	}
++update_nr_requests:
+ 	if (!ret) {
+ 		q->nr_requests = nr;
+ 		if (blk_mq_is_shared_tags(set->flags)) {
+
+> one line patch for this merge window? just fix the first double free
+> issue for now.
 > 
-> $ make check
-> shellcheck -x -e SC2119 -f gcc check common/* \
->         tests/*/rc tests/*/[0-9]*[0-9] src/*.sh
-> common/rc:679:7: note: Double quote to prevent globbing and word splitting. [SC2086]
-> tests/nvme/065:44:7: warning: Quote this to prevent word splitting. [SC2046]
-> tests/nvme/065:44:7: note: Useless echo? Instead of 'echo $(cmd)', just use 'cmd'. [SC2005]
-> make: *** [Makefile:21: check] Error 1
+> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+> index d880c50629d6..1e0ccf19295a 100644
+> --- a/block/blk-mq-tag.c
+> +++ b/block/blk-mq-tag.c
+> @@ -622,6 +622,7 @@ int blk_mq_tag_update_depth(struct blk_mq_hw_ctx *hctx,
+>                         return -ENOMEM;
+> 
+>                 blk_mq_free_map_and_rqs(set, *tagsptr, hctx->queue_num);
+> +               hctx->queue->elevator->et->tags[hctx->queue_num]= new;
+>                 *tagsptr = new;
 
-Sorry for missing these warnings, and thank you for fixing them! :-)
+It is fine if this way can work, however old elevator->et may has lower
+depth, then:
 
-Thanks.
-Yi.
+- the above change cause et->tags overflow
+
+- meantime memory leak is caused in blk_mq_free_sched_tags()
+
+
+Thanks,
+Ming
 
