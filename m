@@ -1,103 +1,173 @@
-Received: from mail-il1-f179.google.com (mail-il1-f179.google.com [209.85.166.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-002e3701.pphosted.com (mx0a-002e3701.pphosted.com [148.163.147.86])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 522AB26461F
-	for <linux-block@vger.kernel.org>; Mon, 18 Aug 2025 17:18:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91B8F3314A5;
+	Mon, 18 Aug 2025 18:49:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.147.86
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755537529; cv=none; b=jr5YT+z7Gg/jCWXj8gK8o1mq27r/+aVnbBZFCogtgzi5rKKQQ8a0OUmOLSukVT7Zaaz/N2J+UJN4lnganTHQEtla6WxkDloCXshZFrZo5uhM3MAIbngcrWno3ob1zwiCYX6E3zXiDbfX9xcjwTZsHZCaOStN9S4MmrtFXvYx71s=
+	t=1755542951; cv=none; b=J5ZO9ZGp0084L3d9RHuboUzPf0eM/Uktskw9AO9gRh1dk9KsImsP6+XWQ87Yv8HG+kJvFzvRTvo8/iV7Gz/GNekgjHjqVYqr7BZchnKfkljP2ItNjjVc7o0xp2uuiuYBH7GkBvVBc2DTdyzOFWLv5owQLa02CV1Cey1IjhWupcI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755537529; c=relaxed/simple;
-	bh=I2Y9f6HTNCdz/i8iZn+y6eKyu1wXCQbTreQdDmi89v8=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=uAMTArC8djw8qeptmCx6jx1JULHd6rEY/7kqEEK4TtUhEHUdykLIfUXp6H32M9xrmPdwukQcSv2rfeWeHYBhogjSV23bIP0OY2lL1zCrJm1l3JBZ63xdpQi7md5Y4wSN5BDaI9QG0MULsL99a7FLYtGijszQMKZux36ZJuQ9SVI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=rtFfBuxf; arc=none smtp.client-ip=209.85.166.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1755542951; c=relaxed/simple;
+	bh=58T/05imWQvD6p4dHOS/FRvkCp+AM46+vB/3ZcTxmFU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Sgkx3LCBjcukQTHIGmdDqSUO0XmBFWOk8pKa9yh7iUqFo1xXjPQEMkgEPArNxn/D3CS/7l3GYMsipka+WuSEYaTl9HszQzxM2pacH7+nwTHSUq9Fya7kYzzcg5THGT3MDYDCSBCTB7jaztdCr8Ai3wHGsQs1RQLNAwtaJgIvH88=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hpe.com; spf=pass smtp.mailfrom=hpe.com; dkim=pass (2048-bit key) header.d=hpe.com header.i=@hpe.com header.b=Apg2F4g2; arc=none smtp.client-ip=148.163.147.86
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hpe.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hpe.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="rtFfBuxf"
-Received: by mail-il1-f179.google.com with SMTP id e9e14a558f8ab-3e66c013e4dso5093755ab.0
-        for <linux-block@vger.kernel.org>; Mon, 18 Aug 2025 10:18:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1755537527; x=1756142327; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2q2GiRwCyrStVHviQb75voz5g4GkVn0PiT/uA+RUvCI=;
-        b=rtFfBuxfgmi1UgYuQwHRafH9AqSEsisBDF19CEmWi4f8bYDVSsgcaeZlJp180fleD8
-         3z7hiDNzgtMx7DDBYgCVNDm8WJKuCzQdTgzT+tXdePFMWV/N18UotME1jOMteccO1ed3
-         TEP7S+i0zvIMwrjne//YRPdRAE2D6pRQZuHhh77Nol1g+XxSaV6l/fVUYEDKhOcjS+Fq
-         ovo+ybeFdbounCC8A4yJ074RrMKHscl0ukhcUz2RUG5U6U1YWFHyHFHlXZ8isi9PTTjz
-         VSbOSFBFS9muuQMgGVyFzS1XGqFBEXUsvxykvmctHICC2dXzhfPGIOmKdDCe4i2EPVE7
-         NiIQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755537527; x=1756142327;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2q2GiRwCyrStVHviQb75voz5g4GkVn0PiT/uA+RUvCI=;
-        b=mGva99wVOy0lnFzwtXavtje5Ryn1xL2iqoaac220IWucLq+1lY5DB1mpw+6/uqU3GM
-         tVdrF772hHgyF7QaclCRmmZ/YU2Lq1AKFzz4n3B8kHM4CBFP0QRC0gwM+h1pjKp5lRjj
-         auqFs5Ipe13ENf+JHhzGeuKiy9LV9ET7uOriKyigAQjIVwhMFU9rEIABMPw39KuEKGbs
-         tOpUGA84C4DbyDPW2fdJOUv0KjAVUYIy1ma9YAqlxpzg0+jVqqyBF1j785Al+IoVGkac
-         lyeiadAGXhTN0oDW9gSdNCDKNjrLNZv48C9u0CUWShfFWX1YEPNaJLtBou/2bpG1Jl4K
-         9Bug==
-X-Gm-Message-State: AOJu0YzN1afgTvR4f18nZ5ZJ+Qxmd272qDw2EpomwZQQ88yGzYKvbmMu
-	GxXmNVQQFNbsV//9Sr3T92Ty79EWPkcVNtX9nZO1YnFl7yZthN/M/ZYWwLSh6MkpVy4=
-X-Gm-Gg: ASbGncvWFv+NRnhkLnR0XCR0gROtNEdzc1vih930nAxb/dlJEbLgs2fGUijPleG7M2K
-	DNer+GraHygXAco1+KQ79r68dU+RSkp4wMGCsmkRiLyLNyXMjlP0SgeKgQcFjn1qsq3UvyiGf8d
-	FkajlXECOCXgmhaCEtciJGGZfEAvdIdyluLz5CxdtbRz3mJ7h9Sr0g8AeYqPp+KEf4kLbpItC/i
-	voBga43j3L0VH0QJIA0dcti2mvbKMOT95d4maVqzwIJFZzNcUGxOMDTGDfSyIqFPOfZ3bWll8cu
-	23u0wyggUeF25SfuPg+xHzeEE0Qj0vPXz+MS57xvIPgX1b2ut3xxHxQ5khYTbfyzp/8umPsh4CR
-	cK2YhrLmRaIhQEHUIn1S7CbK9
-X-Google-Smtp-Source: AGHT+IHbtat8NIcMoxtMIiLgN6Bnk+HqyIo/IRxl3kjOH30/T6Sd64G/ZSakOgGR2pysjZYeGvl/sQ==
-X-Received: by 2002:a05:6e02:1949:b0:3e5:7150:ebf6 with SMTP id e9e14a558f8ab-3e675014028mr5314465ab.11.1755537524467;
-        Mon, 18 Aug 2025 10:18:44 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3e57e58c321sm37866815ab.1.2025.08.18.10.18.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Aug 2025 10:18:43 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: ming.lei@redhat.com, shuah@kernel.org, 
- Akhilesh Patil <akhilesh@ee.iitb.ac.in>
-Cc: linux-block@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- linux-kernel@vger.kernel.org, akhileshpatilvnit@gmail.com
-In-Reply-To: <aKGihYui6/Pcijbk@bhairav-test.ee.iitb.ac.in>
-References: <aKGihYui6/Pcijbk@bhairav-test.ee.iitb.ac.in>
-Subject: Re: [PATCH] selftests: ublk: Use ARRAY_SIZE() macro to improve
- code
-Message-Id: <175553752359.87011.5736670614642029375.b4-ty@kernel.dk>
-Date: Mon, 18 Aug 2025 11:18:43 -0600
+	dkim=pass (2048-bit key) header.d=hpe.com header.i=@hpe.com header.b="Apg2F4g2"
+Received: from pps.filterd (m0134422.ppops.net [127.0.0.1])
+	by mx0b-002e3701.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57IB6s5I027362;
+	Mon, 18 Aug 2025 18:48:46 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=cc
+	:content-transfer-encoding:date:from:in-reply-to:message-id
+	:mime-version:references:subject:to; s=pps0720; bh=Knk53XSodiWJU
+	cWSw7daHPGmi3QSj2S5WbMAwpKSJxA=; b=Apg2F4g2mhdNo4MQnrVgkJDDfYz8y
+	Kr8pGmcl7vFFLw6KKxZiDnnWWZutZvWE3bno7TZeoq7R+2stuDeWqH/fpyt3kVub
+	phsHstzA4Xnr0qrjTzB2gp4sL5V72Om4hSr03Ct5kuS43NbUrUz/FYJ6mBm6Cjju
+	xySHBwer72pkvcuZ/45ElNIYwgnrKSGGqSescQJnOJUGFRK3bA4P68/pTf+iPWXi
+	KyG6q/AntTaxFYw4HAQJmqWm8Ed+4QKT2kQrjqMUjS80axSlJh2MLL5R/SEdIIqP
+	MU1k7SSt3sXPRE6HNuHCPJWZIR+JIbtbESvRowumo600aMwsFQOjgL6qg==
+Received: from p1lg14878.it.hpe.com ([16.230.97.204])
+	by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 48jkd3jxxw-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 18 Aug 2025 18:48:46 +0000 (GMT)
+Received: from test-build-fcntl.hpe.com (unknown [192.58.206.38])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by p1lg14878.it.hpe.com (Postfix) with ESMTPS id 5FFF5130D8;
+	Mon, 18 Aug 2025 18:48:45 +0000 (UTC)
+Received: by test-build-fcntl.hpe.com (Postfix, from userid 1000)
+	id 1E7B2883B90F; Mon, 18 Aug 2025 18:48:27 +0000 (UTC)
+From: Rajeev Mishra <rajeevm@hpe.com>
+To: axboe@kernel.dk, yukuai1@huaweicloud.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Rajeev Mishra <rajeevm@hpe.com>
+Subject: [PATCH v4 1/2] loop: Consolidate size calculation logic into lo_calculate_size()
+Date: Mon, 18 Aug 2025 18:48:20 +0000
+Message-ID: <20250818184821.115033-2-rajeevm@hpe.com>
+X-Mailer: git-send-email 2.43.7
+In-Reply-To: <20250818184821.115033-1-rajeevm@hpe.com>
+References: <20250818184821.115033-1-rajeevm@hpe.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-2ce6c
+Content-Transfer-Encoding: 8bit
+X-Authority-Analysis: v=2.4 cv=TOxFS0la c=1 sm=1 tr=0 ts=68a3758e cx=c_pps
+ a=UObrlqRbTUrrdMEdGJ+KZA==:117 a=UObrlqRbTUrrdMEdGJ+KZA==:17
+ a=2OwXVqhp2XgA:10 a=MvuuwTCpAAAA:8 a=SlmTxP4Kr1pQ6mi-SkUA:9
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODE4MDE3NSBTYWx0ZWRfX7baZ+xeJerkT
+ ie/fsvnLxRqZXXfnGEYcWOj/Q/15p57B89VJxqaK4nCusu2rymv1Md3OHIbCx7/D9Q/5EGcPv8B
+ /0asxZrPePEAWcVJaTiL+hOsc5bZQZfSxXc4Sd8uivzB3IzCMH9aRwDjiTRdQ9Qoo38FqWwiqC7
+ ucS+JjaLenmcrtSZ7ugMk3HScDMCogeMYhv3/nw8Ha6ZZHRL/brLC9yaSUwwqnDs+pG5xvxKCuM
+ I68q3zzxRsVv067CSqrEZMSD5eAfPc08VJlgRVtjaADoBllP/6FQn6Yxd3rJ8JJpqEfgFCjmyCu
+ kAVbKyjdnL7Yi1EPInwd0uH8W3fWuFKIyP//WOUAnpS9Ix87eC119SPTzUCb9G/ChygkT1RZG9x
+ JoRQuFWbCZLqqpp741cs1S+ZtqUk4CFTFOA6d5zRkb+OGgeacWqhbrEqmVe3DOx3AcjLnKl0
+X-Proofpoint-GUID: jOfvX6Omv3se0TizggLo8_qzfIpsnMMz
+X-Proofpoint-ORIG-GUID: jOfvX6Omv3se0TizggLo8_qzfIpsnMMz
+X-HPE-SCL: -1
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-08-18_05,2025-08-14_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ adultscore=0 lowpriorityscore=0 priorityscore=1501 mlxscore=0 malwarescore=0
+ spamscore=0 bulkscore=0 clxscore=1015 phishscore=0 impostorscore=0
+ suspectscore=0 mlxlogscore=999 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2507300000
+ definitions=main-2508180175
 
+Renamed get_size to lo_calculate_size and merged the logic from
+get_size and get_loop_size into a single function.
+Updated all callers to use lo_calculate_size
 
-On Sun, 17 Aug 2025 15:06:05 +0530, Akhilesh Patil wrote:
-> Use ARRAY_SIZE() macro while calculating size of an array to improve
-> code readability and reduce potential sizing errors.
-> Implement this suggestion given by spatch tool by running
-> coccinelle script - scripts/coccinelle/misc/array_size.cocci
-> Follow ARRAY_SIZE() macro usage pattern in ublk.c introduced by,
-> commit ec120093180b9 ("selftests: ublk: fix ublk_find_tgt()")
-> wherever appropriate to maintain consistency.
-> 
-> [...]
+Signed-off-by: Rajeev Mishra <rajeevm@hpe.com>
+---
+ drivers/block/loop.c | 26 +++++++++-----------------
+ 1 file changed, 9 insertions(+), 17 deletions(-)
 
-Applied, thanks!
-
-[1/1] selftests: ublk: Use ARRAY_SIZE() macro to improve code
-      commit: 0227af355b50c526bf83ca52d67aef5d102e9b07
-
-Best regards,
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 1b6ee91f8eb9..0e1b9eb9db10 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -137,20 +137,18 @@ static void loop_global_unlock(struct loop_device *lo, bool global)
+ static int max_part;
+ static int part_shift;
+ 
+-static loff_t get_size(loff_t offset, loff_t sizelimit, struct file *file)
++static loff_t lo_calculate_size(struct loop_device *lo, struct file *file)
+ {
+ 	loff_t loopsize;
+-
+ 	/* Compute loopsize in bytes */
+ 	loopsize = i_size_read(file->f_mapping->host);
+-	if (offset > 0)
+-		loopsize -= offset;
++	if (lo->lo_offset > 0)
++		loopsize -= lo->lo_offset;
+ 	/* offset is beyond i_size, weird but possible */
+ 	if (loopsize < 0)
+ 		return 0;
+-
+-	if (sizelimit > 0 && sizelimit < loopsize)
+-		loopsize = sizelimit;
++	if (lo->lo_sizelimit > 0 && lo->lo_sizelimit < loopsize)
++		loopsize = lo->lo_sizelimit;
+ 	/*
+ 	 * Unfortunately, if we want to do I/O on the device,
+ 	 * the number of 512-byte sectors has to fit into a sector_t.
+@@ -158,11 +156,6 @@ static loff_t get_size(loff_t offset, loff_t sizelimit, struct file *file)
+ 	return loopsize >> 9;
+ }
+ 
+-static loff_t get_loop_size(struct loop_device *lo, struct file *file)
+-{
+-	return get_size(lo->lo_offset, lo->lo_sizelimit, file);
+-}
+-
+ /*
+  * We support direct I/O only if lo_offset is aligned with the logical I/O size
+  * of backing device, and the logical block size of loop is bigger than that of
+@@ -569,7 +562,7 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
+ 	error = -EINVAL;
+ 
+ 	/* size of the new backing store needs to be the same */
+-	if (get_loop_size(lo, file) != get_loop_size(lo, old_file))
++	if (lo_calculate_size(lo, file) != lo_calculate_size(lo, old_file))
+ 		goto out_err;
+ 
+ 	/*
+@@ -1063,7 +1056,7 @@ static int loop_configure(struct loop_device *lo, blk_mode_t mode,
+ 	loop_update_dio(lo);
+ 	loop_sysfs_init(lo);
+ 
+-	size = get_loop_size(lo, file);
++	size = lo_calculate_size(lo, file);
+ 	loop_set_size(lo, size);
+ 
+ 	/* Order wrt reading lo_state in loop_validate_file(). */
+@@ -1255,8 +1248,7 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
+ 	if (partscan)
+ 		clear_bit(GD_SUPPRESS_PART_SCAN, &lo->lo_disk->state);
+ 	if (!err && size_changed) {
+-		loff_t new_size = get_size(lo->lo_offset, lo->lo_sizelimit,
+-					   lo->lo_backing_file);
++		loff_t new_size = lo_calculate_size(lo, lo->lo_backing_file);
+ 		loop_set_size(lo, new_size);
+ 	}
+ out_unlock:
+@@ -1399,7 +1391,7 @@ static int loop_set_capacity(struct loop_device *lo)
+ 	if (unlikely(lo->lo_state != Lo_bound))
+ 		return -ENXIO;
+ 
+-	size = get_loop_size(lo, lo->lo_backing_file);
++	size = lo_calculate_size(lo, lo->lo_backing_file);
+ 	loop_set_size(lo, size);
+ 
+ 	return 0;
 -- 
-Jens Axboe
-
-
+2.43.7
 
