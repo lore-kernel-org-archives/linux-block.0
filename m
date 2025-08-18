@@ -1,52 +1,67 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E75E5304969;
-	Sun, 17 Aug 2025 18:38:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFFEE173;
+	Mon, 18 Aug 2025 01:14:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755455902; cv=none; b=egOP9RSxWvrMEJqhSys3frkb2qTIsjwyp50pmX82RlAK9Pwq77JEDo+J+/eRHTUgGbJOD5pYw19AkIJ9OYO/YBuODzHN+dKvEc7ZWFn2gDGhQgl5dY6BglhNRrplB2GVvCCx2HLlRTYs2xfpi0de4r5oRE5GuM89KJZ1MgHtNMc=
+	t=1755479659; cv=none; b=SDHArnLZH3izG87edr6ocNW6n1vP6nODPSOcETNikgK21XKoCXmHnKMVNQmsMYDiDT1J0fzHsqKd9fEJ1Nq4LzSIO325fXSU7C4x3AboYbRh94LDmVAQhFnLRzR5g3Ccq/R1f3v0BJ/IX0nPGf6jUFiix0z2D7qlPIYHlVt3dyc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755455902; c=relaxed/simple;
-	bh=CQIEt+kc8zkHcTX+x0T3XWeAnJn2m+yVzHehaaPk3FA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SAqeQ4O3LnMtq1UlnCvHp0ArYyu20DJL1xB0wRkEuoPJfEGhVVybqhdN9gbaedG0JdKJaNvX2wRk+G8HkJ6f2XxWi7Xa33HsWTiTonz7EBdJ9cK+UEeq4YM5vEv2P7+PFqPOvtlWXQcurjRa6DRIiwIsHrNcTFqirA64VZGHDiQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [10.0.54.22] (unknown [62.214.191.67])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 741B261E647BB;
-	Sun, 17 Aug 2025 20:37:55 +0200 (CEST)
-Message-ID: <2c4755bf-6f64-45cd-b49e-37b37676ea40@molgen.mpg.de>
-Date: Sun, 17 Aug 2025 20:37:50 +0200
+	s=arc-20240116; t=1755479659; c=relaxed/simple;
+	bh=eb5PlIfT6g+w4fS62MOSzlP07RKj3EbNoIAA+QzNpI4=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=Rhxvo9TpVmTEOSoOwH/unFYBXqz4+PAkjx/V9Cn5iQxhn/w1/BjRh57T2D3vTtyCfgHRaRmTw6RHFmBfCqDM5wkfTYputiZkT9aEiddafiIZFmjmbCoL2cr1SE3HSqeJMkpUByngVywk1wqvdlh7iOWd/Yy4ulvgc++Zd+3hlKg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4c4vr42NG7zKHMXr;
+	Mon, 18 Aug 2025 09:14:12 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id B52AF1A0E9A;
+	Mon, 18 Aug 2025 09:14:11 +0800 (CST)
+Received: from [10.174.179.143] (unknown [10.174.179.143])
+	by APP4 (Coremail) with SMTP id gCh0CgBn4hJhfqJoBpQzEA--.39932S3;
+	Mon, 18 Aug 2025 09:14:11 +0800 (CST)
+Subject: Re: [PATCH 1/2] block: ignore underlying non-stack devices io_opt
+To: colyli@kernel.org, linux-raid@vger.kernel.org
+Cc: linux-block@vger.kernel.org, "yukuai (C)" <yukuai3@huawei.com>
+References: <20250817152645.7115-1-colyli@kernel.org>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <a3a98a81-16e9-2f3c-b6e5-c83a0055c784@huaweicloud.com>
+Date: Mon, 18 Aug 2025 09:14:09 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] block: ignore underlying non-stack devices io_opt
-To: Coly Li <colyli@kernel.org>
-Cc: linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
- yukuai3@huawei.com
-References: <20250817152645.7115-1-colyli@kernel.org>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
 In-Reply-To: <20250817152645.7115-1-colyli@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgBn4hJhfqJoBpQzEA--.39932S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxAFW3JFWkuF13Zr47tF15twb_yoW5ur4kpF
+	1kuF9ruayjqF10vayDZ3W3CF9Yvws0kryxCr13uw48CrWq9r12grWIqFy5Xrn7tws8u3y3
+	t3WIkF98uayUurDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUyKb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij
+	64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x
+	8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE
+	2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42
+	xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF
+	7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUrNtxDUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-Dear Coly,
+Hi,
 
-
-Thank you for your patch.
-
-Am 17.08.25 um 17:26 schrieb colyli@kernel.org:
+ÔÚ 2025/08/17 23:26, colyli@kernel.org Ð´µÀ:
 > From: Coly Li <colyli@kernel.org>
 > 
 > This patch adds a new BLK_FLAG_STACK_IO_OPT for stack block device. If a
@@ -55,14 +70,15 @@ Am 17.08.25 um 17:26 schrieb colyli@kernel.org:
 > block devices, BLK_FLAG_STACK_IO_OPT can be set on limits.flags. Then in
 > blk_stack_limits(), lcm_not_zero(t->io_opt, b->io_opt) will be avoided.
 > 
+It's better refering to the thread:
+
+https://lore.kernel.org/all/ywsfp3lqnijgig6yrlv2ztxram6ohf5z4yfeebswjkvp2dzisd@f5ikoyo3sfq5/
+
+That scsi and mdraid have different definition of io_opt.
+
 > For md raid5, it is necessary to keep a proper io_opt size for better
 > I/O thoughput.
-
-th*r*oughput
-
-For performance claims, itâ€™d be great if you added the benchmark and the 
-test system details and test results.
-
+> 
 > Signed-off-by: Coly Li <colyli@kernel.org>
 > ---
 >   block/blk-settings.c   | 6 +++++-
@@ -106,6 +122,12 @@ test system details and test results.
 >   	lim.discard_granularity = stripe;
 >   	lim.max_write_zeroes_sectors = 0;
 >   	mddev_stack_rdev_limits(mddev, &lim, 0);
+
+And I think raid0/raid1/raid10 should all set this flag as well.
+
+Thanks,
+Kuai
+
 > diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
 > index 95886b404b16..a22c7cea9836 100644
 > --- a/include/linux/blkdev.h
@@ -120,8 +142,5 @@ test system details and test results.
 >   struct queue_limits {
 >   	blk_features_t		features;
 >   	blk_flags_t		flags;
+> 
 
-
-Kind regards,
-
-Paul
