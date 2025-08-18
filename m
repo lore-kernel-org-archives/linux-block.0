@@ -1,158 +1,122 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F714211A11;
-	Mon, 18 Aug 2025 02:57:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF44725392C
+	for <linux-block@vger.kernel.org>; Mon, 18 Aug 2025 03:13:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755485877; cv=none; b=cd0Hz5Ed69WkyRH1DngY3ueQ6RQQRS/cXHKJYtYSNudRHJ+xjELFzG9kV2pF4Vw3KrAXVVSD2NTuyfuYX2ULU/8aA8f7CKpY3AsLHQYhbdLTTnua0YPksepjzQkzEnDpi8m2v8H/8QVTIyjlAjpusYb9oWt340MTyU54so/7El0=
+	t=1755486784; cv=none; b=HnSTFr0+R8Vt0ZXAzrOUWltE4tVmTcJ4vsX5ovfaGNeBDoUlXwSbE4EHQ7s8GEKWE7h5lnIZQ6/Mr8e+i4L4MrTgjK/wB9USQQZDDqCF44uNSoYbP9m4tom0COb6MHmWVqlaJInBMfNkBrH1npaTlNzOCONaV2pTkOVzL71Tr4o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755485877; c=relaxed/simple;
-	bh=QxrWNLmgVm6jvDz1RGXpLJXMoaWYFPl1x3f+p9U+mO4=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=AvATqWYpCGcTPMaTWvp9XstNy2qwMuszUI/+Y2Xy0dHfnMyqn2fUvlYcAV7r7uHpkyli6ZGT4K01hgked5xEvSIlMOqBCttj6DkqJzyPRZLb9gGcjeR2Zx9MzxRWQ/1L0Od2rd3uP+Pznz4GBodBen8LScH6IbwOUnPQZ24HblE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4c4y7j2VGjzYQts5;
-	Mon, 18 Aug 2025 10:57:53 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id E97E41A0359;
-	Mon, 18 Aug 2025 10:57:51 +0800 (CST)
-Received: from [10.174.179.143] (unknown [10.174.179.143])
-	by APP4 (Coremail) with SMTP id gCh0CgAHzw+vlqJoK8s7EA--.47149S3;
-	Mon, 18 Aug 2025 10:57:51 +0800 (CST)
-Subject: Re: [PATCH 1/2] block: ignore underlying non-stack devices io_opt
-To: Damien Le Moal <dlemoal@kernel.org>, colyli@kernel.org,
- linux-raid@vger.kernel.org
-Cc: linux-block@vger.kernel.org, "yukuai (C)" <yukuai3@huawei.com>
-References: <20250817152645.7115-1-colyli@kernel.org>
- <756b587d-2a5c-4749-a03b-cfc786740684@kernel.org>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <ffa13f8c-5dfe-20d4-f67d-e3ccd0c70b86@huaweicloud.com>
-Date: Mon, 18 Aug 2025 10:57:50 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.1
+	s=arc-20240116; t=1755486784; c=relaxed/simple;
+	bh=fNTmw2fBuD548RFxUye8NfcsGZKy4gYCOaELXJHaOOI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HCPavEra8MLArpd1DOjeDRQJzUrqqJ7BhVeyj5QQm6Qx0D52IoqiD8/CxH24JEDWGG75iTquLqrXjJFac/rIQQn4y/tlM3s/TbTgalLGuSra0MCxPrwWDc6TxizbXZaZsh9pFgFzYHRbuVQK0lurmPzMt+NVOCUHumE1S43aDJI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZuZ95ZA2; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZuZ95ZA2"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1755486781;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=NxP4/8pUHKOzQChgnbfSSvo+Fj1kOBX1r6KKSDodaO8=;
+	b=ZuZ95ZA2v3aSC9p2yAVUTyK7Z+VWDRUj7pM6O7oO4cZuyp7OFW/aeUc+jaPfO9AQ96E0Wx
+	GC3Pc7JwMyrH3vVQNRI1rB116JWXXdie3IT+P869+reH8NkEM6zUhEz2c5cAwYMzymgO9h
+	NPwMj+X7TeCHJ70xyHxCci/bqE6jPOM=
+Received: from mail-vk1-f198.google.com (mail-vk1-f198.google.com
+ [209.85.221.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-645-CQd5PPWCPHiYlrXgmR-SCQ-1; Sun, 17 Aug 2025 23:12:59 -0400
+X-MC-Unique: CQd5PPWCPHiYlrXgmR-SCQ-1
+X-Mimecast-MFC-AGG-ID: CQd5PPWCPHiYlrXgmR-SCQ_1755486779
+Received: by mail-vk1-f198.google.com with SMTP id 71dfb90a1353d-53b1757cfcfso2000021e0c.3
+        for <linux-block@vger.kernel.org>; Sun, 17 Aug 2025 20:12:59 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755486779; x=1756091579;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NxP4/8pUHKOzQChgnbfSSvo+Fj1kOBX1r6KKSDodaO8=;
+        b=j3y1vXwE1AO3HLcVvIrPX/Dw/4bWmSU7WobtJc1TQ0fQ8q+X8jXnIuAecg5VJMnE0Q
+         On8JaHiLJVWBailtCMqygHmjxtj8ho75vNdz/9mkREvBH9uiC3zDqmXka4JYnHcj7AR4
+         RCw0VC5yrceVZS5XbsdJafqwaXVv+S/SFTC+glkFMs1FyhbG3JjsvOZmBWAzJ7qmqLUo
+         k68iW0+3Pif8TISrnzKX9uvdukP0OJ58ubGLhCo2UkEg8pGiJo56Y6MzlCnl9mQBi8Fg
+         LCooltfZAkWhxBiquqnU4xiO3P7vXES9DdMha2EeAGdGYEE2aktdGJYk1/VwTmcPO3pT
+         BXtg==
+X-Forwarded-Encrypted: i=1; AJvYcCWNPSzf3M7Uf6Qfe5iV5UxZvofl0jl6v5k4WmclmJmQG8BXpD/8ZAaFjcQwEs0gEuMBPsocepZ9aRb00g==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwMtDzn7QCqSVJhdm+Wp7Vpd4dmZFwA23dUdN6H7OQyVWNzQlCu
+	X3ADP36GAWkHcw9EfvpLJTI5j+A/JUPex8OgzT9X5CZiBl9LMBTtR9BdazPGLztRQK/xVTMcXPm
+	UauNR2HGJl0wk3vuU2asPBgj5v0IW3gg0JFzKm02Lviu9s++q2uFI7k/cPjh7ktF3lwvkD+ON3+
+	yj5H+WVbPKKBMYKB0k4Ait+6mryap/tN0CpOHdBFg=
+X-Gm-Gg: ASbGnctExe03qobZwiDzYslx3yAFgSaZFsWgWLsz1oXpuRB0fbZKYfIKVNXJWMbR+ki
+	7x/W50+hebxdHY9iGo+MJh+YYzLKPi98WJ0rKcPE2UEqzTKTcr1HlerJYSbEAhWoJZomsDMn1m1
+	/pcmu5X67gUBeUHLX8AkAcuw==
+X-Received: by 2002:a05:6102:2ac7:b0:4df:8259:eab with SMTP id ada2fe7eead31-5126d027f98mr3387482137.19.1755486778974;
+        Sun, 17 Aug 2025 20:12:58 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHWsK8UrKTDkdR4i2/n1OFDGnu1OhTpAxLc5OsSgAw6h8ie0dKEQqEUFX1dVqBXMdHohFVdBVowlCJLnw8kGQ0=
+X-Received: by 2002:a05:6102:2ac7:b0:4df:8259:eab with SMTP id
+ ada2fe7eead31-5126d027f98mr3387473137.19.1755486778504; Sun, 17 Aug 2025
+ 20:12:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <756b587d-2a5c-4749-a03b-cfc786740684@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgAHzw+vlqJoK8s7EA--.47149S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxGF4rArWfuFWxuF1kGFy3Jwb_yoWrXry7pF
-	n7CFW7Ca1jqF10va4qv3W3CF9Yvw4YyrW8Cr1fGw40kryq9r17KryxtFy5Xrnrtwsxu3y5
-	t3W8KF98CFy5u37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvjb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-	6I80ewAv7VC0I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AF
-	wI0_JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
-	xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1D
-	MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
-	0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWU
-	JVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUwz
-	uWDUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+References: <20250815080216.410665-1-yukuai1@huaweicloud.com>
+ <20250815080216.410665-9-yukuai1@huaweicloud.com> <c5e63966-e7f6-4d82-9d66-3a0abccc9d17@linux.ibm.com>
+ <af40ef99-9b61-4725-ba77-c5d3741add99@kernel.org> <aKADe9hNz99dQTfy@fedora>
+ <CAHW3DrjPEHX=XmPCQDBLJoXmnjz3GKsht33o-S6tH-tNb-_WQQ@mail.gmail.com> <aKKL5nL4gf2bnXUd@fedora>
+In-Reply-To: <aKKL5nL4gf2bnXUd@fedora>
+From: Ming Lei <ming.lei@redhat.com>
+Date: Mon, 18 Aug 2025 11:12:47 +0800
+X-Gm-Features: Ac12FXwf8fc9hFman4MiOzTae05viaZPrSxfQiwQzelZ0-I9UaKM7qnzU6vE_P0
+Message-ID: <CAFj5m9LOsj3dUYX5qHSGxekFMGTonsSxSoRczUO8jr4DW3wtew@mail.gmail.com>
+Subject: Re: [PATCH 08/10] blk-mq: fix blk_mq_tags double free while
+ nr_requests grown
+To: =?UTF-8?B?5L2Z5b+r?= <yukuai1994@gmail.com>
+Cc: Yu Kuai <yukuai@kernel.org>, Nilay Shroff <nilay@linux.ibm.com>, 
+	Yu Kuai <yukuai1@huaweicloud.com>, axboe@kernel.dk, hare@suse.de, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, yukuai3@huawei.com, 
+	yi.zhang@huawei.com, yangerkun@huawei.com, johnny.chenyi@huawei.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi,
+On Mon, Aug 18, 2025 at 10:12=E2=80=AFAM Ming Lei <ming.lei@redhat.com> wro=
+te:
+>
+> On Sat, Aug 16, 2025 at 04:05:30PM +0800, =E4=BD=99=E5=BF=AB wrote:
+...
+> > one line patch for this merge window? just fix the first double free
+> > issue for now.
+> >
+> > diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+> > index d880c50629d6..1e0ccf19295a 100644
+> > --- a/block/blk-mq-tag.c
+> > +++ b/block/blk-mq-tag.c
+> > @@ -622,6 +622,7 @@ int blk_mq_tag_update_depth(struct blk_mq_hw_ctx *h=
+ctx,
+> >                         return -ENOMEM;
+> >
+> >                 blk_mq_free_map_and_rqs(set, *tagsptr, hctx->queue_num)=
+;
+> > +               hctx->queue->elevator->et->tags[hctx->queue_num]=3D new=
+;
+> >                 *tagsptr =3D new;
+>
+> It is fine if this way can work, however old elevator->et may has lower
+> depth, then:
+>
+> - the above change cause et->tags overflow
+>
+> - meantime memory leak is caused in blk_mq_free_sched_tags()
 
-在 2025/08/18 10:51, Damien Le Moal 写道:
-> On 8/18/25 12:26 AM, colyli@kernel.org wrote:
->> From: Coly Li <colyli@kernel.org>
->>
->> This patch adds a new BLK_FLAG_STACK_IO_OPT for stack block device. If a
->> stack block device like md raid5 declares its io_opt when don't want
->> blk_stack_limits() to change it with io_opt of underlying non-stack
->> block devices, BLK_FLAG_STACK_IO_OPT can be set on limits.flags. Then in
->> blk_stack_limits(), lcm_not_zero(t->io_opt, b->io_opt) will be avoided.
->>
->> For md raid5, it is necessary to keep a proper io_opt size for better
->> I/O thoughput.
->>
->> Signed-off-by: Coly Li <colyli@kernel.org>
->> ---
->>   block/blk-settings.c   | 6 +++++-
->>   drivers/md/raid5.c     | 1 +
->>   include/linux/blkdev.h | 3 +++
->>   3 files changed, 9 insertions(+), 1 deletion(-)
->>
->> diff --git a/block/blk-settings.c b/block/blk-settings.c
->> index 07874e9b609f..46ee538b2be9 100644
->> --- a/block/blk-settings.c
->> +++ b/block/blk-settings.c
->> @@ -782,6 +782,7 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
->>   		t->features &= ~BLK_FEAT_POLL;
->>   
->>   	t->flags |= (b->flags & BLK_FLAG_MISALIGNED);
->> +	t->flags |= (b->flags & BLK_FLAG_STACK_IO_OPT);
->>   
->>   	t->max_sectors = min_not_zero(t->max_sectors, b->max_sectors);
->>   	t->max_user_sectors = min_not_zero(t->max_user_sectors,
->> @@ -839,7 +840,10 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
->>   				     b->physical_block_size);
->>   
->>   	t->io_min = max(t->io_min, b->io_min);
->> -	t->io_opt = lcm_not_zero(t->io_opt, b->io_opt);
->> +	if (!t->io_opt || !(t->flags & BLK_FLAG_STACK_IO_OPT) ||
->> +	    (b->flags & BLK_FLAG_STACK_IO_OPT))
->> +		t->io_opt = lcm_not_zero(t->io_opt, b->io_opt);
->> +
->>   	t->dma_alignment = max(t->dma_alignment, b->dma_alignment);
->>   
->>   	/* Set non-power-of-2 compatible chunk_sectors boundary */
->> diff --git a/drivers/md/raid5.c b/drivers/md/raid5.c
->> index 023649fe2476..989acd8abd98 100644
->> --- a/drivers/md/raid5.c
->> +++ b/drivers/md/raid5.c
->> @@ -7730,6 +7730,7 @@ static int raid5_set_limits(struct mddev *mddev)
->>   	lim.io_min = mddev->chunk_sectors << 9;
->>   	lim.io_opt = lim.io_min * (conf->raid_disks - conf->max_degraded);
-> 
-> It seems to me that moving this *after* the call to mddev_stack_rdev_limits()
-> would simply overwrite the io_opt limit coming from stacking and get you the
-> same result as your patch, but without adding the new limit flags.
-
-This is not enough, we have the case array is build on the top of
-another array, we still need the lcm_not_zero() to not break this case.
-And I would expect this flag for all the arrays, not just raid5.
+oops, looks I misunderstoodd nr_hw_queues as queue depth, so this single
+line patch should fix the double free issue.
 
 Thanks,
-Kuai
-
-> 
-> I do not think that the use of such flag is good as we definitely do not want
-> to have more of these. That would make the limit stacking far too complicated
-> with too many corner cases. Instead, drivers should simply change whatever
-> limit they do not like. DM has the .io_hint method for that. md should have
-> something similar.
-> 
->>   	lim.features |= BLK_FEAT_RAID_PARTIAL_STRIPES_EXPENSIVE;
->> +	lim.flags |= BLK_FLAG_STACK_IO_OPT;
->>   	lim.discard_granularity = stripe;
->>   	lim.max_write_zeroes_sectors = 0;
->>   	mddev_stack_rdev_limits(mddev, &lim, 0);
->> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
->> index 95886b404b16..a22c7cea9836 100644
->> --- a/include/linux/blkdev.h
->> +++ b/include/linux/blkdev.h
->> @@ -366,6 +366,9 @@ typedef unsigned int __bitwise blk_flags_t;
->>   /* passthrough command IO accounting */
->>   #define BLK_FLAG_IOSTATS_PASSTHROUGH	((__force blk_flags_t)(1u << 2))
->>   
->> +/* ignore underlying non-stack devices io_opt */
->> +#define BLK_FLAG_STACK_IO_OPT		((__force blk_flags_t)(1u << 3))
->> +
->>   struct queue_limits {
->>   	blk_features_t		features;
->>   	blk_flags_t		flags;
-> 
-> 
+Ming
 
