@@ -1,208 +1,130 @@
 Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C5DE1B7F4;
-	Mon, 18 Aug 2025 01:38:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AFDF2264B1;
+	Mon, 18 Aug 2025 01:43:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755481113; cv=none; b=cGAKLW+AN4FBw1vVDQbVPPrTpyKz4Zm/Jy0BZy/f0xa1SElDXzI+KYWmGpc6xbZQqoUFgMiyCKYLWGRwswX8W4iCnMtF+GY6P9P+MVTPt/JjNWDJdIhfDpLdld/BG8xN9BrACT9iCrzY8TqJCOV1LwigI3y8i3oWEMO6hYz4t98=
+	t=1755481386; cv=none; b=ctQEW1YCjkW2RAlKRRJ0ycLxKTikY+X0/qXoSwikPggBpOTfRuuS3/ekXwSq1PvSPjfL77DAkpRuYJVrmFy/rckmPYyACJqFE/NPtrU7GlGBFhbIZDycI7v2r10on+9nsC9KYLlWTlRN0/ZJKJ/O6RPBDdDHcFHtcgB0E8YyDAk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755481113; c=relaxed/simple;
-	bh=FNZzYCyYlMZ3esTtoZfJ0+eMxLb0mliT55yhcqzO29M=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=jiPI+KOlQ29SP8DCtNj8oJXUnvl+pD/REjEhVQ1+YSJK0uwrkdMMWJthBe407ei11D2k39bF4XECuRkno/YXlMOhyLSGXomSVa/DDITts3jZcyv/U1a3OJWa+hvtvKeJ94e3vPXs+oITk2SybItUEypzj0DAkefTfbJYhLJc1ps=
+	s=arc-20240116; t=1755481386; c=relaxed/simple;
+	bh=3BrdEm9YWQ4b9T8dYVemL7Ff85aMXjPNNHmqsSoFDS4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rFuLyyJ63V4nRgl+Y2V8qKQmGQ56b88dudhjhvHwlBN7pMl+oOqbGQyaI3ny9p881epnPFs4S0vx4ImYfAUBuG5nXME+W357Efi41RfBW28vqgeXNOCinjAhZkhcxhbEdeN0LTa0I47fPh3FTwdgAYBBHoxEfDERO5hDkjXmwdc=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4c4wN43g0VzYQv4N;
-	Mon, 18 Aug 2025 09:38:28 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.93.142])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4c4wTL0jTWzYQv8W;
+	Mon, 18 Aug 2025 09:43:02 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 1B65D1A0839;
-	Mon, 18 Aug 2025 09:38:27 +0800 (CST)
-Received: from [10.174.179.143] (unknown [10.174.179.143])
-	by APP4 (Coremail) with SMTP id gCh0CgDHjxARhKJoP4A1EA--.37635S3;
-	Mon, 18 Aug 2025 09:38:27 +0800 (CST)
-Subject: Re: [PATCH 2/2] md: split bio by io_opt size in md_submit_bio()
-To: colyli@kernel.org, linux-raid@vger.kernel.org
-Cc: linux-block@vger.kernel.org, "yukuai (C)" <yukuai3@huawei.com>
-References: <20250817152645.7115-1-colyli@kernel.org>
- <20250817152645.7115-2-colyli@kernel.org>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <3e2dd600-58e3-c4ff-af97-37dbb50193f1@huaweicloud.com>
-Date: Mon, 18 Aug 2025 09:38:25 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.1
+	by mail.maildlp.com (Postfix) with ESMTP id A71FF1A018D;
+	Mon, 18 Aug 2025 09:43:00 +0800 (CST)
+Received: from [10.174.179.80] (unknown [10.174.179.80])
+	by APP4 (Coremail) with SMTP id gCh0CgAHgxMfhaJo6Ns1EA--.15154S3;
+	Mon, 18 Aug 2025 09:42:57 +0800 (CST)
+Message-ID: <95a4a94b-7aa0-4e3c-a386-7692dde66a4f@huaweicloud.com>
+Date: Mon, 18 Aug 2025 09:42:55 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20250817152645.7115-2-colyli@kernel.org>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgDHjxARhKJoP4A1EA--.37635S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxKF1rWryUWF4Utw1UtF4xJFb_yoW7WF13pr
-	4UWryavrWkXFsFkwsxJ3W29FnYvrWFgrWjyry7C3y8Cr4qg3Z2kFWxGw1rZry3Gry8G34U
-	twnYvF9xCa1qvrJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUyKb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k2
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH blktests v2 0/3] blktest: add unmap write zeroes tests
+To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc: "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "dm-devel@lists.linux.dev" <dm-devel@lists.linux.dev>,
+ "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+ "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ hch <hch@lst.de>, "tytso@mit.edu" <tytso@mit.edu>,
+ "djwong@kernel.org" <djwong@kernel.org>,
+ "bmarzins@redhat.com" <bmarzins@redhat.com>,
+ "chaitanyak@nvidia.com" <chaitanyak@nvidia.com>,
+ "brauner@kernel.org" <brauner@kernel.org>,
+ "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+ "yi.zhang@huawei.com" <yi.zhang@huawei.com>,
+ "chengzhihao1@huawei.com" <chengzhihao1@huawei.com>,
+ "yukuai3@huawei.com" <yukuai3@huawei.com>,
+ "yangerkun@huawei.com" <yangerkun@huawei.com>
+References: <20250813024421.2507446-1-yi.zhang@huaweicloud.com>
+ <7dswufawxmyqblokjesulhdexqld3bx7sycgmylbaeqs43ougk@25rseyqm3beg>
+Content-Language: en-US
+From: Zhang Yi <yi.zhang@huaweicloud.com>
+In-Reply-To: <7dswufawxmyqblokjesulhdexqld3bx7sycgmylbaeqs43ougk@25rseyqm3beg>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-CM-TRANSID:gCh0CgAHgxMfhaJo6Ns1EA--.15154S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7WFy3tFy8uFWrXr15tr1rXrb_yoW8tw15pr
+	W5Xa4Dtws8GrWDJa4vvayq9Fy3Jws7Zry7A3Z5tr18Cr15ZFyfWrZ8Xw4aga17KrnxGw1I
+	v3W2gryS93WUJ3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUv0b4IE77IF4wAFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k2
 	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
 	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
 	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
 	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
 	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij
-	64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x
-	8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE
-	2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42
-	xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF
-	7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUzsqWUUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0En4kS
+	14v26r4a6rW5MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I
+	8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWr
+	XwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x
+	0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_
+	Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU0
+	s2-5UUUUU==
+X-CM-SenderInfo: d1lo6xhdqjqx5xdzvxpfor3voofrz/
 
-Hi,
+On 8/17/2025 2:14 PM, Shinichiro Kawasaki wrote:
+> On Aug 13, 2025 / 10:44, Zhang Yi wrote:
+>> From: Zhang Yi <yi.zhang@huawei.com>
+>>
+>> Change since v2:
+>>  - Modify the sysfs interfaces according to the kernel implementation.
+>>  - Determine whether the kernel supports it by directly checking the
+>>    existence of the sysfs interface, instead of using device_requries(). 
+>>  - Drop _short_dev() helper and directly use _real_dev() to acquire dm
+>>    path.
+>>  - Check the return value of setup_test_device().
+>>  - Fix the '"make check'" errors.
+>>
+>>
+>> The Linux kernel (since version 6.17)[1] supports FALLOC_FL_WRITE_ZEROES
+>> in fallocate(2) and add max_{hw|user}_wzeroes_unmap_sectors parameters
+>> to the block device queue limit. These tests test those block device
+>> unmap write zeroes sysfs interface
+>>
+>>         /sys/block/<disk>/queue/write_zeroes_max_bytes
+>>         /sys/block/<disk>/queue/write_zeroes_unmap_max_hw_bytes
+>>
+>> with various SCSI/NVMe/device-mapper devices.
+>>
+>> The value of /sys/block//queue/write_zeroes_unmap_max_hw_bytes should be
+>> equal to a nonzero value of /sys/block//queue/write_zeroes_max_bytes if
+>> the block device supports the unmap write zeroes command; otherwise, it
+>> should return 0. We can also disable unmap write zeroes command by
+>> setting /sys/block/<disk>/queue/write_zeroes_max_bytes to 0.
+>>
+>>  - scsi/010 test SCSI devices.
+>>  - dm/003 test device mapper stacked devices.
+>>  - nvme/065 test NVMe devices.
+>>
+>> [1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=278c7d9b5e0c
+> 
+> I applied this v2 series. Of note is that I amended the 2nd and 3rd patches to
+> fix the shellcheck warnings below. Anyway, thanks for the patches!
+> 
+> $ make check
+> shellcheck -x -e SC2119 -f gcc check common/* \
+>         tests/*/rc tests/*/[0-9]*[0-9] src/*.sh
+> common/rc:679:7: note: Double quote to prevent globbing and word splitting. [SC2086]
+> tests/nvme/065:44:7: warning: Quote this to prevent word splitting. [SC2046]
+> tests/nvme/065:44:7: note: Useless echo? Instead of 'echo $(cmd)', just use 'cmd'. [SC2005]
+> make: *** [Makefile:21: check] Error 1
 
-ÔÚ 2025/08/17 23:26, colyli@kernel.org Ð´µÀ:
-> From: Coly Li <colyli@kernel.org>
-> 
-> Currently in md_submit_bio() the incoming request bio is split by
-> bio_split_to_limits() which makes sure the bio won't exceed
-> max_hw_sectors of a specific raid level before senting into its
-> .make_request method.
-> 
-> For raid level 4/5/6 such split method might be problematic and hurt
-> large read/write perforamnce. Because limits.max_hw_sectors are not
-> always aligned to limits.io_opt size, the split bio won't be full
-> stripes covered on all data disks, and will introduce extra read-in I/O.
-> Even the bio's bi_sector is aligned to limits.io_opt size and large
-> enough, the resulted split bio is not size-friendly to corresponding
-> raid456 level.
-> 
-> This patch introduces bio_split_by_io_opt() to solve the above issue,
-> 1, If the incoming bio is not limits.io_opt aligned, split the non-
->    aligned head part. Then the next one will be aligned.
-> 2, If the imcoming bio is limits.io_opt aligned, and split is necessary,
->    then try to split a by multiple of limits.io_opt but not exceed
->    limits.max_hw_sectors.
-> 
-> Then for large bio, the sligned split part will be full-stripes covered
-> to all data disks, no extra read-in I/Os when rmw_level is 0. And for
-> rmw_level > 0 condistions, the limits.io_opt aligned bios are welcomed
-> for performace as well.
-> 
-> This patch only tests on 8 disks raid5 array with 64KiB chunk size.
-> By this patch, 64KiB chunk size for a 8 disks raid5 array, sequential
-> write performance increases from 900MiB/s to 1.1GiB/s by fio bs=10M.
-> If fio bs=488K (exact limits.io_opt size) the peak sequential write
-> throughput can reach 1.51GiB/s.
-> 
-> Signed-off-by: Coly Li <colyli@kernel.org>
-> ---
->   drivers/md/md.c    | 51 +++++++++++++++++++++++++++++++++++++++++++++-
->   drivers/md/raid5.c |  6 +++++-
->   2 files changed, 55 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/md/md.c b/drivers/md/md.c
-> index ac85ec73a409..d0d4d05150fe 100644
-> --- a/drivers/md/md.c
-> +++ b/drivers/md/md.c
-> @@ -426,6 +426,55 @@ bool md_handle_request(struct mddev *mddev, struct bio *bio)
->   }
->   EXPORT_SYMBOL(md_handle_request);
->   
-> +/**
-> + * For raid456 read/write request, if bio LBA isn't aligned tot io_opt,
-> + * split the non io_opt aligned header, to make the second part's LBA be
-> + * aligned to io_opt. Otherwise still call bio_split_to_limits() to
-> + * handle bio split with queue limits.
-> + */
-> +static struct bio *bio_split_by_io_opt(struct bio *bio)
-> +{
-> +	sector_t io_opt_sectors, start, offset;
-> +	struct queue_limits lim;
-> +	struct mddev *mddev;
-> +	struct bio *split;
-> +	int level;
-> +
-> +	mddev = bio->bi_bdev->bd_disk->private_data;
-> +	level = mddev->level;
-> +
-> +	/* Only handle read456 read/write requests */
-> +	if (level == 1 || level == 10 || level == 0 || level == LEVEL_LINEAR ||
-> +	    (bio_op(bio) != REQ_OP_READ && bio_op(bio) != REQ_OP_WRITE))
-For raid0/1/10, I feel this change may also beneficial for IO bandwith,
-not 100% percent sure.
-> +		return bio_split_to_limits(bio);
-> +
-> +	/* In case raid456 chunk size is too large */
-> +	lim = mddev->gendisk->queue->limits;
-> +	io_opt_sectors = lim.io_opt >> SECTOR_SHIFT;
-> +	if (unlikely(io_opt_sectors > lim.max_hw_sectors))
-> +		return bio_split_to_limits(bio);
-> +
-> +	/* Small request, no need to split */
-> +	if (bio_sectors(bio) <= io_opt_sectors)
-> +		return bio;
-> +
-> +	/* Only split the non-io-opt aligned header part */
-> +	start = bio->bi_iter.bi_sector;
-> +	offset = sector_div(start, io_opt_sectors);
-> +	if (offset == 0)
-> +		return bio_split_to_limits(bio);
-> +
-> +	split = bio_split(bio, (io_opt_sectors - offset), GFP_NOIO,
-> +			  &bio->bi_bdev->bd_disk->bio_split);
-> +	if (!split)
+Sorry for missing these warnings, and thank you for fixing them! :-)
 
-bio_split return ERR_PTR now.
-> +		return bio_split_to_limits(bio);
-> +
-> +	split->bi_opf |= REQ_NOMERGE;
-> +	bio_chain(split, bio);
-> +	submit_bio_noacct(bio);
-> +	return split;
-> +}
-> +
->   static void md_submit_bio(struct bio *bio)
->   {
->   	const int rw = bio_data_dir(bio);
-> @@ -441,7 +490,7 @@ static void md_submit_bio(struct bio *bio)
->   		return;
->   	}
->   
-> -	bio = bio_split_to_limits(bio);
-> +	bio = bio_split_by_io_opt(bio);
->   	if (!bio)
->   		return;
->   
-> diff --git a/drivers/md/raid5.c b/drivers/md/raid5.c
-> index 989acd8abd98..985fabeeead5 100644
-> --- a/drivers/md/raid5.c
-> +++ b/drivers/md/raid5.c
-> @@ -7759,9 +7759,13 @@ static int raid5_set_limits(struct mddev *mddev)
->   
->   	/*
->   	 * Requests require having a bitmap for each stripe.
-> -	 * Limit the max sectors based on this.
-> +	 * Limit the max sectors based on this. And being
-> +	 * aligned to lim.io_opt for better I/O performance.
->   	 */
->   	lim.max_hw_sectors = RAID5_MAX_REQ_STRIPES << RAID5_STRIPE_SHIFT(conf);
-> +	if (lim.max_hw_sectors > lim.io_opt >> SECTOR_SHIFT)
-> +		lim.max_hw_sectors = rounddown(lim.max_hw_sectors,
-> +			  lim.io_opt >> SECTOR_SHIFT);
-
-For huge chunksize, I think it'll also make sense to simpliy things in
-mdraid by setting max_hw_sectors to at least io_opt after patch 1. Then
-we only need to consider alignment in split case.
-
-BTW, consider this more common in mddev_stack_rdev_limits()?
-
-Thanks,
-Kuai
-
->   
->   	/* No restrictions on the number of segments in the request */
->   	lim.max_segments = USHRT_MAX;
-> 
+Thanks.
+Yi.
 
