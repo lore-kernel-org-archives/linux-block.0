@@ -1,88 +1,165 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44FCB173
-	for <linux-block@vger.kernel.org>; Mon, 18 Aug 2025 02:14:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 401762451F3;
+	Mon, 18 Aug 2025 02:17:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755483245; cv=none; b=FfOuFfFoETc+BrNoHSlxg8qqftSCY/sMvkGuJ0qHHQJRdnVzDkcvlDiI6wG8xSLNinRFd8C+LEcJ1AaelkH1JjCvz75EAgdUuB7fgwREl4W/J4IDves7zn3859G677OukQQ/nUoDipohDHZFtrUHMktfTfpL5gsd6yVWnou5jco=
+	t=1755483444; cv=none; b=Prsks4geCLjHTGPV0KFBxbTPN4tRy8Yl4+a7u1iQdUAZivEHTmx2vyXyJS0g+/ymC0oboI5SOzuKF5QLG1yPoFmZfg43xV+4Yf4tBfrtoSTTz+0FSvMnpZQ//a9b6/3W5gdiPJXs833LjMf/7ljWDQQdtnoqXM0b6DtEDPzOvRY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755483245; c=relaxed/simple;
-	bh=IJc2jypFRnh16B3SmyiGG7GcC4dV7V2WPKeNjWuZ/7M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cZsA849JnRHDxT75xQczF6lM531TJptMF470biZA5RuK9Mrjsnj1HFvT6TagyFToZ+rorOD/4HZ7+pLPzHaZ6CW3Hz51xx3xgWL3yklVcgiOkZFZRlJYX33cYiJFf2ONpNnlTstzEVIV07kQYOjz7ErHmOThNVzIh+z4S9bFT3Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ekQdVd2B; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ekQdVd2B"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1755483242;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=b8XuxuYGVNjlRqBB5h51vG9u+ccEzqMpuG57Y8sa914=;
-	b=ekQdVd2BcgTtsdGC4LKDSCnGC8LRR1YErUTxKyPvBpR+X0RQKypu17nfx48dbwpEpN6bZh
-	EwP6JCNvdItSCMha5zANNprJ8XxrSWCg8PNLfa/QGtvm7M4DuWH/wj6kvetKVIH1Hk4dqE
-	Q/PCMa4H/o1/Kioo6wefoNoozBRPKME=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-687-zUxGj90XMYyc361uKnXIBg-1; Sun,
- 17 Aug 2025 22:14:00 -0400
-X-MC-Unique: zUxGj90XMYyc361uKnXIBg-1
-X-Mimecast-MFC-AGG-ID: zUxGj90XMYyc361uKnXIBg_1755483239
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2E43E180034F;
-	Mon, 18 Aug 2025 02:13:59 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.112])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0DED219560AD;
-	Mon, 18 Aug 2025 02:13:53 +0000 (UTC)
-Date: Mon, 18 Aug 2025 10:13:48 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Akhilesh Patil <akhilesh@ee.iitb.ac.in>
-Cc: shuah@kernel.org, axboe@kernel.dk, linux-block@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	akhileshpatilvnit@gmail.com
-Subject: Re: [PATCH] selftests: ublk: Use ARRAY_SIZE() macro to improve code
-Message-ID: <aKKMXOeHEK_LHV8M@fedora>
-References: <aKGihYui6/Pcijbk@bhairav-test.ee.iitb.ac.in>
+	s=arc-20240116; t=1755483444; c=relaxed/simple;
+	bh=COjrbNnCxCKV2KBfhnMvvRq/a1syyPCm/kWdX9F8Huk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=L35DsqvjeC5MqOPZYyvmE0aiABL/C47Acuqczr1G97K4ZsBY2qAiWHQApZ6RKTV07VAsnDJv0RrHnj7ILxD8YhdwLgASVzGOlC93/BvU0G6zzY8SwgsHRho/Rz2HkJu7ojjamMqLR1eqN3EZZGw/4VTVLN2k/FrzhDG2hcpBlR8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=none smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4c4xDv2Lm8zYQtxK;
+	Mon, 18 Aug 2025 10:17:19 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id DE9E81A15CF;
+	Mon, 18 Aug 2025 10:17:17 +0800 (CST)
+Received: from [10.174.179.80] (unknown [10.174.179.80])
+	by APP4 (Coremail) with SMTP id gCh0CgBHERIqjaJoBpM4EA--.3972S3;
+	Mon, 18 Aug 2025 10:17:16 +0800 (CST)
+Message-ID: <4798d44a-4aa5-4b95-a3f4-25be3d8ee35a@huaweicloud.com>
+Date: Mon, 18 Aug 2025 10:17:14 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aKGihYui6/Pcijbk@bhairav-test.ee.iitb.ac.in>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH util-linux v2] fallocate: add FALLOC_FL_WRITE_ZEROES
+ support
+To: "Darrick J. Wong" <djwong@kernel.org>
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+ dm-devel@lists.linux.dev, linux-nvme@lists.infradead.org,
+ linux-scsi@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-api@vger.kernel.org, hch@lst.de, tytso@mit.edu, bmarzins@redhat.com,
+ chaitanyak@nvidia.com, shinichiro.kawasaki@wdc.com, brauner@kernel.org,
+ martin.petersen@oracle.com, yi.zhang@huawei.com, chengzhihao1@huawei.com,
+ yukuai3@huawei.com, yangerkun@huawei.com
+References: <20250813024015.2502234-1-yi.zhang@huaweicloud.com>
+ <20250814165218.GQ7942@frogsfrogsfrogs>
+ <a0eda581-ae6c-4b49-8b4f-7bb039b17487@huaweicloud.com>
+ <20250815142908.GG7981@frogsfrogsfrogs>
+Content-Language: en-US
+From: Zhang Yi <yi.zhang@huaweicloud.com>
+In-Reply-To: <20250815142908.GG7981@frogsfrogsfrogs>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-CM-TRANSID:gCh0CgBHERIqjaJoBpM4EA--.3972S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxCr4UXw4UCrWkXw13Jr4Utwb_yoW5Kr47pa
+	y3JF1Utr48KF17G3s2v3WkuF1Fyws7trWxWr4Igr1kZrnI9F1xKF4UWr1Y9F97Wr1kCa1j
+	vr4IvFy3uF1UAFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUv0b4IE77IF4wAFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0En4kS
+	14v26r4a6rW5MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I
+	8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWr
+	XwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x
+	0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_
+	Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU0
+	s2-5UUUUU==
+X-CM-SenderInfo: d1lo6xhdqjqx5xdzvxpfor3voofrz/
 
-On Sun, Aug 17, 2025 at 03:06:05PM +0530, Akhilesh Patil wrote:
-> Use ARRAY_SIZE() macro while calculating size of an array to improve
-> code readability and reduce potential sizing errors.
-> Implement this suggestion given by spatch tool by running
-> coccinelle script - scripts/coccinelle/misc/array_size.cocci
-> Follow ARRAY_SIZE() macro usage pattern in ublk.c introduced by,
-> commit ec120093180b9 ("selftests: ublk: fix ublk_find_tgt()")
-> wherever appropriate to maintain consistency.
+On 8/15/2025 10:29 PM, Darrick J. Wong wrote:
+> On Fri, Aug 15, 2025 at 05:29:19PM +0800, Zhang Yi wrote:
+>> Thank you for your review comments!
+>>
+>> On 2025/8/15 0:52, Darrick J. Wong wrote:
+>>> On Wed, Aug 13, 2025 at 10:40:15AM +0800, Zhang Yi wrote:
+>>>> From: Zhang Yi <yi.zhang@huawei.com>
+>>>>
+>>>> The Linux kernel (since version 6.17) supports FALLOC_FL_WRITE_ZEROES in
+>>>> fallocate(2). Add support for FALLOC_FL_WRITE_ZEROES to the fallocate
+>>>> utility by introducing a new option -w|--write-zeroes.
+>>>>
+>>>> Link: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=278c7d9b5e0c
+>>>> Signed-off-by: Zhang Yi <yi.zhang@huawei.com>
+>>>> ---
+>>>> v1->v2:
+>>>>  - Minor description modification to align with the kernel.
+>>>>
+>>>>  sys-utils/fallocate.1.adoc | 11 +++++++++--
+>>>>  sys-utils/fallocate.c      | 20 ++++++++++++++++----
+>>>>  2 files changed, 25 insertions(+), 6 deletions(-)
+>>>>
+>>>> diff --git a/sys-utils/fallocate.1.adoc b/sys-utils/fallocate.1.adoc
+>>>> index 44ee0ef4c..0ec9ff9a9 100644
+>>>> --- a/sys-utils/fallocate.1.adoc
+>>>> +++ b/sys-utils/fallocate.1.adoc
+>>>> @@ -12,7 +12,7 @@ fallocate - preallocate or deallocate space to a file
+>>>
+>>> <snip all the long lines>
+>>>
+>>>> +*-w*, *--write-zeroes*::
+>>>> +Zeroes space in the byte range starting at _offset_ and continuing
+>>>> for _length_ bytes. Within the specified range, blocks are
+>>>> preallocated for the regions that span the holes in the file. After a
+>>>> successful call, subsequent reads from this range will return zeroes,
+>>>> subsequent writes to that range do not require further changes to the
+>>>> file mapping metadata.
+>>>
+>>> "...will return zeroes and subsequent writes to that range..." ?
+>>>
+>>
+>> Yeah.
+>>
+>>>> ++
+>>>> +Zeroing is done within the filesystem by preferably submitting write
+>>>
+>>> I think we should say less about what the filesystem actually does to
+>>> preserve some flexibility:
+>>>
+>>> "Zeroing is done within the filesystem. The filesystem may use a
+>>> hardware accelerated zeroing command, or it may submit regular writes.
+>>> The behavior depends on the filesystem design and available hardware."
+>>>
+>>
+>> Sure.
+>>
+>>>> zeores commands, the alternative way is submitting actual zeroed data,
+>>>> the specified range will be converted into written extents. The write
+>>>> zeroes command is typically faster than write actual data if the
+>>>> device supports unmap write zeroes, the specified range will not be
+>>>> physically zeroed out on the device.
+>>>> ++
+>>>> +Options *--keep-size* can not be specified for the write-zeroes
+>>>> operation.
+>>>> +
+>>>>  include::man-common/help-version.adoc[]
+>>>>  
+>>>>  == AUTHORS
+>> [..]
+>>>> @@ -429,6 +438,9 @@ int main(int argc, char **argv)
+>>>>  			else if (mode & FALLOC_FL_ZERO_RANGE)
+>>>>  				fprintf(stdout, _("%s: %s (%ju bytes) zeroed.\n"),
+>>>>  								filename, str, length);
+>>>> +			else if (mode & FALLOC_FL_WRITE_ZEROES)
+>>>> +				fprintf(stdout, _("%s: %s (%ju bytes) write zeroed.\n"),
+>>>
+>>> "write zeroed" is a little strange, but I don't have a better
+>>> suggestion. :)
+>>>
+>>
+>> Hmm... What about simply using "zeroed", the same to FALLOC_FL_ZERO_RANGE?
+>> Users should be aware of the parameters they have passed to fallocate(),
+>> so they should not use this print for further differentiation.
 > 
-> Signed-off-by: Akhilesh Patil <akhilesh@ee.iitb.ac.in>
-> ---
-> Testing:
-> * build checked for testing/selftests/ublk
-> * tested by running 
-> 	$ ./kublk --help
-> Which exercises the impacted code path.
+> No thanks, different inputs should produce different outputs. :)
+> 
 
-Nice!
-
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-
+OK. perhaps "written as zeros." ? Sounds OK?
 
 Thanks,
-Ming
+Yi.
+
 
