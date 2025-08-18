@@ -1,74 +1,91 @@
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+Received: from mail-ot1-f54.google.com (mail-ot1-f54.google.com [209.85.210.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F862337682
-	for <linux-block@vger.kernel.org>; Mon, 18 Aug 2025 15:59:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC22E322DC3
+	for <linux-block@vger.kernel.org>; Mon, 18 Aug 2025 16:18:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755532750; cv=none; b=Jk0MGNTyfHHaTqNoayDA2ThV6SZS7k7NqJ8fXgwnmpRDt4L2o+2B/Q4In2TjxTGrDSRzEdYgIaSg4ghgQwNGok4XK8BG+AORugEtqQhkQfYnTckIUaC3C/Aa6aen8uqFMrWSIiBs5p8wS584mqIyMS/9CaMue5NoRzhsnNZMlS0=
+	t=1755533922; cv=none; b=F+nf3YNneFGGXCewIB7vix+psQdYYm6bgxhgXnhcGjTEKq2RZEiovGL+laZInANQ7U4yCTpO/rYypG7ZFJwgzusYzWh3BJR1+TgGri+HdlLlAwWun/PVPGxW0RZmCEyAg9IdqcRB/OT87Yn2zf0loRSwncUzxmyExsR9bLZTagY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755532750; c=relaxed/simple;
-	bh=gm1y3HjSbfjetP2qj6SkQ/PvAerOiP935sq/jHQIUpg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cU8/AKr/suNXyhoz2+FNUn3tosBfvq8MvwNpgPPzeHKixaSeDCsKT9yqhgYGd/TjLkPx9VmpslLG4I5pwpxDInJt2kbcuhdZaHuEfqrQYOksw8niZkxLbOcMIo+/F1c4XQxCIPAxuSqKkgIQcfRC9th6iIyBmmdMESCvfoIoBLI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J6BidVG7; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1755533922; c=relaxed/simple;
+	bh=//aetfv37YKeJVqbXw3YpPmhG6DNYA5e4H+UE5ZUcL4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qfV11jvgErbVXpsAcLumKjOhcKmSr8fYMmpj3i5Pj8T4mKVUvbk9rKKg/vs2ZCEyJ30CD+cDVHw9QRZKl5LHJrGD/TxeN9DCJ4RFVjbzLBWT/JfDOcZRpxBBDvO24IGCZjYnA3Zv6iojleGPPcIAFBwxkr9ikzjjblWROpNICxo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=AlGKkveX; arc=none smtp.client-ip=209.85.210.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J6BidVG7"
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-6188b794743so6899948a12.3
-        for <linux-block@vger.kernel.org>; Mon, 18 Aug 2025 08:59:08 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="AlGKkveX"
+Received: by mail-ot1-f54.google.com with SMTP id 46e09a7af769-74381f39a3eso1971596a34.1
+        for <linux-block@vger.kernel.org>; Mon, 18 Aug 2025 09:18:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755532747; x=1756137547; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=gm1y3HjSbfjetP2qj6SkQ/PvAerOiP935sq/jHQIUpg=;
-        b=J6BidVG7ZP4df9ekVd5oWNfhBpRLEOaxobDnceRWfbqca2kQd4wDC7Y78NxnG11q6f
-         Kc1WQI6Qd7Gdcq6oD1/Mgjf/kRvJL/bhqn+XIhYurbgiJ2SkKOQJUxXV/BlZE75QVp1y
-         y9weCGhbVIJrodY/Pk6+izQE91h9GoRcqyGXdopNOlTDA7LgNWYoo03eBEPcmr6Qws2K
-         eOLHeadtezGvB/ie1gDlfp6vdjzkQUAuqJFUy3XmTTRflxKxdHpoUbj+gnwvNVY2Cx0g
-         IFBGxbjuh4Hpg5hg1NTxgSYNIdm6kvpDsgbCQfa+ugD399OYQKHWmHiS0J3Vemuqvaf+
-         ZBgA==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1755533919; x=1756138719; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=cT+WAuja39VMqOvtGfWBOHLuy+NZyDAiBTg1604nP00=;
+        b=AlGKkveX+R98nhjJcwiuRfRbR2KQs2ZOIYNwi/RjlN1GB8CGsYaV1bP2uGsmJIf+cF
+         0hCDs+nWJ1DYzcWqALjxXFR2BM+e9tl1Ho4LYeHgJ2F1T02wNCC35JfHHBiETsGi0Aiy
+         KzFsjFzTz253YSDRXnFfc7JQdv6RlNjN0quehfa139DY+ztmvcjcYOFR8R1+RAseB4/l
+         C71UmLeiy9f4llWYGCJ6Oq0/vziUZJBVeUrm5G23qHn7RL3jFzd59k18u71Ans0nYLJY
+         nvOKhNAcMNeOAoPBEqzWz9Kfo7s3U2WO0qfPuvBm7Es/uJb7R1eUfKjyq9isyxbFZPwV
+         +1TQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755532747; x=1756137547;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=gm1y3HjSbfjetP2qj6SkQ/PvAerOiP935sq/jHQIUpg=;
-        b=Gjk4WHZVfv1oJeQvJfiqqI13dlIbAO/q7FCXwT9dT1Op0nkcPEYhyrK2HpZsyCQvg0
-         GgVgLDMPWc7jCfIjDXMP+1Lqh2t8+wbcRoE0cTniHj4mmcRZFpeOqdanhcoxvwHyryJf
-         Hr2F6ngzpJl0yEMgJ60rBfasCohRgc7e++eSSJ9CC0lLC2wa2UnnKl+4S4ZereFuB4Aj
-         cVNZOmW2rhjgqJLUlr7mOT6tPpYEVG9TDcRpM7i7VR1wLwxNVpzruB3PhjzmPVg5+CLB
-         PjRA6t7wHW5si76dueZJr74kzndQqZP8Kxas1exzZfWHePV/kvlK3ldpq3kw1IO2qzkG
-         KiRg==
-X-Forwarded-Encrypted: i=1; AJvYcCWIdSBMLPoVWpyzSKpMuPF2b4EFEWVOaG/0P4+TVBaqSl9Y57Kq+7JV3xYRBsnrKDO6IG5p6wXCFTbk2g==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzI/vta6bRkV1De0ExZYqhJnhb51il6u39gca7mW7xRnHCOO+yo
-	T2pmGYuI7SDF6LNxNvYJxDGY1zFeN4fqUHTWxgcHW0qVXzf/LRsiGYZCrigLL7oMPA7hzjbHZNv
-	LQxILaUsLMiV2f6RfHd94KuAI+lpqkA==
-X-Gm-Gg: ASbGncvFgdqMk1qnDPE3KjTGYRvLubbj93VOpEgfSOGTKHXdnrca6+Xh3Dbg3ffEJQc
-	0BhuS3FBnNO0z8ShZ6RasJ0cUzHwOAqG8jfgA6lrYIqF7+Kz/BSgWeSRS5yijqzzVIXJ6xuEdqW
-	tc012bLaMIazUT/ZISU2oLKyilIDG645v4lUrFfKGQQPbBjkXCgKx/5u0nApNIb2oR3C2uAskOr
-	V7hPfmQ0vzdDoezt8iD8d8q8NMUWiPUrkMh
-X-Google-Smtp-Source: AGHT+IHzZOE5sdD7K9ztMHScIKCaV0XfJ9+DTjwm50oU5xB5mXy7a9Qk34UbywuJ63e7g3Daxq8M/8goIiHFO2CUkbA=
-X-Received: by 2002:a05:6402:440a:b0:615:979c:e89f with SMTP id
- 4fb4d7f45d1cf-618b053a72amr1562247a12.8.1755532747152; Mon, 18 Aug 2025
- 08:59:07 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1755533919; x=1756138719;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=cT+WAuja39VMqOvtGfWBOHLuy+NZyDAiBTg1604nP00=;
+        b=Y9ybSd2RNvmwzZS2pqFaZbOvdigfs5UmAQ8ELFHzvbtPWGTs1DLdbLo179o5JSpSpy
+         B2BAyxtM+lgxRxjEcunI3VQPCJoMtcA2vxRdwyBB0HnewZ2y74vqUKh5jwVVnIgnz49g
+         kQO6SXNaLpUiIv3dRmqPVOn01kNoC8zzWII3iEKBlGuPiQNFE1mZl7nk25AYf0TTGEIF
+         bhauXfpZPjn75YHCjFvWgR/e5yVQT4cOLv0B3RZzpVpp3O9AAHvcneNO8B9NoE1C4HmP
+         vw1p597utzSawShJZYzSpvX+Srj4Umec9sk1AqCyGN9h0emzaOD2gE888kTDZs5Ljzu3
+         J9Cg==
+X-Gm-Message-State: AOJu0YwC0HdbeNysVSJ45ewJk9aKFsNerl7vA0f9JQCK2kf7b6DBMmX8
+	3dEOhI46ih2cbvpDaZcii3ntfccMXiSj1EOYDvmGQnzkkOtG1AIM51rrMIdvCnN32iw=
+X-Gm-Gg: ASbGnctE4GM6KE7TFNBWWbEEzosVx9/rI5tVigwpeREeK8EwZWfCbBMeiaiwbV4MxY0
+	D1A4fRDIydA6EgpzyMinp7vVMbIx6JCwImYSaWTWZu+46H+qYgvICvd4ZR7ZURNk+r2o6Dt1Xcs
+	dWtBQNSJMK5kHnVKZMJ1EYynEna94lvhgctmT8+ovALRNn+9y1+bjtwKHP+VZxuZUDD7RSPLEbo
+	kmNbFri/3b105ITA/wYcda4QvCPdHZV8vP7NB4B+Qyf4ERPXOjHefygXQ9Vwx5F5igpkrihtGoE
+	3zY0Ts1uemdMMrBWPFY7sUpwKhSFD2g/PyTLmaxx/M7C5sr77xiXW6itbBHjWwBApJFdyPdKKEX
+	m0vLYXREr+2Ex/D1Xbmcvx42JTfytsQ==
+X-Google-Smtp-Source: AGHT+IFuPGXBI7xR6Jyo6KTbZ4Vmpd5eT1fuogNq810C8ExVtbCRFbryYTNLHnDSuJGq05eb/xsFaw==
+X-Received: by 2002:a05:6830:64ca:b0:741:c51c:9e3 with SMTP id 46e09a7af769-7439248d317mr7976713a34.23.1755533918717;
+        Mon, 18 Aug 2025 09:18:38 -0700 (PDT)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-50c947e387bsm2602740173.37.2025.08.18.09.18.37
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 18 Aug 2025 09:18:38 -0700 (PDT)
+Message-ID: <7ed32e97-055a-408d-8c14-1c80c64bfb17@kernel.dk>
+Date: Mon, 18 Aug 2025 10:18:37 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250818045456.1482889-1-hch@lst.de>
-In-Reply-To: <20250818045456.1482889-1-hch@lst.de>
-From: Anuj gupta <anuj1072538@gmail.com>
-Date: Mon, 18 Aug 2025 21:28:29 +0530
-X-Gm-Features: Ac12FXwNnMBJxNoIlK-xi3COE14cERVinE22gDMc_UxvoqnQvy35l2uIogm-nlY
-Message-ID: <CACzX3As8dSi0yWvp95POyAWoOGpGd_a4K62=7SZ-P21f+75DXw@mail.gmail.com>
-Subject: Re: fix stacking of PI-capable devices
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, "Martin K. Petersen" <martin.petersen@oracle.com>, 
-	Anuj Gupta <anuj20.g@samsung.com>, linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 1/2] loop: Rename and merge get_size/get_loop_size to
+ lo_calculate_size
+To: Rajeev Mishra <rajeevm@hpe.com>, yukuai1@huaweicloud.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250814191004.60340-1-rajeevm@hpe.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20250814191004.60340-1-rajeevm@hpe.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Reviewed-by: Anuj Gupta <anuj20.g@samsung.com>
+On 8/14/25 1:10 PM, Rajeev Mishra wrote:
+> - Renamed get_size to lo_calculate_size.
+> - Merged get_size and get_loop_size logic into lo_calculate_size.
+> - Updated all callers to use lo_calculate_size.
+> - Added header to lo_calculate_size.
+
+Please write a proper commit message, rather than these itemized
+lists. Goes for both patches.
+
+-- 
+Jens Axboe
+
