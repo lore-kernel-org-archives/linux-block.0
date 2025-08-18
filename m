@@ -1,72 +1,73 @@
-Received: from mail-il1-f175.google.com (mail-il1-f175.google.com [209.85.166.175])
+Received: from mail-il1-f179.google.com (mail-il1-f179.google.com [209.85.166.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5B372264A7
-	for <linux-block@vger.kernel.org>; Mon, 18 Aug 2025 17:18:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 522AB26461F
+	for <linux-block@vger.kernel.org>; Mon, 18 Aug 2025 17:18:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755537528; cv=none; b=n5mHEOOzffg8E+vFxvyBZrOqo29+VkJ2RwfCNMXOxK6QFNG7LS9MjBeKL/GnR8GwNm/hnPKXU/DhzCCJW+pAG6nOm2Gvv1bEaG/P8oSeZM+rwFBZ9wiL3AWMWqqSDjLy+LbA8rzAcp6PEW/bSn2HMoc1VNCJ1g/2Ok8Dgjeqs7M=
+	t=1755537529; cv=none; b=jr5YT+z7Gg/jCWXj8gK8o1mq27r/+aVnbBZFCogtgzi5rKKQQ8a0OUmOLSukVT7Zaaz/N2J+UJN4lnganTHQEtla6WxkDloCXshZFrZo5uhM3MAIbngcrWno3ob1zwiCYX6E3zXiDbfX9xcjwTZsHZCaOStN9S4MmrtFXvYx71s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755537528; c=relaxed/simple;
-	bh=w7Fzpn7SJ/Hb2R6gM6eyJk4m3715eX39NvQOLiXzCRY=;
+	s=arc-20240116; t=1755537529; c=relaxed/simple;
+	bh=I2Y9f6HTNCdz/i8iZn+y6eKyu1wXCQbTreQdDmi89v8=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=nLze9/OsMUuAYYbcU5roJDr7KI253KutglNveWlttO0GBRhjlPqH9PyHehyyqM9x3HvCGWvYkIqconGCNk/STsbtX5x62WVHs5YkeX5OtDKACcp7VUKXw5U8gpuKeqzU2tg1T7MMYSi/c8a/1PDYP3qrXXYviMeEGogNXiVbngo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=2FW8V74K; arc=none smtp.client-ip=209.85.166.175
+	 MIME-Version:Content-Type; b=uAMTArC8djw8qeptmCx6jx1JULHd6rEY/7kqEEK4TtUhEHUdykLIfUXp6H32M9xrmPdwukQcSv2rfeWeHYBhogjSV23bIP0OY2lL1zCrJm1l3JBZ63xdpQi7md5Y4wSN5BDaI9QG0MULsL99a7FLYtGijszQMKZux36ZJuQ9SVI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=rtFfBuxf; arc=none smtp.client-ip=209.85.166.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="2FW8V74K"
-Received: by mail-il1-f175.google.com with SMTP id e9e14a558f8ab-3e66da97a68so4793295ab.3
-        for <linux-block@vger.kernel.org>; Mon, 18 Aug 2025 10:18:46 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="rtFfBuxf"
+Received: by mail-il1-f179.google.com with SMTP id e9e14a558f8ab-3e66c013e4dso5093755ab.0
+        for <linux-block@vger.kernel.org>; Mon, 18 Aug 2025 10:18:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1755537526; x=1756142326; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1755537527; x=1756142327; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=fu8r2yKO66DThw+kJlK6y2+lhb7FMN/P2S3CMzC2Wlc=;
-        b=2FW8V74K6T19uSMupc+yOPTlguayrjYxGBrKELPIXWX5cZnGMUI8rXdmwkL69cLyAC
-         rXwty+Uj1l9PPCjQZjzCKcsexznrtHF2NduGTzbvGb/FspWG7ysNQOkuJDNAVKEYQnlD
-         WkcUTcoqkCmxKwLdf268rUv+eqowxK3eser/6ohelC6CNnEWTi1HITN4Tv9K+Pyobgls
-         ZJQ40fXjEIiSPq+A2orMe/SvfWBo5josvwkb85sn87naSfaiwq5F58fD9a2n6vH+WTuL
-         4dxLnn69OjOBXLYa+rWkY7fFnw66lBu/Ldm2qlS2+PFca+FKad5CMik8R7/H90QWJkp8
-         EqRg==
+        bh=2q2GiRwCyrStVHviQb75voz5g4GkVn0PiT/uA+RUvCI=;
+        b=rtFfBuxfgmi1UgYuQwHRafH9AqSEsisBDF19CEmWi4f8bYDVSsgcaeZlJp180fleD8
+         3z7hiDNzgtMx7DDBYgCVNDm8WJKuCzQdTgzT+tXdePFMWV/N18UotME1jOMteccO1ed3
+         TEP7S+i0zvIMwrjne//YRPdRAE2D6pRQZuHhh77Nol1g+XxSaV6l/fVUYEDKhOcjS+Fq
+         ovo+ybeFdbounCC8A4yJ074RrMKHscl0ukhcUz2RUG5U6U1YWFHyHFHlXZ8isi9PTTjz
+         VSbOSFBFS9muuQMgGVyFzS1XGqFBEXUsvxykvmctHICC2dXzhfPGIOmKdDCe4i2EPVE7
+         NiIQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755537526; x=1756142326;
+        d=1e100.net; s=20230601; t=1755537527; x=1756142327;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=fu8r2yKO66DThw+kJlK6y2+lhb7FMN/P2S3CMzC2Wlc=;
-        b=r7vlxMgHPuLFSkpqs0U2RIF2os6qPfZa57pXGpew++y7yP0REDU7dS05d8u3StOLS0
-         5Gxz/Do+9M4oNlDrowRQlI9YTCO0mJYm6Gy7W590J0z6pj0j2Ks0/i5rrH06duG9ozmh
-         uAS6V7sLfAKImzVw0e0RcBRJAvViiWVCW7sowdYRhnhM9GUw97apq2VLy3S5wlygd6fn
-         lYAkafJYazhxz9VaM+36LQtG8ZEa6a8MvdtP0kL/+SXjVUFvJGyCFR/nvtPQOM+AoESe
-         Q3tl/3nis5EoQOBCHJQSfnX/ZzsvFczAu4dacZtP7dc+ev5mQ9S7C+YO5+N6p+r54sUu
-         EZDg==
-X-Forwarded-Encrypted: i=1; AJvYcCXsWWqmf79nn5vpd64+8UBURiyirk6AuKOuj3fTSqOWoc2VVDv4t+uV7UQRLO3ldeMV0T9rKFHspUTwHQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyw7xvQPAHycPAhDehep5SjiIQLSHXw8/yFRouYdxFy/v0z3RV6
-	lrO7ehAJZonRtwpb++ZUD9pQ11OjkVGYilrM1fam5oqJFp4COTHhVValrAqLsCp87ic=
-X-Gm-Gg: ASbGncsXDBAPibl1DKrJVimJ7q3qpo8A1etYvjN7QyWagRAEJ1Y2z2VzmcgLy3Y2e45
-	avkYLnDh+zrdIhCVBD3DpXeJUWWM+4ynX/B6e4ZBr0DNOoBvVdXkU/SMsZTflRlhS/pNIDcNQLa
-	yyl4QwjY5k/1FYZfMdO9vTpR+QoT2OZnDPGBufExiI4qCothcjvW/UvLr6zaBT7CVjYFU94FM/z
-	x3gIyQw5MY2l2091be9UOEAW/Z51gotWiuwDFRHgCwWrc3W01KkL0GJsGIlfUVIVOPIkFDU9OQL
-	v4tglXTMlWK+2oMBB53g2tJ74TNeTmE1uuMhzw9S8xNfGPIWffYQGVte3w7rMpZSPZIdoJcV6ZT
-	R/vVHmvQwxwY7eg==
-X-Google-Smtp-Source: AGHT+IGofyjOjXefOUTkdbQvdNHi/3ejsDvhudF69ftu0/UflWY1YbJ16NMpskRsqN16HQ53bFvpEA==
-X-Received: by 2002:a05:6e02:1a87:b0:3e5:2646:df03 with SMTP id e9e14a558f8ab-3e58390e18bmr179454925ab.12.1755537525819;
-        Mon, 18 Aug 2025 10:18:45 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3e57e58c321sm37866815ab.1.2025.08.18.10.18.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        bh=2q2GiRwCyrStVHviQb75voz5g4GkVn0PiT/uA+RUvCI=;
+        b=mGva99wVOy0lnFzwtXavtje5Ryn1xL2iqoaac220IWucLq+1lY5DB1mpw+6/uqU3GM
+         tVdrF772hHgyF7QaclCRmmZ/YU2Lq1AKFzz4n3B8kHM4CBFP0QRC0gwM+h1pjKp5lRjj
+         auqFs5Ipe13ENf+JHhzGeuKiy9LV9ET7uOriKyigAQjIVwhMFU9rEIABMPw39KuEKGbs
+         tOpUGA84C4DbyDPW2fdJOUv0KjAVUYIy1ma9YAqlxpzg0+jVqqyBF1j785Al+IoVGkac
+         lyeiadAGXhTN0oDW9gSdNCDKNjrLNZv48C9u0CUWShfFWX1YEPNaJLtBou/2bpG1Jl4K
+         9Bug==
+X-Gm-Message-State: AOJu0YzN1afgTvR4f18nZ5ZJ+Qxmd272qDw2EpomwZQQ88yGzYKvbmMu
+	GxXmNVQQFNbsV//9Sr3T92Ty79EWPkcVNtX9nZO1YnFl7yZthN/M/ZYWwLSh6MkpVy4=
+X-Gm-Gg: ASbGncvWFv+NRnhkLnR0XCR0gROtNEdzc1vih930nAxb/dlJEbLgs2fGUijPleG7M2K
+	DNer+GraHygXAco1+KQ79r68dU+RSkp4wMGCsmkRiLyLNyXMjlP0SgeKgQcFjn1qsq3UvyiGf8d
+	FkajlXECOCXgmhaCEtciJGGZfEAvdIdyluLz5CxdtbRz3mJ7h9Sr0g8AeYqPp+KEf4kLbpItC/i
+	voBga43j3L0VH0QJIA0dcti2mvbKMOT95d4maVqzwIJFZzNcUGxOMDTGDfSyIqFPOfZ3bWll8cu
+	23u0wyggUeF25SfuPg+xHzeEE0Qj0vPXz+MS57xvIPgX1b2ut3xxHxQ5khYTbfyzp/8umPsh4CR
+	cK2YhrLmRaIhQEHUIn1S7CbK9
+X-Google-Smtp-Source: AGHT+IHbtat8NIcMoxtMIiLgN6Bnk+HqyIo/IRxl3kjOH30/T6Sd64G/ZSakOgGR2pysjZYeGvl/sQ==
+X-Received: by 2002:a05:6e02:1949:b0:3e5:7150:ebf6 with SMTP id e9e14a558f8ab-3e675014028mr5314465ab.11.1755537524467;
         Mon, 18 Aug 2025 10:18:44 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3e57e58c321sm37866815ab.1.2025.08.18.10.18.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 Aug 2025 10:18:43 -0700 (PDT)
 From: Jens Axboe <axboe@kernel.dk>
-To: Christoph Hellwig <hch@lst.de>
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>, 
- Anuj Gupta <anuj20.g@samsung.com>, linux-block@vger.kernel.org
-In-Reply-To: <20250818045456.1482889-1-hch@lst.de>
-References: <20250818045456.1482889-1-hch@lst.de>
-Subject: Re: fix stacking of PI-capable devices
-Message-Id: <175553752471.87011.16999242916763470821.b4-ty@kernel.dk>
-Date: Mon, 18 Aug 2025 11:18:44 -0600
+To: ming.lei@redhat.com, shuah@kernel.org, 
+ Akhilesh Patil <akhilesh@ee.iitb.ac.in>
+Cc: linux-block@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, akhileshpatilvnit@gmail.com
+In-Reply-To: <aKGihYui6/Pcijbk@bhairav-test.ee.iitb.ac.in>
+References: <aKGihYui6/Pcijbk@bhairav-test.ee.iitb.ac.in>
+Subject: Re: [PATCH] selftests: ublk: Use ARRAY_SIZE() macro to improve
+ code
+Message-Id: <175553752359.87011.5736670614642029375.b4-ty@kernel.dk>
+Date: Mon, 18 Aug 2025 11:18:43 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -78,24 +79,21 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.14.3-dev-2ce6c
 
 
-On Mon, 18 Aug 2025 06:54:49 +0200, Christoph Hellwig wrote:
-> this series fixes stacking devices such as DM on top of PI-capable
-> devices by adding support for the new pi_tuple_size field to the
-> stacking helper.  It also makes the error message when this goes wrong
-> more readable.
-> 
-> Diffstat:
->  blk-settings.c |   12 ++++++------
->  1 file changed, 6 insertions(+), 6 deletions(-)
+On Sun, 17 Aug 2025 15:06:05 +0530, Akhilesh Patil wrote:
+> Use ARRAY_SIZE() macro while calculating size of an array to improve
+> code readability and reduce potential sizing errors.
+> Implement this suggestion given by spatch tool by running
+> coccinelle script - scripts/coccinelle/misc/array_size.cocci
+> Follow ARRAY_SIZE() macro usage pattern in ublk.c introduced by,
+> commit ec120093180b9 ("selftests: ublk: fix ublk_find_tgt()")
+> wherever appropriate to maintain consistency.
 > 
 > [...]
 
 Applied, thanks!
 
-[1/2] block: handle pi_tuple_size in queue_limits_stack_integrity
-      commit: 61ca3b891b4b9667334c1356a73f28954c92d43a
-[2/2] block: remove newlines from the warnings in blk_validate_integrity_limits
-      commit: f4ae1744033d54b63c31a3664a4fdf5cebec7f27
+[1/1] selftests: ublk: Use ARRAY_SIZE() macro to improve code
+      commit: 0227af355b50c526bf83ca52d67aef5d102e9b07
 
 Best regards,
 -- 
