@@ -1,92 +1,103 @@
-Received: from mail-il1-f179.google.com (mail-il1-f179.google.com [209.85.166.179])
+Received: from mail-il1-f177.google.com (mail-il1-f177.google.com [209.85.166.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 506BE277036
-	for <linux-block@vger.kernel.org>; Mon, 18 Aug 2025 19:07:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38A2F49620
+	for <linux-block@vger.kernel.org>; Mon, 18 Aug 2025 19:10:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755544065; cv=none; b=u4XdwQt3FlzKdOa7EAiJVJspPmeYNayHKSsccK4Z8ZxC1S7xfRbfXQ9cDcy4VqATyt/1UV6GXiDzFU4IuCxl1q9HfMU/ptWY96UPt/6ogz10WAGFZDwjzyITSBj9ADiRtZbJExrqoNNTArShD4IN0qnC0ir8JkUXnrtOM/UD/Pg=
+	t=1755544256; cv=none; b=fg4VS0QB1bGY35Cw3qQomsQaUsOADoyjbN/GxpU/e/NzledkSJRJ1zqebbO1XAaJ6kNBAf0AaDqsPQVtq52qoFmeTfRY1++4fDyDrnfmjNa0hPulS5rC/H0f+QipKEtCT5eEWxanPvSLzUUZKWmWrPfD/lJaChVFwqdkDSSLonk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755544065; c=relaxed/simple;
-	bh=Ski4TKxNewtrUZds8NDTJNTqJtmxfNhmPkAzaqLMFSw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YzVUnoSw/XUWddUkrvxpCrlyBeoD+lMcYHwFXyF9GranS7uxS/q2eofO4YqzeSM7SWwN2id0k0MDmHL/LerHqkrNdKC6MQRKi7oIYM+sd3wOq78U9PHhFdt5ooGsHeoIuR2vf/oDE7C6zeuuN/rS9bsi9RPMp1AcLybSOaGdI54=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=s1Pr1IAl; arc=none smtp.client-ip=209.85.166.179
+	s=arc-20240116; t=1755544256; c=relaxed/simple;
+	bh=hH9A4ga/R+X23C4gJ+oGriVYHNeRobhPQRPx1lX/z8k=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=TxwkLkW7w2S1fgt2hvRoVZCVqWJzYOQt+vaxoS9uc6DuBcOkUbW30kk75XpbyjDj2AqNee5JrpRwGyRS57oRJFWuxvbtJZRxfKHe+Um0VmdlUH9eBcqpoFpE6SNdk3XJVd9YCLM9V+hMvUTIbwsi0YTprOpuz77qBNBTUtjK5eU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=ECWbyR/8; arc=none smtp.client-ip=209.85.166.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="s1Pr1IAl"
-Received: by mail-il1-f179.google.com with SMTP id e9e14a558f8ab-3e668360ec7so6216895ab.1
-        for <linux-block@vger.kernel.org>; Mon, 18 Aug 2025 12:07:43 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="ECWbyR/8"
+Received: by mail-il1-f177.google.com with SMTP id e9e14a558f8ab-3e57003ee3fso23957825ab.2
+        for <linux-block@vger.kernel.org>; Mon, 18 Aug 2025 12:10:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1755544062; x=1756148862; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=uGRep3tF7KiNS0qSwtnPInQlsC4SL0Dlef048RIg/sI=;
-        b=s1Pr1IAlsKfuNxrzLr/JrOjvJyTQzIJyLgPSPqYIx67L2cu1O8ws3nY3SZ5InU1etV
-         J0wM5OK55+jnhxdnuRh7wAmYkGPJkXaFrnL2yw+aIsLY0MaCXRa59qS2HVFvOByMS8mK
-         duPm6KoLbkQBUZqpiyB7x2K2SQamyZDqLlzEf8TLDiIwXAtey3IznEtc7jpo7BW07Cb4
-         P1Hx1cSz63c4U1XlqeuvsV3JVR1ymt3say/FPNfPmAKwz/MwMOpKBG2Xf9YPYF7hII27
-         SqO+KUBWay4uKiYIlK1Es4sl5e1jUpI+hEFR89S8k0WDWO1ZUxpFY8eViuVPxxwGDHQP
-         qebA==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1755544253; x=1756149053; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=98s4oxjoCh9JFMdNor4pD8PSiVTI+34Wp/PkZUG9epY=;
+        b=ECWbyR/8GEFEjhhelsoRYVb9Qh6gM3j+rROQFNH0RcT9Wg4WB7s/zzguZGi6NVWG4R
+         XrGxNFesBBdigVyNHgzmVm6+KunnElc7mCgUwWqbKHXm4YVmD5rCIxswgPzvaGXku55o
+         tKIAnHrHBF3ppTWBMMuXtijXFRpQk/tlH0AtHP1XgtoAJ95e8xS4ceYnOTuPBNvmxa3g
+         dYpRVCFN8irnPh550e5zRzDcj5WFYqZOfMA8O2+4rMv12SuTthmpAvGBwyOVfx7gZk1+
+         VCPneoUZlgNgyPF5x6rS4VZzUjtK9UMRJm0C+dGpeu4IGh8fXA7GTRjSSf+L4g5KMINe
+         K5qA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755544062; x=1756148862;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=uGRep3tF7KiNS0qSwtnPInQlsC4SL0Dlef048RIg/sI=;
-        b=n44s1Ps412gegbkv767an1G1/D5p/Ub39f/0d2AySyWkoyF8OgdyCvuIqJJdC28pDB
-         a+PS/uTdC8q0+zUbckQWxkwzEWBTA7vOvnPFc90MoD5UqufSrqSjO5ZrqCf1a+vK8vae
-         sRdgvSednPR+Qs89w3jmlLTb0MvdSCvZH7WoggJhcNmtNT0t+dOqwPA8TkFv6bQynIqL
-         1cwc37bRHvNFvJrxBXRPge/+jd3iSpikr5IJ44yKG6AJ+x8u5w9TK3tylgcQc0NFq3GY
-         N2VObJ2dmJ9ET6JhLFOhdpok/OQ10ZmtE5vSwQXA13T4U6C/kG/t5N8mkF7b0u46b6vm
-         WdYg==
-X-Gm-Message-State: AOJu0YySaLLu8A5osp7N7w7PwHex/crEEKS7U5zJKcdl156NoRJo/h8p
-	ca5dAxiGg0AUnOj3Aq4MigLpjHylJz/sv5jvcBp4lUgnvSWj+22utHKVkTJhfolLYsusCl+vDlK
-	QdRCI
-X-Gm-Gg: ASbGncse+2C8BAoImUdrZFfwSSQbNJIlqrodW9WTDOXdb/wkneXfcXB8PrbSEC0jTOK
-	r0i6Y3qYW/tDSS7I90MByi5jwHBlLtQ8v92nS9ZvV6z6dFMRLSr+ekzgPZiAgiabeSIFAbLeNWf
-	FSAOrWCBb9kf+t/N75k17QIh1Ero/isibgHuQuAzsp1IS19D9nZilPRc2zujDM8rjQiC8ZdsV96
-	0Fpg3jww7/0NP4rRjT1H8oLs9aZRzYmRRrsWxYg7xKmKybF0qWTxrW3s9H9ntwh2nWRtF3ILxcu
-	W6kPrFEXh+r3VdUGzLJ6uAqkMsLc8htvtV6pV1M98TJVYpu4XuY4w++1/tff5FvpnKdbtoOChsB
-	U+ktWyGBmETpw4JyTS4kkFUNji0w5Sg==
-X-Google-Smtp-Source: AGHT+IE9tC9UJD6l6NoEtWg3LcOH74IqDydnHLY6xV/kxFHPSmv3CwLQR71mGVEOmsylQw71cEVvNQ==
-X-Received: by 2002:a05:6e02:5e02:b0:3e5:42aa:4c37 with SMTP id e9e14a558f8ab-3e674fb039fmr13629545ab.2.1755544062442;
-        Mon, 18 Aug 2025 12:07:42 -0700 (PDT)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3e57e6cef44sm36568985ab.48.2025.08.18.12.07.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 18 Aug 2025 12:07:41 -0700 (PDT)
-Message-ID: <a8097b4d-cbae-417b-9608-a3512d66f8d3@kernel.dk>
-Date: Mon, 18 Aug 2025 13:07:41 -0600
+        d=1e100.net; s=20230601; t=1755544253; x=1756149053;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=98s4oxjoCh9JFMdNor4pD8PSiVTI+34Wp/PkZUG9epY=;
+        b=Peb+R5T6AsalVgrqFl9KhEcKpSlzJf5ranVqJIvY24wUAKBtKfdwffLMugvR4IOdDm
+         Tj0J3xjQbT9Z5njTh3leN7e2qK05350Fwk+aCmXS6qP6DfySGPSrPGdlFFC3rVL7x7t/
+         E32Vf/5BmMtRXbaYfNuV+lwB/V3TjJOoBYm2SZ4KlIj1rYumgcMkkFDmJHhTBsEBnXUd
+         ifldu/q3TwTsVXFJuZQWPjUOrIBuCYg7fNiQyjAxlbCjDv8MgX/nlFHTR/IeQO5K8B9u
+         oY/m4e0BO3yl06prmLI0qmdpf43dgarWFLWN9D8OI5auRnxyog8PxdfLoywFQ78Ugt0B
+         b4jQ==
+X-Gm-Message-State: AOJu0YyA83qvRfl6zi6GMyaaG60bvjKVUwDlESeOL3gvbPe7+xBWme5N
+	U9X2RsI6APDfcWn4O/0RCZL7MbuhsL2JZXc0xxi1QGt86kq/nNOZb5i1BB50gUXch8Z80Kpkfb/
+	CSDHs
+X-Gm-Gg: ASbGnctqYOB9+X+XMVxNrasTAGhNJYznI0uo9bwhvUxQeRBo/ZWKeCqsgMZE14mYAcG
+	rQVTESFnJ3UoDN5RMzk+6/y44AOgfCeeaImE5AlxS1rUO8cklMDYfKYmIq88//7W3KtiTKrHyvz
+	F+OZ35fKlcCR8dQhBwdToF3JmuB7RUeaVv/g/VHyThsFTwTFp86LP+oOmhGegl3gEIAShwzypiL
+	WOrbeLE8oL0VYvOX3W08fLOaQ2JPC7ycLFlfJje21TSEfgxGI2pBmisr/XAoVok4fX1VWRnv+oK
+	UXK9n6F1x4HQz+rUBcVvbXNZVtgaN6crvpukRdGr2tOz0WypUZKCN/NGeoZL3z67zVRvvLvvRC4
+	SLnA1fXfUgIXFFEmDGTWAK9tx
+X-Google-Smtp-Source: AGHT+IExPQWHNXEp87a6gdTrRalijU8TTfNUlXZ8z/6M63ZuM5HFn5QSpjqem+d6JzrncNeyYbRK+Q==
+X-Received: by 2002:a05:6e02:2705:b0:3e5:5937:e54d with SMTP id e9e14a558f8ab-3e57e9c8e73mr229307185ab.15.1755544253574;
+        Mon, 18 Aug 2025 12:10:53 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3e667540aa6sm19589805ab.32.2025.08.18.12.10.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 Aug 2025 12:10:52 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: yukuai1@huaweicloud.com, Rajeev Mishra <rajeevm@hpe.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+In-Reply-To: <20250818184821.115033-1-rajeevm@hpe.com>
+References: <20250818184821.115033-1-rajeevm@hpe.com>
+Subject: Re: fixed commit message
+Message-Id: <175554425273.106072.9130682116879021274.b4-ty@kernel.dk>
+Date: Mon, 18 Aug 2025 13:10:52 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: fixed commit message
-To: Rajeev Mishra <rajeevm@hpe.com>, yukuai1@huaweicloud.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250818184821.115033-1-rajeevm@hpe.com>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20250818184821.115033-1-rajeevm@hpe.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3-dev-2ce6c
 
-On 8/18/25 12:48 PM, Rajeev Mishra wrote:
+
+On Mon, 18 Aug 2025 18:48:19 +0000, Rajeev Mishra wrote:
 > fixed the commit message
+> Rajeev Mishra (2):
+>   loop: Consolidate size calculation logic into lo_calculate_size()
+>   loop: use vfs_getattr_nosec for accurate file size
+> 
+> drivers/block/loop.c | 39 +++++++++++++++++++++------------------
+>  1 file changed, 21 insertions(+), 18 deletions(-)
+> 
+> [...]
 
-Still leaves something to be desired - a nit is the line length,
-but most in terms of why the change is necessary. At least the
-comment in the code explains why this is a needed change, but
-the commit message is pretty vague.
+Applied, thanks!
 
-I'll fix them up and re-add Yu's review.
+[1/2] loop: Consolidate size calculation logic into lo_calculate_size()
+      commit: 8aa5a3b68ad144da49a3d17f165e6561255e3529
+[2/2] loop: use vfs_getattr_nosec for accurate file size
+      commit: 47b71abd58461a67cae71d2f2a9d44379e4e2fcf
 
+Best regards,
 -- 
 Jens Axboe
+
+
 
