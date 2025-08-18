@@ -1,73 +1,262 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E578929B8C7;
-	Mon, 18 Aug 2025 08:14:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755504881; cv=none; b=tQeMk1zBPDucNgaHobiX4zuKJJTow4gfMXbUIbuK34/Ka9xeBbFimQosYQsbFUR3qAz3DSSgexHp/gnhraI9zn4YYsEkTgDgT60wrYAFyRmO7rDMOpXyHW6fRXYbiYkkfi0wc33I4+SihFVjx/JeNLlfwe1tshUFhu1kpDKuuxM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755504881; c=relaxed/simple;
-	bh=mnrwWKjndoXYz/JYEQ1i/iP5PWiAUSTqSYeORxymW78=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sWevA1W2XhOvSwmyBZZux8N8Ep9LSPfH3DF4MC5BOYq48u6sBO+k9EGynJELWSMMF+KvMsX9HrDpCO2jYyrwwRH9qbrjUetdudHY49/3hvXN80yf0dECmIMqSdOslScPwyOlrrynNoedfN+GXW35/bzbELli9ckuEaO1LbJE1nI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=V6ZXNrvN; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34ABC3009EF
+	for <linux-block@vger.kernel.org>; Mon, 18 Aug 2025 08:35:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.10
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1755506146; cv=fail; b=MWNCPqJ39+jh0qObIu7kh/pVLWem3Esc0OE4Ze16wUc7j/8S5feNxutavau3mNkM3qZPb9u51U7t7Y/k2E9X2KZ4LbX8GHjVzmUiseyKsxQL1ThrUOIslajrUmtePLg6wT2vibPzc2BG7XqsLYzj4GNrK5PTqzi9XjakgF5cyws=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1755506146; c=relaxed/simple;
+	bh=sgomUlbWsZyZr+Nm6pAtndXOwvCpXYsrnDa5/gCjdJE=;
+	h=Message-ID:Date:From:Subject:To:CC:Content-Type:MIME-Version; b=HP9NlusYlv0eUQCDM6lzSOBRNPfAlRBp3bd/gsty2Ak18vneAeziovWiE4ocALe9KbNkceYT1OwPPYwFpI3zm1sgjT9kdlofOQvemaY8FzDGmAWRyAp/XDo5vYXZ9XvodoGbNMSZm67jJHr8KHVGWctW/wryCW84QqsEvl7GhAA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gXG8ew6I; arc=fail smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="V6ZXNrvN"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=woia4pGhdfQCdmebfoJ8hoZTodcCOky+OFdjamql6a0=; b=V6ZXNrvNPWpVvymnUK1YEgZbDv
-	qN4aOaMJ+CxjqP6/2VojS9tiaYtGW0sOssupmiXpK7RaHcmg4L0uccXATGu5SEi8J0TzrfX4qbb6e
-	jEv5mHnHYhAR4hFirRA6bLqbV4q+rtApyoj5OOFQMoIAbVi2JovzO/XJDWPG0xKxCIY6BHQS23Att
-	WXwx1E+o6EGZtly5zXRBFPS7m/Wa5rlMZPOuYaKDIpaaqNIIGng8fIcVBDKW2ATplzkkQ0JW706Da
-	AfzYfVvbTwgQd/kCyaxdG2AaWk0kPk0nUvgUmsBh9HzNBUtru8yILDXgpzLvNYjSplKPkCKZlf6Rh
-	uavb5bfg==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1unv0m-00000006vBH-2jlX;
-	Mon, 18 Aug 2025 08:14:36 +0000
-Date: Mon, 18 Aug 2025 01:14:36 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Yu Kuai <yukuai1@huaweicloud.com>
-Cc: Christoph Hellwig <hch@infradead.org>,
-	Damien Le Moal <dlemoal@kernel.org>, colyli@kernel.org,
-	linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
-	"yukuai (C)" <yukuai3@huawei.com>
-Subject: Re: [PATCH 1/2] block: ignore underlying non-stack devices io_opt
-Message-ID: <aKLg7HbvjVkqB8Uu@infradead.org>
-References: <756b587d-2a5c-4749-a03b-cfc786740684@kernel.org>
- <ffa13f8c-5dfe-20d4-f67d-e3ccd0c70b86@huaweicloud.com>
- <fd5c1916-936b-4253-a7b8-ba53591653f3@kernel.org>
- <4aa48545-7398-c346-5968-5d08f29748c4@huaweicloud.com>
- <aKLAhOxV1KViVw7w@infradead.org>
- <de4fd44c-f8be-e787-27f4-9e9e09921e12@huaweicloud.com>
- <aKLFuQX8ndDxLTVs@infradead.org>
- <e00106ae-e373-9481-8377-5e69203f9de0@huaweicloud.com>
- <aKLdm4GPVfXOm0vO@infradead.org>
- <aa12bb2b-0767-a30d-f7a6-a13722711828@huaweicloud.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gXG8ew6I"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1755506145; x=1787042145;
+  h=message-id:date:from:subject:to:cc:
+   content-transfer-encoding:mime-version;
+  bh=sgomUlbWsZyZr+Nm6pAtndXOwvCpXYsrnDa5/gCjdJE=;
+  b=gXG8ew6IiHHNP0HDkqvL/SYpq/IOWbm9Keqs+BIpSIbJqOtXyjo3DeWV
+   mzVDe6MRq4M6OGM9iSW8zSYYKX6/EWAuTHH7E0UX5Jb+qY4ZLr72B2YbQ
+   ndoljVSnHrEU6A405Wn1EZ7AgNOCyRphoL0mDZA2pU39BveSeobGuDyq4
+   tKof7XJNKZQSJNBdew+6pFcpjwRVpArIRCT6okqRpGF7RZgcFlTGtZNE9
+   MITGMECRsR/RO7U4OkBWo98csJirtt1x6sPGgvTORfF7TxPrCOZG3Wdlk
+   yD6PUC42OiinOZFUpQKd3hVpRaYv+nlO4btA5sMUt3BChe8/L2jE96l6u
+   Q==;
+X-CSE-ConnectionGUID: zZtgSk07SLSNhUs03KaCWg==
+X-CSE-MsgGUID: Ebi1EzVaRZuEblYMfA4wOg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11524"; a="69098142"
+X-IronPort-AV: E=Sophos;i="6.17,293,1747724400"; 
+   d="scan'208";a="69098142"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Aug 2025 01:35:43 -0700
+X-CSE-ConnectionGUID: C0CJ0CPISc6DJAAoP3Uz2A==
+X-CSE-MsgGUID: x2CoKkQ6QU2XTjeQNq2Unw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.17,293,1747724400"; 
+   d="scan'208";a="198370491"
+Received: from fmsmsx901.amr.corp.intel.com ([10.18.126.90])
+  by fmviesa001.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Aug 2025 01:35:43 -0700
+Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Mon, 18 Aug 2025 01:35:43 -0700
+Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
+ FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17 via Frontend Transport; Mon, 18 Aug 2025 01:35:43 -0700
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (40.107.237.79)
+ by edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Mon, 18 Aug 2025 01:35:42 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=xqH2/T7mrkX/oCoVyoYysL/3fJI1P9pCprjZr1g1akGjRubiFFTk70+gEboF0efnbSuotbeZPmg12R5ckZiaA4ya0Jr0mnrp/nV+4KeRSvMVEEaZMCgipL6do+6LvhpvfWblNJNsm+8ptLu72MurEKl2yHlWSltDyNC+2tRIWm4i1CDa+bI0iqjJ0mFooRtiUGIZH3a88BdBniBP5HU28EPptT113OeJ4NR0135eT0a4hxBRH4lNqjPY8Fjl3Xj5d5qAaVfKiWwJgegGFt0g5gHhiDUBvVpHr+vxFxoN+SSde+4I8EVW+YS6/rt/SVA8J6zFBdnNt++88IGY/V03/w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=AsV5eKH5qJf5UyxqX+5Vmzg2YV30e7cMZr/03hCaqNk=;
+ b=Qg/NK+UriRUH9f9sQNvhWad/DlVMWFYVUrlpojiMT40kwyMiuNQfXcRkRFK8Z7VP3GMdmv5WHls4ORpCTFYgi4LVqqR8ve74dXkMrHMJJjsbfkzw7CG5fJLckpUrU94zZpCivACZWdWVBUqpUrAiSfvdVhyAGWS/gp21I1DZrH/NxXh1rZMO9PA9TdY/ivZAKTTo2SZ3iEbbvPLzZ9q0GScpJjJDcVNrVZgTAlSlGA3S5c+P6A4jtSNXErHJUpvnyo2C6qLX+bgFqp2P/qskxP3ELbKw2zoCH1dRQMX8Frsi4Lmo/5kbovkDE/nSobuaUmBmUdCFiWuvt0z7S13WLQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from SJ1PR11MB6129.namprd11.prod.outlook.com (2603:10b6:a03:488::12)
+ by PH3PPFE80710477.namprd11.prod.outlook.com (2603:10b6:518:1::d5a) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9031.24; Mon, 18 Aug
+ 2025 08:35:40 +0000
+Received: from SJ1PR11MB6129.namprd11.prod.outlook.com
+ ([fe80::21c3:4b36:8cc5:b525]) by SJ1PR11MB6129.namprd11.prod.outlook.com
+ ([fe80::21c3:4b36:8cc5:b525%6]) with mapi id 15.20.9031.023; Mon, 18 Aug 2025
+ 08:35:39 +0000
+Message-ID: <ed8f89a3-be5c-4bf4-97a5-886e8e3f969b@intel.com>
+Date: Mon, 18 Aug 2025 14:05:33 +0530
+User-Agent: Mozilla Thunderbird
+From: "Borah, Chaitanya Kumar" <chaitanya.kumar.borah@intel.com>
+Subject: REGRESSION on linux-next (next-20250814)
+Content-Language: en-GB
+To: <sunjunchao2870@gmail.com>
+CC: "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+	"intel-xe@lists.freedesktop.org" <intel-xe@lists.freedesktop.org>,
+	<lucas.demarchi@intel.com>, "Kurmi, Suresh Kumar"
+	<suresh.kumar.kurmi@intel.com>, <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: MA5P287CA0047.INDP287.PROD.OUTLOOK.COM
+ (2603:1096:a01:175::9) To SJ1PR11MB6129.namprd11.prod.outlook.com
+ (2603:10b6:a03:488::12)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aa12bb2b-0767-a30d-f7a6-a13722711828@huaweicloud.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ1PR11MB6129:EE_|PH3PPFE80710477:EE_
+X-MS-Office365-Filtering-Correlation-Id: 53b0b2e7-cee1-4934-e4b8-08ddde3235ee
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7053199007;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?UVhNeUxqRUlST1JubENyc0RTV21uUXp5N1VDODNRRUxCYlVsMmEvYWZ0MWxJ?=
+ =?utf-8?B?UzhScHVPS2x6SXBOU1VuNVp2eHVHbGZMMytEMjFaRUdSWnhuampwdW9Ea0Yx?=
+ =?utf-8?B?NEJiTUJVQUs2QzAremRDdkZoSG9JcG1uQW5WNzZDUXlsUHJ6Rzc2WWtENEZW?=
+ =?utf-8?B?OWJjaFlmWXBsRHNJZlRZbkV2Yy82K25pdmZRY1Fwc0hFRjM0OW5LRjI3bGtZ?=
+ =?utf-8?B?bldmWS9tdnBoUG1VL0JodjBSK1g0cUtadUJFNW5MQTNDUW9maEJpQ0NjVmFR?=
+ =?utf-8?B?UG9XM2tCQ1dKWnA1a0Q4cmM4T1JHUExJaFpaRVIvYzV4eUxBMlUvY3gyRWZh?=
+ =?utf-8?B?anR1VFVwS2MrVWhEVHRpemJYWDVJWGFBWUxlYVlYN0NMek5QMFo2MEVOdFFY?=
+ =?utf-8?B?RjBGejBFazdCTnNaWVpHRFpkck1SRDJWdVFmSjJMSWhWL21iZldGQlR4Qnhp?=
+ =?utf-8?B?bEVFSTVIeWgxQlNveWwrRkl6UGE1MEJQMHVzRUFleTE0dGlseXBkam1vK3Uw?=
+ =?utf-8?B?UVJpcEt1bGt3RmJrVE0vQ0lsOTJaVmd0KzRSZHRReG1tSCsvZEJnVEhOdFhR?=
+ =?utf-8?B?Q2V1YkNrTzA3NXppUllCbnlTWFAvV1YzbWh4dTg4SU81c0xKdVZkVXlyWURI?=
+ =?utf-8?B?K0pqNmFIS2prcXRpWTJ0aytjdDZtR2E3c0tFbHBzSzdKQWJvSDNZSDI3K1J6?=
+ =?utf-8?B?cUpnamF1QVF1eldsKzB2YlpyVmlLcGtlY28xUytPOGVwWituckxmYzdFNnla?=
+ =?utf-8?B?dDRHeUo0dHh1WVArb1pyMi9uelpwTFhOOHU5U091eElsTVV6Tkw5NktDdW95?=
+ =?utf-8?B?WHVDVTRIQVJXT292S3Z2elNLeXo5VTVNMFJwUmhVempic3F2YmV0b3I4ekFD?=
+ =?utf-8?B?SklEZHVwbDVINm8xODltYnlLaDdwKzhxVjBPOHpYUnVFcHFQbDFJUkxoWkJX?=
+ =?utf-8?B?Q2NvU2JmUEZESTlyc05TZjY3Q1hTeW05cmZ0aDlSckxZd3grZklPd01yNlND?=
+ =?utf-8?B?K3V0eFQvc1NyNnJKUURKZkZrNVd1ZGJmMytKZkR1NmxVU0lTaW9PV0pqa2tp?=
+ =?utf-8?B?Zm9jZ2dKN1o0ejZWMmZHMFdQZUx1Ky9nMUdvV2VpUHVwcDJjc0pnMUJMbzcz?=
+ =?utf-8?B?dGFkd2dvdlJLa29tNjNOZnRrWGFVZWdDcjBDeTl3anBwb21iNTZPRm1WaXFB?=
+ =?utf-8?B?em9OWkJjWlczNFRJZHNCRWI3VFJnUXVlZEU1UnpCV1BkelF5c2ZwQ2pDZHVO?=
+ =?utf-8?B?Q1ZmTGNyU0ZCSTdNZlRFZkN2cXVhV1gxZFBGL0VySXdHMlE2c2Q1SWMzbW1I?=
+ =?utf-8?B?aFgrSk1NRlk3aVVkZDNkZmFjTnVBSHczQ28wbk03cGJKWUdjajFiZ2VoTVBZ?=
+ =?utf-8?B?UGhKYm9VRnU4UGwzNURmTFZTMFJTbG5ZaXVpUFAxVmdyaktCN3FoMVJwdEUw?=
+ =?utf-8?B?KzREaXBuOXo3Q0M5Q1pjOUJ1UllHR1ExMHUyV3crM0RuWllHdUN1RktrQVpN?=
+ =?utf-8?B?UlNFd0p2WU54bkZGT1FPNkEvRFczVjBsdkp5ZnF1RjVBc3czZmJQNVRLczNh?=
+ =?utf-8?B?R1dvY2RFZGpWNUx2aVVUZ1dkS3RGT0p4UFVJTWY2aXFBUzZ6VlRTaGZIRlUv?=
+ =?utf-8?B?WE1HcTRMWitzQWN0Q2d4UjJYUzZlaitSTVVoT2F2RS8xNk5IVndUdWNBVUQy?=
+ =?utf-8?B?SC9zbUhaUkVmdjR3cjA0TFIwS2FWMlNBMTFENlNtZU9WdEZQVDMyTTdHNStp?=
+ =?utf-8?B?SlJJNDdBcHNXUkYxeTZOOTRYdGhZMk9QZkREdjVpQlc1RGZkRURDRHdzSE1v?=
+ =?utf-8?B?NWJoNGVlekZkVjZUaDg2aG9wVlZrejdlQk5GSGhHcEpMei8yWXNyZGFDeW85?=
+ =?utf-8?Q?DZa65urxEcRuO?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ1PR11MB6129.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?THRCRC8wQ3kwNGUyaDdUV0hmZ3RPMWZRbnlieDcxMWZmLzBrL1F5WU5hYkpj?=
+ =?utf-8?B?b3pPZk5BdnJiMVdjekhTaHEySTM4MFYxRG5zaE95dm05ZnNnaDRKU2J1aUJJ?=
+ =?utf-8?B?TnZuVHJMb0ZWcjNQNVdmMm1ZZVZ6ZEVJVjBnQzlVUTk0Qm5jSTZlOWRyK3Zh?=
+ =?utf-8?B?RDJtb3hGNFNaTXpOM0g1MFZiQWVwQTA1dVdXNU9ESGZtT3hJY3dVQVkyVEg1?=
+ =?utf-8?B?Z3BKbFJwaWo3Rm56RWtvbThNck1sOXBNaTlmTzFmWjFzMWdwbUcycVNTSWp5?=
+ =?utf-8?B?UUZQaWovb0krMmFKbTRzbVp3dGNBa2F1c0txUEdTU1ZFTzdTRXFEa2NGMzBW?=
+ =?utf-8?B?dXB5azdTQk5McEJKZ3Zja25NN2dmaWt3akJTOVBja3JFYlg2T3VhSjlyVHBw?=
+ =?utf-8?B?dlhQMHdQZDlXb1dQaWtJek1ONHJuRVJYSjlvenlXcmpJSVBGMW1mQ0JNcWdi?=
+ =?utf-8?B?UkhTdTA5NUg2OU5YY0huaUVKc09yZThHdlFlZlNFK3dzVENXRzluaW5tWUQy?=
+ =?utf-8?B?b25vSjNoY3Jxd2Z5VnoxbS9ENTBzUC8yZklVS3RWSEhuKytEQllLd2Juc1E2?=
+ =?utf-8?B?VGZsK0lFMkNnc0JIYnY3eEMxUkdUbTI5TjZ2UUw3T0o5aStScFp4bkJzdUph?=
+ =?utf-8?B?Q0ZONFA1VzJaMk5jdUFUcXYrSWQrWURxNW9XMWhvRjhOQXpSeXBQblg3dk9S?=
+ =?utf-8?B?TzMxK2U4bmxpclMrWitCM0sxRHFJeDQxeWNnQjA5NmduSTBRbDFZWVFRek8w?=
+ =?utf-8?B?Qkt1QzNwd0lOSDMrMXNRSStvK3Z1QUovdm1RQmJSTnpaNEJiUDZiRHhnTDE2?=
+ =?utf-8?B?R3hLaXhRNm82NTc2NnJOaC9ic2NZQnFaeFFjQ0lCSzUrcDMzMjBydHlzU1BB?=
+ =?utf-8?B?SnJ6OXNQZWFlRXk5Tmo1d3krZGZXOVAwOWdIb2hYYTFQNXRHdkdsM2ppbzhn?=
+ =?utf-8?B?VnRLNUtCTW51SmVmWEVKQVdMNnUrR1R6T252MTFDV2E5VkxEVmFoRGZFdmh1?=
+ =?utf-8?B?NWNhR0pUcXhoU01oOFlVNUhSaHZUQloxZzdvYXNSOE9IQk9ldkI2YmpESTI2?=
+ =?utf-8?B?Q3ozcFRhcGN2bVptZ1RYK2hGTnppWmVQbmVUa1d6UkJYdlduNG9mNW5PWHln?=
+ =?utf-8?B?TFhsS2tiaDBhWGJONEU1K2RHSGFPbVFDQW1rSUsyQU1WYTN2TVdBV0F5RnND?=
+ =?utf-8?B?YWJQeisyNG13aGFrOHpXUXZteE0vbWZ6dWJSRjVQT2xkdFdxM25nVXJsT2w5?=
+ =?utf-8?B?RC93amthMlRzRkpJZXlCNWY1NnFMMWVzNG52Q0VVcFJVUlNqaFBrNHB5Rmcv?=
+ =?utf-8?B?Y0k0c2RJM2hxSVVkSWJqQmJVeFVGUmdOK0kybENGVHBiUGNza3dXeVRnOXNV?=
+ =?utf-8?B?VlNscHJLKzdSeTNGT0dMdDZPb01ab0VZaHAyclA2TGNCcTlmdWNINDR5M2xX?=
+ =?utf-8?B?bkhwMWQ3NzZZQ01adGw3b2wzVzlSTXY3R0sveVFWTGNKaGdGVVJ1SXRYVytR?=
+ =?utf-8?B?SjMzWXBKS01TMW5Gdml1VHNiZDdmTzZTcThra0pvNnN5aHhPTXVYVkhaNmRH?=
+ =?utf-8?B?cjRFaVRTWExlRFpCbGVOeTRUTXdhYXlNSFBySFREc2U5bXZlczI1ekpPVjV2?=
+ =?utf-8?B?aDMyNzhKM0NSRkNKclJjZ3drT2YyclBEbHBQNGluM0lEajJKbU82QmZmYksv?=
+ =?utf-8?B?TkdKRTE4MXplWWNFY0pLbTNDT20rRG9iaTRNNk1HMnhrbGlzWTJTVUdLYnR4?=
+ =?utf-8?B?aElFbC9kcXpRM3RmRTJKNDZ1T2RzR0UyT2V1eW80a3pTSmFYUnN0SjZrVnF2?=
+ =?utf-8?B?T2Z1VUY2ZGRBNVhPeTFRSnU2aHgrSnViSUR1eURWeW53RVQ5blBOUWRFY1Bk?=
+ =?utf-8?B?aXdHU0N1UWpTTU5BYnI1R3J6NStlazVtZVpmNWpqODRUVm1vUmFiT3l0NGJK?=
+ =?utf-8?B?WlVMek5wQkJBbUNNYWNwSU5VMlhtWURuZ2dEb2JFYlBmSFBneXJQd3BxTmlD?=
+ =?utf-8?B?VU5TYy9KU3F5MlpOVGx1MTZmV3dFek8vQ3ZES0Yvd1YydkRSR21PQnpkbkhG?=
+ =?utf-8?B?NXRjOGlDZ3phVFNrYVkwS2crcW5wKzRYaXV3Q1UvVHFNSURXS2xuYkRHdU9w?=
+ =?utf-8?B?aEdzallXYVdxUFBKOWNzcGU3VmlhWkxqWEV6eTQ3WThOVVpqdkIyL3pTbklY?=
+ =?utf-8?Q?g4ygKfDz+6H9O9/ng8H8KOM=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 53b0b2e7-cee1-4934-e4b8-08ddde3235ee
+X-MS-Exchange-CrossTenant-AuthSource: SJ1PR11MB6129.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Aug 2025 08:35:39.9189
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ALe5jsBbLfmNUyukInQApy4ppPCrYb729YalmHNvLnZohRXSG1AYHENF7njYVjgcT7CvgAlqxAVqblLennzcdduTMcDNqc2212NynKJYdE4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH3PPFE80710477
+X-OriginatorOrg: intel.com
 
-On Mon, Aug 18, 2025 at 04:10:32PM +0800, Yu Kuai wrote:
-> Why? We just set the flag for mdraid disks first, and then inherit to
-> top devices that is stacked by mdraid, so md raid limits should always
-> be relevant. I still don't understand the problem that you said :(
+Hello Julian,
 
-The point is the fact how mdraid calculates the opt_io is somewhere
-between ireelevant and wrong for any layer above.  The layers above
-just care about the value.  And to calculate the value you don't
-need a special flag.  mdraid can simply override io_opt (or better
-max_hw_sectors) after stacking the lower level devices with a few
-lines of code (and hopefully a good comment).
+Hope you are doing well. I am Chaitanya from the linux graphics team in 
+Intel.
 
+This mail is regarding a regression we are seeing in our CI runs[1] on
+linux-next repository.
+
+Since the version next-20250814 [2], we are seeing the following regression
+
+`````````````````````````````````````````````````````````````````````````````````
+<4>[   25.645493] ======================================================
+<4>[   25.645497] WARNING: possible circular locking dependency detected
+<5>[   25.645501] 6.17.0-rc2-next-20250818-next-20250818-g3ac864c2d9bb+ 
+#1 Not tainted
+<4>[   25.645506] ------------------------------------------------------
+<4>[   25.645509] swapper/0/1 is trying to acquire lock:
+<5>[   25.645513] ffffffff83488270 (cpu_hotplug_lock){++++}-{0:0}, at: 
+static_key_slow_inc+0x12/0x30
+<4>[   25.645526]
+                   but task is already holding lock:
+<5>[   25.645529] ffff8881063fce30 
+(&q->q_usage_counter(io)){++++}-{0:0}, at: 
+blk_mq_freeze_queue_nomemsave+0x12/0x30
+<4>[   25.645540]
+                   which lock already depends on the new lock.
+
+<4>[   25.645545]
+                   the existing dependency chain (in reverse order) is:
+<5>[   25.645549]
+                   -> #2 (&q->q_usage_counter(io)){++++}-{0:0}:
+<5>[   25.645554]        blk_alloc_queue+0x324/0x360
+<5>[   25.645560]        blk_mq_alloc_queue+0x6a/0xe0
+<5>[   25.645564]        __blk_mq_alloc_disk+0x19/0x70
+<5>[   25.645567]        loop_add+0x240/0x430
+<5>[   25.645573]        loop_init+0xcd/0x190
+<5>[   25.645576]        do_one_initcall+0x5d/0x3f0
+<5>[   25.645581]        kernel_init_freeable+0x3cd/0x6a0
+<5>[   25.645586]        kernel_init+0x1b/0x200
+<5>[   25.645591]        ret_from_fork+0x26c/0x2e0
+<5>[   25.645597]        ret_from_fork_asm+0x1a/0x30
+`````````````````````````````````````````````````````````````````````````````````
+Details log can be found in [3].
+
+After bisecting the tree, the following patch [4] seems to be the first 
+"bad" commit
+
+`````````````````````````````````````````````````````````````````````````````````````````````````````````
+commit 8f5845e0743bf3512b71b3cb8afe06c192d6acc4
+Author: Julian Sun sunjunchao2870@gmail.com
+Date:   Tue Aug 12 23:42:57 2025 +0800
+
+     block: restore default wbt enablement
+`````````````````````````````````````````````````````````````````````````````````````````````````````````
+
+We also verified that if we revert the patch the issue is not seen.
+
+Could you please check why the patch causes this regression and provide 
+a fix if necessary?
+
+Thank you.
+
+Regards
+
+Chaitanya
+
+[1]
+https://intel-gfx-ci.01.org/tree/linux-next/combined-alt.html?
+[2] 
+https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/commit/?h=next-20250814
+[3] 
+https://intel-gfx-ci.01.org/tree/linux-next/next-20250818/bat-twl-1/boot0.txt
+[4] 
+https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/commit/?h=next-20250818&id=8f5845e0743bf3512b71b3cb8afe06c192d6acc4
