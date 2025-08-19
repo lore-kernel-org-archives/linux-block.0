@@ -1,44 +1,44 @@
-Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30A352E228A
-	for <linux-block@vger.kernel.org>; Tue, 19 Aug 2025 17:10:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7100F2E228F
+	for <linux-block@vger.kernel.org>; Tue, 19 Aug 2025 17:10:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755623457; cv=none; b=NIotqlEvScUJw5wSeVQVQ797xYAGtf2alkZdNUZlthFFIeO7aLRAg5heOqYgyGuVcO4DMfHR1YxCRCKdHkf04mrhzhpdbOIShCGMT29oOy21Ahu/1MFrNK3iL7q9AsbB1HDxmSxqeugEVXIo86+5g5NVt+nMYwLsBNRkLp0Hqp8=
+	t=1755623457; cv=none; b=IfydZ9CkIIVZR14bcX7YXwNIefSxhukRd826yZ6AVUYpek8rk3sq8zcVCXn+HQerpGBfe8qmR8XqnnLgsRPYykkg3V2WoKHD3MDGvgXaJP5F5+8E0NFWLdm0omm2cm3d+JnkAIwOBFerOsMaZmaPJuOIbvvaWSqgZMyNrdNNt8c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1755623457; c=relaxed/simple;
-	bh=S4vQX7nEjyr+gyq3Etz01avtlyUujeeIa9MCb69MHzE=;
+	bh=RbrhOuJtcgUJ4xVUhXL4NkIPfBy/mVL25lx3D6+LRlI=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uhwhjbkiBSOfH/YVQTRCN4i4RIUvdUIciIs3K3A8UMppvWuo2HzmjkGY6xeoJctigu8Yq70aSNONfPGn6bL+8rtM4TpT81ezrA2p/eOpksYRn/9h5A9Zn9Udmh1FZeHA5chqQMTDrnEKmhFUf/O57xwVkv7CaWwdjRPnUuZEIts=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=Z8Ai8BrU; arc=none smtp.client-ip=67.231.153.30
+	 MIME-Version:Content-Type; b=ngK3EJ6LEu+kMuNv3VebMkE6AN7e7tU6jZfxlgh1eOxao9R/Indb7gIfkRg70hkporxKBQi2/0pW/HCHwquNojCUXhkur3KkTJVuHYPVMDyYc+xCBn5RHUrPNreMXu6O+fSAZUaEZUqX2TQCrUk+WNvifT22+9VOI7ujVOd295E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=ZujSxYNz; arc=none smtp.client-ip=67.231.145.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="Z8Ai8BrU"
-Received: from pps.filterd (m0109331.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 57JF9hRU1378473
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="ZujSxYNz"
+Received: from pps.filterd (m0109334.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 57JF41SR1371581
 	for <linux-block@vger.kernel.org>; Tue, 19 Aug 2025 10:10:55 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
 	:content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=s2048-2025-q2;
-	 bh=YO0nQZjnXIP++9cJOqBf7rWHiXHgArifu5XawG4IlPY=; b=Z8Ai8BrUUt8z
-	Ni29+/2I7MqwIp3XHtmtEF2dXny5IzLI3e5RK/Dec8v5rxlH2WLHnbA1Jo3tjNgW
-	c3Ewaoh8IVSfTGS/hjNULiYeSYX8K4tGAkkiI9/eJjnBM5FNjaqMZ70SCs4bbw2R
-	OqShsTcNusVMDs+OU7yNwm0WgRuiu96AOZH8L0x3xtciqtkouRqit1F2rTNytu3X
-	UHBXX0nhltTMzfmCQ2QxSPoj0yeAeFjKuc5DQ+46sQYXXQ9KlXRmDF6LSag52JcS
-	rFELH64+G3YLEYK2JecvGgOa9kRj5r6bNSQyNdG0KJzzjd6WR1Yh5dSO4QDzTe6y
-	WynDN4Lb8A==
+	 bh=XutiaynC6eIHmdhILbieOgn8SY0Trp2AHm3YNayem8g=; b=ZujSxYNziiZq
+	4PLdFniG/YpNpnlucTFS1uAA3TPLnM4hrPqsAb1pKaiW8j9Us7RDhK1zHDhhNjHZ
+	sQMtFAnWjnDkRGyvutNV0bfdvEDzDxtRLNszmykwL4SlxWQwmEW7IKiznI6AUund
+	5K7m5IiW+mUIPX8IV+JZjKJZ8tziIEbQWc4xGhzs5hHS3r4Oc2jnajkdWislituT
+	ZgGQRgMLT0izsp19+UKXkcg2fsToOeP8458CKuEXEfIIarn6v8i/S5y8vl5WUgTJ
+	A5YqKWap3HCT032WoHXY8Z/AGQLYlu37cZiOBFbt4GEjyxvmNGPiu5TraMmiwewc
+	hPmDpU/EeQ==
 Received: from maileast.thefacebook.com ([163.114.135.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 48munps719-14
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 48mujxs8b6-7
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Tue, 19 Aug 2025 10:10:54 -0700 (PDT)
+	for <linux-block@vger.kernel.org>; Tue, 19 Aug 2025 10:10:55 -0700 (PDT)
 Received: from twshared17671.07.ash8.facebook.com (2620:10d:c0a8:fe::f072) by
- mail.thefacebook.com (2620:10d:c0a9:6f::8fd4) with Microsoft SMTP Server
+ mail.thefacebook.com (2620:10d:c0a9:6f::237c) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
  15.2.2562.17; Tue, 19 Aug 2025 17:10:50 +0000
 Received: by devbig197.nha3.facebook.com (Postfix, from userid 544533)
-	id A1186C89F2D; Tue, 19 Aug 2025 09:49:48 -0700 (PDT)
+	id 83583C89F27; Tue, 19 Aug 2025 09:49:48 -0700 (PDT)
 From: Keith Busch <kbusch@meta.com>
 To: <linux-block@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>
@@ -47,9 +47,9 @@ CC: <snitzer@kernel.org>, <axboe@kernel.dk>, <dw@davidwei.uk>,
         <djwong@kernel.org>, <linux-xfs@vger.kernel.org>,
         <viro@zeniv.linux.org.uk>, Keith Busch <kbusch@kernel.org>,
         Hannes Reinecke <hare@suse.de>
-Subject: [PATCHv3 6/8] block: remove bdev_iter_is_aligned
-Date: Tue, 19 Aug 2025 09:49:20 -0700
-Message-ID: <20250819164922.640964-7-kbusch@meta.com>
+Subject: [PATCHv3 4/8] block: simplify direct io validity check
+Date: Tue, 19 Aug 2025 09:49:18 -0700
+Message-ID: <20250819164922.640964-5-kbusch@meta.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20250819164922.640964-1-kbusch@meta.com>
 References: <20250819164922.640964-1-kbusch@meta.com>
@@ -62,52 +62,51 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 X-FB-Internal: Safe
 Content-Type: text/plain
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODE5MDE2MCBTYWx0ZWRfX6J+QGACdx/wl
- x9CbxfSsPWuBsachxPc0+v+5ooQ9HHPoqTeXRSDwSyNNRi3Bk9d6TvW5MlN/yKKMZMDEG5PPlb1
- 3cNrfug/PW0xTefGHCXXC2+PQ6eiko1TzwwZJFYQrR60kpjwJDv3DoTEiqMrqBUjBOQUZLYSx6L
- 6qJIkhhiQX+u7YiM/d9zNDljqLOG4uTf7bcHbl+K0nWZgtxHEYaeuh4vbVZyREZydi/BDW3n45P
- lfPy3UTlSaXktj2ieUHgzpy5CedTunrObW9iiGBJloCNDP6b1GC5s1DE+QSaaXfwnd5koHUrOWI
- DDftx2e+leCnUqum/GLtoYluFgjvGpyNB3P9cUP5nlNUsqRza/1O3638397AAo3S3x2uWy4maHD
- 5o3gjlHcfX6tPi91L9sfmqb8mTla6g6hkRxLFzCViIJcvUuDZcaqWWkmWyCLLGTpIJQYaGrF
-X-Proofpoint-GUID: Bnflc-ZTtKZwGeI2rEOyr2Fqv209LsTr
-X-Proofpoint-ORIG-GUID: Bnflc-ZTtKZwGeI2rEOyr2Fqv209LsTr
-X-Authority-Analysis: v=2.4 cv=O/85vA9W c=1 sm=1 tr=0 ts=68a4b01f cx=c_pps
+X-Proofpoint-ORIG-GUID: kU5lBO_PrVIy69To62ouMYjusFVBkkwF
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODE5MDE2MCBTYWx0ZWRfXwsvV1zcVIcd6
+ Vfpur/H2B/guxcf64D6Yl39SISg9vSktmHsdvtTpoY0/tvnUwbLZhrNiaombmvcDF73J4FyQ0rf
+ N38WFKBSKigg/j/7pvqcy+HfwRj642N91rubm2lWpITP+zpMymWYYPKnjEe8RNk9HHKtFqKghsX
+ OO05GlB9zik3CzjCetDHxxAnWs39Tr+zkKspPF6mL6tejV0cY5vgjcihuH1g1FT8poLcy4RyC09
+ y5Y//bbGqZYyjv/q8qN4CJ4Ay9o1WEx8CuuEpMed2acz3CM8bE+SpQqTqO/F1Bx5RvQNz0tqsB6
+ hPGQ0lLXvZC+MMBmArHZmDr6omlWWiSoWLe0qAIvPQMZvvJUEwVNa4SU1o7vDb4P0inJhWkT+PE
+ 85COVFBZjtT/5w5ZN9UdbaAD9rI77Lb2EKl4Nx5YbRqRE4PoAXhqKmzrflPYYtXW1Pz2YApO
+X-Proofpoint-GUID: kU5lBO_PrVIy69To62ouMYjusFVBkkwF
+X-Authority-Analysis: v=2.4 cv=VMTdn8PX c=1 sm=1 tr=0 ts=68a4b01f cx=c_pps
  a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17
- a=2OwXVqhp2XgA:10 a=VwQbUJbxAAAA:8 a=yPCof4ZbAAAA:8 a=x-sBDG6hxYFL5DTe09MA:9
+ a=2OwXVqhp2XgA:10 a=VwQbUJbxAAAA:8 a=yPCof4ZbAAAA:8 a=wgemLMbJKI-cAGOf0tMA:9
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
  definitions=2025-08-19_02,2025-08-14_01,2025-03-28_01
 
 From: Keith Busch <kbusch@kernel.org>
 
-No more callers.
+The block layer checks all the segments for validity later, so no need
+for an early check. Just reduce it to a simple position and total length
+check, and defer the more invasive segment checks to the block layer.
 
 Signed-off-by: Keith Busch <kbusch@kernel.org>
 Reviewed-by: Hannes Reinecke <hare@suse.de>
 Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
 ---
- include/linux/blkdev.h | 7 -------
- 1 file changed, 7 deletions(-)
+ block/fops.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 7f83ad2df5425..a2128af3f08cf 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1589,13 +1589,6 @@ static inline unsigned int bdev_dma_alignment(stru=
-ct block_device *bdev)
- 	return queue_dma_alignment(bdev_get_queue(bdev));
+diff --git a/block/fops.c b/block/fops.c
+index 6d5c1e680d4a7..32a8e6fdc7338 100644
+--- a/block/fops.c
++++ b/block/fops.c
+@@ -38,8 +38,8 @@ static blk_opf_t dio_bio_write_op(struct kiocb *iocb)
+ static bool blkdev_dio_invalid(struct block_device *bdev, struct kiocb *=
+iocb,
+ 				struct iov_iter *iter)
+ {
+-	return iocb->ki_pos & (bdev_logical_block_size(bdev) - 1) ||
+-		!bdev_iter_is_aligned(bdev, iter);
++	return (iocb->ki_pos | iov_iter_count(iter)) &
++			(bdev_logical_block_size(bdev) - 1);
  }
 =20
--static inline bool bdev_iter_is_aligned(struct block_device *bdev,
--					struct iov_iter *iter)
--{
--	return iov_iter_is_aligned(iter, bdev_dma_alignment(bdev),
--				   bdev_logical_block_size(bdev) - 1);
--}
--
- static inline unsigned int
- blk_lim_dma_alignment_and_pad(struct queue_limits *lim)
- {
+ #define DIO_INLINE_BIO_VECS 4
 --=20
 2.47.3
 
