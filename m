@@ -1,141 +1,222 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AB3430F520;
-	Tue, 19 Aug 2025 17:39:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA38A30E0E6
+	for <linux-block@vger.kernel.org>; Tue, 19 Aug 2025 17:41:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755625141; cv=none; b=kAixRL4my1nXHgx4h17OkFiaciHjmCGgLreyvxQVsp7kO+LmVicMLl+uQkEpbnHo/O0yS0ZPt+aKBEJGIyW/ldkFir4wA3C96azFsdHfEruphTX+8ofj8cKNRFkaGJoUs1ByCz4a4yTNAb2+20aIZrJc+m4vkFgXe8w2Sv2Xt5g=
+	t=1755625305; cv=none; b=iyTwWc72BpurzLvdRFAW11/tUzDapqKKynDKMfizNoOZdvitNxC64S2OYeSkaFIQNlhZkNSbqgda7oHZ8h1ffmhY2zKuWzMvqAdCmhBEsyvpCz/hjcVerzDHqsh+rof1cmw+8nySPYJgFC5QlkGBD0IsJn0Y8YqXKGJOr0n/quQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755625141; c=relaxed/simple;
-	bh=shzOb9LxCd4j9ffIAYJARd3Ll/bIHN63Rdsm8jF6HN0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=li0Za4uyQ1tRHewOlMQfUPuJnpj4SP03LGx95e8pS0bf5vc9USfxR30f4RbLCaG7i6WpqJqQJr647uHv1wtIrYafFjGsgwcOIwQw5iZ2XfCkjgNvWqWR5vV3zvSkJHc90m4vGxV607ft0z3NZp/IE7Hfhja8OC1b6rFiTowvLqk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hP0G8Q00; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1755625305; c=relaxed/simple;
+	bh=1ZNp140wpq9E0WCbWIbOnetHmPL+ZOGkE6FAFmKO0mo=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=dgTZEImxhlHrgs63AQHj+c/7PupzPRs8V9uo74PrGyze3BcOXfPL1wDI8M1ASBPWGQgUxVVoxlwJ9fhsFsNMoHGSsMO5pDLdrb2BGSMw5YQIw3TuJRsbdq7cjxEIk9athd7ycxPYmZ8BW5QTIzzzm3438/NfQy7XDa7NGQuYqD0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=agrYEziu; arc=none smtp.client-ip=67.231.153.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hP0G8Q00"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A44ECC113D0;
-	Tue, 19 Aug 2025 17:38:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755625141;
-	bh=shzOb9LxCd4j9ffIAYJARd3Ll/bIHN63Rdsm8jF6HN0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=hP0G8Q00yNTh5FfM8EvmXjWXPCW1VAkoQrIqWO2opf8nY5Pp8kyRoAQ5sJbskFxHe
-	 Dpw2oE6bb6R9DP3zDSAoqrpgkr4LknFTjksf2ZVtrQBA00wb60mjNgoeDWPO1iTMvR
-	 mOZkqJAPBVE7i3vpf3SqAKzTQw9K5Rc7DptngH5viddKvezFNMaYxTj51UPsnXjIa2
-	 zH66GE5Ky5jjWEuNnqpxi+DfDo3WTnC7VWe1CnDp489D3vz6rDN4s4/RlMVvekkmmH
-	 q8YXIBSj9tnBwBYbvKw41cRhfgSA56D3XB40ha8nKdeMey7WqJRapAA4sbPWPZyDe2
-	 vdbwCoOpeQYmA==
-From: Leon Romanovsky <leon@kernel.org>
-To: Marek Szyprowski <m.szyprowski@samsung.com>
-Cc: Leon Romanovsky <leonro@nvidia.com>,
-	Jason Gunthorpe <jgg@nvidia.com>,
-	Abdiel Janulgue <abdiel.janulgue@gmail.com>,
-	Alexander Potapenko <glider@google.com>,
-	Alex Gaynor <alex.gaynor@gmail.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Christoph Hellwig <hch@lst.de>,
-	Danilo Krummrich <dakr@kernel.org>,
-	iommu@lists.linux.dev,
-	Jason Wang <jasowang@redhat.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Joerg Roedel <joro@8bytes.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Juergen Gross <jgross@suse.com>,
-	kasan-dev@googlegroups.com,
-	Keith Busch <kbusch@kernel.org>,
-	linux-block@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org,
-	linux-nvme@lists.infradead.org,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-trace-kernel@vger.kernel.org,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Robin Murphy <robin.murphy@arm.com>,
-	rust-for-linux@vger.kernel.org,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Stefano Stabellini <sstabellini@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	virtualization@lists.linux.dev,
-	Will Deacon <will@kernel.org>,
-	xen-devel@lists.xenproject.org
-Subject: [PATCH v4 16/16] nvme-pci: unmap MMIO pages with appropriate interface
-Date: Tue, 19 Aug 2025 20:37:00 +0300
-Message-ID: <545fffb8c364f36102919a5a1d57137731409f3c.1755624249.git.leon@kernel.org>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <cover.1755624249.git.leon@kernel.org>
-References: <cover.1755624249.git.leon@kernel.org>
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="agrYEziu"
+Received: from pps.filterd (m0089730.ppops.net [127.0.0.1])
+	by m0089730.ppops.net (8.18.1.11/8.18.1.11) with ESMTP id 57JFU4iP1487543
+	for <linux-block@vger.kernel.org>; Tue, 19 Aug 2025 10:41:41 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=s2048-2025-q2;
+	 bh=DCB4Rysuy/Bzw8Dv3uCiD4OHIvxqMr6/GXx8GXcfYy4=; b=agrYEziufep9
+	UFy+WESa0X2OPIDrK8m0zgOnd5SruHnhIo6IPpNKhWkHEVS4rcE+VOlNSH32k67k
+	MghyDTYYAbWlCNZoEh6xuIWNmPGMQAZ/YB2UyLogKXaHI4Z30tpn/4eMclxe9681
+	JTYV0rmoArX9lIqnbnSpGdJ0bs3VHNcm1RexZxzuelBz29hHtdiprcr7rKKPhymN
+	s1WGTVsfTrNWhJ98wl2D81UD8s7dUgkFaYrjbhDYZL5AmNk2t52iEGdSfde5wQHS
+	6kiBDt+AyfAMmQznOquwbD7Ky200xwWQbKF3aZF6d0h06PEStV02+fdLNI76zMVi
+	Zk/xvGeTNQ==
+Received: from maileast.thefacebook.com ([163.114.135.16])
+	by m0089730.ppops.net (PPS) with ESMTPS id 48muy91amd-5
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <linux-block@vger.kernel.org>; Tue, 19 Aug 2025 10:41:41 -0700 (PDT)
+Received: from twshared10560.01.ash9.facebook.com (2620:10d:c0a8:1b::30) by
+ mail.thefacebook.com (2620:10d:c0a9:6f::237c) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.17; Tue, 19 Aug 2025 17:41:39 +0000
+Received: by devbig197.nha3.facebook.com (Postfix, from userid 544533)
+	id B83EDC89F31; Tue, 19 Aug 2025 09:49:48 -0700 (PDT)
+From: Keith Busch <kbusch@meta.com>
+To: <linux-block@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+CC: <snitzer@kernel.org>, <axboe@kernel.dk>, <dw@davidwei.uk>,
+        <brauner@kernel.org>, <hch@lst.de>, <martin.petersen@oracle.com>,
+        <djwong@kernel.org>, <linux-xfs@vger.kernel.org>,
+        <viro@zeniv.linux.org.uk>, Keith Busch <kbusch@kernel.org>,
+        Hannes Reinecke <hare@suse.de>
+Subject: [PATCHv3 8/8] iov_iter: remove iov_iter_is_aligned
+Date: Tue, 19 Aug 2025 09:49:22 -0700
+Message-ID: <20250819164922.640964-9-kbusch@meta.com>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20250819164922.640964-1-kbusch@meta.com>
+References: <20250819164922.640964-1-kbusch@meta.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+Content-Type: text/plain
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODE5MDE2MyBTYWx0ZWRfX1BmlsDc9d5lj
+ RsEy9V6LxYPtTOTch9lb9wu8lJizI0ifsKKwZRAp2xwaklbl9lW+lxoGzA7hChKCe3xCu62En11
+ uu5TjCYEX3u4vKEyQtGS+XzqgTLlJ0B7R4NpZTK4LxATePwiljkFESaSZucNhxcyGin49b6M5Ty
+ DKEKOOxx+k+rDbLfeHOwfbcKsiiQymj/wltTNvci5z3UCshNxjSHKhJDd5ucEFZyyNbxuOlEHTk
+ 6uODbESrcGPV4Wv7uNBY2hoOcRY60QH7NlFzjEO0iVZiluie8awyV7Mk3drTHSLHDxpbrTyQguj
+ PMEYdM/AIaREhQxI3DvX1TRuhCz7ILuVnSAjreWOBoRLeCt3P+AhEWxc1JHm0YY21ApsIQah/OS
+ BUpispetdZJuf/iZeY11muOr7uUKlEvxNv2WuQxnmmhZ8Eazn5JXPnxn+vLnc6Xm4y2RUf69
+X-Proofpoint-GUID: phQUuzHwFh1tu9YEjR44QmnLU9ypDVZg
+X-Proofpoint-ORIG-GUID: phQUuzHwFh1tu9YEjR44QmnLU9ypDVZg
+X-Authority-Analysis: v=2.4 cv=Qatmvtbv c=1 sm=1 tr=0 ts=68a4b755 cx=c_pps
+ a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17
+ a=2OwXVqhp2XgA:10 a=VwQbUJbxAAAA:8 a=yPCof4ZbAAAA:8 a=S-mNSWGAXQVMvOK0xjcA:9
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-08-19_02,2025-08-14_01,2025-03-28_01
 
-From: Leon Romanovsky <leonro@nvidia.com>
+From: Keith Busch <kbusch@kernel.org>
 
-Block layer maps MMIO memory through dma_map_phys() interface
-with help of DMA_ATTR_MMIO attribute. There is a need to unmap
-that memory with the appropriate unmap function, something which
-wasn't possible before adding new REQ attribute to block layer in
-previous patch.
+No more callers.
 
-Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+Signed-off-by: Keith Busch <kbusch@kernel.org>
+Reviewed-by: Hannes Reinecke <hare@suse.de>
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
 ---
- drivers/nvme/host/pci.c | 18 +++++++++++++-----
- 1 file changed, 13 insertions(+), 5 deletions(-)
+ include/linux/uio.h |  2 -
+ lib/iov_iter.c      | 95 ---------------------------------------------
+ 2 files changed, 97 deletions(-)
 
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index 2c6d9506b172..f8ecc0e0f576 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -682,11 +682,15 @@ static void nvme_free_prps(struct request *req)
+diff --git a/include/linux/uio.h b/include/linux/uio.h
+index 2e86c653186c6..5b127043a1519 100644
+--- a/include/linux/uio.h
++++ b/include/linux/uio.h
+@@ -286,8 +286,6 @@ size_t _copy_mc_to_iter(const void *addr, size_t byte=
+s, struct iov_iter *i);
+ #endif
+=20
+ size_t iov_iter_zero(size_t bytes, struct iov_iter *);
+-bool iov_iter_is_aligned(const struct iov_iter *i, unsigned addr_mask,
+-			unsigned len_mask);
+ unsigned long iov_iter_alignment(const struct iov_iter *i);
+ unsigned long iov_iter_gap_alignment(const struct iov_iter *i);
+ void iov_iter_init(struct iov_iter *i, unsigned int direction, const str=
+uct iovec *iov,
+diff --git a/lib/iov_iter.c b/lib/iov_iter.c
+index f9193f952f499..2fe66a6b8789e 100644
+--- a/lib/iov_iter.c
++++ b/lib/iov_iter.c
+@@ -784,101 +784,6 @@ void iov_iter_discard(struct iov_iter *i, unsigned =
+int direction, size_t count)
+ }
+ EXPORT_SYMBOL(iov_iter_discard);
+=20
+-static bool iov_iter_aligned_iovec(const struct iov_iter *i, unsigned ad=
+dr_mask,
+-				   unsigned len_mask)
+-{
+-	const struct iovec *iov =3D iter_iov(i);
+-	size_t size =3D i->count;
+-	size_t skip =3D i->iov_offset;
+-
+-	do {
+-		size_t len =3D iov->iov_len - skip;
+-
+-		if (len > size)
+-			len =3D size;
+-		if (len & len_mask)
+-			return false;
+-		if ((unsigned long)(iov->iov_base + skip) & addr_mask)
+-			return false;
+-
+-		iov++;
+-		size -=3D len;
+-		skip =3D 0;
+-	} while (size);
+-
+-	return true;
+-}
+-
+-static bool iov_iter_aligned_bvec(const struct iov_iter *i, unsigned add=
+r_mask,
+-				  unsigned len_mask)
+-{
+-	const struct bio_vec *bvec =3D i->bvec;
+-	unsigned skip =3D i->iov_offset;
+-	size_t size =3D i->count;
+-
+-	do {
+-		size_t len =3D bvec->bv_len - skip;
+-
+-		if (len > size)
+-			len =3D size;
+-		if (len & len_mask)
+-			return false;
+-		if ((unsigned long)(bvec->bv_offset + skip) & addr_mask)
+-			return false;
+-
+-		bvec++;
+-		size -=3D len;
+-		skip =3D 0;
+-	} while (size);
+-
+-	return true;
+-}
+-
+-/**
+- * iov_iter_is_aligned() - Check if the addresses and lengths of each se=
+gments
+- * 	are aligned to the parameters.
+- *
+- * @i: &struct iov_iter to restore
+- * @addr_mask: bit mask to check against the iov element's addresses
+- * @len_mask: bit mask to check against the iov element's lengths
+- *
+- * Return: false if any addresses or lengths intersect with the provided=
+ masks
+- */
+-bool iov_iter_is_aligned(const struct iov_iter *i, unsigned addr_mask,
+-			 unsigned len_mask)
+-{
+-	if (likely(iter_is_ubuf(i))) {
+-		if (i->count & len_mask)
+-			return false;
+-		if ((unsigned long)(i->ubuf + i->iov_offset) & addr_mask)
+-			return false;
+-		return true;
+-	}
+-
+-	if (likely(iter_is_iovec(i) || iov_iter_is_kvec(i)))
+-		return iov_iter_aligned_iovec(i, addr_mask, len_mask);
+-
+-	if (iov_iter_is_bvec(i))
+-		return iov_iter_aligned_bvec(i, addr_mask, len_mask);
+-
+-	/* With both xarray and folioq types, we're dealing with whole folios. =
+*/
+-	if (iov_iter_is_xarray(i)) {
+-		if (i->count & len_mask)
+-			return false;
+-		if ((i->xarray_start + i->iov_offset) & addr_mask)
+-			return false;
+-	}
+-	if (iov_iter_is_folioq(i)) {
+-		if (i->count & len_mask)
+-			return false;
+-		if (i->iov_offset & addr_mask)
+-			return false;
+-	}
+-
+-	return true;
+-}
+-EXPORT_SYMBOL_GPL(iov_iter_is_aligned);
+-
+ static unsigned long iov_iter_alignment_iovec(const struct iov_iter *i)
  {
- 	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
- 	struct nvme_queue *nvmeq = req->mq_hctx->driver_data;
-+	unsigned int attrs = 0;
- 	unsigned int i;
- 
-+	if (req->cmd_flags & REQ_MMIO)
-+		attrs = DMA_ATTR_MMIO;
-+
- 	for (i = 0; i < iod->nr_dma_vecs; i++)
--		dma_unmap_page(nvmeq->dev->dev, iod->dma_vecs[i].addr,
--				iod->dma_vecs[i].len, rq_dma_dir(req));
-+		dma_unmap_phys(nvmeq->dev->dev, iod->dma_vecs[i].addr,
-+				iod->dma_vecs[i].len, rq_dma_dir(req), attrs);
- 	mempool_free(iod->dma_vecs, nvmeq->dev->dmavec_mempool);
- }
- 
-@@ -699,15 +703,19 @@ static void nvme_free_sgls(struct request *req)
- 	unsigned int sqe_dma_len = le32_to_cpu(iod->cmd.common.dptr.sgl.length);
- 	struct nvme_sgl_desc *sg_list = iod->descriptors[0];
- 	enum dma_data_direction dir = rq_dma_dir(req);
-+	unsigned int attrs = 0;
-+
-+	if (req->cmd_flags & REQ_MMIO)
-+		attrs = DMA_ATTR_MMIO;
- 
- 	if (iod->nr_descriptors) {
- 		unsigned int nr_entries = sqe_dma_len / sizeof(*sg_list), i;
- 
- 		for (i = 0; i < nr_entries; i++)
--			dma_unmap_page(dma_dev, le64_to_cpu(sg_list[i].addr),
--				le32_to_cpu(sg_list[i].length), dir);
-+			dma_unmap_phys(dma_dev, le64_to_cpu(sg_list[i].addr),
-+				le32_to_cpu(sg_list[i].length), dir, attrs);
- 	} else {
--		dma_unmap_page(dma_dev, sqe_dma_addr, sqe_dma_len, dir);
-+		dma_unmap_phys(dma_dev, sqe_dma_addr, sqe_dma_len, dir, attrs);
- 	}
- }
- 
--- 
-2.50.1
+ 	const struct iovec *iov =3D iter_iov(i);
+--=20
+2.47.3
 
