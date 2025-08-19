@@ -1,256 +1,213 @@
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A9CE3009C1
-	for <linux-block@vger.kernel.org>; Tue, 19 Aug 2025 17:21:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C62D30C34A;
+	Tue, 19 Aug 2025 17:37:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755624118; cv=none; b=kHvTTlOw/BYGltHL1bw8A0CgLCmmdmrrRcAR5dQTU8+tfG0oph/btyZSBId/PaCO94fuvPxmLjVSLruhi4nVyzlkas4xQVtcHwEQZv+4Xcd+w6wtI3eAG3Ok5Sw3cKe9PNJ9er8Zq+AxqrHMSl3Vg/MYRN9c+/nk5U86a9N0YBE=
+	t=1755625043; cv=none; b=BQxfAUl3W+pQts8W9Jwwj7GhcyHU6X65/nx2V5x3E3HzSvFJYlBkOYqc/p2Q137qZp2RcXaTnYySCl1yimWkG2fNWrA56ZAdm3sZzwYBaQMR3k8c5wX2N9qUwNDiX0xlhiuOqdlXxF7uhY2iaYGo7ux87SnVkmHaESDvgkeAp4M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755624118; c=relaxed/simple;
-	bh=d55kwcRMx1KoVkubZJSar3TZ+kanYObucfAJxZaoZMQ=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=b9aBtUIX7oLl/epLBtmPgB1q1719gFq3Bhi023Hw6mtSqcTqbs9KEWG1Dmdi1MCNxVAPkeTiA+8cVmNemHILlD+cY/JOBrFllu6M8BR6e2C3QKwElkEfrpuKslHG9BVaDyqeWzEXwtTaaGOpWjvpVl1XBrzq4NQ8yDk0YtLRV4g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=u6r1Smmg; arc=none smtp.client-ip=67.231.145.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+	s=arc-20240116; t=1755625043; c=relaxed/simple;
+	bh=PY9smWWJ4JNRFUAjSvtMNJOBqFCsxBLYO5QlYdxwbLE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=umX8jVGp7/E2+tpGM2gpWxcMNSg5QW4LmweGw0NcjakrwkKY3jZrhZpihd93io4U1OdzrRfC9dIfA5Cs3ttGhbcunFw3RL2s2K7MC9pufBQTLSoQOgOYFowvNwptObpR4VOW2UGzBE7OoZi/71pV8xJ0K2BVbn0+pwSHb++ZpAs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nt8pdRow; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="u6r1Smmg"
-Received: from pps.filterd (m0109334.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 57JF48Xd1372251
-	for <linux-block@vger.kernel.org>; Tue, 19 Aug 2025 10:21:55 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=s2048-2025-q2;
-	 bh=ywUH8rzLdPRtLd6zmKAam6emcQcvMZQwGCr+gJt0NgY=; b=u6r1Smmgnqfs
-	yqDHdAABjzqEWMgpdSFpioSXufXTnCSUC0ZtnVKpNYIkfrpawvek17edAmG/QBkd
-	DQv16yPyDrfHIWThvo6MQ38Lp8oAFphp0e1WoiIggvsCsuS+7qxLRITHQ36HH7O8
-	mS5IKh7mLDieOMFckpQmVXIJOdvyjKtrsjeKcg5ELkIiqx7rUtZi1YEE1C+WNqCA
-	Mf0P1fX0FFTdZys4Tx6Z1Z728gLzfAkkkQtZGY6AizXlhUuUfeAygTLIbwUcuy5N
-	fTAm7GGxbCry2D3DAiwZHo9H2JUm8SK1heeuC9alEDMmrHV+Eb4LbNUlaSVDG8dn
-	HNozSjDGHQ==
-Received: from maileast.thefacebook.com ([163.114.135.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 48mujxsbc6-7
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Tue, 19 Aug 2025 10:21:55 -0700 (PDT)
-Received: from twshared52133.15.frc2.facebook.com (2620:10d:c0a8:1b::2d) by
- mail.thefacebook.com (2620:10d:c0a9:6f::237c) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.17; Tue, 19 Aug 2025 17:21:50 +0000
-Received: by devbig197.nha3.facebook.com (Postfix, from userid 544533)
-	id 77208C89F1E; Tue, 19 Aug 2025 09:49:48 -0700 (PDT)
-From: Keith Busch <kbusch@meta.com>
-To: <linux-block@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-CC: <snitzer@kernel.org>, <axboe@kernel.dk>, <dw@davidwei.uk>,
-        <brauner@kernel.org>, <hch@lst.de>, <martin.petersen@oracle.com>,
-        <djwong@kernel.org>, <linux-xfs@vger.kernel.org>,
-        <viro@zeniv.linux.org.uk>, Keith Busch <kbusch@kernel.org>
-Subject: [PATCHv3 2/8] block: add size alignment to bio_iov_iter_get_pages
-Date: Tue, 19 Aug 2025 09:49:16 -0700
-Message-ID: <20250819164922.640964-3-kbusch@meta.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20250819164922.640964-1-kbusch@meta.com>
-References: <20250819164922.640964-1-kbusch@meta.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nt8pdRow"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C7B6C113D0;
+	Tue, 19 Aug 2025 17:37:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755625042;
+	bh=PY9smWWJ4JNRFUAjSvtMNJOBqFCsxBLYO5QlYdxwbLE=;
+	h=From:To:Cc:Subject:Date:From;
+	b=nt8pdRowHseoXvExKasdI0tEDbHSrgizbMB2qlH1aCU/xuu2CZSaOV8+REt27f9GO
+	 87AyElpEj/wX92YaeYkB2ZUeSYzFX7ugQoGONRfzj6gLwHZfXjbZvX+XecnRMSzKxt
+	 XWFXqQ7FRrUCmWN75OAdzO2Bw50CvLG0hQxnk0yj1TPViX5VQGWTcqYi++OUdBQ/MI
+	 77ZymbBVIJT1fBt6mwrJPXADDaD1SHQ2OEMF2BgRWv5a+KqnO7FRcxsxJl834mNp8D
+	 2IaJ0ZC7YC5w/kVg1P0H0R1EvS8ZJSRiF91vJogJyrKxdQR7Akp5/4TKu+iWzc343Q
+	 0jqutLlV5YsRQ==
+From: Leon Romanovsky <leon@kernel.org>
+To: Marek Szyprowski <m.szyprowski@samsung.com>
+Cc: Jason Gunthorpe <jgg@nvidia.com>,
+	Abdiel Janulgue <abdiel.janulgue@gmail.com>,
+	Alexander Potapenko <glider@google.com>,
+	Alex Gaynor <alex.gaynor@gmail.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Christoph Hellwig <hch@lst.de>,
+	Danilo Krummrich <dakr@kernel.org>,
+	iommu@lists.linux.dev,
+	Jason Wang <jasowang@redhat.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Joerg Roedel <joro@8bytes.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Juergen Gross <jgross@suse.com>,
+	kasan-dev@googlegroups.com,
+	Keith Busch <kbusch@kernel.org>,
+	linux-block@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-nvme@lists.infradead.org,
+	linuxppc-dev@lists.ozlabs.org,
+	linux-trace-kernel@vger.kernel.org,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	Robin Murphy <robin.murphy@arm.com>,
+	rust-for-linux@vger.kernel.org,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Stefano Stabellini <sstabellini@kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	virtualization@lists.linux.dev,
+	Will Deacon <will@kernel.org>,
+	xen-devel@lists.xenproject.org
+Subject: [PATCH v4 00/16] dma-mapping: migrate to physical address-based API
+Date: Tue, 19 Aug 2025 20:36:44 +0300
+Message-ID: <cover.1755624249.git.leon@kernel.org>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-FB-Internal: Safe
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: UEiS0dK6mtaUBZQGp2HzUy7tnlXNdph-
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODE5MDE2MSBTYWx0ZWRfX5r4pUPGJC9K8
- 2t6M0odiulaUOF9tZ/pospbs7xQHeFPl1FoAYTp7s5CEYGFrwHApneRVnfCxVoOw58llYbXUD2Y
- /mQn+PRroBzvIJ2+sX2REDUCx+Bcv91v6/jZd2jmppHVPCByq1cYX7t8+GV+QeExsUb3/jJEhl9
- kwm8Qvjfr41zzl4ocMMMHsizWvAu5LI2QuBdPVlEZjJSqjn3tRTtNK1huzz5Ts7LIWg2/RWo5xm
- d70BuooT9MBscpaxF7UN1MUErbVeLTtjC76FnFmy7NQPI9eZcoZf1CttPbDdTLmqvAQhqjb6x0h
- fzz1V4p4XetlitXMfRROUwgNPBgbz2acuBaaYaMgw8T0ebQU4k+TD7DN3MHyW0h8LwcRMe4JL5z
- D1FhKwU7C0Soz6G40HZRTLs2UNZAW6YRauzVp6dbYY58+q3CMKF35mDjM+j/a3vX7fKcdRk8
-X-Proofpoint-GUID: UEiS0dK6mtaUBZQGp2HzUy7tnlXNdph-
-X-Authority-Analysis: v=2.4 cv=VMTdn8PX c=1 sm=1 tr=0 ts=68a4b2b3 cx=c_pps
- a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17
- a=2OwXVqhp2XgA:10 a=VwQbUJbxAAAA:8 a=yzNSm02vyakeHXeUMvAA:9
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-08-19_02,2025-08-14_01,2025-03-28_01
+Content-Transfer-Encoding: 8bit
 
-From: Keith Busch <kbusch@kernel.org>
+Changelog:
+v4:
+ * Fixed kbuild error with mismatch in kmsan function declaration due to
+   rebase error.
+v3: https://lore.kernel.org/all/cover.1755193625.git.leon@kernel.org
+ * Fixed typo in "cacheable" word
+ * Simplified kmsan patch a lot to be simple argument refactoring
+v2: https://lore.kernel.org/all/cover.1755153054.git.leon@kernel.org
+ * Used commit messages and cover letter from Jason
+ * Moved setting IOMMU_MMIO flag to dma_info_to_prot function
+ * Micro-optimized the code
+ * Rebased code on v6.17-rc1
+v1: https://lore.kernel.org/all/cover.1754292567.git.leon@kernel.org
+ * Added new DMA_ATTR_MMIO attribute to indicate
+   PCI_P2PDMA_MAP_THRU_HOST_BRIDGE path.
+ * Rewrote dma_map_* functions to use thus new attribute
+v0: https://lore.kernel.org/all/cover.1750854543.git.leon@kernel.org/
+------------------------------------------------------------------------
 
-The block layer tries to align bio vectors to the block device's logical
-block size. Some cases don't have a block device, or we may want to align
-to something larger, which we can't derive it from the queue limits.
-Have the caller specify what they want, or allow any length alignment if
-nothing was specified.
+This series refactors the DMA mapping to use physical addresses
+as the primary interface instead of page+offset parameters. This
+change aligns the DMA API with the underlying hardware reality where
+DMA operations work with physical addresses, not page structures.
 
-Signed-off-by: Keith Busch <kbusch@kernel.org>
----
- block/bio.c          | 19 +++++++++++--------
- block/fops.c         |  9 ++++++---
- fs/iomap/direct-io.c |  3 ++-
- include/linux/bio.h  |  9 ++++++++-
- 4 files changed, 27 insertions(+), 13 deletions(-)
+The series maintains export symbol backward compatibility by keeping
+the old page-based API as wrapper functions around the new physical
+address-based implementations.
 
-diff --git a/block/bio.c b/block/bio.c
-index 3b371a5da159e..44286db14355f 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1204,7 +1204,8 @@ static unsigned int get_contig_folio_len(unsigned i=
-nt *num_pages,
-  * For a multi-segment *iter, this function only adds pages from the nex=
-t
-  * non-empty segment of the iov iterator.
-  */
--static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *it=
-er)
-+static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *it=
-er,
-+				    unsigned len_align_mask)
- {
- 	iov_iter_extraction_t extraction_flags =3D 0;
- 	unsigned short nr_pages =3D bio->bi_max_vecs - bio->bi_vcnt;
-@@ -1213,7 +1214,7 @@ static int __bio_iov_iter_get_pages(struct bio *bio=
-, struct iov_iter *iter)
- 	struct page **pages =3D (struct page **)bv;
- 	ssize_t size;
- 	unsigned int num_pages, i =3D 0;
--	size_t offset, folio_offset, left, len;
-+	size_t offset, folio_offset, left, len, trim;
- 	int ret =3D 0;
-=20
- 	/*
-@@ -1242,8 +1243,8 @@ static int __bio_iov_iter_get_pages(struct bio *bio=
-, struct iov_iter *iter)
-=20
- 	nr_pages =3D DIV_ROUND_UP(offset + size, PAGE_SIZE);
-=20
--	if (bio->bi_bdev) {
--		size_t trim =3D size & (bdev_logical_block_size(bio->bi_bdev) - 1);
-+	trim =3D size & len_align_mask;
-+	if (trim) {
- 		iov_iter_revert(iter, trim);
- 		size -=3D trim;
- 	}
-@@ -1298,9 +1299,10 @@ static int __bio_iov_iter_get_pages(struct bio *bi=
-o, struct iov_iter *iter)
- }
-=20
- /**
-- * bio_iov_iter_get_pages - add user or kernel pages to a bio
-+ * bio_iov_iter_get_pages_aligned - add user or kernel pages to a bio
-  * @bio: bio to add pages to
-  * @iter: iov iterator describing the region to be added
-+ * @len_align_mask: the mask to align each vector size to, 0 for any len=
-gth
-  *
-  * This takes either an iterator pointing to user memory, or one pointin=
-g to
-  * kernel pages (BVEC iterator). If we're adding user pages, we pin them=
- and
-@@ -1317,7 +1319,8 @@ static int __bio_iov_iter_get_pages(struct bio *bio=
-, struct iov_iter *iter)
-  * MM encounters an error pinning the requested pages, it stops. Error
-  * is returned only if 0 pages could be pinned.
-  */
--int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
-+int bio_iov_iter_get_pages_aligned(struct bio *bio, struct iov_iter *ite=
-r,
-+			   unsigned len_align_mask)
- {
- 	int ret =3D 0;
-=20
-@@ -1333,12 +1336,12 @@ int bio_iov_iter_get_pages(struct bio *bio, struc=
-t iov_iter *iter)
- 	if (iov_iter_extract_will_pin(iter))
- 		bio_set_flag(bio, BIO_PAGE_PINNED);
- 	do {
--		ret =3D __bio_iov_iter_get_pages(bio, iter);
-+		ret =3D __bio_iov_iter_get_pages(bio, iter, len_align_mask);
- 	} while (!ret && iov_iter_count(iter) && !bio_full(bio, 0));
-=20
- 	return bio->bi_vcnt ? 0 : ret;
- }
--EXPORT_SYMBOL_GPL(bio_iov_iter_get_pages);
-+EXPORT_SYMBOL_GPL(bio_iov_iter_get_pages_aligned);
-=20
- static void submit_bio_wait_endio(struct bio *bio)
- {
-diff --git a/block/fops.c b/block/fops.c
-index 82451ac8ff25d..6d5c1e680d4a7 100644
---- a/block/fops.c
-+++ b/block/fops.c
-@@ -78,7 +78,8 @@ static ssize_t __blkdev_direct_IO_simple(struct kiocb *=
-iocb,
- 	if (iocb->ki_flags & IOCB_ATOMIC)
- 		bio.bi_opf |=3D REQ_ATOMIC;
-=20
--	ret =3D bio_iov_iter_get_pages(&bio, iter);
-+	ret =3D bio_iov_iter_get_pages_aligned(&bio, iter,
-+				     bdev_logical_block_size(bdev) - 1);
- 	if (unlikely(ret))
- 		goto out;
- 	ret =3D bio.bi_iter.bi_size;
-@@ -212,7 +213,8 @@ static ssize_t __blkdev_direct_IO(struct kiocb *iocb,=
- struct iov_iter *iter,
- 		bio->bi_end_io =3D blkdev_bio_end_io;
- 		bio->bi_ioprio =3D iocb->ki_ioprio;
-=20
--		ret =3D bio_iov_iter_get_pages(bio, iter);
-+		ret =3D bio_iov_iter_get_pages_aligned(bio, iter,
-+					     bdev_logical_block_size(bdev) - 1);
- 		if (unlikely(ret)) {
- 			bio->bi_status =3D BLK_STS_IOERR;
- 			bio_endio(bio);
-@@ -348,7 +350,8 @@ static ssize_t __blkdev_direct_IO_async(struct kiocb =
-*iocb,
- 		 */
- 		bio_iov_bvec_set(bio, iter);
- 	} else {
--		ret =3D bio_iov_iter_get_pages(bio, iter);
-+		ret =3D bio_iov_iter_get_pages_aligned(bio, iter,
-+					     bdev_logical_block_size(bdev) - 1);
- 		if (unlikely(ret))
- 			goto out_bio_put;
- 	}
-diff --git a/fs/iomap/direct-io.c b/fs/iomap/direct-io.c
-index 6f25d4cfea9f7..213764bdee8f2 100644
---- a/fs/iomap/direct-io.c
-+++ b/fs/iomap/direct-io.c
-@@ -434,7 +434,8 @@ static int iomap_dio_bio_iter(struct iomap_iter *iter=
-, struct iomap_dio *dio)
- 		bio->bi_private =3D dio;
- 		bio->bi_end_io =3D iomap_dio_bio_end_io;
-=20
--		ret =3D bio_iov_iter_get_pages(bio, dio->submit.iter);
-+		ret =3D bio_iov_iter_get_pages_aligned(bio, dio->submit.iter,
-+				bdev_logical_block_size(iomap->bdev) - 1);
- 		if (unlikely(ret)) {
- 			/*
- 			 * We have to stop part way through an IO. We must fall
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 519a1d59805f8..788a50ff319e3 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -441,7 +441,14 @@ int submit_bio_wait(struct bio *bio);
- int bdev_rw_virt(struct block_device *bdev, sector_t sector, void *data,
- 		size_t len, enum req_op op);
-=20
--int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter);
-+int bio_iov_iter_get_pages_aligned(struct bio *bio, struct iov_iter *ite=
-r,
-+		unsigned len_align_mask);
-+
-+static inline int bio_iov_iter_get_pages(struct bio *bio, struct iov_ite=
-r *iter)
-+{
-+	return bio_iov_iter_get_pages_aligned(bio, iter, 0);
-+}
-+
- void bio_iov_bvec_set(struct bio *bio, const struct iov_iter *iter);
- void __bio_release_pages(struct bio *bio, bool mark_dirty);
- extern void bio_set_pages_dirty(struct bio *bio);
---=20
-2.47.3
+This series refactors the DMA mapping API to provide a phys_addr_t
+based, and struct-page free, external API that can handle all the
+mapping cases we want in modern systems:
+
+ - struct page based cachable DRAM
+ - struct page MEMORY_DEVICE_PCI_P2PDMA PCI peer to peer non-cachable
+   MMIO
+ - struct page-less PCI peer to peer non-cachable MMIO
+ - struct page-less "resource" MMIO
+
+Overall this gets much closer to Matthew's long term wish for
+struct-pageless IO to cachable DRAM. The remaining primary work would
+be in the mm side to allow kmap_local_pfn()/phys_to_virt() to work on
+phys_addr_t without a struct page.
+
+The general design is to remove struct page usage entirely from the
+DMA API inner layers. For flows that need to have a KVA for the
+physical address they can use kmap_local_pfn() or phys_to_virt(). This
+isolates the struct page requirements to MM code only. Long term all
+removals of struct page usage are supporting Matthew's memdesc
+project which seeks to substantially transform how struct page works.
+
+Instead make the DMA API internals work on phys_addr_t. Internally
+there are still dedicated 'page' and 'resource' flows, except they are
+now distinguished by a new DMA_ATTR_MMIO instead of by callchain. Both
+flows use the same phys_addr_t.
+
+When DMA_ATTR_MMIO is specified things work similar to the existing
+'resource' flow. kmap_local_pfn(), phys_to_virt(), phys_to_page(),
+pfn_valid(), etc are never called on the phys_addr_t. This requires
+rejecting any configuration that would need swiotlb. CPU cache
+flushing is not required, and avoided, as ATTR_MMIO also indicates the
+address have no cachable mappings. This effectively removes any
+DMA API side requirement to have struct page when DMA_ATTR_MMIO is
+used.
+
+In the !DMA_ATTR_MMIO mode things work similarly to the 'page' flow,
+except on the common path of no cache flush, no swiotlb it never
+touches a struct page. When cache flushing or swiotlb copying
+kmap_local_pfn()/phys_to_virt() are used to get a KVA for CPU
+usage. This was already the case on the unmap side, now the map side
+is symmetric.
+
+Callers are adjusted to set DMA_ATTR_MMIO. Existing 'resource' users
+must set it. The existing struct page based MEMORY_DEVICE_PCI_P2PDMA
+path must also set it. This corrects some existing bugs where iommu
+mappings for P2P MMIO were improperly marked IOMMU_CACHE.
+
+Since ATTR_MMIO is made to work with all the existing DMA map entry
+points, particularly dma_iova_link(), this finally allows a way to use
+the new DMA API to map PCI P2P MMIO without creating struct page. The
+VFIO DMABUF series demonstrates how this works. This is intended to
+replace the incorrect driver use of dma_map_resource() on PCI BAR
+addresses.
+
+This series does the core code and modern flows. A followup series
+will give the same treatment to the legacy dma_ops implementation.
+
+Thanks
+
+Leon Romanovsky (16):
+  dma-mapping: introduce new DMA attribute to indicate MMIO memory
+  iommu/dma: implement DMA_ATTR_MMIO for dma_iova_link().
+  dma-debug: refactor to use physical addresses for page mapping
+  dma-mapping: rename trace_dma_*map_page to trace_dma_*map_phys
+  iommu/dma: rename iommu_dma_*map_page to iommu_dma_*map_phys
+  iommu/dma: extend iommu_dma_*map_phys API to handle MMIO memory
+  dma-mapping: convert dma_direct_*map_page to be phys_addr_t based
+  kmsan: convert kmsan_handle_dma to use physical addresses
+  dma-mapping: handle MMIO flow in dma_map|unmap_page
+  xen: swiotlb: Open code map_resource callback
+  dma-mapping: export new dma_*map_phys() interface
+  mm/hmm: migrate to physical address-based DMA mapping API
+  mm/hmm: properly take MMIO path
+  block-dma: migrate to dma_map_phys instead of map_page
+  block-dma: properly take MMIO path
+  nvme-pci: unmap MMIO pages with appropriate interface
+
+ Documentation/core-api/dma-api.rst        |   4 +-
+ Documentation/core-api/dma-attributes.rst |  18 ++++
+ arch/powerpc/kernel/dma-iommu.c           |   4 +-
+ block/blk-mq-dma.c                        |  15 ++-
+ drivers/iommu/dma-iommu.c                 |  61 +++++------
+ drivers/nvme/host/pci.c                   |  18 +++-
+ drivers/virtio/virtio_ring.c              |   4 +-
+ drivers/xen/swiotlb-xen.c                 |  21 +++-
+ include/linux/blk-mq-dma.h                |   6 +-
+ include/linux/blk_types.h                 |   2 +
+ include/linux/dma-direct.h                |   2 -
+ include/linux/dma-map-ops.h               |   8 +-
+ include/linux/dma-mapping.h               |  33 ++++++
+ include/linux/iommu-dma.h                 |  11 +-
+ include/linux/kmsan.h                     |   9 +-
+ include/trace/events/dma.h                |   9 +-
+ kernel/dma/debug.c                        |  71 ++++---------
+ kernel/dma/debug.h                        |  37 ++-----
+ kernel/dma/direct.c                       |  22 +---
+ kernel/dma/direct.h                       |  52 ++++++----
+ kernel/dma/mapping.c                      | 117 +++++++++++++---------
+ kernel/dma/ops_helpers.c                  |   6 +-
+ mm/hmm.c                                  |  19 ++--
+ mm/kmsan/hooks.c                          |   5 +-
+ rust/kernel/dma.rs                        |   3 +
+ tools/virtio/linux/kmsan.h                |   2 +-
+ 26 files changed, 305 insertions(+), 254 deletions(-)
+
+-- 
+2.50.1
 
