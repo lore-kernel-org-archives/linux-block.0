@@ -1,44 +1,44 @@
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
+Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7100F2E228F
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A4302D8DD4
 	for <linux-block@vger.kernel.org>; Tue, 19 Aug 2025 17:10:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755623457; cv=none; b=IfydZ9CkIIVZR14bcX7YXwNIefSxhukRd826yZ6AVUYpek8rk3sq8zcVCXn+HQerpGBfe8qmR8XqnnLgsRPYykkg3V2WoKHD3MDGvgXaJP5F5+8E0NFWLdm0omm2cm3d+JnkAIwOBFerOsMaZmaPJuOIbvvaWSqgZMyNrdNNt8c=
+	t=1755623458; cv=none; b=JNE24OhG4Vp3dUnYgfSUKpMKLzbYw5LqGuv7ktQIo0KIUaW70mMI5EEIRhvuLTT9ifGEpP3S813bi0Ee3SWY09bdFhc8i5qVbfQMdsDkFyViUmeASX5XViXPVmblhOwH+CKNbtfbDLVpovKAQVsnb/puBEGsjDKHPqN+Hoh56EE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755623457; c=relaxed/simple;
-	bh=RbrhOuJtcgUJ4xVUhXL4NkIPfBy/mVL25lx3D6+LRlI=;
+	s=arc-20240116; t=1755623458; c=relaxed/simple;
+	bh=0rR9OGUY51qyMct0FZI1Vb5AOMdwpXefL2TIzvZmxd0=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ngK3EJ6LEu+kMuNv3VebMkE6AN7e7tU6jZfxlgh1eOxao9R/Indb7gIfkRg70hkporxKBQi2/0pW/HCHwquNojCUXhkur3KkTJVuHYPVMDyYc+xCBn5RHUrPNreMXu6O+fSAZUaEZUqX2TQCrUk+WNvifT22+9VOI7ujVOd295E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=ZujSxYNz; arc=none smtp.client-ip=67.231.145.42
+	 MIME-Version:Content-Type; b=NvNZ+QaaYdvTKs4tujC5Dy96/hg3ZXgrqV7ZFuqSBxkyA+2alriH65FJJwS408otW1IpH7xV2+hW5PQ7BU5L9gcayVkAukrokvX29MAYAK/RF9w0UM+rOtcr61iDTlwGSaGDeFqeG/eFvTlya2eLvbvHEUTYwWbDaF+Ym5/EGc0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=D7AKnHW7; arc=none smtp.client-ip=67.231.153.30
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="ZujSxYNz"
-Received: from pps.filterd (m0109334.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 57JF41SR1371581
-	for <linux-block@vger.kernel.org>; Tue, 19 Aug 2025 10:10:55 -0700
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="D7AKnHW7"
+Received: from pps.filterd (m0109332.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 57JGuDxt1754206
+	for <linux-block@vger.kernel.org>; Tue, 19 Aug 2025 10:10:56 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
 	:content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=s2048-2025-q2;
-	 bh=XutiaynC6eIHmdhILbieOgn8SY0Trp2AHm3YNayem8g=; b=ZujSxYNziiZq
-	4PLdFniG/YpNpnlucTFS1uAA3TPLnM4hrPqsAb1pKaiW8j9Us7RDhK1zHDhhNjHZ
-	sQMtFAnWjnDkRGyvutNV0bfdvEDzDxtRLNszmykwL4SlxWQwmEW7IKiznI6AUund
-	5K7m5IiW+mUIPX8IV+JZjKJZ8tziIEbQWc4xGhzs5hHS3r4Oc2jnajkdWislituT
-	ZgGQRgMLT0izsp19+UKXkcg2fsToOeP8458CKuEXEfIIarn6v8i/S5y8vl5WUgTJ
-	A5YqKWap3HCT032WoHXY8Z/AGQLYlu37cZiOBFbt4GEjyxvmNGPiu5TraMmiwewc
-	hPmDpU/EeQ==
-Received: from maileast.thefacebook.com ([163.114.135.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 48mujxs8b6-7
+	 bh=59+Hb9AcNy1cne4phcT5L81KNgHgSLj+KSq3JExrmO0=; b=D7AKnHW7480O
+	lsNM4zkHfEpONuMx/e6MUs6dt82dEt9eKpJIpb0KlESc7wImiH8pwobRZ6m8gpF8
+	v1pBjQ45NwiI69vWfM5JkpjXJgQlFAV125AhHQ/xGEy4mtCTjpdYlSTr3xcPi+9j
+	rZJ3b4jxbehDwoj3I3saz+PkabKCSC2N+3xuhdW5aQVKPC/8t27mOmLMFbYlP7OM
+	nU6two7oV5XyjNkdMDvkE+w7uBWVGl2k9TxGNBMKSL3Ws8fjlr3FcoOE1Td0+umO
+	27O4RFub2+UeW1GECsVfDJvSav08yzaVUW1blxB1nfVLwPc6m2rT6K+IK5Iey0en
+	3zC/oeJxKQ==
+Received: from mail.thefacebook.com ([163.114.134.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 48mw7hg5e7-16
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
 	for <linux-block@vger.kernel.org>; Tue, 19 Aug 2025 10:10:55 -0700 (PDT)
-Received: from twshared17671.07.ash8.facebook.com (2620:10d:c0a8:fe::f072) by
- mail.thefacebook.com (2620:10d:c0a9:6f::237c) with Microsoft SMTP Server
+Received: from twshared60001.02.ash8.facebook.com (2620:10d:c085:108::4) by
+ mail.thefacebook.com (2620:10d:c08b:78::c78f) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.17; Tue, 19 Aug 2025 17:10:50 +0000
+ 15.2.2562.17; Tue, 19 Aug 2025 17:10:48 +0000
 Received: by devbig197.nha3.facebook.com (Postfix, from userid 544533)
-	id 83583C89F27; Tue, 19 Aug 2025 09:49:48 -0700 (PDT)
+	id AAEF5C89F2F; Tue, 19 Aug 2025 09:49:48 -0700 (PDT)
 From: Keith Busch <kbusch@meta.com>
 To: <linux-block@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>
@@ -47,9 +47,9 @@ CC: <snitzer@kernel.org>, <axboe@kernel.dk>, <dw@davidwei.uk>,
         <djwong@kernel.org>, <linux-xfs@vger.kernel.org>,
         <viro@zeniv.linux.org.uk>, Keith Busch <kbusch@kernel.org>,
         Hannes Reinecke <hare@suse.de>
-Subject: [PATCHv3 4/8] block: simplify direct io validity check
-Date: Tue, 19 Aug 2025 09:49:18 -0700
-Message-ID: <20250819164922.640964-5-kbusch@meta.com>
+Subject: [PATCHv3 7/8] blk-integrity: use simpler alignment check
+Date: Tue, 19 Aug 2025 09:49:21 -0700
+Message-ID: <20250819164922.640964-8-kbusch@meta.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20250819164922.640964-1-kbusch@meta.com>
 References: <20250819164922.640964-1-kbusch@meta.com>
@@ -62,51 +62,59 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 X-FB-Internal: Safe
 Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: kU5lBO_PrVIy69To62ouMYjusFVBkkwF
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODE5MDE2MCBTYWx0ZWRfXwsvV1zcVIcd6
- Vfpur/H2B/guxcf64D6Yl39SISg9vSktmHsdvtTpoY0/tvnUwbLZhrNiaombmvcDF73J4FyQ0rf
- N38WFKBSKigg/j/7pvqcy+HfwRj642N91rubm2lWpITP+zpMymWYYPKnjEe8RNk9HHKtFqKghsX
- OO05GlB9zik3CzjCetDHxxAnWs39Tr+zkKspPF6mL6tejV0cY5vgjcihuH1g1FT8poLcy4RyC09
- y5Y//bbGqZYyjv/q8qN4CJ4Ay9o1WEx8CuuEpMed2acz3CM8bE+SpQqTqO/F1Bx5RvQNz0tqsB6
- hPGQ0lLXvZC+MMBmArHZmDr6omlWWiSoWLe0qAIvPQMZvvJUEwVNa4SU1o7vDb4P0inJhWkT+PE
- 85COVFBZjtT/5w5ZN9UdbaAD9rI77Lb2EKl4Nx5YbRqRE4PoAXhqKmzrflPYYtXW1Pz2YApO
-X-Proofpoint-GUID: kU5lBO_PrVIy69To62ouMYjusFVBkkwF
-X-Authority-Analysis: v=2.4 cv=VMTdn8PX c=1 sm=1 tr=0 ts=68a4b01f cx=c_pps
- a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17
- a=2OwXVqhp2XgA:10 a=VwQbUJbxAAAA:8 a=yPCof4ZbAAAA:8 a=wgemLMbJKI-cAGOf0tMA:9
+X-Proofpoint-GUID: uopU4NhfUtPl2bAQGkJ8Ua5HjcLR4x6n
+X-Proofpoint-ORIG-GUID: uopU4NhfUtPl2bAQGkJ8Ua5HjcLR4x6n
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODE5MDE2MCBTYWx0ZWRfX/FVcamgGBntF
+ /hYG8Ev/JGbERf/EyoaJwMgEwNGqbdNvoAKMtFE301DdhK2gGBAXE2clbz3fJNFG69mR8EQ0zHm
+ DCbqbmv9l+prSSRt7YNsisQGACv9nUg2WAzFD8Vyb73R+y1YG6TLftC43BTXIJfHKCEyVZJ5n5i
+ lgB+h3OsuHb81TZF1Cmp0K7vASO0bjRfN3TSxPnco/7P8XyYk6RR0cBRmdcrx+MxrhFV7171+9z
+ TFxJIFh3vprPmvhdCjWVMvm1jE2k26M6bgE9tyGcQi4gMf/gA094C9ZyafHPzmzVGe4J451r7KH
+ LMf2Zv1/zAoCzEkcL576nU2/U1k9ocdQCJP/ah7WZqOhXRFzMDfXKBNbnHj1WjHrlo7NEug66uR
+ SWiFOvKBRU8yPoYSkLavPw5eMBoB0JWG7VmS7PAhGHdUo2HyCZ4OFSRSXjKmstKf8ppjw2yk
+X-Authority-Analysis: v=2.4 cv=etzfzppX c=1 sm=1 tr=0 ts=68a4b01f cx=c_pps
+ a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17
+ a=2OwXVqhp2XgA:10 a=VwQbUJbxAAAA:8 a=yPCof4ZbAAAA:8 a=yetF5jY7WHH6jeiS1L0A:9
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
  definitions=2025-08-19_02,2025-08-14_01,2025-03-28_01
 
 From: Keith Busch <kbusch@kernel.org>
 
-The block layer checks all the segments for validity later, so no need
-for an early check. Just reduce it to a simple position and total length
-check, and defer the more invasive segment checks to the block layer.
+We're checking length and addresses against the same alignment value, so
+use the more simple iterator check.
 
 Signed-off-by: Keith Busch <kbusch@kernel.org>
 Reviewed-by: Hannes Reinecke <hare@suse.de>
 Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
 ---
- block/fops.c | 4 ++--
+ block/bio-integrity.c | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/block/fops.c b/block/fops.c
-index 6d5c1e680d4a7..32a8e6fdc7338 100644
---- a/block/fops.c
-+++ b/block/fops.c
-@@ -38,8 +38,8 @@ static blk_opf_t dio_bio_write_op(struct kiocb *iocb)
- static bool blkdev_dio_invalid(struct block_device *bdev, struct kiocb *=
-iocb,
- 				struct iov_iter *iter)
+diff --git a/block/bio-integrity.c b/block/bio-integrity.c
+index 6b077ca937f6b..6d069a49b4aad 100644
+--- a/block/bio-integrity.c
++++ b/block/bio-integrity.c
+@@ -262,7 +262,6 @@ static unsigned int bvec_from_pages(struct bio_vec *b=
+vec, struct page **pages,
+ int bio_integrity_map_user(struct bio *bio, struct iov_iter *iter)
  {
--	return iocb->ki_pos & (bdev_logical_block_size(bdev) - 1) ||
--		!bdev_iter_is_aligned(bdev, iter);
-+	return (iocb->ki_pos | iov_iter_count(iter)) &
-+			(bdev_logical_block_size(bdev) - 1);
- }
+ 	struct request_queue *q =3D bdev_get_queue(bio->bi_bdev);
+-	unsigned int align =3D blk_lim_dma_alignment_and_pad(&q->limits);
+ 	struct page *stack_pages[UIO_FASTIOV], **pages =3D stack_pages;
+ 	struct bio_vec stack_vec[UIO_FASTIOV], *bvec =3D stack_vec;
+ 	size_t offset, bytes =3D iter->count;
+@@ -285,7 +284,8 @@ int bio_integrity_map_user(struct bio *bio, struct io=
+v_iter *iter)
+ 		pages =3D NULL;
+ 	}
 =20
- #define DIO_INLINE_BIO_VECS 4
+-	copy =3D !iov_iter_is_aligned(iter, align, align);
++	copy =3D iov_iter_alignment(iter) &
++			blk_lim_dma_alignment_and_pad(&q->limits);
+ 	ret =3D iov_iter_extract_pages(iter, &pages, bytes, nr_vecs, 0, &offset=
+);
+ 	if (unlikely(ret < 0))
+ 		goto free_bvec;
 --=20
 2.47.3
 
