@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EE6F30DD0E;
-	Tue, 19 Aug 2025 17:38:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAAE830DD0E;
+	Tue, 19 Aug 2025 17:38:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755625122; cv=none; b=SF5JoCM6QzZ5fwt/cKcbqeWnFl+6e39nDRAp73d1ZRlM4MFw3jWCUqNo1R/slq8ZMXTlPFP2WDILHvf2mz75qASMX8npFFJDzehKQaS8LE5aTQ/A2nx+/ThsPcuSo4eCpmiCl7ApbpeN6vRQrXThTc2MUwNILkVFEEkUWVCVOXg=
+	t=1755625129; cv=none; b=UUyNoXNMPb+BoJzZ0DjYmD1GfYL3rwpJOULaI3D94hOMgOpdLw9pOCRI4JPSWJkdSwD4WpEZN2a+wGNGbtxzCO1+2Cye+F9HbKjNUOixe5qQFyX4btUtaAfYQq9RJlKIvDKnF8cornouyolJrc4SSOlIIRSbDwRKFhsMHFgdsq0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755625122; c=relaxed/simple;
-	bh=stLVV7BdINySQbyeqCDmRbXyWeQEecbuIkQ/rhX45FU=;
+	s=arc-20240116; t=1755625129; c=relaxed/simple;
+	bh=5GnXky7X8jRP4E4M761xyU7kxSqR5w3y9HvcAnisW/0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=oWEzRhCtUh+U775B2mK36yNk/yXPNVgTKfMLpoLTlEA9KzO7US5o4E5cIhDW8lV6HevOex7WtbiQtEb2uon2m0WkTMOGcFHMZGtVGqputI8S1kMLMgcfo2z9Y2ZFtiGlsRBUIQ21KEEBO/GyNHVsPUJ1LzjfWnsc1J2iUKOsmQw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QF95AAuh; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=rleDDCo16fD715CCKdmBPvsBBYzTBXiNHQdmbE9q/jpTcCQC2V0yssyWfRpkAa62iKyhp6Fwz1QdNOVrRov1AeTXLgfLZqHIjIEoSCLQ1No5TmsMHo5NENSYIaKxyC1sg5zT6vULCkW1QvS5IzI07syVKtfOBQQzu8/aGpCAKeM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Bp6IjwCK; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QF95AAuh"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7E8DC113D0;
-	Tue, 19 Aug 2025 17:38:40 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bp6IjwCK"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B8E5C4CEF4;
+	Tue, 19 Aug 2025 17:38:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755625122;
-	bh=stLVV7BdINySQbyeqCDmRbXyWeQEecbuIkQ/rhX45FU=;
+	s=k20201202; t=1755625128;
+	bh=5GnXky7X8jRP4E4M761xyU7kxSqR5w3y9HvcAnisW/0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=QF95AAuhc8feQn+SEx82Pkl7/uTlNhnB5cHYHMn4haBNk3mIGB32W95xHVkQetyzQ
-	 l5pjdHoqmA32dwMVHHl2ireizeQrHrNOOpU6veVyXb4NV0jh1tYHCTnC8dcn2zvtTY
-	 J4nrUx7NhDiTec8s4jDArKOAkTIjbwvKXPPen+Vd16+uFXzd7usqZLmgr9JbeXZ1Jn
-	 WjodL0NO0sJNloB+WXRZ6xIN7Ll+mPyFWx7P66aJjQZw9otjgjVcZKNrK0y+CcuICc
-	 ddwwW0q2gx9LzWpv+xxfN0uj6Ze8uJX3Jlyv58Oh1O5dwZ9g8LdLLurbrm7l0u9gfU
-	 vhh2Z4HWzRNIw==
+	b=Bp6IjwCK6iikZBNKRNzlwQSTkIdVOg07zMkHxMwHx2bN8ViJPSPzqSH/QAyq4vh06
+	 wQO6Ewlb0QQbKPmgYqrA9uKQ5ZlVlzrl395y0zlmmQVZo3cmxr2dce8aTWrEgEuVvU
+	 PK81BrhFBj0Sb03L1mOYr5A5QlqVfAMBpJE1psdYb9zwXYegwG/tfmrm5FOWTNfeE8
+	 iY+rPNAKXFYUB6cprmGsa0u1KrjeSM4hl6Yb32H9zVNhuHEbrWVA9oc/K4UQWl86vA
+	 0GIK4Y52fniR/iFJCHHd5h1oBGaE5KSvHvvy9rnqAMrstqGlP8VTJe6ApXPe+l+dK9
+	 yBb54yNAL7EtQ==
 From: Leon Romanovsky <leon@kernel.org>
 To: Marek Szyprowski <m.szyprowski@samsung.com>
 Cc: Leon Romanovsky <leonro@nvidia.com>,
@@ -64,9 +64,9 @@ Cc: Leon Romanovsky <leonro@nvidia.com>,
 	virtualization@lists.linux.dev,
 	Will Deacon <will@kernel.org>,
 	xen-devel@lists.xenproject.org
-Subject: [PATCH v4 14/16] block-dma: migrate to dma_map_phys instead of map_page
-Date: Tue, 19 Aug 2025 20:36:58 +0300
-Message-ID: <22b824931bc8ba090979ab902e4c1c2ec8327b65.1755624249.git.leon@kernel.org>
+Subject: [PATCH v4 13/16] mm/hmm: properly take MMIO path
+Date: Tue, 19 Aug 2025 20:36:57 +0300
+Message-ID: <4b929da0b2dec4bccf489f35ee06098b437053b2.1755624249.git.leon@kernel.org>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <cover.1755624249.git.leon@kernel.org>
 References: <cover.1755624249.git.leon@kernel.org>
@@ -80,30 +80,67 @@ Content-Transfer-Encoding: 8bit
 
 From: Leon Romanovsky <leonro@nvidia.com>
 
-After introduction of dma_map_phys(), there is no need to convert
-from physical address to struct page in order to map page. So let's
-use it directly.
+In case peer-to-peer transaction traverses through host bridge,
+the IOMMU needs to have IOMMU_MMIO flag, together with skip of
+CPU sync.
 
+The latter was handled by provided DMA_ATTR_SKIP_CPU_SYNC flag,
+but IOMMU flag was missed, due to assumption that such memory
+can be treated as regular one.
+
+Reuse newly introduced DMA attribute to properly take MMIO path.
+
+Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
 Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
 ---
- block/blk-mq-dma.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ mm/hmm.c | 15 ++++++++-------
+ 1 file changed, 8 insertions(+), 7 deletions(-)
 
-diff --git a/block/blk-mq-dma.c b/block/blk-mq-dma.c
-index ad283017caef..37e2142be4f7 100644
---- a/block/blk-mq-dma.c
-+++ b/block/blk-mq-dma.c
-@@ -87,8 +87,8 @@ static bool blk_dma_map_bus(struct blk_dma_iter *iter, struct phys_vec *vec)
- static bool blk_dma_map_direct(struct request *req, struct device *dma_dev,
- 		struct blk_dma_iter *iter, struct phys_vec *vec)
- {
--	iter->addr = dma_map_page(dma_dev, phys_to_page(vec->paddr),
--			offset_in_page(vec->paddr), vec->len, rq_dma_dir(req));
-+	iter->addr = dma_map_phys(dma_dev, vec->paddr, vec->len,
-+			rq_dma_dir(req), 0);
- 	if (dma_mapping_error(dma_dev, iter->addr)) {
- 		iter->status = BLK_STS_RESOURCE;
+diff --git a/mm/hmm.c b/mm/hmm.c
+index 015ab243f081..6556c0e074ba 100644
+--- a/mm/hmm.c
++++ b/mm/hmm.c
+@@ -746,7 +746,7 @@ dma_addr_t hmm_dma_map_pfn(struct device *dev, struct hmm_dma_map *map,
+ 	case PCI_P2PDMA_MAP_NONE:
+ 		break;
+ 	case PCI_P2PDMA_MAP_THRU_HOST_BRIDGE:
+-		attrs |= DMA_ATTR_SKIP_CPU_SYNC;
++		attrs |= DMA_ATTR_MMIO;
+ 		pfns[idx] |= HMM_PFN_P2PDMA;
+ 		break;
+ 	case PCI_P2PDMA_MAP_BUS_ADDR:
+@@ -776,7 +776,7 @@ dma_addr_t hmm_dma_map_pfn(struct device *dev, struct hmm_dma_map *map,
+ 			goto error;
+ 
+ 		dma_addr = dma_map_phys(dev, paddr, map->dma_entry_size,
+-					DMA_BIDIRECTIONAL, 0);
++					DMA_BIDIRECTIONAL, attrs);
+ 		if (dma_mapping_error(dev, dma_addr))
+ 			goto error;
+ 
+@@ -811,16 +811,17 @@ bool hmm_dma_unmap_pfn(struct device *dev, struct hmm_dma_map *map, size_t idx)
+ 	if ((pfns[idx] & valid_dma) != valid_dma)
  		return false;
+ 
++	if (pfns[idx] & HMM_PFN_P2PDMA)
++		attrs |= DMA_ATTR_MMIO;
++
+ 	if (pfns[idx] & HMM_PFN_P2PDMA_BUS)
+ 		; /* no need to unmap bus address P2P mappings */
+-	else if (dma_use_iova(state)) {
+-		if (pfns[idx] & HMM_PFN_P2PDMA)
+-			attrs |= DMA_ATTR_SKIP_CPU_SYNC;
++	else if (dma_use_iova(state))
+ 		dma_iova_unlink(dev, state, idx * map->dma_entry_size,
+ 				map->dma_entry_size, DMA_BIDIRECTIONAL, attrs);
+-	} else if (dma_need_unmap(dev))
++	else if (dma_need_unmap(dev))
+ 		dma_unmap_phys(dev, dma_addrs[idx], map->dma_entry_size,
+-			       DMA_BIDIRECTIONAL, 0);
++			       DMA_BIDIRECTIONAL, attrs);
+ 
+ 	pfns[idx] &=
+ 		~(HMM_PFN_DMA_MAPPED | HMM_PFN_P2PDMA | HMM_PFN_P2PDMA_BUS);
 -- 
 2.50.1
 
