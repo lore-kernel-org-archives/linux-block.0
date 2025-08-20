@@ -1,247 +1,226 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B1B421507C;
-	Wed, 20 Aug 2025 04:55:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.14
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755665742; cv=fail; b=RqODHgbsOZBF2QUkSBYlvU/BNURi+KCu/7cY7sl85ErjUWaLIHMOohOAEZgGqi0qhdiBsD9X1Fl+TM5CxDEpSI8cR/BrwffQ9glia1Nm71jDyLKnD+iw723271w7cuMGOxPjSgf8wjWmjL4LrMtPcFhuQ6snQ4Mu6pCwSTAUQuk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755665742; c=relaxed/simple;
-	bh=GFb6ZATjkcHIccNsvDiTX26Pt2V/079VtMGiuVsEiO8=;
-	h=Date:From:To:CC:Subject:Message-ID:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=AvU959/TcJAKGyabO/sIla/PIqcST4Hee7fUcoUEIduAc+RwdIbSMNwPEAlXoT3QmrY8uI3MX/HdqyLCoKu0DGV/SGJ9jilMd877UEgRl57wpXMogQRSn4TNln24jFkVIy1Jh34ZJOqQ5BXHd/vZSNI78bkbRBkZR+FgI4hH8/s=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RYCjACWX; arc=fail smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E43621CA0C;
+	Wed, 20 Aug 2025 05:35:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1755668106; cv=none; b=IbtLhA3h76KSmvQ+YYEr8YgaX7/whk3rWLZ13N6ZBkJp+gAJpTldSdjozUqd98ZzvbACJDh6MT4jdhqny0yqh0LwTRyjqara7MZQ1+XmfIaLpHw5sKiH2hxdGoCETN1g3zfHM8oAj8EUcAE6AvY8OPYPFPHqcibayyHR5aljNUY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1755668106; c=relaxed/simple;
+	bh=PGbpKjjkK7U6vif653Y/08jQ0Nh4rHCGe/3YW/sH7y4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FdDZjLmYkBflwG9L16hc24h+qBeWHf59NtDgiMBjEXEjXNFLRBfqNuQ5aGDN/5gxu1dS1YyXpEUrd61tQsrFfRNlCPHmMrXY3gNpyCNC0jWXOGwYdhUJzAibQKhl/28o9RVckrUu+rE3ddIXJemni8fKEdR3iZrnBMzQcT6JIV0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Er5bMhua; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RYCjACWX"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1755665740; x=1787201740;
-  h=date:from:to:cc:subject:message-id:in-reply-to:
-   mime-version;
-  bh=GFb6ZATjkcHIccNsvDiTX26Pt2V/079VtMGiuVsEiO8=;
-  b=RYCjACWXnD2e7ozQporQiFTJPvwv9UoGlNtdUtaX5vzviwwacPgFHGUA
-   H6Y1qzcAv/nl1RRd2KJ5qe9JPMS5RERQpOMXsBgT4f9f6FZHBZKsxV27F
-   vKlGghmfBsmESuW+PjbjOpxI2/h9RXlZp89ibnu/3SKFMpB7I5om3ozrF
-   DTxHcmbRK1ilcH7DQyOCwrtycidmvIOvXiVMYuJIJ9zLlUePO/nXoIzXU
-   siNFlQfcR7TIRycjbB/ByY5mzaXLhcFdrZP0p5zY4DPams7PClpSlfz4H
-   uQFJj5O+85i9GfaMUCMhdkfOyI/zga7H+ryFhJ+oXkefwJuvl3ti8mfWG
-   A==;
-X-CSE-ConnectionGUID: bTYvzwAFT828YuP7EtprFQ==
-X-CSE-MsgGUID: VYMq/gl8Rh+0r7tS9jquvA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11527"; a="57993486"
-X-IronPort-AV: E=Sophos;i="6.17,302,1747724400"; 
-   d="scan'208";a="57993486"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Aug 2025 21:55:40 -0700
-X-CSE-ConnectionGUID: oVzhvx46Q1uqSyJ7yHlc5A==
-X-CSE-MsgGUID: 4J2Er8kZRYuP9dZVgywwAA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.17,302,1747724400"; 
-   d="scan'208";a="172273082"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by fmviesa005.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Aug 2025 21:55:39 -0700
-Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Tue, 19 Aug 2025 21:55:39 -0700
-Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17 via Frontend Transport; Tue, 19 Aug 2025 21:55:39 -0700
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (40.107.237.72)
- by edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Tue, 19 Aug 2025 21:55:38 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=SPT/yZWPGYeO3H1G8w+mfksx3uaswfYadglLsjuFwT1ZoOs/ioXK74AwtCdLAuTuLT6IcTi5mrBdrThDWLShjM43ieMO/AtmLWFES8uTlQn5y+qzlHg3OCkvepUKfTP2CgJ2NhKq1VNjFbY8vw1idMy5vNfuwd4baMNynYbIoVM+gZRFnexj1sp4xClwsn1iE/6qSq2LRP/9RX9TZ9+pbMORAkEBIvyKm49roNnheZCPaLi4kTeoHrlnBzQa1q4FamkObm0FFcs+qVFCo5zaRTw8wnPFBbHwq4/3Iyx9+Hn37Fvdez74Jj2JBm4ETQbHYHqD99jM+hRuj8kqd75VrA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=vzwSXPyA0VeqUiy+1iL53DYOQ0HHxGDVpdRDS6tgFas=;
- b=PhSywSxiI4ebEPs24+jZhPZT+FfcTfGaPHIHKV/dRLXkLC+Ymv3+9Cz627jsVCakj42URoJ+/NPpxHpxp5M4mp+h1kzFrdFchRttsJScoXXtvNPJc7ogySTLgSZTIVL9zPVJ1mhrLwZywebu7iCQPUWb9E7QHeIDwWyG2A9g5c8wDi7IWg3iIQ69FSy8Jp6/uKOhjtMhUiw1poROgjYmc1cYOGIwaU070dcjc8gtYcYZEGoHhUpIaVFU5hs/SosEwsnlbqTM9AcyfHT4+d9RsYfwd4MOgFJaGnojmJDXSSaBEvsjN0TEREq56REAVcwaMGf9m/k7UPDId9qnob4NDQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from LV3PR11MB8603.namprd11.prod.outlook.com (2603:10b6:408:1b6::9)
- by DM4PR11MB6118.namprd11.prod.outlook.com (2603:10b6:8:b2::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9031.24; Wed, 20 Aug
- 2025 04:55:31 +0000
-Received: from LV3PR11MB8603.namprd11.prod.outlook.com
- ([fe80::4622:29cf:32b:7e5c]) by LV3PR11MB8603.namprd11.prod.outlook.com
- ([fe80::4622:29cf:32b:7e5c%5]) with mapi id 15.20.9052.013; Wed, 20 Aug 2025
- 04:55:31 +0000
-Date: Wed, 20 Aug 2025 12:55:22 +0800
-From: kernel test robot <oliver.sang@intel.com>
-To: Rajeev Mishra <rajeevm@hpe.com>
-CC: <oe-lkp@lists.linux.dev>, <lkp@intel.com>, <linux-block@vger.kernel.org>,
-	<axboe@kernel.dk>, <yukuai1@huaweicloud.com>, <linux-kernel@vger.kernel.org>,
-	Rajeev Mishra <rajeevm@hpe.com>, <oliver.sang@intel.com>
-Subject: Re: [PATCH v4 2/2] loop: use vfs_getattr_nosec for accurate file size
-Message-ID: <202508200409.b2459c02-lkp@intel.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20250814191004.60340-2-rajeevm@hpe.com>
-X-ClientProxiedBy: SG2PR03CA0103.apcprd03.prod.outlook.com
- (2603:1096:4:7c::31) To LV3PR11MB8603.namprd11.prod.outlook.com
- (2603:10b6:408:1b6::9)
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Er5bMhua"
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57JNo8P7028827;
+	Wed, 20 Aug 2025 05:34:28 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=dp+z/2
+	bNtY/qwwyQQqfQ1AQdVSFA4KaNWU9fNir3iNg=; b=Er5bMhuavlteR8n14v6+O3
+	MqBuoy05xJxgv/XXL2TD1VO/8xpPG9DmNIWT6kKWOFQ4NMisFfsrETAcWiR/8CCs
+	qqmXvTWhfOOUfvDdx2IGtEDuYTAumgtdc1MpGcGAMqA/gj52v/cvDbeIXWFHGKWV
+	8FalkCDlcK92xWWt3qomi6qY1x10oOx+WmaC8MqhdPY4yCLeUh0EcyIEwKFvxcWK
+	6VR95bLBmU23nLObfZv76x82axlsSF/NKglYE2s2aPcbVw0C/2XUqQzzhfCJ/RwC
+	tDhaZyxrby9wFHoWKQfrR9S4WiCqbY+SrNc9fW9D2q8KPdufeVete9DIHUEANNKQ
+	==
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48n38v95dv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 20 Aug 2025 05:34:28 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 57K4srw4024192;
+	Wed, 20 Aug 2025 05:34:27 GMT
+Received: from smtprelay05.dal12v.mail.ibm.com ([172.16.1.7])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 48my43hvq1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 20 Aug 2025 05:34:27 +0000
+Received: from smtpav05.dal12v.mail.ibm.com (smtpav05.dal12v.mail.ibm.com [10.241.53.104])
+	by smtprelay05.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 57K5YQoX21758482
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 20 Aug 2025 05:34:27 GMT
+Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D7A4658068;
+	Wed, 20 Aug 2025 05:34:26 +0000 (GMT)
+Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 78F4458067;
+	Wed, 20 Aug 2025 05:34:23 +0000 (GMT)
+Received: from [9.109.198.214] (unknown [9.109.198.214])
+	by smtpav05.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 20 Aug 2025 05:34:23 +0000 (GMT)
+Message-ID: <bb74795a-29f2-4ea6-932a-46b9f9095df0@linux.ibm.com>
+Date: Wed, 20 Aug 2025 11:04:22 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV3PR11MB8603:EE_|DM4PR11MB6118:EE_
-X-MS-Office365-Filtering-Correlation-Id: 692c2017-45e7-4bd8-7196-08dddfa5ca26
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7053199007;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?R7FTkT0qZafxWFwvviAHM+Y0gT1rx8zlB8SB3JYpRzSiWqSWqDPOAnWpYtC3?=
- =?us-ascii?Q?kiiXP+O752RLgEUOsW+H3ATBD1uewGD7UjxCEf4iB52F4rB5FmNA7C9RT0ox?=
- =?us-ascii?Q?kk1pTntVgIjfL4E40Snlg6oplrZJ3evARKodlmQdLy/owRTxibXN1tJdeT8d?=
- =?us-ascii?Q?/ZbmZMJIUAy3UYCvgVQ1QZ33tf7g1/nW/OB6aIEJKhOxCLOOMphcd8jM9ZOf?=
- =?us-ascii?Q?l5D0JtD7cEEDWosKMg5uaA/xb4MVCJ1N4xOrhEuThzpeoAhT3i+5dOXdTRtA?=
- =?us-ascii?Q?PWuShj6nQiKa9Ne5f/p+/OQVEmTm2k11MUb27MIgDpS29pQpihJTqXrjPOje?=
- =?us-ascii?Q?uYzzm87vSLDTuFZY6AotQvybuD5/GMKcZlCB84QvJ+u6va09v/yMNetPv5LU?=
- =?us-ascii?Q?8+ZX8xJylSZyuoYqdlSYxQ0Sw9hNwkQsNiTEph+BsnKzzeKTTqBmo8Hr8ve9?=
- =?us-ascii?Q?1tBGrfNkNxaPdmMe2Z6b8WV2lA2nbPYfOjP8kyeT/sKL87baJ5FZtIgpwSjQ?=
- =?us-ascii?Q?MzBu0ho3WmTgjtwcpxj5s79oiEapo4dvtzQzRQ8oBDwxm2+tTszb5paCnIY1?=
- =?us-ascii?Q?kaf/1ZWb47YLAtk1RUNe3aafGrrpTRIdlg8HnlvmdAlG9r7rIarqEbr13cqV?=
- =?us-ascii?Q?eAtcvaoLQH1YSzo27Ccb1Z89DFc7hsJyuf+yVYFEf/5nUF7WspfynljBiMSp?=
- =?us-ascii?Q?5xyi3+rQ5EQKraUpcA7Tm+C5KeM7fG11MLAbOP3n9eWS5zFORtMZ5sUSoa+u?=
- =?us-ascii?Q?vjzm5NQK3obrL6j4jTaTj7DUbgiYXAQskW/6be/x0RnhOQoVHgd0clIgNSYU?=
- =?us-ascii?Q?Ihdh5Mg96iD0oNgwPX59l56JPfEzIrL2ftoSNDV6opewJI54MQK8Hi0Xm1hj?=
- =?us-ascii?Q?nbs8FwCav6mtzDkMSnC2vSGZAkwfxus9j4GMzXavl9zKVNSeBxpuhmq1prZk?=
- =?us-ascii?Q?2bmxRXFzNswlJc4RZv5XlLaXlQ+TFSIYVmbTexA3sTYWRnWiuYtEkLJ8b0nq?=
- =?us-ascii?Q?9qfxiIut2qKg88/Ksy9T+qPfIT7U26DpRekMptvGZx0+KVYMzUJnchT94r3d?=
- =?us-ascii?Q?/FrYvJzg96nQ0cvs2bHE3BJts2bm6PHvH4HImNt3XPi9YwDbePbNz/MSKj5p?=
- =?us-ascii?Q?fssDl5YHmZoWQLRtA2A7huiZY82Jx8KCNa88fUmMz85od590vVK8+bLfOpat?=
- =?us-ascii?Q?3UTaG1R1IuyUMWy3azArpBeKqWtsPe7HAGc1ayI236WJuOp2iP3RIEmoU1qv?=
- =?us-ascii?Q?aSYwrAoRXIylre3x7ve8u1eOvi12UHkS5+QcbQqYnl2e0jzXE4UsP34Do4Md?=
- =?us-ascii?Q?atE3BBeEJfVGLsrTB2tyb/TrB4BwjnriB27gwsmWX8oG6RvmBf/4CBKrqSxq?=
- =?us-ascii?Q?hhDPhWbEu5KnF1NAdFMLTCWPgr+7?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV3PR11MB8603.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Q6Nhx7F7/aKwfBvQ/w19FZgrvbMGVaGKkYKs4yJLZjaN/jeY9YAvL50rPPaT?=
- =?us-ascii?Q?gQwfh7ACg7/15CdL2jWEzeTEENoJyb20UKYWwHVJnLfFXOMFHz2svMAvxWku?=
- =?us-ascii?Q?zvuVB4Ts6tMs3qxUEQtxJRvng7LpyRKfOp5Mz0rtBW0ei7BvWYB+FKbbWhsi?=
- =?us-ascii?Q?EH0nVjI4z5m7TINJhWTWuY51Zrmrwt/CpEjrl117gbbZKJRXP2M2jNwiZIRU?=
- =?us-ascii?Q?pUfoSFJIQA8/CbrEbBvGwbodH1QcrYvQxAOm8LrijrOjVHqK7uaClEoHEf1Z?=
- =?us-ascii?Q?E3fQ5aM7bZ+m1QJpN35PYaWEyisP80ehVwyEixHIospARk+3Ds7yUBZVmie5?=
- =?us-ascii?Q?6wde/l5mGQ6wimLTSNowh/HdT07HPHitYFf2oWzY5hI4SZDLwrW8JAs0Fl1G?=
- =?us-ascii?Q?9layU/+LX6CJdbKEn3OZcI7TPucd5iVPUylsTBAdjLJPFY6m4U89A7rvpmY/?=
- =?us-ascii?Q?L0+yQlCH6LwQe8+At9LP9qpcNa3MKpgkO8ofkQLZ2YHKbak1NUzdvloXiTwq?=
- =?us-ascii?Q?fn9NtMzfLp4jU4WsI99mFttqsI7hYogol+4y/TjAFGuKX5C9LeBo3TUQPoSW?=
- =?us-ascii?Q?Lyza9vvAFHAVb7wK1b/jHNNDoAzPVxMhln55J73FXc3YitACRPwOuBZSIYZp?=
- =?us-ascii?Q?hn+5nIkkIshs6pxy6dRI4WrhZJnkxdCX1tyxBbrE3MfnuJ0BfVcvTEjadAhG?=
- =?us-ascii?Q?+oerpxCKw1uJi1yBTUIa9vuMT+55fX3jFr1fTdwgNCtsmjDcubmJ3z+t25YY?=
- =?us-ascii?Q?uqY4PnH1Cpnx6A7Rgu/nDuhnxOK2baknnJ7OjPaRhqzeVUMxIx405QocA14A?=
- =?us-ascii?Q?3lHJK5AAOeu/k4ZcMVFBXCSwMS2WWt4a9PHaQqd+MAkLp71nBNOoq+XbjsI3?=
- =?us-ascii?Q?S08YRjiElFicEwTVTk3krFySdAOBoqQMn4j1LVEXf0GOSregHMUb4T9jLZ8G?=
- =?us-ascii?Q?VMJNaifREPstysK9lP90yFbu1tuYZlylXZNElYLNfmNCraL6SmGgvq1WE5N3?=
- =?us-ascii?Q?GMNvSU7zAGmRRkZMcmZe+xiy8ZFxfO/LXX5Li42ewXUdV3gyurAqbkHZl886?=
- =?us-ascii?Q?/9SjW6JSpYxHQcNDiBQYplQl9939EbIpmPXbQqQ9aOaWVXXCqcV3ruDhhrYf?=
- =?us-ascii?Q?Z9vsSgQYjzJYFUhT+wgCgDD4OQFWPN2thsBqN+201XDzGxf8dJuAB2a9R6kD?=
- =?us-ascii?Q?33o6nDiQTN4mnDbnnaOUcNQGtGHx8WhnzPH9SDOk25EKd/uGT+CKUcZTVN+z?=
- =?us-ascii?Q?vkhwyiBDgPpCLzRk/o1eDXRUxgCxjdH3G+DHxDdCRtTSHuYxRvJCittky8RI?=
- =?us-ascii?Q?Cor5gGLtQsD9DKkqcK3fTsziAQvtUX+bge3IUiDY7HqGdQ9/Cq6LBwV5DPEG?=
- =?us-ascii?Q?Q+zTJ9PlNB3K3G0ssHMvoVV5QcWv7+6MAtSTJP5wP+9MKKi2YcLY9arLzGAS?=
- =?us-ascii?Q?gqR5FOYSgqOGYEm/cvoF2xg0e9lnY0fkv35+Zb/sdJP5JxitQH2XB9j+22Nu?=
- =?us-ascii?Q?Xe6OIjZiaQDjygOv2XssxWo0cGSbCx/QnUPQnJqj6QHCsczifpdtiOzW2CwJ?=
- =?us-ascii?Q?hqBvRUT4IAIqFlWOlA9b+T1bF+AN7j/5+ToGEoabCc9K9FajCrCAPfCiUlxJ?=
- =?us-ascii?Q?Lw=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 692c2017-45e7-4bd8-7196-08dddfa5ca26
-X-MS-Exchange-CrossTenant-AuthSource: LV3PR11MB8603.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Aug 2025 04:55:31.2162
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: uScq6Smq2n6KXPF2U3HsVZeaadh0vOMrSXLoVvRzeaUSnnbZ61T3JjYXzUoeME4xIN9fR4S6VffJEEpXSBn8FA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB6118
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/2] blk-mq: fix elevator depth_updated method
+To: Yu Kuai <yukuai1@huaweicloud.com>, axboe@kernel.dk, bvanassche@acm.org,
+        ming.lei@redhat.com, hare@suse.de
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com, yangerkun@huawei.com, johnny.chenyi@huawei.com,
+        "yukuai (C)" <yukuai3@huawei.com>
+References: <20250819012917.523272-1-yukuai1@huaweicloud.com>
+ <20250819012917.523272-2-yukuai1@huaweicloud.com>
+ <f0abcc02-48c6-4d09-86d6-5ca8b968dcde@linux.ibm.com>
+ <0206ea4f-4efd-b7d0-088a-9257d06dcffb@huaweicloud.com>
+Content-Language: en-US
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <0206ea4f-4efd-b7d0-088a-9257d06dcffb@huaweicloud.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODE5MDIyMiBTYWx0ZWRfXxpI6sgN61Ev7
+ Wp8uQtO8zuS3ybBmhMyIpHZkD2r8rP8/Htfy/GtUpvsS66Fp1W3mLV2NQjYzPRVjpJNQaObDftS
+ beO4fBO8G9vXNSTnveHiIrdgdhVM8ZLVgwGfxC0/MstqbewANoJdliS7t7DTOrj7eUtujnUCJ2W
+ t5Y0jut70hIyCVunWWR904VQMZNgbTWlyujnEUkoUoS9jcAd//SWmkdydD+1XDnV1TBmSscP/e6
+ C5CCiUlTjAptKmX1EzMcSY13tNmS48419gJ+SVZg8M+MN667kUVO/8EdjA3BzEbcMQ7l5nxoH9q
+ g4dJJCWeF6Y1TF/3ORCwdB3bsxmghJlvK6YLn19F2N7DERNTMYKkrQW7YOc2o3mpuEbGQv/fESr
+ pXZg3mfELjRR+wUTZVCQB9+RTAA2wA==
+X-Authority-Analysis: v=2.4 cv=PMlWOfqC c=1 sm=1 tr=0 ts=68a55e64 cx=c_pps
+ a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
+ a=IkcTkHD0fZMA:10 a=2OwXVqhp2XgA:10 a=i0EeH86SAAAA:8 a=BM1hubmVBTbMqI6o2TUA:9
+ a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10 a=HhbK4dLum7pmb74im6QT:22
+ a=cPQSjfK2_nFv0Q5t_7PE:22 a=pHzHmUro8NiASowvMSCR:22 a=Ew2E2A-JSTLzCXPT_086:22
+X-Proofpoint-GUID: qoUmJ-I2erK5Omrk9P51FVTb2Bz7vp1z
+X-Proofpoint-ORIG-GUID: qoUmJ-I2erK5Omrk9P51FVTb2Bz7vp1z
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-08-20_02,2025-08-14_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ impostorscore=0 bulkscore=0 adultscore=0 priorityscore=1501
+ lowpriorityscore=0 malwarescore=0 spamscore=0 phishscore=0 suspectscore=0
+ clxscore=1015 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2508110000
+ definitions=main-2508190222
 
 
 
-Hello,
+On 8/20/25 6:26 AM, Yu Kuai wrote:
+> Hi,
+> 
+> 在 2025/08/19 20:20, Nilay Shroff 写道:
+>>
+>>
+>> On 8/19/25 6:59 AM, Yu Kuai wrote:
+>>> From: Yu Kuai <yukuai3@huawei.com>
+>>>
+>>> Current depth_updated has some problems:
+>>>
+>>> 1) depth_updated() will be called for each hctx, while all elevators
+>>> will update async_depth for the disk level, this is not related to hctx;
+>>> 2) In blk_mq_update_nr_requests(), if previous hctx update succeed and
+>>> this hctx update failed, q->nr_requests will not be updated, while
+>>> async_depth is already updated with new nr_reqeuests in previous
+>>> depth_updated();
+>>> 3) All elevators are using q->nr_requests to calculate async_depth now,
+>>> however, q->nr_requests is still the old value when depth_updated() is
+>>> called from blk_mq_update_nr_requests();
+>>>
+>>> Fix those problems by:
+>>>
+>>> - pass in request_queue instead of hctx;
+>>> - move depth_updated() after q->nr_requests is updated in
+>>>    blk_mq_update_nr_requests();
+>>> - add depth_updated() call in blk_mq_init_sched();
+>>> - remove init_hctx() method for mq-deadline and bfq that is useless now;
+>>>
+>>> Fixes: 77f1e0a52d26 ("bfq: update internal depth state when queue depth changes")
+>>> Fixes: 39823b47bbd4 ("block/mq-deadline: Fix the tag reservation code")
+>>> Fixes: 42e6c6ce03fd ("lib/sbitmap: convert shallow_depth from one word to the whole sbitmap")
+>>> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+>>> ---
+>>>   block/bfq-iosched.c   | 21 ++++-----------------
+>>>   block/blk-mq-sched.c  |  3 +++
+>>>   block/blk-mq-sched.h  | 11 +++++++++++
+>>>   block/blk-mq.c        | 23 ++++++++++++-----------
+>>>   block/elevator.h      |  2 +-
+>>>   block/kyber-iosched.c | 10 ++++------
+>>>   block/mq-deadline.c   | 15 ++-------------
+>>>   7 files changed, 37 insertions(+), 48 deletions(-)
+>>>
+>>> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+>>> index 50e51047e1fe..c0c398998aa1 100644
+>>> --- a/block/bfq-iosched.c
+>>> +++ b/block/bfq-iosched.c
+>>> @@ -7109,9 +7109,10 @@ void bfq_put_async_queues(struct bfq_data *bfqd, struct bfq_group *bfqg)
+>>>    * See the comments on bfq_limit_depth for the purpose of
+>>>    * the depths set in the function. Return minimum shallow depth we'll use.
+>>>    */
+>>> -static void bfq_update_depths(struct bfq_data *bfqd, struct sbitmap_queue *bt)
+>>> +static void bfq_depth_updated(struct request_queue *q)
+>>>   {
+>>> -    unsigned int nr_requests = bfqd->queue->nr_requests;
+>>> +    struct bfq_data *bfqd = q->elevator->elevator_data;
+>>> +    unsigned int nr_requests = q->nr_requests;
+>>>         /*
+>>>        * In-word depths if no bfq_queue is being weight-raised:
+>>> @@ -7143,21 +7144,8 @@ static void bfq_update_depths(struct bfq_data *bfqd, struct sbitmap_queue *bt)
+>>>       bfqd->async_depths[1][0] = max((nr_requests * 3) >> 4, 1U);
+>>>       /* no more than ~37% of tags for sync writes (~20% extra tags) */
+>>>       bfqd->async_depths[1][1] = max((nr_requests * 6) >> 4, 1U);
+>>> -}
+>>> -
+>>> -static void bfq_depth_updated(struct blk_mq_hw_ctx *hctx)
+>>> -{
+>>> -    struct bfq_data *bfqd = hctx->queue->elevator->elevator_data;
+>>> -    struct blk_mq_tags *tags = hctx->sched_tags;
+>>>   -    bfq_update_depths(bfqd, &tags->bitmap_tags);
+>>> -    sbitmap_queue_min_shallow_depth(&tags->bitmap_tags, 1);
+>>> -}
+>>> -
+>>> -static int bfq_init_hctx(struct blk_mq_hw_ctx *hctx, unsigned int index)
+>>> -{
+>>> -    bfq_depth_updated(hctx);
+>>> -    return 0;
+>>> +    blk_mq_set_min_shallow_depth(q, 1);
+>>>   }
+>>>     static void bfq_exit_queue(struct elevator_queue *e)
+>>> @@ -7628,7 +7616,6 @@ static struct elevator_type iosched_bfq_mq = {
+>>>           .request_merged        = bfq_request_merged,
+>>>           .has_work        = bfq_has_work,
+>>>           .depth_updated        = bfq_depth_updated,
+>>> -        .init_hctx        = bfq_init_hctx,
+>>>           .init_sched        = bfq_init_queue,
+>>>           .exit_sched        = bfq_exit_queue,
+>>>       },
+>>> diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+>>> index e2ce4a28e6c9..bf7dd97422ec 100644
+>>> --- a/block/blk-mq-sched.c
+>>> +++ b/block/blk-mq-sched.c
+>>> @@ -585,6 +585,9 @@ int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e,
+>>>               }
+>>>           }
+>>>       }
+>>> +
+>>> +    if (e->ops.depth_updated)
+>>> +        e->ops.depth_updated(q);
+>>>       return 0;
+>>>   
+>>
+>> Overall changes look good. That said, I think it might be cleaner to structure
+>> it this way:
+>>
+>> elevator_switch -> blk_mq_init_sched ->init_sched ==> sets async_depth
+>> blk_mq_update_nr_requests ->depth_updated ==> updates async_depth
+>>
+>> This way, we don’t need to call ->depth_updated from blk_mq_init_sched.
+> 
+> Just to be sure, you mean calling the depth_updated method directly
+> inside the init_sched() method? This is indeed cleaner, each elevator
+> has to use this method to initialize async_dpeth.
 
-kernel test robot noticed "xfstests.generic.563.fail" on:
+Yes you're right. As ->init_sched() already has pointer to request queue,
+you may now directly call ->depth_update() method of the respective 
+elevator from ->init_sched().
 
-commit: fb455b8a6ac932603a8c0dbb787f8330b0924834 ("[PATCH v4 2/2] loop: use vfs_getattr_nosec for accurate file size")
-url: https://github.com/intel-lab-lkp/linux/commits/Rajeev-Mishra/loop-use-vfs_getattr_nosec-for-accurate-file-size/20250815-031401
-base: https://git.kernel.org/cgit/linux/kernel/git/axboe/linux-block.git for-next
-patch link: https://lore.kernel.org/all/20250814191004.60340-2-rajeevm@hpe.com/
-patch subject: [PATCH v4 2/2] loop: use vfs_getattr_nosec for accurate file size
-
-in testcase: xfstests
-version: xfstests-x86_64-e1e4a0ea-1_20250714
-with following parameters:
-
-	disk: 4HDD
-	fs: ext4
-	test: generic-563
-
-
-
-config: x86_64-rhel-9.4-func
-compiler: gcc-12
-test machine: 4 threads Intel(R) Core(TM) i5-6500 CPU @ 3.20GHz (Skylake) with 32G memory
-
-(please refer to attached dmesg/kmsg for entire log/backtrace)
-
-
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <oliver.sang@intel.com>
-| Closes: https://lore.kernel.org/oe-lkp/202508200409.b2459c02-lkp@intel.com
-
-2025-08-17 21:02:18 export TEST_DIR=/fs/sda1
-2025-08-17 21:02:18 export TEST_DEV=/dev/sda1
-2025-08-17 21:02:18 export FSTYP=ext4
-2025-08-17 21:02:18 export SCRATCH_MNT=/fs/scratch
-2025-08-17 21:02:18 mkdir /fs/scratch -p
-2025-08-17 21:02:18 export SCRATCH_DEV=/dev/sda4
-2025-08-17 21:02:18 echo generic/563
-2025-08-17 21:02:18 ./check -E tests/exclude/ext4 generic/563
-FSTYP         -- ext4
-PLATFORM      -- Linux/x86_64 lkp-skl-d03 6.17.0-rc1-00020-gfb455b8a6ac9 #1 SMP PREEMPT_DYNAMIC Mon Aug 18 03:05:49 CST 2025
-MKFS_OPTIONS  -- -F /dev/sda4
-MOUNT_OPTIONS -- -o acl,user_xattr /dev/sda4 /fs/scratch
-
-generic/563       [failed, exit status 1]- output mismatch (see /lkp/benchmarks/xfstests/results//generic/563.out.bad)
-    --- tests/generic/563.out	2025-07-14 17:48:52.000000000 +0000
-    +++ /lkp/benchmarks/xfstests/results//generic/563.out.bad	2025-08-17 21:02:31.367411171 +0000
-    @@ -1,14 +1 @@
-     QA output created by 563
-    -read/write
-    -read is in range
-    -write is in range
-    -write -> read/write
-    -read is in range
-    -write is in range
-    ...
-    (Run 'diff -u /lkp/benchmarks/xfstests/tests/generic/563.out /lkp/benchmarks/xfstests/results//generic/563.out.bad'  to see the entire diff)
-Ran: generic/563
-Failures: generic/563
-Failed 1 of 1 tests
-
-
-
-
-The kernel config and materials to reproduce are available at:
-https://download.01.org/0day-ci/archive/20250820/202508200409.b2459c02-lkp@intel.com
-
-
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
-
+Thanks,
+--Nilay
