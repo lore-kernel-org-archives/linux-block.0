@@ -1,45 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DBDE25A352;
-	Wed, 20 Aug 2025 17:50:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E13136CE01
+	for <linux-block@vger.kernel.org>; Wed, 20 Aug 2025 19:22:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755712238; cv=none; b=XBqLSywySmwFLbqfECaC/iO7vN6LUjAG+5bsnXZ/NjJI8mIWXpT1oVMeakDZjBRWxJ6XW8Wq2nhezBKVT5yGTZiBTKK95gneYx8B8DAUAGj8LXkQ+DhvkJTyqAWBl2So29bE2aCOCfRnX69m99AbNTT+cyH1EuEDgJS9hyVkjeA=
+	t=1755717740; cv=none; b=cbVbyY/tSTlzUjS3g640KcC6+aLD61VGsus3o7JxzlEXwfLJBqTHlqq6CXeVLcgz+vYmpQylFehl7SwFKX09SXvKx62ToROi8cUwM4p5bOEiUM6xE49g8zHay46FlUAGjTu+JrZed09jHkCWoQEw/H+pzJQLTAGxK3YoDQBTgMw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755712238; c=relaxed/simple;
-	bh=WKGdVU7WkPGRn6n7Ocqx6xoiPc/q7PCmfXCFdh7Q86g=;
+	s=arc-20240116; t=1755717740; c=relaxed/simple;
+	bh=nawA7cYxMgTGk3717d4LDLFaPbkaJzVudqPw3UlMoFk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZjtCFeIDNl1+VIw3ZKsRgHmOPfYteGe5ysfMD3fBnVQ69jes9MPVbmO7I0xm/dW7fPaqoU1w/TkBnCIPHyEMky/ND4X+McOlA2shRfQP+mkPz4mu3b7u+aDfyuI+OVaxe/8T71TjoLV0eNspsidF0QNykN+vlDBPeId30NDcnqk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JtLF7o4T; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=UVyNrKcvZm76p637OZX6zZmpnTrplZ/S7y1pcvypmAnDZ1k74veqG/DjQ1YcxAcbM4ml01+t9x1P8pqEbXNJAHUjSAqOqy6/3SY0aHzQtdwMzgBMD346pXIrwDKb4+bYH4BjkeOV7GhyyYDJNoByjdh9nLWv1LCGomUOrqdUyrA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CJ/d+A7o; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JtLF7o4T"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3373C4CEE7;
-	Wed, 20 Aug 2025 17:50:37 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CJ/d+A7o"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB5C9C4CEE7;
+	Wed, 20 Aug 2025 19:22:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755712237;
-	bh=WKGdVU7WkPGRn6n7Ocqx6xoiPc/q7PCmfXCFdh7Q86g=;
+	s=k20201202; t=1755717740;
+	bh=nawA7cYxMgTGk3717d4LDLFaPbkaJzVudqPw3UlMoFk=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=JtLF7o4TD79tNlPUFPTyI9EfHMk1NzZ05ZM3oWrOCwq2b1WU7TOTFn97M3gTMZSDj
-	 Fj4JAClIBRK75OBVY68pysedsYjgPY+41IN5EpNIECmBxFNlMbRgCllmTpLs+kjtAf
-	 FNIrB8GvrMRTVEsjI2ozafuZIP0Tirse/3oOsBM9+uqk9nez/GF7v5Ri6sQeBrk6Q/
-	 fXZwrNJZ1c8lw7VYKs8cd029TES4ET99Ly470cjXPxqlQ3QNsM2nwVeb++96UrreP9
-	 Qb3aOdYuVyUkV1fCCSpBU0TdpLPQMys5IdaHwbYX65P4QFq5h/g4h5bx7vP7Hk6YmP
-	 OudKDcUzpL57A==
-Date: Wed, 20 Aug 2025 10:50:37 -0700
-From: "Darrick J. Wong" <djwong@kernel.org>
-To: Zhang Yi <yi.zhang@huaweicloud.com>
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-	dm-devel@lists.linux.dev, linux-nvme@lists.infradead.org,
-	linux-scsi@vger.kernel.org, linux-kernel@vger.kernel.org,
-	hch@lst.de, tytso@mit.edu, bmarzins@redhat.com,
-	chaitanyak@nvidia.com, shinichiro.kawasaki@wdc.com,
-	brauner@kernel.org, martin.petersen@oracle.com, yi.zhang@huawei.com,
-	chengzhihao1@huawei.com, yukuai3@huawei.com, yangerkun@huawei.com
-Subject: Re: [PATCH util-linux v3] fallocate: add FALLOC_FL_WRITE_ZEROES
- support
-Message-ID: <20250820175037.GN7981@frogsfrogsfrogs>
-References: <20250820085632.1879239-1-yi.zhang@huaweicloud.com>
+	b=CJ/d+A7oXtpLOuON7gDLjFxOkgPHYYnE8z2tiFAV5urzXSGkyCyG0AkC7Z+Z2Tyy9
+	 dKRsO2Np0klI+38IrfJoJdiYr5KgoyKFGkcpdN8kSdlIXdw9pBOOH+fTnYrGy4hyeG
+	 lKDrp+xDqhuvlanuCK39i2UndokQ8mx4/5TBIF4t9MMK1ghlJe0rV+uNgZIV48oYPb
+	 ULMqzPslbR3H/eL1ng+hExUawKFajvVfxOnXgSSiFUjMN0tLQPZc30KdFplk1W8cUE
+	 RGBVyXoUb+grq7ytHEv67FYQ1QLLKosmEWSbo8a4D1DtQ1oQlkXpmsTD7kAIJ5X06y
+	 Ww3Q9ALJg1c5A==
+Date: Wed, 20 Aug 2025 13:22:17 -0600
+From: Keith Busch <kbusch@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org, axboe@kernel.dk
+Subject: Re: [PATCH 1/2] block: accumulate segment page gaps per bio
+Message-ID: <aKYgacJZCQEx1kf1@kbusch-mbp>
+References: <20250805195608.2379107-1-kbusch@meta.com>
+ <20250806145621.GC20102@lst.de>
+ <aJN4b6GS30eJdQLd@kbusch-mbp>
+ <20250810143112.GA4860@lst.de>
+ <aJoL1rsvI5bXkod_@kbusch-mbp>
+ <20250811161756.GA25496@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -48,154 +47,24 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250820085632.1879239-1-yi.zhang@huaweicloud.com>
+In-Reply-To: <20250811161756.GA25496@lst.de>
 
-On Wed, Aug 20, 2025 at 04:56:32PM +0800, Zhang Yi wrote:
-> From: Zhang Yi <yi.zhang@huawei.com>
+On Mon, Aug 11, 2025 at 06:17:56PM +0200, Christoph Hellwig wrote:
+> On Mon, Aug 11, 2025 at 09:27:18AM -0600, Keith Busch wrote:
+> > I initially tried to copy the nsegs usage in the request, but there are
+> > multiple places (iomap, xfs, and btrfs) that split to hardware limits
+> > without a request, so I'm not sure where the result is supposed to go to
+> > be referenced later. Or do those all call the same split function later
+> > in the generic block layer, in which case it shouldn't matter if the
+> > upper layers already called it?
 > 
-> The Linux kernel (since version 6.17) supports FALLOC_FL_WRITE_ZEROES in
-> fallocate(2). Add support for FALLOC_FL_WRITE_ZEROES to the fallocate
-> utility by introducing a new option -w|--write-zeroes.
-> 
-> Link: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=278c7d9b5e0c
-> Signed-off-by: Zhang Yi <yi.zhang@huawei.com>
-> ---
-> v2->v3:
->  - Say less about what the filesystem actually implements as Darrick
->    suggested and clarify the reason why "--keep-size" cannot be used
->    together in the man page.
->  - Modify the verbose output message.
-> v1->v2:
->  - Minor description modification to align with the kernel.
-> 
->  sys-utils/fallocate.1.adoc | 11 +++++++++--
->  sys-utils/fallocate.c      | 20 ++++++++++++++++----
->  2 files changed, 25 insertions(+), 6 deletions(-)
-> 
-> diff --git a/sys-utils/fallocate.1.adoc b/sys-utils/fallocate.1.adoc
-> index 44ee0ef4c..a06cf7a50 100644
-> --- a/sys-utils/fallocate.1.adoc
-> +++ b/sys-utils/fallocate.1.adoc
-> @@ -12,7 +12,7 @@ fallocate - preallocate or deallocate space to a file
->  
->  == SYNOPSIS
->  
-> -*fallocate* [*-c*|*-p*|*-z*] [*-o* _offset_] *-l* _length_ [*-n*] _filename_
-> +*fallocate* [*-c*|*-p*|*-z*|*-w*] [*-o* _offset_] *-l* _length_ [*-n*] _filename_
->  
->  *fallocate* *-d* [*-o* _offset_] [*-l* _length_] _filename_
->  
-> @@ -28,7 +28,7 @@ The exit status returned by *fallocate* is 0 on success and 1 on failure.
->  
->  The _length_ and _offset_ arguments may be followed by the multiplicative suffixes KiB (=1024), MiB (=1024*1024), and so on for GiB, TiB, PiB, EiB, ZiB, and YiB (the "iB" is optional, e.g., "K" has the same meaning as "KiB") or the suffixes KB (=1000), MB (=1000*1000), and so on for GB, TB, PB, EB, ZB, and YB.
->  
-> -The options *--collapse-range*, *--dig-holes*, *--punch-hole*, *--zero-range* and *--posix* are mutually exclusive.
-> +The options *--collapse-range*, *--dig-holes*, *--punch-hole*, *--zero-range*, *--write-zeroes* and *--posix* are mutually exclusive.
->  
->  *-c*, *--collapse-range*::
->  Removes a byte range from a file, without leaving a hole. The byte range to be collapsed starts at _offset_ and continues for _length_ bytes. At the completion of the operation, the contents of the file starting at the location __offset__+_length_ will be appended at the location _offset_, and the file will be _length_ bytes smaller. The option *--keep-size* may not be specified for the collapse-range operation.
-> @@ -76,6 +76,13 @@ Option *--keep-size* can be specified to prevent file length modification.
->  +
->  Available since Linux 3.14 for ext4 (only for extent-based files) and XFS.
->  
-> +*-w*, *--write-zeroes*::
-> +Zeroes space in the byte range starting at _offset_ and continuing for _length_ bytes. Within the specified range, written blocks are preallocated for the regions that span the holes in the file. After a successful call, subsequent reads from this range will return zeroes and subsequent writes to that range do not require further changes to the file mapping metadata.
-> ++
-> +Zeroing is done within the filesystem. The filesystem may use a hardware-accelerated zeroing command or may submit regular writes. The behavior depends on the filesystem design and the available hardware.
-> ++
-> +Options *--keep-size* can not be specified for the write-zeroes operation because allocating written blocks beyond the inode size is not permitted.
+> Yes, we'll always end up calling into __bio_split_to_limits in blk-mq,
+> no matter if someone split before.  The upper layer splits are only
+> for zone append users that can't later be split, but
+> __bio_split_to_limits is stilled called on them to count the segments
+> and to assert that they don't need splitting.
 
-Nit: s/can not/cannot/
-
-With that fixed, this looks fine to me, so
-Reviewed-by: "Darrick J. Wong" <djwong@kernel.org>
-
---D
-
-> +
->  include::man-common/help-version.adoc[]
->  
->  == AUTHORS
-> diff --git a/sys-utils/fallocate.c b/sys-utils/fallocate.c
-> index 13bf52915..afd615537 100644
-> --- a/sys-utils/fallocate.c
-> +++ b/sys-utils/fallocate.c
-> @@ -40,7 +40,7 @@
->  #if defined(HAVE_LINUX_FALLOC_H) && \
->      (!defined(FALLOC_FL_KEEP_SIZE) || !defined(FALLOC_FL_PUNCH_HOLE) || \
->       !defined(FALLOC_FL_COLLAPSE_RANGE) || !defined(FALLOC_FL_ZERO_RANGE) || \
-> -     !defined(FALLOC_FL_INSERT_RANGE))
-> +     !defined(FALLOC_FL_INSERT_RANGE) || !defined(FALLOC_FL_WRITE_ZEROES))
->  # include <linux/falloc.h>	/* non-libc fallback for FALLOC_FL_* flags */
->  #endif
->  
-> @@ -65,6 +65,10 @@
->  # define FALLOC_FL_INSERT_RANGE		0x20
->  #endif
->  
-> +#ifndef FALLOC_FL_WRITE_ZEROES
-> +# define FALLOC_FL_WRITE_ZEROES		0x80
-> +#endif
-> +
->  #include "nls.h"
->  #include "strutils.h"
->  #include "c.h"
-> @@ -94,6 +98,7 @@ static void __attribute__((__noreturn__)) usage(void)
->  	fputs(_(" -o, --offset <num>   offset for range operations, in bytes\n"), out);
->  	fputs(_(" -p, --punch-hole     replace a range with a hole (implies -n)\n"), out);
->  	fputs(_(" -z, --zero-range     zero and ensure allocation of a range\n"), out);
-> +	fputs(_(" -w, --write-zeroes   write zeroes and ensure allocation of a range\n"), out);
->  #ifdef HAVE_POSIX_FALLOCATE
->  	fputs(_(" -x, --posix          use posix_fallocate(3) instead of fallocate(2)\n"), out);
->  #endif
-> @@ -304,6 +309,7 @@ int main(int argc, char **argv)
->  	    { "dig-holes",      no_argument,       NULL, 'd' },
->  	    { "insert-range",   no_argument,       NULL, 'i' },
->  	    { "zero-range",     no_argument,       NULL, 'z' },
-> +	    { "write-zeroes",   no_argument,       NULL, 'w' },
->  	    { "offset",         required_argument, NULL, 'o' },
->  	    { "length",         required_argument, NULL, 'l' },
->  	    { "posix",          no_argument,       NULL, 'x' },
-> @@ -312,8 +318,8 @@ int main(int argc, char **argv)
->  	};
->  
->  	static const ul_excl_t excl[] = {	/* rows and cols in ASCII order */
-> -		{ 'c', 'd', 'i', 'p', 'x', 'z'},
-> -		{ 'c', 'i', 'n', 'x' },
-> +		{ 'c', 'd', 'i', 'p', 'w', 'x', 'z'},
-> +		{ 'c', 'i', 'n', 'w', 'x' },
->  		{ 0 }
->  	};
->  	int excl_st[ARRAY_SIZE(excl)] = UL_EXCL_STATUS_INIT;
-> @@ -323,7 +329,7 @@ int main(int argc, char **argv)
->  	textdomain(PACKAGE);
->  	close_stdout_atexit();
->  
-> -	while ((c = getopt_long(argc, argv, "hvVncpdizxl:o:", longopts, NULL))
-> +	while ((c = getopt_long(argc, argv, "hvVncpdizwxl:o:", longopts, NULL))
->  			!= -1) {
->  
->  		err_exclusive_options(c, longopts, excl, excl_st);
-> @@ -353,6 +359,9 @@ int main(int argc, char **argv)
->  		case 'z':
->  			mode |= FALLOC_FL_ZERO_RANGE;
->  			break;
-> +		case 'w':
-> +			mode |= FALLOC_FL_WRITE_ZEROES;
-> +			break;
->  		case 'x':
->  #ifdef HAVE_POSIX_FALLOCATE
->  			posix = 1;
-> @@ -429,6 +438,9 @@ int main(int argc, char **argv)
->  			else if (mode & FALLOC_FL_ZERO_RANGE)
->  				fprintf(stdout, _("%s: %s (%ju bytes) zeroed.\n"),
->  								filename, str, length);
-> +			else if (mode & FALLOC_FL_WRITE_ZEROES)
-> +				fprintf(stdout, _("%s: %s (%ju bytes) written as zeroes.\n"),
-> +								filename, str, length);
->  			else
->  				fprintf(stdout, _("%s: %s (%ju bytes) allocated.\n"),
->  								filename, str, length);
-> -- 
-> 2.39.2
-> 
+Zone write plugging presents a problem. For the same reason that
+"__bi_nr_segments" exists, I have to stash this result somewhere in the
+bio struct. I mentioned earlier I just need one byte, and there's a byte
+hole in the bio already, so won't need to increase the size.
