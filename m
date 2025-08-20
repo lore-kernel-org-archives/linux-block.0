@@ -1,196 +1,132 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E05C18E025;
-	Wed, 20 Aug 2025 00:56:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+Received: from mail.189.cn (unknown [14.29.118.224])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 948CD277C96;
+	Wed, 20 Aug 2025 01:57:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=14.29.118.224
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755651421; cv=none; b=qJI4vs4i2vvGuwkJn9rJFGvLoetxN5LFZBH+CFiym7sEcRPkxgiM+54Qp/M6dV3DJLH6X9n4lWP+AyriwACjI/zDfidPfrmpLinyOShZ4pPmYrE336U4dX9kED7hy7IR/U24U9r2IBIgzqh20d7HOEGMp4TnC9rF2T+JtsMSIbY=
+	t=1755655029; cv=none; b=rEm7JzngIuaHBY+vi0bjt1kWQsLpe/7d0d8QFnRG7dc6tlapoANryYAtdy/TOa8FgXkHcA7Y5Md6rzEqiC3AHvv/q5UOAgdlHtptbh1LK+0N2VtXTakzzPNAUM1UK9nBXMJT1CJmfjAkX8gYkJMjUGANf3/oAJuwcFnlNdBIf5U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755651421; c=relaxed/simple;
-	bh=0HQCK7/5CZQFcRFDH6/1REzuymgJzXwhlRrUXL382Xk=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=n75k3rE/8ci5WzQIxioBcXq1qG4vFZ24wP1HZIQ4fjWqTGbICCeQZGvxJ/gMrhJe0lZ3hVaL4h8iv19xU1Sfn1yLD3X2h34/FKTIMLgWiJtflI4je2HxG/A/z9QGFUGyCbyn0huXpAQWx3vFkdU0uzQgudJioEwaE8Imrbznw9Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4c67MD4NyNzYQtxB;
-	Wed, 20 Aug 2025 08:56:56 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 2F9A81A09D6;
-	Wed, 20 Aug 2025 08:56:55 +0800 (CST)
-Received: from [10.174.179.143] (unknown [10.174.179.143])
-	by APP4 (Coremail) with SMTP id gCh0CgAXkxNVHaVoUe0VEQ--.47546S3;
-	Wed, 20 Aug 2025 08:56:54 +0800 (CST)
-Subject: Re: [PATCH v2 1/2] blk-mq: fix elevator depth_updated method
-To: Nilay Shroff <nilay@linux.ibm.com>, Yu Kuai <yukuai1@huaweicloud.com>,
- axboe@kernel.dk, bvanassche@acm.org, ming.lei@redhat.com, hare@suse.de
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- yi.zhang@huawei.com, yangerkun@huawei.com, johnny.chenyi@huawei.com,
- "yukuai (C)" <yukuai3@huawei.com>
-References: <20250819012917.523272-1-yukuai1@huaweicloud.com>
- <20250819012917.523272-2-yukuai1@huaweicloud.com>
- <f0abcc02-48c6-4d09-86d6-5ca8b968dcde@linux.ibm.com>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <0206ea4f-4efd-b7d0-088a-9257d06dcffb@huaweicloud.com>
-Date: Wed, 20 Aug 2025 08:56:52 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.1
+	s=arc-20240116; t=1755655029; c=relaxed/simple;
+	bh=JljQWhyzIJt7C788pKgaXNB1oPW5minMsML/GRveAao=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lgkV/ODLZFmUOxZiXJEIb/OgBlfhspXlCoT9fnarr0Qa+DEzAYqI4VQbqg94j884npeck4tJPhkyfG8QR3OXdbxL7C5bVTT+ooBv5Rwr5z1yxPC0b+/te1StiBXsLxIhhB2hjAkeXwmDYI0x6svA5Lhyf3vwK7lkNSIytxoxrp8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=189.cn; spf=pass smtp.mailfrom=189.cn; arc=none smtp.client-ip=14.29.118.224
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=189.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=189.cn
+HMM_SOURCE_IP:10.158.242.145:0.323270274
+HMM_ATTACHE_NUM:0000
+HMM_SOURCE_TYPE:SMTP
+Received: from clientip-221.238.56.48 (unknown [10.158.242.145])
+	by mail.189.cn (HERMES) with SMTP id 554F2400310;
+	Wed, 20 Aug 2025 09:52:37 +0800 (CST)
+Received: from  ([221.238.56.48])
+	by gateway-153622-dep-cdbdfc76c-6vnnj with ESMTP id 1fa85400c497490182ac2cbe6ac6ffa0 for kbusch@meta.com;
+	Wed, 20 Aug 2025 09:52:39 CST
+X-Transaction-ID: 1fa85400c497490182ac2cbe6ac6ffa0
+X-Real-From: chensong_2000@189.cn
+X-Receive-IP: 221.238.56.48
+X-MEDUSA-Status: 0
+Sender: chensong_2000@189.cn
+Message-ID: <5706ae6d-5ffd-445d-bfb3-d44fc2afa350@189.cn>
+Date: Wed, 20 Aug 2025 09:52:36 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <f0abcc02-48c6-4d09-86d6-5ca8b968dcde@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCHv3 0/8] direct-io: even more flexible io vectors
+To: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: snitzer@kernel.org, axboe@kernel.dk, dw@davidwei.uk, brauner@kernel.org,
+ hch@lst.de, martin.petersen@oracle.com, djwong@kernel.org,
+ linux-xfs@vger.kernel.org, viro@zeniv.linux.org.uk,
+ Keith Busch <kbusch@kernel.org>
+References: <20250819164922.640964-1-kbusch@meta.com>
+Content-Language: en-US
+From: Song Chen <chensong_2000@189.cn>
+In-Reply-To: <20250819164922.640964-1-kbusch@meta.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgAXkxNVHaVoUe0VEQ--.47546S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxZrW8Gr43tFWrJw18Xw4xWFg_yoW7Jw1fpr
-	ZxtanIkr1rtr47uF1Yy343Xr4rt39akry2yFsxtw1rtryq9Fs3XF1rGF1xXFWIvrZ5CF4x
-	Jr10qa9rXr1IqFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBF14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
-	0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x
-	0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E
-	7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcV
-	C0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF
-	04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7
-	CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUd-B_UUUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
 Hi,
 
-在 2025/08/19 20:20, Nilay Shroff 写道:
+在 2025/8/20 00:49, Keith Busch 写道:
+> From: Keith Busch <kbusch@kernel.org>
 > 
+> Previous version:
 > 
-> On 8/19/25 6:59 AM, Yu Kuai wrote:
->> From: Yu Kuai <yukuai3@huawei.com>
->>
->> Current depth_updated has some problems:
->>
->> 1) depth_updated() will be called for each hctx, while all elevators
->> will update async_depth for the disk level, this is not related to hctx;
->> 2) In blk_mq_update_nr_requests(), if previous hctx update succeed and
->> this hctx update failed, q->nr_requests will not be updated, while
->> async_depth is already updated with new nr_reqeuests in previous
->> depth_updated();
->> 3) All elevators are using q->nr_requests to calculate async_depth now,
->> however, q->nr_requests is still the old value when depth_updated() is
->> called from blk_mq_update_nr_requests();
->>
->> Fix those problems by:
->>
->> - pass in request_queue instead of hctx;
->> - move depth_updated() after q->nr_requests is updated in
->>    blk_mq_update_nr_requests();
->> - add depth_updated() call in blk_mq_init_sched();
->> - remove init_hctx() method for mq-deadline and bfq that is useless now;
->>
->> Fixes: 77f1e0a52d26 ("bfq: update internal depth state when queue depth changes")
->> Fixes: 39823b47bbd4 ("block/mq-deadline: Fix the tag reservation code")
->> Fixes: 42e6c6ce03fd ("lib/sbitmap: convert shallow_depth from one word to the whole sbitmap")
->> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
->> ---
->>   block/bfq-iosched.c   | 21 ++++-----------------
->>   block/blk-mq-sched.c  |  3 +++
->>   block/blk-mq-sched.h  | 11 +++++++++++
->>   block/blk-mq.c        | 23 ++++++++++++-----------
->>   block/elevator.h      |  2 +-
->>   block/kyber-iosched.c | 10 ++++------
->>   block/mq-deadline.c   | 15 ++-------------
->>   7 files changed, 37 insertions(+), 48 deletions(-)
->>
->> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
->> index 50e51047e1fe..c0c398998aa1 100644
->> --- a/block/bfq-iosched.c
->> +++ b/block/bfq-iosched.c
->> @@ -7109,9 +7109,10 @@ void bfq_put_async_queues(struct bfq_data *bfqd, struct bfq_group *bfqg)
->>    * See the comments on bfq_limit_depth for the purpose of
->>    * the depths set in the function. Return minimum shallow depth we'll use.
->>    */
->> -static void bfq_update_depths(struct bfq_data *bfqd, struct sbitmap_queue *bt)
->> +static void bfq_depth_updated(struct request_queue *q)
->>   {
->> -	unsigned int nr_requests = bfqd->queue->nr_requests;
->> +	struct bfq_data *bfqd = q->elevator->elevator_data;
->> +	unsigned int nr_requests = q->nr_requests;
->>   
->>   	/*
->>   	 * In-word depths if no bfq_queue is being weight-raised:
->> @@ -7143,21 +7144,8 @@ static void bfq_update_depths(struct bfq_data *bfqd, struct sbitmap_queue *bt)
->>   	bfqd->async_depths[1][0] = max((nr_requests * 3) >> 4, 1U);
->>   	/* no more than ~37% of tags for sync writes (~20% extra tags) */
->>   	bfqd->async_depths[1][1] = max((nr_requests * 6) >> 4, 1U);
->> -}
->> -
->> -static void bfq_depth_updated(struct blk_mq_hw_ctx *hctx)
->> -{
->> -	struct bfq_data *bfqd = hctx->queue->elevator->elevator_data;
->> -	struct blk_mq_tags *tags = hctx->sched_tags;
->>   
->> -	bfq_update_depths(bfqd, &tags->bitmap_tags);
->> -	sbitmap_queue_min_shallow_depth(&tags->bitmap_tags, 1);
->> -}
->> -
->> -static int bfq_init_hctx(struct blk_mq_hw_ctx *hctx, unsigned int index)
->> -{
->> -	bfq_depth_updated(hctx);
->> -	return 0;
->> +	blk_mq_set_min_shallow_depth(q, 1);
->>   }
->>   
->>   static void bfq_exit_queue(struct elevator_queue *e)
->> @@ -7628,7 +7616,6 @@ static struct elevator_type iosched_bfq_mq = {
->>   		.request_merged		= bfq_request_merged,
->>   		.has_work		= bfq_has_work,
->>   		.depth_updated		= bfq_depth_updated,
->> -		.init_hctx		= bfq_init_hctx,
->>   		.init_sched		= bfq_init_queue,
->>   		.exit_sched		= bfq_exit_queue,
->>   	},
->> diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
->> index e2ce4a28e6c9..bf7dd97422ec 100644
->> --- a/block/blk-mq-sched.c
->> +++ b/block/blk-mq-sched.c
->> @@ -585,6 +585,9 @@ int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e,
->>   			}
->>   		}
->>   	}
->> +
->> +	if (e->ops.depth_updated)
->> +		e->ops.depth_updated(q);
->>   	return 0;
->>   
+>    https://lore.kernel.org/linux-block/20250805141123.332298-1-kbusch@meta.com/
 > 
-> Overall changes look good. That said, I think it might be cleaner to structure
-> it this way:
+> This series removes the direct io requirement that io vector lengths
+> align to the logical block size.
 > 
-> elevator_switch -> blk_mq_init_sched ->init_sched ==> sets async_depth
-> blk_mq_update_nr_requests ->depth_updated ==> updates async_depth
+> I tested this on a few raw block device types including nvme,
+> virtio-blk, ahci, and loop. NVMe is the only one I tested with 4k
+> logical sectors; everything else was 512.
 > 
-> This way, we don’t need to call ->depth_updated from blk_mq_init_sched.
+> On each of those, I tested several iomap filesystems: xfs, ext4, and
+> btrfs. I found it interesting that each behave a little
+> differently with handling invalid vector alignments:
+> 
+>    - XFS is the most straight forward and reports failures on invalid
+>      vector conditions, same as raw blocks devices.
+> 
+>    - EXT4 falls back to buffered io for writes but not for reads.
 
-Just to be sure, you mean calling the depth_updated method directly
-inside the init_sched() method? This is indeed cleaner, each elevator
-has to use this method to initialize async_dpeth.
-> 
-> In summary:
-> - Avoid calling ->depth_updated during blk_mq_init_sched
-> - Set async_depth when the elevator is initialized (via ->init_sched)
-> - Update async_depth when nr_requests is modified through sysfs (via ->depth_updated)
-> 
-> Thanks,
-> --Nilay
-> .
-> 
+I found it in ext4 too, i tried to fall the misaligned dio read request 
+back to buffered io and submitted a patch[1], but haven't received any 
+comments yet.
 
-Thanks,
-Kuai
+[1]:https://lore.kernel.org/all/20250710085910.123168-1-chensong_2000@189.cn/
 
+Song
+> 
+>    - BTRFS doesn't even try direct io for any unusual alignments; it
+>      chooses buffered io from the start.
+> 
+> So it has been a little slow going figuring out which results to expect
+> from various tests, but I think I've got all the corner cases covered. I
+> can submit the tests cases to blktests and fstests for consideration
+> separately, too.
+> 
+> I'm not 100% sure where we're at with the last patch. I think Mike
+> initially indicated this was okay to remove, but I could swear I read
+> something saying that might not be the case anymore. I just can't find
+> the message now. Mike?
+> 
+> Changes from v2:
+> 
+>    Include vector lengths when validating a split. The length check is
+>    only valid for r/w commands, and skipped for passthrough
+>    DRV_IN/DRV_OUT commands.
+> 
+>    Introduce a prep patch having bio_iov_iter_get_pages() take the
+>    caller's desired length alignment.
+> 
+>    Additional code comments explaing less obvious error conditions.
+> 
+>    Added reviews on the patches that haven't changed.
+> 
+> Keith Busch (8):
+>    block: check for valid bio while splitting
+>    block: add size alignment to bio_iov_iter_get_pages
+>    block: align the bio after building it
+>    block: simplify direct io validity check
+>    iomap: simplify direct io validity check
+>    block: remove bdev_iter_is_aligned
+>    blk-integrity: use simpler alignment check
+>    iov_iter: remove iov_iter_is_aligned
+> 
+>   block/bio-integrity.c  |  4 +-
+>   block/bio.c            | 64 ++++++++++++++++++----------
+>   block/blk-map.c        |  2 +-
+>   block/blk-merge.c      | 20 +++++++--
+>   block/fops.c           | 13 +++---
+>   fs/iomap/direct-io.c   |  6 +--
+>   include/linux/bio.h    | 13 ++++--
+>   include/linux/blkdev.h | 20 +++++----
+>   include/linux/uio.h    |  2 -
+>   lib/iov_iter.c         | 95 ------------------------------------------
+>   10 files changed, 94 insertions(+), 145 deletions(-)
+> 
