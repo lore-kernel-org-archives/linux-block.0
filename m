@@ -1,210 +1,214 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79EA52D2480
-	for <linux-block@vger.kernel.org>; Wed, 20 Aug 2025 08:55:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.15
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755680159; cv=fail; b=e14IJwEYZ6Goe0pDijCnhmalhDrIdx6l3xtzUsxAtdc6diNnZ5b+2xGHtIdNg/7cO/AOnjH1amqeBqpFXwCp8Pc+uShd8Wp8XfT6vgORhMXG07HEneqwkWBT8YVxTgHFrJcEl4EJATCMpFih+oPIgt2YybZXTS+iHHw0HrqBbh8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755680159; c=relaxed/simple;
-	bh=1ZL6wimCr36slHEJOu5Cf3y6G5cUuFvBo4d/qiLeiec=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=HhdXtgUgZTBb81uK9t6NQAPpOhtRMLebIaSngw2YiyP4E+vZWJs7yg1GcPCC7umgRy5ojdstg6+2lFRbdf6HCLjOUOJQN+WcRiWh3bUEFwyCtBRtuGJMCdo2bZ0+wdvWQN0HlhYOCrfj8PGQ5LbrAP8huHoesJUwijEdnBVuNNo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ng88bXe+; arc=fail smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ng88bXe+"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1755680158; x=1787216158;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=1ZL6wimCr36slHEJOu5Cf3y6G5cUuFvBo4d/qiLeiec=;
-  b=ng88bXe+W64gSScFxZgsMEoC0aBH+wY1cl1uAFhBKCFUkJczob3K0UMm
-   lLXF32Wz+RmwFp5hqbbP+mad/8DE3oGWNC1lIuH1c+iG/7YitLQm+Ak4j
-   NeZUR537UFD7hQTedkSAhlzX0S9v7iqN/0rJT8t+03zcHyVAsPmDakZef
-   Hv+zJdjZ46xN3gT18PlqOapU1bMBWloqkPp8NsB3YymkSEp0zKToOG6rt
-   q4CYYYDQ5AaOUDSSO+89RBBwSbSkEjYlGBF/9UZUOgHALGiGLPorZ8bpK
-   cdWE14MTQAfoSEyAbHAoVILUwDHmYtUvJVnSXLVh4Trc9fGY5wHVpaJtE
-   w==;
-X-CSE-ConnectionGUID: ZuX/s1/sRau4xb5YxAIQPg==
-X-CSE-MsgGUID: XwWqP9cRR3S+8Tu2QW9yBw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11527"; a="58039147"
-X-IronPort-AV: E=Sophos;i="6.17,302,1747724400"; 
-   d="scan'208";a="58039147"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Aug 2025 01:55:51 -0700
-X-CSE-ConnectionGUID: 5Zpr7Z69R8KywIwms5YDeQ==
-X-CSE-MsgGUID: aZgiv7zKRH+l6KR1xIPB/g==
-X-ExtLoop1: 1
-Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
-  by fmviesa003.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Aug 2025 01:55:50 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Wed, 20 Aug 2025 01:55:49 -0700
-Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17 via Frontend Transport; Wed, 20 Aug 2025 01:55:49 -0700
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (40.107.94.85) by
- edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Wed, 20 Aug 2025 01:55:49 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=DCBSaV6WGNqvfMW4IhYipKQ3jAicDeN87rhNFDTRLD2QxedTwXdijQ7+rOU+NrfHA0sdBFoyjLnwHa2mcstwLPa2n2XWGFfceV0mxJSBfnq6721KujJVwJuV4/HQwoNsWMc09OZTOBCsc70rFl7f2rpq3NJ5f0zcZPbe1pACrRN2KVK4j3BhvMGbgQ6JB8UUfiRltpaxz0J4YGkO7+CU63Ex/4isgF7OnaDrXyoQ4/zWxhE8Vw1qtILEG2UmjDL73cD7X6KnFiUvGGFExr5mluSAZBPwhA2x+n6ZXd3VjJTgcn3r+RPngii4xDFzBeQXgykYVe7pJOzyBRzEi+Fjfg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=LwnKp26GniwC6BOpIbU/wDgH3selcZcs5I+vzsXrUVY=;
- b=RQ84CmsJEY92qQ+JxOjzrzgRxMssCpwXQk6L0Xj3t7XAKOZ4lYwiCX6I0yh0WAmYYOVsSn96mm1omLdkUWSjqR0ox2SoSUp9EY32AVV/eD7naTdVio9KMh38V/Vu8xogc6g/XX3DTmjHTRgXz86wIAZrqqfKCCuKbSnhmnNmWPDyXQbrP9elNugsfDEUAa86hEQwe8WRNtI1LP0RffYNdESiuVBQFwQDtOGsUMMR2Bx32aDaN4f4NL4Mq/j8B3ONqHkhR2fePYipuHGc1Xc0aUi03C0J93l+/Ff7ZiLwRpcsASVjA2Ab0ZdH8949gRW+XUy5F9XVE7RyBqWTKegIHw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from SJ1PR11MB6129.namprd11.prod.outlook.com (2603:10b6:a03:488::12)
- by PH7PR11MB6931.namprd11.prod.outlook.com (2603:10b6:510:206::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9031.24; Wed, 20 Aug
- 2025 08:55:42 +0000
-Received: from SJ1PR11MB6129.namprd11.prod.outlook.com
- ([fe80::21c3:4b36:8cc5:b525]) by SJ1PR11MB6129.namprd11.prod.outlook.com
- ([fe80::21c3:4b36:8cc5:b525%6]) with mapi id 15.20.9031.023; Wed, 20 Aug 2025
- 08:55:42 +0000
-Message-ID: <1b54eaa0-1a0d-456e-9bc1-92999a1afcc2@intel.com>
-Date: Wed, 20 Aug 2025 14:25:36 +0530
-User-Agent: Mozilla Thunderbird
-Subject: Re: REGRESSION on linux-next (next-20250814)
-To: Yu Kuai <yukuai1@huaweicloud.com>, <sunjunchao2870@gmail.com>
-CC: "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
-	"intel-xe@lists.freedesktop.org" <intel-xe@lists.freedesktop.org>,
-	<lucas.demarchi@intel.com>, "Kurmi, Suresh Kumar"
-	<suresh.kumar.kurmi@intel.com>, <linux-block@vger.kernel.org>, "yukuai (C)"
-	<yukuai3@huawei.com>
-References: <ed8f89a3-be5c-4bf4-97a5-886e8e3f969b@intel.com>
- <2b0138fc-2f2a-e897-65fc-8fad844678e2@huaweicloud.com>
-Content-Language: en-GB
-From: "Borah, Chaitanya Kumar" <chaitanya.kumar.borah@intel.com>
-In-Reply-To: <2b0138fc-2f2a-e897-65fc-8fad844678e2@huaweicloud.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MA0PR01CA0057.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:a01:ac::15) To SJ1PR11MB6129.namprd11.prod.outlook.com
- (2603:10b6:a03:488::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25FF1296BA8;
+	Wed, 20 Aug 2025 09:04:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1755680698; cv=none; b=jhE3IxpSNuXnsuOgvnArmdwKHu2Qd2hElI8G7V3jFt7+STIkjCm1wcOcvH61OHPbMu5u7JFygja0SkfpaYLGGCUr85bfvajMa0aZJvYi9dBUINS5QCP7FIdexlmNuIUW9kyCK0ISCTRdPMDzREHCcic34xDxJdPkuP9P3onNGFQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1755680698; c=relaxed/simple;
+	bh=k8HLhVXIgFKtC/yuLWeJTJOc749Fyjaa/tjwkvlEZdk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=mCwrhNyjhGt6V9On1NOEp2k+vLLkB9o8ndSr0iJlsV/R6VJu1QP5mVX2xdrDS6WLe/SIXK6UHsdVCago2kpf/+0OiOf7F0F/o0Yg4TV8KCtNWjg7SQ5h8oy/mNlVvJH2VaajWwwRWhW2cvoWh2zbdDd0tAuJVt5+8uEme2bKl40=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.93.142])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4c6LBF28QNzKHNnY;
+	Wed, 20 Aug 2025 17:04:53 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id B47F41A0CC8;
+	Wed, 20 Aug 2025 17:04:52 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+	by APP4 (Coremail) with SMTP id gCh0CgCnIxSmj6Vo4c48EQ--.61348S4;
+	Wed, 20 Aug 2025 17:04:50 +0800 (CST)
+From: Zhang Yi <yi.zhang@huaweicloud.com>
+To: linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	dm-devel@lists.linux.dev,
+	linux-nvme@lists.infradead.org,
+	linux-scsi@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	hch@lst.de,
+	tytso@mit.edu,
+	djwong@kernel.org,
+	bmarzins@redhat.com,
+	chaitanyak@nvidia.com,
+	shinichiro.kawasaki@wdc.com,
+	brauner@kernel.org,
+	martin.petersen@oracle.com,
+	yi.zhang@huawei.com,
+	yi.zhang@huaweicloud.com,
+	chengzhihao1@huawei.com,
+	yukuai3@huawei.com,
+	yangerkun@huawei.com
+Subject: [PATCH util-linux v3] fallocate: add FALLOC_FL_WRITE_ZEROES support
+Date: Wed, 20 Aug 2025 16:56:32 +0800
+Message-Id: <20250820085632.1879239-1-yi.zhang@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PR11MB6129:EE_|PH7PR11MB6931:EE_
-X-MS-Office365-Filtering-Correlation-Id: c0d450d7-072d-4b50-e55d-08dddfc757a1
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?ZTF0TFZIU05nQW9nbFZLTVRZeGt1N0ZyWDh3WFVDNGxCdGxZV0Vtb01nN3RP?=
- =?utf-8?B?UGV4Q2preEMzUDhLekpjcS93bVQ5Q2ZhSkIzTk1sZ3d6ekEzMGN5Q0psOTRP?=
- =?utf-8?B?b2hIU1pwWW91SjFXUEZvb3JZQWhra1Nwb3VnTUFPRjhmeXNWRldQS3ZBaHRF?=
- =?utf-8?B?dlJiazlTYmxta1IwNThUVGFITmFKbUtDTmNJcy82eTdiVjBVeG9TV2xqZmNp?=
- =?utf-8?B?eEVJZ3pCaEpubFI2YldNTWx0M294T1NPYW5sc1hjaXRhTnMzRDNqZkdmWWJw?=
- =?utf-8?B?d1hIc2Zqc1U3TC9mWTNSOXh5cFVvb0N1REhwMXNpbVJIdGxlSzJ2M29qei95?=
- =?utf-8?B?REFLVjVsS3JPWkFMZ3Q2YnBBMVFOM0tsNXpDT2c3UldZWjN1MkU4b282d1RZ?=
- =?utf-8?B?eWpaMWdtTCtRVEs3ZmNlS2d3QisvRUgzaXpSK1FvbDF5NVQ5K09Qb083NGRY?=
- =?utf-8?B?QTZ3L3BCaVI4TFlGUWJRZ1lJR0Z1MGc1QkVSd09EaXpmc2h4a0pUcmI4b0Rr?=
- =?utf-8?B?eVpuQm9ISzlYZzZjb0JIOGxZbWh0OXk5SGE3WXNUN2hkZXdXWnVreHprbGox?=
- =?utf-8?B?c2lVUEJJQnRoMTZtMnl2cENoSHg4OWFJK2RaNXh1VkJUMFBPbno4TU9pU09r?=
- =?utf-8?B?SW84N2cyWlkzWUJCMUt2RTcrSXpLbXgrNThvb1lSeFJXN0dnU0FjOGZneVdJ?=
- =?utf-8?B?OW9DM2dWemFYdnpuYW96Ky9FV05NVFUvK2hzYTB3Z0VXeUlxOHhtc0ZDakFm?=
- =?utf-8?B?SytJQ01CMmhQZVhaTnpPTDVnMUl1bWFSck1sNm9qTnJRcno4VlRuUlV0eng0?=
- =?utf-8?B?Y1FEeXYrYmFaWERpKzdnTWRkUVVvUGJ5SnYxUjBmTitlYm1teThmaTVMbitL?=
- =?utf-8?B?cVdQQ2llY1RZb2lHVDIxcWxXYUlsK3ZQYlE4Q204SHZUWGtLajBPdmthelp0?=
- =?utf-8?B?TWxvYTZVM1lKM2M1ZFNRc1Q1YVhzVnBxWTQ4eThNYzVISWhkaGdYdnJlK09D?=
- =?utf-8?B?ekNSTEZrV2tSNnJHR0w1R3R5aGFjb0pEeGpuZllpOFcxZkcvZWczOFZWNnVy?=
- =?utf-8?B?YmZON0Q1N2VSZ09BOU4xVGdMVURxbzdRWmVjeC9wWGZSZzE1aitFbmhVdFJM?=
- =?utf-8?B?aks0M2JxYXJtQ2laTnFONlNFNFRwQUNpRGszaCt5S0VZWm5BWHRwNCttVE5D?=
- =?utf-8?B?a252TThKeGU3WVBtTkUxUFFHRlp0RFJLdjh4Y0wzRkl2b1NRYTM3ZjBBS29Q?=
- =?utf-8?B?eFI4OS9iTHRDbDNacklSTkhYckZuUmtrVjd5OXRVUkkyODBud1ZXU1ZCWmw2?=
- =?utf-8?B?UnNzTWlpUVRqaEg5dDQ2YjV3cEpGSWVrYW1ldkR1ZERVNkZPcjhWWXdadkNI?=
- =?utf-8?B?aHVjZVA0WEVTMysveGhrWmtOR2Jhak9CMUQxRDNzaUNVcW13bmEvdG96YVd2?=
- =?utf-8?B?U0FpTWp3OWsxY0hVM0Q0L3BHaDJRSjJtUlMzbnRrSzBsU3JqZEpEMVpSODNV?=
- =?utf-8?B?Ymh2aXV2b28vOFdlb2U4RU5qd244Y0U3ZUNLMWJjRW4veDRvMVNFRVpDNjcw?=
- =?utf-8?B?SE5wTTZ1dTAydDJYT0p5MlZGdU9sdWtCTnNGV2F2ZE5JeG1EOUY4TUk3SzFh?=
- =?utf-8?B?RnRKcGtCQm02ZERrdWJFNllpMXlaUW43N0pOSUFKNkhNVk5YYW1jOHlmV3Ur?=
- =?utf-8?B?dXoxUjdHai9kaG5iZXpzWmhSVXgzQ25EMGZXU3d1dXEzU043cE04cjdFQUkr?=
- =?utf-8?B?eVpyNW9Kc0o3RnpWazR6V1lwT3lieWE4cDBRMWJRaTJMa09qR29uazcrK09x?=
- =?utf-8?B?b0RhdE9LSHhrUHhVRjR0dGdQNWlENFhQVVJIa0ZtdHJRV2xVQnJVek50UVl2?=
- =?utf-8?B?RmdFYlBSaEtHTnpXT0hNZzE0aCs4WFVjWVVlRXJuKzNTNzRmckhNQ01IV0Ir?=
- =?utf-8?Q?UKHAP2LRgJE=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ1PR11MB6129.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Y3NrVS94QUVXcEdJTzU0Mkl0UmQvcjZVWE9kbERNTWVKQWpLKzFUS0RmNUNj?=
- =?utf-8?B?MXVFcDdmTy9TaGdsVHM2RGc5ai91V05lQnhsYkNvS3JCWXBFWURFYkNPWGdU?=
- =?utf-8?B?eEtOajdJZ3VBWVEyakt5SUIzd05YMFFhSlNjUFRUcmQ2eVFDZ0VpSWtBUGUw?=
- =?utf-8?B?c3ZJL2x6UlRveml1OUpwUUpheHZuUlZlbDY5a2tTQ2FYL3hsMzR5RC9mbVJH?=
- =?utf-8?B?a0g3OHg0L1l0QnJDdXRUc3dYYzkxa0tjd1BGcGxqc3luUXlXOWVJeDNITVE5?=
- =?utf-8?B?NVdqUXdOMm4ybnd2Vkh3WEQ0TjM2WTdRaTZQK0dzdTFibkM3NzJsWlZnQXRh?=
- =?utf-8?B?ejdEWWtZYUFaMjA4WWtOa0hNWHFUbGdMdjV5VlRELzNxS3o1WXhWSndrYTFj?=
- =?utf-8?B?MDNzOWR4Y01MMVZKeGlyaU5IYjY5MlRTL3B4bGdoZ09tRzNjUnh3cWlYTCtx?=
- =?utf-8?B?SEhtZng5QmRBWGwzc090dnk3TkFlaWU5S0o2ZFZJdVBUSk80NVA3aVZ3Ry9O?=
- =?utf-8?B?VjM0Qng5QXlQVUpqZkpabXZCM0JvVy8wNDVyNWVEbFAraXBSUjlzV0FNM2pa?=
- =?utf-8?B?dHB1K1V1UnlSMjlhVlNzaDF4OE5jS0hxdWdmTlRVZU5Jcno0Nmp6R09xNFJC?=
- =?utf-8?B?WlVWOHVPTmgvaHROZmIxcDlpb2N1SUdSSUpJTk1ZQjlJVnI2T3NTRmNSZHlV?=
- =?utf-8?B?L2o0UTdLRG10OGdqTGRuMjVYaE1Jb21TNVhESEw2cUFFMmNKUmpZT3h0Rmw4?=
- =?utf-8?B?eFYzL0FndGtscWJkVjNSeVlHTXFCcC9Kcy9ENEJPa3hmZ1QwZ3JYTE1EMy9q?=
- =?utf-8?B?ZDM4RWQ5OGlVRGtRa1lYNTErTmpCOUdwVkZjUXZFZ0sxUWhMeTFaa1orcEYv?=
- =?utf-8?B?U1hvUXBmd1pXaER6cjlmRDNyV0lRd0NGZXl4blRBQ2ZNTEJ2OFRJeDRpR0da?=
- =?utf-8?B?aWpPbG8weGpHYXE3cTJIeXBSNlpObXVIYkJISnYxdE9Ya0dCNEx6aGRLaFRN?=
- =?utf-8?B?c1BiSXk1dVdOdmdIQ1lEaUhTc2ltTlE3VHFsak5RRy9EbVVNOCtDNVVwQXY5?=
- =?utf-8?B?dVRUclV4ZkFiOWNSQUU0ZFlCYlRCNzFDMVVVeS9iY1dLc3VHRGRKT1R3dkt6?=
- =?utf-8?B?QWRyWCtxbTFUejJyMHFuejg0RHFmSTJvSGN5TEtxWkU1ZlFFM3VYeUpBbk9k?=
- =?utf-8?B?YzloTnpUUGw3ZWR5Yjg2NEZCTHhxRG9na2Q1NjdRZzJQaGhURzQ0cjJYVFVR?=
- =?utf-8?B?U0YwaHljdFNUYVNEZnYvWUFaRnZsNzMwc3FIZlBSOTNHcHlxaHVIbVZkaThJ?=
- =?utf-8?B?SUNiYk9aY3FkN0dwTm9zd2dRYW9XdDFnK0V3Yk1hcXJ4RHo5bUtpekV1aXIr?=
- =?utf-8?B?LzVQR1NRRXdwOWh4TkVUM3JDQ1dWWHlOazFiTGtBSGNSZjVpVnQvVHBOR2U2?=
- =?utf-8?B?WGhuRFYxbS9VNmpHWjdXK1R5clRmWjJsUlFhQWdSTTlLVWZySnVpNFdkTGFt?=
- =?utf-8?B?VDFwdjJzazhyZEN3S0pSRERDTms1T1FhWjZuV3p1bVplclQ2d0QrNk5FWnN4?=
- =?utf-8?B?bk80SFhnL1ZDdHVDRC9HQ3RXOXNoMU1YdVJKbE9iY2M1VHJPWEtVQjB4V1pI?=
- =?utf-8?B?QXVwZURkNjhIaVFDU0I4TTRkVEMxbTVhcTBYREJBLzhRMGdoQ1Bhd1lDeVJi?=
- =?utf-8?B?SGJZMm5pM3lpeEZvUDBmZzBnSGNlSDR4bFpuZGVtbURUaGVKdDRtenhrQVU4?=
- =?utf-8?B?bGtsWnQ1Wm9ZRUNiQXZjeVhKUVFNTjltUHZ0akI3YVM0Szh4NnpTNGwzL0Fy?=
- =?utf-8?B?dUgwbnFDdFNnWEV5aitQZWpvbVdnVFhGZ1RYQ2VVRHBVZzhqT2wyK1pXcmxP?=
- =?utf-8?B?YllLenZVejdDelhHK3RwR1haUXdNUmtXWGlLaENNL0t3TjM1V2VxSVlEQmZC?=
- =?utf-8?B?aUZ4WmtpZU5pcHdHdDNoanNRTjV1N01nVGpleldaV2wxbWFKd2xYYmxzY0Rj?=
- =?utf-8?B?SDlwVmU1ME1JWFFnQUl5ZkxBZG9OWk9Kc05OcmRyMUVDZnhucElsZVVNT25Z?=
- =?utf-8?B?V2ZRMm1NRkpwVlRnWmQxa25OSlU2aFozV3c2VFg1N2lDaHFSS2ZOUm9OTmZt?=
- =?utf-8?B?UVNoczdmWVJwam0weTJIZzFZTEVITUl4NlpTSFZOd3hWUk1JNG9WRUVwcEgr?=
- =?utf-8?Q?BBNbHseOBC3pRiS7jfTo1FM=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: c0d450d7-072d-4b50-e55d-08dddfc757a1
-X-MS-Exchange-CrossTenant-AuthSource: SJ1PR11MB6129.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Aug 2025 08:55:42.2035
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: i6WUDAJ9igs5DiCfy3KMgUiKCCKNiSiOj7Ku3TOYatQcF7JE90Sg85TM4SkTvmB67LIiSTXp1+VOOqiWh+3U9X4jeT/6ftICzvl6x+qoiKU=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB6931
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgCnIxSmj6Vo4c48EQ--.61348S4
+X-Coremail-Antispam: 1UD129KBjvJXoWxtFW7XFyDWFyUCryrKF15Arb_yoWxWrykpF
+	W5KF18KrWrWw4xGwn7Aw4kWw15Zws5Wr45CrZ2grykAr13Wa17Ka1vgryFgF9rXFykCa15
+	Xr1avFy3ur48AaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9Y14x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
+	Y2ka0xkIwI1lc7CjxVAaw2AFwI0_GFv_Wryl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x
+	0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2
+	zVAF1VAY17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF
+	4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWU
+	CwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCT
+	nIWIevJa73UjIFyTuYvjTRNJ5oDUUUU
+X-CM-SenderInfo: d1lo6xhdqjqx5xdzvxpfor3voofrz/
 
+From: Zhang Yi <yi.zhang@huawei.com>
 
-On 8/18/2025 2:46 PM, Yu Kuai wrote:
-> 
-> The bisecting is because this patch actually enable wbt now, while this
-> patch is not the root cause.
-> 
-> Following is a fix by Nilay, you can have a test if your problem can be
-> fixed.
-> 
-> https://lore.kernel.org/all/20250814082612.500845-1-nilay@linux.ibm.com/
+The Linux kernel (since version 6.17) supports FALLOC_FL_WRITE_ZEROES in
+fallocate(2). Add support for FALLOC_FL_WRITE_ZEROES to the fallocate
+utility by introducing a new option -w|--write-zeroes.
 
-Thank you, Kuai, for the reply. The patches works for us.
-We will wait for them to get merged.
+Link: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=278c7d9b5e0c
+Signed-off-by: Zhang Yi <yi.zhang@huawei.com>
+---
+v2->v3:
+ - Say less about what the filesystem actually implements as Darrick
+   suggested and clarify the reason why "--keep-size" cannot be used
+   together in the man page.
+ - Modify the verbose output message.
+v1->v2:
+ - Minor description modification to align with the kernel.
 
-Regards
+ sys-utils/fallocate.1.adoc | 11 +++++++++--
+ sys-utils/fallocate.c      | 20 ++++++++++++++++----
+ 2 files changed, 25 insertions(+), 6 deletions(-)
 
-Chaitanya
+diff --git a/sys-utils/fallocate.1.adoc b/sys-utils/fallocate.1.adoc
+index 44ee0ef4c..a06cf7a50 100644
+--- a/sys-utils/fallocate.1.adoc
++++ b/sys-utils/fallocate.1.adoc
+@@ -12,7 +12,7 @@ fallocate - preallocate or deallocate space to a file
+ 
+ == SYNOPSIS
+ 
+-*fallocate* [*-c*|*-p*|*-z*] [*-o* _offset_] *-l* _length_ [*-n*] _filename_
++*fallocate* [*-c*|*-p*|*-z*|*-w*] [*-o* _offset_] *-l* _length_ [*-n*] _filename_
+ 
+ *fallocate* *-d* [*-o* _offset_] [*-l* _length_] _filename_
+ 
+@@ -28,7 +28,7 @@ The exit status returned by *fallocate* is 0 on success and 1 on failure.
+ 
+ The _length_ and _offset_ arguments may be followed by the multiplicative suffixes KiB (=1024), MiB (=1024*1024), and so on for GiB, TiB, PiB, EiB, ZiB, and YiB (the "iB" is optional, e.g., "K" has the same meaning as "KiB") or the suffixes KB (=1000), MB (=1000*1000), and so on for GB, TB, PB, EB, ZB, and YB.
+ 
+-The options *--collapse-range*, *--dig-holes*, *--punch-hole*, *--zero-range* and *--posix* are mutually exclusive.
++The options *--collapse-range*, *--dig-holes*, *--punch-hole*, *--zero-range*, *--write-zeroes* and *--posix* are mutually exclusive.
+ 
+ *-c*, *--collapse-range*::
+ Removes a byte range from a file, without leaving a hole. The byte range to be collapsed starts at _offset_ and continues for _length_ bytes. At the completion of the operation, the contents of the file starting at the location __offset__+_length_ will be appended at the location _offset_, and the file will be _length_ bytes smaller. The option *--keep-size* may not be specified for the collapse-range operation.
+@@ -76,6 +76,13 @@ Option *--keep-size* can be specified to prevent file length modification.
+ +
+ Available since Linux 3.14 for ext4 (only for extent-based files) and XFS.
+ 
++*-w*, *--write-zeroes*::
++Zeroes space in the byte range starting at _offset_ and continuing for _length_ bytes. Within the specified range, written blocks are preallocated for the regions that span the holes in the file. After a successful call, subsequent reads from this range will return zeroes and subsequent writes to that range do not require further changes to the file mapping metadata.
+++
++Zeroing is done within the filesystem. The filesystem may use a hardware-accelerated zeroing command or may submit regular writes. The behavior depends on the filesystem design and the available hardware.
+++
++Options *--keep-size* can not be specified for the write-zeroes operation because allocating written blocks beyond the inode size is not permitted.
++
+ include::man-common/help-version.adoc[]
+ 
+ == AUTHORS
+diff --git a/sys-utils/fallocate.c b/sys-utils/fallocate.c
+index 13bf52915..afd615537 100644
+--- a/sys-utils/fallocate.c
++++ b/sys-utils/fallocate.c
+@@ -40,7 +40,7 @@
+ #if defined(HAVE_LINUX_FALLOC_H) && \
+     (!defined(FALLOC_FL_KEEP_SIZE) || !defined(FALLOC_FL_PUNCH_HOLE) || \
+      !defined(FALLOC_FL_COLLAPSE_RANGE) || !defined(FALLOC_FL_ZERO_RANGE) || \
+-     !defined(FALLOC_FL_INSERT_RANGE))
++     !defined(FALLOC_FL_INSERT_RANGE) || !defined(FALLOC_FL_WRITE_ZEROES))
+ # include <linux/falloc.h>	/* non-libc fallback for FALLOC_FL_* flags */
+ #endif
+ 
+@@ -65,6 +65,10 @@
+ # define FALLOC_FL_INSERT_RANGE		0x20
+ #endif
+ 
++#ifndef FALLOC_FL_WRITE_ZEROES
++# define FALLOC_FL_WRITE_ZEROES		0x80
++#endif
++
+ #include "nls.h"
+ #include "strutils.h"
+ #include "c.h"
+@@ -94,6 +98,7 @@ static void __attribute__((__noreturn__)) usage(void)
+ 	fputs(_(" -o, --offset <num>   offset for range operations, in bytes\n"), out);
+ 	fputs(_(" -p, --punch-hole     replace a range with a hole (implies -n)\n"), out);
+ 	fputs(_(" -z, --zero-range     zero and ensure allocation of a range\n"), out);
++	fputs(_(" -w, --write-zeroes   write zeroes and ensure allocation of a range\n"), out);
+ #ifdef HAVE_POSIX_FALLOCATE
+ 	fputs(_(" -x, --posix          use posix_fallocate(3) instead of fallocate(2)\n"), out);
+ #endif
+@@ -304,6 +309,7 @@ int main(int argc, char **argv)
+ 	    { "dig-holes",      no_argument,       NULL, 'd' },
+ 	    { "insert-range",   no_argument,       NULL, 'i' },
+ 	    { "zero-range",     no_argument,       NULL, 'z' },
++	    { "write-zeroes",   no_argument,       NULL, 'w' },
+ 	    { "offset",         required_argument, NULL, 'o' },
+ 	    { "length",         required_argument, NULL, 'l' },
+ 	    { "posix",          no_argument,       NULL, 'x' },
+@@ -312,8 +318,8 @@ int main(int argc, char **argv)
+ 	};
+ 
+ 	static const ul_excl_t excl[] = {	/* rows and cols in ASCII order */
+-		{ 'c', 'd', 'i', 'p', 'x', 'z'},
+-		{ 'c', 'i', 'n', 'x' },
++		{ 'c', 'd', 'i', 'p', 'w', 'x', 'z'},
++		{ 'c', 'i', 'n', 'w', 'x' },
+ 		{ 0 }
+ 	};
+ 	int excl_st[ARRAY_SIZE(excl)] = UL_EXCL_STATUS_INIT;
+@@ -323,7 +329,7 @@ int main(int argc, char **argv)
+ 	textdomain(PACKAGE);
+ 	close_stdout_atexit();
+ 
+-	while ((c = getopt_long(argc, argv, "hvVncpdizxl:o:", longopts, NULL))
++	while ((c = getopt_long(argc, argv, "hvVncpdizwxl:o:", longopts, NULL))
+ 			!= -1) {
+ 
+ 		err_exclusive_options(c, longopts, excl, excl_st);
+@@ -353,6 +359,9 @@ int main(int argc, char **argv)
+ 		case 'z':
+ 			mode |= FALLOC_FL_ZERO_RANGE;
+ 			break;
++		case 'w':
++			mode |= FALLOC_FL_WRITE_ZEROES;
++			break;
+ 		case 'x':
+ #ifdef HAVE_POSIX_FALLOCATE
+ 			posix = 1;
+@@ -429,6 +438,9 @@ int main(int argc, char **argv)
+ 			else if (mode & FALLOC_FL_ZERO_RANGE)
+ 				fprintf(stdout, _("%s: %s (%ju bytes) zeroed.\n"),
+ 								filename, str, length);
++			else if (mode & FALLOC_FL_WRITE_ZEROES)
++				fprintf(stdout, _("%s: %s (%ju bytes) written as zeroes.\n"),
++								filename, str, length);
+ 			else
+ 				fprintf(stdout, _("%s: %s (%ju bytes) allocated.\n"),
+ 								filename, str, length);
+-- 
+2.39.2
 
