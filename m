@@ -1,114 +1,101 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A1AB2EAB79
-	for <linux-block@vger.kernel.org>; Thu, 21 Aug 2025 04:29:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9248618FDBE;
+	Thu, 21 Aug 2025 06:14:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755750586; cv=none; b=F6fw9YOYufvwfrMJme7N07cAm+XlZdhNH7S9OxhDJ+TiCv4jXcavWDCNPrJ0tkYZE6VmEqKQqYLBWvH2MgWY863sfS8jmNAKEbuBeI9va7Ao0AQYrfaXarPMtaEGcqTWY9pe3c6Q+CdsaWr5XJnQr3QqHPRNC/RVB1h4zeSaQSg=
+	t=1755756870; cv=none; b=p67ajnWfNZkKf8vr+7s2jHlBsU4QCZuan9oik7XM+HDEdRBTGE8B6gGXMNUAfLbsJvxWkAlkDvmb26U8DPUndIGQabh5Ia4MRaU5eGdpbSNJc3+0YNWuEwjyDi8V852OTVyBLgccZt5gI4FE8E5hOmR7k9BOOIM6UGsPy9JPBbg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755750586; c=relaxed/simple;
-	bh=JE74zTIlDOLc4xSb6wCZllVZjklPabBwGuR/QFTNBCE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=clWswzfgs4cd14BftQk/gqVyaZMcTm/NXMa36z1Q36SoLEuqB3lUOS5wm/CUZUtE26Mk8z01KO5Y5w+hIzLSoOHK/Erl09Cpt8Q4SX89RGxIpwOecyqcy1ZY7GXsQo7znWeySdHSCVlZ3Uv9KYpYlZst24HBi03+xhofnqpZnQM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LE7Y9Lnb; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LE7Y9Lnb"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1755750582;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=yl4xgAbL4PUDjjS9jzEUE1nwoo6oTTM4DZE7J0QQKZU=;
-	b=LE7Y9Lnb0t6clXZGWWpfQC4uQCpFvcGmAGm295pqiJPcOdOAOQtOdJeitI+vHNl47qozvy
-	GG+CVpEzA6VVkg03lrrWkCnP/sHciqxeGBoqOeJOgL0/Pvg4OQK0l50ASGX2dpWBQzmuY3
-	9Wz+9N25udwHAI4zawbqLeW7TnVtpPg=
-Received: from mail-vs1-f71.google.com (mail-vs1-f71.google.com
- [209.85.217.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-655-YgMUyHwPNzSZki8Fzh5wlQ-1; Thu, 21 Aug 2025 00:29:40 -0400
-X-MC-Unique: YgMUyHwPNzSZki8Fzh5wlQ-1
-X-Mimecast-MFC-AGG-ID: YgMUyHwPNzSZki8Fzh5wlQ_1755750580
-Received: by mail-vs1-f71.google.com with SMTP id ada2fe7eead31-50f88eeb320so1121921137.1
-        for <linux-block@vger.kernel.org>; Wed, 20 Aug 2025 21:29:40 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755750579; x=1756355379;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yl4xgAbL4PUDjjS9jzEUE1nwoo6oTTM4DZE7J0QQKZU=;
-        b=ijOEIjugn5riAgqo//w/P7WsZJMSTsTpsatoa5cvWoz48g7mHr9TN3ke/HjJJcq7Rr
-         rgKcGJdgYnRgE41nkWBfwoGhKDtQkutDm0jRJC+fr2heSi4C4ctbxUJPJ1GPOhNEr44e
-         KUQL9Ko/o6t84nB9D7qvLV621GcEF2ybKyipI1BjEzWLxNSw6zdFgr1BKz4ZSkME7q9R
-         XQGIk3+v7HYU8bKUEXjNvjWZnwB4TIRjmoLuNmosTsDcOid4fZ6B7my3B7PEosjguP4X
-         WJ2Y/snWu2JdQdrSPlbDDLRflgR9C2NIrr1gkx25Fe+U77W1RUvNK++EIci83MNkZe5p
-         tKTw==
-X-Forwarded-Encrypted: i=1; AJvYcCW+Emc7JEubgnvA8QaPnzZDL4rO2Hdjr63pFKL+jhJRpPdX7hTSI96D+gNel2vVP7ZjfympdILCKBzSSQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy2t6k1T4Y1tZxEpmsmNBQyr5sjOaZDciKM8bEtzfThfy5I6JIi
-	kNUEzJ0SwEDbZB1lhAX4yLW7Cc1JfBAYE4XUKZuytbOh9qmsuIp8INDwFTzraZzzfaCSvauXCWe
-	OQXEDxfdPjVPUSN9b91WjFlX9MMvRoXHopR1gRk8z73IDciNvy/evzIwdSDuGIIoWOhksFVb8R7
-	xRZMEis/u/pTJbX3tg1bY0fpcr9CchI1C0cO7c3Myl/aeNa/w=
-X-Gm-Gg: ASbGncuDbsmil9AGbgUpyTgcXpUQqDripVclxXjjBvYfpylGMtPikO+4CcJZ/MPO3oY
-	A57fFTR3hWuBUHgafmxgmhgXxxQjyLjRkHmEYflHaoF8kvRLBX4wtTiz+meGX7Ra0nswufW2TH9
-	7SeIjcHxRhlfnvidQe/x5MlQ==
-X-Received: by 2002:a05:6102:290f:b0:4e6:ddd0:96ea with SMTP id ada2fe7eead31-51bdf14190amr327936137.10.1755750579700;
-        Wed, 20 Aug 2025 21:29:39 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEUHIG3AHOjKEOl/h6z7KZ5mIVdlQhZ1Um+4/ieLngZ+xMpRrO+Qa0o+wSwDSIGKbyDTFl4+37YbWcgJdF2s68=
-X-Received: by 2002:a05:6102:290f:b0:4e6:ddd0:96ea with SMTP id
- ada2fe7eead31-51bdf14190amr327929137.10.1755750579390; Wed, 20 Aug 2025
- 21:29:39 -0700 (PDT)
+	s=arc-20240116; t=1755756870; c=relaxed/simple;
+	bh=2F8qj9LXUdJK53J3zDVrtY3qsXgrM+dpOM5dxd5zV+I=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=G3Jg2GPdkvXljRubPXWUyv1ko6IN8jPt8XHLsqA+vXAd9c2hLl+SGIK6CY/DMgF2SAtIu2jXHmQ3yAquP/34OTIXJLGeYuk5fUPSZC6dVlwSUVoLhFmxfsAv2DbvJucp7BZo8aElYck/4YTvEmb9iYFyklOoUQFcOxnvBp42Vts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4c6tM50vmczKHNXx;
+	Thu, 21 Aug 2025 14:14:25 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 930551A0B8F;
+	Thu, 21 Aug 2025 14:14:24 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+	by APP4 (Coremail) with SMTP id gCh0CgBHERI+uaZoxBuhEQ--.58405S4;
+	Thu, 21 Aug 2025 14:14:24 +0800 (CST)
+From: Yu Kuai <yukuai1@huaweicloud.com>
+To: yukuai3@huawei.com,
+	axboe@kernel.dk,
+	bvanassche@acm.org,
+	ming.lei@redhat.com,
+	nilay@linux.ibm.com,
+	hare@suse.de
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	yukuai1@huaweicloud.com,
+	yi.zhang@huawei.com,
+	yangerkun@huawei.com,
+	johnny.chenyi@huawei.com
+Subject: [PATCH v3 0/2] blk-mq: fix update nr_requests regressions
+Date: Thu, 21 Aug 2025 14:06:10 +0800
+Message-Id: <20250821060612.1729939-1-yukuai1@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250815131737.331692-1-ming.lei@redhat.com>
-In-Reply-To: <20250815131737.331692-1-ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-Date: Thu, 21 Aug 2025 12:29:28 +0800
-X-Gm-Features: Ac12FXxbx2bs54JnnPSeKSQR06Sww_PEgHS4SFT9EFOoEc2-UhVJOwEmmNTnZKY
-Message-ID: <CAFj5m9J5E5T-ew2csZf-mjRoDEHm4AcxHZMop4oVW5cPHNAapg@mail.gmail.com>
-Subject: Re: [PATCH V2] blk-mq: fix lockdep warning in __blk_mq_update_nr_hw_queues
-To: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Cc: Nilay Shroff <nilay@linux.ibm.com>, Yu Kuai <yukuai3@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgBHERI+uaZoxBuhEQ--.58405S4
+X-Coremail-Antispam: 1UD129KBjvdXoWrKrWfKFy5JrWDWF1DCr1xZrb_yoWkGrg_GF
+	WDAa4kJr4DWF45GFW7KF15JrWxK3yrtr4kGa4DJrWkt34fJF4rArW5Ar4Y9Fs8uFWUGFn5
+	G3sYqr18tr1jgjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUb3kFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
+	6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
+	n2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
+	kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
+	67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
+	CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1x
+	MIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIda
+	VFxhVjvjDU0xZFpf9x0JUd-B_UUUUU=
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On Fri, Aug 15, 2025 at 9:17=E2=80=AFPM Ming Lei <ming.lei@redhat.com> wrot=
-e:
->
-> Commit 5989bfe6ac6b ("block: restore two stage elevator switch while
-> running nr_hw_queue update") reintroduced a lockdep warning by calling
-> blk_mq_freeze_queue_nomemsave() before switching the I/O scheduler.
->
-> The function blk_mq_elv_switch_none() calls elevator_change_done().
-> Running this while the queue is frozen causes a lockdep warning.
->
-> Fix this by reordering the operations: first, switch the I/O scheduler
-> to 'none', and then freeze the queue. This ensures that elevator_change_d=
-one()
-> is not called on an already frozen queue. And this way is safe because
-> elevator_set_none() does freeze queue before switching to none.
->
-> Also we still have to rely on blk_mq_elv_switch_back() for switching
-> back, and it has to cover unfrozen queue case.
->
-> Cc: Nilay Shroff <nilay@linux.ibm.com>
-> Cc: Yu Kuai <yukuai3@huawei.com>
-> Fixes: 5989bfe6ac6b ("block: restore two stage elevator switch while runn=
-ing nr_hw_queue update")
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
-> V2:
->         - fix the issue locally, so patch is simplified
+From: Yu Kuai <yukuai3@huawei.com>
 
-Hi Jens,
+Changes in v3:
+ - call depth_updated() directly in init_sched() method in patch 1;
+ - fix typos in patch 2;
+ - add review for patch 2;
+Changes in v2:
+ - instead of refactor and cleanups and fix updating nr_requests
+ thoroughly, fix the regression in patch 2 the easy way, and dealy
+ refactor and cleanups to next merge window.
 
-Ping...
+patch 1 fix regression that elevator async_depth is not updated correctly
+if nr_requests changes, first from error path and then for mq-deadline,
+and recently for bfq and kyber.
 
-Thanks,
+patch 2 fix regression that if nr_requests grow, kernel will panic due
+to tags double free.
+
+Yu Kuai (2):
+  blk-mq: fix elevator depth_updated method
+  blk-mq: fix blk_mq_tags double free while nr_requests grown
+
+ block/bfq-iosched.c   | 22 +++++-----------------
+ block/blk-mq-sched.h  | 11 +++++++++++
+ block/blk-mq-tag.c    |  1 +
+ block/blk-mq.c        | 23 ++++++++++++-----------
+ block/elevator.h      |  2 +-
+ block/kyber-iosched.c | 19 +++++++++----------
+ block/mq-deadline.c   | 16 +++-------------
+ 7 files changed, 42 insertions(+), 52 deletions(-)
+
+-- 
+2.39.2
 
