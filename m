@@ -1,126 +1,242 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A57B35975;
-	Thu, 21 Aug 2025 09:42:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88D9D264F99;
+	Thu, 21 Aug 2025 10:12:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755769336; cv=none; b=LRsnrhsQ/ZFrANvE3A5LegFiXUVnh1cWi7gf7euhk10zHdyPklGYlNpKCbe3SDK0Bebm/CAlOzctHFLZN5K2Iw3kiLpQX9+OCru/uIyX41PQEOamJSA95lZ/XhrCHxLa7qhdfavfAy3BECIzYDtT2QHdUafVXibbbCxfKgztK/U=
+	t=1755771134; cv=none; b=pkksMoLA3r+enOhLskD8xFZT4LcTcwnCgTODiblyt9eSSyQlXSEABh1Ete/+U1RlF5YVEEXSx5p/CvfqSuEfUD6rjcu1d0+ldrHyrHvsu53g7QTlgbu3w7QBWyvYhJkNB5Cw2FaXMM5XbhPbFB0z96ymjOAQvFCAUl4nlIwXxWk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755769336; c=relaxed/simple;
-	bh=nSeIorMmRmBVL1NRH30V5TAmMQCnj1rs/AYqG4xMiG4=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=QH/OGVfnGrsBa20CdrMmZqxKT5+Z1pMzyxC1aG6sf9EzNp2a7OyYjM4ozUhO4TBj60qNTSTmBkAOxbwQaf85ckoIXptPGXHkSEan3A8yhYViOkuY8aOc9ZjRfHgY3+vGaHQWfH+89SLS2e+/p9ixc9XeQQYmhiuY4qpwvCmk8oA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4c6yyp52x7zKHMvx;
-	Thu, 21 Aug 2025 17:42:10 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 3068D1A1EB1;
-	Thu, 21 Aug 2025 17:42:10 +0800 (CST)
-Received: from [10.174.179.143] (unknown [10.174.179.143])
-	by APP4 (Coremail) with SMTP id gCh0CgAHgxPw6aZoYbqxEQ--.6848S3;
-	Thu, 21 Aug 2025 17:42:09 +0800 (CST)
-Subject: Re: [PATCH] block: fix disordered IO in the case recursive split
-To: Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@infradead.org>,
- Yu Kuai <yukuai1@huaweicloud.com>
-Cc: axboe@kernel.dk, neil@brown.name, akpm@linux-foundation.org,
- linux-block@vger.kernel.org, linux-raid@vger.kernel.org,
- linux-kernel@vger.kernel.org, colyli@kernel.org, xni@redhat.com,
- yi.zhang@huawei.com, yangerkun@huawei.com, johnny.chenyi@huawei.com,
- "yukuai (C)" <yukuai3@huawei.com>
-References: <20250821074707.2604640-1-yukuai1@huaweicloud.com>
- <aKbcM1XDEGeay6An@infradead.org>
- <54fc027f-f4dc-0412-0d6d-b44a3e644c39@huaweicloud.com>
- <aKbgqoF0UN4_FbXO@infradead.org>
- <7db2eb2c-9566-4d6b-9f82-a0f65110a807@suse.de>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <c145302a-175e-da38-2d28-f92dd285b819@huaweicloud.com>
-Date: Thu, 21 Aug 2025 17:42:08 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.1
+	s=arc-20240116; t=1755771134; c=relaxed/simple;
+	bh=UqbPJ04Skx3qeuN8AslDJpOBSlWMMOu7RTbaxK6CX1g=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JZowApDLrQVqzjJwdd3jwTnfZVwzFx8xMZM1ksmW4iz3ZXZX57MnkqmRR30PvRtwzPrsQ2/JNF+E8fCizM409/rCzsMByR48WR0RyYWmCDaWhqPrYAAgU0wFqGr3ErfvDUjgKgACxMfOMJ/AhV146gGmUkSxsAOnP6TIkhEHh24=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bKsQvKo6; arc=none smtp.client-ip=209.85.216.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bKsQvKo6"
+Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-323266cdf64so638809a91.0;
+        Thu, 21 Aug 2025 03:12:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1755771132; x=1756375932; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=jOIaU+ivLyUInrFo1z4/NdrgXjFotuRBDXDYangsfLc=;
+        b=bKsQvKo6cP8+LOP6Kbj4W2C21rxVPTw1HB+GnuzSDygyx4NvOJtgSQkmxOd4gjMCqb
+         ycQbAze9R2xwyMcv2s4LFkSNqnryc3IxnJY3baKcmw2jTXimUXEfffTblk6EDvp5nn9S
+         b9lZZ9Y0eDf6SDlsycnx7qX/L+rA8wRb7toOtl1oWw3SmUzqm8LSGmjyvaUjITVqvFdg
+         /NLPdyuEz+SbRyYD9YGy9GC0LgGOAiqUFaYwwEpNoHgNgh7Ll6gunDpGhEU+E2xzIcLh
+         n0PcOf87/IKFvDpwFZ0WVmcIS1SyrEajXzVYPZTSL8SBmsSmCq/6/cOG3b0jDg0yOkyv
+         qZ+Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755771132; x=1756375932;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jOIaU+ivLyUInrFo1z4/NdrgXjFotuRBDXDYangsfLc=;
+        b=jCIKzDmwOxrShlfw2A8d3YncxLKw6qtMTwIgw6zhBhA2n9pJZbuF89dW3ixthUhn38
+         yClnt2MEPHDAOgxcpix85qS2loNVc/CG2JKNRXfoDzR+RXP5Oyu9zDJ6ZLPHFesZGBIv
+         wWclEBrpWebrdQHSSZLH8I7c3MBfek76m63E2hNYri+Q/nfWt6WG8bXOMMpaH7G7/oLl
+         53kdvCsvdG5p5niGyMJz0iZ4Dhgd215gbL0XEuIUG03nbSy/B7EJimsHEuTbPRSaKCSU
+         l5na0uOd3MY2UUrYG2sU9VE3wXlPxJUq4snAysRAHSGT0kgjFIUjPfebh6Ke4t16krWX
+         Y7GQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVVDujfSkQGSKXAgm05fJLH3SZ8zgEkG2Xwyyoyy6IMkcu9uxxzaH0+CSkcEhThubAwi9GiUkP6QyULvcZzGw==@vger.kernel.org, AJvYcCVdZH9mGJFzYypX3rtp1Rp2t56O9GuMAIvgSxOh+Or5t72bgZpZa85piwSGq8cDSLktw1ct+/yX4AXGvtvt@vger.kernel.org, AJvYcCVrNOXtnjQGNaXLa2FjJeGiNY/TwZRoNJkyzaQu5mKuAWs8dg9J3Kwx+cyWG6lssN/DFFFJvAxQ@vger.kernel.org, AJvYcCWrkoTXCAw6D6Sc7v0/eoGl0ReUBppcNwniYIZE8BqbwiSxFSLwb8/2zaubA2kVs8/qCeNx/xq/8P6zaw==@vger.kernel.org, AJvYcCX4IiGwFsa+LRM9Qt7WgfWVlXXClKUqBJbaWUXLHaYcLft20H3NhMd0ecmbrcdhRK41YY+adM5sLMVDaZr+Jz2TpUGRWQQu@vger.kernel.org, AJvYcCXktRHU8DJu1TAeFizaw2GkX8uo8PymfLFf6zl3Ik2flAPecbgQPqfdqDj3rkzZS2m7NB66Cl5CbcZkaR1pew+G@vger.kernel.org
+X-Gm-Message-State: AOJu0YzPfziuyNdT6yq5UqyXfInSpGsTtp/kIS2LS+9h+VPn+SNQzQpm
+	v2SYwUPY2g6tSjNP9skBCuA+XRG+DgX9+OWm2X+bJ4R+qJunVgYQDLuw
+X-Gm-Gg: ASbGncsQRM2iLR6bBWp248oBK+YhIUzJ/1kfANVL4GKkv8Fy4iGsu8doUEJFCwNFkC5
+	ch7y+mgc1Q7Mz73KrX5l2BGK0JB6uThNaGrgPgk/urXFyz3W0jftUdY0auoUmrywQlwBeJngygA
+	DPMqlFxEaLq4m+f3D7+IH0tnjbONNXt7iWz1K7VxWGfqTXFX7QG0O1BcyqzU/xipxcrIUHYfuxs
+	W+F9VSQySyfzojYH16WIcWSldPw4GiXuJTD4xNoTwTwplJigPzpm0zoFD88xaC6y5XcfuPiTRvj
+	1uaCslzYEjOZjaAJ5q49e+axGF7xz3iZXAUN1MsOY6f2UsUlmMJzvY8uCG1ksr5Mftpcd4znQh0
+	7+iFMCkDoCdDqjKEJNvFFmybaf2YN5wiytw==
+X-Google-Smtp-Source: AGHT+IGyEK2exr+k/V0w8XXUmSIzv3Ytbu6vvsSe7eRwRcTsYn2OH5a5icQQPi/utnU7cQhUneD/0w==
+X-Received: by 2002:a17:90b:224e:b0:323:7e80:8819 with SMTP id 98e67ed59e1d1-324ed15d2c5mr2462627a91.36.1755771131489;
+        Thu, 21 Aug 2025 03:12:11 -0700 (PDT)
+Received: from server.. ([103.250.145.167])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-76e7ccfa8d1sm7835815b3a.0.2025.08.21.03.12.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 Aug 2025 03:12:10 -0700 (PDT)
+From: Bala-Vignesh-Reddy <reddybalavignesh9979@gmail.com>
+To: akpm@linux-foundation.org,
+	shuah@kernel.org
+Cc: mic@digikod.net,
+	gnoack@google.com,
+	david@redhat.com,
+	lorenzo.stoakes@oracle.com,
+	Liam.Howlett@oracle.com,
+	vbabka@suse.cz,
+	rppt@kernel.org,
+	surenb@google.com,
+	mhocko@suse.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	ming.lei@redhat.com,
+	skhan@linuxfoundation.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-security-module@vger.kernel.org,
+	linux-mm@kvack.org,
+	netdev@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	reddybalavignesh9979@gmail.com
+Subject: [PATCH] selftests: centralise maybe-unused definition in kselftest.h
+Date: Thu, 21 Aug 2025 15:41:59 +0530
+Message-ID: <20250821101159.2238-1-reddybalavignesh9979@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <7db2eb2c-9566-4d6b-9f82-a0f65110a807@suse.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgAHgxPw6aZoYbqxEQ--.6848S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7Ar13XrykAF1kuFyUXw4kCrg_yoW8AF1fpr
-	4vqF1jyrWUJrsYkFnrJw4jqa4rtr1UJ34Fyr1rX3W7X34UJrnFqr45WrWY9r98XF48Kr12
-	yr48Jry5Zw1UtFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBF14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
-	0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x
-	0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E
-	7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcV
-	C0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF
-	04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7
-	CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUZYFZUUUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-Hi,
+Several selftests subdirectories duplicated the define __maybe_unused,
+leading to redundant code. Moved to kselftest.h header and removed
+other definition.
 
-在 2025/08/21 17:33, Hannes Reinecke 写道:
-> On 8/21/25 11:02, Christoph Hellwig wrote:
->> On Thu, Aug 21, 2025 at 04:56:33PM +0800, Yu Kuai wrote:
->>> Can you give some examples as how to chain the right way?
->>
->> fs/xfs/xfs_bio_io.c: xfs_rw_bdev
->> fs/xfs/xfs_buf.c: xfs_buf_submit_bio
->> fs/xfs/xfs_log.c: xlog_write_iclog
->>
->>> BTW, for all
->>> the io split case, should this order be fixed? I feel we should, this
->>> disorder can happen on any stack case, where top max_sector is greater
->>> than stacked disk.
->>
->> Yes, I've been trying get Bart to fix this for a while instead of
->> putting in a workaround very similar to the one proposed here,
->> but so far nothing happened.
->>
->>
-> This feels like a really stupid fix, but wouldn't that help?
-> 
-> diff --git a/drivers/md/raid5.c b/drivers/md/raid5.c
-> index 023649fe2476..2b342bb59612 100644
-> --- a/drivers/md/raid5.c
-> +++ b/drivers/md/raid5.c
-> @@ -5478,7 +5478,6 @@ static struct bio *chunk_aligned_read(struct mddev 
-> *mddev, struct bio *raid_bio)
->                  split = bio_split(raid_bio, sectors, GFP_NOIO, 
-> &conf->bio_split);
->                  bio_chain(split, raid_bio);
->                  submit_bio_noacct(raid_bio);
-> -               raid_bio = split;
->          }
-> 
+This addresses the duplication noted in the proc-pid-vm warning fix
 
-I do not understand how can this help, do you miss that submit split
-instead?
+Suggested-by: Andrew Morton <akpm@linux-foundation.org>
+Link:https://lore.kernel.org/lkml/20250820143954.33d95635e504e94df01930d0@linux-foundation.org/
 
-And with this change, this can help, however, I think we'll still submit
-the last lba bio first, like bio_last -> bio0 -> bio1 ... where the
-following is sequential.
+Signed-off-by: Bala-Vignesh-Reddy <reddybalavignesh9979@gmail.com>
+---
+ tools/testing/selftests/kselftest.h                    | 4 ++++
+ tools/testing/selftests/landlock/audit.h               | 6 ++----
+ tools/testing/selftests/landlock/common.h              | 4 ----
+ tools/testing/selftests/mm/pkey-helpers.h              | 3 ---
+ tools/testing/selftests/net/psock_lib.h                | 4 ----
+ tools/testing/selftests/perf_events/watermark_signal.c | 2 --
+ tools/testing/selftests/proc/proc-pid-vm.c             | 4 ----
+ tools/testing/selftests/ublk/utils.h                   | 2 --
+ 8 files changed, 6 insertions(+), 23 deletions(-)
 
-BTW, this is not just a raid5 problem, this is also possible for
-raid0/10 and all other recursive split case.
-
-Thanks,
-Kuai
-
-> 
-> Cheers,
-> 
-> Hannes
+diff --git a/tools/testing/selftests/kselftest.h b/tools/testing/selftests/kselftest.h
+index c3b6d2604b1e..661d31c4b558 100644
+--- a/tools/testing/selftests/kselftest.h
++++ b/tools/testing/selftests/kselftest.h
+@@ -92,6 +92,10 @@
+ #endif
+ #define __printf(a, b)   __attribute__((format(printf, a, b)))
+ 
++#ifndef __maybe_unused
++#define __maybe_unused __attribute__((__unused__))
++#endif
++
+ /* counters */
+ struct ksft_count {
+ 	unsigned int ksft_pass;
+diff --git a/tools/testing/selftests/landlock/audit.h b/tools/testing/selftests/landlock/audit.h
+index b16986aa6442..02fd1393947a 100644
+--- a/tools/testing/selftests/landlock/audit.h
++++ b/tools/testing/selftests/landlock/audit.h
+@@ -20,14 +20,12 @@
+ #include <sys/time.h>
+ #include <unistd.h>
+ 
++#include "../kselftest.h"
++
+ #ifndef ARRAY_SIZE
+ #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
+ #endif
+ 
+-#ifndef __maybe_unused
+-#define __maybe_unused __attribute__((__unused__))
+-#endif
+-
+ #define REGEX_LANDLOCK_PREFIX "^audit([0-9.:]\\+): domain=\\([0-9a-f]\\+\\)"
+ 
+ struct audit_filter {
+diff --git a/tools/testing/selftests/landlock/common.h b/tools/testing/selftests/landlock/common.h
+index 88a3c78f5d98..9acecae36f51 100644
+--- a/tools/testing/selftests/landlock/common.h
++++ b/tools/testing/selftests/landlock/common.h
+@@ -22,10 +22,6 @@
+ 
+ #define TMP_DIR "tmp"
+ 
+-#ifndef __maybe_unused
+-#define __maybe_unused __attribute__((__unused__))
+-#endif
+-
+ /* TEST_F_FORK() should not be used for new tests. */
+ #define TEST_F_FORK(fixture_name, test_name) TEST_F(fixture_name, test_name)
+ 
+diff --git a/tools/testing/selftests/mm/pkey-helpers.h b/tools/testing/selftests/mm/pkey-helpers.h
+index ea404f80e6cb..fa15f006fa68 100644
+--- a/tools/testing/selftests/mm/pkey-helpers.h
++++ b/tools/testing/selftests/mm/pkey-helpers.h
+@@ -84,9 +84,6 @@ extern void abort_hooks(void);
+ #ifndef noinline
+ # define noinline __attribute__((noinline))
+ #endif
+-#ifndef __maybe_unused
+-# define __maybe_unused __attribute__((__unused__))
+-#endif
+ 
+ int sys_pkey_alloc(unsigned long flags, unsigned long init_val);
+ int sys_pkey_free(unsigned long pkey);
+diff --git a/tools/testing/selftests/net/psock_lib.h b/tools/testing/selftests/net/psock_lib.h
+index 6e4fef560873..067265b0a554 100644
+--- a/tools/testing/selftests/net/psock_lib.h
++++ b/tools/testing/selftests/net/psock_lib.h
+@@ -22,10 +22,6 @@
+ 
+ #define PORT_BASE			8000
+ 
+-#ifndef __maybe_unused
+-# define __maybe_unused		__attribute__ ((__unused__))
+-#endif
+-
+ static __maybe_unused void pair_udp_setfilter(int fd)
+ {
+ 	/* the filter below checks for all of the following conditions that
+diff --git a/tools/testing/selftests/perf_events/watermark_signal.c b/tools/testing/selftests/perf_events/watermark_signal.c
+index e03fe1b9bba2..b3a72f0ac522 100644
+--- a/tools/testing/selftests/perf_events/watermark_signal.c
++++ b/tools/testing/selftests/perf_events/watermark_signal.c
+@@ -17,8 +17,6 @@
+ 
+ #include "../kselftest_harness.h"
+ 
+-#define __maybe_unused __attribute__((__unused__))
+-
+ static int sigio_count;
+ 
+ static void handle_sigio(int signum __maybe_unused,
+diff --git a/tools/testing/selftests/proc/proc-pid-vm.c b/tools/testing/selftests/proc/proc-pid-vm.c
+index 978cbcb3eb11..2a72d37ad008 100644
+--- a/tools/testing/selftests/proc/proc-pid-vm.c
++++ b/tools/testing/selftests/proc/proc-pid-vm.c
+@@ -47,10 +47,6 @@
+ #include <sys/resource.h>
+ #include <linux/fs.h>
+ 
+-#ifndef __maybe_unused
+-#define __maybe_unused __attribute__((__unused__))
+-#endif
+-
+ #include "../kselftest.h"
+ 
+ static inline long sys_execveat(int dirfd, const char *pathname, char **argv, char **envp, int flags)
+diff --git a/tools/testing/selftests/ublk/utils.h b/tools/testing/selftests/ublk/utils.h
+index 36545d1567f1..a852e0b7153e 100644
+--- a/tools/testing/selftests/ublk/utils.h
++++ b/tools/testing/selftests/ublk/utils.h
+@@ -2,8 +2,6 @@
+ #ifndef KUBLK_UTILS_H
+ #define KUBLK_UTILS_H
+ 
+-#define __maybe_unused __attribute__((unused))
+-
+ #ifndef min
+ #define min(a, b) ((a) < (b) ? (a) : (b))
+ #endif
+-- 
+2.43.0
 
