@@ -1,112 +1,98 @@
-Received: from mail-io1-f53.google.com (mail-io1-f53.google.com [209.85.166.53])
+Received: from mail-il1-f175.google.com (mail-il1-f175.google.com [209.85.166.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 612C232277F
-	for <linux-block@vger.kernel.org>; Thu, 21 Aug 2025 13:11:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBD94322A23
+	for <linux-block@vger.kernel.org>; Thu, 21 Aug 2025 13:11:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755781895; cv=none; b=dRaal96RaVsORvQ9+3ibdzotxCgVohyJ7EBIAgfKKTqEbIpQGkgLdFllxfHiZuLZGnFGM0GQV0FXiKZ+/PXdaKxivUSFI0iEdDzOdrxYKu+DQoBCmc+wzjX5Nrvu1KPACJp05QoVyyI+PwhGIJeqHNL8U2/cOSaDivmAGhwRYzI=
+	t=1755781921; cv=none; b=NbZZFDSN1DQGe16uqlp6JoufWeHPd7Wlxd+98lDBUkCtow2NsPpI+cUtE0IOfLvi6pf8msq2EzsIvvM5f2R5hjufYCYRwnxe1TdVeM5gT16k21GsvQ+CvGiCo+mW8vvBT1IVCwSMo9hnzIA36dqWgeoXVoL9l6XDhIllmHnkMB0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755781895; c=relaxed/simple;
-	bh=3ZQ8fvIjR0VDpzCRTAArVeBjFDzk3nDf6+Hb7sGdU7k=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=OITO6wFkEfuiY1N49KITMbWM8T2pAofN3cfp/Uag6EH/f3uhX6qUa8HA6IpwOd9xBkQ+pE+urOmKKp2aKcuKyPGySQONXOqhCgCEMBuoHPbxQWRV8TGZ+/dCB+cBUXFFXIm39TeEbK9mDbCt0+KoYwnGQZOa41pBrmeYumb99Po=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=eJSZtAwj; arc=none smtp.client-ip=209.85.166.53
+	s=arc-20240116; t=1755781921; c=relaxed/simple;
+	bh=ynsd5patxKIbEZG3f4ujwFPtsFx1kM0gMc5nkwyt8WA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=K6OLRphU7iexF0tXq5E9NzG1iUoQ05d+ZTuhB7eRx3UTBYQN3/dl43/ArA2DOeIGvjoyIahFivF2YLi6GWxpauy1lGTcyeyybjV5WzHxMAdmC77io5w6m/0g6z0OwoTokCVdoNwjsja4hob5OmGKYhCsjYdm4TX8me0BrWnBGJo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=DPZN60NR; arc=none smtp.client-ip=209.85.166.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="eJSZtAwj"
-Received: by mail-io1-f53.google.com with SMTP id ca18e2360f4ac-88432cbf3fbso76507239f.0
-        for <linux-block@vger.kernel.org>; Thu, 21 Aug 2025 06:11:32 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="DPZN60NR"
+Received: by mail-il1-f175.google.com with SMTP id e9e14a558f8ab-3e570042988so9264055ab.2
+        for <linux-block@vger.kernel.org>; Thu, 21 Aug 2025 06:11:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1755781891; x=1756386691; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qL/kcTRAUROT+PP1JVZ97Mc+Zo0wX2QEXwuGnexfPeo=;
-        b=eJSZtAwja0KhC/Svg8ZQTeWavDuo1iZ+NeshoKUiF3C38yS9cWySDRl2EOqv8cT1ob
-         te3Xv40BsoyK20ANz7sbWNLdnDQ1Azsod0q8X3kiVhsqQFXifeKjP2m2mSBCadOaIZsw
-         dDtwwqRaQC8cHUfbPhk5gOkC5SRRTBmCGxoMsCtTcF4QMA1gTqgeJds+IORbsbRA5XxP
-         sQFRh19dBkUGzfE3yJCDMF+v4CVPJt4Lsu69j0CgnnuwcFVWsCdyu7lVUWI2hFKrOXEO
-         s6X6GTSP7/NpVmp192XOYUFMR0De43QZ7R7Ik53rNO+4SvLu4tkLjPKDWiRxKPcvIp2h
-         +Pdg==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1755781918; x=1756386718; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Mi6ctp4jfXr0Yj3D0M/m6+bjtD7sQFjqRTmqMPnAMaw=;
+        b=DPZN60NRvFz/76nQbP1syeZA/9RvF4qjXmDiGejfqYJYLPLUbqDOOMBwhsLWnxL9bU
+         QVElrTtdtp9NhCuGPVq7ejA+AnDO7y1/EMAEQfwbw6hV4GK7aulzqMd0U61a4Oi3ykRJ
+         LMrG4bvP6DlzDFuE0O/YVfH3l/O5H3SCUOjsV9PdaQzdxn939IqjDM4Sy6lawZCfws8j
+         rH4cjy+JEYQUy+rGsenPYs5lSHTGnLbp8205+o333vWN7N1tMqruK+Cx6JzD4DFjX6uy
+         i6MECcHnVK0oMFRIyUR0DG+WSQGoam9ry84d0CcI4htBECGh+g0DWEeqGRi69lD2tiIU
+         aAaw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755781891; x=1756386691;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qL/kcTRAUROT+PP1JVZ97Mc+Zo0wX2QEXwuGnexfPeo=;
-        b=Xbc+gXUqq3eCZwDV2/EFTyA4w8fCm9atGwIg/ymrzyXSWM2oEQl29iAGcgbOc2RhE/
-         hGqmZ2flWqJL30yDJqLWLCNN97QR3FLdEJYEKn+1n75kZaHlyO+K473KI+/9BcbkjIXY
-         olyRjeLWgdpqEGQV7be3/Ce2DvOuDCmryx1i60arQBELhXA/LXebC/8EmndMjJrRqZnQ
-         4TutfI8XjqYWbms5qjBJQkP1BGhff8MYlRfZHb86I/HZkJwN99qaE+6VHq3gE9OqTDO/
-         gVaIb57LsT/jWA23n6PB9ApFQP+g5C1S67sih/dHYv5Y50/qzJQ5zTNYISdlBuSQLZB+
-         ZgJg==
-X-Gm-Message-State: AOJu0YxNUz68us5AVY+79Z0wu+r82HuDGZVS6tqbyMGs4MRfJirmIZ7X
-	jkEF5iM5XPJDJGkWZy1G26mLFR6WwN0g/3WfzsgbA0e4XDG+FDlrZZO91jseiqdrd5c=
-X-Gm-Gg: ASbGncsvo6fvI5J2B9xMt5/TDFxDFARwYVDscwBDW2og74i4ZMXyh/A1UQ82OA06nXe
-	dOkozq7O0/BRwPPnhOwF99Cs8cBMv/skYw8mh84I8JKSycTbkBJdHTOricZPcS/xQdJ3yUciaaG
-	w2wVb8GjIP7dRswqjt1Hyt3O74ggG0jUA2PsvPFQ54iCvBk4DPUKXqa2sTXRt5xD+tSbSZAjSIg
-	aoBwJ2if5LtGsOc/XdQLn0KE4EzLFhd2NxcW5sHvVEIf+WqRWruhx3yjhnyVuhFTGUAFb0nhkTo
-	gbeaLAmLNB4soO+MYLWvaIa7nvcfZoMLWFyPjuenas58UbuBXmIlG8cKiIh0FeyGTCBUs76TCzc
-	HserNhIBucHmo2g==
-X-Google-Smtp-Source: AGHT+IFLioDQ6sghKlmYNhj+Uo4ALtrAB+xS1QYrxQjdIwXuVfPDpajNFZzQKFk0vBIn+qNg8aP35A==
-X-Received: by 2002:a05:6e02:4515:10b0:3e8:cd52:4ccf with SMTP id e9e14a558f8ab-3e8cd526232mr4822525ab.18.1755781891361;
-        Thu, 21 Aug 2025 06:11:31 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3e66f66bbb8sm44710415ab.24.2025.08.21.06.11.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Aug 2025 06:11:30 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, Nilay Shroff <nilay@linux.ibm.com>
-Cc: ming.lei@redhat.com, yukuai1@huaweicloud.com, hch@lst.de, 
- shinichiro.kawasaki@wdc.com, kch@nvidia.com, gjoyce@ibm.com
-In-Reply-To: <20250814082612.500845-1-nilay@linux.ibm.com>
-References: <20250814082612.500845-1-nilay@linux.ibm.com>
-Subject: Re: [PATCHv3 0/3] block: blk-rq-qos: replace static key with
- atomic bitop
-Message-Id: <175578189034.623211.15789507272079107763.b4-ty@kernel.dk>
-Date: Thu, 21 Aug 2025 07:11:30 -0600
+        d=1e100.net; s=20230601; t=1755781918; x=1756386718;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Mi6ctp4jfXr0Yj3D0M/m6+bjtD7sQFjqRTmqMPnAMaw=;
+        b=iHBg48ALaPX7ghu5NJ40xMKYGeSnijbThXj1hcOaR93XvTVzkHawjbR4UdKqFgrLBF
+         cKkKAgIXpsIjHCvDwZ9N4mw4ALfvXmFBk1pzaaDL/FcvYtyhErE5dQ9wIgGmmjTo6IqU
+         GM4x1QjNMmGqPY7nAHjUKOL0i0aipu40z/xG4IIsojkGvnEcR8CEKbKlQ29gnALuUln4
+         NCc1ZlXsBy5A02+fXINhqNlfEvhKinR5614cIKJaSnrWspn3j8g3Vp7aSNCvAy8+VEMZ
+         kBVbE+zo53fbwZeqF1s2yhz1uFKXsV594s91uBp4cPd3UjHgTculW+SJWJxq1JavEU5n
+         b1RA==
+X-Forwarded-Encrypted: i=1; AJvYcCUN6e0ktIm1KFgEKIHJxhL/YT1eXUltzWwQGGfN0GwcHu/sMOBfZdfiHHJfS1QOLwI66DQ58qQIlJTzyQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzQtZgxX5l49QpnudiYdwv6bElTz8pO30ZpLe9u3DiewzD9aQQ8
+	Iv1Tcu2DFU3aTyx2Mn3gJiAycOCaTHq9nhBTlTZ0qoQw4PtqUFpYyq2iAJtkjqg8XNo=
+X-Gm-Gg: ASbGnct80P+Dtz+t7V6Hyl5wryVR4DMCpZYPfh+WFl9KkSinSm7jnrlZoS9m6YODAYd
+	swCN1nWTpqEjQDDn/tpu4I7FSYEkJhE1ee078Zcix7eVGtwIneLf9j83lDy48lt5IeLDJs5D2ej
+	D4siVWOjJfWB9LiCvvROo41+rxWigWRJ3prYQ+mkHDoQnUiqXOT+wVasQjjRGv3+HAa68qVEwut
+	L+0zkuonpykcfv4VH6AVfXHbsaptw5bMND9/Uj911P7N6HkrUl0OHAD1nOxkCHf61uLV0ehgF3K
+	oFj5HZgA4SMfgplbZxbXIyy1d+ow/qsXkEtFeOHzs6SsilUvt1Sv1y4+iktqC1gYXUW5OXKbLdP
+	+dTzDX0L7ZwBMyVGYY4E=
+X-Google-Smtp-Source: AGHT+IGVvUQf3DnQC6UrZ4nOhPWd0ycDMlb0FEtU/dnYHvJSO0pdt2NxCkH/lkSC0SitDjHIowAihw==
+X-Received: by 2002:a92:c26d:0:b0:3e6:7aad:25ff with SMTP id e9e14a558f8ab-3e6d925cefbmr38771805ab.23.1755781917778;
+        Thu, 21 Aug 2025 06:11:57 -0700 (PDT)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3e6789d85c9sm30709445ab.43.2025.08.21.06.11.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 21 Aug 2025 06:11:57 -0700 (PDT)
+Message-ID: <404c954c-e98d-4a47-861a-3a4e19bcfc4e@kernel.dk>
+Date: Thu, 21 Aug 2025 07:11:56 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Mailer: b4 0.14.3-dev-2ce6c
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCHv3 0/3] block: blk-rq-qos: replace static key with atomic
+ bitop
+To: Nilay Shroff <nilay@linux.ibm.com>
+Cc: ming.lei@redhat.com, yukuai1@huaweicloud.com, hch@lst.de,
+ shinichiro.kawasaki@wdc.com, kch@nvidia.com, gjoyce@ibm.com,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <20250814082612.500845-1-nilay@linux.ibm.com>
+ <1c23ef53-b96b-4891-a1af-af32328139e8@linux.ibm.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <1c23ef53-b96b-4891-a1af-af32328139e8@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-
-On Thu, 14 Aug 2025 13:54:56 +0530, Nilay Shroff wrote:
-> This patchset replaces the use of a static key in the I/O path (rq_qos_
-> xxx()) with an atomic queue flag (QUEUE_FLAG_QOS_ENABLED). This change
-> is made to eliminate a potential deadlock introduced by the use of static
-> keys in the blk-rq-qos infrastructure, as reported by lockdep during
-> blktests block/005[1].
+On 8/21/25 6:19 AM, Nilay Shroff wrote:
+> Hi Jens,
 > 
-> The original static key approach was introduced to avoid unnecessary
-> dereferencing of q->rq_qos when no blk-rq-qos module (e.g., blk-wbt or
-> blk-iolatency) is configured. While efficient, enabling a static key at
-> runtime requires taking cpu_hotplug_lock and jump_label_mutex, which
-> becomes problematic if the queue is already frozen — causing a reverse
-> dependency on ->freeze_lock. This results in a lockdep splat indicating
-> a potential deadlock.
+> Just a gentle ping on this patchset. There have been a couple of recent
+> reports[1][2] highlighting this issue. Could you please consider pulling it?
 > 
-> [...]
+> [1] https://lore.kernel.org/all/4f2bd603-dbd9-434c-9dfe-f2d4f1becd82@linux.ibm.com/
+> [2] https://lore.kernel.org/all/36e552a1-8e8e-4b6f-894b-e7e04e17196e@linux.ibm.com/
 
-Applied, thanks!
+Was waiting for discussion to settle down, but looks like there's
+agreement to go with this approach. I've queued it up, thanks.
 
-[1/3] block: skip q->rq_qos check in rq_qos_done_bio()
-      commit: 275332877e2fa9d6efa7402b1e897f6c6ee695bb
-[2/3] block: decrement block_rq_qos static key in rq_qos_del()
-      commit: ade1beea1c27657712aa8f594226d461639382ff
-[3/3] block: avoid cpu_hotplug_lock depedency on freeze_lock
-      commit: 370ac285f23aecae40600851fb4a1a9e75e50973
-
-Best regards,
 -- 
 Jens Axboe
-
-
 
