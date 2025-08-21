@@ -1,50 +1,50 @@
 Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4A4435FC14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A91435FC1D
 	for <linux-block@vger.kernel.org>; Thu, 21 Aug 2025 20:44:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755809070; cv=none; b=cvOFd/PSQPBcb1pPS9S/79ICH4cjSE3vKBvBpDhhxNCzNwzJW6n80fM76ILA9KVsgSY3hp+7i/NJchWgFqM6TyIdK9c1RWk41YFmZhGlfhV82wvS1glXwmgtiT8mh5JK+Ynv9QNBla8gVKEHxqc7vtIHasoWpCGaoYAMKRRV0gM=
+	t=1755809070; cv=none; b=KpohYdXmL2r5FpCplpqv5/aRRwa6lOWM2oZ4mpdv4+faNBVJmT4fz+mgejISSoOR9iAOQkHQZlW/ByOicjVqiXuAwCpv7vQn/KRMlgkR/Qqa1xBINr1/Sa+Aljg7yqJdEKAxzBMETzzVQU9BpF76JiDoTVrbOhROf/3cH+kEA/k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1755809070; c=relaxed/simple;
-	bh=2lBmUOzbr+X/FFZdGgvBstGNijJantVOTkTkXx2syCQ=;
+	bh=X0odbx0mjTZvAvW5z57Iqzp48R5SMyQ0Q6vD+D8nUN4=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kc2oKq93tri6+GbW8AVGOuUUtKmkfE9rlPnQjo2kuwoVKI+ZBruweKQU3nMLxP5wqGKi+F6fZsduIevm9j/NP+UlG0V5171N9o87IcjqxMn7SkAMVO/knrraHMPqv0ppKnxYM/cuAwoHPYouDCRj07Mf8BpNKOj0VTNW3M0PMnE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=CqPplp4D; arc=none smtp.client-ip=67.231.145.42
+	 MIME-Version:Content-Type; b=q5isCrtybAmC5XmXBziGHyGrGGxaGfNo8Muer623ji+5HLYiBxTAi5giCY3Z1U6h0zlasLss2A0jsNykVva5brhQRszV36lx8Xk9cqD89UEGK46n+ujMjI31SvyEehwwBdtkwUFIw4Xh80VdsS7SxK7/1HnTXqsqUmBCTW330t0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=YOPqtQMw; arc=none smtp.client-ip=67.231.145.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="CqPplp4D"
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="YOPqtQMw"
 Received: from pps.filterd (m0109333.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 57LKUBLw016918
+	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 57LKUBLx016918
 	for <linux-block@vger.kernel.org>; Thu, 21 Aug 2025 13:44:28 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
 	:content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=s2048-2025-q2;
-	 bh=WGdL0884uDAWKmbhibPsPLhCp7gAcDZEMnc4JQscSE4=; b=CqPplp4DAaAD
-	nEL5GpQlqdS7FKr0LogmCJYWsH31TgDId4m0wrj7DonYIVFRMT1QsJ1fPwN46A+t
-	28YTaEnpcwS8SwS2YlJZ/bxNxkG9j1l05y/Pgho17QyDHo7vjSWoX1llwWSaqlCT
-	b7JKlH6jPttOmyS+grXZKhLktBrCOG6FgRvBXen6VTDjrxOPajNorJRWmN0r9jRs
-	oJHs94rDA5k2n28a9+ODL/nevU229VB64zeaXwh30lpr6iyAhCkTKXNoIHUYXTrn
-	ATv6oqB5DSvXx9qEW/2yPlYrkUXrLrMGla2NhDau7Ra6b7ck3Ulb/ADJQ5mfAt6f
-	I/tKBDtLBg==
+	 bh=SpF7gDfNfdb16tfYdO08gdnfGgq/XJWxuudJ21yq/RA=; b=YOPqtQMwVkCo
+	DauA3wSxahwIFVEYxMpQM4G+cK5XYqamIaVEjqHPFF2hgaq7gf7oFqAiWreLsiaX
+	8cVFrp5KcH3BuFWWZ1a9nuhBZHPs2jf8wNOFptBjRnaH+jjDDbsyxqjvCuNkv2HQ
+	FsMZlI/eTRVn0hSTEI/MMyzlENWGEMMP302efNd4shAx6H94lnTuEkfHqhdjE6zy
+	zu6JxfnaSJUexkcMOz+78cal3aitn68mkxOuygKKXs6D5FOoQRvrlbsYEwSkdpp0
+	ciRHhxMGv1uwG/lmwXoDMWHP9anS/LwmxaHerOOncONpnSZVATVp3VaxEdP15Xxc
+	x7qx9wIHvQ==
 Received: from mail.thefacebook.com ([163.114.134.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 48p6fcjc6k-6
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 48p6fcjc6k-7
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Thu, 21 Aug 2025 13:44:27 -0700 (PDT)
-Received: from twshared10560.01.ash9.facebook.com (2620:10d:c085:108::150d) by
+	for <linux-block@vger.kernel.org>; Thu, 21 Aug 2025 13:44:28 -0700 (PDT)
+Received: from twshared17671.07.ash8.facebook.com (2620:10d:c085:208::7cb7) by
  mail.thefacebook.com (2620:10d:c08b:78::c78f) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.17; Thu, 21 Aug 2025 20:44:24 +0000
+ 15.2.2562.17; Thu, 21 Aug 2025 20:44:27 +0000
 Received: by devbig197.nha3.facebook.com (Postfix, from userid 544533)
-	id 1AEB9DAAF4F; Thu, 21 Aug 2025 13:44:22 -0700 (PDT)
+	id 36A03DAAF51; Thu, 21 Aug 2025 13:44:23 -0700 (PDT)
 From: Keith Busch <kbusch@meta.com>
 To: <linux-block@vger.kernel.org>, <linux-nvme@lists.infradead.org>
 CC: <hch@lst.de>, <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>
-Subject: [PATCHv3 1/2] block: accumulate segment page gaps per bio
-Date: Thu, 21 Aug 2025 13:44:19 -0700
-Message-ID: <20250821204420.2267923-2-kbusch@meta.com>
+Subject: [PATCHv3 2/2] nvme: remove virtual boundary for sgl capable devices
+Date: Thu, 21 Aug 2025 13:44:20 -0700
+Message-ID: <20250821204420.2267923-3-kbusch@meta.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20250821204420.2267923-1-kbusch@meta.com>
 References: <20250821204420.2267923-1-kbusch@meta.com>
@@ -57,281 +57,130 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 X-FB-Internal: Safe
 Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: QD9WVjSB1NMPKynr32lwh4uKiVoDomLe
-X-Authority-Analysis: v=2.4 cv=SayutvRu c=1 sm=1 tr=0 ts=68a7852b cx=c_pps
+X-Proofpoint-ORIG-GUID: fKQPHXpa-oXV3st6cISz08mlyMAvwEv5
+X-Authority-Analysis: v=2.4 cv=SayutvRu c=1 sm=1 tr=0 ts=68a7852c cx=c_pps
  a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17
- a=2OwXVqhp2XgA:10 a=VwQbUJbxAAAA:8 a=pC_r94qpXYv0nIwI4BQA:9
-X-Proofpoint-GUID: QD9WVjSB1NMPKynr32lwh4uKiVoDomLe
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODIxMDE3NyBTYWx0ZWRfXzS3w50YJELzV
- wJkjIVh3umYBXqLOFoxxxDLJQYldzgGMlhsSIAjqfbhj8Vc8Y808oFsl6Z6mltlRFg5a5n65Kqh
- yF7CJQJ4UeoCiRJfelXYOV/BtcHKyi3wVDl2U+6P78PIFGFpo2SfKRpzKyYYIvnBXSfKlMU+V+o
- jFXCmj3tFhoKjt6LND/F4H5hWmuiDUZ/5HCfok6se7VUUljnRLhu+IoGWyIfJ/pMmG9tJGGFkft
- vAuVv67FhdodYUjIEBHxxXjflFuPYL2uIO5WMeHih1LOFKS1gA0tCTzHBPjS8YOGXyoWwy3oPLD
- Drvve4IPPWuv5XYqkoe8OEQ2eLXt3iFd/Q4YyNIpfKxfUSszFYIPfqfyGuEfto1aD7UwkiD8bFr
- 7XX0mfJebqc+CAiGPwmz6+3MMts4EQG9B9PzJOMiDDhl72jBoxrQjniphpamfCEwrB3RrR0s
+ a=2OwXVqhp2XgA:10 a=VwQbUJbxAAAA:8 a=DE5RKVN6jYQ7jVVW-c4A:9
+X-Proofpoint-GUID: fKQPHXpa-oXV3st6cISz08mlyMAvwEv5
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODIxMDE3NyBTYWx0ZWRfX+IBQS1Bvd2VY
+ RimZcu1SJ7Oh6wMWhZs0MU6bGR7lzIqhm0w0uhrWIciKYwtrJod3H3aO1x08UytjEv1rRJHtPli
+ CQ6S2Sh/FpJJy1EBAvwXvfC2nLuvuNXvWYN7F6Pzonft3R1eH0XZ+J4Q/LDdMvKMwng0mUnUfvP
+ u2JW0fd3HAog9QS6TuZ4lc/AJUhdK4HI3EQQmssp58CmWsfWkx46GVhnMefXCZutqBKIl4NIhtK
+ DFM60NHWJVVxWcI0c+6P4tl297c86McH4HMblcpxchyZPo3cNV2U+9oS/mZ8NJ/vMyEIiNnBnE0
+ h95s53neXEt6MOWhT331eu59tdnr86hY6mYIVXVY6MKMn5YAtdVQaLtan9atzyT65D5yeVX8Zj0
+ vTrdlueJLqn1Q9COrQcnSUVc5y191jUK22wrJ0anRsLuDsO6N7rlvfpL8AQbdiIWfbDsmDOi
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
  definitions=2025-08-21_04,2025-08-20_03,2025-03-28_01
 
 From: Keith Busch <kbusch@kernel.org>
 
-The blk-mq dma iteration has an optimization for requests that align to
-the device's iommu merge boundary. This boundary may be larger than the
-device's virtual boundary (if any), but the code had been depending on
-that queue limit to know ahead of time if the request is guaranteed to
-align to that optimization.
+The nvme virtual boundary is only required for the PRP format. Devices
+that can use SGL for DMA don't need it for IO queues. Drop reporting it
+for such PCIe devices; fabrics controllers will continue to use the
+limit as they currently don't report any boundary requirements.
 
-Rather than rely on that queue limit, which many devices may not report,
-store the lowest set bit of any page boundary gap between each segment
-into the bio while checking the segments. The request turns this into a
-mask for merging and quickly checking per io if the request can use the
-iova optimization.
+Applications may continue to align to the same virtual boundaries for
+optimization purposes if they want, and the driver will continue to
+decide whether to use the PRP format the same as before if the IO allows
+it.
 
 Signed-off-by: Keith Busch <kbusch@kernel.org>
 ---
- block/bio.c               |  1 +
- block/blk-merge.c         | 39 ++++++++++++++++++++++++++++++++++++---
- block/blk-mq-dma.c        |  3 +--
- block/blk-mq.c            | 10 ++++++++++
- include/linux/blk-mq.h    |  2 ++
- include/linux/blk_types.h |  8 ++++++++
- 6 files changed, 58 insertions(+), 5 deletions(-)
+ drivers/nvme/host/core.c | 21 ++++++++++++++++-----
+ drivers/nvme/host/pci.c  | 16 +++++++++++++---
+ 2 files changed, 29 insertions(+), 8 deletions(-)
 
-diff --git a/block/bio.c b/block/bio.c
-index f185119b8b40b..8bbb9236c2567 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -253,6 +253,7 @@ void bio_init(struct bio *bio, struct block_device *b=
-dev, struct bio_vec *table,
- 	bio->bi_write_hint =3D 0;
- 	bio->bi_write_stream =3D 0;
- 	bio->bi_status =3D 0;
-+	bio->bi_pg_bit =3D 0;
- 	bio->bi_iter.bi_sector =3D 0;
- 	bio->bi_iter.bi_size =3D 0;
- 	bio->bi_iter.bi_idx =3D 0;
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 35e99dd1c5fd8..7e81a729d5067 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -278,6 +278,12 @@ static unsigned int bio_split_alignment(struct bio *=
-bio,
- 	return lim->logical_block_size;
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 812c1565114fd..cce1fbf2becd8 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -2065,13 +2065,24 @@ static u32 nvme_max_drv_segments(struct nvme_ctrl=
+ *ctrl)
  }
 =20
-+static inline unsigned int bvec_seg_gap(struct bio_vec *bv, struct bio_v=
-ec *bvprv)
-+{
-+	return ((bvprv->bv_offset + bvprv->bv_len) & (PAGE_SIZE - 1)) |
-+			bv->bv_offset;
-+}
-+
- /**
-  * bio_split_io_at - check if and where to split a bio
-  * @bio:  [in] bio to be split
-@@ -294,9 +300,9 @@ static unsigned int bio_split_alignment(struct bio *b=
-io,
- int bio_split_io_at(struct bio *bio, const struct queue_limits *lim,
- 		unsigned *segs, unsigned max_bytes, unsigned len_align_mask)
+ static void nvme_set_ctrl_limits(struct nvme_ctrl *ctrl,
+-		struct queue_limits *lim)
++		struct queue_limits *lim, bool admin)
  {
-+	unsigned nsegs =3D 0, bytes =3D 0, page_gaps =3D 0;
- 	struct bio_vec bv, bvprv, *bvprvp =3D NULL;
- 	struct bvec_iter iter;
--	unsigned nsegs =3D 0, bytes =3D 0;
-=20
- 	bio_for_each_bvec(bv, bio, iter) {
- 		if (bv.bv_offset & lim->dma_alignment ||
-@@ -307,8 +313,11 @@ int bio_split_io_at(struct bio *bio, const struct qu=
-eue_limits *lim,
- 		 * If the queue doesn't support SG gaps and adding this
- 		 * offset would create a gap, disallow it.
- 		 */
--		if (bvprvp && bvec_gap_to_prev(lim, bvprvp, bv.bv_offset))
--			goto split;
-+		if (bvprvp) {
-+			if (bvec_gap_to_prev(lim, bvprvp, bv.bv_offset))
-+				goto split;
-+			page_gaps |=3D bvec_seg_gap(&bv, &bvprv);
-+		}
-=20
- 		if (nsegs < lim->max_segments &&
- 		    bytes + bv.bv_len <=3D max_bytes &&
-@@ -326,6 +335,7 @@ int bio_split_io_at(struct bio *bio, const struct que=
-ue_limits *lim,
- 	}
-=20
- 	*segs =3D nsegs;
-+	bio->bi_pg_bit =3D ffs(page_gaps);
- 	return 0;
- split:
- 	if (bio->bi_opf & REQ_ATOMIC)
-@@ -361,6 +371,7 @@ int bio_split_io_at(struct bio *bio, const struct que=
-ue_limits *lim,
- 	 * big IO can be trival, disable iopoll when split needed.
- 	 */
- 	bio_clear_polled(bio);
-+	bio->bi_pg_bit =3D ffs(page_gaps);
- 	return bytes >> SECTOR_SHIFT;
- }
- EXPORT_SYMBOL_GPL(bio_split_io_at);
-@@ -697,6 +708,24 @@ static bool blk_atomic_write_mergeable_rqs(struct re=
-quest *rq,
- 	return (rq->cmd_flags & REQ_ATOMIC) =3D=3D (next->cmd_flags & REQ_ATOMI=
-C);
- }
-=20
-+static inline unsigned int bio_seg_gap(struct request_queue *q,
-+				struct bio *next, struct bio *prev)
-+{
-+	unsigned int page_gaps =3D 0;
-+	struct bio_vec pb, nb;
-+
-+	if (prev->bi_pg_bit)
-+		page_gaps |=3D 1 << (prev->bi_pg_bit - 1);
-+	if (next->bi_pg_bit)
-+		page_gaps |=3D 1 << (next->bi_pg_bit - 1);
-+
-+	bio_get_last_bvec(prev, &pb);
-+	bio_get_first_bvec(next, &nb);
-+	if (!biovec_phys_mergeable(q, &pb, &nb))
-+		page_gaps |=3D bvec_seg_gap(&nb, &pb);
-+	return page_gaps;
-+}
-+
- /*
-  * For non-mq, this has to be called with the request spinlock acquired.
-  * For mq with scheduling, the appropriate queue wide lock should be hel=
-d.
-@@ -761,6 +790,8 @@ static struct request *attempt_merge(struct request_q=
-ueue *q,
- 	if (next->start_time_ns < req->start_time_ns)
- 		req->start_time_ns =3D next->start_time_ns;
-=20
-+	req->page_gap |=3D bio_seg_gap(req->q, next->bio, req->biotail) |
-+			   next->page_gap;
- 	req->biotail->bi_next =3D next->bio;
- 	req->biotail =3D next->biotail;
-=20
-@@ -884,6 +915,7 @@ enum bio_merge_status bio_attempt_back_merge(struct r=
-equest *req,
- 	if (req->rq_flags & RQF_ZONE_WRITE_PLUGGING)
- 		blk_zone_write_plug_bio_merged(bio);
-=20
-+	req->page_gap |=3D bio_seg_gap(req->q, bio, req->biotail);
- 	req->biotail->bi_next =3D bio;
- 	req->biotail =3D bio;
- 	req->__data_len +=3D bio->bi_iter.bi_size;
-@@ -918,6 +950,7 @@ static enum bio_merge_status bio_attempt_front_merge(=
-struct request *req,
-=20
- 	blk_update_mixed_merge(req, bio, true);
-=20
-+	req->page_gap |=3D bio_seg_gap(req->q, req->bio, bio);
- 	bio->bi_next =3D req->bio;
- 	req->bio =3D bio;
-=20
-diff --git a/block/blk-mq-dma.c b/block/blk-mq-dma.c
-index 660b5e200ccf6..ee542ef28de0c 100644
---- a/block/blk-mq-dma.c
-+++ b/block/blk-mq-dma.c
-@@ -79,8 +79,7 @@ static bool blk_map_iter_next(struct request *req, stru=
-ct blk_map_iter *iter,
- static inline bool blk_can_dma_map_iova(struct request *req,
- 		struct device *dma_dev)
- {
--	return !((queue_virt_boundary(req->q) + 1) &
--		dma_get_merge_boundary(dma_dev));
-+	return !(req->page_gap & dma_get_merge_boundary(dma_dev));
- }
-=20
- static bool blk_dma_map_bus(struct blk_dma_iter *iter, struct phys_vec *=
-vec)
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index b67d6c02ecebd..8d1cde13742d4 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -376,6 +376,7 @@ void blk_rq_init(struct request_queue *q, struct requ=
-est *rq)
- 	INIT_LIST_HEAD(&rq->queuelist);
- 	rq->q =3D q;
- 	rq->__sector =3D (sector_t) -1;
-+	rq->page_gap =3D 0;
- 	INIT_HLIST_NODE(&rq->hash);
- 	RB_CLEAR_NODE(&rq->rb_node);
- 	rq->tag =3D BLK_MQ_NO_TAG;
-@@ -659,6 +660,7 @@ struct request *blk_mq_alloc_request(struct request_q=
-ueue *q, blk_opf_t opf,
- 			goto out_queue_exit;
- 	}
- 	rq->__data_len =3D 0;
-+	rq->page_gap =3D 0;
- 	rq->__sector =3D (sector_t) -1;
- 	rq->bio =3D rq->biotail =3D NULL;
- 	return rq;
-@@ -739,6 +741,7 @@ struct request *blk_mq_alloc_request_hctx(struct requ=
-est_queue *q,
- 	rq =3D blk_mq_rq_ctx_init(&data, blk_mq_tags_from_data(&data), tag);
- 	blk_mq_rq_time_init(rq, alloc_time_ns);
- 	rq->__data_len =3D 0;
-+	rq->page_gap =3D 0;
- 	rq->__sector =3D (sector_t) -1;
- 	rq->bio =3D rq->biotail =3D NULL;
- 	return rq;
-@@ -2665,6 +2668,12 @@ static void blk_mq_bio_to_request(struct request *=
-rq, struct bio *bio,
- 	rq->bio =3D rq->biotail =3D bio;
- 	rq->__sector =3D bio->bi_iter.bi_sector;
- 	rq->__data_len =3D bio->bi_iter.bi_size;
-+
-+	if (bio->bi_pg_bit)
-+		rq->page_gap =3D 1 << (bio->bi_pg_bit - 1);
-+	else
-+		rq->page_gap  =3D 0;
-+
- 	rq->nr_phys_segments =3D nr_segs;
- 	if (bio_integrity(bio))
- 		rq->nr_integrity_segments =3D blk_rq_count_integrity_sg(rq->q,
-@@ -3370,6 +3379,7 @@ int blk_rq_prep_clone(struct request *rq, struct re=
-quest *rq_src,
- 	}
- 	rq->nr_phys_segments =3D rq_src->nr_phys_segments;
- 	rq->nr_integrity_segments =3D rq_src->nr_integrity_segments;
-+	rq->page_gap =3D rq_src->page_gap;
-=20
- 	if (rq->bio && blk_crypto_rq_bio_prep(rq, rq->bio, gfp_mask) < 0)
- 		goto free_and_out;
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 2a5a828f19a0b..5ef0cef8823be 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -152,6 +152,8 @@ struct request {
- 	unsigned short nr_phys_segments;
- 	unsigned short nr_integrity_segments;
-=20
-+	unsigned int page_gap;
-+
- #ifdef CONFIG_BLK_INLINE_ENCRYPTION
- 	struct bio_crypt_ctx *crypt_ctx;
- 	struct blk_crypto_keyslot *crypt_keyslot;
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 930daff207df2..0bfea2d4cd03a 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -222,6 +222,14 @@ struct bio {
- 	enum rw_hint		bi_write_hint;
- 	u8			bi_write_stream;
- 	blk_status_t		bi_status;
+ 	lim->max_hw_sectors =3D ctrl->max_hw_sectors;
+ 	lim->max_segments =3D min_t(u32, USHRT_MAX,
+ 		min_not_zero(nvme_max_drv_segments(ctrl), ctrl->max_segments));
+ 	lim->max_integrity_segments =3D ctrl->max_integrity_segments;
+-	lim->virt_boundary_mask =3D NVME_CTRL_PAGE_SIZE - 1;
 +
 +	/*
-+	 * The page gap bit indicates the lowest set bit in any page address
-+	 * offset between all bi_io_vecs. This field is initialized only after
-+	 * splitting to the hardware limits.
++	 * The virtual boundary mask is not necessary for PCI controllers that
++	 * support SGL for DMA. It's only necessary when using PRP. Admin
++	 * queues only support PRP, and fabrics drivers currently don't report
++	 * what boundaries they require, so set the virtual boundary for
++	 * either.
 +	 */
-+	u8			bi_pg_bit;
++	if (!nvme_ctrl_sgl_supported(ctrl) || admin ||
++	    ctrl->ops->flags & NVME_F_FABRICS)
++		lim->virt_boundary_mask =3D NVME_CTRL_PAGE_SIZE - 1;
 +
- 	atomic_t		__bi_remaining;
+ 	lim->max_segment_size =3D UINT_MAX;
+ 	lim->dma_alignment =3D 3;
+ }
+@@ -2173,7 +2184,7 @@ static int nvme_update_ns_info_generic(struct nvme_=
+ns *ns,
+ 	int ret;
 =20
- 	struct bvec_iter	bi_iter;
+ 	lim =3D queue_limits_start_update(ns->disk->queue);
+-	nvme_set_ctrl_limits(ns->ctrl, &lim);
++	nvme_set_ctrl_limits(ns->ctrl, &lim, false);
+=20
+ 	memflags =3D blk_mq_freeze_queue(ns->disk->queue);
+ 	ret =3D queue_limits_commit_update(ns->disk->queue, &lim);
+@@ -2377,7 +2388,7 @@ static int nvme_update_ns_info_block(struct nvme_ns=
+ *ns,
+ 	ns->head->lba_shift =3D id->lbaf[lbaf].ds;
+ 	ns->head->nuse =3D le64_to_cpu(id->nuse);
+ 	capacity =3D nvme_lba_to_sect(ns->head, le64_to_cpu(id->nsze));
+-	nvme_set_ctrl_limits(ns->ctrl, &lim);
++	nvme_set_ctrl_limits(ns->ctrl, &lim, false);
+ 	nvme_configure_metadata(ns->ctrl, ns->head, id, nvm, info);
+ 	nvme_set_chunk_sectors(ns, id, &lim);
+ 	if (!nvme_update_disk_info(ns, id, &lim))
+@@ -3580,7 +3591,7 @@ static int nvme_init_identify(struct nvme_ctrl *ctr=
+l)
+ 		min_not_zero(ctrl->max_hw_sectors, max_hw_sectors);
+=20
+ 	lim =3D queue_limits_start_update(ctrl->admin_q);
+-	nvme_set_ctrl_limits(ctrl, &lim);
++	nvme_set_ctrl_limits(ctrl, &lim, true);
+ 	ret =3D queue_limits_commit_update(ctrl->admin_q, &lim);
+ 	if (ret)
+ 		goto out_free;
+diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+index d8a9dee55de33..6e848aa4531b6 100644
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -619,9 +619,19 @@ static inline enum nvme_use_sgl nvme_pci_use_sgls(st=
+ruct nvme_dev *dev,
+ 	struct nvme_queue *nvmeq =3D req->mq_hctx->driver_data;
+=20
+ 	if (nvmeq->qid && nvme_ctrl_sgl_supported(&dev->ctrl)) {
+-		if (nvme_req(req)->flags & NVME_REQ_USERCMD)
+-			return SGL_FORCED;
+-		if (req->nr_integrity_segments > 1)
++		/*
++		 * A request with page gaps within the controller's mask can
++		 * not use the PRP format.
++		 *
++		 * We force user commands to use SGL because that lets the
++		 * device validate the requested transfer lengths.
++		 *
++		 * Multiple integrity segments must use SGL as that's the only
++		 * way to describe such a command.
++		 */
++		if (req->page_gap & (NVME_CTRL_PAGE_SIZE - 1) ||
++		    nvme_req(req)->flags & NVME_REQ_USERCMD ||
++		    req->nr_integrity_segments > 1)
+ 			return SGL_FORCED;
+ 		return SGL_SUPPORTED;
+ 	}
 --=20
 2.47.3
 
