@@ -1,37 +1,37 @@
 Received: from pegase2.c-s.fr (pegase2.c-s.fr [93.17.235.10])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64EC82EE281;
-	Fri, 22 Aug 2025 10:21:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E69D32EF65A;
+	Fri, 22 Aug 2025 10:21:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.235.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755858064; cv=none; b=Gv0V/KnkESqVGv5pLC9BpBUTRc77LHwldH2T/wZVF3hJ3SrkL/9kXi1TQhitBNzjEtpgLGTEg/TDVvutFY8yxwJ04WayA7sA74ePT2ntFwqxc6ipJwu6+mK+7Id5yYerURvky3aRH8W1A71WKOZR81/nJKB8R5K6sinBIhEH0J8=
+	t=1755858068; cv=none; b=qPTdeGw/64bULAdrOnfmRSSiOHfoznylsAzIYCo5E1RaIK29rRPLy3oq3mKZx1j99KAGtPya8K9sVhaimmXit7B0nO3RMn27ctYPsRNIl8TSvD4UR5HiWxIWgTiS3u3gXziEGxkYIofCO8xOYJC0iUxG6SXt/HbVf50+7Mdt1hg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755858064; c=relaxed/simple;
-	bh=wvMxtbYlp4If4vdp7ThT8540zw2Qu4BJbU9ujWqfR94=;
+	s=arc-20240116; t=1755858068; c=relaxed/simple;
+	bh=pN4mv5SfPTESXIT1PtFDsmVlUJhI6vGXL0aiUyNtU/g=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qfgGEX8XGVyWaRPWjjnU8ApCopRdZL/85VCMIPS4zpoKHfXjY7ao+npF4bH3xgFXs+zkhgbrGG3aiAIf3RFgukHvbul/08hh0wtkZ1KJ5JQzQUtZE69GvY/4IJAAp4s5DJhKd3xT8iW7S8ZWYpGTBZIWaXedcg5xcqvd4yXucFo=
+	 MIME-Version; b=FNK6ZSsIXhqN59phJ0DZXCchtOGypDaIPe8t8dycRi2d1LE52hu2RA5RqwyJPyFReHQqgOCVJePLszqbmag1rRUhsP3W57gDP2M0M1ZZaE7jTa+flnsFezENyke83WSTlGmA/lJ44RqidduS+Id2+xLbYXkFrCqHftkU5oDh/Kw=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.235.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
 Received: from localhost (mailhub4.si.c-s.fr [172.26.127.67])
-	by localhost (Postfix) with ESMTP id 4c7bGv1dQ5z9sSg;
-	Fri, 22 Aug 2025 11:58:15 +0200 (CEST)
+	by localhost (Postfix) with ESMTP id 4c7bGr0ZKTz9sSY;
+	Fri, 22 Aug 2025 11:58:12 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at c-s.fr
 Received: from pegase2.c-s.fr ([172.26.127.65])
 	by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Rouyl7AiVSEH; Fri, 22 Aug 2025 11:58:15 +0200 (CEST)
+	with ESMTP id O2kEh4GEi-xJ; Fri, 22 Aug 2025 11:58:11 +0200 (CEST)
 Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
-	by pegase2.c-s.fr (Postfix) with ESMTP id 4c7bGv0Zshz9sSf;
-	Fri, 22 Aug 2025 11:58:15 +0200 (CEST)
+	by pegase2.c-s.fr (Postfix) with ESMTP id 4c7bGq6d9sz9sSX;
+	Fri, 22 Aug 2025 11:58:11 +0200 (CEST)
 Received: from localhost (localhost [127.0.0.1])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id 001748B781;
-	Fri, 22 Aug 2025 11:58:14 +0200 (CEST)
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id C7E138B775;
+	Fri, 22 Aug 2025 11:58:11 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at c-s.fr
 Received: from messagerie.si.c-s.fr ([127.0.0.1])
 	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
-	with ESMTP id DplApH3IrGdC; Fri, 22 Aug 2025 11:58:14 +0200 (CEST)
+	with ESMTP id kyxvRiMS9UjN; Fri, 22 Aug 2025 11:58:11 +0200 (CEST)
 Received: from PO20335.idsi0.si.c-s.fr (unknown [192.168.235.99])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id F189D8B780;
-	Fri, 22 Aug 2025 11:58:13 +0200 (CEST)
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id 771E88B780;
+	Fri, 22 Aug 2025 11:58:10 +0200 (CEST)
 From: Christophe Leroy <christophe.leroy@csgroup.eu>
 To: Michael Ellerman <mpe@ellerman.id.au>,
 	Nicholas Piggin <npiggin@gmail.com>,
@@ -56,9 +56,9 @@ Cc: Christophe Leroy <christophe.leroy@csgroup.eu>,
 	linux-fsdevel@vger.kernel.org,
 	linux-mm@kvack.org,
 	linux-block@vger.kernel.org
-Subject: [PATCH v2 08/10] powerpc/32s: Fix segments setup when TASK_SIZE is not a multiple of 256M
-Date: Fri, 22 Aug 2025 11:58:04 +0200
-Message-ID: <f8fa4d4b5b8b07c0ac97415fdf7dbf1d17f1deab.1755854833.git.christophe.leroy@csgroup.eu>
+Subject: [PATCH v2 05/10] powerpc/uaccess: Remove unused size and from parameters from allow_access_user()
+Date: Fri, 22 Aug 2025 11:58:01 +0200
+Message-ID: <987c04688a537710c212fb35f2676311da94c1b2.1755854833.git.christophe.leroy@csgroup.eu>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <cover.1755854833.git.christophe.leroy@csgroup.eu>
 References: <cover.1755854833.git.christophe.leroy@csgroup.eu>
@@ -68,133 +68,130 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1755856679; l=4811; i=christophe.leroy@csgroup.eu; s=20211009; h=from:subject:message-id; bh=wvMxtbYlp4If4vdp7ThT8540zw2Qu4BJbU9ujWqfR94=; b=0XuuBKVXcmYYwRlGwBO3iW+/I/d5f9LBhxzTnJgplI/yzvAaD7n5HlA3+nF5oS7YSR/9hIYLw 8yogXkQaywPCaVJBpa6G7Gi3GpY9iDaMyFhJOv8VOsJKAj7rkSEY5AI
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1755856679; l=5354; i=christophe.leroy@csgroup.eu; s=20211009; h=from:subject:message-id; bh=pN4mv5SfPTESXIT1PtFDsmVlUJhI6vGXL0aiUyNtU/g=; b=Bu4ikyLq1pN/L5W86rytn1JbsXSSu+bIHrWJqiGv9PK5Fq01x2XJ3sPr+KkWnmzmy52dACItS CmDpj3q3eZeCPHC21wM4V6/xEYsKrnmPpK5zktbf8Gm3JFSTp1DQzhm
 X-Developer-Key: i=christophe.leroy@csgroup.eu; a=ed25519; pk=HIzTzUj91asvincQGOFx6+ZF5AoUuP9GdOtQChs7Mm0=
 Content-Transfer-Encoding: 8bit
 
-For book3s/32 it is assumed that TASK_SIZE is a multiple of 256 Mbytes,
-but Kconfig allows any value for TASK_SIZE.
+Since commit 16132529cee5 ("powerpc/32s: Rework Kernel Userspace
+Access Protection") the size parameter is unused on all platforms.
 
-In all relevant calculations, align TASK_SIZE to the upper 256 Mbytes
-boundary.
+And the 'from' parameter has never been used.
 
-Also use ASM_CONST() in the definition of TASK_SIZE to ensure it is
-seen as an unsigned constant.
+Remove them.
 
 Signed-off-by: Christophe Leroy <christophe.leroy@csgroup.eu>
 ---
- arch/powerpc/include/asm/book3s/32/mmu-hash.h | 5 ++++-
- arch/powerpc/include/asm/task_size_32.h       | 2 +-
- arch/powerpc/kernel/asm-offsets.c             | 2 +-
- arch/powerpc/kernel/head_book3s_32.S          | 6 +++---
- arch/powerpc/mm/book3s32/mmu.c                | 2 +-
- arch/powerpc/mm/ptdump/segment_regs.c         | 2 +-
- 6 files changed, 11 insertions(+), 8 deletions(-)
+v2: Also remove 'from' param.
+---
+ arch/powerpc/include/asm/book3s/32/kup.h     | 3 +--
+ arch/powerpc/include/asm/book3s/64/kup.h     | 6 ++----
+ arch/powerpc/include/asm/kup.h               | 9 ++++-----
+ arch/powerpc/include/asm/nohash/32/kup-8xx.h | 3 +--
+ arch/powerpc/include/asm/nohash/kup-booke.h  | 3 +--
+ 5 files changed, 9 insertions(+), 15 deletions(-)
 
-diff --git a/arch/powerpc/include/asm/book3s/32/mmu-hash.h b/arch/powerpc/include/asm/book3s/32/mmu-hash.h
-index 78c6a5fde1d6..df00be5b4044 100644
---- a/arch/powerpc/include/asm/book3s/32/mmu-hash.h
-+++ b/arch/powerpc/include/asm/book3s/32/mmu-hash.h
-@@ -192,12 +192,15 @@ extern s32 patch__hash_page_B, patch__hash_page_C;
- extern s32 patch__flush_hash_A0, patch__flush_hash_A1, patch__flush_hash_A2;
- extern s32 patch__flush_hash_B;
+diff --git a/arch/powerpc/include/asm/book3s/32/kup.h b/arch/powerpc/include/asm/book3s/32/kup.h
+index 4e14a5427a63..6718b7e40eef 100644
+--- a/arch/powerpc/include/asm/book3s/32/kup.h
++++ b/arch/powerpc/include/asm/book3s/32/kup.h
+@@ -97,8 +97,7 @@ static __always_inline unsigned long __kuap_get_and_assert_locked(void)
+ }
+ #define __kuap_get_and_assert_locked __kuap_get_and_assert_locked
  
-+#include <linux/sizes.h>
-+#include <linux/align.h>
-+
- #include <asm/reg.h>
- #include <asm/task_size_32.h>
- 
- static __always_inline void update_user_segment(u32 n, u32 val)
+-static __always_inline void allow_user_access(void __user *to, const void __user *from,
+-					      u32 size, unsigned long dir)
++static __always_inline void allow_user_access(void __user *to, unsigned long dir)
  {
--	if (n << 28 < TASK_SIZE)
-+	if (n << 28 < ALIGN(TASK_SIZE, SZ_256M))
- 		mtsr(val + n * 0x111, n << 28);
+ 	BUILD_BUG_ON(!__builtin_constant_p(dir));
+ 
+diff --git a/arch/powerpc/include/asm/book3s/64/kup.h b/arch/powerpc/include/asm/book3s/64/kup.h
+index 497a7bd31ecc..3b8706007fa1 100644
+--- a/arch/powerpc/include/asm/book3s/64/kup.h
++++ b/arch/powerpc/include/asm/book3s/64/kup.h
+@@ -353,8 +353,7 @@ __bad_kuap_fault(struct pt_regs *regs, unsigned long address, bool is_write)
+ 	return (regs->amr & AMR_KUAP_BLOCK_READ) == AMR_KUAP_BLOCK_READ;
  }
  
-diff --git a/arch/powerpc/include/asm/task_size_32.h b/arch/powerpc/include/asm/task_size_32.h
-index de7290ee770f..30edc21f71fb 100644
---- a/arch/powerpc/include/asm/task_size_32.h
-+++ b/arch/powerpc/include/asm/task_size_32.h
-@@ -6,7 +6,7 @@
- #error User TASK_SIZE overlaps with KERNEL_START address
- #endif
+-static __always_inline void allow_user_access(void __user *to, const void __user *from,
+-					      unsigned long size, unsigned long dir)
++static __always_inline void allow_user_access(void __user *to, unsigned long dir)
+ {
+ 	unsigned long thread_amr = 0;
  
--#define TASK_SIZE (CONFIG_TASK_SIZE)
-+#define TASK_SIZE ASM_CONST(CONFIG_TASK_SIZE)
+@@ -383,8 +382,7 @@ static __always_inline unsigned long get_kuap(void)
  
- /*
-  * This decides where the kernel will search for a free chunk of vm space during
-diff --git a/arch/powerpc/kernel/asm-offsets.c b/arch/powerpc/kernel/asm-offsets.c
-index b3048f6d3822..2c7fadddae4a 100644
---- a/arch/powerpc/kernel/asm-offsets.c
-+++ b/arch/powerpc/kernel/asm-offsets.c
-@@ -330,7 +330,7 @@ int main(void)
+ static __always_inline void set_kuap(unsigned long value) { }
  
- #ifndef CONFIG_PPC64
- 	DEFINE(TASK_SIZE, TASK_SIZE);
--	DEFINE(NUM_USER_SEGMENTS, TASK_SIZE>>28);
-+	DEFINE(NUM_USER_SEGMENTS, ALIGN(TASK_SIZE, SZ_256M) >> 28);
- #endif /* ! CONFIG_PPC64 */
+-static __always_inline void allow_user_access(void __user *to, const void __user *from,
+-					      unsigned long size, unsigned long dir)
++static __always_inline void allow_user_access(void __user *to, unsigned long dir)
+ { }
  
- 	/* datapage offsets for use by vdso */
-diff --git a/arch/powerpc/kernel/head_book3s_32.S b/arch/powerpc/kernel/head_book3s_32.S
-index cb2bca76be53..c1779455ea32 100644
---- a/arch/powerpc/kernel/head_book3s_32.S
-+++ b/arch/powerpc/kernel/head_book3s_32.S
-@@ -420,7 +420,7 @@ InstructionTLBMiss:
- 	lwz	r2,0(r2)		/* get pmd entry */
- #ifdef CONFIG_EXECMEM
- 	rlwinm	r3, r0, 4, 0xf
--	subi	r3, r3, (TASK_SIZE >> 28) & 0xf
-+	subi	r3, r3, NUM_USER_SEGMENTS
- #endif
- 	rlwinm.	r2,r2,0,0,19		/* extract address of pte page */
- 	beq-	InstructionAddressInvalid	/* return if no mapping */
-@@ -475,7 +475,7 @@ DataLoadTLBMiss:
- 	lwz	r2,0(r1)		/* get pmd entry */
- 	rlwinm	r3, r0, 4, 0xf
- 	rlwinm.	r2,r2,0,0,19		/* extract address of pte page */
--	subi	r3, r3, (TASK_SIZE >> 28) & 0xf
-+	subi	r3, r3, NUM_USER_SEGMENTS
- 	beq-	2f			/* bail if no mapping */
- 1:	rlwimi	r2,r0,22,20,29		/* insert next 10 bits of address */
- 	lwz	r2,0(r2)		/* get linux-style pte */
-@@ -554,7 +554,7 @@ DataStoreTLBMiss:
- 	lwz	r2,0(r1)		/* get pmd entry */
- 	rlwinm	r3, r0, 4, 0xf
- 	rlwinm.	r2,r2,0,0,19		/* extract address of pte page */
--	subi	r3, r3, (TASK_SIZE >> 28) & 0xf
-+	subi	r3, r3, NUM_USER_SEGMENTS
- 	beq-	2f			/* bail if no mapping */
- 1:
- 	rlwimi	r2,r0,22,20,29		/* insert next 10 bits of address */
-diff --git a/arch/powerpc/mm/book3s32/mmu.c b/arch/powerpc/mm/book3s32/mmu.c
-index be9c4106e22f..afc9b5cac5a6 100644
---- a/arch/powerpc/mm/book3s32/mmu.c
-+++ b/arch/powerpc/mm/book3s32/mmu.c
-@@ -225,7 +225,7 @@ int mmu_mark_initmem_nx(void)
+ #endif /* !CONFIG_PPC_KUAP */
+diff --git a/arch/powerpc/include/asm/kup.h b/arch/powerpc/include/asm/kup.h
+index 6737416dde9f..da5f5b47cca0 100644
+--- a/arch/powerpc/include/asm/kup.h
++++ b/arch/powerpc/include/asm/kup.h
+@@ -72,8 +72,7 @@ static __always_inline void __kuap_kernel_restore(struct pt_regs *regs, unsigned
+  * platforms.
+  */
+ #ifndef CONFIG_PPC_BOOK3S_64
+-static __always_inline void allow_user_access(void __user *to, const void __user *from,
+-					      unsigned long size, unsigned long dir) { }
++static __always_inline void allow_user_access(void __user *to, unsigned long dir) { }
+ static __always_inline void prevent_user_access(unsigned long dir) { }
+ static __always_inline unsigned long prevent_user_access_return(void) { return 0UL; }
+ static __always_inline void restore_user_access(unsigned long flags) { }
+@@ -134,18 +133,18 @@ static __always_inline void kuap_assert_locked(void)
  
- 	BUILD_BUG_ON(ALIGN_DOWN(MODULES_VADDR, SZ_256M) < TASK_SIZE);
+ static __always_inline void allow_read_from_user(const void __user *from, unsigned long size)
+ {
+-	allow_user_access(NULL, from, size, KUAP_READ);
++	allow_user_access(NULL, KUAP_READ);
+ }
  
--	for (i = TASK_SIZE >> 28; i < 16; i++) {
-+	for (i = ALIGN(TASK_SIZE, SZ_256M) >> 28; i < 16; i++) {
- 		/* Do not set NX on VM space for modules */
- 		if (is_module_segment(i << 28))
- 			continue;
-diff --git a/arch/powerpc/mm/ptdump/segment_regs.c b/arch/powerpc/mm/ptdump/segment_regs.c
-index 9df3af8d481f..c06704b18a2c 100644
---- a/arch/powerpc/mm/ptdump/segment_regs.c
-+++ b/arch/powerpc/mm/ptdump/segment_regs.c
-@@ -31,7 +31,7 @@ static int sr_show(struct seq_file *m, void *v)
- 	int i;
+ static __always_inline void allow_write_to_user(void __user *to, unsigned long size)
+ {
+-	allow_user_access(to, NULL, size, KUAP_WRITE);
++	allow_user_access(to, KUAP_WRITE);
+ }
  
- 	seq_puts(m, "---[ User Segments ]---\n");
--	for (i = 0; i < TASK_SIZE >> 28; i++)
-+	for (i = 0; i < ALIGN(TASK_SIZE, SZ_256M) >> 28; i++)
- 		seg_show(m, i);
+ static __always_inline void allow_read_write_user(void __user *to, const void __user *from,
+ 						  unsigned long size)
+ {
+-	allow_user_access(to, from, size, KUAP_READ_WRITE);
++	allow_user_access(to, KUAP_READ_WRITE);
+ }
  
- 	seq_puts(m, "\n---[ Kernel Segments ]---\n");
+ static __always_inline void prevent_read_from_user(const void __user *from, unsigned long size)
+diff --git a/arch/powerpc/include/asm/nohash/32/kup-8xx.h b/arch/powerpc/include/asm/nohash/32/kup-8xx.h
+index 46bc5925e5fd..86621fee746d 100644
+--- a/arch/powerpc/include/asm/nohash/32/kup-8xx.h
++++ b/arch/powerpc/include/asm/nohash/32/kup-8xx.h
+@@ -49,8 +49,7 @@ static __always_inline void uaccess_end_8xx(void)
+ 	    "i"(SPRN_MD_AP), "r"(MD_APG_KUAP), "i"(MMU_FTR_KUAP) : "memory");
+ }
+ 
+-static __always_inline void allow_user_access(void __user *to, const void __user *from,
+-					      unsigned long size, unsigned long dir)
++static __always_inline void allow_user_access(void __user *to, unsigned long dir)
+ {
+ 	uaccess_begin_8xx(MD_APG_INIT);
+ }
+diff --git a/arch/powerpc/include/asm/nohash/kup-booke.h b/arch/powerpc/include/asm/nohash/kup-booke.h
+index 0c7c3258134c..a8fab0349704 100644
+--- a/arch/powerpc/include/asm/nohash/kup-booke.h
++++ b/arch/powerpc/include/asm/nohash/kup-booke.h
+@@ -73,8 +73,7 @@ static __always_inline void uaccess_end_booke(void)
+ 	    "i"(SPRN_PID), "r"(0), "i"(MMU_FTR_KUAP) : "memory");
+ }
+ 
+-static __always_inline void allow_user_access(void __user *to, const void __user *from,
+-					      unsigned long size, unsigned long dir)
++static __always_inline void allow_user_access(void __user *to, unsigned long dir)
+ {
+ 	uaccess_begin_booke(current->thread.pid);
+ }
 -- 
 2.49.0
 
