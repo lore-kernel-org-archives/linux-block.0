@@ -1,37 +1,37 @@
 Received: from pegase2.c-s.fr (pegase2.c-s.fr [93.17.235.10])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 323242D77EF;
-	Fri, 22 Aug 2025 10:20:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2D872EE281;
+	Fri, 22 Aug 2025 10:20:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.235.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755858054; cv=none; b=I5qqFLEfmSK+SzxwAb/5YfN20oodM6FvSXCwYt38iytMgr2uOhGLRLJQR88Zl2OQsPx85HV5KGt5/XEJXeP+QTkIRh7jvNOcowtfC80/nXIOxwRNNjWtMCcNoqm1Pet7vLcU0da9It3VW5sY35IYqvYJdBjwrr7PyzqtAaWfnx8=
+	t=1755858059; cv=none; b=bxP0xLxngwGoOre8mH8zCk6O+s3i7L2nq/3WxtHJ0WH/gKFFwJHO3McQ6c/8P7vfeWwMSEGLfgQTaacovZ0JAj1//CPh3/gVH2ZrMx2iIuvFFQra5yGi22TDsYr6xG1NHa3nhTsqhEl90sqyQDp/WNh4R3l8iJeGi0dr4TnnWlc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755858054; c=relaxed/simple;
-	bh=Q5VXVewln3Cq8QBQY4zJ1R5L8lrSpoSHODi0pVwUSDQ=;
+	s=arc-20240116; t=1755858059; c=relaxed/simple;
+	bh=dM/STExlfioZ7RWL1LZ1zuqJ7l+Gd1UGLLRM2BZr8VQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=CsjdSa08lMg+qzymx75RT9ZsSadwTrjfkwCe2lWcYbm3iU3a/SdHk5Ioh1wVCv4JCanMNNDa75UTkirFFCnzqPCsK4mWLVltygsxsu+VXbwUG9PAuw4MHAHIjZY1wc9TAW4jhQ9SX5l+3WjHs95n8NC2XY1DarqabTZs+DfkwFE=
+	 MIME-Version; b=XVc4TrVJNkFMBBgEwrqGrkSAh2g6VmmXcRYspoBUQGugWEEgo54H5GP0bL7yFTkn5oJUh0CnCJmz36hZQfvj3ZF633Z12/ngmIANED4/1hh+LdBli/d4JAycRUm8PCfMBKG0MmTLQZrTdOZPTOJxuCGRo5ftdFukX3fwOkIOlLk=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.235.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
 Received: from localhost (mailhub4.si.c-s.fr [172.26.127.67])
-	by localhost (Postfix) with ESMTP id 4c7bGw3RnVz9sSj;
-	Fri, 22 Aug 2025 11:58:16 +0200 (CEST)
+	by localhost (Postfix) with ESMTP id 4c7bGn55hjz9sSS;
+	Fri, 22 Aug 2025 11:58:09 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at c-s.fr
 Received: from pegase2.c-s.fr ([172.26.127.65])
 	by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 3D3ihdjAxI-2; Fri, 22 Aug 2025 11:58:16 +0200 (CEST)
+	with ESMTP id Pu_SUmsG5KVL; Fri, 22 Aug 2025 11:58:09 +0200 (CEST)
 Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
-	by pegase2.c-s.fr (Postfix) with ESMTP id 4c7bGw2QVbz9sSh;
-	Fri, 22 Aug 2025 11:58:16 +0200 (CEST)
+	by pegase2.c-s.fr (Postfix) with ESMTP id 4c7bGn4GTMz9sSR;
+	Fri, 22 Aug 2025 11:58:09 +0200 (CEST)
 Received: from localhost (localhost [127.0.0.1])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id 3B1398B780;
-	Fri, 22 Aug 2025 11:58:16 +0200 (CEST)
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id 7E0CC8B781;
+	Fri, 22 Aug 2025 11:58:09 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at c-s.fr
 Received: from messagerie.si.c-s.fr ([127.0.0.1])
 	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
-	with ESMTP id hP4XdQ8I1l6j; Fri, 22 Aug 2025 11:58:16 +0200 (CEST)
+	with ESMTP id i33fjxtVLFhx; Fri, 22 Aug 2025 11:58:09 +0200 (CEST)
 Received: from PO20335.idsi0.si.c-s.fr (unknown [192.168.235.99])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id EBC088B775;
-	Fri, 22 Aug 2025 11:58:14 +0200 (CEST)
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id 704358B780;
+	Fri, 22 Aug 2025 11:58:08 +0200 (CEST)
 From: Christophe Leroy <christophe.leroy@csgroup.eu>
 To: Michael Ellerman <mpe@ellerman.id.au>,
 	Nicholas Piggin <npiggin@gmail.com>,
@@ -56,9 +56,9 @@ Cc: Christophe Leroy <christophe.leroy@csgroup.eu>,
 	linux-fsdevel@vger.kernel.org,
 	linux-mm@kvack.org,
 	linux-block@vger.kernel.org
-Subject: [PATCH v2 09/10] powerpc/32: Automatically adapt TASK_SIZE based on constraints
-Date: Fri, 22 Aug 2025 11:58:05 +0200
-Message-ID: <db7f9b12d731d88ac612a27e2caf4d99d76472d2.1755854833.git.christophe.leroy@csgroup.eu>
+Subject: [PATCH v2 03/10] uaccess: Add masked_user_{read/write}_access_begin
+Date: Fri, 22 Aug 2025 11:57:59 +0200
+Message-ID: <7b570e237f7099d564d7b1a270169428ac1f3099.1755854833.git.christophe.leroy@csgroup.eu>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <cover.1755854833.git.christophe.leroy@csgroup.eu>
 References: <cover.1755854833.git.christophe.leroy@csgroup.eu>
@@ -68,170 +68,116 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1755856679; l=6153; i=christophe.leroy@csgroup.eu; s=20211009; h=from:subject:message-id; bh=Q5VXVewln3Cq8QBQY4zJ1R5L8lrSpoSHODi0pVwUSDQ=; b=fwATo2R/7pzKngfXSvD28g8yFziaXfShMsvp2zyLAu3QXHJwRYR4qxsHgfcYjKtZtpPTf9q2K 4B3BCNI3uM2Bvj2QoVQMyxr0RNNIKNZvnyBRF5R1eOM7dpw+/XsqHoi
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1755856678; l=4235; i=christophe.leroy@csgroup.eu; s=20211009; h=from:subject:message-id; bh=dM/STExlfioZ7RWL1LZ1zuqJ7l+Gd1UGLLRM2BZr8VQ=; b=LfW2Zrcf/qOLKMyRJmXFszZyR+auMiNHDPsO2CmZ3LWYtqVMaj5jy30Bs37sk/DpkfpY4ScpY BhH/brYHdWZCciqcb6YZXz9IaYEwPiyBPpDY3g/qom3TrZu+gfvLQVX
 X-Developer-Key: i=christophe.leroy@csgroup.eu; a=ed25519; pk=HIzTzUj91asvincQGOFx6+ZF5AoUuP9GdOtQChs7Mm0=
 Content-Transfer-Encoding: 8bit
 
-At the time being, TASK_SIZE can be customized by the user via Kconfig
-but it is not possible to check all constraints in Kconfig. Impossible
-setups are detected at compile time with BUILD_BUG() but that leads
-to build failure when setting crazy values. It is not a problem on its
-own because the user will usually either use the default value or set
-a well thought value. However build robots generate crazy random
-configs that lead to build failures, and build robots see it as a
-regression every time a patch adds such a constraint.
+Allthough masked_user_access_begin() is to only be used when reading
+data from user at the moment, introduce masked_user_read_access_begin()
+and masked_user_write_access_begin() in order to match
+user_read_access_begin() and user_write_access_begin().
 
-So instead of failing the build when the custom TASK_SIZE is too
-big, just adjust it to the maximum possible value matching the setup.
+That means masked_user_read_access_begin() is used when user memory is
+exclusively read during the window, masked_user_write_access_begin()
+is used when user memory is exclusively writen during the window,
+masked_user_access_begin() remains and is used when both reads and
+writes are performed during the open window. Each of them is expected
+to be terminated by the matching user_read_access_end(),
+user_write_access_end() and user_access_end().
 
-Several architectures already calculate TASK_SIZE based on other
-parameters and options.
-
-In order to do so, move MODULES_VADDR calculation into task_size_32.h
-and ensure that:
-- On book3s/32, userspace and module area have their own segments (256M)
-- On 8xx, userspace has its own full PGDIR entries (4M)
-
-Then TASK_SIZE is garantied to be correct so remove related
-BUILD_BUG()s.
+Have them default to masked_user_access_begin() when they are
+not defined.
 
 Signed-off-by: Christophe Leroy <christophe.leroy@csgroup.eu>
 ---
- arch/powerpc/Kconfig                         |  3 +--
- arch/powerpc/include/asm/book3s/32/pgtable.h |  4 ---
- arch/powerpc/include/asm/nohash/32/mmu-8xx.h |  4 ---
- arch/powerpc/include/asm/task_size_32.h      | 26 ++++++++++++++++++++
- arch/powerpc/mm/book3s32/mmu.c               |  2 --
- arch/powerpc/mm/mem.c                        |  2 --
- arch/powerpc/mm/nohash/8xx.c                 |  2 --
- 7 files changed, 27 insertions(+), 16 deletions(-)
+v2: Added more explanations in the commit message following comments received.
+---
+ fs/select.c             | 2 +-
+ include/linux/uaccess.h | 7 +++++++
+ kernel/futex/futex.h    | 4 ++--
+ lib/strncpy_from_user.c | 2 +-
+ lib/strnlen_user.c      | 2 +-
+ 5 files changed, 12 insertions(+), 5 deletions(-)
 
-diff --git a/arch/powerpc/Kconfig b/arch/powerpc/Kconfig
-index 93402a1d9c9f..74e514577ee5 100644
---- a/arch/powerpc/Kconfig
-+++ b/arch/powerpc/Kconfig
-@@ -1296,9 +1296,8 @@ config TASK_SIZE_BOOL
- 	  Say N here unless you know what you are doing.
- 
- config TASK_SIZE
--	hex "Size of user task space" if TASK_SIZE_BOOL
-+	hex "Size of maximum user task space" if TASK_SIZE_BOOL
- 	default "0x80000000" if PPC_8xx
--	default "0xb0000000" if PPC_BOOK3S_32 && EXECMEM
- 	default "0xc0000000"
- 
- config MODULES_SIZE_BOOL
-diff --git a/arch/powerpc/include/asm/book3s/32/pgtable.h b/arch/powerpc/include/asm/book3s/32/pgtable.h
-index 92d21c6faf1e..d02d50ca0387 100644
---- a/arch/powerpc/include/asm/book3s/32/pgtable.h
-+++ b/arch/powerpc/include/asm/book3s/32/pgtable.h
-@@ -195,10 +195,6 @@ void unmap_kernel_page(unsigned long va);
- #define VMALLOC_END	ioremap_bot
+diff --git a/fs/select.c b/fs/select.c
+index 082cf60c7e23..36db0359388c 100644
+--- a/fs/select.c
++++ b/fs/select.c
+@@ -777,7 +777,7 @@ static inline int get_sigset_argpack(struct sigset_argpack *to,
+ 	// the path is hot enough for overhead of copy_from_user() to matter
+ 	if (from) {
+ 		if (can_do_masked_user_access())
+-			from = masked_user_access_begin(from);
++			from = masked_user_read_access_begin(from);
+ 		else if (!user_read_access_begin(from, sizeof(*from)))
+ 			return -EFAULT;
+ 		unsafe_get_user(to->p, &from->p, Efault);
+diff --git a/include/linux/uaccess.h b/include/linux/uaccess.h
+index 1beb5b395d81..aa48d5415d32 100644
+--- a/include/linux/uaccess.h
++++ b/include/linux/uaccess.h
+@@ -41,6 +41,13 @@
+  #define mask_user_address(src) (src)
  #endif
  
--#define MODULES_END	ALIGN_DOWN(PAGE_OFFSET, SZ_256M)
--#define MODULES_SIZE	(CONFIG_MODULES_SIZE * SZ_1M)
--#define MODULES_VADDR	(MODULES_END - MODULES_SIZE)
--
- #ifndef __ASSEMBLY__
- #include <linux/sched.h>
- #include <linux/threads.h>
-diff --git a/arch/powerpc/include/asm/nohash/32/mmu-8xx.h b/arch/powerpc/include/asm/nohash/32/mmu-8xx.h
-index 2986f9ba40b8..866574655ffe 100644
---- a/arch/powerpc/include/asm/nohash/32/mmu-8xx.h
-+++ b/arch/powerpc/include/asm/nohash/32/mmu-8xx.h
-@@ -170,10 +170,6 @@
- 
- #define mmu_linear_psize	MMU_PAGE_8M
- 
--#define MODULES_END	PAGE_OFFSET
--#define MODULES_SIZE	(CONFIG_MODULES_SIZE * SZ_1M)
--#define MODULES_VADDR	(MODULES_END - MODULES_SIZE)
--
- #ifndef __ASSEMBLY__
- 
- #include <linux/mmdebug.h>
-diff --git a/arch/powerpc/include/asm/task_size_32.h b/arch/powerpc/include/asm/task_size_32.h
-index 30edc21f71fb..42a64bbd1964 100644
---- a/arch/powerpc/include/asm/task_size_32.h
-+++ b/arch/powerpc/include/asm/task_size_32.h
-@@ -2,11 +2,37 @@
- #ifndef _ASM_POWERPC_TASK_SIZE_32_H
- #define _ASM_POWERPC_TASK_SIZE_32_H
- 
-+#include <linux/sizes.h>
-+
- #if CONFIG_TASK_SIZE > CONFIG_KERNEL_START
- #error User TASK_SIZE overlaps with KERNEL_START address
- #endif
- 
-+#ifdef CONFIG_PPC_8xx
-+#define MODULES_END	ASM_CONST(CONFIG_PAGE_OFFSET)
-+#define MODULES_SIZE	(CONFIG_MODULES_SIZE * SZ_1M)
-+#define MODULES_VADDR	(MODULES_END - MODULES_SIZE)
-+#define MODULES_BASE	(MODULES_VADDR & ~(UL(SZ_4M) - 1))
-+#define USER_TOP	MODULES_BASE
++#ifndef masked_user_write_access_begin
++#define masked_user_write_access_begin masked_user_access_begin
++#endif
++#ifndef masked_user_read_access_begin
++#define masked_user_read_access_begin masked_user_access_begin
 +#endif
 +
-+#ifdef CONFIG_PPC_BOOK3S_32
-+#define MODULES_END	(ASM_CONST(CONFIG_PAGE_OFFSET) & ~(UL(SZ_256M) - 1))
-+#define MODULES_SIZE	(CONFIG_MODULES_SIZE * SZ_1M)
-+#define MODULES_VADDR	(MODULES_END - MODULES_SIZE)
-+#define MODULES_BASE	(MODULES_VADDR & ~(UL(SZ_256M) - 1))
-+#define USER_TOP	MODULES_BASE
-+#endif
-+
-+#ifndef USER_TOP
-+#define USER_TOP	ASM_CONST(CONFIG_PAGE_OFFSET)
-+#endif
-+
-+#if CONFIG_TASK_SIZE < USER_TOP
- #define TASK_SIZE ASM_CONST(CONFIG_TASK_SIZE)
-+#else
-+#define TASK_SIZE USER_TOP
-+#endif
- 
  /*
-  * This decides where the kernel will search for a free chunk of vm space during
-diff --git a/arch/powerpc/mm/book3s32/mmu.c b/arch/powerpc/mm/book3s32/mmu.c
-index afc9b5cac5a6..35ef3a117d3f 100644
---- a/arch/powerpc/mm/book3s32/mmu.c
-+++ b/arch/powerpc/mm/book3s32/mmu.c
-@@ -223,8 +223,6 @@ int mmu_mark_initmem_nx(void)
+  * Architectures should provide two primitives (raw_copy_{to,from}_user())
+  * and get rid of their private instances of copy_{to,from}_user() and
+diff --git a/kernel/futex/futex.h b/kernel/futex/futex.h
+index 2cd57096c38e..a1120a318c18 100644
+--- a/kernel/futex/futex.h
++++ b/kernel/futex/futex.h
+@@ -303,7 +303,7 @@ static __always_inline int futex_get_value(u32 *dest, u32 __user *from)
+ 	u32 val;
  
- 	update_bats();
+ 	if (can_do_masked_user_access())
+-		from = masked_user_access_begin(from);
++		from = masked_user_read_access_begin(from);
+ 	else if (!user_read_access_begin(from, sizeof(*from)))
+ 		return -EFAULT;
+ 	unsafe_get_user(val, from, Efault);
+@@ -318,7 +318,7 @@ static __always_inline int futex_get_value(u32 *dest, u32 __user *from)
+ static __always_inline int futex_put_value(u32 val, u32 __user *to)
+ {
+ 	if (can_do_masked_user_access())
+-		to = masked_user_access_begin(to);
++		to = masked_user_write_access_begin(to);
+ 	else if (!user_write_access_begin(to, sizeof(*to)))
+ 		return -EFAULT;
+ 	unsafe_put_user(val, to, Efault);
+diff --git a/lib/strncpy_from_user.c b/lib/strncpy_from_user.c
+index 6dc234913dd5..5bb752ff7c61 100644
+--- a/lib/strncpy_from_user.c
++++ b/lib/strncpy_from_user.c
+@@ -126,7 +126,7 @@ long strncpy_from_user(char *dst, const char __user *src, long count)
+ 	if (can_do_masked_user_access()) {
+ 		long retval;
  
--	BUILD_BUG_ON(ALIGN_DOWN(MODULES_VADDR, SZ_256M) < TASK_SIZE);
--
- 	for (i = ALIGN(TASK_SIZE, SZ_256M) >> 28; i < 16; i++) {
- 		/* Do not set NX on VM space for modules */
- 		if (is_module_segment(i << 28))
-diff --git a/arch/powerpc/mm/mem.c b/arch/powerpc/mm/mem.c
-index 3ddbfdbfa941..bc0f1a9eb0bc 100644
---- a/arch/powerpc/mm/mem.c
-+++ b/arch/powerpc/mm/mem.c
-@@ -401,8 +401,6 @@ struct execmem_info __init *execmem_arch_setup(void)
- #ifdef MODULES_VADDR
- 	unsigned long limit = (unsigned long)_etext - SZ_32M;
+-		src = masked_user_access_begin(src);
++		src = masked_user_read_access_begin(src);
+ 		retval = do_strncpy_from_user(dst, src, count, count);
+ 		user_read_access_end();
+ 		return retval;
+diff --git a/lib/strnlen_user.c b/lib/strnlen_user.c
+index 6e489f9e90f1..4a6574b67f82 100644
+--- a/lib/strnlen_user.c
++++ b/lib/strnlen_user.c
+@@ -99,7 +99,7 @@ long strnlen_user(const char __user *str, long count)
+ 	if (can_do_masked_user_access()) {
+ 		long retval;
  
--	BUILD_BUG_ON(TASK_SIZE > MODULES_VADDR);
--
- 	/* First try within 32M limit from _etext to avoid branch trampolines */
- 	if (MODULES_VADDR < PAGE_OFFSET && MODULES_END > limit) {
- 		start = limit;
-diff --git a/arch/powerpc/mm/nohash/8xx.c b/arch/powerpc/mm/nohash/8xx.c
-index ab1505cf42bf..a9d3f4729ead 100644
---- a/arch/powerpc/mm/nohash/8xx.c
-+++ b/arch/powerpc/mm/nohash/8xx.c
-@@ -209,8 +209,6 @@ void __init setup_initial_memory_limit(phys_addr_t first_memblock_base,
- 
- 	/* 8xx can only access 32MB at the moment */
- 	memblock_set_current_limit(min_t(u64, first_memblock_size, SZ_32M));
--
--	BUILD_BUG_ON(ALIGN_DOWN(MODULES_VADDR, PGDIR_SIZE) < TASK_SIZE);
- }
- 
- int pud_clear_huge(pud_t *pud)
+-		str = masked_user_access_begin(str);
++		str = masked_user_read_access_begin(str);
+ 		retval = do_strnlen_user(str, count, count);
+ 		user_read_access_end();
+ 		return retval;
 -- 
 2.49.0
 
