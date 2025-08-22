@@ -1,37 +1,36 @@
 Received: from pegase2.c-s.fr (pegase2.c-s.fr [93.17.235.10])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7833A2DFA21;
-	Fri, 22 Aug 2025 10:21:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2FDD2F872;
+	Fri, 22 Aug 2025 10:21:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.235.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755858079; cv=none; b=eCvucU5/8zZEET7gG7ziZSZODVmwTcv0NH6f82royg3UilPMPIAP38xPosj2RG5UenE6t5Gt9vEywbFUgHQMIVRjgUncfRKvAMEXZ/DOAd2YI7ECpU2OguZmK/QHbXct6apVIe63veZ2H/vnqC/Tga3g3wrggepJg1ZbeSd/FbQ=
+	t=1755858084; cv=none; b=ZpIoN/fYP2bAwCsDp4mRcLNNS/6VAN+CMlESsuI0j2a3lkI8MSK293oiKv1AxYBLjFqvCsxTnPdwHLzd7nMHwHh/NQNIeMlR4aT+Yqt3FtyiuFsJgZ30eMgYeIB/DLDtZDfs3mVorceh2QPrQbirJ4r0hFF0qpT9EmngdFZeZLw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755858079; c=relaxed/simple;
-	bh=fP9WObzJ/2N9/4EDoUl1xf8kjta+DR6uuNLODyDCEJs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=A528QEsAnPzU6r6JB6ggMfQxXuPye9OtJHP2q8ZdjX9HWQJk0JNUVvyEcVPyS1uXWCmiDZxPB9dWdKu5Kap14Bmr9U1uxt/h4Q5fVH0f1pTeERXBauvbq7o5sYgxrIJ8Erv93+cYrQK88pf7JgFjd/byuriNtI+NYSnHXJZV7K0=
+	s=arc-20240116; t=1755858084; c=relaxed/simple;
+	bh=/phN/AgtMsLAd6ka2rRe1+fTTKRpm5UtXySxy3tBMG8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ACaVQdkPgSVEQZKgPmQA+ZTMUIFjxXW/VypnAE/lkqbZRne3w3qeygvP8DhKmDUTL1UkjWl84vN43uVD4xDJSJp5ol2FSzQU+vSMU7XgAEveCD3rsZqBXEqYz2EVh3LvafRJFXsVVjqAQ7XeZvEsUvAtLD6HZ/Vlif/Dr+SK68E=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.235.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
 Received: from localhost (mailhub4.si.c-s.fr [172.26.127.67])
-	by localhost (Postfix) with ESMTP id 4c7bGs1qmSz9sSb;
-	Fri, 22 Aug 2025 11:58:13 +0200 (CEST)
+	by localhost (Postfix) with ESMTP id 4c7bGk5BLBz9sS8;
+	Fri, 22 Aug 2025 11:58:06 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at c-s.fr
 Received: from pegase2.c-s.fr ([172.26.127.65])
 	by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id z8vvb6RdR6kp; Fri, 22 Aug 2025 11:58:13 +0200 (CEST)
+	with ESMTP id IWDZVwqsS1ox; Fri, 22 Aug 2025 11:58:06 +0200 (CEST)
 Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
-	by pegase2.c-s.fr (Postfix) with ESMTP id 4c7bGs0pQ7z9sSZ;
-	Fri, 22 Aug 2025 11:58:13 +0200 (CEST)
+	by pegase2.c-s.fr (Postfix) with ESMTP id 4c7bGk4BThz9sRs;
+	Fri, 22 Aug 2025 11:58:06 +0200 (CEST)
 Received: from localhost (localhost [127.0.0.1])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id 0240C8B780;
-	Fri, 22 Aug 2025 11:58:13 +0200 (CEST)
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id 7BEF38B781;
+	Fri, 22 Aug 2025 11:58:06 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at c-s.fr
 Received: from messagerie.si.c-s.fr ([127.0.0.1])
 	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
-	with ESMTP id OVYa2l6pC0BE; Fri, 22 Aug 2025 11:58:12 +0200 (CEST)
+	with ESMTP id eIHQVHg49t7f; Fri, 22 Aug 2025 11:58:06 +0200 (CEST)
 Received: from PO20335.idsi0.si.c-s.fr (unknown [192.168.235.99])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id CB6F58B781;
-	Fri, 22 Aug 2025 11:58:11 +0200 (CEST)
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id 6BEC98B775;
+	Fri, 22 Aug 2025 11:58:05 +0200 (CEST)
 From: Christophe Leroy <christophe.leroy@csgroup.eu>
 To: Michael Ellerman <mpe@ellerman.id.au>,
 	Nicholas Piggin <npiggin@gmail.com>,
@@ -56,194 +55,97 @@ Cc: Christophe Leroy <christophe.leroy@csgroup.eu>,
 	linux-fsdevel@vger.kernel.org,
 	linux-mm@kvack.org,
 	linux-block@vger.kernel.org
-Subject: [PATCH v2 06/10] powerpc/uaccess: Remove {allow/prevent}_{read/write/read_write}_{from/to/}_user()
-Date: Fri, 22 Aug 2025 11:58:02 +0200
-Message-ID: <ffa271c5c127f277ac8213301da2f16a34bca885.1755854833.git.christophe.leroy@csgroup.eu>
+Subject: [PATCH v2 00/10] powerpc: Implement masked user access
+Date: Fri, 22 Aug 2025 11:57:56 +0200
+Message-ID: <cover.1755854833.git.christophe.leroy@csgroup.eu>
 X-Mailer: git-send-email 2.49.0
-In-Reply-To: <cover.1755854833.git.christophe.leroy@csgroup.eu>
-References: <cover.1755854833.git.christophe.leroy@csgroup.eu>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1755856679; l=5380; i=christophe.leroy@csgroup.eu; s=20211009; h=from:subject:message-id; bh=fP9WObzJ/2N9/4EDoUl1xf8kjta+DR6uuNLODyDCEJs=; b=T3sZTJQbWWxSvxnrTMu3Ur0E3ipBuACkn/ijWTup5nP/rhipke3Mwwnj1EIXejhdNUP8CCdp9 d5eMN5XWMP8AtQqVPkELMTCR5a5WQG2m9Ln36oSHSKu+sfZWqRcNB0C
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1755856678; l=3745; i=christophe.leroy@csgroup.eu; s=20211009; h=from:subject:message-id; bh=/phN/AgtMsLAd6ka2rRe1+fTTKRpm5UtXySxy3tBMG8=; b=1V9AFEKpjDyk6FnUrGnkLYoDWwBrkQcqv5fCGwg429FpoGvEzmMQhX1fRZY0SIQqSAI16OrRi R6sNAdKx0x1A+t4how5qZX/b5neGHfNC9U+6+4eTmM1L60Bhm6fz49y
 X-Developer-Key: i=christophe.leroy@csgroup.eu; a=ed25519; pk=HIzTzUj91asvincQGOFx6+ZF5AoUuP9GdOtQChs7Mm0=
 Content-Transfer-Encoding: 8bit
 
-The six following functions have become simple single-line fonctions
-that do not have much added value anymore:
-- allow_read_from_user()
-- allow_write_to_user()
-- allow_read_write_user()
-- prevent_read_from_user()
-- prevent_write_to_user()
-- prevent_read_write_user()
+Masked user access avoids the address/size verification by access_ok().
+Allthough its main purpose is to skip the speculation in the
+verification of user address and size hence avoid the need of spec
+mitigation, it also has the advantage to reduce the amount of
+instructions needed so it also benefits to platforms that don't
+need speculation mitigation, especially when the size of the copy is
+not know at build time.
 
-Directly call allow_user_access() and prevent_user_access(), it doesn't
-reduce the readability and it removes unnecessary middle functions.
+Patches 1,2,4 are cleaning up some redundant barrier_nospec()
+introduced by commit 74e19ef0ff80 ("uaccess: Add speculation barrier
+to copy_from_user()"). To do that, a speculation barrier is added to
+copy_from_user_iter() so that the barrier in powerpc raw_copy_from_user()
+which is redundant with the one in copy_from_user() can be removed. To
+avoid impacting x86, copy_from_user_iter() is first converted to using
+masked user access.
 
-Signed-off-by: Christophe Leroy <christophe.leroy@csgroup.eu>
----
-v2: New
----
- arch/powerpc/include/asm/kup.h     | 47 ------------------------------
- arch/powerpc/include/asm/uaccess.h | 30 +++++++++----------
- 2 files changed, 15 insertions(+), 62 deletions(-)
+Patch 3 adds masked_user_read_access_begin() and
+masked_user_write_access_begin() to match with user_read_access_end()
+and user_write_access_end().
 
-diff --git a/arch/powerpc/include/asm/kup.h b/arch/powerpc/include/asm/kup.h
-index da5f5b47cca0..892ad06bdd8c 100644
---- a/arch/powerpc/include/asm/kup.h
-+++ b/arch/powerpc/include/asm/kup.h
-@@ -131,53 +131,6 @@ static __always_inline void kuap_assert_locked(void)
- 		kuap_get_and_assert_locked();
- }
- 
--static __always_inline void allow_read_from_user(const void __user *from, unsigned long size)
--{
--	allow_user_access(NULL, KUAP_READ);
--}
--
--static __always_inline void allow_write_to_user(void __user *to, unsigned long size)
--{
--	allow_user_access(to, KUAP_WRITE);
--}
--
--static __always_inline void allow_read_write_user(void __user *to, const void __user *from,
--						  unsigned long size)
--{
--	allow_user_access(to, KUAP_READ_WRITE);
--}
--
--static __always_inline void prevent_read_from_user(const void __user *from, unsigned long size)
--{
--	prevent_user_access(KUAP_READ);
--}
--
--static __always_inline void prevent_write_to_user(void __user *to, unsigned long size)
--{
--	prevent_user_access(KUAP_WRITE);
--}
--
--static __always_inline void prevent_read_write_user(void __user *to, const void __user *from,
--						    unsigned long size)
--{
--	prevent_user_access(KUAP_READ_WRITE);
--}
--
--static __always_inline void prevent_current_access_user(void)
--{
--	prevent_user_access(KUAP_READ_WRITE);
--}
--
--static __always_inline void prevent_current_read_from_user(void)
--{
--	prevent_user_access(KUAP_READ);
--}
--
--static __always_inline void prevent_current_write_to_user(void)
--{
--	prevent_user_access(KUAP_WRITE);
--}
--
- #endif /* !__ASSEMBLY__ */
- 
- #endif /* _ASM_POWERPC_KUAP_H_ */
-diff --git a/arch/powerpc/include/asm/uaccess.h b/arch/powerpc/include/asm/uaccess.h
-index 3987a5c33558..698996f34891 100644
---- a/arch/powerpc/include/asm/uaccess.h
-+++ b/arch/powerpc/include/asm/uaccess.h
-@@ -45,14 +45,14 @@
- 	do {							\
- 		__label__ __pu_failed;				\
- 								\
--		allow_write_to_user(__pu_addr, __pu_size);	\
-+		allow_user_access(__pu_addr, KUAP_WRITE);	\
- 		__put_user_size_goto(__pu_val, __pu_addr, __pu_size, __pu_failed);	\
--		prevent_write_to_user(__pu_addr, __pu_size);	\
-+		prevent_user_access(KUAP_WRITE);		\
- 		__pu_err = 0;					\
- 		break;						\
- 								\
- __pu_failed:							\
--		prevent_write_to_user(__pu_addr, __pu_size);	\
-+		prevent_user_access(KUAP_WRITE);		\
- 		__pu_err = -EFAULT;				\
- 	} while (0);						\
- 								\
-@@ -302,9 +302,9 @@ do {								\
- 								\
- 	might_fault();					\
- 	barrier_nospec();					\
--	allow_read_from_user(__gu_addr, __gu_size);		\
-+	allow_user_access(NULL, KUAP_READ);		\
- 	__get_user_size_allowed(__gu_val, __gu_addr, __gu_size, __gu_err);	\
--	prevent_read_from_user(__gu_addr, __gu_size);		\
-+	prevent_user_access(KUAP_READ);				\
- 	(x) = (__typeof__(*(ptr)))__gu_val;			\
- 								\
- 	__gu_err;						\
-@@ -331,9 +331,9 @@ raw_copy_in_user(void __user *to, const void __user *from, unsigned long n)
- 	unsigned long ret;
- 
- 	barrier_nospec();
--	allow_read_write_user(to, from, n);
-+	allow_user_access(to, KUAP_READ_WRITE);
- 	ret = __copy_tofrom_user(to, from, n);
--	prevent_read_write_user(to, from, n);
-+	prevent_user_access(KUAP_READ_WRITE);
- 	return ret;
- }
- #endif /* __powerpc64__ */
-@@ -343,9 +343,9 @@ static inline unsigned long raw_copy_from_user(void *to,
- {
- 	unsigned long ret;
- 
--	allow_read_from_user(from, n);
-+	allow_user_access(NULL, KUAP_READ);
- 	ret = __copy_tofrom_user((__force void __user *)to, from, n);
--	prevent_read_from_user(from, n);
-+	prevent_user_access(KUAP_READ);
- 	return ret;
- }
- 
-@@ -354,9 +354,9 @@ raw_copy_to_user(void __user *to, const void *from, unsigned long n)
- {
- 	unsigned long ret;
- 
--	allow_write_to_user(to, n);
-+	allow_user_access(to, KUAP_WRITE);
- 	ret = __copy_tofrom_user(to, (__force const void __user *)from, n);
--	prevent_write_to_user(to, n);
-+	prevent_user_access(KUAP_WRITE);
- 	return ret;
- }
- 
-@@ -367,9 +367,9 @@ static inline unsigned long __clear_user(void __user *addr, unsigned long size)
- 	unsigned long ret;
- 
- 	might_fault();
--	allow_write_to_user(addr, size);
-+	allow_user_access(addr, KUAP_WRITE);
- 	ret = __arch_clear_user(addr, size);
--	prevent_write_to_user(addr, size);
-+	prevent_user_access(KUAP_WRITE);
- 	return ret;
- }
- 
-@@ -397,9 +397,9 @@ copy_mc_to_user(void __user *to, const void *from, unsigned long n)
- {
- 	if (check_copy_size(from, n, true)) {
- 		if (access_ok(to, n)) {
--			allow_write_to_user(to, n);
-+			allow_user_access(to, KUAP_WRITE);
- 			n = copy_mc_generic((void __force *)to, from, n);
--			prevent_write_to_user(to, n);
-+			prevent_user_access(KUAP_WRITE);
- 		}
- 	}
- 
+Patches 5,6,7 are cleaning up powerpc uaccess functions.
+
+Patches 8 and 9 prepare powerpc/32 for the necessary gap at the top
+of userspace.
+
+Last patch implements masked user access.
+
+Changes in v2:
+- Converted copy_from_user_iter() to using masked user access.
+- Cleaned up powerpc uaccess function to minimise code duplication
+when adding masked user access
+- Automated TASK_SIZE calculation to minimise use of BUILD_BUG_ON()
+- Tried to make some commit messages more clean based on feedback from
+version 1 of the series.
+
+Christophe Leroy (10):
+  iter: Avoid barrier_nospec() in copy_from_user_iter()
+  uaccess: Add speculation barrier to copy_from_user_iter()
+  uaccess: Add masked_user_{read/write}_access_begin
+  powerpc/uaccess: Move barrier_nospec() out of
+    allow_read_{from/write}_user()
+  powerpc/uaccess: Remove unused size and from parameters from
+    allow_access_user()
+  powerpc/uaccess: Remove
+    {allow/prevent}_{read/write/read_write}_{from/to/}_user()
+  powerpc/uaccess: Refactor user_{read/write/}_access_begin()
+  powerpc/32s: Fix segments setup when TASK_SIZE is not a multiple of
+    256M
+  powerpc/32: Automatically adapt TASK_SIZE based on constraints
+  powerpc/uaccess: Implement masked user access
+
+ arch/powerpc/Kconfig                          |   3 +-
+ arch/powerpc/include/asm/barrier.h            |   2 +-
+ arch/powerpc/include/asm/book3s/32/kup.h      |   3 +-
+ arch/powerpc/include/asm/book3s/32/mmu-hash.h |   5 +-
+ arch/powerpc/include/asm/book3s/32/pgtable.h  |   4 -
+ arch/powerpc/include/asm/book3s/64/kup.h      |   6 +-
+ arch/powerpc/include/asm/kup.h                |  52 +------
+ arch/powerpc/include/asm/nohash/32/kup-8xx.h  |   3 +-
+ arch/powerpc/include/asm/nohash/32/mmu-8xx.h  |   4 -
+ arch/powerpc/include/asm/nohash/kup-booke.h   |   3 +-
+ arch/powerpc/include/asm/task_size_32.h       |  28 +++-
+ arch/powerpc/include/asm/uaccess.h            | 134 +++++++++++++-----
+ arch/powerpc/kernel/asm-offsets.c             |   2 +-
+ arch/powerpc/kernel/head_book3s_32.S          |   6 +-
+ arch/powerpc/mm/book3s32/mmu.c                |   4 +-
+ arch/powerpc/mm/mem.c                         |   2 -
+ arch/powerpc/mm/nohash/8xx.c                  |   2 -
+ arch/powerpc/mm/ptdump/segment_regs.c         |   2 +-
+ fs/select.c                                   |   2 +-
+ include/linux/uaccess.h                       |   7 +
+ kernel/futex/futex.h                          |   4 +-
+ lib/iov_iter.c                                |  22 ++-
+ lib/strncpy_from_user.c                       |   2 +-
+ lib/strnlen_user.c                            |   2 +-
+ 24 files changed, 172 insertions(+), 132 deletions(-)
+
 -- 
 2.49.0
 
