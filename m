@@ -1,88 +1,86 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFF6119D07A
-	for <linux-block@vger.kernel.org>; Fri, 22 Aug 2025 01:21:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 851C823D7DA;
+	Fri, 22 Aug 2025 02:41:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755825713; cv=none; b=uBPDsVa1I3l5E+51XyMiZ81ZbO+dfvjAOOC9b+yr+L01uXjcI5kkpQkx20+hxv3zBUrmlPkICBXighfjx+XtJIbHUEJo04K1NoY+2SkUcs4yPjWUlgt6cGGCUXqzcIEj2rCy8exStheFm0AEerlGVGPa+uiWCyBnjvMFm/Aq0bM=
+	t=1755830493; cv=none; b=TLKyKyzhhdzZroJ8mPlxwRwuJL5eCKZpxxkwCKPQAHpvCn9+6a4Fk6Yjp1RZwqwTT08weDVB+XfLvqZ0OXMqwhPj3mlcqML60GtE+PoR2X/0BuGyPSs6E6Zn+GcwVcEL7tLBUAH4kKJ+ZwL+fgdN753x+6zMYJgJf3hZTVGUkdE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755825713; c=relaxed/simple;
-	bh=ntCiTsnHyv89Ppw/YN8mIQ+gYRwhLO3TxI+GVHhT5J0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Vc3S+QHUGzyAuhz/CmDX9UkDG0BBuWxfpZYpNe+vFYK9dKx8vdBo483ATKZ/h9BxCYdgnAo1cBd2PWcDE8N9mxXPbfhnKIPhtnzKVDIN9oDMbT20qOb3LXp3UT1lZC475CM4w9qGATKjObCjQulryqZrnllHF59WwglovLLdHxs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bxz/mP97; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bxz/mP97"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1755825710;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=pP1gIuRFr7tSKsLKFv1sUFXkEDX22rWdnjLkvx8Dr3w=;
-	b=bxz/mP970haO0GhwvMwNYNIg2XAFuRY50CEbjjXhV++QxbQ5jtkmzBx3hSmLDZUmoHcn9i
-	KxUQtIDtB5Ddtc2mHSHhFDJHBCBiCjvazbpybP7tt1bJQQ2gmtstz6+s/6TCysKEZ0Djp6
-	DmNAFH7luWMZDe+55rGMm39WQDGrxuw=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-167-NdzZ7o2eMMy-971uUgmbKA-1; Thu,
- 21 Aug 2025 21:21:47 -0400
-X-MC-Unique: NdzZ7o2eMMy-971uUgmbKA-1
-X-Mimecast-MFC-AGG-ID: NdzZ7o2eMMy-971uUgmbKA_1755825704
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5BF62180035C;
-	Fri, 22 Aug 2025 01:21:43 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.34])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 18ED9180028F;
-	Fri, 22 Aug 2025 01:21:29 +0000 (UTC)
-Date: Fri, 22 Aug 2025 09:21:24 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Bala-Vignesh-Reddy <reddybalavignesh9979@gmail.com>
-Cc: akpm@linux-foundation.org, shuah@kernel.org, mic@digikod.net,
-	gnoack@google.com, david@redhat.com, lorenzo.stoakes@oracle.com,
-	Liam.Howlett@oracle.com, vbabka@suse.cz, rppt@kernel.org,
-	surenb@google.com, mhocko@suse.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	horms@kernel.org, skhan@linuxfoundation.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-security-module@vger.kernel.org, linux-mm@kvack.org,
-	netdev@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: Re: [PATCH] selftests: centralise maybe-unused definition in
- kselftest.h
-Message-ID: <aKfGFB2MmkbA4BBC@fedora>
-References: <20250821101159.2238-1-reddybalavignesh9979@gmail.com>
+	s=arc-20240116; t=1755830493; c=relaxed/simple;
+	bh=Amgx2KIYidrt27I99pMPCCxycDM6hsZDLDlsSBav3mM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FDXrGZnsFmMpy2yqEf2W7jl3Ij+i/BCAoUYiGXhCHMkcWbNcabZFZZ0U6vJPtIw95DYpzETYEaf3GbixXWoUDfiIszuPrMfhuC9Wo6xJENDwgnMK0H4tFyl7ASgG18R25pOeGeBKGlwVWY7kAi/hIY/8lh0dnFUCFf361xEFrPc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: 79bc8ebe7f0111f0b29709d653e92f7d-20250822
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.45,REQID:432c0b1b-219d-41f3-bfc6-a7687221fb09,IP:0,U
+	RL:0,TC:0,Content:-5,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:-5
+X-CID-META: VersionHash:6493067,CLOUDID:35a45e030f0c8ce03749be5732741d30,BulkI
+	D:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0|50,EDM:-3,IP:nil,UR
+	L:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,S
+	PR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 0,NGT
+X-CID-BAS: 0,NGT,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-UUID: 79bc8ebe7f0111f0b29709d653e92f7d-20250822
+Received: from mail.kylinos.cn [(10.44.16.175)] by mailgw.kylinos.cn
+	(envelope-from <zhangheng@kylinos.cn>)
+	(Generic MTA)
+	with ESMTP id 888365627; Fri, 22 Aug 2025 10:41:16 +0800
+Received: from mail.kylinos.cn (localhost [127.0.0.1])
+	by mail.kylinos.cn (NSMail) with SMTP id EA912E008FA3;
+	Fri, 22 Aug 2025 10:41:15 +0800 (CST)
+X-ns-mid: postfix-68A7D8CB-724670333
+Received: from kylin-pc.. (unknown [172.25.130.133])
+	by mail.kylinos.cn (NSMail) with ESMTPA id 8613AE008FA2;
+	Fri, 22 Aug 2025 10:41:13 +0800 (CST)
+From: Zhang Heng <zhangheng@kylinos.cn>
+To: axboe@kernel.dk,
+	phasta@kernel.org,
+	andriy.shevchenko@linux.intel.com,
+	broonie@kernel.org,
+	lizetao1@huawei.com,
+	viro@zeniv.linux.org.uk,
+	fourier.thomas@gmail.com,
+	anuj20.g@samsung.com
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Zhang Heng <zhangheng@kylinos.cn>
+Subject: [PATCH] block: mtip32xx: Remove the redundant return
+Date: Fri, 22 Aug 2025 10:41:00 +0800
+Message-ID: <20250822024100.991144-1-zhangheng@kylinos.cn>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250821101159.2238-1-reddybalavignesh9979@gmail.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Aug 21, 2025 at 03:41:59PM +0530, Bala-Vignesh-Reddy wrote:
-> Several selftests subdirectories duplicated the define __maybe_unused,
-> leading to redundant code. Moved to kselftest.h header and removed
-> other definition.
-> 
-> This addresses the duplication noted in the proc-pid-vm warning fix
-> 
-> Suggested-by: Andrew Morton <akpm@linux-foundation.org>
-> Link:https://lore.kernel.org/lkml/20250820143954.33d95635e504e94df01930d0@linux-foundation.org/
-> 
-> Signed-off-by: Bala-Vignesh-Reddy <reddybalavignesh9979@gmail.com>
+Remove the redundant return
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Zhang Heng <zhangheng@kylinos.cn>
+---
+ drivers/block/mtip32xx/mtip32xx.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-Thanks,
-Ming
+diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/m=
+tip32xx.c
+index 8fc7761397bd..b0c4d1c92da5 100644
+--- a/drivers/block/mtip32xx/mtip32xx.c
++++ b/drivers/block/mtip32xx/mtip32xx.c
+@@ -3841,7 +3841,6 @@ static int mtip_pci_probe(struct pci_dev *pdev,
+ iomap_err:
+ 	kfree(dd);
+ 	pci_set_drvdata(pdev, NULL);
+-	return rv;
+ done:
+ 	return rv;
+ }
+--=20
+2.47.1
 
