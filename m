@@ -1,37 +1,37 @@
 Received: from pegase2.c-s.fr (pegase2.c-s.fr [93.17.235.10])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1472C2D9782;
-	Fri, 22 Aug 2025 10:20:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CF762E2DFA;
+	Fri, 22 Aug 2025 10:20:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.235.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755858041; cv=none; b=e2ifhTLOYkMb+4eSK2dKWazslPLI6nFyBJV+xHHvubOuCH8BGIIhXIx9yqToevndLZe80vHVBypOYm8xPkCkYCJ3IbMoudRp4x2YSH4BNzEedh4RgqWKqpb9iLxSam3JxYniacI2p+I/WRcbLaO4Ttm1L9XCYaLkNUQmCbKv45U=
+	t=1755858046; cv=none; b=NkK3IBhvGgYpBhCz/hGo2EelVrQRseTHmOx6oIC7JvY/XaKPzRqG1lFmeaRDFismZqbUr4n6/43CyxWCuAviYK72CXX5X+H+43f8epQbb4p5oRTK1nXwnHPOawinvRhLCK4I0lhBS3F3e7VLK2H1UCsz3Lq62hJDrHVr07qWFR4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755858041; c=relaxed/simple;
-	bh=W6hpcedkcWK/fNdxM9/tYip/yiX0Wu6MZIyees7Pogw=;
+	s=arc-20240116; t=1755858046; c=relaxed/simple;
+	bh=btOGI5kT/X4BbGkbG9xKSloQXaxXSRXRdA+8gWVdMNQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fwbosgiqo8NpdfVLBf29x4rOCC7HmWyI7Oed89CsLmLdC0M8mE8qQCD35EHSfcrTYLso/bJzA1qveOmn1CdDfLeHUXOfoUor+7A6SqkkUGnE2coU9/pqvJvkvPPzMxB01KPYBAlrgKU+wsuyzdXJl2Cfkwei+W1b4QiYXfi5OMA=
+	 MIME-Version; b=S1TZagC253VyEZXbjSDWbxuLTuqEHZP0PLdT+HaVJ3ZtuAE0J1LkchjgzF390uA/FOLtE0AfzW6NXq1Jq7KTpiGueKuNNqsBkAGm+zsW6nYFlBbDBhL3R8dHyFVUENXlCXX+PPYJ4Jq/TxkJxnAikNg46cBBBMaGXZAPPM1jyXc=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.235.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
 Received: from localhost (mailhub4.si.c-s.fr [172.26.127.67])
-	by localhost (Postfix) with ESMTP id 4c7bGp5G2dz9sSW;
-	Fri, 22 Aug 2025 11:58:10 +0200 (CEST)
+	by localhost (Postfix) with ESMTP id 4c7bGl4ldxz9sSH;
+	Fri, 22 Aug 2025 11:58:07 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at c-s.fr
 Received: from pegase2.c-s.fr ([172.26.127.65])
 	by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id L-iQubse_0cd; Fri, 22 Aug 2025 11:58:10 +0200 (CEST)
+	with ESMTP id 4MzYiAzePFXF; Fri, 22 Aug 2025 11:58:07 +0200 (CEST)
 Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
-	by pegase2.c-s.fr (Postfix) with ESMTP id 4c7bGp4Kv4z9sSV;
-	Fri, 22 Aug 2025 11:58:10 +0200 (CEST)
+	by pegase2.c-s.fr (Postfix) with ESMTP id 4c7bGl3zRbz9sSC;
+	Fri, 22 Aug 2025 11:58:07 +0200 (CEST)
 Received: from localhost (localhost [127.0.0.1])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id 799BB8B781;
-	Fri, 22 Aug 2025 11:58:10 +0200 (CEST)
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id 6EE2F8B775;
+	Fri, 22 Aug 2025 11:58:07 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at c-s.fr
 Received: from messagerie.si.c-s.fr ([127.0.0.1])
 	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
-	with ESMTP id Jh8il3hsJZQH; Fri, 22 Aug 2025 11:58:10 +0200 (CEST)
+	with ESMTP id Mz748sD3BeoZ; Fri, 22 Aug 2025 11:58:07 +0200 (CEST)
 Received: from PO20335.idsi0.si.c-s.fr (unknown [192.168.235.99])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id 7612B8B775;
-	Fri, 22 Aug 2025 11:58:09 +0200 (CEST)
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id 78E258B780;
+	Fri, 22 Aug 2025 11:58:06 +0200 (CEST)
 From: Christophe Leroy <christophe.leroy@csgroup.eu>
 To: Michael Ellerman <mpe@ellerman.id.au>,
 	Nicholas Piggin <npiggin@gmail.com>,
@@ -56,9 +56,9 @@ Cc: Christophe Leroy <christophe.leroy@csgroup.eu>,
 	linux-fsdevel@vger.kernel.org,
 	linux-mm@kvack.org,
 	linux-block@vger.kernel.org
-Subject: [PATCH v2 04/10] powerpc/uaccess: Move barrier_nospec() out of allow_read_{from/write}_user()
-Date: Fri, 22 Aug 2025 11:58:00 +0200
-Message-ID: <90ce0c90c53d3132023d753650b1741fab60dcd3.1755854833.git.christophe.leroy@csgroup.eu>
+Subject: [PATCH v2 01/10] iter: Avoid barrier_nospec() in copy_from_user_iter()
+Date: Fri, 22 Aug 2025 11:57:57 +0200
+Message-ID: <9aa2e04f1c80d45151e2c3d06a45b6a4f29ff576.1755854833.git.christophe.leroy@csgroup.eu>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <cover.1755854833.git.christophe.leroy@csgroup.eu>
 References: <cover.1755854833.git.christophe.leroy@csgroup.eu>
@@ -68,92 +68,52 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1755856679; l=3128; i=christophe.leroy@csgroup.eu; s=20211009; h=from:subject:message-id; bh=W6hpcedkcWK/fNdxM9/tYip/yiX0Wu6MZIyees7Pogw=; b=DUD1UUmtiwXNWatGhsXc9CjjVSp+31iz3JZAC3Kq7lY2UnNgEKtP/hJS7JrJ7X+vsKhFuWqba zo1szpJqvm5BrN9GBW2DIAx7C5wqNiWIty4eJINj4EQofJ+cdDrJaFQ
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1755856678; l=1324; i=christophe.leroy@csgroup.eu; s=20211009; h=from:subject:message-id; bh=btOGI5kT/X4BbGkbG9xKSloQXaxXSRXRdA+8gWVdMNQ=; b=U0aP36j9qq2Z+EzK6fHDU51410l7VDxWduQrkADDOwWueGyv0Sg4bw5dV64YBIg/yRboGmHiq A0ibcHLG9K8DbJhbI+wPLCKPMFbswE9LEUkmxBSkb4CSYHqbanY0rSP
 X-Developer-Key: i=christophe.leroy@csgroup.eu; a=ed25519; pk=HIzTzUj91asvincQGOFx6+ZF5AoUuP9GdOtQChs7Mm0=
 Content-Transfer-Encoding: 8bit
 
-Commit 74e19ef0ff80 ("uaccess: Add speculation barrier to
-copy_from_user()") added a redundant barrier_nospec() in
-copy_from_user(), because powerpc is already calling
-barrier_nospec() in allow_read_from_user() and
-allow_read_write_user(). But on other architectures that
-call to barrier_nospec() was missing. So change powerpc
-instead of reverting the above commit and having to fix
-other architectures one by one. This is now possible
-because barrier_nospec() has also been added in
+Following patch will add missing barrier_nospec() to
 copy_from_user_iter().
 
-Move barrier_nospec() out of allow_read_from_user() and
-allow_read_write_user(). This will also allow reuse of those
-functions when implementing masked user access which doesn't
-require barrier_nospec().
+Avoid it for architectures supporting masked user
+accesses, the same way as done for copy_from_user() by
+commit 0fc810ae3ae1 ("x86/uaccess: Avoid barrier_nospec()
+in 64-bit copy_from_user()")
 
-Don't add it back in raw_copy_from_user() as it is already called
-by copy_from_user() and copy_from_user_iter().
-
-Fixes: 74e19ef0ff80 ("uaccess: Add speculation barrier to copy_from_user()")
 Signed-off-by: Christophe Leroy <christophe.leroy@csgroup.eu>
 ---
- arch/powerpc/include/asm/kup.h     | 2 --
- arch/powerpc/include/asm/uaccess.h | 4 ++++
- 2 files changed, 4 insertions(+), 2 deletions(-)
+v2: New in v2
+---
+ lib/iov_iter.c | 16 ++++++++++------
+ 1 file changed, 10 insertions(+), 6 deletions(-)
 
-diff --git a/arch/powerpc/include/asm/kup.h b/arch/powerpc/include/asm/kup.h
-index 2bb03d941e3e..6737416dde9f 100644
---- a/arch/powerpc/include/asm/kup.h
-+++ b/arch/powerpc/include/asm/kup.h
-@@ -134,7 +134,6 @@ static __always_inline void kuap_assert_locked(void)
+diff --git a/lib/iov_iter.c b/lib/iov_iter.c
+index f9193f952f49..48bd0cbce8c2 100644
+--- a/lib/iov_iter.c
++++ b/lib/iov_iter.c
+@@ -49,12 +49,16 @@ size_t copy_from_user_iter(void __user *iter_from, size_t progress,
  
- static __always_inline void allow_read_from_user(const void __user *from, unsigned long size)
- {
--	barrier_nospec();
- 	allow_user_access(NULL, from, size, KUAP_READ);
+ 	if (should_fail_usercopy())
+ 		return len;
+-	if (access_ok(iter_from, len)) {
+-		to += progress;
+-		instrument_copy_from_user_before(to, iter_from, len);
+-		res = raw_copy_from_user(to, iter_from, len);
+-		instrument_copy_from_user_after(to, iter_from, len, res);
+-	}
++	if (can_do_masked_user_access())
++		iter_from = mask_user_address(iter_from);
++	else if (!access_ok(iter_from, len))
++		return res;
++
++	to += progress;
++	instrument_copy_from_user_before(to, iter_from, len);
++	res = raw_copy_from_user(to, iter_from, len);
++	instrument_copy_from_user_after(to, iter_from, len, res);
++
+ 	return res;
  }
  
-@@ -146,7 +145,6 @@ static __always_inline void allow_write_to_user(void __user *to, unsigned long s
- static __always_inline void allow_read_write_user(void __user *to, const void __user *from,
- 						  unsigned long size)
- {
--	barrier_nospec();
- 	allow_user_access(to, from, size, KUAP_READ_WRITE);
- }
- 
-diff --git a/arch/powerpc/include/asm/uaccess.h b/arch/powerpc/include/asm/uaccess.h
-index 4f5a46a77fa2..3987a5c33558 100644
---- a/arch/powerpc/include/asm/uaccess.h
-+++ b/arch/powerpc/include/asm/uaccess.h
-@@ -301,6 +301,7 @@ do {								\
- 	__typeof__(sizeof(*(ptr))) __gu_size = sizeof(*(ptr));	\
- 								\
- 	might_fault();					\
-+	barrier_nospec();					\
- 	allow_read_from_user(__gu_addr, __gu_size);		\
- 	__get_user_size_allowed(__gu_val, __gu_addr, __gu_size, __gu_err);	\
- 	prevent_read_from_user(__gu_addr, __gu_size);		\
-@@ -329,6 +330,7 @@ raw_copy_in_user(void __user *to, const void __user *from, unsigned long n)
- {
- 	unsigned long ret;
- 
-+	barrier_nospec();
- 	allow_read_write_user(to, from, n);
- 	ret = __copy_tofrom_user(to, from, n);
- 	prevent_read_write_user(to, from, n);
-@@ -415,6 +417,7 @@ static __must_check __always_inline bool user_access_begin(const void __user *pt
- 
- 	might_fault();
- 
-+	barrier_nospec();
- 	allow_read_write_user((void __user *)ptr, ptr, len);
- 	return true;
- }
-@@ -431,6 +434,7 @@ user_read_access_begin(const void __user *ptr, size_t len)
- 
- 	might_fault();
- 
-+	barrier_nospec();
- 	allow_read_from_user(ptr, len);
- 	return true;
- }
 -- 
 2.49.0
 
