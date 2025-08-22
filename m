@@ -1,82 +1,150 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E965302740;
-	Fri, 22 Aug 2025 16:51:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC0743314D7
+	for <linux-block@vger.kernel.org>; Fri, 22 Aug 2025 17:11:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755881477; cv=none; b=AS8A2NEW7c0HHdoBxeJkeX5jwR2TdzmIi3xNLgn4NO56wkLTWwd2AZaUJkJKcGpEta58Gv5vd2d2zCrgKmAqGI1/wYy79J6AHwmmTY8ljJ2/7+pCJ/c2IEhQim+3lAlvjkylex40Ywh+9dQKzGNqJmv9Z2okHXyrXLSztCLMpYQ=
+	t=1755882663; cv=none; b=Xq23+TdPBxaTNpQtvSztrmt6sJrYW3sCpkE2gZQwT1xagEMQqnK16dpWcQT3udNWUkfhAKxWC+Us2fAQZu4c4qHOkXF3EcfNM6lOVMSIOn8R66+qr0RlWHQDIUHlGKK3WKw3M/lfPNf9+/hCtfPkm6JIWWKqp4jw80bXkj3CTl8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755881477; c=relaxed/simple;
-	bh=uRry2CIjiEcSnH960J5NOlseuN3XmHmd33F+6CJVqvw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=drbECsiyi3WWLKP35qONNuHxZySbm49Jzesug20nxkdnTScyPgaitbT6YiAorF9egitiACM005+g+OmoO8nzHlmLtz3SGaqk4HA9Y2O8FTevN8GSOeOwfQajElxAmig+ebzK6df4nyQIEX8wJ8vjlB2LnJh864zp6k6tR4rOKJo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=KL7tIz7h; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1755882663; c=relaxed/simple;
+	bh=siG3rqPeWYx/FOZYceF6K5VABi2BqBI12It1MnUnB9c=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=KFfAJ5MfB0un247QvGfiGPpX4UGPQPY9pRpQV1RonrxAi7eJNhFh22lnPuFVshA/aK9UR6u7OEOpOyRNAUOJDkwXSK3VnymWQY23yeuLFS7THN6EZbciKux64E1Qxe7U09/+WxJsOxF9OoIqPowT3X+dPPR4pkmTVeD5Nzq2Zwk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=RPDDqw6+; arc=none smtp.client-ip=67.231.145.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="KL7tIz7h"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=uxEENz6oloxCKZRngq4FPRiV3fTmt3ZU4b9lbdy3wsg=; b=KL7tIz7huO8uK1YpoFS4ymVYyR
-	KsSQtjYru7NLpH+XFf79/YtiSt8kC61NQr0ImRB1oJoD1t446+EPpLqf5MZY1pQcVbnZ/HNwPLpKF
-	znai4LW1Zcd5wIB4qDUTB2jr/1ReCzGbQ/xci1g2jWAesh+2vTr+7F6LIfS5j7TB2juhkFpxno/Pq
-	S/2TXhlaehldPbDMUDkRMm7Nx3rwxO8ztyBlrihHQ5gpSGO57cNDhqICNMtdK3v9uQSCyycB4HpaS
-	5w7bxfrQZ8HUUWJ73o9JoIMjQxsggWEcpILvVWJBerIIhKHyjJPKzMbmQt+dFGbiXGmC/i8+wEkam
-	TKprpMfg==;
-Received: from willy by casper.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1upUyu-0000000AHKJ-0Qo7;
-	Fri, 22 Aug 2025 16:51:12 +0000
-Date: Fri, 22 Aug 2025 17:51:11 +0100
-From: Matthew Wilcox <willy@infradead.org>
-To: Ritesh Harjani <ritesh.list@gmail.com>
-Cc: "Darrick J. Wong" <djwong@kernel.org>,
-	Fengnan Chang <changfengnan@bytedance.com>, brauner@kernel.org,
-	linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: Re: [PATCH] iomap: allow iomap using the per-cpu bio cache
-Message-ID: <aKif_644529sRXhN@casper.infradead.org>
-References: <20250822082606.66375-1-changfengnan@bytedance.com>
- <20250822150550.GP7942@frogsfrogsfrogs>
- <aKiP966iRv5gEBwm@casper.infradead.org>
- <877byv9w6z.fsf@gmail.com>
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="RPDDqw6+"
+Received: from pps.filterd (m0044010.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 57MGDIlj3540321
+	for <linux-block@vger.kernel.org>; Fri, 22 Aug 2025 10:10:57 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=s2048-2025-q2; bh=fgdy+fZjYX4yFEe2i1
+	+utS3elAgraOTifFsEuqqPIIg=; b=RPDDqw6+PUljwF1t3lr5JW5HdBkJuymRXx
+	f8UEuRMdrFHiK7z+6mvf8+t5iOPQcSgjGxvCfST9aGJZeo6UDX3OUQp6OIuX7nV5
+	QBzXX6+cVJoFI8M1tHfNUZipmk6Nw95TdqVWi5BTQq+6mSa6EA7wW+l3k5liEZky
+	dAcOdGLXnHgpFVQcJXSilaSNGFiMMVWSUogEZba427olSNB3OjhLZKjJOa5ks8kU
+	qTozbXZXRNzWkBAtD9Qd/PcIKP7qHfMRDfqtU+LlnO5QD6rzkS1EhC3T8g1Q6En7
+	M5WOx2t8M+9W8j2t9Q6BtfvRfJQMAzxUlHXt9nYhiEDmVfvO1bOg==
+Received: from maileast.thefacebook.com ([163.114.135.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 48ptdr16bu-2
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <linux-block@vger.kernel.org>; Fri, 22 Aug 2025 10:10:56 -0700 (PDT)
+Received: from twshared51809.40.frc1.facebook.com (2620:10d:c0a8:1b::2d) by
+ mail.thefacebook.com (2620:10d:c0a9:6f::237c) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.17; Fri, 22 Aug 2025 17:10:55 +0000
+Received: by devbig197.nha3.facebook.com (Postfix, from userid 544533)
+	id DF03BE246FF; Fri, 22 Aug 2025 10:10:40 -0700 (PDT)
+From: Keith Busch <kbusch@meta.com>
+To: <axboe@kernel.dk>, <linux-block@vger.kernel.org>, <ming.lei@redhat.com>
+CC: Keith Busch <kbusch@kernel.org>
+Subject: [PATCH] block: rename min_segment_size
+Date: Fri, 22 Aug 2025 10:10:38 -0700
+Message-ID: <20250822171038.1847867-1-kbusch@meta.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <877byv9w6z.fsf@gmail.com>
+Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+Content-Type: text/plain
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODIyMDE1NyBTYWx0ZWRfX9dcGDlkh1s3F
+ KmK1L319nwzkZA5qUQpMA01NhoQVz9svjRYc8TKXy3/2b70GLJ9QaHaZ/zvbUwCS3kaS6J8sX+o
+ RyRqtiYNuGRGg3oN44cwFSvnG8iwfHuk5ZzH8ZYXHZhsJKxljAe9h2xR1Bwo+iuWId4BCVQEIzK
+ +Z8rLEKWrYG7y/kiXtfQingOYheXsTlTxH2SLjn9eQrXNhfIPR+HJengSP/xHc9VJk3jR6TY55q
+ GUnyji8fFRNAU47ymMqbUPX/VKHYVd0AEn4QQg1vK2uu5kOQSsFSOySEgR0NlGqZw3uHnk5xw1e
+ 7vMt+BrNJ4k3Vg2N5ZFR87NhBhz/KG55iXMv1qBvWIpvWM0ArFyeiFkljFoGm47L6r+aF8xi79D
+ IgmlqYp9jXzNSz5vsWoHXE52MmmRNMiqvNUPeq4pGTIWXxziJJkG7oilyPn3T0JxNKwD8W3r
+X-Proofpoint-ORIG-GUID: 7jFmCspnWKHw6foI9bP-fucBKw9s3gjz
+X-Proofpoint-GUID: 7jFmCspnWKHw6foI9bP-fucBKw9s3gjz
+X-Authority-Analysis: v=2.4 cv=E6KUZadl c=1 sm=1 tr=0 ts=68a8a4a0 cx=c_pps
+ a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17
+ a=2OwXVqhp2XgA:10 a=VwQbUJbxAAAA:8 a=ed2C8nVDbJhc1O_0NaQA:9
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-08-22_04,2025-08-20_03,2025-03-28_01
 
-On Fri, Aug 22, 2025 at 09:37:32PM +0530, Ritesh Harjani wrote:
-> Matthew Wilcox <willy@infradead.org> writes:
-> > On Fri, Aug 22, 2025 at 08:05:50AM -0700, Darrick J. Wong wrote:
-> >> Is there a reason /not/ to use the per-cpu bio cache unconditionally?
-> >
-> > AIUI it's not safe because completions might happen on a different CPU
-> > from the submission.
-> 
-> At max the bio de-queued from cpu X can be returned to cpu Y cache, this
-> shouldn't be unsafe right? e.g. bio_put_percpu_cache(). 
-> Not optimal for performance though.
-> 
-> Also even for io-uring the IRQ completions (non-polling requests) can
-> get routed to a different cpu then the submitting cpu, correct?
-> Then the completions (bio completion processing) are handled via IPIs on
-> the submtting cpu or based on the cache topology, right?
-> 
-> > At least, there's nowhere that sets REQ_ALLOC_CACHE unconditionally.
-> >
-> > This could do with some better documentation ..
-> 
-> Agreed. Looking at the history this got added for polling mode first but
-> later got enabled for even irq driven io-uring rw requests [1]. So it
-> make sense to understand if this can be added unconditionally for DIO
-> requests or not.
+From: Keith Busch <kbusch@kernel.org>
 
-So why does the flag now exist at all?  Why not use the cache
-unconditionally?
+Despite its name, the block layer is fine with segments smaller that the
+"min_segment_size" limit. The value is an optimization limit indicating
+the largest aligned segment that can be used without considering segment
+boundary limits, so give it a name that reflects that.
+
+Signed-off-by: Keith Busch <kbusch@kernel.org>
+---
+ block/blk-merge.c      | 2 +-
+ block/blk-settings.c   | 4 ++--
+ block/blk.h            | 2 +-
+ include/linux/blkdev.h | 2 +-
+ 4 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index 70d704615be52..863a4a6d3da62 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -307,7 +307,7 @@ int bio_split_rw_at(struct bio *bio, const struct que=
+ue_limits *lim,
+=20
+ 		if (nsegs < lim->max_segments &&
+ 		    bytes + bv.bv_len <=3D max_bytes &&
+-		    bv.bv_offset + bv.bv_len <=3D lim->min_segment_size) {
++		    bv.bv_offset + bv.bv_len <=3D lim->max_aligned_segment) {
+ 			nsegs++;
+ 			bytes +=3D bv.bv_len;
+ 		} else {
+diff --git a/block/blk-settings.c b/block/blk-settings.c
+index d6438e6c276dc..a61d676ff4c49 100644
+--- a/block/blk-settings.c
++++ b/block/blk-settings.c
+@@ -442,12 +442,12 @@ int blk_validate_limits(struct queue_limits *lim)
+ 			return -EINVAL;
+ 	}
+=20
+-	/* setup min segment size for building new segment in fast path */
++	/* setup max aligned segment size for building new segment in fast path=
+ */
+ 	if (lim->seg_boundary_mask > lim->max_segment_size - 1)
+ 		seg_size =3D lim->max_segment_size;
+ 	else
+ 		seg_size =3D lim->seg_boundary_mask + 1;
+-	lim->min_segment_size =3D min_t(unsigned int, seg_size, PAGE_SIZE);
++	lim->max_aligned_segment =3D min_t(unsigned int, seg_size, PAGE_SIZE);
+=20
+ 	/*
+ 	 * We require drivers to at least do logical block aligned I/O, but
+diff --git a/block/blk.h b/block/blk.h
+index 46f566f9b1266..ed60d3dcdf93c 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -376,7 +376,7 @@ static inline bool bio_may_need_split(struct bio *bio=
+,
+ 	if (bio->bi_vcnt !=3D 1)
+ 		return true;
+ 	return bio->bi_io_vec->bv_len + bio->bi_io_vec->bv_offset >
+-		lim->min_segment_size;
++		lim->max_aligned_segment;
+ }
+=20
+ /**
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index fe1797bbec420..b8d4333716e59 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -378,7 +378,7 @@ struct queue_limits {
+ 	unsigned int		max_sectors;
+ 	unsigned int		max_user_sectors;
+ 	unsigned int		max_segment_size;
+-	unsigned int		min_segment_size;
++	unsigned int		max_aligned_segment;
+ 	unsigned int		physical_block_size;
+ 	unsigned int		logical_block_size;
+ 	unsigned int		alignment_offset;
+--=20
+2.47.3
+
