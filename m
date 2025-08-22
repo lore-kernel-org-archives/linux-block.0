@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08D622FB602;
-	Fri, 22 Aug 2025 12:15:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88C332FB602;
+	Fri, 22 Aug 2025 12:16:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755864958; cv=none; b=MISSI1EmhjCJTcxyyMtAnPwGyqjUVmrVMhN7jHKPkyunAfRa0Vy1trLHtHJZp0oWZZcWG/IDtVD94i9CTfOngZVtene56j53jOR9ZbcgAYN64hshj4pJQRGNkGBKrENSa+G4YdKvkohOvT5Wf6KkahM6Z+S+PcVyWzIEL9mV/P4=
+	t=1755864961; cv=none; b=KweuvthBxUnOepmYyouTqrUtkQARnTqC6K9JL4VbAUCrLJTgPlbyGiSqUAl6AI7R9pX9AjOtS4H4Ldl6ovC/g2Wl6CeBigj4/BcBWZ6Fo0HLW6HslgP9aiq9Ngs5bZ5tqLeLArUvgPRukickaVUlDUxn2exSzDhcMEF8G07In3s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755864958; c=relaxed/simple;
-	bh=pnrl4BHc/0QCGXcnlvXhVfPL/hCVQSnNuvvFpYApzks=;
+	s=arc-20240116; t=1755864961; c=relaxed/simple;
+	bh=pzI+PzwBdiJXG7Rnf/MUlf5BoxNaAVR/4KH77t5lHuM=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=cI0unaqys1kKOCTRR1gH0X3FAi22O/gwlseBZia9TMFlQ35LBqyVnEbokDN05Xlsybn5KLKyxl00pAVco8dSz6xWIZz62uJbTajY4XQMiZ4YemiRK1CZA/ne92ryRq+dbX1q5B8WtvVzb0GElsX5wdqb8svgSPJN5ftTo8U3y+I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y/FLA875; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=F2K2tOq0JKl7BiqHkIeiw51r1T8Ajkh70YJD/H1vJHvau/jKazLAQkeBqU3kczVeXEU76ay2HBwZ0MsMzjZhkBP03B26vkfkWCv5a4LpVLo4N+aSXj4UJKXyaneSbMlN5O5n66gSHAX0k9Iigqmb9Ffohr37IkE2jaJXGtPZz5w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eugPQauq; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y/FLA875"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4161C4CEF1;
-	Fri, 22 Aug 2025 12:15:54 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eugPQauq"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 35A04C4CEED;
+	Fri, 22 Aug 2025 12:15:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755864957;
-	bh=pnrl4BHc/0QCGXcnlvXhVfPL/hCVQSnNuvvFpYApzks=;
+	s=k20201202; t=1755864961;
+	bh=pzI+PzwBdiJXG7Rnf/MUlf5BoxNaAVR/4KH77t5lHuM=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=Y/FLA875JXp7wJkqK81JuURrI8rDS18UCuzxgdG9ySClggRM0mvBppLbrEPqMVoGw
-	 RPXYZfptCAkvG3jtNnRH2GPgxOeLHv2RvmZb1VOwkcoY2YB5MflQjVc9Y9I/pZ6WZ1
-	 8COUTKr+chcMJ77uOarmjjvFGa2beAdsDkgAc6VYEBpRHSMWHDALzIF1V9gJ2nAHwr
-	 e9DwEV1MFbIRNm5uh/nDwZN8AcKBharOUZjo3qetqsd7cftWf9d2qiUYeqFmdKKVe/
-	 ZUXDbFDAMHWrBS+JoKIHEHAxa5tl1DrbHMp+ftRa6L5cAV+6wmPVZ+cNQTXS1LIP8M
-	 YydsuVI/UmmhQ==
+	b=eugPQauqg9s+DD4CckkQbzlLP6GQoWAYapYakDQwI813GtNJNLD6+HbFC8OvY6G4k
+	 whaZnS3bhuC0qC4OBeEHezW6Z1vsvseL3yf21h/GvkukmlcJhZi5i+r33XElg8R6w5
+	 STChSaAiywon/8S883fKnxUSUB+knJwSZlRgCfRnfulOWsF9ekZ4Mii/vMUNYtTrcw
+	 cM+N+DbuqxOBrJc0nWsmKhNK+GhXPGZQbBffe5YA78vkKmT2w4TfF8uEpwrJtiDcF+
+	 3FFBbkWSZGrb/2NmL9xeAXJ+4Z1twB2fSyMslO3BdStXmqK0ARFsi6vQUN0VzhEtm0
+	 Tmv8W9i3KTIbA==
 From: Andreas Hindborg <a.hindborg@kernel.org>
-Date: Fri, 22 Aug 2025 14:14:42 +0200
-Subject: [PATCH v6 06/18] rust: str: add `bytes_to_bool` helper function
+Date: Fri, 22 Aug 2025 14:14:48 +0200
+Subject: [PATCH v6 12/18] rust: block: add block related constants
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -37,7 +37,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250822-rnull-up-v6-16-v6-6-ec65006e2f07@kernel.org>
+Message-Id: <20250822-rnull-up-v6-16-v6-12-ec65006e2f07@kernel.org>
 References: <20250822-rnull-up-v6-16-v6-0-ec65006e2f07@kernel.org>
 In-Reply-To: <20250822-rnull-up-v6-16-v6-0-ec65006e2f07@kernel.org>
 To: Boqun Feng <boqun.feng@gmail.com>, Miguel Ojeda <ojeda@kernel.org>, 
@@ -49,87 +49,53 @@ To: Boqun Feng <boqun.feng@gmail.com>, Miguel Ojeda <ojeda@kernel.org>,
 Cc: linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org, 
  linux-kernel@vger.kernel.org, Andreas Hindborg <a.hindborg@kernel.org>
 X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2761; i=a.hindborg@kernel.org;
- h=from:subject:message-id; bh=pnrl4BHc/0QCGXcnlvXhVfPL/hCVQSnNuvvFpYApzks=;
- b=owEBbQKS/ZANAwAIAeG4Gj55KGN3AcsmYgBoqF83joD+qfDFd5COVCdtfn2Uj8Qes74wKaVFg
- LfX599ms3+JAjMEAAEIAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaKhfNwAKCRDhuBo+eShj
- d24nD/9YPa7FLU1snrfCuoQK6W+EWxTuFfetVokgP3TXmRcM3lq8ycM1MWGV2t5DUL4yhxLYzcu
- i5sh49axa3ZwtZTlqOmt1E+D3U+mpXrWI1WkR+J3mhT7feLXxD2cj7VfKLa5gY5OC4mXWq7xmMe
- mUyhk/MFHhxPArMQuaF5FK8r2kYqTuiLC7lUmT+IWQsZrMUMKP87ms9+4t6HZ7CuRL5UBIDUDY+
- TbS2v5K4BYwhSA3iUUwBHWoj9q187d89yKh4x/4Pu0OI7pcFLfZwP6QmRjbrgpr/nb0fmkP4JFd
- 2z0lpQm5VqcwwfzncnFFtQ3ZYWJ5aI6Flur5op+G6dC4MZMv9PzXE1kmlGrAKSbGhG/GG8SpmG9
- 4Lf9mISNr8TrwEWhVIEHNyvv4rmegtWchMu93W2dIjAHmmdyn/hACsVstiKx6gp1CgRxfIQ3s9v
- WAWuK8dhnw/xqEUHbP/0Ns1zY/4wA/kyA56x32eleAk9lcAqr7j+SbA2bYplmcDw9G6UeWyuzGf
- khbgYT2n+qAcwyypgkC5fHcmigRUR+xhbmSCFk3CjJZfpPkNQXa5K2xV9TCCBfZAOQe5GmUM363
- 5YYyZak4Rl+MQBRHQL/bSI2UE1PyF/yXyxc/DCKLWNY0RP/eqZz1ItU72AMOK1SwsZrmBwS2mfX
- v+HpO2IytWO5Jhg==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1050; i=a.hindborg@kernel.org;
+ h=from:subject:message-id; bh=pzI+PzwBdiJXG7Rnf/MUlf5BoxNaAVR/4KH77t5lHuM=;
+ b=owEBbQKS/ZANAwAIAeG4Gj55KGN3AcsmYgBoqF88vYZZFUYtq6sIQRW6685mmouPx6UDAXTUz
+ URQ6DhtdBaJAjMEAAEIAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaKhfPAAKCRDhuBo+eShj
+ d7M+EADFxD2piNMvveM7zDctM76JNI59SOxhxT6ZlWjPWmPWx5CCZTUK/rCIQ0kAm2TgGGM2rma
+ cDpyV9InTXTn3TTIltEvKKTDk6Y3JeRARm1hfw961YFsZSFlqBJwoMbk/MFvkpFk+jvs3Yg+TBa
+ MdoFL/4dh/7h6R1qRYD2Cfqn4v7CozNWUeQyhwUSg/hWJ/ioPnAn3VPonhFiVySWOt1zeYSi0/m
+ wIf/fBzfqQll9OXmgVaiz/W+VGYKW+cYvt+OM6p7UWsfaCDZ4nkxygRvQSnBaySkfx2ZRIxR85c
+ dw4fKYHjojxzYii4CP8soLiZrT5kpzntUn8ZMYE1yLCl3Sn3IvQOstQwTu9H9uKwj+7VjCwEcz+
+ ead+sErcQMb7r9PpD1ZPZ0lYb6zXfDOCevOnBYMJ3TtolipM4DaqvgLyKpd/vsWhgLsEXIqBoeP
+ 89hHIG3j+Oez4ykDwcl2AchPA2SDbhE8YWv47adWvZtGgQrm4thwAjJRqhpG4nv0zqm+K0ef9r/
+ nJIf3+rf9WChUCsIXT4/FNO/P6SvT+DxhxnYtrCyQJTZU/2aKq1ZrkbWoU8/cP7jlYfJGcgQL7H
+ QzeNx8rOEJGzh6Yrwyy0QqtO/oxTRXJuFh1TI4RACJPoVe08wPuliPxBEmInMOpOm9oKNkCcz+H
+ f8QKbiuohVn2LyQ==
 X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
  fpr=3108C10F46872E248D1FB221376EB100563EF7A7
 
-Add a convenience function to convert byte slices to boolean values by
-wrapping them in a null-terminated C string and delegating to the
-existing `kstrtobool` function. Only considers the first two bytes of
-the input slice, following the kernel's boolean parsing semantics.
+Add a few block subsystem constants to the rust `kernel::block` name space.
+This makes it easier to access the constants from rust code.
 
+Reviewed-by: Alice Ryhl <aliceryhl@google.com>
 Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
 ---
- rust/kernel/str.rs | 35 +++++++++++++++++++++++++++++------
- 1 file changed, 29 insertions(+), 6 deletions(-)
+ rust/kernel/block.rs | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/rust/kernel/str.rs b/rust/kernel/str.rs
-index d070c0bd86c3..b185262b4851 100644
---- a/rust/kernel/str.rs
-+++ b/rust/kernel/str.rs
-@@ -921,6 +921,20 @@ fn write_str(&mut self, s: &str) -> fmt::Result {
-     }
- }
+diff --git a/rust/kernel/block.rs b/rust/kernel/block.rs
+index 150f710efe5b..32c8d865afb6 100644
+--- a/rust/kernel/block.rs
++++ b/rust/kernel/block.rs
+@@ -3,3 +3,16 @@
+ //! Types for working with the block layer.
  
-+/// # Safety
-+///
-+/// - `string` must point to a null terminated string that is valid for read.
-+unsafe fn kstrtobool_raw(string: *const u8) -> Result<bool> {
-+    let mut result: bool = false;
+ pub mod mq;
 +
-+    // SAFETY:
-+    // - By function safety requirement, `string` is a valid null-terminated string.
-+    // - `result` is a valid `bool` that we own.
-+    let ret = unsafe { bindings::kstrtobool(string, &mut result) };
++/// Bit mask for masking out [`SECTOR_SIZE`].
++pub const SECTOR_MASK: u32 = bindings::SECTOR_MASK;
 +
-+    kernel::error::to_result(ret).map(|()| result)
-+}
++/// Sectors are size `1 << SECTOR_SHIFT`.
++pub const SECTOR_SHIFT: u32 = bindings::SECTOR_SHIFT;
 +
- /// Convert common user inputs into boolean values using the kernel's `kstrtobool` function.
- ///
- /// This routine returns `Ok(bool)` if the first character is one of 'YyTt1NnFf0', or
-@@ -968,13 +982,22 @@ fn write_str(&mut self, s: &str) -> fmt::Result {
- /// assert_eq!(kstrtobool(c_str!("2")), Err(EINVAL));
- /// ```
- pub fn kstrtobool(string: &CStr) -> Result<bool> {
--    let mut result: bool = false;
--
--    // SAFETY: `string` is a valid null-terminated C string, and `result` is a valid
--    // pointer to a bool that we own.
--    let ret = unsafe { bindings::kstrtobool(string.as_char_ptr(), &mut result) };
-+    // SAFETY:
-+    // - The pointer returned by `CStr::as_char_ptr` is guaranteed to be
-+    //   null terminated.
-+    // - `string` is live and thus the string is valid for read.
-+    unsafe { kstrtobool_raw(string.as_char_ptr()) }
-+}
- 
--    kernel::error::to_result(ret).map(|()| result)
-+/// Convert `&[u8]` to `bool` by deferring to [`kernel::str::kstrtobool`].
-+///
-+/// Only considers at most the first two bytes of `bytes`.
-+pub fn kstrtobool_bytes(bytes: &[u8]) -> Result<bool> {
-+    // `ktostrbool` only considers the first two bytes of the input.
-+    let stack_string = [*bytes.first().unwrap_or(&0), *bytes.get(1).unwrap_or(&0), 0];
-+    // SAFETY: `stack_string` is null terminated and it is live on the stack so
-+    // it is valid for read.
-+    unsafe { kstrtobool_raw(stack_string.as_ptr()) }
- }
- 
- /// An owned string that is guaranteed to have exactly one `NUL` byte, which is at the end.
++/// Size of a sector.
++pub const SECTOR_SIZE: u32 = bindings::SECTOR_SIZE;
++
++/// The difference between the size of a page and the size of a sector,
++/// expressed as a power of two.
++pub const PAGE_SECTORS_SHIFT: u32 = bindings::PAGE_SECTORS_SHIFT;
 
 -- 
 2.47.2
