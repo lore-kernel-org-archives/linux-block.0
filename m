@@ -1,122 +1,91 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6F8914A8B
-	for <linux-block@vger.kernel.org>; Sun, 24 Aug 2025 14:06:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F0D319CCF5;
+	Sun, 24 Aug 2025 15:08:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756044376; cv=none; b=DCTRiSFD+tEffAXi5cH7IqcTzbs3xRVu+L8vDN49n55zhaiZu0+y8Nk4Yy5wNLO0fN/uERwOpQnGh2qW65WQst5dttEqUn0X4D2WaZannLu12EqDkQqeh9N3f+W3ml1qRvK/NTpdz0J2hYAyCrMT45r+t7rEg0CA66Sa5J4mMUY=
+	t=1756048102; cv=none; b=mdytUqSjeniSbhJ/wy0Y6aAtm7U/KPvMlufaeh3TJPt3IkFMcZuWTd0Z0/3LnEYtmiRFk1AbmSWV9a6MjzrJYhsyO7tCNZ/1pr/5oS4YZCs30t6yg+jS3F1jch0xlt+CnreEDmz6V8M8kG2kW1TEPMsHOc5+VDQnXNyv8DMzphk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756044376; c=relaxed/simple;
-	bh=nGemA6wR36SfaTX9FjGvqqAmcSomoWzFjaNl31BZnQU=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=qaJuyW33+YvmtQHpvSyhiyy+CtJHaIo8HU70YjYkva18EA2wm+DaTeeu6Qt1LdcYDHzbE6aRm6QM3jQF/PvvAQUfCjFrhww07k6IUz2JaTRGm/meQ3WPG0FyKl/heOuFANBhmrH49IPYrr1BDbccpOglm7XXv7hXdk6p0jzhGfo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gMn29BEQ; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1756048102; c=relaxed/simple;
+	bh=Dq1qy+YsZuSC9Eurnh5XV529yl3EMbTPy6RJtwpAa+c=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=gXHi/jvhLBlRt8zKLRsYKAOCEs++rUAVfRLwDSgSdz2KG1lPndU+UoXb37DJc6UD/XIjwr758EmplJCN8chOuye3BPvrFRrQqBl2N3N+IcSUgNc9ghVRsaICxh7hrriDSi1zrfhmGlhhRsO5SWLakdR9yUHiWAhy0F5YQeCOdBk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=FAalNz8n; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=cB54om5a; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gMn29BEQ"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1756044371;
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="FAalNz8n";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="cB54om5a"
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1756048097;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=mX7J1uDxfUFvd7oWRu2x2D7y9Lt8VwYau0YW6qKiJxI=;
-	b=gMn29BEQuoyYvi6aAl0bg/nqMxJkAUJKhqZFjr1rHz1vXMi5bS9/uk/RZDu1+pjhUahhQH
-	nEvn19Khzl219XYxKpsbipTglwux0l75JawmhDPUaMEY/KPVIIt+quj5amPqJXRiKsMf+s
-	KlCG2Dei6WB7EgzXrFaKr1KXvrKjWTA=
-Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
- [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-610-o5gfE0WpMh-CEDaB1paIWQ-1; Sun, 24 Aug 2025 10:06:10 -0400
-X-MC-Unique: o5gfE0WpMh-CEDaB1paIWQ-1
-X-Mimecast-MFC-AGG-ID: o5gfE0WpMh-CEDaB1paIWQ_1756044369
-Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-55f3f8e33d3so513263e87.1
-        for <linux-block@vger.kernel.org>; Sun, 24 Aug 2025 07:06:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756044367; x=1756649167;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=mX7J1uDxfUFvd7oWRu2x2D7y9Lt8VwYau0YW6qKiJxI=;
-        b=MBBkFSetiUB4g5U3WD2oEpnOiuNnb356gA9pXdafSpVJOo93h7aZmg7lY4eR6TxjaB
-         0kjrhKcWb3Tt4QMFA/YPMeAnJ0GrvBS924pHuMadJ7Zb+y9ucDR1qe4HPwBEBpMETkmv
-         Nk+QLHzhoW0yLYAWOMVW4glpRXDjaTo0nX5kk5tpQplVL2h3vsPXpcFOQAzSK08PBaUM
-         0JDiRjLByFnbyD+m5R6VOKS4Z8n77LMGsWLOoliQbM0LiwAZkpQAUCugQH64eDuUFadX
-         DgjjiY5iCba+J90IhbOtGMPu05CjnVW+AHf9sduZh7Ky0TbvvkO2O//7PdE2MThvjH7t
-         2kpg==
-X-Gm-Message-State: AOJu0YxAD0jPfqOYy7b6bUGH1jLHtSHNdZqe28A8RF6mHQp+e+oYwAPQ
-	1eDN9mFK2CLPV0q3vH0yFmPSgAVTRh7MgroNnmT3Xa7pdwVjRSuxpW1EVflXQDfZKm1RFwkXn1D
-	KeAd8lYBsVV8TM6GOJRkEgQ9jq9VkVH6ad7SDFWw5l3d2J5Ql/Jot1lZCEeln0WtjXnzAU4Ldtd
-	7Sr16YvlDhsgh1bKZhBPjYi3ozQcVlwKnHW6pYw+lAbx+0rgLPiQ==
-X-Gm-Gg: ASbGncs6j0vYBezfc1Y/uRuk8/e8rEvBR6hBOnwkgdf9qFMXb1LZk/GQs539ZWlBj4j
-	Z4SpH4rzfevVBaRkCrf4SsQhYxoOs2ZMSfXmRXfOmnP2cT8A8p0MgXYgXMlNjCtKIpglqE2z919
-	5nhQ2Mi+ZX//XVrFUFIkN7Zg==
-X-Received: by 2002:a05:651c:2357:20b0:333:e4cf:d5d7 with SMTP id 38308e7fff4ca-33650dda6b2mr15524211fa.12.1756044367168;
-        Sun, 24 Aug 2025 07:06:07 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE09qyj1F1hKutxBJDZZtN4iFm6oq8cKUMrqBr4L07Bcj87faKRwwDbPQvCEOvtlP0X+2b55XG1mfuj2ZlqqyU=
-X-Received: by 2002:a05:651c:2357:20b0:333:e4cf:d5d7 with SMTP id
- 38308e7fff4ca-33650dda6b2mr15524161fa.12.1756044366755; Sun, 24 Aug 2025
- 07:06:06 -0700 (PDT)
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3ik/NRqYHSG8hmITK6G3KaWPdzyg/qMeKl48YWWYUqc=;
+	b=FAalNz8n80tXbjLu1YEIFUu9UhX73vltRahVCO39qSG0lfGoaJew0vQszt0dphBAjPSnLe
+	7C/FD4/TKQG67Y1B/y0dsYTwbjJzp8XI+uPmsYWLSRhFSL8psTth1rBNfiHP7Pwxv8lCkS
+	TDI4rdGp9S0oezXRjJ36bL2EAtg+sygQdbSF6fTVdqYLjKZ7jo4U5NfPpkFOr2o9HOuWTj
+	/6PuKr1BAXjl0+x4heqkOUOddzMYeBWs8AGL29P6pJnHTVKAF8UGAby6xTND2ABPKNgVED
+	AOj44YWy7naeuHasGmrTDOFaMXE/8Txy4Eo3Krw9/b2ZNN1pdjjL+l+L00m6aQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1756048097;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3ik/NRqYHSG8hmITK6G3KaWPdzyg/qMeKl48YWWYUqc=;
+	b=cB54om5a1WjZnAiZL0WpPY1A+vjsjucby/u6/KzywEDaNIPuqTKO2+T5qzphZpMpszCuEW
+	b3lofR6L1VonsTDQ==
+To: Christophe Leroy <christophe.leroy@csgroup.eu>, Michael Ellerman
+ <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, Madhavan
+ Srinivasan <maddy@linux.ibm.com>, Alexander Viro
+ <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, Jan
+ Kara <jack@suse.cz>, Ingo Molnar <mingo@redhat.com>, Peter Zijlstra
+ <peterz@infradead.org>, Darren Hart <dvhart@infradead.org>, Davidlohr
+ Bueso <dave@stgolabs.net>, Andre Almeida <andrealmeid@igalia.com>, Andrew
+ Morton <akpm@linux-foundation.org>, David Laight
+ <david.laight.linux@gmail.com>, Dave Hansen <dave.hansen@linux.intel.com>,
+ Linus Torvalds <torvalds@linux-foundation.org>, Daniel Borkmann
+ <daniel@iogearbox.net>
+Cc: Christophe Leroy <christophe.leroy@csgroup.eu>,
+ linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+ linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+ linux-block@vger.kernel.org
+Subject: Re: [PATCH v2 03/10] uaccess: Add
+ masked_user_{read/write}_access_begin
+In-Reply-To: <7b570e237f7099d564d7b1a270169428ac1f3099.1755854833.git.christophe.leroy@csgroup.eu>
+References: <cover.1755854833.git.christophe.leroy@csgroup.eu>
+ <7b570e237f7099d564d7b1a270169428ac1f3099.1755854833.git.christophe.leroy@csgroup.eu>
+Date: Sun, 24 Aug 2025 17:08:15 +0200
+Message-ID: <87h5xw3ggw.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Yi Zhang <yi.zhang@redhat.com>
-Date: Sun, 24 Aug 2025 22:05:53 +0800
-X-Gm-Features: Ac12FXwJKHU4HhdZzVJoJaIa8x9yQt-vgM85kSPyNzo4C76lvKEdpbyhSx1Xv2w
-Message-ID: <CAHj4cs8+9S7_4H03_dcNS-wMrT_9iUpSWPF+ic5gRHmfC4dx+Q@mail.gmail.com>
-Subject: [bug report][regression] blktests loop/004 failed
-To: linux-block <linux-block@vger.kernel.org>
-Cc: rajeevm@hpe.com, Ming Lei <ming.lei@redhat.com>, 
-	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 
-Hi
+On Fri, Aug 22 2025 at 11:57, Christophe Leroy wrote:
 
-I found the blktests loop/004[1] failed on the latest
-linux-block/for-next, and it was introduced from the commit[2] from my
-testing,
-please help check it and let me know if you need any info/testing, thanks.
+> Allthough masked_user_access_begin() is to only be used when reading
+> data from user at the moment, introduce masked_user_read_access_begin()
+> and masked_user_write_access_begin() in order to match
+> user_read_access_begin() and user_write_access_begin().
+>
+> That means masked_user_read_access_begin() is used when user memory is
+> exclusively read during the window, masked_user_write_access_begin()
+> is used when user memory is exclusively writen during the window,
+> masked_user_access_begin() remains and is used when both reads and
+> writes are performed during the open window. Each of them is expected
+> to be terminated by the matching user_read_access_end(),
+> user_write_access_end() and user_access_end().
+>
+> Have them default to masked_user_access_begin() when they are
+> not defined.
 
-[1]
-# ./check loop/004
-loop/004 (combine loop direct I/O mode and a custom block size) [failed]
-    runtime  2.770s  ...  5.375s
-    --- tests/loop/004.out 2025-08-24 01:41:06.768628600 -0400
-    +++ /root/blktests/results/nodev/loop/004.out.bad 2025-08-24
-10:01:44.489825116 -0400
-    @@ -1,4 +1,5 @@
-     Running loop/004
-     1
-    -769bd186841c10e5b1106b55986206c0e87fc05a7f565fdee01b5abcaff6ae78  -
-    +pwrite: No space left on device
-    +e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  -
-     Test complete
-[2]
-47b71abd5846 loop: use vfs_getattr_nosec for accurate file size
-[3] dmesg
-[  279.880860] run blktests loop/004 at 2025-08-24 10:01:38
-[  280.249598] scsi_debug:sdebug_driver_probe: scsi_debug: trim
-poll_queues to 0. poll_q/nr_hw = (0/1)
-[  280.259112] scsi host10: scsi_debug: version 0191 [20210520]
-                 dev_size_mb=8, opts=0x0, submit_queues=1, statistics=0
-[  280.289850] scsi 10:0:0:0: Direct-Access     Linux    scsi_debug
-   0191 PQ: 0 ANSI: 7
-[  280.302147] scsi 10:0:0:0: Power-on or device reset occurred
-[  280.336792] sd 10:0:0:0: Attached scsi generic sg5 type 0
-[  280.342300] sd 10:0:0:0: [sdf] 2048 4096-byte logical blocks: (8.39
-MB/8.00 MiB)
-[  280.343809] sd 10:0:0:0: [sdf] Write Protect is off
-[  280.343925] sd 10:0:0:0: [sdf] Mode Sense: 73 00 10 08
-[  280.347889] sd 10:0:0:0: [sdf] Write cache: enabled, read cache:
-enabled, supports DPO and FUA
-[  280.355174] sd 10:0:0:0: [sdf] permanent stream count = 5
-[  280.359355] sd 10:0:0:0: [sdf] Preferred minimum I/O size 4096 bytes
-[  280.359503] sd 10:0:0:0: [sdf] Optimal transfer size 4194304 bytes
-[  280.506461] sd 10:0:0:0: [sdf] Attached SCSI disk
-[  285.158954] sd 10:0:0:0: [sdf] Synchronizing SCSI cache
+Have you seen:
 
--- 
-Best Regards,
-  Yi Zhang
+    https://lore.kernel.org/all/20250813151939.601040635@linutronix.de
 
