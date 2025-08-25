@@ -1,169 +1,228 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12DF52EFD9E
-	for <linux-block@vger.kernel.org>; Mon, 25 Aug 2025 12:07:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97BDD26E71C
+	for <linux-block@vger.kernel.org>; Mon, 25 Aug 2025 12:49:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756123648; cv=none; b=a5jN2JcHjh2ikbuIa8e++jf9H5Zy4qu2F4iPoBNNbQYwGeu8jCtvZ85/zpzPaozxvJDkEiA/Ax5R425i2ZiTMHZvzoQNY2dOSLTqheAWuTNpEh4P3I6IDEEHLewwOMfyadZFKyZP8yj9b7dhnIIgHlFnSOrVapG4KpWRwgjKYpU=
+	t=1756126151; cv=none; b=MHhwtpMk1x20rOrdjiVDLAoMp7/0nkpQbM8P42b5mtNdV2HxlSArVVmkKwopE++j8xbF9G5I+tHgyihL10HmSdxoui9F2M6Ys25F24pGAHNWtLzjsAIyURQQpZBfYznKonyKLy/akzeMGBwMZbXCC+3KFOSfFj2aZ+h1f2nOrYc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756123648; c=relaxed/simple;
-	bh=MWkWojGEIs+5EgCLVlLnBOjxSlqnFs4gPeEtmO3HGug=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ujJPQ/utKea1a/GBJJnx8+TRJ5f4eeuCMj35B+EcKD0AAodrK90g+DIxnWwQAeLNIHqrZHtM05/E0Fb8fdLmOVnUu6L+khGGIlIc96v/n3Qx2VC38cfjE66zFpqQtc87utYCx+K/wY9ZXWLCmc/ABDnUfzYhqxyRFlpoAzApNoM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=t1ZmTaIM; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=83HSOpmW; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=t1ZmTaIM; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=83HSOpmW; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	s=arc-20240116; t=1756126151; c=relaxed/simple;
+	bh=6cNcbP56c/g7M8BxOsHD8BbN0veJqHfg488YKTeo7ho=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=XhdUh2EOz5jpHMTWKEIM4YbtvQnxlU58syg8FNjj65cWVQfDv2Os8vSf6X14lXFnGiG0IZaG+eSPG2d+MGskkAKGbAC3A/SFO7nEkLOxrSnW23y4hn6atBFNuXS4OIZKkgk536GkYc3bfmXKohbSJmqh20PpVLBwSPndjxotykc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QJiAkX9r; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="t1ZmTaIM";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="83HSOpmW";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="t1ZmTaIM";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="83HSOpmW"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QJiAkX9r"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1756126148;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=aQg/tkYr0BiNa0lDbaGrLKBLewCMW3vBJJE79xb8SKQ=;
+	b=QJiAkX9rL2PAnK1AFIFsJ+Xc0It3PcUzDhVyqIRjzEK1ob7rq2Vk0SMQpYvEzeYWzgWEPR
+	p01yZfKxOM+c3q/ys2aTN5F4UeuK2GlvmduhhdQNzV/XywWECfmQJgyqRBxUGgDIyU9wXl
+	9jaSoX2RKz6jOrPL2IdloJ4QeIM2KBQ=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-231-ctF7H7ekMBaehkEVVyLMOg-1; Mon,
+ 25 Aug 2025 08:49:05 -0400
+X-MC-Unique: ctF7H7ekMBaehkEVVyLMOg-1
+X-Mimecast-MFC-AGG-ID: ctF7H7ekMBaehkEVVyLMOg_1756126144
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id F26CE2125B;
-	Mon, 25 Aug 2025 12:07:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1756123644; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5esCATGxFy1rPdQ5wxmc7jMFTL/ZNi1qRrQlBSRFzPk=;
-	b=t1ZmTaIM0+z6zSJxxyOEwYyPqpiki++QwLvf6SbdhQDAXsJzbiPx6tgrlLwtDXBYKzjUz6
-	XmNeoO6v4iiBYcICYhf9+vPppYOsxvqC0O4Z72aLVDKRmHnsaowAsXrRZ/ZkawLyUHVbbD
-	GD4rB/NSxgCYXEY0yC3iDkhx6piJlwo=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1756123644;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5esCATGxFy1rPdQ5wxmc7jMFTL/ZNi1qRrQlBSRFzPk=;
-	b=83HSOpmWO0E4yGKjz/4xp57phgsCaOgr6D95jxGWvKcSI3kfxKy5OpEcOUKKfaG93/AcKo
-	9/pSeIvPZeujdIDA==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=t1ZmTaIM;
-	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=83HSOpmW
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1756123644; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5esCATGxFy1rPdQ5wxmc7jMFTL/ZNi1qRrQlBSRFzPk=;
-	b=t1ZmTaIM0+z6zSJxxyOEwYyPqpiki++QwLvf6SbdhQDAXsJzbiPx6tgrlLwtDXBYKzjUz6
-	XmNeoO6v4iiBYcICYhf9+vPppYOsxvqC0O4Z72aLVDKRmHnsaowAsXrRZ/ZkawLyUHVbbD
-	GD4rB/NSxgCYXEY0yC3iDkhx6piJlwo=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1756123644;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5esCATGxFy1rPdQ5wxmc7jMFTL/ZNi1qRrQlBSRFzPk=;
-	b=83HSOpmWO0E4yGKjz/4xp57phgsCaOgr6D95jxGWvKcSI3kfxKy5OpEcOUKKfaG93/AcKo
-	9/pSeIvPZeujdIDA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id DC8EC1368F;
-	Mon, 25 Aug 2025 12:07:23 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id cU+HNftRrGjtDQAAD6G6ig
-	(envelope-from <jack@suse.cz>); Mon, 25 Aug 2025 12:07:23 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id 707ACA0951; Mon, 25 Aug 2025 14:07:15 +0200 (CEST)
-Date: Mon, 25 Aug 2025 14:07:15 +0200
-From: Jan Kara <jack@suse.cz>
-To: Ritesh Harjani <ritesh.list@gmail.com>
-Cc: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, linux-ext4@vger.kernel.org, 
-	snitzer@kernel.org, axboe@kernel.dk, dw@davidwei.uk, brauner@kernel.org, hch@lst.de, 
-	martin.petersen@oracle.com, djwong@kernel.org, linux-xfs@vger.kernel.org, 
-	viro@zeniv.linux.org.uk, Keith Busch <kbusch@kernel.org>, Jan Kara <jack@suse.com>
-Subject: Re: [PATCHv3 0/8] direct-io: even more flexible io vectors
-Message-ID: <g35u5ugmyldqao7evqfeb3hfcbn3xddvpssawttqzljpigy7u4@k3hehh3grecq>
-References: <20250819164922.640964-1-kbusch@meta.com>
- <87a53ra3mb.fsf@gmail.com>
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9CAF9180AC40;
+	Mon, 25 Aug 2025 12:48:57 +0000 (UTC)
+Received: from localhost (unknown [10.72.116.18])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 86700180047F;
+	Mon, 25 Aug 2025 12:48:55 +0000 (UTC)
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: Uday Shankar <ushankar@purestorage.com>,
+	Keith Busch <kbusch@kernel.org>,
+	Caleb Sander Mateos <csander@purestorage.com>,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V2 1/2] ublk: avoid ublk_io_release() called after ublk char dev is closed
+Date: Mon, 25 Aug 2025 20:48:24 +0800
+Message-ID: <20250825124827.2391820-2-ming.lei@redhat.com>
+In-Reply-To: <20250825124827.2391820-1-ming.lei@redhat.com>
+References: <20250825124827.2391820-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87a53ra3mb.fsf@gmail.com>
-X-Spam-Level: 
-X-Spam-Flag: NO
-X-Rspamd-Queue-Id: F26CE2125B
-X-Rspamd-Action: no action
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Spamd-Result: default: False [-2.51 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	RCVD_COUNT_THREE(0.00)[3];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	TO_DN_SOME(0.00)[];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[];
-	DKIM_TRACE(0.00)[suse.cz:+];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,suse.cz:dkim]
-X-Spam-Score: -2.51
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On Fri 22-08-25 18:57:08, Ritesh Harjani wrote:
-> Keith Busch <kbusch@meta.com> writes:
-> 
-> > From: Keith Busch <kbusch@kernel.org>
-> >
-> > Previous version:
-> >
-> >   https://lore.kernel.org/linux-block/20250805141123.332298-1-kbusch@meta.com/
-> >
-> > This series removes the direct io requirement that io vector lengths
-> > align to the logical block size.
-> >
-> > I tested this on a few raw block device types including nvme,
-> > virtio-blk, ahci, and loop. NVMe is the only one I tested with 4k
-> > logical sectors; everything else was 512.
-> >
-> > On each of those, I tested several iomap filesystems: xfs, ext4, and
-> > btrfs. I found it interesting that each behave a little
-> > differently with handling invalid vector alignments:
-> >
-> >   - XFS is the most straight forward and reports failures on invalid
-> >     vector conditions, same as raw blocks devices.
-> >
-> >   - EXT4 falls back to buffered io for writes but not for reads.
-> 
-> ++linux-ext4 to get any historical context behind why the difference of
-> behaviour in reads v/s writes for EXT4 DIO. 
+When running test_stress_04.sh, the following warning is triggered:
 
-Hum, how did you test? Because in the basic testing I did (with vanilla
-kernel) I get EINVAL when doing unaligned DIO write in ext4... We should be
-falling back to buffered IO only if the underlying file itself does not
-support any kind of direct IO.
+WARNING: CPU: 1 PID: 135 at drivers/block/ublk_drv.c:1933 ublk_ch_release+0x423/0x4b0 [ublk_drv]
 
-								Honza
+This happens when the daemon is abruptly killed:
+
+- some references may still be held, because registering IO buffer
+doesn't grab ublk char device reference
+
+OR
+
+- io->task_registered_buffers won't be cleared because io buffer is
+released from non-daemon context
+
+For zero-copy and auto buffer register modes, I/O reference crosses
+syscalls, so IO reference may not be dropped naturally when ublk server is
+killed abruptly. However, when releasing io_uring context, it is guaranteed
+that the reference is dropped finally, see io_sqe_buffers_unregister() from
+io_ring_ctx_free().
+
+Fix this by adding ublk_drain_io_references() that:
+- Waits for active I/O references dropped in async way by scheduling
+  work function, for avoiding ublk dev and io_uring file's release
+  dependency
+- Reinitializes io->ref and io->task_registered_buffers to clean state
+
+This ensures the reference count state is clean when ublk_queue_reinit()
+is called, preventing the warning and potential use-after-free.
+
+Fixes: 1f6540e2aabb ("ublk: zc register/unregister bvec")
+Fixes: 1ceeedb59749 ("ublk: optimize UBLK_IO_UNREGISTER_IO_BUF on daemon task")
+Fixes: 8a8fe42d765b ("ublk: optimize UBLK_IO_REGISTER_IO_BUF on daemon task")
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ drivers/block/ublk_drv.c | 94 +++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 92 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index 99abd67b708b..f608c7efdc05 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -239,6 +239,7 @@ struct ublk_device {
+ 	struct mutex cancel_mutex;
+ 	bool canceling;
+ 	pid_t 	ublksrv_tgid;
++	struct delayed_work	exit_work;
+ };
+ 
+ /* header of ublk_params */
+@@ -1595,12 +1596,84 @@ static void ublk_set_canceling(struct ublk_device *ub, bool canceling)
+ 		ublk_get_queue(ub, i)->canceling = canceling;
+ }
+ 
+-static int ublk_ch_release(struct inode *inode, struct file *filp)
++static void ublk_reset_io_ref(struct ublk_device *ub)
+ {
+-	struct ublk_device *ub = filp->private_data;
++	int i, j;
++
++	if (!(ub->dev_info.flags & (UBLK_F_SUPPORT_ZERO_COPY |
++					UBLK_F_AUTO_BUF_REG)))
++		return;
++
++	for (i = 0; i < ub->dev_info.nr_hw_queues; i++) {
++		struct ublk_queue *ubq = ublk_get_queue(ub, i);
++
++		for (j = 0; j < ubq->q_depth; j++) {
++			struct ublk_io *io = &ubq->ios[j];
++			/*
++			 * Reinitialize reference counting fields after
++			 * draining. This ensures clean state for queue
++			 * reinitialization.
++			 */
++			refcount_set(&io->ref, 0);
++			io->task_registered_buffers = 0;
++		}
++	}
++}
++
++static bool ublk_has_io_with_active_ref(struct ublk_device *ub)
++{
++	int i, j;
++
++	if (!(ub->dev_info.flags & (UBLK_F_SUPPORT_ZERO_COPY |
++					UBLK_F_AUTO_BUF_REG)))
++		return false;
++
++	for (i = 0; i < ub->dev_info.nr_hw_queues; i++) {
++		struct ublk_queue *ubq = ublk_get_queue(ub, i);
++
++		for (j = 0; j < ubq->q_depth; j++) {
++			struct ublk_io *io = &ubq->ios[j];
++			unsigned int refs = refcount_read(&io->ref) +
++				io->task_registered_buffers;
++
++			/*
++			 * UBLK_REFCOUNT_INIT or zero means no active
++			 * reference
++			 */
++			if (refs != UBLK_REFCOUNT_INIT && refs != 0)
++				return true;
++		}
++	}
++	return false;
++}
++
++static void ublk_ch_release_work_fn(struct work_struct *work)
++{
++	struct ublk_device *ub =
++		container_of(work, struct ublk_device, exit_work.work);
+ 	struct gendisk *disk;
+ 	int i;
+ 
++	/*
++	 * For zero-copy and auto buffer register modes, I/O references
++	 * might not be dropped naturally when the daemon is killed, but
++	 * io_uring guarantees that registered bvec kernel buffers are
++	 * unregistered finally when freeing io_uring context, then the
++	 * active references are dropped.
++	 *
++	 * Wait until active references are dropped for avoiding use-after-free
++	 *
++	 * registered buffer may be unregistered in io_ring's release hander,
++	 * so have to wait by scheduling work function for avoiding the two
++	 * file release dependency.
++	 */
++	if (ublk_has_io_with_active_ref(ub)) {
++		schedule_delayed_work(&ub->exit_work, 1);
++		return;
++	}
++
++	ublk_reset_io_ref(ub);
++
+ 	/*
+ 	 * disk isn't attached yet, either device isn't live, or it has
+ 	 * been removed already, so we needn't to do anything
+@@ -1673,6 +1746,23 @@ static int ublk_ch_release(struct inode *inode, struct file *filp)
+ 	ublk_reset_ch_dev(ub);
+ out:
+ 	clear_bit(UB_STATE_OPEN, &ub->state);
++
++	/* put the reference grabbed in ublk_ch_release() */
++	ublk_put_device(ub);
++}
++
++static int ublk_ch_release(struct inode *inode, struct file *filp)
++{
++	struct ublk_device *ub = filp->private_data;
++
++	/*
++	 * Grab ublk device reference, so it won't be gone until we are
++	 * really released from work function.
++	 */
++	ub = ublk_get_device(ub);
++
++	INIT_DELAYED_WORK(&ub->exit_work, ublk_ch_release_work_fn);
++	schedule_delayed_work(&ub->exit_work, 0);
+ 	return 0;
+ }
+ 
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+2.47.0
+
