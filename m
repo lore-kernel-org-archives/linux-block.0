@@ -1,124 +1,122 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73DEC211F
-	for <linux-block@vger.kernel.org>; Mon, 25 Aug 2025 00:42:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E0C31F418D
+	for <linux-block@vger.kernel.org>; Mon, 25 Aug 2025 01:51:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756082535; cv=none; b=gObV06j7T/UP4PisGR47RqR4vznc3AD0X/5W+KLvqMun5uzg/nkTqLnH5BeYONKOLX20MkGO+OdAPCSh6c1rgmuaaEr0ZYGbmEmYyuPglzu5UNS/8zV7Tx9IeF4W8wNRiJJzox3aJ+8XoIvMuFgSeLNu1xlsYZtHxES0ROFI2/U=
+	t=1756086674; cv=none; b=WvUJHCiAlYRr6yh4CCHW6TDzGVfQGCtYENF3xHVZpBY6MuyjOg9mmy1ETSqXut0ZArVJw6kO6/UYkbkCcYAZ5gQin6HInMbuyh9nHPL0Ott5NRw8LHlDgGDAYDdLKN8DjY421Klu7iwnQ2EPQvDYC4ltU05RAksN5GDtWNwH0cM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756082535; c=relaxed/simple;
-	bh=RM1RcV3i+3kNrRpVNWATLOe1VYDX6UVr2Rj8aKUJO5k=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=qvGHC60Uzo43Ny7VskbVRwWaWJs4bv9Zh7bn5Kp9HSLzqu56rDsTE9/phuuR6i4RqZ2/SxBOS9Egg4Eiy30MrvwEodvS/81ga9PLDwyh6bdFvEFilODgQsgESLYhDBNp9EI60wmkjZaLwsfBRr49EskB0G0IPe5V+YfMpeGnX6Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4c9Bnl1RkVzYQvdv
-	for <linux-block@vger.kernel.org>; Mon, 25 Aug 2025 08:42:03 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id BCCA31A1ABC
-	for <linux-block@vger.kernel.org>; Mon, 25 Aug 2025 08:42:01 +0800 (CST)
-Received: from [10.174.179.143] (unknown [10.174.179.143])
-	by APP4 (Coremail) with SMTP id gCh0CgDXIY5WsatoSQnGAA--.52001S3;
-	Mon, 25 Aug 2025 08:41:59 +0800 (CST)
-Subject: Re: [bug report][regression] blktests loop/004 failed
-To: Yi Zhang <yi.zhang@redhat.com>, linux-block <linux-block@vger.kernel.org>
-Cc: rajeevm@hpe.com, Ming Lei <ming.lei@redhat.com>,
- Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
- "yukuai (C)" <yukuai3@huawei.com>
-References: <CAHj4cs8+9S7_4H03_dcNS-wMrT_9iUpSWPF+ic5gRHmfC4dx+Q@mail.gmail.com>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <68e71471-46cb-2b77-c9cf-e1710c4ce762@huaweicloud.com>
-Date: Mon, 25 Aug 2025 08:41:57 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.1
+	s=arc-20240116; t=1756086674; c=relaxed/simple;
+	bh=Rp1cVCftBz23Fa+VORXeNRa2txptyXNKS3pufTJ/PXU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=IZuJteVYMiE7HWUhNYeaiIcloZUCMDe5ntdOi6c7N3OH873vJ7iERDIXVKcdkQM8t3kHWEhtoDMQU5nYehhKbDdHj/gpiRr167f2W5dFBaTX6P2NKcM6oUW/ppTifDGwkrqPPwpr7lc9TKRxbszBJOpeoybv7ExP3bbOKzcqjxw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ia3lIwJ1; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ia3lIwJ1"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1756086671;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Rp1cVCftBz23Fa+VORXeNRa2txptyXNKS3pufTJ/PXU=;
+	b=Ia3lIwJ17sLA+T6g+pfneGx7PUJVT6459PWLj62zv8gibbHq48VC8ysx2Ws37PsaaQZjF8
+	RX+O5Ze8OfGHmsDLfC935YVBDlA8Xtzf2EqbaW6Kn7bkOtEj0UzKTjEEN+zuUjF3OwUoCM
+	o5nQ+VBSnHZNtB8piWX4Jw6ciKLS2zw=
+Received: from mail-vs1-f72.google.com (mail-vs1-f72.google.com
+ [209.85.217.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-149-MxAE3zAJMjuc2zfN51XjcQ-1; Sun, 24 Aug 2025 21:51:10 -0400
+X-MC-Unique: MxAE3zAJMjuc2zfN51XjcQ-1
+X-Mimecast-MFC-AGG-ID: MxAE3zAJMjuc2zfN51XjcQ_1756086669
+Received: by mail-vs1-f72.google.com with SMTP id ada2fe7eead31-5221dd7ec20so782057137.3
+        for <linux-block@vger.kernel.org>; Sun, 24 Aug 2025 18:51:09 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756086669; x=1756691469;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Rp1cVCftBz23Fa+VORXeNRa2txptyXNKS3pufTJ/PXU=;
+        b=SOPyOtv42uQPyfCkYFsRQXmjhKLj2bAG/ZB7vHLfSNtCoMReF77zH8U1PKH7WsAjc2
+         cYXLG7yTtTcZdTHJPMrOfnLAxO8DI66sQhivYDVzF8aAf/qA8BeW2ZbOAqIWNHsFFWJ3
+         19VC8uv5i0naNPkWsZQiUjaQJn2hK5z+k0E0qLclrMwYB8Z6yzTgOh6u1odTdFTZjE98
+         e2c2rOVJ5NibmuThX9vkYjmdYcOisyRw412brLB3Q0p3J3E8NAdG4bjwz4oq2gX3VsP2
+         U163OEGPfVu9ggVz9VX/KH2CSoEebgCc+5zNNuBdQM0+X4t4I2e8bIVqyWyiw+C9/JqN
+         r0pw==
+X-Forwarded-Encrypted: i=1; AJvYcCWDN5ihp0mSBfZvQJPzkiOZJqy1zjxnJmscXRgRd2NT8tgcEsH+hq6A9zm+HAa6xeCOkFBJCB4IQumb+A==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy+8hsJ+XDtrS9mrWhQg9XSltxxQ21PL0zMuKdMMyRtCrHwwLNe
+	/maXsJPjLW/g0OUJIpMm3WVs+2qAXm03au/NHD3aDpzZvnK9968hsjIBe04JAP3kvlwqRmBvwuY
+	yqutxnsj5NJXklrpIFdE0MkbGjFj8CpG4Q3k1286187j3mbzuO0nBnbkwEATgHsBqftfULVl4LD
+	FaEDMeNqPnGg8/F8Att8TCaXaJAUa3cIOB4YKm5Qo=
+X-Gm-Gg: ASbGncuXFbg6iKkLprifoaSJSHYM74Gspe8gnrDw3LBu7M9c+UK0+0GwGRoLv06CDLV
+	tc88lmKs0JAv1kD/kj63hlfjXcoDuU0GAtKpcq5/YCSbpIhu34/dO+Aeb9GybZ4WF3rU1V6b18R
+	U75oT8vud/YCuqda+a3VRbjA==
+X-Received: by 2002:a05:6102:c02:b0:4e9:963f:2d09 with SMTP id ada2fe7eead31-51d0ceff3dfmr3343105137.10.1756086669481;
+        Sun, 24 Aug 2025 18:51:09 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEpV3OsnfsviLzxRZzowyoLGU7Mreux18ZgJ0TDnpJfNT5ZkNcCfzx585W0QjCd7rSpnNuv5UH1iIZvXAWtMic=
+X-Received: by 2002:a05:6102:c02:b0:4e9:963f:2d09 with SMTP id
+ ada2fe7eead31-51d0ceff3dfmr3343099137.10.1756086669214; Sun, 24 Aug 2025
+ 18:51:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAHj4cs8+9S7_4H03_dcNS-wMrT_9iUpSWPF+ic5gRHmfC4dx+Q@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgDXIY5WsatoSQnGAA--.52001S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7Cw13ZFWkXrW7WrWrury3urg_yoW8Kry7pr
-	W7Xa1Ikr1rZr17CF1Ika98JFy8ZrZ8JFWUJw1fG34kJr12y3s3Ar93G3y8AFZ7A39xXF1U
-	uFnrCFyUAr4kJrJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUkEb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AF
-	wI0_JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
-	xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1D
-	MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
-	0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWU
-	JVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07UK2N
-	tUUUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+References: <20250823025443.2064668-1-ming.lei@redhat.com>
+In-Reply-To: <20250823025443.2064668-1-ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+Date: Mon, 25 Aug 2025 09:50:58 +0800
+X-Gm-Features: Ac12FXxEjY3o2RMA1BrwoKLpNXI8Tb0XMnfB_BJBWXUPgHMPo2-JC6LVWVyrfok
+Message-ID: <CAFj5m9K7FepEmqg=26jZK6UtJkjpK+ehijxgj-JSdg1wk0h7XQ@mail.gmail.com>
+Subject: Re: [PATCH] ublk: avoid ublk_io_release() called after ublk char dev
+ is closed
+To: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Cc: Uday Shankar <ushankar@purestorage.com>, Keith Busch <kbusch@kernel.org>, 
+	Caleb Sander Mateos <csander@purestorage.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi,
+On Sat, Aug 23, 2025 at 10:55=E2=80=AFAM Ming Lei <ming.lei@redhat.com> wro=
+te:
+>
+> When running test_stress_04.sh, the following warning is triggered:
+>
+> WARNING: CPU: 1 PID: 135 at drivers/block/ublk_drv.c:1933 ublk_ch_release=
++0x423/0x4b0 [ublk_drv]
+>
+> This happens when the daemon is abruptly killed:
+>
+> - some references may still be held, because registering IO buffer
+> doesn't grab ublk char device reference
+>
+> OR
+>
+> - io->task_registered_buffers won't be cleared because io buffer is
+> released from non-daemon context
+>
+> For zero-copy and auto buffer register modes, I/O reference crosses
+> syscalls, so IO reference may not be dropped naturally when ublk server i=
+s
+> killed abruptly. However, when releasing io_uring context, it is guarante=
+ed
+> that the reference is dropped finally, see io_sqe_buffers_unregister() fr=
+om
+> io_ring_ctx_free().
+>
+> Fix this by adding ublk_drain_io_references() that:
+> - Waits for active I/O references dropped
+> - Reinitializes io->ref and io->task_registered_buffers to clean state
+>
+> This way won't hang because releasing ublk char device doesn't depend on
+> unregistering sqe buffers in do_exit().
 
-在 2025/08/24 22:05, Yi Zhang 写道:
-> Hi
-> 
-> I found the blktests loop/004[1] failed on the latest
-> linux-block/for-next, and it was introduced from the commit[2] from my
-> testing,
-> please help check it and let me know if you need any info/testing, thanks.
-> 
-> [1]
-> # ./check loop/004
-> loop/004 (combine loop direct I/O mode and a custom block size) [failed]
->      runtime  2.770s  ...  5.375s
->      --- tests/loop/004.out 2025-08-24 01:41:06.768628600 -0400
->      +++ /root/blktests/results/nodev/loop/004.out.bad 2025-08-24
-> 10:01:44.489825116 -0400
->      @@ -1,4 +1,5 @@
->       Running loop/004
->       1
->      -769bd186841c10e5b1106b55986206c0e87fc05a7f565fdee01b5abcaff6ae78  -
->      +pwrite: No space left on device
->      +e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  -
->       Test complete
-
-This looks like the same as:
-
-https://lore.kernel.org/all/79ab5533-82d1-4f06-461b-689e94f738ec@huaweicloud.com/
-
-However, I'm not sure if people will agree to change file size for block
-inode returned by syscall from 0 to disk size. I'll send a patch later
-today.
+Actually io_uring file close may rely on ublk char dev close, so still has =
+hang
+risk, will send V2 for addressing it.
 
 Thanks,
-Kuai
-> [2]
-> 47b71abd5846 loop: use vfs_getattr_nosec for accurate file size
-> [3] dmesg
-> [  279.880860] run blktests loop/004 at 2025-08-24 10:01:38
-> [  280.249598] scsi_debug:sdebug_driver_probe: scsi_debug: trim
-> poll_queues to 0. poll_q/nr_hw = (0/1)
-> [  280.259112] scsi host10: scsi_debug: version 0191 [20210520]
->                   dev_size_mb=8, opts=0x0, submit_queues=1, statistics=0
-> [  280.289850] scsi 10:0:0:0: Direct-Access     Linux    scsi_debug
->     0191 PQ: 0 ANSI: 7
-> [  280.302147] scsi 10:0:0:0: Power-on or device reset occurred
-> [  280.336792] sd 10:0:0:0: Attached scsi generic sg5 type 0
-> [  280.342300] sd 10:0:0:0: [sdf] 2048 4096-byte logical blocks: (8.39
-> MB/8.00 MiB)
-> [  280.343809] sd 10:0:0:0: [sdf] Write Protect is off
-> [  280.343925] sd 10:0:0:0: [sdf] Mode Sense: 73 00 10 08
-> [  280.347889] sd 10:0:0:0: [sdf] Write cache: enabled, read cache:
-> enabled, supports DPO and FUA
-> [  280.355174] sd 10:0:0:0: [sdf] permanent stream count = 5
-> [  280.359355] sd 10:0:0:0: [sdf] Preferred minimum I/O size 4096 bytes
-> [  280.359503] sd 10:0:0:0: [sdf] Optimal transfer size 4194304 bytes
-> [  280.506461] sd 10:0:0:0: [sdf] Attached SCSI disk
-> [  285.158954] sd 10:0:0:0: [sdf] Synchronizing SCSI cache
-> 
 
