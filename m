@@ -1,102 +1,95 @@
-Received: from mail-io1-f45.google.com (mail-io1-f45.google.com [209.85.166.45])
+Received: from mail-il1-f176.google.com (mail-il1-f176.google.com [209.85.166.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53F431DFCE
-	for <linux-block@vger.kernel.org>; Mon, 25 Aug 2025 13:47:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0891F2F0694
+	for <linux-block@vger.kernel.org>; Mon, 25 Aug 2025 13:48:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756129677; cv=none; b=RhsFST2uuRnNDVVT5fbZ+H1zLwXR40ur9ctU7yzyrr2OiLPP51Njq/2AGrFV10s3p9osojXgkiFR2fG+gfwO5zBnRYRLChrEsKtXNooKOZjz+e+fztLc5Iq9AxrVj8nIR4iYmc/VvHYWvJeZ26wPsGxd9jiDmpWXl4RFlGxn40s=
+	t=1756129714; cv=none; b=YogAld93p40/jKcp6QzG+sTkzbr5cvwfxQIpdtmGprrxr1X+XIlRn4VY07t1sW6cL0tkHAJBBXhuN8S2Lkq8kvM8lDBIAYMT8O8SADOzrLX85ffcoPFLpOMu9xwQmuxTCohu+unbGgChb8rIvkVAWQxSwnlViQQUcyuifbnpfWU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756129677; c=relaxed/simple;
-	bh=0g4nfZL06xXfcqQP2ZXeFhZtwkwQeXk3VS6zc+kDK/g=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=Sw3fexjYKZ4RXJejabtaAYTvU243jOBZ0nAS1hXrmYEd1Jv4CZo+nnek+GePivtAM2/DuRu0oQjJfK2jRRiSPiVcTKbc9wbqlZb7nP56GTMvyPvN5UJjAcm6hT6XUiDIPWvwFqySv8dARw5j5ZRwNprrwBeh79Zsb6nS7Asq6Yg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=hfgmdoRS; arc=none smtp.client-ip=209.85.166.45
+	s=arc-20240116; t=1756129714; c=relaxed/simple;
+	bh=UkvCHo8AnnsdKPECOAK1tt2CPjzxfbeJy7x/xGsMYQU=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=m1JtXGXfqc6oUbFBO2TQWR3oxRCebfvVFAN5rPEsA0LqeBoZ2lklV7mDAaSohbxFSnIdyvr4lU5uQPTE+GuT+do0pqxNZAUEqjS/7Djlv4qkS1T0JhDEdWEK7cwpq7WgHl+MM8QL6GXr83qDiDZz3Wkh38s6RZBEDx/bax2vG9k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=ZVGIaNdg; arc=none smtp.client-ip=209.85.166.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="hfgmdoRS"
-Received: by mail-io1-f45.google.com with SMTP id ca18e2360f4ac-88432dc61d8so431232139f.1
-        for <linux-block@vger.kernel.org>; Mon, 25 Aug 2025 06:47:55 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="ZVGIaNdg"
+Received: by mail-il1-f176.google.com with SMTP id e9e14a558f8ab-3ec3b5f05e8so7007155ab.0
+        for <linux-block@vger.kernel.org>; Mon, 25 Aug 2025 06:48:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1756129674; x=1756734474; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yaJhzYO4iaGPetQog50EhntUWyYduBz9Frmzzr2P5Qo=;
-        b=hfgmdoRSzKpjCpiNql9Lwq6XbXmLMRNwntE8BJy0O0SAFu1eDcv1fjKMmAN/zDohPH
-         JG2mu8IaEnJtxXD908Qr6Htuv3a5M0yGo+LJTMJUREKu3VVu/jfj+5glnFhOKf9ml9MT
-         ZKQb/ZCvZH5SWMC849Kjqb3bu0WlParJWMz3NZU0hq2qzjlpT6rzSKPSjoll+u51mK9P
-         Xh75TZC0vIKPWvyvB74lhX8PVCbOXkNILwMBzygXrLOM14kxwbYOeIusIqZhuXcVNVLH
-         EpkXE+emkjI9G1xKi0QOhsePy8AqN/IH9y5LU0CmcoePPCBzPV85nB0kpLVi//JwcvR9
-         1mxQ==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1756129712; x=1756734512; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:from:user-agent:mime-version:date:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=OFQ/rLR1VcRI8EdNfUQIRb/FRTu4u4BQ9Glpx9EACls=;
+        b=ZVGIaNdgWwm0gw/vPo3OH/G3AdLndad6qDUGhKvw6gBsm9H+YxhmGpGeiHTRw05cyX
+         vZZgjLdT1EibDjm23IK7XH2exB+vpEsEH+2hstJbkeKtg0Bfj03yz+n+9Bg3w2dpUH+j
+         MzealrXWYbZL2rz0ctwreJBjDgHoGgUt0/NBxg7LmbCyI4BawBqPyuUStj8Qa62f3L9P
+         seFww4qmLovjy0F0hZzuRZp90TID/28gfXIZoPrv9dXtGYj+RwFkqCGA9Mv+qyuxvszv
+         DhsqVngIfSxnhau0DEHP2dlzzx9DRuMEeUdGOIV32plpl8Mmt6qLLJYaXXLhB0FMvcMV
+         Z3iw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756129674; x=1756734474;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yaJhzYO4iaGPetQog50EhntUWyYduBz9Frmzzr2P5Qo=;
-        b=dxx8VSs+IL2NH2tE+gcVLCiz3b2u8IhhshM9ENNjCz+sCn77U7RfDLc8ezgCCTEEtz
-         3EpsyM9r9D/tEZh9fqzoOQ36SDioo3VVfokwcufUWyMAQwkW/Y1a20rKq25XYENuv8hB
-         QD5KRvce5mAfmE2B/6js8Esw7hsYmdJoIBMlLROjSIIIdo9RGYA7eU8/v5hCMm6ALNWT
-         1EbGo2jctgbA5Pe4LnL3JnIP3yf6aUtxWiQLnAFBmC9GHPx1+UinQgfMfhV/+uRv+ltz
-         agOgQ50jMnsa9sTS91JTkLpIvjJJZMJsbgnwpvm+vQ87qCSyUie1EurdlJXOgy8zLDLp
-         J8yA==
-X-Gm-Message-State: AOJu0Yw+Um9XOZaK4dGYdPgBSN1vB5ZESkJnk/lrBDRHUX1nZzZWajTh
-	VDJTOEmJ29383MR1J6gsgFATV/DQEb5qzWnH/3Tcuf5PHbz2LTTcB/E/VJKi8BJ/7zk=
-X-Gm-Gg: ASbGncsxzH/pnFvRSKrrMIr0g8imzhgZ1JtPKRKkYmADtcwSH7tNcor5taqotyTPqSo
-	H1lA+wufVMCgdkRNKHxZvFspW1bTUq+jO1397ZAQUzh4uOPzWkIQsxW0snLDY1jBsDHbI6msU4H
-	7kf8GO5XywBydtpwEUQINbYyHA57DgmQaBC1ajoQ6U06I3EcH5GTbKp+Mz1UsYokx1fp+cQIYW4
-	uxBTvAJr3Jg12LQ+8kpuHsjrrKamHBYxCsTUISsQSzFN5YyfYE9Om0/FSxYHSF4Hchl6bBoXjG4
-	pZBQMQ4aSYI5CV/VR3m5cQesDJ0I/0MRw6u+PA0EeXj990IvxctM0S2I7p8cEW4X+w/SG4LAr95
-	c8qCH2YHrX5fl0g==
-X-Google-Smtp-Source: AGHT+IG9EQPhdHbz8mEGF2jLK140waZfJrbHSx+bzTm1sOM18L8qwaMMO1zcVhW/7At0bhqvqh7H7g==
-X-Received: by 2002:a05:6e02:184c:b0:3ec:40cf:2d37 with SMTP id e9e14a558f8ab-3ec40cf2ed7mr54279585ab.31.1756129666261;
-        Mon, 25 Aug 2025 06:47:46 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3eb18693d2esm38348625ab.42.2025.08.25.06.47.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Aug 2025 06:47:45 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: ming.lei@redhat.com, hch@infradead.org, yukuai3@huawei.com, 
- rajeevm@hpe.com, Yu Kuai <yukuai1@huaweicloud.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
- yi.zhang@huawei.com, yangerkun@huawei.com, johnny.chenyi@huawei.com
-In-Reply-To: <20250825093205.3684121-1-yukuai1@huaweicloud.com>
-References: <20250825093205.3684121-1-yukuai1@huaweicloud.com>
-Subject: Re: [PATCH v2] loop: fix zero sized loop for block special file
-Message-Id: <175612966482.55174.12405819858243003502.b4-ty@kernel.dk>
-Date: Mon, 25 Aug 2025 07:47:44 -0600
+        d=1e100.net; s=20230601; t=1756129712; x=1756734512;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:from:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OFQ/rLR1VcRI8EdNfUQIRb/FRTu4u4BQ9Glpx9EACls=;
+        b=oLxiO/13NLmVjOb+rXdhZ2k6lnHrVz/8h3K779cumP96m1bgcmoSXScd7Cgn/kUCrj
+         ZM0s5RDucbSf5vEsOOvUqIAGTU8NMwvDcDG3qhYcF+lln/BwIl9++bLXFwYPaPx2WZuQ
+         IU16XMDVn/EOQp1+qsWY8/DABf/5pBrRS2thoMVRdz30AKd9vmkpsQ0Ing5R01YaTtoS
+         5D6Yb8fb8Hv7G7j3E9GRbLz/QInl4pc+HD5B+1rfHEm/lbT93Lpp9pEi67ygret1irlK
+         SlluwWhR1vlFQwJpQwHR0Y3gmsiW2g7Tdx3Hv+stU6XUoL32b5uIgmd2EAnp8fT1tvTM
+         wLnQ==
+X-Gm-Message-State: AOJu0Yw+3++ZWuFoVagPOQAR5bVbFRo9nzoM0SoMYdh8M0ZpsYD+37ap
+	i9uyAr/GIXI6v8st6hypmPmxFy4SVF+zSBXbjC8yi+Qd3OWk0eYPFOQtLe8NII6SVe0HosBDYJZ
+	d2jsm
+X-Gm-Gg: ASbGnct9hbAyQXDGVl8GIhimacBuUZmaHWZwZ76eN5Bhz+NRQIh7Dlad6EgC+DLrNUe
+	nH0jllEmzHoauo+F1UAKYCrQ+1Z11mBmd1kKM7rAo7mxx5R0N8VihXQlNbA1hiurgdM/iTm31uX
+	aICH5ZBfenBd2jPC+oY1GrbF7InrnZ0nbEQAex6Lj/nOKCXOvVLm+8u1eopJb5rZt5LSc4Zb+bq
+	rVAVmTXWnMDqkRH4GKDcKkkvj1HPwDa6+sC1W+9xu5vRXULsqCPmYIF1oK1rO+JOkuXErm2og6Y
+	63mM3FUSB2idn8RQnU0VutWkSKBuzJFLvAVsIumEOPxoSwMw8SKEYGhjRNisNfKHBzamJOOc40I
+	AsbhDhZXq03/tm2ppKyWuJsxfbkB6mw==
+X-Google-Smtp-Source: AGHT+IFmdpQnFHY0CsqnLhTIm2CC8k9CgZ1i2H9Ua/qLSGVCLW1Nc9PYe+yiIusFAZqIr/2pS0oKkg==
+X-Received: by 2002:a05:6e02:480f:b0:3e9:eec4:9b68 with SMTP id e9e14a558f8ab-3e9eec4a01fmr141394275ab.31.1756129712073;
+        Mon, 25 Aug 2025 06:48:32 -0700 (PDT)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3ea4ea35fe0sm49003885ab.37.2025.08.25.06.48.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 25 Aug 2025 06:48:31 -0700 (PDT)
+Message-ID: <61bf6a0f-05de-44c6-b4eb-87254fca4d24@kernel.dk>
+Date: Mon, 25 Aug 2025 07:48:30 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+From: Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH] block: Move a misplaced comment in queue_wb_lat_store()
+To: Bart Van Assche <bvanassche@acm.org>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+ Bart Van Assche <bvanassche@acm.org>, Nilay Shroff <nilay@linux.ibm.com>
+References: <20250822200157.762148-1-bvanassche@acm.org>
+Content-Language: en-US
+In-Reply-To: <20250822200157.762148-1-bvanassche@acm.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-2ce6c
 
+On Fri, Aug 22, 2025 at 2:02?PM Bart Van Assche <bvanassche@acm.org> wrote:
+>
+> blk_mq_quiesce_queue() does not wait for pending I/O to finish. Freezing
+> a queue waits for pending I/O to finish. Hence move the comment that
+> refers to waiting for pending I/O above the call that freezes the
+> request queue. This patch moves this comment back to the position where
+> it was when this comment was introduced. See also commit c125311d96b1
+> ("blk-wbt: don't maintain inflight counts if disabled").
 
-On Mon, 25 Aug 2025 17:32:05 +0800, Yu Kuai wrote:
-> By default, /dev/sda is block specail file from devtmpfs, getattr will
-> return file size as zero, causing loop failed for raw block device.
-> 
-> We can add bdev_statx() to return device size, however this may introduce
-> changes that are not acknowledged by user. Fix this problem by reverting
-> changes for block special file, file mapping host is set to bdev inode
-> while opening, and use i_size_read() directly to get device size.
-> 
-> [...]
+Doesn't apply to the current tree, what is this against? In any case,
+please resend.
 
-Applied, thanks!
-
-[1/1] loop: fix zero sized loop for block special file
-      commit: d14469ed7c00314fe8957b2841bda329e4eaf4ab
-
-Best regards,
 -- 
 Jens Axboe
-
-
 
