@@ -1,40 +1,106 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCE7028850B
-	for <linux-block@vger.kernel.org>; Mon, 25 Aug 2025 07:55:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2A862D23B1;
+	Mon, 25 Aug 2025 08:33:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756108533; cv=none; b=C0gxtHIiBCV38Bv0QXu0dPpIgelogeD7ZSCpMoz5eOXTbnZyuUThHQkn+LY0svHSupxJr7WgjW5RDwBNIvpWQzgcgGXqekS2B1NOnj3wzeZPPXHFou1zgAB0GtOapZs93+4ZXQ0tuWx6adnXgVQQJhAfOqatK+lv3SQ9E5HAHVU=
+	t=1756110829; cv=none; b=thX0dEEjyljDpkUxHw29RMdnXrhOOgFgzLsVGWbmtbVemp2fA+kXJuDKA/Iq8/LuVDcUPixKry7gN7XdPXwumW8VF+nOMZIIwXUqsrsBRcla/OJtJNbv+l8Em7vAtmV/QmJHWcUD2tCBaJr4mLwMCddC/uM/FKKCn69Qe+Vw3pU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756108533; c=relaxed/simple;
-	bh=0+4M3BUA9zvD8BaTM7hRLHCZrT6kLmaOitXDirkEl00=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=O12Lch5sI2y8RElrAXKy3AJ3bUW0XZUz+e+tTjybTZnbOZ7xZnmHCR5vxoYo2Kl0TqbZEenRtnmkczosfL9x8GWX4YU7TSFSbvWT5rqjwr5Z3c66R8BRyB6MHbgSmVjvMlFuGGMCOFkyFViP8N2pjn5f43uAjuBbmOBdPjDghz0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id CF51C68AA6; Mon, 25 Aug 2025 09:55:26 +0200 (CEST)
-Date: Mon, 25 Aug 2025 09:55:26 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Keith Busch <kbusch@meta.com>
-Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, hch@lst.de,
-	axboe@kernel.dk, joshi.k@samsung.com,
-	Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCHv7 0/9] blk dma iter for integrity metadata
-Message-ID: <20250825075526.GL20853@lst.de>
-References: <20250813153153.3260897-1-kbusch@meta.com>
+	s=arc-20240116; t=1756110829; c=relaxed/simple;
+	bh=1W2SEYz7RYrf/YDuUuDzn0Qpp8Sw+Y8aFKYnEY+issc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=MoDguzPTPYboQAywKxB/lOuc5TzOhFOrHv9B4th44FYaFnB/nf7Ee31m6vFxJ3NciKi1K1P4Hr0l/Jvwz6oNQJZAH2FflipZYgO2eY1sUSPcz1v3k5/FEESziPHF7vLAxEgGLbXr65D+fh10m3j1h1XQL5GsyQQO/5ydbF9ihaQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4c9PG148FszYQvyT;
+	Mon, 25 Aug 2025 16:33:45 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 228701A13D5;
+	Mon, 25 Aug 2025 16:33:44 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.50.85.155])
+	by APP4 (Coremail) with SMTP id gCh0CgAncIzcH6xoZc7rAA--.43322S6;
+	Mon, 25 Aug 2025 16:33:44 +0800 (CST)
+From: Zhang Yi <yi.zhang@huaweicloud.com>
+To: linux-block@vger.kernel.org,
+	linux-raid@vger.kernel.org,
+	drbd-dev@lists.linbit.com
+Cc: linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	john.g.garry@oracle.com,
+	hch@lst.de,
+	martin.petersen@oracle.com,
+	axboe@kernel.dk,
+	yi.zhang@huawei.com,
+	yi.zhang@huaweicloud.com,
+	yukuai3@huawei.com,
+	yangerkun@huawei.com
+Subject: [PATCH 2/2] drbd: init queue_limits->max_hw_wzeroes_unmap_sectors parameter
+Date: Mon, 25 Aug 2025 16:33:20 +0800
+Message-ID: <20250825083320.797165-3-yi.zhang@huaweicloud.com>
+X-Mailer: git-send-email 2.46.1
+In-Reply-To: <20250825083320.797165-1-yi.zhang@huaweicloud.com>
+References: <20250825083320.797165-1-yi.zhang@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250813153153.3260897-1-kbusch@meta.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgAncIzcH6xoZc7rAA--.43322S6
+X-Coremail-Antispam: 1UD129KBjvJXoW7uFW7JF1xGFy3KrW7WF18Grg_yoW8GF1DpF
+	47XFyIqryjgF4Ivws8Jw17ZF1rKa95JFya9ay7A3Z8W34Skrn3XF42kay3Xa12gr95Gw4F
+	q3W2yrWvk34jqrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUm014x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_Jryl82xGYIkIc2
+	x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0
+	Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJw
+	A2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS
+	0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2
+	IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0
+	Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kIc2
+	xKxwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWU
+	JVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67
+	kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY
+	6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0x
+	vEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVj
+	vjDU0xZFpf9x0JUQXo7UUUUU=
+X-CM-SenderInfo: d1lo6xhdqjqx5xdzvxpfor3voofrz/
 
-Jens, anything blocking this?
+From: Zhang Yi <yi.zhang@huawei.com>
+
+The parameter max_hw_wzeroes_unmap_sectors in queue_limits should be
+equal to max_write_zeroes_sectors if it is set to a non-zero value.
+However, when the backend bdev is specified, this parameter is
+initialized to UINT_MAX during the call to blk_set_stacking_limits(),
+while only max_write_zeroes_sectors is adjusted. Therefore, this
+discrepancy triggers a value check failure in blk_validate_limits().
+
+Since the drvd driver doesn't yet support unmap write zeroes, so fix
+this failure by explicitly setting max_hw_wzeroes_unmap_sectors to
+zero.
+
+Fixes: 0c40d7cb5ef3 ("block: introduce max_{hw|user}_wzeroes_unmap_sectors to queue limits")
+Signed-off-by: Zhang Yi <yi.zhang@huawei.com>
+---
+ drivers/block/drbd/drbd_nl.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/block/drbd/drbd_nl.c b/drivers/block/drbd/drbd_nl.c
+index e09930c2b226..91f3b8afb63c 100644
+--- a/drivers/block/drbd/drbd_nl.c
++++ b/drivers/block/drbd/drbd_nl.c
+@@ -1330,6 +1330,7 @@ void drbd_reconsider_queue_parameters(struct drbd_device *device,
+ 		lim.max_write_zeroes_sectors = DRBD_MAX_BBIO_SECTORS;
+ 	else
+ 		lim.max_write_zeroes_sectors = 0;
++	lim.max_hw_wzeroes_unmap_sectors = 0;
+ 
+ 	if ((lim.discard_granularity >> SECTOR_SHIFT) >
+ 	    lim.max_hw_discard_sectors) {
+-- 
+2.46.1
 
