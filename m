@@ -1,105 +1,131 @@
 Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E74F235041;
-	Mon, 25 Aug 2025 09:36:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C3522C325D;
+	Mon, 25 Aug 2025 09:40:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756114571; cv=none; b=LwCCv+7tgLcm99ALKaxhP0l1A4/qGeaPDFRA4pna2xC63c4KZ10rsIZuYarQp6KPeKeEyyALSwWZ5XBig7Ea/NwwWZGOKZM8pqU7q7IQgLKNwYssvdRCh1SKljn2jMsjSzhQH3V0Ikanv+1Qbmm/SBauynGDgAFdYt15e7e5HFw=
+	t=1756114840; cv=none; b=dvSSJ3neOhLy9BaxxFgqnq7TEWOdUxjrnzNIIHCd86crkH1ym3PJfrkKxhZMPi002cog2+dGzeqA2H7hYhl69jgKF7ymSfHBbACTRrsPkGKI5QmoQGka9pbglrwrO7HzZCv5GJhX1WQQSNL3eMRm+7DmblqiGbaTp3GQAHn0AAI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756114571; c=relaxed/simple;
-	bh=N9qWtkRk3fJ5bIXuhkjNCG48R1vPFV+wVc1tIXHExks=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=UxVPPP/+TgFLLYSw0Q1gzBwBLpyn9/7YS8wlPmuNbAZ5qcrZGxX/ESsa6wYqa/DMMa4WG7yx9+u0sdWE57p/DE7PK1x+/lPG9aREbZ8Dra6Fx0OzZX3nOILLxAHhDbKonhBGQaryEZV+0BFmjq5IQLR3bi++Jy32QANl3S4oJDY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+	s=arc-20240116; t=1756114840; c=relaxed/simple;
+	bh=KCdWXka9iUATzabyiJtKJBa5aHa4D/RfatKkHfWhyLw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=YGWDoj1b64vowFNTKnmp7O2w5UxlGhru5IpJ1VNyM9A/1AZ/PlCUpdCdW1nso/y+H+5O6kR4+UprGuLA0QwOMMiggRFIxRje8+bt3aa45hd0OOUlMbxmweN3K775WKfMtzbybC9hAHjqQxw2J4QuDrVUO1xkGP97Cxw28eMKzCM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=none smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4c9Qdy2sppzYQtnt;
-	Mon, 25 Aug 2025 17:36:06 +0800 (CST)
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.93.142])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4c9Ql761g9zYQvc7;
+	Mon, 25 Aug 2025 17:40:35 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id E9F391A01A1;
-	Mon, 25 Aug 2025 17:36:04 +0800 (CST)
-Received: from [10.174.179.143] (unknown [10.174.179.143])
-	by APP4 (Coremail) with SMTP id gCh0CgAXYIyCLqxo09rwAA--.44762S3;
-	Mon, 25 Aug 2025 17:36:04 +0800 (CST)
-Subject: Re: [PATCH] loop: fix zero sized loop for block special file
-To: Christoph Hellwig <hch@infradead.org>, Ming Lei <ming.lei@redhat.com>
-Cc: Yu Kuai <yukuai1@huaweicloud.com>, axboe@kernel.dk, rajeevm@hpe.com,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- yi.zhang@huawei.com, yangerkun@huawei.com, johnny.chenyi@huawei.com,
- linux-fsdevel@vger.kernel.org, "yukuai (C)" <yukuai3@huawei.com>
-References: <20250825062300.2485281-1-yukuai1@huaweicloud.com>
- <aKwlVypJuBtPH_EL@fedora> <aKwqUVmX-yH6_lZy@infradead.org>
+	by mail.maildlp.com (Postfix) with ESMTP id 603FA1A0EB5;
+	Mon, 25 Aug 2025 17:40:34 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+	by APP4 (Coremail) with SMTP id gCh0CgAncIyOL6xoWDXxAA--.44691S4;
+	Mon, 25 Aug 2025 17:40:32 +0800 (CST)
 From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <eb572576-89f4-c192-09ab-b4585d09b75a@huaweicloud.com>
-Date: Mon, 25 Aug 2025 17:36:02 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.1
+To: ming.lei@redhat.com,
+	hch@infradead.org,
+	axboe@kernel.dk,
+	yukuai3@huawei.com,
+	rajeevm@hpe.com
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	yukuai1@huaweicloud.com,
+	yi.zhang@huawei.com,
+	yangerkun@huawei.com,
+	johnny.chenyi@huawei.com
+Subject: [PATCH v2] loop: fix zero sized loop for block special file
+Date: Mon, 25 Aug 2025 17:32:05 +0800
+Message-Id: <20250825093205.3684121-1-yukuai1@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <aKwqUVmX-yH6_lZy@infradead.org>
-Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgAXYIyCLqxo09rwAA--.44762S3
-X-Coremail-Antispam: 1UD129KBjvdXoWruF48CrWrCF1fKw4xAF43Jrb_yoWftrb_Wr
-	1rAFyDt348Zrn2k3y3K3WDtrZ5GF4jkry3X3y0kF9Fywn7X34fuF1rZ343WF12qryjyrsI
-	9w43Zr1UJry3ujkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUbfAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-	A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
-	6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-	4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
-	c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7V
-	AKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCj
-	r7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6x
-	IIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAI
-	w20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x
-	0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbGQ6JUUUUU==
+X-CM-TRANSID:gCh0CgAncIyOL6xoWDXxAA--.44691S4
+X-Coremail-Antispam: 1UD129KBjvJXoW7WrWrGFyUur47ZF47uw4kWFg_yoW8urWUpF
+	W3uFyayryYgFnrCanrZw17Xa4rGan3u3yUury2g34093W3Arya9as5tFyrWr1jqFy3Ja1Y
+	qayDJFy0kryDZr7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9Y14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
+	Y2ka0xkIwI1lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x
+	0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2
+	zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF
+	4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWU
+	CwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCT
+	nIWIevJa73UjIFyTuYvjfUonmRUUUUU
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-Hi,
+From: Yu Kuai <yukuai3@huawei.com>
 
-ÔÚ 2025/08/25 17:18, Christoph Hellwig Ð´µÀ:
-> On Mon, Aug 25, 2025 at 04:56:55PM +0800, Ming Lei wrote:
->> `stat $BDEV_PATH` never works for getting bdev size, so it looks wrong
->> to call vfs_getattr_nosec() with bdev path for retrieving bdev's size.
-> 
-> Exactly.
-> 
+By default, /dev/sda is block specail file from devtmpfs, getattr will
+return file size as zero, causing loop failed for raw block device.
 
-Ok.
->> So just wondering why not take the following more readable way?
->>
->> 	/* vfs_getattr() never works for retrieving bdev size */
->> 	if (S_ISBLK(stat.mode)) {
->> 		loopsize = i_size_read(file->f_mapping->host);
->> 	} else {
->>            ret = vfs_getattr_nosec(&file->f_path, &stat, STATX_SIZE, 0);
->>            if (ret)
->>                    return 0;
->>            loopsize = stat.size;
->> 	}
+We can add bdev_statx() to return device size, however this may introduce
+changes that are not acknowledged by user. Fix this problem by reverting
+changes for block special file, file mapping host is set to bdev inode
+while opening, and use i_size_read() directly to get device size.
 
-Just we can't use stat.mode here, I'll replace it with:
+Fixes: 47b71abd5846 ("loop: use vfs_getattr_nosec for accurate file size")
+Reported-by: kernel test robot <oliver.sang@intel.com>
+Closes: https://lore.kernel.org/oe-lkp/202508200409.b2459c02-lkp@intel.com
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+---
+Changes in v2:
+ - don't call vfs_getattr_nosec() for block special file path, by Ming
 
-S_ISBLK(file_inode(file)->i_mode)
+ drivers/block/loop.c | 26 ++++++++++++++++----------
+ 1 file changed, 16 insertions(+), 10 deletions(-)
 
-Thanks,
-Kuai
-
->>
->> Also the above looks like how application reads file size in case of bdev
->> involved.
-> 
-> That's not just more readable, but simply the way to go.  Maybe split
-> it into a helper for readability, though.
-> .
-> 
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 57263c273f0f..053a086d547e 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -139,20 +139,26 @@ static int part_shift;
+ 
+ static loff_t lo_calculate_size(struct loop_device *lo, struct file *file)
+ {
+-	struct kstat stat;
+ 	loff_t loopsize;
+ 	int ret;
+ 
+-	/*
+-	 * Get the accurate file size. This provides better results than
+-	 * cached inode data, particularly for network filesystems where
+-	 * metadata may be stale.
+-	 */
+-	ret = vfs_getattr_nosec(&file->f_path, &stat, STATX_SIZE, 0);
+-	if (ret)
+-		return 0;
++	if (S_ISBLK(file_inode(file)->i_mode)) {
++		loopsize = i_size_read(file->f_mapping->host);
++	} else {
++		struct kstat stat;
++
++		/*
++		 * Get the accurate file size. This provides better results than
++		 * cached inode data, particularly for network filesystems where
++		 * metadata may be stale.
++		 */
++		ret = vfs_getattr_nosec(&file->f_path, &stat, STATX_SIZE, 0);
++		if (ret)
++			return 0;
++
++		loopsize = stat.size;
++	}
+ 
+-	loopsize = stat.size;
+ 	if (lo->lo_offset > 0)
+ 		loopsize -= lo->lo_offset;
+ 	/* offset is beyond i_size, weird but possible */
+-- 
+2.39.2
 
