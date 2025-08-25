@@ -1,128 +1,69 @@
-Received: from mout-p-202.mailbox.org (mout-p-202.mailbox.org [80.241.56.172])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08FC12E973E;
-	Mon, 25 Aug 2025 11:33:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C1FC22A4E5;
+	Mon, 25 Aug 2025 12:01:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756121609; cv=none; b=Z58l+ti3JHCLVjq5DwDFgcZa2ACX5ReZUd2XU0skjFxlZvY5LBhYfGVmdOVzXRMLkaMDbfOwMnUMgudUO+eNg5yZiFylyM52H1AoQ4/PX+c/oXkhz43sH9W5FLAj9lprCUiacOYFwhcSg0QUTgb8MhBMX2gwuP9ItCjI4UfuKs0=
+	t=1756123273; cv=none; b=Z9kl+ToG4Fovgoq+pdYGIV0HcjWJeTwUCme0RBu1FxQ5UWW/QX6hXKuigpOIQfRUuWz6xGefIYzqSmif1TT/9PdoIAI4a4sY9ysacOgNHqPz8wbZi+fDvPFskjiIH6yl9EpyTn7MCe6jVA1gZOEnTAC/irOgs/dZBhE3+act1nQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756121609; c=relaxed/simple;
-	bh=eEtIaibKqKdPr4YrsIFVAnudVNi9K3ryFlvOQIzI4AU=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=qeNk7j8NdhSuNFfc7vlAkOGiYaPaPPZ0CbDJhmg7yhLbzjNFSJXFvi5Q3pC8wzmdI7M0PymiLdB78jcsB+MQZbafpRe2ISUjCZrHl59MmIYF0dM3dtdunqeQZRBkYtqQ2zfHNKo1tvMJE9e6fZr3kZ/64u0lY+AF8luKITP0O/E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=xx5f5TIc; arc=none smtp.client-ip=80.241.56.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
+	s=arc-20240116; t=1756123273; c=relaxed/simple;
+	bh=coPKTGDhD+vmF6gBi7FlpvcCk8kMW+tsVWXxq4ug5/0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=drG2adxa+G5WeAVKYEybwjJeKorKIRxbuKmS9khK667YVfUl+Pf27Rlfn/QXaenehmJqA1OZdnW9l0n/5rsF/AvqCidVEVHDiTFyC2YxH78g5lNH5FL7kplDYgDcH+2hy/jzFm0GqOdFUpe4ov/L2tiCeRVdCjz1btamaJrnMww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G4ftXcAQ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="xx5f5TIc"
-Received: from smtp202.mailbox.org (smtp202.mailbox.org [IPv6:2001:67c:2050:b231:465::202])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-202.mailbox.org (Postfix) with ESMTPS id 4c9TFH1pXdz9tQL;
-	Mon, 25 Aug 2025 13:33:23 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1756121603; h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=VNSSCPeGqN6zjA3VkCq993OovPyznVI5qQSB6QgIYew=;
-	b=xx5f5TIcNOek4XsyREHU8dpczmFGQcYDQ9vVhKY0A4XV4Zzf0NtX/q5nSrWVbQsKBLECyE
-	mkGB6kXz6WTHD8wN171TjBFgSlScZ3GJ2NQvvXSN6EE5iB1OZq7aQ3q+AXXrRR+aVP9wgr
-	Cpo134VBWG4/mcMvREeIVexlQ1HqoNutWWwScRfuc+2Nh6yx4yKicTb0yvUIa9Jbn9z4+e
-	xKXNsUob0JULzs/V5vFyRrfaxmeeZzCNi24LIKWBp3P0W6p/z41R49MFQooPgvtiHtf1iM
-	W/BjPt+4mbtfJwaZ4Kuued0TK8HJtMOxIaTFxaECwtkfja+HqW7GsvdBNXzc+g==
-Message-ID: <ab3196a1e0ccb8f94eafb83de589c0ae8f82d598.camel@mailbox.org>
-Subject: Re: [PATCH v2] block: mtip32xx: Prioritize state cleanup over
- memory freeing in the mtip_pci_probe error path.
-From: Philipp Stanner <phasta@mailbox.org>
-Reply-To: phasta@kernel.org
-To: Zhang Heng <zhangheng@kylinos.cn>, axboe@kernel.dk, phasta@kernel.org, 
- andriy.shevchenko@linux.intel.com, broonie@kernel.org, lizetao1@huawei.com,
-  viro@zeniv.linux.org.uk, fourier.thomas@gmail.com, anuj20.g@samsung.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Date: Mon, 25 Aug 2025 13:33:17 +0200
-In-Reply-To: <20250823083222.3137817-1-zhangheng@kylinos.cn>
-References: <20250823083222.3137817-1-zhangheng@kylinos.cn>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G4ftXcAQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB09EC116D0;
+	Mon, 25 Aug 2025 12:01:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756123271;
+	bh=coPKTGDhD+vmF6gBi7FlpvcCk8kMW+tsVWXxq4ug5/0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=G4ftXcAQj9nVXAhf53Q4/KaXLmbbkd7sTsZiuId2nskg7EGyKX5EeZxBxu04q9ZnP
+	 x49RdbEsxMoEPmYOF/41EXhjo52rgow5IFG/wHk1V+OzXvHRfzzRdlvMR/AAABddfr
+	 qRNJp25k9eH/szL9bTKY8NbzYAH8fsfcdMF48jq8Y/cy8KIhGHpsylEm6JKimrcIB7
+	 iOMTeLx94sBDeMRInCJHOCQA/9MXcjS6mWoAVVTDah/yuzN4QDcvAQL1SIHqDrkqeQ
+	 AExoalx0xkabeQ39PpoG1gahqDN/vWYKnxC6oewQndNk31SCFRmAVb2xnhQ8PMr1aM
+	 9cPLcBOMv7nmQ==
+Date: Mon, 25 Aug 2025 14:01:07 +0200
+From: Christian Brauner <brauner@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Jan Kara <jack@suse.cz>, Anuj Gupta <anuj20.g@samsung.com>, 
+	Kanchan Joshi <joshi.k@samsung.com>, linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	io-uring@vger.kernel.org
+Subject: Re: [PATCH 1/2] fs: add a FMODE_ flag to indicate IOCB_HAS_METADATA
+ availability
+Message-ID: <20250825-randbemerkung-machbar-ae3dde406069@brauner>
+References: <20250819082517.2038819-1-hch@lst.de>
+ <20250819082517.2038819-2-hch@lst.de>
+ <20250819-erwirbt-freischaffend-e3d3c1e8967a@brauner>
+ <20250819092219.GA6234@lst.de>
+ <20250819-verrichten-bagger-d139351bb033@brauner>
+ <20250819133447.GA16775@lst.de>
+ <20250820-voruntersuchung-fehlzeiten-4dcf7e45c29f@brauner>
+ <20250821084213.GA29944@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MBO-RS-ID: f202200c8dda11aa72e
-X-MBO-RS-META: pray9abyjp7i4pz3qhweyh49jf4yeb7y
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250821084213.GA29944@lst.de>
 
-On Sat, 2025-08-23 at 16:32 +0800, Zhang Heng wrote:
-> The original sequence kfree(dd); pci_set_drvdata(pdev, NULL); creates a
-> theoretical race condition window. Between these two calls, the pci_dev
-> structure retains a dangling pointer to the already-freed device private
-> data (dd). Any concurrent access to the drvdata (e.g., from an interrupt
-> handler or an unexpected call to remove) would lead to a use-after-free
-> kernel oops.
+On Thu, Aug 21, 2025 at 10:42:13AM +0200, Christoph Hellwig wrote:
+> On Wed, Aug 20, 2025 at 11:40:36AM +0200, Christian Brauner wrote:
+> > I meant something like this which should effectively be the same thing
+> > just that we move the burden of having to use two bits completely into
+> > file->f_iocb_flags instead of wasting a file->f_mode bit:
+> 
+> Yeah, that could work.  But I think the double use of f_iocb_flags is
+> a bit confusing.  Another option at least for this case would be to
+> have a FOP_ flag, and then check inside the operation if it is supported
+> for this particular instance.
 
-I tend to disagree I think . This is the driver's probe() function. It
-is always invoked serially by the driver core.
-
-remove() cannot be called while probe() is still running.
-
-Thus, the only potential explosion that could happen would be if an
-interrupt handler were to be set up in this probe() and then accesses
-dd.
-
-However, if that were the case, everything would be exploding already
-because there is no place in the code that tears down that interrupt
-handler or other potential parallel accessors before kfree(dd) is
-called.
-
-In this case, the relevant call is pci_enable_msi(). Sooner errors,
-like iomap_err: are jumped to before that's the case. Which is the only
-sane design for probe() anyways. Otherwise, pci_disable_msi() switches
-that off again; IOW: there are no racers.
-
-So I think that the pci_set_drvdata(=E2=80=A6 NULL) can be removed
-alltogether.=C2=A0
-
-When working on the probe() / remove() paths last and this year, I came
-to believe that calls like that were often used because of a
-misunderstanding of how the driver core APIs work.
-
-
-P.
-
-
->=20
-> Changes made:
-> 1. `pci_set_drvdata(pdev, NULL);` - First, atomically sever the link
-> from the pci_dev.
-> 2. `kfree(dd);` - Then, safely free the private memory.
->=20
-> This ensures the kernel state is always consistent before resources
-> are released, adhering to defensive programming principles.
->=20
-> Signed-off-by: Zhang Heng <zhangheng@kylinos.cn>
-> ---
-> =C2=A0drivers/block/mtip32xx/mtip32xx.c | 3 +--
-> =C2=A01 file changed, 1 insertion(+), 2 deletions(-)
->=20
-> diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/m=
-tip32xx.c
-> index 8fc7761397bd..f228363e6b1c 100644
-> --- a/drivers/block/mtip32xx/mtip32xx.c
-> +++ b/drivers/block/mtip32xx/mtip32xx.c
-> @@ -3839,9 +3839,8 @@ static int mtip_pci_probe(struct pci_dev *pdev,
-> =C2=A0	}
-> =C2=A0
-> =C2=A0iomap_err:
-> -	kfree(dd);
-> =C2=A0	pci_set_drvdata(pdev, NULL);
-> -	return rv;
-> +	kfree(dd);
-> =C2=A0done:
-> =C2=A0	return rv;
-> =C2=A0}
-
+Do you want to try something like that? Maybe we can do this for other
+FMODE_*-based IOCB_* opt{in,outs}?
