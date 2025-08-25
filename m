@@ -1,102 +1,117 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f41.google.com (mail-io1-f41.google.com [209.85.166.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AC211DB54C
-	for <linux-block@vger.kernel.org>; Mon, 25 Aug 2025 13:46:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 287652D3731
+	for <linux-block@vger.kernel.org>; Mon, 25 Aug 2025 13:47:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756129619; cv=none; b=OFZ539KFMNi/dbmIkly2XmtulHenZoXBJXdnGnvwzuvhzlRc0ADTqAeG87sdakXi3BZNCtwuCM+07YpbWe10POLTdzLr88i/n5olrD+XjAA73tGX0ompAVT7R74OOHBDy9VOjNhBR8qmAnrTTfrJSZiT/psssWVVXlajY+YGaso=
+	t=1756129671; cv=none; b=Ctz7hkGmNxOhBawZ0ltNwGQ6RSBOzv94F6TCom6TdYxcYcxr/sFWXBZypZgmjSWwI/zC1oRH6Ip3GR7aY33dne1dYNoBrobWaqxZrIr3YMT2uLfLk9mgaL4rxQGCqDG4Y9yn2XIPtm0tKq2+nXBhrEDsX6CldacPXu7u9lhOO/g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756129619; c=relaxed/simple;
-	bh=Ry04do6buW4cQ98rpi/43eNvs0uz0HJIYqKY1/BXDCg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FAn6N1uQmQG6k/evW8DPfzF1DMARxUeM292lEM4MW+rHSHUMRmPRgt8L8J0S8CVqBJSjhkS27dPim5ZuGet4fsletWVZTKIA0V8dZ8FEeRhrnG9H6fOl/EbnPZJKZkY9wMFRec+TfBIWxp1hTGS2Gj21asoh250vA1AhFwkJexE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=acanBRuE; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1756129671; c=relaxed/simple;
+	bh=vR3ELiBlp+nEPtCo+5yznHNNX7nIlPRPDkL6/Y4usVs=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=nLeIHrbO51QJi4wU1ebXVbT0hYqg0yLXNVfU9/uem5Zq8dBP7m3A78Xir18CD1tPNusSmh/EFZ5+gxTyyFd7keJu0Fv7hHLW2U4qxIipDTiRpEQjSwMZrPzkOMv1eANBGGOZCPW0tlN2V4QlBSqZeq0Ej1t86+k3p+ugFZSMd2I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=AvcHDz9v; arc=none smtp.client-ip=209.85.166.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="acanBRuE"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=H97IW4yLW8X5kx49pR9Pd/DSwq2doQEkPk1XM5QP8h0=; b=acanBRuEmLIBHqVYdAwgv8pafV
-	TwDspYhVvp3PsoR+gqqDu3HEGpU4BIe2zflw5EzXA1pK0fC6VSbRBv7HioGCuhye9+ezjr5wvfV4D
-	BT4iilrKH6VF4z30Vg86/cvtwH+KCKn1y+sWwcEO49xnWKWaIKpvZ8aPUuglc+gwTHYf8fpVb6DxP
-	QcvsJtSo2B9762oSPVG0gsEFDMWpcGvF7G4wXm7BsYdbQLVoOTEso7jPsxp5egnPr7F0BA7Ax65lO
-	uKT3mjAd4yrrHelaj7i2oXG4XbNtSrmW5TxS1UjP0mEKGA6Z/HYJB1edACTmO1gl7Xt4wapP2VNXj
-	i1czDSqg==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1uqXX8-000000088cd-2phP;
-	Mon, 25 Aug 2025 13:46:50 +0000
-Date: Mon, 25 Aug 2025 06:46:50 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Keith Busch <kbusch@meta.com>
-Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, hch@lst.de,
-	axboe@kernel.dk, Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCHv3 1/2] block: accumulate segment page gaps per bio
-Message-ID: <aKxpSorluMXgOFEI@infradead.org>
-References: <20250821204420.2267923-1-kbusch@meta.com>
- <20250821204420.2267923-2-kbusch@meta.com>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="AvcHDz9v"
+Received: by mail-io1-f41.google.com with SMTP id ca18e2360f4ac-88432e31114so367123639f.2
+        for <linux-block@vger.kernel.org>; Mon, 25 Aug 2025 06:47:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1756129665; x=1756734465; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HBc+koNxzNYkLXGaE2HMu3UyvOdaSSN/vPguHG2JiMI=;
+        b=AvcHDz9vGWYjBnTLOIKflH9zW3Oix/sOTuN6jxMIFuzObC4ZeSZRf4XH0CtBgNs6uC
+         jdm6qYJnBITKUoDwb6NdetAMI7ktWD7UQTMWTyNhfBPS0BWzjVLkVWyyPrDHeTK6X39X
+         UPGeVkXxz/VwsRbthXVjeG/M7erKUFT1vljWzqGOtKGOsPP/SjY/1DS/JDEHi5dfGTL/
+         DcoqKju5cQZFPM80RaDpxU7A3Pj7UEOP9mE0xqqIlNV2o86BrqdRqn39GX5sx0ko3hDD
+         SGv5Acauuxg7w0ujRHKLzkLxKmb/llzkycffiB0g0ldmfP1gacmBsAgz1/NnhY10p192
+         Prug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756129665; x=1756734465;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=HBc+koNxzNYkLXGaE2HMu3UyvOdaSSN/vPguHG2JiMI=;
+        b=kPj0Op9nyOt4BuGPEdm7Yq2TLOvQ8+ExMTzOnvtidpB1YIVRfK5xcX/N34CiAs3XkX
+         Veg0PYGpcvqdOxt+OyM42/wTqSlglRD6zPuAuFvC8QXVATQUdN2EotVgJH2D+cQ0iZlF
+         ra2JOD4Ko0un8nOUA9pqAo12vr56xLm6YAVCmBiSwXOzTrygTDuG+mCSmSCIzg8T4LVY
+         K+B+Phv97Jg5w2VAK1sAWzPG9Ih8B3vvcOSAhppzR59wzCN0YmDifzoAQ1Y7eR+EE1ZF
+         n9yqrmtNXQvUFPtAtsjZ2tTKzZ+vadysrJPTraasOxay4Zt8UviEf8j82NYIU3GacNkv
+         XNoQ==
+X-Gm-Message-State: AOJu0Yw0raZIWErNNlYcP5P1gRRUGWzeYxIBgpajLfm49py0vqw2vwC7
+	5zWJCe6YsIMhF9PZK9zoORM+YsPPeFMpAG7MR44E7h5PFHBZ5FgLJYwE8PsLGg7hmYg=
+X-Gm-Gg: ASbGncurJvhtfj97Nv+v9ocHsYcJMRc3LJFD8vseie1rCV/g/ynagNxiBeKiqmdTHjx
+	6nI2cwTRrk15PhcwGigT4Z75pJOBKCFfVDnYWS+O/GDO2VZpLVPUUwcMxUN/gIPYgswvCZP9NA+
+	6SZ4yT6kHCuxDwn0XSnGNv8kj+UJ1lRzzCe5n9foGGu0N4mpX36h8Djmvyn2xiHTy8y3xOSAx7q
+	FSQbVv2+Hs2A7itjj0YPOowFfZkm0ozBPomuo23aGEXezrARRN9wOphx6gWw7Fi7Jf5dExYFy9y
+	lPu5FpVttURPmggO6FjF1LZJkhRi/rqz8CjCJx1fEEdLc91/Z1xi8HrjudnstEY6eLFRNr8yRmf
+	CN1ORb92wbposgbaW/Mj1OS8U
+X-Google-Smtp-Source: AGHT+IElh9Q/ZAIPGzrZLoacK3I57vtsTZr0FfqOvIqZ2YsoI3hlDMJrBjCesK4YwM4uPnK+wWiMTA==
+X-Received: by 2002:a05:6e02:3309:b0:3eb:1211:8738 with SMTP id e9e14a558f8ab-3eb121187c5mr80555825ab.21.1756129664761;
+        Mon, 25 Aug 2025 06:47:44 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3eb18693d2esm38348625ab.42.2025.08.25.06.47.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 25 Aug 2025 06:47:43 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, 
+ Keith Busch <kbusch@meta.com>
+Cc: hch@lst.de, joshi.k@samsung.com, Keith Busch <kbusch@kernel.org>
+In-Reply-To: <20250813153153.3260897-1-kbusch@meta.com>
+References: <20250813153153.3260897-1-kbusch@meta.com>
+Subject: Re: [PATCHv7 0/9] blk dma iter for integrity metadata
+Message-Id: <175612966335.55174.17855813946100333153.b4-ty@kernel.dk>
+Date: Mon, 25 Aug 2025 07:47:43 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250821204420.2267923-2-kbusch@meta.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3-dev-2ce6c
 
-On Thu, Aug 21, 2025 at 01:44:19PM -0700, Keith Busch wrote:
-> +static inline unsigned int bvec_seg_gap(struct bio_vec *bv, struct bio_vec *bvprv)
 
-Nit: overly long line.
+On Wed, 13 Aug 2025 08:31:44 -0700, Keith Busch wrote:
+> Previous version:
+> 
+>   https://lore.kernel.org/linux-block/20250812135210.4172178-1-kbusch@meta.com/
+> 
+> Changes since v6 addressing review feeback from Christoph:
+> 
+>   - Moved the integrity sg conversion to its own patch
+> 
+> [...]
 
-> +{
-> +	return ((bvprv->bv_offset + bvprv->bv_len) & (PAGE_SIZE - 1)) |
-> +			bv->bv_offset;
+Applied, thanks!
 
-But what's actually more important is a good name, and a good comment.
-Without much of an explanation this just looks like black magic :)
+[1/9] blk-mq-dma: create blk_map_iter type
+      (no commit info)
+[2/9] blk-mq-dma: provide the bio_vec array being iterated
+      (no commit info)
+[3/9] blk-mq-dma: require unmap caller provide p2p map type
+      (no commit info)
+[4/9] blk-mq: remove REQ_P2PDMA flag
+      (no commit info)
+[5/9] blk-mq-dma: move common dma start code to a helper
+      (no commit info)
+[6/9] blk-mq-dma: add scatter-less integrity data DMA mapping
+      (no commit info)
+[7/9] blk-integrity: use iterator for mapping sg
+      (no commit info)
+[8/9] nvme-pci: create common sgl unmapping helper
+      (no commit info)
+[9/9] nvme-pci: convert metadata mapping to dma iter
+      (no commit info)
 
-Also use the chance to document why all this is PAGE_SIZE based and
-not based on either the iommu granule size or the virt boundary.
+Best regards,
+-- 
+Jens Axboe
 
-> +		if (bvprvp) {
-> +			if (bvec_gap_to_prev(lim, bvprvp, bv.bv_offset))
-> +				goto split;
-> +			page_gaps |= bvec_seg_gap(&bv, &bvprv);
-> +		}
->  
->  		if (nsegs < lim->max_segments &&
->  		    bytes + bv.bv_len <= max_bytes &&
-> @@ -326,6 +335,7 @@ int bio_split_io_at(struct bio *bio, const struct queue_limits *lim,
->  	}
->  
->  	*segs = nsegs;
-> +	bio->bi_pg_bit = ffs(page_gaps);
 
-Caling this "bit" feels odd.  I guess the idea is that you only care
-about power of two alignments?  I think this would be much easier
-with the whole theory of operation spelled out somewhere in detail,
-including why the compression to the set bits works, why the PAGE
-granularity matters, why we only need to set this bit when splitting
-but not on bios that never gets split or at least looped over for
-splitting decisions.
-
->  	enum rw_hint		bi_write_hint;
->  	u8			bi_write_stream;
->  	blk_status_t		bi_status;
-> +
-> +	/*
-> +	 * The page gap bit indicates the lowest set bit in any page address
-> +	 * offset between all bi_io_vecs. This field is initialized only after
-> +	 * splitting to the hardware limits.
-> +	 */
-> +	u8			bi_pg_bit;
-
-Maybe move this one up so that all the field only set on the submission
-side stay together?
 
