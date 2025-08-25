@@ -1,191 +1,107 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CC1B2DBF69;
-	Mon, 25 Aug 2025 11:25:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B07CD2E889D
+	for <linux-block@vger.kernel.org>; Mon, 25 Aug 2025 11:27:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756121128; cv=none; b=pk43SL10fY7pzFcTAESLxwCyMm2LrhubJsFrA90PVlG1bthhf2FD1Q2Qe7PbPhcHJ1w3xG9WTvAl/2LLAF3OvtYNZsytMbwPfGbBKxPaNJR2IvV/XDIcyuuJ+YyChLKz1r+IoQQzAiJ4QdYfMYTO4hTeHnZBJOJsVna1tNXGAqI=
+	t=1756121235; cv=none; b=o+iHHHpC48PrSLo2wTN61LNEhv9eNGWF1G4+Mbc2XWMoW6Gm6wnZ0fFHgqdlve1obeBAm4dODi91jcdVIBUkkoIqiCWDPFT0yC0DpoUfkaCAC0PRBVX1hH9RbcCekmU8w0v0l224TC51hXPSZvi2o32EB5fxdOih9g+8SIuJvag=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756121128; c=relaxed/simple;
-	bh=DwChpy4ANEjVlPYn/TaBAfYFi6YRdwQVHhewt+5qY8g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=AZFyWQrfw5lQwgmv4GHDEsUgJYukbUAmdRZCyq0jmLBJDb0DW30qfkEdjHZSpUwfoiuAHVs1SarldZyLRvv8x6fv4qCokM1jbQxS2ZK4LxahyoLC6Tqz7QRRBfpBpv0Cp4cqpEorH7EOEP97crc3FlxTyLavNByyYhwNdLk2P6Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4c9T4127PgzKHNJh;
-	Mon, 25 Aug 2025 19:25:21 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id DAEE31A1A88;
-	Mon, 25 Aug 2025 19:25:20 +0800 (CST)
-Received: from [10.174.179.80] (unknown [10.174.179.80])
-	by APP4 (Coremail) with SMTP id gCh0CgCX4o4cSKxo6pz5AA--.64814S3;
-	Mon, 25 Aug 2025 19:25:18 +0800 (CST)
-Message-ID: <bb1f66f4-da09-4841-a7f7-839047b1fe32@huaweicloud.com>
-Date: Mon, 25 Aug 2025 19:25:16 +0800
+	s=arc-20240116; t=1756121235; c=relaxed/simple;
+	bh=pTHQElAElWmtrbZTXpxQVTHBHqc05mvh3lFsp+T4NEY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=I6MLBy/Brj78RSGkKdA3UmXXQ3PIbxE04dEw1e+SbKw9A1Ks/zE2s7o8yzZbcbPtLpoHOnkYqKtFLTZQYmFiEUt4wqguu/0pDjLfCi4VhHp4An5DhjOeFABe8Y0zZlwrftiRoCnr/wysihThGsa6c1M4CWb0+b0ThLm9xfK4/mM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fEQnpoIi; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fEQnpoIi"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1756121232;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=qDMukmH0FQggYXKvzUec4QBhOgYrZ5QeyS3SsGzawf0=;
+	b=fEQnpoIiTCUpH+JWCTwlngioyP31bYVbJ0+d/0MSrY3L9J0TYSmc1x+X2i81noIrKZefV5
+	BC/TVKsnsomXmwfThMOpeSxyrbM3EMNDGf8oLX+7Lo//xl2e7sajp2FJxCsI2FlgxCt1yC
+	Q9rKogp9muM+LA4J3I/7m286znmcRiA=
+Received: from mail-ua1-f70.google.com (mail-ua1-f70.google.com
+ [209.85.222.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-78-7o_FrloDMGemOb7F6wbvXw-1; Mon, 25 Aug 2025 07:27:10 -0400
+X-MC-Unique: 7o_FrloDMGemOb7F6wbvXw-1
+X-Mimecast-MFC-AGG-ID: 7o_FrloDMGemOb7F6wbvXw_1756121230
+Received: by mail-ua1-f70.google.com with SMTP id a1e0cc1a2514c-89248531bd2so393343241.3
+        for <linux-block@vger.kernel.org>; Mon, 25 Aug 2025 04:27:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756121230; x=1756726030;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qDMukmH0FQggYXKvzUec4QBhOgYrZ5QeyS3SsGzawf0=;
+        b=D6kCyC/jqwsaLBNfcS5RQR4Dw/lrF35I7VeNcziOA5HrluKda0JdrIDiK+bk/bngWS
+         zp5KiiVzkhGRJApTNj00nmJxS4kRm9u2W+RnTLkg/dM/rozox1oDkn1lL9DOP5nc0Hf4
+         32pIhbATHgI9LqLmK/6x/q9ffpo/RDsWi4B/sOcYFGatxuzbPqQUKl5jNOirbX0dUsvO
+         DB15pIyCEDdy6+7QnyYCJkaiZIcArfd299CrfiGrlalCtZwgCHOS+ors9kzZEOa5kfX/
+         JR16t1OadBtyNuUJOl396RpaTzw4nwedUDWEJusPurM4aZFm7UbFE+oq0kLRkP6dIrJp
+         XPJA==
+X-Forwarded-Encrypted: i=1; AJvYcCXNYx52f/oJDZRRXYGX8BOHcvb8VvJeWdq39okJlGkKxl6+UQwofITzBZi0Tp3S3PR0N1VxAcSg+YiKAA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzR1VUSqc96H7MpvfZAHqhLwQSz8A02YEXDOMQEvBBhT5Jk5gqe
+	ennATv6i0wmURlg3uZsuRFB6nnqOT+zBBhsDBct04JXfMEJ1702LDGf0xhkxe6U373zleZ3qQI3
+	hOJADXA9Ul2/WaVg5sJz+j74S9EKa9Ojw1waNF42Op8rX4quCqqz/KmMELjVKZVttuArSMD5Ujo
+	ixWpCgOqx2MGya+eJvvQw633vv+U8AzPrYBpqaeqE=
+X-Gm-Gg: ASbGncuONBu4aloFbNBO2iI/UHu0YqDb1kKpjXNfSYRZW3d06xuKsD4Kx8nqCFURR7y
+	ewXbWk6DfGGEXny8rGvIr+1J5uy8OMzXofULb6xzpkGyiXRY1afb1rxfkit3yYxkQg93utGPZMY
+	Bvnfyz8CHppC8J1cj3L54UmQ==
+X-Received: by 2002:a05:6102:a4e:b0:4fb:b78a:6cd1 with SMTP id ada2fe7eead31-51d0edd3396mr2320029137.19.1756121230052;
+        Mon, 25 Aug 2025 04:27:10 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHPYvkopN7UqDChOYSkUj5QzTSAZ7Hijf4D6K12CDHkzfHjzTz0n9WJqHj87a0m2x1X1OvuE+9z3muxtjNHvs4=
+X-Received: by 2002:a05:6102:a4e:b0:4fb:b78a:6cd1 with SMTP id
+ ada2fe7eead31-51d0edd3396mr2320024137.19.1756121229688; Mon, 25 Aug 2025
+ 04:27:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] md: init queue_limits->max_hw_wzeroes_unmap_sectors
- parameter
-To: Paul Menzel <pmenzel@molgen.mpg.de>
-Cc: linux-block@vger.kernel.org, linux-raid@vger.kernel.org,
- drbd-dev@lists.linbit.com, linux-fsdevel@vger.kernel.org,
- linux-kernel@vger.kernel.org, john.g.garry@oracle.com, hch@lst.de,
- martin.petersen@oracle.com, axboe@kernel.dk, yi.zhang@huawei.com,
- yukuai3@huawei.com, yangerkun@huawei.com
-References: <20250825083320.797165-1-yi.zhang@huaweicloud.com>
- <20250825083320.797165-2-yi.zhang@huaweicloud.com>
- <8c843d2c-56c1-44af-aa1f-59675885747e@molgen.mpg.de>
-Content-Language: en-US
-From: Zhang Yi <yi.zhang@huaweicloud.com>
-In-Reply-To: <8c843d2c-56c1-44af-aa1f-59675885747e@molgen.mpg.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgCX4o4cSKxo6pz5AA--.64814S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxtFWfCr43Ar13tF1kKr17ZFb_yoW7ZF4xpw
-	s2qFyIvr98Way8A3yUXw1UuFWrX345C3yqkFy7X3Z5ur17Wry2gF48Xa90gr1DXw4rJw1U
-	t3WUKrZru3WUKrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUv0b4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0En4kS
-	14v26r1q6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I
-	8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8
-	ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x
-	0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_
-	Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU1
-	7KsUUUUUU==
-X-CM-SenderInfo: d1lo6xhdqjqx5xdzvxpfor3voofrz/
+References: <20250825093205.3684121-1-yukuai1@huaweicloud.com>
+In-Reply-To: <20250825093205.3684121-1-yukuai1@huaweicloud.com>
+From: Ming Lei <ming.lei@redhat.com>
+Date: Mon, 25 Aug 2025 19:26:58 +0800
+X-Gm-Features: Ac12FXyUr3hWAroe70N31cD1VLoq7XqtMeU0YdR_bS7U3-G764sUu_8sjIHgAtE
+Message-ID: <CAFj5m9KTdHdQrrwBdUF=2xK9uDqnv6Zt6j7gLXRzr7CYy_cW+A@mail.gmail.com>
+Subject: Re: [PATCH v2] loop: fix zero sized loop for block special file
+To: Yu Kuai <yukuai1@huaweicloud.com>
+Cc: hch@infradead.org, axboe@kernel.dk, yukuai3@huawei.com, rajeevm@hpe.com, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	yi.zhang@huawei.com, yangerkun@huawei.com, johnny.chenyi@huawei.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi, Paul!
+On Mon, Aug 25, 2025 at 5:40=E2=80=AFPM Yu Kuai <yukuai1@huaweicloud.com> w=
+rote:
+>
+> From: Yu Kuai <yukuai3@huawei.com>
+>
+> By default, /dev/sda is block specail file from devtmpfs, getattr will
+> return file size as zero, causing loop failed for raw block device.
+>
+> We can add bdev_statx() to return device size, however this may introduce
+> changes that are not acknowledged by user. Fix this problem by reverting
+> changes for block special file, file mapping host is set to bdev inode
+> while opening, and use i_size_read() directly to get device size.
+>
+> Fixes: 47b71abd5846 ("loop: use vfs_getattr_nosec for accurate file size"=
+)
+> Reported-by: kernel test robot <oliver.sang@intel.com>
+> Closes: https://lore.kernel.org/oe-lkp/202508200409.b2459c02-lkp@intel.co=
+m
+> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+> ---
+> Changes in v2:
+>  - don't call vfs_getattr_nosec() for block special file path, by Ming
 
-On 8/25/2025 4:59 PM, Paul Menzel wrote:
-> Dear Yi,
-> 
-> 
-> Thank you for your patch.
-> 
-> Am 25.08.25 um 10:33 schrieb Zhang Yi:
->> From: Zhang Yi <yi.zhang@huawei.com>
->>
->> The parameter max_hw_wzeroes_unmap_sectors in queue_limits should be
->> equal to max_write_zeroes_sectors if it is set to a non-zero value.
-> 
-> Excuse my ignorance, but why?
-
-Currently, the max_hw_wzeroes_unmap_sectors parameter is used only to
-determine whether the backend device supports the "unmap write zeroes"
-operation. If it is set to a non-zero value, it indicates that the
-device supports this operation. It depends on the device supports the
-write zeroes command, which means that the max_write_zeroes_sectors
-should not be zero. However, we do not use this specific value, so the
-max_hw_wzeroes_unmap_sectors can only have one of two values:
-max_write_zeroes_sectors or 0, any other value is meaningless.
-
-> 
->> However, the stacked md drivers call md_init_stacking_limits() to
->> initialize this parameter to UINT_MAX but only adjust
->> max_write_zeroes_sectors when setting limits. Therefore, this
->> discrepancy triggers a value check failure in blk_validate_limits().
->>
->> Fix this failure by explicitly setting max_hw_wzeroes_unmap_sectors to
->> zero.
-> 
-> In `linear_set_limits()` and `raid0_set_limits()` you set it to `mddev->chunk_sectors`. Is that intentional?
-
-Yes, the linear and raid0 drivers can support unmap write zeroes
-operation if all of the backend devices supports it, so we can initialize
-it to chunk_sectors (the same to max_write_zeroes_sectors). raid1/10/5
-drivers doesn't support write zeroes, so we have to set it to zero.
-
-> 
->> Fixes: 0c40d7cb5ef3 ("block: introduce max_{hw|user}_wzeroes_unmap_sectors to queue limits")
->> Reported-by: John Garry <john.g.garry@oracle.com>
->> Closes: https://lore.kernel.org/linux-block/803a2183-a0bb-4b7a-92f1-afc5097630d2@oracle.com/
-> 
-> It’d be great if you added the test case to the commit message.
-
-Yeah, I will add a test to blktests.
-
-Thanks,
-Yi.
-
-> 
->> Signed-off-by: Zhang Yi <yi.zhang@huawei.com>
->> ---
->>   drivers/md/md-linear.c | 1 +
->>   drivers/md/raid0.c     | 1 +
->>   drivers/md/raid1.c     | 1 +
->>   drivers/md/raid10.c    | 1 +
->>   drivers/md/raid5.c     | 1 +
->>   5 files changed, 5 insertions(+)
->>
->> diff --git a/drivers/md/md-linear.c b/drivers/md/md-linear.c
->> index 5d9b08115375..3e1f165c2d20 100644
->> --- a/drivers/md/md-linear.c
->> +++ b/drivers/md/md-linear.c
->> @@ -73,6 +73,7 @@ static int linear_set_limits(struct mddev *mddev)
->>       md_init_stacking_limits(&lim);
->>       lim.max_hw_sectors = mddev->chunk_sectors;
->>       lim.max_write_zeroes_sectors = mddev->chunk_sectors;
->> +    lim.max_hw_wzeroes_unmap_sectors = mddev->chunk_sectors;
->>       lim.io_min = mddev->chunk_sectors << 9;
->>       err = mddev_stack_rdev_limits(mddev, &lim, MDDEV_STACK_INTEGRITY);
->>       if (err)
->> diff --git a/drivers/md/raid0.c b/drivers/md/raid0.c
->> index f1d8811a542a..419139ad7663 100644
->> --- a/drivers/md/raid0.c
->> +++ b/drivers/md/raid0.c
->> @@ -382,6 +382,7 @@ static int raid0_set_limits(struct mddev *mddev)
->>       md_init_stacking_limits(&lim);
->>       lim.max_hw_sectors = mddev->chunk_sectors;
->>       lim.max_write_zeroes_sectors = mddev->chunk_sectors;
->> +    lim.max_hw_wzeroes_unmap_sectors = mddev->chunk_sectors;
->>       lim.io_min = mddev->chunk_sectors << 9;
->>       lim.io_opt = lim.io_min * mddev->raid_disks;
->>       lim.chunk_sectors = mddev->chunk_sectors;
->> diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
->> index 408c26398321..35c6498b4917 100644
->> --- a/drivers/md/raid1.c
->> +++ b/drivers/md/raid1.c
->> @@ -3211,6 +3211,7 @@ static int raid1_set_limits(struct mddev *mddev)
->>         md_init_stacking_limits(&lim);
->>       lim.max_write_zeroes_sectors = 0;
->> +    lim.max_hw_wzeroes_unmap_sectors = 0;
->>       lim.features |= BLK_FEAT_ATOMIC_WRITES;
->>       err = mddev_stack_rdev_limits(mddev, &lim, MDDEV_STACK_INTEGRITY);
->>       if (err)
->> diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
->> index b60c30bfb6c7..9832eefb2f15 100644
->> --- a/drivers/md/raid10.c
->> +++ b/drivers/md/raid10.c
->> @@ -4008,6 +4008,7 @@ static int raid10_set_queue_limits(struct mddev *mddev)
->>         md_init_stacking_limits(&lim);
->>       lim.max_write_zeroes_sectors = 0;
->> +    lim.max_hw_wzeroes_unmap_sectors = 0;
->>       lim.io_min = mddev->chunk_sectors << 9;
->>       lim.chunk_sectors = mddev->chunk_sectors;
->>       lim.io_opt = lim.io_min * raid10_nr_stripes(conf);
->> diff --git a/drivers/md/raid5.c b/drivers/md/raid5.c
->> index 023649fe2476..e385ef1355e8 100644
->> --- a/drivers/md/raid5.c
->> +++ b/drivers/md/raid5.c
->> @@ -7732,6 +7732,7 @@ static int raid5_set_limits(struct mddev *mddev)
->>       lim.features |= BLK_FEAT_RAID_PARTIAL_STRIPES_EXPENSIVE;
->>       lim.discard_granularity = stripe;
->>       lim.max_write_zeroes_sectors = 0;
->> +    lim.max_hw_wzeroes_unmap_sectors = 0;
->>       mddev_stack_rdev_limits(mddev, &lim, 0);
->>       rdev_for_each(rdev, mddev)
->>           queue_limits_stack_bdev(&lim, rdev->bdev, rdev->new_data_offset,
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
