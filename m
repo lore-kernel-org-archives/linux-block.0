@@ -1,114 +1,98 @@
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FF3A17BD6;
-	Mon, 25 Aug 2025 05:41:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 877A220A5C4;
+	Mon, 25 Aug 2025 06:15:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756100513; cv=none; b=h38AQZosafu6XQv/PPBABCA3g6WvBbkSLcFJYuPSvRmkCdpGGzqbb0XdjZvPRCd/VlbFPCElEdQTSd4JruYRXNMRvZjZq1ucc/mTJfFnKinJE7C55IWJkY1lIp+t5bEQToo1FeQFO/IL1UlHn0kyvq5L1sjXROCaBUWb7jguUJk=
+	t=1756102557; cv=none; b=pBso1Zk9hY20EU2Cmi13A/AM2yUiK3UlVcY1hQ7hGTrXRvfaP5UCbyTd0Z3nYLRsRtbgtuKKalGvd1RWm5qvqNool6y/8tldI99Fi/Y5ciPVbBHGSKPVIVgn/y64ORORFwxpmt+rQFiNxwq4oP2xAEMwDApBgsC7cbNHrVwFH3E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756100513; c=relaxed/simple;
-	bh=MnZiu7fXrkM6+MnglxgLey/FjF8ZRA2j7g6c+i2mgeI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lxyhlj6bqyV7r3gZPA7xpCQ6i1RmjgekJV/sBzTz0oEkrKVy92YdYorHpQc+aBVYpHz3KVD8nM7QmUDNyJRguTXA6PbXL32CQiFZKSYoa7+xwijqYbFdgVS6SVayJphpkDQLNsQkAbJci9uBFdBUnUToVYdNpF/VOZdk38B2fnk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gSFGaveN; arc=none smtp.client-ip=209.85.216.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gSFGaveN"
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-324eb9cc40aso2952970a91.0;
-        Sun, 24 Aug 2025 22:41:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756100511; x=1756705311; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XNqmPCrc+HXWAXDIRkVQuzgw6NMzo3YWapK+gmBm+rI=;
-        b=gSFGaveNVS6/u50l/oaep2COXNPlS1dBmurY7HWN4HlPuFUevakXnfWshG17xi0j5I
-         uFKEiy5TqcKzdAi1lzfOnw39w2avvEGh2CQVryQWhtL65lvCwWpBY6eCmmDO3wSrvPLe
-         BUJNkbCfxdlsBfAgyM0JRmKY74EgkjBSLmtixs9Ustv+wAb9N8WyRruYNrOAY1pwNok4
-         VnGtaZ6lQLcZ7j7v3fayMNa1zGOgKzGfnZ1gY4hp/X7iaMPrVwiEsqOXScI7RkTXy0iP
-         QO2+XzW5oT2x41KZL4S8CIGo3aCE+IQYuKOXWupUF+/Mvn2PvKw/puqG5z4ejmk7AYmN
-         ce1A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756100511; x=1756705311;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=XNqmPCrc+HXWAXDIRkVQuzgw6NMzo3YWapK+gmBm+rI=;
-        b=OeTf4uBMIVlU/+gvIYsNSdzTS4L5gy5+4vFtnIJUkaXL0FvHdplgDIoiX3io5DgLgy
-         7p55GbcMmQILOgkTbaw5j6OPxmcy8cqgQFIdqh6qH/q5PHyNZwpuJg4xwmRii/9kmizO
-         INHE6InqvDsqgOC4LJFw8JMyD3kuzQ+0ZGDuqX7SfcRI9MTMi47xst2zyJoJd9jetICz
-         v57Ptk2+9A4mOdTde8zsr81rK5gmuuV2SF/dApkR9kOLRut6uiqlAskISWyj1XixA6y4
-         U0kp8xWw/eobtzdTELJXzOfFZNpeEHlR7Ndz0+Gwobsf9o2dpxTnH3rFaI9MpKRnrw2c
-         TEew==
-X-Forwarded-Encrypted: i=1; AJvYcCUsbUK6rDioBAHjuCuac1HxW2hyG+q1YwWUVG9l9js9kvs04aOUJErD3kLdqGAT+wsBl25Xqz11lMJ++w==@vger.kernel.org, AJvYcCWQUEom18unX8YpQS+eVkxNZ0QnFVUBN2IfUTar/2vNnU/omRaoIHml+2OCMdhIIXeQ8zvgMG14h9yb7cY5@vger.kernel.org, AJvYcCX8LAGrUxaBE27I/D8I2kCdLy1cdFThhMlTh83owrUM9IRukXO5BqY9DxH4xAtvMU/+iUxLPfYPewr3cRziCMM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwtlDY1YFSckrDilI+U2iwM+8QUPr2rpFoOU39thT7CVRbOu/BB
-	Lk2RqfC1RDIO3oQObUi0B78tYJq4YSx6q/AZX4xZbtJd55HRaYZpL7B1
-X-Gm-Gg: ASbGncswiDKFqrLQ6g7UtzWqhyUxWjiP8ElwvO8lvmtgTBuLlBewd6BiQETaB/doebT
-	mJQQkvcFWU2wl+PIza1llFQBBllx+wg++kPGpG9zQuE44XDviYRtmu9EDNYg0s5KmmFVY8AcYge
-	QnpiBHimZQ9I8U4VIjt3dTgmzmyG2OUpnz6P6fI5XcOggFGdn4ku1d+xhPADQ04AZhtRWtLuiW9
-	BJpqgf0rQbbRrCOvJpmic5boAyYSOByS2kJE2CNSYFqYn3VUO/jwwIzCRf8TcvV0CQ3GUVmH5fM
-	OL/6FOW1h4Yd6kqsTf1SaR+n6JV4XvGPixeD0jKneHwuKVninGzgU0d5nlWGXiUOsl75jzLbTzF
-	nUEZdOpbVRKUFWvm32uwAT8cHfUWswOs5ioK1Wpze1x4=
-X-Google-Smtp-Source: AGHT+IGY58Ypohz2bYe1bBZh2q57Dq1fev6swoKD3WIWeo6f/8JKG6e9vuIpZOUm322P5Z4BcaQvug==
-X-Received: by 2002:a17:90b:14cf:b0:325:6598:30d7 with SMTP id 98e67ed59e1d1-32565983322mr5164426a91.16.1756100511144;
-        Sun, 24 Aug 2025 22:41:51 -0700 (PDT)
-Received: from shankari-IdeaPad.. ([2409:408c:8785:5427:408b:6413:d449:110c])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3254af4c347sm5804475a91.18.2025.08.24.22.41.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 24 Aug 2025 22:41:50 -0700 (PDT)
-From: Shankari Anand <shankari.ak0208@gmail.com>
-To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
-	Andreas Hindborg <a.hindborg@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Miguel Ojeda <ojeda@kernel.org>,
-	Alex Gaynor <alex.gaynor@gmail.com>,
-	linux-block@vger.kernel.org,
-	rust-for-linux@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Gary Guo <gary@garyguo.net>,
-	=?UTF-8?q?Bj=C3=B6rn=20Roy=20Baron?= <bjorn3_gh@protonmail.com>,
-	Benno Lossin <lossin@kernel.org>,
-	Alice Ryhl <aliceryhl@google.com>,
-	Trevor Gross <tmgross@umich.edu>,
-	Danilo Krummrich <dakr@kernel.org>
-Subject: Re: [PATCH 1/7] rust: block: update ARef and AlwaysRefCounted imports from sync::aref
-Date: Mon, 25 Aug 2025 11:11:41 +0530
-Message-Id: <20250825054141.56262-1-shankari.ak0208@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <CANiq72k_+eA259oEq1fBKCOVOK+2GCAwqF_JfweJ9A3ih_Px0A@mail.gmail.com>
-References: <CANiq72k_+eA259oEq1fBKCOVOK+2GCAwqF_JfweJ9A3ih_Px0A@mail.gmail.com>
+	s=arc-20240116; t=1756102557; c=relaxed/simple;
+	bh=U97WVDPZFYoUgWdt+TuwlTAS+SfYDfaU00t+WmyHZtg=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=WvZjHWXb01Kt3cceVsBtJPiAwgcu6stx26OKzSupy2B9m+/vzWW/xdBUalWjFlsO+AZeUZYwSQV5EpceDKrQKlsslaFKOJGpSDsarwYLTZ4VcvysPNJREgXLfWUaN3ozwGa0B9IPyHieQWdvamAbTht6jKVFI8HIkfzDPfodEek=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.93.142])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4c9LBw2TbmzKHLyH;
+	Mon, 25 Aug 2025 14:15:52 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id E48B61A129A;
+	Mon, 25 Aug 2025 14:15:51 +0800 (CST)
+Received: from [10.174.179.143] (unknown [10.174.179.143])
+	by APP4 (Coremail) with SMTP id gCh0CgCX4o6V_6toKrDgAA--.58258S3;
+	Mon, 25 Aug 2025 14:15:51 +0800 (CST)
+Subject: Re: [PATCH] block: fix disordered IO in the case recursive split
+To: Yu Kuai <yukuai1@huaweicloud.com>, Christoph Hellwig <hch@infradead.org>
+Cc: axboe@kernel.dk, neil@brown.name, akpm@linux-foundation.org,
+ linux-block@vger.kernel.org, linux-raid@vger.kernel.org,
+ linux-kernel@vger.kernel.org, colyli@kernel.org, xni@redhat.com,
+ yi.zhang@huawei.com, yangerkun@huawei.com, johnny.chenyi@huawei.com,
+ tieren@fnnas.com, "yukuai (C)" <yukuai3@huawei.com>
+References: <20250821074707.2604640-1-yukuai1@huaweicloud.com>
+ <aKbcM1XDEGeay6An@infradead.org>
+ <54fc027f-f4dc-0412-0d6d-b44a3e644c39@huaweicloud.com>
+ <aKbgqoF0UN4_FbXO@infradead.org>
+ <060396d7-797e-b876-9945-1dc9c8cbf2b4@huaweicloud.com>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <510600c4-5ff3-a02e-de6d-020fad771425@huaweicloud.com>
+Date: Mon, 25 Aug 2025 14:15:49 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <060396d7-797e-b876-9945-1dc9c8cbf2b4@huaweicloud.com>
+Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgCX4o6V_6toKrDgAA--.58258S3
+X-Coremail-Antispam: 1UD129KBjvdXoWrtF4DtrWxAFW3Cr15CF1Utrb_yoW3GrcEva
+	9akw4DCw1UA3s29as8Krnxt3yvgw4rJr4xXF98GF4Y9r98JryDG3W5C39xZrWrurn5Xwn3
+	u3ykXry0qryYgjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUbfAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+	A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
+	6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
+	c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7V
+	AKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCj
+	r7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6x
+	IIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAI
+	w20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x
+	0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbGQ6JUUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On Mon, Aug 11, 2025 at 12:44:01PM +0200, Miguel Ojeda wrote:
-> On Mon, Aug 11, 2025 at 9:49鈥疉M Andreas Hindborg <a.hindborg@kernel.org> wrote:
-> >
-> > Jens is picking the block patches directly from list. I would prefer
-> > sending a PR, but that is not the way we agreed on doing it.
-> >
-> > @Jens, do you still prefer to pick the rust block patches directly?
+Hi,
+
+在 2025/08/21 17:37, Yu Kuai 写道:
+> 在 2025/08/21 17:02, Christoph Hellwig 写道:
+>> On Thu, Aug 21, 2025 at 04:56:33PM +0800, Yu Kuai wrote:
+>>> Can you give some examples as how to chain the right way?
+>>
+>> fs/xfs/xfs_bio_io.c: xfs_rw_bdev
 > 
-> That is fine, if Jens wants to pick it, that is nice. Otherwise, I can
-> pick it up, no worries.
+> Just take a look, this is
 > 
-> Thanks!
+> old bio->new bio
 > 
-> Cheers,
-> Miguel
+> while bio split is:
+> 
+> new_bio->old bio
+> 
+> So xfs_rw_bdev won't flag old bio as BIO_CHAIN, while old bio will still
+> be resubmitted to current->bio_list, hence this patch won't break this
+> case, right?
 
-Hi Jens, Miguel,
+And xfs_rw_bdev() is not under submit_bio() context, current->bio_list
+is still NULL, means xfs_rw_bdev() is submitting bio one by one in the
+right lba order, the bio recursive handling is not related in this case.
 
-Just a kind reminder about this patch I sent earlier.
-Thanks a lot for your time!
+Thanks,
+Kuai
 
-Cheers,
-Shankari
