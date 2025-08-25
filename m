@@ -1,105 +1,108 @@
-Received: from mail-oo1-f47.google.com (mail-oo1-f47.google.com [209.85.161.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7561923C4F4
-	for <linux-block@vger.kernel.org>; Mon, 25 Aug 2025 09:42:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADDA32C15B1;
+	Mon, 25 Aug 2025 09:45:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756114931; cv=none; b=Iz2xa9M+9HgeradsW9T5cvp122hb2boTW9097VYOiAk/UkIs8yBbeGFMMwdPo+k4MIfFiwXk0WnTxPSrKwbCojR9qjwhLx75g8zbNPPoKyo+SjQ0df7sMyQetqcoM2zsATeWZvdYKE0ooiz9y20iVFA9q5bW6WWlgtq0EnQnniI=
+	t=1756115131; cv=none; b=iARcn0YzN+X3IUVJrXjB15KlT04obxjbgBjAKz/ePhuzdy0SgzTHIao+BvI5n5EtbGNw4u7Qo6+ueOSj13gzAP8RSWqCiIw/caVkOBxKrkLEiBE9twoG+b68s7+9d8JUA3RE29tLQBVZYZd1UXTdt7GZKZSh3WrKjelCRXnf/sA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756114931; c=relaxed/simple;
-	bh=qSxAdEFkr92eN+3eEeJ9Yx+AdgaO5dXFSmZHlto/gbY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MHLyipijgHrFcZOOuQEb+zWpELiWpgsKqtZP6m2bRfAVqh5UorODiEnZiWJ/Hav26EigWBvSHz41OBeohYfnCUaLrxLzI7x3fIOM99E1Z/F+ajDd9yljPP3oy+8POvsxp8TfPlNEcOYTSsKusJhOFT3Hckyc/vaA7eT81MtnRW8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=T7KT1Qha; arc=none smtp.client-ip=209.85.161.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="T7KT1Qha"
-Received: by mail-oo1-f47.google.com with SMTP id 006d021491bc7-61da7b78978so1563148eaf.1
-        for <linux-block@vger.kernel.org>; Mon, 25 Aug 2025 02:42:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1756114928; x=1756719728; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+GRu22p3tVeEW2VrGOdoxPvOS1mLmNVegFteBbU78nI=;
-        b=T7KT1QhaStHCSKMvU7GPD2OmBkxi0cCXr3UmxNrRBbY+rXsozpojT9GP0Oo0Avidn2
-         LyZ/A9hDc7l6Ju4MGsoVGzUjGLfSzpnS9JMMdf4bUwNAlSQa3IIjieSIuyQJAkuoNwe+
-         VYlCu6LKO8xYSBeXQKG4PSOVBkILLEyQKwPTaTnz7uJqdNz1IU6R1LM9ZSd8zr+ueqHP
-         Fu2PWhU3GMy8CLg3kjKZ67D+afTpvCJnrFjq4/k5ZGFPSM6JWBB3wH3IeG4lSUPmra9w
-         bGp9GUC+o5Vc8dvF8aDUhXGyzbBlkfZk3Z3PPyd4nrXI7UOhXu6Fs7Qkuz6uJa6AE2M2
-         3UfQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756114928; x=1756719728;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+GRu22p3tVeEW2VrGOdoxPvOS1mLmNVegFteBbU78nI=;
-        b=Qk9MgFPrqQ0OLrurEzLfZ5ZuvQBYbvcCD7djb2eSVDh0Gd55mS5cEI77dWpsqhr8UD
-         y+2T1Lr6EhNMR+u1Q7UIPjvPpI2yWUIIPLvAfF2/k9jaTqvcXXAvRjgCGB0ajOU4LEJ9
-         YrERqn+A2ajdKjof5KUuYcAbYOcY5G0MuLNPH7az1J+UKwt4nfwXmNusD2eFJH44E7QX
-         +gXaSXSqEhEfDWeOIeUwSglRaM5chVvzUQwmqQOljloUQF3FyWwTgQtG2kTTnbRrb1J8
-         KcodwpgDkDotI/cYmgDVonbd5E8z2c2HIcef7md63JhwAhlkAmmp/K2KFC4bafklaBv4
-         Tqfg==
-X-Forwarded-Encrypted: i=1; AJvYcCUWeI9keLNA82y6dP4vG/4C0nGgq3Yyrv28jL+soL4c39JPdOmUdW05FuLFrBaAAIzMuM5Tsmul77+oMA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxwrbQG92S8rDOLl2BpyaG1VcFSVyHRow2SlmEOJ/A/KL1I37xA
-	5Ogrmj55JsYcv1PRGimMzHMgBh9UtRKxiPNJIl4Ve5iIsvs73Uel4tmUiLklf3J7+//kHPldCWd
-	vAdbVTTIJUA5jW3hibkUJPGqxVI/Ka2k5tQH17CLAkA==
-X-Gm-Gg: ASbGnctfv6s1Noh/5Zf4fMWzL/zli18kRAt3zfZ8Oqsl88jjALzuoIWmxsCqDeLqLXP
-	Flspxo6ykT4GygUavtRz4pyaiXWm+2v2QzmO8oz7lMfSoHjA34ZkF4wIodYYkuglXNgJm4jPX3U
-	PdD0BAhs3csZcfdcanMOBeuhEV8FEj/0wAQm3KCaqut1p5PENr3aVVDku3ZL7rLrBvl34XjRgkM
-	IFXhcQcdvFA
-X-Google-Smtp-Source: AGHT+IH9whC+Nt+KP6zMOInVqQwfTRZ9vyaBO1gLszlXrDLuQ8rxx0C4w5IQE2c6Fn1IFfz6+QQxtpnzgbhuqH3KxgU=
-X-Received: by 2002:a05:6808:1883:b0:40b:2566:9569 with SMTP id
- 5614622812f47-4378525e610mr4960520b6e.24.1756114928355; Mon, 25 Aug 2025
- 02:42:08 -0700 (PDT)
+	s=arc-20240116; t=1756115131; c=relaxed/simple;
+	bh=2yjjvo3ufYFsl3ZDOcn9W92qBsYVrRKHbAkhuPAHNBg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=JcAK0YX+oyVjHJJCNlO/Q8oIuvHC+Ai4Wk3+PNlUnkYIaFFlgkSQuHCSKxs5miczdwIBjb5kgI1OPwcISKgdvaKF7Yl+zIHFHol/e0L9TomI4sLBI2q6a8PJt0MibQnes9LyFvTKQa/kp+HniCH1uMFYGE0U4y7baONvNEpCzm0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4c9Qrm3p0nzYQvgT;
+	Mon, 25 Aug 2025 17:45:28 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 104B31A1003;
+	Mon, 25 Aug 2025 17:45:27 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+	by APP4 (Coremail) with SMTP id gCh0CgAXYIy1MKxonJnxAA--.44975S4;
+	Mon, 25 Aug 2025 17:45:26 +0800 (CST)
+From: Yu Kuai <yukuai1@huaweicloud.com>
+To: hch@infradead.org,
+	colyli@kernel.org,
+	hare@suse.de,
+	tieren@fnnas.com,
+	axboe@kernel.dk,
+	tj@kernel.org,
+	josef@toxicpanda.com,
+	song@kernel.org,
+	yukuai3@huawei.com,
+	akpm@linux-foundation.org,
+	neil@brown.name
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	cgroups@vger.kernel.org,
+	linux-raid@vger.kernel.org,
+	yukuai1@huaweicloud.com,
+	yi.zhang@huawei.com,
+	yangerkun@huawei.com,
+	johnny.chenyi@huawei.com
+Subject: [PATCH RFC 0/7] block: fix disordered IO in the case recursive split
+Date: Mon, 25 Aug 2025 17:36:53 +0800
+Message-Id: <20250825093700.3731633-1-yukuai1@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250822082606.66375-1-changfengnan@bytedance.com>
- <20250822150550.GP7942@frogsfrogsfrogs> <aKiP966iRv5gEBwm@casper.infradead.org>
- <877byv9w6z.fsf@gmail.com> <aKif_644529sRXhN@casper.infradead.org>
- <874ityad1d.fsf@gmail.com> <CAPFOzZufTPCT_56-7LCc6oGHYiaPixix30yFNEsiFfN1s9ySMQ@mail.gmail.com>
- <aKwq_QoiEvtK89vY@infradead.org>
-In-Reply-To: <aKwq_QoiEvtK89vY@infradead.org>
-From: Fengnan Chang <changfengnan@bytedance.com>
-Date: Mon, 25 Aug 2025 17:41:57 +0800
-X-Gm-Features: Ac12FXxB3S3g0sTu8keoah4lgnqnAcyUyXsuVt_e56y_rQP7QRz4QmS_1ZuROw0
-Message-ID: <CAPFOzZvBvHWHUwNLnH+Ss90OMdu91oZsSD0D7_ncjVh0pF29rQ@mail.gmail.com>
-Subject: Re: [PATCH] iomap: allow iomap using the per-cpu bio cache
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Ritesh Harjani <ritesh.list@gmail.com>, Matthew Wilcox <willy@infradead.org>, 
-	"Darrick J. Wong" <djwong@kernel.org>, brauner@kernel.org, linux-xfs@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>, 
-	linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgAXYIy1MKxonJnxAA--.44975S4
+X-Coremail-Antispam: 1UD129KBjvJXoW7Jry8XrWxWF45tF45XF1kZrb_yoW8Jr1DpF
+	43WrW3Zr18Gr1a9r9xZw4Ut3Z8JF48G34UKrnxXw48XF9xZFy0yw1UAry8Gryjgryft3yU
+	Xr1UAr45GF1UGFDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9Y14x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
+	Y2ka0xkIwI1lc7CjxVAaw2AFwI0_GFv_Wryl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x
+	0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2
+	zVAF1VAY17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF
+	4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWU
+	CwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCT
+	nIWIevJa73UjIFyTuYvjTRRBT5DUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-Christoph Hellwig <hch@infradead.org> =E4=BA=8E2025=E5=B9=B48=E6=9C=8825=E6=
-=97=A5=E5=91=A8=E4=B8=80 17:21=E5=86=99=E9=81=93=EF=BC=9A
->
-> On Mon, Aug 25, 2025 at 04:51:27PM +0800, Fengnan Chang wrote:
-> > No restrictions for now, I think we can enable this by default.
-> > Maybe better solution is modify in bio.c?  Let me do some test first.
->
-> Any kind of numbers you see where this makes a different, including
-> the workloads would also be very valuable here.
-I'm test random direct read performance on  io_uring+ext4, and try
-compare to io_uring+ raw blkdev,  io_uring+ext4 is quite poor, I'm try to
-improve this, I found ext4 is quite different with blkdev when run
-bio_alloc_bioset. It's beacuse blkdev ext4  use percpu bio cache, but ext4
-path not. So I make this modify.
-My test command is:
-/fio/t/io_uring -p0 -d128 -b4096 -s1 -c1 -F1 -B1 -R1 -X1 -n1 -P1 -t0
-/data01/testfile
-Without this patch:
-BW is 1950MB
-with this patch
-BW is 2001MB.
+From: Yu Kuai <yukuai3@huawei.com>
 
+patch 1 export a bio split helper;
+patch 2-6 unfiy bio split code from mdraid to use the helper;
+patch 7 convert the helper to insert split bio to the head of current
+bio_list
 
->
+This set is just test for raid5 for now, see details in patch 7;
+
+Yu Kuai (7):
+  block: export helper bio_submit_split()
+  md/raid0: convert raid0_handle_discard() to use bio_submit_split()
+  md/raid1: convert to use bio_submit_split()
+  md/raid10: convert read/write to use bio_submit_split()
+  md/raid5: convert to use bio_submit_split()
+  md/md-linear: convert to use bio_submit_split()
+  block: fix disordered IO in the case recursive split
+
+ block/blk-core.c       | 54 ++++++++++++++++++++++++-------------
+ block/blk-merge.c      | 60 +++++++++++++++++++++++++++---------------
+ block/blk-throttle.c   |  2 +-
+ block/blk.h            |  3 ++-
+ drivers/md/md-linear.c | 14 +++-------
+ drivers/md/raid0.c     | 20 ++++++--------
+ drivers/md/raid1.c     | 35 ++++++++++--------------
+ drivers/md/raid10.c    | 53 ++++++++++++++++---------------------
+ drivers/md/raid10.h    |  1 +
+ drivers/md/raid5.c     | 12 +++++----
+ include/linux/bio.h    |  2 ++
+ 11 files changed, 135 insertions(+), 121 deletions(-)
+
+-- 
+2.39.2
+
