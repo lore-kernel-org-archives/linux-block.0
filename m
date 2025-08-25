@@ -1,72 +1,123 @@
-Received: from 004.mia.mailroute.net (004.mia.mailroute.net [199.89.3.7])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3B44301013;
-	Mon, 25 Aug 2025 16:10:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30FB02367B5;
+	Mon, 25 Aug 2025 16:35:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756138212; cv=none; b=Ds3/iq8ncFzpSp8vExAXxyNcBFCuN/oS5RliWtWcdkRJ8N/qShYa7r0q+EwlAptiHOFNcAQ0qrKyr8DykNGxChmZua96nKIdlJH8ZllfotLsK+uaf8gOU5urI0+7u3/tvsthqfzTM8u0uWSLJd2hj5Gs7lWb5f6X9b0SCQMR8Ck=
+	t=1756139757; cv=none; b=J5pwUrLHqUxUdfLv4+Gjafiq5Q/S47gao4DQn0dfdF3dsuhPWO5IGGZWAg5Vlb396QyV45PFVtuwiQESWuWQqJzAXtlP6OsvIcfquTHTKiFbcJnKggEWq1ZguB3Scb5mIS+b5DFq2jL+19w37xlM4DmFyHSEn2UZRphlOAyk29U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756138212; c=relaxed/simple;
-	bh=Tjj9fFFMxfm5wq/Jzz3oDejeUiSni4NVLGvr02EWqvM=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=rY1l/pohTl8KoT/llUH2+SQhIw5fno9h8zmdkLq/2HQbq0NTRRaYuCc5EIuc49+4bdZ7s7rHqiXoDiMMQsoGeht7WluFeFjEesS6y3sgK5d+8Hn5wglpgLSijNR2W4n+s58+e3WrFEINOxfXkk8XPbDsC/35XFjaJXpp7y6eXU4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=zMXFCzn+; arc=none smtp.client-ip=199.89.3.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1756139757; c=relaxed/simple;
+	bh=L2un3Tp24kq84D49bPeqtKFgx0ttvdt2Oi+LfIRW2Jk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=u+wT30xuGlRhD1VS9y4xnkmQWjuE0zeIVyTWWGRObzs+IjVYfCwmSer/69gWp3DRILELdbDdL8utUK0MA9DoswtUH1GJGSCImXcu47PZmBQUhfrVUHJQzyIB9Yj/1WdCF5n+sQzgittFyN70QyQkX+8GtMYGFUfFox/CAUA2CrQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=aQ4JtXe6; arc=none smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="zMXFCzn+"
-Received: from localhost (localhost [127.0.0.1])
-	by 004.mia.mailroute.net (Postfix) with ESMTP id 4c9bNb48gkzm174H;
-	Mon, 25 Aug 2025 16:10:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:subject
-	:subject:from:from:content-language:user-agent:mime-version:date
-	:date:message-id:received:received; s=mr01; t=1756138206; x=
-	1758730207; bh=Tjj9fFFMxfm5wq/Jzz3oDejeUiSni4NVLGvr02EWqvM=; b=z
-	MXFCzn+1riOFKvwceh9XTxoQumlx8p3GJVsabeKIONgJaGDzQzH/uzeDGz8P+MeD
-	tdnIfAVPNB5slRxtsJheAeqjSYIyUzLc0w/s4879nUUZpymI9EK90ptBQ2sCajVQ
-	ee8yjf+S1pXvU0yDnQdyoRtzSHmsLhP7g53DwI/QprmSa4AG8L3Zxhijw0YqADt6
-	ikAiL1PJ+jHTJHfDiJxiC5tqyKQbwByWDP//4iu1VHVN31ERrsc407noFJV7lok+
-	TcnedkCh74d48bPPDJrDwrIb9QnxDmUeAIlOR2e+2HyrhaIUjhH6Git3n7UOKIQC
-	QL1BiUyGAAjiQpBtXJiMA==
-X-Virus-Scanned: by MailRoute
-Received: from 004.mia.mailroute.net ([127.0.0.1])
- by localhost (004.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id 017oq8RA6eDE; Mon, 25 Aug 2025 16:10:06 +0000 (UTC)
-Received: from [192.168.51.14] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 004.mia.mailroute.net (Postfix) with ESMTPSA id 4c9bNV56CZzm1745;
-	Mon, 25 Aug 2025 16:10:01 +0000 (UTC)
-Message-ID: <b2678a98-037c-4567-b028-07e5bf149714@acm.org>
-Date: Mon, 25 Aug 2025 09:10:00 -0700
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aQ4JtXe6"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1756139756; x=1787675756;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=L2un3Tp24kq84D49bPeqtKFgx0ttvdt2Oi+LfIRW2Jk=;
+  b=aQ4JtXe64l+megZLLTslxyNO3mJqjxdtJ26XSa/vg7Ok0/CPcoWHylNS
+   sy7pZklbtxpurn/BksnbsqCcROHvDk6acKNemmeoCLgviZMx9To+ysikz
+   EdWm7ujPGtjUyp8MohOgTFCufJzi5KQ0cMNvOl+AzGO5N52dsnVC/dpTp
+   JP2GkFp+B4U7cXsOqor3Jq6ku+sW4EGsBmdVrX1dLtNXZFulX9PA0+ZxU
+   TCqaefv5XJmYMQdXjFqGC7ZsHjmSKJQCskjGAauLG/aMOV77ejuZpgaHC
+   daCGL962vrAplIU/KS0uGjxyp1jnq+tEWKEflG7ocsis59TMXvx69grQ2
+   g==;
+X-CSE-ConnectionGUID: TonUE+BYSi2EtIOi3kn5rw==
+X-CSE-MsgGUID: Lj7NOPs8TAKPfDvF5eODHQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11533"; a="69459506"
+X-IronPort-AV: E=Sophos;i="6.18,213,1751266800"; 
+   d="scan'208";a="69459506"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Aug 2025 09:35:55 -0700
+X-CSE-ConnectionGUID: orFQ8jjkTR+a1kLWJels8Q==
+X-CSE-MsgGUID: l5OrMqmGT8icT6nXAJqR8A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,213,1751266800"; 
+   d="scan'208";a="169241087"
+Received: from black.igk.intel.com ([10.91.253.5])
+  by orviesa007.jf.intel.com with ESMTP; 25 Aug 2025 09:35:48 -0700
+Received: by black.igk.intel.com (Postfix, from userid 1003)
+	id D581B94; Mon, 25 Aug 2025 18:35:46 +0200 (CEST)
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Helge Deller <deller@gmx.de>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Geert Uytterhoeven <geert@linux-m68k.org>,
+	Thomas Fourier <fourier.thomas@gmail.com>,
+	linux-alpha@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-m68k@lists.linux-m68k.org,
+	linux-mips@vger.kernel.org,
+	linux-parisc@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	sparclinux@vger.kernel.org,
+	linux-block@vger.kernel.org
+Cc: Richard Henderson <richard.henderson@linaro.org>,
+	Matt Turner <mattst88@gmail.com>,
+	Ian Molton <spyro@f2s.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+	"James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	"David S. Miller" <davem@davemloft.net>,
+	Andreas Larsson <andreas@gaisler.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Denis Efremov <efremov@linux.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Andrew Morton <akpm@linux-foundation.org>
+Subject: [PATCH v2 0/3] floppy: A couple of cleanups
+Date: Mon, 25 Aug 2025 18:32:54 +0200
+Message-ID: <20250825163545.39303-1-andriy.shevchenko@linux.intel.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: David Sterba <dsterba@suse.com>, Josef Bacik <josef@toxicpanda.com>
-Cc: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
- linux-btrfs@vger.kernel.org,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Bart Van Assche <bvanassche@acm.org>
-Subject: v6.17-rc3: zbd/009 hangs
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi,
+There are a few places in architecture code for the floppy driver
+that may be cleaned up. Do it so.
 
-If I run blktests test zbd/009 on top of Jens' for-next branch
-(commit 6763582c1263 ("Merge branch 'block-6.17' into for-next")) then
-the test triggers a hang in btrfs_writepages(). The same test zbd/009
-passes with older kernel versions (v6.16 and before). Other ZBD tests
-pass with the same kernel. Could this indicate a BTRFS regression?
+Assumed to route via Andrew Morton's tree as floppy is basically orphaned.
 
-Thanks,
+Changelog v2:
+- combined separate patches sent earlier into a series
+- added tags (Helge, Geert)
+- fixed typo in the commit message (Geert)
 
-Bart.
+Andy Shevchenko (3):
+  floppy: Remove unused CROSS_64KB() macro from arch/ code
+  floppy: Replace custom SZ_64K constant
+  floppy: Sort headers alphabetically
+
+ arch/alpha/include/asm/floppy.h    | 19 ----------
+ arch/arm/include/asm/floppy.h      |  2 --
+ arch/m68k/include/asm/floppy.h     |  4 ---
+ arch/mips/include/asm/floppy.h     | 15 --------
+ arch/parisc/include/asm/floppy.h   | 11 +++---
+ arch/powerpc/include/asm/floppy.h  |  5 ---
+ arch/sparc/include/asm/floppy_32.h |  3 --
+ arch/sparc/include/asm/floppy_64.h |  3 --
+ arch/x86/include/asm/floppy.h      |  8 ++---
+ drivers/block/floppy.c             | 56 ++++++++++++++----------------
+ 10 files changed, 34 insertions(+), 92 deletions(-)
+
+-- 
+2.50.1
+
