@@ -1,113 +1,114 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37C474C92
-	for <linux-block@vger.kernel.org>; Mon, 25 Aug 2025 02:40:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FF3A17BD6;
+	Mon, 25 Aug 2025 05:41:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756089644; cv=none; b=BQMNEKrRzWH5EYBLW3g2VH7AP/roC/E9UFLmO045m75O+HjPHrDfXK69auyf/zW1qaZQ3gZrlCmT28a+QBUPJzI3VJ8mQ1ky+SET2BtbpQWC/NzxVmG2wu5lOIRMs2+yYVYxTEQr+X7jrsk7VekSrhcm6CoCtPFW5tMAcCPEjQA=
+	t=1756100513; cv=none; b=h38AQZosafu6XQv/PPBABCA3g6WvBbkSLcFJYuPSvRmkCdpGGzqbb0XdjZvPRCd/VlbFPCElEdQTSd4JruYRXNMRvZjZq1ucc/mTJfFnKinJE7C55IWJkY1lIp+t5bEQToo1FeQFO/IL1UlHn0kyvq5L1sjXROCaBUWb7jguUJk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756089644; c=relaxed/simple;
-	bh=ioJcawFZkmt42f7xGokM145SqH4kR8Zq0wybAkkGWF4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pHFFX/tCF0ljBslVUANpBEhBmGVzwlt0GInCRnn86x8iQDgDhFsymIgpwzg6gDjAtEOhBth/LxEnsatqZmm/Xr1jax4NYGGvM9ObwFt2oCZ8jjeKqu8XHugijJ1hMBqZj3MI/Mbah7a6+54A7eq+YFV90qNx1oewMEPNRUOlXsE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=YkZoeuPs; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1756100513; c=relaxed/simple;
+	bh=MnZiu7fXrkM6+MnglxgLey/FjF8ZRA2j7g6c+i2mgeI=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=lxyhlj6bqyV7r3gZPA7xpCQ6i1RmjgekJV/sBzTz0oEkrKVy92YdYorHpQc+aBVYpHz3KVD8nM7QmUDNyJRguTXA6PbXL32CQiFZKSYoa7+xwijqYbFdgVS6SVayJphpkDQLNsQkAbJci9uBFdBUnUToVYdNpF/VOZdk38B2fnk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gSFGaveN; arc=none smtp.client-ip=209.85.216.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="YkZoeuPs"
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57OFYwAV028164;
-	Mon, 25 Aug 2025 02:40:18 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=WAzBIX
-	+NClB9lqxIXgLkbA5mOFeKdbkh+dn/Ycc0ZqQ=; b=YkZoeuPsY7KU2GajlmbgIX
-	eHqYEVMbBtMFs/ov1BSgbWbVCEW6AULhe3zNdZ9bBWAMPi98SXVkMI4947WcIYCL
-	eq68WzN7okftgFzDNNb+Y+PrRTYlYMRWwkMCuro0wopiqQWwiiXMmxaLc+g+o+9f
-	hP9nGPdkbVwIw6lxubg9GD01JbjJdU836w4cMgT03O4pAVTlLU2gaeO4z00JKV+9
-	q49ENsao/KwnAgU0LXwtXPp9iwZ/5gM1mx/zR/qx/zBW38ew5VZ1aybsVXFpH1/O
-	NeYblfworfgaFcTXRj95CpgP+UVYhcNJN33kTfk+GyNWwCOhmtLAqwMZMyKxwwmg
-	==
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48q42hpmj5-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 25 Aug 2025 02:40:18 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 57P21d0g017981;
-	Mon, 25 Aug 2025 02:40:17 GMT
-Received: from smtprelay04.dal12v.mail.ibm.com ([172.16.1.6])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 48qtp33j49-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 25 Aug 2025 02:40:17 +0000
-Received: from smtpav05.dal12v.mail.ibm.com (smtpav05.dal12v.mail.ibm.com [10.241.53.104])
-	by smtprelay04.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 57P2eHjx57278722
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 25 Aug 2025 02:40:17 GMT
-Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6D4AD58067;
-	Mon, 25 Aug 2025 02:40:17 +0000 (GMT)
-Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 9E26458052;
-	Mon, 25 Aug 2025 02:40:15 +0000 (GMT)
-Received: from [9.43.95.74] (unknown [9.43.95.74])
-	by smtpav05.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 25 Aug 2025 02:40:15 +0000 (GMT)
-Message-ID: <8fc2a2d7-bead-4d9e-9de8-3af6a64e7003@linux.ibm.com>
-Date: Mon, 25 Aug 2025 08:10:13 +0530
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gSFGaveN"
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-324eb9cc40aso2952970a91.0;
+        Sun, 24 Aug 2025 22:41:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1756100511; x=1756705311; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XNqmPCrc+HXWAXDIRkVQuzgw6NMzo3YWapK+gmBm+rI=;
+        b=gSFGaveNVS6/u50l/oaep2COXNPlS1dBmurY7HWN4HlPuFUevakXnfWshG17xi0j5I
+         uFKEiy5TqcKzdAi1lzfOnw39w2avvEGh2CQVryQWhtL65lvCwWpBY6eCmmDO3wSrvPLe
+         BUJNkbCfxdlsBfAgyM0JRmKY74EgkjBSLmtixs9Ustv+wAb9N8WyRruYNrOAY1pwNok4
+         VnGtaZ6lQLcZ7j7v3fayMNa1zGOgKzGfnZ1gY4hp/X7iaMPrVwiEsqOXScI7RkTXy0iP
+         QO2+XzW5oT2x41KZL4S8CIGo3aCE+IQYuKOXWupUF+/Mvn2PvKw/puqG5z4ejmk7AYmN
+         ce1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756100511; x=1756705311;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=XNqmPCrc+HXWAXDIRkVQuzgw6NMzo3YWapK+gmBm+rI=;
+        b=OeTf4uBMIVlU/+gvIYsNSdzTS4L5gy5+4vFtnIJUkaXL0FvHdplgDIoiX3io5DgLgy
+         7p55GbcMmQILOgkTbaw5j6OPxmcy8cqgQFIdqh6qH/q5PHyNZwpuJg4xwmRii/9kmizO
+         INHE6InqvDsqgOC4LJFw8JMyD3kuzQ+0ZGDuqX7SfcRI9MTMi47xst2zyJoJd9jetICz
+         v57Ptk2+9A4mOdTde8zsr81rK5gmuuV2SF/dApkR9kOLRut6uiqlAskISWyj1XixA6y4
+         U0kp8xWw/eobtzdTELJXzOfFZNpeEHlR7Ndz0+Gwobsf9o2dpxTnH3rFaI9MpKRnrw2c
+         TEew==
+X-Forwarded-Encrypted: i=1; AJvYcCUsbUK6rDioBAHjuCuac1HxW2hyG+q1YwWUVG9l9js9kvs04aOUJErD3kLdqGAT+wsBl25Xqz11lMJ++w==@vger.kernel.org, AJvYcCWQUEom18unX8YpQS+eVkxNZ0QnFVUBN2IfUTar/2vNnU/omRaoIHml+2OCMdhIIXeQ8zvgMG14h9yb7cY5@vger.kernel.org, AJvYcCX8LAGrUxaBE27I/D8I2kCdLy1cdFThhMlTh83owrUM9IRukXO5BqY9DxH4xAtvMU/+iUxLPfYPewr3cRziCMM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwtlDY1YFSckrDilI+U2iwM+8QUPr2rpFoOU39thT7CVRbOu/BB
+	Lk2RqfC1RDIO3oQObUi0B78tYJq4YSx6q/AZX4xZbtJd55HRaYZpL7B1
+X-Gm-Gg: ASbGncswiDKFqrLQ6g7UtzWqhyUxWjiP8ElwvO8lvmtgTBuLlBewd6BiQETaB/doebT
+	mJQQkvcFWU2wl+PIza1llFQBBllx+wg++kPGpG9zQuE44XDviYRtmu9EDNYg0s5KmmFVY8AcYge
+	QnpiBHimZQ9I8U4VIjt3dTgmzmyG2OUpnz6P6fI5XcOggFGdn4ku1d+xhPADQ04AZhtRWtLuiW9
+	BJpqgf0rQbbRrCOvJpmic5boAyYSOByS2kJE2CNSYFqYn3VUO/jwwIzCRf8TcvV0CQ3GUVmH5fM
+	OL/6FOW1h4Yd6kqsTf1SaR+n6JV4XvGPixeD0jKneHwuKVninGzgU0d5nlWGXiUOsl75jzLbTzF
+	nUEZdOpbVRKUFWvm32uwAT8cHfUWswOs5ioK1Wpze1x4=
+X-Google-Smtp-Source: AGHT+IGY58Ypohz2bYe1bBZh2q57Dq1fev6swoKD3WIWeo6f/8JKG6e9vuIpZOUm322P5Z4BcaQvug==
+X-Received: by 2002:a17:90b:14cf:b0:325:6598:30d7 with SMTP id 98e67ed59e1d1-32565983322mr5164426a91.16.1756100511144;
+        Sun, 24 Aug 2025 22:41:51 -0700 (PDT)
+Received: from shankari-IdeaPad.. ([2409:408c:8785:5427:408b:6413:d449:110c])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3254af4c347sm5804475a91.18.2025.08.24.22.41.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 24 Aug 2025 22:41:50 -0700 (PDT)
+From: Shankari Anand <shankari.ak0208@gmail.com>
+To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
+	Andreas Hindborg <a.hindborg@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Miguel Ojeda <ojeda@kernel.org>,
+	Alex Gaynor <alex.gaynor@gmail.com>,
+	linux-block@vger.kernel.org,
+	rust-for-linux@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Gary Guo <gary@garyguo.net>,
+	=?UTF-8?q?Bj=C3=B6rn=20Roy=20Baron?= <bjorn3_gh@protonmail.com>,
+	Benno Lossin <lossin@kernel.org>,
+	Alice Ryhl <aliceryhl@google.com>,
+	Trevor Gross <tmgross@umich.edu>,
+	Danilo Krummrich <dakr@kernel.org>
+Subject: Re: [PATCH 1/7] rust: block: update ARef and AlwaysRefCounted imports from sync::aref
+Date: Mon, 25 Aug 2025 11:11:41 +0530
+Message-Id: <20250825054141.56262-1-shankari.ak0208@gmail.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <CANiq72k_+eA259oEq1fBKCOVOK+2GCAwqF_JfweJ9A3ih_Px0A@mail.gmail.com>
+References: <CANiq72k_+eA259oEq1fBKCOVOK+2GCAwqF_JfweJ9A3ih_Px0A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block: Move a misplaced comment in queue_wb_lat_store()
-To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
-References: <20250822200157.762148-1-bvanassche@acm.org>
-Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <20250822200157.762148-1-bvanassche@acm.org>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODIzMDAxMCBTYWx0ZWRfX1I4I0Dzb15XE
- g3jloVeHWUXe3U6dVrjvEQUUzaBFTng9VuPr/yRZr08BCcWYiWCpQQEx2zQJGtnYYXN9+Slw9vz
- ESKK9sjO/lmSoPaEKOTkeiT3QFPGtgJADpwACGwqcdot6LyZ7xoXwji/4UxI8U89lTqrMNj72po
- NlWh7/ozVldMCn5/iR/o9UOInf5er0ZHPLDpxXPClERJweEsO9NYePsTxVLjVhMAOBkcE3ioE1B
- VJlXF7V+J+tvU519hCj6n+BdPCcPzut6tc8ZC1sFLXCoF6OjDncD6cSl3wJlSFxC12TWeGRTMFV
- 4btnwYexLOvTxozuGcKVM3fvCU3lpg5IjHpzhBUbFpDqcqRyCFlStIyW5Uk9hO7Ptkc7SmCffXO
- epOw2C97
-X-Proofpoint-ORIG-GUID: Oczq8IgzNzKuvjnYxMOcbjZeGIcDItG-
-X-Proofpoint-GUID: Oczq8IgzNzKuvjnYxMOcbjZeGIcDItG-
-X-Authority-Analysis: v=2.4 cv=evffzppX c=1 sm=1 tr=0 ts=68abcd12 cx=c_pps
- a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
- a=IkcTkHD0fZMA:10 a=2OwXVqhp2XgA:10 a=VnNF1IyMAAAA:8 a=N54-gffFAAAA:8
- a=BM4iouFTzF-huzC_6qMA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-08-25_01,2025-08-20_03,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0 adultscore=0 malwarescore=0 spamscore=0 bulkscore=0
- impostorscore=0 clxscore=1015 priorityscore=1501 phishscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2508230010
+Content-Transfer-Encoding: 8bit
 
-
-
-On 8/23/25 1:31 AM, Bart Van Assche wrote:
-> blk_mq_quiesce_queue() does not wait for pending I/O to finish. Freezing
-> a queue waits for pending I/O to finish. Hence move the comment that
-> refers to waiting for pending I/O above the call that freezes the
-> request queue. This patch moves this comment back to the position where
-> it was when this comment was introduced. See also commit c125311d96b1
-> ("blk-wbt: don't maintain inflight counts if disabled").
+On Mon, Aug 11, 2025 at 12:44:01PM +0200, Miguel Ojeda wrote:
+> On Mon, Aug 11, 2025 at 9:49 AM Andreas Hindborg <a.hindborg@kernel.org> wrote:
+> >
+> > Jens is picking the block patches directly from list. I would prefer
+> > sending a PR, but that is not the way we agreed on doing it.
+> >
+> > @Jens, do you still prefer to pick the rust block patches directly?
 > 
-> Cc: Christoph Hellwig <hch@lst.de>
-> Cc: Nilay Shroff <nilay@linux.ibm.com>
-> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+> That is fine, if Jens wants to pick it, that is nice. Otherwise, I can
+> pick it up, no worries.
+> 
+> Thanks!
+> 
+> Cheers,
+> Miguel
 
-Looks good to me:
-Reviewed-by: Nilay Shroff <nilay@linux.ibm.com>
+Hi Jens, Miguel,
 
+Just a kind reminder about this patch I sent earlier.
+Thanks a lot for your time!
+
+Cheers,
+Shankari
