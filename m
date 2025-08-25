@@ -1,74 +1,116 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f179.google.com (mail-il1-f179.google.com [209.85.166.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 050C32DFA27
-	for <linux-block@vger.kernel.org>; Mon, 25 Aug 2025 13:49:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87C1B2F1FC1
+	for <linux-block@vger.kernel.org>; Mon, 25 Aug 2025 13:56:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756129765; cv=none; b=XsDndYMAL7lq2VPaAyWP7r3u2UpWTq7WzfnWiAY5N/UO7wPLDtzZRlj/rFbGWW9twyD9C97LI1b21oM06gn+hV3lP+V+GFCxz3E6p0TYjpHzzw8ly3Y2xM+KZzFTDzczLSjSe6/HTPbNsPq79dxTfHTWGaQF0ucjhpdvCLZMfPM=
+	t=1756130166; cv=none; b=MNUdRXUFfELMqLX1/PZ7QIa0nUmkl1+elZTEXxx3tIJfuP+TFyqU6z+f79jQ5D5Up9u3ytlO5gmBYdGmooXkblvOyPIGKXEilwUr6N9tCaV6sv3MCtdOtL431FXxNc+Nua/hQIh4ZpZJ3mByfyRqQRI/lTpT6cFAtockoQber6M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756129765; c=relaxed/simple;
-	bh=xvihwrp/pRyz3ZXXFiXJBH9fwLmQSvpHmuqrOxh7tic=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bxVSQNsdNkq1cHab9gp6Albjo56LrR0hiexEDz+U2AEOaCjiwmzTWtINzBgs7INPg4e/0g/EA8GasdP6IcSnslM843tvq/3Q9I0FXJc3X88xartmnfx1DfF/BJOhZdiKAPZd8Hl7FYU3u9P+mvYdPw/bjTrAOMIrfbdPnQEB3Oo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=I8Zxl3Ac; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1756130166; c=relaxed/simple;
+	bh=uTCLex4r+CcOhhp0Jw1xbazf6aFLqhbTTS7XiB9UMvk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Qc1H84RnOVDNN7bOzB7VvHCtInnlptYmodJ4nG9GbRK1tGIGKGHcXtLTh+ufS95qqmabh8hNvJxYDgiSx15VVovpEZ8PQhtS7x5FoNpKM7ilQcR+xuC+TbZKM8H0OAnA19h0iV+A3SpE1lStTtvL8JRgHrWQr84Y0HYkwSaeaBU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Z0ejFYse; arc=none smtp.client-ip=209.85.166.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="I8Zxl3Ac"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=Qxpdd7vSHWAWUcYcWrm3MJxf6eR+loQRCQUNdueFNek=; b=I8Zxl3AcU5+mQkAyzwqT6jM/1z
-	aPY6bEjgGFo6cnczecSZVjpbH4kLbnWjEMa76c5nZIVuvr46dJXAgheDD0KXucXylIPflBhGaD6ht
-	QdqHRbhLBRfW83dSUeVXEOQ2/+5EFuD6jmLkJw1r2mKILkYViYP1XI7b5fNGnN5tWhIM3bhpnrbEE
-	r62LeNqGwySHqp+YXozEEe0NKSmx36Hd0KkFQXwB0wTEpLhZ33QPNnMDuZkMLFtNn7vxg3Xup7oj8
-	Naw/ea0tZmwDaiDKWdeP5qWsnkLfHMHYkTyMsGx3loJ87hQn+j6cGa46GJOLvylGqYtJQ7uKr3Tpt
-	zpi7sgkw==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1uqXZb-000000088zb-2BlD;
-	Mon, 25 Aug 2025 13:49:23 +0000
-Date: Mon, 25 Aug 2025 06:49:23 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Keith Busch <kbusch@meta.com>
-Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, hch@lst.de,
-	axboe@kernel.dk, Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCHv3 2/2] nvme: remove virtual boundary for sgl capable
- devices
-Message-ID: <aKxp49SdTknkO1fb@infradead.org>
-References: <20250821204420.2267923-1-kbusch@meta.com>
- <20250821204420.2267923-3-kbusch@meta.com>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Z0ejFYse"
+Received: by mail-il1-f179.google.com with SMTP id e9e14a558f8ab-3e66c013e4dso23156845ab.0
+        for <linux-block@vger.kernel.org>; Mon, 25 Aug 2025 06:56:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1756130163; x=1756734963; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+bj16z3bAVbIZz7VeQgjGNlWSy6Fqh6GjG5p/aTnAY0=;
+        b=Z0ejFYsePerMbR0np2UCURp6B5gR2IU8MemNn/750ldCjktwcIj+TQ+eOpFyxNZX+I
+         EFJ7/MK0LigcIp0tmXqqmeAsSlrZKn/O2XrU6prlpzdTbDr66jYI83uMYNb3l1OlE5hb
+         mOZJfnYYQSG5PsOlpQP1AldLBhGqxmDYp6n1KKRWq6e+JOhryXM9rPyk9tsnT6ydx1oS
+         4bmE2rJcDR8CMTX3Cr703ifBMy8jYtBsr1mhgKnyO56g9WP3qfQhi23qZH+KCKpew9Kg
+         rXTbzKD91M4Cvyl7lsK9gwoSCLyfRM2ifi5PfZu+N0T3358Q94Qk1AFBJIaBw76Ahas1
+         Xqbg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756130163; x=1756734963;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+bj16z3bAVbIZz7VeQgjGNlWSy6Fqh6GjG5p/aTnAY0=;
+        b=LyFLv0AVq9vapJDiljoZZonUUdJ0Rez+TfKfRywvFTh0b/S8vVCGqeP1R1J2o3Y57U
+         2A57kRnKgGje/fQh6t0/dk/sfFpESGuWBDVM6uLAemu13vPMTPTD0oFnmJe/FM0oKvge
+         nbwvKkKh+AvxGVkv1zQoSjquclEb1ZOxbTx+cKkHsye6+prZpuQgwPTksZCahIR8znnc
+         gt8MNFDwJbeyjfeIp0jyleLtB2O2e0lGn1/QxWAfasLrHE2K47BktJWL57hyqYheHE5a
+         Y53tsilaim/fC2J6YRXf6U/h71uCaOCnogOt0gUuAGVke0C3kHk6cTc+CZh4CTSFE9xa
+         W1cw==
+X-Gm-Message-State: AOJu0YxofsAnOjIePn70iQGOscMJv4oKR9/7DMAMLRksUOQ6Udl7miqf
+	AkadJA7jlJY4PgzKpduxPbvle/veJh8sMuVOEd2sDdoiJ/08u7oHhSu1LgyHl+UCC68=
+X-Gm-Gg: ASbGnct/zNWQY/Lc9NFOmOoRfs1aSrE4zRxYo1hGL4WcV7m7JvwEZmsEfh0uhUhP+No
+	1vvZrr4XdI4108lJ+oevJqAexLpNI0LQ53oxQMxClGlLluK65RjsVMgGVTylRHKBM5K+t1sxivy
+	ZhjgoqbNLsBD1+WzCJHDZl0HDuFtPbYTjl/gMdPt1RQSfAmNdh+wUfvPVL+3/Ez3t8kFcw49WPF
+	eAmMpfDhtZL8TUXGf6bY8GHOD8+t3hUlX5C0SScWTof6a0MI8+++aaqGfWHJYc1eNw86QsjbbM1
+	WSO6B7H9mTpnCjK6dd6y7OKMsRofI2J2JjEVcP9gN9Fk3ku772RF4LfLdfNjyaugSIeVCvHW6Zo
+	k2v9LLaIrb73DQBOq6QeW99eJNAFzpA==
+X-Google-Smtp-Source: AGHT+IEiq20Lr6w+nHnroyq/OSDP6bjRqBGwYdseaIsmpNKgrJv38nh2DaKDNtgxmvXhu4eboRHU1Q==
+X-Received: by 2002:a05:6e02:170d:b0:3ec:4b19:1cff with SMTP id e9e14a558f8ab-3ec4b1927b2mr76913505ab.7.1756130163389;
+        Mon, 25 Aug 2025 06:56:03 -0700 (PDT)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3ea4e45a717sm50317145ab.31.2025.08.25.06.56.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 25 Aug 2025 06:56:02 -0700 (PDT)
+Message-ID: <36f30d8d-02fb-4579-b527-16da24cdc856@kernel.dk>
+Date: Mon, 25 Aug 2025 07:56:02 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250821204420.2267923-3-kbusch@meta.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] loop: fix zero sized loop for block special file
+To: Yu Kuai <yukuai1@huaweicloud.com>, ming.lei@redhat.com,
+ hch@infradead.org, yukuai3@huawei.com, rajeevm@hpe.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ yi.zhang@huawei.com, yangerkun@huawei.com, johnny.chenyi@huawei.com
+References: <20250825093205.3684121-1-yukuai1@huaweicloud.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20250825093205.3684121-1-yukuai1@huaweicloud.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Aug 21, 2025 at 01:44:20PM -0700, Keith Busch wrote:
-> +	/*
-> +	 * The virtual boundary mask is not necessary for PCI controllers that
-> +	 * support SGL for DMA. It's only necessary when using PRP. Admin
-> +	 * queues only support PRP, and fabrics drivers currently don't report
-> +	 * what boundaries they require, so set the virtual boundary for
-> +	 * either.
-> +	 */
-> +	if (!nvme_ctrl_sgl_supported(ctrl) || admin ||
-> +	    ctrl->ops->flags & NVME_F_FABRICS)
-> +		lim->virt_boundary_mask = NVME_CTRL_PAGE_SIZE - 1;
+On 8/25/25 3:32 AM, Yu Kuai wrote:
+>  static loff_t lo_calculate_size(struct loop_device *lo, struct file *file)
+>  {
+> -	struct kstat stat;
+>  	loff_t loopsize;
+>  	int ret;
+>  
+> -	/*
+> -	 * Get the accurate file size. This provides better results than
+> -	 * cached inode data, particularly for network filesystems where
+> -	 * metadata may be stale.
+> -	 */
+> -	ret = vfs_getattr_nosec(&file->f_path, &stat, STATX_SIZE, 0);
+> -	if (ret)
+> -		return 0;
+> +	if (S_ISBLK(file_inode(file)->i_mode)) {
+> +		loopsize = i_size_read(file->f_mapping->host);
+> +	} else {
+> +		struct kstat stat;
+> +
+> +		/*
+> +		 * Get the accurate file size. This provides better results than
+> +		 * cached inode data, particularly for network filesystems where
+> +		 * metadata may be stale.
+> +		 */
+> +		ret = vfs_getattr_nosec(&file->f_path, &stat, STATX_SIZE, 0);
+> +		if (ret)
+> +			return 0;
+> +
+> +		loopsize = stat.size;
+> +	}
 
-Fabrics itself never needs the virt boundary.  And for TCP which is a
-software only transport I think we can just do away with it.  For
-FC I suspect we can do away with it as well, as all the FC HBA support
-proper SGLs.  For RDMA the standard MR methods do require the virtual
-boundary, but somewhat recent Mellanox / Nvidia hardware does not.
+Gah, that was pretty silly...
 
-No need for you to update all these, but I think having the transport
-advertise the capability is probably better than a bunch of random
-conditions in the core code.
-
+-- 
+Jens Axboe
