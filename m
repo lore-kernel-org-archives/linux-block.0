@@ -1,192 +1,177 @@
-Received: from mx0a-002e3701.pphosted.com (mx0a-002e3701.pphosted.com [148.163.147.86])
+Received: from 004.mia.mailroute.net (004.mia.mailroute.net [199.89.3.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DE7F2798FB;
-	Mon, 25 Aug 2025 18:18:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.147.86
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F60D2741DA
+	for <linux-block@vger.kernel.org>; Mon, 25 Aug 2025 18:27:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756145937; cv=none; b=hLY3ZfJA2d4kTf1AcpwJBhaZcPhSYv6f7LNTh+sEYqUsoeTd+9rJB5Rt4afv4nJsCY/NerAstGjPOeKe6IZTtvGo9+GV4MnR80X2sitRtj0++hYyRW/biAhHMiFN8lSF6vj/1GdgwP1Wu61w7kGAKbRXP3E6pHg3+9Ems7ugKUE=
+	t=1756146463; cv=none; b=iIUcw/p86jBCulXSd58F1Fm+jHqowywQF+y99ioN7Rs/8b7q6lCagF5B5zEJO2NkEloPI7l0XFQWR8GRBNWjHf4KDPAAeQTWEgSCrpHAgNM8jS/i+l+jb0eED1ML3EIg7ZtNCbOO7gAciZqG3hBUXTbXRscNBsQGjm8p/RKyaXA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756145937; c=relaxed/simple;
-	bh=dp28qYPxsm8KbDCT4NEaZ4Yg86ZSr2Ee74duus94/rs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=T/Bk7ZficRchmM9t/Cidp+tkmsSoiyMYyzCuaIQY4egssw5psfOHym6ANqMmbhfqxIEKHaMXCddiKkZEYlaXqwaPLPDdmB6fz2AwpS525gszW0pB19ZebtQJYVRcRhi3MDB16Zh7YIWG7WEQYJ1n5i4nYqNTMkZTE0Hkb16hvLM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hpe.com; spf=pass smtp.mailfrom=hpe.com; dkim=pass (2048-bit key) header.d=hpe.com header.i=@hpe.com header.b=fZeuW3oP; arc=none smtp.client-ip=148.163.147.86
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hpe.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hpe.com
+	s=arc-20240116; t=1756146463; c=relaxed/simple;
+	bh=j748ER8dNugfb2W/p/egcOaeeLwzkk4lufR6OPSx/m8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Q7LtECOIoAn8y13Go//k4/RAFJBxcYpp+z0LnK9HG0Cbzvr0zmLn+ICKuyTyXvxFV+tMdYPLrt2ob11k2QwxNPn+Y9WJs2reHHfp6OubfKh4vmC/irxoFFbZ/Ijz4Js3gKmvE1LTA1QwU6RCNy8z0srN+lCH+LOHDskB+/hNd7o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=zLKlcXSC; arc=none smtp.client-ip=199.89.3.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hpe.com header.i=@hpe.com header.b="fZeuW3oP"
-Received: from pps.filterd (m0148663.ppops.net [127.0.0.1])
-	by mx0a-002e3701.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57PE3fvk018056;
-	Mon, 25 Aug 2025 18:18:13 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=cc
-	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pps0720; bh=GqenFbVHORaaL
-	NwrYhVpETeOY5EZU2le5oeUYt9o/OM=; b=fZeuW3oPIIl94VwjsbgyxTL0oUNxN
-	BmZyo8PQS7eh5dhtXjaKJ+HbIyCmmlIei//1YGMrRKyWGxjFnmGrmytIccP6Fq7e
-	s2skkeqCW71pOQ6CnfiRfFHj355NMTWQx35WaFVRwtZSuGB33USkjxXBHGp01JLV
-	KG2zcCJegJyxm+J0um3104JD3eCR+9ChxoACuBF2Ry92o6fSiRp0nZI0zLbO3/dP
-	udV2mcO3cdMX9dgK707bSiPEHvhDVMzhoXh1L2RcnC53L0CF5nNFYi7jAJEoyJ2c
-	Ho688MmW4D+G6HQtqqmxTdD7niSXA3YzLP9PmzyMeYeboMFj+T2JBWO7Q==
-Received: from p1lg14879.it.hpe.com ([16.230.97.200])
-	by mx0a-002e3701.pphosted.com (PPS) with ESMTPS id 48rj2edpc9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 25 Aug 2025 18:18:12 +0000 (GMT)
-Received: from mlperfr9.3-rocky.novalocal (unknown [192.58.206.35])
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="zLKlcXSC"
+Received: from localhost (localhost [127.0.0.1])
+	by 004.mia.mailroute.net (Postfix) with ESMTP id 4c9fRH2yj2zm174D;
+	Mon, 25 Aug 2025 18:27:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:mime-version:x-mailer:message-id:date
+	:date:subject:subject:from:from:received:received; s=mr01; t=
+	1756146457; x=1758738458; bh=LOJniSLLnDt8hto+mpuq2vbwwSE0AY29jfw
+	L2o5iLCs=; b=zLKlcXSCH46Hmtvha/skJsrgE52pl6TCmU++2AenIGumMcPhBSl
+	44JXdx/225jpvFjm+soT4x1ZEppmwxiX+SwA1uO50z9GZjtjJ44/H/kiPT8A672e
+	qWRDgmkHt95VFpigiQlihNYqPuaR125/4PtjdcOwHWA1FjJTxvxJ3Q4trmzGE5Tu
+	JwhhauoWfMMS2NfCHN0dyypivtij7ag7xCcvMZqvyuFdVmhyIiKx3adTuKGc1tqN
+	+u70TBBGFciAOWN6eGeTNkqFZlDJBjl1qnRIBuTiKyt6w3qKx9R/k/cCWoYMJCFg
+	6s5aZEKQ2PqtdiMJzZfG8Q7IGZNbNRO659Q==
+X-Virus-Scanned: by MailRoute
+Received: from 004.mia.mailroute.net ([127.0.0.1])
+ by localhost (004.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id beJOD4ZoZIdp; Mon, 25 Aug 2025 18:27:37 +0000 (UTC)
+Received: from bvanassche.mtv.corp.google.com (unknown [104.135.204.82])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by p1lg14879.it.hpe.com (Postfix) with ESMTPS id DD99313154;
-	Mon, 25 Aug 2025 18:18:10 +0000 (UTC)
-Received: from mlperfr9.3-rocky.novalocal (localhost [IPv6:::1])
-	by mlperfr9.3-rocky.novalocal (Postfix) with ESMTP id 16D9DA0ACF57;
-	Mon, 25 Aug 2025 18:18:06 +0000 (UTC)
-From: Cloud User <rajeevm@hpe.com>
-To: yukuai1@huaweicloud.com, ming.lei@redhat.com, hch@infradead.org,
-        yukuai3@huawei.com, rajeevm@hpe.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yi.zhang@huawei.com, yangerkun@huawei.com, johnny.chenyi@huawei.com
-Subject: Re: [PATCH v2] loop: fix zero sized loop for block special file
-Date: Mon, 25 Aug 2025 18:17:58 +0000
-Message-ID: <20250825181758.3464556-1-rajeevm@hpe.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <36f30d8d-02fb-4579-b527-16da24cdc856@kernel.dk>
-References: <36f30d8d-02fb-4579-b527-16da24cdc856@kernel.dk>
+	(Authenticated sender: bvanassche@acm.org)
+	by 004.mia.mailroute.net (Postfix) with ESMTPSA id 4c9fR94Thvzm10gS;
+	Mon, 25 Aug 2025 18:27:32 +0000 (UTC)
+From: Bart Van Assche <bvanassche@acm.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Hannes Reinecke <hare@suse.de>
+Subject: [PATCH] blk-zoned: Fix a lockdep complaint about recursive locking
+Date: Mon, 25 Aug 2025 11:27:19 -0700
+Message-ID: <20250825182720.1697203-1-bvanassche@acm.org>
+X-Mailer: git-send-email 2.51.0.261.g7ce5a0a67e-goog
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODI1MDE2NSBTYWx0ZWRfX1qp1wAHeU3mP
- QsXGQaCuJXRqrhgvJDOQLydnnlD9PDwlqka6Up4dC/vScNu8j5wiNFAJoHuYi7kJQuODrNiWwIJ
- RcKXV2by4qWqAfARa5UAdmM2BVXscvtKerII2/VkUSf+i2+CdIQxq77USO6u+mHuKzGHzyMkFnd
- Czu8wGGJUHFLv9xTThjEtW/yC5fHafxflUIwy1U2VuJLUulbJFferqXC23sipe0O3upcQEt73f8
- sD1ud7SC57iYT38iy+PO4JeCyA2JlGadrSe6zNSb/vpB9kESYzyKSc7Oy/LMgcVqVNOL/2mVoIx
- JF4kUhsCJDzbjt0XyU2M59c0W3UjLNAlpkSiD1d8m8SgcjJHh++ZqmNInu2w7xJAwOsxU/EnfS9
- jzCoqsVGK1Y4m5fsbmXRrQkHisUfOIV42SidaiG2eENh/MpJ9Yp65IJjisPUy3x/74olsmMg
-X-Proofpoint-ORIG-GUID: YUY8DnqQDpVSet8Y-UP2kfDILGX_nflQ
-X-Proofpoint-GUID: YUY8DnqQDpVSet8Y-UP2kfDILGX_nflQ
-X-Authority-Analysis: v=2.4 cv=a5ow9VSF c=1 sm=1 tr=0 ts=68aca8e4 cx=c_pps
- a=5jkVtQsCUlC8zk5UhkBgHg==:117 a=5jkVtQsCUlC8zk5UhkBgHg==:17
- a=xqWC_Br6kY4A:10 a=2OwXVqhp2XgA:10 a=BkdJ9jHThSt66Mx6hGYA:9
-X-HPE-SCL: -1
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-08-25_08,2025-08-20_03,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- adultscore=0 lowpriorityscore=0 phishscore=0 suspectscore=0 bulkscore=0
- mlxlogscore=999 impostorscore=0 malwarescore=0 clxscore=1011
- priorityscore=1501 mlxscore=0 spamscore=0 classifier=spam authscore=0
- authtc=n/a authcc= route=outbound adjust=0 reason=mlx scancount=1
- engine=8.19.0-2507300000 definitions=main-2508250165
+Content-Transfer-Encoding: quoted-printable
 
+If preparing a write bio fails then blk_zone_wplug_bio_work() calls
+bio_endio() with zwplug->lock held. If a device mapper driver is stacked
+on top of the zoned block device then this results in nested locking of
+zwplug->lock. The resulting lockdep complaint is a false positive
+because this is nested locking and not recursive locking. Suppress this
+false positive by calling blk_zone_wplug_bio_io_error() without holding
+zwplug->lock. This is safe because no code in
+blk_zone_wplug_bio_io_error() depends on zwplug->lock being held. This
+patch suppresses the following lockdep complaint:
 
+WARNING: possible recursive locking detected
+--------------------------------------------
+kworker/3:0H/46 is trying to acquire lock:
+ffffff882968b830 (&zwplug->lock){-...}-{2:2}, at: blk_zone_write_plug_bio=
+_endio+0x64/0x1f0
 
-Hi Jens, Kuai,
+but task is already holding lock:
+ffffff88315bc230 (&zwplug->lock){-...}-{2:2}, at: blk_zone_wplug_bio_work=
++0x8c/0x48c
 
-Thank you for your feedback, and apologies for the delay.
+other info that might help us debug this:
+ Possible unsafe locking scenario:
 
-I will send the v5 patch in two parts as before.
-The final commit will include the fix you suggested.
-Below is the final git diff; the key change is the added ISBLK check.
+       CPU0
+       ----
+  lock(&zwplug->lock);
+  lock(&zwplug->lock);
 
-Best regards,
-Rajeev Mishra
+ *** DEADLOCK ***
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 1b6ee91f8eb9..1e81620c0c72 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -137,20 +137,33 @@ static void loop_global_unlock(struct loop_device *lo, bool global)
- static int max_part;
- static int part_shift;
- 
--static loff_t get_size(loff_t offset, loff_t sizelimit, struct file *file)
-+static loff_t lo_calculate_size(struct loop_device *lo, struct file *file)
- {
-+	struct kstat stat;
- 	loff_t loopsize;
-+	int ret;
- 
--	/* Compute loopsize in bytes */
--	loopsize = i_size_read(file->f_mapping->host);
--	if (offset > 0)
--		loopsize -= offset;
-+	/*
-+	 * Get the accurate file size. This provides better results than
-+	 * cached inode data, particularly for network filesystems where
-+	 * metadata may be stale.
-+	 */
-+	if (S_ISBLK(file->f_inode->i_mode)) {
-+		loopsize = i_size_read(file->f_mapping->host);
-+	} else {
-+		ret = vfs_getattr_nosec(&file->f_path, &stat, STATX_SIZE, 0);
-+		if (ret)
-+		      return 0;
-+		loopsize = stat.size;
-+	}
+ May be due to missing lock nesting notation
+
+3 locks held by kworker/3:0H/46:
+ #0: ffffff8809486758 ((wq_completion)sdd_zwplugs){+.+.}-{0:0}, at: proce=
+ss_one_work+0x1bc/0x65c
+ #1: ffffffc085de3d70 ((work_completion)(&zwplug->bio_work)){+.+.}-{0:0},=
+ at: process_one_work+0x1e4/0x65c
+ #2: ffffff88315bc230 (&zwplug->lock){-...}-{2:2}, at: blk_zone_wplug_bio=
+_work+0x8c/0x48c
+
+stack backtrace:
+CPU: 3 UID: 0 PID: 46 Comm: kworker/3:0H Tainted: G        W  OE      6.1=
+2.38-android16-5-maybe-dirty-4k #1 8b362b6f76e3645a58cd27d86982bce10d1500=
+25
+Tainted: [W]=3DWARN, [O]=3DOOT_MODULE, [E]=3DUNSIGNED_MODULE
+Hardware name: Spacecraft board based on MALIBU (DT)
+Workqueue: sdd_zwplugs blk_zone_wplug_bio_work
+Call trace:
+ dump_backtrace+0xfc/0x17c
+ show_stack+0x18/0x28
+ dump_stack_lvl+0x40/0xa0
+ dump_stack+0x18/0x24
+ print_deadlock_bug+0x38c/0x398
+ __lock_acquire+0x13e8/0x2e1c
+ lock_acquire+0x134/0x2b4
+ _raw_spin_lock_irqsave+0x5c/0x80
+ blk_zone_write_plug_bio_endio+0x64/0x1f0
+ bio_endio+0x9c/0x240
+ __dm_io_complete+0x214/0x260
+ clone_endio+0xe8/0x214
+ bio_endio+0x218/0x240
+ blk_zone_wplug_bio_work+0x204/0x48c
+ process_one_work+0x26c/0x65c
+ worker_thread+0x33c/0x498
+ kthread+0x110/0x134
+ ret_from_fork+0x10/0x20
+
+Cc: Damien Le Moal <dlemoal@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>
+Fixes: dd291d77cc90 ("block: Introduce zone write plugging")
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+---
+ block/blk-zoned.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
+
+diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+index ef43aaca49f4..5e2a5788dc3b 100644
+--- a/block/blk-zoned.c
++++ b/block/blk-zoned.c
+@@ -1286,14 +1286,14 @@ static void blk_zone_wplug_bio_work(struct work_s=
+truct *work)
+ 	struct block_device *bdev;
+ 	unsigned long flags;
+ 	struct bio *bio;
++	bool prepared;
+=20
+ 	/*
+ 	 * Submit the next plugged BIO. If we do not have any, clear
+ 	 * the plugged flag.
+ 	 */
+-	spin_lock_irqsave(&zwplug->lock, flags);
+-
+ again:
++	spin_lock_irqsave(&zwplug->lock, flags);
+ 	bio =3D bio_list_pop(&zwplug->bio_list);
+ 	if (!bio) {
+ 		zwplug->flags &=3D ~BLK_ZONE_WPLUG_PLUGGED;
+@@ -1304,13 +1304,14 @@ static void blk_zone_wplug_bio_work(struct work_s=
+truct *work)
+ 	trace_blk_zone_wplug_bio(zwplug->disk->queue, zwplug->zone_no,
+ 				 bio->bi_iter.bi_sector, bio_sectors(bio));
+=20
+-	if (!blk_zone_wplug_prepare_bio(zwplug, bio)) {
++	prepared =3D blk_zone_wplug_prepare_bio(zwplug, bio);
++	spin_unlock_irqrestore(&zwplug->lock, flags);
 +
-+	if (lo->lo_offset > 0)
-+		loopsize -= lo->lo_offset;
- 	/* offset is beyond i_size, weird but possible */
- 	if (loopsize < 0)
- 		return 0;
--
--	if (sizelimit > 0 && sizelimit < loopsize)
--		loopsize = sizelimit;
-+	if (lo->lo_sizelimit > 0 && lo->lo_sizelimit < loopsize)
-+		loopsize = lo->lo_sizelimit;
- 	/*
- 	 * Unfortunately, if we want to do I/O on the device,
- 	 * the number of 512-byte sectors has to fit into a sector_t.
-@@ -158,11 +171,6 @@ static loff_t get_size(loff_t offset, loff_t sizelimit, struct file *file)
- 	return loopsize >> 9;
- }
- 
--static loff_t get_loop_size(struct loop_device *lo, struct file *file)
--{
--	return get_size(lo->lo_offset, lo->lo_sizelimit, file);
--}
--
- /*
-  * We support direct I/O only if lo_offset is aligned with the logical I/O size
-  * of backing device, and the logical block size of loop is bigger than that of
-@@ -569,7 +577,7 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
- 	error = -EINVAL;
- 
- 	/* size of the new backing store needs to be the same */
--	if (get_loop_size(lo, file) != get_loop_size(lo, old_file))
-+	if (lo_calculate_size(lo, file) != lo_calculate_size(lo, old_file))
- 		goto out_err;
- 
- 	/*
-@@ -1063,7 +1071,7 @@ static int loop_configure(struct loop_device *lo, blk_mode_t mode,
- 	loop_update_dio(lo);
- 	loop_sysfs_init(lo);
- 
--	size = get_loop_size(lo, file);
-+	size = lo_calculate_size(lo, file);
- 	loop_set_size(lo, size);
- 
- 	/* Order wrt reading lo_state in loop_validate_file(). */
-@@ -1255,8 +1263,7 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
- 	if (partscan)
- 		clear_bit(GD_SUPPRESS_PART_SCAN, &lo->lo_disk->state);
- 	if (!err && size_changed) {
--		loff_t new_size = get_size(lo->lo_offset, lo->lo_sizelimit,
--					   lo->lo_backing_file);
-+		loff_t new_size = lo_calculate_size(lo, lo->lo_backing_file);
- 		loop_set_size(lo, new_size);
++	if (!prepared) {
+ 		blk_zone_wplug_bio_io_error(zwplug, bio);
+ 		goto again;
  	}
- out_unlock:
-@@ -1399,7 +1406,7 @@ static int loop_set_capacity(struct loop_device *lo)
- 	if (unlikely(lo->lo_state != Lo_bound))
- 		return -ENXIO;
- 
--	size = get_loop_size(lo, lo->lo_backing_file);
-+	size = lo_calculate_size(lo, lo->lo_backing_file);
- 	loop_set_size(lo, size);
- 
- 	return 0;
+=20
+-	spin_unlock_irqrestore(&zwplug->lock, flags);
+-
+ 	bdev =3D bio->bi_bdev;
+=20
+ 	/*
