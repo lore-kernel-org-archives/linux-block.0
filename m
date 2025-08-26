@@ -1,107 +1,139 @@
-Received: from mail-oi1-f171.google.com (mail-oi1-f171.google.com [209.85.167.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D6E128725F
-	for <linux-block@vger.kernel.org>; Tue, 26 Aug 2025 09:46:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4265A32142F;
+	Tue, 26 Aug 2025 09:56:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756201580; cv=none; b=CiBuzrlZUkfsg8snxYLRCYXaBGQ5IIuiSTKFRUpec57uxyyvjFe1KwTRfNx0x5hy1wO3Z1mRUSX6TSGgqkbHT+b1Mdw+5KPg38f0yrrrld1iOexW2ueDiHO92kMxC7bTWvzic2YeOpIPNfrWLQToPBY8howSjv++86ZThNHaHeY=
+	t=1756202179; cv=none; b=rhqRUhzbzotp6Nz9DuZX30TbrJzMSqtPsfdi5d9+Vt/GwKbL35m0jldjQ8XsObiWB3aBcdC0Tg2m5FrfbEFADzI2OOtP8fRtXffwRYJir1MCvbnYVKHSHjvwB9o+zHklW2Dyt5ipDCQJ9ysNs9258m7MfFsDYEXx8it8i5vF2Oc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756201580; c=relaxed/simple;
-	bh=OPAZZxNYE58hJae/e/m2Tf7VPpzwodHhO2tzCOR73hA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=c+5Rdkem1qoNyK5bAwJix8VaNBp3pzFsPlVEsNx4JxmjZ522xgzlS7YEvOaQB56STq3m8Shl9dfsxiZjH9RkB+pA81ZUE+vffDeaDght0ac7p7RT5wsvR4hmKkn3dQyXApKhlLYu8VD7W+p+hREvgE4ylH1Dpwk9/FlGwEt95JM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=POHt1stG; arc=none smtp.client-ip=209.85.167.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+	s=arc-20240116; t=1756202179; c=relaxed/simple;
+	bh=BeJNyWZ1Fie4kRLOY57azxsF0Sg2itRwuOuGejwWzZQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=UIoA0gqXRkq4tEcqSJIa6cP/KjbVnwCsX0j8Lk4UWRhaYTX9WBh2fxdoa6y7xTVB2YNKURqYpTUItT2yaAFBHVcxJjbiIPmdwGrizWkuT8aOV93Pkik0zvTMtKIzsh9JaXOrclBE0hxEsWVvcueDhWughrFUxKhY8paJk2mJ888=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=KOWT7ppA; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="POHt1stG"
-Received: by mail-oi1-f171.google.com with SMTP id 5614622812f47-437ba5e649aso610786b6e.0
-        for <linux-block@vger.kernel.org>; Tue, 26 Aug 2025 02:46:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1756201577; x=1756806377; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sGNJFCgl4cuzHPkyc+Ken0/krtCf4Ypf9u2DKlmbJSI=;
-        b=POHt1stGUpr2mPxf57ewGczQRQR5qIsikpfCJZv9JSeBu2TCuJRoFmC6aY50IY7hDw
-         VeT3BXLjvsRGKbMfNTvD9uVYz7WR70YarJoSM/PX/1eHHmtR3VkHpkcGtWP44z8yXB/G
-         ONw/+Z/vWxZrtSTt/Y0KpUx7LTe8PCbZJwzsa0EhHHHtXRPRHUniGpjfHtMi1d/k9XIM
-         AA8B/SRxjP+VkSJ8tuDrk22AeR2BMxtB1dYnsipo8TmP+A+F+izpMY+il6CFkAkXrgcS
-         134WZwQGfMHz/KK286ZNUmbdlnyvgzKKPjS4ju+1r8ATk6LZEYFdkn54f86mE4NFWJIa
-         zwgA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756201577; x=1756806377;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sGNJFCgl4cuzHPkyc+Ken0/krtCf4Ypf9u2DKlmbJSI=;
-        b=JRvGnMsBFqGHvi53M6lsx9v49g+VRc1gCSWdF0F6cMQlzStRGmRdMOyosmX4Z2Fmvn
-         tgktIZNf6tao+c11XJZRuOegS94PPSp43QGCdpkL7WH+dUDQg5ikhTTAw4oxzbGR2R17
-         Fs+rICISmTXNnXkxvugAAHpno0XKCC11h/kmOBVqas6aduWSEyAGO/xB9MFwaLkEs2Un
-         1xmxzI5jS/xiGLQhsm+4yWxTwgH9kgF5H+Zyr7NlZHENws/i6qAfqw2HlgHBR5M2ELcK
-         09+lWoJoaI+cSwBth6JvBdLOce0lLFaMqmwMQIwyADhxDIh8l1a22PKCihJgMRL6U4f0
-         AISA==
-X-Forwarded-Encrypted: i=1; AJvYcCXWxAnnSxNIBzcZZlO7fRoNI88+T70pkC2n/ba5mqw4eS45wRku3+XG2n+AAEnvKdZSKbSkI7RmKzX68Q==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy/qnRGtEQu77DTlX311wGUvi9y7UugdwqtUXXc8tOz8eny8VTQ
-	xepEFp7HF0sRneUhpS5TSFVr/ym3m1ZnCTGkAoSLXz7iQS92imeUCp11ooc88AydbIGjDrZQ0kl
-	GlOzVOgw3D3lLAohhVK2t2XDFn8uyuOvsPVpTTWmoYg==
-X-Gm-Gg: ASbGnctogaBubY+nboNtbQ8s4rDcYkZkfCFGCTYuhoYn3YGjDm6CCpiS05pXPs+7qts
-	GZnRqKp64q/cIkj/P0fK5QDnxr+tB/65OzZdbO8JqTggfslo3lhtKt2Xie3/nKgiSQRpyc6GXEO
-	PUbKNt0AxplI5aUQchr3GKOWHiZ0BuGNEb4Yr+VLEX0OyOxfUtHab4ZPMqIchDUAAk6QLVOM9R6
-	O4pgZkDZgBn
-X-Google-Smtp-Source: AGHT+IF5+Gw96sL9RY4NRRpY4/PqOPO6y5oEcC2tJqWM/kg3CPBQzUej8mAwKMn7/3T/5r3lecdpgQOOx/9Rqy2e5Ik=
-X-Received: by 2002:a05:6808:f16:b0:434:2d4:f198 with SMTP id
- 5614622812f47-4378524c0fcmr7225038b6e.31.1756201577356; Tue, 26 Aug 2025
- 02:46:17 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="KOWT7ppA"
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57Q6Xm9G030141;
+	Tue, 26 Aug 2025 09:56:10 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=7RtZYH
+	nVw6eX3lNU4nryADRyNuIKrw/WbNMfCfPtBU0=; b=KOWT7ppASrdtjsxjS7aJ0q
+	n+1HtY04sD5BdZn2PGVKhF2RnDEwA6NOaLjfT+Ck4rXtwkpNGFXzhh2iKvCErSEG
+	IVtfSemENLmcAVx4zTkOeVp1IVWgqlpe+1FvUY37CKKkaYXOnsXwhPfZQb3gRYtC
+	s43o13hBZih5j8DetmcFbbi4tAk20+scLTM+0uq0rWtzHAYzHnKMYF31+5JvQFx4
+	QbDyvTjH2fg6+tKZHnxfbxZUwIOseFMW9CE3otx04gvCvKPzbwXXVQ/ygvQgvdp0
+	DfBEPsGVgCfcqLebzbf4nNLm2jd6izIEflVZSj6xVcP9ic8YUeagfktcaGgtLftw
+	==
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48s7rvru8h-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 26 Aug 2025 09:56:09 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 57Q6aa3u007459;
+	Tue, 26 Aug 2025 09:56:08 GMT
+Received: from smtprelay05.wdc07v.mail.ibm.com ([172.16.1.72])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 48qqyuac0c-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 26 Aug 2025 09:56:08 +0000
+Received: from smtpav06.dal12v.mail.ibm.com (smtpav06.dal12v.mail.ibm.com [10.241.53.105])
+	by smtprelay05.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 57Q9u71I18154228
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 26 Aug 2025 09:56:08 GMT
+Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D301E58063;
+	Tue, 26 Aug 2025 09:56:07 +0000 (GMT)
+Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8FB6258055;
+	Tue, 26 Aug 2025 09:56:05 +0000 (GMT)
+Received: from [9.43.46.213] (unknown [9.43.46.213])
+	by smtpav06.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 26 Aug 2025 09:56:05 +0000 (GMT)
+Message-ID: <b877e779-5395-4162-ba87-2a0e07932eb4@linux.ibm.com>
+Date: Tue, 26 Aug 2025 15:26:02 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250822082606.66375-1-changfengnan@bytedance.com>
- <20250822150550.GP7942@frogsfrogsfrogs> <aKiP966iRv5gEBwm@casper.infradead.org>
- <877byv9w6z.fsf@gmail.com> <aKif_644529sRXhN@casper.infradead.org>
- <874ityad1d.fsf@gmail.com> <CAPFOzZufTPCT_56-7LCc6oGHYiaPixix30yFNEsiFfN1s9ySMQ@mail.gmail.com>
- <aKwq_QoiEvtK89vY@infradead.org> <CAPFOzZvBvHWHUwNLnH+Ss90OMdu91oZsSD0D7_ncjVh0pF29rQ@mail.gmail.com>
- <aKw_XSEEFVG4n79_@infradead.org>
-In-Reply-To: <aKw_XSEEFVG4n79_@infradead.org>
-From: Fengnan Chang <changfengnan@bytedance.com>
-Date: Tue, 26 Aug 2025 17:46:03 +0800
-X-Gm-Features: Ac12FXwhbCfrLvQfnya8JqMdT-q61XbBqqnKzdiMRp9wFxXNvgUveywUyXpPL3E
-Message-ID: <CAPFOzZuH=Mb2D_sNTZrnbcx0SYKcQOqMydk373_eTLc19-H+cQ@mail.gmail.com>
-Subject: Re: [PATCH] iomap: allow iomap using the per-cpu bio cache
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Ritesh Harjani <ritesh.list@gmail.com>, Matthew Wilcox <willy@infradead.org>, 
-	"Darrick J. Wong" <djwong@kernel.org>, brauner@kernel.org, linux-xfs@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>, 
-	linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [blktest/nvme/058] Kernel OOPs while running nvme/058 tests
+To: Ming Lei <ming.lei@redhat.com>,
+        Venkat Rao Bagalkote <venkat88@linux.ibm.com>
+Cc: LKML <linux-kernel@vger.kernel.org>, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org
+References: <3a07b752-06a4-4eee-b302-f4669feb859d@linux.ibm.com>
+ <aK15dbUiEyr0O2Ka@fedora>
+Content-Language: en-US
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <aK15dbUiEyr0O2Ka@fedora>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: i88LFnnQn_h0R8a2H-pHaSAqRmajHcgd
+X-Authority-Analysis: v=2.4 cv=fbCty1QF c=1 sm=1 tr=0 ts=68ad84b9 cx=c_pps
+ a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
+ a=IkcTkHD0fZMA:10 a=2OwXVqhp2XgA:10 a=VwQbUJbxAAAA:8 a=CtkdCJSX4R_F1qFop-kA:9
+ a=QEXdDO2ut3YA:10
+X-Proofpoint-GUID: i88LFnnQn_h0R8a2H-pHaSAqRmajHcgd
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODI2MDA1NSBTYWx0ZWRfXyLQG3xQ+rKOS
+ 1+ScGmGy8RRDozs/oY0nqPO6WloYOX/pVidR04LeNixUHG8R0xsPyQ7J3GNlRcIiysv0KdxkHcE
+ H2ePzI+BhhZdo7+1L5Ncqsd/A7+suKjUCFVkns2H2uFKHcdUS1eEpIguCgM7GqVhBmXqJdZXLtn
+ AuJ4FoTpxERbnDZYStpaxdo3IDR26hYTK56+HxqyocT6iOLdqlMk7hzJXeORG5Gyr8Kt709S9/g
+ yOdTYCySf1UX5+hnUSLg7m/nViq8PdJGzTxPfI7N+AKtMwfFwIbVv6kKOxZbZ/JsuoZf2KYz3+l
+ aIohW3+N5KsoLcRUG2pYztEyXwoUv69vThLM0OD48+aAIoydEPGlRgtD7kVMKMpqRBCFpTL5ufd
+ U/K9pU80
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-08-26_02,2025-08-26_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 malwarescore=0 bulkscore=0 clxscore=1015 priorityscore=1501
+ impostorscore=0 adultscore=0 phishscore=0 suspectscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2508260055
 
-Christoph Hellwig <hch@infradead.org> =E4=BA=8E2025=E5=B9=B48=E6=9C=8825=E6=
-=97=A5=E5=91=A8=E4=B8=80 18:48=E5=86=99=E9=81=93=EF=BC=9A
->
-> On Mon, Aug 25, 2025 at 05:41:57PM +0800, Fengnan Chang wrote:
-> > I'm test random direct read performance on  io_uring+ext4, and try
-> > compare to io_uring+ raw blkdev,  io_uring+ext4 is quite poor, I'm try =
-to
-> > improve this, I found ext4 is quite different with blkdev when run
-> > bio_alloc_bioset. It's beacuse blkdev ext4  use percpu bio cache, but e=
-xt4
-> > path not. So I make this modify.
-> > My test command is:
-> > /fio/t/io_uring -p0 -d128 -b4096 -s1 -c1 -F1 -B1 -R1 -X1 -n1 -P1 -t0
-> > /data01/testfile
-> > Without this patch:
-> > BW is 1950MB
-> > with this patch
-> > BW is 2001MB.
->
-> Interesting.  This is why the not yet merged ext4 iomap patches I guess?
-> Do you see similar numbers with XFS?
-Yes, similar numbers with XFS.
 
->
-> >
+
+On 8/26/25 2:38 PM, Ming Lei wrote:
+> On Tue, Aug 26, 2025 at 02:00:56PM +0530, Venkat Rao Bagalkote wrote:
+>> Greetings!!!
+>>
+>>
+>> IBM CI has reported a kernel OOPs, while running blktest suite(nvme/058
+>> test).
+>>
+>>
+>> Kernel Repo:
+>> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+>>
+>>
+>> Traces:
+>>
+>>
+>> [37496.800225] BUG: Kernel NULL pointer dereference at 0x00000000
+>> [37496.800230] Faulting instruction address: 0xc0000000008a34b0
+>> [37496.800235] Oops: Kernel access of bad area, sig: 11 [#1]
+> 
+> ...
+> 
+>> [37496.800365] GPR28: 0000000000000001 0000000000000001 c0000000b005c400
+>> 0000000000000000
+>> [37496.800424] NIP [c0000000008a34b0] __rq_qos_done_bio+0x3c/0x88
+> 
+> It looks regression from 370ac285f23a ("block: avoid cpu_hotplug_lock depedency on freeze_lock"),
+> For nvme mpath, same bio crosses two drivers, so QUEUE_FLAG_QOS_ENABLED & q->rq_qos check can't
+> be skipped.
+> 
+Thanks Ming for looking at it. And yes you were correct, we can't skip
+QUEUE_FLAG_QOS_ENABLED & q->rq_qos for NVMe, However this issue only
+manifests with NVMe multipath enabled, as that would create the stacked
+NVMe devices. So shall I send the fix or are you going to send the patch
+with fix?
+
+Thanks,
+--Nilay
