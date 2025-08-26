@@ -1,107 +1,98 @@
-Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A1CF257830;
-	Tue, 26 Aug 2025 00:43:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04FD53BBF2;
+	Tue, 26 Aug 2025 00:44:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756169039; cv=none; b=MVkhCGsWLI2aS5mV4OOEzqXau5utH66/2a3Nmnhk4jqvFV7JIoqXueJf0+VlEaxPGeduNvG5Iu6jFZl8CTt9IVogH8KY4P7mjs0k2gxduV51Jt7vVrv9eg5cJnPeXpR3kJ5iUAZFg/nywARjbP6kKnPKaKTb1aWFVwvkXU/U43s=
+	t=1756169077; cv=none; b=R8+cD9v0YaBUSG5XfYvMEBcKV+ldLvcuB2rBVDcIvZ0MSmDJSs1dbsHLD89h4VFDQtpeDQB8mkNHA9Pumzk/+wfm+R6Q5+52w48IheopLCUPeN+FaX5Ik+cx8RnQLfgqxS/oUHgakk3P4XflCtllJKgFOvOe53z0VdZEs0O8XvY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756169039; c=relaxed/simple;
-	bh=VuprAmNdVwRNwOpNRwdqS3ze/UV1SfnuogRvhgFIa4c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Oj0W224LEQNLXFtZg9gWzOqnQHNI2L2dmlLaGVMM6NtViK4qZ7rhVl6xzXmpiOqp5UTCjjfRGGBUztC9YFhP4OuONmHIRjMRYCrMaIDtP1ACO2zbHoMcDR9HLI3ih4IgCqQF0zIUk6YOU6FaU6kg9mlk9Aa2wa7O2wnWQaQ/xXY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BvLx8lpp; arc=none smtp.client-ip=209.85.215.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BvLx8lpp"
-Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-b482fd89b0eso4074639a12.2;
-        Mon, 25 Aug 2025 17:43:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756169034; x=1756773834; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=VuprAmNdVwRNwOpNRwdqS3ze/UV1SfnuogRvhgFIa4c=;
-        b=BvLx8lppu7G09/YeilUGEbxPqZN5A+9bD1RRW9sP/rl5rbMg/6pMVa2auwgi3AvJfP
-         He8BHL9Sb4jiv0lsOqNB7zkIYNw5Ph1b2owtUUuEdLDLNVbTnmoKntj/3ciJUjiaBfMc
-         CqN193x6zUHQdpc11OS8+Tb36ZU1OIwEWU3J3r4Lk+yt91cPXWQWix7ZtBGJa7Fa3WVE
-         6ymG8MnNuWoIDfJ3I4AFsgnug6lt6C8YRZbQL05tp+fb01s+RPwX4J6qJqZoWvQNJsUH
-         0cdBO8OG5Vqxpj/y+d0e1EiAkibEjjuaPj6OLTq6xrVraVguW7Q4WJjnuCjfJsiwlFxd
-         dVag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756169034; x=1756773834;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VuprAmNdVwRNwOpNRwdqS3ze/UV1SfnuogRvhgFIa4c=;
-        b=a86QPpJpl50ytEMIBe7ZwIMvUQM2VxkuHE85K5vYU56X1CqVwsoGhDMI+9QMBLrJuG
-         5Z77bUCyoISNwl592KSzueWTTGZirwSKRgBr/UO7h7LjwRKptA26IRKYZLXpFC3yWRiI
-         RPKm0XORv5MXkXB2mE7RlgKC7gC4rqWaAGahz//QR2CFwgy3pzj9rUvJgneOpKJr9Hc6
-         qpQla7MgFUA7ES2FBy6r909pm6K8xHlB7u4rT6D+aJvIGQN0WDuXaKpE4aMd37aBr8Cf
-         NLJbxF9m1XmEWnigr3gP4shLZ7Pc998K2IfXGB8W0WBanboBFbob7Gp+HA65AoUzGKWb
-         JnCA==
-X-Forwarded-Encrypted: i=1; AJvYcCXl6LVTJqzmhwyH9W3fIQH+atwWuCElyC4s4H8tXRRNJtWv2LnixkvJ5y+kEdOUnvkVnKvzsgXx3iCMXg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyCx1r2nGAQ0Tlg7aPAUdxmvB8txpc9v0DF3f/SoeteoDLJMRGX
-	Pe3U6oB1NiLVklSeVeV9N3lSfTbwXuL/KKbNkcSqdgbkf8SkKgJ9+Bz/
-X-Gm-Gg: ASbGncsyLXm5PnRBHL4qesGJMTj6TnANUhglbr2g3iIpjuSDN/yjUHz7hsMtgKgvnA3
-	Y4G3iaLpb4kwiWtONHTs0KPsIRmA8U6nKfGuGTJQ9Q3rqp9egeU5QGdIcmn62K2m7nwu2V3dmbk
-	AzInQB7mEHpigUUFmNnHLCXm/GXP+H0cN4pKvMKPYjS3WICUPOFwlXcva9MFH06wMiltsI3v/zz
-	WQb2c3EKx5MTzVhynsbC2A0Xzov2Z+JauOJxnHNA6wQAYY9xACXtUy59ZQ32+PjyWDSe9GsMTqj
-	TcfiTpJm/cziqHNPNMEatVktQlociW5Qy8RGTbYowJaM0K+4M3kXInHXyNQqyUoyvE+akg789H0
-	+TRgF3zWhjQp1vz9cMsqcg61ryOHwvCJ6T8APfEziWs3mH5z6W1GrBJ3AOHtoGEYzzd9y/rdHWW
-	m3
-X-Google-Smtp-Source: AGHT+IGp5FBArIhU/5h3FompoWSCrr9aBj9rYowb5yYc8b97+Kug3LWN+VlxhvsRiwLfgUmOqNa3lQ==
-X-Received: by 2002:a17:902:c40f:b0:244:99aa:54a1 with SMTP id d9443c01a7336-2462ee0b77emr194203385ad.7.1756169034231;
-        Mon, 25 Aug 2025 17:43:54 -0700 (PDT)
-Received: from ?IPV6:2600:8802:b00:9ce0:b09e:9199:95c4:55ec? ([2600:8802:b00:9ce0:b09e:9199:95c4:55ec])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-246687af23fsm79304815ad.51.2025.08.25.17.43.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 25 Aug 2025 17:43:53 -0700 (PDT)
-Message-ID: <7be35af0-d249-4910-8f67-309e111f8c08@gmail.com>
-Date: Mon, 25 Aug 2025 17:43:52 -0700
+	s=arc-20240116; t=1756169077; c=relaxed/simple;
+	bh=XVEgFqGODfE47rhyZY5ahAo/dKdN2WDtN6jxtG/maos=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=ONA4at94yvqf9kvi84z2ZqnYOC5zHujjzUQLKIhw4GPE37DHTJ2a0qIWrDoLKuwj3IkmkCrvMKCqoV1V6SuunhBMagoSOCwGE8Hyitz9JShsGpSI5bcDrze6SUeWLayQ+wUpLZ1jDIg7mTsGoP/jerqd72c2blzjQTLEW1gznLQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4c9pp73rxMzKHNPd;
+	Tue, 26 Aug 2025 08:44:31 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 25CC41A0D28;
+	Tue, 26 Aug 2025 08:44:31 +0800 (CST)
+Received: from [10.174.179.143] (unknown [10.174.179.143])
+	by APP4 (Coremail) with SMTP id gCh0CgDnMY5tA61oi1A5AQ--.16236S3;
+	Tue, 26 Aug 2025 08:44:30 +0800 (CST)
+Subject: Re: [PATCH 0/2] Fix the initialization of
+ max_hw_wzeroes_unmap_sectors for stacking drivers
+To: Zhang Yi <yi.zhang@huaweicloud.com>, linux-block@vger.kernel.org,
+ linux-raid@vger.kernel.org, drbd-dev@lists.linbit.com
+Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+ john.g.garry@oracle.com, hch@lst.de, martin.petersen@oracle.com,
+ axboe@kernel.dk, yi.zhang@huawei.com, yangerkun@huawei.com,
+ "yukuai (C)" <yukuai3@huawei.com>
+References: <20250825083320.797165-1-yi.zhang@huaweicloud.com>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <18a92f4f-e4e8-4b61-79b1-1b1f116af5fa@huaweicloud.com>
+Date: Tue, 26 Aug 2025 08:44:29 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH blktests] zbd/009: increase max open zones limit to 16
-To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
- linux-block@vger.kernel.org
-Cc: linux-btrfs@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>,
- Naohiro Aota <naohiro.aota@wdc.com>
-References: <20250826002720.12222-1-shinichiro.kawasaki@wdc.com>
-Content-Language: en-US
-From: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
-In-Reply-To: <20250826002720.12222-1-shinichiro.kawasaki@wdc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20250825083320.797165-1-yi.zhang@huaweicloud.com>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgDnMY5tA61oi1A5AQ--.16236S3
+X-Coremail-Antispam: 1UD129KBjvdXoWrurW3Cw4DKw1xJryxWFy7Awb_yoW3ZrgEkF
+	1FqFZavw4kCF1SvF15ur1fZry2yay8XF95ury7KayFgayfZFn5G3Wj93s8J3WUAFyqvFWD
+	Ar1kt3yxAryUXjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUbaxYFVCjjxCrM7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E6xAIw20E
+	Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwV
+	A0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x02
+	67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
+	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
+	x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
+	0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7I2V7IY0VAS
+	07AlzVAYIcxG8wCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4
+	IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1r
+	MI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJV
+	WUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j
+	6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYx
+	BIdaVFxhVjvjDU0xZFpf9x07UAwIDUUUUU=
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On 8/25/25 17:27, Shin'ichiro Kawasaki wrote:
-> The kernel commit 04147d8394e8 ("btrfs: zoned: limit active zones to
-> max_open_zones") introduced in kernel version v6.17-rc3 caused the
-> zbd/009 test case to hang during execution. The hang happens because
-> zoned btrfs requires the maximum active zones limit of zoned block
-> devices to be at least 11 or greater. The kernel commit applies this
-> same requirement to the maximum open zones limit also.
->
-> However, by default, the maximum open zones limit for zoned scsi_debug
-> devices is 8. The test case zbd/009 creates a scsi_debug device with
-> this limit and set up zoned btrfs. Thereby it violates the 11-zones
-> requirement, which resulted in the hang.
->
-> To avoid the hang, increase the max open zones limit of the scsi_debug
-> device from the default value 8 to 16.
->
-> Suggested-by: Naohiro Aota<naohiro.aota@wdc.com>
-> Signed-off-by: Shin'ichiro Kawasaki<shinichiro.kawasaki@wdc.com>
+ÔÚ 2025/08/25 16:33, Zhang Yi Ð´µÀ:
+> From: Zhang Yi <yi.zhang@huawei.com>
+> 
+> Hello,
+> 
+> This series fixes the initialization of max_hw_wzeroes_unmap_sectors in
+> queue_limits for all md raid and drbd drivers, preventing
+> blk_validate_limits() failures on underlying devices that support the
+> unmap write zeroes command.
+> 
+> Best regards,
+> Yi.
+> 
+> Zhang Yi (2):
+>    md: init queue_limits->max_hw_wzeroes_unmap_sectors parameter
+>    drbd: init queue_limits->max_hw_wzeroes_unmap_sectors parameter
+> 
+>   drivers/block/drbd/drbd_nl.c | 1 +
+>   drivers/md/md-linear.c       | 1 +
+>   drivers/md/raid0.c           | 1 +
+>   drivers/md/raid1.c           | 1 +
+>   drivers/md/raid10.c          | 1 +
+>   drivers/md/raid5.c           | 1 +
+>   6 files changed, 6 insertions(+)
+> 
 
-Looks good.
+For this set
+Reviewed-by: Yu Kuai <yukuai3@huawei.com>
 
-Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
-
--ck
+Thanks
 
