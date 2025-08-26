@@ -1,131 +1,82 @@
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F08C2E7645;
-	Tue, 26 Aug 2025 17:25:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E952A5661;
+	Tue, 26 Aug 2025 19:41:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756229155; cv=none; b=VBuVcOMLN0mbUcQdgZOA4Q16QYLNUun+82FBsjsb9wYa7gByACb7fzcBtha/daydyDWJXvxr2GCsPTMcF9nbp+VxZhZtkMNTLw47ztiuTvJJDTuZGdOozimCZ0d4XfBiHxN28taXs43H8ErW8MoW4LfCBLN+Ns1y9bB+HUn/jR4=
+	t=1756237270; cv=none; b=kcU6p2ArxRvAtnZLDJRKH+jjrF1neXOlD2deR5w0tl+Y1fXUxajihZyz4xTcjyooQdYoqv/sAeDg3q2ikQvVoJZgfRfiQ1dKQfhhyJWIKb+UjoTu1mkkQDorplSHJOIX55DRooI2mcK6JS2SL0QWJs+hZGbzPFRStjIwH5GbHv8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756229155; c=relaxed/simple;
-	bh=mfizfHDWKSGlozkc4tLuwDndi6x0KhMxNlC41A3u0sU=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-version:Content-type; b=mJIju3+XS2wPqQtjtDBoHqAKIl1lUK1Lh0FbW32ZwHpa3VXrR7Axx+atzYe3ojeWEIeiOqitTcUyMtP+a/pD8897XlgwzH3jeShYDQNinn/VnO+OL03Pv/i0mMyUMxOt7SjbzNZDidfOKlIzIOqeDZSkuQybr/htMgaqkG/rK1o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GL3EkfL8; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1756237270; c=relaxed/simple;
+	bh=pB0HN5+AQjHtb2JgkDO+ZgAWnxex9FXJJaeFRpvCmWk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=grlSm8nbhKEIWcv96tjlykv5YJty0EkXdnxfl9B8w47bUC/ECTkIpv+FcUu4mKXAyLNQI05zOPgoeBaP0pCy79GHbmUIsCSOvDQVvoZzdTWJE073zS5ZyfLYU3c/CeCj1zLrFda0f41DeeV+0Q5HjRswdMt0bGtgblVicM5fg/Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=tLMhM2UN; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GL3EkfL8"
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2467de5160eso29206395ad.0;
-        Tue, 26 Aug 2025 10:25:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756229153; x=1756833953; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:message-id:date
-         :in-reply-to:subject:cc:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=uLw9Uoz6Tbt81Fl6ED1MMbaPVoc6YtscpFiSGvOkBd4=;
-        b=GL3EkfL87O/A7OlKgXmRLmBfz6wD6dtuPg6MbFwmNFycQ2jmHOKThl+4ao3AfsXKhu
-         LrrU29aaDN0y69sxowFP5Q9XUYzo4nQdsqyIMsOexj5YrSIvpNHOP3fxGUyFWsMG+5fm
-         rk/AzzrVUKdVDoAzwYvsFzys0TM2hXlPg5vfMfUTMvMfHmZig57QKzn46O0FwRKeECQH
-         lXlBPGx+1rTXHPKHItQTAn4vlumyL/yzQCYQmw1pQj7KW2UEnJX+WWXZYEvqq0OQTIQe
-         iHzZ0m9ICyn3IDX8PRbTYTF+yh1e+wCXi3p3t+DUw7MJ6m0mvQpNJAJB0Ndeq3pl4yo2
-         rGsw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756229154; x=1756833954;
-        h=content-transfer-encoding:mime-version:references:message-id:date
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=uLw9Uoz6Tbt81Fl6ED1MMbaPVoc6YtscpFiSGvOkBd4=;
-        b=rsq/8B07CYfQefiws1fhvvWa9A70WIGDaSp0xMyxj7scsCWHhPW3PwTgru6M/7Ulkt
-         lTFSmY+FaIgFGXhiq3D++M0UcSS4UdTTcc7jmHBKFe5A8Q0TP0zGDXAtWfw535/snq/n
-         ZC404nIORaYCwDyFOBxXF0NwmstEaserOIJ6n710QBnxH5rHQFO7Gm0jO5XtYTGE7Y0M
-         hRGDHlhQ9bl7su+j2cg1bKIRR8c29FLU5YIqpiGyyFSh0MbxcnkWi1FFtR2axFODNyJP
-         6GQ9l2Ulwbh+vIV/PoQZfGeYk0l6UfnoWOOdgQuxDYTIm11ytKdCNmmtrS9skKkW9oqY
-         k/8Q==
-X-Forwarded-Encrypted: i=1; AJvYcCV+ZM+For/+DPnQ0IUUHp6rtKwist7rptKd7tslXkJNC9MlJpx7MT6r/idxHeFpKjvz+rC28lxWSHy2Iw==@vger.kernel.org, AJvYcCXaUBl3ayjtWPzu5t8VtOppjOsJy/pDZZNFDJw/+O3gjoraOMzwzVhJZYBGGQo5YUmbaFzrWQRxdc8m@vger.kernel.org, AJvYcCXooQwE96Ohbs8klubjhl7b4FvZT6cyoUz0oDONmAWF0cPhsW+w0RL9qGtNZBzTEG/MF9ZJ5F12BSv3cFxUyQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyqyxBfcyKNJLy/2aDnZxNqwxaZ511AKuUo7i9LPXwY/SlN9VTi
-	JTZdlkpCDPOUwtikeEah7EqHyzGebORLoYGlFUMERh3Or0SKUQT4bRza
-X-Gm-Gg: ASbGncsKgPJu9kJzOyk1sisklf78GQHY75C6ljPGfBR2vafV/5iOczze1Vn0IkWxlTR
-	0wGoYC96HDVb3gkfXWStDeGJRFXIZz8fdsYhAsBFwP7cFIb1Kt0+Caa7g8r3cve0mnEFfSuOYtL
-	2Qv99Buovj+fNSIO+oUY1h92ZvikRMNB9VkfyIkVxWC6T+Ja9wcfMT+FmCWht6VMrpfzC85pDeF
-	ec0+NIHBnSRR8gk3xY/Pb1AeZdMwUKaakx988EOgw0mjpGNto1Ne5h5aNsP0y8A2Hrgy39sfAv6
-	Le3XrfK/YN90Ewb0VS8CNWzBO7841uCl0M0IjoGX58ZZMU6V+CGTea4WYB4QvDzHeAP5LXpP9sG
-	FDvJZMKPOhdsGnVH+oXPWTQxs
-X-Google-Smtp-Source: AGHT+IEWgBRM0v2G+FcafZmJl/omfs0Uh0JKNPlp/i5SCyYCxuFG2i32PH0SvPbcdPMPohfb3MIzow==
-X-Received: by 2002:a17:902:e788:b0:246:80ef:87fc with SMTP id d9443c01a7336-24680ef8bc7mr154253345ad.45.1756229153495;
-        Tue, 26 Aug 2025 10:25:53 -0700 (PDT)
-Received: from dw-tp ([171.76.82.15])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-32745bbff33sm1024685a91.9.2025.08.26.10.25.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Aug 2025 10:25:52 -0700 (PDT)
-From: Ritesh Harjani (IBM) <ritesh.list@gmail.com>
-To: Fengnan Chang <changfengnan@bytedance.com>, 
-Cc: Matthew Wilcox <willy@infradead.org>, "Darrick J. Wong" <djwong@kernel.org>, brauner@kernel.org, linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>
-Subject: Re: [PATCH] iomap: allow iomap using the per-cpu bio cache
-In-Reply-To: <CAPFOzZvBvHWHUwNLnH+Ss90OMdu91oZsSD0D7_ncjVh0pF29rQ@mail.gmail.com>
-Date: Tue, 26 Aug 2025 22:23:05 +0530
-Message-ID: <878qj6qb2m.fsf@gmail.com>
-References: <20250822082606.66375-1-changfengnan@bytedance.com> <20250822150550.GP7942@frogsfrogsfrogs> <aKiP966iRv5gEBwm@casper.infradead.org> <877byv9w6z.fsf@gmail.com> <aKif_644529sRXhN@casper.infradead.org> <874ityad1d.fsf@gmail.com> <CAPFOzZufTPCT_56-7LCc6oGHYiaPixix30yFNEsiFfN1s9ySMQ@mail.gmail.com> <aKwq_QoiEvtK89vY@infradead.org> <CAPFOzZvBvHWHUwNLnH+Ss90OMdu91oZsSD0D7_ncjVh0pF29rQ@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="tLMhM2UN"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=CXZHG7FeAOLOdb03rd+3Zpl+8D1DiDY/d4hTHKY6fqE=; b=tLMhM2UN+tFtFq/me9RYX9Ry4N
+	ZLFYOPNJDlPOeXHAENuvC6xLP+OdJYI7lc9H8OEOWi9UiN5RLcky/5CUBRBznFnZ6KHGPMYyeTcS6
+	vV2+YZVbTe3o+lsHsGETnLvtBva1cNmCaV6pdcntMCvIOwUceGiHBoTTWA59pzOb9fSoh7yayjYQW
+	K9wbPXqGA8LG++N7xJ2YyC+SSvQEYwLcO6fa+eBqu6c6BPuZF5i11STRG8+wDnYdzSvu+SKOS2i8K
+	y+V17UBijIjB1jEODonYhpqCAedvVkN+vaxSzzditWefHn+TObeP3XWCKO0s/+kEdQDVzJmqx8Gp1
+	Sm1t0+PA==;
+Received: from willy by casper.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1uqzXT-00000008f9y-2mU8;
+	Tue, 26 Aug 2025 19:41:03 +0000
+Date: Tue, 26 Aug 2025 20:41:03 +0100
+From: Matthew Wilcox <willy@infradead.org>
+To: "Vishal Moola (Oracle)" <vishal.moola@gmail.com>
+Cc: linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Justin Sanders <justin@coraid.com>, Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Subject: Re: [PATCH 2/7] aoe: Stop calling page_address() in free_page()
+Message-ID: <aK4NzxmGZjKvsGz8@casper.infradead.org>
+References: <20250826193258.902608-1-vishal.moola@gmail.com>
+ <20250826193258.902608-3-vishal.moola@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-version: 1.0
-Content-type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250826193258.902608-3-vishal.moola@gmail.com>
 
-Fengnan Chang <changfengnan@bytedance.com> writes:
+On Tue, Aug 26, 2025 at 12:32:53PM -0700, Vishal Moola (Oracle) wrote:
+> free_page() should be used when we only have a virtual address. We
+> should call __free_page() directly on our page instead.
+> 
+> Signed-off-by: Vishal Moola (Oracle) <vishal.moola@gmail.com>
 
-> Christoph Hellwig <hch@infradead.org> 于2025年8月25日周一 17:21写道：
->>
->> On Mon, Aug 25, 2025 at 04:51:27PM +0800, Fengnan Chang wrote:
->> > No restrictions for now, I think we can enable this by default.
->> > Maybe better solution is modify in bio.c?  Let me do some test first.
+Reviewed-by: Matthew Wilcox (Oracle) <willy@infradead.org>
 
-If there are other implications to consider, for using per-cpu bio cache
-by default, then maybe we can first get the optimizations for iomap in
-for at least REQ_ALLOC_CACHE users and later work on to see if this
-can be enabled by default for other users too.
-Unless someone else thinks otherwise.
+Probably should have run ./scripts/get_maintainer.pl drivers/block/aoe/aoecmd.c
+Adding ccs.
 
-Why I am thinking this is - due to limited per-cpu bio cache if everyone
-uses it for their bio submission, we may not get the best performance
-where needed. So that might require us to come up with a different
-approach.
-
->>
->> Any kind of numbers you see where this makes a different, including
->> the workloads would also be very valuable here.
-> I'm test random direct read performance on  io_uring+ext4, and try
-> compare to io_uring+ raw blkdev,  io_uring+ext4 is quite poor, I'm try to
-> improve this, I found ext4 is quite different with blkdev when run
-> bio_alloc_bioset. It's beacuse blkdev ext4  use percpu bio cache, but ext4
-> path not. So I make this modify.
-
-I am assuming you meant to say - DIO with iouring+raw_blkdev uses
-per-cpu bio cache where as iouring+(ext4/xfs) does not use it.
-Hence you added this patch which will enable the use of it - which
-should also improve the performance of iouring+(ext4/xfs). 
-
-That make sense to me. 
-
-> My test command is:
-> /fio/t/io_uring -p0 -d128 -b4096 -s1 -c1 -F1 -B1 -R1 -X1 -n1 -P1 -t0
-> /data01/testfile
-> Without this patch:
-> BW is 1950MB
-> with this patch
-> BW is 2001MB.
-
-Ok. That's around 2.6% improvement.. Is that what you were expecting to
-see too? Is that because you were testing with -p0 (non-polled I/O)? 
-
-Looking at the numbers here [1] & [2], I was hoping this could give
-maybe around 5-6% improvement ;) 
-
-[1]: https://lore.kernel.org/io-uring/cover.1666347703.git.asml.silence@gmail.com/
-[2]: https://lore.kernel.org/all/20220806152004.382170-3-axboe@kernel.dk/
-
-
--ritesh
+>  drivers/block/aoe/aoecmd.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/block/aoe/aoecmd.c b/drivers/block/aoe/aoecmd.c
+> index 6298f8e271e3..a9affb7c264d 100644
+> --- a/drivers/block/aoe/aoecmd.c
+> +++ b/drivers/block/aoe/aoecmd.c
+> @@ -1761,6 +1761,6 @@ aoecmd_exit(void)
+>  	kfree(kts);
+>  	kfree(ktiowq);
+>  
+> -	free_page((unsigned long) page_address(empty_page));
+> +	__free_page(empty_page);
+>  	empty_page = NULL;
+>  }
+> -- 
+> 2.51.0
+> 
+> 
