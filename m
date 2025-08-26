@@ -1,95 +1,119 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31560308F34
-	for <linux-block@vger.kernel.org>; Tue, 26 Aug 2025 09:08:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13C58279DC5;
+	Tue, 26 Aug 2025 09:11:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756199305; cv=none; b=f6285OItJ4X0eFJRqKHdpOZ6hLJOZyQmLRNwoGg6OclkS/OZ9BlS8Rd9HOjASRPtZJ+Dit9VIjR9jh34KI2Cweck09+MsfVGMOQEFiGR+TYf1iq40YGoAGaoKpWfy/DGiyG/NPqFFzvA7E3zKPyIAMIxofv8peFL5BibBkDxJIs=
+	t=1756199487; cv=none; b=Xn45d1U1jvUWnE+plGx40LFDGgqYZmCsB1KSP3B0uL5RKag95prsQ9pHNbD83FNml+K6yFhsfNWowUg2yJyFSoVRNVgulqXuk9P/SAaosljUDpoUtk7v1tymfqu48wZE/jUzGOwxR0i6TG+rDEqRpnbwgaK7eamAeVgWGmVnuVw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756199305; c=relaxed/simple;
-	bh=GN5uQD4JD6djLG9PPbtEplS2jSso9GU5V0zzpg+K9Pc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pbuO1QPSqXWftDHBpiaF9g9jSubMQMiVlUM0tw+nr3DwrUvaheeqhBWas+daPLW23aeuaUamXjJsaQcIY74FfWDinO/xBiZp+9NFXnjL7q3T/SPdNe9miSlJ34JIijEy0ckwmXZxtxNfXz07zl5vfmTq7ZS37KSMNYT86LhPtz8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RrY7fxji; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RrY7fxji"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1756199303;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kgK6zVCaewV2AgflcmKRv9pWzRpDi+X/xM0/4eUVBak=;
-	b=RrY7fxjiKFwwdN25ZvvqKwf286LFVlNiXXnt5VqscYPcBsivjwAm/PDZxOVg4NGwobtPwr
-	Ogk11aDI/9kY/9Y+OuVzSGS3HdLb8q4AAWdT6Lh2vnIaEppUEBeei9i3JwHMQSfKuwHOLS
-	lRRBdCJp49sxr86Fh5BdlSNnp0Egbwo=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-626-bkekoeDEPDS-J6oAGgdWIQ-1; Tue,
- 26 Aug 2025 05:08:19 -0400
-X-MC-Unique: bkekoeDEPDS-J6oAGgdWIQ-1
-X-Mimecast-MFC-AGG-ID: bkekoeDEPDS-J6oAGgdWIQ_1756199298
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AB241195419B;
-	Tue, 26 Aug 2025 09:08:17 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.57])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A231919560AB;
-	Tue, 26 Aug 2025 09:08:12 +0000 (UTC)
-Date: Tue, 26 Aug 2025 17:08:05 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Venkat Rao Bagalkote <venkat88@linux.ibm.com>
-Cc: LKML <linux-kernel@vger.kernel.org>, linux-nvme@lists.infradead.org,
-	Nilay Shroff <nilay@linux.ibm.com>, linux-block@vger.kernel.org
-Subject: Re: [blktest/nvme/058] Kernel OOPs while running nvme/058 tests
-Message-ID: <aK15dbUiEyr0O2Ka@fedora>
-References: <3a07b752-06a4-4eee-b302-f4669feb859d@linux.ibm.com>
+	s=arc-20240116; t=1756199487; c=relaxed/simple;
+	bh=zeSUYqpCyQktVExq8yTiXlqOX3wp9QK+YqIwke6RiJ8=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=CuRjeBQydBIZ7UCAZ4EZTaE384kJPqzG2OjL/uloLVcd7W1gMuGAXPL8LTPmUcBcnUToOJdTvF37CcGyCWRZVUS3LzlXDDlsq2RppUaGsYlr067xhYq9T9v+oo/lmJ9sg244nxsOVZ3T4hs2cy+8p2KTzu+zNGaqr/V1V5NfnDk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.93.142])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4cB22z05cXzYQvHK;
+	Tue, 26 Aug 2025 17:11:23 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 85CB41A1945;
+	Tue, 26 Aug 2025 17:11:21 +0800 (CST)
+Received: from [10.174.179.143] (unknown [10.174.179.143])
+	by APP4 (Coremail) with SMTP id gCh0CgAncY03eq1otrxhAQ--.25926S3;
+	Tue, 26 Aug 2025 17:11:21 +0800 (CST)
+Subject: Re: [PATCH RFC 2/7] md/raid0: convert raid0_handle_discard() to use
+ bio_submit_split()
+To: Christoph Hellwig <hch@infradead.org>, Yu Kuai <yukuai1@huaweicloud.com>
+Cc: colyli@kernel.org, hare@suse.de, tieren@fnnas.com, axboe@kernel.dk,
+ tj@kernel.org, josef@toxicpanda.com, song@kernel.org,
+ akpm@linux-foundation.org, neil@brown.name, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, cgroups@vger.kernel.org,
+ linux-raid@vger.kernel.org, yi.zhang@huawei.com, yangerkun@huawei.com,
+ johnny.chenyi@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
+References: <20250825093700.3731633-1-yukuai1@huaweicloud.com>
+ <20250825093700.3731633-3-yukuai1@huaweicloud.com>
+ <aKxBgNQXphpa1BNt@infradead.org>
+ <2984b719-f555-7588-fa2a-1f78d2691e8a@huaweicloud.com>
+ <aK1oLSppbXNELKCX@infradead.org>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <8f33c7b8-81bb-f167-b7a1-2783c20ede6f@huaweicloud.com>
+Date: Tue, 26 Aug 2025 17:11:19 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3a07b752-06a4-4eee-b302-f4669feb859d@linux.ibm.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+In-Reply-To: <aK1oLSppbXNELKCX@infradead.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgAncY03eq1otrxhAQ--.25926S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7AF18uF4DGr1DtFykAr48tFb_yoW8Wrykp3
+	y5Way8tr4DJrsFkw1vqw1UtFn5tw15Xry5ZryfXrWIyFn8KF1ayr1fKr1Fkry3KryDG3WY
+	q340vFWrGry5C3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUBa14x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r4j6F4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
+	0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AKxVW8ZVWrXwCF04k20xvY0x
+	0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E
+	7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_GFv_WrylIxkGc2Ij64vIr41lIxAIcV
+	C0I7IYx2IY67AKxVW8JVW5JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJwCI42IY
+	6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aV
+	CY1x0267AKxVW8Jr0_Cr1UYxBIdaVFxhVjvjDU0xZFpf9x0pRx-BiUUUUU=
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On Tue, Aug 26, 2025 at 02:00:56PM +0530, Venkat Rao Bagalkote wrote:
-> Greetings!!!
-> 
-> 
-> IBM CI has reported a kernel OOPs, while running blktest suite(nvme/058
-> test).
-> 
-> 
-> Kernel Repo:
-> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
-> 
-> 
-> Traces:
-> 
-> 
-> [37496.800225] BUG: Kernel NULL pointer dereference at 0x00000000
-> [37496.800230] Faulting instruction address: 0xc0000000008a34b0
-> [37496.800235] Oops: Kernel access of bad area, sig: 11 [#1]
+Hi,
 
-...
+在 2025/08/26 15:54, Christoph Hellwig 写道:
+> On Tue, Aug 26, 2025 at 09:08:33AM +0800, Yu Kuai wrote:
+>> 在 2025/08/25 18:57, Christoph Hellwig 写道:
+>>> On Mon, Aug 25, 2025 at 05:36:55PM +0800, Yu Kuai wrote:
+>>>> +		bio = bio_submit_split(bio,
+>>>> +				zone->zone_end - bio->bi_iter.bi_sector,
+>>>> +				&mddev->bio_set);
+>>>
+>>> Do you know why raid0 and linear use mddev->bio_set for splitting
+>>> instead of their own split bio_sets like raid1/10/5?  Is this safe?
+>>>
+>>
+>> I think it's not safe, as mddev->bio_split pool size is just 2, reuse
+>> this pool to split multiple times before submitting will need greate
+>> pool size to make this work.
+>>
+>> By the way, do you think it's better to increate disk->bio_split pool
+>> size to 4 and convert all mdraid internal split to use disk->bio_split
+>> directly?
+> 
+> I don't really know where that magic number 4 or even the current number
+> comes from, but I think Jens might be amenable to a small increase with a
+> good explanation.
 
-> [37496.800365] GPR28: 0000000000000001 0000000000000001 c0000000b005c400
-> 0000000000000000
-> [37496.800424] NIP [c0000000008a34b0] __rq_qos_done_bio+0x3c/0x88
+I was thinking we have to make sure issuing the allocated split bio
+before allocating new bio, and that number is the safe limit that we can
+allocated before issuing.
 
-It looks regression from 370ac285f23a ("block: avoid cpu_hotplug_lock depedency on freeze_lock"),
-For nvme mpath, same bio crosses two drivers, so QUEUE_FLAG_QOS_ENABLED & q->rq_qos check can't
-be skipped.
+In case of recursive split, we can hold multiple split bio in
+curent->bio_list, and with this set to handle split bio first, we can
+gurantee we'll at most hold 3 split bios from mdraid:
+  - bio_split_to_limits(), for example, by max_sectors
+  - bio_split() by internal chunksize
+  - bio_split() by badblocks
 
+That's why I said 4 should be safe :) If genddisk->bio_split can be
+expanded to 4, all internal bio_split can be removed now.
 
 Thanks,
-Ming
+Kuai
+
+> 
+> .
+> 
 
