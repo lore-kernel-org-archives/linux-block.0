@@ -1,46 +1,46 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77DA2C133;
-	Tue, 26 Aug 2025 22:33:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61A392FE598;
+	Tue, 26 Aug 2025 23:11:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756247598; cv=none; b=dz94O0Ozv9mlSLU+N8LlrwwCQQKMiX3LS9N47nhPwKapkJ0PGzCT3qYO49Y8A6DiRoKaDAa6LvxIcQCrl3J2mEGE2Fp6sbGcyghXqtQQ0r5GK1bMg3Qg1OBzYTyr1o/P9GRpOA2wnwQwyL6XoGsDZlTP9+hK9ySTwRTIKVlvbQs=
+	t=1756249888; cv=none; b=fjehw6S89Vi35jX5PAfLt/22iOVbITzrSW1VidDVUrcytbUWcUJ44+VBx9ZD4E4iWx4kBkWwhi0m4K/DLBiUZd4fYrdmXoJJJiwk4wcj33y5gVKQYLp9+DQbULxCQZ5j0tIftgy9T/ckx0bX/pqhT/XfKP4NOZZYuReB7+++fmM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756247598; c=relaxed/simple;
-	bh=enAWv7FM+3cCYyKIq2hsdtFuRu631uhygsKoaTBzjso=;
+	s=arc-20240116; t=1756249888; c=relaxed/simple;
+	bh=sGMWLjp5FHkDT8CA0fmK2D7DNtmFNB7Fq4mFCeJK7ts=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Q/5DcD79ITpf4+byX+zw/XGAP5bspxC8anuQSkK9FFY++l+IqqA3Nn3dClFew9vW7RJwZxtxRIS9CO1X8TiIbi8q8V0uKxlENY48f6Y/hsI3fI5SvBwwYnq+UgsESfmLqeftcksUkWcFj23EMX0hYAsUr2SCMn7wDrWegcvD+NQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mvAZzZJ1; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=dmuUaLum7UPIx7FBm8yiblxyl3RMclTo0XKl/qIPl8y0geCVllvQcG+2bD9vmtLZagH5OQuZYUxnxdHAVqU/GBCCfoDCPGOd7UmRdRsBFNMTbyjNhpz/lYNB0GODnhzijKiWz8+oVmSG054BhdElctt2jPkpq/lcy1G2ClIkNgg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=crSZhsTb; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mvAZzZJ1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84940C4CEF1;
-	Tue, 26 Aug 2025 22:33:17 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="crSZhsTb"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 147B8C4CEF1;
+	Tue, 26 Aug 2025 23:11:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756247598;
-	bh=enAWv7FM+3cCYyKIq2hsdtFuRu631uhygsKoaTBzjso=;
+	s=k20201202; t=1756249887;
+	bh=sGMWLjp5FHkDT8CA0fmK2D7DNtmFNB7Fq4mFCeJK7ts=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=mvAZzZJ16Lko9gWeA6XLyGd0vlNbHlTJ+grcokJ3kz7RBiXyBw7uMkBBbcHDOQcoe
-	 fOUS9A0kfmH8cp/OebZHMMchUkyWWE2AjJqWkRWGvI89IBtHhAdL/JiUUIqjER+yt4
-	 iwZzxCWbdhSY3UkqRtzVWTfFXsebYOu44eezPldyHW0QP5oG5xbzhgjCk8ECy+YV6F
-	 tB7yigAWW93QqgPSUG9bFU+C1kxXPzXK8vcGKUPgNOjIEx6DsGTEr2yWSqw3hBE0J8
-	 DdT0leJ3Pjo9EPGaB/ftg4PJIwRi1AR2N8VqJ7mxJFeujjgW1O82iDx92Hx55O0fk3
-	 iFz7f5gn9CIww==
-Date: Tue, 26 Aug 2025 16:33:15 -0600
+	b=crSZhsTbza9I/Iqyd6AeV7zsyHoUsmZK2f8dzFizxT8mh+fSyaAG/g5M/VEtqCjm0
+	 jGAyioFCWwZNN2uCP4Rl37gN/n1AtWUHQW9Q3zkMPCFL810f6wj+lx2S1xDQUbZ4Gl
+	 N0zMI3qwLa4wEvyFqqmbmCwLZejDqzy3O6iT7vTMHXbGFcZiySvfPNOJ9ziZiCRLm1
+	 CKrKHVjTkzRzl6fwg/kS9gkqDlyLqBQuZPO+JwvL6fYB3Fy2mYeblMoJW2SfqRCqoc
+	 cEa5UXEO2no196AQEWpm6c6yZBdyRCeA/nwVYEqYOmTV++UCUEnMAtIWpIc6YdUWNb
+	 IqcI9w/FfcqKA==
+Date: Tue, 26 Aug 2025 17:11:24 -0600
 From: Keith Busch <kbusch@kernel.org>
 To: Christoph Hellwig <hch@lst.de>
-Cc: Christoph Hellwig <hch@infradead.org>, Keith Busch <kbusch@meta.com>,
-	linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-	axboe@kernel.dk, iommu@lists.linux.dev
-Subject: Re: [PATCHv3 1/2] block: accumulate segment page gaps per bio
-Message-ID: <aK42K_-gHrOQsNyv@kbusch-mbp>
-References: <20250821204420.2267923-1-kbusch@meta.com>
- <20250821204420.2267923-2-kbusch@meta.com>
- <aKxpSorluMXgOFEI@infradead.org>
- <aKxu83upEBhf5gT7@kbusch-mbp>
- <20250826130344.GA32739@lst.de>
- <aK27AhpcQOWADLO8@kbusch-mbp>
- <20250826135734.GA4532@lst.de>
+Cc: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+	snitzer@kernel.org, axboe@kernel.dk, dw@davidwei.uk,
+	brauner@kernel.org, martin.petersen@oracle.com, djwong@kernel.org,
+	linux-xfs@vger.kernel.org, viro@zeniv.linux.org.uk
+Subject: Re: [PATCHv3 3/8] block: align the bio after building it
+Message-ID: <aK4_HMksxi1HEMZF@kbusch-mbp>
+References: <20250819164922.640964-1-kbusch@meta.com>
+ <20250819164922.640964-4-kbusch@meta.com>
+ <20250825074744.GF20853@lst.de>
+ <aK0Bsf6AKL8a0wFy@kbusch-mbp>
+ <20250826080200.GA23095@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -49,21 +49,20 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250826135734.GA4532@lst.de>
+In-Reply-To: <20250826080200.GA23095@lst.de>
 
-On Tue, Aug 26, 2025 at 03:57:34PM +0200, Christoph Hellwig wrote:
-> On Tue, Aug 26, 2025 at 07:47:46AM -0600, Keith Busch wrote:
-> > Currently, the virtual boundary is always compared to bv_offset, which
-> > is a page offset. If the virtual boundary is larger than a page, then we
-> > need something like "page_to_phys(bv.bv_page) + bv.bv_offset" every
-> > place we need to check against the virt boundary.
+On Tue, Aug 26, 2025 at 10:02:00AM +0200, Christoph Hellwig wrote:
+> On Mon, Aug 25, 2025 at 06:37:05PM -0600, Keith Busch wrote:
+> > bio_iov_iter_get_pages() might submit the segments as separate IO's
+> > anyway for other reasons. I am not sure why the alignment conditions are
+> > handled specifically here.
 > 
-> bv_offset is only guaranteed to be a page offset if your use
-> bio_for_each_segment(_all) or the low-level helpers implementing
-> it and not bio_for_each_bvec(_all) where it can be much larger
-> than PAGE_SIZE.
+> I'll take another look.  Basically what this wants to prevent is
+> bio_iov_iter_get_pages creating bios not aligned to file system
+> block size.
 
-Yes, good point. So we'd have a folio offset when it's not a single
-page, but I don't think we want to special case large folios for every
-virt boundary check. It's looking like replace bvec's "page + offset"
-with phys addrs, yeah?!
+Got it, I think we're okay in that case. You should only need to
+consider the ki_pos and the iov_iter_count to align to the filesystem
+block size. This patch will dispatch appropriately sized IO as long as
+the hw limits allow it, and you'll get an error (same as before) if it
+doesn't.
