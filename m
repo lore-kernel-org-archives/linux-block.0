@@ -1,101 +1,131 @@
-Received: from mail-il1-f180.google.com (mail-il1-f180.google.com [209.85.166.180])
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71DC030FC2B
-	for <linux-block@vger.kernel.org>; Tue, 26 Aug 2025 16:34:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F08C2E7645;
+	Tue, 26 Aug 2025 17:25:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756226075; cv=none; b=MPLuq26ZxJywB2GR61ApUXV/mhCNWSDbDQE6bqWI6pdWo03jU35V6WnDK9nMpHR9dG4puduocVhbiuNOgnzaf0rFXVGmEQCFvehAb53SX51oBJdh+wf1FrVRA4PEJaug1FHw5bjC73MEX4Psg/gz1QK/rHJpX6sGJ0D5W6rPA5s=
+	t=1756229155; cv=none; b=VBuVcOMLN0mbUcQdgZOA4Q16QYLNUun+82FBsjsb9wYa7gByACb7fzcBtha/daydyDWJXvxr2GCsPTMcF9nbp+VxZhZtkMNTLw47ztiuTvJJDTuZGdOozimCZ0d4XfBiHxN28taXs43H8ErW8MoW4LfCBLN+Ns1y9bB+HUn/jR4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756226075; c=relaxed/simple;
-	bh=JEDKsB+0vxmL/ouuAFgu2eU3JiXMhyVprA4z1ejIepE=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=Z5+AehmjTVLuAnLA0moyIMk5YvGtRRcjZpIZTIw1FZvtUgnuDRc/4iQbZPiJ8psa0eJIuJ3q4RUVZDzgY71Bm9aj3xs7AElJ3zfB5HkrVvRkLWA8YZZL5G8X+DYLtXav7+c6JiQB954DY+hj4518rMFZ515byhbj42DDZ47ffpw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=h3AMC3pN; arc=none smtp.client-ip=209.85.166.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1756229155; c=relaxed/simple;
+	bh=mfizfHDWKSGlozkc4tLuwDndi6x0KhMxNlC41A3u0sU=;
+	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
+	 MIME-version:Content-type; b=mJIju3+XS2wPqQtjtDBoHqAKIl1lUK1Lh0FbW32ZwHpa3VXrR7Axx+atzYe3ojeWEIeiOqitTcUyMtP+a/pD8897XlgwzH3jeShYDQNinn/VnO+OL03Pv/i0mMyUMxOt7SjbzNZDidfOKlIzIOqeDZSkuQybr/htMgaqkG/rK1o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GL3EkfL8; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="h3AMC3pN"
-Received: by mail-il1-f180.google.com with SMTP id e9e14a558f8ab-3ea8b3a64c1so16340035ab.0
-        for <linux-block@vger.kernel.org>; Tue, 26 Aug 2025 09:34:31 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GL3EkfL8"
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2467de5160eso29206395ad.0;
+        Tue, 26 Aug 2025 10:25:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1756226070; x=1756830870; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=z/cjvUBr/J9NL3y09c7zmhpXo81NHiBvjaERJhNYUEw=;
-        b=h3AMC3pNijEpubOOxNV154NUfUtVRQ1/nyj+S3bQNuSpSXTT1/6d8r3ITICu07pYlD
-         rWynkjaExZcUXA5tdq9Uwcj+JknV9HU3Qsmvbzg/R71EXrh++F3rPtlHhkVsurFTMplT
-         YsQRitIKly0lgyMTcS114fbV6SRSizB6naAgJuCqCROhYaoTUnE2RKnWDbUHlTdMcuTM
-         ypMk+PGmxPQcdurUkLgV5WigsgxbhChgTlXnHN4YPYJHJfsrnIskVpHMChffUd1/eLrP
-         aHiw5qlXYoXGYXJ+8rY7S2Z+Og0sdxquuI0qspXdEIxvmOWhpQhX3+BT0hM3RgjBJ1Kl
-         Xm9w==
+        d=gmail.com; s=20230601; t=1756229153; x=1756833953; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:message-id:date
+         :in-reply-to:subject:cc:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=uLw9Uoz6Tbt81Fl6ED1MMbaPVoc6YtscpFiSGvOkBd4=;
+        b=GL3EkfL87O/A7OlKgXmRLmBfz6wD6dtuPg6MbFwmNFycQ2jmHOKThl+4ao3AfsXKhu
+         LrrU29aaDN0y69sxowFP5Q9XUYzo4nQdsqyIMsOexj5YrSIvpNHOP3fxGUyFWsMG+5fm
+         rk/AzzrVUKdVDoAzwYvsFzys0TM2hXlPg5vfMfUTMvMfHmZig57QKzn46O0FwRKeECQH
+         lXlBPGx+1rTXHPKHItQTAn4vlumyL/yzQCYQmw1pQj7KW2UEnJX+WWXZYEvqq0OQTIQe
+         iHzZ0m9ICyn3IDX8PRbTYTF+yh1e+wCXi3p3t+DUw7MJ6m0mvQpNJAJB0Ndeq3pl4yo2
+         rGsw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756226070; x=1756830870;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1756229154; x=1756833954;
+        h=content-transfer-encoding:mime-version:references:message-id:date
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=z/cjvUBr/J9NL3y09c7zmhpXo81NHiBvjaERJhNYUEw=;
-        b=K2aZpLVtC5YEMdumRV/+ThASIWxS9T+wQE9eTJrChYEX+M5OeMQweAtbf5aOu8zeAC
-         +N+AFeipGYWUXU6sT2tprAyj667ywUjRlMBsKX4D19GHirO4RMtBmikgCPs5yAzrg2op
-         q2B++tnYiiBnRLwO8sStVd8gEaCvMMxBNUotF45ILeHoYX9zOiL6eb7MWDe26egeEhdq
-         2jXwsyWjy0/7dl33IHqq9uXwLSKLjXXWS4zOP8DKvKb8FrpUJJ2QqYhC6uPWuDxShVvE
-         RD3o9UFJ9n4GEPTUVeF7PGQdgTsmrvhzq5xYygwLS7rmOypqfQNVQgiJ+7SxImtmNlWq
-         5w2A==
-X-Gm-Message-State: AOJu0YxdDi/0y7/QHWcRyKFcMB+CeXpAHdmmURgFsUl6lfme14zop48F
-	Wq0ZywNOS3FIe0rCTIvupRghhA+SukM3Wn4FB46OveVWhohOQZxiEdc2y7M8cUCNtHXAyGH4OQ4
-	F4OmQ
-X-Gm-Gg: ASbGncsUS4a5Z6foZaMOSIOx5lAkJGrNzDG2TvdbvDLIoamoERzgV2A9F+bhD5fdhmV
-	3Jf57GviOEnsUy4fbJJYd+HwV3Vba9etPL9mGw3iqJOUWiAsI883fDeKNr79wnn1jER/WEnErUw
-	OUOLyRXCYqhRf9lyrDKZzdRzBUaY2OU03czZPgnz7XJ5rhDILbJBa3ad/QsO+Al0B9dpdiqN8gA
-	yC+DoxTDpngyR14ujysaymwn3eb7LaHHKmB0jCkYvimtkevGrev1bM7Ns4Ym2r1YDvgcp+1e9GK
-	a3Tg+gExyWZ3cEtFCzOlAa88i1gQvxOFEcLg0qmerk5zMc1CVDDSuumwOzMckai/GquLPfYFunL
-	85ivRA1u8yTfrXg==
-X-Google-Smtp-Source: AGHT+IHiMrbUMGQS0T9yXBOtKjSzX0HApEauW4j4F92W5wtXBFx7N7AtfJQpj9E/zapCHoywUTBtQQ==
-X-Received: by 2002:a05:6e02:198c:b0:3ef:2fe3:9a08 with SMTP id e9e14a558f8ab-3ef2ff2dd13mr22243295ab.28.1756226069407;
-        Tue, 26 Aug 2025 09:34:29 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3ea4e457cc9sm72679405ab.34.2025.08.26.09.34.28
+        bh=uLw9Uoz6Tbt81Fl6ED1MMbaPVoc6YtscpFiSGvOkBd4=;
+        b=rsq/8B07CYfQefiws1fhvvWa9A70WIGDaSp0xMyxj7scsCWHhPW3PwTgru6M/7Ulkt
+         lTFSmY+FaIgFGXhiq3D++M0UcSS4UdTTcc7jmHBKFe5A8Q0TP0zGDXAtWfw535/snq/n
+         ZC404nIORaYCwDyFOBxXF0NwmstEaserOIJ6n710QBnxH5rHQFO7Gm0jO5XtYTGE7Y0M
+         hRGDHlhQ9bl7su+j2cg1bKIRR8c29FLU5YIqpiGyyFSh0MbxcnkWi1FFtR2axFODNyJP
+         6GQ9l2Ulwbh+vIV/PoQZfGeYk0l6UfnoWOOdgQuxDYTIm11ytKdCNmmtrS9skKkW9oqY
+         k/8Q==
+X-Forwarded-Encrypted: i=1; AJvYcCV+ZM+For/+DPnQ0IUUHp6rtKwist7rptKd7tslXkJNC9MlJpx7MT6r/idxHeFpKjvz+rC28lxWSHy2Iw==@vger.kernel.org, AJvYcCXaUBl3ayjtWPzu5t8VtOppjOsJy/pDZZNFDJw/+O3gjoraOMzwzVhJZYBGGQo5YUmbaFzrWQRxdc8m@vger.kernel.org, AJvYcCXooQwE96Ohbs8klubjhl7b4FvZT6cyoUz0oDONmAWF0cPhsW+w0RL9qGtNZBzTEG/MF9ZJ5F12BSv3cFxUyQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyqyxBfcyKNJLy/2aDnZxNqwxaZ511AKuUo7i9LPXwY/SlN9VTi
+	JTZdlkpCDPOUwtikeEah7EqHyzGebORLoYGlFUMERh3Or0SKUQT4bRza
+X-Gm-Gg: ASbGncsKgPJu9kJzOyk1sisklf78GQHY75C6ljPGfBR2vafV/5iOczze1Vn0IkWxlTR
+	0wGoYC96HDVb3gkfXWStDeGJRFXIZz8fdsYhAsBFwP7cFIb1Kt0+Caa7g8r3cve0mnEFfSuOYtL
+	2Qv99Buovj+fNSIO+oUY1h92ZvikRMNB9VkfyIkVxWC6T+Ja9wcfMT+FmCWht6VMrpfzC85pDeF
+	ec0+NIHBnSRR8gk3xY/Pb1AeZdMwUKaakx988EOgw0mjpGNto1Ne5h5aNsP0y8A2Hrgy39sfAv6
+	Le3XrfK/YN90Ewb0VS8CNWzBO7841uCl0M0IjoGX58ZZMU6V+CGTea4WYB4QvDzHeAP5LXpP9sG
+	FDvJZMKPOhdsGnVH+oXPWTQxs
+X-Google-Smtp-Source: AGHT+IEWgBRM0v2G+FcafZmJl/omfs0Uh0JKNPlp/i5SCyYCxuFG2i32PH0SvPbcdPMPohfb3MIzow==
+X-Received: by 2002:a17:902:e788:b0:246:80ef:87fc with SMTP id d9443c01a7336-24680ef8bc7mr154253345ad.45.1756229153495;
+        Tue, 26 Aug 2025 10:25:53 -0700 (PDT)
+Received: from dw-tp ([171.76.82.15])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-32745bbff33sm1024685a91.9.2025.08.26.10.25.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Aug 2025 09:34:28 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, Nilay Shroff <nilay@linux.ibm.com>
-Cc: ming.lei@redhat.com, yukuai1@huaweicloud.com, hch@lst.de, 
- venkat88@linux.ibm.com, gjoyce@ibm.com
-In-Reply-To: <20250826163128.1952394-1-nilay@linux.ibm.com>
-References: <20250826163128.1952394-1-nilay@linux.ibm.com>
-Subject: Re: [PATCH] block: validate QoS before calling __rq_qos_done_bio()
-Message-Id: <175622606847.70049.13136831917327617637.b4-ty@kernel.dk>
-Date: Tue, 26 Aug 2025 10:34:28 -0600
+        Tue, 26 Aug 2025 10:25:52 -0700 (PDT)
+From: Ritesh Harjani (IBM) <ritesh.list@gmail.com>
+To: Fengnan Chang <changfengnan@bytedance.com>, 
+Cc: Matthew Wilcox <willy@infradead.org>, "Darrick J. Wong" <djwong@kernel.org>, brauner@kernel.org, linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>
+Subject: Re: [PATCH] iomap: allow iomap using the per-cpu bio cache
+In-Reply-To: <CAPFOzZvBvHWHUwNLnH+Ss90OMdu91oZsSD0D7_ncjVh0pF29rQ@mail.gmail.com>
+Date: Tue, 26 Aug 2025 22:23:05 +0530
+Message-ID: <878qj6qb2m.fsf@gmail.com>
+References: <20250822082606.66375-1-changfengnan@bytedance.com> <20250822150550.GP7942@frogsfrogsfrogs> <aKiP966iRv5gEBwm@casper.infradead.org> <877byv9w6z.fsf@gmail.com> <aKif_644529sRXhN@casper.infradead.org> <874ityad1d.fsf@gmail.com> <CAPFOzZufTPCT_56-7LCc6oGHYiaPixix30yFNEsiFfN1s9ySMQ@mail.gmail.com> <aKwq_QoiEvtK89vY@infradead.org> <CAPFOzZvBvHWHUwNLnH+Ss90OMdu91oZsSD0D7_ncjVh0pF29rQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-2ce6c
+MIME-version: 1.0
+Content-type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+
+Fengnan Chang <changfengnan@bytedance.com> writes:
+
+> Christoph Hellwig <hch@infradead.org> 于2025年8月25日周一 17:21写道：
+>>
+>> On Mon, Aug 25, 2025 at 04:51:27PM +0800, Fengnan Chang wrote:
+>> > No restrictions for now, I think we can enable this by default.
+>> > Maybe better solution is modify in bio.c?  Let me do some test first.
+
+If there are other implications to consider, for using per-cpu bio cache
+by default, then maybe we can first get the optimizations for iomap in
+for at least REQ_ALLOC_CACHE users and later work on to see if this
+can be enabled by default for other users too.
+Unless someone else thinks otherwise.
+
+Why I am thinking this is - due to limited per-cpu bio cache if everyone
+uses it for their bio submission, we may not get the best performance
+where needed. So that might require us to come up with a different
+approach.
+
+>>
+>> Any kind of numbers you see where this makes a different, including
+>> the workloads would also be very valuable here.
+> I'm test random direct read performance on  io_uring+ext4, and try
+> compare to io_uring+ raw blkdev,  io_uring+ext4 is quite poor, I'm try to
+> improve this, I found ext4 is quite different with blkdev when run
+> bio_alloc_bioset. It's beacuse blkdev ext4  use percpu bio cache, but ext4
+> path not. So I make this modify.
+
+I am assuming you meant to say - DIO with iouring+raw_blkdev uses
+per-cpu bio cache where as iouring+(ext4/xfs) does not use it.
+Hence you added this patch which will enable the use of it - which
+should also improve the performance of iouring+(ext4/xfs). 
+
+That make sense to me. 
+
+> My test command is:
+> /fio/t/io_uring -p0 -d128 -b4096 -s1 -c1 -F1 -B1 -R1 -X1 -n1 -P1 -t0
+> /data01/testfile
+> Without this patch:
+> BW is 1950MB
+> with this patch
+> BW is 2001MB.
+
+Ok. That's around 2.6% improvement.. Is that what you were expecting to
+see too? Is that because you were testing with -p0 (non-polled I/O)? 
+
+Looking at the numbers here [1] & [2], I was hoping this could give
+maybe around 5-6% improvement ;) 
+
+[1]: https://lore.kernel.org/io-uring/cover.1666347703.git.asml.silence@gmail.com/
+[2]: https://lore.kernel.org/all/20220806152004.382170-3-axboe@kernel.dk/
 
 
-On Tue, 26 Aug 2025 22:00:32 +0530, Nilay Shroff wrote:
-> If a bio has BIO_QOS_xxx set, it doesn't guarantee that q->rq_qos is
-> also present at-least for stacked block devices. For instance, in case
-> of NVMe when multipath is enabled, the bottom device may have QoS
-> enabled but top device doesn't. So always validate QoS is enabled and
-> q->rq_qos is present before calling __rq_qos_done_bio().
-> 
-> 
-> [...]
-
-Applied, thanks!
-
-[1/1] block: validate QoS before calling __rq_qos_done_bio()
-      commit: e3ef9445cd9d90e43de0bd3cd55d437773dfd139
-
-Best regards,
--- 
-Jens Axboe
-
-
-
+-ritesh
