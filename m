@@ -1,38 +1,42 @@
 Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1CE61C84D0;
-	Tue, 26 Aug 2025 00:49:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5BDE946A;
+	Tue, 26 Aug 2025 00:51:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756169362; cv=none; b=gq2P4eH89LvfC+lajF4PaaGQwLMGPwU9GP1omQeIrA6KYzdILoKxvIAz4cgvbnfM3Dv57gUFSVoiZkTDVWCd+ap/zR/rY+Bh7ckjhPaodtg+teENvHbJ9cD4LHgD6WcVYW5cQpZdfp/WXZviJHMeQwKdZL1GBmoqxlblinwU99Q=
+	t=1756169504; cv=none; b=a5a9H25dAhMSJe8br3s0eRBekMtH6H2snQjha6e1S8xJAV3nkDihoNMkqvikbrJeNeDGi1xsYVI2/GC6GPY31UvaUij+edlEBi7NKcldnvVa9JsoIyrCDwle/5QkvWdr/uRsclfAaWWVH7+TMk1jxDU5ofzxJwIhA4VYRfoVhdQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756169362; c=relaxed/simple;
-	bh=bcHEjOiEZWIIuHQA1z67dcDCVx/79tblsC/89CJ8UUI=;
+	s=arc-20240116; t=1756169504; c=relaxed/simple;
+	bh=nYe6WiPQ/iQ3LISjWrcn/D6lzmcAjjnNS8+WP+HYA60=;
 	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=rR65eaC8OXcYMTWg/bSMs9VTVvfmBThoUO+Jp0Yd3yBhV4TRkzzndtRZ7+u8bHexmOmWDjRj12YQDLx6RvyNQ8sd+DXwFjBrQ0nZAfMsqmbKPdb/yPnq9c/v2SWBCs2bajmwtfr+M2IkdRlhqoKXinTuJGBB+W1Pz/UcVZZosao=
+	 In-Reply-To:Content-Type; b=DN22c/mSQkHNbYr5RptHFx3t+1EJn4tFzR+Sj/6E8eSwZv25J1EeMVbJtaGTjuEbOt13v3CHJpvE24HNkbkb1YwdrvuL6T1zjVzHMhpMLnBx3tkB3UOVzF1snOT4WjdLS7GSs35fdo91qBgfXUkLeWoB5Qn++8b6YlF9dWot+84=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4c9pvY6BVjzYQvJW;
-	Tue, 26 Aug 2025 08:49:13 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4c9pyN26DPzYQvnm;
+	Tue, 26 Aug 2025 08:51:40 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 63E1F1A0C5D;
-	Tue, 26 Aug 2025 08:49:12 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTP id CD9931A1517;
+	Tue, 26 Aug 2025 08:51:38 +0800 (CST)
 Received: from [10.174.179.143] (unknown [10.174.179.143])
-	by APP4 (Coremail) with SMTP id gCh0CgAXYIyHBK1okrA5AQ--.63597S3;
-	Tue, 26 Aug 2025 08:49:12 +0800 (CST)
-Subject: Re: [PATCH v5] fixed the blok file statx issue
-To: Cloud User <rajeevm@hpe.com>, Yu Kuai <yukuai1@huaweicloud.com>,
- ming.lei@redhat.com, hch@infradead.org
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- yi.zhang@huawei.com, yangerkun@huawei.com, johnny.chenyi@huawei.com,
- "yukuai (C)" <yukuai3@huawei.com>
-References: <20250825221741.3714488-1-rajeevm@hpe.com>
+	by APP4 (Coremail) with SMTP id gCh0CgD3QY4ZBa1o3OI5AQ--.16741S3;
+	Tue, 26 Aug 2025 08:51:38 +0800 (CST)
+Subject: Re: [PATCH RFC 1/7] block: export helper bio_submit_split()
+To: Christoph Hellwig <hch@infradead.org>, Yu Kuai <yukuai1@huaweicloud.com>
+Cc: colyli@kernel.org, hare@suse.de, tieren@fnnas.com, axboe@kernel.dk,
+ tj@kernel.org, josef@toxicpanda.com, song@kernel.org,
+ akpm@linux-foundation.org, neil@brown.name, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, cgroups@vger.kernel.org,
+ linux-raid@vger.kernel.org, yi.zhang@huawei.com, yangerkun@huawei.com,
+ johnny.chenyi@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
+References: <20250825093700.3731633-1-yukuai1@huaweicloud.com>
+ <20250825093700.3731633-2-yukuai1@huaweicloud.com>
+ <aKxApo1u8j-ZNOaI@infradead.org>
 From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <a118e156-36a2-6612-517a-ba22c11fbd1d@huaweicloud.com>
-Date: Tue, 26 Aug 2025 08:49:11 +0800
+Message-ID: <b128ed58-97d8-b3b2-f86f-6f50efd98db8@huaweicloud.com>
+Date: Tue, 26 Aug 2025 08:51:37 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.1
 Precedence: bulk
@@ -41,42 +45,77 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20250825221741.3714488-1-rajeevm@hpe.com>
+In-Reply-To: <aKxApo1u8j-ZNOaI@infradead.org>
 Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgAXYIyHBK1okrA5AQ--.63597S3
-X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
-	VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUYK7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E
-	6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28Cjx
-	kF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8I
-	cVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87
-	Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE
-	6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r106r15McIj6I8E87Iv67AKxVWUJVW8JwAm72
-	CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4II
-	rI8v6xkF7I0E8cxan2IY04v7Mxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij64vIr4
-	1l4c8EcI0Ec7CjxVAaw2AFwI0_Jw0_GFyl4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAq
-	x4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r
-	43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF
-	7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxV
-	WUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfU
-	F9a9DUUUU
+X-CM-TRANSID:gCh0CgD3QY4ZBa1o3OI5AQ--.16741S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7tw4rCrW7JFWfZrW5Kr1rZwb_yoW8GF4Dpr
+	4jgw1DJrZ5JFsI9w1qqa4Ut34kKrW5XrW2kryfX3WDJrnrtwnxKF1Igr1ruF1Fkr15C34x
+	Jw18ua1rC3s8CFDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUBF14x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jrv_JF1lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
+	0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AKxVW8ZVWrXwCF04k20xvY0x
+	0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E
+	7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_GFv_WrylIxkGc2Ij64vIr41lIxAIcV
+	C0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF
+	04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7
+	CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0pRJPE-UUUUU=
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
 Hi,
 
-在 2025/08/26 6:17, Cloud User 写道:
-> This fixes the statx issue which caused multiple test issue
+在 2025/08/25 18:53, Christoph Hellwig 写道:
+> On Mon, Aug 25, 2025 at 05:36:54PM +0800, Yu Kuai wrote:
+>> From: Yu Kuai <yukuai3@huawei.com>
+>>
+>> No functional changes are intended, some drivers like mdraid will split
+>> bio by internal processing, prepare to unify bio split codes.
 > 
-> Rajeev Mishra (2):
->    loop: Rename and merge get_size/get_loop_size to lo_calculate_size
->    loop: use vfs_getattr_nosec for accurate file size
+> Maybe name the exported helper bio_submit_split_bioset and keep
+> bio_submit_split() as a wrapper that passes the default split
+> bioset to keep the code a bit tidyer in blk-merge.c?
 > 
->   drivers/block/loop.c | 43 +++++++++++++++++++++++++------------------
->   1 file changed, 25 insertions(+), 18 deletions(-)
-> 
+Sure.
 
-There is no need, to late for this now. :(
+>> +struct bio *bio_submit_split(struct bio *bio, int split_sectors,
+>> +			     struct bio_set *bs)
+>>   {
+>> +	struct bio *split;
+>> +
+>>   	if (unlikely(split_sectors < 0))
+>>   		goto error;
+>>   
+>> -	if (split_sectors) {
+>> -		struct bio *split;
+>> +	if (!split_sectors)
+>> +		return bio;
+>>   
+>> -		split = bio_split(bio, split_sectors, GFP_NOIO,
+>> -				&bio->bi_bdev->bd_disk->bio_split);
+>> -		if (IS_ERR(split)) {
+>> -			split_sectors = PTR_ERR(split);
+>> -			goto error;
+>> -		}
+>> -		split->bi_opf |= REQ_NOMERGE;
+>> -		blkcg_bio_issue_init(split);
+>> -		bio_chain(split, bio);
+>> -		trace_block_split(split, bio->bi_iter.bi_sector);
+>> -		WARN_ON_ONCE(bio_zone_write_plugging(bio));
+>> -		submit_bio_noacct(bio);
+> 
+> Maybe skip the reformatting which makes this much harder to read?
+> If you think it is useful it can be done in a separate patch.
+> 
+Please ignore this, I'll skip this.
 
-Thanks,
+Thanks for the review!
 Kuai
+
+> .
+> 
 
