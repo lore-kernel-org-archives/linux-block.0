@@ -1,113 +1,175 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2C5121A453;
-	Tue, 26 Aug 2025 06:27:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C7582D6412;
+	Tue, 26 Aug 2025 06:40:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756189666; cv=none; b=OUDh8o7VF5V3KuPC1dynhzy2J1X80Xs4Yi5R6sYR3rdsTcDnQnZTBC1uMj3yMLyFifxUkDDJm0D/FGrUQdQ3WifETPgFPDXTVmlvA3SmVZ4AfjvHeH5utERA/KRGgwKyPuomOnYw9WlCzPqoLI5kg160bqM4HlFNlSQuB/pfz7U=
+	t=1756190439; cv=none; b=DnjITOkWI9OcPysa6qdXEI+CctMB5qugRFPQDQnIlzcxtz1Z5Eva3/tvz+9CPaPu1x3/oNKjtjke535iSGqqsKGOcdvs7HgCoiEnm7x66rfd0SylhGnj3i+AyK3tWROGjoBnzCVjg3QDSEusOvd3o23PgkYn7eB0AeihT5EG2wY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756189666; c=relaxed/simple;
-	bh=r0h+91TIIPBHTec6V3ZjgapP7MwF3HiLZxw0A69u1oQ=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=bTZJVYxzvGiQ+JM3HIqIXGDySfmCm40t8LCsVCzd54s0p0h8/KMlKzZg0G5gXmb2cxAkfOQhWdOQ0G70MEsav6yFpxLKlaHl29f0HmmjK1sungxY8tqJpQ2LEZJkbG5iay3NkvyVdhBqnrxkqJdxvJjNg+rHZY7VwazDrMO565Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4c9yQ55jk9zYQvf1;
-	Tue, 26 Aug 2025 14:27:41 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 557411A084D;
-	Tue, 26 Aug 2025 14:27:40 +0800 (CST)
-Received: from [10.174.179.143] (unknown [10.174.179.143])
-	by APP4 (Coremail) with SMTP id gCh0CgCn8Y3YU61o3MNUAQ--.23294S3;
-	Tue, 26 Aug 2025 14:27:38 +0800 (CST)
-Subject: Re: [PATCH v3 0/2] blk-mq: fix update nr_requests regressions
-To: Yu Kuai <yukuai1@huaweicloud.com>, axboe@kernel.dk, bvanassche@acm.org,
- ming.lei@redhat.com, nilay@linux.ibm.com, hare@suse.de
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- yi.zhang@huawei.com, yangerkun@huawei.com, johnny.chenyi@huawei.com,
- "yukuai (C)" <yukuai3@huawei.com>
-References: <20250821060612.1729939-1-yukuai1@huaweicloud.com>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <95389918-b809-f81b-5fd0-2e350154ca01@huaweicloud.com>
-Date: Tue, 26 Aug 2025 14:27:35 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.1
+	s=arc-20240116; t=1756190439; c=relaxed/simple;
+	bh=OPeSeeN5sm4B+A5/piocA+tuR6C93uRHpSyGNO+hSSs=;
+	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References; b=A8wGSpoVOMrym7ZtqPHyn8Aoq1qmoz6/0oqdHu5yCbIcYWrBLiJG2s2sG89h7/gWu49GoqVb11cUc0Nqhamm8tkrMXFntN4NH49s+w7SP/+ngDr/N9v2QSOQRrEI6TYF7KRt+KKWtLhNkd607FczhadCscwAxHOMWXIQqRecVN8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ov3Af6id; arc=none smtp.client-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ov3Af6id"
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-771fa65b0e1so105837b3a.0;
+        Mon, 25 Aug 2025 23:40:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1756190433; x=1756795233; darn=vger.kernel.org;
+        h=references:message-id:date:in-reply-to:subject:cc:to:from:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=oFbku8l3NNlrZ/5pf3rxrWelYCFBeqxIPXUp7eudbew=;
+        b=Ov3Af6idD8tQIllh/4i6kV7Bee+HClfqkikbcbSo5PlThZwFIHNGqSo3LNjX7LJGDi
+         KH25/gcO16P1PQkcx6/qFJjn5WTYoqBc0dnd0bbW15PMys5Fa3yZ6iIyn8Mj7uFv41iP
+         oB3CB5vV1Zo0jzjPorgmjX+uZRTuEAj2eKTjYAHEHODTCsy1j0owoB6ZVSap0bSnukRk
+         QyP2xG06sVUFpjgzq3TjUE5Zy5FtwipGX4N3h4jc2akVnCPdi8ze1JRjFDKuxv9+uH6a
+         Ywqtbit5RfwiBj68Uj12od4NZvZj/tbP/pWH9bOyoejlpNe/CT2dWc4ZvTedvJDwdeXQ
+         73zQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756190433; x=1756795233;
+        h=references:message-id:date:in-reply-to:subject:cc:to:from
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=oFbku8l3NNlrZ/5pf3rxrWelYCFBeqxIPXUp7eudbew=;
+        b=ouA2Wtx/IDD5MYaa9udxQb2s13E+v2R8Lj6a0BlzIoT95gdA/bJho8zH1+RKdTqHQe
+         M7BgnYekdO8RSCB5QXJVqiW/AXM9FjNa2xaVbT1IVpYMKgGWbqfcSjsHMQ2BmiKRxDZi
+         nwQrouQVZtaOQTF0iKp5wJ8zr7eoPPq+DCnLdXXRTKZOPgWzLhezHOnmWalZF0vvCF8m
+         m9I+ktls46MgzMAIK6+aQu4UJ0jowmbpXPrzRlWdYOVMps00KkA+xB+EEgIL7Dn8goMp
+         HwDCQw1tOktn6AyjfSCkk5UbKWtxZ3uxSy4NzsqF0pMv0WGZ+NkLtTYNtuMyXMATAGTN
+         tl9A==
+X-Forwarded-Encrypted: i=1; AJvYcCVKoumyIslck1boEpBjL0ZZ9u2rTDKckmwtqHV9TgueSTI15Y/RuLUqSh9cdLnLPIIk+kv72x9gRqgc@vger.kernel.org, AJvYcCW+dHgJzZIQs4jZkStSfrDz7KRGKLdqQeMiwYpy0LYBhVxnkJkhyGJAqnS/YoIbD+knxp09qgrkOKkkDQ==@vger.kernel.org, AJvYcCX6Pmtcj4cahUdfy8UyYKLrwg538wYzeWF89uP+iaXDv3lUe7N0DRmOeBZkQJ3DZYjWbITkV/uRZHjGaYOr@vger.kernel.org, AJvYcCXqZPk3pwWhabd4czNRhY18RLeJ/bWaxeb1SEB26lrmA3LsgjneAYGK5bV49MDjlC6yuQnI3j/smJJmlQ==@vger.kernel.org, AJvYcCXxKxrjRGBo9DzMc1q2hpIxt4+gtJY+y7uw7kXPAB5jFl/lIJJwKGfTjw8CFWNZvqqrCJbXAlskQPgfvQBzSA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxfoQAx/X7ZiccCwNY51oAHyKhK9u5g37R13Qj5Tlzatk4cDBm6
+	Y1/CYlOom70tGxURyzFP31Q+uZbsX1HpuB8mI1GaIlSFKmQk3f4DBN/D
+X-Gm-Gg: ASbGncuDmPeJPGGCJzldJU4fdCvCjIMBgKlmYbaNpqNDYiOGx8c7/nagRCOvgzTjaZ3
+	JjQCEPD3mIla9Qk8uqJAosAoH8qcG9psasmBqJRDIg9Jzaq0pl3Kxmysd1pRQIR2m0FO1aWbO5R
+	91rEZf44n6TwLzEJisG7Dr/k+f8fh8K0mNA40jGcoFlbzzXhCAu2DKJUKJ+fEXmvTcSOki609U7
+	SivBYSNASYULWqD+7BDM+U4aK3biNT3EL2fLpTARcxrR7fZ1XPGLrtBS41oVX7MXPSvLaOUTeJG
+	D7zKpFz/DV+FtS0tw01berHYh4hq5A+CV0RVDttjPOIdylJq6OztxvK8rwofyCq1hvkrlU44JVq
+	dIOIjdqEOWmLAyJJ9QDK7uNm4
+X-Google-Smtp-Source: AGHT+IEc+gSdYQ6hfEohMYhEAqp/AIMMOR/OMinFKwRDdz+PsR7qTqufzjT7jd8JoY+/Ftxk3txX0w==
+X-Received: by 2002:a05:6a20:2585:b0:240:ed9:dd0a with SMTP id adf61e73a8af0-24340d11bf2mr20872863637.35.1756190433217;
+        Mon, 25 Aug 2025 23:40:33 -0700 (PDT)
+Received: from dw-tp ([171.76.82.15])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b49cb8ca240sm8255492a12.25.2025.08.25.23.40.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 25 Aug 2025 23:40:32 -0700 (PDT)
+From: Ritesh Harjani (IBM) <ritesh.list@gmail.com>
+To: Keith Busch <kbusch@kernel.org>, Jan Kara <jack@suse.cz>
+Cc: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, linux-ext4@vger.kernel.org, snitzer@kernel.org, axboe@kernel.dk, dw@davidwei.uk, brauner@kernel.org, hch@lst.de, martin.petersen@oracle.com, djwong@kernel.org, linux-xfs@vger.kernel.org, viro@zeniv.linux.org.uk, Jan Kara <jack@suse.com>
+Subject: Re: [PATCHv3 0/8] direct-io: even more flexible io vectors
+In-Reply-To: <aKx485EMthHfBWef@kbusch-mbp>
+Date: Tue, 26 Aug 2025 10:29:58 +0530
+Message-ID: <87cy8ir835.fsf@gmail.com>
+References: <20250819164922.640964-1-kbusch@meta.com> <87a53ra3mb.fsf@gmail.com> <g35u5ugmyldqao7evqfeb3hfcbn3xddvpssawttqzljpigy7u4@k3hehh3grecq> <aKx485EMthHfBWef@kbusch-mbp>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <20250821060612.1729939-1-yukuai1@huaweicloud.com>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgCn8Y3YU61o3MNUAQ--.23294S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7KF4rtrWDJryrCrW8Cr45Wrg_yoW8Wry3pr
-	W3tFsIkr18Kr4xXF4fAw17Xr1rAw4kXw15uFsxtw1rJ3s09r1xGF10gF18WF9FqrWSgrsF
-	grn0q34DWw1UArDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUB214x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r4j6F4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
-	0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x
-	0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E
-	7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcV
-	C0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF
-	04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7
-	CjxVAFwI0_Gr1j6F4UJbIYCTnIWIevJa73UjIFyTuYvjfU52NtDUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-Hi, Jens
+Keith Busch <kbusch@kernel.org> writes:
 
-ÔÚ 2025/08/21 14:06, Yu Kuai Ð´µÀ:
-> From: Yu Kuai <yukuai3@huawei.com>
-> 
-> Changes in v3:
->   - call depth_updated() directly in init_sched() method in patch 1;
->   - fix typos in patch 2;
->   - add review for patch 2;
-> Changes in v2:
->   - instead of refactor and cleanups and fix updating nr_requests
->   thoroughly, fix the regression in patch 2 the easy way, and dealy
->   refactor and cleanups to next merge window.
-> 
-> patch 1 fix regression that elevator async_depth is not updated correctly
-> if nr_requests changes, first from error path and then for mq-deadline,
-> and recently for bfq and kyber.
-> 
-> patch 2 fix regression that if nr_requests grow, kernel will panic due
-> to tags double free.
-> 
-> Yu Kuai (2):
->    blk-mq: fix elevator depth_updated method
->    blk-mq: fix blk_mq_tags double free while nr_requests grown
-> 
->   block/bfq-iosched.c   | 22 +++++-----------------
->   block/blk-mq-sched.h  | 11 +++++++++++
->   block/blk-mq-tag.c    |  1 +
->   block/blk-mq.c        | 23 ++++++++++++-----------
->   block/elevator.h      |  2 +-
->   block/kyber-iosched.c | 19 +++++++++----------
->   block/mq-deadline.c   | 16 +++-------------
->   7 files changed, 42 insertions(+), 52 deletions(-)
-> 
+> On Mon, Aug 25, 2025 at 02:07:15PM +0200, Jan Kara wrote:
+>> On Fri 22-08-25 18:57:08, Ritesh Harjani wrote:
+>> > Keith Busch <kbusch@meta.com> writes:
+>> > >
+>> > >   - EXT4 falls back to buffered io for writes but not for reads.
+>> > 
+>> > ++linux-ext4 to get any historical context behind why the difference of
+>> > behaviour in reads v/s writes for EXT4 DIO. 
+>> 
+>> Hum, how did you test? Because in the basic testing I did (with vanilla
+>> kernel) I get EINVAL when doing unaligned DIO write in ext4... We should be
+>> falling back to buffered IO only if the underlying file itself does not
+>> support any kind of direct IO.
+>
+> Simple test case (dio-offset-test.c) below.
+>
+> I also ran this on vanilla kernel and got these results:
+>
+>   # mkfs.ext4 /dev/vda
+>   # mount /dev/vda /mnt/ext4/
+>   # make dio-offset-test
+>   # ./dio-offset-test /mnt/ext4/foobar
+>   write: Success
+>   read: Invalid argument
+>
+> I tracked the "write: Success" down to ext4's handling for the "special"
+> -ENOTBLK error after ext4_want_directio_fallback() returns "true".
+>
 
-Friendly ping, please consider this set in this merge window.
+Right. Ext4 has fallback only for dio writes but not for DIO reads... 
 
-BTW, I see that for-6.18/block branch was created, however, I have
-a pending set[1] for the next merge window that will have conflicts with
-this set, not sure if you want to rebase for-6.18/block with block-6.17
-or handle conflicts later for 6.18-rc1.
+buffered
+static inline bool ext4_want_directio_fallback(unsigned flags, ssize_t written)
+{
+	/* must be a directio to fall back to buffered */
+	if ((flags & (IOMAP_WRITE | IOMAP_DIRECT)) !=
+		    (IOMAP_WRITE | IOMAP_DIRECT))
+		return false;
 
-[1] 
-https://lore.kernel.org/all/20250815080216.410665-1-yukuai1@huaweicloud.com/
+    ...
+}
 
-Thanks,
-Kuai
+So basically the path is ext4_file_[read|write]_iter() -> iomap_dio_rw
+    -> iomap_dio_bio_iter() -> return -EINVAL. i.e. from...
 
+
+	if ((pos | length) & (bdev_logical_block_size(iomap->bdev) - 1) ||
+	    !bdev_iter_is_aligned(iomap->bdev, dio->submit.iter))
+		return -EINVAL;
+
+EXT4 then fallsback to buffered-io only for writes, but not for reads. 
+
+
+-ritesh
+
+
+> dio-offset-test.c:
+> ---
+> #ifndef _GNU_SOURCE
+> #define _GNU_SOURCE
+> #endif
+>
+> #include <sys/uio.h>
+> #include <err.h>
+> #include <errno.h>
+> #include <fcntl.h>
+> #include <stdlib.h>
+> #include <stdio.h>
+> #include <unistd.h>
+>
+> int main(int argc, char **argv)
+> {
+> 	unsigned int pagesize;
+> 	struct iovec iov[2];
+> 	int ret, fd;
+> 	void *buf;
+>
+> 	if (argc < 2)
+> 		err(EINVAL, "usage: %s <file>", argv[0]);
+> 	
+> 	pagesize = sysconf(_SC_PAGE_SIZE);
+> 	ret = posix_memalign((void **)&buf, pagesize, 2 * pagesize);
+> 	if (ret)
+> 		err(errno, "%s: failed to allocate buf", __func__);
+> 	
+> 	fd = open(argv[1], O_RDWR | O_CREAT | O_TRUNC | O_DIRECT);
+> 	if (fd < 0)
+> 		err(errno, "%s: failed to open %s", __func__, argv[1]);
+> 	
+> 	iov[0].iov_base = buf;
+> 	iov[0].iov_len = 256;
+> 	iov[1].iov_base = buf + pagesize;
+> 	iov[1].iov_len = 256;
+> 	ret = pwritev(fd, iov, 2, 0);
+> 	perror("write");
+> 	
+> 	ret = preadv(fd, iov, 2, 0);
+> 	perror("read");
+> 	
+> 	return 0;
+> }
+> --
