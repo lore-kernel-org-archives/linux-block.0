@@ -1,110 +1,115 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E5672F99B5
-	for <linux-block@vger.kernel.org>; Tue, 26 Aug 2025 08:36:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6BF928D8ED;
+	Tue, 26 Aug 2025 08:57:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756197421; cv=none; b=db10w2sD1+lFVWnBNQcOI65zdzLKp3ICO2360fQnM9SjoplHB2dkvM7bwmetxy9R9DMN/FYdO6US2Tt81ws7k6Ay6Q32tZGh8U2kf9i6fcL3hxY7ctN1L2GnPcVwGhCkI5oOsVu+tkTgN9XgV93wgE/Bf71vQ6vhHtTZcCF2j0M=
+	t=1756198651; cv=none; b=MG82JlhgdBcR04IJWbSqym4/jpRVw49zu+XsQMCD/YH8Qp7V44xYvkTJpxGDBOMT2xvBOzDvC+DJL7XmlP0Buj1HJIyaZuAxnhW2xACV8p+4pIKBh770s+/jvS+83Vhldo0N31s4dDPSKVu/oobdsiGreIpX4iy4sb8Bx22mXTs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756197421; c=relaxed/simple;
-	bh=6OgoAk934HTIV3WcXtzczGvOW9FgNkUuK1zXvn0N9Jc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GTUHXvxzvH2TMjIzDC83yqpyOQkiWur3rsUoZ7Nh16EotSG/CW6t3upQW0VNUR+jfyXLEOnAOm7+vrfe9OmccBzy/OSA4P9UPceEVnV2zAOYR3j8sD5P92jtaPoev12+T8N8p9Ord+qAlt/GlXvEokFcrKclblyUjMp0JgNh+eU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VZxtsFiB; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VZxtsFiB"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1756197418;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kcKsnR0+caJeVtwLFg0Jr6sfhvBW9VzwUJF/fLLk8ck=;
-	b=VZxtsFiB9uoG6RuDzd6BT8qYKN7igl+jwuhdQ6v4hFJUhc70NEtMQD5GqJwyJ7skW3lU3m
-	ZexVz9u+pXaPE0hOHHl1loxOwbOB06DQUpR2nqsOya7OJJ1xBNlylT5drnlC9mnPIARaDg
-	q1GfS+Vh+836WJvimSSGysRC6ROod3Q=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-677-JIQ9KB3OOB6Lk-uylsVcgw-1; Tue,
- 26 Aug 2025 04:36:57 -0400
-X-MC-Unique: JIQ9KB3OOB6Lk-uylsVcgw-1
-X-Mimecast-MFC-AGG-ID: JIQ9KB3OOB6Lk-uylsVcgw_1756197416
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 98AED1800371;
-	Tue, 26 Aug 2025 08:36:55 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.57])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AF96C30001A2;
-	Tue, 26 Aug 2025 08:36:51 +0000 (UTC)
-Date: Tue, 26 Aug 2025 16:36:43 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Caleb Sander Mateos <csander@purestorage.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Uday Shankar <ushankar@purestorage.com>,
-	Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCH V2 2/2] ublk selftests: add --no_ublk_fixed_fd for not
- using registered ublk char device
-Message-ID: <aK1yG6mfYfkRKI3Z@fedora>
-References: <20250825124827.2391820-1-ming.lei@redhat.com>
- <20250825124827.2391820-3-ming.lei@redhat.com>
- <CADUfDZrZLiD9r7AK+83HLgi-tXGvzNX_fasvwQ2_-wm6EVPifQ@mail.gmail.com>
+	s=arc-20240116; t=1756198651; c=relaxed/simple;
+	bh=YdpElEc8FqofAz4HPN+/tPIgeQ7pHmfY9a81hBS71yg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=jBdHErmec3t2RBhCaa8zNHFS0zjMd4qXxYe0t3sLrm9jW2Zcm6u97jgJIpvXNnModWyUT982FlwZZHiWoZdLckPv8H/QtS+Eakld9pFSJKV1ISmqvPT7tFSH8OFwPemn9r7KrJV4ucCImL/lAltd+8yHGCNwhuOGoGyh6XnJ+cc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4cB1kt2YwkzYQtLT;
+	Tue, 26 Aug 2025 16:57:26 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id DEEA71A19F3;
+	Tue, 26 Aug 2025 16:57:24 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+	by APP4 (Coremail) with SMTP id gCh0CgCn8Izydq1oQapgAQ--.23704S4;
+	Tue, 26 Aug 2025 16:57:24 +0800 (CST)
+From: linan666@huaweicloud.com
+To: axboe@kernel.dk,
+	ming.lei@redhat.com,
+	jianchao.w.wang@oracle.com
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linan666@huaweicloud.com,
+	yukuai3@huawei.com,
+	yangerkun@huawei.com,
+	yi.zhang@huawei.com
+Subject: [PATCH] blk-mq: check kobject state_in_sysfs before deleting in blk_mq_unregister_hctx
+Date: Tue, 26 Aug 2025 16:48:54 +0800
+Message-Id: <20250826084854.1030545-1-linan666@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CADUfDZrZLiD9r7AK+83HLgi-tXGvzNX_fasvwQ2_-wm6EVPifQ@mail.gmail.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+X-CM-TRANSID:gCh0CgCn8Izydq1oQapgAQ--.23704S4
+X-Coremail-Antispam: 1UD129KBjvJXoW7WryrCFWfCryfZw45Xw1xAFb_yoW8Aw1UpF
+	W3Ga13W3yDtr4jva12van7Wr13KF4kArykA393Xr1Sv3Wjkrn5WrsYyrWUJFy8trZ3CF4x
+	X3WUJ345Gw40g3JanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9G14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1lnxkEFVAIw20F6cxK64vIFxWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xv
+	F2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r
+	4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I
+	648v4I1lw4CEc2x0rVAKj4xxMxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7VAKI48JMx
+	C20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAF
+	wI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20x
+	vE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v2
+	0xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxV
+	W8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbfWrJUUUUU==
+X-CM-SenderInfo: polqt0awwwqx5xdzvxpfor3voofrz/
 
-On Mon, Aug 25, 2025 at 09:53:27PM -0700, Caleb Sander Mateos wrote:
-> On Mon, Aug 25, 2025 at 5:49 AM Ming Lei <ming.lei@redhat.com> wrote:
-> >
-> > Add a new command line option --no_ublk_fixed_fd that excludes the ublk
-> > control device (/dev/ublkcN) from io_uring's registered files array.
-> > When this option is used, only backing files are registered starting
-> > from index 1, while the ublk control device is accessed using its raw
-> > file descriptor.
-> >
-> > Add ublk_get_registered_fd() helper function that returns the appropriate
-> > file descriptor for use with io_uring operations, taking ublk_queue *
-> > parameter instead of ublk_thread * for better performance.
-> >
-> > Key optimizations implemented:
-> > - Cache UBLKS_Q_NO_UBLK_FIXED_FD flag in ublk_queue.flags to avoid
-> >   reading dev->no_ublk_fixed_fd in fast path
-> > - Cache ublk char device fd in ublk_queue.ublk_fd for fast access
-> > - Update ublk_get_registered_fd() to use ublk_queue * parameter
-> > - Update io_uring_prep_buf_register/unregister() to use ublk_queue *
-> > - Replace ublk_device * access with ublk_queue * access in fast paths
-> >
-> > This improves performance by:
-> > - Eliminating device structure traversal in hot paths
-> > - Better cache locality with queue-local data access
-> > - Reduced indirection for flag and fd lookups
-> 
-> Are you saying that performance is better when using the raw
-> /dev/ublkcN fd instead of an io_uring registered file? That would be
-> really surprising to me, since the whole point of io_uring file
-> registration is to avoid the file reference counting in the I/O path.
+From: Li Nan <linan122@huawei.com>
 
-No, here it just describes one implementation detail by caching per-device
-flag(no_ublk_fixed_fd) in queue's flag.
+In __blk_mq_update_nr_hw_queues() the return value of
+blk_mq_sysfs_register_hctxs() is not checked. If sysfs creation for hctx
+fails, later changing the number of hw_queues or removing disk will
+trigger the following warning:
 
-The test can trigger hang with patch V1 by passing --no_ublk_fixed_fd
-because /dev/ublkcN and io_uring closes can be depended, both are run
-from task work context in current task.
+  kernfs: can not remove 'nr_tags', no directory
+  WARNING: CPU: 2 PID: 637 at fs/kernfs/dir.c:1707 kernfs_remove_by_name_ns+0x13f/0x160
+  Call Trace:
+   remove_files.isra.1+0x38/0xb0
+   sysfs_remove_group+0x4d/0x100
+   sysfs_remove_groups+0x31/0x60
+   __kobject_del+0x23/0xf0
+   kobject_del+0x17/0x40
+   blk_mq_unregister_hctx+0x5d/0x80
+   blk_mq_sysfs_unregister_hctxs+0x94/0xd0
+   blk_mq_update_nr_hw_queues+0x124/0x760
+   nullb_update_nr_hw_queues+0x71/0xf0 [null_blk]
+   nullb_device_submit_queues_store+0x92/0x120 [null_blk]
 
+kobjct_del() was called unconditionally even if sysfs creation failed.
+Fix it by checkig the kobject creation statusbefore deleting it.
 
-Thanks,
-Ming
+Fixes: 477e19dedc9d ("blk-mq: adjust debugfs and sysfs register when updating nr_hw_queues")
+Signed-off-by: Li Nan <linan122@huawei.com>
+---
+ block/blk-mq-sysfs.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
+index 24656980f443..5c399ac562ea 100644
+--- a/block/blk-mq-sysfs.c
++++ b/block/blk-mq-sysfs.c
+@@ -150,9 +150,11 @@ static void blk_mq_unregister_hctx(struct blk_mq_hw_ctx *hctx)
+ 		return;
+ 
+ 	hctx_for_each_ctx(hctx, ctx, i)
+-		kobject_del(&ctx->kobj);
++		if (ctx->kobj.state_in_sysfs)
++			kobject_del(&ctx->kobj);
+ 
+-	kobject_del(&hctx->kobj);
++	if (hctx->kobj.state_in_sysfs)
++		kobject_del(&hctx->kobj);
+ }
+ 
+ static int blk_mq_register_hctx(struct blk_mq_hw_ctx *hctx)
+-- 
+2.39.2
 
