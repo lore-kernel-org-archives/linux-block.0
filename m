@@ -1,423 +1,116 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from sender4-pp-f112.zoho.com (sender4-pp-f112.zoho.com [136.143.188.112])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 725DC3019C2
-	for <linux-block@vger.kernel.org>; Wed, 27 Aug 2025 12:16:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756296995; cv=none; b=DwcbGHvmmazJKfFDx4G3CIgAkKkLiqYI8XjE7iHxLJ8PPCZ1egdiAzQfNqedHv3JQOUBeIcofbCTUgbuW6naIpANfFrQqHy/vnHhTHz81W1tNcgFd+tVcuBDUGT4WofeHPznEpqIruEqxNpNEVQHTXiEgXTLVgonHS5sUzkUrXg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756296995; c=relaxed/simple;
-	bh=n6ly0d52LjoJe9h8uIo/mcD/uqMNrjZEINubemjWcvE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bHo/ibJL4S1qq3jaDCJFO8dkExlvv2h5xR4E4D9s41v8/y2Gx8u2xGwkWxWA500WdIGGvMZiS05yq7MGwJALOl+7fbf29+cpplISHYbZy6xwqMfNexkYubMQ4AmXXGSf1RrCnZVKkLjsnOY5J/fIxPDY3u9FAuc1zj1ywhnvtsU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RLlRYRx5; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E5C1303CA8;
+	Wed, 27 Aug 2025 12:25:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.112
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756297543; cv=pass; b=Sb6TuX6SY8bQTEIXuIU7/zM5Bk/aHk6bDo/tMc9TnXg3mTh/Eb0jZY400xr6vw7c3Bu07BcepgeJBFD8aS+DeqhI5SrKo0O0d5Dw1eH2vKFNL3Vm65pUf64h0o3uVCn+wBO6GXfYgfk8xJ8bWXBnDYPCzbZfUi4s9N3xKHUsMLA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756297543; c=relaxed/simple;
+	bh=C4+vc/rI27ADAlxP0+hNA33yvt2az3LH6R0xRiNv94I=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=T6a/rTmTdLWuYUpjBoN8yjm7UYqyZF/S23iYvGnTEGKeMfIbr9KN4Okkw3O1mwCkMtAmufoKKA9tF+pBMFtoAj+EBpOHgNyaG5EjVW+IpFFu4+MQQ10MvtbQqnfzIgVdHzH7/zbnAuAUhAOLDLT8KCvDPMs1ZBn90/0Hqv1EOcg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=daniel.almeida@collabora.com header.b=hiLQ73mD; arc=pass smtp.client-ip=136.143.188.112
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RLlRYRx5"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1756296992;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=c5hqwM3GaKUgu/gTNgAz6fDATWgGhG2kphinW0Q0/oU=;
-	b=RLlRYRx5AHRCCe3hOCsn3ZNr2qB9Gi/0KjZG1t6BPf9NwO4AX1HncBai8EFP929N54DVhA
-	HBIOwzH5ZoHtyAt7IwmmAS/dWM2lG1RyLT5Z3IBcyjtqHa7QS2VfuA8gjLKA6VoHmLPeKn
-	VWDH3SGN8ZvcUTEH5ZK7wmyatbvXMWo=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-513-V2lNTWCZMCSuj1RSHSdhJw-1; Wed,
- 27 Aug 2025 08:16:27 -0400
-X-MC-Unique: V2lNTWCZMCSuj1RSHSdhJw-1
-X-Mimecast-MFC-AGG-ID: V2lNTWCZMCSuj1RSHSdhJw_1756296986
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id EDB351956088;
-	Wed, 27 Aug 2025 12:16:25 +0000 (UTC)
-Received: from localhost (unknown [10.72.116.24])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 956EA19560AB;
-	Wed, 27 Aug 2025 12:16:22 +0000 (UTC)
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: Uday Shankar <ushankar@purestorage.com>,
-	Keith Busch <kbusch@kernel.org>,
-	Caleb Sander Mateos <csander@purestorage.com>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V3 2/2] ublk selftests: add --no_ublk_fixed_fd for not using registered ublk char device
-Date: Wed, 27 Aug 2025 20:16:00 +0800
-Message-ID: <20250827121602.2619736-3-ming.lei@redhat.com>
-In-Reply-To: <20250827121602.2619736-1-ming.lei@redhat.com>
-References: <20250827121602.2619736-1-ming.lei@redhat.com>
+	dkim=pass (1024-bit key) header.d=collabora.com header.i=daniel.almeida@collabora.com header.b="hiLQ73mD"
+ARC-Seal: i=1; a=rsa-sha256; t=1756297524; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=aY6oSfgPN9mYAxX76fKjCykaf/85KK42O2x8A7NmUOwFZ5XrkeuDW4xPxg6J7hDHlxbhokpmc9Ju+vTbHwrhr/qb5lb15n7vsVJ0vTkJIo7l2eGAVAJ4l9C/X0cjbiQhvogCyGAY5YAm/20prm5oXik1SHctZPlyh5Sjn/72Kck=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1756297524; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=yTHr4GuvJ82yATxlRHsTWsU3wlSxy8CyHreP2Xc96ik=; 
+	b=G6er20C5i/y88T6Jm6yHNWSo0HXDUoQtOqla5+w0oGRCr4KpXYkbINwZgjmA4PtLpRbjDZbgOdYMiCd/6f29kPbyNEXhZLepLFqvOg1f9two/l/vMixtMpRD1x82MdOWL51ZpyWCPtW1dtNn/CZYQGWtB3mp2fpEQ6keEdYTHEc=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=collabora.com;
+	spf=pass  smtp.mailfrom=daniel.almeida@collabora.com;
+	dmarc=pass header.from=<daniel.almeida@collabora.com>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1756297524;
+	s=zohomail; d=collabora.com; i=daniel.almeida@collabora.com;
+	h=Content-Type:Mime-Version:Subject:Subject:From:From:In-Reply-To:Date:Date:Cc:Cc:Content-Transfer-Encoding:Message-Id:Message-Id:References:To:To:Reply-To;
+	bh=yTHr4GuvJ82yATxlRHsTWsU3wlSxy8CyHreP2Xc96ik=;
+	b=hiLQ73mD5BMf4IdM7C8tyqsYK7iW2pP/SHcW+WL15lmyg77hiz05skCXgsHnBMZF
+	df+oUaenfvjutDu+bIIUjFV2mo+gHYXYPdNUELmBJNP3r3osXvPRQraMbrrNB0EY+HW
+	CwXOC8axaeIa/wxShU+GZ2/MwoE99t/CWz6mSy+k=
+Received: by mx.zohomail.com with SMTPS id 1756297521363698.2551424341978;
+	Wed, 27 Aug 2025 05:25:21 -0700 (PDT)
+Content-Type: text/plain;
+	charset=us-ascii
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.700.81\))
+Subject: Re: [PATCH v6 01/18] rust: str: normalize imports in `str.rs`
+From: Daniel Almeida <daniel.almeida@collabora.com>
+In-Reply-To: <20250822-rnull-up-v6-16-v6-1-ec65006e2f07@kernel.org>
+Date: Wed, 27 Aug 2025 09:25:04 -0300
+Cc: Boqun Feng <boqun.feng@gmail.com>,
+ Miguel Ojeda <ojeda@kernel.org>,
+ Alex Gaynor <alex.gaynor@gmail.com>,
+ Gary Guo <gary@garyguo.net>,
+ =?utf-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>,
+ Benno Lossin <lossin@kernel.org>,
+ Alice Ryhl <aliceryhl@google.com>,
+ Trevor Gross <tmgross@umich.edu>,
+ Danilo Krummrich <dakr@kernel.org>,
+ Jens Axboe <axboe@kernel.dk>,
+ Breno Leitao <leitao@debian.org>,
+ linux-block@vger.kernel.org,
+ rust-for-linux@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Content-Transfer-Encoding: 7bit
+Message-Id: <D9BA84D8-51D8-4473-8FF0-9FBD4BF58F81@collabora.com>
+References: <20250822-rnull-up-v6-16-v6-0-ec65006e2f07@kernel.org>
+ <20250822-rnull-up-v6-16-v6-1-ec65006e2f07@kernel.org>
+To: Andreas Hindborg <a.hindborg@kernel.org>
+X-Mailer: Apple Mail (2.3826.700.81)
+X-ZohoMailClient: External
 
-Add a new command line option --no_ublk_fixed_fd that excludes the ublk
-control device (/dev/ublkcN) from io_uring's registered files array.
-When this option is used, only backing files are registered starting
-from index 1, while the ublk control device is accessed using its raw
-file descriptor.
 
-Add ublk_get_registered_fd() helper function that returns the appropriate
-file descriptor for use with io_uring operations.
 
-Key optimizations implemented:
-- Cache UBLKS_Q_NO_UBLK_FIXED_FD flag in ublk_queue.flags to avoid
-  reading dev->no_ublk_fixed_fd in fast path
-- Cache ublk char device fd in ublk_queue.ublk_fd for fast access
-- Update ublk_get_registered_fd() to use ublk_queue * parameter
-- Update io_uring_prep_buf_register/unregister() to use ublk_queue *
-- Replace ublk_device * access with ublk_queue * access in fast paths
+> On 22 Aug 2025, at 09:14, Andreas Hindborg <a.hindborg@kernel.org> wrote:
+> 
+> Clean up imports in `str.rs`. This makes future code manipulation more
+> manageable.
+> 
+> Reviewed-by: Alice Ryhl <aliceryhl@google.com>
+> Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
+> ---
+> rust/kernel/str.rs | 9 +++++----
+> 1 file changed, 5 insertions(+), 4 deletions(-)
+> 
+> diff --git a/rust/kernel/str.rs b/rust/kernel/str.rs
+> index 6c892550c0ba..082790b7a621 100644
+> --- a/rust/kernel/str.rs
+> +++ b/rust/kernel/str.rs
+> @@ -2,12 +2,13 @@
+> 
+> //! String representations.
+> 
+> -use crate::alloc::{flags::*, AllocError, KVec};
+> -use crate::fmt::{self, Write};
+> +use crate::{
+> +    alloc::{flags::*, AllocError, KVec},
+> +    fmt::{self, Write},
+> +    prelude::*,
+> +};
+> use core::ops::{self, Deref, DerefMut, Index};
+> 
+> -use crate::prelude::*;
+> -
+> /// Byte string without UTF-8 validity guarantee.
+> #[repr(transparent)]
+> pub struct BStr([u8]);
+> 
+> -- 
+> 2.47.2
+> 
+> 
+> 
 
-Also pass --no_ublk_fixed_fd to test_stress_04.sh for covering
-plain ublk char device mode.
-
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- tools/testing/selftests/ublk/file_backed.c    | 10 ++---
- tools/testing/selftests/ublk/kublk.c          | 38 +++++++++++++---
- tools/testing/selftests/ublk/kublk.h          | 45 +++++++++++++------
- tools/testing/selftests/ublk/null.c           |  4 +-
- tools/testing/selftests/ublk/stripe.c         |  4 +-
- .../testing/selftests/ublk/test_stress_04.sh  |  6 +--
- 6 files changed, 74 insertions(+), 33 deletions(-)
-
-diff --git a/tools/testing/selftests/ublk/file_backed.c b/tools/testing/selftests/ublk/file_backed.c
-index 2d93ac860bd5..cd9fe69ecce2 100644
---- a/tools/testing/selftests/ublk/file_backed.c
-+++ b/tools/testing/selftests/ublk/file_backed.c
-@@ -20,7 +20,7 @@ static int loop_queue_flush_io(struct ublk_thread *t, struct ublk_queue *q,
- 	struct io_uring_sqe *sqe[1];
- 
- 	ublk_io_alloc_sqes(t, sqe, 1);
--	io_uring_prep_fsync(sqe[0], 1 /*fds[1]*/, IORING_FSYNC_DATASYNC);
-+	io_uring_prep_fsync(sqe[0], ublk_get_registered_fd(q, 1) /*fds[1]*/, IORING_FSYNC_DATASYNC);
- 	io_uring_sqe_set_flags(sqe[0], IOSQE_FIXED_FILE);
- 	/* bit63 marks us as tgt io */
- 	sqe[0]->user_data = build_user_data(tag, ublk_op, 0, q->q_id, 1);
-@@ -42,7 +42,7 @@ static int loop_queue_tgt_rw_io(struct ublk_thread *t, struct ublk_queue *q,
- 		if (!sqe[0])
- 			return -ENOMEM;
- 
--		io_uring_prep_rw(op, sqe[0], 1 /*fds[1]*/,
-+		io_uring_prep_rw(op, sqe[0], ublk_get_registered_fd(q, 1) /*fds[1]*/,
- 				addr,
- 				iod->nr_sectors << 9,
- 				iod->start_sector << 9);
-@@ -56,19 +56,19 @@ static int loop_queue_tgt_rw_io(struct ublk_thread *t, struct ublk_queue *q,
- 
- 	ublk_io_alloc_sqes(t, sqe, 3);
- 
--	io_uring_prep_buf_register(sqe[0], 0, tag, q->q_id, ublk_get_io(q, tag)->buf_index);
-+	io_uring_prep_buf_register(sqe[0], q, tag, q->q_id, ublk_get_io(q, tag)->buf_index);
- 	sqe[0]->flags |= IOSQE_CQE_SKIP_SUCCESS | IOSQE_IO_HARDLINK;
- 	sqe[0]->user_data = build_user_data(tag,
- 			ublk_cmd_op_nr(sqe[0]->cmd_op), 0, q->q_id, 1);
- 
--	io_uring_prep_rw(op, sqe[1], 1 /*fds[1]*/, 0,
-+	io_uring_prep_rw(op, sqe[1], ublk_get_registered_fd(q, 1) /*fds[1]*/, 0,
- 		iod->nr_sectors << 9,
- 		iod->start_sector << 9);
- 	sqe[1]->buf_index = tag;
- 	sqe[1]->flags |= IOSQE_FIXED_FILE | IOSQE_IO_HARDLINK;
- 	sqe[1]->user_data = build_user_data(tag, ublk_op, 0, q->q_id, 1);
- 
--	io_uring_prep_buf_unregister(sqe[2], 0, tag, q->q_id, ublk_get_io(q, tag)->buf_index);
-+	io_uring_prep_buf_unregister(sqe[2], q, tag, q->q_id, ublk_get_io(q, tag)->buf_index);
- 	sqe[2]->user_data = build_user_data(tag, ublk_cmd_op_nr(sqe[2]->cmd_op), 0, q->q_id, 1);
- 
- 	return 2;
-diff --git a/tools/testing/selftests/ublk/kublk.c b/tools/testing/selftests/ublk/kublk.c
-index 6512dfbdbce3..b71faba86c3b 100644
---- a/tools/testing/selftests/ublk/kublk.c
-+++ b/tools/testing/selftests/ublk/kublk.c
-@@ -432,7 +432,7 @@ static void ublk_thread_deinit(struct ublk_thread *t)
- 	}
- }
- 
--static int ublk_queue_init(struct ublk_queue *q, unsigned extra_flags)
-+static int ublk_queue_init(struct ublk_queue *q, unsigned long long extra_flags)
- {
- 	struct ublk_dev *dev = q->dev;
- 	int depth = dev->dev_info.queue_depth;
-@@ -446,6 +446,9 @@ static int ublk_queue_init(struct ublk_queue *q, unsigned extra_flags)
- 	q->flags = dev->dev_info.flags;
- 	q->flags |= extra_flags;
- 
-+	/* Cache fd in queue for fast path access */
-+	q->ublk_fd = dev->fds[0];
-+
- 	cmd_buf_size = ublk_queue_cmd_buf_sz(q);
- 	off = UBLKSRV_CMD_BUF_OFFSET + q->q_id * ublk_queue_max_cmd_buf_sz();
- 	q->io_cmd_buf = mmap(0, cmd_buf_size, PROT_READ,
-@@ -481,9 +484,10 @@ static int ublk_queue_init(struct ublk_queue *q, unsigned extra_flags)
- 	return -ENOMEM;
- }
- 
--static int ublk_thread_init(struct ublk_thread *t)
-+static int ublk_thread_init(struct ublk_thread *t, unsigned long long extra_flags)
- {
- 	struct ublk_dev *dev = t->dev;
-+	unsigned long long flags = dev->dev_info.flags | extra_flags;
- 	int ring_depth = dev->tgt.sq_depth, cq_depth = dev->tgt.cq_depth;
- 	int ret;
- 
-@@ -512,7 +516,17 @@ static int ublk_thread_init(struct ublk_thread *t)
- 
- 	io_uring_register_ring_fd(&t->ring);
- 
--	ret = io_uring_register_files(&t->ring, dev->fds, dev->nr_fds);
-+	if (flags & UBLKS_Q_NO_UBLK_FIXED_FD) {
-+		/* Register only backing files starting from index 1, exclude ublk control device */
-+		if (dev->nr_fds > 1) {
-+			ret = io_uring_register_files(&t->ring, &dev->fds[1], dev->nr_fds - 1);
-+		} else {
-+			/* No backing files to register, skip file registration */
-+			ret = 0;
-+		}
-+	} else {
-+		ret = io_uring_register_files(&t->ring, dev->fds, dev->nr_fds);
-+	}
- 	if (ret) {
- 		ublk_err("ublk dev %d thread %d register files failed %d\n",
- 				t->dev->dev_info.dev_id, t->idx, ret);
-@@ -626,9 +640,12 @@ int ublk_queue_io_cmd(struct ublk_thread *t, struct ublk_io *io)
- 
- 	/* These fields should be written once, never change */
- 	ublk_set_sqe_cmd_op(sqe[0], cmd_op);
--	sqe[0]->fd		= 0;	/* dev->fds[0] */
-+	sqe[0]->fd	= ublk_get_registered_fd(q, 0);	/* dev->fds[0] */
- 	sqe[0]->opcode	= IORING_OP_URING_CMD;
--	sqe[0]->flags	= IOSQE_FIXED_FILE;
-+	if (q->flags & UBLKS_Q_NO_UBLK_FIXED_FD)
-+		sqe[0]->flags	= 0;  /* Use raw FD, not fixed file */
-+	else
-+		sqe[0]->flags	= IOSQE_FIXED_FILE;
- 	sqe[0]->rw_flags	= 0;
- 	cmd->tag	= io->tag;
- 	cmd->q_id	= q->q_id;
-@@ -832,6 +849,7 @@ struct ublk_thread_info {
- 	unsigned		idx;
- 	sem_t 			*ready;
- 	cpu_set_t 		*affinity;
-+	unsigned long long	extra_flags;
- };
- 
- static void *ublk_io_handler_fn(void *data)
-@@ -844,7 +862,7 @@ static void *ublk_io_handler_fn(void *data)
- 	t->dev = info->dev;
- 	t->idx = info->idx;
- 
--	ret = ublk_thread_init(t);
-+	ret = ublk_thread_init(t, info->extra_flags);
- 	if (ret) {
- 		ublk_err("ublk dev %d thread %u init failed\n",
- 				dev_id, t->idx);
-@@ -934,6 +952,8 @@ static int ublk_start_daemon(const struct dev_ctx *ctx, struct ublk_dev *dev)
- 
- 	if (ctx->auto_zc_fallback)
- 		extra_flags = UBLKS_Q_AUTO_BUF_REG_FALLBACK;
-+	if (ctx->no_ublk_fixed_fd)
-+		extra_flags |= UBLKS_Q_NO_UBLK_FIXED_FD;
- 
- 	for (i = 0; i < dinfo->nr_hw_queues; i++) {
- 		dev->q[i].dev = dev;
-@@ -951,6 +971,7 @@ static int ublk_start_daemon(const struct dev_ctx *ctx, struct ublk_dev *dev)
- 		tinfo[i].dev = dev;
- 		tinfo[i].idx = i;
- 		tinfo[i].ready = &ready;
-+		tinfo[i].extra_flags = extra_flags;
- 
- 		/*
- 		 * If threads are not tied 1:1 to queues, setting thread
-@@ -1471,7 +1492,7 @@ static void __cmd_create_help(char *exe, bool recovery)
- 	printf("%s %s -t [null|loop|stripe|fault_inject] [-q nr_queues] [-d depth] [-n dev_id]\n",
- 			exe, recovery ? "recover" : "add");
- 	printf("\t[--foreground] [--quiet] [-z] [--auto_zc] [--auto_zc_fallback] [--debug_mask mask] [-r 0|1 ] [-g]\n");
--	printf("\t[-e 0|1 ] [-i 0|1]\n");
-+	printf("\t[-e 0|1 ] [-i 0|1] [--no_ublk_fixed_fd]\n");
- 	printf("\t[--nthreads threads] [--per_io_tasks]\n");
- 	printf("\t[target options] [backfile1] [backfile2] ...\n");
- 	printf("\tdefault: nr_queues=2(max 32), depth=128(max 1024), dev_id=-1(auto allocation)\n");
-@@ -1534,6 +1555,7 @@ int main(int argc, char *argv[])
- 		{ "size",		1,	NULL, 's'},
- 		{ "nthreads",		1,	NULL,  0 },
- 		{ "per_io_tasks",	0,	NULL,  0 },
-+		{ "no_ublk_fixed_fd",	0,	NULL,  0 },
- 		{ 0, 0, 0, 0 }
- 	};
- 	const struct ublk_tgt_ops *ops = NULL;
-@@ -1613,6 +1635,8 @@ int main(int argc, char *argv[])
- 				ctx.nthreads = strtol(optarg, NULL, 10);
- 			if (!strcmp(longopts[option_idx].name, "per_io_tasks"))
- 				ctx.per_io_tasks = 1;
-+			if (!strcmp(longopts[option_idx].name, "no_ublk_fixed_fd"))
-+				ctx.no_ublk_fixed_fd = 1;
- 			break;
- 		case '?':
- 			/*
-diff --git a/tools/testing/selftests/ublk/kublk.h b/tools/testing/selftests/ublk/kublk.h
-index 219233f8a053..5e55484fb0aa 100644
---- a/tools/testing/selftests/ublk/kublk.h
-+++ b/tools/testing/selftests/ublk/kublk.h
-@@ -77,6 +77,7 @@ struct dev_ctx {
- 	unsigned int	recovery:1;
- 	unsigned int	auto_zc_fallback:1;
- 	unsigned int	per_io_tasks:1;
-+	unsigned int	no_ublk_fixed_fd:1;
- 
- 	int _evtfd;
- 	int _shmid;
-@@ -166,7 +167,9 @@ struct ublk_queue {
- 
- /* borrow one bit of ublk uapi flags, which may never be used */
- #define UBLKS_Q_AUTO_BUF_REG_FALLBACK	(1ULL << 63)
-+#define UBLKS_Q_NO_UBLK_FIXED_FD	(1ULL << 62)
- 	__u64 flags;
-+	int ublk_fd;	/* cached ublk char device fd */
- 	struct ublk_io ios[UBLK_QUEUE_DEPTH];
- };
- 
-@@ -273,34 +276,48 @@ static inline int ublk_io_alloc_sqes(struct ublk_thread *t,
- 	return nr_sqes;
- }
- 
--static inline void io_uring_prep_buf_register(struct io_uring_sqe *sqe,
--		int dev_fd, int tag, int q_id, __u64 index)
-+static inline int ublk_get_registered_fd(struct ublk_queue *q, int fd_index)
-+{
-+	if (q->flags & UBLKS_Q_NO_UBLK_FIXED_FD) {
-+		if (fd_index == 0)
-+			/* Return the raw ublk FD for index 0 */
-+			return q->ublk_fd;
-+		/* Adjust index for backing files (index 1 becomes 0, etc.) */
-+		return fd_index - 1;
-+	}
-+	return fd_index;
-+}
-+
-+static inline void __io_uring_prep_buf_reg_unreg(struct io_uring_sqe *sqe,
-+		struct ublk_queue *q, int tag, int q_id, __u64 index)
- {
- 	struct ublksrv_io_cmd *cmd = (struct ublksrv_io_cmd *)sqe->cmd;
-+	int dev_fd = ublk_get_registered_fd(q, 0);
- 
- 	io_uring_prep_read(sqe, dev_fd, 0, 0, 0);
- 	sqe->opcode		= IORING_OP_URING_CMD;
--	sqe->flags		|= IOSQE_FIXED_FILE;
--	sqe->cmd_op		= UBLK_U_IO_REGISTER_IO_BUF;
-+	if (q->flags & UBLKS_Q_NO_UBLK_FIXED_FD)
-+		sqe->flags	&= ~IOSQE_FIXED_FILE;
-+	else
-+		sqe->flags	|= IOSQE_FIXED_FILE;
- 
- 	cmd->tag		= tag;
- 	cmd->addr		= index;
- 	cmd->q_id		= q_id;
- }
- 
--static inline void io_uring_prep_buf_unregister(struct io_uring_sqe *sqe,
--		int dev_fd, int tag, int q_id, __u64 index)
-+static inline void io_uring_prep_buf_register(struct io_uring_sqe *sqe,
-+		struct ublk_queue *q, int tag, int q_id, __u64 index)
- {
--	struct ublksrv_io_cmd *cmd = (struct ublksrv_io_cmd *)sqe->cmd;
-+	__io_uring_prep_buf_reg_unreg(sqe, q, tag, q_id, index);
-+	sqe->cmd_op		= UBLK_U_IO_REGISTER_IO_BUF;
-+}
- 
--	io_uring_prep_read(sqe, dev_fd, 0, 0, 0);
--	sqe->opcode		= IORING_OP_URING_CMD;
--	sqe->flags		|= IOSQE_FIXED_FILE;
-+static inline void io_uring_prep_buf_unregister(struct io_uring_sqe *sqe,
-+		struct ublk_queue *q, int tag, int q_id, __u64 index)
-+{
-+	__io_uring_prep_buf_reg_unreg(sqe, q, tag, q_id, index);
- 	sqe->cmd_op		= UBLK_U_IO_UNREGISTER_IO_BUF;
--
--	cmd->tag		= tag;
--	cmd->addr		= index;
--	cmd->q_id		= q_id;
- }
- 
- static inline void *ublk_get_sqe_cmd(const struct io_uring_sqe *sqe)
-diff --git a/tools/testing/selftests/ublk/null.c b/tools/testing/selftests/ublk/null.c
-index f0e0003a4860..280043f6b689 100644
---- a/tools/testing/selftests/ublk/null.c
-+++ b/tools/testing/selftests/ublk/null.c
-@@ -63,7 +63,7 @@ static int null_queue_zc_io(struct ublk_thread *t, struct ublk_queue *q,
- 
- 	ublk_io_alloc_sqes(t, sqe, 3);
- 
--	io_uring_prep_buf_register(sqe[0], 0, tag, q->q_id, ublk_get_io(q, tag)->buf_index);
-+	io_uring_prep_buf_register(sqe[0], q, tag, q->q_id, ublk_get_io(q, tag)->buf_index);
- 	sqe[0]->user_data = build_user_data(tag,
- 			ublk_cmd_op_nr(sqe[0]->cmd_op), 0, q->q_id, 1);
- 	sqe[0]->flags |= IOSQE_CQE_SKIP_SUCCESS | IOSQE_IO_HARDLINK;
-@@ -71,7 +71,7 @@ static int null_queue_zc_io(struct ublk_thread *t, struct ublk_queue *q,
- 	__setup_nop_io(tag, iod, sqe[1], q->q_id);
- 	sqe[1]->flags |= IOSQE_IO_HARDLINK;
- 
--	io_uring_prep_buf_unregister(sqe[2], 0, tag, q->q_id, ublk_get_io(q, tag)->buf_index);
-+	io_uring_prep_buf_unregister(sqe[2], q, tag, q->q_id, ublk_get_io(q, tag)->buf_index);
- 	sqe[2]->user_data = build_user_data(tag, ublk_cmd_op_nr(sqe[2]->cmd_op), 0, q->q_id, 1);
- 
- 	// buf register is marked as IOSQE_CQE_SKIP_SUCCESS
-diff --git a/tools/testing/selftests/ublk/stripe.c b/tools/testing/selftests/ublk/stripe.c
-index 1fb9b7cc281b..791fa8dc1651 100644
---- a/tools/testing/selftests/ublk/stripe.c
-+++ b/tools/testing/selftests/ublk/stripe.c
-@@ -142,7 +142,7 @@ static int stripe_queue_tgt_rw_io(struct ublk_thread *t, struct ublk_queue *q,
- 	ublk_io_alloc_sqes(t, sqe, s->nr + extra);
- 
- 	if (zc) {
--		io_uring_prep_buf_register(sqe[0], 0, tag, q->q_id, io->buf_index);
-+		io_uring_prep_buf_register(sqe[0], q, tag, q->q_id, io->buf_index);
- 		sqe[0]->flags |= IOSQE_CQE_SKIP_SUCCESS | IOSQE_IO_HARDLINK;
- 		sqe[0]->user_data = build_user_data(tag,
- 			ublk_cmd_op_nr(sqe[0]->cmd_op), 0, q->q_id, 1);
-@@ -168,7 +168,7 @@ static int stripe_queue_tgt_rw_io(struct ublk_thread *t, struct ublk_queue *q,
- 	if (zc) {
- 		struct io_uring_sqe *unreg = sqe[s->nr + 1];
- 
--		io_uring_prep_buf_unregister(unreg, 0, tag, q->q_id, io->buf_index);
-+		io_uring_prep_buf_unregister(unreg, q, tag, q->q_id, io->buf_index);
- 		unreg->user_data = build_user_data(
- 			tag, ublk_cmd_op_nr(unreg->cmd_op), 0, q->q_id, 1);
- 	}
-diff --git a/tools/testing/selftests/ublk/test_stress_04.sh b/tools/testing/selftests/ublk/test_stress_04.sh
-index 40d1437ca298..3f901db4d09d 100755
---- a/tools/testing/selftests/ublk/test_stress_04.sh
-+++ b/tools/testing/selftests/ublk/test_stress_04.sh
-@@ -28,14 +28,14 @@ _create_backfile 0 256M
- _create_backfile 1 128M
- _create_backfile 2 128M
- 
--ublk_io_and_kill_daemon 8G -t null -q 4 -z &
--ublk_io_and_kill_daemon 256M -t loop -q 4 -z "${UBLK_BACKFILES[0]}" &
-+ublk_io_and_kill_daemon 8G -t null -q 4 -z --no_ublk_fixed_fd &
-+ublk_io_and_kill_daemon 256M -t loop -q 4 -z --no_ublk_fixed_fd "${UBLK_BACKFILES[0]}" &
- ublk_io_and_kill_daemon 256M -t stripe -q 4 -z "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
- 
- if _have_feature "AUTO_BUF_REG"; then
- 	ublk_io_and_kill_daemon 8G -t null -q 4 --auto_zc &
- 	ublk_io_and_kill_daemon 256M -t loop -q 4 --auto_zc "${UBLK_BACKFILES[0]}" &
--	ublk_io_and_kill_daemon 256M -t stripe -q 4 --auto_zc "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
-+	ublk_io_and_kill_daemon 256M -t stripe -q 4 --auto_zc --no_ublk_fixed_fd "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
- 	ublk_io_and_kill_daemon 8G -t null -q 4 -z --auto_zc --auto_zc_fallback &
- fi
- 
--- 
-2.47.0
+Reviewed-by: Daniel Almeida <daniel.almeida@collabora.com>
 
