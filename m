@@ -1,137 +1,115 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FD86277803
-	for <linux-block@vger.kernel.org>; Wed, 27 Aug 2025 03:13:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84DCF1AB52D;
+	Wed, 27 Aug 2025 03:13:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756264403; cv=none; b=VO/cBDTKBCmX0NCRdqvv3uUtV9oUB5ns+gH3wPU+VdLC2q+WCVqhbei3jAoSPAnQEV38H3FFPOsK8uyXOuEIE+PrHBp5ASpJE4j6rmWu6QoCsvCF1/jwJt8JRob40C4ayVzU2BL0go3zInuXsZKW/uCpIc6WMaY/2h69+ixeoOs=
+	t=1756264410; cv=none; b=BD57sepTMOzXBiDOp+m23AQPpXXhskDn1v/XLzNG1KFiYtBuC7JoByVf+uLYLbb3Id7Uigp3BEhAMpUINwaLrw+k0JjyQfvw7iIzhcPMEMcBYJzyrhfHovUywsPgNKl7kKZAd4LSBi/EhMpJmmGT3OhMqjfiiZVj45C3Ok3PF7Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756264403; c=relaxed/simple;
-	bh=aPLKW75+adg0/YV0HGh5cTV3gO1o8TBBS+Dc+9jK/G0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CGT2KHlbsmaTHiDYTJRY+olqarGzHwE2qIaBSVsNls3a6Brx91woo99mre+2fWpEKp+Z7h7EghBWPZt0U28QEsj3fi7RrZk9NPK5AVaCsl7kXxU2b5IXULuUu1b301+JncnHqlmcG9X/KVe3Z53ZmzimlMcQWOKCsIjYxZmEFIU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HpPZ7hCp; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HpPZ7hCp"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1756264398;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Kg12dc7FGsxg2cEXvFrtAlEITELVLt1bMnDwTAUgL2w=;
-	b=HpPZ7hCp9Sx8JxoDem3TS1d4FvySc5fbW0WeFSGeivssbFrcKjtll+0b/BQr5LBA9NPWhP
-	Db80YYD6+WsQwN+KWXFwNVZA267Zu2cQBeK1+xCFC72QK4palKW2sZwoRsjPpPQhCHQoMn
-	+i/noNjmaiCpuv+1caCeKyn9hUqbWo4=
-Received: from mail-lj1-f200.google.com (mail-lj1-f200.google.com
- [209.85.208.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-130-dfW0zjjYMcmFdUEX-WsyGQ-1; Tue, 26 Aug 2025 23:13:16 -0400
-X-MC-Unique: dfW0zjjYMcmFdUEX-WsyGQ-1
-X-Mimecast-MFC-AGG-ID: dfW0zjjYMcmFdUEX-WsyGQ_1756264395
-Received: by mail-lj1-f200.google.com with SMTP id 38308e7fff4ca-3365be0c13aso11125841fa.1
-        for <linux-block@vger.kernel.org>; Tue, 26 Aug 2025 20:13:16 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756264395; x=1756869195;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Kg12dc7FGsxg2cEXvFrtAlEITELVLt1bMnDwTAUgL2w=;
-        b=khGgDmsOlhPjPK3cmQqfgftB4iOAen9f5En9vxWRRa8nkyYXKHklkBcsLI8VUTDCIv
-         BoC+YXR9eHIVLIRX5H7wEIDHpB/1VSdkGKE4yf0JD6gytasPUS6lfuJpwaO9WVdjO6Il
-         9cJTL0rBrkz9j5F9S92TWT36NnDOIf3mrGcy7C29q/h+cKjo0KZ0Xqeq4dEeShK1AjHd
-         sIoLZKYom2XgxVsBjAkqV2Eo2x2aJH2TqSI/7LlN+hca3zey4E2IjGUPFSwjj2WB5136
-         s8FKBcYI+Tg/WwdVU1beZNrMMDH14Jk+d2HuXW2dGYkgn/3/P25FQI3ayp4iu57vG98w
-         puSA==
-X-Forwarded-Encrypted: i=1; AJvYcCXGrT/mY53lsgO8rVZvllqYxUZkiuoBOeUGrlN8PgvXT5Pxtukil+ka6JK7+ATWF1JoRmKt0VhXCoUu6A==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz+p9CjAmdQ34WedkGr9DVfRo54aLmQWCFYTqNmX2DMJJ2jyTCN
-	iWcsNSkSufHnS0d/v+TpvAMk9QwLzT4vlyWpsQ6iQD0MwQKNlkBiypX7WzphSGkpifQgBLVJ7eT
-	pgBnIWg64NO0O7iBLeJjG0qcoNbNozuP/9H1HFnrHZ1UYufXONqkEghniF6ldGNmLbtmwdlfGsC
-	WOTgqqmHSUe/viJq7kVibUufJ1eEAFAIC5d/6efPI=
-X-Gm-Gg: ASbGncv+D9s4btUJUALz5IUTJvkuQTlbcgtNu10vy+DpTKEdTxTZW6PtTjbSU076+uR
-	7Bz1bvuB+Z+4HInZa7S1u4Tm7RSFF6Ac8GoMQBHzC1qyISlfWaoPNZIb/1YiaUFC4HkBPPXrf4U
-	itp4xKP6cMZ97FMFy19DQrVg==
-X-Received: by 2002:a2e:bc1c:0:b0:336:6739:bfb3 with SMTP id 38308e7fff4ca-3366739c241mr37467261fa.42.1756264395308;
-        Tue, 26 Aug 2025 20:13:15 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHwL9asrCb30GtiLU63tnVNtdXq6YLZHU/N4ALzSlaz37rXXjcT8tNliezQroDpGEELRyoE/R2PLgx6pJiOvlM=
-X-Received: by 2002:a2e:bc1c:0:b0:336:6739:bfb3 with SMTP id
- 38308e7fff4ca-3366739c241mr37467191fa.42.1756264394875; Tue, 26 Aug 2025
- 20:13:14 -0700 (PDT)
+	s=arc-20240116; t=1756264410; c=relaxed/simple;
+	bh=dVQ2iRM0B9mG/QkcgL/3eV7ZWiGhjSm9OFZfHWGE5f8=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=NjC/xb3NeHINBJENXHMiz2PuwtLFHSMN5/Pgz21Dcbcx3tsvd1TSqf8kf8ibZzCSCJ1KICRa82/YbWZ4ZrlTf1X22ePJRbPW4oBoQNfkp8d7p9R/TtUQMsZRv4HxIg5haRr+YbapzP5iqw1bw2wL8XN4as8yrRmbSUwO2HNW6l8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.93.142])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4cBV3L0mjxzKHMc1;
+	Wed, 27 Aug 2025 11:13:18 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id B9F0B1A1040;
+	Wed, 27 Aug 2025 11:13:17 +0800 (CST)
+Received: from [10.174.179.143] (unknown [10.174.179.143])
+	by APP4 (Coremail) with SMTP id gCh0CgCn8IzJd65o6fO3AQ--.46037S3;
+	Wed, 27 Aug 2025 11:13:15 +0800 (CST)
+Subject: Re: [REGRESSION] loop: use vfs_getattr_nosec for accurate file size
+To: Theodore Ts'o <tytso@mit.edu>, Rajeev Mishra <rajeevm@hpe.com>
+Cc: linux-block@vger.kernel.org,
+ Linux Filesystem Development List <linux-fsdevel@vger.kernel.org>,
+ Jens Axboe <axboe@kernel.dk>, "yukuai (C)" <yukuai3@huawei.com>
+References: <20250827025939.GA2209224@mit.edu>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <274c312c-d0e5-10af-0ef0-bab92e71eb64@huaweicloud.com>
+Date: Wed, 27 Aug 2025 11:13:13 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250827025939.GA2209224@mit.edu>
 In-Reply-To: <20250827025939.GA2209224@mit.edu>
-From: Yi Zhang <yi.zhang@redhat.com>
-Date: Wed, 27 Aug 2025 11:13:02 +0800
-X-Gm-Features: Ac12FXxyq0rlPWzcAsl2hibY4PT_vpCJFYSBtvC5vmWqeafX1BtyyM-a6hwPslY
-Message-ID: <CAHj4cs8BWKXQfch8EXQVZLDD51uMg2yY9caOsb0b3n+uTXXaMQ@mail.gmail.com>
-Subject: Re: [REGRESSION] loop: use vfs_getattr_nosec for accurate file size
-To: "Theodore Ts'o" <tytso@mit.edu>
-Cc: Rajeev Mishra <rajeevm@hpe.com>, linux-block@vger.kernel.org, 
-	Linux Filesystem Development List <linux-fsdevel@vger.kernel.org>, Yu Kuai <yukuai3@huawei.com>, 
-	Jens Axboe <axboe@kernel.dk>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgCn8IzJd65o6fO3AQ--.46037S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7WF18Cr4rGr48ZryxJF45GFg_yoW8Ww4xpa
+	9a9F1Ykr1DKr1UCFWjgr1UZ3W0grZ5X3sxWr18twn3ZFyUt34jkr929r43WF4Ykryrua1a
+	kwna93s09r4IvaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvjb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AF
+	wI0_JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
+	xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1D
+	MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
+	0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWU
+	JVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUwx
+	hLUUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-Hi Theodore
+Hi,
 
-It should be fixed by this commit:
-https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git/commi=
-t/?h=3Dfor-next&id=3Dd14469ed7c00314fe8957b2841bda329e4eaf4ab
-
-On Wed, Aug 27, 2025 at 11:00=E2=80=AFAM Theodore Ts'o <tytso@mit.edu> wrot=
-e:
->
+ÔÚ 2025/08/27 10:59, Theodore Ts'o Ð´µÀ:
 > Hi, I was testing 6.17-rc3, and I noticed a test failure in fstest
 > generic/563[1], when testing both ext4 and xfs.  If you are using my
 > test appliance[2], this can be trivially reproduced using:
->
->    kvm-xfstests -c ext4/4k generic/563
+> 
+>     kvm-xfstests -c ext4/4k generic/563
 > or
->    kvm-xfstests -c xfs/4k generic/563
->
-> [1] https://git.kernel.org/pub/scm/fs/xfs/xfstests-dev.git/tree/tests/gen=
-eric/563
-> [2] https://github.com/tytso/xfstests-bld/blob/master/Documentation/kvm-q=
-uickstart.md
->
+>     kvm-xfstests -c xfs/4k generic/563
+> 
+> [1] https://git.kernel.org/pub/scm/fs/xfs/xfstests-dev.git/tree/tests/generic/563
+> [2] https://github.com/tytso/xfstests-bld/blob/master/Documentation/kvm-quickstart.md
+> 
 > A git bisect pointed the problem at:
->
+> 
 > commit 47b71abd58461a67cae71d2f2a9d44379e4e2fcf
 > Author: Rajeev Mishra <rajeevm@hpe.com>
 > Date:   Mon Aug 18 18:48:21 2025 +0000
->
->     loop: use vfs_getattr_nosec for accurate file size
->
->     Use vfs_getattr_nosec() in lo_calculate_size() for getting the file
->     size, rather than just read the cached inode size via i_size_read().
->     This provides better results than cached inode data, particularly for
->     network filesystems where metadata may be stale.
->
->     Signed-off-by: Rajeev Mishra <rajeevm@hpe.com>
->     Reviewed-by: Yu Kuai <yukuai3@huawei.com>
->     Link: https://lore.kernel.org/r/20250818184821.115033-3-rajeevm@hpe.c=
-om
->     [axboe: massage commit message]
->     Signed-off-by: Jens Axboe <axboe@kernel.dk>
->
+> 
+>      loop: use vfs_getattr_nosec for accurate file size
+>      
+>      Use vfs_getattr_nosec() in lo_calculate_size() for getting the file
+>      size, rather than just read the cached inode size via i_size_read().
+>      This provides better results than cached inode data, particularly for
+>      network filesystems where metadata may be stale.
+>      
+>      Signed-off-by: Rajeev Mishra <rajeevm@hpe.com>
+>      Reviewed-by: Yu Kuai <yukuai3@huawei.com>
+>      Link: https://lore.kernel.org/r/20250818184821.115033-3-rajeevm@hpe.com
+>      [axboe: massage commit message]
+>      Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> 
 > ... and indeed if I go to 6.17-rc3, and revert this commit,
 > generic/563 starts passing again.
->
+> 
 > Could you please take a look, and/or revert this change?  Many thanks!
->
->                                         - Ted
->
 
+This is fixed by:
 
---=20
-Best Regards,
-  Yi Zhang
+https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git/commit/?h=block-6.17&id=d14469ed7c00314fe8957b2841bda329e4eaf4ab
+
+Thanks,
+Kuai
+
+> 
+>        	  	      	      	 	- Ted
+> 
+> .
+> 
 
