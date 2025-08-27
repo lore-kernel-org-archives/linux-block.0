@@ -1,119 +1,66 @@
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
+Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A18D35E4F9
-	for <linux-block@vger.kernel.org>; Wed, 27 Aug 2025 14:13:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3303B481B1
+	for <linux-block@vger.kernel.org>; Wed, 27 Aug 2025 14:32:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.9.28.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756304012; cv=none; b=rDa+Xp7wpT+hKGGj/CsMiYIHgL4mpmSKf3PXUAuH4zxL/ibIeRj9R962PPu55tbKy5uPuBLevfqFCgdT96TGf6TPf50xuZyHIw0MADSicb7cZYe6cZ1OgM1ye9UQjbw6q9MPeWWFTNQrrDab9bD9ov2UD10StERiE25prUPhmGc=
+	t=1756305129; cv=none; b=POlqnsFXG4N/MF7XVUksd8zbW75LEjVANKSwgzva78MmsH8c90SX41a8ZqOiOzL5/bTSsaL1JzrvDpkEoWk2rw8bu57ZbB9MT2b20lmCXtjkyJRBBG53miYmOBagGcX+SNz7QKThrKCkGa3dpQ8nDkO/W95N0PV1xk1zR687W1w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756304012; c=relaxed/simple;
-	bh=hNWh89z7bVho/nucDYtzmjo0CgvLk3JXnCFimcvoW48=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BUTpThPdoorvIIOryGcaFJSA5Uhngu89RHYcCCkky8BWKl5p1ccPR+Wjm5+Y2f+4pML3JyE6R0M/73JgxwUj4Con82xjU6p0DkYmev9kOhUlCQAKcqqawtQaqWZcZkS0C8cAFu9ZinkqLre2udROCYRNiDO889KKlgv0cLQfRbQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=bC/BpT8Y; arc=none smtp.client-ip=67.231.145.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+	s=arc-20240116; t=1756305129; c=relaxed/simple;
+	bh=PjW5u2C4oIHFPGUUbul58it83dJlsOPZCpSMDE4NdEs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=k9ADLobxKV/qTS1MHMWoPscFU4/ZqD0vHqKrvcVF1ZcVrkZ7vaDPFDu7gullayTXJRmpL5i3mQh+nm6b2xaJvX4bt8w9SqNmtPOhN7MMMr7blPtboK5r/SOmMb1yzQzaGeoja1CglvEtxA5UgP0ClFUrdwleVE8WHzLdgKSpwng=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu; spf=pass smtp.mailfrom=mit.edu; dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b=M7a2nhQo; arc=none smtp.client-ip=18.9.28.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mit.edu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="bC/BpT8Y"
-Received: from pps.filterd (m0044012.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 57R4s9Ef763685
-	for <linux-block@vger.kernel.org>; Wed, 27 Aug 2025 07:13:27 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=s2048-2025-q2;
-	 bh=TvAw+PhgN5KIMKT9wim4ffyA9Ijp09dFqqsdzWDRAtM=; b=bC/BpT8YEIRS
-	0ZSTq8zY4hHjzHh2iyu7vjxwsZ98WtSFlCrfK3r7G8Gk6Se2r94lagSoSxON+DvL
-	mAlPkMVgqdpHr33b1rww/IJEHR/vxXXZlA72oMPxmoLAtm5bRExzKdZhst/3SBJ8
-	88gOBN0E72i+MejIfwKfPGLNsDRwTwMIjdqZoxURm+a+lur/Wg4NzwESM5OhTBdL
-	pjRB80fwTyK2oAzxHCebNiqosYcavSy3Zm9LbbN+Dl8G2n1YD2BZl8fQlHqm57Co
-	Q9py5rM9h9wzlDkTR2eFN/7dUfipFwyZT0Qvm/LI0Sm4N28FBBmfJI7pCwCMQF7t
-	M2+pXC8r1w==
-Received: from mail.thefacebook.com ([163.114.134.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 48sud32jy8-13
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Wed, 27 Aug 2025 07:13:27 -0700 (PDT)
-Received: from twshared71707.17.frc2.facebook.com (2620:10d:c085:208::7cb7) by
- mail.thefacebook.com (2620:10d:c08b:78::2ac9) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.17; Wed, 27 Aug 2025 14:13:15 +0000
-Received: by devbig197.nha3.facebook.com (Postfix, from userid 544533)
-	id EB42010CF629; Wed, 27 Aug 2025 07:13:03 -0700 (PDT)
-From: Keith Busch <kbusch@meta.com>
-To: <linux-block@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>
-CC: <linux-xfs@vger.kernel.org>, <linux-ext4@vger.kernel.org>, <hch@lst.de>,
-        <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
-        Hannes Reinecke
-	<hare@suse.de>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>
-Subject: [PATCHv4 7/8] blk-integrity: use simpler alignment check
-Date: Wed, 27 Aug 2025 07:12:57 -0700
-Message-ID: <20250827141258.63501-8-kbusch@meta.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20250827141258.63501-1-kbusch@meta.com>
-References: <20250827141258.63501-1-kbusch@meta.com>
+	dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b="M7a2nhQo"
+Received: from trampoline.thunk.org (pool-173-48-119-253.bstnma.fios.verizon.net [173.48.119.253])
+	(authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+	by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 57REVa5n031440
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 27 Aug 2025 10:31:38 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
+	t=1756305100; bh=leSVJr87AJLkI6gqe4SbWcGd4Z7szfWPhzpgcxxKdYA=;
+	h=Date:From:Subject:Message-ID:MIME-Version:Content-Type;
+	b=M7a2nhQoTM73TSeCuyWOH01HifuSPIANS641VQRcaJEXq8avfPcK3E61AtR1QSWD5
+	 WovfGqa/IweTG8Bk96sVIMyRXgAfr+VOndPuYVAk9IjXrRgOrOBJWHzYuAcURU5uAj
+	 hjESpjq43WVZKgaIhCQRaN6LFFgHTmram8UUnSEi01a6IvZGjB55xlf0WtDYPwymSj
+	 cfuWyRfpfhuNo6Gm7Se8Wq6NrDFtGlKESaWZur0Oy5aGkSS7eGKetUqDxGadAKdH7z
+	 fGzJXxhZd+9Q1h8DDOVQ7Qgq6c3GopVbmDM4od/dhF2AU9HUJarpPU18zbNH7SB+JO
+	 qT4djdLwtCwiA==
+Received: by trampoline.thunk.org (Postfix, from userid 15806)
+	id C1F112E00D6; Wed, 27 Aug 2025 10:31:36 -0400 (EDT)
+Date: Wed, 27 Aug 2025 10:31:36 -0400
+From: "Theodore Ts'o" <tytso@mit.edu>
+To: Yu Kuai <yukuai1@huaweicloud.com>
+Cc: Rajeev Mishra <rajeevm@hpe.com>, linux-block@vger.kernel.org,
+        Linux Filesystem Development List <linux-fsdevel@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>, "yukuai (C)" <yukuai3@huawei.com>
+Subject: Re: [REGRESSION] loop: use vfs_getattr_nosec for accurate file size
+Message-ID: <20250827143136.GA2462272@mit.edu>
+References: <20250827025939.GA2209224@mit.edu>
+ <274c312c-d0e5-10af-0ef0-bab92e71eb64@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-FB-Internal: Safe
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: J8g1CtUS_Uu-maiiwHm1ZsyQPpsIJr_a
-X-Authority-Analysis: v=2.4 cv=PqeTbxM3 c=1 sm=1 tr=0 ts=68af1287 cx=c_pps
- a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17
- a=2OwXVqhp2XgA:10 a=VwQbUJbxAAAA:8 a=yPCof4ZbAAAA:8 a=yetF5jY7WHH6jeiS1L0A:9
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODI3MDEyMSBTYWx0ZWRfX3VAGrR9n97iO
- HBQANq0FtWDfTOX79MWPT7WW/eEazkQNhvh2+gH4qq60Dc7fCPi7JUtpZtD7f8akUYTEUvDNuXA
- ei8490qP+CdtEbFTFlQ8kUUzkk+IH+KrNrobbrk640Mn0H/5fA8KuBe4M4E2ijr59iDGX1cozjV
- Mvwxxw0lBlZLxr1yCrtIw6PUo6pZLVJVl5Qj/37EtjDr1wJ4dLlcvAgXzn36ueVCJr7e++lICZW
- Bh0rHdMdZXDBfUWjX7ZhJ0cLrL9yaGSnJrzvkY+qj7WgQE0aEz8Uk14etDBKkwM3EaYbqtZxgFT
- EDkl/dt8ig+iGlTFPYObZt40cTTehMQED6zx/Bgb9ZbhCnf5deB7w3YSkSGUrY=
-X-Proofpoint-GUID: J8g1CtUS_Uu-maiiwHm1ZsyQPpsIJr_a
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-08-27_03,2025-08-26_01,2025-03-28_01
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <274c312c-d0e5-10af-0ef0-bab92e71eb64@huaweicloud.com>
 
-From: Keith Busch <kbusch@kernel.org>
+On Wed, Aug 27, 2025 at 11:13:13AM +0800, Yu Kuai wrote:
+> This is fixed by:
+> 
+> https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git/commit/?h=block-6.17&id=d14469ed7c00314fe8957b2841bda329e4eaf4ab
 
-We're checking length and addresses against the same alignment value, so
-use the more simple iterator check.
+Great, thanks!  Looking forward to this landing in linux-next (since
+it showed up in my automated linux-next testing laght night).
 
-Signed-off-by: Keith Busch <kbusch@kernel.org>
-Reviewed-by: Hannes Reinecke <hare@suse.de>
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
----
- block/bio-integrity.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Thanks,
 
-diff --git a/block/bio-integrity.c b/block/bio-integrity.c
-index 6b077ca937f6b..6d069a49b4aad 100644
---- a/block/bio-integrity.c
-+++ b/block/bio-integrity.c
-@@ -262,7 +262,6 @@ static unsigned int bvec_from_pages(struct bio_vec *b=
-vec, struct page **pages,
- int bio_integrity_map_user(struct bio *bio, struct iov_iter *iter)
- {
- 	struct request_queue *q =3D bdev_get_queue(bio->bi_bdev);
--	unsigned int align =3D blk_lim_dma_alignment_and_pad(&q->limits);
- 	struct page *stack_pages[UIO_FASTIOV], **pages =3D stack_pages;
- 	struct bio_vec stack_vec[UIO_FASTIOV], *bvec =3D stack_vec;
- 	size_t offset, bytes =3D iter->count;
-@@ -285,7 +284,8 @@ int bio_integrity_map_user(struct bio *bio, struct io=
-v_iter *iter)
- 		pages =3D NULL;
- 	}
-=20
--	copy =3D !iov_iter_is_aligned(iter, align, align);
-+	copy =3D iov_iter_alignment(iter) &
-+			blk_lim_dma_alignment_and_pad(&q->limits);
- 	ret =3D iov_iter_extract_pages(iter, &pages, bytes, nr_vecs, 0, &offset=
-);
- 	if (unlikely(ret < 0))
- 		goto free_bvec;
---=20
-2.47.3
-
+						- Ted
