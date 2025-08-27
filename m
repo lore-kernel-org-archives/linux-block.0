@@ -1,44 +1,59 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E935335BBB;
-	Wed, 27 Aug 2025 16:09:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FFDC278143
+	for <linux-block@vger.kernel.org>; Wed, 27 Aug 2025 17:48:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756310971; cv=none; b=Yylw7d6Ma1Bs7ijqOH5Wxw59KYDo35RSOW0+tfrPrs0FRnDawmcENhRQT8wx1bQE4LHxiKstW5wiVGtJ8rVXrRTvrmTUJp0amMve3ZyF3LLBz2JtPjXCMIhf6VZthJSAxYCl5b1SHM5fg1ZvrXlrwglsGe797WO3LsRMQw7CJ60=
+	t=1756316935; cv=none; b=rO7CU78sPWLIHvKVDE4IUhg2wVuhl+LHJrV7V8b43Hg8sETR/X5xSQZw0zcWql27cw9TiZIY4ogBi+1QHpDH5Ifv4bAq0pxhMxMsf8ddkSqFO5+s+0gtPXPxvT8ujybVW9wKQ9d7tUT3s/oeWDUnKxUVF8KRqg1V4tZr9E0wTX8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756310971; c=relaxed/simple;
-	bh=3nnatlP1fBqIs79HM6dGWG8y2mvb98rMjnvORo80/yw=;
+	s=arc-20240116; t=1756316935; c=relaxed/simple;
+	bh=jUFz9jruHYXkyKMr2r0i+WWI9/MTQ7vAdaDz5a2Ztwo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iAs5GSR9mAUDs7hYZbEJYauwrpfzu1Cp36e3Yr2i5OCJ9UaFvUU6lhWEUPCRRIjnpJFmDJ+QQy3cRY7QHZbiSxNnvbk3EF+0gWqsr+iqqYNoEDC8l97/01ruJ2KqLpyJUCig7DDWG52KupJWoBhzZlyCBEEa22YIZNmbrMn81tU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n5lLe0Ex; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=YG1NXrsOWBXwQa5R7I5r9P94KHCNUvuos5h1xTO/Nh6wllh0Bs1dPkUxqkuBfWkCH+sxtwS482Z4Vf28a7bhWEQ2Prw+8ncXoIbGCg/EatbK+yE8CgGsMtyRkW+sSaveiHZRxQcok8F5ioKGzjabYi5c+OKE2RZBiZL/32aIBCE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=O4l3/ZHi; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n5lLe0Ex"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C9A3C4CEEB;
-	Wed, 27 Aug 2025 16:09:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756310970;
-	bh=3nnatlP1fBqIs79HM6dGWG8y2mvb98rMjnvORo80/yw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=n5lLe0ExCpNJcx9HD9+tHMs62ZPzPN3LolGxkVKXQbJnWWS+XfzG94xy9mOVxPclM
-	 HQqAMveFN9XExZ9p3AIDq5sozf2Mevy/+VgZCxtSXnT8dyZkUPdQeh3rcfaFPDDHT1
-	 7ibnZyK5damlUHv89OJckYLCakpe9guaEu4LhezAyhUbzAoMKc/LiBX9tKs8FjJvAz
-	 9kuKy4W92TU3RwtW2EdAwMyeGaDaAa3/EC+nzWHggFCfTPlV60caTOuJcKLUE0m2u1
-	 5U1U/9H6NeSG14yeaNvQF81XaoiqOODVhsJLWqSQ6inXoG2eFEw4vSQpgB82wSex/8
-	 tGDmSFT0+OMVw==
-Date: Wed, 27 Aug 2025 12:09:29 -0400
-From: Mike Snitzer <snitzer@kernel.org>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O4l3/ZHi"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1756316933;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CY1ybBNELINlBW46BpY0I29Oa4pllqZv5dG3GvoWIX0=;
+	b=O4l3/ZHiCAyimDc4gMBMUGoiel4GtohOEoOKKHZUQVIGhsUfDLuQ0gH8ZpT3b8a/UseNdY
+	pCZtLCG/ztxEiW3TMLzpMADncD7kR518qzsrWhRq8S7WHQ7H+txxxIJx0NRo38xhxIIF49
+	rVFHs2J5xPKIlWDZ9EGp2e2MIfyzvLk=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-339-jQMARTUAN46urj9FdaLopg-1; Wed,
+ 27 Aug 2025 13:48:48 -0400
+X-MC-Unique: jQMARTUAN46urj9FdaLopg-1
+X-Mimecast-MFC-AGG-ID: jQMARTUAN46urj9FdaLopg_1756316925
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 634BD19560B5;
+	Wed, 27 Aug 2025 17:48:44 +0000 (UTC)
+Received: from bfoster (unknown [10.22.80.41])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A795C30001A6;
+	Wed, 27 Aug 2025 17:48:40 +0000 (UTC)
+Date: Wed, 27 Aug 2025 13:52:37 -0400
+From: Brian Foster <bfoster@redhat.com>
 To: Jan Kara <jack@suse.cz>
 Cc: Ritesh Harjani <ritesh.list@gmail.com>, Keith Busch <kbusch@kernel.org>,
 	Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
 	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-ext4@vger.kernel.org, axboe@kernel.dk, dw@davidwei.uk,
-	brauner@kernel.org, hch@lst.de, martin.petersen@oracle.com,
-	djwong@kernel.org, linux-xfs@vger.kernel.org,
-	viro@zeniv.linux.org.uk, Jan Kara <jack@suse.com>,
-	Brian Foster <bfoster@redhat.com>
+	linux-ext4@vger.kernel.org, snitzer@kernel.org, axboe@kernel.dk,
+	dw@davidwei.uk, brauner@kernel.org, hch@lst.de,
+	martin.petersen@oracle.com, djwong@kernel.org,
+	linux-xfs@vger.kernel.org, viro@zeniv.linux.org.uk,
+	Jan Kara <jack@suse.com>
 Subject: Re: [PATCHv3 0/8] direct-io: even more flexible io vectors
-Message-ID: <aK8tuTnuHbD8VOyo@kernel.org>
+Message-ID: <aK9F5euA3kQdGaMi@bfoster>
 References: <20250819164922.640964-1-kbusch@meta.com>
  <87a53ra3mb.fsf@gmail.com>
  <g35u5ugmyldqao7evqfeb3hfcbn3xddvpssawttqzljpigy7u4@k3hehh3grecq>
@@ -54,8 +69,7 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <ua7ib34kk5s6yfthqkgy3m2pnbk33a34g7prezmwl7hfwv6lwq@fljhjaogd6gq>
-
-Hi Jan,
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
 On Wed, Aug 27, 2025 at 05:20:53PM +0200, Jan Kara wrote:
 > On Tue 26-08-25 10:29:58, Ritesh Harjani wrote:
@@ -121,6 +135,30 @@ On Wed, Aug 27, 2025 at 05:20:53PM +0200, Jan Kara wrote:
 > (which is ENOTBLK in ext4 case), it gets propagated to userspace instead of
 > the error returned by iomap_dio_bio_iter().
 > 
+
+Ah, so IIUC you're referring to the change in iomap_iter() where the
+iomap_end() error code was returned "if (ret < 0 && !iter->processed)",
+where iter->processed held a potential error code from the iterator.
+That was changed to !advanced, which filters out the processed < 0 case
+and allows the error to return from iomap_end here rather than from
+iter->processed a few lines down.
+
+There were further changes to eliminate the advance from iomap_iter()
+case (and rename processed -> status), so I suppose we could consider
+changing that to something like:
+
+	if (ret < 0 && !advanced && !iter->status)
+		return ret;
+
+... which I think would restore original error behavior. But I agree
+it's not totally clear which is preferable. Certainly the change in
+behavior was not intentional so thanks for the analysis. I'd have to
+stare at the code and think (and test) some more to form an opinion on
+whether it's worth changing. Meanwhile it looks like you have a
+reasonable enough workaround..
+
+Brian
+
 > Now both the old and new behavior make some sense so I won't argue that the
 > new iomap_iter() behavior is wrong. But I think we should change ext4 back
 > to the old behavior of failing unaligned dio writes instead of them falling
@@ -151,36 +189,9 @@ On Wed, Aug 27, 2025 at 05:20:53PM +0200, Jan Kara wrote:
 > unnecessary these days. It is enough to return ENOTBLK from
 > ext4_iomap_begin() when we don't support DIO write for that particular
 > file offset (due to hole).
-
-Any particular reason for ext4 still returning -ENOTBLK for unaligned
-DIO?
-
-In my experience XFS returns -EINVAL when failing unaligned DIO (but
-maybe there are edge cases where that isn't always the case?)
-
-Would be nice to have consistency across filesystems for what is
-returned when failing unaligned DIO.
-
-The iomap code returns -ENOTBLK as "the magic error code to fall back
-to buffered I/O".  But that seems only for page cache invalidation
-failure, _not_ for unaligned DIO.
-
-(Anyway, __iomap_dio_rw's WRITE handling can return -ENOTBLK if page
-cache invalidation fails during DIO write. So it seems higher-level
-code, like I've added to NFS/NFSD to check for unaligned DIO failure,
-should check for both -EINVAL and -ENOTBLK).
-
-Thanks,
-Mike
-
-ps. ENOTBLK is actually much less easily confused with other random
-uses of EINVAL (EINVAL use is generally way too overloaded, rendering
-it a pretty unhelpful error).  But switching XFS to use ENOTBLK
-instead of EINVAL seems like disruptive interface breakage (I suppose
-same could be said for ext4 if it were to now return EINVAL for
-unaligned DIO, but ext4 flip-flopping on how it handles unaligned DIO
-prompted me to ask these questions now)
-
+> 
+> Fixes: bc264fea0f6f ("iomap: support incremental iomap_iter advances")
+> Signed-off-by: Jan Kara <jack@suse.cz>
 > ---
 >  fs/ext4/file.c  |  2 --
 >  fs/ext4/inode.c | 35 -----------------------------------
