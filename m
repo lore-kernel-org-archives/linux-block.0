@@ -1,115 +1,229 @@
-Received: from 004.mia.mailroute.net (004.mia.mailroute.net [199.89.3.7])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B33B630CD85;
-	Wed, 27 Aug 2025 21:31:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8020F30DEB4
+	for <linux-block@vger.kernel.org>; Wed, 27 Aug 2025 21:52:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756330304; cv=none; b=JwkkLs06Mgh2jIh+hYEMzSn1DLJaczv99Az/mVgxctC7KWlsHp7vaqd5hhHxCByf2ClfCFFZJKxQQDIROqiwSu40HUreVfuluDijrwlBxd1JkkXTqaBFbR8z8WmsMWt+ZASCUrDnyYZ7BonaH1+ylFyRBEJAwWtBO/LLtkfiq+A=
+	t=1756331528; cv=none; b=aVIDI1QgA5S9PxJEKkqFIQ6CWbJmBKVK1LSqYhR6RM91ADERXo+aRYrzVuy0ecY0EcWkIWa8mAhkLTTQKfkcSnrbrqWX6pMBqAfn7mD1w8i0PGOQyLXax3O0LNaGEQfs3WM1zQI7GTI8bQaWcAwqtLR+GGt30Z6OpyaSSVns8Ys=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756330304; c=relaxed/simple;
-	bh=CrTvDb32WrIN1o4xx/JNbKmh8GPvH8CHHjGStwJFzG8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Hka76U0+17S9ABZj6mt82Aymjvz4LWKjFdpM4Fz0AgT/k3DZDnQvnABg16JfFMKYOgga0Xtix9Q4CgU5fP2414Xq+5mj0VkgV/+7WX9b03iJlZBCrq1VsYSJfOxVHjs47jixgBCmnZGqu7Pp7YSHGnzQbC/+YsTRd7AkBnVDyUo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=BdzseIMx; arc=none smtp.client-ip=199.89.3.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1756331528; c=relaxed/simple;
+	bh=7MhEe9Qx+MhhPsvUqS34YdpaHn9qVoXMVNVWABwNZfA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=a67D3ydQEuw2ETgbTey95NvdApxZkuGTo/C0Y6MBHom1tzT9HXnVL+bF6B9MhlySxkNKvJtHkOax7dF/U0CvW+l1InHXOjStlwwaGXad5yIxMawwMEoNVkPWaxUbUWHRMDWpIzzp5CvPlM5wOvLH+ktLeRxUqI5HXib6BgpYOTo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Mecfj6Uk; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="BdzseIMx"
-Received: from localhost (localhost [127.0.0.1])
-	by 004.mia.mailroute.net (Postfix) with ESMTP id 4cByQk0d7tzm0ySh;
-	Wed, 27 Aug 2025 21:31:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:mime-version:references:in-reply-to
-	:x-mailer:message-id:date:date:subject:subject:from:from
-	:received:received; s=mr01; t=1756330300; x=1758922301; bh=4Fme3
-	YHNhvvQ1oM+hE/DT50vE5BpmOdvIjT1vX/Uhq0=; b=BdzseIMx6DHzb9SydobEM
-	1CjzDdb2Yru/SnbIaRXFZA8ZrK3TC9j8/YGqnYnr0BOIG9ouOKTEOnWOwlAJ6wEa
-	zK1LlyO9HEmzaPx6AnVktAPjwOoI9PoMjFoZ0QpxUt4ZV2yCIcrVxxCZin2Ph18h
-	8x/FcRTGwuvppBoO69SNfWI/bw12Kur8TzMLKwwutKFysqCRWhl4jEryHzPGirWR
-	xcm3x9TAfaSTAYebn76nm9nJwnJ4oyA0YsR29V7e/B9gTxiX0oKBjkWclGt49lUf
-	00ZHGXEZhBgi2b1SuvhaN2stHHXNEKL/0p7C8z5V+36JXjzy297BFTS8fZiJSmp/
-	A==
-X-Virus-Scanned: by MailRoute
-Received: from 004.mia.mailroute.net ([127.0.0.1])
- by localhost (004.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id s1Nr0naykepw; Wed, 27 Aug 2025 21:31:40 +0000 (UTC)
-Received: from bvanassche.mtv.corp.google.com (unknown [104.135.204.82])
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Mecfj6Uk"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1756331523;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0MV09FhzMIF8Ui9xrCM0Bui7E6jEybYpp51C5kSRmrI=;
+	b=Mecfj6UkQ2SE9pzNMlJlPKOx87TzCRDqPuWkygBFbIS0P7JZQccTXsTlsgqwowcI7K+xuI
+	GyTXdFTKc/i8RBJ/3LNWmwHO9PZSn8qSYPcok/zKmGKM5RqZQKgFdix+qHrUODjnMd2BVO
+	/RX1iFVkdayaKVLrvwVAj+x0DM2k6s8=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-220-KkFmcprhOI--aTUidTr60g-1; Wed,
+ 27 Aug 2025 17:52:00 -0400
+X-MC-Unique: KkFmcprhOI--aTUidTr60g-1
+X-Mimecast-MFC-AGG-ID: KkFmcprhOI--aTUidTr60g_1756331517
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 004.mia.mailroute.net (Postfix) with ESMTPSA id 4cByQY5fGtzm174B;
-	Wed, 27 Aug 2025 21:31:33 +0000 (UTC)
-From: Bart Van Assche <bvanassche@acm.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Avri Altman <avri.altman@wdc.com>,
-	Can Guo <quic_cang@quicinc.com>,
-	"Bao D. Nguyen" <quic_nguyenb@quicinc.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>
-Subject: [PATCH v24 18/18] ufs: core: Inform the block layer about write ordering
-Date: Wed, 27 Aug 2025 14:29:37 -0700
-Message-ID: <20250827212937.2759348-19-bvanassche@acm.org>
-X-Mailer: git-send-email 2.51.0.318.gd7df087d1a-goog
-In-Reply-To: <20250827212937.2759348-1-bvanassche@acm.org>
-References: <20250827212937.2759348-1-bvanassche@acm.org>
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C289A195608E;
+	Wed, 27 Aug 2025 21:51:55 +0000 (UTC)
+Received: from [10.22.88.109] (unknown [10.22.88.109])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 552111955F24;
+	Wed, 27 Aug 2025 21:51:49 +0000 (UTC)
+Message-ID: <ccb441d0-7603-4e96-b59a-d69ee6a95e6d@redhat.com>
+Date: Wed, 27 Aug 2025 17:51:48 -0400
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3] nvme-cli: nvmf-autoconnect: udev-rule: add a file for
+ new arrays
+To: Xose Vazquez Perez <xose.vazquez@gmail.com>
+Cc: Wayne Berthiaume <Wayne.Berthiaume@dell.com>,
+ Vasuki Manikarnike <vasuki.manikarnike@hpe.com>,
+ Matthias Rudolph <Matthias.Rudolph@hitachivantara.com>,
+ Martin George <marting@netapp.com>,
+ NetApp RDAC team <ng-eseries-upstream-maintainers@netapp.com>,
+ Zou Ming <zouming.zouming@huawei.com>, Li Xiaokeng <lixiaokeng@huawei.com>,
+ Randy Jennings <randyj@purestorage.com>, Jyoti Rani <jrani@purestorage.com>,
+ Brian Bunker <brian@purestorage.com>, Uday Shankar
+ <ushankar@purestorage.com>, Chaitanya Kulkarni <kch@nvidia.com>,
+ Sagi Grimberg <sagi@grimberg.me>, Keith Busch <kbusch@kernel.org>,
+ Christoph Hellwig <hch@lst.de>, Marco Patalano <mpatalan@redhat.com>,
+ "Ewan D. Milne" <emilne@redhat.com>, Daniel Wagner <dwagner@suse.de>,
+ Daniel Wagner <wagi@monom.org>, Hannes Reinecke <hare@suse.de>,
+ Martin Wilck <mwilck@suse.com>, Benjamin Marzinski <bmarzins@redhat.com>,
+ Christophe Varoqui <christophe.varoqui@opensvc.com>,
+ BLOCK-ML <linux-block@vger.kernel.org>,
+ NVME-ML <linux-nvme@lists.infradead.org>,
+ SCSI-ML <linux-scsi@vger.kernel.org>, DM_DEVEL-ML <dm-devel@lists.linux.dev>
+References: <20250820213254.220715-1-xose.vazquez@gmail.com>
+Content-Language: en-US
+From: John Meneghini <jmeneghi@redhat.com>
+Organization: RHEL Core Storge Team
+In-Reply-To: <20250820213254.220715-1-xose.vazquez@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-From the UFSHCI 4.0 specification, about the MCQ mode:
-"Command Submission
-1. Host SW writes an Entry to SQ
-2. Host SW updates SQ doorbell tail pointer
+I'm sorry but Red Hat will not approve any upstream change like this that modifies the policy for OTHER VENDORS stuff.
 
-Command Processing
-3. After fetching the Entry, Host Controller updates SQ doorbell head
-   pointer
-4. Host controller sends COMMAND UPIU to UFS device"
+You can't simply change the IO policy for all of these arrays.  Many vendors have no autoconnect/udev-rules because they don't want one.  They want to use the default ctrl_loss_tmo and the default iopolicy (numa)... you can't just change this for them.
 
-In other words, in MCQ mode, UFS controllers are required to forward
-commands to the UFS device in the order these commands have been
-received from the host.
+If you want people to migrate their udev rules out of separate files and into a single autoconnect file like this then you'll have to get them to agree.
 
-This patch improves performance as follows on a test setup with UFSHCI
-4.0 controller:
-- When not using an I/O scheduler: 2.3x more IOPS for small writes.
-- With the mq-deadline scheduler: 2.0x more IOPS for small writes.
+When I look upstream I see exactly 3 vendors who have a udev-rule for their iopolicy.
 
-Reviewed-by: Avri Altman <avri.altman@wdc.com>
-Reviewed-by: Can Guo <quic_cang@quicinc.com>
-Cc: Bao D. Nguyen <quic_nguyenb@quicinc.com>
-Cc: Martin K. Petersen <martin.petersen@oracle.com>
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
----
- drivers/ufs/core/ufshcd.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+nvme-cli(master) > ls -1 nvmf-autoconnect/udev-rules/71*
+nvmf-autoconnect/udev-rules/71-nvmf-hpe.rules.in
+nvmf-autoconnect/udev-rules/71-nvmf-netapp.rules.in
+nvmf-autoconnect/udev-rules/71-nvmf-vastdata.rules.in
 
-diff --git a/drivers/ufs/core/ufshcd.c b/drivers/ufs/core/ufshcd.c
-index 9a43102b2b21..c980857db9e2 100644
---- a/drivers/ufs/core/ufshcd.c
-+++ b/drivers/ufs/core/ufshcd.c
-@@ -5324,6 +5324,13 @@ static int ufshcd_sdev_configure(struct scsi_devic=
-e *sdev,
- 	struct ufs_hba *hba =3D shost_priv(sdev->host);
- 	struct request_queue *q =3D sdev->request_queue;
-=20
-+	/*
-+	 * The write order is preserved per MCQ. Without MCQ, auto-hibernation
-+	 * may cause write reordering that results in unaligned write errors.
-+	 */
-+	if (hba->mcq_enabled)
-+		lim->features |=3D BLK_FEAT_ORDERED_HWQ;
-+
- 	lim->dma_pad_mask =3D PRDT_DATA_BYTE_COUNT_PAD - 1;
-=20
- 	/*
+I suggest that you get these three vendors to agree to move their policy into a single 71-nvmf-mulitpath-policy.rules.in file, and then leave everyone else's stuff alone.
+
+In the future, vendors who want to add a multipath-policy rule can then use the new file instead of adding their own.
+
+/John
+
+On 8/20/25 5:32 PM, Xose Vazquez Perez wrote:
+> One file per vendor, or device, is a bit excessive for two-four rules.
+> 
+> 
+> If possible, select round-robin (>=5.1), or queue-depth (>=6.11).
+> round-robin is a basic selector, and only works well under ideal conditions.
+> 
+> A nvme benchmark, round-robin vs queue-depth, shows how bad it is:
+> https://marc.info/?l=linux-kernel&m=171931850925572
+> https://marc.info/?l=linux-kernel&m=171931852025575
+> https://github.com/johnmeneghini/iopolicy/?tab=readme-ov-file#sample-data
+> https://people.redhat.com/jmeneghi/ALPSS_2023/NVMe_QD_Multipathing.pdf
+> 
+> 
+> [ctrl_loss_tmo default value is 600 (ten minutes)]
+
+You can't remove this because vendors have ctrl_loss_tmo set to -1 on purpose.
+
+> v3:
+>   - add Fujitsu/ETERNUS AB/HB
+>   - add Hitachi/VSP
+> 
+> v2:
+>   - fix ctrl_loss_tmo commnent
+>   - add Infinidat/InfiniBox
+> 
+> 
+> Cc: Wayne Berthiaume <Wayne.Berthiaume@dell.com>
+> Cc: Vasuki Manikarnike <vasuki.manikarnike@hpe.com>
+> Cc: Matthias Rudolph <Matthias.Rudolph@hitachivantara.com>
+> Cc: Martin George <marting@netapp.com>
+> Cc: NetApp RDAC team <ng-eseries-upstream-maintainers@netapp.com>
+> Cc: Zou Ming <zouming.zouming@huawei.com>
+> Cc: Li Xiaokeng <lixiaokeng@huawei.com>
+> Cc: Randy Jennings <randyj@purestorage.com>
+> Cc: Jyoti Rani <jrani@purestorage.com>
+> Cc: Brian Bunker <brian@purestorage.com>
+> Cc: Uday Shankar <ushankar@purestorage.com>
+> Cc: Chaitanya Kulkarni <kch@nvidia.com>
+> Cc: Sagi Grimberg <sagi@grimberg.me>
+> Cc: Keith Busch <kbusch@kernel.org>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Marco Patalano <mpatalan@redhat.com>
+> Cc: Ewan D. Milne <emilne@redhat.com>
+> Cc: John Meneghini <jmeneghi@redhat.com>
+> Cc: Daniel Wagner <dwagner@suse.de>
+> Cc: Daniel Wagner <wagi@monom.org>
+> Cc: Hannes Reinecke <hare@suse.de>
+> Cc: Martin Wilck <mwilck@suse.com>
+> Cc: Benjamin Marzinski <bmarzins@redhat.com>
+> Cc: Christophe Varoqui <christophe.varoqui@opensvc.com>
+> Cc: BLOCK-ML <linux-block@vger.kernel.org>
+> Cc: NVME-ML <linux-nvme@lists.infradead.org>
+> Cc: SCSI-ML <linux-scsi@vger.kernel.org>
+> Cc: DM_DEVEL-ML <dm-devel@lists.linux.dev>
+> Signed-off-by: Xose Vazquez Perez <xose.vazquez@gmail.com>
+> ---
+> 
+> This will be the last iteration of this patch, there are no more NVMe storage
+> array manufacturers.
+> 
+> 
+> Maybe these rules should be merged into this new file. ???
+> 71-nvmf-hpe.rules.in
+> 71-nvmf-netapp.rules.in
+> 71-nvmf-vastdata.rules.in
+> 
+> ---
+>   .../80-nvmf-storage_arrays.rules.in           | 48 +++++++++++++++++++
+>   1 file changed, 48 insertions(+)
+>   create mode 100644 nvmf-autoconnect/udev-rules/80-nvmf-storage_arrays.rules.in
+> 
+> diff --git a/nvmf-autoconnect/udev-rules/80-nvmf-storage_arrays.rules.in b/nvmf-autoconnect/udev-rules/80-nvmf-storage_arrays.rules.in
+> new file mode 100644
+> index 00000000..ac5df797
+> --- /dev/null
+> +++ b/nvmf-autoconnect/udev-rules/80-nvmf-storage_arrays.rules.in
+> @@ -0,0 +1,48 @@
+> +##### Storage arrays
+> +
+> +#### Set iopolicy for NVMe-oF
+> +### iopolicy: numa (default), round-robin (>=5.1), or queue-depth (>=6.11)
+> +
+> +## Dell EMC
+> +# PowerMax
+> +ACTION=="add|change", SUBSYSTEM=="nvme-subsystem", ATTR{subsystype}=="nvm", ATTR{iopolicy}="round-robin", ATTR{model}=="EMC PowerMax"
+> +ACTION=="add|change", SUBSYSTEM=="nvme-subsystem", ATTR{subsystype}=="nvm", ATTR{iopolicy}="queue-depth", ATTR{model}=="EMC PowerMax"
+> +# PowerStore
+> +ACTION=="add|change", SUBSYSTEM=="nvme-subsystem", ATTR{subsystype}=="nvm", ATTR{iopolicy}="round-robin", ATTR{model}=="dellemc-powerstore"
+> +ACTION=="add|change", SUBSYSTEM=="nvme-subsystem", ATTR{subsystype}=="nvm", ATTR{iopolicy}="queue-depth", ATTR{model}=="dellemc-powerstore"
+> +
+> +## Fujitsu
+> +# ETERNUS AB/HB
+> +ACTION=="add|change", SUBSYSTEM=="nvme-subsystem", ATTR{subsystype}=="nvm", ATTR{iopolicy}="round-robin", ATTR{model}=="Fujitsu ETERNUS AB/HB Series"
+> +ACTION=="add|change", SUBSYSTEM=="nvme-subsystem", ATTR{subsystype}=="nvm", ATTR{iopolicy}="queue-depth", ATTR{model}=="Fujitsu ETERNUS AB/HB Series"
+> +
+> +## Hitachi Vantara
+> +# VSP
+> +ACTION=="add|change", SUBSYSTEM=="nvme-subsystem", ATTR{subsystype}=="nvm", ATTR{iopolicy}="round-robin", ATTR{model}=="HITACHI SVOS-RF-System"
+> +ACTION=="add|change", SUBSYSTEM=="nvme-subsystem", ATTR{subsystype}=="nvm", ATTR{iopolicy}="queue-depth", ATTR{model}=="HITACHI SVOS-RF-System"
+> +
+> +## Huawei
+> +# OceanStor
+> +ACTION=="add|change", SUBSYSTEM=="nvme-subsystem", ATTR{subsystype}=="nvm", ATTR{iopolicy}="round-robin", ATTR{model}=="Huawei-XSG1"
+> +ACTION=="add|change", SUBSYSTEM=="nvme-subsystem", ATTR{subsystype}=="nvm", ATTR{iopolicy}="queue-depth", ATTR{model}=="Huawei-XSG1"
+> +
+> +## IBM
+> +# FlashSystem (RamSan)
+> +ACTION=="add|change", SUBSYSTEM=="nvme-subsystem", ATTR{subsystype}=="nvm", ATTR{iopolicy}="round-robin", ATTR{model}=="FlashSystem"
+> +ACTION=="add|change", SUBSYSTEM=="nvme-subsystem", ATTR{subsystype}=="nvm", ATTR{iopolicy}="queue-depth", ATTR{model}=="FlashSystem"
+> +# FlashSystem (Storwize/SVC)
+> +ACTION=="add|change", SUBSYSTEM=="nvme-subsystem", ATTR{subsystype}=="nvm", ATTR{iopolicy}="round-robin", ATTR{model}=="IBM*214"
+> +ACTION=="add|change", SUBSYSTEM=="nvme-subsystem", ATTR{subsystype}=="nvm", ATTR{iopolicy}="queue-depth", ATTR{model}=="IBM*214"
+> +
+> +## Infinidat
+> +# InfiniBox
+> +ACTION=="add|change", SUBSYSTEM=="nvme-subsystem", ATTR{subsystype}=="nvm", ATTR{iopolicy}="round-robin", ATTR{model}=="InfiniBox"
+> +ACTION=="add|change", SUBSYSTEM=="nvme-subsystem", ATTR{subsystype}=="nvm", ATTR{iopolicy}="queue-depth", ATTR{model}=="InfiniBox"
+> +
+> +## Pure
+> +# FlashArray
+> +ACTION=="add|change", SUBSYSTEM=="nvme-subsystem", ATTR{subsystype}=="nvm", ATTR{iopolicy}="round-robin", ATTR{model}=="Pure Storage FlashArray"
+> +ACTION=="add|change", SUBSYSTEM=="nvme-subsystem", ATTR{subsystype}=="nvm", ATTR{iopolicy}="queue-depth", ATTR{model}=="Pure Storage FlashArray"
+> +
+> +
+> +##### EOF
+
