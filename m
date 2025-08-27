@@ -1,41 +1,41 @@
 Received: from sender4-pp-f112.zoho.com (sender4-pp-f112.zoho.com [136.143.188.112])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D099221FF55;
-	Wed, 27 Aug 2025 17:53:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A9E72D1911;
+	Wed, 27 Aug 2025 18:01:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.112
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756317200; cv=pass; b=MseMvGGxFLJGjreyyAXBDZxPEcf4QOy8bNn0L7/Tu00+hHGocnhSMr0Wl4uVRPDkXFQiIunU6O2s9My0Ium6yq5YF6NyKnvFoCBoEWKg1RH5SDWRrK52/6bLSiNrnM8C9Vrw+8byvPLjdekmv1KmfZsqG7kSWjq8ZqzsaR4U9Ww=
+	t=1756317663; cv=pass; b=OHzU0IrddPQLNTW00oKfWrQgyDxr+70w7QFYs9TBt/giwQEb23HtDdtLSzLaUC4MzE4tmLcT3mcVxcX3ibYHH+hN1U17VAEy3GbhaHihOhOhviAzWv7gPgAjHQTaUCFpXSLqIk8Tckqr4BHi+6+E4kcAuWcZHFmO6Kgq8UuRfSI=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756317200; c=relaxed/simple;
-	bh=FiAVdmpAd56Eo8yeLlOaWldznsJoTafgRx9VVj0nzMk=;
+	s=arc-20240116; t=1756317663; c=relaxed/simple;
+	bh=Bmra0yHDrDmMquqwwRPfDojs8A453BKefFckklWkKO4=;
 	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=gAkqpiZTlSeZWqv5rl8qdfeOBqXELtOpge/Mb0Ad/U5jnQ3bzcCBXVH2WaiAethLkL+qmuAmQaumNjnf9UQWjZDxEKn20XVPDkvXRUjpySnM41LW9I2Xx8MpUM50zO+fIDY0K+yLcGXlVZMJP5NkttcjxEiUDfBQGM7Mksf0yvc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=daniel.almeida@collabora.com header.b=LCsWkMSc; arc=pass smtp.client-ip=136.143.188.112
+	 Message-Id:References:To; b=GUkwMNwrgtSiCeKAngLZNOhDsK5st72RW1vjKMwYyL/JkUIcKPGOTrWMvIEYSICCDMN/wAi9/sfKfs/OnrMgXvodCh+PRmUkPK2MMrYmM4rEAy5CagMAtBW+aO7bE3mo1yWBGKHI9DXdzL7B4ZGAqg76fTUhdOiyIt0/tV/iQhU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=daniel.almeida@collabora.com header.b=LwMKN5LC; arc=pass smtp.client-ip=136.143.188.112
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=collabora.com header.i=daniel.almeida@collabora.com header.b="LCsWkMSc"
-ARC-Seal: i=1; a=rsa-sha256; t=1756317177; cv=none; 
+	dkim=pass (1024-bit key) header.d=collabora.com header.i=daniel.almeida@collabora.com header.b="LwMKN5LC"
+ARC-Seal: i=1; a=rsa-sha256; t=1756317637; cv=none; 
 	d=zohomail.com; s=zohoarc; 
-	b=SFVlvlMoLih63YeCfRuKzBIkV+AUuk/QLm3VgUpXJWAmHCRq7QHlFjsEt9J3fmt0Mv7m/nhASCQDyFAjI2Afvxr8VLSEeU9HY5TLJs6mroKycJ2HwdtzLPYBNmcDt9EcymDCmURLbhg4VgJQZGM+aGeE547A3TESt8yd7ytoTUg=
+	b=m610epDxkvi7Nv/Xlhx/MHA00U6vYUrcyly/TJ4WjlbWQR3qdwW0DlD3CVEVE8rxCxJhQAXv8Om38ynUlcKGG8I4OcVXsl/+G0egJURgnl3n3mo1aPJNbPfYtnc8clyBA0GMcHP2TDGBw21WzD8IuswkEGe9ODUzFWGija/7JRM=
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1756317177; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=AnFhkcCNOfTOWgQFBiJ5K7cFdzpqzmzqvFP4oFM1Njs=; 
-	b=EIdlqEWLwRWlfX6AsZ7mJCs64+vGlYGTRREf8MlOZlDna7kuXMOi19FdBNRe9xbD0fBMKWki7bwE0vExh9d5BDeD07iHnA8F6HcKGc82E5qUtFPjdQyt4c8c4pknyTyhgslMxnZZDr14Zh4UqBk5aOtzT3kub5AgMy6zoczYA7A=
+	t=1756317637; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=5lsJ/CKHYSw2E1OBWMxzWS11bJuOF1wD7BSg69A2WeU=; 
+	b=SvAUrouxUh9BUMKVGK6kTQHkF5dSH6EkJqsVNwpY/tIj50oGiPv+oygdZBR1xkv4FShcu5d/p8ULT75/JM4RANvfLz51SA9RcdbgexEzAqzaOZWVQzrW5E0dkyoMu4vFczRai1hAz1Rw9XXpSPDKX7Upba78mRVECKNm4J/wRl4=
 ARC-Authentication-Results: i=1; mx.zohomail.com;
 	dkim=pass  header.i=collabora.com;
 	spf=pass  smtp.mailfrom=daniel.almeida@collabora.com;
 	dmarc=pass header.from=<daniel.almeida@collabora.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1756317177;
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1756317637;
 	s=zohomail; d=collabora.com; i=daniel.almeida@collabora.com;
 	h=Content-Type:Mime-Version:Subject:Subject:From:From:In-Reply-To:Date:Date:Cc:Cc:Content-Transfer-Encoding:Message-Id:Message-Id:References:To:To:Reply-To;
-	bh=AnFhkcCNOfTOWgQFBiJ5K7cFdzpqzmzqvFP4oFM1Njs=;
-	b=LCsWkMScpLH2aCcZAv0dbhhdFX8o5mDYOByE4xE4QNiN6Irwmw7b4dmM9+mwy2y0
-	XMiVHNlULO7v1oSprH+eQgDwfgi3/54ZrF6FFYHxZBxW6kIZ+X22W4Ol6OVAv2R8n9E
-	MGNfIEJ9ow4PhtsYGLWU4xQf1rMpUdXC4brKvC6M=
-Received: by mx.zohomail.com with SMTPS id 1756317173875832.4987805869289;
-	Wed, 27 Aug 2025 10:52:53 -0700 (PDT)
+	bh=5lsJ/CKHYSw2E1OBWMxzWS11bJuOF1wD7BSg69A2WeU=;
+	b=LwMKN5LCuZHFrxpf4+SvsHF95xWBlAXIAMUGBLr76nbpAIhfaL3UezeSgMuf/74w
+	JW7CSmHaVKqd14TDhwqV0z2MxXt7/xHCeAf1pRL1MsImijY0Y3uiMihbAUiwEavAUPz
+	F9/oqFQSU6UHe+KxjQTJuD+XWM3qqU0Qn2kgbXic=
+Received: by mx.zohomail.com with SMTPS id 1756317634865757.1344901121528;
+	Wed, 27 Aug 2025 11:00:34 -0700 (PDT)
 Content-Type: text/plain;
 	charset=utf-8
 Precedence: bulk
@@ -44,10 +44,10 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.700.81\))
-Subject: Re: [PATCH v6 15/18] rust: block: add `GenDisk` private data support
+Subject: Re: [PATCH v6 17/18] rust: block: add remote completion to `Request`
 From: Daniel Almeida <daniel.almeida@collabora.com>
-In-Reply-To: <20250822-rnull-up-v6-16-v6-15-ec65006e2f07@kernel.org>
-Date: Wed, 27 Aug 2025 14:52:37 -0300
+In-Reply-To: <20250822-rnull-up-v6-16-v6-17-ec65006e2f07@kernel.org>
+Date: Wed, 27 Aug 2025 15:00:19 -0300
 Cc: Boqun Feng <boqun.feng@gmail.com>,
  Miguel Ojeda <ojeda@kernel.org>,
  Alex Gaynor <alex.gaynor@gmail.com>,
@@ -63,335 +63,178 @@ Cc: Boqun Feng <boqun.feng@gmail.com>,
  rust-for-linux@vger.kernel.org,
  linux-kernel@vger.kernel.org
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <F5F77953-D3B2-4A03-BEFF-D937A01A645E@collabora.com>
+Message-Id: <680BB9D0-3720-44EC-A25D-83806F635D8D@collabora.com>
 References: <20250822-rnull-up-v6-16-v6-0-ec65006e2f07@kernel.org>
- <20250822-rnull-up-v6-16-v6-15-ec65006e2f07@kernel.org>
+ <20250822-rnull-up-v6-16-v6-17-ec65006e2f07@kernel.org>
 To: Andreas Hindborg <a.hindborg@kernel.org>
 X-Mailer: Apple Mail (2.3826.700.81)
 X-ZohoMailClient: External
 
-
+Hi Andreas,
 
 > On 22 Aug 2025, at 09:14, Andreas Hindborg <a.hindborg@kernel.org> =
 wrote:
 >=20
-> Allow users of the rust block device driver API to install private =
-data in
-> the `GenDisk` structure.
+> Allow users of rust block device driver API to schedule completion of
+> requests via `blk_mq_complete_request_remote`.
 >=20
 > Reviewed-by: Alice Ryhl <aliceryhl@google.com>
+> Reviewed-by: Daniel Almeida <daniel.almeida@collabora.com>
 > Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
 > ---
-> drivers/block/rnull/rnull.rs       |  8 ++++---
-> rust/kernel/block/mq.rs            |  7 +++---
-> rust/kernel/block/mq/gen_disk.rs   | 32 ++++++++++++++++++++++----
-> rust/kernel/block/mq/operations.rs | 46 =
-++++++++++++++++++++++++++++++--------
-> 4 files changed, 74 insertions(+), 19 deletions(-)
+> drivers/block/rnull/rnull.rs       |  9 +++++++++
+> rust/kernel/block/mq.rs            |  6 ++++++
+> rust/kernel/block/mq/operations.rs | 19 +++++++++++++++----
+> rust/kernel/block/mq/request.rs    | 17 +++++++++++++++++
+> 4 files changed, 47 insertions(+), 4 deletions(-)
 >=20
 > diff --git a/drivers/block/rnull/rnull.rs =
 b/drivers/block/rnull/rnull.rs
-> index 8690ff5f974f..8255236bc550 100644
+> index 8255236bc550..a19c55717c4f 100644
 > --- a/drivers/block/rnull/rnull.rs
 > +++ b/drivers/block/rnull/rnull.rs
-> @@ -61,14 +61,16 @@ fn new(
->             .logical_block_size(block_size)?
->             .physical_block_size(block_size)?
->             .rotational(rotational)
-> -            .build(fmt!("{}", name.to_str()?), tagset)
-> +            .build(fmt!("{}", name.to_str()?), tagset, ())
+> @@ -82,4 +82,13 @@ fn queue_rq(_queue_data: (), rq: =
+ARef<mq::Request<Self>>, _is_last: bool) -> Res
 >     }
-> }
 >=20
-> #[vtable]
-> impl Operations for NullBlkDevice {
-> +    type QueueData =3D ();
+>     fn commit_rqs(_queue_data: ()) {}
 > +
->     #[inline(always)]
-> -    fn queue_rq(rq: ARef<mq::Request<Self>>, _is_last: bool) -> =
-Result {
-> +    fn queue_rq(_queue_data: (), rq: ARef<mq::Request<Self>>, =
-_is_last: bool) -> Result {
->         mq::Request::end_ok(rq)
->             .map_err(|_e| kernel::error::code::EIO)
->             // We take no refcounts on the request, so we expect to be =
-able to
-> @@ -79,5 +81,5 @@ fn queue_rq(rq: ARef<mq::Request<Self>>, _is_last: =
-bool) -> Result {
->         Ok(())
->     }
->=20
-> -    fn commit_rqs() {}
-> +    fn commit_rqs(_queue_data: ()) {}
+> +    fn complete(rq: ARef<mq::Request<Self>>) {
+> +        mq::Request::end_ok(rq)
+> +            .map_err(|_e| kernel::error::code::EIO)
+> +            // We take no refcounts on the request, so we expect to =
+be able to
+> +            // end the request. The request reference must be unique =
+at this
+> +            // point, and so `end_ok` cannot fail.
+> +            .expect("Fatal error - expected to be able to end =
+request");
+> +    }
 > }
 > diff --git a/rust/kernel/block/mq.rs b/rust/kernel/block/mq.rs
-> index 98fa0d6bc8f7..6e546f4f3d1c 100644
+> index 6e546f4f3d1c..c0ec06b84355 100644
 > --- a/rust/kernel/block/mq.rs
 > +++ b/rust/kernel/block/mq.rs
-> @@ -69,20 +69,21 @@
-> //!
-> //! #[vtable]
-> //! impl Operations for MyBlkDevice {
-> +//!     type QueueData =3D ();
-> //!
-> -//!     fn queue_rq(rq: ARef<Request<Self>>, _is_last: bool) -> =
-Result {
-> +//!     fn queue_rq(_queue_data: (), rq: ARef<Request<Self>>, =
-_is_last: bool) -> Result {
-> //!         Request::end_ok(rq);
-> //!         Ok(())
+> @@ -77,6 +77,12 @@
 > //!     }
 > //!
-> -//!     fn commit_rqs() {}
-> +//!     fn commit_rqs(_queue_data: ()) {}
+> //!     fn commit_rqs(_queue_data: ()) {}
+> +//!
+> +//!     fn complete(rq: ARef<Request<Self>>) {
+> +//!         Request::end_ok(rq)
+> +//!             .map_err(|_e| kernel::error::code::EIO)
+> +//!             .expect("Fatal error - expected to be able to end =
+request");
+> +//!     }
 > //! }
 > //!
 > //! let tagset: Arc<TagSet<MyBlkDevice>> =3D
-> //!     Arc::pin_init(TagSet::new(1, 256, 1), flags::GFP_KERNEL)?;
-> //! let mut disk =3D gen_disk::GenDiskBuilder::new()
-> //!     .capacity_sectors(4096)
-> -//!     .build(format_args!("myblk"), tagset)?;
-> +//!     .build(format_args!("myblk"), tagset, ())?;
-> //!
-> //! # Ok::<(), kernel::error::Error>(())
-> //! ```
-> diff --git a/rust/kernel/block/mq/gen_disk.rs =
-b/rust/kernel/block/mq/gen_disk.rs
-> index 6b1b846874db..46ec80269970 100644
-> --- a/rust/kernel/block/mq/gen_disk.rs
-> +++ b/rust/kernel/block/mq/gen_disk.rs
-> @@ -13,6 +13,7 @@
->     static_lock_class,
->     str::NullTerminatedFormatter,
->     sync::Arc,
-> +    types::{ForeignOwnable, ScopeGuard},
-> };
-> use core::fmt::{self, Write};
->=20
-> @@ -98,7 +99,14 @@ pub fn build<T: Operations>(
->         self,
->         name: fmt::Arguments<'_>,
->         tagset: Arc<TagSet<T>>,
-> +        queue_data: T::QueueData,
->     ) -> Result<GenDisk<T>> {
-> +        let data =3D queue_data.into_foreign();
-> +        let recover_data =3D ScopeGuard::new(|| {
-> +            // SAFETY: T::QueueData was created by the call to =
-`into_foreign()` above
-> +            drop(unsafe { T::QueueData::from_foreign(data) });
-> +        });
-> +
->         // SAFETY: `bindings::queue_limits` contain only fields that =
-are valid when zeroed.
->         let mut lim: bindings::queue_limits =3D unsafe { =
-core::mem::zeroed() };
->=20
-> @@ -113,7 +121,7 @@ pub fn build<T: Operations>(
->             bindings::__blk_mq_alloc_disk(
->                 tagset.raw_tag_set(),
->                 &mut lim,
-> -                core::ptr::null_mut(),
-> +                data,
->                 static_lock_class!().as_ptr(),
->             )
->         })?;
-> @@ -167,8 +175,12 @@ pub fn build<T: Operations>(
->             },
->         )?;
->=20
-> +        recover_data.dismiss();
-> +
->         // INVARIANT: `gendisk` was initialized above.
->         // INVARIANT: `gendisk` was added to the VFS via =
-`device_add_disk` above.
-> +        // INVARIANT: `gendisk.queue.queue_data` is set to `data` in =
-the call to
-> +        // `__blk_mq_alloc_disk` above.
->         Ok(GenDisk {
->             _tagset: tagset,
->             gendisk,
-> @@ -180,9 +192,10 @@ pub fn build<T: Operations>(
-> ///
-> /// # Invariants
-> ///
-> -/// - `gendisk` must always point to an initialized and valid `struct =
-gendisk`.
-> -/// - `gendisk` was added to the VFS through a call to
-> -///   `bindings::device_add_disk`.
-> +///  - `gendisk` must always point to an initialized and valid =
-`struct gendisk`.
-> +///  - `gendisk` was added to the VFS through a call to
-> +///    `bindings::device_add_disk`.
-> +///  - `self.gendisk.queue.queuedata` is initialized by a call to =
-`ForeignOwnable::into_foreign`.
-> pub struct GenDisk<T: Operations> {
->     _tagset: Arc<TagSet<T>>,
->     gendisk: *mut bindings::gendisk,
-> @@ -194,9 +207,20 @@ unsafe impl<T: Operations + Send> Send for =
-GenDisk<T> {}
->=20
-> impl<T: Operations> Drop for GenDisk<T> {
->     fn drop(&mut self) {
-> +        // SAFETY: By type invariant of `Self`, `self.gendisk` points =
-to a valid
-> +        // and initialized instance of `struct gendisk`, and, =
-`queuedata` was
-> +        // initialized with the result of a call to
-> +        // `ForeignOwnable::into_foreign`.
-> +        let queue_data =3D unsafe { =
-(*(*self.gendisk).queue).queuedata };
-> +
->         // SAFETY: By type invariant, `self.gendisk` points to a valid =
-and
->         // initialized instance of `struct gendisk`, and it was =
-previously added
->         // to the VFS.
->         unsafe { bindings::del_gendisk(self.gendisk) };
-> +
-> +        // SAFETY: `queue.queuedata` was created by =
-`GenDiskBuilder::build` with
-> +        // a call to `ForeignOwnable::into_foreign` to create =
-`queuedata`.
-> +        // `ForeignOwnable::from_foreign` is only called here.
-> +        drop(unsafe { T::QueueData::from_foreign(queue_data) });
->     }
-> }
 > diff --git a/rust/kernel/block/mq/operations.rs =
 b/rust/kernel/block/mq/operations.rs
-> index c2b98f507bcb..6fb256f55acc 100644
+> index 6fb256f55acc..0fece577de7c 100644
 > --- a/rust/kernel/block/mq/operations.rs
 > +++ b/rust/kernel/block/mq/operations.rs
-> @@ -6,14 +6,15 @@
->=20
-> use crate::{
->     bindings,
-> -    block::mq::request::RequestDataWrapper,
-> -    block::mq::Request,
-> +    block::mq::{request::RequestDataWrapper, Request},
->     error::{from_result, Result},
->     prelude::*,
-> -    types::ARef,
-> +    types::{ARef, ForeignOwnable},
-> };
-> use core::{marker::PhantomData, sync::atomic::AtomicU64, =
-sync::atomic::Ordering};
->=20
-> +type ForeignBorrowed<'a, T> =3D <T as ForeignOwnable>::Borrowed<'a>;
-> +
-> /// Implement this trait to interface blk-mq as block devices.
-> ///
-> /// To implement a block device driver, implement this trait as =
-described in the
-> @@ -26,12 +27,20 @@
-> /// [module level documentation]: kernel::block::mq
-> #[macros::vtable]
-> pub trait Operations: Sized {
-> +    /// Data associated with the `struct request_queue` that is =
-allocated for
-> +    /// the `GenDisk` associated with this `Operations` =
-implementation.
-> +    type QueueData: ForeignOwnable;
-> +
->     /// Called by the kernel to queue a request with the driver. If =
-`is_last` is
->     /// `false`, the driver is allowed to defer committing the =
-request.
-> -    fn queue_rq(rq: ARef<Request<Self>>, is_last: bool) -> Result;
-> +    fn queue_rq(
-> +        queue_data: ForeignBorrowed<'_, Self::QueueData>,
-> +        rq: ARef<Request<Self>>,
-> +        is_last: bool,
-> +    ) -> Result;
->=20
+> @@ -42,6 +42,9 @@ fn queue_rq(
 >     /// Called by the kernel to indicate that queued requests should =
 be submitted.
-> -    fn commit_rqs();
-> +    fn commit_rqs(queue_data: ForeignBorrowed<'_, Self::QueueData>);
+>     fn commit_rqs(queue_data: ForeignBorrowed<'_, Self::QueueData>);
 >=20
+> +    /// Called by the kernel when the request is completed.
+> +    fn complete(rq: ARef<Request<Self>>);
+> +
 >     /// Called by the kernel to poll the device for completed =
 requests. Only
 >     /// used for poll queues.
-> @@ -70,7 +79,7 @@ impl<T: Operations> OperationsVTable<T> {
->     ///   promise to not access the request until the driver calls
->     ///   `bindings::blk_mq_end_request` for the request.
->     unsafe extern "C" fn queue_rq_callback(
-> -        _hctx: *mut bindings::blk_mq_hw_ctx,
-> +        hctx: *mut bindings::blk_mq_hw_ctx,
->         bd: *const bindings::blk_mq_queue_data,
->     ) -> bindings::blk_status_t {
->         // SAFETY: `bd.rq` is valid as required by the safety =
-requirement for
-> @@ -88,10 +97,20 @@ impl<T: Operations> OperationsVTable<T> {
->         //    reference counted by `ARef` until then.
->         let rq =3D unsafe { Request::aref_from_raw((*bd).rq) };
+>     fn poll() -> bool {
+> @@ -143,13 +146,21 @@ impl<T: Operations> OperationsVTable<T> {
+>         T::commit_rqs(queue_data)
+>     }
 >=20
-> +        // SAFETY: `hctx` is valid as required by this function.
-> +        let queue_data =3D unsafe { (*(*hctx).queue).queuedata };
-> +
-> +        // SAFETY: `queue.queuedata` was created by =
-`GenDisk::try_new()` with a
-
-isn=E2=80=99t this set on build() ?
-
-> +        // call to `ForeignOwnable::into_pointer()` to create =
-`queuedata`.
-
-into_pointer() ?
-
-> +        // `ForeignOwnable::from_foreign()` is only called when the =
-tagset is
-> +        // dropped, which happens after we are dropped.
-> +        let queue_data =3D unsafe { T::QueueData::borrow(queue_data) =
-};
-> +
->         // SAFETY: We have exclusive access and we just set the =
-refcount above.
->         unsafe { Request::start_unchecked(&rq) };
->=20
->         let ret =3D T::queue_rq(
-> +            queue_data,
->             rq,
->             // SAFETY: `bd` is valid as required by the safety =
-requirement for
->             // this function.
-> @@ -110,9 +129,18 @@ impl<T: Operations> OperationsVTable<T> {
+> -    /// This function is called by the C kernel. It is not currently
+> -    /// implemented, and there is no way to exercise this code path.
+> +    /// This function is called by the C kernel. A pointer to this =
+function is
+> +    /// installed in the `blk_mq_ops` vtable for the driver.
 >     ///
 >     /// # Safety
 >     ///
 > -    /// This function may only be called by blk-mq C infrastructure.
-> -    unsafe extern "C" fn commit_rqs_callback(_hctx: *mut =
-bindings::blk_mq_hw_ctx) {
-> -        T::commit_rqs()
+> -    unsafe extern "C" fn complete_callback(_rq: *mut =
+bindings::request) {}
 > +    /// This function may only be called by blk-mq C infrastructure. =
-The caller
-> +    /// must ensure that `hctx` is valid.
-> +    unsafe extern "C" fn commit_rqs_callback(hctx: *mut =
-bindings::blk_mq_hw_ctx) {
-> +        // SAFETY: `hctx` is valid as required by this function.
-> +        let queue_data =3D unsafe { (*(*hctx).queue).queuedata };
-> +
-> +        // SAFETY: `queue.queuedata` was created by =
-`GenDisk::try_new()` with a
-> +        // call to `ForeignOwnable::into_pointer()` to create =
-`queuedata`.
-
-into_foreign()?
-
-> +        // `ForeignOwnable::from_foreign()` is only called when the =
-tagset is
-> +        // dropped, which happens after we are dropped.
-> +        let queue_data =3D unsafe { T::QueueData::borrow(queue_data) =
-};
-> +        T::commit_rqs(queue_data)
+`rq` must
+> +    /// point to a valid request that has been marked as completed. =
+The pointee
+> +    /// of `rq` must be valid for write for the duration of this =
+function.
+> +    unsafe extern "C" fn complete_callback(rq: *mut =
+bindings::request) {
+> +        // SAFETY: This function can only be dispatched through
+> +        // `Request::complete`. We leaked a refcount then which we =
+pick back up
+> +        // now.
+> +        let aref =3D unsafe { Request::aref_from_raw(rq) };
+> +        T::complete(aref);
+> +    }
+>=20
+>     /// This function is called by the C kernel. A pointer to this =
+function is
+>     /// installed in the `blk_mq_ops` vtable for the driver.
+> diff --git a/rust/kernel/block/mq/request.rs =
+b/rust/kernel/block/mq/request.rs
+> index 3848cfe63f77..f7f757f7459f 100644
+> --- a/rust/kernel/block/mq/request.rs
+> +++ b/rust/kernel/block/mq/request.rs
+> @@ -135,6 +135,23 @@ pub fn end_ok(this: ARef<Self>) -> Result<(), =
+ARef<Self>> {
+>         Ok(())
 >     }
 >=20
->     /// This function is called by the C kernel. It is not currently
+> +    /// Complete the request by scheduling `Operations::complete` for
+> +    /// execution.
+> +    ///
+> +    /// The function may be scheduled locally, via SoftIRQ or =
+remotely via IPMI.
+> +    /// See `blk_mq_complete_request_remote` in [`blk-mq.c`] for =
+details.
+> +    ///
+> +    /// [`blk-mq.c`]: srctree/block/blk-mq.c
+> +    pub fn complete(this: ARef<Self>) {
+> +        let ptr =3D =
+ARef::into_raw(this).cast::<bindings::request>().as_ptr();
+> +        // SAFETY: By type invariant, `self.0` is a valid `struct =
+request`
+> +        if !unsafe { bindings::blk_mq_complete_request_remote(ptr) } =
+{
+> +            // SAFETY: We released a refcount above that we can =
+reclaim here.
+> +            let this =3D unsafe { Request::aref_from_raw(ptr) };
+> +            T::complete(this);
+> +        }
+> +    }
+> +
+>     /// Return a pointer to the [`RequestDataWrapper`] stored in the =
+private area
+>     /// of the request structure.
+>     ///
 >=20
 > --=20
 > 2.47.2
 >=20
 >=20
->=20
 
-Reviewed-by: Daniel Almeida <daniel.almeida@collabora.com>
+I had another look here. While I do trust your reasoning, perhaps we =
+should
+remove the call to expect()?
 
+If it is not called ever as you said, great, removing the expect() will =
+not
+change the code behavior. If it is, be it because of some minor =
+oversight or
+unexpected condition, we should produce some error output instead of =
+crashing
+the kernel. Maybe we should use a warn() here instead? Or maybe =
+dev/pr_err as
+applicable?
+
+=E2=80=94 Daniel=
