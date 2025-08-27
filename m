@@ -1,169 +1,187 @@
-Received: from sender4-pp-f112.zoho.com (sender4-pp-f112.zoho.com [136.143.188.112])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4B51302760;
-	Wed, 27 Aug 2025 13:03:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.112
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756299795; cv=pass; b=dZlM0VrWXZtz0hcy5SS10JprLqi3JaMZOTsPByenkSbamWOs77OLxrJjHo3HRjVwrEeRr/nlGgwvOz4psb4Q/egv646nr6wf9o/r/SdlT7WL+6SgBgV1jRImyzFRgF9D+tkWka9FDmzMyNTVPmWpovZ9r+/PvKqEDZ4rNZ4Q5xo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756299795; c=relaxed/simple;
-	bh=cE6hyLFmrH6jjJyToAUXyVeW+z60z7Zgr6CnYsE7u0E=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=J5EREN6YW7Aq8+xywVa5WWtLIJJPHat29SI1iarszomWGkSRmuzsS/hsNj/LbajIl2PdKaJ/CMXUDtSOF8g1uQxYZkLo/w/FY4GmduklemBmRFB/PLtMY9bn2640Dv2pdRLzMHLdR6yHfotZbhVN7ctp/t5MBcboTDMf0L+qvBk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=daniel.almeida@collabora.com header.b=CslwVnhF; arc=pass smtp.client-ip=136.143.188.112
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=collabora.com header.i=daniel.almeida@collabora.com header.b="CslwVnhF"
-ARC-Seal: i=1; a=rsa-sha256; t=1756299775; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=BExQClGzndmlQKTCBnyz+1S0/ZEzYWm/AJJod51VKiUhg1X+nkC/oluNU36oYkHwSAy/vxuw40F6k+fDQ5BJHxn5qMJqOel1TCNDhdCL9xPpWYbi5aN8DqeIwjA/q0v5moheWOj98+KzYvJ2Mu+KrkJGf+NwQhLaO6aj3T/DCbQ=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1756299775; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=bF7pQBFY7CqIgY8f35aNdCRUmkVlp59evzsupE6bLEM=; 
-	b=S48DMefZQ0TkOyLb/199DbWj8GB8vQ2raf75ZCoj6OulfgtfKtWFqLfLZ4Wm/pO3JFT3SONmV9VbvRsS/lnv8XkYiVSlBJvSC/5xnCOl7ts6DDCDxRboZYa/OhyYGWQFMW2742iLY/nwSODLiLTg3BuWBcvRRb9lQP0+OJKXl5w=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=collabora.com;
-	spf=pass  smtp.mailfrom=daniel.almeida@collabora.com;
-	dmarc=pass header.from=<daniel.almeida@collabora.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1756299775;
-	s=zohomail; d=collabora.com; i=daniel.almeida@collabora.com;
-	h=Content-Type:Mime-Version:Subject:Subject:From:From:In-Reply-To:Date:Date:Cc:Cc:Content-Transfer-Encoding:Message-Id:Message-Id:References:To:To:Reply-To;
-	bh=bF7pQBFY7CqIgY8f35aNdCRUmkVlp59evzsupE6bLEM=;
-	b=CslwVnhFWFsXgAlrEq2ctLnxCqzWKx6WJVr/6KzDS539x3UMYIOPjwMQHCKhtvuo
-	k6QsUY2WMcPot2T+HHwwrghXvp7dcgmxwLjVFD5GoUHhC8EvsJvKJ9+M3hwDJtDyZnX
-	9e0v57HXvXMU86x8s3k3orNpS2/4N3M+/akJPGLg=
-Received: by mx.zohomail.com with SMTPS id 1756299774531372.8098676556684;
-	Wed, 27 Aug 2025 06:02:54 -0700 (PDT)
-Content-Type: text/plain;
-	charset=us-ascii
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06E133128A2
+	for <linux-block@vger.kernel.org>; Wed, 27 Aug 2025 13:07:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.206
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756300054; cv=none; b=QK68RaFq8LlOVFC68em8/bUapqvrZdp4iKQRc+9ni71TNjVn7+HfG3gkTX0GG9DPbSelFGNPKul6Gzt/79zYlCKxSFf4Ma7iFlVASD52cSpqUeRoUqQpNCLEzo5jC9kNmqwMjROwn0HlcL4q70EZ690nswZs0u6v3rt2D83rjR4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756300054; c=relaxed/simple;
+	bh=uhZEyNjpgt2nKhG1FnpuwlfVRtd/DA2+sMMguQJJMic=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=kNfrRKhFvZhzezXlhx6hOVOu2lls14Sxlcek5kQ9tQJ3zm5Y42yBLxkxmip5pLQXgMaqpdxSNJIJaq0oLMg/qugMhWsJGm0KaDz7qocQPLEMQXOln/vsHYMemm+YK7b+B+kWJjVYdhyIijTKBtsvsXfzJbN5zkuZihD/5KhDsNs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-3efa61f3ab5so34252535ab.3
+        for <linux-block@vger.kernel.org>; Wed, 27 Aug 2025 06:07:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756300052; x=1756904852;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=VqAAZ2PNKYljta7EnxR4rGO0uElyvx3egJwvBQhHbdA=;
+        b=MFTGOyOZsDLAZuxM5H1rPrIc+bYObUc5h4vTsEZiE0rlqpEjwAVZTwe3CJTno3bO08
+         wM2e1r8L3/4BcZZtKL2ncDNBl4AhP+liMhvVoH4a5mS7I2zcqyltTPfPUBUUVRbnDPlh
+         2G+iP1JWti4dJCPeB+eRJO/8muNmQO7yBRR73TppImaP3eoHiSHmQfG00fkePYp4r2SL
+         ycfXxeRjg+qQN7DSZAvoJdEZpbSy/1g+wUoQImDm6kUtopC8Dofl6h7b/1jeEUUb5zty
+         HJW1PTNN1EU1awYshKzALXEKh//M/rhfo5EIMfNn9LctO+qRNie23fj/9wajCUieoHHP
+         siFQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW60h/QU+JyTKrq1CFSconI+pyo0TXXo2lpRQbRjZk4jUq0bBqoYR7oCfChUh/aDdy05ekzt6N4G3pWiw==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx6ujgTWAEtqtmp2EKTfw64Mdmu7911a2MqcRa2G8LLFQSgP5Lb
+	POz82jPSRAe4yJy0et6U/tcbcfyrUM1leCrvGiP5jvU5U9/K75BD06mwffANTWQXIozW2hPuC4H
+	eK/trvTNfEguRNvrzCGVXpKfuG+DxPXLAxQusbl7avCDg97MEBnLTxG7IUpw=
+X-Google-Smtp-Source: AGHT+IEqs+daARbh9yMs35OsmplpX2B5BTuI9FVSQSDfBuhtSnWgP2j53rMkalQByvr/nOab0ANgDGAkdG0Vxgcbi+gNsSs4qV5l
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.700.81\))
-Subject: Re: [PATCH v6 04/18] rust: str: introduce `NullTerminatedFormatter`
-From: Daniel Almeida <daniel.almeida@collabora.com>
-In-Reply-To: <20250822-rnull-up-v6-16-v6-4-ec65006e2f07@kernel.org>
-Date: Wed, 27 Aug 2025 10:02:38 -0300
-Cc: Boqun Feng <boqun.feng@gmail.com>,
- Miguel Ojeda <ojeda@kernel.org>,
- Alex Gaynor <alex.gaynor@gmail.com>,
- Gary Guo <gary@garyguo.net>,
- =?utf-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>,
- Benno Lossin <lossin@kernel.org>,
- Alice Ryhl <aliceryhl@google.com>,
- Trevor Gross <tmgross@umich.edu>,
- Danilo Krummrich <dakr@kernel.org>,
- Jens Axboe <axboe@kernel.dk>,
- Breno Leitao <leitao@debian.org>,
- linux-block@vger.kernel.org,
- rust-for-linux@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <2C9D54CC-F931-41C9-967C-14EA375F9F2A@collabora.com>
-References: <20250822-rnull-up-v6-16-v6-0-ec65006e2f07@kernel.org>
- <20250822-rnull-up-v6-16-v6-4-ec65006e2f07@kernel.org>
-To: Andreas Hindborg <a.hindborg@kernel.org>
-X-Mailer: Apple Mail (2.3826.700.81)
-X-ZohoMailClient: External
+MIME-Version: 1.0
+X-Received: by 2002:a05:6e02:18cb:b0:3eb:2b11:441d with SMTP id
+ e9e14a558f8ab-3eb2b1146bdmr213821075ab.15.1756300051987; Wed, 27 Aug 2025
+ 06:07:31 -0700 (PDT)
+Date: Wed, 27 Aug 2025 06:07:31 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68af0313.a70a0220.3cafd4.0020.GAE@google.com>
+Subject: [syzbot] [block?] [ext4?] [btrfs?] INFO: rcu detected stall in
+ sys_mount (8)
+From: syzbot <syzbot+4507914ec56d21bb39ed@syzkaller.appspotmail.com>
+To: brauner@kernel.org, clm@fb.com, dsterba@suse.com, jack@suse.cz, 
+	josef@toxicpanda.com, linux-block@vger.kernel.org, 
+	linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com, viro@zeniv.linux.org.uk
+Content-Type: text/plain; charset="UTF-8"
+
+Hello,
+
+syzbot found the following issue on:
+
+HEAD commit:    8f5ae30d69d7 Linux 6.17-rc1
+git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
+console output: https://syzkaller.appspot.com/x/log.txt?x=16a85ef0580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=8c5ac3d8b8abfcb
+dashboard link: https://syzkaller.appspot.com/bug?extid=4507914ec56d21bb39ed
+compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
+userspace arch: arm64
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1455a462580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12229462580000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/18a2e4bd0c4a/disk-8f5ae30d.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/3b5395881b25/vmlinux-8f5ae30d.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/e875f4e3b7ff/Image-8f5ae30d.gz.xz
+mounted in repro: https://storage.googleapis.com/syzbot-assets/47be3ab62135/mount_6.gz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+4507914ec56d21bb39ed@syzkaller.appspotmail.com
+
+watchdog: BUG: soft lockup - CPU#1 stuck for 23s! [syz.0.563:8489]
+Modules linked in:
+irq event stamp: 251614
+hardirqs last  enabled at (251613): [<ffff80008b028df8>] __raw_spin_unlock_irqrestore include/linux/spinlock_api_smp.h:151 [inline]
+hardirqs last  enabled at (251613): [<ffff80008b028df8>] _raw_spin_unlock_irqrestore+0x38/0x98 kernel/locking/spinlock.c:194
+hardirqs last disabled at (251614): [<ffff80008b001cbc>] __el1_irq arch/arm64/kernel/entry-common.c:650 [inline]
+hardirqs last disabled at (251614): [<ffff80008b001cbc>] el1_interrupt+0x24/0x54 arch/arm64/kernel/entry-common.c:668
+softirqs last  enabled at (251590): [<ffff8000803d88a0>] softirq_handle_end kernel/softirq.c:425 [inline]
+softirqs last  enabled at (251590): [<ffff8000803d88a0>] handle_softirqs+0xaf8/0xc88 kernel/softirq.c:607
+softirqs last disabled at (251581): [<ffff800080022028>] __do_softirq+0x14/0x20 kernel/softirq.c:613
+CPU: 1 UID: 0 PID: 8489 Comm: syz.0.563 Not tainted 6.17.0-rc1-syzkaller-g8f5ae30d69d7 #0 PREEMPT 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/30/2025
+pstate: 83400005 (Nzcv daif +PAN -UAO +TCO +DIT -SSBS BTYPE=--)
+pc : skip_mnt_tree fs/namespace.c:-1 [inline]
+pc : commit_tree fs/namespace.c:1201 [inline]
+pc : attach_recursive_mnt+0x1414/0x19f0 fs/namespace.c:2716
+lr : skip_mnt_tree fs/namespace.c:1184 [inline]
+lr : commit_tree fs/namespace.c:1201 [inline]
+lr : attach_recursive_mnt+0x1430/0x19f0 fs/namespace.c:2716
+sp : ffff8000a0de7960
+x29: ffff8000a0de7a60 x28: ffff0000df3956c0 x27: dfff800000000000
+x26: ffff0000d65d31c0 x25: ffff0000d65d3180 x24: ffff0000d931d600
+x23: ffff0000df3956c0 x22: ffff0000df395500 x21: ffff0000d65d2e41
+x20: ffff0000f39e5ab0 x19: ffff0000f39e5ab0 x18: 1fffe000337a0688
+x17: ffff0001fea8c8b0 x16: ffff80008afd3190 x15: 0000000000000002
+x14: 1fffe0001be72ae1 x13: 0000000000000000 x12: 0000000000000000
+x11: ffff60001be72ae3 x10: 0000000000ff0100 x9 : 0000000000000000
+x8 : 0000000000000000 x7 : 0000000000000000 x6 : 0000000000000000
+x5 : 0000000000000001 x4 : 0000000000000008 x3 : 0000000000000000
+x2 : 0000000000000008 x1 : ffff0000d65d31c0 x0 : ffff0000f39e5aa8
+Call trace:
+ skip_mnt_tree fs/namespace.c:-1 [inline] (P)
+ commit_tree fs/namespace.c:1201 [inline] (P)
+ attach_recursive_mnt+0x1414/0x19f0 fs/namespace.c:2716 (P)
+ graft_tree+0x134/0x184 fs/namespace.c:2862
+ do_loopback+0x334/0x3e8 fs/namespace.c:3037
+ path_mount+0x4cc/0xde0 fs/namespace.c:4114
+ do_mount fs/namespace.c:4133 [inline]
+ __do_sys_mount fs/namespace.c:4344 [inline]
+ __se_sys_mount fs/namespace.c:4321 [inline]
+ __arm64_sys_mount+0x3e8/0x468 fs/namespace.c:4321
+ __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
+ invoke_syscall+0x98/0x2b8 arch/arm64/kernel/syscall.c:49
+ el0_svc_common+0x130/0x23c arch/arm64/kernel/syscall.c:132
+ do_el0_svc+0x48/0x58 arch/arm64/kernel/syscall.c:151
+ el0_svc+0x58/0x180 arch/arm64/kernel/entry-common.c:879
+ el0t_64_sync_handler+0x84/0x12c arch/arm64/kernel/entry-common.c:898
+ el0t_64_sync+0x198/0x19c arch/arm64/kernel/entry.S:596
+Sending NMI from CPU 1 to CPUs 0:
+NMI backtrace for cpu 0
+CPU: 0 UID: 0 PID: 6164 Comm: udevd Not tainted 6.17.0-rc1-syzkaller-g8f5ae30d69d7 #0 PREEMPT 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/30/2025
+pstate: 83400005 (Nzcv daif +PAN -UAO +TCO +DIT -SSBS BTYPE=--)
+pc : __sanitizer_cov_trace_pc+0x80/0x84 kernel/kcov.c:235
+lr : path_init+0xdc0/0xe98 fs/namei.c:2537
+sp : ffff8000a43e7740
+x29: ffff8000a43e77a0 x28: dfff800000000000 x27: 1fffe00018f95664
+x26: ffff0000c7cab320 x25: 0000000000000101 x24: 1ffff0001487cf5b
+x23: ffff80008f745840 x22: ffff8000a43e7adc x21: 0000000000000100
+x20: ffff8000a43e7aa0 x19: 0000000000032fab x18: 0000000000000000
+x17: 0000000000000000 x16: ffff80008b007230 x15: 0000000000000001
+x14: 1ffff00011ee8b08 x13: 0000000000000000 x12: 0000000000000000
+x11: ffff700011ee8b09 x10: 0000000000ff0100 x9 : 0000000000000000
+x8 : ffff0000d8babd00 x7 : ffff800080daa4c4 x6 : 0000000000000000
+x5 : 0000000000000000 x4 : 0000000000000000 x3 : ffff800080da8a84
+x2 : 0000000000000000 x1 : 0000000000000004 x0 : 0000000000000001
+Call trace:
+ __sanitizer_cov_trace_pc+0x80/0x84 kernel/kcov.c:235 (P)
+ path_openat+0x13c/0x2c40 fs/namei.c:4041
+ do_filp_open+0x18c/0x36c fs/namei.c:4073
+ do_sys_openat2+0x11c/0x1b4 fs/open.c:1435
+ do_sys_open fs/open.c:1450 [inline]
+ __do_sys_openat fs/open.c:1466 [inline]
+ __se_sys_openat fs/open.c:1461 [inline]
+ __arm64_sys_openat+0x120/0x158 fs/open.c:1461
+ __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
+ invoke_syscall+0x98/0x2b8 arch/arm64/kernel/syscall.c:49
+ el0_svc_common+0x130/0x23c arch/arm64/kernel/syscall.c:132
+ do_el0_svc+0x48/0x58 arch/arm64/kernel/syscall.c:151
+ el0_svc+0x58/0x180 arch/arm64/kernel/entry-common.c:879
+ el0t_64_sync_handler+0x84/0x12c arch/arm64/kernel/entry-common.c:898
+ el0t_64_sync+0x198/0x19c arch/arm64/kernel/entry.S:596
 
 
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-> On 22 Aug 2025, at 09:14, Andreas Hindborg <a.hindborg@kernel.org> =
-wrote:
->=20
-> Add `NullTerminatedFormatter`, a formatter that writes a null =
-terminated
-> string to an array or slice buffer. Because this type needs to manage =
-the
-> trailing null marker, the existing formatters cannot be used to =
-implement
-> this type.
->=20
-> Reviewed-by: Alice Ryhl <aliceryhl@google.com>
-> Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
-> ---
-> rust/kernel/str.rs | 49 =
-+++++++++++++++++++++++++++++++++++++++++++++++++
-> 1 file changed, 49 insertions(+)
->=20
-> diff --git a/rust/kernel/str.rs b/rust/kernel/str.rs
-> index 46cdc85dad63..d8326f7bc9c1 100644
-> --- a/rust/kernel/str.rs
-> +++ b/rust/kernel/str.rs
-> @@ -871,6 +871,55 @@ fn write_str(&mut self, s: &str) -> fmt::Result {
->     }
-> }
->=20
-> +/// A mutable reference to a byte buffer where a string can be =
-written into.
-> +///
-> +/// The buffer will be automatically null terminated after the last =
-written character.
-> +///
-> +/// # Invariants
-> +///
-> +/// * The first byte of `buffer` is always zero.
-> +/// * The length of `buffer` is at least 1.
-> +pub(crate) struct NullTerminatedFormatter<'a> {
-> +    buffer: &'a mut [u8],
-> +}
-> +
-> +impl<'a> NullTerminatedFormatter<'a> {
-> +    /// Create a new [`Self`] instance.
-> +    #[expect(dead_code)]
-> +    pub(crate) fn new(buffer: &'a mut [u8]) -> =
-Option<NullTerminatedFormatter<'a>> {
-> +        *(buffer.first_mut()?) =3D 0;
-> +
-> +        // INVARIANT:
-> +        //  - We wrote zero to the first byte above.
-> +        //  - If buffer was not at least length 1, =
-`buffer.first_mut()` would return None.
-> +        Some(Self { buffer })
-> +    }
-> +}
-> +
-> +impl Write for NullTerminatedFormatter<'_> {
-> +    fn write_str(&mut self, s: &str) -> fmt::Result {
-> +        let bytes =3D s.as_bytes();
-> +        let len =3D bytes.len();
-> +
-> +        // We want space for a zero. By type invariant, buffer length =
-is always at least 1, so no
-> +        // underflow.
-> +        if len > self.buffer.len() - 1 {
-> +            return Err(fmt::Error);
-> +        }
-> +
-> +        let buffer =3D core::mem::take(&mut self.buffer);
-> +        // We break the zero start invariant for a short while.
-> +        buffer[..len].copy_from_slice(bytes);
-> +        // INVARIANT: We checked above that buffer will have size at =
-least 1 after this assignment.
-> +        self.buffer =3D &mut buffer[len..];
-> +
-> +        // INVARIANT: We write zero to the first byte of the buffer.
-> +        self.buffer[0] =3D 0;
-> +
-> +        Ok(())
-> +    }
-> +}
-> +
-> /// An owned string that is guaranteed to have exactly one `NUL` byte, =
-which is at the end.
-> ///
-> /// Used for interoperability with kernel APIs that take C strings.
->=20
-> --=20
-> 2.47.2
->=20
->=20
->=20
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
-Reviewed-by: Daniel Almeida <daniel.almeida@collabora.com>
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
