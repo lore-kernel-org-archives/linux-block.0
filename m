@@ -1,268 +1,397 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from sender4-pp-f112.zoho.com (sender4-pp-f112.zoho.com [136.143.188.112])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FFDC278143
-	for <linux-block@vger.kernel.org>; Wed, 27 Aug 2025 17:48:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756316935; cv=none; b=rO7CU78sPWLIHvKVDE4IUhg2wVuhl+LHJrV7V8b43Hg8sETR/X5xSQZw0zcWql27cw9TiZIY4ogBi+1QHpDH5Ifv4bAq0pxhMxMsf8ddkSqFO5+s+0gtPXPxvT8ujybVW9wKQ9d7tUT3s/oeWDUnKxUVF8KRqg1V4tZr9E0wTX8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756316935; c=relaxed/simple;
-	bh=jUFz9jruHYXkyKMr2r0i+WWI9/MTQ7vAdaDz5a2Ztwo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YG1NXrsOWBXwQa5R7I5r9P94KHCNUvuos5h1xTO/Nh6wllh0Bs1dPkUxqkuBfWkCH+sxtwS482Z4Vf28a7bhWEQ2Prw+8ncXoIbGCg/EatbK+yE8CgGsMtyRkW+sSaveiHZRxQcok8F5ioKGzjabYi5c+OKE2RZBiZL/32aIBCE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=O4l3/ZHi; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D099221FF55;
+	Wed, 27 Aug 2025 17:53:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.112
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756317200; cv=pass; b=MseMvGGxFLJGjreyyAXBDZxPEcf4QOy8bNn0L7/Tu00+hHGocnhSMr0Wl4uVRPDkXFQiIunU6O2s9My0Ium6yq5YF6NyKnvFoCBoEWKg1RH5SDWRrK52/6bLSiNrnM8C9Vrw+8byvPLjdekmv1KmfZsqG7kSWjq8ZqzsaR4U9Ww=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756317200; c=relaxed/simple;
+	bh=FiAVdmpAd56Eo8yeLlOaWldznsJoTafgRx9VVj0nzMk=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=gAkqpiZTlSeZWqv5rl8qdfeOBqXELtOpge/Mb0Ad/U5jnQ3bzcCBXVH2WaiAethLkL+qmuAmQaumNjnf9UQWjZDxEKn20XVPDkvXRUjpySnM41LW9I2Xx8MpUM50zO+fIDY0K+yLcGXlVZMJP5NkttcjxEiUDfBQGM7Mksf0yvc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=daniel.almeida@collabora.com header.b=LCsWkMSc; arc=pass smtp.client-ip=136.143.188.112
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O4l3/ZHi"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1756316933;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CY1ybBNELINlBW46BpY0I29Oa4pllqZv5dG3GvoWIX0=;
-	b=O4l3/ZHiCAyimDc4gMBMUGoiel4GtohOEoOKKHZUQVIGhsUfDLuQ0gH8ZpT3b8a/UseNdY
-	pCZtLCG/ztxEiW3TMLzpMADncD7kR518qzsrWhRq8S7WHQ7H+txxxIJx0NRo38xhxIIF49
-	rVFHs2J5xPKIlWDZ9EGp2e2MIfyzvLk=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-339-jQMARTUAN46urj9FdaLopg-1; Wed,
- 27 Aug 2025 13:48:48 -0400
-X-MC-Unique: jQMARTUAN46urj9FdaLopg-1
-X-Mimecast-MFC-AGG-ID: jQMARTUAN46urj9FdaLopg_1756316925
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 634BD19560B5;
-	Wed, 27 Aug 2025 17:48:44 +0000 (UTC)
-Received: from bfoster (unknown [10.22.80.41])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A795C30001A6;
-	Wed, 27 Aug 2025 17:48:40 +0000 (UTC)
-Date: Wed, 27 Aug 2025 13:52:37 -0400
-From: Brian Foster <bfoster@redhat.com>
-To: Jan Kara <jack@suse.cz>
-Cc: Ritesh Harjani <ritesh.list@gmail.com>, Keith Busch <kbusch@kernel.org>,
-	Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-ext4@vger.kernel.org, snitzer@kernel.org, axboe@kernel.dk,
-	dw@davidwei.uk, brauner@kernel.org, hch@lst.de,
-	martin.petersen@oracle.com, djwong@kernel.org,
-	linux-xfs@vger.kernel.org, viro@zeniv.linux.org.uk,
-	Jan Kara <jack@suse.com>
-Subject: Re: [PATCHv3 0/8] direct-io: even more flexible io vectors
-Message-ID: <aK9F5euA3kQdGaMi@bfoster>
-References: <20250819164922.640964-1-kbusch@meta.com>
- <87a53ra3mb.fsf@gmail.com>
- <g35u5ugmyldqao7evqfeb3hfcbn3xddvpssawttqzljpigy7u4@k3hehh3grecq>
- <aKx485EMthHfBWef@kbusch-mbp>
- <87cy8ir835.fsf@gmail.com>
- <ua7ib34kk5s6yfthqkgy3m2pnbk33a34g7prezmwl7hfwv6lwq@fljhjaogd6gq>
+	dkim=pass (1024-bit key) header.d=collabora.com header.i=daniel.almeida@collabora.com header.b="LCsWkMSc"
+ARC-Seal: i=1; a=rsa-sha256; t=1756317177; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=SFVlvlMoLih63YeCfRuKzBIkV+AUuk/QLm3VgUpXJWAmHCRq7QHlFjsEt9J3fmt0Mv7m/nhASCQDyFAjI2Afvxr8VLSEeU9HY5TLJs6mroKycJ2HwdtzLPYBNmcDt9EcymDCmURLbhg4VgJQZGM+aGeE547A3TESt8yd7ytoTUg=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1756317177; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=AnFhkcCNOfTOWgQFBiJ5K7cFdzpqzmzqvFP4oFM1Njs=; 
+	b=EIdlqEWLwRWlfX6AsZ7mJCs64+vGlYGTRREf8MlOZlDna7kuXMOi19FdBNRe9xbD0fBMKWki7bwE0vExh9d5BDeD07iHnA8F6HcKGc82E5qUtFPjdQyt4c8c4pknyTyhgslMxnZZDr14Zh4UqBk5aOtzT3kub5AgMy6zoczYA7A=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=collabora.com;
+	spf=pass  smtp.mailfrom=daniel.almeida@collabora.com;
+	dmarc=pass header.from=<daniel.almeida@collabora.com>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1756317177;
+	s=zohomail; d=collabora.com; i=daniel.almeida@collabora.com;
+	h=Content-Type:Mime-Version:Subject:Subject:From:From:In-Reply-To:Date:Date:Cc:Cc:Content-Transfer-Encoding:Message-Id:Message-Id:References:To:To:Reply-To;
+	bh=AnFhkcCNOfTOWgQFBiJ5K7cFdzpqzmzqvFP4oFM1Njs=;
+	b=LCsWkMScpLH2aCcZAv0dbhhdFX8o5mDYOByE4xE4QNiN6Irwmw7b4dmM9+mwy2y0
+	XMiVHNlULO7v1oSprH+eQgDwfgi3/54ZrF6FFYHxZBxW6kIZ+X22W4Ol6OVAv2R8n9E
+	MGNfIEJ9ow4PhtsYGLWU4xQf1rMpUdXC4brKvC6M=
+Received: by mx.zohomail.com with SMTPS id 1756317173875832.4987805869289;
+	Wed, 27 Aug 2025 10:52:53 -0700 (PDT)
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ua7ib34kk5s6yfthqkgy3m2pnbk33a34g7prezmwl7hfwv6lwq@fljhjaogd6gq>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.700.81\))
+Subject: Re: [PATCH v6 15/18] rust: block: add `GenDisk` private data support
+From: Daniel Almeida <daniel.almeida@collabora.com>
+In-Reply-To: <20250822-rnull-up-v6-16-v6-15-ec65006e2f07@kernel.org>
+Date: Wed, 27 Aug 2025 14:52:37 -0300
+Cc: Boqun Feng <boqun.feng@gmail.com>,
+ Miguel Ojeda <ojeda@kernel.org>,
+ Alex Gaynor <alex.gaynor@gmail.com>,
+ Gary Guo <gary@garyguo.net>,
+ =?utf-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>,
+ Benno Lossin <lossin@kernel.org>,
+ Alice Ryhl <aliceryhl@google.com>,
+ Trevor Gross <tmgross@umich.edu>,
+ Danilo Krummrich <dakr@kernel.org>,
+ Jens Axboe <axboe@kernel.dk>,
+ Breno Leitao <leitao@debian.org>,
+ linux-block@vger.kernel.org,
+ rust-for-linux@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <F5F77953-D3B2-4A03-BEFF-D937A01A645E@collabora.com>
+References: <20250822-rnull-up-v6-16-v6-0-ec65006e2f07@kernel.org>
+ <20250822-rnull-up-v6-16-v6-15-ec65006e2f07@kernel.org>
+To: Andreas Hindborg <a.hindborg@kernel.org>
+X-Mailer: Apple Mail (2.3826.700.81)
+X-ZohoMailClient: External
 
-On Wed, Aug 27, 2025 at 05:20:53PM +0200, Jan Kara wrote:
-> On Tue 26-08-25 10:29:58, Ritesh Harjani wrote:
-> > Keith Busch <kbusch@kernel.org> writes:
-> > 
-> > > On Mon, Aug 25, 2025 at 02:07:15PM +0200, Jan Kara wrote:
-> > >> On Fri 22-08-25 18:57:08, Ritesh Harjani wrote:
-> > >> > Keith Busch <kbusch@meta.com> writes:
-> > >> > >
-> > >> > >   - EXT4 falls back to buffered io for writes but not for reads.
-> > >> > 
-> > >> > ++linux-ext4 to get any historical context behind why the difference of
-> > >> > behaviour in reads v/s writes for EXT4 DIO. 
-> > >> 
-> > >> Hum, how did you test? Because in the basic testing I did (with vanilla
-> > >> kernel) I get EINVAL when doing unaligned DIO write in ext4... We should be
-> > >> falling back to buffered IO only if the underlying file itself does not
-> > >> support any kind of direct IO.
-> > >
-> > > Simple test case (dio-offset-test.c) below.
-> > >
-> > > I also ran this on vanilla kernel and got these results:
-> > >
-> > >   # mkfs.ext4 /dev/vda
-> > >   # mount /dev/vda /mnt/ext4/
-> > >   # make dio-offset-test
-> > >   # ./dio-offset-test /mnt/ext4/foobar
-> > >   write: Success
-> > >   read: Invalid argument
-> > >
-> > > I tracked the "write: Success" down to ext4's handling for the "special"
-> > > -ENOTBLK error after ext4_want_directio_fallback() returns "true".
-> > >
-> > 
-> > Right. Ext4 has fallback only for dio writes but not for DIO reads... 
-> > 
-> > buffered
-> > static inline bool ext4_want_directio_fallback(unsigned flags, ssize_t written)
-> > {
-> > 	/* must be a directio to fall back to buffered */
-> > 	if ((flags & (IOMAP_WRITE | IOMAP_DIRECT)) !=
-> > 		    (IOMAP_WRITE | IOMAP_DIRECT))
-> > 		return false;
-> > 
-> >     ...
-> > }
-> > 
-> > So basically the path is ext4_file_[read|write]_iter() -> iomap_dio_rw
-> >     -> iomap_dio_bio_iter() -> return -EINVAL. i.e. from...
-> > 
-> > 
-> > 	if ((pos | length) & (bdev_logical_block_size(iomap->bdev) - 1) ||
-> > 	    !bdev_iter_is_aligned(iomap->bdev, dio->submit.iter))
-> > 		return -EINVAL;
-> > 
-> > EXT4 then fallsback to buffered-io only for writes, but not for reads. 
-> 
-> Right. And the fallback for writes was actually inadvertedly "added" by
-> commit bc264fea0f6f "iomap: support incremental iomap_iter advances". That
-> changed the error handling logic. Previously if iomap_dio_bio_iter()
-> returned EINVAL, it got propagated to userspace regardless of what
-> ->iomap_end() returned. After this commit if ->iomap_end() returns error
-> (which is ENOTBLK in ext4 case), it gets propagated to userspace instead of
-> the error returned by iomap_dio_bio_iter().
-> 
 
-Ah, so IIUC you're referring to the change in iomap_iter() where the
-iomap_end() error code was returned "if (ret < 0 && !iter->processed)",
-where iter->processed held a potential error code from the iterator.
-That was changed to !advanced, which filters out the processed < 0 case
-and allows the error to return from iomap_end here rather than from
-iter->processed a few lines down.
 
-There were further changes to eliminate the advance from iomap_iter()
-case (and rename processed -> status), so I suppose we could consider
-changing that to something like:
-
-	if (ret < 0 && !advanced && !iter->status)
-		return ret;
-
-... which I think would restore original error behavior. But I agree
-it's not totally clear which is preferable. Certainly the change in
-behavior was not intentional so thanks for the analysis. I'd have to
-stare at the code and think (and test) some more to form an opinion on
-whether it's worth changing. Meanwhile it looks like you have a
-reasonable enough workaround..
-
-Brian
-
-> Now both the old and new behavior make some sense so I won't argue that the
-> new iomap_iter() behavior is wrong. But I think we should change ext4 back
-> to the old behavior of failing unaligned dio writes instead of them falling
-> back to buffered IO. I think something like the attached patch should do
-> the trick - it makes unaligned dio writes fail again while writes to holes
-> of indirect-block mapped files still correctly fall back to buffered IO.
-> Once fstests run completes, I'll do a proper submission...
-> 
-> 
-> 								Honza
-> -- 
-> Jan Kara <jack@suse.com>
-> SUSE Labs, CR
-
-> From ce6da00a09647a03013c3f420c2e7ef7489c3de8 Mon Sep 17 00:00:00 2001
-> From: Jan Kara <jack@suse.cz>
-> Date: Wed, 27 Aug 2025 14:55:19 +0200
-> Subject: [PATCH] ext4: Fail unaligned direct IO write with EINVAL
-> 
-> Commit bc264fea0f6f ("iomap: support incremental iomap_iter advances")
-> changed the error handling logic in iomap_iter(). Previously any error
-> from iomap_dio_bio_iter() got propagated to userspace, after this commit
-> if ->iomap_end returns error, it gets propagated to userspace instead of
-> an error from iomap_dio_bio_iter(). This results in unaligned writes to
-> ext4 to silently fallback to buffered IO instead of erroring out.
-> 
-> Now returning ENOTBLK for DIO writes from ext4_iomap_end() seems
-> unnecessary these days. It is enough to return ENOTBLK from
-> ext4_iomap_begin() when we don't support DIO write for that particular
-> file offset (due to hole).
-> 
-> Fixes: bc264fea0f6f ("iomap: support incremental iomap_iter advances")
-> Signed-off-by: Jan Kara <jack@suse.cz>
+> On 22 Aug 2025, at 09:14, Andreas Hindborg <a.hindborg@kernel.org> =
+wrote:
+>=20
+> Allow users of the rust block device driver API to install private =
+data in
+> the `GenDisk` structure.
+>=20
+> Reviewed-by: Alice Ryhl <aliceryhl@google.com>
+> Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
 > ---
->  fs/ext4/file.c  |  2 --
->  fs/ext4/inode.c | 35 -----------------------------------
->  2 files changed, 37 deletions(-)
-> 
-> diff --git a/fs/ext4/file.c b/fs/ext4/file.c
-> index 93240e35ee36..cf39f57d21e9 100644
-> --- a/fs/ext4/file.c
-> +++ b/fs/ext4/file.c
-> @@ -579,8 +579,6 @@ static ssize_t ext4_dio_write_iter(struct kiocb *iocb, struct iov_iter *from)
->  		iomap_ops = &ext4_iomap_overwrite_ops;
->  	ret = iomap_dio_rw(iocb, from, iomap_ops, &ext4_dio_write_ops,
->  			   dio_flags, NULL, 0);
-> -	if (ret == -ENOTBLK)
-> -		ret = 0;
->  	if (extend) {
->  		/*
->  		 * We always perform extending DIO write synchronously so by
-> diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c
-> index 5b7a15db4953..c3b23c90fd11 100644
-> --- a/fs/ext4/inode.c
-> +++ b/fs/ext4/inode.c
-> @@ -3872,47 +3872,12 @@ static int ext4_iomap_overwrite_begin(struct inode *inode, loff_t offset,
->  	return ret;
->  }
->  
-> -static inline bool ext4_want_directio_fallback(unsigned flags, ssize_t written)
-> -{
-> -	/* must be a directio to fall back to buffered */
-> -	if ((flags & (IOMAP_WRITE | IOMAP_DIRECT)) !=
-> -		    (IOMAP_WRITE | IOMAP_DIRECT))
-> -		return false;
-> -
-> -	/* atomic writes are all-or-nothing */
-> -	if (flags & IOMAP_ATOMIC)
-> -		return false;
-> -
-> -	/* can only try again if we wrote nothing */
-> -	return written == 0;
-> -}
-> -
-> -static int ext4_iomap_end(struct inode *inode, loff_t offset, loff_t length,
-> -			  ssize_t written, unsigned flags, struct iomap *iomap)
-> -{
-> -	/*
-> -	 * Check to see whether an error occurred while writing out the data to
-> -	 * the allocated blocks. If so, return the magic error code for
-> -	 * non-atomic write so that we fallback to buffered I/O and attempt to
-> -	 * complete the remainder of the I/O.
-> -	 * For non-atomic writes, any blocks that may have been
-> -	 * allocated in preparation for the direct I/O will be reused during
-> -	 * buffered I/O. For atomic write, we never fallback to buffered-io.
-> -	 */
-> -	if (ext4_want_directio_fallback(flags, written))
-> -		return -ENOTBLK;
-> -
-> -	return 0;
-> -}
-> -
->  const struct iomap_ops ext4_iomap_ops = {
->  	.iomap_begin		= ext4_iomap_begin,
-> -	.iomap_end		= ext4_iomap_end,
->  };
->  
->  const struct iomap_ops ext4_iomap_overwrite_ops = {
->  	.iomap_begin		= ext4_iomap_overwrite_begin,
-> -	.iomap_end		= ext4_iomap_end,
->  };
->  
->  static int ext4_iomap_begin_report(struct inode *inode, loff_t offset,
-> -- 
-> 2.43.0
-> 
+> drivers/block/rnull/rnull.rs       |  8 ++++---
+> rust/kernel/block/mq.rs            |  7 +++---
+> rust/kernel/block/mq/gen_disk.rs   | 32 ++++++++++++++++++++++----
+> rust/kernel/block/mq/operations.rs | 46 =
+++++++++++++++++++++++++++++++--------
+> 4 files changed, 74 insertions(+), 19 deletions(-)
+>=20
+> diff --git a/drivers/block/rnull/rnull.rs =
+b/drivers/block/rnull/rnull.rs
+> index 8690ff5f974f..8255236bc550 100644
+> --- a/drivers/block/rnull/rnull.rs
+> +++ b/drivers/block/rnull/rnull.rs
+> @@ -61,14 +61,16 @@ fn new(
+>             .logical_block_size(block_size)?
+>             .physical_block_size(block_size)?
+>             .rotational(rotational)
+> -            .build(fmt!("{}", name.to_str()?), tagset)
+> +            .build(fmt!("{}", name.to_str()?), tagset, ())
+>     }
+> }
+>=20
+> #[vtable]
+> impl Operations for NullBlkDevice {
+> +    type QueueData =3D ();
+> +
+>     #[inline(always)]
+> -    fn queue_rq(rq: ARef<mq::Request<Self>>, _is_last: bool) -> =
+Result {
+> +    fn queue_rq(_queue_data: (), rq: ARef<mq::Request<Self>>, =
+_is_last: bool) -> Result {
+>         mq::Request::end_ok(rq)
+>             .map_err(|_e| kernel::error::code::EIO)
+>             // We take no refcounts on the request, so we expect to be =
+able to
+> @@ -79,5 +81,5 @@ fn queue_rq(rq: ARef<mq::Request<Self>>, _is_last: =
+bool) -> Result {
+>         Ok(())
+>     }
+>=20
+> -    fn commit_rqs() {}
+> +    fn commit_rqs(_queue_data: ()) {}
+> }
+> diff --git a/rust/kernel/block/mq.rs b/rust/kernel/block/mq.rs
+> index 98fa0d6bc8f7..6e546f4f3d1c 100644
+> --- a/rust/kernel/block/mq.rs
+> +++ b/rust/kernel/block/mq.rs
+> @@ -69,20 +69,21 @@
+> //!
+> //! #[vtable]
+> //! impl Operations for MyBlkDevice {
+> +//!     type QueueData =3D ();
+> //!
+> -//!     fn queue_rq(rq: ARef<Request<Self>>, _is_last: bool) -> =
+Result {
+> +//!     fn queue_rq(_queue_data: (), rq: ARef<Request<Self>>, =
+_is_last: bool) -> Result {
+> //!         Request::end_ok(rq);
+> //!         Ok(())
+> //!     }
+> //!
+> -//!     fn commit_rqs() {}
+> +//!     fn commit_rqs(_queue_data: ()) {}
+> //! }
+> //!
+> //! let tagset: Arc<TagSet<MyBlkDevice>> =3D
+> //!     Arc::pin_init(TagSet::new(1, 256, 1), flags::GFP_KERNEL)?;
+> //! let mut disk =3D gen_disk::GenDiskBuilder::new()
+> //!     .capacity_sectors(4096)
+> -//!     .build(format_args!("myblk"), tagset)?;
+> +//!     .build(format_args!("myblk"), tagset, ())?;
+> //!
+> //! # Ok::<(), kernel::error::Error>(())
+> //! ```
+> diff --git a/rust/kernel/block/mq/gen_disk.rs =
+b/rust/kernel/block/mq/gen_disk.rs
+> index 6b1b846874db..46ec80269970 100644
+> --- a/rust/kernel/block/mq/gen_disk.rs
+> +++ b/rust/kernel/block/mq/gen_disk.rs
+> @@ -13,6 +13,7 @@
+>     static_lock_class,
+>     str::NullTerminatedFormatter,
+>     sync::Arc,
+> +    types::{ForeignOwnable, ScopeGuard},
+> };
+> use core::fmt::{self, Write};
+>=20
+> @@ -98,7 +99,14 @@ pub fn build<T: Operations>(
+>         self,
+>         name: fmt::Arguments<'_>,
+>         tagset: Arc<TagSet<T>>,
+> +        queue_data: T::QueueData,
+>     ) -> Result<GenDisk<T>> {
+> +        let data =3D queue_data.into_foreign();
+> +        let recover_data =3D ScopeGuard::new(|| {
+> +            // SAFETY: T::QueueData was created by the call to =
+`into_foreign()` above
+> +            drop(unsafe { T::QueueData::from_foreign(data) });
+> +        });
+> +
+>         // SAFETY: `bindings::queue_limits` contain only fields that =
+are valid when zeroed.
+>         let mut lim: bindings::queue_limits =3D unsafe { =
+core::mem::zeroed() };
+>=20
+> @@ -113,7 +121,7 @@ pub fn build<T: Operations>(
+>             bindings::__blk_mq_alloc_disk(
+>                 tagset.raw_tag_set(),
+>                 &mut lim,
+> -                core::ptr::null_mut(),
+> +                data,
+>                 static_lock_class!().as_ptr(),
+>             )
+>         })?;
+> @@ -167,8 +175,12 @@ pub fn build<T: Operations>(
+>             },
+>         )?;
+>=20
+> +        recover_data.dismiss();
+> +
+>         // INVARIANT: `gendisk` was initialized above.
+>         // INVARIANT: `gendisk` was added to the VFS via =
+`device_add_disk` above.
+> +        // INVARIANT: `gendisk.queue.queue_data` is set to `data` in =
+the call to
+> +        // `__blk_mq_alloc_disk` above.
+>         Ok(GenDisk {
+>             _tagset: tagset,
+>             gendisk,
+> @@ -180,9 +192,10 @@ pub fn build<T: Operations>(
+> ///
+> /// # Invariants
+> ///
+> -/// - `gendisk` must always point to an initialized and valid `struct =
+gendisk`.
+> -/// - `gendisk` was added to the VFS through a call to
+> -///   `bindings::device_add_disk`.
+> +///  - `gendisk` must always point to an initialized and valid =
+`struct gendisk`.
+> +///  - `gendisk` was added to the VFS through a call to
+> +///    `bindings::device_add_disk`.
+> +///  - `self.gendisk.queue.queuedata` is initialized by a call to =
+`ForeignOwnable::into_foreign`.
+> pub struct GenDisk<T: Operations> {
+>     _tagset: Arc<TagSet<T>>,
+>     gendisk: *mut bindings::gendisk,
+> @@ -194,9 +207,20 @@ unsafe impl<T: Operations + Send> Send for =
+GenDisk<T> {}
+>=20
+> impl<T: Operations> Drop for GenDisk<T> {
+>     fn drop(&mut self) {
+> +        // SAFETY: By type invariant of `Self`, `self.gendisk` points =
+to a valid
+> +        // and initialized instance of `struct gendisk`, and, =
+`queuedata` was
+> +        // initialized with the result of a call to
+> +        // `ForeignOwnable::into_foreign`.
+> +        let queue_data =3D unsafe { =
+(*(*self.gendisk).queue).queuedata };
+> +
+>         // SAFETY: By type invariant, `self.gendisk` points to a valid =
+and
+>         // initialized instance of `struct gendisk`, and it was =
+previously added
+>         // to the VFS.
+>         unsafe { bindings::del_gendisk(self.gendisk) };
+> +
+> +        // SAFETY: `queue.queuedata` was created by =
+`GenDiskBuilder::build` with
+> +        // a call to `ForeignOwnable::into_foreign` to create =
+`queuedata`.
+> +        // `ForeignOwnable::from_foreign` is only called here.
+> +        drop(unsafe { T::QueueData::from_foreign(queue_data) });
+>     }
+> }
+> diff --git a/rust/kernel/block/mq/operations.rs =
+b/rust/kernel/block/mq/operations.rs
+> index c2b98f507bcb..6fb256f55acc 100644
+> --- a/rust/kernel/block/mq/operations.rs
+> +++ b/rust/kernel/block/mq/operations.rs
+> @@ -6,14 +6,15 @@
+>=20
+> use crate::{
+>     bindings,
+> -    block::mq::request::RequestDataWrapper,
+> -    block::mq::Request,
+> +    block::mq::{request::RequestDataWrapper, Request},
+>     error::{from_result, Result},
+>     prelude::*,
+> -    types::ARef,
+> +    types::{ARef, ForeignOwnable},
+> };
+> use core::{marker::PhantomData, sync::atomic::AtomicU64, =
+sync::atomic::Ordering};
+>=20
+> +type ForeignBorrowed<'a, T> =3D <T as ForeignOwnable>::Borrowed<'a>;
+> +
+> /// Implement this trait to interface blk-mq as block devices.
+> ///
+> /// To implement a block device driver, implement this trait as =
+described in the
+> @@ -26,12 +27,20 @@
+> /// [module level documentation]: kernel::block::mq
+> #[macros::vtable]
+> pub trait Operations: Sized {
+> +    /// Data associated with the `struct request_queue` that is =
+allocated for
+> +    /// the `GenDisk` associated with this `Operations` =
+implementation.
+> +    type QueueData: ForeignOwnable;
+> +
+>     /// Called by the kernel to queue a request with the driver. If =
+`is_last` is
+>     /// `false`, the driver is allowed to defer committing the =
+request.
+> -    fn queue_rq(rq: ARef<Request<Self>>, is_last: bool) -> Result;
+> +    fn queue_rq(
+> +        queue_data: ForeignBorrowed<'_, Self::QueueData>,
+> +        rq: ARef<Request<Self>>,
+> +        is_last: bool,
+> +    ) -> Result;
+>=20
+>     /// Called by the kernel to indicate that queued requests should =
+be submitted.
+> -    fn commit_rqs();
+> +    fn commit_rqs(queue_data: ForeignBorrowed<'_, Self::QueueData>);
+>=20
+>     /// Called by the kernel to poll the device for completed =
+requests. Only
+>     /// used for poll queues.
+> @@ -70,7 +79,7 @@ impl<T: Operations> OperationsVTable<T> {
+>     ///   promise to not access the request until the driver calls
+>     ///   `bindings::blk_mq_end_request` for the request.
+>     unsafe extern "C" fn queue_rq_callback(
+> -        _hctx: *mut bindings::blk_mq_hw_ctx,
+> +        hctx: *mut bindings::blk_mq_hw_ctx,
+>         bd: *const bindings::blk_mq_queue_data,
+>     ) -> bindings::blk_status_t {
+>         // SAFETY: `bd.rq` is valid as required by the safety =
+requirement for
+> @@ -88,10 +97,20 @@ impl<T: Operations> OperationsVTable<T> {
+>         //    reference counted by `ARef` until then.
+>         let rq =3D unsafe { Request::aref_from_raw((*bd).rq) };
+>=20
+> +        // SAFETY: `hctx` is valid as required by this function.
+> +        let queue_data =3D unsafe { (*(*hctx).queue).queuedata };
+> +
+> +        // SAFETY: `queue.queuedata` was created by =
+`GenDisk::try_new()` with a
+
+isn=E2=80=99t this set on build() ?
+
+> +        // call to `ForeignOwnable::into_pointer()` to create =
+`queuedata`.
+
+into_pointer() ?
+
+> +        // `ForeignOwnable::from_foreign()` is only called when the =
+tagset is
+> +        // dropped, which happens after we are dropped.
+> +        let queue_data =3D unsafe { T::QueueData::borrow(queue_data) =
+};
+> +
+>         // SAFETY: We have exclusive access and we just set the =
+refcount above.
+>         unsafe { Request::start_unchecked(&rq) };
+>=20
+>         let ret =3D T::queue_rq(
+> +            queue_data,
+>             rq,
+>             // SAFETY: `bd` is valid as required by the safety =
+requirement for
+>             // this function.
+> @@ -110,9 +129,18 @@ impl<T: Operations> OperationsVTable<T> {
+>     ///
+>     /// # Safety
+>     ///
+> -    /// This function may only be called by blk-mq C infrastructure.
+> -    unsafe extern "C" fn commit_rqs_callback(_hctx: *mut =
+bindings::blk_mq_hw_ctx) {
+> -        T::commit_rqs()
+> +    /// This function may only be called by blk-mq C infrastructure. =
+The caller
+> +    /// must ensure that `hctx` is valid.
+> +    unsafe extern "C" fn commit_rqs_callback(hctx: *mut =
+bindings::blk_mq_hw_ctx) {
+> +        // SAFETY: `hctx` is valid as required by this function.
+> +        let queue_data =3D unsafe { (*(*hctx).queue).queuedata };
+> +
+> +        // SAFETY: `queue.queuedata` was created by =
+`GenDisk::try_new()` with a
+> +        // call to `ForeignOwnable::into_pointer()` to create =
+`queuedata`.
+
+into_foreign()?
+
+> +        // `ForeignOwnable::from_foreign()` is only called when the =
+tagset is
+> +        // dropped, which happens after we are dropped.
+> +        let queue_data =3D unsafe { T::QueueData::borrow(queue_data) =
+};
+> +        T::commit_rqs(queue_data)
+>     }
+>=20
+>     /// This function is called by the C kernel. It is not currently
+>=20
+> --=20
+> 2.47.2
+>=20
+>=20
+>=20
+
+Reviewed-by: Daniel Almeida <daniel.almeida@collabora.com>
 
