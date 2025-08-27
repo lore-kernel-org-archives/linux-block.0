@@ -1,115 +1,106 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84DCF1AB52D;
-	Wed, 27 Aug 2025 03:13:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 579A330CD98;
+	Wed, 27 Aug 2025 03:22:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756264410; cv=none; b=BD57sepTMOzXBiDOp+m23AQPpXXhskDn1v/XLzNG1KFiYtBuC7JoByVf+uLYLbb3Id7Uigp3BEhAMpUINwaLrw+k0JjyQfvw7iIzhcPMEMcBYJzyrhfHovUywsPgNKl7kKZAd4LSBi/EhMpJmmGT3OhMqjfiiZVj45C3Ok3PF7Q=
+	t=1756264934; cv=none; b=FbPIRzoaIjFaTisz7OVFK1P+rQlOStBqw9hjbcnerLd0a4fo8TDFWPfV3dOF1ByY/egTPIsL9Eb2Aby8DoJwH3Nz8V7GWDuozEVPqqYEOn7+66U5zCRH0OGsF8hvGFKHIbsdvZB8hbLuX5gpkUo60dqdoqZ9yadANdkPgNzXYfU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756264410; c=relaxed/simple;
-	bh=dVQ2iRM0B9mG/QkcgL/3eV7ZWiGhjSm9OFZfHWGE5f8=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=NjC/xb3NeHINBJENXHMiz2PuwtLFHSMN5/Pgz21Dcbcx3tsvd1TSqf8kf8ibZzCSCJ1KICRa82/YbWZ4ZrlTf1X22ePJRbPW4oBoQNfkp8d7p9R/TtUQMsZRv4HxIg5haRr+YbapzP5iqw1bw2wL8XN4as8yrRmbSUwO2HNW6l8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+	s=arc-20240116; t=1756264934; c=relaxed/simple;
+	bh=XfOhz1jxPWqok8rdhjGzlCjQcqFV+0wL+yVgmuQ/ziQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=B24kBpSRgcRcpZ0YjGzm87Ly/bgsZBMBqEeQ0BMmzyKLhWEz5aRhCd2seLe7Qydwj3chpQ/pVkiGRrePiVEpZtNnaCup2KHxFpftxiGg3ulFDlHZVoi9aYZHVGBI+mnBOl7Qgu45j4m6nNT2IINItn6zw94xcXi49ByV/EHx6bM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
 Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4cBV3L0mjxzKHMc1;
-	Wed, 27 Aug 2025 11:13:18 +0800 (CST)
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4cBVFY6hLdzYQv5q;
+	Wed, 27 Aug 2025 11:22:09 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id B9F0B1A1040;
-	Wed, 27 Aug 2025 11:13:17 +0800 (CST)
-Received: from [10.174.179.143] (unknown [10.174.179.143])
-	by APP4 (Coremail) with SMTP id gCh0CgCn8IzJd65o6fO3AQ--.46037S3;
-	Wed, 27 Aug 2025 11:13:15 +0800 (CST)
-Subject: Re: [REGRESSION] loop: use vfs_getattr_nosec for accurate file size
-To: Theodore Ts'o <tytso@mit.edu>, Rajeev Mishra <rajeevm@hpe.com>
-Cc: linux-block@vger.kernel.org,
- Linux Filesystem Development List <linux-fsdevel@vger.kernel.org>,
- Jens Axboe <axboe@kernel.dk>, "yukuai (C)" <yukuai3@huawei.com>
-References: <20250827025939.GA2209224@mit.edu>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <274c312c-d0e5-10af-0ef0-bab92e71eb64@huaweicloud.com>
-Date: Wed, 27 Aug 2025 11:13:13 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.1
+	by mail.maildlp.com (Postfix) with ESMTP id 734D81A018D;
+	Wed, 27 Aug 2025 11:22:08 +0800 (CST)
+Received: from [10.174.179.247] (unknown [10.174.179.247])
+	by APP4 (Coremail) with SMTP id gCh0CgCn8Izeea5o0qi4AQ--.46201S3;
+	Wed, 27 Aug 2025 11:22:08 +0800 (CST)
+Message-ID: <b5f385bc-5e16-2a79-f997-5fd697f2a38a@huaweicloud.com>
+Date: Wed, 27 Aug 2025 11:22:06 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20250827025939.GA2209224@mit.edu>
-Content-Type: text/plain; charset=gbk; format=flowed
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [PATCH] blk-mq: check kobject state_in_sysfs before deleting in
+ blk_mq_unregister_hctx
+To: Ming Lei <ming.lei@redhat.com>, Yu Kuai <yukuai1@huaweicloud.com>
+Cc: linan666@huaweicloud.com, axboe@kernel.dk, jianchao.w.wang@oracle.com,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ yangerkun@huawei.com, yi.zhang@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
+References: <20250826084854.1030545-1-linan666@huaweicloud.com>
+ <aK5YH4Jbt3ZNngwR@fedora>
+ <3853d5bf-a561-ec2d-e063-5fbe5cf025ca@huaweicloud.com>
+ <aK5g-38izFqjPk9v@fedora>
+From: Li Nan <linan666@huaweicloud.com>
+In-Reply-To: <aK5g-38izFqjPk9v@fedora>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgCn8IzJd65o6fO3AQ--.46037S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7WF18Cr4rGr48ZryxJF45GFg_yoW8Ww4xpa
-	9a9F1Ykr1DKr1UCFWjgr1UZ3W0grZ5X3sxWr18twn3ZFyUt34jkr929r43WF4Ykryrua1a
-	kwna93s09r4IvaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvjb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AF
-	wI0_JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
-	xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1D
-	MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
-	0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWU
-	JVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUwx
-	hLUUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CM-TRANSID:gCh0CgCn8Izeea5o0qi4AQ--.46201S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7Gry7XFWkAF1xZrWxtF4UXFb_yoW8Jry7pF
+	Z5Ca48Kr1Dtr4293Wjvws7GFyYkrs7Gr43Zr98JryS9wnF9r95tr4xKF4DWFW8Ars7A3WI
+	qa1UXFZ3ZFy8uaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUPI14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1lnxkEFVAIw20F6cxK64vIFxWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xv
+	F2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r
+	4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v
+	4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7
+	AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02
+	F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GF
+	ylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7Cj
+	xVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r
+	1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUQ
+	vtAUUUUU=
+X-CM-SenderInfo: polqt0awwwqx5xdzvxpfor3voofrz/
 
-Hi,
 
-ÔÚ 2025/08/27 10:59, Theodore Ts'o Ð´µÀ:
-> Hi, I was testing 6.17-rc3, and I noticed a test failure in fstest
-> generic/563[1], when testing both ext4 and xfs.  If you are using my
-> test appliance[2], this can be trivially reproduced using:
-> 
->     kvm-xfstests -c ext4/4k generic/563
-> or
->     kvm-xfstests -c xfs/4k generic/563
-> 
-> [1] https://git.kernel.org/pub/scm/fs/xfs/xfstests-dev.git/tree/tests/generic/563
-> [2] https://github.com/tytso/xfstests-bld/blob/master/Documentation/kvm-quickstart.md
-> 
-> A git bisect pointed the problem at:
-> 
-> commit 47b71abd58461a67cae71d2f2a9d44379e4e2fcf
-> Author: Rajeev Mishra <rajeevm@hpe.com>
-> Date:   Mon Aug 18 18:48:21 2025 +0000
-> 
->      loop: use vfs_getattr_nosec for accurate file size
->      
->      Use vfs_getattr_nosec() in lo_calculate_size() for getting the file
->      size, rather than just read the cached inode size via i_size_read().
->      This provides better results than cached inode data, particularly for
->      network filesystems where metadata may be stale.
->      
->      Signed-off-by: Rajeev Mishra <rajeevm@hpe.com>
->      Reviewed-by: Yu Kuai <yukuai3@huawei.com>
->      Link: https://lore.kernel.org/r/20250818184821.115033-3-rajeevm@hpe.com
->      [axboe: massage commit message]
->      Signed-off-by: Jens Axboe <axboe@kernel.dk>
-> 
-> ... and indeed if I go to 6.17-rc3, and revert this commit,
-> generic/563 starts passing again.
-> 
-> Could you please take a look, and/or revert this change?  Many thanks!
 
-This is fixed by:
+åœ¨ 2025/8/27 9:35, Ming Lei å†™é“:
+> On Wed, Aug 27, 2025 at 09:04:45AM +0800, Yu Kuai wrote:
+>> Hi,
+>>
+>> åœ¨ 2025/08/27 8:58, Ming Lei å†™é“:
+>>> On Tue, Aug 26, 2025 at 04:48:54PM +0800, linan666@huaweicloud.com wrote:
+>>>> From: Li Nan <linan122@huawei.com>
+>>>>
+>>>> In __blk_mq_update_nr_hw_queues() the return value of
+>>>> blk_mq_sysfs_register_hctxs() is not checked. If sysfs creation for hctx
+>>>
+>>> Looks we should check its return value and handle the failure in both
+>>> the call site and blk_mq_sysfs_register_hctxs().
+>>
+>>  From __blk_mq_update_nr_hw_queues(), the old hctxs is already
+>> unregistered, and this function is void, we failed to register new hctxs
+>> because of memory allocation failure. I really don't know how to handle
+>> the failure here, do you have any suggestions?
+> 
+> It is out of memory, I think it is fine to do whatever to leave queue state
+> intact instead of making it `partial workable`, such as:
+> 
+> - try update nr_hw_queues to 1
+> 
+> - if it still fails, delete disk & mark queue as dead if disk is attached
+> 
 
-https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git/commit/?h=block-6.17&id=d14469ed7c00314fe8957b2841bda329e4eaf4ab
+If we ignore these non-critical sysfs creation failures, the disk remains 
+usable with no loss of functionality. Deleting the disk seems to escalate
+the error?
 
+-- 
 Thanks,
-Kuai
-
-> 
->        	  	      	      	 	- Ted
-> 
-> .
-> 
+Nan
 
