@@ -1,97 +1,318 @@
-Received: from mail-io1-f51.google.com (mail-io1-f51.google.com [209.85.166.51])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 340FF18C011
-	for <linux-block@vger.kernel.org>; Wed, 27 Aug 2025 14:33:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7736A275AE7
+	for <linux-block@vger.kernel.org>; Wed, 27 Aug 2025 15:20:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756305211; cv=none; b=X0n6uGmTt0yUYzAlf1r09M7+xDbE0U8zs1L7nTdcuQ6IkRg/+TRpApGgvnfvmpR9yzazAKUO0UkGxDN/FSandHg2xdCObGz9cH9ABbVLZFDh/FRLrO61OPubA6fAOHiu1Akpp/NwMrwMQv4I3uanfdipCLq2Ta1lO9z7FRU1qZY=
+	t=1756308058; cv=none; b=BagXwpMCBFudAk2Z1meFoZISKTFBzA/TY00R3ubJb5Yon6JrpcQgUpHNlPZm9l/4OoGwrPyPmsMP3ub1j2ToyQsmW1OyRS96umeIdFBxk+Ct3CTZfx3m0Hc2kMDxrnf2yTNM6F9MpESC7RbMhtvmcwQLUdb+rgcNvnG49ZCC8iA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756305211; c=relaxed/simple;
-	bh=sldAhQQpmLk8JfPQ/X/+f6FvtcyWfPIoIRD3vqVION0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Xh+hQCTMF+pnrGPLoJE21AYyRkRg9kowmzvfd8dxtU1iMLHyOjlsvQ1CzmHxjT/YKq4ZW3GU1QSk2gAfOgBps0o3Hnv/NP7azYki7dHyEBKu3hQvuxy3cv7tVq0gSoHeGlScmx90nigkjb49HZ1p/m0NQPF2Rd44ahdzE2YTFiQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=EqmoFEq4; arc=none smtp.client-ip=209.85.166.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1756308058; c=relaxed/simple;
+	bh=2wuf/nHdFysBGBlr5kTnDgd5NgVKF4J69Lu6nnyta4M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hZj+Msb2c0YtMozFOBYuE5TwHtyLsO3jKt83eyLtiuvBXACMf4bXzA0cXxJA9dSOZeyR4Re3dHVBG6gxK4vMffgkdM/W6g682/QlRQFuAnjmfuzuK0t7n02s+IrFRhNGN6vwf3BQlJvQv6eYm6+yyg8BktMQ5GGj4ntwocOl+A8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=hNJ1gfKo; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=+n9khl2d; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=hNJ1gfKo; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=+n9khl2d; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="EqmoFEq4"
-Received: by mail-io1-f51.google.com with SMTP id ca18e2360f4ac-88432efaf45so88129839f.3
-        for <linux-block@vger.kernel.org>; Wed, 27 Aug 2025 07:33:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1756305208; x=1756910008; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=cuXTvGJMiWGFlmLyQyXukPdAfvRayni7TOXCI1oEsiI=;
-        b=EqmoFEq41KGQNhGdLYTS0SQP41vUPjT42sofrhJQjgGRicuyrAqkPEap+DyoFF19pw
-         1c9PyODXgCiZMBQmPd3zYMyNTuqLYdPqhfN2NysBZ910QNr+Z6HrawSj4SDITlWHjxhh
-         3YcEMjbPtEQu40l73qiIl0r0fmG46LxoohVOMPxeaUppaQbj8C5VH5plK4dwY0EfT3wl
-         QJwpBTTH+rY3b9BNvoms7WzmDj0r+IoHU8L4lLBDoc9GctiyZ+wVTeHVtfth28kG5Jef
-         rMyEPivKoxFWTbhMn3NyyZp3Ges/1TKkyKCL51N06VCEp8i4ZSuTMzTTbcr541Sz8gpZ
-         OZFw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756305208; x=1756910008;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cuXTvGJMiWGFlmLyQyXukPdAfvRayni7TOXCI1oEsiI=;
-        b=na1C8vIn/4xHAg49megqbzWq2dRgguLXEJbnLsC0gywQore0MOe992KOBvTUJ/ZBCM
-         yQbh1jVmrAcZLFPqzg5qT1Rit+fc1DyOA8Qodua6IxJZgj0WfnlUy8QDriUYOWS5Mcgx
-         NqihxZ1SwYfe1pvrKt0SxjVl/HDqHfUmUAkiWJbLB/cBUMLZod76MwOmuGHQUjFk4bwN
-         CbNAvOkCK0YnsZ1u05LtdfKNQWxAC4BNspYqrSKfamDaa2bf0idtePrd5vaTchvhwiup
-         SDN41JefT4fJXLKCSNighYvFLQjLBLe9+CTmzm2rBkOOHxXHGcpYGxtPuIPBHECv61nx
-         EyOA==
-X-Forwarded-Encrypted: i=1; AJvYcCXAY9q2vfcY43Q5tc8X/e89dHJ9SU1a9/dSPUeP/Roy+u4s2ZgCjTSdqAi+ZY5BG6ZZeuf97f7Vw6r3XQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyScpvJ/YWsPDZ2fMeI7BX3nCcdivCyLJ6J6nFKnGy3C4ut5o1A
-	eJi8EyidJJs8uD+2fgpxfHNaivE6Te4PfppaZNaLFXJQR8zJQ3WUci3Ia7155HYrG14=
-X-Gm-Gg: ASbGnctOpP4uKSas/OXrpFqvMYC0Ny4Kj51u80V4RS6RyxZpGEc5TILv9lScVK44NOd
-	lDha943F981gA763d6lJt5DCbeqobmCc0OO6Nx3EBRw4aJRt6e3GDgmGmrwEa+fVGHy6cbgtVyY
-	eOvCAx+n3Ko31Fr51oBH2jMLcH85ao5R23ddFOlbOnZ8RONxg4SMoBDaS9B0bz7wNw+838emR4Y
-	xHxPMxH5EQy1B0jB97c5xiGxj91BeL1NvWtVfXI1aiL/JM47nYsPEi4wlqvF3rsyGLbt2y76XCe
-	KCa6ATIwxfT+lxA7A2kTcYjjpnLnBL1Y86TNPZ6dJOUqG/tkUeAO1I5/wPWOzm/K6wyE1kL8/oS
-	k2TApabi81xsvV0nOPq+ZVKp6KGZ9NFRg/uB+mwnI
-X-Google-Smtp-Source: AGHT+IFhCDX+vznxC1PeElLem/u1bc5IXLzc0em6nOpMfx2mbDcc4ih3vaywDiYCZarP1Vk6NBlZyA==
-X-Received: by 2002:a05:6602:6215:b0:886:f821:a575 with SMTP id ca18e2360f4ac-886f821a5cdmr567026339f.1.1756305207920;
-        Wed, 27 Aug 2025 07:33:27 -0700 (PDT)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-886c8f0c68asm849331339f.11.2025.08.27.07.33.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 27 Aug 2025 07:33:27 -0700 (PDT)
-Message-ID: <a7006be1-fcb0-4132-88c1-0b23bc6d642b@kernel.dk>
-Date: Wed, 27 Aug 2025 08:33:26 -0600
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="hNJ1gfKo";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="+n9khl2d";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="hNJ1gfKo";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="+n9khl2d"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 9CAA122852;
+	Wed, 27 Aug 2025 15:20:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1756308054; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=jIUV/rvBNFGtnWoz6AMDWcfQSNFQrImn3StxIXuCvcY=;
+	b=hNJ1gfKoug0X+QSVF/LIxJImahP6cGP2oX6BEFPvhOy66hDhOSFMzY3/mrklfuOZBw3rR0
+	8Q7i2eQvuocJdvvIRpw3XRyngoNwIWu0XGWWmKUMKx1mrnGdGIuJJ+TSwP/aFpuBMiVfa4
+	vQKYj/VheBJKa4esq+8A86Z5mv/kG8I=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1756308054;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=jIUV/rvBNFGtnWoz6AMDWcfQSNFQrImn3StxIXuCvcY=;
+	b=+n9khl2dkHFNup0m6p3/3gGv7KWesh/bRWwJuPsnjqWa8ULhrcERGZatAF2TLNOeHupMkt
+	4XAt6SLUdlV4xoAA==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=hNJ1gfKo;
+	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=+n9khl2d
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1756308054; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=jIUV/rvBNFGtnWoz6AMDWcfQSNFQrImn3StxIXuCvcY=;
+	b=hNJ1gfKoug0X+QSVF/LIxJImahP6cGP2oX6BEFPvhOy66hDhOSFMzY3/mrklfuOZBw3rR0
+	8Q7i2eQvuocJdvvIRpw3XRyngoNwIWu0XGWWmKUMKx1mrnGdGIuJJ+TSwP/aFpuBMiVfa4
+	vQKYj/VheBJKa4esq+8A86Z5mv/kG8I=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1756308054;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=jIUV/rvBNFGtnWoz6AMDWcfQSNFQrImn3StxIXuCvcY=;
+	b=+n9khl2dkHFNup0m6p3/3gGv7KWesh/bRWwJuPsnjqWa8ULhrcERGZatAF2TLNOeHupMkt
+	4XAt6SLUdlV4xoAA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 6E1CF13867;
+	Wed, 27 Aug 2025 15:20:54 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id AunaGlYir2hiDQAAD6G6ig
+	(envelope-from <jack@suse.cz>); Wed, 27 Aug 2025 15:20:54 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+	id 84F96A0999; Wed, 27 Aug 2025 17:20:53 +0200 (CEST)
+Date: Wed, 27 Aug 2025 17:20:53 +0200
+From: Jan Kara <jack@suse.cz>
+To: Ritesh Harjani <ritesh.list@gmail.com>
+Cc: Keith Busch <kbusch@kernel.org>, Jan Kara <jack@suse.cz>, 
+	Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-ext4@vger.kernel.org, snitzer@kernel.org, axboe@kernel.dk, 
+	dw@davidwei.uk, brauner@kernel.org, hch@lst.de, martin.petersen@oracle.com, 
+	djwong@kernel.org, linux-xfs@vger.kernel.org, viro@zeniv.linux.org.uk, 
+	Jan Kara <jack@suse.com>, Brian Foster <bfoster@redhat.com>
+Subject: Re: [PATCHv3 0/8] direct-io: even more flexible io vectors
+Message-ID: <ua7ib34kk5s6yfthqkgy3m2pnbk33a34g7prezmwl7hfwv6lwq@fljhjaogd6gq>
+References: <20250819164922.640964-1-kbusch@meta.com>
+ <87a53ra3mb.fsf@gmail.com>
+ <g35u5ugmyldqao7evqfeb3hfcbn3xddvpssawttqzljpigy7u4@k3hehh3grecq>
+ <aKx485EMthHfBWef@kbusch-mbp>
+ <87cy8ir835.fsf@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [REGRESSION] loop: use vfs_getattr_nosec for accurate file size
-To: Theodore Ts'o <tytso@mit.edu>, Yu Kuai <yukuai1@huaweicloud.com>
-Cc: Rajeev Mishra <rajeevm@hpe.com>, linux-block@vger.kernel.org,
- Linux Filesystem Development List <linux-fsdevel@vger.kernel.org>,
- "yukuai (C)" <yukuai3@huawei.com>
-References: <20250827025939.GA2209224@mit.edu>
- <274c312c-d0e5-10af-0ef0-bab92e71eb64@huaweicloud.com>
- <20250827143136.GA2462272@mit.edu>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20250827143136.GA2462272@mit.edu>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/mixed; boundary="na3a25opjxispaux"
+Content-Disposition: inline
+In-Reply-To: <87cy8ir835.fsf@gmail.com>
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Rspamd-Queue-Id: 9CAA122852
+X-Rspamd-Action: no action
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spamd-Result: default: False [-2.51 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[multipart/mixed,text/plain,text/x-patch];
+	MX_GOOD(-0.01)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	MIME_TRACE(0.00)[0:+,1:+,2:+];
+	ARC_NA(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	TO_DN_SOME(0.00)[];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	TAGGED_RCPT(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DKIM_TRACE(0.00)[suse.cz:+];
+	HAS_ATTACHMENT(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,suse.com:email]
+X-Spam-Score: -2.51
 
-On 8/27/25 8:31 AM, Theodore Ts'o wrote:
-> On Wed, Aug 27, 2025 at 11:13:13AM +0800, Yu Kuai wrote:
->> This is fixed by:
->>
->> https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git/commit/?h=block-6.17&id=d14469ed7c00314fe8957b2841bda329e4eaf4ab
+
+--na3a25opjxispaux
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+On Tue 26-08-25 10:29:58, Ritesh Harjani wrote:
+> Keith Busch <kbusch@kernel.org> writes:
 > 
-> Great, thanks!  Looking forward to this landing in linux-next (since
-> it showed up in my automated linux-next testing laght night).
+> > On Mon, Aug 25, 2025 at 02:07:15PM +0200, Jan Kara wrote:
+> >> On Fri 22-08-25 18:57:08, Ritesh Harjani wrote:
+> >> > Keith Busch <kbusch@meta.com> writes:
+> >> > >
+> >> > >   - EXT4 falls back to buffered io for writes but not for reads.
+> >> > 
+> >> > ++linux-ext4 to get any historical context behind why the difference of
+> >> > behaviour in reads v/s writes for EXT4 DIO. 
+> >> 
+> >> Hum, how did you test? Because in the basic testing I did (with vanilla
+> >> kernel) I get EINVAL when doing unaligned DIO write in ext4... We should be
+> >> falling back to buffered IO only if the underlying file itself does not
+> >> support any kind of direct IO.
+> >
+> > Simple test case (dio-offset-test.c) below.
+> >
+> > I also ran this on vanilla kernel and got these results:
+> >
+> >   # mkfs.ext4 /dev/vda
+> >   # mount /dev/vda /mnt/ext4/
+> >   # make dio-offset-test
+> >   # ./dio-offset-test /mnt/ext4/foobar
+> >   write: Success
+> >   read: Invalid argument
+> >
+> > I tracked the "write: Success" down to ext4's handling for the "special"
+> > -ENOTBLK error after ext4_want_directio_fallback() returns "true".
+> >
+> 
+> Right. Ext4 has fallback only for dio writes but not for DIO reads... 
+> 
+> buffered
+> static inline bool ext4_want_directio_fallback(unsigned flags, ssize_t written)
+> {
+> 	/* must be a directio to fall back to buffered */
+> 	if ((flags & (IOMAP_WRITE | IOMAP_DIRECT)) !=
+> 		    (IOMAP_WRITE | IOMAP_DIRECT))
+> 		return false;
+> 
+>     ...
+> }
+> 
+> So basically the path is ext4_file_[read|write]_iter() -> iomap_dio_rw
+>     -> iomap_dio_bio_iter() -> return -EINVAL. i.e. from...
+> 
+> 
+> 	if ((pos | length) & (bdev_logical_block_size(iomap->bdev) - 1) ||
+> 	    !bdev_iter_is_aligned(iomap->bdev, dio->submit.iter))
+> 		return -EINVAL;
+> 
+> EXT4 then fallsback to buffered-io only for writes, but not for reads. 
 
-Sorry about that, the patch was queued for linux-next on my end on Monday.
-Surprised it isn't there already - in any case, it will be soon.
+Right. And the fallback for writes was actually inadvertedly "added" by
+commit bc264fea0f6f "iomap: support incremental iomap_iter advances". That
+changed the error handling logic. Previously if iomap_dio_bio_iter()
+returned EINVAL, it got propagated to userspace regardless of what
+->iomap_end() returned. After this commit if ->iomap_end() returns error
+(which is ENOTBLK in ext4 case), it gets propagated to userspace instead of
+the error returned by iomap_dio_bio_iter().
 
+Now both the old and new behavior make some sense so I won't argue that the
+new iomap_iter() behavior is wrong. But I think we should change ext4 back
+to the old behavior of failing unaligned dio writes instead of them falling
+back to buffered IO. I think something like the attached patch should do
+the trick - it makes unaligned dio writes fail again while writes to holes
+of indirect-block mapped files still correctly fall back to buffered IO.
+Once fstests run completes, I'll do a proper submission...
+
+
+								Honza
 -- 
-Jens Axboe
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
+
+--na3a25opjxispaux
+Content-Type: text/x-patch; charset=us-ascii
+Content-Disposition: attachment;
+	filename="0001-ext4-Fail-unaligned-direct-IO-write-with-EINVAL.patch"
+
+From ce6da00a09647a03013c3f420c2e7ef7489c3de8 Mon Sep 17 00:00:00 2001
+From: Jan Kara <jack@suse.cz>
+Date: Wed, 27 Aug 2025 14:55:19 +0200
+Subject: [PATCH] ext4: Fail unaligned direct IO write with EINVAL
+
+Commit bc264fea0f6f ("iomap: support incremental iomap_iter advances")
+changed the error handling logic in iomap_iter(). Previously any error
+from iomap_dio_bio_iter() got propagated to userspace, after this commit
+if ->iomap_end returns error, it gets propagated to userspace instead of
+an error from iomap_dio_bio_iter(). This results in unaligned writes to
+ext4 to silently fallback to buffered IO instead of erroring out.
+
+Now returning ENOTBLK for DIO writes from ext4_iomap_end() seems
+unnecessary these days. It is enough to return ENOTBLK from
+ext4_iomap_begin() when we don't support DIO write for that particular
+file offset (due to hole).
+
+Fixes: bc264fea0f6f ("iomap: support incremental iomap_iter advances")
+Signed-off-by: Jan Kara <jack@suse.cz>
+---
+ fs/ext4/file.c  |  2 --
+ fs/ext4/inode.c | 35 -----------------------------------
+ 2 files changed, 37 deletions(-)
+
+diff --git a/fs/ext4/file.c b/fs/ext4/file.c
+index 93240e35ee36..cf39f57d21e9 100644
+--- a/fs/ext4/file.c
++++ b/fs/ext4/file.c
+@@ -579,8 +579,6 @@ static ssize_t ext4_dio_write_iter(struct kiocb *iocb, struct iov_iter *from)
+ 		iomap_ops = &ext4_iomap_overwrite_ops;
+ 	ret = iomap_dio_rw(iocb, from, iomap_ops, &ext4_dio_write_ops,
+ 			   dio_flags, NULL, 0);
+-	if (ret == -ENOTBLK)
+-		ret = 0;
+ 	if (extend) {
+ 		/*
+ 		 * We always perform extending DIO write synchronously so by
+diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c
+index 5b7a15db4953..c3b23c90fd11 100644
+--- a/fs/ext4/inode.c
++++ b/fs/ext4/inode.c
+@@ -3872,47 +3872,12 @@ static int ext4_iomap_overwrite_begin(struct inode *inode, loff_t offset,
+ 	return ret;
+ }
+ 
+-static inline bool ext4_want_directio_fallback(unsigned flags, ssize_t written)
+-{
+-	/* must be a directio to fall back to buffered */
+-	if ((flags & (IOMAP_WRITE | IOMAP_DIRECT)) !=
+-		    (IOMAP_WRITE | IOMAP_DIRECT))
+-		return false;
+-
+-	/* atomic writes are all-or-nothing */
+-	if (flags & IOMAP_ATOMIC)
+-		return false;
+-
+-	/* can only try again if we wrote nothing */
+-	return written == 0;
+-}
+-
+-static int ext4_iomap_end(struct inode *inode, loff_t offset, loff_t length,
+-			  ssize_t written, unsigned flags, struct iomap *iomap)
+-{
+-	/*
+-	 * Check to see whether an error occurred while writing out the data to
+-	 * the allocated blocks. If so, return the magic error code for
+-	 * non-atomic write so that we fallback to buffered I/O and attempt to
+-	 * complete the remainder of the I/O.
+-	 * For non-atomic writes, any blocks that may have been
+-	 * allocated in preparation for the direct I/O will be reused during
+-	 * buffered I/O. For atomic write, we never fallback to buffered-io.
+-	 */
+-	if (ext4_want_directio_fallback(flags, written))
+-		return -ENOTBLK;
+-
+-	return 0;
+-}
+-
+ const struct iomap_ops ext4_iomap_ops = {
+ 	.iomap_begin		= ext4_iomap_begin,
+-	.iomap_end		= ext4_iomap_end,
+ };
+ 
+ const struct iomap_ops ext4_iomap_overwrite_ops = {
+ 	.iomap_begin		= ext4_iomap_overwrite_begin,
+-	.iomap_end		= ext4_iomap_end,
+ };
+ 
+ static int ext4_iomap_begin_report(struct inode *inode, loff_t offset,
+-- 
+2.43.0
+
+
+--na3a25opjxispaux--
