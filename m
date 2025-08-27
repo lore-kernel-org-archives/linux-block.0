@@ -1,455 +1,110 @@
-Received: from sender4-pp-f112.zoho.com (sender4-pp-f112.zoho.com [136.143.188.112])
+Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC22C3570D0;
-	Wed, 27 Aug 2025 14:10:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.112
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756303854; cv=pass; b=SifoixzvkeC9k0oj0J6s/w/X2kecb2bOhmNTAecDal2UZAZBLZvgH7y+iPQfUPM5Eyd5fs9esg+ISriXe3mXvUG46JDJ3aRksdRemwOUkHcepk+NGX7WhoSohRd7ch5g8PoUgC6zxDm2ccl8u6c/uh9WMJkmxN7WKrPlKShWjcY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756303854; c=relaxed/simple;
-	bh=ojISwd1qY2TCNOEld/0A0K0KGIXLObHFwDe20BaZZ4M=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=dIWGgtks1F+soQr1Ch117y+tmiGeY+qJ507ms/FlP9Fx8d77Tj4cOSnnjI7vGtIeF60YCFAOXvOcmVNLSfibuV3ZP6ULALp2Zy8AtdL8j3ovxwlSHt/VVQqJ6UfzPWYVjQmbX63tmnPWutrGOo/Wyu2e5rxEyyMwvbHeejOubHY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=daniel.almeida@collabora.com header.b=W2969Unj; arc=pass smtp.client-ip=136.143.188.112
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF44835AAAA
+	for <linux-block@vger.kernel.org>; Wed, 27 Aug 2025 14:13:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756303998; cv=none; b=FWLndyWEzpp7Z0wBGzo9rZ4GU+pDkhlgv2ozsj5pFTMoUbl//I7DS9tCe71PrCrTuHMxAxg/LyI6Z42nsIUwuEAmFEnRwSoMyvoBpDSG68MQ4SpB9E3UNLRMX4u7RVsKBUSjGhDU7gBiZ9EIfiJv7M13Z6eWutV3D0JzxuAZ9PE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756303998; c=relaxed/simple;
+	bh=4EuDcwVcgg4XYUbwMBGRKkF0194+qMOR8Fxoz5uvsPk=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=IpqdY9YFEjaCRItBpAE0E5FwO62/Bu0v1eywN8ZO71sa9ZITJi16J3h4JCeNUe735zTBK2V7jFyFqb56SyWmNbxwDYlFfaqML35UbOmO17/Yyf6lOwC4aloQ4SMEmwG8rxX4H44I0IzQonK2n7+aP17A1GtWfi7TeDmgGjTM8ek=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=sh3b5UYX; arc=none smtp.client-ip=67.231.145.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=collabora.com header.i=daniel.almeida@collabora.com header.b="W2969Unj"
-ARC-Seal: i=1; a=rsa-sha256; t=1756303832; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=RwcRNVMFT6yrjsBxZMp+1Aox92yYTjEe1s3tQAUyZwAmX2iC6USlR27aoLRRpEZPDomgRRgIIWg8uGzW3WJV6SA7qX0zba4ocsXRsZLVEmo3hx70CrzVQxc5taSx2W+56ERAEF1wDJkMG6TyAWZFp4QOWMVe0IGR+pXkSes5EhA=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1756303832; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=J4BlMs46TcKuQ6XUE/j+iarthoa+EByDQJ4eXRSVSGY=; 
-	b=ANqsVKHiHXkLC139grGm0R8DJp/uYJJsY8XwCdCEZi8qQ35AkUYeJhy1hXEGPgyEMoBlou5omQ4Ow+sElsn9s2ysl3o/m8LiCBN0jtnV1J1i7hjg919hOj0Z81sGdlkA+9hAXUe/td3OldKckoj+3EdoiAnyozyBAaI6beoxX1I=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=collabora.com;
-	spf=pass  smtp.mailfrom=daniel.almeida@collabora.com;
-	dmarc=pass header.from=<daniel.almeida@collabora.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1756303832;
-	s=zohomail; d=collabora.com; i=daniel.almeida@collabora.com;
-	h=Content-Type:Mime-Version:Subject:Subject:From:From:In-Reply-To:Date:Date:Cc:Cc:Content-Transfer-Encoding:Message-Id:Message-Id:References:To:To:Reply-To;
-	bh=J4BlMs46TcKuQ6XUE/j+iarthoa+EByDQJ4eXRSVSGY=;
-	b=W2969Unj2f9FGUrgx0gazecLv/huveuk7ftXS7noEhzxp8e3GJN4YIX6hGD891vY
-	Lp1aeMYEooBdoWtUZ4bI7RtNO/6MaWD/PwN5MUX+VrWtL0LOSkvYJuksegJ/qv/yweL
-	vYhGVhwvQQilrObpIvCZIMDspxIgQyvf1Jsnljhc=
-Received: by mx.zohomail.com with SMTPS id 1756303829655926.757398195364;
-	Wed, 27 Aug 2025 07:10:29 -0700 (PDT)
-Content-Type: text/plain;
-	charset=us-ascii
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="sh3b5UYX"
+Received: from pps.filterd (m0109334.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 57R7vwcm1426096
+	for <linux-block@vger.kernel.org>; Wed, 27 Aug 2025 07:13:16 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=s2048-2025-q2;
+	 bh=A7mQgPp2sl5oTNiddVPCjxxlfAI/+hp6HiDsqOExGuM=; b=sh3b5UYXbRqg
+	vB+bUFV+rda/OsKGndrDaLFknkCQ3aauQicBfSWWQPCjCDGqIXyj95LJeczT4UGF
+	+jY7w+m2kbAC7E+f5nRtMVDkmyXTKEt5u2eqS4y01jKAdnDu9y/XtkOsNTWDyOoS
+	iDJKPDSHdbxrn2uobUnpodpp99wIWjGXbBWsWRiOZRbym3R2N16eKdjwqSyd/jos
+	1hvIS8ChVZ5XZ4l3pdY7kyKGCOHluN879gzER6NqtBPxfRYHkYWIfZtErx/s+q5h
+	O+ABay6zdk9jP9eF1sv0PpFW6eHlyuPLQWc2BvTdMfjD84roU85Y51/YYrMg7+WB
+	7nV+qjqLLA==
+Received: from mail.thefacebook.com ([163.114.134.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 48sx3bhvgy-16
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <linux-block@vger.kernel.org>; Wed, 27 Aug 2025 07:13:15 -0700 (PDT)
+Received: from twshared0973.10.ash9.facebook.com (2620:10d:c085:208::7cb7) by
+ mail.thefacebook.com (2620:10d:c08b:78::c78f) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.17; Wed, 27 Aug 2025 14:13:07 +0000
+Received: by devbig197.nha3.facebook.com (Postfix, from userid 544533)
+	id CC92310CF623; Wed, 27 Aug 2025 07:13:03 -0700 (PDT)
+From: Keith Busch <kbusch@meta.com>
+To: <linux-block@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>
+CC: <linux-xfs@vger.kernel.org>, <linux-ext4@vger.kernel.org>, <hch@lst.de>,
+        <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
+        Hannes Reinecke
+	<hare@suse.de>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>
+Subject: [PATCHv4 5/8] iomap: simplify direct io validity check
+Date: Wed, 27 Aug 2025 07:12:55 -0700
+Message-ID: <20250827141258.63501-6-kbusch@meta.com>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20250827141258.63501-1-kbusch@meta.com>
+References: <20250827141258.63501-1-kbusch@meta.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.700.81\))
-Subject: Re: [PATCH v6 14/18] rnull: enable configuration via `configfs`
-From: Daniel Almeida <daniel.almeida@collabora.com>
-In-Reply-To: <20250822-rnull-up-v6-16-v6-14-ec65006e2f07@kernel.org>
-Date: Wed, 27 Aug 2025 11:10:13 -0300
-Cc: Boqun Feng <boqun.feng@gmail.com>,
- Miguel Ojeda <ojeda@kernel.org>,
- Alex Gaynor <alex.gaynor@gmail.com>,
- Gary Guo <gary@garyguo.net>,
- =?utf-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>,
- Benno Lossin <lossin@kernel.org>,
- Alice Ryhl <aliceryhl@google.com>,
- Trevor Gross <tmgross@umich.edu>,
- Danilo Krummrich <dakr@kernel.org>,
- Jens Axboe <axboe@kernel.dk>,
- Breno Leitao <leitao@debian.org>,
- linux-block@vger.kernel.org,
- rust-for-linux@vger.kernel.org,
- linux-kernel@vger.kernel.org
+MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <19FC4705-9925-4717-9B69-3D2705BC3833@collabora.com>
-References: <20250822-rnull-up-v6-16-v6-0-ec65006e2f07@kernel.org>
- <20250822-rnull-up-v6-16-v6-14-ec65006e2f07@kernel.org>
-To: Andreas Hindborg <a.hindborg@kernel.org>
-X-Mailer: Apple Mail (2.3826.700.81)
-X-ZohoMailClient: External
+X-FB-Internal: Safe
+Content-Type: text/plain
+X-Proofpoint-GUID: 0eIU_-d5I72VewnHismpBNb4p0J_YZ_W
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODI3MDEyMSBTYWx0ZWRfX3SFzsnaxAjsi
+ BvOxz72Wlm5fH6Thw6XmzsmarufHVlNZcn2Wa71L+BDXjtGndYHdjtJYAv63ucH1DR60+LaXlm9
+ 5afX3gWAXwmk5ghFakChSkEcU+rQktoK9j3fU5TIUnonNvswnt9ISbbA0KgBvFNn14X7FfK7I9z
+ +vCCs+4h+jKDqqcADxbcZPvu/cGXB4oA96he7iFknV3van+06S2zsHV97zsWypkNR8JZAI/r0fK
+ rqRIofHC2p8R3UYZOWzK86ogXMVXzxaNIstjvkUMmiiJieu3mQ6wdYzXTsf4YgCNTjsESffpDBu
+ KffPq9+9qfnRRdc7RaNOSMVqn35T4GgoGvo+KFMFDZ+XAj4SQSj7j+HT2GDQjQ=
+X-Authority-Analysis: v=2.4 cv=B6u50PtM c=1 sm=1 tr=0 ts=68af127b cx=c_pps
+ a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17
+ a=2OwXVqhp2XgA:10 a=VwQbUJbxAAAA:8 a=yPCof4ZbAAAA:8 a=yYvhBQMpDZKDIMWT91YA:9
+X-Proofpoint-ORIG-GUID: 0eIU_-d5I72VewnHismpBNb4p0J_YZ_W
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-08-27_03,2025-08-26_01,2025-03-28_01
 
+From: Keith Busch <kbusch@kernel.org>
 
+The block layer checks all the segments for validity later, so no need
+for an early check. Just reduce it to a simple position and total length
+check, and defer the more invasive segment checks to the block layer.
 
-> On 22 Aug 2025, at 09:14, Andreas Hindborg <a.hindborg@kernel.org> =
-wrote:
->=20
-> Allow rust null block devices to be configured and instantiated via
-> `configfs`.
->=20
-> Reviewed-by: Alice Ryhl <aliceryhl@google.com>
-> Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
-> ---
-> drivers/block/rnull/Kconfig      |   2 +-
-> drivers/block/rnull/configfs.rs  | 207 =
-+++++++++++++++++++++++++++++++++++++++
-> drivers/block/rnull/rnull.rs     |  59 +++++------
-> rust/kernel/block/mq/gen_disk.rs |   2 +-
-> 4 files changed, 240 insertions(+), 30 deletions(-)
->=20
-> diff --git a/drivers/block/rnull/Kconfig b/drivers/block/rnull/Kconfig
-> index 6dc5aff96bf4..7bc5b376c128 100644
-> --- a/drivers/block/rnull/Kconfig
-> +++ b/drivers/block/rnull/Kconfig
-> @@ -4,7 +4,7 @@
->=20
-> config BLK_DEV_RUST_NULL
-> tristate "Rust null block driver (Experimental)"
-> - depends on RUST
-> + depends on RUST && CONFIGFS_FS
-> help
->  This is the Rust implementation of the null block driver. Like
->  the C version, the driver allows the user to create virutal block
-> diff --git a/drivers/block/rnull/configfs.rs =
-b/drivers/block/rnull/configfs.rs
-> new file mode 100644
-> index 000000000000..46710a1e1af4
-> --- /dev/null
-> +++ b/drivers/block/rnull/configfs.rs
-> @@ -0,0 +1,207 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +
-> +use super::{NullBlkDevice, THIS_MODULE};
-> +use core::fmt::Write;
-> +use kernel::{
-> +    block::mq::gen_disk::{GenDisk, GenDiskBuilder},
-> +    c_str,
-> +    configfs::{self, AttributeOperations},
-> +    configfs_attrs, new_mutex,
-> +    page::PAGE_SIZE,
-> +    prelude::*,
-> +    str::{kstrtobool_bytes, CString},
-> +    sync::Mutex,
-> +};
-> +use pin_init::PinInit;
-> +
-> +pub(crate) fn subsystem() -> impl =
-PinInit<kernel::configfs::Subsystem<Config>, Error> {
-> +    let item_type =3D configfs_attrs! {
-> +        container: configfs::Subsystem<Config>,
-> +        data: Config,
-> +        child: DeviceConfig,
-> +        attributes: [
-> +            features: 0,
-> +        ],
-> +    };
-> +
-> +    kernel::configfs::Subsystem::new(c_str!("rnull"), item_type, =
-try_pin_init!(Config {}))
-> +}
-> +
-> +#[pin_data]
-> +pub(crate) struct Config {}
-> +
-> +#[vtable]
-> +impl AttributeOperations<0> for Config {
-> +    type Data =3D Config;
-> +
-> +    fn show(_this: &Config, page: &mut [u8; PAGE_SIZE]) -> =
-Result<usize> {
-> +        let mut writer =3D kernel::str::Formatter::new(page);
-> +        writer.write_str("blocksize,size,rotational\n")?;
-> +        Ok(writer.bytes_written())
-> +    }
-> +}
-> +
-> +#[vtable]
-> +impl configfs::GroupOperations for Config {
-> +    type Child =3D DeviceConfig;
-> +
-> +    fn make_group(
-> +        &self,
-> +        name: &CStr,
-> +    ) -> Result<impl PinInit<configfs::Group<DeviceConfig>, Error>> {
-> +        let item_type =3D configfs_attrs! {
-> +            container: configfs::Group<DeviceConfig>,
-> +            data: DeviceConfig,
-> +            attributes: [
-> +                // Named for compatibility with C null_blk
-> +                power: 0,
-> +                blocksize: 1,
-> +                rotational: 2,
-> +                size: 3,
-> +            ],
-> +        };
-> +
-> +        Ok(configfs::Group::new(
-> +            name.try_into()?,
-> +            item_type,
-> +            // TODO: cannot coerce new_mutex!() to impl PinInit<_, =
-Error>, so put mutex inside
-> +            try_pin_init!( DeviceConfig {
-> +                data <- new_mutex!(DeviceConfigInner {
-> +                    powered: false,
-> +                    block_size: 4096,
-> +                    rotational: false,
-> +                    disk: None,
-> +                    capacity_mib: 4096,
-> +                    name: name.try_into()?,
-> +                }),
-> +            }),
-> +        ))
-> +    }
-> +}
-> +
-> +#[pin_data]
-> +pub(crate) struct DeviceConfig {
-> +    #[pin]
-> +    data: Mutex<DeviceConfigInner>,
-> +}
-> +
-> +#[pin_data]
-> +struct DeviceConfigInner {
-> +    powered: bool,
-> +    name: CString,
-> +    block_size: u32,
-> +    rotational: bool,
-> +    capacity_mib: u64,
-> +    disk: Option<GenDisk<NullBlkDevice>>,
-> +}
-> +
-> +#[vtable]
-> +impl configfs::AttributeOperations<0> for DeviceConfig {
-> +    type Data =3D DeviceConfig;
-> +
-> +    fn show(this: &DeviceConfig, page: &mut [u8; PAGE_SIZE]) -> =
-Result<usize> {
-> +        let mut writer =3D kernel::str::Formatter::new(page);
-> +
-> +        if this.data.lock().powered {
-> +            writer.write_str("1\n")?;
-> +        } else {
-> +            writer.write_str("0\n")?;
-> +        }
-> +
-> +        Ok(writer.bytes_written())
-> +    }
-> +
-> +    fn store(this: &DeviceConfig, page: &[u8]) -> Result {
-> +        let power_op =3D kstrtobool_bytes(page)?;
-> +        let mut guard =3D this.data.lock();
-> +
-> +        if !guard.powered && power_op {
-> +            guard.disk =3D Some(NullBlkDevice::new(
-> +                &guard.name,
-> +                guard.block_size,
-> +                guard.rotational,
-> +                guard.capacity_mib,
-> +            )?);
-> +            guard.powered =3D true;
-> +        } else if guard.powered && !power_op {
-> +            drop(guard.disk.take());
-> +            guard.powered =3D false;
-> +        }
-> +
-> +        Ok(())
-> +    }
-> +}
-> +
-> +#[vtable]
-> +impl configfs::AttributeOperations<1> for DeviceConfig {
-> +    type Data =3D DeviceConfig;
-> +
-> +    fn show(this: &DeviceConfig, page: &mut [u8; PAGE_SIZE]) -> =
-Result<usize> {
-> +        let mut writer =3D kernel::str::Formatter::new(page);
-> +        writer.write_fmt(fmt!("{}\n", this.data.lock().block_size))?;
-> +        Ok(writer.bytes_written())
-> +    }
-> +
-> +    fn store(this: &DeviceConfig, page: &[u8]) -> Result {
-> +        if this.data.lock().powered {
-> +            return Err(EBUSY);
-> +        }
-> +
-> +        let text =3D core::str::from_utf8(page)?.trim();
-> +        let value =3D text.parse::<u32>().map_err(|_| EINVAL)?;
-> +
-> +        GenDiskBuilder::validate_block_size(value)?;
-> +        this.data.lock().block_size =3D value;
-> +        Ok(())
-> +    }
-> +}
-> +
-> +#[vtable]
-> +impl configfs::AttributeOperations<2> for DeviceConfig {
-> +    type Data =3D DeviceConfig;
-> +
-> +    fn show(this: &DeviceConfig, page: &mut [u8; PAGE_SIZE]) -> =
-Result<usize> {
-> +        let mut writer =3D kernel::str::Formatter::new(page);
-> +
-> +        if this.data.lock().rotational {
-> +            writer.write_str("1\n")?;
-> +        } else {
-> +            writer.write_str("0\n")?;
-> +        }
-> +
-> +        Ok(writer.bytes_written())
-> +    }
-> +
-> +    fn store(this: &DeviceConfig, page: &[u8]) -> Result {
-> +        if this.data.lock().powered {
-> +            return Err(EBUSY);
-> +        }
-> +
-> +        this.data.lock().rotational =3D kstrtobool_bytes(page)?;
-> +
-> +        Ok(())
-> +    }
-> +}
-> +
-> +#[vtable]
-> +impl configfs::AttributeOperations<3> for DeviceConfig {
-> +    type Data =3D DeviceConfig;
-> +
-> +    fn show(this: &DeviceConfig, page: &mut [u8; PAGE_SIZE]) -> =
-Result<usize> {
-> +        let mut writer =3D kernel::str::Formatter::new(page);
-> +        writer.write_fmt(fmt!("{}\n", =
-this.data.lock().capacity_mib))?;
-> +        Ok(writer.bytes_written())
-> +    }
-> +
-> +    fn store(this: &DeviceConfig, page: &[u8]) -> Result {
-> +        if this.data.lock().powered {
-> +            return Err(EBUSY);
-> +        }
-> +
-> +        let text =3D core::str::from_utf8(page)?.trim();
-> +        let value =3D text.parse::<u64>().map_err(|_| EINVAL)?;
-> +
-> +        this.data.lock().capacity_mib =3D value;
-> +        Ok(())
-> +    }
-> +}
-> diff --git a/drivers/block/rnull/rnull.rs =
-b/drivers/block/rnull/rnull.rs
-> index d07e76ae2c13..8690ff5f974f 100644
-> --- a/drivers/block/rnull/rnull.rs
-> +++ b/drivers/block/rnull/rnull.rs
-> @@ -1,28 +1,25 @@
-> // SPDX-License-Identifier: GPL-2.0
->=20
-> //! This is a Rust implementation of the C null block driver.
-> -//!
-> -//! Supported features:
-> -//!
-> -//! - blk-mq interface
-> -//! - direct completion
-> -//! - block size 4k
-> -//!
-> -//! The driver is not configurable.
-> +
-> +mod configfs;
->=20
-> use kernel::{
-> -    alloc::flags,
-> -    block::mq::{
-> +    block::{
->         self,
-> -        gen_disk::{self, GenDisk},
-> -        Operations, TagSet,
-> +        mq::{
-> +            self,
-> +            gen_disk::{self, GenDisk},
-> +            Operations, TagSet,
-> +        },
->     },
->     error::Result,
-> -    new_mutex, pr_info,
-> +    pr_info,
->     prelude::*,
-> -    sync::{Arc, Mutex},
-> +    sync::Arc,
->     types::ARef,
-> };
-> +use pin_init::PinInit;
->=20
-> module! {
->     type: NullBlkModule,
-> @@ -35,33 +32,39 @@
-> #[pin_data]
-> struct NullBlkModule {
->     #[pin]
-> -    _disk: Mutex<GenDisk<NullBlkDevice>>,
-> +    configfs_subsystem: =
-kernel::configfs::Subsystem<configfs::Config>,
-> }
->=20
-> impl kernel::InPlaceModule for NullBlkModule {
->     fn init(_module: &'static ThisModule) -> impl PinInit<Self, Error> =
-{
->         pr_info!("Rust null_blk loaded\n");
->=20
-> -        // Use a immediately-called closure as a stable `try` block
-> -        let disk =3D /* try */ (|| {
-> -            let tagset =3D Arc::pin_init(TagSet::new(1, 256, 1), =
-flags::GFP_KERNEL)?;
-> -
-> -            gen_disk::GenDiskBuilder::new()
-> -                .capacity_sectors(4096 << 11)
-> -                .logical_block_size(4096)?
-> -                .physical_block_size(4096)?
-> -                .rotational(false)
-> -                .build(format_args!("rnullb{}", 0), tagset)
-> -        })();
-> -
->         try_pin_init!(Self {
-> -            _disk <- new_mutex!(disk?, "nullb:disk"),
-> +            configfs_subsystem <- configfs::subsystem(),
->         })
->     }
-> }
->=20
-> struct NullBlkDevice;
->=20
-> +impl NullBlkDevice {
-> +    fn new(
-> +        name: &CStr,
-> +        block_size: u32,
-> +        rotational: bool,
-> +        capacity_mib: u64,
-> +    ) -> Result<GenDisk<Self>> {
-> +        let tagset =3D Arc::pin_init(TagSet::new(1, 256, 1), =
-GFP_KERNEL)?;
-> +
-> +        gen_disk::GenDiskBuilder::new()
-> +            .capacity_sectors(capacity_mib << (20 - =
-block::SECTOR_SHIFT))
-> +            .logical_block_size(block_size)?
-> +            .physical_block_size(block_size)?
-> +            .rotational(rotational)
-> +            .build(fmt!("{}", name.to_str()?), tagset)
-> +    }
-> +}
-> +
-> #[vtable]
-> impl Operations for NullBlkDevice {
->     #[inline(always)]
-> diff --git a/rust/kernel/block/mq/gen_disk.rs =
-b/rust/kernel/block/mq/gen_disk.rs
-> index 20f1d46c774d..6b1b846874db 100644
-> --- a/rust/kernel/block/mq/gen_disk.rs
-> +++ b/rust/kernel/block/mq/gen_disk.rs
-> @@ -51,7 +51,7 @@ pub fn rotational(mut self, rotational: bool) -> =
-Self {
->=20
->     /// Validate block size by verifying that it is between 512 and =
-`PAGE_SIZE`,
->     /// and that it is a power of two.
-> -    fn validate_block_size(size: u32) -> Result {
-> +    pub fn validate_block_size(size: u32) -> Result {
->         if !(512..=3Dbindings::PAGE_SIZE as u32).contains(&size) || =
-!size.is_power_of_two() {
->             Err(error::code::EINVAL)
->         } else {
->=20
-> --=20
-> 2.47.2
->=20
->=20
->=20
+Signed-off-by: Keith Busch <kbusch@kernel.org>
+Reviewed-by: Hannes Reinecke <hare@suse.de>
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+---
+ fs/iomap/direct-io.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-Reviewed-by: Daniel Almeida <daniel.almeida@collabora.com>=
+diff --git a/fs/iomap/direct-io.c b/fs/iomap/direct-io.c
+index fea23fa6a402f..c06e41fd4d0af 100644
+--- a/fs/iomap/direct-io.c
++++ b/fs/iomap/direct-io.c
+@@ -337,8 +337,7 @@ static int iomap_dio_bio_iter(struct iomap_iter *iter=
+, struct iomap_dio *dio)
+ 	u64 copied =3D 0;
+ 	size_t orig_count;
+=20
+-	if ((pos | length) & (bdev_logical_block_size(iomap->bdev) - 1) ||
+-	    !bdev_iter_is_aligned(iomap->bdev, dio->submit.iter))
++	if ((pos | length) & (bdev_logical_block_size(iomap->bdev) - 1))
+ 		return -EINVAL;
+=20
+ 	if (dio->flags & IOMAP_DIO_WRITE) {
+--=20
+2.47.3
+
