@@ -1,101 +1,126 @@
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42DB534A334
-	for <linux-block@vger.kernel.org>; Wed, 27 Aug 2025 10:16:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F3CB3164B4
+	for <linux-block@vger.kernel.org>; Wed, 27 Aug 2025 10:19:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756289779; cv=none; b=jvpLhf64vN3vdEMIv0CKwYbO8vmLln7epA717S6ZpXN/8FATmo5xWrmiDu1WgUm49+mdG4MAY5JXQAcVdvTX1hyeu/6cDwNVO0cU6aFj1A4AD8jp/43BaRer5bUl1rrIIgTcBCPgsFBLzzt7aLs38U3yt04kz+24rPLuZm+Slq8=
+	t=1756289966; cv=none; b=W3XwLDZZEH563Z4+y8w1AM1DsHyTPKMxkLNZ2rNNfp43FlOifgFeLy/5nH5fjIi3W1th7b7ZOKrcwVApo4Nttrnwg7Jl/tZczJ2mKpRwlvhgmj1JR103XAoEvfY3Ngo+XkYAsRQf/cMucQNyyASa784DWnuALqX8TtEopfo6/I8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756289779; c=relaxed/simple;
-	bh=CZqe5rzTDS5ajZjIcC88VV1OoN4rTkwjNr3LOMmJSW0=;
+	s=arc-20240116; t=1756289966; c=relaxed/simple;
+	bh=dCfxmqI5NQievIDHdaUucZ8EXZqp2k9O4S3tudNYjfc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JDOik4XkQIo1z9CVdd4mle6waRLEIz69frD2zJjjc1fLoxwh5IhcRPu2rO1o5VCagpuZeRpAJj3gjT8Sg0KwOrqGhF4wnJ3EWw50uctxLpUaYy74L4wAJwi/HZRjmXV39lk2fgH2pg0z0T44eqFewaznl76/KjmyVfUhSikQmeM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=lSlEYh2D; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=G5IgJnA2; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+	 Content-Type:Content-Disposition:In-Reply-To; b=hB2zXJ1cdpXcnR4Q0qTW4ULptZG4Ysb2aPm+CCxpB01Vbl6nrlzv1bdfejdiSxVWULxC7ykgkOzB/qrDj8boh8Vfp/5VHqnN/uX4oOlwDO4zDOPvewn17Q3Qgpi++KCawWGC32MTYHvWgsSc1rkGZtvCoFg6fWbHzzOOA59pgJM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Sx5RwQl4; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=IydAXml5; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Sx5RwQl4; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=IydAXml5; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="lSlEYh2D";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="G5IgJnA2"
-Date: Wed, 27 Aug 2025 12:16:14 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1756289776;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Sx5RwQl4";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="IydAXml5";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Sx5RwQl4";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="IydAXml5"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 1304D22221;
+	Wed, 27 Aug 2025 10:10:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1756289427; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=7z4kOkb9hJ5KDJ7AViQ8ws/d+x00zbISk9ncb+f0SBk=;
-	b=lSlEYh2DN9jgZYMsEqm8iUPctwZCanA05KGl62AiwDceD49ZYGCyfg/BRjtdVuCvzJGTWR
-	ckcA4Qcc2x+BTr2/PkeBdEdG2eBX6ZpAc0VCrYKp1JwtK6XWH2k/xgjOTLGfUIBkMhIVl7
-	7ftU3vwc2WngKYOEyUHI8cFAqRJePrWUByJWM6BpFskEYNJklQjAmNUB8OB5voPPbYwGNa
-	SWNiYW2DzEx7jzfruVDTQekht+jzQROqG1N/whAk47BuS/6vnyCVKwXAJywSmY8hBnDFRm
-	8SwYBDD88W1Rlukmg5vIikvM+fajAax8k2bk6BoRZOYA2XyJSFT2D/WeopFXZA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1756289776;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	bh=NxE5rKnj5TjaBsXbpbII/rsOANqwX+dNrTnexSalI0E=;
+	b=Sx5RwQl4mdrvGKXWphXUQ0hvtykvK3pbomkWvnnY3C/J3xN+x2ZHAOSBJLxC4GLt4+IHP6
+	fhIb397Tjh7ZItBttJVZrcn5W6MbblkxSPnUuMkh2m4qZnlZylUmCvuzsNJNQDI/fgYDPT
+	CxFKOH1aH8JG61b+9eFz6FNE5WZULgs=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1756289427;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=7z4kOkb9hJ5KDJ7AViQ8ws/d+x00zbISk9ncb+f0SBk=;
-	b=G5IgJnA2BvwMrCwiHFriaLI2ml1hac0nZXXi99JSUtpruyXSPXQjcSZzAKG6Tha1gUKRjX
-	fbNMACPMH0NJTYAQ==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Damien Le Moal <dlemoal@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>
-Subject: Re: [PATCH v2] block: Increase BLK_DEF_MAX_SECTORS_CAP
-Message-ID: <20250827101614.K6_74JSa@linutronix.de>
-References: <20250618060045.37593-1-dlemoal@kernel.org>
- <175078375641.82625.9467584315092336312.b4-ty@kernel.dk>
- <20250827070705.4iWhHGPE@linutronix.de>
- <20250827073836.GA25169@lst.de>
- <20250827075221.6hTi-i7m@linutronix.de>
- <39ac5089-794c-4e50-a090-6dabf4a60575@kernel.org>
- <20250827084248.tLS5-C5i@linutronix.de>
- <ebd83628-162c-4f5e-9563-8713cbf5854e@kernel.org>
+	bh=NxE5rKnj5TjaBsXbpbII/rsOANqwX+dNrTnexSalI0E=;
+	b=IydAXml5RA8wO5fCwvDAMvtOzsuRqzJS78ZPyZQjET5bKCdXt3mdY6VsEVH2Z8wcR9Zny6
+	ul1gwma8lALLX1Cg==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1756289427; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=NxE5rKnj5TjaBsXbpbII/rsOANqwX+dNrTnexSalI0E=;
+	b=Sx5RwQl4mdrvGKXWphXUQ0hvtykvK3pbomkWvnnY3C/J3xN+x2ZHAOSBJLxC4GLt4+IHP6
+	fhIb397Tjh7ZItBttJVZrcn5W6MbblkxSPnUuMkh2m4qZnlZylUmCvuzsNJNQDI/fgYDPT
+	CxFKOH1aH8JG61b+9eFz6FNE5WZULgs=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1756289427;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=NxE5rKnj5TjaBsXbpbII/rsOANqwX+dNrTnexSalI0E=;
+	b=IydAXml5RA8wO5fCwvDAMvtOzsuRqzJS78ZPyZQjET5bKCdXt3mdY6VsEVH2Z8wcR9Zny6
+	ul1gwma8lALLX1Cg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 038D713310;
+	Wed, 27 Aug 2025 10:10:26 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id Z+iAO5LZrmg1JQAAD6G6ig
+	(envelope-from <dwagner@suse.de>); Wed, 27 Aug 2025 10:10:26 +0000
+Date: Wed, 27 Aug 2025 12:10:26 +0200
+From: Daniel Wagner <dwagner@suse.de>
+To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, 
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>, "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>, 
+	"nbd@other.debian.org" <nbd@other.debian.org>, "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
+Subject: Re: blktests failures with v6.17-rc1 kernel
+Message-ID: <ff748a3f-9f07-4933-b4b3-b4f58aacac5b@flourine.local>
+References: <suhzith2uj75uiprq4m3cglvr7qwm3d7gi4tmjeohlxl6fcmv3@zu6zym6nmvun>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ebd83628-162c-4f5e-9563-8713cbf5854e@kernel.org>
+In-Reply-To: <suhzith2uj75uiprq4m3cglvr7qwm3d7gi4tmjeohlxl6fcmv3@zu6zym6nmvun>
+X-Spam-Level: 
+X-Spamd-Result: default: False [-4.30 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-0.999];
+	MIME_GOOD(-0.10)[text/plain];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo]
+X-Spam-Flag: NO
+X-Spam-Score: -4.30
 
-On 2025-08-27 18:01:58 [+0900], Damien Le Moal wrote:
-> Yep, looks like it.
-> What is the driver used for that "PowerEdge R6525 which exposes a "DELLBOSS VD"
-> device with firmware MV.R00-0" ? Is it the regular ahci driver ?
-> If yes, we can quirk it to limit the max command size, but we would need to
-> know what the limit is. That means repeating that test with varying max command
-> sise (max_sectors_kb) to try to figure out the threshold.
+On Wed, Aug 13, 2025 at 10:50:34AM +0000, Shinichiro Kawasaki wrote:
+> #4: nvme/061 (fc transport)
+> 
+>     The test case nvme/061 sometimes fails for fc transport due to a WARN and
+>     refcount message "refcount_t: underflow; use-after-free." Refer to the
+>     report for the v6.15 kernel [5].
+> 
+>     [5]
+>     https://lore.kernel.org/linux-block/2xsfqvnntjx5iiir7wghhebmnugmpfluv6ef22mghojgk6gilr@mvjscqxroqqk/
 
-issued 'dd if=/dev/sda of=/dev/null bs=4M count=1 iflag=direct'
+This one might be fixed with
 
-| echo 3584 > /sys/block/sda/queue/max_sectors_kb
-
-survives
-
-| echo 4096 > /sys/block/sda/queue/max_sectors_kb
-dies after a few attempts.
-
-| lrwxrwxrwx 1 root root 0 Aug 27 11:01 0:0:0:0 -> ../../../devices/pci0000:a0/0000:a0:03.1/0000:a1:00.0/ata1/host0/target0:0:0/0:0:0:0
-| a1:00.0 SATA controller: Marvell Technology Group Ltd. 88SE9230 PCIe 2.0 x2 4-port SATA 6 Gb/s RAID Controller (rev 11)
-|         Subsystem: Dell BOSS-S1 Adapter
-|         Kernel driver in use: ahci
-|         Kernel modules: ahci
-
-so a Marvell one. Interesting.
-
-> And maybe contact Dell support too if this is still a supported device.
-> (I have zero experience with this, no idea what that DELLBOSS VD is...)
-
-There are two physical disks which are behind this controller and
-exposed as one virtual device after applying some raid magic. I have no
-idea if this limitation is due to the physical device or the controller.
-
-Now, how do I put this. The disk behind it is an INTEL SSDSCKKB240G8R.
-The firmware XC31DL6P exposed this problem. After an update to XC31DL6R
-the problem is gone.
-
-Sebastian
+https://lore.kernel.org/linux-nvme/20250821-fix-nvmet-fc-v1-1-3349da4f416e@kernel.org/
