@@ -1,84 +1,60 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51B152E1723;
-	Wed, 27 Aug 2025 07:32:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41994278771
+	for <linux-block@vger.kernel.org>; Wed, 27 Aug 2025 07:37:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756279927; cv=none; b=EzMA8A1bEdB/qW6Zfx1/6+/OyOgTu1dvO3H13utfk5MgJBQE1NlnfHN9c7smyVrE7ZzV/osXHftZ0MQe67H8YAGDA+ewx2RNCUtazxaeAx+p0POqSFTAjgWzuR4tuWA4kMOhFAY1JkLSG5MK5nPwswtDf3hewGdL3ctDyUI6MXo=
+	t=1756280237; cv=none; b=hJiNcliznH7T58gvRxMUZaNbhMw6BLLaUPk1z7HUHMBp4y/opqkpHxD6gBvcbiW22B/TxrVAO0BxD0uXdKeNdTo6QZCQYXCq1UQtlXCqU0r5cqvgxBDQ81fCL5Sek4Dc08mAS9HOG63G51YfhiKgRh1htMahYRc/7L/eTp7QBWM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756279927; c=relaxed/simple;
-	bh=m60YP2l0OQVjwwUvCpC26uRwuFUQ8d+ffT/0DA5nFwo=;
+	s=arc-20240116; t=1756280237; c=relaxed/simple;
+	bh=GW4ytYy9cRjvbMsUTK4HxjuMCsvKeixLpvhkwZ26nyE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CndKMZIandrtw6IlfhgGGdvXF9qqdU32Ht+KDp4gEphEZli/uVK4g8pS+a+2Wr5y9ggjkBQtWrLSB+8VlD19T4aaawviznyjdw+zwE1yqjdiU5DSOTaKnG7ZJTgkFqeH9UJQKHzUNtprnkSUXbtWuSP9s7KyN4HSczH65iqib5Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=JZ4/k2a3; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="JZ4/k2a3"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Transfer-Encoding
-	:Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
-	Sender:Reply-To:Content-ID:Content-Description;
-	bh=/U7TDdgVS0XTpH2wrHd6NGuad3QpZ7xAtceEl+MVTEg=; b=JZ4/k2a3nNOadUbaZYE/D0bAu6
-	mKeQBdWkdOBG+Gqmz49R058h9vKZZsKvN2ablsyK/nrxN4SPF8rTbQHOYsYpVKmQS1RUJNSiwZ5z7
-	3u73+tNJTPsX1CwUJL1gYDote7d1TGUN26gRD30d5/eVdXf7djjgNJs3/XuheiquBQkaOny0cNdkv
-	H0QRKRP0n+0SkwYZ/NhBshQW8y3JM1EAyr6CXNW2RKDG6xv58EWk+M0kUjYABjy59AabK2R/xYrcP
-	n8TW0EfEWpmvAoR3y82jwq8sFf/N5EK21ZRuPZCPb4aCJP0hPDWg3zK73fZuUi/C7UdxY9R91yE6P
-	YoJvugYw==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1urAdS-0000000EQpI-3YHJ;
-	Wed, 27 Aug 2025 07:31:58 +0000
-Date: Wed, 27 Aug 2025 00:31:58 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: anthony <antmbox@youngman.org.uk>
-Cc: Yu Kuai <yukuai1@huaweicloud.com>,
-	Christoph Hellwig <hch@infradead.org>, colyli@kernel.org,
-	hare@suse.de, tieren@fnnas.com, axboe@kernel.dk, tj@kernel.org,
-	josef@toxicpanda.com, song@kernel.org, akpm@linux-foundation.org,
-	neil@brown.name, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, cgroups@vger.kernel.org,
-	linux-raid@vger.kernel.org, yi.zhang@huawei.com,
-	yangerkun@huawei.com, johnny.chenyi@huawei.com,
-	John Garry <john.g.garry@oracle.com>,
-	"yukuai (C)" <yukuai3@huawei.com>
-Subject: Re: [PATCH RFC 4/7] md/raid10: convert read/write to use
- bio_submit_split()
-Message-ID: <aK60bmotWLT50qt5@infradead.org>
-References: <20250825093700.3731633-1-yukuai1@huaweicloud.com>
- <20250825093700.3731633-5-yukuai1@huaweicloud.com>
- <aKxCJT6ul_WC94-x@infradead.org>
- <6c6b183a-bce7-b01c-8749-6e0b5a078384@huaweicloud.com>
- <aK1ocfvjLrIR_Xf2@infradead.org>
- <fe595b6a-8653-d1aa-0ae3-af559107ac5d@huaweicloud.com>
- <835fe512-4cff-4130-8b67-d30b91d95099@youngman.org.uk>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Dxi0+AH71H0a6YFTWjJxJlgJ8o7l9G+sO3Jhkj6VtCaxOWkY0WfuFH2K2tNZ4S/qU/avXqYOO0ckkTnAEHSWy+6YyvJcT0erSMPGCBKUis/b6Yq/AA63pG/y735yfaaGUwIRayrzO8a3BFn9n440CADAgaPWbIYA3arowLBqEOE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 2DEE268AA6; Wed, 27 Aug 2025 09:37:10 +0200 (CEST)
+Date: Wed, 27 Aug 2025 09:37:09 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Keith Busch <kbusch@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>, Christoph Hellwig <hch@infradead.org>,
+	Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org, axboe@kernel.dk,
+	iommu@lists.linux.dev
+Subject: Re: [PATCHv3 1/2] block: accumulate segment page gaps per bio
+Message-ID: <20250827073709.GA25032@lst.de>
+References: <20250821204420.2267923-1-kbusch@meta.com> <20250821204420.2267923-2-kbusch@meta.com> <aKxpSorluMXgOFEI@infradead.org> <aKxu83upEBhf5gT7@kbusch-mbp> <20250826130344.GA32739@lst.de> <aK27AhpcQOWADLO8@kbusch-mbp> <20250826135734.GA4532@lst.de> <aK42K_-gHrOQsNyv@kbusch-mbp>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <835fe512-4cff-4130-8b67-d30b91d95099@youngman.org.uk>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <aK42K_-gHrOQsNyv@kbusch-mbp>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Tue, Aug 26, 2025 at 06:35:10PM +0100, anthony wrote:
-> On 26/08/2025 10:14, Yu Kuai wrote:
-> > > Umm, that's actually a red flag.  If a device guarantees atomic behavior
-> > > it can't just fail it.  So I think REQ_ATOMIC should be disallowed
-> > > for md raid with bad block tracking.
-> > > 
+On Tue, Aug 26, 2025 at 04:33:15PM -0600, Keith Busch wrote:
+> On Tue, Aug 26, 2025 at 03:57:34PM +0200, Christoph Hellwig wrote:
+> > On Tue, Aug 26, 2025 at 07:47:46AM -0600, Keith Busch wrote:
+> > > Currently, the virtual boundary is always compared to bv_offset, which
+> > > is a page offset. If the virtual boundary is larger than a page, then we
+> > > need something like "page_to_phys(bv.bv_page) + bv.bv_offset" every
+> > > place we need to check against the virt boundary.
 > > 
-> > I agree that do not look good, however, John explained while adding this
-> > that user should retry and fallback without REQ_ATOMIC to make things
-> > work as usual.
+> > bv_offset is only guaranteed to be a page offset if your use
+> > bio_for_each_segment(_all) or the low-level helpers implementing
+> > it and not bio_for_each_bvec(_all) where it can be much larger
+> > than PAGE_SIZE.
 > 
-> Whether a device promises atomic write is orthogonal to whether that write
-> succeeds - it could fail for a whole host of reasons, so why can't "this is
-> too big to be atomic" just be another reason for failing?
+> Yes, good point. So we'd have a folio offset when it's not a single
+> page, but I don't think we want to special case large folios for every
+> virt boundary check. It's looking like replace bvec's "page + offset"
+> with phys addrs, yeah?!
 
-Too big to be atomic is a valid failure reason.  But the limit needs
-to be documented in the queue limits beforehand.
-
+Basically everything should be using physical address.  The page + offset
+is just a weird and inefficient way to represent that and we really
+need to get rid of it.
