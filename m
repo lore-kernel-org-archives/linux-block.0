@@ -1,96 +1,149 @@
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB96C274B23
-	for <linux-block@vger.kernel.org>; Wed, 27 Aug 2025 08:15:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AB8E33A00E
+	for <linux-block@vger.kernel.org>; Wed, 27 Aug 2025 08:42:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756282536; cv=none; b=udj8jrvjECFj8UuWv+ix+ZpmruMIAQfE3AejskHHSR+a6iDtTckcntoB9aLvmkrfOeoLTbP/xHhoS6xylzSLiiPJRMJRWtV8za0JfPx7pmqBoSszpoCs0FSnB7GD4D6dJsSgiKTa+SMYxSzLcAeriPP4l46zfVUMQrAU0hcGpPE=
+	t=1756284172; cv=none; b=N+hZtd8+tAJ/FkaRIPLpkgkaof1XmLgUYOMaiMSyNB5nva8KrzD3doKgExNWlDAQLIkfvRZzqLbhnPlw52CFJ4FwXG4NO+2lqklfT5rNEYUS0xFog5l8R0cM30DA0o/yVCjQNTcBSvHwzHbG6TCjEGCb8wgwOLah5Pgi+ZeP328=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756282536; c=relaxed/simple;
-	bh=m9fZPyREP9mMFo5dFbqtZdxitG/UM8cTyXcCwjYqFmA=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=ZwN5kwRHdQpBdFc0bCT/pMgjy+yY+EdP3kGFl8/Rg+AchTDjwzkwM5DehVuaYdVcNrE2ofUq83x/wuFtU3UkENCJliYgn5EHDOkeT+ye5tcHPlweqVLo66+7TCJkZNV5YyxSTvgzsXF9ywRg+YQP3GNqv63nqxhMvCTUuWpJSA8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3ed9502b6b3so33203055ab.3
-        for <linux-block@vger.kernel.org>; Wed, 27 Aug 2025 01:15:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756282534; x=1756887334;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=k03l+q/FPZAUzkeruzpDHLoZk+YpUT83RQwZwMZ2xes=;
-        b=pysBrYIoqzBPNpKxiL5PKyLejNjYyzWK6Vsz+TgcnwVVd/ipUvzYKti8bUCq5/+bQf
-         gc3Ncdte1WQMdAxOzwawjTkW2L8rE7um5EQb9CL9fp3FxQE9Ew2R3tPfNdqFzurn56qO
-         DTxXUaq6ihjWYXsXZz2rnZS2uLWRGKOA/oRgGBZ/vsQOp02RbauESa/h7EtBl/Zn2oIA
-         klJa7QDUwGGBXEZ4iyqY60aVpS7xTPBNABqNt1eixKcOdGplboI/rtHHsFboIoa0PkZI
-         SjUakRmbahY31tG67JZtadFnbTGmhsEaT7uW7fb29iTb8gjNDt7mpaaXaQnLs+SyQ2UD
-         ZeRA==
-X-Gm-Message-State: AOJu0YzrkZTkNRwUW7hopdRdyFqbernUrQbAZNNXSJU1/gS2gPwaZrdM
-	bjd2+IMaDdWMNNx0ycg28IuzHET3l21PUOhDD6otYU6jxcGPRpdnfbCKpx7wtw/FDAoWdAwNfMX
-	VN9qNd0/dklQNcOz6dBl2RFIFatL/CV8mU/8h5BZ4+bnpdHBGvvxGgLSPvEY=
-X-Google-Smtp-Source: AGHT+IGPV1rmArovvxBES9M6nYuG/AQ0qtDQVHQmVeIxOvvA2ISNOPKVqA4rbcbm1J7DmA3RXVNekHGR3ZyEWLZ/ZxmOlNPShute
+	s=arc-20240116; t=1756284172; c=relaxed/simple;
+	bh=zlsk2zOzk9KYHzhk1LzeST1WauthAbkauFvG8nbX8+A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZNn27YIsLI4MOavk/by2fg5O7x4i7Fhr3Kty9c4Ajts0vXSxxMrvCdTpnkBYfRPvfbjW1YTal2tu9BYv2+m+FGJp/jMXuXbK77aVitPxpJVW7jr3DCKDPvXYUrqA5dMJCfs/Xb4vbJc6N+tJf3baijnF6DydgXQFMheiD808Ng4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=1YHAn1bC; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=gQ2z1j8d; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="1YHAn1bC";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="gQ2z1j8d"
+Date: Wed, 27 Aug 2025 10:42:48 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1756284169;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9697rRianlWm8lAUBcz/4h03JjfH94JM+MdYN8KdjfY=;
+	b=1YHAn1bCbACW6M/bZCPtl339hv58HFfAZN22pECKgD17mUstQzUP1XVvmjVu5BYtpiRNhs
+	TelnoIrppyNVvwz+rdqN9V6KjhzNiZUfpi+PWQt0aC1l1XNG+Gt9F+DDp/N2QhAzrVNuIi
+	lXqKoDCArHU1ZBAfqHGmPi1Kn3bkK+rc7DTFhEeOGf1rmFGjDcqM5mmW1mIwRYolIFoVl5
+	ZT91DQk8SUseJ2orE4Z+eKl0Y7RfFEBo/EaLYPW+w7buCqnuEPPt7LhYGAfAYZfeh1nmsN
+	KFhoUCcZXy3EnSJBpRper0utMo5ZkTKFWV11Es4Z1/Atk67GKQrh7zkHLSuMww==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1756284169;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9697rRianlWm8lAUBcz/4h03JjfH94JM+MdYN8KdjfY=;
+	b=gQ2z1j8dBQVxUucj4+QgR51RO5Qf339i+9k+JnQyAYVWgYgxrwYic00oKqvPE16/OMTjC9
+	DT2aJtOgTi0DeoAA==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Damien Le Moal <dlemoal@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>
+Subject: Re: [PATCH v2] block: Increase BLK_DEF_MAX_SECTORS_CAP
+Message-ID: <20250827084248.tLS5-C5i@linutronix.de>
+References: <20250618060045.37593-1-dlemoal@kernel.org>
+ <175078375641.82625.9467584315092336312.b4-ty@kernel.dk>
+ <20250827070705.4iWhHGPE@linutronix.de>
+ <20250827073836.GA25169@lst.de>
+ <20250827075221.6hTi-i7m@linutronix.de>
+ <39ac5089-794c-4e50-a090-6dabf4a60575@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:12e1:b0:3ec:88e3:903b with SMTP id
- e9e14a558f8ab-3ec88e392f1mr150014815ab.24.1756282534104; Wed, 27 Aug 2025
- 01:15:34 -0700 (PDT)
-Date: Wed, 27 Aug 2025 01:15:34 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68aebea6.a70a0220.3cafd4.0013.GAE@google.com>
-Subject: [syzbot] Monthly block report (Aug 2025)
-From: syzbot <syzbot+list17848dc1d79bb6dd245d@syzkaller.appspotmail.com>
-To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <39ac5089-794c-4e50-a090-6dabf4a60575@kernel.org>
 
-Hello block maintainers/developers,
+On 2025-08-27 17:01:49 [+0900], Damien Le Moal wrote:
+> Don't read a file. Read the disk directly. So please use "if=/dev/sdX".
+> Also, there is no way that a 1GiB I/O will be done as a single large command.
+> That is not going to happen.
+> 
+> With 345c5091ffec reverted, what does:
+> 
+> cat /sys/block/sdX/queue/max_sectors_kb
+> cat /sys/block/sdX/queue/max_hw_sectors_kb
+> 
+> say ?
 
-This is a 31-day syzbot report for the block subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/block
+| # cat /sys/block/sda/queue/max_sectors_kb
+| 1280
+| # cat /sys/block/sda/queue/max_hw_sectors_kb
+| 32767
 
-During the period, 2 new issues were detected and 1 were fixed.
-In total, 42 issues are still open and 104 have already been fixed.
+> Likely, the first one is "1280". So before running dd, you need to do:
+> 
+> echo 4096 > /sys/block/sdX/queue/max_sectors_kb
+> 
+> and then
+> 
+> dd if=/dev/sdX of=/dev/null bs=4M count=1 iflag=direct
 
-Some of the still happening issues:
+| # echo 4096 > /sys/block/sda/queue/max_sectors_kb
+| # cat /sys/block/sda/queue/max_sectors_kb 
+| 4096
+| # dd if=/dev/sda of=/dev/null bs=4M count=1 iflag=direct
+| 1+0 records in
+| 1+0 records out
+| 4194304 bytes (4.2 MB, 4.0 MiB) copied, 0.00966543 s, 434 MB/s
 
-Ref  Crashes Repro Title
-<1>  44250   Yes   possible deadlock in blk_mq_update_nr_hw_queues
-                   https://syzkaller.appspot.com/bug?extid=6279b273d888c2017726
-<2>  43987   Yes   possible deadlock in __del_gendisk
-                   https://syzkaller.appspot.com/bug?extid=2e9e529ac0b319316453
-<3>  6788    Yes   KMSAN: kernel-infoleak in filemap_read
-                   https://syzkaller.appspot.com/bug?extid=905d785c4923bea2c1db
-<4>  2605    Yes   INFO: task hung in bdev_release
-                   https://syzkaller.appspot.com/bug?extid=4da851837827326a7cd4
-<5>  2281    No    INFO: task hung in read_part_sector (2)
-                   https://syzkaller.appspot.com/bug?extid=82de77d3f217960f087d
-<6>  1685    Yes   INFO: task hung in blkdev_fallocate
-                   https://syzkaller.appspot.com/bug?extid=39b75c02b8be0a061bfc
-<7>  1384    Yes   INFO: task hung in bdev_open
-                   https://syzkaller.appspot.com/bug?extid=5c6179f2c4f1e111df11
-<8>  747     Yes   INFO: task hung in sync_bdevs (3)
-                   https://syzkaller.appspot.com/bug?extid=97bc0b256218ed6df337
-<9>  574     Yes   possible deadlock in elevator_change
-                   https://syzkaller.appspot.com/bug?extid=ccae337393ac17091c34
-<10> 105     No    KCSAN: data-race in block_uevent / inc_diskseq (2)
-                   https://syzkaller.appspot.com/bug?extid=c147f9175ec6cc7bd73b
+It passed.
+After a reboot I issued the same dd command five times and all came
+back. Then I increased the sector size and issued it again. The first
+two came back and then
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+| root@zen3:~# dd if=/dev/sda of=/dev/null bs=4M count=1 iflag=direct
+| 1+0 records in
+| 1+0 records out
+| 4194304 bytes (4.2 MB, 4.0 MiB) copied, 33.1699 s, 126 kB/s
+| root@zen3:~# dd if=/dev/sda of=/dev/null bs=4M count=1 iflag=direct
+| 1+0 records in
+| 1+0 records out
+| 4194304 bytes (4.2 MB, 4.0 MiB) copied, 57.3711 s, 73.1 kB/s
+| root@zen3:~# dd if=/dev/sda of=/dev/null bs=4M count=1 iflag=direct
+| 1+0 records in
+| 1+0 records out
+| 4194304 bytes (4.2 MB, 4.0 MiB) copied, 0.0264171 s, 159 MB/s
 
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
+They all came back but as you see on the speed side, it took while. And
+I see
+| [  191.641315] ata1.00: exception Emask 0x0 SAct 0x800000 SErr 0x0 action 0x6 frozen
+| [  191.648839] ata1.00: failed command: READ FPDMA QUEUED
+| [  191.653995] ata1.00: cmd 60/00:b8:00:00:00/20:00:00:00:00/40 tag 23 ncq dma 4194304 in
+|                         res 40/00:00:00:00:00/00:00:00:00:00/00 Emask 0x4 (timeout)
+| [  191.669306] ata1.00: status: { DRDY }
+| [  191.672981] ata1: hard resetting link
+| [  192.702763] ata1: SATA link up 6.0 Gbps (SStatus 133 SControl 300)
+| [  192.702964] ata1.00: Security Log not supported
+| [  192.703207] ata1.00: Security Log not supported
+| [  192.703215] ata1.00: configured for UDMA/133
+| [  192.703282] ata1: EH complete
+| [  248.985303] ata1.00: exception Emask 0x0 SAct 0x10001 SErr 0x0 action 0x6 frozen
+| [  248.992733] ata1.00: failed command: READ FPDMA QUEUED
+| [  248.997889] ata1.00: cmd 60/00:00:00:00:00/20:00:00:00:00/40 tag 0 ncq dma 4194304 in
+|                         res 40/00:00:00:00:00/00:00:00:00:00/00 Emask 0x4 (timeout)
+| [  249.013107] ata1.00: status: { DRDY }
+| [  249.016775] ata1.00: failed command: WRITE FPDMA QUEUED
+| [  249.022011] ata1.00: cmd 61/08:80:40:d1:18/00:00:00:00:00/40 tag 16 ncq dma 4096 out
+|                         res 40/00:00:00:00:00/00:00:00:00:00/00 Emask 0x4 (timeout)
+| [  249.037135] ata1.00: status: { DRDY }
+| [  249.040802] ata1: hard resetting link
+| [  250.076059] ata1: SATA link up 6.0 Gbps (SStatus 133 SControl 300)
+| [  250.076258] ata1.00: Security Log not supported
+| [  250.076471] ata1.00: Security Log not supported
+| [  250.076478] ata1.00: configured for UDMA/133
+| [  250.076537] ata1: EH complete
 
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
+> And you will likely trigger the issue, even with 345c5091ffec reverted.
+> The issue is likely caused by a FW bug handling large commands.
+> Please try.
+Done. It seems the firmware is not always dedicated to fulfill larger
+requests.
 
-You may send multiple commands in a single email message.
+Sebastian
