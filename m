@@ -1,96 +1,105 @@
-Received: from mail-il1-f182.google.com (mail-il1-f182.google.com [209.85.166.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBD84264A9D
-	for <linux-block@vger.kernel.org>; Thu, 28 Aug 2025 16:06:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AE01239591;
+	Thu, 28 Aug 2025 16:54:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756397191; cv=none; b=orEg+6NfxzHtV/76OfQyXGB4oWrpnpWiVnKTjSLwMhop5OWjUAZKrY8mGHUtxXIaApNz4TcuWAWKS+krWhBQKEw18GS5LPtPVLTEq+rXC1GOooLrC7ugf3TcXUnH++s1uvVKgz2+BiW3T9lKIIMYx6zzw+hUdr5IYFl14RW8A2E=
+	t=1756400074; cv=none; b=OKy3t5IInbTn4MzacZ50x4alKaB9QW3aidx2/kM8lGpm6YqCkSeW6ON0tzYdgb6TnhXNgdNBoxbfZslP4YZZzOOgBJT5kPHUPXuGft/Xb+fffDyuh2EaSWnYGPLyxiy8DrOMAWX/iAUdEghJhEgjSVt1BRExO2gzr/Bunkg1cvA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756397191; c=relaxed/simple;
-	bh=F//I10DGQ3c+0b/Z9jeGysiniCCLugL6GuqwDiDfu4A=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=To7zQg+IuJvycs+EjDCLfIxbBgTpoDhAvOGj5R8BLxKHvFwf+Lx30gHP6cjRQVYEenKTs2si3LtCnTun2ix7LcnZZbIqI0XtM2XFW9zX2lyXEF93cUcaXNa7Q/gYJtx9r/MmJS/55K+n2FVLWTm7VxvwwrHtdQejky0ZJNaeVbw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=gqW0fJgs; arc=none smtp.client-ip=209.85.166.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1756400074; c=relaxed/simple;
+	bh=3QSqWFwhLXFpgIQB1AhDzeFYEFSsyOykW/t8YMcdvDs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RtLva3nkQcBVWZrKbjaVkcaNP2AXxkRrdw24eElLjoB8BLpR/OhRAd5RUIz3utUW+Gtl1XsgcygMs64/IlEBHSIOomAMF0/0IAVL0Qc6+MX+yrFdc04F01pNrBZrmiXSMd6o5kOIzprIOkiYCYWfxRPpyOFWskguSH6lzLMEm68=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Utug3C4q; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="gqW0fJgs"
-Received: by mail-il1-f182.google.com with SMTP id e9e14a558f8ab-3f0651cb8aeso9855785ab.3
-        for <linux-block@vger.kernel.org>; Thu, 28 Aug 2025 09:06:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1756397188; x=1757001988; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sQ1iBkivcgNxINJNzY151f9lwALON3YL8XgfKRBEIv8=;
-        b=gqW0fJgs8ha6cUN1GUJE12BOGPI8m3auFSLy6xdurSNOubKCa20L37Bb4a58xKPINy
-         oaJJMDWWN6jm0oIE52zCaWWvC23dg7Tr/mi4ge/Huq0gSogeRI20HIhXzd1oCHSmhfz7
-         lDazi7b6n4zK77UWCWxetxdJCrkNqSwAWYvXKgqJsAVz2sIZ6QuEjhPT/H96DiGpUk8t
-         rZi4zjo0t5258kUzPNZteGL4btzTMfCHtkthICLi4myp+w1gEBhuk/wOrhzTCB0UWKX2
-         1sSx0KhTo+58ap6soFB0/7uHzMCMS30cZDjf2kVRoDcrW0zsyIilhxZq2LvCB5kPHI3n
-         Aj4w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756397188; x=1757001988;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sQ1iBkivcgNxINJNzY151f9lwALON3YL8XgfKRBEIv8=;
-        b=urINgrVCifP6dSTmv2YSGxhfclfQ/7CpkCPW8cs0RcE9JdrBejVtvjEWSO5/KVzjja
-         t3ZhICvB/AH0YWIGAujy5vVTPzQFhDRvXQzJffeCk9MdH4dACBH+F1j6jbXsyAsNjXGf
-         UGwGsMoGYYqlQGuo5m6cz7e1geJtiAoOa1AihaXd02Y0YIgbZS40CwyxJII+diaCKwO/
-         5pJtIzI2mo5eIIaXk0SxUFOjk88JHM1MVPF44u+pdU0+OIi8Jw6KJOxKKi745oOIdhQ+
-         8OtJQgv3jSxI7n7K3/KOIs2fl+L+IhKEbAHdmAnUBUw/pBgKpjMgJ/foPPGHih10EzCG
-         tAXg==
-X-Forwarded-Encrypted: i=1; AJvYcCXEG/bDWL0WeYKERM2PJ12C558ukQk+FjZWHbGUDrbw9yGfBjH1vxlv1nqnf/os01xonPTwUuh16EUwlg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzsKS12Qj5DSdFx2w8w99GR3+Cpu0NwWMbeURX+6GHsD5+ApBHl
-	0ETSG2kIO1IgyWhiBAWSo2MgTqyUSyxTPXxvyOoUt/ftrparx9MHHZ1qRt08WbW3H08=
-X-Gm-Gg: ASbGncsyjZYASg+qS6PK2YT9x1qAaKZQPAw1W3lZ/qIkj1wiaUb7CTceoAhq+MzG2Du
-	1CjotOMuNMEHAkGBfrnxtPpSSY/3eC6iTmWetoaSjCkdOa2Ycwotk3gc1mm1gcktoUOKY9RcHF7
-	RH9VpDjo3qJvQeypxSYof/sEtufDKau7ySSXCfJgcddra0fm2Q+BXavBVWgeCeXNzHJ5XwJrRM6
-	jFnw3kiVDayBQ8WAhQuhNR9ToUuA1/341PmJLszaeWm0CSwg0YdvL/Y6UrkELiMZBsLugqNK/c4
-	7tk5knDtPKZZwYRNzme9C83hR7EloHkoZlQ4ChWc8AotC4QK8OyF/SkUwz+rg80MnB/WCnWlVBW
-	X+6a0piG99t7Naqpnacx/l4KA
-X-Google-Smtp-Source: AGHT+IFYVPLNEA9w3bodw9+YfXXXHlX/wG691OXdZ7TUdqpI2rZ1DapvCar4yq/2nhje8ygl3GK+kQ==
-X-Received: by 2002:a05:6e02:1448:b0:3ec:7e74:36bb with SMTP id e9e14a558f8ab-3ec7e7438b4mr206664125ab.9.1756397187718;
-        Thu, 28 Aug 2025 09:06:27 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3ea4c191f23sm111747185ab.16.2025.08.28.09.06.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Aug 2025 09:06:26 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: colyli@kernel.org
-Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org, 
- Coly Li <colyli@suse.de>, Coly Li <colyli@fnnas.com>
-In-Reply-To: <20250828154835.32926-1-colyli@kernel.org>
-References: <20250828154835.32926-1-colyli@kernel.org>
-Subject: Re: [PATCH] bcache: change maintainer's email address
-Message-Id: <175639718595.484892.13913272754617595641.b4-ty@kernel.dk>
-Date: Thu, 28 Aug 2025 10:06:25 -0600
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Utug3C4q"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6C34C4CEED;
+	Thu, 28 Aug 2025 16:54:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756400072;
+	bh=3QSqWFwhLXFpgIQB1AhDzeFYEFSsyOykW/t8YMcdvDs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Utug3C4qHAngGkUPRUqPcVpMv2skHSOiyTR1dzioCxiyV/N0D3D3xwLMN4kKVhjRg
+	 R1e3GaQ66/QDlvAbclIdn1b0xrBO+DODu7rLesJ54dZQOJ+qr4UwXmhZorK6X6L1pe
+	 /mKnN3THYo/PX+SSQI5FBBXcz4a8pvxXQG8iBycA9jlkdj9zJMMNMWOCxqVVHcRMG0
+	 jrJGkyKqRduB/ujzl45UowCIqtVEnLBTqm/vLH4mWU4+vwRxIYccg9OHedq9aiILZs
+	 hmuixBFk7xqznER0ERf4UjMVjXknV66U4Y9wYKKHbgLQRBDuheIDJSUa9AzDEN/7Pr
+	 p4K8MwEWQi7/w==
+Date: Thu, 28 Aug 2025 19:54:27 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Keith Busch <kbusch@kernel.org>
+Cc: Marek Szyprowski <m.szyprowski@samsung.com>,
+	Jason Gunthorpe <jgg@nvidia.com>,
+	Abdiel Janulgue <abdiel.janulgue@gmail.com>,
+	Alexander Potapenko <glider@google.com>,
+	Alex Gaynor <alex.gaynor@gmail.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Christoph Hellwig <hch@lst.de>, Danilo Krummrich <dakr@kernel.org>,
+	iommu@lists.linux.dev, Jason Wang <jasowang@redhat.com>,
+	Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>,
+	Jonathan Corbet <corbet@lwn.net>, Juergen Gross <jgross@suse.com>,
+	kasan-dev@googlegroups.com, linux-block@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org, linux-nvme@lists.infradead.org,
+	linuxppc-dev@lists.ozlabs.org, linux-trace-kernel@vger.kernel.org,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	Robin Murphy <robin.murphy@arm.com>, rust-for-linux@vger.kernel.org,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Stefano Stabellini <sstabellini@kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	virtualization@lists.linux.dev, Will Deacon <will@kernel.org>,
+	xen-devel@lists.xenproject.org
+Subject: Re: [PATCH v4 15/16] block-dma: properly take MMIO path
+Message-ID: <20250828165427.GB10073@unreal>
+References: <cover.1755624249.git.leon@kernel.org>
+ <642dbeb7aa94257eaea71ec63c06e3f939270023.1755624249.git.leon@kernel.org>
+ <aLBzeMNT3WOrjprC@kbusch-mbp>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-2ce6c
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aLBzeMNT3WOrjprC@kbusch-mbp>
 
-
-On Thu, 28 Aug 2025 23:48:35 +0800, colyli@kernel.org wrote:
-> Change to my new email address on fnnas.com.
+On Thu, Aug 28, 2025 at 09:19:20AM -0600, Keith Busch wrote:
+> On Tue, Aug 19, 2025 at 08:36:59PM +0300, Leon Romanovsky wrote:
+> > diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+> > index 09b99d52fd36..283058bcb5b1 100644
+> > --- a/include/linux/blk_types.h
+> > +++ b/include/linux/blk_types.h
+> > @@ -387,6 +387,7 @@ enum req_flag_bits {
+> >  	__REQ_FS_PRIVATE,	/* for file system (submitter) use */
+> >  	__REQ_ATOMIC,		/* for atomic write operations */
+> >  	__REQ_P2PDMA,		/* contains P2P DMA pages */
+> > +	__REQ_MMIO,		/* contains MMIO memory */
+> >  	/*
+> >  	 * Command specific flags, keep last:
+> >  	 */
+> > @@ -420,6 +421,7 @@ enum req_flag_bits {
+> >  #define REQ_FS_PRIVATE	(__force blk_opf_t)(1ULL << __REQ_FS_PRIVATE)
+> >  #define REQ_ATOMIC	(__force blk_opf_t)(1ULL << __REQ_ATOMIC)
+> >  #define REQ_P2PDMA	(__force blk_opf_t)(1ULL << __REQ_P2PDMA)
+> > +#define REQ_MMIO	(__force blk_opf_t)(1ULL << __REQ_MMIO)
 > 
+> Now that my integrity metadata DMA series is staged, I don't think we
+> can use REQ flags like this because data and metadata may have different
+> mapping types. I think we should add a flags field to the dma_iova_state
+> instead.
+
+Before integrity metadata code was merged, the assumption was that request is
+only one type or p2p or host. Is it still holding now?
+
+And we can't store in dma_iova_state() as HMM/RDMA code works in page-based
+granularity and one dma_iova_state() can mix different types.
+
+Thanks
+
 > 
-
-Applied, thanks!
-
-[1/1] bcache: change maintainer's email address
-      commit: 95a7c5000956f939b86d8b00b8e6b8345f4a9b65
-
-Best regards,
--- 
-Jens Axboe
-
-
-
