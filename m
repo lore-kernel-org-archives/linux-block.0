@@ -1,74 +1,72 @@
-Received: from mail-il1-f172.google.com (mail-il1-f172.google.com [209.85.166.172])
+Received: from mail-il1-f182.google.com (mail-il1-f182.google.com [209.85.166.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5456C250BF2
-	for <linux-block@vger.kernel.org>; Thu, 28 Aug 2025 16:06:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBD84264A9D
+	for <linux-block@vger.kernel.org>; Thu, 28 Aug 2025 16:06:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756397190; cv=none; b=NHJU1iD97IRisrKwt+AAcUQcccVRI1obaHWcCxITOiM6CySxX/9xIdsJhZlqPe03cQ/PIGRcjWuiW2DXVJyPvFy0+n7ILv2TgPFzKILJCUBJtkMCEdSJunkTq63/sBVso7X80ZEmHnhtl+qgOU//syC1ZGgZsbAlLMNbcc99ifU=
+	t=1756397191; cv=none; b=orEg+6NfxzHtV/76OfQyXGB4oWrpnpWiVnKTjSLwMhop5OWjUAZKrY8mGHUtxXIaApNz4TcuWAWKS+krWhBQKEw18GS5LPtPVLTEq+rXC1GOooLrC7ugf3TcXUnH++s1uvVKgz2+BiW3T9lKIIMYx6zzw+hUdr5IYFl14RW8A2E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756397190; c=relaxed/simple;
-	bh=Xfed49w/j895hUQ4WC6JI5uU4bCQvEoU2MX25kF5DgU=;
+	s=arc-20240116; t=1756397191; c=relaxed/simple;
+	bh=F//I10DGQ3c+0b/Z9jeGysiniCCLugL6GuqwDiDfu4A=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=mGYVImc5CXkYN4KV51XQ5MWvpRBHWElF55/39TV7horSk573NOjuOQ/v4wWwu7RRrrVH5QIRw439a5o/XLtqSooxYG4Z0kCO40uiP9VJiiFN+MPnrZ4F4TX2R3Xm7v7SSU8FIhF424gJZ05uhTPLOQLK4Q9u5dvaKl+XEVrqUdE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=wj3pEbkR; arc=none smtp.client-ip=209.85.166.172
+	 MIME-Version:Content-Type; b=To7zQg+IuJvycs+EjDCLfIxbBgTpoDhAvOGj5R8BLxKHvFwf+Lx30gHP6cjRQVYEenKTs2si3LtCnTun2ix7LcnZZbIqI0XtM2XFW9zX2lyXEF93cUcaXNa7Q/gYJtx9r/MmJS/55K+n2FVLWTm7VxvwwrHtdQejky0ZJNaeVbw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=gqW0fJgs; arc=none smtp.client-ip=209.85.166.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="wj3pEbkR"
-Received: by mail-il1-f172.google.com with SMTP id e9e14a558f8ab-3ec4802d43bso11180835ab.0
-        for <linux-block@vger.kernel.org>; Thu, 28 Aug 2025 09:06:27 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="gqW0fJgs"
+Received: by mail-il1-f182.google.com with SMTP id e9e14a558f8ab-3f0651cb8aeso9855785ab.3
+        for <linux-block@vger.kernel.org>; Thu, 28 Aug 2025 09:06:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1756397186; x=1757001986; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1756397188; x=1757001988; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=fVcgehLU7koY0n61CAA/8K7qOPY+THIxVHvuwo9n41c=;
-        b=wj3pEbkRiKx3YYWHkNgdXh6ug1YOjzYoy+chpULEpyAhBBqfMz4T2BHDyqfsM1+TkR
-         smOowSNaAkANbSccyYheGkW8ACMCbnRpuTicOjdC6F82Mai5ImGCh1NCfC6BkfQBhdk7
-         /PaCh82c2TG7Pi+ZldbUJHBUckEdfDrwpqGjuJvcSchm6Ui7yCmWKH8yagmRGRll1bt+
-         paHwi4PyDeOWHtxQqdYQW2K6e3FlTGhdO5laS+MCvTqVaYCy2DpT3UqJbuvsAyCU9KWY
-         OmESi88LX5umGOfWzYiYsnCmhKIZhA4/PYJUB8j/oG03BzYn+fwEw+Y6I+FfGv5HueYB
-         kJJw==
+        bh=sQ1iBkivcgNxINJNzY151f9lwALON3YL8XgfKRBEIv8=;
+        b=gqW0fJgs8ha6cUN1GUJE12BOGPI8m3auFSLy6xdurSNOubKCa20L37Bb4a58xKPINy
+         oaJJMDWWN6jm0oIE52zCaWWvC23dg7Tr/mi4ge/Huq0gSogeRI20HIhXzd1oCHSmhfz7
+         lDazi7b6n4zK77UWCWxetxdJCrkNqSwAWYvXKgqJsAVz2sIZ6QuEjhPT/H96DiGpUk8t
+         rZi4zjo0t5258kUzPNZteGL4btzTMfCHtkthICLi4myp+w1gEBhuk/wOrhzTCB0UWKX2
+         1sSx0KhTo+58ap6soFB0/7uHzMCMS30cZDjf2kVRoDcrW0zsyIilhxZq2LvCB5kPHI3n
+         Aj4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756397186; x=1757001986;
+        d=1e100.net; s=20230601; t=1756397188; x=1757001988;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=fVcgehLU7koY0n61CAA/8K7qOPY+THIxVHvuwo9n41c=;
-        b=OnPYR7MRZ8K7OGgeNoXSVmE5Pp1OIkebQDXPat0268l8pdEgYj3dtJ2RR+V5jbbK3l
-         n6FU2zZW2sjhpgEiLdGVzhZfzeHIfgfhbWNaZzPrj02EU2HxvlUmb0ZKS+6ibxzGRmhM
-         Lg5rvtzA93ovgmG3zj63GH6qLZX5sDpmrUrUa75NjfS/DswMA0UwRmFmmBlvMKkKv/66
-         RtOmpxnso5vYcBzjrFZv3/z/sTQBHIXS3V/yv5vn1wroEtJBCmlIzWbalXmKvBO3EZGR
-         7oF1Gfd60gvSIsONINQnCp9EfcrycFi+fOUKZ0mX7ygW/B4d/Swq0o/DYQ1vyvaVrVnp
-         rXBw==
-X-Gm-Message-State: AOJu0Yx7HpO/tjQbLj6aa2KigTxDldKeCTM2b7lbkns8kXM04ocboCvi
-	pBUHv5K3R9iUKGcWGA48ChrSoDoSjlnpsT2jfqGMu5i7f6zJoRrWe0UQEMLrxY6m30C2r87Oqhf
-	KW9Yu
-X-Gm-Gg: ASbGncur9NoA9pwAJIGACxQJzyI3qS+oW90KxXEIQABUg6K9BijgFOwwXDhXZtLGJVv
-	sy3QSTWnMx2747clFQYk98JZGgyyfoNgKtA00s0Vzh63BbXR60DLezBGYmugwWgWKE3BHhODDNo
-	41lS6mANCwNVo3BCaPF84iyza+nTAci3cN9lD3cuwJrxCRDDf9oAN+63GKtOifAp2dpUzcz6axj
-	MuQ9ydHQ6zUwWMYSzhXo2be1eAJS9IVY9AEzEIL6HFanu81qUZ90i5vUl96+gBbBRrbyxM+CzSq
-	aWx21LuqbSMK7gmoiWjGUbhmqSRyWOP0NAG5dyvO6E6p91sufxsZ9g2Z1X2Nea50jnIO05OKQaU
-	YycLQEbRuFhB5eg==
-X-Google-Smtp-Source: AGHT+IGtCqksd0vhhRUONKLjnY3YNB4P0OL5Hof/gDaJqktkdXZUqgz9EdCkp9LADlQTZqTe5w7aVw==
-X-Received: by 2002:a05:6e02:16c5:b0:3e5:5cee:a9ba with SMTP id e9e14a558f8ab-3e91fc22d7emr358031125ab.5.1756397184182;
-        Thu, 28 Aug 2025 09:06:24 -0700 (PDT)
+        bh=sQ1iBkivcgNxINJNzY151f9lwALON3YL8XgfKRBEIv8=;
+        b=urINgrVCifP6dSTmv2YSGxhfclfQ/7CpkCPW8cs0RcE9JdrBejVtvjEWSO5/KVzjja
+         t3ZhICvB/AH0YWIGAujy5vVTPzQFhDRvXQzJffeCk9MdH4dACBH+F1j6jbXsyAsNjXGf
+         UGwGsMoGYYqlQGuo5m6cz7e1geJtiAoOa1AihaXd02Y0YIgbZS40CwyxJII+diaCKwO/
+         5pJtIzI2mo5eIIaXk0SxUFOjk88JHM1MVPF44u+pdU0+OIi8Jw6KJOxKKi745oOIdhQ+
+         8OtJQgv3jSxI7n7K3/KOIs2fl+L+IhKEbAHdmAnUBUw/pBgKpjMgJ/foPPGHih10EzCG
+         tAXg==
+X-Forwarded-Encrypted: i=1; AJvYcCXEG/bDWL0WeYKERM2PJ12C558ukQk+FjZWHbGUDrbw9yGfBjH1vxlv1nqnf/os01xonPTwUuh16EUwlg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzsKS12Qj5DSdFx2w8w99GR3+Cpu0NwWMbeURX+6GHsD5+ApBHl
+	0ETSG2kIO1IgyWhiBAWSo2MgTqyUSyxTPXxvyOoUt/ftrparx9MHHZ1qRt08WbW3H08=
+X-Gm-Gg: ASbGncsyjZYASg+qS6PK2YT9x1qAaKZQPAw1W3lZ/qIkj1wiaUb7CTceoAhq+MzG2Du
+	1CjotOMuNMEHAkGBfrnxtPpSSY/3eC6iTmWetoaSjCkdOa2Ycwotk3gc1mm1gcktoUOKY9RcHF7
+	RH9VpDjo3qJvQeypxSYof/sEtufDKau7ySSXCfJgcddra0fm2Q+BXavBVWgeCeXNzHJ5XwJrRM6
+	jFnw3kiVDayBQ8WAhQuhNR9ToUuA1/341PmJLszaeWm0CSwg0YdvL/Y6UrkELiMZBsLugqNK/c4
+	7tk5knDtPKZZwYRNzme9C83hR7EloHkoZlQ4ChWc8AotC4QK8OyF/SkUwz+rg80MnB/WCnWlVBW
+	X+6a0piG99t7Naqpnacx/l4KA
+X-Google-Smtp-Source: AGHT+IFYVPLNEA9w3bodw9+YfXXXHlX/wG691OXdZ7TUdqpI2rZ1DapvCar4yq/2nhje8ygl3GK+kQ==
+X-Received: by 2002:a05:6e02:1448:b0:3ec:7e74:36bb with SMTP id e9e14a558f8ab-3ec7e7438b4mr206664125ab.9.1756397187718;
+        Thu, 28 Aug 2025 09:06:27 -0700 (PDT)
 Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3ea4c191f23sm111747185ab.16.2025.08.28.09.06.22
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3ea4c191f23sm111747185ab.16.2025.08.28.09.06.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Aug 2025 09:06:22 -0700 (PDT)
+        Thu, 28 Aug 2025 09:06:26 -0700 (PDT)
 From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
-Cc: Uday Shankar <ushankar@purestorage.com>, 
- Keith Busch <kbusch@kernel.org>, 
- Caleb Sander Mateos <csander@purestorage.com>
-In-Reply-To: <20250827121602.2619736-1-ming.lei@redhat.com>
-References: <20250827121602.2619736-1-ming.lei@redhat.com>
-Subject: Re: [PATCH V3 0/2] ublk: avoid ublk_io_release() called after ublk
- char dev is closed
-Message-Id: <175639718236.484892.10632372373584799794.b4-ty@kernel.dk>
-Date: Thu, 28 Aug 2025 10:06:22 -0600
+To: colyli@kernel.org
+Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org, 
+ Coly Li <colyli@suse.de>, Coly Li <colyli@fnnas.com>
+In-Reply-To: <20250828154835.32926-1-colyli@kernel.org>
+References: <20250828154835.32926-1-colyli@kernel.org>
+Subject: Re: [PATCH] bcache: change maintainer's email address
+Message-Id: <175639718595.484892.13913272754617595641.b4-ty@kernel.dk>
+Date: Thu, 28 Aug 2025 10:06:25 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -80,25 +78,15 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.14.3-dev-2ce6c
 
 
-On Wed, 27 Aug 2025 20:15:58 +0800, Ming Lei wrote:
-> The 1st patch fixes ublk_io_release(), and avoids warning from ublk
-> selftest(test_stress_04.sh).
+On Thu, 28 Aug 2025 23:48:35 +0800, colyli@kernel.org wrote:
+> Change to my new email address on fnnas.com.
 > 
-> The 2nd patch adds test case for this issue.
 > 
-> V3:
-> - move reference counter reset into the check helper(Caleb Sander Mateos)
-> - remove 'ub' re-assignment in ublk_ch_release() (Caleb Sander Mateos)
-> - improve commit log
-> 
-> [...]
 
 Applied, thanks!
 
-[1/2] ublk: avoid ublk_io_release() called after ublk char dev is closed
-      commit: c5c5eb24ed6177fc0ef4bb75fc18d07a99c1d3f0
-[2/2] ublk selftests: add --no_ublk_fixed_fd for not using registered ublk char device
-      commit: 9b2785ea8592f239836405de023c75c4f3f5ce00
+[1/1] bcache: change maintainer's email address
+      commit: 95a7c5000956f939b86d8b00b8e6b8345f4a9b65
 
 Best regards,
 -- 
