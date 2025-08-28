@@ -1,217 +1,135 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59586208994;
-	Thu, 28 Aug 2025 11:57:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64E2130FF13
+	for <linux-block@vger.kernel.org>; Thu, 28 Aug 2025 12:09:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756382254; cv=none; b=ONTOpL3VUSJwVzxa5dFb5UjVQv+x7ueo8id0tNOgahhRfzjy8U7OG1pHlsqIXKXgnbIPaZEQ6sH27ia2DNBSKOLnIe2UIsZupbxPrVaq2/18hX0MuvVeJuP1jl24pYHpSuGno4VlRK6YgWeMqQF15LjCp9AjSiZmrJ84gtXnGfA=
+	t=1756382963; cv=none; b=Bgssg2kAJ/Kypzapemwz67EOzBB0HKYy6qMDIyRRyKky2hBN4b9ZtPGUYnCCfrZv+AWRqfK4eV+n0JEwOzygk1QJHMOzAxp+tJ9dQWZrDO+k8QgYTL2Zqo1JqTo9oHABg4G9wNOqA6Qf963VCHc03Tu2H8u5qnwrJQH70aIn7Us=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756382254; c=relaxed/simple;
-	bh=n8QXY5YRm9nQQBYQQGaxgrl8XdTmVTKFna/oqVl/xhQ=;
+	s=arc-20240116; t=1756382963; c=relaxed/simple;
+	bh=00isV9pgMOT+EOxLZrvOcj/hyY1mQftLr8hMFssxPt8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AJ9GfL1/bM4FM1Ded2cEKFeo/9V36xjtNbK+8bJwgiuCB56NnHwkS2w706Hv3yIULS8AJoCtHFeYaC+5zKp7fB2eAxl2vU2HmFcCHnFSlKMGDbBzMlU4vjpp1xtaLpZzlyinWEp6mYLSAvN+agGDUqbG4mwrc0bBwPxi4uJREfQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OqLtXq0g; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=s664h4fpZt180qv9F+DD9A7C9gQKHKJNaInpR4foQAYGqAtYA9KWZ6iUAd50B1MUGWDs7PF8AQA8r73FAQNvyrfEx3PRv4qegyYTQLfsgIWHu7FqirAUM5gMyEa6TDngvigIcfsxx6xxamiwojIwtIYMeXU6XuRPNIb/oIsDPV4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QjK14zkF; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OqLtXq0g"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E94ADC4CEEB;
-	Thu, 28 Aug 2025 11:57:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756382253;
-	bh=n8QXY5YRm9nQQBYQQGaxgrl8XdTmVTKFna/oqVl/xhQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=OqLtXq0gi9UBzAMP2wcXlT2cBb1dLghW49oEfniFZWmFDZ8XrTzjet3Se+cK+4Enz
-	 bUcas58K9zqJYJO8K1xC/lojuRYXP35XvwWJ9XYIMcJRmRtfzd1ENQlyeWdM0r06Gk
-	 0iGSQIedtJXaN5EXHSKxCaObLHf9f2/iEhzMO/91YHWTXC+kQV5HZRzX+s7pvZgTMs
-	 /wX7b7wyAX9BAZbCT37OSLoaEdenWMo5h/NWko9aq0V1TzuE+BMc75vbwrCyO1DV2e
-	 WdS++dKThCK37gVl5uHk3NBx12J9+O+GbVUmIbjagbvOKAeDIwhduPUosVAdqLdX7n
-	 wfEu8DIXf5M5g==
-Date: Thu, 28 Aug 2025 14:57:29 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Marek Szyprowski <m.szyprowski@samsung.com>
-Cc: Jason Gunthorpe <jgg@nvidia.com>,
-	Abdiel Janulgue <abdiel.janulgue@gmail.com>,
-	Alexander Potapenko <glider@google.com>,
-	Alex Gaynor <alex.gaynor@gmail.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Christoph Hellwig <hch@lst.de>, Danilo Krummrich <dakr@kernel.org>,
-	iommu@lists.linux.dev, Jason Wang <jasowang@redhat.com>,
-	Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>,
-	Jonathan Corbet <corbet@lwn.net>, Juergen Gross <jgross@suse.com>,
-	kasan-dev@googlegroups.com, Keith Busch <kbusch@kernel.org>,
-	linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	linux-nvme@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
-	linux-trace-kernel@vger.kernel.org,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Robin Murphy <robin.murphy@arm.com>, rust-for-linux@vger.kernel.org,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Stefano Stabellini <sstabellini@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	virtualization@lists.linux.dev, Will Deacon <will@kernel.org>,
-	xen-devel@lists.xenproject.org
-Subject: Re: [PATCH v4 00/16] dma-mapping: migrate to physical address-based
- API
-Message-ID: <20250828115729.GA10073@unreal>
-References: <cover.1755624249.git.leon@kernel.org>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QjK14zkF"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1756382960;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=FeaggWAAFNQCZlCBo2LizV3WKfNjpyXN5B4dcdfNqIM=;
+	b=QjK14zkFgdVxquX8B0/VGvz0rdvHdY0t2IXn6YSEKIs0iZReaa1AhD8PGLNfgEbu093dtD
+	sttLAijijFsG2CqqcB1kba9KfRlFiap5eAGtEp5cZ6nzcpuvwSafUoFVU1aXxus2OKJPAd
+	hbOAqLazPqatP2cDc7MW/xMpBg5rA3c=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-592-h4rSok_AP3y182jUk-5QhA-1; Thu,
+ 28 Aug 2025 08:09:14 -0400
+X-MC-Unique: h4rSok_AP3y182jUk-5QhA-1
+X-Mimecast-MFC-AGG-ID: h4rSok_AP3y182jUk-5QhA_1756382953
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3A1271800291;
+	Thu, 28 Aug 2025 12:09:12 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.22])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id F11C51800447;
+	Thu, 28 Aug 2025 12:09:02 +0000 (UTC)
+Date: Thu, 28 Aug 2025 20:08:57 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Li Nan <linan666@huaweicloud.com>
+Cc: Yu Kuai <yukuai1@huaweicloud.com>, axboe@kernel.dk,
+	jianchao.w.wang@oracle.com, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, yangerkun@huawei.com,
+	yi.zhang@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
+Subject: Re: [PATCH] blk-mq: check kobject state_in_sysfs before deleting in
+ blk_mq_unregister_hctx
+Message-ID: <aLBG2VCNZEnSYxx9@fedora>
+References: <20250826084854.1030545-1-linan666@huaweicloud.com>
+ <aK5YH4Jbt3ZNngwR@fedora>
+ <3853d5bf-a561-ec2d-e063-5fbe5cf025ca@huaweicloud.com>
+ <aK5g-38izFqjPk9v@fedora>
+ <b5f385bc-5e16-2a79-f997-5fd697f2a38a@huaweicloud.com>
+ <aK69gpTnVv3TZtjg@fedora>
+ <fc587a1a-97fb-584c-c17c-13bb5e3d7a92@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <cover.1755624249.git.leon@kernel.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <fc587a1a-97fb-584c-c17c-13bb5e3d7a92@huaweicloud.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-On Tue, Aug 19, 2025 at 08:36:44PM +0300, Leon Romanovsky wrote:
-> Changelog:
-> v4:
->  * Fixed kbuild error with mismatch in kmsan function declaration due to
->    rebase error.
-> v3: https://lore.kernel.org/all/cover.1755193625.git.leon@kernel.org
->  * Fixed typo in "cacheable" word
->  * Simplified kmsan patch a lot to be simple argument refactoring
-> v2: https://lore.kernel.org/all/cover.1755153054.git.leon@kernel.org
->  * Used commit messages and cover letter from Jason
->  * Moved setting IOMMU_MMIO flag to dma_info_to_prot function
->  * Micro-optimized the code
->  * Rebased code on v6.17-rc1
-> v1: https://lore.kernel.org/all/cover.1754292567.git.leon@kernel.org
->  * Added new DMA_ATTR_MMIO attribute to indicate
->    PCI_P2PDMA_MAP_THRU_HOST_BRIDGE path.
->  * Rewrote dma_map_* functions to use thus new attribute
-> v0: https://lore.kernel.org/all/cover.1750854543.git.leon@kernel.org/
-> ------------------------------------------------------------------------
+On Thu, Aug 28, 2025 at 05:28:26PM +0800, Li Nan wrote:
 > 
-> This series refactors the DMA mapping to use physical addresses
-> as the primary interface instead of page+offset parameters. This
-> change aligns the DMA API with the underlying hardware reality where
-> DMA operations work with physical addresses, not page structures.
 > 
-> The series maintains export symbol backward compatibility by keeping
-> the old page-based API as wrapper functions around the new physical
-> address-based implementations.
+> 在 2025/8/27 16:10, Ming Lei 写道:
+> > On Wed, Aug 27, 2025 at 11:22:06AM +0800, Li Nan wrote:
+> > > 
+> > > 
+> > > 在 2025/8/27 9:35, Ming Lei 写道:
+> > > > On Wed, Aug 27, 2025 at 09:04:45AM +0800, Yu Kuai wrote:
+> > > > > Hi,
+> > > > > 
+> > > > > 在 2025/08/27 8:58, Ming Lei 写道:
+> > > > > > On Tue, Aug 26, 2025 at 04:48:54PM +0800, linan666@huaweicloud.com wrote:
+> > > > > > > From: Li Nan <linan122@huawei.com>
+> > > > > > > 
+> > > > > > > In __blk_mq_update_nr_hw_queues() the return value of
+> > > > > > > blk_mq_sysfs_register_hctxs() is not checked. If sysfs creation for hctx
+> > > > > > 
+> > > > > > Looks we should check its return value and handle the failure in both
+> > > > > > the call site and blk_mq_sysfs_register_hctxs().
+> > > > > 
+> > > > >   From __blk_mq_update_nr_hw_queues(), the old hctxs is already
+> > > > > unregistered, and this function is void, we failed to register new hctxs
+> > > > > because of memory allocation failure. I really don't know how to handle
+> > > > > the failure here, do you have any suggestions?
+> > > > 
+> > > > It is out of memory, I think it is fine to do whatever to leave queue state
+> > > > intact instead of making it `partial workable`, such as:
+> > > > 
+> > > > - try update nr_hw_queues to 1
+> > > > 
+> > > > - if it still fails, delete disk & mark queue as dead if disk is attached
+> > > > 
+> > > 
+> > > If we ignore these non-critical sysfs creation failures, the disk remains
+> > > usable with no loss of functionality. Deleting the disk seems to escalate
+> > > the error?
+> > 
+> > It is more like a workaround by ignoring the sysfs register failure. And if
+> > the issue need to be fixed in this way, you have to document it. >
+> > In case of OOM, it usually means that the system isn't usable any more.
+> > But it is NOIO allocation and the typical use case is for error recovery in
+> > nvme pci, so there may not be enough pages for noio allocation only. That is
+> > the reason for ignoring sysfs register in blk_mq_update_nr_hw_queues()?
+> > 
+> > But NVMe has been pretty fragile in this area by using non-owner queue
+> > freeze, and call blk_mq_update_nr_hw_queues() on frozen queue, so it is
+> > really necessary to take it into account?
 > 
-> This series refactors the DMA mapping API to provide a phys_addr_t
-> based, and struct-page free, external API that can handle all the
-> mapping cases we want in modern systems:
+> I agree with your points about NOIO and NVMe.
 > 
->  - struct page based cachable DRAM
->  - struct page MEMORY_DEVICE_PCI_P2PDMA PCI peer to peer non-cachable
->    MMIO
->  - struct page-less PCI peer to peer non-cachable MMIO
->  - struct page-less "resource" MMIO
-> 
-> Overall this gets much closer to Matthew's long term wish for
-> struct-pageless IO to cachable DRAM. The remaining primary work would
-> be in the mm side to allow kmap_local_pfn()/phys_to_virt() to work on
-> phys_addr_t without a struct page.
-> 
-> The general design is to remove struct page usage entirely from the
-> DMA API inner layers. For flows that need to have a KVA for the
-> physical address they can use kmap_local_pfn() or phys_to_virt(). This
-> isolates the struct page requirements to MM code only. Long term all
-> removals of struct page usage are supporting Matthew's memdesc
-> project which seeks to substantially transform how struct page works.
-> 
-> Instead make the DMA API internals work on phys_addr_t. Internally
-> there are still dedicated 'page' and 'resource' flows, except they are
-> now distinguished by a new DMA_ATTR_MMIO instead of by callchain. Both
-> flows use the same phys_addr_t.
-> 
-> When DMA_ATTR_MMIO is specified things work similar to the existing
-> 'resource' flow. kmap_local_pfn(), phys_to_virt(), phys_to_page(),
-> pfn_valid(), etc are never called on the phys_addr_t. This requires
-> rejecting any configuration that would need swiotlb. CPU cache
-> flushing is not required, and avoided, as ATTR_MMIO also indicates the
-> address have no cachable mappings. This effectively removes any
-> DMA API side requirement to have struct page when DMA_ATTR_MMIO is
-> used.
-> 
-> In the !DMA_ATTR_MMIO mode things work similarly to the 'page' flow,
-> except on the common path of no cache flush, no swiotlb it never
-> touches a struct page. When cache flushing or swiotlb copying
-> kmap_local_pfn()/phys_to_virt() are used to get a KVA for CPU
-> usage. This was already the case on the unmap side, now the map side
-> is symmetric.
-> 
-> Callers are adjusted to set DMA_ATTR_MMIO. Existing 'resource' users
-> must set it. The existing struct page based MEMORY_DEVICE_PCI_P2PDMA
-> path must also set it. This corrects some existing bugs where iommu
-> mappings for P2P MMIO were improperly marked IOMMU_CACHE.
-> 
-> Since ATTR_MMIO is made to work with all the existing DMA map entry
-> points, particularly dma_iova_link(), this finally allows a way to use
-> the new DMA API to map PCI P2P MMIO without creating struct page. The
-> VFIO DMABUF series demonstrates how this works. This is intended to
-> replace the incorrect driver use of dma_map_resource() on PCI BAR
-> addresses.
-> 
-> This series does the core code and modern flows. A followup series
-> will give the same treatment to the legacy dma_ops implementation.
-> 
-> Thanks
-> 
-> Leon Romanovsky (16):
->   dma-mapping: introduce new DMA attribute to indicate MMIO memory
->   iommu/dma: implement DMA_ATTR_MMIO for dma_iova_link().
->   dma-debug: refactor to use physical addresses for page mapping
->   dma-mapping: rename trace_dma_*map_page to trace_dma_*map_phys
->   iommu/dma: rename iommu_dma_*map_page to iommu_dma_*map_phys
->   iommu/dma: extend iommu_dma_*map_phys API to handle MMIO memory
->   dma-mapping: convert dma_direct_*map_page to be phys_addr_t based
->   kmsan: convert kmsan_handle_dma to use physical addresses
->   dma-mapping: handle MMIO flow in dma_map|unmap_page
->   xen: swiotlb: Open code map_resource callback
->   dma-mapping: export new dma_*map_phys() interface
->   mm/hmm: migrate to physical address-based DMA mapping API
->   mm/hmm: properly take MMIO path
->   block-dma: migrate to dma_map_phys instead of map_page
->   block-dma: properly take MMIO path
->   nvme-pci: unmap MMIO pages with appropriate interface
-> 
->  Documentation/core-api/dma-api.rst        |   4 +-
->  Documentation/core-api/dma-attributes.rst |  18 ++++
->  arch/powerpc/kernel/dma-iommu.c           |   4 +-
->  block/blk-mq-dma.c                        |  15 ++-
->  drivers/iommu/dma-iommu.c                 |  61 +++++------
->  drivers/nvme/host/pci.c                   |  18 +++-
->  drivers/virtio/virtio_ring.c              |   4 +-
->  drivers/xen/swiotlb-xen.c                 |  21 +++-
->  include/linux/blk-mq-dma.h                |   6 +-
->  include/linux/blk_types.h                 |   2 +
->  include/linux/dma-direct.h                |   2 -
->  include/linux/dma-map-ops.h               |   8 +-
->  include/linux/dma-mapping.h               |  33 ++++++
->  include/linux/iommu-dma.h                 |  11 +-
->  include/linux/kmsan.h                     |   9 +-
->  include/trace/events/dma.h                |   9 +-
->  kernel/dma/debug.c                        |  71 ++++---------
->  kernel/dma/debug.h                        |  37 ++-----
->  kernel/dma/direct.c                       |  22 +---
->  kernel/dma/direct.h                       |  52 ++++++----
->  kernel/dma/mapping.c                      | 117 +++++++++++++---------
->  kernel/dma/ops_helpers.c                  |   6 +-
->  mm/hmm.c                                  |  19 ++--
->  mm/kmsan/hooks.c                          |   5 +-
->  rust/kernel/dma.rs                        |   3 +
->  tools/virtio/linux/kmsan.h                |   2 +-
->  26 files changed, 305 insertions(+), 254 deletions(-)
+> I hit this issue in null_blk during fuzz testing with memory-fault
+> injection. Changing the number of hardware queues under OOM is extremely
+> rare in real-world usage. So I think adding a workaround and documenting it
+> is sufficient. What do you think?
 
-Marek,
+Looks fine for me.
 
-So what are the next steps here? This series is pre-requirement for the
-VFIO MMIO patches.
 
-Thanks
+Thanks, 
+Ming
 
-> 
-> -- 
-> 2.50.1
-> 
-> 
