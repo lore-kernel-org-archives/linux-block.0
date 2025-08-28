@@ -1,223 +1,217 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D1E730E83A
-	for <linux-block@vger.kernel.org>; Thu, 28 Aug 2025 11:33:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59586208994;
+	Thu, 28 Aug 2025 11:57:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756380789; cv=none; b=KkUCQEo7E7vnySlCuwoSSyItddf+/RrcGZXRlY5OP9WQ6oIY2/tg9Ms8vbuR73xMpF5Z0bWk2EpjLWfrZtXVCmZKXkjvRwq/xDDvCywmSR9F5dzBqkFahCRftzcBxnkSs3hnFySUkmQm5YKYNA28tBFmdG/bdihzmEz6fyg91xs=
+	t=1756382254; cv=none; b=ONTOpL3VUSJwVzxa5dFb5UjVQv+x7ueo8id0tNOgahhRfzjy8U7OG1pHlsqIXKXgnbIPaZEQ6sH27ia2DNBSKOLnIe2UIsZupbxPrVaq2/18hX0MuvVeJuP1jl24pYHpSuGno4VlRK6YgWeMqQF15LjCp9AjSiZmrJ84gtXnGfA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756380789; c=relaxed/simple;
-	bh=+TQQc6mh+HwTWTWoKqBarEkj1nKwweW26x4pr0Mnjq8=;
+	s=arc-20240116; t=1756382254; c=relaxed/simple;
+	bh=n8QXY5YRm9nQQBYQQGaxgrl8XdTmVTKFna/oqVl/xhQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aVGkk4ucAmU00vGNigjQePQZaRphbZEKQS6753ksW1yOPi/KHgx6TLktEgQ6njO4kfDA0ESAn4TQOibMFhsK+WMTNFcWxt8+CA9gCSZyurfjOJDvwL9sgHZCwVSn3OYYXzNEPxezv59CJSQjMqXE19Q3kEZyeyalmzs9LHk7SuM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Y00ACjZx; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=6++6OaBQ; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Y00ACjZx; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=6++6OaBQ; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	 Content-Type:Content-Disposition:In-Reply-To; b=AJ9GfL1/bM4FM1Ded2cEKFeo/9V36xjtNbK+8bJwgiuCB56NnHwkS2w706Hv3yIULS8AJoCtHFeYaC+5zKp7fB2eAxl2vU2HmFcCHnFSlKMGDbBzMlU4vjpp1xtaLpZzlyinWEp6mYLSAvN+agGDUqbG4mwrc0bBwPxi4uJREfQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OqLtXq0g; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Y00ACjZx";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="6++6OaBQ";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Y00ACjZx";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="6++6OaBQ"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 8ACEE21E00;
-	Thu, 28 Aug 2025 11:33:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1756380785; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nDBbpYYqSB5yXQjk2/9a0sEktjKGihTIib3At2S16rY=;
-	b=Y00ACjZx0/M0I+BO8pj890eiofCwNE31j3jd9WLCaXzfinz0IGMFs+SX9gkgxUm1SSYKr0
-	l0LGRH4Bbz13Z2c3zB1V6t8xJz+GM1Mfs/hw6kkh0fh0Xu997GYVO2euajn8Guv1Pg3zLx
-	rSxy+V517gTlibqyAdfCT4YUwMZR6dA=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1756380785;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nDBbpYYqSB5yXQjk2/9a0sEktjKGihTIib3At2S16rY=;
-	b=6++6OaBQXt4evqnG5Z9K9jLAcBl/ylDZMmc3F+OxuVCDBZrmizaGEEH7T0NeptMjgHQCcI
-	OSkmlzdrmy68hOBA==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1756380785; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nDBbpYYqSB5yXQjk2/9a0sEktjKGihTIib3At2S16rY=;
-	b=Y00ACjZx0/M0I+BO8pj890eiofCwNE31j3jd9WLCaXzfinz0IGMFs+SX9gkgxUm1SSYKr0
-	l0LGRH4Bbz13Z2c3zB1V6t8xJz+GM1Mfs/hw6kkh0fh0Xu997GYVO2euajn8Guv1Pg3zLx
-	rSxy+V517gTlibqyAdfCT4YUwMZR6dA=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1756380785;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nDBbpYYqSB5yXQjk2/9a0sEktjKGihTIib3At2S16rY=;
-	b=6++6OaBQXt4evqnG5Z9K9jLAcBl/ylDZMmc3F+OxuVCDBZrmizaGEEH7T0NeptMjgHQCcI
-	OSkmlzdrmy68hOBA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 7BA3613326;
-	Thu, 28 Aug 2025 11:33:05 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id POZmHXE+sGgMaAAAD6G6ig
-	(envelope-from <dwagner@suse.de>); Thu, 28 Aug 2025 11:33:05 +0000
-Date: Thu, 28 Aug 2025 13:33:04 +0200
-From: Daniel Wagner <dwagner@suse.de>
-To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, 
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>, "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>, 
-	"nbd@other.debian.org" <nbd@other.debian.org>, "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
-Subject: Re: blktests failures with v6.17-rc1 kernel
-Message-ID: <6ef89cb5-1745-4b98-9203-51ba6de40799@flourine.local>
-References: <suhzith2uj75uiprq4m3cglvr7qwm3d7gi4tmjeohlxl6fcmv3@zu6zym6nmvun>
- <ff748a3f-9f07-4933-b4b3-b4f58aacac5b@flourine.local>
- <rsdinhafrtlguauhesmrrzkybpnvwantwmyfq2ih5aregghax5@mhr7v3eryci3>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OqLtXq0g"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E94ADC4CEEB;
+	Thu, 28 Aug 2025 11:57:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756382253;
+	bh=n8QXY5YRm9nQQBYQQGaxgrl8XdTmVTKFna/oqVl/xhQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=OqLtXq0gi9UBzAMP2wcXlT2cBb1dLghW49oEfniFZWmFDZ8XrTzjet3Se+cK+4Enz
+	 bUcas58K9zqJYJO8K1xC/lojuRYXP35XvwWJ9XYIMcJRmRtfzd1ENQlyeWdM0r06Gk
+	 0iGSQIedtJXaN5EXHSKxCaObLHf9f2/iEhzMO/91YHWTXC+kQV5HZRzX+s7pvZgTMs
+	 /wX7b7wyAX9BAZbCT37OSLoaEdenWMo5h/NWko9aq0V1TzuE+BMc75vbwrCyO1DV2e
+	 WdS++dKThCK37gVl5uHk3NBx12J9+O+GbVUmIbjagbvOKAeDIwhduPUosVAdqLdX7n
+	 wfEu8DIXf5M5g==
+Date: Thu, 28 Aug 2025 14:57:29 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Marek Szyprowski <m.szyprowski@samsung.com>
+Cc: Jason Gunthorpe <jgg@nvidia.com>,
+	Abdiel Janulgue <abdiel.janulgue@gmail.com>,
+	Alexander Potapenko <glider@google.com>,
+	Alex Gaynor <alex.gaynor@gmail.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Christoph Hellwig <hch@lst.de>, Danilo Krummrich <dakr@kernel.org>,
+	iommu@lists.linux.dev, Jason Wang <jasowang@redhat.com>,
+	Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>,
+	Jonathan Corbet <corbet@lwn.net>, Juergen Gross <jgross@suse.com>,
+	kasan-dev@googlegroups.com, Keith Busch <kbusch@kernel.org>,
+	linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+	linux-nvme@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
+	linux-trace-kernel@vger.kernel.org,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	Robin Murphy <robin.murphy@arm.com>, rust-for-linux@vger.kernel.org,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Stefano Stabellini <sstabellini@kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	virtualization@lists.linux.dev, Will Deacon <will@kernel.org>,
+	xen-devel@lists.xenproject.org
+Subject: Re: [PATCH v4 00/16] dma-mapping: migrate to physical address-based
+ API
+Message-ID: <20250828115729.GA10073@unreal>
+References: <cover.1755624249.git.leon@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="h2ijb4czulrzbkl4"
-Content-Disposition: inline
-In-Reply-To: <rsdinhafrtlguauhesmrrzkybpnvwantwmyfq2ih5aregghax5@mhr7v3eryci3>
-X-Spamd-Result: default: False [-4.30 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-0.999];
-	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
-	ARC_NA(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	MIME_TRACE(0.00)[0:+,1:+,2:+];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo];
-	HAS_ATTACHMENT(0.00)[]
-X-Spam-Flag: NO
-X-Spam-Level: 
-X-Spam-Score: -4.30
-
-
---h2ijb4czulrzbkl4
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <cover.1755624249.git.leon@kernel.org>
 
-On Thu, Aug 28, 2025 at 05:55:06AM +0000, Shinichiro Kawasaki wrote:
-> On Aug 27, 2025 / 12:10, Daniel Wagner wrote:
-> > On Wed, Aug 13, 2025 at 10:50:34AM +0000, Shinichiro Kawasaki wrote:
-> > > #4: nvme/061 (fc transport)
-> > > 
-> > >     The test case nvme/061 sometimes fails for fc transport due to a WARN and
-> > >     refcount message "refcount_t: underflow; use-after-free." Refer to the
-> > >     report for the v6.15 kernel [5].
-> > > 
-> > >     [5]
-> > >     https://lore.kernel.org/linux-block/2xsfqvnntjx5iiir7wghhebmnugmpfluv6ef22mghojgk6gilr@mvjscqxroqqk/
-> > 
-> > This one might be fixed with
-> > 
-> > https://lore.kernel.org/linux-nvme/20250821-fix-nvmet-fc-v1-1-3349da4f416e@kernel.org/
+On Tue, Aug 19, 2025 at 08:36:44PM +0300, Leon Romanovsky wrote:
+> Changelog:
+> v4:
+>  * Fixed kbuild error with mismatch in kmsan function declaration due to
+>    rebase error.
+> v3: https://lore.kernel.org/all/cover.1755193625.git.leon@kernel.org
+>  * Fixed typo in "cacheable" word
+>  * Simplified kmsan patch a lot to be simple argument refactoring
+> v2: https://lore.kernel.org/all/cover.1755153054.git.leon@kernel.org
+>  * Used commit messages and cover letter from Jason
+>  * Moved setting IOMMU_MMIO flag to dma_info_to_prot function
+>  * Micro-optimized the code
+>  * Rebased code on v6.17-rc1
+> v1: https://lore.kernel.org/all/cover.1754292567.git.leon@kernel.org
+>  * Added new DMA_ATTR_MMIO attribute to indicate
+>    PCI_P2PDMA_MAP_THRU_HOST_BRIDGE path.
+>  * Rewrote dma_map_* functions to use thus new attribute
+> v0: https://lore.kernel.org/all/cover.1750854543.git.leon@kernel.org/
+> ------------------------------------------------------------------------
 > 
-> I applied this patch on top of v6.17-rc3 kernel, but still I observe the
-> refcount WARN at nvme/061 with.
+> This series refactors the DMA mapping to use physical addresses
+> as the primary interface instead of page+offset parameters. This
+> change aligns the DMA API with the underlying hardware reality where
+> DMA operations work with physical addresses, not page structures.
+> 
+> The series maintains export symbol backward compatibility by keeping
+> the old page-based API as wrapper functions around the new physical
+> address-based implementations.
+> 
+> This series refactors the DMA mapping API to provide a phys_addr_t
+> based, and struct-page free, external API that can handle all the
+> mapping cases we want in modern systems:
+> 
+>  - struct page based cachable DRAM
+>  - struct page MEMORY_DEVICE_PCI_P2PDMA PCI peer to peer non-cachable
+>    MMIO
+>  - struct page-less PCI peer to peer non-cachable MMIO
+>  - struct page-less "resource" MMIO
+> 
+> Overall this gets much closer to Matthew's long term wish for
+> struct-pageless IO to cachable DRAM. The remaining primary work would
+> be in the mm side to allow kmap_local_pfn()/phys_to_virt() to work on
+> phys_addr_t without a struct page.
+> 
+> The general design is to remove struct page usage entirely from the
+> DMA API inner layers. For flows that need to have a KVA for the
+> physical address they can use kmap_local_pfn() or phys_to_virt(). This
+> isolates the struct page requirements to MM code only. Long term all
+> removals of struct page usage are supporting Matthew's memdesc
+> project which seeks to substantially transform how struct page works.
+> 
+> Instead make the DMA API internals work on phys_addr_t. Internally
+> there are still dedicated 'page' and 'resource' flows, except they are
+> now distinguished by a new DMA_ATTR_MMIO instead of by callchain. Both
+> flows use the same phys_addr_t.
+> 
+> When DMA_ATTR_MMIO is specified things work similar to the existing
+> 'resource' flow. kmap_local_pfn(), phys_to_virt(), phys_to_page(),
+> pfn_valid(), etc are never called on the phys_addr_t. This requires
+> rejecting any configuration that would need swiotlb. CPU cache
+> flushing is not required, and avoided, as ATTR_MMIO also indicates the
+> address have no cachable mappings. This effectively removes any
+> DMA API side requirement to have struct page when DMA_ATTR_MMIO is
+> used.
+> 
+> In the !DMA_ATTR_MMIO mode things work similarly to the 'page' flow,
+> except on the common path of no cache flush, no swiotlb it never
+> touches a struct page. When cache flushing or swiotlb copying
+> kmap_local_pfn()/phys_to_virt() are used to get a KVA for CPU
+> usage. This was already the case on the unmap side, now the map side
+> is symmetric.
+> 
+> Callers are adjusted to set DMA_ATTR_MMIO. Existing 'resource' users
+> must set it. The existing struct page based MEMORY_DEVICE_PCI_P2PDMA
+> path must also set it. This corrects some existing bugs where iommu
+> mappings for P2P MMIO were improperly marked IOMMU_CACHE.
+> 
+> Since ATTR_MMIO is made to work with all the existing DMA map entry
+> points, particularly dma_iova_link(), this finally allows a way to use
+> the new DMA API to map PCI P2P MMIO without creating struct page. The
+> VFIO DMABUF series demonstrates how this works. This is intended to
+> replace the incorrect driver use of dma_map_resource() on PCI BAR
+> addresses.
+> 
+> This series does the core code and modern flows. A followup series
+> will give the same treatment to the legacy dma_ops implementation.
+> 
+> Thanks
+> 
+> Leon Romanovsky (16):
+>   dma-mapping: introduce new DMA attribute to indicate MMIO memory
+>   iommu/dma: implement DMA_ATTR_MMIO for dma_iova_link().
+>   dma-debug: refactor to use physical addresses for page mapping
+>   dma-mapping: rename trace_dma_*map_page to trace_dma_*map_phys
+>   iommu/dma: rename iommu_dma_*map_page to iommu_dma_*map_phys
+>   iommu/dma: extend iommu_dma_*map_phys API to handle MMIO memory
+>   dma-mapping: convert dma_direct_*map_page to be phys_addr_t based
+>   kmsan: convert kmsan_handle_dma to use physical addresses
+>   dma-mapping: handle MMIO flow in dma_map|unmap_page
+>   xen: swiotlb: Open code map_resource callback
+>   dma-mapping: export new dma_*map_phys() interface
+>   mm/hmm: migrate to physical address-based DMA mapping API
+>   mm/hmm: properly take MMIO path
+>   block-dma: migrate to dma_map_phys instead of map_page
+>   block-dma: properly take MMIO path
+>   nvme-pci: unmap MMIO pages with appropriate interface
+> 
+>  Documentation/core-api/dma-api.rst        |   4 +-
+>  Documentation/core-api/dma-attributes.rst |  18 ++++
+>  arch/powerpc/kernel/dma-iommu.c           |   4 +-
+>  block/blk-mq-dma.c                        |  15 ++-
+>  drivers/iommu/dma-iommu.c                 |  61 +++++------
+>  drivers/nvme/host/pci.c                   |  18 +++-
+>  drivers/virtio/virtio_ring.c              |   4 +-
+>  drivers/xen/swiotlb-xen.c                 |  21 +++-
+>  include/linux/blk-mq-dma.h                |   6 +-
+>  include/linux/blk_types.h                 |   2 +
+>  include/linux/dma-direct.h                |   2 -
+>  include/linux/dma-map-ops.h               |   8 +-
+>  include/linux/dma-mapping.h               |  33 ++++++
+>  include/linux/iommu-dma.h                 |  11 +-
+>  include/linux/kmsan.h                     |   9 +-
+>  include/trace/events/dma.h                |   9 +-
+>  kernel/dma/debug.c                        |  71 ++++---------
+>  kernel/dma/debug.h                        |  37 ++-----
+>  kernel/dma/direct.c                       |  22 +---
+>  kernel/dma/direct.h                       |  52 ++++++----
+>  kernel/dma/mapping.c                      | 117 +++++++++++++---------
+>  kernel/dma/ops_helpers.c                  |   6 +-
+>  mm/hmm.c                                  |  19 ++--
+>  mm/kmsan/hooks.c                          |   5 +-
+>  rust/kernel/dma.rs                        |   3 +
+>  tools/virtio/linux/kmsan.h                |   2 +-
+>  26 files changed, 305 insertions(+), 254 deletions(-)
 
-Thanks for testing and I was able to reproduce it also. The problem is
-that it's possible that an association is scheduled for deletion twice.
+Marek,
 
-Would you mind to give the attached patch a try? It fixes the problem I
-was able to reproduce.
+So what are the next steps here? This series is pre-requirement for the
+VFIO MMIO patches.
 
-> Said that, I like the patch. This week, I noticed that nvme/030 hangs with fc
-> transport. This hang is rare, but it is recreated in stable manner when I
-> repeat the test case. I tried the fix patch, and it avoided this hang :)
-> Thanks for the fix!
+Thanks
 
-Ah, nice so at least this one is fixed by the first patch :)
-
---h2ijb4czulrzbkl4
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: attachment;
-	filename="0001-nvmet-fc-avoid-scheduling-association-deletion-twice.patch"
-
-From b0db044f5e828d5c12c368fecd17327f7a6e854d Mon Sep 17 00:00:00 2001
-From: Daniel Wagner <wagi@kernel.org>
-Date: Thu, 28 Aug 2025 13:18:21 +0200
-Subject: [PATCH] nvmet-fc: avoid scheduling association deletion twice
-
-When forcefully shutting down a port via the configfs interface,
-nvmet_port_subsys_drop_link() first calls nvmet_port_del_ctrls() and
-then nvmet_disable_port(). Both functions will eventually schedule all
-remaining associations for deletion.
-
-The current implementation checks whether an association is about to be
-removed, but only after the work item has already been scheduled. As a
-result, it is possible for the first scheduled work item to free all
-resources, and then for the same work item to be scheduled again for
-deletion.
-
-Because the association list is an RCU list, it is not possible to take
-a lock and remove the list entry directly, so it cannot be looked up
-again. Instead, a flag (terminating) must be used to determine whether
-the association is already in the process of being deleted.
-
-Signed-off-by: Daniel Wagner <wagi@kernel.org>
----
- drivers/nvme/target/fc.c | 16 +++++++++-------
- 1 file changed, 9 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/nvme/target/fc.c b/drivers/nvme/target/fc.c
-index 6725c34dd7c9..7d84527d5a43 100644
---- a/drivers/nvme/target/fc.c
-+++ b/drivers/nvme/target/fc.c
-@@ -1075,6 +1075,14 @@ nvmet_fc_delete_assoc_work(struct work_struct *work)
- static void
- nvmet_fc_schedule_delete_assoc(struct nvmet_fc_tgt_assoc *assoc)
- {
-+	int terminating;
-+
-+	terminating = atomic_xchg(&assoc->terminating, 1);
-+
-+	/* if already terminating, do nothing */
-+	if (terminating)
-+		return;
-+
- 	nvmet_fc_tgtport_get(assoc->tgtport);
- 	if (!queue_work(nvmet_wq, &assoc->del_work))
- 		nvmet_fc_tgtport_put(assoc->tgtport);
-@@ -1202,13 +1210,7 @@ nvmet_fc_delete_target_assoc(struct nvmet_fc_tgt_assoc *assoc)
- {
- 	struct nvmet_fc_tgtport *tgtport = assoc->tgtport;
- 	unsigned long flags;
--	int i, terminating;
--
--	terminating = atomic_xchg(&assoc->terminating, 1);
--
--	/* if already terminating, do nothing */
--	if (terminating)
--		return;
-+	int i;
- 
- 	spin_lock_irqsave(&tgtport->lock, flags);
- 	list_del_rcu(&assoc->a_list);
--- 
-2.51.0
-
-
---h2ijb4czulrzbkl4--
+> 
+> -- 
+> 2.50.1
+> 
+> 
