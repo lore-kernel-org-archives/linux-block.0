@@ -1,109 +1,102 @@
-Received: from 003.mia.mailroute.net (003.mia.mailroute.net [199.89.3.6])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF55E30CD9F;
-	Fri, 29 Aug 2025 04:38:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 694E3216E32;
+	Fri, 29 Aug 2025 06:16:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756442322; cv=none; b=CSzPDvC9JsKB4Lxb76vvvWdaOxlfE689QRBU+5zZRu1baitkl23R5skv3xaTdCfqFxPhgBhMkrcOMAgp0IxPlDX0HTtWteokBCZHFK4sjJjsbRqQqJ1rccdBijnkyS0nCDm1S/yKb6BJ17zfMLQiPOAShtahx23zBqYMJb0K4G8=
+	t=1756448172; cv=none; b=j+LI+SLIZi5IOII7DJPG+hLeA3tHwrDDSKtDsu67PMfRI2ov5Q4/FRXMhZHLqgTIC+t1aW20NYoqrFLr8LKUlH8bcPlWdNdYa6nksEBCOhn7sw7j86YJnvNnEAJV6oXM9oQv9jpYpz0inN9TC3s//SG7BVVb2l8DN7p1gqrkdys=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756442322; c=relaxed/simple;
-	bh=kR47r7+cZe1DzINd4XA4apwTZcOc4Rqjsr0w0We2qGc=;
+	s=arc-20240116; t=1756448172; c=relaxed/simple;
+	bh=VHHVMb8XgCPvYCPfC3eGNbcc1M15wSJqME8WVjJz3vM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cbtRsQSLAJFCdKSXF0QGB7UxJKXbM/ZKgDDG0gjEA7NHbgijMjo0XdppBtlvfd5Qehe3Z3YVWzD0lGSG4igvoo9T7MdJ8tNE2Kd+NJ6MGYEaKeJf/hoxKalDpLGIORMbN0LysGbMthO6vexfUhhe97baGWFuC65yJYZe/is/mBI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=WI81Mo1b; arc=none smtp.client-ip=199.89.3.6
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="WI81Mo1b"
-Received: from localhost (localhost [127.0.0.1])
-	by 003.mia.mailroute.net (Postfix) with ESMTP id 4cClrv4V8tzltPtf;
-	Fri, 29 Aug 2025 04:38:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1756442318; x=1759034319; bh=IaPSaBw2KwMcDI1oubljBKPZ
-	1q5dOYR2yWs8+LQ+2iw=; b=WI81Mo1bKW4UckaLrlytM6X1pG4i/tjylT1z99Aj
-	d3dSbIyIN6+Uxvqozkc7LJk424zJ6Vxrn5h0xl8wJy4zZ7UH9FYhQMhOnYpiBO2m
-	HVOvRf//3lNEsQc6sCg4j8LUIqCwhPSJTeWUHmqOLiS3G6dJKksyGVIBbsZa5/OC
-	F1Yl4HXFqeEJnrUoMdVPstRBXiyBteu3SNyo0tixWe+zz552Qj5U20Vyk+MInxbO
-	0ZPnmO0SyXPUt0feYhsxLX8mJ3tWuEkJNiuwh6kSb91hGkuWrFH0ldCswaKwvC1c
-	4su4TZ9JgPAtpwsvF+/KtF9qZQljHF+2ci32a8OUrHg8Fg==
-X-Virus-Scanned: by MailRoute
-Received: from 003.mia.mailroute.net ([127.0.0.1])
- by localhost (003.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id raeT_GyE74iU; Fri, 29 Aug 2025 04:38:38 +0000 (UTC)
-Received: from [172.20.6.188] (unknown [208.98.210.68])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4cClrn3c1mzltM5Z;
-	Fri, 29 Aug 2025 04:38:31 +0000 (UTC)
-Message-ID: <62c9b68f-6adc-41d8-b504-4bce4d721e64@acm.org>
-Date: Thu, 28 Aug 2025 21:38:24 -0700
+	 In-Reply-To:Content-Type; b=DJWULgUlyICwEcK14diek0wyFTEjcsYVxe/Jhaqg+ptj3Y36j82KNM+XXT4L29zKSL0UFTJb1lCDB/C7yrz3p/y0s5Y65OHDrUeY0Bghjrrfy/2c3hBUEdDahXMLyTFY1RSzlF8Jpj9LecOJTujmqTHNG9jzMwaQx4lo/e10q8k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4cCp1M5SfGzYQtL4;
+	Fri, 29 Aug 2025 14:16:07 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 49BE81A0E11;
+	Fri, 29 Aug 2025 14:16:06 +0800 (CST)
+Received: from [10.174.179.247] (unknown [10.174.179.247])
+	by APP4 (Coremail) with SMTP id gCh0CgAXYIykRbFoprasAg--.25285S3;
+	Fri, 29 Aug 2025 14:16:06 +0800 (CST)
+Message-ID: <d6702b7c-a674-6fb8-f326-acbd87b148bb@huaweicloud.com>
+Date: Fri, 29 Aug 2025 14:16:04 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block/mq-deadline: Replace DD_PRIO_MAX with DD_PRIO_COUNT
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [PATCH v2] block/mq-deadline: Remove the redundant rb_entry_rq in
+ the deadline_from_pos().
 To: chengkaitao <pilgrimtao@gmail.com>, axboe@kernel.dk
 Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
  chengkaitao <chengkaitao@kylinos.cn>
-References: <20250829015444.91369-1-pilgrimtao@gmail.com>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20250829015444.91369-1-pilgrimtao@gmail.com>
+References: <20250829034505.95468-1-pilgrimtao@gmail.com>
+From: Li Nan <linan666@huaweicloud.com>
+In-Reply-To: <20250829034505.95468-1-pilgrimtao@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgAXYIykRbFoprasAg--.25285S3
+X-Coremail-Antispam: 1UD129KBjvdXoWrtr4rWr43ur4xKry8JrW7XFb_yoWDXFX_Gr
+	WIkrZ7Cw48AFn5uws5CFy3XFW5t3W8K393C3WkGrWxA3WxW3WkCFyDJrn8Za97WFZ3Wa98
+	C3sYvF47Krn8JjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUb3kYFVCjjxCrM7AC8VAFwI0_Jr0_Gr1l1xkIjI8I6I8E6xAIw20E
+	Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwV
+	A0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8IcVCY1x02
+	67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
+	0E14v26rxl6s0DM2vYz4IE04k24VAvwVAKI4IrM2AIxVAIcxkEcVAq07x20xvEncxIr21l
+	5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67
+	AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07Al
+	zVAYIcxG8wCY1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
+	kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
+	67AF67kF1VAFwI0_JF0_Jw1lIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
+	CI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1x
+	MIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIda
+	VFxhVjvjDU0xZFpf9x07jb2-nUUUUU=
+X-CM-SenderInfo: polqt0awwwqx5xdzvxpfor3voofrz/
 
-On 8/28/25 6:54 PM, chengkaitao wrote:
+
+
+在 2025/8/29 11:45, chengkaitao 写道:
+> From: chengkaitao <chengkaitao@kylinos.cn>
+> 
+> In commit(fde02699c242), the "if (blk_rq_is_seq_zoned_write(rq))"
+> was removed, but the "rb_entry_rq(node)" and some other code were
+> inadvertently left behind. This patch fixed it.
+> 
+> Signed-off-by: chengkaitao <chengkaitao@kylinos.cn>
+> ---
+>   block/mq-deadline.c | 4 ----
+>   1 file changed, 4 deletions(-)
+> 
 > diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-> index b9b7cdf1d3c9..1a031922c447 100644
+> index 1a031922c447..63145cc9825f 100644
 > --- a/block/mq-deadline.c
 > +++ b/block/mq-deadline.c
-> @@ -41,19 +41,16 @@ static const int fifo_batch = 16;       /* # of sequential requests treated as o
->   enum dd_data_dir {
->   	DD_READ		= READ,
->   	DD_WRITE	= WRITE,
-> +	DD_DIR_COUNT	= 2
->   };
+> @@ -133,10 +133,6 @@ static inline struct request *deadline_from_pos(struct dd_per_prio *per_prio,
+>   	struct rb_node *node = per_prio->sort_list[data_dir].rb_node;
+>   	struct request *rq, *res = NULL;
 >   
-> -enum { DD_DIR_COUNT = 2 };
+> -	if (!node)
+> -		return NULL;
 > -
+> -	rq = rb_entry_rq(node);
+>   	while (node) {
+>   		rq = rb_entry_rq(node);
+>   		if (blk_rq_pos(rq) >= pos) {
 
-This change is not an improvement in my opinion because it makes it
-less clear what the role of DD_DIR_COUNT is.
+LGTM
 
->   enum dd_prio {
-> -	DD_RT_PRIO	= 0,
-> -	DD_BE_PRIO	= 1,
-> -	DD_IDLE_PRIO	= 2,
-> -	DD_PRIO_MAX	= 2,
-> +	DD_RT_PRIO,
-> +	DD_BE_PRIO,
-> +	DD_IDLE_PRIO,
+Reviewed-by: Li Nan <linan122@huawei.com>
 
-There is code that depends on DD_RT_PRIO < DD_BE_PRIO < DD_IDLE_PRIO so 
-I'd like to keep the explicit enum values.
-
-> +	DD_PRIO_COUNT
->   };
->   
-> -enum { DD_PRIO_COUNT = 3 };
-
-I see the above change as a step backwards because it makes the role of
-DD_PRIO_COUNT less clear.
-
-> -	for (prio = DD_BE_PRIO; prio <= DD_PRIO_MAX; prio++) {
-> +	for (prio = DD_BE_PRIO; prio < DD_PRIO_COUNT; prio++) {
-
-The current code is easier to read IMHO than the new code.
-
+-- 
 Thanks,
+Nan
 
-Bart.
