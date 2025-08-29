@@ -1,62 +1,156 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C91C310630;
-	Fri, 29 Aug 2025 18:27:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E587B26F445;
+	Fri, 29 Aug 2025 22:19:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756492062; cv=none; b=EnG7anxX2lpDUpyVxDylLZ+O2QXJBDcocQYY4zzaBMqk6JpoEKYGNdOU85rQnV8Y/xVjwMdEbgqgTZdFNQlvv8WcGIk9ks+Z9vU2W4gCDqOJUYDv6OX4m5kGXcu2yk3duIaI0iLwG7KRW0XN+MkepE64yfY/3AeuKghWa+PBvME=
+	t=1756505963; cv=none; b=KWfpnpANmvoB8AmYyfgghbwai/yntVP4vpuksvJNMe+gDLl75aSUQzNNTB3jjbBJ0ttUwDW6DBBXM0Us05cAPJUmumQSo94GTaFpdPjKfXxZPzs5czy9YEyi+cQ1aUizz4mDSgrYzqmY/iCcA75dLMJ0e2SZokn72N8bs2zsK6s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756492062; c=relaxed/simple;
-	bh=Rzyh/Fwr9GWnR+kDAxYDEuwfTqoreoGm02s5YBwLhOQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VXRlvvfM3YiCuebeMiZRC76acIf6fpzVtcJ3+p2xAt0bOdhTpMIyf3/IwtdAvXlDvpzmcj5o/pK1tcdi2bmMnPBnJFI+6r2iJtYwyc2NEb9JpVOF0hYsmIlrKsbRgjN2e8QvFywp5G/ZnsEgAmM3ho+iKL3qXD6dydYr1AYVNGY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=wfjBOAv4; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1756505963; c=relaxed/simple;
+	bh=0bwPfbMyrek5L9hOu7GBREJXWyINw9aI7B0CsO+yy18=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=gS+j9X+RZCCT8PBD6OtENW+p+FlHGfJmu3fCai1WIit2rIGItApAfXYPs0v17ovLIHNWBYH+9Rih7VQXIdCtX4ygWlzvGAH1zMITezdu7NlFKbJ+dD5DvyWDuIj5tBXXNNry//txCFk4dCRLLIeR4y2SumO8s1yxYABn4hnKoAc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NpneGQ3Q; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="wfjBOAv4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9EAB1C4CEF0;
-	Fri, 29 Aug 2025 18:27:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1756492061;
-	bh=Rzyh/Fwr9GWnR+kDAxYDEuwfTqoreoGm02s5YBwLhOQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=wfjBOAv41h9wzzL60Ulg6ED6MmROGlLS0VxmKJKsaJjehuYmx330MdfnxEvA0m4fw
-	 UfblAdiinGC6hMemO6Gh8asu0IVBMKpEbsjWFQV6sZiRoBEwynAkJRAttfvEKhPpoa
-	 f9PzMX3bG7j7KrGhxxsCDspkCbNqSabO9cDD3tl0=
-Date: Fri, 29 Aug 2025 14:27:40 -0400
-From: Konstantin Ryabitsev <konstantin@linuxfoundation.org>
-To: Andreas Hindborg <a.hindborg@kernel.org>
-Cc: Daniel Almeida <daniel.almeida@collabora.com>, 
-	Boqun Feng <boqun.feng@gmail.com>, Miguel Ojeda <ojeda@kernel.org>, 
-	Alex Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>, 
-	=?utf-8?B?QmrDtnJu?= Roy Baron <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>, 
-	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
-	Danilo Krummrich <dakr@kernel.org>, Jens Axboe <axboe@kernel.dk>, Breno Leitao <leitao@debian.org>, 
-	linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v5 02/18] rust: str: allow `str::Formatter` to format
- into `&mut [u8]`.
-Message-ID: <20250829-famous-honest-pelican-7fe42e@lemur>
-References: <20250815-rnull-up-v6-16-v5-0-581453124c15@kernel.org>
- <20250815-rnull-up-v6-16-v5-2-581453124c15@kernel.org>
- <b2IkbJXRER5mLrLu1mpLMb6tjooPM_des2iveijPsIGSfUzKYRomwCoKPnXSJsidg1c-KY2R76d0TYb2DZmbzw==@protonmail.internalid>
- <15990453-889F-40C3-863D-DB41306E2A84@collabora.com>
- <874itqidfy.fsf@t14s.mail-host-address-is-not-set>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NpneGQ3Q"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D549C4CEF0;
+	Fri, 29 Aug 2025 22:19:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756505962;
+	bh=0bwPfbMyrek5L9hOu7GBREJXWyINw9aI7B0CsO+yy18=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
+	b=NpneGQ3QoAZZMVPOqxAMTMsnXEod1MdR9ylvjRjnlUJ/5Mz3jdgYOeIgkfRKPhZ/U
+	 vShN87eLYGT8BEANkp63jXP/WsDTW3PU0xitnIZmnudm3QKOtQPPDMN6lDjVT1DMy6
+	 XFRyCvB6YJQmelc7Wn3BJtfB7gPtsENP28OUr9nZgR3Z3uJVJ4N4zjTqq2R/gAAsif
+	 WTFcvK4iQOHAl7e/mRAw01njvP6SR0PeP/vp9kcpLKktQGVHBqKVQ45BB3W4Cv3bfY
+	 SvtEaHF5gGrpETbJNljug4x3qCKcghxgOt/gZHQtCpaow0R9q2yCiFsgb9Uaue3SoT
+	 1eYuRWMtynFfw==
+From: Mark Brown <broonie@kernel.org>
+To: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
+ Linux Documentation <linux-doc@vger.kernel.org>, 
+ Linux DAMON <damon@lists.linux.dev>, 
+ Linux Memory Management List <linux-mm@kvack.org>, 
+ Linux Power Management <linux-pm@vger.kernel.org>, 
+ Linux Block Devices <linux-block@vger.kernel.org>, 
+ Linux BPF <bpf@vger.kernel.org>, 
+ Linux Kernel Workflows <workflows@vger.kernel.org>, 
+ Linux KASAN <kasan-dev@googlegroups.com>, 
+ Linux Devicetree <devicetree@vger.kernel.org>, 
+ Linux fsverity <fsverity@lists.linux.dev>, 
+ Linux MTD <linux-mtd@lists.infradead.org>, 
+ Linux DRI Development <dri-devel@lists.freedesktop.org>, 
+ Linux Kernel Build System <linux-lbuild@vger.kernel.org>, 
+ Linux Networking <netdev@vger.kernel.org>, 
+ Linux Sound <linux-sound@vger.kernel.org>, 
+ Bagas Sanjaya <bagasdotme@gmail.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>, 
+ Peter Zijlstra <peterz@infradead.org>, Josh Poimboeuf <jpoimboe@kernel.org>, 
+ Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, 
+ Jonathan Corbet <corbet@lwn.net>, SeongJae Park <sj@kernel.org>, 
+ Andrew Morton <akpm@linux-foundation.org>, 
+ David Hildenbrand <david@redhat.com>, 
+ Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, 
+ "Liam R. Howlett" <Liam.Howlett@oracle.com>, 
+ Vlastimil Babka <vbabka@suse.cz>, Mike Rapoport <rppt@kernel.org>, 
+ Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>, 
+ Huang Rui <ray.huang@amd.com>, "Gautham R. Shenoy" <gautham.shenoy@amd.com>, 
+ Mario Limonciello <mario.limonciello@amd.com>, 
+ Perry Yuan <perry.yuan@amd.com>, Jens Axboe <axboe@kernel.dk>, 
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+ Andrii Nakryiko <andrii@kernel.org>, 
+ Martin KaFai Lau <martin.lau@linux.dev>, 
+ Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+ Yonghong Song <yonghong.song@linux.dev>, 
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
+ Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
+ Jiri Olsa <jolsa@kernel.org>, Dwaipayan Ray <dwaipayanray1@gmail.com>, 
+ Lukas Bulwahn <lukas.bulwahn@gmail.com>, Joe Perches <joe@perches.com>, 
+ Andrey Ryabinin <ryabinin.a.a@gmail.com>, 
+ Alexander Potapenko <glider@google.com>, 
+ Andrey Konovalov <andreyknvl@gmail.com>, Dmitry Vyukov <dvyukov@google.com>, 
+ Vincenzo Frascino <vincenzo.frascino@arm.com>, 
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, Eric Biggers <ebiggers@kernel.org>, 
+ tytso@mit.edu, Richard Weinberger <richard@nod.at>, 
+ Zhihao Cheng <chengzhihao1@huawei.com>, David Airlie <airlied@gmail.com>, 
+ Simona Vetter <simona@ffwll.ch>, 
+ Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
+ Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, 
+ Nathan Chancellor <nathan@kernel.org>, 
+ Nicolas Schier <nicolas.schier@linux.dev>, Ingo Molnar <mingo@redhat.com>, 
+ Will Deacon <will@kernel.org>, Boqun Feng <boqun.feng@gmail.com>, 
+ Waiman Long <longman@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+ Shay Agroskin <shayagr@amazon.com>, Arthur Kiyanovski <akiyano@amazon.com>, 
+ David Arinzon <darinzon@amazon.com>, Saeed Bishara <saeedb@amazon.com>, 
+ Andrew Lunn <andrew@lunn.ch>, Liam Girdwood <lgirdwood@gmail.com>, 
+ Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, 
+ Alexandru Ciobotaru <alcioa@amazon.com>, 
+ The AWS Nitro Enclaves Team <aws-nitro-enclaves-devel@amazon.com>, 
+ Jesper Dangaard Brouer <hawk@kernel.org>, 
+ Laurent Pinchart <laurent.pinchart@ideasonboard.com>, 
+ Steve French <stfrench@microsoft.com>, 
+ Meetakshi Setiya <msetiya@microsoft.com>, 
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ "Martin K. Petersen" <martin.petersen@oracle.com>, 
+ Bart Van Assche <bvanassche@acm.org>, 
+ =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>, 
+ Masahiro Yamada <masahiroy@kernel.org>
+In-Reply-To: <20250829075524.45635-1-bagasdotme@gmail.com>
+References: <20250829075524.45635-1-bagasdotme@gmail.com>
+Subject: Re: (subset) [PATCH 00/14] Internalize www.kernel.org/doc
+ cross-reference
+Message-Id: <175650594072.395832.3911302052314725751.b4-ty@kernel.org>
+Date: Fri, 29 Aug 2025 23:19:00 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <874itqidfy.fsf@t14s.mail-host-address-is-not-set>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.15-dev-a9b2a
 
-On Fri, Aug 29, 2025 at 01:18:09PM +0200, Andreas Hindborg wrote:
-> > I gave my r-b on v3 for this patch IIRC. What happened?
+On Fri, 29 Aug 2025 14:55:10 +0700, Bagas Sanjaya wrote:
+> Cross-references to other docs (so-called internal links) are typically
+> done following Documentation/doc-guide/sphinx.rst: either simply
+> write the target docs (preferred) or use :doc: or :ref: reST directives
+> (for use-cases like having anchor text or cross-referencing sections).
+> In some places, however, links to https://www.kernel.org/doc
+> are used instead (outgoing, external links), owing inconsistency as
+> these requires Internet connection only to see docs that otherwise
+> can be accessed locally (after building with ``make htmldocs``).
 > 
-> I probably messed up. I'm having a really bad time with b4 collecting
-> the tags.
+> [...]
 
-Can I offer any help?
+Applied to
 
--K
+   https://git.kernel.org/pub/scm/linux/kernel/git/broonie/sound.git for-next
+
+Thanks!
+
+[12/14] ASoC: doc: Internally link to Writing an ALSA Driver docs
+        commit: f522da9ab56c96db8703b2ea0f09be7cdc3bffeb
+
+All being well this means that it will be integrated into the linux-next
+tree (usually sometime in the next 24 hours) and sent to Linus during
+the next merge window (or sooner if it is a bug fix), however if
+problems are discovered then the patch may be dropped or reverted.
+
+You may get further e-mails resulting from automated or manual testing
+and review of the tree, please engage with people reporting problems and
+send followup patches addressing any issues that are reported if needed.
+
+If any updates are required or you are submitting further changes they
+should be sent as incremental updates against current git, existing
+patches will not be replaced.
+
+Please add any relevant lists and maintainers to the CCs when replying
+to this mail.
+
+Thanks,
+Mark
+
