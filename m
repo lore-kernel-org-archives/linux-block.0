@@ -1,145 +1,101 @@
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFBEA1F416B
-	for <linux-block@vger.kernel.org>; Fri, 29 Aug 2025 01:27:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDCA91DFF7;
+	Fri, 29 Aug 2025 01:54:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756430877; cv=none; b=TNLlEt1qxqnG53rpwOutFiwWmV6I/LXghMerUIimwjQGUFKVShk6L7r/PFrgYrWhyumzuM6FvPwFL33awV4bX5BGj1uGJqN4lQNOC73e+39tNSAMuw3bR0uZhvqUPs27/XyhDp2jc6uWYs2xHM/6stVVWcyryyqlvhML+bZN164=
+	t=1756432447; cv=none; b=UEAB76SI1dz5LJq6GRX9HbgUNXDn2HEXdgTe+Q4mTRoA+Sp+5S9cup8J3EnjYlu4IKccp2goS7CTEWP5abLiW7bqM62acImMl46+DYTg4Z2jD5BgnyiJt9sfzsoANxkcS8T2e5Q3ermn5i+hKN9DM/ExVUuh2TV95P+dUkA2IG8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756430877; c=relaxed/simple;
-	bh=R6xx7AKdRkEyVQIbD3H9U4Id6oY8IdGTxhgP8Eaxc2M=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=FS2Tro6UVdfLOmOjs9+3/OeWYKUnbQMBDZM4DZ+Ede4NkVUEF2Cxz8BdOqvkxLarrA3pDSLGPniVsFzr5XRWk/DIIidOoMUMrF85Y8/C9sZDoeJOFAGcCE1dcFSDuVqovVTrV9J/pL1bGXN6J+M4aur3urqcwZSu4Eas6hO04qE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=ncJP6QQ4; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1756432447; c=relaxed/simple;
+	bh=OWFmvzsVpeZgMbpE1dW6+FVSeCbwmUNz/xvqxcvj7Bo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=XpaNt4VoVIrrOpmxRCUbTXqU0RIpsG4s6Fz9/MasxTpvddSKp1bckOi4kX9m9s8lsWjlh8rdODdQsQ/MzmB/69RrVwDCNygRpTt3BTrmyNvBpUbGXHF+IBUD3M2z9LS+M5mHKbT92vQrNOi7cAdXxzkdoshmMAz0+0rcy844/6g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W6dfpG+M; arc=none smtp.client-ip=209.85.216.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="ncJP6QQ4"
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-24646202152so19506965ad.0
-        for <linux-block@vger.kernel.org>; Thu, 28 Aug 2025 18:27:55 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W6dfpG+M"
+Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-32326e5f058so1296222a91.3;
+        Thu, 28 Aug 2025 18:54:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1756430875; x=1757035675; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-language:cc:to:subject:from
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pUOBidSoXR5Yma9X+peRRGJo5hBZ5voUpK4jTjGddc0=;
-        b=ncJP6QQ4q+KnEKNRUZhep1BvjwDdByxlZorhmO4WkzjS00zD5cZFq5AW3Oy8z+n4I2
-         X6L3dF/fmNJFS9nStVCyfCTwkLMqovSemTr4aARoltioBw0MHaIfjBCAQP2USE+nrv1g
-         y4SAfhg5xSf4Ey9ut21gyZ/9dX9I7ISTJby1p62Chm10i2SeFVn5Kf9uD80aSHueF/or
-         7TDOQt+sjZ/APWvONMV/v6/YIfgWW1k86K/y3kAoiev6x3Vhl+0d2Wyrhk1qKy9TWEDs
-         UaHYL6b6kqA2oMeVs0c2QTM2nvviQct4GcRbonhzSHEs28mQdGA9YFSrBb//S1HKRRFq
-         pcfQ==
+        d=gmail.com; s=20230601; t=1756432445; x=1757037245; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=M94lH8MA5wNtCfiWKos3XiM3bUM+bzg2Tsiy9Jdi1Yw=;
+        b=W6dfpG+M/ESSA2P6i8bSF7OGnyLNorIDJGYVjzOhgy+zjCJvFm4pc8sQ0MGs8s7WyW
+         h5nV0O4nlDCUFmdKSeTlQu0d7+tG0hIwtuYbbmGE9Okfp++aefvXCDo7oV8261rDR8AJ
+         pgFLjolIQ1+duATdaXv07wezK/PmLt6cCCPbJSEikD28KwhE0MaSHST3JdTuNO9pcVX7
+         ehmFcbgk/4/JAtqAUb/d5fJWkBw4OzP4WpEW6/tXdpCxU9I0dKUW5A9YPbdy80G+A7hr
+         WJrO4qBzz7HfaQmfRDefUwqmRSYAgB6S+2LMRHCS5EiNDa8M5GjOndFN4oQnk3jNj+ud
+         hXEg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756430875; x=1757035675;
-        h=content-transfer-encoding:content-language:cc:to:subject:from
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=pUOBidSoXR5Yma9X+peRRGJo5hBZ5voUpK4jTjGddc0=;
-        b=LjuMAOYCuE5ab95397ZxBVqg9ZLTvDfYYFADbq6ItrqVDcrHHPF4zJ/VZfd3m3+jFY
-         PaJe5heff8qX4dAXPlNGFtAEmlbkb3+qSNhxTF3/p9DT7tc+/5ecmXWYF3MSKKroJJLw
-         b9ufLS08I3V9frm6EwlaBhyRPFNEsRSyhnmg2K+q8rb1YSqCkV7FKcCmONpxs6KUViOc
-         qN4+SnedViYWhM6SR9CDSJ7BiUosDbGJJsuf/hkqazBhADbR0oEPnni88cBRAsQ06dKO
-         uGqD0lKUKpzENpHQ+HW05ZO3XEHlyUUA6yM2kY3sPmNpW/Qu+LCFdHaJB9Awj1OXF7Bq
-         djBg==
-X-Gm-Message-State: AOJu0YzCx2AYwj/rd+EtvfYZbpE547EMerGkwS3uszHixixdvSSkczLo
-	XKtYhLCNkwG/lP0845LO8zHX/mxBwKCBPZ9Oj3jAULXsrHCFPwjxAGzC/X/wRjTKjDRdP1KuC75
-	vR7ak
-X-Gm-Gg: ASbGnctjQYITO3YBkASLfC8ptZaLBIK8dYNhUj7aooDionyXFKoC1l3jhIbH3pGXwn+
-	s4RZpmVBN7zqDjxwfp+dFKYRGlAGh9KGDB3AK6havjodAAEkphi9RMlK22O0A/P5dSxnYhN9zn8
-	tFZZ5BMr7e+zql8xwcIR+wGotHw09f2QTqX9vz4HM5ZTDkOivyVFygKBgOuMjkr9hpKYtHWUsjv
-	jgVbI1lDQNmmQs2GC0wy0zT14CE6xtfql19DkAMmq4slyhrgpSU/6QGKz4MPjjovyk8B/U3C86h
-	zGjY9AFYHZCwIBfuqashimXnUHiEEQmr8zKFr+l7tXj2MXDJ5LpDFqTIMVRAlhbNcCZCouC+kCS
-	7wovxJ/fXKEgOqSD7mzLC
-X-Google-Smtp-Source: AGHT+IHAtwYtTvcVnuQtw6l5k/road3opgS9hkuBfO9PNTP+4e2ILsU4SjttvR+QSqS2llJlOIQ87Q==
-X-Received: by 2002:a17:902:d2c7:b0:248:9429:3641 with SMTP id d9443c01a7336-24894293aa4mr128335015ad.48.1756430875014;
-        Thu, 28 Aug 2025 18:27:55 -0700 (PDT)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-24903704060sm8228165ad.20.2025.08.28.18.27.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 28 Aug 2025 18:27:54 -0700 (PDT)
-Message-ID: <42115c00-7422-4c51-9d2b-5296bd462c27@kernel.dk>
-Date: Thu, 28 Aug 2025 19:27:53 -0600
+        d=1e100.net; s=20230601; t=1756432445; x=1757037245;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=M94lH8MA5wNtCfiWKos3XiM3bUM+bzg2Tsiy9Jdi1Yw=;
+        b=MNj9u7/io64kvYJHhb9Y2iqvYUa1yBCk1wCZnNasu9l7mVGUw0V+fDA5Dg9szzB6db
+         3mANeP6jlBJM5hld7eQam+pp16Znb3CIJxzvEst9RkNcfeQyYI/v2eWHEW0pyLvVcW7H
+         UGXNo0DaCtQxIwfKjmA4GQlN8/hwAATJrgJcGVjhf+cxAFgtquP6XjkbDQ9HtdrhZb4J
+         faMBsl9gmY52jjS5gtcoL5q5Pa4aIIgeUuUw5xbmoYPvUNxsQTFj4pA0wvbCqZRAa4JH
+         nSS7L6dF+wIuS9lZLnerfP6b5RP33u8GgVxNAKXz98VK9KJU875vdJufYyNWTA0eY1+W
+         1J0w==
+X-Forwarded-Encrypted: i=1; AJvYcCVtlVQ4b5IFIqwYEUsAGRQ4RaxY0eOKwsK4vWwGgpxWR2jdvD8E0nNxcRQDSEXwb3yloZsmbhgW40lIi7Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxh6T13JaMUyTmt0w/DC7ZVB+x9U1H/rZ471ENDs4CjG49PXvLE
+	ZybWR5a4jDJkcuZRL9X/ZFz4LSpCDyyHeKx5+cZ0pwnCid9CADQotGOr
+X-Gm-Gg: ASbGncuV6TlBdlnlDlnfYmAZ6f10RkBxNCwhVmAhgpGNlD95GveSt/9S1f64chbzoIE
+	tPbhZiIfA3JPDaMVIG8RFZuPbUNg5L59KpKHskUbRzg2IFTAopHro4fYaLqjehd7N6epoBy3Ngz
+	OVnYX6V4fTn6Su3kcGSJ5uLirB4g1iJ1R1pFCE5d2wQ6nw4AR5n08lH0nYEkU0obyywmouWvxuT
+	MDbgurOtSYrKyckaSk6U6bMX/lfzyMVIYvAQaGozZUOucaCpu8TU9EUk6I7RxeSAxM2go9IVTBZ
+	2RijT83SjWcWhPmMB5Jg3QdY5JjWkpNA93Mp5YwoyAg26DEB6GGxhDSz70Pi5bsl/8JP/BZepOX
+	ufJQ6hdz2pyCZvM00FaIAAXXUD4vNd5JcKL8G4wUc2TM4YE5U
+X-Google-Smtp-Source: AGHT+IGc7SwzCuuG9wnat3x0V0Nx1Ip2wqCPwtYX+Aa9q6e9Th18a9MxCD78QT+pPcq+h7NbsediBQ==
+X-Received: by 2002:a17:90b:3c45:b0:327:b824:2257 with SMTP id 98e67ed59e1d1-327b8242bbemr4748750a91.32.1756432444984;
+        Thu, 28 Aug 2025 18:54:04 -0700 (PDT)
+Received: from localhost.localdomain ([116.128.244.171])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b4cd025eac9sm695175a12.6.2025.08.28.18.54.02
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Thu, 28 Aug 2025 18:54:04 -0700 (PDT)
+From: chengkaitao <pilgrimtao@gmail.com>
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	chengkaitao <chengkaitao@kylinos.cn>
+Subject: [PATCH] block/mq-deadline: Remove the redundant rb_entry_rq in the deadline_from_pos().
+Date: Fri, 29 Aug 2025 09:53:41 +0800
+Message-Id: <20250829015341.91304-1-pilgrimtao@gmail.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 6.17-rc4
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi Linus,
+From: chengkaitao <chengkaitao@kylinos.cn>
 
-Set of fixes for block that should go into the 6.17-rc4 kernel release.
-This pull request contains:
+In commit(fde02699c242), the "if (blk_rq_is_seq_zoned_write(rq))" was
+removed, but the "rb_entry_rq(node)" was inadvertently left behind.
+This patch fixed it.
 
-- Fix a lockdep spotted issue on recursive locking for zoned writes, in
-  case of errors.
+Signed-off-by: chengkaitao <chengkaitao@kylinos.cn>
+---
+ block/mq-deadline.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-- Update bcache MAINTAINERS entry address for Coly.
-
-- Fix for a ublk release issue, with selftests.
-
-- Fix for a regression introduced in this cycle, where it assumed
-  q->rq_qos was always set if the bio flag indicated that.
-
-- Fix for a regression introduced in this cycle, where loop retrieving
-  block device sizes got broken.
-
-Please pull!
-
-
-The following changes since commit 370ac285f23aecae40600851fb4a1a9e75e50973:
-
-  block: avoid cpu_hotplug_lock depedency on freeze_lock (2025-08-21 07:11:11 -0600)
-
-are available in the Git repository at:
-
-  git://git.kernel.dk/linux.git tags/block-6.17-20250828
-
-for you to fetch changes up to 95a7c5000956f939b86d8b00b8e6b8345f4a9b65:
-
-  bcache: change maintainer's email address (2025-08-28 10:05:37 -0600)
-
-----------------------------------------------------------------
-block-6.17-20250828
-
-----------------------------------------------------------------
-Bart Van Assche (1):
-      blk-zoned: Fix a lockdep complaint about recursive locking
-
-Coly Li (1):
-      bcache: change maintainer's email address
-
-Ming Lei (2):
-      ublk: avoid ublk_io_release() called after ublk char dev is closed
-      ublk selftests: add --no_ublk_fixed_fd for not using registered ublk char device
-
-Nilay Shroff (1):
-      block: validate QoS before calling __rq_qos_done_bio()
-
-Yu Kuai (1):
-      loop: fix zero sized loop for block special file
-
- MAINTAINERS                                    |  2 +-
- block/blk-rq-qos.h                             | 13 +++--
- block/blk-zoned.c                              | 11 ++--
- drivers/block/loop.c                           | 26 ++++++----
- drivers/block/ublk_drv.c                       | 72 +++++++++++++++++++++++++-
- tools/testing/selftests/ublk/file_backed.c     | 10 ++--
- tools/testing/selftests/ublk/kublk.c           | 38 +++++++++++---
- tools/testing/selftests/ublk/kublk.h           | 45 +++++++++++-----
- tools/testing/selftests/ublk/null.c            |  4 +-
- tools/testing/selftests/ublk/stripe.c          |  4 +-
- tools/testing/selftests/ublk/test_stress_04.sh |  6 +--
- 11 files changed, 175 insertions(+), 56 deletions(-)
-
+diff --git a/block/mq-deadline.c b/block/mq-deadline.c
+index 1a031922c447..0f5d0d5fe837 100644
+--- a/block/mq-deadline.c
++++ b/block/mq-deadline.c
+@@ -136,7 +136,6 @@ static inline struct request *deadline_from_pos(struct dd_per_prio *per_prio,
+ 	if (!node)
+ 		return NULL;
+ 
+-	rq = rb_entry_rq(node);
+ 	while (node) {
+ 		rq = rb_entry_rq(node);
+ 		if (blk_rq_pos(rq) >= pos) {
 -- 
-Jens Axboe
+2.39.5 (Apple Git-154)
 
