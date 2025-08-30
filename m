@@ -1,56 +1,56 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94A53221FDA
-	for <linux-block@vger.kernel.org>; Sat, 30 Aug 2025 02:18:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC65D221FDA
+	for <linux-block@vger.kernel.org>; Sat, 30 Aug 2025 02:19:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756520336; cv=none; b=Xu3+bBD23dkf6xFb4VxYUsXClDFK3t4ctdUQofl1ahax0NFU6wCvAieJaeg4ppwkdXJ3Hf+ph4wjzMm63ItLjDhHPMItOU7B32C5Bx8WVJkznnyoZmaj9VZT/w2C+Rvbfl586xzPjNrF6HfFTjo5OZPv+vJrkZcV0xORwTdZ4Ow=
+	t=1756520343; cv=none; b=rRm+TSurRUwLUoCVEIRYDg6xWdovMEaddjTbU1OY9NJDg180/ejr7BcyFudjGDkNcPTjgsKT7rAsW5lmmJONgv+ooxMHGAIBqUt0Qxum2XP6YH5QyBxdZTHd+1zcxMT0R242X1ZFebTpCR9otv1cm52uf2TIs7Nlmg4EPXsgpVo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756520336; c=relaxed/simple;
-	bh=XpdT1YS1YBNLDgdcbNHF8AJMyasAeExyLw1UVw6UDNo=;
+	s=arc-20240116; t=1756520343; c=relaxed/simple;
+	bh=es+V7TP22q8mblzrhwqeB/n/dpkx016MjsCbZkCT1DM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cNJJnyv5PlL29c02SMN7RzrJ+yXG++UmoZ7VmTymvYZeKxOy/8s2FXRa6scxPH5RbyHnlrynMaoUIkA/aBAUs63iGzsTSvpJJ5NcpAfqYwhWmJj190wQrzjOKMrdiv5SSX0N7Xhv9+UPZjJfawVIwgRPQgxsv+2xuS0M2q8E1Z0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NshMoPJQ; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=BCRGdfu8PnNA9faHm1I/VCgALi8K9Ddvr7Z0MtGrn2R5I/kZOgkr6B05FGFM4DPtw/oVlhPhWI9uEH8sE0ehiD17vaHAqLlfK5ayu8mHxdsFp8KeQyXlUdycoQm2W8+WPt17S2SulAQJGz3Hh+4qjMUN1eaBhNMLwxbxwHP1oXs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GzaPnqxK; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NshMoPJQ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GzaPnqxK"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1756520333;
+	s=mimecast20190719; t=1756520340;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=VEQ3rJ2su8s4baTvaqAjyOfj57YDG6n84CcB9aAm+gc=;
-	b=NshMoPJQ8mQYjfc7BJRAD7KPwSK0NztU0eRuTL5om3CHI/MrHdMZBPgoMveen3WbT31J/p
-	WSFb0U5w1tU0ztP2iBm1dGVceiEtoJPSjURkbzHk2M8ZaN2K3lPyru4UXLQ+b6nWJQadM9
-	7bLLzFd9tgIVKhC+jK+/a6mT89f48NM=
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+	bh=G0rOLSJwyerjlhOc2RTEThakzUC/PrySZEcWnp9kemw=;
+	b=GzaPnqxKRuYpuf/hXb/hvk8M9faWrcep2fLWExd43bPUfeiOoU21zSm8TLB9T12qb76wFf
+	TzsLz2dXiWzKkHvHsggbJcs3flrQUFdnZQ5TbPbiu+cyiDKxDsqeemSslmSWiaRQjuKm1L
+	qVfPcbz8FO3S1OHDhSdFTiZu9zQm80E=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-674-R9HSNUfVOpSgK5NEYejPXg-1; Fri,
- 29 Aug 2025 22:18:51 -0400
-X-MC-Unique: R9HSNUfVOpSgK5NEYejPXg-1
-X-Mimecast-MFC-AGG-ID: R9HSNUfVOpSgK5NEYejPXg_1756520330
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-567-NiAjLiuJNzSOEdnQOjtrJw-1; Fri,
+ 29 Aug 2025 22:18:56 -0400
+X-MC-Unique: NiAjLiuJNzSOEdnQOjtrJw-1
+X-Mimecast-MFC-AGG-ID: NiAjLiuJNzSOEdnQOjtrJw_1756520335
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A8AFF195608D;
-	Sat, 30 Aug 2025 02:18:50 +0000 (UTC)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id F21EC19560B1;
+	Sat, 30 Aug 2025 02:18:54 +0000 (UTC)
 Received: from localhost (unknown [10.72.116.21])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 5F4A11800446;
-	Sat, 30 Aug 2025 02:18:48 +0000 (UTC)
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id D089919560B4;
+	Sat, 30 Aug 2025 02:18:53 +0000 (UTC)
 From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org
 Cc: Hannes Reinecke <hare@suse.de>,
 	Yu Kuai <yukuai3@huawei.com>,
 	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V2 4/5] blk-mq: Defer freeing flush queue to SRCU callback
-Date: Sat, 30 Aug 2025 10:18:22 +0800
-Message-ID: <20250830021825.2859325-5-ming.lei@redhat.com>
+Subject: [PATCH V2 5/5] blk-mq: Replace tags->lock with SRCU for tag iterators
+Date: Sat, 30 Aug 2025 10:18:23 +0800
+Message-ID: <20250830021825.2859325-6-ming.lei@redhat.com>
 In-Reply-To: <20250830021825.2859325-1-ming.lei@redhat.com>
 References: <20250830021825.2859325-1-ming.lei@redhat.com>
 Precedence: bulk
@@ -60,74 +60,156 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-The freeing of the flush queue/request in blk_mq_exit_hctx() can race with
-tag iterators that may still be accessing it. To prevent a potential
-use-after-free, the deallocation should be deferred until after a grace
-period. With this way, we can replace the big tags->lock in tags iterator
-code path with srcu for solving the issue.
+Replace the spinlock in blk_mq_find_and_get_req() with an SRCU read lock
+around the tag iterators.
 
-This patch introduces an SRCU-based deferred freeing mechanism for the
-flush queue.
+This is done by:
 
-The changes include:
-- Adding a `rcu_head` to `struct blk_flush_queue`.
-- Creating a new callback function, `blk_free_flush_queue_callback`,
-  to handle the actual freeing.
-- Replacing the direct call to `blk_free_flush_queue()` in
-  `blk_mq_exit_hctx()` with `call_srcu()`, using the `tags_srcu`
-  instance to ensure synchronization with tag iterators.
+- Holding the SRCU read lock in blk_mq_queue_tag_busy_iter(),
+blk_mq_tagset_busy_iter(), and blk_mq_hctx_has_requests().
+
+- Removing the now-redundant tags->lock from blk_mq_find_and_get_req().
+
+This change fixes lockup issue in scsi_host_busy() in case of shost->host_blocked.
+
+Also avoids big tags->lock when reading disk sysfs attribute `inflight`.
 
 Reviewed-by: Hannes Reinecke <hare@suse.de>
-Reviewed-by: Yu Kuai <yukuai3@huawei.com>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-mq.c | 11 ++++++++++-
- block/blk.h    |  1 +
- 2 files changed, 11 insertions(+), 1 deletion(-)
+ block/blk-mq-tag.c | 12 ++++++++----
+ block/blk-mq.c     | 24 ++++--------------------
+ 2 files changed, 12 insertions(+), 24 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 14bfdc6eadce..c9c6e954bfbc 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -3912,6 +3912,14 @@ static void blk_mq_clear_flush_rq_mapping(struct blk_mq_tags *tags,
- 	spin_unlock_irqrestore(&tags->lock, flags);
+diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+index 6c2f5881e0de..7ae431077a32 100644
+--- a/block/blk-mq-tag.c
++++ b/block/blk-mq-tag.c
+@@ -256,13 +256,10 @@ static struct request *blk_mq_find_and_get_req(struct blk_mq_tags *tags,
+ 		unsigned int bitnr)
+ {
+ 	struct request *rq;
+-	unsigned long flags;
+ 
+-	spin_lock_irqsave(&tags->lock, flags);
+ 	rq = tags->rqs[bitnr];
+ 	if (!rq || rq->tag != bitnr || !req_ref_inc_not_zero(rq))
+ 		rq = NULL;
+-	spin_unlock_irqrestore(&tags->lock, flags);
+ 	return rq;
  }
  
-+static void blk_free_flush_queue_callback(struct rcu_head *head)
-+{
-+	struct blk_flush_queue *fq =
-+		container_of(head, struct blk_flush_queue, rcu_head);
+@@ -440,7 +437,9 @@ void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
+ 		busy_tag_iter_fn *fn, void *priv)
+ {
+ 	unsigned int flags = tagset->flags;
+-	int i, nr_tags;
++	int i, nr_tags, srcu_idx;
 +
-+	blk_free_flush_queue(fq);
-+}
++	srcu_idx = srcu_read_lock(&tagset->tags_srcu);
+ 
+ 	nr_tags = blk_mq_is_shared_tags(flags) ? 1 : tagset->nr_hw_queues;
+ 
+@@ -449,6 +448,7 @@ void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
+ 			__blk_mq_all_tag_iter(tagset->tags[i], fn, priv,
+ 					      BT_TAG_ITER_STARTED);
+ 	}
++	srcu_read_unlock(&tagset->tags_srcu, srcu_idx);
+ }
+ EXPORT_SYMBOL(blk_mq_tagset_busy_iter);
+ 
+@@ -499,6 +499,8 @@ EXPORT_SYMBOL(blk_mq_tagset_wait_completed_request);
+ void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_tag_iter_fn *fn,
+ 		void *priv)
+ {
++	int srcu_idx;
 +
- /* hctx->ctxs will be freed in queue's release handler */
- static void blk_mq_exit_hctx(struct request_queue *q,
- 		struct blk_mq_tag_set *set,
-@@ -3931,7 +3939,8 @@ static void blk_mq_exit_hctx(struct request_queue *q,
- 	if (set->ops->exit_hctx)
- 		set->ops->exit_hctx(hctx, hctx_idx);
+ 	/*
+ 	 * __blk_mq_update_nr_hw_queues() updates nr_hw_queues and hctx_table
+ 	 * while the queue is frozen. So we can use q_usage_counter to avoid
+@@ -507,6 +509,7 @@ void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_tag_iter_fn *fn,
+ 	if (!percpu_ref_tryget(&q->q_usage_counter))
+ 		return;
  
--	blk_free_flush_queue(hctx->fq);
-+	call_srcu(&set->tags_srcu, &hctx->fq->rcu_head,
-+			blk_free_flush_queue_callback);
- 	hctx->fq = NULL;
++	srcu_idx = srcu_read_lock(&q->tag_set->tags_srcu);
+ 	if (blk_mq_is_shared_tags(q->tag_set->flags)) {
+ 		struct blk_mq_tags *tags = q->tag_set->shared_tags;
+ 		struct sbitmap_queue *bresv = &tags->breserved_tags;
+@@ -536,6 +539,7 @@ void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_tag_iter_fn *fn,
+ 			bt_for_each(hctx, q, btags, fn, priv, false);
+ 		}
+ 	}
++	srcu_read_unlock(&q->tag_set->tags_srcu, srcu_idx);
+ 	blk_queue_exit(q);
+ }
  
- 	xa_erase(&q->hctx_table, hctx_idx);
-diff --git a/block/blk.h b/block/blk.h
-index 46f566f9b126..7d420c247d81 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -41,6 +41,7 @@ struct blk_flush_queue {
- 	struct list_head	flush_queue[2];
- 	unsigned long		flush_data_in_flight;
- 	struct request		*flush_rq;
-+	struct rcu_head		rcu_head;
- };
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index c9c6e954bfbc..8191ffac998e 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -3415,7 +3415,6 @@ static void blk_mq_clear_rq_mapping(struct blk_mq_tags *drv_tags,
+ 				    struct blk_mq_tags *tags)
+ {
+ 	struct page *page;
+-	unsigned long flags;
  
- bool is_flush_rq(struct request *req);
+ 	/*
+ 	 * There is no need to clear mapping if driver tags is not initialized
+@@ -3439,15 +3438,6 @@ static void blk_mq_clear_rq_mapping(struct blk_mq_tags *drv_tags,
+ 			}
+ 		}
+ 	}
+-
+-	/*
+-	 * Wait until all pending iteration is done.
+-	 *
+-	 * Request reference is cleared and it is guaranteed to be observed
+-	 * after the ->lock is released.
+-	 */
+-	spin_lock_irqsave(&drv_tags->lock, flags);
+-	spin_unlock_irqrestore(&drv_tags->lock, flags);
+ }
+ 
+ void blk_mq_free_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
+@@ -3670,8 +3660,12 @@ static bool blk_mq_hctx_has_requests(struct blk_mq_hw_ctx *hctx)
+ 	struct rq_iter_data data = {
+ 		.hctx	= hctx,
+ 	};
++	int srcu_idx;
+ 
++	srcu_idx = srcu_read_lock(&hctx->queue->tag_set->tags_srcu);
+ 	blk_mq_all_tag_iter(tags, blk_mq_has_request, &data);
++	srcu_read_unlock(&hctx->queue->tag_set->tags_srcu, srcu_idx);
++
+ 	return data.has_rq;
+ }
+ 
+@@ -3891,7 +3885,6 @@ static void blk_mq_clear_flush_rq_mapping(struct blk_mq_tags *tags,
+ 		unsigned int queue_depth, struct request *flush_rq)
+ {
+ 	int i;
+-	unsigned long flags;
+ 
+ 	/* The hw queue may not be mapped yet */
+ 	if (!tags)
+@@ -3901,15 +3894,6 @@ static void blk_mq_clear_flush_rq_mapping(struct blk_mq_tags *tags,
+ 
+ 	for (i = 0; i < queue_depth; i++)
+ 		cmpxchg(&tags->rqs[i], flush_rq, NULL);
+-
+-	/*
+-	 * Wait until all pending iteration is done.
+-	 *
+-	 * Request reference is cleared and it is guaranteed to be observed
+-	 * after the ->lock is released.
+-	 */
+-	spin_lock_irqsave(&tags->lock, flags);
+-	spin_unlock_irqrestore(&tags->lock, flags);
+ }
+ 
+ static void blk_free_flush_queue_callback(struct rcu_head *head)
 -- 
 2.47.0
 
