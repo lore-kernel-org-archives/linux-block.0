@@ -1,68 +1,105 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96BC0C133;
-	Sat, 30 Aug 2025 01:47:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A01A030CDA5
+	for <linux-block@vger.kernel.org>; Sat, 30 Aug 2025 02:18:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756518463; cv=none; b=Kv5Yx4cTjfVtyFarhz1Kwb/LTRnGuKLUtiG9OP1ce8vxgrKwC9xkbvTlAL76b9HLE894Y3NvW0VaaUndy0Zov6OMsJBgU5p6ehAnaP8da6gXsS+nklrHyoMlsh4P3987eVIa3z9z+yRyByMEkqDl0QdbJEZnnGu23tTILvYXUwk=
+	t=1756520322; cv=none; b=qLCfbrqd5habvQufosRpshz6JkMWFiF/+0k3pdL1RhaPcs5mbP9GH7oRqvFvRrGgUqDxAwSQf/VKCThaCfdWhqK69RbwNiWYB2dKYv49lk47vsjeMQy9HUPkdwAnQ8lhPEASJqV0rKe7Kz4p+06PSQ45N602hB1UiWoKI31pdbg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756518463; c=relaxed/simple;
-	bh=zDvl+0mYl7B1IhYYLGnaqnKHVG/ZkuRi7oUHiicRwf8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ApkcG9Orroyc1xDugUjZ5Z98+sTmJWoZouZf4gEY2je9EcSWAJwg2CJ7UBvxnFskKmacrXzCd5QlQwO8O7Z2Y7KH3AkSI+XI2kMK7xSnlStkCHS1ciZt+PtB82babAGUcBN24v4f+EbXAU8Olam7ReK45omn+xXvftZQR1vw4/Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nqsj8dN+; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1756520322; c=relaxed/simple;
+	bh=l537mO/COp4WjDTlH55oOLtqTRPUvyZZv5YzLsam+XY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Bu4AJnzuRusmGRLaceqTVOz6Y86XdtYD1wcu06HwakD/0IwjVt4meIG+pUfahsrOEuiSlmd8ETfx5iNcC6C3P7phO0ZAp0VR9vcriOCef4JpllpqmAG8bMzf80+cmF6APZLakZT2eEKgVqvaGnQY+wxfXgNiZLhTa0x3TCujQDY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BZO4fymv; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nqsj8dN+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6222C4CEF0;
-	Sat, 30 Aug 2025 01:47:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756518463;
-	bh=zDvl+0mYl7B1IhYYLGnaqnKHVG/ZkuRi7oUHiicRwf8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=nqsj8dN+DUEsg1mJ2QeNwyZCNjjtY5olN8/7yi6jMQs7E7ITe97a/OXNae7SguaO/
-	 19om4q+mKKxoah75XzkrDdOXZFVAZeLHUrjozV+8HTkBvG97J6D20AcXld6ZPz+sCB
-	 zezMEVYQqc1kJJboQlvTTMreLozgtSwiXjv6c0gE35LM3Y0eSHZJa3zllemdD5ocL5
-	 If5ey2NVeII7UYUyDJHelS7yw4uik/YTVmT+CXBCr6P93WVze2HUbyMkgKDVSSYDp0
-	 Lh3BWmbjmIEIrZKrV88flYV7VY++9zwL3yvFjC/JJYWIlsYf0SEgEZDR2m1MUMiCPS
-	 5PVbvITmfZkkg==
-Date: Fri, 29 Aug 2025 19:47:40 -0600
-From: Keith Busch <kbusch@kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Christoph Hellwig <hch@infradead.org>, Keith Busch <kbusch@meta.com>,
-	linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-	axboe@kernel.dk, iommu@lists.linux.dev
-Subject: Re: [PATCHv3 1/2] block: accumulate segment page gaps per bio
-Message-ID: <aLJYPGKE4Y_6QzY2@kbusch-mbp>
-References: <20250821204420.2267923-1-kbusch@meta.com>
- <20250821204420.2267923-2-kbusch@meta.com>
- <aKxpSorluMXgOFEI@infradead.org>
- <aKxu83upEBhf5gT7@kbusch-mbp>
- <20250826130344.GA32739@lst.de>
- <aK27AhpcQOWADLO8@kbusch-mbp>
- <20250826135734.GA4532@lst.de>
- <aK42K_-gHrOQsNyv@kbusch-mbp>
- <20250827073709.GA25032@lst.de>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BZO4fymv"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1756520319;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=DfGmeYuogDgqtgmLLzzTyFT2WUbSxG87WkGoP1dy79k=;
+	b=BZO4fymvb+yaoI6Lts6g7TMevNipNKqGBLfmscFBAyj6pv8voMyDLIScKXmZNwExGhVAUg
+	ccY81SIU83Jlu2mRGkfdW4JV3x4N9b4hIirPZUqsDwr5eXHEhohWCZ/lbtfQfbJhhp6T6C
+	Te6boa8ucHZtsKOXxJiiM59gg1tepdM=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-292-vewYtIZCNluH9UjbU3mNkw-1; Fri,
+ 29 Aug 2025 22:18:35 -0400
+X-MC-Unique: vewYtIZCNluH9UjbU3mNkw-1
+X-Mimecast-MFC-AGG-ID: vewYtIZCNluH9UjbU3mNkw_1756520314
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C63C51956087;
+	Sat, 30 Aug 2025 02:18:33 +0000 (UTC)
+Received: from localhost (unknown [10.72.116.21])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 893D030001BB;
+	Sat, 30 Aug 2025 02:18:31 +0000 (UTC)
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: Hannes Reinecke <hare@suse.de>,
+	Yu Kuai <yukuai3@huawei.com>,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V2 0/5] blk-mq: Replace tags->lock with SRCU for tag iterators
+Date: Sat, 30 Aug 2025 10:18:18 +0800
+Message-ID: <20250830021825.2859325-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250827073709.GA25032@lst.de>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Wed, Aug 27, 2025 at 09:37:09AM +0200, Christoph Hellwig wrote:
-> On Tue, Aug 26, 2025 at 04:33:15PM -0600, Keith Busch wrote:
-> > virt boundary check. It's looking like replace bvec's "page + offset"
-> > with phys addrs, yeah?!
-> 
-> Basically everything should be using physical address.  The page + offset
-> is just a weird and inefficient way to represent that and we really
-> need to get rid of it.
+Hello Jens,
 
-I was plowing ahead with converting to phys addrs only to discover
-skb_frag_t overlays a bvec with tightly coupled expectations on its
-layout. I'm not comfortable right now messing with that type. I think it
-may need to be decoupled to proceed on this path. :(
+Replace the spinlock in blk_mq_find_and_get_req() with an SRCU read lock
+around the tag iterators.
+
+Avoids scsi_host_busy() lockup during scsi host blocked in case of big cpu
+cores & deep queue depth.
+
+Also the big tags lock isn't needed when reading disk sysfs attribute
+'inflight' any more.
+
+Take the following approach:
+
+- clearing rq reference in tags->rqs[] and deferring freeing scheduler requests
+in SRCU callback
+
+- replace tags->lock with srcu read lock in tags iterator.
+
+V2:
+	- rebase on for-6.18/block
+	- add review tags
+
+
+Thanks,
+Ming
+
+
+Ming Lei (5):
+  blk-mq: Move flush queue allocation into blk_mq_init_hctx()
+  blk-mq: Pass tag_set to blk_mq_free_rq_map/tags
+  blk-mq: Defer freeing of tags page_list to SRCU callback
+  blk-mq: Defer freeing flush queue to SRCU callback
+  blk-mq: Replace tags->lock with SRCU for tag iterators
+
+ block/blk-mq-sysfs.c   |  1 -
+ block/blk-mq-tag.c     | 38 +++++++++++++++---
+ block/blk-mq.c         | 87 +++++++++++++++++++++---------------------
+ block/blk-mq.h         |  4 +-
+ block/blk.h            |  1 +
+ include/linux/blk-mq.h |  2 +
+ 6 files changed, 80 insertions(+), 53 deletions(-)
+
+-- 
+2.47.0
+
