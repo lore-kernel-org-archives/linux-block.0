@@ -1,139 +1,116 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6593257845;
-	Sun, 31 Aug 2025 13:12:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0E4C1F473A;
+	Mon,  1 Sep 2025 02:40:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756645976; cv=none; b=QRzp0i+kcNgZ47JcW5NjL9aqSe1PfLlkTHRNPEhV53fkaq1SRcpYAEtp8UTIIk2WHx6UoO1/lEznvNd/Q9MkOSl5Syt2Z59a4bIBJzJamDiIRi0dvxOsKNZ5DSGtjxFbL0PmKu6RgQUiOMISVwYu4X42tFm9mpAgVHj8haIplWs=
+	t=1756694459; cv=none; b=d0BBo3Pf/OfrDZr7Cvi4CZhESGuFK4TdH46sQ8VRYH6o0OsUTFFX4YX3aSVl8t9zYpziZv0ZsyJu+8fg7KyYRiD5LorOsf20LLbaYQZszvejprU6CPsVpVm1ZqsHACwaW//HK/LiuKACabkgLJmdchNL/GlE0u9397pIFVfekBU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756645976; c=relaxed/simple;
-	bh=SVfffytdJ7l+FJFH+NQ2fAYz/jln+XvhXnCAv4vVciA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mgVzYVgVV0a50cguRnBjMpk0rWqmBnYI9ly+aegefDLM5gbBix+8QByEcn7D+tvkT8kWgd8McPFGvYvbdFmEungfSVsQgOVwMU74/cw5B1Op5bNPF2D6Gcqept5LmyxHZFTIOLh6JBebz8ST2271kH5qupwLWBnI9OftPmnOC74=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WMN3gtSJ; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WMN3gtSJ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB2B1C4CEED;
-	Sun, 31 Aug 2025 13:12:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756645976;
-	bh=SVfffytdJ7l+FJFH+NQ2fAYz/jln+XvhXnCAv4vVciA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=WMN3gtSJVf7yZJvH25PHoup176xzR4iH45PFd5WTaZl3P3yIlcpIRkfu5U3ulpn36
-	 IKubxjRKitiVH7tEFGk0EvSWGehRo+3Ze6ErmIyU4uPo4HQlYX4MxtypCD8fFWeHBM
-	 x5lx5bK4qJ+D+MLZSAMBnr8/dS6PtN2tAd1/pTiMLV/guQAHue805z1yqYSMaGWuq1
-	 Airln6Bzle28Ohk7U9LgDEafLkaTwO2O0iuzeLmhUWu5F6SgZbC5gh8KCCHy3wqp2C
-	 Hcv7g6EwqE5WnoDtEeiWuc9ndJyrHz9MWyHpBWe4DPcTvzNQTROEZWINBtgECoxCxA
-	 rqMaDKHjRKGlQ==
-Date: Sun, 31 Aug 2025 16:12:50 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Marek Szyprowski <m.szyprowski@samsung.com>,
-	Abdiel Janulgue <abdiel.janulgue@gmail.com>,
-	Alexander Potapenko <glider@google.com>,
-	Alex Gaynor <alex.gaynor@gmail.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Christoph Hellwig <hch@lst.de>, Danilo Krummrich <dakr@kernel.org>,
-	iommu@lists.linux.dev, Jason Wang <jasowang@redhat.com>,
-	Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>,
-	Jonathan Corbet <corbet@lwn.net>, Juergen Gross <jgross@suse.com>,
-	kasan-dev@googlegroups.com, Keith Busch <kbusch@kernel.org>,
-	linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	linux-nvme@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
-	linux-trace-kernel@vger.kernel.org,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Robin Murphy <robin.murphy@arm.com>, rust-for-linux@vger.kernel.org,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Stefano Stabellini <sstabellini@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	virtualization@lists.linux.dev, Will Deacon <will@kernel.org>,
-	xen-devel@lists.xenproject.org
-Subject: Re: [PATCH v4 09/16] dma-mapping: handle MMIO flow in
- dma_map|unmap_page
-Message-ID: <20250831131250.GC10073@unreal>
-References: <cover.1755624249.git.leon@kernel.org>
- <ba5b6525bb8d49ca356a299aa63b0a495d3c74ca.1755624249.git.leon@kernel.org>
- <20250828151730.GH9469@nvidia.com>
+	s=arc-20240116; t=1756694459; c=relaxed/simple;
+	bh=BXWqjzqFfb808DiXpxTG1EzGF8XFU+4nXLPwseoxB+E=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=ifYVN1CyMHcVwu05Mm9WoKaQSJTohRttFiTqq5mXgHJkvYqboecg9lbm8vsUuf8jowI27BNYMpRiECwBI2ir/T9S51HGwATyTYOVY4tWKn0M/oUpIorY2ZaoGZneMyzrVz5ATFhPqLu7vTrLngnSQVrNP4J2qqSY3+Dz84Bq6Yo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4cFY5f4KRkzYQv1H;
+	Mon,  1 Sep 2025 10:40:54 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 187911A08F8;
+	Mon,  1 Sep 2025 10:40:53 +0800 (CST)
+Received: from [10.174.179.143] (unknown [10.174.179.143])
+	by APP4 (Coremail) with SMTP id gCh0CgAncY2yB7VoD6DwAw--.55423S3;
+	Mon, 01 Sep 2025 10:40:52 +0800 (CST)
+Subject: Re: [PATCH RFC v2 09/10] block: fix disordered IO in the case
+ recursive split
+To: Yu Kuai <hailan@yukuai.org.cn>, Damien Le Moal <dlemoal@kernel.org>,
+ Yu Kuai <yukuai1@huaweicloud.com>, axboe@kernel.dk, tj@kernel.org,
+ josef@toxicpanda.com, song@kernel.org, neil@brown.name,
+ akpm@linux-foundation.org, hch@infradead.org, colyli@kernel.org,
+ hare@suse.de, tieren@fnnas.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ cgroups@vger.kernel.org, linux-raid@vger.kernel.org, yi.zhang@huawei.com,
+ yangerkun@huawei.com, johnny.chenyi@huawei.com,
+ "yukuai (C)" <yukuai3@huawei.com>
+References: <20250828065733.556341-1-yukuai1@huaweicloud.com>
+ <20250828065733.556341-10-yukuai1@huaweicloud.com>
+ <23872034-2b36-4a71-91b9-e599976902b6@kernel.org>
+ <79aae55c-a2fe-465c-9204-44dce9a80256@yukuai.org.cn>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <5417dfdd-f558-2d5e-43b1-043c6bd30041@huaweicloud.com>
+Date: Mon, 1 Sep 2025 10:40:49 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250828151730.GH9469@nvidia.com>
+In-Reply-To: <79aae55c-a2fe-465c-9204-44dce9a80256@yukuai.org.cn>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgAncY2yB7VoD6DwAw--.55423S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7tw18JrW8Jry8Zry7Gr17KFg_yoW8WF4UpF
+	WkJFWUtry5Gr4fKrn7XF1UWFy0krZrXw4kJrn8Ga48ArWjyr4aqa1UWry0gFyUCr48W34U
+	Xrn5trnxuFyDAFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUBF14x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
+	0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AKxVW8ZVWrXwCF04k20xvY0x
+	0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E
+	7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_GFv_WrylIxkGc2Ij64vIr41lIxAIcV
+	C0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF
+	04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7
+	CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0pRHUDLUUUUU=
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On Thu, Aug 28, 2025 at 12:17:30PM -0300, Jason Gunthorpe wrote:
-> On Tue, Aug 19, 2025 at 08:36:53PM +0300, Leon Romanovsky wrote:
-> > From: Leon Romanovsky <leonro@nvidia.com>
-> > 
-> > Extend base DMA page API to handle MMIO flow and follow
-> > existing dma_map_resource() implementation to rely on dma_map_direct()
-> > only to take DMA direct path.
-> 
-> I would reword this a little bit too
-> 
-> dma-mapping: implement DMA_ATTR_MMIO for dma_(un)map_page_attrs()
-> 
-> Make dma_map_page_attrs() and dma_map_page_attrs() respect
-> DMA_ATTR_MMIO.
-> 
-> DMA_ATR_MMIO makes the functions behave the same as dma_(un)map_resource():
->  - No swiotlb is possible
->  - Legacy dma_ops arches use ops->map_resource()
->  - No kmsan
->  - No arch_dma_map_phys_direct()
-> 
-> The prior patches have made the internl funtions called here support
-> DMA_ATTR_MMIO.
-> 
-> This is also preparation for turning dma_map_resource() into an inline
-> calling dma_map_phys(DMA_ATTR_MMIO) to consolidate the flows.
-> 
-> > @@ -166,14 +167,25 @@ dma_addr_t dma_map_page_attrs(struct device *dev, struct page *page,
-> >  		return DMA_MAPPING_ERROR;
-> >  
-> >  	if (dma_map_direct(dev, ops) ||
-> > -	    arch_dma_map_phys_direct(dev, phys + size))
-> > +	    (!is_mmio && arch_dma_map_phys_direct(dev, phys + size)))
-> >  		addr = dma_direct_map_phys(dev, phys, size, dir, attrs);
-> 
-> PPC is the only user of arch_dma_map_phys_direct() and it looks like
-> it should be called on MMIO memory. Seems like another inconsistency
-> with map_resource. I'd leave it like the above though for this series.
-> 
-> >  	else if (use_dma_iommu(dev))
-> >  		addr = iommu_dma_map_phys(dev, phys, size, dir, attrs);
-> > -	else
-> > +	else if (is_mmio) {
-> > +		if (!ops->map_resource)
-> > +			return DMA_MAPPING_ERROR;
-> 
-> Probably written like:
-> 
-> 		if (ops->map_resource)
-> 			addr = ops->map_resource(dev, phys, size, dir, attrs);
-> 		else
-> 			addr = DMA_MAPPING_ERROR;
+Hi,
 
-I'm big fan of "if (!ops->map_resource)" coding style and prefer to keep it.
+在 2025/08/30 12:28, Yu Kuai 写道:
+>>> @@ -745,12 +745,16 @@ void submit_bio_noacct_nocheck(struct bio *bio)
+>>>        * to collect a list of requests submited by a ->submit_bio 
+>>> method while
+>>>        * it is active, and then process them after it returned.
+>>>        */
+>>> -    if (current->bio_list)
+>>> -        bio_list_add(&current->bio_list[0], bio);
+>>> -    else if (!bdev_test_flag(bio->bi_bdev, BD_HAS_SUBMIT_BIO))
+>>> +    if (current->bio_list) {
+>>> +        if (split)
+>>> +            bio_list_add_head(&current->bio_list[0], bio);
+>>> +        else
+>>> +            bio_list_add(&current->bio_list[0], bio);
+>> This really needs a comment clarifying why we do an add at tail 
+>> instead of
+>> keeping the original order with a add at head. I am also scared that 
+>> this may
+>> break sequential write ordering for zoned devices.
+> 
+> I think add at head is exactly what we do here to keep the orginal order 
+> for
+> the case bio split. Other than split, if caller do generate multiple 
+> sequential
+> bios, we should keep the order by add at tail.
+> 
+> Not sure about zoned devices for now, I'll have a look in details.
 
-> 
-> As I think some of the design here is to run the trace even on the
-> failure path?
+For zoned devices, can we somehow trigger this recursive split? I
+suspect bio disordered will apear in this case but I don't know for
+now and I can't find a way to reporduce it.
 
-Yes, this is how it worked before.
+Perhaps I can bypass zoned devices for now, and if we really met the
+recursive split case and there is a problem, we can fix it later:
 
-> 
-> Otherwise looks OK
-> 
-> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
-> 
-> Jason
+if (split && !bdev_is_zoned(bio->bi_bdev))
+	bio_list_add_head()
+
+Thanks,
+Kuai
+
