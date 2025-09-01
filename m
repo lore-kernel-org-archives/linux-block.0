@@ -1,102 +1,162 @@
-Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from sender4-pp-f112.zoho.com (sender4-pp-f112.zoho.com [136.143.188.112])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2532031B124
-	for <linux-block@vger.kernel.org>; Mon,  1 Sep 2025 14:37:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756737467; cv=none; b=TwA7ZT6oUQdc6KfPbX1PV735PuE+3EvzD+ub49Yjf2NIPe9zQk61UXvNqqblH2Rfb5GeIjhFfr5AtLFiT2t3ijzGl0eEjihHJTMDGSyQlgTVao5FP6EbjGnSic6ogdKgEE9V6D/hzg7s2RDWDkoR6PzfzD/9RSVaFnDNQGTlPf8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756737467; c=relaxed/simple;
-	bh=sra0/FDnnUH8X1K3s5FaMUQj5vaPuAreMN5Lt9OQLYk=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=knE7810HlqaIh70Z1plPrvqPWsMZzlP8Of7d2Dtd5Z9QmdVhjxaD9qqtRbdWZSr0ZPItnNCIrBTpEi8NnSLLtcdIgqWGkxWHnAV1+6ZNF8ap9cQ2r43FApNcC/MSnk262hGTJKxny4C8yLn+AydvAujEGiCzKZmbcwhEWstvyQw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=liWgYTtm; arc=none smtp.client-ip=209.85.215.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D453F223DFF;
+	Mon,  1 Sep 2025 14:40:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.112
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756737641; cv=pass; b=rM/B6yKOxttXTj2oO+Q30S0nTNa7JhqZXrhdIcgt6Jvylk2hY7EZOFGrclYlucsVI+mo/bd1qIpxbS4MzP9GqszKg+seh8EeSWBOU1OcoH7XS7C6yPqng8LjgHQCWVoVI70b3dvaCpreicwJmrQ8C83N4+qLBwxMcu5IY8eyc/A=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756737641; c=relaxed/simple;
+	bh=VkF3mFyeQYzzBkD053RksWScWObs3Mf/d0Yz3sin1gQ=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=ppkZqqww1VyQTK77UboSQhJ+ChlxzR+NsrdzMF2SMzgguO2L5OYafvl6cLQkPj4fh29HTX6zwcH8X+qH49C2ib4+7hhR852p6bkZ9Sk1bju+4dsPmOc7EPFqRz4Uqn6vrq+8cBnGv6E2PARJi2sStTdP5SZ+b/H5eBkvDUzIg5o=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=daniel.almeida@collabora.com header.b=XSliqd0u; arc=pass smtp.client-ip=136.143.188.112
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="liWgYTtm"
-Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-b47174beb13so2966555a12.2
-        for <linux-block@vger.kernel.org>; Mon, 01 Sep 2025 07:37:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1756737465; x=1757342265; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MTfsWeNGithKokPaf8LnUeHsYMRih1Pm7H+/AYqRTGM=;
-        b=liWgYTtmY44mCW6rLBVTC5Se3eeAexg5teq0lLK6gWh1HB/plUCp/0j6uvmEzl+QZt
-         JrM1OOCZHhNIfkttG9yTVpDQ0l77DaAc96mHMeLc+SxkTzpq7MlZZKswrpUK5ekJABoB
-         mZebhGA2+hAmJR0fl19FiBmwuvLNpz+OLc4xnOo4Kpckt4ip0RtDWAxnLUVSwhxqrRv+
-         BMp1niscqXgQFX96w1d1VCFXnEp0xGsghire7Ij8ztFg9iDy7tsdDEcMV8wvze2jksP8
-         ShcFL4dS4tO9pFjPJyeJyeahar+mPkkwnHgCuggFdR78oQJAV87RJjU55Wz96td3XeWt
-         dJJA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756737465; x=1757342265;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MTfsWeNGithKokPaf8LnUeHsYMRih1Pm7H+/AYqRTGM=;
-        b=JmRSik/DNnkk9hpAb/Acm/BRX+vkWVBRvFVz7HCHfz1EEEWd+6cTmeBHl1vANioQ9H
-         exrBLVwqml/9bctWDvCqz0sku89rOgfkMDcwFaT572tI6UMzKoMliacpOBAiZDrN5Oo1
-         CzWMqaJ7jJYtg8/AgXtiAqv6q6RrKFIdgk2oW6c+AATSqInrGF78p/qFjobuiMGnxCGI
-         YxmOUyiIrSVVpCkFVjQk4M4WE7ist4tHQi8H7GQGSy4Fxp6pUWBMZebN3bQeAa61ia4+
-         33F7n5gal0lfRjuzTLJgR3Fph5MnXBcBpum8drA452D7lzsmPqU22DiKGwxew0WX02Qj
-         3yjQ==
-X-Gm-Message-State: AOJu0Yxz1XKKYR1Il1/mqY/dezHdQiVe6oSNbs6el++nGH0rfxff8/RF
-	brdPaec4eEeqIovFUP2A+OyPbIsg1GmCn7OzKBq/zGwLlM39/VrXWjdmGo9JGbFM6FVA1IXV8Qh
-	le3kV
-X-Gm-Gg: ASbGncuYyimyDfEtKWkhLblykOWYRa5kj73B8WXoX7Qes3jKfr0eNJKuHUWW7VALJsb
-	BvRiNEcMPH1vr0CDAL+kATgKvzvK9tl4+sQrEfjDd15yTNlWmr413hf1CrgOqST7holJ3Uq/vXO
-	tH4IUM9Esxkm4Zf8qWH0seHeIGXURphFJyg+t+tsV32ez5JwewGOTDFqozSXs2JSR7gkHMBU6qo
-	KVCxX0+KMyZw41L5PEBJSVilS9bjfloLxUiOkIhSnsT8dmXPYPQyDzhHDiex9ixjVe2DU87YRm7
-	gy5+65SGkOdX/ZAj+Y2ZCi8m22edhKP08cJdswGeb3muIrjUHDXrXdFqgQQo+BrXURNzqMRr7eL
-	Qo4V1jKl+c6Q/41U=
-X-Google-Smtp-Source: AGHT+IEaM9vFz+UVeUU5AY/6OvHJYzbkVtiO4j665XtK5yxUnNyy9lt762KQCwiXvBmRtrrLMjcdcQ==
-X-Received: by 2002:a17:90b:48d0:b0:327:dce5:f635 with SMTP id 98e67ed59e1d1-328156dfca5mr10342372a91.25.1756737464713;
-        Mon, 01 Sep 2025 07:37:44 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b4cd28b37dfsm9546596a12.25.2025.09.01.07.37.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Sep 2025 07:37:44 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: hch@lst.de, houtao1@huawei.com, Yu Kuai <yukuai1@huaweicloud.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
- yukuai3@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com, 
- johnny.chenyi@huawei.com
-In-Reply-To: <20250811065628.1829339-1-yukuai1@huaweicloud.com>
-References: <20250811065628.1829339-1-yukuai1@huaweicloud.com>
-Subject: Re: [PATCH v3] brd: use page reference to protect page lifetime
-Message-Id: <175673746364.13707.6940913855936222519.b4-ty@kernel.dk>
-Date: Mon, 01 Sep 2025 08:37:43 -0600
+	dkim=pass (1024-bit key) header.d=collabora.com header.i=daniel.almeida@collabora.com header.b="XSliqd0u"
+ARC-Seal: i=1; a=rsa-sha256; t=1756737619; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=Bj5zdtPq368dBT+rPmTMahcglDllNf0S36AuIc0aEBuwzbkf5YKACjnuQKPRRlpDxkfcdqlKbiGco1b0r4tgD2q54jpHfSJdqWtf1zLBTdIt9Kf8yATA2uQREJ9HX3Ex1OKZnX7uc1OMXxGlo8sdK8BMGQeCp6twtTUHDKDny5k=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1756737619; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=vsyH3+I3gMBwgO8gidOB41GRKGanWU/9605BIKzf0hs=; 
+	b=btaMInDTYjNIvzjKVAkOBYe28h7ausIFLTmRilsXbN8tgdBfw2P/U41A3XP6p0WA1JL1bJqgXB87yyVgBh7OGgAITTVellRCu+eli1Ja2iazJ+LZy7GTCX6kBfzQfmbV9xVZRIkH5jAhgGs1++g+w/jCsxa+e3p+T1ENGBY/JLw=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=collabora.com;
+	spf=pass  smtp.mailfrom=daniel.almeida@collabora.com;
+	dmarc=pass header.from=<daniel.almeida@collabora.com>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1756737619;
+	s=zohomail; d=collabora.com; i=daniel.almeida@collabora.com;
+	h=Content-Type:Mime-Version:Subject:Subject:From:From:In-Reply-To:Date:Date:Cc:Cc:Content-Transfer-Encoding:Message-Id:Message-Id:References:To:To:Reply-To;
+	bh=vsyH3+I3gMBwgO8gidOB41GRKGanWU/9605BIKzf0hs=;
+	b=XSliqd0ue5eoZIdyqmTP1raEpNsLOBHVCB12lz6m/XRX/o6uc0Ny7zeAhX0Hiz8Y
+	jRT/CZFTo+Whpozsdmae5n3KUntSl4KowRNgzzLuPuWp4Jsjqa4/eQR7+wQCURnH81m
+	CnAbSZXZ5Gu5hIelaym+3Ot5KtZKwtwUSq/dbuMw=
+Received: by mx.zohomail.com with SMTPS id 1756737617388356.5060508240639;
+	Mon, 1 Sep 2025 07:40:17 -0700 (PDT)
+Content-Type: text/plain;
+	charset=us-ascii
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-2ce6c
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.700.81\))
+Subject: Re: [PATCH v6 06/18] rust: str: add `bytes_to_bool` helper function
+From: Daniel Almeida <daniel.almeida@collabora.com>
+In-Reply-To: <20250822-rnull-up-v6-16-v6-6-ec65006e2f07@kernel.org>
+Date: Mon, 1 Sep 2025 11:40:01 -0300
+Cc: Boqun Feng <boqun.feng@gmail.com>,
+ Miguel Ojeda <ojeda@kernel.org>,
+ Alex Gaynor <alex.gaynor@gmail.com>,
+ Gary Guo <gary@garyguo.net>,
+ =?utf-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>,
+ Benno Lossin <lossin@kernel.org>,
+ Alice Ryhl <aliceryhl@google.com>,
+ Trevor Gross <tmgross@umich.edu>,
+ Danilo Krummrich <dakr@kernel.org>,
+ Jens Axboe <axboe@kernel.dk>,
+ Breno Leitao <leitao@debian.org>,
+ linux-block@vger.kernel.org,
+ rust-for-linux@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <93C0C9AA-9CA9-4B0A-B7C8-654C75D1542C@collabora.com>
+References: <20250822-rnull-up-v6-16-v6-0-ec65006e2f07@kernel.org>
+ <20250822-rnull-up-v6-16-v6-6-ec65006e2f07@kernel.org>
+To: Andreas Hindborg <a.hindborg@kernel.org>
+X-Mailer: Apple Mail (2.3826.700.81)
+X-ZohoMailClient: External
 
 
-On Mon, 11 Aug 2025 14:56:28 +0800, Yu Kuai wrote:
-> As discussed [1], hold rcu for copying data from/to page is too heavy,
-> it's better to protect page with rcu around for page lookup and then
-> grab a reference to prevent page to be freed by discard.
-> 
-> [1] https://lore.kernel.org/all/eb41cab3-5946-4fe3-a1be-843dd6fca159@kernel.dk/
-> 
-> 
-> [...]
 
-Applied, thanks!
+> On 22 Aug 2025, at 09:14, Andreas Hindborg <a.hindborg@kernel.org> =
+wrote:
+>=20
+> Add a convenience function to convert byte slices to boolean values by
+> wrapping them in a null-terminated C string and delegating to the
+> existing `kstrtobool` function. Only considers the first two bytes of
+> the input slice, following the kernel's boolean parsing semantics.
+>=20
+> Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
+> ---
+> rust/kernel/str.rs | 35 +++++++++++++++++++++++++++++------
+> 1 file changed, 29 insertions(+), 6 deletions(-)
+>=20
+> diff --git a/rust/kernel/str.rs b/rust/kernel/str.rs
+> index d070c0bd86c3..b185262b4851 100644
+> --- a/rust/kernel/str.rs
+> +++ b/rust/kernel/str.rs
+> @@ -921,6 +921,20 @@ fn write_str(&mut self, s: &str) -> fmt::Result {
+>     }
+> }
+>=20
+> +/// # Safety
+> +///
+> +/// - `string` must point to a null terminated string that is valid =
+for read.
+> +unsafe fn kstrtobool_raw(string: *const u8) -> Result<bool> {
+> +    let mut result: bool =3D false;
+> +
+> +    // SAFETY:
+> +    // - By function safety requirement, `string` is a valid =
+null-terminated string.
+> +    // - `result` is a valid `bool` that we own.
+> +    let ret =3D unsafe { bindings::kstrtobool(string, &mut result) };
+> +
+> +    kernel::error::to_result(ret).map(|()| result)
+> +}
+> +
+> /// Convert common user inputs into boolean values using the kernel's =
+`kstrtobool` function.
+> ///
+> /// This routine returns `Ok(bool)` if the first character is one of =
+'YyTt1NnFf0', or
+> @@ -968,13 +982,22 @@ fn write_str(&mut self, s: &str) -> fmt::Result =
+{
+> /// assert_eq!(kstrtobool(c_str!("2")), Err(EINVAL));
+> /// ```
+> pub fn kstrtobool(string: &CStr) -> Result<bool> {
+> -    let mut result: bool =3D false;
+> -
+> -    // SAFETY: `string` is a valid null-terminated C string, and =
+`result` is a valid
+> -    // pointer to a bool that we own.
+> -    let ret =3D unsafe { bindings::kstrtobool(string.as_char_ptr(), =
+&mut result) };
+> +    // SAFETY:
+> +    // - The pointer returned by `CStr::as_char_ptr` is guaranteed to =
+be
+> +    //   null terminated.
+> +    // - `string` is live and thus the string is valid for read.
+> +    unsafe { kstrtobool_raw(string.as_char_ptr()) }
+> +}
+>=20
+> -    kernel::error::to_result(ret).map(|()| result)
+> +/// Convert `&[u8]` to `bool` by deferring to =
+[`kernel::str::kstrtobool`].
+> +///
+> +/// Only considers at most the first two bytes of `bytes`.
+> +pub fn kstrtobool_bytes(bytes: &[u8]) -> Result<bool> {
+> +    // `ktostrbool` only considers the first two bytes of the input.
+> +    let stack_string =3D [*bytes.first().unwrap_or(&0), =
+*bytes.get(1).unwrap_or(&0), 0];
+> +    // SAFETY: `stack_string` is null terminated and it is live on =
+the stack so
+> +    // it is valid for read.
+> +    unsafe { kstrtobool_raw(stack_string.as_ptr()) }
+> }
+>=20
+> /// An owned string that is guaranteed to have exactly one `NUL` byte, =
+which is at the end.
+>=20
+> --=20
+> 2.47.2
+>=20
+>=20
+>=20
 
-[1/1] brd: use page reference to protect page lifetime
-      commit: 2a0614522885b136e9e650791c794dd49abb5b31
-
-Best regards,
--- 
-Jens Axboe
-
-
+Reviewed-by: Daniel Almeida <daniel.almeida@collabora.com>
 
