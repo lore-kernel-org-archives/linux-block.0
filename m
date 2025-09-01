@@ -1,28 +1,28 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54E9922D7B9;
-	Mon,  1 Sep 2025 03:41:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76E61242917;
+	Mon,  1 Sep 2025 03:41:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756698082; cv=none; b=VkaNHPMiETXouOurf/GpA1d4fauY5w+k4oYvpp4tk6a1YwghsueBy9nBo/e6n6h0djL7G36MiHLESxq1bN2r1Jsz24RatJH3oLfKepEghGKEkHiq3d8pwz8RTzx5nUMpz0oyUyMxXGdoL9Cg799yZLxh+YRXiGpJH2Z8O8McCE8=
+	t=1756698083; cv=none; b=iOcZBbywlGCYn21Txrk3l4Rcs39Z7OHeZkDk3gSHCbRsT36KZst3b8axgtaDWkji4ttuBWpAav10D1S2ur2aXDBVcyjnlvmImPJijlkSu7EqZUs9vgiZaieTjqIeRCSlI99A4Mc/51sDMqtpnZHdyHreVO3NxdSXe2d3Uuy2Qdg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756698082; c=relaxed/simple;
-	bh=FXmWGb+H+rs5F5W54UcdydezHRpFhg7ownTZdKpauuE=;
+	s=arc-20240116; t=1756698083; c=relaxed/simple;
+	bh=Z6V/LgmG/FexB1shTnKIy8K9gHJHd6QaaMdS5h7cdbQ=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=LiVvUQ3atVMqCkqL3/AmjyFjkJlPtlA9wMo68FhAo0jdXOT7aQ9hyYOljrlDaiImoqLi4s6u0KO/iiOragI7QjjNz7+V6c2IxhTfL2bBNZHFSvKXtlztqpZ2LJl9ekr4zh7VBXakbpJMYC7Zzm89RaU0iuAtCm7IhwBoBdAo/34=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+	 MIME-Version; b=uh3OG8R4XIVS6U09hqWVcGIGp1Jat8QLFfiLk3T9REiglYyWJlaplH7fAZ4d1d38710sBo5k3JQX6i21K15sVDJ2+EJICUL2k+1IB6U1Uaq3hulo+0guoBl5Ldq88L6+cdD5uDqdGVXL2030uMaI7K5htMzTWsVX++1NGaSAKI0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4cFZRL2lWZzKHN5C;
-	Mon,  1 Sep 2025 11:41:18 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4cFZRP27XBzYQvPX;
+	Mon,  1 Sep 2025 11:41:21 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 304071A0F97;
-	Mon,  1 Sep 2025 11:41:18 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTP id C7F751A18FB;
+	Mon,  1 Sep 2025 11:41:19 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.104.67])
-	by APP4 (Coremail) with SMTP id gCh0CgAncIzWFbVotmf1Aw--.38057S10;
-	Mon, 01 Sep 2025 11:41:17 +0800 (CST)
+	by APP4 (Coremail) with SMTP id gCh0CgAncIzWFbVotmf1Aw--.38057S12;
+	Mon, 01 Sep 2025 11:41:19 +0800 (CST)
 From: Yu Kuai <yukuai1@huaweicloud.com>
 To: hch@infradead.org,
 	colyli@kernel.org,
@@ -47,9 +47,9 @@ Cc: linux-block@vger.kernel.org,
 	yi.zhang@huawei.com,
 	yangerkun@huawei.com,
 	johnny.chenyi@huawei.com
-Subject: [PATCH RFC v3 06/15] md/raid0: convert raid0_handle_discard() to use bio_submit_split_bioset()
-Date: Mon,  1 Sep 2025 11:32:11 +0800
-Message-Id: <20250901033220.42982-7-yukuai1@huaweicloud.com>
+Subject: [PATCH RFC v3 08/15] md/raid10: add a new r10bio flag R10BIO_Returned
+Date: Mon,  1 Sep 2025 11:32:13 +0800
+Message-Id: <20250901033220.42982-9-yukuai1@huaweicloud.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20250901033220.42982-1-yukuai1@huaweicloud.com>
 References: <20250901033220.42982-1-yukuai1@huaweicloud.com>
@@ -60,10 +60,10 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgAncIzWFbVotmf1Aw--.38057S10
-X-Coremail-Antispam: 1UD129KBjvJXoW7WFWxCF1rJr4xAF1xAFyrJFb_yoW8Wry3p3
-	9xua4aqrW8Grs0939rAa42gas5Ja4DWrWUGFZrX3yxGFy7Zr1qkw4UtryrXFy5CrySka4U
-	X3WkAasxG34DXrUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+X-CM-TRANSID:gCh0CgAncIzWFbVotmf1Aw--.38057S12
+X-Coremail-Antispam: 1UD129KBjvJXoWxJr43ZFW3Gw1rJw4fKF1DGFg_yoW8XFWxp3
+	9xWry3Z3yjka1UZr1DX3yUAasYv3ZrKrWjka4vk3yrZFy3XFZ0k3W8JayUXrWDXFWS9a47
+	XF1UtrZrGF45tFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
 	9KBjDU0xBIdaVrnRJUUUmS14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
 	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_JF0E3s1l82xGYI
 	kIc2x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2
@@ -82,54 +82,50 @@ X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
 From: Yu Kuai <yukuai3@huawei.com>
 
-Unify bio split code, and prepare to fix disordered split IO
+Prepare to unfiy the bio split code, the helper
+bio_submit_split_bioset() can failed the orginal bio on split errors.
 
-Noted commit 319ff40a5427 ("md/raid0: Fix performance regression for large
-sequential writes") already fix disordered split IO by converting bio to
-underlying disks before submit_bio_noacct(), with the respect
-md_submit_bio() already split by sectors, and raid0_make_request() will
-split at most once for unaligned IO. This is a bit hacky and we'll convert
-this to solution in general later.
+The flag name is refer to the r1bio flag name.
 
 Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 ---
- drivers/md/raid0.c | 19 ++++++-------------
- 1 file changed, 6 insertions(+), 13 deletions(-)
+ drivers/md/raid10.c | 8 +++++---
+ drivers/md/raid10.h | 2 ++
+ 2 files changed, 7 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/md/raid0.c b/drivers/md/raid0.c
-index 1ba7d0c090f7..99f7839b4e96 100644
---- a/drivers/md/raid0.c
-+++ b/drivers/md/raid0.c
-@@ -463,23 +463,16 @@ static void raid0_handle_discard(struct mddev *mddev, struct bio *bio)
- 	zone = find_zone(conf, &start);
+diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
+index 859c40a5ecf4..a775a1317635 100644
+--- a/drivers/md/raid10.c
++++ b/drivers/md/raid10.c
+@@ -322,10 +322,12 @@ static void raid_end_bio_io(struct r10bio *r10_bio)
+ 	struct bio *bio = r10_bio->master_bio;
+ 	struct r10conf *conf = r10_bio->mddev->private;
  
- 	if (bio_end_sector(bio) > zone->zone_end) {
--		struct bio *split = bio_split(bio,
--			zone->zone_end - bio->bi_iter.bi_sector, GFP_NOIO,
--			&mddev->bio_set);
--
--		if (IS_ERR(split)) {
--			bio->bi_status = errno_to_blk_status(PTR_ERR(split));
--			bio_endio(bio);
-+		bio = bio_submit_split_bioset(
-+				bio, zone->zone_end - bio->bi_iter.bi_sector,
-+				&mddev->bio_set);
-+		if (!bio)
- 			return;
--		}
- 
--		bio_chain(split, bio);
--		trace_block_split(split, bio->bi_iter.bi_sector);
--		submit_bio_noacct(bio);
--		bio = split;
- 		end = zone->zone_end;
--	} else
-+	} else {
- 		end = bio_end_sector(bio);
+-	if (!test_bit(R10BIO_Uptodate, &r10_bio->state))
+-		bio->bi_status = BLK_STS_IOERR;
++	if (!test_and_set_bit(R10BIO_Returned, &r10_bio->state)) {
++		if (!test_bit(R10BIO_Uptodate, &r10_bio->state))
++			bio->bi_status = BLK_STS_IOERR;
++		bio_endio(bio);
 +	}
  
- 	orig_end = end;
- 	if (zone != conf->strip_zone)
+-	bio_endio(bio);
+ 	/*
+ 	 * Wake up any possible resync thread that waits for the device
+ 	 * to go idle.
+diff --git a/drivers/md/raid10.h b/drivers/md/raid10.h
+index 3f16ad6904a9..da00a55f7a55 100644
+--- a/drivers/md/raid10.h
++++ b/drivers/md/raid10.h
+@@ -165,6 +165,8 @@ enum r10bio_state {
+  * so that raid10d knows what to do with them.
+  */
+ 	R10BIO_ReadError,
++/* For bio_split errors, record that bi_end_io was called. */
++	R10BIO_Returned,
+ /* If a write for this request means we can clear some
+  * known-bad-block records, we set this flag.
+  */
 -- 
 2.39.2
 
