@@ -1,155 +1,170 @@
-Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAB1A2FE06D
-	for <linux-block@vger.kernel.org>; Mon,  1 Sep 2025 08:48:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.33
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 147E430506F
+	for <linux-block@vger.kernel.org>; Mon,  1 Sep 2025 09:02:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756716525; cv=none; b=oIgc/Y8ZU4VrKgvQLaFvmniPZdJl+btQQlpE7aX4uHYHjoZfuttTXzMucWsrvhRv4wH21IjHLfStwllB1GyqwG6v78NfVNUTDe7D7msr5PchOX+PK8R1eHuv3bLoWe+H1WjPqW833vOXJZs14xDvHhN9DGA+B0URYMI6zHOxCpE=
+	t=1756717342; cv=none; b=FN6ANHnv15zmMcmr4nEp1ZK+4PnnT+CeQzMFfY8tmTYs6I59+aAjz7dtu4y6yl0z1EqEMy86s9YuOc+VXGPdvMV/tts+E88qhQYWsc0Y7z6/GXnr5VaQcYTUoU6H9caeG6X7seCDYQe7pvl3p0fs1X/teETdspFtTxbF0LyL86M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756716525; c=relaxed/simple;
-	bh=nDUefRFJgIpCXOdGPm4VWR5UXiX2SJ345ziR0YrDGco=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type:
-	 References; b=ZWUy2hveFUTyV3bwAtErrDDZQGhVj9bkXBgAppx2MpqjmGrR0W8Jj4AXGlcLtUwUW15VHuM0LG4CMeh3rrT6ATWuf0jSK5rFdT6JjoIlM2C+33q5+89qh2Sk9pgbWaQkwZaLRb5mNifi7cl0SarxDT3yCOS44HVgtw2Jjq5kUf0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=hp1JZNn+; arc=none smtp.client-ip=203.254.224.33
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	s=arc-20240116; t=1756717342; c=relaxed/simple;
+	bh=/I7E2fk1T0Aqgi6iRHMY63UidkJpRR/LHgnlOMO4SIk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=h24Z9IEqFuM09c07on1OR3k8RAuqWxwpfkPZnUsu2rFZFDex5U8UL5KDDthKKICaJXW0uzKXYUm1cibBcozmNFkP8wnaFuhatSMc1s0jzlDJAy7gKjASq7bKVPiyhryfXSdRi0KMpQMcdkiU8ClfxUgCQwpXRaqRRVxoEP+FinA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=kEqJM6ny; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=5FxxqrJO; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=kEqJM6ny; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=5FxxqrJO; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="hp1JZNn+"
-Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
-	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20250901084840epoutp03fbb5e8055a74de6bc5ebce44161ccbc3~hHF4unvF_1033110331epoutp03c
-	for <linux-block@vger.kernel.org>; Mon,  1 Sep 2025 08:48:40 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20250901084840epoutp03fbb5e8055a74de6bc5ebce44161ccbc3~hHF4unvF_1033110331epoutp03c
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1756716520;
-	bh=TilKFeQT9M5SnZybeAtnZNeeolgMBtWZzteXq1psp+o=;
-	h=From:To:Cc:Subject:Date:References:From;
-	b=hp1JZNn+dw/uLyc4j9Mtoi5PG4KX+iStZfEH7y1WFTDrZB5teeBZZg9GwhUjKZDy+
-	 H+yGxgv2ODMHiaIp7/DEXIsZlKLVVpnFVoFZdbvIy96nqZFTcdU54JfJJ+2k+DpvUp
-	 GtIj0SwcXn3Y6q2u8ZxPeQf+NJZkW2u+UZElMp2s=
-Received: from epsnrtp01.localdomain (unknown [182.195.42.153]) by
-	epcas5p1.samsung.com (KnoxPortal) with ESMTPS id
-	20250901084839epcas5p1239b37f833a889b63e910e56acdca31c~hHF4P0y9T2477024770epcas5p1M;
-	Mon,  1 Sep 2025 08:48:39 +0000 (GMT)
-Received: from epcas5p4.samsung.com (unknown [182.195.38.91]) by
-	epsnrtp01.localdomain (Postfix) with ESMTP id 4cFjFy6gxmz6B9m5; Mon,  1 Sep
-	2025 08:48:38 +0000 (GMT)
-Received: from epsmtip2.samsung.com (unknown [182.195.34.31]) by
-	epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
-	20250901082648epcas5p18f81021213f2b8a050efa25f76e0fb54~hGyynP-sM1629316293epcas5p1p;
-	Mon,  1 Sep 2025 08:26:48 +0000 (GMT)
-Received: from node122.. (unknown [109.105.118.122]) by epsmtip2.samsung.com
-	(KnoxPortal) with ESMTPA id
-	20250901082647epsmtip2c335fdfb4a62178c61f72598f98cc029~hGyx9B0R-0905609056epsmtip2P;
-	Mon,  1 Sep 2025 08:26:47 +0000 (GMT)
-From: Xue He <xue01.he@samsung.com>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, hexue
-	<xue01.he@samsung.com>
-Subject: [PATCH] block: plug attempts to batch allocate tags multiple times
-Date: Mon,  1 Sep 2025 08:22:09 +0000
-Message-Id: <20250901082209.13349-1-xue01.he@samsung.com>
-X-Mailer: git-send-email 2.34.1
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="kEqJM6ny";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="5FxxqrJO";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="kEqJM6ny";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="5FxxqrJO"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 3047C1F388;
+	Mon,  1 Sep 2025 09:02:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1756717336; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5NNItQtiBSkxwIsvVF62gD4BFcFmFvPJ0ltQD6wGBjM=;
+	b=kEqJM6nywEAUgYQb4LPOCS9x9CjMVjfT2pnsMCSV9DTx/jgNqP8IZLV2t+plzC1sP9wMaL
+	GOhKuDM0yWqpfeHp0cfONI9h9TLcBAWteTn9V0Or7jy/w+iMKKO2kGC6yzLNhG0hF6mwka
+	bdi0JTTtuJOsZkiBNVwarHRzIqGBH18=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1756717336;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5NNItQtiBSkxwIsvVF62gD4BFcFmFvPJ0ltQD6wGBjM=;
+	b=5FxxqrJOXYxi7cIuJhJkfSbGklr2EzNlJDQByDz2Au4l+Js2PvkmKMv5kolMeUygTW4FHp
+	T+tOdYG8QsLfJEDA==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1756717336; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5NNItQtiBSkxwIsvVF62gD4BFcFmFvPJ0ltQD6wGBjM=;
+	b=kEqJM6nywEAUgYQb4LPOCS9x9CjMVjfT2pnsMCSV9DTx/jgNqP8IZLV2t+plzC1sP9wMaL
+	GOhKuDM0yWqpfeHp0cfONI9h9TLcBAWteTn9V0Or7jy/w+iMKKO2kGC6yzLNhG0hF6mwka
+	bdi0JTTtuJOsZkiBNVwarHRzIqGBH18=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1756717336;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5NNItQtiBSkxwIsvVF62gD4BFcFmFvPJ0ltQD6wGBjM=;
+	b=5FxxqrJOXYxi7cIuJhJkfSbGklr2EzNlJDQByDz2Au4l+Js2PvkmKMv5kolMeUygTW4FHp
+	T+tOdYG8QsLfJEDA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 200681378C;
+	Mon,  1 Sep 2025 09:02:16 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id ZJoTBxhhtWgnZgAAD6G6ig
+	(envelope-from <dwagner@suse.de>); Mon, 01 Sep 2025 09:02:16 +0000
+Date: Mon, 1 Sep 2025 11:02:15 +0200
+From: Daniel Wagner <dwagner@suse.de>
+To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, 
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>, "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>, 
+	"nbd@other.debian.org" <nbd@other.debian.org>, "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
+Subject: Re: blktests failures with v6.17-rc1 kernel
+Message-ID: <7a773833-a193-4243-80f4-fc52243883a9@flourine.local>
+References: <suhzith2uj75uiprq4m3cglvr7qwm3d7gi4tmjeohlxl6fcmv3@zu6zym6nmvun>
+ <ff748a3f-9f07-4933-b4b3-b4f58aacac5b@flourine.local>
+ <rsdinhafrtlguauhesmrrzkybpnvwantwmyfq2ih5aregghax5@mhr7v3eryci3>
+ <6ef89cb5-1745-4b98-9203-51ba6de40799@flourine.local>
+ <u4ttvhnn7lark5w3sgrbuy2rxupcvosp4qmvj46nwzgeo5ausc@uyrkdls2muwx>
+ <629ddb72-c10d-4930-9d81-61d7322ed3b0@flourine.local>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CMS-MailID: 20250901082648epcas5p18f81021213f2b8a050efa25f76e0fb54
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-cpgsPolicy: CPGSC10-505,Y
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20250901082648epcas5p18f81021213f2b8a050efa25f76e0fb54
-References: <CGME20250901082648epcas5p18f81021213f2b8a050efa25f76e0fb54@epcas5p1.samsung.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <629ddb72-c10d-4930-9d81-61d7322ed3b0@flourine.local>
+X-Spamd-Result: default: False [-4.30 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-0.999];
+	MIME_GOOD(-0.10)[text/plain];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo]
+X-Spam-Flag: NO
+X-Spam-Level: 
+X-Spam-Score: -4.30
 
-From: hexue <xue01.he@samsung.com>
+On Mon, Sep 01, 2025 at 10:34:23AM +0200, Daniel Wagner wrote:
+> The test is removing the ports while the host driver is about to
+> reconnect and accesses a stale pointer.
+> 
+> nvme_fc_create_association is calling nvme_fc_ctlr_inactive_on_rport in
+> the error path. The problem is that nvme_fc_create_association gets half
+> through the setup and then fails. In the cleanup path
+> 
+> 	dev_warn(ctrl->ctrl.device,
+> 		"NVME-FC{%d}: create_assoc failed, assoc_id %llx ret %d\n",
+> 		ctrl->cnum, ctrl->association_id, ret);
+> 
+> is issued and then nvme_fc_ctlr_inactive_on_rport is called. And there
+> is the log message above, so it's clear the error path is taken.
+> 
+> But the thing is fcloop is not supposed to remove the ports when the
+> host driver is still using it. So there is a race window where it's
+> possible to enter nvme_fc_create_assocation and fcloop removing the
+> ports.
+> 
+> So between nvme_fc_create_assocation and nvme_fc_ctlr_active_on_rport.
 
-In the existing plug mechanism, tags are allocated in batches based on
-the number of requests. However, testing has shown that the plug only
-attempts batch allocation of tags once at the beginning of a batch of
-I/O operations. Since the tag_mask does not always have enough available
-tags to satisfy the requested number, a full batch allocation is not
-guaranteed to succeed each time. The remaining tags are then allocated
-individually (occurs frequently), leading to multiple single-tag
-allocation overheads.
+I think the problem is that nvme_fc_create_association is not holding
+the rport locks when checking the port_state and marking the rport
+active. This races with nvme_fc_unregister_remoteport.
 
-This patch aims to allow the remaining I/O operations to retry batch
-allocation of tags, reducing the overhead caused by multiple
-individual tag allocations.
+diff --git a/drivers/nvme/host/fc.c b/drivers/nvme/host/fc.c
+index 3e12d4683ac7..03987f497a5b 100644
+--- a/drivers/nvme/host/fc.c
++++ b/drivers/nvme/host/fc.c
+@@ -3032,11 +3032,17 @@ nvme_fc_create_association(struct nvme_fc_ctrl *ctrl)
 
-------------------------------------------------------------------------
-test result
-During testing of the PCIe Gen4 SSD Samsung PM9A3, the perf tool
-observed CPU improvements. The CPU usage of the original function
-_blk_mq_alloc_requests function was 1.39%, which decreased to 0.82%
-after modification.
+ 	++ctrl->ctrl.nr_reconnects;
 
-Additionally, performance variations were observed on different devices.
-workload:randread
-blocksize:4k
-thread:1
-------------------------------------------------------------------------
-                  PCIe Gen3 SSD   PCIe Gen4 SSD    PCIe Gen5 SSD
-native kernel     553k iops       633k iops        793k iops
-modified          553k iops       635k iops        801k iops
+-	if (ctrl->rport->remoteport.port_state != FC_OBJSTATE_ONLINE)
++	spin_lock_irqsave(&ctrl->rport->lock, flags);
++	if (ctrl->rport->remoteport.port_state != FC_OBJSTATE_ONLINE) {
++		spin_unlock_irqrestore(&ctrl->rport->lock, flags);
+ 		return -ENODEV;
++	}
 
-with Optane SSDs, the performance like
-two device one thread
-cmd :sudo taskset -c 0 ./t/io_uring -b512 -d128 -c32 -s32 -p1 -F1 -B1
--n1 -r4 /dev/nvme0n1 /dev/nvme1n1
+-	if (nvme_fc_ctlr_active_on_rport(ctrl))
++	if (nvme_fc_ctlr_active_on_rport(ctrl)) {
++		spin_unlock_irqrestore(&ctrl->rport->lock, flags);
+ 		return -ENOTUNIQ;
++	}
++	spin_unlock_irqrestore(&ctrl->rport->lock, flags);
 
-base: 6.4 Million IOPS
-patch: 6.49 Million IOPS
+ 	dev_info(ctrl->ctrl.device,
+ 		"NVME-FC{%d}: create association : host wwpn 0x%016llx "
 
-two device two thread
-cmd: sudo taskset -c 0 ./t/io_uring -b512 -d128 -c32 -s32 -p1 -F1 -B1
--n1 -r4 /dev/nvme0n1 /dev/nvme1n1
-
-base: 7.34 Million IOPS
-patch: 7.48 Million IOPS
--------------------------------------------------------------------------
-
-Signed-off-by: hexue <xue01.he@samsung.com>
----
- block/blk-mq.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index b67d6c02eceb..1fb280764b76 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -587,9 +587,9 @@ static struct request *blk_mq_rq_cache_fill(struct request_queue *q,
- 	if (blk_queue_enter(q, flags))
- 		return NULL;
- 
--	plug->nr_ios = 1;
--
- 	rq = __blk_mq_alloc_requests(&data);
-+	plug->nr_ios = data.nr_tags;
-+
- 	if (unlikely(!rq))
- 		blk_queue_exit(q);
- 	return rq;
-@@ -3034,11 +3034,13 @@ static struct request *blk_mq_get_new_requests(struct request_queue *q,
- 
- 	if (plug) {
- 		data.nr_tags = plug->nr_ios;
--		plug->nr_ios = 1;
- 		data.cached_rqs = &plug->cached_rqs;
- 	}
- 
- 	rq = __blk_mq_alloc_requests(&data);
-+	if (plug)
-+		plug->nr_ios = data.nr_tags;
-+
- 	if (unlikely(!rq))
- 		rq_qos_cleanup(q, bio);
- 	return rq;
--- 
-2.34.1
-
+I'll to reproduce it and see if this patch does make a difference.
