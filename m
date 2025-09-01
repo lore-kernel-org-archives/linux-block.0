@@ -1,171 +1,278 @@
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D66222FB60F
-	for <linux-block@vger.kernel.org>; Mon,  1 Sep 2025 08:36:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B45A2FB62E
+	for <linux-block@vger.kernel.org>; Mon,  1 Sep 2025 08:45:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756715783; cv=none; b=seN4/mesfbbVpyGivuI4njqlhr95z5X1Di8sXeBmKYjvH5mQdJnDiOa5SERxFWscN1h/6A2UM5GC6eohSSQvZKqXPzauityQaIgYymdbaBLoworz1Bzc04cCxfgNKDIrnz04APoaui7JYb15/6v84ztQDsy5T82k0Z+QDn8NX04=
+	t=1756716310; cv=none; b=c7skFusmco4N+08ljmc8wIWrdsJKVv9JLIdaFmMOxySCZsItbKJJ7jUmRxRj2N1d+I9Kq05vAgwJ3DWcVQC7xYM6YzQdIa4NbaOmzmycwM0r24vmAZYEz5XeXRmereAFn50Ovhx4trvI4SPeczEit3HOo4yTae6Zcum0SNq9SaE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756715783; c=relaxed/simple;
-	bh=yGTmQwopt1HdGhxa/Ad97/8uXXqeHBaz5YtUtcqQjCU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tzw8XtrKJ5psdrH6t7PaCYbBbWgJxcpSCK9w/GjEWB7unLzuf9TCx9mcSo89RGn/KGf/4KDLJi4YS1vqaEsZ0YIwRdh4ct8J2LPHojvQT4m1gS5hpD/iAKPfCuIt3EOe8wnCDPCTbVvnWK6IwPYUSOzMYp/hoDerF8+d5JgwU3E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hwwSNaT8; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1756716310; c=relaxed/simple;
+	bh=AhlvBVxDwZhYCV6Gj7StDOKIz3Ja9P9Dxs64SVFXK1w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nBis0sWNgKfFx/JaoZvNaf4aVsycGsJD3QUcuBXouMtcfpygQuryCqiTImSZwJ7vCARNygBTSrDm8APQsJx/1lEw/+/D37CD+SSIDBemQ4YNwgfjfMJEB0MWOhR2Ox/syYYK07EprxbwIFWS25YAFmHaXmJXOTOSMJuuO+QClL4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=jBTY4D2k; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hwwSNaT8"
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-45b8b02dd14so4928345e9.1
-        for <linux-block@vger.kernel.org>; Mon, 01 Sep 2025 01:36:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756715780; x=1757320580; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hHm6+8TqjeCNqsd1vb4l6ddQt0tZxWa+70awNp7aNXU=;
-        b=hwwSNaT8/VngiRY0kRUEfhE5Ec/h0JztgogCAdECtVxHn4/yW5Xeua8HuAFpb/RqRZ
-         1BS2VREhDJD+kqo8MyH66od2R9XNSShfdmV50W5wdB8sCBHUd8DqZ0Na2CEqHodbdWxJ
-         CSgC/PODdxpIndyQ1ybQi5M5T/xphNuk3hg5VGwLZjbwRIHQUH6ATL9XYDKkEmvAneW9
-         0RAV6RCUG/NSrFfzEpCwD8Gzyec+03LzhwF0OP7kxk1basGkMqeyj1z8A7gzF+1AHZlF
-         t4j9L3eYw5wQxMASsHGX0xDUJOfsl0pC1Bm/oegYei3H5Iepx2gTzLRUT8pEjV2ckfdx
-         f+2g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756715780; x=1757320580;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hHm6+8TqjeCNqsd1vb4l6ddQt0tZxWa+70awNp7aNXU=;
-        b=SypALLVb536LjI/J8F5uqiIkqIiLgJhSdH3m8X+cJ83RJ9FjhbutUpBpb0d0waQeV/
-         TnsmL6uZFKQ9mJOS559Y87NuBDyVQE/V6CFyCio/frge1tm2uBMscfS/plb31RAFP8Ll
-         5tK6SDQTYfIQfFSGnG9x27U4ipwA726zh8tBcJUHQcWzPUh1v/Du56jK5yWGPIXfBpox
-         JLr65OEAZW+qGuKGGLIRW7xopL+mqljMCWRbNJlCkfW4uTg6fPrAfVmz0Id5VWNxFr39
-         o1xdiHVfo/wUsyGUykFiqGM1BROFfr3KtVNG7FSHVaHKBz6gdHSOKUyxfTi08PI626+E
-         Jtwg==
-X-Forwarded-Encrypted: i=1; AJvYcCUVHF8SnwBliRemIS2IyEMLRuJK3l/KzGZwuIkpIYeTQflFDuVL/znm6MhENm1zoq5jzs2OG4tKg5jr3g==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz36AM2YjsMQG6bu71ZfkgHgAolRdSfWypFcwY7JxARrroGmbRv
-	hWlVODOeeNt8S8CMQD27Pth1SWtkkWZNUTk1RkeefXDKcRwTJnzzTqYm/z9JYOdgY+sVhG1DioK
-	hmeeA2sJROtgaLkeDzIPSAPwtsOK4IOShmWEIrvp3
-X-Gm-Gg: ASbGncv4ifG5jPjINjHhGRTKNpOelxPW/oXO7Tn+5BEV3b5qctF1pIlqJ3Htu71WZGE
-	F05JBIZsp4CEwEqzK3cm25WvAxx2wTV/8QOkF0/qIGaV7uxmKVLMajwiTyXXID4dVBNnw9YGu1O
-	/jBf8RSomnexOQdVWDmBl3Ga5RTWhsy/t10fE/jmiaFtRXhCDGS+WKVraI5RHYR3WkHqsD6VKaA
-	HIBYqFDnGDL2rGhs2agNWU4g9GlSWgEmri0zrXHs2rCVYOZ7sLspl+8Td3mbtXE/hOg676h8XLs
-	Ibn6qFMS1+0=
-X-Google-Smtp-Source: AGHT+IFOyZ/K9inIYcfsBcdFd2sn+axEaovrgR1WQbNKlDCM7EkUFX8hdWD8GiWTp7Mb8lsTdSYIgKbtCsVTIIXZFIE=
-X-Received: by 2002:a05:600c:8b42:b0:45b:79fd:cb3d with SMTP id
- 5b1f17b1804b1-45b8558b522mr50268455e9.36.1756715779928; Mon, 01 Sep 2025
- 01:36:19 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jBTY4D2k"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1756716307;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/uvxiJPSJQkMyA7rnxksrv/oRovVQH2ELYUFsb6+os4=;
+	b=jBTY4D2krb6ri8LQ+Ri+XPkKGNz1diE0HHUrvnHtPfW6I4Q061lgRvwPSVtrZo0cllHg1B
+	tCYETyiqMU92IhxUnSlctsELinKvpBKJMlYLz8OJbqT7Muj06Neyh0xh8OZ8xMLYwCZmOC
+	tBNhOkvZgbwNCTg0/tp3XCg74Xr+Zt4=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-632-CYjqnNLCP7CpS6bD0yCp1A-1; Mon,
+ 01 Sep 2025 04:45:05 -0400
+X-MC-Unique: CYjqnNLCP7CpS6bD0yCp1A-1
+X-Mimecast-MFC-AGG-ID: CYjqnNLCP7CpS6bD0yCp1A_1756716304
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 99F9D195E90A;
+	Mon,  1 Sep 2025 08:45:04 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.133])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DEDBE1955EA4;
+	Mon,  1 Sep 2025 08:45:00 +0000 (UTC)
+Date: Mon, 1 Sep 2025 16:44:55 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Caleb Sander Mateos <csander@purestorage.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Uday Shankar <ushankar@purestorage.com>,
+	Keith Busch <kbusch@kernel.org>
+Subject: Re: [PATCH V2 1/2] ublk: avoid ublk_io_release() called after ublk
+ char dev is closed
+Message-ID: <aLVdB4q_Bk5Ypzcr@fedora>
+References: <20250825124827.2391820-1-ming.lei@redhat.com>
+ <20250825124827.2391820-2-ming.lei@redhat.com>
+ <CADUfDZp1-Tg+Gp+9kaudFNYyz3mLjNn+v=H3wKLEoKDftcX1wg@mail.gmail.com>
+ <aK1xLM9TLUBxEmmC@fedora>
+ <CADUfDZqJ8PN8FT50gg0grJ+Kj+gOaosRctS_dimWAaRC-myfRw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250822-rnull-up-v6-16-v6-0-ec65006e2f07@kernel.org>
- <20250822-rnull-up-v6-16-v6-6-ec65006e2f07@kernel.org> <60D09FDF-D1EB-46A0-8F76-13F98BE9C518@collabora.com>
-In-Reply-To: <60D09FDF-D1EB-46A0-8F76-13F98BE9C518@collabora.com>
-From: Alice Ryhl <aliceryhl@google.com>
-Date: Mon, 1 Sep 2025 10:36:07 +0200
-X-Gm-Features: Ac12FXwspuKkks0jeuxbZRG0FFiSi8FCXOsFN9qbGxckrqaGTXEv6cLZ9MWyrFc
-Message-ID: <CAH5fLgiEi4gZtb6qProd0tXBHU-ZEs2CKCduO25w9V4ZGqgF4g@mail.gmail.com>
-Subject: Re: [PATCH v6 06/18] rust: str: add `bytes_to_bool` helper function
-To: Daniel Almeida <daniel.almeida@collabora.com>
-Cc: Andreas Hindborg <a.hindborg@kernel.org>, Boqun Feng <boqun.feng@gmail.com>, 
-	Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>, 
-	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <lossin@kernel.org>, Trevor Gross <tmgross@umich.edu>, 
-	Danilo Krummrich <dakr@kernel.org>, Jens Axboe <axboe@kernel.dk>, Breno Leitao <leitao@debian.org>, 
-	linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CADUfDZqJ8PN8FT50gg0grJ+Kj+gOaosRctS_dimWAaRC-myfRw@mail.gmail.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On Wed, Aug 27, 2025 at 3:46=E2=80=AFPM Daniel Almeida
-<daniel.almeida@collabora.com> wrote:
->
->
->
-> > On 22 Aug 2025, at 09:14, Andreas Hindborg <a.hindborg@kernel.org> wrot=
-e:
+On Fri, Aug 29, 2025 at 08:37:28AM -0700, Caleb Sander Mateos wrote:
+> On Tue, Aug 26, 2025 at 1:33 AM Ming Lei <ming.lei@redhat.com> wrote:
 > >
-> > Add a convenience function to convert byte slices to boolean values by
-> > wrapping them in a null-terminated C string and delegating to the
-> > existing `kstrtobool` function. Only considers the first two bytes of
-> > the input slice, following the kernel's boolean parsing semantics.
+> > On Mon, Aug 25, 2025 at 10:49:49PM -0700, Caleb Sander Mateos wrote:
+> > > On Mon, Aug 25, 2025 at 5:49 AM Ming Lei <ming.lei@redhat.com> wrote:
+> > > >
+> > > > When running test_stress_04.sh, the following warning is triggered:
+> > > >
+> > > > WARNING: CPU: 1 PID: 135 at drivers/block/ublk_drv.c:1933 ublk_ch_release+0x423/0x4b0 [ublk_drv]
+> > > >
+> > > > This happens when the daemon is abruptly killed:
+> > > >
+> > > > - some references may still be held, because registering IO buffer
+> > > > doesn't grab ublk char device reference
+> > >
+> > > Ah, good observation. That's definitely a problem.
+> > >
+> > > >
+> > > > OR
+> > > >
+> > > > - io->task_registered_buffers won't be cleared because io buffer is
+> > > > released from non-daemon context
+> > >
+> > > I don't think the task_registered_buffers optimization is really
+> > > involved here; that's just a different way of tracking the reference
+> > > count. Regardless of what task the buffer is registered or
+> > > unregistered on, the buffer still counts as 1 reference on the
+> > > ublk_io. Summing up the reference counts and making sure they are both
+> > > reset to 0 seems like a good approach to me.
 > >
-> > Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
-> > ---
-> > rust/kernel/str.rs | 35 +++++++++++++++++++++++++++++------
-> > 1 file changed, 29 insertions(+), 6 deletions(-)
+> > The warning in ublk_queue_reinit() is triggered because
 > >
-> > diff --git a/rust/kernel/str.rs b/rust/kernel/str.rs
-> > index d070c0bd86c3..b185262b4851 100644
-> > --- a/rust/kernel/str.rs
-> > +++ b/rust/kernel/str.rs
-> > @@ -921,6 +921,20 @@ fn write_str(&mut self, s: &str) -> fmt::Result {
-> >     }
-> > }
+> > - the reference is not dropped
 > >
-> > +/// # Safety
-> > +///
-> > +/// - `string` must point to a null terminated string that is valid fo=
-r read.
-> > +unsafe fn kstrtobool_raw(string: *const u8) -> Result<bool> {
-> > +    let mut result: bool =3D false;
-> > +
-> > +    // SAFETY:
-> > +    // - By function safety requirement, `string` is a valid null-term=
-inated string.
-> > +    // - `result` is a valid `bool` that we own.
-> > +    let ret =3D unsafe { bindings::kstrtobool(string, &mut result) };
-> > +
-> > +    kernel::error::to_result(ret).map(|()| result)
-> > +}
-> > +
-> > /// Convert common user inputs into boolean values using the kernel's `=
-kstrtobool` function.
-> > ///
-> > /// This routine returns `Ok(bool)` if the first character is one of 'Y=
-yTt1NnFf0', or
-> > @@ -968,13 +982,22 @@ fn write_str(&mut self, s: &str) -> fmt::Result {
-> > /// assert_eq!(kstrtobool(c_str!("2")), Err(EINVAL));
-> > /// ```
-> > pub fn kstrtobool(string: &CStr) -> Result<bool> {
-> > -    let mut result: bool =3D false;
-> > -
-> > -    // SAFETY: `string` is a valid null-terminated C string, and `resu=
-lt` is a valid
-> > -    // pointer to a bool that we own.
-> > -    let ret =3D unsafe { bindings::kstrtobool(string.as_char_ptr(), &m=
-ut result) };
-> > +    // SAFETY:
-> > +    // - The pointer returned by `CStr::as_char_ptr` is guaranteed to =
-be
-> > +    //   null terminated.
-> > +    // - `string` is live and thus the string is valid for read.
-> > +    unsafe { kstrtobool_raw(string.as_char_ptr()) }
-> > +}
+> > OR
 > >
-> > -    kernel::error::to_result(ret).map(|()| result)
-> > +/// Convert `&[u8]` to `bool` by deferring to [`kernel::str::kstrtoboo=
-l`].
-> > +///
-> > +/// Only considers at most the first two bytes of `bytes`.
-> > +pub fn kstrtobool_bytes(bytes: &[u8]) -> Result<bool> {
-> > +    // `ktostrbool` only considers the first two bytes of the input.
-> > +    let stack_string =3D [*bytes.first().unwrap_or(&0), *bytes.get(1).=
-unwrap_or(&0), 0];
->
-> Can=E2=80=99t this be CStr::from_bytes_with_nul() ?
->
-> This means that kstrtobool_raw could take a &CStr directly and thus not b=
-e unsafe IIUC?
+> > - the io buf unregister is done from another task context(kernel wq), so
+> > both io->ref and io->task_registered_buffers are not zero, which is started
+> > from task_registered_buffers optimization
+> 
+> Right, but I would consider that to be an outstanding reference. I
+> think we're on the same page.
+> 
+> >
+> > >
+> > > >
+> > > > For zero-copy and auto buffer register modes, I/O reference crosses
+> > > > syscalls, so IO reference may not be dropped naturally when ublk server is
+> > > > killed abruptly. However, when releasing io_uring context, it is guaranteed
+> > > > that the reference is dropped finally, see io_sqe_buffers_unregister() from
+> > > > io_ring_ctx_free().
+> > > >
+> > > > Fix this by adding ublk_drain_io_references() that:
+> > > > - Waits for active I/O references dropped in async way by scheduling
+> > > >   work function, for avoiding ublk dev and io_uring file's release
+> > > >   dependency
+> > > > - Reinitializes io->ref and io->task_registered_buffers to clean state
+> > > >
+> > > > This ensures the reference count state is clean when ublk_queue_reinit()
+> > > > is called, preventing the warning and potential use-after-free.
+> > >
+> > > One scenario I worry about is if the ublk server has already issued
+> > > UBLK_IO_COMMIT_AND_FETCH_REQ for an I/O but is killed while it still
+> > > has registered buffer(s). It's possible the ublk server hasn't
+> > > finished performing I/O to/from the registered buffers and so the I/O
+> > > isn't really complete yet. But when io_uring automatically releases
+> > > the registered buffers, the reference count will hit 0 and the ublk
+> > > I/O will be completed successfully. There seems to be some data
+> > > corruption risk in this scenario.
+> >
+> > The final io buffer unregister is from freeing io_uring conext in
+> > io_uring_release(), any user of this uring context has been done,
+> > so it isn't possible that ublk server is performing io with the
+> > un-registered buffer.
+> 
+> Well, the ublk server could have been killed before it could submit an
+> I/O using the registered buffer. But it's an existing concern,
+> certainly not introduced by your patch. I think you can make a
+> reasonable argument that a ublk server shouldn't submit a
+> UBLK_IO_COMMIT_AND_FETCH_REQ until it knows the I/O completed
+> successfully or with an error, otherwise it won't be able to change
+> the result code if the I/O using the registered buffer unexpectedly
+> fails.
 
-That's what Andreas did in the previous version. It ended up being
-pretty complex because CStr::from_bytes_with_nul() requires that we
-compute the length of `stack_string`, which isn't really needed here.
-I recommended having a _raw method like this to avoid that complexity.
-I don't think this is meaningfully more unsafe the way it is in this
-patch.
+Yes, it was one trouble because ublk server can do whatever.
 
-Alice
+However, since your task_registered_buffers optimization, ublk request
+won't be completed from freeing uring_ctx context any more, and it is always
+aborted from ublk_abort_queue(), so it is failed in case of killed ublk
+server.
+
+The situation can be improved by failing request explicitly by setting io->res
+as -EIO, then -EIO can be taken first in case of killed ublk server.
+
+> 
+> >
+> > > But maybe it doesn't make sense for
+> > > a ublk server to issue UBLK_IO_COMMIT_AND_FETCH_REQ with a result code
+> > > before knowing whether the zero-copy I/Os succeeded?
+> > >
+> > > >
+> > > > Fixes: 1f6540e2aabb ("ublk: zc register/unregister bvec")
+> > > > Fixes: 1ceeedb59749 ("ublk: optimize UBLK_IO_UNREGISTER_IO_BUF on daemon task")
+> > > > Fixes: 8a8fe42d765b ("ublk: optimize UBLK_IO_REGISTER_IO_BUF on daemon task")
+> > > > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > > > ---
+> > > >  drivers/block/ublk_drv.c | 94 +++++++++++++++++++++++++++++++++++++++-
+> > > >  1 file changed, 92 insertions(+), 2 deletions(-)
+> > > >
+> > > > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> > > > index 99abd67b708b..f608c7efdc05 100644
+> > > > --- a/drivers/block/ublk_drv.c
+> > > > +++ b/drivers/block/ublk_drv.c
+> > > > @@ -239,6 +239,7 @@ struct ublk_device {
+> > > >         struct mutex cancel_mutex;
+> > > >         bool canceling;
+> > > >         pid_t   ublksrv_tgid;
+> > > > +       struct delayed_work     exit_work;
+> > > >  };
+> > > >
+> > > >  /* header of ublk_params */
+> > > > @@ -1595,12 +1596,84 @@ static void ublk_set_canceling(struct ublk_device *ub, bool canceling)
+> > > >                 ublk_get_queue(ub, i)->canceling = canceling;
+> > > >  }
+> > > >
+> > > > -static int ublk_ch_release(struct inode *inode, struct file *filp)
+> > > > +static void ublk_reset_io_ref(struct ublk_device *ub)
+> > > >  {
+> > > > -       struct ublk_device *ub = filp->private_data;
+> > > > +       int i, j;
+> > > > +
+> > > > +       if (!(ub->dev_info.flags & (UBLK_F_SUPPORT_ZERO_COPY |
+> > > > +                                       UBLK_F_AUTO_BUF_REG)))
+> > > > +               return;
+> > > > +
+> > > > +       for (i = 0; i < ub->dev_info.nr_hw_queues; i++) {
+> > > > +               struct ublk_queue *ubq = ublk_get_queue(ub, i);
+> > > > +
+> > > > +               for (j = 0; j < ubq->q_depth; j++) {
+> > > > +                       struct ublk_io *io = &ubq->ios[j];
+> > > > +                       /*
+> > > > +                        * Reinitialize reference counting fields after
+> > > > +                        * draining. This ensures clean state for queue
+> > > > +                        * reinitialization.
+> > > > +                        */
+> > > > +                       refcount_set(&io->ref, 0);
+> > > > +                       io->task_registered_buffers = 0;
+> > > > +               }
+> > > > +       }
+> > > > +}
+> > > > +
+> > > > +static bool ublk_has_io_with_active_ref(struct ublk_device *ub)
+> > > > +{
+> > > > +       int i, j;
+> > > > +
+> > > > +       if (!(ub->dev_info.flags & (UBLK_F_SUPPORT_ZERO_COPY |
+> > > > +                                       UBLK_F_AUTO_BUF_REG)))
+> > > > +               return false;
+> > > > +
+> > > > +       for (i = 0; i < ub->dev_info.nr_hw_queues; i++) {
+> > > > +               struct ublk_queue *ubq = ublk_get_queue(ub, i);
+> > > > +
+> > > > +               for (j = 0; j < ubq->q_depth; j++) {
+> > > > +                       struct ublk_io *io = &ubq->ios[j];
+> > > > +                       unsigned int refs = refcount_read(&io->ref) +
+> > > > +                               io->task_registered_buffers;
+> > > > +
+> > > > +                       /*
+> > > > +                        * UBLK_REFCOUNT_INIT or zero means no active
+> > > > +                        * reference
+> > > > +                        */
+> > > > +                       if (refs != UBLK_REFCOUNT_INIT && refs != 0)
+> > > > +                               return true;
+> > >
+> > > It's technically possible to hit refs == UBLK_REFCOUNT_INIT by having
+> > > UBLK_REFCOUNT_INIT active references. It would be safer to check
+> > > UBLK_IO_FLAG_OWNED_BY_SRV: if the flag is set, the reference count
+> > > needs to reach UBLK_REFCOUNT_INIT; if the flag is unset, the reference
+> > > count needs to reach 0.
+> >
+> > It is actually one invariant that the two's sum is zero or UBLK_REFCOUNT_INIT
+> > any time if the io buffer isn't registered, so it is enough and
+> > simpler.
+> 
+> I think it's theoretically possible to make the reference count
+> arbitrarily high with ublk registered buffers, which can cause it to
+> actually have UBLK_REFCOUNT_INIT references (not because all
+> references are released) or the reference count to overflow back to 0.
+> One way to do this would be to register the same I/O's buffer in many
+> slots of many io_urings at the same time.
+
+The reference is initialized as UBLK_REFCOUNT_INIT, the only way for
+triggering it is to make the counter overflow first.
+
+
+> Another possibility would be
+> to repeatedly register the buffer, use it in an I/O that never
+> completes (e.g. recv from an empty socket), and then unregister the
+> buffer. But this reference count overflow issue is an existing issue,
+> not introduced by the patch.
+
+Yes, overflow can be detected & warned by refcount checking, also it is only
+allowed for privileged user, so looks this way is just fine.
+
+
+Thanks, 
+Ming
+
