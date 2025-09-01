@@ -1,83 +1,95 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE5071C84A2;
-	Mon,  1 Sep 2025 06:05:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3914F203706;
+	Mon,  1 Sep 2025 06:23:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756706717; cv=none; b=NS8GUJSo6Td4WX7jpOaq2mRB9Bwf8azD6nIpfHiHIVOdV34NjujS9eyN7hrqSbUkyn5ZSZ07oT67aqgVljsum5Z0tFfVfss0J9YXOZMBob5om1l2VYDHRZXXZPtNI+t5hialdVnRsuaVpuQ07crkJg7zvCV2Sf4JvGH42bFPxCY=
+	t=1756707787; cv=none; b=l8y0hJXySk8aBCVynib1HtTocG0HO0nDQFpylF916HN3EgtnBlasDwd4Ufr5/iH5RfI1HnbL7YvZF4V42fuZTdCUJ+YiFH4Q8YSKpE01LIJDzwkotEQAt/ja0n/C63Qg0Nn3Mx23g5JYA6GGqfcQj89WlD/rTgs11bwkPysw4Go=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756706717; c=relaxed/simple;
-	bh=CEKN/UJ6w/FhlgeUtzc5km+IHx5Quu8hJSId0IelxJw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TQxI5MePoCOE7q7qTS5rlTiLrQt1yWl+gFIXdf7OQaq48ZA17rYrtjP4g/LbZdLLeknHg1Bdz93kWhvYT9bp7Jt8i+ij6J59R46qG6TSf0vBWCiSjilj31DvSwTBNltWXINbp8TcRz8uvrWuf26ybIDj5B+hqWlM7LZS2ImlVus=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bip7KmZv; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bip7KmZv"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1756706716; x=1788242716;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=CEKN/UJ6w/FhlgeUtzc5km+IHx5Quu8hJSId0IelxJw=;
-  b=bip7KmZvck3sZ5IR7Jr+q1SsQMiU/0Ioq8qB4sbsucf9n9VEWgkB6jCC
-   VBZTNiP+ESMvTo6yIwxahDth6UBxldS8IsrYCZgWViTf4mpMESvf6Krf9
-   j+GM4jag0M0YvtYjBBLYIeeQexRWZ5zJUZhDr9+srQGvT09sH9HLi0oz6
-   UtsKz8u7SQvEe/q6TVQ5DxBKP/I5WwYXOMOM77Xn8o/gLa1RamfnS51jQ
-   yEs5N8bR1zupVjjo7a21LLsAb2/m9p3kC8C3jWMSoZmZOAvrIC1xu0Xap
-   ufWicWroKbKNyzjVWJy/ucW+VVnDb5xlSkSapSdW8hKuYyd0PNw7VikI7
-   A==;
-X-CSE-ConnectionGUID: kvcRTxtORlaWjdLVLX1z2A==
-X-CSE-MsgGUID: tXKCdGSTRLedURte32zxJA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11539"; a="46467639"
-X-IronPort-AV: E=Sophos;i="6.18,225,1751266800"; 
-   d="scan'208";a="46467639"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Aug 2025 23:05:15 -0700
-X-CSE-ConnectionGUID: uQT3SGlQT96TOebk0hBydg==
-X-CSE-MsgGUID: D7Y2JAhkQpm4XOv2Sz5tjw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,225,1751266800"; 
-   d="scan'208";a="175231763"
-Received: from smile.fi.intel.com ([10.237.72.52])
-  by fmviesa005.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Aug 2025 23:05:13 -0700
-Received: from andy by smile.fi.intel.com with local (Exim 4.98.2)
-	(envelope-from <andriy.shevchenko@linux.intel.com>)
-	id 1usxfC-0000000AGtL-0HQM;
-	Mon, 01 Sep 2025 09:05:10 +0300
-Date: Mon, 1 Sep 2025 09:05:09 +0300
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Zhang Heng <zhangheng@kylinos.cn>
-Cc: axboe@kernel.dk, phasta@kernel.org, broonie@kernel.org,
-	lizetao1@huawei.com, viro@zeniv.linux.org.uk,
-	fourier.thomas@gmail.com, anuj20.g@samsung.com,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3] block: mtip32xx: Remove excess code in mtip_pci_probe
-Message-ID: <aLU3lYKDdw2VnY54@smile.fi.intel.com>
-References: <20250827131228.2826678-1-zhangheng@kylinos.cn>
+	s=arc-20240116; t=1756707787; c=relaxed/simple;
+	bh=W2Z++sDS9nUnLNBneF07oL8yJ0fb58gxs1WgCjdwSOE=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=pM0aw/yF82Utg1IIbemYTxVeJoziDWytX0wOmGK8HI8iwP3Qo9OoaGmIYP5zlW5ys9NXywvrUI81nme2BX9fnT60C5+MgxaeEK5xYlJWwcsjgpzwHkOp5Gl13esUXjB8LbHnGrOyYZIZdEl0C0Jac/EkmJiRlodOC/QTfNdCw0g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.93.142])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4cFf1y5R3GzYQvlf;
+	Mon,  1 Sep 2025 14:23:02 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 3FC261A084B;
+	Mon,  1 Sep 2025 14:23:01 +0800 (CST)
+Received: from [10.174.179.143] (unknown [10.174.179.143])
+	by APP4 (Coremail) with SMTP id gCh0CgCn8IzCO7VoyUICBA--.57685S3;
+	Mon, 01 Sep 2025 14:23:00 +0800 (CST)
+Subject: Re: [PATCH RFC v3 01/15] block: cleanup bio_issue
+To: Damien Le Moal <dlemoal@kernel.org>, Yu Kuai <yukuai1@huaweicloud.com>,
+ hch@infradead.org, colyli@kernel.org, hare@suse.de, tieren@fnnas.com,
+ axboe@kernel.dk, tj@kernel.org, josef@toxicpanda.com, song@kernel.org,
+ kmo@daterainc.com, satyat@google.com, ebiggers@google.com, neil@brown.name,
+ akpm@linux-foundation.org
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ cgroups@vger.kernel.org, linux-raid@vger.kernel.org, yi.zhang@huawei.com,
+ yangerkun@huawei.com, johnny.chenyi@huawei.com,
+ "yukuai (C)" <yukuai3@huawei.com>
+References: <20250901033220.42982-1-yukuai1@huaweicloud.com>
+ <20250901033220.42982-2-yukuai1@huaweicloud.com>
+ <7ef5c6dc-5eae-41a7-9403-0d8616668c4b@kernel.org>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <2fc7611b-ed38-7006-580d-f18b12c24ae7@huaweicloud.com>
+Date: Mon, 1 Sep 2025 14:22:58 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250827131228.2826678-1-zhangheng@kylinos.cn>
-Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
- krs, Bertel Jungin Aukio 5, 02600 Espoo
+In-Reply-To: <7ef5c6dc-5eae-41a7-9403-0d8616668c4b@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgCn8IzCO7VoyUICBA--.57685S3
+X-Coremail-Antispam: 1UD129KBjvdXoWruw4xXw1rZr4kAw1ktFyrZwb_yoW3XrX_WF
+	sYkrZ2yw17X3Wxtwn5tFnxZ3ykGw4fXryUXrWxG3WfG3WkArWktFs5Jrs8Xw4Uu397J34r
+	Krn0gwsxJr1IqjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUbS8FF20E14v26ryj6rWUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+	A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
+	6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
+	c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxkF7I0En4kS14v26r4a6rW5MxAIw28IcxkI7V
+	AKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCj
+	r7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6x
+	IIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAI
+	w20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aVCY1x
+	0267AKxVW8Jr0_Cr1UYxBIdaVFxhVjvjDU0xZFpf9x0pRHUDLUUUUU=
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On Wed, Aug 27, 2025 at 09:12:27PM +0800, Zhang Heng wrote:
-> In the error exit function of the iomap_err in mtip_pci_probe,
-> pci_set_drvdata(pdev, NULL) and return can be removed without
-> affecting the code execution
+Hi,
 
-Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+在 2025/09/01 11:43, Damien Le Moal 写道:
+> On 9/1/25 12:32 PM, Yu Kuai wrote:
+>> From: Yu Kuai <yukuai3@huawei.com>
+>>
+>> Now that bio->bi_issue is only used by io-latency to get bio issue time,
+>> replace bio_issue with u64 time directly and remove bio_issue to make
+>> code cleaner.
+>>
+>> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+> 
+> It seems that this patch is completely independent of the series.
+> Maybe post it separately not as an RFC ?
+> 
 
--- 
-With Best Regards,
-Andy Shevchenko
+Actually, functionaly patch 1,2 must be applied before the following
+cleanup, otherwise bio_submit_split_bioset() will add unnecessary
+blk_time_get_ns() from blkcg_bio_issue_init() for mdraid, because
+iolatency can never be initialized for mdraid, which is bio based.
 
+Thanks,
+Kuai
 
