@@ -1,170 +1,139 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 147E430506F
-	for <linux-block@vger.kernel.org>; Mon,  1 Sep 2025 09:02:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 906581A9F8C
+	for <linux-block@vger.kernel.org>; Mon,  1 Sep 2025 10:02:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756717342; cv=none; b=FN6ANHnv15zmMcmr4nEp1ZK+4PnnT+CeQzMFfY8tmTYs6I59+aAjz7dtu4y6yl0z1EqEMy86s9YuOc+VXGPdvMV/tts+E88qhQYWsc0Y7z6/GXnr5VaQcYTUoU6H9caeG6X7seCDYQe7pvl3p0fs1X/teETdspFtTxbF0LyL86M=
+	t=1756720977; cv=none; b=azaxaO6Hil9MCGkTwoHdDIbWPgKLdAiQeKv3qbhTyh6CWXzpEwSFRoLBoWXlxMcBRmq5ZnIwgJjI6ImykMwf8au5IGtqhXx3kAj3OAEH2we1TwOq6P/VYhsfmGKGYSbr6avVsyOc6RWh6sFGkzWtvB9DYBLfZeHfMbRjTmCMXLM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756717342; c=relaxed/simple;
-	bh=/I7E2fk1T0Aqgi6iRHMY63UidkJpRR/LHgnlOMO4SIk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=h24Z9IEqFuM09c07on1OR3k8RAuqWxwpfkPZnUsu2rFZFDex5U8UL5KDDthKKICaJXW0uzKXYUm1cibBcozmNFkP8wnaFuhatSMc1s0jzlDJAy7gKjASq7bKVPiyhryfXSdRi0KMpQMcdkiU8ClfxUgCQwpXRaqRRVxoEP+FinA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=kEqJM6ny; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=5FxxqrJO; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=kEqJM6ny; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=5FxxqrJO; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1756720977; c=relaxed/simple;
+	bh=Q6zGO7uiPA/2rX2ZBn8KT9Mrjlgez6p/EgOH20/wWfg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=S3+bnqsrnyxhJJlGosM3JuXs+1vMF4PhDmQWRwlur4PmYoUzVCyfwBq32Km5YaGbuddrlT0Tcc5hnS8npZb0R41FPNqBWU39/qP5JdZN1ExC0PSqaqr/wQHJF3/4DZRPA+vWh/GzJwj16TYE2AAyEzeyVdi2EIVyFPoF/dpkcEs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IrDPFRgS; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="kEqJM6ny";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="5FxxqrJO";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="kEqJM6ny";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="5FxxqrJO"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IrDPFRgS"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1756720974;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=FcgwTCck96hmtVaUIWTvtBdoB4O8lXvfgaZyvdNdAzg=;
+	b=IrDPFRgSHl0MJut43CNcYlgMZwneB32slAGdPg2QQoCzznyyd8++kyiic+z/sAT6+mgxoD
+	IneJKBzFv14eTClcyPQSUI+rol4gufBpJY3O8v1zY9AxRzSBEIH8wSWqGET+DZkUPNncF2
+	QuQVAphPTs5DeV1LYVf4tE+Gg8zA8BA=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-664-00SUfkOmN_2KI88N-3_bIA-1; Mon,
+ 01 Sep 2025 06:02:53 -0400
+X-MC-Unique: 00SUfkOmN_2KI88N-3_bIA-1
+X-Mimecast-MFC-AGG-ID: 00SUfkOmN_2KI88N-3_bIA_1756720972
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 3047C1F388;
-	Mon,  1 Sep 2025 09:02:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1756717336; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5NNItQtiBSkxwIsvVF62gD4BFcFmFvPJ0ltQD6wGBjM=;
-	b=kEqJM6nywEAUgYQb4LPOCS9x9CjMVjfT2pnsMCSV9DTx/jgNqP8IZLV2t+plzC1sP9wMaL
-	GOhKuDM0yWqpfeHp0cfONI9h9TLcBAWteTn9V0Or7jy/w+iMKKO2kGC6yzLNhG0hF6mwka
-	bdi0JTTtuJOsZkiBNVwarHRzIqGBH18=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1756717336;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5NNItQtiBSkxwIsvVF62gD4BFcFmFvPJ0ltQD6wGBjM=;
-	b=5FxxqrJOXYxi7cIuJhJkfSbGklr2EzNlJDQByDz2Au4l+Js2PvkmKMv5kolMeUygTW4FHp
-	T+tOdYG8QsLfJEDA==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1756717336; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5NNItQtiBSkxwIsvVF62gD4BFcFmFvPJ0ltQD6wGBjM=;
-	b=kEqJM6nywEAUgYQb4LPOCS9x9CjMVjfT2pnsMCSV9DTx/jgNqP8IZLV2t+plzC1sP9wMaL
-	GOhKuDM0yWqpfeHp0cfONI9h9TLcBAWteTn9V0Or7jy/w+iMKKO2kGC6yzLNhG0hF6mwka
-	bdi0JTTtuJOsZkiBNVwarHRzIqGBH18=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1756717336;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5NNItQtiBSkxwIsvVF62gD4BFcFmFvPJ0ltQD6wGBjM=;
-	b=5FxxqrJOXYxi7cIuJhJkfSbGklr2EzNlJDQByDz2Au4l+Js2PvkmKMv5kolMeUygTW4FHp
-	T+tOdYG8QsLfJEDA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 200681378C;
-	Mon,  1 Sep 2025 09:02:16 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id ZJoTBxhhtWgnZgAAD6G6ig
-	(envelope-from <dwagner@suse.de>); Mon, 01 Sep 2025 09:02:16 +0000
-Date: Mon, 1 Sep 2025 11:02:15 +0200
-From: Daniel Wagner <dwagner@suse.de>
-To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, 
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>, "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>, 
-	"nbd@other.debian.org" <nbd@other.debian.org>, "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
-Subject: Re: blktests failures with v6.17-rc1 kernel
-Message-ID: <7a773833-a193-4243-80f4-fc52243883a9@flourine.local>
-References: <suhzith2uj75uiprq4m3cglvr7qwm3d7gi4tmjeohlxl6fcmv3@zu6zym6nmvun>
- <ff748a3f-9f07-4933-b4b3-b4f58aacac5b@flourine.local>
- <rsdinhafrtlguauhesmrrzkybpnvwantwmyfq2ih5aregghax5@mhr7v3eryci3>
- <6ef89cb5-1745-4b98-9203-51ba6de40799@flourine.local>
- <u4ttvhnn7lark5w3sgrbuy2rxupcvosp4qmvj46nwzgeo5ausc@uyrkdls2muwx>
- <629ddb72-c10d-4930-9d81-61d7322ed3b0@flourine.local>
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E3D881800561;
+	Mon,  1 Sep 2025 10:02:51 +0000 (UTC)
+Received: from localhost (unknown [10.72.116.17])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id C4AB430001B5;
+	Mon,  1 Sep 2025 10:02:50 +0000 (UTC)
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: Uday Shankar <ushankar@purestorage.com>,
+	Caleb Sander Mateos <csander@purestorage.com>,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH 00/23] ublk: add UBLK_F_BATCH_IO
+Date: Mon,  1 Sep 2025 18:02:17 +0800
+Message-ID: <20250901100242.3231000-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <629ddb72-c10d-4930-9d81-61d7322ed3b0@flourine.local>
-X-Spamd-Result: default: False [-4.30 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-0.999];
-	MIME_GOOD(-0.10)[text/plain];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo]
-X-Spam-Flag: NO
-X-Spam-Level: 
-X-Spam-Score: -4.30
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Mon, Sep 01, 2025 at 10:34:23AM +0200, Daniel Wagner wrote:
-> The test is removing the ports while the host driver is about to
-> reconnect and accesses a stale pointer.
-> 
-> nvme_fc_create_association is calling nvme_fc_ctlr_inactive_on_rport in
-> the error path. The problem is that nvme_fc_create_association gets half
-> through the setup and then fails. In the cleanup path
-> 
-> 	dev_warn(ctrl->ctrl.device,
-> 		"NVME-FC{%d}: create_assoc failed, assoc_id %llx ret %d\n",
-> 		ctrl->cnum, ctrl->association_id, ret);
-> 
-> is issued and then nvme_fc_ctlr_inactive_on_rport is called. And there
-> is the log message above, so it's clear the error path is taken.
-> 
-> But the thing is fcloop is not supposed to remove the ports when the
-> host driver is still using it. So there is a race window where it's
-> possible to enter nvme_fc_create_assocation and fcloop removing the
-> ports.
-> 
-> So between nvme_fc_create_assocation and nvme_fc_ctlr_active_on_rport.
+Hello,
 
-I think the problem is that nvme_fc_create_association is not holding
-the rport locks when checking the port_state and marking the rport
-active. This races with nvme_fc_unregister_remoteport.
+This patchset adds UBLK_F_BATCH_IO feature for communicating between kernel and ublk
+server in batching way:
 
-diff --git a/drivers/nvme/host/fc.c b/drivers/nvme/host/fc.c
-index 3e12d4683ac7..03987f497a5b 100644
---- a/drivers/nvme/host/fc.c
-+++ b/drivers/nvme/host/fc.c
-@@ -3032,11 +3032,17 @@ nvme_fc_create_association(struct nvme_fc_ctrl *ctrl)
+- **Per-queue vs Per-I/O**: Commands operate on queues rather than individual I/Os
+- **Batch processing**: Multiple I/Os are handled in single operation
+- **Multishot commands**: Use io_uring multishot for reducing submission overhead
+- **Flexible task assignment**: Any task can handle any I/O (no per-I/O daemons)
+- **Better load balancing**: Tasks can adjust their workload dynamically
+- **help for following future optimizations**:
+	- blk-mq batch tags allocation/free,
+  	- easier to support io-poll
+	- per-task batch for avoiding per-io lock
 
- 	++ctrl->ctrl.nr_reconnects;
+selftest for this feature are provided.
 
--	if (ctrl->rport->remoteport.port_state != FC_OBJSTATE_ONLINE)
-+	spin_lock_irqsave(&ctrl->rport->lock, flags);
-+	if (ctrl->rport->remoteport.port_state != FC_OBJSTATE_ONLINE) {
-+		spin_unlock_irqrestore(&ctrl->rport->lock, flags);
- 		return -ENODEV;
-+	}
+This patchset depends on uring_cmd multishot support, which is merged to for-6.18/io_uring.
 
--	if (nvme_fc_ctlr_active_on_rport(ctrl))
-+	if (nvme_fc_ctlr_active_on_rport(ctrl)) {
-+		spin_unlock_irqrestore(&ctrl->rport->lock, flags);
- 		return -ENOTUNIQ;
-+	}
-+	spin_unlock_irqrestore(&ctrl->rport->lock, flags);
 
- 	dev_info(ctrl->ctrl.device,
- 		"NVME-FC{%d}: create association : host wwpn 0x%016llx "
+Thanks,
+Ming
 
-I'll to reproduce it and see if this patch does make a difference.
+
+Ming Lei (23):
+  ublk: add parameter `struct io_uring_cmd *` to
+    ublk_prep_auto_buf_reg()
+  ublk: add `union ublk_io_buf` with improved naming
+  ublk: refactor auto buffer register in ublk_dispatch_req()
+  ublk: add helper of __ublk_fetch()
+  ublk: define ublk_ch_batch_io_fops for the coming feature F_BATCH_IO
+  ublk: prepare for not tracking task context for command batch
+  ublk: add new batch command UBLK_U_IO_PREP_IO_CMDS &
+    UBLK_U_IO_COMMIT_IO_CMDS
+  ublk: handle UBLK_U_IO_PREP_IO_CMDS
+  ublk: handle UBLK_U_IO_COMMIT_IO_CMDS
+  ublk: add io events fifo structure
+  ublk: add batch I/O dispatch infrastructure
+  ublk: add UBLK_U_IO_FETCH_IO_CMDS for batch I/O processing
+  ublk: abort requests filled in event kfifo
+  ublk: add new feature UBLK_F_BATCH_IO
+  ublk: document feature UBLK_F_BATCH_IO
+  selftests: ublk: replace assert() with ublk_assert()
+  selftests: ublk: add ublk_io_buf_idx() for returning io buffer index
+  selftests: ublk: add batch buffer management infrastructure
+  selftests: ublk: handle UBLK_U_IO_PREP_IO_CMDS
+  selftests: ublk: handle UBLK_U_IO_COMMIT_IO_CMDS
+  selftests: ublk: handle UBLK_U_IO_FETCH_IO_CMDS
+  selftests: ublk: add --batch/-b for enabling F_BATCH_IO
+  selftests: ublk: support arbitrary threads/queues combination
+
+ Documentation/block/ublk.rst                  |   60 +-
+ drivers/block/ublk_drv.c                      | 1208 +++++++++++++++--
+ include/uapi/linux/ublk_cmd.h                 |   91 ++
+ tools/testing/selftests/ublk/Makefile         |    7 +-
+ tools/testing/selftests/ublk/batch.c          |  610 +++++++++
+ tools/testing/selftests/ublk/common.c         |    2 +-
+ tools/testing/selftests/ublk/file_backed.c    |   11 +-
+ tools/testing/selftests/ublk/kublk.c          |  128 +-
+ tools/testing/selftests/ublk/kublk.h          |  190 ++-
+ tools/testing/selftests/ublk/null.c           |   18 +-
+ tools/testing/selftests/ublk/stripe.c         |   17 +-
+ .../testing/selftests/ublk/test_generic_13.sh |   32 +
+ .../testing/selftests/ublk/test_generic_14.sh |   30 +
+ .../testing/selftests/ublk/test_generic_15.sh |   30 +
+ .../testing/selftests/ublk/test_stress_06.sh  |   45 +
+ .../testing/selftests/ublk/test_stress_07.sh  |   44 +
+ tools/testing/selftests/ublk/utils.h          |   64 +
+ 17 files changed, 2431 insertions(+), 156 deletions(-)
+ create mode 100644 tools/testing/selftests/ublk/batch.c
+ create mode 100755 tools/testing/selftests/ublk/test_generic_13.sh
+ create mode 100755 tools/testing/selftests/ublk/test_generic_14.sh
+ create mode 100755 tools/testing/selftests/ublk/test_generic_15.sh
+ create mode 100755 tools/testing/selftests/ublk/test_stress_06.sh
+ create mode 100755 tools/testing/selftests/ublk/test_stress_07.sh
+
+-- 
+2.47.0
+
