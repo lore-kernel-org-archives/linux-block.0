@@ -1,116 +1,143 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0E4C1F473A;
-	Mon,  1 Sep 2025 02:40:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E604A52F99;
+	Mon,  1 Sep 2025 03:41:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756694459; cv=none; b=d0BBo3Pf/OfrDZr7Cvi4CZhESGuFK4TdH46sQ8VRYH6o0OsUTFFX4YX3aSVl8t9zYpziZv0ZsyJu+8fg7KyYRiD5LorOsf20LLbaYQZszvejprU6CPsVpVm1ZqsHACwaW//HK/LiuKACabkgLJmdchNL/GlE0u9397pIFVfekBU=
+	t=1756698078; cv=none; b=J8rcxPTbsYCtRjbUuwrVg629zPpmFU1oRcoAYl7Nfws5uXYJRS6JlMCuMjpQFFB2pAtuFZpA1+a0DkVfIh49hO/MHX7hJBSivgtL6kc0g4+O49XMDW2Z/8HMCQmSfivYjgAxgdxB9wg93COCwk865WVvh1U58qb6F5uvryr8DXA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756694459; c=relaxed/simple;
-	bh=BXWqjzqFfb808DiXpxTG1EzGF8XFU+4nXLPwseoxB+E=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=ifYVN1CyMHcVwu05Mm9WoKaQSJTohRttFiTqq5mXgHJkvYqboecg9lbm8vsUuf8jowI27BNYMpRiECwBI2ir/T9S51HGwATyTYOVY4tWKn0M/oUpIorY2ZaoGZneMyzrVz5ATFhPqLu7vTrLngnSQVrNP4J2qqSY3+Dz84Bq6Yo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+	s=arc-20240116; t=1756698078; c=relaxed/simple;
+	bh=L6kY369ygnM7s2a8RN7xIRPMZh5a0TVH61deIUF6TzI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=eCD/2LY7AI9nwk7N56cNWty86Wa1IjaQuYugQYihgX44LgYIG3d79SSbuCwVc8NV5ywNJOdQGObii29EDlNTrAvVSq2FTS577BiNe1LkrRBpDsbXdxz/VDUCWnO6Qe9S4G6eXBv1Tpp0BMDXuBZ1SstOxKrWG80b5vN+iBoVlwk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
 Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4cFY5f4KRkzYQv1H;
-	Mon,  1 Sep 2025 10:40:54 +0800 (CST)
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4cFZRF3ny9zKHN5Q;
+	Mon,  1 Sep 2025 11:41:13 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 187911A08F8;
-	Mon,  1 Sep 2025 10:40:53 +0800 (CST)
-Received: from [10.174.179.143] (unknown [10.174.179.143])
-	by APP4 (Coremail) with SMTP id gCh0CgAncY2yB7VoD6DwAw--.55423S3;
-	Mon, 01 Sep 2025 10:40:52 +0800 (CST)
-Subject: Re: [PATCH RFC v2 09/10] block: fix disordered IO in the case
- recursive split
-To: Yu Kuai <hailan@yukuai.org.cn>, Damien Le Moal <dlemoal@kernel.org>,
- Yu Kuai <yukuai1@huaweicloud.com>, axboe@kernel.dk, tj@kernel.org,
- josef@toxicpanda.com, song@kernel.org, neil@brown.name,
- akpm@linux-foundation.org, hch@infradead.org, colyli@kernel.org,
- hare@suse.de, tieren@fnnas.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- cgroups@vger.kernel.org, linux-raid@vger.kernel.org, yi.zhang@huawei.com,
- yangerkun@huawei.com, johnny.chenyi@huawei.com,
- "yukuai (C)" <yukuai3@huawei.com>
-References: <20250828065733.556341-1-yukuai1@huaweicloud.com>
- <20250828065733.556341-10-yukuai1@huaweicloud.com>
- <23872034-2b36-4a71-91b9-e599976902b6@kernel.org>
- <79aae55c-a2fe-465c-9204-44dce9a80256@yukuai.org.cn>
+	by mail.maildlp.com (Postfix) with ESMTP id 57E691A0877;
+	Mon,  1 Sep 2025 11:41:13 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+	by APP4 (Coremail) with SMTP id gCh0CgAncIzWFbVotmf1Aw--.38057S4;
+	Mon, 01 Sep 2025 11:41:12 +0800 (CST)
 From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <5417dfdd-f558-2d5e-43b1-043c6bd30041@huaweicloud.com>
-Date: Mon, 1 Sep 2025 10:40:49 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.1
+To: hch@infradead.org,
+	colyli@kernel.org,
+	hare@suse.de,
+	dlemoal@kernel.org,
+	tieren@fnnas.com,
+	axboe@kernel.dk,
+	tj@kernel.org,
+	josef@toxicpanda.com,
+	song@kernel.org,
+	kmo@daterainc.com,
+	satyat@google.com,
+	ebiggers@google.com,
+	neil@brown.name,
+	akpm@linux-foundation.org
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	cgroups@vger.kernel.org,
+	linux-raid@vger.kernel.org,
+	yukuai3@huawei.com,
+	yukuai1@huaweicloud.com,
+	yi.zhang@huawei.com,
+	yangerkun@huawei.com,
+	johnny.chenyi@huawei.com
+Subject: [PATCH RFC v3 00/15] block: fix disordered IO in the case recursive split
+Date: Mon,  1 Sep 2025 11:32:05 +0800
+Message-Id: <20250901033220.42982-1-yukuai1@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <79aae55c-a2fe-465c-9204-44dce9a80256@yukuai.org.cn>
-Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgAncY2yB7VoD6DwAw--.55423S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7tw18JrW8Jry8Zry7Gr17KFg_yoW8WF4UpF
-	WkJFWUtry5Gr4fKrn7XF1UWFy0krZrXw4kJrn8Ga48ArWjyr4aqa1UWry0gFyUCr48W34U
-	Xrn5trnxuFyDAFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBF14x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+X-CM-TRANSID:gCh0CgAncIzWFbVotmf1Aw--.38057S4
+X-Coremail-Antispam: 1UD129KBjvJXoW7KrW7KryUXF4UJFWfCF15Arb_yoW8KFyxpw
+	43Wr4fZr48GF9IgFsxX3W7tFn5GanYgFy5Gr9aqws5ZFyDZryxtw48Ar18tryUGrWSk34U
+	Xr1UArWUGr15GrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9Y14x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
 	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
 	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
 	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
 	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
-	0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AKxVW8ZVWrXwCF04k20xvY0x
-	0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E
-	7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_GFv_WrylIxkGc2Ij64vIr41lIxAIcV
-	C0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF
-	04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7
-	CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0pRHUDLUUUUU=
+	2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
+	Y2ka0xkIwI1lc7CjxVAaw2AFwI0_GFv_Wryl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x
+	0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2
+	zVAF1VAY17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF
+	4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWU
+	CwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCT
+	nIWIevJa73UjIFyTuYvjTRRBT5DUUUU
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-Hi,
+From: Yu Kuai <yukuai3@huawei.com>
 
-在 2025/08/30 12:28, Yu Kuai 写道:
->>> @@ -745,12 +745,16 @@ void submit_bio_noacct_nocheck(struct bio *bio)
->>>        * to collect a list of requests submited by a ->submit_bio 
->>> method while
->>>        * it is active, and then process them after it returned.
->>>        */
->>> -    if (current->bio_list)
->>> -        bio_list_add(&current->bio_list[0], bio);
->>> -    else if (!bdev_test_flag(bio->bi_bdev, BD_HAS_SUBMIT_BIO))
->>> +    if (current->bio_list) {
->>> +        if (split)
->>> +            bio_list_add_head(&current->bio_list[0], bio);
->>> +        else
->>> +            bio_list_add(&current->bio_list[0], bio);
->> This really needs a comment clarifying why we do an add at tail 
->> instead of
->> keeping the original order with a add at head. I am also scared that 
->> this may
->> break sequential write ordering for zoned devices.
-> 
-> I think add at head is exactly what we do here to keep the orginal order 
-> for
-> the case bio split. Other than split, if caller do generate multiple 
-> sequential
-> bios, we should keep the order by add at tail.
-> 
-> Not sure about zoned devices for now, I'll have a look in details.
+Changes in v3:
+ - add patch 1,2 to cleanup bio_issue;
+ - add patch 3,4 to fix missing processing for split bio first;
+ - bypass zoned device in patch 14;
+Changes in v2:
+ - export a new helper bio_submit_split_bioset() instead of
+export bio_submit_split() directly;
+ - don't set no merge flag in the new helper;
+ - add patch 7 and patch 10;
+ - add patch 8 to skip bio checks for resubmitting split bio;
 
-For zoned devices, can we somehow trigger this recursive split? I
-suspect bio disordered will apear in this case but I don't know for
-now and I can't find a way to reporduce it.
+patch 1,2 cleanup bio_issue;
+patch 3,4 to fix missing processing for split bio;
+patch 5 export a bio split helper;
+patch 6-12 unify bio split code;
+path 13,14 convert the helper to insert split bio to the head of current
+bio list;
+patch 15 is a follow cleanup for raid0;
 
-Perhaps I can bypass zoned devices for now, and if we really met the
-recursive split case and there is a problem, we can fix it later:
+This set is just test for raid5 for now, see details in patch 9;
 
-if (split && !bdev_is_zoned(bio->bi_bdev))
-	bio_list_add_head()
+Yu Kuai (15):
+  block: cleanup bio_issue
+  block: add QUEUE_FLAG_BIO_ISSUE
+  md: fix mssing blktrace bio split events
+  blk-crypto: fix missing processing for split bio
+  block: factor out a helper bio_submit_split_bioset()
+  md/raid0: convert raid0_handle_discard() to use
+    bio_submit_split_bioset()
+  md/raid1: convert to use bio_submit_split_bioset()
+  md/raid10: add a new r10bio flag R10BIO_Returned
+  md/raid10: convert read/write to use bio_submit_split_bioset()
+  md/raid5: convert to use bio_submit_split_bioset()
+  md/md-linear: convert to use bio_submit_split_bioset()
+  blk-crypto: convert to use bio_submit_split_bioset()
+  block: skip unnecessary checks for split bio
+  block: fix disordered IO in the case recursive split
+  md/raid0: convert raid0_make_request() to use
+    bio_submit_split_bioset()
 
-Thanks,
-Kuai
+ block/bio.c                 |  2 +-
+ block/blk-cgroup.h          |  5 ++-
+ block/blk-core.c            | 35 +++++++++++++++++----
+ block/blk-crypto-fallback.c | 15 +++------
+ block/blk-iolatency.c       | 15 +++------
+ block/blk-merge.c           | 63 ++++++++++++++++++++++++-------------
+ block/blk-mq-debugfs.c      |  1 +
+ block/blk-throttle.c        |  2 +-
+ block/blk.h                 | 45 ++------------------------
+ drivers/md/md-linear.c      | 11 ++-----
+ drivers/md/raid0.c          | 30 ++++++------------
+ drivers/md/raid1.c          | 38 ++++++++--------------
+ drivers/md/raid1.h          |  4 ++-
+ drivers/md/raid10.c         | 54 ++++++++++++++-----------------
+ drivers/md/raid10.h         |  2 ++
+ drivers/md/raid5.c          | 10 +++---
+ include/linux/blk_types.h   |  7 ++---
+ include/linux/blkdev.h      |  3 ++
+ 18 files changed, 152 insertions(+), 190 deletions(-)
+
+-- 
+2.39.2
 
