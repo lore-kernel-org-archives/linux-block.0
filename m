@@ -1,56 +1,56 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AAF6310640
-	for <linux-block@vger.kernel.org>; Mon,  1 Sep 2025 10:03:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DEB030DEDB
+	for <linux-block@vger.kernel.org>; Mon,  1 Sep 2025 10:03:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756721016; cv=none; b=FHeXXJA4O5M468/GWQQeTTaFB9tumPBlrLFfJbX5Rv95/hos066CYO2tZNJCsT6iicMqIRPl3eFDuZEzW6z6WNJMod7AOHmZ0AttkD3bg5KWL6bbaDkhQooIiyL0JkmRuE+uMjNE4KJcA3/fLmMcmsxK/0PUzyr5MdCEbs83YvI=
+	t=1756721021; cv=none; b=UJHR2oUnk/xowHZuSoEz8zifD3Z+51i/T8pe2djev5ZhUuXcDgEfgp1ucuh3qlCu6/lxWXomnkRt4NNY4SLoKZ0eD5buhmbuN1XVQ9ZRU37xdOjb6XU0ZlANBl2keWfWmQMuIAseVwdtT/1ebs9gJcDe92etlDsa3Wm4ENTxu58=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756721016; c=relaxed/simple;
-	bh=yPu4jfhA+EMN18LiNE0SernJ/EuOVyIbcYdiKj4Eqy0=;
+	s=arc-20240116; t=1756721021; c=relaxed/simple;
+	bh=al3nfEgroyQ1heaC+tto4lszvQ7dfDN9Rj2fJ2ObRG0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=X9g+Y2pnMVHjVXQ35PycJJ/KhFfEisXlKw0MB25XTBgZYVAo8tpOXp7IpkfLpkyxwdo0vNYEzIbNFlHJXOOtzEcYZugmyWDekSDoPCb0BvP+5r6BsexUBvRRvffiJ4k4ajbWtakpYwnkZGiNf1Y22VNcM8F6Ycy0YPpzYJAo7PA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CBPBTL+p; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=DgxgY7v+878e3+yVPeGD1mXvY+kCXgEJIe8EAXKeJdYbvJzS3/dVQZNpksStuuQFCagB8pYPawI76jioAt+vB7iF5iCg6Bz00xTAoeqN5jrLnaiQTYWh9gxu2VCt6GXcZiNdTzH/G0PdI5ebjkx3TQP/aNxhVtQwTGAznYDkMTM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FEHYmfx5; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CBPBTL+p"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FEHYmfx5"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1756721014;
+	s=mimecast20190719; t=1756721018;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=MvkM7K1D2Ji+DuiHhmgJvpiE90CpPW2Jr2DphxiYEaA=;
-	b=CBPBTL+pcPAaOZri5+FEvjIYcx2oREziIxpwc1UJjzkE8UOZHUspepIsbFAvr1Alxq1H7g
-	xJH5tUx1UhiONFkTki5ZUXQk4mhJhiWGHzdKefVSlldzeOAI6o0tPzuSIWEMWCU/GOeX+3
-	0uqDUkFjQZrwGofyNNtyz+WeTa5/KhM=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+	bh=Xcc7a/QAjVg2Pq38UHnDcGCwwrbTiIV68vYz2YT7lw0=;
+	b=FEHYmfx5EsFuDzOeZnerCG+zH7nuqu2HEidIaeIMAde0jMEFxvtCpNZFpZoXfUC38lgJ3D
+	vBboauCRA48viQDG6wfyNQqLy1DZPcCKRTR5L2kEe99bd++Zl8BWy/xYVSG4jKpIwVvnKb
+	0vNQUh7w8PXJUTZDVGBC3AYOjy7vbj0=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-160--5Q0C6LIMBGzK_EThzx8dQ-1; Mon,
- 01 Sep 2025 06:03:33 -0400
-X-MC-Unique: -5Q0C6LIMBGzK_EThzx8dQ-1
-X-Mimecast-MFC-AGG-ID: -5Q0C6LIMBGzK_EThzx8dQ_1756721012
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-512-Te1RLq9gMGqNpfkY-YEsIg-1; Mon,
+ 01 Sep 2025 06:03:37 -0400
+X-MC-Unique: Te1RLq9gMGqNpfkY-YEsIg-1
+X-Mimecast-MFC-AGG-ID: Te1RLq9gMGqNpfkY-YEsIg_1756721016
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DAA8B180035C;
-	Mon,  1 Sep 2025 10:03:31 +0000 (UTC)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E1CAD1956087;
+	Mon,  1 Sep 2025 10:03:35 +0000 (UTC)
 Received: from localhost (unknown [10.72.116.17])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id C6CD71955EA4;
-	Mon,  1 Sep 2025 10:03:30 +0000 (UTC)
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id CAAC019560B4;
+	Mon,  1 Sep 2025 10:03:34 +0000 (UTC)
 From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org
 Cc: Uday Shankar <ushankar@purestorage.com>,
 	Caleb Sander Mateos <csander@purestorage.com>,
 	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 10/23] ublk: add io events fifo structure
-Date: Mon,  1 Sep 2025 18:02:27 +0800
-Message-ID: <20250901100242.3231000-11-ming.lei@redhat.com>
+Subject: [PATCH 11/23] ublk: add batch I/O dispatch infrastructure
+Date: Mon,  1 Sep 2025 18:02:28 +0800
+Message-ID: <20250901100242.3231000-12-ming.lei@redhat.com>
 In-Reply-To: <20250901100242.3231000-1-ming.lei@redhat.com>
 References: <20250901100242.3231000-1-ming.lei@redhat.com>
 Precedence: bulk
@@ -60,126 +60,205 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-Add ublk io events fifo structure and prepare for supporting command
-batch, which will use io_uring multishot uring_cmd for fetching one
-batch of io commands each time.
+Add infrastructure for delivering I/O commands to ublk server in batches,
+preparing for the upcoming UBLK_U_IO_FETCH_IO_CMDS feature.
 
-One nice feature of kfifo is to allow multiple producer vs single
-consumer. We just need lock the producer side, meantime the single
-consumer can be lockless.
+Key components:
 
-The producer is actually from ublk_queue_rq() or ublk_queue_rqs(), so
-lock contention can be eased by setting proper blk-mq nr_queues.
+- struct ublk_batch_fcmd: Represents a batch fetch uring_cmd that will
+  receive multiple I/O tags in a single operation, using io_uring's
+  multishot command for efficient ublk IO delivery.
+
+- ublk_batch_dispatch(): Batch version of ublk_dispatch_req() that:
+  * Pulls multiple request tags from the events FIFO (lock-free reader)
+  * Prepares each I/O for delivery (including auto buffer registration)
+  * Delivers tags to userspace via single uring_cmd notification
+  * Handles partial failures by restoring undelivered tags to FIFO
+
+The batch approach significantly reduces notification overhead by aggregating
+multiple I/O completions into single uring_cmd, while maintaining the same
+I/O processing semantics as individual operations.
+
+Error handling ensures system consistency: if buffer selection or CQE
+posting fails, undelivered tags are restored to the FIFO for retry.
+
+This runs in task work context, scheduled via io_uring_cmd_complete_in_task()
+or called directly from ->uring_cmd(), enabling efficient batch processing
+without blocking the I/O submission path.
 
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/block/ublk_drv.c | 55 +++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 54 insertions(+), 1 deletion(-)
+ drivers/block/ublk_drv.c      | 123 ++++++++++++++++++++++++++++++++++
+ include/uapi/linux/ublk_cmd.h |   6 ++
+ 2 files changed, 129 insertions(+)
 
 diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index fae016b67254..0f955592ebd5 100644
+index 0f955592ebd5..2ed2adc93df6 100644
 --- a/drivers/block/ublk_drv.c
 +++ b/drivers/block/ublk_drv.c
-@@ -44,6 +44,7 @@
- #include <linux/task_work.h>
- #include <linux/namei.h>
- #include <linux/kref.h>
-+#include <linux/kfifo.h>
- #include <uapi/linux/ublk_cmd.h>
+@@ -91,6 +91,12 @@
+ 	 UBLK_BATCH_F_HAS_BUF_ADDR | \
+ 	 UBLK_BATCH_F_AUTO_BUF_REG_FALLBACK)
  
- #define UBLK_MINORS		(1U << MINORBITS)
-@@ -220,6 +221,22 @@ struct ublk_queue {
- 	unsigned short nr_io_ready;	/* how many ios setup */
- 	spinlock_t		cancel_lock;
- 	struct ublk_device *dev;
++/* ublk batch fetch uring_cmd */
++struct ublk_batch_fcmd {
++	struct io_uring_cmd *cmd;
++	unsigned short buf_group;
++};
 +
-+	/*
-+	 * Inflight ublk request tag is saved in this fifo
-+	 *
-+	 * There are multiple writer from ublk_queue_rq() or ublk_queue_rqs(),
-+	 * so lock is required for storing request tag to fifo
-+	 *
-+	 * Make sure just one reader for fetching request from task work
-+	 * function to ublk server, so no need to grab the lock in reader
-+	 * side.
-+	 */
-+	struct {
-+		DECLARE_KFIFO_PTR(evts_fifo, unsigned short);
-+		spinlock_t evts_lock;
-+	}____cacheline_aligned_in_smp;
+ struct ublk_uring_cmd_pdu {
+ 	/*
+ 	 * Store requests in same batch temporarily for queuing them to
+@@ -623,6 +629,32 @@ static wait_queue_head_t ublk_idr_wq;	/* wait until one idr is freed */
+ static DEFINE_MUTEX(ublk_ctl_mutex);
+ 
+ 
++static void ublk_batch_deinit_fetch_buf(struct ublk_batch_io_data *data,
++					struct ublk_batch_fcmd *fcmd,
++					int res)
++{
++	io_uring_cmd_done(fcmd->cmd, res, 0, data->issue_flags);
++	fcmd->cmd = NULL;
++}
 +
- 	struct ublk_io ios[];
++static int ublk_batch_fetch_post_cqe(struct ublk_batch_fcmd *fcmd,
++				     struct io_br_sel *sel,
++				     unsigned int issue_flags)
++{
++	if (io_uring_mshot_cmd_post_cqe(fcmd->cmd, sel, issue_flags))
++		return -ENOBUFS;
++	return 0;
++}
++
++static ssize_t ublk_batch_copy_io_tags(struct ublk_batch_fcmd *fcmd,
++				       void __user *buf, const u16 *tag_buf,
++				       unsigned int len)
++{
++	if (copy_to_user(buf, tag_buf, len))
++		return -EFAULT;
++	return len;
++}
++
+ #define UBLK_MAX_UBLKS UBLK_MINORS
+ 
+ /*
+@@ -1424,6 +1456,97 @@ static void ublk_dispatch_req(struct ublk_queue *ubq,
+ 	}
+ }
+ 
++static bool __ublk_batch_prep_dispatch(struct ublk_batch_io_data *data,
++				       unsigned short tag)
++{
++	struct ublk_queue *ubq = data->ubq;
++	struct ublk_device *ub = ubq->dev;
++	struct ublk_io *io = &ubq->ios[tag];
++	struct request *req = blk_mq_tag_to_rq(ub->tag_set.tags[ubq->q_id], tag);
++	enum auto_buf_reg_res res = AUTO_BUF_REG_FALLBACK;
++	struct io_uring_cmd *cmd = data->cmd;
++
++	if (!ublk_start_io(ubq, req, io))
++		return false;
++
++	if (ublk_support_auto_buf_reg(ubq) && ublk_rq_has_data(req))
++		res = __ublk_do_auto_buf_reg(ubq, req, io, cmd,
++				data->issue_flags);
++
++	ublk_io_lock(io);
++	ublk_prep_auto_buf_reg_io(ubq, req, io, cmd, res == AUTO_BUF_REG_OK);
++	ublk_io_unlock(io);
++
++	return res != AUTO_BUF_REG_FAIL;
++}
++
++static void ublk_batch_prep_dispatch(struct ublk_batch_io_data *data,
++				     unsigned short *tag_buf,
++				     unsigned int len)
++{
++	int i;
++
++	for (i = 0; i < len; i += 1) {
++		unsigned short tag = tag_buf[i];
++
++		if (!__ublk_batch_prep_dispatch(data, tag))
++			tag_buf[i] = UBLK_BATCH_IO_UNUSED_TAG;
++	}
++}
++
++#define MAX_NR_TAG 128
++static int __ublk_batch_dispatch(struct ublk_batch_io_data *data,
++				 struct ublk_batch_fcmd *fcmd)
++{
++	unsigned short tag_buf[MAX_NR_TAG];
++	struct io_br_sel sel;
++	size_t len = 0;
++	int ret;
++
++	sel = io_uring_cmd_buffer_select(fcmd->cmd, fcmd->buf_group, &len,
++					 data->issue_flags);
++	if (sel.val < 0)
++		return sel.val;
++	if (!sel.addr)
++		return -ENOBUFS;
++
++	/* single reader needn't lock and sizeof(kfifo element) is 2 bytes */
++	len = min(len, sizeof(tag_buf)) / 2;
++	len = kfifo_out(&data->ubq->evts_fifo, tag_buf, len);
++
++	ublk_batch_prep_dispatch(data, tag_buf, len);
++
++	sel.val = ublk_batch_copy_io_tags(fcmd, sel.addr, tag_buf, len * 2);
++	ret = ublk_batch_fetch_post_cqe(fcmd, &sel, data->issue_flags);
++	if (unlikely(ret < 0)) {
++		int res = kfifo_in_spinlocked_noirqsave(&data->ubq->evts_fifo,
++			tag_buf, len, &data->ubq->evts_lock);
++
++		pr_warn("%s: copy tags or post CQE failure, move back "
++				"tags(%d %lu) ret %d\n", __func__, res, len,
++				ret);
++	}
++	return ret;
++}
++
++static __maybe_unused int
++ublk_batch_dispatch(struct ublk_batch_io_data *data,
++		    struct ublk_batch_fcmd *fcmd)
++{
++	int ret = 0;
++
++	while (!ublk_io_evts_empty(data->ubq)) {
++		ret = __ublk_batch_dispatch(data, fcmd);
++		if (ret <= 0)
++			break;
++	}
++
++	if (ret < 0)
++		ublk_batch_deinit_fetch_buf(data, fcmd, ret);
++
++	return ret;
++}
++
+ static void ublk_cmd_tw_cb(struct io_uring_cmd *cmd,
+ 			   unsigned int issue_flags)
+ {
+diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.h
+index 695b38522995..fbd3582bc203 100644
+--- a/include/uapi/linux/ublk_cmd.h
++++ b/include/uapi/linux/ublk_cmd.h
+@@ -553,6 +553,12 @@ struct ublk_elem_header {
+ 	__u32 result;	/* I/O completion result (commit only) */
  };
  
-@@ -291,6 +308,31 @@ static inline void ublk_io_unlock(struct ublk_io *io)
- 	spin_unlock(&io->lock);
- }
- 
-+/* Initialize the queue */
-+static inline int ublk_io_evts_init(struct ublk_queue *q, unsigned int size)
-+{
-+	spin_lock_init(&q->evts_lock);
-+	return kfifo_alloc(&q->evts_fifo, size, GFP_KERNEL);
-+}
++/*
++ * If this tag value is observed from buffer of `UBLK_U_IO_FETCH_IO_CMDS`
++ * ublk server can simply ignore it
++ */
++#define UBLK_BATCH_IO_UNUSED_TAG 	(__u16)(-1)
 +
-+/* Check if queue is empty */
-+static inline bool ublk_io_evts_empty(const struct ublk_queue *q)
-+{
-+	return kfifo_is_empty(&q->evts_fifo);
-+}
-+
-+/* Check if queue is full */
-+static inline bool ublk_io_evts_full(const struct ublk_queue *q)
-+{
-+	return kfifo_is_full(&q->evts_fifo);
-+}
-+
-+static inline void ublk_io_evts_deinit(struct ublk_queue *q)
-+{
-+	WARN_ON_ONCE(!kfifo_is_empty(&q->evts_fifo));
-+	kfifo_free(&q->evts_fifo);
-+}
-+
- static inline struct ublksrv_io_desc *
- ublk_get_iod(const struct ublk_queue *ubq, unsigned tag)
- {
-@@ -3071,6 +3113,8 @@ static void ublk_deinit_queue(struct ublk_device *ub, int q_id)
- 
- 	if (ubq->io_cmd_buf)
- 		free_pages((unsigned long)ubq->io_cmd_buf, get_order(size));
-+	if (ublk_support_batch_io(ubq))
-+		ublk_io_evts_deinit(ubq);
- }
- 
- static int ublk_init_queue(struct ublk_device *ub, int q_id)
-@@ -3078,7 +3122,7 @@ static int ublk_init_queue(struct ublk_device *ub, int q_id)
- 	struct ublk_queue *ubq = ublk_get_queue(ub, q_id);
- 	gfp_t gfp_flags = GFP_KERNEL | __GFP_ZERO;
- 	void *ptr;
--	int size, i;
-+	int size, i, ret = 0;
- 
- 	spin_lock_init(&ubq->cancel_lock);
- 	ubq->flags = ub->dev_info.flags;
-@@ -3095,7 +3139,16 @@ static int ublk_init_queue(struct ublk_device *ub, int q_id)
- 
- 	ubq->io_cmd_buf = ptr;
- 	ubq->dev = ub;
-+
-+	if (ublk_support_batch_io(ubq)) {
-+		ret = ublk_io_evts_init(ubq, ubq->q_depth);
-+		if (ret)
-+			goto fail;
-+	}
- 	return 0;
-+fail:
-+	ublk_deinit_queue(ub, q_id);
-+	return ret;
- }
- 
- static void ublk_deinit_queues(struct ublk_device *ub)
+ /*
+  * uring_cmd buffer structure
+  *
 -- 
 2.47.0
 
