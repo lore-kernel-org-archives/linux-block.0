@@ -1,114 +1,159 @@
-Received: from sender4-pp-f112.zoho.com (sender4-pp-f112.zoho.com [136.143.188.112])
+Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98AA7198A11;
-	Tue,  2 Sep 2025 19:41:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.112
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756842088; cv=pass; b=FcUP59+DGCu/B5+fF0uj9lHmq7I2VZdQ20TH1473dUlgNSXkjiOcA40VrVw0lM9QOCwMH+0mDW57NijzvC9EX6VfDPd0YvqoUNVI5w6SBcgW4WdJxVl145vYWsMdx6yzTqZQKxDPgyzbJ//Umlye1Yk556+9RqPRM1nyWvyuqJo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756842088; c=relaxed/simple;
-	bh=9KUiVlHOSx3yLQtBjqIEEn8A6eLglGZix9UneSF8ZFo=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=LjyzLTWahXFBAq6ZTmiEPvp1l7upiugSKDW9TwCCYI5ovWV+pDgPxVOohRBQ6yYkMRVah7UHgEccduaHaFvt9IqNrosJnGpVOZHDmSwB/gIoGTU87N0BP3y6GzqgFLqNBQ+79vJu8BmvZXNpOlZ9wdQC5nCfUFNaX/Epes/OqLs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=daniel.almeida@collabora.com header.b=VDlptCP2; arc=pass smtp.client-ip=136.143.188.112
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 027F2208CA
+	for <linux-block@vger.kernel.org>; Tue,  2 Sep 2025 20:01:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756843303; cv=none; b=AnIVXRHFCZDZI4oWhZICBwiycphp2U5L8CxikMhzKmMmRD76htJeid8m22WbRGMYoRk0eJoLoM6vVdkgt5HWRYiN0/uHXW9bOCbMqHSLx35Hlnb/KNmIIkwxINqW8iIo1CUCRWOMeG0pEsaSutSzmm6Y+WlxhrzlMJQOi1k74hk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756843303; c=relaxed/simple;
+	bh=MZyZaJliWM6EYKWEqIFLWhllgjlsHmSQoTR7a6Rko2E=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=rN1M5ao38lzKuMxds5MDYjQMIQ89J/m6arkiYaUKT8fMkj9Z7NMT7uQIzgo6tRwqZyqeF9Y6pafuJI/5TD5Bw/cV/y2os7B3K2F9Hn23VnJNp87JWE1/NX393ccaVDQ6NHTWWwhvDe7nSLiNovg+DpHnK//EBz5W/n/ENgGMDq4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=YVb5Gzb0; arc=none smtp.client-ip=67.231.145.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=collabora.com header.i=daniel.almeida@collabora.com header.b="VDlptCP2"
-ARC-Seal: i=1; a=rsa-sha256; t=1756842064; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=UHvzHgVFpRNKwZW6xC3IYWq3/z1MAQ+WGRwP83cnUgUArqIimwAZXtbUBFa3e1kfr4XvsNx6YvUvuD5UFGrcSCS7/hx1ZKWMNKk+h73Le0QfwhAEpglvarnvqLzCDcICbaOrtVFeD+NbDQIYvNbXGUZLUrBI73IGAIOmdmfFBU0=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1756842064; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=9KUiVlHOSx3yLQtBjqIEEn8A6eLglGZix9UneSF8ZFo=; 
-	b=URq60oLY7951Lx9OjIWl1GVh3uQYNQwZ/3I6cteQKzWKdE4BBTKFB8OExO08zASrEcO3hUk2OwV3l/TAQ0NBXrOZTd3j+WNrncBnqCn9eIqGDw8SyTjy8D9FuWlWb1ACfmutJ6sz5TplSfI5lfasNU5eWP3czJvxtcU7Y5Qmto8=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=collabora.com;
-	spf=pass  smtp.mailfrom=daniel.almeida@collabora.com;
-	dmarc=pass header.from=<daniel.almeida@collabora.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1756842064;
-	s=zohomail; d=collabora.com; i=daniel.almeida@collabora.com;
-	h=Content-Type:Mime-Version:Subject:Subject:From:From:In-Reply-To:Date:Date:Cc:Cc:Content-Transfer-Encoding:Message-Id:Message-Id:References:To:To:Reply-To;
-	bh=9KUiVlHOSx3yLQtBjqIEEn8A6eLglGZix9UneSF8ZFo=;
-	b=VDlptCP2gcaFGw4epeQDpIxmm1hV7gbUHrrpW2N3yLLYYR8cl/h4N6EcjivXbGhl
-	fp4B7F2ccRpo52GKB92eZ36LugVEgUkBN0DeL56lqoFJuskFEEMd/q9iyW0a2S6gVJF
-	vd4uTh2j9NzvxdDoo7mN1XhVs9E5kt1eTQT5fZ58=
-Received: by mx.zohomail.com with SMTPS id 1756842062765279.12565293887326;
-	Tue, 2 Sep 2025 12:41:02 -0700 (PDT)
-Content-Type: text/plain;
-	charset=utf-8
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="YVb5Gzb0"
+Received: from pps.filterd (m0044012.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 582EkAvi3604190
+	for <linux-block@vger.kernel.org>; Tue, 2 Sep 2025 13:01:41 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=s2048-2025-q2;
+	 bh=cBrf5yw3v5nX8JGtQ7uv8R4eFJ2lqhxaw+fwEA0WyII=; b=YVb5Gzb0ZUz9
+	v917AMXeir7khFGBgAwnzaSu1qto5RxTfmSyjY/TeBBcNQai3qvzIL5YUDt1TDCx
+	VDG/6GCHiZru25VrYwP9zXz12D/of7fr2BVo/9Rxhl3MBBovfrpRKVIDO9aQv15s
+	4xSWDP2rPU+y/9zqFMtxjoNKiR0cMRPY7y1Lix3GGSU/+MZVKyNCcruvLKLRwsOb
+	7kxuVjlMMj5Oo16hTjhQCwCz1r+mcak6p9zs8i/wozgJH12N0DeoIIzMusz6Q+OG
+	QVb8zszLoydKnrppPV19YdQM/UpNTInFAi6ZFvYfElbie3vRn7PiWlTaGg8rAYyT
+	6nuaLqbJqA==
+Received: from mail.thefacebook.com ([163.114.134.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 48x2mutrpm-10
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <linux-block@vger.kernel.org>; Tue, 02 Sep 2025 13:01:41 -0700 (PDT)
+Received: from twshared71707.17.frc2.facebook.com (2620:10d:c085:208::f) by
+ mail.thefacebook.com (2620:10d:c08b:78::c78f) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.20; Tue, 2 Sep 2025 20:01:37 +0000
+Received: by devbig197.nha3.facebook.com (Postfix, from userid 544533)
+	id 9BDEE142C456; Tue,  2 Sep 2025 13:01:22 -0700 (PDT)
+From: Keith Busch <kbusch@meta.com>
+To: <linux-block@vger.kernel.org>, <linux-nvme@lists.infradead.org>
+CC: <hch@lst.de>, <axboe@kernel.dk>, <martin.petersen@oracle.com>,
+        <jgg@nvidia.com>, <leon@kernel.org>, Keith Busch <kbusch@kernel.org>
+Subject: [PATCHv2 1/2] blk-integrity: enable p2p source and destination
+Date: Tue, 2 Sep 2025 13:01:20 -0700
+Message-ID: <20250902200121.3665600-2-kbusch@meta.com>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20250902200121.3665600-1-kbusch@meta.com>
+References: <20250902200121.3665600-1-kbusch@meta.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.700.81\))
-Subject: Re: [PATCH v7 00/17] rnull: add configfs, remote completion to rnull
-From: Daniel Almeida <daniel.almeida@collabora.com>
-In-Reply-To: <20250902-rnull-up-v6-16-v7-0-b5212cc89b98@kernel.org>
-Date: Tue, 2 Sep 2025 16:40:46 -0300
-Cc: Boqun Feng <boqun.feng@gmail.com>,
- Miguel Ojeda <ojeda@kernel.org>,
- Alex Gaynor <alex.gaynor@gmail.com>,
- Gary Guo <gary@garyguo.net>,
- =?utf-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>,
- Benno Lossin <lossin@kernel.org>,
- Alice Ryhl <aliceryhl@google.com>,
- Trevor Gross <tmgross@umich.edu>,
- Danilo Krummrich <dakr@kernel.org>,
- Jens Axboe <axboe@kernel.dk>,
- Breno Leitao <leitao@debian.org>,
- linux-block@vger.kernel.org,
- rust-for-linux@vger.kernel.org,
- linux-kernel@vger.kernel.org
+MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <6A619CD0-4B72-433D-97D9-CBA8AC37DB01@collabora.com>
-References: <20250902-rnull-up-v6-16-v7-0-b5212cc89b98@kernel.org>
-To: Andreas Hindborg <a.hindborg@kernel.org>
-X-Mailer: Apple Mail (2.3826.700.81)
-X-ZohoMailClient: External
+X-FB-Internal: Safe
+Content-Type: text/plain
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTAyMDE5OCBTYWx0ZWRfX6HA6RIazcsf0
+ Cyo8DsTQD2DQqyDqJu+tseR5lFKK6Y9xuZxX1dmDocrH4r70EeN6rKeGSCY9M8gKwAuYSG58TAO
+ cSs8EgWOhglTnoap2zoZd/8AE+A7VVQuhwu3k353s6DQ2sBayPXWx/XgTmRNRGpGub4N8Lggsio
+ 4RqxlI0s2U7v2iTc1/6rka2+SGIXifp4+f8bIEuRInsNdM2JmxWM0kSaVlzNAXwdAs8iY1mc7u6
+ yKZf/mZMbxY56VBF74S4L3+IeNod6hz4xdXyr+SI9L+xZx/hf1Y3ORtHpBd8f9ymIoHgcrMHcvv
+ sYLbFpHTIJ+YYckwpS2UkgJQVgSzZ54Dzt0l2AcLJdbz77WcUCtFosMe8CT4Do=
+X-Authority-Analysis: v=2.4 cv=dcCA3WXe c=1 sm=1 tr=0 ts=68b74d25 cx=c_pps
+ a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17
+ a=yJojWOMRYYMA:10 a=VwQbUJbxAAAA:8 a=nFeozVan30irdC35seoA:9
+X-Proofpoint-GUID: ftMjaULYwHf3Uf5TLFAwneoWwGBFngvs
+X-Proofpoint-ORIG-GUID: ftMjaULYwHf3Uf5TLFAwneoWwGBFngvs
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-09-02_06,2025-08-28_01,2025-03-28_01
 
-Hi Andreas,
+From: Keith Busch <kbusch@kernel.org>
 
-> On 2 Sep 2025, at 06:54, Andreas Hindborg <a.hindborg@kernel.org> =
-wrote:
->=20
-> This series adds configuration via configfs and remote completion to
-> the rnull driver. The series also includes a set of changes to the
-> rust block device driver API: a few cleanup patches, and a few =
-features
-> supporting the rnull changes.
->=20
-> The series removes the raw buffer formatting logic from =
-`kernel::block`
-> and improves the logic available in `kernel::string` to support the =
-same
-> use as the removed logic.
->=20
-> This series is a smaller subset of the patches available in the
-> downstream rnull tree. I hope to minimize the delta between upstream
-> and downstream over the next few kernel releases.
->=20
-> Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
-> ---
-> Changes in v7:
-> - Fix name of `kstrtobool_bytes` in commit message of patch 06/18.
-> - Fix stale safety comments in patch 15/18.
-> - Refactor `kstrtobool_raw` for readability.
-> - Link to v6: =
-https://lore.kernel.org/r/20250822-rnull-up-v6-16-v6-0-ec65006e2f07@kernel=
-.org
->=20
+Set the extraction flags to allow p2p pages for the metadata buffer if
+the block device allows it. Similar to data payloads, ensure the bio
+does not allow merging if we see a p2p page.
 
-You told me that some of my tags were not picked up by accident?
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Keith Busch <kbusch@kernel.org>
+---
+ block/bio-integrity.c | 21 +++++++++++++++++----
+ 1 file changed, 17 insertions(+), 4 deletions(-)
 
-I checked again and all patches seem to have my rb tag. In any case,
+diff --git a/block/bio-integrity.c b/block/bio-integrity.c
+index 6b077ca937f6b..d3618ed106f4e 100644
+--- a/block/bio-integrity.c
++++ b/block/bio-integrity.c
+@@ -230,7 +230,8 @@ static int bio_integrity_init_user(struct bio *bio, s=
+truct bio_vec *bvec,
+ }
+=20
+ static unsigned int bvec_from_pages(struct bio_vec *bvec, struct page **=
+pages,
+-				    int nr_vecs, ssize_t bytes, ssize_t offset)
++				    int nr_vecs, ssize_t bytes, ssize_t offset,
++				    bool *is_p2p)
+ {
+ 	unsigned int nr_bvecs =3D 0;
+ 	int i, j;
+@@ -251,6 +252,9 @@ static unsigned int bvec_from_pages(struct bio_vec *b=
+vec, struct page **pages,
+ 			bytes -=3D next;
+ 		}
+=20
++		if (is_pci_p2pdma_page(pages[i]))
++			*is_p2p =3D true;
++
+ 		bvec_set_page(&bvec[nr_bvecs], pages[i], size, offset);
+ 		offset =3D 0;
+ 		nr_bvecs++;
+@@ -265,10 +269,11 @@ int bio_integrity_map_user(struct bio *bio, struct =
+iov_iter *iter)
+ 	unsigned int align =3D blk_lim_dma_alignment_and_pad(&q->limits);
+ 	struct page *stack_pages[UIO_FASTIOV], **pages =3D stack_pages;
+ 	struct bio_vec stack_vec[UIO_FASTIOV], *bvec =3D stack_vec;
++	iov_iter_extraction_t extraction_flags =3D 0;
+ 	size_t offset, bytes =3D iter->count;
++	bool copy, is_p2p =3D false;
+ 	unsigned int nr_bvecs;
+ 	int ret, nr_vecs;
+-	bool copy;
+=20
+ 	if (bio_integrity(bio))
+ 		return -EINVAL;
+@@ -286,15 +291,23 @@ int bio_integrity_map_user(struct bio *bio, struct =
+iov_iter *iter)
+ 	}
+=20
+ 	copy =3D !iov_iter_is_aligned(iter, align, align);
+-	ret =3D iov_iter_extract_pages(iter, &pages, bytes, nr_vecs, 0, &offset=
+);
++
++	if (blk_queue_pci_p2pdma(q))
++		extraction_flags |=3D ITER_ALLOW_P2PDMA;
++
++	ret =3D iov_iter_extract_pages(iter, &pages, bytes, nr_vecs,
++					extraction_flags, &offset);
+ 	if (unlikely(ret < 0))
+ 		goto free_bvec;
+=20
+-	nr_bvecs =3D bvec_from_pages(bvec, pages, nr_vecs, bytes, offset);
++	nr_bvecs =3D bvec_from_pages(bvec, pages, nr_vecs, bytes, offset,
++				   &is_p2p);
+ 	if (pages !=3D stack_pages)
+ 		kvfree(pages);
+ 	if (nr_bvecs > queue_max_integrity_segments(q))
+ 		copy =3D true;
++	if (is_p2p)
++		bio->bi_opf |=3D REQ_NOMERGE;
+=20
+ 	if (copy)
+ 		ret =3D bio_integrity_copy_user(bio, bvec, nr_bvecs, bytes);
+--=20
+2.47.3
 
-For the series:
-
-Reviewed-by: Daniel Almeida <daniel.almeida@collabora.com>
-
-This should be enough for "b4 trailers" to pick this up.
-
-=E2=80=94 Daniel=
