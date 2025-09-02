@@ -1,140 +1,226 @@
-Received: from mail-il1-f174.google.com (mail-il1-f174.google.com [209.85.166.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2084.outbound.protection.outlook.com [40.107.94.84])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DF54275AE9
-	for <linux-block@vger.kernel.org>; Tue,  2 Sep 2025 22:22:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.174
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756851768; cv=none; b=GeW3b9JQTKXNmPeSTg9io4IjY+4hmoKi4A0TymE0aBdumHdmMeQtNEQhVYIk/MA2Y4pscCnknbjKfYHWLtAkdVg82mazJY20I++2l7N7kNUQdhIG4c45OftO/U6gtHyOTlNDDiItND6EyJfz8lqmLg/V+560B191S57OP825pFc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756851768; c=relaxed/simple;
-	bh=1r8Dd1Vxp/ZfKTkV/+QQqeGZJ37/gBVxDRLdoNTobx4=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=fRVpzn+GBWq5nOLuhffd7vxg1lP+WtmbIiJBseRlg6JDwYYlHYQuRA+A2PQM/tg+2ar7+GWk+0E1leb0ljwmveemTVKOVj0Gnzo3A576/zOjiMnZMYyamdmFruWSV/EXsNRtv+EwsdMoSRVx4f0noDvnp84NU3NG+jjkwedOSEE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Q9+Fmpy4; arc=none smtp.client-ip=209.85.166.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 042FA1FA272;
+	Tue,  2 Sep 2025 23:25:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.84
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756855502; cv=fail; b=cl8TYsLkP9JBsysw5YYmyQt0pJaux7Nkh36Mcx/FnIYMZsEc9m0JpZos1fhR8QJ6U9tlpNa87bZKOlqtm82oWr5oNBiwc7q65rwXPa/YVZka+O65Fd1YwWM3wpOJLJWLCDtEI7r1bzxNBe/w4xU7WAnUtY5iC6XdjqrltOKKxyk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756855502; c=relaxed/simple;
+	bh=4H2pOsEdZoIl2mJtj4VlRUtrWiWjH0i0/PdqKegi9so=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=didmfjPP3RtHAfAACgas8/cnGHyOjrs8exD27TjdwcHGSt5yGEUcfKyUzd1wbBvhTSZ8adYLh2vR3rGe691h9jfco9TiMSkDspHspQKV48K6jT5R04NSIVmDMm0qJVjDxfwn3r3QuX6DXJ9u/xsQsBRRC/hhqq38WyTVIew85aI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=FrwZLjyp; arc=fail smtp.client-ip=40.107.94.84
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Q9+Fmpy4"
-Received: by mail-il1-f174.google.com with SMTP id e9e14a558f8ab-3f372839583so2517765ab.1
-        for <linux-block@vger.kernel.org>; Tue, 02 Sep 2025 15:22:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1756851765; x=1757456565; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zsgHYoXl8XEDv6u9usSm/TLGj9iq5mbiFJJ4P4xGJcU=;
-        b=Q9+Fmpy4dndieky0PudmQdsl/stk6Q+AweMcMIyn91LFVai3hbIioaqyiPam+zolFF
-         1MIlPvd2jFCkwAJUjA5BZz5RE4sjQL/nDMbwe/DdEVQEXlDmdDwn8mbvO9r/K5UltAql
-         wr74LPy5kZqFye4b5N1ZVMTxsYu8PLMcF/008/qTIixLJ7CkbfzYJETZzh9HvLLibltT
-         icuq7aDYXD6r2zmOJSSOlgMbVoeBpWb/xqyvNmI733UOW/lMPiKV739cPFcXnwzwmrPL
-         nMSBZQ1PVaPcD/5SCl+CbSsnlDLjKRxqPyusWDxMMzWGB9VqqwmE2uyJncyYemKJ1cHA
-         k5JA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756851765; x=1757456565;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zsgHYoXl8XEDv6u9usSm/TLGj9iq5mbiFJJ4P4xGJcU=;
-        b=ska7ZnoWLpO43eQLSq3dd7KH9O/GkaSz88JZxUFMrX8b8pmrT5ovBzFYE5X5MsgKGa
-         4+Q/lT3mPQw6RcZoy2DORTyfTXslMzPSN61ltpfaAkWruGPIF8YgwmjyE6fMsi0vlBc8
-         kUuTsuLXyKzte7VnH29Eptg9h+A4q/uOdGFcApD8DxOpcEbH98kz3cydFnA39dcNCJZP
-         Y/xYcaPHib/FinNfEuiShlMsxCU0r4BpykOIrHrvjrlLVb/bJvpEuk2+HfWWRyDB7p6O
-         td17pih+TEpAlNwUdjYnGpe3mlf5kMbWBDSi6BbrF+1dZ3yIW9ae8ZVjA+4ARUuTce9G
-         lIqA==
-X-Gm-Message-State: AOJu0YyavTOYmFzlyDEQwZS56Uf+RH64oHq3HsFuOimJtfLrJNF5/iog
-	LoBup5BaB5Exa15eUQ4UuF2/t2ZsDOR+ZqOLH9Ndfd0vu1G67JO22IN6qGghEX90XZM=
-X-Gm-Gg: ASbGncsOKlKt7TwT7Yznkkidy2OynopQLIvjZnenq084kfScxO6nFScg/0X8dFGH4Vk
-	sfAR5ht6MoyPhFY9QX+6qJVQMNoSm7q0q99GG/PLi0QA0roRUW4LDlu30CsoolqQZWS8s3BYGMY
-	eWAVg6+J86Qy9REd+t+o5uDNc5jiURqJmml0IQ33yvpu6vogjtKhuyS3mCjfdF59H81K1OYd0t4
-	FvC0y1NwBRzCna0eScbQAmAeJhUgl1BsdU56LOipgECoaJnIry4mkd2zwDRObaP31sXawPONnb6
-	3hLbDf3qDwotvG9S5wH0PK7YiKVk0s9O8FftiCXZsBeoN1dsXmriGmEsVvLnltbN8bahyMC+f+J
-	DV68biUky9c7OnFmuQZ+Ez439PYfnJr6Af6hOXqIwJu+FYjCFT8yoU1B/4tyFF+bs
-X-Google-Smtp-Source: AGHT+IFfI7hKWtDAOl7ZVodkkOkz+AIezL3CZ2BrlZMAw59f9+OYjXiNDkBRRbyrOg6biAgWIE7oTA==
-X-Received: by 2002:a05:6e02:216c:b0:3e6:7ac1:b8bf with SMTP id e9e14a558f8ab-3f3d60dcb9fmr225041885ab.9.1756851765148;
-        Tue, 02 Sep 2025 15:22:45 -0700 (PDT)
-Received: from [127.0.0.1] (syn-047-044-098-030.biz.spectrum.com. [47.44.98.30])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3f3e136b841sm45322195ab.44.2025.09.02.15.22.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Sep 2025 15:22:44 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: Boqun Feng <boqun.feng@gmail.com>, Miguel Ojeda <ojeda@kernel.org>, 
- Alex Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>, 
- =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
- Benno Lossin <lossin@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
- Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, 
- Breno Leitao <leitao@debian.org>, Andreas Hindborg <a.hindborg@kernel.org>
-Cc: linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Daniel Almeida <daniel.almeida@collabora.com>
-In-Reply-To: <20250902-rnull-up-v6-16-v7-0-b5212cc89b98@kernel.org>
-References: <20250902-rnull-up-v6-16-v7-0-b5212cc89b98@kernel.org>
-Subject: Re: [PATCH v7 00/17] rnull: add configfs, remote completion to
- rnull
-Message-Id: <175685176380.67509.14270978539673986925.b4-ty@kernel.dk>
-Date: Tue, 02 Sep 2025 16:22:43 -0600
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="FrwZLjyp"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=EPPUGTpBQtvDStMLISia+THnTG3E+xG7M30x/PlBo2tAa/Nr/FmSG//W8J1ytvmYfhHAim/W9vQgGujfcSuDILGI3MLD6pI6zS/OBY6OjTRcOngtk4jHhyGUh7jyRRB7szMQuPkC0FVnIUpnLJxS17iQdNA6AwS8d3tSA1dKuSftvGm2YCpQt3teeyNM/4nDnpsnuHxKCtSsm4ZxJ7lDZKrevojcXGC2x64W2xWlegQeMIK2rdxpSOR3mUEg+68waaoLnziZs6CRUl9OORYmCDYjZdsiUhla3kDKGqETPLX9l+jUVxkpUfFVQZaaMQUTmy9sd4idVJ3XjDo1oc5Fqg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=5WhB/bSCKzhLBnuuHt7TF4nSB4uzH/8ebtNNvqKnLZo=;
+ b=Bp8uobg7Bc/BzSSDdn/btXqGPCvh/sMoJV2WrMiwae2gLXXMNa74iBFMOK8/Kd3nIe9DK65EPLAHjJyQmW8DOXDs0DsFGRmQLve8gYV8a6tY17tfpTo8zCgFv5+3GgNHnagEytgV8j4HLlBahFH4W76yI1oHiycXqbmiQtuJxjyhuu6icEqsWPa7LoOyNl2pEd2PzvwHOQbnGhYo3Fzzd9EA/sudkNK/l5w4yDPSkDAmsiZvXW6QfcWhCsAF2m1x/v5zC7XkqaqZe82trwitDyL1DcbG/w15m/gyz76Y438tMp0oBXpcw+HMFmc6FRhQx7LSn25C6eW1Cargibj6zQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=5WhB/bSCKzhLBnuuHt7TF4nSB4uzH/8ebtNNvqKnLZo=;
+ b=FrwZLjypAbDrjjqAKk256crdzVZq5Sew5KLCSVqXFIm6JyrV7WWqseMrpiu6vHBAy6Xlq7hJUsVrsT/FkYId14wsn536VKml4D6dVf0nX1pDWvZdYx95NPTtj+TUehlsqj5w0TNjWea9EzqyGH1Szex82Slu5m16O469Jqf4vo8LVpYziiKli7KTd/FS6+moUTxeys5qqRTu4BHPio4D6BiG9luxRnn5KUs1cBGj9i9sQBFRtT+dthQPMa8u8xyA4r41LbqjNUFXR0e1kW0r+ZfYYrCZlj/fR+WLDmZd8zFTpgKVynLwnmDbpnxukVNhCQvtdttg4v7iM17l9idL/Q==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
+ by CH1PR12MB9574.namprd12.prod.outlook.com (2603:10b6:610:2ae::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9073.27; Tue, 2 Sep
+ 2025 23:24:58 +0000
+Received: from CH3PR12MB8659.namprd12.prod.outlook.com
+ ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
+ ([fe80::6eb6:7d37:7b4b:1732%4]) with mapi id 15.20.9073.026; Tue, 2 Sep 2025
+ 23:24:58 +0000
+Date: Tue, 2 Sep 2025 20:24:57 -0300
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Keith Busch <kbusch@kernel.org>
+Cc: Marek Szyprowski <m.szyprowski@samsung.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Leon Romanovsky <leonro@nvidia.com>,
+	Abdiel Janulgue <abdiel.janulgue@gmail.com>,
+	Alexander Potapenko <glider@google.com>,
+	Alex Gaynor <alex.gaynor@gmail.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Christoph Hellwig <hch@lst.de>, Danilo Krummrich <dakr@kernel.org>,
+	iommu@lists.linux.dev, Jason Wang <jasowang@redhat.com>,
+	Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>,
+	Jonathan Corbet <corbet@lwn.net>, Juergen Gross <jgross@suse.com>,
+	kasan-dev@googlegroups.com, linux-block@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org, linux-nvme@lists.infradead.org,
+	linuxppc-dev@lists.ozlabs.org, linux-trace-kernel@vger.kernel.org,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	Robin Murphy <robin.murphy@arm.com>, rust-for-linux@vger.kernel.org,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Stefano Stabellini <sstabellini@kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	virtualization@lists.linux.dev, Will Deacon <will@kernel.org>,
+	xen-devel@lists.xenproject.org
+Subject: Re: [PATCH v4 14/16] block-dma: migrate to dma_map_phys instead of
+ map_page
+Message-ID: <20250902232457.GC470103@nvidia.com>
+References: <cover.1755624249.git.leon@kernel.org>
+ <CGME20250819173845eucas1p221cd6842839f5e7130f131cd341df566@eucas1p2.samsung.com>
+ <22b824931bc8ba090979ab902e4c1c2ec8327b65.1755624249.git.leon@kernel.org>
+ <2d8e67b2-4ab2-4c1f-9ef3-470810f99d07@samsung.com>
+ <aLdoyWevrQMQUGyz@kbusch-mbp>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aLdoyWevrQMQUGyz@kbusch-mbp>
+X-ClientProxiedBy: YT4PR01CA0469.CANPRD01.PROD.OUTLOOK.COM
+ (2603:10b6:b01:d6::7) To CH3PR12MB8659.namprd12.prod.outlook.com
+ (2603:10b6:610:17c::13)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-2ce6c
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|CH1PR12MB9574:EE_
+X-MS-Office365-Filtering-Correlation-Id: 63dbd94d-8dd9-4729-0d10-08ddea77eed5
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?Higtp3/WM5oOHXkSSI5Z6pkQhOJorSSmJ1rnzoaJINMSn5inopVW+5S1K/Ek?=
+ =?us-ascii?Q?7UrVD4MqKyLijH5h/vlsnHGvvpnFBsM7bvA+EFOiGdGldsWfaZYD8zUnE+Ia?=
+ =?us-ascii?Q?ecNJ/0eJumt+b4s+tCBkkWx3wAlbR3L7ZwRembGJ0qEAW5a8nMcl2O4pKBo3?=
+ =?us-ascii?Q?PdQLHRgzmpB+Zi9Fyvs7ObYDwqrX3SvjiyXTY7dfz6xgl2cNvZLi0VYii1/b?=
+ =?us-ascii?Q?MkmMnZxsMlCME5PY63Vbs+iSk/IsvqtWZHysYL4ru2GKkqHySeU/UxTsKS9H?=
+ =?us-ascii?Q?NCQuJHY9AoYkjqmoR9wiyV8tPiNXWxpRtpTZLV+P9wxTPx+sIP6lmWoS5/S8?=
+ =?us-ascii?Q?tScHp8k0n3YfKg3GgKbdM3XqOzkoumuJYdU2wWmSvEiefzhn121027ScVc0M?=
+ =?us-ascii?Q?mgzvNL4BID9woA1Jopw2qWMOUr6I42j9dddH10a2Hv1fG7SqI425nv/pOe0t?=
+ =?us-ascii?Q?XJLZrlOU3bEWKkS5qf5qLZ4koodOuW/or2bHHG01Kw+qVJViR5uQMQErX1Rn?=
+ =?us-ascii?Q?dtqR9Vv9ju+N686ia1iq1DS9dkK7YGKHd5W0b0ulhNTSQMFxZH3cWGGjfWTk?=
+ =?us-ascii?Q?pjUR3HiLnhZ/Gd+XDqBYF4iqr14XCZkC491u0cxXUHDii+HrI0WlyWJ2BKs0?=
+ =?us-ascii?Q?dBy7a/RbGYkwaioywaADLcf4CQNWk5/2GrFCGWhBSwYB4ZjprP1MGHvYdI3R?=
+ =?us-ascii?Q?DMzz2x8pNRL7Mivdz1EtHsC/rhFLc7JonZiWPL/pvdgvSnbboCWHS7c6QOpl?=
+ =?us-ascii?Q?0swby8pOQj4N0n49XZtvW/idwcbe4eNzXJ0jm7wrkcFtMMUxVvl8m7yvIDtZ?=
+ =?us-ascii?Q?lkBLoshQkBjqhFQ/rMBX0tNenSjQGAw3q6U+TAYT6ONJyKzPzXMD6ONMEEr2?=
+ =?us-ascii?Q?lM7nczTb/5U62gC4bHgrqTQZG0/IV/K146tgoh4kVZhRNS4+1TDwn85Ef00w?=
+ =?us-ascii?Q?b25m6ZgpKhrAxPuKScb48bdqsiYSeRjlub9AcOjtrsTjupvo5g4b1uCSu360?=
+ =?us-ascii?Q?ihn81VgyyrErWwvwyxXUY+zUoPHstPTvUXgO4hhJQGEphLgRHf5IZJ8FNF9E?=
+ =?us-ascii?Q?y8aOe+19T3uf4BgYrljrHnyl7H7Ivmy/M3TWnpkf0Ne3P/rxpcFURQqPyxrA?=
+ =?us-ascii?Q?nmax8Lk0p77thdRstB+Hc504ESJo3wkqm2nGrwePMZqg9Ex+ZwuwPzIh+yFc?=
+ =?us-ascii?Q?NW4E84kHyQmH9bigD2OQ2nj80E+nsEUiEfPtQu9DDNkHPhsc3DWmsQp5F5ID?=
+ =?us-ascii?Q?v2iXvkdUv4q4fUxzbDu8lvbKB34fT2OkWHmduiMObfU44H+8USLbzFbYGHvp?=
+ =?us-ascii?Q?W+zopG0awjW8HwejpiP/r5KxoNSrY51NLps/3h1ryMebgbOTFkdvuQ/1Jubh?=
+ =?us-ascii?Q?wHoM62r1+0y7npOtu7w7ng34SwuefUBlBMTA1ghgxypuzWM4sbecLls4XAyK?=
+ =?us-ascii?Q?d1RHM5UhoGk=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?p5eHAhSaNlykrbWpG/UPoqPb+iB4di9SrzYYl3qOPeAc97/mV6PDVi69YGjb?=
+ =?us-ascii?Q?/G5ZcFGR6SHgsNA89667543XYP54vL2aGbWD7mO+dDPSxdYPwrSwbR4OZKGj?=
+ =?us-ascii?Q?0uZ/4QYa3QBppOpU7LU6Ruc7Eb3ZaXR3MCTcpATP7+YKn3PKMq/qRJBInuh0?=
+ =?us-ascii?Q?mndkVYAZ72At+hxcF5ZZ1QA16/AxGYtIV/Rwnv1vRZM5FjoG/84e4j5oYx0S?=
+ =?us-ascii?Q?ocyFVke+zLfEuBT2oM5/3BmRbPrJY0izl9cUqeCfBv+jquc7o7TVk014BH20?=
+ =?us-ascii?Q?TrICRhQ3NARiEsVmZK87iG72oNredufI/8XNg3bhNZYwsHRYRQcEPg6aDbLL?=
+ =?us-ascii?Q?mT/NPGXf52sa56OYUv6OkB7bxN24Uich0CeXNjMtCeNXO2pASJCwHnwEB1gZ?=
+ =?us-ascii?Q?PV0X5lZBA2ewO+tX4LQUKqqT3mB8MTEJYbqCa94pF3vxk5cbJMuob9np/A/L?=
+ =?us-ascii?Q?o6CfmeH6x+Z7S8Pfqgb/Q12IwsSGyQFRPyo7W8hR2V/qW5e7ER223wB7eCyx?=
+ =?us-ascii?Q?ZIg3y+y0vcamWCdg2D0pXVK9J4+85ZPfxV7N1YX2oez3G9epg/ohsdHic9fu?=
+ =?us-ascii?Q?JxCIJgemIxztEXy4YoOTaMsgz4GYwTVodoS1cZ0NYpMROKPBCTm7xT4XBjq6?=
+ =?us-ascii?Q?2+DE2mLQ/UCL5jhiTp6poXSCR0qBOgWzUJKyaLwjQ1GZAyzxbNrcljo82ame?=
+ =?us-ascii?Q?TKeXuuv6aBzpD/6RZMBMAZzh2sr9hg0LORN8vJe5fFvmR5JRmNzsO7Q9ris6?=
+ =?us-ascii?Q?HfrkG070I/eqfwuSBDJ4nzLvACcAJoQhez6FytC0UcpRlbOPD+r1rMwKdl+w?=
+ =?us-ascii?Q?8lx/vYLaNoXVZSsWZEpftqg+gPlzE2ccC3sAfFDqYq3osSe3yhfuGgjIngrI?=
+ =?us-ascii?Q?N763ZBm1UZHKcOoUIJkq1IlWBPaat+KVqpOv53f9E59PqJtGu2/h6H95WyRJ?=
+ =?us-ascii?Q?bW7CcTqQM9bEWsW9kzofp/5dvkCxlaWHY3Nh4Nxjy0jS2fGPWAPM3qZAc0jS?=
+ =?us-ascii?Q?V9kmZydsir6/Cx30g7K33l3dwibq6q46+W03IF+gjL9XnaWlmCieooWek8lW?=
+ =?us-ascii?Q?h/uGyVI8CqH12zNfrFojddv8yK/hTDrQN9jYSkA1ahEv6ZL1DLwqBlMya4Ap?=
+ =?us-ascii?Q?/r5/qlXRyAHu5A0QAwyPDGs5ml3qsMX2ajkBGSk9X0ntPihhkWkUqk8sd2hO?=
+ =?us-ascii?Q?rlkadpZpHqJepYOKHZrUdi3WSU0xKSSJeQ+u71wDEK9qghkKVjSYjER13IuG?=
+ =?us-ascii?Q?i4NUzxZ2pIKqaql+Ty58blZQRf1++v8itAdRiREY4lAVu2ikKLoPkfJFvxNJ?=
+ =?us-ascii?Q?Q1hdIWrcRdvBX+JaZtvjSYcRpyrhBZdKBE0l39mN8fcvqiw5hQ3glHMoqD8j?=
+ =?us-ascii?Q?ccHD1YCwdTzvyjY8bMoZJ/h7M+UAHuTS16dOswEl+UJKX5koND+Ql9PGkxhP?=
+ =?us-ascii?Q?9fgidwA9mzNyZdN9S2gZjRAls3FnVg2GPr6TkGVDXf8WJ8ZImtMPr+uZU7Kx?=
+ =?us-ascii?Q?C3uqBfEEQfmHvbJAVwFTC6HZU+GYssMua51pl763bOE6Zw39qHuaSaSowPOq?=
+ =?us-ascii?Q?x1wOdD6P+giXyxbN/Ko=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 63dbd94d-8dd9-4729-0d10-08ddea77eed5
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Sep 2025 23:24:58.6964
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: zp9UTtFHtRHHEdUZ3DhGe9qQeSrMw2x+t/nR0QIEskMOvB26XU5zEDnMfQkF+y5a
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH1PR12MB9574
 
-
-On Tue, 02 Sep 2025 11:54:54 +0200, Andreas Hindborg wrote:
-> This series adds configuration via configfs and remote completion to
-> the rnull driver. The series also includes a set of changes to the
-> rust block device driver API: a few cleanup patches, and a few features
-> supporting the rnull changes.
+On Tue, Sep 02, 2025 at 03:59:37PM -0600, Keith Busch wrote:
+> On Tue, Sep 02, 2025 at 10:49:48PM +0200, Marek Szyprowski wrote:
+> > On 19.08.2025 19:36, Leon Romanovsky wrote:
+> > > @@ -87,8 +87,8 @@ static bool blk_dma_map_bus(struct blk_dma_iter *iter, struct phys_vec *vec)
+> > >   static bool blk_dma_map_direct(struct request *req, struct device *dma_dev,
+> > >   		struct blk_dma_iter *iter, struct phys_vec *vec)
+> > >   {
+> > > -	iter->addr = dma_map_page(dma_dev, phys_to_page(vec->paddr),
+> > > -			offset_in_page(vec->paddr), vec->len, rq_dma_dir(req));
+> > > +	iter->addr = dma_map_phys(dma_dev, vec->paddr, vec->len,
+> > > +			rq_dma_dir(req), 0);
+> > >   	if (dma_mapping_error(dma_dev, iter->addr)) {
+> > >   		iter->status = BLK_STS_RESOURCE;
+> > >   		return false;
+> > 
+> > I wonder where is the corresponding dma_unmap_page() call and its change 
+> > to dma_unmap_phys()...
 > 
-> The series removes the raw buffer formatting logic from `kernel::block`
-> and improves the logic available in `kernel::string` to support the same
-> use as the removed logic.
-> 
-> [...]
+> You can't do that in the generic layer, so it's up to the caller. The
+> dma addrs that blk_dma_iter yield are used in a caller specific
+> structure. For example, for NVMe, it goes into an NVMe PRP. The generic
+> layer doesn't know what that is, so the driver has to provide the
+> unmapping.
 
-Applied, thanks!
+To be specific I think it is this hunk in another patch that matches
+the above:
 
-[01/17] rust: str: normalize imports in `str.rs`
-        commit: d5d060d624e34c6ce1748a157cf2391e49af2a54
-[02/17] rust: str: allow `str::Formatter` to format into `&mut [u8]`.
-        commit: 87482d6d9104d087935592ebbf52b70f8a777c47
-[03/17] rust: str: expose `str::{Formatter, RawFormatter}` publicly.
-        commit: 8c5ac71cf19bc8a2ad5bc905d1fd3191d887d469
-[04/17] rust: str: introduce `NullTerminatedFormatter`
-        commit: cdde7a1951ff0600adc45718ba251559e4d3fd7c
-[05/17] rust: str: introduce `kstrtobool` function
-        commit: b1dae0be89278348e2c99ddca820d91292856b10
-[06/17] rust: configfs: re-export `configfs_attrs` from `configfs` module
-        commit: 60e1eeed8b53f65ef7919fd3f79cc9b7f20795c5
-[07/17] rust: block: normalize imports for `gen_disk.rs`
-        commit: f4b72f1558be1e2b173b6b1f93c09dc668592a26
-[08/17] rust: block: use `NullTerminatedFormatter`
-        commit: c3a54220b54a1bda0662f0e7ab90ffabf5036d50
-[09/17] rust: block: remove `RawWriter`
-        commit: f52689fcd8a2f78436b57d10ba742455431885a0
-[10/17] rust: block: remove trait bound from `mq::Request` definition
-        commit: 8c32697c4edd4180bc90d367e54fb64490c230c6
-[11/17] rust: block: add block related constants
-        commit: 19c37c91b4a0ff7abfc3dcfe165d1377939469ac
-[12/17] rnull: move driver to separate directory
-        commit: edd8650691c374bdce133af1b25ff4f3496f489f
-[13/17] rnull: enable configuration via `configfs`
-        commit: d969d504bc13b2f0c1f208e009e73f2625b421c0
-[14/17] rust: block: add `GenDisk` private data support
-        commit: 90d952fac8ac1aa6cb21aad7010d33af4d309f4a
-[15/17] rust: block: mq: fix spelling in a safety comment
-        commit: bde50e28f7c5fe874112fe9d98e84873548fa8de
-[16/17] rust: block: add remote completion to `Request`
-        commit: 4ec052841a545297a276e833817990f0e13b1b32
-[17/17] rnull: add soft-irq completion support
-        commit: 34585dc649fb255b40075dab56af063c1bfc9933
-
-Best regards,
--- 
-Jens Axboe
+@@ -682,11 +682,15 @@ static void nvme_free_prps(struct request *req)
+ {
+        struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
+        struct nvme_queue *nvmeq = req->mq_hctx->driver_data;
++       unsigned int attrs = 0;
+        unsigned int i;
+ 
++       if (req->cmd_flags & REQ_MMIO)
++               attrs = DMA_ATTR_MMIO;
++
+        for (i = 0; i < iod->nr_dma_vecs; i++)
+-               dma_unmap_page(nvmeq->dev->dev, iod->dma_vecs[i].addr,
+-                               iod->dma_vecs[i].len, rq_dma_dir(req));
++               dma_unmap_phys(nvmeq->dev->dev, iod->dma_vecs[i].addr,
++                               iod->dma_vecs[i].len, rq_dma_dir(req), attrs);
 
 
+And it is functionally fine to split the series like this because
+unmap_page is a nop around unmap_phys:
 
+void dma_unmap_page_attrs(struct device *dev, dma_addr_t addr, size_t size,
+                 enum dma_data_direction dir, unsigned long attrs)
+{
+        if (unlikely(attrs & DMA_ATTR_MMIO))
+                return;
+
+        dma_unmap_phys(dev, addr, size, dir, attrs);
+}
+EXPORT_SYMBOL(dma_unmap_page_attrs);
+
+Jason
