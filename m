@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5DB32E5412;
-	Tue,  2 Sep 2025 09:55:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60C052EC0A6;
+	Tue,  2 Sep 2025 09:55:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756806936; cv=none; b=FPyEsn7e3k4W5+GVwYSPNpHFmxvvz7FJwgr48boZgOMZ1uOLv17dze7k7AUrSSjrTmS85HtxXb3KrF/RnCroA0+WdVVXVVf2skCjoWquw5KECnlI/twYgmk7ypeS8kFZvsRG+K7OsvwsvIi2aNV8P1FFqz01uIh8mqx0SIgDXYw=
+	t=1756806941; cv=none; b=JzSr0dYpHUofce824auud7HDyNWYk2QL8ukDs+FX1Ezrsu7qCS7euNLhok6C8n1jRuLdyYd4cElb35fErRFb7vDgFvbxJaR35MIrFNNHmYyKgCGIuhQX0NpnL80SncF3N2ZuGGEj9fC70mIKe2+nimae6OzvKTDQRk0XPzyCsXE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756806936; c=relaxed/simple;
-	bh=rOUQXRZ83o80AuQ37m2uEGiiSyGCYlN8hLzAd5IY00A=;
+	s=arc-20240116; t=1756806941; c=relaxed/simple;
+	bh=Ccx5zgSLlbSIiXofZb52HFU6BY4bx1BMin6k8F+fBLU=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=ctWbPC0Az/OxWSGcMA1zVW+d75u5F8KCYW0BrEjTAyXQxN3iIv2R5KBeJ4moCzbUwI69+a70R9Gm+FIO6ENVCG+KRlv4rL5nW8hEgN+831brg2wH9GEt0A0FK9g3yifhlqloiaMeFucJvkf2Y0b5fNyPIqNBfq6KRcp3DwjJUhU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sc3v+sD7; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=iLV9sKM5VqspwaGl5Trzki61OXpatSIxyQ7fDUjvkmRHUf1njCKtX5YpxFZoR2Znr4lfveEiRl1LuNbbyjePPRXkL9gKHukjpGaYgTTk/tHckaHMSlh3pAHWg1opp19BgdwLgeibOBwFsANpiycE+3gN+zatYtBsV4Yx07zVo7Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dxqv/w0i; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sc3v+sD7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47129C4CEF5;
-	Tue,  2 Sep 2025 09:55:33 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dxqv/w0i"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8EC8C4CEED;
+	Tue,  2 Sep 2025 09:55:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756806936;
-	bh=rOUQXRZ83o80AuQ37m2uEGiiSyGCYlN8hLzAd5IY00A=;
+	s=k20201202; t=1756806939;
+	bh=Ccx5zgSLlbSIiXofZb52HFU6BY4bx1BMin6k8F+fBLU=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=sc3v+sD76Cfp91bar+8hY2uR2Vll3pz0hhxpiWvWMHa/4fyLD9hZ68YqjeNTAiJ3n
-	 rkRj1HfUQgFEO/MxuOlVNDS5Urkz9zxZtKnEqjxFioxafp0Y2kNKoPnDPQ4hayNMFi
-	 IXBnH/jnduiZrN8BjVih5Fd6PLg+36rsz3kGWrnJF5vRpE9XsIMuAHhpCl9cKuE8FO
-	 WxNZkY9Xwx5T525dhCTVyVR5yTarNENPcdlLng9ndrgVcKl+Gj0C1s9s/MLf3tBEGr
-	 6/ooT17fvibx9xJlXG8eOwzmb6VabtmhQ9D9qZu6Upp68MfzqKUb0pm1IMnF9mWv8b
-	 G0HDNCgJlrAww==
+	b=dxqv/w0i80AdDS6EklP0g/qQpG4WtZwrifySVJkOXA7grhyBKrGahzM2ere+UJoZd
+	 lCz9/OXd2+xEFOyK12Tn4A4oIM57x1T2UGMj2Uacu2MjXQujjVhTXs+zY8ZYv5orxr
+	 5rnADlpJcSCo5vXyUL7F7Oe1D+9vuMFum7VJoWXGxs5PSR++JEHyG0zmlGVtbvRCTB
+	 evjKvFJIFmx7xHQSay3EScLd0hI4IB/llfpqNhp8ZVwUi8igu3qkhB+EIVWVkRImoA
+	 6/joGdNcGxZZgAaiZYbE0ofXPCfpyq7SinD4rsfiNNRlypoBqXH3Y9YXqkVESYdvBx
+	 TfSyso/+cemQw==
 From: Andreas Hindborg <a.hindborg@kernel.org>
-Date: Tue, 02 Sep 2025 11:55:02 +0200
-Subject: [PATCH v7 08/17] rust: block: use `NullTerminatedFormatter`
+Date: Tue, 02 Sep 2025 11:55:03 +0200
+Subject: [PATCH v7 09/17] rust: block: remove `RawWriter`
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -37,7 +37,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250902-rnull-up-v6-16-v7-8-b5212cc89b98@kernel.org>
+Message-Id: <20250902-rnull-up-v6-16-v7-9-b5212cc89b98@kernel.org>
 References: <20250902-rnull-up-v6-16-v7-0-b5212cc89b98@kernel.org>
 In-Reply-To: <20250902-rnull-up-v6-16-v7-0-b5212cc89b98@kernel.org>
 To: Boqun Feng <boqun.feng@gmail.com>, Miguel Ojeda <ojeda@kernel.org>, 
@@ -50,97 +50,107 @@ Cc: linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org,
  linux-kernel@vger.kernel.org, Andreas Hindborg <a.hindborg@kernel.org>, 
  Daniel Almeida <daniel.almeida@collabora.com>
 X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2961; i=a.hindborg@kernel.org;
- h=from:subject:message-id; bh=rOUQXRZ83o80AuQ37m2uEGiiSyGCYlN8hLzAd5IY00A=;
- b=owEBbQKS/ZANAwAIAeG4Gj55KGN3AcsmYgBotr8A5Ei+YAWjlEujbD5s51yKCLiyheQdKiXgd
- 4WJLo1hCROJAjMEAAEIAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaLa/AAAKCRDhuBo+eShj
- dzUkD/0VhEDq9QT2aNlifacumpaLB2zsg3v2zXvg9bKAAIFZWZBN+txR+cnPpAaz/AdXhty/eBG
- 5R15sViSwzIKUn4H1FI5/VhBimnj0Th2/4oqszYCH2tvIrrVdmF4cCrl1nCJRrNoMePTKGIV5Et
- u4cf9xmzgLmdRajLmE96VeV76/qxyyFRlXAVZzUjQ7u2IgxBaZxCnvE4G6IEqHzE1bKfM3Coe/O
- Ua843TgDUu6D9xCTzy+8ISMFnSdZ4kHCdGbav5WdCyNgKWrc+WfE3W8MF26Bkem0uHyl9Na2b3g
- gpxfMSrgQyj6nfQm8Pnk5guH+A6QVY2gO/2Y+pp2Fc0ihLFQl0WgVf+vrRh2UVppxEc1s0Ml/OO
- je6zv8Pw+juxm47//hvsbeY1hW3k1Vbpm0dWBHy//79XtGJw818s1Ms6UJz1ugXEOHpIYXoCsp6
- Tzdf8bmIWh1G7uCvoqQPUNa+1eHdsKezNYnVgmwxggcL1MDLeORWQGq+CZ3biWRhlFhWnDMyUh1
- +c8mMWQpN0wxK5PfCn81Vphcv516zNODd+n85nSFisbaReBSXRhUAr/kHvmjGeO4cDnncsmXG4Q
- uh8FDnga+Zl/m09MR/+euCtpcQXlJpmcCrdLcV7X/IjSv3EJSDfnf16h3Qa7tQm2FsIdlYSnCgb
- 00i47XTSSLv5riQ==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2507; i=a.hindborg@kernel.org;
+ h=from:subject:message-id; bh=Ccx5zgSLlbSIiXofZb52HFU6BY4bx1BMin6k8F+fBLU=;
+ b=owEBbQKS/ZANAwAIAeG4Gj55KGN3AcsmYgBotr8BMQQLj0yN+Xma3LafyoSW49KGgCCJaKdiC
+ IwDwwjBIYiJAjMEAAEIAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaLa/AQAKCRDhuBo+eShj
+ d5GsEACYnYVWaMdu+NvEExxfgA7yFObB0KyUrgg/BaDPSa6ua1f4WumVBsiFzzuJPCo2HbRoIEe
+ Yq3YHs2BHIh0bTnpiIg/kYDPrQmhrE9FXKOiqSBdaZ+7oOinX0/Aj03iqMPGtkR76jYJmEEXVbJ
+ obSgDU+6H23DEBzl6bhenR5qUehP+uoqlCA5TN+AN82jWuOSx4Ol3Lfd/LLBmMeY+m2XTSnD7Vd
+ G66XVLjBm/nXTXAfQTdLLNrSNotg/Yn/+pM5YeOX1g64a5oX7WH+ZrFvE67R1soJjpgXF8WD8iP
+ 3P2DOFO3CfjaggxUfo+ZWBK9k9TLSdLR2xidTiiSD1tw3RYpIv6rLVz5oX0lK2StFpFHHGV9lrB
+ XDx2wmd4FCLW5IEy/OALxmG9F5De7sosplvtJ2V7TBss3q1jDM0BF2aIs227ErmYLtfUw+LalUY
+ nqNNaNwvlK39Dv8BQk4X7ADA//2zVgWRMdhtLJrWI3Ipz3SKjFC09wi6CIhXwZjVFqhm4GwLYQa
+ bxcIet7L5q0lFCm62Zzrp2Oyi5XckvJBkQGL1+zzmr7sz2cOrOftX6D9BCWLbus7GcaGyaAy0/T
+ LmwdDmD839Clj1QIjrQDCGcPo5Emmpngd2v9DRHB8lFjbnvE4j9fVq4gzH8eRFwQJ4/sqSz2MN9
+ O0iTtuEFY9bwR7g==
 X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
  fpr=3108C10F46872E248D1FB221376EB100563EF7A7
 
-Use the new `NullTerminatedFormatter` to write the name of a `GenDisk` to
-the name buffer. This new formatter automatically adds a trailing null
-marker after the written characters, so we don't need to append that at the
-call site any longer.
+`RawWriter` is now dead code, so remove it.
 
 Reviewed-by: Alice Ryhl <aliceryhl@google.com>
 Reviewed-by: Daniel Almeida <daniel.almeida@collabora.com>
 Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
 ---
- rust/kernel/block/mq/gen_disk.rs   | 12 +++++++-----
- rust/kernel/block/mq/raw_writer.rs |  1 +
- rust/kernel/str.rs                 |  1 -
- 3 files changed, 8 insertions(+), 6 deletions(-)
+ rust/kernel/block/mq.rs            |  1 -
+ rust/kernel/block/mq/raw_writer.rs | 56 --------------------------------------
+ 2 files changed, 57 deletions(-)
 
-diff --git a/rust/kernel/block/mq/gen_disk.rs b/rust/kernel/block/mq/gen_disk.rs
-index 679ee1bb2195..20f1d46c774d 100644
---- a/rust/kernel/block/mq/gen_disk.rs
-+++ b/rust/kernel/block/mq/gen_disk.rs
-@@ -7,9 +7,11 @@
+diff --git a/rust/kernel/block/mq.rs b/rust/kernel/block/mq.rs
+index 831445d37181..98fa0d6bc8f7 100644
+--- a/rust/kernel/block/mq.rs
++++ b/rust/kernel/block/mq.rs
+@@ -89,7 +89,6 @@
  
- use crate::{
-     bindings,
--    block::mq::{raw_writer::RawWriter, Operations, TagSet},
-+    block::mq::{Operations, TagSet},
-     error::{self, from_err_ptr, Result},
-+    prelude::*,
-     static_lock_class,
-+    str::NullTerminatedFormatter,
-     sync::Arc,
- };
- use core::fmt::{self, Write};
-@@ -143,14 +145,14 @@ pub fn build<T: Operations>(
-         // SAFETY: `gendisk` is a valid pointer as we initialized it above
-         unsafe { (*gendisk).fops = &TABLE };
+ pub mod gen_disk;
+ mod operations;
+-mod raw_writer;
+ mod request;
+ mod tag_set;
  
--        let mut raw_writer = RawWriter::from_array(
-+        let mut writer = NullTerminatedFormatter::new(
-             // SAFETY: `gendisk` points to a valid and initialized instance. We
-             // have exclusive access, since the disk is not added to the VFS
-             // yet.
-             unsafe { &mut (*gendisk).disk_name },
--        )?;
--        raw_writer.write_fmt(name)?;
--        raw_writer.write_char('\0')?;
-+        )
-+        .ok_or(EINVAL)?;
-+        writer.write_fmt(name)?;
- 
-         // SAFETY: `gendisk` points to a valid and initialized instance of
-         // `struct gendisk`. `set_capacity` takes a lock to synchronize this
 diff --git a/rust/kernel/block/mq/raw_writer.rs b/rust/kernel/block/mq/raw_writer.rs
-index 7e2159e4f6a6..0aef55703e71 100644
+deleted file mode 100644
+index 0aef55703e71..000000000000
 --- a/rust/kernel/block/mq/raw_writer.rs
-+++ b/rust/kernel/block/mq/raw_writer.rs
-@@ -24,6 +24,7 @@ fn new(buffer: &'a mut [u8]) -> Result<RawWriter<'a>> {
-         Ok(Self { buffer, pos: 0 })
-     }
- 
-+    #[expect(dead_code)]
-     pub(crate) fn from_array<const N: usize>(
-         a: &'a mut [crate::ffi::c_char; N],
-     ) -> Result<RawWriter<'a>> {
-diff --git a/rust/kernel/str.rs b/rust/kernel/str.rs
-index d2f9ebc94b75..5c74e5f77601 100644
---- a/rust/kernel/str.rs
-+++ b/rust/kernel/str.rs
-@@ -886,7 +886,6 @@ pub(crate) struct NullTerminatedFormatter<'a> {
- 
- impl<'a> NullTerminatedFormatter<'a> {
-     /// Create a new [`Self`] instance.
++++ /dev/null
+@@ -1,56 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0
+-
+-use core::fmt::{self, Write};
+-
+-use crate::error::Result;
+-use crate::prelude::EINVAL;
+-
+-/// A mutable reference to a byte buffer where a string can be written into.
+-///
+-/// # Invariants
+-///
+-/// `buffer` is always null terminated.
+-pub(crate) struct RawWriter<'a> {
+-    buffer: &'a mut [u8],
+-    pos: usize,
+-}
+-
+-impl<'a> RawWriter<'a> {
+-    /// Create a new `RawWriter` instance.
+-    fn new(buffer: &'a mut [u8]) -> Result<RawWriter<'a>> {
+-        *(buffer.last_mut().ok_or(EINVAL)?) = 0;
+-
+-        // INVARIANT: We null terminated the buffer above.
+-        Ok(Self { buffer, pos: 0 })
+-    }
+-
 -    #[expect(dead_code)]
-     pub(crate) fn new(buffer: &'a mut [u8]) -> Option<NullTerminatedFormatter<'a>> {
-         *(buffer.first_mut()?) = 0;
- 
+-    pub(crate) fn from_array<const N: usize>(
+-        a: &'a mut [crate::ffi::c_char; N],
+-    ) -> Result<RawWriter<'a>> {
+-        Self::new(
+-            // SAFETY: the buffer of `a` is valid for read and write as `u8` for
+-            // at least `N` bytes.
+-            unsafe { core::slice::from_raw_parts_mut(a.as_mut_ptr().cast::<u8>(), N) },
+-        )
+-    }
+-}
+-
+-impl Write for RawWriter<'_> {
+-    fn write_str(&mut self, s: &str) -> fmt::Result {
+-        let bytes = s.as_bytes();
+-        let len = bytes.len();
+-
+-        // We do not want to overwrite our null terminator
+-        if self.pos + len > self.buffer.len() - 1 {
+-            return Err(fmt::Error);
+-        }
+-
+-        // INVARIANT: We are not overwriting the last byte
+-        self.buffer[self.pos..self.pos + len].copy_from_slice(bytes);
+-
+-        self.pos += len;
+-
+-        Ok(())
+-    }
+-}
 
 -- 
 2.47.2
