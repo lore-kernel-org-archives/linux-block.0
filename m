@@ -1,209 +1,247 @@
-Received: from smtp153-141.sina.com.cn (smtp153-141.sina.com.cn [61.135.153.141])
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 525BE2E175F
-	for <linux-block@vger.kernel.org>; Tue,  2 Sep 2025 06:47:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=61.135.153.141
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756795633; cv=none; b=B5FF7X11FxJr+YucwgRp+Dfo8VQ0vYaKQ9S+G8XVGcffy94v8Jck443FpUsmkJZfJSP8vbksssdfgc2uOND6+3K7Kqb3/a5beEUQF6C//83cwCbpHaCw5RGUmhZTCD9ab/hfinqg9fuZgL4OpjNRCANgANHaFwMAXEPyF3uejJY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756795633; c=relaxed/simple;
-	bh=ozWWqIbgoU/NajLhSsOzZNleWXGGn+tK9Hpnd3ud2LE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qGZQnODpDc1d2Y2Yvp5m/ua8lDOOp/W8yaMeQOtGrNTxJrr5LSMK47EtqMWsbzkgDY9LKtJH0C16G2SNbi7PQPMoR4gl13H6eW7K09N4mgpMfB2DzKio0qz2Zy5UMd42JSBgHF02NUNkFmLa+kWfRuXWxBktULTpVNDr6t867XE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b=iY/X2tEs; arc=none smtp.client-ip=61.135.153.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCE13469D;
+	Tue,  2 Sep 2025 06:59:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756796383; cv=fail; b=ox8q9lK83a7Ugcy8gBaboDLDRhkVuqw/MdjCM9cbmKeXpue4oWpZolsSa50u+eRMCn4pdRMxHMb36RlzM80vtsW9D+XrPtls7pAQiixbnLDW3Hgf1GLcJTWmoUvUuVoguNgO5TfWmpn8zTKPnFdd47prg0AnrhnvX0vDMBzz8WY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756796383; c=relaxed/simple;
+	bh=dN3k37UN+8Dy5UuttB/OANjiHhtSlIST4naBdw1Q15M=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=kjVmGkr3sefSaWImOv0IrchoMJ+VvN5zAO/P3sfmnpT+mfj0YvK9SUYQ91itK/RuFdhpgMEGRNpno0OizuXoTkGzouOdJNMO5PJaReI3yHE3Ortpog5uP3gqYTAD3S3LzbYepMycoZyBH8Q/SGG0iykYwc2XT0G0XcdCLRKBwiM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=lN/u8kPb; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=B22MF5Pn; arc=fail smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b="iY/X2tEs"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sina.com; s=201208; t=1756795626;
-	bh=cfWmZjgZ7JzZ8t9RCs6Yo4Kc385FM8hAFRrU9s2mWyA=;
-	h=From:Subject:Date:Message-ID;
-	b=iY/X2tEszKbySeslmm4NyiUw5tMG7CscpBAY2UbV6aTG7H507yJsxUe0jaEr3c0Fs
-	 U+4UbW9tTkDnDAV99hpk15xCol58K8vprdBloazjW8r9+umQOP4gCauYMaxy+PkJ/O
-	 469icLhNH+G8MM9x5KVPlVOpE9y3/xWOzvJRXZcY=
-X-SMAIL-HELO: localhost.localdomain
-Received: from unknown (HELO localhost.localdomain)([114.249.58.236])
-	by sina.com (10.54.253.31) with ESMTP
-	id 68B692E50000044B; Tue, 2 Sep 2025 14:47:03 +0800 (CST)
-X-Sender: hdanton@sina.com
-X-Auth-ID: hdanton@sina.com
-Authentication-Results: sina.com;
-	 spf=none smtp.mailfrom=hdanton@sina.com;
-	 dkim=none header.i=none;
-	 dmarc=none action=none header.from=hdanton@sina.com
-X-SMAIL-MID: 2208976816260
-X-SMAIL-UIID: 34D3DA63F4544A8DAFA9566402950A72-20250902-144703-1
-From: Hillf Danton <hdanton@sina.com>
-To: syzbot <syzbot+4032319a6a907f69e985@syzkaller.appspotmail.com>
-Cc: axboe@kernel.dk,
-	edumazet@google.com,
-	Dmitry Vyukov <dvyukov@google.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	"Paul E. McKenney" <paulmck@kernel.org>,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org,
-	netdev@vger.kernel.org,
-	syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [net?] BUG: soft lockup in sys_sendmsg (2)
-Date: Tue,  2 Sep 2025 14:46:50 +0800
-Message-ID: <20250902064651.6359-1-hdanton@sina.com>
-In-Reply-To: <68b6726d.a70a0220.1c57d1.0594.GAE@google.com>
-References: 
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="lN/u8kPb";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="B22MF5Pn"
+Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5826ftEZ026897;
+	Tue, 2 Sep 2025 06:59:07 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=
+	corp-2025-04-25; bh=O0xf52IhtHYrf31ygm2ShUgi8sbmZre7lMsjKSEDQjM=; b=
+	lN/u8kPbJBiO0PJ3mxSHsCexPnnqX9EDHUXFlrOpVPXtsOLKK1f6Ma6iVads3wAi
+	9JvYeaU2ieyrItd61c1Qd323q043dph0Sww5Gsh7Q2vUM1/00OJ4PzZHh+B3w8EQ
+	5mgOF8+J3ep8vbgqz+MUh1/9K91sc1oHEJFQ9eOu8svh2YqWB4xxpcAzb1Cr09u6
+	RiIDjog9CZHmfGi3woUdMzYE9HtiSbpjJY4+E5m0LViLuRZ1dqqdFWn5H6PGl5h/
+	ABR/IxsyUXTmh0EiEabh/O34TvzhLoblO0OELJHqIb6eE7HlMpWpAsCCWP42bsXP
+	rOyqBDyB/ihK+TeqBsykvw==
+Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 48ushgubk1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 02 Sep 2025 06:59:07 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 58251DPt028664;
+	Tue, 2 Sep 2025 06:59:06 GMT
+Received: from nam12-bn8-obe.outbound.protection.outlook.com (mail-bn8nam12on2049.outbound.protection.outlook.com [40.107.237.49])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 48uqr8sm40-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 02 Sep 2025 06:59:06 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Hj49WUUlRoCD3e2EUObizXXdaehYLO1/O5AP585KN39M66DFv7dyzfI3W0nwvjswgo8CUrQuNNA4Am1KczA8U50QQkC+QcCsTsvlx+WZMGP0xzvPbfHTo5UJ0+VIRUceo7bQZwI67bWWmDPMKCKhfYyJP7cztFvMZ128QrM/gXMkfgYv4kBmT/gu7vZGVfIZfarUMEUQIP7mV/BI0AatsCJAVnnK+kaBefYUmft7C9pDrZ/gGlcGQtexF/u82cdgF+Pod0KfMiHtusvXwZJZU7+m7Fa44QVsk7aeGLRIIrVFrbNdiWlCXVhCsG3Nf1GakcKZFic7ZBUOujFg/8GPMA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=O0xf52IhtHYrf31ygm2ShUgi8sbmZre7lMsjKSEDQjM=;
+ b=c0eFt06LxSymRepfyoVk/kANyfyegaf8CbjyxND+6yVS89TrSsJQRVQGvl/oKYYT5qZGAFl0cmAG2xa86RFKWvaQPH04UfbbPf6QrDUJquQ6IPVQFoJ/r/YEL8aD3imqd/yp0gZHgLud25nP7bxMOKsYQMTWi166iLrdGXLiWpp466r57sLBDq5o6KnwPbEHc853lh0lVCqRlY/E6qLSc6Nvsfh6XrkIkYtMkFnQztJQsT5VRIRJR43B/Amriep1xslrYXw0HjSKj/J8ttSFqhuSYE4aDeWW2RWSZKuohoGSj7ZkoddCqgPAeORjiIGshVxVnYwX/KfX/qzyaHe0YA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=O0xf52IhtHYrf31ygm2ShUgi8sbmZre7lMsjKSEDQjM=;
+ b=B22MF5PnLNtln94nQo6AS+L4spiM5F8oBQp8pOpel90FZlnx0zfYbWab+/soqGx+kzRdqE1MQg+fkE2Nmleeu9vS0CqYNTCRwsbxdZZAg/OaccQ+L7SznZb/cgn1GK9cDXL+CKpFdgzYE8t29W4OVYvQ6j8N4jqk68lLDxli/JE=
+Received: from MN2PR10MB4320.namprd10.prod.outlook.com (2603:10b6:208:1d5::16)
+ by DM3PPF01BF54C53.namprd10.prod.outlook.com (2603:10b6:f:fc00::c05) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9073.27; Tue, 2 Sep
+ 2025 06:59:02 +0000
+Received: from MN2PR10MB4320.namprd10.prod.outlook.com
+ ([fe80::42ec:1d58:8ba8:800c]) by MN2PR10MB4320.namprd10.prod.outlook.com
+ ([fe80::42ec:1d58:8ba8:800c%7]) with mapi id 15.20.9073.026; Tue, 2 Sep 2025
+ 06:59:02 +0000
+Message-ID: <bcdb3af6-44b4-44f8-b03f-a89f98d8a71b@oracle.com>
+Date: Tue, 2 Sep 2025 07:58:48 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC 4/7] md/raid10: convert read/write to use
+ bio_submit_split()
+To: Christoph Hellwig <hch@infradead.org>, Yu Kuai <yukuai1@huaweicloud.com>
+Cc: anthony <antmbox@youngman.org.uk>, colyli@kernel.org, hare@suse.de,
+        tieren@fnnas.com, axboe@kernel.dk, tj@kernel.org, josef@toxicpanda.com,
+        song@kernel.org, akpm@linux-foundation.org, neil@brown.name,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        cgroups@vger.kernel.org, linux-raid@vger.kernel.org,
+        yi.zhang@huawei.com, yangerkun@huawei.com, johnny.chenyi@huawei.com,
+        "yukuai (C)" <yukuai3@huawei.com>
+References: <20250825093700.3731633-1-yukuai1@huaweicloud.com>
+ <20250825093700.3731633-5-yukuai1@huaweicloud.com>
+ <aKxCJT6ul_WC94-x@infradead.org>
+ <6c6b183a-bce7-b01c-8749-6e0b5a078384@huaweicloud.com>
+ <aK1ocfvjLrIR_Xf2@infradead.org>
+ <fe595b6a-8653-d1aa-0ae3-af559107ac5d@huaweicloud.com>
+ <835fe512-4cff-4130-8b67-d30b91d95099@youngman.org.uk>
+ <aK60bmotWLT50qt5@infradead.org>
+ <def0970e-0bf7-4a6d-9b68-692b40aeecae@oracle.com>
+ <aLaPHctB8IgtD_Sg@infradead.org>
+Content-Language: en-US
+From: John Garry <john.g.garry@oracle.com>
+Organization: Oracle Corporation
+In-Reply-To: <aLaPHctB8IgtD_Sg@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: LO4P123CA0221.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:1a6::10) To MN2PR10MB4320.namprd10.prod.outlook.com
+ (2603:10b6:208:1d5::16)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN2PR10MB4320:EE_|DM3PPF01BF54C53:EE_
+X-MS-Office365-Filtering-Correlation-Id: c24da822-7417-42e4-7f4c-08dde9ee32ee
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|7416014|376014|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?bEdlNHQ4TEw1M25YbFZhL0VQbHRYRUUvTVg1LzJQS1Vaa2FIUUYzd3dRYVdQ?=
+ =?utf-8?B?QU9CQkZ2SkhTSDN4RHIweHAramoyZVRXM2Y4QUdUSVNUd1VHaXRDR0NKZXRp?=
+ =?utf-8?B?dmFuRmxrUEhia0dQM3ZDNmFuUzArMzBOempoSEJJK2doTnNSak5lVlhRZHFS?=
+ =?utf-8?B?ZjNsTHRaUE1zVGwycmJRblk1TzlaUmVWYm85TlRYeTliRThaRG5wMjM5ZzlN?=
+ =?utf-8?B?SlhTWHdLcWJCelZ0MlBHWUFNMlJxU04zMXUvZ0I2aUJ6c21NUml1MHZSU1JR?=
+ =?utf-8?B?WXphYTRwUDIzUE0zMG9HQzRNN2JlQlBLeDQrcnlpWUN6MVFkS3V6UXl3dm5y?=
+ =?utf-8?B?SGpsRGgxcnlSaitENzBmOWpjM1NZRzdNQTdGVlRrUkNXNzhRQWVGbkt1Z0c3?=
+ =?utf-8?B?NzNyYjlFbDBnRVBTbFJQWDNyZWVQU0pSNjlOZDJQdE1Vd3J1c1l2cVB6N015?=
+ =?utf-8?B?eTdIQUVGejBEd0xnTDR5MlFtRHRWMGgzZW5NOTRqb3VyZjg1V25Yc09MaTFy?=
+ =?utf-8?B?RVZrb1hiM2llYWw1N2xkbWQ5U01wdXZyYmVDR3M0aVo0TDhSTHN1cHVvMjJj?=
+ =?utf-8?B?NVRDMExvZVpmQmFVczBjZ1IrSjF0LzExMjFEa3N3WFJmWUJHWS9qZU1NRmhM?=
+ =?utf-8?B?TmRDTkhwb3J0cU1uRk0yY2dTb3VpKzUzUlVjT1BHNXdEa2VFQU9zNFUwYnlG?=
+ =?utf-8?B?aVFqcDRFYmVmMzRKdVVkcEdFSUZFSE5pTVhCQXI0dDVTdWpVUVd2Y0dISUtD?=
+ =?utf-8?B?bkJyT01kSDczRmVMWG9OSjNTbE81Vk5sUmZpcmFqbm5aUktnckd0TE9OdVly?=
+ =?utf-8?B?RWZpdE90c01KVE9NcEQ5Sjh6VGdaZ0ozYmxUTVB5bG1JZWgzK2ZWWER6ZzZv?=
+ =?utf-8?B?Sjh1cDl4Q1AxMzBJV05KOTNMbW9iNDR6NllSbFhSV0NvZE1IMFVMSW5lblU0?=
+ =?utf-8?B?T3VxQWMzQ21JWGtDVzlUR0tNZUNXS20wa0tySFNYN0ZTUTlzZFZINVZoaU9v?=
+ =?utf-8?B?anRaZ3FNR2REOFpTN0FVV1lIVFc1U1diSkVrN0hiSnFyckl6WUFyNVV1REE4?=
+ =?utf-8?B?QUVtTUFLTGdud3c1LzhpQ1p4dElON2xWUUZpVmxSMkNsZXpCdDlMVGZ1enVi?=
+ =?utf-8?B?RkJQVmU5Uk92djdaOGNpcmJlRXJ4ZzNmUHJmaGVwN2pndldZWkN5V0RmbnYz?=
+ =?utf-8?B?V3JNVUc4TmVqbVA5WGYwSmZVUmt3Z0RqVmluWUVFVENibzRlY090SG5aMmtr?=
+ =?utf-8?B?RFJvTHRURUQrOEdwUlZyVUJXZzZ6dG9nTDFHeXZTQUI4MDNKaTMzV2k1R3Rk?=
+ =?utf-8?B?L2tmSXZKQlJEeGliR2FqRmMvSWFPRE02Q3V0bG44elRCS2tWNzREbTRxb0hP?=
+ =?utf-8?B?eGNVMGdzOTFZd1RzdFRyMDR3SEpMNm40cVZCMjF3b21Ld0JtOVZhVEphS2dt?=
+ =?utf-8?B?TWhpVVdoMGg3SXBnTGZhUUxweGN3a2FBcEwvRUpjS2IyT0llOUh3aFZaTitx?=
+ =?utf-8?B?a3BtMzRkanBOKzdnaDM3K1gwTkFrbm8rcklJRVQvVDErbzNJMUVWMHFPU3Y3?=
+ =?utf-8?B?UkRmMHdGNUg0RlVIcE41aVpmc3JYTWpXME1MdTZ6NTBwZjEzN2MyZkszNW1n?=
+ =?utf-8?B?dms1aG5zUzNyNEs3em1ITk1sR2N6YTMvQm1FUkJQZ3RoOHp5VHYwVE55ekxh?=
+ =?utf-8?B?bTVUMG1qVStHWHVkbHhBbmpyT2RoN09SRFhqZTROcnlLekJ0aTZrdys5SXhP?=
+ =?utf-8?B?ejQ3SkNiWTlhZXJxV2VKRnBDMklURWJTYTJUKy9vc2hwb3cyYi9EejVpemJR?=
+ =?utf-8?B?MjZlTGl0QXFOeUtQa3lkSXIwQzBUYVBEOEZHTmpiMlhXVHpKSGdOSDMvUENu?=
+ =?utf-8?B?RG9CY1BJa3ltKzJmVGdrZVNuRzY2NFFIYkw5OE5yK0tLQ1E9PQ==?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR10MB4320.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?Zm1zOWRrdFRqaGd3MWdSNkExRU5EVVZDZnUyekJwb0J4WTJpZ0Q5RkY3eStP?=
+ =?utf-8?B?SUErVFRtYTR0S2MyMGpZdlpDTFJhbEsycjcwdzZGZkErWkZSNVpmZHpuUTF5?=
+ =?utf-8?B?a2htMGQrbFI4OXpGRmprUWFHMjllU2JuK0tpZFhnSzRVSmtFOVBKbDBuTHp5?=
+ =?utf-8?B?dW43Z29odGtvVmZRNEVyYWFZYU9YazN2V0JkRG1NVy9uVXNqeWhVdTQwUGsy?=
+ =?utf-8?B?ZE1kanpRMktXcnRvUmlWUDJFV3EvOCtrOXg5TGtzSDZqWW5uZC9qWXoxbE9y?=
+ =?utf-8?B?MVRDRDFOa3FnTWRKUFV0ZUY1UW9zTkRQNGc2YWlrRlMreEc1Tyt2SUptd1Rn?=
+ =?utf-8?B?aElQVFo2NnUxakl6WDl3dGdzSjZQUVdaT0JHdVpkMTNLemFybGszb1Z6T1k4?=
+ =?utf-8?B?d3Q1eWJrUlVtaVdyRmVaQzY5NDR4V3dnQjdWUjBYT3hkWEloSUkyeG9NQlFZ?=
+ =?utf-8?B?VlpVUW1IaG5UbVZ4ZGxZcG1LbU8xZmpNQlhHTHRTVnJreTlqeHMvTGZDWktM?=
+ =?utf-8?B?R1Q1c0szK1NiejFEeXRubGhrcmhXc2R5TFZWamw2aWs4UEZIVzljdjd3TXVj?=
+ =?utf-8?B?UTFrZjI3aHBQNkszYWkrUnA4RjVhRVNOTmk1Zy9TQ3VORTFHVTZ4bUdOSXJa?=
+ =?utf-8?B?Y3ZGTHY1TnIzUWppQkg5UkFpY1hEVWJVUnpxZy81TThiZW9MamZMaTdOVy8w?=
+ =?utf-8?B?Wm9nTzAza1ZubDJTMFR4MFBpdGNrbzhldGxicWE1MmFCcUpwNldLbjJ3VEky?=
+ =?utf-8?B?djNSZXluWEFpekNpWExFdTZ6S3hCZ3RMR1NobTdlbHVxenBKMHZSRGNuVzJs?=
+ =?utf-8?B?cUNMc01tRzRKNnhzd2l4NXlGdS9jRDBvU2p1WlBHZHVBL1N0OUQvaUtINVdX?=
+ =?utf-8?B?bHhmUmhRaC9SN2tXTWlUNUJlQmhVZUNxbDFVdGZRSiszdU8wSEhXdnpydEc3?=
+ =?utf-8?B?SWNDdVZEdk5HZU11eFFNWjlxYUk1Zk4yT3NOd1Vxblp5THc4cExaVjViQkVN?=
+ =?utf-8?B?VW1iSkQvbFdLdmc5WnlZTVVDUnQ2a2J6NVpoRHdyMEtaTCtiWXlTamIreGIw?=
+ =?utf-8?B?WllqVldLWS9Mb3VNT0RqL2lNMlVPeXlISnAxK25PdXFJYmpCbWNPMnVzTHhC?=
+ =?utf-8?B?ak9acU5nWUF3eHBpSE83b0Q5SUdRcE5SbE1Cd2x1RW9JcE82NEFlTS9VS0Na?=
+ =?utf-8?B?N2cxTHFSd3h3dmw3amRmT0IwalJzSWh1ajdBeW5YY0drTmtXQzhMblpTNFY1?=
+ =?utf-8?B?ZXFaaDM1SU9LWGFIa1puaytvdzdaTEVFT3VMdXpLZzZaYXVEMGZEeXNvZkt4?=
+ =?utf-8?B?aGpOaWRyN1lGSmo0MFp0c0tDOEJTUTI4NmRINkI5VloyZngzbU9adnBadUJs?=
+ =?utf-8?B?SGordjFEZ2E5Z2M1dUtESTJKNnA2bW9TYlc0ekJNMWVzYXlMN2FqMW5CTVBs?=
+ =?utf-8?B?aHBSRUJkVlQ2bFB1VCtTZ1h2dWQ1emR3ZjhONjVLVEd0bWdKYWRFWTJzNXQ0?=
+ =?utf-8?B?ZVJHQUdCd0NqR2czUm85RjNmaWwvazNodjlkYWJ2Y3UxL3A2YmdXWFFwNUJC?=
+ =?utf-8?B?RGpaVUZIZEsvRHc1cDFmQ3JsRTlvM00vcXYrTXdqOXhPb24xdEcyL0oxcGYz?=
+ =?utf-8?B?RkRnazYzOWFPeC9OWWtJdmluTkJKdjYvRzd2eE5XVGM4WC9rRm5wcVdmQ0Vw?=
+ =?utf-8?B?enVGVmFaeDd3WmhJT2kyMElyRkY2L2NSVUhyRnE1WDFkVzFiSWVLdGM2eXhr?=
+ =?utf-8?B?TU1YcERIM1pDV3N5UlltT2VQRnFTamRZWkdYYlVWQUt0TUpmVUdTbkVPQ0NT?=
+ =?utf-8?B?MzVrQU5xRCtPTzJoNmhHSG5aSmhOQUFLSUNEaXVKSUl2VWQrZnV1d21IQ21L?=
+ =?utf-8?B?MUtKQlBOMExGM0ZwaGR6ZklBTGh6TUNvTmI4cGUzOTlHeENiRm9IYjVsYU1r?=
+ =?utf-8?B?UnI1bHZjQi93Qmc5K0ZqRWs5V0xkeWdiM3FYNktIL2VWTmFzams4eHNoK20z?=
+ =?utf-8?B?YmRsR2JDaCsvKzNNVUZUZGNRSUJHREZuSmN3V1gyelUrT2NwQzRMMzZkaDdK?=
+ =?utf-8?B?Y0ZkdzczTmJVZmNlZEx3ZW16Q1dDVU1KOCtJeWlWRXFjWXdPSlVkMDVVV2sz?=
+ =?utf-8?B?dGZLekJtM21tQVo2eXNuakFUMmdBWHlUcXBidkpWNDF4eVpkOGI2Ull3UkUy?=
+ =?utf-8?B?aWc9PQ==?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	ZHSMoPCQx8s/zdt9hGg4O205fpr88Ke3L4O0qg/l1JzhFSsSwjO8mFUkKDFNbvyk6xcSatui6rToNA/1FyxB7c9VoNWieTq0xtk+MM7GNdkOa+E7KcqIqCADB1gQpYa36KjIXBypfg++6+ldgl6YrtX3GjroC7Y8dAMAxQqLnbi+FlCEJcbv0WqecqDok1JWC5PvkNKPIc6KPNerF7sjDtx2i+KNDqV6EfNKln9avBt0w3j+Xp11BC0CrjN3CaPSdhgK+vM7t3vYwtzmiHnTnnJqFBO0pkkf23ExYyHVdYxQ2HfnjeW99TQ4l03SAvus7FvTXEroBKPj2v9tIs3HPTYIorw8nhYuhFUJEe7s9tHYzNiXEEHcvSn0+p8S4qZnJ3xtQj1VgMgO67Tiv94SJzzNKDyuUPq51LI98QyA1LxXiMgC8MeTFSFiV/xn8irXZo2TNjtSzQvtoHGG4oh354+qMkqshW9Lz+4KieHv88yGDWvF6sKJV7l4VgPvPftu0iAJRlvuqFBpO+H4eR/AKSxJEe4F2YwKUv142nsbd/5v6qvGsUsygZd4ZRgbfW69R410nTrecP7sk4/BjL5W8FqEjHO7vq89EL7ngw5dnjI=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c24da822-7417-42e4-7f4c-08dde9ee32ee
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR10MB4320.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Sep 2025 06:59:02.4199
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: krcV/Iv5GCCsbSQQLD8OCovSFh+iTbIUMtAlKlUUcdQBeQLu/+SlGy7k25umYyJithHAhyYcSK+liLfX/qgyXA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM3PPF01BF54C53
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-09-02_01,2025-08-28_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 adultscore=0
+ suspectscore=0 spamscore=0 phishscore=0 mlxscore=0 malwarescore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2508110000 definitions=main-2509020068
+X-Proofpoint-ORIG-GUID: O6RS267xH0MwSutKTuV0h8f9Jr7RfpnM
+X-Authority-Analysis: v=2.4 cv=YKifyQGx c=1 sm=1 tr=0 ts=68b695bb b=1 cx=c_pps
+ a=e1sVV491RgrpLwSTMOnk8w==:117 a=e1sVV491RgrpLwSTMOnk8w==:17
+ a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19
+ a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=wKuvFiaSGQ0qltdbU6+NXLB8nM8=:19
+ a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
+ a=yJojWOMRYYMA:10 a=GoEa3M9JfhUA:10 a=mOa3dlkvei2mQtE-i8MA:9
+ a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10 a=zgiPjhLxNE0A:10 cc=ntf awl=host:13602
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODMwMDAzMiBTYWx0ZWRfX8CY7fFkiHHO8
+ At4OTOBvdPvhNedKxGQrEYb171pGR23DgE1R2F4hbP0K9ABIx0MwulW2GNg6FRrQGa+7MEs23R4
+ 2bDimGfojg3EA2C3U0fQp5qFdLTHNQxxW7qMgHuxlCBf3ZeW1NYkWg7czKGjKa7RqUx9LXh67Ej
+ bK863qAclIKCUftum+8HoWca0aSxvdv+1/OmhytccVg4WY9Y/sQpmgFymUFTYlke/6JPLyrLQGY
+ TNz+j3bY6FgpsI5VOTMVGhdDRh8CnDsR/Dtq3q+JHVnwnB2WFchpiVYbKMViiCP5gSFfl7j7fgo
+ tidot57XNWMrGkhwTNM1pqFKo+NRTRJ0u2DuyfyJV1DrCJ5cdMLwbLVdM1HZN4DQ6Hphqhb4kRg
+ PQVH4ClPQlcYZZlUF4JKtLtKD8WKHA==
+X-Proofpoint-GUID: O6RS267xH0MwSutKTuV0h8f9Jr7RfpnM
 
-> Date: Mon, 01 Sep 2025 21:28:29 -0700
-> syzbot has found a reproducer for the following issue on:
+On 02/09/2025 07:30, Christoph Hellwig wrote:
+> On Tue, Sep 02, 2025 at 07:18:01AM +0100, John Garry wrote:
+>> BTW, do we realistically expect atomic writes HW support and bad blocks ever
+>> to meet?
 > 
-This report makes no sense even with a reproducer because
+> That's the point I'm trying to make.  bad block tracking is stupid
+> with modern hardware.  Both SSDs and HDDs are overprovisioned on
+> physical "blocks", and once they run out fine grained bad block tracking
+> is not going to help.  І really do not understand why md even tries
+> to do this bad block tracking, 
 
-> HEAD commit:    7fa4d8dc380f Add linux-next specific files for 20250821
-> git tree:       linux-next
-> console output: https://syzkaller.appspot.com/x/log.txt?x=16094a42580000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=ae76068823a236b3
-> dashboard link: https://syzkaller.appspot.com/bug?extid=4032319a6a907f69e985
-> compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15990312580000
-> 
-> Downloadable assets:
-> disk image: https://storage.googleapis.com/syzbot-assets/63178c6ef3f8/disk-7fa4d8dc.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/c5c27b0841e0/vmlinux-7fa4d8dc.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/9a8832715cca/bzImage-7fa4d8dc.xz
-> 
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+4032319a6a907f69e985@syzkaller.appspotmail.com
-> 
-> rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
-> rcu: 	Tasks blocked on level-0 rcu_node (CPUs 0-1): P5234/1:b..l
-> rcu: 	(detected by 1, t=10503 jiffies, g=7533, q=653 ncpus=2)
-> task:udevd           state:R  running task     stack:26096 pid:5234  tgid:5234  ppid:1      task_flags:0x400140 flags:0x00004002
-> Call Trace:
->  <TASK>
->  context_switch kernel/sched/core.c:5357 [inline]
->  __schedule+0x1798/0x4cc0 kernel/sched/core.c:6961
->  preempt_schedule_irq+0xb5/0x150 kernel/sched/core.c:7288
->  irqentry_exit+0x6f/0x90 kernel/entry/common.c:197
->  asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:697
-> RIP: 0010:constant_test_bit arch/x86/include/asm/bitops.h:206 [inline]
-> RIP: 0010:arch_test_bit arch/x86/include/asm/bitops.h:238 [inline]
-> RIP: 0010:tif_test_bit include/linux/thread_info.h:192 [inline]
-> RIP: 0010:tif_need_resched include/linux/thread_info.h:208 [inline]
-> RIP: 0010:need_resched include/linux/sched.h:2211 [inline]
-> RIP: 0010:preempt_schedule_common+0x11/0xd0 kernel/sched/core.c:7153
-> Code: 2e 0f 1f 84 00 00 00 00 00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 41 57 41 56 53 49 bf 00 00 00 00 00 fc ff df eb 0d <48> f7 03 08 00 00 00 0f 84 9b 00 00 00 65 ff 05 0b 76 5e 07 65 8b
-> RSP: 0018:ffffc900030c7540 EFLAGS: 00000246
-> RAX: 1ffff11008494b40 RBX: ffff8880424a5a00 RCX: aa2a76cb3742ae00
-> RDX: 0000000000000000 RSI: ffffffff8c04e5e0 RDI: ffffffff8c04e5a0
-> RBP: ffffc900030c75d8 R08: ffffffff8fe52d37 R09: 1ffffffff1fca5a6
-> R10: dffffc0000000000 R11: fffffbfff1fca5a7 R12: dffffc0000000000
-> R13: ffff88807da4ce80 R14: ffff8880424a6ee0 R15: dffffc0000000000
->  preempt_schedule+0xae/0xc0 kernel/sched/core.c:7169
->  preempt_schedule_thunk+0x16/0x30 arch/x86/entry/thunk.S:12
->  __raw_spin_unlock_irqrestore include/linux/spinlock_api_smp.h:152 [inline]
->  _raw_spin_unlock_irqrestore+0xfd/0x110 kernel/locking/spinlock.c:194
->  spin_unlock_irqrestore include/linux/spinlock.h:406 [inline]
->  __wake_up_common_lock+0x190/0x1f0 kernel/sched/wait.c:127
->  sock_def_readable+0x1fb/0x550 net/core/sock.c:3564
->  __netlink_sendskb net/netlink/af_netlink.c:1265 [inline]
->  netlink_sendskb+0xa1/0x140 net/netlink/af_netlink.c:1271
->  netlink_unicast+0x397/0x9e0 net/netlink/af_netlink.c:1361
->  netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1896
->  sock_sendmsg_nosec net/socket.c:714 [inline]
->  __sock_sendmsg+0x21c/0x270 net/socket.c:729
->  ____sys_sendmsg+0x505/0x830 net/socket.c:2614
->  ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2668
->  __sys_sendmsg net/socket.c:2700 [inline]
->  __do_sys_sendmsg net/socket.c:2705 [inline]
->  __se_sys_sendmsg net/socket.c:2703 [inline]
->  __x64_sys_sendmsg+0x19b/0x260 net/socket.c:2703
->  do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
->  do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> RIP: 0033:0x7fa3432a7407
-> RSP: 002b:00007ffded507800 EFLAGS: 00000202 ORIG_RAX: 000000000000002e
-> RAX: ffffffffffffffda RBX: 00007fa343a95880 RCX: 00007fa3432a7407
-> RDX: 0000000000000000 RSI: 00007ffded507860 RDI: 0000000000000004
-> RBP: 0000562320cd2f40 R08: 0000000000000000 R09: 0000000000000000
-> R10: 0000000000000000 R11: 0000000000000202 R12: 00000000000000b2
-> R13: 0000562320cb09e0 R14: 0000000000000000 R15: 0000000000000000
->  </TASK>
-> rcu: rcu_preempt kthread starved for 10543 jiffies! g7533 f0x0 RCU_GP_WAIT_FQS(5) ->state=0x0 ->cpu=0
-> rcu: 	Unless rcu_preempt kthread gets sufficient CPU time, OOM is now expected behavior.
-> rcu: RCU grace-period kthread stack dump:
-> task:rcu_preempt     state:R  running task     stack:28008 pid:16    tgid:16    ppid:2      task_flags:0x208040 flags:0x00004000
-> Call Trace:
->  <TASK>
->  context_switch kernel/sched/core.c:5357 [inline]
->  __schedule+0x1798/0x4cc0 kernel/sched/core.c:6961
->  __schedule_loop kernel/sched/core.c:7043 [inline]
->  schedule+0x165/0x360 kernel/sched/core.c:7058
->  schedule_timeout+0x12b/0x270 kernel/time/sleep_timeout.c:99
->  rcu_gp_fqs_loop+0x301/0x1540 kernel/rcu/tree.c:2083
->  rcu_gp_kthread+0x99/0x390 kernel/rcu/tree.c:2285
->  kthread+0x711/0x8a0 kernel/kthread.c:463
->  ret_from_fork+0x47c/0x820 arch/x86/kernel/process.c:148
->  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
->  </TASK>
-> rcu: Stack dump where RCU GP kthread last ran:
-> Sending NMI from CPU 1 to CPUs 0:
-> NMI backtrace for cpu 0
-> CPU: 0 UID: 0 PID: 6072 Comm: syz.2.32 Not tainted syzkaller #0 PREEMPT(full) 
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/12/2025
-> RIP: 0010:list_empty include/linux/list.h:381 [inline]
-> RIP: 0010:plist_del+0x88/0x3f0 lib/plist.c:126
-> Code: 5e f0 3f f6 48 89 df e8 56 07 00 00 4d 8d 7e 08 4c 89 fd 48 c1 ed 03 42 80 7c 25 00 00 74 08 4c 89 ff e8 0b 9a a3 f6 4d 8b 2f <4d> 39 fd 74 6d 4d 8d 66 18 4c 89 e0 48 c1 e8 03 48 b9 00 00 00 00
-> RSP: 0018:ffffc900030d76d0 EFLAGS: 00000046
-> RAX: ffffffff8b80e8df RBX: ffff8880b863a8e8 RCX: ffff888027c59e00
-> RDX: 0000000000000000 RSI: ffff8880b863a8e8 RDI: ffff8880b863a8e8
-> RBP: 1ffff11004f8b464 R08: ffff888140a911f7 R09: 1ffff1102815223e
-> R10: dffffc0000000000 R11: ffffed102815223f R12: dffffc0000000000
-> R13: ffff888027c5a320 R14: ffff888027c5a318 R15: ffff888027c5a320
-> FS:  00007ffbb84b56c0(0000) GS:ffff8881257c4000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 0000200000000058 CR3: 000000007dd24000 CR4: 00000000003526f0
-> Call Trace:
->  <TASK>
->  dequeue_pushable_task+0x2e/0x2d0 kernel/sched/rt.c:415
->  dequeue_task_rt+0x25e/0x790 kernel/sched/rt.c:1457
+Just because they can try to deal with bad blocks for some (mirroring) 
+personalities, I suppose.
 
-RT task can turn scheduler into the guy in the oval office if they like.
-That is why running syzbot with RT turned on wastes minutes at the first
-place.
+> but claiming to support atomic writes
+> while it does is actively harmful.
+> 
 
->  block_task kernel/sched/core.c:2155 [inline]
->  try_to_block_task kernel/sched/core.c:6585 [inline]
->  __schedule+0x5f1/0x4cc0 kernel/sched/core.c:6896
->  __schedule_loop kernel/sched/core.c:7043 [inline]
->  schedule+0x165/0x360 kernel/sched/core.c:7058
->  futex_do_wait kernel/futex/waitwake.c:358 [inline]
->  __futex_wait+0x1c3/0x3e0 kernel/futex/waitwake.c:687
->  futex_wait+0x104/0x360 kernel/futex/waitwake.c:715
->  do_futex+0x333/0x420 kernel/futex/syscalls.c:102
->  __do_sys_futex kernel/futex/syscalls.c:179 [inline]
->  __se_sys_futex+0x36f/0x400 kernel/futex/syscalls.c:160
->  do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
->  do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> RIP: 0033:0x7ffbb758ebe9
-> Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-> RSP: 002b:00007ffbb84b50e8 EFLAGS: 00000246 ORIG_RAX: 00000000000000ca
-> RAX: ffffffffffffffda RBX: 00007ffbb77c5fa8 RCX: 00007ffbb758ebe9
-> RDX: 0000000000000000 RSI: 0000000000000080 RDI: 00007ffbb77c5fa8
-> RBP: 00007ffbb77c5fa0 R08: 0000000000000000 R09: 0000000000000000
-> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-> R13: 00007ffbb77c6038 R14: 00007ffea00f5430 R15: 00007ffea00f5518
->  </TASK>
-> 
-> 
-> ---
-> If you want syzbot to run the reproducer, reply with:
-> #syz test: git://repo/address.git branch-or-commit-hash
-> If you attach or paste a git patch, syzbot will apply it before testing.
-> 
+There does not look to be some switch to turn off bad block support. 
+That's from briefly checking raid10.c anyway. Kuai, any thoughts on 
+whether we should allow this to be disabled?
+
+Thanks,
+John
