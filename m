@@ -1,106 +1,92 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91C071E47CA;
-	Tue,  2 Sep 2025 01:51:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 144FE198A11
+	for <linux-block@vger.kernel.org>; Tue,  2 Sep 2025 02:08:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756777864; cv=none; b=OWL3klHRSUBdp3Om2FB9s8TpT+Oc+WSD/AOMcsF6MdiMy1QK01fQkEoKtkAEkBm0HE18GfcOjOf15r+QWCcCzR4HJEpZFQyoHmsZR136iAeG2IkyREQ3l214o/ibN7P7J9XXqhtGGmqlBEUOBZe/hv/dqWJi1bqsOER1QOmxSF4=
+	t=1756778920; cv=none; b=r7ujF05iITq1BHXO5IMp/iM2azvLkMEYQkhF/KUeFt3emQYDzKDzt+92VZEWBisjpSF8icEGrORAF7WiQ/tU2OSQ+HqbLmXXZuCZg7ybzDj4ys/iUL4M6ZwnLfWmaT5ACCrGoh/kV8QjksT6Qdtc1T4al19WWsUExEbBH7N0Vfo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756777864; c=relaxed/simple;
-	bh=eZHqbM0sZ45R7Sy9LTRYFYVLH5mQq+QL7Px/R1t57XQ=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=eRFslI4CrsU0PvaFiDPtYIPeK13Qv/fvuVZ5gB6nvpDHl3SqL7theoiKXNBj5NPAFbj3bItlqRV6KmorObHB7ynwJSo7Wti0Lub844wQGF/Md8wz/SxX3RWQTvPVJrWnJPp3McS6fwuPlk3/vyRvC3cZFu9Q+JkpjB20StHYZsQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4cG7xX5VrVzYQvJ1;
-	Tue,  2 Sep 2025 09:50:56 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 434AA1A0ADF;
-	Tue,  2 Sep 2025 09:50:55 +0800 (CST)
-Received: from [10.174.179.143] (unknown [10.174.179.143])
-	by APP4 (Coremail) with SMTP id gCh0CgCn8Y16TbZoqjtfBA--.16323S3;
-	Tue, 02 Sep 2025 09:50:52 +0800 (CST)
-Subject: Re: [PATCH RFC v3 00/15] block: fix disordered IO in the case
- recursive split
-To: Bart Van Assche <bvanassche@acm.org>, Yu Kuai <yukuai1@huaweicloud.com>,
- hch@infradead.org, colyli@kernel.org, hare@suse.de, dlemoal@kernel.org,
- tieren@fnnas.com, axboe@kernel.dk, tj@kernel.org, josef@toxicpanda.com,
- song@kernel.org, kmo@daterainc.com, satyat@google.com, ebiggers@google.com,
- neil@brown.name, akpm@linux-foundation.org
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- cgroups@vger.kernel.org, linux-raid@vger.kernel.org, yi.zhang@huawei.com,
- yangerkun@huawei.com, johnny.chenyi@huawei.com,
- "yukuai (C)" <yukuai3@huawei.com>
-References: <20250901033220.42982-1-yukuai1@huaweicloud.com>
- <5b3a5bed-939f-4402-aafd-f7381cd46975@acm.org>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <130482e9-8363-6051-5fc6-549cf9aad57b@huaweicloud.com>
-Date: Tue, 2 Sep 2025 09:50:50 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.1
+	s=arc-20240116; t=1756778920; c=relaxed/simple;
+	bh=ejL7FVtpbCP0UrziFGS9r8cFFr4hRAr6pj4iXIHIW0Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=B0GwIcQw2rgp7fZrFRQ/OFYGEtTJ5VgnQmnGNgleZfl8RcK41fzAR8BZ2JBp6+VlTz7pLtMJhn8e35kJNQxxFDbRvGaKx/2vLKk1Rsy9R91Db+EflMpKzAznoTFIU4Tzzrr9K1mRbNJknhm9cIUjWB6KYNKZIwgyW4WJikg2DfU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=F5JpacJG; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F5JpacJG"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1756778918;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=uho2Jrk1tvw2+42+MtjQMqg1bG7hf+OQ5CaL9V3WvCg=;
+	b=F5JpacJGJ1xxucN2mPgIq72YQfGAxVcWiIaWkPVIwWbW3v091Ci3rO26ammmOamvJqkczs
+	j4m0NrXkW5mr6eQn8cG2TlI5FFd+RxqT7X0A/t3A5eZU6QbF32Y7AyLs9PArJ2rl2PRlnR
+	1jZqnoEK7a9HGJjeiZ2HDskgcyxNNRo=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-253-7--9wh9aNna7wJWvNf40_A-1; Mon,
+ 01 Sep 2025 22:08:36 -0400
+X-MC-Unique: 7--9wh9aNna7wJWvNf40_A-1
+X-Mimecast-MFC-AGG-ID: 7--9wh9aNna7wJWvNf40_A_1756778916
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 66EE51800345;
+	Tue,  2 Sep 2025 02:08:35 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.121])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CD83330001A2;
+	Tue,  2 Sep 2025 02:08:31 +0000 (UTC)
+Date: Tue, 2 Sep 2025 10:08:26 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Caleb Sander Mateos <csander@purestorage.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] ublk: inline __ublk_ch_uring_cmd()
+Message-ID: <aLZRmowkkbEQ1tlh@fedora>
+References: <20250808153251.282107-1-csander@purestorage.com>
+ <CADUfDZovEN1MouTGyWHC4ZuhuPPTZ6WCkrS=yqa18xuJifuvqw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <5b3a5bed-939f-4402-aafd-f7381cd46975@acm.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgCn8Y16TbZoqjtfBA--.16323S3
-X-Coremail-Antispam: 1UD129KBjvdXoWruFyrKF1fKFWrtryxWr1UAwb_yoWfXwb_Cw
-	s8Aa4DtrWxJanaka1xCF1rArWrKFy5Xr4jq34Utr1xWw13JF90qa18ursay3W3GFyxCrnx
-	X3y7u39Yy3yIqjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUbfAFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-	A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
-	6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-	4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
-	c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxkF7I0En4kS14v26r4a6rW5MxAIw28IcxkI7V
-	AKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCj
-	r7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6x
-	IIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAI
-	w20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x
-	0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7sRidbbtUUUUU==
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+In-Reply-To: <CADUfDZovEN1MouTGyWHC4ZuhuPPTZ6WCkrS=yqa18xuJifuvqw@mail.gmail.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-Hi,
-
-在 2025/09/01 22:09, Bart Van Assche 写道:
-> On 8/31/25 8:32 PM, Yu Kuai wrote:
->> This set is just test for raid5 for now, see details in patch 9;
+On Mon, Sep 01, 2025 at 06:42:31PM -0700, Caleb Sander Mateos wrote:
+> On Fri, Aug 8, 2025 at 8:32 AM Caleb Sander Mateos
+> <csander@purestorage.com> wrote:
+> >
+> > ublk_ch_uring_cmd_local() is a thin wrapper around __ublk_ch_uring_cmd()
+> > that copies the ublksrv_io_cmd from user-mapped memory to the stack
+> > using READ_ONCE(). This ublksrv_io_cmd is passed by pointer to
+> > __ublk_ch_uring_cmd() and __ublk_ch_uring_cmd() is a large function
+> > unlikely to be inlined, so __ublk_ch_uring_cmd() will have to load the
+> > ublksrv_io_cmd fields back from the stack. Inline __ublk_ch_uring_cmd()
+> > into ublk_ch_uring_cmd_local() and load the ublksrv_io_cmd fields into
+> > local variables with READ_ONCE(). This allows the compiler to delay
+> > loading the fields until they are needed and choose whether to store
+> > them in registers or on the stack.
 > 
-> Does this mean that this patch series doesn't fix reordering caused by
-> recursive splitting for zoned block devices? A test case that triggers
-> an I/O error is available here:
-> https://lore.kernel.org/linux-block/a8a714c7-de3d-4cc9-8c23-38b8dc06f5bb@acm.org/ 
-> 
-I'll try this test.
+> Ming, thoughts on this patch? Do you see any value I'm missing in
+> keeping ublk_ch_uring_cmd_local() and __ublk_ch_uring_cmd() as
+> separate functions?
 
-zoned block device is bypassed in patch 14 by:
+oops, looks I missed your patch, sorry!
 
-+		if (split && !bdev_is_zoned(bio->bi_bdev))
-+			bio_list_add_head(&current->bio_list[0], bio);
+Will take a look later.
 
-If I can find a reporducer for zoned block, and verify that recursive
-split can be fixed as well, I can remove the checking for zoned devices
-in the next verison.
 
-Thanks,
-Kuai
-
-> 
-> I have not yet had the time to review this patch series but plan to take
-> a look soon.
-> 
-> Thanks,
-> 
-> Bart.
-> .
-> 
+Thanks, 
+Ming
 
