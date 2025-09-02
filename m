@@ -1,91 +1,150 @@
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45AEC2E4241
-	for <linux-block@vger.kernel.org>; Tue,  2 Sep 2025 11:05:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92BEB2E92C5;
+	Tue,  2 Sep 2025 11:06:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756811129; cv=none; b=OC1jodmEn99dC9dTtarPkds2eyymWlWIdq3vkbZn16DlTCU3zsmbLNw/Adk6xn/b4Y1hEMOSUptc94Nb/jkiGkGjWKCwDhBp1aP8XaUz7n8hMvETkaK8ilTzjNdQStQtXSuLSynKzSRKFmrUn+SiFXIIvGhhcD8s7p2j44rsSFk=
+	t=1756811217; cv=none; b=eDk0SJ9NglRtWAlWPjUwtEUFQqcupDCysSz+EyS3VbUDTWPjrL1+qkx7IIP35TZHwbs+7LWIUdqGFEznoNKS+TonOsiy5FADH96/LfuWtJLsw3FkOaxmJJPzLwTDpoVee9n8qKrb/1vqJQFrNKp4xUxeLH+hsUG9FE5+cqbnooM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756811129; c=relaxed/simple;
-	bh=JNhLbkrTSSYl1O0oaQX9iodNALQo/R7RSOEwFYkJ1XE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XBCcH8oXKqsfu5tHaptzS8CXkFzuFLE2u3OH/eYt4mUrs1VfdG1F0jhJNO2ST5t5qz9A23+swBYO5V4eim8mbRuXeI+uipIWinNpVpip0UHwh3LAW+zCH7NAUXZPUC5iWs+X0rr8sLNI42V+EsRBKdQXYriEqMPIdfqc1C3waKE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wIz+/tyL; arc=none smtp.client-ip=209.85.221.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1756811217; c=relaxed/simple;
+	bh=hCa1C3d5MBR18h+mVpk4RAM474rjo1/g4TQSzEy0Gzo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Extkj077px/uWP8AStzNqcoYDBdI4QigYu/2389Wp9czN2sOFY7gBxnV8gXCjD/1Zy7iqTcp1u02J/zbETj0bbRgLrQlS8Sbw2m/93EPtR4DYngxC9KrVDurGh8VyYDwDDC7NYHXEbub+wvOkidabjEOKzyqJAJGlTs5MllBlCM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=luXQtemq; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wIz+/tyL"
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-3cf991e8c82so2745901f8f.3
-        for <linux-block@vger.kernel.org>; Tue, 02 Sep 2025 04:05:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756811127; x=1757415927; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JNhLbkrTSSYl1O0oaQX9iodNALQo/R7RSOEwFYkJ1XE=;
-        b=wIz+/tyLynWinX07cShV7AOfQnG8aytx5+sMI58P1ASrqbRxI+mFfY24XkTovyYHA2
-         6YN/vwkUVbwqU9RS/EQf5eNtsGct8grrdxMWIdJHvnxrhqpBbRwgWaZB7hn0+Rma7MnW
-         CNnlGtrp1daRKOVvD88Ea668GdTjchMSslmoX0ZK/upxEu3Fmno4CvRoYXVNByJpOIxg
-         5UA689tnYpt1rMJ/BV+tUrHaCnKS0da9ogrD1CMXWHm2x517kQu5rRjyaZyvjWcnU2R7
-         grOM1lZNC1NadSCu2V7zQNWWUF8k27YP8e3VVvyHFuS2g4uP8i/So2q8B/lXgGIFs62a
-         lyJA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756811127; x=1757415927;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JNhLbkrTSSYl1O0oaQX9iodNALQo/R7RSOEwFYkJ1XE=;
-        b=in7DlAz5n8xKA2wBnnb+gxNxMDie+/4jc9K7uL7AmoffBUC8UfbF+wav4WVGoVydYl
-         zoAL/r0Z6FcSYIs7Ox2uDZZMzyOxJIhzZ71LrN4+TLdBV84qUQLfOlXIqPCdBlZilWdD
-         z+JzUvFwUPYtsc/smlh21f+bZtEAjBxGzsnZ3iRbDvFLZv/eJAPcAMYclFAGzcCD90rP
-         9ymbjkHtGtCChTgPYVEzd4zO0H+ranfPXED9DXGWq4weEyV2fyd1f7YsVnV5O+H4GHBe
-         UWMzAxrHBX8D5mT5IF6p0PCbuOlPPmCrv3v8D1SvphO9++/sndzIJjpw6L5zFeOj28aX
-         uWlQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUWUXRK6OP90Y5ORguQU74OwITiYmA8L4H5uqYDzTDIs9bmj9LY6C7k1QarigUpX0NJNta1VIjUTcLI7w==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyelVMgksJXLGwBmvVYOX7yp/EMRIvZY+nCa71QPIf6iKSrCXTx
-	3BBTMNihGD+MoiBRWGUJdPU3PbTPTwYbrvTUpIDen8u21SP8ldv+VXpB4P/VFbXCcN1aW+iWmFn
-	ZI0uBrVdgh6/7fPrceznVF+RW2k6ZlNlAl3ZJ8VyJ
-X-Gm-Gg: ASbGncuNizlgqebwPeC0vjFF330V48evCfOqQGF3xpPmxFbL1htVgo2tF3t9YJRpBId
-	uO9yMoYi9LchardIFmA51Z/fJMVAAIaBn33aEYfMFC/9Hp/L7Wlc80I6ZBAZtZG46aSaZQbIg0S
-	6wG/8jCEdNSyuCPGic6AbB5GKyzZv4BRKKcWmO+A6j3d2KIqGB6Zszv8dbC3VF1qu2uR0kNR78r
-	VaAml6Cn43fZYwbc9m0ZHkByDRUqbj++h4z2EMHTCU+97PtAHijyhZC+HJd1CrhjAKzJJLMi621
-	j10OUh8T12U=
-X-Google-Smtp-Source: AGHT+IEir5U2skpXGJOKBLRo8SShEmmKbmwKkr6fi+yT+rQfVyO6HXi3h1QxrXMkv1T7lG1XS1yx0dP3rkpZMldBUX4=
-X-Received: by 2002:a05:6000:268a:b0:3d4:2f8c:1d37 with SMTP id
- ffacd0b85a97d-3d42f8c2014mr7963608f8f.26.1756811126368; Tue, 02 Sep 2025
- 04:05:26 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="luXQtemq"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D67BC4CEED;
+	Tue,  2 Sep 2025 11:06:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756811217;
+	bh=hCa1C3d5MBR18h+mVpk4RAM474rjo1/g4TQSzEy0Gzo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=luXQtemqwauDCW1OGofW7KOn0Ed3TXz+7wSyh4Rq/4C4pBNfrCav73O7nhlQqKsu9
+	 pJwS6fgD10XM5MWzc2V32cauwX2xcs5uKtg2Bn+xWgyC8SmOfVZ8jKdythn+ZO4vAa
+	 0h7EOGiI+UMeKypfX8GCyk9wrCAP4tCX2z8kMskVDMEaLSOSdX6db0uWHaJchKjybu
+	 MaLbWwVqK1itWBWz4FOiOlTEHChtIjiBEjBS0WHuFG4wArCchdxmDkRdChfk7RgGoF
+	 PbQcn5XJw0e6Ezn8C5XZTAc61l/+qt/LvKdGUrn6ovVC7JKrzqR3GHSc85H+bG5dhG
+	 nrqyYFGPfwuJg==
+Date: Tue, 2 Sep 2025 14:06:51 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Jason Gunthorpe <jgg@nvidia.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	Christoph Hellwig <hch@lst.de>, dri-devel@lists.freedesktop.org,
+	iommu@lists.linux.dev, Jens Axboe <axboe@kernel.dk>,
+	Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+	linaro-mm-sig@lists.linaro.org, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
+	linux-mm@kvack.org, linux-pci@vger.kernel.org,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Vivek Kasireddy <vivek.kasireddy@intel.com>,
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v1 01/10] PCI/P2PDMA: Remove redundant bus_offset from
+ map state
+Message-ID: <20250902110651.GF10073@unreal>
+References: <cover.1754311439.git.leon@kernel.org>
+ <c9b6237964b9606418af400bb6bec5178fcffff2.1754311439.git.leon@kernel.org>
+ <20250806145825.2654ee59.alex.williamson@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250902-rnull-up-v6-16-v7-0-b5212cc89b98@kernel.org> <20250902-rnull-up-v6-16-v7-5-b5212cc89b98@kernel.org>
-In-Reply-To: <20250902-rnull-up-v6-16-v7-5-b5212cc89b98@kernel.org>
-From: Alice Ryhl <aliceryhl@google.com>
-Date: Tue, 2 Sep 2025 13:05:14 +0200
-X-Gm-Features: Ac12FXy-xKi1uby6tg12v55n-9aLUomtRzJeW72bbKsP_0DXTmIVIHyqBwAX6YA
-Message-ID: <CAH5fLghbUMBqFEEe+xMyucBuwVg_N=fWjCiG+5+wzUzGFHQEYw@mail.gmail.com>
-Subject: Re: [PATCH v7 05/17] rust: str: introduce `kstrtobool` function
-To: Andreas Hindborg <a.hindborg@kernel.org>
-Cc: Boqun Feng <boqun.feng@gmail.com>, Miguel Ojeda <ojeda@kernel.org>, 
-	Alex Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>, 
-	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <lossin@kernel.org>, Trevor Gross <tmgross@umich.edu>, 
-	Danilo Krummrich <dakr@kernel.org>, Jens Axboe <axboe@kernel.dk>, Breno Leitao <leitao@debian.org>, 
-	linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Daniel Almeida <daniel.almeida@collabora.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250806145825.2654ee59.alex.williamson@redhat.com>
 
-On Tue, Sep 2, 2025 at 11:56=E2=80=AFAM Andreas Hindborg <a.hindborg@kernel=
-.org> wrote:
->
-> Add a Rust wrapper for the kernel's `kstrtobool` function that converts
-> common user inputs into boolean values.
->
-> Reviewed-by: Daniel Almeida <daniel.almeida@collabora.com>
-> Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
+On Wed, Aug 06, 2025 at 02:58:25PM -0600, Alex Williamson wrote:
+> On Mon,  4 Aug 2025 16:00:36 +0300
+> Leon Romanovsky <leon@kernel.org> wrote:
+> 
+> > From: Leon Romanovsky <leonro@nvidia.com>
+> > 
+> > Remove the bus_off field from pci_p2pdma_map_state since it duplicates
+> > information already available in the pgmap structure. The bus_offset
+> > is only used in one location (pci_p2pdma_bus_addr_map) and is always
+> > identical to pgmap->bus_offset.
+> > 
+> > Reviewed-by: Christoph Hellwig <hch@lst.de>
+> > Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> > Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+> > ---
+> >  drivers/pci/p2pdma.c       | 1 -
+> >  include/linux/pci-p2pdma.h | 3 +--
+> >  2 files changed, 1 insertion(+), 3 deletions(-)
+> > 
+> > diff --git a/drivers/pci/p2pdma.c b/drivers/pci/p2pdma.c
+> > index da5657a020074..274bb7bcc0bc5 100644
+> > --- a/drivers/pci/p2pdma.c
+> > +++ b/drivers/pci/p2pdma.c
+> > @@ -1009,7 +1009,6 @@ void __pci_p2pdma_update_state(struct pci_p2pdma_map_state *state,
+> >  {
+> >  	state->pgmap = page_pgmap(page);
+> >  	state->map = pci_p2pdma_map_type(state->pgmap, dev);
+> > -	state->bus_off = to_p2p_pgmap(state->pgmap)->bus_offset;
+> >  }
+> >  
+> >  /**
+> > diff --git a/include/linux/pci-p2pdma.h b/include/linux/pci-p2pdma.h
+> > index 075c20b161d98..b502fc8b49bf9 100644
+> > --- a/include/linux/pci-p2pdma.h
+> > +++ b/include/linux/pci-p2pdma.h
+> > @@ -146,7 +146,6 @@ enum pci_p2pdma_map_type {
+> >  struct pci_p2pdma_map_state {
+> >  	struct dev_pagemap *pgmap;
+> >  	enum pci_p2pdma_map_type map;
+> > -	u64 bus_off;
+> >  };
+> >  
+> >  /* helper for pci_p2pdma_state(), do not use directly */
+> > @@ -186,7 +185,7 @@ static inline dma_addr_t
+> >  pci_p2pdma_bus_addr_map(struct pci_p2pdma_map_state *state, phys_addr_t paddr)
+> >  {
+> >  	WARN_ON_ONCE(state->map != PCI_P2PDMA_MAP_BUS_ADDR);
+> > -	return paddr + state->bus_off;
+> > +	return paddr + to_p2p_pgmap(state->pgmap)->bus_offsetf;
+> >  }
+> >  
+> >  #endif /* _LINUX_PCI_P2P_H */
 
-Reviewed-by: Alice Ryhl <aliceryhl@google.com>
+Sorry for long time to reply, I waited to see what is going on with DMA
+phys_vec basic series and together with my summer vacation, it took a
+while.
+
+> 
+> Looks like you're relying on this bogus code getting resolved in the
+> next patch...
+> 
+> In file included from kernel/dma/direct.c:16:
+> ./include/linux/pci-p2pdma.h: In function ‘pci_p2pdma_bus_addr_map’:
+> ./include/linux/pci-p2pdma.h:188:24: error: implicit declaration of function ‘to_p2p_pgmap’ [-Wimplicit-function-declaration]
+>   188 |         return paddr + to_p2p_pgmap(state->pgmap)->bus_offsetf;
+>       |                        ^~~~~~~~~~~~
+> ./include/linux/pci-p2pdma.h:188:50: error: invalid type argument of ‘->’ (have ‘int’)
+>   188 |         return paddr + to_p2p_pgmap(state->pgmap)->bus_offsetf;
+>       |                                                  ^~
+> ./include/linux/pci-p2pdma.h:189:1: error: control reaches end of non-void function [-Werror=return-type]
+>   189 | }
+>       | ^
+> 
+> to_p2p_pgmap() is a static function and struct pci_p2pdma_pagemap
+> doesn't have a bus_offsetf member.  Thanks,
+
+You are right, probably the best way to fix the error is simply squash
+this change into the next patch.
+
+Thanks
+
+
+
+> 
+> Alex
+> 
