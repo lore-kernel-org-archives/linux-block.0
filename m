@@ -1,35 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 142C62EF657;
-	Tue,  2 Sep 2025 09:55:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF5F32ED873;
+	Tue,  2 Sep 2025 09:55:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756806944; cv=none; b=dCNoUngCDsa8sWkZrINzekcDI3CBroo6iMdshbmCeoEaHc5yN7q9QCb6x6I1uynC6cKYpjgj3zzYGLGunQAZblsxXHVJDKxhUUYjm661zkVVodnouN8O6pd+7Zxgcu58FXGqwdnzHZ6fU2e3eYIWL82kpQOglQ2QKmb5mjIT3IQ=
+	t=1756806949; cv=none; b=dO29aiE6vtl39Gaqyxn/wssbRwQPhPO27TSqMydMw4hT6GzPmisSc+cuoqF0eYsJveW+DtUyap3ISc60A8hESPkAy1cqLT0EwOL2c1fuH9x1mrmX+ZbcTPdQjECZvxJsJatFWKpLXdkMNImH/ssC2FTAdjbPZrvDqfq119cYAtE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756806944; c=relaxed/simple;
-	bh=nwKi1FGptwRfXIELQTuMx2CYoPiscRWnpzAnP5fcCw4=;
+	s=arc-20240116; t=1756806949; c=relaxed/simple;
+	bh=5CeGT7OlLAwJ+n1eYK2YzNXyyrj/zX7cdxpv5cnx/wQ=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=BLJ82vLSFR6qTWu8vwaWxCsn5hSZNZUNc+Zh8aQ6pVzktK5cxbodAMonRBoTmMjznnfGLpRSarqAbdxLx8yJnkqCaVgVBC5YC0w5yQZ2fztuJZ7KlmXepXzagdZnvfLdQU7AnNyEUAHc+UIT0ld35qPnB8H2K1Y1/idW4qC/zU4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HnTiX9CV; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=rLNCLQ98IKiHByi246mzA4Cpfqxmm3abm6D3jgMs2pvsalfL4sBISDn9uRC8zjDgmzJ7T2pcCpFuxKIs9RLMzX6Gy+2iKFv342GMouq94MIsq7nww+iv7qW5Q9UkLJRlruLvJgTQZTGJxncS6jmO0dyxciuX6m4Kr6uXK08FcOw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NGkFaXtD; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HnTiX9CV"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78D1DC4CEF5;
-	Tue,  2 Sep 2025 09:55:40 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NGkFaXtD"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29F2FC4CEF7;
+	Tue,  2 Sep 2025 09:55:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756806943;
-	bh=nwKi1FGptwRfXIELQTuMx2CYoPiscRWnpzAnP5fcCw4=;
+	s=k20201202; t=1756806947;
+	bh=5CeGT7OlLAwJ+n1eYK2YzNXyyrj/zX7cdxpv5cnx/wQ=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=HnTiX9CVzwT/BoVDHWh0NnYwjx5NSS7a4yXI5nhM/SfOlp+tMgeVkJ2ZMPBkKUEyN
-	 K5r6xxH0otPBBDcL702IREHPQBzm+j71uhC6W/oGcVLiJyFEqWxaPkHiPmbyhVPKgT
-	 cVm+ruWWCEj8W2IBGbpHxl0j7mvlIEZYd72s96WslaTUSXf3M8orQjRI7bxnikqtem
-	 BzcoEtfYCpLLub9/zeu5sCoF7xq8Khcct6WQTWzw0HbOK7N7yxy8uL9bIr16fAEEJr
-	 /0bpHIgKN6BTuE6VoWgtND9xcm9BS0oLHtrxIjNBY4/wPiqnIirE4Ny2RCR7Tv+xQg
-	 +6Eq/o4RpgQhQ==
+	b=NGkFaXtDYROSoorv26I+Obr4udAKVmi2ap0zcj2jL0QcFzK79pxqlQmB/B8EGe3Oo
+	 /klizut9Em/TL+wJJbpURr4c2y8UdHbbCa8qYR8tZ7sPn12INPPVR7yFfrLGUUWO2d
+	 +cBEM0NxirQQK8PV9l7Dg38XSg872ik3IucF2BWBjgm1qrZ1uiDrySNpokh7x4FESu
+	 R+ih/wG/HGvUGWrs6pItSenoVF4VUc9fAZ03wm0UflCqHgz0KjdhiHiMUWbywKZ3Ct
+	 7oPWNtzomt4Qx+P/g2HqPLaVjEhz13VLtbhHYNic0yGQWdg66HYZ2+gSxutLqVamtU
+	 jVP4jOAFkveHQ==
 From: Andreas Hindborg <a.hindborg@kernel.org>
-Date: Tue, 02 Sep 2025 11:55:00 +0200
-Subject: [PATCH v7 06/17] rust: configfs: re-export `configfs_attrs` from
- `configfs` module
+Date: Tue, 02 Sep 2025 11:55:05 +0200
+Subject: [PATCH v7 11/17] rust: block: add block related constants
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -38,7 +37,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250902-rnull-up-v6-16-v7-6-b5212cc89b98@kernel.org>
+Message-Id: <20250902-rnull-up-v6-16-v7-11-b5212cc89b98@kernel.org>
 References: <20250902-rnull-up-v6-16-v7-0-b5212cc89b98@kernel.org>
 In-Reply-To: <20250902-rnull-up-v6-16-v7-0-b5212cc89b98@kernel.org>
 To: Boqun Feng <boqun.feng@gmail.com>, Miguel Ojeda <ojeda@kernel.org>, 
@@ -51,60 +50,54 @@ Cc: linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org,
  linux-kernel@vger.kernel.org, Andreas Hindborg <a.hindborg@kernel.org>, 
  Daniel Almeida <daniel.almeida@collabora.com>
 X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1232; i=a.hindborg@kernel.org;
- h=from:subject:message-id; bh=nwKi1FGptwRfXIELQTuMx2CYoPiscRWnpzAnP5fcCw4=;
- b=owEBbQKS/ZANAwAIAeG4Gj55KGN3AcsmYgBotr7+i+yQ3swVe5U9MLrSxaZg5jxxn784e/SvU
- q+ylRqmmC+JAjMEAAEIAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaLa+/gAKCRDhuBo+eShj
- d3iuD/9L8zSZvRa4HWcj9rN3REcp2gI7x5Z59IyF5rjRNVv+DbZE3RVAmoQutGL4FVjkxHKRPDa
- oIRP0+w2azN3CS3t+aNNBvsLZ+nSS6q5OCxUo1W523ZrKqBHFAxb1DctxBYTSTKG1IrsIAXDHNA
- w5yHzibzWChVdBrXz8yZ5aN2av36kCkBJ/4H/JVYRaI7Pa/WVtgCEtieGCeCHOo0x2V5iTTFpLu
- +UsYONTfZmnSAJEAZJYfxvfaoF6XYHUGEk8EZWTtv0mYnJAVli+tmz0PetzuCGbX6F8oCCi6qk/
- QqTGUgO/mwaOYIP+egJJssAsgAuxDVsHEWBDJxtutHiuh9zsCeJ5iTLx8+roTd3G906wvMek9hv
- T0Qmu/EOsXIkPBIVXY98KjFfez6ajw8rO8LEmJ6Bluke7m3ZvUpyuCDcQXzyc1nWMa/g/4baE5x
- /mSZIpMwQBevLsv3/zzN6snBmdP5K5T2Q65lEyMomb6meRTvsjohP0ogf4H3trybXBdv5R9P0M4
- GmmilFnDOofcZ+lGBb3Zn7u1zpFZ2ZOfFjWwVRnvMZymw+B0+wGEkkRNCLLjMn//by3RBUa0Cyu
- h6saa7xuDBWCm4UGzhZhxoXymx/vO01V20hkwNsbCRIOlbZ9dNG7t86my99nqxChhCNsH7dSfhx
- MginnAqqtuuSkbg==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1110; i=a.hindborg@kernel.org;
+ h=from:subject:message-id; bh=5CeGT7OlLAwJ+n1eYK2YzNXyyrj/zX7cdxpv5cnx/wQ=;
+ b=owEBbQKS/ZANAwAIAeG4Gj55KGN3AcsmYgBotr8DpXUlLvBi5GBvjmorCapQWZ7gRCkj5msQP
+ d1SM7HF+R2JAjMEAAEIAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaLa/AwAKCRDhuBo+eShj
+ d1ghEAChXQKR8qxW7URDo2QAuBfIybQwxVb14/7oblaHobyj4KVlMk7uSkdN8tDSTXR/ciNbYdy
+ S0jS2socVsGdgBNfOtfCzaszz0v7UVWKNcnSPE5WwYat5tu35MWqq44HNrnMyyHuxzxVgjcVJct
+ lyOoBoRblOHRxB7Jppjf+z8Nr2SKYzaK3uIyB0Mfdv8tb+KCYlAuZpR44pD606k6XLZMGvDZ36x
+ zojOqoAuOBx1Oja95XymouwVFpVOm5nGozB3oB5JpxHBUmBA794W/jDQin+2bIkh5NBpb/RUlWs
+ C+knMHYJRdqGMfqKytmoWFselxDpo7aL8T0TgbHTZgK6BNQmmMLD/udhTFeUUdSiGWU3Yyc+CfH
+ 2wC0woMAPDUhykFHZqZMY0NTXUbnDr4Rv1bfCax3nYrb1b8uhJZaIGwGxL7FhXYIuDSe4LyF25n
+ EiQqDkAy+rS7lhm8fS43xcTWSpjdxF4wfgdA7XjIzgUhAWNjx0nm4IUAUZfzCyUAHegJern/UC2
+ N4dtm3OvLG/Jz/08paLouGomJXDM0DEg7pqRb41914m0HfN8QTDkNy7/u1sBCpi4z3qpU5eweiL
+ jPFcHJPjBQOXG/tMHbmijpV3SHk7G+ljolcRZrfgYdVqLXdc+tSIU3gPSPhrvCETz3+UgofKEnT
+ JgLWOFoxsmov6uA==
 X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
  fpr=3108C10F46872E248D1FB221376EB100563EF7A7
 
-Re-export `configfs_attrs` from `configfs` module, so that users can import
-the macro from the `configfs` module rather than the root of the `kernel`
-crate.
-
-Also update users to import from the new path.
+Add a few block subsystem constants to the rust `kernel::block` name space.
+This makes it easier to access the constants from rust code.
 
 Reviewed-by: Alice Ryhl <aliceryhl@google.com>
 Reviewed-by: Daniel Almeida <daniel.almeida@collabora.com>
 Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
 ---
- rust/kernel/configfs.rs       | 2 ++
- samples/rust/rust_configfs.rs | 2 +-
- 2 files changed, 3 insertions(+), 1 deletion(-)
+ rust/kernel/block.rs | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/rust/kernel/configfs.rs b/rust/kernel/configfs.rs
-index 2736b798cdc6..318a2f073d1c 100644
---- a/rust/kernel/configfs.rs
-+++ b/rust/kernel/configfs.rs
-@@ -1039,3 +1039,5 @@ macro_rules! configfs_attrs {
-     };
+diff --git a/rust/kernel/block.rs b/rust/kernel/block.rs
+index 150f710efe5b..32c8d865afb6 100644
+--- a/rust/kernel/block.rs
++++ b/rust/kernel/block.rs
+@@ -3,3 +3,16 @@
+ //! Types for working with the block layer.
  
- }
+ pub mod mq;
 +
-+pub use crate::configfs_attrs;
-diff --git a/samples/rust/rust_configfs.rs b/samples/rust/rust_configfs.rs
-index af04bfa35cb2..ad364fb93e53 100644
---- a/samples/rust/rust_configfs.rs
-+++ b/samples/rust/rust_configfs.rs
-@@ -5,7 +5,7 @@
- use kernel::alloc::flags;
- use kernel::c_str;
- use kernel::configfs;
--use kernel::configfs_attrs;
-+use kernel::configfs::configfs_attrs;
- use kernel::new_mutex;
- use kernel::page::PAGE_SIZE;
- use kernel::prelude::*;
++/// Bit mask for masking out [`SECTOR_SIZE`].
++pub const SECTOR_MASK: u32 = bindings::SECTOR_MASK;
++
++/// Sectors are size `1 << SECTOR_SHIFT`.
++pub const SECTOR_SHIFT: u32 = bindings::SECTOR_SHIFT;
++
++/// Size of a sector.
++pub const SECTOR_SIZE: u32 = bindings::SECTOR_SIZE;
++
++/// The difference between the size of a page and the size of a sector,
++/// expressed as a power of two.
++pub const PAGE_SECTORS_SHIFT: u32 = bindings::PAGE_SECTORS_SHIFT;
 
 -- 
 2.47.2
