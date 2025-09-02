@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5FFA32ED58;
-	Tue,  2 Sep 2025 14:49:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8CCC31B102;
+	Tue,  2 Sep 2025 14:49:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756824581; cv=none; b=jwuYEFMyseJeFNZ4ujAOrinzhnUc4lWn/5R95ulvYIa6kpC4OjOzzw8dwXZLwEez+/1S0sRbnDaUY6CGTLg3PRV9VZnj1N6EyAOd5DWRfbNSntD/Xp5ZcoG8HbK/e3E/FXKV0PhSPvOIbmPzJwmo0ovotyxyRbD5QlLnaVkfc2k=
+	t=1756824584; cv=none; b=XSDwb+5xdJImaVXq06HnID690UlhKup6HUUHUIAPQVeKv3ZCyfRp6iQO2SimX1LhQwbAD5CgYbJ+aCGIVjvgx6Hn2GZslTPMDi5RiiqasWk3JO02StvmpmQ8Z2RCIcxqohO6r0IUv3iWBtmveGObPuj5wy4CDSDmZ5/rxnH2RsQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756824581; c=relaxed/simple;
-	bh=RB2ksoieyLntDs7HJ/RFuf6vwP6H3wdrcrPesmw+pyc=;
+	s=arc-20240116; t=1756824584; c=relaxed/simple;
+	bh=2/thOeJ4NuvxSVVC3hxw/9bIX2PIBvboPgYtgi2/VE0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=t2+dwgEaBrGErzTHt+aqbx7dHwUNSFFmyZm8IetlGbijNktryNFPNPcao5zFUY2Yg/Vw1xqOyM83kIZQ07f7+7z3NHpAr1r0eYOOhrTENcu4QCC0mYT/2L3oN+m17iTdlmyNNgB8v1hmybDa7k9YvlHz7ypuVhrNkGHZtedUxGk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JZSrHfV5; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=W2zxUOvsl/rC19N1Wn03I9n43SjrNSRynnk/xsMTH+uTaLZVVXpEhJT9nxNutNHXVAv70sXL3PXTGmfKc8nCDpLokMxgGq23u0N1UittT60gsc0ZoROwahaCQKyj4JJT5t079RwiQL/OdepiAVBeVTRQkDoOgbjBOfTHG1gopGg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VKECAb+7; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JZSrHfV5"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B593DC4CEED;
-	Tue,  2 Sep 2025 14:49:39 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VKECAb+7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A66F8C4CEED;
+	Tue,  2 Sep 2025 14:49:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756824580;
-	bh=RB2ksoieyLntDs7HJ/RFuf6vwP6H3wdrcrPesmw+pyc=;
+	s=k20201202; t=1756824584;
+	bh=2/thOeJ4NuvxSVVC3hxw/9bIX2PIBvboPgYtgi2/VE0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=JZSrHfV5RjgP6FwDhcPDrLH1lW/wS4YlLapHJysxuEeYKBdTeEA7mwHWta+DUwvDK
-	 8usdO9pm0G9OJcPH2r6xdHblIJrIO415RfC5Jo9IYcWrcDkjpHn2FwnkLHPhIz23St
-	 wXHYoacDeswL+oFmO249wc5MuSyna3BF+sSD/rKFuhG8BkS8Swzg+mJ44CRMdKCVjJ
-	 JT5Y2NQNPc+7xnLzw9pSQotk1nGvp4p1upES9s3UQSikhPHPq/nquZmZaXUq0AprZi
-	 s3B+kTchlbCY1zBP+cxrbq6M9+mc7YC1+9T3u/HEsQcoDp2oijrmaAzD/IHheWAhET
-	 7nxwjSwvkkL9Q==
+	b=VKECAb+7Sse52mYJL41SXOrXDFGCRiIF9tuTww+7tx8TF5Ejmreeh3HY00rHaazQn
+	 aOTh2UXi0X7gB6XKiPuY2KJcOfZeTrAYxYVSBqbTN3F5Fl7eG0quZrJ/k42DqVVCsr
+	 GwhvRXbAMz4CU6yoxiw2WzZdasqegGQPNyQKGXTE5/3T3HPR4sL/jxhRLhqbGHtIqp
+	 Olwm6UL/KtvfA0rjsrKrcjQo7JfNFlEx+nnbC0Q+EsvdfGHJP1R+qDhsLnUhQ/x3ua
+	 ilF/FQzSLWqW8sNqDmIhrghX9qmh9Vix0gO6Gy0buRmc6/knYwd5Ib7hdXL+VxUnMe
+	 /kIUohye23SrQ==
 From: Leon Romanovsky <leon@kernel.org>
 To: Marek Szyprowski <m.szyprowski@samsung.com>
 Cc: Leon Romanovsky <leonro@nvidia.com>,
@@ -65,9 +65,9 @@ Cc: Leon Romanovsky <leonro@nvidia.com>,
 	virtualization@lists.linux.dev,
 	Will Deacon <will@kernel.org>,
 	xen-devel@lists.xenproject.org
-Subject: [PATCH v5 09/16] dma-mapping: implement DMA_ATTR_MMIO for dma_(un)map_page_attrs()
-Date: Tue,  2 Sep 2025 17:48:46 +0300
-Message-ID: <098a7aace5780f8ad504ce021e7731dfe1f82dca.1756822782.git.leon@kernel.org>
+Subject: [PATCH v5 06/16] iommu/dma: implement DMA_ATTR_MMIO for iommu_dma_(un)map_phys()
+Date: Tue,  2 Sep 2025 17:48:43 +0300
+Message-ID: <615b270dc8cd285c1b05cf3b9d3a969487049a5f.1756822782.git.leon@kernel.org>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <cover.1756822782.git.leon@kernel.org>
 References: <cover.1756822782.git.leon@kernel.org>
@@ -81,90 +81,68 @@ Content-Transfer-Encoding: 8bit
 
 From: Leon Romanovsky <leonro@nvidia.com>
 
-Make dma_map_page_attrs() and dma_map_page_attrs() respect
+Make iommu_dma_map_phys() and iommu_dma_unmap_phys() respect
 DMA_ATTR_MMIO.
 
-DMA_ATR_MMIO makes the functions behave the same as
-dma_(un)map_resource():
+DMA_ATTR_MMIO makes the functions behave the same as
+iommu_dma_(un)map_resource():
  - No swiotlb is possible
- - Legacy dma_ops arches use ops->map_resource()
- - No kmsan
- - No arch_dma_map_phys_direct()
+ - No cache flushing is done (ATTR_MMIO should not be cached memory)
+ - prot for iommu_map() has IOMMU_MMIO not IOMMU_CACHE
 
-The prior patches have made the internal functions called here support
-DMA_ATTR_MMIO.
-
-This is also preparation for turning dma_map_resource() into an inline
-calling dma_map_phys(DMA_ATTR_MMIO) to consolidate the flows.
+This is preparation for replacing iommu_dma_map_resource() callers
+with iommu_dma_map_phys(DMA_ATTR_MMIO) and removing
+iommu_dma_(un)map_resource().
 
 Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
 Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
 ---
- kernel/dma/mapping.c | 26 +++++++++++++++++++++-----
- 1 file changed, 21 insertions(+), 5 deletions(-)
+ drivers/iommu/dma-iommu.c | 15 +++++++++++----
+ 1 file changed, 11 insertions(+), 4 deletions(-)
 
-diff --git a/kernel/dma/mapping.c b/kernel/dma/mapping.c
-index 891e1fc3e582..fdabfdaeff1d 100644
---- a/kernel/dma/mapping.c
-+++ b/kernel/dma/mapping.c
-@@ -158,6 +158,7 @@ dma_addr_t dma_map_page_attrs(struct device *dev, struct page *page,
- {
- 	const struct dma_map_ops *ops = get_dma_ops(dev);
- 	phys_addr_t phys = page_to_phys(page) + offset;
-+	bool is_mmio = attrs & DMA_ATTR_MMIO;
- 	dma_addr_t addr;
- 
- 	BUG_ON(!valid_dma_direction(dir));
-@@ -166,14 +167,25 @@ dma_addr_t dma_map_page_attrs(struct device *dev, struct page *page,
- 		return DMA_MAPPING_ERROR;
- 
- 	if (dma_map_direct(dev, ops) ||
--	    arch_dma_map_phys_direct(dev, phys + size))
-+	    (!is_mmio && arch_dma_map_phys_direct(dev, phys + size)))
- 		addr = dma_direct_map_phys(dev, phys, size, dir, attrs);
- 	else if (use_dma_iommu(dev))
- 		addr = iommu_dma_map_phys(dev, phys, size, dir, attrs);
--	else
-+	else if (is_mmio) {
-+		if (!ops->map_resource)
+diff --git a/drivers/iommu/dma-iommu.c b/drivers/iommu/dma-iommu.c
+index aea119f32f96..6804aaf034a1 100644
+--- a/drivers/iommu/dma-iommu.c
++++ b/drivers/iommu/dma-iommu.c
+@@ -1211,16 +1211,19 @@ dma_addr_t iommu_dma_map_phys(struct device *dev, phys_addr_t phys, size_t size,
+ 	 */
+ 	if (dev_use_swiotlb(dev, size, dir) &&
+ 	    iova_unaligned(iovad, phys, size)) {
++		if (attrs & DMA_ATTR_MMIO)
 +			return DMA_MAPPING_ERROR;
 +
-+		addr = ops->map_resource(dev, phys, size, dir, attrs);
-+	} else {
-+		/*
-+		 * The dma_ops API contract for ops->map_page() requires
-+		 * kmappable memory, while ops->map_resource() does not.
-+		 */
- 		addr = ops->map_page(dev, page, offset, size, dir, attrs);
-+	}
+ 		phys = iommu_dma_map_swiotlb(dev, phys, size, dir, attrs);
+ 		if (phys == (phys_addr_t)DMA_MAPPING_ERROR)
+ 			return DMA_MAPPING_ERROR;
+ 	}
  
--	kmsan_handle_dma(phys, size, dir);
-+	if (!is_mmio)
-+		kmsan_handle_dma(phys, size, dir);
- 	trace_dma_map_phys(dev, phys, addr, size, dir, attrs);
- 	debug_dma_map_phys(dev, phys, size, dir, addr, attrs);
+-	if (!coherent && !(attrs & DMA_ATTR_SKIP_CPU_SYNC))
++	if (!coherent && !(attrs & (DMA_ATTR_SKIP_CPU_SYNC | DMA_ATTR_MMIO)))
+ 		arch_sync_dma_for_device(phys, size, dir);
  
-@@ -185,14 +197,18 @@ void dma_unmap_page_attrs(struct device *dev, dma_addr_t addr, size_t size,
- 		enum dma_data_direction dir, unsigned long attrs)
+ 	iova = __iommu_dma_map(dev, phys, size, prot, dma_mask);
+-	if (iova == DMA_MAPPING_ERROR)
++	if (iova == DMA_MAPPING_ERROR && !(attrs & DMA_ATTR_MMIO))
+ 		swiotlb_tbl_unmap_single(dev, phys, size, dir, attrs);
+ 	return iova;
+ }
+@@ -1228,10 +1231,14 @@ dma_addr_t iommu_dma_map_phys(struct device *dev, phys_addr_t phys, size_t size,
+ void iommu_dma_unmap_phys(struct device *dev, dma_addr_t dma_handle,
+ 		size_t size, enum dma_data_direction dir, unsigned long attrs)
  {
- 	const struct dma_map_ops *ops = get_dma_ops(dev);
-+	bool is_mmio = attrs & DMA_ATTR_MMIO;
+-	struct iommu_domain *domain = iommu_get_dma_domain(dev);
+ 	phys_addr_t phys;
  
- 	BUG_ON(!valid_dma_direction(dir));
- 	if (dma_map_direct(dev, ops) ||
--	    arch_dma_unmap_phys_direct(dev, addr + size))
-+	    (!is_mmio && arch_dma_unmap_phys_direct(dev, addr + size)))
- 		dma_direct_unmap_phys(dev, addr, size, dir, attrs);
- 	else if (use_dma_iommu(dev))
- 		iommu_dma_unmap_phys(dev, addr, size, dir, attrs);
--	else
-+	else if (is_mmio) {
-+		if (ops->unmap_resource)
-+			ops->unmap_resource(dev, addr, size, dir, attrs);
-+	} else
- 		ops->unmap_page(dev, addr, size, dir, attrs);
- 	trace_dma_unmap_phys(dev, addr, size, dir, attrs);
- 	debug_dma_unmap_phys(dev, addr, size, dir);
+-	phys = iommu_iova_to_phys(domain, dma_handle);
++	if (attrs & DMA_ATTR_MMIO) {
++		__iommu_dma_unmap(dev, dma_handle, size);
++		return;
++	}
++
++	phys = iommu_iova_to_phys(iommu_get_dma_domain(dev), dma_handle);
+ 	if (WARN_ON(!phys))
+ 		return;
+ 
 -- 
 2.50.1
 
