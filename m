@@ -1,95 +1,140 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f174.google.com (mail-il1-f174.google.com [209.85.166.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC9292550A3;
-	Tue,  2 Sep 2025 21:59:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DF54275AE9
+	for <linux-block@vger.kernel.org>; Tue,  2 Sep 2025 22:22:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756850381; cv=none; b=reXV5f+5OMjBuk5DqMxJehtewVbJ12SLVFwfxvywZhoSsB0BaMHPYlcM2pz0xdaQaLlPuHqQ2CN9XHYodMeG5duM894BmMpL1LQl3+CMRtE+ubmmLvu0LrJvMtE75Ok9YpbgVI7tpGWFno4Yh52TVykaPvCIScff47i4rmTj9wQ=
+	t=1756851768; cv=none; b=GeW3b9JQTKXNmPeSTg9io4IjY+4hmoKi4A0TymE0aBdumHdmMeQtNEQhVYIk/MA2Y4pscCnknbjKfYHWLtAkdVg82mazJY20I++2l7N7kNUQdhIG4c45OftO/U6gtHyOTlNDDiItND6EyJfz8lqmLg/V+560B191S57OP825pFc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756850381; c=relaxed/simple;
-	bh=zUOixGI5e23gDVx/zmq/5QWAYGpvZZ1gzj0irhRA2AU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VgbH5uDI/2QVhMi2LizJeLKPm+fa/+rummUVILiUu1HgZHWFI3zma08dYZ9uuLxno7yGg3aTPCBhP3TmYsIQmGpeT4aaFCdcW248LG8DYhjQiANP4BnXZNWqIT+oB+3Se5X466BoQsqrKcOEzk3yctzI5+BuFRy9CVfI/lCnUTw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t/Eu3Rve; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1756851768; c=relaxed/simple;
+	bh=1r8Dd1Vxp/ZfKTkV/+QQqeGZJ37/gBVxDRLdoNTobx4=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=fRVpzn+GBWq5nOLuhffd7vxg1lP+WtmbIiJBseRlg6JDwYYlHYQuRA+A2PQM/tg+2ar7+GWk+0E1leb0ljwmveemTVKOVj0Gnzo3A576/zOjiMnZMYyamdmFruWSV/EXsNRtv+EwsdMoSRVx4f0noDvnp84NU3NG+jjkwedOSEE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Q9+Fmpy4; arc=none smtp.client-ip=209.85.166.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t/Eu3Rve"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A15CEC4CEED;
-	Tue,  2 Sep 2025 21:59:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756850381;
-	bh=zUOixGI5e23gDVx/zmq/5QWAYGpvZZ1gzj0irhRA2AU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=t/Eu3RveeWFJ7QPQZS0HMJnJ18RJisbVk4Pk4B2mkUogsXCsDnOh5nmkT6QJ4KkpV
-	 WAD5v3cszsJls2vJneW0RL/RKpho+ZzAZhFpATDVsn7wwLvJDFu6zSx6RUEKSctSsY
-	 MYZrvd5dFbrPEZmkILy8ZxDbNlA6Ej38GRHuRquE0I86IxDtV1kdU0Sm1EDnwtGqEF
-	 c1keYzFalxZPfGjORlUbEIAtFrtMdhOixv+lPDaKzXO5a+aOyNEdMKgtKZcG+wqmef
-	 IRgJjgP6zlr77O2RCDhrfy6xxK73ZGX0o3JyM4rB09vZuyTewz4+/r6JUDL31Kg2Mp
-	 O1zPH9rjxq5Aw==
-Date: Tue, 2 Sep 2025 15:59:37 -0600
-From: Keith Busch <kbusch@kernel.org>
-To: Marek Szyprowski <m.szyprowski@samsung.com>
-Cc: Leon Romanovsky <leon@kernel.org>, Leon Romanovsky <leonro@nvidia.com>,
-	Jason Gunthorpe <jgg@nvidia.com>,
-	Abdiel Janulgue <abdiel.janulgue@gmail.com>,
-	Alexander Potapenko <glider@google.com>,
-	Alex Gaynor <alex.gaynor@gmail.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Christoph Hellwig <hch@lst.de>, Danilo Krummrich <dakr@kernel.org>,
-	iommu@lists.linux.dev, Jason Wang <jasowang@redhat.com>,
-	Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>,
-	Jonathan Corbet <corbet@lwn.net>, Juergen Gross <jgross@suse.com>,
-	kasan-dev@googlegroups.com, linux-block@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org, linux-nvme@lists.infradead.org,
-	linuxppc-dev@lists.ozlabs.org, linux-trace-kernel@vger.kernel.org,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Robin Murphy <robin.murphy@arm.com>, rust-for-linux@vger.kernel.org,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Stefano Stabellini <sstabellini@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	virtualization@lists.linux.dev, Will Deacon <will@kernel.org>,
-	xen-devel@lists.xenproject.org
-Subject: Re: [PATCH v4 14/16] block-dma: migrate to dma_map_phys instead of
- map_page
-Message-ID: <aLdoyWevrQMQUGyz@kbusch-mbp>
-References: <cover.1755624249.git.leon@kernel.org>
- <CGME20250819173845eucas1p221cd6842839f5e7130f131cd341df566@eucas1p2.samsung.com>
- <22b824931bc8ba090979ab902e4c1c2ec8327b65.1755624249.git.leon@kernel.org>
- <2d8e67b2-4ab2-4c1f-9ef3-470810f99d07@samsung.com>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Q9+Fmpy4"
+Received: by mail-il1-f174.google.com with SMTP id e9e14a558f8ab-3f372839583so2517765ab.1
+        for <linux-block@vger.kernel.org>; Tue, 02 Sep 2025 15:22:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1756851765; x=1757456565; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zsgHYoXl8XEDv6u9usSm/TLGj9iq5mbiFJJ4P4xGJcU=;
+        b=Q9+Fmpy4dndieky0PudmQdsl/stk6Q+AweMcMIyn91LFVai3hbIioaqyiPam+zolFF
+         1MIlPvd2jFCkwAJUjA5BZz5RE4sjQL/nDMbwe/DdEVQEXlDmdDwn8mbvO9r/K5UltAql
+         wr74LPy5kZqFye4b5N1ZVMTxsYu8PLMcF/008/qTIixLJ7CkbfzYJETZzh9HvLLibltT
+         icuq7aDYXD6r2zmOJSSOlgMbVoeBpWb/xqyvNmI733UOW/lMPiKV739cPFcXnwzwmrPL
+         nMSBZQ1PVaPcD/5SCl+CbSsnlDLjKRxqPyusWDxMMzWGB9VqqwmE2uyJncyYemKJ1cHA
+         k5JA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756851765; x=1757456565;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=zsgHYoXl8XEDv6u9usSm/TLGj9iq5mbiFJJ4P4xGJcU=;
+        b=ska7ZnoWLpO43eQLSq3dd7KH9O/GkaSz88JZxUFMrX8b8pmrT5ovBzFYE5X5MsgKGa
+         4+Q/lT3mPQw6RcZoy2DORTyfTXslMzPSN61ltpfaAkWruGPIF8YgwmjyE6fMsi0vlBc8
+         kUuTsuLXyKzte7VnH29Eptg9h+A4q/uOdGFcApD8DxOpcEbH98kz3cydFnA39dcNCJZP
+         Y/xYcaPHib/FinNfEuiShlMsxCU0r4BpykOIrHrvjrlLVb/bJvpEuk2+HfWWRyDB7p6O
+         td17pih+TEpAlNwUdjYnGpe3mlf5kMbWBDSi6BbrF+1dZ3yIW9ae8ZVjA+4ARUuTce9G
+         lIqA==
+X-Gm-Message-State: AOJu0YyavTOYmFzlyDEQwZS56Uf+RH64oHq3HsFuOimJtfLrJNF5/iog
+	LoBup5BaB5Exa15eUQ4UuF2/t2ZsDOR+ZqOLH9Ndfd0vu1G67JO22IN6qGghEX90XZM=
+X-Gm-Gg: ASbGncsOKlKt7TwT7Yznkkidy2OynopQLIvjZnenq084kfScxO6nFScg/0X8dFGH4Vk
+	sfAR5ht6MoyPhFY9QX+6qJVQMNoSm7q0q99GG/PLi0QA0roRUW4LDlu30CsoolqQZWS8s3BYGMY
+	eWAVg6+J86Qy9REd+t+o5uDNc5jiURqJmml0IQ33yvpu6vogjtKhuyS3mCjfdF59H81K1OYd0t4
+	FvC0y1NwBRzCna0eScbQAmAeJhUgl1BsdU56LOipgECoaJnIry4mkd2zwDRObaP31sXawPONnb6
+	3hLbDf3qDwotvG9S5wH0PK7YiKVk0s9O8FftiCXZsBeoN1dsXmriGmEsVvLnltbN8bahyMC+f+J
+	DV68biUky9c7OnFmuQZ+Ez439PYfnJr6Af6hOXqIwJu+FYjCFT8yoU1B/4tyFF+bs
+X-Google-Smtp-Source: AGHT+IFfI7hKWtDAOl7ZVodkkOkz+AIezL3CZ2BrlZMAw59f9+OYjXiNDkBRRbyrOg6biAgWIE7oTA==
+X-Received: by 2002:a05:6e02:216c:b0:3e6:7ac1:b8bf with SMTP id e9e14a558f8ab-3f3d60dcb9fmr225041885ab.9.1756851765148;
+        Tue, 02 Sep 2025 15:22:45 -0700 (PDT)
+Received: from [127.0.0.1] (syn-047-044-098-030.biz.spectrum.com. [47.44.98.30])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3f3e136b841sm45322195ab.44.2025.09.02.15.22.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Sep 2025 15:22:44 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: Boqun Feng <boqun.feng@gmail.com>, Miguel Ojeda <ojeda@kernel.org>, 
+ Alex Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>, 
+ =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+ Benno Lossin <lossin@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
+ Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, 
+ Breno Leitao <leitao@debian.org>, Andreas Hindborg <a.hindborg@kernel.org>
+Cc: linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Daniel Almeida <daniel.almeida@collabora.com>
+In-Reply-To: <20250902-rnull-up-v6-16-v7-0-b5212cc89b98@kernel.org>
+References: <20250902-rnull-up-v6-16-v7-0-b5212cc89b98@kernel.org>
+Subject: Re: [PATCH v7 00/17] rnull: add configfs, remote completion to
+ rnull
+Message-Id: <175685176380.67509.14270978539673986925.b4-ty@kernel.dk>
+Date: Tue, 02 Sep 2025 16:22:43 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2d8e67b2-4ab2-4c1f-9ef3-470810f99d07@samsung.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3-dev-2ce6c
 
-On Tue, Sep 02, 2025 at 10:49:48PM +0200, Marek Szyprowski wrote:
-> On 19.08.2025 19:36, Leon Romanovsky wrote:
-> > @@ -87,8 +87,8 @@ static bool blk_dma_map_bus(struct blk_dma_iter *iter, struct phys_vec *vec)
-> >   static bool blk_dma_map_direct(struct request *req, struct device *dma_dev,
-> >   		struct blk_dma_iter *iter, struct phys_vec *vec)
-> >   {
-> > -	iter->addr = dma_map_page(dma_dev, phys_to_page(vec->paddr),
-> > -			offset_in_page(vec->paddr), vec->len, rq_dma_dir(req));
-> > +	iter->addr = dma_map_phys(dma_dev, vec->paddr, vec->len,
-> > +			rq_dma_dir(req), 0);
-> >   	if (dma_mapping_error(dma_dev, iter->addr)) {
-> >   		iter->status = BLK_STS_RESOURCE;
-> >   		return false;
+
+On Tue, 02 Sep 2025 11:54:54 +0200, Andreas Hindborg wrote:
+> This series adds configuration via configfs and remote completion to
+> the rnull driver. The series also includes a set of changes to the
+> rust block device driver API: a few cleanup patches, and a few features
+> supporting the rnull changes.
 > 
-> I wonder where is the corresponding dma_unmap_page() call and its change 
-> to dma_unmap_phys()...
+> The series removes the raw buffer formatting logic from `kernel::block`
+> and improves the logic available in `kernel::string` to support the same
+> use as the removed logic.
+> 
+> [...]
 
-You can't do that in the generic layer, so it's up to the caller. The
-dma addrs that blk_dma_iter yield are used in a caller specific
-structure. For example, for NVMe, it goes into an NVMe PRP. The generic
-layer doesn't know what that is, so the driver has to provide the
-unmapping.
+Applied, thanks!
+
+[01/17] rust: str: normalize imports in `str.rs`
+        commit: d5d060d624e34c6ce1748a157cf2391e49af2a54
+[02/17] rust: str: allow `str::Formatter` to format into `&mut [u8]`.
+        commit: 87482d6d9104d087935592ebbf52b70f8a777c47
+[03/17] rust: str: expose `str::{Formatter, RawFormatter}` publicly.
+        commit: 8c5ac71cf19bc8a2ad5bc905d1fd3191d887d469
+[04/17] rust: str: introduce `NullTerminatedFormatter`
+        commit: cdde7a1951ff0600adc45718ba251559e4d3fd7c
+[05/17] rust: str: introduce `kstrtobool` function
+        commit: b1dae0be89278348e2c99ddca820d91292856b10
+[06/17] rust: configfs: re-export `configfs_attrs` from `configfs` module
+        commit: 60e1eeed8b53f65ef7919fd3f79cc9b7f20795c5
+[07/17] rust: block: normalize imports for `gen_disk.rs`
+        commit: f4b72f1558be1e2b173b6b1f93c09dc668592a26
+[08/17] rust: block: use `NullTerminatedFormatter`
+        commit: c3a54220b54a1bda0662f0e7ab90ffabf5036d50
+[09/17] rust: block: remove `RawWriter`
+        commit: f52689fcd8a2f78436b57d10ba742455431885a0
+[10/17] rust: block: remove trait bound from `mq::Request` definition
+        commit: 8c32697c4edd4180bc90d367e54fb64490c230c6
+[11/17] rust: block: add block related constants
+        commit: 19c37c91b4a0ff7abfc3dcfe165d1377939469ac
+[12/17] rnull: move driver to separate directory
+        commit: edd8650691c374bdce133af1b25ff4f3496f489f
+[13/17] rnull: enable configuration via `configfs`
+        commit: d969d504bc13b2f0c1f208e009e73f2625b421c0
+[14/17] rust: block: add `GenDisk` private data support
+        commit: 90d952fac8ac1aa6cb21aad7010d33af4d309f4a
+[15/17] rust: block: mq: fix spelling in a safety comment
+        commit: bde50e28f7c5fe874112fe9d98e84873548fa8de
+[16/17] rust: block: add remote completion to `Request`
+        commit: 4ec052841a545297a276e833817990f0e13b1b32
+[17/17] rnull: add soft-irq completion support
+        commit: 34585dc649fb255b40075dab56af063c1bfc9933
+
+Best regards,
+-- 
+Jens Axboe
+
+
+
