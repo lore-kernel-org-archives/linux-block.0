@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 967492F4A09;
-	Tue,  2 Sep 2025 09:56:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD0922EFD87;
+	Tue,  2 Sep 2025 09:56:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756806973; cv=none; b=AqXWIREL0Q6MQg5BaBHsvLVrvO7aE/CxAzNW5Zd3N1l7gVuvZYsaxXtjlkcUNfbMr9LZTpO8sl818QMSZkp3buQh7u6mBtip+j+xOm7CK5HwKGgk6cnaoGWHOJPghdUT2oZBNM+sXfDTcq1WtJlpp7Lh5cH6/KNzUjeUAYRiAkA=
+	t=1756806978; cv=none; b=fdKYFDVeLolKcCA6Y+aWZTU65uiz0lfK2VaZAfq0Qta9S5xl9KEirVbms7DaPQ2B5q5BlHSgXEmSlD7kA4O3wZuTJH07wyOJuUgnkUbC6Rky9yZYDw+7iXX17Jxf38n+Kd6f8RbdCOYIjQTwC1sRTcYEKbzU795G92EOHDTjeTc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756806973; c=relaxed/simple;
-	bh=pIuBZvrIaCfOxk5R8QT6fU57Jtv4V7ScNiWvZ/2peFE=;
+	s=arc-20240116; t=1756806978; c=relaxed/simple;
+	bh=aP8rjJy/aucU/AdvUODqarq27NqARAu9QR2SBF7RTRs=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=cBnoZ+KY6Kl1cJ0iH4JKpB4n9G+Fi1ggk9FcV2xDbmxWdJSu/39iFIh/4IxV0PRNZNeo120QuT3TdyT+RZXRG9WFobu6bpAJBH4y3IbjpzJTPtNPIp4u8BMCzAJOmAuQ5vgumHlix3XId7qGwYeTWA283f7j3c+5k9a9tS6aeGI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ndSbxD6i; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=lLFvmjhwnHxD001OrQx9Boau8ckrK+20dlslzxsYLGvuRFw7jqqtPQf/V9RzJY+4zx7dGBwnp13XZ9VcFE6lrggYyE/UsMA9L+7VVZNZ3m+K9idSyXW34c87i32n3RYIFie3HlGKUo8B8IBukU/gV1EpuNMxMl5WCx0SP69ctXc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q5V1zOvK; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ndSbxD6i"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24E3AC4CEED;
-	Tue,  2 Sep 2025 09:56:08 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q5V1zOvK"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CDFADC4CEED;
+	Tue,  2 Sep 2025 09:56:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756806973;
-	bh=pIuBZvrIaCfOxk5R8QT6fU57Jtv4V7ScNiWvZ/2peFE=;
+	s=k20201202; t=1756806978;
+	bh=aP8rjJy/aucU/AdvUODqarq27NqARAu9QR2SBF7RTRs=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=ndSbxD6iB3kGoDhL7VTkbdea5vVoNd0p6dev48Q8fxyuMe8Ty8cGWsSQF6Mzg+VIp
-	 8+MBB/v+2eG6MInm8UuSzx0sKHVFDDwtK7ush1EBrI263F7FO2mp9jTgRqTUP8As79
-	 9rqd9YssJMdsqj8u2m/D8KLFdGuqhyxWwq2JSM2TyVvqYeySmEUZ7V4c9Oz0uuSq9I
-	 42JRHu0Bwuz3YWm894t9UIqdpNSGMk5jsUqWrDNEN2SyBAfdAUTDXRJOlfEvAJvySz
-	 h8zz7yiwp34Z3vdt1QvFi6tu9xj0AVid1v3nNfTpreIwtjT4agOVkjjFBkQ/TJxJr7
-	 G6D3zBKH36+Mw==
+	b=q5V1zOvK66uXPBVXkTZAGq2iioQokxkC4nWSiQJjAQb+TNt6LorkfQja9Du5E4dZh
+	 WDZpdhhLzfl7IgBGJO0QP68IWialXEXvv9pxm52ErY7moNUK8jvP911AT/QpbmoxUt
+	 cGOmcjQhodpkuSNsxSPzeqj17lEJIueXt3StNigIxRAKBIEhg2zUMsCFIfUJaGn+rx
+	 0sifpYLLtwhp9NMKaDqyXXu9xWQDVaHCIpp9gs7accLAjjc8xFmO5IiKAsGpHdKG4y
+	 7ktvew5XKqisobTcvVczvI0nRTaPK+1UnCq9wNv3Sht5qcboHo8mwoxRvBttm9yPbG
+	 Eehv74/5KqtXQ==
 From: Andreas Hindborg <a.hindborg@kernel.org>
-Date: Tue, 02 Sep 2025 11:55:06 +0200
-Subject: [PATCH v7 12/17] rnull: move driver to separate directory
+Date: Tue, 02 Sep 2025 11:55:11 +0200
+Subject: [PATCH v7 17/17] rnull: add soft-irq completion support
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -37,7 +37,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250902-rnull-up-v6-16-v7-12-b5212cc89b98@kernel.org>
+Message-Id: <20250902-rnull-up-v6-16-v7-17-b5212cc89b98@kernel.org>
 References: <20250902-rnull-up-v6-16-v7-0-b5212cc89b98@kernel.org>
 In-Reply-To: <20250902-rnull-up-v6-16-v7-0-b5212cc89b98@kernel.org>
 To: Boqun Feng <boqun.feng@gmail.com>, Miguel Ojeda <ojeda@kernel.org>, 
@@ -50,133 +50,218 @@ Cc: linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org,
  linux-kernel@vger.kernel.org, Andreas Hindborg <a.hindborg@kernel.org>, 
  Daniel Almeida <daniel.almeida@collabora.com>
 X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3780; i=a.hindborg@kernel.org;
- h=from:subject:message-id; bh=pIuBZvrIaCfOxk5R8QT6fU57Jtv4V7ScNiWvZ/2peFE=;
- b=owEBbQKS/ZANAwAIAeG4Gj55KGN3AcsmYgBotr8EMrtCGQJaSfg5FNjqv7eu4cedktkAzfTYV
- udhcYHI2NmJAjMEAAEIAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaLa/BAAKCRDhuBo+eShj
- dyykEACyYN9nV7NnY266IMC+HwV7lYYDnvjpQEPehKkSbW9IGOMntwX4Izin3vdqj9UnDPgtxqr
- qMcw/h7owGs4zx3GgQBSR/2myqRbuVGsgazSCzAZ8hZ1D/7BUBPbYO7WOEzrEn7qc9typ2Hq/vx
- xd10lirFdV5Ujs5LaEMv1cucK225LWL9bF6aelykSmkLZsejXsFOpNiLS9J8nCXwSi9o38Ph8+u
- lEQ8Q8Gjv3ZgL2yF3aiBcjJSwPwJj1h6t1P6GwA+kmaVmVwsjfjsxpiTNrWFf0eYDVMgxnDLHGC
- n/6/T5JmuTq6ckh/qChmOr0Ute5Dnlcitmj/HIOaeebKbmy9gtxh9LHP4hnjC8KmVpAbHP2RTLB
- HYerZRE0IeialIemkc8cKwjwow/LL2Maht53Xk7831JQm1WTQrSvCOrOHD2MUS8qWOMn81tcS+r
- H8vd9KLb7kNI5ryBRS4fj9obzsGEIAXz1r6qyZQTLw7sYtryEBvt9JsTNiyahV8WgYnVCbBtrlE
- NNpz1XA4Lo0jk38eCMA7bmpbDxuEb3arDjzNf8FjEVwh87EJ+6kU3Q6zlTEOvImidg7/aLOCa8A
- 49Q5yehIuQheUPJtWFaO70YhgkuSXC+VONq8WcA8pNogcD1+QEQ/gP6fsYiStl7dsd+sFzlQkUx
- f53psD4978/5IAA==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=6432; i=a.hindborg@kernel.org;
+ h=from:subject:message-id; bh=aP8rjJy/aucU/AdvUODqarq27NqARAu9QR2SBF7RTRs=;
+ b=owEBbQKS/ZANAwAIAeG4Gj55KGN3AcsmYgBotr8IjCY/BdHMZ8XJPjj87NQsvEdfa7Mg1jHq7
+ bfQXYRKm0yJAjMEAAEIAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaLa/CAAKCRDhuBo+eShj
+ d8kqEACDbS/6X7I8dK6VSVaSFhS2Ylq/gIAKfVNieEzjfUJ5TX1+SGgo8UsqzY9bXWbIuH0Pyip
+ 8PVho4RQiTAjnyzIuTQIzjqxLThq899ASeTejTVNaJ6+XeU/8QwZ+GeQALzYl6HqNw1Apnsl3wj
+ 5Psrx8ICZQtS4pyppo7+GYw6l1REJ+Uo/GWDZVrVKsofi+UB/o9crUXnxLvUGaHKyBovxeUVc8q
+ SrjMpJKPgICW2zdM0A182JSzwO/FZ2XN1NK5eMUfvLb7tPWhAT4rJ0P4Pm4nvrf9VdXQA5SMnLI
+ Z5rU+a7j0CuXQiwn5F/n6q4/wPleqN+NuGPdauRgdbniBMAe/lvnGABThW5lSCxTY3Iw4HGRrbT
+ vkkGz14i+UGQ5/t3/t26DMsiyLvnNYD/1OUwi7wRLyPeJYXjfRBjKPxH7jlxQBU3fRgAycOgdY1
+ Ew8AztcmGIJUR+TvH07j20Mo5+GSQxUh8R2dwY89vMwh2bBaG3rf0FDZDttlTtJzoNuUuTcBrUz
+ Dx8gnmBQ3Tb0hONgiBOoKHSSRu7zKx8ED5e/Pi/ibFv/EWHjeHsy/yplk41XbLq7u8WhglYTl0P
+ odUukwtDLyL314zJcQ9HE3RwgGBkMcrc7ZiJ4mDDV07k3tdrhM6UMl35/M2HqePPE0rgCJgHp6Q
+ SdLTo0l4pCpiLzQ==
 X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
  fpr=3108C10F46872E248D1FB221376EB100563EF7A7
 
-The rust null block driver is about to gain some additional modules. Rather
-than pollute the current directory, move the driver to a subdirectory.
+rnull currently only supports direct completion. Add option for completing
+requests across CPU nodes via soft IRQ or IPI.
 
 Reviewed-by: Alice Ryhl <aliceryhl@google.com>
 Reviewed-by: Daniel Almeida <daniel.almeida@collabora.com>
 Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
 ---
- MAINTAINERS                        |  2 +-
- drivers/block/Kconfig              | 10 +---------
- drivers/block/Makefile             |  4 +---
- drivers/block/rnull/Kconfig        | 13 +++++++++++++
- drivers/block/rnull/Makefile       |  3 +++
- drivers/block/{ => rnull}/rnull.rs |  0
- 6 files changed, 19 insertions(+), 13 deletions(-)
+ drivers/block/rnull/configfs.rs | 59 +++++++++++++++++++++++++++++++++++++++--
+ drivers/block/rnull/rnull.rs    | 32 ++++++++++++++--------
+ 2 files changed, 78 insertions(+), 13 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index daf520a13bdf..d5addcc4b132 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -4343,7 +4343,7 @@ W:	https://rust-for-linux.com
- B:	https://github.com/Rust-for-Linux/linux/issues
- C:	https://rust-for-linux.zulipchat.com/#narrow/stream/Block
- T:	git https://github.com/Rust-for-Linux/linux.git rust-block-next
--F:	drivers/block/rnull.rs
-+F:	drivers/block/rnull/
- F:	rust/kernel/block.rs
- F:	rust/kernel/block/
+diff --git a/drivers/block/rnull/configfs.rs b/drivers/block/rnull/configfs.rs
+index 46710a1e1af4..8498e9bae6fd 100644
+--- a/drivers/block/rnull/configfs.rs
++++ b/drivers/block/rnull/configfs.rs
+@@ -1,7 +1,7 @@
+ // SPDX-License-Identifier: GPL-2.0
  
-diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
-index df38fb364904..77d694448990 100644
---- a/drivers/block/Kconfig
-+++ b/drivers/block/Kconfig
-@@ -17,6 +17,7 @@ menuconfig BLK_DEV
- if BLK_DEV
+ use super::{NullBlkDevice, THIS_MODULE};
+-use core::fmt::Write;
++use core::fmt::{Display, Write};
+ use kernel::{
+     block::mq::gen_disk::{GenDisk, GenDiskBuilder},
+     c_str,
+@@ -36,7 +36,7 @@ impl AttributeOperations<0> for Config {
  
- source "drivers/block/null_blk/Kconfig"
-+source "drivers/block/rnull/Kconfig"
+     fn show(_this: &Config, page: &mut [u8; PAGE_SIZE]) -> Result<usize> {
+         let mut writer = kernel::str::Formatter::new(page);
+-        writer.write_str("blocksize,size,rotational\n")?;
++        writer.write_str("blocksize,size,rotational,irqmode\n")?;
+         Ok(writer.bytes_written())
+     }
+ }
+@@ -58,6 +58,7 @@ fn make_group(
+                 blocksize: 1,
+                 rotational: 2,
+                 size: 3,
++                irqmode: 4,
+             ],
+         };
  
- config BLK_DEV_FD
- 	tristate "Normal floppy disk support"
-@@ -311,15 +312,6 @@ config VIRTIO_BLK
- 	  This is the virtual block driver for virtio.  It can be used with
-           QEMU based VMMs (like KVM or Xen).  Say Y or M.
+@@ -72,6 +73,7 @@ fn make_group(
+                     rotational: false,
+                     disk: None,
+                     capacity_mib: 4096,
++                    irq_mode: IRQMode::None,
+                     name: name.try_into()?,
+                 }),
+             }),
+@@ -79,6 +81,34 @@ fn make_group(
+     }
+ }
  
--config BLK_DEV_RUST_NULL
--	tristate "Rust null block driver (Experimental)"
--	depends on RUST
--	help
--	  This is the Rust implementation of the null block driver. For now it
--	  is only a minimal stub.
--
--	  If unsure, say N.
--
- config BLK_DEV_RBD
- 	tristate "Rados block device (RBD)"
- 	depends on INET && BLOCK
-diff --git a/drivers/block/Makefile b/drivers/block/Makefile
-index a695ce74ef22..2d8096eb8cdf 100644
---- a/drivers/block/Makefile
-+++ b/drivers/block/Makefile
-@@ -9,9 +9,6 @@
- # needed for trace events
- ccflags-y				+= -I$(src)
- 
--obj-$(CONFIG_BLK_DEV_RUST_NULL) += rnull_mod.o
--rnull_mod-y := rnull.o
--
- obj-$(CONFIG_MAC_FLOPPY)	+= swim3.o
- obj-$(CONFIG_BLK_DEV_SWIM)	+= swim_mod.o
- obj-$(CONFIG_BLK_DEV_FD)	+= floppy.o
-@@ -38,6 +35,7 @@ obj-$(CONFIG_ZRAM) += zram/
- obj-$(CONFIG_BLK_DEV_RNBD)	+= rnbd/
- 
- obj-$(CONFIG_BLK_DEV_NULL_BLK)	+= null_blk/
-+obj-$(CONFIG_BLK_DEV_RUST_NULL) += rnull/
- 
- obj-$(CONFIG_BLK_DEV_UBLK)			+= ublk_drv.o
- obj-$(CONFIG_BLK_DEV_ZONED_LOOP) += zloop.o
-diff --git a/drivers/block/rnull/Kconfig b/drivers/block/rnull/Kconfig
-new file mode 100644
-index 000000000000..6dc5aff96bf4
---- /dev/null
-+++ b/drivers/block/rnull/Kconfig
-@@ -0,0 +1,13 @@
-+# SPDX-License-Identifier: GPL-2.0
-+#
-+# Rust null block device driver configuration
++#[derive(Debug, Clone, Copy)]
++pub(crate) enum IRQMode {
++    None,
++    Soft,
++}
 +
-+config BLK_DEV_RUST_NULL
-+	tristate "Rust null block driver (Experimental)"
-+	depends on RUST
-+	help
-+	  This is the Rust implementation of the null block driver. Like
-+	  the C version, the driver allows the user to create virutal block
-+	  devices that can be configured via various configuration options.
++impl TryFrom<u8> for IRQMode {
++    type Error = kernel::error::Error;
 +
-+	  If unsure, say N.
-diff --git a/drivers/block/rnull/Makefile b/drivers/block/rnull/Makefile
-new file mode 100644
-index 000000000000..11cfa5e615dc
---- /dev/null
-+++ b/drivers/block/rnull/Makefile
-@@ -0,0 +1,3 @@
++    fn try_from(value: u8) -> Result<Self> {
++        match value {
++            0 => Ok(Self::None),
++            1 => Ok(Self::Soft),
++            _ => Err(EINVAL),
++        }
++    }
++}
 +
-+obj-$(CONFIG_BLK_DEV_RUST_NULL) += rnull_mod.o
-+rnull_mod-y := rnull.o
-diff --git a/drivers/block/rnull.rs b/drivers/block/rnull/rnull.rs
-similarity index 100%
-rename from drivers/block/rnull.rs
-rename to drivers/block/rnull/rnull.rs
++impl Display for IRQMode {
++    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
++        match self {
++            Self::None => f.write_str("0")?,
++            Self::Soft => f.write_str("1")?,
++        }
++        Ok(())
++    }
++}
++
+ #[pin_data]
+ pub(crate) struct DeviceConfig {
+     #[pin]
+@@ -92,6 +122,7 @@ struct DeviceConfigInner {
+     block_size: u32,
+     rotational: bool,
+     capacity_mib: u64,
++    irq_mode: IRQMode,
+     disk: Option<GenDisk<NullBlkDevice>>,
+ }
+ 
+@@ -121,6 +152,7 @@ fn store(this: &DeviceConfig, page: &[u8]) -> Result {
+                 guard.block_size,
+                 guard.rotational,
+                 guard.capacity_mib,
++                guard.irq_mode,
+             )?);
+             guard.powered = true;
+         } else if guard.powered && !power_op {
+@@ -205,3 +237,26 @@ fn store(this: &DeviceConfig, page: &[u8]) -> Result {
+         Ok(())
+     }
+ }
++
++#[vtable]
++impl configfs::AttributeOperations<4> for DeviceConfig {
++    type Data = DeviceConfig;
++
++    fn show(this: &DeviceConfig, page: &mut [u8; PAGE_SIZE]) -> Result<usize> {
++        let mut writer = kernel::str::Formatter::new(page);
++        writer.write_fmt(fmt!("{}\n", this.data.lock().irq_mode))?;
++        Ok(writer.bytes_written())
++    }
++
++    fn store(this: &DeviceConfig, page: &[u8]) -> Result {
++        if this.data.lock().powered {
++            return Err(EBUSY);
++        }
++
++        let text = core::str::from_utf8(page)?.trim();
++        let value = text.parse::<u8>().map_err(|_| EINVAL)?;
++
++        this.data.lock().irq_mode = IRQMode::try_from(value)?;
++        Ok(())
++    }
++}
+diff --git a/drivers/block/rnull/rnull.rs b/drivers/block/rnull/rnull.rs
+index a19c55717c4f..1ec694d7f1a6 100644
+--- a/drivers/block/rnull/rnull.rs
++++ b/drivers/block/rnull/rnull.rs
+@@ -4,6 +4,7 @@
+ 
+ mod configfs;
+ 
++use configfs::IRQMode;
+ use kernel::{
+     block::{
+         self,
+@@ -53,35 +54,44 @@ fn new(
+         block_size: u32,
+         rotational: bool,
+         capacity_mib: u64,
++        irq_mode: IRQMode,
+     ) -> Result<GenDisk<Self>> {
+         let tagset = Arc::pin_init(TagSet::new(1, 256, 1), GFP_KERNEL)?;
+ 
++        let queue_data = Box::new(QueueData { irq_mode }, GFP_KERNEL)?;
++
+         gen_disk::GenDiskBuilder::new()
+             .capacity_sectors(capacity_mib << (20 - block::SECTOR_SHIFT))
+             .logical_block_size(block_size)?
+             .physical_block_size(block_size)?
+             .rotational(rotational)
+-            .build(fmt!("{}", name.to_str()?), tagset, ())
++            .build(fmt!("{}", name.to_str()?), tagset, queue_data)
+     }
+ }
+ 
++struct QueueData {
++    irq_mode: IRQMode,
++}
++
+ #[vtable]
+ impl Operations for NullBlkDevice {
+-    type QueueData = ();
++    type QueueData = KBox<QueueData>;
+ 
+     #[inline(always)]
+-    fn queue_rq(_queue_data: (), rq: ARef<mq::Request<Self>>, _is_last: bool) -> Result {
+-        mq::Request::end_ok(rq)
+-            .map_err(|_e| kernel::error::code::EIO)
+-            // We take no refcounts on the request, so we expect to be able to
+-            // end the request. The request reference must be unique at this
+-            // point, and so `end_ok` cannot fail.
+-            .expect("Fatal error - expected to be able to end request");
+-
++    fn queue_rq(queue_data: &QueueData, rq: ARef<mq::Request<Self>>, _is_last: bool) -> Result {
++        match queue_data.irq_mode {
++            IRQMode::None => mq::Request::end_ok(rq)
++                .map_err(|_e| kernel::error::code::EIO)
++                // We take no refcounts on the request, so we expect to be able to
++                // end the request. The request reference must be unique at this
++                // point, and so `end_ok` cannot fail.
++                .expect("Fatal error - expected to be able to end request"),
++            IRQMode::Soft => mq::Request::complete(rq),
++        }
+         Ok(())
+     }
+ 
+-    fn commit_rqs(_queue_data: ()) {}
++    fn commit_rqs(_queue_data: &QueueData) {}
+ 
+     fn complete(rq: ARef<mq::Request<Self>>) {
+         mq::Request::end_ok(rq)
 
 -- 
 2.47.2
