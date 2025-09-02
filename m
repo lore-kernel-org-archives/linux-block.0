@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CD7D31158C;
-	Tue,  2 Sep 2025 14:50:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C0D5312802;
+	Tue,  2 Sep 2025 14:50:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756824606; cv=none; b=YXSPJLoLU/f+AiJ5sdTXRhtDL9MJA6inemnkWYeD66KL5hr9NVLgvDJW/7gkR6DKgrRA7k+qOZ9tA/DYVk/F4cU5L/OPwYKzgBK57bs12ph9ndzpOeNL39G11eTOc0LpLFu33hF1OAx+RVw3l7Wpd5e0aWCgyM7GV0zts7Nr91A=
+	t=1756824611; cv=none; b=Vaq0lOnhfzwVtfT8MIuGvTCMerYzCEG5tooC6gO5GCbUYBzuExvQVBvncuKpEb0X7olrT0dajLt2J3lP8yniY6rijPZtalkpZHgqDwdtsAV2ifX9gXvrU13TBrUb0pDDuwD8fHptkqJbjnrxGCjLcZho7YRhnupIzQfjNsyfh0k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756824606; c=relaxed/simple;
-	bh=LO26BwKAcM5bzAy5+YIJkrmuLLytzpcl+we8V4Bhs/s=;
+	s=arc-20240116; t=1756824611; c=relaxed/simple;
+	bh=loKqVytyVDIeLrj3FO1P5XlYadT3usoA9sJi/ZhWYE4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tphjHCfpYicQ52fRqwlQyJ8EMXiiKLKJHf1wpLQjjGjbKfBk+OneqYhyKa7qd4tDXmoJFP8jdxCjptck/7QEJZgQxYYmoKDAN0H5S35wrh0tM+fVWeHClgLmMsdyeLiwXUG7eyVYYAKFLeP1/GwU6CZKrJiGDLGi4arHQCjKVFo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LKY9fKoZ; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=IbbOLbi7Xs9ud3SiXuzIngp24ZdVnaAG+oZq1uUCTn0yhe+TAZUBy6ut27ctLaFKBzzi9f9CjhyBG592a8hjwuMzoKTq4cHZCCdsdfvnVtXzoyQjpccr2+Ahv06O0qHJdbpPPRjGHY7hcaQ0z1CQhhKRz10p9SGfITkCoaEeXPQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XDqouYHc; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LKY9fKoZ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36EC5C4CEED;
-	Tue,  2 Sep 2025 14:50:05 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XDqouYHc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF152C4CEED;
+	Tue,  2 Sep 2025 14:50:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756824606;
-	bh=LO26BwKAcM5bzAy5+YIJkrmuLLytzpcl+we8V4Bhs/s=;
+	s=k20201202; t=1756824610;
+	bh=loKqVytyVDIeLrj3FO1P5XlYadT3usoA9sJi/ZhWYE4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=LKY9fKoZOkueicaHrUccAoKo/BCx6mgGEeI1cqKthujBHZcr0grk1DET+0qz5Nn3j
-	 X04UfMZEYGgOAdyBKbdv3EPfUfaCtaHmX0pkTRXBtHe1eSWe+6/4HHjjh1fCZIrwFI
-	 9u4k+CxQYWnfdDbRqzv9VvChyCpccmAzs4QD4X/Tb26RvsKJ7RFD5Cp//R7boSucJj
-	 9OjWn48Lw0oVFJJbBnM3GtjtMTkhWTqDbczjxsHp85mixuHu1ODHv+b4/ZI3zPt/sf
-	 2V6wheinrYkzZWQgXJQybZfQtO7DZfnbugbPgpjLZrYH99wuatKrAavrSz5zlEbB2g
-	 MSo533i8qyD0A==
+	b=XDqouYHc8vRB0ajJZqK4lwxspBtMW6b4AWggjQsPi5/K2g2R10AjUbWT8azo/7M7O
+	 N6Jh6bQk4hBxULYIt59wnr7HzVq+T18QfRotRvkr6SqeRycgt3KrMgeI2f9YoYF65R
+	 AMah6TQRO20arumHElmz/9xJv71VS+55KKRTzUhrWxBMRXKYC/ULWECIEily7rCTXe
+	 eS9NQqKv9qVWkNYpMk5mwrAgRsMMcEg2+JJNlzJdw/9SSH0fatvocB6pT/Dy/lfKbD
+	 W+rnlIzxGxfqLNVSwZwF1T0salbWquRx/dFWfgfMqcj//UlZSSQb08JaE3KYrMoHxH
+	 hxEoSoVhdeDtQ==
 From: Leon Romanovsky <leon@kernel.org>
 To: Marek Szyprowski <m.szyprowski@samsung.com>
 Cc: Leon Romanovsky <leonro@nvidia.com>,
@@ -65,9 +65,9 @@ Cc: Leon Romanovsky <leonro@nvidia.com>,
 	virtualization@lists.linux.dev,
 	Will Deacon <will@kernel.org>,
 	xen-devel@lists.xenproject.org
-Subject: [PATCH v5 15/16] block-dma: properly take MMIO path
-Date: Tue,  2 Sep 2025 17:48:52 +0300
-Message-ID: <a640e74c8f407ed46dcc51e0f704e0a128cb4d3b.1756822782.git.leon@kernel.org>
+Subject: [PATCH v5 16/16] nvme-pci: unmap MMIO pages with appropriate interface
+Date: Tue,  2 Sep 2025 17:48:53 +0300
+Message-ID: <fedc4cb3d79c81dae7d8b4ef45b5b3373f6a8bad.1756822782.git.leon@kernel.org>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <cover.1756822782.git.leon@kernel.org>
 References: <cover.1756822782.git.leon@kernel.org>
@@ -81,104 +81,62 @@ Content-Transfer-Encoding: 8bit
 
 From: Leon Romanovsky <leonro@nvidia.com>
 
-Make sure that CPU is not synced and IOMMU is configured to take
-MMIO path by providing newly introduced DMA_ATTR_MMIO attribute.
+Block layer maps MMIO memory through dma_map_phys() interface
+with help of DMA_ATTR_MMIO attribute. There is a need to unmap
+that memory with the appropriate unmap function, something which
+wasn't possible before adding new REQ attribute to block layer in
+previous patch.
 
 Reviewed-by: Keith Busch <kbusch@kernel.org>
 Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
 ---
- block/blk-mq-dma.c         | 13 +++++++++++--
- include/linux/blk-mq-dma.h |  6 +++++-
- include/linux/blk_types.h  |  2 ++
- 3 files changed, 18 insertions(+), 3 deletions(-)
+ drivers/nvme/host/pci.c | 18 +++++++++++++-----
+ 1 file changed, 13 insertions(+), 5 deletions(-)
 
-diff --git a/block/blk-mq-dma.c b/block/blk-mq-dma.c
-index 37e2142be4f7..d415088ed9fd 100644
---- a/block/blk-mq-dma.c
-+++ b/block/blk-mq-dma.c
-@@ -87,8 +87,13 @@ static bool blk_dma_map_bus(struct blk_dma_iter *iter, struct phys_vec *vec)
- static bool blk_dma_map_direct(struct request *req, struct device *dma_dev,
- 		struct blk_dma_iter *iter, struct phys_vec *vec)
+diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+index 2c6d9506b172..f8ecc0e0f576 100644
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -682,11 +682,15 @@ static void nvme_free_prps(struct request *req)
  {
+ 	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
+ 	struct nvme_queue *nvmeq = req->mq_hctx->driver_data;
 +	unsigned int attrs = 0;
-+
+ 	unsigned int i;
+ 
 +	if (req->cmd_flags & REQ_MMIO)
 +		attrs = DMA_ATTR_MMIO;
 +
- 	iter->addr = dma_map_phys(dma_dev, vec->paddr, vec->len,
--			rq_dma_dir(req), 0);
-+			rq_dma_dir(req), attrs);
- 	if (dma_mapping_error(dma_dev, iter->addr)) {
- 		iter->status = BLK_STS_RESOURCE;
- 		return false;
-@@ -103,14 +108,17 @@ static bool blk_rq_dma_map_iova(struct request *req, struct device *dma_dev,
- {
+ 	for (i = 0; i < iod->nr_dma_vecs; i++)
+-		dma_unmap_page(nvmeq->dev->dev, iod->dma_vecs[i].addr,
+-				iod->dma_vecs[i].len, rq_dma_dir(req));
++		dma_unmap_phys(nvmeq->dev->dev, iod->dma_vecs[i].addr,
++				iod->dma_vecs[i].len, rq_dma_dir(req), attrs);
+ 	mempool_free(iod->dma_vecs, nvmeq->dev->dmavec_mempool);
+ }
+ 
+@@ -699,15 +703,19 @@ static void nvme_free_sgls(struct request *req)
+ 	unsigned int sqe_dma_len = le32_to_cpu(iod->cmd.common.dptr.sgl.length);
+ 	struct nvme_sgl_desc *sg_list = iod->descriptors[0];
  	enum dma_data_direction dir = rq_dma_dir(req);
- 	unsigned int mapped = 0;
 +	unsigned int attrs = 0;
- 	int error;
- 
- 	iter->addr = state->addr;
- 	iter->len = dma_iova_size(state);
++
 +	if (req->cmd_flags & REQ_MMIO)
 +		attrs = DMA_ATTR_MMIO;
  
- 	do {
- 		error = dma_iova_link(dma_dev, state, vec->paddr, mapped,
--				vec->len, dir, 0);
-+				vec->len, dir, attrs);
- 		if (error)
- 			break;
- 		mapped += vec->len;
-@@ -176,6 +184,7 @@ bool blk_rq_dma_map_iter_start(struct request *req, struct device *dma_dev,
- 			 * same as non-P2P transfers below and during unmap.
- 			 */
- 			req->cmd_flags &= ~REQ_P2PDMA;
-+			req->cmd_flags |= REQ_MMIO;
- 			break;
- 		default:
- 			iter->status = BLK_STS_INVAL;
-diff --git a/include/linux/blk-mq-dma.h b/include/linux/blk-mq-dma.h
-index c26a01aeae00..6c55f5e58511 100644
---- a/include/linux/blk-mq-dma.h
-+++ b/include/linux/blk-mq-dma.h
-@@ -48,12 +48,16 @@ static inline bool blk_rq_dma_map_coalesce(struct dma_iova_state *state)
- static inline bool blk_rq_dma_unmap(struct request *req, struct device *dma_dev,
- 		struct dma_iova_state *state, size_t mapped_len)
- {
-+	unsigned int attrs = 0;
-+
- 	if (req->cmd_flags & REQ_P2PDMA)
- 		return true;
+ 	if (iod->nr_descriptors) {
+ 		unsigned int nr_entries = sqe_dma_len / sizeof(*sg_list), i;
  
- 	if (dma_use_iova(state)) {
-+		if (req->cmd_flags & REQ_MMIO)
-+			attrs = DMA_ATTR_MMIO;
- 		dma_iova_destroy(dma_dev, state, mapped_len, rq_dma_dir(req),
--				 0);
-+				 attrs);
- 		return true;
+ 		for (i = 0; i < nr_entries; i++)
+-			dma_unmap_page(dma_dev, le64_to_cpu(sg_list[i].addr),
+-				le32_to_cpu(sg_list[i].length), dir);
++			dma_unmap_phys(dma_dev, le64_to_cpu(sg_list[i].addr),
++				le32_to_cpu(sg_list[i].length), dir, attrs);
+ 	} else {
+-		dma_unmap_page(dma_dev, sqe_dma_addr, sqe_dma_len, dir);
++		dma_unmap_phys(dma_dev, sqe_dma_addr, sqe_dma_len, dir, attrs);
  	}
- 
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 09b99d52fd36..283058bcb5b1 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -387,6 +387,7 @@ enum req_flag_bits {
- 	__REQ_FS_PRIVATE,	/* for file system (submitter) use */
- 	__REQ_ATOMIC,		/* for atomic write operations */
- 	__REQ_P2PDMA,		/* contains P2P DMA pages */
-+	__REQ_MMIO,		/* contains MMIO memory */
- 	/*
- 	 * Command specific flags, keep last:
- 	 */
-@@ -420,6 +421,7 @@ enum req_flag_bits {
- #define REQ_FS_PRIVATE	(__force blk_opf_t)(1ULL << __REQ_FS_PRIVATE)
- #define REQ_ATOMIC	(__force blk_opf_t)(1ULL << __REQ_ATOMIC)
- #define REQ_P2PDMA	(__force blk_opf_t)(1ULL << __REQ_P2PDMA)
-+#define REQ_MMIO	(__force blk_opf_t)(1ULL << __REQ_MMIO)
- 
- #define REQ_NOUNMAP	(__force blk_opf_t)(1ULL << __REQ_NOUNMAP)
+ }
  
 -- 
 2.50.1
