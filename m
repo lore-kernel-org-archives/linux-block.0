@@ -1,85 +1,105 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from 004.mia.mailroute.net (004.mia.mailroute.net [199.89.3.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33EBA2DAFB8
-	for <linux-block@vger.kernel.org>; Tue,  2 Sep 2025 14:57:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7860D322775;
+	Tue,  2 Sep 2025 16:03:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756825065; cv=none; b=eU07G2IaFKbnte+nZ8PUbPIlJXld0/Jnu30ZCkqsS4YjF79W7VyT8ahenZyJV5bCdPkZ7iBYjFTySPdUYdbRmzOKvttd9/65e/qcNZy5Hf97gAIQNs0JGbkW8SJXrTmeJlXugYi73WBKy9BEuy58a1u83lT47Qkpsm9h6P6qEPc=
+	t=1756829005; cv=none; b=GN4Viz7bRLPhw80OkFahfDdZYjsEHHSs/UdU+NHCg5r8HcfPtDVFlqJqG3c9Qr3W+3lSoIgidBtB9TSm2S9/SgqjZpg8PW1V69xNKFjFGCY0quNmb4JcTitFjuMr3nWz/FOcGIkvTNaeYAvDJ10eP6VXndugr/uRFtR0G28Iv8A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756825065; c=relaxed/simple;
-	bh=ffW3f6G8GTh9+GY4dZadiSebboE7pBfqZFq/9rOMOMo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dEOBbDEihnb+9GIsyCyj5ujVshoHAnaIOp8wJrmQ0tV131xwFmK2s5T/Xf00ZQLQaBurtDIQLFXjpnaky6wApYznWFaol4hhygDV83QyxJ90o7AzdNgj+9LK9RB3n8FHngpjAQOqSMW6sJHp3ba5O/4PlmOupo5TTmuf7PxObFA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PYg399Zh; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1756829005; c=relaxed/simple;
+	bh=VguaB0iJUAqfQVHbnBDjVTfLYKDwO5t09siwFQORS8U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=WKLp9vScLZOhzxF58DTgonJ3a6ffXEKcxujncBO+jfuhXS6x+Ovx9MrRNwuIwUX3b9W/v9Qh8GIuR9I+MUxAbXb/M3JIaDLEMcLPG+1soK1yOALLHHDujOiwyUwsTbS9NZROcJqJfRGK3IGZNx1920YXMYiu36jIwYCcfGAX+tw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=31Pl2Ym3; arc=none smtp.client-ip=199.89.3.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PYg399Zh"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49D35C4CEED;
-	Tue,  2 Sep 2025 14:57:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756825064;
-	bh=ffW3f6G8GTh9+GY4dZadiSebboE7pBfqZFq/9rOMOMo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=PYg399Zhxgi3s4CNzOtESV3U4to38XhkK0QmKm+uTDp/cTg0pZIvtYflE/3fM/0sX
-	 TUciH2e4vgBVJe0b1YJPJ9+UdtP8+0J+5lhpYVjE1nUIVtAyyN055krDsB2B+gJgqF
-	 7S/wjaH0diJbxy2AcZ6zzhQ6it2yWgEMUw0E4aUH5uzqdPOY6pie7cJpKhilmjSxlS
-	 koioY5JoYYfpyOUo3SHHZuXzxj67SMSGLQwf5KrRQbtfSv5z6/+bZIofP9QV2Ht7Ps
-	 OJ1GJ8sVEQIu0tobCwYaWvvNW0tEAMhygnM+eyFBEz2vmix/gGbxZZNV59LCUgTMwY
-	 GsrBkQsA8o/ig==
-Date: Tue, 2 Sep 2025 17:57:40 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>
-Cc: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org, axboe@kernel.dk,
-	martin.petersen@oracle.com, jgg@nvidia.com
-Subject: Re: [PATCH 2/2] blk-mq-dma: bring back p2p request flags
-Message-ID: <20250902145740.GJ10073@unreal>
-References: <20250829142307.3769873-1-kbusch@meta.com>
- <20250829142307.3769873-3-kbusch@meta.com>
- <20250902053358.GB11204@lst.de>
- <aLcBA-Z8yZ44t4ZK@kbusch-mbp>
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="31Pl2Ym3"
+Received: from localhost (localhost [127.0.0.1])
+	by 004.mia.mailroute.net (Postfix) with ESMTP id 4cGVs02J7Kzm0djF;
+	Tue,  2 Sep 2025 16:03:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1756828993; x=1759420994; bh=9WDGhDQ0YrDyGB1djJuD4ncV
+	es60eDmcGGP3MSyD3Ts=; b=31Pl2Ym3fcLIkkKwdEYE7VIZ29NeB8TJ4lO5imKp
+	+JseXhqXQ14JC74bCuoR4L/Lr0LzUStzJ9yBet0tn+vAi3rKXMJvqFwzUeF8BRPh
+	pqGBc2NarjVb9RrTUl4voQjuqNHJjSSaaJ0ULRGAa5G0Qc9GUjxCxOmqDxvrTf08
+	SAb9rkEyDaR3uHlu9bscHBEK7PLJcfGgRDr7PWB3sK1HEpUpvGDzQbpDBe4xwPTF
+	sIGIMX9d5kRYkDT6uqJPHrCkrxXfQyzX/SaE7bPGV6sJxUlfoF35xvi2jYAd8jPc
+	g/0zgP4BumY7uCoPYFypnLHeWz7CtC4YdYVNf21FOQFFGg==
+X-Virus-Scanned: by MailRoute
+Received: from 004.mia.mailroute.net ([127.0.0.1])
+ by localhost (004.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id pDmgZPLVVovA; Tue,  2 Sep 2025 16:03:13 +0000 (UTC)
+Received: from [100.66.154.22] (unknown [104.135.204.82])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 004.mia.mailroute.net (Postfix) with ESMTPSA id 4cGVrt0d6Tzm0XCl;
+	Tue,  2 Sep 2025 16:03:09 +0000 (UTC)
+Message-ID: <51d863a4-fe0a-4a08-a3a5-dd7b402ce824@acm.org>
+Date: Tue, 2 Sep 2025 09:03:08 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aLcBA-Z8yZ44t4ZK@kbusch-mbp>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] block: use int type to store negative value
+To: Qianfeng Rong <rongqianfeng@vivo.com>, Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ "Martin K . Petersen" <martin.petersen@oracle.com>
+References: <20250902130930.68317-1-rongqianfeng@vivo.com>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20250902130930.68317-1-rongqianfeng@vivo.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Sep 02, 2025 at 08:36:51AM -0600, Keith Busch wrote:
-> On Tue, Sep 02, 2025 at 07:33:58AM +0200, Christoph Hellwig wrote:
-> > On Fri, Aug 29, 2025 at 07:23:07AM -0700, Keith Busch wrote:
-> > > From: Keith Busch <kbusch@kernel.org>
-> > > 
-> > > We only need to consider data and metadata dma mapping types separately.
-> > > The request and bio integrity payload have enough flag bits to
-> > > internally track the mapping type for each. Add flags for these so the
-> > > caller doesn't need to track them, and provide separete request and
-> > > integrity helpers to the common code for unmpaping. This will make it
-> > > easier to scale as new mappings are added without burdening the caller
-> > > to track such things.
-> > 
-> > We are actually about to run out of REQ_* bits with the current
-> > encoding.  We could shrink the space for REQ_OP_ a bit to create
-> > more, or try to move some flags out into BIO_ flags (like
-> > REQ_ALLOC_CACHE) or kill them by looking at pointers instead
-> > (REQ_INTEGRITY), or by overlaying flags that can't be used with
-> > the same of (REQ_FUA vs REQ_RAHEAD vs REQ_UNMAP for example).
-> > And maybe we can come up with a more coherent scheme for
-> > REQ_PRIO / REQ_BACKGROUND / REQ_SWAP and maybe REQ_IDLE that create
-> > another priority scheme in addition to the I/O priorities.
->  
-> Sure, but can we do that effort separately from this? I'm mainly trying
-> to align with Leon's DMA series that adds REQ_MMIO so that we won't have
-> flag conflicts.
+On 9/2/25 6:09 AM, Qianfeng Rong wrote:
+> Change the 'ret' variable in blk_stack_limits() from unsigned int to int,
+> as it needs to store negative value -1.
+> 
+> Storing the negative error codes in unsigned type, or performing equality
+> comparisons (e.g., ret == -1), doesn't cause an issue at runtime [1] but
+> can be confusing.  Additionally, assigning negative error codes to unsigned
+> type may trigger a GCC warning when the -Wsign-conversion flag is enabled.
+> 
+> No effect on runtime.
+> 
+> Link: https://lore.kernel.org/all/x3wogjf6vgpkisdhg3abzrx7v7zktmdnfmqeih5kosszmagqfs@oh3qxrgzkikf/ #1
+> Signed-off-by: Qianfeng Rong <rongqianfeng@vivo.com>
+> ---
+>   block/blk-settings.c | 3 ++-
+>   1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/block/blk-settings.c b/block/blk-settings.c
+> index d6438e6c276d..693bc8d20acf 100644
+> --- a/block/blk-settings.c
+> +++ b/block/blk-settings.c
+> @@ -763,7 +763,8 @@ static void blk_stack_atomic_writes_limits(struct queue_limits *t,
+>   int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
+>   		     sector_t start)
+>   {
+> -	unsigned int top, bottom, alignment, ret = 0;
+> +	unsigned int top, bottom, alignment;
+> +	int ret = 0;
+>   
+>   	t->features |= (b->features & BLK_FEAT_INHERIT_MASK);
 
-Christoph,
+Has it been considered to add a Fixes tag, e.g. this tag?
 
-In addition, let's make sure that functionality is correct and working right.
+Fixes: fe0b393f2c0a ("block: Correct handling of bottom device misaligment")
 
-REQ_* cleanup can be perfect followup series for someone who understands
-semantics around these bits.
+With or without that tag:
 
-Thanks
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+
+
+
+
