@@ -1,216 +1,240 @@
-Received: from mail-il1-f205.google.com (mail-il1-f205.google.com [209.85.166.205])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9E8F2F744C
-	for <linux-block@vger.kernel.org>; Tue,  2 Sep 2025 14:41:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.205
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EB3F3128AF;
+	Tue,  2 Sep 2025 14:49:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756824091; cv=none; b=Il+1poXGA+f2UUC0tBBnlpodmNYiDCtniT8xa5bygs4o5nEYW0jtUaNAd4Mo/iQSZ+M+/Q2mgyB/2NzMgey26GmgID8q6hX9LVEPS9Tak4TK4w6AJTn3phbkUK+4GaMhbMEUOx4iVnrbhPZ7q5IbSJh/+ER38sS5sBK/9i17vac=
+	t=1756824546; cv=none; b=fQgEcuQJbSEuDQuQITINCvjXxlpqgLWH0EWRvBzZEp4jllqyhu8mGlGh3cOPmmaguNycGjetiQpDzCTfn6qQ6bXK9jnlXW9fYPC95T6Vv0qYm6nTIt2ClbzOOhrZPWED7Tp6mUIhqDW4i7psovIouwXOsTzP6uhOTkpJd8WRKVY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756824091; c=relaxed/simple;
-	bh=4mNRDK0udOU7z0Z89PU+wrdMa307/ikR3aK53nZH9Cg=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=GN7zaMZ1u3VgN9A5vRp3ZzSKTDotH93+IlfuZH5mC8VkXggM/5n0qCYYIW/EEIx+zc+8NMnfaQ1uhhPJYJ6s9Z/sHWhhlotu334QtkYRZ0+wLSH/1C6rF1P90YFRhurj5ELeGviIGQ6bzDNYvMl21WeTonarmc0daG2gVgVl0BQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.205
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f205.google.com with SMTP id e9e14a558f8ab-3ee1d164774so72388825ab.1
-        for <linux-block@vger.kernel.org>; Tue, 02 Sep 2025 07:41:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756824089; x=1757428889;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=t/5JWzgvXCWK6jYp7RBORfP6Epn9/qkHRz9kION0DM4=;
-        b=EV98ZeOCtRk3GS3hAlXjigKqTkZlRmuuzFmcVeXAPJdOVh8gF0W/1z/BL9ZkXxZ1dG
-         RW7h/xsUe2GhXzKr+irIs+dS1bRLxiQMOplfZYUjODq/MKdEy9nAmIrUfcJdspqTtKD8
-         d1fBDdbRLNbTw8vkgt22LK2Ipqns4cCLLhL1moeYD0sG/SJDApLZT9lQonrI66zr7p2u
-         CrezH3o5kJtqkxstOc7lYF6UaE7sJS/n10m9GsvkMR1JAWsLXI5E5yxESchWdXGRKEVM
-         IFz9k/cXl6GpFKjkRMQQrLNl9F9/Lx61s3ixbemnGuxYPlcZwxZ6EJrAeXmKahz8Kl82
-         wCsA==
-X-Forwarded-Encrypted: i=1; AJvYcCUTMk3JxX+FIeQ+Tdom6v5FT4EjX/1TyG0tkIrx+re5KddFXdtvTRHIsTRHp8D3ZfAK1PFCw5hhwufgkQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw2khFDrkaG7H28qROE092im/7zfhLUac40gyIlPebF/T06/Jgv
-	gpN9mux70ZktyWTaJs5+4JM9uqLY51tKoZNUHjAHiTJV66QbSbXra9kuyx/bh57YpSESex1WJ8m
-	tIGismkSjQf2/Y7sGzB6DZqQb9g3Ms0e5aXy0eqQxdJeqmc4S5EA7w+tCchk=
-X-Google-Smtp-Source: AGHT+IGhPWpx2cUi9fYTwQKECTaLcmbeLI5iD67ghTJGxyd0JULrHR0UwRjnM1auyoIIVB5SL5zDhwlGh2nEJuf65sdqJiTIinUX
+	s=arc-20240116; t=1756824546; c=relaxed/simple;
+	bh=3SAFSguWc3mEh+7tLjgls851bpgvCDXeoOLUKYRDCQw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=P21r7udrV+bktR1WwV5X4xw3l2CQfzrG9/RWvfurLGBUqePleqQVV8IJa7okPbQhwiUV0ABqgebVRe4S76vVFIzikz5v27RWTX1dVjioKaEgrsW6sINd/S715l5YaExyAkVYNpbdRQVpGHB0TjTyrTMSnR9gQrYHzLR4OvG+O5Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T4z/viMp; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T4z/viMp"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ACFA9C4CEED;
+	Tue,  2 Sep 2025 14:49:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756824545;
+	bh=3SAFSguWc3mEh+7tLjgls851bpgvCDXeoOLUKYRDCQw=;
+	h=From:To:Cc:Subject:Date:From;
+	b=T4z/viMpK/6nZf/nQZOIsRAAm3EHCx98H3vJy/7M+HoAOU06u4ge/kUryG+aCfwUr
+	 EPLJmc0enqvgMLu/ql+aqcT5Fj2w9kmxR9H/m3pCJndhGClrY92+csP8H8rqa+M2F0
+	 +/tg51ze5lLUyJvb9GuRMyJ6Mnz6YmTZuEbkE8BZXJxNc0WBeGGkH6nfvvoKcKyT7D
+	 72RQkLhAK72Yfulrr+BomhHq1M5YBXZDuDEbusIH/tJezD3AHPAbYmPt0An2e0azvi
+	 DpDSFe11OrTeaTIEkB3Rx5xhIiAEjLUzU+nXQYo+9uCB+p85bgbRHkcFyUX4QjIfNW
+	 +sNnsW+E+uHqg==
+From: Leon Romanovsky <leon@kernel.org>
+To: Marek Szyprowski <m.szyprowski@samsung.com>
+Cc: Jason Gunthorpe <jgg@nvidia.com>,
+	Abdiel Janulgue <abdiel.janulgue@gmail.com>,
+	Alexander Potapenko <glider@google.com>,
+	Alex Gaynor <alex.gaynor@gmail.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Christoph Hellwig <hch@lst.de>,
+	Danilo Krummrich <dakr@kernel.org>,
+	David Hildenbrand <david@redhat.com>,
+	iommu@lists.linux.dev,
+	Jason Wang <jasowang@redhat.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Joerg Roedel <joro@8bytes.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Juergen Gross <jgross@suse.com>,
+	kasan-dev@googlegroups.com,
+	Keith Busch <kbusch@kernel.org>,
+	linux-block@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-nvme@lists.infradead.org,
+	linuxppc-dev@lists.ozlabs.org,
+	linux-trace-kernel@vger.kernel.org,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	Robin Murphy <robin.murphy@arm.com>,
+	rust-for-linux@vger.kernel.org,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Stefano Stabellini <sstabellini@kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	virtualization@lists.linux.dev,
+	Will Deacon <will@kernel.org>,
+	xen-devel@lists.xenproject.org
+Subject: [PATCH v5 00/16] dma-mapping: migrate to physical address-based API
+Date: Tue,  2 Sep 2025 17:48:37 +0300
+Message-ID: <cover.1756822782.git.leon@kernel.org>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:17ca:b0:3f6:5ea4:f0a3 with SMTP id
- e9e14a558f8ab-3f65ea4f0b3mr1493415ab.11.1756824088951; Tue, 02 Sep 2025
- 07:41:28 -0700 (PDT)
-Date: Tue, 02 Sep 2025 07:41:28 -0700
-In-Reply-To: <6871117d.a00a0220.26a83e.004c.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68b70218.050a0220.3db4df.01d1.GAE@google.com>
-Subject: Re: [syzbot] [block?] [mm?] INFO: rcu detected stall in wb_workfn (4)
-From: syzbot <syzbot+5b4f4f81240931b16844@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-mm@kvack.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-syzbot has found a reproducer for the following issue on:
+Marek,
 
-HEAD commit:    b320789d6883 Linux 6.17-rc4
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=1406ae62580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=d4703ac89d9e185a
-dashboard link: https://syzkaller.appspot.com/bug?extid=5b4f4f81240931b16844
-compiler:       gcc (Debian 12.2.0-14+deb12u1) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=133b5e34580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1639ca42580000
+Please pay attention that I'm resending all patches which includes
+nvme/blk conversion too. The code is based on clean -rc3, but NVMe
+tree got patch in this cycle which removes one of their REQ_* bits,
+on which I'm relying.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/daf1f6c847dd/disk-b320789d.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/fbeb0bd5d987/vmlinux-b320789d.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/a85084f8e16b/bzImage-b320789d.xz
+This is the patch:
+https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git/commit/?h=for-6.18/block&id=7092639031a1bd5320ab827e8f665350f332b7ce
+and this is Keith's attempt to restore it:
+https://lore.kernel.org/linux-block/20250829142307.3769873-3-kbusch@meta.com/
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+5b4f4f81240931b16844@syzkaller.appspotmail.com
+So there are two possible options:
+1. Apply only first 13 patches and I'll resend nvme/blk patches in next
+cycle with the hope that REQ_* bits issue is sorted.
+2. Apply whole series and deal with merge conflicts by sending PR to
+Jens and ask him to merge this DMA series.
 
-rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
-rcu: 	Tasks blocked on level-0 rcu_node (CPUs 0-1): P1288/1:b.el P5851/1:b..l
-rcu: 	(detected by 0, t=11117 jiffies, g=9285, q=859 ncpus=2)
-task:udevd           state:R  running task     stack:27176 pid:5851  tgid:5851  ppid:5218   task_flags:0x400140 flags:0x00004002
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5357 [inline]
- __schedule+0x1190/0x5de0 kernel/sched/core.c:6961
- preempt_schedule_common+0x44/0xc0 kernel/sched/core.c:7145
- preempt_schedule_thunk+0x16/0x30 arch/x86/entry/thunk.S:12
- __raw_spin_unlock include/linux/spinlock_api_smp.h:143 [inline]
- _raw_spin_unlock+0x3e/0x50 kernel/locking/spinlock.c:186
- spin_unlock include/linux/spinlock.h:391 [inline]
- wp_page_copy mm/memory.c:3653 [inline]
- do_wp_page+0x177b/0x4f00 mm/memory.c:4013
- handle_pte_fault mm/memory.c:6068 [inline]
- __handle_mm_fault+0x1b2d/0x2a50 mm/memory.c:6195
- handle_mm_fault+0x589/0xd10 mm/memory.c:6364
- do_user_addr_fault+0x60c/0x1370 arch/x86/mm/fault.c:1336
- handle_page_fault arch/x86/mm/fault.c:1476 [inline]
- exc_page_fault+0x5c/0xb0 arch/x86/mm/fault.c:1532
- asm_exc_page_fault+0x26/0x30 arch/x86/include/asm/idtentry.h:623
-RIP: 0033:0x7f5c948b5db7
-RSP: 002b:00007ffd6b822260 EFLAGS: 00010202
-RAX: 0000000000006010 RBX: 00000000000001f0 RCX: 000055b18d0b4fe0
-RDX: 0000000000006010 RSI: 000055b18d0aefd0 RDI: 00007f5c949f1ac0
-RBP: 00007f5c949f1ac0 R08: 00000000000001f0 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000202 R12: 000055b18d0aefd0
-R13: 00007f5c949f1ac0 R14: 00000000000001f0 R15: 00007f5c949f1ac0
- </TASK>
-task:kworker/u8:5    state:R  running task     stack:22344 pid:1288  tgid:1288  ppid:2      task_flags:0x24248060 flags:0x00004000
-Workqueue: writeback wb_workfn (flush-8:0)
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5357 [inline]
- __schedule+0x1190/0x5de0 kernel/sched/core.c:6961
- preempt_schedule_irq+0x51/0x90 kernel/sched/core.c:7288
- irqentry_exit+0x36/0x90 kernel/entry/common.c:197
- asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
-RIP: 0010:__sanitizer_cov_trace_switch+0x7f/0x90 kernel/kcov.c:336
-Code: 39 de 75 e2 5b 5d 41 5c 41 5d 41 5e c3 cc cc cc cc 41 bd 07 00 00 00 48 83 f8 40 74 be 5b 5d 41 5c 41 5d 41 5e e9 91 66 db 09 <41> bd 01 00 00 00 eb a9 41 bd 05 00 00 00 eb a1 90 90 90 90 90 90
-RSP: 0018:ffffc90004d1e918 EFLAGS: 00000246
-RAX: 0000000000000008 RBX: ffff888029fc9a50 RCX: ffffffff863bcae4
-RDX: ffff888028ca2440 RSI: ffffffff8c136f20 RDI: 0000000000000000
-RBP: ffffffff8c136f20 R08: 0000000000000005 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000000
-R13: ffff888029fc9a48 R14: ffff888027e99000 R15: ffffc90004d1eb60
- blk_mq_dispatch_rq_list+0x428/0x1e20 block/blk-mq.c:2121
- __blk_mq_do_dispatch_sched block/blk-mq-sched.c:168 [inline]
- blk_mq_do_dispatch_sched block/blk-mq-sched.c:182 [inline]
- __blk_mq_sched_dispatch_requests+0xcb7/0x15f0 block/blk-mq-sched.c:307
- blk_mq_sched_dispatch_requests+0xd8/0x1b0 block/blk-mq-sched.c:329
- blk_mq_run_hw_queue+0x349/0x670 block/blk-mq.c:2358
- blk_mq_dispatch_list+0x514/0x1310 block/blk-mq.c:2919
- blk_mq_flush_plug_list block/blk-mq.c:2967 [inline]
- blk_mq_flush_plug_list+0x130/0x600 block/blk-mq.c:2939
- blk_add_rq_to_plug+0x1ca/0x540 block/blk-mq.c:1390
- blk_mq_submit_bio+0x1a6b/0x2a10 block/blk-mq.c:3212
- __submit_bio+0x3cf/0x690 block/blk-core.c:635
- __submit_bio_noacct_mq block/blk-core.c:722 [inline]
- submit_bio_noacct_nocheck+0x660/0xd30 block/blk-core.c:751
- submit_bio_noacct+0xc20/0x1ed0 block/blk-core.c:874
- ext4_io_submit+0xa6/0x140 fs/ext4/page-io.c:404
- ext4_do_writepages+0xe42/0x3cf0 fs/ext4/inode.c:2951
- ext4_writepages+0x37a/0x7d0 fs/ext4/inode.c:3025
- do_writepages+0x27a/0x600 mm/page-writeback.c:2634
- __writeback_single_inode+0x160/0xfb0 fs/fs-writeback.c:1680
- writeback_sb_inodes+0x60d/0xfa0 fs/fs-writeback.c:1976
- __writeback_inodes_wb+0xf8/0x2d0 fs/fs-writeback.c:2047
- wb_writeback+0x7f3/0xb70 fs/fs-writeback.c:2158
- wb_check_old_data_flush fs/fs-writeback.c:2262 [inline]
- wb_do_writeback fs/fs-writeback.c:2315 [inline]
- wb_workfn+0x8ca/0xbe0 fs/fs-writeback.c:2343
- process_one_work+0x9cf/0x1b70 kernel/workqueue.c:3236
- process_scheduled_works kernel/workqueue.c:3319 [inline]
- worker_thread+0x6c8/0xf10 kernel/workqueue.c:3400
- kthread+0x3c5/0x780 kernel/kthread.c:463
- ret_from_fork+0x5d4/0x6f0 arch/x86/kernel/process.c:148
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
- </TASK>
-rcu: rcu_preempt kthread starved for 11117 jiffies! g9285 f0x0 RCU_GP_WAIT_FQS(5) ->state=0x0 ->cpu=0
-rcu: 	Unless rcu_preempt kthread gets sufficient CPU time, OOM is now expected behavior.
-rcu: RCU grace-period kthread stack dump:
-task:rcu_preempt     state:R  running task     stack:27928 pid:16    tgid:16    ppid:2      task_flags:0x208040 flags:0x00004000
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5357 [inline]
- __schedule+0x1190/0x5de0 kernel/sched/core.c:6961
- __schedule_loop kernel/sched/core.c:7043 [inline]
- schedule+0xe7/0x3a0 kernel/sched/core.c:7058
- schedule_timeout+0x123/0x290 kernel/time/sleep_timeout.c:99
- rcu_gp_fqs_loop+0x1ea/0xb00 kernel/rcu/tree.c:2083
- rcu_gp_kthread+0x270/0x380 kernel/rcu/tree.c:2285
- kthread+0x3c5/0x780 kernel/kthread.c:463
- ret_from_fork+0x5d4/0x6f0 arch/x86/kernel/process.c:148
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
- </TASK>
-rcu: Stack dump where RCU GP kthread last ran:
-CPU: 0 UID: 0 PID: 5513 Comm: dhcpcd Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/12/2025
-RIP: 0010:__sanitizer_cov_trace_const_cmp4+0x8/0x20 kernel/kcov.c:314
-Code: bf 03 00 00 00 e9 58 fe ff ff 0f 1f 84 00 00 00 00 00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 f3 0f 1e fa 48 8b 0c 24 <89> f2 89 fe bf 05 00 00 00 e9 2a fe ff ff 66 2e 0f 1f 84 00 00 00
-RSP: 0018:ffffc90003277730 EFLAGS: 00000202
-RAX: 0000000000000001 RBX: ffff8880b853fe80 RCX: ffffffff81af8ea1
-RDX: ffff8880213e4880 RSI: 0000000000000001 RDI: 0000000000000000
-RBP: 0000000000000003 R08: 0000000000000005 R09: 0000000000000000
-R10: 0000000000000001 R11: 0000000000000000 R12: dffffc0000000000
-R13: ffffed10170a7fd1 R14: 0000000000000001 R15: 0000000000000001
-FS:  00007fd829003740(0000) GS:ffff8881246b8000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f9856c3ffdc CR3: 00000000782b2000 CR4: 00000000003526f0
-Call Trace:
- <TASK>
- csd_lock_wait kernel/smp.c:342 [inline]
- smp_call_function_many_cond+0xe21/0x1600 kernel/smp.c:877
- on_each_cpu_cond_mask+0x40/0x90 kernel/smp.c:1044
- __flush_tlb_multi arch/x86/include/asm/paravirt.h:91 [inline]
- flush_tlb_multi arch/x86/mm/tlb.c:1361 [inline]
- flush_tlb_mm_range+0x4a0/0x17a0 arch/x86/mm/tlb.c:1451
- dup_mmap+0xfa2/0x21d0 mm/mmap.c:1873
- dup_mm kernel/fork.c:1485 [inline]
- copy_mm kernel/fork.c:1537 [inline]
- copy_process+0x4081/0x7690 kernel/fork.c:2175
- kernel_clone+0xfc/0x930 kernel/fork.c:2605
- __do_sys_clone+0xce/0x120 kernel/fork.c:2748
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xcd/0x4c0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fd8290d7636
-Code: 89 df e8 6d e8 f6 ff 45 31 c0 31 d2 31 f6 64 48 8b 04 25 10 00 00 00 bf 11 00 20 01 4c 8d 90 d0 02 00 00 b8 38 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 52 89 c5 85 c0 75 31 64 48 8b 04 25 10 00 00
-RSP: 002b:00007ffc8dce2200 EFLAGS: 00000246 ORIG_RAX: 0000000000000038
-RAX: ffffffffffffffda RBX: 00007ffc8dce2208 RCX: 00007fd8290d7636
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000001200011
-RBP: 00007ffc8dd02750 R08: 0000000000000000 R09: 0000000000000001
-R10: 00007fd829003a10 R11: 0000000000000246 R12: 00007ffc8dce2340
-R13: 0000000000000000 R14: 0000000000000000 R15: 0000560acbd41ac0
- </TASK>
+Thanks
 
+------------------------------------------------------------------------
+Changelog:
+v5:
+ * Added Jason's and Keith's Reviewed-by tags
+ * Fixed DMA_ATTR_MMIO check in dma_direct_map_phys
+ * Jason's cleanup suggestions
+v4: https://lore.kernel.org/all/cover.1755624249.git.leon@kernel.org/
+ * Fixed kbuild error with mismatch in kmsan function declaration due to
+   rebase error.
+v3: https://lore.kernel.org/all/cover.1755193625.git.leon@kernel.org
+ * Fixed typo in "cacheable" word
+ * Simplified kmsan patch a lot to be simple argument refactoring
+v2: https://lore.kernel.org/all/cover.1755153054.git.leon@kernel.org
+ * Used commit messages and cover letter from Jason
+ * Moved setting IOMMU_MMIO flag to dma_info_to_prot function
+ * Micro-optimized the code
+ * Rebased code on v6.17-rc1
+v1: https://lore.kernel.org/all/cover.1754292567.git.leon@kernel.org
+ * Added new DMA_ATTR_MMIO attribute to indicate
+   PCI_P2PDMA_MAP_THRU_HOST_BRIDGE path.
+ * Rewrote dma_map_* functions to use thus new attribute
+v0: https://lore.kernel.org/all/cover.1750854543.git.leon@kernel.org/
+------------------------------------------------------------------------
 
----
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+This series refactors the DMA mapping to use physical addresses
+as the primary interface instead of page+offset parameters. This
+change aligns the DMA API with the underlying hardware reality where
+DMA operations work with physical addresses, not page structures.
+
+The series maintains export symbol backward compatibility by keeping
+the old page-based API as wrapper functions around the new physical
+address-based implementations.
+
+This series refactors the DMA mapping API to provide a phys_addr_t
+based, and struct-page free, external API that can handle all the
+mapping cases we want in modern systems:
+
+ - struct page based cacheable DRAM
+ - struct page MEMORY_DEVICE_PCI_P2PDMA PCI peer to peer non-cacheable
+   MMIO
+ - struct page-less PCI peer to peer non-cacheable MMIO
+ - struct page-less "resource" MMIO
+
+Overall this gets much closer to Matthew's long term wish for
+struct-pageless IO to cacheable DRAM. The remaining primary work would
+be in the mm side to allow kmap_local_pfn()/phys_to_virt() to work on
+phys_addr_t without a struct page.
+
+The general design is to remove struct page usage entirely from the
+DMA API inner layers. For flows that need to have a KVA for the
+physical address they can use kmap_local_pfn() or phys_to_virt(). This
+isolates the struct page requirements to MM code only. Long term all
+removals of struct page usage are supporting Matthew's memdesc
+project which seeks to substantially transform how struct page works.
+
+Instead make the DMA API internals work on phys_addr_t. Internally
+there are still dedicated 'page' and 'resource' flows, except they are
+now distinguished by a new DMA_ATTR_MMIO instead of by callchain. Both
+flows use the same phys_addr_t.
+
+When DMA_ATTR_MMIO is specified things work similar to the existing
+'resource' flow. kmap_local_pfn(), phys_to_virt(), phys_to_page(),
+pfn_valid(), etc are never called on the phys_addr_t. This requires
+rejecting any configuration that would need swiotlb. CPU cache
+flushing is not required, and avoided, as ATTR_MMIO also indicates the
+address have no cacheable mappings. This effectively removes any
+DMA API side requirement to have struct page when DMA_ATTR_MMIO is
+used.
+
+In the !DMA_ATTR_MMIO mode things work similarly to the 'page' flow,
+except on the common path of no cache flush, no swiotlb it never
+touches a struct page. When cache flushing or swiotlb copying
+kmap_local_pfn()/phys_to_virt() are used to get a KVA for CPU
+usage. This was already the case on the unmap side, now the map side
+is symmetric.
+
+Callers are adjusted to set DMA_ATTR_MMIO. Existing 'resource' users
+must set it. The existing struct page based MEMORY_DEVICE_PCI_P2PDMA
+path must also set it. This corrects some existing bugs where iommu
+mappings for P2P MMIO were improperly marked IOMMU_CACHE.
+
+Since ATTR_MMIO is made to work with all the existing DMA map entry
+points, particularly dma_iova_link(), this finally allows a way to use
+the new DMA API to map PCI P2P MMIO without creating struct page. The
+VFIO DMABUF series demonstrates how this works. This is intended to
+replace the incorrect driver use of dma_map_resource() on PCI BAR
+addresses.
+
+This series does the core code and modern flows. A followup series
+will give the same treatment to the legacy dma_ops implementation.
+
+Thanks
+
+Leon Romanovsky (16):
+  dma-mapping: introduce new DMA attribute to indicate MMIO memory
+  iommu/dma: implement DMA_ATTR_MMIO for dma_iova_link().
+  dma-debug: refactor to use physical addresses for page mapping
+  dma-mapping: rename trace_dma_*map_page to trace_dma_*map_phys
+  iommu/dma: rename iommu_dma_*map_page to iommu_dma_*map_phys
+  iommu/dma: implement DMA_ATTR_MMIO for iommu_dma_(un)map_phys()
+  dma-mapping: convert dma_direct_*map_page to be phys_addr_t based
+  kmsan: convert kmsan_handle_dma to use physical addresses
+  dma-mapping: implement DMA_ATTR_MMIO for dma_(un)map_page_attrs()
+  xen: swiotlb: Open code map_resource callback
+  dma-mapping: export new dma_*map_phys() interface
+  mm/hmm: migrate to physical address-based DMA mapping API
+  mm/hmm: properly take MMIO path
+  block-dma: migrate to dma_map_phys instead of map_page
+  block-dma: properly take MMIO path
+  nvme-pci: unmap MMIO pages with appropriate interface
+
+ Documentation/core-api/dma-api.rst        |   4 +-
+ Documentation/core-api/dma-attributes.rst |  18 ++++
+ arch/powerpc/kernel/dma-iommu.c           |   4 +-
+ block/blk-mq-dma.c                        |  15 ++-
+ drivers/iommu/dma-iommu.c                 |  61 +++++------
+ drivers/nvme/host/pci.c                   |  18 +++-
+ drivers/virtio/virtio_ring.c              |   4 +-
+ drivers/xen/swiotlb-xen.c                 |  21 +++-
+ include/linux/blk-mq-dma.h                |   6 +-
+ include/linux/blk_types.h                 |   2 +
+ include/linux/dma-direct.h                |   2 -
+ include/linux/dma-map-ops.h               |   8 +-
+ include/linux/dma-mapping.h               |  33 ++++++
+ include/linux/iommu-dma.h                 |  11 +-
+ include/linux/kmsan.h                     |   9 +-
+ include/linux/page-flags.h                |   1 +
+ include/trace/events/dma.h                |   9 +-
+ kernel/dma/debug.c                        |  81 ++++-----------
+ kernel/dma/debug.h                        |  37 ++-----
+ kernel/dma/direct.c                       |  22 +---
+ kernel/dma/direct.h                       |  57 +++++++----
+ kernel/dma/mapping.c                      | 117 +++++++++++++---------
+ kernel/dma/ops_helpers.c                  |   6 +-
+ mm/hmm.c                                  |  19 ++--
+ mm/kmsan/hooks.c                          |   8 +-
+ rust/kernel/dma.rs                        |   3 +
+ tools/virtio/linux/kmsan.h                |   2 +-
+ 27 files changed, 315 insertions(+), 263 deletions(-)
+
+-- 
+2.50.1
+
