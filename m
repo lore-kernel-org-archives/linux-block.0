@@ -1,150 +1,86 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-out3.simply.com (smtp-out3.simply.com [94.231.106.210])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92BEB2E92C5;
-	Tue,  2 Sep 2025 11:06:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D20302FF159;
+	Tue,  2 Sep 2025 11:44:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=94.231.106.210
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756811217; cv=none; b=eDk0SJ9NglRtWAlWPjUwtEUFQqcupDCysSz+EyS3VbUDTWPjrL1+qkx7IIP35TZHwbs+7LWIUdqGFEznoNKS+TonOsiy5FADH96/LfuWtJLsw3FkOaxmJJPzLwTDpoVee9n8qKrb/1vqJQFrNKp4xUxeLH+hsUG9FE5+cqbnooM=
+	t=1756813502; cv=none; b=GqVCtkGags45mKFqBAVTH1SuSl8cOdxReSIHiVDZK4PtJwXMZrWkUUW28i+ltsja/j2PSQdc2bVpZEZ9kdzKilKaqVolRm1feS6udwLb/ia3eNfhP7ZAxnr9pzelqUOxSW6SoGqv95zxrDD+uUTVA7SDeodfkyMSG+m++krA4BE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756811217; c=relaxed/simple;
-	bh=hCa1C3d5MBR18h+mVpk4RAM474rjo1/g4TQSzEy0Gzo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Extkj077px/uWP8AStzNqcoYDBdI4QigYu/2389Wp9czN2sOFY7gBxnV8gXCjD/1Zy7iqTcp1u02J/zbETj0bbRgLrQlS8Sbw2m/93EPtR4DYngxC9KrVDurGh8VyYDwDDC7NYHXEbub+wvOkidabjEOKzyqJAJGlTs5MllBlCM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=luXQtemq; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1756813502; c=relaxed/simple;
+	bh=0o5C5Ly/rHsnoowmYx3m8IcTZ1cPVbKim17lOjF7UUg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Yr99fq3LKd2sOGPqzXWTUgrntYafMafyWYpftc7jDAzWfecr0WG1Ub7D8gMijEC4SwxcBl6NFyyJsXN1ld62UMoKvIvLOlitEsQhmblHnR6Fq6O/AY91Lt7Nxv02Mz5VrJhsVI6HlMjwvwjOaRYaMnspm/e0NWPvOj1le/Ik8WI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gaisler.com; spf=pass smtp.mailfrom=gaisler.com; dkim=fail (0-bit key) header.d=gaisler.com header.i=@gaisler.com header.b=jXmzEnXa reason="key not found in DNS"; arc=none smtp.client-ip=94.231.106.210
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gaisler.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gaisler.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="luXQtemq"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D67BC4CEED;
-	Tue,  2 Sep 2025 11:06:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756811217;
-	bh=hCa1C3d5MBR18h+mVpk4RAM474rjo1/g4TQSzEy0Gzo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=luXQtemqwauDCW1OGofW7KOn0Ed3TXz+7wSyh4Rq/4C4pBNfrCav73O7nhlQqKsu9
-	 pJwS6fgD10XM5MWzc2V32cauwX2xcs5uKtg2Bn+xWgyC8SmOfVZ8jKdythn+ZO4vAa
-	 0h7EOGiI+UMeKypfX8GCyk9wrCAP4tCX2z8kMskVDMEaLSOSdX6db0uWHaJchKjybu
-	 MaLbWwVqK1itWBWz4FOiOlTEHChtIjiBEjBS0WHuFG4wArCchdxmDkRdChfk7RgGoF
-	 PbQcn5XJw0e6Ezn8C5XZTAc61l/+qt/LvKdGUrn6ovVC7JKrzqR3GHSc85H+bG5dhG
-	 nrqyYFGPfwuJg==
-Date: Tue, 2 Sep 2025 14:06:51 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: Jason Gunthorpe <jgg@nvidia.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	Christoph Hellwig <hch@lst.de>, dri-devel@lists.freedesktop.org,
-	iommu@lists.linux.dev, Jens Axboe <axboe@kernel.dk>,
-	Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-	linaro-mm-sig@lists.linaro.org, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
-	linux-mm@kvack.org, linux-pci@vger.kernel.org,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Vivek Kasireddy <vivek.kasireddy@intel.com>,
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v1 01/10] PCI/P2PDMA: Remove redundant bus_offset from
- map state
-Message-ID: <20250902110651.GF10073@unreal>
-References: <cover.1754311439.git.leon@kernel.org>
- <c9b6237964b9606418af400bb6bec5178fcffff2.1754311439.git.leon@kernel.org>
- <20250806145825.2654ee59.alex.williamson@redhat.com>
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=gaisler.com header.i=@gaisler.com header.b="jXmzEnXa"
+Received: from localhost (localhost [127.0.0.1])
+	by smtp.simply.com (Simply.com) with ESMTP id 4cGP6x6Rpwz1FZPJ;
+	Tue,  2 Sep 2025 13:44:57 +0200 (CEST)
+Received: from [192.168.0.25] (h-98-128-223-123.NA.cust.bahnhof.se [98.128.223.123])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by smtp.simply.com (Simply.com) with ESMTPSA id 4cGP6w5mgsz1FXjD;
+	Tue,  2 Sep 2025 13:44:56 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gaisler.com;
+	s=simplycom2; t=1756813497;
+	bh=voGobjfJ+JDIyxPuu8fGQb2u9QP7Z513vboXRHjWrpI=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=jXmzEnXapdgWj3k2C76LGG7k/5mt1kwvMqAYSfMFYlJ0dMOQ80Oj2YE0pnZAtNJ4t
+	 tXQk/LzaZA57Nv160y42KGcSc12HLtx5zDkXLTwO001yujBIUCUp0jXWbSqOup1wEK
+	 caelEQWo/j1aiLxV7BPWjSbstlue7ClkuM93YSG2cSzlCJSLWryT6cSw2EEQcr+aVF
+	 FTt0lGn6fnMuHg7U0U6sd3U2Ku9tEiPKwlVMzDHUsOHxPUryMAOV1qAvelOgjen0aR
+	 RoDQinmHdiIG1eCVLztKOXDNMYphrSPAPE4G8u5ceaF4FDq1DzCH6UTTJUx5w29cc0
+	 vZYTj+Lq2QLjQ==
+Message-ID: <92bace9a-b5c4-4ea1-a1f7-4742c15a64a0@gaisler.com>
+Date: Tue, 2 Sep 2025 13:44:56 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250806145825.2654ee59.alex.williamson@redhat.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 3/4] arch: copy_thread: pass clone_flags as u64
+To: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
+ Arnd Bergmann <arnd@arndb.de>
+Cc: linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+ linux-riscv@lists.infradead.org, linux-csky@vger.kernel.org,
+ linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ cgroups@vger.kernel.org, linux-security-module@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-perf-users@vger.kernel.org, apparmor@lists.ubuntu.com,
+ selinux@vger.kernel.org, linux-alpha@vger.kernel.org,
+ linux-snps-arc@lists.infradead.org, linux-arm-kernel@lists.infradead.org,
+ linux-hexagon@vger.kernel.org, loongarch@lists.linux.dev,
+ linux-m68k@lists.linux-m68k.org, linux-mips@vger.kernel.org,
+ linux-openrisc@vger.kernel.org, linux-parisc@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
+ linux-sh@vger.kernel.org, sparclinux@vger.kernel.org,
+ linux-um@lists.infradead.org
+References: <20250901-nios2-implement-clone3-v2-0-53fcf5577d57@siemens-energy.com>
+ <20250901-nios2-implement-clone3-v2-3-53fcf5577d57@siemens-energy.com>
+ <f2371539-cd4e-4d70-9576-4bb1c677104c@gaisler.com>
+ <11a4d0a953e3a9405177d67f287c69379a2b2f8f.camel@physik.fu-berlin.de>
+Content-Language: en-US
+From: Andreas Larsson <andreas@gaisler.com>
+In-Reply-To: <11a4d0a953e3a9405177d67f287c69379a2b2f8f.camel@physik.fu-berlin.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Aug 06, 2025 at 02:58:25PM -0600, Alex Williamson wrote:
-> On Mon,  4 Aug 2025 16:00:36 +0300
-> Leon Romanovsky <leon@kernel.org> wrote:
+On 2025-09-02 09:15, John Paul Adrian Glaubitz wrote:
+>> Thanks for this and for the whole series! Needed foundation for a
+>> sparc32 clone3 implementation as well.
 > 
-> > From: Leon Romanovsky <leonro@nvidia.com>
-> > 
-> > Remove the bus_off field from pci_p2pdma_map_state since it duplicates
-> > information already available in the pgmap structure. The bus_offset
-> > is only used in one location (pci_p2pdma_bus_addr_map) and is always
-> > identical to pgmap->bus_offset.
-> > 
-> > Reviewed-by: Christoph Hellwig <hch@lst.de>
-> > Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> > Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-> > ---
-> >  drivers/pci/p2pdma.c       | 1 -
-> >  include/linux/pci-p2pdma.h | 3 +--
-> >  2 files changed, 1 insertion(+), 3 deletions(-)
-> > 
-> > diff --git a/drivers/pci/p2pdma.c b/drivers/pci/p2pdma.c
-> > index da5657a020074..274bb7bcc0bc5 100644
-> > --- a/drivers/pci/p2pdma.c
-> > +++ b/drivers/pci/p2pdma.c
-> > @@ -1009,7 +1009,6 @@ void __pci_p2pdma_update_state(struct pci_p2pdma_map_state *state,
-> >  {
-> >  	state->pgmap = page_pgmap(page);
-> >  	state->map = pci_p2pdma_map_type(state->pgmap, dev);
-> > -	state->bus_off = to_p2p_pgmap(state->pgmap)->bus_offset;
-> >  }
-> >  
-> >  /**
-> > diff --git a/include/linux/pci-p2pdma.h b/include/linux/pci-p2pdma.h
-> > index 075c20b161d98..b502fc8b49bf9 100644
-> > --- a/include/linux/pci-p2pdma.h
-> > +++ b/include/linux/pci-p2pdma.h
-> > @@ -146,7 +146,6 @@ enum pci_p2pdma_map_type {
-> >  struct pci_p2pdma_map_state {
-> >  	struct dev_pagemap *pgmap;
-> >  	enum pci_p2pdma_map_type map;
-> > -	u64 bus_off;
-> >  };
-> >  
-> >  /* helper for pci_p2pdma_state(), do not use directly */
-> > @@ -186,7 +185,7 @@ static inline dma_addr_t
-> >  pci_p2pdma_bus_addr_map(struct pci_p2pdma_map_state *state, phys_addr_t paddr)
-> >  {
-> >  	WARN_ON_ONCE(state->map != PCI_P2PDMA_MAP_BUS_ADDR);
-> > -	return paddr + state->bus_off;
-> > +	return paddr + to_p2p_pgmap(state->pgmap)->bus_offsetf;
-> >  }
-> >  
-> >  #endif /* _LINUX_PCI_P2P_H */
+> Can you implement clone3 for sparc64 as well?
 
-Sorry for long time to reply, I waited to see what is going on with DMA
-phys_vec basic series and together with my summer vacation, it took a
-while.
+(heavily pairing down the to list)
 
-> 
-> Looks like you're relying on this bogus code getting resolved in the
-> next patch...
-> 
-> In file included from kernel/dma/direct.c:16:
-> ./include/linux/pci-p2pdma.h: In function ‘pci_p2pdma_bus_addr_map’:
-> ./include/linux/pci-p2pdma.h:188:24: error: implicit declaration of function ‘to_p2p_pgmap’ [-Wimplicit-function-declaration]
->   188 |         return paddr + to_p2p_pgmap(state->pgmap)->bus_offsetf;
->       |                        ^~~~~~~~~~~~
-> ./include/linux/pci-p2pdma.h:188:50: error: invalid type argument of ‘->’ (have ‘int’)
->   188 |         return paddr + to_p2p_pgmap(state->pgmap)->bus_offsetf;
->       |                                                  ^~
-> ./include/linux/pci-p2pdma.h:189:1: error: control reaches end of non-void function [-Werror=return-type]
->   189 | }
->       | ^
-> 
-> to_p2p_pgmap() is a static function and struct pci_p2pdma_pagemap
-> doesn't have a bus_offsetf member.  Thanks,
+We'll take a look at that as well.
 
-You are right, probably the best way to fix the error is simply squash
-this change into the next patch.
+Cheers,
+Andreas
 
-Thanks
-
-
-
-> 
-> Alex
-> 
