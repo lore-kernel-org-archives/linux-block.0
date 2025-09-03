@@ -1,100 +1,139 @@
-Received: from mail-il1-f181.google.com (mail-il1-f181.google.com [209.85.166.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66CFA1DE2A5
-	for <linux-block@vger.kernel.org>; Wed,  3 Sep 2025 01:21:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65D302566;
+	Wed,  3 Sep 2025 01:41:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756862504; cv=none; b=KQF9NeDX3eZfaaAXqfVy8IuuKzAJFEg3qbUCRHZXCKAutOi1kAjp3Zm9A5QJGlFkxz/NqW68ZSyZ1H59l4wX5fDRiUTNxYXYJZCinFRYsKXsnqHcbuwSFshJS10VThv8tgYe4bKx5kLU53BIFbADDLxwRyHWDFMMAokohGmovL4=
+	t=1756863688; cv=none; b=jTK6U3bLHZkNhq6jgW6qLDNRNix1Nv/f/GslBHXBtAjiI/4KEG2wLTvnRzg6OPKAtH7str7YKozBZRtPKDpCWWN8xX5ReISQ+BNdUkAfXjvX86SNRlbhEVAYbaEOFjfu9dzCA19H7bgHQjM013PxPiL8EMmbge6quR5NNzZRaLw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756862504; c=relaxed/simple;
-	bh=rQLNif5sl2BzEcHPDWCigKu+HqJuv/2O9dOuEdyKUT8=;
-	h=From:To:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=f7Lwq3SMHMnwLlxR5EIWdz2nb4sb0KOX0YmYLCVxfL6Q4V9ae9T1QJdsbGsNWKlPLlh/uLXxHrYssUdV1LiqdSWg0Lf4jI4LlXUSrPlYz2VwRQ8KR8zaHbu2s9reK9pYR0wHIAduZXwmqPu6dWszVpFbXCXkjX2WRHwlhrbueVc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Jj6Go02x; arc=none smtp.client-ip=209.85.166.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Jj6Go02x"
-Received: by mail-il1-f181.google.com with SMTP id e9e14a558f8ab-3f3b00f738cso42362975ab.1
-        for <linux-block@vger.kernel.org>; Tue, 02 Sep 2025 18:21:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1756862501; x=1757467301; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=rjAS8byAOwIr5PFgfyLQACeUTVvKtTs0AAlpz2j48FA=;
-        b=Jj6Go02xAmdqzq0pwi594P5+bM56Rr6+acOEEvq0HOXojH6h+KqqskiDxs0pn5n/gP
-         1mg5obPTpR6drBtfJccI6CqYMUEzd2MnwB/u0/Psd0Zqvjm/hgzZB+ez4yfhAWK1J4xv
-         Tl3QnZiswRfk/DJmwgcju9riNSE1zI4vPKMAHfZnuudFm56pXGD4Y6/iEOhB42DYMscP
-         F7thwrZkPGXTKf4n506F6sGxYQuWzRqqQnKTZjWBkLEbpfMhOuE5NtaSHN6Iv3yYQbL6
-         AOIwRN5dFwSatfJGdVe8Dsdcp6xM5dY4PyKon26MGt9XwfeqoRrwpRHGgK4fJgoee7MC
-         Y22Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756862501; x=1757467301;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rjAS8byAOwIr5PFgfyLQACeUTVvKtTs0AAlpz2j48FA=;
-        b=BNgUCFxbeDfdj6ElBnz9n7QV7kUqt6/o1JKJSrYSgiu/l0yw/DEYEfckSvqX4CmlBd
-         JSx3cOHCidtSkxT2RCnCz9w6COAscdxFGLVN0vmlN8LJ3pd5Xpao0Ctc1XpZJD6yXSw1
-         kcdWqd+I5+roBgq74u9P0b+SGzOgEXfCrjX6zgscZg++Wd3BN+TJagDHr933yhbEe23r
-         Vj0JDU144ornYn7NP5kQ3X5chwMKpa1DAaJl9Dm3MWc37kdlu0r1HkUbdqwjorKKKjgs
-         0mW4c6Sv6cohc6nbFq0EtPYWW4NHjK8VLN0FB4b1qT5rMgq1r7tfa6ZAhOZeMuIvjpga
-         WkWQ==
-X-Gm-Message-State: AOJu0YzY1GjYc8qskfdEJRuidA4f3R5GEhuTXWPrnwrDOZBVTCAhDOPn
-	OfVkp++GBNyRGKuc3RTznoOtgFAl0fnE1AXtcaw4hMB4VtXbEhPWUetas31vCim7Nu8=
-X-Gm-Gg: ASbGncuHYL2GuP3o/ywAZueqY6GNjrdNLWMmbzWcBx/tOpQbj7VNmbP9nVRQj/BG8M/
-	iWh86scgDInALTgBzajybmnlboITaw0lZhajfclUwiLWcetBNKiKy6lPfnkNMcYMpVlM9J0ZhPJ
-	P8dZ35nj1iLstRr4A7HF4W3tV2GDQXGZCwtodXgHwb2acwLQBx471twrcTvj0SMkRyEIl4wI1jF
-	Ba0lQcp/cI9SqSYSE7y2IkxrXii1+1sLrDvOc2Yplo4UhC0u7EIfttUZoNEBs2H1YGsZKCpDpRZ
-	N9WsjU09hEAtX4tjaV6pgHjWeEZr94uBM8HEzU2v2VD5fWXOO+rnXG2/Fy00vZ6zgu1j1t6GqRn
-	H3nv1hN6sZtsYIaRPF9jwvdX9Z0RgX87KNUr2JtXw5GcNPKxyACsWyHXTqIC7n/xc
-X-Google-Smtp-Source: AGHT+IHP5bpnitaSPsC737EVCCHHb9hXsYOc52M1nYnXz7j2gVymoM6d5QMfMkdWCV0dXunxYJ6FkQ==
-X-Received: by 2002:a05:6e02:17c9:b0:3f0:dce:2550 with SMTP id e9e14a558f8ab-3f401be27a3mr210428985ab.19.1756862501398;
-        Tue, 02 Sep 2025 18:21:41 -0700 (PDT)
-Received: from [127.0.0.1] (syn-047-044-098-030.biz.spectrum.com. [47.44.98.30])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-50d8f31cc0dsm3662537173.38.2025.09.02.18.21.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Sep 2025 18:21:40 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Qianfeng Rong <rongqianfeng@vivo.com>
-In-Reply-To: <20250902130930.68317-1-rongqianfeng@vivo.com>
-References: <20250902130930.68317-1-rongqianfeng@vivo.com>
-Subject: Re: [PATCH] block: use int type to store negative value
-Message-Id: <175686250047.108754.9991172148469474347.b4-ty@kernel.dk>
-Date: Tue, 02 Sep 2025 19:21:40 -0600
+	s=arc-20240116; t=1756863688; c=relaxed/simple;
+	bh=A1iTz/bQZLLbrGiybLQQMrmmgfCHqf+1326YBH1shOM=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=Fj3Cs7yV/2Z62T/2YcCRGiFpRAaEpjO/FStljv6rGdrMfNhuzp50WkZNy6rGyd77cq68JcYR7h/5jTGbRZJZNe0VIMREm/xuSdNFWsa/3K9oQ6JdB3TzaLsWk5mlWEJb1Kp7U2eeH0H4O2oFf8iJEQczgx3uClXWGAVTSsldI5Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.93.142])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4cGlh41fQ6zYQtxw;
+	Wed,  3 Sep 2025 09:41:24 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id B097A1A129D;
+	Wed,  3 Sep 2025 09:41:22 +0800 (CST)
+Received: from [10.174.179.143] (unknown [10.174.179.143])
+	by APP4 (Coremail) with SMTP id gCh0CgAXYIy+nLdooxzRBA--.26887S3;
+	Wed, 03 Sep 2025 09:41:20 +0800 (CST)
+Subject: Re: [PATCH RFC v3 14/15] block: fix disordered IO in the case
+ recursive split
+To: Bart Van Assche <bvanassche@acm.org>, Yu Kuai <yukuai1@huaweicloud.com>,
+ hch@infradead.org, colyli@kernel.org, hare@suse.de, dlemoal@kernel.org,
+ tieren@fnnas.com, axboe@kernel.dk, tj@kernel.org, josef@toxicpanda.com,
+ song@kernel.org, kmo@daterainc.com, satyat@google.com, ebiggers@google.com,
+ neil@brown.name, akpm@linux-foundation.org
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ cgroups@vger.kernel.org, linux-raid@vger.kernel.org, yi.zhang@huawei.com,
+ yangerkun@huawei.com, johnny.chenyi@huawei.com,
+ "yukuai (C)" <yukuai3@huawei.com>
+References: <20250901033220.42982-1-yukuai1@huaweicloud.com>
+ <20250901033220.42982-15-yukuai1@huaweicloud.com>
+ <e40b076d-583d-406b-b223-005910a9f46f@acm.org>
+ <0f7345dd-8c6b-a75c-c234-2bb09f842069@huaweicloud.com>
+ <7edded3f-1075-4c14-9db9-a62adc0a4aa3@acm.org>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <d23ba315-c197-0e3a-88a9-8e71a93637c0@huaweicloud.com>
+Date: Wed, 3 Sep 2025 09:41:18 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-2ce6c
+In-Reply-To: <7edded3f-1075-4c14-9db9-a62adc0a4aa3@acm.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgAXYIy+nLdooxzRBA--.26887S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxJw47WFWkWw1kWw45WF4DArb_yoW5GrWxpr
+	WkKFyDtrWrGr1Sgw1vvayUtFyvyw4UXw4rGFy5Gay7Jr4DZr1qq3srXryvgryDAr48CryU
+	ZF1vgr9xua1DArJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUBF14x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
+	0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AKxVW8ZVWrXwCF04k20xvY0x
+	0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E
+	7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_GFv_WrylIxkGc2Ij64vIr41lIxAIcV
+	C0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF
+	04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7
+	CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0pRHUDLUUUUU=
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
+Hi,
 
-On Tue, 02 Sep 2025 21:09:30 +0800, Qianfeng Rong wrote:
-> Change the 'ret' variable in blk_stack_limits() from unsigned int to int,
-> as it needs to store negative value -1.
+在 2025/09/03 9:12, Bart Van Assche 写道:
+> On 9/2/25 6:00 PM, Yu Kuai wrote:
+>> Hi,
+>>
+>> 在 2025/09/03 1:20, Bart Van Assche 写道:
+>>> On 8/31/25 8:32 PM, Yu Kuai wrote:
+>>>> -void submit_bio_noacct_nocheck(struct bio *bio)
+>>>> +void submit_bio_noacct_nocheck(struct bio *bio, bool split)
+>>>>   {
+>>>>       blk_cgroup_bio_start(bio);
+>>>>       blkcg_bio_issue_init(bio);
+>>>> @@ -745,12 +745,16 @@ void submit_bio_noacct_nocheck(struct bio *bio)
+>>>>        * to collect a list of requests submited by a ->submit_bio 
+>>>> method while
+>>>>        * it is active, and then process them after it returned.
+>>>>        */
+>>>> -    if (current->bio_list)
+>>>> -        bio_list_add(&current->bio_list[0], bio);
+>>>> -    else if (!bdev_test_flag(bio->bi_bdev, BD_HAS_SUBMIT_BIO))
+>>>> +    if (current->bio_list) {
+>>>> +        if (split && !bdev_is_zoned(bio->bi_bdev))
+>>>> +            bio_list_add_head(&current->bio_list[0], bio);
+>>>> +        else
+>>>> +            bio_list_add(&current->bio_list[0], bio);
+>>>
+>>> The above change will cause write errors for zoned block devices. As I
+>>> have shown before, also for zoned block devices, if a bio is split
+>>> insertion must happen at the head of the list. See e.g.
+>>> "Re: [PATCH 1/2] block: Make __submit_bio_noacct() preserve the bio 
+>>> submission order"
+>>> (https://lore.kernel.org/linux-block/a0c89df8-4b33-409c-ba43- 
+>>> f9543fb1b091@acm.org/)
+>>
+>> Do you mean we should remove the bdev_is_zoned() checking? I added this
+>> checking because I'm not quite sure about details in zone device, and
+>> this checking is aimed at prevent functional changes in zone device.
 > 
-> Storing the negative error codes in unsigned type, or performing equality
-> comparisons (e.g., ret == -1), doesn't cause an issue at runtime [1] but
-> can be confusing.  Additionally, assigning negative error codes to unsigned
-> type may trigger a GCC warning when the -Wsign-conversion flag is enabled.
+> Yes, the bdev_is_zoned() check should be removed. I spent a significant
+> amount of time on root-causing and proposing fixes for write errors
+> caused by recursive bio splitting for zoned devices. What I learned by
+> analyzing these write errors is the basis for this feedback.
 > 
-> [...]
+>> So I don't think this change will cause write errors, the write errors
+>> should already exist before this set, right?
+> 
+> Agreed. Although I haven't checked this yet, if the bdev_is_zoned()
+> check is removed from this patch, this patch should fix the write errors
+> triggered by stacking a dm driver on top of a zoned block device if
+> inline encryption is enabled.
+> 
 
-Applied, thanks!
+Ok, I'll remove the checking and mention this problem in the next formal
+version.
 
-[1/1] block: use int type to store negative value
-      commit: b0b4518c992eb5f316c6e40ff186cbb7a5009518
+Thanks,
+Kuai
 
-Best regards,
--- 
-Jens Axboe
-
-
+> Thanks,
+> 
+> Bart.
+> .
+> 
 
