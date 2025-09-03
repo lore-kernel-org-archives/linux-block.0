@@ -1,50 +1,43 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28EC72FF160;
-	Wed,  3 Sep 2025 13:34:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7D08302CB3
+	for <linux-block@vger.kernel.org>; Wed,  3 Sep 2025 14:09:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.89.141.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756906485; cv=none; b=p1N0XsIm2z/x33LI/8VaXdZFwShgG3rH31A7MnPQ/1LvwLZqz5ZcKGQ8gjDeUVkVHTf6BohSDhfq5iW9dXJpw4uAGy41mSJY5uZoujKqGkij83VEMBxwLpfyuRgl53bEpUuMjxiLH591z71RwEMy+1VUmzYn4QKiIHyaNikkftQ=
+	t=1756908581; cv=none; b=Yw472rb4cHDh9txAZGCp0CD3MgjMSdzGm0wuFRaNZKgWy0Q0dwJpa1nlM/TvsnUgD57nuArVeS0y0SaydpFcJY4AA7fOlePmE3lc5QIFF1L1DUScdjc6kw539T9mO3VWczNKjmicvMCSk65uJVp7Ux3w2N3ttlO+/pYx3vYnXvw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756906485; c=relaxed/simple;
-	bh=7F6XOAzUhsDHmCI3/SCs3uVB95vrfC3f7t3UxCYkuGA=;
+	s=arc-20240116; t=1756908581; c=relaxed/simple;
+	bh=NAAsiGhebLYdg4FBLRmrHJpwhXvSoS4qXNZJe+yKFEo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oS+KCGYYDR9S47JUQ9hcgNXc7rB8AVm+EyZ0AxQZl0Nt4FMtagy4Krmp5YGWuHQGRLsh+gylKOmJuiQ0gNHUVc5Y953ccTl8Ul+1QHShvyt4p0nnxxEe2Yy0jmS/RRXnUSJKKL2Iv1FxU/HW/Vky2gfw5W5h50kV7nNLkuwjGQM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=aCoM+M/i; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=Mi4g2Iou+l7IyWqbLBkJdSqynuB26SatSEnCeMAfoQZ1Kc7srbdTAk+z+KaU+uG/FGHRNd/mj+z2e8Gz9ehHdHCAWvGgZNo2zL8j57q12oicRnaHJfHtSNFxR/eH0TQQ0B/j9jFDCxgehBOuVv+ocpgiHJJ3aXJfuMCBlIxOZfE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=b+jXQ/BW; arc=none smtp.client-ip=62.89.141.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="aCoM+M/i"
+	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="b+jXQ/BW"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=c/WRtC4WLl4+ChMSM11wBey1MNP5VSLO7LDcCYVKt0w=; b=aCoM+M/ixXSp6SCJUeLc1q1KwC
-	qnHd1CCJ4h+LcjUib+boUGHt5vi1QaXfY5NOTB3uRTJt20/lJVHeCIG6S7nSWOXHhdwE1PlSchAk0
-	ZQnyygZQntkUqXk8QlDKeafE2whZgfpza9IeLt5hKoP8z21tEGG0cilsHjqAyeCkjYsYLtJXjNIqp
-	MI/6Xq86k0nvXXVCzNQYOUyL74MpGOmWyVrzAhBh6qer1nKKpvMps3qw1aUoP+G6IsYLzR7cq/xl3
-	iQV9Usd4YSieGqh5+tkFI7L5U7B8WtoHQuMJIz4qgtL5G8swZxeJqHQdesjQwXIUW4Z432UltvVhj
-	GDYHLaHw==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1utndJ-00000006c6S-16b2;
-	Wed, 03 Sep 2025 13:34:41 +0000
-Date: Wed, 3 Sep 2025 06:34:41 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Yu Kuai <yukuai1@huaweicloud.com>
-Cc: hch@infradead.org, colyli@kernel.org, hare@suse.de, dlemoal@kernel.org,
-	tieren@fnnas.com, axboe@kernel.dk, tj@kernel.org,
-	josef@toxicpanda.com, song@kernel.org, kmo@daterainc.com,
-	satyat@google.com, ebiggers@google.com, neil@brown.name,
-	akpm@linux-foundation.org, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, cgroups@vger.kernel.org,
-	linux-raid@vger.kernel.org, yukuai3@huawei.com, yi.zhang@huawei.com,
-	yangerkun@huawei.com, johnny.chenyi@huawei.com
-Subject: Re: [PATCH RFC v3 14/15] block: fix disordered IO in the case
- recursive split
-Message-ID: <aLhD8Vi-UwnwK93L@infradead.org>
-References: <20250901033220.42982-1-yukuai1@huaweicloud.com>
- <20250901033220.42982-15-yukuai1@huaweicloud.com>
+	bh=dTdOfwnUX1/7f9KR5MCmCBljhDZ69OSp5gjo3Ndyj1w=; b=b+jXQ/BWnnf8OMElLtldyPBz8Y
+	iwVank1MRhxYxRIaRQ0rxk3kWYhJpCSRXuIA2BEQHwaqvfBvux5xHkzQ1sUuUTGjLzY2rUXdA/o8W
+	KR25/Cg6CkZgpXnEoy/240IVzcC0sFsZcAHXj+gh975YDCrj7snUaZddqarxQwJIpNbHlV/Hp/KUc
+	rGCid/0bMayUToAivYfCbVKsBJHDzKZQyfaeGNqSNs2lq6XEj7cB8spLnHo7RJs46XqnjHnoJQmt7
+	NiOWRaFu9F4N6UwjmZ/2fplcvwDeSpfjpBNZlwEFkxCt7RZcfkoGN/bG0IE9y+2CRwiSUmSONtFsj
+	hDYWGVKg==;
+Received: from viro by zeniv.linux.org.uk with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1utoB6-00000000YXd-109B;
+	Wed, 03 Sep 2025 14:09:36 +0000
+Date: Wed, 3 Sep 2025 15:09:36 +0100
+From: Al Viro <viro@zeniv.linux.org.uk>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>
+Subject: Re: [RFC][PATCHES] convert ->getgeo() from block_device of partition
+ to gendisk
+Message-ID: <20250903140936.GK39973@ZenIV>
+References: <20250718192642.GE2580412@ZenIV>
+ <c821c881-76c4-4dde-a208-bb9e8f3ea63f@kernel.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -53,14 +46,34 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250901033220.42982-15-yukuai1@huaweicloud.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <c821c881-76c4-4dde-a208-bb9e8f3ea63f@kernel.dk>
+Sender: Al Viro <viro@ftp.linux.org.uk>
 
-Btw disordered IO sounds a bit odd to me.  I'm not a native english
-sepaker, but in the past we've used the term "I/O reordering" for
-issues like this.
+On Fri, Jul 18, 2025 at 03:20:02PM -0600, Jens Axboe wrote:
+> On 7/18/25 1:26 PM, Al Viro wrote:
+> > 	Instances of ->getgeo() get a block_device of partition and
+> > fill the (mostly fake) geometry information of the disk into caller's
+> > struct hd_geometry.  It *does* contain one member related to specific
+> > partition (the starting sector), but... that member is actually filled
+> > by the callers of ->getgeo() (blkdev_getgeo() and compat_hdio_getgeo()),
+> > leaving the instances partition-agnostic.
+> > 
+> > 	All actual work is done using bdev->bd_disk, be it the disk
+> > capacity, IO, or cached geometry information.  AFAICS, it would make
+> > more sense to pass it gendisk to start with.
+> > 
+> > 	The series is pretty straightforward - conversion of scsi_bios_ptable()
+> > and scsi_partsize() to gendisk, then the same for ->bios_param(), then
+> > ->getgeo() itself.   It sits in viro/vfs.git#rebase.getgeo, individual patches
+> > in followups.
+> > 
+> > 	Comments, objections?
+> 
+> None from me, looks fine:
+> 
+> Acked-by: Jens Axboe <axboe@kernel.dk>
 
-> +		if (split && !bdev_is_zoned(bio->bi_bdev))
-
-Why are zoned devices special cased here?
-
+Which tree would you prefer it to go through?  Currently it's in viro/vfs.git
+#work.getgeo (rebased to 6.17-rc1, no changes since the last posting);
+I can merge it into vfs/viro #for-next and push it to Linus in the next
+window, unless you prefer it to go through the block tree...
