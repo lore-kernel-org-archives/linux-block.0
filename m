@@ -1,150 +1,88 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FDAC3FB31
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D263D2FE05F
 	for <linux-block@vger.kernel.org>; Wed,  3 Sep 2025 12:36:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756902997; cv=none; b=jG0bX13WmbnZP8G0TjwV1Bgm9iG6pJXsoopY2NAMOkhsLhlAVS6ghHck16mGPuUc+rf+GdJ0bYtMPaWMBKhWfM30+z/XT+gsQ2NFLkrBID3m/9Xo5p8kMnJsZAOt7SumZNHsZ36u5e7PkbtIQ6i/tBQzFLC2CyOYymNCryC+640=
+	t=1756902998; cv=none; b=F/6ALpK8+5OFlWJAko2qUaBB7AqcuMCePnvAES8VEe0Z06AIky/CdSSPkLd7KoU/UShiQRaqrK0Vhiyz+SCA83gt1o7iCbPxrPSu0wj3/qGGGpZHjHaAvqujlQwz6TVjxa3fW4PrEcUnDc0sMH0v8lrPlnifz+r7nEqTJcYlc1w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756902997; c=relaxed/simple;
-	bh=l/WUmSKmcloVy0aJQRPVTdT7iDD8Xpxi1iTBHrSsDs0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UbHZIVB01mSF0Yxs1d2caJz42zrnXhi/KNfFaYcU8lxkeKumsWZSRczjlYUgtZ4lNxAODQcYfdZ8LGCeJKhoJo2yGTGc0EX5zA4FFNjMM25+qSn+h73j9t9nIySVHTPSHOcYPgr+FJe3Bqajwwj3BzP0l1geaQgFeCB8JkDDn/Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=kVjoFdCg; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=JC7gL9++; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=kVjoFdCg; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=JC7gL9++; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="kVjoFdCg";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="JC7gL9++";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="kVjoFdCg";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="JC7gL9++"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 53B3A1F453;
-	Wed,  3 Sep 2025 12:36:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1756902994; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Z4dkn1xOtjZMvux09Ypde4SPog5LI5mjRt8sFdLaY4U=;
-	b=kVjoFdCgu/5/fm2+jELu+JLMX4XJc08ulrCIWfDshl3SRtjuY50CbL41pdnlV1OKFRuenV
-	FPAoq4yhQZqcXvNj3heuoiNr6bzpfxXstXbAkQ7u9kfZU81EfA4D+VFODrDuySMAohMReg
-	zzO9RSlJ8LNx3dXJLq2V+Q8WFDVle98=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1756902994;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Z4dkn1xOtjZMvux09Ypde4SPog5LI5mjRt8sFdLaY4U=;
-	b=JC7gL9++1ZpB9YCxnC/6M9nz3W8JxHmybvcmSdFTfEWWWDkcRfZCWClUCvdzzxdxrLUTIf
-	yBSx//eaP2+gDMAA==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=kVjoFdCg;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=JC7gL9++
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1756902994; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Z4dkn1xOtjZMvux09Ypde4SPog5LI5mjRt8sFdLaY4U=;
-	b=kVjoFdCgu/5/fm2+jELu+JLMX4XJc08ulrCIWfDshl3SRtjuY50CbL41pdnlV1OKFRuenV
-	FPAoq4yhQZqcXvNj3heuoiNr6bzpfxXstXbAkQ7u9kfZU81EfA4D+VFODrDuySMAohMReg
-	zzO9RSlJ8LNx3dXJLq2V+Q8WFDVle98=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1756902994;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Z4dkn1xOtjZMvux09Ypde4SPog5LI5mjRt8sFdLaY4U=;
-	b=JC7gL9++1ZpB9YCxnC/6M9nz3W8JxHmybvcmSdFTfEWWWDkcRfZCWClUCvdzzxdxrLUTIf
-	yBSx//eaP2+gDMAA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 4149513A31;
-	Wed,  3 Sep 2025 12:36:34 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id XMvsD1I2uGj2MAAAD6G6ig
-	(envelope-from <dwagner@suse.de>); Wed, 03 Sep 2025 12:36:34 +0000
-Date: Wed, 3 Sep 2025 14:36:33 +0200
-From: Daniel Wagner <dwagner@suse.de>
-To: Hannes Reinecke <hare@suse.de>
-Cc: Daniel Wagner <wagi@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
-	Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Aaron Tomlin <atomlin@atomlin.com>, 
-	"Martin K. Petersen" <martin.petersen@oracle.com>, Thomas Gleixner <tglx@linutronix.de>, 
-	Costa Shulyupin <costa.shul@redhat.com>, Juri Lelli <juri.lelli@redhat.com>, 
-	Valentin Schneider <vschneid@redhat.com>, Waiman Long <llong@redhat.com>, Ming Lei <ming.lei@redhat.com>, 
-	Frederic Weisbecker <frederic@kernel.org>, Mel Gorman <mgorman@suse.de>, 
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
-	linux-nvme@lists.infradead.org, megaraidlinux.pdl@broadcom.com, linux-scsi@vger.kernel.org, 
-	storagedev@microchip.com, virtualization@lists.linux.dev, 
-	GR-QLogic-Storage-Upstream@marvell.com
-Subject: Re: [PATCH v7 01/10] lib/group_cpus: Add group_masks_cpus_evenly()
-Message-ID: <5397286b-bb1f-493b-9d7d-b4168a67efe6@flourine.local>
-References: <20250702-isolcpus-io-queues-v7-0-557aa7eacce4@kernel.org>
- <20250702-isolcpus-io-queues-v7-1-557aa7eacce4@kernel.org>
- <db0cbbe2-792c-4263-8be9-14b76eb0f7e6@suse.de>
+	s=arc-20240116; t=1756902998; c=relaxed/simple;
+	bh=OeZ2/DC7R0QGjvivR5IydEgfYsUxOmhBrplooZ0Wm9o=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=DULjs+cDqhcXqvfvOc0euqyn7vNPeK9eO5BXVpgwZ09zkxzQIE5rCDrHgmmfrMA2SpESzEHEq1Jun8pbH9JmkWULf3EMMMue7oPvsxN6XbCWgv+BoGTK9hFgGXClCkUGTYX2yH/rpr9RmCMcM42IuDAo41JTNlyZALwzPKrxgJk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3eea931c037so150998925ab.0
+        for <linux-block@vger.kernel.org>; Wed, 03 Sep 2025 05:36:36 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756902996; x=1757507796;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=2LHOUvTxUHRDZHTuy2WgSxf7xJT4vtu2i2hgQBjuX7w=;
+        b=mgaKQkN2yK5x9GomCq7vVvuAMwvGGucg0Dq7F3GAMFqNCt6zIEszhhUjlk9vmKYLzl
+         su/nMlOOUHLiSSMAlALuZZigcrGZabYm1P+Cl3npXTvgOxOa3iOxOrgptHYteVHTxpdB
+         79/0w3gNseSyVE3tN+s6t1j2NTDvMUkU32b4bdqxikVJxujl96qGXfSBUpidC+gtv2Q6
+         BFkvH9C5kLya4EOo/p55qzo+YCAqF4jLPZnUQlVeJGjjZFhUrgLMNQq72SzuTEfsRJx6
+         3uXRCklHuQUi7fwqrO6bRKr3ZHPcfdn2A1VzLsgRKuKWqNbwORfKKJJNirYR4hpX4SFU
+         Fyxg==
+X-Forwarded-Encrypted: i=1; AJvYcCUuTb75L0Xh4jAt5W5p4qaKD8z4FmQF/9l2v0Q+4ShJx+2fFN0goNkybj81LXE4CiuwAFGwxrXFLbzkEw==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw0ZvQT4renP3kYigR6SqVt+fuA0D7EIAZnX+xIelUP6KNl/d3i
+	XpxYk6Ewr9DkzUFozULhFafUFpQk19w5b24nm2KmfowPdPQh0IijRquFgNmVMfbBJvAF0LyGIA3
+	iDNMTWTxLYxiX/rwxSrr4G8Xlf0wJ9tggqyklNBTE3Zep7AqIE7VpEPSHAUc=
+X-Google-Smtp-Source: AGHT+IETUswS2yDFuaaHHg2PyJKvgAiFrqCIYR4tRHFKt9SSy6k3VMVIe6nukUo/0neTzFmx7S3M8oMr51X9urYuFi1S6OfiVxkd
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <db0cbbe2-792c-4263-8be9-14b76eb0f7e6@suse.de>
-X-Spamd-Result: default: False [-4.51 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	ARC_NA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[26];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	R_RATELIMIT(0.00)[to_ip_from(RL71uuc3g3e76oxfn4mu5aogan)];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim];
-	DKIM_TRACE(0.00)[suse.de:+]
-X-Spam-Flag: NO
-X-Spam-Level: 
-X-Rspamd-Queue-Id: 53B3A1F453
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Rspamd-Action: no action
-X-Spam-Score: -4.51
+X-Received: by 2002:a05:6e02:1488:b0:3f1:a5b9:4a32 with SMTP id
+ e9e14a558f8ab-3f3ffda5bacmr225600425ab.1.1756902995790; Wed, 03 Sep 2025
+ 05:36:35 -0700 (PDT)
+Date: Wed, 03 Sep 2025 05:36:35 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68b83653.050a0220.3db4df.01ef.GAE@google.com>
+Subject: [syzbot] Monthly nbd report (Sep 2025)
+From: syzbot <syzbot+liste8f48e3526c73d4bcab4@syzkaller.appspotmail.com>
+To: josef@toxicpanda.com, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, nbd@other.debian.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Jul 03, 2025 at 08:18:50AM +0200, Hannes Reinecke wrote:
-> > +/**
-> > + * group_mask_cpus_evenly - Group all CPUs evenly per NUMA/CPU locality
-> > + * @numgrps: number of groups
-> > + * @cpu_mask: CPU to consider for the grouping
-> > + * @nummasks: number of initialized cpusmasks
-> > + *
-> > + * Return: cpumask array if successful, NULL otherwise. And each element
-> > + * includes CPUs assigned to this group.
-> > + *
-> > + * Try to put close CPUs from viewpoint of CPU and NUMA locality into
-> > + * same group. Allocate present CPUs on these groups evenly.
-> > + */
-> 
-> Description could be improved. Point is that you do not do any
-> calculation here, you just call __group_cpus_evenly() with
-> a different mask.
+Hello nbd maintainers/developers,
 
-I updated the documentation, it matches with group_cpus_evenly but with
-the constrain mask.
+This is a 31-day syzbot report for the nbd subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/nbd
+
+During the period, 0 new issues were detected and 0 were fixed.
+In total, 8 issues are still open and 8 have already been fixed.
+
+Some of the still happening issues:
+
+Ref Crashes Repro Title
+<1> 861     Yes   possible deadlock in pcpu_alloc_noprof (2)
+                  https://syzkaller.appspot.com/bug?extid=91771b3fb86ec2dd7227
+<2> 304     Yes   INFO: task hung in nbd_queue_rq
+                  https://syzkaller.appspot.com/bug?extid=30c16035531e3248dcbc
+<3> 143     Yes   INFO: task hung in nbd_ioctl (3)
+                  https://syzkaller.appspot.com/bug?extid=fe03c50d25c0188f7487
+<4> 55      No    INFO: task hung in nbd_disconnect_and_put
+                  https://syzkaller.appspot.com/bug?extid=aa56a8f25e07970eef7f
+<5> 6       No    possible deadlock in nbd_queue_rq
+                  https://syzkaller.appspot.com/bug?extid=3dbc6142c85cc77eaf04
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
+
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
