@@ -1,158 +1,243 @@
-Received: from mail-ot1-f42.google.com (mail-ot1-f42.google.com [209.85.210.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 060192EBB83
-	for <linux-block@vger.kernel.org>; Wed,  3 Sep 2025 08:28:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7CD12E3B15
+	for <linux-block@vger.kernel.org>; Wed,  3 Sep 2025 08:36:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756888112; cv=none; b=Qkz7VlvQYdAYSqBhErLzKjAnmDyKR10muX8qmaW/i/VBX8iW0jYQO/28okslUiuvsJBjkdS+Mt8mVL1X8kljMNLszaL6Ez0t7XnpGKENiXNm01zABJa3Mx1jNbpo49XBrbm12JZqxvINZ719JWefXFCf4k0SuW89cAJ3UurH548=
+	t=1756888584; cv=none; b=Me0Y65bpbrzB7VuSWwiDisvCZhUUptClmQ2rLqhFHA445a6aooaoyi7cZE5uEVUJdWAngSfozYiIqI5RB9a+YVzvSuRXiqk7Q7ZBxGNHPoiAtNFfRU0GQTvzH4jhUfbBGoSH3kiit6tnItPrOv4RUASIncxT67pcs6lTXp+Ho/I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756888112; c=relaxed/simple;
-	bh=fiIV5iCnxTVLl0kbKnQRDz6LgUwnj50LzskxwIhPreA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WhL1ZbiP8e3YV8Wc75OZ8dne+iR/V04BEdUgg4RtdZNsUbkQxWDjWkvfkm72N8zC8wC32hDDXFLSUqWyM8oQAg1zZdMm2O+rnxMVI7MTNWusZ37RDC8cMAQLzIimWQe2pLaUCCG2V4Ua6R4vBItYM3run9zAGwKezqO6GatWQjY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=gQ8n9DV8; arc=none smtp.client-ip=209.85.210.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+	s=arc-20240116; t=1756888584; c=relaxed/simple;
+	bh=olxkUNFwK0Tag6o4j7p6P9GWmZAFPKdlUvs7dlGbxUU=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=aA6Ju1GEZhRL9T70olH5JxfKdKMjjicrTnhtIK5oYctLeyJN+Uz6eCDBXWE6fSEEWiWpwq4ElDQ2eX7ZBK/JhWzH5wVXc6pc2HKycYcqgQojCkzWDHC3V43mYaqhiinMP643cZYf0JgdcFZjC9VJgvpFp3Uwm9ztbl2ibspQkKQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YiSfB5DH; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="gQ8n9DV8"
-Received: by mail-ot1-f42.google.com with SMTP id 46e09a7af769-7456b27fac1so3413177a34.2
-        for <linux-block@vger.kernel.org>; Wed, 03 Sep 2025 01:28:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1756888110; x=1757492910; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=X4Gk0WkO/ltGDuq5EYSYDJNW0uN5qNSvxVpuSLyFD1c=;
-        b=gQ8n9DV8X8wB71Mf/KEU0+4WwezsvstFwK9RMULNUPelurPhnCUlb6OS5lzZfXbkfj
-         JKaoyI9OkMihPRu9XhXjCJDcpZrZgegvS2vnroZIdhVVG4mwad4WTSU0i9em+AMNKKMd
-         oacA6eNy/Qlm5iwnP/cZ84It21i2P+mCx/zmSiXkAJxlyirbblvkGPHd2jhovjI9eSAW
-         LT6al7jCb8YE28tRkIcqemQHzb0P9b4f0QadZHgPOS1CeiAcAVc6aH2MzQz96xSRlicQ
-         7TZ+CcDmdhGWoKkcCmTsEXKoDj/AOzKZspE9jmglT1MwjXUsO6YzoPBbh6Sh8vnThQjt
-         dOfQ==
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YiSfB5DH"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1756888581;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=ATJnjvon6PGHuf6owIZ/V8GyLUWmctCBG5gDKklYycE=;
+	b=YiSfB5DH9Le7S8JjOVqZtkwZv1tfzYXyGqBoXaaxPB3WfNFWO2apgFpfygQ4ZWBTu7dGWN
+	iH0Kh0/gzNfKqjlXp93RD+rOtw8q980hZKopIvploPwSGTvdmFTQtrDMJCblh4a7sAbAFl
+	VvDsOnOFTILxPDGgU5fNzAH6z7cO/kM=
+Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
+ [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-592-6lYbltmqM4mqsdp-xvp4pg-1; Wed, 03 Sep 2025 04:36:20 -0400
+X-MC-Unique: 6lYbltmqM4mqsdp-xvp4pg-1
+X-Mimecast-MFC-AGG-ID: 6lYbltmqM4mqsdp-xvp4pg_1756888579
+Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-336e13bf342so15568211fa.3
+        for <linux-block@vger.kernel.org>; Wed, 03 Sep 2025 01:36:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756888110; x=1757492910;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=X4Gk0WkO/ltGDuq5EYSYDJNW0uN5qNSvxVpuSLyFD1c=;
-        b=rqK6l6ozA1gx28jq4/n2KTJUeAENNym5cFyHdo3M+FAdumL/7zRzIuhjlTKt6Se6vG
-         hf1HT/zMR5OaHqaIT5MLedS6NubVahQFA4Qnwh8glaV1HIzISuzu7nd/8N/pKug20ghA
-         pUETb3OfSJAWml3Ixng2YUVILDhBs/PCDZv21xgTAmOCVLdDp2ExvRb1ILdJCKigkTns
-         +OGuFb5zthmJLhALjZM8w++TesTpGSQjoYTBQX1c+RFv+6sVIbzeLK6IpYz2KRqBvmkg
-         StsHUjeAPOJU4khbh+CgfVqfgeFjA2ZCJQt1OFnWosiYMbzeGNddNxeY7+S5MOIDnfX6
-         zSZQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWV/uQ2y4Zjf3RXd/PI9SByfcV5cMsMG/a3h38YEOX0lJhmHoxDUeM64fWWuIwcBAow9d3CKphJ4DLnrA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwxhqENDZbbERt3O8OycafcfGQdovGHGaDovujwgRUrpiL5+mfY
-	HtATqq2ug7vi+vrqpRWF3cENGWP4RoIAzZM46hvdvKzTD0bB6VmRZDUq55lqOYJI8gYgrGthBBB
-	gDbmpwbO87dRriL0cYBfXsd8aqwoGSsuqqE0v9w4kmQ==
-X-Gm-Gg: ASbGncs1NVpsvwkgYE3BE6FnV5PjM8RinMFsuyWGaIiTTRh3OW2Vb/fJGcJAxp8PO9q
-	9iOictXVDFeMA1OwZiIlAM1FLw863kdq5HAW50NmRnr7/FkSiR8oSvOPtKG4fyTCVF88V+5+H9A
-	QPcrPfVFI9VuQYGnmeb/nKIeJYa1qLq95JY1mXtzbldGlXZkI2zuu5I+lEphWAm0dh4OHTnJQEG
-	zDNtzK/avqfloZd
-X-Google-Smtp-Source: AGHT+IGCmULQPRqXwY751nUtLh+1D5afI8G1snYcO3jggywuAFC7i00tRMmVTYcG+Y2fl7Iou0UE3uogU/1EnR3FqSA=
-X-Received: by 2002:a05:6808:bc4:b0:433:fe9c:686d with SMTP id
- 5614622812f47-437f7d016d5mr5934622b6e.21.1756888109793; Wed, 03 Sep 2025
- 01:28:29 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1756888577; x=1757493377;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ATJnjvon6PGHuf6owIZ/V8GyLUWmctCBG5gDKklYycE=;
+        b=Y25sbzZyLEJcmydK5Mq5JM90S2cV3FL6/HMqlfSKiD+7nL8kcSHF27AgjBq9T1xM+B
+         myzlAqLP8oU4HMxDMFe4VW08nqMhmaF7+nD2JSrohF4RGDmrnVLRbGnm3hZuZnfoObHK
+         oA1LdhZ3qbdhJt3hjE7UJHPqvbkRJfowg54db3iO264uYYfkdKmlbqE675r+QgYaI56F
+         bpvmCz3McnoqGcPG15+J/a9tFsrbhKxSJ1bqHrAwcFxEM3MyvR0rupBSrb46c7Oyp4eR
+         EivYbYTMC89x3np0wMMvVtjRfSStA/gQ0mxbA/a4t6EsVkKlO3VSagLdm1XGWMtn4WPo
+         B+Tg==
+X-Gm-Message-State: AOJu0Yxr7O0HHIe/U5RjjvAAP8FH0XbU+lTM9hLI2MgOjCCRuuVX58JV
+	s/Tcx7CnU8EBDZHq8u7HixzkTGh6e2bh6O9S08KEpeL/LgvlCMEkh11g0O4GvNYNG77J5/xLDMZ
+	KTJ9ZJ4/6xlgylDQyQmh10mBQAsRlMDNVPLxZU4YPsVjfx5R4Td2dfdyusH89Fqa4+0FlufoQkF
+	9OYCPSzBIAapnNz4rOYw6Ty5q/DlxtrbMWYwjcAS6vnxIiV2fIV8ZxUW4=
+X-Gm-Gg: ASbGncteNZiCL9eocs2pNwPQPrrma3pZhwp4cJP9RqAmP8zJ6NecJ8T7WQ90pKEjT4E
+	Blrsvk+GCjwy2CsJc9kwSsXWaSobfRrMHSy7lbES23oLTLXmIg6CwMzdkR+24jFEHIU/VOZkuxX
+	gZKpgqy73cJBpYhf5FZHRywQ==
+X-Received: by 2002:a05:651c:41d1:b0:336:bbff:2739 with SMTP id 38308e7fff4ca-336caafe852mr43766081fa.27.1756888577141;
+        Wed, 03 Sep 2025 01:36:17 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFiH6oJawsKiaV2emBtiCryq7VxvYGkKuppaAF88afZzAOgAqdZC7ekdUHgogv4bl+cw6YY3CT+cp1n9V/U4qk=
+X-Received: by 2002:a05:651c:41d1:b0:336:bbff:2739 with SMTP id
+ 38308e7fff4ca-336caafe852mr43765921fa.27.1756888576663; Wed, 03 Sep 2025
+ 01:36:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250822082606.66375-1-changfengnan@bytedance.com>
- <20250822150550.GP7942@frogsfrogsfrogs> <aKiP966iRv5gEBwm@casper.infradead.org>
- <877byv9w6z.fsf@gmail.com> <aKif_644529sRXhN@casper.infradead.org>
- <874ityad1d.fsf@gmail.com> <CAPFOzZufTPCT_56-7LCc6oGHYiaPixix30yFNEsiFfN1s9ySMQ@mail.gmail.com>
- <aKwq_QoiEvtK89vY@infradead.org> <CAPFOzZvBvHWHUwNLnH+Ss90OMdu91oZsSD0D7_ncjVh0pF29rQ@mail.gmail.com>
- <878qj6qb2m.fsf@gmail.com>
-In-Reply-To: <878qj6qb2m.fsf@gmail.com>
-From: Fengnan Chang <changfengnan@bytedance.com>
-Date: Wed, 3 Sep 2025 16:28:19 +0800
-X-Gm-Features: Ac12FXzcH3FvBYuIMHRcDxMXndXly-fnK62pQIHzDq-Gs-RJzqJjIKfLMgOwLoE
-Message-ID: <CAPFOzZsbEgmogYMdt7Koau-GzRf9vu8qF7615VNRjW9cLUREKw@mail.gmail.com>
-Subject: Re: [External] Re: [PATCH] iomap: allow iomap using the per-cpu bio cache
-To: Ritesh Harjani <ritesh.list@gmail.com>
-Cc: Matthew Wilcox <willy@infradead.org>, "Darrick J. Wong" <djwong@kernel.org>, brauner@kernel.org, 
-	linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
-	Christoph Hellwig <hch@infradead.org>
+From: Yi Zhang <yi.zhang@redhat.com>
+Date: Wed, 3 Sep 2025 16:36:04 +0800
+X-Gm-Features: Ac12FXzrYUwte2yTaoqyfew2-kR5ijplB6Zqzb8AbHJYfj3dgzlxAx1SOZrhtFQ
+Message-ID: <CAHj4cs8-cS2E+-xQ-d2Bj6vMJZ+CwT_cbdWBTju4BV35LsvEYw@mail.gmail.com>
+Subject: [bug report]kernel BUG at fs/btrfs/zoned.c:2587! triggered by
+ blktests zbd/009
+To: linux-block <linux-block@vger.kernel.org>, linux-btrfs@vger.kernel.org
+Cc: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Ritesh Harjani <ritesh.list@gmail.com> =E4=BA=8E2025=E5=B9=B48=E6=9C=8827=
-=E6=97=A5=E5=91=A8=E4=B8=89 01:26=E5=86=99=E9=81=93=EF=BC=9A
->
-> Fengnan Chang <changfengnan@bytedance.com> writes:
->
-> > Christoph Hellwig <hch@infradead.org> =E4=BA=8E2025=E5=B9=B48=E6=9C=882=
-5=E6=97=A5=E5=91=A8=E4=B8=80 17:21=E5=86=99=E9=81=93=EF=BC=9A
-> >>
-> >> On Mon, Aug 25, 2025 at 04:51:27PM +0800, Fengnan Chang wrote:
-> >> > No restrictions for now, I think we can enable this by default.
-> >> > Maybe better solution is modify in bio.c?  Let me do some test first=
-.
->
-> If there are other implications to consider, for using per-cpu bio cache
-> by default, then maybe we can first get the optimizations for iomap in
-> for at least REQ_ALLOC_CACHE users and later work on to see if this
-> can be enabled by default for other users too.
-> Unless someone else thinks otherwise.
->
-> Why I am thinking this is - due to limited per-cpu bio cache if everyone
-> uses it for their bio submission, we may not get the best performance
-> where needed. So that might require us to come up with a different
-> approach.
+Hello
+The kernel BUG was triggered by blktests zbd/009 on v6.17-rc3, please
+help check it and let me know if you need any infor/test for it,
+thanks.
 
-Agree, if everyone uses it for their bio submission, we can not get the bes=
-t
-performance.
+# ./check zbd/009
+zbd/009 (test gap zone support with BTRFS)                   [failed]
+    runtime  1.777s  ...  5.890s
+    --- tests/zbd/009.out 2025-09-02 20:08:01.638628999 -0400
+    +++ /root/blktests/results/nodev/zbd/009.out.bad 2025-09-03
+04:18:32.360095891 -0400
+    @@ -1,2 +1,4 @@
+     Running zbd/009
+    -Test complete
+    +tests/zbd/009: line 42:  1461 Segmentation fault         mount -t
+btrfs "${dev}" "${mount_dir}"
+    +modprobe: FATAL: Module scsi_debug is in use.
+    +Test failed
+modprobe: FATAL: Module scsi_debug is in use.
 
->
-> >>
-> >> Any kind of numbers you see where this makes a different, including
-> >> the workloads would also be very valuable here.
-> > I'm test random direct read performance on  io_uring+ext4, and try
-> > compare to io_uring+ raw blkdev,  io_uring+ext4 is quite poor, I'm try =
-to
-> > improve this, I found ext4 is quite different with blkdev when run
-> > bio_alloc_bioset. It's beacuse blkdev ext4  use percpu bio cache, but e=
-xt4
-> > path not. So I make this modify.
->
-> I am assuming you meant to say - DIO with iouring+raw_blkdev uses
-> per-cpu bio cache where as iouring+(ext4/xfs) does not use it.
-> Hence you added this patch which will enable the use of it - which
-> should also improve the performance of iouring+(ext4/xfs).
+[  317.501900] run blktests zbd/009 at 2025-09-03 04:33:43
+[  317.661628] sd 13:0:0:0: [sdn] Synchronizing SCSI cache
+[  318.464792] scsi_debug:sdebug_driver_probe: scsi_debug: trim
+poll_queues to 0. poll_q/nr_hw = (0/1)
+[  318.474936] scsi host13: scsi_debug: version 0191 [20210520]
+                 dev_size_mb=1024, opts=0x0, submit_queues=1, statistics=0
+[  318.502019] scsi 13:0:0:0: Direct-Access-ZBC Linux    scsi_debug
+   0191 PQ: 0 ANSI: 7
+[  318.514301] scsi 13:0:0:0: Power-on or device reset occurred
+[  318.526186] sd 13:0:0:0: Attached scsi generic sg13 type 20
+[  318.527006] sd 13:0:0:0: [sdn] Host-managed zoned block device
+[  318.543292] sd 13:0:0:0: [sdn] 262144 4096-byte logical blocks:
+(1.07 GB/1.00 GiB)
+[  318.552614] sd 13:0:0:0: [sdn] Write Protect is off
+[  318.558137] sd 13:0:0:0: [sdn] Mode Sense: 5b 00 10 08
+[  318.558555] sd 13:0:0:0: [sdn] Write cache: enabled, read cache:
+enabled, supports DPO and FUA
+[  318.568950] sd 13:0:0:0: [sdn] permanent stream count = 5
+[  318.576121] sd 13:0:0:0: [sdn] Preferred minimum I/O size 4096 bytes
+[  318.583446] sd 13:0:0:0: [sdn] Optimal transfer size 4194304 bytes
+[  318.593500] sd 13:0:0:0: [sdn] 256 zones of 1024 logical blocks
+[  318.651787] sd 13:0:0:0: [sdn] Attached SCSI disk
+[  319.736198] BTRFS: device fsid 2c2dcb97-3f07-481c-ad31-dce6d400c303
+devid 1 transid 8 /dev/sdn (8:208) scanned by mount (1370)
+[  319.755053] BTRFS info (device sdn): first mount of filesystem
+2c2dcb97-3f07-481c-ad31-dce6d400c303
+[  319.765257] BTRFS info (device sdn): using crc32c (crc32c-lib)
+checksum algorithm
+[  319.795471] BTRFS info (device sdn): host-managed zoned block
+device /dev/sdn, 256 zones of 4194304 bytes
+[  319.806542] BTRFS info (device sdn): zoned mode enabled with zone
+size 4194304
+[  319.819821] assertion failed: bg->zone_unusable == 0 :: 0, in
+fs/btrfs/zoned.c:2587
+[  319.828449] ------------[ cut here ]------------
+[  319.833618] kernel BUG at fs/btrfs/zoned.c:2587!
+[  319.838793] Oops: invalid opcode: 0000 [#1] SMP KASAN PTI
+[  319.844829] CPU: 3 UID: 0 PID: 1370 Comm: mount Tainted: G        W
+         ------  ---
+6.17.0-0.rc3.250826gfab1beda7597.32.fc44.x86_64+debug #1 PREEMPT(lazy)
+[  319.860948] Tainted: [W]=WARN
+[  319.864259] Hardware name: Dell Inc. PowerEdge R730/0WCJNT, BIOS
+2.19.0 12/12/2023
+[  319.872704] RIP: 0010:btrfs_zoned_reserve_data_reloc_bg.cold+0xb2/0xb4
+[  319.880014] Code: ab e8 7e ab f7 ff 0f 0b 41 b8 1b 0a 00 00 48 c7
+c1 80 9f 59 ab 31 d2 48 c7 c6 20 b8 59 ab 48 c7 c7 20 a0 59 ab e8 5a
+ab f7 ff <0f> 0b 41 b8 5f 0a 00 00 48 c7 c1 80 9f 59 ab 31 d2 48 c7 c6
+00 b9
+[  319.900977] RSP: 0018:ffffc9000c21f930 EFLAGS: 00010282
+[  319.906816] RAX: 0000000000000047 RBX: ffff8888d1a54000 RCX: 0000000000000000
+[  319.914783] RDX: 0000000000000047 RSI: 1ffffffff629cc84 RDI: fffff52001843f18
+[  319.922742] RBP: ffff888121b7c000 R08: ffffffffa802cbb5 R09: fffff52001843edc
+[  319.930709] R10: 0000000000000003 R11: 0000000000000001 R12: 0000000000000000
+[  319.938666] R13: 0000000000000001 R14: ffff888121b7c128 R15: ffff88810f379800
+[  319.946625] FS:  00007fbd89e98840(0000) GS:ffff8890af8e8000(0000)
+knlGS:0000000000000000
+[  319.955661] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[  319.962077] CR2: 0000559e0ad4b540 CR3: 00000008e14ce003 CR4: 00000000003726f0
+[  319.970046] Call Trace:
+[  319.972767]  <TASK>
+[  319.975102]  ? create_space_info+0x155/0x390
+[  319.979880]  open_ctree+0x1874/0x2203
+[  319.983977]  btrfs_fill_super.cold+0x2c/0x16d
+[  319.988850]  btrfs_get_tree_super+0x936/0xd60
+[  319.993725]  btrfs_get_tree_subvol+0x230/0x5f0
+[  319.998692]  vfs_get_tree+0x8b/0x2f0
+[  320.002690]  ? capable+0x58/0xc0
+[  320.006299]  vfs_cmd_create+0xbd/0x280
+[  320.010490]  __do_sys_fsconfig+0x659/0xa40
+[  320.015066]  ? __pfx___do_sys_fsconfig+0x10/0x10
+[  320.020223]  ? rcu_is_watching+0x15/0xe0
+[  320.024608]  ? __pfx___mutex_lock+0x10/0x10
+[  320.029282]  ? fscontext_read+0x24e/0x2a0
+[  320.033761]  ? file_has_perm+0x25b/0x320
+[  320.038149]  ? __pfx___mutex_unlock_slowpath+0x10/0x10
+[  320.043892]  do_syscall_64+0x98/0x3c0
+[  320.047991]  ? fscontext_read+0x24e/0x2a0
+[  320.052468]  ? rw_verify_area+0x6f/0x5f0
+[  320.056855]  ? vfs_read+0x171/0xb20
+[  320.060753]  ? vfs_fstatat+0x75/0xa0
+[  320.064752]  ? __pfx_vfs_read+0x10/0x10
+[  320.069038]  ? vfs_fstatat+0x75/0xa0
+[  320.073032]  ? __pfx_map_id_range_up+0x10/0x10
+[  320.078002]  ? __do_sys_newfstatat+0x83/0xe0
+[  320.082773]  ? __pfx___do_sys_newfstatat+0x10/0x10
+[  320.088128]  ? from_kgid_munged+0x8c/0x120
+[  320.092707]  ? ksys_read+0xff/0x200
+[  320.096606]  ? __pfx_ksys_read+0x10/0x10
+[  320.100987]  ? trace_hardirqs_on_prepare+0x1d/0x30
+[  320.106342]  ? do_syscall_64+0x161/0x3c0
+[  320.110725]  ? trace_irq_enable.constprop.0+0xc0/0x100
+[  320.116465]  ? rcu_is_watching+0x15/0xe0
+[  320.120847]  ? trace_irq_enable.constprop.0+0xc0/0x100
+[  320.126587]  ? trace_hardirqs_on_prepare+0x1d/0x30
+[  320.131938]  ? do_syscall_64+0x161/0x3c0
+[  320.136322]  ? trace_hardirqs_on_prepare+0x1d/0x30
+[  320.141674]  ? do_syscall_64+0x161/0x3c0
+[  320.146055]  ? rcu_is_watching+0x15/0xe0
+[  320.150438]  ? trace_irq_enable.constprop.0+0xc0/0x100
+[  320.156178]  ? trace_hardirqs_on_prepare+0x1d/0x30
+[  320.161529]  ? do_syscall_64+0x161/0x3c0
+[  320.165912]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+[  320.171556] RIP: 0033:0x7fbd8a0782ce
+[  320.175566] Code: 73 01 c3 48 8b 0d 32 3b 0f 00 f7 d8 64 89 01 48
+83 c8 ff c3 0f 1f 84 00 00 00 00 00 f3 0f 1e fa 49 89 ca b8 af 01 00
+00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d 02 3b 0f 00 f7 d8 64 89
+01 48
+[  320.196527] RSP: 002b:00007ffee3b47c88 EFLAGS: 00000246 ORIG_RAX:
+00000000000001af
+[  320.204984] RAX: ffffffffffffffda RBX: 0000557b66ff26f0 RCX: 00007fbd8a0782ce
+[  320.212951] RDX: 0000000000000000 RSI: 0000000000000006 RDI: 0000000000000003
+[  320.220917] RBP: 00007ffee3b47dd0 R08: 0000000000000000 R09: 0000000000000000
+[  320.228876] R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+[  320.236843] R13: 0000557b66ff3860 R14: 00007fbd8a1f9a60 R15: 0000557b66ff3928
+[  320.244817]  </TASK>
+[  320.247257] Modules linked in: scsi_debug null_blk platform_profile
+dell_wmi dell_smbios dell_wmi_descriptor sparse_keymap iTCO_wdt rfkill
+intel_rapl_msr video intel_pmc_bxt iTCO_vendor_support
+intel_rapl_common dcdbas intel_uncore_frequency
+intel_uncore_frequency_common sb_edac x86_pkg_temp_thermal
+intel_powerclamp coretemp kvm_intel kvm irqbypass rapl intel_cstate
+intel_uncore bnx2x mxm_wmi i40e mei_me mei mdio libie bna lpc_ich
+libie_adminq ipmi_ssif ipmi_si acpi_power_meter acpi_ipmi ipmi_devintf
+ipmi_msghandler fuse loop nfnetlink zram lz4hc_compress lz4_compress
+nvme mgag200 polyval_clmulni nvme_core i2c_algo_bit
+ghash_clmulni_intel nvme_keyring bfa nvme_auth megaraid_sas
+scsi_transport_fc wmi i2c_dev [last unloaded: scsi_debug]
+[  320.320131] ---[ end trace 0000000000000000 ]---
+[  320.389848] RIP: 0010:btrfs_zoned_reserve_data_reloc_bg.cold+0xb2/0xb4
+[  320.397161] Code: ab e8 7e ab f7 ff 0f 0b 41 b8 1b 0a 00 00 48 c7
+c1 80 9f 59 ab 31 d2 48 c7 c6 20 b8 59 ab 48 c7 c7 20 a0 59 ab e8 5a
+ab f7 ff <0f> 0b 41 b8 5f 0a 00 00 48 c7 c1 80 9f 59 ab 31 d2 48 c7 c6
+00 b9
+[  320.418138] RSP: 0018:ffffc9000c21f930 EFLAGS: 00010282
+[  320.423987] RAX: 0000000000000047 RBX: ffff8888d1a54000 RCX: 0000000000000000
+[  320.431967] RDX: 0000000000000047 RSI: 1ffffffff629cc84 RDI: fffff52001843f18
+[  320.439947] RBP: ffff888121b7c000 R08: ffffffffa802cbb5 R09: fffff52001843edc
+[  320.447924] R10: 0000000000000003 R11: 0000000000000001 R12: 0000000000000000
+[  320.455903] R13: 0000000000000001 R14: ffff888121b7c128 R15: ffff88810f379800
+[  320.463881] FS:  00007fbd89e98840(0000) GS:ffff8890af8e8000(0000)
+knlGS:0000000000000000
+[  320.472926] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[  320.479353] CR2: 0000559e0ad4b540 CR3: 00000008e14ce003 CR4: 00000000003726f0
+[  320.487333] note: mount[1370] exited with preempt_count 1
 
-Yes. DIO+iouring+raw_blkdev vs DIO+iouring+(ext4/xfs).
 
->
-> That make sense to me.
->
-> > My test command is:
-> > /fio/t/io_uring -p0 -d128 -b4096 -s1 -c1 -F1 -B1 -R1 -X1 -n1 -P1 -t0
-> > /data01/testfile
-> > Without this patch:
-> > BW is 1950MB
-> > with this patch
-> > BW is 2001MB.
->
-> Ok. That's around 2.6% improvement.. Is that what you were expecting to
-> see too? Is that because you were testing with -p0 (non-polled I/O)?
+-- 
+Best Regards,
+  Yi Zhang
 
-I don't have a quantitative target for expectations, 2.6% seems reasonable.
-Not related to -p0, with -p1, about 3.1% improvement.
-Why we can't get 5-6% improvement? I think the biggest bottlenecks are
-in ext4/xfs, most in ext4_es_lookup_extent.
-
->
-> Looking at the numbers here [1] & [2], I was hoping this could give
-> maybe around 5-6% improvement ;)
->
-> [1]: https://lore.kernel.org/io-uring/cover.1666347703.git.asml.silence@g=
-mail.com/
-> [2]: https://lore.kernel.org/all/20220806152004.382170-3-axboe@kernel.dk/
->
->
-> -ritesh
