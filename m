@@ -1,137 +1,85 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95D2932F740;
-	Wed,  3 Sep 2025 03:32:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FA2B221FCA
+	for <linux-block@vger.kernel.org>; Wed,  3 Sep 2025 03:47:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756870341; cv=none; b=UKNfRQPDhSb7p+4/Wfv3XTdfIs51PaiHxO7AlU7Uco5oz+sqOxjHF438ibH4JKa8AP2YMf+khgEPDyedmjsftH24qI+mIFRJnPUHcYo8z5Qlx+IYXF72k7g1MAh2uhXjB1ImChypZP2VO0mj/WCiIinulK1zPAzhlEwEgx3o4L0=
+	t=1756871235; cv=none; b=EMfNFbjVVcKfN9px8oMZkUqHcSoIDkcmq8qPFIBg1sLZaH5YwA0U7DgBMqfgsj4IfePdybFyWr+IlxW4uiSB6zHAWe34Nossk3cRoFTKX5KRM6ht8YUEmGDYwWfDBk/5+bEk2+HtCnTWZYy2CKqVt4zql6po57lcEBzi4nMlo+0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756870341; c=relaxed/simple;
-	bh=1armfrQSPhghEXbEgCR40kMT3Mz1KUNVgAlY6GjrTLM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=J5t5VZXgL/5Iof6OoWLFo3U1JfXrDUBu3hVZfePtCs16N4B/zwrcpCdWF5EmmR9bz4kftQTc+tOyppvPyFtKM+m5+YtnovbWV3uiDJ8FjlShx5IrpkZg3QttQElhH/1khn+snkJjD9WDehyCIr2qMeogk0BceX0EmBfunuymcOk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c6/aA16+; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1756871235; c=relaxed/simple;
+	bh=2pQ8jDzZasIWA5+gZ8m0h0ujwZ/qawrxqftq2PEbKqw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=MXSjiKuZ1CEYN3Q2QzZVbll/Rna0bL+9nV35b+ykJk/95FKj5AS4Z78tnOfM9KbL+64ReS8EewBbLLqT0Fx841HuKdPOy524l05R7RT2o+HG4xX7n5yIVwmkCd31gHwdIoJUBbjW69B7AncdLCDCtOh+LhxSvcNgy+4YKHs0onE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=QHuLdsNT; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c6/aA16+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C22F8C4CEF0;
-	Wed,  3 Sep 2025 03:32:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756870340;
-	bh=1armfrQSPhghEXbEgCR40kMT3Mz1KUNVgAlY6GjrTLM=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=c6/aA16+bBkQH51tR2bcv5SM6tXtTwJMULf4022Tate2FmzdfUbzGvPiP2fkcVpWI
-	 RriSmrsN2ZlJj0IloB/qX3FQ3Nx9cN4lqbucrjYT4KLxt2DgUbVBqvIKo2olMXLgfB
-	 9N5kKv4v3IBmC1YJev3/3rxoXwXwhR46dCAt8jPxByNLb/XkehQ3Po6KdKfM7VpmMm
-	 1Q1BM8WVxFsEMqVtGOxGMqeKmeEKRty2lb7WMxAWqJ6tmtHvJWE+KovB1IE7Kw9o50
-	 ge8OGusvBxfm+9So2e0mbnLX+HsjFa6ZxAt4PFAo/YR4SAEcoNc0h0IuibbyWbTQJn
-	 FVh2NdAaEjS2A==
-Message-ID: <3242f4a2-9a5f-4165-8d24-5c2387967277@kernel.org>
-Date: Tue, 2 Sep 2025 22:32:05 -0500
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="QHuLdsNT"
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-24aacdf40a2so8665195ad.1
+        for <linux-block@vger.kernel.org>; Tue, 02 Sep 2025 20:47:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1756871232; x=1757476032; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2pQ8jDzZasIWA5+gZ8m0h0ujwZ/qawrxqftq2PEbKqw=;
+        b=QHuLdsNTna8OmqCK2rBoW370F91Jmjg6px/pcbxDAbYSWu6lg3BXGYNigIQbhY6pN1
+         kGmD4d/YMkBrLBAe9g0CHCadfyDOjc4olP1t/UaEqjhUWw4LTiwok5i6+hFOWmBEoy0E
+         2/xeW2iijZ9Q1gOnlY6s4BwjiaDmH96EXgGy7gGELgb6QhLhD3YgmgqClv2y9M9xqkZd
+         S+exWLOcG7EwhQcaIwgCvtdPZb+hLxwKQrNzcad4PMn4FsqFZmaLbnsRD7Z063LxAfYY
+         szWjAumJYFoIC2H3Vi28WDz6Jj1NUNFB6KukKPOXK4dm/tzNrNPJnJtCbJk1UT50Ckj1
+         qjcA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756871232; x=1757476032;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2pQ8jDzZasIWA5+gZ8m0h0ujwZ/qawrxqftq2PEbKqw=;
+        b=BXSrHvOHeqZhLWAVvwPzy0osR5Qh2bsh8kwUMT0khD0dDBzYu2TzbThCW6dfoXWnyt
+         QmQNCjExemZ0L3WljAhlEoGK1WvOFbIe5lEZIq7aMmDCg2/GMM2a5M8IejuGx4dge9nN
+         vgWlDj4hBk8n7Xxza2zHae11KjjEuCMEKDzuZjB7qqostSlch0t1zDhbsG6cmG/BxqlX
+         uhDSzaPxvdnMCxQtoeAYQU2oIFp8hVSXZ3GEza9WIDgpvvHsZWx5/4M4HyHj2w4WNQUO
+         JWVBD7FHFAX/Z8XNRyzjsb3mP3DVPE5K5zjwPrbq0S+sdQbFaT4+Jj4twS8bf6QJLKlw
+         96Sg==
+X-Forwarded-Encrypted: i=1; AJvYcCWs8IG6oed5CvsMWAGwfxHltREmRaUm3wvjtU+Bq08JNkRKatT+nSBitcYNvv/hwIM10Z2mJrb73UFijw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YynjwFlXxmWi9r2bA/LmNcu475oT4CEZaWfKIUJwrrCAU6JhuGc
+	R+HMGaRrvaSIDquoBo1p3Jp5LrhOREY0GTnBiCHKQsCfgzM8MfDPv9IolV7//3WEU74ul7euBjI
+	eY8DgmMPA9620wMTk/HtyzbKr4jT/pWmR+uD1XoqH/A==
+X-Gm-Gg: ASbGnct0O4PSBkHRb76o5EyiQrocEoiOIeCuhZg0OtMBzHs8XISE3NA1JY2awhIZ0cV
+	Vg4aArSgVWZL7dQyikn7AgzKxnkIqdYOBemzSuc2mImtbhisx9n/aY2WTZgGgP94PC3eQqkVm40
+	sj4imb+vYcPo+wXW4n/RqF89W5SkKwkIrxQ0+l26/5PRpl0aIe9BvWmKKzFO8VwIKB/OXyOAdwE
+	QtAUZ5vHOnAua286Q7/8GPAzHlpNe2zSQ==
+X-Google-Smtp-Source: AGHT+IFeVBJ/Z5E9XZsB3C3xPIRC+M1KZv9BteaXEzfzJqEPOwFV3blAzzS3ngvmlLPBTmnEKi4X7Pac7tdUMdZjTbg=
+X-Received: by 2002:a17:902:c943:b0:248:bac6:4fc6 with SMTP id
+ d9443c01a7336-2490f6bc65cmr122195635ad.1.1756871232173; Tue, 02 Sep 2025
+ 20:47:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 04/14] Documentation: amd-pstate: Use internal link to
- kselftest
-To: Bagas Sanjaya <bagasdotme@gmail.com>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Linux Documentation <linux-doc@vger.kernel.org>,
- Linux DAMON <damon@lists.linux.dev>,
- Linux Memory Management List <linux-mm@kvack.org>,
- Linux Power Management <linux-pm@vger.kernel.org>,
- Linux Block Devices <linux-block@vger.kernel.org>,
- Linux BPF <bpf@vger.kernel.org>,
- Linux Kernel Workflows <workflows@vger.kernel.org>,
- Linux KASAN <kasan-dev@googlegroups.com>,
- Linux Devicetree <devicetree@vger.kernel.org>,
- Linux fsverity <fsverity@lists.linux.dev>,
- Linux MTD <linux-mtd@lists.infradead.org>,
- Linux DRI Development <dri-devel@lists.freedesktop.org>,
- Linux Kernel Build System <linux-lbuild@vger.kernel.org>,
- Linux Networking <netdev@vger.kernel.org>,
- Linux Sound <linux-sound@vger.kernel.org>
-Cc: Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>,
- Peter Zijlstra <peterz@infradead.org>, Josh Poimboeuf <jpoimboe@kernel.org>,
- Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
- Jonathan Corbet <corbet@lwn.net>, SeongJae Park <sj@kernel.org>,
- Andrew Morton <akpm@linux-foundation.org>,
- David Hildenbrand <david@redhat.com>,
- Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
- "Liam R. Howlett" <Liam.Howlett@oracle.com>, Vlastimil Babka
- <vbabka@suse.cz>, Mike Rapoport <rppt@kernel.org>,
- Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>,
- Huang Rui <ray.huang@amd.com>, "Gautham R. Shenoy" <gautham.shenoy@amd.com>,
- Perry Yuan <perry.yuan@amd.com>, Jens Axboe <axboe@kernel.dk>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
- <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>,
- Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Dwaipayan Ray <dwaipayanray1@gmail.com>,
- Lukas Bulwahn <lukas.bulwahn@gmail.com>, Joe Perches <joe@perches.com>,
- Andrey Ryabinin <ryabinin.a.a@gmail.com>,
- Alexander Potapenko <glider@google.com>,
- Andrey Konovalov <andreyknvl@gmail.com>, Dmitry Vyukov <dvyukov@google.com>,
- Vincenzo Frascino <vincenzo.frascino@arm.com>, Rob Herring
- <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Eric Biggers <ebiggers@kernel.org>,
- tytso@mit.edu, Richard Weinberger <richard@nod.at>,
- Zhihao Cheng <chengzhihao1@huawei.com>, David Airlie <airlied@gmail.com>,
- Simona Vetter <simona@ffwll.ch>,
- Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
- Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>,
- Nathan Chancellor <nathan@kernel.org>,
- Nicolas Schier <nicolas.schier@linux.dev>, Ingo Molnar <mingo@redhat.com>,
- Will Deacon <will@kernel.org>, Boqun Feng <boqun.feng@gmail.com>,
- Waiman Long <longman@redhat.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Shay Agroskin <shayagr@amazon.com>, Arthur Kiyanovski <akiyano@amazon.com>,
- David Arinzon <darinzon@amazon.com>, Saeed Bishara <saeedb@amazon.com>,
- Andrew Lunn <andrew@lunn.ch>, Liam Girdwood <lgirdwood@gmail.com>,
- Mark Brown <broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>,
- Takashi Iwai <tiwai@suse.com>, Alexandru Ciobotaru <alcioa@amazon.com>,
- The AWS Nitro Enclaves Team <aws-nitro-enclaves-devel@amazon.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
- Steve French <stfrench@microsoft.com>,
- Meetakshi Setiya <msetiya@microsoft.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- Bart Van Assche <bvanassche@acm.org>, =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?=
- <linux@weissschuh.net>, Masahiro Yamada <masahiroy@kernel.org>
-References: <20250829075524.45635-1-bagasdotme@gmail.com>
- <20250829075524.45635-5-bagasdotme@gmail.com>
-Content-Language: en-US
-From: Mario Limonciello <superm1@kernel.org>
-In-Reply-To: <20250829075524.45635-5-bagasdotme@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20250901100242.3231000-1-ming.lei@redhat.com> <20250901100242.3231000-2-ming.lei@redhat.com>
+In-Reply-To: <20250901100242.3231000-2-ming.lei@redhat.com>
+From: Caleb Sander Mateos <csander@purestorage.com>
+Date: Tue, 2 Sep 2025 20:47:00 -0700
+X-Gm-Features: Ac12FXzAk-8v2R4QEHKE5ou60KmwJ8ugXfW4I9uM-9LvWv8OHjxBXAYVhQ7WU-o
+Message-ID: <CADUfDZoQkD8sqAAsYb5_-xDkjqcZtabZ4jVrfWJ3-3LXVvApBA@mail.gmail.com>
+Subject: Re: [PATCH 01/23] ublk: add parameter `struct io_uring_cmd *` to ublk_prep_auto_buf_reg()
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
+	Uday Shankar <ushankar@purestorage.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 8/29/2025 2:55 AM, Bagas Sanjaya wrote:
-> Convert kselftest docs link to internal cross-reference.
-> 
-> Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
-> ---
->   Documentation/admin-guide/pm/amd-pstate.rst | 3 +--
->   1 file changed, 1 insertion(+), 2 deletions(-)
-> 
-> diff --git a/Documentation/admin-guide/pm/amd-pstate.rst b/Documentation/admin-guide/pm/amd-pstate.rst
-> index e1771f2225d5f0..37082f2493a7c1 100644
-> --- a/Documentation/admin-guide/pm/amd-pstate.rst
-> +++ b/Documentation/admin-guide/pm/amd-pstate.rst
-> @@ -798,5 +798,4 @@ Reference
->   .. [3] Processor Programming Reference (PPR) for AMD Family 19h Model 51h, Revision A1 Processors
->          https://www.amd.com/system/files/TechDocs/56569-A1-PUB.zip
->   
-> -.. [4] Linux Kernel Selftests,
-> -       https://www.kernel.org/doc/html/latest/dev-tools/kselftest.html
-> +.. [4] Documentation/dev-tools/kselftest.rst
+On Mon, Sep 1, 2025 at 3:03=E2=80=AFAM Ming Lei <ming.lei@redhat.com> wrote=
+:
+>
+> Add parameter `struct io_uring_cmd *` to ublk_prep_auto_buf_reg() and
+> prepare for reusing this helper for the coming UBLK_BATCH_IO feature,
+> which can fetch & commit one batch of io commands via single uring_cmd.
+>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
 
-Acked-by: Mario Limonciello (AMD) <superm1@kernel.org>
-
+Reviewed-by: Caleb Sander Mateos <csander@purestorage.com>
