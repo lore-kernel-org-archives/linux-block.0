@@ -1,108 +1,137 @@
-Received: from out203-205-221-209.mail.qq.com (out203-205-221-209.mail.qq.com [203.205.221.209])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8E0B253944;
-	Wed,  3 Sep 2025 02:56:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.209
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95D2932F740;
+	Wed,  3 Sep 2025 03:32:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756868198; cv=none; b=RHrrHfsPIDiKIZRFdEs/A3oK3yjAxi3tSrreWnGq2naI28LYbRuhCD1bxvwlnxPi9+0ia92PiNZRooVcXS185yZLNKeJjRC6rOeExgQvDdgHBIDQDlaC4f0q5oStWQZbE4oqdlHrygWd3ouhvOQoyppeo1PGcyHcm6Fl9VoEXIU=
+	t=1756870341; cv=none; b=UKNfRQPDhSb7p+4/Wfv3XTdfIs51PaiHxO7AlU7Uco5oz+sqOxjHF438ibH4JKa8AP2YMf+khgEPDyedmjsftH24qI+mIFRJnPUHcYo8z5Qlx+IYXF72k7g1MAh2uhXjB1ImChypZP2VO0mj/WCiIinulK1zPAzhlEwEgx3o4L0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756868198; c=relaxed/simple;
-	bh=3S0O5j09jByTVKpKUxhX/L770aYSwCNoU8tbKyOPim0=;
-	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
-	 MIME-Version; b=dcxmJwsDFgySNJuE1+vAI6hCdOeItFfknawE8fpOSboJUIgI5LVmoTi5lVcq6I86JVDmJp9Wylj2O8JTW3Yu0xWPkKjjogcL2W4vsMDz0Kj1hx8TesXcprSImFe2TZJFuaK4xNCz0rf2aeb634ErRAAcBesPQ1NpfMRiFpP8OHk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=nbnKhG+Q; arc=none smtp.client-ip=203.205.221.209
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
+	s=arc-20240116; t=1756870341; c=relaxed/simple;
+	bh=1armfrQSPhghEXbEgCR40kMT3Mz1KUNVgAlY6GjrTLM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=J5t5VZXgL/5Iof6OoWLFo3U1JfXrDUBu3hVZfePtCs16N4B/zwrcpCdWF5EmmR9bz4kftQTc+tOyppvPyFtKM+m5+YtnovbWV3uiDJ8FjlShx5IrpkZg3QttQElhH/1khn+snkJjD9WDehyCIr2qMeogk0BceX0EmBfunuymcOk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c6/aA16+; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="nbnKhG+Q"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
-	s=s201512; t=1756868174;
-	bh=3sg0BqN482BG4zMESM20Xi2WG/XC5mgF+as+5lnUqXI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=nbnKhG+Q99WkAkyCiu26zqPF45mjyOZR58PdtMp+pGXcDLEp/WEHydvRXEAXSC/cX
-	 ITV+WIuZ80Yvd2ZFicDo1/rGhU8JBx137ajZ45EsNwkWZUwubMOSEtPydoPGmeJi8T
-	 hRIJR8F3IA1mo5WwwPiQgw4gkV8klBZ8e3ZRb6x0=
-Received: from SSOC3-SH.company.local ([58.33.109.195])
-	by newxmesmtplogicsvrsza36-0.qq.com (NewEsmtp) with SMTP
-	id DF7246ED; Wed, 03 Sep 2025 10:55:55 +0800
-X-QQ-mid: xmsmtpt1756868155t9obqy343
-Message-ID: <tencent_9DE422078550681A63BE8AC4C6DE7CB29809@qq.com>
-X-QQ-XMAILINFO: NmRjDopJZVxOLuX2YDs1H2GJIsdzgPRQeROhzzfEUa0iWkERuy4R4lH5cErN31
-	 WgMVfS/nFAIf+ImufX4hLYQf6cvPbvdYfi3Mzd+mx8DX/txPNROxnRZq0bm6S+ojKCcYZa4UuZZl
-	 X4TIZsvVdfY1Jh9n0DcyrDWb8L7BOoTP/rHtrDJFJLjxll+Q/3D9P/pjavfvdyeeRCsDAodyRS8N
-	 5bkIMUe6Pnj/C41WF1FSB4Lk4QL/o68VgZAoN2xtlJtCtc09jzPmDCghbERvGNMa1yB65rsxdlJm
-	 NhHy+Q+FjFdY9ZGB/5st0bq7escYVTw0EyG6Pv4ycs83EmHGAjrKG2mQu5xY/k2VpYLA65SNqiUs
-	 fhvq8pNT4VhFXCCI+UvSERRDL0jp7UoLuGH6lE4YCCsOROATCew/0jkLQe9vBbDLJSr4gmnr0QTx
-	 o1KAn/a1q1WaH8uY9/ws2rsdO2ZfSAU3xMEY23+H1SThmEMro9Kjet4qzzT6lqhOx8ngUOYciouV
-	 rCGu3CIVkQ7opAG94csgHbs2A3AzQHvqQ4Upg98hXSkCVJTnNtnlaIERt23IaTzqpZ2X246nyPq2
-	 49rg633uAN+8rBPnj0D7gzYLsdaMdPEoVyN1GU5rHrNt2NI8ImKtsAX2tx8bb2S09APP9YJ64hEi
-	 hLvc7tYpn9p9hDK14phxN4sC39FkilmeLkp5pVbCVNpIxWUKiGsGOP7rJzp5y1S3zBYkSn4g7+T9
-	 xnzMvytjM4mnnxrx1j8FKSLuRm35JmeJawIrS2GRlolCMa6ty85JHZixvfeXi2MFcoTh69QRw81p
-	 W2y3CG8MbZMfoQ/oeEVPQ6/26VknD+onqgadzYobjHUIrYc99vrCLuw8H19IbmXOBXogHmwP7HeY
-	 MEIffhWZOmU7iwhy/CYJiuu1Ck89SCD1Hdswi956EV2RIY4viIhlvLlWyxXKYZUSLEf/anbVSvLA
-	 u0OxU8g0u5V/6iJxt04QpcjeK2mgGt+slky6MopybAVYMo2wj4JNybAJrI6DFotdWKg/AzAh2Uq4
-	 uqcOxxdbhiOgLSfi1qExBC2B+Fv3EU8oxaH7BmYW2TDkx4AzOY/bt0a95Qh9kOHgzh0LWHHA==
-X-QQ-XMRINFO: MPJ6Tf5t3I/ycC2BItcBVIA=
-From: Han Guangjiang <gj.han@foxmail.com>
-To: hailan@yukuai.org.cn
-Cc: axboe@kernel.dk,
-	fanggeng@lixiang.com,
-	gj.han@foxmail.com,
-	hanguangjiang@lixiang.com,
-	liangjie@lixiang.com,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	yangchen11@lixiang.com
-Subject: Re: [PATCH] blk-throttle: check policy bit in blk_throtl_activated()
-Date: Wed,  3 Sep 2025 10:55:55 +0800
-X-OQ-MSGID: <20250903025555.949316-1-gj.han@foxmail.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <59464ad0-856c-4ec3-b5b7-e7799c337a84@yukuai.org.cn>
-References: <59464ad0-856c-4ec3-b5b7-e7799c337a84@yukuai.org.cn>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c6/aA16+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C22F8C4CEF0;
+	Wed,  3 Sep 2025 03:32:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756870340;
+	bh=1armfrQSPhghEXbEgCR40kMT3Mz1KUNVgAlY6GjrTLM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=c6/aA16+bBkQH51tR2bcv5SM6tXtTwJMULf4022Tate2FmzdfUbzGvPiP2fkcVpWI
+	 RriSmrsN2ZlJj0IloB/qX3FQ3Nx9cN4lqbucrjYT4KLxt2DgUbVBqvIKo2olMXLgfB
+	 9N5kKv4v3IBmC1YJev3/3rxoXwXwhR46dCAt8jPxByNLb/XkehQ3Po6KdKfM7VpmMm
+	 1Q1BM8WVxFsEMqVtGOxGMqeKmeEKRty2lb7WMxAWqJ6tmtHvJWE+KovB1IE7Kw9o50
+	 ge8OGusvBxfm+9So2e0mbnLX+HsjFa6ZxAt4PFAo/YR4SAEcoNc0h0IuibbyWbTQJn
+	 FVh2NdAaEjS2A==
+Message-ID: <3242f4a2-9a5f-4165-8d24-5c2387967277@kernel.org>
+Date: Tue, 2 Sep 2025 22:32:05 -0500
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 04/14] Documentation: amd-pstate: Use internal link to
+ kselftest
+To: Bagas Sanjaya <bagasdotme@gmail.com>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Linux Documentation <linux-doc@vger.kernel.org>,
+ Linux DAMON <damon@lists.linux.dev>,
+ Linux Memory Management List <linux-mm@kvack.org>,
+ Linux Power Management <linux-pm@vger.kernel.org>,
+ Linux Block Devices <linux-block@vger.kernel.org>,
+ Linux BPF <bpf@vger.kernel.org>,
+ Linux Kernel Workflows <workflows@vger.kernel.org>,
+ Linux KASAN <kasan-dev@googlegroups.com>,
+ Linux Devicetree <devicetree@vger.kernel.org>,
+ Linux fsverity <fsverity@lists.linux.dev>,
+ Linux MTD <linux-mtd@lists.infradead.org>,
+ Linux DRI Development <dri-devel@lists.freedesktop.org>,
+ Linux Kernel Build System <linux-lbuild@vger.kernel.org>,
+ Linux Networking <netdev@vger.kernel.org>,
+ Linux Sound <linux-sound@vger.kernel.org>
+Cc: Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>,
+ Peter Zijlstra <peterz@infradead.org>, Josh Poimboeuf <jpoimboe@kernel.org>,
+ Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+ Jonathan Corbet <corbet@lwn.net>, SeongJae Park <sj@kernel.org>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ David Hildenbrand <david@redhat.com>,
+ Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+ "Liam R. Howlett" <Liam.Howlett@oracle.com>, Vlastimil Babka
+ <vbabka@suse.cz>, Mike Rapoport <rppt@kernel.org>,
+ Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>,
+ Huang Rui <ray.huang@amd.com>, "Gautham R. Shenoy" <gautham.shenoy@amd.com>,
+ Perry Yuan <perry.yuan@amd.com>, Jens Axboe <axboe@kernel.dk>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
+ <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>,
+ Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Dwaipayan Ray <dwaipayanray1@gmail.com>,
+ Lukas Bulwahn <lukas.bulwahn@gmail.com>, Joe Perches <joe@perches.com>,
+ Andrey Ryabinin <ryabinin.a.a@gmail.com>,
+ Alexander Potapenko <glider@google.com>,
+ Andrey Konovalov <andreyknvl@gmail.com>, Dmitry Vyukov <dvyukov@google.com>,
+ Vincenzo Frascino <vincenzo.frascino@arm.com>, Rob Herring
+ <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Eric Biggers <ebiggers@kernel.org>,
+ tytso@mit.edu, Richard Weinberger <richard@nod.at>,
+ Zhihao Cheng <chengzhihao1@huawei.com>, David Airlie <airlied@gmail.com>,
+ Simona Vetter <simona@ffwll.ch>,
+ Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+ Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>,
+ Nathan Chancellor <nathan@kernel.org>,
+ Nicolas Schier <nicolas.schier@linux.dev>, Ingo Molnar <mingo@redhat.com>,
+ Will Deacon <will@kernel.org>, Boqun Feng <boqun.feng@gmail.com>,
+ Waiman Long <longman@redhat.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Shay Agroskin <shayagr@amazon.com>, Arthur Kiyanovski <akiyano@amazon.com>,
+ David Arinzon <darinzon@amazon.com>, Saeed Bishara <saeedb@amazon.com>,
+ Andrew Lunn <andrew@lunn.ch>, Liam Girdwood <lgirdwood@gmail.com>,
+ Mark Brown <broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>,
+ Takashi Iwai <tiwai@suse.com>, Alexandru Ciobotaru <alcioa@amazon.com>,
+ The AWS Nitro Enclaves Team <aws-nitro-enclaves-devel@amazon.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
+ Steve French <stfrench@microsoft.com>,
+ Meetakshi Setiya <msetiya@microsoft.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ Bart Van Assche <bvanassche@acm.org>, =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?=
+ <linux@weissschuh.net>, Masahiro Yamada <masahiroy@kernel.org>
+References: <20250829075524.45635-1-bagasdotme@gmail.com>
+ <20250829075524.45635-5-bagasdotme@gmail.com>
+Content-Language: en-US
+From: Mario Limonciello <superm1@kernel.org>
+In-Reply-To: <20250829075524.45635-5-bagasdotme@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi Kuai,
+On 8/29/2025 2:55 AM, Bagas Sanjaya wrote:
+> Convert kselftest docs link to internal cross-reference.
+> 
+> Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
+> ---
+>   Documentation/admin-guide/pm/amd-pstate.rst | 3 +--
+>   1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/Documentation/admin-guide/pm/amd-pstate.rst b/Documentation/admin-guide/pm/amd-pstate.rst
+> index e1771f2225d5f0..37082f2493a7c1 100644
+> --- a/Documentation/admin-guide/pm/amd-pstate.rst
+> +++ b/Documentation/admin-guide/pm/amd-pstate.rst
+> @@ -798,5 +798,4 @@ Reference
+>   .. [3] Processor Programming Reference (PPR) for AMD Family 19h Model 51h, Revision A1 Processors
+>          https://www.amd.com/system/files/TechDocs/56569-A1-PUB.zip
+>   
+> -.. [4] Linux Kernel Selftests,
+> -       https://www.kernel.org/doc/html/latest/dev-tools/kselftest.html
+> +.. [4] Documentation/dev-tools/kselftest.rst
 
-> Instead of add checking from hot path, do you consider delaying setting q->td
-> until policy is activated from the slow path? I think this is better solution.
-
-Thank you for your review. You're absolutely right that performance 
-considerations in the hot path are important.
-
-We actually considered delaying the setting of q->td until after policy 
-activation, but we found that q->td is needed by blkcg_activate_policy() 
-during its execution, so it has to be set before calling 
-blkcg_activate_policy().
-
-We explored several alternative approaches:
-
-1) Adding a dedicated flag like 'throttle_ready' to struct request_queue: 
-   - Set this flag at the end of blk_throtl_init()
-   - Check this flag in blk_throtl_activated() to determine if policy 
-     loading is complete
-   - However, this requires adding a new bool variable to the struct
-
-2) Reusing the q->td pointer with low-order bit flags:
-   - Use pointer low-order bits to mark initialization completion status
-   - This would avoid adding new fields but requires careful handling 
-     and additional processing
-
-Given these constraints, we chose the current approach of checking the 
-policy bit in blk_throtl_activated() as it:
-- Doesn't require struct changes
-- Provides a clean, atomic check
-- Aligns with the existing policy activation mechanism
-
-We would appreciate your suggestions on how to better handle this 
-initialization race condition.
-
-Thanks,
-Han Guangjiang
+Acked-by: Mario Limonciello (AMD) <superm1@kernel.org>
 
