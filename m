@@ -1,90 +1,155 @@
-Received: from pegase2.c-s.fr (pegase2.c-s.fr [93.17.235.10])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25AA029ACE5;
-	Thu,  4 Sep 2025 07:21:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.235.10
+Received: from out162-62-57-49.mail.qq.com (out162-62-57-49.mail.qq.com [162.62.57.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7086B28934F;
+	Thu,  4 Sep 2025 08:17:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756970477; cv=none; b=Cx77HlUx7PccTIWq2NgL8HmTyxrVnDqs4OPHiqraSfiK0lKt5d3wCRz1kw4G9+DBBY5hw11B/BVXJQWSaO13Mxh5TbTSWA07aYOW3GTz4nZbG13/tO8LaiWa3CcWZx634/nkFkXhXDyjgTVpNljlLq4h56yq6uZFQB8zX7Jw910=
+	t=1756973879; cv=none; b=NNSvi9i29PihlUq1jFQYCJ6gRTilHGyXj/2YAjJNu744fFEoEJGfONw3a6jMa7KORfeBhAN1kdWlFvJbqK7ZEIx3BSl2Lak/ohtuLlVr7jxYo8sKHkb0OS9gOqz/1C8ex/DGS+mMdLI2vrqyITqQeZLV7HPaEnBsAnpjKNRm79I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756970477; c=relaxed/simple;
-	bh=64Idyk7KpaYg2cooNWe1O1ydAYcDe1fcDSernhyvyEM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=e2OtZXiE+w3/qiQcrZkvJSTdj2RwfCIXkUQiRKo2BMiXAW+bteDA0q+vidNf0FT+sCBvVNVgjE2Bs+A5MmJPCvcf7bkimjVTqh53sZ8wbihaEID5nv5E1vKcSDC5spbIFucO7RwcUCW41HmXq3NWm919HSah5NA9M2kk/qN9wCk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.235.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
-Received: from localhost (mailhub4.si.c-s.fr [172.26.127.67])
-	by localhost (Postfix) with ESMTP id 4cHVwp4xsdz9sVh;
-	Thu,  4 Sep 2025 09:10:02 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from pegase2.c-s.fr ([172.26.127.65])
-	by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id WEv7Y2YJZkgd; Thu,  4 Sep 2025 09:10:02 +0200 (CEST)
-Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
-	by pegase2.c-s.fr (Postfix) with ESMTP id 4cHVwp4BWrz9sVk;
-	Thu,  4 Sep 2025 09:10:02 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id 784388B764;
-	Thu,  4 Sep 2025 09:10:02 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from messagerie.si.c-s.fr ([127.0.0.1])
-	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
-	with ESMTP id JZAEJLwTYdG3; Thu,  4 Sep 2025 09:10:02 +0200 (CEST)
-Received: from [192.168.235.99] (unknown [192.168.235.99])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id 23FBF8B763;
-	Thu,  4 Sep 2025 09:10:02 +0200 (CEST)
-Message-ID: <3b333f4e-9817-4a5b-bf0a-f8a9d33575e9@csgroup.eu>
-Date: Thu, 4 Sep 2025 09:10:01 +0200
+	s=arc-20240116; t=1756973879; c=relaxed/simple;
+	bh=iB8zf4ILLJtrhXWACql/9RfpikVB1vZodKodgHO7l2M=;
+	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
+	 MIME-Version; b=q7Je1wpqpOQcAFE229981K/ijP7BqWME44sM0cLIiMwHeBf4lAJ0tDwzvvK8nMsYbGqiQS5uTSrkHJ7QnFWRKswot/FA1VfYfDtl2KQrYUwmKdiHcWhBWf2UTqILQW4IBhl3VOfAhQNV6DxLvhWyGR+4AIWN3G99MhQLHM3o5xg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=KUwYP7X/; arc=none smtp.client-ip=162.62.57.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="KUwYP7X/"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
+	s=s201512; t=1756973864;
+	bh=gkJTf2c1jzQR5OVVEr7uU0ySLW7GWWkeJTjOv6J6hGk=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=KUwYP7X/0SLY51bF3laX/H+jmhb3g25s0lnndGhL2sGBD/M1PSJO4wAlcMju7HbZv
+	 Fx5ehgaLpPbaSMiWKFYyVf9Nx4MrFUVUv5WBxPFe1hOgVmpjE1W2+gTWvPqzge98Db
+	 ZnASVxnepi0RAb8fvDR9UGavce7uhwHwX4uYDgfE=
+Received: from SSOC3-SH.company.local ([58.33.109.195])
+	by newxmesmtplogicsvrszc41-0.qq.com (NewEsmtp) with SMTP
+	id 45E044AB; Thu, 04 Sep 2025 16:17:30 +0800
+X-QQ-mid: xmsmtpt1756973850tuug394uz
+Message-ID: <tencent_2B678DA920124B08854638A6BE68746CCC05@qq.com>
+X-QQ-XMAILINFO: N2bAIxLK0elnhXEhPkfXE/RSi6PihdH4cXUbzQ0GGcOAG32Qhxgni3WQaKSVHI
+	 pRmntZwJtpUeAE507+g9Q3g63Y1T3y/vhMZD89SZnn3YZU02ZWLUFmBVRDfAOZlJ+uc9J5bcvgIs
+	 zJ4nqLuVLpnWZTqtVjLJ3Bht2UOxsZDhcmRX22rY+43hd/4aZkfRamGs2A08Z33vlXXykWuMwSH+
+	 0ZnJcBS3ey5ABVx8sojnRJMubsSHhFtfJKzU6Y8kULz4hitlNKsSMZL0WUX8+67ioGjd7S5Vmyls
+	 xWUDbLrpEK7J54PYb4/Whw/24gpXmpAkfifO60NUDScQQ5SHIdarpFRKVcFd0WFM5aUgt3kUsMoO
+	 SrLctRWZOORFmz7165O4nVhiX3RoAwyJ26IfYO+JIgbI5/t3XaA1ZxD27xsJhxxVGn/ebkcR76v7
+	 34GTasWshqzU9DT35H8u3PhYYCcYVEDmtiXm8DYOqELECFBgSPPPLxzehYvcAqJbvxubG5YHDPLf
+	 p4wKJZ/FKyLHjpag+h6boHAQylzevEgsTDhpm94z3VHosp5lWqzRLkhUBBguCM927sbgdt5QjGun
+	 3gc9oj89FEXWdrfWobXcm6TqZw6ub1whPa/PXB+91E4lldSViMrh5GVnfwITqcbyL7lCuTaBKlG1
+	 gfhAWSx40P16RvU6XDYteu7PKjs5YYeAsVqwfNHXuZZz5OOvL9e9dcm+/6eL3n8cS3Yi14ZR3X3D
+	 DDouRsD/ehhXjU6AU2NAMoz9dTZVWGFhLNF/r9iCIF81MmYGC7Kc9FQ2DB19hqQXDTDf6Ah3OMqo
+	 GyxScuPL6sxvUP0dmhEExoWd78A9/7dvofok+bCZBOKpOY/lRN8gajzTYnMdRtOGH+RvoQk0VWG0
+	 aKJhrIcoplhIIl7k8RthT2oOmfAZ3eSKgx6Ur7za3/jEheYTA7nzgsOz4Z4DAYHNY/qblYSdVjzy
+	 RCLziPTySMPuin2F9eEgSkYTdYk05TfkPgQXzj3imHCs0TgoXXPOAQS6720M0x
+X-QQ-XMRINFO: Mp0Kj//9VHAxr69bL5MkOOs=
+From: Han Guangjiang <gj.han@foxmail.com>
+To: yukuai1@huaweicloud.com,
+	Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org (open list:BLOCK LAYER),
+	linux-kernel@vger.kernel.org (open list)
+Cc: hanguangjiang@lixiang.com,
+	fanggeng@lixiang.com,
+	yangchen11@lixiang.com,
+	liangjie@lixiang.com
+Subject: [PATCH v2] blk-throttle: fix access race during throttle policy activation
+Date: Thu,  4 Sep 2025 16:17:26 +0800
+X-OQ-MSGID: <20250904081727.3975758-1-gj.han@foxmail.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <59464ad0-856c-4ec3-b5b7-e7799c337a84@yukuai.org.cn>
+References: <59464ad0-856c-4ec3-b5b7-e7799c337a84@yukuai.org.cn>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 5/7] powerpc: Stop calling page_address() in
- free_pages()
-To: "Vishal Moola (Oracle)" <vishal.moola@gmail.com>, linux-mm@kvack.org
-Cc: linux-kernel@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>,
- linux-block@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
- linux-efi@vger.kernel.org, virtualization@lists.linux.dev,
- Madhavan Srinivasan <maddy@linux.ibm.com>,
- Michael Ellerman <mpe@ellerman.id.au>,
- "Ritesh Harjani (IBM)" <ritesh.list@gmail.com>
-References: <20250903185921.1785167-1-vishal.moola@gmail.com>
- <20250903185921.1785167-6-vishal.moola@gmail.com>
-From: Christophe Leroy <christophe.leroy@csgroup.eu>
-Content-Language: fr-FR
-In-Reply-To: <20250903185921.1785167-6-vishal.moola@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
+From: Han Guangjiang <hanguangjiang@lixiang.com>
 
+On repeated cold boots we occasionally hit a NULL pointer crash in
+blk_should_throtl() when throttling is consulted before the throttle
+policy is fully enabled for the queue. Checking only q->td != NULL is
+insufficient during early initialization, so blkg_to_pd() for the
+throttle policy can still return NULL and blkg_to_tg() becomes NULL,
+which later gets dereferenced.
 
-Le 03/09/2025 à 20:59, Vishal Moola (Oracle) a écrit :
-> free_pages() should be used when we only have a virtual address. We
-> should call __free_pages() directly on our page instead.
-> 
-> Signed-off-by: Vishal Moola (Oracle) <vishal.moola@gmail.com>
-> Reviewed-by: Ritesh Harjani (IBM) <ritesh.list@gmail.com>
+ Unable to handle kernel NULL pointer dereference
+ at virtual address 0000000000000156
+ ...
+ pc : submit_bio_noacct+0x14c/0x4c8
+ lr : submit_bio_noacct+0x48/0x4c8
+ sp : ffff800087f0b690
+ x29: ffff800087f0b690 x28: 0000000000005f90 x27: ffff00068af393c0
+ x26: 0000000000080000 x25: 000000000002fbc0 x24: ffff000684ddcc70
+ x23: 0000000000000000 x22: 0000000000000000 x21: 0000000000000000
+ x20: 0000000000080000 x19: ffff000684ddcd08 x18: ffffffffffffffff
+ x17: 0000000000000000 x16: ffff80008132a550 x15: 0000ffff98020fff
+ x14: 0000000000000000 x13: 1fffe000d11d7021 x12: ffff000688eb810c
+ x11: ffff00077ec4bb80 x10: ffff000688dcb720 x9 : ffff80008068ef60
+ x8 : 00000a6fb8a86e85 x7 : 000000000000111e x6 : 0000000000000002
+ x5 : 0000000000000246 x4 : 0000000000015cff x3 : 0000000000394500
+ x2 : ffff000682e35e40 x1 : 0000000000364940 x0 : 000000000000001a
+ Call trace:
+  submit_bio_noacct+0x14c/0x4c8
+  verity_map+0x178/0x2c8
+  __map_bio+0x228/0x250
+  dm_submit_bio+0x1c4/0x678
+  __submit_bio+0x170/0x230
+  submit_bio_noacct_nocheck+0x16c/0x388
+  submit_bio_noacct+0x16c/0x4c8
+  submit_bio+0xb4/0x210
+  f2fs_submit_read_bio+0x4c/0xf0
+  f2fs_mpage_readpages+0x3b0/0x5f0
+  f2fs_readahead+0x90/0xe8
 
-Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu>
+Tighten blk_throtl_activated() to also require that the throttle policy
+bit is set on the queue:
 
-> ---
->   arch/powerpc/mm/book3s64/radix_pgtable.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/powerpc/mm/book3s64/radix_pgtable.c b/arch/powerpc/mm/book3s64/radix_pgtable.c
-> index be523e5fe9c5..73977dbabcf2 100644
-> --- a/arch/powerpc/mm/book3s64/radix_pgtable.c
-> +++ b/arch/powerpc/mm/book3s64/radix_pgtable.c
-> @@ -780,7 +780,7 @@ static void __meminit free_vmemmap_pages(struct page *page,
->   		while (nr_pages--)
->   			free_reserved_page(page++);
->   	} else
-> -		free_pages((unsigned long)page_address(page), order);
-> +		__free_pages(page, order);
->   }
->   
->   static void __meminit remove_pte_table(pte_t *pte_start, unsigned long addr,
+  return q->td != NULL &&
+         test_bit(blkcg_policy_throtl.plid, q->blkcg_pols);
+
+This prevents blk_should_throtl() from accessing throttle group state
+until policy data has been attached to blkgs.
+
+Fixes: a3166c51702b ("blk-throttle: delay initialization until configuration")
+Co-developed-by: Liang Jie <liangjie@lixiang.com>
+Signed-off-by: Liang Jie <liangjie@lixiang.com>
+Signed-off-by: Han Guangjiang <hanguangjiang@lixiang.com>
+---
+v2:
+ - remove the comment about freeze queue in blk_should_throtl()
+ - Retitle: "blk-throttle: fix access race during throttle policy activation"
+---
+ block/blk-throttle.h | 7 +------
+ 1 file changed, 1 insertion(+), 6 deletions(-)
+
+diff --git a/block/blk-throttle.h b/block/blk-throttle.h
+index 3b27755bfbff..fbf97c531c48 100644
+--- a/block/blk-throttle.h
++++ b/block/blk-throttle.h
+@@ -156,7 +156,7 @@ void blk_throtl_cancel_bios(struct gendisk *disk);
+ 
+ static inline bool blk_throtl_activated(struct request_queue *q)
+ {
+-	return q->td != NULL;
++	return q->td != NULL && test_bit(blkcg_policy_throtl.plid, q->blkcg_pols);
+ }
+ 
+ static inline bool blk_should_throtl(struct bio *bio)
+@@ -164,11 +164,6 @@ static inline bool blk_should_throtl(struct bio *bio)
+ 	struct throtl_grp *tg;
+ 	int rw = bio_data_dir(bio);
+ 
+-	/*
+-	 * This is called under bio_queue_enter(), and it's synchronized with
+-	 * the activation of blk-throtl, which is protected by
+-	 * blk_mq_freeze_queue().
+-	 */
+ 	if (!blk_throtl_activated(bio->bi_bdev->bd_queue))
+ 		return false;
+ 
+-- 
+2.25.1
 
