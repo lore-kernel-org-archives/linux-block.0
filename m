@@ -1,121 +1,90 @@
-Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DEC223D7EC
-	for <linux-block@vger.kernel.org>; Thu,  4 Sep 2025 06:37:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.33
+Received: from pegase2.c-s.fr (pegase2.c-s.fr [93.17.235.10])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25AA029ACE5;
+	Thu,  4 Sep 2025 07:21:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.235.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756967864; cv=none; b=LEymAP5Yetsjhme0MdDrg322Im/fHZIcPYZ+rjtvpIoN0Jo9nF76x/uJO/ClcYhHuqOa3bJgUur0nWTkcQr+vkhql8v2O/Nfi6CesYoKZfcpZ/xVN+FmCL88ZlNXn9Z+0k0TyGXWiPtMhh2eDnEQ9pm2lRFFeMgYAcDzvlcYNv8=
+	t=1756970477; cv=none; b=Cx77HlUx7PccTIWq2NgL8HmTyxrVnDqs4OPHiqraSfiK0lKt5d3wCRz1kw4G9+DBBY5hw11B/BVXJQWSaO13Mxh5TbTSWA07aYOW3GTz4nZbG13/tO8LaiWa3CcWZx634/nkFkXhXDyjgTVpNljlLq4h56yq6uZFQB8zX7Jw910=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756967864; c=relaxed/simple;
-	bh=4G9E878SIS/wbuyZyR8KFsHh8YP6quGk35BoPlc/5o0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:MIME-Version:
-	 Content-Type:References; b=RDHkvDoi08tiCPHXWQFmJ4LUyhNywvdwtN/DamoLNkckw63jG4klyolcZGMW40zatqxnWrhKUMl2WZ7Ahnxdid8xMOkNXOzpcD5i+DUoaEGSCYJak7OtAPYYkObzssjlLUo3yET14MIppZYywtzJLDglXCV8KLICNBkY8SHRr1k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=rYnNUfie; arc=none smtp.client-ip=203.254.224.33
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="rYnNUfie"
-Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
-	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20250904063740epoutp0380f1ecb1cfbb5c78352ce8fbd4f133a4~iAPXQ4hnM1917519175epoutp03V
-	for <linux-block@vger.kernel.org>; Thu,  4 Sep 2025 06:37:40 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20250904063740epoutp0380f1ecb1cfbb5c78352ce8fbd4f133a4~iAPXQ4hnM1917519175epoutp03V
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1756967860;
-	bh=L7d+FR1/8tzMMzgyBtzSiqeqlPWmljT4OodjD28MEuE=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=rYnNUfieCPp1two5PYM4yfmwkEP5UrJka+GQycWZGrula6GFRqwzXYDzLC1560hgW
-	 yYs/zyxj0peIaR/sRVFZ9oaPwQL/SzRbd5uNpdDhZ0Ivj2fzSozf4x/L1d0FWHknCL
-	 jM28GCeU7AHEV9RNmRyWJKItiNkNHyTc1IpjO884=
-Received: from epsnrtp01.localdomain (unknown [182.195.42.153]) by
-	epcas5p4.samsung.com (KnoxPortal) with ESMTPS id
-	20250904063740epcas5p46e506f80abbf698a49575878c2fd3dc1~iAPW97Ib01444614446epcas5p4c;
-	Thu,  4 Sep 2025 06:37:40 +0000 (GMT)
-Received: from epcas5p2.samsung.com (unknown [182.195.38.87]) by
-	epsnrtp01.localdomain (Postfix) with ESMTP id 4cHVCQ6wY7z6B9mB; Thu,  4 Sep
-	2025 06:37:38 +0000 (GMT)
-Received: from epsmtip2.samsung.com (unknown [182.195.34.31]) by
-	epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
-	20250904063643epcas5p3a831ee47fb91bae02b07dfe398b77dd8~iAOibCy-J0506205062epcas5p3A;
-	Thu,  4 Sep 2025 06:36:43 +0000 (GMT)
-Received: from node122.. (unknown [109.105.118.122]) by epsmtip2.samsung.com
-	(KnoxPortal) with ESMTPA id
-	20250904063642epsmtip249667dfd8f792ee479b5833d10408d3d~iAOhnvQLo1627016270epsmtip2u;
-	Thu,  4 Sep 2025 06:36:42 +0000 (GMT)
-From: Xue He <xue01.he@samsung.com>
-To: yukuai1@huaweicloud.com, axboe@kernel.dk
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	yukuai3@huawei.com
-Subject: Re: [PATCH] block: plug attempts to batch allocate tags multiple
- times
-Date: Thu,  4 Sep 2025 06:32:09 +0000
-Message-Id: <20250904063209.12586-1-xue01.he@samsung.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <bfc12406-e608-b3fa-45e7-2105d9cc15bf@huaweicloud.com>
+	s=arc-20240116; t=1756970477; c=relaxed/simple;
+	bh=64Idyk7KpaYg2cooNWe1O1ydAYcDe1fcDSernhyvyEM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=e2OtZXiE+w3/qiQcrZkvJSTdj2RwfCIXkUQiRKo2BMiXAW+bteDA0q+vidNf0FT+sCBvVNVgjE2Bs+A5MmJPCvcf7bkimjVTqh53sZ8wbihaEID5nv5E1vKcSDC5spbIFucO7RwcUCW41HmXq3NWm919HSah5NA9M2kk/qN9wCk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.235.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
+Received: from localhost (mailhub4.si.c-s.fr [172.26.127.67])
+	by localhost (Postfix) with ESMTP id 4cHVwp4xsdz9sVh;
+	Thu,  4 Sep 2025 09:10:02 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from pegase2.c-s.fr ([172.26.127.65])
+	by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id WEv7Y2YJZkgd; Thu,  4 Sep 2025 09:10:02 +0200 (CEST)
+Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
+	by pegase2.c-s.fr (Postfix) with ESMTP id 4cHVwp4BWrz9sVk;
+	Thu,  4 Sep 2025 09:10:02 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id 784388B764;
+	Thu,  4 Sep 2025 09:10:02 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from messagerie.si.c-s.fr ([127.0.0.1])
+	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
+	with ESMTP id JZAEJLwTYdG3; Thu,  4 Sep 2025 09:10:02 +0200 (CEST)
+Received: from [192.168.235.99] (unknown [192.168.235.99])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id 23FBF8B763;
+	Thu,  4 Sep 2025 09:10:02 +0200 (CEST)
+Message-ID: <3b333f4e-9817-4a5b-bf0a-f8a9d33575e9@csgroup.eu>
+Date: Thu, 4 Sep 2025 09:10:01 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 5/7] powerpc: Stop calling page_address() in
+ free_pages()
+To: "Vishal Moola (Oracle)" <vishal.moola@gmail.com>, linux-mm@kvack.org
+Cc: linux-kernel@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>,
+ linux-block@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
+ linux-efi@vger.kernel.org, virtualization@lists.linux.dev,
+ Madhavan Srinivasan <maddy@linux.ibm.com>,
+ Michael Ellerman <mpe@ellerman.id.au>,
+ "Ritesh Harjani (IBM)" <ritesh.list@gmail.com>
+References: <20250903185921.1785167-1-vishal.moola@gmail.com>
+ <20250903185921.1785167-6-vishal.moola@gmail.com>
+From: Christophe Leroy <christophe.leroy@csgroup.eu>
+Content-Language: fr-FR
+In-Reply-To: <20250903185921.1785167-6-vishal.moola@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CMS-MailID: 20250904063643epcas5p3a831ee47fb91bae02b07dfe398b77dd8
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-cpgsPolicy: CPGSC10-505,Y
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20250904063643epcas5p3a831ee47fb91bae02b07dfe398b77dd8
-References: <bfc12406-e608-b3fa-45e7-2105d9cc15bf@huaweicloud.com>
-	<CGME20250904063643epcas5p3a831ee47fb91bae02b07dfe398b77dd8@epcas5p3.samsung.com>
 
-On 2025/09/03/18:35PM, Yu Kuai wrote:
->On 2025/09/03 16:41 PM, Xue He wrote:
->> On 2025/09/02 08:47 AM, Yu Kuai wrote:
->>> On 2025/09/01 16:22 PM, Xue He wrote:
->> ......
->> 
->> the information of my nvme like this:
->> number of CPU: 16
->> memory: 16G
->> nvme nvme0: 16/0/16 default/read/poll queue
->> cat /sys/class/nvme/nvme0/nvme0n1/queue/nr_requests
->> 1023
->> 
->> In more precise terms, I think it is not that the tags are fully exhausted,
->> but rather that after scanning the bitmap for free bits, the remaining
->> contiguous bits are nsufficient to meet the requirement (have but not enough).
->> The specific function involved is __sbitmap_queue_get_batch in lib/sbitmap.c.
->>                      get_mask = ((1UL << nr_tags) - 1) << nr;
->>                      if (nr_tags > 1) {
->>                              printk("before %ld\n", get_mask);
->>                      }
->>                      while (!atomic_long_try_cmpxchg(ptr, &val,
->>                                                        get_mask | val))
->>                              ;
->>                      get_mask = (get_mask & ~val) >> nr;
->> 
->> where during the batch acquisition of contiguous free bits, an atomic operation
->> is performed, resulting in the actual tag_mask obtained differing from the
->> originally requested one.
->
->Yes, so this function will likely to obtain less tags than nr_tags,the
->mask is always start from first zero bit with nr_tags bit, and
->sbitmap_deferred_clear() is called uncondionally, it's likely there are
->non-zero bits within this range.
->
->Just wonder, do you consider fixing this directly in
->__blk_mq_alloc_requests_batch()?
->
->  - call sbitmap_deferred_clear() and retry on allocation failure, so
->that the whole word can be used even if previous allocated request are
->done, especially for nvme with huge tag depths;
->  - retry blk_mq_get_tags() until data->nr_tags is zero;
->
 
-I haven't tried this yet, as I'm concerned that if it spin here, it might
-introduce more latency. Anyway, I may try to implement this idea and do some
-tests to observe the results.
 
-Thanks.
+Le 03/09/2025 à 20:59, Vishal Moola (Oracle) a écrit :
+> free_pages() should be used when we only have a virtual address. We
+> should call __free_pages() directly on our page instead.
+> 
+> Signed-off-by: Vishal Moola (Oracle) <vishal.moola@gmail.com>
+> Reviewed-by: Ritesh Harjani (IBM) <ritesh.list@gmail.com>
+
+Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu>
+
+> ---
+>   arch/powerpc/mm/book3s64/radix_pgtable.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/powerpc/mm/book3s64/radix_pgtable.c b/arch/powerpc/mm/book3s64/radix_pgtable.c
+> index be523e5fe9c5..73977dbabcf2 100644
+> --- a/arch/powerpc/mm/book3s64/radix_pgtable.c
+> +++ b/arch/powerpc/mm/book3s64/radix_pgtable.c
+> @@ -780,7 +780,7 @@ static void __meminit free_vmemmap_pages(struct page *page,
+>   		while (nr_pages--)
+>   			free_reserved_page(page++);
+>   	} else
+> -		free_pages((unsigned long)page_address(page), order);
+> +		__free_pages(page, order);
+>   }
+>   
+>   static void __meminit remove_pte_table(pte_t *pte_start, unsigned long addr,
+
