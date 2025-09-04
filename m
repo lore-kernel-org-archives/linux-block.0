@@ -1,104 +1,122 @@
-Received: from mail-il1-f177.google.com (mail-il1-f177.google.com [209.85.166.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 733692ED143
-	for <linux-block@vger.kernel.org>; Wed,  3 Sep 2025 23:36:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 368E63BBF2;
+	Thu,  4 Sep 2025 00:50:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756942581; cv=none; b=KxaFeLx9A5xMP7/MXxxUjCIpxTbVJ9vee9u0qJ9AqlQM6HOyOC6gqqGOUvPN8eJ14FCXF/Dc6EdPiEZLc94ZIhcv0Bk767GXrFj3JVFcT7oJ7LIyjHVVYNl8fVsqpHYUJ/d9+vrArbgiBYSfT7eH1OxbvpJuxjGIRx6hLjnVmxw=
+	t=1756947032; cv=none; b=YsH6bB6x1Mc45SB3XFlMKYQB0rHiGHgExyydWNjdJShKDMOE9weJJi74MoZTKPFhEzHGHXl9k0aoTfa4LObd/Okwt+RGJP5ZxNGDbqQfPwZk3a5KndsVhilEfIFXDd7lK3HaXDVMS22yeokpyFz+khl7kXraHXAJGnpdgcrqkOE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756942581; c=relaxed/simple;
-	bh=hTsUf+7pIdM/lXCqAe9D86CNr2C3O5JzzF0WNrYSDIU=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=a/PH3J021WOieEaVDtrSlv2K8zY8W/KoSQ8KIt5+Pdt3EASZEaYuND4wx+a0EnLdT4YZZtzhx00jPC5cHsER2sDUMRnK3Z9deLdom7IxuTOqaB2PKOCQylVrEWvGFJI45HDuUgRuiALHylIGrMkChIf/N5wBZVrNiJk7C89n/RM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=DrXH5bNF; arc=none smtp.client-ip=209.85.166.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="DrXH5bNF"
-Received: by mail-il1-f177.google.com with SMTP id e9e14a558f8ab-3f660084016so3428805ab.3
-        for <linux-block@vger.kernel.org>; Wed, 03 Sep 2025 16:36:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1756942579; x=1757547379; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QpgLGMWO0awdNrt/VLr9OxSO9rXyxL66JQE1TwfW2uw=;
-        b=DrXH5bNFOFDGGBA7a5ba+H5TbdMgdKJAPsxeN4Wj+n6XUT19vlRnPmbEcboKP2x9/q
-         vKe72MjpspPHgJO1O6V/2Z0OmngQ34mgRZjowDqlobqLsQgo6zn1pR5GP86rJwsQheDO
-         0YyMvNhINfsQnp+ik5KdD04ddXO5arfXG3oW0d+iXpmBsqxAFHw8hjVRlxbBh06l1ZHj
-         PfUlnJkIbXrsX0JivnIvFsdtN3dCxkdjB0db3X/lUY/+cZ73q7yRKm6RYe89yMQmObkH
-         wv5XzJqZ1DhvieyJr2PM6cfSnQlM9kqTD6VtDUBXvcPQyc3266cRyS+K+jfbB667qKb1
-         dCJA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756942579; x=1757547379;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QpgLGMWO0awdNrt/VLr9OxSO9rXyxL66JQE1TwfW2uw=;
-        b=bDSub4M1l+Fj5C6Cs5GMxVUY3puwPv3BPf00SiW3uwb2OVurvCezJFei0kjS/QKDGz
-         8UZbi08hfWOUvvwZZQ6Iar3/NiHCg/98U5OpbMu4lgVKuJAOx/I7++ZhFLxrV10h5u7N
-         TbSeEt0hOZi0yqFlg823BALTRmfg0LlaliDFsEBMRJ2QeRVnUKw/47tnRdjgcR902H6B
-         2bByMxYX6oH13KZTfvHlcJH3DIrat8oEl2L4D7mewoDND16SkGPmkg6iUDrBLep2wxoU
-         b7uRqhgbXYimj3Xg+yXgtRrr/qEbj/jBm496trH//NjwP/n1Op8hdPIQFof9JaL/AvUy
-         LIjw==
-X-Gm-Message-State: AOJu0YzHGIDxpbihMSILnUrbsyZs49NtsmNdd4UQ7lKO8mp6X8SRhT58
-	RFmYLWGQBh4bz77+5YDan8gHiOtJlIIg7XcOKK0xyZBmLRxSMgYZK5XbtROU/Bdtbig=
-X-Gm-Gg: ASbGncscgvNt4ud+JjMDq4yHuDP3KTKvjntRSxSD4aCganAwcOIQHUzJ9MKhMfCNOXl
-	B4TpRSZdvkd6HpP7JAxa/aApqmBjXIdtE9+3Qb7E2mwiRU8Bx03fJv9EehkILNyGIVX8TDpqeUF
-	mB7COd+Khj0/n4EIiPdjOI9ypiOIqWxGrxCLvskbAXmhPfy3JvtYH+gLJXcBRPuIRhgmVh9DD1r
-	kbT6/hIvSSAY5UtK94PE4Duw219hPpJ24xWYeIwMD67OFNszaZXxJEnQGoLAuvnX6rMvzt5BU5A
-	QcgXe3M5wf3H29ZD4RhrqXFxuOlBs+LtDKGomZExbVWsgDjTKLBX8xnTeZA+/acijmAugOdhi6y
-	PjwvSLCP2Q5PySCFkz5j28QmiHvz3TSTrWX/G
-X-Google-Smtp-Source: AGHT+IHnXqc+QrXXfnvVjSXU+Urf58cLLyfm4Xz21aO3AQHu4oJHxvNC61ADrYGkuPGDXqoCBDPmSw==
-X-Received: by 2002:a92:cda5:0:b0:3f6:6228:33d3 with SMTP id e9e14a558f8ab-3f662283597mr46635955ab.19.1756942579489;
-        Wed, 03 Sep 2025 16:36:19 -0700 (PDT)
-Received: from [127.0.0.1] ([70.88.81.106])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3f65d1ef2c7sm18736855ab.5.2025.09.03.16.36.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Sep 2025 16:36:18 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: Ming Lei <ming.lei@redhat.com>, 
- Caleb Sander Mateos <csander@purestorage.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-In-Reply-To: <20250808153251.282107-1-csander@purestorage.com>
-References: <20250808153251.282107-1-csander@purestorage.com>
-Subject: Re: [PATCH] ublk: inline __ublk_ch_uring_cmd()
-Message-Id: <175694257775.217330.8898056117894470803.b4-ty@kernel.dk>
-Date: Wed, 03 Sep 2025 17:36:17 -0600
+	s=arc-20240116; t=1756947032; c=relaxed/simple;
+	bh=WhL2lpXnpH/xQrI8S/IAldN9C5OZWpkHcqkvMEsCQBw=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=CkHspUjybXk/C06oYm9VA3ho97DBrIuyBBOVv5WRwWXm4hqKUS4Yc9VoaoSvbQ1dxgIK/wH4rb77vWhHj3AZV3ROcyBzDNoMrS1bxO7WgmpmTZHkEGY434rezg7PxRvAHmcxJtG0iQE8qOuDNQWSmps5GPSxDizopBMegVMYsrY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4cHLVp31kbzKHMrq;
+	Thu,  4 Sep 2025 08:50:26 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 5367C1A092F;
+	Thu,  4 Sep 2025 08:50:26 +0800 (CST)
+Received: from [10.174.179.143] (unknown [10.174.179.143])
+	by APP4 (Coremail) with SMTP id gCh0CgAncY1P4rho6Uc_BQ--.5353S3;
+	Thu, 04 Sep 2025 08:50:25 +0800 (CST)
+Subject: Re: [PATCH RFC v3 11/15] md/md-linear: convert to use
+ bio_submit_split_bioset()
+To: Bart Van Assche <bvanassche@acm.org>, Yu Kuai <yukuai1@huaweicloud.com>,
+ hch@infradead.org, colyli@kernel.org, hare@suse.de, dlemoal@kernel.org,
+ tieren@fnnas.com, axboe@kernel.dk, tj@kernel.org, josef@toxicpanda.com,
+ song@kernel.org, kmo@daterainc.com, satyat@google.com, ebiggers@google.com,
+ neil@brown.name, akpm@linux-foundation.org
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ cgroups@vger.kernel.org, linux-raid@vger.kernel.org, yi.zhang@huawei.com,
+ yangerkun@huawei.com, johnny.chenyi@huawei.com,
+ "yukuai (C)" <yukuai3@huawei.com>
+References: <20250901033220.42982-1-yukuai1@huaweicloud.com>
+ <20250901033220.42982-12-yukuai1@huaweicloud.com>
+ <238625a0-c9ab-4354-a23e-d8a8bdd869ad@acm.org>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <5db345bd-fee5-8dce-3f61-1f8efb758f05@huaweicloud.com>
+Date: Thu, 4 Sep 2025 08:50:22 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-2ce6c
+In-Reply-To: <238625a0-c9ab-4354-a23e-d8a8bdd869ad@acm.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgAncY1P4rho6Uc_BQ--.5353S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7AFW8XF4xCrWkXFW8uw4fuFg_yoW8CF4kpF
+	WkGry5GrWUJr18Gw1UXryUta4rJr1UJ345JFW7J3W8JF1UGryq9r1UXr109r1DJrWrCr1j
+	qr1UJr1UZF1UJrUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUBY14x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
+	6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
+	c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxkF7I0En4kS14v26r4a6rW5MxAIw28IcxkI7V
+	AKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCj
+	r7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6x
+	IIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAI
+	w20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x
+	0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7sRidbbtUUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
+Hi,
 
-On Fri, 08 Aug 2025 09:32:50 -0600, Caleb Sander Mateos wrote:
-> ublk_ch_uring_cmd_local() is a thin wrapper around __ublk_ch_uring_cmd()
-> that copies the ublksrv_io_cmd from user-mapped memory to the stack
-> using READ_ONCE(). This ublksrv_io_cmd is passed by pointer to
-> __ublk_ch_uring_cmd() and __ublk_ch_uring_cmd() is a large function
-> unlikely to be inlined, so __ublk_ch_uring_cmd() will have to load the
-> ublksrv_io_cmd fields back from the stack. Inline __ublk_ch_uring_cmd()
-> into ublk_ch_uring_cmd_local() and load the ublksrv_io_cmd fields into
-> local variables with READ_ONCE(). This allows the compiler to delay
-> loading the fields until they are needed and choose whether to store
-> them in registers or on the stack.
+在 2025/09/04 1:43, Bart Van Assche 写道:
+> On 8/31/25 8:32 PM, Yu Kuai wrote:
+>> From: Yu Kuai <yukuai3@huawei.com>
+>>
+>> Unify bio split code, prepare to fix disordered split IO.
+>>
+>> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+>> ---
+>>   drivers/md/md-linear.c | 12 ++----------
+>>   1 file changed, 2 insertions(+), 10 deletions(-)
+>>
+>> diff --git a/drivers/md/md-linear.c b/drivers/md/md-linear.c
+>> index 59d7963c7843..701e3aac0a21 100644
+>> --- a/drivers/md/md-linear.c
+>> +++ b/drivers/md/md-linear.c
+>> @@ -256,19 +256,11 @@ static bool linear_make_request(struct mddev 
+>> *mddev, struct bio *bio)
+>>       if (unlikely(bio_end_sector(bio) > end_sector)) {
+>>           /* This bio crosses a device boundary, so we have to split 
+>> it */
+>> -        struct bio *split = bio_split(bio, end_sector - bio_sector,
+>> +        bio = bio_submit_split_bioset(bio, end_sector - bio_sector,
+>>                             GFP_NOIO, &mddev->bio_set);
 > 
-> [...]
+> This patch cannot have been tested because it triggers the following
+> build error:
 
-Applied, thanks!
+Yes, sorry about that. As I said I only tested with raid5 with this
+RFC version. I will at least run all the test cases in the next formal
+version.
 
-[1/1] ublk: inline __ublk_ch_uring_cmd()
-      commit: 225dc96f35afce6ffe3d798ffc0064445847a63b
+Thanks,
+Kuai
 
-Best regards,
--- 
-Jens Axboe
-
-
+> 
+> drivers/md/md-linear.c: In function ‘linear_make_request’:
+> ./include/linux/gfp_types.h:381:25: error: passing argument 3 of 
+> ‘bio_submit_split_bioset’ makes pointer from integer without a cast 
+> [-Wint-conversion]
+>    381 | #define GFP_NOIO        (__GFP_RECLAIM)
+>        |                         ^~~~~~~~~~~~~~~
+>        |                         |
+>        |                         unsigned int
+> 
+> Bart.
+> .
+> 
 
