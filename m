@@ -1,60 +1,62 @@
-Received: from out162-62-57-49.mail.qq.com (out162-62-57-49.mail.qq.com [162.62.57.49])
+Received: from xmbghk7.mail.qq.com (xmbghk7.mail.qq.com [43.163.128.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7086B28934F;
-	Thu,  4 Sep 2025 08:17:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61F2E2877EE;
+	Thu,  4 Sep 2025 08:25:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=43.163.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756973879; cv=none; b=NNSvi9i29PihlUq1jFQYCJ6gRTilHGyXj/2YAjJNu744fFEoEJGfONw3a6jMa7KORfeBhAN1kdWlFvJbqK7ZEIx3BSl2Lak/ohtuLlVr7jxYo8sKHkb0OS9gOqz/1C8ex/DGS+mMdLI2vrqyITqQeZLV7HPaEnBsAnpjKNRm79I=
+	t=1756974309; cv=none; b=tMvF8ZjCDiaTMRmiwvUGX8DdaNfadj7JYhUDdERc7N5iuxYRuLDTVtozRv2PaD+wnxJAsugHkzyrhYiTIhdyE8diSidYRe1mhXSN29png79VL7ZbpfRjRqp5Cm29abuBXe+lHDrtZO+MTLOVEU0XH5Yyo6elgZkLYlvLKxq1J/I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756973879; c=relaxed/simple;
-	bh=iB8zf4ILLJtrhXWACql/9RfpikVB1vZodKodgHO7l2M=;
+	s=arc-20240116; t=1756974309; c=relaxed/simple;
+	bh=0w+xnx8GDzBkVH9MReXmk6GUPZ5qZuiT3Hfka7nZ3z4=;
 	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
-	 MIME-Version; b=q7Je1wpqpOQcAFE229981K/ijP7BqWME44sM0cLIiMwHeBf4lAJ0tDwzvvK8nMsYbGqiQS5uTSrkHJ7QnFWRKswot/FA1VfYfDtl2KQrYUwmKdiHcWhBWf2UTqILQW4IBhl3VOfAhQNV6DxLvhWyGR+4AIWN3G99MhQLHM3o5xg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=KUwYP7X/; arc=none smtp.client-ip=162.62.57.49
+	 MIME-Version; b=rMsVfuoO+u0efE5MQn/CaEu2r+Q9F3AESA19VrvAd1nHlTOdtNeyyn0sP3iqLXRF8o7N1Omk2tv8pzX04ApsDbT1BffQ1eBPwy/ufw3IYwqQcxGgyCRv3nbh46WmsRhR6olrO5iJzsD91wc2D8onkisPUgnCTtobW2lGhs3/Gts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=a8WXWOTv; arc=none smtp.client-ip=43.163.128.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="KUwYP7X/"
+	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="a8WXWOTv"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
-	s=s201512; t=1756973864;
-	bh=gkJTf2c1jzQR5OVVEr7uU0ySLW7GWWkeJTjOv6J6hGk=;
+	s=s201512; t=1756973995;
+	bh=7DN0jn8EFbvGagtqyUaHOSQPeNSavR6C85ONmpAUNNc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=KUwYP7X/0SLY51bF3laX/H+jmhb3g25s0lnndGhL2sGBD/M1PSJO4wAlcMju7HbZv
-	 Fx5ehgaLpPbaSMiWKFYyVf9Nx4MrFUVUv5WBxPFe1hOgVmpjE1W2+gTWvPqzge98Db
-	 ZnASVxnepi0RAb8fvDR9UGavce7uhwHwX4uYDgfE=
+	b=a8WXWOTvRijQdEPpl+JiVWZmXQWN+VosqIrCO8GJAuvis3J3WSZ1zmIBLEdYzwEi+
+	 OdXqTSJyrCvej+/DNjqZurVkVziyLZ8Sx6ZzL2h+EEd9LE9ewMavLFfg2Sso85XFov
+	 4PNx5bctctOCJksSzdwCC1/M3zklWSLoInNomowI=
 Received: from SSOC3-SH.company.local ([58.33.109.195])
-	by newxmesmtplogicsvrszc41-0.qq.com (NewEsmtp) with SMTP
-	id 45E044AB; Thu, 04 Sep 2025 16:17:30 +0800
-X-QQ-mid: xmsmtpt1756973850tuug394uz
-Message-ID: <tencent_2B678DA920124B08854638A6BE68746CCC05@qq.com>
-X-QQ-XMAILINFO: N2bAIxLK0elnhXEhPkfXE/RSi6PihdH4cXUbzQ0GGcOAG32Qhxgni3WQaKSVHI
-	 pRmntZwJtpUeAE507+g9Q3g63Y1T3y/vhMZD89SZnn3YZU02ZWLUFmBVRDfAOZlJ+uc9J5bcvgIs
-	 zJ4nqLuVLpnWZTqtVjLJ3Bht2UOxsZDhcmRX22rY+43hd/4aZkfRamGs2A08Z33vlXXykWuMwSH+
-	 0ZnJcBS3ey5ABVx8sojnRJMubsSHhFtfJKzU6Y8kULz4hitlNKsSMZL0WUX8+67ioGjd7S5Vmyls
-	 xWUDbLrpEK7J54PYb4/Whw/24gpXmpAkfifO60NUDScQQ5SHIdarpFRKVcFd0WFM5aUgt3kUsMoO
-	 SrLctRWZOORFmz7165O4nVhiX3RoAwyJ26IfYO+JIgbI5/t3XaA1ZxD27xsJhxxVGn/ebkcR76v7
-	 34GTasWshqzU9DT35H8u3PhYYCcYVEDmtiXm8DYOqELECFBgSPPPLxzehYvcAqJbvxubG5YHDPLf
-	 p4wKJZ/FKyLHjpag+h6boHAQylzevEgsTDhpm94z3VHosp5lWqzRLkhUBBguCM927sbgdt5QjGun
-	 3gc9oj89FEXWdrfWobXcm6TqZw6ub1whPa/PXB+91E4lldSViMrh5GVnfwITqcbyL7lCuTaBKlG1
-	 gfhAWSx40P16RvU6XDYteu7PKjs5YYeAsVqwfNHXuZZz5OOvL9e9dcm+/6eL3n8cS3Yi14ZR3X3D
-	 DDouRsD/ehhXjU6AU2NAMoz9dTZVWGFhLNF/r9iCIF81MmYGC7Kc9FQ2DB19hqQXDTDf6Ah3OMqo
-	 GyxScuPL6sxvUP0dmhEExoWd78A9/7dvofok+bCZBOKpOY/lRN8gajzTYnMdRtOGH+RvoQk0VWG0
-	 aKJhrIcoplhIIl7k8RthT2oOmfAZ3eSKgx6Ur7za3/jEheYTA7nzgsOz4Z4DAYHNY/qblYSdVjzy
-	 RCLziPTySMPuin2F9eEgSkYTdYk05TfkPgQXzj3imHCs0TgoXXPOAQS6720M0x
-X-QQ-XMRINFO: Mp0Kj//9VHAxr69bL5MkOOs=
+	by newxmesmtplogicsvrszb20-0.qq.com (NewEsmtp) with SMTP
+	id 4E5236EA; Thu, 04 Sep 2025 16:19:37 +0800
+X-QQ-mid: xmsmtpt1756973977tsvxx6u76
+Message-ID: <tencent_329AB29889A28A31719F322691C87E214C07@qq.com>
+X-QQ-XMAILINFO: NZa67OCgpTu6oc+56M+ZfTWjVoMuYGJi2nW9nhd25uQ8uEJ0hgY8nnHyG8p8A2
+	 AW3VIDJTXs7yDI7E2fjw5JORUw5U3Ic4t8lM10c/YEwxuCFKNaxVR9WptP33/bXb+buu0Hb3q9z6
+	 WqXo5ifbVzcYHjjhNDLWec3DSYEdQ4cuYIyXvgahGy89UFw6mDBS+kcWkw9kSw4wgolstVj4QHl1
+	 uQVyEhAdJCzZrnhi9hI1VU1w/Dbda5rPpMQsSpnUrAgJwkNmosTRSOXg73T4uLa9rwEVaTT/C2dW
+	 0x73pjmTv2qe7vKZFSZ3HQ33QwSbTL4jIuVPV4EuaT4i3ypj96tWpyx9ZbEXQgwybO9ZhS2V4OKR
+	 MTcNPfr6L7vTZzRuUERxMTjFFg25QCb7ts1TvQX2uG0vP8zOR+YA5A2B5fW8cvyl7UMTHVViFdMg
+	 4NbvQsxa2yaa81+J988I7KGuON59H1q7jxhZKyfgIUMVSS3Wvvbq1aHd5NxFowXR/S0P/1KrA8ah
+	 3Tw3Eb2fqcHdNIqT+6AM39JkmfLRUuP89lNqUe1xvbxbb4PSIm6ssQRVVJDqOVdiodYWkVz3JzLb
+	 aZYrNU5miF6a2Xq9oOsR5+UqINfglG+2FlfnqWrZ3zudCQ8VzebYb2lAeS6Fw4IA4BMvkZXrs8Bw
+	 2ObIlrp5Ax8Of+LOiHbH+mFO9VNvhUlsv/Q7ZXeqaqkRGN/+bCi9nliUhACdEd2j8kyEkHGL4Sx5
+	 vdnOE4biva4Sw3bzhMvYi/wW1LYV+CkyM5Q6vB1RgePRTJ2Yk+t/l7ezAju26vIEh/6R61f0c3tz
+	 hloXwzyjdlkWTP3AKVWy4m3boaKGdnLQ2FGmGhlGmd33vqYhoycQi5H4IMRRqRpGFvXfY/zMXZSa
+	 4hKPn+Z8j5+tqaUxXS0pJU/qKzIGIzo24f1rEFrVUN+GbTZt5FLsrB6FOoHgfdX/QIGoncxSoM5l
+	 gffXwPiQOKRayw3o3YgjxS8q8hMPR+EB1OeMqtprAUwndbTVQPGgvtNwcqUd14huCRZT9c90ysDr
+	 8npCOtew==
+X-QQ-XMRINFO: NI4Ajvh11aEj8Xl/2s1/T8w=
 From: Han Guangjiang <gj.han@foxmail.com>
-To: yukuai1@huaweicloud.com,
-	Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org (open list:BLOCK LAYER),
-	linux-kernel@vger.kernel.org (open list)
-Cc: hanguangjiang@lixiang.com,
+To: yukuai1@huaweicloud.com
+Cc: axboe@kernel.dk,
 	fanggeng@lixiang.com,
-	yangchen11@lixiang.com,
-	liangjie@lixiang.com
-Subject: [PATCH v2] blk-throttle: fix access race during throttle policy activation
-Date: Thu,  4 Sep 2025 16:17:26 +0800
-X-OQ-MSGID: <20250904081727.3975758-1-gj.han@foxmail.com>
+	gj.han@foxmail.com,
+	hanguangjiang@lixiang.com,
+	liangjie@lixiang.com,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	yangchen11@lixiang.com
+Subject: Re: [PATCH] blk-throttle: check policy bit in blk_throtl_activated()
+Date: Thu,  4 Sep 2025 16:19:37 +0800
+X-OQ-MSGID: <20250904081937.3979230-1-gj.han@foxmail.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <59464ad0-856c-4ec3-b5b7-e7799c337a84@yukuai.org.cn>
 References: <59464ad0-856c-4ec3-b5b7-e7799c337a84@yukuai.org.cn>
@@ -66,90 +68,37 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Han Guangjiang <hanguangjiang@lixiang.com>
+Hi,
 
-On repeated cold boots we occasionally hit a NULL pointer crash in
-blk_should_throtl() when throttling is consulted before the throttle
-policy is fully enabled for the queue. Checking only q->td != NULL is
-insufficient during early initialization, so blkg_to_pd() for the
-throttle policy can still return NULL and blkg_to_tg() becomes NULL,
-which later gets dereferenced.
+> Yes, however, this can be fixed very similar:
+> 
+> Set sq->parent_sq to NULL here, and add a helper parent_sq(q, sq):
+> 
+> if (sq->parent_sq)
+>         return sq->parent_sq;
+> 
+> td_sq = &q->td->service_queue;
+> return sq == td_sq ? NULL : td_sq;
+> 
+> And sq_to_tg() need to be changed as well. So far, I'm not sure how many
+> code changes are required this way. We of course want a simple fix for
+> stable backport, but we definitely still want this kind of fix in future
+> release.
 
- Unable to handle kernel NULL pointer dereference
- at virtual address 0000000000000156
- ...
- pc : submit_bio_noacct+0x14c/0x4c8
- lr : submit_bio_noacct+0x48/0x4c8
- sp : ffff800087f0b690
- x29: ffff800087f0b690 x28: 0000000000005f90 x27: ffff00068af393c0
- x26: 0000000000080000 x25: 000000000002fbc0 x24: ffff000684ddcc70
- x23: 0000000000000000 x22: 0000000000000000 x21: 0000000000000000
- x20: 0000000000080000 x19: ffff000684ddcd08 x18: ffffffffffffffff
- x17: 0000000000000000 x16: ffff80008132a550 x15: 0000ffff98020fff
- x14: 0000000000000000 x13: 1fffe000d11d7021 x12: ffff000688eb810c
- x11: ffff00077ec4bb80 x10: ffff000688dcb720 x9 : ffff80008068ef60
- x8 : 00000a6fb8a86e85 x7 : 000000000000111e x6 : 0000000000000002
- x5 : 0000000000000246 x4 : 0000000000015cff x3 : 0000000000394500
- x2 : ffff000682e35e40 x1 : 0000000000364940 x0 : 000000000000001a
- Call trace:
-  submit_bio_noacct+0x14c/0x4c8
-  verity_map+0x178/0x2c8
-  __map_bio+0x228/0x250
-  dm_submit_bio+0x1c4/0x678
-  __submit_bio+0x170/0x230
-  submit_bio_noacct_nocheck+0x16c/0x388
-  submit_bio_noacct+0x16c/0x4c8
-  submit_bio+0xb4/0x210
-  f2fs_submit_read_bio+0x4c/0xf0
-  f2fs_mpage_readpages+0x3b0/0x5f0
-  f2fs_readahead+0x90/0xe8
+We preliminarily tried implementing this approach. But the changes are 
+scattered and backport might be complex. So we provide a simple fix first.
 
-Tighten blk_throtl_activated() to also require that the throttle policy
-bit is set on the queue:
+> Meanwhile, please remove the comment about freeze queue, turns out it
+> can't protect blk_throtl_bio() becasue q_usage_coutner is not grabbed
+> yet while issuing bio.
 
-  return q->td != NULL &&
-         test_bit(blkcg_policy_throtl.plid, q->blkcg_pols);
+As discussed before, we also removed some outdated comments in 
+blk_should_throtl().
 
-This prevents blk_should_throtl() from accessing throttle group state
-until policy data has been attached to blkgs.
+We just submitted v2 which includes the changes.
 
-Fixes: a3166c51702b ("blk-throttle: delay initialization until configuration")
-Co-developed-by: Liang Jie <liangjie@lixiang.com>
-Signed-off-by: Liang Jie <liangjie@lixiang.com>
-Signed-off-by: Han Guangjiang <hanguangjiang@lixiang.com>
----
-v2:
- - remove the comment about freeze queue in blk_should_throtl()
- - Retitle: "blk-throttle: fix access race during throttle policy activation"
----
- block/blk-throttle.h | 7 +------
- 1 file changed, 1 insertion(+), 6 deletions(-)
+We look forward to your feedback and suggestions on the v2 patch.
 
-diff --git a/block/blk-throttle.h b/block/blk-throttle.h
-index 3b27755bfbff..fbf97c531c48 100644
---- a/block/blk-throttle.h
-+++ b/block/blk-throttle.h
-@@ -156,7 +156,7 @@ void blk_throtl_cancel_bios(struct gendisk *disk);
- 
- static inline bool blk_throtl_activated(struct request_queue *q)
- {
--	return q->td != NULL;
-+	return q->td != NULL && test_bit(blkcg_policy_throtl.plid, q->blkcg_pols);
- }
- 
- static inline bool blk_should_throtl(struct bio *bio)
-@@ -164,11 +164,6 @@ static inline bool blk_should_throtl(struct bio *bio)
- 	struct throtl_grp *tg;
- 	int rw = bio_data_dir(bio);
- 
--	/*
--	 * This is called under bio_queue_enter(), and it's synchronized with
--	 * the activation of blk-throtl, which is protected by
--	 * blk_mq_freeze_queue().
--	 */
- 	if (!blk_throtl_activated(bio->bi_bdev->bd_queue))
- 		return false;
- 
--- 
-2.25.1
+Thanks,
+Han Guangjiang
 
