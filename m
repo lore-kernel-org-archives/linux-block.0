@@ -1,97 +1,99 @@
-Received: from xmbghk7.mail.qq.com (xmbghk7.mail.qq.com [43.163.128.52])
+Received: from sender4-op-o12.zoho.com (sender4-op-o12.zoho.com [136.143.188.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D22843019B3;
-	Thu,  4 Sep 2025 10:12:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=43.163.128.52
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756980727; cv=none; b=KWqWSkVKSEPjPSd4Ani/WPcgFadYl/lQAh0Tc0AGRYGQLPl1fa+Ng24bkgKWrICFigZhPcUFdOJNJVB2+HuzcnZyeeIEsumR2cHAt0tZIOy+Y0o/0a9GpPPH1Ak2/pkQ+3Zx3+oRmw83d36OxYVlAh26/4WPAooHhynx8tzEhdc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756980727; c=relaxed/simple;
-	bh=SVzrlG6EiqurtcYJS6e3s4CsW++ZWmmqsKqR3pT6waA=;
-	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
-	 MIME-Version; b=uepbIA72c+N9ZSrqY7SpDNhEvCGJAk8siiLM2amDLGvvhTpyHmjmNcg4Q/KBrY9rdHM2JcNd7590eOGbQqqgtprzlhJroZh/o0OtGQtB1Jyrbqw2pTLDV2uVKmEXluDc4Wt4i8+OtZIsuVNsxEZ8/9WK8b1xqm0sHk+QW2UAfQc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=Wi/KJwDe; arc=none smtp.client-ip=43.163.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 885472FB608;
+	Thu,  4 Sep 2025 10:59:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756983599; cv=pass; b=bFtf9wvnNg2PlGKolVtbZkHEYx2jTZLTNCMKL7Dc1PFjtAQdoeCGXldXZY2Ju8vSiTRVISM127e5Vsyf1PiAJ0+SvbT57gAHXGMiBwOrbN3jOZRbyp2G6df83CnaINs/6OpNw+I50K2tv7Ah8ay2Z3rRnfUK5GEyIMmJqcNif8U=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756983599; c=relaxed/simple;
+	bh=tj4bpgROzqe+kysrrtTFTW/8czrJhJvJ4R1wJxckKas=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=EsSWr1bnCU30Cc9w+DOaOJAeEubJc2oB7PkrvnaJislr6UeGhpiKLNsrr0FL5NWl5W+7E7oq+O08XF73AUAaiae7OqQGpgQIHJmVSQOKf0nuucsttWI2G9iVPruJ8nB8CAfD8j9fDhICBX5g/gO46jdf/qoqSjzPQhGKnN00reM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yukuai.org.cn; spf=pass smtp.mailfrom=yukuai.org.cn; dkim=pass (1024-bit key) header.d=yukuai.org.cn header.i=hailan@yukuai.org.cn header.b=U2fJRW52; arc=pass smtp.client-ip=136.143.188.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yukuai.org.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yukuai.org.cn
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="Wi/KJwDe"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
-	s=s201512; t=1756980721;
-	bh=SmrgEE1d/4hfg8XYik2jCXkw+t8AuBI4gpU0IEWiY1M=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=Wi/KJwDelfnfVCQI9GmRZvZLq6ERIqinTPq+f9THbaL2Srebmj550miVR/1HvPiQa
-	 z5VwUQ0kim5J5GIT+1INx0X8+6Wod2PXPxg9du1a4d/DkX+53wl84aEdqdd5qc/Pto
-	 pmfiEkxs3sCuYvLkuWiHWHWuoZXJXZLnjBIAKMpA=
-Received: from SSOC3-SH.company.local ([58.33.109.195])
-	by newxmesmtplogicsvrsza56-0.qq.com (NewEsmtp) with SMTP
-	id 150B5428; Thu, 04 Sep 2025 18:05:16 +0800
-X-QQ-mid: xmsmtpt1756980316t3kaej8v2
-Message-ID: <tencent_4D98FA22B5856469AC62088A7AC6D67CB009@qq.com>
-X-QQ-XMAILINFO: M+DG/l9YxNXYhGG6xTZvAHoCs6fLNiYGPXsqjT7cDZEE2lTAJAvjOTlJAc/mQh
-	 9yzgVcYfyODOaZtU2mEqApQ6o9zfL3/i4cJvdXpu2/LpCsXqkULThC6EZ4mw/m3ikwySUg3e49/t
-	 28LEphxSJlY7sDzhx4NoSBEm48D1lE5gwBKDXXY/8uwp5IYSsSQ1ov6Xk1ro1aFF5LWYRw9HIaKE
-	 x4N3AdfNUPUP2cMQeatgJNu/Thus7ME4RVKPs0QVKS6qK1p1ADqT+Vrh7sAbgYAbEaa3tqPU7Bi6
-	 QEocdHwyKyJULrcRttl7/Kpz82gR0mzpcCdpJyDwpTFNx+r3ce7eA/z2mQLLsQN1XL1WJZT7P1w8
-	 wZsIpBdk/fTldu4KwMyaSl4k9cyk8iWgQUMVMC2BIMi1znjjVzKNpCcqlB3h6RmoIsYczZKiXc5q
-	 luZQmOPkeuuQyI5L4yDrgDRW9mFMNKflT4l02ce/48Yni04ZKU78jziYPj3GVM8KX0voAo9WY1nM
-	 EbV2GFqMzmUY92mlx94aGanuj+oLSs4z5NnqM7Mxzlez/5k/i5B9EtxMgIHXeeBfxpgSdLyd56JV
-	 a+Lz5jddEVfB3Wk4Rnc2EtO3uFLJsrM7bPHl0/Dp2C0vNbcB/Ta34Z0/IWnTBZNYEjsVEpq3HmcR
-	 dJYAa1q+wzdHyKsdH+WnS8JBqVE5ok7cfrprXsnvNdV44kQ93ziIECeVMZV43Cn5NazXKj5vRAa/
-	 b0ftCVoOvc94gOmigGnqV0E8BdMsVCieJH8e8JOYr7a4eeA24XXcVxTtJTN6tD4lqHbFQreADxI3
-	 N7p/0f/gqOlaUcslIyia/iaSgXOf9FD/p8ZvvlmloD6PtgeUt6V8go5xY+LU84INMeDx23I9e+WR
-	 UFM0ocPf46iuuscgHpLZ4XV9g3hnUsd2flr3YFwO33IuccNxFuBIhAIcFnguk6EXNAIAP8d/YbsL
-	 xP47q/CtISOVAP/vXF85tnKk6NChwZN/IhJELKzn4hUl/+YP7frAWvhK0xVVQ3JJbM5IU+3t5264
-	 1Wf/JzpndK3Sh6HA9Z
-X-QQ-XMRINFO: NI4Ajvh11aEj8Xl/2s1/T8w=
-From: Han Guangjiang <gj.han@foxmail.com>
-To: yukuai1@huaweicloud.com
-Cc: axboe@kernel.dk,
-	fanggeng@lixiang.com,
-	gj.han@foxmail.com,
-	hanguangjiang@lixiang.com,
-	liangjie@lixiang.com,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	yangchen11@lixiang.com,
-	yukuai3@huawei.com
-Subject: Re: [PATCH] blk-throttle: check policy bit in blk_throtl_activated()
-Date: Thu,  4 Sep 2025 18:05:16 +0800
-X-OQ-MSGID: <20250904100516.250579-1-gj.han@foxmail.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <1f9c674a-9f5b-6c89-0504-1f6985095fa0@huaweicloud.com>
-References: <1f9c674a-9f5b-6c89-0504-1f6985095fa0@huaweicloud.com>
+	dkim=pass (1024-bit key) header.d=yukuai.org.cn header.i=hailan@yukuai.org.cn header.b="U2fJRW52"
+ARC-Seal: i=1; a=rsa-sha256; t=1756983571; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=XHeyWrbpJooNCQiTlV6hCuyavV0l6DP8+6Rn6vg0+S45Wt8GgvYaWs3n6ggXrSbx3FIRYBKOwPaKgPpSuXVOhryyYofJYi8nNLfImD/rdnUvqiwaYZJr6E5q91ao9Z3+KUgFCzPaXeDxPiDYnjrTFu5Ycguhvp16q+DqUTd+gMg=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1756983571; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=O2alNobFBrDQf5QIPdCYH2KS/kRB0TDTmghALol7FC4=; 
+	b=Hw7sIM+fYBnQ7bDm2zdzwavTvirjTsIMJa5hr9ziScEvIdLItAyXOMH0FTwOrsJUc2Msk9CHuoBKvGBxPrlXd28vFiamFd7lOsWTA0WwqnRd1i760QGcGEpvwF4tMc/F3FEyl6XVwX8lVL/WKAPkkeMpfk6JDAbJdtF/rOFcahU=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=yukuai.org.cn;
+	spf=pass  smtp.mailfrom=hailan@yukuai.org.cn;
+	dmarc=pass header.from=<hailan@yukuai.org.cn>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1756983571;
+	s=zmail; d=yukuai.org.cn; i=hailan@yukuai.org.cn;
+	h=Message-ID:Date:Date:MIME-Version:Subject:Subject:To:To:Cc:Cc:References:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=O2alNobFBrDQf5QIPdCYH2KS/kRB0TDTmghALol7FC4=;
+	b=U2fJRW52X7Ob1Y+FXq+6WC3WdCb3fg9N7QPC9rllj8O3FB2glLYYpgdUzuAQV/Ee
+	CQjxBvwMivjqi/ccyz6sNS468sjezZjK+3PzWlO74oICM2IJWBAjvNJ28+UBMRSYRkM
+	iOLtcsbiGQHtVUTprm61a8Hu3h3ANHdgfOoY5SzU=
+Received: by mx.zohomail.com with SMTPS id 1756983568388359.0808765853875;
+	Thu, 4 Sep 2025 03:59:28 -0700 (PDT)
+Message-ID: <5b626062-d2c2-4811-bb0f-2e4276ad28c0@yukuai.org.cn>
+Date: Thu, 4 Sep 2025 18:59:20 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] blk-throttle: check policy bit in blk_throtl_activated()
+To: Han Guangjiang <gj.han@foxmail.com>, yukuai1@huaweicloud.com
+Cc: axboe@kernel.dk, fanggeng@lixiang.com, hanguangjiang@lixiang.com,
+ liangjie@lixiang.com, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, yangchen11@lixiang.com, yukuai3@huawei.com
+References: <1f9c674a-9f5b-6c89-0504-1f6985095fa0@huaweicloud.com>
+ <tencent_4D98FA22B5856469AC62088A7AC6D67CB009@qq.com>
+From: Yu Kuai <hailan@yukuai.org.cn>
+In-Reply-To: <tencent_4D98FA22B5856469AC62088A7AC6D67CB009@qq.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-ZohoMailClient: External
 
 Hi,
 
->>   static inline bool blk_throtl_activated(struct request_queue *q)
->>   {
->> -        return q->td != NULL;
->> +        return q->td != NULL && test_bit(blkcg_policy_throtl.plid, q->blkcg_pols);
->>   }
-> 
-> You can just remove the fist checking, p->td must be set if policy is
-> enabled. And please make blkcg_policy_enabled() inline function in
-> blk-cgroup.h and use it here.
+在 2025/9/4 18:05, Han Guangjiang 写道:
+> Hi,
+>
+>>>    static inline bool blk_throtl_activated(struct request_queue *q)
+>>>    {
+>>> -        return q->td != NULL;
+>>> +        return q->td != NULL && test_bit(blkcg_policy_throtl.plid, q->blkcg_pols);
+>>>    }
+>> You can just remove the fist checking, p->td must be set if policy is
+>> enabled. And please make blkcg_policy_enabled() inline function in
+>> blk-cgroup.h and use it here.
+> We intentionally kept the q->td != NULL check because we cannot guarantee
+> that the policy module is fully loaded when this function is called.
+> If the policy module is not loaded yet, blkcg_policy_throtl.plid might not be
+> assigned, which could cause the test_bit() check to be incorrect.
+>
+> By keeping this check, we ensure that we have at least reached the cgroup
+> configuration flow, indicating that the policy loading is complete.
+>
+> I'm wondering if there are any risks here and whether we should remove
+> the q->td != NULL check?
 
-We intentionally kept the q->td != NULL check because we cannot guarantee 
-that the policy module is fully loaded when this function is called. 
-If the policy module is not loaded yet, blkcg_policy_throtl.plid might not be 
-assigned, which could cause the test_bit() check to be incorrect.
+I think there is none. blk-throttle can't be build as module, if config is n,
+blk_throtl_bio() is a non-function, if config is y, policy is registered during
+init. And throtl_init() failure will panic, noted blkcg_policy_register() will
+never fail for blk-throttle. BTW, policy pid is not a dynamic value at runtime.
 
-By keeping this check, we ensure that we have at least reached the cgroup 
-configuration flow, indicating that the policy loading is complete.
-
-I'm wondering if there are any risks here and whether we should remove 
-the q->td != NULL check?
+Perhaps remove the checking and add some comments?
 
 Thanks,
-Han Guangjiang
+Kuai
 
+>
+> Thanks,
+> Han Guangjiang
+>
+>
