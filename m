@@ -1,106 +1,76 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 912431DED53
-	for <linux-block@vger.kernel.org>; Thu,  4 Sep 2025 04:58:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62C3D33E7;
+	Thu,  4 Sep 2025 05:10:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756961934; cv=none; b=JP4orBRZedT3dQtRwZlrzQaE1qmFUPRCjxcqw7Ax14cxRiVYQo6oiiZ9ZOrU95INqr2B4+HocadnZOMw9BkJuV+ML/FggmBLgAJ8uuLsFsS9rJig8SOv9WxRev2wGtSvn1KLepc2HmVkXZq8W5+9kp0Nz3aEHS42yryr2m7cJ9k=
+	t=1756962605; cv=none; b=OJ5Qa8V/unoXrPUo+SVez5NOdApZth5O0wlIkez+7J9Dias06IL4aGQhAYpJsdgaq4qCjEjaoad+Y4WAu3p1lY3apHYdLKYCvpHPt35sHZ6yBTGRWkEfbRm2sOPRkX2KvLpSfX0WqhJn1dT+O4ecpLrus1RkuVSUxozYIsiA+ko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756961934; c=relaxed/simple;
-	bh=ebnvjKIBK2/qzwXTlv+KsVV9YMjbcDc1wMGaeqNpL/k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bQ2KyRwbO8ErzOF7wX5uBy1L5lvWOoetexgiXMu9pcxY5qDP8x1j9BQlg1o2s/2PeIHuKMaraJvbeA3DQMdk9GdxeqV1uNVbne0jI1dFyPKmG/4Q04D0kiBcENOP4fkGWxoKRZjaE9QVPGE5wT5QXkCu8OMUDYYtWdy2w1fK2TM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I0P4mtFB; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1756962605; c=relaxed/simple;
+	bh=ydFs6i7keCMfBbD9quYtCVIwH9y+8boTcTxEbezuoqI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FAxvlDnh0ixw/8kBK6MMSp5rPI1PP8hUx2ZiPoyZrgzGl17RV4jzWqpXPnqm+EjINQBcN+DiwxSx3XKHSUxrfYCkJ+eZFy5EiqXpq7iGU2vyr8Cb33O1jXkiK0XfXuXKVTsKk/hgpX3EQMEyWUZeM1jGWkeeQDo/pMMaqTSyc8k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=v2nhIvAH; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I0P4mtFB"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AAA1CC4CEF6;
-	Thu,  4 Sep 2025 04:58:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756961934;
-	bh=ebnvjKIBK2/qzwXTlv+KsVV9YMjbcDc1wMGaeqNpL/k=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=I0P4mtFBr3D4+55yLQNGcrzaPiMqdoYT2MuZMHjElA6vQg+j5Zzv88+R3qklFpeBf
-	 aHaRmN6MAE51Ys4fGZRmM74qA2nYZ9EZgYPoxC8w3jQ+n06JG7uM5irUx9Mu4K14Yi
-	 pn9Mloi0X6MnOwVxFMNO5T7nOe1QJbY1tg8Ga1CdgUlilRFtvImdkJeKU3WWGlY3TH
-	 lD96JJzjlg6bti+3WFM5dYtniJV4+uHrjmP+rkUharWZlr1REEZCvwC5OrG2yrbMG4
-	 /9GAU1u2Zb3afUyiGUWf5VGzI0Xl11paveJoPn0qJIPIh64mSTaAFWFwSPHS8Oj6JQ
-	 KQaUoZT+9F3LQ==
-Message-ID: <e6cdf8c6-bc67-419b-8b79-d96e06bb7be7@kernel.org>
-Date: Thu, 4 Sep 2025 13:55:54 +0900
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="v2nhIvAH"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=ydFs6i7keCMfBbD9quYtCVIwH9y+8boTcTxEbezuoqI=; b=v2nhIvAHa8n7akzk3SUERXmaHo
+	YvNeXa5K0jwkINpKuRz0S5VtIcpV710I+gAMavCPxiHGRUIRKK/UoZk7idl1zok3c0L86qWILmnyr
+	9eHA8+oT5R9Ho2y2JNUDI86b1HTqGj28rmQYVXMz6WcrzQeKG+ojLdutPKj85v62fh8oRYC/FfuGB
+	6iYOUIURK6e64WDJkkkSPooaRQfbglSijM/sO9oYgDiZQgl3zbfb6ioUXvfiifvrHipr/+QhcmuvU
+	xkDWaE//NvdBrotQ1jIeSGblxfklYqFb6Xh5x+W9vY1iod5cBOnxCIb1ckRapLbxFpwEmrM2YVeVM
+	JuTlcZ1w==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1uu2EH-00000009A1O-0i6e;
+	Thu, 04 Sep 2025 05:09:49 +0000
+Date: Wed, 3 Sep 2025 22:09:49 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Yu Kuai <yukuai1@huaweicloud.com>
+Cc: Yu Kuai <hailan@yukuai.org.cn>, Christoph Hellwig <hch@infradead.org>,
+	colyli@kernel.org, hare@suse.de, dlemoal@kernel.org,
+	tieren@fnnas.com, axboe@kernel.dk, tj@kernel.org,
+	josef@toxicpanda.com, song@kernel.org, kmo@daterainc.com,
+	satyat@google.com, ebiggers@google.com, neil@brown.name,
+	akpm@linux-foundation.org, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, cgroups@vger.kernel.org,
+	linux-raid@vger.kernel.org, yi.zhang@huawei.com,
+	yangerkun@huawei.com, johnny.chenyi@huawei.com,
+	"yukuai (C)" <yukuai3@huawei.com>
+Subject: Re: [PATCH RFC v3 02/15] block: add QUEUE_FLAG_BIO_ISSUE
+Message-ID: <aLkfHW2KuNvrcYyN@infradead.org>
+References: <20250901033220.42982-1-yukuai1@huaweicloud.com>
+ <20250901033220.42982-3-yukuai1@huaweicloud.com>
+ <aLhBqTrbUWVK4OKy@infradead.org>
+ <5378349f-4d00-4d3e-9834-f3ddf2e514cc@yukuai.org.cn>
+ <dbbfce94-22d8-5c34-ba70-c6de2b902659@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Sanitize set_task_ioprio() permission checks
-To: Chen Yufeng <chenyufeng@iie.ac.cn>, axboe@kernel.dk
-Cc: linux-block@vger.kernel.org
-References: <20250904031312.887-1-chenyufeng@iie.ac.cn>
-From: Damien Le Moal <dlemoal@kernel.org>
-Content-Language: en-US
-Organization: Western Digital Research
-In-Reply-To: <20250904031312.887-1-chenyufeng@iie.ac.cn>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <dbbfce94-22d8-5c34-ba70-c6de2b902659@huaweicloud.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On 9/4/25 12:13 PM, Chen Yufeng wrote:
-> A patch similar to commit 197e7e521384("Sanitize 'move_pages()' permission 
-> checks").
-> 
-> The set_task_ioprio function is responsible for setting the IO priority of a 
-> specified process. The current implementation only checks if the target 
-> process's uid matches the calling process's euid/uid, or if the caller has the 
-> CAP_SYS_NICE capability. This permission check is too permissive and allows a 
-> user to modify the IO priority of other processes with the same uid, including 
-> privileged or system processes.
-> 
-> Local users can affect the IO scheduling of other processes with the same 
-> uid, including suid binaries and system services, potentially causing denial 
-> of service (DoS) or performance degradation.
-> 
-> So change the access checks to the more common 'ptrace_may_access()'
-> model instead.
-> 
-> Signed-off-by: Chen Yufeng <chenyufeng@iie.ac.cn>
-> ---
->  block/blk-ioc.c | 5 +----
->  1 file changed, 1 insertion(+), 4 deletions(-)
-> 
-> diff --git a/block/blk-ioc.c b/block/blk-ioc.c
-> index 9fda3906e5f5..bd3e556809c5 100644
-> --- a/block/blk-ioc.c
-> +++ b/block/blk-ioc.c
-> @@ -244,12 +244,9 @@ static struct io_context *alloc_io_context(gfp_t gfp_flags, int node)
->  int set_task_ioprio(struct task_struct *task, int ioprio)
->  {
->  	int err;
-> -	const struct cred *cred = current_cred(), *tcred;
->  
->  	rcu_read_lock();
-> -	tcred = __task_cred(task);
-> -	if (!uid_eq(tcred->uid, cred->euid) &&
-> -	    !uid_eq(tcred->uid, cred->uid) && !capable(CAP_SYS_NICE)) {
-> +	if (!ptrace_may_access(task, PTRACE_MODE_READ_REALCREDS)) {
+On Thu, Sep 04, 2025 at 10:44:32AM +0800, Yu Kuai wrote:
+> - it's only used by iolatency, which can only be enabled for rq-based
+> disks;
+> - For bio that is submitted the first time, blk_cgroup_bio_start() is
+> called from submit_bio_no_acct_nocheck(), where q_usage_counter is not
+> grabbed yet, hence it's not safe to enable that flag while enabling
+> iolatency.
 
-The description of commit 197e7e521384 explicitely mentions that changing the
-CAP_SYS_NICE check for that system call into CAP_SYS_PTRACE should be OK
-because hardly anyone use that system call.
+Yes, keeping more things in blk-mq is always good.
 
-I do not think that the same can be said of the nice() and ioprio_set() system
-calls. So dropping the capable(CAP_SYS_NICE) check seems wrong, unless you can
-actually justify that it is safe ?
+> -void blk_mq_submit_bio(struct bio *bio)
+> +void b k_mq_submit_bio(struct bio *bio)
 
-Lots of production systems out there use IO priority. We do not want these to
-suddenly stop working because of a permission denied.
-
->  		rcu_read_unlock();
->  		return -EPERM;
->  	}
-
-
--- 
-Damien Le Moal
-Western Digital Research
+This got mangled somehow.
