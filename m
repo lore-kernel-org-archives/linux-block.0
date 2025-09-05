@@ -1,129 +1,176 @@
-Received: from mail-yb1-f182.google.com (mail-yb1-f182.google.com [209.85.219.182])
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D6BC3594B
-	for <linux-block@vger.kernel.org>; Fri,  5 Sep 2025 11:20:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C87D1F61C
+	for <linux-block@vger.kernel.org>; Fri,  5 Sep 2025 12:58:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757071230; cv=none; b=VThqW7R9s6M+XQlDp2QTZSQC33v5GbG+RabU/liJvSkZXeyjr27KGKkDMEoc5lhIxLnTSq4ZZLZJPRSNZQWiz1oS7dk/lWAKXi8g2XZnSRdvc5LSKEkbMKChutG8wEn9UwSIqmN8wWAqr2xdMWE2eyPU8zbTEX0yCML6tM7cOk4=
+	t=1757077096; cv=none; b=XZqpdUGseH+pfwglIBPIrmJ9yDx0yL2kI4aAz946DHZHBDvbvus1rpJ+Q3BojK8T78duO/Jf20zb+FE3e69i4PihjZhkufSDUfeoi9T0TIs2CWz6/yBCeoi1onj+eRGqwWhws/7ArNsyBnu2ZVk/8ObEBcNwdQaBI2BIHCsJko8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757071230; c=relaxed/simple;
-	bh=WTUEAuaEC938WdQc/fThO0qI0BJvhIM5ibgPcne/EWQ=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=cHZ3Oo6aNgCzoN4sPl5nTjzSap48b/jNfJjeJcWVYRlGs/6ZJAR1fUqbblvY2zMuj8o+bHpRJBQSxDGZHLsUVLNS0nmLbyGS83tHGiNw43B2NtL072sIBneMGl6DNwntfC76KjY5WFBTZDW9SWSbMlhEj9LVQMC91EuYHTnOH2M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=T8J6AHSG; arc=none smtp.client-ip=209.85.219.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1757077096; c=relaxed/simple;
+	bh=B4t5lfIeAigVVk9t8Ob6HbXErWQiFE5Us9s4emvtCSk=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=AI7aoSKzIN7RCVpVb+e1CCrJpHkmu1Ie9auE3ehi0nljq18yByNdILab+p5Ojqxg8Hdfn/sXYGVtTiiLcmSoHQ2T6s9JSmXBfOkLqUXAsCgl2ITtgDoXCVxTywg0VbAwNgYIGjqb+7eKQ8aPeV5gzIX/3uYZ3CMdj/tGZI0RBRQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ws25oJ9S; arc=none smtp.client-ip=209.85.210.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="T8J6AHSG"
-Received: by mail-yb1-f182.google.com with SMTP id 3f1490d57ef6-e9d923fd113so1051622276.2
-        for <linux-block@vger.kernel.org>; Fri, 05 Sep 2025 04:20:28 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ws25oJ9S"
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-7723f0924a3so2877369b3a.2
+        for <linux-block@vger.kernel.org>; Fri, 05 Sep 2025 05:58:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1757071227; x=1757676027; darn=vger.kernel.org;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=m0obPffwyoUjRLmBWZSNECzWosU5uvWiFYS7ygRpodg=;
-        b=T8J6AHSGSZTQUJLzY/fG+3wq8MskvfDcgpamT/sAWea6rcfUZCZiQml3hcT7rr+wNA
-         Uj8cVvyooYqsRMTK1TRM1VFDynmLxXyjVatIulWg7JHF3liMux533uilIsf9shKJ1uic
-         SV6cW12COAl32KtCdHPowOV0GSCl1G1d0IyMB6q/9VTPLyaS29qs+hh5WAEKabmz2dPA
-         K4pf+eLfjnGiyEuZxkBD/ce8SS5tvdoKFkA3HSm8g+acOgHbqwuHY3EuoboC5PIfmYT8
-         7q4ErIKNquMP2LXv6jo4Sw+X2Bd2jT5JBPYjNh6+kkTHEQsiGfrkfqPkQGbqX99/8O3w
-         mEdg==
+        d=linaro.org; s=google; t=1757077093; x=1757681893; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=JX+UloOjfH7D+sxycIEOtQIvDvV/64rp/Z1H0sQ8SEs=;
+        b=ws25oJ9SDRNIKIZ9CkwvB7buUc27BSPN2v4eDfZ/2puZc4b5hjjC5QL9Cpwx5yy/gd
+         6pAmiXT8kGQco123HEK1hPL2fWA9sZQc4hRuIFn+d6r/OHbKAySxTD3uUQc8Xto2y9qo
+         DH9NTwd+5LhVl7c7k7PDyTHzx1RZFlBpzslwJ+IwwT6XI7bldQ8H8VrosL81yJwHSa76
+         EZM3UkMQNWclaqi9tL/ezTt+ColV5BjmOwYFcuu+AP+hXVqKx5J0jRKdPJZcXim40oaS
+         pcNPvsbQrsCzzXI/GF3mMR5l2Hse5WKr6GeKDMaZuNnyPMwUQBi4uH+z+GsizShnQrQq
+         Igtw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757071227; x=1757676027;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=m0obPffwyoUjRLmBWZSNECzWosU5uvWiFYS7ygRpodg=;
-        b=Aa9rqMtgUtQsVVxOc0GbR4b50jNIcFK4tAWEG4oAycfFS4lNchKAWwqjsKkdqBsDrP
-         Jqqa1PqwjQLv9TCD82NAE9mIuruAma2n7cbhJpLnHcHAfFBrvT7P+aH8Wm8Y/BOFSm23
-         eoweTgzm30dB7lcpaEEzIoVTB5IboMLchDq0F57EmjTHsP8n/ewwSJjsUWu5Tf4bIVD0
-         Eo2pdkmw7Gap59rbl6s08+4GcZICAEsZJm78dinOzhoFF43uU+Y7ixhpuc5f+ZDHaAFP
-         +F1F7TAAy2zG9DgEirFMJdan7c+t2Hy9n8Wkc+M48pvbxMXEH9JI1dVUi4pVSweY/aH+
-         hu7w==
-X-Gm-Message-State: AOJu0Ywzi3lwYS7oOOnTOsDXrtBD1Vjy6Jl90S6IT1YN2ulYs1fVX1SW
-	U0G2UcTi0hZOAhT4p7AmmQu4pQ6DrzyO08tt9m+HudmNgkd6QagNzwpItXp6a79eMjF19iLKGIe
-	3K79C
-X-Gm-Gg: ASbGncvJ4KrZj/Jvk7svcoAT0oIUfiYqkymRmHaeOKZNGvenHNxMyLesHLDRxPoD7jH
-	jxAWfGe+fEcj/+AXXwOTMIKIi1MBAwVfOe3LNIuC7nGldHo/DILG76PZrBPoysQWEZY/3rqVPep
-	ciaIWHtfxg7zIF4YWggNHdLHbUGGa9Da33iQQl+BCafo+/l+LV6Pq1v8JrpK3l/0yXMLkSF/HvR
-	Bpq+1QxaXZ+NOLygTiJDXD1aVsRVqn2ed27W+q3WYw5D1AxarPuJwRa3lmeIpVSLqscriUvu8Wp
-	Mk6fbC8DDDdkjo4hjtAHLBvnqIu/Tu1GGhGiP5xeTayb9HyuZsRxOufsC7CaM+7hAO9wZ0wKaKF
-	5+F6ClBM0VBEjlpCuSQ==
-X-Google-Smtp-Source: AGHT+IHcYnWtaLyP+1p3Rscdcg9fE5Xi8UKUqmmp5rvzlIxeUYNW56JKrJdHuxdXOF4kzKZMgCiOMQ==
-X-Received: by 2002:a05:690c:3511:b0:724:bd2d:ac97 with SMTP id 00721157ae682-724bd2dbf18mr53908497b3.32.1757071227581;
-        Fri, 05 Sep 2025 04:20:27 -0700 (PDT)
-Received: from [10.0.3.24] ([50.227.229.138])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-723a855a89csm28124487b3.55.2025.09.05.04.20.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 05 Sep 2025 04:20:26 -0700 (PDT)
-Message-ID: <fc773af0-d2c2-4394-b286-9e7be415fd74@kernel.dk>
-Date: Fri, 5 Sep 2025 05:20:26 -0600
+        d=1e100.net; s=20230601; t=1757077093; x=1757681893;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=JX+UloOjfH7D+sxycIEOtQIvDvV/64rp/Z1H0sQ8SEs=;
+        b=cuWKHQfFUCu/fG1mfw8h8ErT5znGrm5pPGH+DSKutpMG3q21E94fUwkxrpTC68AY7H
+         N8pJHnHzNzFrS3D1y0mSi8+Kpr84AjfM1fRQ88SZq74wPYGBEM6pJ/i20yo4GceYsGzB
+         /14ZMRNmj2n+I2m5owdZ2kZMAVCQwNM+7ayQ1wzoBVLKtiAFQCC6ttFGanWcnQEkPPIi
+         Z17em2LYwYpoHkpeheSjzKa/uL1Wt56RLUuNJEtJ6PQhilEwHeOflazzXQTRrV7bw4KD
+         uYfIPFZi5P5eor3VBMyb+AfhfYX2zhtMoBOJn1/tC1zbLvOe/eoS4inVEnCEusxVVRCE
+         rY/w==
+X-Forwarded-Encrypted: i=1; AJvYcCU5IOEJSch8GV9Fs5T4+ef4oE8G8kwx2eng1RWU4dL3UxC48FpQB+JxKz9RRw1qFl2YObBqxodH6vTLqQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywm98tCJeBDGIQUKLieTJGOIQJHj3W8/zSKDf2OFHoAQYxxZxqA
+	fWNxxWvhUmcyFZGrbGr0FByRprORgIoKUpVOtRX4GAYnbK4hAz57YK8xLjtBchM/XQ+dsOKrCta
+	+xAgtH7f/r7G1U3JCI4YYUbom1LWcZAkWy1RY6ea/3w==
+X-Gm-Gg: ASbGncvvrKO9Vu5Ffojrq3BA5dEL46FvJsjyyxnPGVCMNkbGKRy2nO1rzO9mxdaWAHD
+	H1HX/+MuxRcoACrFzHj0RGb6Gl67N8E9Lca++NEl7iRE8AkY2GSBc4sN48Rzuv3gj3dQDEk5K0B
+	hnvG0FJmzgjU67iWTc3qv5tePqZgYfJRAvWBUmN8UPIxLnzzXfT7pOmBV4WS2hhVkzFDIra27Sj
+	8ZZDtkh4xr8G71PNG7fvGsEangY36BQn3hj3eavEh456dTb2Z0=
+X-Google-Smtp-Source: AGHT+IHFc84uQD7HnKhbvnMlVkJWu/UesQwpj5m5QbYQvo39J9ytF/CDHAmibmoLeZCOjeCF7ZgfEj4bm8un2AUlLVk=
+X-Received: by 2002:a17:903:3ba4:b0:24a:ceea:b96f with SMTP id
+ d9443c01a7336-24aceeabf79mr205950155ad.24.1757077093464; Fri, 05 Sep 2025
+ 05:58:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 6.17-rc5
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+From: Naresh Kamboju <naresh.kamboju@linaro.org>
+Date: Fri, 5 Sep 2025 18:28:01 +0530
+X-Gm-Features: Ac12FXw1zyoAY5th54tVc4lJ5HX0a8azkxHLTgbPsqhejM_y90ZgToo_FYVmtlE
+Message-ID: <CA+G9fYtsamwXQzuQm4dYNC8kbSJzGAQvZ5mr4BA8X9WE29+yyg@mail.gmail.com>
+Subject: qemu-arm64: xfstests crash in bio_iov_iter_get_pages on next-20250904
+To: Linux btrfs <linux-btrfs@vger.kernel.org>, linux-block <linux-block@vger.kernel.org>, 
+	linux-fsdevel@vger.kernel.org, open list <linux-kernel@vger.kernel.org>, 
+	lkft-triage@lists.linaro.org, Linux Regressions <regressions@lists.linux.dev>
+Cc: Christoph Hellwig <hch@lst.de>, David Sterba <dsterba@suse.cz>, "Darrick J. Wong" <djwong@kernel.org>, 
+	Jens Axboe <axboe@kernel.dk>, Anders Roxell <anders.roxell@linaro.org>, 
+	Arnd Bergmann <arnd@arndb.de>, Dan Carpenter <dan.carpenter@linaro.org>, 
+	Ben Copeland <benjamin.copeland@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Linus,
+The following regressions were detected on qemu-arm64 while running
+xfstests with the Linux next-20250904 tag. The system crashed with an
+internal error in bio_iov_iter_get_pages(), resulting in an Oops during
+direct I/O write operations.
 
-Small set of fixes for block that should go into the -rc5 kernel
-release. This pull request contains:
+Regression Analysis:
+- New regression? yes
+- Reproducibility? yes
 
-- NVMe pull request via Keith
-	- Fix protection information ref tag for device side gen/strip
-	  (Christoph)
+First seen on next-20250904
+Bad: next-20250904 and next-20250905
+Good: next-20250822
 
-- MD pull request via Yu
-	- fix data loss for writemostly in raid1 (Yu Kuai)
-	- fix potentional data loss by skipping recovery (Li Nan)
+Test regression: next-20250904 qemu-arm64 xfstests Internal error Oops
+bio_iov_iter_get_pages
 
-Please pull!
+Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
+
+qemu-arm64:
+Test:
+* xfstests
+
+Test crash:
+
+[ 2074.633472] Internal error: Oops: 0000000096000004 [#1]  SMP
+[ 2074.639619] Modules linked in: sm3_ce sha3_ce fuse drm backlight dm_mod
+[ 2074.651698] CPU: 0 UID: 0 PID: 154238 Comm: xfs_io Not tainted
+6.17.0-rc4-next-20250904 #1 PREEMPT
+[ 2074.652132] Hardware name: linux,dummy-virt (DT)
+[ 2074.652429] pstate: 22402009 (nzCv daif +PAN -UAO +TCO -DIT -SSBS BTYPE=--)
+[ 2074.652716] pc : bio_iov_iter_get_pages (block/bio.c:1074
+block/bio.c:1272 block/bio.c:1336)
+[ 2074.701159] lr : bio_iov_iter_get_pages (block/bio.c:1072
+block/bio.c:1272 block/bio.c:1336)
+[ 2074.701366] sp : ffff800080f83950
+[ 2074.701506] x29: ffff800080f83980 x28: 000000000006f000 x27: fff00000c03b9408
+[ 2074.701853] x26: 0000000000001000 x25: 0000000000000091 x24: ffffc1ffc153b480
+[ 2074.702133] x23: 0000000000000002 x22: 00000000ffffffff x21: 0000000000000100
+[ 2074.702421] x20: 0000000000000001 x19: 0000000000001000 x18: 0000000000001000
+[ 2074.702710] x17: 0000000000000000 x16: 0000000000000000 x15: fff00000ff6e9a80
+[ 2074.702987] x14: fff0000007413500 x13: ffffa44770f6e000 x12: ffffc1ffc0000000
+[ 2074.703264] x11: 0000000000001000 x10: fff00000cf850800 x9 : fff00000cf850b78
+[ 2074.703510] x8 : ffffc1ffc153ac08 x7 : 0000ffff9626f000 x6 : 0000000000000fff
+[ 2074.703794] x5 : 0000000000021000 x4 : ffffc1ffbf000000 x3 : 7878782f78787878
+[ 2074.704079] x2 : 0000000000000000 x1 : 0000000000000000 x0 : 0000000000001000
+[ 2074.704436] Call trace:
+[ 2074.704685] bio_iov_iter_get_pages (block/bio.c:1074
+block/bio.c:1272 block/bio.c:1336) (P)
+[ 2074.704971] iomap_dio_bio_iter (fs/iomap/direct-io.c:437)
+[ 2074.705167] __iomap_dio_rw (include/linux/uio.h:228
+fs/iomap/direct-io.c:530 fs/iomap/direct-io.c:559
+fs/iomap/direct-io.c:729)
+[ 2074.705331] btrfs_direct_write+0x1f4/0x3bc
+[ 2074.713828] btrfs_do_write_iter+0x18c/0x1ec
+[ 2074.725568] btrfs_file_write_iter+0x14/0x20
+[ 2074.725936] vfs_write (fs/read_write.c:593 fs/read_write.c:686)
+[ 2074.731508] __arm64_sys_pwrite64 (fs/read_write.c:793
+fs/read_write.c:801 fs/read_write.c:798 fs/read_write.c:798)
+[ 2074.731822] invoke_syscall (arch/arm64/kernel/syscall.c:35
+arch/arm64/kernel/syscall.c:49)
+[ 2074.737438] el0_svc_common.constprop.0 (arch/arm64/kernel/syscall.c:132)
+[ 2074.737885] do_el0_svc (arch/arm64/kernel/syscall.c:151)
+[ 2074.738235] el0_svc (arch/arm64/kernel/entry-common.c:879)
+[ 2074.785073] el0t_64_sync_handler (arch/arm64/kernel/entry-common.c:899)
+[ 2074.785245] el0t_64_sync (arch/arm64/kernel/entry.S:596)
+[ 2074.785643] Code: f9400fea d2820000 7940c377 f8795943 (f9400462)
+All code
+========
+   0: f9400fea ldr x10, [sp, #24]
+   4: d2820000 mov x0, #0x1000                // #4096
+   8: 7940c377 ldrh w23, [x27, #96]
+   c: f8795943 ldr x3, [x10, w25, uxtw #3]
+  10:* f9400462 ldr x2, [x3, #8] <-- trapping instruction
+
+Code starting with the faulting instruction
+===========================================
+   0: f9400462 ldr x2, [x3, #8]
+[ 2074.786668] ---[ end trace 0000000000000000 ]---
 
 
-The following changes since commit 95a7c5000956f939b86d8b00b8e6b8345f4a9b65:
+## Source
+* Kernel version: 6.17.0-rc4-next-20250904
+* Git tree: https://kernel.googlesource.com/pub/scm/linux/kernel/git/next/linux-next.git
+* Git describe: next-20250904
+* Git commit: 4ac65880ebca1b68495bd8704263b26c050ac010
+* Architectures / Devices: qemu-arm64
+* Toolchains: gcc-13
+* Kconfigs: defconfig+xfstests
+* xfstests: v2024.12.01
 
-  bcache: change maintainer's email address (2025-08-28 10:05:37 -0600)
+## Build
+* Test log: https://qa-reports.linaro.org/api/testruns/29762004/log_file/
+* Test details:
+https://regressions.linaro.org/lkft/linux-next-master/next-20250904/log-parser-test/internal-error-oops-oops-smp/
+* Test plan: https://tuxapi.tuxsuite.com/v1/groups/linaro/projects/lkft/tests/32E6ypoTqaDjAEJISuUAAgkPUva
+* Build link: https://storage.tuxsuite.com/public/linaro/lkft/builds/32E6us2qcXmnop3jTYQMOB9eVPt/
+* Kernel config:
+https://storage.tuxsuite.com/public/linaro/lkft/builds/32E6us2qcXmnop3jTYQMOB9eVPt/config
+* xfstests: https://storage.tuxboot.com/overlays/debian/trixie/arm64/xfstests/v2024.12.01/xfstests.tar.xz
 
-are available in the Git repository at:
-
-  git://git.kernel.dk/linux.git tags/block-6.17-20250905
-
-for you to fetch changes up to 743bf030947169c413a711f60cebe73f837e649f:
-
-  Merge tag 'md-6.17-20250905' of https://git.kernel.org/pub/scm/linux/kernel/git/mdraid/linux into block-6.17 (2025-09-05 05:08:27 -0600)
-
-----------------------------------------------------------------
-block-6.17-20250905
-
-----------------------------------------------------------------
-Christoph Hellwig (1):
-      nvme: fix PI insert on write
-
-Jens Axboe (2):
-      Merge tag 'nvme-6.17-2025-09-04' of git://git.infradead.org/nvme into block-6.17
-      Merge tag 'md-6.17-20250905' of https://git.kernel.org/pub/scm/linux/kernel/git/mdraid/linux into block-6.17
-
-Li Nan (1):
-      md: prevent incorrect update of resync/recovery offset
-
-Yu Kuai (1):
-      md/raid1: fix data lost for writemostly rdev
-
- drivers/md/md.c          |  5 +++++
- drivers/md/raid1.c       |  2 +-
- drivers/nvme/host/core.c | 18 +++++++++++-------
- 3 files changed, 17 insertions(+), 8 deletions(-)
-
--- 
-Jens Axboe
-
+--
+Linaro LKFT
+https://lkft.linaro.org
