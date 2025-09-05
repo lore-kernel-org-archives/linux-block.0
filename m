@@ -1,32 +1,32 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BC90306B3D;
-	Fri,  5 Sep 2025 16:50:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94CE83191A2;
+	Fri,  5 Sep 2025 17:38:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757091058; cv=none; b=in2Jjf5hDGgJ5BtBNl2mgSh3gmXfY3BlT8huNcPsfroXpNesqCYSULXqBPUfLr4M6t/UnTUsYhpYTgrJHBFRA9dtXRtOp/tqsNp2mtAlK6hOwVxTxdoGCJls62/X8eUxze5FGsPObOJHzI3p/ioNLB11q7dt5Gy5KNwAqqhZpCg=
+	t=1757093935; cv=none; b=aZDrTys816/NRomw7OkJqC08+tz2Z60kjQXjvtNZYnU93t0dNL9LOPF1vAvBvQn2JNpiW0DkM7ZqrgIzESbz5pY2WxLQGcwKQd6upMizMizrkIUlbijGDDfw2JA96kIRUt9rX+9C1HUW7ijjfcB0O+H6HtqwBbBU46josiMcMxw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757091058; c=relaxed/simple;
-	bh=ed7tjh37WUsiWKbFsXU4Fz4LWP9OYuSxI0T6PtehL5I=;
+	s=arc-20240116; t=1757093935; c=relaxed/simple;
+	bh=RwgI6iOiiGGaVq5ryV0ZWpJOK9YgvvrfbQAyHKlknns=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fF0IRiuy/yeYx6gLhj0ZJLHuFQusxejUghJ3ONvhsEGAJeUz0ZlwsWzGUkQ1b8hzrERb654vfk+fwH4oSxy7tgslFMiGX0hXnumqRuUqN3/Qqx3JCcBj+gQGG2V9Lg6RaK2QBBSYrdqWGdMTc9aISJHXl+zHlQ1TFczWt+RLdqU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Hkj6jwvL; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ubr+6eQzglu21Zk/rhKmInfpkcsRiY028daSWnNnZ9aix7VLebvEsLFIjqdVPP/XUROVbQz7VnnBuG55/gGZ/3yj82JRjixB1YH0OLMY6GVI14zatg5vvT9P53ZwQ5d/oL7L6Kv+CaP3CsTMfhWTDBllNvAbnWEwLPf7QEb71zU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ld3/+CXF; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hkj6jwvL"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 291F0C4CEF1;
-	Fri,  5 Sep 2025 16:50:57 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ld3/+CXF"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4AA22C4CEF1;
+	Fri,  5 Sep 2025 17:38:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757091058;
-	bh=ed7tjh37WUsiWKbFsXU4Fz4LWP9OYuSxI0T6PtehL5I=;
+	s=k20201202; t=1757093935;
+	bh=RwgI6iOiiGGaVq5ryV0ZWpJOK9YgvvrfbQAyHKlknns=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Hkj6jwvLxKggBm5BaYRmXNHFJSTzS4j//v2v297B9zbvAb6zaXk3ye+d7kJpzYt+i
-	 pVjGPf+glYmCMY8ZXxKqFzfErZn5vYpuxstgE5z7K6bWjnB52Zu2pWhWX8YpcE0TZ3
-	 wqpQ/atJ+vA0oyDRUVNRdo8I0NXlm4wfllQDaEaUhi9U9aEo4xqnHh2mcEuBjTyxog
-	 A1t4vtOjJmcxMXWsrEs0iDeQq9drkmd4Whjs7cSHTOvVKn09EIzsL7m+VCMmXlxsZx
-	 LFVA53bS5HpTQKBuuE67ybcB5j6vm/3A//si20RgKUC4Z6Fe/u+7Z/FKOCjsOXLxSF
-	 Mdr++eBA7BRQw==
-Date: Fri, 5 Sep 2025 19:50:51 +0300
+	b=Ld3/+CXFzo5ZlgBaEJAAJ7n8ftGIf1vPmYVyQ1Q0lHbk30C+f/zGBCjYcCjqKGMkP
+	 ws0j93C+g7AZ/Qe51tbRHlFMkxmG8V2HiTKDDiIWpTC2x67XRe77cJRX2O/0Emokq3
+	 empFPEdzGq6Yu1WtRJ7c3H3VguQh/C6NxRnBxnFK+dgTB/PoKfshLNhSffqo96FEeK
+	 5gqAp6J/XAgqm8C64dBl5bC3cJKCuXlyMRuLkxNADtvKhMqMkGQ2Y7tGhP772p1Ynd
+	 b5DRxNZc712LsAvfWwUYrOIy6AN49OJHPTqpk5krnaWlYW3AAU/MPcrMbpxJdoJz6O
+	 DAfHVEkZTDmug==
+Date: Fri, 5 Sep 2025 20:38:50 +0300
 From: Leon Romanovsky <leon@kernel.org>
 To: Marek Szyprowski <m.szyprowski@samsung.com>
 Cc: Jason Gunthorpe <jgg@nvidia.com>,
@@ -35,14 +35,14 @@ Cc: Jason Gunthorpe <jgg@nvidia.com>,
 	Alex Gaynor <alex.gaynor@gmail.com>,
 	Andrew Morton <akpm@linux-foundation.org>,
 	Christoph Hellwig <hch@lst.de>, Danilo Krummrich <dakr@kernel.org>,
-	David Hildenbrand <david@redhat.com>, iommu@lists.linux.dev,
-	Jason Wang <jasowang@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-	Joerg Roedel <joro@8bytes.org>, Jonathan Corbet <corbet@lwn.net>,
-	Juergen Gross <jgross@suse.com>, kasan-dev@googlegroups.com,
-	Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org, linux-nvme@lists.infradead.org,
-	linuxppc-dev@lists.ozlabs.org, linux-trace-kernel@vger.kernel.org,
+	iommu@lists.linux.dev, Jason Wang <jasowang@redhat.com>,
+	Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>,
+	Jonathan Corbet <corbet@lwn.net>, Juergen Gross <jgross@suse.com>,
+	kasan-dev@googlegroups.com, Keith Busch <kbusch@kernel.org>,
+	linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+	linux-nvme@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
+	linux-trace-kernel@vger.kernel.org,
 	Madhavan Srinivasan <maddy@linux.ibm.com>,
 	Masami Hiramatsu <mhiramat@kernel.org>,
 	Michael Ellerman <mpe@ellerman.id.au>,
@@ -54,76 +54,153 @@ Cc: Jason Gunthorpe <jgg@nvidia.com>,
 	Steven Rostedt <rostedt@goodmis.org>,
 	virtualization@lists.linux.dev, Will Deacon <will@kernel.org>,
 	xen-devel@lists.xenproject.org
-Subject: Re: [PATCH v5 07/16] dma-mapping: convert dma_direct_*map_page to be
- phys_addr_t based
-Message-ID: <20250905165051.GA25881@unreal>
-References: <cover.1756822782.git.leon@kernel.org>
- <CGME20250902144935eucas1p253de9e94315de54325cc61dea9c76490@eucas1p2.samsung.com>
- <6b2f4cb436c98d6342db69e965a5621707b9711f.1756822782.git.leon@kernel.org>
- <087e7f3d-1e0d-4efe-822f-72d16d161a60@samsung.com>
+Subject: Re: [PATCH v4 00/16] dma-mapping: migrate to physical address-based
+ API
+Message-ID: <20250905173850.GB25881@unreal>
+References: <cover.1755624249.git.leon@kernel.org>
+ <CGME20250829131641eucas1p2ddd687e4e8c16a2bc64a293b6364fa6f@eucas1p2.samsung.com>
+ <20250829131625.GK9469@nvidia.com>
+ <7557f31e-1504-4f62-b00b-70e25bb793cb@samsung.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <087e7f3d-1e0d-4efe-822f-72d16d161a60@samsung.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <7557f31e-1504-4f62-b00b-70e25bb793cb@samsung.com>
 
-On Fri, Sep 05, 2025 at 06:21:44PM +0200, Marek Szyprowski wrote:
-> On 02.09.2025 16:48, Leon Romanovsky wrote:
-> > From: Leon Romanovsky <leonro@nvidia.com>
+On Fri, Sep 05, 2025 at 06:20:51PM +0200, Marek Szyprowski wrote:
+> On 29.08.2025 15:16, Jason Gunthorpe wrote:
+> > On Tue, Aug 19, 2025 at 08:36:44PM +0300, Leon Romanovsky wrote:
 > >
-> > Convert the DMA direct mapping functions to accept physical addresses
-> > directly instead of page+offset parameters. The functions were already
-> > operating on physical addresses internally, so this change eliminates
-> > the redundant page-to-physical conversion at the API boundary.
+> >> This series does the core code and modern flows. A followup series
+> >> will give the same treatment to the legacy dma_ops implementation.
+> > I took a quick check over this to see that it is sane.  I think using
+> > phys is an improvement for most of the dma_ops implemenations.
 > >
-> > The functions dma_direct_map_page() and dma_direct_unmap_page() are
-> > renamed to dma_direct_map_phys() and dma_direct_unmap_phys() respectively,
-> > with their calling convention changed from (struct page *page,
-> > unsigned long offset) to (phys_addr_t phys).
+> >    arch/sparc/kernel/pci_sun4v.c
+> >    arch/sparc/kernel/iommu.c
+> >      Uses __pa to get phys from the page, never touches page
 > >
-> > Architecture-specific functions arch_dma_map_page_direct() and
-> > arch_dma_unmap_page_direct() are similarly renamed to
-> > arch_dma_map_phys_direct() and arch_dma_unmap_phys_direct().
+> >    arch/alpha/kernel/pci_iommu.c
+> >    arch/sparc/mm/io-unit.c
+> >    drivers/parisc/ccio-dma.c
+> >    drivers/parisc/sba_iommu.c
+> >      Does page_addres() and later does __pa on it. Doesn't touch struct page
 > >
-> > The is_pci_p2pdma_page() checks are replaced with DMA_ATTR_MMIO checks
-> > to allow integration with dma_direct_map_resource and dma_direct_map_phys()
-> > is extended to support MMIO path either.
+> >    arch/x86/kernel/amd_gart_64.c
+> >    drivers/xen/swiotlb-xen.c
+> >    arch/mips/jazz/jazzdma.c
+> >      Immediately does page_to_phys(), never touches struct page
 > >
-> > Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
-> > Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-> > ---
-> >   arch/powerpc/kernel/dma-iommu.c |  4 +--
-> >   include/linux/dma-map-ops.h     |  8 ++---
-> >   kernel/dma/direct.c             |  6 ++--
-> >   kernel/dma/direct.h             | 57 +++++++++++++++++++++------------
-> >   kernel/dma/mapping.c            |  8 ++---
-> >   5 files changed, 49 insertions(+), 34 deletions(-)
-
-<...>
-
-> > -	if (unlikely(!dma_capable(dev, dma_addr, size, true)) ||
-> > -	    dma_kmalloc_needs_bounce(dev, size, dir)) {
-> > -		if (is_pci_p2pdma_page(page))
-> > -			return DMA_MAPPING_ERROR;
-> > -		if (is_swiotlb_active(dev))
-> > -			return swiotlb_map(dev, phys, size, dir, attrs);
-> > -
-> > -		dev_WARN_ONCE(dev, 1,
-> > -			     "DMA addr %pad+%zu overflow (mask %llx, bus limit %llx).\n",
-> > -			     &dma_addr, size, *dev->dma_mask, dev->bus_dma_limit);
-> > -		return DMA_MAPPING_ERROR;
-> > +	if (attrs & DMA_ATTR_MMIO) {
-> > +		dma_addr = phys;
-> > +		if (unlikely(dma_capable(dev, dma_addr, size, false)))
+> >    drivers/vdpa/vdpa_user/vduse_dev.c
+> >      Does page_to_phys() to call iommu_map()
+> >
+> >    drivers/xen/grant-dma-ops.c
+> >      Does page_to_pfn() and nothing else
+> >
+> >    arch/powerpc/platforms/ps3/system-bus.c
+> >     This is a maze but I think it wants only phys and the virt is only
+> >     used for debug prints.
+> >
+> > The above all never touch a KVA and just want a phys_addr_t.
+> >
+> > The below are touching the KVA somehow:
+> >
+> >    arch/sparc/mm/iommu.c
+> >    arch/arm/mm/dma-mapping.c
+> >      Uses page_address to cache flush, would be happy with phys_to_virt()
+> >      and a PhysHighMem()
+> >
+> >    arch/powerpc/kernel/dma-iommu.c
+> >    arch/powerpc/platforms/pseries/vio.c
+> >     Uses iommu_map_page() which wants phys_to_virt(), doesn't touch
+> >     struct page
+> >
+> >    arch/powerpc/platforms/pseries/ibmebus.c
+> >      Returns phys_to_virt() as dma_addr_t.
+> >
+> > The two PPC ones are weird, I didn't figure out how that was working..
+> >
+> > It would be easy to make map_phys patches for about half of these, in
+> > the first grouping. Doing so would also grant those arches
+> > map_resource capability.
+> >
+> > Overall I didn't think there was any reduction in maintainability in
+> > these places. Most are improvements eliminating code, and some are
+> > just switching to phys_to_virt() from page_address(), which we could
+> > further guard with DMA_ATTR_MMIO and a check for highmem.
 > 
-> "!dma_capable(dev, dma_addr, size, false)" in the above line.
+> Thanks for this summary.
 > 
-> It took me a while to find this after noticing that this patchset breaks booting some of me test systems.
+> However I would still like to get an answer for the simple question - 
+> why all this work cannot be replaced by a simple use of dma_map_resource()?
+> 
+> I've checked the most advertised use case in 
+> https://git.kernel.org/pub/scm/linux/kernel/git/leon/linux-rdma.git/log/?h=dmabuf-vfio 
+> and I still don't see the reason why it cannot be based 
+> on dma_map_resource() API? I'm aware of the little asymmetry of the 
+> client calls is such case, indeed it is not preety, but this should work 
+> even now:
+> 
+> phys = phys_vec[i].paddr;
+> 
+> if (is_mmio)
+>      dma_map_resource(phys, len, ...);
+> else
+>      dma_map_page(phys_to_page(phys), offset_in_page(phys), ...);
+> 
+> What did I miss?
 
-Ohh, sorry, I overlooked it. Do you expect from me v6?
+"Even now" can't work mainly because both of these interfaces don't
+support p2p case (PCI_P2PDMA_MAP_BUS_ADDR).
+
+It is unclear how to extend them without introducing new functions
+and/or changing whole kernel. In PCI_P2PDMA_MAP_BUS_ADDR case, there
+is no struct page, so dma_map_page() is unlikely to be possible to
+extend and dma_map_resource() has no direct way to access PCI
+bus_offset. In theory, it is doable, but will be layer violation as DMA
+will need to rely on PCI layer for address calculations.
+
+If we don't extend, in general case (for HMM, RDMA and NVMe) end result will be something like that:
+if (...PCI_P2PDMA_MAP_BUS_ADDR)
+  pci_p2pdma_bus_addr_map
+else if (mmio)
+  dma_map_resource
+else              <- this case is not applicable to VFIO-DMABUF
+  dma_map_page
+
+In case, we will somehow extend these functions to support it, we will
+lose very important optimization where we are performing one IOTLB
+sync for whole DMABUF region == dma_iova_state, and I was told that
+it is very large region.
+
+  103         for (i = 0; i < priv->nr_ranges; i++) {
+  <...>
+  107                 } else if (dma_use_iova(state)) {
+  108                         ret = dma_iova_link(attachment->dev, state,
+  109                                             phys_vec[i].paddr, 0,
+  110                                             phys_vec[i].len, dir, attrs);
+  111                         if (ret)
+  112                                 goto err_unmap_dma;
+  113
+  114                         mapped_len += phys_vec[i].len;
+  <...>
+  132         }
+  133
+  134         if (state && dma_use_iova(state)) {
+  135                 WARN_ON_ONCE(mapped_len != priv->size);
+  136                 ret = dma_iova_sync(attachment->dev, state, 0, mapped_len);
+
+> 
+> I'm not against this rework, but I would really like to know the 
+> rationale. I know that the 2-step dma-mapping API also use phys 
+> addresses and this is the same direction.
+
+This series is continuation of 2-step dma-mapping API. The plan to
+provide dma_map_phys() was from the beginning.
 
 Thanks
