@@ -1,176 +1,277 @@
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C87D1F61C
-	for <linux-block@vger.kernel.org>; Fri,  5 Sep 2025 12:58:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FA722F7AAF;
+	Fri,  5 Sep 2025 14:59:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757077096; cv=none; b=XZqpdUGseH+pfwglIBPIrmJ9yDx0yL2kI4aAz946DHZHBDvbvus1rpJ+Q3BojK8T78duO/Jf20zb+FE3e69i4PihjZhkufSDUfeoi9T0TIs2CWz6/yBCeoi1onj+eRGqwWhws/7ArNsyBnu2ZVk/8ObEBcNwdQaBI2BIHCsJko8=
+	t=1757084394; cv=none; b=e9Soz8DRqdgSbDObOxYJfSFy8fQ9aTLxg1hJs3aDZZVOvgJLJDkUvamTIUeDfE0mQ+lx1RF3DnoKFYrq3/UlU2CNA7BTVOhvI/Mqv42RI+4+5OaO/as6wI5/GKxF23lQeb936UBM/roNxvKCJsjHisrYxOQQQu2VL3QsBDMHuws=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757077096; c=relaxed/simple;
-	bh=B4t5lfIeAigVVk9t8Ob6HbXErWQiFE5Us9s4emvtCSk=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=AI7aoSKzIN7RCVpVb+e1CCrJpHkmu1Ie9auE3ehi0nljq18yByNdILab+p5Ojqxg8Hdfn/sXYGVtTiiLcmSoHQ2T6s9JSmXBfOkLqUXAsCgl2ITtgDoXCVxTywg0VbAwNgYIGjqb+7eKQ8aPeV5gzIX/3uYZ3CMdj/tGZI0RBRQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ws25oJ9S; arc=none smtp.client-ip=209.85.210.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1757084394; c=relaxed/simple;
+	bh=yRGd8CiKgE1ucAOdb3yAQkpPBUr0SUK/ISIzXtaBgiI=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=GkWDciiyubZAmuzZc8f0pRjJVSND0fd4bT+qFT1UDtGmjyBHAyKpBwlGIWNJsB11HYeRez4dfcHzRT1wr7CFREVuYGjKsVyE766g3nRVPqBJFks0uAJkrLBAfJ6isWEZpqQC42DeyJ3yQMT6UcHfjGhhdRKv9x1n4EprB2+PEcE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Uqw4pg2e; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ws25oJ9S"
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-7723f0924a3so2877369b3a.2
-        for <linux-block@vger.kernel.org>; Fri, 05 Sep 2025 05:58:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1757077093; x=1757681893; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=JX+UloOjfH7D+sxycIEOtQIvDvV/64rp/Z1H0sQ8SEs=;
-        b=ws25oJ9SDRNIKIZ9CkwvB7buUc27BSPN2v4eDfZ/2puZc4b5hjjC5QL9Cpwx5yy/gd
-         6pAmiXT8kGQco123HEK1hPL2fWA9sZQc4hRuIFn+d6r/OHbKAySxTD3uUQc8Xto2y9qo
-         DH9NTwd+5LhVl7c7k7PDyTHzx1RZFlBpzslwJ+IwwT6XI7bldQ8H8VrosL81yJwHSa76
-         EZM3UkMQNWclaqi9tL/ezTt+ColV5BjmOwYFcuu+AP+hXVqKx5J0jRKdPJZcXim40oaS
-         pcNPvsbQrsCzzXI/GF3mMR5l2Hse5WKr6GeKDMaZuNnyPMwUQBi4uH+z+GsizShnQrQq
-         Igtw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757077093; x=1757681893;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=JX+UloOjfH7D+sxycIEOtQIvDvV/64rp/Z1H0sQ8SEs=;
-        b=cuWKHQfFUCu/fG1mfw8h8ErT5znGrm5pPGH+DSKutpMG3q21E94fUwkxrpTC68AY7H
-         N8pJHnHzNzFrS3D1y0mSi8+Kpr84AjfM1fRQ88SZq74wPYGBEM6pJ/i20yo4GceYsGzB
-         /14ZMRNmj2n+I2m5owdZ2kZMAVCQwNM+7ayQ1wzoBVLKtiAFQCC6ttFGanWcnQEkPPIi
-         Z17em2LYwYpoHkpeheSjzKa/uL1Wt56RLUuNJEtJ6PQhilEwHeOflazzXQTRrV7bw4KD
-         uYfIPFZi5P5eor3VBMyb+AfhfYX2zhtMoBOJn1/tC1zbLvOe/eoS4inVEnCEusxVVRCE
-         rY/w==
-X-Forwarded-Encrypted: i=1; AJvYcCU5IOEJSch8GV9Fs5T4+ef4oE8G8kwx2eng1RWU4dL3UxC48FpQB+JxKz9RRw1qFl2YObBqxodH6vTLqQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywm98tCJeBDGIQUKLieTJGOIQJHj3W8/zSKDf2OFHoAQYxxZxqA
-	fWNxxWvhUmcyFZGrbGr0FByRprORgIoKUpVOtRX4GAYnbK4hAz57YK8xLjtBchM/XQ+dsOKrCta
-	+xAgtH7f/r7G1U3JCI4YYUbom1LWcZAkWy1RY6ea/3w==
-X-Gm-Gg: ASbGncvvrKO9Vu5Ffojrq3BA5dEL46FvJsjyyxnPGVCMNkbGKRy2nO1rzO9mxdaWAHD
-	H1HX/+MuxRcoACrFzHj0RGb6Gl67N8E9Lca++NEl7iRE8AkY2GSBc4sN48Rzuv3gj3dQDEk5K0B
-	hnvG0FJmzgjU67iWTc3qv5tePqZgYfJRAvWBUmN8UPIxLnzzXfT7pOmBV4WS2hhVkzFDIra27Sj
-	8ZZDtkh4xr8G71PNG7fvGsEangY36BQn3hj3eavEh456dTb2Z0=
-X-Google-Smtp-Source: AGHT+IHFc84uQD7HnKhbvnMlVkJWu/UesQwpj5m5QbYQvo39J9ytF/CDHAmibmoLeZCOjeCF7ZgfEj4bm8un2AUlLVk=
-X-Received: by 2002:a17:903:3ba4:b0:24a:ceea:b96f with SMTP id
- d9443c01a7336-24aceeabf79mr205950155ad.24.1757077093464; Fri, 05 Sep 2025
- 05:58:13 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Uqw4pg2e"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7FBF7C4CEF1;
+	Fri,  5 Sep 2025 14:59:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757084394;
+	bh=yRGd8CiKgE1ucAOdb3yAQkpPBUr0SUK/ISIzXtaBgiI=;
+	h=From:Subject:Date:To:Cc:From;
+	b=Uqw4pg2eSLlLqt4hunI8pwNBPebkZH23w6mIKWwrid3DZBSW9P6k3l9R1bd8c3Eq4
+	 ODeXarAhghoen+iReDzQ141bSpBWr0/5e9FDUzr01oK/Hos+8cL1sJH2/BD39W6waF
+	 J5OJPjM6R/RsjWFZfVfNqMZalxjY+X4LoAzmXQEPGBxMYpXRnOlTB2fPRz1d446C2o
+	 e7TypnYlUclmFZRO29sIMlstmZkiXT3fgv6oNibgKaXYgNzO6R5oT2kHvpKrDpvntT
+	 PxU1shvpwH0mZ2bJ/MF3fdmM3P1Nyva2QI1+OXKFH/+nX8nfSl3I2Bs6vzzUDU/8U8
+	 l7b+USvYsSEtw==
+From: Daniel Wagner <wagi@kernel.org>
+Subject: [PATCH v8 00/12] blk: honor isolcpus configuration
+Date: Fri, 05 Sep 2025 16:59:46 +0200
+Message-Id: <20250905-isolcpus-io-queues-v8-0-885984c5daca@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Naresh Kamboju <naresh.kamboju@linaro.org>
-Date: Fri, 5 Sep 2025 18:28:01 +0530
-X-Gm-Features: Ac12FXw1zyoAY5th54tVc4lJ5HX0a8azkxHLTgbPsqhejM_y90ZgToo_FYVmtlE
-Message-ID: <CA+G9fYtsamwXQzuQm4dYNC8kbSJzGAQvZ5mr4BA8X9WE29+yyg@mail.gmail.com>
-Subject: qemu-arm64: xfstests crash in bio_iov_iter_get_pages on next-20250904
-To: Linux btrfs <linux-btrfs@vger.kernel.org>, linux-block <linux-block@vger.kernel.org>, 
-	linux-fsdevel@vger.kernel.org, open list <linux-kernel@vger.kernel.org>, 
-	lkft-triage@lists.linaro.org, Linux Regressions <regressions@lists.linux.dev>
-Cc: Christoph Hellwig <hch@lst.de>, David Sterba <dsterba@suse.cz>, "Darrick J. Wong" <djwong@kernel.org>, 
-	Jens Axboe <axboe@kernel.dk>, Anders Roxell <anders.roxell@linaro.org>, 
-	Arnd Bergmann <arnd@arndb.de>, Dan Carpenter <dan.carpenter@linaro.org>, 
-	Ben Copeland <benjamin.copeland@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-B4-Tracking: v=1; b=H4sIAOL6umgC/23SzW4CIRQF4FcxrIvh8q8r36PpApiLkhpHwZm0M
+ b57Ga21E1keEj44XC6kYE5YyHpxIRnHVFJ/qMG+LUjYucMWaepqJpxxyTRnNJV+H45DoamnpwE
+ HLBScteilidF6UjceM8b0dUPfP2repXLu8/ftjBGm1QcHLW4Eyqj1oFc+SmBWbMpQcNkhmbCR/
+ wdME+AV4NoJjiLIaNQcEE/AMt0ERAU6xxBDRFdbzQH5BwCH9g1kBVQnlIreA4LcfGI+4H7Z5+3
+ dUA9DMYDmq46qGgxlBLDaMs9eDP00JJdNQ1dj5ZRw1rDgIL4Y5mkYxpuGmboo45xBFwLOu1zv8
+ 854GurfOf8O/Xr9AeyxlhxZAgAA
+X-Change-ID: 20240620-isolcpus-io-queues-1a88eb47ff8b
+To: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>, 
+ Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>, 
+ "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Aaron Tomlin <atomlin@atomlin.com>, 
+ "Martin K. Petersen" <martin.petersen@oracle.com>, 
+ Thomas Gleixner <tglx@linutronix.de>, 
+ Costa Shulyupin <costa.shul@redhat.com>, Juri Lelli <juri.lelli@redhat.com>, 
+ Valentin Schneider <vschneid@redhat.com>, Waiman Long <llong@redhat.com>, 
+ Ming Lei <ming.lei@redhat.com>, Frederic Weisbecker <frederic@kernel.org>, 
+ Mel Gorman <mgorman@suse.de>, Hannes Reinecke <hare@suse.de>, 
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
+ Aaron Tomlin <atomlin@atomlin.com>, linux-kernel@vger.kernel.org, 
+ linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, 
+ megaraidlinux.pdl@broadcom.com, linux-scsi@vger.kernel.org, 
+ storagedev@microchip.com, virtualization@lists.linux.dev, 
+ GR-QLogic-Storage-Upstream@marvell.com, Daniel Wagner <wagi@kernel.org>
+X-Mailer: b4 0.14.2
 
-The following regressions were detected on qemu-arm64 while running
-xfstests with the Linux next-20250904 tag. The system crashed with an
-internal error in bio_iov_iter_get_pages(), resulting in an Oops during
-direct I/O write operations.
+The main changes in this version are
 
-Regression Analysis:
-- New regression? yes
-- Reproducibility? yes
+  - merged the mapping algorithm into the existing code
+  - dropping a bunch of SCSI drivers update
 
-First seen on next-20250904
-Bad: next-20250904 and next-20250905
-Good: next-20250822
+With the merging of the isolcpus-aware mapping code, there is a change in
+how the resulting CPU–hctx mapping looks for systems with identical CPUs
+(non-hyperthreaded CPUs). My understanding is that it shouldn't matter,
+but the devil is in the details.
 
-Test regression: next-20250904 qemu-arm64 xfstests Internal error Oops
-bio_iov_iter_get_pages
+  Package L#0
+    NUMANode L#0 (P#0 3255MB)
+    L3 L#0 (16MB)
+      L2 L#0 (512KB) + L1d L#0 (64KB) + L1i L#0 (64KB) + Core L#0 + PU L#0 (P#0)
+      L2 L#1 (512KB) + L1d L#1 (64KB) + L1i L#1 (64KB) + Core L#1 + PU L#1 (P#1)
+      L2 L#2 (512KB) + L1d L#2 (64KB) + L1i L#2 (64KB) + Core L#2 + PU L#2 (P#2)
+      L2 L#3 (512KB) + L1d L#3 (64KB) + L1i L#3 (64KB) + Core L#3 + PU L#3 (P#3)
+      L2 L#4 (512KB) + L1d L#4 (64KB) + L1i L#4 (64KB) + Core L#4 + PU L#4 (P#4)
+      L2 L#5 (512KB) + L1d L#5 (64KB) + L1i L#5 (64KB) + Core L#5 + PU L#5 (P#5)
+      L2 L#6 (512KB) + L1d L#6 (64KB) + L1i L#6 (64KB) + Core L#6 + PU L#6 (P#6)
+      L2 L#7 (512KB) + L1d L#7 (64KB) + L1i L#7 (64KB) + Core L#7 + PU L#7 (P#7)
 
-Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
+base version:
+queue mapping for /dev/nvme0n1
+        hctx0: default 0 8
+        hctx1: default 1 9
+        hctx2: default 2 10
+        hctx3: default 3 11
+        hctx4: default 4 12
+        hctx5: default 5 13
+        hctx6: default 6 14
+        hctx7: default 7 15
 
-qemu-arm64:
-Test:
-* xfstests
+patched:
+queue mapping for /dev/nvme0n1
+        hctx0: default 0 1
+        hctx1: default 2 3
+        hctx2: default 4 5
+        hctx3: default 6 7
+        hctx4: default 8 9
+        hctx5: default 10 11
+        hctx6: default 12 13
+        hctx7: default 14 15
 
-Test crash:
+  Package L#0 + L3 L#0 (16MB)
+    L2 L#0 (512KB) + L1d L#0 (64KB) + L1i L#0 (64KB) + Core L#0
+      PU L#0 (P#0)
+      PU L#1 (P#1)
+    L2 L#1 (512KB) + L1d L#1 (64KB) + L1i L#1 (64KB) + Core L#1
+      PU L#2 (P#2)
+      PU L#3 (P#3)
+    L2 L#2 (512KB) + L1d L#2 (64KB) + L1i L#2 (64KB) + Core L#2
+      PU L#4 (P#4)
+      PU L#5 (P#5)
+    L2 L#3 (512KB) + L1d L#3 (64KB) + L1i L#3 (64KB) + Core L#3
+      PU L#6 (P#6)
+      PU L#7 (P#7)
+  Package L#1 + L3 L#1 (16MB)
+    L2 L#4 (512KB) + L1d L#4 (64KB) + L1i L#4 (64KB) + Core L#4
+      PU L#8 (P#8)
+      PU L#9 (P#9)
+    L2 L#5 (512KB) + L1d L#5 (64KB) + L1i L#5 (64KB) + Core L#5
+      PU L#10 (P#10)
+      PU L#11 (P#11)
+    L2 L#6 (512KB) + L1d L#6 (64KB) + L1i L#6 (64KB) + Core L#6
+      PU L#12 (P#12)
+      PU L#13 (P#13)
+    L2 L#7 (512KB) + L1d L#7 (64KB) + L1i L#7 (64KB) + Core L#7
+      PU L#14 (P#14)
+      PU L#15 (P#15)
 
-[ 2074.633472] Internal error: Oops: 0000000096000004 [#1]  SMP
-[ 2074.639619] Modules linked in: sm3_ce sha3_ce fuse drm backlight dm_mod
-[ 2074.651698] CPU: 0 UID: 0 PID: 154238 Comm: xfs_io Not tainted
-6.17.0-rc4-next-20250904 #1 PREEMPT
-[ 2074.652132] Hardware name: linux,dummy-virt (DT)
-[ 2074.652429] pstate: 22402009 (nzCv daif +PAN -UAO +TCO -DIT -SSBS BTYPE=--)
-[ 2074.652716] pc : bio_iov_iter_get_pages (block/bio.c:1074
-block/bio.c:1272 block/bio.c:1336)
-[ 2074.701159] lr : bio_iov_iter_get_pages (block/bio.c:1072
-block/bio.c:1272 block/bio.c:1336)
-[ 2074.701366] sp : ffff800080f83950
-[ 2074.701506] x29: ffff800080f83980 x28: 000000000006f000 x27: fff00000c03b9408
-[ 2074.701853] x26: 0000000000001000 x25: 0000000000000091 x24: ffffc1ffc153b480
-[ 2074.702133] x23: 0000000000000002 x22: 00000000ffffffff x21: 0000000000000100
-[ 2074.702421] x20: 0000000000000001 x19: 0000000000001000 x18: 0000000000001000
-[ 2074.702710] x17: 0000000000000000 x16: 0000000000000000 x15: fff00000ff6e9a80
-[ 2074.702987] x14: fff0000007413500 x13: ffffa44770f6e000 x12: ffffc1ffc0000000
-[ 2074.703264] x11: 0000000000001000 x10: fff00000cf850800 x9 : fff00000cf850b78
-[ 2074.703510] x8 : ffffc1ffc153ac08 x7 : 0000ffff9626f000 x6 : 0000000000000fff
-[ 2074.703794] x5 : 0000000000021000 x4 : ffffc1ffbf000000 x3 : 7878782f78787878
-[ 2074.704079] x2 : 0000000000000000 x1 : 0000000000000000 x0 : 0000000000001000
-[ 2074.704436] Call trace:
-[ 2074.704685] bio_iov_iter_get_pages (block/bio.c:1074
-block/bio.c:1272 block/bio.c:1336) (P)
-[ 2074.704971] iomap_dio_bio_iter (fs/iomap/direct-io.c:437)
-[ 2074.705167] __iomap_dio_rw (include/linux/uio.h:228
-fs/iomap/direct-io.c:530 fs/iomap/direct-io.c:559
-fs/iomap/direct-io.c:729)
-[ 2074.705331] btrfs_direct_write+0x1f4/0x3bc
-[ 2074.713828] btrfs_do_write_iter+0x18c/0x1ec
-[ 2074.725568] btrfs_file_write_iter+0x14/0x20
-[ 2074.725936] vfs_write (fs/read_write.c:593 fs/read_write.c:686)
-[ 2074.731508] __arm64_sys_pwrite64 (fs/read_write.c:793
-fs/read_write.c:801 fs/read_write.c:798 fs/read_write.c:798)
-[ 2074.731822] invoke_syscall (arch/arm64/kernel/syscall.c:35
-arch/arm64/kernel/syscall.c:49)
-[ 2074.737438] el0_svc_common.constprop.0 (arch/arm64/kernel/syscall.c:132)
-[ 2074.737885] do_el0_svc (arch/arm64/kernel/syscall.c:151)
-[ 2074.738235] el0_svc (arch/arm64/kernel/entry-common.c:879)
-[ 2074.785073] el0t_64_sync_handler (arch/arm64/kernel/entry-common.c:899)
-[ 2074.785245] el0t_64_sync (arch/arm64/kernel/entry.S:596)
-[ 2074.785643] Code: f9400fea d2820000 7940c377 f8795943 (f9400462)
-All code
-========
-   0: f9400fea ldr x10, [sp, #24]
-   4: d2820000 mov x0, #0x1000                // #4096
-   8: 7940c377 ldrh w23, [x27, #96]
-   c: f8795943 ldr x3, [x10, w25, uxtw #3]
-  10:* f9400462 ldr x2, [x3, #8] <-- trapping instruction
+base and patched:
+queue mapping for /dev/nvme0n1
+        hctx0: default 0 1
+        hctx1: default 2 3
+        hctx2: default 4 5
+        hctx3: default 6 7
+        hctx4: default 8 9
+        hctx5: default 10 11
+        hctx6: default 12 13
+        hctx7: default 14 15
 
-Code starting with the faulting instruction
-===========================================
-   0: f9400462 ldr x2, [x3, #8]
-[ 2074.786668] ---[ end trace 0000000000000000 ]---
+As mentioned I've decided to update only SCSI drivers which are already
+using pci_alloc_irq_vectors_affinity with the PCI_IRQ_AFFINITY. These
+drivers are using the auto IRQ affinity managment code, which is what is
+the pre-condition for isolcpus to work.
 
+Also missing are the FC drivers which support nvme-fabrics (lpfc,
+qla2xxx). The nvme-fabrics code needs to be touched first. I've got the
+patches for this, but let's first get the main change in shape.
 
-## Source
-* Kernel version: 6.17.0-rc4-next-20250904
-* Git tree: https://kernel.googlesource.com/pub/scm/linux/kernel/git/next/linux-next.git
-* Git describe: next-20250904
-* Git commit: 4ac65880ebca1b68495bd8704263b26c050ac010
-* Architectures / Devices: qemu-arm64
-* Toolchains: gcc-13
-* Kconfigs: defconfig+xfstests
-* xfstests: v2024.12.01
+After that, I can start updating one driver one by one. I think this
+reduced the risk of regression significantly.
 
-## Build
-* Test log: https://qa-reports.linaro.org/api/testruns/29762004/log_file/
-* Test details:
-https://regressions.linaro.org/lkft/linux-next-master/next-20250904/log-parser-test/internal-error-oops-oops-smp/
-* Test plan: https://tuxapi.tuxsuite.com/v1/groups/linaro/projects/lkft/tests/32E6ypoTqaDjAEJISuUAAgkPUva
-* Build link: https://storage.tuxsuite.com/public/linaro/lkft/builds/32E6us2qcXmnop3jTYQMOB9eVPt/
-* Kernel config:
-https://storage.tuxsuite.com/public/linaro/lkft/builds/32E6us2qcXmnop3jTYQMOB9eVPt/config
-* xfstests: https://storage.tuxboot.com/overlays/debian/trixie/arm64/xfstests/v2024.12.01/xfstests.tar.xz
+Signed-off-by: Daniel Wagner <wagi@kernel.org>
+---
+Changes in v8:
+- added 524f5eea4bbe ("lib/group_cpus: remove !SMP code")
+- merged new logic into existing function, avoid special casing
+- group_mask_cpus_evenly:
+  - /s/group_masks_cpus_evenly/group_mask_cpus_evenly
+  - updated comment on group_mask_cpus_evenly
+  - renamed argument from cpu_mask to mask
+- aacraid: added missing num queue calculcation (new patch)
+- only update scsi drivers which support PCI_IRQ_AFFINIT,
+  and do not support nvme-fabrics
+- don't __free for cpumask_var_t, it seems incompatible
+- updated doc to hightlight the CPU offlining limitation
+- collected tags
+- Link to v7: https://patch.msgid.link/20250702-isolcpus-io-queues-v7-0-557aa7eacce4@kernel.org
 
---
-Linaro LKFT
-https://lkft.linaro.org
+Changes in v7:
+- send out first part of the series:
+  https://lore.kernel.org/all/20250617-isolcpus-queue-counters-v1-0-13923686b54b@kernel.org/
+- added command line documentation
+- added validation code, so that resulting mapping is operational
+- rewrote mapping code for isolcpus so it takes into account active hctx
+- added blk_mq_map_hk_irq_queues which uses mask from irq_get_affinity
+- refactored blk_mq_map_hk_queues so caller tests for HK_TYPE_MANAGED_IRQ
+- Link to v6: https://patch.msgid.link/20250424-isolcpus-io-queues-v6-0-9a53a870ca1f@kernel.org
+
+Changes in v6:
+- added io_queue isolcpus type back
+- prevent offlining hk cpu if a isol cpu is still present isntead just warning
+- Link to v5: https://lore.kernel.org/r/20250110-isolcpus-io-queues-v5-0-0e4f118680b0@kernel.org
+
+Changes in v5:
+- rebased on latest for-6.14/block
+- udpated documetation on managed_irq
+- updated commit message "blk-mq: issue warning when offlining hctx with online isolcpus"
+- split input/output parameter in "lib/group_cpus: let group_cpu_evenly return number of groups"
+- dropped "sched/isolation: document HK_TYPE housekeeping option"
+- Link to v4: https://lore.kernel.org/r/20241217-isolcpus-io-queues-v4-0-5d355fbb1e14@kernel.org
+
+Changes in v4:
+- added "blk-mq: issue warning when offlining hctx with online isolcpus"
+- fixed check in cgroup_cpus_evenly, the if condition needs to use
+  housekeeping_enabled() and not cpusmask_weight(housekeeping_masks),
+  because the later will always return a valid mask.
+- dropped fixed tag from "lib/group_cpus.c: honor housekeeping config when
+  grouping CPUs"
+- fixed overlong line "scsi: use block layer helpers to calculate num
+  of queues"
+- dropped "sched/isolation: Add io_queue housekeeping option",
+  just document the housekeep enum hk_type
+- added "lib/group_cpus: let group_cpu_evenly return number of groups"
+- collected tags
+- splitted series into a preperation series:
+  https://lore.kernel.org/linux-nvme/20241202-refactor-blk-affinity-helpers-v6-0-27211e9c2cd5@kernel.org/
+- Link to v3: https://lore.kernel.org/r/20240806-isolcpus-io-queues-v3-0-da0eecfeaf8b@suse.de
+
+Changes in v3:
+- lifted a couple of patches from
+  https://lore.kernel.org/all/20210709081005.421340-1-ming.lei@redhat.com/
+  "virito: add APIs for retrieving vq affinity"
+  "blk-mq: introduce blk_mq_dev_map_queues"
+- replaces all users of blk_mq_[pci|virtio]_map_queues with
+  blk_mq_dev_map_queues
+- updated/extended number of queue calc helpers
+- add isolcpus=io_queue CPU-hctx mapping function
+- documented enum hk_type and isolcpus=io_queue
+- added "scsi: pm8001: do not overwrite PCI queue mapping"
+- Link to v2: https://lore.kernel.org/r/20240627-isolcpus-io-queues-v2-0-26a32e3c4f75@suse.de
+
+Changes in v2:
+- updated documentation
+- splitted blk/nvme-pci patch
+- dropped HK_TYPE_IO_QUEUE, use HK_TYPE_MANAGED_IRQ
+- Link to v1: https://lore.kernel.org/r/20240621-isolcpus-io-queues-v1-0-8b169bf41083@suse.de
+
+---
+Daniel Wagner (12):
+      scsi: aacraid: use block layer helpers to calculate num of queues
+      lib/group_cpus: remove dead !SMP code
+      lib/group_cpus: Add group_mask_cpus_evenly()
+      genirq/affinity: Add cpumask to struct irq_affinity
+      blk-mq: add blk_mq_{online|possible}_queue_affinity
+      nvme-pci: use block layer helpers to constrain queue affinity
+      scsi: Use block layer helpers to constrain queue affinity
+      virtio: blk/scsi: use block layer helpers to constrain queue affinity
+      isolation: Introduce io_queue isolcpus type
+      blk-mq: use hk cpus only when isolcpus=io_queue is enabled
+      blk-mq: prevent offlining hk CPUs with associated online isolated CPUs
+      docs: add io_queue flag to isolcpus
+
+ Documentation/admin-guide/kernel-parameters.txt |  22 ++-
+ block/blk-mq-cpumap.c                           | 201 +++++++++++++++++++++---
+ block/blk-mq.c                                  |  42 +++++
+ drivers/block/virtio_blk.c                      |   4 +-
+ drivers/nvme/host/pci.c                         |   1 +
+ drivers/scsi/aacraid/comminit.c                 |   3 +-
+ drivers/scsi/hisi_sas/hisi_sas_v3_hw.c          |   1 +
+ drivers/scsi/megaraid/megaraid_sas_base.c       |   5 +-
+ drivers/scsi/mpi3mr/mpi3mr_fw.c                 |   6 +-
+ drivers/scsi/mpt3sas/mpt3sas_base.c             |   5 +-
+ drivers/scsi/pm8001/pm8001_init.c               |   1 +
+ drivers/scsi/virtio_scsi.c                      |   5 +-
+ include/linux/blk-mq.h                          |   2 +
+ include/linux/group_cpus.h                      |   3 +
+ include/linux/interrupt.h                       |  16 +-
+ include/linux/sched/isolation.h                 |   1 +
+ kernel/irq/affinity.c                           |  12 +-
+ kernel/sched/isolation.c                        |   7 +
+ lib/group_cpus.c                                |  63 ++++++--
+ 19 files changed, 353 insertions(+), 47 deletions(-)
+---
+base-commit: b320789d6883cc00ac78ce83bccbfe7ed58afcf0
+change-id: 20240620-isolcpus-io-queues-1a88eb47ff8b
+
+Best regards,
+-- 
+Daniel Wagner <wagi@kernel.org>
+
