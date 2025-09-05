@@ -1,137 +1,105 @@
-Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
+Received: from mail-yb1-f172.google.com (mail-yb1-f172.google.com [209.85.219.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 943FB248176
-	for <linux-block@vger.kernel.org>; Fri,  5 Sep 2025 19:52:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ABC127FD49
+	for <linux-block@vger.kernel.org>; Fri,  5 Sep 2025 19:54:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757101965; cv=none; b=OIo8wrhrdxwYByyY+h6jnfPQ7vbi73BMOQrVMyCLZXC0RauwUkx87JXXAf7Dj1aoikHjSYVz0sDz+E6a+0zZ/l8qZclyEf3KLHmlozjep7cgVYZeRxww1RZYYzjUganhWHBB1PR9Dt0himf9I9OaTsHe95j87xoz68k3KX5AEyo=
+	t=1757102075; cv=none; b=JU+RnGFZuebXhorwjeERuC/5jb+uwLcNwp8rzGfH7G1PkkFqR0Tq/uLkCjxGF093qHCZk4GGFSCwK8fAl3RCVrmfZGondCvLgwSCE6bUBKXeCpZtt5rEBoNeC5dUs5tU2rWHHP1bgGDtLLFKQIRbnMZ0lxnAJgxC39yvCARkqO4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757101965; c=relaxed/simple;
-	bh=2bnmXoFq8hT07977Bt8V37gyvrBp2WvBZT/P/9TkDN0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Nk5ImH827JuaqMVtgjuZZDrcKWeGw2vePGuFaI5fSu6dRvWGvmr1sxnApQJ4CIws3CINCtqsOyohYXVu0JGCiw4YgChcy0oALTNuX6M0FagsBemXPu1OrBVLjc1D5iWBd0jQkX1vEtYgADpgW/9mFE+IjoFEfIfM5AtFlEsm0zo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=wKsSzsBx; arc=none smtp.client-ip=209.85.128.173
+	s=arc-20240116; t=1757102075; c=relaxed/simple;
+	bh=STm1WeWxux/k9ErGazCiP6pvMOeNUroj5qNzqv2OwyA=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=RtexM3eEdTIm5ugjBuBIor2ubrVbFYsBf/zCJmNUgUc+bV4MlkWu2+K3zRbhFkIfv+Fi0VfrmM7yLv0BITCNxpZZ8HBlftGgxaO5lttXMdrc8weqDKwMpTQz0YILFb1KLLNimnMLA7RNmI3niLy4pfy7Mw4ZkgPAalUI1qqagsw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=eL5EWMNZ; arc=none smtp.client-ip=209.85.219.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="wKsSzsBx"
-Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-71d603b62adso25340337b3.1
-        for <linux-block@vger.kernel.org>; Fri, 05 Sep 2025 12:52:41 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="eL5EWMNZ"
+Received: by mail-yb1-f172.google.com with SMTP id 3f1490d57ef6-e98b64d7000so2298602276.3
+        for <linux-block@vger.kernel.org>; Fri, 05 Sep 2025 12:54:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1757101960; x=1757706760; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=4HSKMhFHnXL4om4k6tLAqbvEJ0fBQx5JXzb5/1sEFd8=;
-        b=wKsSzsBxAqegFKINgKpx1VtTvmOMhaasEQkbYKTZM6icWw5vFFL79beYX9IlWGzhlJ
-         LGjiJvKFXtbq/BcRW45Etn8ewNuHda11BAvBdzT4BK4+9vXBvFRygMfq+VCSomBbqrDN
-         /ph66V2UIFGmamobZMRqlNWQl+K4kJYZgthAsU1C50Eeo+AiK6acRpmIvPUY6XMkjk6c
-         1o5j4jVeFwu1sA/lJ0qZrCaG327aVyj+09y45Qa6QtGRgiTEyCk0fFkIdPxMQd7NhK6J
-         R+2kPvRWzZosQ964uJDV6VO1yVIv3kQLzENbP5ekkeP+Vr1YocicpbwIY1gBHrlSCu7K
-         HLKg==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1757102073; x=1757706873; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4NnTdCOEg5OXsYY6GJwoHnwWPPG37oz/se7JGI6fcqw=;
+        b=eL5EWMNZHIbD1wGo0mi1SMZddzjg0TqTrLegd+/R89CPLoCL+AJjpxIKuAcrT3W625
+         hUYjYPwTz3QtKn4k2MHWlCNbKm/ZLGXfxW8Wydd9xcmb0C8Zlba+F1sYLU1zdDKEKvar
+         0L60OlPlYReGrj/4nfhPDfaa4iJh3iYelXqdq0dd+mTIPUJAPpQ73tlaqwihePGi59GJ
+         QwxNMY0NHPcjhlk8wzDIF0jEPqNpPWQjkA4yR6BYxOGZ9FH2S6h17mn3vmiZcPr9zTjU
+         93CFxTGREyt5tJsJm8NabaU6PB1ts+KA+gueA1TVijRgrO7ytP6RozoSnbKLzRYHcLNd
+         s9jA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757101960; x=1757706760;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4HSKMhFHnXL4om4k6tLAqbvEJ0fBQx5JXzb5/1sEFd8=;
-        b=INpXeyBVYEwqTQTRVAFXPSaSKz5HatLeqT/BZPKg7S2oF670MfjDGUKAuVoQaor3Wt
-         8qscW35SuDHKWB52VUyS9slRvH5oNIyGbzMIhAbcVnVb9Aoc6CdMEpF4zqWTdAOZwq+9
-         oS5PMfOROY9PDECRffTiTdbmfxR1BII1p0D239Virux8wI1x6uHppLzSM9BPR9vkJBtM
-         fV7GBfYE+ZNt0gYuhZ0sDiCH5W4jkh95Rq7J/yZM94Yixy0jHNnA3EHPCJ9ZRJ+l8CK3
-         k1PR9HmLLpT887CeTxWa4KU/1hl9/2YQd+vJdWsIEK9gM4B5eVFtH6bHiLlOtqCegcS3
-         GrOA==
-X-Gm-Message-State: AOJu0YyPk4mlS+VsFnAsfKRpEnRYnfX0onszvftjzJEr0kPqAssY92QA
-	wjp/IijyIQ+hBystOxZmwVOE8CMjm0PHekkbP1TPpnwFAqMTR+NzfouaCJlWlutsUaM0XG9twPT
-	5GNdc
-X-Gm-Gg: ASbGncsSnfYkvxDzg9fALsxIcs3/Kj1tcIFlXKB9DUuQud+ehAZmGHQNBcq/BY1JuiD
-	xZZoaddGbbvHjVNVzhUs5/BPs43Otgi+YnchxgsslzMEGvOGebagjV6gFvgN/Hh7djmGiNOEsX5
-	sNLTaAW22gj0Y6wBF9Nz7yTsECO/lZ4O8o5rNxH/VtHdrbvCKXAC61/35VZPQFyALBTBd8uCstF
-	p71LdlKWyhNZmE/66dKwBjajAYxZQ/Xe3no1UD14lIZq5JxBAdy8TU3nmk8wHvETlRiNK9ePEJb
-	tUzyWGnJ4HhhHipu5B777ftSBKRd0wiw2gNb6iPgBYxnce+z+wDO+gYLFRRx6tC8Sj79M0B6nEc
-	95snAHFR0NVUXtWN3gKw=
-X-Google-Smtp-Source: AGHT+IFdsFDBwdpPG1DdzDrJ6wvtu1VxG7NloPK+qUtgvUQ5KzDXlITM6YW8RLXwJZuYT9usxfwmIg==
-X-Received: by 2002:a05:690c:6411:b0:721:5880:6b2 with SMTP id 00721157ae682-727f5e3b124mr925857b3.51.1757101960514;
-        Fri, 05 Sep 2025 12:52:40 -0700 (PDT)
-Received: from [172.17.0.109] ([50.168.186.2])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-609d205c24dsm1361503d50.0.2025.09.05.12.52.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 05 Sep 2025 12:52:40 -0700 (PDT)
-Message-ID: <e15833f9-c18b-4783-af01-42f44a9cecb3@kernel.dk>
-Date: Fri, 5 Sep 2025 13:52:39 -0600
+        d=1e100.net; s=20230601; t=1757102073; x=1757706873;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4NnTdCOEg5OXsYY6GJwoHnwWPPG37oz/se7JGI6fcqw=;
+        b=Iq/1zKnrGzXYJ6J/OsI+eD+Atp4OqLXc3Un7z7Bs8+2cAiBdGKqGtQBrsxthTgXYh5
+         crq8b4c1s14RW7qld0DOfctIa8btTn68ZqaLUWFJxb4bANk0Vy7nyoEgmvBXEG7vM185
+         22+XvCkCqLmpLKc7w0fr7VWG8Suzo30M3YTgX2plGxAfbAIEKsXOmF/QOlJfc4qOSPVq
+         eqer94gqbBuMim9xgiHAjVTZihstgERcG70OjjXvwfS5mHceMFUz5wuG56VUgVYfGoT7
+         Th2uk5hV+vE0elN3WnQ3ceBKe4/Kj/SX3glSWOnB8lIZ78/xtJNG1t6PPt/4n5++3me0
+         myig==
+X-Gm-Message-State: AOJu0YzXLszUI9gHYn2LLfRlc0vSuLXYACsOL+EkE6vmZ4lwx7hLaszq
+	Gxc6hOk5ElAVjmHjkZkIJz9ibamqmLxp0OVdP7euW0utyiWxqhofDjZFK6Kncj/4YFY=
+X-Gm-Gg: ASbGncvG996t+Sl28obBL7OBVugX8+c1BvBdXoeJq9aY9UbDWTQkON0pVocVS6URBuD
+	Eher8jbd1JsPkXNhstiYBPmdV9NB2bngc8E5uSa7qzzLUFnQgYUYXpuhgvA1nDYR5PBHfflOu3f
+	piOlVrxdHWSh7/yWe71DmTUDd25d721nUGMPUbUiqnYuGp4JJ4Ea450iz2MtDKwE9IRgKbbbFWs
+	bD/p84N+CT4J8MTwE9UFlS4ZW4kdViB0545UqhuEa4ZQSZLl10kKs7RpTRy8V2nx3umSMuzwwW3
+	gZL19oLVBWKe2Gi28yigBJqC7Q29D8qyfKTzEfqSmzjwVAX1pQL/H1FUMj+duacP36C8XEOi4aN
+	vHSL1JFA45FWdIpH7Ny9SKAR51A==
+X-Google-Smtp-Source: AGHT+IFS6bxmxveB0S+gbdE1esXUwfY0MdW4w9rHkaICFKEHHTpXWj9UllIVCZDVFVQ47O6PC0q21w==
+X-Received: by 2002:a05:690c:296:b0:71b:f6d6:9572 with SMTP id 00721157ae682-727f4b600a7mr898847b3.18.1757102072705;
+        Fri, 05 Sep 2025 12:54:32 -0700 (PDT)
+Received: from [127.0.0.1] ([50.168.186.2])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-723a85aefcfsm31548457b3.68.2025.09.05.12.54.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 05 Sep 2025 12:54:32 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: yukuai3@huawei.com, bvanassche@acm.org, ming.lei@redhat.com, 
+ nilay@linux.ibm.com, hare@suse.de, Yu Kuai <yukuai1@huaweicloud.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ yi.zhang@huawei.com, yangerkun@huawei.com, johnny.chenyi@huawei.com
+In-Reply-To: <20250821060612.1729939-1-yukuai1@huaweicloud.com>
+References: <20250821060612.1729939-1-yukuai1@huaweicloud.com>
+Subject: Re: [PATCH v3 0/2] blk-mq: fix update nr_requests regressions
+Message-Id: <175710207227.395498.3249940818566938241.b4-ty@kernel.dk>
+Date: Fri, 05 Sep 2025 13:54:32 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 0/2] blk-mq: fix update nr_requests regressions
-To: Yu Kuai <yukuai1@huaweicloud.com>, bvanassche@acm.org,
- ming.lei@redhat.com, nilay@linux.ibm.com, hare@suse.de
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- yi.zhang@huawei.com, yangerkun@huawei.com, johnny.chenyi@huawei.com,
- "yukuai (C)" <yukuai3@huawei.com>
-References: <20250821060612.1729939-1-yukuai1@huaweicloud.com>
- <95389918-b809-f81b-5fd0-2e350154ca01@huaweicloud.com>
- <f4231a7f-cc73-c506-e30b-b2bfa9d98dba@huaweicloud.com>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <f4231a7f-cc73-c506-e30b-b2bfa9d98dba@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3-dev-2ce6c
 
-On 9/5/25 1:20 AM, Yu Kuai wrote:
-> Hi, Jens
+
+On Thu, 21 Aug 2025 14:06:10 +0800, Yu Kuai wrote:
+> Changes in v3:
+>  - call depth_updated() directly in init_sched() method in patch 1;
+>  - fix typos in patch 2;
+>  - add review for patch 2;
+> Changes in v2:
+>  - instead of refactor and cleanups and fix updating nr_requests
+>  thoroughly, fix the regression in patch 2 the easy way, and dealy
+>  refactor and cleanups to next merge window.
 > 
-> ? 2025/08/26 14:27, Yu Kuai ??:
->> Hi, Jens
->>
->> ? 2025/08/21 14:06, Yu Kuai ??:
->>> From: Yu Kuai <yukuai3@huawei.com>
->>>
->>> Changes in v3:
->>>   - call depth_updated() directly in init_sched() method in patch 1;
->>>   - fix typos in patch 2;
->>>   - add review for patch 2;
->>> Changes in v2:
->>>   - instead of refactor and cleanups and fix updating nr_requests
->>>   thoroughly, fix the regression in patch 2 the easy way, and dealy
->>>   refactor and cleanups to next merge window.
->>>
->>> patch 1 fix regression that elevator async_depth is not updated correctly
->>> if nr_requests changes, first from error path and then for mq-deadline,
->>> and recently for bfq and kyber.
->>>
->>> patch 2 fix regression that if nr_requests grow, kernel will panic due
->>> to tags double free.
->>>
->>> Yu Kuai (2):
->>>    blk-mq: fix elevator depth_updated method
->>>    blk-mq: fix blk_mq_tags double free while nr_requests grown
->>>
->>>   block/bfq-iosched.c   | 22 +++++-----------------
->>>   block/blk-mq-sched.h  | 11 +++++++++++
->>>   block/blk-mq-tag.c    |  1 +
->>>   block/blk-mq.c        | 23 ++++++++++++-----------
->>>   block/elevator.h      |  2 +-
->>>   block/kyber-iosched.c | 19 +++++++++----------
->>>   block/mq-deadline.c   | 16 +++-------------
->>>   7 files changed, 42 insertions(+), 52 deletions(-)
->>>
->>
->> Friendly ping, please consider this set in this merge window.
->>
->> BTW, I see that for-6.18/block branch was created, however, I have
->> a pending set[1] for the next merge window that will have conflicts with
->> this set, not sure if you want to rebase for-6.18/block with block-6.17
->> or handle conflicts later for 6.18-rc1.
+> [...]
 
-I think we're just a bit late on this one, given that they'd go into
--rc6 at this point. Going to queue this up for 6.18 and then we just get
-it into stable instead, that gives us a lot more time to shake out any
-potential issues.
+Applied, thanks!
 
+[1/2] blk-mq: fix elevator depth_updated method
+      commit: 7d337eef4affc5e26e0570513168c69ddbc40f92
+[2/2] blk-mq: fix blk_mq_tags double free while nr_requests grown
+      commit: ba28afbd9eff2a6370f23ef4e6a036ab0cfda409
+
+Best regards,
 -- 
 Jens Axboe
+
+
+
