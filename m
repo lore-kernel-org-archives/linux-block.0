@@ -1,63 +1,84 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from 004.mia.mailroute.net (004.mia.mailroute.net [199.89.3.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6D6E246799
-	for <linux-block@vger.kernel.org>; Fri,  5 Sep 2025 20:17:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED80A2E1755;
+	Fri,  5 Sep 2025 20:45:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757103453; cv=none; b=iRYw47jR3vGDV8egrdSjUABko9+xrvWY9VkrXdBpBaiy4m7S6QV2KssG79NYHSGrZs6ibT0dwWBpqil7GPznTZJt0siiH47B0CAR8pt4G5Wbvo+F7uK3l9iCJJB/jmQ3cv9gkHD0IS2cnB50XIM0j2iuMKdSLN5j1p8S8EPS1PE=
+	t=1757105118; cv=none; b=bDGi+w38JHxO0BSvSZbjis4TJ79fPQtIuyf/bUojbNw1UlkDrx+TfEv8JG4kBcSppakd+OBy+QGEyo+eiT+ZmhTZ57wMGeco5VEFXqYa7zMzdJTZ6RpRmEykIchGjIJ6YmzSkMx+n8gJtRLlOv8Sjmc3iNEc/QWu+Ce1gB53K0o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757103453; c=relaxed/simple;
-	bh=PdRtbT0KUCT8ibchjgvkvNsXmvKuEQhL95LKHdMPm7g=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=GWUXP1UHW5vve7LoJacbwvjboaHzzvkMmP2u+L7SVq5+MQggszJEIlxXDKPvSczMyEza1eQ41YOB6jdLEeswEzGrq/Q10Jj9JVk42NI0RUTURutykEZT467HvQVRLyPJQIZVKIlUUmYxOVrqU04eW5w3XO2fKYfQa4pJSdk7pZc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qqJaTRxr; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1757105118; c=relaxed/simple;
+	bh=yGqSDSETg0D9smLQAvT9y8KGHzU9JxSmB0xeu3ZXYvw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kGvD3w+ZJatBeCb1V3HRrg1dXVdhFgPv+22w+oZ4OJkb9B3LA4+RGqB0WNORXhC1nCPpG52xwXEvuWaATMEngvmIBg4qiQeGE8ko025oFzyJp67S03KRhn3qqF2DdO4i8a3XLgt3X1i8fZPN0DDJPo2tZbdE2yEVK9fkFycYAj8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=RyUxivph; arc=none smtp.client-ip=199.89.3.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qqJaTRxr"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8B6FC4CEF1;
-	Fri,  5 Sep 2025 20:17:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757103453;
-	bh=PdRtbT0KUCT8ibchjgvkvNsXmvKuEQhL95LKHdMPm7g=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=qqJaTRxr1G1ztRGXCfcI7Bs6io98OXIP+xyacxJRjDNjUTsgmK22CmWlvq6lqhoZQ
-	 MzLfgmRMdWIWxJji/oKnHKxfw+GEpnHf39JZP/quJyAYu3728WwzF/3Wv79NMgPhsB
-	 EWcS1jcfbVlFDwboiZopvVZM7QdNiMC0J9BAFCPec0h5KJy/oZXq/l/iwBB9DpVYkd
-	 BccHLB41K5pzU1/S5ggTtqzjBWxag6/vmXSuooo9wNK5kAsOvjhKR0W4TfzpPyw24H
-	 67c73u9djD80We2NvrNuQ+cKv9IRpdeLlZUSACsWunAs8JBXKELb1QH4E5sR5zsDrS
-	 H2hPnEUOaSSsg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 6D1CD383BF69;
-	Fri,  5 Sep 2025 20:17:39 +0000 (UTC)
-Subject: Re: [GIT PULL] Block fixes for 6.17-rc5
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <fc773af0-d2c2-4394-b286-9e7be415fd74@kernel.dk>
-References: <fc773af0-d2c2-4394-b286-9e7be415fd74@kernel.dk>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <fc773af0-d2c2-4394-b286-9e7be415fd74@kernel.dk>
-X-PR-Tracked-Remote: git://git.kernel.dk/linux.git tags/block-6.17-20250905
-X-PR-Tracked-Commit-Id: 743bf030947169c413a711f60cebe73f837e649f
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: e9eaca6bf69d3f261b9bd51637420b05c9352965
-Message-Id: <175710345818.2676293.5800121718379639664.pr-tracker-bot@kernel.org>
-Date: Fri, 05 Sep 2025 20:17:38 +0000
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="RyUxivph"
+Received: from localhost (localhost [127.0.0.1])
+	by 004.mia.mailroute.net (Postfix) with ESMTP id 4cJSyt4TgBzm0jvQ;
+	Fri,  5 Sep 2025 20:45:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1757105100; x=1759697101; bh=6C+msqSYnF4/0BdNNlLbNvrG
+	xVbkMF9a9jeXiu/yWY0=; b=RyUxivph3oqydNPn4qCChxMtfmVnkfl8E4Jc+XY9
+	L4K4puS8kc48cAu3t4ByZUlP+LyRO6adRPDRI0Az9G637v3evCSTwd6/xOKIXq0Q
+	uE6NJoX405VfS9EOzvdE5y91ipNgmr2DGIG1X+LQuufKIdd9BIAMDNK9fw+dXbnu
+	m/oOn1nX2UmX/M8DhGP8KH8dNZ8XY0ZNCdhbBIQXOLMEZpKxSj/0SZkSzmvLbo22
+	SsiJVhMMqpi3jW2RViZTJ1v9gQGtW3SRmADNXHPMY4m5voondgxQ1UxZSVoz51Q6
+	UabUlPYuBRSrX78mYoVRv+xhvxgVR6bOlRS8ocVFz1bAAw==
+X-Virus-Scanned: by MailRoute
+Received: from 004.mia.mailroute.net ([127.0.0.1])
+ by localhost (004.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id pOaAMcCzSUux; Fri,  5 Sep 2025 20:45:00 +0000 (UTC)
+Received: from [100.66.154.22] (unknown [104.135.204.82])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 004.mia.mailroute.net (Postfix) with ESMTPSA id 4cJSyM60zszm0yNS;
+	Fri,  5 Sep 2025 20:44:42 +0000 (UTC)
+Message-ID: <143ea81e-60bf-4bbe-bbe2-579545d84f65@acm.org>
+Date: Fri, 5 Sep 2025 13:44:41 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH for-6.18/block 04/16] md: fix mssing blktrace bio split
+ events
+To: Yu Kuai <yukuai1@huaweicloud.com>, hch@infradead.org, colyli@kernel.org,
+ hare@suse.de, dlemoal@kernel.org, tieren@fnnas.com, axboe@kernel.dk,
+ tj@kernel.org, josef@toxicpanda.com, song@kernel.org, yukuai3@huawei.com,
+ satyat@google.com, ebiggers@google.com, kmo@daterainc.com,
+ akpm@linux-foundation.org, neil@brown.name
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ cgroups@vger.kernel.org, linux-raid@vger.kernel.org, yi.zhang@huawei.com,
+ yangerkun@huawei.com, johnny.chenyi@huawei.com
+References: <20250905070643.2533483-1-yukuai1@huaweicloud.com>
+ <20250905070643.2533483-5-yukuai1@huaweicloud.com>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20250905070643.2533483-5-yukuai1@huaweicloud.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-The pull request you sent on Fri, 5 Sep 2025 05:20:26 -0600:
 
-> git://git.kernel.dk/linux.git tags/block-6.17-20250905
+On 9/5/25 12:06 AM, Yu Kuai wrote:
+> If bio is split by internal handling like chunksize or badblocks, the
+> corresponding trace_block_split() is missing, resulting in blktrace
+> inability to catch BIO split events and making it harder to analyze the
+> BIO sequence.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/e9eaca6bf69d3f261b9bd51637420b05c9352965
+The bio splitting code in block/blk-crypto-fallback.c doesn't call
+trace_block_split() either but maybe that code falls outside the scope 
+of this patch?
 
-Thank you!
+Thanks,
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Bart.
