@@ -1,126 +1,121 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FCFC2F4A19;
-	Fri,  5 Sep 2025 07:20:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33D2B1DE4E5;
+	Fri,  5 Sep 2025 07:35:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757056809; cv=none; b=XHxVt6KSG3WT+lLlabvcfhAXMvn6LMk3cgSJw4dyDey/G40f6N5oIshznbjEhO41OUcFy8tpaKBEn7kWGw5CLLxIxF6oD9nCD5kRyVGphbbsldWQnbqLEZHjM/1pzgGmvS0w81KfyqxXtS4aqc/Xk6b0Gomjp94amptzu1CWd44=
+	t=1757057760; cv=none; b=kwygCBTjV5o6V8BKPFwW067Q8DO3O3CM1pfxSKOWtlK7hQBI1WKGmAYBKazWTrxGaM6sD+vleRgpkx4CmDuW8C3QCdEvxwnzqJV+FmJW/SnKBXYPLfAvGqalrE3igZ9wjVPspsYEl+ZdhmnrNivPutaGOfFw2SldbhrQllHxrCc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757056809; c=relaxed/simple;
-	bh=d3MhxYFWdpuDbIbKX3VsMWBE+wEo3XzfqmNa/b9vZgE=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=uO3eB6DP5PBFefmBf0E1qlyJsNSIlh9zgDLTCzrIMV3uh78U1jlEKFJy8iM/5cGGMLL24eo1udU/oel1IDi67Nn2n2vSP7Hvuop/jF15tKDnWHHNIEYckipEXj4z1UeWchKjsjpcOUklP1Rg7YaOoMK39P3XHlEbJFHFJ+9lEw8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+	s=arc-20240116; t=1757057760; c=relaxed/simple;
+	bh=nPPTfxRSkXNleuMU0NjjkuvGPoT2zGvquDtml6qPd4U=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=YqVkm/xw2nqYtZkLEgrFY5KK1R0oTAbH38doSMpEjV5agT1jAwNbFuUL2YEr7FC/X/9wq12ELz6MSN7EWt8r6Awha55E8siGdQnAwBdOpbbm93P+qaw5YKW20wg+8EF+Jl6TnQSYUkR9qW3j1ylhqsjtQERev3pavmf2/qepqow=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4cJ75y6bLgzYQvYm;
-	Fri,  5 Sep 2025 15:20:06 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.93.142])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4cJ71F5T9xzKHMbR;
+	Fri,  5 Sep 2025 15:16:01 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 68C0E1A08FC;
-	Fri,  5 Sep 2025 15:20:05 +0800 (CST)
-Received: from [10.174.179.143] (unknown [10.174.179.143])
-	by APP4 (Coremail) with SMTP id gCh0CgAncY0kj7povtzQBQ--.42269S3;
-	Fri, 05 Sep 2025 15:20:05 +0800 (CST)
-Subject: Re: [PATCH v3 0/2] blk-mq: fix update nr_requests regressions
-To: Yu Kuai <yukuai1@huaweicloud.com>, axboe@kernel.dk, bvanassche@acm.org,
- ming.lei@redhat.com, nilay@linux.ibm.com, hare@suse.de
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- yi.zhang@huawei.com, yangerkun@huawei.com, johnny.chenyi@huawei.com,
- "yukuai (C)" <yukuai3@huawei.com>
-References: <20250821060612.1729939-1-yukuai1@huaweicloud.com>
- <95389918-b809-f81b-5fd0-2e350154ca01@huaweicloud.com>
+	by mail.maildlp.com (Postfix) with ESMTP id B19A61A1367;
+	Fri,  5 Sep 2025 15:16:01 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+	by APP4 (Coremail) with SMTP id gCh0CgAncIwkjrpowYbQBQ--.23573S16;
+	Fri, 05 Sep 2025 15:16:01 +0800 (CST)
 From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <f4231a7f-cc73-c506-e30b-b2bfa9d98dba@huaweicloud.com>
-Date: Fri, 5 Sep 2025 15:20:04 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.1
+To: hch@infradead.org,
+	colyli@kernel.org,
+	hare@suse.de,
+	dlemoal@kernel.org,
+	tieren@fnnas.com,
+	bvanassche@acm.org,
+	axboe@kernel.dk,
+	tj@kernel.org,
+	josef@toxicpanda.com,
+	song@kernel.org,
+	yukuai3@huawei.com,
+	satyat@google.com,
+	ebiggers@google.com,
+	kmo@daterainc.com,
+	akpm@linux-foundation.org,
+	neil@brown.name
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	cgroups@vger.kernel.org,
+	linux-raid@vger.kernel.org,
+	yi.zhang@huawei.com,
+	yangerkun@huawei.com,
+	johnny.chenyi@huawei.com
+Subject: [PATCH for-6.18/block 12/16] md/md-linear: convert to use bio_submit_split_bioset()
+Date: Fri,  5 Sep 2025 15:06:39 +0800
+Message-Id: <20250905070643.2533483-13-yukuai1@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20250905070643.2533483-1-yukuai1@huaweicloud.com>
+References: <20250905070643.2533483-1-yukuai1@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <95389918-b809-f81b-5fd0-2e350154ca01@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgAncY0kj7povtzQBQ--.42269S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7AFyUZF4UWw1UuFW5Aw1fZwb_yoW8Cryrpr
-	s3Xa13Cr18Wrsaqr4fAw17XryrAw4vqw15Crsxtw1fC34Y9F1xXF18WF10gFyqqrWfWr42
-	grn8tryDWr1UArDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBI14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4U
-	JVW0owA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-	I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-	4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
-	c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7V
-	AKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCj
-	r7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6x
-	IIjxv20xvE14v26r4j6ryUMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UMIIF0xvE
-	42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JVWxJwCI42IY6I8E87Iv6x
-	kF7I0E14v26r4UJVWxJrUvcSsGvfC2KfnxnUUI43ZEXa7VU13ku3UUUUU==
+X-CM-TRANSID:gCh0CgAncIwkjrpowYbQBQ--.23573S16
+X-Coremail-Antispam: 1UD129KBjvdXoWrur1xWrWxtw1UZF4Dtr43Jrb_yoWkWrX_Wa
+	4ruFykWr1UK397tr1Yqws0v39Yvwn8Wry8uFyjqa13A3WfAwn7Arn5Xw43X34xXFWxXa45
+	tr47GryftF1UJjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUbgxYFVCjjxCrM7AC8VAFwI0_Wr0E3s1l1xkIjI8I6I8E6xAIw20E
+	Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l82xGYIkIc2x26280x7IE14v26r126s
+	0DM28IrcIa0xkI8VCY1x0267AKxVW5JVCq3wA2ocxC64kIII0Yj41l84x0c7CEw4AK67xG
+	Y2AK021l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14
+	v26r4UJVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAF
+	wI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2
+	WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkE
+	bVWUJVW8JwACjcxG0xvY0x0EwIxGrwACI402YVCY1x02628vn2kIc2xKxwCY1x0262kKe7
+	AKxVW8ZVWrXwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02
+	F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_GFv_Wr
+	ylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVW8JVW5JwCI42IY6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI
+	0_Gr0_Cr1lIxAIcVC2z280aVCY1x0267AKxVW8Jr0_Cr1UYxBIdaVFxhVjvjDU0xZFpf9x
+	07jIPfQUUUUU=
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-Hi, Jens
+From: Yu Kuai <yukuai3@huawei.com>
 
-在 2025/08/26 14:27, Yu Kuai 写道:
-> Hi, Jens
-> 
-> 在 2025/08/21 14:06, Yu Kuai 写道:
->> From: Yu Kuai <yukuai3@huawei.com>
->>
->> Changes in v3:
->>   - call depth_updated() directly in init_sched() method in patch 1;
->>   - fix typos in patch 2;
->>   - add review for patch 2;
->> Changes in v2:
->>   - instead of refactor and cleanups and fix updating nr_requests
->>   thoroughly, fix the regression in patch 2 the easy way, and dealy
->>   refactor and cleanups to next merge window.
->>
->> patch 1 fix regression that elevator async_depth is not updated correctly
->> if nr_requests changes, first from error path and then for mq-deadline,
->> and recently for bfq and kyber.
->>
->> patch 2 fix regression that if nr_requests grow, kernel will panic due
->> to tags double free.
->>
->> Yu Kuai (2):
->>    blk-mq: fix elevator depth_updated method
->>    blk-mq: fix blk_mq_tags double free while nr_requests grown
->>
->>   block/bfq-iosched.c   | 22 +++++-----------------
->>   block/blk-mq-sched.h  | 11 +++++++++++
->>   block/blk-mq-tag.c    |  1 +
->>   block/blk-mq.c        | 23 ++++++++++++-----------
->>   block/elevator.h      |  2 +-
->>   block/kyber-iosched.c | 19 +++++++++----------
->>   block/mq-deadline.c   | 16 +++-------------
->>   7 files changed, 42 insertions(+), 52 deletions(-)
->>
-> 
-> Friendly ping, please consider this set in this merge window.
-> 
-> BTW, I see that for-6.18/block branch was created, however, I have
-> a pending set[1] for the next merge window that will have conflicts with
-> this set, not sure if you want to rebase for-6.18/block with block-6.17
-> or handle conflicts later for 6.18-rc1.
-> 
-> [1] 
-> https://lore.kernel.org/all/20250815080216.410665-1-yukuai1@huaweicloud.com/ 
-> 
-Friendly ping ...
+Unify bio split code, prepare to fix reordered split IO.
 
-Thanks,
-Kuai
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+---
+ drivers/md/md-linear.c | 15 +++------------
+ 1 file changed, 3 insertions(+), 12 deletions(-)
 
-> 
-> Thanks,
-> Kuai
-> 
-> .
-> 
+diff --git a/drivers/md/md-linear.c b/drivers/md/md-linear.c
+index 59d7963c7843..76f85cc32942 100644
+--- a/drivers/md/md-linear.c
++++ b/drivers/md/md-linear.c
+@@ -256,19 +256,10 @@ static bool linear_make_request(struct mddev *mddev, struct bio *bio)
+ 
+ 	if (unlikely(bio_end_sector(bio) > end_sector)) {
+ 		/* This bio crosses a device boundary, so we have to split it */
+-		struct bio *split = bio_split(bio, end_sector - bio_sector,
+-					      GFP_NOIO, &mddev->bio_set);
+-
+-		if (IS_ERR(split)) {
+-			bio->bi_status = errno_to_blk_status(PTR_ERR(split));
+-			bio_endio(bio);
++		bio = bio_submit_split_bioset(bio, end_sector - bio_sector,
++					      &mddev->bio_set);
++		if (!bio)
+ 			return true;
+-		}
+-
+-		bio_chain(split, bio);
+-		trace_block_split(split, bio->bi_iter.bi_sector);
+-		submit_bio_noacct(bio);
+-		bio = split;
+ 	}
+ 
+ 	md_account_bio(mddev, &bio);
+-- 
+2.39.2
 
