@@ -1,119 +1,251 @@
-Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A114423FC66
-	for <linux-block@vger.kernel.org>; Sat,  6 Sep 2025 09:17:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E116A1FF7C8;
+	Sat,  6 Sep 2025 15:28:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757150232; cv=none; b=V4QwbE9YcSFRkq4cDJ+u4ApsD++5eS1dGwSkllCxUm6AlhfLS8MCQnwuHSgqbwV2FhOfYL672Rv/BSe6KonpbWFugiRp4ryFIFQR8O9OiD5RZjPsBL/WYkCNJiPpyOLTpzXBCTjCOR9/iyKzI3C4wPOIZJtGM/sNPNhyUvjJn74=
+	t=1757172485; cv=none; b=sEfOPlnkb08Ar+Lob1dPFRh41cyOk4RQJPii+q1tX9bBbYZAmI77EkobbmEF2AXB0ueeTwb4hZsJiq0XV97VSilnzSjz/tpydRKK9l0fsLX6OZ2itcg23wegZchxQoJeobK+7/DjTHH+OkU1bAO+sl6KFnyAUC6Km6rQLPS4qZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757150232; c=relaxed/simple;
-	bh=4tcf+x1bAGP5gLbbX2/0mJXn6QiSKzTB0gWtNPgyCvs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YGneC3sKPl3QKIek5nHDMv1J9d9ytsgbJdKUcMrH2UJnWMe87YQmvHX4L1sdBEiAVUQCr5a2L/JfX2sLJBIV3ThKTt7nUwlIExb9CofUx3XMm6efJkym+PMT1sqgk1IHEWwn+DE1IA2ID35hwGPuFUNqxf2vuAaNw9CTPyDGioI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Uo4szKVP; arc=none smtp.client-ip=209.85.222.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1757172485; c=relaxed/simple;
+	bh=Fd+f0h7u71k8ta1mGTmB0yEZENuQafdk6dSDxEsjevU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uu4T8k53GpfrFJGyrdjWG+kEXk2zIkE56Y6PYkFzxzCCsoYWRVUhb01LXY7wyqnwQHDbj7FOT9P6MAuM/XU90v/n33TT4tK3dU5+OPPvw03H+FSHWqUzlrcV8lXSmyyrhA4nAckwaof2mm+dV7pKOBGmtdItA2uK8DZEU/OAlMc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iWrJe8WR; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Uo4szKVP"
-Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-80c45a0b023so280249585a.0
-        for <linux-block@vger.kernel.org>; Sat, 06 Sep 2025 02:17:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1757150229; x=1757755029; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jyTsTWBfEVvg2d8Q116wig3LF6X3zwSWXkw8iB2bvBY=;
-        b=Uo4szKVPKNwugn/xYEwclUxWlsz/wfzT0y9wtG3my9pHhhcL8wsOsbrRJZDfUE+9Vd
-         qvkuh+VnfzmX76DBCPWCv1gaIuMdie+q6XRHbVKvwhgAe8WqTMih8rf3oXo7MtKzOqzv
-         zAst9Dxnbkk5NC16gEv0aSMfZ3MJDI0sFkA9l8xteaGy0z0HpvS0fLcq95u0c7ypFFNQ
-         j8dNe66mdVCav+vJOz/byabyP+13IqJQ3Uz4R8+GqF7Stt0cbNPrzcKvjbGXyQkw8ttk
-         XjEfxfTytfyVaULVheLtxif9fxFABEp5m+r671ggybaYPoo5GD/jplvX+UVy0Jn/Pn/v
-         C+lA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757150229; x=1757755029;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jyTsTWBfEVvg2d8Q116wig3LF6X3zwSWXkw8iB2bvBY=;
-        b=LVie7Jwe+6IC6nftfkQPXFTW9yxMJ703aSbXNkeAVDsqh+F7neLl4XWZog0AgYUB4j
-         hsIG6PZ3c/O/gpDqhG/UdMNcpBX6XIN7bSeNzOZe7EXXscwQTdo7MjmRytRI8JL/uRLH
-         wPmxHyEPBGpICscvY35gq8GjXZZ1imqKvHFDAtftMnz8ZWjNqWQT5TQvTcXLmLnK5BZc
-         4x/zj0mE5qqw2XGFVbduo96T5HXRCxjXzYTxzJo7FJpiO6jk5dJhUFN/M9cx6mm/Zd4z
-         G8IItsduzFjtjYe5/ylurMyo1C0a6I/6Il2bl5bIv8XQynoHsI0ylu5DCtBAQYrNVyPo
-         2NJA==
-X-Forwarded-Encrypted: i=1; AJvYcCXBEvDL+YoUTvD9kv2eOGlOMTt+O2scwzQ3diAIf0/LNauvp7lHT1ZOej+kgND5IaiKpZ5CEY6RwOUEXA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzGjotDJQY2jQNtt10/t4GfrdHCgK0SrZcVsG1oKF3G0u9ESyI1
-	cv1ymdUZucWElGLPmzzO/I9Ps34l/i8KHgWl5rdZ8lhy0iKvX9sRoc/xr8P08GAuBilTRd/C3+A
-	zOygvY4l+MRPcIg0DiAyQrulc1F4BxGjxg6vyyTE9
-X-Gm-Gg: ASbGncs1txBZjwwvPr4Xuy5TX1+38FliG+vPGKU3aHrfobjLZivUE4APADEEcZavCMo
-	BVoldYa7i9dW6UGm1xnO9R6CzydJtiL/AxGj+xQmhoPH/FXHsOHJl4ywbk218gJdJFhoKe1VoS8
-	fZ2E1N1bPf7FtU/GzmK8DAMP9q4XbupeE+vGAYeHyPwm70TkqFfcsSEs1/6Qn9s3lAz/4dcAztz
-	1njp4Gp2j4CV2QcKAxUM+o=
-X-Google-Smtp-Source: AGHT+IFNHk3o12uxwbf6OpMNI0I53ugLfIK2NXUHGthDfhTNjq2NSap4D+GDM5PavZ580+AiwTooTru70iUwX14qHME=
-X-Received: by 2002:a05:620a:440f:b0:806:7c82:fd2f with SMTP id
- af79cd13be357-813c33dbd99mr153395285a.75.1757150229022; Sat, 06 Sep 2025
- 02:17:09 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iWrJe8WR"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1757172483; x=1788708483;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Fd+f0h7u71k8ta1mGTmB0yEZENuQafdk6dSDxEsjevU=;
+  b=iWrJe8WRaLdfJTi8G7SYRVqZJUkJ+AZzdcTifXSxprAMAT32qV2tsqYz
+   VgmDvgI3Lq7kBSNDKla4oHzDbWBPEEfR1r1VeNHeI62KYYUqJI4AX6RyW
+   59nLf9sDZbjh8JWeEl++W1r6hx20B/HkiCdsDkBq6nAhnEcOtCAd5TsYA
+   mt49Irzr/01PYy2/B++Wd+gYq11pB6giiXDTnH3Pxp/vsHCUnQNxqZ0V2
+   DVDdOxF+vQidsEOGV4kGwXBydXWTEvsqD4JD9r6gu9IrIfu4xA0jGzu1T
+   C5dkdKwjDB5cuRungYUmX+jRxImVSh4srZXdR4w+ceekp49Cqri8s5wNu
+   Q==;
+X-CSE-ConnectionGUID: /sDpFxNyRNWqtRU9PT18Tg==
+X-CSE-MsgGUID: m3Ez7pgJTbucsgI05mDkGA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11544"; a="76951434"
+X-IronPort-AV: E=Sophos;i="6.18,244,1751266800"; 
+   d="scan'208";a="76951434"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Sep 2025 08:28:02 -0700
+X-CSE-ConnectionGUID: tKpXEcEASZysj9NeJPBqNg==
+X-CSE-MsgGUID: 1FVE4y2MRkyIMk6rrBiwfw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,244,1751266800"; 
+   d="scan'208";a="176480242"
+Received: from lkp-server01.sh.intel.com (HELO 114d98da2b6c) ([10.239.97.150])
+  by orviesa003.jf.intel.com with ESMTP; 06 Sep 2025 08:27:55 -0700
+Received: from kbuild by 114d98da2b6c with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uuupV-0001Zn-1S;
+	Sat, 06 Sep 2025 15:27:53 +0000
+Date: Sat, 6 Sep 2025 23:27:39 +0800
+From: kernel test robot <lkp@intel.com>
+To: Yu Kuai <yukuai1@huaweicloud.com>, hch@infradead.org, colyli@kernel.org,
+	hare@suse.de, dlemoal@kernel.org, tieren@fnnas.com,
+	bvanassche@acm.org, axboe@kernel.dk, tj@kernel.org,
+	josef@toxicpanda.com, song@kernel.org, yukuai3@huawei.com,
+	satyat@google.com, ebiggers@google.com, kmo@daterainc.com,
+	akpm@linux-foundation.org, neil@brown.name
+Cc: oe-kbuild-all@lists.linux.dev, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, cgroups@vger.kernel.org,
+	linux-raid@vger.kernel.org, yi.zhang@huawei.com,
+	yangerkun@huawei.com, johnny.chenyi@huawei.com
+Subject: Re: [PATCH for-6.18/block 02/16] block: initialize bio issue time in
+ blk_mq_submit_bio()
+Message-ID: <202509062332.tqE0Bc8k-lkp@intel.com>
+References: <20250905070643.2533483-3-yukuai1@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <68bb4160.050a0220.192772.0198.GAE@google.com> <CANn89iLNFHBMTF2Pb6hHERYpuih9eQZb6A12+ndzBcQs_kZoBA@mail.gmail.com>
-In-Reply-To: <CANn89iLNFHBMTF2Pb6hHERYpuih9eQZb6A12+ndzBcQs_kZoBA@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Sat, 6 Sep 2025 02:16:58 -0700
-X-Gm-Features: Ac12FXxOqkfzxU_8v9kW7s_ChUAwPmKMRLy0TrO1zWLZ0WwxfLDIRZs52c2CrbU
-Message-ID: <CANn89iJaY+MJPUJgtowZOPwHaf8ToNVxEyFN9U+Csw9+eB7YHg@mail.gmail.com>
-Subject: Re: [syzbot] [net?] possible deadlock in inet_shutdown
-To: syzbot <syzbot+e1cd6bd8493060bd701d@syzkaller.appspotmail.com>, 
-	Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>
-Cc: davem@davemloft.net, dsahern@kernel.org, horms@kernel.org, kuba@kernel.org, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	ming.lei@redhat.com, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com, thomas.hellstrom@linux.intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250905070643.2533483-3-yukuai1@huaweicloud.com>
 
-On Fri, Sep 5, 2025 at 1:03=E2=80=AFPM Eric Dumazet <edumazet@google.com> w=
-rote:
->
-> On Fri, Sep 5, 2025 at 1:00=E2=80=AFPM syzbot
-> <syzbot+e1cd6bd8493060bd701d@syzkaller.appspotmail.com> wrote:
+Hi Yu,
 
-Note to NBD maintainers : I held about  20 syzbot reports all pointing
-to NBD accepting various sockets, I  can release them if needed, if you pre=
-fer
-to triage them.
+kernel test robot noticed the following build errors:
 
->
-> Question to NBD maintainers.
->
-> What socket types are supposed to be supported by NBD ?
->
-> I was thinking adding a list of supported ones, assuming TCP and
-> stream unix are the only ones:
->
-> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-> index 6463d0e8d0ce..87b0b78249da 100644
-> --- a/drivers/block/nbd.c
-> +++ b/drivers/block/nbd.c
-> @@ -1217,6 +1217,14 @@ static struct socket *nbd_get_socket(struct
-> nbd_device *nbd, unsigned long fd,
->         if (!sock)
->                 return NULL;
->
-> +       if (!sk_is_tcp(sock->sk) &&
-> +           !sk_is_stream_unix(sock->sk)) {
-> +               dev_err(disk_to_dev(nbd->disk), "Unsupported socket:
-> should be TCP or UNIX.\n");
-> +               *err =3D -EINVAL;
-> +               sockfd_put(sock);
-> +               return NULL;
-> +       }
-> +
->         if (sock->ops->shutdown =3D=3D sock_no_shutdown) {
->                 dev_err(disk_to_dev(nbd->disk), "Unsupported socket:
-> shutdown callout must be supported.\n");
->                 *err =3D -EINVAL;
+[auto build test ERROR on axboe-block/for-next]
+[also build test ERROR on linus/master v6.17-rc4 next-20250905]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Yu-Kuai/block-cleanup-bio_issue/20250905-153659
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
+patch link:    https://lore.kernel.org/r/20250905070643.2533483-3-yukuai1%40huaweicloud.com
+patch subject: [PATCH for-6.18/block 02/16] block: initialize bio issue time in blk_mq_submit_bio()
+config: i386-buildonly-randconfig-003-20250906 (https://download.01.org/0day-ci/archive/20250906/202509062332.tqE0Bc8k-lkp@intel.com/config)
+compiler: gcc-13 (Debian 13.3.0-16) 13.3.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250906/202509062332.tqE0Bc8k-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202509062332.tqE0Bc8k-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   block/blk-mq.c: In function 'blk_mq_submit_bio':
+>> block/blk-mq.c:3171:12: error: 'struct bio' has no member named 'issue_time_ns'
+    3171 |         bio->issue_time_ns = blk_time_get_ns();
+         |            ^~
+
+
+vim +3171 block/blk-mq.c
+
+  3097	
+  3098	/**
+  3099	 * blk_mq_submit_bio - Create and send a request to block device.
+  3100	 * @bio: Bio pointer.
+  3101	 *
+  3102	 * Builds up a request structure from @q and @bio and send to the device. The
+  3103	 * request may not be queued directly to hardware if:
+  3104	 * * This request can be merged with another one
+  3105	 * * We want to place request at plug queue for possible future merging
+  3106	 * * There is an IO scheduler active at this queue
+  3107	 *
+  3108	 * It will not queue the request if there is an error with the bio, or at the
+  3109	 * request creation.
+  3110	 */
+  3111	void blk_mq_submit_bio(struct bio *bio)
+  3112	{
+  3113		struct request_queue *q = bdev_get_queue(bio->bi_bdev);
+  3114		struct blk_plug *plug = current->plug;
+  3115		const int is_sync = op_is_sync(bio->bi_opf);
+  3116		struct blk_mq_hw_ctx *hctx;
+  3117		unsigned int nr_segs;
+  3118		struct request *rq;
+  3119		blk_status_t ret;
+  3120	
+  3121		/*
+  3122		 * If the plug has a cached request for this queue, try to use it.
+  3123		 */
+  3124		rq = blk_mq_peek_cached_request(plug, q, bio->bi_opf);
+  3125	
+  3126		/*
+  3127		 * A BIO that was released from a zone write plug has already been
+  3128		 * through the preparation in this function, already holds a reference
+  3129		 * on the queue usage counter, and is the only write BIO in-flight for
+  3130		 * the target zone. Go straight to preparing a request for it.
+  3131		 */
+  3132		if (bio_zone_write_plugging(bio)) {
+  3133			nr_segs = bio->__bi_nr_segments;
+  3134			if (rq)
+  3135				blk_queue_exit(q);
+  3136			goto new_request;
+  3137		}
+  3138	
+  3139		/*
+  3140		 * The cached request already holds a q_usage_counter reference and we
+  3141		 * don't have to acquire a new one if we use it.
+  3142		 */
+  3143		if (!rq) {
+  3144			if (unlikely(bio_queue_enter(bio)))
+  3145				return;
+  3146		}
+  3147	
+  3148		/*
+  3149		 * Device reconfiguration may change logical block size or reduce the
+  3150		 * number of poll queues, so the checks for alignment and poll support
+  3151		 * have to be done with queue usage counter held.
+  3152		 */
+  3153		if (unlikely(bio_unaligned(bio, q))) {
+  3154			bio_io_error(bio);
+  3155			goto queue_exit;
+  3156		}
+  3157	
+  3158		if ((bio->bi_opf & REQ_POLLED) && !blk_mq_can_poll(q)) {
+  3159			bio->bi_status = BLK_STS_NOTSUPP;
+  3160			bio_endio(bio);
+  3161			goto queue_exit;
+  3162		}
+  3163	
+  3164		bio = __bio_split_to_limits(bio, &q->limits, &nr_segs);
+  3165		if (!bio)
+  3166			goto queue_exit;
+  3167	
+  3168		if (!bio_integrity_prep(bio))
+  3169			goto queue_exit;
+  3170	
+> 3171		bio->issue_time_ns = blk_time_get_ns();
+  3172		if (blk_mq_attempt_bio_merge(q, bio, nr_segs))
+  3173			goto queue_exit;
+  3174	
+  3175		if (bio_needs_zone_write_plugging(bio)) {
+  3176			if (blk_zone_plug_bio(bio, nr_segs))
+  3177				goto queue_exit;
+  3178		}
+  3179	
+  3180	new_request:
+  3181		if (rq) {
+  3182			blk_mq_use_cached_rq(rq, plug, bio);
+  3183		} else {
+  3184			rq = blk_mq_get_new_requests(q, plug, bio);
+  3185			if (unlikely(!rq)) {
+  3186				if (bio->bi_opf & REQ_NOWAIT)
+  3187					bio_wouldblock_error(bio);
+  3188				goto queue_exit;
+  3189			}
+  3190		}
+  3191	
+  3192		trace_block_getrq(bio);
+  3193	
+  3194		rq_qos_track(q, rq, bio);
+  3195	
+  3196		blk_mq_bio_to_request(rq, bio, nr_segs);
+  3197	
+  3198		ret = blk_crypto_rq_get_keyslot(rq);
+  3199		if (ret != BLK_STS_OK) {
+  3200			bio->bi_status = ret;
+  3201			bio_endio(bio);
+  3202			blk_mq_free_request(rq);
+  3203			return;
+  3204		}
+  3205	
+  3206		if (bio_zone_write_plugging(bio))
+  3207			blk_zone_write_plug_init_request(rq);
+  3208	
+  3209		if (op_is_flush(bio->bi_opf) && blk_insert_flush(rq))
+  3210			return;
+  3211	
+  3212		if (plug) {
+  3213			blk_add_rq_to_plug(plug, rq);
+  3214			return;
+  3215		}
+  3216	
+  3217		hctx = rq->mq_hctx;
+  3218		if ((rq->rq_flags & RQF_USE_SCHED) ||
+  3219		    (hctx->dispatch_busy && (q->nr_hw_queues == 1 || !is_sync))) {
+  3220			blk_mq_insert_request(rq, 0);
+  3221			blk_mq_run_hw_queue(hctx, true);
+  3222		} else {
+  3223			blk_mq_run_dispatch_ops(q, blk_mq_try_issue_directly(hctx, rq));
+  3224		}
+  3225		return;
+  3226	
+  3227	queue_exit:
+  3228		/*
+  3229		 * Don't drop the queue reference if we were trying to use a cached
+  3230		 * request and thus didn't acquire one.
+  3231		 */
+  3232		if (!rq)
+  3233			blk_queue_exit(q);
+  3234	}
+  3235	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
