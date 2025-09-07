@@ -1,193 +1,249 @@
-Received: from mail-il1-f208.google.com (mail-il1-f208.google.com [209.85.166.208])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from sender4-op-o12.zoho.com (sender4-op-o12.zoho.com [136.143.188.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2A92315D40
-	for <linux-block@vger.kernel.org>; Sun,  7 Sep 2025 07:11:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.208
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757229097; cv=none; b=fSH1D0ZKFpT+IdT1UClg1cMPYJLqMhfcJ55cr5YhHu2aclBIPxFuHMoznedNzjinL3+T7uEjyF3xDXlQJo0wSSQlfCDdomgMVmCBhyVtuarKGtbC6sdkS3DdQxqwbpLkB4uYI1hNxNN7exb23uZ43sR6SlSr6O8FhxcLbE9H0UU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757229097; c=relaxed/simple;
-	bh=srrrLs+wEC07kyRpepO2/fSGE8nq9ahbv9VrAG4PnAY=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=TCeAsqO0Nu6nHzKAT+cpTjFZNfqJKzQunxjm63pzBUWRXSbFQG7WAOsn1C7bnh8rCICOsR/R2X39JfaICnIBYOQVVcGQhCSznoDENplaFc80r1FC02Afc4LjGUXrT6uZGBZAPRZfdz3kQpsfcYLhcYHX4NZI2aWeTxm4d8jKOVM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.208
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f208.google.com with SMTP id e9e14a558f8ab-3ee1d164774so64060935ab.1
-        for <linux-block@vger.kernel.org>; Sun, 07 Sep 2025 00:11:35 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757229095; x=1757833895;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ubewheY8ZTSPDA8vJSlVExU9cNAqFiFuY9Aubhjpw4s=;
-        b=f7JFWMBMa3x1rXSiBj/ojwPydvtqJSPJccptIBmWW3Fur3A9WffRXeCWObKQcv7QHB
-         3+X0IDjWjl2HS2uRLgvxiVlZPd8Na5KoR5dMMUnIcGXoG+MP/u96TH7fHMoQkZtRWoSy
-         8/mgLdSzkw2Yk0wqeu8nvrqQYqlBfrC5lea6B/t2czLXAjdf/El0PuZR4vn72yW3MrpP
-         ppPTBcwiTHg/yzqwgz+PJt/zzHJg70tR4YmHjQ8Ap1z7rvpzTrbcXXl3AJDeqfsWwSx1
-         FYMjP/+yqI9/bE8L7eJxfRtSgNs4lOsPSIuCOxmbaQNJDy/yIBP0izNplE/iV5yoF8b4
-         ziCQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXSHld0RH74mRNAbZLHApPFBTBMAQOpzTL733HBWEwYzmZQb+VWu5ZGGQwR0TxxlH2fLojxDnyK0HZvbg==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz7zzIvuO6xtB1cZweT4qoeI2pz/KON7ThrnJNMoZeDp4gxNHoL
-	L/4h3rDdsVcYEN9S9VFeGKS95N3TuBvkF1Hsi0kU/4BzCtUfCXt84IDJQ/mUdcNCKxG2molpiKW
-	nBKRbzTdyu8Bf1owmSS6MfdV/+HGjk/J69gqicQNeXIDwPc08wla9xAkUwrw=
-X-Google-Smtp-Source: AGHT+IFhxpWMbfP/8VjiaFb7Tjmk3W3CHtWSS2RDMm5Zf5J9mhCagz2YYGMLQrpTVpALgZ+jcAzo324oJgcV6ErhnCztNRrgBxos
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6538C20C001;
+	Sun,  7 Sep 2025 07:59:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1757231964; cv=pass; b=J8tlngLTZCb+weUqhIltOORXBolNzohOhiFnpjMgWKQ9Mb/k+Oka1YHzkpyu1ThQJL/JAyaTwd7ZUEVBjpLH7hiWwJn8fBLq/d5oGM4etVA5pS1YWkdZpiQBkJiL+K5Ue1GGf3AoRIPte5r4uKSuJAm8aXDpE6vmLHH8Z/KhORk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1757231964; c=relaxed/simple;
+	bh=bceuT68gqsDMF4TNyJ22n2FepSM/6gukiJKQSTOnqUY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KbThZuYJc8ZzLJJ7z8SS9QDIbY7rBUyCd8AJGWQrKNpHzOQEP75dt28WFSXoVkTLJIYWpEwf4BAiql/I/zrd8LkG9RsWhPZXLuKv6hE25jxeUrJBb+07TCd1AiPhc7wklJEoAOSxaNAaMquELX8ptf6snQy4Pzkll3QyWGqG9+U=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yukuai.org.cn; spf=pass smtp.mailfrom=yukuai.org.cn; dkim=pass (1024-bit key) header.d=yukuai.org.cn header.i=hailan@yukuai.org.cn header.b=ITckcUML; arc=pass smtp.client-ip=136.143.188.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yukuai.org.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yukuai.org.cn
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=yukuai.org.cn header.i=hailan@yukuai.org.cn header.b="ITckcUML"
+ARC-Seal: i=1; a=rsa-sha256; t=1757231879; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=AyhSX1nRAoBCgQZytDqP73HE8tPC8zBIQU1NicP0a19bVm/b/voWai6Gsqc2pi4khqVZgWVh+2OSjx8Xtf0+MAWP3Wt7D0XorfPPpKv1o9AbJPrm1bHmDV6HroqGsokkUMeScuOxuFIwV+dwGZmFkGHV9W7y15JnJjG9JrlDd7o=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1757231879; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=1zL3s3OBirXX73TaUZOE/4KjYhwaz1Ly//egXWV/bgc=; 
+	b=KVoaPUbwFi641r5BGI89IPb9wvy/hBD+ybecBzBpaUFUPdERvF5d/Egf94fgjjYNks8NRNYrh9lJBiA5ODdOC9if36IJZc0PHQYAiic3KAwvuejp/1G3qP7cQLxTA9GuFxby9YYedJlkcLpYF3xrHF5lO7zkZU5zlABE2mShMTI=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=yukuai.org.cn;
+	spf=pass  smtp.mailfrom=hailan@yukuai.org.cn;
+	dmarc=pass header.from=<hailan@yukuai.org.cn>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1757231879;
+	s=zmail; d=yukuai.org.cn; i=hailan@yukuai.org.cn;
+	h=Message-ID:Date:Date:MIME-Version:Subject:Subject:To:To:Cc:Cc:References:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=1zL3s3OBirXX73TaUZOE/4KjYhwaz1Ly//egXWV/bgc=;
+	b=ITckcUMLZFXVhyAg5vbBV0erosb4aKETXrandH1GA+Rqu3ugcg2NHi7+xGNnbLLS
+	hYfouJGpyCSLvLm31RPFNzBdoMZq82ZHVaAkjz0bL3IugjZrRir5/jvevm+z38SKtd1
+	UkvFfNhNl7FTRIPVVX4z1r/kSODbE6sEAPeGHawo=
+Received: by mx.zohomail.com with SMTPS id 1757231875364926.6023354554346;
+	Sun, 7 Sep 2025 00:57:55 -0700 (PDT)
+Message-ID: <9c763646-f320-4975-ae19-2a40607757b1@yukuai.org.cn>
+Date: Sun, 7 Sep 2025 15:57:45 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1a48:b0:3fb:d14c:3562 with SMTP id
- e9e14a558f8ab-3fbd14c368amr87816915ab.2.1757229095079; Sun, 07 Sep 2025
- 00:11:35 -0700 (PDT)
-Date: Sun, 07 Sep 2025 00:11:35 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68bd3027.050a0220.192772.01cc.GAE@google.com>
-Subject: [syzbot] [block?] general protection fault in bio_iov_iter_get_pages
-From: syzbot <syzbot+b253ade8e1751d90a7a9@syzkaller.appspotmail.com>
-To: akpm@linux-foundation.org, axboe@kernel.dk, david@redhat.com, jgg@ziepe.ca, 
-	jhubbard@nvidia.com, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org, peterx@redhat.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH for-6.18/block 02/16] block: initialize bio issue time in
+ blk_mq_submit_bio()
+To: kernel test robot <lkp@intel.com>, Yu Kuai <yukuai1@huaweicloud.com>,
+ hch@infradead.org, colyli@kernel.org, hare@suse.de, dlemoal@kernel.org,
+ tieren@fnnas.com, bvanassche@acm.org, axboe@kernel.dk, tj@kernel.org,
+ josef@toxicpanda.com, song@kernel.org, yukuai3@huawei.com,
+ satyat@google.com, ebiggers@google.com, kmo@daterainc.com,
+ akpm@linux-foundation.org, neil@brown.name
+Cc: oe-kbuild-all@lists.linux.dev, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, cgroups@vger.kernel.org,
+ linux-raid@vger.kernel.org, yi.zhang@huawei.com, yangerkun@huawei.com,
+ johnny.chenyi@huawei.com
+References: <20250905070643.2533483-3-yukuai1@huaweicloud.com>
+ <202509062332.tqE0Bc8k-lkp@intel.com>
+From: Yu Kuai <hailan@yukuai.org.cn>
+In-Reply-To: <202509062332.tqE0Bc8k-lkp@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ZohoMailClient: External
 
-Hello,
+Hi,
 
-syzbot found the following issue on:
+在 2025/9/6 23:27, kernel test robot 写道:
+> Hi Yu,
+>
+> kernel test robot noticed the following build errors:
+>
+> [auto build test ERROR on axboe-block/for-next]
+> [also build test ERROR on linus/master v6.17-rc4 next-20250905]
+> [If your patch is applied to the wrong git tree, kindly drop us a note.
+> And when submitting patch, we suggest to use '--base' as documented in
+> https://git-scm.com/docs/git-format-patch#_base_tree_information]
+>
+> url:    https://github.com/intel-lab-lkp/linux/commits/Yu-Kuai/block-cleanup-bio_issue/20250905-153659
+> base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
+> patch link:    https://lore.kernel.org/r/20250905070643.2533483-3-yukuai1%40huaweicloud.com
+> patch subject: [PATCH for-6.18/block 02/16] block: initialize bio issue time in blk_mq_submit_bio()
+> config: i386-buildonly-randconfig-003-20250906 (https://download.01.org/0day-ci/archive/20250906/202509062332.tqE0Bc8k-lkp@intel.com/config)
+> compiler: gcc-13 (Debian 13.3.0-16) 13.3.0
+> reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250906/202509062332.tqE0Bc8k-lkp@intel.com/reproduce)
+>
+> If you fix the issue in a separate patch/commit (i.e. not just a new version of
+> the same patch/commit), kindly add following tags
+> | Reported-by: kernel test robot <lkp@intel.com>
+> | Closes: https://lore.kernel.org/oe-kbuild-all/202509062332.tqE0Bc8k-lkp@intel.com/
+>
+> All errors (new ones prefixed by >>):
+>
+>     block/blk-mq.c: In function 'blk_mq_submit_bio':
+>>> block/blk-mq.c:3171:12: error: 'struct bio' has no member named 'issue_time_ns'
+>      3171 |         bio->issue_time_ns = blk_time_get_ns();
 
-HEAD commit:    be5d4872e528 Add linux-next specific files for 20250905
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=17896962580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=a726684450a7d788
-dashboard link: https://syzkaller.appspot.com/bug?extid=b253ade8e1751d90a7a9
-compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10496962580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=14a98962580000
+This should be included inside BLK_CGROUP config, sorry about this.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/f67121360b62/disk-be5d4872.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/4f666ca2e57f/vmlinux-be5d4872.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/e86b794b985e/bzImage-be5d4872.xz
+Thanks,
+Kuai
 
-The issue was bisected to:
-
-commit db076b5db550aa34169dceee81d0974c7b2a2482
-Author: David Hildenbrand <david@redhat.com>
-Date:   Mon Sep 1 15:03:40 2025 +0000
-
-    mm/gup: remove record_subpages()
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=15a0b312580000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=17a0b312580000
-console output: https://syzkaller.appspot.com/x/log.txt?x=13a0b312580000
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+b253ade8e1751d90a7a9@syzkaller.appspotmail.com
-Fixes: db076b5db550 ("mm/gup: remove record_subpages()")
-
-Oops: general protection fault, probably for non-canonical address 0xdffffc0000000001: 0000 [#1] SMP KASAN PTI
-KASAN: null-ptr-deref in range [0x0000000000000008-0x000000000000000f]
-CPU: 1 UID: 0 PID: 6063 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/12/2025
-RIP: 0010:_compound_head include/linux/page-flags.h:284 [inline]
-RIP: 0010:__bio_iov_iter_get_pages block/bio.c:1258 [inline]
-RIP: 0010:bio_iov_iter_get_pages+0x5b2/0x11c0 block/bio.c:1336
-Code: 9c 24 20 01 00 00 48 89 d8 48 c1 e8 03 42 80 3c 20 00 74 08 48 89 df e8 0c c9 7c fd 48 8b 1b 4c 8d 73 08 4c 89 f0 48 c1 e8 03 <42> 80 3c 20 00 74 08 4c 89 f7 e8 ef c8 7c fd 4d 8b 3e 4c 89 fe 48
-RSP: 0018:ffffc90002f773e0 EFLAGS: 00010202
-RAX: 0000000000000001 RBX: 0000000000000000 RCX: ffff88807bfd0000
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
-RBP: ffffc90002f77590 R08: 0000000000000000 R09: ffffffff84a7d3b5
-R10: dffffc0000000000 R11: fffff94000329b51 R12: dffffc0000000000
-R13: ffff888078cd0294 R14: 0000000000000008 R15: 00000000000000f0
-FS:  0000555567d13500(0000) GS:ffff888125af9000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f9a3134c000 CR3: 0000000074d2a000 CR4: 00000000003526f0
-Call Trace:
- <TASK>
- __blkdev_direct_IO+0x60b/0xee0 block/fops.c:215
- blkdev_direct_IO+0x120f/0x1730 block/fops.c:434
- blkdev_direct_write+0x7c/0x140 block/fops.c:719
- blkdev_write_iter+0x547/0x710 block/fops.c:787
- aio_write+0x535/0x7a0 fs/aio.c:1634
- __io_submit_one fs/aio.c:-1 [inline]
- io_submit_one+0x78b/0x1310 fs/aio.c:2053
- __do_sys_io_submit fs/aio.c:2112 [inline]
- __se_sys_io_submit+0x185/0x2f0 fs/aio.c:2082
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f9a3058ebe9
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffdf48caa48 EFLAGS: 00000246 ORIG_RAX: 00000000000000d1
-RAX: ffffffffffffffda RBX: 00007f9a307c5fa0 RCX: 00007f9a3058ebe9
-RDX: 00002000000000c0 RSI: 00000000000000f3 RDI: 00007f9a3134c000
-RBP: 00007f9a30611e19 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f9a307c5fa0 R14: 00007f9a307c5fa0 R15: 0000000000000003
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:_compound_head include/linux/page-flags.h:284 [inline]
-RIP: 0010:__bio_iov_iter_get_pages block/bio.c:1258 [inline]
-RIP: 0010:bio_iov_iter_get_pages+0x5b2/0x11c0 block/bio.c:1336
-Code: 9c 24 20 01 00 00 48 89 d8 48 c1 e8 03 42 80 3c 20 00 74 08 48 89 df e8 0c c9 7c fd 48 8b 1b 4c 8d 73 08 4c 89 f0 48 c1 e8 03 <42> 80 3c 20 00 74 08 4c 89 f7 e8 ef c8 7c fd 4d 8b 3e 4c 89 fe 48
-RSP: 0018:ffffc90002f773e0 EFLAGS: 00010202
-RAX: 0000000000000001 RBX: 0000000000000000 RCX: ffff88807bfd0000
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
-RBP: ffffc90002f77590 R08: 0000000000000000 R09: ffffffff84a7d3b5
-R10: dffffc0000000000 R11: fffff94000329b51 R12: dffffc0000000000
-R13: ffff888078cd0294 R14: 0000000000000008 R15: 00000000000000f0
-FS:  0000555567d13500(0000) GS:ffff8881259f9000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007ffe8453cfd8 CR3: 0000000074d2a000 CR4: 00000000003526f0
-----------------
-Code disassembly (best guess):
-   0:	9c                   	pushf
-   1:	24 20                	and    $0x20,%al
-   3:	01 00                	add    %eax,(%rax)
-   5:	00 48 89             	add    %cl,-0x77(%rax)
-   8:	d8 48 c1             	fmuls  -0x3f(%rax)
-   b:	e8 03 42 80 3c       	call   0x3c804213
-  10:	20 00                	and    %al,(%rax)
-  12:	74 08                	je     0x1c
-  14:	48 89 df             	mov    %rbx,%rdi
-  17:	e8 0c c9 7c fd       	call   0xfd7cc928
-  1c:	48 8b 1b             	mov    (%rbx),%rbx
-  1f:	4c 8d 73 08          	lea    0x8(%rbx),%r14
-  23:	4c 89 f0             	mov    %r14,%rax
-  26:	48 c1 e8 03          	shr    $0x3,%rax
-* 2a:	42 80 3c 20 00       	cmpb   $0x0,(%rax,%r12,1) <-- trapping instruction
-  2f:	74 08                	je     0x39
-  31:	4c 89 f7             	mov    %r14,%rdi
-  34:	e8 ef c8 7c fd       	call   0xfd7cc928
-  39:	4d 8b 3e             	mov    (%r14),%r15
-  3c:	4c 89 fe             	mov    %r15,%rsi
-  3f:	48                   	rex.W
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+>           |            ^~
+>
+>
+> vim +3171 block/blk-mq.c
+>
+>    3097	
+>    3098	/**
+>    3099	 * blk_mq_submit_bio - Create and send a request to block device.
+>    3100	 * @bio: Bio pointer.
+>    3101	 *
+>    3102	 * Builds up a request structure from @q and @bio and send to the device. The
+>    3103	 * request may not be queued directly to hardware if:
+>    3104	 * * This request can be merged with another one
+>    3105	 * * We want to place request at plug queue for possible future merging
+>    3106	 * * There is an IO scheduler active at this queue
+>    3107	 *
+>    3108	 * It will not queue the request if there is an error with the bio, or at the
+>    3109	 * request creation.
+>    3110	 */
+>    3111	void blk_mq_submit_bio(struct bio *bio)
+>    3112	{
+>    3113		struct request_queue *q = bdev_get_queue(bio->bi_bdev);
+>    3114		struct blk_plug *plug = current->plug;
+>    3115		const int is_sync = op_is_sync(bio->bi_opf);
+>    3116		struct blk_mq_hw_ctx *hctx;
+>    3117		unsigned int nr_segs;
+>    3118		struct request *rq;
+>    3119		blk_status_t ret;
+>    3120	
+>    3121		/*
+>    3122		 * If the plug has a cached request for this queue, try to use it.
+>    3123		 */
+>    3124		rq = blk_mq_peek_cached_request(plug, q, bio->bi_opf);
+>    3125	
+>    3126		/*
+>    3127		 * A BIO that was released from a zone write plug has already been
+>    3128		 * through the preparation in this function, already holds a reference
+>    3129		 * on the queue usage counter, and is the only write BIO in-flight for
+>    3130		 * the target zone. Go straight to preparing a request for it.
+>    3131		 */
+>    3132		if (bio_zone_write_plugging(bio)) {
+>    3133			nr_segs = bio->__bi_nr_segments;
+>    3134			if (rq)
+>    3135				blk_queue_exit(q);
+>    3136			goto new_request;
+>    3137		}
+>    3138	
+>    3139		/*
+>    3140		 * The cached request already holds a q_usage_counter reference and we
+>    3141		 * don't have to acquire a new one if we use it.
+>    3142		 */
+>    3143		if (!rq) {
+>    3144			if (unlikely(bio_queue_enter(bio)))
+>    3145				return;
+>    3146		}
+>    3147	
+>    3148		/*
+>    3149		 * Device reconfiguration may change logical block size or reduce the
+>    3150		 * number of poll queues, so the checks for alignment and poll support
+>    3151		 * have to be done with queue usage counter held.
+>    3152		 */
+>    3153		if (unlikely(bio_unaligned(bio, q))) {
+>    3154			bio_io_error(bio);
+>    3155			goto queue_exit;
+>    3156		}
+>    3157	
+>    3158		if ((bio->bi_opf & REQ_POLLED) && !blk_mq_can_poll(q)) {
+>    3159			bio->bi_status = BLK_STS_NOTSUPP;
+>    3160			bio_endio(bio);
+>    3161			goto queue_exit;
+>    3162		}
+>    3163	
+>    3164		bio = __bio_split_to_limits(bio, &q->limits, &nr_segs);
+>    3165		if (!bio)
+>    3166			goto queue_exit;
+>    3167	
+>    3168		if (!bio_integrity_prep(bio))
+>    3169			goto queue_exit;
+>    3170	
+>> 3171		bio->issue_time_ns = blk_time_get_ns();
+>    3172		if (blk_mq_attempt_bio_merge(q, bio, nr_segs))
+>    3173			goto queue_exit;
+>    3174	
+>    3175		if (bio_needs_zone_write_plugging(bio)) {
+>    3176			if (blk_zone_plug_bio(bio, nr_segs))
+>    3177				goto queue_exit;
+>    3178		}
+>    3179	
+>    3180	new_request:
+>    3181		if (rq) {
+>    3182			blk_mq_use_cached_rq(rq, plug, bio);
+>    3183		} else {
+>    3184			rq = blk_mq_get_new_requests(q, plug, bio);
+>    3185			if (unlikely(!rq)) {
+>    3186				if (bio->bi_opf & REQ_NOWAIT)
+>    3187					bio_wouldblock_error(bio);
+>    3188				goto queue_exit;
+>    3189			}
+>    3190		}
+>    3191	
+>    3192		trace_block_getrq(bio);
+>    3193	
+>    3194		rq_qos_track(q, rq, bio);
+>    3195	
+>    3196		blk_mq_bio_to_request(rq, bio, nr_segs);
+>    3197	
+>    3198		ret = blk_crypto_rq_get_keyslot(rq);
+>    3199		if (ret != BLK_STS_OK) {
+>    3200			bio->bi_status = ret;
+>    3201			bio_endio(bio);
+>    3202			blk_mq_free_request(rq);
+>    3203			return;
+>    3204		}
+>    3205	
+>    3206		if (bio_zone_write_plugging(bio))
+>    3207			blk_zone_write_plug_init_request(rq);
+>    3208	
+>    3209		if (op_is_flush(bio->bi_opf) && blk_insert_flush(rq))
+>    3210			return;
+>    3211	
+>    3212		if (plug) {
+>    3213			blk_add_rq_to_plug(plug, rq);
+>    3214			return;
+>    3215		}
+>    3216	
+>    3217		hctx = rq->mq_hctx;
+>    3218		if ((rq->rq_flags & RQF_USE_SCHED) ||
+>    3219		    (hctx->dispatch_busy && (q->nr_hw_queues == 1 || !is_sync))) {
+>    3220			blk_mq_insert_request(rq, 0);
+>    3221			blk_mq_run_hw_queue(hctx, true);
+>    3222		} else {
+>    3223			blk_mq_run_dispatch_ops(q, blk_mq_try_issue_directly(hctx, rq));
+>    3224		}
+>    3225		return;
+>    3226	
+>    3227	queue_exit:
+>    3228		/*
+>    3229		 * Don't drop the queue reference if we were trying to use a cached
+>    3230		 * request and thus didn't acquire one.
+>    3231		 */
+>    3232		if (!rq)
+>    3233			blk_queue_exit(q);
+>    3234	}
+>    3235	
+>
