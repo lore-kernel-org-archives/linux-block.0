@@ -1,77 +1,77 @@
-Received: from mail-qk1-f225.google.com (mail-qk1-f225.google.com [209.85.222.225])
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C5CD31C57D
-	for <linux-block@vger.kernel.org>; Mon,  8 Sep 2025 18:45:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.225
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB65A1A5BBE;
+	Mon,  8 Sep 2025 18:52:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757357148; cv=none; b=LieRdwvhkkI5HgTgpbHK6n1IuuxL6iZiCI1U94PmZNKOGyQbbWTW/bbwsA8A6e1pbTaNYSL92W5k3bP8bZMCEoutuZ2iQwy8707DQwiOdfcjj9ivk4MT5ymoFh4k3oDGGHiCgYcRNRaqyoFPFXgIYAyuIu5ll/kj8NgfhMS448k=
+	t=1757357537; cv=none; b=Q6lnFIhbVrqoHkSekdcunbw6hfoEbb5uS4mg/biguIlzFgdc7RpO17UlP0DYV+JAbQ60Kcn9FkNzLDmt6taWVCaLmpKdtmwKd5v+FyAPc/75ss4fq/FQ7sVbyJ4nPlQqtMEcoOI1wmvF+h+GGyDP6jVzFctAiOF3CFKp28BlVXs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757357148; c=relaxed/simple;
-	bh=bs4Y23mCgkbnt3UBx65Ms29RtcfnigDOozwdxRrutj8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AdvevKjjqyzXiGQhxc+9HOdlY+yRP6+CmxUI01Fx/tlCA0IbK8aV9TwxZxruek/LnH4QtBDKogmigKXfemBubpeSEZQprUc0J3UKfaWfMX9POMBpU6MjKLN7ey6b6gRTRrqu96dQnAhawabFwlsx/jE3cmCoGaIkAeuT9HbggoI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=BuYk+9mw; arc=none smtp.client-ip=209.85.222.225
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	s=arc-20240116; t=1757357537; c=relaxed/simple;
+	bh=gCN5SxT5vP1NX+CbbCHkHf478+/hzyRd7OEKpfS6fDU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hyrmoYhVfJrxvbqYDyzwk3sYV82kWL8vGxJUiAbA3nsjhG9/CXF6kj7Ad9Ufc5skxH1irZY7Mem96nFGH1Jiq4+N39pWG9C8F/ukHWH25oaNK6qBDLpPAPO0TdC1qpxBWmaMcd9NuQyM9GS+GErkOyonn/uRpE3ScnR+RZTF7JU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DjrX61xD; arc=none smtp.client-ip=209.85.210.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="BuYk+9mw"
-Received: by mail-qk1-f225.google.com with SMTP id af79cd13be357-80f6846bf6dso67794585a.2
-        for <linux-block@vger.kernel.org>; Mon, 08 Sep 2025 11:45:45 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DjrX61xD"
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-7741991159bso4054544b3a.0;
+        Mon, 08 Sep 2025 11:52:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1757357145; x=1757961945; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1757357535; x=1757962335; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=O/DTdCtvVCgsE2r4Q32039ITkF16WxVWkLE1/TEOzfA=;
-        b=BuYk+9mw6KDSQA3ndl+WZDc7PLrIKDYEuBjEEqAtEhqFIDzcW+PdharjtF+G28Mqtk
-         HCl5SjmPyY2Xa1aH49OGRv0bwLgmU3k2rTnbGXN0x4HNEhGFCo3+7B+UB7M9GsDjuFBm
-         5PerThB+LKlhSRvdTjdtgiemsaWrYsEQVcwv8jX8P+KgiL8rsvIU6LoGg8/vMhXl8xO5
-         Es/nM1P0Tks2zSQPBfPmvgNlxBgcCZHkWknOIYKzXTjWzYrUzt8QneTj1hvkaAn7jWRZ
-         pZr9YgrBEEAIRElqsdb3v9xRDA7dW8Vz+/3aWL3J8JGv5Zsbpeg5eSyEvO4gbVN6nyA4
-         5gEA==
+        bh=lm3Imf0pgBjvWBHNU/XQYZEiSLH4qTMAkyxrgY5m5W0=;
+        b=DjrX61xD2vnnmdEcCYky7HuhrQLIUfXN75RoGwcfkd1dX1AarzB/BKZyPo4jGRQfuM
+         dFYB2U/oTyhDxFk9APrC60wBCfGSpJvLNowS0lNTyG+zHYzhKgPLmkHrO7ZjraNDaTsW
+         /ioeTk0QJb47QRb0PJO0911VouflWwcFHaBl+avPNZ8XhN1KRGHaldUijLLFzxOULkPn
+         qSRlL+5XQoOOitVYTP3iu3lF52D5CMRd2ZWQrMnK9WkLGWWoNrrAUQUwRHikC6KVqRTV
+         mlm0mnQLeU94Rr6iPzXKTiDgyTojSfnNbODgV0YETXSE8ruYc2L4YBeQRkPpkH17QQTy
+         8KkA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757357145; x=1757961945;
+        d=1e100.net; s=20230601; t=1757357535; x=1757962335;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=O/DTdCtvVCgsE2r4Q32039ITkF16WxVWkLE1/TEOzfA=;
-        b=mbr0V1OCZlNsVzHs6uTwnkFiEafDhHXeObhk262HrL3FwwzYWQEFV9SC3rtuzXJNjs
-         h+5kZH8gTuAqHhWZKDQf9Z5V9U8t4pQbu2cwKHx+odUuhZLy/edvlrROFlVcVEFb4Yz4
-         uBtErhSekYoVCxB8cJ8xPWnc4KlXgM2uazsHsBdXTxaUwjVGafJdT9fMqRrwteu1egyZ
-         zCTsWUzrqZ5ZG2CufrFy755PU6Y2xSgt7vBxrmtbbx6WLWYS8flcKnNWEZyrEcqooavs
-         xC1lZKIyBkjhpCGsR0K0t9IIemthr0xotaiTO0vtW9/A/zTmBzJVkD7MrLN6Yaq4Q3bK
-         2lBA==
-X-Forwarded-Encrypted: i=1; AJvYcCVq+2i5jwheeEW6hqIwwh1kqDRKkF6D/T+3UE7tTUuRarTt/DgKBIApH30VGQv04tR+n0M9jNYoQ4QTAg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzHRi+5hw9Fdpz5YPOocZ08RA5jcDC0DH9jutZpDrGgN+OcTwGh
-	Vs4hPBKz2BQUiICkEeao0lBjBb8A0sMwaC12INyn6Yue8Y53XHyLqi1ZM8X2gUDQ69A7ZufT608
-	6mfPBcBlikXQyF7B+s7EDNIFSuUwOBV5ADwZs
-X-Gm-Gg: ASbGnctFWGsfr+cFtek0gJ1bYHJIYLGE8eB3VY7KzXQq8+5PDywebxhU1W3fWbqA4Hk
-	lTeB3R9CDYhEGox5d/R9msucc7B4/nwKGP6FssKgBdAu/ShAUHkFM5363Sne/hcaNHjFpDBvwTp
-	aqN6LnucATlGeQr3e8oH/YZS1f3TmklKIoZIyt6drBOALjGu9rZk3gEO1a6TvwAF2nL63X11XLM
-	4ISD8hdDagZPiKFN9TpMgg/3lyoyzH8LpmnskHdecKP4pd9dliJBvnbZCaBQ4NgKT+iSojAukle
-	g3mJ6iANlIiJ6fT+iCexZbEs60xVr5/rBvMbFjmOQPdZLMjxN3/VtTa2ZvrFiL1HRK6SyTd2
-X-Google-Smtp-Source: AGHT+IHw6VuqllmK6/n48bgXeNTTwG0cfLASlmhRZTLoDOwdhBdjsJdOlcCJluCNJ3jDSZ4WJ48NIblCq0t/
-X-Received: by 2002:a05:620a:701c:b0:7f9:c230:2cbe with SMTP id af79cd13be357-813c2361ca5mr484273685a.11.1757357144716;
-        Mon, 08 Sep 2025 11:45:44 -0700 (PDT)
-Received: from c7-smtp-2023.dev.purestorage.com ([208.88.159.128])
-        by smtp-relay.gmail.com with ESMTPS id af79cd13be357-80aab3b4eacsm42261585a.8.2025.09.08.11.45.44
+        bh=lm3Imf0pgBjvWBHNU/XQYZEiSLH4qTMAkyxrgY5m5W0=;
+        b=dfxCPGuOmG+VC7XQMgmvtNx1rAFHdHZFqy73sMtt9nbNLpK17gS3r5g6pt6LmuAo4Z
+         7fJfKmu+ptuYBq3f03C9bgDOEFBh4v18ET3CHkpKRikUQzTP4CyHQjMDXmPzJnpkyO7h
+         ghYgiXIasflUQ2worEQ9VM8UhVaA9SQfkXPuBLf6joyLguwCeOplsTdJlygmcdFYrkkU
+         gdsDSK2ahgh/FzRYdT5NZCmNMM2G8BFfxTfpqqNvn0NYN20CXjKVpfXXMTHS4gqcPgA1
+         /WEa4darEf9vRYeSlUha3U+jEX2QnhvDy0XFATQsiVZLGDYdNUsjm9vsTcsBqHB01/RW
+         WxUw==
+X-Forwarded-Encrypted: i=1; AJvYcCVTaySNOOyN3hClXhBfb9rWxrOWK44tFGDj+xDis15T8RwF7MKp5qqqA+hWUus/ddwp1zGlsG9Zbzwd@vger.kernel.org, AJvYcCW5vw+z2FtyPObHxmEeyh+1NWYeWMI9Jnr2VUNBdqoSuXvPDGtKlbDHUTe9XAF2LDDGtRm68nLHKYn6IQ==@vger.kernel.org, AJvYcCWfQyJM1VO47SUCuQUMBszKEbJTGT9XQcseEmZ9dNgy0gqAABPQoPQDFsobDjymQBppdMJmAnB9bj329T1xuQ==@vger.kernel.org, AJvYcCXO60Xc+g9+c+4UMJj801+D58kS0iOPNluyvtQ/GLlQiqobfwQCO60wo5aICtiqHdUdDuVBR6l3EQO9@vger.kernel.org
+X-Gm-Message-State: AOJu0YwIQqkfnQvwGyL/n8wOm9k8Fs7gKQr2L1H3NKUzTo4SatX6Bs6Z
+	wuoCvYIbxacNstlRPtBgYlTEyP5O6fom1JxTCvciCLIapssz44Whs/UQ
+X-Gm-Gg: ASbGncvrua52osfzfCxcT1UxB5T7CUsPGvUhZ5z5qFaL23mctOVdODdlBKyS3fkCZ1z
+	5eF1Z0UbSYu9he1bMXDNPKuGpVsEUNfQyIfwVmQmDizqGQ++snCxVfvqkJluR2ly5TepFPk0XCB
+	FcCuxbF6ORFBq0V4ViDRcBzuqXV2tQuflv7e6q388HEJPJk32jGVETDggyQlMHkorE/4+81BZBK
+	COl6nbtoWxCw/m25DSibyKKmycYuNkMaEAatJ5Qa2VTVG5yEhr4/eBqEVKU09hrMVWeUuuNIr6U
+	7BrIhzfrFtNS0Xdf+ecxZGx3fzGxB2q9hqPNr/QhojjF3lD3RHRRbTgR/AkaRTUKg0BZ1kwiFfC
+	73UwpECgr2nwz7X9+vBDGzO2eWgls
+X-Google-Smtp-Source: AGHT+IHt7wUFngbPJ1fb9lzSML52MmUa09gdmnjs+gYzwN3cD9RrhRVdwNduOqUtB5yJFavDHOvpJw==
+X-Received: by 2002:a05:6a00:4f8b:b0:772:3b9d:70f0 with SMTP id d2e1a72fcca58-7742dd64e08mr11340077b3a.2.1757357535099;
+        Mon, 08 Sep 2025 11:52:15 -0700 (PDT)
+Received: from localhost ([2a03:2880:ff:4a::])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7722a2d97acsm30230068b3a.41.2025.09.08.11.52.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Sep 2025 11:45:44 -0700 (PDT)
-X-Relaying-Domain: purestorage.com
-Received: from dev-csander.dev.purestorage.com (unknown [IPv6:2620:125:9007:640:ffff::1199])
-	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 028AD340199;
-	Mon,  8 Sep 2025 12:45:44 -0600 (MDT)
-Received: by dev-csander.dev.purestorage.com (Postfix, from userid 1557716354)
-	id 0699EE41BCB; Mon,  8 Sep 2025 12:45:44 -0600 (MDT)
-From: Caleb Sander Mateos <csander@purestorage.com>
-To: Ming Lei <ming.lei@redhat.com>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Caleb Sander Mateos <csander@purestorage.com>,
+        Mon, 08 Sep 2025 11:52:14 -0700 (PDT)
+From: Joanne Koong <joannelkoong@gmail.com>
+To: brauner@kernel.org,
+	miklos@szeredi.hu
+Cc: hch@infradead.org,
+	djwong@kernel.org,
+	hsiangkao@linux.alibaba.com,
 	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] ublk: consolidate nr_io_ready and nr_queues_ready
-Date: Mon,  8 Sep 2025 12:45:41 -0600
-Message-ID: <20250908184542.472230-1-csander@purestorage.com>
-X-Mailer: git-send-email 2.45.2
+	gfs2@lists.linux.dev,
+	linux-fsdevel@vger.kernel.org,
+	kernel-team@meta.com,
+	linux-xfs@vger.kernel.org,
+	linux-doc@vger.kernel.org
+Subject: [PATCH v2 00/16] fuse: use iomap for buffered reads + readahead 
+Date: Mon,  8 Sep 2025 11:51:06 -0700
+Message-ID: <20250908185122.3199171-1-joannelkoong@gmail.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -80,144 +80,73 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-ublk_mark_io_ready() tracks whether all the ublk_device's I/Os have been
-fetched by incrementing ublk_queue's nr_io_ready count and incrementing
-ublk_device's nr_queues_ready count if the whole queue is ready.
-Simplify the logic by just tracking the total number of fetched I/Os on
-each ublk_device. When this count reaches nr_hw_queues * queue_depth,
-the ublk_device is ready to receive I/O.
+This series adds fuse iomap support for buffered reads and readahead.
+This is needed so that granular uptodate tracking can be used in fuse when
+large folios are enabled so that only the non-uptodate portions of the folio
+need to be read in instead of having to read in the entire folio. It also is
+needed in order to turn on large folios for servers that use the writeback
+cache since otherwise there is a race condition that may lead to data
+corruption if there is a partial write, then a read and the read happens
+before the write has undergone writeback, since otherwise the folio will not
+be marked uptodate from the partial write so the read will read in the entire
+folio from disk, which will overwrite the partial write.
 
-Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
----
- drivers/block/ublk_drv.c | 28 ++++++++++++----------------
- 1 file changed, 12 insertions(+), 16 deletions(-)
+This is on top of commit d02ae3528998 ("Merge branch 'kernel-6.18.clone3'
+into vfs.all") in Christian's vfs tree.
 
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 3cf6d344d1c0..aa64f530d5e9 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -199,11 +199,10 @@ struct ublk_queue {
- 	struct ublksrv_io_desc *io_cmd_buf;
- 
- 	bool force_abort;
- 	bool canceling;
- 	bool fail_io; /* copy of dev->state == UBLK_S_DEV_FAIL_IO */
--	unsigned short nr_io_ready;	/* how many ios setup */
- 	spinlock_t		cancel_lock;
- 	struct ublk_device *dev;
- 	struct ublk_io ios[];
- };
- 
-@@ -232,11 +231,11 @@ struct ublk_device {
- 	struct mm_struct	*mm;
- 
- 	struct ublk_params	params;
- 
- 	struct completion	completion;
--	unsigned int		nr_queues_ready;
-+	u32			nr_io_ready;
- 	bool 			unprivileged_daemons;
- 	struct mutex cancel_mutex;
- 	bool canceling;
- 	pid_t 	ublksrv_tgid;
- };
-@@ -1497,13 +1496,10 @@ static const struct blk_mq_ops ublk_mq_ops = {
- 
- static void ublk_queue_reinit(struct ublk_device *ub, struct ublk_queue *ubq)
- {
- 	int i;
- 
--	/* All old ioucmds have to be completed */
--	ubq->nr_io_ready = 0;
--
- 	for (i = 0; i < ubq->q_depth; i++) {
- 		struct ublk_io *io = &ubq->ios[i];
- 
- 		/*
- 		 * UBLK_IO_FLAG_CANCELED is kept for avoiding to touch
-@@ -1548,11 +1544,11 @@ static void ublk_reset_ch_dev(struct ublk_device *ub)
- 	for (i = 0; i < ub->dev_info.nr_hw_queues; i++)
- 		ublk_queue_reinit(ub, ublk_get_queue(ub, i));
- 
- 	/* set to NULL, otherwise new tasks cannot mmap io_cmd_buf */
- 	ub->mm = NULL;
--	ub->nr_queues_ready = 0;
-+	ub->nr_io_ready = 0;
- 	ub->unprivileged_daemons = false;
- 	ub->ublksrv_tgid = -1;
- }
- 
- static struct gendisk *ublk_get_disk(struct ublk_device *ub)
-@@ -1846,13 +1842,15 @@ static void ublk_uring_cmd_cancel_fn(struct io_uring_cmd *cmd,
- 
- 	WARN_ON_ONCE(io->cmd != cmd);
- 	ublk_cancel_cmd(ubq, pdu->tag, issue_flags);
- }
- 
--static inline bool ublk_queue_ready(struct ublk_queue *ubq)
-+static inline bool ublk_dev_ready(const struct ublk_device *ub)
- {
--	return ubq->nr_io_ready == ubq->q_depth;
-+	u32 total = (u32)ub->dev_info.nr_hw_queues * ub->dev_info.queue_depth;
-+
-+	return ub->nr_io_ready == total;
- }
- 
- static void ublk_cancel_queue(struct ublk_queue *ubq)
- {
- 	int i;
-@@ -1972,20 +1970,18 @@ static void ublk_reset_io_flags(struct ublk_device *ub)
- 	ublk_set_canceling(ub, false);
- 	mutex_unlock(&ub->cancel_mutex);
- }
- 
- /* device can only be started after all IOs are ready */
--static void ublk_mark_io_ready(struct ublk_device *ub, struct ublk_queue *ubq)
-+static void ublk_mark_io_ready(struct ublk_device *ub)
- 	__must_hold(&ub->mutex)
- {
--	ubq->nr_io_ready++;
--	if (ublk_queue_ready(ubq))
--		ub->nr_queues_ready++;
- 	if (!ub->unprivileged_daemons && !capable(CAP_SYS_ADMIN))
- 		ub->unprivileged_daemons = true;
- 
--	if (ub->nr_queues_ready == ub->dev_info.nr_hw_queues) {
-+	ub->nr_io_ready++;
-+	if (ublk_dev_ready(ub)) {
- 		/* now we are ready for handling ublk io request */
- 		ublk_reset_io_flags(ub);
- 		complete_all(&ub->completion);
- 	}
- }
-@@ -2187,12 +2183,12 @@ static int ublk_fetch(struct io_uring_cmd *cmd, struct ublk_queue *ubq,
- 	 * When handling FETCH command for setting up ublk uring queue,
- 	 * ub->mutex is the innermost lock, and we won't block for handling
- 	 * FETCH, so it is fine even for IO_URING_F_NONBLOCK.
- 	 */
- 	mutex_lock(&ub->mutex);
--	/* UBLK_IO_FETCH_REQ is only allowed before queue is setup */
--	if (ublk_queue_ready(ubq)) {
-+	/* UBLK_IO_FETCH_REQ is only allowed before dev is setup */
-+	if (ublk_dev_ready(ub)) {
- 		ret = -EBUSY;
- 		goto out;
- 	}
- 
- 	/* allow each command to be FETCHed at most once */
-@@ -2207,11 +2203,11 @@ static int ublk_fetch(struct io_uring_cmd *cmd, struct ublk_queue *ubq,
- 	ret = ublk_config_io_buf(ubq, io, cmd, buf_addr, NULL);
- 	if (ret)
- 		goto out;
- 
- 	WRITE_ONCE(io->task, get_task_struct(current));
--	ublk_mark_io_ready(ub, ubq);
-+	ublk_mark_io_ready(ub);
- out:
- 	mutex_unlock(&ub->mutex);
- 	return ret;
- }
- 
+This series was run through fstests on fuse passthrough_hp with an
+out-of kernel patch enabling fuse large folios.
+
+This patchset does not enable large folios on fuse yet. That will be part
+of a different patchset.
+
+Thanks,
+Joanne
+
+Changelog
+---------
+v1: https://lore.kernel.org/linux-fsdevel/20250829235627.4053234-1-joannelkoong@gmail.com/
+v1 -> v2:
+* Don't pass in caller-provided arg through iter->private, pass it through
+  ctx->private instead (Darrick & Christoph)
+* Separate 'bias' for ifs->read_bytes_pending into separate patch (Christoph)
+* Rework read/readahead interface to take in struct iomap_read_folio_ctx
+  (Christoph)
+* Add patch for removing fuse fc->blkbits workaround, now that Miklos's tree
+  has been merged into Christian's
+
+Joanne Koong (16):
+  iomap: move async bio read logic into helper function
+  iomap: move read/readahead bio submission logic into helper function
+  iomap: rename cur_folio_in_bio to folio_owned
+  iomap: store read/readahead bio generically
+  iomap: propagate iomap_read_folio() error to caller
+  iomap: iterate over entire folio in iomap_readpage_iter()
+  iomap: rename iomap_readpage_iter() to iomap_read_folio_iter()
+  iomap: rename iomap_readpage_ctx struct to iomap_read_folio_ctx
+  iomap: add public start/finish folio read helpers
+  iomap: make iomap_read_folio_ctx->folio_owned internal
+  iomap: add caller-provided callbacks for read and readahead
+  iomap: add bias for async read requests
+  iomap: move read/readahead logic out of CONFIG_BLOCK guard
+  fuse: use iomap for read_folio
+  fuse: use iomap for readahead
+  fuse: remove fc->blkbits workaround for partial writes
+
+ .../filesystems/iomap/operations.rst          |  42 +++
+ block/fops.c                                  |  14 +-
+ fs/erofs/data.c                               |  14 +-
+ fs/fuse/dir.c                                 |   2 +-
+ fs/fuse/file.c                                | 291 ++++++++++-------
+ fs/fuse/fuse_i.h                              |   8 -
+ fs/fuse/inode.c                               |  13 +-
+ fs/gfs2/aops.c                                |  21 +-
+ fs/iomap/buffered-io.c                        | 307 ++++++++++--------
+ fs/xfs/xfs_aops.c                             |  14 +-
+ fs/zonefs/file.c                              |  14 +-
+ include/linux/iomap.h                         |  45 ++-
+ 12 files changed, 509 insertions(+), 276 deletions(-)
+
 -- 
-2.45.2
+2.47.3
 
