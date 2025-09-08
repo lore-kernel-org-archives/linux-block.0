@@ -1,92 +1,101 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21A961A9FA0
-	for <linux-block@vger.kernel.org>; Mon,  8 Sep 2025 01:29:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F8A12110;
+	Mon,  8 Sep 2025 01:32:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757294959; cv=none; b=O/G1h1L9z9oJbwOQ+Jm+SUS8zNeM+RlcuvsMshbWadH9wLzRK8PcAl5GtLQoCEZVJkHf69SqDSCqFx1ZgHRjODLmGtgID+17QekVIwdhQ5XV6kTAer5mJ0G2yPThs0vpfI8W8DhedaLVE5pKta8s/7WHd06wp+z1rMK8dcelDnQ=
+	t=1757295139; cv=none; b=eoompHCGv5T88MEfbQVsyt061iqt2AAgHYf+/cxqDKFtkJikAIAAoydc6aOoauSmgixfZSVjqye11r9IdhwS32DLpDOjfLCMRztQlywaXLmYSiAn4EyTUyiqccCiS9Kvm9mjQJRr2/ofOJlRKlc4W1W5oStGU31GHKJlm9puSnQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757294959; c=relaxed/simple;
-	bh=ltKsrL8XuvFDcFv3IZBGLefyei/XNUgJcxT5XWlu7/s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WSV++BL32g9zFR8AivcEMcPOzXp6ZkS7DBFPFycraIfbnk8LSdWfMCsaJRwbMJQoopY8w5K6QE9SW/wzrE1GmKpiQfXtqM0SCVAmq6O2z08AOtPda5BfR1Yvd9E3809QY3B7tEAIa+g5tK6Y8ffC9mT9S+Wc+kT0NpMoBAz1Sy0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bPVVUnnJ; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bPVVUnnJ"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1757294954;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8jvDWZPSNp6TtCQnfkgzTNaiEAdcRYOJN/AA4nNQaVk=;
-	b=bPVVUnnJsc0QOF8RN18pOFt5GQhxYUJnLOkclMU129D8vUoewtbuZI4SimAlk1sBIM7hwo
-	p0Xmk5N8TbyXI0bql589jAxsElEctZedLWdvZJvfTtmrg5CL/85DUCToCdtqwkavgwvMGn
-	K5NEYkuqdKJO4iWlxr6JxV2qRYkTtnU=
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-341-J1B9W5jtOb6V_vO4HswOrA-1; Sun,
- 07 Sep 2025 21:29:11 -0400
-X-MC-Unique: J1B9W5jtOb6V_vO4HswOrA-1
-X-Mimecast-MFC-AGG-ID: J1B9W5jtOb6V_vO4HswOrA_1757294950
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B77A41956087;
-	Mon,  8 Sep 2025 01:29:09 +0000 (UTC)
-Received: from fedora (unknown [10.72.120.3])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id F0C471800446;
-	Mon,  8 Sep 2025 01:29:05 +0000 (UTC)
-Date: Mon, 8 Sep 2025 09:28:59 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Cc: Hannes Reinecke <hare@suse.de>, Yu Kuai <yukuai3@huawei.com>
-Subject: Re: [PATCH V2 0/5] blk-mq: Replace tags->lock with SRCU for tag
- iterators
-Message-ID: <aL4xW_wRG2MZFA3U@fedora>
-References: <20250830021825.2859325-1-ming.lei@redhat.com>
+	s=arc-20240116; t=1757295139; c=relaxed/simple;
+	bh=+eV1jTgxKlUFpHs6zB7ttmfep+nMsmqrdkfdLOJl5jM=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=bZg6Qv3YL8moIvrCBpa0P1pJYAqZ39dNycC0dI7UFNxhTajydVS7vwWY739qUTyjyXTSfvO6bYqWHEILgoOG/Xxo6SNF9rV0UWVI7sM0lZkO4CH7c2PXVxlSSQkIL7X0F27vqB97W3mdGgX6wIqmvhhGCoWAEMjQ/e767NU/Tkk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4cKqFD4KN2zYQtsW;
+	Mon,  8 Sep 2025 09:32:16 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 193D71A1AE9;
+	Mon,  8 Sep 2025 09:32:15 +0800 (CST)
+Received: from [10.174.179.143] (unknown [10.174.179.143])
+	by APP4 (Coremail) with SMTP id gCh0CgAncY0aMr5ome0LBw--.54766S3;
+	Mon, 08 Sep 2025 09:32:12 +0800 (CST)
+Subject: Re: [PATCH for-6.18/block 02/16] block: initialize bio issue time in
+ blk_mq_submit_bio()
+To: Yu Kuai <hailan@yukuai.org.cn>, kernel test robot <lkp@intel.com>,
+ Yu Kuai <yukuai1@huaweicloud.com>, hch@infradead.org, colyli@kernel.org,
+ hare@suse.de, dlemoal@kernel.org, tieren@fnnas.com, bvanassche@acm.org,
+ axboe@kernel.dk, tj@kernel.org, josef@toxicpanda.com, song@kernel.org,
+ satyat@google.com, ebiggers@google.com, kmo@daterainc.com,
+ akpm@linux-foundation.org, neil@brown.name
+Cc: oe-kbuild-all@lists.linux.dev, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, cgroups@vger.kernel.org,
+ linux-raid@vger.kernel.org, yi.zhang@huawei.com, yangerkun@huawei.com,
+ johnny.chenyi@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
+References: <20250905070643.2533483-3-yukuai1@huaweicloud.com>
+ <202509062332.tqE0Bc8k-lkp@intel.com>
+ <9c763646-f320-4975-ae19-2a40607757b1@yukuai.org.cn>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <adb6b29c-ad24-0377-c5f3-17868f3e3116@huaweicloud.com>
+Date: Mon, 8 Sep 2025 09:32:10 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250830021825.2859325-1-ming.lei@redhat.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+In-Reply-To: <9c763646-f320-4975-ae19-2a40607757b1@yukuai.org.cn>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgAncY0aMr5ome0LBw--.54766S3
+X-Coremail-Antispam: 1UD129KBjvdXoW7Jw1fGFy7XrWxJw45ur1UGFg_yoWfGrgEgr
+	WjvwnrWFy8Jw4kJF4Du3sIvrZ7Kw1ktFyF9345AF12g3Z5Xr98uFZ5Gr9aqw1kCw48Za1U
+	CF4DXFZxXF43AjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUbfAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+	A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
+	6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUXVWUAwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
+	c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxkF7I0En4kS14v26r4a6rW5MxAIw28IcxkI7V
+	AKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCj
+	r7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6x
+	IIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAI
+	w20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x
+	0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7sRRwID5UUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On Sat, Aug 30, 2025 at 10:18:18AM +0800, Ming Lei wrote:
-> Hello Jens,
-> 
-> Replace the spinlock in blk_mq_find_and_get_req() with an SRCU read lock
-> around the tag iterators.
-> 
-> Avoids scsi_host_busy() lockup during scsi host blocked in case of big cpu
-> cores & deep queue depth.
-> 
-> Also the big tags lock isn't needed when reading disk sysfs attribute
-> 'inflight' any more.
-> 
-> Take the following approach:
-> 
-> - clearing rq reference in tags->rqs[] and deferring freeing scheduler requests
-> in SRCU callback
-> 
-> - replace tags->lock with srcu read lock in tags iterator.
-> 
-> V2:
-> 	- rebase on for-6.18/block
-> 	- add review tags
+Hi,
 
-Hello Jens,
+在 2025/09/07 15:57, Yu Kuai 写道:
+>> If you fix the issue in a separate patch/commit (i.e. not just a new 
+>> version of
+>> the same patch/commit), kindly add following tags
+>> | Reported-by: kernel test robot <lkp@intel.com>
+>> | Closes: 
+>> https://lore.kernel.org/oe-kbuild-all/202509062332.tqE0Bc8k-lkp@intel.com/ 
+>>
+>>
+>> All errors (new ones prefixed by >>):
+>>
+>>     block/blk-mq.c: In function 'blk_mq_submit_bio':
+>>>> block/blk-mq.c:3171:12: error: 'struct bio' has no member named 
+>>>> 'issue_time_ns'
+>>      3171 |         bio->issue_time_ns = blk_time_get_ns();
+> 
+> This should be included inside BLK_CGROUP config, sorry about this.
+> 
 
-Ping...
+I should keep the blkcg_bio_issue_init() and call it here. I'll wait for
+sometime and let people revice other patches before I send a new
+version.
 
 Thanks,
-Ming
+Kuai
 
