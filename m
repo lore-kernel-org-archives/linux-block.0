@@ -1,153 +1,89 @@
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from m16.mail.126.com (m16.mail.126.com [117.135.210.8])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B67DD2FC026
-	for <linux-block@vger.kernel.org>; Mon,  8 Sep 2025 09:40:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06A3C214A64;
+	Mon,  8 Sep 2025 09:59:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757324441; cv=none; b=KYidYSh1NX1LX+PTudwRuF5aJC1n9nYVn61h9Xt6IiJjqlD9Fgc+fIfeL4jNIjpqWayMZ2jM+xW3NKgdoXf52690SoiZ6m91KlsbtAiqxXfx/1C/qai5iKfi1TV75caQpIDoD/5fdgNMlr6e+CrZQZChrsf5hcqnRQ13sZ04rRA=
+	t=1757325575; cv=none; b=m9N6it0t1rZ6DeMyesUUXSWi+SmeGxZ5L28zBE0MdPGP9ddjiNYRF6HxDaLULZDI3RMj97A9Lr4EUhAXrJuwo8qtSr2b3sfQ7tYoEKT8JcXC0p2iJGgVgiCF4P1QQXY5Jzjomk+yL3udGFKP6vMYBDACGZX1PuMLY8yydfLyL88=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757324441; c=relaxed/simple;
-	bh=t+aVCYfXA+p0hAUl+r/idM6sMNdxYBy4dFyRlU1jIEA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=l+AUHe35L8j4tt0XbHH8xSgcl308KSoHEFlKfVf/0JqHwyfUsLCli7FZrjq0i/sVKzfbhMALYYapS6lezaZkXxkaIOtQ/b0JV4oit5vHCKgU1ZIUvRSmVAjDP+wrIYP0YqI+LQQSWbBOLtdukLZZSdG8NTQCStTEBIok4nzLaEk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sWBg62i9; arc=none smtp.client-ip=209.85.160.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1757325575; c=relaxed/simple;
+	bh=RQ5nnNREJlpXGOY6Wb1YQ35hR0TcbY0REiVLtNzBlCU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
+	 MIME-Version:Message-ID; b=Xi5RPWPe8n03od7TRUD71VjfMYuixTn9zgEmtM3JPGMhZP6fHec8UVzV1PiR/v3x0LiWwjeXN4QfuK+nIrjiioKvoV14/eycIYV8EQR2tKFlHd0RUrnCrMPRhJagM9hm9MbWg1GbulvhiizDPlVtJ/fqwPpXQ2glecwULR9vR1Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=126.com; spf=pass smtp.mailfrom=126.com; dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b=O12XNp3B; arc=none smtp.client-ip=117.135.210.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=126.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=126.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sWBg62i9"
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-4b61161dd37so3787721cf.3
-        for <linux-block@vger.kernel.org>; Mon, 08 Sep 2025 02:40:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1757324438; x=1757929238; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=erhcBr1kcJ+JmJqrcMGs+dfvelpre/iMdOwMlOMIkIk=;
-        b=sWBg62i9ztJvL0fW7U6HoDRPORu4Wi58UFJBzWV3i2hx9z39EAefe0xxGFj7bHtPcg
-         r1V6F6UnpT4uegw9gjmZfMpqfSRXYNfdxaL7r+q3qYsFDA+231Wbm8DdfjWivfWfgChl
-         C3q5JN7E83jkp/gHCrWOodb2OozdO+D5jyMnRYdqJKtV152dJHL232ZpMCLvDQVeozS0
-         iP0KWahwy0EIAortVJuYq8C7kX33rzO17J4jb1mOApW5kOG1o+Wr7mLBER96PetiIQ0Y
-         +BoCluEEY8WeagfURHUIF+CVZvWW/IZB6McgSarCMfHlfiEqywSjboVmyj/+hrFVPIl8
-         STzw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757324438; x=1757929238;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=erhcBr1kcJ+JmJqrcMGs+dfvelpre/iMdOwMlOMIkIk=;
-        b=obDuxu7evINwPr/h489yOMs+DR1j1bm3LheV2SS+bzigbhoXE2bU+rYWQIW3reXdz3
-         ZhpQf2tduzUkQp3h3TDo7MJarJCRzxrUDtB5fTAdgdnCDMais735FiZSYfYGjjkSlIrj
-         ofC78n19K5agknHhhDaTjyFjwsbdTJRGOUdeuJ9jFXa/u86XCVcleE53tEgW3KmpCQLd
-         emgA2srI5cV5WKlgNsN7KFDXW5Jm7yg0tz4xpTvlk/gdH7bXKaBuSYl6/n3/XtHaBg6H
-         +0e/hamm+sTs5GYy0nlD20v3PpiVD+WVBjRes9a/bK6SHlYfu4BFlBg0RezZ9MvxNTGQ
-         SVEg==
-X-Forwarded-Encrypted: i=1; AJvYcCWwKuqXnt++83+jk5WqNVnslEaEwLgdU8Iq8rzkU0mMLgy90WwBCGuUTKOXsILwFN8pk+ijyp71BJ16OQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxdiEJBZrIONGrepRJM4w9XikN0PF7y3V8J0NA/S+ergUwsn8VW
-	aNd09zZKd1My0bDKHC2nlU3MLlsBJa9/sUVU/KJdk7XCqRQM9lKAoxR57ROekY03aAzelIO+AgN
-	/PEGw2oEVv2GGL9YZJQKDoeWgCknnMjhiPapcaipo
-X-Gm-Gg: ASbGncuCOo6IIP7gN+yEXiuBNOhQ1ax5vS+puVkc+KK3ghIw7J4Vv/2BhwCO3siiFM3
-	HGuGK9nRn6wx3EFV8djx6fItqVHVoLfjQ1MutA1DUrdT3du/eKSZDy1hulji/3ROo6obnGfEiBw
-	jpzRD9JONI+KXF1jHiCQ9YVoEig7ty5yaRuN+0LE1PFTwUn0t/0jbPchbM7rd5xvpAUfGKX5/GW
-	PppUNe+rJcH6NtuYxtyGFUg
-X-Google-Smtp-Source: AGHT+IH1qcux165XgeTJOKRdM2g9mlniLhsoO7eTSJyAbSGCi4jHXwjx9GOnwgxGTG5T20bMMEWW7o7k2xMBN/Lj20k=
-X-Received: by 2002:ac8:7dd1:0:b0:4b3:96a:fda8 with SMTP id
- d75a77b69052e-4b5f834cff6mr66658841cf.17.1757324437178; Mon, 08 Sep 2025
- 02:40:37 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b="O12XNp3B"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=126.com;
+	s=s110527; h=Date:From:To:Subject:Content-Type:MIME-Version:
+	Message-ID; bh=RQ5nnNREJlpXGOY6Wb1YQ35hR0TcbY0REiVLtNzBlCU=; b=O
+	12XNp3BvR1+mNvbSOq1pP0+luRQdQeugXkGI1Ue6W8yWrxy9oASxiQMTUa/SK161
+	Zb8/ef0jE4LU0bmh8QnQJkfR7h1cuYbAdsqB4x+5BAl84BpOb9h0eNBLomtuUzIp
+	7WCx1ZztM9uQ2sOrQTaJK5UPFU+PGnmliP6ukjU4xw=
+Received: from zhanggenjian$126.com ( [116.128.244.171] ) by
+ ajax-webmail-wmsvr-41-112 (Coremail) ; Mon, 8 Sep 2025 17:58:24 +0800 (CST)
+Date: Mon, 8 Sep 2025 17:58:24 +0800 (CST)
+From: "genjian zhang" <zhanggenjian@126.com>
+To: axboe@kernel.dk, dlemoal@kernel.org, shinichiro.kawasaki@wdc.com,
+	johannes.thumshirn@wdc.com, kch@nvidia.com, zhengqixing@huawei.com,
+	willy@infradead.org, namcao@linutronix.de, vincent.fu@samsung.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	"Genjian Zhang" <zhanggenjian@kylinos.cn>, zhanggenjian@126.com
+Subject: Re:[PATCH v2] null_blk: Fix the description of the cache_size
+ module argument
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version 2023.4-cmXT build
+ 20250723(a044bf12) Copyright (c) 2002-2025 www.mailtech.cn 126com
+In-Reply-To: <20250815090732.1813343-1-zhanggenjian@126.com>
+References: <20250815090732.1813343-1-zhanggenjian@126.com>
+X-NTES-SC: AL_Qu2eBf+Zuk0r4imRZOkfmUgQhec8W8ewvfsh2IFXOJl8jArj6z8BV0F9AnL21P+lBT+yrimFdhxE5vt1XLt8Q6EpKFmVUHC8mEblRKSlztO0Rg==
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=GBK
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <68bb4160.050a0220.192772.0198.GAE@google.com> <CANn89iLNFHBMTF2Pb6hHERYpuih9eQZb6A12+ndzBcQs_kZoBA@mail.gmail.com>
- <CANn89iJaY+MJPUJgtowZOPwHaf8ToNVxEyFN9U+Csw9+eB7YHg@mail.gmail.com>
- <c035df1c-abaf-9173-032f-3dd91b296101@huaweicloud.com> <CANn89iKVbTKxgO=_47TU21b6GakhnRuBk2upGviCK0Y1Q2Ar2Q@mail.gmail.com>
- <51adf9cb-619e-9646-36f0-1362828e801e@huaweicloud.com>
-In-Reply-To: <51adf9cb-619e-9646-36f0-1362828e801e@huaweicloud.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 8 Sep 2025 02:40:25 -0700
-X-Gm-Features: Ac12FXwc26OpvX9zU43reFsjsweUwJNkA8yDt2oGLAvJhUo4PxXaORks-CcUgHI
-Message-ID: <CANn89iLhNzYUdtuaz9+ZHvwpbsK6gGfbCWmoic+ACQBVJafBXA@mail.gmail.com>
-Subject: Re: [syzbot] [net?] possible deadlock in inet_shutdown
-To: Yu Kuai <yukuai1@huaweicloud.com>
-Cc: syzbot <syzbot+e1cd6bd8493060bd701d@syzkaller.appspotmail.com>, 
-	Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>, davem@davemloft.net, 
-	dsahern@kernel.org, horms@kernel.org, kuba@kernel.org, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	ming.lei@redhat.com, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com, thomas.hellstrom@linux.intel.com, 
-	"yukuai (C)" <yukuai3@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Message-ID: <2baa9d5f.86c7.19928c331e3.Coremail.zhanggenjian@126.com>
+X-Coremail-Locale: zh_CN
+X-CM-TRANSID:cCkvCgD3VyTCqL5oRZopAA--.20777W
+X-CM-SenderInfo: x2kd0wxjhqyxldq6ij2wof0z/1tbiHh-Cfmi+mUOgxwACsU
+X-Coremail-Antispam: 1U5529EdanIXcx71UUUUU7vcSsGvfC2KfnxnUU==
 
-On Mon, Sep 8, 2025 at 2:34=E2=80=AFAM Yu Kuai <yukuai1@huaweicloud.com> wr=
-ote:
->
-> Hi,
->
-> =E5=9C=A8 2025/09/08 17:07, Eric Dumazet =E5=86=99=E9=81=93:
-> > On Mon, Sep 8, 2025 at 1:52=E2=80=AFAM Yu Kuai <yukuai1@huaweicloud.com=
-> wrote:
-> >>
-> >> Hi,
-> >>
-> >> =E5=9C=A8 2025/09/06 17:16, Eric Dumazet =E5=86=99=E9=81=93:
-> >>> On Fri, Sep 5, 2025 at 1:03=E2=80=AFPM Eric Dumazet <edumazet@google.=
-com> wrote:
-> >>>>
-> >>>> On Fri, Sep 5, 2025 at 1:00=E2=80=AFPM syzbot
-> >>>> <syzbot+e1cd6bd8493060bd701d@syzkaller.appspotmail.com> wrote:
-> >>>
-> >>> Note to NBD maintainers : I held about  20 syzbot reports all pointin=
-g
-> >>> to NBD accepting various sockets, I  can release them if needed, if y=
-ou prefer
-> >>> to triage them.
-> >>>
-> >> I'm not NBD maintainer, just trying to understand the deadlock first.
-> >>
-> >> Is this deadlock only possible for some sepecific socket types? Take
-> >> a look at the report here:
-> >>
-> >> Usually issue IO will require the order:
-> >>
-> >> q_usage_counter -> cmd lock -> tx lock -> sk lock
-> >>
-> >
-> > I have not seen the deadlock being reported with normal TCP sockets.
-> >
-> > NBD sets sk->sk_allocation to  GFP_NOIO | __GFP_MEMALLOC;
-> > from __sock_xmit(), and TCP seems to respect this.
-> > .
-> >
->
-> What aboud iscsi and nvme-tcp? and probably other drivers, where
-> sk_allocation is GFP_ATOMIC, do they have similar problem?
->
+QXQgMjAyNS0wOC0xNSAxNzowNzozMiwgIkdlbmppYW4iIDx6aGFuZ2dlbmppYW5AMTI2LmNvbT4g
+d3JvdGU6Cj5Gcm9tOiBHZW5qaWFuIFpoYW5nIDx6aGFuZ2dlbmppYW5Aa3lsaW5vcy5jbj4KPgo+
+V2hlbiBleGVjdXRpbmcgbW9kaW5mbyBudWxsX2JsaywgdGhlcmUgaXMgYW4gZXJyb3IgaW4gdGhl
+IGRlc2NyaXB0aW9uCj5vZiBtb2R1bGUgcGFyYW1ldGVyIG1icHMsIGFuZCB0aGUgb3V0cHV0IGlu
+Zm9ybWF0aW9uIG9mIGNhY2hlX3NpemUgaXMKPmluY29tcGxldGUuVGhlIG91dHB1dCBvZiBtb2Rp
+bmZvIGJlZm9yZSBhbmQgYWZ0ZXIgYXBwbHlpbmcgdGhpcyBwYXRjaAo+aXMgYXMgZm9sbG93czoK
+Pgo+QmVmb3JlOgo+Wy4uLl0KPnBhcm06ICAgICAgICAgICBjYWNoZV9zaXplOnVsb25nCj5bLi4u
+XQo+cGFybTogICAgICAgICAgIG1icHM6Q2FjaGUgc2l6ZSBpbiBNaUIgZm9yIG1lbW9yeS1iYWNr
+ZWQgZGV2aWNlLgo+CQlEZWZhdWx0OiAwIChub25lKSAodWludCkKPlsuLi5dCj4KPkFmdGVyOgo+
+Wy4uLl0KPnBhcm06ICAgICAgICAgICBjYWNoZV9zaXplOkNhY2hlIHNpemUgaW4gTWlCIGZvciBt
+ZW1vcnktYmFja2VkIGRldmljZS4KPgkJRGVmYXVsdDogMCAobm9uZSkgKHVsb25nKQo+Wy4uLl0K
+PnBhcm06ICAgICAgICAgICBtYnBzOkxpbWl0IG1heGltdW0gYmFuZHdpZHRoIChpbiBNaUIvcyku
+Cj4JCURlZmF1bHQ6IDAgKG5vIGxpbWl0KSAodWludCkKPlsuLi5dCj4KPkZpeGVzOiAwNThlZmUw
+MDBiMzEgKCJudWxsX2JsazogYWRkIG1vZHVsZSBwYXJhbWV0ZXJzIGZvciA0IG9wdGlvbnMiKQo+
+U2lnbmVkLW9mZi1ieTogR2VuamlhbiBaaGFuZyA8emhhbmdnZW5qaWFuQGt5bGlub3MuY24+Cj5S
+ZXZpZXdlZC1ieTogRGFtaWVuIExlIE1vYWwgPGRsZW1vYWxAa2VybmVsLm9yZz4KPi0tLQo+IGRy
+aXZlcnMvYmxvY2svbnVsbF9ibGsvbWFpbi5jIHwgMiArLQo+IDEgZmlsZSBjaGFuZ2VkLCAxIGlu
+c2VydGlvbigrKSwgMSBkZWxldGlvbigtKQo+Cj5kaWZmIC0tZ2l0IGEvZHJpdmVycy9ibG9jay9u
+dWxsX2Jsay9tYWluLmMgYi9kcml2ZXJzL2Jsb2NrL251bGxfYmxrL21haW4uYwo+aW5kZXggOTE2
+NDJjOWEzYjI5Li5mOTgyMDI3ZThjODUgMTAwNjQ0Cj4tLS0gYS9kcml2ZXJzL2Jsb2NrL251bGxf
+YmxrL21haW4uYwo+KysrIGIvZHJpdmVycy9ibG9jay9udWxsX2Jsay9tYWluLmMKPkBAIC0yMjMs
+NyArMjIzLDcgQEAgTU9EVUxFX1BBUk1fREVTQyhkaXNjYXJkLCAiU3VwcG9ydCBkaXNjYXJkIG9w
+ZXJhdGlvbnMgKHJlcXVpcmVzIG1lbW9yeS1iYWNrZWQgbnUKPiAKPiBzdGF0aWMgdW5zaWduZWQg
+bG9uZyBnX2NhY2hlX3NpemU7Cj4gbW9kdWxlX3BhcmFtX25hbWVkKGNhY2hlX3NpemUsIGdfY2Fj
+aGVfc2l6ZSwgdWxvbmcsIDA0NDQpOwo+LU1PRFVMRV9QQVJNX0RFU0MobWJwcywgIkNhY2hlIHNp
+emUgaW4gTWlCIGZvciBtZW1vcnktYmFja2VkIGRldmljZS4gRGVmYXVsdDogMCAobm9uZSkiKTsK
+PitNT0RVTEVfUEFSTV9ERVNDKGNhY2hlX3NpemUsICJDYWNoZSBzaXplIGluIE1pQiBmb3IgbWVt
+b3J5LWJhY2tlZCBkZXZpY2UuIERlZmF1bHQ6IDAgKG5vbmUpIik7Cj4gCj4gc3RhdGljIGJvb2wg
+Z19mdWEgPSB0cnVlOwo+IG1vZHVsZV9wYXJhbV9uYW1lZChmdWEsIGdfZnVhLCBib29sLCAwNDQ0
+KTsKPi0tIAo+Mi4yNS4xCgpDaGFuZ2VzIGluIHYyOgogLSBBZGp1c3RlZCB0aGUgcGF0Y2ggdGl0
+bGUuCiAtIFJlbW92ZWQgcmVkdW5kYW50IGJsYW5rIGxpbmVzLgogLSBMaW5rIHRvIHYxOiBodHRw
+czovL2xvcmUua2VybmVsLm9yZy9hbGwvMzA0NDVjNmEuNjkyMC4xOThhY2VmOGYyNC5Db3JlbWFp
+bC56aGFuZ2dlbmppYW5AMTI2LmNvbS8KCkdlbnRsZSBwaW5nLgoKVGhhbmtzCi1HZW5qaWFuCgo=
 
-AFAIK after this fix, iscsi was fine.
-
-commit f4f82c52a0ead5ab363d207d06f81b967d09ffb8
-Author: Eric Dumazet <edumazet@google.com>
-Date:   Fri Sep 15 17:11:11 2023 +0000
-
-    scsi: iscsi_tcp: restrict to TCP sockets
-
-    Nothing prevents iscsi_sw_tcp_conn_bind() to receive file descriptor
-    pointing to non TCP socket (af_unix for example).
-
-    Return -EINVAL if this is attempted, instead of crashing the kernel.
-
-    Fixes: 7ba247138907 ("[SCSI] open-iscsi/linux-iscsi-5 Initiator:
-Initiator code")
-    Signed-off-by: Eric Dumazet <edumazet@google.com>
-    Cc: Lee Duncan <lduncan@suse.com>
-    Cc: Chris Leech <cleech@redhat.com>
-    Cc: Mike Christie <michael.christie@oracle.com>
-    Cc: "James E.J. Bottomley" <jejb@linux.ibm.com>
-    Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
-    Cc: open-iscsi@googlegroups.com
-    Cc: linux-scsi@vger.kernel.org
-    Reviewed-by: Mike Christie <michael.christie@oracle.com>
-    Signed-off-by: David S. Miller <davem@davemloft.net>
