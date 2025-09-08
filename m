@@ -1,28 +1,28 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B721239E7F;
-	Mon,  8 Sep 2025 06:24:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AB581A262A;
+	Mon,  8 Sep 2025 06:40:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757312701; cv=none; b=aeUlhBtNtmRGUNkGZEAlYp8pXtrLZ6LnK75f9FcF3SC0nZUOu64oswnag6PUgSLZ5Kb2zJMjmnrdqUoOabxzZPtzvBt1hF2S/t/MEKBXR4ErnwUePETt55Tx2bmCtEM8KgEwQQu1qXrRZKSsh29Y4INQlMb5qdrb4C+VjDMJr10=
+	t=1757313657; cv=none; b=itH4L6kjrr+LrJgA+ydfYU26r9kUA395bbzNYM6L1O+0rNszaHfNYyvlm/hEmnyy1ugkdVcon/1IljtjUlZOX1/yeCa5tOsz/Exfzy4MUBDWCgik0fLq0V6M3Kn9abP3iixXq6UUfdfERDtQKvx2/PuM2/JFxRde0QjWLN9ua8M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757312701; c=relaxed/simple;
-	bh=sVkzsW6DvvNj+oP0kCEtKRPpDU5Cl0/OUmbzikDQKR4=;
+	s=arc-20240116; t=1757313657; c=relaxed/simple;
+	bh=por5FVkETrw0t+twqGZClVMpdCkS3aLmnlAefWWwm/k=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=FkXB29mmUKzPdhPLwwvTtjN88gFqDFfnk2QTCVdjRbumHgfRnobYBFayo9Ah80A7k0h19ITq2DmU5mF5NiJkmuaUKT/Nmlz78gSjRINouSUaaDlWqEG3snDNPaHfXSFUydOURt3jMLQzXvBytpVJGKfKFbI4/HWp4I8jeopcTGU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+	 MIME-Version; b=jEa4BG8pFo41VfgthJEzpqaLvGuN5dg5hBHnH4Z/JRsvgK4KqMaqqP2/dVMvYTTVOpNKFJ51NJr7bus765SMslSlzWPDiiOrFvHgvPgQUztjQALzQII1ifqswGHOQfLx4Zf/E8NHqsY519UKm4o/IKtm1oPZQnQMYx/c49mUOVo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
 Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4cKxky67F3zYQvMn;
-	Mon,  8 Sep 2025 14:24:58 +0800 (CST)
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4cKxkt5gdgzKHMxf;
+	Mon,  8 Sep 2025 14:24:54 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 595511A1C46;
-	Mon,  8 Sep 2025 14:24:57 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTP id DEC181A1B4C;
+	Mon,  8 Sep 2025 14:24:54 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.104.67])
-	by APP4 (Coremail) with SMTP id gCh0CgD3QY6xdr5oCGEjBw--.62066S12;
-	Mon, 08 Sep 2025 14:24:55 +0800 (CST)
+	by APP4 (Coremail) with SMTP id gCh0CgD3QY6xdr5oCGEjBw--.62066S11;
+	Mon, 08 Sep 2025 14:24:54 +0800 (CST)
 From: Yu Kuai <yukuai1@huaweicloud.com>
 To: nilay@linux.ibm.com,
 	ming.lei@redhat.com,
@@ -34,9 +34,9 @@ Cc: linux-block@vger.kernel.org,
 	yi.zhang@huawei.com,
 	yangerkun@huawei.com,
 	johnny.chenyi@huawei.com
-Subject: [PATCH for-6.18/block 08/10] blk-mq: fix potential deadlock while nr_requests grown
-Date: Mon,  8 Sep 2025 14:15:31 +0800
-Message-Id: <20250908061533.3062917-9-yukuai1@huaweicloud.com>
+Subject: [PATCH for-6.18/block 07/10] blk-mq-sched: add new parameter nr_requests in blk_mq_alloc_sched_tags()
+Date: Mon,  8 Sep 2025 14:15:30 +0800
+Message-Id: <20250908061533.3062917-8-yukuai1@huaweicloud.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20250908061533.3062917-1-yukuai1@huaweicloud.com>
 References: <20250908061533.3062917-1-yukuai1@huaweicloud.com>
@@ -47,10 +47,10 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgD3QY6xdr5oCGEjBw--.62066S12
-X-Coremail-Antispam: 1UD129KBjvJXoWxAF13uFWkZrW7JFykCw1Utrb_yoWrAFW3pF
-	W5Ja12k3ySqr18XrW8Aw47XwnxKws2gr1xGrWSy34S9rnrKrs7Z3W8GFy8XrW0yrWkCFsr
-	Ar4DJrZ8uF97W37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+X-CM-TRANSID:gCh0CgD3QY6xdr5oCGEjBw--.62066S11
+X-Coremail-Antispam: 1UD129KBjvJXoWxJw1kXF1rWryftFWrZryDGFg_yoWrGr4fpF
+	45XanFk34Yqr1kXay2yw4xXr13tws29FyxGr4ft34Fyr1q9rs3XF10gr47XrW0yrZ3AFsF
+	yr1Dtay5WrsFg3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
 	9KBjDU0xBIdaVrnRJUUUma14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
 	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_JF0E3s1l82xGYI
 	kIc2x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2
@@ -69,143 +69,107 @@ X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
 From: Yu Kuai <yukuai3@huawei.com>
 
-Allocate and free sched_tags while queue is freezed can deadlock[1],
-this is a long term problem, hence allocate memory before freezing
-queue and free memory after queue is unfreezed.
+This helper only support to allocate the default number of requests,
+add a new parameter to support specific number of requests.
 
-[1] https://lore.kernel.org/all/0659ea8d-a463-47c8-9180-43c719e106eb@linux.ibm.com/
-Fixes: e3a2b3f931f5 ("blk-mq: allow changing of queue depth through sysfs")
+Prepare to fix potential deadlock in the case nr_requests grow.
 
 Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 ---
- block/blk-mq.c    | 22 ++++++++++------------
- block/blk-mq.h    |  5 ++++-
- block/blk-sysfs.c | 25 +++++++++++++++++--------
- 3 files changed, 31 insertions(+), 21 deletions(-)
+ block/blk-mq-sched.c | 14 +++++---------
+ block/blk-mq-sched.h |  2 +-
+ block/blk-mq.h       | 11 +++++++++++
+ block/elevator.c     |  3 ++-
+ 4 files changed, 19 insertions(+), 11 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 82fa81036115..d85afbb9f031 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -4917,11 +4917,13 @@ void blk_mq_free_tag_set(struct blk_mq_tag_set *set)
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index e2ce4a28e6c9..d06bb137a743 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -454,7 +454,7 @@ void blk_mq_free_sched_tags_batch(struct xarray *et_table,
  }
- EXPORT_SYMBOL(blk_mq_free_tag_set);
  
--int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
-+struct elevator_tags *blk_mq_update_nr_requests(struct request_queue *q,
-+						struct elevator_tags *et,
-+						unsigned int nr)
+ struct elevator_tags *blk_mq_alloc_sched_tags(struct blk_mq_tag_set *set,
+-		unsigned int nr_hw_queues)
++		unsigned int nr_hw_queues, unsigned int nr_requests)
  {
- 	struct blk_mq_tag_set *set = q->tag_set;
-+	struct elevator_tags *old_et = NULL;
- 	struct blk_mq_hw_ctx *hctx;
--	int ret = 0;
- 	unsigned long i;
- 
- 	blk_mq_quiesce_queue(q);
-@@ -4946,23 +4948,19 @@ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
- 				nr - hctx->sched_tags->nr_reserved_tags);
- 		}
- 	} else {
--		queue_for_each_hw_ctx(q, hctx, i) {
--			if (!hctx->sched_tags)
--				continue;
--			blk_mq_tag_update_depth(hctx, &hctx->sched_tags, nr);
--			if (ret)
--				goto out;
--		}
-+		queue_for_each_hw_ctx(q, hctx, i)
-+			hctx->sched_tags = et->tags[i];
+ 	unsigned int nr_tags;
+ 	int i;
+@@ -470,13 +470,8 @@ struct elevator_tags *blk_mq_alloc_sched_tags(struct blk_mq_tag_set *set,
+ 			nr_tags * sizeof(struct blk_mq_tags *), gfp);
+ 	if (!et)
+ 		return NULL;
+-	/*
+-	 * Default to double of smaller one between hw queue_depth and
+-	 * 128, since we don't split into sync/async like the old code
+-	 * did. Additionally, this is a per-hw queue depth.
+-	 */
+-	et->nr_requests = 2 * min_t(unsigned int, set->queue_depth,
+-			BLKDEV_DEFAULT_RQ);
 +
-+		old_et = q->elevator->et;
-+		q->elevator->et = et;
- 	}
++	et->nr_requests = nr_requests;
+ 	et->nr_hw_queues = nr_hw_queues;
  
- 	q->nr_requests = nr;
- 	if (q->elevator && q->elevator->type->ops.depth_updated)
- 		q->elevator->type->ops.depth_updated(q);
+ 	if (blk_mq_is_shared_tags(set->flags)) {
+@@ -521,7 +516,8 @@ int blk_mq_alloc_sched_tags_batch(struct xarray *et_table,
+ 		 * concurrently.
+ 		 */
+ 		if (q->elevator) {
+-			et = blk_mq_alloc_sched_tags(set, nr_hw_queues);
++			et = blk_mq_alloc_sched_tags(set, nr_hw_queues,
++					blk_mq_default_nr_requests(set));
+ 			if (!et)
+ 				goto out_unwind;
+ 			if (xa_insert(et_table, q->id, et, gfp))
+diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
+index fe83187f41db..8e21a6b1415d 100644
+--- a/block/blk-mq-sched.h
++++ b/block/blk-mq-sched.h
+@@ -24,7 +24,7 @@ void blk_mq_exit_sched(struct request_queue *q, struct elevator_queue *e);
+ void blk_mq_sched_free_rqs(struct request_queue *q);
  
--out:
- 	blk_mq_unquiesce_queue(q);
--
--	return ret;
-+	return old_et;
- }
- 
- /*
+ struct elevator_tags *blk_mq_alloc_sched_tags(struct blk_mq_tag_set *set,
+-		unsigned int nr_hw_queues);
++		unsigned int nr_hw_queues, unsigned int nr_requests);
+ int blk_mq_alloc_sched_tags_batch(struct xarray *et_table,
+ 		struct blk_mq_tag_set *set, unsigned int nr_hw_queues);
+ void blk_mq_free_sched_tags(struct elevator_tags *et,
 diff --git a/block/blk-mq.h b/block/blk-mq.h
-index 731f4578d9a8..6c9d03625ba1 100644
+index 2b3ade60c90b..731f4578d9a8 100644
 --- a/block/blk-mq.h
 +++ b/block/blk-mq.h
-@@ -6,6 +6,7 @@
- #include "blk-stat.h"
+@@ -109,6 +109,17 @@ static inline struct blk_mq_hw_ctx *blk_mq_map_queue(blk_opf_t opf,
+ 	return ctx->hctxs[blk_mq_get_hctx_type(opf)];
+ }
  
- struct blk_mq_tag_set;
-+struct elevator_tags;
++/*
++ * Default to double of smaller one between hw queue_depth and
++ * 128, since we don't split into sync/async like the old code
++ * did. Additionally, this is a per-hw queue depth.
++ */
++static inline unsigned int blk_mq_default_nr_requests(
++		struct blk_mq_tag_set *set)
++{
++	return 2 * min_t(unsigned int, set->queue_depth, BLKDEV_DEFAULT_RQ);
++}
++
+ /*
+  * sysfs helpers
+  */
+diff --git a/block/elevator.c b/block/elevator.c
+index fe96c6f4753c..e2ebfbf107b3 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -669,7 +669,8 @@ static int elevator_change(struct request_queue *q, struct elv_change_ctx *ctx)
+ 	lockdep_assert_held(&set->update_nr_hwq_lock);
  
- struct blk_mq_ctxs {
- 	struct kobject kobj;
-@@ -45,7 +46,9 @@ void blk_mq_submit_bio(struct bio *bio);
- int blk_mq_poll(struct request_queue *q, blk_qc_t cookie, struct io_comp_batch *iob,
- 		unsigned int flags);
- void blk_mq_exit_queue(struct request_queue *q);
--int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr);
-+struct elevator_tags *blk_mq_update_nr_requests(struct request_queue *q,
-+						struct elevator_tags *tags,
-+						unsigned int nr);
- void blk_mq_wake_waiters(struct request_queue *q);
- bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *,
- 			     bool);
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 7ea15bf68b4b..a0a7ebad378f 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -64,11 +64,12 @@ static ssize_t queue_requests_show(struct gendisk *disk, char *page)
- static ssize_t
- queue_requests_store(struct gendisk *disk, const char *page, size_t count)
- {
--	unsigned long nr;
--	int ret, err;
--	unsigned int memflags;
- 	struct request_queue *q = disk->queue;
- 	struct blk_mq_tag_set *set = q->tag_set;
-+	struct elevator_tags *et = NULL;
-+	unsigned int memflags;
-+	unsigned long nr;
-+	int ret;
- 
- 	ret = queue_var_store(&nr, page, count);
- 	if (ret < 0)
-@@ -90,16 +91,24 @@ queue_requests_store(struct gendisk *disk, const char *page, size_t count)
- 		goto unlock;
+ 	if (strncmp(ctx->name, "none", 4)) {
+-		ctx->et = blk_mq_alloc_sched_tags(set, set->nr_hw_queues);
++		ctx->et = blk_mq_alloc_sched_tags(set, set->nr_hw_queues,
++				blk_mq_default_nr_requests(set));
+ 		if (!ctx->et)
+ 			return -ENOMEM;
  	}
- 
-+	if (q->elevator && nr > q->elevator->et->nr_requests) {
-+		/* allocate memory before freezing queue to prevent deadlock */
-+		et = blk_mq_alloc_sched_tags(set, q->nr_hw_queues, nr);
-+		if (!et) {
-+			ret = -ENOMEM;
-+			goto unlock;
-+		}
-+	}
-+
- 	memflags = blk_mq_freeze_queue(q);
- 	mutex_lock(&q->elevator_lock);
--
--	err = blk_mq_update_nr_requests(disk->queue, nr);
--	if (err)
--		ret = err;
--
-+	et = blk_mq_update_nr_requests(q, et, nr);
- 	mutex_unlock(&q->elevator_lock);
- 	blk_mq_unfreeze_queue(q, memflags);
- 
-+	if (et)
-+		blk_mq_free_sched_tags(et, set);
-+
- unlock:
- 	up_write(&set->update_nr_hwq_lock);
- 	return ret;
 -- 
 2.39.2
 
