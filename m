@@ -1,97 +1,97 @@
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97A3E2248BD;
-	Sun,  7 Sep 2025 22:30:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D0873C38
+	for <linux-block@vger.kernel.org>; Mon,  8 Sep 2025 00:29:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757284208; cv=none; b=BSj0amRE6q5BoihSv7LT3T+uwW3d8WRe1tXHaqtgJJp/gstk/zHESwrVr3IORaJ5U0QXfRlpvjdiDu4r2ce6ynq+KvVtJgWGDVMPcq1whkEoGbtnhnfWkb9OYRAsjO7oQVGUFoa8GNx/DhKshE0LBN3JWii2taBwo+f0ckmQbEY=
+	t=1757291343; cv=none; b=Fj4FV5JaMb/NJxb3ZTq7dtuajdJOVS6d88lchxiRf4L1/OT/t694PFi4wtEo1oeb7imCGeWd5wt1rqmT6sIzxqQTmnHtYvTWQXwf/+O6EMaS4byt3RYCJLtQkrQ02PUaEJyIKWNtEMekavmmGgv6OW3Eg7HyIkuGSLyo1Z/7VZA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757284208; c=relaxed/simple;
-	bh=YiYQFvOAi/L3rfcO0B8Dn3oJyiTeX8xkf4kbnG9dX4Q=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YXjjGAtnqoGt96g0g0Kx6t2XHndhG5i0qjv2jXBoTyPm5qqN9/uGaBiaDTlKrcmrQ5oi8JiSvK5AUwh3Ndop98TTsvdaeRijC/ZbmO+qhVyqanecd93k0kHEc3yxYs43HwLvRsb7abGEfN0wO/8G9w23QvQL1Mxhqk/MVihKsYk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nLzOM805; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1757291343; c=relaxed/simple;
+	bh=36z0+y8OTF2avqCw2FFABT9x4zD+kKxQwdoCXsY/FwY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZtNouQ/rnrSSBxq79i9c2QXnurq74PD8q/SHlAsp0eUWAV7xg6XR/p0uB8vYjF2EpwA72SCi6LmEqvCtwQ5m/RpgwTSNfpc1SCTw8w4bmqDhSY4vi5ncc+CcUxDXFlAPKJdLh0BDlHCQlLjC4uCGk1qOjckfRhUjMqbZdiNNwhQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Sr9SDbXj; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nLzOM805"
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-24c95f20117so10478005ad.3;
-        Sun, 07 Sep 2025 15:30:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757284207; x=1757889007; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YiYQFvOAi/L3rfcO0B8Dn3oJyiTeX8xkf4kbnG9dX4Q=;
-        b=nLzOM805mrdxtkMBZHfjhD3mrqfoO9JY1fp4lWv0o3X/ppOt9IWf6LuCSfuJhiTL6o
-         hgOCpy9qZ7J/313U2QdZh2Iuk6QMjXf/EXPwJf5kaMCyXG0MtjTiStD782ypWjAvEPTf
-         0ZfZVusJ1Oi2pW21Bt+zyJwJZ8xNajq/dSDEbYcs/yJfbtUw+YRBJws5iK46CRASTcm6
-         LyibQz5luK4WquJydcD+g9dUnHJce4WrbNjTk/Oj/hUega78ofSpfvx2xyzBZLEyeGsF
-         VGv+39PhUsp2ihsWjrfpBk/Z0z5hKee9hboS43ZqyDEXilQyuLlJjXylYyVcF5oVr7VY
-         +muQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757284207; x=1757889007;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=YiYQFvOAi/L3rfcO0B8Dn3oJyiTeX8xkf4kbnG9dX4Q=;
-        b=KCO7XjoFCwtrzBuXnCmd+PiFV7YrNUJzWu/ZTN8YDaQ0D4oRmLB5mQC8+qy6ckab5X
-         pBOImuMBsotkoDdnSDCnz8eLg8oZJzqLLuBxnQDDMnIaoLUzDIr4VMPcHDXssSKst168
-         hgCFY6cipxZUuMh/KeSKAuA1o79esljpyZVfGMoOzudSMOmMqpbawLY1p5L9V/bJonjZ
-         ADDDdbV1nnXg0Fd4hzjtgSbqQF8T18i9w844rYZGA35I2y5JVFrB6aThPOPH1fIrgmRe
-         X2PZrpuPFYCtqqnx77qPIQ9WW4xzfKZEaSByKDWnTNSXHEvbLasUnBGTZrT1SuM3ot2/
-         3XYg==
-X-Forwarded-Encrypted: i=1; AJvYcCU8vQGKfRNcQqedZTOTQ7HCDKk5lVRhxPF5qNziIWDyAIXKe7EBT14xSmjhT0V4R6owNB1gMZ3zp6uZ2Q==@vger.kernel.org, AJvYcCUE6Xifau55j7geJFJP8K2KnOAqIg77oyPJdaUuVdyadY5EjS1ZdlO5dgxc1ipUI/QoMnzkM2mZGcBzzUYv@vger.kernel.org, AJvYcCXrvfiGg1B6+bbshoFUxeFX4ptwpvM7nddYrTHKmQGRGBcYCkuILKwfBkpkua9CW1e7uLxsrOwwekYL7gzXKHs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxDF9UzADJLAAUtvue+2DUgDLZGidRtiNNp4cXk6S4lDlJ2SAKi
-	B3omXINAmy1kuTyPzM0Q1ZZW4PaZcHrFakjbdQ44NI6gYh/1UaHhnfUjIf+Rz2x0+6GXdF/ZLsg
-	MDn+8WDYKTZa050kqn7ibbO0zsG0Z5Gs=
-X-Gm-Gg: ASbGncvb3lsQDjAeYqW98Ax41cbSVRgAckTJY0HwCk48o5VXCoSYaHWe8xXXTKDE9Sk
-	5zo1w0hD74QoZsDMRbODnXShATk+vmkkLRuI73F9PLxJB+1EBaIbmLOFCoNVXGbRsbafch0IUMM
-	noAECKucLOgnpOSoQ5iwPzGZrL4mTL0u28MiWGxymDvCi6BAwWCIxn23Da3uyQzNEUbc5tHd3Xr
-	FyHEd0LV1lEHSLgApUIiUu7trbFVtxMvE1W8sYq6HUFOKgYg2PZVqqnHxLjm8ma4MO56QFSVRx2
-	qTu0jaebUWgxch1id2YXYEOa2g==
-X-Google-Smtp-Source: AGHT+IEJXHXVeEXiUuxDDtDL+F2z+Li35l5mEMwus84iNqmeDyb9GLSYacR9e0Qf9AaGo8FSywEfNdNTn/METasbJfo=
-X-Received: by 2002:a17:902:ce83:b0:24c:b881:201 with SMTP id
- d9443c01a7336-251757ba959mr44510665ad.9.1757284206873; Sun, 07 Sep 2025
- 15:30:06 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Sr9SDbXj"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1757291339;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xKTt01T7Rh9dDqG0nLx7f4bh3eGgvtcoXM5/mgLYFak=;
+	b=Sr9SDbXjKuAYk5VNof8HI+w7IGcyLWvmsPt3G2eBg5k6XJW4ulX9vvChRg59EuxpV4JoFM
+	4WKDNzuhiXWY6nGgYwb+0ttBc2Yybv8V/d7I02vJ4L6jC9O3kncPm9TbZF8SyoQS4BZhfO
+	T7+Iyjx9janFxUMQ82RYoHqHqcbou1E=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-691-fOdpvSj7PlW36UgVcuK-kQ-1; Sun,
+ 07 Sep 2025 20:28:58 -0400
+X-MC-Unique: fOdpvSj7PlW36UgVcuK-kQ-1
+X-Mimecast-MFC-AGG-ID: fOdpvSj7PlW36UgVcuK-kQ_1757291337
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 291A0180034A;
+	Mon,  8 Sep 2025 00:28:57 +0000 (UTC)
+Received: from fedora (unknown [10.72.120.3])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 861C9180044F;
+	Mon,  8 Sep 2025 00:28:53 +0000 (UTC)
+Date: Mon, 8 Sep 2025 08:28:48 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Heorhi Valakhanovich <code@mail.geov.name>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [blk-mq] Kernel OOPS after usb drive surprise remove (bisected)
+Message-ID: <aL4jQG-_CeHxGPsU@fedora>
+References: <LmKwxMZhQ0h6bHWk_m7EMu4jDpbdcL0Z4gix3USIvS2sJpGZP1b_858GvxaDL6zwoGxrPIs-dT10NLxersJpxExsOOpJmyDh_fTOp97ZBYE=@mail.geov.name>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250730130716.3278285-1-ojeda@kernel.org>
-In-Reply-To: <20250730130716.3278285-1-ojeda@kernel.org>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Mon, 8 Sep 2025 00:29:54 +0200
-X-Gm-Features: AS18NWDiFBEztBvhh545-DHfsVGSBiVzynGVpEdm2_GOyJiuoW_17RumQHpRyQ4
-Message-ID: <CANiq72=gYXqcXyVK1vq36Y6ofv4QQiLLgnAY=zhFVV8CGYuziw@mail.gmail.com>
-Subject: Re: [PATCH 0/3] Fix broken `srctree/` links and warn about them
-To: Miguel Ojeda <ojeda@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
-	Boqun Feng <boqun.feng@gmail.com>
-Cc: Alex Gaynor <alex.gaynor@gmail.com>, 
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
-	Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
-	Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <lossin@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
-	Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, rust-for-linux@vger.kernel.org, 
-	linux-block@vger.kernel.org, dri-devel@lists.freedesktop.org, 
-	linux-kernel@vger.kernel.org, patches@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <LmKwxMZhQ0h6bHWk_m7EMu4jDpbdcL0Z4gix3USIvS2sJpGZP1b_858GvxaDL6zwoGxrPIs-dT10NLxersJpxExsOOpJmyDh_fTOp97ZBYE=@mail.geov.name>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-On Wed, Jul 30, 2025 at 3:07=E2=80=AFPM Miguel Ojeda <ojeda@kernel.org> wro=
-te:
->
-> This fixes a handful of broken links and introduces a warning to
-> prevent them from happening in the future.
+On Sun, Sep 07, 2025 at 02:48:27PM +0000, Heorhi Valakhanovich wrote:
+> Kernel version 6.16.4 and later.
+> 
+> Usb3 thumb drive surprise removal triggers an oops in blk_mq_free_map_and_rqs.
+> Block IO is limping afterwards and often system is unusable.
+> 
+> 
+> Bisected to:
+> 
+> commit f9a9098ca82612006b9c71ce03b8fe189a437370 (HEAD)
+> Author: Ming Lei <ming.lei@redhat.com>
+> Date:   Fri Aug 15 21:17:37 2025 +0800
+> 
+>     blk-mq: fix lockdep warning in __blk_mq_update_nr_hw_queues
+> 
+>     [ Upstream commit 2d82f3bd8910eb65e30bb2a3c9b945bfb3b6d661 ]
 
-Applied to `rust-next` -- thanks everyone!
+No, that is not true, because scsi/usb does not call into
+blk_mq_update_nr_hw_queues().
 
-I added Cc: stable@vger.kernel.org on the fixes.
+> 
+> 
+> relevant kernel log:
+> 
+> Sep 07 17:19:26: BUG: kernel NULL pointer dereference, address: 0000000000000020
+> Sep 07 17:19:26: #PF: supervisor read access in kernel mode
+> Sep 07 17:19:26: #PF: error_code(0x0000) - not-present page
+> Sep 07 17:19:26: PGD 0 P4D 0 
 
-Andreas/Boqun: if you don't want the block fix, please shout!
+Please try the following fix:
 
-Cheers,
-Miguel
+https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git/commit/?h=for-6.18/block&id=ba28afbd9eff2a6370f23ef4e6a036ab0cfda409
+
+Thanks,
+Ming
+
