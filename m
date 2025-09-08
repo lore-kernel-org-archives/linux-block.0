@@ -1,107 +1,102 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 856C01C54AF;
-	Mon,  8 Sep 2025 07:00:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BE9D2E2EF8
+	for <linux-block@vger.kernel.org>; Mon,  8 Sep 2025 07:26:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757314859; cv=none; b=m7nJGZB2s/SD7C12ZfDzN9rvJpvQU0uYcMK9sMwNk2TAvMiBftIyHrkJm5Xh/BBVxBjjhQziQz0LuEZCFdfGuFnde+nY8ijbCA52XZv3ydxPLXvF0FEYpKKlADYXlPbmsoCrYuEUeR8vS0Hq/DImeZaJq+DnGSqbMnQytvH0Klk=
+	t=1757316370; cv=none; b=G3ygl0mPpG0UaOKBdcsKGa91j4WMlVHzuTNvWlUMywCosKfJBd5epHXonrWC74H7HFV+lPZmrv8qsfr0lw7E5myGHUJKLsN7+zl5IFFSg9UP6V8FGMThSUHy/qdqbU0ZTex4qCCcgxHW78Sc7qEgSdUGxYGOA1nUtgtfUEDaE+I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757314859; c=relaxed/simple;
-	bh=SJDQlr8kYnUVXlqjG3XTlvRhDl2Ax+wgpIYELK54IoE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Jtr02osE4TQgbudir7qOwSDwLrdUT3s7Prcpf8YWIshN3X5l74jo23KrL9TAsMuJ1Q6KvbFXSSjQsOc42CRiVXmD/xlR2UACs44uuBi5wVc4j2+uOudWWOQgZRx48LZoIjlKn58Y06wL5JmWtjT1StBw1ErY3OL31DpnFmiQd5o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4cKxky12KNzKHN4Q;
-	Mon,  8 Sep 2025 14:24:58 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 3BDA41A10EC;
-	Mon,  8 Sep 2025 14:24:58 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.104.67])
-	by APP4 (Coremail) with SMTP id gCh0CgD3QY6xdr5oCGEjBw--.62066S14;
-	Mon, 08 Sep 2025 14:24:58 +0800 (CST)
-From: Yu Kuai <yukuai1@huaweicloud.com>
-To: nilay@linux.ibm.com,
-	ming.lei@redhat.com,
-	axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	yukuai3@huawei.com,
-	yukuai1@huaweicloud.com,
-	yi.zhang@huawei.com,
-	yangerkun@huawei.com,
-	johnny.chenyi@huawei.com
-Subject: [PATCH for-6.18/block 10/10] blk-mq: fix stale nr_requests documentation
-Date: Mon,  8 Sep 2025 14:15:33 +0800
-Message-Id: <20250908061533.3062917-11-yukuai1@huaweicloud.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20250908061533.3062917-1-yukuai1@huaweicloud.com>
-References: <20250908061533.3062917-1-yukuai1@huaweicloud.com>
+	s=arc-20240116; t=1757316370; c=relaxed/simple;
+	bh=cr8Y+j1Bw7kjEWcO3gXESae1Joncig4F/jhAK10OxY0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nq+LQHRIDMxchO1pF2zZNIu23K1R4MMbp6le6QqrPIxCWS0atWwarnTK9g8Jv5E2MyStcEhYhln7C8o267MWfwpuRbBVAdQ5cYfnIoBUPSxwAbv8nAn+KZPkmGGkF80P/B19LfK8EQmaoT1dkvbvGFU13JPkYnXu/mx1K0ng4U4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id DABA1266D1;
+	Mon,  8 Sep 2025 07:26:05 +0000 (UTC)
+Authentication-Results: smtp-out2.suse.de;
+	none
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id C891B13869;
+	Mon,  8 Sep 2025 07:26:05 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id MUfxMA2FvmjiQQAAD6G6ig
+	(envelope-from <dwagner@suse.de>); Mon, 08 Sep 2025 07:26:05 +0000
+Date: Mon, 8 Sep 2025 09:26:05 +0200
+From: Daniel Wagner <dwagner@suse.de>
+To: Hannes Reinecke <hare@suse.de>
+Cc: Daniel Wagner <wagi@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
+	Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Aaron Tomlin <atomlin@atomlin.com>, 
+	"Martin K. Petersen" <martin.petersen@oracle.com>, Thomas Gleixner <tglx@linutronix.de>, 
+	Costa Shulyupin <costa.shul@redhat.com>, Juri Lelli <juri.lelli@redhat.com>, 
+	Valentin Schneider <vschneid@redhat.com>, Waiman Long <llong@redhat.com>, Ming Lei <ming.lei@redhat.com>, 
+	Frederic Weisbecker <frederic@kernel.org>, Mel Gorman <mgorman@suse.de>, 
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
+	linux-nvme@lists.infradead.org, megaraidlinux.pdl@broadcom.com, linux-scsi@vger.kernel.org, 
+	storagedev@microchip.com, virtualization@lists.linux.dev, 
+	GR-QLogic-Storage-Upstream@marvell.com
+Subject: Re: [PATCH v8 10/12] blk-mq: use hk cpus only when isolcpus=io_queue
+ is enabled
+Message-ID: <d11a0c60-1b75-49ec-a2f8-7df402c4adf2@flourine.local>
+References: <20250905-isolcpus-io-queues-v8-0-885984c5daca@kernel.org>
+ <20250905-isolcpus-io-queues-v8-10-885984c5daca@kernel.org>
+ <ff66801c-f261-411d-bbbf-b386e013d096@suse.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgD3QY6xdr5oCGEjBw--.62066S14
-X-Coremail-Antispam: 1UD129KBjvJXoW7KFWDCryfKr15Zw1xKFWfZrb_yoW8Xw1Dp3
-	yft39Fgwn5Zw18Wr10yay8tF13Aa95Aw43Jr4DKF1rtr98Awn29Fs2qr1rXF4xZrZ7AFWU
-	urZ29r98Aa1qva7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUmS14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_JF0E3s1l82xGYI
-	kIc2x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2
-	z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F
-	4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq
-	3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7
-	IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4U
-	M4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2
-	kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkE
-	bVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67
-	AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVW8JVW5JwCI
-	42IY6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF
-	4lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aVCY1x0267AKxVW8Jr0_Cr1UYxBI
-	daVFxhVjvjDU0xZFpf9x0JUQFxUUUUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ff66801c-f261-411d-bbbf-b386e013d096@suse.de>
+X-Rspamd-Pre-Result: action=no action;
+	module=replies;
+	Message is reply to one we originated
+X-Rspamd-Action: no action
+X-Spam-Flag: NO
+X-Spam-Level: 
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Spamd-Result: default: False [-4.00 / 50.00];
+	REPLY(-4.00)[]
+X-Rspamd-Queue-Id: DABA1266D1
+X-Rspamd-Pre-Result: action=no action;
+	module=replies;
+	Message is reply to one we originated
+X-Spam-Score: -4.00
 
-From: Yu Kuai <yukuai3@huawei.com>
+On Mon, Sep 08, 2025 at 08:13:31AM +0200, Hannes Reinecke wrote:
+> >   const struct cpumask *blk_mq_online_queue_affinity(void)
+> >   {
+> > +	if (housekeeping_enabled(HK_TYPE_IO_QUEUE)) {
+> > +		cpumask_and(&blk_hk_online_mask, cpu_online_mask,
+> > +			    housekeeping_cpumask(HK_TYPE_IO_QUEUE));
+> > +		return &blk_hk_online_mask;
+> 
+> Can you explain the use of 'blk_hk_online_mask'?
+> Why is a static variable?
 
-The nr_requests documentation is still the removed single queue, remove
-it and update to current blk-mq.
+The blk_mq_*_queue_affinity helpers return a const struct cpumask *, the
+caller doesn't need to free the return value. Because cpumask_and needs
+store its result somewhere, I opted for the global static variable.
 
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
- Documentation/ABI/stable/sysfs-block | 14 ++++----------
- 1 file changed, 4 insertions(+), 10 deletions(-)
+> To my untrained eye it's being recalculated every time one calls
+> this function. And only the first invocation run on an empty mask,
+> all subsequent ones see a populated mask.
 
-diff --git a/Documentation/ABI/stable/sysfs-block b/Documentation/ABI/stable/sysfs-block
-index 0ddffc9133d0..0ed10aeff86b 100644
---- a/Documentation/ABI/stable/sysfs-block
-+++ b/Documentation/ABI/stable/sysfs-block
-@@ -603,16 +603,10 @@ Date:		July 2003
- Contact:	linux-block@vger.kernel.org
- Description:
- 		[RW] This controls how many requests may be allocated in the
--		block layer for read or write requests. Note that the total
--		allocated number may be twice this amount, since it applies only
--		to reads or writes (not the accumulated sum).
--
--		To avoid priority inversion through request starvation, a
--		request queue maintains a separate request pool per each cgroup
--		when CONFIG_BLK_CGROUP is enabled, and this parameter applies to
--		each such per-block-cgroup request pool.  IOW, if there are N
--		block cgroups, each request queue may have up to N request
--		pools, each independently regulated by nr_requests.
-+		block layer. Noted this value only represents the quantity for a
-+		single blk_mq_tags instance. The actual number for the entire
-+		device depends on the hardware queue count, whether elevator is
-+		enabled, and whether tags are shared.
- 
- 
- What:		/sys/block/<disk>/queue/nr_zones
--- 
-2.39.2
-
+The cpu_online_mask might change over time, it's not a static bitmap.
+Thus it's necessary to update the blk_hk_online_mask. Doing some sort of
+caching is certainly possible. Given that we have plenty of cpumask
+logic operation in the cpu_group_evenly code path later, I am not so
+sure this really makes a huge difference.
