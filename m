@@ -1,143 +1,126 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f53.google.com (mail-io1-f53.google.com [209.85.166.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D2453570DE;
-	Tue,  9 Sep 2025 13:29:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0D69353356
+	for <linux-block@vger.kernel.org>; Tue,  9 Sep 2025 13:32:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757424562; cv=none; b=I+wwdS23DmoSzeuGcMRVHiWbBByMyDZ3BvAlqt6HCVQwbpZnJWWlOTOiPK/cvUTnp+aw5YZE1/odu3603uNxK48XAK0+RHG4aDQgkWY6KeFgFb6WnAAMAReFfTmH6YPiXdtAM0EA2vUhvUsMEZ5kcgyo5Xe9J3mcoHotf8dTG0M=
+	t=1757424739; cv=none; b=h71ekBFAaukTZrB17ZM483oyhMce4+CcCTsi5arU2n0DzEGrupsf+HGUVe/gkhcFcLM4RN89YMmafzwfPLYjZgcU7o00teg1AcW4Jv/nfi1plFd/Hmk6/zbQMDRrEHeP2FQGYm7LeNhPt7YV4iQ50Ys7nPqNxZuAmD0reRkcJFg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757424562; c=relaxed/simple;
-	bh=iTHTFebdJnIM4qjuR28g9oSbyH9qTLhzazcpZ251F1w=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=El3XKuPSyOlK+BkI913YfJCqNC/A98/BGLVnTwLPXMdeAH4H48XjrOciYf0E2ilGxF3df6laYzRXrA2nzfzWDzV2MWq9j3bpmNchtCQGrtp/9+nyCE+DHMYuWonH/U2qiSnOHXraOMUYiOs9FDnKyTTAxcaMCAjOh2ppQkr6cLM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jsG+qsUJ; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1757424739; c=relaxed/simple;
+	bh=hkagkYSn8JCIKje4opj+ZWhB95aqsDfPnVS7kaY2IQs=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=JM4SxtkcWS5O7umuiasKfRpJUCciUGL7FTYr+EQttNcY6pWhxFo97me6L+Ry1u8Cc/obN8i4kqcIJnazp4XSCnhics9eEDhe8wA58apdxBRy+0rHXYUQyMBapSIcnu+uGuIg49UoE7HONdjjPhR3lHpNE6+WI7tIg0VIhfYrIOo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=07HN/Kh0; arc=none smtp.client-ip=209.85.166.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jsG+qsUJ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7C94C4CEF5;
-	Tue,  9 Sep 2025 13:29:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757424561;
-	bh=iTHTFebdJnIM4qjuR28g9oSbyH9qTLhzazcpZ251F1w=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=jsG+qsUJK7ffZ/z3OPchqA7x0yHguyPrENB1hNDceKyevn8Y0UY23vIlJKogKoOAV
-	 mdweaZvTaV73xdPNvzuLcSgBCkcKJinDpA+AFFif7FJFzPv/yP0eacNr7loyHWPJQl
-	 oDjSg5lytMZ5QZs3srGmQGs2aZnhiieWxGdijxV8InWTHYLEbMLD5nMB8zsJzQ7Y5/
-	 n6m5X6Og8JA73w+GsQKGuK+FDZc8VM+Pv/R0ANeQAPkMSUkS/Z7Crlwiferwk3j/aY
-	 bciFy1DVrMp5bQJF6IrE2GwiFytJBqVGnuxPc5FU5fznd5ZzC/Ro1XzYA9SknCnnqK
-	 nq4YmMAH6+QaA==
-From: Leon Romanovsky <leon@kernel.org>
-To: Marek Szyprowski <m.szyprowski@samsung.com>
-Cc: Leon Romanovsky <leonro@nvidia.com>,
-	Jason Gunthorpe <jgg@nvidia.com>,
-	Abdiel Janulgue <abdiel.janulgue@gmail.com>,
-	Alexander Potapenko <glider@google.com>,
-	Alex Gaynor <alex.gaynor@gmail.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Christoph Hellwig <hch@lst.de>,
-	Danilo Krummrich <dakr@kernel.org>,
-	David Hildenbrand <david@redhat.com>,
-	iommu@lists.linux.dev,
-	Jason Wang <jasowang@redhat.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Joerg Roedel <joro@8bytes.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Juergen Gross <jgross@suse.com>,
-	kasan-dev@googlegroups.com,
-	Keith Busch <kbusch@kernel.org>,
-	linux-block@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org,
-	linux-nvme@lists.infradead.org,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-trace-kernel@vger.kernel.org,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Robin Murphy <robin.murphy@arm.com>,
-	rust-for-linux@vger.kernel.org,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Stefano Stabellini <sstabellini@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	virtualization@lists.linux.dev,
-	Will Deacon <will@kernel.org>,
-	xen-devel@lists.xenproject.org
-Subject: [PATCH v6 16/16] nvme-pci: unmap MMIO pages with appropriate interface
-Date: Tue,  9 Sep 2025 16:27:44 +0300
-Message-ID: <be35a070a883286f0e401f6746334d84a7a42612.1757423202.git.leonro@nvidia.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <cover.1757423202.git.leonro@nvidia.com>
-References: <cover.1757423202.git.leonro@nvidia.com>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="07HN/Kh0"
+Received: by mail-io1-f53.google.com with SMTP id ca18e2360f4ac-88758c2a133so519122439f.0
+        for <linux-block@vger.kernel.org>; Tue, 09 Sep 2025 06:32:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1757424737; x=1758029537; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yO59olxiRg1XK9XpYrLC+/QiojSbULiCcu8M5YdCEYE=;
+        b=07HN/Kh0QkSNklSttlAwuVw0Zy7rx3Vk4lCustIfbo4NA7UVeFLOQeDLnNSBgV13HA
+         hI/p7sXx5nxxTYiynuLbftkxm3mRCLSe8JeGLhRKNGcYQmviGOXnBuZ3FtkFNnbUfUBc
+         DQa9KodnuYrC/J4XV4bEAcby471GU6Y805tsjesTGYvwBfmEBXpPMp2PXzZ+AFTa2vqB
+         zkq/kb5wgi78QQU1COgrvV5lZ61waBQ+uhB9tInL59mM+aWSZ+hAtce42KSGBgW2yX4A
+         WKZx3KCvON/TyscoCbRn2FDpAb6gau5tMOtMmFIOgF6C/SA0802scfuhURCpcb7GKCjM
+         kpiA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757424737; x=1758029537;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=yO59olxiRg1XK9XpYrLC+/QiojSbULiCcu8M5YdCEYE=;
+        b=Ef7x+OhaEKOaTP4O9QkTkWQl3jwjoV0sOzcFqjruG3a4gAkOLirK85tnJffJJTn+RZ
+         41LWSKYop6iVDQJTmdnaYptm7urg0q1MkoNghgd04Bgx+KFBrVoETcRYryENc70Bn+22
+         2iI5vL8xqBJw+BBFi32FGWdfFhvdgifgcAlSRSef/V2oK7Y+gn8TeC+5mdEYKjchASwy
+         dkz3ZHdzUZ9ZVhM/1fFXrRGJd5TisO2oowIfT++8wUQsml4drWbJiBdiwC5A7xa18CAG
+         3AgaAQinPXHEaC4ypUkrmwf7Kj9tIU7bKaRCAJ9yH86S8oLpv0wF6UGt9qTNJ9PFCoWM
+         04oQ==
+X-Gm-Message-State: AOJu0YzwvRelxZrHGiU2YDpLniWw7LTK9wkULjwgBOX4ftwF/+6GKHFI
+	qalM+2fL555vCSasi7ukSDWwn5Y145us2JzTLIVCPHTH/SlQY+xXkSucefYIQqvJ5qG25DaMr7j
+	K30QN
+X-Gm-Gg: ASbGnctOrdb13pe8FLcRAiIze5fWTZFdvIOlY8rTjupt7igyHpZMAQVYT1jDXVcylkW
+	pUrq/DZZNewMgeU9IxXw2O4OGZoOZIx+ShzJEtVmvz2ouCvurSvxAgaGCyk8BINx33BNFOh8IBA
+	rmJR42EvHj1aexmAsp7e2iQWCv5hDflrWJJbw3IlvF8pKq0ofmPyDRzVXavnU7SWIDOClMVASMB
+	x4430W37Lx0XpwSxtcoZlbtme3WYyO+PCPBSsoWbqWoC9UmkINcM4kevCxaimKV/ZeP0L4oty1s
+	OgcBLgDdS+rAHJ66dRPiLgfaM5dTkZ+t4aXidU+J+1UOEaYTOFbU1xkS4pXSzPbFojieUEz6ECE
+	Mrh3Evk9W3yil5Mc+73ELRwsw
+X-Google-Smtp-Source: AGHT+IFRgx8SXH+61I5ht3ylw3r3rKrFFUhy+QHUQResarsL2INHTZU94tdJ3saaPxvTkCDTmKcaAA==
+X-Received: by 2002:a05:6602:6c0c:b0:881:94db:6c1a with SMTP id ca18e2360f4ac-8877753bfbfmr1794053539f.5.1757424736548;
+        Tue, 09 Sep 2025 06:32:16 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-8875d8791dasm577204439f.8.2025.09.09.06.32.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 Sep 2025 06:32:16 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: Christoph Hellwig <hch@lst.de>
+Cc: linux-block@vger.kernel.org
+In-Reply-To: <20250908105653.4079264-1-hch@lst.de>
+References: <20250908105653.4079264-1-hch@lst.de>
+Subject: Re: remove the bi_inline_vecs field struct bio
+Message-Id: <175742473605.75938.8479854785092722671.b4-ty@kernel.dk>
+Date: Tue, 09 Sep 2025 07:32:16 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3-dev-2ce6c
 
-From: Leon Romanovsky <leonro@nvidia.com>
 
-Block layer maps MMIO memory through dma_map_phys() interface
-with help of DMA_ATTR_MMIO attribute. There is a need to unmap
-that memory with the appropriate unmap function, something which
-wasn't possible before adding new REQ attribute to block layer in
-previous patch.
+On Mon, 08 Sep 2025 12:56:37 +0200, Christoph Hellwig wrote:
+> the bi_inline_vecs causes sparse to warn when a bio is embedded into a
+> structure, but not the last member.   This is a bit annoying but
+> probably not a big.  But it can be easily fixed by just removing the
+> member and doing pointer arithmetics in a helper, so do that.
+> 
+> Diffstat:
+>  block/bio.c                        |   10 +++++++---
+>  block/blk-crypto-fallback.c        |    3 +--
+>  block/blk-map.c                    |    8 ++++----
+>  drivers/md/bcache/debug.c          |    3 +--
+>  drivers/md/bcache/io.c             |    3 +--
+>  drivers/md/bcache/journal.c        |    2 +-
+>  drivers/md/bcache/movinggc.c       |    8 ++++----
+>  drivers/md/bcache/super.c          |    2 +-
+>  drivers/md/bcache/writeback.c      |    8 ++++----
+>  drivers/md/dm-bufio.c              |    2 +-
+>  drivers/md/dm-flakey.c             |    2 +-
+>  drivers/md/dm-vdo/vio.c            |    2 +-
+>  drivers/md/raid1.c                 |    2 +-
+>  drivers/md/raid10.c                |    4 ++--
+>  drivers/target/target_core_pscsi.c |    2 +-
+>  fs/bcachefs/btree_io.c             |    2 +-
+>  fs/bcachefs/data_update.h          |    1 -
+>  fs/bcachefs/journal.c              |    6 +++---
+>  fs/bcachefs/journal_io.c           |    2 +-
+>  fs/bcachefs/super-io.c             |    2 +-
+>  fs/squashfs/block.c                |    2 +-
+>  include/linux/bio.h                |    5 +++++
+>  include/linux/blk_types.h          |   12 +++++-------
+>  23 files changed, 48 insertions(+), 45 deletions(-)
+> 
+> [...]
 
-Reviewed-by: Keith Busch <kbusch@kernel.org>
-Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
----
- drivers/nvme/host/pci.c | 18 +++++++++++++-----
- 1 file changed, 13 insertions(+), 5 deletions(-)
+Applied, thanks!
 
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index 2c6d9506b1725..f8ecc0e0f576d 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -682,11 +682,15 @@ static void nvme_free_prps(struct request *req)
- {
- 	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
- 	struct nvme_queue *nvmeq = req->mq_hctx->driver_data;
-+	unsigned int attrs = 0;
- 	unsigned int i;
- 
-+	if (req->cmd_flags & REQ_MMIO)
-+		attrs = DMA_ATTR_MMIO;
-+
- 	for (i = 0; i < iod->nr_dma_vecs; i++)
--		dma_unmap_page(nvmeq->dev->dev, iod->dma_vecs[i].addr,
--				iod->dma_vecs[i].len, rq_dma_dir(req));
-+		dma_unmap_phys(nvmeq->dev->dev, iod->dma_vecs[i].addr,
-+				iod->dma_vecs[i].len, rq_dma_dir(req), attrs);
- 	mempool_free(iod->dma_vecs, nvmeq->dev->dmavec_mempool);
- }
- 
-@@ -699,15 +703,19 @@ static void nvme_free_sgls(struct request *req)
- 	unsigned int sqe_dma_len = le32_to_cpu(iod->cmd.common.dptr.sgl.length);
- 	struct nvme_sgl_desc *sg_list = iod->descriptors[0];
- 	enum dma_data_direction dir = rq_dma_dir(req);
-+	unsigned int attrs = 0;
-+
-+	if (req->cmd_flags & REQ_MMIO)
-+		attrs = DMA_ATTR_MMIO;
- 
- 	if (iod->nr_descriptors) {
- 		unsigned int nr_entries = sqe_dma_len / sizeof(*sg_list), i;
- 
- 		for (i = 0; i < nr_entries; i++)
--			dma_unmap_page(dma_dev, le64_to_cpu(sg_list[i].addr),
--				le32_to_cpu(sg_list[i].length), dir);
-+			dma_unmap_phys(dma_dev, le64_to_cpu(sg_list[i].addr),
-+				le32_to_cpu(sg_list[i].length), dir, attrs);
- 	} else {
--		dma_unmap_page(dma_dev, sqe_dma_addr, sqe_dma_len, dir);
-+		dma_unmap_phys(dma_dev, sqe_dma_addr, sqe_dma_len, dir, attrs);
- 	}
- }
- 
+[1/2] block: add a bio_init_inline helper
+      commit: 70a6f71b1a77decfc5b1db426ccbe914b58adb38
+[2/2] block: remove the bi_inline_vecs variable sized array from struct bio
+      commit: d86eaa0f3c56da286853b698b45c8ce404291082
+
+Best regards,
 -- 
-2.51.0
+Jens Axboe
+
+
 
