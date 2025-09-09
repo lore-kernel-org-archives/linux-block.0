@@ -1,126 +1,132 @@
-Received: from mail-io1-f53.google.com (mail-io1-f53.google.com [209.85.166.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0D69353356
-	for <linux-block@vger.kernel.org>; Tue,  9 Sep 2025 13:32:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 910F63451B6
+	for <linux-block@vger.kernel.org>; Tue,  9 Sep 2025 13:32:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757424739; cv=none; b=h71ekBFAaukTZrB17ZM483oyhMce4+CcCTsi5arU2n0DzEGrupsf+HGUVe/gkhcFcLM4RN89YMmafzwfPLYjZgcU7o00teg1AcW4Jv/nfi1plFd/Hmk6/zbQMDRrEHeP2FQGYm7LeNhPt7YV4iQ50Ys7nPqNxZuAmD0reRkcJFg=
+	t=1757424768; cv=none; b=CeJsSNbOZFiwN/uDOS2WnEcPcKcFjmAeQi5/bV6Wb/yaALH0vzv9dnR4nAFbKAkMlwU0w2ZYq1NGarRuPk+j4UfHsblJdyMxM1tGyBDjdt9rwd95Itye1JP600qTNNbmeNFZHNDtmDVr3yvWRvxpcNH1mLN2OLcWTovf/Ht+cds=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757424739; c=relaxed/simple;
-	bh=hkagkYSn8JCIKje4opj+ZWhB95aqsDfPnVS7kaY2IQs=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=JM4SxtkcWS5O7umuiasKfRpJUCciUGL7FTYr+EQttNcY6pWhxFo97me6L+Ry1u8Cc/obN8i4kqcIJnazp4XSCnhics9eEDhe8wA58apdxBRy+0rHXYUQyMBapSIcnu+uGuIg49UoE7HONdjjPhR3lHpNE6+WI7tIg0VIhfYrIOo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=07HN/Kh0; arc=none smtp.client-ip=209.85.166.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1757424768; c=relaxed/simple;
+	bh=MY8eAzyDaP5DVy3awWgMxodlcnWPUFKzXBdeLXpV/pc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TcWlFzwNsSACUcxoQUkpWs6Z/bICDYbXVmVk5bfE42s52acGCji9FxWtJ3M68RKc+1zTCMjeDNF/W/E3/PveY9kyGHPCLfzpWghR0ymfU1DKLz1Xrjeg1PphDmTkVkkdyzkFPPqlmSqJkVdYXuclJQCsR65bcMlsYZcvj1uyuhM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=U1di4U7j; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="07HN/Kh0"
-Received: by mail-io1-f53.google.com with SMTP id ca18e2360f4ac-88758c2a133so519122439f.0
-        for <linux-block@vger.kernel.org>; Tue, 09 Sep 2025 06:32:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1757424737; x=1758029537; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yO59olxiRg1XK9XpYrLC+/QiojSbULiCcu8M5YdCEYE=;
-        b=07HN/Kh0QkSNklSttlAwuVw0Zy7rx3Vk4lCustIfbo4NA7UVeFLOQeDLnNSBgV13HA
-         hI/p7sXx5nxxTYiynuLbftkxm3mRCLSe8JeGLhRKNGcYQmviGOXnBuZ3FtkFNnbUfUBc
-         DQa9KodnuYrC/J4XV4bEAcby471GU6Y805tsjesTGYvwBfmEBXpPMp2PXzZ+AFTa2vqB
-         zkq/kb5wgi78QQU1COgrvV5lZ61waBQ+uhB9tInL59mM+aWSZ+hAtce42KSGBgW2yX4A
-         WKZx3KCvON/TyscoCbRn2FDpAb6gau5tMOtMmFIOgF6C/SA0802scfuhURCpcb7GKCjM
-         kpiA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757424737; x=1758029537;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yO59olxiRg1XK9XpYrLC+/QiojSbULiCcu8M5YdCEYE=;
-        b=Ef7x+OhaEKOaTP4O9QkTkWQl3jwjoV0sOzcFqjruG3a4gAkOLirK85tnJffJJTn+RZ
-         41LWSKYop6iVDQJTmdnaYptm7urg0q1MkoNghgd04Bgx+KFBrVoETcRYryENc70Bn+22
-         2iI5vL8xqBJw+BBFi32FGWdfFhvdgifgcAlSRSef/V2oK7Y+gn8TeC+5mdEYKjchASwy
-         dkz3ZHdzUZ9ZVhM/1fFXrRGJd5TisO2oowIfT++8wUQsml4drWbJiBdiwC5A7xa18CAG
-         3AgaAQinPXHEaC4ypUkrmwf7Kj9tIU7bKaRCAJ9yH86S8oLpv0wF6UGt9qTNJ9PFCoWM
-         04oQ==
-X-Gm-Message-State: AOJu0YzwvRelxZrHGiU2YDpLniWw7LTK9wkULjwgBOX4ftwF/+6GKHFI
-	qalM+2fL555vCSasi7ukSDWwn5Y145us2JzTLIVCPHTH/SlQY+xXkSucefYIQqvJ5qG25DaMr7j
-	K30QN
-X-Gm-Gg: ASbGnctOrdb13pe8FLcRAiIze5fWTZFdvIOlY8rTjupt7igyHpZMAQVYT1jDXVcylkW
-	pUrq/DZZNewMgeU9IxXw2O4OGZoOZIx+ShzJEtVmvz2ouCvurSvxAgaGCyk8BINx33BNFOh8IBA
-	rmJR42EvHj1aexmAsp7e2iQWCv5hDflrWJJbw3IlvF8pKq0ofmPyDRzVXavnU7SWIDOClMVASMB
-	x4430W37Lx0XpwSxtcoZlbtme3WYyO+PCPBSsoWbqWoC9UmkINcM4kevCxaimKV/ZeP0L4oty1s
-	OgcBLgDdS+rAHJ66dRPiLgfaM5dTkZ+t4aXidU+J+1UOEaYTOFbU1xkS4pXSzPbFojieUEz6ECE
-	Mrh3Evk9W3yil5Mc+73ELRwsw
-X-Google-Smtp-Source: AGHT+IFRgx8SXH+61I5ht3ylw3r3rKrFFUhy+QHUQResarsL2INHTZU94tdJ3saaPxvTkCDTmKcaAA==
-X-Received: by 2002:a05:6602:6c0c:b0:881:94db:6c1a with SMTP id ca18e2360f4ac-8877753bfbfmr1794053539f.5.1757424736548;
-        Tue, 09 Sep 2025 06:32:16 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-8875d8791dasm577204439f.8.2025.09.09.06.32.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Sep 2025 06:32:16 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: Christoph Hellwig <hch@lst.de>
-Cc: linux-block@vger.kernel.org
-In-Reply-To: <20250908105653.4079264-1-hch@lst.de>
-References: <20250908105653.4079264-1-hch@lst.de>
-Subject: Re: remove the bi_inline_vecs field struct bio
-Message-Id: <175742473605.75938.8479854785092722671.b4-ty@kernel.dk>
-Date: Tue, 09 Sep 2025 07:32:16 -0600
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U1di4U7j"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1757424765;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4BXqa/2VkY+MYk3taj1l57EoqmZshiIHmHuWstQftUs=;
+	b=U1di4U7jNkqiWrbGMje9tfZ409biW8EVfc2U2xIx2rKT2DxOWydcW0tYNlAUMKLxxWm4hn
+	XpnaYKNhHb7l6AOk8k0zzbxdkRdiH04zPl3kO6Zg+5Ejzjj4KHsh3jME59hBmW9C+W4x4O
+	rXQYv+WtcvhHnzKL70NTcMMiJ2WLcq0=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-633-2iugDZeIPuO7Vf7gf0CKVg-1; Tue,
+ 09 Sep 2025 09:32:42 -0400
+X-MC-Unique: 2iugDZeIPuO7Vf7gf0CKVg-1
+X-Mimecast-MFC-AGG-ID: 2iugDZeIPuO7Vf7gf0CKVg_1757424760
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E93CA19541BD;
+	Tue,  9 Sep 2025 13:32:39 +0000 (UTC)
+Received: from localhost (unknown [10.45.226.196])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id EA2163000198;
+	Tue,  9 Sep 2025 13:32:36 +0000 (UTC)
+Date: Tue, 9 Sep 2025 14:32:32 +0100
+From: "Richard W.M. Jones" <rjones@redhat.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>,
+	linux-kernel <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org,
+	Eric Dumazet <eric.dumazet@gmail.com>,
+	syzbot+e1cd6bd8493060bd701d@syzkaller.appspotmail.com,
+	Mike Christie <mchristi@redhat.com>,
+	Yu Kuai <yukuai1@huaweicloud.com>, linux-block@vger.kernel.org,
+	nbd@other.debian.org
+Subject: Re: [PATCH] nbd: restrict sockets to TCP and UDP
+Message-ID: <20250909132936.GA1460@redhat.com>
+References: <20250909132243.1327024-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-2ce6c
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250909132243.1327024-1-edumazet@google.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-
-On Mon, 08 Sep 2025 12:56:37 +0200, Christoph Hellwig wrote:
-> the bi_inline_vecs causes sparse to warn when a bio is embedded into a
-> structure, but not the last member.   This is a bit annoying but
-> probably not a big.  But it can be easily fixed by just removing the
-> member and doing pointer arithmetics in a helper, so do that.
+On Tue, Sep 09, 2025 at 01:22:43PM +0000, Eric Dumazet wrote:
+> Recently, syzbot started to abuse NBD with all kinds of sockets.
 > 
-> Diffstat:
->  block/bio.c                        |   10 +++++++---
->  block/blk-crypto-fallback.c        |    3 +--
->  block/blk-map.c                    |    8 ++++----
->  drivers/md/bcache/debug.c          |    3 +--
->  drivers/md/bcache/io.c             |    3 +--
->  drivers/md/bcache/journal.c        |    2 +-
->  drivers/md/bcache/movinggc.c       |    8 ++++----
->  drivers/md/bcache/super.c          |    2 +-
->  drivers/md/bcache/writeback.c      |    8 ++++----
->  drivers/md/dm-bufio.c              |    2 +-
->  drivers/md/dm-flakey.c             |    2 +-
->  drivers/md/dm-vdo/vio.c            |    2 +-
->  drivers/md/raid1.c                 |    2 +-
->  drivers/md/raid10.c                |    4 ++--
->  drivers/target/target_core_pscsi.c |    2 +-
->  fs/bcachefs/btree_io.c             |    2 +-
->  fs/bcachefs/data_update.h          |    1 -
->  fs/bcachefs/journal.c              |    6 +++---
->  fs/bcachefs/journal_io.c           |    2 +-
->  fs/bcachefs/super-io.c             |    2 +-
->  fs/squashfs/block.c                |    2 +-
->  include/linux/bio.h                |    5 +++++
->  include/linux/blk_types.h          |   12 +++++-------
->  23 files changed, 48 insertions(+), 45 deletions(-)
+> Commit cf1b2326b734 ("nbd: verify socket is supported during setup")
+> made sure the socket supported a shutdown() method.
 > 
-> [...]
+> Explicitely accept TCP and UNIX stream sockets.
 
-Applied, thanks!
+I'm not clear what the actual problem is, but I will say that libnbd &
+nbdkit (which are another NBD client & server, interoperable with the
+kernel) we support and use NBD over vsock[1].  And we could support
+NBD over pretty much any stream socket (Infiniband?) [2].
 
-[1/2] block: add a bio_init_inline helper
-      commit: 70a6f71b1a77decfc5b1db426ccbe914b58adb38
-[2/2] block: remove the bi_inline_vecs variable sized array from struct bio
-      commit: d86eaa0f3c56da286853b698b45c8ce404291082
+[1] https://libguestfs.org/nbd_aio_connect_vsock.3.html
+    https://libguestfs.org/nbdkit-service.1.html#AF_VSOCK
+[2] https://libguestfs.org/nbd_connect_socket.3.html
 
-Best regards,
+TCP and Unix domain sockets are by far the most widely used, but I
+don't think it's fair to exclude other socket types.
+
+Rich.
+
+> Fixes: cf1b2326b734 ("nbd: verify socket is supported during setup")
+> Reported-by: syzbot+e1cd6bd8493060bd701d@syzkaller.appspotmail.com
+> Closes: https://lore.kernel.org/netdev/CANn89iJ+76eE3A_8S_zTpSyW5hvPRn6V57458hCZGY5hbH_bFA@mail.gmail.com/T/#m081036e8747cd7e2626c1da5d78c8b9d1e55b154
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Cc: Mike Christie <mchristi@redhat.com>
+> Cc: Richard W.M. Jones <rjones@redhat.com>
+> Cc: Jens Axboe <axboe@kernel.dk>
+> Cc: Yu Kuai <yukuai1@huaweicloud.com>
+> Cc: linux-block@vger.kernel.org
+> Cc: nbd@other.debian.org
+> ---
+>  drivers/block/nbd.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+> 
+> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+> index 6463d0e8d0cef71e73e67fecd16de4dec1c75da7..87b0b78249da3325023949585f4daf40486c9692 100644
+> --- a/drivers/block/nbd.c
+> +++ b/drivers/block/nbd.c
+> @@ -1217,6 +1217,14 @@ static struct socket *nbd_get_socket(struct nbd_device *nbd, unsigned long fd,
+>  	if (!sock)
+>  		return NULL;
+>  
+> +	if (!sk_is_tcp(sock->sk) &&
+> +	    !sk_is_stream_unix(sock->sk)) {
+> +		dev_err(disk_to_dev(nbd->disk), "Unsupported socket: should be TCP or UNIX.\n");
+> +		*err = -EINVAL;
+> +		sockfd_put(sock);
+> +		return NULL;
+> +	}
+> +
+>  	if (sock->ops->shutdown == sock_no_shutdown) {
+>  		dev_err(disk_to_dev(nbd->disk), "Unsupported socket: shutdown callout must be supported.\n");
+>  		*err = -EINVAL;
+> -- 
+> 2.51.0.384.g4c02a37b29-goog
+
 -- 
-Jens Axboe
-
-
+Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
+Read my programming and virtualization blog: http://rwmj.wordpress.com
+virt-builder quickly builds VMs from scratch
+http://libguestfs.org/virt-builder.1.html
 
