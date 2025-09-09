@@ -1,105 +1,143 @@
-Received: from mail-io1-f54.google.com (mail-io1-f54.google.com [209.85.166.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 104BF3451AB
-	for <linux-block@vger.kernel.org>; Tue,  9 Sep 2025 13:29:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D2453570DE;
+	Tue,  9 Sep 2025 13:29:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757424560; cv=none; b=nEnCDnO8MElO8uu9FrtPa0gK5hcY5pxTCR4berESqOdWHjWGaUlA7nZlRnz4sk2YK5mlXsqGqM35a4/u9fvv96Sx4ugdup8C6Y3OrKyBZvP98u9Hy4VIYeAjKLU59MjODthEtAiI3JCGuzTSmY0SkqD8EEtdIuQmZskeulbjT20=
+	t=1757424562; cv=none; b=I+wwdS23DmoSzeuGcMRVHiWbBByMyDZ3BvAlqt6HCVQwbpZnJWWlOTOiPK/cvUTnp+aw5YZE1/odu3603uNxK48XAK0+RHG4aDQgkWY6KeFgFb6WnAAMAReFfTmH6YPiXdtAM0EA2vUhvUsMEZ5kcgyo5Xe9J3mcoHotf8dTG0M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757424560; c=relaxed/simple;
-	bh=sdAUUAnXyg3K/25QJcJ/H03t1J2tpAN5WH0WT43DIUw=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=aAKdDAshWl+0r3AnyIIdYJGWJtks4ZkB1Wy+2x9b7MUlgfxJxH6MDHT9MmIGXJOyboKfbGrvQEzbGUT/DtKe+zMQ1D1PgAesFn0n62UBn2+i2okjwQJ/YMfvPIOgBBo8yNt5fPlr22pYy9grL6OCM+S7hxE8j60ALqpAV0JaK6k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=3Fz/YLx2; arc=none smtp.client-ip=209.85.166.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1757424562; c=relaxed/simple;
+	bh=iTHTFebdJnIM4qjuR28g9oSbyH9qTLhzazcpZ251F1w=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=El3XKuPSyOlK+BkI913YfJCqNC/A98/BGLVnTwLPXMdeAH4H48XjrOciYf0E2ilGxF3df6laYzRXrA2nzfzWDzV2MWq9j3bpmNchtCQGrtp/9+nyCE+DHMYuWonH/U2qiSnOHXraOMUYiOs9FDnKyTTAxcaMCAjOh2ppQkr6cLM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jsG+qsUJ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="3Fz/YLx2"
-Received: by mail-io1-f54.google.com with SMTP id ca18e2360f4ac-8876de33c86so341845839f.3
-        for <linux-block@vger.kernel.org>; Tue, 09 Sep 2025 06:29:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1757424557; x=1758029357; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VrUpdS9XW8kCmiI/HdKgdDuMgaTmT22blEzvxDbI6UY=;
-        b=3Fz/YLx2M8b0ASqOsObwg/F7nj6Bz1m4S5gi2raA8xXcMWalm8Vza4oIPHmgsbAJOP
-         fVjQ3DXRLa9zsLK16oheajgZ1lUoH7Kx1dfepg6OiMAn7rwb+iVdWN0Qm3Rdf7EzPzIW
-         5AH1DjDwM7M8WXhc6Uuhg8+ckMZ17hLSh/1oAt86eY7xXKYGw0db1TVux1ylNkQzWL95
-         StKd7j5VgC6YIulq5Iaz6k+GCU3MgvZraHDajQF3s7jIUGU7cDC7K2j6EA28rOkxZTWP
-         UG/2n2HTeY3uE0Bpc9RFOlIFcKrB2Nc3wEIF6gOh5r2Ns6Jysh5pDMyG23QsNs/4hIA0
-         kl3g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757424557; x=1758029357;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=VrUpdS9XW8kCmiI/HdKgdDuMgaTmT22blEzvxDbI6UY=;
-        b=jgDlRXq88FqE5uDNBzO3fX7OkCfyskqghc60zt3wP2t/dgaOdgkOPbuEKBvdHXtcrB
-         4psZPIu/uT5vY8QDX6dn0/X/6MtHxl0eVk/Tnmwf4BFNhUQ+iLmwdo+hkgjyayZpZEts
-         0EqEVyihn+Zu5hS0F9tqW2VQc4uXADI/xBfEZQ6/0Ioxok7g2ENd8COJGl3Swipsbg71
-         rFPzP/zaTSaXEtA9LKvZEySWxez9yv/1fisdxyhy71x0iE7BkPxyxflv5F68KUEUL9v2
-         fgXQ3R21qVjbwIelti3GwYp8U2D0KLN9N1c8ABJpxww/OSh3kftRGZR7HtS8m+nTTixG
-         rraw==
-X-Forwarded-Encrypted: i=1; AJvYcCXifHePCVdOGSEvs7vAtlZwbtFk6SEJ6yFP0Kv0QO9pelK5SAQzUYwpHsrbzcCUB0W1l/pRPi2zevxJvw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YytAbgxpZW8nYhk11jtKQnFapdSjWZyk7rGNV3ugsyUZSH62n38
-	KDorwY4tOxeAnPwx2lBbm6uFElcw1U9+vYmD+FPTCBM49Gpyo/SVliZZEnILuRPYMpQ=
-X-Gm-Gg: ASbGncs6F/NRvo1azznqcjUH/Us6o1fdP+u2RDj3Cn2XRGreK5q8ksHGv/1HYpedNXF
-	11KJ/HZLxbsRnvIjqXAxNU+9+qtBTkLfvAhKcM8h2Y4Hn+wx4a18fmtUmRd2vjS/bYXgD989Wgb
-	+vjHdBwZZZ1I6daK3/n8wZ7/3Gqnhs7cxHhFyROQwHJWFU31aGZmi0PrIHBvibuqzWmLFL8N/Dr
-	YbHBlXRlQp2RhQSYRfHrlLsibDmkxsp8OWKJsIS/TbacBqerJgUYNd3TXWwHddqfJwKYL8SesGG
-	rD8wWNjqNg6tqol7tSGXVlk5LM0u18z4AVWboqDSr0x5gasarOGuX+21QjN+GwPAkzPPvf8P5Q3
-	+4J1HuMSgXpUB85RKjNMJJXe5S3X82uYRKLw=
-X-Google-Smtp-Source: AGHT+IEIjWqcE1zYENpDxaX7YutdAIuak1sO9GmLbuURziKcQXpN8xbXlPbtAPoitLTAuWNCpHzs7g==
-X-Received: by 2002:a05:6e02:3784:b0:3f3:bbda:d037 with SMTP id e9e14a558f8ab-3fd965c4d04mr182350825ab.26.1757424557099;
-        Tue, 09 Sep 2025 06:29:17 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-50d8f31f6e4sm9895116173.47.2025.09.09.06.29.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Sep 2025 06:29:16 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: Josef Bacik <josef@toxicpanda.com>, Eric Dumazet <edumazet@google.com>
-Cc: linux-kernel <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org, 
- Eric Dumazet <eric.dumazet@gmail.com>, 
- syzbot+e1cd6bd8493060bd701d@syzkaller.appspotmail.com, 
- Mike Christie <mchristi@redhat.com>, 
- "Richard W.M. Jones" <rjones@redhat.com>, Yu Kuai <yukuai1@huaweicloud.com>, 
- linux-block@vger.kernel.org, nbd@other.debian.org
-In-Reply-To: <20250909132243.1327024-1-edumazet@google.com>
-References: <20250909132243.1327024-1-edumazet@google.com>
-Subject: Re: [PATCH] nbd: restrict sockets to TCP and UDP
-Message-Id: <175742455632.75115.15346620038817180242.b4-ty@kernel.dk>
-Date: Tue, 09 Sep 2025 07:29:16 -0600
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jsG+qsUJ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7C94C4CEF5;
+	Tue,  9 Sep 2025 13:29:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757424561;
+	bh=iTHTFebdJnIM4qjuR28g9oSbyH9qTLhzazcpZ251F1w=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=jsG+qsUJK7ffZ/z3OPchqA7x0yHguyPrENB1hNDceKyevn8Y0UY23vIlJKogKoOAV
+	 mdweaZvTaV73xdPNvzuLcSgBCkcKJinDpA+AFFif7FJFzPv/yP0eacNr7loyHWPJQl
+	 oDjSg5lytMZ5QZs3srGmQGs2aZnhiieWxGdijxV8InWTHYLEbMLD5nMB8zsJzQ7Y5/
+	 n6m5X6Og8JA73w+GsQKGuK+FDZc8VM+Pv/R0ANeQAPkMSUkS/Z7Crlwiferwk3j/aY
+	 bciFy1DVrMp5bQJF6IrE2GwiFytJBqVGnuxPc5FU5fznd5ZzC/Ro1XzYA9SknCnnqK
+	 nq4YmMAH6+QaA==
+From: Leon Romanovsky <leon@kernel.org>
+To: Marek Szyprowski <m.szyprowski@samsung.com>
+Cc: Leon Romanovsky <leonro@nvidia.com>,
+	Jason Gunthorpe <jgg@nvidia.com>,
+	Abdiel Janulgue <abdiel.janulgue@gmail.com>,
+	Alexander Potapenko <glider@google.com>,
+	Alex Gaynor <alex.gaynor@gmail.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Christoph Hellwig <hch@lst.de>,
+	Danilo Krummrich <dakr@kernel.org>,
+	David Hildenbrand <david@redhat.com>,
+	iommu@lists.linux.dev,
+	Jason Wang <jasowang@redhat.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Joerg Roedel <joro@8bytes.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Juergen Gross <jgross@suse.com>,
+	kasan-dev@googlegroups.com,
+	Keith Busch <kbusch@kernel.org>,
+	linux-block@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-nvme@lists.infradead.org,
+	linuxppc-dev@lists.ozlabs.org,
+	linux-trace-kernel@vger.kernel.org,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	Robin Murphy <robin.murphy@arm.com>,
+	rust-for-linux@vger.kernel.org,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Stefano Stabellini <sstabellini@kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	virtualization@lists.linux.dev,
+	Will Deacon <will@kernel.org>,
+	xen-devel@lists.xenproject.org
+Subject: [PATCH v6 16/16] nvme-pci: unmap MMIO pages with appropriate interface
+Date: Tue,  9 Sep 2025 16:27:44 +0300
+Message-ID: <be35a070a883286f0e401f6746334d84a7a42612.1757423202.git.leonro@nvidia.com>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <cover.1757423202.git.leonro@nvidia.com>
+References: <cover.1757423202.git.leonro@nvidia.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-2ce6c
+Content-Transfer-Encoding: 8bit
 
+From: Leon Romanovsky <leonro@nvidia.com>
 
-On Tue, 09 Sep 2025 13:22:43 +0000, Eric Dumazet wrote:
-> Recently, syzbot started to abuse NBD with all kinds of sockets.
-> 
-> Commit cf1b2326b734 ("nbd: verify socket is supported during setup")
-> made sure the socket supported a shutdown() method.
-> 
-> Explicitely accept TCP and UNIX stream sockets.
-> 
-> [...]
+Block layer maps MMIO memory through dma_map_phys() interface
+with help of DMA_ATTR_MMIO attribute. There is a need to unmap
+that memory with the appropriate unmap function, something which
+wasn't possible before adding new REQ attribute to block layer in
+previous patch.
 
-Applied, thanks!
+Reviewed-by: Keith Busch <kbusch@kernel.org>
+Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+---
+ drivers/nvme/host/pci.c | 18 +++++++++++++-----
+ 1 file changed, 13 insertions(+), 5 deletions(-)
 
-[1/1] nbd: restrict sockets to TCP and UDP
-      commit: 9f7c02e031570e8291a63162c6c046dc15ff85b0
-
-Best regards,
+diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+index 2c6d9506b1725..f8ecc0e0f576d 100644
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -682,11 +682,15 @@ static void nvme_free_prps(struct request *req)
+ {
+ 	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
+ 	struct nvme_queue *nvmeq = req->mq_hctx->driver_data;
++	unsigned int attrs = 0;
+ 	unsigned int i;
+ 
++	if (req->cmd_flags & REQ_MMIO)
++		attrs = DMA_ATTR_MMIO;
++
+ 	for (i = 0; i < iod->nr_dma_vecs; i++)
+-		dma_unmap_page(nvmeq->dev->dev, iod->dma_vecs[i].addr,
+-				iod->dma_vecs[i].len, rq_dma_dir(req));
++		dma_unmap_phys(nvmeq->dev->dev, iod->dma_vecs[i].addr,
++				iod->dma_vecs[i].len, rq_dma_dir(req), attrs);
+ 	mempool_free(iod->dma_vecs, nvmeq->dev->dmavec_mempool);
+ }
+ 
+@@ -699,15 +703,19 @@ static void nvme_free_sgls(struct request *req)
+ 	unsigned int sqe_dma_len = le32_to_cpu(iod->cmd.common.dptr.sgl.length);
+ 	struct nvme_sgl_desc *sg_list = iod->descriptors[0];
+ 	enum dma_data_direction dir = rq_dma_dir(req);
++	unsigned int attrs = 0;
++
++	if (req->cmd_flags & REQ_MMIO)
++		attrs = DMA_ATTR_MMIO;
+ 
+ 	if (iod->nr_descriptors) {
+ 		unsigned int nr_entries = sqe_dma_len / sizeof(*sg_list), i;
+ 
+ 		for (i = 0; i < nr_entries; i++)
+-			dma_unmap_page(dma_dev, le64_to_cpu(sg_list[i].addr),
+-				le32_to_cpu(sg_list[i].length), dir);
++			dma_unmap_phys(dma_dev, le64_to_cpu(sg_list[i].addr),
++				le32_to_cpu(sg_list[i].length), dir, attrs);
+ 	} else {
+-		dma_unmap_page(dma_dev, sqe_dma_addr, sqe_dma_len, dir);
++		dma_unmap_phys(dma_dev, sqe_dma_addr, sqe_dma_len, dir, attrs);
+ 	}
+ }
+ 
 -- 
-Jens Axboe
-
-
+2.51.0
 
