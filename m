@@ -1,98 +1,166 @@
-Received: from mail-io1-f52.google.com (mail-io1-f52.google.com [209.85.166.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from sender4-op-o12.zoho.com (sender4-op-o12.zoho.com [136.143.188.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 523EA221FC7
-	for <linux-block@vger.kernel.org>; Tue,  9 Sep 2025 16:35:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.52
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757435756; cv=none; b=CE1WFb011RLz/SM070STGPYBqP4PnGLqN9xlUzY+HspLJW+t4u36q3fhbP8QtSwA64fuBPcqgB5YEdxORsAGCdG/x3SESQenTKqbv6/b2JiR5SrHi7xK3FC2Yr5rTSn7czlwU5JILm61aD8+iNW6VUQnGECD6ebWvSIpLEzmLSs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757435756; c=relaxed/simple;
-	bh=e8WFp1zpZun1HsYZIO7PfQYNNlbDwCYr2GnvTqk6riY=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=DKE6Tn8OV2yxzEHvpmX9lk3sJpTsN9JcFNOuUjWRLPOdjJ8QT9kGJtwKSZxpknTLxWNJlYBTJI767AAz31Ev3ByaWDWrnwR+ebXkgoOI0SlKHivOQyef1J1L2/QbKS7G4n/n60mVqCdFqLvOjt7YSGuE+V7XYklQHVUHQLMDGnw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=n50zlsnl; arc=none smtp.client-ip=209.85.166.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C5D42264D5;
+	Tue,  9 Sep 2025 16:40:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1757436039; cv=pass; b=nC+G4EaYH68DWm+x/An/uaw1mT9QtAMAMm9k8xmIUGK4Hbo0sQC61ozJTQOhmk72I2xhBMvYrpW5FoqeAzOlGtWh3VhTXmWWpSXm6l68i2xnDSuEyHVcKJVPGzJD1XY7pgB0N94vgOlYSx2UDRbAyLQQkbhR3fxQoS/ELRtjqXI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1757436039; c=relaxed/simple;
+	bh=xwTdNVGntl/WyiRwz22zt6mGRkZoq8qi1F558qxpero=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=s7sCUszTP+fWObkJ1pvYmaX3BT5IUwr7Kuz71gqZOAYu0KZz4j1E73zKGn+heSygUnYusbaGBmKezHtjyly2WKlGvYHgVeqBRQdii9386LX/tx4vq/0cxV37mHgSEldHPgDWu5E1EQI0+m4zN254kWbg9XR0z9XgRHUUgxrPIzo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yukuai.org.cn; spf=pass smtp.mailfrom=yukuai.org.cn; dkim=pass (1024-bit key) header.d=yukuai.org.cn header.i=hailan@yukuai.org.cn header.b=B8ouFWqd; arc=pass smtp.client-ip=136.143.188.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yukuai.org.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yukuai.org.cn
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="n50zlsnl"
-Received: by mail-io1-f52.google.com with SMTP id ca18e2360f4ac-88762f20125so458217839f.0
-        for <linux-block@vger.kernel.org>; Tue, 09 Sep 2025 09:35:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1757435753; x=1758040553; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EAq7BOyP0B72ZyrsylWLSagzgiFC6B6Gb5G0213Wrro=;
-        b=n50zlsnl0GtZDFpxfz0GOSsoSAo3/VL6fH2CDLbUBi27ZoOMkTrh+EHmQkphhG/r/c
-         PLuv5dc1x3c3tVFeWw6l6ZZ4DJuBGdZdncK9DriY5mvKsJyIEerqGB3Xt9YXqfx5h3Yt
-         qx+AUN7E8G1I2x7G/UDGNT+ms5iPmnDhhR4JNhsgML1EMTdBw+C8RQCxeMC3jCNIK7Yz
-         PXUv6R311NjYa0dA2AC787n3Qpqlco2eEKQWlYn+RMeyo96EOOQGc34Hf/zB8bogmsVr
-         7SwS8iXVZW4LC8LchvlQtzyHeR3o5xIN4F6oAuzVDHZdich90R1PKiE9/oyvdtmDTL3I
-         RIHg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757435753; x=1758040553;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=EAq7BOyP0B72ZyrsylWLSagzgiFC6B6Gb5G0213Wrro=;
-        b=UBnJbr19rqM6cwBodosoyslSNby+De56VOrxGdH8l+Yfloyb4cL1ubxuMYyI7DOEvW
-         FT4QiKF1pnTkOL+DgxxiKEJ8dufjxmgCdNpEUGXR6JCiCBdt5VbqBx7nXnZO+yQA+Vdn
-         GAcgg+880iLllCkfdEclHr52n41TvMWj5k2S1NdUuIQWKrUXom1iOlKPncF/eyDj7Gi4
-         MlD8vUQu38a7YciWBAF3jZMRymRg8Sx6WxuCWZvUSDDBTLmxzxCOKdplTWLNX+4laTv0
-         tF3ttzxPAkHkOFYvJf8B2E+1mMqq2zuk1GgKE6OiHXCU8pfpk5aw1lnW58tYVQW4a072
-         LDGw==
-X-Gm-Message-State: AOJu0YyscFdJNChiIy/bnJ3NQm8lbb1F28srsEKxkxv0h1P/SJOPFtQT
-	zlEL5eyUzm/wADaSX2oFbNpKE7SMsrMwmaDlsAsSZZYi2mwrRplBf5IkzZfA8lWXN/Ek1gTOqUM
-	qXdIJ
-X-Gm-Gg: ASbGncuwTqkc+eBg5BohvpFUlSoveu4x+6Uql5GuXGzh98ShLfoikvQUDIHvuYWojaP
-	nEqWx58h+kOcsmXapbOrt28hFQIt6TkGorLU8q5/3UCY+t55Fs76Ob11zkjH+9tXApXUFnY9B6A
-	7KzDsA3UkVmXvoOCiSSw+AbfYuq5Y4jQ3jk7vyM/kZpWfkGHfh8XD6nwrSIagItSZ+nvaftLZP0
-	70g61t/LEvl9VEYIpzHzhX9Kkug119w4Dc5qfAgL3kmPArDhgCwjKviHORqk8xdOMbjDPx0DZIV
-	+hJMIMYRvnkiUDTrShETQV2SdTnMcqMmdommZqppxtybviO/oGZ1qjixGHiVwHIUS+YxRnjYmgb
-	tI12cVXUFNLzWig==
-X-Google-Smtp-Source: AGHT+IE4StV8pHw158LA69+GRldNKkauD57gep0bmq97NRh7X24SVIdYQpdkULoXIuu/kSDyy40+SQ==
-X-Received: by 2002:a92:c24c:0:b0:3e3:f9db:c0f2 with SMTP id e9e14a558f8ab-3fd8e98d19amr216327265ab.10.1757435752165;
-        Tue, 09 Sep 2025 09:35:52 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-50d8f31cc4esm9921243173.50.2025.09.09.09.35.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Sep 2025 09:35:51 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, Keith Busch <kbusch@meta.com>
-Cc: hch@lst.de, leon@kernel.org, Keith Busch <kbusch@kernel.org>
-In-Reply-To: <20250903202746.3629381-1-kbusch@meta.com>
-References: <20250903202746.3629381-1-kbusch@meta.com>
-Subject: Re: [PATCH] blk-map: provide the bdev to bio if one exists
-Message-Id: <175743575162.122061.6789614378331426216.b4-ty@kernel.dk>
-Date: Tue, 09 Sep 2025 10:35:51 -0600
+	dkim=pass (1024-bit key) header.d=yukuai.org.cn header.i=hailan@yukuai.org.cn header.b="B8ouFWqd"
+ARC-Seal: i=1; a=rsa-sha256; t=1757436015; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=Gv8GV6rRG5Jb7hAWqmD5ER/1d0mM+JfKw4xpPZh/0s3Y8i5a0+dRuCKjJn7RnoMhhxfV3MU8fKccj6fpIhMrOFA/ZfxDAHN6xf+yHkZnrXSKLVBZekbDNlwM3oiwMpaGm5KvqymORB8Emy1KL7ssXEtiktms8R8Y+u5S8jTGWvQ=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1757436015; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=9vrgL/+kl5uyRE7ByyiVzWPCWsoDk4jEde9g5wb1A1U=; 
+	b=Px4Vw/MDfw5WjuFFc7IVut3/hNzvGfL4oLuPYFBokhmXJPrxj06cC7e0L+jxG3DjMHRwsWstRWwpIVAraHJFC9bDbPZ3t1qi2iD011LsUMkDcPh3O80mZDn8RQT96hQWUvOrcoKhs0wbA8gH78G+vnjwhblUK2VxeDS1bNzqK7M=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=yukuai.org.cn;
+	spf=pass  smtp.mailfrom=hailan@yukuai.org.cn;
+	dmarc=pass header.from=<hailan@yukuai.org.cn>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1757436015;
+	s=zmail; d=yukuai.org.cn; i=hailan@yukuai.org.cn;
+	h=Message-ID:Date:Date:MIME-Version:Subject:Subject:To:To:Cc:Cc:References:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=9vrgL/+kl5uyRE7ByyiVzWPCWsoDk4jEde9g5wb1A1U=;
+	b=B8ouFWqdqV24DmFpiBjIG+kCuima/iaHEv/2NfNqJFVF5V15pIuffzHoJrpUw6GC
+	jsCpJ1KWLloFKG7rSZHztEuvS07dYWt+frL4WI50D7cBuWi4+y33ArbRA74fFKuuWtk
+	PubcA6IOut8JxwwcNW0zLkG71pmV4ZJSysRQ1+Dc=
+Received: by mx.zohomail.com with SMTPS id 1757436012464672.9661036833609;
+	Tue, 9 Sep 2025 09:40:12 -0700 (PDT)
+Message-ID: <8ab0b2e2-a3da-43b1-9fb8-141e85aee3b2@yukuai.org.cn>
+Date: Wed, 10 Sep 2025 00:39:58 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-2ce6c
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH for-6.18/block 06/10] blk-mq: split bitmap grow and resize
+ case in blk_mq_update_nr_requests()
+To: Nilay Shroff <nilay@linux.ibm.com>, Yu Kuai <yukuai1@huaweicloud.com>,
+ ming.lei@redhat.com, axboe@kernel.dk
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ yukuai3@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com,
+ johnny.chenyi@huawei.com
+References: <20250908061533.3062917-1-yukuai1@huaweicloud.com>
+ <20250908061533.3062917-7-yukuai1@huaweicloud.com>
+ <85259339-d832-468a-a9b0-0c326c896370@linux.ibm.com>
+From: Yu Kuai <hailan@yukuai.org.cn>
+In-Reply-To: <85259339-d832-468a-a9b0-0c326c896370@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ZohoMailClient: External
 
+Hi,
 
-On Wed, 03 Sep 2025 13:27:46 -0700, Keith Busch wrote:
-> We can now safely provide a block device when extracting user pages for
-> driver and user passthrough commands. Set the bdev so the caller doesn't
-> have to do that later. This has an additional  benefit of being able to
-> extract P2P pages in the passthrough path.
-> 
-> 
+在 2025/9/9 20:18, Nilay Shroff 写道:
+>
+> On 9/8/25 11:45 AM, Yu Kuai wrote:
+>> From: Yu Kuai <yukuai3@huawei.com>
+>>
+>> No functional changes are intended, make code cleaner and prepare to fix
+>> the grow case in following patches.
+>>
+>> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+>> ---
+>>   block/blk-mq.c | 28 ++++++++++++++++------------
+>>   1 file changed, 16 insertions(+), 12 deletions(-)
+>>
+>> diff --git a/block/blk-mq.c b/block/blk-mq.c
+>> index 1ff6370f7314..82fa81036115 100644
+>> --- a/block/blk-mq.c
+>> +++ b/block/blk-mq.c
+>> @@ -4931,21 +4931,25 @@ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
+>>   			blk_mq_tag_update_sched_shared_tags(q);
+>>   		else
+>>   			blk_mq_tag_resize_shared_tags(set, nr);
+>> -	} else {
+>> +	} else if (!q->elevator) {
+>>   		queue_for_each_hw_ctx(q, hctx, i) {
+>>   			if (!hctx->tags)
+>>   				continue;
+>> -			/*
+>> -			 * If we're using an MQ scheduler, just update the
+>> -			 * scheduler queue depth. This is similar to what the
+>> -			 * old code would do.
+>> -			 */
+>> -			if (hctx->sched_tags)
+>> -				ret = blk_mq_tag_update_depth(hctx,
+>> -							&hctx->sched_tags, nr);
+>> -			else
+>> -				ret = blk_mq_tag_update_depth(hctx,
+>> -							&hctx->tags, nr);
+>> +			sbitmap_queue_resize(&hctx->tags->bitmap_tags,
+>> +				nr - hctx->tags->nr_reserved_tags);
+>> +		}
+>> +	} else if (nr <= q->elevator->et->nr_requests) {
+>> +		queue_for_each_hw_ctx(q, hctx, i) {
+>> +			if (!hctx->sched_tags)
+>> +				continue;
+>> +			sbitmap_queue_resize(&hctx->sched_tags->bitmap_tags,
+>> +				nr - hctx->sched_tags->nr_reserved_tags);
+>> +		}
+>> +	} else {
+>> +		queue_for_each_hw_ctx(q, hctx, i) {
+>> +			if (!hctx->sched_tags)
+>> +				continue;
+>> +			blk_mq_tag_update_depth(hctx, &hctx->sched_tags, nr);
+>>   			if (ret)
+>>   				goto out;
+>>   		}
+> The above code is good however can this be bit simplified?
+> It's a bit difficult to follow through all nesting and so
+> could it be simplified as below:
+>
+> if (shared-tags) {
+>      if (elevator)
+>         // resize sched-shared-tags bitmap
+>      else
+>         // resize shared-tags bitmap
+> } else {
+>      // non-shared tags
+>      if (elevator) {
+>          if (new-depth-is-less-than-the-current-depth)
+>              // resize sched-tags bitmap
+>          else
+>              // handle sched tags grow
+>      } else
+>          // resize tags bitmap
+> }
 
-Applied, thanks!
+AFAIK, if - else if chain should be better than nested if - else, right?
 
-[1/1] blk-map: provide the bdev to bio if one exists
-      commit: d0d1d522316e91f2b935a78bbf962b8e529d8c4f
+If you don't mind, I can add comments to each else if chain to make code cleaner:
 
-Best regards,
--- 
-Jens Axboe
+if () {
+	/* shared tags */
+	...
+} else if () {
+	/* non-shared tags and elevator is none */
+	...
+} else if () {
+	/* non-shared tags and elevator is not none, nr_requests doesn't grow */
+	...
+} else () {
+	/* non-shared tags and elevator is not none, nr_requests grow */
+	...
+}
 
+Thanks,
+Kuai
 
-
+>
+> Thanks,
+> --Nilay
+>
+>
