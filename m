@@ -1,111 +1,112 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 493651D799D;
-	Tue,  9 Sep 2025 12:36:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2585214204
+	for <linux-block@vger.kernel.org>; Tue,  9 Sep 2025 13:22:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757421375; cv=none; b=poI91snxP6ZJEa8vbcrEwX5oMVQ7sNUQYZuvarqEo38VYrY+7ApchHgx+PLq8PYaOxpsmi5N2om6Ny4ohByDlU8JihztoeEJpX0fwopQej0LTtjvicrnv5LgcMreW97cyRcuSwNQ8+4y5yiAnFAPJekWnjffFUNHYjlNJ+ayw2Q=
+	t=1757424174; cv=none; b=cV5hGgCFnx90Cq22+A1VU+NQ3AWPwQKeYDhfzIA5bhrK4p4UI51J+ZuQ2GZU7pzk35jNy6mvyWc+D7AdnNqBYNK7oB93rpcT5EG5repVs6m0zCXFM/EKoYywWZeeKWipJKOBVOtUgH7Z1eK5b3I6HsTJsgicpYWg+rt1IcghAfs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757421375; c=relaxed/simple;
-	bh=7rmZVvt1lcuBAeV6Cot6FBTLe3RiTlDsHklY1dOONpk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=d7QvecVXK8ZzbMFaSgMnVRt4ZlpzaOfTiW4INqRW26073JQnDppJ0o02Ook0FOJyXG2BC2xkzZi78RzQE92hqNxji3vB9MqgdxoJIDFzCqXOm1+2wLBAmJq+lG6kvHzZGPyvmeULlzlUfiVL1Q14mbFNmDFYG1koHumzpMCjgo0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=ryAlLX9U; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1757424174; c=relaxed/simple;
+	bh=kAoIWg0eouVwlZINqB9hM9ZgDWPys75E8dPDrrUOVRI=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=bcc7fXKgxBda+cDQI48i2HW26bT32qIZi+lQNVuRSzhE+ZE6CF55sAneX25Oj/nBWTC7Ifxi7AdFUK0eEn8AFgN7DDANF7UuFmIW5pLhWARcDSumw8Qwe3yhWVIvcu6McTbXrOo6UAxGfFAZXpWgYMpMVltz17Wf713In3ymSLo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XGQ1gNTm; arc=none smtp.client-ip=209.85.160.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ryAlLX9U"
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 589ABrAa029066;
-	Tue, 9 Sep 2025 12:35:57 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=9UCon7
-	2yABUdesFhCOJAJC9dH242g84d7p2QQ2CuUGM=; b=ryAlLX9USZ3R25WpmThfJ6
-	aAS61HA1INKmFFOZROWmgknAWsyXQKkJW8wBid2U2PClkhcwMXJqhsjnnvay2muw
-	3NHi0xrww0mNDIZ4/1PuC1dLznY9vDaMxjxBDl1IJmh7/CRZA8FBSnXAJeolN2U8
-	5w2CrsEnsszIDwXD9soQBM1vh6xbaterVu4YfkiR9ZRmMcdH6Ea0BMyvodBDPWCJ
-	i53BaPiya05DVMRM+nPDC7fcP8c40cLrQuRnLChMlyrnN+1LjNmlLQZhx4FGuFyF
-	aGuRIuITHULjht/TA1Uthuh9lAgRAA4cuoRWRM9NM1TEuLeQJAXwAohB6b8XiHhg
-	==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 490cmwqpx4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 09 Sep 2025 12:35:56 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5899mdTQ020469;
-	Tue, 9 Sep 2025 12:35:55 GMT
-Received: from smtprelay07.dal12v.mail.ibm.com ([172.16.1.9])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 490yp0u80w-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 09 Sep 2025 12:35:55 +0000
-Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
-	by smtprelay07.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 589CZs2q6686178
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 9 Sep 2025 12:35:54 GMT
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id CAEB858057;
-	Tue,  9 Sep 2025 12:35:54 +0000 (GMT)
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 107C458058;
-	Tue,  9 Sep 2025 12:35:51 +0000 (GMT)
-Received: from [9.43.86.190] (unknown [9.43.86.190])
-	by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Tue,  9 Sep 2025 12:35:50 +0000 (GMT)
-Message-ID: <12a95d11-9153-40c5-ae44-92e827817c99@linux.ibm.com>
-Date: Tue, 9 Sep 2025 18:05:49 +0530
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XGQ1gNTm"
+Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-4b6090aeaacso66361641cf.3
+        for <linux-block@vger.kernel.org>; Tue, 09 Sep 2025 06:22:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1757424172; x=1758028972; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=uchVPC5V5AnCU++0LQSE31dfyzhx8FL2wjNsKVYAXlI=;
+        b=XGQ1gNTmJSgz5hjFPrtuVBGnqeKdf1jj/8mf/pZNeqdhyJkwTnWjQEnqraShpxMxti
+         CU6WcZm1JHOrnR3D0MTiTAriv9nU1GeFNJDODjehxQNuzMwpevMhw0Zff5VURVLXM2dv
+         5c9LKOSP1QfwHX9DgylFmNR5nYunILLJaANmrr387Lb84helrD1k3uK3NszUBAzT8oWT
+         qKKRIVELjQXlqwK64Md4qW9tjMuYBGZUrd3U9HyBJ73/uXZo8phM1oMkN8p7bxDVylka
+         tU9ldJnU9FbIaYZdYylBhFCA8xad0mdklE4HKWvs02u1Ls3WkAGFj/YH1pYERjm9UJkJ
+         2rHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757424172; x=1758028972;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=uchVPC5V5AnCU++0LQSE31dfyzhx8FL2wjNsKVYAXlI=;
+        b=iToKUtSeh9mF47SYASBd4RIQKOsd44OkmdcZhibu/m6MZCZKJJPmx+e68SAgMX8ZZQ
+         4NDE66jCgnD8QP74d00bwIlhGB7cOsFJCHkO9EGzWH3jiKVvAKQE7LhdpUzWt23U7EaC
+         bE5J+kKSHVFYoJc4wzltzmqzOcnqYYrFfzoAKGqGJJi074bFuEjUm1uQB8ZYIL7/FbsT
+         et3NQaHzhWDwd/og/dCnChObgo5Wy+6IuShqlBDJzyRPji6g2mb9iFKJo6Tp6WlHAGXS
+         1HljnnC4sPlQnQPKwhPD8ekjT8h6wvsdqwYMsyiATIQro2UXdIhHXwsH0UbN2awvasAp
+         UKTA==
+X-Forwarded-Encrypted: i=1; AJvYcCXo5HKrnm3hGqs4bwEp8iSA92kQbJCZFpYqkXwd62F1Botgu4tV1Sh0nQga4xnzQxFcciep0uAfizJaJA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxEId9Gqz6eP9a4zpPISWoYgtWgoCUBSf4aJcqsDDZWmEsKm2iL
+	X255tNzE1cKpSZfAzAR3iJ4H1HH7Qk6xw83vvuJawmvFS0IGpZRi4ZFpPvEc8VmYoUfb2JyxQCd
+	JaX/m6HE0yUOCTA==
+X-Google-Smtp-Source: AGHT+IGYpVQiEzn9QHE1zn1hAW5xwDjdaQLoTNKxPgWkv7gyao/+uTsXb3LQmW5bD0GeIq3wlXcgPuI+F3/c5w==
+X-Received: from qtz5.prod.google.com ([2002:ac8:5945:0:b0:4b0:a157:1d5b])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:622a:4b14:b0:4b0:da5c:de57 with SMTP id d75a77b69052e-4b5f844d1fbmr103893091cf.54.1757424171653;
+ Tue, 09 Sep 2025 06:22:51 -0700 (PDT)
+Date: Tue,  9 Sep 2025 13:22:43 +0000
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH for-6.18/block 09/10] blk-mq: remove
- blk_mq_tag_update_depth()
-To: Yu Kuai <yukuai1@huaweicloud.com>, ming.lei@redhat.com, axboe@kernel.dk
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yukuai3@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com,
-        johnny.chenyi@huawei.com
-References: <20250908061533.3062917-1-yukuai1@huaweicloud.com>
- <20250908061533.3062917-10-yukuai1@huaweicloud.com>
-Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <20250908061533.3062917-10-yukuai1@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: VsOWi1pG2SwKRGVplQszkobCTW9DSyP1
-X-Proofpoint-ORIG-GUID: VsOWi1pG2SwKRGVplQszkobCTW9DSyP1
-X-Authority-Analysis: v=2.4 cv=J52q7BnS c=1 sm=1 tr=0 ts=68c01f2c cx=c_pps
- a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
- a=IkcTkHD0fZMA:10 a=yJojWOMRYYMA:10 a=i0EeH86SAAAA:8 a=VnNF1IyMAAAA:8
- a=tYaLi_SPQAiz_1EOLDQA:9 a=QEXdDO2ut3YA:10 a=Ba5x5ocL4jwA:10
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTA2MDAyNSBTYWx0ZWRfXy6EQRlZyGX2K
- NtRAF6k8vg2XVPzKz4uGijYiT26W4chrIrwRNIpxZQgMkjOE8NSovfvdRFVym9ReTl64LRqxZvB
- BzncdNbBQlVrCewYYaLFL656kERoB/m4ke5qh/OlBPXPXa0L7IDPT5+vHxqUs9ebek8XI/47vGO
- q/mOBYVSQ155pRv1pVeds1nnbBWdranUhCmfXxC5Qpc93byv15kBhiWQ938UYV0mdo5cMqIMPQS
- 0hoxJ47VC23EiHXsSauKwkbDjmioqkDm4uAG7vQIhq3Z9Dw+gS+BnZCzmewCPGKlIBFm1fjkXPu
- MOsq7ObOBOjpKpyBV9EPACw+LJizpDGqTX4PNCQctWdYzhPGCxYfTrfc8BypZjQBKP9S7n6n5Kh
- CdVGw/jy
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-09-09_01,2025-09-08_02,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 clxscore=1015 suspectscore=0 spamscore=0 phishscore=0
- bulkscore=0 adultscore=0 malwarescore=0 priorityscore=1501
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2509060025
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.0.384.g4c02a37b29-goog
+Message-ID: <20250909132243.1327024-1-edumazet@google.com>
+Subject: [PATCH] nbd: restrict sockets to TCP and UDP
+From: Eric Dumazet <edumazet@google.com>
+To: Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-kernel <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org, 
+	Eric Dumazet <eric.dumazet@gmail.com>, Eric Dumazet <edumazet@google.com>, 
+	syzbot+e1cd6bd8493060bd701d@syzkaller.appspotmail.com, 
+	Mike Christie <mchristi@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>, 
+	Yu Kuai <yukuai1@huaweicloud.com>, linux-block@vger.kernel.org, nbd@other.debian.org
+Content-Type: text/plain; charset="UTF-8"
 
+Recently, syzbot started to abuse NBD with all kinds of sockets.
 
+Commit cf1b2326b734 ("nbd: verify socket is supported during setup")
+made sure the socket supported a shutdown() method.
 
-On 9/8/25 11:45 AM, Yu Kuai wrote:
-> From: Yu Kuai <yukuai3@huawei.com>
-> 
-> This helper is not used now.
-> 
-> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+Explicitely accept TCP and UNIX stream sockets.
 
-Looks good to me:
-Reviewed-by: Nilay Shroff <nilay@linux.ibm.com>
+Fixes: cf1b2326b734 ("nbd: verify socket is supported during setup")
+Reported-by: syzbot+e1cd6bd8493060bd701d@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/netdev/CANn89iJ+76eE3A_8S_zTpSyW5hvPRn6V57458hCZGY5hbH_bFA@mail.gmail.com/T/#m081036e8747cd7e2626c1da5d78c8b9d1e55b154
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Cc: Mike Christie <mchristi@redhat.com>
+Cc: Richard W.M. Jones <rjones@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: Yu Kuai <yukuai1@huaweicloud.com>
+Cc: linux-block@vger.kernel.org
+Cc: nbd@other.debian.org
+---
+ drivers/block/nbd.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index 6463d0e8d0cef71e73e67fecd16de4dec1c75da7..87b0b78249da3325023949585f4daf40486c9692 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -1217,6 +1217,14 @@ static struct socket *nbd_get_socket(struct nbd_device *nbd, unsigned long fd,
+ 	if (!sock)
+ 		return NULL;
+ 
++	if (!sk_is_tcp(sock->sk) &&
++	    !sk_is_stream_unix(sock->sk)) {
++		dev_err(disk_to_dev(nbd->disk), "Unsupported socket: should be TCP or UNIX.\n");
++		*err = -EINVAL;
++		sockfd_put(sock);
++		return NULL;
++	}
++
+ 	if (sock->ops->shutdown == sock_no_shutdown) {
+ 		dev_err(disk_to_dev(nbd->disk), "Unsupported socket: shutdown callout must be supported.\n");
+ 		*err = -EINVAL;
+-- 
+2.51.0.384.g4c02a37b29-goog
+
