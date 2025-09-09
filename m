@@ -1,146 +1,168 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3731C34DCFF
-	for <linux-block@vger.kernel.org>; Tue,  9 Sep 2025 15:19:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 207DE2BB17;
+	Tue,  9 Sep 2025 15:24:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757431146; cv=none; b=IpwqJvw5svK57tVbIOKz/vulOVKfJTaCk2WMcmHdVSm1DGp00kRHyjCd1nXYEpstl14tFe3iYnNfsY2+2LzDFzNMPDNqNALY6AGeN+ekZkauuDRK01fCh5bHSDf3eRdXSJZiBJjZDpawoCFI6hEfS2WvFN6e11MlXw6Cac9o0Ek=
+	t=1757431481; cv=none; b=MgTWwr5mAdN9L78hung4beu4GmK0P/QvE0v0XGMs9e+/t3bmpOEKcjOOaE3VlYBtOyuBNKNLVtNYL9A9P515fnHAN67AgChtCBuz8oxwBl1gLyPyZEVFq3w3zWf8Cjukb+Hl+VWigyUXDcxKB69APErhWAnYjoSY2usInKKqToo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757431146; c=relaxed/simple;
-	bh=8CHr7K7d1f1v8CLSz72YmFzCdsX5ZJJa0FEZjgunY7I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=C55c4dJnsM6ba1fJn3xm4NWKrJdIL3OW/g1N+0QGYLU1OlfWPT8VHI23IDo586bJxQ5+Wp7VakNKhR1RPwamaE0K96CwBcrbh9QbP3aRgJT1a5/G45wKabPVtA/37Cx78n8Df/OnAqnzK8uxbAMqOslGiyTr2FxKpaT3FLx4tqI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ILhxlYXa; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1757431481; c=relaxed/simple;
+	bh=3R0m6L3Xc0jpTLVgVCR9emnQCAji/4frJjenqqSAQLU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Content-Type; b=ItOpzB1UdDfOjePDlJdaALf9K8SdMDtCNVydvfFCctvrj/LtaExoy2XiMDVLj0UKTMQAIGz7D7cnCU2py/P/gKXRFcHgoy7MGU3p1UZ2JHwJlQ6grnhcJbVMpZbb0RtEh1/LSOhpLBqpjELdcGG3eV0h41F4lD8DGHJ3a9HSw4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CvcehZ0z; arc=none smtp.client-ip=209.85.160.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ILhxlYXa"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1757431144;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=AvU0fSTgyz2cMM7lj4jbJRyN5QgDN88AlP1jEm41ccg=;
-	b=ILhxlYXarP9hF64rhXDuFVlcDA4bB36+nKAiZdsHnK7pYKXqY0lsRge7otShspmajKSYko
-	oBEQdEcWcsSYE9DghLPcWyV+l+fqdfaftskFWqY9Kuwzih0kf/q5NAjR2u1a/FpxCyqkjT
-	D5HytPzo+0984lhzIKwqsGqlfnxnOPQ=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-529-rZq0yZUDPwW9rfJ3H8udsQ-1; Tue,
- 09 Sep 2025 11:18:58 -0400
-X-MC-Unique: rZq0yZUDPwW9rfJ3H8udsQ-1
-X-Mimecast-MFC-AGG-ID: rZq0yZUDPwW9rfJ3H8udsQ_1757431137
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BDCE3180057D;
-	Tue,  9 Sep 2025 15:18:56 +0000 (UTC)
-Received: from localhost (unknown [10.45.226.196])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id EEFFE19560BA;
-	Tue,  9 Sep 2025 15:18:53 +0000 (UTC)
-Date: Tue, 9 Sep 2025 16:18:52 +0100
-From: "Richard W.M. Jones" <rjones@redhat.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Josef Bacik <josef@toxicpanda.com>,
-	linux-kernel <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org,
-	Eric Dumazet <eric.dumazet@gmail.com>,
-	syzbot+e1cd6bd8493060bd701d@syzkaller.appspotmail.com,
-	Mike Christie <mchristi@redhat.com>,
-	Yu Kuai <yukuai1@huaweicloud.com>, linux-block@vger.kernel.org,
-	nbd@other.debian.org, Stefan Hajnoczi <stefanha@redhat.com>,
-	Stefano Garzarella <sgarzare@redhat.com>
-Subject: Re: [PATCH] nbd: restrict sockets to TCP and UDP
-Message-ID: <20250909151851.GB1460@redhat.com>
-References: <20250909132243.1327024-1-edumazet@google.com>
- <20250909132936.GA1460@redhat.com>
- <CANn89iLyxMYTw6fPzUeVcwLh=4=iPjHZOAjg5BVKeA7Tq06wPg@mail.gmail.com>
- <CANn89iKdKMZLT+ArMbFAc8=X+Pp2XaVH7H88zSjAZw=_MvbWLQ@mail.gmail.com>
- <63c99735-80ba-421f-8ad4-0c0ec8ebc3ea@kernel.dk>
- <CANn89iJiBuJ=sHbfKjR-bJe6p12UrJ_DkOgysmAQuwCbNEy8BA@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CvcehZ0z"
+Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-4b61161c32eso24845491cf.3;
+        Tue, 09 Sep 2025 08:24:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1757431479; x=1758036279; darn=vger.kernel.org;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yDbmDBECNsOMyPFBVxB/4/c6RAXu7g94A+5MaF46ZQw=;
+        b=CvcehZ0zhYLfn1KqL6gzPBpXgFNx3aOpbCFQ/5d61ERAwyGioTgFmv38hUGXQ0ssEe
+         oZ87K6lmeNJYp6BDj01LHF1EQk9c8aAwcY2TdRvKga66arhvpNWXbxHJhlaKbCvCC+5g
+         DdKgwk9XSTVEf+MjWv2UqH8kh0PtpmR4ZREVrgKk3JQhAUPkGEK0ezyIzebtJsBc34NI
+         4+G8CR77oFi0mcteGq6nW8g5n6nLAN3HNA0r+zQPMxahQihml/8D1kVmKzPiVxHjzpOK
+         ED0GscbwdCJRkSDhethxK+KINrypoTL/QPoV7r0UsUFqlcq2YlnIcCNeLZwtBSnfy3yv
+         VAag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757431479; x=1758036279;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=yDbmDBECNsOMyPFBVxB/4/c6RAXu7g94A+5MaF46ZQw=;
+        b=X9pA2y3PpjRFVtWvdxlLTFWzq1akiLkzXNHE/JUgbxylGpnE2ddgzhqMt/bz0qejMc
+         SaGG3HaxnoHhEawjEii/khhsIPifioCV44MNRGA/zZtbULSisrQILHYjSElrKYAYLNRu
+         CxXzBYpdek8lvgJTgwyLcGXh8fvvK6bRmiVQiNVTTo4IzQIjyF7vTphCdUvlBB3GW2UB
+         s/dMuuv/nSnGGN4//t16XlqNwxHs4BNHDO0REYsCadDdbpBl8fFyh1+uZKqnW7/HINVe
+         Df/A/r1TLXrmmBH6OXDWAk7qrSaaBpT6nTfqvs/vBWY4YhYxiBo+CJKrebdpME2IuyEu
+         1+Sg==
+X-Forwarded-Encrypted: i=1; AJvYcCUMgEK8TPQi8ryMQtFlH2r+DUc91iZS+xjtF+JsS0ec+TKPmlxgKHmWAEoZ8LSB+UEHGaGtw0Rwwjh45jvd7Q==@vger.kernel.org, AJvYcCVf30DcDJzvnbHoPHR8ahS88A7Hai3X0LyH0rxfd34yRuv8mlvTYvYcdqEZxkHCLRQPSaBnVOD3wIgd@vger.kernel.org, AJvYcCWnWqVMFXEFX2lIC+EBrO/AcPLbhXJfFPcRIjbFkasAXMvRyn+eVd6Hba/WOLQ24XawbbDdm/4r+iPOxQ==@vger.kernel.org, AJvYcCXnrN2C0sb9fWdWwG7RMA48/HIfx6pEd6dRevH2/JvjPwm+9XZ8FJ7ulFmrhmAMMRYWOgpsSmXYtQcP@vger.kernel.org
+X-Gm-Message-State: AOJu0YxkPOnSY/g0s8YWpD9UtSGDNnLTW+M+dnd9k/YWY+RT85aoo+ct
+	xJc0xCrOY+/G7UJRs9qdQQ/vZizzBhYyQZaQohjddKFsFin3SLgkU+SK/HTEtq1PjCQGgThyDvk
+	m2Nhi9H0Vxw5QtjAEOguglZnkAQnbvdZbddgag2s=
+X-Gm-Gg: ASbGnctLGvRve1EgG6oW0aV6Fthb0ksQWghJO8P6dkmu8WjvV7EGuoavycfNXjNx/Bj
+	+0pO2ECOm07Kc7+fvb5KIJtFLnf2HvYbzQ8dwnhGYo3WftXKpyeBkYU5dWH9NxCfcfQD3RtMrjp
+	yiyqKL8pyB/TSLAt+J32pOl5IKRsV0uJtF4hGS8dSa/qwep7YQxaT4EGaNQfBHVG3tDbnoRb2JR
+	A+G6n22yACcV7v/A2Mv9YQ=
+X-Google-Smtp-Source: AGHT+IE6h/blzNtkiS7tRQSAW4vjy70N2RtjiCed7Thx/n7bpwfptLXKBBHGKN92aIlVAliSIdhlvRW+askAAL9wkJo=
+X-Received: by 2002:ac8:5dd1:0:b0:4b5:f421:14dd with SMTP id
+ d75a77b69052e-4b5f836b29cmr131506101cf.7.1757431478686; Tue, 09 Sep 2025
+ 08:24:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANn89iJiBuJ=sHbfKjR-bJe6p12UrJ_DkOgysmAQuwCbNEy8BA@mail.gmail.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+References: <20250908185122.3199171-1-joannelkoong@gmail.com>
+ <20250908185122.3199171-12-joannelkoong@gmail.com> <aL9xb5Jw8tvIRMcQ@debian>
+In-Reply-To: <aL9xb5Jw8tvIRMcQ@debian>
+From: Joanne Koong <joannelkoong@gmail.com>
+Date: Tue, 9 Sep 2025 11:24:25 -0400
+X-Gm-Features: Ac12FXyx8pmrJDFeGMYZs3RCR1CTlhpwdwdT0peJF0IyLF-S26qPwC0nNO2DnTs
+Message-ID: <CAJnrk1YPpNs811dwWo+ts1xwFi-57OgWvSO4_8WLL_3fJgzrFw@mail.gmail.com>
+Subject: Re: [PATCH v2 11/16] iomap: add caller-provided callbacks for read
+ and readahead
+To: Joanne Koong <joannelkoong@gmail.com>, djwong@kernel.org, hch@infradead.org, 
+	brauner@kernel.org, miklos@szeredi.hu, hsiangkao@linux.alibaba.com, 
+	linux-block@vger.kernel.org, gfs2@lists.linux.dev, 
+	linux-fsdevel@vger.kernel.org, kernel-team@meta.com, 
+	linux-xfs@vger.kernel.org, linux-doc@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Sep 09, 2025 at 07:47:09AM -0700, Eric Dumazet wrote:
-> On Tue, Sep 9, 2025 at 7:37 AM Jens Axboe <axboe@kernel.dk> wrote:
+On Mon, Sep 8, 2025 at 8:14=E2=80=AFPM Gao Xiang <xiang@kernel.org> wrote:
+>
+> Hi Joanne,
+>
+> On Mon, Sep 08, 2025 at 11:51:17AM -0700, Joanne Koong wrote:
+> > Add caller-provided callbacks for read and readahead so that it can be
+> > used generically, especially by filesystems that are not block-based.
 > >
-> > On 9/9/25 8:35 AM, Eric Dumazet wrote:
-> > > On Tue, Sep 9, 2025 at 7:04 AM Eric Dumazet <edumazet@google.com> wrote:
-> > >>
-> > >> On Tue, Sep 9, 2025 at 6:32 AM Richard W.M. Jones <rjones@redhat.com> wrote:
-> > >>>
-> > >>> On Tue, Sep 09, 2025 at 01:22:43PM +0000, Eric Dumazet wrote:
-> > >>>> Recently, syzbot started to abuse NBD with all kinds of sockets.
-> > >>>>
-> > >>>> Commit cf1b2326b734 ("nbd: verify socket is supported during setup")
-> > >>>> made sure the socket supported a shutdown() method.
-> > >>>>
-> > >>>> Explicitely accept TCP and UNIX stream sockets.
-> > >>>
-> > >>> I'm not clear what the actual problem is, but I will say that libnbd &
-> > >>> nbdkit (which are another NBD client & server, interoperable with the
-> > >>> kernel) we support and use NBD over vsock[1].  And we could support
-> > >>> NBD over pretty much any stream socket (Infiniband?) [2].
-> > >>>
-> > >>> [1] https://libguestfs.org/nbd_aio_connect_vsock.3.html
-> > >>>     https://libguestfs.org/nbdkit-service.1.html#AF_VSOCK
-> > >>> [2] https://libguestfs.org/nbd_connect_socket.3.html
-> > >>>
-> > >>> TCP and Unix domain sockets are by far the most widely used, but I
-> > >>> don't think it's fair to exclude other socket types.
-> > >>
-> > >> If we have known and supported socket types, please send a patch to add them.
-> > >>
-> > >> I asked the question last week and got nothing about vsock or other types.
-> > >>
-> > >> https://lore.kernel.org/netdev/CANn89iLNFHBMTF2Pb6hHERYpuih9eQZb6A12+ndzBcQs_kZoBA@mail.gmail.com/
-> > >>
-> > >> For sure, we do not want datagram sockets, RAW, netlink, and many others.
-> > >
-> > > BTW vsock will probably fire lockdep warnings, I see GFP_KERNEL
-> > > being used in net/vmw_vsock/virtio_transport.c
-
-CC-ing Stefan & Stefano.  Myself, I'm only using libnbd
-(ie. userspace) over vsock, not the kernel client.
-
-> > > So you will have to fix this.
+> > In particular, this:
+> > * Modifies the read and readahead interface to take in a
+> >   struct iomap_read_folio_ctx that is publicly defined as:
 > >
-> > Rather than play whack-a-mole with this, would it make sense to mark as
-> > socket as "writeback/reclaim" safe and base the nbd decision on that rather
-> > than attempt to maintain some allow/deny list of sockets?
-> 
-> Even if a socket type was writeback/reclaim safe, probably NBD would not support
-> arbitrary socket type, like netlink, af_packet, or af_netrom.
-> 
-> An allow list seems safer to me, with commits with a clear owner.
-> 
-> If future syzbot reports are triggered, the bisection will point to
-> these commits.
+> >   struct iomap_read_folio_ctx {
+> >       const struct iomap_read_ops *ops;
+> >       struct folio *cur_folio;
+> >       struct readahead_control *rac;
+> >       void *private;
+> >   };
+> >
+> >   where struct iomap_read_ops is defined as:
+> >
+> >   struct iomap_read_ops {
+> >       int (*read_folio_range)(const struct iomap_iter *iter,
+> >                              struct iomap_read_folio_ctx *ctx,
+> >                              loff_t pos, size_t len);
+> >       int (*read_submit)(struct iomap_read_folio_ctx *ctx);
+> >   };
+> >
+>
+> No, I don't think `struct iomap_read_folio_ctx` has another
+> `.private` makes any sense, because:
+>
+>  - `struct iomap_iter *iter` already has `.private` and I think
+>    it's mainly used for per-request usage; and your new
+>    `.read_folio_range` already passes
+>     `const struct iomap_iter *iter` which has `.private`
+>    I don't think some read-specific `.private` is useful in any
+>    case, also below.
+>
+>  - `struct iomap_read_folio_ctx` cannot be accessed by previous
+>    .iomap_{begin,end} helpers, which means `struct iomap_read_ops`
+>    is only useful for FUSE read iter/submit logic.
+>
+> Also after my change, the prototype will be:
+>
+> int iomap_read_folio(const struct iomap_ops *ops,
+>                      struct iomap_read_folio_ctx *ctx, void *private2);
+> void iomap_readahead(const struct iomap_ops *ops,
+>                      struct iomap_read_folio_ctx *ctx, void *private2);
+>
+> Is it pretty weird due to `.iomap_{begin,end}` in principle can
+> only use `struct iomap_iter *` but have no way to access
+> ` struct iomap_read_folio_ctx` to get more enough content for
+> read requests.
 
-From the outside it seems really odd to hard code a list of "good"
-socket types into each kernel client that can open a socket.  Normally
-if you wanted to restrict socket types wouldn't you do that through
-something more flexible like nftables?
+Hi Gao,
 
-Rich.
+imo I don't think it makes sense to, if I'm understanding what you're
+proposing correctly, have one shared data pointer between iomap
+read/readahead and the iomap_{begin,end} helpers because
 
--- 
-Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
-Read my programming and virtualization blog: http://rwmj.wordpress.com
-virt-p2v converts physical machines to virtual machines.  Boot with a
-live CD or over the network (PXE) and turn machines into KVM guests.
-http://libguestfs.org/virt-v2v
+a) I don't think it's guaranteed that the data needed by
+read/readahead and iomap_{begin,end} is the same.  I guess we could
+combine the data each needs altogether into one struct, but it seems
+simpler and cleaner to me to just have the two be separate.
 
+b) I'm not sure about the erofs use case, but at least for what I'm
+seeing for fuse and the block-based filesystems currently using iomap,
+the data needed by iomap read/readahead (eg bios, the fuse
+fuse_fill_read_data) is irrelevant for iomap_{begin/end} and it seems
+unclean to expose that extraneous info. (btw I don't think it's true
+that iomap_iter is mainly used for per-request usage - for readahead
+for example, iomap_{begin,end} is called before and after we service
+the entire readahead, not called per request, whereas
+.read_folio_range() is called per request).
+
+c) imo iomap_{begin,end} is meant to be a more generic interface and I
+don't think it makes sense to tie read-specific data to it. For
+example, some filesystems (eg gfs2) use the same iomap_ops across
+different file operations (eg buffered writes, direct io, reads, bmap,
+etc).
+
+
+Thanks,
+Joanne
+
+>
+> Thanks,
+> Gao Xiang
