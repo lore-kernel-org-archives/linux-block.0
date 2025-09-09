@@ -1,99 +1,133 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f173.google.com (mail-il1-f173.google.com [209.85.166.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB13E2D249E
-	for <linux-block@vger.kernel.org>; Tue,  9 Sep 2025 14:37:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD2B134F47E
+	for <linux-block@vger.kernel.org>; Tue,  9 Sep 2025 14:37:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757428640; cv=none; b=g5sIta5g6rrB46X/wpFkndTcK281Upuxiy3k7kVolUuQ4yr2XMBkjYf8/EvQPZz1QSYlqZfSGDzzGJeqosFqbkf2vNrZlrod7AhFB1OweXp07CL2l2TZ1hqtrUHG1/l8NK4TbN3TjD/W2TSFxY5U93+QAkp7pIXMxR+mDBOE89Q=
+	t=1757428652; cv=none; b=UkqxSzGdZDVvX+bO/jlemnKJmRRYBGKGLClARfYruKXHvknd6yYBPjxrK496G1bJ4nE+C5WIST1TFqFHQaAQp81YNqODnyFgN7Stg67LRXj81SVOJ1SChVvZKs3n1ujlkNK8W/uBQXDUp3rMB1xm8kSWtbtzChPCFQItjRvV1TY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757428640; c=relaxed/simple;
-	bh=qji7ndBGGf1F0cddUdpok5dBFQOGDW0OUwxCJi94E2s=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=tFIOswR1ZfL5vx/NRm7ZE6+qs5nEd53FvdR1/rBbFEcmMG8smsm7rAOyZwTMU1LCHSsw2c5ILenBOE6xNxaUGlBkdCXkvhX/Ql5QjLUiFRq5OLMJaLs1O2SzJsUIFT0b7kNX6YnRF4kG1GmnQTtISUnYQ+yAV8mFjtCYzI0fceQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eR9ss5Cy; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1757428652; c=relaxed/simple;
+	bh=FLvfa7fq92v+sqqn62k81V/o5eNgNqP5wcAxdiLtk/8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YD3WYson8pSiUyeee80X4lqVbX5pHVKOswcVvc4yq3rnzRTkH29kWXjzV0diXRbDA9AXXZi6nhABcIjcY11HYvqEa9pZ0HUncwvmXNOTvzv0Nw7hsMll29s/3NLl3F12arFzEgKVvM7RnF2Nx5d/iDgYaEXxAFCOEQGVNg1MHGQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=uMSbsfVL; arc=none smtp.client-ip=209.85.166.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eR9ss5Cy"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1757428637;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=OgPu/DKnX2K31+MoLiSGUSH5PiwbvH1FPLjG+9pe2/Q=;
-	b=eR9ss5CyxG/nYtEQ1W/tG04wr8Ix1TSq5uEE6NKb06RFHhSF/nPcDVP5l87PbXdJlunuDY
-	Xt74t16RXyDEW3AKjdbzbz3XRrek6fVVGW63HYwUXOJBkn6IZwmD9roJAHaNziXO20zoaP
-	r4dzvj/wAsX97NWxaofNAHDVybk+m8A=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-204-g66fT2hGNAGRUk42xgT7SQ-1; Tue,
- 09 Sep 2025 10:37:16 -0400
-X-MC-Unique: g66fT2hGNAGRUk42xgT7SQ-1
-X-Mimecast-MFC-AGG-ID: g66fT2hGNAGRUk42xgT7SQ_1757428635
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 180E61955F3D;
-	Tue,  9 Sep 2025 14:37:15 +0000 (UTC)
-Received: from [10.44.32.12] (unknown [10.44.32.12])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9AF4E18003FC;
-	Tue,  9 Sep 2025 14:37:13 +0000 (UTC)
-Date: Tue, 9 Sep 2025 16:37:09 +0200 (CEST)
-From: Mikulas Patocka <mpatocka@redhat.com>
-To: Robert Beckett <bob.beckett@collabora.com>
-cc: dm-devel <dm-devel@lists.linux.dev>, 
-    linux-block <linux-block@vger.kernel.org>, kernel <kernel@collabora.com>
-Subject: Re: deadlock when swapping to encrypted swapfile
-In-Reply-To: <1992a9545eb.1ec14bf0659281.6434647558731823661@collabora.com>
-Message-ID: <2d517844-b7bf-3930-e811-e073ec347d4a@redhat.com>
-References: <1992a9545eb.1ec14bf0659281.6434647558731823661@collabora.com>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="uMSbsfVL"
+Received: by mail-il1-f173.google.com with SMTP id e9e14a558f8ab-40b035b23c6so9585055ab.2
+        for <linux-block@vger.kernel.org>; Tue, 09 Sep 2025 07:37:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1757428649; x=1758033449; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=GJnzswevlDUuq/OfoxD0pVudGLoTsCpDMKvJC+rT6Cg=;
+        b=uMSbsfVLIICn9znjJfaJzX0EzI9htlDDlvRX+uXbaSpQjgcfX1TG4lJgO4PLITIrpo
+         pMLon5sn5DYWkRWHWLkJhskWwKSGklfeQOuQAP++62MRXfUpPjkNWZVEy5qNLDcJfZZh
+         R7oNxauWVw+rlIDhJu7vGa+oITK9XoWuiYLCRDcfQOegAYvy2z3c3WNk20L6wqoT/ofg
+         yuLMogVaeSnK8F1ValpoPBDhno2wnwAJA1VfIsznZhO7gjZQ4US6EjhiiGeLvXSsXxtN
+         Wxim49H8gM81f3Fte3cFNFbNXhTYdLwh+2aMrDIz1uCuaiTVp15oPqxaCeoRF/fJS66R
+         d8Ng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757428649; x=1758033449;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=GJnzswevlDUuq/OfoxD0pVudGLoTsCpDMKvJC+rT6Cg=;
+        b=wJj3nQoORNaEqyTjUPUxppJr2yTbkrHNb+OsnVZvbsFz1SExX7kzzWgAuePF6YyMHq
+         kOnKkcNYP7KY3LZkm1la5l/w4NDQUv1hKfSBbcPjtpDtqAn2RVtXOjV484xphT+Q42f1
+         EtUybzOTWdV0PmzZ8eTpae5evh57axOTCdp//O43cV6t3kFTA8u6JfWMqMKRDA5yJbCT
+         YOwYbCqfwz4bGOs031g5z7mpCPGTcB8VG/gNkdKJHGM7dOd+NTCohOx4bE0Qzk5izsLJ
+         qOKiCa1ccE51nqEd7/+WwTH5imuFCJVjhCHtwRaRnicGlyWA6qZ2bwY9YA2OPgIz8tan
+         rE2Q==
+X-Forwarded-Encrypted: i=1; AJvYcCV+Yx/0iNf5Ya18zhGI9J87k7k6OrazUrGzCI6vE3UvpoAYxiNwguJ99W0ca+GjhCEy7I9yN9Jm9n4Qig==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwRHUYhcaksF69K3pr6KHNC3uXV2v8pkodZu2yWRmTlEJUY6C6X
+	EsERLwOoYN3zgAKaIlX/rnzKzTvYhVlvIZz68XnDCejNWpVYqcVNJ+NVJgcP7LbZBkE=
+X-Gm-Gg: ASbGncvdpxA2DHeayS6nMWhZKNN98ykM9pOIy9mYJ0QJeJ1lbi8zmjbTQ6R/2kU4moZ
+	vcjlIpAGIXxceKT1wXWC1Rt9ygqqwdqU2Xd8Qr0KJy2RnsoMeMksH2K8fuXypvfQeBc+vcpCjKj
+	aOA38U7d6/yk7TZ7HAcP6JuXYd5x4wwhFH53CTQohnOxY+gv1YoqAGVLy3Ue5YE2mXNR6Umkmgb
+	5cCBGinueIoFvzoiA4ZeCon5G+loKwHYKCD8wH84CBXMl5hp7Gb8bzT6/NLsbbkRbUm0r5okqoT
+	iN1zkJqolRSGe4HqHmWNNMQJtILeLMsCmK2CDTLYOwGEYbweuufa5CaeBi/4GS+Vc/5TL7r4zHS
+	aD6W6R/bWnnRyUP20P5QHKJrXEgJSYw==
+X-Google-Smtp-Source: AGHT+IFFRSb/tnom+YwXf9uhxtCm5e69yWnLr+MwUSsv+r9w/hXHhYam53Z1HpV1oSqQ0qe9EVHAew==
+X-Received: by 2002:a05:6e02:1a63:b0:414:cb8e:a801 with SMTP id e9e14a558f8ab-414cb8ebdffmr10529905ab.29.1757428648340;
+        Tue, 09 Sep 2025 07:37:28 -0700 (PDT)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-50ece96399csm9130641173.20.2025.09.09.07.37.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 09 Sep 2025 07:37:27 -0700 (PDT)
+Message-ID: <63c99735-80ba-421f-8ad4-0c0ec8ebc3ea@kernel.dk>
+Date: Tue, 9 Sep 2025 08:37:27 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] nbd: restrict sockets to TCP and UDP
+To: Eric Dumazet <edumazet@google.com>, "Richard W.M. Jones"
+ <rjones@redhat.com>
+Cc: Josef Bacik <josef@toxicpanda.com>,
+ linux-kernel <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org,
+ Eric Dumazet <eric.dumazet@gmail.com>,
+ syzbot+e1cd6bd8493060bd701d@syzkaller.appspotmail.com,
+ Mike Christie <mchristi@redhat.com>, Yu Kuai <yukuai1@huaweicloud.com>,
+ linux-block@vger.kernel.org, nbd@other.debian.org
+References: <20250909132243.1327024-1-edumazet@google.com>
+ <20250909132936.GA1460@redhat.com>
+ <CANn89iLyxMYTw6fPzUeVcwLh=4=iPjHZOAjg5BVKeA7Tq06wPg@mail.gmail.com>
+ <CANn89iKdKMZLT+ArMbFAc8=X+Pp2XaVH7H88zSjAZw=_MvbWLQ@mail.gmail.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <CANn89iKdKMZLT+ArMbFAc8=X+Pp2XaVH7H88zSjAZw=_MvbWLQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-
-
-On Mon, 8 Sep 2025, Robert Beckett wrote:
-
-> Hi,
+On 9/9/25 8:35 AM, Eric Dumazet wrote:
+> On Tue, Sep 9, 2025 at 7:04 AM Eric Dumazet <edumazet@google.com> wrote:
+>>
+>> On Tue, Sep 9, 2025 at 6:32 AM Richard W.M. Jones <rjones@redhat.com> wrote:
+>>>
+>>> On Tue, Sep 09, 2025 at 01:22:43PM +0000, Eric Dumazet wrote:
+>>>> Recently, syzbot started to abuse NBD with all kinds of sockets.
+>>>>
+>>>> Commit cf1b2326b734 ("nbd: verify socket is supported during setup")
+>>>> made sure the socket supported a shutdown() method.
+>>>>
+>>>> Explicitely accept TCP and UNIX stream sockets.
+>>>
+>>> I'm not clear what the actual problem is, but I will say that libnbd &
+>>> nbdkit (which are another NBD client & server, interoperable with the
+>>> kernel) we support and use NBD over vsock[1].  And we could support
+>>> NBD over pretty much any stream socket (Infiniband?) [2].
+>>>
+>>> [1] https://libguestfs.org/nbd_aio_connect_vsock.3.html
+>>>     https://libguestfs.org/nbdkit-service.1.html#AF_VSOCK
+>>> [2] https://libguestfs.org/nbd_connect_socket.3.html
+>>>
+>>> TCP and Unix domain sockets are by far the most widely used, but I
+>>> don't think it's fair to exclude other socket types.
+>>
+>> If we have known and supported socket types, please send a patch to add them.
+>>
+>> I asked the question last week and got nothing about vsock or other types.
+>>
+>> https://lore.kernel.org/netdev/CANn89iLNFHBMTF2Pb6hHERYpuih9eQZb6A12+ndzBcQs_kZoBA@mail.gmail.com/
+>>
+>> For sure, we do not want datagram sockets, RAW, netlink, and many others.
 > 
-> While testing resiliency of encrypted swap using dmcrypt we encounter easily reproducible deadlocks.
-> The setup is a simple 1GB encrypted swap file [1] with a little mem chewer program [2] to consume all ram.
+> BTW vsock will probably fire lockdep warnings, I see GFP_KERNEL being used
+> in net/vmw_vsock/virtio_transport.c
 > 
-> [1] Swap file setup
-> ```
-> $ swapoff /home/swapfile
-> $ echo 'swap /home/swapfile /dev/urandom swap,cipher=aes-cbc-essiv:sha256,size=256' >> /etc/crypttab
-> $ systemctl daemon-reload
-> $ systemctl start systemd-cryptsetup@swap.service
-> $ swapon /dev/mapper/swap
-> ```
+> So you will have to fix this.
 
-I have tried to swap on encrypted block device and it worked for me.
+Rather than play whack-a-mole with this, would it make sense to mark as
+socket as "writeback/reclaim" safe and base the nbd decision on that rather
+than attempt to maintain some allow/deny list of sockets?
 
-I've just realized that you are swapping to a file with the loopback 
-driver on the top of it and with the dm-crypt device on the top of the 
-loopback device.
-
-This can't work in principle - the problem is that the filesystem needs to 
-allocate memory when you write to it, so it deadlocks when the machine 
-runs out of memory and needs to write back some pages. There is no easy 
-fix - fixing this would require major rewrite of the VFS layer.
-
-When you swap to a file directly, the kernel bypasses the filesystem, so 
-it should work - but when you put encryption on the top of a file, there 
-is no way how to bypass the filesystem.
-
-So, I suggest to create a partition or a logical volume for swap and put 
-dm-crypt on the top of it.
-
-Mikulas
+-- 
+Jens Axboe
 
