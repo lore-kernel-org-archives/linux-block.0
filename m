@@ -1,73 +1,71 @@
-Received: from mail-il1-f176.google.com (mail-il1-f176.google.com [209.85.166.176])
+Received: from mail-io1-f52.google.com (mail-io1-f52.google.com [209.85.166.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D741C221FC7
-	for <linux-block@vger.kernel.org>; Tue,  9 Sep 2025 16:35:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 523EA221FC7
+	for <linux-block@vger.kernel.org>; Tue,  9 Sep 2025 16:35:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757435754; cv=none; b=oYIHTcp5edWAzCInD/OwQ0piZ25FNWw7jDASM4nLaizy8Wp6P4EetAe97t1+5+fqVVX2Uj3RewTspAjnp3Qbn76NJDgo+va9GSAxDF/qsLA9rS5PUnBsrAhf1wLfFeG8bGCJFlt+QBnkAIq1mlzgdOKcU3cnsIL0hz0BQJENIHo=
+	t=1757435756; cv=none; b=CE1WFb011RLz/SM070STGPYBqP4PnGLqN9xlUzY+HspLJW+t4u36q3fhbP8QtSwA64fuBPcqgB5YEdxORsAGCdG/x3SESQenTKqbv6/b2JiR5SrHi7xK3FC2Yr5rTSn7czlwU5JILm61aD8+iNW6VUQnGECD6ebWvSIpLEzmLSs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757435754; c=relaxed/simple;
-	bh=cHOsjKxRXBKer0OgLaCcNyfxWLmesZOboqa1m5/d9NY=;
+	s=arc-20240116; t=1757435756; c=relaxed/simple;
+	bh=e8WFp1zpZun1HsYZIO7PfQYNNlbDwCYr2GnvTqk6riY=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=f5p3tWdmy6gPOrvUrjcbW/S5qsK2aVTq7szAAj4hDGjYY+aRr0VOYJ3s1CH4l/I+D0Xt4X+tUBDWfiwCt5t5ppOZKUf3eeVyrgWxasvea06GU5adJiNFe4MohWBoDonBGXBYR3TOYqgbvd/6XgrXk0pDFl3UCOLxwI0fI1xSTtE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=G5xyJlHj; arc=none smtp.client-ip=209.85.166.176
+	 MIME-Version:Content-Type; b=DKE6Tn8OV2yxzEHvpmX9lk3sJpTsN9JcFNOuUjWRLPOdjJ8QT9kGJtwKSZxpknTLxWNJlYBTJI767AAz31Ev3ByaWDWrnwR+ebXkgoOI0SlKHivOQyef1J1L2/QbKS7G4n/n60mVqCdFqLvOjt7YSGuE+V7XYklQHVUHQLMDGnw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=n50zlsnl; arc=none smtp.client-ip=209.85.166.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="G5xyJlHj"
-Received: by mail-il1-f176.google.com with SMTP id e9e14a558f8ab-3f663c571ffso60177905ab.1
-        for <linux-block@vger.kernel.org>; Tue, 09 Sep 2025 09:35:52 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="n50zlsnl"
+Received: by mail-io1-f52.google.com with SMTP id ca18e2360f4ac-88762f20125so458217839f.0
+        for <linux-block@vger.kernel.org>; Tue, 09 Sep 2025 09:35:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1757435752; x=1758040552; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1757435753; x=1758040553; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=azaY819Deh5pUbCRAwMj+JkZb7rn9xmL1tkkd8jfW24=;
-        b=G5xyJlHj79VrS4SLXhfYWQh50hdoIegqj82k0ttSb97yUHDpkWu3pNDywV5mikxxyk
-         c2Suh6tNiDgPQeTO3MqJ73WOrnM+llqEw3rwwiW2LUkJ8VslIDfn1XC5Q+55oeZpIDIz
-         4dM1m3mr9UVhPiIaTko+hM4ERP/HpaIFiaPMVfauTPv80trB+FvsdnOh9rMCfO2jkZgi
-         aPBKnvud1jMKhX3yJVm0B9hBtJ5pWTup8tyjYkYGsvmRxgQ1XfWQAxfLdxfQwQjvREKZ
-         +AHwKGWFnzrWprUcb+/PxZKRYVe5nX7ftoT9Z0m6TBhieJdPDaGt2VNLM54+9sTLLEyf
-         bWTQ==
+        bh=EAq7BOyP0B72ZyrsylWLSagzgiFC6B6Gb5G0213Wrro=;
+        b=n50zlsnl0GtZDFpxfz0GOSsoSAo3/VL6fH2CDLbUBi27ZoOMkTrh+EHmQkphhG/r/c
+         PLuv5dc1x3c3tVFeWw6l6ZZ4DJuBGdZdncK9DriY5mvKsJyIEerqGB3Xt9YXqfx5h3Yt
+         qx+AUN7E8G1I2x7G/UDGNT+ms5iPmnDhhR4JNhsgML1EMTdBw+C8RQCxeMC3jCNIK7Yz
+         PXUv6R311NjYa0dA2AC787n3Qpqlco2eEKQWlYn+RMeyo96EOOQGc34Hf/zB8bogmsVr
+         7SwS8iXVZW4LC8LchvlQtzyHeR3o5xIN4F6oAuzVDHZdich90R1PKiE9/oyvdtmDTL3I
+         RIHg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757435752; x=1758040552;
+        d=1e100.net; s=20230601; t=1757435753; x=1758040553;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=azaY819Deh5pUbCRAwMj+JkZb7rn9xmL1tkkd8jfW24=;
-        b=F4RuD45NMxYB/XQdXsit43KbUcKMef47ctJfERNOC978vmwmnYIp/YttLZVmm339hl
-         s0CrFz9wQPiaXf4ll/wKUqxSHTdzM2B3vAGG1FDhDfbnjtDKA+bzqjwSFI16vYChuPEH
-         N7xQJCKcrysN2AyLwCcij8JlO0BDA4ceu2I0rv517RN8wIZEEnETWcOjx99kT25MI57r
-         ibgA6pP7aLeWs1LOdwhgG3/+1whNQedeHhiXOpBcueMGomDBjIGcTIiPPjVEwXxklsbe
-         wCMkJHRcXS8nyGvd0nkUiOAbFcXXK78Ax2V6RjirXfGvCQLDdBJUPTROXvbu8zsucsSp
-         p/YA==
-X-Gm-Message-State: AOJu0Yy6FmCScSTJCmV9onoYyibrVqGioZ3RPhpAw+m3DYgQ/zghpAen
-	3QOigBJbxgZgwWmNFbJ9b7oyiCXUvquUYfELC7iL2t1gT+GuTNjyL+POQ7Q40kz+xp24AfeORsz
-	jAcCC
-X-Gm-Gg: ASbGnctGnM+wv/Y0MNvinhi9j+NI+d2vhBs16oTbck/59jd2hEMeFoqBUkR2ttG5FK1
-	Ha2wbNE/V3KjOA9rbfw9weayl+Df/MFry5jlt8oP5VKEzW5T9jGMF/fp8TpLO4MNqOF85r9VVXM
-	/JPOhhDk47SuTORe/biTxMxOyXAOZZguj7cPsvIl7FyGW1YTI6YdpJdY7eZDTGjaUMAjFnOo2ri
-	2x7daR9pvpEBeEwhltiCJwJQUUspZ2S5vBmnFD3rQRNIouHI5VUO35sbfZgJGTrFIueiyJSBXpD
-	Pt+jownkKWi/RAM8gCOqXcNocZ0xM4ngbxASo3qBQ6T/l2U7gaLBAIqA9n9/GAy15B3OK37n05U
-	uzjT/g7CIoJfSUQ==
-X-Google-Smtp-Source: AGHT+IG1zg6oATQHP0eeaq/wYWBcuVXnvSltFI3aE5ecyguQfrwrGPn0865GKjPXMogjDW+mtYZcsA==
-X-Received: by 2002:a05:6e02:17cc:b0:405:b792:32dd with SMTP id e9e14a558f8ab-405b79233b5mr107028745ab.16.1757435751532;
-        Tue, 09 Sep 2025 09:35:51 -0700 (PDT)
+        bh=EAq7BOyP0B72ZyrsylWLSagzgiFC6B6Gb5G0213Wrro=;
+        b=UBnJbr19rqM6cwBodosoyslSNby+De56VOrxGdH8l+Yfloyb4cL1ubxuMYyI7DOEvW
+         FT4QiKF1pnTkOL+DgxxiKEJ8dufjxmgCdNpEUGXR6JCiCBdt5VbqBx7nXnZO+yQA+Vdn
+         GAcgg+880iLllCkfdEclHr52n41TvMWj5k2S1NdUuIQWKrUXom1iOlKPncF/eyDj7Gi4
+         MlD8vUQu38a7YciWBAF3jZMRymRg8Sx6WxuCWZvUSDDBTLmxzxCOKdplTWLNX+4laTv0
+         tF3ttzxPAkHkOFYvJf8B2E+1mMqq2zuk1GgKE6OiHXCU8pfpk5aw1lnW58tYVQW4a072
+         LDGw==
+X-Gm-Message-State: AOJu0YyscFdJNChiIy/bnJ3NQm8lbb1F28srsEKxkxv0h1P/SJOPFtQT
+	zlEL5eyUzm/wADaSX2oFbNpKE7SMsrMwmaDlsAsSZZYi2mwrRplBf5IkzZfA8lWXN/Ek1gTOqUM
+	qXdIJ
+X-Gm-Gg: ASbGncuwTqkc+eBg5BohvpFUlSoveu4x+6Uql5GuXGzh98ShLfoikvQUDIHvuYWojaP
+	nEqWx58h+kOcsmXapbOrt28hFQIt6TkGorLU8q5/3UCY+t55Fs76Ob11zkjH+9tXApXUFnY9B6A
+	7KzDsA3UkVmXvoOCiSSw+AbfYuq5Y4jQ3jk7vyM/kZpWfkGHfh8XD6nwrSIagItSZ+nvaftLZP0
+	70g61t/LEvl9VEYIpzHzhX9Kkug119w4Dc5qfAgL3kmPArDhgCwjKviHORqk8xdOMbjDPx0DZIV
+	+hJMIMYRvnkiUDTrShETQV2SdTnMcqMmdommZqppxtybviO/oGZ1qjixGHiVwHIUS+YxRnjYmgb
+	tI12cVXUFNLzWig==
+X-Google-Smtp-Source: AGHT+IE4StV8pHw158LA69+GRldNKkauD57gep0bmq97NRh7X24SVIdYQpdkULoXIuu/kSDyy40+SQ==
+X-Received: by 2002:a92:c24c:0:b0:3e3:f9db:c0f2 with SMTP id e9e14a558f8ab-3fd8e98d19amr216327265ab.10.1757435752165;
+        Tue, 09 Sep 2025 09:35:52 -0700 (PDT)
 Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-50d8f31cc4esm9921243173.50.2025.09.09.09.35.50
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-50d8f31cc4esm9921243173.50.2025.09.09.09.35.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Tue, 09 Sep 2025 09:35:51 -0700 (PDT)
 From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, 
- Keith Busch <kbusch@meta.com>
-Cc: hch@lst.de, martin.petersen@oracle.com, leon@kernel.org, 
- Keith Busch <kbusch@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>
-In-Reply-To: <20250903193317.3185435-1-kbusch@meta.com>
-References: <20250903193317.3185435-1-kbusch@meta.com>
-Subject: Re: [PATCHv3 0/2] blk-mq-dma: p2p cleanups and integrity fixup
-Message-Id: <175743575084.122061.9156524850167958252.b4-ty@kernel.dk>
-Date: Tue, 09 Sep 2025 10:35:50 -0600
+To: linux-block@vger.kernel.org, Keith Busch <kbusch@meta.com>
+Cc: hch@lst.de, leon@kernel.org, Keith Busch <kbusch@kernel.org>
+In-Reply-To: <20250903202746.3629381-1-kbusch@meta.com>
+References: <20250903202746.3629381-1-kbusch@meta.com>
+Subject: Re: [PATCH] blk-map: provide the bdev to bio if one exists
+Message-Id: <175743575162.122061.6789614378331426216.b4-ty@kernel.dk>
+Date: Tue, 09 Sep 2025 10:35:51 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -79,25 +77,18 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.14.3-dev-2ce6c
 
 
-On Wed, 03 Sep 2025 12:33:15 -0700, Keith Busch wrote:
-> This series moves the p2p dma tracking from the caller to the block
-> layer, and makes it possible to actually use p2p for metadata payloads.
+On Wed, 03 Sep 2025 13:27:46 -0700, Keith Busch wrote:
+> We can now safely provide a block device when extracting user pages for
+> driver and user passthrough commands. Set the bdev so the caller doesn't
+> have to do that later. This has an additional  benefit of being able to
+> extract P2P pages in the passthrough path.
 > 
-> v2 had a mistake when CONFIG_BLK_DEV_INTEGRITY was not enabled, and this
-> update fixes that.
 > 
-> Keith Busch (2):
->   blk-integrity: enable p2p source and destination
->   blk-mq-dma: bring back p2p request flags
-> 
-> [...]
 
 Applied, thanks!
 
-[1/2] blk-integrity: enable p2p source and destination
-      commit: 05ceea5d3ec9a1b1d6858ffd4739fdb0ed1b8eaf
-[2/2] blk-mq-dma: bring back p2p request flags
-      commit: d57447ffb5fadffdba920f2fb933296fb6c5ff57
+[1/1] blk-map: provide the bdev to bio if one exists
+      commit: d0d1d522316e91f2b935a78bbf962b8e529d8c4f
 
 Best regards,
 -- 
