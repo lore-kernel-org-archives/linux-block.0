@@ -1,125 +1,118 @@
-Received: from sender4-pp-f112.zoho.com (sender4-pp-f112.zoho.com [136.143.188.112])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f49.google.com (mail-io1-f49.google.com [209.85.166.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 605A62797A7
-	for <linux-block@vger.kernel.org>; Tue,  9 Sep 2025 16:50:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.112
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757436656; cv=pass; b=EBE3cJZiCoWcyTvgNVMcEp/d68fLxlsX4VlR/rXjMsAj/0mLKHwGY85hcKSN42wZnRY3sFqMwqFuTOpSDS16yTNPnA67YRz7uy0lelvKhx/Nf9stbq5KEHyd7icxac9a16WhvPBnRvd1Q7usrX/Drg8AcmpqRSJxvFWxrHs/fX4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757436656; c=relaxed/simple;
-	bh=JBBoQ8TWsmsHOqvf2YeTeo1MD7sBN48rrpem15UnyQQ=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 MIME-Version:Content-Type; b=QjctDa0kN/qQ+1JqBUypr2VqJ/uVmXDHhlFyF3K+9Cn6DJQhEb2j3jhAfhWcrQ8nOKS88aMcNSn5XfnWU4mIPpVLpi2pBiUtgWaZKun9a85/SeRVTjqW6R5JockiHgChP371nT4GNGNojukHGDYzVxptJD7JEyzmM89r02ZHaes=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=bob.beckett@collabora.com header.b=NPtZY0ZT; arc=pass smtp.client-ip=136.143.188.112
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19E76352FEF
+	for <linux-block@vger.kernel.org>; Tue,  9 Sep 2025 16:51:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.49
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1757436686; cv=none; b=EbM2EjWrKif03kbT+e4oNqr3gm68YiudY3PhJMO4xbf7kLwgdlsf4kA15ZfyGAE9K1xKG0qPy4vm/UQrcMTLGPY7rbi8FAWZeHtDCDWmVe58o7ETkQ0J7L6GmnKUU+HcPXd386MMeWjb+GeeTkgyzG7mF3W0jgnc6DmaYJaCKvY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1757436686; c=relaxed/simple;
+	bh=i2oFNz8KDQFEYrN95Tvu60S75H7pBtoWYl4ODsySMy8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pMK0WI9BxXIYp7syi8pt6bEsClDrQVxgg/jkhXt/vqsDZQyb8j97RH2vk6zXOMrLwNlHbgJm8Yex9vMb1/mr8ESVMPWYbFhwul4lmeYszPgi0ld/2pHwGV/65lIvXQ6sndvUOePgDQz5U5WngusHKa1IyYS4si8qC1DaB549rX0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=sSZUED4c; arc=none smtp.client-ip=209.85.166.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=collabora.com header.i=bob.beckett@collabora.com header.b="NPtZY0ZT"
-ARC-Seal: i=1; a=rsa-sha256; t=1757436640; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=DFoUism+IkLw9QreGKfBd587z+dU2pfKH45vQfnR6AsOni2A+hcYqvb0eGI5YmP0lq33PHLYpyXQZmh1YJwkfxISYJUKg68yyZSh1NZCqJ1ostCEyx2l97rCm756hRVHRCOdqcpQXeb1QRDmdK+siHuOz66gmoVyk1IbP4aZ1kI=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1757436640; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=hitEiwKn4XLBjoJ1lCdJpzRdbm/tiRsfKolLG73pv3k=; 
-	b=M2KVLwJSfHfdo+Xacet1g35b8bMJt8er1wQJRxUMHzdKyeNhUI3G0go1HZlMpHHPI1VP/aFHLo60B3mEdnE+z0Gi35zjHMDFoAp204x1N/jxlMzUJJ9fLGQ9SBQmIVSw/ICLR5Y+kjb9QMeE61mZmjUU/gYJT9EwLfoR/lcvKjM=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=collabora.com;
-	spf=pass  smtp.mailfrom=bob.beckett@collabora.com;
-	dmarc=pass header.from=<bob.beckett@collabora.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1757436640;
-	s=zohomail; d=collabora.com; i=bob.beckett@collabora.com;
-	h=Date:Date:From:From:To:To:Cc:Cc:Message-ID:In-Reply-To:References:Subject:Subject:MIME-Version:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
-	bh=hitEiwKn4XLBjoJ1lCdJpzRdbm/tiRsfKolLG73pv3k=;
-	b=NPtZY0ZTs1uZMmPyQZqWH78qPNAYYP5jII/updbH0dJsvbAFUK2svy/rNcS+Rv6M
-	vRZFn/BEH/w2u6Cg4c8dmJWeD9c6aYoVkS9eyfGfj/TyYv1N6JVPZdFC0xjifazROcg
-	aK2xSuk98UdanRwzbnNTeLpJh7Wl73eAZ0Pvn5p4=
-Received: from mail.zoho.com by mx.zohomail.com
-	with SMTP id 1757436608797953.4772012543705; Tue, 9 Sep 2025 09:50:08 -0700 (PDT)
-Date: Tue, 09 Sep 2025 17:50:08 +0100
-From: Robert Beckett <bob.beckett@collabora.com>
-To: "Mikulas Patocka" <mpatocka@redhat.com>
-Cc: "dm-devel" <dm-devel@lists.linux.dev>,
-	"linux-block" <linux-block@vger.kernel.org>,
-	"kernel" <kernel@collabora.com>
-Message-ID: <1992f628105.2bf0303b1373545.4844645742991812595@collabora.com>
-In-Reply-To: <2d517844-b7bf-3930-e811-e073ec347d4a@redhat.com>
-References: <1992a9545eb.1ec14bf0659281.6434647558731823661@collabora.com> <2d517844-b7bf-3930-e811-e073ec347d4a@redhat.com>
-Subject: Re: deadlock when swapping to encrypted swapfile
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="sSZUED4c"
+Received: by mail-io1-f49.google.com with SMTP id ca18e2360f4ac-88703c873d5so135766839f.3
+        for <linux-block@vger.kernel.org>; Tue, 09 Sep 2025 09:51:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1757436682; x=1758041482; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Nl6S7tZ9WVcfsH6+luPLSSFWeiL6zAI9kTl63dXqFSY=;
+        b=sSZUED4cLQTw1GgnQiCeiroFIU44f7DwQ3znoZbMZQeMoLM+aAsoDibMzVRMc6i2si
+         3RoB+1F32y09Tb2eaL60rz6G1JlScJyhiyNtI/WvVrfUMYNW5mBep0bahBL9JebcPuNq
+         lxT4ULkNq/RsVG2Y0SDG/jWPhfLTQ5xN5iTSYgE2YeY2Xa71nBvnFhZVbQdFz+waYrXD
+         ISvQWFW60V4YxYrOAHrJamEIAS4wvKBHS6mAG47JKjM/lszA6KnU9o9ENwxxyyH8lX+o
+         DKyX4PYqFK6RAvVCKIllki4ZccGzUQEHVUm/EPAp9BmgBajuS3ObpA1GlELO1+ehlyDB
+         i3Cg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757436682; x=1758041482;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Nl6S7tZ9WVcfsH6+luPLSSFWeiL6zAI9kTl63dXqFSY=;
+        b=BSnvwIvHMPB5pVch5Uy3xIWdsFytUl4cjTvfZLQIO4xvD4o7Z2Keom69M3xYR2ZNwo
+         EyOz692UOLBAYqA7cZnFwycz0XU0ARdtCee/xZJa96B/pE7AAdgFnIrgzL6WIgSj/oMG
+         JTiTv5dmpwGpgE3K7YyrzgWfylrJOezu2TAJR8k06Ys4B0UDE3jMHblubrQx15tV+E3W
+         AvfDlEze04+1QSTEmsPM6JmBaOPmuDHUOM3wUpT948sNnt/YWXBr9TDxTTkFkkfi35E6
+         MN7Tu402jXKJqKchVSHo+9VABM+mRFv+xTvdUbVLdOK+c7s672TdRZd+hw8FGVw/b14l
+         enrw==
+X-Forwarded-Encrypted: i=1; AJvYcCVj6xGAuGUf5V/hDYZaz3HIcWWwrWdeOZ5Dxt8LJmE6mYd912UKj2mHeSONGXwCtr8SzimM5z/Rs/n+/w==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxvf/0D6vJIhInkOt84M/FjY8DkiF4oD8KIhutc5PWNHZm7jPKf
+	ZNDKCpHMFySyVXnHJ4MVWBrJAZ0sPRhdN8CKk2BjKk1XSfBdJrYL4qGv3/zoABKgpCA=
+X-Gm-Gg: ASbGncs36CswaZaE6+e36e+UWcJnE+fKXT90bpPumM2dCnKIyz3AmWKiRuNfXxNsiwi
+	AEqlmVqtIM/pFJG92QNWNuY1HOALhAoFlO1nE0nEKqqZfgmcKejxTGB41RupHl5CTt6KkNlqjX2
+	vG8RkoOG/mkVPhhFPSB97Ui/LhTNLcwhrhd45/ti7Rc3r9evksKW0OZALwTSdsPVxT+GbbnTYN8
+	rtmmvfX9xOoK7yyNaDYO/FSkxIFZQZeMvLcp9lzBjcGiVgs3TjZC3hMCssV16pKG8TtHUbru5VP
+	KxOz6YtX+ZyQ1I8Z+Ptal/A4iFET2W+HG8Iksy/CYQdQkcy2BP9uAk1DZpEjT2h12NcMo931i+M
+	pkezuWHdgu18cpQ7Bj2yZdosYGUBaQQ==
+X-Google-Smtp-Source: AGHT+IGSoSy5k+n7jRykIgwPuKALtDfhjr9F5/3YPGRKRhiuxXTLI5fAMBHOqjizj8fvtQ0R5ZhMWA==
+X-Received: by 2002:a92:ca46:0:b0:3f2:b471:e617 with SMTP id e9e14a558f8ab-3fd8778175amr175246755ab.25.1757436682088;
+        Tue, 09 Sep 2025 09:51:22 -0700 (PDT)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-50d8f0d3001sm9931691173.24.2025.09.09.09.51.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 09 Sep 2025 09:51:21 -0700 (PDT)
+Message-ID: <16a63a35-9a44-443a-8f59-e60afbfbfff3@kernel.dk>
+Date: Tue, 9 Sep 2025 10:51:18 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [GIT PULL] md-6.17-20250909
+To: Yu Kuai <hailan@yukuai.org.cn>, Yu Kuai <yukuai1@huaweicloud.com>,
+ linux-block@vger.kernel.org, inux-raid@vger.kernel.org, song@kernel.org
+Cc: linan122@huawei.com, xni@redhat.com, colyli@kernel.org,
+ yukuai3@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com,
+ johnny.chenyi@huawei.com
+References: <20250909082005.3005224-1-yukuai1@huaweicloud.com>
+ <a56b2c76-e254-48bc-86a6-8beb47ac79ff@kernel.dk>
+ <fdfcb000-916b-4599-b75c-1b4680accca7@yukuai.org.cn>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <fdfcb000-916b-4599-b75c-1b4680accca7@yukuai.org.cn>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Importance: Medium
-User-Agent: Zoho Mail
-X-Mailer: Zoho Mail
 
+On 9/9/25 10:44 AM, Yu Kuai wrote:
+> Hi,
+> 
+> ? 2025/9/9 21:26, Jens Axboe ??:
+>> On 9/9/25 2:20 AM, Yu Kuai wrote:
+>>> Hi, Jens
+>>>
+>>> Please consider pulling following changes on your for-6.18/block branch,
+>>> this pull request contains:
+>>>
+>>>   - add kconfig for internal bitmap;
+>>>   - introduce new experimental feature lockless bitmap;
+>> Can you write a bit of a better pull request letter? It'd be nice to get
+>> an actual description of what the "lockless bitmap" is, and why it makes
+>> sense to have it. This is pretty sparse...
+> 
+> Of course, details in be found in the patch 0 of the thread. I'll send a v2.
 
- ---- On Tue, 09 Sep 2025 15:37:09 +0100  Mikulas Patocka <mpatocka@redhat.com> wrote --- 
- > 
- > 
- > On Mon, 8 Sep 2025, Robert Beckett wrote:
- > 
- > > Hi,
- > > 
- > > While testing resiliency of encrypted swap using dmcrypt we encounter easily reproducible deadlocks.
- > > The setup is a simple 1GB encrypted swap file [1] with a little mem chewer program [2] to consume all ram.
- > > 
- > > [1] Swap file setup
- > > ```
- > > $ swapoff /home/swapfile
- > > $ echo 'swap /home/swapfile /dev/urandom swap,cipher=aes-cbc-essiv:sha256,size=256' >> /etc/crypttab
- > > $ systemctl daemon-reload
- > > $ systemctl start systemd-cryptsetup@swap.service
- > > $ swapon /dev/mapper/swap
- > > ```
- > 
- > I have tried to swap on encrypted block device and it worked for me.
- > 
- > I've just realized that you are swapping to a file with the loopback 
- > driver on the top of it and with the dm-crypt device on the top of the 
- > loopback device.
- > 
- > This can't work in principle - the problem is that the filesystem needs to 
- > allocate memory when you write to it, so it deadlocks when the machine 
- > runs out of memory and needs to write back some pages. There is no easy 
- > fix - fixing this would require major rewrite of the VFS layer.
- > 
- > When you swap to a file directly, the kernel bypasses the filesystem, so 
- > it should work - but when you put encryption on the top of a file, there 
- > is no way how to bypass the filesystem.
- > 
- > So, I suggest to create a partition or a logical volume for swap and put 
- > dm-crypt on the top of it.
- > 
- > Mikulas
- > 
- > 
+Please always write a decent message on why any pull request needs
+merging.
 
-Yeah, unfortunately we are currently restricted to using a swapfile due to many units already shipped with that.
-We have longer term plans to dynamically allocate the swapfiles as neded based on a new query for estimated size
-required for hibernation etc. Moving to swap partition is just not viable currently.
+>>>    https://kernel.googlesource.com/pub/scm/linux/kernel/git/mdraid/linux.git tags/md-6.18-20250909
+>>>
+>> and this is a new source for you, is the above tag signed?
+> 
+> I thought they are the same, I'll switch back in v2.
 
-I tried halving /sys/module/dm_mod/parameters/swap_bios but it didn't help, which based on your more recent
-reply is not unexpected.
+They are very much NOT the same. One is some random site, the other is
+the official kernel infrastructure. If you don't use git.kernel.org,
+I'm definitely not pulling anything that isn't signed by a key, and
+that key in turn has been signed by other people I know.
 
-I have a work around for now, which is to run a userland earlyoom daemon. That seems to get in and oomkill in time.
-I guess another option would be to have the swapfile in a luks encrypted partition, but that equally is not viable for
-steamdeck currently.
-
-However, I'm still interested in the longer term solution of fixing the kernel so that it can handle scenarios
-like this no matter how ill advised they may be. Telling users not to do something seems like a bad solution :)
-
-Do you have any ideas about the unreliable kernel oomkiller stepping in? I definitely fill ram and swap, seems like
-it should be firing.
-
-Thanks
-
-Bob
-
-
-
+-- 
+Jens Axboe
