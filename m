@@ -1,82 +1,112 @@
-Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D44BC2D7DDA
-	for <linux-block@vger.kernel.org>; Mon,  8 Sep 2025 20:10:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B24E14286;
+	Tue,  9 Sep 2025 00:14:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757362249; cv=none; b=ViYG9So/e1KMPQKeT7nwWbv0iLMSdnERm/NPZstS9/igwTpAmYIEXZCe4zQ7Y01JuUMwjxghAFFxXp6sQt4lonwZIxh0zriOFnrSsOMj46JrP+CCxkS5cnPhnML/fvkWZKdHqlXLLRlvr1ATwOL4hGKWYtjF+uf+4xB3TknPpC0=
+	t=1757376889; cv=none; b=hTRkxCQmtkmq2MMGDZ10ZbNlbDMnp36Z9gzkhOsi+l2NplCyBMO3vHDjxMCZ/j1dnq5Ud8HiKPD8OjDw5x3aEbiMKXBzuk0uAMEXAgPEaNa7D4WQtafst54FkwLL+xJ3qa1N+ndpVorySYPD1C4YsDg8FMpC5IhgxJj2UmPRgbo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757362249; c=relaxed/simple;
-	bh=GdWo5qY2s+/q2DpoLVfpe8mWXYCuezbFaAPeomuAb9A=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YvIJobG+jqhagtps+4fhMi9q63TNwnc822JdCH+9fY51FFB4r+cftEQfMGHudDW7MKCr3Xstbvq0AVQvGB9GjZTDQhgZABo15xtyyfkTmOBgjXKbFCACKsvOBciAYU6cxw8o1+lKudYjhk6/W5ATWfV2rtmYUFWKha5/QHpugDk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=XqvgMC4m; arc=none smtp.client-ip=95.215.58.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1757376889; c=relaxed/simple;
+	bh=HTsCb1oDiC0QvYoU0wK26hVLcTbGDrlmKN2iL0nK59Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LleKrGoXl1VMbO0VeOIM/tqftqTAPleQpYIr8iNA1VdUxO2Iv+WMuQUpayM9o4Dd+4vDvwChQF0POCs6nOwgEpte9QAie45FICCVcshD6ujSZM8vdPF8BmuZXiNDxavkdg1Uf4hYd0I+dnwVIh/cOYKPifNbtYGh2Cw3ZtCEeis=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mOWLOxo4; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="XqvgMC4m"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1757362244;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=ARYB/S5SqL4eD+uW75wvhyRnd19Sdd8JhvFggm3s75Q=;
-	b=XqvgMC4mKPssXCE7EmlpVlIaoMbGNzGc2Chh7TlK+hAi4I2DQhkE8qtc3TfqzMgs8R9QjE
-	8kNSAwIyA/s8mj4OfpI8P6LmDYRtQzEdbWf6V6C/EG2pdcneqw0zjMlwJlGDBGaao9WSKn
-	q3MrO7oc9diw7vVmejVz43wuBRnYw8A=
-From: Thorsten Blum <thorsten.blum@linux.dev>
-To: Denis Efremov <efremov@linux.com>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Thorsten Blum <thorsten.blum@linux.dev>,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] block: floppy: Replace kmalloc() + copy_from_user() with memdup_user()
-Date: Mon,  8 Sep 2025 22:10:20 +0200
-Message-ID: <20250908201021.439952-1-thorsten.blum@linux.dev>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mOWLOxo4"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47C20C4CEF1;
+	Tue,  9 Sep 2025 00:14:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757376889;
+	bh=HTsCb1oDiC0QvYoU0wK26hVLcTbGDrlmKN2iL0nK59Y=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=mOWLOxo4BzWDRUTrIyczukYbrDUi6BpGVpqF02LfVogMJjDzTgu3zKAIJw/24vuhl
+	 JuBmK+DeME4iDYrssJTvZytKoo3/HNJ8ZHNOWQNFo4Z9j+2pxdz0a9VuvcbhTg8BzY
+	 JNcxEgjTlcPeF0PHAmAPQlXzYOtkupbyeEHR26QhpokNikwMeN2YFrUPSha4oliOKc
+	 yWVx6heegbO8GTlN1ZOOJZ/+TmR1ELaqBVSlvNGivewbF1rguAYWAexRIVnxckpgK3
+	 CNE8r+6ygI/jfJ613WpJLiiarxIOUw/Ey+eSN1/WxFI0Y0ULHg5mP7Jov/SR0ztYhY
+	 mXdEL5L7ST2ew==
+Date: Tue, 9 Sep 2025 08:14:39 +0800
+From: Gao Xiang <xiang@kernel.org>
+To: Joanne Koong <joannelkoong@gmail.com>, djwong@kernel.org,
+	hch@infradead.org
+Cc: brauner@kernel.org, miklos@szeredi.hu, hsiangkao@linux.alibaba.com,
+	linux-block@vger.kernel.org, gfs2@lists.linux.dev,
+	linux-fsdevel@vger.kernel.org, kernel-team@meta.com,
+	linux-xfs@vger.kernel.org, linux-doc@vger.kernel.org
+Subject: Re: [PATCH v2 11/16] iomap: add caller-provided callbacks for read
+ and readahead
+Message-ID: <aL9xb5Jw8tvIRMcQ@debian>
+Mail-Followup-To: Joanne Koong <joannelkoong@gmail.com>, djwong@kernel.org,
+	hch@infradead.org, brauner@kernel.org, miklos@szeredi.hu,
+	hsiangkao@linux.alibaba.com, linux-block@vger.kernel.org,
+	gfs2@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+	kernel-team@meta.com, linux-xfs@vger.kernel.org,
+	linux-doc@vger.kernel.org
+References: <20250908185122.3199171-1-joannelkoong@gmail.com>
+ <20250908185122.3199171-12-joannelkoong@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250908185122.3199171-12-joannelkoong@gmail.com>
 
-Replace kmalloc() followed by copy_from_user() with memdup_user() to
-improve and simplify raw_cmd_copyin().
+Hi Joanne,
 
-No functional changes intended.
+On Mon, Sep 08, 2025 at 11:51:17AM -0700, Joanne Koong wrote:
+> Add caller-provided callbacks for read and readahead so that it can be
+> used generically, especially by filesystems that are not block-based.
+> 
+> In particular, this:
+> * Modifies the read and readahead interface to take in a
+>   struct iomap_read_folio_ctx that is publicly defined as:
+> 
+>   struct iomap_read_folio_ctx {
+> 	const struct iomap_read_ops *ops;
+> 	struct folio *cur_folio;
+> 	struct readahead_control *rac;
+> 	void *private;
+>   };
+> 
+>   where struct iomap_read_ops is defined as:
+> 
+>   struct iomap_read_ops {
+>       int (*read_folio_range)(const struct iomap_iter *iter,
+>                              struct iomap_read_folio_ctx *ctx,
+>                              loff_t pos, size_t len);
+>       int (*read_submit)(struct iomap_read_folio_ctx *ctx);
+>   };
+> 
 
-Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
----
- drivers/block/floppy.c | 9 +++------
- 1 file changed, 3 insertions(+), 6 deletions(-)
+No, I don't think `struct iomap_read_folio_ctx` has another
+`.private` makes any sense, because:
 
-diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
-index 24be0c2c4075..b33c6543ddf2 100644
---- a/drivers/block/floppy.c
-+++ b/drivers/block/floppy.c
-@@ -3092,16 +3092,13 @@ static int raw_cmd_copyin(int cmd, void __user *param,
- 	*rcmd = NULL;
- 
- loop:
--	ptr = kmalloc(sizeof(struct floppy_raw_cmd), GFP_KERNEL);
--	if (!ptr)
--		return -ENOMEM;
-+	ptr = memdup_user(param, sizeof(*ptr));
-+	if (IS_ERR(ptr))
-+		return PTR_ERR(ptr);
- 	*rcmd = ptr;
--	ret = copy_from_user(ptr, param, sizeof(*ptr));
- 	ptr->next = NULL;
- 	ptr->buffer_length = 0;
- 	ptr->kernel_data = NULL;
--	if (ret)
--		return -EFAULT;
- 	param += sizeof(struct floppy_raw_cmd);
- 	if (ptr->cmd_count > FD_RAW_CMD_FULLSIZE)
- 		return -EINVAL;
--- 
-2.51.0
+ - `struct iomap_iter *iter` already has `.private` and I think
+   it's mainly used for per-request usage; and your new
+   `.read_folio_range` already passes
+    `const struct iomap_iter *iter` which has `.private`
+   I don't think some read-specific `.private` is useful in any
+   case, also below.
 
+ - `struct iomap_read_folio_ctx` cannot be accessed by previous
+   .iomap_{begin,end} helpers, which means `struct iomap_read_ops`
+   is only useful for FUSE read iter/submit logic.
+
+Also after my change, the prototype will be:
+
+int iomap_read_folio(const struct iomap_ops *ops,
+		     struct iomap_read_folio_ctx *ctx, void *private2);
+void iomap_readahead(const struct iomap_ops *ops,
+		     struct iomap_read_folio_ctx *ctx, void *private2);
+
+Is it pretty weird due to `.iomap_{begin,end}` in principle can
+only use `struct iomap_iter *` but have no way to access
+` struct iomap_read_folio_ctx` to get more enough content for
+read requests.
+
+Thanks,
+Gao Xiang
