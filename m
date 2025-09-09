@@ -1,133 +1,105 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f54.google.com (mail-io1-f54.google.com [209.85.166.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDA873451A8;
-	Tue,  9 Sep 2025 13:29:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 104BF3451AB
+	for <linux-block@vger.kernel.org>; Tue,  9 Sep 2025 13:29:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757424557; cv=none; b=XNTNP9C5ab0E/UZL8ODce2c8roxo7jxar8QHlCzpo7N1ZYUXOhb78BmfkIbsWhgh2GjVPTppVg0rRB6LRM4msXMuOFMQSrVDhDSDC3PpCeARpiw4R9J/h+msVzgzlQk6wiF9tNGgz/bl32wEVw/k7dRpxsz2a+6BmsFiHXanxcM=
+	t=1757424560; cv=none; b=nEnCDnO8MElO8uu9FrtPa0gK5hcY5pxTCR4berESqOdWHjWGaUlA7nZlRnz4sk2YK5mlXsqGqM35a4/u9fvv96Sx4ugdup8C6Y3OrKyBZvP98u9Hy4VIYeAjKLU59MjODthEtAiI3JCGuzTSmY0SkqD8EEtdIuQmZskeulbjT20=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757424557; c=relaxed/simple;
-	bh=wtwQANAMZgZyvB6tiFp96jG3UeEes+qCqSz/NoS3UPQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BDBQvILc6OcW0GPxaO90mn+IEKB1mGb1DFuIceSJnkTZE8MXK18QiSHeXsJ++Pbq2ZMg9+0Q3YPnsnmtQ+pDfIip7MMFnEGlHZrkVJii205RXGamY/64FvZFQvm0xw4PfV9+Lj6sCTQtfmSu5nsxGIcaiw8oM2DEjIA92K3fVsA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RO8Swnvn; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1757424560; c=relaxed/simple;
+	bh=sdAUUAnXyg3K/25QJcJ/H03t1J2tpAN5WH0WT43DIUw=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=aAKdDAshWl+0r3AnyIIdYJGWJtks4ZkB1Wy+2x9b7MUlgfxJxH6MDHT9MmIGXJOyboKfbGrvQEzbGUT/DtKe+zMQ1D1PgAesFn0n62UBn2+i2okjwQJ/YMfvPIOgBBo8yNt5fPlr22pYy9grL6OCM+S7hxE8j60ALqpAV0JaK6k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=3Fz/YLx2; arc=none smtp.client-ip=209.85.166.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RO8Swnvn"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1F67C4CEF5;
-	Tue,  9 Sep 2025 13:29:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757424557;
-	bh=wtwQANAMZgZyvB6tiFp96jG3UeEes+qCqSz/NoS3UPQ=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=RO8SwnvnOfqCFFo/OQtuk43y08F/9NiC0qo46QlPcxTa4eGVUHYLlbxNnl6dZ85H0
-	 x20F6dmOkEPcmpHsf5R+/6fXBIjXKuBiWRMkaWwUQubRdIinqe54Txa6tN8WlX2eCE
-	 TjNCykXDXDAKP22rhADMYKKG4IeQ/xdqjUNB9nFAhHvWm8XVmqmTnjP+KsZMgXmxER
-	 U9ohR1NuEHfgYDgyAZHMIK03b2sbV6Yt6fuGDW5ZtsOhCz1qoFNEVy4A6MCZp4MaVA
-	 K+CH97tUymCL5/6yV3iWa8ebvxIWwf3QpaIqoywL+4IYTWGZmoJfNhPPhhg16fdKRx
-	 XixjO6eOuMVKQ==
-From: Leon Romanovsky <leon@kernel.org>
-To: Marek Szyprowski <m.szyprowski@samsung.com>
-Cc: Leon Romanovsky <leonro@nvidia.com>,
-	Jason Gunthorpe <jgg@nvidia.com>,
-	Abdiel Janulgue <abdiel.janulgue@gmail.com>,
-	Alexander Potapenko <glider@google.com>,
-	Alex Gaynor <alex.gaynor@gmail.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Christoph Hellwig <hch@lst.de>,
-	Danilo Krummrich <dakr@kernel.org>,
-	David Hildenbrand <david@redhat.com>,
-	iommu@lists.linux.dev,
-	Jason Wang <jasowang@redhat.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Joerg Roedel <joro@8bytes.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Juergen Gross <jgross@suse.com>,
-	kasan-dev@googlegroups.com,
-	Keith Busch <kbusch@kernel.org>,
-	linux-block@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org,
-	linux-nvme@lists.infradead.org,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-trace-kernel@vger.kernel.org,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Robin Murphy <robin.murphy@arm.com>,
-	rust-for-linux@vger.kernel.org,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Stefano Stabellini <sstabellini@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	virtualization@lists.linux.dev,
-	Will Deacon <will@kernel.org>,
-	xen-devel@lists.xenproject.org
-Subject: [PATCH v6 12/16] mm/hmm: migrate to physical address-based DMA mapping API
-Date: Tue,  9 Sep 2025 16:27:40 +0300
-Message-ID: <d45207f195b8f77d23cc2d571c83197328a86b04.1757423202.git.leonro@nvidia.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <cover.1757423202.git.leonro@nvidia.com>
-References: <cover.1757423202.git.leonro@nvidia.com>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="3Fz/YLx2"
+Received: by mail-io1-f54.google.com with SMTP id ca18e2360f4ac-8876de33c86so341845839f.3
+        for <linux-block@vger.kernel.org>; Tue, 09 Sep 2025 06:29:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1757424557; x=1758029357; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VrUpdS9XW8kCmiI/HdKgdDuMgaTmT22blEzvxDbI6UY=;
+        b=3Fz/YLx2M8b0ASqOsObwg/F7nj6Bz1m4S5gi2raA8xXcMWalm8Vza4oIPHmgsbAJOP
+         fVjQ3DXRLa9zsLK16oheajgZ1lUoH7Kx1dfepg6OiMAn7rwb+iVdWN0Qm3Rdf7EzPzIW
+         5AH1DjDwM7M8WXhc6Uuhg8+ckMZ17hLSh/1oAt86eY7xXKYGw0db1TVux1ylNkQzWL95
+         StKd7j5VgC6YIulq5Iaz6k+GCU3MgvZraHDajQF3s7jIUGU7cDC7K2j6EA28rOkxZTWP
+         UG/2n2HTeY3uE0Bpc9RFOlIFcKrB2Nc3wEIF6gOh5r2Ns6Jysh5pDMyG23QsNs/4hIA0
+         kl3g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757424557; x=1758029357;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=VrUpdS9XW8kCmiI/HdKgdDuMgaTmT22blEzvxDbI6UY=;
+        b=jgDlRXq88FqE5uDNBzO3fX7OkCfyskqghc60zt3wP2t/dgaOdgkOPbuEKBvdHXtcrB
+         4psZPIu/uT5vY8QDX6dn0/X/6MtHxl0eVk/Tnmwf4BFNhUQ+iLmwdo+hkgjyayZpZEts
+         0EqEVyihn+Zu5hS0F9tqW2VQc4uXADI/xBfEZQ6/0Ioxok7g2ENd8COJGl3Swipsbg71
+         rFPzP/zaTSaXEtA9LKvZEySWxez9yv/1fisdxyhy71x0iE7BkPxyxflv5F68KUEUL9v2
+         fgXQ3R21qVjbwIelti3GwYp8U2D0KLN9N1c8ABJpxww/OSh3kftRGZR7HtS8m+nTTixG
+         rraw==
+X-Forwarded-Encrypted: i=1; AJvYcCXifHePCVdOGSEvs7vAtlZwbtFk6SEJ6yFP0Kv0QO9pelK5SAQzUYwpHsrbzcCUB0W1l/pRPi2zevxJvw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YytAbgxpZW8nYhk11jtKQnFapdSjWZyk7rGNV3ugsyUZSH62n38
+	KDorwY4tOxeAnPwx2lBbm6uFElcw1U9+vYmD+FPTCBM49Gpyo/SVliZZEnILuRPYMpQ=
+X-Gm-Gg: ASbGncs6F/NRvo1azznqcjUH/Us6o1fdP+u2RDj3Cn2XRGreK5q8ksHGv/1HYpedNXF
+	11KJ/HZLxbsRnvIjqXAxNU+9+qtBTkLfvAhKcM8h2Y4Hn+wx4a18fmtUmRd2vjS/bYXgD989Wgb
+	+vjHdBwZZZ1I6daK3/n8wZ7/3Gqnhs7cxHhFyROQwHJWFU31aGZmi0PrIHBvibuqzWmLFL8N/Dr
+	YbHBlXRlQp2RhQSYRfHrlLsibDmkxsp8OWKJsIS/TbacBqerJgUYNd3TXWwHddqfJwKYL8SesGG
+	rD8wWNjqNg6tqol7tSGXVlk5LM0u18z4AVWboqDSr0x5gasarOGuX+21QjN+GwPAkzPPvf8P5Q3
+	+4J1HuMSgXpUB85RKjNMJJXe5S3X82uYRKLw=
+X-Google-Smtp-Source: AGHT+IEIjWqcE1zYENpDxaX7YutdAIuak1sO9GmLbuURziKcQXpN8xbXlPbtAPoitLTAuWNCpHzs7g==
+X-Received: by 2002:a05:6e02:3784:b0:3f3:bbda:d037 with SMTP id e9e14a558f8ab-3fd965c4d04mr182350825ab.26.1757424557099;
+        Tue, 09 Sep 2025 06:29:17 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-50d8f31f6e4sm9895116173.47.2025.09.09.06.29.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 Sep 2025 06:29:16 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: Josef Bacik <josef@toxicpanda.com>, Eric Dumazet <edumazet@google.com>
+Cc: linux-kernel <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org, 
+ Eric Dumazet <eric.dumazet@gmail.com>, 
+ syzbot+e1cd6bd8493060bd701d@syzkaller.appspotmail.com, 
+ Mike Christie <mchristi@redhat.com>, 
+ "Richard W.M. Jones" <rjones@redhat.com>, Yu Kuai <yukuai1@huaweicloud.com>, 
+ linux-block@vger.kernel.org, nbd@other.debian.org
+In-Reply-To: <20250909132243.1327024-1-edumazet@google.com>
+References: <20250909132243.1327024-1-edumazet@google.com>
+Subject: Re: [PATCH] nbd: restrict sockets to TCP and UDP
+Message-Id: <175742455632.75115.15346620038817180242.b4-ty@kernel.dk>
+Date: Tue, 09 Sep 2025 07:29:16 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3-dev-2ce6c
 
-From: Leon Romanovsky <leonro@nvidia.com>
 
-Convert HMM DMA operations from the legacy page-based API to the new
-physical address-based dma_map_phys() and dma_unmap_phys() functions.
-This demonstrates the preferred approach for new code that should use
-physical addresses directly rather than page+offset parameters.
+On Tue, 09 Sep 2025 13:22:43 +0000, Eric Dumazet wrote:
+> Recently, syzbot started to abuse NBD with all kinds of sockets.
+> 
+> Commit cf1b2326b734 ("nbd: verify socket is supported during setup")
+> made sure the socket supported a shutdown() method.
+> 
+> Explicitely accept TCP and UNIX stream sockets.
+> 
+> [...]
 
-The change replaces dma_map_page() and dma_unmap_page() calls with
-dma_map_phys() and dma_unmap_phys() respectively, using the physical
-address that was already available in the code. This eliminates the
-redundant page-to-physical address conversion and aligns with the
-DMA subsystem's move toward physical address-centric interfaces.
+Applied, thanks!
 
-This serves as an example of how new code should be written to leverage
-the more efficient physical address API, which provides cleaner interfaces
-for drivers that already have access to physical addresses.
+[1/1] nbd: restrict sockets to TCP and UDP
+      commit: 9f7c02e031570e8291a63162c6c046dc15ff85b0
 
-Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
-Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
----
- mm/hmm.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/mm/hmm.c b/mm/hmm.c
-index d545e24949949..015ab243f0813 100644
---- a/mm/hmm.c
-+++ b/mm/hmm.c
-@@ -775,8 +775,8 @@ dma_addr_t hmm_dma_map_pfn(struct device *dev, struct hmm_dma_map *map,
- 		if (WARN_ON_ONCE(dma_need_unmap(dev) && !dma_addrs))
- 			goto error;
- 
--		dma_addr = dma_map_page(dev, page, 0, map->dma_entry_size,
--					DMA_BIDIRECTIONAL);
-+		dma_addr = dma_map_phys(dev, paddr, map->dma_entry_size,
-+					DMA_BIDIRECTIONAL, 0);
- 		if (dma_mapping_error(dev, dma_addr))
- 			goto error;
- 
-@@ -819,8 +819,8 @@ bool hmm_dma_unmap_pfn(struct device *dev, struct hmm_dma_map *map, size_t idx)
- 		dma_iova_unlink(dev, state, idx * map->dma_entry_size,
- 				map->dma_entry_size, DMA_BIDIRECTIONAL, attrs);
- 	} else if (dma_need_unmap(dev))
--		dma_unmap_page(dev, dma_addrs[idx], map->dma_entry_size,
--			       DMA_BIDIRECTIONAL);
-+		dma_unmap_phys(dev, dma_addrs[idx], map->dma_entry_size,
-+			       DMA_BIDIRECTIONAL, 0);
- 
- 	pfns[idx] &=
- 		~(HMM_PFN_DMA_MAPPED | HMM_PFN_P2PDMA | HMM_PFN_P2PDMA_BUS);
+Best regards,
 -- 
-2.51.0
+Jens Axboe
+
+
 
