@@ -1,114 +1,148 @@
-Received: from sender4-op-o12.zoho.com (sender4-op-o12.zoho.com [136.143.188.12])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8500F31D38E
-	for <linux-block@vger.kernel.org>; Tue,  9 Sep 2025 17:09:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757437767; cv=pass; b=og/eUycCY1x1yF3C3tB7NJeh4GTzch+/d4NPjLs3UN1I8PnQwoJhMbAsHddVtDu7VsS+1UR2iay98TPlqW/1PGMgu0GiYaRyFgLEzsW57VS9UcSYCsA8vxG5plTySqUPmlsqNM47O4lq2vegBuWHklrI8o6t6iCKY8MhDYP1OQw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757437767; c=relaxed/simple;
-	bh=kmqUQgrZCWuj2L/qvkPpYKQ1uITSSTVZ/zBzOxnitaE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mCmtVh3WrWpj7JYZ2LaxA6Hj43stvawHaeLb6JisgI5Nfqh2lya22JbLoYXJDzD99EAnNM9gAnrZ1eHDw/fjDfNtX/stWIw0m0+uFrP4KDTmk6uQCPQyjb7WGOZttHUFJVg2Aznii4PQcIH+H/6vB3mTT39GSEs/zRdcZnf60+A=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yukuai.org.cn; spf=pass smtp.mailfrom=yukuai.org.cn; dkim=pass (1024-bit key) header.d=yukuai.org.cn header.i=hailan@yukuai.org.cn header.b=K10UL1Wq; arc=pass smtp.client-ip=136.143.188.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yukuai.org.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yukuai.org.cn
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9ED51D5CD1;
+	Tue,  9 Sep 2025 17:13:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1757438014; cv=none; b=GCgMLWeOgtlw95SYEnp4hOrtY2RqFhS65wbA1Wi6yzTHUGqcXo/igV/yRr0fnxbQztK3g4a7UgILF/p2cvbj7hnNoZsRTBGP1TSruY17VAuyG4srrTVOE5rFdJWx8UD0hbJCEoBJW9BANkJtbsVxWn0eQ2H1IoWbR4IgjMo9Uk8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1757438014; c=relaxed/simple;
+	bh=F/1KmH6Ih2AiaeEpSd/DqRQpCrUv8zbxcwx5j1/Alf0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oJiKGnkO6VzAX2IzFpa6ymk8Y2meqDi62WJq7jC9BsvdlREc5PKK1w2ysLBL4eQ9Q0xik9JtAX65MV6TL0aD977WNOL4U8PK1Ir1Kf99UFY4Qg2eXsi0RTlZskDKXXlw+TQJ/k034aWfKG1dM1L9HAtcOshRg7z/NbNnkJOCypU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lWHpsHRr; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=yukuai.org.cn header.i=hailan@yukuai.org.cn header.b="K10UL1Wq"
-ARC-Seal: i=1; a=rsa-sha256; t=1757437752; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=SUgPqRPn1klmOBx9hVg182J6V08u5uZCOV3Wz0RuRVQreBVlBuu+gC6PkBtdodxqkWG3UkLgHWkMEvsHpuBKQorWy1ukM8+WCX/Z/kK/B69yy9vtQAsNt2OjwXhMvXvsic2QmPryKoH/gO4lajmJwUzO7tGoVGdglD/Kx77VsJ0=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1757437752; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=rjOVQsC1oQbcBwBkyjeMi20Ye7E+OhBdVCB+N2M3qto=; 
-	b=RAnASLCI1gCN0v5tp5vpMfxbyaftuZ6RrVhGEkG0hl9WhLY/v2CJKlqmL8bDBEVGKoEh47QXfWzko6tlHLRLT3YwVxkf7e8MCi/Dfv+SRm7+fOKPztySgQkNHC4ArHqtva8NxzO2USNepP78ZSn79hnweWm6oz0sEIqGXRMvZN0=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=yukuai.org.cn;
-	spf=pass  smtp.mailfrom=hailan@yukuai.org.cn;
-	dmarc=pass header.from=<hailan@yukuai.org.cn>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1757437752;
-	s=zmail; d=yukuai.org.cn; i=hailan@yukuai.org.cn;
-	h=Message-ID:Date:Date:MIME-Version:Subject:Subject:To:To:Cc:Cc:References:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
-	bh=rjOVQsC1oQbcBwBkyjeMi20Ye7E+OhBdVCB+N2M3qto=;
-	b=K10UL1WqX1SismNStKYjFeIUsYeXao1NXlCA8d/lAzyvRkfW08OTpLIst7JodE+t
-	/emPe1pIHtQKGawTVLBMXIBNykvWrLyHgzTvHQWw5JcGMtCXh+riD8LLYlOKKokHk+g
-	lIG7DOod2qzmFnvdGDhyA+BGQChOISNtB8cs3j0k=
-Received: by mx.zohomail.com with SMTPS id 1757437750475716.9676216369968;
-	Tue, 9 Sep 2025 10:09:10 -0700 (PDT)
-Message-ID: <8a9aa1af-9142-41d5-b229-7deddd624b0f@yukuai.org.cn>
-Date: Wed, 10 Sep 2025 01:09:05 +0800
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lWHpsHRr"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21A84C4CEF4;
+	Tue,  9 Sep 2025 17:13:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757438012;
+	bh=F/1KmH6Ih2AiaeEpSd/DqRQpCrUv8zbxcwx5j1/Alf0=;
+	h=From:To:Cc:Subject:Date:From;
+	b=lWHpsHRrNiCYuwo7o/GaIHoR9MIkRDuM1IVT/I5CSRTlsJT34IIWfujCErIIjy47J
+	 uNDLYM7osJIEFLRvkGe4JFKB0G9yuLDdALyrfc+evwAavtaSLylqYO8kUxikDbO7Lz
+	 si1vDMxABmCGh9X3PBSynUXPWL3IrDaAJh4YKMlyyWudfElamcpmXbRKAeCHE5alHz
+	 pHAKJU2+gdiQatBSgfb52xdGLl6p4/BV7ATlDQc3RgqmxJhtqkhTf9vKNU/+GMFMoD
+	 lKAQoqcqhNqWR0wDyGUsW0hm+9XmQP5rtJYWtxX1g1aPVTP+xvv6kwfC4fH7qAj6js
+	 xHJKugZe7nOIg==
+From: Yu Kuai <yukuai@kernel.org>
+To: axboe@kernel.dk,
+	linux-block@vger.kernel.org,
+	linux-raid@vger.kernel.org
+Cc: linan122@huawei.com,
+	xni@redhat.com,
+	colyli@kernel.org,
+	yukuai3@huawei.com,
+	yi.zhang@huawei.com,
+	yangerkun@huawei.com,
+	johnny.chenyi@huawei.com
+Subject: [GIT PULL v2] md-6.18-20250909
+Date: Wed, 10 Sep 2025 01:13:28 +0800
+Message-ID: <20250909171328.2691074-1-yukuai@kernel.org>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [GIT PULL] md-6.17-20250909
-To: Jens Axboe <axboe@kernel.dk>, Yu Kuai <hailan@yukuai.org.cn>,
- Yu Kuai <yukuai1@huaweicloud.com>, linux-block@vger.kernel.org,
- inux-raid@vger.kernel.org, song@kernel.org
-Cc: linan122@huawei.com, xni@redhat.com, colyli@kernel.org,
- yukuai3@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com,
- johnny.chenyi@huawei.com
-References: <20250909082005.3005224-1-yukuai1@huaweicloud.com>
- <a56b2c76-e254-48bc-86a6-8beb47ac79ff@kernel.dk>
- <fdfcb000-916b-4599-b75c-1b4680accca7@yukuai.org.cn>
- <16a63a35-9a44-443a-8f59-e60afbfbfff3@kernel.dk>
- <af63883c-2cfb-4cc2-8b9d-979ecc5187f5@kernel.dk>
-From: Yu Kuai <hailan@yukuai.org.cn>
-In-Reply-To: <af63883c-2cfb-4cc2-8b9d-979ecc5187f5@kernel.dk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-ZohoMailClient: External
 
-Hi,
+Hi, Jens
 
-在 2025/9/10 0:54, Jens Axboe 写道:
-> On 9/9/25 10:51 AM, Jens Axboe wrote:
->> On 9/9/25 10:44 AM, Yu Kuai wrote:
->>> Hi,
->>>
->>> ? 2025/9/9 21:26, Jens Axboe ??:
->>>> On 9/9/25 2:20 AM, Yu Kuai wrote:
->>>>> Hi, Jens
->>>>>
->>>>> Please consider pulling following changes on your for-6.18/block branch,
->>>>> this pull request contains:
->>>>>
->>>>>    - add kconfig for internal bitmap;
->>>>>    - introduce new experimental feature lockless bitmap;
->>>> Can you write a bit of a better pull request letter? It'd be nice to get
->>>> an actual description of what the "lockless bitmap" is, and why it makes
->>>> sense to have it. This is pretty sparse...
->>> Of course, details in be found in the patch 0 of the thread. I'll send a v2.
->> Please always write a decent message on why any pull request needs
->> merging.
->>
->>>>>     https://kernel.googlesource.com/pub/scm/linux/kernel/git/mdraid/linux.git tags/md-6.18-20250909
->>>>>
->>>> and this is a new source for you, is the above tag signed?
->>> I thought they are the same, I'll switch back in v2.
->> They are very much NOT the same. One is some random site, the other is
->> the official kernel infrastructure. If you don't use git.kernel.org,
->> I'm definitely not pulling anything that isn't signed by a key, and
->> that key in turn has been signed by other people I know.
-> Oh and since I keep getting these, the last 5 pull requests you have
-> sent me have CC'ed:
->
-> inux-raid@vger.kernel.org
->
-> which of course doesn't exist, and hence the md list doesn't get
-> your PR emails, and I get failure notifications when I reply.
-> I'm assuming this is in your scripts somewhere, and I keep
-> thinking "it was a typo, hence a one time thing", but no, it keeps
-> being there every time. Can you please fix your script to use the
-> actually correct email?
+Redundant data is used to enhance data fault tolerance, and the storage
+method for redundant data vary depending on the RAID levels. And it's
+important to maintain the consistency of redundant data.
 
-Of course, lessons are learned. Sorry for the typo, I just checked and
-I do get the failure notifications as well.
+Bitmap is used to record which data blocks have been synchronized and which
+ones need to be resynchronized or recovered. Each bit in the bitmap
+represents a segment of data in the array. When a bit is set, it indicates
+that the multiple redundant copies of that data segment may not be
+consistent. Data synchronization can be performed based on the bitmap after
+power failure or readding a disk. If there is no bitmap, a full disk
+synchronization is required.
 
-Thanks!
-Kuai
+Due to known performance issues with md-bitmap and the unreasonable
+implementations:
+
+ - self-managed IO submitting like filemap_write_page();
+ - global spin_lock
+ - ...
+
+I have decided not to continue optimizing based on the current bitmap
+implementation, this new bitmap is invented without locking from IO fast
+path and can be used with fast disks.
+
+Key features for the new bitmap:
+ - IO fastpath is lockless, if user issues lots of write IO to the same
+   bitmap bit in a short time, only the first write has additional 
+   overhead to update bitmap bit, no additional overhead for the following
+   writes;
+ - support only resync or recover written data, means in the case creating
+   new array or replacing with a new disk, there is no need to do a full
+   disk resync/recovery;
+
+Please consider pulling following changes on your for-6.18/block branch,
+this pull request contains:
+
+  - add kconfig for internal bitmap, this is for isolation;
+  - introduce new experimental feature lockless bitmap(details in [1]);
+
+[1] https://lore.kernel.org/linux-raid/20250829080426.1441678-12-yukuai1@huaweicloud.com/
+
+The following changes since commit ba28afbd9eff2a6370f23ef4e6a036ab0cfda409:
+
+  blk-mq: fix blk_mq_tags double free while nr_requests grown (2025-09-05 13:52:52 -0600)
+
+are available in the Git repository at:
+
+  git@gitolite.kernel.org:pub/scm/linux/kernel/git/mdraid/linux.git tags/md-6.18-20250909
+
+for you to fetch changes up to 5ab829f1971dc99f2aac10846c378e67fc875abc:
+
+  md/md-llbitmap: introduce new lockless bitmap (2025-09-06 17:27:51 +0800)
+
+----------------------------------------------------------------
+Yu Kuai (24):
+      md/md-bitmap: remove the parameter 'init' for bitmap_ops->resize()
+      md/md-bitmap: merge md_bitmap_group into bitmap_operations
+      md/md-bitmap: add a new parameter 'flush' to bitmap_ops->enabled
+      md/md-bitmap: add md_bitmap_registered/enabled() helper
+      md/md-bitmap: handle the case bitmap is not enabled before start_sync()
+      md/md-bitmap: handle the case bitmap is not enabled before end_sync()
+      md/raid1: check bitmap before behind write
+      md/raid1: check before referencing mddev->bitmap_ops
+      md/raid10: check before referencing mddev->bitmap_ops
+      md/raid5: check before referencing mddev->bitmap_ops
+      md/dm-raid: check before referencing mddev->bitmap_ops
+      md: check before referencing mddev->bitmap_ops
+      md/md-bitmap: introduce CONFIG_MD_BITMAP
+      md: add a new parameter 'offset' to md_super_write()
+      md: factor out a helper raid_is_456()
+      md/md-bitmap: support discard for bitmap ops
+      md: add a new mddev field 'bitmap_id'
+      md/md-bitmap: add a new sysfs api bitmap_type
+      md/md-bitmap: delay registration of bitmap_ops until creating bitmap
+      md/md-bitmap: add a new method skip_sync_blocks() in bitmap_operations
+      md/md-bitmap: add a new method blocks_synced() in bitmap_operations
+      md: add a new recovery_flag MD_RECOVERY_LAZY_RECOVER
+      md/md-bitmap: make method bitmap_ops->daemon_work optional
+      md/md-llbitmap: introduce new lockless bitmap
+
+ Documentation/admin-guide/md.rst |   86 +++-
+ drivers/md/Kconfig               |   29 ++
+ drivers/md/Makefile              |    4 +-
+ drivers/md/dm-raid.c             |   18 +-
+ drivers/md/md-bitmap.c           |   89 ++--
+ drivers/md/md-bitmap.h           |  107 ++++-
+ drivers/md/md-cluster.c          |    2 +-
+ drivers/md/md-llbitmap.c         | 1626 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ drivers/md/md.c                  |  378 ++++++++++++---
+ drivers/md/md.h                  |   24 +-
+ drivers/md/raid1-10.c            |    2 +-
+ drivers/md/raid1.c               |   79 ++--
+ drivers/md/raid10.c              |   49 +-
+ drivers/md/raid5.c               |   64 ++-
+ 14 files changed, 2313 insertions(+), 244 deletions(-)
+ create mode 100644 drivers/md/md-llbitmap.c
 
