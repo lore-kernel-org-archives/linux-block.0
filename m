@@ -1,124 +1,97 @@
-Received: from mail-il1-f182.google.com (mail-il1-f182.google.com [209.85.166.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E3D133EAF1
-	for <linux-block@vger.kernel.org>; Tue,  9 Sep 2025 17:25:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 574E5303A21;
+	Tue,  9 Sep 2025 19:37:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757438706; cv=none; b=nDk1Vmz+hF7LgAvd+VydrcEEkjaNczZOf7UvcW/mbBXTmOzpvenU3gYNdyFBrAg41J5mG+AEEdlAIk4BouL3SfYbSUsFfxjQ6JOys5WghCFvVhLN8mBJkffYrmIWFPBeVIZC9HRDjP4ME8Zln0ObuOpvCCTZiXAD60QHj0JPlws=
+	t=1757446673; cv=none; b=QMIENappSzMzwE3tsCbeYlAzwWpGty8pwrW7hR+W/O1/GWNHyrClRtiB5iOYSqNtR5TWHstscdlKj/2hRaUjoCb7PD7pt3zSayKVSfq/RhfcefSSmqZreLjv7GZQ9i31h9s8eMr5pWUJCZqbdZ6kGHUQOAyWch/oIgb87dNUMDY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757438706; c=relaxed/simple;
-	bh=GxX8esyfHUOzyn1nbvdyM3kzfLY/i6mmOtX0dvajPUo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=E5cMiQPeOtxK5G7qPIv5OdqKuvMqeTZFd308SyGEV79Ak/dB/dhuKWAL1y2YIayDYaGWb2Tzwueu9uLWHTqywlXjs5LQBuTbQ4UKlSIs0tBgEm5W7CYkyHoQF4dCuHRH2IEAJehJXh59mJcCIcG9aMBInXsJNBJbQi1q5ysP5UA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=b2gRo43M; arc=none smtp.client-ip=209.85.166.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1757446673; c=relaxed/simple;
+	bh=Vkfs1C2Q/m2ciXngYEnMywKI/5g7jYuOYmYnMi4Z+6A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Rm4LUgXeKAsTGWx/ZlACaduok0nVUObGFx9OsGPz6taAPydSRUvc4WtNHB+WR2CZEAtihAnoMa8W3oiqdVtvLrPDtqXLI8U553y93eLI+rxkVKWhQlpfVw0KEv0J25lpUWW9/gJfGRmd+nb2hmHabdPbGIP3eIlgGskjtnG3s9A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BK33sGpV; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="b2gRo43M"
-Received: by mail-il1-f182.google.com with SMTP id e9e14a558f8ab-4103fb72537so10213195ab.0
-        for <linux-block@vger.kernel.org>; Tue, 09 Sep 2025 10:25:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1757438703; x=1758043503; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=GtJFSvBHbG4cz0l8W9N+fN70Uv12jmFund9WRET9NFQ=;
-        b=b2gRo43MQFuGtER6CyJhYExnNF18pjv15zJa2fMhjM6ttIACu8D+nnnAWxwg3jJh/+
-         EqNgyJnUewQhkkm/Pf3xge1gLwGWxvYM03lIcr/a1yYvutmeidVZsA5TTiFMKcsyCgjh
-         dEcvSKiQYBWrymqs3ZdSDi49Jbk9R63tOftymy6gW7hHvKuf09DA/Txd3/xyjEQ9oXCn
-         H7lOjocFKxveBuW1I+nBjY+obBLlQTVvWL3ZuQxZFm5zb+nGSBB+qiPgqCM2htMSw3G3
-         S7gqL/c2hr6XkbgaxkWuPzAP+rp7eGLYG87gQ/owGm1hyVTaj80NcOb5A0I1RL64HARn
-         NSrw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757438703; x=1758043503;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GtJFSvBHbG4cz0l8W9N+fN70Uv12jmFund9WRET9NFQ=;
-        b=vp172gTIHj0FF1s5oNoBOF1RpTLh/9tPpEa99myyJUyyZKo5Z8lCHpxe+UlyKSWVht
-         RmYl9yi8DX1H5Jhmq5fPIvYerc8VrTfs066lH3YxmjRYPZJFhDGde9G5gUDBMyX0MtEl
-         3PdSgLPDZ+RSJFHlDnu02k+RpiepXhMkhJiHKzAGrX4ED4CQW2WtpNBDNNzZYjOLHNVh
-         1CTn0UoeGA/2Tnm0q/AMFkGvB35muM/MV2zX2ZAD2scd/IWipQPj4gM0imRPtK6JyWKR
-         LDIUEif+2+5g+Y45albIEHffIU0nBOzuch0BWCKLaXe4EQZg/RaNj8LN8AEO0WEoxGPc
-         rfdA==
-X-Forwarded-Encrypted: i=1; AJvYcCVE3ChWfKxQHvzGXzrwQpkkzGUGtS6qE6Wiy9NK5WwaAZNVJKc0+ym2lL7tZYbEqCMChKfL541s7EquGg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyVoP7Wa8PgjBenL//6H1077gnGBUPizAxbjEigJEd/A7WIohWu
-	BRveQtclHQevJ1pNCnjxbokRDmjgLEpkyVB51UyMrQXIY0xRVd3lNH7684CPMiMK3DM=
-X-Gm-Gg: ASbGncvCB/jwWPu6u1eJd2/T+5SgreKRcbWvV+IXyiUza6qfpo7scSMIZ918jIC0YiF
-	9wtsenYfqA/saaavxV8wZBZK7ZwzPgtfVHOVYYdwY+VcL5kIniyd7T9ldQ9DyA8qFb4Be0Rv7FQ
-	lTgIISFWPM8JPSvGLzjdGm/bViOqzIgCMKtheRX8r1mMS8Q2a8NT5Ez87uvkIGtjR9C5tdhXqzc
-	wOYEw5rca2xJNQpAnsaM91JF0MjS5VWQIsJhrw2vlXydljlD5ZBLjNaTc8nDXYR+NTF9ZXZF9Hv
-	4n49il3l/1bsGzzMELjPkqh3JkwdSI3BWnOiny25AtBxWYqjM19STRdFUS2Hpjv24Wylx166123
-	blP5jdb9TDYQ7bxbicF6UZz/J+8nWpQ==
-X-Google-Smtp-Source: AGHT+IHw3W8XExwwEsXUvAVGW3t5lxP4OUVBcfgIYshMPU1SR0wVT5HUrtuzxi4b4jeVJvg662d+Pg==
-X-Received: by 2002:a05:6e02:451a:b0:3fe:f1f4:77b2 with SMTP id e9e14a558f8ab-3fef1f4788emr155227595ab.5.1757438703279;
-        Tue, 09 Sep 2025 10:25:03 -0700 (PDT)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-50d8f0f020csm9796359173.29.2025.09.09.10.25.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 09 Sep 2025 10:25:02 -0700 (PDT)
-Message-ID: <dc6a5862-547e-446e-a444-53b105ab00cb@kernel.dk>
-Date: Tue, 9 Sep 2025 11:25:02 -0600
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BK33sGpV"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30BB1C4CEF4;
+	Tue,  9 Sep 2025 19:37:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757446672;
+	bh=Vkfs1C2Q/m2ciXngYEnMywKI/5g7jYuOYmYnMi4Z+6A=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=BK33sGpV6gJZdNQka35B5igzFncF6O4QoVJduYx5uymEwm19+Pae/Y8Ji2ztm6vFh
+	 Of79hrgQzN752E6kK9Pd6CitdpQ05JM71b0yY2nJK5WUadz3JmWI4AqHd+rhRkpPML
+	 jPSesTwS7Zw48bKNgh3AxJtfj3r28MMf09jWFv3Lide1Ok8C5lkasp0zoJfr6zuOnF
+	 N5cxlSvTSt07fnYvpbKZtFqt6TP2eL80kCSBPIQL9mOveIT/STSyNFrSlP91N6uUF+
+	 FdL0uwcDH/ATxbhiykxuiJP1XMjnnp4vhtxpR+0sRrU4PCEIaA22KI5S4HXWZpjWlB
+	 smMV1bUYsFvcA==
+Date: Tue, 9 Sep 2025 22:37:48 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Marek Szyprowski <m.szyprowski@samsung.com>
+Cc: Jason Gunthorpe <jgg@nvidia.com>,
+	Abdiel Janulgue <abdiel.janulgue@gmail.com>,
+	Alexander Potapenko <glider@google.com>,
+	Alex Gaynor <alex.gaynor@gmail.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Christoph Hellwig <hch@lst.de>, Danilo Krummrich <dakr@kernel.org>,
+	David Hildenbrand <david@redhat.com>, iommu@lists.linux.dev,
+	Jason Wang <jasowang@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+	Joerg Roedel <joro@8bytes.org>, Jonathan Corbet <corbet@lwn.net>,
+	Juergen Gross <jgross@suse.com>, kasan-dev@googlegroups.com,
+	Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org, linux-nvme@lists.infradead.org,
+	linuxppc-dev@lists.ozlabs.org, linux-trace-kernel@vger.kernel.org,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	Robin Murphy <robin.murphy@arm.com>, rust-for-linux@vger.kernel.org,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Stefano Stabellini <sstabellini@kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	virtualization@lists.linux.dev, Will Deacon <will@kernel.org>,
+	xen-devel@lists.xenproject.org
+Subject: Re: [PATCH v6 03/16] dma-debug: refactor to use physical addresses
+ for page mapping
+Message-ID: <20250909193748.GG341237@unreal>
+References: <cover.1757423202.git.leonro@nvidia.com>
+ <56d1a6769b68dfcbf8b26a75a7329aeb8e3c3b6a.1757423202.git.leonro@nvidia.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [GIT PULL v2] md-6.18-20250909
-To: Yu Kuai <yukuai@kernel.org>, linux-block@vger.kernel.org,
- linux-raid@vger.kernel.org
-Cc: linan122@huawei.com, xni@redhat.com, colyli@kernel.org,
- yukuai3@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com,
- johnny.chenyi@huawei.com
-References: <20250909171328.2691074-1-yukuai@kernel.org>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20250909171328.2691074-1-yukuai@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <56d1a6769b68dfcbf8b26a75a7329aeb8e3c3b6a.1757423202.git.leonro@nvidia.com>
 
-On 9/9/25 11:13 AM, Yu Kuai wrote:
-> Hi, Jens
-> 
-> Redundant data is used to enhance data fault tolerance, and the storage
-> method for redundant data vary depending on the RAID levels. And it's
-> important to maintain the consistency of redundant data.
-> 
-> Bitmap is used to record which data blocks have been synchronized and which
-> ones need to be resynchronized or recovered. Each bit in the bitmap
-> represents a segment of data in the array. When a bit is set, it indicates
-> that the multiple redundant copies of that data segment may not be
-> consistent. Data synchronization can be performed based on the bitmap after
-> power failure or readding a disk. If there is no bitmap, a full disk
-> synchronization is required.
-> 
-> Due to known performance issues with md-bitmap and the unreasonable
-> implementations:
-> 
->  - self-managed IO submitting like filemap_write_page();
->  - global spin_lock
->  - ...
-> 
-> I have decided not to continue optimizing based on the current bitmap
-> implementation, this new bitmap is invented without locking from IO fast
-> path and can be used with fast disks.
-> 
-> Key features for the new bitmap:
->  - IO fastpath is lockless, if user issues lots of write IO to the same
->    bitmap bit in a short time, only the first write has additional 
->    overhead to update bitmap bit, no additional overhead for the following
->    writes;
->  - support only resync or recover written data, means in the case creating
->    new array or replacing with a new disk, there is no need to do a full
->    disk resync/recovery;
+On Tue, Sep 09, 2025 at 04:27:31PM +0300, Leon Romanovsky wrote:
+> From: Leon Romanovsky <leonro@nvidia.com>
 
-Much better! Though I suspect you forgot to add more where you have
-the "..." above, I just removed it.
+<...>
 
-Pulled, thanks.
+>  include/linux/page-flags.h         |  1 +
 
--- 
-Jens Axboe
+<...>
+
+> --- a/include/linux/page-flags.h
+> +++ b/include/linux/page-flags.h
+> @@ -614,6 +614,7 @@ FOLIO_FLAG(dropbehind, FOLIO_HEAD_PAGE)
+>   * available at this point.
+>   */
+>  #define PageHighMem(__p) is_highmem_idx(page_zonenum(__p))
+> +#define PhysHighMem(__p) (PageHighMem(phys_to_page(__p)))
+
+This was a not so great idea to add PhysHighMem() because of "else"
+below which unfolds to maze of macros and automatically generated
+functions with "static inline int Page##uname ..." signature.
+
+>  #define folio_test_highmem(__f)	is_highmem_idx(folio_zonenum(__f))
+>  #else
+>  PAGEFLAG_FALSE(HighMem, highmem)
+
+Thanks
