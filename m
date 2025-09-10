@@ -1,141 +1,154 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 827C329ACE5
-	for <linux-block@vger.kernel.org>; Wed, 10 Sep 2025 17:45:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B8A92FB08E;
+	Wed, 10 Sep 2025 20:47:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757526336; cv=none; b=TJ3d3a01E7CU+oxjxMQ0dhKfjfgHOWZdCWl7PwsibzhTCgi6X7Ws+QHFgXDltdMZhtTG9OgPHPySWZ6UKQY/IZJOgIqI1P028O+cdOXQsX9ZueN5+Relt9rC7y7uBlGD8BeR7WZw1D7Sr4QfqNA5Ek1qCVoSWlM+1UbN/QLzuKE=
+	t=1757537257; cv=none; b=onvfFHdamOvQms2ZshPGilFxbTbd9W8P9fNUHBpR44xtyfzuh+UBK4OQEidBbMsYBtg35TSnjWu3geqeuAleT5GjTnnvveHb2AF3Uw9pBq5Qv77eUDvVZ4ePJDTD94o72vubCbRA346ajxqH8DWzwRsqkF4Ro0z4FyyemF2ldrQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757526336; c=relaxed/simple;
-	bh=dNOWI7gSBAR/8CDRKSX9BtwfzV+PfFdf0Quy3tkARWQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=N7JHGe1p9sjxyJNn7krypQXHgI4Y8J4Ksxz+62FoS+oZbnGYq0qZmaRWslovRAnhGSCwzdVOb4MUT51yNF/FY+beOmn9EODU35qm718Fbmml0t+xx5MpFDIGf5QfNTCQA6Tdkc4TFQ6CjmIVDfvDKUy7fCbu4TIO8hVXwyaBwPE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=jTwJ2DOz; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1757537257; c=relaxed/simple;
+	bh=B9nXx/uAd8bzj5r9K99vQjrO7Sot+mOg+1OtU9x4TJA=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=YnxNTfnY9KDSSC3jKprg16OFlKPDV0ktl0qPiQE3GHHWYb1gQSYPUjniCQ2i7YSVQUnUX01CGs42G4p7GgZNFJ7da7kAcTUFtg3+6gmdkuLcJIHoGm/aL/cgeHDikn+e6undnK9l8STHKW9YBQwhyQmfb+I7qyOYVZrTJHfpp+I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Pw4J8UXk; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jTwJ2DOz"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1757526333;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WlcFe5oCmvjN1h1Es6PI20V1rT7RlTmmj6wUjzqcp7M=;
-	b=jTwJ2DOzYqOwz4IhU3sO8Z/4mmb6el50DzR8ptdhSG5Z33V/33rNOs/7Vh6wfCLKoWg3Az
-	3TuXvKB3mZV/Usn5y+dLViHnyr92z9nZ+GksaRUBIwLDPOJXPe7k20mcyeoIgD77h977mQ
-	1VrNI3ffXJnJRK6izGCZdspv5QC8/oo=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-626-StHxun1SNO2lwtKLC2N6UQ-1; Wed, 10 Sep 2025 13:45:31 -0400
-X-MC-Unique: StHxun1SNO2lwtKLC2N6UQ-1
-X-Mimecast-MFC-AGG-ID: StHxun1SNO2lwtKLC2N6UQ_1757526331
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-45dd62a0dd2so4021795e9.1
-        for <linux-block@vger.kernel.org>; Wed, 10 Sep 2025 10:45:31 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757526330; x=1758131130;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WlcFe5oCmvjN1h1Es6PI20V1rT7RlTmmj6wUjzqcp7M=;
-        b=vS6nUxVLmKMxb2ME7c6qG9mbEVbqP9YQ8d7BMuXqjzk2tijMFBF0d9CSuOEMQnT/ge
-         ytqw6QFAV6ODSzjixvJ5312gOAw11f9og0w6PMz7hW6ZHtWFs9/d1Ho1EtmWckDnaifP
-         VWLdRR84SnUU7KOHUCt9U4crUFFwCpouiAULGHXezqoqLCMc9L2uDqz/gn6QTOooM2hH
-         zNQn7VTcBrVxp8uVi9f2dUqwXjfobCgbm0pFAihSYlD78JrunK8nSrJrHMrJ4NTQ+1JA
-         qwatW2V8ArrLqw6mhaQs6crv6ZS/WH1AARU/5Zp03qflUhj5Q+Fp+FReezAPBpnMFzWD
-         3zxQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU9LUH3oJaC0JzG3Qq8MoLqWLxgIdA9EN9w0b778n6MDCaDdu13OoZCuNDb3VXZ2+ckluZmkUmWBiNYLw==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw0SebkoN/JFiGCHxQ/72lR+MUmlYrwzYT6Ox9PUSrqR3ADJs2A
-	Hg8tLj/BT/PJ2++0q648gGGLpyIgDlHJ3LQWCGcXyxBCCUMEcAC+Xyekih+9yM6yFrPak845snn
-	4TNi7LDqZ2HOi8OpqgDVskThTVz3DDlsf8PXOgwjEi5n4eDIv5NOavkpTyMHYRUgp
-X-Gm-Gg: ASbGncupNywxcIjUZJsP+dvIWY6rEQhId+mchTzOWoG/Ay9kjgeQIrFB9t4bcintn9A
-	VCa/udg6sATbDMSGE/y8JoxoSnsn4bWLxD1nM99A81OqbeqGuJeBBi6Gi+mHimyOzeTl5ihdlt9
-	sBcgYRYojN6u8UEb0ykzeLGXaoDCea1wa/XXgjB6nzPuK6aJLxf8iDpVWnhneeLBPMDpwg7IXxr
-	E5iPdRLcis6L+e4OJOBtPMuJDVERAhXeuoKVxdf2tV27PItoWQMT2xMq5WJPzcpU4JGt5hWLnY4
-	VqSLsKbFHcLYWZPVVeoKqhv4sNECH3FnhM4vEFK4vmrNY7fmYVJM4Iggag==
-X-Received: by 2002:a05:600c:c098:b0:45c:b501:795c with SMTP id 5b1f17b1804b1-45dfd5e3da8mr3261855e9.10.1757526330525;
-        Wed, 10 Sep 2025 10:45:30 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFMyl7SOy3kBxxrDvaG0ZHwpCo+23n3nT2GR9WmBKsR0hHAuXPPpMwuMAjIh8YD03Q6O8LuqA==
-X-Received: by 2002:a05:600c:c098:b0:45c:b501:795c with SMTP id 5b1f17b1804b1-45dfd5e3da8mr3261595e9.10.1757526329906;
-        Wed, 10 Sep 2025 10:45:29 -0700 (PDT)
-Received: from redhat.com (128.19.187.81.in-addr.arpa. [81.187.19.128])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45df81d20d2sm35623175e9.8.2025.09.10.10.45.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Sep 2025 10:45:29 -0700 (PDT)
-Date: Wed, 10 Sep 2025 18:45:27 +0100
-From: "Bryn M. Reeves" <bmr@redhat.com>
-To: Robert Beckett <bob.beckett@collabora.com>
-Cc: Mikulas Patocka <mpatocka@redhat.com>,
-	dm-devel <dm-devel@lists.linux.dev>,
-	linux-block <linux-block@vger.kernel.org>,
-	kernel <kernel@collabora.com>
-Subject: Re: deadlock when swapping to encrypted swapfile
-Message-ID: <aMG5N4nG58GHrE7K@redhat.com>
-References: <1992a9545eb.1ec14bf0659281.6434647558731823661@collabora.com>
- <2d517844-b7bf-3930-e811-e073ec347d4a@redhat.com>
- <1992f628105.2bf0303b1373545.4844645742991812595@collabora.com>
- <a7872ca2-be14-0720-190c-c03d4ddf7a5d@redhat.com>
- <199343ab2a7.11b1e13e161813.4990067961195858029@collabora.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Pw4J8UXk"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82205C4CEEB;
+	Wed, 10 Sep 2025 20:47:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757537257;
+	bh=B9nXx/uAd8bzj5r9K99vQjrO7Sot+mOg+1OtU9x4TJA=;
+	h=From:Date:Subject:To:Cc:From;
+	b=Pw4J8UXkQy5+jBVfd2aWCgPsOF3LXMVECSVAQ09SL5iQQH4LNdhmS4nAJ1faOP54w
+	 ZwSIkie9GiLSvp+f7iCn7fSdm9n84HnC8sf8KmAF0F/BqyPuevrnzZ/z2kDIo1uR2E
+	 LDGFqR+kGG7GXalmI3uppOIJMjiDbCQ+8MKaiTZ77pZtqc3REy0f8pCsLYZRjZiLR9
+	 JDm8j7NNFYFTSDa8ktJuX0nJkLSRKqknAhEJ1lW4wlFs2bVkPyPDrzrxDsVQntH2Fp
+	 7q8v+cJ7zA23X9PUu/eM3d6Q36AFFNkPHmZSSRO8ISV5/PPLQV15QvM2GpjZnX69G1
+	 RnZH0iosdNKlA==
+From: Nathan Chancellor <nathan@kernel.org>
+Date: Wed, 10 Sep 2025 13:47:26 -0700
+Subject: [PATCH] md/md-llbitmap: Use DIV_ROUND_UP_SECTOR_T
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <199343ab2a7.11b1e13e161813.4990067961195858029@collabora.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250910-llbitmap-fix-64-div-for-32-bit-v1-1-453a5c8e3e00@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAN3jwWgC/x2NSwqEMBAFryK99kESP0SvIi4yk3Zs8EciMiDef
+ ZpZFq94dVPmJJypL25KfEmWfVOwZUHvOWwfhkRlcsY1prMGy/KScw0HJvmirRHlwrQnVA46oPO
+ +CTY676ua9ORIrOI/MIzP8wNeZXLKcAAAAA==
+X-Change-ID: 20250910-llbitmap-fix-64-div-for-32-bit-9885a1d28834
+To: Jens Axboe <axboe@kernel.dk>, Song Liu <song@kernel.org>, 
+ Yu Kuai <yukuai3@huawei.com>, Li Nan <linan122@huawei.com>
+Cc: linux-raid@vger.kernel.org, linux-block@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Nathan Chancellor <nathan@kernel.org>
+X-Mailer: b4 0.15-dev
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4615; i=nathan@kernel.org;
+ h=from:subject:message-id; bh=B9nXx/uAd8bzj5r9K99vQjrO7Sot+mOg+1OtU9x4TJA=;
+ b=owGbwMvMwCUmm602sfCA1DTG02pJDBkHHz+33p76/YjXv9aEo7McPZx06tnZ1p96u/HJjRnKI
+ vXFPam1HaUsDGJcDLJiiizVj1WPGxrOOct449QkmDmsTCBDGLg4BWAi3QqMDDta8xw7jy3cXzrt
+ U0JPWtyFDM7Xvls5Fn99fUY6VLX4UQojw9na7EeCpj3ZNuuPvSg+9Hju1L/Sq2Xf+Cf1aNztWGZ
+ 9iRUA
+X-Developer-Key: i=nathan@kernel.org; a=openpgp;
+ fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
 
-On Wed, Sep 10, 2025 at 04:24:46PM +0100, Robert Beckett wrote:
-> I see that dm-loop is very old at this point. Do you know the rationale for rejection?
-> was there any hope to get it included with more work?
-> If the main objection was regarding file spans that they can't gurantee persist, maybe a new fallocate based
-> contrace with the filesystems could aleviate the worries? 
+When building for 32-bit platforms, there are several link (if builtin)
+or modpost (if a module) errors due to dividends of type 'sector_t' in
+DIV_ROUND_UP:
 
-Right: I first wrote it back in 2006. When it fimally made it onto a
-mailing list in 2008 the concerns were basically threefold: "why is DM
-reinventing everything?", the borrowing of the S_SWAPFILE flag to keep
-the file mapping stable while dm-loop goes behind the filesystem's
-back, and the greedy population of the extent table (lazily filling the
-extent table reduces start up time and the amount of pinned memory, but
-has the drawback that the target needs to allocate memory for unmapped
-extents while it is running, reintroducing the possibility of deadlock
-in low memory situations).
+  arm-linux-gnueabi-ld: drivers/md/md-llbitmap.o: in function `llbitmap_resize':
+  drivers/md/md-llbitmap.c:1017:(.text+0xae8): undefined reference to `__aeabi_uldivmod'
+  arm-linux-gnueabi-ld: drivers/md/md-llbitmap.c:1020:(.text+0xb10): undefined reference to `__aeabi_uldivmod'
+  arm-linux-gnueabi-ld: drivers/md/md-llbitmap.o: in function `llbitmap_end_discard':
+  drivers/md/md-llbitmap.c:1114:(.text+0xf14): undefined reference to `__aeabi_uldivmod'
+  arm-linux-gnueabi-ld: drivers/md/md-llbitmap.o: in function `llbitmap_start_discard':
+  drivers/md/md-llbitmap.c:1097:(.text+0x1808): undefined reference to `__aeabi_uldivmod'
+  arm-linux-gnueabi-ld: drivers/md/md-llbitmap.o: in function `llbitmap_read_sb':
+  drivers/md/md-llbitmap.c:867:(.text+0x2080): undefined reference to `__aeabi_uldivmod'
+  arm-linux-gnueabi-ld: drivers/md/md-llbitmap.o:drivers/md/md-llbitmap.c:895: more undefined references to `__aeabi_uldivmod' follow
 
-Most of the interesting discussions happened in this thread after Jens
-posted an RFC patch taking a similar approach for /dev/loop:
+Use DIV_ROUND_UP_SECTOR_T instead of DIV_ROUND_UP, which exists to
+handle this exact situation.
 
-  https://lkml.iu.edu/hypermail/linux/kernel/0801.1/0716.html
+Fixes: 5ab829f1971d ("md/md-llbitmap: introduce new lockless bitmap")
+Signed-off-by: Nathan Chancellor <nathan@kernel.org>
+---
+ drivers/md/md-llbitmap.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-This used a prio tree instead of a simple table and binary search.
+diff --git a/drivers/md/md-llbitmap.c b/drivers/md/md-llbitmap.c
+index 3337d5c7e7e5..1eb434306162 100644
+--- a/drivers/md/md-llbitmap.c
++++ b/drivers/md/md-llbitmap.c
+@@ -781,7 +781,7 @@ static int llbitmap_init(struct llbitmap *llbitmap)
+ 
+ 	while (chunks > space) {
+ 		chunksize = chunksize << 1;
+-		chunks = DIV_ROUND_UP(blocks, chunksize);
++		chunks = DIV_ROUND_UP_SECTOR_T(blocks, chunksize);
+ 	}
+ 
+ 	llbitmap->barrier_idle = DEFAULT_BARRIER_IDLE;
+@@ -864,8 +864,8 @@ static int llbitmap_read_sb(struct llbitmap *llbitmap)
+ 		goto out_put_page;
+ 	}
+ 
+-	if (chunksize < DIV_ROUND_UP(mddev->resync_max_sectors,
+-				     mddev->bitmap_info.space << SECTOR_SHIFT)) {
++	if (chunksize < DIV_ROUND_UP_SECTOR_T(mddev->resync_max_sectors,
++					      mddev->bitmap_info.space << SECTOR_SHIFT)) {
+ 		pr_err("md/llbitmap: %s: chunksize too small %lu < %llu / %lu",
+ 		       mdname(mddev), chunksize, mddev->resync_max_sectors,
+ 		       mddev->bitmap_info.space);
+@@ -892,7 +892,7 @@ static int llbitmap_read_sb(struct llbitmap *llbitmap)
+ 
+ 	llbitmap->barrier_idle = DEFAULT_BARRIER_IDLE;
+ 	llbitmap->chunksize = chunksize;
+-	llbitmap->chunks = DIV_ROUND_UP(mddev->resync_max_sectors, chunksize);
++	llbitmap->chunks = DIV_ROUND_UP_SECTOR_T(mddev->resync_max_sectors, chunksize);
+ 	llbitmap->chunkshift = ffz(~chunksize);
+ 	ret = llbitmap_cache_pages(llbitmap);
+ 
+@@ -1014,10 +1014,10 @@ static int llbitmap_resize(struct mddev *mddev, sector_t blocks, int chunksize)
+ 		chunksize = llbitmap->chunksize;
+ 
+ 	/* If there is enough space, leave the chunksize unchanged. */
+-	chunks = DIV_ROUND_UP(blocks, chunksize);
++	chunks = DIV_ROUND_UP_SECTOR_T(blocks, chunksize);
+ 	while (chunks > mddev->bitmap_info.space << SECTOR_SHIFT) {
+ 		chunksize = chunksize << 1;
+-		chunks = DIV_ROUND_UP(blocks, chunksize);
++		chunks = DIV_ROUND_UP_SECTOR_T(blocks, chunksize);
+ 	}
+ 
+ 	llbitmap->chunkshift = ffz(~chunksize);
+@@ -1094,7 +1094,7 @@ static void llbitmap_start_discard(struct mddev *mddev, sector_t offset,
+ 				   unsigned long sectors)
+ {
+ 	struct llbitmap *llbitmap = mddev->bitmap;
+-	unsigned long start = DIV_ROUND_UP(offset, llbitmap->chunksize);
++	unsigned long start = DIV_ROUND_UP_SECTOR_T(offset, llbitmap->chunksize);
+ 	unsigned long end = (offset + sectors - 1) >> llbitmap->chunkshift;
+ 	int page_start = (start + BITMAP_DATA_OFFSET) >> PAGE_SHIFT;
+ 	int page_end = (end + BITMAP_DATA_OFFSET) >> PAGE_SHIFT;
+@@ -1111,7 +1111,7 @@ static void llbitmap_end_discard(struct mddev *mddev, sector_t offset,
+ 				 unsigned long sectors)
+ {
+ 	struct llbitmap *llbitmap = mddev->bitmap;
+-	unsigned long start = DIV_ROUND_UP(offset, llbitmap->chunksize);
++	unsigned long start = DIV_ROUND_UP_SECTOR_T(offset, llbitmap->chunksize);
+ 	unsigned long end = (offset + sectors - 1) >> llbitmap->chunkshift;
+ 	int page_start = (start + BITMAP_DATA_OFFSET) >> PAGE_SHIFT;
+ 	int page_end = (end + BITMAP_DATA_OFFSET) >> PAGE_SHIFT;
 
-There have been various different approaches proposed down the years but
-none have made it to mainline to date. I wrote one in 2011 that
-refactored drivers/block/loop.c so that it could be reused by
-device-mapper: that seemed like it might be more acceptable upstream but
-we didn't pursue it at the time (it also removes the main benefit for
-your case, since it uses the regular loop.c machinery for IO).
+---
+base-commit: 5ab829f1971dc99f2aac10846c378e67fc875abc
+change-id: 20250910-llbitmap-fix-64-div-for-32-bit-9885a1d28834
 
-The version Mikulas posted is most closely related to a version I was
-working on in 2008-9:
-
-  https://www.sourceware.org/pub/dm/patches/2.6-unstable/editing/patches-2.6.31/dm-loop.patch
-
-Which is the one discussed in the thread above - I think roughly the
-same objections exist today.
-
-(historical note - dmsetup still has code to generate dm-loop tables if
-symlinked to the name 'dmlosetup' or 'losetup':
-
-  # dmlosetup 
-  dmlosetup: Please specify loop_device.
-  Usage:
-  
-  dmlosetup [-d|-a] [-e encryption] [-o offset] [-f|loop_device] [file]
-  
-  Couldn't process command line)
-
-Regards,
-Bryn.
+Best regards,
+--  
+Nathan Chancellor <nathan@kernel.org>
 
