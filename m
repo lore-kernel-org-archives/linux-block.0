@@ -1,153 +1,122 @@
-Received: from out30-112.freemail.mail.aliyun.com (out30-112.freemail.mail.aliyun.com [115.124.30.112])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D57BEAC7;
-	Wed, 10 Sep 2025 04:59:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.112
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 116522BD597;
+	Wed, 10 Sep 2025 05:26:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757480395; cv=none; b=JYvLUlTehivQMaBsoYus7HT9qmLjoQpV9Hl77rO5majjIiSbuKYgMmKvrsldcaRWJB9C7NXxywj3ZXAAVSt5q52xJzMbdvvEq/lc20vtsoIRfJpE8Y+6WqBY41jTmO0u0O23PkMjlcsBWrf7/s7tFYzpStjzVZV0mvB1mX36TvQ=
+	t=1757481985; cv=none; b=EdzSlKwlzJ4cII89OePdM1PwGHtEk+6eOGtlDQKmOr4OJkKHXuIyOAm9MymoX6k6Xx9HHeQ1L4nhrHzJ//Q8s06OuYqsSTRr38/2b3bGFm++eZ5WqrSyFCOBcI2U165WktcfR+WZ8oewc1JkbZxhGDFutLBdVduC59XpsCa8Vic=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757480395; c=relaxed/simple;
-	bh=lj5kD8P6093sAHvRDXOxI/tbWQdnAOy4Ybz98dwxlLY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WTEQBtUWootuDzV0wyLKobT0XijYu3ze0QVaHxW2MwocLIjgKeSpbVNGJAZrFWCUbfwALCzDuoVg7zRg2tT81q6bQDXT4MLn8zqTVp5i44WkMcpU6SqUsFEyxUkVXkCCaBoCF2csRooiciyjURptsGo/oMXwBW3cl5NiWELi/i0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=fbM1aV9h; arc=none smtp.client-ip=115.124.30.112
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+	s=arc-20240116; t=1757481985; c=relaxed/simple;
+	bh=bqpgnX0YeaX4gP4gTelyGSzbrLPxwuSSl4ugIJkeFPI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Y0bZuDXiBB3zpTYlTt9cGuC8/jtS0DtM7Av7SJYIuIjzM4EHBmHGS8gtdgPoouGbq6cV5Nv8hPF11UaFGZcv2ZyBVfwFPqVeLbgR7KLMKwNjNaPKzAI9uWxfpU+L8l8zmHRyHKTDaixlZfwysql032l7FHDLsZVZVO/l7ZB6pNY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W3++ctIi; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="fbM1aV9h"
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1757480384; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=nhxJhzMQKjnuR6FVjOzzTFISD7o26U38o9kESPDCcIc=;
-	b=fbM1aV9hyw5e8BiEuSZibcFsYnCPoc4/YHDqD2FFARYycVnsy1MK+Rs5iTQU5e3RYgckPTE5uYPxFTagkPHqQH2jyiTfX+sfAQ5T5LT0fT07DNg9BSQQviEgq+4cvMZulkcvocgH6csDQbthIXRqH2WnIGxs9vnybVya+alD24M=
-Received: from 30.221.131.126(mailfrom:hsiangkao@linux.alibaba.com fp:SMTPD_---0Wngc.UD_1757480382 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Wed, 10 Sep 2025 12:59:43 +0800
-Message-ID: <0b33ab17-2fc0-438f-95aa-56a1d20edb38@linux.alibaba.com>
-Date: Wed, 10 Sep 2025 12:59:41 +0800
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W3++ctIi"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF34CC4CEF0;
+	Wed, 10 Sep 2025 05:26:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757481983;
+	bh=bqpgnX0YeaX4gP4gTelyGSzbrLPxwuSSl4ugIJkeFPI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=W3++ctIiiR7UFpzqM9AUidv9AQ1n3Dz1tKeZadPk/293ETffI9nRLBp7aQx9AFled
+	 M5GCYM1B4a3jkkhLPVRESnUtwcqokI2ZK9ojJ1YPCMkJpjHT45Cl+QruyYKY3aGARs
+	 FpovID2F5xbpoec1xDhgC6MFSHIrXsB7JTzFkx6nfm41N+Pm3w/y/LnuGSrU2VRkhJ
+	 x7tt8kh1ACIrOtgalXRNyxNgQvord1Z8/t1JGvHRdIaRHxawPvJnDmdHHJxvC9RDqD
+	 RQiYwqXBRXcawbcju2eKP99VtdepUl8ofw/258NbTAl3BVZxhNFXZSkWH5N4CtNQIn
+	 DIZ8LyFL6amIQ==
+Date: Wed, 10 Sep 2025 08:26:18 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Marek Szyprowski <m.szyprowski@samsung.com>
+Cc: Jason Gunthorpe <jgg@nvidia.com>,
+	Abdiel Janulgue <abdiel.janulgue@gmail.com>,
+	Alexander Potapenko <glider@google.com>,
+	Alex Gaynor <alex.gaynor@gmail.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Christoph Hellwig <hch@lst.de>, Danilo Krummrich <dakr@kernel.org>,
+	David Hildenbrand <david@redhat.com>, iommu@lists.linux.dev,
+	Jason Wang <jasowang@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+	Joerg Roedel <joro@8bytes.org>, Jonathan Corbet <corbet@lwn.net>,
+	Juergen Gross <jgross@suse.com>, kasan-dev@googlegroups.com,
+	Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org, linux-nvme@lists.infradead.org,
+	linuxppc-dev@lists.ozlabs.org, linux-trace-kernel@vger.kernel.org,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	Robin Murphy <robin.murphy@arm.com>, rust-for-linux@vger.kernel.org,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Stefano Stabellini <sstabellini@kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	virtualization@lists.linux.dev, Will Deacon <will@kernel.org>,
+	xen-devel@lists.xenproject.org
+Subject: Re: [PATCH v6 03/16] dma-debug: refactor to use physical addresses
+ for page mapping
+Message-ID: <20250910052618.GH341237@unreal>
+References: <cover.1757423202.git.leonro@nvidia.com>
+ <56d1a6769b68dfcbf8b26a75a7329aeb8e3c3b6a.1757423202.git.leonro@nvidia.com>
+ <20250909193748.GG341237@unreal>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 13/16] iomap: move read/readahead logic out of
- CONFIG_BLOCK guard
-To: Joanne Koong <joannelkoong@gmail.com>
-Cc: brauner@kernel.org, miklos@szeredi.hu, hch@infradead.org,
- djwong@kernel.org, linux-block@vger.kernel.org, gfs2@lists.linux.dev,
- linux-fsdevel@vger.kernel.org, kernel-team@meta.com,
- linux-xfs@vger.kernel.org, linux-doc@vger.kernel.org
-References: <20250908185122.3199171-1-joannelkoong@gmail.com>
- <20250908185122.3199171-14-joannelkoong@gmail.com>
- <a1529c0f-1f1a-477a-aeeb-a4f108aab26b@linux.alibaba.com>
- <CAJnrk1aCCqoOAgcPUpr+Z09DhJ5BAYoSho5dveGQKB9zincYSQ@mail.gmail.com>
-From: Gao Xiang <hsiangkao@linux.alibaba.com>
-In-Reply-To: <CAJnrk1aCCqoOAgcPUpr+Z09DhJ5BAYoSho5dveGQKB9zincYSQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250909193748.GG341237@unreal>
 
-
-
-On 2025/9/9 23:33, Joanne Koong wrote:
-> On Mon, Sep 8, 2025 at 10:14 PM Gao Xiang <hsiangkao@linux.alibaba.com> wrote:
->>
->> On 2025/9/9 02:51, Joanne Koong wrote:
->>> There is no longer a dependency on CONFIG_BLOCK in the iomap read and
->>> readahead logic. Move this logic out of the CONFIG_BLOCK guard. This
->>> allows non-block-based filesystems to use iomap for reads/readahead.
->>>
->>> Signed-off-by: Joanne Koong <joannelkoong@gmail.com>
->>> ---
->>>    fs/iomap/buffered-io.c | 151 +++++++++++++++++++++--------------------
->>>    1 file changed, 76 insertions(+), 75 deletions(-)
->>>
->>> diff --git a/fs/iomap/buffered-io.c b/fs/iomap/buffered-io.c
->>> index f673e03f4ffb..c424e8c157dd 100644
->>> --- a/fs/iomap/buffered-io.c
->>> +++ b/fs/iomap/buffered-io.c
->>> @@ -358,81 +358,6 @@ void iomap_finish_folio_read(struct folio *folio, size_t off, size_t len,
->>>    }
->>> +
->>> +/**
->>> + * Read in a folio range asynchronously through bios.
->>> + *
->>> + * This should only be used for read/readahead, not for buffered writes.
->>> + * Buffered writes must read in the folio synchronously.
->>> + */
->>> +static int iomap_read_folio_range_bio_async(const struct iomap_iter *iter,
->>> +             struct iomap_read_folio_ctx *ctx, loff_t pos, size_t plen)
->>> +{
->>> +     struct folio *folio = ctx->cur_folio;
->>> +     const struct iomap *iomap = &iter->iomap;
->>> +     size_t poff = offset_in_folio(folio, pos);
->>> +     loff_t length = iomap_length(iter);
->>> +     sector_t sector;
->>> +     struct bio *bio = ctx->private;
->>> +
->>> +     iomap_start_folio_read(folio, plen);
->>> +
->>> +     sector = iomap_sector(iomap, pos);
->>> +     if (!bio || bio_end_sector(bio) != sector ||
->>> +         !bio_add_folio(bio, folio, plen, poff)) {
->>> +             gfp_t gfp = mapping_gfp_constraint(folio->mapping, GFP_KERNEL);
->>> +             gfp_t orig_gfp = gfp;
->>> +             unsigned int nr_vecs = DIV_ROUND_UP(length, PAGE_SIZE);
->>> +
->>> +             if (bio)
->>> +                     submit_bio(bio);
->>> +
->>> +             if (ctx->rac) /* same as readahead_gfp_mask */
->>> +                     gfp |= __GFP_NORETRY | __GFP_NOWARN;
->>> +             bio = bio_alloc(iomap->bdev, bio_max_segs(nr_vecs),
->>> +                                  REQ_OP_READ, gfp);
->>> +             /*
->>> +              * If the bio_alloc fails, try it again for a single page to
->>> +              * avoid having to deal with partial page reads.  This emulates
->>> +              * what do_mpage_read_folio does.
->>> +              */
->>> +             if (!bio)
->>> +                     bio = bio_alloc(iomap->bdev, 1, REQ_OP_READ, orig_gfp);
->>> +             if (ctx->rac)
->>> +                     bio->bi_opf |= REQ_RAHEAD;
->>> +             bio->bi_iter.bi_sector = sector;
->>> +             bio->bi_end_io = iomap_read_end_io;
->>> +             bio_add_folio_nofail(bio, folio, plen, poff);
->>> +             ctx->private = bio;
->>
->> Yes, I understand some way is needed to isolate bio from non-bio
->> based filesystems, and I also agree `bio` shouldn't be stashed
->> into `iter->private` since it's just an abuse usage as mentioned
->> in:
->> https://lore.kernel.org/r/20250903203031.GM1587915@frogsfrogsfrogs
->> https://lore.kernel.org/r/aLkskcgl3Z91oIVB@infradead.org
->>
->> However, the naming of `(struct iomap_read_folio_ctx)->private`
->> really makes me feel confused because the `private` name in
->> `read_folio_ctx` is much like a filesystem read context instead
->> of just be used as `bio` internally in iomap for block-based
->> filesystems.
->>
->> also the existing of `iter->private` makes the naming of
->> `ctx->private` more confusing at least in my view.
+On Tue, Sep 09, 2025 at 10:37:48PM +0300, Leon Romanovsky wrote:
+> On Tue, Sep 09, 2025 at 04:27:31PM +0300, Leon Romanovsky wrote:
+> > From: Leon Romanovsky <leonro@nvidia.com>
 > 
-> Do you think "ctx->data" would be better? Or is there something else
-> you had in mind?
+> <...>
+> 
+> >  include/linux/page-flags.h         |  1 +
+> 
+> <...>
+> 
+> > --- a/include/linux/page-flags.h
+> > +++ b/include/linux/page-flags.h
+> > @@ -614,6 +614,7 @@ FOLIO_FLAG(dropbehind, FOLIO_HEAD_PAGE)
+> >   * available at this point.
+> >   */
+> >  #define PageHighMem(__p) is_highmem_idx(page_zonenum(__p))
+> > +#define PhysHighMem(__p) (PageHighMem(phys_to_page(__p)))
+> 
+> This was a not so great idea to add PhysHighMem() because of "else"
+> below which unfolds to maze of macros and automatically generated
+> functions with "static inline int Page##uname ..." signature.
+> 
+> >  #define folio_test_highmem(__f)	is_highmem_idx(folio_zonenum(__f))
+> >  #else
+> >  PAGEFLAG_FALSE(HighMem, highmem)
 
-At least it sounds better on my side, but anyway it's just
-my own overall thought.  If other folks have different idea,
-I don't have strong opinion, I just need something for my own
-as previous said.
+After sleeping over it, the following hunk will help:
 
-Thanks,
-Gao Xiang
+diff --git a/include/linux/page-flags.h b/include/linux/page-flags.h
+index dfbc4ba86bba2..2a1f346178024 100644
+--- a/include/linux/page-flags.h
++++ b/include/linux/page-flags.h
+@@ -614,11 +614,11 @@ FOLIO_FLAG(dropbehind, FOLIO_HEAD_PAGE)
+  * available at this point.
+  */
+ #define PageHighMem(__p) is_highmem_idx(page_zonenum(__p))
+-#define PhysHighMem(__p) (PageHighMem(phys_to_page(__p)))
+ #define folio_test_highmem(__f)        is_highmem_idx(folio_zonenum(__f))
+ #else
+ PAGEFLAG_FALSE(HighMem, highmem)
+ #endif
++#define PhysHighMem(__p) (PageHighMem(phys_to_page(__p)))
+
+ /* Does kmap_local_folio() only allow access to one page of the folio? */
+ #ifdef CONFIG_DEBUG_KMAP_LOCAL_FORCE_MAP
+
 
 > 
-> Thanks,
-> Joanne
->>
->> Thanks,
->> Gao Xiang
-
+> Thanks
+> 
