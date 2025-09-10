@@ -1,169 +1,165 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE30E32A3D8
-	for <linux-block@vger.kernel.org>; Wed, 10 Sep 2025 15:48:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5ACB6327A3E
+	for <linux-block@vger.kernel.org>; Wed, 10 Sep 2025 15:55:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757519304; cv=none; b=sXHP9DGfGGT+t/AvQmuWEtc49nda1bBndXyDusYhP94v4m8BoSf0tSTcPqUWhB5KB/tbkYA1q+66YNTa59gOg6fEK6dGRQMb7Mgfm4mztdIxsQfqRRRLfy97DAvguYoZfs0NxZnlCH/U/Axjqwxz8C8cguACG1+7B4Xvtt5S4v4=
+	t=1757519758; cv=none; b=lb++ZXP71gmZYp3s9qTDl741BtG3/NOplYuO4gM9OoQ6Sw2hC1CrJn9ISK7jMZmmrCGAqK2HBTN6LlFXFQMWE8rGlWg3cZdZ9RxsgwtC5fVCYcX82fJgt8XKs5g5UaW3NnhyD8X4MucW0j5UPELoHDvvD0ZBWCi6fKilC7+u98I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757519304; c=relaxed/simple;
-	bh=523Ci022C3f4FlEiw0E+5BqweO7UB3kj+ojuHiTDzUs=;
+	s=arc-20240116; t=1757519758; c=relaxed/simple;
+	bh=JbkGbKmGymGSLLsdUZaBOo51FNEi13jYTbdjLpf1unA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bmBij+bybAs+W4/U9ik0nGJTS+EbX86+2GuzxsBi0lgB/IRqFQ33V0Vjr9TM6DCM024F94ST5XSGzFN60ttnEANvbmcfD/kHbXFzk7DvxVkDbOmHyY8MLoGAS+ws1TTUBiQDZnNA0HiJ+fjMBf84OnDtc/cOQcjZA/BdpnyiZXc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=mE5JItwS; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=o2CdR7nu; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=tNUhQ5dX; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=wketGrD4; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	 Content-Type:Content-Disposition:In-Reply-To; b=GIQ8wUZ0jdva1hOu70ej3+i3IYAfgwTehVXxfPs4N3nZTCiZ7Fb6ZECv3lsPaLfTuK/qMWcCTR7ylzCAvmKru0nV1rLBCbOLNt/ohqHqAiWkT/5SbjBZoTM5VCxPvZhjeW45nQ3GkaxVZta+DitQmPg0OdmNXCwpRVDqhroyA5w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LZpfVRhf; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="mE5JItwS";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="o2CdR7nu";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="tNUhQ5dX";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="wketGrD4"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id CB7EE37EF1;
-	Wed, 10 Sep 2025 15:48:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1757519299; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LZpfVRhf"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1757519756;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=HaWvMxpb8Ns4qwJJs7/pnIWdJsAZBETo2QPX7ztSweA=;
-	b=mE5JItwSu4Y5fM3LV/baQMXomzyo3q91aK9nWVjYm3sTghFWQ3YjRpRZwnDfcxhf3VtHHc
-	0mxgawfr5k3kgf6lxv8e9RNYqXRDbrdVh809Y1+jdemhhfH1p6lWqDXhi3HmBmf2zx4q8J
-	kjEBlgdw/Hses9D1ADQkEqnLDehn0V4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1757519299;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HaWvMxpb8Ns4qwJJs7/pnIWdJsAZBETo2QPX7ztSweA=;
-	b=o2CdR7nuVdLUEBy2nFMIO3RTf2/Kkqo2At8HF1WnUlQSbpCG3ElO7Vve0xJx474Y7TrUQ1
-	tvCqbcFAHuOgCHCA==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1757519298; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HaWvMxpb8Ns4qwJJs7/pnIWdJsAZBETo2QPX7ztSweA=;
-	b=tNUhQ5dXFj46AUkaqL2isKzb0vm4NIwrij31/avinfzVc74wdy8zBDYsv5gVFotewUzBag
-	uR8fzd7BQIrqBrMMKFujmlonwplxW1v+AUq6lZmyEFrJwtE/WGU/RFtkgZlpfFCL27g6Qi
-	E1goHCwCSLZYSucgTIfLMenWNt4IkvE=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1757519298;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HaWvMxpb8Ns4qwJJs7/pnIWdJsAZBETo2QPX7ztSweA=;
-	b=wketGrD4yuT1e9LxG7SzuOM4rRfDNOy2ACzWxtg0rHKpwHJjjII/5dEqNunsijhMWr3pFx
-	98nfjR5Zd5LTUEBw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 550D613310;
-	Wed, 10 Sep 2025 15:48:18 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id sVnBFMKdwWiMPQAAD6G6ig
-	(envelope-from <jack@suse.cz>); Wed, 10 Sep 2025 15:48:18 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id 13310A0A2D; Wed, 10 Sep 2025 17:48:11 +0200 (CEST)
-Date: Wed, 10 Sep 2025 17:48:11 +0200
-From: Jan Kara <jack@suse.cz>
-To: Christian Brauner <brauner@kernel.org>
-Cc: Jan Kara <jack@suse.cz>, Amir Goldstein <amir73il@gmail.com>, 
-	linux-fsdevel@vger.kernel.org, Josef Bacik <josef@toxicpanda.com>, 
-	Jeff Layton <jlayton@kernel.org>, Mike Yuan <me@yhndnzj.com>, 
-	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>, Lennart Poettering <mzxreary@0pointer.de>, 
-	Daan De Meyer <daan.j.demeyer@gmail.com>, Aleksa Sarai <cyphar@cyphar.com>, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>, 
-	Johannes Weiner <hannes@cmpxchg.org>, Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Chuck Lever <chuck.lever@oracle.com>, linux-nfs@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, cgroups@vger.kernel.org, 
-	netdev@vger.kernel.org
-Subject: Re: [PATCH 15/32] ns: remove ns_alloc_inum()
-Message-ID: <dz7tomtgcicj5woujey3uxmo23ou5bi4wdtmvuannbbyj3xcru@j5giavsztsyl>
-References: <20250910-work-namespace-v1-0-4dd56e7359d8@kernel.org>
- <20250910-work-namespace-v1-15-4dd56e7359d8@kernel.org>
+	bh=7RAbP5UJcO2BtVVPAKVuEh/4gKQck7zOlT1pd89BKDw=;
+	b=LZpfVRhf+TQDh6yiv16sYtGmEJnkDGT1RnqhUlSuUG0ifVhxBXLFX47Wu6qQosiJ4CKudj
+	c2uQsUSJprvsQOMI8uq2xOeMv35nrBIKwoEBHq+Hq7+uDCAMUspUN+pG6eC9h6V6dxMSdu
+	M4pRYcrj60tB5HblmvuFiyMouohq81c=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-399-6DhDCy1NPM616F_MIQDJjw-1; Wed, 10 Sep 2025 11:55:52 -0400
+X-MC-Unique: 6DhDCy1NPM616F_MIQDJjw-1
+X-Mimecast-MFC-AGG-ID: 6DhDCy1NPM616F_MIQDJjw_1757519752
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-b04206e3d7eso70256366b.1
+        for <linux-block@vger.kernel.org>; Wed, 10 Sep 2025 08:55:52 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757519751; x=1758124551;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7RAbP5UJcO2BtVVPAKVuEh/4gKQck7zOlT1pd89BKDw=;
+        b=GYKkyw06R5s9Q6vF8YzmV/pAs/c4EKeybjDYoQC9CMLHycYero4t/iqcWsrUqLkWkQ
+         UpTLao1GU/hOBafDQko+yLyHgR3ctSrAlX+KiAK2tvwj4CgWU8ZqcIcA9CdgO4pLuu7f
+         mkL9M6nwGEjy975wI+g1jcM37hcMm/ipTt17dpEg6msHnrPAvmBHUEYIR3SlryvGJ2Hm
+         HE6yURMOXEnB/fDMW7FwoxgRFNbtgjgEWkjVXIBbpU+h0DfR6Xe3MTnKEpBQAtc2O8GX
+         49pVovUaT85pktLeRiqrutHMffG4oo8vQVBGJP9t8hrt4OqEoaLAuTFbtcZnAnCRJ/x1
+         iaxg==
+X-Forwarded-Encrypted: i=1; AJvYcCW8J/iFeR1M026lzmKLbVLQk33WqYNfjE3ZcbaSLSlq30K2IH7lV865rmstUNCnsTq0+2vwuqwohIzOeA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy2m/JIHSLBzZPhfb+nZUU2Afg3iilM5nAG7fyCueZp4GllvjSE
+	lkPDJTSsmQk30ItvB7Q17TeF6KeMZiidwzTCSCE8UhBjH5/MCApfoVH+NSbviI7r2a2GawyuX8s
+	AE3c7Y1uqmvoG9jwfrEdHacxTowYTd/QEAPi0zNK44Ecf/O/xmY46/UHKOdViDYXT
+X-Gm-Gg: ASbGncv2R/cDQ/4rWQuT0UJxFWUKfXO/92qO83rgHNL5SblGnaVE19CNYM4ANIdmN8Q
+	qpsDLH9h/HpHqhLeqZg7BWjRRaU4c0RpiEcUSVKO2xWPpTGRX26L0FFVNU60olQXjGWtnqRTZPD
+	sTMY3rmdkUmCrpNfMRP4/CmY+SKqyIoHNguxYVfrlfwgcmJPvfmPlYHQvUknqNrglaRZFQ4Lvb8
+	TrPtqgrOu0ryPNOrKWarVrpO9o3G2EvjlIuh+XtmLBORD3SmmE94kDOwixH0mYJah37+shbd7pX
+	r/jCI6NbjrZedAxBe7rtuKW5qsFTdGMxcRTty3LmL2MIFDxsiZ7HJyxNJhj8XwXqQOY5VF6FU3w
+	k2HdlJ85YjIOJ+UiM
+X-Received: by 2002:a17:907:6d20:b0:af9:70f0:62e3 with SMTP id a640c23a62f3a-b07a648ed52mr11275366b.15.1757519751570;
+        Wed, 10 Sep 2025 08:55:51 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE4scsY5n/QsLA6mG0sjvrsfoCoD0h3ZgLanYsu42CsuN5gQm2fBKl3Hy6FexJBMaEtSlxTnw==
+X-Received: by 2002:a17:907:6d20:b0:af9:70f0:62e3 with SMTP id a640c23a62f3a-b07a648ed52mr11271166b.15.1757519751033;
+        Wed, 10 Sep 2025 08:55:51 -0700 (PDT)
+Received: from sgarzare-redhat (host-87-12-185-93.business.telecomitalia.it. [87.12.185.93])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b078334dd71sm180635766b.61.2025.09.10.08.55.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 10 Sep 2025 08:55:50 -0700 (PDT)
+Date: Wed, 10 Sep 2025 17:55:45 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "Richard W.M. Jones" <rjones@redhat.com>, Jens Axboe <axboe@kernel.dk>, 
+	Josef Bacik <josef@toxicpanda.com>, linux-kernel <linux-kernel@vger.kernel.org>, 
+	netdev@vger.kernel.org, Eric Dumazet <eric.dumazet@gmail.com>, 
+	syzbot+e1cd6bd8493060bd701d@syzkaller.appspotmail.com, Mike Christie <mchristi@redhat.com>, 
+	Yu Kuai <yukuai1@huaweicloud.com>, linux-block@vger.kernel.org, nbd@other.debian.org, 
+	Stefan Hajnoczi <stefanha@redhat.com>
+Subject: Re: [PATCH] nbd: restrict sockets to TCP and UDP
+Message-ID: <p43lkbkmsgnztlfbnrebsnnlkdvz4lt53vmnenoarejg6lhivz@cbia5lxat73k>
+References: <20250909132243.1327024-1-edumazet@google.com>
+ <20250909132936.GA1460@redhat.com>
+ <CANn89iLyxMYTw6fPzUeVcwLh=4=iPjHZOAjg5BVKeA7Tq06wPg@mail.gmail.com>
+ <CANn89iKdKMZLT+ArMbFAc8=X+Pp2XaVH7H88zSjAZw=_MvbWLQ@mail.gmail.com>
+ <63c99735-80ba-421f-8ad4-0c0ec8ebc3ea@kernel.dk>
+ <CANn89iJiBuJ=sHbfKjR-bJe6p12UrJ_DkOgysmAQuwCbNEy8BA@mail.gmail.com>
+ <20250909151851.GB1460@redhat.com>
+ <CANn89i+-mODVnC=TjwoxVa-qBc4ucibbGoqfM9W7Uf9bryj9qQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20250910-work-namespace-v1-15-4dd56e7359d8@kernel.org>
-X-Spam-Level: 
-X-Spamd-Result: default: False [-2.30 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	RCVD_TLS_LAST(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	ARC_NA(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	RCPT_COUNT_TWELVE(0.00)[27];
-	MIME_TRACE(0.00)[0:+];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[suse.cz,gmail.com,vger.kernel.org,toxicpanda.com,kernel.org,yhndnzj.com,in.waw.pl,0pointer.de,cyphar.com,zeniv.linux.org.uk,kernel.dk,cmpxchg.org,suse.com,google.com,redhat.com,oracle.com];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	TAGGED_RCPT(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	R_RATELIMIT(0.00)[to_ip_from(RLbyy5b47ky7xssyr143sji8pp)];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email,imap1.dmz-prg2.suse.org:helo,suse.cz:email]
-X-Spam-Flag: NO
-X-Spam-Score: -2.30
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANn89i+-mODVnC=TjwoxVa-qBc4ucibbGoqfM9W7Uf9bryj9qQ@mail.gmail.com>
 
-On Wed 10-09-25 16:37:00, Christian Brauner wrote:
-> It's now unused.
-> 
-> Signed-off-by: Christian Brauner <brauner@kernel.org>
+On Tue, Sep 09, 2025 at 08:33:27AM -0700, Eric Dumazet wrote:
+>On Tue, Sep 9, 2025 at 8:19 AM Richard W.M. Jones <rjones@redhat.com> wrote:
+>>
+>> On Tue, Sep 09, 2025 at 07:47:09AM -0700, Eric Dumazet wrote:
+>> > On Tue, Sep 9, 2025 at 7:37 AM Jens Axboe <axboe@kernel.dk> wrote:
+>> > >
+>> > > On 9/9/25 8:35 AM, Eric Dumazet wrote:
+>> > > > On Tue, Sep 9, 2025 at 7:04 AM Eric Dumazet <edumazet@google.com> wrote:
+>> > > >>
+>> > > >> On Tue, Sep 9, 2025 at 6:32 AM Richard W.M. Jones <rjones@redhat.com> wrote:
+>> > > >>>
+>> > > >>> On Tue, Sep 09, 2025 at 01:22:43PM +0000, Eric Dumazet wrote:
+>> > > >>>> Recently, syzbot started to abuse NBD with all kinds of sockets.
+>> > > >>>>
+>> > > >>>> Commit cf1b2326b734 ("nbd: verify socket is supported during setup")
+>> > > >>>> made sure the socket supported a shutdown() method.
+>> > > >>>>
+>> > > >>>> Explicitely accept TCP and UNIX stream sockets.
+>> > > >>>
+>> > > >>> I'm not clear what the actual problem is, but I will say that libnbd &
+>> > > >>> nbdkit (which are another NBD client & server, interoperable with the
+>> > > >>> kernel) we support and use NBD over vsock[1].  And we could support
+>> > > >>> NBD over pretty much any stream socket (Infiniband?) [2].
+>> > > >>>
+>> > > >>> [1] https://libguestfs.org/nbd_aio_connect_vsock.3.html
+>> > > >>>     https://libguestfs.org/nbdkit-service.1.html#AF_VSOCK
+>> > > >>> [2] https://libguestfs.org/nbd_connect_socket.3.html
+>> > > >>>
+>> > > >>> TCP and Unix domain sockets are by far the most widely used, but I
+>> > > >>> don't think it's fair to exclude other socket types.
+>> > > >>
+>> > > >> If we have known and supported socket types, please send a patch to add them.
+>> > > >>
+>> > > >> I asked the question last week and got nothing about vsock or other types.
+>> > > >>
+>> > > >> https://lore.kernel.org/netdev/CANn89iLNFHBMTF2Pb6hHERYpuih9eQZb6A12+ndzBcQs_kZoBA@mail.gmail.com/
+>> > > >>
+>> > > >> For sure, we do not want datagram sockets, RAW, netlink, and many others.
+>> > > >
+>> > > > BTW vsock will probably fire lockdep warnings, I see GFP_KERNEL
+>> > > > being used in net/vmw_vsock/virtio_transport.c
+>>
+>> CC-ing Stefan & Stefano.  Myself, I'm only using libnbd
+>> (ie. userspace) over vsock, not the kernel client.
 
-Looks good. Feel free to add:
+Thanks Rich for cceing me!
 
-Reviewed-by: Jan Kara <jack@suse.cz>
+>>
+>> > > > So you will have to fix this.
 
-								Honza
+How we should fix that?
 
-> ---
->  include/linux/proc_ns.h | 6 ------
->  1 file changed, 6 deletions(-)
-> 
-> diff --git a/include/linux/proc_ns.h b/include/linux/proc_ns.h
-> index dbb119bda097..e50d312f9fee 100644
-> --- a/include/linux/proc_ns.h
-> +++ b/include/linux/proc_ns.h
-> @@ -66,12 +66,6 @@ static inline void proc_free_inum(unsigned int inum) {}
->  
->  #endif /* CONFIG_PROC_FS */
->  
-> -static inline int ns_alloc_inum(struct ns_common *ns)
-> -{
-> -	WRITE_ONCE(ns->stashed, NULL);
-> -	return proc_alloc_inum(&ns->inum);
-> -}
-> -
->  static inline int ns_common_init(struct ns_common *ns,
->  				 const struct proc_ns_operations *ops,
->  				 bool alloc_inum)
-> 
-> -- 
-> 2.47.3
-> 
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+IIUC GFP_KERNEL in virtio_transport.c is used only by workqueue's 
+functions, but we have GFP_ATOMIC in the fast path that can be called 
+when the user is sending a packet.
+
+This is basically the driver for the virtio-vsock device that can 
+allocates extra buffers to be exposed to the device.
+In this case the allocation can happen in virtqueue_add_sgs() for virtio 
+indirect buffer, that IIRC virtio-vsock is not using currently (but we 
+don't know in the future).
+
+In any case, we use GFP_KERNEL also in virtio_transport_common.c to 
+allocate the sk_buff, so that should be the same issue.
+
+Thanks,
+Stefano
+
