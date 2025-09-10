@@ -1,611 +1,151 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20436319873
-	for <linux-block@vger.kernel.org>; Wed, 10 Sep 2025 11:26:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FB782D63F8
+	for <linux-block@vger.kernel.org>; Wed, 10 Sep 2025 11:30:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757503581; cv=none; b=Jbg6UTlzCPvhGwC7IoBzyXVOEs8eJrwLwpye+hM62uDBk5/YpjPe0sXkHDJ6LWO/+ZdumOif42s42YvdxoEmlt8PxkIFTMxH9Oemb6mY61ln+MRoChFMfkkU56oUehP5wp0/em7/uHD5nESG8d0SiLCvzkCRkKhISodhw4MBKpE=
+	t=1757503803; cv=none; b=KQp3Ny4DCP7LkDriL5BPYvp4zmmBNU1WWHcr1RzLNcz2smb+wbpVUuxTUIVjq6zJL7r/gjuBXQFNhO3eje8DOqo+por8mGzpw3c1VLfgbyDlP/JuUrJeRIj7UOBjnnYVatF9QZTQzrSHWPJoIafNlgmehNnETmDbsidL9FLTKiw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757503581; c=relaxed/simple;
-	bh=fRKHKQ5pUYl14SKLlAHyFBocmPkLHnTcohgfQbzTUXM=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=T8O+tHHn+6d+DcdthaSQ/eKxs25B/7osBmEeiacA5NEcsAzeleo+3ZYTXZzc2qJOiiH4XaAKLblJVwPJKkd428xyGY94HJ3OjcJdAMj3Oeb021bZC9EQrrXcX9+Vefi0FYrOowr5mUMuwnjchGXFRfmNVeuKFFsWqpxKnGOW3ls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=edp7TCJ4; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1757503803; c=relaxed/simple;
+	bh=Qc9ouAXEskfOMC2oi+ncx55YvT5qr8hhC366cFST6ww=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=mzTrhaVGIU3seqIxGBVcRVoh2iU9+ekWUT8Bq1J7jAGbMopMQybuFFcjdrAGTGqDGJx32UAKJB7o1znp5VI4cREWH2H+gNY9sDuePSegHsB11mdQTarGWyDAY+njvWPAtOZowV4h/Vj8wcvy3isWVxjAYMCMwkZFpxc0isV/M50=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=eA622EpI; arc=none smtp.client-ip=209.85.210.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="edp7TCJ4"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1757503578;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=liH1nklnHVre2p28ZbtNudhCSs0+M7IgI71XDYkZejs=;
-	b=edp7TCJ4jJvNgBcB1Bi6qFYz52FUevxswOVwgZ+52Rl1IsMSaCGrCPsy4CuhoJUh/Bg5yJ
-	A8M4TqC4vvckCBfCFg6+mvlVUAnGJeWwH0c1YXD74b/rTS0uvWWItjQw8EJPMUIM849Nev
-	JlpwyhPaOjt41/JT5gDNm8UlfK5b6RM=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-211-gHMBVzymM86vmYphXr2YQA-1; Wed,
- 10 Sep 2025 07:26:16 -0400
-X-MC-Unique: gHMBVzymM86vmYphXr2YQA-1
-X-Mimecast-MFC-AGG-ID: gHMBVzymM86vmYphXr2YQA_1757503575
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3090E180034A;
-	Wed, 10 Sep 2025 11:26:15 +0000 (UTC)
-Received: from [10.44.32.12] (unknown [10.44.32.12])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 810F61800576;
-	Wed, 10 Sep 2025 11:26:13 +0000 (UTC)
-Date: Wed, 10 Sep 2025 13:26:06 +0200 (CEST)
-From: Mikulas Patocka <mpatocka@redhat.com>
-To: Robert Beckett <bob.beckett@collabora.com>
-cc: dm-devel <dm-devel@lists.linux.dev>, 
-    linux-block <linux-block@vger.kernel.org>, kernel <kernel@collabora.com>
-Subject: Re: deadlock when swapping to encrypted swapfile
-In-Reply-To: <1992f628105.2bf0303b1373545.4844645742991812595@collabora.com>
-Message-ID: <a7872ca2-be14-0720-190c-c03d4ddf7a5d@redhat.com>
-References: <1992a9545eb.1ec14bf0659281.6434647558731823661@collabora.com> <2d517844-b7bf-3930-e811-e073ec347d4a@redhat.com> <1992f628105.2bf0303b1373545.4844645742991812595@collabora.com>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="eA622EpI"
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-77238cb3cbbso7030587b3a.0
+        for <linux-block@vger.kernel.org>; Wed, 10 Sep 2025 04:30:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1757503800; x=1758108600; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Ga9+oP8GJMEvZEK47pxYW+xPRCoN8XvpDsIn4NoQ3I8=;
+        b=eA622EpII/lw7KXH+sQLUXm/RKri5K7EbPSJDp9IolDskuAJzUcodBmrMCMndc2eIn
+         fboRjx5UvE8BWvySlGtIubp7v2Fk8Fvo11Aivjr3Vm/gB9l+2Mbkn2o6IrdNzZS1ipOI
+         dT+l2Eks6AdhG7ddkZVVgbC4sOPv7J7fCW2NHJgUMIl5a0qDALdyz/6hgMrBuXr6Y+gH
+         qhP+zRWv7flCXnnhTBVHhsc+owqnnp9lxkO1WoZqMKsDxjOdIoHRKskKfVn1wZo6fdJA
+         OBJ0qGq1YpS9Vz2616ex/grepkCVkXkZvz/swdAPjtCY+MJAQOdxEUbPXcSGgacBEdOP
+         EHlw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757503800; x=1758108600;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Ga9+oP8GJMEvZEK47pxYW+xPRCoN8XvpDsIn4NoQ3I8=;
+        b=tCO+q7eTTsLLdmaes2VBNxPLmhqqRVfr7u8aho1rjsG9qXYLq7JlSv9XPnS9vavuu4
+         zhQs4tgfOwhTfZ6/h7k3hzqyQKLvkSOLGYvQgbN/wRRl3tyhDNl8ghqMEnY/3Fbu/IrX
+         n3i4SM7QKwrIc2Ji7e6Dth1MFfAa35/Ku4S3xwv/nujCct+Vueju1Rm+PmH8B4VpaaWg
+         CKu2aYyk5yu5Yx36KGL35l8CMZ3/C8lUXnV9rSMw7wzaxutwmsNm0F5sl/WJYPHq6/z5
+         jPRDglVzfxjjIh+IGbfGkle8Ju/HTdNwd6rSKOXF9YMnN2IdN6sAbeekv5wKqOKIlyeO
+         ZFKQ==
+X-Gm-Message-State: AOJu0YxQZaAb5fb8IkDuQ93gbYIQdmbAxrBh6ruqCxCfKayiPU/aoiuU
+	LKHi968ngVYW75JRhBg2FgufzGJaXrymFfHOsAFiewFguagHzQmyGDFgcHqBnQy8igg=
+X-Gm-Gg: ASbGncsDk2xocB0EkzenWAyY59t6ln5yD9/1jO6zeYTFwWUF1McseVj5pMyWExVNfTo
+	cXibPEdD4uoJN6NWYS8czm67UjKRg8djwKQPvXFpF0fZk2PtKjB1Ker/2odpg3A4ZHQFm3JgiaI
+	R814yEM1kxP6/q8Kn9YZauCRuOz99FhVemdvvCG1n2g5fAl6DJJmNPm87gkUHqSHud+uRW27Vf4
+	Isi1yJ/Wp3N1vWNnr1E2PuXd4Eu8pV/Lt+I1WfH0enIykB1CjC683dzHiHVufnd2+AdNWQ52Zul
+	OrI9vMybZljV03puj21VO1VkmWehlgUXiiX4ugNOqDdw9XA5q+eTR37J0vY50HuVVpfSJtihYyC
+	kCuyPYzUVWqNgi8M=
+X-Google-Smtp-Source: AGHT+IHmcYOon3e+vAK2exKd9NspHl41ZALs3u/nxenWGV2WwxtMrS9LQckcTVCeEJ6LUSVFA5o+mQ==
+X-Received: by 2002:a05:6a20:2447:b0:245:ffe1:560a with SMTP id adf61e73a8af0-2533fab6247mr22677088637.22.1757503800180;
+        Wed, 10 Sep 2025 04:30:00 -0700 (PDT)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-774662920b1sm4964965b3a.52.2025.09.10.04.29.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 10 Sep 2025 04:29:59 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: hch@infradead.org, colyli@kernel.org, hare@suse.de, dlemoal@kernel.org, 
+ tieren@fnnas.com, bvanassche@acm.org, tj@kernel.org, josef@toxicpanda.com, 
+ song@kernel.org, satyat@google.com, ebiggers@google.com, kmo@daterainc.com, 
+ neil@brown.name, akpm@linux-foundation.org, 
+ Yu Kuai <yukuai1@huaweicloud.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ cgroups@vger.kernel.org, linux-raid@vger.kernel.org, yukuai3@huawei.com, 
+ yi.zhang@huawei.com, yangerkun@huawei.com, johnny.chenyi@huawei.com
+In-Reply-To: <20250910063056.4159857-1-yukuai1@huaweicloud.com>
+References: <20250910063056.4159857-1-yukuai1@huaweicloud.com>
+Subject: Re: [PATCH v2 for-6.18/block 00/16] block: fix ordering of
+ recursive split IO
+Message-Id: <175750379870.204398.16969834521074103761.b4-ty@kernel.dk>
+Date: Wed, 10 Sep 2025 05:29:58 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3-dev-2ce6c
 
 
-
-On Tue, 9 Sep 2025, Robert Beckett wrote:
-
+On Wed, 10 Sep 2025 14:30:40 +0800, Yu Kuai wrote:
+> Changes from v1:
+>  - fix compile failure if CONFIG_BLOCK_CGROUP is disabled in patch 2;
+>  - change the words:
+>    fix disordered split IO -> fix ordering of split IO
+>  - add review tag from Bart and Christoph
+> Changes from RFC v3:
+>  - initialize bio->issue_time_ns in blk_mq_submit_bio, patch 2;
+>  - set/clear new queue_flag when iolatency is enabled/disabled, patch 3;
+>  - fix compile problem for md-linear, patch 12;
+>  - make should_fail_bio() non-static, and open code new helper, patch 14;
+>  - remove the checking for zoned disk, patch 15;
+> Changes from RFC v2:
+>  - add patch 1,2 to cleanup bio_issue;
+>  - add patch 3,4 to fix missing processing for split bio first;
+>  - bypass zoned device in patch 14;
+> Changes from RFC:
+>  - export a new helper bio_submit_split_bioset() instead of
+> export bio_submit_split() directly;
+>  - don't set no merge flag in the new helper;
+>  - add patch 7 and patch 10;
+>  - add patch 8 to skip bio checks for resubmitting split bio;
 > 
->  ---- On Tue, 09 Sep 2025 15:37:09 +0100  Mikulas Patocka <mpatocka@redhat.com> wrote --- 
->  > 
->  > 
->  > On Mon, 8 Sep 2025, Robert Beckett wrote:
->  > 
->  > > Hi,
->  > > 
->  > > While testing resiliency of encrypted swap using dmcrypt we encounter easily reproducible deadlocks.
->  > > The setup is a simple 1GB encrypted swap file [1] with a little mem chewer program [2] to consume all ram.
->  > > 
->  > > [1] Swap file setup
->  > > ```
->  > > $ swapoff /home/swapfile
->  > > $ echo 'swap /home/swapfile /dev/urandom swap,cipher=aes-cbc-essiv:sha256,size=256' >> /etc/crypttab
->  > > $ systemctl daemon-reload
->  > > $ systemctl start systemd-cryptsetup@swap.service
->  > > $ swapon /dev/mapper/swap
->  > > ```
->  > 
->  > I have tried to swap on encrypted block device and it worked for me.
->  > 
->  > I've just realized that you are swapping to a file with the loopback 
->  > driver on the top of it and with the dm-crypt device on the top of the 
->  > loopback device.
->  > 
->  > This can't work in principle - the problem is that the filesystem needs to 
->  > allocate memory when you write to it, so it deadlocks when the machine 
->  > runs out of memory and needs to write back some pages. There is no easy 
->  > fix - fixing this would require major rewrite of the VFS layer.
->  > 
->  > When you swap to a file directly, the kernel bypasses the filesystem, so 
->  > it should work - but when you put encryption on the top of a file, there 
->  > is no way how to bypass the filesystem.
->  > 
->  > So, I suggest to create a partition or a logical volume for swap and put 
->  > dm-crypt on the top of it.
->  > 
->  > Mikulas
->  > 
->  > 
-> 
-> Yeah, unfortunately we are currently restricted to using a swapfile due to many units already shipped with that.
-> We have longer term plans to dynamically allocate the swapfiles as neded based on a new query for estimated size
-> required for hibernation etc. Moving to swap partition is just not viable currently.
+> [...]
 
-You can try the dm-loop target that I created some times ago. It won't be 
-in the official kernel because the Linux developers don't like the idea of 
-creating fixed mapping for a file, but it may work better for you. Unlike 
-the in-kernel loop driver, the dm-loop driver doesn't allocate memory when 
-processing reads and write.
+Applied, thanks!
 
-Create a swap file on the filesystem, load the dm-loop target on the top 
-of that file and then create dm-crypt on the top of the dm-loop target. 
-Then, run mkswap and swapon on the dm-crypt device.
+[01/16] block: cleanup bio_issue
+        commit: 1733e88874838ddebf7774440c285700865e6b08
+[02/16] block: initialize bio issue time in blk_mq_submit_bio()
+        commit: 1f963bdd6420b6080bcfd0ee84a75c96f35545a6
+[03/16] blk-mq: add QUEUE_FLAG_BIO_ISSUE_TIME
+        commit: ea3d1f104db60f9d5074b33819ccea3c216e0bee
+[04/16] md: fix mssing blktrace bio split events
+        commit: 22f166218f7313e8fe2d19213b5f4b3265f8c39e
+[05/16] blk-crypto: fix missing blktrace bio split events
+        commit: 06d712d297649f48ebf1381d19bd24e942813b37
+[06/16] block: factor out a helper bio_submit_split_bioset()
+        commit: e37b5596a19be9a150cb194ec32e78f295a3574b
+[07/16] md/raid0: convert raid0_handle_discard() to use bio_submit_split_bioset()
+        commit: 5b38ee5a4a12cfdefd848f7ec09da3e9007ad55f
+[08/16] md/raid1: convert to use bio_submit_split_bioset()
+        commit: a6fcc160d6fd9b4ddd229e351518daee21eecad7
+[09/16] md/raid10: add a new r10bio flag R10BIO_Returned
+        commit: deeeab3028afebf2f13428f69dcba9f572f0463b
+[10/16] md/raid10: convert read/write to use bio_submit_split_bioset()
+        commit: 6fc07785d9b89255bba45fc84475bb32f9737a90
+[11/16] md/raid5: convert to use bio_submit_split_bioset()
+        commit: 9e8a5b37c9ea3ae9db9028ea756ececf221d9a5a
+[12/16] md/md-linear: convert to use bio_submit_split_bioset()
+        commit: 6529d41d87827f9a27f6c0c6d34c2b77b250b6c6
+[13/16] blk-crypto: convert to use bio_submit_split_bioset()
+        commit: e3290419d9be6cbd7a42c0691504dd66825cabf5
+[14/16] block: skip unnecessary checks for split bio
+        commit: 0b64682e78f7a53ea863e368b1aa66f05767858d
+[15/16] block: fix ordering of recursive split IO
+        commit: b2f5974079d82a4761f002e80601064d4e39a81f
+[16/16] md/raid0: convert raid0_make_request() to use bio_submit_split_bioset()
+        commit: e0ed2bca7bef9267da0928a8ed6d1de41f19ecf6
 
-> I tried halving /sys/module/dm_mod/parameters/swap_bios but it didn't help, which based on your more recent
-> reply is not unexpected.
-> 
-> I have a work around for now, which is to run a userland earlyoom daemon. That seems to get in and oomkill in time.
-> I guess another option would be to have the swapfile in a luks encrypted partition, but that equally is not viable for
-> steamdeck currently.
-> 
-> However, I'm still interested in the longer term solution of fixing the kernel so that it can handle scenarios
-> like this no matter how ill advised they may be. Telling users not to do something seems like a bad solution :)
+Best regards,
+-- 
+Jens Axboe
 
-You would have to rewrite the filesystems not to allocate memory when 
-processing reads and writes. I think that this is not feasible.
 
-> Do you have any ideas about the unreliable kernel oomkiller stepping in? I definitely fill ram and swap, seems like
-> it should be firing.
-
-I think that the main problem with the OOM killer is that it sometimes 
-doesn't fire for big applications.
-
-If you create a simple program that does malloc in a loop, the OOM killer 
-will kill it reliably. However, if some big program (such as web browser, 
-text editor, ...) allocates too much memory, the OOM killer may not kill 
-it.
-
-The problem is that when the kernel runs out of memory, it tries to flush 
-filesystem caches first. However the program code is also executed from 
-filesystem cache. So, it flushes the pages with the program code, which 
-makes the big program run slower. The program that is running out of 
-memory allocates more pages, so more code will be flushed and the program 
-will run even slower - and so on, in a loop. So, the system slows down 
-gradually to a halt without really going out of memory and killing the big 
-program.
-
-I think that using userspace OOM killer is appropriate to prevent this 
-problem with the kernel OOM killer. 
-
-Mikulas
-
-> Thanks
-> 
-> Bob
-
----
- drivers/md/Kconfig   |    9 +
- drivers/md/Makefile  |    1 
- drivers/md/dm-loop.c |  404 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 414 insertions(+)
-
-Index: linux-2.6/drivers/md/Kconfig
-===================================================================
---- linux-2.6.orig/drivers/md/Kconfig	2025-09-10 13:06:15.000000000 +0200
-+++ linux-2.6/drivers/md/Kconfig	2025-09-10 13:06:15.000000000 +0200
-@@ -647,6 +647,15 @@ config DM_ZONED
- 
- 	  If unsure, say N.
- 
-+config DM_LOOP
-+	tristate "Loop target"
-+	depends on BLK_DEV_DM
-+	help
-+	  This device-mapper target allows you to treat a regular file as
-+	  a block device.
-+
-+	  If unsure, say N.
-+
- config DM_AUDIT
- 	bool "DM audit events"
- 	depends on BLK_DEV_DM
-Index: linux-2.6/drivers/md/Makefile
-===================================================================
---- linux-2.6.orig/drivers/md/Makefile	2025-09-10 13:06:15.000000000 +0200
-+++ linux-2.6/drivers/md/Makefile	2025-09-10 13:06:15.000000000 +0200
-@@ -79,6 +79,7 @@ obj-$(CONFIG_DM_CLONE)		+= dm-clone.o
- obj-$(CONFIG_DM_LOG_WRITES)	+= dm-log-writes.o
- obj-$(CONFIG_DM_INTEGRITY)	+= dm-integrity.o
- obj-$(CONFIG_DM_ZONED)		+= dm-zoned.o
-+obj-$(CONFIG_DM_LOOP)		+= dm-loop.o
- obj-$(CONFIG_DM_WRITECACHE)	+= dm-writecache.o
- obj-$(CONFIG_SECURITY_LOADPIN_VERITY)	+= dm-verity-loadpin.o
- 
-Index: linux-2.6/drivers/md/dm-loop.c
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ linux-2.6/drivers/md/dm-loop.c	2025-09-10 13:06:15.000000000 +0200
-@@ -0,0 +1,404 @@
-+#include <linux/device-mapper.h>
-+
-+#include <linux/module.h>
-+#include <linux/pagemap.h>
-+
-+#define DM_MSG_PREFIX "loop"
-+
-+struct loop_c {
-+	struct file *filp;
-+	char *path;
-+	loff_t offset;
-+	struct block_device *bdev;
-+	struct inode *inode;
-+	unsigned blkbits;
-+	bool read_only;
-+	sector_t mapped_sectors;
-+
-+	sector_t nr_extents;
-+	struct dm_loop_extent *map;
-+};
-+
-+struct dm_loop_extent {
-+	sector_t start; 		/* start sector in mapped device */
-+	sector_t to;			/* start sector on target device */
-+	sector_t len;			/* length in sectors */
-+};
-+
-+static sector_t blk2sect(struct loop_c *lc, blkcnt_t block)
-+{
-+	return block << (lc->blkbits - SECTOR_SHIFT);
-+}
-+
-+static blkcnt_t sec2blk(struct loop_c *lc, sector_t sector)
-+{
-+	return sector >> (lc->blkbits - SECTOR_SHIFT);
-+}
-+
-+static blkcnt_t sec2blk_roundup(struct loop_c *lc, sector_t sector)
-+{
-+	return (sector + (1 << (lc->blkbits - SECTOR_SHIFT)) - 1) >> (lc->blkbits - SECTOR_SHIFT);
-+}
-+
-+static struct dm_loop_extent *extent_binary_lookup(struct loop_c *lc, sector_t sector)
-+{
-+	ssize_t first = 0;
-+	ssize_t last = lc->nr_extents - 1;
-+
-+	while (first <= last) {
-+		ssize_t middle = (first + last) >> 1;
-+		struct dm_loop_extent *ex = &lc->map[middle];
-+		if (sector < ex->start) {
-+			last = middle - 1;
-+			continue;
-+		}
-+		if (likely(sector >= ex->start + ex->len)) {
-+			first = middle + 1;
-+			continue;
-+		}
-+		return ex;
-+	}
-+
-+	return NULL;
-+}
-+
-+static int loop_map(struct dm_target *ti, struct bio *bio)
-+{
-+	struct loop_c *lc = ti->private;
-+	sector_t sector, len;
-+	struct dm_loop_extent *ex;
-+
-+	sector = dm_target_offset(ti, bio->bi_iter.bi_sector);
-+	ex = extent_binary_lookup(lc, sector);
-+	if (!ex)
-+		return DM_MAPIO_KILL;
-+
-+	bio_set_dev(bio, lc->bdev);
-+	bio->bi_iter.bi_sector = ex->to + (sector - ex->start);
-+	len = ex->len - (sector - ex->start);
-+	if (len < bio_sectors(bio))
-+		dm_accept_partial_bio(bio, len);
-+
-+	if (unlikely(!ex->to)) {
-+		if (unlikely(!lc->read_only))
-+			return DM_MAPIO_KILL;
-+		zero_fill_bio(bio);
-+		bio_endio(bio);
-+		return DM_MAPIO_SUBMITTED;
-+	}
-+
-+	return DM_MAPIO_REMAPPED;
-+}
-+
-+static void loop_status(struct dm_target *ti, status_type_t type,
-+		unsigned status_flags, char *result, unsigned maxlen)
-+{
-+	struct loop_c *lc = ti->private;
-+	size_t sz = 0;
-+
-+	switch (type) {
-+		case STATUSTYPE_INFO:
-+			result[0] = '\0';
-+			break;
-+		case STATUSTYPE_TABLE:
-+			DMEMIT("%s %llu", lc->path, lc->offset);
-+			break;
-+		case STATUSTYPE_IMA:
-+			DMEMIT_TARGET_NAME_VERSION(ti->type);
-+			DMEMIT(",file_name=%s,offset=%llu;", lc->path, lc->offset);
-+			break;
-+	}
-+}
-+
-+static int loop_iterate_devices(struct dm_target *ti,
-+				iterate_devices_callout_fn fn, void *data)
-+{
-+	return 0;
-+}
-+
-+static int extent_range(struct loop_c *lc,
-+			sector_t logical_blk, sector_t last_blk,
-+			sector_t *begin_blk, sector_t *nr_blks,
-+			char **error)
-+{
-+	sector_t dist = 0, phys_blk, probe_blk = logical_blk;
-+	int r;
-+
-+	/* Find beginning physical block of extent starting at logical_blk. */
-+	*begin_blk = probe_blk;
-+	*nr_blks = 0;
-+	r = bmap(lc->inode, begin_blk);
-+	if (r) {
-+		*error = "bmap failed";
-+		return r;
-+	}
-+	if (!*begin_blk) {
-+		if (!lc->read_only) {
-+			*error = "File is sparse";
-+			return -ENXIO;
-+		}
-+	}
-+
-+	for (phys_blk = *begin_blk; phys_blk == *begin_blk + dist; dist += !!*begin_blk) {
-+		cond_resched();
-+
-+		(*nr_blks)++;
-+		if (++probe_blk > last_blk)
-+			break;
-+
-+		phys_blk = probe_blk;
-+		r = bmap(lc->inode, &phys_blk);
-+		if (r) {
-+			*error = "bmap failed";
-+			return r;
-+		}
-+		if (unlikely(!phys_blk)) {
-+			if (!lc->read_only) {
-+				*error = "File is sparse";
-+				return -ENXIO;
-+			}
-+		}
-+	}
-+
-+	return 0;
-+}
-+
-+static int loop_extents(struct loop_c *lc, sector_t *nr_extents,
-+			struct dm_loop_extent *map, char **error)
-+{
-+	int r;
-+	sector_t start = 0;
-+	sector_t nr_blks, begin_blk;
-+	sector_t after_last_blk = sec2blk_roundup(lc,
-+			(lc->mapped_sectors + (lc->offset >> 9)));
-+	sector_t logical_blk = sec2blk(lc, lc->offset >> 9);
-+
-+	*nr_extents = 0;
-+
-+	/* for each block in the mapped region */
-+	while (logical_blk < after_last_blk) {
-+		r = extent_range(lc, logical_blk, after_last_blk - 1,
-+				 &begin_blk, &nr_blks, error);
-+
-+		if (unlikely(r))
-+			return r;
-+
-+		if (map) {
-+			if (*nr_extents >= lc->nr_extents) {
-+				*error = "The file changed while mapping it";
-+				return -EBUSY;
-+			}
-+			map[*nr_extents].start = start;
-+			map[*nr_extents].to = blk2sect(lc, begin_blk);
-+			map[*nr_extents].len = blk2sect(lc, nr_blks);
-+		}
-+
-+		(*nr_extents)++;
-+		start += blk2sect(lc, nr_blks);
-+		logical_blk += nr_blks;
-+	}
-+
-+	if (*nr_extents != lc->nr_extents) {
-+		*error = "The file changed while mapping it";
-+		return -EBUSY;
-+	}
-+
-+	return 0;
-+}
-+
-+static int setup_block_map(struct loop_c *lc, struct dm_target *ti)
-+{
-+	int r;
-+	sector_t n_file_sectors, offset_sector, nr_extents_tmp;
-+
-+	if (!S_ISREG(lc->inode->i_mode) || !lc->inode->i_sb || !lc->inode->i_sb->s_bdev) {
-+		ti->error = "The file is not a regular file";
-+		return -ENXIO;
-+	}
-+
-+	lc->bdev = lc->inode->i_sb->s_bdev;
-+	lc->blkbits = lc->inode->i_blkbits;
-+	n_file_sectors = i_size_read(lc->inode) >> lc->blkbits << (lc->blkbits - 9);
-+
-+	if (lc->offset & ((1 << lc->blkbits) - 1)) {
-+		ti->error = "Unaligned offset";
-+		return -EINVAL;
-+	}
-+	offset_sector = lc->offset >> 9;
-+	if (offset_sector >= n_file_sectors) {
-+		ti->error = "Offset is greater than file size";
-+		return -EINVAL;
-+	}
-+	if (ti->len > (n_file_sectors - offset_sector)) {
-+		ti->error = "Target maps area after file end";
-+		return -EINVAL;
-+	}
-+	lc->mapped_sectors = ti->len >> (lc->blkbits - 9) << (lc->blkbits - 9);
-+
-+	r = loop_extents(lc, &lc->nr_extents, NULL, &ti->error);
-+	if (r)
-+		return r;
-+
-+	if (lc->nr_extents != (size_t)lc->nr_extents) {
-+		ti->error = "Too many extents";
-+		return -EOVERFLOW;
-+	}
-+
-+	lc->map = kvcalloc(lc->nr_extents, sizeof(struct dm_loop_extent), GFP_KERNEL);
-+	if (!lc->map) {
-+		ti->error = "Failed to allocate extent map";
-+		return -ENOMEM;
-+	}
-+
-+	r = loop_extents(lc, &nr_extents_tmp, lc->map, &ti->error);
-+	if (r)
-+		return r;
-+
-+	return 0;
-+}
-+
-+static int loop_lock_inode(struct inode *inode)
-+{
-+	int r;
-+	inode_lock(inode);
-+	if (IS_SWAPFILE(inode)) {
-+		inode_unlock(inode);
-+		return -EBUSY;
-+	}
-+	inode->i_flags |= S_SWAPFILE;
-+	r = inode_drain_writes(inode);
-+	if (r) {
-+		inode->i_flags &= ~S_SWAPFILE;
-+		inode_unlock(inode);
-+		return r;
-+	}
-+	inode_unlock(inode);
-+	return 0;
-+}
-+
-+static void loop_unlock_inode(struct inode *inode)
-+{
-+	inode_lock(inode);
-+	inode->i_flags &= ~S_SWAPFILE;
-+	inode_unlock(inode);
-+}
-+
-+static void loop_free(struct loop_c *lc)
-+{
-+	if (!lc)
-+		return;
-+	if (!IS_ERR_OR_NULL(lc->filp)) {
-+		loop_unlock_inode(lc->inode);
-+		filp_close(lc->filp, NULL);
-+	}
-+	kvfree(lc->map);
-+	kfree(lc->path);
-+	kfree(lc);
-+}
-+
-+static int loop_ctr(struct dm_target *ti, unsigned argc, char **argv)
-+{
-+	struct loop_c *lc = NULL;
-+	int r;
-+	char dummy;
-+
-+	if (argc != 2) {
-+		r = -EINVAL;
-+		ti->error = "Invalid number of arguments";
-+		goto err;
-+	}
-+
-+	lc = kzalloc(sizeof(*lc), GFP_KERNEL);
-+	if (!lc) {
-+		r = -ENOMEM;
-+		ti->error = "Cannot allocate loop context";
-+		goto err;
-+	}
-+	ti->private = lc;
-+
-+	lc->path = kstrdup(argv[0], GFP_KERNEL);
-+	if (!lc->path) {
-+		r = -ENOMEM;
-+		ti->error = "Cannot allocate loop path";
-+		goto err;
-+	}
-+
-+	if (sscanf(argv[1], "%lld%c", &lc->offset, &dummy) != 1) {
-+		r = -EINVAL;
-+		ti->error = "Invalid file offset";
-+		goto err;
-+	}
-+
-+	lc->read_only = !(dm_table_get_mode(ti->table) & FMODE_WRITE);
-+
-+	lc->filp = filp_open(lc->path, lc->read_only ? O_RDONLY : O_RDWR, 0);
-+	if (IS_ERR(lc->filp)) {
-+		r = PTR_ERR(lc->filp);
-+		ti->error = "Could not open backing file";
-+		goto err;
-+	}
-+
-+	lc->inode = lc->filp->f_mapping->host;
-+
-+	r = loop_lock_inode(lc->inode);
-+	if (r) {
-+		ti->error = "Could not lock inode";
-+		goto err;
-+	}
-+
-+	r = setup_block_map(lc, ti);
-+	if (r) {
-+		goto err;
-+	}
-+
-+	return 0;
-+
-+err:
-+	loop_free(lc);
-+	return r;
-+}
-+
-+static void loop_dtr(struct dm_target *ti)
-+{
-+	struct loop_c *lc = ti->private;
-+	loop_free(lc);
-+}
-+
-+static struct target_type loop_target = {
-+	.name = "loop",
-+	.version = {1, 0, 0},
-+	.module = THIS_MODULE,
-+	.ctr = loop_ctr,
-+	.dtr = loop_dtr,
-+	.map = loop_map,
-+	.status = loop_status,
-+	.iterate_devices = loop_iterate_devices,
-+};
-+
-+static int __init dm_loop_init(void)
-+{
-+	int r;
-+
-+	r = dm_register_target(&loop_target);
-+	if (r < 0) {
-+		DMERR("register failed %d", r);
-+		goto err_target;
-+	}
-+
-+	return 0;
-+
-+err_target:
-+	return r;
-+}
-+
-+static void __exit dm_loop_exit(void)
-+{
-+	dm_unregister_target(&loop_target);
-+}
-+
-+module_init(dm_loop_init);
-+module_exit(dm_loop_exit);
-+
-+MODULE_LICENSE("GPL");
-+MODULE_AUTHOR("Mikulas Patocka <mpatocka@redhat.com>");
-+MODULE_DESCRIPTION("device-mapper loop target");
 
