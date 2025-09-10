@@ -1,113 +1,100 @@
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA189245028;
-	Wed, 10 Sep 2025 08:22:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94A7F2D5947;
+	Wed, 10 Sep 2025 08:31:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757492549; cv=none; b=PMpbs0VRH9dUgFYFOZ0Wg4S6tfeslBkRUwZJ+/xQ1KEMTrOYHwxhVeAd/LpRy+QiGlFGS11LoUmG10kDQjjvUTKZuZmnyeDwbaaZUh0tfG8gHtEK8un2H+kNKWqK+DYHTWJvLqiuNWk/TEq4OzxP56kPNV5XBmCfx2mebzG7s+o=
+	t=1757493115; cv=none; b=vCGhlW1oIehzzqcihZ5IWJ4rfKYiHYgCVytTO+L3mBmKzEmvCxGSWTV4wzqLCdHxe2DN1/GjzyB4rJQ+E8zGczIiESa6zKFn4IG/07L2BpyCbI0ofnhJJ4pv518UsupJfdHrRaXV2LMUsMCSUBwQkHqevRNIBuf7UuxWnWY4Ky4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757492549; c=relaxed/simple;
-	bh=85UKcsOMfyn0E3yinLzfkoR/jW47TpISZIXdMgdVMIE=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=fMxR3reGUJhmiyiP2FRD3tzAMZmp2IcqDy+GYc+T39V7Cw5K+vQmFY0254ueBDmhTXV1sB/lADnKdmzVEvd9RdzIuOzoPNJ+tXe+1kCppJ8Zz6mBQdl6s4alPOEel2GjZyGVTFBf9RhvqGHa+xO3MGMXN5ku0Eq7i8jpayc3TrE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=4OgNlmQT; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=k1RrGMx8; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="4OgNlmQT";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="k1RrGMx8"
-From: Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1757492546;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WQUAVcjXn7tf95scgh3pOPJD9865+15BngQtRr5ID5E=;
-	b=4OgNlmQTqS4AyVDZHcTox0tlSaBwDkJEL/Ts7pkw/dx/M20Ltu0mrLteEBzdn9sJCVLD2y
-	dfcDP2k/EfsDTMJe8iTDcOHbq2BngCcR1pbaFFCTimZtO0pqy4HziY964ELyL3VGhPzbuS
-	I46WwDbecRUNZqYt1o8HVYCiswSpMka/TqCAedJJlSUhci4k9ImyLi3psTc+Rao3niCHBo
-	mDNGZo71G7ZhUHWl7fzzx0tPbWfneJvCy34cNAAEOFdknyQqPsI0i8u+u8+b/E2q+kPo4k
-	dVOmJyABT05U8tEgXNXEiJ9BjjvnFlL25g3XQ9eMAo54Isys05Y7C9zjDJj6tA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1757492546;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WQUAVcjXn7tf95scgh3pOPJD9865+15BngQtRr5ID5E=;
-	b=k1RrGMx8UOcygrkA8B9pm+mc/YjWJfzFVvkuTYWUt4MA239Asn+1jaJhj5EpeHW+3neqBz
-	3wzspqNtmL4AzyBg==
-To: Daniel Wagner <wagi@kernel.org>, Jens Axboe <axboe@kernel.dk>, Keith
- Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>, Sagi Grimberg
- <sagi@grimberg.me>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Aaron Tomlin <atomlin@atomlin.com>, "Martin K. Petersen"
- <martin.petersen@oracle.com>, Costa Shulyupin <costa.shul@redhat.com>,
- Juri Lelli <juri.lelli@redhat.com>, Valentin Schneider
- <vschneid@redhat.com>, Waiman Long <llong@redhat.com>, Ming Lei
- <ming.lei@redhat.com>, Frederic Weisbecker <frederic@kernel.org>, Mel
- Gorman <mgorman@suse.de>, Hannes Reinecke <hare@suse.de>, Mathieu
- Desnoyers <mathieu.desnoyers@efficios.com>, Aaron Tomlin
- <atomlin@atomlin.com>, linux-kernel@vger.kernel.org,
- linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
- megaraidlinux.pdl@broadcom.com, linux-scsi@vger.kernel.org,
- storagedev@microchip.com, virtualization@lists.linux.dev,
- GR-QLogic-Storage-Upstream@marvell.com, Daniel Wagner <wagi@kernel.org>
-Subject: Re: [PATCH v8 04/12] genirq/affinity: Add cpumask to struct
- irq_affinity
-In-Reply-To: <20250905-isolcpus-io-queues-v8-4-885984c5daca@kernel.org>
-References: <20250905-isolcpus-io-queues-v8-0-885984c5daca@kernel.org>
- <20250905-isolcpus-io-queues-v8-4-885984c5daca@kernel.org>
-Date: Wed, 10 Sep 2025 10:22:25 +0200
-Message-ID: <87jz26u37i.ffs@tglx>
+	s=arc-20240116; t=1757493115; c=relaxed/simple;
+	bh=btYuSerNDcokDO6Y/one3a829eB8ISvBdG67DcBTu9c=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=fhq/dL/3BGLaMAtv4lnvq3QpLFjVUO/cT0wr9wUKsL9tKG9zymYE6NWtlsX3sPd3IzWXJ6NoDts+eykiTerneg0DjlhVRx9nbJ/zSO0b9l2bpi8JOaeghHXlcRnHfeak7A1tvKkFzP8IViYwt6pDvz5Ah92EJZUi43jJsv0GPiw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4cMDSR0LhGzYQvcg;
+	Wed, 10 Sep 2025 16:31:51 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 881DB1A23A5;
+	Wed, 10 Sep 2025 16:31:49 +0800 (CST)
+Received: from [10.174.179.143] (unknown [10.174.179.143])
+	by APP4 (Coremail) with SMTP id gCh0CgCn8IxzN8Fol3MSCA--.51693S3;
+	Wed, 10 Sep 2025 16:31:49 +0800 (CST)
+Subject: Re: [PATCH 1/2] md: init queue_limits->max_hw_wzeroes_unmap_sectors
+ parameter
+To: John Garry <john.g.garry@oracle.com>, Zhang Yi
+ <yi.zhang@huaweicloud.com>, linux-block@vger.kernel.org,
+ linux-raid@vger.kernel.org, drbd-dev@lists.linbit.com
+Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, hch@lst.de,
+ martin.petersen@oracle.com, axboe@kernel.dk, yi.zhang@huawei.com,
+ yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
+References: <20250825083320.797165-1-yi.zhang@huaweicloud.com>
+ <20250825083320.797165-2-yi.zhang@huaweicloud.com>
+ <5b0fd2a0-dffc-4f51-bdff-746e9bd611bd@oracle.com>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <05249654-3088-d3e1-570d-79f58019377c@huaweicloud.com>
+Date: Wed, 10 Sep 2025 16:31:47 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <5b0fd2a0-dffc-4f51-bdff-746e9bd611bd@oracle.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgCn8IxzN8Fol3MSCA--.51693S3
+X-Coremail-Antispam: 1UD129KBjvdXoWruw45WFyUuF4kGr43Jw4Utwb_yoWkCrgEkr
+	sxXa98XFW5AF42qw4UKr13ZrW3ta95Wr1kZF1rWrs8XFyrZrykursxZ3sa9F15JFWIqr90
+	kan7Xw1I9FZFvjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUbaxYFVCjjxCrM7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E6xAIw20E
+	Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwV
+	A0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x02
+	67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
+	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
+	x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
+	0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7I2V7IY0VAS
+	07AlzVAYIcxG8wCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4
+	IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1r
+	MI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJV
+	WUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j
+	6r1xMIIF0xvEx4A2jsIE14v26r4j6F4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Cr1j6rxdYx
+	BIdaVFxhVjvjDU0xZFpf9x07UAwIDUUUUU=
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On Fri, Sep 05 2025 at 16:59, Daniel Wagner wrote:
-> Pass a cpumask to irq_create_affinity_masks as an additional constraint
-> to consider when creating the affinity masks. This allows the caller to
-> exclude specific CPUs, e.g., isolated CPUs (see the 'isolcpus' kernel
-> command-line parameter).
->
-> Reviewed-by: Hannes Reinecke <hare@suse.de>
-> Signed-off-by: Daniel Wagner <wagi@kernel.org>
-> ---
->  include/linux/interrupt.h | 16 ++++++++++------
->  kernel/irq/affinity.c     | 12 ++++++++++--
->  2 files changed, 20 insertions(+), 8 deletions(-)
->
-> diff --git a/include/linux/interrupt.h b/include/linux/interrupt.h
-> index 51b6484c049345c75816c4a63b4efa813f42f27b..b1a230953514da57e30e601727cd0e94796153d3 100644
-> --- a/include/linux/interrupt.h
-> +++ b/include/linux/interrupt.h
-> @@ -284,18 +284,22 @@ struct irq_affinity_notify {
->   * @nr_sets:		The number of interrupt sets for which affinity
->   *			spreading is required
->   * @set_size:		Array holding the size of each interrupt set
-> + * @mask:		cpumask that constrains which CPUs to consider when
-> + *			calculating the number and size of the interrupt sets
+Hi,
 
-You surely couldn't come up with a less descriptive name for this
-member, right?
+在 2025/09/02 20:25, John Garry 写道:
+>> diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
+>> index 408c26398321..35c6498b4917 100644
+>> --- a/drivers/md/raid1.c
+>> +++ b/drivers/md/raid1.c
+>> @@ -3211,6 +3211,7 @@ static int raid1_set_limits(struct mddev *mddev)
+>>       md_init_stacking_limits(&lim);
+>>       lim.max_write_zeroes_sectors = 0;
+>> +    lim.max_hw_wzeroes_unmap_sectors = 0;
+> 
+> It would be better if we documented why we cannot support this on 
+> raid1/10, yet we can on raid0.
+> 
+> I am looking through the history of why max_write_zeroes_sectors is set 
+> to zero. I have gone as far back as 5026d7a9b, and this tells us that 
+> the retry mechanism for WRITE SAME causes an issue where mirrors are 
+> offlined (and so we disabled the support); and this was simply copied 
+> for write zeroes in 3deff1a70.
 
-> diff --git a/kernel/irq/affinity.c b/kernel/irq/affinity.c
-> index 4013e6ad2b2f1cb91de12bb428b3281105f7d23b..c68156f7847a7920103e39124676d06191304ef6 100644
-> --- a/kernel/irq/affinity.c
-> +++ b/kernel/irq/affinity.c
-> @@ -70,7 +70,13 @@ irq_create_affinity_masks(unsigned int nvecs, struct irq_affinity *affd)
->  	 */
->  	for (i = 0, usedvecs = 0; i < affd->nr_sets; i++) {
->  		unsigned int nr_masks, this_vecs = affd->set_size[i];
-> -		struct cpumask *result = group_cpus_evenly(this_vecs, &nr_masks);
-> +		struct cpumask *result;
-> +
-> +		if (affd->mask)
-> +			result = group_mask_cpus_evenly(this_vecs, affd->mask,
-> +							&nr_masks);
+Yes, we don't support it for now, and I think it is not too hard to
+support write zeros, and finaly to support unmap zeros. BTW, raid5
+discard is in the same suituation.
 
-Please get rid of this line break. You have 100 characters.
+However, I feel this is not related to this set, perhaps a seperate
+patch to add comments, I can accept that.
+
+Thanks,
+Kuai
 
