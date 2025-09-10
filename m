@@ -1,182 +1,185 @@
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2058.outbound.protection.outlook.com [40.107.94.58])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E06EA316900;
-	Wed, 10 Sep 2025 11:58:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.58
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757505525; cv=fail; b=Ag5mG3hWo5IuXknetv8IhE9SbBxnLUI10gy1ne1jOZ6ejNo1iIRjE5CA2z8OUR1WNmQno6CGpYTn2093+HNp3r9W6WamyzIoOKeVFmlIxlQwdcqmxuQThnJKvEjFdSHNwZfTORLxUgOefxym042Mkm43tag5uSbJvTU6MbwlUVk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757505525; c=relaxed/simple;
-	bh=D0diukIneuBxxsZ+gaEgXn6zfxuX17JD8EjqTvzBrTQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=YRD7aRkjnkjq+Ut/heqyjdsAAHO+DeeaI6HSNOJGYxe0kf7PRcxYXhbYATG0FBvoPti1H/+YSBUMeTJztmbUGsw1qGfHNPoJ4dDCPvVtLNRofYt+GYzeUIG5b9p71YUshDULwBL0wEpG+MlGOkYM4QjwvFATkvT2yilPyRSvbDM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=DCGX5i1w; arc=fail smtp.client-ip=40.107.94.58
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11C38298994;
+	Wed, 10 Sep 2025 14:37:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1757515025; cv=none; b=AuyL4qBADfwLAg/18HjZOLlKYmW57Bg1VHfvs3dkvVCkaVjMoxrpQTwexyrPLCyaF3XbaPiT2y7PtWSS6zk41LK4miBhro3E/r/L8a5Z1ZAv9RrGltESccok14OXQssjncj2QPLSjVbclylwIqg6opx93ZVDgP7j3Pjhve3xpFA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1757515025; c=relaxed/simple;
+	bh=29JCSfGuYzyRn8o97QCN0am5XLSW+0yBJ9vdb9NvVOA=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=E0xP+0uAAn8/MAn4SJoL8TttFC/jh3wEUUrzH7HnQ7lNq1Vzmr24sgo+o7Nn2+HcWTCgcm2CcxKYWjibRy7d1ZPt0JwiqaIkZ2YN/Xdak2JMvf4oPQfgQOozR20aYc/uNJilklqXh0dAG6Mljf6Sxi7ljU8ZZHlou3iv+rtOEvo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ply1gfTD; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="DCGX5i1w"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Sn3V7oELjkrT+Ex+wYuTTfJd3WsUwYgnJmnkM+tItOpmbM+J8qovkAPHYt/A7PKdAxoWGlisZ5TesXjmIXvOHKWcNXtA1O3Hg9SA6mAhfrHEezRPKmMCSHIRBmSiBgsvZgxaw6V0hH4pbdO54/Yd5q5EIYBFKZuN7d/8WIw+zLxloBetM/UCcYtcIc6GW5rH0jBKwge7a0m4jPykaBH8Y8sKHehJQWlDdKdUNpkCp2evYTZ7lvgs+TsiTWScPuI24eLlp6TrdOL+hleedbJyK+OJ4SytpZZpW4FYO/j3zVP4FD60hiKyFc9ZB4/0Ery3tfckBgfq1QXuqElNvsjftw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=M2CRGJWbvgTRAKQCpQVq3CvW0DQ/ZyYML+xgjXHDleo=;
- b=tB2vXc4aLG7Xvj/iBdZSvwn5l5BDP6C+4bz1pIRIWCRgMWFDDbhmT5qJwttomGtb8BHCznSs1U/3u4v6DHTHmWC/I6z+Xr6vluxXtIpc3nRzQiDjGvtecnGkPUr8uW7zs/hJWBGP80S7Nc1dUlCLFh9qUOu5jO987pSlHgXoT/P1w6NsT3FQBwOILLwl3So1eAjWPEjg3x9jiy8sN7xCZqAPkDZVJitbvd8ChCDhycviaJq9+sQzjix1CUYwDf9us224wMfxwnVp/LXMt9t30uAoOeFS7X2kQZFGh8Eg3ciqLaMSqi0Ur/Kgqry1mm4HqC3j/XfupYGVGiT8b2TLaA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=M2CRGJWbvgTRAKQCpQVq3CvW0DQ/ZyYML+xgjXHDleo=;
- b=DCGX5i1wV1JzbNNAuAK46B1FTzUqbIWJJr1k/xRxSeDUhzU9om62gERPuNF9zaGeSw3Z47iVGhqjLYvnnpANarQksVzq5onyjKQEa/uqx4+QH9ptjWiYcpUBJuCKrMO21J8C5gZEzPW3uZshpwp8TsczXFauxzksXuc9pJwioRUTXudhdy6L2hUGfrzW6zFhm7ermfbnA+frN//qvdI/SL4Ye+KQ/MfEcYEEtrj13319OvercvtIa+jAK7pRYfUZPJwYgn+rUmDsHPM/wcOgja0mFu5Tjb6neURlaC8VFX+tVNuwHJvJyj+If2Ypv4p2rx/AJA7xTfLlNTPx9BllEA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from PH7PR12MB5757.namprd12.prod.outlook.com (2603:10b6:510:1d0::13)
- by CH3PR12MB8709.namprd12.prod.outlook.com (2603:10b6:610:17c::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9094.22; Wed, 10 Sep
- 2025 11:58:41 +0000
-Received: from PH7PR12MB5757.namprd12.prod.outlook.com
- ([fe80::f012:300c:6bf4:7632]) by PH7PR12MB5757.namprd12.prod.outlook.com
- ([fe80::f012:300c:6bf4:7632%2]) with mapi id 15.20.9094.021; Wed, 10 Sep 2025
- 11:58:40 +0000
-Date: Wed, 10 Sep 2025 08:58:39 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Marek Szyprowski <m.szyprowski@samsung.com>,
-	Abdiel Janulgue <abdiel.janulgue@gmail.com>,
-	Alexander Potapenko <glider@google.com>,
-	Alex Gaynor <alex.gaynor@gmail.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Christoph Hellwig <hch@lst.de>, Danilo Krummrich <dakr@kernel.org>,
-	David Hildenbrand <david@redhat.com>, iommu@lists.linux.dev,
-	Jason Wang <jasowang@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-	Joerg Roedel <joro@8bytes.org>, Jonathan Corbet <corbet@lwn.net>,
-	Juergen Gross <jgross@suse.com>, kasan-dev@googlegroups.com,
-	Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org, linux-nvme@lists.infradead.org,
-	linuxppc-dev@lists.ozlabs.org, linux-trace-kernel@vger.kernel.org,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Robin Murphy <robin.murphy@arm.com>, rust-for-linux@vger.kernel.org,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Stefano Stabellini <sstabellini@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	virtualization@lists.linux.dev, Will Deacon <will@kernel.org>,
-	xen-devel@lists.xenproject.org
-Subject: Re: [PATCH v6 03/16] dma-debug: refactor to use physical addresses
- for page mapping
-Message-ID: <20250910115839.GT789684@nvidia.com>
-References: <cover.1757423202.git.leonro@nvidia.com>
- <56d1a6769b68dfcbf8b26a75a7329aeb8e3c3b6a.1757423202.git.leonro@nvidia.com>
- <20250909193748.GG341237@unreal>
- <20250910052618.GH341237@unreal>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250910052618.GH341237@unreal>
-X-ClientProxiedBy: YT4PR01CA0498.CANPRD01.PROD.OUTLOOK.COM
- (2603:10b6:b01:10c::6) To PH7PR12MB5757.namprd12.prod.outlook.com
- (2603:10b6:510:1d0::13)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ply1gfTD"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0677C4CEEB;
+	Wed, 10 Sep 2025 14:36:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757515024;
+	bh=29JCSfGuYzyRn8o97QCN0am5XLSW+0yBJ9vdb9NvVOA=;
+	h=From:Subject:Date:To:Cc:From;
+	b=ply1gfTDPLahptTIk5N6WND1mewN4KFa9zI23F4ZjeXo9zwOxuxediKAZ8dgvhSrW
+	 G3G2F8OjR+28VHNwRpAk7FotLKfVoOs4f+aiMIqjExP7xmCaOaV3XqVwmjzdlw0G03
+	 ptK8BQfTvt7lpG1dvYiMxF5GqI7V+lNuPL07WFmYTB7qnopFGmFZd98POouRUU4xM+
+	 bHPV1NRgYeJEJNwZFo9yvQ6vY44rxX4JkiI73hGZuWiVzw+E5ds/vAKqpVsz3jeD05
+	 icqB9S3DaY+Bp6t5PEn7RBafOmRmZ9o5QZicpgbKJKStFEosSHhXP71AYDov3Eqct2
+	 7HfgR//jDf6EQ==
+From: Christian Brauner <brauner@kernel.org>
+Subject: [PATCH 00/32] ns: support file handles
+Date: Wed, 10 Sep 2025 16:36:45 +0200
+Message-Id: <20250910-work-namespace-v1-0-4dd56e7359d8@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH7PR12MB5757:EE_|CH3PR12MB8709:EE_
-X-MS-Office365-Filtering-Correlation-Id: d3d1beeb-870b-4064-522c-08ddf0616235
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|1800799024|376014|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?FzIxhCTl/DFGFmaXIkSJW43QRlHeUwrObkzUBGOXZlpW5TknvixiA4gDQdO0?=
- =?us-ascii?Q?Y/Q2AqArhV3Ean+ESTnkZr/fvpBX2nkWxFKLLH4g5CA9C8G475Hr3gb3OOjv?=
- =?us-ascii?Q?6uJVbcwr9hyVssPYNNIHf4cHbHNfa1FcsJ0EkEfNXG98vrQPHF/sWCvG8QI/?=
- =?us-ascii?Q?COGsWCNfWUGpIWeBBcktY7eFttSjXnJa/fCDlR5M7SnWvVHjP09ct5kmeZoH?=
- =?us-ascii?Q?SAYNOPDNskcy46Em8ly9RRUNfqYG4XoPucVxFGwyPQt0cGYV/RAX2nuBRLnY?=
- =?us-ascii?Q?oDenFOddnolaVnUlfh0CImgVZFr/tUkfCle8aamRAftKGcs67gzyutBwvoDi?=
- =?us-ascii?Q?dNUaAWRksh0OpZeDtOzS+yUixVU6iF6zuAgdtdJ+/SJw1dzFDkGfm80wGCoH?=
- =?us-ascii?Q?pckzkDSveUd+iwi2lfDzjyPVQ9yj0CiH/xxWs9md9M1AQSc3NZiJU1hLjeKm?=
- =?us-ascii?Q?aAY8FuT7mkNTvmr+F8IaY1xbUkqwDE0/IWF1EmvaP2B2COuQ7wMj4RNUjEOc?=
- =?us-ascii?Q?O/AhbcPzLAMyP9dJTa4ojajfgOMtdCIXx/Rxry4yk0Rx2rZ2fjSA6M+C0jit?=
- =?us-ascii?Q?E4yYm3ZocgAEqqYDdafANBeHp39vXTx87t0jZIqiUkS+AeC6ISIHwD9hDxkj?=
- =?us-ascii?Q?3NKmejdUiaLbjH+sBCgqd206gGNFVcc0Zt98Oozys1GBZXwHRLMY812uQPYE?=
- =?us-ascii?Q?uyHrhpRnGAIYWFfAHefw01QVwryhLl4F/p2FxxZ5WJ2mJk8iLma6uzFa9nse?=
- =?us-ascii?Q?KDIQcCRrG9o4DskmRPMDf1PaNxx8TvwULUPJB0jwTMsE0RkZQnTZYU69eX3J?=
- =?us-ascii?Q?DTJiamg3E5I0LV9zQ7KUNLWj7+scC2fn2wUO2D+w6NK2kvcb0lvj02l6UkTc?=
- =?us-ascii?Q?X7jKgFI4/1/bAGQetuBuvx+ircaAenX1Iq6FMnRYQcgdor2MWhUDTqFKizIA?=
- =?us-ascii?Q?vJmD0Pht5I+lSm+VVTECa5eMOZE6H/UwUgnXBgFiR+SdXv8DEnEnO9a+9Ujl?=
- =?us-ascii?Q?fTzsLsC/NZI0DsiAFIBO+4w+7SMolqtyX9A00a9XgVJOp0yXxu2QqO44FHlF?=
- =?us-ascii?Q?F5kOApjBfLOwHK4UEafL48ADf1hzQpNZPMIk6R2fhwlKEIUMoSNqHn4cTPxl?=
- =?us-ascii?Q?znJlbuU5Ch+3Eejo3q7yZqrX3ozlPCo0nBxc8d/f9Cr9yddhddHSyXN4+eBq?=
- =?us-ascii?Q?1K8vM06RHw5aht/nrdIYWUbgLh/jYAL7eVKdCjw67lWNVVQn+anrn3l19WdD?=
- =?us-ascii?Q?BSnlzXwqrv/YfQoqXhsDx+EYQ9FcwydQzXtPK0D5bSt8yOGcjkm9NRk++zQ6?=
- =?us-ascii?Q?K5aUj8NJxT+OVBPsX2TS4htXjJaFpFkDZIIIo3/5K+GVBWGmqOwVOybPuki7?=
- =?us-ascii?Q?iI62pGuhOEA82Yro5WGvlkvleuez4YsUAy/C9hO+W3hCWvzy7fg3ZN0wgqkG?=
- =?us-ascii?Q?ptHYclhyF3Q=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB5757.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?9YO2VNtN7/AVkNY5N+N6bpbx5DVFYyJdxIshjK2kTpMeuaOdcSF5l7noHEF1?=
- =?us-ascii?Q?s+lB5UEncua+s5Drg3oPC44ZKgxdHC7EQ1mmSbi+XEq4qFKNNVBpiRWSIfc/?=
- =?us-ascii?Q?8ywQrj440x8YBHiXj4uZB0QE+J1KktuhiJc4bflyorZLYXXCNTQlvOTv371c?=
- =?us-ascii?Q?ASDGOoCEv3wTgUSySdjTbUQQGWvJC0NQpKSsq2qJNstew84LYBuDpBk3uV4o?=
- =?us-ascii?Q?vBenXfKllbuWTEDAUQSxwockvdu2HZ5HxpgplNGCWZ7znKBO2Us7KIHdhBAe?=
- =?us-ascii?Q?TCX53Fa2wFwLETR5Ho0D0sOXqpILTIZlgHisolBKChaVQ1AKIqqsvk1hmIgd?=
- =?us-ascii?Q?YE6/iB4CEGVROiDFPAO5TfADkkrbbKpGKD5A/XCbSSUrHrrkqIUnPM/LzYXQ?=
- =?us-ascii?Q?WGT0sXGTpAAVusd7OCVZF7nEWNxNPvf9OafKMixxZg+5lm9hMrGaDiXZ7U/0?=
- =?us-ascii?Q?bWiQu0xeLBXSVpmNEob1HkW8KfUJ1e3A8+quycFN8fJOn5cfpnSW3FEqOAjC?=
- =?us-ascii?Q?JgfkhIRa6APiEb2G4je21c6BWKbOX5cOHZDHFENP3jL5g+YoyyU1LJz0NoX8?=
- =?us-ascii?Q?mASc/SCKxHdg3dyOiFa2V+Xpjd+N2LutqqAwhQg4IORPN9sNWSwzKWeX8TPJ?=
- =?us-ascii?Q?OYNp+31ak76mDNFtIe0GgR/CPpX7wrNktItOo5t05HaCglof/SdPTIbMFvnQ?=
- =?us-ascii?Q?dIlVEWzu0f1mZZgQUsT1aBY9Hx24N4Kx5QcmLxuijEYIEebO87J8trQkpOC6?=
- =?us-ascii?Q?5HvTn80xxmbnBR4Z8s48Qux7dO4liJ+EP9gA8N10i8HYKFz6FU5y6aWdKBDu?=
- =?us-ascii?Q?F2nCo6aUF13uff4b9pX53OdttabCsWvQhcMi73AjQz70ijVhIZRi5rD81caI?=
- =?us-ascii?Q?qzAmnxy0fXs8ZFjYivEVLHNmcYoWZVTCFLm9h9ZlCYQajTaL3WZ2b4bBYqGY?=
- =?us-ascii?Q?mE3YlmZLwZtHu8pjWIHa8Vu9ugDe14ebg5WRs5a83zohvO7s4Sb4LfCpMic1?=
- =?us-ascii?Q?IpBv8kPo4agNFbf1H2TyXz5QyQaAkHqbPjJgR2bgQJ8ELYUjejyvmEhrmoEJ?=
- =?us-ascii?Q?cle6p7D1vIfzHtVjImdzimXsTUYCsAKTGPmt140QMNxPK7rxy96x1wl3+GfE?=
- =?us-ascii?Q?2QmAUir2xSQdsVPQXgP+rTTiGOpzo02zLXIOySsQlKBQPfcSP0MVBNdZmxpU?=
- =?us-ascii?Q?KY1LAWASYTztVwsHLEbLnBvuORa0/G0/n1GbQA1BBOj9PkqnwENbff4O7HYX?=
- =?us-ascii?Q?n/06d/f2gFt8Gr7mnZ6gme2FoyHeKWUKi0gX2Yeoawx+x9szqxzDkBmWGxM8?=
- =?us-ascii?Q?R24cd960+95kkj5RLQyuLq+qQSfIut3CnDpnavZuMCT8M7VanWjlKpxbVBmH?=
- =?us-ascii?Q?9ZdLMvbeCVO22byX6zJ/TqPCtJxTr4zQCRF5JSAHjnClMwsB+zPNa8RuDdCD?=
- =?us-ascii?Q?ozo2sXZqvbCbHoDATIse33PWDM4HV99uQGVFvcLv2sGGvcSNU4Qq3K73wuEo?=
- =?us-ascii?Q?rAyxsA9mNo4oh0K+wFkx6BNR032gCcNqav90jaUAoi5RrDp9pRWy4nuuK/ZR?=
- =?us-ascii?Q?TKRZ0lKjkgxNLtP0ngU=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d3d1beeb-870b-4064-522c-08ddf0616235
-X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB5757.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Sep 2025 11:58:40.8152
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: NOBo5qiUePOEw1x7YNat0KXcE5eLDbKYD5g/dL+or0XOWmfL8YpjCGLIZSmZwreP
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8709
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAP6MwWgC/x3MwQ6CMAyA4VchPVuyLTLRVzEeSldlMQzSGjQhv
+ LvT43f4/w1MNIvBpdlAZc2W51LhDw3wSOUhmFM1BBc6d3Ydvmd9YqFJbCEW5Nj3IaZELh2hRov
+ KPX/+w+uteiATHJQKj7/NRPYSbdfY+hMqe9j3L+fOymWDAAAA
+X-Change-ID: 20250905-work-namespace-c68826dda0d4
+To: Jan Kara <jack@suse.cz>, Amir Goldstein <amir73il@gmail.com>, 
+ linux-fsdevel@vger.kernel.org
+Cc: Josef Bacik <josef@toxicpanda.com>, Jeff Layton <jlayton@kernel.org>, 
+ Mike Yuan <me@yhndnzj.com>, 
+ =?utf-8?q?Zbigniew_J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>, 
+ Lennart Poettering <mzxreary@0pointer.de>, 
+ Daan De Meyer <daan.j.demeyer@gmail.com>, Aleksa Sarai <cyphar@cyphar.com>, 
+ Alexander Viro <viro@zeniv.linux.org.uk>, Jens Axboe <axboe@kernel.dk>, 
+ Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, 
+ =?utf-8?q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+ Chuck Lever <chuck.lever@oracle.com>, linux-nfs@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, linux-block@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, cgroups@vger.kernel.org, 
+ netdev@vger.kernel.org, Christian Brauner <brauner@kernel.org>
+X-Mailer: b4 0.14.3-dev-385fa
+X-Developer-Signature: v=1; a=openpgp-sha256; l=5591; i=brauner@kernel.org;
+ h=from:subject:message-id; bh=29JCSfGuYzyRn8o97QCN0am5XLSW+0yBJ9vdb9NvVOA=;
+ b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWQc7GU/cGwNl6TVTYXIpcb7q5bN3rt9Mve/4mB15VYxy
+ 6Iwb0b5jlIWBjEuBlkxRRaHdpNwueU8FZuNMjVg5rAygQxh4OIUgJvsxcgwJVb7npojv+6Jix9S
+ ito5N9szLrwW/Gzz9uTb5n1rL93azMjQq7xrwykO5xxm/Vsf/VxsYoMesnhwhkry77y27kpoUSc
+ fAA==
+X-Developer-Key: i=brauner@kernel.org; a=openpgp;
+ fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
 
-On Wed, Sep 10, 2025 at 08:26:18AM +0300, Leon Romanovsky wrote:
->  #define PageHighMem(__p) is_highmem_idx(page_zonenum(__p))
-> -#define PhysHighMem(__p) (PageHighMem(phys_to_page(__p)))
->  #define folio_test_highmem(__f)        is_highmem_idx(folio_zonenum(__f))
->  #else
->  PAGEFLAG_FALSE(HighMem, highmem)
->  #endif
-> +#define PhysHighMem(__p) (PageHighMem(phys_to_page(__p)))
+For a while now we have supported file handles for pidfds. This has
+proven to be very useful.
 
-Yeah, that's what I imagined, and I'd make it a static inline
+Extend the concept to cover namespaces as well. After this patchset it
+is possible to encode and decode namespace file handles using the
+commong name_to_handle_at() and open_by_handle_at() apis.
 
-static inline bool PhysHighMem(phys_addr_t phys)
+Namespaces file descriptors can already be derived from pidfds which
+means they aren't subject to overmount protection bugs. IOW, it's
+irrelevant if the caller would not have access to an appropriate
+/proc/<pid>/ns/ directory as they could always just derive the namespace
+based on a pidfd already.
 
-These existing macros are old fashioned imho.
+It has the same advantage as pidfds. It's possible to reliably and for
+the lifetime of the system refer to a namespace without pinning any
+resources and to compare them.
 
-Jason
+Permission checking is kept simple. If the caller is located in the
+namespace the file handle refers to they are able to open it otherwise
+they must hold privilege over the owning namespace of the relevant
+namespace.
+
+Both the network namespace and the mount namespace already have an
+associated cookie that isn't recycled and is fully exposed to userspace.
+Move this into ns_common and use the same id space for all namespaces so
+they can trivially and reliably be compared.
+
+There's more coming based on the iterator infrastructure but the series
+is large enough and focuses on file handles.
+
+Extensive selftests included. I still have various other test-suites to
+run but it holds up so far.
+
+Signed-off-by: Christian Brauner <brauner@kernel.org>
+---
+Christian Brauner (32):
+      pidfs: validate extensible ioctls
+      nsfs: validate extensible ioctls
+      block: use extensible_ioctl_valid()
+      ns: move to_ns_common() to ns_common.h
+      nsfs: add nsfs.h header
+      ns: uniformly initialize ns_common
+      mnt: use ns_common_init()
+      ipc: use ns_common_init()
+      cgroup: use ns_common_init()
+      pid: use ns_common_init()
+      time: use ns_common_init()
+      uts: use ns_common_init()
+      user: use ns_common_init()
+      net: use ns_common_init()
+      ns: remove ns_alloc_inum()
+      nstree: make iterator generic
+      mnt: support iterator
+      cgroup: support iterator
+      ipc: support iterator
+      net: support iterator
+      pid: support iterator
+      time: support iterator
+      userns: support iterator
+      uts: support iterator
+      ns: add to_<type>_ns() to respective headers
+      nsfs: add current_in_namespace()
+      nsfs: support file handles
+      nsfs: support exhaustive file handles
+      nsfs: add missing id retrieval support
+      tools: update nsfs.h uapi header
+      selftests/namespaces: add identifier selftests
+      selftests/namespaces: add file handle selftests
+
+ block/blk-integrity.c                              |    8 +-
+ fs/fhandle.c                                       |    6 +
+ fs/internal.h                                      |    1 +
+ fs/mount.h                                         |   10 +-
+ fs/namespace.c                                     |  156 +--
+ fs/nsfs.c                                          |  266 +++-
+ fs/pidfs.c                                         |    2 +-
+ include/linux/cgroup.h                             |    5 +
+ include/linux/exportfs.h                           |    6 +
+ include/linux/fs.h                                 |   14 +
+ include/linux/ipc_namespace.h                      |    5 +
+ include/linux/ns_common.h                          |   29 +
+ include/linux/nsfs.h                               |   40 +
+ include/linux/nsproxy.h                            |   11 -
+ include/linux/nstree.h                             |   89 ++
+ include/linux/pid_namespace.h                      |    5 +
+ include/linux/proc_ns.h                            |   32 +-
+ include/linux/time_namespace.h                     |    9 +
+ include/linux/user_namespace.h                     |    5 +
+ include/linux/utsname.h                            |    5 +
+ include/net/net_namespace.h                        |    6 +
+ include/uapi/linux/fcntl.h                         |    1 +
+ include/uapi/linux/nsfs.h                          |   12 +-
+ init/main.c                                        |    2 +
+ ipc/msgutil.c                                      |    1 +
+ ipc/namespace.c                                    |   12 +-
+ ipc/shm.c                                          |    2 +
+ kernel/Makefile                                    |    2 +-
+ kernel/cgroup/cgroup.c                             |    2 +
+ kernel/cgroup/namespace.c                          |   24 +-
+ kernel/nstree.c                                    |  233 ++++
+ kernel/pid_namespace.c                             |   13 +-
+ kernel/time/namespace.c                            |   23 +-
+ kernel/user_namespace.c                            |   17 +-
+ kernel/utsname.c                                   |   28 +-
+ net/core/net_namespace.c                           |   59 +-
+ tools/include/uapi/linux/nsfs.h                    |   23 +-
+ tools/testing/selftests/namespaces/.gitignore      |    2 +
+ tools/testing/selftests/namespaces/Makefile        |    7 +
+ tools/testing/selftests/namespaces/config          |    7 +
+ .../selftests/namespaces/file_handle_test.c        | 1410 ++++++++++++++++++++
+ tools/testing/selftests/namespaces/nsid_test.c     |  986 ++++++++++++++
+ 42 files changed, 3306 insertions(+), 270 deletions(-)
+---
+base-commit: 8f5ae30d69d7543eee0d70083daf4de8fe15d585
+change-id: 20250905-work-namespace-c68826dda0d4
+
