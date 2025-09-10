@@ -1,154 +1,166 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B8A92FB08E;
-	Wed, 10 Sep 2025 20:47:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F28B623D7D1
+	for <linux-block@vger.kernel.org>; Wed, 10 Sep 2025 20:53:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757537257; cv=none; b=onvfFHdamOvQms2ZshPGilFxbTbd9W8P9fNUHBpR44xtyfzuh+UBK4OQEidBbMsYBtg35TSnjWu3geqeuAleT5GjTnnvveHb2AF3Uw9pBq5Qv77eUDvVZ4ePJDTD94o72vubCbRA346ajxqH8DWzwRsqkF4Ro0z4FyyemF2ldrQ=
+	t=1757537608; cv=none; b=OCnxiCNU536q9GuWqKdGXxOUzzRE98sPKGhTxD5RqvMkqC+eogcQP2G52fhxXW1hM0e3gKcbCetdCXqNw1vxI/72yNMpr3hQHm8+ZdKQY9R0V2T9dKNqPm2aeqGDPV/NKv6bqD/MjH4M89H4aB6FMF2530ARITIo3eA6O+s4n1Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757537257; c=relaxed/simple;
-	bh=B9nXx/uAd8bzj5r9K99vQjrO7Sot+mOg+1OtU9x4TJA=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=YnxNTfnY9KDSSC3jKprg16OFlKPDV0ktl0qPiQE3GHHWYb1gQSYPUjniCQ2i7YSVQUnUX01CGs42G4p7GgZNFJ7da7kAcTUFtg3+6gmdkuLcJIHoGm/aL/cgeHDikn+e6undnK9l8STHKW9YBQwhyQmfb+I7qyOYVZrTJHfpp+I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Pw4J8UXk; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Pw4J8UXk"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82205C4CEEB;
-	Wed, 10 Sep 2025 20:47:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757537257;
-	bh=B9nXx/uAd8bzj5r9K99vQjrO7Sot+mOg+1OtU9x4TJA=;
-	h=From:Date:Subject:To:Cc:From;
-	b=Pw4J8UXkQy5+jBVfd2aWCgPsOF3LXMVECSVAQ09SL5iQQH4LNdhmS4nAJ1faOP54w
-	 ZwSIkie9GiLSvp+f7iCn7fSdm9n84HnC8sf8KmAF0F/BqyPuevrnzZ/z2kDIo1uR2E
-	 LDGFqR+kGG7GXalmI3uppOIJMjiDbCQ+8MKaiTZ77pZtqc3REy0f8pCsLYZRjZiLR9
-	 JDm8j7NNFYFTSDa8ktJuX0nJkLSRKqknAhEJ1lW4wlFs2bVkPyPDrzrxDsVQntH2Fp
-	 7q8v+cJ7zA23X9PUu/eM3d6Q36AFFNkPHmZSSRO8ISV5/PPLQV15QvM2GpjZnX69G1
-	 RnZH0iosdNKlA==
-From: Nathan Chancellor <nathan@kernel.org>
-Date: Wed, 10 Sep 2025 13:47:26 -0700
-Subject: [PATCH] md/md-llbitmap: Use DIV_ROUND_UP_SECTOR_T
+	s=arc-20240116; t=1757537608; c=relaxed/simple;
+	bh=z+SSr5e4raDynlSrCzw4DbMZwm/elGSHp/acpNaX/IA=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=EerWZ9nKVMUN2WHPGCajBtOy9k/gFS+L94N+ujP6KdwemOkySFe51I9OUMjPjtvUjvSS+zknr4AWtudh7mFbOq+JtnqbZhTd63ATib5GhQO+6Y+t/SUh1xX3aVOX/IrCk9oYOIqWD2BxC0SpeNKilyd8WP8LOq7P5K9pot8IOrQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-40856fed6a6so507645ab.0
+        for <linux-block@vger.kernel.org>; Wed, 10 Sep 2025 13:53:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757537605; x=1758142405;
+        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ORHDDrKhvA3/qUkPzDVcq1X/g8kCw2zy04ZymDlu2HE=;
+        b=U2faWxcpjNoj9JluiJEaLFypHumVYjFgqmeQl/dua08kZOaf+pEi+PVppYPuWpZbfc
+         FKGB+e8bJnWno6HZD85NgElkQ89oy3z8I5EOfYjuhSIC7pOjLbrLck9GBP8AnJ4ve1QD
+         5guVxrmkka4/RysAJL/dCF4UgBg8IpLZ9TuIhx/QcMoDWM4UZXdzr1kORDCHyf744Uca
+         d/5GiTsqBAssjgVHtBKTcCrzyN8NxY5KcURuar7FsNX5tkJObEKj89Exy3S3j6/A1fRL
+         eM8x1yQ+mRzAK/HonUUS2yooQgBTPj0v0vb9z5yMkzDvKCa0OvmZk2QHzBiWfwNgLdLa
+         fJSA==
+X-Forwarded-Encrypted: i=1; AJvYcCWem/XbWCs1T3Ry3VUKLu6j9AJD5Aj3aIlNNpf9pg9uh1aLzbcHyPK0Zq+mhMrGVuD7MARdydzU0alKwA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwiElpVIuhySBYOPkBIyc2IvM0yFAQnR/RFUU/4K6qJeclz/Tx1
+	byvKt0aR3A92WmknKv4NKST9KvxV46lIblgnEEZPoGs9Lcvkmuss1QRIA2YiEP6U//DoeywAFah
+	A33BU/0yXg3Tw62ICemG0wzcdRPdnA02MVF/GiOgjAQ2ylfi119I3hsdsKTA=
+X-Google-Smtp-Source: AGHT+IELNcieJyO3PScSY3ls43ocO856dpwKju7gM2D1Vty+fwi/cTBoqQMfNRZ1V0PBBKdy5zAPf22QzDDN/RUdRFlpuS0plJbP
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250910-llbitmap-fix-64-div-for-32-bit-v1-1-453a5c8e3e00@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAN3jwWgC/x2NSwqEMBAFryK99kESP0SvIi4yk3Zs8EciMiDef
- ZpZFq94dVPmJJypL25KfEmWfVOwZUHvOWwfhkRlcsY1prMGy/KScw0HJvmirRHlwrQnVA46oPO
- +CTY676ua9ORIrOI/MIzP8wNeZXLKcAAAAA==
-X-Change-ID: 20250910-llbitmap-fix-64-div-for-32-bit-9885a1d28834
-To: Jens Axboe <axboe@kernel.dk>, Song Liu <song@kernel.org>, 
- Yu Kuai <yukuai3@huawei.com>, Li Nan <linan122@huawei.com>
-Cc: linux-raid@vger.kernel.org, linux-block@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Nathan Chancellor <nathan@kernel.org>
-X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4615; i=nathan@kernel.org;
- h=from:subject:message-id; bh=B9nXx/uAd8bzj5r9K99vQjrO7Sot+mOg+1OtU9x4TJA=;
- b=owGbwMvMwCUmm602sfCA1DTG02pJDBkHHz+33p76/YjXv9aEo7McPZx06tnZ1p96u/HJjRnKI
- vXFPam1HaUsDGJcDLJiiizVj1WPGxrOOct449QkmDmsTCBDGLg4BWAi3QqMDDta8xw7jy3cXzrt
- U0JPWtyFDM7Xvls5Fn99fUY6VLX4UQojw9na7EeCpj3ZNuuPvSg+9Hju1L/Sq2Xf+Cf1aNztWGZ
- 9iRUA
-X-Developer-Key: i=nathan@kernel.org; a=openpgp;
- fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
+X-Received: by 2002:a92:ca46:0:b0:410:cae9:a07c with SMTP id
+ e9e14a558f8ab-410cae9a261mr93638345ab.5.1757537605114; Wed, 10 Sep 2025
+ 13:53:25 -0700 (PDT)
+Date: Wed, 10 Sep 2025 13:53:25 -0700
+In-Reply-To: <20250910-work-namespace-v1-0-4dd56e7359d8@kernel.org>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68c1e545.050a0220.3c6139.002b.GAE@google.com>
+Subject: [syzbot ci] Re: ns: support file handles
+From: syzbot ci <syzbot+cic2a3475eff9e1ea7@syzkaller.appspotmail.com>
+To: amir73il@gmail.com, axboe@kernel.dk, brauner@kernel.org, 
+	cgroups@vger.kernel.org, chuck.lever@oracle.com, cyphar@cyphar.com, 
+	daan.j.demeyer@gmail.com, edumazet@google.com, hannes@cmpxchg.org, 
+	horms@kernel.org, jack@suse.cz, jlayton@kernel.org, josef@toxicpanda.com, 
+	kuba@kernel.org, linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-nfs@vger.kernel.org, me@yhndnzj.com, mkoutny@suse.com, 
+	mzxreary@0pointer.de, netdev@vger.kernel.org, pabeni@redhat.com, 
+	tj@kernel.org, viro@zeniv.linux.org.uk, zbyszek@in.waw.pl
+Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-When building for 32-bit platforms, there are several link (if builtin)
-or modpost (if a module) errors due to dividends of type 'sector_t' in
-DIV_ROUND_UP:
+syzbot ci has tested the following series
 
-  arm-linux-gnueabi-ld: drivers/md/md-llbitmap.o: in function `llbitmap_resize':
-  drivers/md/md-llbitmap.c:1017:(.text+0xae8): undefined reference to `__aeabi_uldivmod'
-  arm-linux-gnueabi-ld: drivers/md/md-llbitmap.c:1020:(.text+0xb10): undefined reference to `__aeabi_uldivmod'
-  arm-linux-gnueabi-ld: drivers/md/md-llbitmap.o: in function `llbitmap_end_discard':
-  drivers/md/md-llbitmap.c:1114:(.text+0xf14): undefined reference to `__aeabi_uldivmod'
-  arm-linux-gnueabi-ld: drivers/md/md-llbitmap.o: in function `llbitmap_start_discard':
-  drivers/md/md-llbitmap.c:1097:(.text+0x1808): undefined reference to `__aeabi_uldivmod'
-  arm-linux-gnueabi-ld: drivers/md/md-llbitmap.o: in function `llbitmap_read_sb':
-  drivers/md/md-llbitmap.c:867:(.text+0x2080): undefined reference to `__aeabi_uldivmod'
-  arm-linux-gnueabi-ld: drivers/md/md-llbitmap.o:drivers/md/md-llbitmap.c:895: more undefined references to `__aeabi_uldivmod' follow
+[v1] ns: support file handles
+https://lore.kernel.org/all/20250910-work-namespace-v1-0-4dd56e7359d8@kernel.org
+* [PATCH 01/32] pidfs: validate extensible ioctls
+* [PATCH 02/32] nsfs: validate extensible ioctls
+* [PATCH 03/32] block: use extensible_ioctl_valid()
+* [PATCH 04/32] ns: move to_ns_common() to ns_common.h
+* [PATCH 05/32] nsfs: add nsfs.h header
+* [PATCH 06/32] ns: uniformly initialize ns_common
+* [PATCH 07/32] mnt: use ns_common_init()
+* [PATCH 08/32] ipc: use ns_common_init()
+* [PATCH 09/32] cgroup: use ns_common_init()
+* [PATCH 10/32] pid: use ns_common_init()
+* [PATCH 11/32] time: use ns_common_init()
+* [PATCH 12/32] uts: use ns_common_init()
+* [PATCH 13/32] user: use ns_common_init()
+* [PATCH 14/32] net: use ns_common_init()
+* [PATCH 15/32] ns: remove ns_alloc_inum()
+* [PATCH 16/32] nstree: make iterator generic
+* [PATCH 17/32] mnt: support iterator
+* [PATCH 18/32] cgroup: support iterator
+* [PATCH 19/32] ipc: support iterator
+* [PATCH 20/32] net: support iterator
+* [PATCH 21/32] pid: support iterator
+* [PATCH 22/32] time: support iterator
+* [PATCH 23/32] userns: support iterator
+* [PATCH 24/32] uts: support iterator
+* [PATCH 25/32] ns: add to_<type>_ns() to respective headers
+* [PATCH 26/32] nsfs: add current_in_namespace()
+* [PATCH 27/32] nsfs: support file handles
+* [PATCH 28/32] nsfs: support exhaustive file handles
+* [PATCH 29/32] nsfs: add missing id retrieval support
+* [PATCH 30/32] tools: update nsfs.h uapi header
+* [PATCH 31/32] selftests/namespaces: add identifier selftests
+* [PATCH 32/32] selftests/namespaces: add file handle selftests
 
-Use DIV_ROUND_UP_SECTOR_T instead of DIV_ROUND_UP, which exists to
-handle this exact situation.
+and found the following issue:
+WARNING in copy_net_ns
 
-Fixes: 5ab829f1971d ("md/md-llbitmap: introduce new lockless bitmap")
-Signed-off-by: Nathan Chancellor <nathan@kernel.org>
+Full report is available here:
+https://ci.syzbot.org/series/bc3dfd83-98cc-488c-b046-f849c79a6a41
+
+***
+
+WARNING in copy_net_ns
+
+tree:      net-next
+URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net-next.git
+base:      deb105f49879dd50d595f7f55207d6e74dec34e6
+arch:      amd64
+compiler:  Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+config:    https://ci.syzbot.org/builds/a560fd28-b788-4442-a7c8-10c6240b4dbf/config
+syz repro: https://ci.syzbot.org/findings/18e91b10-567e-4cae-a279-8a5f2f2cde80/syz_repro
+
+------------[ cut here ]------------
+ida_free called for id=1326 which is not allocated.
+WARNING: CPU: 0 PID: 6146 at lib/idr.c:592 ida_free+0x280/0x310 lib/idr.c:592
+Modules linked in:
+CPU: 0 UID: 0 PID: 6146 Comm: syz.1.60 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+RIP: 0010:ida_free+0x280/0x310 lib/idr.c:592
+Code: 00 00 00 00 fc ff df 48 8b 5c 24 10 48 8b 7c 24 40 48 89 de e8 d1 8a 0c 00 90 48 c7 c7 80 ee ba 8c 44 89 fe e8 11 87 12 f6 90 <0f> 0b 90 90 eb 34 e8 95 02 4f f6 49 bd 00 00 00 00 00 fc ff df eb
+RSP: 0018:ffffc9000302fba0 EFLAGS: 00010246
+RAX: c838d58ce4bb0000 RBX: 0000000000000a06 RCX: ffff88801eac0000
+RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000002
+RBP: ffffc9000302fca0 R08: ffff88804b024293 R09: 1ffff11009604852
+R10: dffffc0000000000 R11: ffffed1009604853 R12: 1ffff92000605f78
+R13: dffffc0000000000 R14: ffff888026c1fd00 R15: 000000000000052e
+FS:  00007f6d7aab16c0(0000) GS:ffff8880b8613000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000200000004000 CR3: 000000002726e000 CR4: 00000000000006f0
+Call Trace:
+ <TASK>
+ copy_net_ns+0x37a/0x510 net/core/net_namespace.c:593
+ create_new_namespaces+0x3f3/0x720 kernel/nsproxy.c:110
+ unshare_nsproxy_namespaces+0x11c/0x170 kernel/nsproxy.c:218
+ ksys_unshare+0x4c8/0x8c0 kernel/fork.c:3127
+ __do_sys_unshare kernel/fork.c:3198 [inline]
+ __se_sys_unshare kernel/fork.c:3196 [inline]
+ __x64_sys_unshare+0x38/0x50 kernel/fork.c:3196
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f6d79b8eba9
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f6d7aab1038 EFLAGS: 00000246 ORIG_RAX: 0000000000000110
+RAX: ffffffffffffffda RBX: 00007f6d79dd5fa0 RCX: 00007f6d79b8eba9
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000062040200
+RBP: 00007f6d79c11e19 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007f6d79dd6038 R14: 00007f6d79dd5fa0 R15: 00007ffd5ab830f8
+ </TASK>
+
+
+***
+
+If these findings have caused you to resend the series or submit a
+separate fix, please add the following tag to your commit message:
+  Tested-by: syzbot@syzkaller.appspotmail.com
+
 ---
- drivers/md/md-llbitmap.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
-
-diff --git a/drivers/md/md-llbitmap.c b/drivers/md/md-llbitmap.c
-index 3337d5c7e7e5..1eb434306162 100644
---- a/drivers/md/md-llbitmap.c
-+++ b/drivers/md/md-llbitmap.c
-@@ -781,7 +781,7 @@ static int llbitmap_init(struct llbitmap *llbitmap)
- 
- 	while (chunks > space) {
- 		chunksize = chunksize << 1;
--		chunks = DIV_ROUND_UP(blocks, chunksize);
-+		chunks = DIV_ROUND_UP_SECTOR_T(blocks, chunksize);
- 	}
- 
- 	llbitmap->barrier_idle = DEFAULT_BARRIER_IDLE;
-@@ -864,8 +864,8 @@ static int llbitmap_read_sb(struct llbitmap *llbitmap)
- 		goto out_put_page;
- 	}
- 
--	if (chunksize < DIV_ROUND_UP(mddev->resync_max_sectors,
--				     mddev->bitmap_info.space << SECTOR_SHIFT)) {
-+	if (chunksize < DIV_ROUND_UP_SECTOR_T(mddev->resync_max_sectors,
-+					      mddev->bitmap_info.space << SECTOR_SHIFT)) {
- 		pr_err("md/llbitmap: %s: chunksize too small %lu < %llu / %lu",
- 		       mdname(mddev), chunksize, mddev->resync_max_sectors,
- 		       mddev->bitmap_info.space);
-@@ -892,7 +892,7 @@ static int llbitmap_read_sb(struct llbitmap *llbitmap)
- 
- 	llbitmap->barrier_idle = DEFAULT_BARRIER_IDLE;
- 	llbitmap->chunksize = chunksize;
--	llbitmap->chunks = DIV_ROUND_UP(mddev->resync_max_sectors, chunksize);
-+	llbitmap->chunks = DIV_ROUND_UP_SECTOR_T(mddev->resync_max_sectors, chunksize);
- 	llbitmap->chunkshift = ffz(~chunksize);
- 	ret = llbitmap_cache_pages(llbitmap);
- 
-@@ -1014,10 +1014,10 @@ static int llbitmap_resize(struct mddev *mddev, sector_t blocks, int chunksize)
- 		chunksize = llbitmap->chunksize;
- 
- 	/* If there is enough space, leave the chunksize unchanged. */
--	chunks = DIV_ROUND_UP(blocks, chunksize);
-+	chunks = DIV_ROUND_UP_SECTOR_T(blocks, chunksize);
- 	while (chunks > mddev->bitmap_info.space << SECTOR_SHIFT) {
- 		chunksize = chunksize << 1;
--		chunks = DIV_ROUND_UP(blocks, chunksize);
-+		chunks = DIV_ROUND_UP_SECTOR_T(blocks, chunksize);
- 	}
- 
- 	llbitmap->chunkshift = ffz(~chunksize);
-@@ -1094,7 +1094,7 @@ static void llbitmap_start_discard(struct mddev *mddev, sector_t offset,
- 				   unsigned long sectors)
- {
- 	struct llbitmap *llbitmap = mddev->bitmap;
--	unsigned long start = DIV_ROUND_UP(offset, llbitmap->chunksize);
-+	unsigned long start = DIV_ROUND_UP_SECTOR_T(offset, llbitmap->chunksize);
- 	unsigned long end = (offset + sectors - 1) >> llbitmap->chunkshift;
- 	int page_start = (start + BITMAP_DATA_OFFSET) >> PAGE_SHIFT;
- 	int page_end = (end + BITMAP_DATA_OFFSET) >> PAGE_SHIFT;
-@@ -1111,7 +1111,7 @@ static void llbitmap_end_discard(struct mddev *mddev, sector_t offset,
- 				 unsigned long sectors)
- {
- 	struct llbitmap *llbitmap = mddev->bitmap;
--	unsigned long start = DIV_ROUND_UP(offset, llbitmap->chunksize);
-+	unsigned long start = DIV_ROUND_UP_SECTOR_T(offset, llbitmap->chunksize);
- 	unsigned long end = (offset + sectors - 1) >> llbitmap->chunkshift;
- 	int page_start = (start + BITMAP_DATA_OFFSET) >> PAGE_SHIFT;
- 	int page_end = (end + BITMAP_DATA_OFFSET) >> PAGE_SHIFT;
-
----
-base-commit: 5ab829f1971dc99f2aac10846c378e67fc875abc
-change-id: 20250910-llbitmap-fix-64-div-for-32-bit-9885a1d28834
-
-Best regards,
---  
-Nathan Chancellor <nathan@kernel.org>
-
+This report is generated by a bot. It may contain errors.
+syzbot ci engineers can be reached at syzkaller@googlegroups.com.
