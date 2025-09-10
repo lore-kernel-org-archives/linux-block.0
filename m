@@ -1,135 +1,171 @@
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E08BF2BEC26
-	for <linux-block@vger.kernel.org>; Wed, 10 Sep 2025 11:30:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3010221271
+	for <linux-block@vger.kernel.org>; Wed, 10 Sep 2025 11:41:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757503804; cv=none; b=V/Z/76Oi4Nlnsya/Q5jIPoohldSFMad3JEu4N9p0mdfvb1M5uZr5Cwd870grMNgFNrstKtG4XmdJB/fUxe+SdMQIjDlDoIy92Y+342ViM6WQC2e+nCRauplbDmj/lYkPtCtFi/CBEK7Rkauz8lYOtVRLob2V7cTmpn2WEvZ6AoA=
+	t=1757504477; cv=none; b=eEXmF++G07lg6nwNDgkGAxSJ7rtb1Gj46VNMSi7CvHo0Giws3zo1X8/oVG63973klB5PzzAPt3ir1yXpOiK/RJqUSqe6EZXIyCxux3OfUj15JEppFi2ftMERO0fprp2TP7Bz6jz2nPS/qFUyuOtlt4EDdSEW2BHwNjyNkQohzZE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757503804; c=relaxed/simple;
-	bh=iU3g6YqT3iBhtM4Qx6LE4jyqmLa5j7vhy7FFkAC+vbY=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=irVWZhja/7SpVA5pOz8vPBETtZ8rAhdrRAwho8PEN00WS9/FE657zCkHTMSd6lfkMwe2BHShPFPKeRxmAzRT75a0MHP7qk9w/2Q/JVaivDCneTaXZ8yVCJD3asFG7uJz9DwbseGWqoRf9KT+cdpTpELFad7jQA0LFvY5bD9bjK4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=rB3nbBiG; arc=none smtp.client-ip=209.85.210.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1757504477; c=relaxed/simple;
+	bh=ghP75ITTr1Wbl8YiC9b7VSPLJvLHnLZXtrGBe0Jldgo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qXjPczMVE2TNm/EVcr7Q4z2J2QQe9QE8VJgRSRmCXvuiDIltYkdrnQUwfU7cZBdDLtX2k9P97FdjG5bz7Tj2i9/h310S7Il4qEvKQoaehgI0pHC+8CPmBTFyqEWz0o3jKz2w50ne9CkZDdyGNPs4isCjeSh+omYJH+l0CJoemeM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Do8T5X9t; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=OMvVrlQA; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Do8T5X9t; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=OMvVrlQA; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="rB3nbBiG"
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-77256e75eacso5976407b3a.0
-        for <linux-block@vger.kernel.org>; Wed, 10 Sep 2025 04:30:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1757503802; x=1758108602; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=UHog35fdZul65rJ2KSFV2eXJRn1rF30zkol6ZT3v8ug=;
-        b=rB3nbBiGCCmUq5GzWvTdIf3pbOGPTQHXycuWNkfM6XjrU0bKY5pbZ8viPOo2jCHobj
-         1lzHzpEgfB5r/gdwtboudIQXpL7M8N1yswrMTWnHhCwcXg6qjJv0Y+5tlfhjX/K9lFvG
-         cSoepf/cgsc4hQogO+/wQAzge5GZicpLIQYFoCMHR6jJWgScpSZPSWVoYfG+oDY8Kd59
-         RaDxUIyCNMVTo81on34pnnNrzFN6u/+ZB9rfKuvyC5m6hjb3lHJ0iSjNv/QV8mHuiuav
-         7cOVevZE/SmRKsqhkz5+PssfDDXnr9Z6PnxkSEIYgX9xLHQyIod32Ekb/9dbGpxd2ELF
-         uUFw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757503802; x=1758108602;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=UHog35fdZul65rJ2KSFV2eXJRn1rF30zkol6ZT3v8ug=;
-        b=ZlouoiVoIBqd0EcEySUJ3MLpAvOv059GSm+E5BhlA+Yt0660xLB/rTiW92+RFRiGUi
-         CGs0TnBGQXHGnKN4RgxTGVpDabjPG/Jie0cCDjnrsx3MAjIvzeaOmhhKw8xPCH9ppOex
-         hcC52CMJnuOfc4l7xMUdrSaD+lAqvLjrjDU1PdwE3KEt3d4kDIhxE6DEkzH1z4slsG51
-         oS0A1nY2Rd7bo/Ay4jjOqmj4HMyEfhUxku4Klq//b1J3jddIuvAz0U3m1MGdF9Ykgg9f
-         81qAlwhTWWyQk2NRbM2/SawYAH1Hwj8FORfusuOsr7kTltv9ZBkXcgoELaIQA0A6gTa+
-         gl3Q==
-X-Gm-Message-State: AOJu0YxpdQh4HOIomaCNgxMYUmDwCDBD3CZr1K37L4EYh8uTIU6Eyg9r
-	dndUEI5I7xbitXDp43dBrDihJsQkfK77WlD8SdmPkPFu17gmvUi7fg724/C9gO6wPOE=
-X-Gm-Gg: ASbGncsNG0zBCMh38Hizf87Rd8iesUFv4ETFhid151r7Gi6+kFYlZk2uFiMzRMfSx38
-	XN4Az3xwH1lpRzkvJgyOblG42EFTAN6fi6QriEtXq3m2Yu3Lk5yfHo5/DOiwykSWBcD6qxaLveC
-	xohNDeTVmIJ7Vt3ahcOQv8d4nKTSM61hDTntyyf+IymWu7vnNxaJ1YP53a32IpkyG9FumyQz6E3
-	OarDEqPgFPeXPJxsB5+Y2WR7yjFqWe0kUskONKI8yn7spQxr5dw1pqwsCE0yS13VwIWnPtsUqyQ
-	mJJyJkBLEFi/PIU26VW4tPP0FWAnB8WrM4kWJFxE+4VhpMU7KiRKdQCqaMNZLuQ6Oer7NKkTZN6
-	MsyT9g5UO8dca0bk=
-X-Google-Smtp-Source: AGHT+IHkihz9yFR54R0EvSFdM+hx3ztjH6FzLB6hWLgclGcjkfYrDxszfqHbE5NQHR7E0043fCmspg==
-X-Received: by 2002:a05:6a00:13a0:b0:771:f951:16c6 with SMTP id d2e1a72fcca58-7742de60a43mr17847732b3a.15.1757503802237;
-        Wed, 10 Sep 2025 04:30:02 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-774662920b1sm4964965b3a.52.2025.09.10.04.30.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Sep 2025 04:30:01 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: nilay@linux.ibm.com, ming.lei@redhat.com, 
- Yu Kuai <yukuai1@huaweicloud.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
- yukuai3@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com, 
- johnny.chenyi@huawei.com
-In-Reply-To: <20250910080445.239096-1-yukuai1@huaweicloud.com>
-References: <20250910080445.239096-1-yukuai1@huaweicloud.com>
-Subject: Re: [PATCH v2 for-6.18/block 00/10] blk-mq: cleanup and fixes for
- updating nr_requests
-Message-Id: <175750380136.204398.548203762682278830.b4-ty@kernel.dk>
-Date: Wed, 10 Sep 2025 05:30:01 -0600
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Do8T5X9t";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="OMvVrlQA";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Do8T5X9t";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="OMvVrlQA"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 49FFB21CAA;
+	Wed, 10 Sep 2025 11:41:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1757504471; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nukXpjG51dnhqFzISUdKc6Tj4RBvQvnQkSubneWFZLQ=;
+	b=Do8T5X9t7+rDxBdAzSuZ8cI2u5NWyCE/ajCIpCuxFECTqMvVEAkp49FtbBulrIC/QY09Hq
+	2/GMaFcJS6esdGOfBbu85Mawkix1/ky0HkLBVKUnGlNervWSNhC5NudBF3aKEQZHTwx7nR
+	T/pizcI+3/NXZkl+YfRgT6+Nk4+RAhk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1757504471;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nukXpjG51dnhqFzISUdKc6Tj4RBvQvnQkSubneWFZLQ=;
+	b=OMvVrlQAkYHnriEewU/AgB6bH84erNrd6ikz93vPIegO68SWH9X+dXWo2++n+uNNhAjbqk
+	0nEw2QePrW1l90DA==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1757504471; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nukXpjG51dnhqFzISUdKc6Tj4RBvQvnQkSubneWFZLQ=;
+	b=Do8T5X9t7+rDxBdAzSuZ8cI2u5NWyCE/ajCIpCuxFECTqMvVEAkp49FtbBulrIC/QY09Hq
+	2/GMaFcJS6esdGOfBbu85Mawkix1/ky0HkLBVKUnGlNervWSNhC5NudBF3aKEQZHTwx7nR
+	T/pizcI+3/NXZkl+YfRgT6+Nk4+RAhk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1757504471;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nukXpjG51dnhqFzISUdKc6Tj4RBvQvnQkSubneWFZLQ=;
+	b=OMvVrlQAkYHnriEewU/AgB6bH84erNrd6ikz93vPIegO68SWH9X+dXWo2++n+uNNhAjbqk
+	0nEw2QePrW1l90DA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 1208C13310;
+	Wed, 10 Sep 2025 11:41:11 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id vKBkA9djwWjhagAAD6G6ig
+	(envelope-from <hare@suse.de>); Wed, 10 Sep 2025 11:41:11 +0000
+Message-ID: <22b03d52-76c8-4ac6-96cf-830ec88eaef4@suse.de>
+Date: Wed, 10 Sep 2025 13:41:10 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-2ce6c
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/2] md: init
+ queue_limits->max_hw_wzeroes_unmap_sectors parameter
+To: Zhang Yi <yi.zhang@huaweicloud.com>, linux-block@vger.kernel.org,
+ linux-raid@vger.kernel.org, drbd-dev@lists.linbit.com
+Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+ john.g.garry@oracle.com, pmenzel@molgen.mpg.de, hch@lst.de,
+ martin.petersen@oracle.com, axboe@kernel.dk, yi.zhang@huawei.com,
+ yukuai3@huawei.com, yangerkun@huawei.com
+References: <20250910111107.3247530-1-yi.zhang@huaweicloud.com>
+ <20250910111107.3247530-2-yi.zhang@huaweicloud.com>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20250910111107.3247530-2-yi.zhang@huaweicloud.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-4.30 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-0.999];
+	MIME_GOOD(-0.10)[text/plain];
+	FROM_HAS_DN(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	ARC_NA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	MID_RHS_MATCH_FROM(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[oracle.com:email,suse.de:mid,suse.de:email]
+X-Spam-Flag: NO
+X-Spam-Level: 
+X-Spam-Score: -4.30
 
-
-On Wed, 10 Sep 2025 16:04:35 +0800, Yu Kuai wrote:
-> Changes from v1:
->  - add comments explaining accessing q->elevator without holding
->    elevator_lock in patch 4;
->  - add non-shared checking in patch 8;
->  - add review tag by Nilay, patch 1-5,7,9,10;
+On 9/10/25 13:11, Zhang Yi wrote:
+> From: Zhang Yi <yi.zhang@huawei.com>
 > 
-> Yu Kuai (10):
->   blk-mq: remove useless checking in queue_requests_store()
->   blk-mq: remove useless checkings in blk_mq_update_nr_requests()
->   blk-mq: check invalid nr_requests in queue_requests_store()
->   blk-mq: convert to serialize updating nr_requests with
->     update_nr_hwq_lock
->   blk-mq: cleanup shared tags case in blk_mq_update_nr_requests()
->   blk-mq: split bitmap grow and resize case in
->     blk_mq_update_nr_requests()
->   blk-mq-sched: add new parameter nr_requests in
->     blk_mq_alloc_sched_tags()
->   blk-mq: fix potential deadlock while nr_requests grown
->   blk-mq: remove blk_mq_tag_update_depth()
->   blk-mq: fix stale nr_requests documentation
+> The parameter max_hw_wzeroes_unmap_sectors in queue_limits should be
+> equal to max_write_zeroes_sectors if it is set to a non-zero value.
+> However, the stacked md drivers call md_init_stacking_limits() to
+> initialize this parameter to UINT_MAX but only adjust
+> max_write_zeroes_sectors when setting limits. Therefore, this
+> discrepancy triggers a value check failure in blk_validate_limits().
 > 
-> [...]
+>   $ modprobe scsi_debug num_parts=2 dev_size_mb=8 lbprz=1 lbpws=1
+>   $ mdadm --create /dev/md0 --level=0 --raid-device=2 /dev/sda1 /dev/sda2
+>     mdadm: Defaulting to version 1.2 metadata
+>     mdadm: RUN_ARRAY failed: Invalid argument
+> 
+> Fix this failure by explicitly setting max_hw_wzeroes_unmap_sectors to
+> max_write_zeroes_sectors. Since the linear and raid0 drivers support
+> write zeroes, so they can support unmap write zeroes operation if all of
+> the backend devices support it. However, the raid1/10/5 drivers don't
+> support write zeroes, so we have to set it to zero.
+> 
+> Fixes: 0c40d7cb5ef3 ("block: introduce max_{hw|user}_wzeroes_unmap_sectors to queue limits")
+> Reported-by: John Garry <john.g.garry@oracle.com>
+> Closes: https://lore.kernel.org/linux-block/803a2183-a0bb-4b7a-92f1-afc5097630d2@oracle.com/
+> Signed-off-by: Zhang Yi <yi.zhang@huawei.com>
+> Tested-by: John Garry <john.g.garry@oracle.com>
+> Reviewed-by: Li Nan <linan122@huawei.com>
+> Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+> Reviewed-by: Yu Kuai <yukuai3@huawei.com>
+> ---
+>   drivers/md/md-linear.c | 1 +
+>   drivers/md/raid0.c     | 1 +
+>   drivers/md/raid1.c     | 1 +
+>   drivers/md/raid10.c    | 1 +
+>   drivers/md/raid5.c     | 1 +
+>   5 files changed, 5 insertions(+)
+> 
+Notice the failure, too. Thanks for fixing it.
 
-Applied, thanks!
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 
-[01/10] blk-mq: remove useless checking in queue_requests_store()
-        commit: dc1dd13d44fa4e4d466476c0f3517c1230c237e4
-[02/10] blk-mq: remove useless checkings in blk_mq_update_nr_requests()
-        commit: 8bd7195fea6d9662aa3b32498a3828bfd9b63185
-[03/10] blk-mq: check invalid nr_requests in queue_requests_store()
-        commit: b46d4c447db76e36906ed59ebb9b3ef8f3383322
-[04/10] blk-mq: convert to serialize updating nr_requests with update_nr_hwq_lock
-        commit: 626ff4f8ebcb7207f01e7810acb85812ccf06bd8
-[05/10] blk-mq: cleanup shared tags case in blk_mq_update_nr_requests()
-        commit: 7f2799c546dba9e12f9ff4d07936601e416c640d
-[06/10] blk-mq: split bitmap grow and resize case in blk_mq_update_nr_requests()
-        commit: e63200404477456ec60c62dd8b3b1092aba2e211
-[07/10] blk-mq-sched: add new parameter nr_requests in blk_mq_alloc_sched_tags()
-        commit: 6293e336f6d7d3f3415346ce34993b3398846166
-[08/10] blk-mq: fix potential deadlock while nr_requests grown
-        commit: b86433721f46d934940528f28d49c1dedb690df1
-[09/10] blk-mq: remove blk_mq_tag_update_depth()
-        commit: 9784041145796994f2b21f4c7e628d7c9db762f4
-[10/10] blk-mq: fix stale nr_requests documentation
-        commit: a75fe12fa2e2f96b619f25b8cda1fdef6d616ab1
+Cheers,
 
-Best regards,
+Hannes
 -- 
-Jens Axboe
-
-
-
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
