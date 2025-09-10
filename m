@@ -1,106 +1,105 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECB9431158E;
-	Wed, 10 Sep 2025 08:14:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61F5C30F943;
+	Wed, 10 Sep 2025 08:20:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757492065; cv=none; b=aump5IrEEkVT79AuYkKk+VVI6bU4P4OaV5eOLFT3av4EJb9F9O3AffHvmnp9QwxElRiwRS0rcKIe+CqIAPH3rB63yB/CP5yY+5+nCh5gCILQ5uLWo57JY/NuXUUR7lOjSO68vXrBs5avUG4hJ5dZG9wifEoiZYGnsLB04NQrTuo=
+	t=1757492431; cv=none; b=h6jaDzo8mYj90erAtclnX/ZLVAfohHCfer4hTCAbgCwhbG1DopOxJJdFIeyLAd3jSQ1r8iJ48eJd+h5Wrr4SUucN8xeLFDtITvk99vCaDnEG0xS7xsMue83mkh5ZtCzoTVLEpIvWyqx8beUO/HEn3f6vCkdRbLm3oarOLdTk0v8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757492065; c=relaxed/simple;
-	bh=0QBIETaXXTTvVgA6n9Qg1SE4aRgNz6YT48YXQsRlc8E=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=XuxjrQvbDMpjgHojvibWLhwpaRFQP9Y6huk+tIHi+0SpolP3vKd689D3vnMcZu+UmhRiJalhVbMvglClvfoT5aNL0K9EQ0YeRjIN2DYCnNQhSH+Y8eVq1zgJkcLLG7L343KFcdt9l+drF4k8kxV6Qz/gSL+fZ6btRzbCbATmSyk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4cMD480tXJzKHNLK;
-	Wed, 10 Sep 2025 16:14:16 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 571AE1A133C;
-	Wed, 10 Sep 2025 16:14:16 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.104.67])
-	by APP4 (Coremail) with SMTP id gCh0CgDnMY5QM8Fo1ggRCA--.52270S14;
-	Wed, 10 Sep 2025 16:14:16 +0800 (CST)
-From: Yu Kuai <yukuai1@huaweicloud.com>
-To: axboe@kernel.dk,
-	nilay@linux.ibm.com,
-	ming.lei@redhat.com
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	yukuai3@huawei.com,
-	yi.zhang@huawei.com,
-	yangerkun@huawei.com,
-	johnny.chenyi@huawei.com
-Subject: [PATCH v2 for-6.18/block 10/10] blk-mq: fix stale nr_requests documentation
-Date: Wed, 10 Sep 2025 16:04:45 +0800
-Message-Id: <20250910080445.239096-11-yukuai1@huaweicloud.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20250910080445.239096-1-yukuai1@huaweicloud.com>
-References: <20250910080445.239096-1-yukuai1@huaweicloud.com>
+	s=arc-20240116; t=1757492431; c=relaxed/simple;
+	bh=1uPEjYWxkLIek3T+4iAvG+2at77ecF4QIzsgSji0HkY=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=n082HXAmoCfwtEO9k0iyQEvnf+8TZC6A6n634VBi2R4Aqlb1XHLVxby1r1vkNLRKeb6eXC5KhHY/qO+NYMXobKo/vO4cGTo3ZzYWHGlE5Iw7c3xAS8uxs2zdOXc5ihc4asyo1YGFLaRfwu1TRlNcd9VW6RiDypU76Wc1r1DHUWk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=mNNqA8px; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=UOasHq1u; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="mNNqA8px";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="UOasHq1u"
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1757492427;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+CP7a9wws54uQZjmYM4sfmOi5aU+3bjgiGZVeJJmASM=;
+	b=mNNqA8pxV739WOsKJHgEtTJOMzX94iX97K4Ca48VKToBLBDsOAuPRpnAviQ4cvMU6C0Bk7
+	A5mfIda9JkS3gxSPqX4A+hpyJFgpGHWTOOfmtQ1HAe/wSFGkeSscPc9fAM+Jfxb59IH/1I
+	0k0n5GyOhU6D34bkPuFoMEaCL7l9A95WcVb0RR++NMWymRaP241u2PPYxunvC6aJm4vHUH
+	43q626KUuKnVAHYivEM6NNaQuk/ZUwrMjLOg4MQTbqZIE8CpvaFQ6G6f6wB1RBE188f9vN
+	aeFANjWsi6tymtcat1kCVAgA1TyopPhL3jM96rdJctbl2DdhndatVkQKFYxAMg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1757492427;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+CP7a9wws54uQZjmYM4sfmOi5aU+3bjgiGZVeJJmASM=;
+	b=UOasHq1uYa5lt0uQ97FDdS3UHchNqSx7ZJpnsh0V4afb/TZLgNqSAON8pWEePxp1gYSODg
+	Qy/0se5U0TRUFnCw==
+To: Daniel Wagner <dwagner@suse.de>, Hannes Reinecke <hare@suse.de>
+Cc: Daniel Wagner <wagi@kernel.org>, Jens Axboe <axboe@kernel.dk>, Keith
+ Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>, Sagi Grimberg
+ <sagi@grimberg.me>, "Michael S. Tsirkin" <mst@redhat.com>, Aaron Tomlin
+ <atomlin@atomlin.com>, "Martin K. Petersen" <martin.petersen@oracle.com>,
+ Costa Shulyupin <costa.shul@redhat.com>, Juri Lelli
+ <juri.lelli@redhat.com>, Valentin Schneider <vschneid@redhat.com>, Waiman
+ Long <llong@redhat.com>, Ming Lei <ming.lei@redhat.com>, Frederic
+ Weisbecker <frederic@kernel.org>, Mel Gorman <mgorman@suse.de>, Mathieu
+ Desnoyers <mathieu.desnoyers@efficios.com>, linux-kernel@vger.kernel.org,
+ linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+ megaraidlinux.pdl@broadcom.com, linux-scsi@vger.kernel.org,
+ storagedev@microchip.com, virtualization@lists.linux.dev,
+ GR-QLogic-Storage-Upstream@marvell.com
+Subject: Re: [PATCH v8 10/12] blk-mq: use hk cpus only when
+ isolcpus=io_queue is enabled
+In-Reply-To: <d11a0c60-1b75-49ec-a2f8-7df402c4adf2@flourine.local>
+References: <20250905-isolcpus-io-queues-v8-0-885984c5daca@kernel.org>
+ <20250905-isolcpus-io-queues-v8-10-885984c5daca@kernel.org>
+ <ff66801c-f261-411d-bbbf-b386e013d096@suse.de>
+ <d11a0c60-1b75-49ec-a2f8-7df402c4adf2@flourine.local>
+Date: Wed, 10 Sep 2025 10:20:26 +0200
+Message-ID: <87ms72u3at.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgDnMY5QM8Fo1ggRCA--.52270S14
-X-Coremail-Antispam: 1UD129KBjvJXoW7KFWDCryfKr15Zw1xKFWfZrb_yoW8WrW5p3
-	yft3y2gwn5Zw18Wr10yay8tF13Aa93Aw43Jr4DKF1rKr98Awna9Fs2qr1rXF4xZrZ2yFWU
-	urZ29r98Ca1jva7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBYb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUAV
-	Cq3wA2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0
-	rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x0267
-	AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E
-	14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7
-	xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Y
-	z7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64
-	vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8G
-	jcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2I
-	x0cI8IcVAFwI0_Gr0_Xr1lIxAIcVC0I7IYx2IY6xkF7I0E14v26F4j6r4UJwCI42IY6xAI
-	w20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aVCY1x
-	0267AKxVWxJr0_GcJvcSsGvfC2KfnxnUUI43ZEXa7IU1aLvJUUUUU==
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+Content-Type: text/plain
 
-From: Yu Kuai <yukuai3@huawei.com>
+On Mon, Sep 08 2025 at 09:26, Daniel Wagner wrote:
+> On Mon, Sep 08, 2025 at 08:13:31AM +0200, Hannes Reinecke wrote:
+>> >   const struct cpumask *blk_mq_online_queue_affinity(void)
+>> >   {
+>> > +	if (housekeeping_enabled(HK_TYPE_IO_QUEUE)) {
+>> > +		cpumask_and(&blk_hk_online_mask, cpu_online_mask,
+>> > +			    housekeeping_cpumask(HK_TYPE_IO_QUEUE));
+>> > +		return &blk_hk_online_mask;
+>> 
+>> Can you explain the use of 'blk_hk_online_mask'?
+>> Why is a static variable?
+>
+> The blk_mq_*_queue_affinity helpers return a const struct cpumask *, the
+> caller doesn't need to free the return value. Because cpumask_and needs
+> store its result somewhere, I opted for the global static variable.
+>
+>> To my untrained eye it's being recalculated every time one calls
+>> this function. And only the first invocation run on an empty mask,
+>> all subsequent ones see a populated mask.
+>
+> The cpu_online_mask might change over time, it's not a static bitmap.
+> Thus it's necessary to update the blk_hk_online_mask. Doing some sort of
+> caching is certainly possible. Given that we have plenty of cpumask
+> logic operation in the cpu_group_evenly code path later, I am not so
+> sure this really makes a huge difference.
 
-The nr_requests documentation is still the removed single queue, remove
-it and update to current blk-mq.
+Sure,  but none of this is serialized against CPU hotplug operations. So
+the resulting mask, which is handed into the spreading code can be
+concurrently modified. IOW it's not as const as the code claims.
 
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
-Reviewed-by: Nilay Shroff <nilay@linux.ibm.com>
----
- Documentation/ABI/stable/sysfs-block | 14 ++++----------
- 1 file changed, 4 insertions(+), 10 deletions(-)
+How is this even remotely correct?
 
-diff --git a/Documentation/ABI/stable/sysfs-block b/Documentation/ABI/stable/sysfs-block
-index 0ddffc9133d0..0ed10aeff86b 100644
---- a/Documentation/ABI/stable/sysfs-block
-+++ b/Documentation/ABI/stable/sysfs-block
-@@ -603,16 +603,10 @@ Date:		July 2003
- Contact:	linux-block@vger.kernel.org
- Description:
- 		[RW] This controls how many requests may be allocated in the
--		block layer for read or write requests. Note that the total
--		allocated number may be twice this amount, since it applies only
--		to reads or writes (not the accumulated sum).
--
--		To avoid priority inversion through request starvation, a
--		request queue maintains a separate request pool per each cgroup
--		when CONFIG_BLK_CGROUP is enabled, and this parameter applies to
--		each such per-block-cgroup request pool.  IOW, if there are N
--		block cgroups, each request queue may have up to N request
--		pools, each independently regulated by nr_requests.
-+		block layer. Noted this value only represents the quantity for a
-+		single blk_mq_tags instance. The actual number for the entire
-+		device depends on the hardware queue count, whether elevator is
-+		enabled, and whether tags are shared.
- 
- 
- What:		/sys/block/<disk>/queue/nr_zones
--- 
-2.39.2
+Thanks,
 
+        tglx
