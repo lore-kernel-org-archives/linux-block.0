@@ -1,191 +1,120 @@
-Received: from sender4-pp-f112.zoho.com (sender4-pp-f112.zoho.com [136.143.188.112])
+Received: from 003.mia.mailroute.net (003.mia.mailroute.net [199.89.3.6])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C8B3329F05
-	for <linux-block@vger.kernel.org>; Thu, 11 Sep 2025 17:13:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.112
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757610791; cv=pass; b=VdyMtdCyrE2ZBJj76cVWiZ/MqOwNUbrwUEc4wSKNUhWfk5CttJ9t9G5Iw8iRtrsz3BJSbRDA6zwLtGkEnt1qVDpOINIjR89zBVWsgWpI3ULJSCwHvlTIhIUoFzl00yKi7mZSRhYbcWz7TKVpjxtun/MMvrp2TCh5BpH3dl9fcuA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757610791; c=relaxed/simple;
-	bh=gvYG/ftsEkt1ukbLIv9crYcPv9Gyvwap3kPiHfuwFZM=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 MIME-Version:Content-Type; b=U62gCcD/AdujufIEZXercb5cLJArcR8WLtUdfSLlJfGjKY6VrRQ4T9aSTIRX8Ja+6yzcKA34lvEyikFB1xn6/c84E9I6UbhP1BePrO/8a1cacdNNLzyWJqXgo9t6RgRnmAFtK+1ygtp3HPrwnCoPpw0MyN9Aa4MxBpkd7P12EZg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=bob.beckett@collabora.com header.b=UBqOPiXx; arc=pass smtp.client-ip=136.143.188.112
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 699978F4A;
+	Thu, 11 Sep 2025 17:37:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.6
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1757612245; cv=none; b=G00w2HhTW5IdfzwZvPkaqBsW0H2wzgCfDqCe4woaazZvcK3anFnumzY9cG6IIoAwkGCOOoqqTvh32b92ctYc6b5zO7kgE00Zz+sWrQVaBB+Q/vGVp0QC9ISGz+MsIhfrAHcld82MNfuWfOqX+GulhwEc/9gcErbMSsE9fP1pmYk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1757612245; c=relaxed/simple;
+	bh=iCKOQgzTM+f6v185z6tPloY/PSMpZ/tPiCdc71DfVWA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HzgfDWwZbvMca9y2USap+YfZ7Cz6ujuvDEteXbfEc7koEpus9kBWfZxU2GMYK2tVxgWb8ESuWnQiAAUprrNBz4BdztVsg83th8LqYVMUwz5osB20qYtQbbC3au7uHXv2bYL+Tk5P0zTldVnNdVCfpGsWqb41yrWArEtM/xp2nuQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=X1/l1YkV; arc=none smtp.client-ip=199.89.3.6
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=collabora.com header.i=bob.beckett@collabora.com header.b="UBqOPiXx"
-ARC-Seal: i=1; a=rsa-sha256; t=1757610775; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=Pb5VwZaDoLpNWSOJkfKtVZiif1KZcKdJbyGSxzeYGgmouiedl3He5mMlMCjn2v1UA5G5LqUZeRCgJCkzbllDJFI+DEelAUnewl+v1z9MuNsa7auCGx0nR4x6PcW1/cvKNpRL7xQ509rFX63/8oihG/KlOfGgJbVWmEDGH7HILFI=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1757610775; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=9wywiY2GlNrnJWWCyhgQ/MZchSDbGB0hTUB1dttlRB4=; 
-	b=Xs8lBWw10O7gkE0Qhqgo+1ob60lnG22m2YS5t34/RGVlsLeBOsg3L4psTS9JMJBdWN1P2GN5cVM/tbYm24YscO0ogV+3Y13Z5J11/T+8+1iT/IGlmoQgOmkMWnR3+zy/O5sEUogS1DV31jBhjS9R/6h0q1jSUWb3ueNeB8R6HV4=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=collabora.com;
-	spf=pass  smtp.mailfrom=bob.beckett@collabora.com;
-	dmarc=pass header.from=<bob.beckett@collabora.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1757610775;
-	s=zohomail; d=collabora.com; i=bob.beckett@collabora.com;
-	h=Date:Date:From:From:To:To:Cc:Cc:Message-ID:In-Reply-To:References:Subject:Subject:MIME-Version:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
-	bh=9wywiY2GlNrnJWWCyhgQ/MZchSDbGB0hTUB1dttlRB4=;
-	b=UBqOPiXxhuOUMF9i0WpCXFK3Wf2LggW5VwaDahusajwLUN7k8lyxN+RBoKv8clw9
-	3ze8tkG2072AY37mMArzKyEjl4nayr2bzwEuh/COdhAbtaEhdaC8CKh5cXC+FN5w2cg
-	nx3hhoqpIr9WKkS5tw2+B3BiJlnRa2bhuii3Pvak=
-Received: from mail.zoho.com by mx.zohomail.com
-	with SMTP id 1757610743040950.0726086101374; Thu, 11 Sep 2025 10:12:23 -0700 (PDT)
-Date: Thu, 11 Sep 2025 18:12:22 +0100
-From: Robert Beckett <bob.beckett@collabora.com>
-To: "Mikulas Patocka" <mpatocka@redhat.com>
-Cc: "dm-devel" <dm-devel@lists.linux.dev>,
-	"linux-block" <linux-block@vger.kernel.org>,
-	"kernel" <kernel@collabora.com>
-Message-ID: <19939c394c6.2d36e917643588.7927929178438809583@collabora.com>
-In-Reply-To: <60e5d1ec-3c9d-c6d2-e2c0-9e718e9a0ad0@redhat.com>
-References: <1992a9545eb.1ec14bf0659281.6434647558731823661@collabora.com> <2d517844-b7bf-3930-e811-e073ec347d4a@redhat.com> <1992f628105.2bf0303b1373545.4844645742991812595@collabora.com> <a7872ca2-be14-0720-190c-c03d4ddf7a5d@redhat.com>
- <199343ab2a7.11b1e13e161813.4990067961195858029@collabora.com> <60e5d1ec-3c9d-c6d2-e2c0-9e718e9a0ad0@redhat.com>
-Subject: Re: deadlock when swapping to encrypted swapfile
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="X1/l1YkV"
+Received: from localhost (localhost [127.0.0.1])
+	by 003.mia.mailroute.net (Postfix) with ESMTP id 4cN4WJ4zvjzlgqV0;
+	Thu, 11 Sep 2025 17:37:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1757612234; x=1760204235; bh=fqboVfhzysRBmiVevqdbN2cF
+	2Ov3HPp4z2+i2opY8dE=; b=X1/l1YkVA/M6GzTQY0eqZsBxEVmQuDKpqDTdvgHp
+	Cc1QLJomcKVRqegrA8j5oOjMfMvs0q06LftkpgXuOSYRdlAyuxM7+vOwXv5htlQH
+	AaH1psfnXYqgeIKYrhmRaYz+9tdjMcYsFhT2bUmbqm7CekdJ6PA/JxUrjhYu6f4G
+	ryV+BxrsHSiR1ks6Wwlt+nfsjBSpHR9Q8U++oikEZx2JjVd4CeGU8xnaDdmcWNar
+	LaggvY0ghzGD3UXsEUUdKlGOdqzcrGsGd7d2aF0VJJeD2xaH/7Qcvwz3xleJzZEt
+	IyWqaAvV3L6KUS+uTeYDriqbzXu/5nrhD01V2TLPVi1+Qg==
+X-Virus-Scanned: by MailRoute
+Received: from 003.mia.mailroute.net ([127.0.0.1])
+ by localhost (003.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id ZxFS2dDb8wVJ; Thu, 11 Sep 2025 17:37:14 +0000 (UTC)
+Received: from [100.66.154.22] (unknown [104.135.204.82])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4cN4WB1DWNzlgqV1;
+	Thu, 11 Sep 2025 17:37:09 +0000 (UTC)
+Message-ID: <0c056e23-59c7-4125-8cd6-1e22ceaadea4@acm.org>
+Date: Thu, 11 Sep 2025 10:37:08 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 3/3] scsi: core: Improve IOPS in case of host-wide tags
+To: John Garry <john.g.garry@oracle.com>,
+ "Martin K . Petersen" <martin.petersen@oracle.com>
+Cc: linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+ Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@infradead.org>,
+ Ming Lei <ming.lei@redhat.com>,
+ "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>
+References: <20250910213254.1215318-1-bvanassche@acm.org>
+ <20250910213254.1215318-4-bvanassche@acm.org>
+ <a28d07ef-34a9-41ed-bd4b-ddcbf3de13f4@oracle.com>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <a28d07ef-34a9-41ed-bd4b-ddcbf3de13f4@oracle.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Importance: Medium
-User-Agent: Zoho Mail
-X-Mailer: Zoho Mail
 
+On 9/11/25 1:15 AM, John Garry wrote:
+> this can race with a call to scsi_change_queue_depth() (which may free 
+> sdev->budget_map.map), right?
+> 
+> scsi_change_queue_depth() does not seem to do any queue freezing.
 
+Hi John,
 
+Are there any SCSI devices left about which we care and for which queue
+depth tracking is important?
 
+scsi_change_queue_depth() can be called from interrupt context as
+follows:
 
+LLD completion interrupt
+   scsi_done()
+     scsi_done_internal()
+       blk_mq_complete_request()
+         scsi_complete()
+           scsi_decide_disposition()
+             scsi_handle_queue_ramp_up()
+               scsi_change_queue_depth()
 
- ---- On Thu, 11 Sep 2025 17:56:01 +0100  Mikulas Patocka <mpatocka@redhat.com> wrote --- 
- > 
- > 
- > On Wed, 10 Sep 2025, Robert Beckett wrote:
- > 
- > >  > > Yeah, unfortunately we are currently restricted to using a swapfile due to many units already shipped with that.
- > >  > > We have longer term plans to dynamically allocate the swapfiles as neded based on a new query for estimated size
- > >  > > required for hibernation etc. Moving to swap partition is just not viable currently.
- > >  > 
- > >  > You can try the dm-loop target that I created some times ago. It won't be 
- > >  > in the official kernel because the Linux developers don't like the idea of 
- > >  > creating fixed mapping for a file, but it may work better for you. Unlike 
- > >  > the in-kernel loop driver, the dm-loop driver doesn't allocate memory when 
- > >  > processing reads and write.
- > > 
- > > oh interesting. I hadn't seen that.
- > > I was discussing a quick idea of potentially adding a new fallocate mode bit to request contiguous non-moveable
- > > block assignment as it pre-allocates, which filesystems could then implement support for.
- > 
- > You can ask the VFS maintainers about this, but I think they'll reject it.
- > 
- > > Then use the known
- > > file range with dm-crypt directly instead of going via the block device.
- > > I guess this is roughly analaguous to that idea.
- > > 
- > > I see that dm-loop is very old at this point. Do you know the rationale for rejection?
- > 
- > The reason was that the filesystem developers think that the filesystems 
- > should have freedom to move the allocated blocks around.
- > 
- > The dm-loop patch sets the flag S_SWAPFILE to prevent that from happening, 
- > but they don't want more code to use this flag.
- > 
- > > was there any hope to get it included with more work?
- > 
- > No - because they don't like the idea of creating a map of file blocks in 
- > advance.
- > 
- > One could rework the dm-loop patch to use standard filesystem methods read 
- > and write, but then it would allocate memory when processing requests and 
- > it would be unsuitable for swapping.
- > 
- > > If the main objection was regarding file spans that they can't gurantee persist, maybe a new fallocate based
- > > contrace with the filesystems could aleviate the worries? 
- > > 
- > > 
- > >  > 
- > >  > Create a swap file on the filesystem, load the dm-loop target on the top 
- > >  > of that file and then create dm-crypt on the top of the dm-loop target. 
- > >  > Then, run mkswap and swapon on the dm-crypt device.
- > >  > 
- > >  > > I tried halving /sys/module/dm_mod/parameters/swap_bios but it didn't help, which based on your more recent
- > >  > > reply is not unexpected.
- > >  > > 
- > >  > > I have a work around for now, which is to run a userland earlyoom daemon. That seems to get in and oomkill in time.
- > >  > > I guess another option would be to have the swapfile in a luks encrypted partition, but that equally is not viable for
- > >  > > steamdeck currently.
- > >  > > 
- > >  > > However, I'm still interested in the longer term solution of fixing the kernel so that it can handle scenarios
- > >  > > like this no matter how ill advised they may be. Telling users not to do something seems like a bad solution :)
- > >  > 
- > >  > You would have to rewrite the filesystems not to allocate memory when 
- > >  > processing reads and writes. I think that this is not feasible.
- > >  > 
- > >  > > Do you have any ideas about the unreliable kernel oomkiller stepping in? I definitely fill ram and swap, seems like
- > >  > > it should be firing.
- > >  > 
- > >  > I think that the main problem with the OOM killer is that it sometimes 
- > >  > doesn't fire for big applications.
- > > 
- > > perhaps oom_kill_allocating_task helps in that scenario?
- > > in this lockup scenario I don't see oomkiller starting at all. It looks like it soft
- > > locks and never feels the need to step in.
- > > Perhaps because it sees some (tiny) amount of forward progress with
- > > some swapout requests completing?
- > 
- > If you are swapping to an encrypted file, it may deadlock even before you 
- > exhaust the memory and swap.
- > 
- > >  > I think that using userspace OOM killer is appropriate to prevent this 
- > >  > problem with the kernel OOM killer. 
- > > 
- > > Turns out I spoke too soon on the userland earloom daemon being a solution.
- > > It worked for some patterns, but not others.
- > > It mostly worked well when swap was either pre-filled with data greater than it's
- > > threshold so as soon as ram is exhausted it stepped in, or when the allocations are
- > > sufficiently spaced for it to fill greater than it's threshold without many more
- > > outstanding swapouts before it gets to evaluate again.
- > > 
- > > For now the only really reliable way to work around is to disable memory
- > > overcommit, but we really don't want to go looking down that route as it 
- > > will have all sorts of other impacts.
- > 
- > You can allocate a file, use e4defrag to reduce the number of fragments, 
- > then use the FS_IOC_FIEMAP ioctl to find out the location of the file and 
- > then use the dm-linear target to map the file - and place encryption and 
- > swapping on the top of that.
- > 
- > If you have control over the whole device and make sure that no one moves 
- > the file, it should work.
- > 
- > Note that you can't use device mapper on a block device that has 
- > filesystem mounted, so you'll have to add one dm-linear device underneath 
- > the filesystem.
+Freezing a request queue requires thread context. Hence, the queue ramp
+up queue depth increase would have to happen asynchronously, e.g. via
+queue_work().
 
-Yeah, I already looked in to that and discounted it.
-We want to support dynamic swapfile sizing, which means files, not statically reserved regions of disk.
-Besides, if static regions were suitable for our design, we could just use partitions instead.
+Here is another call chain:
 
-At this point, we accept that any sort of mapping over the top of dependable extents is just not
-going to happen. And Based on the discussions from your previous attempt
- https://lore.kernel.org/dm-devel/7d6ae2c9-df8e-50d0-7ad6-b787cb3cfab4@redhat.com/
-I can definitely agree with the fs folks why it makes sense to avoid that approach.
+scsi_error_handler()
+   scsi_unjam_host()
+     scsi_eh_ready_devs()
+       scsi_eh_host_reset()
+         scsi_eh_test_devices()
+           scsi_eh_tur()
+             scsi_send_eh_cmnd()
+               scsi_eh_completed_normally()
+                 scsi_handle_queue_full()
+                   scsi_track_queue_full()
+                     scsi_change_queue_depth()
 
-I think instead we'll go looking at ancyrpting swap data during swap out.
-zswap exists as a permutation of data during swap in/out. I suspect we could do
-something with encryption in a similar manner (to be investigated).
+Freezing the request queue probably would result in a deadlock for this 
+call chain. So also for this call chain, changing the queue depth would
+have to happen asynchronously.
 
-Thanks for the discussion, was interesting diving in to it.
+Does anyone see any other options than either making 
+scsi_change_queue_depth() a no-op or making all queue depth changes
+asynchronously, except the call from scsi_alloc_sdev()?
 
- > 
- > Mikulas
- > 
- > 
+Thanks,
 
+Bart.
