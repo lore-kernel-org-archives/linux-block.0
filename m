@@ -1,149 +1,68 @@
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BEAC31C587
-	for <linux-block@vger.kernel.org>; Thu, 11 Sep 2025 11:36:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24E55334367;
+	Thu, 11 Sep 2025 11:37:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757590604; cv=none; b=b29erAK7bONkefovygava7TK3cRZrsBajVaCWclqXQNsCLT+xL2rY0NyVGTqkv1ZuhGHh5id98cxJ50RXxDXx8rbDXIXYcIOMxNyoL/EM8cv4JQ8dewSk6PGjs9LVLxolrvZuHL4u55u0F0f1MjVIS44IdFV4/vwp3FgFq0dEXA=
+	t=1757590678; cv=none; b=D/5xZqlhHu2l+byzpcpXjlV4xPoj3GGRnBSZa5T1UNn6JMyjxa83ScqDcg16/qhrJwWvX02CrA3XAYKZCR2EAJ7reQ2w50A7XiklLCYZpToVsCzvUKrTmRb6qNcN9OeZo8rbXghXk5Dcif0w1mAtIk5O69WRT1yrLjy1FOsB7Is=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757590604; c=relaxed/simple;
-	bh=l3WS5mh3b7m+0CGnd7HwPGEX6fOXJSXSic0gzbaETOY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FPdh5yvZZB4VMPcnrXyyTIRorPPrttfbVZXXGsLegWmOKpvjCD0q0+fTWpB4LUNyDyE7nqmEhbH7Q+WqmfKYtq/WWrQMPjgwT1bHoy6hezHtmBMPYc3kPXU6XisfMS4LutwdtShjB9warvE1iommjvGeWeD000nUgnNaxSwCc04=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QbgcjOFd; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1757590678; c=relaxed/simple;
+	bh=rnp8EsaMc9fWMrqdqXN4/XgyJX6op1Hcet7eQl/Xfbs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hjRUK8lLf44wBLok+6CJ4ItQC86vjoCi9kEergdw+TKrrYwc2WyQGyPGRmmEFV4JcJMtPoihKmcvy1mboxl77yLBHUkpUmjwvxLu7BdG7LDJrbPCAA0H9yXwd3t67ovz0M7K0QtZl0Pp5iLFwOqqVm8d2JdYZaNJCZLM8uRgnto=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=UzOLmEC0; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QbgcjOFd"
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-6228de280a4so1046584a12.2
-        for <linux-block@vger.kernel.org>; Thu, 11 Sep 2025 04:36:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757590601; x=1758195401; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=l3WS5mh3b7m+0CGnd7HwPGEX6fOXJSXSic0gzbaETOY=;
-        b=QbgcjOFdQCEX77z/FdlRwnzEmGsALvq3U9SOMI0CS5/Coz9cwTG3pr8H10coBpZ0ZT
-         ALfxzqhBFvmTlunvaBg5eojquIU2M0Jaj6+Hd0e8iXqgKuOZqpt4Pv6GARREjVuH73n6
-         hdS/4L12c0LlPui/1Ra+uKktXYpezhtgeFeBAindj/qegG++n014aPkSXSpYqw+JJt2x
-         5d9AacMrKkjsMmKaZ0myeESD6BMVT92frcJGeyabQR1LDI54v2GGB/cQhRWnOlA2P3pb
-         1nosawlRTBFeGlzHK360D6IZGmPAf3T+Q0SiPG4HX3udF0VqG3qAdTsBxdNsQnMuetky
-         AnCQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757590601; x=1758195401;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=l3WS5mh3b7m+0CGnd7HwPGEX6fOXJSXSic0gzbaETOY=;
-        b=mUPJXoYfJ1hPODSqIdFNmy8iq1nHBMFmvIRCqqnliObsKhTWZ0hEsP0LqTvBmrHgf2
-         DkOC3n6vGy3myAJJ7sgLOB3ejJAeYjF7oqWE4M638xDE+CJMevkDyzdOz1/UWuAzVZLR
-         334TJBo0lPxjo04lwdCUw1z/MzYpQCekeHcQG5PBUSAM1KXcY0N0oqIrXfeM/jcso68a
-         VYvHxZvAmTAmwv77RggTFqLrXUUZryNjlNpFg5LYfcbsHZ3KBcLZ1R5caB1TZlVTULbE
-         uIAwX0r50f4fzvsyv4PsWzqwBbNk6eY4vXyKZ7tcMeFTTwrw6IpLdd5a3bM6Xi0WoHi5
-         M+og==
-X-Forwarded-Encrypted: i=1; AJvYcCV373yhdYLMAlYsLGE/y+bqElYTXTLOOILxu/muwARsXearaXorrvxLItXU4g1Bk27XwmFyPx0hadrSQw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzHBHBEFAp+5kpL5RRgkDEHpR1MJReDbHlvIMvDfauPCbYlq7ku
-	651ZNnmXdn4atPVLncpnUGshr2nGZaZ9XIsxnWwik63ERZPHcVAuqrWlZrdbSkDP6XXcrwwC9bb
-	PQIOc++VwX/RP7OJqsCBRNXUn++3AUiY=
-X-Gm-Gg: ASbGnctSlyLCQgChrviKY5EwOO6VMXdav87gCzVS6JrmPN4oiX7lSQAd1zssBeyyFBh
-	8Ww/xQ4Cl2BTitPqUdRvlXAHKONw2hgrJikUxnaogxE1QD4eJJGwhd1ux8wPga7dQexwpjl3rZu
-	yWyaR+BI0+wiZYZrCrIi/5WYg1lWTos1lddelV8BDLKqFHDybZ7TfwjqPZOmxWvJrcvVGekyZLd
-	TRiaWgDzxh0QhTTHg==
-X-Google-Smtp-Source: AGHT+IFTNKY6jjRUaK+95vjWoIXWhr+sTjejTLV8OOCQsfjrobYVHw8JMmZi1nhLUH2mOW0HugLlXyiAfLiI1n/62Pg=
-X-Received: by 2002:a05:6402:2685:b0:61d:dd9:20db with SMTP id
- 4fb4d7f45d1cf-6237c048793mr16217741a12.31.1757590600743; Thu, 11 Sep 2025
- 04:36:40 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="UzOLmEC0"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=Y8JcLR6V6lTUkf/L1dN4cS7VInD8rNcP4lWlHUTCHcc=; b=UzOLmEC0OxawPpj5/Q0LlYCNhQ
+	tqfL/EZf3cpCdOcXJO46I+ieEgX3c8LiYPTUpE2YtoK8TJ68jH5mdpySRwCCf6Nt+7ZSTSIEN0BNH
+	n4o6OtSJOFUY74TKbcQJYSUxAnGd34M4N8mqNzEt4ErBo8Mo8fa0fOHJnqHvzc8rqx5F7+Yzhp/Iz
+	Rq8aRWD6MemS4RPDyfnHYPxAuFKQWBz0ZPGiOGOh+hfMBEAgVjPWLivnLvC9V8Fjwhr3a6sLxAtxn
+	U74x4j6KjnwagkqgBbiHdO038Xu5lL7Gj7EBJY+LC6ugoGKCQLtyqWG9V8LgMETZfRZINdNiSVoc5
+	7LkYKxNw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1uwfci-00000002jXy-14Tz;
+	Thu, 11 Sep 2025 11:37:56 +0000
+Date: Thu, 11 Sep 2025 04:37:56 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Gao Xiang <hsiangkao@linux.alibaba.com>
+Cc: Joanne Koong <joannelkoong@gmail.com>, brauner@kernel.org,
+	miklos@szeredi.hu, hch@infradead.org, djwong@kernel.org,
+	linux-block@vger.kernel.org, gfs2@lists.linux.dev,
+	linux-fsdevel@vger.kernel.org, kernel-team@meta.com,
+	linux-xfs@vger.kernel.org, linux-doc@vger.kernel.org
+Subject: Re: [PATCH v2 13/16] iomap: move read/readahead logic out of
+ CONFIG_BLOCK guard
+Message-ID: <aMK0lC5iwM0GWKHq@infradead.org>
+References: <20250908185122.3199171-1-joannelkoong@gmail.com>
+ <20250908185122.3199171-14-joannelkoong@gmail.com>
+ <a1529c0f-1f1a-477a-aeeb-a4f108aab26b@linux.alibaba.com>
+ <CAJnrk1aCCqoOAgcPUpr+Z09DhJ5BAYoSho5dveGQKB9zincYSQ@mail.gmail.com>
+ <0b33ab17-2fc0-438f-95aa-56a1d20edb38@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250910-work-namespace-v1-0-4dd56e7359d8@kernel.org>
- <20250910-work-namespace-v1-27-4dd56e7359d8@kernel.org> <CAOQ4uxgtQQa-jzsnTBxgUTPzgtCiAaH8X6ffMqd+1Y5Jjy0dmQ@mail.gmail.com>
- <20250911-werken-raubzug-64735473739c@brauner>
-In-Reply-To: <20250911-werken-raubzug-64735473739c@brauner>
-From: Amir Goldstein <amir73il@gmail.com>
-Date: Thu, 11 Sep 2025 13:36:28 +0200
-X-Gm-Features: Ac12FXxRFt9Ctd5Cl_pR-FdI4tarLWVQlbT7aCbaq2ftodBoMLqTaIDo5wMZnik
-Message-ID: <CAOQ4uxgMgzOjz4E-4kJFJAz3Dpd=Q6vXoGrhz9F0=mb=4XKZqA@mail.gmail.com>
-Subject: Re: [PATCH 27/32] nsfs: support file handles
-To: Christian Brauner <brauner@kernel.org>
-Cc: Jan Kara <jack@suse.cz>, linux-fsdevel@vger.kernel.org, 
-	Josef Bacik <josef@toxicpanda.com>, Jeff Layton <jlayton@kernel.org>, Mike Yuan <me@yhndnzj.com>, 
-	=?UTF-8?Q?Zbigniew_J=C4=99drzejewski=2DSzmek?= <zbyszek@in.waw.pl>, 
-	Lennart Poettering <mzxreary@0pointer.de>, Daan De Meyer <daan.j.demeyer@gmail.com>, 
-	Aleksa Sarai <cyphar@cyphar.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, 
-	=?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Chuck Lever <chuck.lever@oracle.com>, linux-nfs@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, cgroups@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0b33ab17-2fc0-438f-95aa-56a1d20edb38@linux.alibaba.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Thu, Sep 11, 2025 at 11:31=E2=80=AFAM Christian Brauner <brauner@kernel.=
-org> wrote:
->
-> On Wed, Sep 10, 2025 at 07:21:22PM +0200, Amir Goldstein wrote:
-> > On Wed, Sep 10, 2025 at 4:39=E2=80=AFPM Christian Brauner <brauner@kern=
-el.org> wrote:
-> > >
-> > > A while ago we added support for file handles to pidfs so pidfds can =
-be
-> > > encoded and decoded as file handles. Userspace has adopted this quick=
-ly
-> > > and it's proven very useful.
-> >
-> > > Pidfd file handles are exhaustive meaning
-> > > they don't require a handle on another pidfd to pass to
-> > > open_by_handle_at() so it can derive the filesystem to decode in.
-> > >
-> > > Implement the exhaustive file handles for namespaces as well.
-> >
-> > I think you decide to split the "exhaustive" part to another patch,
-> > so better drop this paragraph?
->
-> Yes, good point. I've dont that.
->
-> > I am missing an explanation about the permissions for
-> > opening these file handles.
-> >
-> > My understanding of the code is that the opener needs to meet one of
-> > the conditions:
-> > 1. user has CAP_SYS_ADMIN in the userns owning the opened namespace
-> > 2. current task is in the opened namespace
->
-> Yes.
->
-> >
-> > But I do not fully understand the rationale behind the 2nd condition,
-> > that is, when is it useful?
->
-> A caller is always able to open a file descriptor to it's own set of
-> namespaces. File handles will behave the same way.
->
+On Wed, Sep 10, 2025 at 12:59:41PM +0800, Gao Xiang wrote:
+> At least it sounds better on my side, but anyway it's just
+> my own overall thought.  If other folks have different idea,
+> I don't have strong opinion, I just need something for my own
+> as previous said.
 
-I understand why it's safe, and I do not object to it at all,
-I just feel that I do not fully understand the use case of how ns file hand=
-les
-are expected to be used.
-A process can always open /proc/self/ns/mnt
-What's the use case where a process may need to open its own ns by handle?
+I already dropped my two suggestions on the earlier patch.  Not totally
+happy about either my suggestions or data, but in full agreement that
+it should be something else than private.
 
-I will explain. For CAP_SYS_ADMIN I can see why keeping handles that
-do not keep an elevated refcount of ns object could be useful in the same
-way that an NFS client keeps file handles without keeping the file object a=
-live.
-
-But if you do not have CAP_SYS_ADMIN and can only open your own ns
-by handle, what is the application that could make use of this?
-and what's the benefit of such application keeping a file handle instead of
-ns fd?
-
-Sorry. I feel that I may be missing something in the big picture.
-
-Thanks,
-Amir.
