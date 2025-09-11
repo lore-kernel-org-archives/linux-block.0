@@ -1,355 +1,148 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE01E267386
-	for <linux-block@vger.kernel.org>; Thu, 11 Sep 2025 06:40:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 754BD145A05
+	for <linux-block@vger.kernel.org>; Thu, 11 Sep 2025 06:47:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757572861; cv=none; b=PgHV3fHOIC2CJsuOtaA0CUF1RIHtAu/Dw5RuY25v2MpJ0tsDvWK02c88V8CmYAaOQWTrrLhG96sell+WDwueBwq7jCz3zwWB8mkghCqktNFOsG0bnXpdQnLBiwCySiPjbAj1fxk8aJkFE39ljwL0eztVl018yJaHexLGTuHpZL8=
+	t=1757573278; cv=none; b=GA/D+ZWdO1VBlUEAIiYFBju4baiStrJel/6TRo+Wy9dp6kDiHm7KU5+4g/xuRwAiuolDyXEKU2KAslV7I47/V0VCsftNYfHoVskqN/QL8s49fyUeH3WdQwqQOPTFlH8s6a0HbCUc6h+NCgKNr8vl7H7Nn7Z0+1p1HSX7SDhegPg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757572861; c=relaxed/simple;
-	bh=oc3pfMxtwNalmPMOZFevwegSFiZUZK15z34En/YiVGc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=AzPWSDgE8YIiqOCwFkQywCLLYPZJC9sIbUUeTb4uE87RymJr1FApXdi7K+t0sW1al6i6vL8SpWTfluYyB0qskyYd1QV6E1xeZJXQkMlkSPrhLvjBYeHMoMp11+7VieBVJHThGZ7uKojXymxd8w/jdqN7mgL5dgD8JdVNz6N6EUk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=vuujZcv0; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=gHeHMCdN; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=swdOLtFG; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=1T2MnEf2; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="vuujZcv0";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="gHeHMCdN";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="swdOLtFG";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="1T2MnEf2"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id D4B783FA8D;
-	Thu, 11 Sep 2025 06:40:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1757572856; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5f5LJGeMPUM4kaRt+2xWRpOD4y/a+ZDx0gdKKdb/GO4=;
-	b=vuujZcv0GOnF53I0O5jfbyg4qyy0GZItpqsftuZ68n+VOgsxAMmhXIxCjCcOIdj0XjeE0e
-	q8baiAl/erMOPgtWzrQsnQL8xWbdZPrxYGPMPZxCJlPd+DRtZx3f6ojk2KbqSAjVdz6ueV
-	ReiVD5XDzN0vI6rVjCViKtw8cXbGa5I=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1757572856;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5f5LJGeMPUM4kaRt+2xWRpOD4y/a+ZDx0gdKKdb/GO4=;
-	b=gHeHMCdNa7C93YZ+DoxVaiaikhEfAcz0vQw6BYHZzivfhD2ddTkgk4vgAPCsjEqsjvS55V
-	IwQLOooA8/pCczBg==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1757572855; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5f5LJGeMPUM4kaRt+2xWRpOD4y/a+ZDx0gdKKdb/GO4=;
-	b=swdOLtFGFV5DcLRpW4g8nFlAR0AsSVgSO0HUrlPUIkRKzHPmNI1Y3cmUz5h+Nh0mcZETXg
-	nM1cIF6/3d4jHIsk2hSOsOh7mWySH/S+e5KgTMGvW2vqghNvYcLyoPnKTcpSsUQPbI/A8g
-	WVaVZRus2URybOrwoFignMwaPEiIlmo=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1757572855;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5f5LJGeMPUM4kaRt+2xWRpOD4y/a+ZDx0gdKKdb/GO4=;
-	b=1T2MnEf2YdSCuWHMWLwfJvUpnsyyuzIBP1kpC23Y1u9ZGFBh0oF5V4EJdVIhAJG8smFdfo
-	G/xl5zyruLuSntDQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 792711372E;
-	Thu, 11 Sep 2025 06:40:55 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id GvwGHPduwmilTgAAD6G6ig
-	(envelope-from <hare@suse.de>); Thu, 11 Sep 2025 06:40:55 +0000
-Message-ID: <efb81481-5af3-4bb6-b378-878dc24b9767@suse.de>
-Date: Thu, 11 Sep 2025 08:40:54 +0200
+	s=arc-20240116; t=1757573278; c=relaxed/simple;
+	bh=+nh5ik/bBOdjUmd+UPI99egxFPB8L88IQHnryBCONQ4=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=c+kScdLWdZXdOuzz68vNSQltR8o9S0R/2HKevh075GEsS/g+TGdzzmNvjBg/5x4NuTOc8bsTJ/nvEhUxNrOUUflFBa9jLMDd239xh1B3EVjhzXOIaiygqUJpF0D+6PBbmsID5VGDXAFrmo6YnjTZ7UrLin3KHRM8JVXw8LlucVU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4cMp5y3dmvzKHNKS
+	for <linux-block@vger.kernel.org>; Thu, 11 Sep 2025 14:47:50 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id C6DC81A26AF
+	for <linux-block@vger.kernel.org>; Thu, 11 Sep 2025 14:47:50 +0800 (CST)
+Received: from [10.174.179.143] (unknown [10.174.179.143])
+	by APP4 (Coremail) with SMTP id gCh0CgCX4o6VcMJoHj58CA--.13079S3;
+	Thu, 11 Sep 2025 14:47:50 +0800 (CST)
+Subject: Re: [bug report][regression] blktests throtl/ triggered kmemleak in
+ blk_throtl_init
+To: Yi Zhang <yi.zhang@redhat.com>, linux-block <linux-block@vger.kernel.org>
+Cc: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+ Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>,
+ hanguangjiang@lixiang.com, "yukuai (C)" <yukuai3@huawei.com>
+References: <CAHj4cs-p-ZwBEKigBj7T6hQCOo-H68-kVwCrV6ZvRovrr9Z+HA@mail.gmail.com>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <d657831b-469a-998b-7493-eef4baea9bc9@huaweicloud.com>
+Date: Thu, 11 Sep 2025 14:47:49 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/3] scsi: core: Improve IOPS in case of host-wide tags
-To: Bart Van Assche <bvanassche@acm.org>,
- "Martin K . Petersen" <martin.petersen@oracle.com>
-Cc: linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
- Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@infradead.org>,
- Ming Lei <ming.lei@redhat.com>, John Garry <john.g.garry@oracle.com>,
- "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>
-References: <20250910213254.1215318-1-bvanassche@acm.org>
- <20250910213254.1215318-4-bvanassche@acm.org>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20250910213254.1215318-4-bvanassche@acm.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+In-Reply-To: <CAHj4cs-p-ZwBEKigBj7T6hQCOo-H68-kVwCrV6ZvRovrr9Z+HA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Level: 
-X-Spamd-Result: default: False [-4.30 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-0.998];
-	MIME_GOOD(-0.10)[text/plain];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	ARC_NA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,suse.de:mid]
-X-Spam-Flag: NO
-X-Spam-Score: -4.30
+X-CM-TRANSID:gCh0CgCX4o6VcMJoHj58CA--.13079S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxAF1UtFy7Kr1xGF18tr48Xrb_yoW5Ar4xpF
+	y0gw4qka18tF1DAr4IkayfXFyrZFWxAF17J393Grn3AryF9F1DJFyUXry7Wa1DXFZrXr4I
+	yas5t3s0g345Cw7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvjb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AF
+	wI0_JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
+	xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1D
+	MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
+	0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWU
+	JVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUwx
+	hLUUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On 9/10/25 23:32, Bart Van Assche wrote:
-> The SCSI core uses the budget map to enforce the cmd_per_lun limit.
-> That limit cannot be exceeded if host->cmd_per_lun >= host->can_queue
-> and if the host tag set is shared across all hardware queues.
-> Since scsi_mq_get_budget() shows up in all CPU profiles for fast SCSI
-> devices, do not allocate a budget map if cmd_per_lun >= can_queue and
-> if the host tag set is shared across all hardware queues.
+Hi,
+
+在 2025/09/11 14:14, Yi Zhang 写道:
+> Hi
 > 
-> On my UFS 4 test setup this patch improves IOPS by 1% and reduces the
-> time spent in scsi_mq_get_budget() from 0.22% to 0.01%.
+> The following  kmemleak issue was observed in the latest
+> linux-block/for-next, It seems a regression issue. Please help check
+> it and let me know if you need any info/test for it, thanks.
 > 
-> Cc: Jens Axboe <axboe@kernel.dk>
-> Cc: Christoph Hellwig <hch@infradead.org>
-> Cc: Ming Lei <ming.lei@redhat.com>
-> Cc: John Garry <john.g.garry@oracle.com>
-> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-> ---
->   drivers/scsi/scsi.c        |  7 ++++-
->   drivers/scsi/scsi_lib.c    | 60 +++++++++++++++++++++++++++++++++-----
->   drivers/scsi/scsi_scan.c   | 11 ++++++-
->   include/scsi/scsi_device.h |  5 +---
->   4 files changed, 70 insertions(+), 13 deletions(-)
+> unreferenced object 0xffff888160f75c00 (size 512):
+>    comm "check", pid 29719, jiffies 4302480465
+>    hex dump (first 32 bytes):
+>      00 00 00 00 00 00 00 00 08 5c f7 60 81 88 ff ff  .........\.`....
+>      08 5c f7 60 81 88 ff ff 18 5c f7 60 81 88 ff ff  .\.`.....\.`....
+>    backtrace (crc dc08e6b1):
+>      __kmalloc_cache_node_noprof+0x3b1/0x4d0
+>      blk_throtl_init+0xa2/0x6a0
+>      tg_set_limit+0x5ac/0x720
+>      cgroup_file_write+0x1ab/0x670
+>      kernfs_fop_write_iter+0x3a3/0x5a0
+>      vfs_write+0x525/0xfd0
+>      ksys_write+0xf9/0x1d0
+>      do_syscall_64+0x94/0x8d0
+>      entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> unreferenced object 0xffff888111280c00 (size 512):
+>    comm "check", pid 30240, jiffies 4302503636
+>    hex dump (first 32 bytes):
+>      00 00 00 00 00 00 00 00 08 0c 28 11 81 88 ff ff  ..........(.....
+>      08 0c 28 11 81 88 ff ff 18 0c 28 11 81 88 ff ff  ..(.......(.....
+>    backtrace (crc 2d0490fe):
+>      __kmalloc_cache_node_noprof+0x3b1/0x4d0
+>      blk_throtl_init+0xa2/0x6a0
+>      tg_set_limit+0x5ac/0x720
+>      cgroup_file_write+0x1ab/0x670
+>      kernfs_fop_write_iter+0x3a3/0x5a0
+>      vfs_write+0x525/0xfd0
+>      ksys_write+0xf9/0x1d0
+>      do_syscall_64+0x94/0x8d0
+>      entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> unreferenced object 0xffff888187ac6400 (size 512):
+>    comm "check", pid 30484, jiffies 4302512625
+>    hex dump (first 32 bytes):
+>      00 00 00 00 00 00 00 00 08 64 ac 87 81 88 ff ff  .........d......
+>      08 64 ac 87 81 88 ff ff 18 64 ac 87 81 88 ff ff  .d.......d......
+>    backtrace (crc 4a3a862a):
+>      __kmalloc_cache_node_noprof+0x3b1/0x4d0
+>      blk_throtl_init+0xa2/0x6a0
+>      tg_set_limit+0x5ac/0x720
+>      cgroup_file_write+0x1ab/0x670
+>      kernfs_fop_write_iter+0x3a3/0x5a0
+>      vfs_write+0x525/0xfd0
+>      ksys_write+0xf9/0x1d0
+>      do_syscall_64+0x94/0x8d0
+>      entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> unreferenced object 0xffff88822cbf3800 (size 512):
+>    comm "check", pid 30715, jiffies 4302520405
+>    hex dump (first 32 bytes):
+>      00 00 00 00 00 00 00 00 08 38 bf 2c 82 88 ff ff  .........8.,....
+>      08 38 bf 2c 82 88 ff ff 18 38 bf 2c 82 88 ff ff  .8.,.....8.,....
+>    backtrace (crc 7eb87e87):
+>      __kmalloc_cache_node_noprof+0x3b1/0x4d0
+>      blk_throtl_init+0xa2/0x6a0
+>      tg_set_limit+0x5ac/0x720
+>      cgroup_file_write+0x1ab/0x670
+>      kernfs_fop_write_iter+0x3a3/0x5a0
+>      vfs_write+0x525/0xfd0
+>      ksys_write+0xf9/0x1d0
+>      do_syscall_64+0x94/0x8d0
+>      entry_SYSCALL_64_after_hwframe+0x76/0x7e
 > 
-That is actually a valid point.
-There are devices which set 'cmd_per_lun' to the same value
-as 'can_queue', rendering the budget map a bit pointless.
-But calling blk_mq_all_tag_iter() is more expensive than a simple
-sbitmap_weight(), so the improvement isn't _that_ big
-(as demonstrated by just 1% performance increase).
-
-> diff --git a/drivers/scsi/scsi.c b/drivers/scsi/scsi.c
-> index 9a0f467264b3..06066b694d8a 100644
-> --- a/drivers/scsi/scsi.c
-> +++ b/drivers/scsi/scsi.c
-> @@ -216,6 +216,8 @@ int scsi_device_max_queue_depth(struct scsi_device *sdev)
->    */
->   int scsi_change_queue_depth(struct scsi_device *sdev, int depth)
->   {
-> +	struct Scsi_Host *shost = sdev->host;
-> +
->   	depth = min_t(int, depth, scsi_device_max_queue_depth(sdev));
->   
->   	if (depth > 0) {
-> @@ -226,7 +228,10 @@ int scsi_change_queue_depth(struct scsi_device *sdev, int depth)
->   	if (sdev->request_queue)
->   		blk_set_queue_depth(sdev->request_queue, depth);
->   
-> -	sbitmap_resize(&sdev->budget_map, sdev->queue_depth);
-> +	if (shost->host_tagset && depth >= shost->can_queue)
-> +		sbitmap_free(&sdev->budget_map);
-> +	else
-> +		sbitmap_resize(&sdev->budget_map, sdev->queue_depth);
->   
->   	return sdev->queue_depth;
->   }
-I would make this static, and only allocate a budget_map if the
-'cmd_per_lun' setting is smaller than the 'can_queue' setting.
-
-> diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-> index 0c65ecfedfbd..c546514d1049 100644
-> --- a/drivers/scsi/scsi_lib.c
-> +++ b/drivers/scsi/scsi_lib.c
-> @@ -396,7 +396,8 @@ void scsi_device_unbusy(struct scsi_device *sdev, struct scsi_cmnd *cmd)
->   	if (starget->can_queue > 0)
->   		atomic_dec(&starget->target_busy);
->   
-> -	sbitmap_put(&sdev->budget_map, cmd->budget_token);
-> +	if (sdev->budget_map.map)
-> +		sbitmap_put(&sdev->budget_map, cmd->budget_token);
->   	cmd->budget_token = -1;
->   }
->   
-> @@ -445,6 +446,47 @@ static void scsi_single_lun_run(struct scsi_device *current_sdev)
->   	spin_unlock_irqrestore(shost->host_lock, flags);
->   }
->   
-> +struct sdev_in_flight_data {
-> +	const struct scsi_device *sdev;
-> +	int count;
-> +};
-> +
-> +static bool scsi_device_check_in_flight(struct request *rq, void *data)
-> +{
-> +	struct scsi_cmnd *cmd = blk_mq_rq_to_pdu(rq);
-> +	struct sdev_in_flight_data *sifd = data;
-> +
-> +	if (cmd->device == sifd->sdev)
-> +		sifd->count++;
-> +
-> +	return true;
-> +}
-> +
-> +/**
-> + * scsi_device_busy() - Number of commands allocated for a SCSI device
-> + * @sdev: SCSI device.
-> + *
-> + * Note: There is a subtle difference between this function and
-> + * scsi_host_busy(). scsi_host_busy() counts the number of commands that have
-> + * been started. This function counts the number of commands that have been
-> + * allocated. At least the UFS driver depends on this function counting commands
-
-But then please don't name the callback 'scsi_device_check_in_flight',
-as 'in flight' means 'commands which have been started'.
-Please name it 'scsi_device_check_allocated' to make the distinction
-clear.
-
-> + * that have already been allocated but that have not yet been started.
-> + */
-> +int scsi_device_busy(const struct scsi_device *sdev)
-> +{
-> +	struct sdev_in_flight_data sifd = { .sdev = sdev };
-> +	struct blk_mq_tag_set *set = &sdev->host->tag_set;
-> +
-> +	if (sdev->budget_map.map)
-> +		return sbitmap_weight(&sdev->budget_map);
-> +	if (WARN_ON_ONCE(!set->shared_tags))
-> +		return 0;
-
-One wonders: what would happen if you would return '0' here if
-there is only one LUN?
-
-> +	blk_mq_all_tag_iter(set->shared_tags, scsi_device_check_in_flight,
-> +			    &sifd);
-> +	return sifd.count;
-> +}
-> +EXPORT_SYMBOL(scsi_device_busy);
-> +
->   static inline bool scsi_device_is_busy(struct scsi_device *sdev)
->   {
->   	if (scsi_device_busy(sdev) >= sdev->queue_depth)
-> @@ -1358,11 +1400,13 @@ scsi_device_state_check(struct scsi_device *sdev, struct request *req)
->   static inline int scsi_dev_queue_ready(struct request_queue *q,
->   				  struct scsi_device *sdev)
->   {
-> -	int token;
-> +	int token = INT_MAX;
->   
-> -	token = sbitmap_get(&sdev->budget_map);
-> -	if (token < 0)
-> -		return -1;
-> +	if (sdev->budget_map.map) {
-> +		token = sbitmap_get(&sdev->budget_map);
-> +		if (token < 0)
-> +			return -1;
-> +	}
->   
->   	if (!atomic_read(&sdev->device_blocked))
->   		return token;
-> @@ -1373,7 +1417,8 @@ static inline int scsi_dev_queue_ready(struct request_queue *q,
->   	 */
->   	if (scsi_device_busy(sdev) > 1 ||
->   	    atomic_dec_return(&sdev->device_blocked) > 0) {
-> -		sbitmap_put(&sdev->budget_map, token);
-> +		if (sdev->budget_map.map)
-> +			sbitmap_put(&sdev->budget_map, token);
->   		return -1;
->   	}
->   
-> @@ -1749,7 +1794,8 @@ static void scsi_mq_put_budget(struct request_queue *q, int budget_token)
->   {
->   	struct scsi_device *sdev = q->queuedata;
->   
-> -	sbitmap_put(&sdev->budget_map, budget_token);
-> +	if (sdev->budget_map.map)
-> +		sbitmap_put(&sdev->budget_map, budget_token);
->   }
->   
->   /*
-> diff --git a/drivers/scsi/scsi_scan.c b/drivers/scsi/scsi_scan.c
-> index 3c6e089e80c3..6f2d0bf0e3ec 100644
-> --- a/drivers/scsi/scsi_scan.c
-> +++ b/drivers/scsi/scsi_scan.c
-> @@ -218,6 +218,7 @@ static void scsi_unlock_floptical(struct scsi_device *sdev,
->   static int scsi_realloc_sdev_budget_map(struct scsi_device *sdev,
->   					unsigned int depth)
->   {
-> +	struct Scsi_Host *shost = sdev->host;
->   	int new_shift = sbitmap_calculate_shift(depth);
->   	bool need_alloc = !sdev->budget_map.map;
->   	bool need_free = false;
-> @@ -225,6 +226,13 @@ static int scsi_realloc_sdev_budget_map(struct scsi_device *sdev,
->   	int ret;
->   	struct sbitmap sb_backup;
->   
-> +	if (shost->host_tagset && depth >= shost->can_queue) {
-> +		memflags = blk_mq_freeze_queue(sdev->request_queue);
-> +		sbitmap_free(&sb_backup);
-
-What are you freeing here?
-The sbitmap was never allocated, so you should be able to simply
-return 0 here...
-
-> +		blk_mq_unfreeze_queue(sdev->request_queue, memflags);
-> +		return 0;
-> +	}
-> +
->   	depth = min_t(unsigned int, depth, scsi_device_max_queue_depth(sdev));
->   
->   	/*
-> @@ -1112,7 +1120,8 @@ static int scsi_add_lun(struct scsi_device *sdev, unsigned char *inq_result,
->   	scsi_cdl_check(sdev);
->   
->   	sdev->max_queue_depth = sdev->queue_depth;
-> -	WARN_ON_ONCE(sdev->max_queue_depth > sdev->budget_map.depth);
-> +	WARN_ON_ONCE(sdev->budget_map.map &&
-> +		     sdev->max_queue_depth > sdev->budget_map.depth);
->   	sdev->sdev_bflags = *bflags;
->   
->   	/*
-> diff --git a/include/scsi/scsi_device.h b/include/scsi/scsi_device.h
-> index 6d6500148c4b..3c7a95fa9b67 100644
-> --- a/include/scsi/scsi_device.h
-> +++ b/include/scsi/scsi_device.h
-> @@ -687,10 +687,7 @@ static inline int scsi_device_supports_vpd(struct scsi_device *sdev)
->   	return 0;
->   }
->   
-> -static inline int scsi_device_busy(struct scsi_device *sdev)
-> -{
-> -	return sbitmap_weight(&sdev->budget_map);
-> -}
-> +int scsi_device_busy(const struct scsi_device *sdev);
->   
->   /* Macros to access the UNIT ATTENTION counters */
->   #define scsi_get_ua_new_media_ctr(sdev) \
 > 
-Cheers,
 
-Hannes
--- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
++CC Han Guangjiang
+
+Thanks for the test, clearly this is because blkg_destroy_all() already
+clear the policy bit, and later blk_throtl_exit() fail the
+blk_throtl_activated() test.
+
+I think we should call blk_throtl_exit() before blkg_destroy_all().
+
+Thanks,
+Kuai
+
