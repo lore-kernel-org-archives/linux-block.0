@@ -1,1550 +1,206 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4272823D7EF;
-	Thu, 11 Sep 2025 09:15:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757582157; cv=none; b=fiVHlFEesIciYvyGvSb/2KnWMROZYQ9wbxt0ffwiXTq1H2IFg8VAeXNIMgNExzP1/u0rtzlMdlDmCjKUHU37pQj82/MAEhU8nQukPDF5Q1AAN/MMlTBv1SFJSsysnlkbrNYHKxDRE3WV5dGBFPKQfYAIG4Ee3gDzVTKxWOM2fqc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757582157; c=relaxed/simple;
-	bh=7JeoRin9S23r3xhlAnlRxLvyx/y+xvTL36epeZ3mgNM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=flEKZcHol5N1Vf0sE4Ei+hXs76IJTO0NMEUT8gGjy9YFFTW4zxu9u5g1hK+u47xxfRTbKje+4SkPgqQ2IdxDZG1Mt+8WNhn6u6hqAY7xQHaiPByM2gINTPYYyT/NetVCgaE2LDr6cyTSxK5yxF5ADfnTgyCwXAMwjrn46XmFMEg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=idOXHeHR; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 792DF26E709;
+	Thu, 11 Sep 2025 09:18:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=210.61.82.184
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1757582301; cv=fail; b=XF5FKq20QfMzF+wrDQAzEFeByaxXDBCJs1MALX3v3q7yW1B0+XtQWfXkKis8QkFPg4+PYiVsd7bjwpOm/zkPKVwbLosZBCTy4cjA917b7XEHqfxnn7fOgHYi4s6CLPSg+zfiZ46tyJ1prm+jpszlGwChBMUOIaPAFAvDYUbPuYo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1757582301; c=relaxed/simple;
+	bh=jwTeC+swoPDLXdsKA+mym9T5TQCPgs/2EO/CtRPdqVc=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=Sp4bLYfahRW3wRAqXlQAVWVOYy3ngfwhl9uxsro88RJixzgW7vOy1hLPbKerV64BNjNOa6MROwPKIMyT/EiJP8qvmnYqFLSM58vCrQLRMKY1TYj4qz0dhgvEuL/vlYFdv3MrTiA9Z+BFH4HcL8udRdeIEkGolfIY7+pJlx957g0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=aeiHkzk7; dkim=pass (1024-bit key) header.d=mediateko365.onmicrosoft.com header.i=@mediateko365.onmicrosoft.com header.b=XK+g2sA0; arc=fail smtp.client-ip=210.61.82.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="idOXHeHR"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B592C4CEF8;
-	Thu, 11 Sep 2025 09:15:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757582157;
-	bh=7JeoRin9S23r3xhlAnlRxLvyx/y+xvTL36epeZ3mgNM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=idOXHeHRL1vWJPwUafXBQuLJfPQlDF2UoPabBq2DlF2BI2Opb3hjVXrJiAHfTusKb
-	 WwNLvwxkLVu+Bg/akjgNUa6rWGUvwftbiz3My6DGVRHCNSMQa7G6NZbiEEapz8RpoU
-	 /haJKKQS+sslKRvLS8k7gfXwgoLJAtZHrLSKGAn0ElqWj7qGgz0uYTFIQqVy/3Joj9
-	 TKKEuZY5+17h3DoF/JN3B0EeRnUXtnPZpnFVheAi87ETSI6cUuBda89OOAtD+Wa/4I
-	 efmQPAiPpKQktr002OvsISkmvKJNcqlJEXTpKnxBXkK/MyOMVgTvqIQIFVh+exMr5y
-	 9LqVmC9OQ+A1Q==
-Date: Thu, 11 Sep 2025 11:15:48 +0200
-From: Christian Brauner <brauner@kernel.org>
-To: Amir Goldstein <amir73il@gmail.com>
-Cc: Jan Kara <jack@suse.cz>, linux-fsdevel@vger.kernel.org, 
-	Josef Bacik <josef@toxicpanda.com>, Jeff Layton <jlayton@kernel.org>, Mike Yuan <me@yhndnzj.com>, 
-	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>, Lennart Poettering <mzxreary@0pointer.de>, 
-	Daan De Meyer <daan.j.demeyer@gmail.com>, Aleksa Sarai <cyphar@cyphar.com>, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>, 
-	Johannes Weiner <hannes@cmpxchg.org>, Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Chuck Lever <chuck.lever@oracle.com>, linux-nfs@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, cgroups@vger.kernel.org, 
-	netdev@vger.kernel.org
-Subject: Re: [PATCH 32/32] selftests/namespaces: add file handle selftests
-Message-ID: <20250911-ergriffen-autopilot-7e0488c135c7@brauner>
-References: <20250910-work-namespace-v1-0-4dd56e7359d8@kernel.org>
- <20250910-work-namespace-v1-32-4dd56e7359d8@kernel.org>
- <CAOQ4uxhwJBLCzfKs0dVFOpcgP=LQU5hkRxVeLLR6g-qOxb9ocQ@mail.gmail.com>
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="aeiHkzk7";
+	dkim=pass (1024-bit key) header.d=mediateko365.onmicrosoft.com header.i=@mediateko365.onmicrosoft.com header.b="XK+g2sA0"
+X-UUID: 39c82f588ef011f0b33aeb1e7f16c2b6-20250911
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+	h=MIME-Version:Content-Transfer-Encoding:Content-ID:Content-Type:In-Reply-To:References:Message-ID:Date:Subject:CC:To:From; bh=jwTeC+swoPDLXdsKA+mym9T5TQCPgs/2EO/CtRPdqVc=;
+	b=aeiHkzk7JuT90GQp5uw+dKkrB+5MCWvTn6bqIrXavyYWQnE0963KUofNXTZyoEamywjIwwSr/853gyM8OrqrQHOYitaq7Phk1RV3PSKKC+1H+/avn1xrWnbIQmUCz3ITPTKigsNyLTtXidAOcLDaD4mVLhpWWpMujzHloqw2i54=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.4,REQID:3e4ffb73-04d6-42e3-8b22-66116105cf8b,IP:0,UR
+	L:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:r
+	elease,TS:0
+X-CID-META: VersionHash:1ca6b93,CLOUDID:2861716c-8443-424b-b119-dc42e68239b0,B
+	ulkID:nil,BulkQuantity:0,Recheck:0,SF:80|81|82|83|102|110|111,TC:-5,Conten
+	t:0|15|50,EDM:-3,IP:nil,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:
+	0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: 39c82f588ef011f0b33aeb1e7f16c2b6-20250911
+Received: from mtkmbs13n2.mediatek.inc [(172.21.101.108)] by mailgw02.mediatek.com
+	(envelope-from <peter.wang@mediatek.com>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 923557316; Thu, 11 Sep 2025 17:18:06 +0800
+Received: from mtkmbs10n1.mediatek.inc (172.21.101.34) by
+ MTKMBS09N2.mediatek.inc (172.21.101.94) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.39; Thu, 11 Sep 2025 17:18:04 +0800
+Received: from TYPPR03CU001.outbound.protection.outlook.com (172.21.101.237)
+ by mtkmbs10n1.mediatek.inc (172.21.101.34) with Microsoft SMTP Server id
+ 15.2.1258.39 via Frontend Transport; Thu, 11 Sep 2025 17:18:04 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=rgBBMcrQIk2+hyTS4Pcbqs5ojEYpykufUb8NjB48TsDszDoR6rEcnqs5wEwLv/L3mdr0b9S8cLvuJv5wYVHxFZjHAgxki2Nf0pRAskwaOQdcTYOw/orMEPug2MikPkWJmzDyvxWOb0F669YqUn81YbEbQY8a9MPNU3juNeQu7PQ8LsQFG0rCqlR8yIFFF9z8x7L/fwXzNLjC2esSFf/bJWysaEwK3AY+bmCD09TDKYFF+fmsXYXhJj0VBdK1uPnUYou7NOIZRH4MHSGInyh2vXSpL+CcpOe6/M8a1lunwGb9UBryRilK9jeC1Z6Po+/itbcTVYCjhmmmBGuuKNGDWg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=jwTeC+swoPDLXdsKA+mym9T5TQCPgs/2EO/CtRPdqVc=;
+ b=kUNYMFaAzxRNJ3uoLQPj4xFp8HJNLgls4VDxV+qp3OKuaBleCCeg0tIasp4n2e14TKTHNiTEbIAL4+5yNC/7XOokLEtgcidHnE9iedZLePplDUZIxzVQLJt8YnoiZZ/E72orAuzUBBXcWshU1xYyLkYKyUamEUQYYSy76PAGi6+oslIWG+N2MiCu7tSDSKTABRIUy5wYzTzYvMrmJgsqG01pS8P7w5yYddSWm9En29AAetPxDTsviiSIffAk5lkBBjh05Bls+3zLgHeCVSuBoso7jraWpjHd6O803/zO5IX3HFRm+ExMDr41V33MMRFcbPWFlXimwO81//w+ShZObQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=mediatek.com; dmarc=pass action=none header.from=mediatek.com;
+ dkim=pass header.d=mediatek.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=mediateko365.onmicrosoft.com; s=selector2-mediateko365-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=jwTeC+swoPDLXdsKA+mym9T5TQCPgs/2EO/CtRPdqVc=;
+ b=XK+g2sA0TpAlZp/vr/kDPCvmkBa9LZwhXltNOZekCdW13VZuBJ34+IWR8Rh8ufiJtP1o4is4TqxG302blhb29uiXdC+LX80qG/Yu6u6wwcsTdGvOFNUoM1Z/Lz0KrhpCpfYu5QrThua9p/IrNBGkynXG0QowYNu/eIDjXQaGvQM=
+Received: from PSAPR03MB5605.apcprd03.prod.outlook.com (2603:1096:301:66::6)
+ by KUZPR03MB9416.apcprd03.prod.outlook.com (2603:1096:d10:45::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9094.22; Thu, 11 Sep
+ 2025 09:18:02 +0000
+Received: from PSAPR03MB5605.apcprd03.prod.outlook.com
+ ([fe80::3945:7dbc:62bd:c31c]) by PSAPR03MB5605.apcprd03.prod.outlook.com
+ ([fe80::3945:7dbc:62bd:c31c%6]) with mapi id 15.20.9094.021; Thu, 11 Sep 2025
+ 09:18:02 +0000
+From: =?utf-8?B?UGV0ZXIgV2FuZyAo546L5L+h5Y+LKQ==?= <peter.wang@mediatek.com>
+To: "bvanassche@acm.org" <bvanassche@acm.org>, "martin.petersen@oracle.com"
+	<martin.petersen@oracle.com>
+CC: "beanhuo@micron.com" <beanhuo@micron.com>, "hch@infradead.org"
+	<hch@infradead.org>, "linux-scsi@vger.kernel.org"
+	<linux-scsi@vger.kernel.org>, "ming.lei@redhat.com" <ming.lei@redhat.com>,
+	"john.g.garry@oracle.com" <john.g.garry@oracle.com>, "axboe@kernel.dk"
+	<axboe@kernel.dk>, "avri.altman@sandisk.com" <avri.altman@sandisk.com>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"James.Bottomley@HansenPartnership.com"
+	<James.Bottomley@HansenPartnership.com>
+Subject: Re: [PATCH 2/3] ufs: core: Use scsi_device_busy()
+Thread-Topic: [PATCH 2/3] ufs: core: Use scsi_device_busy()
+Thread-Index: AQHcIpqeXAFGL9Zoj02xO7xj0oa2qbSNtLuA
+Date: Thu, 11 Sep 2025 09:18:02 +0000
+Message-ID: <7219c5bf11d6b2337d3c61d28abfc26d420018d9.camel@mediatek.com>
+References: <20250910213254.1215318-1-bvanassche@acm.org>
+	 <20250910213254.1215318-3-bvanassche@acm.org>
+In-Reply-To: <20250910213254.1215318-3-bvanassche@acm.org>
+Accept-Language: zh-TW, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=mediatek.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PSAPR03MB5605:EE_|KUZPR03MB9416:EE_
+x-ms-office365-filtering-correlation-id: c741e6ad-6856-4013-df56-08ddf1141bce
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014|38070700021;
+x-microsoft-antispam-message-info: =?utf-8?B?Z1lXVUwxZ2lYQncxdmcwUUM3dk5YYkl2amE4b3dJT0VjWVltRGd4Qm81ZEc0?=
+ =?utf-8?B?eS9lVFNoVWRCWE5JL0hlVG1sQXFHNVV1MUNPR3UvSGJhNFoza3R6UE53d2x6?=
+ =?utf-8?B?UUdUcEVIU1FLc2tDdkVIYTdrcXQrU2JsL1VjR0pSV3hlUDY2WjZPWjVVc01u?=
+ =?utf-8?B?eXJVL1QrSlJHREprdTY0NHBYa0lDTGVIbStNV0VDQWV5b2wzbWtMWldzUWZW?=
+ =?utf-8?B?OEprMGEvRkFUMFZNZDErSjVKbjhITWdWNmNjVFRFMndwVUFncHNJUUZmMVFK?=
+ =?utf-8?B?VWdIaDdxRkRRc3ZEcGx3cTgxcjNoRkVxdU10N3kvenZzQUpDN2xTVVJtT2JG?=
+ =?utf-8?B?cHlYcDdCc0dMNkJrK1lJd0psNnBuKzVXWVFmRCs3RnE0R0RUR2NZb0I0dlIr?=
+ =?utf-8?B?RkhVcGc4czlnaHFnTjVoRGcwL1VSYmZMMHJ3YS9IMlVDOXlJSWlrcThHS0lV?=
+ =?utf-8?B?bVpSU1FGaTJHYkRMalBER01BOUxncTM4QW9ncm1jcTFDOTdYZDhDejh5dnFo?=
+ =?utf-8?B?MlNPUnJGMjB3S0ljWjJlM0ZuVHZLY2F2dElUUnZDcmFSVW5xK0Y0VmtNc05Y?=
+ =?utf-8?B?MHlDMXpSRFFadXpnYS9sc1VEbWlmQ3BGejVWa1dmL3BDalo5UmY1Vnp6ckNz?=
+ =?utf-8?B?WFNXaDg3NStDQnhpblMyRHJjeWhSc2VWeWRpcXlmNTluNmljdit4TTNWMmVQ?=
+ =?utf-8?B?MnJHVWJUeDZaV2xCcFUzdTFSVzUxTmdJR3pqWGE5MTNzc3JlR0x5bXhFS21B?=
+ =?utf-8?B?UzdCbGVyVVJjWHJoOUZVMWQ1WWVxTGJraDhxeFgrRmw2Rk9objlrVS9jcnI5?=
+ =?utf-8?B?N0hqRmVKWVdlT3hUd0R5akJtd0hTMkdiTG5lMmFLaCsvTzRQSjNnbnpST01L?=
+ =?utf-8?B?d0w3UzB6OXg4WDI1VFFtUHF1ay8ySlErd0lZRkVUalNmY25yWDNKbGRRd3Rr?=
+ =?utf-8?B?NG5kMlVGUk4rWW16RGxwV1Y3aUdsWEx3YjdEVXRneHpDSGZpZHN0OFpYdTVx?=
+ =?utf-8?B?Yi91OTZ3NlJrTVF2MFlHbFFaejczVUcrODRFMHh2RElCYWVJUDM1bjFnWjQv?=
+ =?utf-8?B?aE1Dd0UyV21WN0MyTVVQUFRqcHhBL01ib2p5NzVvK3FYUVV1STlETGJrZEVD?=
+ =?utf-8?B?UmpNR21Yd05wTFRyVy9uSzNDZTN6WjdUV0o3VE1xQVhqTVNmc0hPb0FsOERX?=
+ =?utf-8?B?bHg1TWVJUWdqUXJ1UFBWaGcrMmNncDM0Y0pQdW5sckI1QnN0VkJFYUpjVWhS?=
+ =?utf-8?B?c2RrcXE2MkFnMXZtenNoTzN4aHpqRzloZnRXbDlBd1FCY1dhYTNoRGRyZ0N4?=
+ =?utf-8?B?eVRjbXRpSGJQZEVLbVhiRUtITUFDeGNOL2ZqMUxvU08ydzJsdnNlL1o0RFhG?=
+ =?utf-8?B?eVRtVEpGVTNodmg3MHNiY1VXcHd1a0ZES3NnWFJqcGxtaU5GNXM3Q0IwK3Iv?=
+ =?utf-8?B?VGczbVpOYzRVcDZhNG1Va01pUVVnbFhXTjBsMmZIaWs0R1JDbHAzbEhtYURK?=
+ =?utf-8?B?eElwMmhWUStiSTVsZm5VK2VhYklMRnVHOHpPYk5uMExIMHdhOVl0SEVNM1Jo?=
+ =?utf-8?B?VFRFTU9jNFRoNEZUc3pTSmV2UmNkaVBuVVhqL3hOTk5ReGRRK2huUDh3cjl0?=
+ =?utf-8?B?d2ZhbTJTZ2QvRFRib2ZCK1ozeTBVTHRveXB0Wnh5V1BJcjRlcW9uZXFwTWlU?=
+ =?utf-8?B?S3RON0hESkhqMDN0S1pMcGh4bWdkOFhHbStOMGp2NC9lVkF3Ukc1MGNYYmYz?=
+ =?utf-8?B?MEJ1a00ya1FHd3g4UVd3dlgzejAvYUNxMEc3OVJvcXlhdGdsYTFMdm12UmFk?=
+ =?utf-8?B?elZhZDdKNlI4RmszckRkQzJYQ25YU0U2WVI0VlRWdFZFWXBqclZnY0pkaWh4?=
+ =?utf-8?B?blptT3JMVmVjYWZzSW1sc0p3cjlaWkdrbWJQaVFOZndZdHI4Z2tlMXBaUVFE?=
+ =?utf-8?B?Z0ZLUHZPZ0ExbHk0RllxNW9OU1VRSUhTYkk0L091MG96TUx2NkFES2dHQVo2?=
+ =?utf-8?Q?6TQ81w9m/IVduSkOlhzCqi0WWOYruY=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PSAPR03MB5605.apcprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?bVNBR0ZlUC92dm93Q01MRWZRUUNjSDQ1RjNGNTFMZ2trRWlWdWxuRHlEU2JX?=
+ =?utf-8?B?K1NVS2tPK0swWjZ3RjlIUDgwWmdxMFFkTkFLNy9jbTZSQWxETEtyQXBWVG5n?=
+ =?utf-8?B?ek1GTE9rS1JwQ0puaVhCeEV6cjNPVHVPSHBjTk1XdkJSTEJGQmR1ei9SMlgw?=
+ =?utf-8?B?SklUOGRWb3Bxd2t4dUUyTWR3OUtLdmwxUDZ2bXFNU0FuT3RHZnhWdXpUOGFv?=
+ =?utf-8?B?ZlNCKy9XbkpJMFBnVFVMbjN3Um11aXV1dzJuekxMM2RSY09wY3h6bGJIMzdE?=
+ =?utf-8?B?NWNsbnVzempZaDdaY1pRblAzRXEwSmkyNDJpVHdWNnJzTlV5QkFHb0RaUWRl?=
+ =?utf-8?B?NDhlRnRQMUVwVHlUWVUxaGl5bUkzVUVCakVRNmV6dzRlL280YUp4Q3A0UVds?=
+ =?utf-8?B?U0ZTaXJtZDFBc2FiTkd1YW1yWFdBYlVqS001T2EzRVJJREZWcG96TVU4THkv?=
+ =?utf-8?B?dlVNdmh1YlIybTFxR1RGaGwrYlUybGFGNTU4SFlOT2swY205NktaSmZVT01y?=
+ =?utf-8?B?VDdSUXpLUE10TWt6UktPMlhRcUR4eDJoaXF0Z0ZrWm1QZVNoVmJVcy9TV1hB?=
+ =?utf-8?B?Rkt3ZW1COW5XckZ2WjBIMmdsdEE3RndYWWVnaTRRQXA1amhEOTVuakxMdG1U?=
+ =?utf-8?B?RG8ydjZhdEdabkhSZmdRQUdUZGdLMkdGS3U3ckE0K0trc3dvcHI2SWtRaGYv?=
+ =?utf-8?B?UDVYK0RBb3R2NWd4TUlpVUxTS0dGZW9FanpITlNmekFpUmxMNTVCNjJkZXhW?=
+ =?utf-8?B?YTdzVnRMaGhyTXZ6cGlHVzVDRE9DMDY0YlNENTd0ckczVTZtN2ltaEpRZC91?=
+ =?utf-8?B?dHdpYklGWkprYm1Rc21ldmwzdHNpNEdPK1U5eUJFWHhKemx6cmdGK0RuaEdr?=
+ =?utf-8?B?SUc1TmZheEZJRnJIZTZrTmtKOUxCSHZrMHVJZksvQzg2SzNWVVF4eVJXL3pa?=
+ =?utf-8?B?N1RxZk02RzhqbkNzVUMrLzFUMjFsU1phZWw4NDZNeFllTjV2cTZVSHNZbnZP?=
+ =?utf-8?B?VlBaYVErZ1Z0QjREVHk2VytyZUc3NmpWVjZKbXIvOHpRb1RFQUkvdmVWb212?=
+ =?utf-8?B?MGhoSEtjdVByNkFTcUdZUjdFay9RS29lVXI4OURCZ1k4Z2JLNUFsd0hzbjM2?=
+ =?utf-8?B?TXQ2a0QvdFBnNGN0VzhZcytuejNHNzJUUnZQb0ZHUzQ1QksyUXV0UVBKSHdF?=
+ =?utf-8?B?ek9tVE9XTUlLTDNrZ0I3ZldEK0Z0VEtNc3d4WmpNRk1HcEU5cnY0M2tJZDZi?=
+ =?utf-8?B?UkIxUGQvL243aWxxUXJ5ZTMzblk4MjhlMjA4UDBiNFlQNnprbnhvVVlGQUhW?=
+ =?utf-8?B?WWlIS1NTT1NpekN3S2JjTlN2bmpRMHB4Y0R1Y3o4MC81QTJxRUhQV3VDc3ky?=
+ =?utf-8?B?TXUySVIzTUp2cmFlZFVkaE5sWDFLRXNQYklHNnFYUjBMMUpSb2MxcTFnbnc4?=
+ =?utf-8?B?MTNGRFJFZG1UNkNyZDVZN1dDUDIzamtNWUhUaUpvMTFIZ0FEbyt6cFY4ZWZ4?=
+ =?utf-8?B?THZ6eit5WUlDSVErbGdqdG00NENpcVhmaVRWZXVsNUl6a00xVjdmZXNObkk2?=
+ =?utf-8?B?blNyS3VLRitsZGxVODVRcE8yaGNYMElSSll4ME9KUG9WenQ2RWhNaFdzVU9m?=
+ =?utf-8?B?NFFLcWNoSmpyb1g4bGl6Y3dIWFk5cVEzRm8wekExN28xU29sVW5KblBuWlF3?=
+ =?utf-8?B?TUNaWWNaWUVLU2tkazFUdFBtSk05TGhRYTQ0NmExNHRHbnhQL3kwOElFeTVa?=
+ =?utf-8?B?U2ZWYVJ1eitLbU9WTytQQkRKUlZsN3gwWW1WbzRHV0ZJSGZXNFNTUi95aW01?=
+ =?utf-8?B?LytlYyszU25QNEZJNXlIVndDM1RWWUtZN01BYWhlbHRGakRaSm0zRTBmMW5R?=
+ =?utf-8?B?eE1uUHo0N0k4VDFBd3BjK1Y0akVBMkhBaUpLNWJjTXE3QkN3d29Ca3R3TXZC?=
+ =?utf-8?B?T1hkSm5lTW9xZ2lXMnBRNytncklkR1BqT2t2d1JUM0d2WjBLQiszVGwrNWMr?=
+ =?utf-8?B?VzBQaVhYL3NiNEdxVXRROURzY3MxYU0zellOSjFSWnN3UUxOZENZa0h0UXJ1?=
+ =?utf-8?B?V2lyUWY4azNBaXJaVGNMZFNXaVZvb2dveEx3VGdqN2dFYkVYRDZ1VXVlaW1W?=
+ =?utf-8?B?djFEWVFPMXhhNVVkTmZLU2U5S3ZSRjdHbG4wTG5iTkRSQkdnMGxya1g1dXJq?=
+ =?utf-8?B?WHc9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <8206B6D47B8C1643B81F0A5306FEF3DE@apcprd03.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAOQ4uxhwJBLCzfKs0dVFOpcgP=LQU5hkRxVeLLR6g-qOxb9ocQ@mail.gmail.com>
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PSAPR03MB5605.apcprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c741e6ad-6856-4013-df56-08ddf1141bce
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Sep 2025 09:18:02.3922
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: a7687ede-7a6b-4ef6-bace-642f677fbe31
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: +8rGnOSBV2HAaciNegl79ZQqp3Io/UEPIXAJt1R8o2GnDEViePrsil9Me0FZzg+K9JAGJyATP0RVXC7nXzATQA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: KUZPR03MB9416
 
-On Wed, Sep 10, 2025 at 07:30:03PM +0200, Amir Goldstein wrote:
-> On Wed, Sep 10, 2025 at 4:40 PM Christian Brauner <brauner@kernel.org> wrote:
-> >
-> > Add a bunch of selftests for namespace file handles.
-> >
-> > Signed-off-by: Christian Brauner <brauner@kernel.org>
-> 
-> Obviously, I did not go over every single line, but for the general
-> test template and test coverage you may add:
-> 
-> Reviewed-by: Amir Goldstein <amir73il@gmail.com>
-> 
-> However, see my comment on file handle support patch.
-> The test matrix is incomplete.
-
-I mean, I'll just drop to non-root in the non-cross ns tests:
-
-/* Drop to unprivileged uid/gid */
-ASSERT_EQ(setresgid(65534, 65534, 65534), 0); /* nogroup */
-ASSERT_EQ(setresuid(65534, 65534, 65534), 0); /* nobody */
-
-> Maybe it would be complete if test is run as root and then
-> as non root, but then I think the test needs some changes
-> for running as root and opening non-self ns.
-> 
-> I am not sure what the standard is wrt running the selftests
-> as root /non-root.
-> 
-> I see that the userns isolation tests do:
-> /* Map current uid/gid to root in the new namespace */
-> 
-> Are you assuming that non root is running this test
-> or am I missing something?
-
-No, I'm not assuming that. I just need a new user namespace and become
-root in it to assume privilege over it so I can test that decoding
-doesn't work from an ancestor userns owned namespace.
-
-> 
-> Wouldn't mapping uid 0 to uid 0 in the new userns cause
-> the test to fail because opening by handle will succeed?
-> 
-> Thanks,
-> Amir.
-> 
-> 
-> > ---
-> >  tools/testing/selftests/namespaces/.gitignore      |    1 +
-> >  tools/testing/selftests/namespaces/Makefile        |    2 +-
-> >  .../selftests/namespaces/file_handle_test.c        | 1410 ++++++++++++++++++++
-> >  3 files changed, 1412 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/tools/testing/selftests/namespaces/.gitignore b/tools/testing/selftests/namespaces/.gitignore
-> > index c1e8d634dd21..7639dbf58bbf 100644
-> > --- a/tools/testing/selftests/namespaces/.gitignore
-> > +++ b/tools/testing/selftests/namespaces/.gitignore
-> > @@ -1 +1,2 @@
-> >  nsid_test
-> > +file_handle_test
-> > diff --git a/tools/testing/selftests/namespaces/Makefile b/tools/testing/selftests/namespaces/Makefile
-> > index 9280c703533e..f6c117ce2c2b 100644
-> > --- a/tools/testing/selftests/namespaces/Makefile
-> > +++ b/tools/testing/selftests/namespaces/Makefile
-> > @@ -1,7 +1,7 @@
-> >  # SPDX-License-Identifier: GPL-2.0-only
-> >  CFLAGS += -Wall -O0 -g $(KHDR_INCLUDES) $(TOOLS_INCLUDES)
-> >
-> > -TEST_GEN_PROGS := nsid_test
-> > +TEST_GEN_PROGS := nsid_test file_handle_test
-> >
-> >  include ../lib.mk
-> >
-> > diff --git a/tools/testing/selftests/namespaces/file_handle_test.c b/tools/testing/selftests/namespaces/file_handle_test.c
-> > new file mode 100644
-> > index 000000000000..87573fa06990
-> > --- /dev/null
-> > +++ b/tools/testing/selftests/namespaces/file_handle_test.c
-> > @@ -0,0 +1,1410 @@
-> > +// SPDX-License-Identifier: GPL-2.0
-> > +#define _GNU_SOURCE
-> > +#include <errno.h>
-> > +#include <fcntl.h>
-> > +#include <grp.h>
-> > +#include <limits.h>
-> > +#include <sched.h>
-> > +#include <stdio.h>
-> > +#include <stdlib.h>
-> > +#include <string.h>
-> > +#include <sys/mount.h>
-> > +#include <sys/stat.h>
-> > +#include <sys/types.h>
-> > +#include <sys/wait.h>
-> > +#include <unistd.h>
-> > +#include <linux/unistd.h>
-> > +#include "../kselftest_harness.h"
-> > +
-> > +#ifndef FD_NSFS_ROOT
-> > +#define FD_NSFS_ROOT -10003 /* Root of the nsfs filesystem */
-> > +#endif
-> > +
-> > +TEST(nsfs_net_handle)
-> > +{
-> > +       struct file_handle *handle;
-> > +       int mount_id;
-> > +       int ret;
-> > +       int fd;
-> > +       int ns_fd;
-> > +       char ns_path[256];
-> > +       struct stat st1, st2;
-> > +
-> > +       handle = malloc(sizeof(*handle) + MAX_HANDLE_SZ);
-> > +       ASSERT_NE(handle, NULL);
-> > +
-> > +       /* Open a namespace file descriptor */
-> > +       snprintf(ns_path, sizeof(ns_path), "/proc/self/ns/net");
-> > +       ns_fd = open(ns_path, O_RDONLY);
-> > +       ASSERT_GE(ns_fd, 0);
-> > +
-> > +       /* Get handle for the namespace */
-> > +       handle->handle_bytes = MAX_HANDLE_SZ;
-> > +       ret = name_to_handle_at(ns_fd, "", handle, &mount_id, AT_EMPTY_PATH);
-> > +       if (ret < 0 && errno == EOPNOTSUPP) {
-> > +               SKIP(free(handle); close(ns_fd);
-> > +                    return, "nsfs doesn't support file handles");
-> > +       }
-> > +       ASSERT_EQ(ret, 0);
-> > +       ASSERT_GT(handle->handle_bytes, 0);
-> > +
-> > +       /* Try to open using FD_NSFS_ROOT */
-> > +       fd = open_by_handle_at(FD_NSFS_ROOT, handle, O_RDONLY);
-> > +       if (fd < 0 && (errno == EINVAL || errno == EOPNOTSUPP)) {
-> > +               SKIP(free(handle); close(ns_fd);
-> > +                    return,
-> > +                          "open_by_handle_at with FD_NSFS_ROOT not supported");
-> > +       }
-> > +       ASSERT_GE(fd, 0);
-> > +
-> > +       /* Verify we opened the correct namespace */
-> > +       ASSERT_EQ(fstat(ns_fd, &st1), 0);
-> > +       ASSERT_EQ(fstat(fd, &st2), 0);
-> > +       ASSERT_EQ(st1.st_ino, st2.st_ino);
-> > +       ASSERT_EQ(st1.st_dev, st2.st_dev);
-> > +
-> > +       close(fd);
-> > +       close(ns_fd);
-> > +       free(handle);
-> > +}
-> > +
-> > +TEST(nsfs_uts_handle)
-> > +{
-> > +       struct file_handle *handle;
-> > +       int mount_id;
-> > +       int ret;
-> > +       int fd;
-> > +       int ns_fd;
-> > +       char ns_path[256];
-> > +       struct stat st1, st2;
-> > +
-> > +       handle = malloc(sizeof(*handle) + MAX_HANDLE_SZ);
-> > +       ASSERT_NE(handle, NULL);
-> > +
-> > +       /* Open UTS namespace file descriptor */
-> > +       snprintf(ns_path, sizeof(ns_path), "/proc/self/ns/uts");
-> > +       ns_fd = open(ns_path, O_RDONLY);
-> > +       ASSERT_GE(ns_fd, 0);
-> > +
-> > +       /* Get handle for the namespace */
-> > +       handle->handle_bytes = MAX_HANDLE_SZ;
-> > +       ret = name_to_handle_at(ns_fd, "", handle, &mount_id, AT_EMPTY_PATH);
-> > +       if (ret < 0 && errno == EOPNOTSUPP) {
-> > +               SKIP(free(handle); close(ns_fd);
-> > +                    return, "nsfs doesn't support file handles");
-> > +       }
-> > +       ASSERT_EQ(ret, 0);
-> > +       ASSERT_GT(handle->handle_bytes, 0);
-> > +
-> > +       /* Try to open using FD_NSFS_ROOT */
-> > +       fd = open_by_handle_at(FD_NSFS_ROOT, handle, O_RDONLY);
-> > +       if (fd < 0 && (errno == EINVAL || errno == EOPNOTSUPP)) {
-> > +               SKIP(free(handle); close(ns_fd);
-> > +                    return,
-> > +                          "open_by_handle_at with FD_NSFS_ROOT not supported");
-> > +       }
-> > +       ASSERT_GE(fd, 0);
-> > +
-> > +       /* Verify we opened the correct namespace */
-> > +       ASSERT_EQ(fstat(ns_fd, &st1), 0);
-> > +       ASSERT_EQ(fstat(fd, &st2), 0);
-> > +       ASSERT_EQ(st1.st_ino, st2.st_ino);
-> > +       ASSERT_EQ(st1.st_dev, st2.st_dev);
-> > +
-> > +       close(fd);
-> > +       close(ns_fd);
-> > +       free(handle);
-> > +}
-> > +
-> > +TEST(nsfs_ipc_handle)
-> > +{
-> > +       struct file_handle *handle;
-> > +       int mount_id;
-> > +       int ret;
-> > +       int fd;
-> > +       int ns_fd;
-> > +       char ns_path[256];
-> > +       struct stat st1, st2;
-> > +
-> > +       handle = malloc(sizeof(*handle) + MAX_HANDLE_SZ);
-> > +       ASSERT_NE(handle, NULL);
-> > +
-> > +       /* Open IPC namespace file descriptor */
-> > +       snprintf(ns_path, sizeof(ns_path), "/proc/self/ns/ipc");
-> > +       ns_fd = open(ns_path, O_RDONLY);
-> > +       ASSERT_GE(ns_fd, 0);
-> > +
-> > +       /* Get handle for the namespace */
-> > +       handle->handle_bytes = MAX_HANDLE_SZ;
-> > +       ret = name_to_handle_at(ns_fd, "", handle, &mount_id, AT_EMPTY_PATH);
-> > +       if (ret < 0 && errno == EOPNOTSUPP) {
-> > +               SKIP(free(handle); close(ns_fd);
-> > +                    return, "nsfs doesn't support file handles");
-> > +       }
-> > +       ASSERT_EQ(ret, 0);
-> > +       ASSERT_GT(handle->handle_bytes, 0);
-> > +
-> > +       /* Try to open using FD_NSFS_ROOT */
-> > +       fd = open_by_handle_at(FD_NSFS_ROOT, handle, O_RDONLY);
-> > +       if (fd < 0 && (errno == EINVAL || errno == EOPNOTSUPP)) {
-> > +               SKIP(free(handle); close(ns_fd);
-> > +                    return,
-> > +                          "open_by_handle_at with FD_NSFS_ROOT not supported");
-> > +       }
-> > +       ASSERT_GE(fd, 0);
-> > +
-> > +       /* Verify we opened the correct namespace */
-> > +       ASSERT_EQ(fstat(ns_fd, &st1), 0);
-> > +       ASSERT_EQ(fstat(fd, &st2), 0);
-> > +       ASSERT_EQ(st1.st_ino, st2.st_ino);
-> > +       ASSERT_EQ(st1.st_dev, st2.st_dev);
-> > +
-> > +       close(fd);
-> > +       close(ns_fd);
-> > +       free(handle);
-> > +}
-> > +
-> > +TEST(nsfs_pid_handle)
-> > +{
-> > +       struct file_handle *handle;
-> > +       int mount_id;
-> > +       int ret;
-> > +       int fd;
-> > +       int ns_fd;
-> > +       char ns_path[256];
-> > +       struct stat st1, st2;
-> > +
-> > +       handle = malloc(sizeof(*handle) + MAX_HANDLE_SZ);
-> > +       ASSERT_NE(handle, NULL);
-> > +
-> > +       /* Open PID namespace file descriptor */
-> > +       snprintf(ns_path, sizeof(ns_path), "/proc/self/ns/pid");
-> > +       ns_fd = open(ns_path, O_RDONLY);
-> > +       ASSERT_GE(ns_fd, 0);
-> > +
-> > +       /* Get handle for the namespace */
-> > +       handle->handle_bytes = MAX_HANDLE_SZ;
-> > +       ret = name_to_handle_at(ns_fd, "", handle, &mount_id, AT_EMPTY_PATH);
-> > +       if (ret < 0 && errno == EOPNOTSUPP) {
-> > +               SKIP(free(handle); close(ns_fd);
-> > +                    return, "nsfs doesn't support file handles");
-> > +       }
-> > +       ASSERT_EQ(ret, 0);
-> > +       ASSERT_GT(handle->handle_bytes, 0);
-> > +
-> > +       /* Try to open using FD_NSFS_ROOT */
-> > +       fd = open_by_handle_at(FD_NSFS_ROOT, handle, O_RDONLY);
-> > +       if (fd < 0 && (errno == EINVAL || errno == EOPNOTSUPP)) {
-> > +               SKIP(free(handle); close(ns_fd);
-> > +                    return,
-> > +                          "open_by_handle_at with FD_NSFS_ROOT not supported");
-> > +       }
-> > +       ASSERT_GE(fd, 0);
-> > +
-> > +       /* Verify we opened the correct namespace */
-> > +       ASSERT_EQ(fstat(ns_fd, &st1), 0);
-> > +       ASSERT_EQ(fstat(fd, &st2), 0);
-> > +       ASSERT_EQ(st1.st_ino, st2.st_ino);
-> > +       ASSERT_EQ(st1.st_dev, st2.st_dev);
-> > +
-> > +       close(fd);
-> > +       close(ns_fd);
-> > +       free(handle);
-> > +}
-> > +
-> > +TEST(nsfs_mnt_handle)
-> > +{
-> > +       struct file_handle *handle;
-> > +       int mount_id;
-> > +       int ret;
-> > +       int fd;
-> > +       int ns_fd;
-> > +       char ns_path[256];
-> > +       struct stat st1, st2;
-> > +
-> > +       handle = malloc(sizeof(*handle) + MAX_HANDLE_SZ);
-> > +       ASSERT_NE(handle, NULL);
-> > +
-> > +       /* Open mount namespace file descriptor */
-> > +       snprintf(ns_path, sizeof(ns_path), "/proc/self/ns/mnt");
-> > +       ns_fd = open(ns_path, O_RDONLY);
-> > +       ASSERT_GE(ns_fd, 0);
-> > +
-> > +       /* Get handle for the namespace */
-> > +       handle->handle_bytes = MAX_HANDLE_SZ;
-> > +       ret = name_to_handle_at(ns_fd, "", handle, &mount_id, AT_EMPTY_PATH);
-> > +       if (ret < 0 && errno == EOPNOTSUPP) {
-> > +               SKIP(free(handle); close(ns_fd);
-> > +                    return, "nsfs doesn't support file handles");
-> > +       }
-> > +       ASSERT_EQ(ret, 0);
-> > +       ASSERT_GT(handle->handle_bytes, 0);
-> > +
-> > +       /* Try to open using FD_NSFS_ROOT */
-> > +       fd = open_by_handle_at(FD_NSFS_ROOT, handle, O_RDONLY);
-> > +       if (fd < 0 && (errno == EINVAL || errno == EOPNOTSUPP)) {
-> > +               SKIP(free(handle); close(ns_fd);
-> > +                    return,
-> > +                          "open_by_handle_at with FD_NSFS_ROOT not supported");
-> > +       }
-> > +       ASSERT_GE(fd, 0);
-> > +
-> > +       /* Verify we opened the correct namespace */
-> > +       ASSERT_EQ(fstat(ns_fd, &st1), 0);
-> > +       ASSERT_EQ(fstat(fd, &st2), 0);
-> > +       ASSERT_EQ(st1.st_ino, st2.st_ino);
-> > +       ASSERT_EQ(st1.st_dev, st2.st_dev);
-> > +
-> > +       close(fd);
-> > +       close(ns_fd);
-> > +       free(handle);
-> > +}
-> > +
-> > +TEST(nsfs_user_handle)
-> > +{
-> > +       struct file_handle *handle;
-> > +       int mount_id;
-> > +       int ret;
-> > +       int fd;
-> > +       int ns_fd;
-> > +       char ns_path[256];
-> > +       struct stat st1, st2;
-> > +
-> > +       handle = malloc(sizeof(*handle) + MAX_HANDLE_SZ);
-> > +       ASSERT_NE(handle, NULL);
-> > +
-> > +       /* Open user namespace file descriptor */
-> > +       snprintf(ns_path, sizeof(ns_path), "/proc/self/ns/user");
-> > +       ns_fd = open(ns_path, O_RDONLY);
-> > +       ASSERT_GE(ns_fd, 0);
-> > +
-> > +       /* Get handle for the namespace */
-> > +       handle->handle_bytes = MAX_HANDLE_SZ;
-> > +       ret = name_to_handle_at(ns_fd, "", handle, &mount_id, AT_EMPTY_PATH);
-> > +       if (ret < 0 && errno == EOPNOTSUPP) {
-> > +               SKIP(free(handle); close(ns_fd);
-> > +                    return, "nsfs doesn't support file handles");
-> > +       }
-> > +       ASSERT_EQ(ret, 0);
-> > +       ASSERT_GT(handle->handle_bytes, 0);
-> > +
-> > +       /* Try to open using FD_NSFS_ROOT */
-> > +       fd = open_by_handle_at(FD_NSFS_ROOT, handle, O_RDONLY);
-> > +       if (fd < 0 && (errno == EINVAL || errno == EOPNOTSUPP)) {
-> > +               SKIP(free(handle); close(ns_fd);
-> > +                    return,
-> > +                          "open_by_handle_at with FD_NSFS_ROOT not supported");
-> > +       }
-> > +       ASSERT_GE(fd, 0);
-> > +
-> > +       /* Verify we opened the correct namespace */
-> > +       ASSERT_EQ(fstat(ns_fd, &st1), 0);
-> > +       ASSERT_EQ(fstat(fd, &st2), 0);
-> > +       ASSERT_EQ(st1.st_ino, st2.st_ino);
-> > +       ASSERT_EQ(st1.st_dev, st2.st_dev);
-> > +
-> > +       close(fd);
-> > +       close(ns_fd);
-> > +       free(handle);
-> > +}
-> > +
-> > +TEST(nsfs_cgroup_handle)
-> > +{
-> > +       struct file_handle *handle;
-> > +       int mount_id;
-> > +       int ret;
-> > +       int fd;
-> > +       int ns_fd;
-> > +       char ns_path[256];
-> > +       struct stat st1, st2;
-> > +
-> > +       handle = malloc(sizeof(*handle) + MAX_HANDLE_SZ);
-> > +       ASSERT_NE(handle, NULL);
-> > +
-> > +       /* Open cgroup namespace file descriptor */
-> > +       snprintf(ns_path, sizeof(ns_path), "/proc/self/ns/cgroup");
-> > +       ns_fd = open(ns_path, O_RDONLY);
-> > +       if (ns_fd < 0) {
-> > +               SKIP(free(handle); return, "cgroup namespace not available");
-> > +       }
-> > +
-> > +       /* Get handle for the namespace */
-> > +       handle->handle_bytes = MAX_HANDLE_SZ;
-> > +       ret = name_to_handle_at(ns_fd, "", handle, &mount_id, AT_EMPTY_PATH);
-> > +       if (ret < 0 && errno == EOPNOTSUPP) {
-> > +               SKIP(free(handle); close(ns_fd);
-> > +                    return, "nsfs doesn't support file handles");
-> > +       }
-> > +       ASSERT_EQ(ret, 0);
-> > +       ASSERT_GT(handle->handle_bytes, 0);
-> > +
-> > +       /* Try to open using FD_NSFS_ROOT */
-> > +       fd = open_by_handle_at(FD_NSFS_ROOT, handle, O_RDONLY);
-> > +       if (fd < 0 && (errno == EINVAL || errno == EOPNOTSUPP)) {
-> > +               SKIP(free(handle); close(ns_fd);
-> > +                    return,
-> > +                          "open_by_handle_at with FD_NSFS_ROOT not supported");
-> > +       }
-> > +       ASSERT_GE(fd, 0);
-> > +
-> > +       /* Verify we opened the correct namespace */
-> > +       ASSERT_EQ(fstat(ns_fd, &st1), 0);
-> > +       ASSERT_EQ(fstat(fd, &st2), 0);
-> > +       ASSERT_EQ(st1.st_ino, st2.st_ino);
-> > +       ASSERT_EQ(st1.st_dev, st2.st_dev);
-> > +
-> > +       close(fd);
-> > +       close(ns_fd);
-> > +       free(handle);
-> > +}
-> > +
-> > +TEST(nsfs_time_handle)
-> > +{
-> > +       struct file_handle *handle;
-> > +       int mount_id;
-> > +       int ret;
-> > +       int fd;
-> > +       int ns_fd;
-> > +       char ns_path[256];
-> > +       struct stat st1, st2;
-> > +
-> > +       handle = malloc(sizeof(*handle) + MAX_HANDLE_SZ);
-> > +       ASSERT_NE(handle, NULL);
-> > +
-> > +       /* Open time namespace file descriptor */
-> > +       snprintf(ns_path, sizeof(ns_path), "/proc/self/ns/time");
-> > +       ns_fd = open(ns_path, O_RDONLY);
-> > +       if (ns_fd < 0) {
-> > +               SKIP(free(handle); return, "time namespace not available");
-> > +       }
-> > +
-> > +       /* Get handle for the namespace */
-> > +       handle->handle_bytes = MAX_HANDLE_SZ;
-> > +       ret = name_to_handle_at(ns_fd, "", handle, &mount_id, AT_EMPTY_PATH);
-> > +       if (ret < 0 && errno == EOPNOTSUPP) {
-> > +               SKIP(free(handle); close(ns_fd);
-> > +                    return, "nsfs doesn't support file handles");
-> > +       }
-> > +       ASSERT_EQ(ret, 0);
-> > +       ASSERT_GT(handle->handle_bytes, 0);
-> > +
-> > +       /* Try to open using FD_NSFS_ROOT */
-> > +       fd = open_by_handle_at(FD_NSFS_ROOT, handle, O_RDONLY);
-> > +       if (fd < 0 && (errno == EINVAL || errno == EOPNOTSUPP)) {
-> > +               SKIP(free(handle); close(ns_fd);
-> > +                    return,
-> > +                          "open_by_handle_at with FD_NSFS_ROOT not supported");
-> > +       }
-> > +       ASSERT_GE(fd, 0);
-> > +
-> > +       /* Verify we opened the correct namespace */
-> > +       ASSERT_EQ(fstat(ns_fd, &st1), 0);
-> > +       ASSERT_EQ(fstat(fd, &st2), 0);
-> > +       ASSERT_EQ(st1.st_ino, st2.st_ino);
-> > +       ASSERT_EQ(st1.st_dev, st2.st_dev);
-> > +
-> > +       close(fd);
-> > +       close(ns_fd);
-> > +       free(handle);
-> > +}
-> > +
-> > +TEST(nsfs_user_net_namespace_isolation)
-> > +{
-> > +       struct file_handle *handle;
-> > +       int mount_id;
-> > +       int ret;
-> > +       int fd;
-> > +       int ns_fd;
-> > +       pid_t pid;
-> > +       int status;
-> > +       int pipefd[2];
-> > +       char result;
-> > +
-> > +       handle = malloc(sizeof(*handle) + MAX_HANDLE_SZ);
-> > +       ASSERT_NE(handle, NULL);
-> > +
-> > +       /* Create pipe for communication */
-> > +       ASSERT_EQ(pipe(pipefd), 0);
-> > +
-> > +       /* Get handle for current network namespace */
-> > +       ns_fd = open("/proc/self/ns/net", O_RDONLY);
-> > +       ASSERT_GE(ns_fd, 0);
-> > +
-> > +       handle->handle_bytes = MAX_HANDLE_SZ;
-> > +       ret = name_to_handle_at(ns_fd, "", handle, &mount_id, AT_EMPTY_PATH);
-> > +       if (ret < 0 && errno == EOPNOTSUPP) {
-> > +               SKIP(free(handle); close(ns_fd); close(pipefd[0]);
-> > +                    close(pipefd[1]);
-> > +                    return, "nsfs doesn't support file handles");
-> > +       }
-> > +       ASSERT_EQ(ret, 0);
-> > +       close(ns_fd);
-> > +
-> > +       pid = fork();
-> > +       ASSERT_GE(pid, 0);
-> > +
-> > +       if (pid == 0) {
-> > +               /* Child process */
-> > +               close(pipefd[0]);
-> > +
-> > +               /* First create new user namespace to drop privileges */
-> > +               ret = unshare(CLONE_NEWUSER);
-> > +               if (ret < 0) {
-> > +                       write(pipefd[1], "U",
-> > +                             1); /* Unable to create user namespace */
-> > +                       close(pipefd[1]);
-> > +                       exit(0);
-> > +               }
-> > +
-> > +               /* Write uid/gid mappings to maintain some capabilities */
-> > +               int uid_map_fd = open("/proc/self/uid_map", O_WRONLY);
-> > +               int gid_map_fd = open("/proc/self/gid_map", O_WRONLY);
-> > +               int setgroups_fd = open("/proc/self/setgroups", O_WRONLY);
-> > +
-> > +               if (uid_map_fd < 0 || gid_map_fd < 0 || setgroups_fd < 0) {
-> > +                       write(pipefd[1], "M", 1); /* Unable to set mappings */
-> > +                       close(pipefd[1]);
-> > +                       exit(0);
-> > +               }
-> > +
-> > +               /* Disable setgroups to allow gid mapping */
-> > +               write(setgroups_fd, "deny", 4);
-> > +               close(setgroups_fd);
-> > +
-> > +               /* Map current uid/gid to root in the new namespace */
-> > +               char mapping[64];
-> > +               snprintf(mapping, sizeof(mapping), "0 %d 1", getuid());
-> > +               write(uid_map_fd, mapping, strlen(mapping));
-> > +               close(uid_map_fd);
-> > +
-> > +               snprintf(mapping, sizeof(mapping), "0 %d 1", getgid());
-> > +               write(gid_map_fd, mapping, strlen(mapping));
-> > +               close(gid_map_fd);
-> > +
-> > +               /* Now create new network namespace */
-> > +               ret = unshare(CLONE_NEWNET);
-> > +               if (ret < 0) {
-> > +                       write(pipefd[1], "N",
-> > +                             1); /* Unable to create network namespace */
-> > +                       close(pipefd[1]);
-> > +                       exit(0);
-> > +               }
-> > +
-> > +               /* Try to open parent's network namespace handle from new user+net namespace */
-> > +               fd = open_by_handle_at(FD_NSFS_ROOT, handle, O_RDONLY);
-> > +
-> > +               if (fd >= 0) {
-> > +                       /* Should NOT succeed - we're in a different user namespace */
-> > +                       write(pipefd[1], "S", 1); /* Unexpected success */
-> > +                       close(fd);
-> > +               } else if (errno == ESTALE) {
-> > +                       /* Expected: Stale file handle */
-> > +                       write(pipefd[1], "P", 1);
-> > +               } else {
-> > +                       /* Other error */
-> > +                       write(pipefd[1], "F", 1);
-> > +               }
-> > +
-> > +               close(pipefd[1]);
-> > +               exit(0);
-> > +       }
-> > +
-> > +       /* Parent process */
-> > +       close(pipefd[1]);
-> > +       ASSERT_EQ(read(pipefd[0], &result, 1), 1);
-> > +
-> > +       waitpid(pid, &status, 0);
-> > +       ASSERT_TRUE(WIFEXITED(status));
-> > +       ASSERT_EQ(WEXITSTATUS(status), 0);
-> > +
-> > +       if (result == 'U') {
-> > +               SKIP(free(handle); close(pipefd[0]);
-> > +                    return, "Cannot create new user namespace");
-> > +       }
-> > +       if (result == 'M') {
-> > +               SKIP(free(handle); close(pipefd[0]);
-> > +                    return, "Cannot set uid/gid mappings");
-> > +       }
-> > +       if (result == 'N') {
-> > +               SKIP(free(handle); close(pipefd[0]);
-> > +                    return, "Cannot create new network namespace");
-> > +       }
-> > +
-> > +       /* Should fail with permission denied since we're in a different user namespace */
-> > +       ASSERT_EQ(result, 'P');
-> > +
-> > +       close(pipefd[0]);
-> > +       free(handle);
-> > +}
-> > +
-> > +TEST(nsfs_user_uts_namespace_isolation)
-> > +{
-> > +       struct file_handle *handle;
-> > +       int mount_id;
-> > +       int ret;
-> > +       int fd;
-> > +       int ns_fd;
-> > +       pid_t pid;
-> > +       int status;
-> > +       int pipefd[2];
-> > +       char result;
-> > +
-> > +       handle = malloc(sizeof(*handle) + MAX_HANDLE_SZ);
-> > +       ASSERT_NE(handle, NULL);
-> > +
-> > +       /* Create pipe for communication */
-> > +       ASSERT_EQ(pipe(pipefd), 0);
-> > +
-> > +       /* Get handle for current UTS namespace */
-> > +       ns_fd = open("/proc/self/ns/uts", O_RDONLY);
-> > +       ASSERT_GE(ns_fd, 0);
-> > +
-> > +       handle->handle_bytes = MAX_HANDLE_SZ;
-> > +       ret = name_to_handle_at(ns_fd, "", handle, &mount_id, AT_EMPTY_PATH);
-> > +       if (ret < 0 && errno == EOPNOTSUPP) {
-> > +               SKIP(free(handle); close(ns_fd); close(pipefd[0]);
-> > +                    close(pipefd[1]);
-> > +                    return, "nsfs doesn't support file handles");
-> > +       }
-> > +       ASSERT_EQ(ret, 0);
-> > +       close(ns_fd);
-> > +
-> > +       pid = fork();
-> > +       ASSERT_GE(pid, 0);
-> > +
-> > +       if (pid == 0) {
-> > +               /* Child process */
-> > +               close(pipefd[0]);
-> > +
-> > +               /* First create new user namespace to drop privileges */
-> > +               ret = unshare(CLONE_NEWUSER);
-> > +               if (ret < 0) {
-> > +                       write(pipefd[1], "U",
-> > +                             1); /* Unable to create user namespace */
-> > +                       close(pipefd[1]);
-> > +                       exit(0);
-> > +               }
-> > +
-> > +               /* Write uid/gid mappings to maintain some capabilities */
-> > +               int uid_map_fd = open("/proc/self/uid_map", O_WRONLY);
-> > +               int gid_map_fd = open("/proc/self/gid_map", O_WRONLY);
-> > +               int setgroups_fd = open("/proc/self/setgroups", O_WRONLY);
-> > +
-> > +               if (uid_map_fd < 0 || gid_map_fd < 0 || setgroups_fd < 0) {
-> > +                       write(pipefd[1], "M", 1); /* Unable to set mappings */
-> > +                       close(pipefd[1]);
-> > +                       exit(0);
-> > +               }
-> > +
-> > +               /* Disable setgroups to allow gid mapping */
-> > +               write(setgroups_fd, "deny", 4);
-> > +               close(setgroups_fd);
-> > +
-> > +               /* Map current uid/gid to root in the new namespace */
-> > +               char mapping[64];
-> > +               snprintf(mapping, sizeof(mapping), "0 %d 1", getuid());
-> > +               write(uid_map_fd, mapping, strlen(mapping));
-> > +               close(uid_map_fd);
-> > +
-> > +               snprintf(mapping, sizeof(mapping), "0 %d 1", getgid());
-> > +               write(gid_map_fd, mapping, strlen(mapping));
-> > +               close(gid_map_fd);
-> > +
-> > +               /* Now create new UTS namespace */
-> > +               ret = unshare(CLONE_NEWUTS);
-> > +               if (ret < 0) {
-> > +                       write(pipefd[1], "N",
-> > +                             1); /* Unable to create UTS namespace */
-> > +                       close(pipefd[1]);
-> > +                       exit(0);
-> > +               }
-> > +
-> > +               /* Try to open parent's UTS namespace handle from new user+uts namespace */
-> > +               fd = open_by_handle_at(FD_NSFS_ROOT, handle, O_RDONLY);
-> > +
-> > +               if (fd >= 0) {
-> > +                       /* Should NOT succeed - we're in a different user namespace */
-> > +                       write(pipefd[1], "S", 1); /* Unexpected success */
-> > +                       close(fd);
-> > +               } else if (errno == ESTALE) {
-> > +                       /* Expected: Stale file handle */
-> > +                       write(pipefd[1], "P", 1);
-> > +               } else {
-> > +                       /* Other error */
-> > +                       write(pipefd[1], "F", 1);
-> > +               }
-> > +
-> > +               close(pipefd[1]);
-> > +               exit(0);
-> > +       }
-> > +
-> > +       /* Parent process */
-> > +       close(pipefd[1]);
-> > +       ASSERT_EQ(read(pipefd[0], &result, 1), 1);
-> > +
-> > +       waitpid(pid, &status, 0);
-> > +       ASSERT_TRUE(WIFEXITED(status));
-> > +       ASSERT_EQ(WEXITSTATUS(status), 0);
-> > +
-> > +       if (result == 'U') {
-> > +               SKIP(free(handle); close(pipefd[0]);
-> > +                    return, "Cannot create new user namespace");
-> > +       }
-> > +       if (result == 'M') {
-> > +               SKIP(free(handle); close(pipefd[0]);
-> > +                    return, "Cannot set uid/gid mappings");
-> > +       }
-> > +       if (result == 'N') {
-> > +               SKIP(free(handle); close(pipefd[0]);
-> > +                    return, "Cannot create new UTS namespace");
-> > +       }
-> > +
-> > +       /* Should fail with ESTALE since we're in a different user namespace */
-> > +       ASSERT_EQ(result, 'P');
-> > +
-> > +       close(pipefd[0]);
-> > +       free(handle);
-> > +}
-> > +
-> > +TEST(nsfs_user_ipc_namespace_isolation)
-> > +{
-> > +       struct file_handle *handle;
-> > +       int mount_id;
-> > +       int ret;
-> > +       int fd;
-> > +       int ns_fd;
-> > +       pid_t pid;
-> > +       int status;
-> > +       int pipefd[2];
-> > +       char result;
-> > +
-> > +       handle = malloc(sizeof(*handle) + MAX_HANDLE_SZ);
-> > +       ASSERT_NE(handle, NULL);
-> > +
-> > +       /* Create pipe for communication */
-> > +       ASSERT_EQ(pipe(pipefd), 0);
-> > +
-> > +       /* Get handle for current IPC namespace */
-> > +       ns_fd = open("/proc/self/ns/ipc", O_RDONLY);
-> > +       ASSERT_GE(ns_fd, 0);
-> > +
-> > +       handle->handle_bytes = MAX_HANDLE_SZ;
-> > +       ret = name_to_handle_at(ns_fd, "", handle, &mount_id, AT_EMPTY_PATH);
-> > +       if (ret < 0 && errno == EOPNOTSUPP) {
-> > +               SKIP(free(handle); close(ns_fd); close(pipefd[0]);
-> > +                    close(pipefd[1]);
-> > +                    return, "nsfs doesn't support file handles");
-> > +       }
-> > +       ASSERT_EQ(ret, 0);
-> > +       close(ns_fd);
-> > +
-> > +       pid = fork();
-> > +       ASSERT_GE(pid, 0);
-> > +
-> > +       if (pid == 0) {
-> > +               /* Child process */
-> > +               close(pipefd[0]);
-> > +
-> > +               /* First create new user namespace to drop privileges */
-> > +               ret = unshare(CLONE_NEWUSER);
-> > +               if (ret < 0) {
-> > +                       write(pipefd[1], "U",
-> > +                             1); /* Unable to create user namespace */
-> > +                       close(pipefd[1]);
-> > +                       exit(0);
-> > +               }
-> > +
-> > +               /* Write uid/gid mappings to maintain some capabilities */
-> > +               int uid_map_fd = open("/proc/self/uid_map", O_WRONLY);
-> > +               int gid_map_fd = open("/proc/self/gid_map", O_WRONLY);
-> > +               int setgroups_fd = open("/proc/self/setgroups", O_WRONLY);
-> > +
-> > +               if (uid_map_fd < 0 || gid_map_fd < 0 || setgroups_fd < 0) {
-> > +                       write(pipefd[1], "M", 1); /* Unable to set mappings */
-> > +                       close(pipefd[1]);
-> > +                       exit(0);
-> > +               }
-> > +
-> > +               /* Disable setgroups to allow gid mapping */
-> > +               write(setgroups_fd, "deny", 4);
-> > +               close(setgroups_fd);
-> > +
-> > +               /* Map current uid/gid to root in the new namespace */
-> > +               char mapping[64];
-> > +               snprintf(mapping, sizeof(mapping), "0 %d 1", getuid());
-> > +               write(uid_map_fd, mapping, strlen(mapping));
-> > +               close(uid_map_fd);
-> > +
-> > +               snprintf(mapping, sizeof(mapping), "0 %d 1", getgid());
-> > +               write(gid_map_fd, mapping, strlen(mapping));
-> > +               close(gid_map_fd);
-> > +
-> > +               /* Now create new IPC namespace */
-> > +               ret = unshare(CLONE_NEWIPC);
-> > +               if (ret < 0) {
-> > +                       write(pipefd[1], "N",
-> > +                             1); /* Unable to create IPC namespace */
-> > +                       close(pipefd[1]);
-> > +                       exit(0);
-> > +               }
-> > +
-> > +               /* Try to open parent's IPC namespace handle from new user+ipc namespace */
-> > +               fd = open_by_handle_at(FD_NSFS_ROOT, handle, O_RDONLY);
-> > +
-> > +               if (fd >= 0) {
-> > +                       /* Should NOT succeed - we're in a different user namespace */
-> > +                       write(pipefd[1], "S", 1); /* Unexpected success */
-> > +                       close(fd);
-> > +               } else if (errno == ESTALE) {
-> > +                       /* Expected: Stale file handle */
-> > +                       write(pipefd[1], "P", 1);
-> > +               } else {
-> > +                       /* Other error */
-> > +                       write(pipefd[1], "F", 1);
-> > +               }
-> > +
-> > +               close(pipefd[1]);
-> > +               exit(0);
-> > +       }
-> > +
-> > +       /* Parent process */
-> > +       close(pipefd[1]);
-> > +       ASSERT_EQ(read(pipefd[0], &result, 1), 1);
-> > +
-> > +       waitpid(pid, &status, 0);
-> > +       ASSERT_TRUE(WIFEXITED(status));
-> > +       ASSERT_EQ(WEXITSTATUS(status), 0);
-> > +
-> > +       if (result == 'U') {
-> > +               SKIP(free(handle); close(pipefd[0]);
-> > +                    return, "Cannot create new user namespace");
-> > +       }
-> > +       if (result == 'M') {
-> > +               SKIP(free(handle); close(pipefd[0]);
-> > +                    return, "Cannot set uid/gid mappings");
-> > +       }
-> > +       if (result == 'N') {
-> > +               SKIP(free(handle); close(pipefd[0]);
-> > +                    return, "Cannot create new IPC namespace");
-> > +       }
-> > +
-> > +       /* Should fail with ESTALE since we're in a different user namespace */
-> > +       ASSERT_EQ(result, 'P');
-> > +
-> > +       close(pipefd[0]);
-> > +       free(handle);
-> > +}
-> > +
-> > +TEST(nsfs_user_mnt_namespace_isolation)
-> > +{
-> > +       struct file_handle *handle;
-> > +       int mount_id;
-> > +       int ret;
-> > +       int fd;
-> > +       int ns_fd;
-> > +       pid_t pid;
-> > +       int status;
-> > +       int pipefd[2];
-> > +       char result;
-> > +
-> > +       handle = malloc(sizeof(*handle) + MAX_HANDLE_SZ);
-> > +       ASSERT_NE(handle, NULL);
-> > +
-> > +       /* Create pipe for communication */
-> > +       ASSERT_EQ(pipe(pipefd), 0);
-> > +
-> > +       /* Get handle for current mount namespace */
-> > +       ns_fd = open("/proc/self/ns/mnt", O_RDONLY);
-> > +       ASSERT_GE(ns_fd, 0);
-> > +
-> > +       handle->handle_bytes = MAX_HANDLE_SZ;
-> > +       ret = name_to_handle_at(ns_fd, "", handle, &mount_id, AT_EMPTY_PATH);
-> > +       if (ret < 0 && errno == EOPNOTSUPP) {
-> > +               SKIP(free(handle); close(ns_fd); close(pipefd[0]);
-> > +                    close(pipefd[1]);
-> > +                    return, "nsfs doesn't support file handles");
-> > +       }
-> > +       ASSERT_EQ(ret, 0);
-> > +       close(ns_fd);
-> > +
-> > +       pid = fork();
-> > +       ASSERT_GE(pid, 0);
-> > +
-> > +       if (pid == 0) {
-> > +               /* Child process */
-> > +               close(pipefd[0]);
-> > +
-> > +               /* First create new user namespace to drop privileges */
-> > +               ret = unshare(CLONE_NEWUSER);
-> > +               if (ret < 0) {
-> > +                       write(pipefd[1], "U",
-> > +                             1); /* Unable to create user namespace */
-> > +                       close(pipefd[1]);
-> > +                       exit(0);
-> > +               }
-> > +
-> > +               /* Write uid/gid mappings to maintain some capabilities */
-> > +               int uid_map_fd = open("/proc/self/uid_map", O_WRONLY);
-> > +               int gid_map_fd = open("/proc/self/gid_map", O_WRONLY);
-> > +               int setgroups_fd = open("/proc/self/setgroups", O_WRONLY);
-> > +
-> > +               if (uid_map_fd < 0 || gid_map_fd < 0 || setgroups_fd < 0) {
-> > +                       write(pipefd[1], "M", 1); /* Unable to set mappings */
-> > +                       close(pipefd[1]);
-> > +                       exit(0);
-> > +               }
-> > +
-> > +               /* Disable setgroups to allow gid mapping */
-> > +               write(setgroups_fd, "deny", 4);
-> > +               close(setgroups_fd);
-> > +
-> > +               /* Map current uid/gid to root in the new namespace */
-> > +               char mapping[64];
-> > +               snprintf(mapping, sizeof(mapping), "0 %d 1", getuid());
-> > +               write(uid_map_fd, mapping, strlen(mapping));
-> > +               close(uid_map_fd);
-> > +
-> > +               snprintf(mapping, sizeof(mapping), "0 %d 1", getgid());
-> > +               write(gid_map_fd, mapping, strlen(mapping));
-> > +               close(gid_map_fd);
-> > +
-> > +               /* Now create new mount namespace */
-> > +               ret = unshare(CLONE_NEWNS);
-> > +               if (ret < 0) {
-> > +                       write(pipefd[1], "N",
-> > +                             1); /* Unable to create mount namespace */
-> > +                       close(pipefd[1]);
-> > +                       exit(0);
-> > +               }
-> > +
-> > +               /* Try to open parent's mount namespace handle from new user+mnt namespace */
-> > +               fd = open_by_handle_at(FD_NSFS_ROOT, handle, O_RDONLY);
-> > +
-> > +               if (fd >= 0) {
-> > +                       /* Should NOT succeed - we're in a different user namespace */
-> > +                       write(pipefd[1], "S", 1); /* Unexpected success */
-> > +                       close(fd);
-> > +               } else if (errno == ESTALE) {
-> > +                       /* Expected: Stale file handle */
-> > +                       write(pipefd[1], "P", 1);
-> > +               } else {
-> > +                       /* Other error */
-> > +                       write(pipefd[1], "F", 1);
-> > +               }
-> > +
-> > +               close(pipefd[1]);
-> > +               exit(0);
-> > +       }
-> > +
-> > +       /* Parent process */
-> > +       close(pipefd[1]);
-> > +       ASSERT_EQ(read(pipefd[0], &result, 1), 1);
-> > +
-> > +       waitpid(pid, &status, 0);
-> > +       ASSERT_TRUE(WIFEXITED(status));
-> > +       ASSERT_EQ(WEXITSTATUS(status), 0);
-> > +
-> > +       if (result == 'U') {
-> > +               SKIP(free(handle); close(pipefd[0]);
-> > +                    return, "Cannot create new user namespace");
-> > +       }
-> > +       if (result == 'M') {
-> > +               SKIP(free(handle); close(pipefd[0]);
-> > +                    return, "Cannot set uid/gid mappings");
-> > +       }
-> > +       if (result == 'N') {
-> > +               SKIP(free(handle); close(pipefd[0]);
-> > +                    return, "Cannot create new mount namespace");
-> > +       }
-> > +
-> > +       /* Should fail with ESTALE since we're in a different user namespace */
-> > +       ASSERT_EQ(result, 'P');
-> > +
-> > +       close(pipefd[0]);
-> > +       free(handle);
-> > +}
-> > +
-> > +TEST(nsfs_user_cgroup_namespace_isolation)
-> > +{
-> > +       struct file_handle *handle;
-> > +       int mount_id;
-> > +       int ret;
-> > +       int fd;
-> > +       int ns_fd;
-> > +       pid_t pid;
-> > +       int status;
-> > +       int pipefd[2];
-> > +       char result;
-> > +
-> > +       handle = malloc(sizeof(*handle) + MAX_HANDLE_SZ);
-> > +       ASSERT_NE(handle, NULL);
-> > +
-> > +       /* Create pipe for communication */
-> > +       ASSERT_EQ(pipe(pipefd), 0);
-> > +
-> > +       /* Get handle for current cgroup namespace */
-> > +       ns_fd = open("/proc/self/ns/cgroup", O_RDONLY);
-> > +       if (ns_fd < 0) {
-> > +               SKIP(free(handle); close(pipefd[0]); close(pipefd[1]);
-> > +                    return, "cgroup namespace not available");
-> > +       }
-> > +
-> > +       handle->handle_bytes = MAX_HANDLE_SZ;
-> > +       ret = name_to_handle_at(ns_fd, "", handle, &mount_id, AT_EMPTY_PATH);
-> > +       if (ret < 0 && errno == EOPNOTSUPP) {
-> > +               SKIP(free(handle); close(ns_fd); close(pipefd[0]);
-> > +                    close(pipefd[1]);
-> > +                    return, "nsfs doesn't support file handles");
-> > +       }
-> > +       ASSERT_EQ(ret, 0);
-> > +       close(ns_fd);
-> > +
-> > +       pid = fork();
-> > +       ASSERT_GE(pid, 0);
-> > +
-> > +       if (pid == 0) {
-> > +               /* Child process */
-> > +               close(pipefd[0]);
-> > +
-> > +               /* First create new user namespace to drop privileges */
-> > +               ret = unshare(CLONE_NEWUSER);
-> > +               if (ret < 0) {
-> > +                       write(pipefd[1], "U",
-> > +                             1); /* Unable to create user namespace */
-> > +                       close(pipefd[1]);
-> > +                       exit(0);
-> > +               }
-> > +
-> > +               /* Write uid/gid mappings to maintain some capabilities */
-> > +               int uid_map_fd = open("/proc/self/uid_map", O_WRONLY);
-> > +               int gid_map_fd = open("/proc/self/gid_map", O_WRONLY);
-> > +               int setgroups_fd = open("/proc/self/setgroups", O_WRONLY);
-> > +
-> > +               if (uid_map_fd < 0 || gid_map_fd < 0 || setgroups_fd < 0) {
-> > +                       write(pipefd[1], "M", 1); /* Unable to set mappings */
-> > +                       close(pipefd[1]);
-> > +                       exit(0);
-> > +               }
-> > +
-> > +               /* Disable setgroups to allow gid mapping */
-> > +               write(setgroups_fd, "deny", 4);
-> > +               close(setgroups_fd);
-> > +
-> > +               /* Map current uid/gid to root in the new namespace */
-> > +               char mapping[64];
-> > +               snprintf(mapping, sizeof(mapping), "0 %d 1", getuid());
-> > +               write(uid_map_fd, mapping, strlen(mapping));
-> > +               close(uid_map_fd);
-> > +
-> > +               snprintf(mapping, sizeof(mapping), "0 %d 1", getgid());
-> > +               write(gid_map_fd, mapping, strlen(mapping));
-> > +               close(gid_map_fd);
-> > +
-> > +               /* Now create new cgroup namespace */
-> > +               ret = unshare(CLONE_NEWCGROUP);
-> > +               if (ret < 0) {
-> > +                       write(pipefd[1], "N",
-> > +                             1); /* Unable to create cgroup namespace */
-> > +                       close(pipefd[1]);
-> > +                       exit(0);
-> > +               }
-> > +
-> > +               /* Try to open parent's cgroup namespace handle from new user+cgroup namespace */
-> > +               fd = open_by_handle_at(FD_NSFS_ROOT, handle, O_RDONLY);
-> > +
-> > +               if (fd >= 0) {
-> > +                       /* Should NOT succeed - we're in a different user namespace */
-> > +                       write(pipefd[1], "S", 1); /* Unexpected success */
-> > +                       close(fd);
-> > +               } else if (errno == ESTALE) {
-> > +                       /* Expected: Stale file handle */
-> > +                       write(pipefd[1], "P", 1);
-> > +               } else {
-> > +                       /* Other error */
-> > +                       write(pipefd[1], "F", 1);
-> > +               }
-> > +
-> > +               close(pipefd[1]);
-> > +               exit(0);
-> > +       }
-> > +
-> > +       /* Parent process */
-> > +       close(pipefd[1]);
-> > +       ASSERT_EQ(read(pipefd[0], &result, 1), 1);
-> > +
-> > +       waitpid(pid, &status, 0);
-> > +       ASSERT_TRUE(WIFEXITED(status));
-> > +       ASSERT_EQ(WEXITSTATUS(status), 0);
-> > +
-> > +       if (result == 'U') {
-> > +               SKIP(free(handle); close(pipefd[0]);
-> > +                    return, "Cannot create new user namespace");
-> > +       }
-> > +       if (result == 'M') {
-> > +               SKIP(free(handle); close(pipefd[0]);
-> > +                    return, "Cannot set uid/gid mappings");
-> > +       }
-> > +       if (result == 'N') {
-> > +               SKIP(free(handle); close(pipefd[0]);
-> > +                    return, "Cannot create new cgroup namespace");
-> > +       }
-> > +
-> > +       /* Should fail with ESTALE since we're in a different user namespace */
-> > +       ASSERT_EQ(result, 'P');
-> > +
-> > +       close(pipefd[0]);
-> > +       free(handle);
-> > +}
-> > +
-> > +TEST(nsfs_user_pid_namespace_isolation)
-> > +{
-> > +       struct file_handle *handle;
-> > +       int mount_id;
-> > +       int ret;
-> > +       int fd;
-> > +       int ns_fd;
-> > +       pid_t pid;
-> > +       int status;
-> > +       int pipefd[2];
-> > +       char result;
-> > +
-> > +       handle = malloc(sizeof(*handle) + MAX_HANDLE_SZ);
-> > +       ASSERT_NE(handle, NULL);
-> > +
-> > +       /* Create pipe for communication */
-> > +       ASSERT_EQ(pipe(pipefd), 0);
-> > +
-> > +       /* Get handle for current PID namespace */
-> > +       ns_fd = open("/proc/self/ns/pid", O_RDONLY);
-> > +       ASSERT_GE(ns_fd, 0);
-> > +
-> > +       handle->handle_bytes = MAX_HANDLE_SZ;
-> > +       ret = name_to_handle_at(ns_fd, "", handle, &mount_id, AT_EMPTY_PATH);
-> > +       if (ret < 0 && errno == EOPNOTSUPP) {
-> > +               SKIP(free(handle); close(ns_fd); close(pipefd[0]);
-> > +                    close(pipefd[1]);
-> > +                    return, "nsfs doesn't support file handles");
-> > +       }
-> > +       ASSERT_EQ(ret, 0);
-> > +       close(ns_fd);
-> > +
-> > +       pid = fork();
-> > +       ASSERT_GE(pid, 0);
-> > +
-> > +       if (pid == 0) {
-> > +               /* Child process */
-> > +               close(pipefd[0]);
-> > +
-> > +               /* First create new user namespace to drop privileges */
-> > +               ret = unshare(CLONE_NEWUSER);
-> > +               if (ret < 0) {
-> > +                       write(pipefd[1], "U",
-> > +                             1); /* Unable to create user namespace */
-> > +                       close(pipefd[1]);
-> > +                       exit(0);
-> > +               }
-> > +
-> > +               /* Write uid/gid mappings to maintain some capabilities */
-> > +               int uid_map_fd = open("/proc/self/uid_map", O_WRONLY);
-> > +               int gid_map_fd = open("/proc/self/gid_map", O_WRONLY);
-> > +               int setgroups_fd = open("/proc/self/setgroups", O_WRONLY);
-> > +
-> > +               if (uid_map_fd < 0 || gid_map_fd < 0 || setgroups_fd < 0) {
-> > +                       write(pipefd[1], "M", 1); /* Unable to set mappings */
-> > +                       close(pipefd[1]);
-> > +                       exit(0);
-> > +               }
-> > +
-> > +               /* Disable setgroups to allow gid mapping */
-> > +               write(setgroups_fd, "deny", 4);
-> > +               close(setgroups_fd);
-> > +
-> > +               /* Map current uid/gid to root in the new namespace */
-> > +               char mapping[64];
-> > +               snprintf(mapping, sizeof(mapping), "0 %d 1", getuid());
-> > +               write(uid_map_fd, mapping, strlen(mapping));
-> > +               close(uid_map_fd);
-> > +
-> > +               snprintf(mapping, sizeof(mapping), "0 %d 1", getgid());
-> > +               write(gid_map_fd, mapping, strlen(mapping));
-> > +               close(gid_map_fd);
-> > +
-> > +               /* Now create new PID namespace - requires fork to take effect */
-> > +               ret = unshare(CLONE_NEWPID);
-> > +               if (ret < 0) {
-> > +                       write(pipefd[1], "N",
-> > +                             1); /* Unable to create PID namespace */
-> > +                       close(pipefd[1]);
-> > +                       exit(0);
-> > +               }
-> > +
-> > +               /* Fork again for PID namespace to take effect */
-> > +               pid_t child_pid = fork();
-> > +               if (child_pid < 0) {
-> > +                       write(pipefd[1], "N",
-> > +                             1); /* Unable to fork in PID namespace */
-> > +                       close(pipefd[1]);
-> > +                       exit(0);
-> > +               }
-> > +
-> > +               if (child_pid == 0) {
-> > +                       /* Grandchild in new PID namespace */
-> > +                       /* Try to open parent's PID namespace handle from new user+pid namespace */
-> > +                       fd = open_by_handle_at(FD_NSFS_ROOT, handle, O_RDONLY);
-> > +
-> > +                       if (fd >= 0) {
-> > +                               /* Should NOT succeed - we're in a different user namespace */
-> > +                               write(pipefd[1], "S",
-> > +                                     1); /* Unexpected success */
-> > +                               close(fd);
-> > +                       } else if (errno == ESTALE) {
-> > +                               /* Expected: Stale file handle */
-> > +                               write(pipefd[1], "P", 1);
-> > +                       } else {
-> > +                               /* Other error */
-> > +                               write(pipefd[1], "F", 1);
-> > +                       }
-> > +
-> > +                       close(pipefd[1]);
-> > +                       exit(0);
-> > +               }
-> > +
-> > +               /* Wait for grandchild */
-> > +               waitpid(child_pid, NULL, 0);
-> > +               exit(0);
-> > +       }
-> > +
-> > +       /* Parent process */
-> > +       close(pipefd[1]);
-> > +       ASSERT_EQ(read(pipefd[0], &result, 1), 1);
-> > +
-> > +       waitpid(pid, &status, 0);
-> > +       ASSERT_TRUE(WIFEXITED(status));
-> > +       ASSERT_EQ(WEXITSTATUS(status), 0);
-> > +
-> > +       if (result == 'U') {
-> > +               SKIP(free(handle); close(pipefd[0]);
-> > +                    return, "Cannot create new user namespace");
-> > +       }
-> > +       if (result == 'M') {
-> > +               SKIP(free(handle); close(pipefd[0]);
-> > +                    return, "Cannot set uid/gid mappings");
-> > +       }
-> > +       if (result == 'N') {
-> > +               SKIP(free(handle); close(pipefd[0]);
-> > +                    return, "Cannot create new PID namespace");
-> > +       }
-> > +
-> > +       /* Should fail with ESTALE since we're in a different user namespace */
-> > +       ASSERT_EQ(result, 'P');
-> > +
-> > +       close(pipefd[0]);
-> > +       free(handle);
-> > +}
-> > +
-> > +TEST(nsfs_user_time_namespace_isolation)
-> > +{
-> > +       struct file_handle *handle;
-> > +       int mount_id;
-> > +       int ret;
-> > +       int fd;
-> > +       int ns_fd;
-> > +       pid_t pid;
-> > +       int status;
-> > +       int pipefd[2];
-> > +       char result;
-> > +
-> > +       handle = malloc(sizeof(*handle) + MAX_HANDLE_SZ);
-> > +       ASSERT_NE(handle, NULL);
-> > +
-> > +       /* Create pipe for communication */
-> > +       ASSERT_EQ(pipe(pipefd), 0);
-> > +
-> > +       /* Get handle for current time namespace */
-> > +       ns_fd = open("/proc/self/ns/time", O_RDONLY);
-> > +       if (ns_fd < 0) {
-> > +               SKIP(free(handle); close(pipefd[0]); close(pipefd[1]);
-> > +                    return, "time namespace not available");
-> > +       }
-> > +
-> > +       handle->handle_bytes = MAX_HANDLE_SZ;
-> > +       ret = name_to_handle_at(ns_fd, "", handle, &mount_id, AT_EMPTY_PATH);
-> > +       if (ret < 0 && errno == EOPNOTSUPP) {
-> > +               SKIP(free(handle); close(ns_fd); close(pipefd[0]);
-> > +                    close(pipefd[1]);
-> > +                    return, "nsfs doesn't support file handles");
-> > +       }
-> > +       ASSERT_EQ(ret, 0);
-> > +       close(ns_fd);
-> > +
-> > +       pid = fork();
-> > +       ASSERT_GE(pid, 0);
-> > +
-> > +       if (pid == 0) {
-> > +               /* Child process */
-> > +               close(pipefd[0]);
-> > +
-> > +               /* First create new user namespace to drop privileges */
-> > +               ret = unshare(CLONE_NEWUSER);
-> > +               if (ret < 0) {
-> > +                       write(pipefd[1], "U",
-> > +                             1); /* Unable to create user namespace */
-> > +                       close(pipefd[1]);
-> > +                       exit(0);
-> > +               }
-> > +
-> > +               /* Write uid/gid mappings to maintain some capabilities */
-> > +               int uid_map_fd = open("/proc/self/uid_map", O_WRONLY);
-> > +               int gid_map_fd = open("/proc/self/gid_map", O_WRONLY);
-> > +               int setgroups_fd = open("/proc/self/setgroups", O_WRONLY);
-> > +
-> > +               if (uid_map_fd < 0 || gid_map_fd < 0 || setgroups_fd < 0) {
-> > +                       write(pipefd[1], "M", 1); /* Unable to set mappings */
-> > +                       close(pipefd[1]);
-> > +                       exit(0);
-> > +               }
-> > +
-> > +               /* Disable setgroups to allow gid mapping */
-> > +               write(setgroups_fd, "deny", 4);
-> > +               close(setgroups_fd);
-> > +
-> > +               /* Map current uid/gid to root in the new namespace */
-> > +               char mapping[64];
-> > +               snprintf(mapping, sizeof(mapping), "0 %d 1", getuid());
-> > +               write(uid_map_fd, mapping, strlen(mapping));
-> > +               close(uid_map_fd);
-> > +
-> > +               snprintf(mapping, sizeof(mapping), "0 %d 1", getgid());
-> > +               write(gid_map_fd, mapping, strlen(mapping));
-> > +               close(gid_map_fd);
-> > +
-> > +               /* Now create new time namespace - requires fork to take effect */
-> > +               ret = unshare(CLONE_NEWTIME);
-> > +               if (ret < 0) {
-> > +                       write(pipefd[1], "N",
-> > +                             1); /* Unable to create time namespace */
-> > +                       close(pipefd[1]);
-> > +                       exit(0);
-> > +               }
-> > +
-> > +               /* Fork again for time namespace to take effect */
-> > +               pid_t child_pid = fork();
-> > +               if (child_pid < 0) {
-> > +                       write(pipefd[1], "N",
-> > +                             1); /* Unable to fork in time namespace */
-> > +                       close(pipefd[1]);
-> > +                       exit(0);
-> > +               }
-> > +
-> > +               if (child_pid == 0) {
-> > +                       /* Grandchild in new time namespace */
-> > +                       /* Try to open parent's time namespace handle from new user+time namespace */
-> > +                       fd = open_by_handle_at(FD_NSFS_ROOT, handle, O_RDONLY);
-> > +
-> > +                       if (fd >= 0) {
-> > +                               /* Should NOT succeed - we're in a different user namespace */
-> > +                               write(pipefd[1], "S",
-> > +                                     1); /* Unexpected success */
-> > +                               close(fd);
-> > +                       } else if (errno == ESTALE) {
-> > +                               /* Expected: Stale file handle */
-> > +                               write(pipefd[1], "P", 1);
-> > +                       } else {
-> > +                               /* Other error */
-> > +                               write(pipefd[1], "F", 1);
-> > +                       }
-> > +
-> > +                       close(pipefd[1]);
-> > +                       exit(0);
-> > +               }
-> > +
-> > +               /* Wait for grandchild */
-> > +               waitpid(child_pid, NULL, 0);
-> > +               exit(0);
-> > +       }
-> > +
-> > +       /* Parent process */
-> > +       close(pipefd[1]);
-> > +       ASSERT_EQ(read(pipefd[0], &result, 1), 1);
-> > +
-> > +       waitpid(pid, &status, 0);
-> > +       ASSERT_TRUE(WIFEXITED(status));
-> > +       ASSERT_EQ(WEXITSTATUS(status), 0);
-> > +
-> > +       if (result == 'U') {
-> > +               SKIP(free(handle); close(pipefd[0]);
-> > +                    return, "Cannot create new user namespace");
-> > +       }
-> > +       if (result == 'M') {
-> > +               SKIP(free(handle); close(pipefd[0]);
-> > +                    return, "Cannot set uid/gid mappings");
-> > +       }
-> > +       if (result == 'N') {
-> > +               SKIP(free(handle); close(pipefd[0]);
-> > +                    return, "Cannot create new time namespace");
-> > +       }
-> > +
-> > +       /* Should fail with ESTALE since we're in a different user namespace */
-> > +       ASSERT_EQ(result, 'P');
-> > +
-> > +       close(pipefd[0]);
-> > +       free(handle);
-> > +}
-> > +
-> > +TEST(nsfs_open_flags)
-> > +{
-> > +       struct file_handle *handle;
-> > +       int mount_id;
-> > +       int ret;
-> > +       int fd;
-> > +       int ns_fd;
-> > +       char ns_path[256];
-> > +
-> > +       handle = malloc(sizeof(*handle) + MAX_HANDLE_SZ);
-> > +       ASSERT_NE(handle, NULL);
-> > +
-> > +       /* Open a namespace file descriptor */
-> > +       snprintf(ns_path, sizeof(ns_path), "/proc/self/ns/net");
-> > +       ns_fd = open(ns_path, O_RDONLY);
-> > +       ASSERT_GE(ns_fd, 0);
-> > +
-> > +       /* Get handle for the namespace */
-> > +       handle->handle_bytes = MAX_HANDLE_SZ;
-> > +       ret = name_to_handle_at(ns_fd, "", handle, &mount_id, AT_EMPTY_PATH);
-> > +       if (ret < 0 && errno == EOPNOTSUPP) {
-> > +               SKIP(free(handle); close(ns_fd);
-> > +                    return, "nsfs doesn't support file handles");
-> > +       }
-> > +       ASSERT_EQ(ret, 0);
-> > +       ASSERT_GT(handle->handle_bytes, 0);
-> > +
-> > +       /* Test invalid flags that should fail */
-> > +       fd = open_by_handle_at(FD_NSFS_ROOT, handle, O_WRONLY);
-> > +       ASSERT_LT(fd, 0);
-> > +       ASSERT_EQ(errno, EPERM);
-> > +
-> > +       fd = open_by_handle_at(FD_NSFS_ROOT, handle, O_RDWR);
-> > +       ASSERT_LT(fd, 0);
-> > +       ASSERT_EQ(errno, EPERM);
-> > +
-> > +       fd = open_by_handle_at(FD_NSFS_ROOT, handle, O_CREAT);
-> > +       ASSERT_LT(fd, 0);
-> > +       ASSERT_EQ(errno, EINVAL);
-> > +
-> > +       fd = open_by_handle_at(FD_NSFS_ROOT, handle, O_TRUNC);
-> > +       ASSERT_LT(fd, 0);
-> > +       ASSERT_EQ(errno, EINVAL);
-> > +
-> > +       fd = open_by_handle_at(FD_NSFS_ROOT, handle, O_APPEND);
-> > +       ASSERT_LT(fd, 0);
-> > +       ASSERT_EQ(errno, EINVAL);
-> > +
-> > +       fd = open_by_handle_at(FD_NSFS_ROOT, handle, O_DIRECT);
-> > +       ASSERT_LT(fd, 0);
-> > +       ASSERT_EQ(errno, EINVAL);
-> > +
-> > +       close(ns_fd);
-> > +       free(handle);
-> > +}
-> > +
-> > +TEST_HARNESS_MAIN
-> >
-> > --
-> > 2.47.3
-> >
+T24gV2VkLCAyMDI1LTA5LTEwIGF0IDE0OjMyIC0wNzAwLCBCYXJ0IFZhbiBBc3NjaGUgd3JvdGU6
+DQo+IFVzZSBzY3NpX2RldmljZV9idXN5KCkgaW5zdGVhZCBvZiBvcGVuLWNvZGluZyBpdC4gVGhp
+cyBwYXRjaCBwcmVwYXJlcw0KPiBmb3Igc2tpcHBpbmcgdGhlIFNDU0kgZGV2aWNlIGJ1ZGdldCBt
+YXAgaW5pdGlhbGl6YXRpb24gaW4gY2VydGFpbg0KPiBjYXNlcy4NCj4gDQo+IENjOiBKZW5zIEF4
+Ym9lIDxheGJvZUBrZXJuZWwuZGs+DQo+IENjOiBDaHJpc3RvcGggSGVsbHdpZyA8aGNoQGluZnJh
+ZGVhZC5vcmc+DQo+IENjOiBNaW5nIExlaSA8bWluZy5sZWlAcmVkaGF0LmNvbT4NCj4gQ2M6IEpv
+aG4gR2FycnkgPGpvaG4uZy5nYXJyeUBvcmFjbGUuY29tPg0KPiBTaWduZWQtb2ZmLWJ5OiBCYXJ0
+IFZhbiBBc3NjaGUgPGJ2YW5hc3NjaGVAYWNtLm9yZz4NCj4gLS0tDQo+IMKgZHJpdmVycy91ZnMv
+Y29yZS91ZnNoY2QuYyB8IDQgKystLQ0KPiDCoDEgZmlsZSBjaGFuZ2VkLCAyIGluc2VydGlvbnMo
+KyksIDIgZGVsZXRpb25zKC0pDQo+IA0KDQpSZXZpZXdlZC1ieTogUGV0ZXIgV2FuZyA8cGV0ZXIu
+d2FuZ0BtZWRpYXRlay5jb20+DQoNCg==
