@@ -1,210 +1,186 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A76E826F2BF
-	for <linux-block@vger.kernel.org>; Fri, 12 Sep 2025 08:32:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D876E274FD1
+	for <linux-block@vger.kernel.org>; Fri, 12 Sep 2025 09:12:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757665971; cv=none; b=NSfnMTiybXbz3oocZCl/8D2/eB7jWNNTbPmqXCi4JOfPeKTH1XscfRZokOeXHTOcFNW+OwRo4tTZW1ny27NjLeoLIVFmmlPxM+IshimyqSfrKIHzLvvpyPMUionWEed3igIcNhQLkehA3F87mVJEPiupV10p/OA3QzPCTFGv4Dc=
+	t=1757668344; cv=none; b=mCwQeOmL079xWMMi0HkTCKfV2Or+Grjj8696GnyuXcqLUYivK7RnSR0juuJisgkfA5zJI5AoEQiTClOhLjU9hXUSrx0Z3SaZJW81A0hhQPk9c4Nux2deo8zyyxuroXFmgVwDNC/knEOnKDo1lAizSFbOpUEdffNj4zxWOk9DYaU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757665971; c=relaxed/simple;
-	bh=LipYxOUh3mZhOquz2ghmpDRHwnWmjxQ7Y1qMaDoBYyY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jiZd+Z7RyHWgWPVMZa0w5yWEUWogcraWGOqo1/waaMuOurQll1JdjZqkT15DYlL1jF5doaRkheal2ZgjKJjsJG+2FPPKxC8zoDJ2mpEmEySB/kbblbPmDPCTnseacVOrsh3wC0YA+QzyGCB2K/Xa57aXzUjaohF6XUl33tHZaoY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=NzGZs2Va; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=IJRvEf8M; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=NzGZs2Va; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=IJRvEf8M; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1757668344; c=relaxed/simple;
+	bh=ioIOH2p5Blrv6vNOqNmSCymoSvN1zmkkAsnVeBc1SMY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=FO3PUiGAIFdfPzxEx3TyIpJVDAP9BjgDwnav4G7Uu5qQxzKK+Fa07gZHJ67hbAb7Y89T2VzhYy4OMeRtmLGDqPxYQKPTCtU25FupqjC9xJOSs9GUosydG04pf0Q3JfPXIA7p7WBq8nOGwm2SajaXrIswHvJAf2r3C1C5UC5PqQI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aploMs7w; arc=none smtp.client-ip=209.85.218.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="NzGZs2Va";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="IJRvEf8M";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="NzGZs2Va";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="IJRvEf8M"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 46C8C20706;
-	Fri, 12 Sep 2025 08:32:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1757665967; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=E/CSSfN43nuBpCmvlSQv0g4m2YsMRqWgQtvSodhnH28=;
-	b=NzGZs2VaUva7nAB6VbcEuZSvhBSVlcW4blbtBY6HNBMWWAXbae08r9qYs3v5z+GdRFYgY/
-	VbeEpqO4pA7jByje53TP/rNV4Elzxv+SZjUQ0OFLzzAAZ+Kr/L3Bym88W7Dx4Ul2nVvL3l
-	TyT0M91a3S/Kr9Dj+CvBgTFiBddEJYI=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1757665967;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=E/CSSfN43nuBpCmvlSQv0g4m2YsMRqWgQtvSodhnH28=;
-	b=IJRvEf8MaAIKPa9ZL8mK7o1+fIpbj5bi9eT0ydLdxT6d/IYDCbkKoZdlcbLdgnxuO7SBlJ
-	gjmRz1UNrH/tLXCA==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1757665967; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=E/CSSfN43nuBpCmvlSQv0g4m2YsMRqWgQtvSodhnH28=;
-	b=NzGZs2VaUva7nAB6VbcEuZSvhBSVlcW4blbtBY6HNBMWWAXbae08r9qYs3v5z+GdRFYgY/
-	VbeEpqO4pA7jByje53TP/rNV4Elzxv+SZjUQ0OFLzzAAZ+Kr/L3Bym88W7Dx4Ul2nVvL3l
-	TyT0M91a3S/Kr9Dj+CvBgTFiBddEJYI=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1757665967;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=E/CSSfN43nuBpCmvlSQv0g4m2YsMRqWgQtvSodhnH28=;
-	b=IJRvEf8MaAIKPa9ZL8mK7o1+fIpbj5bi9eT0ydLdxT6d/IYDCbkKoZdlcbLdgnxuO7SBlJ
-	gjmRz1UNrH/tLXCA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 33B4113869;
-	Fri, 12 Sep 2025 08:32:47 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id YkOaDK/aw2hKLgAAD6G6ig
-	(envelope-from <dwagner@suse.de>); Fri, 12 Sep 2025 08:32:47 +0000
-Date: Fri, 12 Sep 2025 10:32:38 +0200
-From: Daniel Wagner <dwagner@suse.de>
-To: Thomas Gleixner <tglx@linutronix.de>
-Cc: Hannes Reinecke <hare@suse.de>, Daniel Wagner <wagi@kernel.org>, 
-	Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>, 
-	Sagi Grimberg <sagi@grimberg.me>, "Michael S. Tsirkin" <mst@redhat.com>, 
-	Aaron Tomlin <atomlin@atomlin.com>, "Martin K. Petersen" <martin.petersen@oracle.com>, 
-	Costa Shulyupin <costa.shul@redhat.com>, Juri Lelli <juri.lelli@redhat.com>, 
-	Valentin Schneider <vschneid@redhat.com>, Waiman Long <llong@redhat.com>, Ming Lei <ming.lei@redhat.com>, 
-	Frederic Weisbecker <frederic@kernel.org>, Mel Gorman <mgorman@suse.de>, 
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
-	linux-nvme@lists.infradead.org, megaraidlinux.pdl@broadcom.com, linux-scsi@vger.kernel.org, 
-	storagedev@microchip.com, virtualization@lists.linux.dev, 
-	GR-QLogic-Storage-Upstream@marvell.com
-Subject: Re: [PATCH v8 10/12] blk-mq: use hk cpus only when isolcpus=io_queue
- is enabled
-Message-ID: <bc5ebdea-7091-4999-a021-ec2a65573aa0@flourine.local>
-References: <20250905-isolcpus-io-queues-v8-0-885984c5daca@kernel.org>
- <20250905-isolcpus-io-queues-v8-10-885984c5daca@kernel.org>
- <ff66801c-f261-411d-bbbf-b386e013d096@suse.de>
- <d11a0c60-1b75-49ec-a2f8-7df402c4adf2@flourine.local>
- <87ms72u3at.ffs@tglx>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aploMs7w"
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-aff0775410eso468128066b.0
+        for <linux-block@vger.kernel.org>; Fri, 12 Sep 2025 02:12:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1757668341; x=1758273141; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ioIOH2p5Blrv6vNOqNmSCymoSvN1zmkkAsnVeBc1SMY=;
+        b=aploMs7whY/LgaXCAuOUQbkHlH9PozV3z9HFoHHh4tp/dJFhM6pt21fAvHgYgjlN8M
+         rmpVcHSueNagemUBdQowpA6BdoN7gqqaLplS1v3ScHX+yKhTwev5VBs4Bed/9bkH4dLN
+         4rfLLpcIvHJONxgYVXSLM7qEor3rn+MmXCTKDCzXypEm5HHBP38sGD0OFUOjAm326bQ+
+         1r2w7gh4g7621FkXF6rJzjHEIMZg4g13DDPyWgPK4mWuR3T6PMXO71Jvdha7GKG/r6lh
+         avbJhFNvPx4G+gPZm0XJKYAQwKp/BQENGe5DK6uHxVZst/QOlcM6CwamdS6qIfXycNC8
+         TKgw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757668341; x=1758273141;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ioIOH2p5Blrv6vNOqNmSCymoSvN1zmkkAsnVeBc1SMY=;
+        b=bICXcrKbdvgvjs/cvMpoWlVNh1O5SSVmS49o0dKdLPNp7Ma3G3NpaR87uGDlDiC/aI
+         9Mnt0Fu0BzyVM4N0ucXwLXHwpUzbUX8Hp7u2VWsbBzCtRkrRBlN5puavCuJYsTloLlqv
+         gZe/YpU6wCzJek+IdRkJubgJVCWTHZgLS2fju06hccy0LneUC66P2Lrw3fpHLNRU1Rrm
+         00EDh1T9dZa8Xj4oMw9pZ3i+zeSN1OarnhDTeQqA8bB9I31duvhZmMPzCCcS6QLLhs4m
+         1Yd0hva7nctVpUx0B+lnOP4l7sMR1rRnaWdRUvppp1wFsfFUJrg7CGO6YF+6VlEk5xj0
+         bn3Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXnuGFU4WvSvxlOSji0FteZlWA8JAuZkptk5bH809KMVdwTWJrIQt2kTTq4jbxLnNBX9XvrtYElZgmbYg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxzDuBo82w9qxhmjxdaCSQUCelA2dxIjFL+jUX+R29F9j/m8iNE
+	fp3CBz6sHxaWnADDBwKoYVJTfXMxtZrkhLcAHUTmozwJ+syevE4wQiFcxVAHErMzu0FEDgaqlky
+	xk//qrQeDFx21dbD+clnjE+q66Xd2hOY=
+X-Gm-Gg: ASbGncuqU20jlZTNp7sHbm83Z70zSkyUxYxQg5GJnTb8MR//rLL4pz2K084q2mGlt6t
+	8U4DHbMegCBE9pF0VjkeyZznBpYZLDs3DNOJ3qIRQ7zRzGT7nUmgnm0aWkCO/E1Cwt5EE4UXpEQ
+	Z/4WD52DErKa/ZRwqhdzr31kvPVyprrGGl2PxGxGkStxel8CYFjTo6zheQ9LZBonvp94vgbQRoR
+	LCSMNU=
+X-Google-Smtp-Source: AGHT+IECQ2FSxCpELdyt8w8+Ta17OX81olY1L21qGnLXRiiNiAsbzwmD/JJZPTQJsBBXBb5BWfCf5Q2bF6gDjvOJbJk=
+X-Received: by 2002:a17:907:3e9f:b0:b04:3402:391c with SMTP id
+ a640c23a62f3a-b07a68bddd8mr590036766b.24.1757668340932; Fri, 12 Sep 2025
+ 02:12:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87ms72u3at.ffs@tglx>
-X-Spam-Level: 
-X-Spamd-Result: default: False [-4.30 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-0.999];
-	MIME_GOOD(-0.10)[text/plain];
-	MISSING_XM_UA(0.00)[];
-	ARC_NA(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[26];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_HAS_DN(0.00)[];
-	R_RATELIMIT(0.00)[to_ip_from(RL67935bhfdkbndpbo95z3ogoo)];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo]
-X-Spam-Flag: NO
-X-Spam-Score: -4.30
+References: <20250910-work-namespace-v1-0-4dd56e7359d8@kernel.org>
+ <20250910-work-namespace-v1-27-4dd56e7359d8@kernel.org> <CAOQ4uxgtQQa-jzsnTBxgUTPzgtCiAaH8X6ffMqd+1Y5Jjy0dmQ@mail.gmail.com>
+ <20250911-werken-raubzug-64735473739c@brauner> <CAOQ4uxgMgzOjz4E-4kJFJAz3Dpd=Q6vXoGrhz9F0=mb=4XKZqA@mail.gmail.com>
+ <20250912-wirsing-karibus-7f6a98621dd1@brauner>
+In-Reply-To: <20250912-wirsing-karibus-7f6a98621dd1@brauner>
+From: Amir Goldstein <amir73il@gmail.com>
+Date: Fri, 12 Sep 2025 11:12:09 +0200
+X-Gm-Features: Ac12FXzXlVrWyNxThzcVLm8bWdnJouio3PTW50wsmgaWY6Ne9FaEF2yc3iNy4og
+Message-ID: <CAOQ4uxgGpdQ42d-QRuHbvdrvZWrS9qz9=A2GRa2Bq-sMcK6w4w@mail.gmail.com>
+Subject: Re: [PATCH 27/32] nsfs: support file handles
+To: Christian Brauner <brauner@kernel.org>
+Cc: Jan Kara <jack@suse.cz>, linux-fsdevel@vger.kernel.org, 
+	Josef Bacik <josef@toxicpanda.com>, Jeff Layton <jlayton@kernel.org>, Mike Yuan <me@yhndnzj.com>, 
+	=?UTF-8?Q?Zbigniew_J=C4=99drzejewski=2DSzmek?= <zbyszek@in.waw.pl>, 
+	Lennart Poettering <mzxreary@0pointer.de>, Daan De Meyer <daan.j.demeyer@gmail.com>, 
+	Aleksa Sarai <cyphar@cyphar.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, 
+	=?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, Chuck Lever <chuck.lever@oracle.com>, linux-nfs@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, cgroups@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Sep 10, 2025 at 10:20:26AM +0200, Thomas Gleixner wrote:
-> On Mon, Sep 08 2025 at 09:26, Daniel Wagner wrote:
-> > On Mon, Sep 08, 2025 at 08:13:31AM +0200, Hannes Reinecke wrote:
-> >> >   const struct cpumask *blk_mq_online_queue_affinity(void)
-> >> >   {
-> >> > +	if (housekeeping_enabled(HK_TYPE_IO_QUEUE)) {
-> >> > +		cpumask_and(&blk_hk_online_mask, cpu_online_mask,
-> >> > +			    housekeeping_cpumask(HK_TYPE_IO_QUEUE));
-> >> > +		return &blk_hk_online_mask;
-> >> 
-> >> Can you explain the use of 'blk_hk_online_mask'?
-> >> Why is a static variable?
+On Fri, Sep 12, 2025 at 10:20=E2=80=AFAM Christian Brauner <brauner@kernel.=
+org> wrote:
+>
+> On Thu, Sep 11, 2025 at 01:36:28PM +0200, Amir Goldstein wrote:
+> > On Thu, Sep 11, 2025 at 11:31=E2=80=AFAM Christian Brauner <brauner@ker=
+nel.org> wrote:
+> > >
+> > > On Wed, Sep 10, 2025 at 07:21:22PM +0200, Amir Goldstein wrote:
+> > > > On Wed, Sep 10, 2025 at 4:39=E2=80=AFPM Christian Brauner <brauner@=
+kernel.org> wrote:
+> > > > >
+> > > > > A while ago we added support for file handles to pidfs so pidfds =
+can be
+> > > > > encoded and decoded as file handles. Userspace has adopted this q=
+uickly
+> > > > > and it's proven very useful.
+> > > >
+> > > > > Pidfd file handles are exhaustive meaning
+> > > > > they don't require a handle on another pidfd to pass to
+> > > > > open_by_handle_at() so it can derive the filesystem to decode in.
+> > > > >
+> > > > > Implement the exhaustive file handles for namespaces as well.
+> > > >
+> > > > I think you decide to split the "exhaustive" part to another patch,
+> > > > so better drop this paragraph?
+> > >
+> > > Yes, good point. I've dont that.
+> > >
+> > > > I am missing an explanation about the permissions for
+> > > > opening these file handles.
+> > > >
+> > > > My understanding of the code is that the opener needs to meet one o=
+f
+> > > > the conditions:
+> > > > 1. user has CAP_SYS_ADMIN in the userns owning the opened namespace
+> > > > 2. current task is in the opened namespace
+> > >
+> > > Yes.
+> > >
+> > > >
+> > > > But I do not fully understand the rationale behind the 2nd conditio=
+n,
+> > > > that is, when is it useful?
+> > >
+> > > A caller is always able to open a file descriptor to it's own set of
+> > > namespaces. File handles will behave the same way.
+> > >
 > >
-> > The blk_mq_*_queue_affinity helpers return a const struct cpumask *, the
-> > caller doesn't need to free the return value. Because cpumask_and needs
-> > store its result somewhere, I opted for the global static variable.
+> > I understand why it's safe, and I do not object to it at all,
+> > I just feel that I do not fully understand the use case of how ns file =
+handles
+> > are expected to be used.
+> > A process can always open /proc/self/ns/mnt
+> > What's the use case where a process may need to open its own ns by hand=
+le?
 > >
-> >> To my untrained eye it's being recalculated every time one calls
-> >> this function. And only the first invocation run on an empty mask,
-> >> all subsequent ones see a populated mask.
+> > I will explain. For CAP_SYS_ADMIN I can see why keeping handles that
+> > do not keep an elevated refcount of ns object could be useful in the sa=
+me
+> > way that an NFS client keeps file handles without keeping the file obje=
+ct alive.
 > >
-> > The cpu_online_mask might change over time, it's not a static bitmap.
-> > Thus it's necessary to update the blk_hk_online_mask. Doing some sort of
-> > caching is certainly possible. Given that we have plenty of cpumask
-> > logic operation in the cpu_group_evenly code path later, I am not so
-> > sure this really makes a huge difference.
-> 
-> Sure,  but none of this is serialized against CPU hotplug operations. So
-> the resulting mask, which is handed into the spreading code can be
-> concurrently modified. IOW it's not as const as the code claims.
+> > But if you do not have CAP_SYS_ADMIN and can only open your own ns
+> > by handle, what is the application that could make use of this?
+> > and what's the benefit of such application keeping a file handle instea=
+d of
+> > ns fd?
+>
+> A process is not always able to open /proc/self/ns/. That requires
+> procfs to be mounted and for /proc/self/ or /proc/self/ns/ to not be
+> overmounted. However, they can derive a namespace fd from their own
+> pidfd. And that also always works if it's their own namespace.
+>
+> There's no need to introduce unnecessary behavioral differences between
+> /proc/self/ns/, pidfd-derived namespace fs, and file-handle-derived
+> namespace fds. That's just going to be confusing.
+>
+> The other thing is that there are legitimate use-case for encoding your
+> own namespace. For example, you might store file handles to your set of
+> namespaces in a file on-disk so you can verify when you get rexeced that
+> they're still valid and so on. This is akin to the pidfd use-case.
+>
+> Or just plainly for namespace comparison reasons where you keep a file
+> handle to your own namespaces and can then easily check against others.
 
-Thanks for explaining.
+OK. As I said no objections I was just curious about this use case.
 
-In group_cpu_evenly:
+FWIW, comparing current ns to a stored file handle does not really require
+permission to open_by_handle_at(). name_to_handle_at() the current ns
+and binary compare to the stored file handle should be a viable option.
 
-	/*
-	 * Make a local cache of 'cpu_present_mask', so the two stages
-	 * spread can observe consistent 'cpu_present_mask' without holding
-	 * cpu hotplug lock, then we can reduce deadlock risk with cpu
-	 * hotplug code.
-	 *
-	 * Here CPU hotplug may happen when reading `cpu_present_mask`, and
-	 * we can live with the case because it only affects that hotplug
-	 * CPU is handled in the 1st or 2nd stage, and either way is correct
-	 * from API user viewpoint since 2-stage spread is sort of
-	 * optimization.
-	 */
-	cpumask_copy(npresmsk, data_race(cpu_present_mask));
+This was exactly the reason for introducing AT_HANDLE_FID, so that fanotify
+unprivileged watcher with no permission to open_by_handle_at() could compar=
+e
+an fid reported in an event with another fid they obtained earlier with
+name_to_handle_at() and kept in a map.
 
-
-0263f92fadbb ("lib/group_cpus.c: avoid acquiring cpu hotplug lock in
-group_cpus_evenly"):
-
-  group_cpus_evenly() could be part of storage driver's error handler, such
-  as nvme driver, when may happen during CPU hotplug, in which storage queue
-  has to drain its pending IOs because all CPUs associated with the queue
-  are offline and the queue is becoming inactive.  And handling IO needs
-  error handler to provide forward progress.
-
-  Then deadlock is caused:
-
-  1) inside CPU hotplug handler, CPU hotplug lock is held, and blk-mq's
-     handler is waiting for inflight IO
-
-  2) error handler is waiting for CPU hotplug lock
-
-  3) inflight IO can't be completed in blk-mq's CPU hotplug handler
-     because error handling can't provide forward progress.
-
-  Solve the deadlock by not holding CPU hotplug lock in group_cpus_evenly(),
-  in which two stage spreads are taken: 1) the 1st stage is over all present
-  CPUs; 2) the end stage is over all other CPUs.
-
-  Turns out the two stage spread just needs consistent 'cpu_present_mask',
-  and remove the CPU hotplug lock by storing it into one local cache.  This
-  way doesn't change correctness, because all CPUs are still covered.
-
-This sounds like I should do something similar with cpu_online_mask.
-Anyway, I'll work on this.
-
-> How is this even remotely correct?
-
-It isn't :( I did hotplug tests but obviously these were not really up
-to the task. The kernel test bot gave me a pointer how I should test.
+Thanks for the explanation!
+Amir.
