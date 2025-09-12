@@ -1,174 +1,159 @@
-Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
+Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 679E0381C4;
-	Fri, 12 Sep 2025 01:11:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.119
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3E43222582
+	for <linux-block@vger.kernel.org>; Fri, 12 Sep 2025 03:14:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757639467; cv=none; b=K77nuxEVKirX87aQ+94rLhKAuazGZio7p+dkI/LYrmzJRXt4RvJb3w/3VeKIL7TSQ3XsVrdksnYLczeDYvW5ylvozTtjiQ+OoLXQbMaahIzS4nal0EqbKiscZUlzxQTKJPujPdZDJ8s7kuuxUwe0sJNSecJ8cioaX9SBnpb7cIo=
+	t=1757646902; cv=none; b=CYXYjlF4hX0QHsZs6VXISKUGH+mKmsX9YoEKMKTwQA37ORAN2Ho3raSaU10lSA1kOOikMFsjQdXcVuRzoXCuSroHeNQPN6pzTeITIRz3auf3K+5iCmLiOlpwEzgRSK4PM+dX3UEwu+q3VwthBtYsPIMAYnZpPh5+Wl4aSg5cfEo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757639467; c=relaxed/simple;
-	bh=vqPSzQgj6c/vcGJwIGjwfFlNQHUveO6QouzOa9uIMuU=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=PPhMr5grnduUlLInhu1QN5lgbcLCOiECaRMYFr9JklRKzw1sPZCJS7vDUeUtg0huY0/u3RunRbDwaaSiyV2RhMGchtZsT1Ji/Z3M10U8eMNabqmIdlOt66C4Se5G4AniNB8+P2a1QSEK6iffUK32gvyhPgWyaR4CoFEGVmboWMk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=tHPiMtqG; arc=none smtp.client-ip=115.124.30.119
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+	s=arc-20240116; t=1757646902; c=relaxed/simple;
+	bh=A8Zgi4kyYrz+VcezB5BnREYndevofiMV6qNejq8swZM=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:MIME-Version:
+	 Content-Type:References; b=XlybLlNBv01D8dK8uQD99zuKF5DQJ+RZOiVXTWOBgHnpbkNFFaXqNbBJH1obN9uOrj35R4nztR4oW4DvCFVlIRqs2H15rgtl5vVK6kNWNCzsPofkLZE3+2sf0JpH4SsIBD+VGi9TfxZZ8osn7AXRkKzYAp4eBVtkNF9DXGEQ3M8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=NAZg/u0v; arc=none smtp.client-ip=203.254.224.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="tHPiMtqG"
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1757639461; h=Message-ID:Date:MIME-Version:Subject:From:To:Content-Type;
-	bh=92OXjVgj5kXo0QHletDaCdXlq03ag7yLQDUAH9tWdAo=;
-	b=tHPiMtqGxu0ObSi+aLybSaWQnGCUnEN+B3bCXewtsK8erbJwF4xdODTfXdlBa9uhVRn0hqcgM4YvyMCGkRs3PX5fq8KMP6qGkMMYijw9iy+w4vJKS9UTbvylBKjIWdMSDC+pvwWQE3umaSZsLwXYeE8NAFap6TW6e+R+IKsA+GE=
-Received: from 30.180.0.242(mailfrom:hsiangkao@linux.alibaba.com fp:SMTPD_---0WnoZ3GP_1757639460 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Fri, 12 Sep 2025 09:11:01 +0800
-Message-ID: <267abd34-2337-4ae3-ae95-5126e9f9b51c@linux.alibaba.com>
-Date: Fri, 12 Sep 2025 09:10:59 +0800
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="NAZg/u0v"
+Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
+	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20250912031457epoutp029b57ea4747e740f1557f87b4d3229965~kaoqGr_CR1190711907epoutp02G
+	for <linux-block@vger.kernel.org>; Fri, 12 Sep 2025 03:14:57 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20250912031457epoutp029b57ea4747e740f1557f87b4d3229965~kaoqGr_CR1190711907epoutp02G
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1757646897;
+	bh=3NM0DqzQah0ZzTtHgBZREV5jdbjqfPi7VwM4heyyDus=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=NAZg/u0vFDHwRQgNRAWV0/0J7dmipScMQXNPiz3tq6Mthxz4xiZqYf97h7wOjekDA
+	 SSo3qk8EhLqa7MbTpc1tKGwW0hKybggQKaD/56fj5zBBl9M+4ZeO3UKyt42qpXRQ7u
+	 J+BbGzPytEh7XAWTxtSdLchosmXi9y3OpSWFSNPU=
+Received: from epsnrtp04.localdomain (unknown [182.195.42.156]) by
+	epcas5p2.samsung.com (KnoxPortal) with ESMTPS id
+	20250912031457epcas5p269cebe29bef1c77c2a7588c0d9032554~kaopvGOHy1904519045epcas5p22;
+	Fri, 12 Sep 2025 03:14:57 +0000 (GMT)
+Received: from epcas5p4.samsung.com (unknown [182.195.38.89]) by
+	epsnrtp04.localdomain (Postfix) with ESMTP id 4cNKKr37ymz6B9m5; Fri, 12 Sep
+	2025 03:14:56 +0000 (GMT)
+Received: from epsmtip1.samsung.com (unknown [182.195.34.30]) by
+	epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
+	20250912031032epcas5p3f38da43ad6cf93b849bb44f14e49c8f9~kaky5-geZ0074300743epcas5p3n;
+	Fri, 12 Sep 2025 03:10:32 +0000 (GMT)
+Received: from node122.. (unknown [109.105.118.122]) by epsmtip1.samsung.com
+	(KnoxPortal) with ESMTPA id
+	20250912031031epsmtip1f497818f0ca9f7b10491d8a2eff7816c~kakyNZGVV3046230462epsmtip1O;
+	Fri, 12 Sep 2025 03:10:31 +0000 (GMT)
+From: Xue He <xue01.he@samsung.com>
+To: yukuai1@huaweicloud.com
+Cc: axboe@kernel.dk, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, xue01.he@samsung.com, yukuai3@huawei.com
+Subject: Re: [PATCH] block: plug attempts to batch allocate tags multiple
+ times
+Date: Fri, 12 Sep 2025 03:06:01 +0000
+Message-Id: <20250912030601.236426-1-xue01.he@samsung.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <bfc12406-e608-b3fa-45e7-2105d9cc15bf@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 13/16] iomap: move read/readahead logic out of
- CONFIG_BLOCK guard
-From: Gao Xiang <hsiangkao@linux.alibaba.com>
-To: Joanne Koong <joannelkoong@gmail.com>
-Cc: Christoph Hellwig <hch@infradead.org>, brauner@kernel.org,
- miklos@szeredi.hu, djwong@kernel.org, linux-block@vger.kernel.org,
- gfs2@lists.linux.dev, linux-fsdevel@vger.kernel.org, kernel-team@meta.com,
- linux-xfs@vger.kernel.org, linux-doc@vger.kernel.org
-References: <20250908185122.3199171-1-joannelkoong@gmail.com>
- <20250908185122.3199171-14-joannelkoong@gmail.com>
- <a1529c0f-1f1a-477a-aeeb-a4f108aab26b@linux.alibaba.com>
- <CAJnrk1aCCqoOAgcPUpr+Z09DhJ5BAYoSho5dveGQKB9zincYSQ@mail.gmail.com>
- <0b33ab17-2fc0-438f-95aa-56a1d20edb38@linux.alibaba.com>
- <aMK0lC5iwM0GWKHq@infradead.org>
- <9c104881-f09e-4594-9e41-0b6f75a5308c@linux.alibaba.com>
- <CAJnrk1b2_XGfMuK-UAej31TtCAAg5Aq8PFS_36yyGg8NerA97g@mail.gmail.com>
- <6609e444-5210-42aa-b655-8ed8309aae75@linux.alibaba.com>
- <66971d07-2c1a-4632-bc9e-e0fc0ae2bd04@linux.alibaba.com>
-In-Reply-To: <66971d07-2c1a-4632-bc9e-e0fc0ae2bd04@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-CMS-MailID: 20250912031032epcas5p3f38da43ad6cf93b849bb44f14e49c8f9
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+cpgsPolicy: CPGSC10-505,Y
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20250912031032epcas5p3f38da43ad6cf93b849bb44f14e49c8f9
+References: <bfc12406-e608-b3fa-45e7-2105d9cc15bf@huaweicloud.com>
+	<CGME20250912031032epcas5p3f38da43ad6cf93b849bb44f14e49c8f9@epcas5p3.samsung.com>
 
+On 2025/09/03 18:35 PM, Yu Kuai wrote:
+>On 2025/09/03 16:41 PM, Xue He wrote:
+>> On 2025/09/02 08:47 AM, Yu Kuai wrote:
+>>> On 2025/09/01 16:22, Xue He wrote:
+>> ......
+>
+>
+>Yes, so this function will likely to obtain less tags than nr_tags,the
+>mask is always start from first zero bit with nr_tags bit, and
+>sbitmap_deferred_clear() is called uncondionally, it's likely there are
+>non-zero bits within this range.
+>
+>Just wonder, do you consider fixing this directly in
+>__blk_mq_alloc_requests_batch()?
+>
+>  - call sbitmap_deferred_clear() and retry on allocation failure, so
+>that the whole word can be used even if previous allocated request are
+>done, especially for nvme with huge tag depths;
+>  - retry blk_mq_get_tags() until data->nr_tags is zero;
 
+Hi, Yu Kuai, I'm not entirely sure if I understand correctly, but during
+each tag allocation, sbitmap_deferred_clear() is typically called first, 
+as seen in the __sbitmap_queue_get_batch() function.
 
-On 2025/9/12 09:09, Gao Xiang wrote:
-> 
-> 
-> On 2025/9/12 08:06, Gao Xiang wrote:
->>
->>
->> On 2025/9/12 03:45, Joanne Koong wrote:
->>> On Thu, Sep 11, 2025 at 8:29 AM Gao Xiang <hsiangkao@linux.alibaba.com> wrote:
->>
->> ...
->>
->>>> ```
->>>>
->>>> But if FUSE or some other fs later needs to request L2P information
->>>> in their .iomap_begin() and need to send L2P requests to userspace
->>>> daemon to confirm where to get the physical data (maybe somewhat
->>>> like Darrick's work but I don't have extra time to dig into that
->>>> either) rather than just something totally bypass iomap-L2P logic
->>>> as above, then I'm not sure the current `iomap_iter->private` is
->>>> quite seperate to `struct iomap_read_folio_ctx->private`, it seems
->>>
->>> If in the future this case arises, the L2P mapping info is accessible
->>> by the read callback in the current design. `.read_folio_range()`
->>> passes the iomap iter to the filesystem and they can access
->>> iter->private to get the L2P mapping data they need.
->>
->> The question is what exposes to `iter->private` then, take
->> an example:
->>
->> ```
->> struct file *file;
->> ```
->>
->> your .read_folio_range() needs `file->private_data` to get
->> `struct fuse_file` so `file` is kept into
->> `struct iomap_read_folio_ctx`.
->>
->> If `file->private_data` will be used for `.iomap_begin()`
->> as well, what's your proposal then?
->>
->> Duplicate the same `file` pointer in both
->> `struct iomap_read_folio_ctx` and `iter->private` context?
-> 
-> It's just an not-so-appropriate example because
-> `struct file *` and `struct fuse_file *` are widely used
-> in the (buffer/direct) read/write flow but Darrick's work
-> doesn't use `file` in .iomap_{begin/end}.
-> 
-> But you may find out `file` pointer is already used for
-> both FUSE buffer write and your proposal, e.g.
-> 
-> buffer write:
->   /*
->    * Use iomap so that we can do granular uptodate reads
->    * and granular dirty tracking for large folios.
->    */
->   written = iomap_file_buffered_write(iocb, from,
->                                       &fuse_iomap_ops,
->                                       &fuse_iomap_write_ops,
->                                       file);
+        for (i = 0; i < sb->map_nr; i++) {
+                struct sbitmap_word *map = &sb->map[index];
+                unsigned long get_mask;
+                unsigned int map_depth = __map_depth(sb, index);
+                unsigned long val;
 
-And your buffer write per-fs context seems just use
-`iter->private` entirely instead to keep `file`.
+                sbitmap_deferred_clear(map, 0, 0, 0);
+------------------------------------------------------------------------
+so I try to recall blk_mq_get_tags() until data->nr_tags is zero, like:
 
-> 
-> 
-> I just try to say if there is a case/feature which needs
-> something previously in `struct iomap_read_folio_ctx` to
-> be available in .iomap_{begin,end} too, you have to either:
->   - duplicate this in `iter->private` as well;
->   - move this to `iter->private` entirely.
-> 
-> The problem is that both `iter->private` and
-> `struct iomap_read_folio_ctx` are filesystem-specific,
-> I can only see there is no clear boundary to leave something
-> in which one.  It seems just like an artificial choice.
-> 
-> Thanks,
-> Gao Xiang
-> 
->>
->>
->>>
->>>> both needs fs-specific extra contexts for the same I/O flow.
->>>>
->>>> I think the reason why `struct iomap_read_folio_ctx->private` is
->>>> introduced is basically previous iomap filesystems are all
->>>> bio-based, and they shares `bio` concept in common but
->>>> `iter->private` was not designed for this usage.
->>>>
->>>> But fuse `struct iomap_read_folio_ctx` and
->>>> `struct fuse_fill_read_data` are too FUSE-specific, I cannot
->>>> see it could be shared by other filesystems in the near future,
->>>> which is much like a single-filesystem specific concept, and
->>>> unlike to `bio` at all.
->>>
->>> Currently fuse is the only non-block-based filesystem using iomap but
->>> I don't see why there wouldn't be more in the future. For example,
->>> while looking at some of the netfs code, a lot of the core
->>> functionality looks the same between that and iomap and I think it
->>> might be a good idea to have netfs in the future use iomap's interface
->>> so that it can get the large folio dirty/uptodate tracking stuff and
->>> any other large folio stuff like more granular writeback stats
->>> accounting for free.
->>
->> I think you need to ask David on this idea, I've told him to
->> switch fscache to use iomap in 2022 before netfs is fully out [1],
->> but I don't see it will happen.
->>
->> [1] https://lore.kernel.org/linux-fsdevel/YfivxC9S52FlyKoL@B-P7TQMD6M-0146/
->>
->> Thanks,
->> Gao Xiang
-> 
+-       int i, nr = 0;
 
+-       tag_mask = blk_mq_get_tags(data, data->nr_tags, &tag_offset);
+-       if (unlikely(!tag_mask))
+-               return NULL;
+-
+-       tags = blk_mq_tags_from_data(data);
+-       for (i = 0; tag_mask; i++) {
+-               if (!(tag_mask & (1UL << i)))
+-                       continue;
+-               tag = tag_offset + i;
+-               prefetch(tags->static_rqs[tag]);
+-               tag_mask &= ~(1UL << i);
+-               rq = blk_mq_rq_ctx_init(data, tags, tag);
+-               rq_list_add_head(data->cached_rqs, rq);
+-               nr++;
+-       }
+-       if (!(data->rq_flags & RQF_SCHED_TAGS))
+-               blk_mq_add_active_requests(data->hctx, nr);
+-       /* caller already holds a reference, add for remainder */
+-       percpu_ref_get_many(&data->q->q_usage_counter, nr - 1);
+-       data->nr_tags -= nr;
++       do {
++               int i, nr = 0;
++               tag_mask = blk_mq_get_tags(data, data->nr_tags, &tag_offset);
++               if (unlikely(!tag_mask))
++                       return NULL;
++               tags = blk_mq_tags_from_data(data);
++               for (i = 0; tag_mask; i++) {
++                       if (!(tag_mask & (1UL << i)))
++                               continue;
++                       tag = tag_offset + i;
++                       prefetch(tags->static_rqs[tag]);
++                       tag_mask &= ~(1UL << i);
++                       rq = blk_mq_rq_ctx_init(data, tags, tag);
++                       rq_list_add_head(data->cached_rqs, rq);
++                       nr++;
++               }
++               if (!(data->rq_flags & RQF_SCHED_TAGS))
++                       blk_mq_add_active_requests(data->hctx, nr);
++               /* caller already holds a reference, add for remainder */
++               percpu_ref_get_many(&data->q->q_usage_counter, nr - 1);
++               data->nr_tags -= nr;
++       } while (data->nr_tags);
+
+I added a loop structure, it also achieve a good results like before,
+but I have a question: although the loop will retry tag allocation
+when the required number of tags is not met, there is a risk of an
+infinite loop, right? However, I couldn't think of a safer condition
+to terminate the loop. Do you have any suggestions?
+
+Thanks,
+Xue
