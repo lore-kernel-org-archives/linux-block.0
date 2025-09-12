@@ -1,159 +1,105 @@
-Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3E43222582
-	for <linux-block@vger.kernel.org>; Fri, 12 Sep 2025 03:14:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 450DC23D7EA;
+	Fri, 12 Sep 2025 06:16:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757646902; cv=none; b=CYXYjlF4hX0QHsZs6VXISKUGH+mKmsX9YoEKMKTwQA37ORAN2Ho3raSaU10lSA1kOOikMFsjQdXcVuRzoXCuSroHeNQPN6pzTeITIRz3auf3K+5iCmLiOlpwEzgRSK4PM+dX3UEwu+q3VwthBtYsPIMAYnZpPh5+Wl4aSg5cfEo=
+	t=1757657782; cv=none; b=NrVNMx2nD+bJ9c0yM3nneE/hdDcb+//Xj4L7IKQ2/VT6QeIKXSu5EdBdgT0KSEy3JsT6vaTUCdAQ9rsaGY7QpPOSRrhDu9/D5UAh3caL+0+rcyAteVMl/DUN7ay4gn3X2SPBSm/4Qtc3zKI2E9V3I2ZrgBkhI+H33Asen9TmPkU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757646902; c=relaxed/simple;
-	bh=A8Zgi4kyYrz+VcezB5BnREYndevofiMV6qNejq8swZM=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:MIME-Version:
-	 Content-Type:References; b=XlybLlNBv01D8dK8uQD99zuKF5DQJ+RZOiVXTWOBgHnpbkNFFaXqNbBJH1obN9uOrj35R4nztR4oW4DvCFVlIRqs2H15rgtl5vVK6kNWNCzsPofkLZE3+2sf0JpH4SsIBD+VGi9TfxZZ8osn7AXRkKzYAp4eBVtkNF9DXGEQ3M8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=NAZg/u0v; arc=none smtp.client-ip=203.254.224.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="NAZg/u0v"
-Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
-	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20250912031457epoutp029b57ea4747e740f1557f87b4d3229965~kaoqGr_CR1190711907epoutp02G
-	for <linux-block@vger.kernel.org>; Fri, 12 Sep 2025 03:14:57 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20250912031457epoutp029b57ea4747e740f1557f87b4d3229965~kaoqGr_CR1190711907epoutp02G
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1757646897;
-	bh=3NM0DqzQah0ZzTtHgBZREV5jdbjqfPi7VwM4heyyDus=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=NAZg/u0vFDHwRQgNRAWV0/0J7dmipScMQXNPiz3tq6Mthxz4xiZqYf97h7wOjekDA
-	 SSo3qk8EhLqa7MbTpc1tKGwW0hKybggQKaD/56fj5zBBl9M+4ZeO3UKyt42qpXRQ7u
-	 J+BbGzPytEh7XAWTxtSdLchosmXi9y3OpSWFSNPU=
-Received: from epsnrtp04.localdomain (unknown [182.195.42.156]) by
-	epcas5p2.samsung.com (KnoxPortal) with ESMTPS id
-	20250912031457epcas5p269cebe29bef1c77c2a7588c0d9032554~kaopvGOHy1904519045epcas5p22;
-	Fri, 12 Sep 2025 03:14:57 +0000 (GMT)
-Received: from epcas5p4.samsung.com (unknown [182.195.38.89]) by
-	epsnrtp04.localdomain (Postfix) with ESMTP id 4cNKKr37ymz6B9m5; Fri, 12 Sep
-	2025 03:14:56 +0000 (GMT)
-Received: from epsmtip1.samsung.com (unknown [182.195.34.30]) by
-	epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
-	20250912031032epcas5p3f38da43ad6cf93b849bb44f14e49c8f9~kaky5-geZ0074300743epcas5p3n;
-	Fri, 12 Sep 2025 03:10:32 +0000 (GMT)
-Received: from node122.. (unknown [109.105.118.122]) by epsmtip1.samsung.com
-	(KnoxPortal) with ESMTPA id
-	20250912031031epsmtip1f497818f0ca9f7b10491d8a2eff7816c~kakyNZGVV3046230462epsmtip1O;
-	Fri, 12 Sep 2025 03:10:31 +0000 (GMT)
-From: Xue He <xue01.he@samsung.com>
-To: yukuai1@huaweicloud.com
-Cc: axboe@kernel.dk, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, xue01.he@samsung.com, yukuai3@huawei.com
-Subject: Re: [PATCH] block: plug attempts to batch allocate tags multiple
- times
-Date: Fri, 12 Sep 2025 03:06:01 +0000
-Message-Id: <20250912030601.236426-1-xue01.he@samsung.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <bfc12406-e608-b3fa-45e7-2105d9cc15bf@huaweicloud.com>
+	s=arc-20240116; t=1757657782; c=relaxed/simple;
+	bh=CoHOnG0sU8oHdFLCPcDgLq5oy9StIEmgbV/rIBCw1bY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LmI3GqXtlGvoUuGA6Vk7U5bDX6fEWh/DnxayjASXJ3bR4pdPYgH/em5Up2bBcbNuMpZb99gG9NQm5Fpbr5GeTnN21QgNHYDVTAdMl4+j0heQ2YsQvI5EL1Olrc7FHzSqDWsm4KxjU7H0tISZHuLRR9ljVKL2EYywby5emP93+Jo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4cNPM63CJlzYQvFJ;
+	Fri, 12 Sep 2025 14:16:18 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id EFE8F1A0F1E;
+	Fri, 12 Sep 2025 14:16:16 +0800 (CST)
+Received: from [10.174.179.80] (unknown [10.174.179.80])
+	by APP4 (Coremail) with SMTP id gCh0CgDXIY6rusNoytzrCA--.39146S3;
+	Fri, 12 Sep 2025 14:16:13 +0800 (CST)
+Message-ID: <c7dd117e-6e3e-4b2d-a890-20f5c4bade2f@huaweicloud.com>
+Date: Fri, 12 Sep 2025 14:16:10 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CMS-MailID: 20250912031032epcas5p3f38da43ad6cf93b849bb44f14e49c8f9
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-cpgsPolicy: CPGSC10-505,Y
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20250912031032epcas5p3f38da43ad6cf93b849bb44f14e49c8f9
-References: <bfc12406-e608-b3fa-45e7-2105d9cc15bf@huaweicloud.com>
-	<CGME20250912031032epcas5p3f38da43ad6cf93b849bb44f14e49c8f9@epcas5p3.samsung.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 0/2] Fix the initialization of
+ max_hw_wzeroes_unmap_sectors for stacking drivers
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org, linux-raid@vger.kernel.org,
+ drbd-dev@lists.linbit.com, linux-fsdevel@vger.kernel.org,
+ linux-kernel@vger.kernel.org, john.g.garry@oracle.com,
+ pmenzel@molgen.mpg.de, hch@lst.de, martin.petersen@oracle.com,
+ yi.zhang@huawei.com, yukuai3@huawei.com, yangerkun@huawei.com
+References: <20250910111107.3247530-1-yi.zhang@huaweicloud.com>
+Content-Language: en-US
+From: Zhang Yi <yi.zhang@huaweicloud.com>
+In-Reply-To: <20250910111107.3247530-1-yi.zhang@huaweicloud.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-CM-TRANSID:gCh0CgDXIY6rusNoytzrCA--.39146S3
+X-Coremail-Antispam: 1UD129KBjvdXoW7Xw13KrW7Zw1fAF4UCr18Grg_yoWkWrc_uF
+	4YgrZ2vw4kGF1ayF1UKF1fZry2yay8XFn5uryjgayFg34Sva1rCa1q9ry5J3Z8AF9FvFZ8
+	AF1kt3yxZF9xXjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUbxxYFVCjjxCrM7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E6xAIw20E
+	Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwV
+	A0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x02
+	67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
+	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
+	x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
+	0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2AF
+	wI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
+	xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43
+	MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
+	0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWU
+	JVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUF1
+	v3UUUUU
+X-CM-SenderInfo: d1lo6xhdqjqx5xdzvxpfor3voofrz/
 
-On 2025/09/03 18:35 PM, Yu Kuai wrote:
->On 2025/09/03 16:41 PM, Xue He wrote:
->> On 2025/09/02 08:47 AM, Yu Kuai wrote:
->>> On 2025/09/01 16:22, Xue He wrote:
->> ......
->
->
->Yes, so this function will likely to obtain less tags than nr_tags,the
->mask is always start from first zero bit with nr_tags bit, and
->sbitmap_deferred_clear() is called uncondionally, it's likely there are
->non-zero bits within this range.
->
->Just wonder, do you consider fixing this directly in
->__blk_mq_alloc_requests_batch()?
->
->  - call sbitmap_deferred_clear() and retry on allocation failure, so
->that the whole word can be used even if previous allocated request are
->done, especially for nvme with huge tag depths;
->  - retry blk_mq_get_tags() until data->nr_tags is zero;
+Hi, Jens!
 
-Hi, Yu Kuai, I'm not entirely sure if I understand correctly, but during
-each tag allocation, sbitmap_deferred_clear() is typically called first, 
-as seen in the __sbitmap_queue_get_batch() function.
-
-        for (i = 0; i < sb->map_nr; i++) {
-                struct sbitmap_word *map = &sb->map[index];
-                unsigned long get_mask;
-                unsigned int map_depth = __map_depth(sb, index);
-                unsigned long val;
-
-                sbitmap_deferred_clear(map, 0, 0, 0);
-------------------------------------------------------------------------
-so I try to recall blk_mq_get_tags() until data->nr_tags is zero, like:
-
--       int i, nr = 0;
-
--       tag_mask = blk_mq_get_tags(data, data->nr_tags, &tag_offset);
--       if (unlikely(!tag_mask))
--               return NULL;
--
--       tags = blk_mq_tags_from_data(data);
--       for (i = 0; tag_mask; i++) {
--               if (!(tag_mask & (1UL << i)))
--                       continue;
--               tag = tag_offset + i;
--               prefetch(tags->static_rqs[tag]);
--               tag_mask &= ~(1UL << i);
--               rq = blk_mq_rq_ctx_init(data, tags, tag);
--               rq_list_add_head(data->cached_rqs, rq);
--               nr++;
--       }
--       if (!(data->rq_flags & RQF_SCHED_TAGS))
--               blk_mq_add_active_requests(data->hctx, nr);
--       /* caller already holds a reference, add for remainder */
--       percpu_ref_get_many(&data->q->q_usage_counter, nr - 1);
--       data->nr_tags -= nr;
-+       do {
-+               int i, nr = 0;
-+               tag_mask = blk_mq_get_tags(data, data->nr_tags, &tag_offset);
-+               if (unlikely(!tag_mask))
-+                       return NULL;
-+               tags = blk_mq_tags_from_data(data);
-+               for (i = 0; tag_mask; i++) {
-+                       if (!(tag_mask & (1UL << i)))
-+                               continue;
-+                       tag = tag_offset + i;
-+                       prefetch(tags->static_rqs[tag]);
-+                       tag_mask &= ~(1UL << i);
-+                       rq = blk_mq_rq_ctx_init(data, tags, tag);
-+                       rq_list_add_head(data->cached_rqs, rq);
-+                       nr++;
-+               }
-+               if (!(data->rq_flags & RQF_SCHED_TAGS))
-+                       blk_mq_add_active_requests(data->hctx, nr);
-+               /* caller already holds a reference, add for remainder */
-+               percpu_ref_get_many(&data->q->q_usage_counter, nr - 1);
-+               data->nr_tags -= nr;
-+       } while (data->nr_tags);
-
-I added a loop structure, it also achieve a good results like before,
-but I have a question: although the loop will retry tag allocation
-when the required number of tags is not met, there is a risk of an
-infinite loop, right? However, I couldn't think of a safer condition
-to terminate the loop. Do you have any suggestions?
+Can you take this patch set through the linux-block tree?
 
 Thanks,
-Xue
+Yi.
+
+On 9/10/2025 7:11 PM, Zhang Yi wrote:
+> From: Zhang Yi <yi.zhang@huawei.com>
+> 
+> Changes since v1:
+>  - Improve commit messages in patch 1 by adding a simple reproduction
+>    case as Paul suggested and explaining the implementation differences
+>    between RAID 0 and RAID 1/10/5, no code changes.
+> 
+> v1: https://lore.kernel.org/linux-block/20250825083320.797165-1-yi.zhang@huaweicloud.com/
+> 
+> This series fixes the initialization of max_hw_wzeroes_unmap_sectors in
+> queue_limits for all md raid and drbd drivers, preventing
+> blk_validate_limits() failures on underlying devices that support the
+> unmap write zeroes command.
+> 
+> Best regards,
+> Yi.
+> 
+> Zhang Yi (2):
+>   md: init queue_limits->max_hw_wzeroes_unmap_sectors parameter
+>   drbd: init queue_limits->max_hw_wzeroes_unmap_sectors parameter
+> 
+>  drivers/block/drbd/drbd_nl.c | 1 +
+>  drivers/md/md-linear.c       | 1 +
+>  drivers/md/raid0.c           | 1 +
+>  drivers/md/raid1.c           | 1 +
+>  drivers/md/raid10.c          | 1 +
+>  drivers/md/raid5.c           | 1 +
+>  6 files changed, 6 insertions(+)
+> 
+
