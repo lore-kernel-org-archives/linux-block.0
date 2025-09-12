@@ -1,186 +1,101 @@
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D876E274FD1
-	for <linux-block@vger.kernel.org>; Fri, 12 Sep 2025 09:12:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CCB827B35C;
+	Fri, 12 Sep 2025 09:23:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757668344; cv=none; b=mCwQeOmL079xWMMi0HkTCKfV2Or+Grjj8696GnyuXcqLUYivK7RnSR0juuJisgkfA5zJI5AoEQiTClOhLjU9hXUSrx0Z3SaZJW81A0hhQPk9c4Nux2deo8zyyxuroXFmgVwDNC/knEOnKDo1lAizSFbOpUEdffNj4zxWOk9DYaU=
+	t=1757669008; cv=none; b=t2lo1So//SdoQEOQ02rLJnFgMfBwNYklVJbxN80dsuMr4Jx76H2qgS5ztqsynju/UjcBdlTA5HcvOg7CyoQ/DSQkcc5wI6CFrKBKNs3gIHVFza435ECOCS2dTU3/4gXrPVeaZc9apCDABE8vmiKHd8oVh0h/WjT37DunERDV4uo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757668344; c=relaxed/simple;
-	bh=ioIOH2p5Blrv6vNOqNmSCymoSvN1zmkkAsnVeBc1SMY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FO3PUiGAIFdfPzxEx3TyIpJVDAP9BjgDwnav4G7Uu5qQxzKK+Fa07gZHJ67hbAb7Y89T2VzhYy4OMeRtmLGDqPxYQKPTCtU25FupqjC9xJOSs9GUosydG04pf0Q3JfPXIA7p7WBq8nOGwm2SajaXrIswHvJAf2r3C1C5UC5PqQI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aploMs7w; arc=none smtp.client-ip=209.85.218.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1757669008; c=relaxed/simple;
+	bh=C41iYMKm4+K4EFYPba7bEsrP/ut3g2gBXRLTNMIh0I0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IgZvFaECKk3gVb+GI0NE6vIy2Zg4OLHsuZH/hWbpiZSFFcCl3ekrSsqWZ2DfTL8fu+W5z1jRg2N9E2uwRDZQLsX4qtwfS4C3dbzmUus8rsNbUyGbtJCgMMIbq1LiPv31vBt7rkwzRku55muC3bK7A746t/dkkfujYSG5hfFvRcQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h9EnDURd; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aploMs7w"
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-aff0775410eso468128066b.0
-        for <linux-block@vger.kernel.org>; Fri, 12 Sep 2025 02:12:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757668341; x=1758273141; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ioIOH2p5Blrv6vNOqNmSCymoSvN1zmkkAsnVeBc1SMY=;
-        b=aploMs7whY/LgaXCAuOUQbkHlH9PozV3z9HFoHHh4tp/dJFhM6pt21fAvHgYgjlN8M
-         rmpVcHSueNagemUBdQowpA6BdoN7gqqaLplS1v3ScHX+yKhTwev5VBs4Bed/9bkH4dLN
-         4rfLLpcIvHJONxgYVXSLM7qEor3rn+MmXCTKDCzXypEm5HHBP38sGD0OFUOjAm326bQ+
-         1r2w7gh4g7621FkXF6rJzjHEIMZg4g13DDPyWgPK4mWuR3T6PMXO71Jvdha7GKG/r6lh
-         avbJhFNvPx4G+gPZm0XJKYAQwKp/BQENGe5DK6uHxVZst/QOlcM6CwamdS6qIfXycNC8
-         TKgw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757668341; x=1758273141;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ioIOH2p5Blrv6vNOqNmSCymoSvN1zmkkAsnVeBc1SMY=;
-        b=bICXcrKbdvgvjs/cvMpoWlVNh1O5SSVmS49o0dKdLPNp7Ma3G3NpaR87uGDlDiC/aI
-         9Mnt0Fu0BzyVM4N0ucXwLXHwpUzbUX8Hp7u2VWsbBzCtRkrRBlN5puavCuJYsTloLlqv
-         gZe/YpU6wCzJek+IdRkJubgJVCWTHZgLS2fju06hccy0LneUC66P2Lrw3fpHLNRU1Rrm
-         00EDh1T9dZa8Xj4oMw9pZ3i+zeSN1OarnhDTeQqA8bB9I31duvhZmMPzCCcS6QLLhs4m
-         1Yd0hva7nctVpUx0B+lnOP4l7sMR1rRnaWdRUvppp1wFsfFUJrg7CGO6YF+6VlEk5xj0
-         bn3Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXnuGFU4WvSvxlOSji0FteZlWA8JAuZkptk5bH809KMVdwTWJrIQt2kTTq4jbxLnNBX9XvrtYElZgmbYg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxzDuBo82w9qxhmjxdaCSQUCelA2dxIjFL+jUX+R29F9j/m8iNE
-	fp3CBz6sHxaWnADDBwKoYVJTfXMxtZrkhLcAHUTmozwJ+syevE4wQiFcxVAHErMzu0FEDgaqlky
-	xk//qrQeDFx21dbD+clnjE+q66Xd2hOY=
-X-Gm-Gg: ASbGncuqU20jlZTNp7sHbm83Z70zSkyUxYxQg5GJnTb8MR//rLL4pz2K084q2mGlt6t
-	8U4DHbMegCBE9pF0VjkeyZznBpYZLDs3DNOJ3qIRQ7zRzGT7nUmgnm0aWkCO/E1Cwt5EE4UXpEQ
-	Z/4WD52DErKa/ZRwqhdzr31kvPVyprrGGl2PxGxGkStxel8CYFjTo6zheQ9LZBonvp94vgbQRoR
-	LCSMNU=
-X-Google-Smtp-Source: AGHT+IECQ2FSxCpELdyt8w8+Ta17OX81olY1L21qGnLXRiiNiAsbzwmD/JJZPTQJsBBXBb5BWfCf5Q2bF6gDjvOJbJk=
-X-Received: by 2002:a17:907:3e9f:b0:b04:3402:391c with SMTP id
- a640c23a62f3a-b07a68bddd8mr590036766b.24.1757668340932; Fri, 12 Sep 2025
- 02:12:20 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h9EnDURd"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 189FEC4CEF1;
+	Fri, 12 Sep 2025 09:23:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757669007;
+	bh=C41iYMKm4+K4EFYPba7bEsrP/ut3g2gBXRLTNMIh0I0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=h9EnDURdVKe3ZIPAxFRgqiKn5VY9IjvNjJ6km+9IJDaM534N9BrLJTsLpNn5/fsES
+	 4Ik7r8FxqvxuNPsAGq4KflI7Pov0/6GspoWzfwLxqTWN2s4lRP/r51j+MSc0bUiqeL
+	 bsdNPyjz9O7EJT5rxqP6ul+8r8gSVNrqJaND/aa05MjsIaS3BRZRqIUqUR5CuUBSE4
+	 j2YuNzv1IlfFvgSSXhp4s9EJtzKiP0dZh2U+OfNqT6/NXVLDMzSV3CxogjxvaoTy76
+	 zjJjLNweCmtWGiG3Yh9UKpX3vQckrrRXEAjdGjg7dOb8oU03/dywCsvuf60eJ7xvBQ
+	 NguucfbJTfStw==
+Date: Fri, 12 Sep 2025 10:23:22 +0100
+From: Simon Horman <horms@kernel.org>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "Richard W.M. Jones" <rjones@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+	Josef Bacik <josef@toxicpanda.com>,
+	linux-kernel <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org,
+	Eric Dumazet <eric.dumazet@gmail.com>,
+	syzbot+e1cd6bd8493060bd701d@syzkaller.appspotmail.com,
+	Mike Christie <mchristi@redhat.com>,
+	Yu Kuai <yukuai1@huaweicloud.com>, linux-block@vger.kernel.org,
+	nbd@other.debian.org, Stefan Hajnoczi <stefanha@redhat.com>,
+	Stefano Garzarella <sgarzare@redhat.com>
+Subject: Re: [PATCH] nbd: restrict sockets to TCP and UDP
+Message-ID: <20250912092322.GZ30363@horms.kernel.org>
+References: <20250909132243.1327024-1-edumazet@google.com>
+ <20250909132936.GA1460@redhat.com>
+ <CANn89iLyxMYTw6fPzUeVcwLh=4=iPjHZOAjg5BVKeA7Tq06wPg@mail.gmail.com>
+ <CANn89iKdKMZLT+ArMbFAc8=X+Pp2XaVH7H88zSjAZw=_MvbWLQ@mail.gmail.com>
+ <63c99735-80ba-421f-8ad4-0c0ec8ebc3ea@kernel.dk>
+ <CANn89iJiBuJ=sHbfKjR-bJe6p12UrJ_DkOgysmAQuwCbNEy8BA@mail.gmail.com>
+ <20250909151851.GB1460@redhat.com>
+ <CANn89i+-mODVnC=TjwoxVa-qBc4ucibbGoqfM9W7Uf9bryj9qQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250910-work-namespace-v1-0-4dd56e7359d8@kernel.org>
- <20250910-work-namespace-v1-27-4dd56e7359d8@kernel.org> <CAOQ4uxgtQQa-jzsnTBxgUTPzgtCiAaH8X6ffMqd+1Y5Jjy0dmQ@mail.gmail.com>
- <20250911-werken-raubzug-64735473739c@brauner> <CAOQ4uxgMgzOjz4E-4kJFJAz3Dpd=Q6vXoGrhz9F0=mb=4XKZqA@mail.gmail.com>
- <20250912-wirsing-karibus-7f6a98621dd1@brauner>
-In-Reply-To: <20250912-wirsing-karibus-7f6a98621dd1@brauner>
-From: Amir Goldstein <amir73il@gmail.com>
-Date: Fri, 12 Sep 2025 11:12:09 +0200
-X-Gm-Features: Ac12FXzXlVrWyNxThzcVLm8bWdnJouio3PTW50wsmgaWY6Ne9FaEF2yc3iNy4og
-Message-ID: <CAOQ4uxgGpdQ42d-QRuHbvdrvZWrS9qz9=A2GRa2Bq-sMcK6w4w@mail.gmail.com>
-Subject: Re: [PATCH 27/32] nsfs: support file handles
-To: Christian Brauner <brauner@kernel.org>
-Cc: Jan Kara <jack@suse.cz>, linux-fsdevel@vger.kernel.org, 
-	Josef Bacik <josef@toxicpanda.com>, Jeff Layton <jlayton@kernel.org>, Mike Yuan <me@yhndnzj.com>, 
-	=?UTF-8?Q?Zbigniew_J=C4=99drzejewski=2DSzmek?= <zbyszek@in.waw.pl>, 
-	Lennart Poettering <mzxreary@0pointer.de>, Daan De Meyer <daan.j.demeyer@gmail.com>, 
-	Aleksa Sarai <cyphar@cyphar.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, 
-	=?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Chuck Lever <chuck.lever@oracle.com>, linux-nfs@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, cgroups@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANn89i+-mODVnC=TjwoxVa-qBc4ucibbGoqfM9W7Uf9bryj9qQ@mail.gmail.com>
 
-On Fri, Sep 12, 2025 at 10:20=E2=80=AFAM Christian Brauner <brauner@kernel.=
-org> wrote:
->
-> On Thu, Sep 11, 2025 at 01:36:28PM +0200, Amir Goldstein wrote:
-> > On Thu, Sep 11, 2025 at 11:31=E2=80=AFAM Christian Brauner <brauner@ker=
-nel.org> wrote:
-> > >
-> > > On Wed, Sep 10, 2025 at 07:21:22PM +0200, Amir Goldstein wrote:
-> > > > On Wed, Sep 10, 2025 at 4:39=E2=80=AFPM Christian Brauner <brauner@=
-kernel.org> wrote:
-> > > > >
-> > > > > A while ago we added support for file handles to pidfs so pidfds =
-can be
-> > > > > encoded and decoded as file handles. Userspace has adopted this q=
-uickly
-> > > > > and it's proven very useful.
-> > > >
-> > > > > Pidfd file handles are exhaustive meaning
-> > > > > they don't require a handle on another pidfd to pass to
-> > > > > open_by_handle_at() so it can derive the filesystem to decode in.
-> > > > >
-> > > > > Implement the exhaustive file handles for namespaces as well.
-> > > >
-> > > > I think you decide to split the "exhaustive" part to another patch,
-> > > > so better drop this paragraph?
-> > >
-> > > Yes, good point. I've dont that.
-> > >
-> > > > I am missing an explanation about the permissions for
-> > > > opening these file handles.
-> > > >
-> > > > My understanding of the code is that the opener needs to meet one o=
-f
-> > > > the conditions:
-> > > > 1. user has CAP_SYS_ADMIN in the userns owning the opened namespace
-> > > > 2. current task is in the opened namespace
-> > >
-> > > Yes.
-> > >
-> > > >
-> > > > But I do not fully understand the rationale behind the 2nd conditio=
-n,
-> > > > that is, when is it useful?
-> > >
-> > > A caller is always able to open a file descriptor to it's own set of
-> > > namespaces. File handles will behave the same way.
-> > >
-> >
-> > I understand why it's safe, and I do not object to it at all,
-> > I just feel that I do not fully understand the use case of how ns file =
-handles
-> > are expected to be used.
-> > A process can always open /proc/self/ns/mnt
-> > What's the use case where a process may need to open its own ns by hand=
-le?
-> >
-> > I will explain. For CAP_SYS_ADMIN I can see why keeping handles that
-> > do not keep an elevated refcount of ns object could be useful in the sa=
-me
-> > way that an NFS client keeps file handles without keeping the file obje=
-ct alive.
-> >
-> > But if you do not have CAP_SYS_ADMIN and can only open your own ns
-> > by handle, what is the application that could make use of this?
-> > and what's the benefit of such application keeping a file handle instea=
-d of
-> > ns fd?
->
-> A process is not always able to open /proc/self/ns/. That requires
-> procfs to be mounted and for /proc/self/ or /proc/self/ns/ to not be
-> overmounted. However, they can derive a namespace fd from their own
-> pidfd. And that also always works if it's their own namespace.
->
-> There's no need to introduce unnecessary behavioral differences between
-> /proc/self/ns/, pidfd-derived namespace fs, and file-handle-derived
-> namespace fds. That's just going to be confusing.
->
-> The other thing is that there are legitimate use-case for encoding your
-> own namespace. For example, you might store file handles to your set of
-> namespaces in a file on-disk so you can verify when you get rexeced that
-> they're still valid and so on. This is akin to the pidfd use-case.
->
-> Or just plainly for namespace comparison reasons where you keep a file
-> handle to your own namespaces and can then easily check against others.
+On Tue, Sep 09, 2025 at 08:33:27AM -0700, Eric Dumazet wrote:
+> On Tue, Sep 9, 2025 at 8:19 AM Richard W.M. Jones <rjones@redhat.com> wrote:
+> > On Tue, Sep 09, 2025 at 07:47:09AM -0700, Eric Dumazet wrote:
+> > > On Tue, Sep 9, 2025 at 7:37 AM Jens Axboe <axboe@kernel.dk> wrote:
+> > > > On 9/9/25 8:35 AM, Eric Dumazet wrote:
+> > > > > On Tue, Sep 9, 2025 at 7:04 AM Eric Dumazet <edumazet@google.com> wrote:
+> > > > >> On Tue, Sep 9, 2025 at 6:32 AM Richard W.M. Jones <rjones@redhat.com> wrote:
+> > > > >>> On Tue, Sep 09, 2025 at 01:22:43PM +0000, Eric Dumazet wrote:
 
-OK. As I said no objections I was just curious about this use case.
+...
 
-FWIW, comparing current ns to a stored file handle does not really require
-permission to open_by_handle_at(). name_to_handle_at() the current ns
-and binary compare to the stored file handle should be a viable option.
+> > From the outside it seems really odd to hard code a list of "good"
+> > socket types into each kernel client that can open a socket.  Normally
+> > if you wanted to restrict socket types wouldn't you do that through
+> > something more flexible like nftables?
+> 
+> nftables is user policy.
+> 
+> We need a kernel that will not crash, even if nftables is not
+> compiled/loaded/used .
 
-This was exactly the reason for introducing AT_HANDLE_FID, so that fanotify
-unprivileged watcher with no permission to open_by_handle_at() could compar=
-e
-an fid reported in an event with another fid they obtained earlier with
-name_to_handle_at() and kept in a map.
+Hi Rich, Eric, all,
 
-Thanks for the explanation!
-Amir.
+FWIIW, I think that the kernel maintaining a list of acceptable and
+known to work socket types is a reasonable measure. It reduces the
+surface where problems can arise - a surface that has real bugs.
+And can be expanded as necessary.
+
+For sure it is not perfect. There is a risk of entering wack-a-mole
+territory. And a more flexible mechanism may be nice.
+
+But, OTOH, we may be speculating about a problem that doesn't exist.
+If, very occasionally, a new socket type comes along and has to be used.
+Or perhaps more likely, there is a follow-up to this change for some
+cases it missed (i.e. the topic of this thread). And if that is very
+occasional. Is there really a problem?
+
+The answer is of course subjective. But I lean towards no.
+
+...
