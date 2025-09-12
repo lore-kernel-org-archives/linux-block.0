@@ -1,59 +1,59 @@
-Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B8DD31A04D
-	for <linux-block@vger.kernel.org>; Fri, 12 Sep 2025 16:28:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DD6B800
+	for <linux-block@vger.kernel.org>; Fri, 12 Sep 2025 17:30:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757694496; cv=none; b=Zfbamkg29FkyzPL7U++aaPdiQznuirsnUTC8urPVTt8nhwsEFuxdOVSjmWZbd7WuuGQ+a3hUcLf4iaAv4mJGHK00/juSHKn5QIXnQ/a84Edgzf0WSawbZv/0IZOC8Ln1QO8ksrYFBDuhbxiw+Lf9fevxWUdj+w42dqev32CH8X4=
+	t=1757698248; cv=none; b=JdeHVKu4ipkhNh08gbBRAq6f7v/+KJ52wvC4vP1dsSvoMdzvGrb4wBuNK745HTW3htWpMMgdGP+G6+YCcZ8F+hpx0n5qOQzEreBStS9MLg92H0QbQ6rctfs/WHE+u+AAOKrqRRpv+L63pKsPnHveFAZBd3mhhNZJZzp/F3mjieA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757694496; c=relaxed/simple;
-	bh=4ZQds+rLQqXKtrUuxNGp9y/Vi70dhfBppH9lnk7gdCA=;
+	s=arc-20240116; t=1757698248; c=relaxed/simple;
+	bh=o20p7GmDi8+ZFGPUj4WAT9L80iQUq9XRuj2nEHhmdqI=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=C1cOCLXjtt11IJCy6GWXSvelGtaJ3e28pJDgVw7l5g69LuhoZ0aBW9XYAEO5Fs7RIHG9aSGX+IDc2Gh6iBit3omtjYoyqSkAYL0CvkjI8mWpn595Pbk1nlAMAtlAFiyNnyrjX4yFn/5NJc/KHbfbgun8W9D7wqaWr9JdpGQJTMw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fDuJXpnn; arc=none smtp.client-ip=209.85.160.171
+	 To:Cc:Content-Type; b=gAuHZ7x7Er7BiMnf//Tnl2evyhJwoFVZRtEKwNxm7wV8Ab0xlSTriCry7Md3gmIBP2P06m3ITRum/m1y7MR9//jP5JgFwguu7JZihYxbokgFPmGaz4R3x0eRCTJhDYxF2UdB0VeF+pCLKeR/rgBZG5Fvdi7YU3fd0TO4JK7PZjk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T5e2Qev9; arc=none smtp.client-ip=209.85.160.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fDuJXpnn"
-Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-4b5e35453acso26406031cf.2
-        for <linux-block@vger.kernel.org>; Fri, 12 Sep 2025 09:28:14 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T5e2Qev9"
+Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-4b61161dd37so17261791cf.3
+        for <linux-block@vger.kernel.org>; Fri, 12 Sep 2025 10:30:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757694494; x=1758299294; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1757698246; x=1758303046; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=4ZQds+rLQqXKtrUuxNGp9y/Vi70dhfBppH9lnk7gdCA=;
-        b=fDuJXpnnzZBgy62qA/zbs9nS//r+43P1NYWcv/V/VdowLoQ0o+SChONYShoeUoHeFG
-         ygtVQvDW3+mH6sVgUEN8Im4BNY6c7xRwDyz5wC77cSNb3is9JD99KRJAAkhxJTLNF5Fr
-         e7gdM4MIJh2Xt/1LSL2v8fOyDPSDq2GwTCpQ19ehQlD/Um2NGuPcd7i5JjsimIhAnJd8
-         5eqNOK4/HMp1CoRFSw7gzvJM5tz/vHuwA2gwF59L+TcS4P7q/2o57vgpUaTndAuv3aIP
-         /CA/+3Sfyf8Tr6xR2O4tuqrPzrA6gRJkJZyjTL5B1G72SweM9EOiV5N2UYr+PGo9xveV
-         bSZA==
+        bh=oIIexxQJuuGcppYfGlH23qFT2xQkXBrd7Hq3B7cHXU8=;
+        b=T5e2Qev9f+0vQDmCT/6qKmuwEl9B9YY7nU8UX+l7Rw7BCD13SiFpkEPSQ0CrTV1Tvs
+         FVHYpHiTnu/OZgAcUkFdxpFS92yIf8ulrY9zYqi985Pdk9QifHcUHTHOa1sUotSvzcO3
+         kqem5KiLNCxN3U8xtOTBMjZQnR39wEAYHwdnjg+Kfo/fw8ZB0fzZvwuOkYSmqozUfDpz
+         WzdnBdCmeHl2kmWPTYnl6gcvqVJXBennvPESITsiClyzNLwIlYdpscaBOweJlLylZf9P
+         reI6tfhFDJdw6PYTNcoO9U/f9JXNh+jGi9MbzLQrOQij22jn0F+BhLE/1/Byoj8Ks0fJ
+         XvrQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757694494; x=1758299294;
+        d=1e100.net; s=20230601; t=1757698246; x=1758303046;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=4ZQds+rLQqXKtrUuxNGp9y/Vi70dhfBppH9lnk7gdCA=;
-        b=pXG/zy6O2/MAM9vJ6qWxePamU/MVUOqnBJ+W6tFLJXsel78CXQ472JwihbHc5eMqFX
-         SNBtT5WkIWvyRjydLikM0xcNQvfsTuS1SzqPMCClp9IIKw3coI8arX4x1Bo4s/brc9AJ
-         9RYt4arJ6MmoTmja/yP8uJR1+7wn0QDQW/9/9QoWaUJgYEL60VbS2jQwc0wZZQ8X/qLv
-         3MDjnHvzyNGw2fmQ/HoFavcOiC1/F5JdeziUdy1Ur449OfakA/Lqh8N22tsPCBsBmZKH
-         fpLzRREjAJRGO2xzqjdCfDwW0YJ5g3aVNf37eY16/rqEz4VhqqPVf/J+I5aJJIoX5zCR
-         nW7w==
-X-Forwarded-Encrypted: i=1; AJvYcCU3+Pf5QCy6WWuk8iqjxbYCPlnc85irdiBjyCKKLovO3SdY4uf0tADVwGt92kHZUkPhCNGo4qsV3Yv5NA==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx971TPJHuzA4+nAkIQxh5955e8kiDNLqco7mwfqWzHXvvHH80i
-	9V/0AN83NcNN4KwPTlNgQXCMthlXmoBdjtBjPNHcyx3ZZjlf7heI5Vf2irBofPVZwZ4HMPDSBII
-	oo2tpQ66vTClhs7nrDEXdSLRmmOJKt4k=
-X-Gm-Gg: ASbGncuAOZmjZxZGis1Mj3UGiJ2uTpoQrJcwyN2Rbzwo1F6wUH0e+gE/oLK4ToCeElR
-	01JfgitD92BRvGhRalwNczQ7Ks3SutTTdbnBkRZG4IfjRkzRyR1VKpY/iX/wkAU7xRoQmqeZ5p1
-	aFxV6ZYZL4ZU/P4nZAYC3kC3V7ng+6FbN931SWMgS9uxppayouri5fzdZSiWZUeIx933TmJB8Sx
-	KgR+A88KWtRq1R65+V9QkIV6Mj+h4/bpU+svFBh2EmsyvNWqQhgOociIqhZT1A=
-X-Google-Smtp-Source: AGHT+IH3sgRSs+dcbMoU7VA9j2cW53LQyv/IZLN7O9xGcrcKIirLDxNle7DY6XecZsiCSB6AFLxXPVP6mp6QV78ZXRU=
-X-Received: by 2002:a05:622a:1c09:b0:4b5:b28e:f0ee with SMTP id
- d75a77b69052e-4b77d035872mr40986501cf.51.1757694493815; Fri, 12 Sep 2025
- 09:28:13 -0700 (PDT)
+        bh=oIIexxQJuuGcppYfGlH23qFT2xQkXBrd7Hq3B7cHXU8=;
+        b=nrfHdzvHexHYZusPPOkoBz1h8p3Xce7gzI3iY2ZmctmcrKPoO61coEXtTfA+vTCNzj
+         1TQE4sflUewJkvj1fmUn7YRUNTNhMVQ+KK6799OnDUIQTRM2zJ2PtRUZD1fPW056RR9p
+         RZ+4kTIeOdCYBn8h9lTjmLhL2Tu9fnUXTEhZTf/QPwcXXwjh+4HO53h//wsCR2fJHJUV
+         Zh4rNemSNGY2m6T3ekPOAnM3dqIpv/tci0c4IZlCj9TgzK55Y5Aqw+AKasJmmSsZ+K6D
+         f75cnnd+NhcHlsfi7VkIyvEencmZ5haMdYV4lRqx3qMUMe1154cV662bSEdC5KTrwLMX
+         D79A==
+X-Forwarded-Encrypted: i=1; AJvYcCXAMe+iTUMjgQO/3EV10JbP85RoJXcKfMiOx1YalRWCEfnTqHmlTG0IgNLG8n43v72nJg9efObIwx3jVg==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw+Tc8tykjy48QolSdNTdihhbg3XqoAjwkGYi+QgL7p0n4lUbj7
+	H9SGnT2P9XXhsqwU/MJt0GyKtBaqGCt1K1zJ9EXSpStVoFpVdwKS4q67I93mH6zfcM+U17umzLT
+	+hE1Ami5H/6uVFPLu0PcJoiaiUhwD71A=
+X-Gm-Gg: ASbGncuW4tN2bMQUHWZLRqlFm46RYJcKY3FpHG1XpMNHY8EWhHA10gQ7hZxAVFkx2we
+	UBizhrS6n0yyTIklfgg3LzXCEp1DwWS1y+/XSA9dFjlKiHfX/sebbCCqxRC2id1ROOoDoovcmjC
+	EtrZfYft3x7lQkAGANzsxMKpU1OtGNpJipXynzKCago07iZ4U8xExcMLNsa7LLJvsdG18yXFXFE
+	5CtV4k538cHPN7joAI5mNZDeIgwf1zeMTSZpjVEfWK7/lqcHp1N
+X-Google-Smtp-Source: AGHT+IEcdCSZjZDX72w4oinaB7XT6QqmpJZk3VMxTChZFpoYvtCeUS7bDJlGiyqj98thpHZJTlGF9yw6Sf32KJ6S4V8=
+X-Received: by 2002:a05:622a:5c98:b0:4b2:8ac4:ef93 with SMTP id
+ d75a77b69052e-4b77d0ff805mr50626621cf.78.1757698245900; Fri, 12 Sep 2025
+ 10:30:45 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -61,13 +61,13 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <20250908185122.3199171-1-joannelkoong@gmail.com>
- <20250908185122.3199171-6-joannelkoong@gmail.com> <aMKuxZq_MK4KWgRc@infradead.org>
-In-Reply-To: <aMKuxZq_MK4KWgRc@infradead.org>
+ <20250908185122.3199171-13-joannelkoong@gmail.com> <aMKzG3NUGsQijvEg@infradead.org>
+In-Reply-To: <aMKzG3NUGsQijvEg@infradead.org>
 From: Joanne Koong <joannelkoong@gmail.com>
-Date: Fri, 12 Sep 2025 12:28:02 -0400
-X-Gm-Features: Ac12FXxFDjN5YQNfv2vrM4ZDEgMv6WgrZBCDj2pFB-Fs02NqF_4tIokmTzA_qak
-Message-ID: <CAJnrk1b8+ojpK3Zr18jGkUxEo9SiFw8NgDCO9crg8jDavBS3ag@mail.gmail.com>
-Subject: Re: [PATCH v2 05/16] iomap: propagate iomap_read_folio() error to caller
+Date: Fri, 12 Sep 2025 13:30:35 -0400
+X-Gm-Features: Ac12FXwnGYyLDAMLNpwS8zmPZj5g0R1lO_gh0yPx8OPOW_t5xNmOKu_QWWNBsIc
+Message-ID: <CAJnrk1Z2JwUKKoaqExh2gPDxtjRbzSPxzHi3YdBWXKvygGuGFA@mail.gmail.com>
+Subject: Re: [PATCH v2 12/16] iomap: add bias for async read requests
 To: Christoph Hellwig <hch@infradead.org>
 Cc: brauner@kernel.org, miklos@szeredi.hu, djwong@kernel.org, 
 	hsiangkao@linux.alibaba.com, linux-block@vger.kernel.org, 
@@ -76,31 +76,55 @@ Cc: brauner@kernel.org, miklos@szeredi.hu, djwong@kernel.org,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Sep 11, 2025 at 7:13=E2=80=AFAM Christoph Hellwig <hch@infradead.or=
+On Thu, Sep 11, 2025 at 7:31=E2=80=AFAM Christoph Hellwig <hch@infradead.or=
 g> wrote:
 >
-> On Mon, Sep 08, 2025 at 11:51:11AM -0700, Joanne Koong wrote:
-> > Propagate any error encountered in iomap_read_folio() back up to its
-> > caller (otherwise a default -EIO will be passed up by
-> > filemap_read_folio() to callers). This is standard behavior for how
-> > other filesystems handle their ->read_folio() errors as well.
+> > +static void __iomap_finish_folio_read(struct folio *folio, size_t off,
+> > +             size_t len, int error, bool update_bitmap)
+> >  {
+> >       struct iomap_folio_state *ifs =3D folio->private;
+> >       bool uptodate =3D !error;
+> > @@ -340,7 +340,7 @@ void iomap_finish_folio_read(struct folio *folio, s=
+ize_t off, size_t len,
+> >               unsigned long flags;
 > >
-> > Remove the out of date comment about setting the folio error flag.
-> > Folio error flags were removed in commit 1f56eedf7ff7 ("iomap:
-> > Remove calls to set and clear folio error flag").
+> >               spin_lock_irqsave(&ifs->state_lock, flags);
+> > -             if (!error)
+> > +             if (!error && update_bitmap)
+> >                       uptodate =3D ifs_set_range_uptodate(folio, ifs, o=
+ff, len);
 >
-> As mentioned last time I actually think this is a bad idea, and the most
-> common helpers (mpage_read_folio and block_read_full_folio) will not
-> return and error here.
+> This code sharing keeps confusing me a bit.  I think it's technically
+> perfectly fine, but not helpful for readability.  We'd solve that by
+> open coding the !update_bitmap case in iomap_read_folio_iter.  Which
+> would also allow to use spin_lock_irq instead of spin_lock_irqsave there
+> as a nice little micro-optimization.  If we'd then also get rid of the
+> error return from ->read_folio_range and always do asynchronous error
+> returns it would be even simpler.
 >
+> Or maybe I just need to live with the magic bitmap update, but the
+> fact that "len" sometimes is an actual length, and sometimes just a
+> counter for read_bytes_pending keeps confusing me
 >
 
-I'll drop this. I interpreted Matthew's comment to mean the error
-return isn't useful for ->readahead but is for ->read_folio.
+I think you're right, this is probably clearer without trying to share
+the function.
 
-If iomap_read_folio() doesn't do error returns and always just returns
-0, then maybe we should just make it `void iomap_read_folio(...)`
-instead of `int iomap_read_folio(...)` then.
+I think maybe we can make this even simpler. Right now we mark the
+bitmap uptodate every time a range is read in but I think instead we
+can just do one bitmap uptodate operation for the entire folio when
+the read has completely finished.  If we do this, then we can make
+"ifs->read_bytes_pending" back to an atomic_t since we don't save one
+atomic operation from doing it through a spinlock anymore (eg what
+commit f45b494e2a "iomap: protect read_bytes_pending with the
+state_lock" optimized). And then this bias thing can just become:
+
+if (ifs) {
+    if (atomic_dec_and_test(&ifs->read_bytes_pending))
+        folio_end_read(folio, !ret);
+    *cur_folio_owned =3D true;
+}
+
 
 Thanks,
 Joanne
