@@ -1,105 +1,130 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 450DC23D7EA;
-	Fri, 12 Sep 2025 06:16:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71FC12D739C;
+	Fri, 12 Sep 2025 08:20:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757657782; cv=none; b=NrVNMx2nD+bJ9c0yM3nneE/hdDcb+//Xj4L7IKQ2/VT6QeIKXSu5EdBdgT0KSEy3JsT6vaTUCdAQ9rsaGY7QpPOSRrhDu9/D5UAh3caL+0+rcyAteVMl/DUN7ay4gn3X2SPBSm/4Qtc3zKI2E9V3I2ZrgBkhI+H33Asen9TmPkU=
+	t=1757665208; cv=none; b=EN2VkutKcaxxTaDEoWUd1pfT4aaGRzSgPVCIjs1UHV411eWGze1PlFfuI0PR1BNt1O39A4eL/IDUsWDUcqVEDoK8b/Klgc6AcHS8AB6dQ29SyjdL1aSNjJCgk5q4/8yVoiBY69jd7q7Y0X+Sielfl4qi+rkB5c4kAk5F+YVcV4w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757657782; c=relaxed/simple;
-	bh=CoHOnG0sU8oHdFLCPcDgLq5oy9StIEmgbV/rIBCw1bY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LmI3GqXtlGvoUuGA6Vk7U5bDX6fEWh/DnxayjASXJ3bR4pdPYgH/em5Up2bBcbNuMpZb99gG9NQm5Fpbr5GeTnN21QgNHYDVTAdMl4+j0heQ2YsQvI5EL1Olrc7FHzSqDWsm4KxjU7H0tISZHuLRR9ljVKL2EYywby5emP93+Jo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4cNPM63CJlzYQvFJ;
-	Fri, 12 Sep 2025 14:16:18 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id EFE8F1A0F1E;
-	Fri, 12 Sep 2025 14:16:16 +0800 (CST)
-Received: from [10.174.179.80] (unknown [10.174.179.80])
-	by APP4 (Coremail) with SMTP id gCh0CgDXIY6rusNoytzrCA--.39146S3;
-	Fri, 12 Sep 2025 14:16:13 +0800 (CST)
-Message-ID: <c7dd117e-6e3e-4b2d-a890-20f5c4bade2f@huaweicloud.com>
-Date: Fri, 12 Sep 2025 14:16:10 +0800
+	s=arc-20240116; t=1757665208; c=relaxed/simple;
+	bh=OOusLVxnKHKzYYpqIszKMcMpYFoufzRxkmlgmDbuoAE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RIl/z+PTsAoK11LpN2Fbr1CKXLGKIR4GbKS5EZ93sIpgOvs7+nZySzJR5VFeMMuR/XoRu+X6wPJdQ3+k5CHXVrkmSqy3YNx7682ZXhwyTLtE9kBcWsVxQSUNpsSozeytQqPP40lUsqOZMq+vMw4zqTWPR/RDzGMf0qDxOlVsR9w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YoAdT8CJ; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YoAdT8CJ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53489C4CEF4;
+	Fri, 12 Sep 2025 08:20:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757665208;
+	bh=OOusLVxnKHKzYYpqIszKMcMpYFoufzRxkmlgmDbuoAE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=YoAdT8CJrYPBnrdP51NjrTWIRu+cXQR39oCZb/t/2jvT1bIJM9VXgbYW0tSIkbYrL
+	 NVMqDCnH8Dj8VBDVUAgtyQTvh/3MoRpno+6fCQoZSAox46ONzWRZJp1ktv5Lp5bhzi
+	 r9+106OXqgmFfl4iT7miTolwEFwmk1NdK/6Cdi2nBGnzY98SjgBObq8DEg7wHqVRms
+	 7AhZQLM74buaIeh3rrJVvSHBVOu3bHROqsVjaM45tLQQ8qPm3HTbOPAXBwytOq7FnC
+	 ofuKpTvPGQmC535taTMphjBBwAhRG1wg8Y14FaNzd9xz43E+4693r1aCn97d5Bj/T5
+	 ZXJ9rbbMWyWoQ==
+Date: Fri, 12 Sep 2025 10:19:57 +0200
+From: Christian Brauner <brauner@kernel.org>
+To: Amir Goldstein <amir73il@gmail.com>
+Cc: Jan Kara <jack@suse.cz>, linux-fsdevel@vger.kernel.org, 
+	Josef Bacik <josef@toxicpanda.com>, Jeff Layton <jlayton@kernel.org>, Mike Yuan <me@yhndnzj.com>, 
+	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>, Lennart Poettering <mzxreary@0pointer.de>, 
+	Daan De Meyer <daan.j.demeyer@gmail.com>, Aleksa Sarai <cyphar@cyphar.com>, 
+	Alexander Viro <viro@zeniv.linux.org.uk>, Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>, 
+	Johannes Weiner <hannes@cmpxchg.org>, Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Chuck Lever <chuck.lever@oracle.com>, linux-nfs@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, cgroups@vger.kernel.org, 
+	netdev@vger.kernel.org
+Subject: Re: [PATCH 27/32] nsfs: support file handles
+Message-ID: <20250912-wirsing-karibus-7f6a98621dd1@brauner>
+References: <20250910-work-namespace-v1-0-4dd56e7359d8@kernel.org>
+ <20250910-work-namespace-v1-27-4dd56e7359d8@kernel.org>
+ <CAOQ4uxgtQQa-jzsnTBxgUTPzgtCiAaH8X6ffMqd+1Y5Jjy0dmQ@mail.gmail.com>
+ <20250911-werken-raubzug-64735473739c@brauner>
+ <CAOQ4uxgMgzOjz4E-4kJFJAz3Dpd=Q6vXoGrhz9F0=mb=4XKZqA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 0/2] Fix the initialization of
- max_hw_wzeroes_unmap_sectors for stacking drivers
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org, linux-raid@vger.kernel.org,
- drbd-dev@lists.linbit.com, linux-fsdevel@vger.kernel.org,
- linux-kernel@vger.kernel.org, john.g.garry@oracle.com,
- pmenzel@molgen.mpg.de, hch@lst.de, martin.petersen@oracle.com,
- yi.zhang@huawei.com, yukuai3@huawei.com, yangerkun@huawei.com
-References: <20250910111107.3247530-1-yi.zhang@huaweicloud.com>
-Content-Language: en-US
-From: Zhang Yi <yi.zhang@huaweicloud.com>
-In-Reply-To: <20250910111107.3247530-1-yi.zhang@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-CM-TRANSID:gCh0CgDXIY6rusNoytzrCA--.39146S3
-X-Coremail-Antispam: 1UD129KBjvdXoW7Xw13KrW7Zw1fAF4UCr18Grg_yoWkWrc_uF
-	4YgrZ2vw4kGF1ayF1UKF1fZry2yay8XFn5uryjgayFg34Sva1rCa1q9ry5J3Z8AF9FvFZ8
-	AF1kt3yxZF9xXjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUbxxYFVCjjxCrM7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E6xAIw20E
-	Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwV
-	A0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x02
-	67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
-	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
-	x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
-	0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2AF
-	wI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
-	xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43
-	MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
-	0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWU
-	JVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUF1
-	v3UUUUU
-X-CM-SenderInfo: d1lo6xhdqjqx5xdzvxpfor3voofrz/
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAOQ4uxgMgzOjz4E-4kJFJAz3Dpd=Q6vXoGrhz9F0=mb=4XKZqA@mail.gmail.com>
 
-Hi, Jens!
+On Thu, Sep 11, 2025 at 01:36:28PM +0200, Amir Goldstein wrote:
+> On Thu, Sep 11, 2025 at 11:31 AM Christian Brauner <brauner@kernel.org> wrote:
+> >
+> > On Wed, Sep 10, 2025 at 07:21:22PM +0200, Amir Goldstein wrote:
+> > > On Wed, Sep 10, 2025 at 4:39 PM Christian Brauner <brauner@kernel.org> wrote:
+> > > >
+> > > > A while ago we added support for file handles to pidfs so pidfds can be
+> > > > encoded and decoded as file handles. Userspace has adopted this quickly
+> > > > and it's proven very useful.
+> > >
+> > > > Pidfd file handles are exhaustive meaning
+> > > > they don't require a handle on another pidfd to pass to
+> > > > open_by_handle_at() so it can derive the filesystem to decode in.
+> > > >
+> > > > Implement the exhaustive file handles for namespaces as well.
+> > >
+> > > I think you decide to split the "exhaustive" part to another patch,
+> > > so better drop this paragraph?
+> >
+> > Yes, good point. I've dont that.
+> >
+> > > I am missing an explanation about the permissions for
+> > > opening these file handles.
+> > >
+> > > My understanding of the code is that the opener needs to meet one of
+> > > the conditions:
+> > > 1. user has CAP_SYS_ADMIN in the userns owning the opened namespace
+> > > 2. current task is in the opened namespace
+> >
+> > Yes.
+> >
+> > >
+> > > But I do not fully understand the rationale behind the 2nd condition,
+> > > that is, when is it useful?
+> >
+> > A caller is always able to open a file descriptor to it's own set of
+> > namespaces. File handles will behave the same way.
+> >
+> 
+> I understand why it's safe, and I do not object to it at all,
+> I just feel that I do not fully understand the use case of how ns file handles
+> are expected to be used.
+> A process can always open /proc/self/ns/mnt
+> What's the use case where a process may need to open its own ns by handle?
+> 
+> I will explain. For CAP_SYS_ADMIN I can see why keeping handles that
+> do not keep an elevated refcount of ns object could be useful in the same
+> way that an NFS client keeps file handles without keeping the file object alive.
+> 
+> But if you do not have CAP_SYS_ADMIN and can only open your own ns
+> by handle, what is the application that could make use of this?
+> and what's the benefit of such application keeping a file handle instead of
+> ns fd?
 
-Can you take this patch set through the linux-block tree?
+A process is not always able to open /proc/self/ns/. That requires
+procfs to be mounted and for /proc/self/ or /proc/self/ns/ to not be
+overmounted. However, they can derive a namespace fd from their own
+pidfd. And that also always works if it's their own namespace.
 
-Thanks,
-Yi.
+There's no need to introduce unnecessary behavioral differences between
+/proc/self/ns/, pidfd-derived namespace fs, and file-handle-derived
+namespace fds. That's just going to be confusing.
 
-On 9/10/2025 7:11 PM, Zhang Yi wrote:
-> From: Zhang Yi <yi.zhang@huawei.com>
-> 
-> Changes since v1:
->  - Improve commit messages in patch 1 by adding a simple reproduction
->    case as Paul suggested and explaining the implementation differences
->    between RAID 0 and RAID 1/10/5, no code changes.
-> 
-> v1: https://lore.kernel.org/linux-block/20250825083320.797165-1-yi.zhang@huaweicloud.com/
-> 
-> This series fixes the initialization of max_hw_wzeroes_unmap_sectors in
-> queue_limits for all md raid and drbd drivers, preventing
-> blk_validate_limits() failures on underlying devices that support the
-> unmap write zeroes command.
-> 
-> Best regards,
-> Yi.
-> 
-> Zhang Yi (2):
->   md: init queue_limits->max_hw_wzeroes_unmap_sectors parameter
->   drbd: init queue_limits->max_hw_wzeroes_unmap_sectors parameter
-> 
->  drivers/block/drbd/drbd_nl.c | 1 +
->  drivers/md/md-linear.c       | 1 +
->  drivers/md/raid0.c           | 1 +
->  drivers/md/raid1.c           | 1 +
->  drivers/md/raid10.c          | 1 +
->  drivers/md/raid5.c           | 1 +
->  6 files changed, 6 insertions(+)
-> 
+The other thing is that there are legitimate use-case for encoding your
+own namespace. For example, you might store file handles to your set of
+namespaces in a file on-disk so you can verify when you get rexeced that
+they're still valid and so on. This is akin to the pidfd use-case.
 
+Or just plainly for namespace comparison reasons where you keep a file
+handle to your own namespaces and can then easily check against others.
