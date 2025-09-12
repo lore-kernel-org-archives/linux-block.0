@@ -1,188 +1,126 @@
-Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
+Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FDA92EDD44;
-	Thu, 11 Sep 2025 22:25:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0EC31114;
+	Fri, 12 Sep 2025 00:06:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757629547; cv=none; b=u6EiosywlU1KHTdNOGlMKqyH6Q+5mLwYiyIj0ja7V/jbfRazxKvRvNxFbB4cVubkJTg1C/V0KEYVL7q99ZehRKM2QVLior39qcWA99PRzVXwjUPaRliDnEhZhgYyRnTntSbNU5mwAqFoqhYlXa6+jhpvuypcwGQXbVOwyX5+d70=
+	t=1757635595; cv=none; b=RPKuJURD903DgJm3UunozAx84f+od33LAVf24xGLWFl9+LR1OR+jiqOxrt0kjKpe/BLCrrHOPg47IJYjCTTD9rE5xbK88/kTmbWnzg20f9EV+qlbRtXEss/ENc30X1b66QDoPkljAkZPu6kktpKjn2iZYfyAvNLgyqWenphTtYA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757629547; c=relaxed/simple;
-	bh=VhTUKknuQKZIQNlc9FeAjofdR8C1UbnCNE3GysWSRWM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
-	 Content-Type:References; b=kj6PVMy+saLBv0GxbND4Kr6Qw2KkX98ULYrXDHWBjpJ5nHv8jCcVFpnVDatWMmILxTcGfsr8J+mbAYl1hBRQLtvqMpB44H2R26X9x1sqxD/tRpNeLm6qgFWbc4jxie1kP+6zKxKIRaqx9IDffvWlqMeGrxN5cRr9Z2MDY0PQV+E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=TYzap3cs; arc=none smtp.client-ip=210.118.77.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	s=arc-20240116; t=1757635595; c=relaxed/simple;
+	bh=uuId6RVxbxVcke3+P4e45amuMIc/DVveXZXSYU+ifzU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=j463kvfciV+QCyJZLPIMWpEZtrtwTW4XIchij9EnQGzvbTK+6qizvlkz+dVclzFrvwqn5lAKFnnSakJyCo/T5mpUkxX98sQyNe0V1K9rrNny3LGEpV7dVYBPUtqr5Bq846axwZ7UdFaKTXkJRhwgGJki1jah2RA75JwDMm4Pn7I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=Yx4aRNzW; arc=none smtp.client-ip=115.124.30.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="TYzap3cs"
-Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
-	by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20250911222543euoutp0181a9340dd64dc67c6339e0a47181ebf4~kWsHnYW5E2610126101euoutp01U;
-	Thu, 11 Sep 2025 22:25:43 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20250911222543euoutp0181a9340dd64dc67c6339e0a47181ebf4~kWsHnYW5E2610126101euoutp01U
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1757629543;
-	bh=pKZpcAmq/bht8ZKkJqtZPTgOAGANcQvA5kKLVuXifcI=;
-	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
-	b=TYzap3cszLDOEgEsqU6EupJ7Zu8ir86kgd0ybK+4ACWZaOiATyvZFbUDShQ8MbR85
-	 SejzQ/ANTvod+crbxkB+bIskmGYNCRGJfAnTK7Wx3EUgGfsfp9YrG/QNqAamMubhrs
-	 7HS78hSROwDaJIS7uPVpylvDm+iDdZwL3r/+voe4=
-Received: from eusmtip1.samsung.com (unknown [203.254.199.221]) by
-	eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
-	20250911222542eucas1p1fd99b15e46362a0af4417b04fa0c831b~kWsHKwmS41727217272eucas1p1e;
-	Thu, 11 Sep 2025 22:25:42 +0000 (GMT)
-Received: from [106.210.134.192] (unknown [106.210.134.192]) by
-	eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
-	20250911222538eusmtip17e16b44d9939848958cad6696cc3414c~kWsDGpMzk2282122821eusmtip1T;
-	Thu, 11 Sep 2025 22:25:38 +0000 (GMT)
-Message-ID: <0db9bce5-40df-4cf5-85ab-f032c67d5c71@samsung.com>
-Date: Fri, 12 Sep 2025 00:25:38 +0200
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="Yx4aRNzW"
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1757635583; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=4l/OnBqgkZe1Br8bpGPNu/6NUjQj9S0DUi0oZkkxZRQ=;
+	b=Yx4aRNzWabtTDKYBB89+iAVOV+Qs39u4Wp9o1FzJdiP07aABPV3GU/mRvt8QrEnqE3bgWsgELeKbJa+d/BGa3tpKuJWY0uRRP0deyncrnjGHONEmud98CA2fea3e/ZTESz8Jv6ZVlMNQMeiwvR50Kh96EJWBxOnQZVVaJ53UjLA=
+Received: from 30.180.0.242(mailfrom:hsiangkao@linux.alibaba.com fp:SMTPD_---0Wno1Q-e_1757635581 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Fri, 12 Sep 2025 08:06:22 +0800
+Message-ID: <6609e444-5210-42aa-b655-8ed8309aae75@linux.alibaba.com>
+Date: Fri, 12 Sep 2025 08:06:19 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Betterbird (Windows)
-Subject: Re: [PATCH v6 00/16] dma-mapping: migrate to physical address-based
- API
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Leon Romanovsky <leonro@nvidia.com>, Jason Gunthorpe <jgg@nvidia.com>,
-	Abdiel Janulgue <abdiel.janulgue@gmail.com>, Alexander Potapenko
-	<glider@google.com>, Alex Gaynor <alex.gaynor@gmail.com>, Andrew Morton
-	<akpm@linux-foundation.org>, Christoph Hellwig <hch@lst.de>, Danilo
-	Krummrich <dakr@kernel.org>, David Hildenbrand <david@redhat.com>,
-	iommu@lists.linux.dev, Jason Wang <jasowang@redhat.com>, Jens Axboe
-	<axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>, Jonathan Corbet
-	<corbet@lwn.net>, Juergen Gross <jgross@suse.com>,
-	kasan-dev@googlegroups.com, Keith Busch <kbusch@kernel.org>,
-	linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	linux-nvme@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
-	linux-trace-kernel@vger.kernel.org, Madhavan Srinivasan
-	<maddy@linux.ibm.com>, Masami Hiramatsu <mhiramat@kernel.org>, Michael
-	Ellerman <mpe@ellerman.id.au>, "Michael S. Tsirkin" <mst@redhat.com>, Miguel
-	Ojeda <ojeda@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
-	rust-for-linux@vger.kernel.org, Sagi Grimberg <sagi@grimberg.me>, Stefano
-	Stabellini <sstabellini@kernel.org>, Steven Rostedt <rostedt@goodmis.org>,
-	virtualization@lists.linux.dev, Will Deacon <will@kernel.org>,
-	xen-devel@lists.xenproject.org
-Content-Language: en-US
-From: Marek Szyprowski <m.szyprowski@samsung.com>
-In-Reply-To: <cover.1757423202.git.leonro@nvidia.com>
-Content-Transfer-Encoding: 7bit
-X-CMS-MailID: 20250911222542eucas1p1fd99b15e46362a0af4417b04fa0c831b
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-RootMTR: 20250909132821eucas1p1051ce9e0270ddbf520e105c913fa8db6
-X-EPHeader: CA
-X-CMS-RootMailID: 20250909132821eucas1p1051ce9e0270ddbf520e105c913fa8db6
-References: <CGME20250909132821eucas1p1051ce9e0270ddbf520e105c913fa8db6@eucas1p1.samsung.com>
-	<cover.1757423202.git.leonro@nvidia.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 13/16] iomap: move read/readahead logic out of
+ CONFIG_BLOCK guard
+To: Joanne Koong <joannelkoong@gmail.com>
+Cc: Christoph Hellwig <hch@infradead.org>, brauner@kernel.org,
+ miklos@szeredi.hu, djwong@kernel.org, linux-block@vger.kernel.org,
+ gfs2@lists.linux.dev, linux-fsdevel@vger.kernel.org, kernel-team@meta.com,
+ linux-xfs@vger.kernel.org, linux-doc@vger.kernel.org
+References: <20250908185122.3199171-1-joannelkoong@gmail.com>
+ <20250908185122.3199171-14-joannelkoong@gmail.com>
+ <a1529c0f-1f1a-477a-aeeb-a4f108aab26b@linux.alibaba.com>
+ <CAJnrk1aCCqoOAgcPUpr+Z09DhJ5BAYoSho5dveGQKB9zincYSQ@mail.gmail.com>
+ <0b33ab17-2fc0-438f-95aa-56a1d20edb38@linux.alibaba.com>
+ <aMK0lC5iwM0GWKHq@infradead.org>
+ <9c104881-f09e-4594-9e41-0b6f75a5308c@linux.alibaba.com>
+ <CAJnrk1b2_XGfMuK-UAej31TtCAAg5Aq8PFS_36yyGg8NerA97g@mail.gmail.com>
+From: Gao Xiang <hsiangkao@linux.alibaba.com>
+In-Reply-To: <CAJnrk1b2_XGfMuK-UAej31TtCAAg5Aq8PFS_36yyGg8NerA97g@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On 09.09.2025 15:27, Leon Romanovsky wrote:
-> From: Leon Romanovsky <leonro@nvidia.com>
->
-> Changelog:
-> v6:
->   * Based on "dma-debug: don't enforce dma mapping check on noncoherent
->     allocations" patch.
->   * Removed some unused variables from kmsan conversion.
->   * Fixed missed ! in dma check.
-> v5: https://lore.kernel.org/all/cover.1756822782.git.leon@kernel.org
->   * Added Jason's and Keith's Reviewed-by tags
->   * Fixed DMA_ATTR_MMIO check in dma_direct_map_phys
->   * Jason's cleanup suggestions
-> v4: https://lore.kernel.org/all/cover.1755624249.git.leon@kernel.org/
->   * Fixed kbuild error with mismatch in kmsan function declaration due to
->     rebase error.
-> v3: https://lore.kernel.org/all/cover.1755193625.git.leon@kernel.org
->   * Fixed typo in "cacheable" word
->   * Simplified kmsan patch a lot to be simple argument refactoring
-> v2: https://lore.kernel.org/all/cover.1755153054.git.leon@kernel.org
->   * Used commit messages and cover letter from Jason
->   * Moved setting IOMMU_MMIO flag to dma_info_to_prot function
->   * Micro-optimized the code
->   * Rebased code on v6.17-rc1
-> v1: https://lore.kernel.org/all/cover.1754292567.git.leon@kernel.org
->   * Added new DMA_ATTR_MMIO attribute to indicate
->     PCI_P2PDMA_MAP_THRU_HOST_BRIDGE path.
->   * Rewrote dma_map_* functions to use thus new attribute
-> v0: https://lore.kernel.org/all/cover.1750854543.git.leon@kernel.org/
-> ------------------------------------------------------------------------
->
-> This series refactors the DMA mapping to use physical addresses
-> as the primary interface instead of page+offset parameters. This
-> change aligns the DMA API with the underlying hardware reality where
-> DMA operations work with physical addresses, not page structures.
->
-> The series maintains export symbol backward compatibility by keeping
-> the old page-based API as wrapper functions around the new physical
-> address-based implementations.
->
-> This series refactors the DMA mapping API to provide a phys_addr_t
-> based, and struct-page free, external API that can handle all the
-> mapping cases we want in modern systems:
->
->   - struct page based cacheable DRAM
->   - struct page MEMORY_DEVICE_PCI_P2PDMA PCI peer to peer non-cacheable
->     MMIO
->   - struct page-less PCI peer to peer non-cacheable MMIO
->   - struct page-less "resource" MMIO
->
-> Overall this gets much closer to Matthew's long term wish for
-> struct-pageless IO to cacheable DRAM. The remaining primary work would
-> be in the mm side to allow kmap_local_pfn()/phys_to_virt() to work on
-> phys_addr_t without a struct page.
->
-> The general design is to remove struct page usage entirely from the
-> DMA API inner layers. For flows that need to have a KVA for the
-> physical address they can use kmap_local_pfn() or phys_to_virt(). This
-> isolates the struct page requirements to MM code only. Long term all
-> removals of struct page usage are supporting Matthew's memdesc
-> project which seeks to substantially transform how struct page works.
->
-> Instead make the DMA API internals work on phys_addr_t. Internally
-> there are still dedicated 'page' and 'resource' flows, except they are
-> now distinguished by a new DMA_ATTR_MMIO instead of by callchain. Both
-> flows use the same phys_addr_t.
->
-> When DMA_ATTR_MMIO is specified things work similar to the existing
-> 'resource' flow. kmap_local_pfn(), phys_to_virt(), phys_to_page(),
-> pfn_valid(), etc are never called on the phys_addr_t. This requires
-> rejecting any configuration that would need swiotlb. CPU cache
-> flushing is not required, and avoided, as ATTR_MMIO also indicates the
-> address have no cacheable mappings. This effectively removes any
-> DMA API side requirement to have struct page when DMA_ATTR_MMIO is
-> used.
->
-> In the !DMA_ATTR_MMIO mode things work similarly to the 'page' flow,
-> except on the common path of no cache flush, no swiotlb it never
-> touches a struct page. When cache flushing or swiotlb copying
-> kmap_local_pfn()/phys_to_virt() are used to get a KVA for CPU
-> usage. This was already the case on the unmap side, now the map side
-> is symmetric.
->
-> Callers are adjusted to set DMA_ATTR_MMIO. Existing 'resource' users
-> must set it. The existing struct page based MEMORY_DEVICE_PCI_P2PDMA
-> path must also set it. This corrects some existing bugs where iommu
-> mappings for P2P MMIO were improperly marked IOMMU_CACHE.
->
-> Since ATTR_MMIO is made to work with all the existing DMA map entry
-> points, particularly dma_iova_link(), this finally allows a way to use
-> the new DMA API to map PCI P2P MMIO without creating struct page. The
-> VFIO DMABUF series demonstrates how this works. This is intended to
-> replace the incorrect driver use of dma_map_resource() on PCI BAR
-> addresses.
->
-> This series does the core code and modern flows. A followup series
-> will give the same treatment to the legacy dma_ops implementation.
 
-Applied patches 1-13 into dma-mapping-for-next branch. Let's check if it 
-works fine in linux-next.
 
-Best regards
--- 
-Marek Szyprowski, PhD
-Samsung R&D Institute Poland
+On 2025/9/12 03:45, Joanne Koong wrote:
+> On Thu, Sep 11, 2025 at 8:29 AM Gao Xiang <hsiangkao@linux.alibaba.com> wrote:
 
+...
+
+>> ```
+>>
+>> But if FUSE or some other fs later needs to request L2P information
+>> in their .iomap_begin() and need to send L2P requests to userspace
+>> daemon to confirm where to get the physical data (maybe somewhat
+>> like Darrick's work but I don't have extra time to dig into that
+>> either) rather than just something totally bypass iomap-L2P logic
+>> as above, then I'm not sure the current `iomap_iter->private` is
+>> quite seperate to `struct iomap_read_folio_ctx->private`, it seems
+> 
+> If in the future this case arises, the L2P mapping info is accessible
+> by the read callback in the current design. `.read_folio_range()`
+> passes the iomap iter to the filesystem and they can access
+> iter->private to get the L2P mapping data they need.
+
+The question is what exposes to `iter->private` then, take
+an example:
+
+```
+struct file *file;
+```
+
+your .read_folio_range() needs `file->private_data` to get
+`struct fuse_file` so `file` is kept into
+`struct iomap_read_folio_ctx`.
+
+If `file->private_data` will be used for `.iomap_begin()`
+as well, what's your proposal then?
+
+Duplicate the same `file` pointer in both
+`struct iomap_read_folio_ctx` and `iter->private` context?
+
+
+> 
+>> both needs fs-specific extra contexts for the same I/O flow.
+>>
+>> I think the reason why `struct iomap_read_folio_ctx->private` is
+>> introduced is basically previous iomap filesystems are all
+>> bio-based, and they shares `bio` concept in common but
+>> `iter->private` was not designed for this usage.
+>>
+>> But fuse `struct iomap_read_folio_ctx` and
+>> `struct fuse_fill_read_data` are too FUSE-specific, I cannot
+>> see it could be shared by other filesystems in the near future,
+>> which is much like a single-filesystem specific concept, and
+>> unlike to `bio` at all.
+> 
+> Currently fuse is the only non-block-based filesystem using iomap but
+> I don't see why there wouldn't be more in the future. For example,
+> while looking at some of the netfs code, a lot of the core
+> functionality looks the same between that and iomap and I think it
+> might be a good idea to have netfs in the future use iomap's interface
+> so that it can get the large folio dirty/uptodate tracking stuff and
+> any other large folio stuff like more granular writeback stats
+> accounting for free.
+
+I think you need to ask David on this idea, I've told him to
+switch fscache to use iomap in 2022 before netfs is fully out [1],
+but I don't see it will happen.
+
+[1] https://lore.kernel.org/linux-fsdevel/YfivxC9S52FlyKoL@B-P7TQMD6M-0146/
+
+Thanks,
+Gao Xiang
