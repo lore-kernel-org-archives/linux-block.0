@@ -1,267 +1,124 @@
-Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from outpost1.zedat.fu-berlin.de (outpost1.zedat.fu-berlin.de [130.133.4.66])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C299B2C027B
-	for <linux-block@vger.kernel.org>; Fri, 12 Sep 2025 20:10:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B793F26E17D;
+	Fri, 12 Sep 2025 20:21:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=130.133.4.66
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757707809; cv=none; b=WCRPt54HSKX/lw7zvKFmNSFaI0pe2u3WtlFdPHUn+7IrIRSMC2DRhRHsIw3wddlRuxDMgCRi1JQc1497StEEtNmh1dM70QSD18GCcztOO25jlss6WkPT+HQYMScEojdDXfNJn5WHRKo5oSUjGjLFiNU/e6F0njUzbvRJ5HEjHwc=
+	t=1757708514; cv=none; b=T+btKuWCde/bcwl6vGGXFGHAZNQb55Z8nbj/lqM3Po6XPxvRx/Q68LLj1ueeTf6xUfIZhFZiObKQmd3V/vM1GqtiXfyg59b6NW6QwFqIgXC8t5foJTTDwfSrRKGg8f12Lhmiw7SfZN0IHyGofCtJyywg2CkT+UP9kkFYIP2uXTo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757707809; c=relaxed/simple;
-	bh=J7whkdgtw+r5eOooTlUKSxqksHF4jMLVv76DD83j+Vo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=atkJyKXCxBGCs8A+pUQLr+x0nczUnTk4fpqbFYZuI1R6uDm5d6qtbl+B1zImsB+AY59swYSB+9lnq4/WW6gQ19YNeXY++wRxlhsYzSoOupbpRkqE7h1a0ShTDIeiU5sCwDVdDxoLFnbgWj2i8NHsQrQfOmSTcccIAV0Qt2+lgko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DV6u0Isg; arc=none smtp.client-ip=209.85.160.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1757708514; c=relaxed/simple;
+	bh=1XR56SR+z2CBR5E5TriztVfhwFNUArCinFwYBUwkU40=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=Yg7XIo+/LELilXq//jQznZEMQYAGshzrB9w3NFgdmuaUQgyuoGvDKNcqHZeqZqRPh6DhM7vOd6aJ9LbIgTXlYh0YLH+5yFM9lJj/aJAkaww1m/rlOazMRnl1v8ktIn//7A0ogrCg4Xhenwelws/lXbrqZt+3oyb60HM1TKTTVq8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=physik.fu-berlin.de; spf=pass smtp.mailfrom=zedat.fu-berlin.de; dkim=pass (2048-bit key) header.d=fu-berlin.de header.i=@fu-berlin.de header.b=FSYzCyYN; arc=none smtp.client-ip=130.133.4.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=physik.fu-berlin.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zedat.fu-berlin.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DV6u0Isg"
-Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-4b5eee40cc0so24535751cf.0
-        for <linux-block@vger.kernel.org>; Fri, 12 Sep 2025 13:10:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757707807; x=1758312607; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kUvk3PQT9iJETVmI+H9Y57Sl5Dee/ugWdBMz2xir9FU=;
-        b=DV6u0IsgVFNPqGtB+m+ojn3dj4gHL2UmDA1mE0/ukBtGUT2Cfz53LgCswjm/9J9/Bj
-         nJwW0gPDkQPJ50F0nGWv6vtV7i95GejKrkoAaCtJrkugobKs5CEAvHFAGOnjb3mlLgg6
-         obLjFQ/wquE5e6jJwUi6yNuZ4QCuIc/HqRsjvgLOnAQVUnKHzlg+mhEpUAvk+KFtyFih
-         rv1wxxdC61fCWVORHBuTOwNSEspRnI6UZFoXRVpOVNsV+9cNCikTrnBv2Ogdv9U5bkKE
-         TxgYH90afG37tIayKuUmsTDbkn3SmjuVZzvjzeHCblj7QyyL4UrASKWMUi7qg9Wo6diu
-         RwJA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757707807; x=1758312607;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=kUvk3PQT9iJETVmI+H9Y57Sl5Dee/ugWdBMz2xir9FU=;
-        b=qR44iIoNFYPzF8BmWtQQWHVYZhqge5sNOa2mRotsStrotXmCVNclAGWDzyYJZxwt6k
-         YrbL//WQlfZbomYClh3Np0Dp7WrMWJdOtJun9auMb5Hu5kpoCdUdf12X3QU5VS6C4VN6
-         304FiIJ60tb8USIbyIygWdEHXvgSpV5CFpXG8gyNds1NCZlsSzafo555/FYI9AbKplzI
-         FyoTBSksBcSt2lOQvP6ERqg3J6dxnoCTyVrT8bIEG3SU483nBaKg0U14Ox5pKnIilhqs
-         Hh4qlQav8/YL/M0c8XXJ9p6RZuGPtO101tfJXtPIDWWLrX18ZVk5NhUBvjSAbGpoJAUq
-         meEg==
-X-Forwarded-Encrypted: i=1; AJvYcCWVIvb9/7dXpT+y/TNESkyiD7d3XUWTqjFwuAzvn3EjpJULtiq+PAeMJfjqDy7sXqeerY3vRlj1XKGGpg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzBKORfqqqXKSKukH63wCCRXz9twdSxX4IJYu6OMto+sujU2Bj+
-	8SF2I36fPlcC1yR0nPK4ZsBfCn2BIlgRU3GkvGbuPqbO1nhNx1qKzI9OdoAvy01hBBtjfLeZxUq
-	wRd0PeQCn1UFUDRQLS0AL/s/ivZK63HU=
-X-Gm-Gg: ASbGncu3NVj3aVNAgQu1uzf4kSXibnDS/huHKxPQ956OKrxyolnqyNPUSZOSr7xI6d7
-	A5CGVnNPw4dIP6NmX9d8Y/kaDiCuHs+um9fWbtdhhBDmc06inyrb2RMSqp3HBjapk4iefPlmwAv
-	zh2V6L5IWQ1jZQYIt1hNj6IguIK8Fe0akxbZvt/gJOODDsI5IOMziiZyYgn9rp5Jfas4zy0lPT3
-	Hyohf1Eakd4ayVBAWytCh75cSo9jUTe21y0cygpyfqNRPoRslAgYakXIPst
-X-Google-Smtp-Source: AGHT+IEWbv39vMnYlQ1SD0ZUhw0yLiTfWxsf26h64ZL6lZSTKK/c4qoFwMSw183eQ+ZBkoMKnWL15JY76Ze4fGknDs4=
-X-Received: by 2002:a05:622a:1805:b0:4b7:5de6:a69 with SMTP id
- d75a77b69052e-4b77d097ca4mr48388851cf.30.1757707806462; Fri, 12 Sep 2025
- 13:10:06 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=fu-berlin.de header.i=@fu-berlin.de header.b="FSYzCyYN"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=fu-berlin.de; s=fub01; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:From:
+	Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:In-Reply-To:
+	References; bh=CrZcAOEzjLjX1gZCVLM20v02GJXBX5Y+1e/kkg2NnnM=; t=1757708511;
+	x=1758313311; b=FSYzCyYNFgOIpB5mYUcGKRNo96Ezc+f11YiWr76QeGdYDRw9VP1KWLy7FVrEB
+	vvxuLOHDIB0l+sMyB5FUGqgAEd0EUFGZFBIvACmVrQwN3mwKSbEy7aQRrVDvHGSK5X24fkk9bRz40
+	hPCbG6Uga3m6+Aceo234EIE7AkesyJR1DxNUfOy2vQs079tznXHBHeyg/KVUPGSD6G6TrKZKKhjDU
+	8whBzMQWdNruP22rxJJj5FqiaysgSCwNPkG0DVVc4BvF+MtwyX41GHKTR3jBs1+7RIU+QfIT1tCi+
+	NK+7ETYu2AHOcin0tFy0MzHpQ9Je0SjvzOcd3w7LvGelDAsWPQ==;
+Received: from inpost2.zedat.fu-berlin.de ([130.133.4.69])
+          by outpost.zedat.fu-berlin.de (Exim 4.98)
+          with esmtps (TLS1.3)
+          tls TLS_AES_256_GCM_SHA384
+          (envelope-from <glaubitz@zedat.fu-berlin.de>)
+          id 1uxAH8-00000002lZ0-3oso; Fri, 12 Sep 2025 22:21:42 +0200
+Received: from p5b13aa34.dip0.t-ipconnect.de ([91.19.170.52] helo=[192.168.178.61])
+          by inpost2.zedat.fu-berlin.de (Exim 4.98)
+          with esmtpsa (TLS1.3)
+          tls TLS_AES_256_GCM_SHA384
+          (envelope-from <glaubitz@physik.fu-berlin.de>)
+          id 1uxAH8-000000045T8-2tlU; Fri, 12 Sep 2025 22:21:42 +0200
+Message-ID: <471f32d77e201bc54e23842b69ce87e36929d8a2.camel@physik.fu-berlin.de>
+Subject: Re: [PATCH] sunvdc: Do not spin in an infinite loop when
+ vio_ldc_send() returns EAGAIN
+From: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
+To: Jens Axboe <axboe@kernel.dk>, Yang Xiao <YangX92@hotmail.com>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Anthony
+ Yznaga <anthony.yznaga@oracle.com>, Sam James <sam@gentoo.org>, sparclinux
+	 <sparclinux@vger.kernel.org>
+Date: Fri, 12 Sep 2025 22:21:41 +0200
+In-Reply-To: <4c693ebe-dfc4-b5fb-f8d5-28f93b05b77a@kernel.dk>
+References: 
+	<HK0PR01MB21634739CFCEA8CB1AC08E45ADD10@HK0PR01MB2163.apcprd01.prod.exchangelabs.com>
+	 <4c693ebe-dfc4-b5fb-f8d5-28f93b05b77a@kernel.dk>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.2 
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250908185122.3199171-1-joannelkoong@gmail.com>
- <20250908185122.3199171-14-joannelkoong@gmail.com> <a1529c0f-1f1a-477a-aeeb-a4f108aab26b@linux.alibaba.com>
- <CAJnrk1aCCqoOAgcPUpr+Z09DhJ5BAYoSho5dveGQKB9zincYSQ@mail.gmail.com>
- <0b33ab17-2fc0-438f-95aa-56a1d20edb38@linux.alibaba.com> <aMK0lC5iwM0GWKHq@infradead.org>
- <9c104881-f09e-4594-9e41-0b6f75a5308c@linux.alibaba.com> <CAJnrk1b2_XGfMuK-UAej31TtCAAg5Aq8PFS_36yyGg8NerA97g@mail.gmail.com>
- <6609e444-5210-42aa-b655-8ed8309aae75@linux.alibaba.com> <66971d07-2c1a-4632-bc9e-e0fc0ae2bd04@linux.alibaba.com>
- <267abd34-2337-4ae3-ae95-5126e9f9b51c@linux.alibaba.com> <CAJnrk1Y31b-Yr03rN8SXPmUA7D6HW8OhnkfFOebn56z57egDOw@mail.gmail.com>
-In-Reply-To: <CAJnrk1Y31b-Yr03rN8SXPmUA7D6HW8OhnkfFOebn56z57egDOw@mail.gmail.com>
-From: Joanne Koong <joannelkoong@gmail.com>
-Date: Fri, 12 Sep 2025 16:09:53 -0400
-X-Gm-Features: Ac12FXy-J-VlWsro9NrSIzcDj4rKWuNwCZfBlBwTbl7b7lNj5FofdR9Weg0GYow
-Message-ID: <CAJnrk1ZXM-fRKytRFptKNJrdN9pSbKJqXLW80T4UY=RLRKOBKQ@mail.gmail.com>
-Subject: Re: [PATCH v2 13/16] iomap: move read/readahead logic out of
- CONFIG_BLOCK guard
-To: Gao Xiang <hsiangkao@linux.alibaba.com>
-Cc: Christoph Hellwig <hch@infradead.org>, brauner@kernel.org, miklos@szeredi.hu, 
-	djwong@kernel.org, linux-block@vger.kernel.org, gfs2@lists.linux.dev, 
-	linux-fsdevel@vger.kernel.org, kernel-team@meta.com, 
-	linux-xfs@vger.kernel.org, linux-doc@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-Original-Sender: glaubitz@physik.fu-berlin.de
+X-ZEDAT-Hint: PO
 
-On Fri, Sep 12, 2025 at 3:56=E2=80=AFPM Joanne Koong <joannelkoong@gmail.co=
-m> wrote:
->
-> On Thu, Sep 11, 2025 at 9:11=E2=80=AFPM Gao Xiang <hsiangkao@linux.alibab=
-a.com> wrote:
-> >
-> > On 2025/9/12 09:09, Gao Xiang wrote:
-> > >
-> > >
-> > > On 2025/9/12 08:06, Gao Xiang wrote:
-> > >>
-> > >>
-> > >> On 2025/9/12 03:45, Joanne Koong wrote:
-> > >>> On Thu, Sep 11, 2025 at 8:29=E2=80=AFAM Gao Xiang <hsiangkao@linux.=
-alibaba.com> wrote:
-> > >>
-> > >>>> But if FUSE or some other fs later needs to request L2P informatio=
-n
-> > >>>> in their .iomap_begin() and need to send L2P requests to userspace
-> > >>>> daemon to confirm where to get the physical data (maybe somewhat
-> > >>>> like Darrick's work but I don't have extra time to dig into that
-> > >>>> either) rather than just something totally bypass iomap-L2P logic
-> > >>>> as above, then I'm not sure the current `iomap_iter->private` is
-> > >>>> quite seperate to `struct iomap_read_folio_ctx->private`, it seems
-> > >>>
-> > >>> If in the future this case arises, the L2P mapping info is accessib=
-le
-> > >>> by the read callback in the current design. `.read_folio_range()`
-> > >>> passes the iomap iter to the filesystem and they can access
-> > >>> iter->private to get the L2P mapping data they need.
-> > >>
-> > >> The question is what exposes to `iter->private` then, take
-> > >> an example:
-> > >>
-> > >> ```
-> > >> struct file *file;
-> > >> ```
-> > >>
-> > >> your .read_folio_range() needs `file->private_data` to get
-> > >> `struct fuse_file` so `file` is kept into
-> > >> `struct iomap_read_folio_ctx`.
-> > >>
-> > >> If `file->private_data` will be used for `.iomap_begin()`
-> > >> as well, what's your proposal then?
-> > >>
-> > >> Duplicate the same `file` pointer in both
-> > >> `struct iomap_read_folio_ctx` and `iter->private` context?
-> > >
-> > > It's just an not-so-appropriate example because
-> > > `struct file *` and `struct fuse_file *` are widely used
-> > > in the (buffer/direct) read/write flow but Darrick's work
-> > > doesn't use `file` in .iomap_{begin/end}.
-> > >
-> > > But you may find out `file` pointer is already used for
-> > > both FUSE buffer write and your proposal, e.g.
-> > >
-> > > buffer write:
-> > >   /*
-> > >    * Use iomap so that we can do granular uptodate reads
-> > >    * and granular dirty tracking for large folios.
-> > >    */
-> > >   written =3D iomap_file_buffered_write(iocb, from,
-> > >                                       &fuse_iomap_ops,
-> > >                                       &fuse_iomap_write_ops,
-> > >                                       file);
-> >
-> > And your buffer write per-fs context seems just use
-> > `iter->private` entirely instead to keep `file`.
-> >
->
-> I don=E2=80=99t think the iomap buffered writes interface is good to use =
-as a
-> model. I looked a bit at some of the other iomap file operations and I
-> think we should just pass operation-specific data through an
-> operation-specific context for those too, eg for buffered writes and
-> dio modifying the interface from
->
-> ssize_t iomap_file_buffered_write(struct kiocb *iocb, struct iov_iter
-> *from, const struct iomap_ops *ops, const struct iomap_write_ops
-> *write_ops, void *private);
-> ssize_t iomap_dio_rw(struct kiocb *iocb, struct iov_iter *iter, const
-> struct iomap_ops *ops, const struct iomap_dio_ops *dops, unsigned int
-> dio_flags, void *private, size_t done_before);
->
-> to something like
->
-> ssize_t iomap_file_buffered_write(const struct iomap_ops *ops, struct
-> iomap_write_folio_ctx *ctx);
-> ssize_t iomap_dio_rw(const struct iomap_ops *ops, struct iomap_dio_ctx *c=
-tx);
->
-> There=E2=80=99s one filesystem besides fuse that uses =E2=80=9Citer->priv=
-ate=E2=80=9D and
-> that=E2=80=99s for xfs zoned inodes (xfs_zoned_buffered_write_iomap_begin=
-()),
-> which passes the  struct xfs_zone_alloc_ctx*  through iter->private,
-> and it's used afaict for tracking block reservations. imo that's what
-> iter->private should be used for, to track the more high level
-> metadata stuff and then the lower-level details that are
-> operation-specific go through the ctx->data fields. That seems the
-> cleanest design to me. I think we should rename the iter->private
-> field to something like "iter->metadata" to make that delineation more
-> clear.  I'm not sure what the iomap maintainers think, but that is my
-> opinion.
->
-> I think if in the future there is a case/feature which needs something
-> previously in one of the operation-specific ctxes, it seems fine to me
-> to have both iter->private and ctx->data point to the same thing.
->
->
-> Thanks,
-> Joanne
->
-> > >
-> > >
-> > > I just try to say if there is a case/feature which needs
-> > > something previously in `struct iomap_read_folio_ctx` to
-> > > be available in .iomap_{begin,end} too, you have to either:
-> > >   - duplicate this in `iter->private` as well;
-> > >   - move this to `iter->private` entirely.
-> > >
-> > > The problem is that both `iter->private` and
-> > > `struct iomap_read_folio_ctx` are filesystem-specific,
-> > > I can only see there is no clear boundary to leave something
-> > > in which one.  It seems just like an artificial choice.
-> > >
-> > > Thanks,
-> > > Gao Xiang
-> > >
-> > >>
-> > >>
-> > >>>
-> > >>>> both needs fs-specific extra contexts for the same I/O flow.
-> > >>>>
-> > >>>> I think the reason why `struct iomap_read_folio_ctx->private` is
-> > >>>> introduced is basically previous iomap filesystems are all
-> > >>>> bio-based, and they shares `bio` concept in common but
-> > >>>> `iter->private` was not designed for this usage.
-> > >>>>
-> > >>>> But fuse `struct iomap_read_folio_ctx` and
-> > >>>> `struct fuse_fill_read_data` are too FUSE-specific, I cannot
-> > >>>> see it could be shared by other filesystems in the near future,
-> > >>>> which is much like a single-filesystem specific concept, and
-> > >>>> unlike to `bio` at all.
-> > >>>
-> > >>> Currently fuse is the only non-block-based filesystem using iomap b=
-ut
-> > >>> I don't see why there wouldn't be more in the future. For example,
-> > >>> while looking at some of the netfs code, a lot of the core
-> > >>> functionality looks the same between that and iomap and I think it
-> > >>> might be a good idea to have netfs in the future use iomap's interf=
-ace
-> > >>> so that it can get the large folio dirty/uptodate tracking stuff an=
-d
-> > >>> any other large folio stuff like more granular writeback stats
-> > >>> accounting for free.
-> > >>
-> > >> I think you need to ask David on this idea, I've told him to
-> > >> switch fscache to use iomap in 2022 before netfs is fully out [1],
-> > >> but I don't see it will happen.
-> > >>
-> > >> [1] https://lore.kernel.org/linux-fsdevel/YfivxC9S52FlyKoL@B-P7TQMD6=
-M-0146/
+Hello Jens and Yang,
 
-(sorry, just saw this part of the email otherwise I would have
-included this in the previous message)
+On Wed, 2018-11-28 at 06:23 -0700, Jens Axboe wrote:
+> On 11/28/18 5:36 AM, Yang Xiao wrote:
+> > From: Young Xiao <YangX92@hotmail.com>
+> >=20
+> > __vdc_tx_trigger should only loop on EAGAIN a finite
+> > number of times.
+> >=20
+> > See commit adddc32d6fde ("sunvnet: Do not spin in an
+> > infinite loop when vio_ldc_send() returns EAGAIN") for detail.
+>=20
+> Looks good to me, applied.
 
-Thanks for the link to the thread. My understanding is that the large
-folio optimizations stuff was added to iomap in July 2023 (afaict from
-the git history) and iomap is entangled with the block layer but it's
-becoming more of a generic interface now. Maybe now it makes sense to
-go through iomap's interface than it did in 2022, but of course David
-has the most context on this.
+I am seeing a lot of I/O errors as a result of this change of Linux running
+inside a SPARC T5-2 LDOM running on Solaris 11.4.81 and I'm wondering wheth=
+er
+this change was justified by the commit in adddc32d6fde ("sunvnet: Do not s=
+pin
+in an infinite loop when vio_ldc_send() returns EAGAIN") only or whether th=
+ere
+were actual bug reports.
 
+See the output below:
 
-Thanks,
-Joanne
+[19095.192532] sunvdc: vdc_tx_trigger() failure, err=3D-11
+[19095.192605] I/O error, dev vdiskc, sector 368208928 op 0x1:(WRITE) flags=
+ 0x1000 phys_seg 2 prio class 2
+[19095.205681] XFS (vdiskc1): metadata I/O error in "xfs_buf_ioend+0x28c/0x=
+600 [xfs]" at daddr 0x15f26420 len 32 error 5
+[19432.043471] sunvdc: vdc_tx_trigger() failure, err=3D-11
+[19432.043529] I/O error, dev vdiskc, sector 3732568 op 0x1:(WRITE) flags 0=
+x1000 phys_seg 1 prio class 2
+[19432.058821] sunvdc: vdc_tx_trigger() failure, err=3D-11
+[19432.058843] I/O error, dev vdiskc, sector 3736256 op 0x1:(WRITE) flags 0=
+x1000 phys_seg 4 prio class 2
+[19432.074109] sunvdc: vdc_tx_trigger() failure, err=3D-11
+[19432.074128] I/O error, dev vdiskc, sector 3736512 op 0x1:(WRITE) flags 0=
+x1000 phys_seg 4 prio class 2
+[19432.089425] sunvdc: vdc_tx_trigger() failure, err=3D-11
+[19432.089443] I/O error, dev vdiskc, sector 3737024 op 0x1:(WRITE) flags 0=
+x1000 phys_seg 1 prio class 2
+[19432.100964] XFS (vdiskc1): metadata I/O error in "xfs_buf_ioend+0x28c/0x=
+600 [xfs]" at daddr 0x38ec58 len 8 error 5
 
-> > >>
-> > >> Thanks,
-> > >> Gao Xiang
-> > >
-> >
+At least Oracle's UEK kernel for SPARC [1] does not contain this change whi=
+ch
+is why I'm a bit reluctant to believe that the change is correct.
+
+Adrian
+
+> [1] https://github.com/oracle/linux-uek/tree/uek4/qu7/
+
+--=20
+ .''`.  John Paul Adrian Glaubitz
+: :' :  Debian Developer
+`. `'   Physicist
+  `-    GPG: 62FF 8A75 84E0 2956 9546  0006 7426 3B37 F5B5 F913
