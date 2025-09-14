@@ -1,63 +1,63 @@
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB8D71DED64
-	for <linux-block@vger.kernel.org>; Sun, 14 Sep 2025 04:04:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77BB226F47D
+	for <linux-block@vger.kernel.org>; Sun, 14 Sep 2025 04:04:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757822667; cv=none; b=HVsctqNwniNDhB3IBvkCD9gKxMYQ4Mv3tNVx3mT8DFM9FY6G4alP51fSuJoVpBfherIhCiHBD03Kj3bTbVTWiK8nQGOJqQkS26pjcgn7fp6OZmOdJOBuUBM/k3onwsuGZ+ulOXvdY/SAPcnxj4xqNnT2PK8JtQX2hJTbvTjfMec=
+	t=1757822704; cv=none; b=Cx9u6lbzdrYklDxlIbYEijvC6mRwG79Pypvv0djMOf47DltvfdeTIwyzYfbYIAy54Ybs5g0gmZX+kEZQbGE0CxmVE3g6+fAYjvk8opWVpf+0+uCg7iVwKUF0gxy20vXokpk/e7BhvhG5e49bdxIfPMthVQW3kqJLMD9IF52UJ1I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757822667; c=relaxed/simple;
-	bh=CLKN0vFxPTCS+4xpoDHyCjYmZBC4ifFWYJ0ane4ULJI=;
+	s=arc-20240116; t=1757822704; c=relaxed/simple;
+	bh=K5eh5PFkTwqgMsR/pgApUC7mRgd5tIkIjFvctye1Fsc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=MgCzOp4578/A9lDLXHnkpBGuydSdXyUImbIMpTH5KqKBEYWvxB2LmopLVYiNI91J4C7QrEanw4xJJELomRi5XM2C9C11cdpo5OgWXMu8ZHBsWhaLSpQ+xPLcFdkn+8/Qn5IZUKGF2yp2S3UuiWv9E9oP6Mn5g3KK8wXH3UIdJiQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=O4aOOK0f; arc=none smtp.client-ip=209.85.218.54
+	 MIME-Version; b=IimL4hSEOdE1PY4188MQViGxoT5E+OXLs91ljM/kBCzdMt+WzrLvxd/eh0Pa+/Chh7FVLQaVNNzLbARjdBkLWipxp2mZaaarrwBqyCjDMnyTcINgvennuFOv9G6SkdfokHn/J2PMmQ86BYjSXHsucU/P5vmeLynH+MJdrbLX1h0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kPbZj1qM; arc=none smtp.client-ip=209.85.218.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O4aOOK0f"
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-b07883a5feeso549709766b.1
-        for <linux-block@vger.kernel.org>; Sat, 13 Sep 2025 21:04:22 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kPbZj1qM"
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-b07c28f390eso368921366b.2
+        for <linux-block@vger.kernel.org>; Sat, 13 Sep 2025 21:04:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757822661; x=1758427461; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1757822698; x=1758427498; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=zQmt9Zed9iIletHUt2qeYNjKhIuvjCTi/Cw19xUj63o=;
-        b=O4aOOK0f+GtOsGAAPPlXg8fFE95tuM2EQFB49oUx3b3Nl5B/5OA5rXfu1q9ojKkWV9
-         Zo4btBxuUzDdk+pqdb3IYp5Ulqq+lzZJsgtJmaCa457noCUwaLR81qIJL6ouiGc00gRk
-         5p5Br5m/TW7pvovRPr7L5WYkpqnIZE+y8IbYJliRhk3YkABphhkugbXrSPHoLgu3y7Dw
-         zcgwcsd9h4d8FZo0id5gds80lttGaQtyWJwWGsS7UuoN3+ALaZgIusniAiKigUAClqEY
-         lZ5zRA8Q2QenwaZ7oHQJKbrqN0oMNsoM1No9BD7u+iVWyDHQlQyPBD2XSYErmZSkQp4k
-         iSOA==
+        bh=Mw6NNXq6XfJ0FNmZ5frjZGClHo0iZVSxbFf+bMTHIN8=;
+        b=kPbZj1qMmGYeecjJGUIlyIHIYamuich/CNzkJDmaNgGaqWvmKRH/xWtRF41uM5qkzv
+         aCOo6S2Jlgd26xKUeuaakbbG7HEqDWn4lpel7AStmc2VlwPrBzY5joso88BimDPHYlXE
+         lGKrirBAgOS/lwpoTHzC/tUmPxv1QF+CBszBJWWwZ+66J7mYEyOimyL2AtSvZIWLx1gK
+         5mb9tOIr2zMFazTcGHaTU8u9ffMEBQkt1YmPKV0KVFaH5qyy1RH+UXAWhuy3AcjFOjXc
+         Kxvqk7LMiYKMLQ7+ce+4bi1vcyj+dMrkLMVvDZ3cpLh4Ep/R+rND2M09mBBHfKuxH8K6
+         CeEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757822661; x=1758427461;
+        d=1e100.net; s=20230601; t=1757822698; x=1758427498;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=zQmt9Zed9iIletHUt2qeYNjKhIuvjCTi/Cw19xUj63o=;
-        b=NF1fCkPFUGWXHVRVJ4S7ipSg1pjd+AsTmGUSpq6RSiSot/oD0muswmwNYdLkVPB+vJ
-         61JnekCHrNAH6ovd3YixVWg4D35e///PCuZE1+uyUd79fJslBQODWxvTIhPhg8H6LH+O
-         KKzQh3kYWnFMOUf6Ik2Hp0pStLmexcb+4VPvhFiO4Rv97sVIDdAg8GqZobUXORPntbG8
-         Hmsdtx5MIrlGvYDsyH8T2RrBjY7uLBzlYlOfloDnQrQiomDl4q3wM0PubPht0jQnqt2W
-         JCUSp8wA5tWanD4QjXb343HhlbDQh4r2pseu1j2kUZMf3/NgbXISdFC97MiE/OixUe8W
-         UlDw==
-X-Forwarded-Encrypted: i=1; AJvYcCWiTs9XaoDg/BRgP8wrFfAtc1GKTNkS0iCcYbIlWxbLGoLZ4ZG7cKuFYHiZpvKCw58Q08+XvIWnmRR8aA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyaKZlowBe+O9V9u8jtkxHp7ALSKfZdlYXlUZCUXbURIDGRIWgg
-	rONIUQolFzleIDtMydcnmrX1yPS3WstOvLagJoEVEVscOsmeI7gMunfc
-X-Gm-Gg: ASbGnctuVJ/DxOvxM+cAM5ySKhl5Fc+/1A80hgxpSVc5Rr/k7wrPQknvXsxUcORhbqI
-	lS477mcww0zg02ETqU5n4Bv2z2IKhK1kRZACRn1EuBcsZGD0oOK3DiCSaFKTh7e+R7sXnHjrEqB
-	HxdlsCfJI7bkIJNClZZlZudf+9CTuV0Wl4lf3i2vVh1iyQNM/0MDKdaVADAPBY/nF7xXcOfzoCk
-	EKZegejwBMkCzgg2i9+PYM1MmXL48+4da2ymGtH43nhpBPVbk2b1fqNePpIJm5riHrmZ0QzaVeR
-	YDv1NZbDB9YE7kkYPf08hmoXm2J7YTcAnorrzfH/6SS99iVY4MIRNPQoTbbOw4v8mRxqj6vlvPk
-	mRl6a1umlMxf6wQzdMmhlMp4PPwuUSA==
-X-Google-Smtp-Source: AGHT+IHaFT6KFwuX+yIp0UoOdQj6J/d/IOTebo0H4gG0vMFBsMmT50PoMXVLJ+eEN7aUH8ZQwvBwiA==
-X-Received: by 2002:a17:907:3ea6:b0:b09:48c6:b7b0 with SMTP id a640c23a62f3a-b0948c6c713mr431888166b.56.1757822661177;
-        Sat, 13 Sep 2025 21:04:21 -0700 (PDT)
+        bh=Mw6NNXq6XfJ0FNmZ5frjZGClHo0iZVSxbFf+bMTHIN8=;
+        b=d6J5RetwTbDT0MKgTVRyH+uFw4iTjUX34dyGiM+qF0Uwx7lN38MuRtCS9HzjfHtpb1
+         kT/sctu6EYKCpfQU9QKbSIdbpuZiN1UTUAQz08TYKc6jxZ0AHRX2EL3AY9k06OPoxUGz
+         U7S7RMB75C3iNx02LdG8rshf/z9Vfc7bOv3vS2eP4iFXDnzeVIn5JxgDA+B8dhcgIgd2
+         QARCubAD5jsK373z6jLiEcEJHPkyaLlIeMccpdKn5ErmQsdIE4ERY/yUdT6KVqWlQa3/
+         0M51uroZjuEqnReWQpLgdsQjz6O9QUYyoyffHLY4apu6ttMXSL9UhIMtTjVB4ZM+Z6ZK
+         sudg==
+X-Forwarded-Encrypted: i=1; AJvYcCWR6B6/FgtrKrjntCnTDa2amIWVTHZTrIsHxP0kdLoP8pzMCKnyIJYY3GUMS8XKo5f1/gp4W/cUqBxE8A==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzn1EjpPYhaTAUfd0oIYUGGMTm4IJANjS5D76yS/ul792I9TRt2
+	ew1W6zsUGRZW83tUuoroGdOgl++z135PBeuDpR1QZFj9YCQC1gT4pmnW
+X-Gm-Gg: ASbGncuDMUTOwJ2PxBqQtTtshMtXU+letql+b3aR8DuYORLrF7ajT7PoDfp9r9Xzk0h
+	zWmzJrEVHvaG8b0+BOzqMHSsUevS+U8cT3UY1DxMgIk18PKdxl5qUQInjbbFBSfW+kseH4+fPg8
+	oM9AjDbCpHas1LKDsDEZwRsfDJCrA9VvA3Aoaods6uFQ8n0Is2gCu6ruf8EBJgVysXbiOOCHK4G
+	Duo91wSoXw3wFbPy05wp4bNq+DPfelR1N9nLkgYmIuaIw1xU2Ut/Ae9bqyTvsJ87i753WRv9JtR
+	hXFb1Wel2IgWcBB1RsiH/4csA8Ik2EbFHpWi571enjyfdd5pRAdFZC9+xPj2593ApCkVRObxWPm
+	K/7Uu6eY2M/cvat8VmlU=
+X-Google-Smtp-Source: AGHT+IEha/cEycx+vu0xF7TxjEegwfvZABBYj962u8Q3zWPEYF1LD+BxwewIqIoCpytaOJDSx3nrIQ==
+X-Received: by 2002:a17:907:3d8e:b0:b04:706a:bcfc with SMTP id a640c23a62f3a-b07c37fd45cmr876333266b.33.1757822697695;
+        Sat, 13 Sep 2025 21:04:57 -0700 (PDT)
 Received: from localhost ([212.73.77.104])
-        by smtp.gmail.com with UTF8SMTPSA id a640c23a62f3a-b07b32dd57csm669318166b.52.2025.09.13.21.04.16
+        by smtp.gmail.com with UTF8SMTPSA id a640c23a62f3a-b07dbf5dbf5sm308085466b.79.2025.09.13.21.04.53
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 13 Sep 2025 21:04:20 -0700 (PDT)
+        Sat, 13 Sep 2025 21:04:57 -0700 (PDT)
 From: Askar Safin <safinaskar@gmail.com>
 To: linux-fsdevel@vger.kernel.org,
 	linux-kernel@vger.kernel.org
@@ -113,9 +113,9 @@ Cc: Linus Torvalds <torvalds@linux-foundation.org>,
 	Thorsten Blum <thorsten.blum@linux.dev>,
 	Heiko Carstens <hca@linux.ibm.com>,
 	patches@lists.linux.dev
-Subject: [PATCH RESEND 61/62] init: rename CONFIG_RD_LZ4 to CONFIG_INITRAMFS_DECOMPRESS_LZ4
-Date: Sun, 14 Sep 2025 07:04:15 +0300
-Message-ID: <20250914040416.3840072-1-safinaskar@gmail.com>
+Subject: [PATCH RESEND 62/62] init: rename CONFIG_RD_ZSTD to CONFIG_INITRAMFS_DECOMPRESS_ZSTD
+Date: Sun, 14 Sep 2025 07:04:51 +0300
+Message-ID: <20250914040451.3848715-1-safinaskar@gmail.com>
 X-Mailer: git-send-email 2.47.2
 In-Reply-To: <20250913003842.41944-1-safinaskar@gmail.com>
 References: <20250913003842.41944-1-safinaskar@gmail.com>
@@ -128,233 +128,51 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
 Initrd support was removed,
-and CONFIG_RD_LZ4 has nothing to do with ramdisks.
+and CONFIG_RD_ZSTD has nothing to do with ramdisks.
 
 Update your configs
 
 Signed-off-by: Askar Safin <safinaskar@gmail.com>
 ---
- arch/arm/configs/aspeed_g4_defconfig       | 2 +-
- arch/arm/configs/aspeed_g5_defconfig       | 2 +-
- arch/arm/configs/lpc18xx_defconfig         | 2 +-
- arch/arm/configs/sp7021_defconfig          | 2 +-
- arch/arm/configs/vf610m4_defconfig         | 2 +-
- arch/mips/configs/ath25_defconfig          | 2 +-
- arch/mips/configs/bmips_stb_defconfig      | 2 +-
- arch/openrisc/configs/simple_smp_defconfig | 2 +-
- arch/powerpc/configs/44x/fsp2_defconfig    | 2 +-
- arch/powerpc/configs/skiroot_defconfig     | 2 +-
- arch/riscv/configs/nommu_k210_defconfig    | 2 +-
- arch/riscv/configs/nommu_virt_defconfig    | 2 +-
- arch/xtensa/configs/cadence_csp_defconfig  | 2 +-
- arch/xtensa/configs/nommu_kc705_defconfig  | 2 +-
- usr/Kconfig                                | 4 ++--
- 15 files changed, 16 insertions(+), 16 deletions(-)
+ arch/riscv/configs/nommu_k210_defconfig | 2 +-
+ usr/Kconfig                             | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm/configs/aspeed_g4_defconfig b/arch/arm/configs/aspeed_g4_defconfig
-index 2b22ce99e42d..a65bdc6e6c2f 100644
---- a/arch/arm/configs/aspeed_g4_defconfig
-+++ b/arch/arm/configs/aspeed_g4_defconfig
-@@ -11,7 +11,7 @@ CONFIG_NAMESPACES=y
- CONFIG_INITRAMFS=y
- # CONFIG_INITRAMFS_DECOMPRESS_BZIP2 is not set
- # CONFIG_INITRAMFS_DECOMPRESS_LZO is not set
--# CONFIG_RD_LZ4 is not set
-+# CONFIG_INITRAMFS_DECOMPRESS_LZ4 is not set
- CONFIG_EXPERT=y
- # CONFIG_UID16 is not set
- # CONFIG_SYSFS_SYSCALL is not set
-diff --git a/arch/arm/configs/aspeed_g5_defconfig b/arch/arm/configs/aspeed_g5_defconfig
-index 764fde3d416b..24954645c34f 100644
---- a/arch/arm/configs/aspeed_g5_defconfig
-+++ b/arch/arm/configs/aspeed_g5_defconfig
-@@ -11,7 +11,7 @@ CONFIG_NAMESPACES=y
- CONFIG_INITRAMFS=y
- # CONFIG_INITRAMFS_DECOMPRESS_BZIP2 is not set
- # CONFIG_INITRAMFS_DECOMPRESS_LZO is not set
--# CONFIG_RD_LZ4 is not set
-+# CONFIG_INITRAMFS_DECOMPRESS_LZ4 is not set
- CONFIG_EXPERT=y
- # CONFIG_UID16 is not set
- # CONFIG_SYSFS_SYSCALL is not set
-diff --git a/arch/arm/configs/lpc18xx_defconfig b/arch/arm/configs/lpc18xx_defconfig
-index b14ebbe5b023..4dee6346a6a8 100644
---- a/arch/arm/configs/lpc18xx_defconfig
-+++ b/arch/arm/configs/lpc18xx_defconfig
-@@ -5,7 +5,7 @@ CONFIG_INITRAMFS=y
- # CONFIG_INITRAMFS_DECOMPRESS_LZMA is not set
- # CONFIG_INITRAMFS_DECOMPRESS_XZ is not set
- # CONFIG_INITRAMFS_DECOMPRESS_LZO is not set
--# CONFIG_RD_LZ4 is not set
-+# CONFIG_INITRAMFS_DECOMPRESS_LZ4 is not set
- CONFIG_CC_OPTIMIZE_FOR_SIZE=y
- # CONFIG_UID16 is not set
- CONFIG_BASE_SMALL=y
-diff --git a/arch/arm/configs/sp7021_defconfig b/arch/arm/configs/sp7021_defconfig
-index e65c94f24341..6b1166cbf478 100644
---- a/arch/arm/configs/sp7021_defconfig
-+++ b/arch/arm/configs/sp7021_defconfig
-@@ -10,7 +10,7 @@ CONFIG_LOG_BUF_SHIFT=14
- # CONFIG_INITRAMFS_DECOMPRESS_LZMA is not set
- # CONFIG_INITRAMFS_DECOMPRESS_XZ is not set
- # CONFIG_INITRAMFS_DECOMPRESS_LZO is not set
--# CONFIG_RD_LZ4 is not set
-+# CONFIG_INITRAMFS_DECOMPRESS_LZ4 is not set
- CONFIG_CC_OPTIMIZE_FOR_SIZE=y
- CONFIG_PERF_EVENTS=y
- CONFIG_ARCH_SUNPLUS=y
-diff --git a/arch/arm/configs/vf610m4_defconfig b/arch/arm/configs/vf610m4_defconfig
-index 7d457a196dfc..acec039e2f16 100644
---- a/arch/arm/configs/vf610m4_defconfig
-+++ b/arch/arm/configs/vf610m4_defconfig
-@@ -3,7 +3,7 @@ CONFIG_INITRAMFS=y
- # CONFIG_INITRAMFS_DECOMPRESS_BZIP2 is not set
- # CONFIG_INITRAMFS_DECOMPRESS_LZMA is not set
- # CONFIG_INITRAMFS_DECOMPRESS_XZ is not set
--# CONFIG_RD_LZ4 is not set
-+# CONFIG_INITRAMFS_DECOMPRESS_LZ4 is not set
- CONFIG_EXPERT=y
- CONFIG_KALLSYMS_ALL=y
- # CONFIG_MMU is not set
-diff --git a/arch/mips/configs/ath25_defconfig b/arch/mips/configs/ath25_defconfig
-index baf32dfe8295..5e84ee24e372 100644
---- a/arch/mips/configs/ath25_defconfig
-+++ b/arch/mips/configs/ath25_defconfig
-@@ -7,7 +7,7 @@ CONFIG_INITRAMFS=y
- # CONFIG_INITRAMFS_DECOMPRESS_BZIP2 is not set
- # CONFIG_INITRAMFS_DECOMPRESS_XZ is not set
- # CONFIG_INITRAMFS_DECOMPRESS_LZO is not set
--# CONFIG_RD_LZ4 is not set
-+# CONFIG_INITRAMFS_DECOMPRESS_LZ4 is not set
- CONFIG_CC_OPTIMIZE_FOR_SIZE=y
- # CONFIG_FHANDLE is not set
- # CONFIG_AIO is not set
-diff --git a/arch/mips/configs/bmips_stb_defconfig b/arch/mips/configs/bmips_stb_defconfig
-index 44830de10527..b5fb138bf237 100644
---- a/arch/mips/configs/bmips_stb_defconfig
-+++ b/arch/mips/configs/bmips_stb_defconfig
-@@ -19,7 +19,7 @@ CONFIG_MIPS_O32_FP64_SUPPORT=y
- # CONFIG_INITRAMFS_DECOMPRESS_LZMA is not set
- CONFIG_INITRAMFS_DECOMPRESS_XZ=y
- # CONFIG_INITRAMFS_DECOMPRESS_LZO is not set
--# CONFIG_RD_LZ4 is not set
-+# CONFIG_INITRAMFS_DECOMPRESS_LZ4 is not set
- CONFIG_PCI=y
- CONFIG_PCI_MSI=y
- CONFIG_PCIEASPM_POWERSAVE=y
-diff --git a/arch/openrisc/configs/simple_smp_defconfig b/arch/openrisc/configs/simple_smp_defconfig
-index 9f4bb9d940f0..5265f6f940a5 100644
---- a/arch/openrisc/configs/simple_smp_defconfig
-+++ b/arch/openrisc/configs/simple_smp_defconfig
-@@ -7,7 +7,7 @@ CONFIG_INITRAMFS=y
- # CONFIG_INITRAMFS_DECOMPRESS_LZMA is not set
- # CONFIG_INITRAMFS_DECOMPRESS_XZ is not set
- # CONFIG_INITRAMFS_DECOMPRESS_LZO is not set
--# CONFIG_RD_LZ4 is not set
-+# CONFIG_INITRAMFS_DECOMPRESS_LZ4 is not set
- CONFIG_EXPERT=y
- # CONFIG_KALLSYMS is not set
- # CONFIG_EPOLL is not set
-diff --git a/arch/powerpc/configs/44x/fsp2_defconfig b/arch/powerpc/configs/44x/fsp2_defconfig
-index e5e4f6721728..34486aa5155f 100644
---- a/arch/powerpc/configs/44x/fsp2_defconfig
-+++ b/arch/powerpc/configs/44x/fsp2_defconfig
-@@ -12,7 +12,7 @@ CONFIG_INITRAMFS=y
- # CONFIG_INITRAMFS_DECOMPRESS_LZMA is not set
- # CONFIG_INITRAMFS_DECOMPRESS_XZ is not set
- # CONFIG_INITRAMFS_DECOMPRESS_LZO is not set
--# CONFIG_RD_LZ4 is not set
-+# CONFIG_INITRAMFS_DECOMPRESS_LZ4 is not set
- CONFIG_KALLSYMS_ALL=y
- CONFIG_BPF_SYSCALL=y
- CONFIG_EXPERT=y
-diff --git a/arch/powerpc/configs/skiroot_defconfig b/arch/powerpc/configs/skiroot_defconfig
-index fc1a718af17a..d159882484f6 100644
---- a/arch/powerpc/configs/skiroot_defconfig
-+++ b/arch/powerpc/configs/skiroot_defconfig
-@@ -14,7 +14,7 @@ CONFIG_INITRAMFS=y
- # CONFIG_INITRAMFS_DECOMPRESS_BZIP2 is not set
- # CONFIG_INITRAMFS_DECOMPRESS_LZMA is not set
- # CONFIG_INITRAMFS_DECOMPRESS_LZO is not set
--# CONFIG_RD_LZ4 is not set
-+# CONFIG_INITRAMFS_DECOMPRESS_LZ4 is not set
- CONFIG_CC_OPTIMIZE_FOR_SIZE=y
- CONFIG_EXPERT=y
- # CONFIG_SGETMASK_SYSCALL is not set
 diff --git a/arch/riscv/configs/nommu_k210_defconfig b/arch/riscv/configs/nommu_k210_defconfig
-index 7507045e9c4a..6e961256a941 100644
+index 6e961256a941..68cae0496b54 100644
 --- a/arch/riscv/configs/nommu_k210_defconfig
 +++ b/arch/riscv/configs/nommu_k210_defconfig
-@@ -6,7 +6,7 @@ CONFIG_INITRAMFS=y
- # CONFIG_INITRAMFS_DECOMPRESS_LZMA is not set
+@@ -7,7 +7,7 @@ CONFIG_INITRAMFS=y
  # CONFIG_INITRAMFS_DECOMPRESS_XZ is not set
  # CONFIG_INITRAMFS_DECOMPRESS_LZO is not set
--# CONFIG_RD_LZ4 is not set
-+# CONFIG_INITRAMFS_DECOMPRESS_LZ4 is not set
- # CONFIG_RD_ZSTD is not set
+ # CONFIG_INITRAMFS_DECOMPRESS_LZ4 is not set
+-# CONFIG_RD_ZSTD is not set
++# CONFIG_INITRAMFS_DECOMPRESS_ZSTD is not set
  CONFIG_CC_OPTIMIZE_FOR_SIZE=y
  # CONFIG_SYSFS_SYSCALL is not set
-diff --git a/arch/riscv/configs/nommu_virt_defconfig b/arch/riscv/configs/nommu_virt_defconfig
-index afa79217f06e..eb289c44dfc3 100644
---- a/arch/riscv/configs/nommu_virt_defconfig
-+++ b/arch/riscv/configs/nommu_virt_defconfig
-@@ -5,7 +5,7 @@ CONFIG_INITRAMFS=y
- # CONFIG_INITRAMFS_DECOMPRESS_LZMA is not set
- # CONFIG_INITRAMFS_DECOMPRESS_XZ is not set
- # CONFIG_INITRAMFS_DECOMPRESS_LZO is not set
--# CONFIG_RD_LZ4 is not set
-+# CONFIG_INITRAMFS_DECOMPRESS_LZ4 is not set
- CONFIG_CC_OPTIMIZE_FOR_SIZE=y
- CONFIG_EXPERT=y
- # CONFIG_SYSFS_SYSCALL is not set
-diff --git a/arch/xtensa/configs/cadence_csp_defconfig b/arch/xtensa/configs/cadence_csp_defconfig
-index dad9383c6deb..26a4a9f3886a 100644
---- a/arch/xtensa/configs/cadence_csp_defconfig
-+++ b/arch/xtensa/configs/cadence_csp_defconfig
-@@ -18,7 +18,7 @@ CONFIG_INITRAMFS_SOURCE="$$KERNEL_INITRAMFS_SOURCE"
- # CONFIG_INITRAMFS_DECOMPRESS_LZMA is not set
- # CONFIG_INITRAMFS_DECOMPRESS_XZ is not set
- # CONFIG_INITRAMFS_DECOMPRESS_LZO is not set
--# CONFIG_RD_LZ4 is not set
-+# CONFIG_INITRAMFS_DECOMPRESS_LZ4 is not set
- CONFIG_CC_OPTIMIZE_FOR_SIZE=y
- CONFIG_EXPERT=y
- CONFIG_PROFILING=y
-diff --git a/arch/xtensa/configs/nommu_kc705_defconfig b/arch/xtensa/configs/nommu_kc705_defconfig
-index 0a0e94ae7b1c..988998806661 100644
---- a/arch/xtensa/configs/nommu_kc705_defconfig
-+++ b/arch/xtensa/configs/nommu_kc705_defconfig
-@@ -19,7 +19,7 @@ CONFIG_INITRAMFS=y
- # CONFIG_INITRAMFS_DECOMPRESS_LZMA is not set
- # CONFIG_INITRAMFS_DECOMPRESS_XZ is not set
- # CONFIG_INITRAMFS_DECOMPRESS_LZO is not set
--# CONFIG_RD_LZ4 is not set
-+# CONFIG_INITRAMFS_DECOMPRESS_LZ4 is not set
- CONFIG_EXPERT=y
- CONFIG_KALLSYMS_ALL=y
- CONFIG_PERF_EVENTS=y
+ # CONFIG_FHANDLE is not set
 diff --git a/usr/Kconfig b/usr/Kconfig
-index 62c978018565..3a891a0c9ef4 100644
+index 3a891a0c9ef4..06e1c1474b68 100644
 --- a/usr/Kconfig
 +++ b/usr/Kconfig
-@@ -92,7 +92,7 @@ config INITRAMFS_DECOMPRESS_LZO
- 	  Support loading of a LZO encoded initial ramfs.
+@@ -100,7 +100,7 @@ config INITRAMFS_DECOMPRESS_LZ4
+ 	  Support loading of a LZ4 encoded initial ramfs.
  	  If unsure, say N.
  
--config RD_LZ4
-+config INITRAMFS_DECOMPRESS_LZ4
- 	bool "Support initial ramfs compressed using LZ4"
+-config RD_ZSTD
++config INITRAMFS_DECOMPRESS_ZSTD
+ 	bool "Support initial ramfs compressed using ZSTD"
  	default y
- 	select DECOMPRESS_LZ4
-@@ -195,7 +195,7 @@ config INITRAMFS_COMPRESSION_LZO
+ 	select DECOMPRESS_ZSTD
+@@ -206,7 +206,7 @@ config INITRAMFS_COMPRESSION_LZ4
  
- config INITRAMFS_COMPRESSION_LZ4
- 	bool "LZ4"
--	depends on RD_LZ4
-+	depends on INITRAMFS_DECOMPRESS_LZ4
+ config INITRAMFS_COMPRESSION_ZSTD
+ 	bool "ZSTD"
+-	depends on RD_ZSTD
++	depends on INITRAMFS_DECOMPRESS_ZSTD
  	help
- 	  It's compression ratio is the poorest amongst the choices. The kernel
- 	  size is about 15% bigger than gzip; however its decompression speed
+ 	  ZSTD is a compression algorithm targeting intermediate compression
+ 	  with fast decompression speed. It will compress better than GZIP and
 -- 
 2.47.2
 
