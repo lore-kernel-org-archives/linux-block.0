@@ -1,63 +1,63 @@
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C065226A1CC
-	for <linux-block@vger.kernel.org>; Sun, 14 Sep 2025 03:54:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5353F26B755
+	for <linux-block@vger.kernel.org>; Sun, 14 Sep 2025 03:54:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757822052; cv=none; b=CfkVlZiFN8hrVRjRJIFLaXYOxoaT8wbIfMBhHs+p2gUcHJ8GvyzlurtQitmKMi2Rbu+2JDvUZzCCUgLFxX4f8xY8bZFs4NDFpQXKgoPI9Rz5XbUhHqtLBlgwIuCQffHEu6/A9AtK8mugWrYqb9oOZv8PMueizaJo9dwDjRGFj0U=
+	t=1757822089; cv=none; b=VPLPp7nqXyAgfPf4EPBpoG4H1JqoH/hqGo1AE3ZRfoJZ4X5KZpkOliDc/l+8Lhoq+w6NaijYPQURd5VO1Hy6I+hF6nIqkadmnp2H3ZoH8o8dIq/9O93GI3+L0YvZ6lMpemLvvdVgiX1+DQONgMXKYrhgexdu9gC7zSUEJDTpLvU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757822052; c=relaxed/simple;
-	bh=E3G8T/3zLMm3x5kad8USEbJCkxfjt487WTCm3NfxUQM=;
+	s=arc-20240116; t=1757822089; c=relaxed/simple;
+	bh=z148AkYrWgRabAliJ93Wt4Z2ZD8niTFA9cUReN1NNec=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Xfxj5nwo0ieU4X9yw0BBbBLm62/97S3r35DT1ol9IQxLRIJDvngmg2sK3i8sFqdn6TVUODlUpvSKpXdVV37aH3MNtfnqxEPLsQL0ZzSO1ihV9esJoj8kjjl1n+t0QDCnARmiZJ1jau5K3VvxWi/28cZ/2Chg/mnsg1VHwAecFbc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m7q9EjnF; arc=none smtp.client-ip=209.85.218.43
+	 MIME-Version; b=BZ4D7MogUJWsqE+SDCpVhpdDf84UOyagztyD9u1VPNLATeSX9ml0z0a/HlvNlq0J6eIKD1TWzOWIeZ4Dg36WJamAQPdQ0YX2fWt++FuwZBvJhoylL+/t1nUDnHZIVF2RNga9Le4LtZIvSQuuGkfWTt/VQB2BVnvlHBK+W3TtJBc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SnKvRore; arc=none smtp.client-ip=209.85.218.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m7q9EjnF"
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-b042eb09948so660047966b.3
-        for <linux-block@vger.kernel.org>; Sat, 13 Sep 2025 20:54:09 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SnKvRore"
+Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-b00a9989633so589071766b.0
+        for <linux-block@vger.kernel.org>; Sat, 13 Sep 2025 20:54:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757822048; x=1758426848; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1757822083; x=1758426883; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=U0YiDU4Bzw7IKNW2/fgCfvKW6iRx1DQ4l7Ssn455PQA=;
-        b=m7q9EjnFFJXZKnnJWAuHewuPVuFM6vjLTLUvGfzyzdImBQ++EznbIWQrk7ZI2edCxN
-         ABVvHSn4RknXX5w6azOwuYHGkiavtI++cDhw2VB+z9yMG4LKQot3louLK0jFpgqq1FWv
-         Q78TRjdvR0Cw/rFvCF6EeApx0C0A+QEIwW3wsoRz53U0346Ms0IAbOFiBo7TQKjy2D0H
-         6fAS2QfZ95SJNv8tL8ibrMA8/T7EUfTK9KZRsSZi0NwfZi/1IKHCtEKzDysYdoxQDCFa
-         Jvp3JCGDTMjnFlQzVxYRvv7qTI5TjZp2QRR+sCsbevZnJUnSRA7koomaDueq5ksTsrH3
-         uUqg==
+        bh=pjKVSjXysip/b5UNUwgMX+OIg9u3DNn6e0+I8Cmpn0k=;
+        b=SnKvRoreLVbwLq3ZfOlOAtKHzJTK+2CRHD7ST4oqw6m/ZX2K/TZA22o1yNoPXi2wZ5
+         G7kuVImssYITwW/jgXP4hkFh2XUZ+TERnohXGu6hptn3aDrOoY98hw+QU1dhrDTt5T8k
+         mMC8GCnLmrUP1UL8ToJv32F/LGSgjUKrOXx4232qqs1cxpwgRVRk7tE8FWchEOHHC9Tp
+         2SVUSHGslP+mCL9Z2UrOW6k9kv36DNY8Z2iTZPf0J8NDSEFQeGls4ACw/IuSe9ucFlYV
+         m/I19RcmkFI3CO/PBZXuNWwi6tPZdk4wyrRTTsiUNwQ1IuWcK82Mr0pn/is7hcMyR4y2
+         XIhQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757822048; x=1758426848;
+        d=1e100.net; s=20230601; t=1757822083; x=1758426883;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=U0YiDU4Bzw7IKNW2/fgCfvKW6iRx1DQ4l7Ssn455PQA=;
-        b=uZT+vHU8T93NKCYbK93qxDcI8K93j0Crr47doToFu8/IZfT7g4EYplTJtpUUYpW8Tq
-         Ig6B7Z8k9H16sCd1RxDFJ0XeZZnhvsQs+k++pECBz0GJgI0jrTwcYIs4pSBTv3ey78U/
-         CBvtXPnsqtLGC3lVcAq+a1pTe1Tp2tBmqwZeR86H7M/XL2NA4hc6a7rGaoXUpDerT5ex
-         4yTZ9a0GrEeMIh7oI2uPWcM4bxdVt4HpOk/70Zi54e0mAb3qBwANQO1dmZH7uaN6EcVU
-         VlqQ5rIo5JgM+Ht91R1L50KPbURyP3flUNHxqmJ4vlhxpeL438FzYuDnLIolF97HoM1T
-         jwCw==
-X-Forwarded-Encrypted: i=1; AJvYcCWZPYQn1s3fqoOQH0+poeP2MhXvUiXXucgQOxSQRxgB0x9jkpo1OQssiRp6cod91U1VakjVymGeQ6YfWA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YypJna6cC/CAZfyMUEb2WgwgElosNIdfrhs4FAkOF2RuAZx1/PI
-	s/8MNml5/6cCu8xyrPJsil5UC3/88/aWNZ+c94PdOSHwVQTDPXHz6Cj3
-X-Gm-Gg: ASbGncvo0TzgJhuI+MY6kX3ch0eh9VJZIqGt4T3hAsabG8NGXeLmGfZUIRrG+NL8u5D
-	xo0QxnHUPEowecBpOu9XFi0EUymUEQAqkK37E1FtVwdC6WX8Xq2T2uGYHfM9JKH2CmWvPjWlIPr
-	/5Om/NFKc2mBmmIgMpYLzTfzpMCRhA4OJb/v+Um1pExvMvrcKIuDL46U/yelgC10CyPo+xX63dd
-	7ChnuMjqFO9bvvYKMQGUTJzmHYdf7Ca4Zbck6Bznkl/KWR8xgBpQbIglzFqLNg6NaW+JtS2Pi3f
-	jJOrgsiMnE9VffyXAqofiBJWnAMFSNqe4RiLmHrxLruhMk2j7HZJKXj6yen2I+sOfvB1Q0gMLN1
-	5sq/IRVyNnrJr9Rw6noSHThURBqnFfg==
-X-Google-Smtp-Source: AGHT+IEVLkeZlLSkzoTpPLzlBRvNTQ9m/bl133jXYp2zZldNvB+tlYKH8pXYzZ5ISfOO2+UjGM6RFg==
-X-Received: by 2002:a17:907:e8d:b0:b0e:3d88:27fd with SMTP id a640c23a62f3a-b0e3d97e027mr75192266b.8.1757822048020;
-        Sat, 13 Sep 2025 20:54:08 -0700 (PDT)
+        bh=pjKVSjXysip/b5UNUwgMX+OIg9u3DNn6e0+I8Cmpn0k=;
+        b=bGYbZjslMktTashDyArDJI+9gZ+hykcZ2uH8tme4F03icCEMVPdQvO05/Qh/N+v2/d
+         GAwzi8GQ8DZyq4gp3pyWVpE0ZK7tHYNd7XxyIko0q+zDLcW88Jkr4Hsqto9AXA037v5w
+         1MsIx6KU8cIgsNxyTblCseLiGQAY/5cpy7veDJi3JEkFDsLlqQFmXWnXEH500vc+czRi
+         HvQFgofrEDRGEOiat/mBHAIhDCnihyi5YpJK3zQKNLI+P2/ULKhQF5y7eptXQSEbopA0
+         H2+zW9DcpEA9xw7BQ8bkycfPqEwpdG99Z8SRkPlZya/8C880UOZPRw/V1GZekwg78rY7
+         DfOw==
+X-Forwarded-Encrypted: i=1; AJvYcCV4Y0LzD6HaHXp1Or0Wg461dLQdVDkqTeyyIsScJion2jFWBeAzSzBYXt8WzZlneYGrZuFGEZ3f8JqoYw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyBQwigau4GpancxXM8uGkOxvQAn0v8yVQjQ09D4GVOJCSi0v8V
+	dmO7Vg29iaxAws+T3KpGdsMhayqPB3dRJSfKepjrFg/j/k5KGlfUcLFs
+X-Gm-Gg: ASbGncuonm/8bScy1A+FZaQpBMdTtql2Whh20tYaZIt+AzlYHpgIwlfWjCKWbv0v5lq
+	OBmKtVsLjsTlah/tHnYGmk5ZutfkKkgknVNNwCW/2UbODwadNmtqfmbiyxQPMjzXGAcTaKFBa/o
+	rwVsbKcpFyQ/dV7uvkX2956R4iIOi4L4lv9+eZkXoylY1wRRbVXWuPIEqNcrUDhCgoESo+ZaGSa
+	u1ACyYdUXIZxDPamCkxDEcHp4QxynVK3AzJmoBBML+9QmgdFJ7YPUjNIPpKXOqmuIcL7EMUu/ZM
+	aXYn1n7Qc6BCPSP34/g6hPpsRNrJbaO/aHbqdtm2PK9oSEcXMqvEXCOG98OKeG8X+KoXaYi3zAN
+	Gv3D/mm1TOysKePzDFzIdjLnDSAdctw==
+X-Google-Smtp-Source: AGHT+IFpMpCVJeNrUipt0dZC4eBHRTy08fiFy9cwywIocPIoMawoMDT0bJrFyHi72vkPeUNRc3Oodg==
+X-Received: by 2002:a17:906:114e:b0:b0b:35d8:248e with SMTP id a640c23a62f3a-b0b35d8267fmr237998166b.18.1757822083468;
+        Sat, 13 Sep 2025 20:54:43 -0700 (PDT)
 Received: from localhost ([212.73.77.104])
-        by smtp.gmail.com with UTF8SMTPSA id a640c23a62f3a-b07da7a8918sm303079766b.56.2025.09.13.20.54.03
+        by smtp.gmail.com with UTF8SMTPSA id a640c23a62f3a-b07b32dd5a9sm665619166b.57.2025.09.13.20.54.39
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 13 Sep 2025 20:54:07 -0700 (PDT)
+        Sat, 13 Sep 2025 20:54:43 -0700 (PDT)
 From: Askar Safin <safinaskar@gmail.com>
 To: linux-fsdevel@vger.kernel.org,
 	linux-kernel@vger.kernel.org
@@ -113,9 +113,9 @@ Cc: Linus Torvalds <torvalds@linux-foundation.org>,
 	Thorsten Blum <thorsten.blum@linux.dev>,
 	Heiko Carstens <hca@linux.ibm.com>,
 	patches@lists.linux.dev
-Subject: [PATCH RESEND 44/62] doc: kernel-parameters: remove [RAM] from reserve_mem=
-Date: Sun, 14 Sep 2025 06:54:02 +0300
-Message-ID: <20250914035402.3670906-1-safinaskar@gmail.com>
+Subject: [PATCH RESEND 45/62] doc: kernel-parameters: replace [RAM] with [INITRAMFS]
+Date: Sun, 14 Sep 2025 06:54:38 +0300
+Message-ID: <20250914035438.3682240-1-safinaskar@gmail.com>
 X-Mailer: git-send-email 2.47.2
 In-Reply-To: <20250913003842.41944-1-safinaskar@gmail.com>
 References: <20250913003842.41944-1-safinaskar@gmail.com>
@@ -127,27 +127,117 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This parameter has nothing to do with ramdisk
+Also, do other initramfs-related edits, while we are here
 
 Signed-off-by: Askar Safin <safinaskar@gmail.com>
 ---
- Documentation/admin-guide/kernel-parameters.txt | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ .../admin-guide/kernel-parameters.rst         |  4 ++--
+ .../admin-guide/kernel-parameters.txt         | 20 +++++++++----------
+ 2 files changed, 12 insertions(+), 12 deletions(-)
 
+diff --git a/Documentation/admin-guide/kernel-parameters.rst b/Documentation/admin-guide/kernel-parameters.rst
+index 39d0e7ff0965..22af6bbffc35 100644
+--- a/Documentation/admin-guide/kernel-parameters.rst
++++ b/Documentation/admin-guide/kernel-parameters.rst
+@@ -123,7 +123,7 @@ is applicable::
+ 	CMA	Contiguous Memory Area support is enabled.
+ 	DRM	Direct Rendering Management support is enabled.
+ 	DYNAMIC_DEBUG Build in debug messages and enable them at runtime
+-	EARLY	Parameter processed too early to be embedded in initrd.
++	EARLY	Parameter processed too early to be embedded in initramfs.
+ 	EDD	BIOS Enhanced Disk Drive Services (EDD) is enabled
+ 	EFI	EFI Partitioning (GPT) is enabled
+ 	EVM	Extended Verification Module
+@@ -134,6 +134,7 @@ is applicable::
+ 	HW	Appropriate hardware is enabled.
+ 	HYPER_V HYPERV support is enabled.
+ 	IMA     Integrity measurement architecture is enabled.
++	INITRAMFS Initramfs support is enabled.
+ 	IP_PNP	IP DHCP, BOOTP, or RARP is enabled.
+ 	IPV6	IPv6 support is enabled.
+ 	ISAPNP	ISA PnP code is enabled.
+@@ -167,7 +168,6 @@ is applicable::
+ 	PPT	Parallel port support is enabled.
+ 	PS2	Appropriate PS/2 support is enabled.
+ 	PV_OPS	A paravirtualized kernel is enabled.
+-	RAM	RAM disk support is enabled.
+ 	RDT	Intel Resource Director Technology.
+ 	RISCV	RISCV architecture is enabled.
+ 	S390	S390 architecture is enabled.
 diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-index a259f2bdba0f..0805d3ebc75a 100644
+index 0805d3ebc75a..8e10abac4cc7 100644
 --- a/Documentation/admin-guide/kernel-parameters.txt
 +++ b/Documentation/admin-guide/kernel-parameters.txt
-@@ -6277,8 +6277,7 @@
- 			them.  If <base> is less than 0x10000, the region
- 			is assumed to be I/O ports; otherwise it is memory.
+@@ -565,7 +565,7 @@
+ 			Format: integer
  
--	reserve_mem=	[RAM]
--			Format: nn[KMG]:<align>:<label>
-+	reserve_mem=	Format: nn[KMG]:<align>:<label>
- 			Reserve physical memory and label it with a name that
- 			other subsystems can use to access it. This is typically
- 			used for systems that do not wipe the RAM, and this command
+ 	bootconfig	[KNL,EARLY]
+-			Extended command line options can be added to an initrd
++			Extended command line options can be added to an initramfs
+ 			and this will cause the kernel to look for it.
+ 
+ 			See Documentation/admin-guide/bootconfig.rst
+@@ -1005,7 +1005,7 @@
+ 			may be missing from the dump.
+ 
+ 			A standard crashkernel reservation, as described above,
+-			is still needed to hold the crash kernel and initrd.
++			is still needed to hold the crash kernel and initramfs.
+ 
+ 			This option increases the risk of a kdump failure: DMA
+ 			transfers configured by the first kernel may end up
+@@ -2298,7 +2298,7 @@
+ 			initcall functions.  Useful for debugging built-in
+ 			modules and initcalls.
+ 
+-	initramfs_async= [KNL]
++	initramfs_async= [INITRAMFS,KNL]
+ 			Format: <bool>
+ 			Default: 1
+ 			This parameter controls whether the initramfs
+@@ -2310,10 +2310,10 @@
+ 			unpacking being completed before device_ and
+ 			late_ initcalls.
+ 
+-	initrd=		[BOOT,EARLY] Specify the location of the initial ramdisk
++	initrd=		[BOOT,EARLY,INITRAMFS,KNL] Same as initrdmem=
+ 
+-	initrdmem=	[KNL,EARLY] Specify a physical address and size from which to
+-			load the initrd. If an initrd is compiled in or
++	initrdmem=	[BOOT,EARLY,INITRAMFS,KNL] Specify a physical address and size from which to
++			load initramfs. If initramfs is compiled in or
+ 			specified in the bootparams, it takes priority over this
+ 			setting.
+ 			Format: ss[KMG],nn[KMG]
+@@ -2749,7 +2749,7 @@
+ 			between unregistering the boot console and initializing
+ 			the real console.
+ 
+-	keepinitrd	[HW,ARM] See retain_initrd.
++	keepinitrd	[HW,ARM,INITRAMFS] See retain_initrd.
+ 
+ 	kernelcore=	[KNL,X86,PPC,EARLY]
+ 			Format: nn[KMGTPE] | nn% | "mirror"
+@@ -6129,8 +6129,8 @@
+ 
+ 	rdinit=		[KNL]
+ 			Format: <full_path>
+-			Run specified binary instead of /init from the ramdisk,
+-			used for early userspace startup. See initrd.
++			Run specified binary instead of /init from initramfs,
++			used for early userspace startup.
+ 
+ 	rdrand=		[X86,EARLY]
+ 			force - Override the decision by the kernel to hide the
+@@ -6324,7 +6324,7 @@
+ 			Useful for devices that are detected asynchronously
+ 			(e.g. USB and MMC devices).
+ 
+-	retain_initrd	[RAM] Keep initrd memory after extraction. After boot, it will
++	retain_initrd	[INITRAMFS] Keep initramfs memory after extraction. After boot, it will
+ 			be accessible via /sys/firmware/initrd.
+ 
+ 	retbleed=	[X86] Control mitigation of RETBleed (Arbitrary
 -- 
 2.47.2
 
