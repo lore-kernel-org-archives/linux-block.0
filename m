@@ -1,171 +1,107 @@
-Received: from pegase2.c-s.fr (pegase2.c-s.fr [93.17.235.10])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0101030C35A;
-	Mon, 15 Sep 2025 12:21:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.235.10
+Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD2DC211460
+	for <linux-block@vger.kernel.org>; Mon, 15 Sep 2025 12:33:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757938874; cv=none; b=n1HsfQjcgyuTD5e21sqFRi+TaeHO7gurdpAPKSucOE88iCi4ZkR5UANI9eZhZnEDdbpjgHsBzhZcoH4JWN+EE3trbe5mwGt2E+LMzNefnQlWyncMR1Zb3/UPnRV+eEjBN+zLC9a9XI1pqCIw5AOHPFsAtr5iDLMr3ioHRUzQP9U=
+	t=1757939596; cv=none; b=VWb3w7aU1aamI/MG90SRdcNOd1B7YNIL4NDifLzHwCam1UrgxGyAHU7rSBj6yzcsOzEyWaviGjYI7FXIY8VkMPpFJXLUfz/lHUQZEuA1VmF+rowN1nJ33UBELwexwL4mHuaCoGAv44lmPZYkkX278v/HmuNqV/T7KgPtLxbtNPg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757938874; c=relaxed/simple;
-	bh=9RLcS91I7/JfJmj5gROsGNlF/zDbJRvo+2amvvvj6yQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TZykKVC7pyy/mtCA1vR/XeLkskmICdXY19JpPrfPvCxndFS44alE5iIUJ4F532oWvlsA4WuBwV4zI8geUSt6dNvu6T9GrDT/dhkkcCBBVl9rofLH8ppvpAvkcE5pfqExzTh/P8Q8g9s2W9uIlci+63ND7ILUaB00dcJvoAIgEEk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.235.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
-Received: from localhost (mailhub4.si.c-s.fr [172.26.127.67])
-	by localhost (Postfix) with ESMTP id 4cQNnR0pmTz9sxp;
-	Mon, 15 Sep 2025 13:57:31 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from pegase2.c-s.fr ([172.26.127.65])
-	by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id CofbtF7b-0VV; Mon, 15 Sep 2025 13:57:31 +0200 (CEST)
-Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
-	by pegase2.c-s.fr (Postfix) with ESMTP id 4cQNnQ5DNGz9sxl;
-	Mon, 15 Sep 2025 13:57:30 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id 981DC8B766;
-	Mon, 15 Sep 2025 13:57:30 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from messagerie.si.c-s.fr ([127.0.0.1])
-	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
-	with ESMTP id aYicW_kKuipv; Mon, 15 Sep 2025 13:57:30 +0200 (CEST)
-Received: from [10.25.207.160] (unknown [10.25.207.160])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id 227808B763;
-	Mon, 15 Sep 2025 13:57:30 +0200 (CEST)
-Message-ID: <99563c3d-7322-4164-81f3-0d28e91ed653@csgroup.eu>
-Date: Mon, 15 Sep 2025 13:57:29 +0200
+	s=arc-20240116; t=1757939596; c=relaxed/simple;
+	bh=ka4FueWz0Un+jHqDZVdsex6ys5suckZYq6W+FIQx+Vw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=bhFiZokx+AfB9RxzwwvbN491gKGOTSumkX/gAemlpkA2Kb+VUsjcPZaL7HwT42HRr8wk3gROQPjTpMViuJvfbFD39hTc+H6CL5MXHrcCzAWYsVeKgq+Tye1Udcgl/czSYjhqTWEWkcrVJUMPDxdsXIQBTUASVubhBarVlbAwMi4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T2GW5hSu; arc=none smtp.client-ip=209.85.216.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T2GW5hSu"
+Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-327f87275d4so3971492a91.1
+        for <linux-block@vger.kernel.org>; Mon, 15 Sep 2025 05:33:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1757939594; x=1758544394; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ICbjoiLsYOok1c81flKhzX2Dr5LZXmq+Z/dcfqb5QA0=;
+        b=T2GW5hSuYjeCSPKG4uahEZzPreVaiOtEDqUpmvm5rk6dEubX6+yP0XM/nhjJrrrVUf
+         c4Exzm7JF4Zw2loI8NezZSKeFG/c3iiVVsDba3Ez2RBduLITvlVscJKw2LVd6rkZSl4w
+         AJcSPCjT7H6OIAuHXHReRg2zWPQeS70tKgYG8B3JlaQYCYBPcLj7o9Mr9RmQa5jwNNdw
+         g0itH4p2mKF1KORp7uodbw5zFm6HgiIsBSMPhPkyYyXo/762KYxLmFTZBgwCR2z9b76v
+         vtpDs8LMPlf1LOvgiBhSTDt+03szq3SA+tBbItgxzzFkOmFmfyUUMN9p8l3LuNl+4uNX
+         4XCw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757939594; x=1758544394;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ICbjoiLsYOok1c81flKhzX2Dr5LZXmq+Z/dcfqb5QA0=;
+        b=QNPm73ph5oDcRer5jLrDVZ8MgBvEPGWQHn0/xjtZ9xHchqG58nkTnIGYOPdJf/W/q4
+         SSkPkMLbVsLr9KDYCWKNGbGZ+8FvyThwu//R8lS3xbVKBvkoqn2KGpiuvwnMx6Dp+sCE
+         u6Er8QAbUDcCjceuL/E4djVG3MjnMJK/RU/LSr1sPgVvKMhdSdTve6pEUMUIM9O3H6vh
+         guw4jHTiORSjQsV3doMBTo3QNiJepwFFRYGBpzHtmuyZWUWyL9+lMPWiHbjrepnba+MN
+         93UaxtyD8In9mDf23H5mWM/QLzSX/SwUhmnzhcgvyfhSnFA1VVtszCI7KLBze+/2NuUH
+         cxRg==
+X-Gm-Message-State: AOJu0YyLE5Q4ZLyM7l5G2ggm98M5t3bAP3U41XbFWTD4HIf9QPGoCl11
+	ftLwy/bAttbA3C4+XPElqhM2hHps4n4z53vhOAykEpoM00Wqkgug8GmpHmFSJDnUEuIegQ==
+X-Gm-Gg: ASbGncuLbRFUJXg6waBZjq9tgdETTau+z2RP83G0DP0VzGH5QdI21GhuIFDwSA1yaM0
+	DBRitec2uOII0Z5GU5UMfy29mF7vsmlt4LXRsgR5hcLzRlIytSpuNUh2x4N1r6nPgXMoDtGIy6b
+	hGMBA4OYtYXzWkhDue6CydusFQ9dVqWvzFZq7AjEQFxbtMD4t47s1fakMAq/bTY9NMpqcGd+/gO
+	Cp4psTGjfzQhvN91Wgew4WeOyXcFrkDv1a5kmco0pRMDLxmhPYP8JAgaqLDcUT8W6YYt+cIjNVb
+	AXRv7Bf9d+j7V0S4l8Rz3EPdWn9/u51MWPcTXBSxVi6RJ91eSUeEdBa5nTe5D/AdkjrqFgVE958
+	XRtuQhZgt3luZSCgsxmB8I7gc7lzEqIHEug2/o8bmOtDblhFXayB25yguObQ=
+X-Google-Smtp-Source: AGHT+IGejX8mFgf07YiMaFVmYLT41CYD7SaPHvbYCUMkBuErliPIRTYGZ2dSA/aTiLTYcgLAHiZL/g==
+X-Received: by 2002:a17:903:1b25:b0:246:d70e:ea82 with SMTP id d9443c01a7336-25d2528da26mr148679175ad.5.1757939594159;
+        Mon, 15 Sep 2025 05:33:14 -0700 (PDT)
+Received: from localhost.localdomain ([113.218.252.158])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-265819a6212sm37858845ad.57.2025.09.15.05.33.11
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Mon, 15 Sep 2025 05:33:13 -0700 (PDT)
+From: chengkaitao <pilgrimtao@gmail.com>
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	chengkaitao <chengkaitao@kylinos.cn>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Li Nan <linan122@huawei.com>
+Subject: [PATCH RESEND v2] block/mq-deadline: Remove the redundant rb_entry_rq in the deadline_from_pos().
+Date: Mon, 15 Sep 2025 20:33:07 +0800
+Message-Id: <20250915123307.96964-1-pilgrimtao@gmail.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RESEND 06/62] arm: init: remove special logic for setting
- brd.rd_size
-To: Askar Safin <safinaskar@gmail.com>, linux-fsdevel@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Cc: Linus Torvalds <torvalds@linux-foundation.org>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Christian Brauner <brauner@kernel.org>, Al Viro <viro@zeniv.linux.org.uk>,
- Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@lst.de>,
- Jens Axboe <axboe@kernel.dk>, Andy Shevchenko <andy.shevchenko@gmail.com>,
- Aleksa Sarai <cyphar@cyphar.com>,
- =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>,
- Julian Stecklina <julian.stecklina@cyberus-technology.de>,
- Gao Xiang <hsiangkao@linux.alibaba.com>, Art Nikpal <email2tema@gmail.com>,
- Andrew Morton <akpm@linux-foundation.org>, Eric Curtin <ecurtin@redhat.com>,
- Alexander Graf <graf@amazon.com>, Rob Landley <rob@landley.net>,
- Lennart Poettering <mzxreary@0pointer.de>, linux-arch@vger.kernel.org,
- linux-alpha@vger.kernel.org, linux-snps-arc@lists.infradead.org,
- linux-arm-kernel@lists.infradead.org, linux-csky@vger.kernel.org,
- linux-hexagon@vger.kernel.org, loongarch@lists.linux.dev,
- linux-m68k@lists.linux-m68k.org, linux-mips@vger.kernel.org,
- linux-openrisc@vger.kernel.org, linux-parisc@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
- linux-s390@vger.kernel.org, linux-sh@vger.kernel.org,
- sparclinux@vger.kernel.org, linux-um@lists.infradead.org, x86@kernel.org,
- Ingo Molnar <mingo@redhat.com>, linux-block@vger.kernel.org,
- initramfs@vger.kernel.org, linux-api@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-efi@vger.kernel.org,
- linux-ext4@vger.kernel.org, "Theodore Y . Ts'o" <tytso@mit.edu>,
- linux-acpi@vger.kernel.org, Michal Simek <monstr@monstr.eu>,
- devicetree@vger.kernel.org, Luis Chamberlain <mcgrof@kernel.org>,
- Kees Cook <kees@kernel.org>, Thorsten Blum <thorsten.blum@linux.dev>,
- Heiko Carstens <hca@linux.ibm.com>, patches@lists.linux.dev
-References: <20250913003842.41944-1-safinaskar@gmail.com>
- <20250913003842.41944-7-safinaskar@gmail.com>
-From: Christophe Leroy <christophe.leroy@csgroup.eu>
-Content-Language: fr-FR
-In-Reply-To: <20250913003842.41944-7-safinaskar@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
+From: chengkaitao <chengkaitao@kylinos.cn>
 
+In commit(fde02699c242), the "if (blk_rq_is_seq_zoned_write(rq))"
+was removed, but the "rb_entry_rq(node)" and some other code were
+inadvertently left behind. This patch fixed it.
 
-Le 13/09/2025 à 02:37, Askar Safin a écrit :
-> [Vous ne recevez pas souvent de courriers de safinaskar@gmail.com. Découvrez pourquoi ceci est important à https://aka.ms/LearnAboutSenderIdentification ]
-> 
-> There is no any reason for having special mechanism
-> for setting ramdisk size.
-> 
-> Also this allows us to change rd_size variable to static
+Signed-off-by: chengkaitao <chengkaitao@kylinos.cn>
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+Reviewed-by: Li Nan <linan122@huawei.com>
+---
+ block/mq-deadline.c | 4 ----
+ 1 file changed, 4 deletions(-)
 
-Can you squash patches 6 to 9 all together ?
-
-> 
-> Signed-off-by: Askar Safin <safinaskar@gmail.com>
-> ---
->   arch/arm/kernel/atags_parse.c | 12 ------------
->   drivers/block/brd.c           |  8 ++++----
->   include/linux/initrd.h        |  3 ---
->   3 files changed, 4 insertions(+), 19 deletions(-)
-> 
-> diff --git a/arch/arm/kernel/atags_parse.c b/arch/arm/kernel/atags_parse.c
-> index a3f0a4f84e04..615d9e83c9b5 100644
-> --- a/arch/arm/kernel/atags_parse.c
-> +++ b/arch/arm/kernel/atags_parse.c
-> @@ -87,18 +87,6 @@ static int __init parse_tag_videotext(const struct tag *tag)
->   __tagtable(ATAG_VIDEOTEXT, parse_tag_videotext);
->   #endif
-> 
-> -#ifdef CONFIG_BLK_DEV_RAM
-> -static int __init parse_tag_ramdisk(const struct tag *tag)
-> -{
-> -       if (tag->u.ramdisk.size)
-> -               rd_size = tag->u.ramdisk.size;
-> -
-> -       return 0;
-> -}
-> -
-> -__tagtable(ATAG_RAMDISK, parse_tag_ramdisk);
-> -#endif
-> -
->   static int __init parse_tag_serialnr(const struct tag *tag)
->   {
->          system_serial_low = tag->u.serialnr.low;
-> diff --git a/drivers/block/brd.c b/drivers/block/brd.c
-> index 0c2eabe14af3..72f02d2b8a99 100644
-> --- a/drivers/block/brd.c
-> +++ b/drivers/block/brd.c
-> @@ -27,6 +27,10 @@
-> 
->   #include <linux/uaccess.h>
-> 
-> +static unsigned long rd_size = CONFIG_BLK_DEV_RAM_SIZE;
-> +module_param(rd_size, ulong, 0444);
-> +MODULE_PARM_DESC(rd_size, "Size of each RAM disk in kbytes.");
-> +
->   /*
->    * Each block ramdisk device has a xarray brd_pages of pages that stores
->    * the pages containing the block device's contents.
-> @@ -209,10 +213,6 @@ static int rd_nr = CONFIG_BLK_DEV_RAM_COUNT;
->   module_param(rd_nr, int, 0444);
->   MODULE_PARM_DESC(rd_nr, "Maximum number of brd devices");
-> 
-> -unsigned long rd_size = CONFIG_BLK_DEV_RAM_SIZE;
-> -module_param(rd_size, ulong, 0444);
-> -MODULE_PARM_DESC(rd_size, "Size of each RAM disk in kbytes.");
-> -
->   static int max_part = 1;
->   module_param(max_part, int, 0444);
->   MODULE_PARM_DESC(max_part, "Num Minors to reserve between devices");
-> diff --git a/include/linux/initrd.h b/include/linux/initrd.h
-> index 6320a9cb6686..b42235c21444 100644
-> --- a/include/linux/initrd.h
-> +++ b/include/linux/initrd.h
-> @@ -5,9 +5,6 @@
-> 
->   #define INITRD_MINOR 250 /* shouldn't collide with /dev/ram* too soon ... */
-> 
-> -/* size of a single RAM disk */
-> -extern unsigned long rd_size;
-> -
->   /* 1 if it is not an error if initrd_start < memory_start */
->   extern int initrd_below_start_ok;
-> 
-> --
-> 2.47.2
-> 
-> 
+diff --git a/block/mq-deadline.c b/block/mq-deadline.c
+index 1a031922c447..63145cc9825f 100644
+--- a/block/mq-deadline.c
++++ b/block/mq-deadline.c
+@@ -133,10 +133,6 @@ static inline struct request *deadline_from_pos(struct dd_per_prio *per_prio,
+ 	struct rb_node *node = per_prio->sort_list[data_dir].rb_node;
+ 	struct request *rq, *res = NULL;
+ 
+-	if (!node)
+-		return NULL;
+-
+-	rq = rb_entry_rq(node);
+ 	while (node) {
+ 		rq = rb_entry_rq(node);
+ 		if (blk_rq_pos(rq) >= pos) {
+-- 
+2.39.5 (Apple Git-154)
 
