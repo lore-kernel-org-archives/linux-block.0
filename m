@@ -1,119 +1,85 @@
-Received: from 004.mia.mailroute.net (004.mia.mailroute.net [199.89.3.7])
+Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBD062DC78E;
-	Mon, 15 Sep 2025 21:26:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ABBA21A420;
+	Mon, 15 Sep 2025 22:59:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.89.141.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757971612; cv=none; b=h+PhxaotZcCeXwn5E3InePPIaISAbyk5XO0JtRtZHT2W/P9yF2Qs4b5GAtbfatmkq0gGbrRslzdshdScz35lsSFqCqp4NEKD92IQQhZOHZzRQ0kEagG9SmLjDQV1gYKpHwvrztjhmOEXw5Nr9ayS9OekPRxgC8mSYHO86QhEMo0=
+	t=1757977149; cv=none; b=O4w5DHWSEmb8HCXc90tM8yynhOwk6/nLsW0T1P28OcFfCUrGlyDq+iWUZVmk8yXx9PMcekV2SG61wJ7zeUDG3cl8/bVeaNuwhkbwAlPaL0JeXnS3BAqvNqsj1kFE9Lj0R7b9s44i9+WFZxrygRZG56ymELC/Cj8EYfIz290dU6k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757971612; c=relaxed/simple;
-	bh=F1ipfS8UGPGTKCo2J4DQxAs8vmHs6cZPnkAiHnP/5Hg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=UoCDZL23NdMf7/9WGJcJK2KTB+YR+PmVGFHfzeMssT55706lmrS+RFqQ/0bA+x07OUKMsJXqCyQzSBVTF2Ind3vHiQjFFxd/mgAylbs2xpt719C6UEQkPrqmjEuL+FQXPuozoVGu2CtxyZMTwjEtYldtu2Q47MKuGiIBNN9E8vs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=wkvea9OY; arc=none smtp.client-ip=199.89.3.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1757977149; c=relaxed/simple;
+	bh=1/okIRx6o6vXJ31CVPKT9oMoMrLI+nwNYwzkdKXP1jw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LLmOal2Iy6ZxqK42X3cpO1nW586wmBXSu03AbyWhNsEU26Fig35XfF7Yd/5efBjB3Yo91IDHOhvoCQiVgxzeLTALH+ZXshTRhNxy/O1e85SapjlqR5aF6UlxqdwochCPFDtdKSniH/iTzU1cDgtnyZQIL8cDU7qg0MmsaUkXMHI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=KRInvItP; arc=none smtp.client-ip=62.89.141.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="wkvea9OY"
-Received: from localhost (localhost [127.0.0.1])
-	by 004.mia.mailroute.net (Postfix) with ESMTP id 4cQdQK606Vzm0ySc;
-	Mon, 15 Sep 2025 21:26:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1757971607; x=1760563608; bh=23miGv/7QuDmfuZP+/ZrmchU
-	VWkCWSYajP4qSG4TBvQ=; b=wkvea9OYD7LrQtPQZS+KNEDFppoqKn1W/cjEM0q5
-	ZuPeio2I25eY5AGxpk5XMasEYEwIUI9/547r2FOruI9PYelB1PKKA4iKezmP0N68
-	A15uemDg1FK2vfFCa6iYWftjQwsXeuk6tP2cyELgBN9cfQ+FQIKaBrRh6iMvla7j
-	91NxQa0g7E7XlqtIS77eQenkEv/UvetMICX+tKIxMt1tdLmjLuy6s8L3k+Ka9QiG
-	Y+If7nWmgX4nkFz1/ZjPxr9oXtl/xQELWy5Z4AjqZXHdG29dVVrLPtfk9FPMrCBX
-	E3nyrheu/lSgb6/c03+OwBd0gwpwsrs4LuqZLqiZEJitnA==
-X-Virus-Scanned: by MailRoute
-Received: from 004.mia.mailroute.net ([127.0.0.1])
- by localhost (004.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id BaI7MOOtGWAV; Mon, 15 Sep 2025 21:26:47 +0000 (UTC)
-Received: from [100.66.154.22] (unknown [104.135.204.82])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 004.mia.mailroute.net (Postfix) with ESMTPSA id 4cQdQ51p48zm0yT2;
-	Mon, 15 Sep 2025 21:26:35 +0000 (UTC)
-Message-ID: <191ca54f-0faa-4615-967a-7b4c86d59e0e@acm.org>
-Date: Mon, 15 Sep 2025 14:26:34 -0700
+	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="KRInvItP"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=mdyKMuWGpTGQ0ttuPEqL6sr1d5oGlQeSkZeqJKPbKkQ=; b=KRInvItPTiQ7sozyuVsD7co6HF
+	vxfW8ElvkU/dhOCccE2SPJnhwzjpdgiOudDzvaWosTn2ujITQSuhw7alUhf6nk27jQ62/s1P4Z6a2
+	Nu/Y0ZoYsh5JhxpXdsgsugp+acqkD/MgSbHBi0BrV+0J2JdPCPa2X9GoHVyQ2TVK/3Svjx8ag6WFY
+	StuNrAayldaXINOzw97HMRjLYeSQ7d0qfCww1rnvlxGC93WoQiJ/jesCwguey8dI9yVKzoy6kbnsk
+	nR22zsssC3HmfdCm/v0STAhQTazT3X4Zquqfw2qfLCRjHftac+ivCetImKyTataYaGh/WZrTwjYmR
+	4gui8AyQ==;
+Received: from viro by zeniv.linux.org.uk with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1uyIA2-00000001xLm-0jr3;
+	Mon, 15 Sep 2025 22:59:02 +0000
+Date: Mon, 15 Sep 2025 23:59:02 +0100
+From: Al Viro <viro@zeniv.linux.org.uk>
+To: Christian Brauner <brauner@kernel.org>
+Cc: Jan Kara <jack@suse.cz>, Amir Goldstein <amir73il@gmail.com>,
+	linux-fsdevel@vger.kernel.org, Josef Bacik <josef@toxicpanda.com>,
+	Jeff Layton <jlayton@kernel.org>, Mike Yuan <me@yhndnzj.com>,
+	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>,
+	Lennart Poettering <mzxreary@0pointer.de>,
+	Daan De Meyer <daan.j.demeyer@gmail.com>,
+	Aleksa Sarai <cyphar@cyphar.com>, Jens Axboe <axboe@kernel.dk>,
+	Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>,
+	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Chuck Lever <chuck.lever@oracle.com>, linux-nfs@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, cgroups@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v2 11/33] net: use ns_common_init()
+Message-ID: <20250915225902.GK39973@ZenIV>
+References: <20250912-work-namespace-v2-0-1a247645cef5@kernel.org>
+ <20250912-work-namespace-v2-11-1a247645cef5@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/3] block: add support for device frequency PM QoS tuning
-To: Wang Jianzheng <wangjianzheng@vivo.com>, Jens Axboe <axboe@kernel.dk>,
- Alim Akhtar <alim.akhtar@samsung.com>, Avri Altman <avri.altman@wdc.com>,
- "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- "Rafael J. Wysocki" <rafael@kernel.org>, Peter Wang
- <peter.wang@mediatek.com>, Bean Huo <beanhuo@micron.com>,
- "Bao D. Nguyen" <quic_nguyenb@quicinc.com>,
- Adrian Hunter <adrian.hunter@intel.com>, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
- linux-pm@vger.kernel.org
-References: <20250914114549.650671-1-wangjianzheng@vivo.com>
- <20250914114549.650671-3-wangjianzheng@vivo.com>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20250914114549.650671-3-wangjianzheng@vivo.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250912-work-namespace-v2-11-1a247645cef5@kernel.org>
+Sender: Al Viro <viro@ftp.linux.org.uk>
 
-On 9/14/25 4:45 AM, Wang Jianzheng wrote:
-> +#ifdef CONFIG_PM
-> +static void blk_mq_dev_frequency_work(struct work_struct *work)
-> +{
-> +	struct request_queue *q =
-> +			container_of(work, struct request_queue, dev_freq_work.work);
-> +	unsigned long timeout;
-> +	struct dev_pm_qos_request *qos = q->dev_freq_qos;
-> +
-> +	timeout = msecs_to_jiffies(q->disk->dev_freq_timeout);
-> +	if (!q || IS_ERR_OR_NULL(q->dev) || IS_ERR_OR_NULL(qos))
-> +		return;
-> +
-> +	if (q->pm_qos_status == PM_QOS_ACTIVE) {
-> +		q->pm_qos_status = PM_QOS_FREQ_SET;
-> +		dev_pm_qos_add_request(q->dev, qos, DEV_PM_QOS_MIN_FREQUENCY,
-> +				       FREQ_QOS_MAX_DEFAULT_VALUE);
-> +	} else {
-> +		if (time_after(jiffies, READ_ONCE(q->last_active) + timeout))
-> +			q->pm_qos_status = PM_QOS_FREQ_REMOV;
-> +	}
-> +
-> +	if (q->pm_qos_status == PM_QOS_FREQ_REMOV) {
-> +		dev_pm_qos_remove_request(qos);
-> +		q->pm_qos_status = PM_QOS_ACTIVE;
-> +	} else {
-> +		schedule_delayed_work(&q->dev_freq_work,
-> +				      q->last_active + timeout - jiffies);
-> +	}
-> +}
+On Fri, Sep 12, 2025 at 01:52:34PM +0200, Christian Brauner wrote:
 
-The above code is similar in nature to the activity detection by the
-run-time power management (RPM) code. Why a new timer mechanism instead
-of adding more code in the UFS driver RPM callbacks?
+> +	ret = ns_common_init(&net->ns, ns_ops, false);
+					       ^^^^^
+> +	if (ret)
+> +		return ret;
 
-> @@ -3161,6 +3211,8 @@ void blk_mq_submit_bio(struct bio *bio)
->   		goto queue_exit;
->   	}
->   
-> +	blk_pm_qos_dev_freq_update(q, bio);
+How would that possibly fail?  You are not trying to grab inum here,
+what's there to fail?
 
-Good luck with adding power-management code in the block layer hot path
-... I'm not sure anyone will be enthusiast seeing code being added in
-blk_mq_submit_bio().
+> @@ -559,7 +572,9 @@ struct net *copy_net_ns(unsigned long flags,
+>  		goto dec_ucounts;
+>  	}
+>  
+> -	preinit_net(net, user_ns);
+> +	rv = preinit_net(net, user_ns);
+> +	if (rv < 0)
+> +		goto dec_ucounts;
 
-Thanks,
-
-Bart.
+Ditto.
