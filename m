@@ -1,58 +1,50 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4792313291;
-	Mon, 15 Sep 2025 13:34:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4587A313286;
+	Mon, 15 Sep 2025 13:45:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757943281; cv=none; b=kCNzxLouwtx8lvaGWcXqci7Kn71XRx8w2dQ1fLwM/DXh9iDxqXvsXYeJzPj1jHfIAOL1phX7A68L3FGvGSWP/IUQitJJj9IHvy0j4zvMk3lcnQ7/HaWG6iSgFATOW47d7fA+U7rAqv4BkNgwQjonsa6i6PW1cD8xwOtR+R2krKk=
+	t=1757943910; cv=none; b=j9aO9BMV23MRxZjH2LDt3zjRM80yqwVc1WSfI7eu71bQDreAQ7gLSUhXA2PiWuvM8Xg8CWaWuDN2glzUHlY6Fx8mdSSr8qbpeFyUaOkmLQAhPlBFOOalPOLuUGRN+zp66Idum1OUQEIBoBjNh3ikWUIHj5qx+D5jt6rIaf81Myo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757943281; c=relaxed/simple;
-	bh=G1pxbFOuDJsJnBF0m+5CY6Xwwfubv5cFdvznrZJvWPg=;
+	s=arc-20240116; t=1757943910; c=relaxed/simple;
+	bh=QsaenlLe+MpwjJA3/3iLUSdHMSKRqd8RhiCv3IDh7Xc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OkfHiPj1UpfBq8XCfhhzzHPDGr9xBeZaX7wPEA1SOYykFR7UBSgp0wkVo2BBFYed+ECtfAmcx/kTpNpTTEqv2oNAs8tIPopgbduz/YzdO6pwjGTIbD7wplQT9aK9SN6DdzWj0CGvL9zj8ggJjuwp+n3TVsqYQZHImRxsTB3LVsA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BJGZ1vBQ; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=RrxbumNjgXOBpLFwgkxFVOP/TpeCFnI2PDBAR9Lhv81rgJYMqOppPVdvcfIFhR8FmoP0hICYYUsu6zD1ZDXRBDzu3n1Xyb9e3yxLM18f4XI9ZCpK7I933eCGRxEaFZCuXbXQuU4frXRlagoBhF3vdlSsnuYy1vii/XPS6L21ihg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kLZfvLJH; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BJGZ1vBQ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06662C4CEF5;
-	Mon, 15 Sep 2025 13:34:28 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kLZfvLJH"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C17BC4CEF1;
+	Mon, 15 Sep 2025 13:45:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757943280;
-	bh=G1pxbFOuDJsJnBF0m+5CY6Xwwfubv5cFdvznrZJvWPg=;
+	s=k20201202; t=1757943909;
+	bh=QsaenlLe+MpwjJA3/3iLUSdHMSKRqd8RhiCv3IDh7Xc=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=BJGZ1vBQTvO1OLFpsKgtQvIkjtAVvJey56ZqhZxYzVB3EDoeucwA9j3Ikra0r96a5
-	 jQw9/XHjAdC85R6jORBqXH6OkpLRRmI0UaRxSBMlJTyGu8sObrPf6EYsRHYnpzWABK
-	 4guOhpliPb5aYSSJ1cikDCiA9fl38O9CJLfhWdf/1FUDPbaUHhsgjd/BUigP/DwSAR
-	 ZgzXa5kZ1LN2Vwu2d8y8wxYWU6XMdt47ld5N4t1CFweo+0HtUX4GHSNgmsq7QjI/jF
-	 wghZzlNvaq7LpEjMzkOqler37Pf0I1gD2UiJKUJFEipxphTk6d9TTXloxjbYPhi7oP
-	 Dxi908vsrFrMg==
-Date: Mon, 15 Sep 2025 15:34:26 +0200
+	b=kLZfvLJHFwUpC8HG54W3zYAdHQKzxO7fX/VXxZnpyRmwEkUm1WFhjQfdpQZyCo1YG
+	 60KQWsaHTDiBWRoD+43/0rTtJIShZTkAl5ZPq9z+r3ut/Aiydo345vdFzB5j2HOQxm
+	 470c2kA3uvhpHYUOjyd9Bma367Qg6TxDhaA6MFV+IBL+44bjN6ah9Hy4Yl0SqdnuQx
+	 OvgCOAqJBvHekZzlTqZOMgT8mL6yjPTjnyDBWNEGNUDLoWw55dkgDZmB6427DAhKVx
+	 1Q0iIEjlsXGC7S8FSDlLGxZIQ4FhMIv4fF/zb4PybKvKNMcLuHS1KPRoFDh9IZCppR
+	 YkbGTNEC7nCOQ==
+Date: Mon, 15 Sep 2025 15:45:02 +0200
 From: Christian Brauner <brauner@kernel.org>
-To: Askar Safin <safinaskar@gmail.com>
-Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Linus Torvalds <torvalds@linux-foundation.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Al Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@lst.de>, 
-	Jens Axboe <axboe@kernel.dk>, Andy Shevchenko <andy.shevchenko@gmail.com>, 
-	Aleksa Sarai <cyphar@cyphar.com>, 
-	Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>, Julian Stecklina <julian.stecklina@cyberus-technology.de>, 
-	Gao Xiang <hsiangkao@linux.alibaba.com>, Art Nikpal <email2tema@gmail.com>, 
-	Andrew Morton <akpm@linux-foundation.org>, Eric Curtin <ecurtin@redhat.com>, 
-	Alexander Graf <graf@amazon.com>, Rob Landley <rob@landley.net>, 
-	Lennart Poettering <mzxreary@0pointer.de>, linux-arch@vger.kernel.org, linux-alpha@vger.kernel.org, 
-	linux-snps-arc@lists.infradead.org, linux-arm-kernel@lists.infradead.org, linux-csky@vger.kernel.org, 
-	linux-hexagon@vger.kernel.org, loongarch@lists.linux.dev, linux-m68k@lists.linux-m68k.org, 
-	linux-mips@vger.kernel.org, linux-openrisc@vger.kernel.org, linux-parisc@vger.kernel.org, 
-	linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org, 
-	linux-sh@vger.kernel.org, sparclinux@vger.kernel.org, linux-um@lists.infradead.org, 
-	x86@kernel.org, Ingo Molnar <mingo@redhat.com>, linux-block@vger.kernel.org, 
-	initramfs@vger.kernel.org, linux-api@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-efi@vger.kernel.org, linux-ext4@vger.kernel.org, "Theodore Y . Ts'o" <tytso@mit.edu>, 
-	linux-acpi@vger.kernel.org, Michal Simek <monstr@monstr.eu>, devicetree@vger.kernel.org, 
-	Luis Chamberlain <mcgrof@kernel.org>, Kees Cook <kees@kernel.org>, 
-	Thorsten Blum <thorsten.blum@linux.dev>, Heiko Carstens <hca@linux.ibm.com>, patches@lists.linux.dev
-Subject: Re: [PATCH RESEND 00/62] initrd: remove classic initrd support
-Message-ID: <20250915-modebranche-marken-fc832a25e05d@brauner>
-References: <20250913003842.41944-1-safinaskar@gmail.com>
+To: Jan Kara <jack@suse.cz>
+Cc: Amir Goldstein <amir73il@gmail.com>, linux-fsdevel@vger.kernel.org, 
+	Josef Bacik <josef@toxicpanda.com>, Jeff Layton <jlayton@kernel.org>, Mike Yuan <me@yhndnzj.com>, 
+	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>, Lennart Poettering <mzxreary@0pointer.de>, 
+	Daan De Meyer <daan.j.demeyer@gmail.com>, Aleksa Sarai <cyphar@cyphar.com>, 
+	Alexander Viro <viro@zeniv.linux.org.uk>, Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>, 
+	Johannes Weiner <hannes@cmpxchg.org>, Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Chuck Lever <chuck.lever@oracle.com>, linux-nfs@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, cgroups@vger.kernel.org, 
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v2 18/33] mnt: support ns lookup
+Message-ID: <20250915-gepachtet-paprika-a7b4274372c1@brauner>
+References: <20250912-work-namespace-v2-0-1a247645cef5@kernel.org>
+ <20250912-work-namespace-v2-18-1a247645cef5@kernel.org>
+ <4hey7blvy6dfk22kargj46oevtrnk6nccbgjrbk3xvctvbfhdt@jimfucryj25d>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -61,25 +53,29 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250913003842.41944-1-safinaskar@gmail.com>
+In-Reply-To: <4hey7blvy6dfk22kargj46oevtrnk6nccbgjrbk3xvctvbfhdt@jimfucryj25d>
 
-On Sat, Sep 13, 2025 at 12:37:39AM +0000, Askar Safin wrote:
-> Intro
-> ====
-> This patchset removes classic initrd (initial RAM disk) support,
-> which was deprecated in 2020.
+On Mon, Sep 15, 2025 at 01:48:51PM +0200, Jan Kara wrote:
+> On Fri 12-09-25 13:52:41, Christian Brauner wrote:
+> > Move the mount namespace to the generic ns lookup infrastructure.
+> > This allows us to drop a bunch of members from struct mnt_namespace.
+> >                                                                       t
+> > Signed-off-by: Christian Brauner <brauner@kernel.org>
+> 
+> Just one nit below. Feel free to add:
+> 
+> Reviewed-by: Jan Kara <jack@suse.cz>
+> 
+> > @@ -4185,11 +4107,11 @@ static struct mnt_namespace *alloc_mnt_ns(struct user_namespace *user_ns, bool a
+> >  		return ERR_PTR(ret);
+> >  	}
+> >  	if (!anon)
+> > -		new_ns->seq = atomic64_inc_return(&mnt_ns_seq);
+> > +		ns_tree_gen_id(&new_ns->ns);
+> > +	RB_CLEAR_NODE(&new_ns->ns.ns_tree_node);
+> > +	INIT_LIST_HEAD(&new_ns->ns.ns_list_node);
+> 
+> Why do you initialize ns_tree_node and ns_list_node here when
+> ns_init_common() already initialized them?
 
-This is a good idea but the patchset does a bit too much and it's pretty
-convoluted and mixes cleanups with the removal of initrd support and so
-it's not that great to review let alone merge especially considering
-that a revert might be needed.
-
-Split it up into multiple patch series. Send a first series that
-focusses only on removing the generic infrastructure keeping it as
-contained as possible. Only do non-generic cleanups that are absolutely
-essential for the removal. Then the cleanups can go in separate series
-later.
-
-As usual I'm happy to try to shed old code but I wouldn't be too
-optimistic that we'll get away with this and if so it needs to be
-surgical.
+I forgot to remove that. I should note I did all this while severly sick. :D
