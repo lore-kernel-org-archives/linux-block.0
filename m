@@ -1,91 +1,173 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B92F8EEAB;
-	Sun, 14 Sep 2025 20:13:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0892F7464;
+	Mon, 15 Sep 2025 01:22:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757880804; cv=none; b=MyB2Gwyu1BOl0hAoRbOp+7v4Qz6eKsfNO4fR69Z5DlP2Bm2/EpqHpaX3ADhgUCrt8Zt3bOYLuKolTii5c8EvseGYI6Lg65JHlTj/trkkBlr1xmqRYxxl6NO8/w5Lqjl+Gj0yPHZrakntpFwKMFx8fl9oXX9uW4TLrC1fOBDAyIw=
+	t=1757899376; cv=none; b=tzWRktyR4q4+YdCJvHsLBNTPkLiIX324mym2x0G0ZyIS9QrrKy9xVvm7XXc+PF596Ig3mK7XbD6nEfIL5pPlyo1istikkZFeuasggQO3aChVtNB5i5WeQpC5Y1fFxPtr8AIijhpSaii12yDIA3kJ4bENhajyc43T60ro+ddY6dc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757880804; c=relaxed/simple;
-	bh=S1O2mYg/nuSFWiepEfi3INn1/VxeJMAKyzsDV4vYqvg=;
-	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=J+jptC/J4YKLwKI3aHT7snFfP84NJQk0HTR18Ww5e2AXCQg3c6guvNc9b3LB3SOubHVnQHwAP6wzn+xnhQlwtRG/xPpZ4PicPNMfgb41hm3EfwS3OTsNwBXv5FciZQTzyw1WObPXMCJhz+FNCsWkcCzc3PW2ZIGvVRKS+Izs6CQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=2UPxRGMw; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="2UPxRGMw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6D19C4CEF0;
-	Sun, 14 Sep 2025 20:13:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
-	s=korg; t=1757880803;
-	bh=S1O2mYg/nuSFWiepEfi3INn1/VxeJMAKyzsDV4vYqvg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=2UPxRGMw8I/maQZ+HN3ir+gn07zWGBMkkdWTdW2X4OKEgkpUDDbZLiyj3E0pJDtL3
-	 1+D42ZKa/D0blrtutGoeATk6sFzQAtpGrIpNKIWACFz+9+7ensOkK9v2abyA5QnetQ
-	 dB1gPfBNpyMhvJhlFN9WW4x1lQUIWNYqbIuD5q6A=
-Date: Sun, 14 Sep 2025 13:13:21 -0700
-From: Andrew Morton <akpm@linux-foundation.org>
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: Askar Safin <safinaskar@gmail.com>, linux-fsdevel@vger.kernel.org,
- linux-kernel@vger.kernel.org, Linus Torvalds
- <torvalds@linux-foundation.org>, Greg Kroah-Hartman
- <gregkh@linuxfoundation.org>, Christian Brauner <brauner@kernel.org>, Al
- Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, Christoph Hellwig
- <hch@lst.de>, Jens Axboe <axboe@kernel.dk>, Andy Shevchenko
- <andy.shevchenko@gmail.com>, Aleksa Sarai <cyphar@cyphar.com>, Thomas
- =?ISO-8859-1?Q?Wei=DFschuh?= <thomas.weissschuh@linutronix.de>, Julian
- Stecklina <julian.stecklina@cyberus-technology.de>, Gao Xiang
- <hsiangkao@linux.alibaba.com>, Art Nikpal <email2tema@gmail.com>, Eric
- Curtin <ecurtin@redhat.com>, Alexander Graf <graf@amazon.com>, Rob Landley
- <rob@landley.net>, Lennart Poettering <mzxreary@0pointer.de>,
- linux-arch@vger.kernel.org, linux-alpha@vger.kernel.org,
- linux-snps-arc@lists.infradead.org, linux-arm-kernel@lists.infradead.org,
- linux-csky@vger.kernel.org, linux-hexagon@vger.kernel.org,
- loongarch@lists.linux.dev, linux-m68k@lists.linux-m68k.org,
- linux-mips@vger.kernel.org, linux-openrisc@vger.kernel.org,
- linux-parisc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
- linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
- linux-sh@vger.kernel.org, sparclinux@vger.kernel.org,
- linux-um@lists.infradead.org, x86@kernel.org, Ingo Molnar
- <mingo@redhat.com>, linux-block@vger.kernel.org, initramfs@vger.kernel.org,
- linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-efi@vger.kernel.org, linux-ext4@vger.kernel.org, "Theodore Y . Ts'o"
- <tytso@mit.edu>, linux-acpi@vger.kernel.org, Michal Simek
- <monstr@monstr.eu>, devicetree@vger.kernel.org, Luis Chamberlain
- <mcgrof@kernel.org>, Kees Cook <kees@kernel.org>, Thorsten Blum
- <thorsten.blum@linux.dev>, Heiko Carstens <hca@linux.ibm.com>,
- patches@lists.linux.dev
-Subject: Re: [PATCH RESEND 21/62] init: remove all mentions of
- root=/dev/ram*
-Message-Id: <20250914131321.df00dfc835be48c10f4cce4b@linux-foundation.org>
-In-Reply-To: <a079375f-38c2-4f38-b2be-57737084fde8@kernel.org>
-References: <20250913003842.41944-1-safinaskar@gmail.com>
-	<20250913003842.41944-22-safinaskar@gmail.com>
-	<a079375f-38c2-4f38-b2be-57737084fde8@kernel.org>
-X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1757899376; c=relaxed/simple;
+	bh=l0juZ/ynTtBV7EGkcGAm9rP8owpzoA9PWtcats2I68A=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=G/gNOXkqzPVV41r3RKSrg1JNkeOl6YV8nMPz1/UOQSBYoKD2ke9dgYCsHPclMV3Rk9r/veLhsXMzqEuszcDjmM6WBafvnYsz/IBkAnmhOGuH4XM6ueY5RJtjFv6+eB8B5FfcicBxZ32vn/JUpMIb9i3EodwEqyutaC8Z75FurWw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4cQ6j22FQ3zYQv0K;
+	Mon, 15 Sep 2025 09:22:46 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id DC7BC1A0930;
+	Mon, 15 Sep 2025 09:22:44 +0800 (CST)
+Received: from [10.174.179.143] (unknown [10.174.179.143])
+	by APP4 (Coremail) with SMTP id gCh0CgD3QY5jasdozTAqCg--.54847S3;
+	Mon, 15 Sep 2025 09:22:44 +0800 (CST)
+Subject: Re: [PATCH] block: plug attempts to batch allocate tags multiple
+ times
+To: Xue He <xue01.he@samsung.com>, yukuai1@huaweicloud.com
+Cc: axboe@kernel.dk, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, "yukuai (C)" <yukuai3@huawei.com>
+References: <bfc12406-e608-b3fa-45e7-2105d9cc15bf@huaweicloud.com>
+ <CGME20250912031032epcas5p3f38da43ad6cf93b849bb44f14e49c8f9@epcas5p3.samsung.com>
+ <20250912030601.236426-1-xue01.he@samsung.com>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <51ad6831-31c9-945b-dc7a-136013f79c14@huaweicloud.com>
+Date: Mon, 15 Sep 2025 09:22:43 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+In-Reply-To: <20250912030601.236426-1-xue01.he@samsung.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgD3QY5jasdozTAqCg--.54847S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxGrW5JF4kZw4kJw13WF4kJFb_yoW5KF1fpF
+	WfJa1akrZ5AFyq9r4qq3yxCryFywnrWF48Jw15Kr1rur9F9r1fXw4xJ3WSva4SkrWkAF40
+	qr45Jr9xWFZ0gFUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvK14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7I2V7IY0VAS07AlzVAY
+	IcxG8wCY1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbV
+	WUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF
+	67kF1VAFwI0_JF0_Jw1lIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42
+	IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF
+	0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxh
+	VjvjDU0xZFpf9x0JUBVbkUUUUU=
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On Sun, 14 Sep 2025 12:06:24 +0200 Krzysztof Kozlowski <krzk@kernel.org> wrote:
+Hi,
 
-> >  Documentation/admin-guide/kernel-parameters.txt          | 3 +--
-> >  Documentation/arch/m68k/kernel-options.rst               | 9 ++-------
-> >  arch/arm/boot/dts/arm/integratorap.dts                   | 2 +-
-> >  arch/arm/boot/dts/arm/integratorcp.dts                   | 2 +-
-> >  arch/arm/boot/dts/aspeed/aspeed-bmc-facebook-cmm.dts     | 2 +-
-> >  .../boot/dts/aspeed/aspeed-bmc-facebook-galaxy100.dts    | 2 +-
-> >  .../arm/boot/dts/aspeed/aspeed-bmc-facebook-minipack.dts | 2 +-
-> >  .../arm/boot/dts/aspeed/aspeed-bmc-facebook-wedge100.dts | 2 +-
-> >  arch/arm/boot/dts/aspeed/aspeed-bmc-facebook-wedge40.dts | 2 +-
-> >  arch/arm/boot/dts/aspeed/aspeed-bmc-facebook-yamp.dts    | 2 +-
-> >  .../boot/dts/aspeed/ast2600-facebook-netbmc-common.dtsi  | 2 +-
+在 2025/09/12 11:06, Xue He 写道:
+> On 2025/09/03 18:35 PM, Yu Kuai wrote:
+>> On 2025/09/03 16:41 PM, Xue He wrote:
+>>> On 2025/09/02 08:47 AM, Yu Kuai wrote:
+>>>> On 2025/09/01 16:22, Xue He wrote:
+>>> ......
+>>
+>>
+>> Yes, so this function will likely to obtain less tags than nr_tags,the
+>> mask is always start from first zero bit with nr_tags bit, and
+>> sbitmap_deferred_clear() is called uncondionally, it's likely there are
+>> non-zero bits within this range.
+>>
+>> Just wonder, do you consider fixing this directly in
+>> __blk_mq_alloc_requests_batch()?
+>>
+>>   - call sbitmap_deferred_clear() and retry on allocation failure, so
+>> that the whole word can be used even if previous allocated request are
+>> done, especially for nvme with huge tag depths;
+>>   - retry blk_mq_get_tags() until data->nr_tags is zero;
 > 
-> No, don't do that. DTS is always separate.
+> Hi, Yu Kuai, I'm not entirely sure if I understand correctly, but during
+> each tag allocation, sbitmap_deferred_clear() is typically called first,
+> as seen in the __sbitmap_queue_get_batch() function.
+> 
+>          for (i = 0; i < sb->map_nr; i++) {
+>                  struct sbitmap_word *map = &sb->map[index];
+>                  unsigned long get_mask;
+>                  unsigned int map_depth = __map_depth(sb, index);
+>                  unsigned long val;
+> 
+>                  sbitmap_deferred_clear(map, 0, 0, 0);
 
-Why can't DTS changes be carried in a different tree?
+Yes, this is called first each time, and I don't feel this is good for
+performance anyway. I think it can be dealyed after a try first, like
+sbitmap_find_bit_in_word().
+
+> ------------------------------------------------------------------------
+> so I try to recall blk_mq_get_tags() until data->nr_tags is zero, like:
+> 
+> -       int i, nr = 0;
+> 
+> -       tag_mask = blk_mq_get_tags(data, data->nr_tags, &tag_offset);
+> -       if (unlikely(!tag_mask))
+> -               return NULL;
+> -
+> -       tags = blk_mq_tags_from_data(data);
+> -       for (i = 0; tag_mask; i++) {
+> -               if (!(tag_mask & (1UL << i)))
+> -                       continue;
+> -               tag = tag_offset + i;
+> -               prefetch(tags->static_rqs[tag]);
+> -               tag_mask &= ~(1UL << i);
+> -               rq = blk_mq_rq_ctx_init(data, tags, tag);
+> -               rq_list_add_head(data->cached_rqs, rq);
+> -               nr++;
+> -       }
+> -       if (!(data->rq_flags & RQF_SCHED_TAGS))
+> -               blk_mq_add_active_requests(data->hctx, nr);
+> -       /* caller already holds a reference, add for remainder */
+> -       percpu_ref_get_many(&data->q->q_usage_counter, nr - 1);
+> -       data->nr_tags -= nr;
+> +       do {
+> +               int i, nr = 0;
+> +               tag_mask = blk_mq_get_tags(data, data->nr_tags, &tag_offset);
+> +               if (unlikely(!tag_mask))
+> +                       return NULL;
+> +               tags = blk_mq_tags_from_data(data);
+> +               for (i = 0; tag_mask; i++) {
+> +                       if (!(tag_mask & (1UL << i)))
+> +                               continue;
+> +                       tag = tag_offset + i;
+> +                       prefetch(tags->static_rqs[tag]);
+> +                       tag_mask &= ~(1UL << i);
+> +                       rq = blk_mq_rq_ctx_init(data, tags, tag);
+> +                       rq_list_add_head(data->cached_rqs, rq);
+> +                       nr++;
+> +               }
+> +               if (!(data->rq_flags & RQF_SCHED_TAGS))
+> +                       blk_mq_add_active_requests(data->hctx, nr);
+> +               /* caller already holds a reference, add for remainder */
+> +               percpu_ref_get_many(&data->q->q_usage_counter, nr - 1);
+> +               data->nr_tags -= nr;
+> +       } while (data->nr_tags);
+> 
+> I added a loop structure, it also achieve a good results like before,
+> but I have a question: although the loop will retry tag allocation
+> when the required number of tags is not met, there is a risk of an
+> infinite loop, right? However, I couldn't think of a safer condition
+> to terminate the loop. Do you have any suggestions?
+
+Yes, this is what I have in mind. Why do you think there can be infinite
+loop? We should allcocate at least one tag by blk_mq_get_tags() in each
+loop, or return directly.
+
+Thanks,
+Kuai
+
+> 
+> Thanks,
+> Xue
+> 
+> .
+> 
+
