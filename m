@@ -1,107 +1,193 @@
-Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD2DC211460
-	for <linux-block@vger.kernel.org>; Mon, 15 Sep 2025 12:33:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A34930DD04
+	for <linux-block@vger.kernel.org>; Mon, 15 Sep 2025 12:59:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757939596; cv=none; b=VWb3w7aU1aamI/MG90SRdcNOd1B7YNIL4NDifLzHwCam1UrgxGyAHU7rSBj6yzcsOzEyWaviGjYI7FXIY8VkMPpFJXLUfz/lHUQZEuA1VmF+rowN1nJ33UBELwexwL4mHuaCoGAv44lmPZYkkX278v/HmuNqV/T7KgPtLxbtNPg=
+	t=1757941178; cv=none; b=dbOb/xIa5h+owcmmB7Jgw4lOcxK6GaIAuBPzxo8/ilIOxxm968TQavL/6oeTFbfaGxEsK54kQMGPMNaxv2aa6FectQbbzwJog+xjF7GhWJFEkWWhOgV1QUfROROnRKlmRmLwfyRvXekWj1u8914pLJgulFjlj0J/ZO5PrNGEkhk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757939596; c=relaxed/simple;
-	bh=ka4FueWz0Un+jHqDZVdsex6ys5suckZYq6W+FIQx+Vw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=bhFiZokx+AfB9RxzwwvbN491gKGOTSumkX/gAemlpkA2Kb+VUsjcPZaL7HwT42HRr8wk3gROQPjTpMViuJvfbFD39hTc+H6CL5MXHrcCzAWYsVeKgq+Tye1Udcgl/czSYjhqTWEWkcrVJUMPDxdsXIQBTUASVubhBarVlbAwMi4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T2GW5hSu; arc=none smtp.client-ip=209.85.216.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1757941178; c=relaxed/simple;
+	bh=mxocf+cy5MC3Cu0DwEUz97XcAG5uLkrwSdD8mAteRYY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=U9FfLj93xfb911oNW0604Ir7kYMhCc7RObwhObCu7/8b/m26BQgd9gZNpOJ72k34rT+fvC2LwBiCxZInj6n5AEp5h53+vTfIaw/Ms92JHYeCG7UgvAGRwOOqyb/hJicIfB5ujLn3ChAu/j7LBAViJKypr12/bP/PeARuUAP+wl8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=OAcrO9AP; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=bU22iS28; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=OAcrO9AP; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=bU22iS28; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T2GW5hSu"
-Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-327f87275d4so3971492a91.1
-        for <linux-block@vger.kernel.org>; Mon, 15 Sep 2025 05:33:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757939594; x=1758544394; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ICbjoiLsYOok1c81flKhzX2Dr5LZXmq+Z/dcfqb5QA0=;
-        b=T2GW5hSuYjeCSPKG4uahEZzPreVaiOtEDqUpmvm5rk6dEubX6+yP0XM/nhjJrrrVUf
-         c4Exzm7JF4Zw2loI8NezZSKeFG/c3iiVVsDba3Ez2RBduLITvlVscJKw2LVd6rkZSl4w
-         AJcSPCjT7H6OIAuHXHReRg2zWPQeS70tKgYG8B3JlaQYCYBPcLj7o9Mr9RmQa5jwNNdw
-         g0itH4p2mKF1KORp7uodbw5zFm6HgiIsBSMPhPkyYyXo/762KYxLmFTZBgwCR2z9b76v
-         vtpDs8LMPlf1LOvgiBhSTDt+03szq3SA+tBbItgxzzFkOmFmfyUUMN9p8l3LuNl+4uNX
-         4XCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757939594; x=1758544394;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ICbjoiLsYOok1c81flKhzX2Dr5LZXmq+Z/dcfqb5QA0=;
-        b=QNPm73ph5oDcRer5jLrDVZ8MgBvEPGWQHn0/xjtZ9xHchqG58nkTnIGYOPdJf/W/q4
-         SSkPkMLbVsLr9KDYCWKNGbGZ+8FvyThwu//R8lS3xbVKBvkoqn2KGpiuvwnMx6Dp+sCE
-         u6Er8QAbUDcCjceuL/E4djVG3MjnMJK/RU/LSr1sPgVvKMhdSdTve6pEUMUIM9O3H6vh
-         guw4jHTiORSjQsV3doMBTo3QNiJepwFFRYGBpzHtmuyZWUWyL9+lMPWiHbjrepnba+MN
-         93UaxtyD8In9mDf23H5mWM/QLzSX/SwUhmnzhcgvyfhSnFA1VVtszCI7KLBze+/2NuUH
-         cxRg==
-X-Gm-Message-State: AOJu0YyLE5Q4ZLyM7l5G2ggm98M5t3bAP3U41XbFWTD4HIf9QPGoCl11
-	ftLwy/bAttbA3C4+XPElqhM2hHps4n4z53vhOAykEpoM00Wqkgug8GmpHmFSJDnUEuIegQ==
-X-Gm-Gg: ASbGncuLbRFUJXg6waBZjq9tgdETTau+z2RP83G0DP0VzGH5QdI21GhuIFDwSA1yaM0
-	DBRitec2uOII0Z5GU5UMfy29mF7vsmlt4LXRsgR5hcLzRlIytSpuNUh2x4N1r6nPgXMoDtGIy6b
-	hGMBA4OYtYXzWkhDue6CydusFQ9dVqWvzFZq7AjEQFxbtMD4t47s1fakMAq/bTY9NMpqcGd+/gO
-	Cp4psTGjfzQhvN91Wgew4WeOyXcFrkDv1a5kmco0pRMDLxmhPYP8JAgaqLDcUT8W6YYt+cIjNVb
-	AXRv7Bf9d+j7V0S4l8Rz3EPdWn9/u51MWPcTXBSxVi6RJ91eSUeEdBa5nTe5D/AdkjrqFgVE958
-	XRtuQhZgt3luZSCgsxmB8I7gc7lzEqIHEug2/o8bmOtDblhFXayB25yguObQ=
-X-Google-Smtp-Source: AGHT+IGejX8mFgf07YiMaFVmYLT41CYD7SaPHvbYCUMkBuErliPIRTYGZ2dSA/aTiLTYcgLAHiZL/g==
-X-Received: by 2002:a17:903:1b25:b0:246:d70e:ea82 with SMTP id d9443c01a7336-25d2528da26mr148679175ad.5.1757939594159;
-        Mon, 15 Sep 2025 05:33:14 -0700 (PDT)
-Received: from localhost.localdomain ([113.218.252.158])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-265819a6212sm37858845ad.57.2025.09.15.05.33.11
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 15 Sep 2025 05:33:13 -0700 (PDT)
-From: chengkaitao <pilgrimtao@gmail.com>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	chengkaitao <chengkaitao@kylinos.cn>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Li Nan <linan122@huawei.com>
-Subject: [PATCH RESEND v2] block/mq-deadline: Remove the redundant rb_entry_rq in the deadline_from_pos().
-Date: Mon, 15 Sep 2025 20:33:07 +0800
-Message-Id: <20250915123307.96964-1-pilgrimtao@gmail.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="OAcrO9AP";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="bU22iS28";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="OAcrO9AP";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="bU22iS28"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 8BAE11FB6B;
+	Mon, 15 Sep 2025 12:59:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1757941173; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=M6WMrfXNUP0q2tEtBXN294FElV6YXFXuqFCdyldB7kc=;
+	b=OAcrO9APtk2UaMNWdH/85ofNQGQl/E+RqET2VQKRfBVFxDOQV1wOjD/zDEZNT+BpPQUxPx
+	Z/jppeSRpIngqVMhcip35nGclQZb5nYwFlxddScQMFwWlqzoF2aVedl2K/eVbIG0jOIMUP
+	1/39fN1lZiDskdAS+hM9j7v4aUbcYOk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1757941173;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=M6WMrfXNUP0q2tEtBXN294FElV6YXFXuqFCdyldB7kc=;
+	b=bU22iS28aEk+zXS1KzuNABm/j2SkZdZeTnMeyVIVuMmahhjNymt76VhqEMNvHnFJc5/Qhw
+	8DmpAn+dUvt/qjDQ==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1757941173; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=M6WMrfXNUP0q2tEtBXN294FElV6YXFXuqFCdyldB7kc=;
+	b=OAcrO9APtk2UaMNWdH/85ofNQGQl/E+RqET2VQKRfBVFxDOQV1wOjD/zDEZNT+BpPQUxPx
+	Z/jppeSRpIngqVMhcip35nGclQZb5nYwFlxddScQMFwWlqzoF2aVedl2K/eVbIG0jOIMUP
+	1/39fN1lZiDskdAS+hM9j7v4aUbcYOk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1757941173;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=M6WMrfXNUP0q2tEtBXN294FElV6YXFXuqFCdyldB7kc=;
+	b=bU22iS28aEk+zXS1KzuNABm/j2SkZdZeTnMeyVIVuMmahhjNymt76VhqEMNvHnFJc5/Qhw
+	8DmpAn+dUvt/qjDQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 73E851372E;
+	Mon, 15 Sep 2025 12:59:33 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id a+NCHLUNyGgBRAAAD6G6ig
+	(envelope-from <jack@suse.cz>); Mon, 15 Sep 2025 12:59:33 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+	id 04507A0A06; Mon, 15 Sep 2025 14:59:29 +0200 (CEST)
+Date: Mon, 15 Sep 2025 14:59:28 +0200
+From: Jan Kara <jack@suse.cz>
+To: Christian Brauner <brauner@kernel.org>
+Cc: Jan Kara <jack@suse.cz>, Amir Goldstein <amir73il@gmail.com>, 
+	linux-fsdevel@vger.kernel.org, Josef Bacik <josef@toxicpanda.com>, 
+	Jeff Layton <jlayton@kernel.org>, Mike Yuan <me@yhndnzj.com>, 
+	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>, Lennart Poettering <mzxreary@0pointer.de>, 
+	Daan De Meyer <daan.j.demeyer@gmail.com>, Aleksa Sarai <cyphar@cyphar.com>, 
+	Alexander Viro <viro@zeniv.linux.org.uk>, Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>, 
+	Johannes Weiner <hannes@cmpxchg.org>, Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Chuck Lever <chuck.lever@oracle.com>, linux-nfs@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, cgroups@vger.kernel.org, 
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v2 25/33] uts: support ns lookup
+Message-ID: <altaotwhserbakcnhlenmma5o7o7j6yhy3gcaqwxdaf7sotlz5@qzsiiyu5s4ah>
+References: <20250912-work-namespace-v2-0-1a247645cef5@kernel.org>
+ <20250912-work-namespace-v2-25-1a247645cef5@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250912-work-namespace-v2-25-1a247645cef5@kernel.org>
+X-Spam-Level: 
+X-Spamd-Result: default: False [-2.30 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	ARC_NA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[27];
+	TAGGED_RCPT(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	R_RATELIMIT(0.00)[to_ip_from(RLbyy5b47ky7xssyr143sji8pp)];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[suse.cz,gmail.com,vger.kernel.org,toxicpanda.com,kernel.org,yhndnzj.com,in.waw.pl,0pointer.de,cyphar.com,zeniv.linux.org.uk,kernel.dk,cmpxchg.org,suse.com,google.com,redhat.com,oracle.com];
+	RCVD_COUNT_THREE(0.00)[3];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email,imap1.dmz-prg2.suse.org:helo,suse.cz:email]
+X-Spam-Flag: NO
+X-Spam-Score: -2.30
 
-From: chengkaitao <chengkaitao@kylinos.cn>
+On Fri 12-09-25 13:52:48, Christian Brauner wrote:
+> Support the generic ns lookup infrastructure to support file handles for
+> namespaces.
+> 
+> Signed-off-by: Christian Brauner <brauner@kernel.org>
 
-In commit(fde02699c242), the "if (blk_rq_is_seq_zoned_write(rq))"
-was removed, but the "rb_entry_rq(node)" and some other code were
-inadvertently left behind. This patch fixed it.
+Looks good. Feel free to add:
 
-Signed-off-by: chengkaitao <chengkaitao@kylinos.cn>
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
-Reviewed-by: Li Nan <linan122@huawei.com>
----
- block/mq-deadline.c | 4 ----
- 1 file changed, 4 deletions(-)
+Reviewed-by: Jan Kara <jack@suse.cz>
 
-diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-index 1a031922c447..63145cc9825f 100644
---- a/block/mq-deadline.c
-+++ b/block/mq-deadline.c
-@@ -133,10 +133,6 @@ static inline struct request *deadline_from_pos(struct dd_per_prio *per_prio,
- 	struct rb_node *node = per_prio->sort_list[data_dir].rb_node;
- 	struct request *rq, *res = NULL;
- 
--	if (!node)
--		return NULL;
--
--	rq = rb_entry_rq(node);
- 	while (node) {
- 		rq = rb_entry_rq(node);
- 		if (blk_rq_pos(rq) >= pos) {
+								Honza
+
+> ---
+>  kernel/utsname.c | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
+> 
+> diff --git a/kernel/utsname.c b/kernel/utsname.c
+> index 02037010b378..64155417ae0c 100644
+> --- a/kernel/utsname.c
+> +++ b/kernel/utsname.c
+> @@ -13,6 +13,7 @@
+>  #include <linux/cred.h>
+>  #include <linux/user_namespace.h>
+>  #include <linux/proc_ns.h>
+> +#include <linux/nstree.h>
+>  #include <linux/sched/task.h>
+>  
+>  static struct kmem_cache *uts_ns_cache __ro_after_init;
+> @@ -58,6 +59,7 @@ static struct uts_namespace *clone_uts_ns(struct user_namespace *user_ns,
+>  	memcpy(&ns->name, &old_ns->name, sizeof(ns->name));
+>  	ns->user_ns = get_user_ns(user_ns);
+>  	up_read(&uts_sem);
+> +	ns_tree_add(ns);
+>  	return ns;
+>  
+>  fail_free:
+> @@ -93,10 +95,12 @@ struct uts_namespace *copy_utsname(unsigned long flags,
+>  
+>  void free_uts_ns(struct uts_namespace *ns)
+>  {
+> +	ns_tree_remove(ns);
+>  	dec_uts_namespaces(ns->ucounts);
+>  	put_user_ns(ns->user_ns);
+>  	ns_free_inum(&ns->ns);
+> -	kmem_cache_free(uts_ns_cache, ns);
+> +	/* Concurrent nstree traversal depends on a grace period. */
+> +	kfree_rcu(ns, ns.ns_rcu);
+>  }
+>  
+>  static inline struct uts_namespace *to_uts_ns(struct ns_common *ns)
+> @@ -162,4 +166,5 @@ void __init uts_ns_init(void)
+>  			offsetof(struct uts_namespace, name),
+>  			sizeof_field(struct uts_namespace, name),
+>  			NULL);
+> +	ns_tree_add(&init_uts_ns);
+>  }
+> 
+> -- 
+> 2.47.3
+> 
 -- 
-2.39.5 (Apple Git-154)
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
