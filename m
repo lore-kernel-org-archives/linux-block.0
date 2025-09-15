@@ -1,171 +1,96 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E70A8313276;
-	Mon, 15 Sep 2025 13:55:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EF123101B8
+	for <linux-block@vger.kernel.org>; Mon, 15 Sep 2025 14:12:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757944514; cv=none; b=qX4nQjBIXCLTrgie6eFbOo4HhHp1CRWtFNaZbh2CrRBqyt+bEU63i+rEJ9V6rwJvHrTVYPDNkFhQ+2fDdRLAlBsUANMfIqpGpmf3rG7Huxyoe8ZXwfOBwzGy/mgWKvJHU7jjK3w5doa/+298TyB2YX/8k8DA9g7QppvDh0+RE0o=
+	t=1757945580; cv=none; b=Wm5wL9MVVzg57sZviBJbfXYMv1Zhbml0BxuMl+huCA4rrxqac/wlzA2q3mrItreDt2qMywWPyVqcQuQ25ZI+8y789U/Y42HKhVYsuHmWERSPJfJT1NuSPoewGJOqo9ofbMyi0b1cxlvblH1ZfDEnVHA+xgQYjbmD9Zs5AyEMMnY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757944514; c=relaxed/simple;
-	bh=SqkBMfDzVgXsgPROtjP+BoCmQJ8xB5+m7QOWTr9D1IQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=l87rp3QpNUf+7IyHImgWKlYyxLCN6kcF9YWEkcLeaWIRYmXQDaOsP+XNHWsalrRSNvR88JLfzcNl/g2lD02QoBzHdyNa6DFP9Mlv+ULLTJuiHBdln/u4ehKeucjDxE48x7CcEEkcRSzGXwXB94JGuI37xGQUgLjcZ4CAk2cgvn4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dtxXaOW3; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1757945580; c=relaxed/simple;
+	bh=bD1VDb47JqTiFl9l8D1pFl10SPENR4DsAXT3zVs+g6Y=;
+	h=Date:From:To:cc:Subject:Message-ID:MIME-Version:Content-Type; b=gyVYuLgY7AwB3c5zhfdJ/WJS5H0o7lh1cKixx11VbloaOwdK8urO5FQnvI6eg5jBqxEiiEwvhjQwxSGEmQnIa5MRWtPtYipl2fz6pekr+y8B9TOEFsgI3DsovcE9g20RmQD3fsjCEmNvTudcYYn3cqSR6nvoQfWapSynHzA2CdI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NUkL+ojz; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dtxXaOW3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2DA9CC4CEF7;
-	Mon, 15 Sep 2025 13:55:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757944513;
-	bh=SqkBMfDzVgXsgPROtjP+BoCmQJ8xB5+m7QOWTr9D1IQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=dtxXaOW30CbEBJCeNCrF087li2ViBB91z3Iv3OlXdKAAXsPKWRRzBTV1C85Ye2DuE
-	 Lngh7cH6caGrMdf/5g/YzGIqc+/+nl/jWZpBvnpdaJAcqXQ62f7yfNdFCBPCknwLcf
-	 OgnQzOrteFXDU9ikNGVgU9mfbkdyw2iF5uhRSFGYcRZKP/0RqdQhBt2w5aaW5E/geV
-	 jgfQBKkEBBGW23B7cGTwGAAb0Qj5f63sQSqALt/AhYFHWPhBhNCLnPqJEgLkr/AK3e
-	 kprRZBMe8dGrF5rVt4+Lw55KXT4ooQhxTMwkuRwARu2/fpq5KdTIJ0mPMM/veMhmHl
-	 ViCGIwt59Z5/Q==
-Date: Mon, 15 Sep 2025 15:55:05 +0200
-From: Christian Brauner <brauner@kernel.org>
-To: Jan Kara <jack@suse.cz>
-Cc: Amir Goldstein <amir73il@gmail.com>, linux-fsdevel@vger.kernel.org, 
-	Josef Bacik <josef@toxicpanda.com>, Jeff Layton <jlayton@kernel.org>, Mike Yuan <me@yhndnzj.com>, 
-	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>, Lennart Poettering <mzxreary@0pointer.de>, 
-	Daan De Meyer <daan.j.demeyer@gmail.com>, Aleksa Sarai <cyphar@cyphar.com>, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>, 
-	Johannes Weiner <hannes@cmpxchg.org>, Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Chuck Lever <chuck.lever@oracle.com>, linux-nfs@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, cgroups@vger.kernel.org, 
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v2 28/33] nsfs: support file handles
-Message-ID: <20250915-laufpass-anraten-b250875c462a@brauner>
-References: <20250912-work-namespace-v2-0-1a247645cef5@kernel.org>
- <20250912-work-namespace-v2-28-1a247645cef5@kernel.org>
- <4gsrbaiqrt3ymcze7rm6ec2oy25ernllidg2i3rkrsqh6q5deu@7bozrym7omj4>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NUkL+ojz"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1757945577;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=L7OokSgrhTJ8VA+7L8IMSRj/EETwfbwYTPn91bZUtfg=;
+	b=NUkL+ojzM92fvWpTr+Va/w+8ujVtXa6dlO6YSdvQ1+2iZuPYu/f4GcOFx3zpzf3iedpUpd
+	HZgv4Qc72633KM6PspByBevuOaQfsIQWsNvOi9tYS+IYg9KQWZw9EZITb8wDb0Cd33ixvI
+	O3BklFKM1z7z7FQ8+E7F/OludcSEapU=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-367-bXH3eMplPq-mhVZ_FLTWtQ-1; Mon,
+ 15 Sep 2025 10:12:54 -0400
+X-MC-Unique: bXH3eMplPq-mhVZ_FLTWtQ-1
+X-Mimecast-MFC-AGG-ID: bXH3eMplPq-mhVZ_FLTWtQ_1757945569
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 131D21944F06;
+	Mon, 15 Sep 2025 14:12:49 +0000 (UTC)
+Received: from [10.45.225.219] (unknown [10.45.225.219])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9C14019540EB;
+	Mon, 15 Sep 2025 14:12:45 +0000 (UTC)
+Date: Mon, 15 Sep 2025 16:12:40 +0200 (CEST)
+From: Mikulas Patocka <mpatocka@redhat.com>
+To: dm-devel@lists.linux.dev, zkabelac@redhat.com
+cc: Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>, 
+    Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Subject: [PATCH] dm-raid: don't set io_min and io_opt for raid1
+Message-ID: <c434231d-a71c-4610-612c-a27a44d26d6d@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <4gsrbaiqrt3ymcze7rm6ec2oy25ernllidg2i3rkrsqh6q5deu@7bozrym7omj4>
+Content-Type: text/plain; charset=US-ASCII
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On Mon, Sep 15, 2025 at 03:25:20PM +0200, Jan Kara wrote:
-> On Fri 12-09-25 13:52:51, Christian Brauner wrote:
-> > A while ago we added support for file handles to pidfs so pidfds can be
-> > encoded and decoded as file handles. Userspace has adopted this quickly
-> > and it's proven very useful. Implement file handles for namespaces as
-> > well.
-> > 
-> > A process is not always able to open /proc/self/ns/. That requires
-> > procfs to be mounted and for /proc/self/ or /proc/self/ns/ to not be
-> > overmounted. However, userspace can always derive a namespace fd from
-> > a pidfd. And that always works for a task's own namespace.
-> > 
-> > There's no need to introduce unnecessary behavioral differences between
-> > /proc/self/ns/ fds, pidfd-derived namespace fds, and file-handle-derived
-> > namespace fds. So namespace file handles are always decodable if the
-> > caller is located in the namespace the file handle refers to.
-> > 
-> > This also allows a task to e.g., store a set of file handles to its
-> > namespaces in a file on-disk so it can verify when it gets rexeced that
-> > they're still valid and so on. This is akin to the pidfd use-case.
-> > 
-> > Or just plainly for namespace comparison reasons where a file handle to
-> > the task's own namespace can be easily compared against others.
-> > 
-> > Reviewed-by: Amir Goldstein <amir73il@gmail.com>
-> > Signed-off-by: Christian Brauner <brauner@kernel.org>
-> 
-> ...
-> 
-> > +	switch (ns->ops->type) {
-> > +#ifdef CONFIG_CGROUPS
-> > +	case CLONE_NEWCGROUP:
-> > +		if (!current_in_namespace(to_cg_ns(ns)))
-> > +			owning_ns = to_cg_ns(ns)->user_ns;
-> > +		break;
-> > +#endif
-> > +#ifdef CONFIG_IPC_NS
-> > +	case CLONE_NEWIPC:
-> > +		if (!current_in_namespace(to_ipc_ns(ns)))
-> > +			owning_ns = to_ipc_ns(ns)->user_ns;
-> > +		break;
-> > +#endif
-> > +	case CLONE_NEWNS:
-> > +		if (!current_in_namespace(to_mnt_ns(ns)))
-> > +			owning_ns = to_mnt_ns(ns)->user_ns;
-> > +		break;
-> > +#ifdef CONFIG_NET_NS
-> > +	case CLONE_NEWNET:
-> > +		if (!current_in_namespace(to_net_ns(ns)))
-> > +			owning_ns = to_net_ns(ns)->user_ns;
-> > +		break;
-> > +#endif
-> > +#ifdef CONFIG_PID_NS
-> > +	case CLONE_NEWPID:
-> > +		if (!current_in_namespace(to_pid_ns(ns))) {
-> > +			owning_ns = to_pid_ns(ns)->user_ns;
-> > +		} else if (!READ_ONCE(to_pid_ns(ns)->child_reaper)) {
-> > +			ns->ops->put(ns);
-> > +			return ERR_PTR(-EPERM);
-> > +		}
-> > +		break;
-> > +#endif
-> > +#ifdef CONFIG_TIME_NS
-> > +	case CLONE_NEWTIME:
-> > +		if (!current_in_namespace(to_time_ns(ns)))
-> > +			owning_ns = to_time_ns(ns)->user_ns;
-> > +		break;
-> > +#endif
-> > +#ifdef CONFIG_USER_NS
-> > +	case CLONE_NEWUSER:
-> > +		if (!current_in_namespace(to_user_ns(ns)))
-> > +			owning_ns = to_user_ns(ns);
-> > +		break;
-> > +#endif
-> > +#ifdef CONFIG_UTS_NS
-> > +	case CLONE_NEWUTS:
-> > +		if (!current_in_namespace(to_uts_ns(ns)))
-> > +			owning_ns = to_uts_ns(ns)->user_ns;
-> > +		break;
-> > +#endif
-> 
-> Frankly, switches like these are asking for more Generic usage ;) But ok
-> for now.
-> 
-> > +	default:
-> > +		return ERR_PTR(-EOPNOTSUPP);
-> > +	}
-> > +
-> > +	if (owning_ns && !ns_capable(owning_ns, CAP_SYS_ADMIN)) {
-> > +		ns->ops->put(ns);
-> > +		return ERR_PTR(-EPERM);
-> > +	}
-> > +
-> > +	/* path_from_stashed() unconditionally consumes the reference. */
-> > +	ret = path_from_stashed(&ns->stashed, nsfs_mnt, ns, &path);
-> > +	if (ret)
-> > +		return ERR_PTR(ret);
-> > +
-> > +	return no_free_ptr(path.dentry);
-> 
-> Ugh, so IMO this is very subtle because we declare
-> 
-> 	struct path path __free(path_put)
-> 
-> but then do no_free_ptr(path.dentry). I really had to lookup implementation
-> of no_free_ptr() to check whether we are leaking mnt reference here or not
-> (we are not). But that seems as an implementation detail we shouldn't
-> better rely on? Wouldn't be:
-> 
-> 	return dget(path.dentry);
-> 
-> much clearer (and sligthly less efficient, I know, but who cares)?
+These commands
+# modprobe brd rd_size=1048576
+# vgcreate vg /dev/ram*
+# lvcreate -m4 -L10 -n lv vg
+trigger the following warnings:
+device-mapper: table: 252:10: adding target device (start sect 0 len 24576) caused an alignment inconsistency
+device-mapper: table: 252:10: adding target device (start sect 0 len 24576) caused an alignment inconsistency
 
-Fine by me as well!
+The warnings are caused by the fact that io_min is 512 and physical block
+size is 4096.
+
+If there's chunk-less raid, such as raid1, io_min shouldn't be set to zero 
+because it would be raised to 512 and it would trigger the warning.
+
+Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
+Cc: stable@vger.kernel.org
+
+---
+ drivers/md/dm-raid.c |    6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+Index: linux-2.6/drivers/md/dm-raid.c
+===================================================================
+--- linux-2.6.orig/drivers/md/dm-raid.c	2025-09-15 15:56:34.000000000 +0200
++++ linux-2.6/drivers/md/dm-raid.c	2025-09-15 15:56:56.000000000 +0200
+@@ -3813,8 +3813,10 @@ static void raid_io_hints(struct dm_targ
+ 	struct raid_set *rs = ti->private;
+ 	unsigned int chunk_size_bytes = to_bytes(rs->md.chunk_sectors);
+ 
+-	limits->io_min = chunk_size_bytes;
+-	limits->io_opt = chunk_size_bytes * mddev_data_stripes(rs);
++	if (chunk_size_bytes) {
++		limits->io_min = chunk_size_bytes;
++		limits->io_opt = chunk_size_bytes * mddev_data_stripes(rs);
++	}
+ }
+ 
+ static void raid_presuspend(struct dm_target *ti)
+
