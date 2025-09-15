@@ -1,75 +1,67 @@
-Received: from 004.mia.mailroute.net (004.mia.mailroute.net [199.89.3.7])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 764B62DC786;
-	Mon, 15 Sep 2025 15:59:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C7E5236457;
+	Mon, 15 Sep 2025 16:05:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757951982; cv=none; b=YPV+IzJ2THO4NwgkhS3tukg/2YvfHo9sVGQCz2ga9dHMoHV7ZeJQrTgaKhNYz0ewn7rCUQfu/LZhIlb7v10LAlJg78Yvph2dyI6GiwtzZlBIg5PmcAaSyQjxgUrZGwqj5PgzItZaUjwYCbJipEIk5u+JuKa4MxBQDLE4lAL6mp0=
+	t=1757952322; cv=none; b=sXdvHwM5NWfmDAPzk6+ge88/hLFwzGzWZ09BYzCMmNmPPGMTW7AEtJSAhXGyZs8tlYhpNWXrV6ldZy1MWWKUNiAFsvzQwS6ue9NW8/4bM+NB4l4JaFhuVaOGOb7Ns7dtQa6g3itLe7fKJjhGR9jNHxd0YdP5UK9shtUL9f2fmZ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757951982; c=relaxed/simple;
-	bh=nL9ggkeLKrCag013OOuf2Q3tK+5yJb8z4YPOcfsj9ow=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=opLDsGwN3L2EQMOj1bDinT9GiQJO/ZbzXXBIdpZGpE9kGKFpY3l4Qliq+Lo12CRrUgjAdmd+TPPTsY97cIX3X1mZdPI6/mMyPZrA6VrE4vKEnTu6TZCKelStsB8EMnv7OhIbJqmhI7iIpO9aDMx50dyl/cDFZWdiav6Znb8eGIg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=TGFpRk15; arc=none smtp.client-ip=199.89.3.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1757952322; c=relaxed/simple;
+	bh=lh+A2uC5baBTdfsKEwA9RHUSK9bZrIqABMvtzleJQAc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pniA2ssAHp3KAMGXcJMGurmP6qMt5mqlvv30hSYToAjJToQ47M0T8FxUB6/iZJld2gd8uWU5nxeKA9LVhjlk0u3/fDs5C00PDIF3DI5ijXeXqg3O57hQxVWfC0vIvaOo4APtG6cUUH0zzBSdAvYaZ01jql/AWtLDMlUxS4ZjMm4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=MM82k24O; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="TGFpRk15"
-Received: from localhost (localhost [127.0.0.1])
-	by 004.mia.mailroute.net (Postfix) with ESMTP id 4cQV8q2SzFzm0yVd;
-	Mon, 15 Sep 2025 15:59:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1757951978; x=1760543979; bh=UvimxUoZtBhyUDAYakrj8TxX
-	dlqZ1vtiiNbu0AdWBx8=; b=TGFpRk15MH/ooGvAu2NCTZhho8GCRmFPVLcgXz4n
-	mHz8j5iCgQTizRF7MxnzSL4Ui2L6p3l6RWjOCh/uWhgFUFf92g+GmOKPbLZE7cTl
-	hiRDVB4wa9JB2OQjHaInKA6bqfKH4YuWCf82DLVXIwlG6atvaT5ezFoMCo22JQQ7
-	idrx00iBCXNs8nMVxTRHqHrAlGp7Cle6W5XCuOomWSRJHIrGaAQdQuzXJ9TRel0/
-	dDPcFYHT5wCrp7EqsvLdts9NXjARQdPKzvgorXcGbFTXBlSkOg9riLprBKrmhxVY
-	T/56wqtYEw/Itnx6C6mOYlYZprqapS1VcRTywXGAnnewag==
-X-Virus-Scanned: by MailRoute
-Received: from 004.mia.mailroute.net ([127.0.0.1])
- by localhost (004.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id E7Fnayo8jkLR; Mon, 15 Sep 2025 15:59:38 +0000 (UTC)
-Received: from [100.66.154.22] (unknown [104.135.204.82])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 004.mia.mailroute.net (Postfix) with ESMTPSA id 4cQV8k4Q9hzm0yV6;
-	Mon, 15 Sep 2025 15:59:33 +0000 (UTC)
-Message-ID: <41ff57c2-19d4-495b-ae51-f30e555a74b4@acm.org>
-Date: Mon, 15 Sep 2025 08:59:32 -0700
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="MM82k24O"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=NHJlgt/7WEGea+bBx0aICsKkZy53NaDlU69o7eoYh5Y=; b=MM82k24OY6Ssx56rmv9ma0vdmF
+	9jsLBsxeeSl6lXpyUj5DWnDt67itDtOVxJodvKCmr9Ad8khCFmuYXUYkXi1Z7+kdhbMrxXH2wqI5K
+	ny4u1Q3R2RNKrw+c7EtxVhI93m13Fe4MAVmJlYFtHiBTlLgXeHaWfzKYN1lLaPV+rSyw0nU88wXI4
+	0/fnse8AhqcwQe6QUpPMKUohJedS4hwwaoonEEZp+WrRc+nNV68tM0vsJsvN8BJjmARLddbMUFCCa
+	/ty6GKyFXV1nRHRG0br5YOyWgzatCbQXotKJac8EFogt66nwUVuD1BHx7l064x7vEGM6kpKdRgY23
+	hjisokWg==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1uyBhe-0000000539n-0h0N;
+	Mon, 15 Sep 2025 16:05:18 +0000
+Date: Mon, 15 Sep 2025 09:05:18 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Joanne Koong <joannelkoong@gmail.com>
+Cc: Christoph Hellwig <hch@infradead.org>, brauner@kernel.org,
+	miklos@szeredi.hu, djwong@kernel.org, hsiangkao@linux.alibaba.com,
+	linux-block@vger.kernel.org, gfs2@lists.linux.dev,
+	linux-fsdevel@vger.kernel.org, kernel-team@meta.com,
+	linux-xfs@vger.kernel.org, linux-doc@vger.kernel.org
+Subject: Re: [PATCH v2 05/16] iomap: propagate iomap_read_folio() error to
+ caller
+Message-ID: <aMg5Pgj9L-ajiAev@infradead.org>
+References: <20250908185122.3199171-1-joannelkoong@gmail.com>
+ <20250908185122.3199171-6-joannelkoong@gmail.com>
+ <aMKuxZq_MK4KWgRc@infradead.org>
+ <CAJnrk1b8+ojpK3Zr18jGkUxEo9SiFw8NgDCO9crg8jDavBS3ag@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RESEND] block/mq-deadline: Replace DD_PRIO_MAX with
- DD_PRIO_COUNT
-To: chengkaitao <pilgrimtao@gmail.com>, axboe@kernel.dk
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- chengkaitao <chengkaitao@kylinos.cn>
-References: <20250915130606.97949-1-pilgrimtao@gmail.com>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20250915130606.97949-1-pilgrimtao@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAJnrk1b8+ojpK3Zr18jGkUxEo9SiFw8NgDCO9crg8jDavBS3ag@mail.gmail.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On 9/15/25 6:06 AM, chengkaitao wrote:
-> Remove redundant DD_PRIO_MAX and enum types, Move DD_PRIO_COUNT
-> into enum dd_prio{}, and similarly for DD_DIR_COUNT.
+On Fri, Sep 12, 2025 at 12:28:02PM -0400, Joanne Koong wrote:
+> I'll drop this. I interpreted Matthew's comment to mean the error
+> return isn't useful for ->readahead but is for ->read_folio.
+> 
+> If iomap_read_folio() doesn't do error returns and always just returns
+> 0, then maybe we should just make it `void iomap_read_folio(...)`
+> instead of `int iomap_read_folio(...)` then.
 
-Why has this patch been reposted? Last time it was posted I explained in
-detail that in my opinion all changes in this patch makes the code worse
-instead of better. Additionally, when a new version of a patch is
-posted, it should include a changelog. I don't see a changelog in this 
-patch. Please drop this patch.
+Yes, more void returns also really help to simplify the code flow.
 
-Bart.
