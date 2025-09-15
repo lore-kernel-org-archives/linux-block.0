@@ -1,184 +1,75 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 004.mia.mailroute.net (004.mia.mailroute.net [199.89.3.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5E4631C58F
-	for <linux-block@vger.kernel.org>; Mon, 15 Sep 2025 14:14:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 764B62DC786;
+	Mon, 15 Sep 2025 15:59:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757945694; cv=none; b=S8cJ2t3T64mDQJtxdnkP+AS/Jzihetkgu88xU/QGuvBandcuk9EbzZpG3wiLO0zZQMN37Hl5SxqNpRos9xzj2iysGVYdR2X7ocCS8m0ghbRB8kHOKYEWDB3Wb/A8SNAM3TCqb+hhjtKGFD25BRj+3jA9l3m5td0K6vBdiWASrGc=
+	t=1757951982; cv=none; b=YPV+IzJ2THO4NwgkhS3tukg/2YvfHo9sVGQCz2ga9dHMoHV7ZeJQrTgaKhNYz0ewn7rCUQfu/LZhIlb7v10LAlJg78Yvph2dyI6GiwtzZlBIg5PmcAaSyQjxgUrZGwqj5PgzItZaUjwYCbJipEIk5u+JuKa4MxBQDLE4lAL6mp0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757945694; c=relaxed/simple;
-	bh=kDdiKvRzZs74joM2c+r6TWVCJFJiOkwsvb50nM/IAIM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bMrig/+/BYQCaMAZ0PUydVeGfF+/UnBsLiR8VfpANR05UFmqKKLrO3/HtJoDXYa1Qz/j/DMiRipIKLUbAOxvOOuYPUj6lr8/+xhWW2T9/RN3F5g9KfP6HCsfXmyrd52pAFYT1KPYiHg5C5gRz6TZYnrVrcN2T9QtW1NygZode90=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=ou3VryN3; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=2mzOUJQM; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=ZpPwxUC3; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=vLnaHrLV; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	s=arc-20240116; t=1757951982; c=relaxed/simple;
+	bh=nL9ggkeLKrCag013OOuf2Q3tK+5yJb8z4YPOcfsj9ow=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=opLDsGwN3L2EQMOj1bDinT9GiQJO/ZbzXXBIdpZGpE9kGKFpY3l4Qliq+Lo12CRrUgjAdmd+TPPTsY97cIX3X1mZdPI6/mMyPZrA6VrE4vKEnTu6TZCKelStsB8EMnv7OhIbJqmhI7iIpO9aDMx50dyl/cDFZWdiav6Znb8eGIg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=TGFpRk15; arc=none smtp.client-ip=199.89.3.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="ou3VryN3";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="2mzOUJQM";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="ZpPwxUC3";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="vLnaHrLV"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="TGFpRk15"
+Received: from localhost (localhost [127.0.0.1])
+	by 004.mia.mailroute.net (Postfix) with ESMTP id 4cQV8q2SzFzm0yVd;
+	Mon, 15 Sep 2025 15:59:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1757951978; x=1760543979; bh=UvimxUoZtBhyUDAYakrj8TxX
+	dlqZ1vtiiNbu0AdWBx8=; b=TGFpRk15MH/ooGvAu2NCTZhho8GCRmFPVLcgXz4n
+	mHz8j5iCgQTizRF7MxnzSL4Ui2L6p3l6RWjOCh/uWhgFUFf92g+GmOKPbLZE7cTl
+	hiRDVB4wa9JB2OQjHaInKA6bqfKH4YuWCf82DLVXIwlG6atvaT5ezFoMCo22JQQ7
+	idrx00iBCXNs8nMVxTRHqHrAlGp7Cle6W5XCuOomWSRJHIrGaAQdQuzXJ9TRel0/
+	dDPcFYHT5wCrp7EqsvLdts9NXjARQdPKzvgorXcGbFTXBlSkOg9riLprBKrmhxVY
+	T/56wqtYEw/Itnx6C6mOYlYZprqapS1VcRTywXGAnnewag==
+X-Virus-Scanned: by MailRoute
+Received: from 004.mia.mailroute.net ([127.0.0.1])
+ by localhost (004.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id E7Fnayo8jkLR; Mon, 15 Sep 2025 15:59:38 +0000 (UTC)
+Received: from [100.66.154.22] (unknown [104.135.204.82])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id C2AF5336A2;
-	Mon, 15 Sep 2025 14:14:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1757945691; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=GVDIBoXI5PkmR2yBJg4qG4wQKyhaIJX7uV/hEXmMXs8=;
-	b=ou3VryN3TJFt4FY4IY62tzlkNxzTk2nIt77lDQi6F8qdKmm8KfDz2oMzo5KiJNvbZu0BCP
-	xorF3RuI3QF6U2drqTeovq5cluMcOsI7T3au2RWRaK6202Lg/jibiwudC6KVnIvLe78UEA
-	sXJMER7C4B6Snsz5tDTBr+ZM9XfSEL0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1757945691;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=GVDIBoXI5PkmR2yBJg4qG4wQKyhaIJX7uV/hEXmMXs8=;
-	b=2mzOUJQM/311vHeI5LDaUx9gyVESMhWzGcoYTZ+ZitJz7aR2ydDyGQWIVXx8wMOKq4cLrj
-	qFz6iELOKzW25VBA==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1757945690; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=GVDIBoXI5PkmR2yBJg4qG4wQKyhaIJX7uV/hEXmMXs8=;
-	b=ZpPwxUC3V8kU2mcYC0gzYq7KKGCV1/PHMiIpnC9eTP0qmLFdu9+nA2wft1zHj2tdpEnH12
-	98/FlZ/gi4pwS/3BwFGalgSWPaz3DMnWGUyjZU0Z9kx9/Wj06w704rgpcKG7XiVb/1XrtC
-	HssWZ0C4yLW1PvPT7CrVKgBus9gf/8o=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1757945690;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=GVDIBoXI5PkmR2yBJg4qG4wQKyhaIJX7uV/hEXmMXs8=;
-	b=vLnaHrLVPwh55KlAopRuS/32SIQqCJl+i+CPJCbsLR4gkvDVX3q13yii0LLUNbF6FADxnX
-	jcTo6AJvypkuDbCg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id B0A121368D;
-	Mon, 15 Sep 2025 14:14:50 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id gOGwKlofyGiBXAAAD6G6ig
-	(envelope-from <jack@suse.cz>); Mon, 15 Sep 2025 14:14:50 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id 5B07CA0A06; Mon, 15 Sep 2025 16:14:50 +0200 (CEST)
-Date: Mon, 15 Sep 2025 16:14:50 +0200
-From: Jan Kara <jack@suse.cz>
-To: Christian Brauner <brauner@kernel.org>
-Cc: Jan Kara <jack@suse.cz>, Amir Goldstein <amir73il@gmail.com>, 
-	linux-fsdevel@vger.kernel.org, Josef Bacik <josef@toxicpanda.com>, 
-	Jeff Layton <jlayton@kernel.org>, Mike Yuan <me@yhndnzj.com>, 
-	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>, Lennart Poettering <mzxreary@0pointer.de>, 
-	Daan De Meyer <daan.j.demeyer@gmail.com>, Aleksa Sarai <cyphar@cyphar.com>, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>, 
-	Johannes Weiner <hannes@cmpxchg.org>, Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Chuck Lever <chuck.lever@oracle.com>, linux-nfs@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, cgroups@vger.kernel.org, 
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v2 24/33] user: support ns lookup
-Message-ID: <aqu3yraxpt7h7rxjzzwvelcwvn7ehzufydhye57w6c6n2spddp@5pdsdhgfbxy5>
-References: <20250912-work-namespace-v2-0-1a247645cef5@kernel.org>
- <20250912-work-namespace-v2-24-1a247645cef5@kernel.org>
- <bh6wllwygal6hfdjbv3amgok2yxzjgmemyvzriqf2wos6b3plp@tvhvgz47mll3>
- <20250915-faken-rufen-db3c29188501@brauner>
+	(Authenticated sender: bvanassche@acm.org)
+	by 004.mia.mailroute.net (Postfix) with ESMTPSA id 4cQV8k4Q9hzm0yV6;
+	Mon, 15 Sep 2025 15:59:33 +0000 (UTC)
+Message-ID: <41ff57c2-19d4-495b-ae51-f30e555a74b4@acm.org>
+Date: Mon, 15 Sep 2025 08:59:32 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250915-faken-rufen-db3c29188501@brauner>
-X-Spamd-Result: default: False [-2.30 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	ARC_NA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[27];
-	TAGGED_RCPT(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	R_RATELIMIT(0.00)[to_ip_from(RLbyy5b47ky7xssyr143sji8pp)];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[suse.cz,gmail.com,vger.kernel.org,toxicpanda.com,kernel.org,yhndnzj.com,in.waw.pl,0pointer.de,cyphar.com,zeniv.linux.org.uk,kernel.dk,cmpxchg.org,suse.com,google.com,redhat.com,oracle.com];
-	RCVD_COUNT_THREE(0.00)[3];
-	FROM_EQ_ENVFROM(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email,suse.cz:email,imap1.dmz-prg2.suse.org:helo]
-X-Spam-Flag: NO
-X-Spam-Level: 
-X-Spam-Score: -2.30
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RESEND] block/mq-deadline: Replace DD_PRIO_MAX with
+ DD_PRIO_COUNT
+To: chengkaitao <pilgrimtao@gmail.com>, axboe@kernel.dk
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ chengkaitao <chengkaitao@kylinos.cn>
+References: <20250915130606.97949-1-pilgrimtao@gmail.com>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20250915130606.97949-1-pilgrimtao@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon 15-09-25 15:54:26, Christian Brauner wrote:
-> On Mon, Sep 15, 2025 at 02:11:55PM +0200, Jan Kara wrote:
-> > On Fri 12-09-25 13:52:47, Christian Brauner wrote:
-> > > Support the generic ns lookup infrastructure to support file handles for
-> > > namespaces.
-> > > 
-> > > Signed-off-by: Christian Brauner <brauner@kernel.org>
-> > ...
-> > > @@ -200,6 +202,7 @@ static void free_user_ns(struct work_struct *work)
-> > >  	do {
-> > >  		struct ucounts *ucounts = ns->ucounts;
-> > >  		parent = ns->parent;
-> > > +		ns_tree_remove(ns);
-> > >  		if (ns->gid_map.nr_extents > UID_GID_MAP_MAX_BASE_EXTENTS) {
-> > >  			kfree(ns->gid_map.forward);
-> > >  			kfree(ns->gid_map.reverse);
-> > > @@ -218,7 +221,8 @@ static void free_user_ns(struct work_struct *work)
-> > >  		retire_userns_sysctls(ns);
-> > >  		key_free_user_ns(ns);
-> > >  		ns_free_inum(&ns->ns);
-> > > -		kmem_cache_free(user_ns_cachep, ns);
-> > > +		/* Concurrent nstree traversal depends on a grace period. */
-> > > +		kfree_rcu(ns, ns.ns_rcu);
-> > 
-> > So this is correct for now but it's a bit of a landmine. A lot of stuff
-> > that ns references is kfreed before the RCU expires. Thus if you lookup ns
-> > using id, then even if you're under RCU protection you have to be very
-> > careful about what you can and cannot dereference. IMHO this deserves a
-> > careful documentation at least or, preferably, split free_user_ns() into
-> > pre and post-RCU period parts...
-> 
-> Right, the thing is that you cannot touch anything in any namespace
-> structure without having an actual reference to it. IOW, the only thing
-> that's valid under rcu is to access the reference count. That's the only
-> guarantee that the _generic_ infrastructure gives _and_ expects. IOW, if
-> one can get a live reference (inc_not_zero) that thing better be valid.
-> 
-> Individual namespace implementers may ofc provide additional guarantees
-> but they are not transparent to the generic infrastructure.
-> 
-> Otherwise I fully agree.
+On 9/15/25 6:06 AM, chengkaitao wrote:
+> Remove redundant DD_PRIO_MAX and enum types, Move DD_PRIO_COUNT
+> into enum dd_prio{}, and similarly for DD_DIR_COUNT.
 
-I guess fair enough for this patch set so feel free to add:
+Why has this patch been reposted? Last time it was posted I explained in
+detail that in my opinion all changes in this patch makes the code worse
+instead of better. Additionally, when a new version of a patch is
+posted, it should include a changelog. I don't see a changelog in this 
+patch. Please drop this patch.
 
-Reviewed-by: Jan Kara <jack@suse.cz>
-
-but longer term we might need to revisit this.
-
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Bart.
