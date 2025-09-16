@@ -1,333 +1,264 @@
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 520322E62CB
-	for <linux-block@vger.kernel.org>; Tue, 16 Sep 2025 10:20:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758018038; cv=fail; b=majS6ZtmwkNG2OHfs4fE7Cylhl87PDQtp5qHdC1TjdoSOQrzP00STKp0oW44JKAocz62T5+BcTldvyLhliNLkJ9YS3FY8L8kc5LFqBZYtBsgVtOPp1kd+a8ZxPD+MKwaB0cnR7fdRuOU//VVn6jhjXShSXvw2RXNT6zffyfiux0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758018038; c=relaxed/simple;
-	bh=bV0udrzbOq/Wcu+f1dYw33URIy8hVfV5oR9y1+bU4RQ=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=C9RSPGGdV5lXU1g1uGnK5tcKgfLvGVKmRdz/6bfunMuFNBElJFslTOgS9WRznSBc7noB38706RZD8mABPCIZkPUSCE1OA3ewUGifa+85BX2kiEb+XnGmlcrTT+GCCHGpH4y5lGtq698BPBwfqsE8y1RRDe7QlKLwypQMGBIQfxk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=Qvh9VXL4; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=VPbVyLL3; arc=fail smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09FF129B237
+	for <linux-block@vger.kernel.org>; Tue, 16 Sep 2025 11:04:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758020691; cv=none; b=k931JflVBwzR61YPng6TKeF4a0nV4rohVsNFxyof5n9zaKvIyLU4MBlo1TGk4OdntBZNgyg2sjIVHtj8hBVSqiOBF5nZ69NcJHOixWO5QxLkX/zWeXcvzbyoS8uaKaXK19IlIlmoO644qV5Xz0X0FPjk1AGXNFjeOnIL2hU4FZg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758020691; c=relaxed/simple;
+	bh=6iZ/hVZU+vtlEEp0FSXnhKnIBs8Acs2EWAnqw48/cAM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cKG3wo2iwV7/9D1ByUEfiJxRa35jUex0Njv6ULQMaD0IEh6a4FUdj8/rLElGs32zLGPcGyngMVIDQ7Pt035q0aKTFABJuUasCRSNJLiqnDLYMVIruuo3Y0yW9XDzdXIXD9P1Zb2euGzrl9zROqQIdtYthx/faW7M2KFZKErCwzE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=Clk+EEY/; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=ytwML0GF; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=ADFGvhn8; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=xgKcjVaa; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Qvh9VXL4";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="VPbVyLL3"
-Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58G1gmeG003469;
-	Tue, 16 Sep 2025 10:20:35 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=
-	corp-2025-04-25; bh=/oYNObNI6zrQK9nUE1eIKkZdxf7umNW1qaF3pFQldwU=; b=
-	Qvh9VXL4oWAik8LlsqdPbtkfgwHbMOepTTReljZabGgN42AUHclW6Ykefhwufy/q
-	GIvJPIPQ11GSR8XuP2o9GoG7cGVDZm8BLfGu9H9mYbTWtcTfdQrV1u9yT1vUj1uR
-	EXc7oBmjkkK10eEExO19mNcIwZZEayZel7+pHz8ShdNqi3RnNAm552gzb8+Kd1fD
-	NUkpzXXMUrd7HDbFtGzexV5pYs7xOtJoNeXADFxZoQaXg8/A5QPLKeY98MDpND/r
-	a4+hDRjJ8XCJTu4I5Kc7ZyEDA0mWw8y15kPSoS/rXsaeO9W4kb/3acOFEc0nIzWD
-	ONyAyktxy1Dvt3t5JOYrhg==
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4950nf4cgj-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 16 Sep 2025 10:20:34 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 58G9A8oA027230;
-	Tue, 16 Sep 2025 10:20:34 GMT
-Received: from sj2pr03cu001.outbound.protection.outlook.com (mail-westusazon11012032.outbound.protection.outlook.com [52.101.43.32])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 494y2jf9v6-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 16 Sep 2025 10:20:34 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Vv3fSSKsiQPNCrctEI5W3BesAokISrhFrCAPC0uLAgmhqJ6TBeaGsderhTf+rDcPmV2I2YptodEQ9pV+yXHSbm/FBYBetEHZolUjZ7xuX5J3oYL3HUpnQi/7Bq1lor7PkDzU2gVoqllw+iyR+PbFjdkKWsfGDN+NNEMBl7vCKDqCTaP5ltR8xtJDNllkZFMhuajQ2Zy6c5qojtcM67v8bAh4HVlfHn7b9fLU5++nW++IAu175Vp01GgsjtDIBejj6Ya+43jYZL195lRMiojmERkF9ox370D0YKK7HWczMyKcdQ1V9yI5bC1s4gW+fUw3keseDLlBWM1R+WgZFCN6PA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/oYNObNI6zrQK9nUE1eIKkZdxf7umNW1qaF3pFQldwU=;
- b=oT8w8y5fE+H0PR0co2zNUiOwbaJ/53cOljOFOShCyu68+Zz8KPGQwWEusHykQ5cBaNOBy/SzQ7pacnWuDxZZPGPq1ZgxSZWyaMeN1Z4v891e292fcmI7QR4LvNcXzRM2rLe1kO4KalzzoVGAVSL4HxBXA2tRTTe+vzF+edUlRWqUjTF+kdYxXDfwfRQonMApjiX5sMNDF3jEcMuD6Ci+pg+sypLaWCCCRjVEK5Hny5I0PQEcGgbbuLBSqYEbDrKM4UUUcHvkSs5DpgoqUPGShXMqiaRqentv6Juh08SYAehcBOdqkpzIYMeQ2oqqrID0nzWYgMuMtClW18QqV+lRpQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/oYNObNI6zrQK9nUE1eIKkZdxf7umNW1qaF3pFQldwU=;
- b=VPbVyLL3w/yzzFekK1XH7yPsMWfOmryH6qMkbXBl6A1tYOoCEIfAsceDp41443imgqnOLn0iJa5e3YHVY5ScrzNLKoHkqV/dY7A+G+gk0oizkLRq0ic6dVNaE0ySUz2Lkc9p758sQ2voZ+H1J5l5iSN4aNr296n2yARX9XRGGsk=
-Received: from MN2PR10MB4320.namprd10.prod.outlook.com (2603:10b6:208:1d5::16)
- by SJ2PR10MB7581.namprd10.prod.outlook.com (2603:10b6:a03:546::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9115.19; Tue, 16 Sep
- 2025 10:20:29 +0000
-Received: from MN2PR10MB4320.namprd10.prod.outlook.com
- ([fe80::42ec:1d58:8ba8:800c]) by MN2PR10MB4320.namprd10.prod.outlook.com
- ([fe80::42ec:1d58:8ba8:800c%7]) with mapi id 15.20.9115.020; Tue, 16 Sep 2025
- 10:20:29 +0000
-Message-ID: <39c9f89a-6e6f-422f-88a2-3b2730b659a3@oracle.com>
-Date: Tue, 16 Sep 2025 11:20:27 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH blktests 0/7] Further stacked device atomic writes testing
-To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <20250912095729.2281934-1-john.g.garry@oracle.com>
- <5eri4pgxaqhd2mcdruzubylfjshfo5ktye55crqgizhvr34qm7@mhqili4zugg5>
-Content-Language: en-US
-From: John Garry <john.g.garry@oracle.com>
-Organization: Oracle Corporation
-In-Reply-To: <5eri4pgxaqhd2mcdruzubylfjshfo5ktye55crqgizhvr34qm7@mhqili4zugg5>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: LO4P123CA0157.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:188::18) To MN2PR10MB4320.namprd10.prod.outlook.com
- (2603:10b6:208:1d5::16)
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="Clk+EEY/";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="ytwML0GF";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="ADFGvhn8";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="xgKcjVaa"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 02404222A4;
+	Tue, 16 Sep 2025 11:04:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1758020688; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=uB3s75uIkNgs3ivEMPKxDsUxxOEwMyVjkPUAHjlB29Q=;
+	b=Clk+EEY/+XyLZNpY7QrN3RIYjibUWBqNZxtXJMrDon3ieCDpqQh2JnfZKi+RKyrOU60LEG
+	FP7qfvM62au2DSQ+8TmDY38UoH0sqpq5hL8XRCY+NIkmB91dtOLeohxaQuJ2gkICXzp1dD
+	nnCQnXA6gr3AnOYrOomCJmGSZNiRIGo=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1758020688;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=uB3s75uIkNgs3ivEMPKxDsUxxOEwMyVjkPUAHjlB29Q=;
+	b=ytwML0GF7CjWKv4PZQYYPP8fvkQDech1EF33QYkPxi5T2wtVrgBiEgspeMXS0NG/hXFpdM
+	R36MqZLTjypGkSBw==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=ADFGvhn8;
+	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=xgKcjVaa
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1758020687; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=uB3s75uIkNgs3ivEMPKxDsUxxOEwMyVjkPUAHjlB29Q=;
+	b=ADFGvhn8TGyBrfikNQaf6x+czHKdB2l2gBTVPQXS6ImHtS5/3EGceVwdmS2ktyJqeoc7g2
+	TT0iTTklU0jZ6mv6HZVj8bMHGSqzRqlHZFblUTVgsN39efBfKtggb9XxX2+QRjnQuv2uJT
+	dNNBqDn5MDWLkytYEzLFBIoCiu1yuHI=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1758020687;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=uB3s75uIkNgs3ivEMPKxDsUxxOEwMyVjkPUAHjlB29Q=;
+	b=xgKcjVaahlY6F4xvT0zvJHVxkesQv4XnlpiukwTfXth/tfjg/hpVPAkFe35PXXcLMtKwsc
+	GrgIVvYz1tcAwPAA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id E4C5D139CB;
+	Tue, 16 Sep 2025 11:04:46 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id pQ+IN05EyWh3WwAAD6G6ig
+	(envelope-from <jack@suse.cz>); Tue, 16 Sep 2025 11:04:46 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+	id 76DECA0A56; Tue, 16 Sep 2025 13:04:42 +0200 (CEST)
+Date: Tue, 16 Sep 2025 13:04:42 +0200
+From: Jan Kara <jack@suse.cz>
+To: Naresh Kamboju <naresh.kamboju@linaro.org>
+Cc: linux-block <linux-block@vger.kernel.org>, 
+	linux-fsdevel@vger.kernel.org, LTP List <ltp@lists.linux.it>, 
+	open list <linux-kernel@vger.kernel.org>, lkft-triage@lists.linaro.org, 
+	Linux Regressions <regressions@lists.linux.dev>, Christian Brauner <brauner@kernel.org>, 
+	chrubis <chrubis@suse.cz>, Petr Vorel <pvorel@suse.cz>, Arnd Bergmann <arnd@arndb.de>, 
+	Dan Carpenter <dan.carpenter@linaro.org>, Al Viro <viro@zeniv.linux.org.uk>, 
+	Amir Goldstein <amir73il@gmail.com>, Jan Kara <jack@suse.cz>, 
+	"Martin K. Petersen" <martin.petersen@oracle.com>, Anuj Gupta <anuj20.g@samsung.com>, 
+	Kanchan Joshi <joshi.k@samsung.com>, Anders Roxell <anders.roxell@linaro.org>, 
+	Ben Copeland <benjamin.copeland@linaro.org>
+Subject: Re: next-20250915: LTP chdir01 df01_sh stat04 tst_device.c:97:
+ TBROK: Could not stat loop device 0
+Message-ID: <arfepejkmgi63wepbkfhl2jjbhleh5degel7i3o7htgwjsayqg@z3pjoszloxni>
+References: <CA+G9fYuFdesVkgGOow7+uQpw-QA6hdqBBUye8CKMxGAiwHagOA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN2PR10MB4320:EE_|SJ2PR10MB7581:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4887fcef-371d-4bcb-69cb-08ddf50aa8f7
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?WEc3eFAzYUdZT2tEbTQ2Y3NNMEFaSEpsSHV6Z21EWSsxNi8yMXpGaHZ1NndH?=
- =?utf-8?B?bGhYUDNwTUZ6LzNQRjdRWXhtU3A0MUYzMkRqTDAyby9vRk5kUFppdm9vNFVR?=
- =?utf-8?B?VlpZRmhjZ0hFT01Va0Y1ZG93SmlMdnRLR1AvSFZZdWhMSEEyZ09kbmtld21h?=
- =?utf-8?B?K1RYWld6Q2hEMm5BS2pvWkp0bGZuNkUxeG9TQ2lKUWRURVk0L2QwNkQvdy9n?=
- =?utf-8?B?WHF5cmRFRW9KQ3B6ZUo0aVhXcEdLTDJPaGxMeXZzVE5XWEFleDZ6WEFkY0hG?=
- =?utf-8?B?cDVLNXh2RUozSXRENzZ1eEtpZVFBZklkdElZY2psaHlkMCtOSm5Jd1RYUDIz?=
- =?utf-8?B?QTJMOWh6enZjOHM4eGh3ZWh3WWFyeVF4djdmeXZLUXZ2bWZKZmg1Vm9XMUQv?=
- =?utf-8?B?SXBDR21xKzU3UVUwK1dqZnpkdStJc3Z0VlpJbUZ3d0NISExsam1RcUVhVmg4?=
- =?utf-8?B?eFdnaWhmR0pQOWI3OVhuS3FZcjM5VENtcVZZekRqUHNFVlVFbXAyUWJMS2ZZ?=
- =?utf-8?B?YmhPaklqaXJ0OXF1RjdXZDlaazJtSCtiK2JYems4RTc4Z1VncDdyRUp6dmJD?=
- =?utf-8?B?MzFtcW0xMDhCTmhHMnpUUytGalBLNDcvM1dHY2h3YmtBb1VaZVVRWFI1WEFy?=
- =?utf-8?B?S3U1b0N1Nzl1YStNTzFOakFMZUV1YUZyaHRmWnVDMnVaNWVxV1RKaXlpS1Nq?=
- =?utf-8?B?N1M4SkRTVVI4NW9xdWU0WUtWclZWMy9IWVZjZkNvZSt2REorT0xHM2ZSUE9Y?=
- =?utf-8?B?L0tzRG5xMGp2OXV1K1o3QzZFdjVYdVhUT3JTYkVHTlhGck1MNG01SU93UDRa?=
- =?utf-8?B?QVNIRmhEN3kzUWVzNVVMMUNVYjRETElwRHZWTDIybHhuNEFhQURjL2NSL1BJ?=
- =?utf-8?B?UkRCRzVuRWVoaWN5cWZ5RDlXQ2xYdlZadzVVdHpDMnJzTGlZK01rWHNHUjRB?=
- =?utf-8?B?TWJ5TDc5RjllMUJxUnZBdE9EalJESjA2b1NQdFdpN0dLMmZKbTBYWXJNVWhk?=
- =?utf-8?B?aDZYdU10bm5FVFFrSzYrSTZsd0VQdWc3a1pmRUl5Si9aQzRPNFIwcFAxMTVx?=
- =?utf-8?B?cEVlZjdVMWVNb3o5dUZ5akx5N0JMRk1GL01CZEdMRHdQTUtaSUFVU2lqdjhp?=
- =?utf-8?B?RWdQRytITEl2Qi9DTFV5R05ITDlqL2x4TUl3YlpFekd6M0JvSFBoZzMxY3FO?=
- =?utf-8?B?NnJPbWFYRG9PbVNnZENRYVZIcVBhOXRBd09abGFQQXN5VnJDSnZOUlllRnlu?=
- =?utf-8?B?YlVINnVHbWRzVTBkbE1ZTFF5REtwNEU1UmFLSUFGY29Ddi9WQTBDT1hyQzN6?=
- =?utf-8?B?MkVwTksybU5LdDNZSWhGTTUyTlZPR2xwU1BJTE5jZWJ2QklWYUNVdzhucVZL?=
- =?utf-8?B?VFdxTThTdHo3K20zM21qNUJsa3h3VUdhaTJuS2ZFNmRBSlZpNW53M2dkNXlO?=
- =?utf-8?B?MW1rWWlwdHdEUDBLeE5SRU9KV3NSVDREdXlQUHp2eG83S2M2bWpkTjQyZmJZ?=
- =?utf-8?B?SUlUa3VlTFlUSGdiZmVxZ0d1K2Y4enZLTitaZkRSSW5neFk2eHplMUkrS25M?=
- =?utf-8?B?alpPZldFVWxtZnNlUXZnUDRXSHRLOEM0M0hLZ0xYa1hPdTNhNm0wd1REYjEz?=
- =?utf-8?B?OUU1bjJLQ1ZMVFVNaWtDeW9aNlJadFpRV0FMOE9yUzhOK2cyNzRUaitxOEI5?=
- =?utf-8?B?RGxod0ZGYVQ0RGo4bEp0NmpaY0xqeXhDWEE3VGhrUWl5SHlidm1tcERTdzhT?=
- =?utf-8?B?ZVp5S3p2elRlY3U1UW5naElsRXB2d0JQS1lxTHBxTTc1cldCRUlhNXlIMHNj?=
- =?utf-8?B?UDYzUExZZE9hQXM1aDdxTWNRTFpJMWxyZ3BQcjNlMHgvanNUSEtVcUJYZTc3?=
- =?utf-8?B?WDU1bTVvMFNGdzJWaWRnVy9GUStBbGpmcHJ3N1JiUzEyakpOZVZ1QzBFdUs1?=
- =?utf-8?Q?AHOXt7w5X3s=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR10MB4320.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?SG1QY3ZCcEZEdXI0aVF6Q1pua2Y4Q3REOU81SzY4Y2tUOTZJUU5mNCt4N3hq?=
- =?utf-8?B?WjRwWEg2VzBoTlo2dmc4aGZoRFdUQkFOTGlZSFZmNnNGK3ZwZDdsUnNST1lG?=
- =?utf-8?B?VHorRldvK2N6d2R2WldPclpaalJFTkprcVFUQzJ6ZTRIdUZNd3VjTVh2WU02?=
- =?utf-8?B?alJjeTFydVpOdWRoQXZHYnYxMW9IMHpyVXVUZ2NoekxtZUxQb0NUZGh2aWho?=
- =?utf-8?B?L2h3RnJzSldGVzFxRlE4MUl3cVpVWHY2VWI4Vmg3TjhRVy9hRUJQV0xDYlpm?=
- =?utf-8?B?SElvUnBsNy95akxRL29NYzZjVDVoRUQzWG5KZGh4OTlUTHZqT2tYYXl1cVFK?=
- =?utf-8?B?OEwwWWVJVVhsbEpOY1NmRFc3dFpMbXRlZk5MYVdqa3pWTXRWREpRa2o2UkVo?=
- =?utf-8?B?UUthOFhLTkRUYVBYQlhJNkh1OXRXNG90SEQ1elk3U1E5b3lRb3QxMzNFa3VG?=
- =?utf-8?B?MHBTS09oUFdLSzBuUjZNRTFSd0hZZUpwSm5LTTV6eTlEL0xYUGovcStFQitQ?=
- =?utf-8?B?RUIxcTFTRmEvQVNVRCszeS9ZNEI4OCtoOUFTSmVDczEzYjVxblE5a21qLzVm?=
- =?utf-8?B?RFA3cFFHSHhBbVhmNmFRYkp1Q1NwSjRVMVBwRU1zeFh4ck9Ea0FlL3VnU2xs?=
- =?utf-8?B?MVdxbXFaMkxEMDUwcFd1NWtIeEdYNzRFbkMra01CSWdLajFzQm5QeW50SnQv?=
- =?utf-8?B?ZUgyQnVFN2xENyt6ejNIaUYvUnFablZrVFh6UVhFSzB5Mm81SWgvTG5KbU5q?=
- =?utf-8?B?R0o0YUx3Y3hzSWdrdjlmZ3NTV2QzRFU0aWxBdUhzQk5JL2xOWno2TnRWbm1P?=
- =?utf-8?B?ZkhZejdQSXVsTFVzNHBVQTN5c2FXRnVuUzFrd0lLK0pEQXVZQ1h3eXBPUGRU?=
- =?utf-8?B?VVFiNmtWMjh4a3VVZGNyZjFsK2hXeCtET3ptbWNJOG42T2JONlM4NGxmcGRs?=
- =?utf-8?B?Zm5YeHowYzdOcDEvS3Q2QTJKZzg1eFpXYmFMdVNJKzFzYmlSY1E5YWUxZHFt?=
- =?utf-8?B?VisrNGE5aCtNeWV0SjVaQUV5TXAxK05wL3RNUnIzNlpVRWx6cEQ1eTl6Nkk3?=
- =?utf-8?B?ZzFoSDEydVRzRWEvZFFYOEpob2g3di9rVW11MENIejFHRzlvNWk3V0ptcERZ?=
- =?utf-8?B?WUsyYjhtZ0dkNSs0aUNxMGcycUF5akFZRnduYjNpUXYvb3lya1hEWmltbjRG?=
- =?utf-8?B?ZnF3ZXNqaXdKT1ZqV1dhdUg0bmZRY2FlcE85L0FQdWVRSm5lR2h3OTVEWlRD?=
- =?utf-8?B?SHk1dmJKSVpOcW0xdGZVNUhrbTFDbjh3Sy9tODZWeDlZckJhV3dlYzhCL1Jp?=
- =?utf-8?B?SVFvZ1BBNVJUUEh4WlpkeU1sZXkySWNwdW01cGhLQkpnR3owcTVGM09TT3Zv?=
- =?utf-8?B?K0V3cEN3YjNHRXluaE5RTmE1WUhVeVlQRjVuN1BVUHFqYzlBYzA1R1pINGY1?=
- =?utf-8?B?U0lweVk1MUtrdlYxTE11L3phN2VvK0dTUGJCQUk2bTNyd0N2aHhveGtNR3Nn?=
- =?utf-8?B?WlFidUFkMWpBbjdjVncrRngrdDFLSUJFd2VIbVFRNFFlV3ZEbDZ2b1dmMWxm?=
- =?utf-8?B?KytUMENmL2U3MTVvM3dFNXFrU1JOVkdQcXB1cGdIWmJTWk1Jd2Z3a1NWblZu?=
- =?utf-8?B?Y0dnK0UyQisyWU01K2F3a0pydkVqUVVlWU0wUllaZ1VJZ0ZLL1Nmd1g0cmZk?=
- =?utf-8?B?ZlV3Q1JvNWNDMTVBV3B3UnUvOFFvYzdiUWFnTjhlQlE3RTQvNFZoK3BqK2d4?=
- =?utf-8?B?MGlXRmY1eDVTVFFtdU5pZ0ZsYUJZU0V5cCt2RmhBSlV4RHNoaDFMbFNaanlK?=
- =?utf-8?B?RGtKL1k4ZmVENWRrak5Kc2g4bzBwaWpWQVd1UVErSUwreTBSTy9RcmtodGwy?=
- =?utf-8?B?elV4VnZJbFlsa0xraStsOWUwQjNRRDJoS1B2TDN2dEFpSG1KMkpiY3FOQjB2?=
- =?utf-8?B?Ky9FMEJXcGNaMUN3ZWtnaWNNbGp5cVhFNTFSNm0zMk1LSTlBTFVXa3hDUVVZ?=
- =?utf-8?B?ZFMrY01RMjFja09qYnlMNnA3MXlFdm5RNmdoYlBuRVcyTE1IVUZ2QUhQSG05?=
- =?utf-8?B?TnVzMDdaNE5jbVVXTXFNaEdPR0g4blQvVVo2d0lEZms0ZTZtZElVdkl0aE5F?=
- =?utf-8?B?Rm9qR2ZBQTBRaGRNREdSRkxjN2pYZDA3RWZ3QlQ0YnVyYTd5Z1lzTTUxOWxR?=
- =?utf-8?B?WVE9PQ==?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	LawTQTt3Pvl/U682QXl2/+c5AC/V6eVbuVOue5RDBnft4hRXe79OM9Oo64xiKvVdzJ0niUrgLGShQaZdqZM/nQcmNWfG8dlfch9lwbumxMEdtfq6B/UdMNlCsbgPc8V4lJIZzlUUbmsY+WZsE6/Vowd7ExRI3oQhgUkBOiPZTsczin7kcQdWEZhtxJhaY3sq0rJM9mngzpymukNHfq09Aoctfj10u3w0WtNFQroJCXFodLNx99hXZYFDgXJ+2FHIWV9bwz8k3U+YN4Vrf4i8x1dpEPWcxsMmkOmE35MprC52wLbaiDsSIHvaA2OPA81FdVCjnXAC5/Gu4+UgxzmopWElqF4Nz1961EEODOLl1q6krjEsaMq8MJV1Zw9e7Xs6pZ6Qm8tvvylwt3LfM1i8fxJhNDz56tHyOOzSasOyfREItpCetNIKFIJjl1HRSSns2b98WNMfj7yEZVJ0vmdg2thvWaGDaFa/RJOL2SzBCuasyDphnF1gZhYcmeAWrO6AELvNZEIjpa0nYcSEau/miLrbUmDe7HpMK26uTtwfz6I1dmnuR6bXiRAkptEXi0XzLfBRNoHjPdO4nUKjgfSnK0Wmhh75HFh/30GoZr9ILHU=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4887fcef-371d-4bcb-69cb-08ddf50aa8f7
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR10MB4320.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Sep 2025 10:20:29.2953
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: duK6ABDaRvYaHIChWfRFnNrSM6QZ7Hy2f0uEUiuj1Hfy3xQtUW05ar7qI1NIl3OG7PBjwCj0Jn+nxQufBT7Plw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR10MB7581
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-09-16_02,2025-09-12_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 bulkscore=0
- mlxlogscore=999 suspectscore=0 malwarescore=0 spamscore=0 phishscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2508110000 definitions=main-2509160099
-X-Authority-Analysis: v=2.4 cv=S7vZwJsP c=1 sm=1 tr=0 ts=68c939f2 b=1 cx=c_pps
- a=zPCbziy225d3KhSqZt3L1A==:117 a=zPCbziy225d3KhSqZt3L1A==:17
- a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19
- a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=wKuvFiaSGQ0qltdbU6+NXLB8nM8=:19
- a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
- a=yJojWOMRYYMA:10 a=GoEa3M9JfhUA:10 a=NEAV23lmAAAA:8 a=jcU5z_5U5o2pKb0cXikA:9
- a=QEXdDO2ut3YA:10 cc=ntf awl=host:12083
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTEzMDAyOSBTYWx0ZWRfX4vqij9Ygkq1I
- RGTqJ0XUA/YcgrgqvZJ0ObLILNM3b8bs2vlVHu0LJKG0eSQE2xhg0SpRzaBfBiWef7UA/fMg34e
- 9mFK1NJMlJXOCHGhAtVf8pan0YCZ6Nc9aJ1OsG9Cl5XB73mgbZVRKplwj7m4Agf8oXkX9zUxrun
- VF8DZBhw5hV5vUDxvipPum/Iznuq5iVU29gaNHttyh0hP2C9dJyYdq9s/JF+R1sxVWVajgHqjey
- Cm5tPJ9Yn5B/RwnCuXK8d0KBCaIIDbYkYXoxCV1CyGf3FFnHqukzwSwC5oz5qvA4h400UqzN7Hr
- RzqnfNKVkbCzCYKEqrtonxmEsOQiyq7ZSA9x57LMDGSpbcBikzQD3xiHw3M2xOffhuV1FV4FMSh
- NB3P4VL3sw7LS+tAnVtP12jb2BpKbg==
-X-Proofpoint-ORIG-GUID: hr5yqoXV7LKFf9F2B9BZ5Se4brYGeUyl
-X-Proofpoint-GUID: hr5yqoXV7LKFf9F2B9BZ5Se4brYGeUyl
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CA+G9fYuFdesVkgGOow7+uQpw-QA6hdqBBUye8CKMxGAiwHagOA@mail.gmail.com>
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Rspamd-Queue-Id: 02404222A4
+X-Rspamd-Action: no action
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spamd-Result: default: False [-4.01 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.linux.it,lists.linaro.org,lists.linux.dev,kernel.org,suse.cz,arndb.de,linaro.org,zeniv.linux.org.uk,gmail.com,oracle.com,samsung.com];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	DNSWL_BLOCKED(0.00)[2a07:de40:b281:106:10:150:64:167:received,2a07:de40:b281:104:10:150:64:97:from];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DWL_DNSWL_BLOCKED(0.00)[suse.cz:dkim];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	DKIM_TRACE(0.00)[suse.cz:+];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.cz:dkim,linaro.org:email,linaro.org:url,imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,suse.com:email]
+X-Spam-Score: -4.01
 
-On 16/09/2025 09:55, Shinichiro Kawasaki wrote:
-> On Sep 12, 2025 / 09:57, John Garry wrote:
->> The testing of atomic writes support for stacked devices is limited.
->>
->> We only test scsi_debug and for a limited sets of personalities.
->>
->> Extend to test NVMe and also extend to the following stacked device
->> personalities:
->> - dm-linear
->> - dm-stripe
->> - dm-mirror
->>
->> Also add more strict atomic writes limits testing.
->>
->> John Garry (7):
->>    common/rc: add _min()
->>    md/rc: add _md_atomics_test
->>    md/002: convert to use _md_atomics_test
->>    md/003: add NVMe atomic write tests for stacked devices
+On Tue 16-09-25 12:57:26, Naresh Kamboju wrote:
+> The following LTP chdir01 df01_sh and stat04 tests failed on the rock-pi-4b
+> qemu-arm64 on the Linux next-20250915 tag build.
 > 
-> Hello John, thanks for this series. Overall, this series looks valuable for me
-> since it expands the test contents and target devices. Also it minimizes code
-> duplication, which is good.
+> First seen on next-20250915
+> Good: next-20250912
+> Bad: next-20250915
+> 
+> Regression Analysis:
+> - New regression? yes
+> - Reproducibility? yes
+> 
+> * rk3399-rock-pi-4b, ltp-smoke
+> * qemu-arm64, ltp-smoke
+> * qemu-arm64-compat, ltp-smoke
+>  - chdir01
+>   - df01_sh
+>   - stat04
+> 
+> Test regression: next-20250915: LTP chdir01 df01_sh stat04
+> tst_device.c:97: TBROK: Could not stat loop device 0
 
-thanks for checking
+This is really strange. Those failing tests all start to complain that
+/dev/loop0 doesn't exist (open gets ENOENT)... The fact that this is
+limited to only a few archs suggests it's some race somewhere but I don't
+see any relevant changes in linux-block in last three days...
+
+								Honza
 
 > 
+> Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
 > 
-> Having said that, I noticed a challenge in the series, especially in the 4th
-> patch "md/003: add NVMe atomic write tests for stacked devices". This patch
-> introduces a new test case md/003 that uses four NVME devices. Actually, this is
-> the very first test case which runs test for multiple devices that users define
-> in the TEST_DEVS variable.
+> ## Test log
+> <8>[   53.655971] <LAVA_SIGNAL_STARTTC chdir01>
+> tst_buffers.c:57: TINFO: Test is using guarded buffers
+> tst_tmpdir.c:316: TINFO: Using /tmp/LTP_chdm4pHJb as tmpdir (tmpfs filesystem)
+> tst_device.c:98: TINFO: Found free device 0 '/dev/loop0'
+> tst_test.c:1953: TINFO: LTP version: 20250530
+> tst_test.c:1956: TINFO: Tested kernel: 6.17.0-rc6-next-20250915 #1 SMP
+> PREEMPT @1757983656 aarch64
+> tst_kconfig.c:88: TINFO: Parsing kernel config '/proc/config.gz'
+> tst_kconfig.c:676: TINFO: CONFIG_TRACE_IRQFLAGS kernel option detected
+> which might slow the execution
+> tst_test.c:1774: TINFO: Overall timeout per run is 0h 28m 48s
+> tst_supported_fs_types.c:97: TINFO: Kernel supports ext2
+> tst_supported_fs_types.c:62: TINFO: mkfs.ext2 does exist
+> tst_supported_fs_types.c:97: TINFO: Kernel supports ext3
+> tst_supported_fs_types.c:62: TINFO: mkfs.ext3 does exist
+> tst_supported_fs_types.c:97: TINFO: Kernel supports ext4
+> tst_supported_fs_types.c:62: TINFO: mkfs.ext4 does exist
+> tst_supported_fs_types.c:128: TINFO: Filesystem xfs is not supported
+> tst_supported_fs_types.c:97: TINFO: Kernel supports btrfs
+> tst_supported_fs_types.c:62: TINFO: mkfs.btrfs does exist
+> tst_supported_fs_types.c:105: TINFO: Skipping bcachefs because of FUSE blacklist
+> tst_supported_fs_types.c:97: TINFO: Kernel supports vfat
+> tst_supported_fs_types.c:62: TINFO: mkfs.vfat does exist
+> tst_supported_fs_types.c:128: TINFO: Filesystem exfat is not supported
+> tst_supported_fs_types.c:132: TINFO: FUSE does support ntfs
+> tst_supported_fs_types.c:62: TINFO: mkfs.ntfs does exist
+> tst_supported_fs_types.c:97: TINFO: Kernel supports tmpfs
+> tst_supported_fs_types.c:49: TINFO: mkfs is not needed for tmpfs
+> tst_test.c:1888: TINFO: === Testing on ext2 ===
+> tst_device.c:391: TWARN: Failed to clear 512k block on /dev/loop0
+> tst_test.c:1217: TBROK: tst_clear_device() failed
+> Summary:
+> passed   0
+> failed   0
+> broken   1
+> skipped  0
+> warnings 1
+> tst_device.c:283: TWARN: open(/dev/loop0) failed: ENOENT (2)
+> <8>[   53.679564] <LAVA_SIGNAL_ENDTC chdir01>
+> <8>[   53.708246] <LAVA_SIGNAL_TESTCASE TEST_CASE_ID=chdir01 RESULT=fail>
 > 
-> Currently, blktests expects that each test case,
+> <8>[   53.933883] <LAVA_SIGNAL_STARTTC stat04>
+> tst_buffers.c:57: TINFO: Test is using guarded buffers
+> tst_tmpdir.c:316: TINFO: Using /tmp/LTP_staPDxElt as tmpdir (tmpfs filesystem)
+> tst_device.c:97: TBROK: Could not stat loop device 0
+> Summary:
+> passed   0
+> failed   0
+> broken   1
+> skipped  0
+> warnings 0
+> <8>[   53.947889] <LAVA_SIGNAL_ENDTC stat04>
+> <8>[   53.974024] <LAVA_SIGNAL_TESTCASE TEST_CASE_ID=stat04 RESULT=fail>
 > 
->   a) implements test() which prepares test target device/s in it and test the
->      device/s, or,
->   b) implements test_device() which tests single TEST_DEV taken from
->      TEST_DEVS that the user prepared
+> <8>[   54.048075] <LAVA_SIGNAL_STARTTC df01_sh>
+> df01 1 TINFO: Running: df01.sh
+> df01 1 TINFO: Tested kernel: Linux
+> runner-j2nyww-sk-project-40964107-concurrent-0
+> 6.17.0-rc6-next-20250915 #1 SMP PREEMPT @1757983656 aarch64 GNU/Linux
+> df01 1 TINFO: Using /tmp/LTP_df01.7pcwUXe1CN as tmpdir (tmpfs filesystem)
+> tst_device.c:97: TBROK: Could not stat loop device 0
+> df01 1 TBROK: Failed to acquire device
+> Summary:
+> passed   0
+> failed   0
+> broken   1
+> skipped  0
+> warnings 0
+> <8>[   54.060936] <LAVA_SIGNAL_ENDTC df01_sh>
+> <8>[   54.087630] <LAVA_SIGNAL_TESTCASE TEST_CASE_ID=df01_sh RESULT=fail>
 > 
-> The test case md/003 tests multiple devices. This is beyond the current blktests
-> assumption. md/003 implements test(), and it refers to TEST_DEVS. It looks
-> working, but it breaks the expectation above. 
-
-Sure, I do think that the current infrastructure cannot handle what I 
-want to do. I want to test multiple specified devices in tandem. md/002 
-does not have such an problem, as it creates the devices itself (and so 
-can specify test()).
-
-> I concern this will confuse users.
-
-understood
-
-> For example, when user defines 4 NVME devices in TEST_DEVS, md/003 is run only
-> once, but other test cases are run 4 times.
-
-Yes
-
-> It also will confuse blktests test
-> case developers, since it is not guided to refer to TEST_DEVS from test(): e.g.,
-> ./new script. So I think a different approach is required to meet your goal.
-
-ok
-
-JFYI, I had been using QEMU to test this with virtual NVMe devices. This 
-allows me to manually set the atomic properties of the devices for good 
-test coverage.
-
+> ## Source
+> * Kernel version: 6.17.0-rc6
+> * Git tree: https://kernel.googlesource.com/pub/scm/linux/kernel/git/next/linux-next.git
+> * Git describe: 6.17.0-rc6-next-20250915
+> * Git commit: c3067c2c38316c3ef013636c93daa285ee6aaa2e
+> * Architectures: arm64
+> * Toolchains: gcc-13 and gcc-8
+> * Kconfigs: lkftconfigs
 > 
+> ## Build
+> * Test log: https://qa-reports.linaro.org/api/testruns/29896973/log_file/
+> * Test details:
+> https://regressions.linaro.org/lkft/linux-next-master/next-20250915/ltp-smoke/stat04/
+> * Test plan: https://tuxapi.tuxsuite.com/v1/groups/linaro/projects/lkft/tests/32l4Vv9hKep2EcmS18u3NBtmoAm
+> * Build link: https://storage.tuxsuite.com/public/linaro/lkft/builds/32l4UF8KltAzu6kUpW3hXaYRWjZ/
+> * Kernel config:
+> https://storage.tuxsuite.com/public/linaro/lkft/builds/32l4UF8KltAzu6kUpW3hXaYRWjZ/config
 > 
-> I can think of two approaches. The first one is to follow the guide a) above.
-> Assuming nvme loop devices can be used for the atomic test, 
-
-I am not sure if they are, as I don't think that any such device will 
-support atomics. I did already consider this.
-
-> md/003 can prepare 4
-> nvme loop devices and use it for test. This meets the expectation. This also
-> will allow to run the test case where NVME devices are not available.
-> 
->    Q: Can we use nvme loop devices for the atomic test?
-
-As above, unfortunately I don't think so.
-
-Indeed, the test really only tests NVMe device queue limits and not 
-really the atomic behaviour itself. If there was a way to configure the 
-atomics-related queue limits for nvmet, then it could work, but I don't 
-think that there are. Indeed, it does not really make sense for these to 
-be configured manually, as they are real HW device properties.
-
-> 
-> If nvme loop devices can not be used for the atomic test, or if you prefer to
-> run the test for the real NVME devices, I think it's the better to improve the
-> blktests framework to support using multiple devices for a single test case. I
-> think new variables and functions should be introduced to support it, to avoid
-> the confusions that I noted above. For example, the test case should implement
-> the test in test_device_array() instead of test(), and it should refer to
-> TEST_DEV_ARRAY that users define instead of TEST_DEVS.
-
-sounds reasonable
-
- > > Based on the second approach, I quickly prototyped the blktests 
-change [1]. I
-> also modified md/003 to adapt to the change [2].
-> 
-> [1] https://urldefense.com/v3/__https://github.com/kawasaki/blktests/commit/7db35a16d7410cae728da8d6b9b2483e33e9c99b__;!!ACWV5N9M2RV99hQ!Lm9AlQ3T9qSGDEjCR0nGmjCGC_2wfuAbkP6zN9EfZD7L2Y7mgpKPah_fYZh6L_OPkH9IIxP4f9n1Q9dRRRJxbZQeqRtr$
-> [2] https://urldefense.com/v3/__https://github.com/kawasaki/blktests/commit/278e6c74deba68e3044abf0e6c3ec350c0bc4a40__;!!ACWV5N9M2RV99hQ!Lm9AlQ3T9qSGDEjCR0nGmjCGC_2wfuAbkP6zN9EfZD7L2Y7mgpKPah_fYZh6L_OPkH9IIxP4f9n1Q9dRRRJxbSlcsw0E$
-> 
-> Please let me know your thoughts on the two approaches.
-
-Let me check it, thanks!
-
-> 
-> 
-> P.S. I will have some more comments on the details of the series, but before
->       making those comments, I would like to clarify how to resolve the challenge
->       above.
-
-ok, good.
-
-Cheers,
-John
-
+> --
+> Linaro LKFT
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
