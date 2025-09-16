@@ -1,162 +1,115 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f176.google.com (mail-yb1-f176.google.com [209.85.219.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53EAB3A1DB
-	for <linux-block@vger.kernel.org>; Tue, 16 Sep 2025 01:04:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2DF51E3DCD
+	for <linux-block@vger.kernel.org>; Tue, 16 Sep 2025 01:05:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757984660; cv=none; b=cXKJMrdN8uzU4WpIy7GlOGN0zGV0pjhrC3rPq2AoYA4w0M3ZQ3QR6MuU6wh87Gb8QBoS7Q0dLCifoGH2ZvQewmlS90QNfYtrnIz5LjA6A8mE6ZIp4KsrVlKBF4wmJwhcNsQMF5kM3d7A27/DLrcEh2KMxAyqEHEONJ3tfEtv5jw=
+	t=1757984728; cv=none; b=Et7p+imQ7cEDEPfwXje8S26RgoMpE/YkEKsYgyLcvIrauHvFVsLfoP+i1mMlKG8Xac5R+ektUkj6RLkyl2V4ZTlUZbqWgtCofjenusHkumwLuIWqdcmTnPnL0fz23hPC0HG9CUXf/sjYFHPq6yMRoRt6WNTuQiByK+7ygaeaYJk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757984660; c=relaxed/simple;
-	bh=B104AO/2vZlVC6H6wI56hNqobjz6+BkizPVgDTPx8RI=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=aj/RWo/Vhg2siE55dc0xuB+Zc+dajx5sHsRar0E0xVQCKUuaxKRgi/E7QZOC6fy8zsSafz5+qal+jtPxEvixzsi/tZvoMNxDMkHE9TAiq+9UdHWPktugrZwL35QWXGBqn7Sg5v2IWDGeAF+zpKRjXCNKoNxvCM7q2VICyv4UqIQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=none smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4cQkF22QdYzKHMjf
-	for <linux-block@vger.kernel.org>; Tue, 16 Sep 2025 09:04:06 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id F044E1A01A4
-	for <linux-block@vger.kernel.org>; Tue, 16 Sep 2025 09:04:06 +0800 (CST)
-Received: from [10.174.179.143] (unknown [10.174.179.143])
-	by APP4 (Coremail) with SMTP id gCh0CgDXIY6Ft8hoxsCaCg--.12284S3;
-	Tue, 16 Sep 2025 09:04:06 +0800 (CST)
-Subject: Re: [bug report][regression] blktests throtl/ triggered kmemleak in
- blk_throtl_init
-To: Yu Kuai <yukuai1@huaweicloud.com>, Yi Zhang <yi.zhang@redhat.com>,
- linux-block <linux-block@vger.kernel.org>
-Cc: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
- Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>,
- hanguangjiang@lixiang.com, "yukuai (C)" <yukuai3@huawei.com>
-References: <CAHj4cs-p-ZwBEKigBj7T6hQCOo-H68-kVwCrV6ZvRovrr9Z+HA@mail.gmail.com>
- <d657831b-469a-998b-7493-eef4baea9bc9@huaweicloud.com>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <725a1568-3bbb-a7c5-a929-10b0c13fbc14@huaweicloud.com>
-Date: Tue, 16 Sep 2025 09:04:05 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.1
+	s=arc-20240116; t=1757984728; c=relaxed/simple;
+	bh=d4rwn8y0vRJNvu8C079VdIgUQlj+kBjL5HuZ7smgp/E=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=SfitUdFPu+H2skQ7qybvigddpcJ+sJAQX/QpQMo0lSKn1NvczV33UspmFQafLwdpA65tU3UK05uwnfzx8PsTyZi3GuEo/sFviZZOmWPrgVcWe7/8iqvEHSyVzcUYOldd9ATfva4Rmq4+GWtSF6XC8eg0c1Tv0Wwh9QdUXB1x7ns=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T0I/Xm2a; arc=none smtp.client-ip=209.85.219.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T0I/Xm2a"
+Received: by mail-yb1-f176.google.com with SMTP id 3f1490d57ef6-e94d678e116so5035719276.2
+        for <linux-block@vger.kernel.org>; Mon, 15 Sep 2025 18:05:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1757984724; x=1758589524; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=d4rwn8y0vRJNvu8C079VdIgUQlj+kBjL5HuZ7smgp/E=;
+        b=T0I/Xm2a26Pz9ueMVGxxM+8PBoBl72rLmCzNxbz1k+Zf7VAgqOZWtMXsxpbWUBL8J8
+         jPG2qCslo6GuL8OE/CdATF314calnEw7vxx91ORh8INwPj72HtzWCItEMHgqlS1BGB4L
+         AnggdLmhtN6PrPfYWJw6oIkc2HOZ6SuTst0SQp47zn7zXDjLJdQBMyL/dFLz8br5otKI
+         8dlCMxoRBNvoekrOuCctZSU/9APTEadss2NF0KJzW0tKMoYDIAsZq+yHkaxGVYfE6o2t
+         SJT7LsbW215Aa9TuYPrX1VwOTxvlChId8n3HZzda/uwuRnZUTB37Ib6PO7vzKl/LFvlj
+         okaw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757984724; x=1758589524;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=d4rwn8y0vRJNvu8C079VdIgUQlj+kBjL5HuZ7smgp/E=;
+        b=QUBaQN5HnJTXQaVqXSzCAegBtGS7DKHauEKcdJkIzlFDKPvN0B2ubZFvS8ep41Ya+H
+         S0XE0MNdWjr1H0yTQ7U7H+4rFTDpt6vOxGE1QUPvpnljXO16DCl75GLsOGnDJ8yDxfdH
+         WYIurZjbEwRm7FOiwokXFWVbbQlsENXN+MNA0llSaA7tuYL2uSBsPMlIzly42hU/gm4B
+         0UfutKGYYQCByY7B5nWCSuwTTK1pVItfQr5vOa+8NQE2PHaIvZAzGVym8+nkNelmUrk5
+         ZRAq5tBEHGLwWCeZbZT/MGY3TDLGbMOXzUczY0Ti0qm5bPkvDuo2J/Kk7WmAclxOL/08
+         qHgg==
+X-Forwarded-Encrypted: i=1; AJvYcCVYRas1YDPkh+X5W7ZKUnOgrQM+17+lV+c67kE9LaeqfZrHMiWhIAd3hZzBfYsoVgKWn7XFbXrV/ZQcvg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwHt0wYRckDy9qB9ixfhwt1ddBUn79ZcwGAbtSPQY6fAuMLOuSj
+	NNPhukFOGAwcPFV+jJDBXsDfxkbB0uvBAawCuXY70fkFM/LaW2uDr/hDuMLPgUxg/Rv8o0NFqLK
+	MEcgThLywtAn/hqYp1bHN1CoRXBDKPQQ=
+X-Gm-Gg: ASbGncs0+JJr60dXjoMgIhTCUPOQJHIcfNuuJ28+8bzEbZi+kkB0VJeFOa0FMsxxMDh
+	SGpB5mHYw4zKkVhHy9CoRQMJU/d4pvZGTMQbTcTb9u1Z35b5p+96H9bxUrz3VTYALZtfOzExQP0
+	Qw7FOmOFMi1CvWq+HZqczYnUg6RHBWGJOwK8rv8vsGOiFvvVJ+6qqOlW/MAt/t3ghH3vAIk28lG
+	Fyjlog/Z6sAwKfT2A==
+X-Google-Smtp-Source: AGHT+IFaJEo1gVHkPCEaCD3vWYjtreYFiQ2WOrRU9CIpbMyg97OVJtr/v3uxdpG+fiXE68E0IfjXLuECnr1bsw09sPQ=
+X-Received: by 2002:a05:6902:2b02:b0:e98:9926:e5ca with SMTP id
+ 3f1490d57ef6-ea3d9a6c911mr10729577276.36.1757984723469; Mon, 15 Sep 2025
+ 18:05:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <d657831b-469a-998b-7493-eef4baea9bc9@huaweicloud.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgDXIY6Ft8hoxsCaCg--.12284S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxXF17uF4xCw1rXw1ktr1fWFg_yoWrJryUpF
-	yvq347CrWrCr1kJr4UtF4rWFyUJr4xA3WDJrWrGF9rZFW8CryqqFWUWryqgF4DXFs7Jr4x
-	A3WUJr9Fvry5Jw7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvK14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7I2V7IY0VAS07AlzVAY
-	IcxG8wCY1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbV
-	WUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF
-	67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42
-	IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF
-	0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxh
-	VjvjDU0xZFpf9x0JUBVbkUUUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+References: <20250913003842.41944-1-safinaskar@gmail.com> <20250915-modebranche-marken-fc832a25e05d@brauner>
+In-Reply-To: <20250915-modebranche-marken-fc832a25e05d@brauner>
+From: Askar Safin <safinaskar@gmail.com>
+Date: Tue, 16 Sep 2025 04:04:47 +0300
+X-Gm-Features: Ac12FXwuxsP2xoupllcCoDiRw8q2uuerrvP566PgC2Qr6qfMP36Zqdrto9P8zEU
+Message-ID: <CAPnZJGAjfpHZn_VzU3ry9ZV6OUS0RN2iWos153_oM_PhVbMgVg@mail.gmail.com>
+Subject: Re: [PATCH RESEND 00/62] initrd: remove classic initrd support
+To: Christian Brauner <brauner@kernel.org>
+Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Linus Torvalds <torvalds@linux-foundation.org>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Al Viro <viro@zeniv.linux.org.uk>, 
+	Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>, 
+	Andy Shevchenko <andy.shevchenko@gmail.com>, Aleksa Sarai <cyphar@cyphar.com>, 
+	=?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>, 
+	Julian Stecklina <julian.stecklina@cyberus-technology.de>, 
+	Gao Xiang <hsiangkao@linux.alibaba.com>, Art Nikpal <email2tema@gmail.com>, 
+	Andrew Morton <akpm@linux-foundation.org>, Alexander Graf <graf@amazon.com>, 
+	Rob Landley <rob@landley.net>, Lennart Poettering <mzxreary@0pointer.de>, linux-arch@vger.kernel.org, 
+	linux-alpha@vger.kernel.org, linux-snps-arc@lists.infradead.org, 
+	linux-arm-kernel@lists.infradead.org, linux-csky@vger.kernel.org, 
+	linux-hexagon@vger.kernel.org, loongarch@lists.linux.dev, 
+	linux-m68k@lists.linux-m68k.org, linux-mips@vger.kernel.org, 
+	linux-openrisc@vger.kernel.org, linux-parisc@vger.kernel.org, 
+	linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org, 
+	linux-s390@vger.kernel.org, linux-sh@vger.kernel.org, 
+	sparclinux@vger.kernel.org, linux-um@lists.infradead.org, x86@kernel.org, 
+	Ingo Molnar <mingo@redhat.com>, linux-block@vger.kernel.org, initramfs@vger.kernel.org, 
+	linux-api@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-efi@vger.kernel.org, linux-ext4@vger.kernel.org, 
+	"Theodore Y . Ts'o" <tytso@mit.edu>, linux-acpi@vger.kernel.org, Michal Simek <monstr@monstr.eu>, 
+	devicetree@vger.kernel.org, Luis Chamberlain <mcgrof@kernel.org>, Kees Cook <kees@kernel.org>, 
+	Thorsten Blum <thorsten.blum@linux.dev>, Heiko Carstens <hca@linux.ibm.com>, patches@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi,
+On Mon, Sep 15, 2025 at 4:34=E2=80=AFPM Christian Brauner <brauner@kernel.o=
+rg> wrote:
+> Split it up into multiple patch series. Send a first series that
+> focusses only on removing the generic infrastructure keeping it as
+> contained as possible. Only do non-generic cleanups that are absolutely
+> essential for the removal. Then the cleanups can go in separate series
+> later.
 
-在 2025/09/11 14:47, Yu Kuai 写道:
-> Hi,
-> 
-> 在 2025/09/11 14:14, Yi Zhang 写道:
->> Hi
->>
->> The following  kmemleak issue was observed in the latest
->> linux-block/for-next, It seems a regression issue. Please help check
->> it and let me know if you need any info/test for it, thanks.
->>
->> unreferenced object 0xffff888160f75c00 (size 512):
->>    comm "check", pid 29719, jiffies 4302480465
->>    hex dump (first 32 bytes):
->>      00 00 00 00 00 00 00 00 08 5c f7 60 81 88 ff ff  .........\.`....
->>      08 5c f7 60 81 88 ff ff 18 5c f7 60 81 88 ff ff  .\.`.....\.`....
->>    backtrace (crc dc08e6b1):
->>      __kmalloc_cache_node_noprof+0x3b1/0x4d0
->>      blk_throtl_init+0xa2/0x6a0
->>      tg_set_limit+0x5ac/0x720
->>      cgroup_file_write+0x1ab/0x670
->>      kernfs_fop_write_iter+0x3a3/0x5a0
->>      vfs_write+0x525/0xfd0
->>      ksys_write+0xf9/0x1d0
->>      do_syscall_64+0x94/0x8d0
->>      entry_SYSCALL_64_after_hwframe+0x76/0x7e
->> unreferenced object 0xffff888111280c00 (size 512):
->>    comm "check", pid 30240, jiffies 4302503636
->>    hex dump (first 32 bytes):
->>      00 00 00 00 00 00 00 00 08 0c 28 11 81 88 ff ff  ..........(.....
->>      08 0c 28 11 81 88 ff ff 18 0c 28 11 81 88 ff ff  ..(.......(.....
->>    backtrace (crc 2d0490fe):
->>      __kmalloc_cache_node_noprof+0x3b1/0x4d0
->>      blk_throtl_init+0xa2/0x6a0
->>      tg_set_limit+0x5ac/0x720
->>      cgroup_file_write+0x1ab/0x670
->>      kernfs_fop_write_iter+0x3a3/0x5a0
->>      vfs_write+0x525/0xfd0
->>      ksys_write+0xf9/0x1d0
->>      do_syscall_64+0x94/0x8d0
->>      entry_SYSCALL_64_after_hwframe+0x76/0x7e
->> unreferenced object 0xffff888187ac6400 (size 512):
->>    comm "check", pid 30484, jiffies 4302512625
->>    hex dump (first 32 bytes):
->>      00 00 00 00 00 00 00 00 08 64 ac 87 81 88 ff ff  .........d......
->>      08 64 ac 87 81 88 ff ff 18 64 ac 87 81 88 ff ff  .d.......d......
->>    backtrace (crc 4a3a862a):
->>      __kmalloc_cache_node_noprof+0x3b1/0x4d0
->>      blk_throtl_init+0xa2/0x6a0
->>      tg_set_limit+0x5ac/0x720
->>      cgroup_file_write+0x1ab/0x670
->>      kernfs_fop_write_iter+0x3a3/0x5a0
->>      vfs_write+0x525/0xfd0
->>      ksys_write+0xf9/0x1d0
->>      do_syscall_64+0x94/0x8d0
->>      entry_SYSCALL_64_after_hwframe+0x76/0x7e
->> unreferenced object 0xffff88822cbf3800 (size 512):
->>    comm "check", pid 30715, jiffies 4302520405
->>    hex dump (first 32 bytes):
->>      00 00 00 00 00 00 00 00 08 38 bf 2c 82 88 ff ff  .........8.,....
->>      08 38 bf 2c 82 88 ff ff 18 38 bf 2c 82 88 ff ff  .8.,.....8.,....
->>    backtrace (crc 7eb87e87):
->>      __kmalloc_cache_node_noprof+0x3b1/0x4d0
->>      blk_throtl_init+0xa2/0x6a0
->>      tg_set_limit+0x5ac/0x720
->>      cgroup_file_write+0x1ab/0x670
->>      kernfs_fop_write_iter+0x3a3/0x5a0
->>      vfs_write+0x525/0xfd0
->>      ksys_write+0xf9/0x1d0
->>      do_syscall_64+0x94/0x8d0
->>      entry_SYSCALL_64_after_hwframe+0x76/0x7e
->>
->>
-> 
-> +CC Han Guangjiang
-> 
-> Thanks for the test, clearly this is because blkg_destroy_all() already
-> clear the policy bit, and later blk_throtl_exit() fail the
-> blk_throtl_activated() test.
-> 
-> I think we should call blk_throtl_exit() before blkg_destroy_all().
-> 
+Ok, I will do this.
+I will send a minimal patchset with arch/ changes kept to absolute minimum
+or even absent. Nearly all of the changes will be in init/ and docs.
+Hopefully it will pass via the VFS tree.
 
-Still no response from Han Guangjiang, I'll send a fix ASAP today.
+If it gets to kernel release, I will consider sending more patchsets.
 
-Thanks,
-Kuai
 
-> Thanks,
-> Kuai
-> 
-> .
-> 
-
+--=20
+Askar Safin
