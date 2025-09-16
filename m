@@ -1,269 +1,456 @@
-Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D173E222566
-	for <linux-block@vger.kernel.org>; Tue, 16 Sep 2025 08:55:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=216.71.153.141
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758012961; cv=fail; b=a1CEdLkrmetVDaDEs64ZOuAdQ50bE+Oi44nTQC2KziLk8zMyk63SKmZBnOuHbxw+hyq+SvpGyyOv/0AacGYFlzSsY49aHMTYpmI8eEJmbetJLh/dX9UgALnYG8v1bJO25OFUUsIDFcDcRJeH4iZc2Wu1iWzALqV7y/3ZthCHPYw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758012961; c=relaxed/simple;
-	bh=qfVVxK4ESFcL9B57DpwMJQQkOiCIdT65e5+j7nrf7Ps=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=Yw055lAqBj04RzoLRBAWB30OVA23G8OqHP5Dfoty9jBI5HSBs2cNNNBtH09RJG5H+p9EPc1q20Aj1Gau9UMzrgSwGHNXeK1kTl7/oOH452dHPwJ0rTVqTBQtrmypZh+FCyHtZFafmSqXFLhRbmujjNg03yOGUrqBEQAyLupj7cE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=dZfZKTiq; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=zgVnBZH/; arc=fail smtp.client-ip=216.71.153.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="dZfZKTiq";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="zgVnBZH/"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1758012959; x=1789548959;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=qfVVxK4ESFcL9B57DpwMJQQkOiCIdT65e5+j7nrf7Ps=;
-  b=dZfZKTiqkB9K3fRqbkp5F5NnuDUpkJS5tc8HtjtKllOLMnTRLDEdUoxV
-   cXvCvJURwNOqUz7HQnXGJouQTXxhdzL5EvKWp6CIxtmZU2/Z2OXWKhpJy
-   7cccPGYDl1/0OawVfyY2XvsiVy/fMKC1e1XO5ScuJwQNM4t20jLg73fWT
-   2DlTDDTtqTnUzoE6YN/9Nw/6JDmJdta94F+uZ5zb6s5WzTM0hJnZmDJwe
-   htaOuYDe6gj/qPMwm+UUmdX+wCKbFCesJUe0WBggWcPPDE20aBr8iSdd0
-   nAj/R0DKuQIfXBYtW1ispppQVC8DLcQQvCeO2xqMMXQgL8JRzt69ioGgy
-   w==;
-X-CSE-ConnectionGUID: 0+xidAvcQPydIr73HYjNvQ==
-X-CSE-MsgGUID: mtKSYOYQTK6B6MSG22vQ3A==
-X-IronPort-AV: E=Sophos;i="6.18,268,1751212800"; 
-   d="scan'208";a="122305122"
-Received: from mail-westus3azon11010003.outbound.protection.outlook.com (HELO PH7PR06CU001.outbound.protection.outlook.com) ([52.101.201.3])
-  by ob1.hgst.iphmx.com with ESMTP; 16 Sep 2025 16:55:59 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=iUz/oeB2eSntBSFgRXlH9qufZ5jrh2OgUxjC6rcFhL8jrXkdAR3fNMDF36wbhlCm/jQUDgcQDnRRX/1T9qjXZlvp2i5KFCfTzQ2P6GRQ+rqih7YXoAE7v+nGPvaGIMSW3b1jO61cUNcNIBVPNI4n4CNleO+ULuv3w5QqHtJ3dFrYHo+FmfUGnpO5gvj/fLfbhz5KuSoz+rxLljiD7ntMLQmBGRV+/omYp8zvQLF8UFrrE7ptfGndl9Ja0ZM6Rvj7U9dvTG2yU3d10GlHoClW+txvMNsjaPvWY5+PeOrMLrVcayBuXuIcdKGe6bDp65Q2almOAvT8ZuaTa+OpZzwJ/g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=TaHv5IC/9YISrmwuDhfR6tNkLIR/BTxEQ89ef560oDk=;
- b=PtXaUjKMxLDWYOjLc/DuyFIf1eLxSv81XtS8NIZ9fQ9SRp6hrILNODQWx2JzdEtq+13AqXbPHtkuaWsUpgsQmpgx3PRHgC9el9UQDzgKAWPYVojNK3GRnzfW7KlNmYk5OtQhhSJBtdbl9Zx+z1HN+4MI2d1SsRsArmAIiY1E1Ke10lzq2mXhG7MuwQt4DWTG1EXh1O7LYpvnqaV8E8oCv6wll6uJD7+NxkRAccI6L1OM5S1+fIimy1dyPdzd7gyWW+F4AMbtnsoQUE0kcEenJ2QU3kXw3OOdm5jbHKxGdAUF6qriw5tKUTiyHsd8WwLGo7ZEtit1GY89eX76wXp8fw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TaHv5IC/9YISrmwuDhfR6tNkLIR/BTxEQ89ef560oDk=;
- b=zgVnBZH/eczTwjcpCsdMPSWglMl6be5tPYmei3GQrmouXgMt76axD0e8Nnds4qomwqs6UdLGYrJIqRCvCxqyATc68lYhlkshggnR1yWFCQK5lpqur4m6eK1wLE79XsJn5GG82ZUWi5lzh87UjlLUrH+CHENnrHtfOKnTB7kNApo=
-Received: from SN7PR04MB8532.namprd04.prod.outlook.com (2603:10b6:806:350::6)
- by DM6PR04MB7114.namprd04.prod.outlook.com (2603:10b6:5:243::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9115.22; Tue, 16 Sep
- 2025 08:55:57 +0000
-Received: from SN7PR04MB8532.namprd04.prod.outlook.com
- ([fe80::4e14:94e7:a9b3:a4d4]) by SN7PR04MB8532.namprd04.prod.outlook.com
- ([fe80::4e14:94e7:a9b3:a4d4%7]) with mapi id 15.20.9115.018; Tue, 16 Sep 2025
- 08:55:57 +0000
-From: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To: John Garry <john.g.garry@oracle.com>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH blktests 0/7] Further stacked device atomic writes testing
-Thread-Topic: [PATCH blktests 0/7] Further stacked device atomic writes
- testing
-Thread-Index: AQHcI8u2iSuhaaPAf0qUtMrB+Xji4LSVh9YA
-Date: Tue, 16 Sep 2025 08:55:56 +0000
-Message-ID: <5eri4pgxaqhd2mcdruzubylfjshfo5ktye55crqgizhvr34qm7@mhqili4zugg5>
-References: <20250912095729.2281934-1-john.g.garry@oracle.com>
-In-Reply-To: <20250912095729.2281934-1-john.g.garry@oracle.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SN7PR04MB8532:EE_|DM6PR04MB7114:EE_
-x-ms-office365-filtering-correlation-id: fd28848a-453d-424a-eb30-08ddf4fed9f5
-wdcipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|19092799006|376014|1800799024|366016|38070700021;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?EBfin1BizUjzdlcfs7WinvM+rpdFcL9Totc2tmoQcrFZJ8d54LE8M819Yp9y?=
- =?us-ascii?Q?oqtqUSn4HMMe08KSUwi3pVrV8v0BTlVrwAw7owwCz0PKLWhSh/Xvzl4UR3WZ?=
- =?us-ascii?Q?Q8ZQ6s9QX+bPTotbsjh9000IenCSQWluy6f5lOm+7e9KcqpWRiXRTXjUzrfd?=
- =?us-ascii?Q?HMK+0y3vciGBUpLTZ67cp4Q5gAzoyeWvoKhTJspqqfNbAxx4okewUm1BYahw?=
- =?us-ascii?Q?nDaQLHI9EMOtmjnqZL6Q8cEufZ5c6yHy7U6rxGd+2hbE1VBW+vhuPmwvz7SB?=
- =?us-ascii?Q?FBrLo5wO5P5u1L0inNN0ox8KtvE+DjLrYM4XJI/WUDe3PC5g9x5s0W4ATNS4?=
- =?us-ascii?Q?7MxlG9Pae4eXaTImwtaxqk3OVRLldIAYmN5L/i70yi4W6syWB3GE34Uca9Vx?=
- =?us-ascii?Q?aSeJ1yfyhsSNUcaK6fCKck7FaPxw5lFUZ1vvtrJq/LQmEPLKvbCWb0+EDlDq?=
- =?us-ascii?Q?TJG6vN0BDrQW1BcMag6xqea1kb9uoBZ3xJSXYn8YL/t0rIeFNn02wZHgAFq8?=
- =?us-ascii?Q?1sjAfJ38DVZ/BO8emljYMrPf1P7ALDQoKKxaoSbiwuTb6Vx5an1qRFsQeQJR?=
- =?us-ascii?Q?Q5A45ucXQQ0Rk5HcjYYwD66JEMnUyiRQnJa8zz0ykJktep0IRajOYDK7udv8?=
- =?us-ascii?Q?mkUk0jeAsce2e/2n7vcX9dy7Au6PujU/+qdrogSpCh+U6+gNVjtzRs64DcPx?=
- =?us-ascii?Q?Q2doEwsQspibzPMGy7jMr00BdbuFLtJce9QnNPvjDKdWBf4kKxLE3fyEdLni?=
- =?us-ascii?Q?1yQYMWn2n6yaezqSBerLNFVWuFIRCNbGjsFigMBQvWlXFNvTD0io3xj6qj/K?=
- =?us-ascii?Q?ky10JI8/x8Ay0lIk4MlmTiUkRj46mJM273+gc0rQCBtk0heglv4b61h79voZ?=
- =?us-ascii?Q?O8sQCcOwv/6PJVSbEhfFY4D87U9FUqtSjLICL2GA0/goFdSQ1woR8/tLsHiL?=
- =?us-ascii?Q?sOmEOXYG+SBnN9UJKZX/N7qmADZx0ehhWflSG8aP4MHTj84xgxki6lz9rT23?=
- =?us-ascii?Q?SekE9GfYl0IYLLNBo2vb3+IEIBA4jeiwPxNP+aQ5XlleoIEjkUz9Oa4JhWpD?=
- =?us-ascii?Q?e2H/HQ2g/AcwvMTxsJzCA6i8zR6H4BghRH8FhK5heOVqlYVQKx2aG/UJOV22?=
- =?us-ascii?Q?cBDKZEwk9kmsyUE7UwVb7q3aXWJdUB0ICTuC45qidlLv3wGUQf1qfKae3cxn?=
- =?us-ascii?Q?7tn7fY1e2nwgDY4QBLGbdHgJMUBiVZZsrCplKfDk6apSU+gKVZe0bALvUcG2?=
- =?us-ascii?Q?7CmghyHPj0N/fTtyuhzx4FJcqTEa59RWqo2pmrqpQPgiaUl4sqtklqAOADhw?=
- =?us-ascii?Q?dBeue6ir4G2zpoDVP/GLXPOyWP1rZVDc1KAKy/J3vd4E5aAmgnhRa64iqFUD?=
- =?us-ascii?Q?dSpr0asNFNFLo0nvLcF1531uoEktLjRBK+cnZs6V0PgiFvo8p288wWgBAhPy?=
- =?us-ascii?Q?g5LpbWU9ZKHPo9UR/zQg97K99GPouTFEYqOGA3hSiDiGN2/gfFskIHxn+KZf?=
- =?us-ascii?Q?47TPh586WQWNvVU=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR04MB8532.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(19092799006)(376014)(1800799024)(366016)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?82c7tXJpcBtuc25uHIvinhEI5d0XpKUE6dRNO+UPTuiDA9seGV6UvIx+PWZY?=
- =?us-ascii?Q?EE7PxqZGZxpowHJ/fgLXKOcOlZvuGovZ8QfsNZws5kmnWqqQAsuJN9wdGeeG?=
- =?us-ascii?Q?gZZVDRPpdWIBMatv9CWupgFsjjeBxn+kf00kHEGOelI4hIolJ9yzLyimfHRp?=
- =?us-ascii?Q?ibLTCgItZvZ+JMDyHDn/zgOOzYKHrF5PMrzx5bsHFZ77ZZUQy8cV1TKmlCXG?=
- =?us-ascii?Q?UyUBfG3pgmXx4Dd/9Ns5sSyw9aKqQShnmv+zUA+ND6vY8UCH4v/c4Dp8qEnk?=
- =?us-ascii?Q?hqyGZ/JG5//V18LqoQYvhcGOfTQtOLj8Eizv5XrieBG0AWXynvjB6Luc1PPN?=
- =?us-ascii?Q?izLsF973HM4xDmpQM+LUwwaN/YOiuiIrX1bQDL4iAjTPEZ3cQu3H9lwmjxkF?=
- =?us-ascii?Q?yOtYcgmv8dOQDJRb0QJ+4/dpEeQT1w8aZXxBLYNZrXYBMw44LYO+mqBe1C+f?=
- =?us-ascii?Q?lsHkPCXgejMqqEb82LflZYzIqDaxkt53zWkwnSw91JJM/5JmjYvL5zpcZPza?=
- =?us-ascii?Q?zln4oUdn1jAswDbMHG6rrBLLx+GTQ40dY8uWXTFyktAmqwlCoDgwMvopOfUN?=
- =?us-ascii?Q?oiFddDep6/d1/wA8Ai44uXzACaQ7R2nnXC4GKjjQmWGIGt5Fi8kEqzzSwkhs?=
- =?us-ascii?Q?gaiZDaqkjA2CLYQOZwvko63zpE3kxKGclBH6deL96jNFvC6oQYCdTpyRZEMd?=
- =?us-ascii?Q?kY3EYJrfqHFpe49/wIvnWkxYo7FVpKr7yKVxcbfrfb0dZK+gLGcJELT58rjL?=
- =?us-ascii?Q?dhjdutZDLaYCq2pX+DJA4ExYKQAgWY3xhiXx6VTG06Hxnm2wSZWe1dhR6FIh?=
- =?us-ascii?Q?azyO01Tl0YvPHeg1tpGHOYf7L+Rpj+sTwwP49Qb3xhaoCIRtkRGQHN6M6PLc?=
- =?us-ascii?Q?/ZjQadEyFWodC/I7cBI6b2FmoTsl32PodegBhWfNYgDC8bTHmAhAYmoyxe9A?=
- =?us-ascii?Q?P3LyWTr8uy+dPfAB8mDzQbuEbWptvgc0tqwMBWK9Vox8ISmVR12dcJqxSDv4?=
- =?us-ascii?Q?gC3MzZ1OkL8HDVpDVj+c1zgEQ/BrP95pYTLql+qKSBJa1Hjn14HDkye0ypeM?=
- =?us-ascii?Q?YK7DwhiBBAmk+kO2hNudqTbv3mEcjp9U/iVsH6lIWLZRTkePeVxp6jNRKk7z?=
- =?us-ascii?Q?ucQ3n3ubTb9bwPm8xEPxI0hWHfhOE2pHZTxURvMfKerzsCLypem6CWe61IAv?=
- =?us-ascii?Q?XVuAxNMJHWtBKig7DrWrBc2uVSW2WZwQmcCPiTPIbro7U+ZWGKhcpQfTT1RJ?=
- =?us-ascii?Q?deYNO9pQ8ABFOTHo4w/DS7w74pTP3pII5hFeU/TecwL3pbNErzG/IqWyZpyU?=
- =?us-ascii?Q?gFscTkNkHiIWP9HJOhtR0gm4A9OtrIbYUAKVKTeYjcgxUHNqPs4qobnYW9Su?=
- =?us-ascii?Q?6T5joR21gUvq9yQXacbgUpx9z9A7/Z2jVQtCbgpJ9LBeOgqv6w5RqKLxgaEN?=
- =?us-ascii?Q?ewwrLjTjs2EY6ZQiiFnv1ohgs8bf1YZWq6R6v/PsVbnb53chgDMQLvi0pbjn?=
- =?us-ascii?Q?g4gd9rLOzqChaXorFL1/4SNJXukSMrqw57guqtdfh+6siUNoQiWMaO8hLZ7y?=
- =?us-ascii?Q?a19qu7UOTAYrqUxqRJvgR1yF/zXEWnwtElEHUnWolNut7PDZ4jHqX7JehKNw?=
- =?us-ascii?Q?Xw=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <5BFF917151803542B769D55C3D63ECBC@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DEA6285C9E;
+	Tue, 16 Sep 2025 09:05:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758013541; cv=none; b=HYN59JglrUG6/KeVKqPcgbbTqyyzsrhu2cp2KF5aAzV0e3HZtvfoiKvIUe6dn0LvD6RoDlEi70ndC/TfKgYz6MVkT9afc2kRSdl9V0uZFPIZvZgWcQEu00UELPKIVugyeYpjxnsyratGF48QaJsoK8enE/9vxtA2zKa/hHY2uIg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758013541; c=relaxed/simple;
+	bh=Nt5dEdvCEHz3sBhg6028LH/jRxBJ71nvL8Ajg7vTixk=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=XGZ4RlQeF9vtOZf5OYgkQX8AUDtdy/HpFJPVwksEoJjfDyXvobLZSuHV+m+0S/UV8vRUaIJeFHNx1DiY4cYj31yp2Zom7PoljFS1b64jf0NVdkPqSppfqgvp8XD7N2RLYmoxRw/XavYpzEjNjibNbQWjmbqSiw6oBjd7xKl9lQs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4cQwwc3WCLzYQvbS;
+	Tue, 16 Sep 2025 17:05:36 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 14CF21A1666;
+	Tue, 16 Sep 2025 17:05:35 +0800 (CST)
+Received: from [10.174.179.143] (unknown [10.174.179.143])
+	by APP4 (Coremail) with SMTP id gCh0CgAncIxaKMlogffACg--.4040S3;
+	Tue, 16 Sep 2025 17:05:32 +0800 (CST)
+Subject: Re: [PATCH] blk-throttle: fix throtl_data leak during disk release
+To: Yi Zhang <yi.zhang@redhat.com>, Yu Kuai <yukuai1@huaweicloud.com>
+Cc: tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk,
+ liangjie@lixiang.com, hanguangjiang@lixiang.com, cgroups@vger.kernel.org,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ yi.zhang@huawei.com, yangerkun@huawei.com, johnny.chenyi@huawei.com,
+ "yukuai (C)" <yukuai3@huawei.com>
+References: <20250916010947.2891471-1-yukuai1@huaweicloud.com>
+ <CAHj4cs9p9H5yx+ywsb3CMUdbqGPhM+8tuBvhW=9ADiCjAqza9w@mail.gmail.com>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <5c01287e-b7f8-6ca2-a08f-f6c66fff379c@huaweicloud.com>
+Date: Tue, 16 Sep 2025 17:05:30 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	l2FO3NgXcN7OOPt2FLmCTOYsxw8VQroJSSrUeMedVE/j3/ti6Fh888jUnN2k6ZU4xvFkX66fmEJCP8OvomteMvgKzG+b200XmaafyRywU6AGZEv3u2rUbZuUaEjJYaR0II6Q0cMi6p0k7jEzkUiw7RYA7fj1Ax3bqjlTy33ikMTSIH2IeCS7i3YUh3JnxRdW6wU4lV7BmTDCwdz5KXCBt/h/PCj/lBXyolQKkMdwebLG9chn6dWOrpEGUpEN4QnsPzWuQGgdspUioS9sDgGVsb8xyg0sCY+XWZzq0r+fhq6lkrFGgdsl6JCKokeTRx8JmIcedqVWj+Nd0YOGZOxn2sshymqvdm/NOvHPg0YyyV+d4EbrC2QSqPTgN8zEla01JorfFhT/5cejOWFuM9dLSyTalLw6V0n3c2xjfTtr+RHppQbAYoWL2Kw1KuPLZCAwxjcKFVTHoBFkvwGMIo6WJv1DYG3lWYGFmEHVS7IJ4M+xL5A9egIBSTjRnauZi1wXyIPc+aMu5pA1T0ak19gQ0W7nRe5wb05nj0bWjfSP636gJBfzpoq9meRhdYiw4xwcB9PoyVbmYabDU/RITblvUxVRYds6r6i3a4hSgpuzG4klldLx5y9n59VEN6O3X5h5
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SN7PR04MB8532.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fd28848a-453d-424a-eb30-08ddf4fed9f5
-X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Sep 2025 08:55:57.1498
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: ZfJCwnlVHrXdx0s0bqC4TWry4VpKo5/MWUwKonAZLs8NovANZnfxPDT3FDE3HulHivT6hNtvPSO/C31Dqhv9vpux4rMuESVwE+KzTYYzg08=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR04MB7114
+In-Reply-To: <CAHj4cs9p9H5yx+ywsb3CMUdbqGPhM+8tuBvhW=9ADiCjAqza9w@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgAncIxaKMlogffACg--.4040S3
+X-Coremail-Antispam: 1UD129KBjvAXoWfJr13CrW5Aryxuw45urWfXwb_yoW8XFWUuo
+	WfX3yfuF18Gw15tFyIk3Zrt3yfG397CFy3KryF9F48uF1xGa4jqry7AF18Ga4fWF1SkFs7
+	ZF13K3Zag34DGrn3n29KB7ZKAUJUUUU8529EdanIXcx71UUUUU7v73VFW2AGmfu7bjvjm3
+	AaLaJ3UjIYCTnIWjp_UUUYW7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E6xAIw20EY4v20xva
+	j40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2
+	x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8
+	Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26r
+	xl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj
+	6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr
+	0_Gr1lF7xvr2IY64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxa
+	n2IY04v7Mxk0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2
+	Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s02
+	6x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0x
+	vE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE
+	42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6x
+	kF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUonmRUUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On Sep 12, 2025 / 09:57, John Garry wrote:
-> The testing of atomic writes support for stacked devices is limited.
->=20
-> We only test scsi_debug and for a limited sets of personalities.
->=20
-> Extend to test NVMe and also extend to the following stacked device
-> personalities:
-> - dm-linear
-> - dm-stripe
-> - dm-mirror
->=20
-> Also add more strict atomic writes limits testing.
->=20
-> John Garry (7):
->   common/rc: add _min()
->   md/rc: add _md_atomics_test
->   md/002: convert to use _md_atomics_test
->   md/003: add NVMe atomic write tests for stacked devices
+Hi,
 
-Hello John, thanks for this series. Overall, this series looks valuable for=
- me
-since it expands the test contents and target devices. Also it minimizes co=
-de
-duplication, which is good.
+在 2025/09/16 16:15, Yi Zhang 写道:
+> Hi Yu
+> A new issue was triggered with the change. Please check it. Thanks.
+> 
+> [  285.804104] run blktests throtl/001 at 2025-09-16 04:11:12
+> [  286.161894] null_blk: disk dev_nullb created
+> 
+> [  293.388583] ======================================================
+> [  293.394762] WARNING: possible circular locking dependency detected
+> [  293.400940] 6.17.0-rc6.v1+ #2 Not tainted
+> [  293.404952] ------------------------------------------------------
+> [  293.411131] find/1609 is trying to acquire lock:
+> [  293.415751] ffff8882911b50b0 ((&sq->pending_timer)){+.-.}-{0:0},
+> at: __timer_delete_sync+0x23/0x120
+> [  293.424817]
+>                 but task is already holding lock:
+> [  293.430648] ffff8882b7794948 (&blkcg->lock){....}-{3:3}, at:
+> blkcg_deactivate_policy+0x1e7/0x4e0
+> [  293.439445]
+>                 which lock already depends on the new lock.
+> 
+> [  293.447619]
+>                 the existing dependency chain (in reverse order) is:
+> [  293.455096]
+>                 -> #2 (&blkcg->lock){....}-{3:3}:
+> [  293.460948]        __lock_acquire+0x57c/0xbd0
+> [  293.465315]        lock_acquire.part.0+0xbd/0x260
+> [  293.470020]        _raw_spin_lock+0x37/0x80
+> [  293.474214]        blkg_create+0x3e2/0x1060
+> [  293.478401]        blkcg_init_disk+0x8f/0x460
+> [  293.482769]        __alloc_disk_node+0x27f/0x600
+> [  293.487397]        __blk_mq_alloc_disk+0x5f/0xd0
+> [  293.492025]        nvme_alloc_ns+0x202/0x17a0 [nvme_core]
+> [  293.497458]        nvme_scan_ns+0x30b/0x380 [nvme_core]
+> [  293.502709]        async_run_entry_fn+0x9a/0x4f0
+> [  293.507330]        process_one_work+0xd8b/0x1320
+> [  293.511956]        worker_thread+0x5f3/0xfe0
+> [  293.516231]        kthread+0x3b4/0x770
+> [  293.519992]        ret_from_fork+0x393/0x480
+> [  293.524272]        ret_from_fork_asm+0x1a/0x30
+> [  293.528728]
+>                 -> #1 (&q->queue_lock){..-.}-{3:3}:
+> [  293.534749]        __lock_acquire+0x57c/0xbd0
+> [  293.539108]        lock_acquire.part.0+0xbd/0x260
+> [  293.543814]        _raw_spin_lock_irq+0x3f/0x90
+> [  293.548348]        throtl_pending_timer_fn+0x11c/0x15b0
+> [  293.553581]        call_timer_fn+0x19c/0x3e0
+> [  293.557853]        __run_timers+0x627/0x9f0
+> [  293.562041]        run_timer_base+0xe6/0x140
+> [  293.566312]        run_timer_softirq+0x1a/0x30
+> [  293.570758]        handle_softirqs+0x1fd/0x890
+> [  293.575205]        __irq_exit_rcu+0xfd/0x250
+> [  293.579477]        irq_exit_rcu+0xe/0x30
+> [  293.583402]        sysvec_apic_timer_interrupt+0xa1/0xd0
+> [  293.588717]        asm_sysvec_apic_timer_interrupt+0x1a/0x20
+> [  293.594383]        cpuidle_enter_state+0xf5/0x2f0
+> [  293.599090]        cpuidle_enter+0x4e/0xa0
+> [  293.603197]        cpuidle_idle_call+0x213/0x370
+> [  293.607816]        do_idle+0x131/0x200
+> [  293.611568]        cpu_startup_entry+0x54/0x60
+> [  293.616017]        start_secondary+0x20d/0x290
+> [  293.620471]        common_startup_64+0x13e/0x141
+> [  293.625096]
+>                 -> #0 ((&sq->pending_timer)){+.-.}-{0:0}:
+> [  293.631642]        check_prev_add+0xf1/0xcd0
+> [  293.635921]        validate_chain+0x487/0x570
+> [  293.640281]        __lock_acquire+0x57c/0xbd0
+> [  293.644641]        lock_acquire.part.0+0xbd/0x260
+> [  293.649345]        __timer_delete_sync+0x40/0x120
+> [  293.654052]        throtl_pd_free+0x19/0x40
+> [  293.658238]        blkcg_deactivate_policy+0x2c9/0x4e0
+> [  293.663378]        blk_throtl_exit+0xa5/0x100
+> [  293.667743]        blkcg_exit_disk+0x1f/0x270
+> [  293.672104]        disk_release+0x11b/0x3a0
+> [  293.676299]        device_release+0x9f/0x210
+> [  293.680579]        kobject_cleanup+0x105/0x360
+> [  293.685027]        null_del_dev.part.0+0x1e5/0x480 [null_blk]
+> [  293.690788]        nullb_group_drop_item+0xa5/0xd0 [null_blk]
+> [  293.696544]        configfs_rmdir+0x69f/0xac0
+> [  293.700910]        vfs_rmdir+0x1a5/0x5b0
+> [  293.704836]        do_rmdir+0x276/0x330
+> [  293.708677]        __x64_sys_unlinkat+0x16b/0x1e0
+> [  293.713393]        do_syscall_64+0x94/0x8d0
+> [  293.717584]        entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> [  293.723160]
+>                 other info that might help us debug this:
+> 
+> [  293.731159] Chain exists of:
+>                   (&sq->pending_timer) --> &q->queue_lock --> &blkcg->lock
+> 
+> [  293.742045]  Possible unsafe locking scenario:
+> 
+> [  293.747972]        CPU0                    CPU1
+> [  293.752511]        ----                    ----
+> [  293.757043]   lock(&blkcg->lock);
+> [  293.760371]                                lock(&q->queue_lock);
+> [  293.766387]                                lock(&blkcg->lock);
+> [  293.772226]   lock((&sq->pending_timer));
+> [  293.776248]
 
+This is true deadlock, however, I think the real problem here is
+pd_free_fn() can be called inside queue_lock, and blk-throttle is
+protecting with this queue_lock. And this problem should already
+exist even before this patch, for example, from blkcg_activate_plicy()
+error patch, pd_free_fn() is called with queue_lock held as well.
 
-Having said that, I noticed a challenge in the series, especially in the 4t=
-h
-patch "md/003: add NVMe atomic write tests for stacked devices". This patch
-introduces a new test case md/003 that uses four NVME devices. Actually, th=
-is is
-the very first test case which runs test for multiple devices that users de=
-fine
-in the TEST_DEVS variable.
+We can fix this by moving all the pd_free_fn() outside of queue_lock,
+however, I think we should fix this in blk-throttle, by using internal
+lock instead of reusing queue_lock.
 
-Currently, blktests expects that each test case,
+Yi, althrogh I already tested, can you give following patch a test on
+the top of this patch as well?
 
- a) implements test() which prepares test target device/s in it and test th=
-e
-    device/s, or,
- b) implements test_device() which tests single TEST_DEV taken from
-    TEST_DEVS that the user prepared
+Thanks,
+Kuai
 
-The test case md/003 tests multiple devices. This is beyond the current blk=
-tests
-assumption. md/003 implements test(), and it refers to TEST_DEVS. It looks
-working, but it breaks the expectation above. I concern this will confuse u=
-sers.
-For example, when user defines 4 NVME devices in TEST_DEVS, md/003 is run o=
-nly
-once, but other test cases are run 4 times. It also will confuse blktests t=
-est
-case developers, since it is not guided to refer to TEST_DEVS from test(): =
-e.g.,
-./new script. So I think a different approach is required to meet your goal=
-.
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index f510ae072868..aaf0aa7756bf 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -33,6 +33,8 @@ static struct workqueue_struct *kthrotld_workqueue;
 
+  struct throtl_data
+  {
++       spinlock_t lock;
++
+         /* service tree for active throtl groups */
+         struct throtl_service_queue service_queue;
 
-I can think of two approaches. The first one is to follow the guide a) abov=
-e.
-Assuming nvme loop devices can be used for the atomic test, md/003 can prep=
-are 4
-nvme loop devices and use it for test. This meets the expectation. This als=
-o
-will allow to run the test case where NVME devices are not available.
+@@ -1140,7 +1142,7 @@ static void throtl_pending_timer_fn(struct 
+timer_list *t)
+         else
+                 q = td->queue;
 
-  Q: Can we use nvme loop devices for the atomic test?
+-       spin_lock_irq(&q->queue_lock);
++       spin_lock_irq(&td->lock);
 
-If nvme loop devices can not be used for the atomic test, or if you prefer =
-to
-run the test for the real NVME devices, I think it's the better to improve =
-the
-blktests framework to support using multiple devices for a single test case=
-. I
-think new variables and functions should be introduced to support it, to av=
-oid
-the confusions that I noted above. For example, the test case should implem=
-ent
-the test in test_device_array() instead of test(), and it should refer to
-TEST_DEV_ARRAY that users define instead of TEST_DEVS.
+         if (!q->root_blkg)
+                 goto out_unlock;
+@@ -1166,9 +1168,9 @@ static void throtl_pending_timer_fn(struct 
+timer_list *t)
+                         break;
 
-Based on the second approach, I quickly prototyped the blktests change [1].=
- I
-also modified md/003 to adapt to the change [2].
+                 /* this dispatch windows is still open, relax and repeat */
+-               spin_unlock_irq(&q->queue_lock);
++               spin_unlock_irq(&td->lock);
+                 cpu_relax();
+-               spin_lock_irq(&q->queue_lock);
++               spin_lock_irq(&td->lock);
+         }
 
-[1] https://github.com/kawasaki/blktests/commit/7db35a16d7410cae728da8d6b9b=
-2483e33e9c99b
-[2] https://github.com/kawasaki/blktests/commit/278e6c74deba68e3044abf0e6c3=
-ec350c0bc4a40
+         if (!dispatched)
+@@ -1191,7 +1193,7 @@ static void throtl_pending_timer_fn(struct 
+timer_list *t)
+                 queue_work(kthrotld_workqueue, &td->dispatch_work);
+         }
+  out_unlock:
+-       spin_unlock_irq(&q->queue_lock);
++       spin_unlock_irq(&td->lock);
+  }
 
-Please let me know your thoughts on the two approaches.
+  /**
+@@ -1207,7 +1209,6 @@ static void blk_throtl_dispatch_work_fn(struct 
+work_struct *work)
+         struct throtl_data *td = container_of(work, struct throtl_data,
+                                               dispatch_work);
+         struct throtl_service_queue *td_sq = &td->service_queue;
+-       struct request_queue *q = td->queue;
+         struct bio_list bio_list_on_stack;
+         struct bio *bio;
+         struct blk_plug plug;
+@@ -1215,11 +1216,11 @@ static void blk_throtl_dispatch_work_fn(struct 
+work_struct *work)
 
+         bio_list_init(&bio_list_on_stack);
 
-P.S. I will have some more comments on the details of the series, but befor=
-e
-     making those comments, I would like to clarify how to resolve the chal=
-lenge
-     above.=
+-       spin_lock_irq(&q->queue_lock);
++       spin_lock_irq(&td->lock);
+         for (rw = READ; rw <= WRITE; rw++)
+                 while ((bio = throtl_pop_queued(td_sq, NULL, rw)))
+                         bio_list_add(&bio_list_on_stack, bio);
+-       spin_unlock_irq(&q->queue_lock);
++       spin_unlock_irq(&td->lock);
+
+         if (!bio_list_empty(&bio_list_on_stack)) {
+                 blk_start_plug(&plug);
+@@ -1324,6 +1325,7 @@ static int blk_throtl_init(struct gendisk *disk)
+         if (!td)
+                 return -ENOMEM;
+
++       spin_lock_init(&td->lock);
+         INIT_WORK(&td->dispatch_work, blk_throtl_dispatch_work_fn);
+         throtl_service_queue_init(&td->service_queue);
+
+@@ -1694,7 +1696,7 @@ void blk_throtl_cancel_bios(struct gendisk *disk)
+         if (!blk_throtl_activated(q))
+                 return;
+
+-       spin_lock_irq(&q->queue_lock);
++       spin_lock_irq(&q->td->lock);
+         /*
+          * queue_lock is held, rcu lock is not needed here technically.
+          * However, rcu lock is still held to emphasize that following
+@@ -1713,7 +1715,7 @@ void blk_throtl_cancel_bios(struct gendisk *disk)
+                 tg_flush_bios(blkg_to_tg(blkg));
+         }
+         rcu_read_unlock();
+-       spin_unlock_irq(&q->queue_lock);
++       spin_unlock_irq(&q->td->lock);
+  }
+
+  static bool tg_within_limit(struct throtl_grp *tg, struct bio *bio, 
+bool rw)
+@@ -1746,7 +1748,6 @@ static bool tg_within_limit(struct throtl_grp *tg, 
+struct bio *bio, bool rw)
+
+  bool __blk_throtl_bio(struct bio *bio)
+  {
+-       struct request_queue *q = bdev_get_queue(bio->bi_bdev);
+         struct blkcg_gq *blkg = bio->bi_blkg;
+         struct throtl_qnode *qn = NULL;
+         struct throtl_grp *tg = blkg_to_tg(blkg);
+@@ -1756,7 +1757,7 @@ bool __blk_throtl_bio(struct bio *bio)
+         struct throtl_data *td = tg->td;
+
+         rcu_read_lock();
+-       spin_lock_irq(&q->queue_lock);
++       spin_lock_irq(&td->lock);
+         sq = &tg->service_queue;
+
+         while (true) {
+@@ -1832,7 +1833,7 @@ bool __blk_throtl_bio(struct bio *bio)
+         }
+
+  out_unlock:
+-       spin_unlock_irq(&q->queue_lock);
++       spin_unlock_irq(&td->lock);
+
+         rcu_read_unlock();
+         return throttled;
+
+>                  *** DEADLOCK ***
+> 
+> [  293.782166] 8 locks held by find/1609:
+> [  293.785921]  #0: ffff88813ddf6448 (sb_writers#16){.+.+}-{0:0}, at:
+> do_rmdir+0x1a8/0x330
+> [  293.793945]  #1: ffff88829e48a108 (&default_group_class[depth -
+> 1]/1){+.+.}-{4:4}, at: do_rmdir+0x1ec/0x330
+> [  293.803704]  #2: ffff8881f918cb48
+> (&sb->s_type->i_mutex_key#22){+.+.}-{4:4}, at: vfs_rmdir+0xc0/0x5b0
+> [  293.812943]  #3: ffffffffc1cc4698
+> (&nullb_subsys.su_mutex){+.+.}-{4:4}, at: configfs_rmdir+0x57b/0xac0
+> [  293.822267]  #4: ffffffffc1ccc130 (&lock){+.+.}-{4:4}, at:
+> nullb_group_drop_item+0x50/0xd0 [null_blk]
+> [  293.831516]  #5: ffff88829ddb9980 (&q->blkcg_mutex){+.+.}-{4:4},
+> at: blkcg_deactivate_policy+0xf6/0x4e0
+> [  293.840926]  #6: ffff88829ddb9650 (&q->queue_lock){..-.}-{3:3}, at:
+> blkcg_deactivate_policy+0x10a/0x4e0
+> [  293.850339]  #7: ffff8882b7794948 (&blkcg->lock){....}-{3:3}, at:
+> blkcg_deactivate_policy+0x1e7/0x4e0
+> [  293.859577]
+>                 stack backtrace:
+> [  293.863939] CPU: 11 UID: 0 PID: 1609 Comm: find Kdump: loaded Not
+> tainted 6.17.0-rc6.v1+ #2 PREEMPT(voluntary)
+> [  293.863946] Hardware name: Dell Inc. PowerEdge R6515/07PXPY, BIOS
+> 2.17.0 12/04/2024
+> [  293.863949] Call Trace:
+> [  293.863953]  <TASK>
+> [  293.863959]  dump_stack_lvl+0x6f/0xb0
+> [  293.863970]  print_circular_bug.cold+0x38/0x45
+> [  293.863981]  check_noncircular+0x148/0x160
+> [  293.863997]  check_prev_add+0xf1/0xcd0
+> [  293.864001]  ? alloc_chain_hlocks+0x13e/0x1d0
+> [  293.864007]  ? srso_return_thunk+0x5/0x5f
+> [  293.864013]  ? add_chain_cache+0x12c/0x310
+> [  293.864022]  validate_chain+0x487/0x570
+> [  293.864027]  ? srso_return_thunk+0x5/0x5f
+> [  293.864037]  __lock_acquire+0x57c/0xbd0
+> [  293.864043]  ? srso_return_thunk+0x5/0x5f
+> [  293.864052]  lock_acquire.part.0+0xbd/0x260
+> [  293.864057]  ? __timer_delete_sync+0x23/0x120
+> [  293.864066]  ? srso_return_thunk+0x5/0x5f
+> [  293.864071]  ? rcu_is_watching+0x15/0xb0
+> [  293.864076]  ? blkcg_deactivate_policy+0x1e7/0x4e0
+> [  293.864080]  ? srso_return_thunk+0x5/0x5f
+> [  293.864085]  ? lock_acquire+0x10b/0x150
+> [  293.864092]  ? __timer_delete_sync+0x23/0x120
+> [  293.864098]  __timer_delete_sync+0x40/0x120
+> [  293.864103]  ? __timer_delete_sync+0x23/0x120
+> [  293.864111]  throtl_pd_free+0x19/0x40
+> [  293.864117]  blkcg_deactivate_policy+0x2c9/0x4e0
+> [  293.864132]  blk_throtl_exit+0xa5/0x100
+> [  293.864140]  blkcg_exit_disk+0x1f/0x270
+> [  293.864150]  disk_release+0x11b/0x3a0
+> [  293.864157]  device_release+0x9f/0x210
+> [  293.864164]  kobject_cleanup+0x105/0x360
+> [  293.864172]  null_del_dev.part.0+0x1e5/0x480 [null_blk]
+> [  293.864189]  nullb_group_drop_item+0xa5/0xd0 [null_blk]
+> [  293.864202]  configfs_rmdir+0x69f/0xac0
+> [  293.864210]  ? __pfx_may_link+0x10/0x10
+> [  293.864221]  ? __pfx_configfs_rmdir+0x10/0x10
+> [  293.864235]  vfs_rmdir+0x1a5/0x5b0
+> [  293.864244]  do_rmdir+0x276/0x330
+> [  293.864252]  ? __pfx_do_rmdir+0x10/0x10
+> [  293.864262]  ? ktime_get_coarse_real_ts64+0x121/0x180
+> [  293.864271]  ? srso_return_thunk+0x5/0x5f
+> [  293.864276]  ? getname_flags.part.0+0xf8/0x480
+> [  293.864285]  __x64_sys_unlinkat+0x16b/0x1e0
+> [  293.864293]  do_syscall_64+0x94/0x8d0
+> [  293.864298]  ? srso_return_thunk+0x5/0x5f
+> [  293.864304]  ? srso_return_thunk+0x5/0x5f
+> [  293.864309]  ? fput_close_sync+0x156/0x1c0
+> [  293.864316]  ? __pfx_fput_close_sync+0x10/0x10
+> [  293.864326]  ? srso_return_thunk+0x5/0x5f
+> [  293.864333]  ? entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> [  293.864337]  ? srso_return_thunk+0x5/0x5f
+> [  293.864342]  ? lockdep_hardirqs_on+0x78/0x100
+> [  293.864347]  ? srso_return_thunk+0x5/0x5f
+> [  293.864351]  ? do_syscall_64+0x139/0x8d0
+> [  293.864355]  ? srso_return_thunk+0x5/0x5f
+> [  293.864362]  ? entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> [  293.864366]  ? srso_return_thunk+0x5/0x5f
+> [  293.864371]  ? lockdep_hardirqs_on+0x78/0x100
+> [  293.864376]  ? srso_return_thunk+0x5/0x5f
+> [  293.864381]  ? do_syscall_64+0x139/0x8d0
+> [  293.864385]  ? srso_return_thunk+0x5/0x5f
+> [  293.864393]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> [  293.864398] RIP: 0033:0x7f13bc09bb9b
+> [  293.864404] Code: 77 05 c3 0f 1f 40 00 48 8b 15 71 52 0d 00 f7 d8
+> 64 89 02 b8 ff ff ff ff c3 66 0f 1f 44 00 00 f3 0f 1e fa b8 07 01 00
+> 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d 45 52 0d 00 f7 d8 64 89
+> 01 48
+> [  293.864408] RSP: 002b:00007ffee8a880e8 EFLAGS: 00000216 ORIG_RAX:
+> 0000000000000107
+> [  293.864414] RAX: ffffffffffffffda RBX: 00005593f2ad7fb0 RCX: 00007f13bc09bb9b
+> [  293.864417] RDX: 0000000000000200 RSI: 00005593f2ad7fb0 RDI: 0000000000000005
+> [  293.864421] RBP: 0000000000000200 R08: 00000000ffffffff R09: 00005593f2acfd50
+> [  293.864424] R10: 00005593f2ac8010 R11: 0000000000000216 R12: 00005593f2ace330
+> [  293.864427] R13: 0000000000000001 R14: 0000000000000005 R15: 00007ffee8a890bb
+> [  293.864445]  </TASK>
+> 
+> On Tue, Sep 16, 2025 at 9:20 AM Yu Kuai <yukuai1@huaweicloud.com> wrote:
+>>
+>> From: Yu Kuai <yukuai3@huawei.com>
+>>
+>> Tightening the throttle activation check in blk_throtl_activated() to
+>> require both q->td presence and policy bit set introduced a memory leak
+>> during disk release:
+>>
+>> blkg_destroy_all() clears the policy bit first during queue deactivation,
+>> causing subsequent blk_throtl_exit() to skip throtl_data cleanup when
+>> blk_throtl_activated() fails policy check.
+>>
+>> Fix by reordering operations in disk_release() to call blk_throtl_exit()
+>> while throttle policy is still active. We avoid modifying blk_throtl_exit()
+>> activation check because it's intuitive that blk-throtl start from
+>> blk_throtl_init() and end in blk_throtl_exit().
+>>
+>> Fixes: bd9fd5be6bc0 ("blk-throttle: fix access race during throttle policy activation")
+>> Reported-by: Yi Zhang <yi.zhang@redhat.com>
+>> Closes: https://lore.kernel.org/all/CAHj4cs-p-ZwBEKigBj7T6hQCOo-H68-kVwCrV6ZvRovrr9Z+HA@mail.gmail.com/
+>> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+>> ---
+>>   block/blk-cgroup.c | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+>> index 7246fc256315..64a56c8697f9 100644
+>> --- a/block/blk-cgroup.c
+>> +++ b/block/blk-cgroup.c
+>> @@ -1539,8 +1539,8 @@ int blkcg_init_disk(struct gendisk *disk)
+>>
+>>   void blkcg_exit_disk(struct gendisk *disk)
+>>   {
+>> -       blkg_destroy_all(disk);
+>>          blk_throtl_exit(disk);
+>> +       blkg_destroy_all(disk);
+>>   }
+>>
+>>   static void blkcg_exit(struct task_struct *tsk)
+>> --
+>> 2.39.2
+>>
+>>
+> 
+> 
+
