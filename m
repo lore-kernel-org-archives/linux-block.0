@@ -1,190 +1,341 @@
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23A0E2E36FB
-	for <linux-block@vger.kernel.org>; Tue, 16 Sep 2025 07:27:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D733827A900
+	for <linux-block@vger.kernel.org>; Tue, 16 Sep 2025 08:15:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758007660; cv=none; b=gLyaGQrD0BWvldQ8RPYxITpExkQ0P7KeIvlkRXFbXp5Ta1wqFCqSAGJpWQhIn1ffCpWy7tWI1C6N7P+RdFRKESEjGTv9EQQSqMaKWJ0PwEiODwNLYXQe6caEerHuZB8JH/Jl/WeL32p3lJC8Oi5uEIOvAgL7QgSoWVVWJeyMkd8=
+	t=1758010524; cv=none; b=VKoD2q1EIx86R+alRi5bCbIAS63CvghFj4VgncqMbQL6Pey+7/RBYv7COXSpjgC8Vh7evTfzsvWMwtRqMElxxsexzIEjfUDaPuzYSc0GKBRvO6D6RBjoT7NfkAhmBeSEJVtbLG68yIzm1lzMr53NIoagYv7e4b+isAGjfmttsJQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758007660; c=relaxed/simple;
-	bh=F9b2EyhEO6rGTgADu2vlV7ZYUMvWMAZOSNB2YByeOEQ=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=HbMXlfDxPXuDxvnSBO85qTsoL/5sl9ez0cftfSO/NfwnQ8tmIG0K3VO8nHkmaT4yTqxwFsosi1LsrOC85k7rjpPQHRcSJXpNASjfYoW87lLvc6A3G+AkHSuubjWCeYcBfkF8cbATM7y74N8VdOpjplV3bkcXMNetAUsjcHal4gk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=cK6bTLES; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1758010524; c=relaxed/simple;
+	bh=IYa01UUPI4nzVnYfKe1Bk46b8x/g231PWrp7VkEdtEM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=QUuAKk/CMz6sGX9IxiXe9Es3x3SqKVJHogtzqKbI1KxmNphLkwgZCS4me5lte4u3dTIPrX/pZPwVg/s7vD9dXPTycIgNd3Jn+e1eM6nDi/OI3NbRm1aefkkWfv4arymAnznlyxIIK0PJHgtclhrRcgorbu4ezzdGM6UgSgEFtlo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YKWNaVRI; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cK6bTLES"
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-266fa7a0552so16636545ad.3
-        for <linux-block@vger.kernel.org>; Tue, 16 Sep 2025 00:27:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1758007658; x=1758612458; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=YdzUgBNm+Fykgerb+7FYicUv4mSP6WHZUtexZFjMOI8=;
-        b=cK6bTLESUs2Iulj9mXcczqVlJ0+e9+ajybZFCW8UX16X85+39TkvjfVaesdgUNATw5
-         6MJDXn+xPw384Z944YQ95XQwseK4ggaI0WRbswSw8JcnLRIW/bXDy6d12IWsRexJ+pgs
-         t6qByrq2zQ9ThoAM08OnN6/ReaNqq4KPN0Cjxy1RKvEt8C1b1a69/fWhN7alO8Ss1+hO
-         NQhCWvAetHG/BCQ3U10Oqnpq41GcCMaG2aKTqYaf6TAf6I5cR8UwkjXXHB9y9WZ4bjeM
-         MKBxsP658VKTDpra8iI0uVWskCkkjj75Dnoxu4BVr+9/f98YA9nj6jbZjptDPBXQhAVp
-         /nmA==
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YKWNaVRI"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1758010521;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=dnXjzBw0dGQlTbJw62UgReVdw+pNT5//JRB8RBterRU=;
+	b=YKWNaVRIuQ6Obx/z7QtJg4+bhXL07lT+LEtOnoLjB4lpqfjWFrGmp5rFDde3Xea+Xeg5T+
+	addEGGmNqD9bAqtZw5EYEsAwuuD0rY5CH3hb6UnSbsD9acB9QbgpBEUi9N/odAIcXncuGH
+	S5h7rsONtuqyQP1P4w+r9XN4DTQuN4I=
+Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
+ [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-444-m38HQ58eO6-NztDomDSD2A-1; Tue, 16 Sep 2025 04:15:20 -0400
+X-MC-Unique: m38HQ58eO6-NztDomDSD2A-1
+X-Mimecast-MFC-AGG-ID: m38HQ58eO6-NztDomDSD2A_1758010519
+Received: by mail-lf1-f72.google.com with SMTP id 2adb3069b0e04-571bb5f218fso2222052e87.2
+        for <linux-block@vger.kernel.org>; Tue, 16 Sep 2025 01:15:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758007658; x=1758612458;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=YdzUgBNm+Fykgerb+7FYicUv4mSP6WHZUtexZFjMOI8=;
-        b=Ig3FjFzz9G7otO4YyYjOvk1xLaTIfHox2zEQiersCArhdiJ9A1gK0c/6YbcFrl34MG
-         vfJZUyZtO7JLrllMfxrXc3V0Rhef1MUfFT6VPWmARgl02TB0NTsiPQHsKt8gEUCJ4Hyg
-         SF9786u0ahZLWmA1Vn8fM3u84J5Vu6OdPQAtmwJ/ASz8CCalw1rmoBka6lm5ZYvGNYcg
-         rVlzQf+h+xQxLft4ueM/t+j4wrUoajZizOGt1R4Ahz/jgwGhH6QfocjRk/uL7+vnDn/V
-         CiG4d2BRUT1zXEqOk4CesVZ+57jzvWBfGfpZKNT22xM/su8qlcDky+oD5M5T5cJB3/QG
-         OPZg==
-X-Gm-Message-State: AOJu0YzxxfDZU89ewQL43hY6e7IdCKmqSv+tmh7a6zV3RM+kere9Y0Cs
-	U34+we1hbPB/xTMr7ChssEfDShnYPafF6QbKaYdSCTyvSq0VGUERIqGtpNa15RqdiDplFGF/pHK
-	n7xU+vZweE4NnZcUEyVDyn87GplCIwQ+gaVzdLFq3AWIsAX8/KZDe0uI=
-X-Gm-Gg: ASbGncvxABiRYsbY0+yA9tTlZ+byw04222fObTAzJofqq7LHPIzxOQq3Cs1jiocjye7
-	CTS6fl4qaUmqhm9hM0D35ogzC3HlnNzStPy+J6yOek92M4Lanis//HmULsTPmOmzT1nEhkfbcSV
-	hwHxwntYIFcCPo1fm29/+l1FN0qVY4DQDHmdkRxIUdzsSMhKL7DNwzqFiYQFftWi77Obl6HHQWM
-	nE77GyLXtB9wXGwADApz66vHHs7ryZ+echNAQlfCu4cgezV3yNKc3nSASkbKmO060Z6ILG4
-X-Google-Smtp-Source: AGHT+IGaVagTx8hEuPpGoL7AEHAise+m6cLY73KC6Dl72g9vxKRp51S5NCherF7SA2OcxJNUcL1e+yLHf56LlaRQ9wY=
-X-Received: by 2002:a17:902:d58a:b0:264:c48:9cae with SMTP id
- d9443c01a7336-2640c489f42mr117753185ad.38.1758007658046; Tue, 16 Sep 2025
- 00:27:38 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1758010519; x=1758615319;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dnXjzBw0dGQlTbJw62UgReVdw+pNT5//JRB8RBterRU=;
+        b=FTf1cwmsAGLGxdNWavISvIOKNaMdSslpt5yhj6NcA7hoC1DM0xvLCb3zPWZ9hFrb/q
+         l4wc55fFIacVgmhgRWj7IvGGbjT7uUqZpFFGfsMFTrbBFHR8qh76vzyc8lQiJaTR130q
+         e3N68zDd7GsChi9rSvMg2mgclmGPHcFB6SzV8gf0l+bsOmzK80Sq8KcWzNOtYvqHfsf+
+         KqY0jHoDG6//7fieFPWxo4jaoNXBrBiMvBnRdO9ktIOOTF10TMYNJQukP3vbkIz/vN5+
+         U7NRNCQdWShs0EN4PSR/JeIIAOAvUdJoxwQ9TQN5vsH8KSyMcndeP+pdPjxecJnVQjME
+         KDfQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUIB6GWRaQz4ygBgZpX8NLZmHiSvlcZJcd7dh48vKTlCX3xsoNBAqf407YkG4RP5110A2+kR7rf5OtwYQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywr9pbVKIrm6cjpp8JtDJqkyMf2NwqTcBtDJ8iPojGP4lcYfE7Y
+	PIJNPgr28Fx2OzNv6vDB6/CBMS0mOSEQX7oHd/XeO+CcOYYlKLnwJoZVPvqaC4hmmr2gn1j8QWm
+	mlxtwCFasDt3Lz+tCsKrdk8pi/fPsDcbIJm/IXE/LvMKgeEqEE+1sUXiC/DTLV7dtmSZHziPmb0
+	gMlKgddjMBbVNK+55CJcTN3jD3M/A7RiZVv9mwycA=
+X-Gm-Gg: ASbGnctI2QjnzB9zotGOfQN/fPjT+SioGDo/7rVGDzm6+w0daYQM8jiMg+xoGw3S7k/
+	Gz6aPaM+Nkzf98wKj3pvP7YQLcqDLkYpoSztRuq2x72YG8+jH27Mb/6Y6+Ux+v+XP+0i+4C+iLP
+	ZpOGZffkeVUUflIrPJF13+qA==
+X-Received: by 2002:a05:6512:404c:b0:55f:4ac2:a5a8 with SMTP id 2adb3069b0e04-57048dd4e9emr4675002e87.13.1758010518497;
+        Tue, 16 Sep 2025 01:15:18 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHfmZnapZ6jW8H2ratKBFIoR2HpTAVXjaSxlTVAhrOT2RXhv8ANoXC94+LYKlORORqMh9VbRWVROo8iLV4yg7Y=
+X-Received: by 2002:a05:6512:404c:b0:55f:4ac2:a5a8 with SMTP id
+ 2adb3069b0e04-57048dd4e9emr4674984e87.13.1758010517970; Tue, 16 Sep 2025
+ 01:15:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Naresh Kamboju <naresh.kamboju@linaro.org>
-Date: Tue, 16 Sep 2025 12:57:26 +0530
-X-Gm-Features: AS18NWAma5_BQDQUJLHrWh8m4zqOKBnCdl8KRwcCODUf5Yb_JGvr-6H4NUsMNP4
-Message-ID: <CA+G9fYuFdesVkgGOow7+uQpw-QA6hdqBBUye8CKMxGAiwHagOA@mail.gmail.com>
-Subject: next-20250915: LTP chdir01 df01_sh stat04 tst_device.c:97: TBROK:
- Could not stat loop device 0
-To: linux-block <linux-block@vger.kernel.org>, linux-fsdevel@vger.kernel.org, 
-	LTP List <ltp@lists.linux.it>, open list <linux-kernel@vger.kernel.org>, 
-	lkft-triage@lists.linaro.org, Linux Regressions <regressions@lists.linux.dev>
-Cc: Christian Brauner <brauner@kernel.org>, chrubis <chrubis@suse.cz>, Petr Vorel <pvorel@suse.cz>, 
-	Arnd Bergmann <arnd@arndb.de>, Dan Carpenter <dan.carpenter@linaro.org>, 
-	Al Viro <viro@zeniv.linux.org.uk>, Amir Goldstein <amir73il@gmail.com>, Jan Kara <jack@suse.cz>, 
-	"Martin K. Petersen" <martin.petersen@oracle.com>, Anuj Gupta <anuj20.g@samsung.com>, 
-	Kanchan Joshi <joshi.k@samsung.com>, Anders Roxell <anders.roxell@linaro.org>, 
-	Ben Copeland <benjamin.copeland@linaro.org>
+References: <20250916010947.2891471-1-yukuai1@huaweicloud.com>
+In-Reply-To: <20250916010947.2891471-1-yukuai1@huaweicloud.com>
+From: Yi Zhang <yi.zhang@redhat.com>
+Date: Tue, 16 Sep 2025 16:15:06 +0800
+X-Gm-Features: AS18NWD_OS82rbxKs-9AlzUzNmDrl5GJgR3EmMZN2DgWgG40M7uAc1UZb0ZpeWA
+Message-ID: <CAHj4cs9p9H5yx+ywsb3CMUdbqGPhM+8tuBvhW=9ADiCjAqza9w@mail.gmail.com>
+Subject: Re: [PATCH] blk-throttle: fix throtl_data leak during disk release
+To: Yu Kuai <yukuai1@huaweicloud.com>
+Cc: tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk, liangjie@lixiang.com, 
+	yukuai3@huawei.com, hanguangjiang@lixiang.com, cgroups@vger.kernel.org, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	yi.zhang@huawei.com, yangerkun@huawei.com, johnny.chenyi@huawei.com
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The following LTP chdir01 df01_sh and stat04 tests failed on the rock-pi-4b
-qemu-arm64 on the Linux next-20250915 tag build.
+Hi Yu
+A new issue was triggered with the change. Please check it. Thanks.
 
-First seen on next-20250915
-Good: next-20250912
-Bad: next-20250915
+[  285.804104] run blktests throtl/001 at 2025-09-16 04:11:12
+[  286.161894] null_blk: disk dev_nullb created
 
-Regression Analysis:
-- New regression? yes
-- Reproducibility? yes
+[  293.388583] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D
+[  293.394762] WARNING: possible circular locking dependency detected
+[  293.400940] 6.17.0-rc6.v1+ #2 Not tainted
+[  293.404952] ------------------------------------------------------
+[  293.411131] find/1609 is trying to acquire lock:
+[  293.415751] ffff8882911b50b0 ((&sq->pending_timer)){+.-.}-{0:0},
+at: __timer_delete_sync+0x23/0x120
+[  293.424817]
+               but task is already holding lock:
+[  293.430648] ffff8882b7794948 (&blkcg->lock){....}-{3:3}, at:
+blkcg_deactivate_policy+0x1e7/0x4e0
+[  293.439445]
+               which lock already depends on the new lock.
 
-* rk3399-rock-pi-4b, ltp-smoke
-* qemu-arm64, ltp-smoke
-* qemu-arm64-compat, ltp-smoke
- - chdir01
-  - df01_sh
-  - stat04
+[  293.447619]
+               the existing dependency chain (in reverse order) is:
+[  293.455096]
+               -> #2 (&blkcg->lock){....}-{3:3}:
+[  293.460948]        __lock_acquire+0x57c/0xbd0
+[  293.465315]        lock_acquire.part.0+0xbd/0x260
+[  293.470020]        _raw_spin_lock+0x37/0x80
+[  293.474214]        blkg_create+0x3e2/0x1060
+[  293.478401]        blkcg_init_disk+0x8f/0x460
+[  293.482769]        __alloc_disk_node+0x27f/0x600
+[  293.487397]        __blk_mq_alloc_disk+0x5f/0xd0
+[  293.492025]        nvme_alloc_ns+0x202/0x17a0 [nvme_core]
+[  293.497458]        nvme_scan_ns+0x30b/0x380 [nvme_core]
+[  293.502709]        async_run_entry_fn+0x9a/0x4f0
+[  293.507330]        process_one_work+0xd8b/0x1320
+[  293.511956]        worker_thread+0x5f3/0xfe0
+[  293.516231]        kthread+0x3b4/0x770
+[  293.519992]        ret_from_fork+0x393/0x480
+[  293.524272]        ret_from_fork_asm+0x1a/0x30
+[  293.528728]
+               -> #1 (&q->queue_lock){..-.}-{3:3}:
+[  293.534749]        __lock_acquire+0x57c/0xbd0
+[  293.539108]        lock_acquire.part.0+0xbd/0x260
+[  293.543814]        _raw_spin_lock_irq+0x3f/0x90
+[  293.548348]        throtl_pending_timer_fn+0x11c/0x15b0
+[  293.553581]        call_timer_fn+0x19c/0x3e0
+[  293.557853]        __run_timers+0x627/0x9f0
+[  293.562041]        run_timer_base+0xe6/0x140
+[  293.566312]        run_timer_softirq+0x1a/0x30
+[  293.570758]        handle_softirqs+0x1fd/0x890
+[  293.575205]        __irq_exit_rcu+0xfd/0x250
+[  293.579477]        irq_exit_rcu+0xe/0x30
+[  293.583402]        sysvec_apic_timer_interrupt+0xa1/0xd0
+[  293.588717]        asm_sysvec_apic_timer_interrupt+0x1a/0x20
+[  293.594383]        cpuidle_enter_state+0xf5/0x2f0
+[  293.599090]        cpuidle_enter+0x4e/0xa0
+[  293.603197]        cpuidle_idle_call+0x213/0x370
+[  293.607816]        do_idle+0x131/0x200
+[  293.611568]        cpu_startup_entry+0x54/0x60
+[  293.616017]        start_secondary+0x20d/0x290
+[  293.620471]        common_startup_64+0x13e/0x141
+[  293.625096]
+               -> #0 ((&sq->pending_timer)){+.-.}-{0:0}:
+[  293.631642]        check_prev_add+0xf1/0xcd0
+[  293.635921]        validate_chain+0x487/0x570
+[  293.640281]        __lock_acquire+0x57c/0xbd0
+[  293.644641]        lock_acquire.part.0+0xbd/0x260
+[  293.649345]        __timer_delete_sync+0x40/0x120
+[  293.654052]        throtl_pd_free+0x19/0x40
+[  293.658238]        blkcg_deactivate_policy+0x2c9/0x4e0
+[  293.663378]        blk_throtl_exit+0xa5/0x100
+[  293.667743]        blkcg_exit_disk+0x1f/0x270
+[  293.672104]        disk_release+0x11b/0x3a0
+[  293.676299]        device_release+0x9f/0x210
+[  293.680579]        kobject_cleanup+0x105/0x360
+[  293.685027]        null_del_dev.part.0+0x1e5/0x480 [null_blk]
+[  293.690788]        nullb_group_drop_item+0xa5/0xd0 [null_blk]
+[  293.696544]        configfs_rmdir+0x69f/0xac0
+[  293.700910]        vfs_rmdir+0x1a5/0x5b0
+[  293.704836]        do_rmdir+0x276/0x330
+[  293.708677]        __x64_sys_unlinkat+0x16b/0x1e0
+[  293.713393]        do_syscall_64+0x94/0x8d0
+[  293.717584]        entry_SYSCALL_64_after_hwframe+0x76/0x7e
+[  293.723160]
+               other info that might help us debug this:
 
-Test regression: next-20250915: LTP chdir01 df01_sh stat04
-tst_device.c:97: TBROK: Could not stat loop device 0
+[  293.731159] Chain exists of:
+                 (&sq->pending_timer) --> &q->queue_lock --> &blkcg->lock
 
-Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
+[  293.742045]  Possible unsafe locking scenario:
 
-## Test log
-<8>[   53.655971] <LAVA_SIGNAL_STARTTC chdir01>
-tst_buffers.c:57: TINFO: Test is using guarded buffers
-tst_tmpdir.c:316: TINFO: Using /tmp/LTP_chdm4pHJb as tmpdir (tmpfs filesystem)
-tst_device.c:98: TINFO: Found free device 0 '/dev/loop0'
-tst_test.c:1953: TINFO: LTP version: 20250530
-tst_test.c:1956: TINFO: Tested kernel: 6.17.0-rc6-next-20250915 #1 SMP
-PREEMPT @1757983656 aarch64
-tst_kconfig.c:88: TINFO: Parsing kernel config '/proc/config.gz'
-tst_kconfig.c:676: TINFO: CONFIG_TRACE_IRQFLAGS kernel option detected
-which might slow the execution
-tst_test.c:1774: TINFO: Overall timeout per run is 0h 28m 48s
-tst_supported_fs_types.c:97: TINFO: Kernel supports ext2
-tst_supported_fs_types.c:62: TINFO: mkfs.ext2 does exist
-tst_supported_fs_types.c:97: TINFO: Kernel supports ext3
-tst_supported_fs_types.c:62: TINFO: mkfs.ext3 does exist
-tst_supported_fs_types.c:97: TINFO: Kernel supports ext4
-tst_supported_fs_types.c:62: TINFO: mkfs.ext4 does exist
-tst_supported_fs_types.c:128: TINFO: Filesystem xfs is not supported
-tst_supported_fs_types.c:97: TINFO: Kernel supports btrfs
-tst_supported_fs_types.c:62: TINFO: mkfs.btrfs does exist
-tst_supported_fs_types.c:105: TINFO: Skipping bcachefs because of FUSE blacklist
-tst_supported_fs_types.c:97: TINFO: Kernel supports vfat
-tst_supported_fs_types.c:62: TINFO: mkfs.vfat does exist
-tst_supported_fs_types.c:128: TINFO: Filesystem exfat is not supported
-tst_supported_fs_types.c:132: TINFO: FUSE does support ntfs
-tst_supported_fs_types.c:62: TINFO: mkfs.ntfs does exist
-tst_supported_fs_types.c:97: TINFO: Kernel supports tmpfs
-tst_supported_fs_types.c:49: TINFO: mkfs is not needed for tmpfs
-tst_test.c:1888: TINFO: === Testing on ext2 ===
-tst_device.c:391: TWARN: Failed to clear 512k block on /dev/loop0
-tst_test.c:1217: TBROK: tst_clear_device() failed
-Summary:
-passed   0
-failed   0
-broken   1
-skipped  0
-warnings 1
-tst_device.c:283: TWARN: open(/dev/loop0) failed: ENOENT (2)
-<8>[   53.679564] <LAVA_SIGNAL_ENDTC chdir01>
-<8>[   53.708246] <LAVA_SIGNAL_TESTCASE TEST_CASE_ID=chdir01 RESULT=fail>
+[  293.747972]        CPU0                    CPU1
+[  293.752511]        ----                    ----
+[  293.757043]   lock(&blkcg->lock);
+[  293.760371]                                lock(&q->queue_lock);
+[  293.766387]                                lock(&blkcg->lock);
+[  293.772226]   lock((&sq->pending_timer));
+[  293.776248]
+                *** DEADLOCK ***
 
-<8>[   53.933883] <LAVA_SIGNAL_STARTTC stat04>
-tst_buffers.c:57: TINFO: Test is using guarded buffers
-tst_tmpdir.c:316: TINFO: Using /tmp/LTP_staPDxElt as tmpdir (tmpfs filesystem)
-tst_device.c:97: TBROK: Could not stat loop device 0
-Summary:
-passed   0
-failed   0
-broken   1
-skipped  0
-warnings 0
-<8>[   53.947889] <LAVA_SIGNAL_ENDTC stat04>
-<8>[   53.974024] <LAVA_SIGNAL_TESTCASE TEST_CASE_ID=stat04 RESULT=fail>
+[  293.782166] 8 locks held by find/1609:
+[  293.785921]  #0: ffff88813ddf6448 (sb_writers#16){.+.+}-{0:0}, at:
+do_rmdir+0x1a8/0x330
+[  293.793945]  #1: ffff88829e48a108 (&default_group_class[depth -
+1]/1){+.+.}-{4:4}, at: do_rmdir+0x1ec/0x330
+[  293.803704]  #2: ffff8881f918cb48
+(&sb->s_type->i_mutex_key#22){+.+.}-{4:4}, at: vfs_rmdir+0xc0/0x5b0
+[  293.812943]  #3: ffffffffc1cc4698
+(&nullb_subsys.su_mutex){+.+.}-{4:4}, at: configfs_rmdir+0x57b/0xac0
+[  293.822267]  #4: ffffffffc1ccc130 (&lock){+.+.}-{4:4}, at:
+nullb_group_drop_item+0x50/0xd0 [null_blk]
+[  293.831516]  #5: ffff88829ddb9980 (&q->blkcg_mutex){+.+.}-{4:4},
+at: blkcg_deactivate_policy+0xf6/0x4e0
+[  293.840926]  #6: ffff88829ddb9650 (&q->queue_lock){..-.}-{3:3}, at:
+blkcg_deactivate_policy+0x10a/0x4e0
+[  293.850339]  #7: ffff8882b7794948 (&blkcg->lock){....}-{3:3}, at:
+blkcg_deactivate_policy+0x1e7/0x4e0
+[  293.859577]
+               stack backtrace:
+[  293.863939] CPU: 11 UID: 0 PID: 1609 Comm: find Kdump: loaded Not
+tainted 6.17.0-rc6.v1+ #2 PREEMPT(voluntary)
+[  293.863946] Hardware name: Dell Inc. PowerEdge R6515/07PXPY, BIOS
+2.17.0 12/04/2024
+[  293.863949] Call Trace:
+[  293.863953]  <TASK>
+[  293.863959]  dump_stack_lvl+0x6f/0xb0
+[  293.863970]  print_circular_bug.cold+0x38/0x45
+[  293.863981]  check_noncircular+0x148/0x160
+[  293.863997]  check_prev_add+0xf1/0xcd0
+[  293.864001]  ? alloc_chain_hlocks+0x13e/0x1d0
+[  293.864007]  ? srso_return_thunk+0x5/0x5f
+[  293.864013]  ? add_chain_cache+0x12c/0x310
+[  293.864022]  validate_chain+0x487/0x570
+[  293.864027]  ? srso_return_thunk+0x5/0x5f
+[  293.864037]  __lock_acquire+0x57c/0xbd0
+[  293.864043]  ? srso_return_thunk+0x5/0x5f
+[  293.864052]  lock_acquire.part.0+0xbd/0x260
+[  293.864057]  ? __timer_delete_sync+0x23/0x120
+[  293.864066]  ? srso_return_thunk+0x5/0x5f
+[  293.864071]  ? rcu_is_watching+0x15/0xb0
+[  293.864076]  ? blkcg_deactivate_policy+0x1e7/0x4e0
+[  293.864080]  ? srso_return_thunk+0x5/0x5f
+[  293.864085]  ? lock_acquire+0x10b/0x150
+[  293.864092]  ? __timer_delete_sync+0x23/0x120
+[  293.864098]  __timer_delete_sync+0x40/0x120
+[  293.864103]  ? __timer_delete_sync+0x23/0x120
+[  293.864111]  throtl_pd_free+0x19/0x40
+[  293.864117]  blkcg_deactivate_policy+0x2c9/0x4e0
+[  293.864132]  blk_throtl_exit+0xa5/0x100
+[  293.864140]  blkcg_exit_disk+0x1f/0x270
+[  293.864150]  disk_release+0x11b/0x3a0
+[  293.864157]  device_release+0x9f/0x210
+[  293.864164]  kobject_cleanup+0x105/0x360
+[  293.864172]  null_del_dev.part.0+0x1e5/0x480 [null_blk]
+[  293.864189]  nullb_group_drop_item+0xa5/0xd0 [null_blk]
+[  293.864202]  configfs_rmdir+0x69f/0xac0
+[  293.864210]  ? __pfx_may_link+0x10/0x10
+[  293.864221]  ? __pfx_configfs_rmdir+0x10/0x10
+[  293.864235]  vfs_rmdir+0x1a5/0x5b0
+[  293.864244]  do_rmdir+0x276/0x330
+[  293.864252]  ? __pfx_do_rmdir+0x10/0x10
+[  293.864262]  ? ktime_get_coarse_real_ts64+0x121/0x180
+[  293.864271]  ? srso_return_thunk+0x5/0x5f
+[  293.864276]  ? getname_flags.part.0+0xf8/0x480
+[  293.864285]  __x64_sys_unlinkat+0x16b/0x1e0
+[  293.864293]  do_syscall_64+0x94/0x8d0
+[  293.864298]  ? srso_return_thunk+0x5/0x5f
+[  293.864304]  ? srso_return_thunk+0x5/0x5f
+[  293.864309]  ? fput_close_sync+0x156/0x1c0
+[  293.864316]  ? __pfx_fput_close_sync+0x10/0x10
+[  293.864326]  ? srso_return_thunk+0x5/0x5f
+[  293.864333]  ? entry_SYSCALL_64_after_hwframe+0x76/0x7e
+[  293.864337]  ? srso_return_thunk+0x5/0x5f
+[  293.864342]  ? lockdep_hardirqs_on+0x78/0x100
+[  293.864347]  ? srso_return_thunk+0x5/0x5f
+[  293.864351]  ? do_syscall_64+0x139/0x8d0
+[  293.864355]  ? srso_return_thunk+0x5/0x5f
+[  293.864362]  ? entry_SYSCALL_64_after_hwframe+0x76/0x7e
+[  293.864366]  ? srso_return_thunk+0x5/0x5f
+[  293.864371]  ? lockdep_hardirqs_on+0x78/0x100
+[  293.864376]  ? srso_return_thunk+0x5/0x5f
+[  293.864381]  ? do_syscall_64+0x139/0x8d0
+[  293.864385]  ? srso_return_thunk+0x5/0x5f
+[  293.864393]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+[  293.864398] RIP: 0033:0x7f13bc09bb9b
+[  293.864404] Code: 77 05 c3 0f 1f 40 00 48 8b 15 71 52 0d 00 f7 d8
+64 89 02 b8 ff ff ff ff c3 66 0f 1f 44 00 00 f3 0f 1e fa b8 07 01 00
+00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d 45 52 0d 00 f7 d8 64 89
+01 48
+[  293.864408] RSP: 002b:00007ffee8a880e8 EFLAGS: 00000216 ORIG_RAX:
+0000000000000107
+[  293.864414] RAX: ffffffffffffffda RBX: 00005593f2ad7fb0 RCX: 00007f13bc0=
+9bb9b
+[  293.864417] RDX: 0000000000000200 RSI: 00005593f2ad7fb0 RDI: 00000000000=
+00005
+[  293.864421] RBP: 0000000000000200 R08: 00000000ffffffff R09: 00005593f2a=
+cfd50
+[  293.864424] R10: 00005593f2ac8010 R11: 0000000000000216 R12: 00005593f2a=
+ce330
+[  293.864427] R13: 0000000000000001 R14: 0000000000000005 R15: 00007ffee8a=
+890bb
+[  293.864445]  </TASK>
 
-<8>[   54.048075] <LAVA_SIGNAL_STARTTC df01_sh>
-df01 1 TINFO: Running: df01.sh
-df01 1 TINFO: Tested kernel: Linux
-runner-j2nyww-sk-project-40964107-concurrent-0
-6.17.0-rc6-next-20250915 #1 SMP PREEMPT @1757983656 aarch64 GNU/Linux
-df01 1 TINFO: Using /tmp/LTP_df01.7pcwUXe1CN as tmpdir (tmpfs filesystem)
-tst_device.c:97: TBROK: Could not stat loop device 0
-df01 1 TBROK: Failed to acquire device
-Summary:
-passed   0
-failed   0
-broken   1
-skipped  0
-warnings 0
-<8>[   54.060936] <LAVA_SIGNAL_ENDTC df01_sh>
-<8>[   54.087630] <LAVA_SIGNAL_TESTCASE TEST_CASE_ID=df01_sh RESULT=fail>
+On Tue, Sep 16, 2025 at 9:20=E2=80=AFAM Yu Kuai <yukuai1@huaweicloud.com> w=
+rote:
+>
+> From: Yu Kuai <yukuai3@huawei.com>
+>
+> Tightening the throttle activation check in blk_throtl_activated() to
+> require both q->td presence and policy bit set introduced a memory leak
+> during disk release:
+>
+> blkg_destroy_all() clears the policy bit first during queue deactivation,
+> causing subsequent blk_throtl_exit() to skip throtl_data cleanup when
+> blk_throtl_activated() fails policy check.
+>
+> Fix by reordering operations in disk_release() to call blk_throtl_exit()
+> while throttle policy is still active. We avoid modifying blk_throtl_exit=
+()
+> activation check because it's intuitive that blk-throtl start from
+> blk_throtl_init() and end in blk_throtl_exit().
+>
+> Fixes: bd9fd5be6bc0 ("blk-throttle: fix access race during throttle polic=
+y activation")
+> Reported-by: Yi Zhang <yi.zhang@redhat.com>
+> Closes: https://lore.kernel.org/all/CAHj4cs-p-ZwBEKigBj7T6hQCOo-H68-kVwCr=
+V6ZvRovrr9Z+HA@mail.gmail.com/
+> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+> ---
+>  block/blk-cgroup.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+> index 7246fc256315..64a56c8697f9 100644
+> --- a/block/blk-cgroup.c
+> +++ b/block/blk-cgroup.c
+> @@ -1539,8 +1539,8 @@ int blkcg_init_disk(struct gendisk *disk)
+>
+>  void blkcg_exit_disk(struct gendisk *disk)
+>  {
+> -       blkg_destroy_all(disk);
+>         blk_throtl_exit(disk);
+> +       blkg_destroy_all(disk);
+>  }
+>
+>  static void blkcg_exit(struct task_struct *tsk)
+> --
+> 2.39.2
+>
+>
 
-## Source
-* Kernel version: 6.17.0-rc6
-* Git tree: https://kernel.googlesource.com/pub/scm/linux/kernel/git/next/linux-next.git
-* Git describe: 6.17.0-rc6-next-20250915
-* Git commit: c3067c2c38316c3ef013636c93daa285ee6aaa2e
-* Architectures: arm64
-* Toolchains: gcc-13 and gcc-8
-* Kconfigs: lkftconfigs
 
-## Build
-* Test log: https://qa-reports.linaro.org/api/testruns/29896973/log_file/
-* Test details:
-https://regressions.linaro.org/lkft/linux-next-master/next-20250915/ltp-smoke/stat04/
-* Test plan: https://tuxapi.tuxsuite.com/v1/groups/linaro/projects/lkft/tests/32l4Vv9hKep2EcmS18u3NBtmoAm
-* Build link: https://storage.tuxsuite.com/public/linaro/lkft/builds/32l4UF8KltAzu6kUpW3hXaYRWjZ/
-* Kernel config:
-https://storage.tuxsuite.com/public/linaro/lkft/builds/32l4UF8KltAzu6kUpW3hXaYRWjZ/config
+--=20
+Best Regards,
+  Yi Zhang
 
---
-Linaro LKFT
