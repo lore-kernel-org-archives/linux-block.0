@@ -1,108 +1,121 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38F5670808;
-	Tue, 16 Sep 2025 01:19:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5942212548
+	for <linux-block@vger.kernel.org>; Tue, 16 Sep 2025 01:48:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757985581; cv=none; b=FK91xyo290OWjXJarP4L1cCFkCmmYGKHUpbXyCm7CVSld2C3xjLjZ6bqdlmo/uMGkpN7bvTuI51mr1JSx4iHzHRgafnPv7SAp/K1ESWkf16lMywC2hlASOIWvpoQkTDHxIjIOJQUqF3P4rZ+OlyU8ugLXoLRJK8/ICPrAmxK77Q=
+	t=1757987337; cv=none; b=YdDMF2Xu+imPZiGkQxqTZ0xhuYcIPFQqxZPPxLRt5XR3iHnz8qlR9tHIGDzd2AlAiAcxgCMHTV64ITx48vFWe8pwWhBy9xQ2JE53iWlAVqJnNrwV0VJ9cX1rIK+wAkV6DYHhOhP+WlJofflWReZuENelwQXnqbvkek7NolbiWTY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757985581; c=relaxed/simple;
-	bh=U8IR5UvODudAhu7jZXRZ8Pcm3iD0tyERJBfX+nm8YNs=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=S/YqL6EN6cOB0CfaiZiLtBO9+Dd6lplqZpeOppTr2BrGF+VkT28oTunCyWhBPNlD9HPy4DUcAhuRcB1uxWK6eHFbLwCXoav2PyEGd+ExRHHZUX2mO3De7x/Twrs86QVuA/AbQKXmmHFxXe2NinDSCk8IWwhFYeP5ujqC4QG9Lrs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=none smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4cQkZv5sqZzKHLxP;
-	Tue, 16 Sep 2025 09:19:35 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 6ECFA1A0D19;
-	Tue, 16 Sep 2025 09:19:36 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.104.67])
-	by APP4 (Coremail) with SMTP id gCh0CgDXIY4ku8hoMgGcCg--.12643S4;
-	Tue, 16 Sep 2025 09:19:34 +0800 (CST)
-From: Yu Kuai <yukuai1@huaweicloud.com>
-To: tj@kernel.org,
-	josef@toxicpanda.com,
-	axboe@kernel.dk,
-	liangjie@lixiang.com,
-	yukuai3@huawei.com,
-	hanguangjiang@lixiang.com
-Cc: cgroups@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	yukuai1@huaweicloud.com,
-	yi.zhang@huawei.com,
-	yangerkun@huawei.com,
-	johnny.chenyi@huawei.com
-Subject: [PATCH] blk-throttle: fix throtl_data leak during disk release
-Date: Tue, 16 Sep 2025 09:09:47 +0800
-Message-Id: <20250916010947.2891471-1-yukuai1@huaweicloud.com>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1757987337; c=relaxed/simple;
+	bh=ixp1vRoqVO/aQuZyYy6zFP7jfZFHYTqyHd5Z6tSU/S0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KdWDJiuy4aNUf7QGzrOxRcSOhvftyVTMvnbc1MSaJ24FXE6ir+9n34TwgMO95xJbAtK8gVSoldVtSQFpZIpDTr7N7glpFSlw+qvDQFLz8ZsWRmeFd1JTnLGQf9HXmYGGzZ84Psx0aDJH9fIgJeaG+zLyJWQWTmqi3BfXkr16lJg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JGzWjT6J; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JGzWjT6J"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1757987333;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UM/63QbNRNL2CWSzKhJPtVEvJogEqqs3VcsifJT7nZg=;
+	b=JGzWjT6JFY44F9HuG73zfC+XVXSpyEZnpQCAqiavnVJaex4OmR07wPNEUXLEBK3aPPNASb
+	DTaTB1gZFE+DJer/o51vsb0HNic3DYvivGyJhMpU+pMvEA5BzK1/RIXnL5VmsY2pUK7A4X
+	JJbm37DGkbr6iy5wEYEwqu+Km41BUrY=
+Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
+ [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-511-xcQN5G4iOSK2sJQjXHkS9A-1; Mon, 15 Sep 2025 21:48:51 -0400
+X-MC-Unique: xcQN5G4iOSK2sJQjXHkS9A-1
+X-Mimecast-MFC-AGG-ID: xcQN5G4iOSK2sJQjXHkS9A_1757987330
+Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-5717bd64621so2091473e87.0
+        for <linux-block@vger.kernel.org>; Mon, 15 Sep 2025 18:48:51 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757987330; x=1758592130;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=UM/63QbNRNL2CWSzKhJPtVEvJogEqqs3VcsifJT7nZg=;
+        b=WP9walY4ypHqomupH8mfOzrE6Nr6mz6stGf6WGUgGfbb0afK72VOit5b0yqkSKx4Yw
+         jHyC3CYPs0cOWFqHkVewRYN2J2+krEDKNr8xg/djGzJvRIVgj9zqph6bQYUO9odLus0B
+         /gH7FJPK3s0yzrCMKyA5JGd7/Z/qOwI1W5/7mCztFf4O0HoYQpMDuAPeVFNGL1v0MaaJ
+         2sz4AR8ATmiMKJZPGTku026Et3xOunlt/PCxmK2cte3rzt0uAiQ0nFhnTJhGOIA//flE
+         7EecBiifyKX3k4Q6DcwSLFj7QiBKBHkdZD0lG0VoaYMiKXhXaofTzEycf3Wvl+sOvNcm
+         eAEg==
+X-Forwarded-Encrypted: i=1; AJvYcCV3bPQr4/7KH52eYJKRALUA5qV6ULzClAl/RHhLEve1MX/m5U5oUG6G7S5OYCNSW9Y81tD8lFaO/t1g5Q==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx/rce9Zr94cqJvCKDICWt5WIbgmiAc3afAR17ImvrSKXMlcqXD
+	gRVevdcizyQGMivS4TElYzFgfypM841PcygMOml1ygSKtzkdxY5D8aZRzTXNd0vonweN80lyu+v
+	ZBFS5aJrY7U5RZtHFO8vej/LWmJPEqY6ggm744D8JnidTHve07dTNn7u8UX0C0GJla8GPRRKg4z
+	NvTdevdArHrYQQs0xWfZyefkaa6kN8EeaL6L9t3EI=
+X-Gm-Gg: ASbGncvNmRRNZbGnxI9xoFXkPn0tlADFfmh88o3s9dvKQ6WS00ZbOaUC8+Hbo9Ly40W
+	BXU1wV3YPCx2aLYUE8XJT09oxal2cRyhOACWEiY1lAbIBI2oqD3GLGFEsFuRCWX3RSeivXYqXgB
+	D4HxyV/Db06m3Mitx5z8A9/A==
+X-Received: by 2002:a05:6512:3f21:b0:563:d896:2d14 with SMTP id 2adb3069b0e04-5704f7a3535mr4252944e87.36.1757987330043;
+        Mon, 15 Sep 2025 18:48:50 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGi0qyrJSXhatUAjAN5GaSbgChEfkulnz/zBRoEI09ayrVbCpTRhDlFRFU2ScIQdlOHU/dANXpgiKsiuT/Fm5k=
+X-Received: by 2002:a05:6512:3f21:b0:563:d896:2d14 with SMTP id
+ 2adb3069b0e04-5704f7a3535mr4252904e87.36.1757987329545; Mon, 15 Sep 2025
+ 18:48:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgDXIY4ku8hoMgGcCg--.12643S4
-X-Coremail-Antispam: 1UD129KBjvJXoW7Cw1xZrWrKr4rCFy5AFyxXwb_yoW8XF15pF
-	W5Zw4UKry5CFnrWayUtr13uFW0ka97JryrJ3s0yr4SkrW2kw18twnFvw1UCF4kAFs2yF4f
-	Zr1rtry0yF1qkFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9Y14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
-	Y2ka0xkIwI1lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x
-	0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2
-	zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF
-	4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWU
-	CwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCT
-	nIWIevJa73UjIFyTuYvjfUonmRUUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+References: <20250912223937.3735076-1-safinaskar@zohomail.com>
+In-Reply-To: <20250912223937.3735076-1-safinaskar@zohomail.com>
+From: Dave Young <dyoung@redhat.com>
+Date: Tue, 16 Sep 2025 09:48:40 +0800
+X-Gm-Features: AS18NWBkCHbtMZDfiuZiXnfW8KzozFHrUJlGejiASEzNumvZVB8NmHoE7UrrQwg
+Message-ID: <CALu+AoRt5wEgx-=S263CReDf8FmLWwjs8dF9cX4_jFcMUkuujQ@mail.gmail.com>
+Subject: Re: [PATCH 00/62] initrd: remove classic initrd support
+To: Askar Safin <safinaskar@zohomail.com>
+Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Linus Torvalds <torvalds@linux-foundation.org>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Christian Brauner <brauner@kernel.org>, 
+	Al Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@lst.de>, 
+	Jens Axboe <axboe@kernel.dk>, Andy Shevchenko <andy.shevchenko@gmail.com>, 
+	Aleksa Sarai <cyphar@cyphar.com>, =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>, 
+	Julian Stecklina <julian.stecklina@cyberus-technology.de>, 
+	Gao Xiang <hsiangkao@linux.alibaba.com>, Art Nikpal <email2tema@gmail.com>, 
+	Andrew Morton <akpm@linux-foundation.org>, Eric Curtin <ecurtin@redhat.com>, 
+	Alexander Graf <graf@amazon.com>, Rob Landley <rob@landley.net>, 
+	Lennart Poettering <mzxreary@0pointer.de>, linux-arch@vger.kernel.org, 
+	linux-alpha@vger.kernel.org, linux-snps-arc@lists.infradead.org, 
+	linux-arm-kernel@lists.infradead.org, linux-csky@vger.kernel.org, 
+	linux-hexagon@vger.kernel.org, loongarch@lists.linux.dev, 
+	linux-m68k@lists.linux-m68k.org, linux-mips@vger.kernel.org, 
+	linux-openrisc@vger.kernel.org, linux-parisc@vger.kernel.org, 
+	linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org, 
+	linux-s390@vger.kernel.org, linux-sh@vger.kernel.org, 
+	sparclinux@vger.kernel.org, linux-um@lists.infradead.org, x86@kernel.org, 
+	Ingo Molnar <mingo@redhat.com>, linux-block@vger.kernel.org, initramfs@vger.kernel.org, 
+	linux-api@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-efi@vger.kernel.org, linux-ext4@vger.kernel.org, 
+	"Theodore Y . Ts'o" <tytso@mit.edu>, linux-acpi@vger.kernel.org, Michal Simek <monstr@monstr.eu>, 
+	devicetree@vger.kernel.org, Luis Chamberlain <mcgrof@kernel.org>, Kees Cook <kees@kernel.org>, 
+	Thorsten Blum <thorsten.blum@linux.dev>, Heiko Carstens <hca@linux.ibm.com>, patches@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-From: Yu Kuai <yukuai3@huawei.com>
+Hi,
 
-Tightening the throttle activation check in blk_throtl_activated() to
-require both q->td presence and policy bit set introduced a memory leak
-during disk release:
+On Sat, 13 Sept 2025 at 06:42, Askar Safin <safinaskar@zohomail.com> wrote:
+>
+> Intro
+> ====
+> This patchset removes classic initrd (initial RAM disk) support,
+> which was deprecated in 2020.
+> Initramfs still stays, and RAM disk itself (brd) still stays, too.
 
-blkg_destroy_all() clears the policy bit first during queue deactivation,
-causing subsequent blk_throtl_exit() to skip throtl_data cleanup when
-blk_throtl_activated() fails policy check.
+There is one initrd use case in my mind, it can be extended to co-work
+with overlayfs as a kernel built-in solution for initrd(compressed fs
+image)+overlayfs.   Currently we can use compressed fs images
+(squashfs or erofs) within initramfs,  and kernel loop mount together
+with overlayfs, this works fine but extra pre-mount phase is needed.
 
-Fix by reordering operations in disk_release() to call blk_throtl_exit()
-while throttle policy is still active. We avoid modifying blk_throtl_exit()
-activation check because it's intuitive that blk-throtl start from
-blk_throtl_init() and end in blk_throtl_exit().
-
-Fixes: bd9fd5be6bc0 ("blk-throttle: fix access race during throttle policy activation")
-Reported-by: Yi Zhang <yi.zhang@redhat.com>
-Closes: https://lore.kernel.org/all/CAHj4cs-p-ZwBEKigBj7T6hQCOo-H68-kVwCrV6ZvRovrr9Z+HA@mail.gmail.com/
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
- block/blk-cgroup.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 7246fc256315..64a56c8697f9 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -1539,8 +1539,8 @@ int blkcg_init_disk(struct gendisk *disk)
- 
- void blkcg_exit_disk(struct gendisk *disk)
- {
--	blkg_destroy_all(disk);
- 	blk_throtl_exit(disk);
-+	blkg_destroy_all(disk);
- }
- 
- static void blkcg_exit(struct task_struct *tsk)
--- 
-2.39.2
+Thanks
+Dave
 
