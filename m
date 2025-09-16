@@ -1,73 +1,190 @@
-Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C78131C75E2;
-	Tue, 16 Sep 2025 04:55:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.89.141.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23A0E2E36FB
+	for <linux-block@vger.kernel.org>; Tue, 16 Sep 2025 07:27:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757998523; cv=none; b=X8y08rTIdxw2MbsmPWVU1xf3X1UfXGyjBVbIzxI7tMh0gWbyUGZBCXzAb5dWWNAlrO6cCB5UqSFcGQ+AXeuVAAWlKFYdW6TXfinbvZrclzCUEv0mxLI1g6pBZghXmFLmPjo7YtZw1XsJ2pL/rDjT7vDsY2AHZ9a3prZfEVaeKZw=
+	t=1758007660; cv=none; b=gLyaGQrD0BWvldQ8RPYxITpExkQ0P7KeIvlkRXFbXp5Ta1wqFCqSAGJpWQhIn1ffCpWy7tWI1C6N7P+RdFRKESEjGTv9EQQSqMaKWJ0PwEiODwNLYXQe6caEerHuZB8JH/Jl/WeL32p3lJC8Oi5uEIOvAgL7QgSoWVVWJeyMkd8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757998523; c=relaxed/simple;
-	bh=StiPQtnvbkOQeER7YWId2jlb+ZLI0M7NP2wd91RD+B4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EmlAd0M0joeHKoZmWRoFuDkoUwT2NbOX1MrWFkG/js8AbW9E/gKkBG6tdHVPtUbYG/SpRYXnjuIytJilHvrQG+MLSOwVK/XGC0PGuzuWiip4HN+iHY/CuW/rrwub1NO4fZ0qnyspdfrmbazirNBSfJ56QsS46mfdbNv9l1iHzrY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=vJo1rW7o; arc=none smtp.client-ip=62.89.141.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
+	s=arc-20240116; t=1758007660; c=relaxed/simple;
+	bh=F9b2EyhEO6rGTgADu2vlV7ZYUMvWMAZOSNB2YByeOEQ=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=HbMXlfDxPXuDxvnSBO85qTsoL/5sl9ez0cftfSO/NfwnQ8tmIG0K3VO8nHkmaT4yTqxwFsosi1LsrOC85k7rjpPQHRcSJXpNASjfYoW87lLvc6A3G+AkHSuubjWCeYcBfkF8cbATM7y74N8VdOpjplV3bkcXMNetAUsjcHal4gk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=cK6bTLES; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="vJo1rW7o"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=StiPQtnvbkOQeER7YWId2jlb+ZLI0M7NP2wd91RD+B4=; b=vJo1rW7olNwfuNc5FR0pjMX6/9
-	qC+ZZ61UqHO7M9LtWzS3LWXKjnfcvuwaOa5Qc8Y6b7q3DhI5HpAV7gvAUIzHnHeCynmW4WfTIOl0g
-	nINC1N8m7RIt6nq8NnqUfHa4tvWhP6vp1LnBAJ93G8FU5DvWFNZvi0SprrHKQxpeBEERwzleTPUWL
-	Ff3hVuMyE/7X5j7QIxvW4Ju5dBbQFuk9B0Je8gRsA6dmzOreHhHY0uzFKMfrRoemNejTtQiFwfDy9
-	N/3en7D+hJGJhpeBshYW5pbFaIHSjQieAExsjN1iYKs3c4idvVqx5lcJZHm0UFFCOVnmrpLzjnCty
-	p7K951cg==;
-Received: from viro by zeniv.linux.org.uk with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1uyNio-00000006Zf2-2k8M;
-	Tue, 16 Sep 2025 04:55:18 +0000
-Date: Tue, 16 Sep 2025 05:55:18 +0100
-From: Al Viro <viro@zeniv.linux.org.uk>
-To: Christian Brauner <brauner@kernel.org>
-Cc: Jan Kara <jack@suse.cz>, Amir Goldstein <amir73il@gmail.com>,
-	linux-fsdevel@vger.kernel.org, Josef Bacik <josef@toxicpanda.com>,
-	Jeff Layton <jlayton@kernel.org>, Mike Yuan <me@yhndnzj.com>,
-	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>,
-	Lennart Poettering <mzxreary@0pointer.de>,
-	Daan De Meyer <daan.j.demeyer@gmail.com>,
-	Aleksa Sarai <cyphar@cyphar.com>, Jens Axboe <axboe@kernel.dk>,
-	Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>,
-	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Chuck Lever <chuck.lever@oracle.com>, linux-nfs@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, cgroups@vger.kernel.org,
-	netdev@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [PATCH v2 00/33] ns: support file handles
-Message-ID: <20250916045518.GQ39973@ZenIV>
-References: <20250912-work-namespace-v2-0-1a247645cef5@kernel.org>
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cK6bTLES"
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-266fa7a0552so16636545ad.3
+        for <linux-block@vger.kernel.org>; Tue, 16 Sep 2025 00:27:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1758007658; x=1758612458; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=YdzUgBNm+Fykgerb+7FYicUv4mSP6WHZUtexZFjMOI8=;
+        b=cK6bTLESUs2Iulj9mXcczqVlJ0+e9+ajybZFCW8UX16X85+39TkvjfVaesdgUNATw5
+         6MJDXn+xPw384Z944YQ95XQwseK4ggaI0WRbswSw8JcnLRIW/bXDy6d12IWsRexJ+pgs
+         t6qByrq2zQ9ThoAM08OnN6/ReaNqq4KPN0Cjxy1RKvEt8C1b1a69/fWhN7alO8Ss1+hO
+         NQhCWvAetHG/BCQ3U10Oqnpq41GcCMaG2aKTqYaf6TAf6I5cR8UwkjXXHB9y9WZ4bjeM
+         MKBxsP658VKTDpra8iI0uVWskCkkjj75Dnoxu4BVr+9/f98YA9nj6jbZjptDPBXQhAVp
+         /nmA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758007658; x=1758612458;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=YdzUgBNm+Fykgerb+7FYicUv4mSP6WHZUtexZFjMOI8=;
+        b=Ig3FjFzz9G7otO4YyYjOvk1xLaTIfHox2zEQiersCArhdiJ9A1gK0c/6YbcFrl34MG
+         vfJZUyZtO7JLrllMfxrXc3V0Rhef1MUfFT6VPWmARgl02TB0NTsiPQHsKt8gEUCJ4Hyg
+         SF9786u0ahZLWmA1Vn8fM3u84J5Vu6OdPQAtmwJ/ASz8CCalw1rmoBka6lm5ZYvGNYcg
+         rVlzQf+h+xQxLft4ueM/t+j4wrUoajZizOGt1R4Ahz/jgwGhH6QfocjRk/uL7+vnDn/V
+         CiG4d2BRUT1zXEqOk4CesVZ+57jzvWBfGfpZKNT22xM/su8qlcDky+oD5M5T5cJB3/QG
+         OPZg==
+X-Gm-Message-State: AOJu0YzxxfDZU89ewQL43hY6e7IdCKmqSv+tmh7a6zV3RM+kere9Y0Cs
+	U34+we1hbPB/xTMr7ChssEfDShnYPafF6QbKaYdSCTyvSq0VGUERIqGtpNa15RqdiDplFGF/pHK
+	n7xU+vZweE4NnZcUEyVDyn87GplCIwQ+gaVzdLFq3AWIsAX8/KZDe0uI=
+X-Gm-Gg: ASbGncvxABiRYsbY0+yA9tTlZ+byw04222fObTAzJofqq7LHPIzxOQq3Cs1jiocjye7
+	CTS6fl4qaUmqhm9hM0D35ogzC3HlnNzStPy+J6yOek92M4Lanis//HmULsTPmOmzT1nEhkfbcSV
+	hwHxwntYIFcCPo1fm29/+l1FN0qVY4DQDHmdkRxIUdzsSMhKL7DNwzqFiYQFftWi77Obl6HHQWM
+	nE77GyLXtB9wXGwADApz66vHHs7ryZ+echNAQlfCu4cgezV3yNKc3nSASkbKmO060Z6ILG4
+X-Google-Smtp-Source: AGHT+IGaVagTx8hEuPpGoL7AEHAise+m6cLY73KC6Dl72g9vxKRp51S5NCherF7SA2OcxJNUcL1e+yLHf56LlaRQ9wY=
+X-Received: by 2002:a17:902:d58a:b0:264:c48:9cae with SMTP id
+ d9443c01a7336-2640c489f42mr117753185ad.38.1758007658046; Tue, 16 Sep 2025
+ 00:27:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250912-work-namespace-v2-0-1a247645cef5@kernel.org>
-Sender: Al Viro <viro@ftp.linux.org.uk>
+From: Naresh Kamboju <naresh.kamboju@linaro.org>
+Date: Tue, 16 Sep 2025 12:57:26 +0530
+X-Gm-Features: AS18NWAma5_BQDQUJLHrWh8m4zqOKBnCdl8KRwcCODUf5Yb_JGvr-6H4NUsMNP4
+Message-ID: <CA+G9fYuFdesVkgGOow7+uQpw-QA6hdqBBUye8CKMxGAiwHagOA@mail.gmail.com>
+Subject: next-20250915: LTP chdir01 df01_sh stat04 tst_device.c:97: TBROK:
+ Could not stat loop device 0
+To: linux-block <linux-block@vger.kernel.org>, linux-fsdevel@vger.kernel.org, 
+	LTP List <ltp@lists.linux.it>, open list <linux-kernel@vger.kernel.org>, 
+	lkft-triage@lists.linaro.org, Linux Regressions <regressions@lists.linux.dev>
+Cc: Christian Brauner <brauner@kernel.org>, chrubis <chrubis@suse.cz>, Petr Vorel <pvorel@suse.cz>, 
+	Arnd Bergmann <arnd@arndb.de>, Dan Carpenter <dan.carpenter@linaro.org>, 
+	Al Viro <viro@zeniv.linux.org.uk>, Amir Goldstein <amir73il@gmail.com>, Jan Kara <jack@suse.cz>, 
+	"Martin K. Petersen" <martin.petersen@oracle.com>, Anuj Gupta <anuj20.g@samsung.com>, 
+	Kanchan Joshi <joshi.k@samsung.com>, Anders Roxell <anders.roxell@linaro.org>, 
+	Ben Copeland <benjamin.copeland@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Sep 12, 2025 at 01:52:23PM +0200, Christian Brauner wrote:
+The following LTP chdir01 df01_sh and stat04 tests failed on the rock-pi-4b
+qemu-arm64 on the Linux next-20250915 tag build.
 
-A nit on whatever script you are using:
+First seen on next-20250915
+Good: next-20250912
+Bad: next-20250915
 
-base-commit: 8f5ae30d69d7543eee0d70083daf4de8fe15d585
+Regression Analysis:
+- New regression? yes
+- Reproducibility? yes
 
-is less convenient than
+* rk3399-rock-pi-4b, ltp-smoke
+* qemu-arm64, ltp-smoke
+* qemu-arm64-compat, ltp-smoke
+ - chdir01
+  - df01_sh
+  - stat04
 
-base-commit: 8f5ae30d69d7543eee0d70083daf4de8fe15d585 (v6.17-rc1)
+Test regression: next-20250915: LTP chdir01 df01_sh stat04
+tst_device.c:97: TBROK: Could not stat loop device 0
+
+Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
+
+## Test log
+<8>[   53.655971] <LAVA_SIGNAL_STARTTC chdir01>
+tst_buffers.c:57: TINFO: Test is using guarded buffers
+tst_tmpdir.c:316: TINFO: Using /tmp/LTP_chdm4pHJb as tmpdir (tmpfs filesystem)
+tst_device.c:98: TINFO: Found free device 0 '/dev/loop0'
+tst_test.c:1953: TINFO: LTP version: 20250530
+tst_test.c:1956: TINFO: Tested kernel: 6.17.0-rc6-next-20250915 #1 SMP
+PREEMPT @1757983656 aarch64
+tst_kconfig.c:88: TINFO: Parsing kernel config '/proc/config.gz'
+tst_kconfig.c:676: TINFO: CONFIG_TRACE_IRQFLAGS kernel option detected
+which might slow the execution
+tst_test.c:1774: TINFO: Overall timeout per run is 0h 28m 48s
+tst_supported_fs_types.c:97: TINFO: Kernel supports ext2
+tst_supported_fs_types.c:62: TINFO: mkfs.ext2 does exist
+tst_supported_fs_types.c:97: TINFO: Kernel supports ext3
+tst_supported_fs_types.c:62: TINFO: mkfs.ext3 does exist
+tst_supported_fs_types.c:97: TINFO: Kernel supports ext4
+tst_supported_fs_types.c:62: TINFO: mkfs.ext4 does exist
+tst_supported_fs_types.c:128: TINFO: Filesystem xfs is not supported
+tst_supported_fs_types.c:97: TINFO: Kernel supports btrfs
+tst_supported_fs_types.c:62: TINFO: mkfs.btrfs does exist
+tst_supported_fs_types.c:105: TINFO: Skipping bcachefs because of FUSE blacklist
+tst_supported_fs_types.c:97: TINFO: Kernel supports vfat
+tst_supported_fs_types.c:62: TINFO: mkfs.vfat does exist
+tst_supported_fs_types.c:128: TINFO: Filesystem exfat is not supported
+tst_supported_fs_types.c:132: TINFO: FUSE does support ntfs
+tst_supported_fs_types.c:62: TINFO: mkfs.ntfs does exist
+tst_supported_fs_types.c:97: TINFO: Kernel supports tmpfs
+tst_supported_fs_types.c:49: TINFO: mkfs is not needed for tmpfs
+tst_test.c:1888: TINFO: === Testing on ext2 ===
+tst_device.c:391: TWARN: Failed to clear 512k block on /dev/loop0
+tst_test.c:1217: TBROK: tst_clear_device() failed
+Summary:
+passed   0
+failed   0
+broken   1
+skipped  0
+warnings 1
+tst_device.c:283: TWARN: open(/dev/loop0) failed: ENOENT (2)
+<8>[   53.679564] <LAVA_SIGNAL_ENDTC chdir01>
+<8>[   53.708246] <LAVA_SIGNAL_TESTCASE TEST_CASE_ID=chdir01 RESULT=fail>
+
+<8>[   53.933883] <LAVA_SIGNAL_STARTTC stat04>
+tst_buffers.c:57: TINFO: Test is using guarded buffers
+tst_tmpdir.c:316: TINFO: Using /tmp/LTP_staPDxElt as tmpdir (tmpfs filesystem)
+tst_device.c:97: TBROK: Could not stat loop device 0
+Summary:
+passed   0
+failed   0
+broken   1
+skipped  0
+warnings 0
+<8>[   53.947889] <LAVA_SIGNAL_ENDTC stat04>
+<8>[   53.974024] <LAVA_SIGNAL_TESTCASE TEST_CASE_ID=stat04 RESULT=fail>
+
+<8>[   54.048075] <LAVA_SIGNAL_STARTTC df01_sh>
+df01 1 TINFO: Running: df01.sh
+df01 1 TINFO: Tested kernel: Linux
+runner-j2nyww-sk-project-40964107-concurrent-0
+6.17.0-rc6-next-20250915 #1 SMP PREEMPT @1757983656 aarch64 GNU/Linux
+df01 1 TINFO: Using /tmp/LTP_df01.7pcwUXe1CN as tmpdir (tmpfs filesystem)
+tst_device.c:97: TBROK: Could not stat loop device 0
+df01 1 TBROK: Failed to acquire device
+Summary:
+passed   0
+failed   0
+broken   1
+skipped  0
+warnings 0
+<8>[   54.060936] <LAVA_SIGNAL_ENDTC df01_sh>
+<8>[   54.087630] <LAVA_SIGNAL_TESTCASE TEST_CASE_ID=df01_sh RESULT=fail>
+
+## Source
+* Kernel version: 6.17.0-rc6
+* Git tree: https://kernel.googlesource.com/pub/scm/linux/kernel/git/next/linux-next.git
+* Git describe: 6.17.0-rc6-next-20250915
+* Git commit: c3067c2c38316c3ef013636c93daa285ee6aaa2e
+* Architectures: arm64
+* Toolchains: gcc-13 and gcc-8
+* Kconfigs: lkftconfigs
+
+## Build
+* Test log: https://qa-reports.linaro.org/api/testruns/29896973/log_file/
+* Test details:
+https://regressions.linaro.org/lkft/linux-next-master/next-20250915/ltp-smoke/stat04/
+* Test plan: https://tuxapi.tuxsuite.com/v1/groups/linaro/projects/lkft/tests/32l4Vv9hKep2EcmS18u3NBtmoAm
+* Build link: https://storage.tuxsuite.com/public/linaro/lkft/builds/32l4UF8KltAzu6kUpW3hXaYRWjZ/
+* Kernel config:
+https://storage.tuxsuite.com/public/linaro/lkft/builds/32l4UF8KltAzu6kUpW3hXaYRWjZ/config
+
+--
+Linaro LKFT
