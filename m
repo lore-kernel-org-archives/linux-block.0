@@ -1,85 +1,136 @@
-Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ABBA21A420;
-	Mon, 15 Sep 2025 22:59:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.89.141.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6B045C96;
+	Tue, 16 Sep 2025 00:49:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757977149; cv=none; b=O4w5DHWSEmb8HCXc90tM8yynhOwk6/nLsW0T1P28OcFfCUrGlyDq+iWUZVmk8yXx9PMcekV2SG61wJ7zeUDG3cl8/bVeaNuwhkbwAlPaL0JeXnS3BAqvNqsj1kFE9Lj0R7b9s44i9+WFZxrygRZG56ymELC/Cj8EYfIz290dU6k=
+	t=1757983765; cv=none; b=gQBZ2ZrJHc/mVo4UyXnnOl3puSXwrhOxXpWgW1n3hIBZK5s6dGXXY6vezvtuIfgOuqgL13L6muQFfT85em36tWNGB7HwvYPPPPdmgaDIqbkKzZYo7EI4mC1+x/jnT7GsTyv4ljFoiZneR8z/P/Elok8oAl3OgDGsXBVFm+VJhOc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757977149; c=relaxed/simple;
-	bh=1/okIRx6o6vXJ31CVPKT9oMoMrLI+nwNYwzkdKXP1jw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LLmOal2Iy6ZxqK42X3cpO1nW586wmBXSu03AbyWhNsEU26Fig35XfF7Yd/5efBjB3Yo91IDHOhvoCQiVgxzeLTALH+ZXshTRhNxy/O1e85SapjlqR5aF6UlxqdwochCPFDtdKSniH/iTzU1cDgtnyZQIL8cDU7qg0MmsaUkXMHI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=KRInvItP; arc=none smtp.client-ip=62.89.141.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="KRInvItP"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=mdyKMuWGpTGQ0ttuPEqL6sr1d5oGlQeSkZeqJKPbKkQ=; b=KRInvItPTiQ7sozyuVsD7co6HF
-	vxfW8ElvkU/dhOCccE2SPJnhwzjpdgiOudDzvaWosTn2ujITQSuhw7alUhf6nk27jQ62/s1P4Z6a2
-	Nu/Y0ZoYsh5JhxpXdsgsugp+acqkD/MgSbHBi0BrV+0J2JdPCPa2X9GoHVyQ2TVK/3Svjx8ag6WFY
-	StuNrAayldaXINOzw97HMRjLYeSQ7d0qfCww1rnvlxGC93WoQiJ/jesCwguey8dI9yVKzoy6kbnsk
-	nR22zsssC3HmfdCm/v0STAhQTazT3X4Zquqfw2qfLCRjHftac+ivCetImKyTataYaGh/WZrTwjYmR
-	4gui8AyQ==;
-Received: from viro by zeniv.linux.org.uk with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1uyIA2-00000001xLm-0jr3;
-	Mon, 15 Sep 2025 22:59:02 +0000
-Date: Mon, 15 Sep 2025 23:59:02 +0100
-From: Al Viro <viro@zeniv.linux.org.uk>
-To: Christian Brauner <brauner@kernel.org>
-Cc: Jan Kara <jack@suse.cz>, Amir Goldstein <amir73il@gmail.com>,
-	linux-fsdevel@vger.kernel.org, Josef Bacik <josef@toxicpanda.com>,
-	Jeff Layton <jlayton@kernel.org>, Mike Yuan <me@yhndnzj.com>,
-	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>,
-	Lennart Poettering <mzxreary@0pointer.de>,
-	Daan De Meyer <daan.j.demeyer@gmail.com>,
-	Aleksa Sarai <cyphar@cyphar.com>, Jens Axboe <axboe@kernel.dk>,
-	Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>,
-	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Chuck Lever <chuck.lever@oracle.com>, linux-nfs@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, cgroups@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v2 11/33] net: use ns_common_init()
-Message-ID: <20250915225902.GK39973@ZenIV>
-References: <20250912-work-namespace-v2-0-1a247645cef5@kernel.org>
- <20250912-work-namespace-v2-11-1a247645cef5@kernel.org>
+	s=arc-20240116; t=1757983765; c=relaxed/simple;
+	bh=X/pFC3va19rRg+gk9IqHnYcd8NlNCqdJD2INmemQlIQ=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=QfKqVOg8AIKAtt7xptEf3Pe3cZiaoptQESXo1SFs8wTzeE2jY9SVEfzOKMH/+NkEFvQvZo7d2W7tGwcLMe3DC+1aZJbxn4EKMcwGZrIGBGsvD58nO9oyn2/dJS9IELt6H98qAQ7pD9ZAm8/1/qgOjfkcj0nixKx7SbgJMYolWgY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.93.142])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4cQjvx38XNzKHMVH;
+	Tue, 16 Sep 2025 08:49:17 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 0DF5E1A0FC4;
+	Tue, 16 Sep 2025 08:49:18 +0800 (CST)
+Received: from [10.174.179.143] (unknown [10.174.179.143])
+	by APP4 (Coremail) with SMTP id gCh0CgDXIY4JtMhoI46ZCg--.11965S3;
+	Tue, 16 Sep 2025 08:49:15 +0800 (CST)
+Subject: Re: [PATCH v2 0/2] Fix the initialization of
+ max_hw_wzeroes_unmap_sectors for stacking drivers
+To: John Garry <john.g.garry@oracle.com>, Zhang Yi
+ <yi.zhang@huaweicloud.com>, axboe@kernel.dk, linux-raid@vger.kernel.org
+Cc: linux-block@vger.kernel.org, drbd-dev@lists.linbit.com,
+ linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+ pmenzel@molgen.mpg.de, hch@lst.de, martin.petersen@oracle.com,
+ yi.zhang@huawei.com, yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
+References: <20250910111107.3247530-1-yi.zhang@huaweicloud.com>
+ <c7dd117e-6e3e-4b2d-a890-20f5c4bade2f@huaweicloud.com>
+ <370ca2e5-a4b2-4b5d-9fd1-a931dc2d1a6b@oracle.com>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <44590d08-2127-e44d-d4f8-6ae9237dd53c@huaweicloud.com>
+Date: Tue, 16 Sep 2025 08:49:13 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250912-work-namespace-v2-11-1a247645cef5@kernel.org>
-Sender: Al Viro <viro@ftp.linux.org.uk>
+In-Reply-To: <370ca2e5-a4b2-4b5d-9fd1-a931dc2d1a6b@oracle.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgDXIY4JtMhoI46ZCg--.11965S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7WFy3Gw4fXw1DGry7Gw1xZrb_yoW8Cw4xpF
+	Z7Wa4jyryUKr48Ar1jqF12vFy5tw1fJ347XrW5Xan3XrWqvFyIgF409FZ0grnrXw4rGa4j
+	qF1UG3s3uw13trDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU92b4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
+	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
+	x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
+	0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7I2V7IY0VAS
+	07AlzVAYIcxG8wCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4
+	IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1r
+	MI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJV
+	WUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j
+	6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYx
+	BIdaVFxhVjvjDU0xZFpf9x07UAwIDUUUUU=
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On Fri, Sep 12, 2025 at 01:52:34PM +0200, Christian Brauner wrote:
+Hi,
 
-> +	ret = ns_common_init(&net->ns, ns_ops, false);
-					       ^^^^^
-> +	if (ret)
-> +		return ret;
+在 2025/09/15 18:43, John Garry 写道:
+> On 12/09/2025 07:16, Zhang Yi wrote:
+>> Hi, Jens!
+>>
+>> Can you take this patch set through the linux-block tree?
+> 
+> 
+> md raid maintainers,
+> 
+> please try to get this picked up ASAP. As things stand, all these RAID 
+> personalities will be broken for 6.17 on drives supporting/reporting 
+> write zeroes.
+> 
 
-How would that possibly fail?  You are not trying to grab inum here,
-what's there to fail?
+Not sure if Jens missed this, I'll pick patch 1 later today if Jens
+doesn't apply.
 
-> @@ -559,7 +572,9 @@ struct net *copy_net_ns(unsigned long flags,
->  		goto dec_ucounts;
->  	}
->  
-> -	preinit_net(net, user_ns);
-> +	rv = preinit_net(net, user_ns);
-> +	if (rv < 0)
-> +		goto dec_ucounts;
+Thanks,
+Kuai
 
-Ditto.
+> Thanks
+> 
+>>
+>> Thanks,
+>> Yi.
+>>
+>> On 9/10/2025 7:11 PM, Zhang Yi wrote:
+>>> From: Zhang Yi <yi.zhang@huawei.com>
+>>>
+>>> Changes since v1:
+>>>   - Improve commit messages in patch 1 by adding a simple reproduction
+>>>     case as Paul suggested and explaining the implementation differences
+>>>     between RAID 0 and RAID 1/10/5, no code changes.
+>>>
+>>> v1: 
+>>> https://urldefense.com/v3/__https://lore.kernel.org/linux-block/20250825083320.797165-1-yi.zhang@huaweicloud.com/__;!!ACWV5N9M2RV99hQ!JAN4eq3ePrspeto0Hn7563lg3392Lh44jM1oTbgxbDoClxVOh5B73QhGD53f9tiLxuxfJCr51PyAP55COV2TTZAt$ 
+>>>
+>>>
+>>> This series fixes the initialization of max_hw_wzeroes_unmap_sectors in
+>>> queue_limits for all md raid and drbd drivers, preventing
+>>> blk_validate_limits() failures on underlying devices that support the
+>>> unmap write zeroes command.
+>>>
+>>> Best regards,
+>>> Yi.
+>>>
+>>> Zhang Yi (2):
+>>>    md: init queue_limits->max_hw_wzeroes_unmap_sectors parameter
+>>>    drbd: init queue_limits->max_hw_wzeroes_unmap_sectors parameter
+>>>
+>>>   drivers/block/drbd/drbd_nl.c | 1 +
+>>>   drivers/md/md-linear.c       | 1 +
+>>>   drivers/md/raid0.c           | 1 +
+>>>   drivers/md/raid1.c           | 1 +
+>>>   drivers/md/raid10.c          | 1 +
+>>>   drivers/md/raid5.c           | 1 +
+>>>   6 files changed, 6 insertions(+)
+>>>
+>>
+>>
+> 
+> 
+> .
+> 
+
