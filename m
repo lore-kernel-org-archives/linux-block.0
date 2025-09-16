@@ -1,72 +1,73 @@
-Received: from mail-pl1-f230.google.com (mail-pl1-f230.google.com [209.85.214.230])
+Received: from mail-pg1-f228.google.com (mail-pg1-f228.google.com [209.85.215.228])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80B11281508
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80A9B27F74B
 	for <linux-block@vger.kernel.org>; Tue, 16 Sep 2025 22:06:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.230
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.228
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758060372; cv=none; b=lXQhyYxl653hpgXYaYQBRapBsXqzBgq0dXlGOr9cuYs7/qoiT9Lx8qDlNakXku5qdyXLKTHBQ4h2MlCUgttbtkV1VtIWqoETu7khTnlr1thr2EqzOB6/IfrsGxuGltPalqEZ1ME3sUeBMeY/pJY0BzsCtIGusfwOB87dnhZhht0=
+	t=1758060372; cv=none; b=EM9aGk7yz5YrLII5iqqaV+3AyZouXydSyneTRbHQVNjBTTJu05mMusWxTpNKJcrAcQ4by5ZMUo4lieJrgbsn3Zi5Hd7ZjvVFAE5/fc5/ckx3P3PK0Y11X/89damgbk6ReLccw9vFQN4dnM0jNzFKOEiWN5kLI95gw/wj6xCYoW0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1758060372; c=relaxed/simple;
-	bh=Dlk+Oewhzc94sbibKhlkOgC+Y4VS05JHCp7u906DoAo=;
+	bh=O6AFxv2rcQekB70jDscAE0h46bRh5B6ciyiol8NPklo=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=mbBTaJFn9ILCHPGxmfgfohAgTA+qLFAj0WqL3p12yFiDmjJcIvUV47/P2FEte5LyrymOj+S54PeB20S/sjuTO9HuyZaK22j1xRLfY4+AuOakG3aApaYng6+/BYHPpUGF/fw21NRAIt1Nq2BfoXsUGXVFlh2qKXrMqWy2Daw6K+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=GiEOpzmm; arc=none smtp.client-ip=209.85.214.230
+	 In-Reply-To:To:Cc; b=U7hDNoYZDwkgcnHiAc2v34v5G1A3CFXiP9uvPPZw/GDffmWXL98W2wsnuTt7F695A76UnmqMNnb1H2X25AJqv0UtmXrWBqiAo2RrUKSclZaxYgnvXKK9p25iVCIGT4nJCl6x6hDfP6pjhGJ8Zb2aR7lOAhm/Ucntk3p2u7fK0OI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=KgbTqTF6; arc=none smtp.client-ip=209.85.215.228
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="GiEOpzmm"
-Received: by mail-pl1-f230.google.com with SMTP id d9443c01a7336-244582738b5so50282735ad.3
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="KgbTqTF6"
+Received: by mail-pg1-f228.google.com with SMTP id 41be03b00d2f7-b4d1e7d5036so3960001a12.1
         for <linux-block@vger.kernel.org>; Tue, 16 Sep 2025 15:06:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=purestorage.com; s=google2022; t=1758060370; x=1758665170; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=YsZQAdC9OI0Rh5GwGUr4F2H2VDgxQJ1oYUQ+4QI9neI=;
-        b=GiEOpzmm146jS+vUcOSY7qfUF3ppLfDs5XrQ9048hXO9D8g3ZVFYdhcDW/VGm9YNb4
-         dsNilTqG0PRzVAEC6sff0cQfMaJK0NGm2U6Ci63mO7E/T1jmO59wsHCVMcz8MmHEQOIx
-         U2r9aQ9x9Z72eQ3qZ5T9hYUZq47M4ooBeJwqxUFym0PXpVhcT11Kc8pk4M1QZt0KlJQI
-         muQ2fJV7oFFJZxUQYvyzlRPs4NE0c/bzzxeG0Sj8k7w5w73sXiVh3hywVU/ahfUJKf5z
-         GD1Cr0CRyBN17/DFpSA6u5UlT3QNR89jtE6aC4PMpr1iGKDjK2HJwoMBDhrGYlS+w1l2
-         aukg==
+        bh=URU8cpb810BL84te6erVF0rZVZMOdMRIWlwwvewIU3Y=;
+        b=KgbTqTF6tVUPkFmJfbH2XBJ9uf3YITRO1ppHLk0ksS4pdQKHfc2MWvtwnLFzFP3Vp+
+         aL9N/n1q6prjlkEoSGYCijdRqYUcLCWJrJbbG7kLDxQVZEMNlLc9VZiA1nz12WOMf7WX
+         GQS6pfj7EvQvHDk3qgXkfQ0Qf+55mG9+BoJsFDPKeplOoP24kuFvsE5Kc614hoaXOO6n
+         BvF3f02WRWBxw8SeKf3ffhId+j5vGhLLcJ7FuPJphZfFjOQhkStwQCYDRDp7W7O7rcMn
+         IDpNEFcT+eucLg8YQWw6euo5MydBMRW3llBBjxv2ud/S63UuH+yJLii5JMDotNQEfJv1
+         oWWw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1758060370; x=1758665170;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=YsZQAdC9OI0Rh5GwGUr4F2H2VDgxQJ1oYUQ+4QI9neI=;
-        b=JSBF0V/bAkvHd9n2deKFfS5vksBLRe7vNhlqFKkSjwpTFXnLUTRxm+UoJRjHq3XMor
-         VPuTy0U5/F5HnPFH8K+pKaIZOacZ/YWfuvkZqc/TjAxwd7AQqQZzkGnbOeX/uKmx21H9
-         KQ+xCUs5RsdCQfvlJ9IXQS58uHjMFKniz5kcW/vqEGsaFCtq6NQASIMFkBdW1Xmxpq6K
-         xr/uSc+5ZJmGyC8c/iOAIoI7fP648jyARSW3Q2DwAU8X9qvfRrjucawRElcPzDfiXMw8
-         qOLrM8JLzzA8v8GXLCoQej6ppxGwGD0QlRsHfhP0llUZX+ivj0+r6c6nvwpx9LBU6GOF
-         zIqQ==
-X-Gm-Message-State: AOJu0YxXksg8NMFhy1r+NebJXRlIXal+1HC5m3ro6aKT3vDhrNI8X9Nm
-	jJ0xw5A2WzDRz2UsdEdTlf0nCQuX1XV8rO9mRdZbTDy2WOovlqQIrvDnGe6GNOn0YxRKoJLMpfv
-	ymcq99bybneVZ+s0dtn6lLeKK4VSmMpbpCKqYZlLmMlnEOBsJnU8C
-X-Gm-Gg: ASbGncv0XAcCWmYHX8rp+RE+HDSvZW71Cx70vH7ZQJFaXlx74G5kh9BR4sFvrd1b/Av
-	GQLCplZh/V1d6Ub2Sr1Bp9jPuCkoPLl3azsQTaRiZ0l3QjYG+tO5O6vFlsGVlD3RNPT3eb+lXCE
-	i0u/f0/hg1/Em1CcOI3/IOzXsNCytlryE30mVPSOHI8NrHLk8nR3mOTMl357hB6q8D41lOMlHVD
-	7TWEI8kiWPiTcYpFa3L+apG4Ec8FaD/E2e6nOPzX9aKujBhVFzZCvXOOFWjnhJZjOjsc5pbTJvd
-	HBNug/wY/EcqPXP+WDYm2zPqrtV4q26JmDuOmgBupZgWJ2Zz6ikFvfq2v9Q=
-X-Google-Smtp-Source: AGHT+IGiJoUhPEuZtFF4wpQYOfXhxSk41Sg03uqDc+U/rjhi5emgbi/g/GBhLda0R/YDZKF9WeQoPhy4MKQY
-X-Received: by 2002:a17:903:2985:b0:266:63de:eefc with SMTP id d9443c01a7336-26663defc4fmr95694425ad.14.1758060369683;
+        bh=URU8cpb810BL84te6erVF0rZVZMOdMRIWlwwvewIU3Y=;
+        b=ucSIf904XlG2CVzrjIwIl+bc4v+nIn/olA3X545zA0fQ4vdn4XacWLrAS8k3b0dAXx
+         qqCZGSBCH0BopmlL3cCNbZAklVN2quw45dJzDjfFi2RvHQBKApZMZ+BpkuG5BGJ9EsEt
+         ofdwalbc4EM2FyMZ3nFWeFhO5Abx5mwpMOAezsGFeIAEVCQP4EYfE62ePis5egrmkREi
+         JALk55ua0VD5eMAyz380h7g6hL47n7wa+O6ra2y/HfMLQ+/iHGjPpkS4CqqbXKVHQoQf
+         8QTM8BK+C9sc7N7GVnC2O6HEJNdtfd5VmOYbDqYTFAIBVvevj0FMa0klNGCcE3cs6ZVt
+         0fzQ==
+X-Gm-Message-State: AOJu0YzwQqxlBKk4Pahf1zmDpmATbtN9cfxvAN+c2vjpRbPD3bWHZROu
+	JxbdWxBr8K7/wUoiJa+QPR/9LZ12ZQHX2x3v0z8sGSS1N6QJFJ3EBhOZmnsmu8eUapKxs4lQnz8
+	UPfxg+rbJ5dQD5ZTl4/LCbXxV1JFspDYwWSjv
+X-Gm-Gg: ASbGncuLH3J0adyKb7OAB2FVLTgIPIJLbUucQAMjbybjIklva+zj/Ns02xP98qOeXKx
+	usuNzUlVQZtCkv3gH9laZhxTbnrppvnpFiivOQAc3miSbqcRPzIXrK0sLvcNZ0YOPXqqatAnRc6
+	QsIqsr9qDGDgZogP0y8cQYMGL6mKuxkfVUde3bc0NI9emAmItLmfxmE+1izUzME6J/0abqAv+cv
+	7tA9xH4FK7E0Fe0bKjuqvSnLxtq4ZRiKtHu8j9dlwIwEjmgGHd1iuN1cRTCUw7BFM+qZgErZi85
+	geZVwdFJbQ6APsU4wruA6BfEnt7S1UCvBB4tB2Hb8vNVnnAKw6wr+LVH/7atu1tO9oVIfE5nzA=
+	=
+X-Google-Smtp-Source: AGHT+IGhjrS0yeLgkgtHFsVSqkeM5EALRxY7xkF7ANB453NveU5cvNrdW/AhOprgzqEc6fqLFtySHktbSA6v
+X-Received: by 2002:a17:902:d48f:b0:266:702a:616b with SMTP id d9443c01a7336-266702a6ed5mr129310065ad.18.1758060369693;
         Tue, 16 Sep 2025 15:06:09 -0700 (PDT)
-Received: from c7-smtp-2023.dev.purestorage.com ([2620:125:9017:12:36:3:5:0])
-        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-265dc1db297sm8154155ad.26.2025.09.16.15.06.09
+Received: from c7-smtp-2023.dev.purestorage.com ([208.88.159.129])
+        by smtp-relay.gmail.com with ESMTPS id 98e67ed59e1d1-32ed2673d71sm63225a91.2.2025.09.16.15.06.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Tue, 16 Sep 2025 15:06:09 -0700 (PDT)
 X-Relaying-Domain: purestorage.com
 Received: from dev-ushankar.dev.purestorage.com (dev-ushankar.dev.purestorage.com [10.7.70.36])
-	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id C48DA34023F;
+	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id C5CEB340325;
 	Tue, 16 Sep 2025 16:06:08 -0600 (MDT)
 Received: by dev-ushankar.dev.purestorage.com (Postfix, from userid 1557716368)
-	id D4C4DE41772; Tue, 16 Sep 2025 16:06:08 -0600 (MDT)
+	id CBA08E41748; Tue, 16 Sep 2025 16:06:08 -0600 (MDT)
 From: Uday Shankar <ushankar@purestorage.com>
-Date: Tue, 16 Sep 2025 16:05:57 -0600
-Subject: [PATCH 3/3] selftests: ublk: add test to verify that feat_map is
- complete
+Date: Tue, 16 Sep 2025 16:05:56 -0600
+Subject: [PATCH 2/3] selftests: ublk: kublk: add UBLK_F_BUF_REG_OFF_DAEMON
+ to feat_map
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -75,7 +76,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250916-ublk_features-v1-3-52014be9cde5@purestorage.com>
+Message-Id: <20250916-ublk_features-v1-2-52014be9cde5@purestorage.com>
 References: <20250916-ublk_features-v1-0-52014be9cde5@purestorage.com>
 In-Reply-To: <20250916-ublk_features-v1-0-52014be9cde5@purestorage.com>
 To: Caleb Sander Mateos <csander@purestorage.com>, 
@@ -84,60 +85,27 @@ Cc: linux-block@vger.kernel.org, linux-kselftest@vger.kernel.org,
  linux-kernel@vger.kernel.org, Uday Shankar <ushankar@purestorage.com>
 X-Mailer: b4 0.14.2
 
-Add a test that verifies that the currently running kernel does not
-report support for any features that are unrecognized by kublk. This
-should catch cases where features are added without updating kublk's
-feat_map accordingly, which has happened multiple times in the past (see
-[1], [2]).
-
-Note that this new test may fail if the test suite is older than the
-kernel, and the newer kernel contains a newly introduced feature. I
-believe this is not a use case we currently care about - we only care
-about newer test suites passing on older kernels.
-
-[1] https://lore.kernel.org/linux-block/20250606214011.2576398-1-csander@purestorage.com/t/#u
-[2] https://lore.kernel.org/linux-block/2a370ab1-d85b-409d-b762-f9f3f6bdf705@nvidia.com/t/#m1c520a058448d594fd877f07804e69b28908533f
+When UBLK_F_BUF_REG_OFF_DAEMON was added, we missed updating kublk's
+feat_map, which results in the feature being reported as "unknown." Add
+UBLK_F_BUF_REG_OFF_DAEMON to feat_map to fix this.
 
 Signed-off-by: Uday Shankar <ushankar@purestorage.com>
 ---
- tools/testing/selftests/ublk/Makefile           |  1 +
- tools/testing/selftests/ublk/test_generic_13.sh | 16 ++++++++++++++++
- 2 files changed, 17 insertions(+)
+ tools/testing/selftests/ublk/kublk.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/tools/testing/selftests/ublk/Makefile b/tools/testing/selftests/ublk/Makefile
-index 5d7f4ecfb81612f919a89eb442f948d6bfafe225..770269efe42ab460366485ccc80abfa145a0c57b 100644
---- a/tools/testing/selftests/ublk/Makefile
-+++ b/tools/testing/selftests/ublk/Makefile
-@@ -20,6 +20,7 @@ TEST_PROGS += test_generic_09.sh
- TEST_PROGS += test_generic_10.sh
- TEST_PROGS += test_generic_11.sh
- TEST_PROGS += test_generic_12.sh
-+TEST_PROGS += test_generic_13.sh
- 
- TEST_PROGS += test_null_01.sh
- TEST_PROGS += test_null_02.sh
-diff --git a/tools/testing/selftests/ublk/test_generic_13.sh b/tools/testing/selftests/ublk/test_generic_13.sh
-new file mode 100755
-index 0000000000000000000000000000000000000000..ff5f22b078ddd08bc19f82aa66da6a44fa073f6f
---- /dev/null
-+++ b/tools/testing/selftests/ublk/test_generic_13.sh
-@@ -0,0 +1,16 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+
-+. "$(cd "$(dirname "$0")" && pwd)"/test_common.sh
-+
-+TID="generic_13"
-+ERR_CODE=0
-+
-+_prep_test "null" "check that feature list is complete"
-+
-+if ${UBLK_PROG} features | grep -q unknown; then
-+        ERR_CODE=255
-+fi
-+
-+_cleanup_test "null"
-+_show_result $TID $ERR_CODE
+diff --git a/tools/testing/selftests/ublk/kublk.c b/tools/testing/selftests/ublk/kublk.c
+index 4e5d82f2a14a01d9e56d31126eae2e26ec718b6c..b636d40b4889d88f7d64d0e71c6f09eca17e3989 100644
+--- a/tools/testing/selftests/ublk/kublk.c
++++ b/tools/testing/selftests/ublk/kublk.c
+@@ -1379,6 +1379,7 @@ static int cmd_dev_get_features(void)
+ 		FEAT_NAME(UBLK_F_AUTO_BUF_REG),
+ 		FEAT_NAME(UBLK_F_QUIESCE),
+ 		FEAT_NAME(UBLK_F_PER_IO_DAEMON),
++		FEAT_NAME(UBLK_F_BUF_REG_OFF_DAEMON),
+ 	};
+ 	struct ublk_dev *dev;
+ 	__u64 features = 0;
 
 -- 
 2.34.1
