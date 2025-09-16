@@ -1,264 +1,160 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09FF129B237
-	for <linux-block@vger.kernel.org>; Tue, 16 Sep 2025 11:04:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 707232773C3;
+	Tue, 16 Sep 2025 11:18:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758020691; cv=none; b=k931JflVBwzR61YPng6TKeF4a0nV4rohVsNFxyof5n9zaKvIyLU4MBlo1TGk4OdntBZNgyg2sjIVHtj8hBVSqiOBF5nZ69NcJHOixWO5QxLkX/zWeXcvzbyoS8uaKaXK19IlIlmoO644qV5Xz0X0FPjk1AGXNFjeOnIL2hU4FZg=
+	t=1758021539; cv=none; b=EPkEazpkFKMm/0KT7zutLn7lCrawp2HXIN2RF/Y4s40EeRJ8ZiF516E/ywXAXrOCC6+N4Oq4IglM4jqowcr1Pt84mxi4dZMzKTQfexD7zx2qksQqDnsShcFyY13zK1jZqSjua5xLJuqKsuN6GODMRsrNcgDtNa728ZOI53xjaXQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758020691; c=relaxed/simple;
-	bh=6iZ/hVZU+vtlEEp0FSXnhKnIBs8Acs2EWAnqw48/cAM=;
+	s=arc-20240116; t=1758021539; c=relaxed/simple;
+	bh=fPi2jTo0hJ6xkgxaFB3CE37jdXxU+Q3zu80o0dV1unM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cKG3wo2iwV7/9D1ByUEfiJxRa35jUex0Njv6ULQMaD0IEh6a4FUdj8/rLElGs32zLGPcGyngMVIDQ7Pt035q0aKTFABJuUasCRSNJLiqnDLYMVIruuo3Y0yW9XDzdXIXD9P1Zb2euGzrl9zROqQIdtYthx/faW7M2KFZKErCwzE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=Clk+EEY/; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=ytwML0GF; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=ADFGvhn8; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=xgKcjVaa; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	 Content-Type:Content-Disposition:In-Reply-To; b=oif6+3BJVrYclfn356Z4EoofjbGMmvGIipGKdVufCUNZt3hfW+73iaejBRO8hCKG2XbSAR8ku3VnnFSy45DCmxvVBb67tCvbpxpi1EbCe4NUtPjMeT7dsEczhORDjn7EFuY4ScSfkDcHVEc1NtV1pKYaft09b6mapD5XQj1j9eo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NQDbh1Va; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="Clk+EEY/";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="ytwML0GF";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="ADFGvhn8";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="xgKcjVaa"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 02404222A4;
-	Tue, 16 Sep 2025 11:04:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1758020688; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=uB3s75uIkNgs3ivEMPKxDsUxxOEwMyVjkPUAHjlB29Q=;
-	b=Clk+EEY/+XyLZNpY7QrN3RIYjibUWBqNZxtXJMrDon3ieCDpqQh2JnfZKi+RKyrOU60LEG
-	FP7qfvM62au2DSQ+8TmDY38UoH0sqpq5hL8XRCY+NIkmB91dtOLeohxaQuJ2gkICXzp1dD
-	nnCQnXA6gr3AnOYrOomCJmGSZNiRIGo=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1758020688;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=uB3s75uIkNgs3ivEMPKxDsUxxOEwMyVjkPUAHjlB29Q=;
-	b=ytwML0GF7CjWKv4PZQYYPP8fvkQDech1EF33QYkPxi5T2wtVrgBiEgspeMXS0NG/hXFpdM
-	R36MqZLTjypGkSBw==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=ADFGvhn8;
-	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=xgKcjVaa
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1758020687; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=uB3s75uIkNgs3ivEMPKxDsUxxOEwMyVjkPUAHjlB29Q=;
-	b=ADFGvhn8TGyBrfikNQaf6x+czHKdB2l2gBTVPQXS6ImHtS5/3EGceVwdmS2ktyJqeoc7g2
-	TT0iTTklU0jZ6mv6HZVj8bMHGSqzRqlHZFblUTVgsN39efBfKtggb9XxX2+QRjnQuv2uJT
-	dNNBqDn5MDWLkytYEzLFBIoCiu1yuHI=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1758020687;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=uB3s75uIkNgs3ivEMPKxDsUxxOEwMyVjkPUAHjlB29Q=;
-	b=xgKcjVaahlY6F4xvT0zvJHVxkesQv4XnlpiukwTfXth/tfjg/hpVPAkFe35PXXcLMtKwsc
-	GrgIVvYz1tcAwPAA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id E4C5D139CB;
-	Tue, 16 Sep 2025 11:04:46 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id pQ+IN05EyWh3WwAAD6G6ig
-	(envelope-from <jack@suse.cz>); Tue, 16 Sep 2025 11:04:46 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id 76DECA0A56; Tue, 16 Sep 2025 13:04:42 +0200 (CEST)
-Date: Tue, 16 Sep 2025 13:04:42 +0200
-From: Jan Kara <jack@suse.cz>
-To: Naresh Kamboju <naresh.kamboju@linaro.org>
-Cc: linux-block <linux-block@vger.kernel.org>, 
-	linux-fsdevel@vger.kernel.org, LTP List <ltp@lists.linux.it>, 
-	open list <linux-kernel@vger.kernel.org>, lkft-triage@lists.linaro.org, 
-	Linux Regressions <regressions@lists.linux.dev>, Christian Brauner <brauner@kernel.org>, 
-	chrubis <chrubis@suse.cz>, Petr Vorel <pvorel@suse.cz>, Arnd Bergmann <arnd@arndb.de>, 
-	Dan Carpenter <dan.carpenter@linaro.org>, Al Viro <viro@zeniv.linux.org.uk>, 
-	Amir Goldstein <amir73il@gmail.com>, Jan Kara <jack@suse.cz>, 
-	"Martin K. Petersen" <martin.petersen@oracle.com>, Anuj Gupta <anuj20.g@samsung.com>, 
-	Kanchan Joshi <joshi.k@samsung.com>, Anders Roxell <anders.roxell@linaro.org>, 
-	Ben Copeland <benjamin.copeland@linaro.org>
-Subject: Re: next-20250915: LTP chdir01 df01_sh stat04 tst_device.c:97:
- TBROK: Could not stat loop device 0
-Message-ID: <arfepejkmgi63wepbkfhl2jjbhleh5degel7i3o7htgwjsayqg@z3pjoszloxni>
-References: <CA+G9fYuFdesVkgGOow7+uQpw-QA6hdqBBUye8CKMxGAiwHagOA@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NQDbh1Va"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB3C2C4CEEB;
+	Tue, 16 Sep 2025 11:18:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758021538;
+	bh=fPi2jTo0hJ6xkgxaFB3CE37jdXxU+Q3zu80o0dV1unM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=NQDbh1VaUF3+xG9O6//FoHCGnbQqBuJSEFwsn9AWaLs19tnsOKvOZeXgtT2Ppbvh7
+	 zDCkjUFEK2bdYgvEchH4TzeIt6kwysmCsoRqQjdVJbkIYKTZ3q04vmBlHo725QsvxO
+	 7AhrEzl52ZcqfZzj3uI7n5oA/VBZAihCXEtpKdn38X5G1vEogTg4rY1Xs4mpRx0rwL
+	 LuyuHxRxaub0nEEe9tvc8fAnssi5DcdHD1bYPfb2UJIA2PoTryL/GJ7dwW60Kxyoqy
+	 zIXqsQ3Dze7L2+355gXdYkt1Z58WO6RCsVslYfMxHuV++DyfOaya0rg/PVyTka9aHH
+	 QsrmJgW1c/GmA==
+Date: Tue, 16 Sep 2025 12:18:50 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Christian Brauner <brauner@kernel.org>
+Cc: Jan Kara <jack@suse.cz>, Amir Goldstein <amir73il@gmail.com>,
+	linux-fsdevel@vger.kernel.org, Josef Bacik <josef@toxicpanda.com>,
+	Jeff Layton <jlayton@kernel.org>, Mike Yuan <me@yhndnzj.com>,
+	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>,
+	Lennart Poettering <mzxreary@0pointer.de>,
+	Daan De Meyer <daan.j.demeyer@gmail.com>,
+	Aleksa Sarai <cyphar@cyphar.com>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Chuck Lever <chuck.lever@oracle.com>, linux-nfs@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, cgroups@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v2 04/33] block: use extensible_ioctl_valid()
+Message-ID: <02da33e3-6583-4344-892f-a9784b9c5b1b@sirena.org.uk>
+References: <20250912-work-namespace-v2-0-1a247645cef5@kernel.org>
+ <20250912-work-namespace-v2-4-1a247645cef5@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="pXrdOnUKtpdJm8VZ"
+Content-Disposition: inline
+In-Reply-To: <20250912-work-namespace-v2-4-1a247645cef5@kernel.org>
+X-Cookie: You dialed 5483.
+
+
+--pXrdOnUKtpdJm8VZ
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CA+G9fYuFdesVkgGOow7+uQpw-QA6hdqBBUye8CKMxGAiwHagOA@mail.gmail.com>
-X-Spam-Level: 
-X-Spam-Flag: NO
-X-Rspamd-Queue-Id: 02404222A4
-X-Rspamd-Action: no action
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Spamd-Result: default: False [-4.01 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lists.linux.it,lists.linaro.org,lists.linux.dev,kernel.org,suse.cz,arndb.de,linaro.org,zeniv.linux.org.uk,gmail.com,oracle.com,samsung.com];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	DNSWL_BLOCKED(0.00)[2a07:de40:b281:106:10:150:64:167:received,2a07:de40:b281:104:10:150:64:97:from];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DWL_DNSWL_BLOCKED(0.00)[suse.cz:dkim];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	DKIM_TRACE(0.00)[suse.cz:+];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.cz:dkim,linaro.org:email,linaro.org:url,imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,suse.com:email]
-X-Spam-Score: -4.01
 
-On Tue 16-09-25 12:57:26, Naresh Kamboju wrote:
-> The following LTP chdir01 df01_sh and stat04 tests failed on the rock-pi-4b
-> qemu-arm64 on the Linux next-20250915 tag build.
-> 
-> First seen on next-20250915
-> Good: next-20250912
-> Bad: next-20250915
-> 
-> Regression Analysis:
-> - New regression? yes
-> - Reproducibility? yes
-> 
-> * rk3399-rock-pi-4b, ltp-smoke
-> * qemu-arm64, ltp-smoke
-> * qemu-arm64-compat, ltp-smoke
->  - chdir01
->   - df01_sh
->   - stat04
-> 
-> Test regression: next-20250915: LTP chdir01 df01_sh stat04
-> tst_device.c:97: TBROK: Could not stat loop device 0
+On Fri, Sep 12, 2025 at 01:52:27PM +0200, Christian Brauner wrote:
+> Use the new extensible_ioctl_valid() helper which is equivalent to what
+> is done here.
 
-This is really strange. Those failing tests all start to complain that
-/dev/loop0 doesn't exist (open gets ENOENT)... The fact that this is
-limited to only a few archs suggests it's some race somewhere but I don't
-see any relevant changes in linux-block in last three days...
+I'm seeing several LTP tests (at least getdents02, msync04, renameat01
+and statx12) failing in yesterday's -next pending-fixes on Raspberry Pi
+4 with bisections pointing to this commit.  renameat01 fails with:
 
-								Honza
+  renameat01    0  TINFO  :  Using /tmp/LTP_renEtNZrS as tmpdir (nfs filesystem)
+  renameat01    1  TBROK  :  tst_device.c:97: Could not stat loop device 0
+  renameat01    2  TBROK  :  tst_device.c:97: Remaining cases broken
 
-> 
-> Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
-> 
-> ## Test log
-> <8>[   53.655971] <LAVA_SIGNAL_STARTTC chdir01>
-> tst_buffers.c:57: TINFO: Test is using guarded buffers
-> tst_tmpdir.c:316: TINFO: Using /tmp/LTP_chdm4pHJb as tmpdir (tmpfs filesystem)
-> tst_device.c:98: TINFO: Found free device 0 '/dev/loop0'
-> tst_test.c:1953: TINFO: LTP version: 20250530
-> tst_test.c:1956: TINFO: Tested kernel: 6.17.0-rc6-next-20250915 #1 SMP
-> PREEMPT @1757983656 aarch64
-> tst_kconfig.c:88: TINFO: Parsing kernel config '/proc/config.gz'
-> tst_kconfig.c:676: TINFO: CONFIG_TRACE_IRQFLAGS kernel option detected
-> which might slow the execution
-> tst_test.c:1774: TINFO: Overall timeout per run is 0h 28m 48s
-> tst_supported_fs_types.c:97: TINFO: Kernel supports ext2
-> tst_supported_fs_types.c:62: TINFO: mkfs.ext2 does exist
-> tst_supported_fs_types.c:97: TINFO: Kernel supports ext3
-> tst_supported_fs_types.c:62: TINFO: mkfs.ext3 does exist
-> tst_supported_fs_types.c:97: TINFO: Kernel supports ext4
-> tst_supported_fs_types.c:62: TINFO: mkfs.ext4 does exist
-> tst_supported_fs_types.c:128: TINFO: Filesystem xfs is not supported
-> tst_supported_fs_types.c:97: TINFO: Kernel supports btrfs
-> tst_supported_fs_types.c:62: TINFO: mkfs.btrfs does exist
-> tst_supported_fs_types.c:105: TINFO: Skipping bcachefs because of FUSE blacklist
-> tst_supported_fs_types.c:97: TINFO: Kernel supports vfat
-> tst_supported_fs_types.c:62: TINFO: mkfs.vfat does exist
-> tst_supported_fs_types.c:128: TINFO: Filesystem exfat is not supported
-> tst_supported_fs_types.c:132: TINFO: FUSE does support ntfs
-> tst_supported_fs_types.c:62: TINFO: mkfs.ntfs does exist
-> tst_supported_fs_types.c:97: TINFO: Kernel supports tmpfs
-> tst_supported_fs_types.c:49: TINFO: mkfs is not needed for tmpfs
-> tst_test.c:1888: TINFO: === Testing on ext2 ===
-> tst_device.c:391: TWARN: Failed to clear 512k block on /dev/loop0
-> tst_test.c:1217: TBROK: tst_clear_device() failed
-> Summary:
-> passed   0
-> failed   0
-> broken   1
-> skipped  0
-> warnings 1
-> tst_device.c:283: TWARN: open(/dev/loop0) failed: ENOENT (2)
-> <8>[   53.679564] <LAVA_SIGNAL_ENDTC chdir01>
-> <8>[   53.708246] <LAVA_SIGNAL_TESTCASE TEST_CASE_ID=chdir01 RESULT=fail>
-> 
-> <8>[   53.933883] <LAVA_SIGNAL_STARTTC stat04>
-> tst_buffers.c:57: TINFO: Test is using guarded buffers
-> tst_tmpdir.c:316: TINFO: Using /tmp/LTP_staPDxElt as tmpdir (tmpfs filesystem)
-> tst_device.c:97: TBROK: Could not stat loop device 0
-> Summary:
-> passed   0
-> failed   0
-> broken   1
-> skipped  0
-> warnings 0
-> <8>[   53.947889] <LAVA_SIGNAL_ENDTC stat04>
-> <8>[   53.974024] <LAVA_SIGNAL_TESTCASE TEST_CASE_ID=stat04 RESULT=fail>
-> 
-> <8>[   54.048075] <LAVA_SIGNAL_STARTTC df01_sh>
-> df01 1 TINFO: Running: df01.sh
-> df01 1 TINFO: Tested kernel: Linux
-> runner-j2nyww-sk-project-40964107-concurrent-0
-> 6.17.0-rc6-next-20250915 #1 SMP PREEMPT @1757983656 aarch64 GNU/Linux
-> df01 1 TINFO: Using /tmp/LTP_df01.7pcwUXe1CN as tmpdir (tmpfs filesystem)
-> tst_device.c:97: TBROK: Could not stat loop device 0
-> df01 1 TBROK: Failed to acquire device
-> Summary:
-> passed   0
-> failed   0
-> broken   1
-> skipped  0
-> warnings 0
-> <8>[   54.060936] <LAVA_SIGNAL_ENDTC df01_sh>
-> <8>[   54.087630] <LAVA_SIGNAL_TESTCASE TEST_CASE_ID=df01_sh RESULT=fail>
-> 
-> ## Source
-> * Kernel version: 6.17.0-rc6
-> * Git tree: https://kernel.googlesource.com/pub/scm/linux/kernel/git/next/linux-next.git
-> * Git describe: 6.17.0-rc6-next-20250915
-> * Git commit: c3067c2c38316c3ef013636c93daa285ee6aaa2e
-> * Architectures: arm64
-> * Toolchains: gcc-13 and gcc-8
-> * Kconfigs: lkftconfigs
-> 
-> ## Build
-> * Test log: https://qa-reports.linaro.org/api/testruns/29896973/log_file/
-> * Test details:
-> https://regressions.linaro.org/lkft/linux-next-master/next-20250915/ltp-smoke/stat04/
-> * Test plan: https://tuxapi.tuxsuite.com/v1/groups/linaro/projects/lkft/tests/32l4Vv9hKep2EcmS18u3NBtmoAm
-> * Build link: https://storage.tuxsuite.com/public/linaro/lkft/builds/32l4UF8KltAzu6kUpW3hXaYRWjZ/
-> * Kernel config:
-> https://storage.tuxsuite.com/public/linaro/lkft/builds/32l4UF8KltAzu6kUpW3hXaYRWjZ/config
-> 
-> --
-> Linaro LKFT
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Full log for that run:
+
+  https://lava.sirena.org.uk/scheduler/job/1830765#L6680
+
+bisect log for renameat (all the bisects cover the same builds, though I
+split the jobs up so it's different test jobs for some of the tests):
+
+# bad: [179688318d56cee63802eb49e3503d799c43db6c] Merge branch 'for-linux-next-fixes' of https://gitlab.freedesktop.org/drm/misc/kernel.git
+# good: [f83ec76bf285bea5727f478a68b894f5543ca76e] Linux 6.17-rc6
+# good: [690aa09b1845c0d5c3c29dabd50a9d0488c97c48] ASoC: Intel: catpt: Expose correct bit depth to userspace
+# good: [3254959b4dd065eae396cf78ccc1361460b2f53e] ASoC: amd: amd_sdw: Add quirks for some new Dell laptops
+# good: [9004a450fccbeb40a71cc173747da37a459fd4dc] ASoC: codecs: lpass-wsa-macro: Fix speaker quality distortion
+# good: [ec630c2c8ce215dd365b8c3644f004f645714a0f] ASoC: SDCA: Reorder members of hide struct to remove holes
+# good: [68f27f7c7708183e7873c585ded2f1b057ac5b97] ASoC: qcom: q6apm-lpass-dais: Fix NULL pointer dereference if source graph failed
+# good: [0c28431f6fe13f3a3be0978f79c1a7ae8a93d028] ASoC: SOF: imx: Fix devm_ioremap_resource check
+# good: [28edfaa10ca1b370b1a27fde632000d35c43402c] ASoC: SDCA: Add quirk for incorrect function types for 3 systems
+# good: [35fc531a59694f24a2456569cf7d1a9c6436841c] ASoC: SOF: Intel: hda-stream: Fix incorrect variable used in error message
+# good: [9b17d3724df55ecc2bc67978822585f2b023be48] ASoC: wm8974: Correct PLL rate rounding
+# good: [f54d87dad7619c8026e95b848d6ef677b9f2b55f] ASoC: rt712: avoid skipping the blind write
+git bisect start '179688318d56cee63802eb49e3503d799c43db6c' 'f83ec76bf285bea5727f478a68b894f5543ca76e' '690aa09b1845c0d5c3c29dabd50a9d0488c97c48' '3254959b4dd065eae396cf78ccc1361460b2f53e' '9004a450fccbeb40a71cc173747da37a459fd4dc' 'ec630c2c8ce215dd365b8c3644f004f645714a0f' '68f27f7c7708183e7873c585ded2f1b057ac5b97' '0c28431f6fe13f3a3be0978f79c1a7ae8a93d028' '28edfaa10ca1b370b1a27fde632000d35c43402c' '35fc531a59694f24a2456569cf7d1a9c6436841c' '9b17d3724df55ecc2bc67978822585f2b023be48' 'f54d87dad7619c8026e95b848d6ef677b9f2b55f'
+# test job: [690aa09b1845c0d5c3c29dabd50a9d0488c97c48] https://lava.sirena.org.uk/scheduler/job/1805508
+# test job: [3254959b4dd065eae396cf78ccc1361460b2f53e] https://lava.sirena.org.uk/scheduler/job/1769788
+# test job: [9004a450fccbeb40a71cc173747da37a459fd4dc] https://lava.sirena.org.uk/scheduler/job/1774162
+# test job: [ec630c2c8ce215dd365b8c3644f004f645714a0f] https://lava.sirena.org.uk/scheduler/job/1772919
+# test job: [68f27f7c7708183e7873c585ded2f1b057ac5b97] https://lava.sirena.org.uk/scheduler/job/1772831
+# test job: [0c28431f6fe13f3a3be0978f79c1a7ae8a93d028] https://lava.sirena.org.uk/scheduler/job/1762707
+# test job: [28edfaa10ca1b370b1a27fde632000d35c43402c] https://lava.sirena.org.uk/scheduler/job/1762245
+# test job: [35fc531a59694f24a2456569cf7d1a9c6436841c] https://lava.sirena.org.uk/scheduler/job/1762959
+# test job: [9b17d3724df55ecc2bc67978822585f2b023be48] https://lava.sirena.org.uk/scheduler/job/1758830
+# test job: [f54d87dad7619c8026e95b848d6ef677b9f2b55f] https://lava.sirena.org.uk/scheduler/job/1758090
+# test job: [179688318d56cee63802eb49e3503d799c43db6c] https://lava.sirena.org.uk/scheduler/job/1830765
+# bad: [179688318d56cee63802eb49e3503d799c43db6c] Merge branch 'for-linux-next-fixes' of https://gitlab.freedesktop.org/drm/misc/kernel.git
+git bisect bad 179688318d56cee63802eb49e3503d799c43db6c
+# test job: [4c3c40178b0e1578a3898092cc33ffb2618edc51] https://lava.sirena.org.uk/scheduler/job/1830986
+# good: [4c3c40178b0e1578a3898092cc33ffb2618edc51] Merge branch 'for-next' of https://git.kernel.org/pub/scm/linux/kernel/git/dlemoal/zonefs.git
+git bisect good 4c3c40178b0e1578a3898092cc33ffb2618edc51
+# test job: [78ca913586336540ec12f262c5bdf16f8925de82] https://lava.sirena.org.uk/scheduler/job/1831233
+# bad: [78ca913586336540ec12f262c5bdf16f8925de82] Merge branch 'vfs.all' of https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
+git bisect bad 78ca913586336540ec12f262c5bdf16f8925de82
+# test job: [06dd3eda0e958cdae48ca755eb5047484f678d78] https://lava.sirena.org.uk/scheduler/job/1831745
+# good: [06dd3eda0e958cdae48ca755eb5047484f678d78] Merge branch 'vfs-6.18.rust' into vfs.all
+git bisect good 06dd3eda0e958cdae48ca755eb5047484f678d78
+# test job: [a7ec4da2c05c5f8be52c2ac884d5672d0a805ee0] https://lava.sirena.org.uk/scheduler/job/1832263
+# bad: [a7ec4da2c05c5f8be52c2ac884d5672d0a805ee0] Merge patch series "ns: support file handles"
+git bisect bad a7ec4da2c05c5f8be52c2ac884d5672d0a805ee0
+# test job: [670f2f915084d1c53f14d59946011b7645601813] https://lava.sirena.org.uk/scheduler/job/1832304
+# bad: [670f2f915084d1c53f14d59946011b7645601813] nstree: make iterator generic
+git bisect bad 670f2f915084d1c53f14d59946011b7645601813
+# test job: [011090b6c0a97a3aa1f659d670d85bbf0eddbe06] https://lava.sirena.org.uk/scheduler/job/1832355
+# bad: [011090b6c0a97a3aa1f659d670d85bbf0eddbe06] cgroup: use ns_common_init()
+git bisect bad 011090b6c0a97a3aa1f659d670d85bbf0eddbe06
+# test job: [60949057a2e71c9244e82608adf269e62e6ac443] https://lava.sirena.org.uk/scheduler/job/1832402
+# bad: [60949057a2e71c9244e82608adf269e62e6ac443] block: use extensible_ioctl_valid()
+git bisect bad 60949057a2e71c9244e82608adf269e62e6ac443
+# test job: [4d906371d1f9fc9ce47b2c8f37444680246557bc] https://lava.sirena.org.uk/scheduler/job/1832439
+# good: [4d906371d1f9fc9ce47b2c8f37444680246557bc] nsfs: drop tautological ioctl() check
+git bisect good 4d906371d1f9fc9ce47b2c8f37444680246557bc
+# test job: [f8527a29f4619f74bc30a9845ea87abb9a6faa1e] https://lava.sirena.org.uk/scheduler/job/1832550
+# good: [f8527a29f4619f74bc30a9845ea87abb9a6faa1e] nsfs: validate extensible ioctls
+git bisect good f8527a29f4619f74bc30a9845ea87abb9a6faa1e
+# first bad commit: [60949057a2e71c9244e82608adf269e62e6ac443] block: use extensible_ioctl_valid()
+
+--pXrdOnUKtpdJm8VZ
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmjJR5kACgkQJNaLcl1U
+h9CJ4Af+ISZ3lljoI72V72kUBKwG6lq4beym3VICH+8DyjBOtQJqkqIE5OlcUns9
+gY6sqsqpxxIvI+a6v6GPW0eqWuAu36UuvdqjURrMubJCQi6zeT4lYVIgcioh4U4G
+FWmhUV1LC5FGYKc7KfibPRCcggsT/XKqMH88jkIfAYSUiQHyuMZMaiA+vNDdVDK+
+f3ZZj6bKcB6h0wVse+BUtM5+Ha+RIzS4bpK9JNzJqV3pHra6Yg3myz2sd46lT4mg
+5K5amhS9uYN26RZGTr3ioMhuGUywjeyWsLccmtBq/fG+bofT1tEReGLdVC9fsvOO
+wPu0MoWdSMaeA2rJE/z5wrxA2nePqA==
+=6jkN
+-----END PGP SIGNATURE-----
+
+--pXrdOnUKtpdJm8VZ--
