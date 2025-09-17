@@ -1,73 +1,77 @@
-Received: from mail-il1-f176.google.com (mail-il1-f176.google.com [209.85.166.176])
+Received: from mail-io1-f50.google.com (mail-io1-f50.google.com [209.85.166.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE3C8238140
-	for <linux-block@vger.kernel.org>; Wed, 17 Sep 2025 13:27:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A84F918BC3B
+	for <linux-block@vger.kernel.org>; Wed, 17 Sep 2025 13:27:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758115639; cv=none; b=VagLpvIiokLCHghCEe4SDTsYCvPc5XGVKVTkXjMMj8A4upn6Gl2ItlebcUc8YcBpar4C1PeqhVaPYCS+KI32HbO8/6lK8zwf18cu900/Xpcn2mJ8nkp9/AijJ7DiyIeRva9eCoC070H0OjccFqxir+sX2oryfBt7PXH6Asx/vfA=
+	t=1758115676; cv=none; b=XWr4MDUCH8CKps3Ip7p7LrGOSGbQey8GRQMz27FtmqwlGPNGqfQpg2/azFhs7NQfh0NMRHmtk9cg7p+Jh2RUt9rL50mDG8+Yn51TfW8UsHJ6HxKU+NYV/WPcALl8lonuYrqZOIROTPF12WklBLQrcane8U5aendNQr4uoLdj3PQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758115639; c=relaxed/simple;
-	bh=6wLJteYne2ghlIdmMqTe6B8rmaVmJKXducM1/MAnUCw=;
+	s=arc-20240116; t=1758115676; c=relaxed/simple;
+	bh=M62rwCb3WpopXPBEr/TcsBpZz+0Rl4/4oOOAHyk9RDw=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=TMro8jWaGdyZxeGMPh3qG7+VDtUyAlKzZNRIGInyNrd5J6S426huAaJFKyJ/Nha8K7Fm4H88WJdaTglvOOjIsBA5eiOcxfjoNojptM7Vj2c071Hz9EbZema5AF185iTqXkJIKpsEegu5VzsSwT8JHKOXZbZgtDHF9HcEZcccWmk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=c71t9RuH; arc=none smtp.client-ip=209.85.166.176
+	 MIME-Version:Content-Type; b=drOlU6HSNMdMRljYctm5/BMlkRqx2DfloXaTRgTbWuNgIRWNMd7MspuvjzA+mx1/ymlsZ0b1Ns7OLK9dL9uqZe+t38Ko0X/qN4XyrARKKGLTN2d6RyUXDvQRvGlS5fdzNONuhT0fkWCSsRLUyCHMHL5QYjEVs1seSEXUvk4K4NY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=rW2uJWgm; arc=none smtp.client-ip=209.85.166.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="c71t9RuH"
-Received: by mail-il1-f176.google.com with SMTP id e9e14a558f8ab-4242bb21f19so1042645ab.1
-        for <linux-block@vger.kernel.org>; Wed, 17 Sep 2025 06:27:16 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="rW2uJWgm"
+Received: by mail-io1-f50.google.com with SMTP id ca18e2360f4ac-88c347db574so203075539f.0
+        for <linux-block@vger.kernel.org>; Wed, 17 Sep 2025 06:27:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1758115636; x=1758720436; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1758115673; x=1758720473; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ncgUhfqmU/yAI6cRRY9SdCcq0O3qaKYavijv88BflA8=;
-        b=c71t9RuHAdu7qpsjYk1VazBtM4tg2qudvQda6pRGaccWbslOqEDDNtOlCcgVNQybZ/
-         UQgpqFjcq9ysB5s0fJlxWZnc0kEF9rbAgC/9g72F6SeN0H2KHx76MmQvpUCtuBmpKnGq
-         6LK316P0w9+PfPmFeP5JtydevNnWBgdqphiHtSGtNXiJGvqcpgjo3Jv2jWzsmurEXmXf
-         3H6S+PZEHDJDI1tgxE6M0CiVbaZ/2ExPMaTlsZNUH4mOc/r0FbPXiK0xekCYTPWHwi15
-         P06ndNXGbbgRwdi23TKZ1SWuogi0xiDRJdNcvkEl5Pbsg49qPyvMXcfGyFeXUfkTK4XB
-         EuWQ==
+        bh=B7GZOzuObGtag5EoNFyxDUa3UQRVufAOUXVJL/ng3BY=;
+        b=rW2uJWgm9RkT7sU7lJ6WTwko6WKw1X0irnKRN7chSnATbsi2S1SQQ2Lq/Y0pJ4EkP+
+         MWwUaIe6JYCqrT4qZsrweJPfQbEzJqGBGFinwY23VhEUDFJNfWXn/gVmqVEcTyZ4dN6Q
+         aLDvg7B2uZENuEt0oZ5S+OSQ7+hqcg6MmuOXh58sVWyNVIhfGrJJ0J+vICVp4dqw72kk
+         urZWwoCWL58g+qidpl4CNb873QGKs1TsOTfjNiH0yI73QWDfqk0tBqsAgRag/jGocquH
+         +rjEu/Gs8hrkoz19o6mgE5ajOYCLitLhXdmj6VxU22NgkEeC9m5mubtL6DAZz474okRY
+         tKHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758115636; x=1758720436;
+        d=1e100.net; s=20230601; t=1758115673; x=1758720473;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ncgUhfqmU/yAI6cRRY9SdCcq0O3qaKYavijv88BflA8=;
-        b=SzbDpjJGFxjLyAQ0P4tpjF0VT1FcHVQY3dykwH/dgdXT6KGy/T6nzr7X98AypRBQoY
-         nNo8myNGyyGFdYKeHi0pWKh9Ipk2b6HCAVvVx0H/OdqW5H0pVQgkJaphoZOzFduu641l
-         oig3TlUtE7PTr43rPpWflHuqeNRJthTlOvIlqOZD6OB3mTRGdhv6kNEegEEitmNhqYyS
-         vP9ri0/ZqyTA5jNRQYQO3krk+5f1L8BoeBrFW6QjgmVoAi9b9HqCnx3BAzaCCnhRN+hm
-         1TRBa0npHLlXxWBlIsj70/pWwoU2SEaPzbGvyT65V+bUDuLkjFUMQjXZyuxDD+Za0R6l
-         idWQ==
-X-Gm-Message-State: AOJu0YyTYPLZlQ1AhXSxkWrEf9xybd0vnMKyEUmcG1oh+mMOzfiDg631
-	6gV5+5RoJJ+txtazqinuy+5vnUHcNDqn8PP2vJ1kI2+2LBM4CsesZOo9M0CDlx/0Tb8=
-X-Gm-Gg: ASbGncscT5y2RzshVdsM7wen48/Km+PlMu1LHhIpeFzBmLFWs8/t0dF5RHxJbrQInz+
-	3AmvuXy9LmlKUjyfTqcbHTpZNCGzG0/6gs6h2+T3/9VA3jXRZCYjIlaGfHLl31BQl762ERdiFl9
-	/IR3nTzeJsiZVktZHv2Kx5AeJK0pp9kSkl/JNVzcHWQ/djLqJVQRlb69RNg8j73YBWJyKLl6TF+
-	m3E3shM57RmXK+3w63c70SEdoXbHiS4ksaAcsKovqaqadKphg54b5zXGJQIiiPE0B2zNiisqcWK
-	PO3xC7VdFtQ/4QrhofLgv/IXVxqtQ8xPiFeMXfVcHKL8/qCQV7Zgfa/fTNqJODvWGNXGbHjiA7Q
-	Qiwb9J+vVhBBqUA==
-X-Google-Smtp-Source: AGHT+IF2IhkVvtdK0/Rt+fwNJ2jA+lP5SvNESzECuU5V5/QO+3CYjVCl2QHwT1P2sqjxSjffG4Qxew==
-X-Received: by 2002:a05:6e02:1845:b0:405:b792:32dd with SMTP id e9e14a558f8ab-4241a53809cmr24674285ab.16.1758115635359;
-        Wed, 17 Sep 2025 06:27:15 -0700 (PDT)
+        bh=B7GZOzuObGtag5EoNFyxDUa3UQRVufAOUXVJL/ng3BY=;
+        b=EAkk54gupbdZLaojTq8WXDU9wWRgiSuaPR1nFDv41PTVM/WASpOyEnrEk2fSD8fF20
+         27ujAKlRqGvrZrpzRjov+roKts9xH/TZMdcxgCXQgFZEt+928xsFNl58wCvfAhTELDHp
+         dZ7k4/tKBdIgYVQMya32GwB0GVoMeHCt26+S2ZiIghTmuyOoU1IYxnCRqTGtFZlGb60l
+         E8QZkzjpBKugTs0Oh6jFeXlNnU82UZtzdYh142Yk+qA+Gkbc2m7jWQG3GYr3HtFlt9C8
+         TbGjG7K6Hk6MTTCt0eoG8DsWYSUQcpj1o/GJlEUSwmQn/X+nLplMdWsX8XHN3PG2oCN6
+         7Vzg==
+X-Forwarded-Encrypted: i=1; AJvYcCWKaQ+/tcFYt3BzgRt/roUUXUPSAoOGDCvcDBg1eWcfeqKm3I0R182PPckyzVB0WQbdi26x/ZdDNEfpng==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwMckDMpk4w5SYxYo59v98gll9oMyesXfacgMZKk977kNhPq+Iv
+	zf1Z3paLRyBLvqs7Pet6tFadq2wXRFW1LpOw8OGqpUi99oBkvZyeMT76dhk+Z98c0Vv0sxPIQcQ
+	7So2/
+X-Gm-Gg: ASbGncvgcbmPaXr2+qn3OrL+SNtfBYHEZ2N31ms8Yenmtk8TQAC65CO4FJbjstPaG0T
+	Oxt+8Z5RH5y+N1S8G2qI99VlUPaGFcTNF0T1BFNDrrv/zEzusyVUiRUaY+wTA+gHKVGX8iX4IYs
+	tZrgSzxVE3CpLRaSa35AlkDp9ov1webzFvee9phwuefubKCms5Ix/u27jnglYzxmUEo0hIRU1vK
+	4//qsE8m19Vqh3lAb3jQi+LC1+jzfE/fpOxdyLXIvvBHcDIYjsSiOV3ze3W8miuUcgY5HI1/mZJ
+	smBfkOCOfAy6WzZU3xs2+QWnv5hJMkhais7nuiTEpHA8bO8+wrYyoOlylkvhx2dd114WJr6njHn
+	8+IS8DhOclTIKhyObR2ammmG5
+X-Google-Smtp-Source: AGHT+IFn/OaWveSG0AWC87YfzNDHOK3c2Lkvjfj2pXX0BCsm8FFh9R1/lMuhrdFs8NTkuH8A65JvwA==
+X-Received: by 2002:a05:6e02:1a6f:b0:410:cae9:a083 with SMTP id e9e14a558f8ab-4241a4b998dmr29796965ab.3.1758115673240;
+        Wed, 17 Sep 2025 06:27:53 -0700 (PDT)
 Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-511f3067a7bsm6934549173.44.2025.09.17.06.27.14
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-511f3062bc3sm7216527173.47.2025.09.17.06.27.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Sep 2025 06:27:15 -0700 (PDT)
+        Wed, 17 Sep 2025 06:27:52 -0700 (PDT)
 From: Jens Axboe <axboe@kernel.dk>
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>, 
- Christoph Hellwig <hch@infradead.org>, Ming Lei <ming.lei@redhat.com>, 
- John Garry <john.g.garry@oracle.com>
-In-Reply-To: <20250916204044.4095532-1-bvanassche@acm.org>
-References: <20250916204044.4095532-1-bvanassche@acm.org>
-Subject: Re: [PATCH] blk-mq: Fix the blk_mq_tagset_busy_iter()
- documentation
-Message-Id: <175811563473.366965.7135061887872837432.b4-ty@kernel.dk>
-Date: Wed, 17 Sep 2025 07:27:14 -0600
+To: yi.zhang@redhat.com, tj@kernel.org, josef@toxicpanda.com, 
+ hanguangjiang@lixiang.com, liangjie@lixiang.com, yukuai3@huawei.com, 
+ Yu Kuai <yukuai1@huaweicloud.com>
+Cc: cgroups@vger.kernel.org, linux-block@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, yi.zhang@huawei.com, yangerkun@huawei.com, 
+ johnny.chenyi@huawei.com
+In-Reply-To: <20250917075539.62003-1-yukuai1@huaweicloud.com>
+References: <20250917075539.62003-1-yukuai1@huaweicloud.com>
+Subject: Re: [PATCH v2] blk-throttle: fix throtl_data leak during disk
+ release
+Message-Id: <175811567232.367585.6804225420415541020.b4-ty@kernel.dk>
+Date: Wed, 17 Sep 2025 07:27:52 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -79,18 +83,21 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.14.3-dev-2ce6c
 
 
-On Tue, 16 Sep 2025 13:40:43 -0700, Bart Van Assche wrote:
-> Commit 2dd6532e9591 ("blk-mq: Drop 'reserved' arg of busy_tag_iter_fn")
-> removed the 'reserved' argument from tag iteration callback functions.
-> Bring the blk_mq_tagset_busy_iter() documentation in sync with that
-> change.
+On Wed, 17 Sep 2025 15:55:39 +0800, Yu Kuai wrote:
+> Tightening the throttle activation check in blk_throtl_activated() to
+> require both q->td presence and policy bit set introduced a memory leak
+> during disk release:
 > 
+> blkg_destroy_all() clears the policy bit first during queue deactivation,
+> causing subsequent blk_throtl_exit() to skip throtl_data cleanup when
+> blk_throtl_activated() fails policy check.
 > 
+> [...]
 
 Applied, thanks!
 
-[1/1] blk-mq: Fix the blk_mq_tagset_busy_iter() documentation
-      commit: 0b507305a08c134722f363de6fe6f1ba84e313b7
+[1/1] blk-throttle: fix throtl_data leak during disk release
+      (no commit info)
 
 Best regards,
 -- 
