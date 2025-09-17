@@ -1,99 +1,94 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD26B218827;
-	Wed, 17 Sep 2025 01:20:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BE272F8BEE
+	for <linux-block@vger.kernel.org>; Wed, 17 Sep 2025 03:40:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758072056; cv=none; b=mkU51Jcyiz3u0BOJvvHTKElJgeK3uifikB6kbLfMDdsErmV0IWBkQph/fesvndfekAaTDbBa5gIaB28fSXNE/UJnfPz2hkxQe9sbhoLN12xFljBdN3a7OzRn2n5ja2hQpxwR8mYXPUwK6zeJEsowyr43HUpwMdo8Tc6rbwMctDo=
+	t=1758080434; cv=none; b=rSe4zx4RPbSV5I98EfzsusKrvpySzdjShvLKCQfLHA/K2QdEGwdVr4pqUgLQ73vJ+Z3ORK1UYasjC/YuZCO3KazxYzejxYhg8wwqb1fkXJPz1xR7SFH9UOikoaMrPy/BnPU45ctZoZjhiPMeijINp+4sd6J1OmewTMqSEg55nNc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758072056; c=relaxed/simple;
-	bh=lzsyV+P7DVedeesKr/JZ731ihVclpmWmbLLcKbL5Pp0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Z99tMzigWv0o86l0eP6SRRyRb6d8KUjymb/4Fg4U8Zvf88bGovEWQGPQdCZsOXJq4izrK2kn77GRGexJDtm/QedLxNKEA3jDys9ByRcveA2a6VNt2XqB3BuB41guwq7ijDxP86aBTF63z032X0Vfvwd0cKU1QIF79hPHUTw5Lds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4cRLYn6D5lzKHMZW;
-	Wed, 17 Sep 2025 09:20:45 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 8BFB01A0E1F;
-	Wed, 17 Sep 2025 09:20:46 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.104.67])
-	by APP4 (Coremail) with SMTP id gCh0CgB3wY3sDMpo5pYNCw--.41830S4;
-	Wed, 17 Sep 2025 09:20:45 +0800 (CST)
-From: Yu Kuai <yukuai1@huaweicloud.com>
-To: axboe@kernel.dk,
-	linux-block@vger.kernel.org,
-	linux-raid@vger.kernel.org
-Cc: john.g.garry@oracle.com,
-	yukuai3@huawei.com,
-	yukuai1@huaweicloud.com,
-	yi.zhang@huawei.com,
-	yangerkun@huawei.com,
-	johnny.chenyi@huawei.com
-Subject: [GIT PULL] md-6.17-20250917
-Date: Wed, 17 Sep 2025 09:10:56 +0800
-Message-Id: <20250917011056.1843135-1-yukuai1@huaweicloud.com>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1758080434; c=relaxed/simple;
+	bh=piyHsypl3GXPi7gLgRDu2bhAxZZutaGxhkD65yAKTno=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DjKRqEuSNwJUC7ValeCtnEG4WUKyo5jzHDT6ZTgox3HTu6cmErWwSPG5j1ORvkP+CLpTuVghd2SmrXZxLbi8KjQcVAiZC9bXw36EX56aMmOvhPyzRSGSSAAsL130ins2uBKCrlRh3U4BWSvk+znIuLiSQdAqJAROkew2U53W4tI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LgerEsju; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LgerEsju"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1758080431;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tNouETy1LKz/oc6u4FY58QTKf+3DfpDxE9rTMG3lvow=;
+	b=LgerEsjur4Qtzbbx5Awk88RZiyIagjwKZLThd8fYkUBRq4yLzl2bE6K1zaqDnthZh4sPxN
+	2mtGxc6wgYugnBcfT23M8itXntT+PKqnxQNvF0e2IbzUC+ppGwxY0aJUwEA2Tv5kPN1RYs
+	5KNHgEAJe0Cg7z5T0kVSqhqqOFWjnbo=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-459-GoyFwYYQOMiBJ9K1CWKj7w-1; Tue,
+ 16 Sep 2025 23:40:27 -0400
+X-MC-Unique: GoyFwYYQOMiBJ9K1CWKj7w-1
+X-Mimecast-MFC-AGG-ID: GoyFwYYQOMiBJ9K1CWKj7w_1758080426
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5CB1519560AE;
+	Wed, 17 Sep 2025 03:40:26 +0000 (UTC)
+Received: from fedora (unknown [10.72.120.8])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AB263300018D;
+	Wed, 17 Sep 2025 03:40:21 +0000 (UTC)
+Date: Wed, 17 Sep 2025 11:40:16 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Uday Shankar <ushankar@purestorage.com>
+Cc: Mohit Gupta <mgupta@purestorage.com>,
+	Caleb Sander Mateos <csander@purestorage.com>,
+	Shuah Khan <shuah@kernel.org>, linux-block@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] selftests: ublk: fix behavior when fio is not
+ installed
+Message-ID: <aMotoKv7vMddunno@fedora>
+References: <20250916-ublk_fio-v2-1-04852e6bf42a@purestorage.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgB3wY3sDMpo5pYNCw--.41830S4
-X-Coremail-Antispam: 1UD129KBjvdXoW7Gr4rJw15CF13AF1UXryxXwb_yoWkGwc_uF
-	WrXFWrtr4UGw17Aa1UWFn3ZryYv34UWF1vqr45KrWYqw13ZF1UKr1aqrWrX3WDZa4IqF98
-	Ar1Ut3s5Ar15ZjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUb4xFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-	A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
-	6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCY1x0262kKe7AKxVWU
-	tVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14
-	v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkG
-	c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4U
-	MIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUd-B_UUU
-	UU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250916-ublk_fio-v2-1-04852e6bf42a@purestorage.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-Hi, Jens
+On Tue, Sep 16, 2025 at 06:42:52PM -0600, Uday Shankar wrote:
+> Some ublk selftests have strange behavior when fio is not installed.
+> While most tests behave correctly (run if they don't need fio, or skip
+> if they need fio), the following tests have different behavior:
+> 
+> - test_null_01, test_null_02, test_generic_01, test_generic_02, and
+>   test_generic_12 try to run fio without checking if it exists first,
+>   and fail on any failure of the fio command (including "fio command
+>   not found"). So these tests fail when they should skip.
+> - test_stress_05 runs fio without checking if it exists first, but
+>   doesn't fail on fio command failure. This test passes, but that pass
+>   is misleading as the test doesn't do anything useful without fio
+>   installed. So this test passes when it should skip.
+> 
+> Fix these issues by adding _have_program fio checks to the top of all of
+> these tests.
+> 
+> Signed-off-by: Uday Shankar <ushankar@purestorage.com>
+> ---
+> Changes in v2:
+> - Also fix test_generic_01, test_generic_02, test_generic_12, which fail 
+>   on systems where bpftrace is installed but fio is not (Mohit Gupta)
+> - Link to v1: https://lore.kernel.org/r/20250916-ublk_fio-v1-1-8d522539eed7@purestorage.com
 
-For 6.17 on drivers supporting write zeros, raid{0,1,10,5} are broken and
-can't be assembled.
-
-Please consider pulling following changes on your block-6.17 branch to
-fix this serious regerssion.
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
 Thanks,
-Kuai
-
-The following changes since commit 743bf030947169c413a711f60cebe73f837e649f:
-
-  Merge tag 'md-6.17-20250905' of https://git.kernel.org/pub/scm/linux/kernel/git/mdraid/linux into block-6.17 (2025-09-05 05:08:27 -0600)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/mdraid/linux.git tags/md-6.17-20250917
-
-for you to fetch changes up to f0bd03832f5c84f90919bd018156b1b6eb911692:
-
-  md: init queue_limits->max_hw_wzeroes_unmap_sectors parameter (2025-09-17 00:37:12 +0800)
-
-----------------------------------------------------------------
-Zhang Yi (1):
-      md: init queue_limits->max_hw_wzeroes_unmap_sectors parameter
-
- drivers/md/md-linear.c | 1 +
- drivers/md/raid0.c     | 1 +
- drivers/md/raid1.c     | 1 +
- drivers/md/raid10.c    | 1 +
- drivers/md/raid5.c     | 1 +
-
- 5 files changed, 5 insertions(+)
+Ming
 
