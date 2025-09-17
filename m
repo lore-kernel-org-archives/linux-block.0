@@ -1,203 +1,171 @@
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3760A1E1C1A
-	for <linux-block@vger.kernel.org>; Wed, 17 Sep 2025 00:45:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758069937; cv=fail; b=QZEazIo0y03xmqo3OIAeOYULp6z7k8rwJOQ1FnbN4JPuzOM2uCHBBWfLkmSm3bM1fEOQTPBpajzcc2mrrfFwy/8hjtGJ0/rbqIHXSb37KDMLAOz3EY/89yIizfjbHOFCJiXK35QmpyHkgmnhYk33aSIlxmH9Wo9N0zFIudWpl4s=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758069937; c=relaxed/simple;
-	bh=5xtL9fsTHLwZY1DKLhbzOdlXTvm6eu6DG+hn3jM5wz4=;
-	h=To:Cc:Subject:From:In-Reply-To:Message-ID:References:Date:
-	 Content-Type:MIME-Version; b=OPdXHhEMHc1lgfDx3m7L/FdvnuXBHyEn3GyKlqsO6I7YRYoliQRXct/cdVEuXJVXkKtPsasMAPu/X9YghlOQ0youLDAZ03h+vqYtOihfc1p3ZnS81cwAkgNp3bVPNYqZoWp6CEjps61AU6ObJTfBKjR8lMvgBoWpqHm7Avrumjs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=AQqqxE7b; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=WMySnqsC; arc=fail smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="AQqqxE7b";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="WMySnqsC"
-Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58GLZMkm022652;
-	Wed, 17 Sep 2025 00:45:22 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=corp-2025-04-25; bh=BVb3KtvdVpznXgRg6H
-	79WyusFuxe4afsKZY2qY0MRTA=; b=AQqqxE7bpLI1hSIxHMJQt4FtEfjNnr7+K3
-	26TuZZKbbBXfKkZ+1CXTsdLbeNmUChJhqFQRQi/kc8F04xth6nyBwZ2O8gz55jF4
-	BOdreG2BUsLjEn34vWd2oUn+fA6DZgwu2hl19ALCS1nLc9o6XIZGE+eUmr90yNld
-	egfJWFiy4TR/8Pe3yxtlg2AV28rqOHXcSobUGW2+hpjMUty60A846aClnWxCRQ6n
-	smsZyED7YqEOouBDAMcacWqQOlEUL6oNRjORbS8NF1S0LEoAiO6fHEVGddiS++a6
-	EpdhAJ07JJTRLKWitmuU6SaRJhoGCCGJe0VQd8KUE8rnMRcmF6zw==
-Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 497fx9063q-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 17 Sep 2025 00:45:22 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 58GLcs1O028970;
-	Wed, 17 Sep 2025 00:45:21 GMT
-Received: from bl0pr03cu003.outbound.protection.outlook.com (mail-eastusazon11012056.outbound.protection.outlook.com [52.101.53.56])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 494y2d33c5-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 17 Sep 2025 00:45:21 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=sD7XwOhy2J5bDadFktHlaHYPpaSPSDmxED6OlApLyTv5l2f1hMRUy8uTQ0XNd2wa75J4WQ6qr/Kzu441ABR74eJ9hyQkJ39tHL8jeP0SM+ZVKravkR1NT/dSWme7MXML3a77ABF2dbhCqjTChCzqZVAZ9e8wBg7vEdO6ZiYXNbi9gdryosaFuUsDVHj4wOjVxgBK1//5fAp49SQuCMLkLmJEBW8PwEqCbKd0sxSILAfEzZ3dRWkNRFCBccdFgjPxnql6O93TQcAVeZpDqqSB7m2ITkpvk4tNFepJwQLu5K/uTSYQbXgPnJHXOaErAJpSEE7x450Kz8wx+8OnYjQSrQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=BVb3KtvdVpznXgRg6H79WyusFuxe4afsKZY2qY0MRTA=;
- b=LgcFjn1iBg+goNO5tbz6NkR8+ID5tPTvt+NWBER9Lltue4WFJK4kjwyzsjVBnqRJfAna/NPUfirK86XMrcHAdwFvYD+bW/xKF/S89J3hHU831jCIJdcoHt9wKHK/WiDJ+n+aboMwdf1Sg+6FNJw0FRxg84U5lz78kaDpKnhBjy8s+mmF9yjsUfUbTgB4XgQAQQDgm6fpC1Uvqj4qU50KW8TgS8JtSKs5SL578HZukUdwkkb3CXfMsVEzE3aLwi4h6Tj2QY+H87wfj0p8UxXI9VY662h1d8Z+4iLs9FI7n82Wt9tx9+miw5Swves2Ud/xBYBiuiT7RxL/nKDn2G9vDQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=BVb3KtvdVpznXgRg6H79WyusFuxe4afsKZY2qY0MRTA=;
- b=WMySnqsCToxM42DTyMQJkntlNVJBbwbPflbA8qId26gqt0hEL1T8/FHIASxxnk8jWLsWPYVvfiOKmoMAAnrUquGFOU9JD5Qb2Q864GaJS8hexcx1vonJbynG7ubPQ+tZOr28ge9TxtPcq5i5myr7ZT6O7JoL51ZXQ8rNuYHsnn8=
-Received: from CH0PR10MB5338.namprd10.prod.outlook.com (2603:10b6:610:cb::8)
- by IA4PR10MB8686.namprd10.prod.outlook.com (2603:10b6:208:56f::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9115.19; Wed, 17 Sep
- 2025 00:45:18 +0000
-Received: from CH0PR10MB5338.namprd10.prod.outlook.com
- ([fe80::5cca:2bcc:cedb:d9bf]) by CH0PR10MB5338.namprd10.prod.outlook.com
- ([fe80::5cca:2bcc:cedb:d9bf%6]) with mapi id 15.20.9115.022; Wed, 17 Sep 2025
- 00:45:18 +0000
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph
- Hellwig <hch@lst.de>, Christoph Hellwig <hch@infradead.org>,
-        Ming Lei
- <ming.lei@redhat.com>, John Garry <john.g.garry@oracle.com>
-Subject: Re: [PATCH] blk-mq: Fix the blk_mq_tagset_busy_iter() documentation
-From: "Martin K. Petersen" <martin.petersen@oracle.com>
-In-Reply-To: <20250916204044.4095532-1-bvanassche@acm.org> (Bart Van Assche's
-	message of "Tue, 16 Sep 2025 13:40:43 -0700")
-Organization: Oracle Corporation
-Message-ID: <yq1ecs5zz44.fsf@ca-mkp.ca.oracle.com>
-References: <20250916204044.4095532-1-bvanassche@acm.org>
-Date: Tue, 16 Sep 2025 20:45:15 -0400
-Content-Type: text/plain
-X-ClientProxiedBy: YQZPR01CA0011.CANPRD01.PROD.OUTLOOK.COM
- (2603:10b6:c01:85::26) To CH0PR10MB5338.namprd10.prod.outlook.com
- (2603:10b6:610:cb::8)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C05E1E32B9;
+	Wed, 17 Sep 2025 01:20:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758072027; cv=none; b=WUDQTGbb0sgHS7Qa1ePtygyIH6NmOFuciutz9+eOt9XQWTJF/sgjw9SHRLOYmaBy8OB8vh5+c1UkMwsRhRfSJPXso6QE3VXC8Ru9IyyQmND/Hs0z7w8r4FPGzn2ME+6i4YZ4Mj9CO5mnDUt5wyVMlwLbqjkfGW0KC2t7nV9ntw4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758072027; c=relaxed/simple;
+	bh=jGZHf18wvFCOhPTzRINGLkXZD67i3bQzutmJMhFhaiI=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=VbJiwlNdZl1jmR/pqV31/CUoADR7dzBNV/P5rqvxdp5MRbkc57IQTAZ4YBfzNBNw9gO/mjR0bd7jGrwx3/4EzJWOtGkKsIp+y+L41YcJicAv2CYk+SCBjGTNEzMSXyY3z3eoD4ENQCrR+yheTZur22RCv9s5EaZIhXxkfrweeQY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4cRLYL6xhxzYQv00;
+	Wed, 17 Sep 2025 09:20:22 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 9022C1A166F;
+	Wed, 17 Sep 2025 09:20:21 +0800 (CST)
+Received: from [10.174.179.143] (unknown [10.174.179.143])
+	by APP4 (Coremail) with SMTP id gCh0CgCn8IzRDMporI0NCw--.40294S3;
+	Wed, 17 Sep 2025 09:20:19 +0800 (CST)
+Subject: Re: [PATCH v2 1/2] md: init
+ queue_limits->max_hw_wzeroes_unmap_sectors parameter
+To: Zhang Yi <yi.zhang@huaweicloud.com>, linux-block@vger.kernel.org,
+ linux-raid@vger.kernel.org, drbd-dev@lists.linbit.com
+Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+ john.g.garry@oracle.com, pmenzel@molgen.mpg.de, hch@lst.de,
+ martin.petersen@oracle.com, axboe@kernel.dk, yi.zhang@huawei.com,
+ yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
+References: <20250910111107.3247530-1-yi.zhang@huaweicloud.com>
+ <20250910111107.3247530-2-yi.zhang@huaweicloud.com>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <f0cbf355-df20-d8a3-94d9-1ada83647a5a@huaweicloud.com>
+Date: Wed, 17 Sep 2025 09:20:17 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH0PR10MB5338:EE_|IA4PR10MB8686:EE_
-X-MS-Office365-Filtering-Correlation-Id: a538dc61-ebd2-4418-3032-08ddf58378c5
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?l/wC8tzXv9JgYXAe8a1wpDrHwPsYnNtlnt8ZSyBmcsSYB9FxB2K4MrunAot+?=
- =?us-ascii?Q?eP4AfnpuCmZLyHSP/SYb2EeThEO8ecfZ6BKVY4YnNfX37a6iqnqtS5jhHi6D?=
- =?us-ascii?Q?YQkxepcAHF1tKegeQUHC5/qbk6wJexz5XfVex4GQwt343pvB45mq9goTtc3N?=
- =?us-ascii?Q?SkPfx16rcLhzqXineb2dLCICGb20IkXt3duaQNCbCAsAU0uECTuNnUEFa1Ry?=
- =?us-ascii?Q?zJcZ4XGElIlFFAEgckKIuadMrQzKrdaXUgrPcoaemwC1Ff8AtitJrpASv7tk?=
- =?us-ascii?Q?/B/g3uWrQVsQxHgVgNp5ru2hWxh0TPeEx4WurSG54W2cXuKYiMN9oNEQ2iC5?=
- =?us-ascii?Q?IK9rJIMFgovolGuor/pWdldMRRip+ppYZK8uCo2uxFDP1NVgNmHKShBXgLVv?=
- =?us-ascii?Q?JkqIPPq2WWAEt5lUZHRECuRg0BvMJJBfvR2EHMx3A/qWIP0Qra02beHzziNt?=
- =?us-ascii?Q?d6QRfvHX6oeUbnmJdvwy3tvy+aSFtcy0I7osvE5lzAPRBdsX3gN7MyeuULaT?=
- =?us-ascii?Q?n19tAOL0KzkoqEh6XM0GPFrPTvOepOWNHybLyFpKHM9a8j1YZ26qAHwZuyPy?=
- =?us-ascii?Q?IY+WhcvBYoCumxvaLP13S3KqW/svOapzoAimlC2m1QFa7h6LlLL1uot1mGM7?=
- =?us-ascii?Q?dBCGD9uxEoFrcts5y1DY9OVgTDGnVQnMMGrtXgbw66BSvsOxK58HzEUMM20G?=
- =?us-ascii?Q?pk3B2u13a14VIlumkL3ol3DbFQp+D58iEqFDeUHiDvksHg+Y/1x+DEl3HO7+?=
- =?us-ascii?Q?s8VZCHEDAbh4Age3KNxRkCLPGHmlu/GeR3JV7rd/j8uAymN57UbL0Q5k1IEu?=
- =?us-ascii?Q?biqYss91dbqWZTgkIrDf73ITrSb3WLhc7HTYiFFfVG8VSNOTUfjM9SOwGCgA?=
- =?us-ascii?Q?9dzp2wg1eg4z1jL3YMrPUYmSqaGX6gbliNrzl4kY2shSdzdJjTLJbTTYZDkX?=
- =?us-ascii?Q?jGAytt9HjCSFgwWrEsyAgG8z4wbGYIs3JSrckm78ErsGmRtCCXQbHe9D8iFV?=
- =?us-ascii?Q?VYP7o8PeBot8OHnsGACLkreXG5iONCsKs9jGQo8vcKQeGRUP0jZqB8HODIlc?=
- =?us-ascii?Q?4fbTsA/tSWe+FsSBHptj8BzW+Dt16BQwvk1L458KFm4vlJIB/d3n3XgG7F2U?=
- =?us-ascii?Q?6oNqSRDts7DFnvRRarB0Awu2lG7DtO58fO/cvVkwnsVqWMwVn5CC8g9qnUeR?=
- =?us-ascii?Q?sJNsGWFw2SLltJ9LS1dOmojpziEUnA9+gBv91CcCXKtKvHPVP/1PDI2CQzv/?=
- =?us-ascii?Q?IuDww3pusKg4H3zMWwzjyWeyc0WQGGdBAJjg/pioNo1PCfGbmRCCHnsjAaJX?=
- =?us-ascii?Q?pa+EpUlnqjCAWJJ4B0UzET0T8BBpjpqFUc++gvlCkGasXD/U+3dKQAf483MD?=
- =?us-ascii?Q?Xn0DRvXJuCALj+vpxCwidP4k4wWc6GuPSzpjQpxsuCWPTzKRfh1ED5bzG3B9?=
- =?us-ascii?Q?jRowBo0FLdM=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH0PR10MB5338.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?NOBuO8CQCgaTfL3r3EHXolrpqnOQY2CD1hJzHYbDbqDZyUg2iWmpH3f3a/7l?=
- =?us-ascii?Q?h5cf3P87kpfkPbo96cI1O3b3N3spPMwvtYYQr25HVeXVDY5EiR/jT+Bq+rLo?=
- =?us-ascii?Q?Qi07qxmM4bf/qYeMSRQffQSga6mWRiix6E8q8DJb+5R8u9ZleplKfyORaHg7?=
- =?us-ascii?Q?TsJgc8ja47w8aaVnT1gI1l1Q9nZ8nOYDBgsvJUo46J2xqocv9MLXxuAmun+V?=
- =?us-ascii?Q?kpMuYCVoPxN4ZVU8JghH+2bUvsBLUqfg6b+k9Et1xdGu3ndBvHgJnBevnCeZ?=
- =?us-ascii?Q?BVXlfUb3iawsIC+jBz8ZuDFZLKlRAUaXcPi6uOzlvRpXX/0nLoPfGdzcqt2Q?=
- =?us-ascii?Q?Wqpc8ZWWZg4uMsgcNjZ7FYPVTzOcOZOWXfqSXf5t+FW7GSzTt8Mh3VEvifNj?=
- =?us-ascii?Q?c4Tg8fjp2PlAksiPpUg2fLak3W24TqRX44rT7bohI9gFa7NXbAEdUMdNd1GP?=
- =?us-ascii?Q?zxh9HU4pwKXA9CH7rdxWnbXPTAeZ+fwBzhFmfEk9l8JbPob9EZGQCTas8hFv?=
- =?us-ascii?Q?0gaI1uW4UGGAR1/zU/LeYZL3a7YogiKEjAhVTjWLvWlpKEyZp3wDNzRrG+7g?=
- =?us-ascii?Q?yKU69+5LbfqeBqULluO4lzhL5r5nyC7QpALfC+0N3Qp9QFll4JzJjFCtpCk3?=
- =?us-ascii?Q?fbE0nJ1JJkM+o4hBZJOKJWqSMGTyxyc6alZpTXezT+38XpXXjJml4ANh2aae?=
- =?us-ascii?Q?pJe+bBv10Q2dOE6YmG0DIrZ12inRrV930xlScVo9TjsHn/bHJzYQzaQWSfF3?=
- =?us-ascii?Q?ywbyON8MMEVk7TdoZG8a5MEKJIVpWNGIaZ78L4KcTqAiXkPRTZAVza3mwbsO?=
- =?us-ascii?Q?EypiKLS60gvd8/vaJ3Df9J3PLaKj7M7J/ypreAd4sCCMbJq6RDoMGP5POKOQ?=
- =?us-ascii?Q?HuKgYlfrHptBCnO0ABmILFLyYR0+/BLykn2GF1KEO4xi7Gnz6PRTyzH38yUd?=
- =?us-ascii?Q?ziDFVBfCTtEOJBf1mRvY/gzblwc6h9+/ToX0XrfvWFTGvnWUU0KNZ65Ajqik?=
- =?us-ascii?Q?4rjUn3H5+qkbnhy5B6lEL6gBomZ+MEIQOOCegkNdCPedIoyycpfYMv6aJjRf?=
- =?us-ascii?Q?cx3Im0l5CesDdzinsGSNa9DhBS+Ga47Wy23pXfpEMopvoeco8r46TfzkHQFj?=
- =?us-ascii?Q?+gGTGiQrPbNQn/JsVWxcFiyCYSX7Ci6AELKSRdVAhCvqeg1Gwt+OUHGtpqbJ?=
- =?us-ascii?Q?7hK+vVBfM05aiA1gcoj/WrjvVuAPx47ArN7Oymyn9afcES7qnZPJT3B8JUNs?=
- =?us-ascii?Q?GZDp5Lq1HxCHMcUlOnLN108abVuLdRLF/4HKNQMi0xcrKqNM59Tbe0AmtngO?=
- =?us-ascii?Q?kJMUXgDfIUnam8VqIzCd3glwEJsec9B+TshyuSu7T5exqzPDCoI9kmLEMma8?=
- =?us-ascii?Q?3ezPgUwt5hePjk5V7vQ/RTC9UHON3fA7b1vcMX1VhNMwVXYsJb/DqfGEuTgE?=
- =?us-ascii?Q?eOn8ZM0MMRFNJRuKs1hXbasGLuyOAFRH8RalGeGOsEvT+TjSSj7uHEfm0rtF?=
- =?us-ascii?Q?7ah66xfwk+CNRP1xWunaH4iAjwSo+Ie2yXmUYKxTmNNhop3xSQ93ynyzdIwq?=
- =?us-ascii?Q?6A+nfXC79VnhL5TjNzOfBbW7lDHgy3egGlbK1fM3f9DjD1TFJsphPgg0tSQy?=
- =?us-ascii?Q?5g=3D=3D?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	zfn9SOcsptwP13Vj4IkXS5pt55Qrd06ACDf8GftTuUCA5zg4K+A+9DaBPM6JY2wizqNCorwYIo9Ernp7qn1X/bgL1hsKlswMDxwgsHg0V3Nde6Tcl905jVKyMlgjocRV7hVo00a/WmJ/eZt8pMnQA2tEQXq0UaCnwBtNEAc3lJ0xiVzCyyrN5X+Sb02Tj9/mhKfu8FPoSGG4irQZ/sy+Wpi+HVyQrVao/bYydjeL4m64vHRAneHvibRtzmdAeOdolB1L470tKFdqw7lRSBRodQ79QJgJYww1CykGoRzs9+vkeO3SxvNtj6PJukyyiJ/8aA0gaelkUbeYSiTMzk/Bv1Y9w9DZmcFn69G+M3q+IECK1DUJcwfO9wvNMYs3OGt1Rbi09iV68K32wRUCYu47SePp+claRa0iYFtzmSPhlty/rmSha7a1HnAvWnh/owwvNefwTynBt3vHrn8hJYowdash7CmL9ZkArU2dociT+W0qlrkqCalyOg0j49/Vt1SjgsosVcBEyzw48cN/4HWxxgzqKpxBYh7DoZxQ1iqTe1kUUJXXwG1RCCW8QG3d/ISrgIXItTQWPhW19MsIbHIj+ri6bqtTqqeI17Lx4fB6T5A=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a538dc61-ebd2-4418-3032-08ddf58378c5
-X-MS-Exchange-CrossTenant-AuthSource: CH0PR10MB5338.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Sep 2025 00:45:17.8666
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: G7zBdSPfJihB8UnxsbHZaLAwDDxGn9mwcUOhmBccIPH327fjG/XEeHHa/VjvI5fUzuVl7FT9uUqMob7oIoCRucCkwX4jL+dq65VmlRj3Cvs=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA4PR10MB8686
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-09-16_02,2025-09-16_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 spamscore=0 phishscore=0
- bulkscore=0 mlxscore=0 suspectscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2508110000
- definitions=main-2509170005
-X-Proofpoint-ORIG-GUID: P2NnvUHdJCOK4VKaeyOt5R2HjbzJmHCa
-X-Proofpoint-GUID: P2NnvUHdJCOK4VKaeyOt5R2HjbzJmHCa
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTE2MDIwMiBTYWx0ZWRfX1hTwB+koecyY
- 1Mb7i9QgTW6UDRsIrNq84rv/3Lx6iF/JMphuidRGkZxLvUKlJazxo+tbKsCCUX6FMJQsMDsqvt3
- rQTTaWtRtfquxgIeQDB/9OIjiogOBTw8pyZcL3wpjH1NE9pokqE9uFsc/BrbA2Edlk1CieqMPaj
- OfK4Twoippr5aIV/uPaZ8KoR7VraeDAQBH5vnAJ9hmlstNlgrXFe7edBLQ2Zfh96djHEu4t/EMR
- dye+66BziPhLq9aZUvb55L4cJd6zMWUhYATRm2LWl85//HU6IPd3jmnSr5UCuuEMq4bPh2xmOtq
- T9EhXyxC65Z4aCPUMJz/40UHTQ9feO1I6vijHtfV+oJGzRl+kxgwRSkCmkW/atE2hd4fhDtJ3vN
- 9zzxsD7H
-X-Authority-Analysis: v=2.4 cv=N/QpF39B c=1 sm=1 tr=0 ts=68ca04a2 cx=c_pps
- a=OOZaFjgC48PWsiFpTAqLcw==:117 a=OOZaFjgC48PWsiFpTAqLcw==:17
- a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19
- a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=wKuvFiaSGQ0qltdbU6+NXLB8nM8=:19
- a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19 a=xqWC_Br6kY4A:10 a=yJojWOMRYYMA:10
- a=GoEa3M9JfhUA:10 a=yPCof4ZbAAAA:8 a=6QoIp_ukNQ5DW1UNWsAA:9
+In-Reply-To: <20250910111107.3247530-2-yi.zhang@huaweicloud.com>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgCn8IzRDMporI0NCw--.40294S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxXFWUXw1fWrWDWrW5CFy7Awb_yoWrtF45pa
+	y7XFySvryUJayUAa98J34UuF4rXa45GrZFkFy3Xw1kur17Wr9rWF4fXa98XFsrZw15C3W7
+	t3W0kFZru3WYgrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9Ib4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7Mxk0xIA0c2IE
+	e2xFo4CEbIxvr21lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4I
+	kC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWU
+	WwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr
+	0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWU
+	JVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJb
+	IYCTnIWIevJa73UjIFyTuYvjxUF1v3UUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
+ÔÚ 2025/09/10 19:11, Zhang Yi Ð´µÀ:
+> From: Zhang Yi <yi.zhang@huawei.com>
+> 
+> The parameter max_hw_wzeroes_unmap_sectors in queue_limits should be
+> equal to max_write_zeroes_sectors if it is set to a non-zero value.
+> However, the stacked md drivers call md_init_stacking_limits() to
+> initialize this parameter to UINT_MAX but only adjust
+> max_write_zeroes_sectors when setting limits. Therefore, this
+> discrepancy triggers a value check failure in blk_validate_limits().
+> 
+>   $ modprobe scsi_debug num_parts=2 dev_size_mb=8 lbprz=1 lbpws=1
+>   $ mdadm --create /dev/md0 --level=0 --raid-device=2 /dev/sda1 /dev/sda2
+>     mdadm: Defaulting to version 1.2 metadata
+>     mdadm: RUN_ARRAY failed: Invalid argument
+> 
+> Fix this failure by explicitly setting max_hw_wzeroes_unmap_sectors to
+> max_write_zeroes_sectors. Since the linear and raid0 drivers support
+> write zeroes, so they can support unmap write zeroes operation if all of
+> the backend devices support it. However, the raid1/10/5 drivers don't
+> support write zeroes, so we have to set it to zero.
+> 
+> Fixes: 0c40d7cb5ef3 ("block: introduce max_{hw|user}_wzeroes_unmap_sectors to queue limits")
+> Reported-by: John Garry <john.g.garry@oracle.com>
+> Closes: https://lore.kernel.org/linux-block/803a2183-a0bb-4b7a-92f1-afc5097630d2@oracle.com/
+> Signed-off-by: Zhang Yi <yi.zhang@huawei.com>
+> Tested-by: John Garry <john.g.garry@oracle.com>
+> Reviewed-by: Li Nan <linan122@huawei.com>
+> Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+> Reviewed-by: Yu Kuai <yukuai3@huawei.com>
+> ---
+>   drivers/md/md-linear.c | 1 +
+>   drivers/md/raid0.c     | 1 +
+>   drivers/md/raid1.c     | 1 +
+>   drivers/md/raid10.c    | 1 +
+>   drivers/md/raid5.c     | 1 +
+>   5 files changed, 5 insertions(+)
+> 
+> diff --git a/drivers/md/md-linear.c b/drivers/md/md-linear.c
+> index 5d9b08115375..3e1f165c2d20 100644
+> --- a/drivers/md/md-linear.c
+> +++ b/drivers/md/md-linear.c
+> @@ -73,6 +73,7 @@ static int linear_set_limits(struct mddev *mddev)
+>   	md_init_stacking_limits(&lim);
+>   	lim.max_hw_sectors = mddev->chunk_sectors;
+>   	lim.max_write_zeroes_sectors = mddev->chunk_sectors;
+> +	lim.max_hw_wzeroes_unmap_sectors = mddev->chunk_sectors;
+>   	lim.io_min = mddev->chunk_sectors << 9;
+>   	err = mddev_stack_rdev_limits(mddev, &lim, MDDEV_STACK_INTEGRITY);
+>   	if (err)
+> diff --git a/drivers/md/raid0.c b/drivers/md/raid0.c
+> index f1d8811a542a..419139ad7663 100644
+> --- a/drivers/md/raid0.c
+> +++ b/drivers/md/raid0.c
+> @@ -382,6 +382,7 @@ static int raid0_set_limits(struct mddev *mddev)
+>   	md_init_stacking_limits(&lim);
+>   	lim.max_hw_sectors = mddev->chunk_sectors;
+>   	lim.max_write_zeroes_sectors = mddev->chunk_sectors;
+> +	lim.max_hw_wzeroes_unmap_sectors = mddev->chunk_sectors;
+>   	lim.io_min = mddev->chunk_sectors << 9;
+>   	lim.io_opt = lim.io_min * mddev->raid_disks;
+>   	lim.chunk_sectors = mddev->chunk_sectors;
+> diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
+> index bf44878ec640..d30b82beeb92 100644
+> --- a/drivers/md/raid1.c
+> +++ b/drivers/md/raid1.c
+> @@ -3211,6 +3211,7 @@ static int raid1_set_limits(struct mddev *mddev)
+>   
+>   	md_init_stacking_limits(&lim);
+>   	lim.max_write_zeroes_sectors = 0;
+> +	lim.max_hw_wzeroes_unmap_sectors = 0;
+>   	lim.features |= BLK_FEAT_ATOMIC_WRITES;
+>   	err = mddev_stack_rdev_limits(mddev, &lim, MDDEV_STACK_INTEGRITY);
+>   	if (err)
+> diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
+> index b60c30bfb6c7..9832eefb2f15 100644
+> --- a/drivers/md/raid10.c
+> +++ b/drivers/md/raid10.c
+> @@ -4008,6 +4008,7 @@ static int raid10_set_queue_limits(struct mddev *mddev)
+>   
+>   	md_init_stacking_limits(&lim);
+>   	lim.max_write_zeroes_sectors = 0;
+> +	lim.max_hw_wzeroes_unmap_sectors = 0;
+>   	lim.io_min = mddev->chunk_sectors << 9;
+>   	lim.chunk_sectors = mddev->chunk_sectors;
+>   	lim.io_opt = lim.io_min * raid10_nr_stripes(conf);
+> diff --git a/drivers/md/raid5.c b/drivers/md/raid5.c
+> index 023649fe2476..e385ef1355e8 100644
+> --- a/drivers/md/raid5.c
+> +++ b/drivers/md/raid5.c
+> @@ -7732,6 +7732,7 @@ static int raid5_set_limits(struct mddev *mddev)
+>   	lim.features |= BLK_FEAT_RAID_PARTIAL_STRIPES_EXPENSIVE;
+>   	lim.discard_granularity = stripe;
+>   	lim.max_write_zeroes_sectors = 0;
+> +	lim.max_hw_wzeroes_unmap_sectors = 0;
+>   	mddev_stack_rdev_limits(mddev, &lim, 0);
+>   	rdev_for_each(rdev, mddev)
+>   		queue_limits_stack_bdev(&lim, rdev->bdev, rdev->new_data_offset,
+> 
+Apply patch 1 to md-6.17.
 
-Bart,
+Thanks,
+Kuai
 
-> Commit 2dd6532e9591 ("blk-mq: Drop 'reserved' arg of busy_tag_iter_fn")
-> removed the 'reserved' argument from tag iteration callback functions.
-> Bring the blk_mq_tagset_busy_iter() documentation in sync with that
-> change.
-
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-
--- 
-Martin K. Petersen
