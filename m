@@ -1,160 +1,124 @@
-Received: from mail-qv1-f102.google.com (mail-qv1-f102.google.com [209.85.219.102])
+Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B15F343D7C
-	for <linux-block@vger.kernel.org>; Wed, 17 Sep 2025 19:12:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.102
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B335B284670
+	for <linux-block@vger.kernel.org>; Wed, 17 Sep 2025 19:59:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758136361; cv=none; b=jhLVLEesbu1xyr32NYyUnYmrLQgCWALldBVTGeOrwITvau0jzYwj8ztfx6TdK1BScmumeGQ/3P5teqkQ31t51wwh/kfYG4n4ocIewvpZN0nlt3D5JrhXVFmYaZIkKlsyaN2+CDkjl/44/zL3+E1vhhqDVr/VeggVUTWPx5onQ+w=
+	t=1758139179; cv=none; b=koJ29tWaK9NLx2v3So3wKX69TLkmt2J7CWLn2PxIoASmTR90k8QgGIsFqosn2S4iQytrQN43hagfaIiUGS3fPoN/GmMgwPkv3onL0wPRgo7BIT6GufDNovhwPZVOXqhxPJU9tnaWy9hMZiYfpy1jadb7K9D4qWCL3phzFc3t2Tk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758136361; c=relaxed/simple;
-	bh=1vjvrErixwiivd/wzISzOVvkbt76yybwtaJToh3tQxk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=il8VeAZ9nQdKPrlEidaiSmvciRDq2DbtP9Cw8lCBgvEu+1VHpW3PNg9G5F1w6Vm2vyvoBKv8JQK+7Dq7Mbp6O5HyC/CHJT6ScrDBVhnuesfxEcTrToIH+AIdu3Gp48sUqyVvAgmlISRDwO/sYt3tY1aXGWp8KSjHMOtihRPhArk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=Cdj9EBJB; arc=none smtp.client-ip=209.85.219.102
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	s=arc-20240116; t=1758139179; c=relaxed/simple;
+	bh=lT+6fz4hGzB3x5TxZKL3rSaWn/F8+CECdWOTuWodsnQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fcGF3ef2ddDC0JCZZ7q4+1Cqwx4ijkvD2RVHADlyNwXr7oe0NsBsIW/81Brr15Swmei9tvQtrXZBarVVcr8Fd8kdm0i0ifjCtmFeJqEqY21YOWuh9ItsIvHLxD/JT33ZpXS6IQtUM+dCA0qgDURtS08YugM30aEmOIthfWjdf20=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PmON3y9l; arc=none smtp.client-ip=209.85.160.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="Cdj9EBJB"
-Received: by mail-qv1-f102.google.com with SMTP id 6a1803df08f44-7814871b581so1568966d6.2
-        for <linux-block@vger.kernel.org>; Wed, 17 Sep 2025 12:12:39 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PmON3y9l"
+Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-4b5eee40cc0so2090261cf.0
+        for <linux-block@vger.kernel.org>; Wed, 17 Sep 2025 12:59:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1758136358; x=1758741158; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=YUffZOSE0pIs8q7STk7EsoZEDkYGtOkYWeXrF7MZ/ro=;
-        b=Cdj9EBJB0GAJY4Ig4TwZSZXpXr1SeTdQphNglugm09ntSAr5u2AJbNUpFAIKw7IdWC
-         BJ4Hj/4f0JZFWYkWnxZONPomfNwdfQZI5kOfDTAUqdyXZKPP7IaeP9COa9H63N/HZWDO
-         GLvIxGG+FnRaI8/xx3dxB6d8AVm8xSLaYrZoIb8b4TWRX0zEXiMuXJQ3zHEVoPlCs3r8
-         /iTBm9wv5R4FiV/jN5tT8o2+g+JWmODnlYZOOTAtgpYMlcWpUWJGWZhEuLlvC8h7rYYY
-         Rt9O3Z6XJTOLbSIEY0CuvPJWosxtX2fIBpFoMLcD4rTg2OEWmM09Ky1UBDjNL5OQ88Hw
-         Kd2w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758136358; x=1758741158;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1758139176; x=1758743976; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=YUffZOSE0pIs8q7STk7EsoZEDkYGtOkYWeXrF7MZ/ro=;
-        b=OK+VxHKrqjC9D7Py62iGT/nhKknv00xSjdDdu3yY0Te/6lkm1KlvbJuECTgmG5UueC
-         Z2875UkxjZAeX/z/zLIzUmj2AUA8lI4qgA38xZqYTqJDypoP21C277/AZatDg5SjP9A2
-         YuLbJl3FR4oiU6aFyjAxDuKPIuldqfsbP06h0ENZhGb5M4hEno4pCJqN0GPGgPVxplHk
-         FBsgtM8pbUPTIoy4zl8t/5TClzZsLYdV/fiztsZM9dOo8OtDAnXqDmfem1uaTVhFThHr
-         SeFmylSsW7Fo7O9mWOsJx8s9vFsgv7RRc8/7pvtmQTjhZdlCq9Q4J9IoK4f78T7UFz9s
-         RDZg==
-X-Forwarded-Encrypted: i=1; AJvYcCVQU1v+mTvccNdMUZegO0zwWkIRos4cwxrSwr9o9rH/2FB48Or5JfAyBdgDGt5/W17kYAi4KOhABf9E9w==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz/kLxXBqeI8AW0PzMv0O++OsSrdjRH66817LKDSbSox9lLWP4g
-	7ISHq1nuMBeZkVN4C/AYVlx1ZX5mqCrpjA+tbVNyAfXVjKWktPOSAwycypong+WtsAqm5eLgZlW
-	lifB7HEbt87FcwRAJAywgoyneKlUXttVxDSs4WWCQjjDGF0/gZ7C8
-X-Gm-Gg: ASbGncvL1XDvQ54zSZsDuo8gkZ9jUGx8APVCBjZzCgm1ryNEgUSxfm45VtN9nh92csi
-	x/ZDdIzBe0imXCssKB8INQ7JL/ropw7gG73q+mGhEdCMvVEbF0eNK7/uTAvOEK9AuQSKmuHUNhy
-	LgP86u0olGv2CWL8vuoP2zvoOSi1h8Oc+9Jz94kEmhCKbShBb0b7KQzcDc9QEU5ole/14ZxyH6X
-	2wm/Q71yn/BSB3PfdUhaI5VgwI44aZubzJ77Fj7vCMwZn//aOykYUthgGI8KOR47OCxuyUq1j1A
-	eGzWXfpBvzzZKECcH0ub5A4ZVbdzMtS5uFe2QWca7jEvr3ccMe0BUxEtzJ8=
-X-Google-Smtp-Source: AGHT+IF5aUvuj1zf+TNucQKa06iCuoRLrdGNIbKzVNhnsAz2hDf+JpWhBo2wnu2LTf3ORroElcN4PqQUofmw
-X-Received: by 2002:a05:6214:d85:b0:766:ab7c:3e89 with SMTP id 6a1803df08f44-78ecf4fe6e5mr32679866d6.64.1758136358312;
-        Wed, 17 Sep 2025 12:12:38 -0700 (PDT)
-Received: from c7-smtp-2023.dev.purestorage.com ([2620:125:9017:12:36:3:5:0])
-        by smtp-relay.gmail.com with ESMTPS id 6a1803df08f44-793456ffd82sm107916d6.15.2025.09.17.12.12.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Sep 2025 12:12:38 -0700 (PDT)
-X-Relaying-Domain: purestorage.com
-Received: from dev-ushankar.dev.purestorage.com (dev-ushankar.dev.purestorage.com [10.7.70.36])
-	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id A6DD234052F;
-	Wed, 17 Sep 2025 13:12:37 -0600 (MDT)
-Received: by dev-ushankar.dev.purestorage.com (Postfix, from userid 1557716368)
-	id 4FFC2E40305; Wed, 17 Sep 2025 13:12:37 -0600 (MDT)
-Date: Wed, 17 Sep 2025 13:12:37 -0600
-From: Uday Shankar <ushankar@purestorage.com>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Caleb Sander Mateos <csander@purestorage.com>,
-	Shuah Khan <shuah@kernel.org>, linux-block@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 3/3] selftests: ublk: add test to verify that feat_map is
- complete
-Message-ID: <aMsIJXDRhkRWDH1m@dev-ushankar.dev.purestorage.com>
-References: <20250916-ublk_features-v1-0-52014be9cde5@purestorage.com>
- <20250916-ublk_features-v1-3-52014be9cde5@purestorage.com>
- <aMowhqjOND9EdiKh@fedora>
+        bh=lT+6fz4hGzB3x5TxZKL3rSaWn/F8+CECdWOTuWodsnQ=;
+        b=PmON3y9lLR3IbvqiAGHM4q/5lWUHJKbpECsPIUixVzjXkHGdjeK89v3LpHxNXAbHPp
+         oaoMXkinM/h5K/dKp0+JLY65AY70YxGcGURRXPF3FWtn2oTQi6xketvulDqE2oZRoxU9
+         wNVq6aa4nRaIycM3l0inE/tyyHIGpecHe7vo9LGinL9JNmjT2iBR1HQNMfzRFyzkQUQh
+         l3DQAeSrVDiyQadqCxV+RFsZWKM38/q9VAWedo1FlgytlQbeEOatAgFglsUMhCOCvabf
+         gZ6FjR9Vb8RvIIs1tCQwVhYyO1hgGmD1NfZA6NBddCa1lpTFS20/y+iLc8VM5iTvP1+O
+         77ww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758139176; x=1758743976;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lT+6fz4hGzB3x5TxZKL3rSaWn/F8+CECdWOTuWodsnQ=;
+        b=APRkcn9nfd490ppuqYz1QYbbOgLsCAxiOmORr5IomSJ146EHe0GF+thgvRe/Q4GYLU
+         zzaBogYLtr4znlcgXvH0UAVxNu34aOKQkdZb1oANon59htP8QnDq2b7UuC1vBTGpiGfA
+         4mW2+fWv6P6gdcrV7N2m93XAii4sOYKlzC4Ij+N2JED4Kr76jJBzYrQJDy/+5bKV9B9u
+         fywsiWFHWe6xH3Jy3jnqhJ0QmDUsO1RxNTyH1aga2zz+29ClyT4Y5Xlzn+vwuJ5uPb+O
+         gB2d5s7Bka+LDUyhsUBroOOLmJpZhA8sYYmcJBv8VnvQcaCzZcbFRZBOWT+UCMWPLkj5
+         EV3w==
+X-Forwarded-Encrypted: i=1; AJvYcCUUo3XLjYm025MF1fUAroybQWISbmWIu+9FRGXMc9LJmreaZ9ezs22sdGUDRx94fKRscYiYNyu6JBYJLQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxpjdLrRiLm+V5fdUI1LCrCePFhIqKeSprWrx5HeElPakuNOaL0
+	UL27nKtqMVCXiHbtT4Pl+MOoZ/KxSs5QLyS8RJco3s0x2QOcFpJsoMxDQsJEmK2hnNhVCYipCCP
+	odEeRZXb7HuauCEYILmjJZyIbqH6aDeI=
+X-Gm-Gg: ASbGncuvJec2enapC+b9qQ0w/Wep/f5e7Meluu5GzCUAlSU+Rg7csBg5yM7VJ25tUCr
+	cLXmUdW1uCsNfhlOgLjJjTr3zzojRvilXNhnXEd1GboP+NC2QaL/1//74iX5aAKQ45osVYCtrlp
+	g0ojrhlozd1y+JvzCGQ7RadacGrBIsrxx1GuzDx2xi8smXp1DhMWPOL+W3Cxo66+baupG38Z9PA
+	oi4HmwV4dEzweLUE1fWN1ocT8iztznXeDF0lRDzrp+jdD+IQO2OW55v4GQ=
+X-Google-Smtp-Source: AGHT+IGMvsb9hFrlxwdIt/gNCY+ZXtdov7G+eqQ0YehxgnuYGPrrjhUsF8j6K/mIV15UQttqUMf4NVIbg9l0zFWT/EU=
+X-Received: by 2002:ac8:5a03:0:b0:4b3:10f0:15ba with SMTP id
+ d75a77b69052e-4ba6a20181amr52761081cf.39.1758139176357; Wed, 17 Sep 2025
+ 12:59:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aMowhqjOND9EdiKh@fedora>
+References: <20250916234425.1274735-1-joannelkoong@gmail.com> <68ca71bd.050a0220.2ff435.04fc.GAE@google.com>
+In-Reply-To: <68ca71bd.050a0220.2ff435.04fc.GAE@google.com>
+From: Joanne Koong <joannelkoong@gmail.com>
+Date: Wed, 17 Sep 2025 12:59:25 -0700
+X-Gm-Features: AS18NWC14gUDKzQcBj3qPbZdYHs2cE9cQhtC5cBOuvB6NHeNGl3mJTY7LRXGD5w
+Message-ID: <CAJnrk1YKPWkaBXe7D2mftN2DMEBqFow80reUGE=2_U8oVFc1tQ@mail.gmail.com>
+Subject: Re: [syzbot ci] Re: fuse: use iomap for buffered reads + readahead
+To: syzbot ci <syzbot+ci9b5a486340e6bcdf@syzkaller.appspotmail.com>, 
+	syzbot <syzkaller@googlegroups.com>
+Cc: brauner@kernel.org, djwong@kernel.org, gfs2@lists.linux.dev, 
+	hch@infradead.org, hch@lst.de, hsiangkao@linux.alibaba.com, 
+	kernel-team@meta.com, linux-block@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org, miklos@szeredi.hu, 
+	syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Sep 17, 2025 at 11:52:38AM +0800, Ming Lei wrote:
-> On Tue, Sep 16, 2025 at 04:05:57PM -0600, Uday Shankar wrote:
-> > Add a test that verifies that the currently running kernel does not
-> > report support for any features that are unrecognized by kublk. This
-> > should catch cases where features are added without updating kublk's
-> > feat_map accordingly, which has happened multiple times in the past (see
-> > [1], [2]).
-> > 
-> > Note that this new test may fail if the test suite is older than the
-> > kernel, and the newer kernel contains a newly introduced feature. I
-> > believe this is not a use case we currently care about - we only care
-> > about newer test suites passing on older kernels.
-> > 
-> > [1] https://lore.kernel.org/linux-block/20250606214011.2576398-1-csander@purestorage.com/t/#u
-> > [2] https://lore.kernel.org/linux-block/2a370ab1-d85b-409d-b762-f9f3f6bdf705@nvidia.com/t/#m1c520a058448d594fd877f07804e69b28908533f
-> > 
-> > Signed-off-by: Uday Shankar <ushankar@purestorage.com>
-> > ---
-> >  tools/testing/selftests/ublk/Makefile           |  1 +
-> >  tools/testing/selftests/ublk/test_generic_13.sh | 16 ++++++++++++++++
-> >  2 files changed, 17 insertions(+)
-> > 
-> > diff --git a/tools/testing/selftests/ublk/Makefile b/tools/testing/selftests/ublk/Makefile
-> > index 5d7f4ecfb81612f919a89eb442f948d6bfafe225..770269efe42ab460366485ccc80abfa145a0c57b 100644
-> > --- a/tools/testing/selftests/ublk/Makefile
-> > +++ b/tools/testing/selftests/ublk/Makefile
-> > @@ -20,6 +20,7 @@ TEST_PROGS += test_generic_09.sh
-> >  TEST_PROGS += test_generic_10.sh
-> >  TEST_PROGS += test_generic_11.sh
-> >  TEST_PROGS += test_generic_12.sh
-> > +TEST_PROGS += test_generic_13.sh
-> >  
-> >  TEST_PROGS += test_null_01.sh
-> >  TEST_PROGS += test_null_02.sh
-> > diff --git a/tools/testing/selftests/ublk/test_generic_13.sh b/tools/testing/selftests/ublk/test_generic_13.sh
-> > new file mode 100755
-> > index 0000000000000000000000000000000000000000..ff5f22b078ddd08bc19f82aa66da6a44fa073f6f
-> > --- /dev/null
-> > +++ b/tools/testing/selftests/ublk/test_generic_13.sh
-> > @@ -0,0 +1,16 @@
-> > +#!/bin/bash
-> > +# SPDX-License-Identifier: GPL-2.0
-> > +
-> > +. "$(cd "$(dirname "$0")" && pwd)"/test_common.sh
-> > +
-> > +TID="generic_13"
-> > +ERR_CODE=0
-> > +
-> > +_prep_test "null" "check that feature list is complete"
-> > +
-> > +if ${UBLK_PROG} features | grep -q unknown; then
-> > +        ERR_CODE=255
-> > +fi
-> > +
-> > +_cleanup_test "null"
-> > +_show_result $TID $ERR_CODE
-> 
-> What if the ublk selftest is run on downstream kernel?
-> 
-> Maybe the output can changed to "unsupported" to show that ublk selftest
-> code doesn't cover or use this feature.
+On Wed, Sep 17, 2025 at 1:37=E2=80=AFAM syzbot ci
+<syzbot+ci9b5a486340e6bcdf@syzkaller.appspotmail.com> wrote:
+>
+> syzbot ci has tested the following series
+>
+> [v3] fuse: use iomap for buffered reads + readahead
+> https://lore.kernel.org/all/20250916234425.1274735-1-joannelkoong@gmail.c=
+om
+> * [PATCH v3 01/15] iomap: move bio read logic into helper function
+> * [PATCH v3 02/15] iomap: move read/readahead bio submission logic into h=
+elper function
+> * [PATCH v3 03/15] iomap: store read/readahead bio generically
+> * [PATCH v3 04/15] iomap: iterate over entire folio in iomap_readpage_ite=
+r()
+> * [PATCH v3 05/15] iomap: rename iomap_readpage_iter() to iomap_read_foli=
+o_iter()
+> * [PATCH v3 06/15] iomap: rename iomap_readpage_ctx struct to iomap_read_=
+folio_ctx
+> * [PATCH v3 07/15] iomap: track read/readahead folio ownership internally
+> * [PATCH v3 08/15] iomap: add public start/finish folio read helpers
+> * [PATCH v3 09/15] iomap: add caller-provided callbacks for read and read=
+ahead
+> * [PATCH v3 10/15] iomap: add bias for async read requests
+> * [PATCH v3 11/15] iomap: move buffered io bio logic into new file
+> * [PATCH v3 12/15] iomap: make iomap_read_folio() a void return
+> * [PATCH v3 13/15] fuse: use iomap for read_folio
+> * [PATCH v3 14/15] fuse: use iomap for readahead
+> * [PATCH v3 15/15] fuse: remove fc->blkbits workaround for partial writes
+>
+> and found the following issues:
+> * WARNING in iomap_iter_advance
+> * WARNING in iomap_readahead
+> * kernel BUG in folio_end_read
+>
+> Full report is available here:
+> https://ci.syzbot.org/series/6845596a-1ec9-4396-b9c4-48bddc606bef
+>
+> ***
+>
+Thanks. Do you get run on every patchset that is sent upstream or is
+it random? Trying to figure out if this means v2 is right and i just
+messed up v3 or if you just didn't run on v2.
 
-Yes I pointed out this issue in the commit message too. But I am unsure
-what you're asking for.
-
-I think we need a failure here if this test is to fulfill its intended
-purposes (catching cases where a feature is added without updating the
-feat_map in kublk). This does also cause failures in cases where an old
-test suite is run against a newer kernel. Since I think this is an
-unusual case, perhaps I can add a log line when this test fails saying
-that the failure is expected if running an old test suite against a new
-kernel?
-
+Thanks,
+Joanne
