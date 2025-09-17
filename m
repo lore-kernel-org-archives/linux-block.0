@@ -1,92 +1,100 @@
-Received: from mail-il1-f178.google.com (mail-il1-f178.google.com [209.85.166.178])
+Received: from mail-il1-f176.google.com (mail-il1-f176.google.com [209.85.166.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CCDB3043C7
-	for <linux-block@vger.kernel.org>; Wed, 17 Sep 2025 13:21:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE3C8238140
+	for <linux-block@vger.kernel.org>; Wed, 17 Sep 2025 13:27:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758115319; cv=none; b=AhRhi3oUjHhEQXzvZxSzWvtUcOeaaqyofh68jqvCuzHrRvb0T5hh8jpQGGV1hzDKwcN8/L7m89cLrhfRNiqUChdaBLTH8hUCGVJh1NvIQjtaZbR9AmGw3vYHpyo6kE0L5QvytwxKJJpXiqmF0+0l2pAKy8pfJplwWeZ/oeTVDG0=
+	t=1758115639; cv=none; b=VagLpvIiokLCHghCEe4SDTsYCvPc5XGVKVTkXjMMj8A4upn6Gl2ItlebcUc8YcBpar4C1PeqhVaPYCS+KI32HbO8/6lK8zwf18cu900/Xpcn2mJ8nkp9/AijJ7DiyIeRva9eCoC070H0OjccFqxir+sX2oryfBt7PXH6Asx/vfA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758115319; c=relaxed/simple;
-	bh=Nmr6lcv2CNDyGpXvoHn0q/udjP4zcmNWEvHXekPMVL0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jI4Ynkry1Os9M26fqujrROk6/HYIuUy9CMA3UMQFkwhcHa+ejlQNPuGaKG8Qww4faGA7nFyHo7lD8Jfa7iha2t/uQt7j2vGCzJpXx8ogriWSF+mApkFIpWcK2U68hapnzNWmAZWWw/+m65kLYqjjJ2iNd8XQjUjW0AMzkOsrko4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=CEL5FUxU; arc=none smtp.client-ip=209.85.166.178
+	s=arc-20240116; t=1758115639; c=relaxed/simple;
+	bh=6wLJteYne2ghlIdmMqTe6B8rmaVmJKXducM1/MAnUCw=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=TMro8jWaGdyZxeGMPh3qG7+VDtUyAlKzZNRIGInyNrd5J6S426huAaJFKyJ/Nha8K7Fm4H88WJdaTglvOOjIsBA5eiOcxfjoNojptM7Vj2c071Hz9EbZema5AF185iTqXkJIKpsEegu5VzsSwT8JHKOXZbZgtDHF9HcEZcccWmk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=c71t9RuH; arc=none smtp.client-ip=209.85.166.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="CEL5FUxU"
-Received: by mail-il1-f178.google.com with SMTP id e9e14a558f8ab-3fe48646d40so5165545ab.0
-        for <linux-block@vger.kernel.org>; Wed, 17 Sep 2025 06:21:57 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="c71t9RuH"
+Received: by mail-il1-f176.google.com with SMTP id e9e14a558f8ab-4242bb21f19so1042645ab.1
+        for <linux-block@vger.kernel.org>; Wed, 17 Sep 2025 06:27:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1758115316; x=1758720116; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=dMJ57nRyP0a6b1BuiyGtLla26Abwla3P9duCF5wfULw=;
-        b=CEL5FUxULkusfYT9Rrpmk7M2gA+dv7m3CZHRyf6nUciIeHfZ3tVOWYPBG0S5V7D8cJ
-         XO1kaBDS9r1x3ZQPW4ATJmjIjp+/obdVkYiEIrLzi0GtbzYiVmk6bd2SiF+0C0kgkywS
-         43dcw4bekYVLLzO4nvdehLz5ruQ1oUd7Ws50ozuRFFwLE0zkl8jYjM+FofedrtV2Ocqi
-         abqUtNTvDN3mpxaD36WaF1bIyMubRTgG2qNBUd4Wu/Lnvm6tjJkosz9AwVPvKleHtHlL
-         OIR6YWBCDuBuOXTRdf3gauTaKQK+cZTX/t41voZgN/KLATk0+Wo5T0CDkvhD4IyJUFf+
-         53wg==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1758115636; x=1758720436; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ncgUhfqmU/yAI6cRRY9SdCcq0O3qaKYavijv88BflA8=;
+        b=c71t9RuHAdu7qpsjYk1VazBtM4tg2qudvQda6pRGaccWbslOqEDDNtOlCcgVNQybZ/
+         UQgpqFjcq9ysB5s0fJlxWZnc0kEF9rbAgC/9g72F6SeN0H2KHx76MmQvpUCtuBmpKnGq
+         6LK316P0w9+PfPmFeP5JtydevNnWBgdqphiHtSGtNXiJGvqcpgjo3Jv2jWzsmurEXmXf
+         3H6S+PZEHDJDI1tgxE6M0CiVbaZ/2ExPMaTlsZNUH4mOc/r0FbPXiK0xekCYTPWHwi15
+         P06ndNXGbbgRwdi23TKZ1SWuogi0xiDRJdNcvkEl5Pbsg49qPyvMXcfGyFeXUfkTK4XB
+         EuWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758115316; x=1758720116;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dMJ57nRyP0a6b1BuiyGtLla26Abwla3P9duCF5wfULw=;
-        b=o8F+5eP/enFR94hi1tgTJautuIpQ1xQdimMKeIkM2Bpk4XTtBKlx9qrt/ltrrENB8L
-         FHhg3BsIc8DYPRqb/HEvdRiMmuV5a62QbMI16QAZoxiPkCy9DuxHVMYu6fWrKSBHyKw5
-         Q0VesPwPYbQ88A9NCJWos8cS9dU/Gl54RWDTMKfGKTed0zRTjgvbf2PqpyUADijTr0q+
-         PVIwnabD1Cfe4JFdUP06SfuxhNlyrqavrPT4Gb+sl8cHFZMUWDqTeJ++FMbyhI5bLM2x
-         0vwKP6Uq++tqGGkN8W6eXE8osaLURn3RlA8yp5GhLdPC7EiO9cyYyekb3fBzoe6W+Gx6
-         Ffyw==
-X-Forwarded-Encrypted: i=1; AJvYcCVw5f3FNUB21VZE0wuKlNib3aNRhn3L1JvCZHVu67Xjby2W6Jwne4HpjAM9N5rRVPtgBKmgUCH3r3LY7Q==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yys9J+TigSUKxCavNQGT9g+UX8IU1OKXLiP7dLUSxLxk9OjQ+/6
-	ahsPwfWJpeOXnxy6bMyJAqJTL1OOz4EQExDUAQV+CVwuQglXOVYvBNFOWKHwad7+WJ8=
-X-Gm-Gg: ASbGncuVPFLQQJPR2CDnCPqzZYzmdHRCq1dzAmOR1oMFav09HSD6dubo8DlQdxG8huZ
-	am0eM6U6MnZxMnieho8tEty5+A8bJruZk6jAweNskUjlxIWzuu9dlnFdjWX67b0WNrVNUDKoVaG
-	rYYekCQuRy1l7k+kFpEvxv7xtIJL/9caFK9yZf8jqoDLoXeEIu+a++mAMvF6SnJfUQl4B6erF3A
-	hc3MFXCc2l50OkH4t0etIlFMVyti7wNrm1Oct66C/G4VjTSXwJirtNgTX6CnbLnqcZJua7TPWus
-	KkFGPgTPiwjRRGpn9K8kx9mCHJCA9EJ8wMBUyKNfFbBE6gpWlpmrpo0/jXgCqeQdBDNHRz68ce+
-	QlZObUJWyLS+EOT9YrUc=
-X-Google-Smtp-Source: AGHT+IHSpzOaWwnFlZgfl4JfEV7AGMMb/I3wng29e2F7j8UdqwxsOuC6KxjQOdtNGivJ3EwBqX/aVw==
-X-Received: by 2002:a92:c242:0:b0:424:36a:7b00 with SMTP id e9e14a558f8ab-424114f2623mr52787045ab.13.1758115316438;
-        Wed, 17 Sep 2025 06:21:56 -0700 (PDT)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-511f2f6b4d6sm6916133173.36.2025.09.17.06.21.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 17 Sep 2025 06:21:54 -0700 (PDT)
-Message-ID: <d334cba6-bc9c-4da0-8e28-672632d70188@kernel.dk>
-Date: Wed, 17 Sep 2025 07:21:54 -0600
+        d=1e100.net; s=20230601; t=1758115636; x=1758720436;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ncgUhfqmU/yAI6cRRY9SdCcq0O3qaKYavijv88BflA8=;
+        b=SzbDpjJGFxjLyAQ0P4tpjF0VT1FcHVQY3dykwH/dgdXT6KGy/T6nzr7X98AypRBQoY
+         nNo8myNGyyGFdYKeHi0pWKh9Ipk2b6HCAVvVx0H/OdqW5H0pVQgkJaphoZOzFduu641l
+         oig3TlUtE7PTr43rPpWflHuqeNRJthTlOvIlqOZD6OB3mTRGdhv6kNEegEEitmNhqYyS
+         vP9ri0/ZqyTA5jNRQYQO3krk+5f1L8BoeBrFW6QjgmVoAi9b9HqCnx3BAzaCCnhRN+hm
+         1TRBa0npHLlXxWBlIsj70/pWwoU2SEaPzbGvyT65V+bUDuLkjFUMQjXZyuxDD+Za0R6l
+         idWQ==
+X-Gm-Message-State: AOJu0YyTYPLZlQ1AhXSxkWrEf9xybd0vnMKyEUmcG1oh+mMOzfiDg631
+	6gV5+5RoJJ+txtazqinuy+5vnUHcNDqn8PP2vJ1kI2+2LBM4CsesZOo9M0CDlx/0Tb8=
+X-Gm-Gg: ASbGncscT5y2RzshVdsM7wen48/Km+PlMu1LHhIpeFzBmLFWs8/t0dF5RHxJbrQInz+
+	3AmvuXy9LmlKUjyfTqcbHTpZNCGzG0/6gs6h2+T3/9VA3jXRZCYjIlaGfHLl31BQl762ERdiFl9
+	/IR3nTzeJsiZVktZHv2Kx5AeJK0pp9kSkl/JNVzcHWQ/djLqJVQRlb69RNg8j73YBWJyKLl6TF+
+	m3E3shM57RmXK+3w63c70SEdoXbHiS4ksaAcsKovqaqadKphg54b5zXGJQIiiPE0B2zNiisqcWK
+	PO3xC7VdFtQ/4QrhofLgv/IXVxqtQ8xPiFeMXfVcHKL8/qCQV7Zgfa/fTNqJODvWGNXGbHjiA7Q
+	Qiwb9J+vVhBBqUA==
+X-Google-Smtp-Source: AGHT+IF2IhkVvtdK0/Rt+fwNJ2jA+lP5SvNESzECuU5V5/QO+3CYjVCl2QHwT1P2sqjxSjffG4Qxew==
+X-Received: by 2002:a05:6e02:1845:b0:405:b792:32dd with SMTP id e9e14a558f8ab-4241a53809cmr24674285ab.16.1758115635359;
+        Wed, 17 Sep 2025 06:27:15 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-511f3067a7bsm6934549173.44.2025.09.17.06.27.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Sep 2025 06:27:15 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: Bart Van Assche <bvanassche@acm.org>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>, 
+ Christoph Hellwig <hch@infradead.org>, Ming Lei <ming.lei@redhat.com>, 
+ John Garry <john.g.garry@oracle.com>
+In-Reply-To: <20250916204044.4095532-1-bvanassche@acm.org>
+References: <20250916204044.4095532-1-bvanassche@acm.org>
+Subject: Re: [PATCH] blk-mq: Fix the blk_mq_tagset_busy_iter()
+ documentation
+Message-Id: <175811563473.366965.7135061887872837432.b4-ty@kernel.dk>
+Date: Wed, 17 Sep 2025 07:27:14 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [GIT PULL] md-6.17-20250917
-To: Yu Kuai <yukuai1@huaweicloud.com>, linux-block@vger.kernel.org,
- linux-raid@vger.kernel.org
-Cc: john.g.garry@oracle.com, yukuai3@huawei.com, yi.zhang@huawei.com,
- yangerkun@huawei.com, johnny.chenyi@huawei.com
-References: <20250917011056.1843135-1-yukuai1@huaweicloud.com>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20250917011056.1843135-1-yukuai1@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3-dev-2ce6c
 
-On 9/16/25 7:10 PM, Yu Kuai wrote:
-> Hi, Jens
+
+On Tue, 16 Sep 2025 13:40:43 -0700, Bart Van Assche wrote:
+> Commit 2dd6532e9591 ("blk-mq: Drop 'reserved' arg of busy_tag_iter_fn")
+> removed the 'reserved' argument from tag iteration callback functions.
+> Bring the blk_mq_tagset_busy_iter() documentation in sync with that
+> change.
 > 
-> For 6.17 on drivers supporting write zeros, raid{0,1,10,5} are broken and
-> can't be assembled.
+> 
 
-Pulled, thanks.
+Applied, thanks!
 
+[1/1] blk-mq: Fix the blk_mq_tagset_busy_iter() documentation
+      commit: 0b507305a08c134722f363de6fe6f1ba84e313b7
+
+Best regards,
 -- 
 Jens Axboe
+
+
 
