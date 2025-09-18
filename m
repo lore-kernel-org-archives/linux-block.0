@@ -1,150 +1,171 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 841B3314D13;
-	Thu, 18 Sep 2025 15:51:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EA90220F5C
+	for <linux-block@vger.kernel.org>; Thu, 18 Sep 2025 16:16:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758210677; cv=none; b=NWhNupRl+9BBIZ+pdOOUQOTqUjiMUoq+mQ+HbPJgntjPA069sf9lMnIOiOUpgJohdB6CvolhyJusNnqMu9A5ryQmEXPLX/vQTx9QZg8KK2gx0BOtm+TAVSVq9cMgdXNaFpZ61CeLDhwjCzY/sTXftmj52d85q7sk+9GRI4v7XHk=
+	t=1758212216; cv=none; b=D6pFnNpQKW4W2m3GY9yt69hYHrEaReVgXRZipZFXGjP+fwRp3qM9VTIFR9T/WYrw/6VGKYwtDQihkGHf6jUBRDg2xHmYpVIos6O9YGNB+Elp69DLq5FPxl+aEZkc4cAvclWxuE+X7NsLtsRypSPc9eAhHz20XWkw9k95iCsaA8I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758210677; c=relaxed/simple;
-	bh=e6XJbeklgFNXwruDywAZe7vowNbZUbwBKpZS63m54og=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=YSXPJ3tti4lzkiCYhxc0Ef9l4a45T2AaiS3YIu3rV2l6gSZjk2hbT3NWkxesZyTWif7TcAG9xmzoUmtbJY53E1lshvud4Q0H5VZlWgUqqa5VJuzutYgXiLZoWAhu6axDN3LmWCi8F76DOdapIAdSeYxB/bLyd+PxM6opRJaE4GQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lAxccBgH; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1758212216; c=relaxed/simple;
+	bh=ulDFdQ2NVV6nKVTrHUERVlJyCw9OstZSSVl171NWk+g=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=P+AowtRIcrP0esp/JpDIEJ8axT8peptKFTWs04VSh6xoGJakFitGXmOrwIg1vs3Y7Tl0R4I4NeklqtYelzh4ZaNKqCS9aljyL9INQRs3iNwK7gRu9ETbXLLy5uUknvY50gVFLxvjRhxHHDJh464vVvnk19bDdE1t0sdqxi4KVt4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=proVjXH9; arc=none smtp.client-ip=67.231.153.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lAxccBgH"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D77DBC4CEE7;
-	Thu, 18 Sep 2025 15:51:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758210677;
-	bh=e6XJbeklgFNXwruDywAZe7vowNbZUbwBKpZS63m54og=;
-	h=Date:From:To:cc:Subject:In-Reply-To:References:From;
-	b=lAxccBgHQJMGKL6W5XO/kIBHMi2AladIz8qPWx4MBG7gpBrzHZckIimBwgkALGSoK
-	 RTpLe7661eFC5B/7BhfypSLu8ciNLbjbhnW0/Uiw7F9qtuf/K/hOn+NGzmTK4Elius
-	 Puw/h1XtP570vHRTCm/o6CmMUjRekyChiJ42E7YZlGDJw6uFwLqKV4izLQfNVxc+1W
-	 3GgwOdBMEpO6bPhXxyYgbuGAlwFII7VeYUA20OL3bsW1JzfLATB4CEE7Um16odYOB9
-	 O8FOQqOy+9iE5VgV50GipK6qrDd5viCwdSnAqnhpyMVlV7VT8suWp23kcrZWa2l0BA
-	 qFbk69uCk7f8g==
-Date: Thu, 18 Sep 2025 09:51:07 -0600 (MDT)
-From: Paul Walmsley <pjw@kernel.org>
-To: Simon Schuster <schuster.simon@siemens-energy.com>
-cc: Dinh Nguyen <dinguyen@kernel.org>, Christian Brauner <brauner@kernel.org>, 
-    Arnd Bergmann <arnd@arndb.de>, Andrew Morton <akpm@linux-foundation.org>, 
-    David Hildenbrand <david@redhat.com>, 
-    Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, 
-    "Liam R. Howlett" <Liam.Howlett@oracle.com>, 
-    Vlastimil Babka <vbabka@suse.cz>, Mike Rapoport <rppt@kernel.org>, 
-    Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>, 
-    Ingo Molnar <mingo@redhat.com>, Peter Zijlstra <peterz@infradead.org>, 
-    Juri Lelli <juri.lelli@redhat.com>, 
-    Vincent Guittot <vincent.guittot@linaro.org>, 
-    Dietmar Eggemann <dietmar.eggemann@arm.com>, 
-    Steven Rostedt <rostedt@goodmis.org>, Ben Segall <bsegall@google.com>, 
-    Mel Gorman <mgorman@suse.de>, Valentin Schneider <vschneid@redhat.com>, 
-    Kees Cook <kees@kernel.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-    Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-    Alexandre Ghiti <alex@ghiti.fr>, Guo Ren <guoren@kernel.org>, 
-    Oleg Nesterov <oleg@redhat.com>, Jens Axboe <axboe@kernel.dk>, 
-    Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, 
-    Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, 
-    =?ISO-8859-15?Q?Michal_Koutn=FD?= <mkoutny@suse.com>, 
-    Paul Moore <paul@paul-moore.com>, Serge Hallyn <sergeh@kernel.org>, 
-    James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, 
-    Anna-Maria Behnsen <anna-maria@linutronix.de>, 
-    Frederic Weisbecker <frederic@kernel.org>, 
-    Thomas Gleixner <tglx@linutronix.de>, 
-    Masami Hiramatsu <mhiramat@kernel.org>, 
-    "David S. Miller" <davem@davemloft.net>, 
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-    Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-    Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
-    Arnaldo Carvalho de Melo <acme@kernel.org>, 
-    Namhyung Kim <namhyung@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
-    Alexander Shishkin <alexander.shishkin@linux.intel.com>, 
-    Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>, 
-    Adrian Hunter <adrian.hunter@intel.com>, 
-    John Johansen <john.johansen@canonical.com>, 
-    Stephen Smalley <stephen.smalley.work@gmail.com>, 
-    Ondrej Mosnacek <omosnace@redhat.com>, 
-    Kentaro Takeda <takedakn@nttdata.co.jp>, 
-    Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>, 
-    Richard Henderson <richard.henderson@linaro.org>, 
-    Matt Turner <mattst88@gmail.com>, Vineet Gupta <vgupta@kernel.org>, 
-    Russell King <linux@armlinux.org.uk>, 
-    Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-    Brian Cain <bcain@kernel.org>, Huacai Chen <chenhuacai@kernel.org>, 
-    WANG Xuerui <kernel@xen0n.name>, Geert Uytterhoeven <geert@linux-m68k.org>, 
-    Michal Simek <monstr@monstr.eu>, 
-    Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
-    Jonas Bonn <jonas@southpole.se>, 
-    Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>, 
-    Stafford Horne <shorne@gmail.com>, 
-    "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>, 
-    Helge Deller <deller@gmx.de>, Madhavan Srinivasan <maddy@linux.ibm.com>, 
-    Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, 
-    Christophe Leroy <christophe.leroy@csgroup.eu>, 
-    Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, 
-    Alexander Gordeev <agordeev@linux.ibm.com>, 
-    Christian Borntraeger <borntraeger@linux.ibm.com>, 
-    Sven Schnelle <svens@linux.ibm.com>, 
-    Yoshinori Sato <ysato@users.sourceforge.jp>, Rich Felker <dalias@libc.org>, 
-    John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>, 
-    Andreas Larsson <andreas@gaisler.com>, Richard Weinberger <richard@nod.at>, 
-    Anton Ivanov <anton.ivanov@cambridgegreys.com>, 
-    Johannes Berg <johannes@sipsolutions.net>, Borislav Petkov <bp@alien8.de>, 
-    Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-    "H. Peter Anvin" <hpa@zytor.com>, Chris Zankel <chris@zankel.net>, 
-    Max Filippov <jcmvbkbc@gmail.com>, linux-mm@kvack.org, 
-    linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, 
-    linux-csky@vger.kernel.org, linux-block@vger.kernel.org, 
-    linux-fsdevel@vger.kernel.org, cgroups@vger.kernel.org, 
-    linux-security-module@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-    netdev@vger.kernel.org, linux-perf-users@vger.kernel.org, 
-    apparmor@lists.ubuntu.com, selinux@vger.kernel.org, 
-    linux-alpha@vger.kernel.org, linux-snps-arc@lists.infradead.org, 
-    linux-arm-kernel@lists.infradead.org, linux-hexagon@vger.kernel.org, 
-    loongarch@lists.linux.dev, linux-m68k@lists.linux-m68k.org, 
-    linux-mips@vger.kernel.org, linux-openrisc@vger.kernel.org, 
-    linux-parisc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
-    linux-s390@vger.kernel.org, linux-sh@vger.kernel.org, 
-    sparclinux@vger.kernel.org, linux-um@lists.infradead.org
-Subject: Re: [PATCH v2 3/4] arch: copy_thread: pass clone_flags as u64
-In-Reply-To: <20250901-nios2-implement-clone3-v2-3-53fcf5577d57@siemens-energy.com>
-Message-ID: <ffb22e54-6b7d-5b88-4217-e67870051c6e@kernel.org>
-References: <20250901-nios2-implement-clone3-v2-0-53fcf5577d57@siemens-energy.com> <20250901-nios2-implement-clone3-v2-3-53fcf5577d57@siemens-energy.com>
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="proVjXH9"
+Received: from pps.filterd (m0001303.ppops.net [127.0.0.1])
+	by m0001303.ppops.net (8.18.1.11/8.18.1.11) with ESMTP id 58IGEDRg2634760
+	for <linux-block@vger.kernel.org>; Thu, 18 Sep 2025 09:16:52 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=s2048-2025-q2; bh=jLwvibaJzHKStENea7
+	UMs0vbMVGV75H2z6urrGsGw80=; b=proVjXH9YT6+3JjofjRKH6dWRj3D6w0zv8
+	FXqvfF28Kqzy7cPtL6gn13/ig3Uk8RUVM3xCjuQ088XL+IlyVDAEdPaaJ+5HUIFs
+	IHD87H0nodcPRC3pdspjAv/xvapuC8t9Wc70rhOMl+4VDWcLe6zTG+8fY29s8o/d
+	GG6Bl/BnXwRZJEMsSJCIpidXcdUHpNTnTLTT+2V4xBYe9yArkM3QrpuEniSAiphc
+	rC4vC6i8JRe44Ui9svt9ExMfVw4FXOrwrLjVPtCd3RPUFpRCZwUKTD6738BZXhX5
+	PvH/jUFw5fPUVGRUf958MCHLACxyxU1BVI84jbElCgrhP1JG/23Q==
+Received: from maileast.thefacebook.com ([163.114.135.16])
+	by m0001303.ppops.net (PPS) with ESMTPS id 498dcx3d47-4
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <linux-block@vger.kernel.org>; Thu, 18 Sep 2025 09:16:52 -0700 (PDT)
+Received: from twshared7571.34.frc3.facebook.com (2620:10d:c0a8:1c::11) by
+ mail.thefacebook.com (2620:10d:c0a9:6f::237c) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.20; Thu, 18 Sep 2025 16:16:50 +0000
+Received: by devbig197.nha3.facebook.com (Postfix, from userid 544533)
+	id 635461D2C204; Thu, 18 Sep 2025 09:16:43 -0700 (PDT)
+From: Keith Busch <kbusch@meta.com>
+To: <dm-devel@lists.linux.dev>
+CC: <snitzer@kernel.org>, <linux-block@vger.kernel.org>, <mpatocka@redhat.com>,
+        <ebiggers@google.com>, Keith Busch <kbusch@kernel.org>
+Subject: [RFC PATCH] dm-crypt: allow unaligned bio_vecs for direct io
+Date: Thu, 18 Sep 2025 09:16:42 -0700
+Message-ID: <20250918161642.2867886-1-kbusch@meta.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+Content-Type: text/plain
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTE4MDE0MyBTYWx0ZWRfX0YcmKhDtzoT2
+ FNCgnWWR+30dnncfhCTyWLyj0gjLEmS3kH8xYOoVHE2bWhDQBeE4NG4phfNinFgPtAHVwDaOwUK
+ eOIyjhsRRb92B0dMmkbP/KfJKtz6FKJgW4a9Hf7glUon/n+V69U1YjeC0HcCoHtsk/gw43rF5Zz
+ eHwKFRCc/zLPHVWw+mWpi2McqOfEknzRFwfSV41WD9I3H7wCJRWbfRkubQvifssHCb4njCQsyam
+ Ga64Jw+x0qItlJUphm98EuafMnuNkVf+zAYR1i/4NnVRU5PZlVk7eLe3eJ3cGwH0OletLKTThdw
+ SJx5l4Th/ORuJ4GacfKdK/TiDZtyPAoseWtuScZeLGOsnCXZDPsPYboWMj7w78=
+X-Proofpoint-GUID: CXEFRsOXAO7nB0TpEwIH7m8_IeOKqh17
+X-Authority-Analysis: v=2.4 cv=JuHxrN4C c=1 sm=1 tr=0 ts=68cc3074 cx=c_pps
+ a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17
+ a=yJojWOMRYYMA:10 a=VwQbUJbxAAAA:8 a=uud4dMGIaqtzyunwYh0A:9
+X-Proofpoint-ORIG-GUID: CXEFRsOXAO7nB0TpEwIH7m8_IeOKqh17
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-09-18_01,2025-09-18_02,2025-03-28_01
 
-On Mon, 1 Sep 2025, Simon Schuster via B4 Relay wrote:
+From: Keith Busch <kbusch@kernel.org>
 
-> From: Simon Schuster <schuster.simon@siemens-energy.com>
-> 
-> With the introduction of clone3 in commit 7f192e3cd316 ("fork: add
-> clone3") the effective bit width of clone_flags on all architectures was
-> increased from 32-bit to 64-bit, with a new type of u64 for the flags.
-> However, for most consumers of clone_flags the interface was not
-> changed from the previous type of unsigned long.
-> 
-> While this works fine as long as none of the new 64-bit flag bits
-> (CLONE_CLEAR_SIGHAND and CLONE_INTO_CGROUP) are evaluated, this is still
-> undesirable in terms of the principle of least surprise.
-> 
-> Thus, this commit fixes all relevant interfaces of the copy_thread
-> function that is called from copy_process to consistently pass
-> clone_flags as u64, so that no truncation to 32-bit integers occurs on
-> 32-bit architectures.
-> 
-> Signed-off-by: Simon Schuster <schuster.simon@siemens-energy.com>
+Most storage devices can handle DMA for data that is not aligned to the
+sector block size. The block and filesystem layers have introduced
+updates to allow that kind of memory alignment flexibility when
+possible.
 
-Acked-by: Paul Walmsley <pjw@kernel.org> # for RISC-V
+dm-crypt, however, currently constrains itself to aligned memory because
+it sends a single scatterlist element for the input ot the encrypt and
+decrypt algorithms. This forces applications that have unaligned data to
+copy through a bounce buffer, increasing CPU and memory utilization.
 
-Thanks!
+It appears to be a pretty straight forward thing to modify for skcipher
+since there are 3 unused scatterlist elements immediately available. In
+practice, that should be enough as the sector granularity of data
+generally doesn't straddle more than one page, if at all.
 
+Signed-off-by: Keith Busch <kbusch@kernel.org>
+---
+ drivers/md/dm-crypt.c | 29 +++++++++++++++++++----------
+ 1 file changed, 19 insertions(+), 10 deletions(-)
 
-- Paul
+diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
+index 5ef43231fe77f..f860716b7a5c1 100644
+--- a/drivers/md/dm-crypt.c
++++ b/drivers/md/dm-crypt.c
+@@ -1429,18 +1429,14 @@ static int crypt_convert_block_skcipher(struct cr=
+ypt_config *cc,
+ 					struct skcipher_request *req,
+ 					unsigned int tag_offset)
+ {
+-	struct bio_vec bv_in =3D bio_iter_iovec(ctx->bio_in, ctx->iter_in);
+ 	struct bio_vec bv_out =3D bio_iter_iovec(ctx->bio_out, ctx->iter_out);
++	unsigned int bytes =3D cc->sector_size;
+ 	struct scatterlist *sg_in, *sg_out;
+ 	struct dm_crypt_request *dmreq;
+ 	u8 *iv, *org_iv, *tag_iv;
+ 	__le64 *sector;
+ 	int r =3D 0;
+=20
+-	/* Reject unexpected unaligned bio. */
+-	if (unlikely(bv_in.bv_len & (cc->sector_size - 1)))
+-		return -EIO;
+-
+ 	dmreq =3D dmreq_of_req(cc, req);
+ 	dmreq->iv_sector =3D ctx->cc_sector;
+ 	if (test_bit(CRYPT_IV_LARGE_SECTORS, &cc->cipher_flags))
+@@ -1457,11 +1453,24 @@ static int crypt_convert_block_skcipher(struct cr=
+ypt_config *cc,
+ 	*sector =3D cpu_to_le64(ctx->cc_sector - cc->iv_offset);
+=20
+ 	/* For skcipher we use only the first sg item */
+-	sg_in  =3D &dmreq->sg_in[0];
+ 	sg_out =3D &dmreq->sg_out[0];
+=20
+-	sg_init_table(sg_in, 1);
+-	sg_set_page(sg_in, bv_in.bv_page, cc->sector_size, bv_in.bv_offset);
++	do {
++		struct bio_vec bv_in =3D bio_iter_iovec(ctx->bio_in, ctx->iter_in);
++		int len =3D min(bytes, bv_in.bv_len);
++
++		if (r >=3D ARRAY_SIZE(dmreq->sg_in))
++			return -EINVAL;
++
++		sg_in =3D &dmreq->sg_in[r++];
++		memset(sg_in, 0, sizeof(*sg_in));
++		sg_set_page(sg_in, bv_in.bv_page, len, bv_in.bv_offset);
++		bio_advance_iter_single(ctx->bio_in, &ctx->iter_in, len);
++		bytes -=3D len;
++	} while (bytes);
++
++	sg_mark_end(sg_in);
++	sg_in =3D dmreq->sg_in[0];
+=20
+ 	sg_init_table(sg_out, 1);
+ 	sg_set_page(sg_out, bv_out.bv_page, cc->sector_size, bv_out.bv_offset);
+@@ -1495,7 +1504,6 @@ static int crypt_convert_block_skcipher(struct cryp=
+t_config *cc,
+ 	if (!r && cc->iv_gen_ops && cc->iv_gen_ops->post)
+ 		r =3D cc->iv_gen_ops->post(cc, org_iv, dmreq);
+=20
+-	bio_advance_iter(ctx->bio_in, &ctx->iter_in, cc->sector_size);
+ 	bio_advance_iter(ctx->bio_out, &ctx->iter_out, cc->sector_size);
+=20
+ 	return r;
+@@ -3750,7 +3758,8 @@ static void crypt_io_hints(struct dm_target *ti, st=
+ruct queue_limits *limits)
+ 	limits->physical_block_size =3D
+ 		max_t(unsigned int, limits->physical_block_size, cc->sector_size);
+ 	limits->io_min =3D max_t(unsigned int, limits->io_min, cc->sector_size)=
+;
+-	limits->dma_alignment =3D limits->logical_block_size - 1;
++	if (crypt_integrity_aead(cc))
++		limits->dma_alignment =3D limits->logical_block_size - 1;
+=20
+ 	/*
+ 	 * For zoned dm-crypt targets, there will be no internal splitting of
+--=20
+2.47.3
+
