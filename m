@@ -1,72 +1,73 @@
-Received: from mail-il1-f228.google.com (mail-il1-f228.google.com [209.85.166.228])
+Received: from mail-yb1-f227.google.com (mail-yb1-f227.google.com [209.85.219.227])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 876D72D6E4E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08BB02D9789
 	for <linux-block@vger.kernel.org>; Thu, 18 Sep 2025 19:34:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.228
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.227
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758224056; cv=none; b=sf44sM0S1sFgR8bVhqRBqcrzEDsDP3DiGVQCN5EQC9YqLOELy81qQFs63C15au8SLHexPNv5/xuAkFXfwrkngbkpaGG4k6ys2qHzHwTyUStReart4MnElpg+fCPCNABmh1BzsaHwhAzDNu33+hyz0QLT0Adkf3FUEuNFU5zHlyw=
+	t=1758224057; cv=none; b=T35NTQvxkbCS7WjzS9VK5EO6C0PzddHhTd9Xc3uR68ka86+/gkDuAtBfAA9A98OYy3z0Fnhu63daYPWjlE/2ls3Zx2oyBVptYIc7YoTDq7obqL7t+C4Jfh//7iWbpxvDbqwOHBmCbI570VmzYohwqW3d/UtdRW7dudB8nXcjres=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758224056; c=relaxed/simple;
-	bh=I1SvgDPbViudLFOaGAb6f8a3G0PYsCRpE1vM8Gvi1dc=;
+	s=arc-20240116; t=1758224057; c=relaxed/simple;
+	bh=Y9/Ne8zaqdwA/LXEG0LconEi+zVGsXicyRVHEDgancw=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=WzT11FUU9zmCbluB6ybsSWl+HZoU2Wv0h2AcTvCjRsyjFZKfCJMqwqcxt1GxiaS9/KJKp1qYbSczmgvY839bB/XrO5mvWqD5hm1D5gONyqNGKQ3F6v8YLlOfYCqXR40wCFg/dccjSkN3c7f7OclvKThSqzIHAXBd1GxJpupaQqU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=ZL6YDe3Y; arc=none smtp.client-ip=209.85.166.228
+	 In-Reply-To:To:Cc; b=Og3LKZLvQoODKbvWUMmrk64Uxeb6ktnMVPV+78xCloP6CxQLf+iNri4tsiG16ZoMfR6YbAxGPgZCuVpDvtZDnkSnPFLV4L/trsd4oMKi/VvRmv2RkLqliRPkKkhXyF6fnMwb0955R9oSlj7edJSYlhh5r/8YuSRwTUE8neqOZTw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=UKq2ug09; arc=none smtp.client-ip=209.85.219.227
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="ZL6YDe3Y"
-Received: by mail-il1-f228.google.com with SMTP id e9e14a558f8ab-4247cfc66a3so4670915ab.2
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="UKq2ug09"
+Received: by mail-yb1-f227.google.com with SMTP id 3f1490d57ef6-ea5c1e394a8so1039026276.1
         for <linux-block@vger.kernel.org>; Thu, 18 Sep 2025 12:34:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=purestorage.com; s=google2022; t=1758224053; x=1758828853; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=yGgcbSkc4b3TEAlty1vI9MIlV1K03L2tgLefNKM4ZS4=;
-        b=ZL6YDe3YckrDXAaaWbx3/TfDA6hxeiGENu7eH4biMVW4KdBXwbLCb8NJArqML6vjLK
-         HyYQPQlofeDAz0U7N+KgCLc34SFLacpWeLfBNsMXAWtcmnuhsBW3mtFWxGODNPYm33aG
-         3+59jvrmf8FrglWW1Li+nkpC22+XB1WNTEYg1E2n/MpjxgislggAQE6EDlB//514H/4w
-         R4rf7pj4rqPYKBTq+vkS4pJx/QC3AsrscD05IP4iepSY+B/94Cb/I50n9gYEr1aoiZVW
-         hmpkVRxkWazwtPLOsYiEYAvVVAuPwDnWoUKpZQ+Zstf/Iu5ng+FEzC33B/tZOExZ/tuz
-         WsXA==
+        bh=zUwZ0WSYzRWLsV37Zv2zW5RoOF8gsqcC5qtG3FfYLLc=;
+        b=UKq2ug09nECDKJ8qP52M5tEonD4ouB9EMtR+X7SlGgf8Q5ifu431/jNdxo/guiTZiL
+         e6rcrF9vVt36B1VXSVd99J27eJpitA2CIRozfsKJfFd4dxujbtidpWvFNa27ls1jA+Rs
+         63fZcd0W9kBh0DeAnKh7bvJ0i+PnBaid3V4aE2cotImXwL7AcsTG4PmF6pVBwa/tUNDy
+         pAiduAQec/w+HLMGpfIj6Fyiqbjq6FuJMmHmhm1moADeopI51gClaamKT6dlwg62Bxn0
+         3CwM3JLsWKmakrQn8vhJ3xRelgw+5vBpTrJl5cGOX9e1O9ZI5tGecMLTW89dS2ipHn+6
+         /y4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1758224053; x=1758828853;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=yGgcbSkc4b3TEAlty1vI9MIlV1K03L2tgLefNKM4ZS4=;
-        b=gX/RvKeA675SPnyH0s78wqJ/e5o6amLq5zKIUTJweSsGO5psJNTQztXchYclHl8EHm
-         /jRVPwnp7/RY+g+E8FLRTZr+EUUrorInZvb3gHZFxNRGO8CFpNJI9FJ+Hlkk35NzuMh1
-         wJQqS9mOFRkiJT2OOht7O1Z/B9i7DZSTmpX0WYOGde5rN5hbIZ2iCUDmrTVj1EusRb2M
-         9YGVMKJCZrF6xbngB7IgqGQE+XX+Bs++qzwT8MPIF1raxxjQYUoOaGgjqqy8o69ub7J9
-         Q829GR04h029W3AKgSfGkbjdZk7JJMCQBxOHxnUFLcW4ikq+Wmjx4X14Mrc7hBHoRzAE
-         /IpQ==
-X-Gm-Message-State: AOJu0Yw7I8vp9QeWZsq71AG2Axw4c9vYHSB6s88l5eJgSRgk4MHmM9rp
-	JFugSPNoC/5cWeBxp+W8R+oOlMrILhQUf2hR7X/L/SmTtqlBu0/sKGGz4E6rsMm5F9Mwu+9SB4t
-	PUPKLPwiGOjXLaHmU2sdTepdlPBurXEzhAvK0hRq3f4J9N4kViwoF
-X-Gm-Gg: ASbGncsV0zjUufAjLoGEtQ3gSMsyY2pfJva4FdJSE3HzAyCiLEFnCT6zb1qXPBwPHzj
-	Frg+ej/rAxhjM5+F8Cq+A63FDI7JRDxD9XSAMLplztfwoZTqBn0U448l3fN4gZRJg+Njg/RzoA4
-	ekGYYKrq1yd/BIn55+AwchCW61uOBt4OuvYX0p5UTYgXxCQd3AlKxQAZuFsVpJsX9a2jo7x5/WW
-	KFR4iJFDO4OS5JRmVbpKCXS0QdPRv04BK0A53PsSzTJULbPwSpytYjrfGHPE0v8hCSeBA1xU4d/
-	PQcjIqHIqEkAuzqTXAJrBzRll7dgFBJdQjUpGRnLJhZ2djKBKgcz3uXBlvg=
-X-Google-Smtp-Source: AGHT+IHFBuXdBHcUoocU29bhImj7n4wo7JMQqdfOvZ3xQYknkYkVo1GnnTsv5mYjprk2aGCiMz9ql+ezl0L1
-X-Received: by 2002:a05:6e02:2293:b0:423:fce3:9255 with SMTP id e9e14a558f8ab-4248197c39fmr12210055ab.23.1758224052653;
+        bh=zUwZ0WSYzRWLsV37Zv2zW5RoOF8gsqcC5qtG3FfYLLc=;
+        b=cEJQeh6mF8z8AMfmJVqyFQ3qs90QZxYnMShHgS1Ggz37N2Bya1AM3jyN4smLaqnN+Z
+         wjiudHk15p4yGRr4hQzzw6+xjm5GgHXP4EJGg13JeHFlS+hyhjS/A44r/gl2tb/53bHy
+         UubAGYvsnrXNOwDz4Dz0DyFR9f1HQbLyNg7Rqb25Li5U2u39WtTuSia8G/0wAuzqvuS9
+         jEpmJvjk8G/Yxgm9swDeJSvTNA0hrTMnRupvDhbUv21GjD7g+DqyRurc5YJkg/Q7d5ER
+         /m7VR/K8pDOkJmu98MyPNIKBQxKmd4IVwjN4siTEbf1c+OTHDhI6099FUH+NcmRLn3kQ
+         XMvQ==
+X-Gm-Message-State: AOJu0YwP7jc9GmK1e1aE1Xam9bnjSDwLgwKBw1MNckaCgEcvLnTed6eh
+	TGQQ85dkJTDYop7DI7T05iq+vXlHVfHUpRShkAOuuayYn8Vhk6jUtAuDwxrP2ukvb5I1J2fxmMy
+	TBt077zWp3sVmlnc5vKZtYb90OeOaGyC06WkR
+X-Gm-Gg: ASbGncsyK8sSO8RNq41IxC0wkbsv9ovbHzSOdyPxFVs4D9lndOil15GQWn5zJbJ8tQQ
+	Kuo8QECgPgDxfy7a2XiOUFncz0I0yZrigBLMAz7JBBzm8rdmme9W/Q0Ak6rWOwA4groVPzSCm3K
+	M+2vPWlizMpu/fgVj0UibS2Dp3nbV+9c+WFYuW5xDlo7oGFbuwey0GhoiPEIbkiRbW7q0A8zlCa
+	m1IBu5JVAMa94xK+bCbnOToRwfk8nHYbyp2wR0sexbJ9qwjl8eykX2C4PjGUEhhCVwY+ndCIqJK
+	p8OunFj/7qmbOXlo2dCAj8gCMRQ38Pocv0/EUB5W4REWQDdU5xfK5D4n8+x4ecOIFB1/Njx7kg=
+	=
+X-Google-Smtp-Source: AGHT+IFECpZeDDEGAhBtzHw6/PxcEE3TRQwhyGlv3EpuDKpWXDFvddkM3Bj/6+YKpS1VWGtiLzjjfhO9SUic
+X-Received: by 2002:a05:6902:150b:b0:ea4:d1:e832 with SMTP id 3f1490d57ef6-ea8a867ea09mr636869276.42.1758224052816;
         Thu, 18 Sep 2025 12:34:12 -0700 (PDT)
-Received: from c7-smtp-2023.dev.purestorage.com ([2620:125:9017:12:36:3:5:0])
-        by smtp-relay.gmail.com with ESMTPS id 8926c6da1cb9f-53d56e41e6bsm198876173.44.2025.09.18.12.34.12
+Received: from c7-smtp-2023.dev.purestorage.com ([208.88.159.129])
+        by smtp-relay.gmail.com with ESMTPS id 3f1490d57ef6-ea5ce832831sm198429276.16.2025.09.18.12.34.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Thu, 18 Sep 2025 12:34:12 -0700 (PDT)
 X-Relaying-Domain: purestorage.com
-Received: from dev-ushankar.dev.purestorage.com (dev-ushankar.dev.purestorage.com [10.7.70.36])
-	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 35A05340853;
+Received: from dev-ushankar.dev.purestorage.com (dev-ushankar.dev.purestorage.com [IPv6:2620:125:9007:640:7:70:36:0])
+	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 3432334049A;
 	Thu, 18 Sep 2025 13:34:12 -0600 (MDT)
 Received: by dev-ushankar.dev.purestorage.com (Postfix, from userid 1557716368)
-	id F2C33E40696; Thu, 18 Sep 2025 13:34:11 -0600 (MDT)
+	id 0452BE541CA; Thu, 18 Sep 2025 13:34:12 -0600 (MDT)
 From: Uday Shankar <ushankar@purestorage.com>
-Date: Thu, 18 Sep 2025 13:34:07 -0600
-Subject: [PATCH v2 1/3] selftests: ublk: kublk: simplify feat_map
- definition
+Date: Thu, 18 Sep 2025 13:34:08 -0600
+Subject: [PATCH v2 2/3] selftests: ublk: kublk: add
+ UBLK_F_BUF_REG_OFF_DAEMON to feat_map
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -75,7 +76,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250918-ublk_features-v2-1-77d2a3064c15@purestorage.com>
+Message-Id: <20250918-ublk_features-v2-2-77d2a3064c15@purestorage.com>
 References: <20250918-ublk_features-v2-0-77d2a3064c15@purestorage.com>
 In-Reply-To: <20250918-ublk_features-v2-0-77d2a3064c15@purestorage.com>
 To: Caleb Sander Mateos <csander@purestorage.com>, 
@@ -84,91 +85,28 @@ Cc: linux-block@vger.kernel.org, linux-kselftest@vger.kernel.org,
  linux-kernel@vger.kernel.org, Uday Shankar <ushankar@purestorage.com>
 X-Mailer: b4 0.14.2
 
-Simplify the definition of feat_map by introducing a helper macro
-FEAT_NAME to avoid having to type the feature name twice. As a side
-effect, this changes the names in the feature list to be the full macro
-name instead of the abbreviated names that were used before, but this is
-a good change for clarity.
-
-Using the full feature macro names ruins the alignment of the output, so
-change the output format to put each feature's hex value before its
-name, as this is easier to align nicely. The output now looks as
-follows:
-
-root# ./kublk features
-ublk_drv features: 0x7fff
-0x1               : UBLK_F_SUPPORT_ZERO_COPY
-0x2               : UBLK_F_URING_CMD_COMP_IN_TASK
-0x4               : UBLK_F_NEED_GET_DATA
-0x8               : UBLK_F_USER_RECOVERY
-0x10              : UBLK_F_USER_RECOVERY_REISSUE
-0x20              : UBLK_F_UNPRIVILEGED_DEV
-0x40              : UBLK_F_CMD_IOCTL_ENCODE
-0x80              : UBLK_F_USER_COPY
-0x100             : UBLK_F_ZONED
-0x200             : UBLK_F_USER_RECOVERY_FAIL_IO
-0x400             : UBLK_F_UPDATE_SIZE
-0x800             : UBLK_F_AUTO_BUF_REG
-0x1000            : UBLK_F_QUIESCE
-0x2000            : UBLK_F_PER_IO_DAEMON
-0x4000            : unknown
+When UBLK_F_BUF_REG_OFF_DAEMON was added, we missed updating kublk's
+feat_map, which results in the feature being reported as "unknown." Add
+UBLK_F_BUF_REG_OFF_DAEMON to feat_map to fix this.
 
 Signed-off-by: Uday Shankar <ushankar@purestorage.com>
 Reviewed-by: Ming Lei <ming.lei@redhat.com>
 ---
- tools/testing/selftests/ublk/kublk.c | 31 ++++++++++++++++---------------
- 1 file changed, 16 insertions(+), 15 deletions(-)
+ tools/testing/selftests/ublk/kublk.c | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/tools/testing/selftests/ublk/kublk.c b/tools/testing/selftests/ublk/kublk.c
-index 6512dfbdbce3a82f1202de17319ea593337427e6..4e5d82f2a14a01d9e56d31126eae2e26ec718b6c 100644
+index 4e5d82f2a14a01d9e56d31126eae2e26ec718b6c..b636d40b4889d88f7d64d0e71c6f09eca17e3989 100644
 --- a/tools/testing/selftests/ublk/kublk.c
 +++ b/tools/testing/selftests/ublk/kublk.c
-@@ -1363,21 +1363,22 @@ static int cmd_dev_list(struct dev_ctx *ctx)
- static int cmd_dev_get_features(void)
- {
- #define const_ilog2(x) (63 - __builtin_clzll(x))
-+#define FEAT_NAME(f) [const_ilog2(f)] = #f
- 	static const char *feat_map[] = {
--		[const_ilog2(UBLK_F_SUPPORT_ZERO_COPY)] = "ZERO_COPY",
--		[const_ilog2(UBLK_F_URING_CMD_COMP_IN_TASK)] = "COMP_IN_TASK",
--		[const_ilog2(UBLK_F_NEED_GET_DATA)] = "GET_DATA",
--		[const_ilog2(UBLK_F_USER_RECOVERY)] = "USER_RECOVERY",
--		[const_ilog2(UBLK_F_USER_RECOVERY_REISSUE)] = "RECOVERY_REISSUE",
--		[const_ilog2(UBLK_F_UNPRIVILEGED_DEV)] = "UNPRIVILEGED_DEV",
--		[const_ilog2(UBLK_F_CMD_IOCTL_ENCODE)] = "CMD_IOCTL_ENCODE",
--		[const_ilog2(UBLK_F_USER_COPY)] = "USER_COPY",
--		[const_ilog2(UBLK_F_ZONED)] = "ZONED",
--		[const_ilog2(UBLK_F_USER_RECOVERY_FAIL_IO)] = "RECOVERY_FAIL_IO",
--		[const_ilog2(UBLK_F_UPDATE_SIZE)] = "UPDATE_SIZE",
--		[const_ilog2(UBLK_F_AUTO_BUF_REG)] = "AUTO_BUF_REG",
--		[const_ilog2(UBLK_F_QUIESCE)] = "QUIESCE",
--		[const_ilog2(UBLK_F_PER_IO_DAEMON)] = "PER_IO_DAEMON",
-+		FEAT_NAME(UBLK_F_SUPPORT_ZERO_COPY),
-+		FEAT_NAME(UBLK_F_URING_CMD_COMP_IN_TASK),
-+		FEAT_NAME(UBLK_F_NEED_GET_DATA),
-+		FEAT_NAME(UBLK_F_USER_RECOVERY),
-+		FEAT_NAME(UBLK_F_USER_RECOVERY_REISSUE),
-+		FEAT_NAME(UBLK_F_UNPRIVILEGED_DEV),
-+		FEAT_NAME(UBLK_F_CMD_IOCTL_ENCODE),
-+		FEAT_NAME(UBLK_F_USER_COPY),
-+		FEAT_NAME(UBLK_F_ZONED),
-+		FEAT_NAME(UBLK_F_USER_RECOVERY_FAIL_IO),
-+		FEAT_NAME(UBLK_F_UPDATE_SIZE),
-+		FEAT_NAME(UBLK_F_AUTO_BUF_REG),
-+		FEAT_NAME(UBLK_F_QUIESCE),
-+		FEAT_NAME(UBLK_F_PER_IO_DAEMON),
+@@ -1379,6 +1379,7 @@ static int cmd_dev_get_features(void)
+ 		FEAT_NAME(UBLK_F_AUTO_BUF_REG),
+ 		FEAT_NAME(UBLK_F_QUIESCE),
+ 		FEAT_NAME(UBLK_F_PER_IO_DAEMON),
++		FEAT_NAME(UBLK_F_BUF_REG_OFF_DAEMON),
  	};
  	struct ublk_dev *dev;
  	__u64 features = 0;
-@@ -1404,7 +1405,7 @@ static int cmd_dev_get_features(void)
- 				feat = feat_map[i];
- 			else
- 				feat = "unknown";
--			printf("\t%-20s: 0x%llx\n", feat, 1ULL << i);
-+			printf("0x%-16llx: %s\n", 1ULL << i, feat);
- 		}
- 	}
- 
 
 -- 
 2.34.1
