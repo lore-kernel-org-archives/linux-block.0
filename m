@@ -1,97 +1,76 @@
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+Received: from mail-oa1-f98.google.com (mail-oa1-f98.google.com [209.85.160.98])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 832FF1DF73C
-	for <linux-block@vger.kernel.org>; Thu, 18 Sep 2025 00:46:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 039E81DF26E
+	for <linux-block@vger.kernel.org>; Thu, 18 Sep 2025 01:50:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.98
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758156379; cv=none; b=TF7kNi4iftFbfbenmMuVaQfq5/eOe5d0erwY7EN3ffAwCl7ctsA/dm3WCL7Vy0nK/Eir9+3XHeUjtgl5SF1xWIkWLFzLhhTC6YjxQc9pcwdpOzjQJ1fdeH+7Ef+J1rtjhrVS64Ub0AAhjahy1BLX8MJNqNOxcYsOwbOzD20MDUg=
+	t=1758160234; cv=none; b=YnOMdQagDBQ0aaSK2JgjKt/X5kZpRNVgvFwDwn9znQ+vssfn/0Do1DJmhMBrSap8g0Na89IEasEUeX8kiJqcNq5u0s/iL84wN2nahAq65r1EiVncAj8UUfnWIqBzI6mgSyLjEUp3j6bK2cIwBvEiTh2+68K1rIteclInvMAKgY8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758156379; c=relaxed/simple;
-	bh=UIo7RA/G/xDD02JBTiyBlQlJJd9IfyisvvvnbSKMNJE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=MHyA67E6b1rMtxLMPplWxk2MLUI40OxdF32GNNT4jn6OSVik0Xj9AJHJoViVB9Ff5tMjINKcDfNRtEONKzhvcBGRneMYGLh1w2Gx3XdpMkngAGxLJhSZfaYrBVfI21EsTn1r1JT3o+h8ZqJ91lOOlxI878Oda/53qJTmaktyiq0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KzGvJlF3; arc=none smtp.client-ip=209.85.218.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1758160234; c=relaxed/simple;
+	bh=YmbL8tWBk7PcWIy4d7codzBe7sqj3ogMoQ4DpsIfxTQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Yq2MfGlAihaShmbyFD3cwtc0JBJlMzvLE5L3sHVW14VHh7yEYT98b3+oFHLe+4ApNG2pvsa6l2NgAWAYLtnbhjvs792gmi8+ib9AN9+QYzcbC0ztOC9uZNhtFFM8eKhkIs2MAgI+2IFnawXAKtYld/EDSI5fgr7nPhCI4xMgj7w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=YxFTJFKm; arc=none smtp.client-ip=209.85.160.98
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KzGvJlF3"
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-afcb78ead12so53541966b.1
-        for <linux-block@vger.kernel.org>; Wed, 17 Sep 2025 17:46:16 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="YxFTJFKm"
+Received: by mail-oa1-f98.google.com with SMTP id 586e51a60fabf-30ccec232bbso45256fac.3
+        for <linux-block@vger.kernel.org>; Wed, 17 Sep 2025 18:50:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758156375; x=1758761175; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ScdSoNWwYp7Lx1FqF0sJinLc5HuMMzMbeEOteqLeKGY=;
-        b=KzGvJlF3KPV470aj9p2+WGc+dHQyYumQ/n1JBBocmuZJA49YLeiUqmwy+/yYPZgQZj
-         ssXCb7z6YgYiOutrT3AfsrRikN0B83+7ruvziWNhCwsz2ELTIiizmfls7PvsFdkvcJLT
-         qpJdXp6xZhBTLS5nekg+F1LDSdhm19EysHMtk07fabj1P6oLuOyCMfvOGen6jT1eBwbP
-         6pMnjF6KJT+0XEj91pCTwQujjt7F6ghOtnCnJ+EU2+tXugoJTsFgk+QsjwfhKOKRRjgu
-         d9FePQZs61kpvgUTD0qeflLnFiVK5p7eAvAv3yf1sOrJiE6TsrG+zJ2UIlYBCl4PmRtc
-         hKkg==
+        d=purestorage.com; s=google2022; t=1758160232; x=1758765032; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=TGIvktuNokMfEeQBYkw+feVubqH5mU5MNNf0kIjurc0=;
+        b=YxFTJFKm+GOwjfBoH9z85PSg9AUcAUd+cAdZAyQjPMkMXMWxLgNHkir8fXi1gWyh9P
+         +FSQPaCehaHpibVwkwYAIu8ZVgbt1xYOSE3poYZLc4zam18wM/rmZVJni2ZbLqNAl4hC
+         a+r6GkQVp3s3wYGpESdOxSbDDnNTFoI55PiMd9LsUzijzexfdVygJP4aLjsMFmWHgDpX
+         eCybjVCWctM1XtYCyeXoATmLPvSb/62SLe+pEEfhjgos8/+8bRtTgNFlTTK/XK/HHyfp
+         Mlk1r+U5owKENgfknsbChNNPvZ0EwDe4jtWV6vseMgg/lpvUSntpAAGfFl3Fykm92UQd
+         j0Yw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758156375; x=1758761175;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ScdSoNWwYp7Lx1FqF0sJinLc5HuMMzMbeEOteqLeKGY=;
-        b=UC79mKOgCZPqthySnDz73smWyfOLq+bgfsXqGdMpXURGDHazzvgvQdcbE5UfakFVzd
-         agOTsdI8Yv1wHKUefxtPP3RMjFjczNuOwg68KDGESAaybVDj9jb8XXOqUmuZS8hsTRbG
-         uM1X/0xgSXrYQ3lAdK7DW7GdWRrUAQzGg6S1f2lv7Kb2Zqjw+zt1vfYZH1KB5lVwGZ8m
-         WGP6JlUHYLi+rl0kzWPBaEheC0KbmMJEkvMuSs+dMIQffbiYcIgjwyzL1mdy/gi25AFm
-         1mf+1p1WCKehVhUoKn3y1Oi3Jex5hGtqhUEAsMeGarK0dhunEsOyyk7bYpIhTqYY5z24
-         7BaA==
-X-Forwarded-Encrypted: i=1; AJvYcCWbJSSJXAviZt+xY06IsnloSzUj0o5cxkjGeDLdGSX48HsrE0H4OSkjGXw6KRszD6NXvm5llkqZtbGtgg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwcEKNX2Wf6rdZz1Ddm34OTEFl8BiIO61XqxIyYF4h0wTGZv0lK
-	j3ZUhE71OSai2wYE0A8E/xb6AL7Ndn++OvrEFNQjnwRLgcZGusOrFay0
-X-Gm-Gg: ASbGncsiaSm+4eoqjBUX/kUjSE5K3SuyuOKQGf9gzNBUIhCVXxBXgIX/qaYepj6ADBc
-	Zl+YTLTiJhovff5kQ/9f52UCFqrbnddMxKvFTzs2SKcjzoUXn1RB0mHDvsONotc866nBjYgZCkQ
-	C7aZEwcIMaY7eBBPanJVKp2cjxL4KwnYccug4Zoe7fJij8E58cA/EDVWIf8DG3lYgswfVyc0ah0
-	KN9hF1ZjCN4MK7Xb3VJWuA6SORda6YkjVdyRooJ1f+9pY+0q7p//65yw6aIZBzPNv7V9wYo7DvZ
-	Fu6DVzrDnZbDXphQHicorhu+CatxpIa5rxJxh9+00nFE1D4D0l12pJ72s76vS+p8FW7JqSPf6Qg
-	DP8XiPf+PwTbeU097c1OkZQYpRQbHbvGiOteZuw==
-X-Google-Smtp-Source: AGHT+IGtolM3WpmMOfPkC5aQN2+QGXojyD9zctBgGDhejOP10KXv+fVObxP+zNTcUHL0l2vGVmYa+w==
-X-Received: by 2002:a17:907:7291:b0:b07:c28f:19c8 with SMTP id a640c23a62f3a-b1bb7d419c3mr514517266b.30.1758156374473;
-        Wed, 17 Sep 2025 17:46:14 -0700 (PDT)
-Received: from localhost ([212.73.77.104])
-        by smtp.gmail.com with UTF8SMTPSA id a640c23a62f3a-b1fd271ead3sm73266366b.101.2025.09.17.17.46.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 17 Sep 2025 17:46:14 -0700 (PDT)
-From: Askar Safin <safinaskar@gmail.com>
-To: brauner@kernel.org
-Cc: amir73il@gmail.com,
-	axboe@kernel.dk,
-	cgroups@vger.kernel.org,
-	chuck.lever@oracle.com,
-	cyphar@cyphar.com,
-	daan.j.demeyer@gmail.com,
-	edumazet@google.com,
-	hannes@cmpxchg.org,
-	horms@kernel.org,
-	jack@suse.cz,
-	jlayton@kernel.org,
-	josef@toxicpanda.com,
-	kuba@kernel.org,
-	linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
+        d=1e100.net; s=20230601; t=1758160232; x=1758765032;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=TGIvktuNokMfEeQBYkw+feVubqH5mU5MNNf0kIjurc0=;
+        b=C9DpQb57ELDPt3akkLwVjXLZNzvhc0jmAFwtBrUai/MapoFg6qEDhLOp7C6lYok/DD
+         kpILu/AbMWUU6SdMpM3cGqGWTbefKGA8heyB0uPnYUxZiHaqvyu3sCDTiQWww/AvuX6Q
+         Wf9jCt769fJCj9xYwXYLfQu3i/RYDPAREeDY7ndtuBvOxNGbHTd8hNRhabqGhPPo2h5d
+         1kXpzUSiTP8riRBKog/1nK5BVUJY0PommrfADLwC8nzs7wZ6yYrkA+lj+BI4oL/ms1fp
+         ONrnj6aJ1OHskWo8vF143uCx+7kG6VAyMtC0tq7xXquxaxnjbp8BvuPC4aUPcEMp88qB
+         PIdw==
+X-Gm-Message-State: AOJu0YzAIdU5HfbBkyUn0e9B5HvjBU2e4yYiGJogpeS4TyipNEUxARZM
+	kNQeDRtQa8yeKDnRiLAeE7qCdS4pkX9+JKOnlIbZqKpIhMreV9C5uoRC+s+wLBLtcZYUTfapwM9
+	EkfzcxKefAyUsD6w+1nRGYxBHbvtdZI1b3YD2qq6b+2oTjaXHXo0H
+X-Gm-Gg: ASbGncsOff4aMX1bbojkqe8I8MI4DeXZ8WELDqqXiujeE/oe5Zsbgh+qTLBHjXeHXBm
+	8Jv1AEFGcneNamB3MaRZl/SewjMZ9YavraOFqZkoZ+/ZRVkhEYWmqviDNZWKEWUjWfiCS6ApaTE
+	zRN0wIxIoyi5v87kcI7G+JZukV6qQoarocSs/ITecp8QXOJJ+/HQA2n+BEpQ27QZ5Y8H4if9sAp
+	j4/0IV5g/GkUyh2qJRXydcvBaymBOjo5vscHbHByf6A3RO3g+JDIbkFlecj/Q5sUlAB08IAjw7T
+	CuFqxo59gYXJanxR8OwNvisok3tepkzfdAJKkxtGO8e3XW+Arwarle+Jlw==
+X-Google-Smtp-Source: AGHT+IFjlktqk/3nYPmb+CRYzX3NN7hHld95pMMXVz0WtXy5Y67cG3TeyxcLYDmSvHwYCTNNBsADk3KeahBe
+X-Received: by 2002:a05:6870:9a97:b0:31d:6420:8791 with SMTP id 586e51a60fabf-335bf6206demr1202085fac.7.1758160232119;
+        Wed, 17 Sep 2025 18:50:32 -0700 (PDT)
+Received: from c7-smtp-2023.dev.purestorage.com ([2620:125:9017:12:36:3:5:0])
+        by smtp-relay.gmail.com with ESMTPS id 586e51a60fabf-336e6487e4asm123459fac.18.2025.09.17.18.50.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Sep 2025 18:50:32 -0700 (PDT)
+X-Relaying-Domain: purestorage.com
+Received: from dev-csander.dev.purestorage.com (dev-csander.dev.purestorage.com [10.7.70.37])
+	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id A36D6340325;
+	Wed, 17 Sep 2025 19:50:31 -0600 (MDT)
+Received: by dev-csander.dev.purestorage.com (Postfix, from userid 1557716354)
+	id 9BC38E41B42; Wed, 17 Sep 2025 19:50:31 -0600 (MDT)
+From: Caleb Sander Mateos <csander@purestorage.com>
+To: Ming Lei <ming.lei@redhat.com>,
+	Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-nfs@vger.kernel.org,
-	me@yhndnzj.com,
-	mkoutny@suse.com,
-	mzxreary@0pointer.de,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	tj@kernel.org,
-	viro@zeniv.linux.org.uk,
-	zbyszek@in.waw.pl
-Subject: Re: [PATCH 17/32] mnt: support iterator
-Date: Thu, 18 Sep 2025 03:46:06 +0300
-Message-ID: <20250918004606.1081264-1-safinaskar@gmail.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20250910-work-namespace-v1-17-4dd56e7359d8@kernel.org>
-References: <20250910-work-namespace-v1-17-4dd56e7359d8@kernel.org>
+	Caleb Sander Mateos <csander@purestorage.com>
+Subject: [PATCH 00/17] ublk: avoid accessing ublk_queue to handle ublksrv_io_cmd
+Date: Wed, 17 Sep 2025 19:49:36 -0600
+Message-ID: <20250918014953.297897-1-csander@purestorage.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -100,12 +79,41 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-> Move the mount namespace to the generic iterator.
-> This allows us to drop a bunch of members from struct mnt_namespace.
->                                                                       t
-> Signed-off-by: Christian Brauner <brauner@kernel.org>
+For ublk servers with many ublk queues, accessing the ublk_queue in
+ublk_ch_uring_cmd_local() and the functions it calls is a frequent cache miss.
+The ublk_queue is only accessed for its q_depth and flags, which are also
+available on ublk_device. And ublk_device is already accessed for nr_hw_queues,
+so it will already be cached. Unfortunately, the UBLK_IO_NEED_GET_DATA path
+still needs to access the ublk_queue for io_cmd_buf, so it's not possible to
+avoid accessing the ublk_queue there. (Allocating a single io_cmd_buf for all of
+a ublk_device's I/Os could be done in the future.) At least we can optimize
+UBLK_IO_FETCH_REQ, UBLK_IO_COMMIT_AND_FETCH_REQ, UBLK_IO_REGISTER_IO_BUF, and
+UBLK_IO_UNREGISTER_IO_BUF.
+Using only the ublk_device and not the ublk_queue in ublk_dispatch_req() is also
+possible, but left for a future change.
 
-There is weird "t" here floating at the right
+Caleb Sander Mateos (17):
+  ublk: remove ubq check in ublk_check_and_get_req()
+  ublk: don't pass q_id to ublk_queue_cmd_buf_size()
+  ublk: don't pass ublk_queue to __ublk_fail_req()
+  ublk: add helpers to check ublk_device flags
+  ublk: don't dereference ublk_queue in ublk_ch_uring_cmd_local()
+  ublk: don't dereference ublk_queue in ublk_check_and_get_req()
+  ublk: pass ublk_device to ublk_register_io_buf()
+  ublk: don't access ublk_queue in ublk_register_io_buf()
+  ublk: don't access ublk_queue in ublk_daemon_register_io_buf()
+  ublk: pass q_id and tag to __ublk_check_and_get_req()
+  ublk: don't access ublk_queue in ublk_check_fetch_buf()
+  ublk: don't access ublk_queue in ublk_config_io_buf()
+  ublk: don't pass ublk_queue to ublk_fetch()
+  ublk: don't access ublk_queue in ublk_check_commit_and_fetch()
+  ublk: don't access ublk_queue in ublk_need_complete_req()
+  ublk: pass ublk_io to __ublk_complete_rq()
+  ublk: don't access ublk_queue in ublk_unmap_io()
+
+ drivers/block/ublk_drv.c | 155 +++++++++++++++++++++++----------------
+ 1 file changed, 93 insertions(+), 62 deletions(-)
 
 -- 
-Askar Safin
+2.45.2
+
