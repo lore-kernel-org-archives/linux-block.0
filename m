@@ -1,113 +1,146 @@
-Received: from mail-yb1-f227.google.com (mail-yb1-f227.google.com [209.85.219.227])
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08BB02D9789
-	for <linux-block@vger.kernel.org>; Thu, 18 Sep 2025 19:34:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.227
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 008583090EF
+	for <linux-block@vger.kernel.org>; Thu, 18 Sep 2025 19:58:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758224057; cv=none; b=T35NTQvxkbCS7WjzS9VK5EO6C0PzddHhTd9Xc3uR68ka86+/gkDuAtBfAA9A98OYy3z0Fnhu63daYPWjlE/2ls3Zx2oyBVptYIc7YoTDq7obqL7t+C4Jfh//7iWbpxvDbqwOHBmCbI570VmzYohwqW3d/UtdRW7dudB8nXcjres=
+	t=1758225500; cv=none; b=JomU1H0OAhXhUsfJImD4jRlY9Lgidi751RXfkXkvtmwhoL/QOyMIZ/97sGLahCsJFJhSu9TrQHL1rGwVta0Cq1dYxDbMf0NbJyEZnWMyNdx4rxblFNzOItGYKPWSTz9KySGbqV5eZFP4R92pUbE7Ter20gduZh2Mh8bRd7uSqZU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758224057; c=relaxed/simple;
-	bh=Y9/Ne8zaqdwA/LXEG0LconEi+zVGsXicyRVHEDgancw=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Og3LKZLvQoODKbvWUMmrk64Uxeb6ktnMVPV+78xCloP6CxQLf+iNri4tsiG16ZoMfR6YbAxGPgZCuVpDvtZDnkSnPFLV4L/trsd4oMKi/VvRmv2RkLqliRPkKkhXyF6fnMwb0955R9oSlj7edJSYlhh5r/8YuSRwTUE8neqOZTw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=UKq2ug09; arc=none smtp.client-ip=209.85.219.227
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	s=arc-20240116; t=1758225500; c=relaxed/simple;
+	bh=hrTKVKMuOKbLilzSA+VEl+XSSF0VIocT2KvCzkuRjcw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=f1t2Uut8X0vjHihrfCxVizQx3oAuiXtbEMNuxUGbeTeANElP+n+8kVqPaX5vSXPNhpixLZ4XTUGM7jyyz80nSDh/C9k9foNUqACygyJ6Y5+tUQ1/Mk7uUAwRPZVV5Q5FTUWQYFvTUFJFp4p801sMMc1U4qqh7Ec9drnq0SsFgxU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hNlT1dRM; arc=none smtp.client-ip=209.85.218.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="UKq2ug09"
-Received: by mail-yb1-f227.google.com with SMTP id 3f1490d57ef6-ea5c1e394a8so1039026276.1
-        for <linux-block@vger.kernel.org>; Thu, 18 Sep 2025 12:34:13 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hNlT1dRM"
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-b0787fdb137so211167766b.0
+        for <linux-block@vger.kernel.org>; Thu, 18 Sep 2025 12:58:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1758224053; x=1758828853; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=zUwZ0WSYzRWLsV37Zv2zW5RoOF8gsqcC5qtG3FfYLLc=;
-        b=UKq2ug09nECDKJ8qP52M5tEonD4ouB9EMtR+X7SlGgf8Q5ifu431/jNdxo/guiTZiL
-         e6rcrF9vVt36B1VXSVd99J27eJpitA2CIRozfsKJfFd4dxujbtidpWvFNa27ls1jA+Rs
-         63fZcd0W9kBh0DeAnKh7bvJ0i+PnBaid3V4aE2cotImXwL7AcsTG4PmF6pVBwa/tUNDy
-         pAiduAQec/w+HLMGpfIj6Fyiqbjq6FuJMmHmhm1moADeopI51gClaamKT6dlwg62Bxn0
-         3CwM3JLsWKmakrQn8vhJ3xRelgw+5vBpTrJl5cGOX9e1O9ZI5tGecMLTW89dS2ipHn+6
-         /y4w==
+        d=gmail.com; s=20230601; t=1758225496; x=1758830296; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9McvDjxp1cOQ8m8DQ7zr8KAOkClRv+R613f7KwPZqLk=;
+        b=hNlT1dRMFhV3nNEO8OCPXfEiZjy7HadMXu4vRgp3Ipj8QW/pTjkxFRxYZEa69pe80J
+         R5WZR6uBlmeIbF+VQhBUi3wnRJuDxh3ZSYPm2HtEzHdmYgYFzaLOTkBNZpxqwUsXFCi5
+         xh48TC/I8mOWxP2I4D6qthvi1wAkVJadHw9+Q6aETqCdcS+tzshGNcO1qODnTVXpUxR3
+         DzGuLf7FRf7YNLECrqzb9ayMBLdTqRvBk0ivmzKueGmRkmu1GRq1Uqn5Uc0kg8EqXgPJ
+         5wCj9Urjk2M3jfgX+oYXsBuDx3I+zNM2GW5fMn6rB/kk6qlx/ZV55XBxceRxo80pIEfP
+         n68Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758224053; x=1758828853;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1758225496; x=1758830296;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=zUwZ0WSYzRWLsV37Zv2zW5RoOF8gsqcC5qtG3FfYLLc=;
-        b=cEJQeh6mF8z8AMfmJVqyFQ3qs90QZxYnMShHgS1Ggz37N2Bya1AM3jyN4smLaqnN+Z
-         wjiudHk15p4yGRr4hQzzw6+xjm5GgHXP4EJGg13JeHFlS+hyhjS/A44r/gl2tb/53bHy
-         UubAGYvsnrXNOwDz4Dz0DyFR9f1HQbLyNg7Rqb25Li5U2u39WtTuSia8G/0wAuzqvuS9
-         jEpmJvjk8G/Yxgm9swDeJSvTNA0hrTMnRupvDhbUv21GjD7g+DqyRurc5YJkg/Q7d5ER
-         /m7VR/K8pDOkJmu98MyPNIKBQxKmd4IVwjN4siTEbf1c+OTHDhI6099FUH+NcmRLn3kQ
-         XMvQ==
-X-Gm-Message-State: AOJu0YwP7jc9GmK1e1aE1Xam9bnjSDwLgwKBw1MNckaCgEcvLnTed6eh
-	TGQQ85dkJTDYop7DI7T05iq+vXlHVfHUpRShkAOuuayYn8Vhk6jUtAuDwxrP2ukvb5I1J2fxmMy
-	TBt077zWp3sVmlnc5vKZtYb90OeOaGyC06WkR
-X-Gm-Gg: ASbGncsyK8sSO8RNq41IxC0wkbsv9ovbHzSOdyPxFVs4D9lndOil15GQWn5zJbJ8tQQ
-	Kuo8QECgPgDxfy7a2XiOUFncz0I0yZrigBLMAz7JBBzm8rdmme9W/Q0Ak6rWOwA4groVPzSCm3K
-	M+2vPWlizMpu/fgVj0UibS2Dp3nbV+9c+WFYuW5xDlo7oGFbuwey0GhoiPEIbkiRbW7q0A8zlCa
-	m1IBu5JVAMa94xK+bCbnOToRwfk8nHYbyp2wR0sexbJ9qwjl8eykX2C4PjGUEhhCVwY+ndCIqJK
-	p8OunFj/7qmbOXlo2dCAj8gCMRQ38Pocv0/EUB5W4REWQDdU5xfK5D4n8+x4ecOIFB1/Njx7kg=
-	=
-X-Google-Smtp-Source: AGHT+IFECpZeDDEGAhBtzHw6/PxcEE3TRQwhyGlv3EpuDKpWXDFvddkM3Bj/6+YKpS1VWGtiLzjjfhO9SUic
-X-Received: by 2002:a05:6902:150b:b0:ea4:d1:e832 with SMTP id 3f1490d57ef6-ea8a867ea09mr636869276.42.1758224052816;
-        Thu, 18 Sep 2025 12:34:12 -0700 (PDT)
-Received: from c7-smtp-2023.dev.purestorage.com ([208.88.159.129])
-        by smtp-relay.gmail.com with ESMTPS id 3f1490d57ef6-ea5ce832831sm198429276.16.2025.09.18.12.34.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Sep 2025 12:34:12 -0700 (PDT)
-X-Relaying-Domain: purestorage.com
-Received: from dev-ushankar.dev.purestorage.com (dev-ushankar.dev.purestorage.com [IPv6:2620:125:9007:640:7:70:36:0])
-	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 3432334049A;
-	Thu, 18 Sep 2025 13:34:12 -0600 (MDT)
-Received: by dev-ushankar.dev.purestorage.com (Postfix, from userid 1557716368)
-	id 0452BE541CA; Thu, 18 Sep 2025 13:34:12 -0600 (MDT)
-From: Uday Shankar <ushankar@purestorage.com>
-Date: Thu, 18 Sep 2025 13:34:08 -0600
-Subject: [PATCH v2 2/3] selftests: ublk: kublk: add
- UBLK_F_BUF_REG_OFF_DAEMON to feat_map
+        bh=9McvDjxp1cOQ8m8DQ7zr8KAOkClRv+R613f7KwPZqLk=;
+        b=erwZNyXvUb2x7ZhPGx0ad4Xl21l5eY9a7XGAsS6X4RhhYE6CrWE+Ypi62/+tUNgbIg
+         UwU3/a6XY7afOXTVup0VvyJprWJXbeBxcPdQ68nccUYetV+x3yaMFJ/4QtUZMWfG58Os
+         QrSNmIhWisK24L5/SHaNRyf8jHjL0KKoHM/UWZtWH70PIvsaSrI80e+u4KmJ9TvRc3ZT
+         cgYO5OTJ+U1XJsU37xiXsx5ZZVh2sBWAGJTMs/lXWA8SIWAY1I3LxI/r7dtWrHROFpP4
+         c4tMNl+S3wNvbYnx91ca2w8TZm/BCTzVRSTp8gQNWXD7kB9jNapv3Gr5ufTCxKfm/Hzc
+         Js5g==
+X-Forwarded-Encrypted: i=1; AJvYcCWb+Sl1GbUq6RtC0XJzTXBOV8lIqmHtJq9cnpG5KMjsoNGjfopBEWCoXRJFLWPR9vvr5/pyUHcJrkfSdw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyZTCdnAbshsPpVP0sH3qbFgQQ8a8UYHVuit3fcRXwHTNOP+L97
+	ewtdcH7ii74fg8VItc/oUEdima1ahciFBBfX19EoWrDyHgxJMe30MS3n
+X-Gm-Gg: ASbGncvvCq2nnv49kaRELI1wHV/bmpq7FOYo0/JfyEB1hF/LA812a+IKNxHzN8M3/kE
+	dCmpdEcR3DZ/pdLshIDuYj6slYbXpPaufQd8yPjBl0vRMZOjCcS2dZWFc+lKGy+VleweuL9WXlJ
+	LpiNK7w71P8sHQbi9TRibz+X+Mujd908sCTdv19f+mAz0hdaYYoDIkcuAiNSmgQkzzVj/H28i/S
+	Sph7PdoWADAyb5+AmAkRpTBZbGSufBZ6l/B8Cu59A0PnHLI76NEADjQb4AMYylNMmtZ7x35+IyT
+	fdDbjtY9d802mdPiRxipGU3Lzm8P59x8D5v1xhrmX3ryzHtKPV02QC9uCPfaJbZXhhGS3ULNAqG
+	qXD+gn4W3UTo9RSYayJ73Jv3fRCcYBjscDkj6+A==
+X-Google-Smtp-Source: AGHT+IH2NBu6L+bASXNqg9sJUcZ42MFCB2aqzEFiqoDEW6um54A4CtHcJnO37auTgFbi6nwycKDm8A==
+X-Received: by 2002:a17:907:a089:b0:b19:969a:86 with SMTP id a640c23a62f3a-b24f35aa177mr45885966b.37.1758225496090;
+        Thu, 18 Sep 2025 12:58:16 -0700 (PDT)
+Received: from localhost ([212.73.77.104])
+        by smtp.gmail.com with UTF8SMTPSA id a640c23a62f3a-b1fd1101c44sm264530466b.82.2025.09.18.12.58.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 18 Sep 2025 12:58:15 -0700 (PDT)
+From: Askar Safin <safinaskar@gmail.com>
+To: nschichan@freebox.fr
+Cc: akpm@linux-foundation.org,
+	andy.shevchenko@gmail.com,
+	axboe@kernel.dk,
+	brauner@kernel.org,
+	cyphar@cyphar.com,
+	devicetree@vger.kernel.org,
+	ecurtin@redhat.com,
+	email2tema@gmail.com,
+	graf@amazon.com,
+	gregkh@linuxfoundation.org,
+	hca@linux.ibm.com,
+	hch@lst.de,
+	hsiangkao@linux.alibaba.com,
+	initramfs@vger.kernel.org,
+	jack@suse.cz,
+	julian.stecklina@cyberus-technology.de,
+	kees@kernel.org,
+	linux-acpi@vger.kernel.org,
+	linux-alpha@vger.kernel.org,
+	linux-api@vger.kernel.org,
+	linux-arch@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-block@vger.kernel.org,
+	linux-csky@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-efi@vger.kernel.org,
+	linux-ext4@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-hexagon@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-m68k@lists.linux-m68k.org,
+	linux-mips@vger.kernel.org,
+	linux-openrisc@vger.kernel.org,
+	linux-parisc@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	linux-s390@vger.kernel.org,
+	linux-sh@vger.kernel.org,
+	linux-snps-arc@lists.infradead.org,
+	linux-um@lists.infradead.org,
+	linuxppc-dev@lists.ozlabs.org,
+	loongarch@lists.linux.dev,
+	mcgrof@kernel.org,
+	mingo@redhat.com,
+	monstr@monstr.eu,
+	mzxreary@0pointer.de,
+	patches@lists.linux.dev,
+	rob@landley.net,
+	safinaskar@gmail.com,
+	sparclinux@vger.kernel.org,
+	thomas.weissschuh@linutronix.de,
+	thorsten.blum@linux.dev,
+	torvalds@linux-foundation.org,
+	tytso@mit.edu,
+	viro@zeniv.linux.org.uk,
+	x86@kernel.org
+Subject: Re: [PATCH RESEND 00/62] initrd: remove classic initrd support
+Date: Thu, 18 Sep 2025 22:58:06 +0300
+Message-ID: <20250918195806.6337-1-safinaskar@gmail.com>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20250918152830.438554-1-nschichan@freebox.fr>
+References: <20250918152830.438554-1-nschichan@freebox.fr>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250918-ublk_features-v2-2-77d2a3064c15@purestorage.com>
-References: <20250918-ublk_features-v2-0-77d2a3064c15@purestorage.com>
-In-Reply-To: <20250918-ublk_features-v2-0-77d2a3064c15@purestorage.com>
-To: Caleb Sander Mateos <csander@purestorage.com>, 
- Ming Lei <ming.lei@redhat.com>, Shuah Khan <shuah@kernel.org>
-Cc: linux-block@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Uday Shankar <ushankar@purestorage.com>
-X-Mailer: b4 0.14.2
+Content-Transfer-Encoding: 8bit
 
-When UBLK_F_BUF_REG_OFF_DAEMON was added, we missed updating kublk's
-feat_map, which results in the feature being reported as "unknown." Add
-UBLK_F_BUF_REG_OFF_DAEMON to feat_map to fix this.
+> When booting with root=/dev/ram0 in the kernel commandline,
+> handle_initrd() where the deprecation message resides is never called,
+> which is rather unfortunate (init/do_mounts_initrd.c):
 
-Signed-off-by: Uday Shankar <ushankar@purestorage.com>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
----
- tools/testing/selftests/ublk/kublk.c | 1 +
- 1 file changed, 1 insertion(+)
+Yes, this is unfortunate.
 
-diff --git a/tools/testing/selftests/ublk/kublk.c b/tools/testing/selftests/ublk/kublk.c
-index 4e5d82f2a14a01d9e56d31126eae2e26ec718b6c..b636d40b4889d88f7d64d0e71c6f09eca17e3989 100644
---- a/tools/testing/selftests/ublk/kublk.c
-+++ b/tools/testing/selftests/ublk/kublk.c
-@@ -1379,6 +1379,7 @@ static int cmd_dev_get_features(void)
- 		FEAT_NAME(UBLK_F_AUTO_BUF_REG),
- 		FEAT_NAME(UBLK_F_QUIESCE),
- 		FEAT_NAME(UBLK_F_PER_IO_DAEMON),
-+		FEAT_NAME(UBLK_F_BUF_REG_OFF_DAEMON),
- 	};
- 	struct ublk_dev *dev;
- 	__u64 features = 0;
+I personally still think that initrd should be removed.
+
+I suggest using workaround I described in cover letter.
+
+Also, for unknown reasons I didn't get your letter in my inbox.
+(Not even in spam folder.) I ocasionally found it on lore.kernel.org .
 
 -- 
-2.34.1
-
+Askar Safin
