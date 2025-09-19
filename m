@@ -1,139 +1,104 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f46.google.com (mail-io1-f46.google.com [209.85.166.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87D7A23C4F3;
-	Fri, 19 Sep 2025 16:08:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B7B731A811
+	for <linux-block@vger.kernel.org>; Fri, 19 Sep 2025 17:06:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758298105; cv=none; b=jq7bWO0EBeqSSdueRBdq/Fbnu6RfoshKz3yaHLQg95gJN9v9BmoDvmGvRKPUAWtz8rjBmMCrvCUX6q7+NzjwbpiEZG8LdN/vGVtQIA47Mb0vwqpad14nmcZU/mcOqG+l1BUxkKs0TRFRV9+7DLpnV+QADkvvRBc/62fgNwr0fdE=
+	t=1758301599; cv=none; b=Z4A257x4CnLVupn5sVRh4uitSfixMiMWDfCv1/7RGo4MIa9kiWLk0kqk0tIcyGtWZFYI40toTHo1+jdVeuWBvq0GpxP++s/P5SdgLLTFtkyxYlXpIVwBz7NU0te6jUdBrtd7K4s7TSZL87E4INSVrqEmStOByc/6dWtPqqRGYfM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758298105; c=relaxed/simple;
-	bh=KR7+2nE82F6C0RiPmuqmiCYxfBNwhzjUQ6Re6K7PmkQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kP7hh39fxv0P9Ur5m66GUvw/XTGzMByZZsmW/tM7RXY/mOp1i+FjN5HY6nnWjW7kNP2Ee2CmM0JHrb5QLd+rw0A0BYGcw6Pcg+kplV7/ELLUufKYJKsuGclGCmG3adNlDzRblWYXb+95Y/eThf8Zea1AorOa8qe45sYo992glfs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gxcwNWOd; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1758301599; c=relaxed/simple;
+	bh=q8hVKWTJYFegeK+gcBPDI5sNVfJB9gAyqBbqKkBR/hM=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=G8yr9dUt8GxKxfmqgKih0lRi7d6TqjGkPDTtExKOOmJWU0uxkPenKtKduBzNdGxM77g6Aw4wr9vdQobXmFLEO15LOyokY/JSrj26XAqvcxfHnvz+hXF9QTGYN6FwQvYmpvosjxe3piaQGZcu7Lb7HjSrFqKtcwGh0Z3wkzfhlZw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=dEu51Wd4; arc=none smtp.client-ip=209.85.166.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gxcwNWOd"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76C8EC4CEF0;
-	Fri, 19 Sep 2025 16:08:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758298105;
-	bh=KR7+2nE82F6C0RiPmuqmiCYxfBNwhzjUQ6Re6K7PmkQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=gxcwNWOdwyYYCt/Mr4IoNw/QjfiG4fCy9ykIixLtIZgzxpvEaTh0ZrsRzbEkVlnG2
-	 m8b1wOyRgj64SHlplGanM4IqWdr6Ywznq35IYlrDTPSiuH1HbSJA9OSV6F3cLQ0fmv
-	 gIfqZUpL6QTaZY7lchfgfbbV/HzPQ9GlWuIYB09YAq8LPsugW8lRkDPp3pD3pmqfjH
-	 MMDTa/BarqpIPeeM6zxgfbm5MTp42dkz6/ahu8QcAFUE+eO/S+U7a/1bN3BopMvk86
-	 +JRB492i+MxOTtI0yVlp8MJ781GY30PjuvtN+/6jEMPcnyQy8X2xhocLeJS5gf/FQl
-	 TeUW9JwC+yaOg==
-Date: Fri, 19 Sep 2025 10:08:21 -0600
-From: Keith Busch <kbusch@kernel.org>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Marek Szyprowski <m.szyprowski@samsung.com>,
-	Jason Gunthorpe <jgg@nvidia.com>,
-	Abdiel Janulgue <abdiel.janulgue@gmail.com>,
-	Alexander Potapenko <glider@google.com>,
-	Alex Gaynor <alex.gaynor@gmail.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Christoph Hellwig <hch@lst.de>, Danilo Krummrich <dakr@kernel.org>,
-	David Hildenbrand <david@redhat.com>, iommu@lists.linux.dev,
-	Jason Wang <jasowang@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-	Joerg Roedel <joro@8bytes.org>, Jonathan Corbet <corbet@lwn.net>,
-	Juergen Gross <jgross@suse.com>, kasan-dev@googlegroups.com,
-	linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	linux-nvme@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
-	linux-trace-kernel@vger.kernel.org,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Robin Murphy <robin.murphy@arm.com>, rust-for-linux@vger.kernel.org,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Stefano Stabellini <sstabellini@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	virtualization@lists.linux.dev, Will Deacon <will@kernel.org>,
-	xen-devel@lists.xenproject.org
-Subject: Re: [PATCH v6 00/16] dma-mapping: migrate to physical address-based
- API
-Message-ID: <aM1_9cS_LGl4GFC5@kbusch-mbp>
-References: <CGME20250909132821eucas1p1051ce9e0270ddbf520e105c913fa8db6@eucas1p1.samsung.com>
- <cover.1757423202.git.leonro@nvidia.com>
- <0db9bce5-40df-4cf5-85ab-f032c67d5c71@samsung.com>
- <20250912090327.GU341237@unreal>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="dEu51Wd4"
+Received: by mail-io1-f46.google.com with SMTP id ca18e2360f4ac-88cdb27571eso88796039f.0
+        for <linux-block@vger.kernel.org>; Fri, 19 Sep 2025 10:06:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1758301596; x=1758906396; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+xszZQkvWINK5WulR3oXM0DZacWHWOr6o1TKTnr/+EE=;
+        b=dEu51Wd4iY0tT1PRC8AXmYSzNp3/M8jEPAX6Osol236IDICTFPF55YSrhkTm2MQIVv
+         H666IJi5qpiTdbcdBgSs082G8iK0qXKiuc0mVH98lxTsrIOcmZ/aS3E6ZrTN3P7t5tps
+         LDpRxtPP9zNZrRtFc82w4IEcdc3IExPt86EAaB29DbFCErqsbQEUZh7TrPDLDWgxDBGm
+         YjjZhrNm0Mu7d1SXy76GFAZUu1jAXZudorY/Q/CxX0pap1u0UEwwEIAu3Hqbqd71HlpQ
+         7rSYD4MDdU3TrCEjxbipzfAIXkErFV2VF2J4MEsH9TAphUtAGHI5D1k9Z3t2UcC2b6js
+         vJZw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758301596; x=1758906396;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+xszZQkvWINK5WulR3oXM0DZacWHWOr6o1TKTnr/+EE=;
+        b=uA9k79/RZeVzBGhhY5KMOpcflh0cfPMYpgFdOd/L2Z4OfZrmOQsfIAj3ETZznNRm54
+         PgNoMk+hR3WaBd1EVmg1Yl02GjQl3orWZkSlCsO8j84cR2IatQrBXnedK+J4X+J+1u81
+         wpFH2YNAYUvLA2ybC4PuUjNHyFIt45louQSPmEEdvNbKRUc4Rc+8VPt/MuUBnJDnEYV6
+         uZ3P4HhS7DFxpYl+IXT+wJbQZVysaBhQ9d0F2cHloYNbB4f0oLTdAMGIcjoFN9CNrgpO
+         30g96cf8JXto7izQtExxSwlu3Qt6MguZsJn7OSGmYuGbwFfjnykTHDNoc/5H4oPaNKyu
+         kMQA==
+X-Gm-Message-State: AOJu0YwBzRyS2HSYJSCa7luUuAFVENNjthuMD8P5eDRQDx1Y1JWaydJK
+	sdG5Hu4aZQyumDp/R01ZGrtMgV5Z/x7u2kp1TN0zodJMx61Jlhf/scmmcaPbW4yImrVrW1ihPSZ
+	5siC0
+X-Gm-Gg: ASbGncuSo8oVFGFNJlTPwVK5xyhfOH14g3567j5usKKN2qiprIi+haE0IKfPaUJm/6I
+	5WvVnLYXBSxWTxd0Yk1SatLeaL2iQ0Gm4iaUixOOE36g3B4J+Mb6L4l81buv1SA+15mvJ3N9Co8
+	oFnE+bOFX/s3m3HKDEaC9S7lsauFuDHhRqnBJ9SjXD096j0IXhMacv1J953UOhtTBAWf5NIjZaN
+	4dw7R0HZp1nRK8ypyMmYqsn2Bp7uF0cIMrMj/dJ4xD+gtc720+XqbsPBwDLyb2g9pBAZI1YtrmT
+	VxytFt0DBkAkyNNB8RCFezWJaYIAg5w30PbfJnB1faDlhrhRaMf67UCl8UQGQBDNxN8kStt3/Fr
+	r3m9zbLuC1zHsmw==
+X-Google-Smtp-Source: AGHT+IEWozrJP43M4DVIrxcb0S2DwxZPhA4LrRW0lqAN04mhddqVBixtfK+2/UInAStgyEXg1YXAIA==
+X-Received: by 2002:a05:6602:164b:b0:887:3ae9:c3d9 with SMTP id ca18e2360f4ac-8adcd809f54mr646108739f.2.1758301596382;
+        Fri, 19 Sep 2025 10:06:36 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-8a46a68330fsm188484939f.2.2025.09.19.10.06.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 19 Sep 2025 10:06:35 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: Caleb Sander Mateos <csander@purestorage.com>, 
+ Ming Lei <ming.lei@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+ Uday Shankar <ushankar@purestorage.com>
+Cc: linux-block@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+ linux-kernel@vger.kernel.org
+In-Reply-To: <20250918-ublk_features-v2-0-77d2a3064c15@purestorage.com>
+References: <20250918-ublk_features-v2-0-77d2a3064c15@purestorage.com>
+Subject: Re: [PATCH v2 0/3] selftests: ublk: kublk: fix feature list
+Message-Id: <175830159548.906981.4104343901277988094.b4-ty@kernel.dk>
+Date: Fri, 19 Sep 2025 11:06:35 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250912090327.GU341237@unreal>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3-dev-2ce6c
 
-On Fri, Sep 12, 2025 at 12:03:27PM +0300, Leon Romanovsky wrote:
-> On Fri, Sep 12, 2025 at 12:25:38AM +0200, Marek Szyprowski wrote:
-> > >
-> > > This series does the core code and modern flows. A followup series
-> > > will give the same treatment to the legacy dma_ops implementation.
-> > 
-> > Applied patches 1-13 into dma-mapping-for-next branch. Let's check if it 
-> > works fine in linux-next.
+
+On Thu, 18 Sep 2025 13:34:06 -0600, Uday Shankar wrote:
+> This patch simplifies kublk's implementation of the feature list
+> command, fixes a bug where a feature was missing, and adds a test to
+> ensure that similar bugs do not happen in the future.
 > 
-> Thanks a lot.
+> 
 
-Just fyi, when dma debug is enabled, we're seeing this new warning
-below. I have not had a chance to look into it yet, so I'm just
-reporting the observation.
+Applied, thanks!
 
- DMA-API: nvme 0006:01:00.0: cacheline tracking EEXIST, overlapping mappings aren't supported
- WARNING: kernel/dma/debug.c:598 at add_dma_entry+0x26c/0x328, CPU#1: (udev-worker)/773
- Modules linked in: acpi_power_meter(E) loop(E) efivarfs(E) autofs4(E)
- CPU: 1 UID: 0 PID: 773 Comm: (udev-worker) Tainted: G            E    N  6.17.0-rc6-next-20250918-debug #6 PREEMPT(none)
- Tainted: [E]=UNSIGNED_MODULE, [N]=TEST
- pstate: 63400009 (nZCv daif +PAN -UAO +TCO +DIT -SSBS BTYPE=--)
- pc : add_dma_entry+0x26c/0x328
- lr : add_dma_entry+0x26c/0x328
- sp : ffff80009fe0f460
- x29: ffff80009fe0f470 x28: 0000000000000001 x27: 0000000000000001
- x26: ffff8000835d7f38 x25: ffff8000835d7000 x24: ffff8000835d7e60
- x23: 0000000000000000 x22: 0000000006e2cc00 x21: 0000000000000000
- x20: ffff800082e8f218 x19: ffff0000a908ff80 x18: 00000000ffffffff
- x17: ffff8000801972a0 x16: ffff800080197054 x15: 0000000000000000
- x14: 0000000000000000 x13: 0000000000000004 x12: 0000000000020006
- x11: 0000000030e4ef9f x10: ffff800083443358 x9 : ffff80008019499c
- x8 : 00000000fffeffff x7 : ffff800083443358 x6 : 0000000000000000
- x5 : 00000000000bfff4 x4 : 0000000000000000 x3 : ffff0000bb005ac0
- x2 : 0000000000000000 x1 : 0000000000000000 x0 : ffff0000bb005ac0
- Call trace:
-  add_dma_entry+0x26c/0x328 (P)
-  debug_dma_map_phys+0xc4/0xf0
-  dma_map_phys+0xe0/0x410
-  dma_map_page_attrs+0x94/0xf8
-  blk_dma_map_direct.isra.0+0x64/0xb8
-  blk_rq_dma_map_iter_next+0x6c/0xc8
-  nvme_prep_rq+0x894/0xa98
-  nvme_queue_rqs+0xb0/0x1a0
-  blk_mq_dispatch_queue_requests+0x268/0x3b8
-  blk_mq_flush_plug_list+0x90/0x188
-  __blk_flush_plug+0x104/0x170
-  blk_finish_plug+0x38/0x50
-  read_pages+0x1a4/0x3b8
-  page_cache_ra_unbounded+0x1a0/0x400
-  force_page_cache_ra+0xa8/0xd8
-  page_cache_sync_ra+0xa0/0x3f8
-  filemap_get_pages+0x104/0x950
-  filemap_read+0xf4/0x498
-  blkdev_read_iter+0x88/0x180
-  vfs_read+0x214/0x310
-  ksys_read+0x70/0x110
-  __arm64_sys_read+0x20/0x30
-  invoke_syscall+0x4c/0x118
-  el0_svc_common.constprop.0+0xc4/0xf0
-  do_el0_svc+0x24/0x38
-  el0_svc+0x1a0/0x340
-  el0t_64_sync_handler+0x98/0xe0
-  el0t_64_sync+0x17c/0x180
- ---[ end trace 0000000000000000 ]---
+[1/3] selftests: ublk: kublk: simplify feat_map definition
+      commit: 1f924cf781de47432f220185bb2beeb12c666aa1
+[2/3] selftests: ublk: kublk: add UBLK_F_BUF_REG_OFF_DAEMON to feat_map
+      commit: 742bcc1101bcaca92901fe3fe434e4b1a467b5e8
+[3/3] selftests: ublk: add test to verify that feat_map is complete
+      commit: a755da0dd0530e53aa026fd4d08b3097e1be6455
+
+Best regards,
+-- 
+Jens Axboe
+
+
 
