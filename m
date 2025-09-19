@@ -1,108 +1,114 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7690B1E51FB
-	for <linux-block@vger.kernel.org>; Fri, 19 Sep 2025 00:58:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D955125484B
+	for <linux-block@vger.kernel.org>; Fri, 19 Sep 2025 02:56:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758243527; cv=none; b=KqqPopDTEHm+vosZZi/vjizQt7O7tLAQndLoLV6T3qqKl+NswPFH3q407abKTQJgBwg7sVUoyjfH65aktww3IATf0yzU4Y/W6745ROjkYDhBye7Z6R2rSTb8FJ+ieecZDTQEEJf8ok9+BBukIAkpbhb1U6ccZAKVRb0rci57+Ds=
+	t=1758250603; cv=none; b=W877JEbumMmpa+2THjMO2Vuo99rjiOusj+4dGRefFtFA6gUyBKhcI4qvSUSVq5FqqZ0GLenj2Adleg2N9vDzyP+4twWEtxxxZovEFxWQZPI0MoNKRq5iczrj/K/xdn0uus5dEk6SMy6zME8pcysIk7xspI1cotphNjC2RObHk5Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758243527; c=relaxed/simple;
-	bh=INL+jGniSEK6jlOzw1pZ4EBFHb9iVRN2n/+Wi3ZEWR0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rUeg+Bx4AI83cQLHubDgPYLrUuULvUOglIfxBAND/t7H784LKDVVyedZEv3Bf8Q0/q9TtS4nykN7uJskiugY5iThPkUmwKmFxuS2AzxC8Zp99HSiXokVv5avuT4j0mY6I8oaQXw29AdKk5YGfgZrql5ISITgL6SMJNV/5JtZLtE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YydwEGiU; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1758250603; c=relaxed/simple;
+	bh=xNC4+5vXuGIoP3AubYqeZ73I0t9q26/OKWO/Q7/2G4w=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=l2c6K4a3feDNfRSSek7jpDX1FQpOnoHsJPsqzDtR603pYccd1p4AQyj0nBwu0L25jLgUiPKPwYDu707L/c8HkuK6U3xWdf9WmaTkHasYw1vrCuEks4Vn/KHIsZou44y1jUh3cU1UMdcQ0v9SdYYErNGxDokThdMskrFE2oRDkdw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F53VD4TQ; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YydwEGiU"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1758243524;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=INL+jGniSEK6jlOzw1pZ4EBFHb9iVRN2n/+Wi3ZEWR0=;
-	b=YydwEGiUvywtpBzVB6wr8L+HcuSsWztDyAiHssPdiWbqXcf4AQ3uwp7TgRyD3C4q7yEBzE
-	jhLORiD2qv950AaAHggePOIoCY+HUN+j+CjAi4gWVi3E+1Lybs9f60S2GCA1QPBJKgO9O/
-	4OV1AxWYShnpQpcgB/eQg2XlxtilHBM=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-621-CQZsUuWDNkaHpqIH3s6iDg-1; Thu, 18 Sep 2025 20:58:41 -0400
-X-MC-Unique: CQZsUuWDNkaHpqIH3s6iDg-1
-X-Mimecast-MFC-AGG-ID: CQZsUuWDNkaHpqIH3s6iDg_1758243521
-Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-78e831e5a42so36175086d6.2
-        for <linux-block@vger.kernel.org>; Thu, 18 Sep 2025 17:58:41 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F53VD4TQ"
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-24457f581aeso16767545ad.0
+        for <linux-block@vger.kernel.org>; Thu, 18 Sep 2025 19:56:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1758250601; x=1758855401; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ovDud+Upvoitt+mbnx9bJAksUkvB+hvEmFPUqVI4Vww=;
+        b=F53VD4TQ7T1MFExVOJZH+AHAqsNVxQ4jMLo3r8Ii6q3JavLwt4sshQ3pxpboQEko3P
+         WisUsce4WNVV9Fkn9G20N6fX/D4gusMOqo0Z8EFB8Mqrri+HYHMFjB3KxWJdOgHiC6tO
+         3M5RBfargClu2kK9ECpZkxANw70hZR5W3Na6DRJFQolUO3XrUHdiAznCsbpIBD20uuP3
+         M09yyvInrU4xMkmeMdCQ+ZfPAfhE1efOSbp/HKm0UUv2YCCi8+03qSQnmJkTTj8SwjRr
+         BWDGc9+dz4oVUuOj27M9gETheGFO+u4uymBnoZguBoXqg2rdmuZYOv8AoeIVT8AxOaM2
+         R/BA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758243521; x=1758848321;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=INL+jGniSEK6jlOzw1pZ4EBFHb9iVRN2n/+Wi3ZEWR0=;
-        b=GfX3hhLVYqYKTyMCf2HvX4/hv+2G5BQpDJz0RS5iQizO2L0YfOieMxbbf2nIW9Y19D
-         G7LsRs5+nMub1x73kRw8XG9I1Esw/tzdle2892CmpFISPWy9fi7JY3J586+8Au9H0Qu+
-         oIgg6cuB9Pj5zrpGca4CszH8HjSSf/0ljerfSZ1zjjt10w1C/GCLQD9RtSygKFY7io/E
-         x7vLNt4TDq/jWP4k8Xv3Hs9Pnyk3V2hJoby6xpL19QBTEBrS0w8XAOS/CWeyho8E71ot
-         38yEyqX0zm9aDw5Ht1nQWDqgDLTYdHnsi6q33gbdUTNWuRCBJXvd01PWypSRsSUUoIbE
-         tQfg==
-X-Forwarded-Encrypted: i=1; AJvYcCWGpW4vB1IUmIX+lwdbSCKnXZFdiJljcYJU8ImvVxUuCIxvqy/YcSarocGjcB/etOeCdHxIBS5jkfDoSg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxfCFimwWVnwaMOzFQnxkyEZpedFwBNvaL2YKMJBUI8gmsC6Hvv
-	rqSuLaetzuil8ttmYaPZE0kEAOuIWLymUptmKby0PcLLHtfotFW49bFmDK5kaFgJ2USmUvxUtem
-	+nifI9mHCUbsdcB1m9l1yjerjhmQPlBqlIUbxxT6ADqkS+CaUZYHhob5eiO/dPsoN9R1qsRpycD
-	q1XC88OX1zxCSVqgJM48RyPQP9er9ap4NuMV8UqrE=
-X-Gm-Gg: ASbGnctwxcPVoZ9/afr1n4y997AYx20jyb/TwPHxw6zRbkBK4BBg/nziIpkhszIoIiI
-	NCpP3K7nejtNPRQCCVYlwQ5xtOMVo/F6HTbN9pzYm6ts/ERQo54d6AjxpEGL7kizOWWPhx6hWdp
-	IB10ov9/weGMl6r3avhyNv4Q==
-X-Received: by 2002:a05:6214:234e:b0:786:dc95:7b4a with SMTP id 6a1803df08f44-7991f60498fmr17130086d6.54.1758243520864;
-        Thu, 18 Sep 2025 17:58:40 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHCePSrkJyt8xOhV9XFxKyR5ORnkdYCLN1UQ0pORMOf3Vpbal9XfU/aSeiMZSMO/Y8ggPzzI0yEwXtZdhKDphA=
-X-Received: by 2002:a05:6214:234e:b0:786:dc95:7b4a with SMTP id
- 6a1803df08f44-7991f60498fmr17129876d6.54.1758243520392; Thu, 18 Sep 2025
- 17:58:40 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1758250601; x=1758855401;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ovDud+Upvoitt+mbnx9bJAksUkvB+hvEmFPUqVI4Vww=;
+        b=lmbsb/BHh6nRnlZ7p+FMSWtcETB9j+gBFRnFHRQCiVDWBN29ap5vAPBwheTNUIEkI4
+         MZZaVNGpS4ZyxLG/ZUn2C+Q6MUg2vljX49SrcaNKCEs1nkk6dQ35YdBrprLQrMLmQLSK
+         OUHxCUTJf1eDAiADGiyIK4VvyEcW8cvW49gcSYSMXjT8mHqaYUb58oXBG7gOGgSXzoqn
+         Ru3lIClHzFRmVm6FptC04q+A7a7PObJGh3cx31Ke6GOpFNBqXsq4gXuZyBxgiFMexcxK
+         fUakk1vbspGnDph09CSCepr4bwl2Bj4jOEZ7L34IGWx147NQnWF+k/PjvXlUwfNbxliB
+         z6UA==
+X-Gm-Message-State: AOJu0YxYkYMHIiICLI4L7/wiSmLt3gCGoM2VlBXOg2Lcd6m0nmsJpX5z
+	mEHdTNSVA6yQULPr8A96eWzQsuIgsgWfv+EipQznKjiVMfhhgagYhJfc
+X-Gm-Gg: ASbGncvtI0nIlwvGz7PdyxmWlvxy69q5lBlQy1mcXxB0gWFQCRabfJbCgt7Pa0QS8BK
+	5ZfoTDekJ8ZNZMTp1hG5sitbmit4cDLRzpk2lWNvIYESpXD8P8JcAWoiS8imPBTEjBzNrUqdA/L
+	cKjaMbXikAI2HLJds6Iq7svgEV5jLwE+23D0IT1e+0F3goHW9krD/wFPI2JMb1Tfz/llfz1SMwO
+	elBrukPwdjdBs/8x/3PdSk5VukfiuJGeuPlCqFJ4CcyxBsd0+1Gaw5EXPHTXRi9x4p7czCXgiTv
+	LsrxkqhJC7VM2F3RQOMxhTqdJPUhCJtdBPzgM9evAXdxBXr3PVn6SRv8+bvCwEVFvGor+vsXaIg
+	jxTeHOJZQL2fmMr61+nN5+ppnIiYzZJLg1HAcke8EHR4WAdLL
+X-Google-Smtp-Source: AGHT+IFVASUMAByOUzxhSZOaC8eWyRPR1v9bRmGRUVLFszgWHEkfj3GYG9eKFdaTPNiM79F1DMo7BQ==
+X-Received: by 2002:a17:903:1b68:b0:264:5c06:4d7b with SMTP id d9443c01a7336-269ba51703cmr21441145ad.32.1758250601071;
+        Thu, 18 Sep 2025 19:56:41 -0700 (PDT)
+Received: from localhost.localdomain ([116.128.244.171])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2698016c08dsm39504675ad.51.2025.09.18.19.56.38
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Thu, 18 Sep 2025 19:56:40 -0700 (PDT)
+From: chengkaitao <pilgrimtao@gmail.com>
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	chengkaitao <chengkaitao@kylinos.cn>
+Subject: [PATCH] block/mq-deadline: adjust the timeout period of the per_prio->dispatch
+Date: Fri, 19 Sep 2025 10:56:13 +0800
+Message-ID: <20250919025613.39771-1-pilgrimtao@gmail.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250918-ublk_features-v2-0-77d2a3064c15@purestorage.com> <20250918-ublk_features-v2-3-77d2a3064c15@purestorage.com>
-In-Reply-To: <20250918-ublk_features-v2-3-77d2a3064c15@purestorage.com>
-From: Ming Lei <ming.lei@redhat.com>
-Date: Fri, 19 Sep 2025 08:58:28 +0800
-X-Gm-Features: AS18NWBMx6gMYpA8xwEV8T0_f_E3cL4Rmg1pd231x9f1zxxG5V9QV0oQsLm1gZ4
-Message-ID: <CAFj5m9+ZFkuq=n9R=d5N_ePzrtvx44TdR+YniCJVEWu_P+DGKw@mail.gmail.com>
-Subject: Re: [PATCH v2 3/3] selftests: ublk: add test to verify that feat_map
- is complete
-To: Uday Shankar <ushankar@purestorage.com>
-Cc: Caleb Sander Mateos <csander@purestorage.com>, Shuah Khan <shuah@kernel.org>, 
-	linux-block@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Fri, Sep 19, 2025 at 3:34=E2=80=AFAM Uday Shankar <ushankar@purestorage.=
-com> wrote:
->
-> Add a test that verifies that the currently running kernel does not
-> report support for any features that are unrecognized by kublk. This
-> should catch cases where features are added without updating kublk's
-> feat_map accordingly, which has happened multiple times in the past (see
-> [1], [2]).
->
-> Note that this new test may fail if the test suite is older than the
-> kernel, and the newer kernel contains a newly introduced feature. I
-> believe this is not a use case we currently care about - we only care
-> about newer test suites passing on older kernels.
->
-> [1] https://lore.kernel.org/linux-block/20250606214011.2576398-1-csander@=
-purestorage.com/t/#u
-> [2] https://lore.kernel.org/linux-block/2a370ab1-d85b-409d-b762-f9f3f6bdf=
-705@nvidia.com/t/#m1c520a058448d594fd877f07804e69b28908533f
->
-> Signed-off-by: Uday Shankar <ushankar@purestorage.com>
+From: chengkaitao <chengkaitao@kylinos.cn>
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Reference function started_after()
+Before modification:
+	Timeout for dispatch{read}: 9.5s
+	started_after - 0.5s < latest_start - 10s
+	9.5s < latest_start - started_after
 
-Thanks,
+	Timeout for dispatch{write}: 5s
+	started_after - 5s < latest_start - 10s
+	5s < latest_start - started_after
+
+At this point, write requests have higher priority than read requests.
+
+After modification:
+	Timeout for dispatch{read/write}: 5s
+	prio_aging_expire / 2 < latest_start - started_after
+
+Signed-off-by: chengkaitao <chengkaitao@kylinos.cn>
+---
+ block/mq-deadline.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/block/mq-deadline.c b/block/mq-deadline.c
+index b9b7cdf1d3c9..f311168f8dfe 100644
+--- a/block/mq-deadline.c
++++ b/block/mq-deadline.c
+@@ -672,7 +672,8 @@ static void dd_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
+ 
+ 	if (flags & BLK_MQ_INSERT_AT_HEAD) {
+ 		list_add(&rq->queuelist, &per_prio->dispatch);
+-		rq->fifo_time = jiffies;
++		rq->fifo_time = jiffies + dd->fifo_expire[data_dir]
++				- dd->prio_aging_expire / 2;
+ 	} else {
+ 		deadline_add_rq_rb(per_prio, rq);
+ 
+-- 
+2.50.1 (Apple Git-155)
 
