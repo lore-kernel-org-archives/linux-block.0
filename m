@@ -1,49 +1,39 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1190313E30;
-	Fri, 19 Sep 2025 15:04:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 723661C862E;
+	Fri, 19 Sep 2025 15:06:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758294259; cv=none; b=HbJJN1e4FAWDVuPVGmtsjHeBKze2uc38mQEZjDdULlKvcg27QIWgSFyDmNLc9wE8xG+9B5vqIABHmApgpb0L79GPilybwax/I3pgiZMCV6uyyJrCAYiBTwfhgzzQ2nuUgS2QOfDdCZggbLFPQTW6AhUOmVYlw1HJughU9z18zCg=
+	t=1758294380; cv=none; b=TgkxLl0f4pBfEvq/KTi+pB2NwT0wE0YFxXIxLNTvAVTDaV/XjNmfNwlyIkLCoCDphiFqmFuEa2Byazt0egZr84pkDnGzoj3ZtTr2SCNAbjlacbVh204K+8NeLrgiOw/GIP3HxfEJHrbNFHSF62EQchT+CoRMSxnBSHtvjd4pFv0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758294259; c=relaxed/simple;
-	bh=42isF/WZsmBh5ZmpcnOp7XXD2OgHyQsMKCD1TyuRvOQ=;
+	s=arc-20240116; t=1758294380; c=relaxed/simple;
+	bh=lFkMcErzDuaSt+XCth850wHsBdhid4N4T9XXbi6rOR0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VN2/+oin6ofIldrpAiYtGYcPdcwVv17KAAB1x9vKXxfMye6NXwdieJg23jCYoGhvt0lD9Sirnj5DDZDw4gtU0llwVAizZwKIkPrYwKSTJj0XqcMMJ/ocvfcwSf0i920n+lLALAQP2hR/XEmWIQ8WiHxVkfiUOjWiEsA48U9z650=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=xE58bSsG; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="xE58bSsG"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=Ci6GUzt/zBUPg8YgjcIKFzIGceTJiYQmoDw0F7XTobs=; b=xE58bSsGEbJk8MPAMD2lNBwyCj
-	6iZDmXZHma806PABiz8+4MZk6xBVmBkKSUKOwwfbK0ZW9i6LG426urRxZlRNnhY10U3rOXkAcNtDi
-	AnQslLXWyOblSLTibCbCBDIdT843nD8KmiyaqkmSbCSkHfIf+NtOCQcuLSf20gUL/5vCE1TNo8qqS
-	Mj0jufB8Upbl+JOjMcvKD8I0RT+1Mve9xDgfwXEIhde+lBkSDWYFu676ISkAOFj0DAPZZJ1SMZHxh
-	nZ4qTK4qwLekk3aqpg4TqBAkSM9X8M4W8dJhuIGyhg+dNTAstEzapteJc9jV5iGN2VjgpqYY51pwx
-	O/l+KiBg==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1uzcel-00000003G5z-2STi;
-	Fri, 19 Sep 2025 15:04:15 +0000
-Date: Fri, 19 Sep 2025 08:04:15 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Joanne Koong <joannelkoong@gmail.com>
-Cc: Christoph Hellwig <hch@infradead.org>, brauner@kernel.org,
-	miklos@szeredi.hu, djwong@kernel.org, hsiangkao@linux.alibaba.com,
-	linux-block@vger.kernel.org, gfs2@lists.linux.dev,
-	linux-fsdevel@vger.kernel.org, kernel-team@meta.com,
-	linux-xfs@vger.kernel.org, linux-doc@vger.kernel.org
-Subject: Re: [PATCH v2 12/16] iomap: add bias for async read requests
-Message-ID: <aM1w77aJZrQPq8Hw@infradead.org>
-References: <20250908185122.3199171-1-joannelkoong@gmail.com>
- <20250908185122.3199171-13-joannelkoong@gmail.com>
- <aMKzG3NUGsQijvEg@infradead.org>
- <CAJnrk1Z2JwUKKoaqExh2gPDxtjRbzSPxzHi3YdBWXKvygGuGFA@mail.gmail.com>
- <CAJnrk1YmxMbT-z9SLxrnrEwagLeyT=bDMzaONYAO6VgQyFHJOQ@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=dPynBShgutKSFZTU+Wq5tX8kdaWAsQYflqpfmMZ0bdBqJW2GJ3E+J889zt1Kr2ghA4A5cqWxlYquO9jToB9FCH3Ecx8tUjuzrP1lyGgTyN3il/VT+pvc4fObQ9iryJ8VmKLMlEFCeYRqU0lVXLBPXVaHVr+yj5AppMCgZYx9iRk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id AC03368AFE; Fri, 19 Sep 2025 17:06:12 +0200 (CEST)
+Date: Fri, 19 Sep 2025 17:06:12 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org, linux-btrace@vger.kernel.org,
+	John Garry <john.g.garry@oracle.com>,
+	Hannes Reinecke <hare@suse.de>, Damien Le Moal <dlemoal@kernel.org>,
+	Christoph Hellwig <hch@lst.de>, Naohiro Aota <naohiro.aota@wdc.com>,
+	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>
+Subject: Re: [PATCH 01/16] blktrace: split do_blk_trace_setup into two
+ functions
+Message-ID: <20250919150612.GA28352@lst.de>
+References: <20250909110611.75559-1-johannes.thumshirn@wdc.com> <20250909110611.75559-2-johannes.thumshirn@wdc.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -52,38 +42,14 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAJnrk1YmxMbT-z9SLxrnrEwagLeyT=bDMzaONYAO6VgQyFHJOQ@mail.gmail.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20250909110611.75559-2-johannes.thumshirn@wdc.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Tue, Sep 16, 2025 at 12:14:05PM -0700, Joanne Koong wrote:
-> > I think you're right, this is probably clearer without trying to share
-> > the function.
-> >
-> > I think maybe we can make this even simpler. Right now we mark the
-> > bitmap uptodate every time a range is read in but I think instead we
-> > can just do one bitmap uptodate operation for the entire folio when
-> > the read has completely finished.  If we do this, then we can make
-> > "ifs->read_bytes_pending" back to an atomic_t since we don't save one
-> > atomic operation from doing it through a spinlock anymore (eg what
-> > commit f45b494e2a "iomap: protect read_bytes_pending with the
-> > state_lock" optimized). And then this bias thing can just become:
-> >
-> > if (ifs) {
-> >     if (atomic_dec_and_test(&ifs->read_bytes_pending))
-> >         folio_end_read(folio, !ret);
-> >     *cur_folio_owned = true;
-> > }
-> >
-> 
-> This idea doesn't work unfortunately because reading in a range might fail.
+On Tue, Sep 09, 2025 at 01:05:56PM +0200, Johannes Thumshirn wrote:
+> Split do_blk_trace_setup into two functions, this is done to prepare for
+> an incoming new BLKTRACESETUP2 ioctl(2) which can receive extended
+> parameters form user-space.
 
-As in the asynchronous read generats an error, but finishes faster
-than the submitting context calling the atomic_dec_and_test here?
-
-Yes, that is possible, although rare.  But having a way to pass
-that information on somehow.  PG_uptodate/folio uptodate would make
-sense for that, but right now we expect folio_end_read to set that.
-And I fail to understand the logic folio_end_read - it should clear
-the locked bit and add the updatodate one, but I have no idea how
-it makes that happen.
-
+This not just splits the function, but also moves some of the logic
+to the caller.  Which looks fine, but should be documented here or
+even better split out into a separate patch.
