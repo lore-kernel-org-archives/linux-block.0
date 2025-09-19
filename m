@@ -1,55 +1,55 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73346263C9F
-	for <linux-block@vger.kernel.org>; Fri, 19 Sep 2025 03:53:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 898581D6DB6
+	for <linux-block@vger.kernel.org>; Fri, 19 Sep 2025 04:04:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758254020; cv=none; b=IMpj9cYFozjEuHQhAN3S1IsqX7crc+MlnUvIbCal1eINLVejJaK5nRL4McoauCLmBXTZCbfsijLxMeoAJqSeTXHJ13fRQTxu3uKMKJE0B78EGPBwcIspMPeH3u2tjI8cQdh+ul9+tBX2M9rdwLnMrNtcbisXpIzpOtnXe6GBbiY=
+	t=1758254667; cv=none; b=JdriVNOekclvntYKAhAIinpd/hQlhNb2LCWWpQnxOKOGhR/daDAnuTDrelUv85IdNrHPHAq33p/z39aLTzCIBIaRFMo/VNXAaCv0yBdkG0uosMPbYcxwxIhVFhAV3zT0uhYYZeXD815SSYDpSb/iRU/gJMoVwyo8TtMLmEepRmg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758254020; c=relaxed/simple;
-	bh=r7u+fIYunh1tQjSKJ4gx+/XeyyhWsam1c6dx2oNcQVg=;
+	s=arc-20240116; t=1758254667; c=relaxed/simple;
+	bh=NqkZnCizAbX+o9YIAhQw0thbKtUrquiDNFODHQ1hcyM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DBIWhRAWzixWmrCayzakx9EDrsrr1bkd5t1GZnRvHj+Jhr3bjsECuW5CPOFgGd6W4WqEuL4kEe77yPmwpmdykvZUwEinnTpxjF6nnATOOz/JT4IG1kRr5GW9bSM0tTp2gW6vf5AHweqpoN5XWa9S10aiyakPoQcqNTJKgwqrnYk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ijgrXA4n; arc=none smtp.client-ip=170.10.133.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=fSL2GWzgKfnxS48ecPtyl5HuhNPP/spQlsH3NqwieJ/TVkZmQA+O8vAhBtfx2Wj2UiZv0d5hi5di/nAsw+5N7f/m2l8oe8XhssvLgNWxtLHX1Z+67RwVCekaj2/m1h/EfEIcA/VuNxLhNXM103dGp/8lwecuDhR7IB/8VPh1wCc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UYlRGU/t; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ijgrXA4n"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UYlRGU/t"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1758254017;
+	s=mimecast20190719; t=1758254664;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=eQrwM23HsGfKWdvsFTuBJVXHncfoNOQVfb470fO9tiU=;
-	b=ijgrXA4nBv/iJ26DRq3xvAiR+ErT5oFn7mhuexr8tXvCAGnr64ClThAfLZ81N7gdWrfoP3
-	BLrbp7D2w5uZkOkyjwtsykmWXJaVl5OQXVZJaCSPy6gCVKxc6VADSppD2E1ypUnO3zFWB7
-	JSFotHBurF5wcb9cRpBPZNMO671NZZE=
+	bh=WJFVTJYb2/ev/ctsj3imyOHvTHcYX61/HGTQGEX5Mzw=;
+	b=UYlRGU/tGjMTXs6ozmx3gVPdOqjFMs6SJ8UQVoRNaCPEUl5zB+eFE5BEXqtvzpbWD9Zt1c
+	u3LaLOSqne4Hqm/k0I7N2OG86D71xmm2/uBw1vjX5n0xapRH8DHXVv8HON2/NAOIjfb/Ap
+	mA7VpbYyLpxb6OsFkVAZSUhXzhCKb8Y=
 Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-596-nEh6cxuiPwyutF-Z5CILuQ-1; Thu,
- 18 Sep 2025 23:53:31 -0400
-X-MC-Unique: nEh6cxuiPwyutF-Z5CILuQ-1
-X-Mimecast-MFC-AGG-ID: nEh6cxuiPwyutF-Z5CILuQ_1758254010
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-465-lpOjRzIAOV-ZhHf9oUdMcQ-1; Fri,
+ 19 Sep 2025 00:04:21 -0400
+X-MC-Unique: lpOjRzIAOV-ZhHf9oUdMcQ-1
+X-Mimecast-MFC-AGG-ID: lpOjRzIAOV-ZhHf9oUdMcQ_1758254660
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 239FE180035C;
-	Fri, 19 Sep 2025 03:53:30 +0000 (UTC)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 879681800576;
+	Fri, 19 Sep 2025 04:04:19 +0000 (UTC)
 Received: from fedora (unknown [10.72.120.15])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3ADD818004A3;
-	Fri, 19 Sep 2025 03:53:22 +0000 (UTC)
-Date: Fri, 19 Sep 2025 11:53:17 +0800
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AA9571955F21;
+	Fri, 19 Sep 2025 04:04:15 +0000 (UTC)
+Date: Fri, 19 Sep 2025 12:04:09 +0800
 From: Ming Lei <ming.lei@redhat.com>
 To: Caleb Sander Mateos <csander@purestorage.com>
 Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 01/17] ublk: remove ubq check in ublk_check_and_get_req()
-Message-ID: <aMzTrazYYfN0eTfM@fedora>
+Subject: Re: [PATCH 02/17] ublk: don't pass q_id to ublk_queue_cmd_buf_size()
+Message-ID: <aMzWOWxelzLme6ZV@fedora>
 References: <20250918014953.297897-1-csander@purestorage.com>
- <20250918014953.297897-2-csander@purestorage.com>
+ <20250918014953.297897-3-csander@purestorage.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -58,17 +58,17 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250918014953.297897-2-csander@purestorage.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+In-Reply-To: <20250918014953.297897-3-csander@purestorage.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On Wed, Sep 17, 2025 at 07:49:37PM -0600, Caleb Sander Mateos wrote:
-> ublk_get_queue() never returns a NULL pointer, so there's no need to
-> check its return value in ublk_check_and_get_req(). Drop the check.
+On Wed, Sep 17, 2025 at 07:49:38PM -0600, Caleb Sander Mateos wrote:
+> ublk_queue_cmd_buf_size() only needs the queue depth, which is the same
+> for all queues. Get the queue depth from the ublk_device instead so the
+> q_id parameter can be dropped.
 > 
 > Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
 
 Reviewed-by: Ming Lei <ming.lei@redhat.com>
-
 
 Thanks,
 Ming
