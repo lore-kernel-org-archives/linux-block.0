@@ -1,144 +1,108 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41A478BEE;
-	Thu, 18 Sep 2025 22:35:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7690B1E51FB
+	for <linux-block@vger.kernel.org>; Fri, 19 Sep 2025 00:58:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758234942; cv=none; b=ukyEcPPwyCjg4OmeDxnBVXLAYfW3ZDI4Bv3Q6fTV8e9xfPjUXdwuceqvVByuBkzPr3Y6U7aE1uXJYyhWULYSxSzrRajYWeyHM2cPOFrdkH4nNpS1/EQyRLi+/0ucfwVKDkozE3hV3E1ogxVU45qJa/1f66wGyosQ6CdxhAWCj1E=
+	t=1758243527; cv=none; b=KqqPopDTEHm+vosZZi/vjizQt7O7tLAQndLoLV6T3qqKl+NswPFH3q407abKTQJgBwg7sVUoyjfH65aktww3IATf0yzU4Y/W6745ROjkYDhBye7Z6R2rSTb8FJ+ieecZDTQEEJf8ok9+BBukIAkpbhb1U6ccZAKVRb0rci57+Ds=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758234942; c=relaxed/simple;
-	bh=e/b85KMA9IEr5mWBMqN3kAA+ZPj41wquStIM9LSDZk4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AsqQT08Zq/ZPGHtUvzr5Uh3sh64kccdQCUd3w10B+rn2Op+3Xkonc82vsZ9sF7h5HgbEkNXhlNLyzayeSuk0qJZkMv2lhNHf8p+53ZNRl9/BgPnrEzL44rC1wmCoo5KcurNxoT+dJli5YQHuSK2gdXNdKABqZmNDtEdz8vLPtkU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bbK03NQI; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1758243527; c=relaxed/simple;
+	bh=INL+jGniSEK6jlOzw1pZ4EBFHb9iVRN2n/+Wi3ZEWR0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=rUeg+Bx4AI83cQLHubDgPYLrUuULvUOglIfxBAND/t7H784LKDVVyedZEv3Bf8Q0/q9TtS4nykN7uJskiugY5iThPkUmwKmFxuS2AzxC8Zp99HSiXokVv5avuT4j0mY6I8oaQXw29AdKk5YGfgZrql5ISITgL6SMJNV/5JtZLtE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YydwEGiU; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bbK03NQI"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AFD28C4CEE7;
-	Thu, 18 Sep 2025 22:35:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758234941;
-	bh=e/b85KMA9IEr5mWBMqN3kAA+ZPj41wquStIM9LSDZk4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=bbK03NQIk5j0WPXeFpQwmfse0lHyNOUvTVl8vzwkscCIwSc8d+irM0Tx6iDcwC5sN
-	 mBLHQF4xx12FhEHR78Ia/HlzqIFKeqOnMF6UXX75LwLxFp1H0xFGrK80HQoMVKHKZ6
-	 1wSNdHdrn/1EOLDksVNooCWTj1XoWuCkR4meISrfZr3dvJrmAiqtK/d4aQEnX19Lef
-	 UBFHCC8mrytjxEI+yFHeJ/49CxVbHneOXCBdtwFD9c96d8KoyRtRKpTpjCgZMIgWIl
-	 +EDSOi/fLUkrtXWIkeho2jda9VKAbmbYuta1l413/6g3uWfKe3RB8W338CJipXML4U
-	 K/5EsuPpbyERg==
-Date: Thu, 18 Sep 2025 15:35:41 -0700
-From: "Darrick J. Wong" <djwong@kernel.org>
-To: Joanne Koong <joannelkoong@gmail.com>
-Cc: brauner@kernel.org, miklos@szeredi.hu, hch@infradead.org,
-	hsiangkao@linux.alibaba.com, linux-block@vger.kernel.org,
-	gfs2@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	kernel-team@meta.com, linux-xfs@vger.kernel.org,
-	linux-doc@vger.kernel.org
-Subject: Re: [PATCH v3 15/15] fuse: remove fc->blkbits workaround for partial
- writes
-Message-ID: <20250918223541.GB1587915@frogsfrogsfrogs>
-References: <20250916234425.1274735-1-joannelkoong@gmail.com>
- <20250916234425.1274735-16-joannelkoong@gmail.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YydwEGiU"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1758243524;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=INL+jGniSEK6jlOzw1pZ4EBFHb9iVRN2n/+Wi3ZEWR0=;
+	b=YydwEGiUvywtpBzVB6wr8L+HcuSsWztDyAiHssPdiWbqXcf4AQ3uwp7TgRyD3C4q7yEBzE
+	jhLORiD2qv950AaAHggePOIoCY+HUN+j+CjAi4gWVi3E+1Lybs9f60S2GCA1QPBJKgO9O/
+	4OV1AxWYShnpQpcgB/eQg2XlxtilHBM=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-621-CQZsUuWDNkaHpqIH3s6iDg-1; Thu, 18 Sep 2025 20:58:41 -0400
+X-MC-Unique: CQZsUuWDNkaHpqIH3s6iDg-1
+X-Mimecast-MFC-AGG-ID: CQZsUuWDNkaHpqIH3s6iDg_1758243521
+Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-78e831e5a42so36175086d6.2
+        for <linux-block@vger.kernel.org>; Thu, 18 Sep 2025 17:58:41 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758243521; x=1758848321;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=INL+jGniSEK6jlOzw1pZ4EBFHb9iVRN2n/+Wi3ZEWR0=;
+        b=GfX3hhLVYqYKTyMCf2HvX4/hv+2G5BQpDJz0RS5iQizO2L0YfOieMxbbf2nIW9Y19D
+         G7LsRs5+nMub1x73kRw8XG9I1Esw/tzdle2892CmpFISPWy9fi7JY3J586+8Au9H0Qu+
+         oIgg6cuB9Pj5zrpGca4CszH8HjSSf/0ljerfSZ1zjjt10w1C/GCLQD9RtSygKFY7io/E
+         x7vLNt4TDq/jWP4k8Xv3Hs9Pnyk3V2hJoby6xpL19QBTEBrS0w8XAOS/CWeyho8E71ot
+         38yEyqX0zm9aDw5Ht1nQWDqgDLTYdHnsi6q33gbdUTNWuRCBJXvd01PWypSRsSUUoIbE
+         tQfg==
+X-Forwarded-Encrypted: i=1; AJvYcCWGpW4vB1IUmIX+lwdbSCKnXZFdiJljcYJU8ImvVxUuCIxvqy/YcSarocGjcB/etOeCdHxIBS5jkfDoSg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxfCFimwWVnwaMOzFQnxkyEZpedFwBNvaL2YKMJBUI8gmsC6Hvv
+	rqSuLaetzuil8ttmYaPZE0kEAOuIWLymUptmKby0PcLLHtfotFW49bFmDK5kaFgJ2USmUvxUtem
+	+nifI9mHCUbsdcB1m9l1yjerjhmQPlBqlIUbxxT6ADqkS+CaUZYHhob5eiO/dPsoN9R1qsRpycD
+	q1XC88OX1zxCSVqgJM48RyPQP9er9ap4NuMV8UqrE=
+X-Gm-Gg: ASbGnctwxcPVoZ9/afr1n4y997AYx20jyb/TwPHxw6zRbkBK4BBg/nziIpkhszIoIiI
+	NCpP3K7nejtNPRQCCVYlwQ5xtOMVo/F6HTbN9pzYm6ts/ERQo54d6AjxpEGL7kizOWWPhx6hWdp
+	IB10ov9/weGMl6r3avhyNv4Q==
+X-Received: by 2002:a05:6214:234e:b0:786:dc95:7b4a with SMTP id 6a1803df08f44-7991f60498fmr17130086d6.54.1758243520864;
+        Thu, 18 Sep 2025 17:58:40 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHCePSrkJyt8xOhV9XFxKyR5ORnkdYCLN1UQ0pORMOf3Vpbal9XfU/aSeiMZSMO/Y8ggPzzI0yEwXtZdhKDphA=
+X-Received: by 2002:a05:6214:234e:b0:786:dc95:7b4a with SMTP id
+ 6a1803df08f44-7991f60498fmr17129876d6.54.1758243520392; Thu, 18 Sep 2025
+ 17:58:40 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250916234425.1274735-16-joannelkoong@gmail.com>
+References: <20250918-ublk_features-v2-0-77d2a3064c15@purestorage.com> <20250918-ublk_features-v2-3-77d2a3064c15@purestorage.com>
+In-Reply-To: <20250918-ublk_features-v2-3-77d2a3064c15@purestorage.com>
+From: Ming Lei <ming.lei@redhat.com>
+Date: Fri, 19 Sep 2025 08:58:28 +0800
+X-Gm-Features: AS18NWBMx6gMYpA8xwEV8T0_f_E3cL4Rmg1pd231x9f1zxxG5V9QV0oQsLm1gZ4
+Message-ID: <CAFj5m9+ZFkuq=n9R=d5N_ePzrtvx44TdR+YniCJVEWu_P+DGKw@mail.gmail.com>
+Subject: Re: [PATCH v2 3/3] selftests: ublk: add test to verify that feat_map
+ is complete
+To: Uday Shankar <ushankar@purestorage.com>
+Cc: Caleb Sander Mateos <csander@purestorage.com>, Shuah Khan <shuah@kernel.org>, 
+	linux-block@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Sep 16, 2025 at 04:44:25PM -0700, Joanne Koong wrote:
-> Now that fuse is integrated with iomap for read/readahead, we can remove
-> the workaround that was added in commit bd24d2108e9c ("fuse: fix fuseblk
-> i_blkbits for iomap partial writes"), which was previously needed to
-> avoid a race condition where an iomap partial write may be overwritten
-> by a read if blocksize < PAGE_SIZE. Now that fuse does iomap
-> read/readahead, this is protected against since there is granular
-> uptodate tracking of blocks, which means this workaround can be removed.
-> 
-> Signed-off-by: Joanne Koong <joannelkoong@gmail.com>
+On Fri, Sep 19, 2025 at 3:34=E2=80=AFAM Uday Shankar <ushankar@purestorage.=
+com> wrote:
+>
+> Add a test that verifies that the currently running kernel does not
+> report support for any features that are unrecognized by kublk. This
+> should catch cases where features are added without updating kublk's
+> feat_map accordingly, which has happened multiple times in the past (see
+> [1], [2]).
+>
+> Note that this new test may fail if the test suite is older than the
+> kernel, and the newer kernel contains a newly introduced feature. I
+> believe this is not a use case we currently care about - we only care
+> about newer test suites passing on older kernels.
+>
+> [1] https://lore.kernel.org/linux-block/20250606214011.2576398-1-csander@=
+purestorage.com/t/#u
+> [2] https://lore.kernel.org/linux-block/2a370ab1-d85b-409d-b762-f9f3f6bdf=
+705@nvidia.com/t/#m1c520a058448d594fd877f07804e69b28908533f
+>
+> Signed-off-by: Uday Shankar <ushankar@purestorage.com>
 
-Oh goody!
-Reviewed-by: "Darrick J. Wong" <djwong@kernel.org>
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
---D
+Thanks,
 
-> ---
->  fs/fuse/dir.c    |  2 +-
->  fs/fuse/fuse_i.h |  8 --------
->  fs/fuse/inode.c  | 13 +------------
->  3 files changed, 2 insertions(+), 21 deletions(-)
-> 
-> diff --git a/fs/fuse/dir.c b/fs/fuse/dir.c
-> index 5c569c3cb53f..ebee7e0b1cd3 100644
-> --- a/fs/fuse/dir.c
-> +++ b/fs/fuse/dir.c
-> @@ -1199,7 +1199,7 @@ static void fuse_fillattr(struct mnt_idmap *idmap, struct inode *inode,
->  	if (attr->blksize != 0)
->  		blkbits = ilog2(attr->blksize);
->  	else
-> -		blkbits = fc->blkbits;
-> +		blkbits = inode->i_sb->s_blocksize_bits;
->  
->  	stat->blksize = 1 << blkbits;
->  }
-> diff --git a/fs/fuse/fuse_i.h b/fs/fuse/fuse_i.h
-> index cc428d04be3e..1647eb7ca6fa 100644
-> --- a/fs/fuse/fuse_i.h
-> +++ b/fs/fuse/fuse_i.h
-> @@ -975,14 +975,6 @@ struct fuse_conn {
->  		/* Request timeout (in jiffies). 0 = no timeout */
->  		unsigned int req_timeout;
->  	} timeout;
-> -
-> -	/*
-> -	 * This is a workaround until fuse uses iomap for reads.
-> -	 * For fuseblk servers, this represents the blocksize passed in at
-> -	 * mount time and for regular fuse servers, this is equivalent to
-> -	 * inode->i_blkbits.
-> -	 */
-> -	u8 blkbits;
->  };
->  
->  /*
-> diff --git a/fs/fuse/inode.c b/fs/fuse/inode.c
-> index fdecd5a90dee..5899a47faaef 100644
-> --- a/fs/fuse/inode.c
-> +++ b/fs/fuse/inode.c
-> @@ -292,7 +292,7 @@ void fuse_change_attributes_common(struct inode *inode, struct fuse_attr *attr,
->  	if (attr->blksize)
->  		fi->cached_i_blkbits = ilog2(attr->blksize);
->  	else
-> -		fi->cached_i_blkbits = fc->blkbits;
-> +		fi->cached_i_blkbits = inode->i_sb->s_blocksize_bits;
->  
->  	/*
->  	 * Don't set the sticky bit in i_mode, unless we want the VFS
-> @@ -1810,21 +1810,10 @@ int fuse_fill_super_common(struct super_block *sb, struct fuse_fs_context *ctx)
->  		err = -EINVAL;
->  		if (!sb_set_blocksize(sb, ctx->blksize))
->  			goto err;
-> -		/*
-> -		 * This is a workaround until fuse hooks into iomap for reads.
-> -		 * Use PAGE_SIZE for the blocksize else if the writeback cache
-> -		 * is enabled, buffered writes go through iomap and a read may
-> -		 * overwrite partially written data if blocksize < PAGE_SIZE
-> -		 */
-> -		fc->blkbits = sb->s_blocksize_bits;
-> -		if (ctx->blksize != PAGE_SIZE &&
-> -		    !sb_set_blocksize(sb, PAGE_SIZE))
-> -			goto err;
->  #endif
->  	} else {
->  		sb->s_blocksize = PAGE_SIZE;
->  		sb->s_blocksize_bits = PAGE_SHIFT;
-> -		fc->blkbits = sb->s_blocksize_bits;
->  	}
->  
->  	sb->s_subtype = ctx->subtype;
-> -- 
-> 2.47.3
-> 
-> 
