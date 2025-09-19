@@ -1,153 +1,63 @@
-Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95031481B1
-	for <linux-block@vger.kernel.org>; Fri, 19 Sep 2025 18:34:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AC2B2AD24
+	for <linux-block@vger.kernel.org>; Fri, 19 Sep 2025 20:18:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758306857; cv=none; b=n9Sef1TY+hnO0gBweHon2FBZK33GmW08Mv4N4pDZgSkKAwsEa/lwiYvmSbcy4OW/o0s4EJE8C4tmz2itvf085bRwyKZQkBVTLdhEE7voRUbXMZg+86OIAFVNfir06ENjeuRcak0MJDdUyNPPs9kIVCbEh62Qie/jqpgC6OvYZRY=
+	t=1758313092; cv=none; b=UP6rO8gDxq2a8U0wSEM9VpKEHIMvgml2IHf9cRwKeftW2QmykxukIyFjf9gS5RFs5P4o4o5aYq6P/x+MylWiqAkhWFUAJTyo63onWJiRqoLhRzPc8TnHuwuXoT5udYvxWO7gfXhjtptd9wGygpPRFQMw46c0GovNdngZLviikxU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758306857; c=relaxed/simple;
-	bh=7uX0BeiPsvWw8q8A4083nVg+t12ANac5Jycw2LTy1oc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VKGNdUpe9PV5gZ6Mtr8j9oZjYNA3kTrKAjGBmOPcQEp3OJVlvvu/4iGXF5i8jM5ecDb0OxaFd75Jylvlf8VlldkItQ+vOqE63evwDrR/StGiutMnSwnd2mqG+xtjMiyrb2iXJYvLP4APQKcFRs3dbb2Hz1KnCUkV+FW+zM/Sfc4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GLRv59a/; arc=none smtp.client-ip=209.85.160.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1758313092; c=relaxed/simple;
+	bh=QaKCBoHBzRhmIEeuT1xCi08iyN8CiKwlso9x55AY+cU=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=cvwpB9y55VmISUO12NqOmUSWolrxVrjtUO7Sk4GbPeC5woGYqsgAdiZibkJC9ICQwjvyzElxK722wCWj8KMX2ysJII03e+DZS8+RIgTbN2TsxQmaaCGKzR7XKIanBv/0sX9gc0feVyLO06rc9R7F8vdcaBPD6sMHsxpt/T6QsVw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ik0Zd6I9; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GLRv59a/"
-Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-4b5f6ae99c3so25328021cf.1
-        for <linux-block@vger.kernel.org>; Fri, 19 Sep 2025 11:34:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758306854; x=1758911654; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rhRHN77jwmvAE0x3y6aKKQENztc6fTFsJqlfUz+6jDw=;
-        b=GLRv59a/rTvS4bvW43r7Ii6vk7K8DBPLFhRNBMr9CAnlo2Q0gEijjt9U8vukfU3RgC
-         eQ6/eKyLGpzGLkQHTzdSRIJOzVw0M4elOd06F0zGmVuyRp+ia5SXD1WyQz4GL5oRiLsX
-         opBj/+dM8b49MQTJcGS4mx4Eck+3mesnqmgjnxR4kHntly+mwyOwcD6Ezrlo+OPnlArT
-         uYaVU8T1kwtf7sb6l9Ocsz5rCGf3+udu8r7I4RRAfLZxncnE53WAdPY9ULAnVC8ZkvDU
-         nun7+8TvubmV71s+Iqe8p+qQ/iUBNwXXEWBLRt43hMkyi6/c+PI73KzfmiZtXkLIZt31
-         +Q9Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758306854; x=1758911654;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rhRHN77jwmvAE0x3y6aKKQENztc6fTFsJqlfUz+6jDw=;
-        b=MVAyOJC2RayJ3/MMcS8OWpkO2AWk5GkJCjW0cQ8Ul5dqvMp4IfxWT5fiDiDEFpFen4
-         HrjRU4ZhgIXrJf5fHhNrFi7MS9RNxG5G6KrJRir7Bc64xzLBDOAxTXcGFgborfcKX0Ej
-         VXcZ3WdUQrW8rgmkTLpCIab5Mbz7QSAaHoWwP3Ir3JzPOyjkRCqM6XAlT7neFzJVVG6t
-         6kck80WfeyzPHIrDP9ygsB1CR2UQAHo+vNT+bohrs5jz/2V9S7ZsxdZtmHnZ3oHUrjV+
-         Y8k7D8osUmPY5VgBbocIAvsxmeixlProISFE6Je+aiyUmuVrLREu41KB83B/yQGeeF4c
-         j5tQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU/RLcoDovttxIMa3Ot7r6P8VeCcUoky5pHo93rzNiiaCl84ZFQfRIpJryc8hH2EFerThfLOyl7ERv9Xg==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx9L/9Ph/tVG/787T5f+rP9+1+LztHfrrDsFqElA1CK5N9hc48X
-	yaKtHeCA2T+8LjQZgxGt/AXuoXDoFqpMGEFkiL+Z0RoitClHoegR7dxMEm9fiaEeUA3BhQed91X
-	SjIr3oI9aOPExpQEmk2seh4s2Qg+1+3M=
-X-Gm-Gg: ASbGncu9tRMnCpmwUbtnJ5T/c6093nNkoljY1Z8mGXzj2dngGJoPswDyO7ZS1mQeT0h
-	IKfh/kI+E3PSlMRg/g+9AjPygji3ihFVr3fbgopTSRnAao3HeNow7T4ioCesdNVhDCBqL7rnWOF
-	UUij0On8cH/Q31KsZT8WU9a0j+QugFtUhlcbrPhAfhv2o3y+rspSqRvy1TKV7JmChr+ZPT+pGUS
-	xyVgW92/QGX6lK4V5zj55p12F3M2cjNX2ECxjNo
-X-Google-Smtp-Source: AGHT+IEl3EPErf3c09yltPELq1CrtgsMWd+b8acWGVirSfI9XbkQbByyu5P2kwwv0Ytvm0XcDlRHkOfSCgIJVsMlx8s=
-X-Received: by 2002:a05:622a:1826:b0:4b0:7cb2:cec3 with SMTP id
- d75a77b69052e-4c07238f39dmr58025631cf.38.1758306854308; Fri, 19 Sep 2025
- 11:34:14 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ik0Zd6I9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9FC78C4CEF0;
+	Fri, 19 Sep 2025 20:18:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758313091;
+	bh=QaKCBoHBzRhmIEeuT1xCi08iyN8CiKwlso9x55AY+cU=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=ik0Zd6I9GMb+HChaAOjZjP8/f6mznY2HsWqett7wqcsGaCARJuo/qg7jAT5ms+J0j
+	 o7DVOscww3+6nhVNnzFSxiIKzDcKbl7xSCLacn1z5R/ko0qKFR5gzrV0RQD8U1ajSu
+	 lNZDdl9xW/jOUGYJu+TSx49HAyDCMVLrYWsaCcjPL9rB3hhWhZp5zUYU8lcHqCSc3g
+	 nqfszRRikkQZ81LBegN8DyVYr3ZWJ92TGXfzr37kAKppO1di+15smz8YsAjluPJG6j
+	 MeS5WVWheSLfK/Vz3A87BIfGVvW01F2rNqUsD2rLz3kQLg+s7WOcQhkju+rZfA1WdH
+	 JlfKZOP6Pi2nQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3400239D0C20;
+	Fri, 19 Sep 2025 20:18:12 +0000 (UTC)
+Subject: Re: [GIT PULL] Block fixes for 6.17-rc7
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <74923ab7-080c-49de-9aee-faa8c0fb3444@kernel.dk>
+References: <74923ab7-080c-49de-9aee-faa8c0fb3444@kernel.dk>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <74923ab7-080c-49de-9aee-faa8c0fb3444@kernel.dk>
+X-PR-Tracked-Remote: git://git.kernel.dk/linux.git tags/block-6.17-20250918
+X-PR-Tracked-Commit-Id: 027a7a9c07d0d759ab496a7509990aa33a4b689c
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 1522b530ac3e2dadd75ccb351b88d3c7c4cf584e
+Message-Id: <175831309062.3686704.17295546034310542489.pr-tracker-bot@kernel.org>
+Date: Fri, 19 Sep 2025 20:18:10 +0000
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250916234425.1274735-1-joannelkoong@gmail.com>
- <20250916234425.1274735-11-joannelkoong@gmail.com> <20250918223018.GY1587915@frogsfrogsfrogs>
-In-Reply-To: <20250918223018.GY1587915@frogsfrogsfrogs>
-From: Joanne Koong <joannelkoong@gmail.com>
-Date: Fri, 19 Sep 2025 11:34:03 -0700
-X-Gm-Features: AS18NWA5eATCQro2K3o3en9fIfjv9ya2PYZQVPmIDN-TkbTJuiFMxPoK5v0Ka7I
-Message-ID: <CAJnrk1bB+=J5g5h+asx12SYMogiKSn9SpEvRg11-_N_xWodvSA@mail.gmail.com>
-Subject: Re: [PATCH v3 10/15] iomap: add bias for async read requests
-To: "Darrick J. Wong" <djwong@kernel.org>
-Cc: brauner@kernel.org, miklos@szeredi.hu, hch@infradead.org, 
-	hsiangkao@linux.alibaba.com, linux-block@vger.kernel.org, 
-	gfs2@lists.linux.dev, linux-fsdevel@vger.kernel.org, kernel-team@meta.com, 
-	linux-xfs@vger.kernel.org, linux-doc@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Sep 18, 2025 at 3:30=E2=80=AFPM Darrick J. Wong <djwong@kernel.org>=
- wrote:
->
-> On Tue, Sep 16, 2025 at 04:44:20PM -0700, Joanne Koong wrote:
-> > Non-block-based filesystems will be using iomap read/readahead. If they
-> > handle reading in ranges asynchronously and fulfill those read requests
-> > on an ongoing basis (instead of all together at the end), then there is
-> > the possibility that the read on the folio may be prematurely ended if
-> > earlier async requests complete before the later ones have been issued.
-> >
-> > For example if there is a large folio and a readahead request for 16
-> > pages in that folio, if doing readahead on those 16 pages is split into
-> > 4 async requests and the first request is sent off and then completed
-> > before we have sent off the second request, then when the first request
-> > calls iomap_finish_folio_read(), ifs->read_bytes_pending would be 0,
-> > which would end the read and unlock the folio prematurely.
-> >
-> > To mitigate this, a "bias" is added to ifs->read_bytes_pending before
-> > the first range is forwarded to the caller and removed after the last
-> > range has been forwarded.
-> >
-> > iomap writeback does this with their async requests as well to prevent
-> > prematurely ending writeback.
-> >
-> > Signed-off-by: Joanne Koong <joannelkoong@gmail.com>
-> > ---
-> >  fs/iomap/buffered-io.c | 55 ++++++++++++++++++++++++++++++++++++------
-> >  1 file changed, 47 insertions(+), 8 deletions(-)
-> >
-> > diff --git a/fs/iomap/buffered-io.c b/fs/iomap/buffered-io.c
-> > index 561378f2b9bb..667a49cb5ae5 100644
-> > --- a/fs/iomap/buffered-io.c
-> > +++ b/fs/iomap/buffered-io.c
-> > @@ -420,6 +420,38 @@ const struct iomap_read_ops iomap_bio_read_ops =3D=
- {
-> >  };
-> >  EXPORT_SYMBOL_GPL(iomap_bio_read_ops);
-> >
-> > +/*
-> > + * Add a bias to ifs->read_bytes_pending to prevent the read on the fo=
-lio from
-> > + * being ended prematurely.
-> > + *
-> > + * Otherwise, if the ranges are read asynchronously and read requests =
-are
-> > + * fulfilled on an ongoing basis, there is the possibility that the re=
-ad on the
-> > + * folio may be prematurely ended if earlier async requests complete b=
-efore the
-> > + * later ones have been issued.
-> > + */
-> > +static void iomap_read_add_bias(struct folio *folio)
-> > +{
-> > +     iomap_start_folio_read(folio, 1);
->
-> I wonder, could you achieve the same effect by elevating
-> read_bytes_pending by the number of bytes that we think we have to read,
-> and subtracting from it as the completions come in or we decide that no
-> read is necessary?
->
+The pull request you sent on Fri, 19 Sep 2025 07:54:07 -0600:
 
-This is an interesting idea and I think it works (eg we set
-read_bytes_pending to the folio size, keep track of how many
-non-uptodate bytes are read in, then at the end subtract
-read_bytes_pending by folio_size - bytes_read_in). Personally I find
-this bias incrementing/decrementing by 1 approach simplest and easier
-to read and reason about, but maybe I'm just biased (pun intended, I
-guess :P). I don't feel strongly about this so if you do, I'm happy to
-change this.
+> git://git.kernel.dk/linux.git tags/block-6.17-20250918
 
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/1522b530ac3e2dadd75ccb351b88d3c7c4cf584e
 
-> (That might just be overthinking the plumbing though)
->
-> --D
->
+Thank you!
+
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
