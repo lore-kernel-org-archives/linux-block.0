@@ -1,114 +1,75 @@
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D955125484B
-	for <linux-block@vger.kernel.org>; Fri, 19 Sep 2025 02:56:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73346263C9F
+	for <linux-block@vger.kernel.org>; Fri, 19 Sep 2025 03:53:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758250603; cv=none; b=W877JEbumMmpa+2THjMO2Vuo99rjiOusj+4dGRefFtFA6gUyBKhcI4qvSUSVq5FqqZ0GLenj2Adleg2N9vDzyP+4twWEtxxxZovEFxWQZPI0MoNKRq5iczrj/K/xdn0uus5dEk6SMy6zME8pcysIk7xspI1cotphNjC2RObHk5Q=
+	t=1758254020; cv=none; b=IMpj9cYFozjEuHQhAN3S1IsqX7crc+MlnUvIbCal1eINLVejJaK5nRL4McoauCLmBXTZCbfsijLxMeoAJqSeTXHJ13fRQTxu3uKMKJE0B78EGPBwcIspMPeH3u2tjI8cQdh+ul9+tBX2M9rdwLnMrNtcbisXpIzpOtnXe6GBbiY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758250603; c=relaxed/simple;
-	bh=xNC4+5vXuGIoP3AubYqeZ73I0t9q26/OKWO/Q7/2G4w=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=l2c6K4a3feDNfRSSek7jpDX1FQpOnoHsJPsqzDtR603pYccd1p4AQyj0nBwu0L25jLgUiPKPwYDu707L/c8HkuK6U3xWdf9WmaTkHasYw1vrCuEks4Vn/KHIsZou44y1jUh3cU1UMdcQ0v9SdYYErNGxDokThdMskrFE2oRDkdw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F53VD4TQ; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1758254020; c=relaxed/simple;
+	bh=r7u+fIYunh1tQjSKJ4gx+/XeyyhWsam1c6dx2oNcQVg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DBIWhRAWzixWmrCayzakx9EDrsrr1bkd5t1GZnRvHj+Jhr3bjsECuW5CPOFgGd6W4WqEuL4kEe77yPmwpmdykvZUwEinnTpxjF6nnATOOz/JT4IG1kRr5GW9bSM0tTp2gW6vf5AHweqpoN5XWa9S10aiyakPoQcqNTJKgwqrnYk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ijgrXA4n; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F53VD4TQ"
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-24457f581aeso16767545ad.0
-        for <linux-block@vger.kernel.org>; Thu, 18 Sep 2025 19:56:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758250601; x=1758855401; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ovDud+Upvoitt+mbnx9bJAksUkvB+hvEmFPUqVI4Vww=;
-        b=F53VD4TQ7T1MFExVOJZH+AHAqsNVxQ4jMLo3r8Ii6q3JavLwt4sshQ3pxpboQEko3P
-         WisUsce4WNVV9Fkn9G20N6fX/D4gusMOqo0Z8EFB8Mqrri+HYHMFjB3KxWJdOgHiC6tO
-         3M5RBfargClu2kK9ECpZkxANw70hZR5W3Na6DRJFQolUO3XrUHdiAznCsbpIBD20uuP3
-         M09yyvInrU4xMkmeMdCQ+ZfPAfhE1efOSbp/HKm0UUv2YCCi8+03qSQnmJkTTj8SwjRr
-         BWDGc9+dz4oVUuOj27M9gETheGFO+u4uymBnoZguBoXqg2rdmuZYOv8AoeIVT8AxOaM2
-         R/BA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758250601; x=1758855401;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ovDud+Upvoitt+mbnx9bJAksUkvB+hvEmFPUqVI4Vww=;
-        b=lmbsb/BHh6nRnlZ7p+FMSWtcETB9j+gBFRnFHRQCiVDWBN29ap5vAPBwheTNUIEkI4
-         MZZaVNGpS4ZyxLG/ZUn2C+Q6MUg2vljX49SrcaNKCEs1nkk6dQ35YdBrprLQrMLmQLSK
-         OUHxCUTJf1eDAiADGiyIK4VvyEcW8cvW49gcSYSMXjT8mHqaYUb58oXBG7gOGgSXzoqn
-         Ru3lIClHzFRmVm6FptC04q+A7a7PObJGh3cx31Ke6GOpFNBqXsq4gXuZyBxgiFMexcxK
-         fUakk1vbspGnDph09CSCepr4bwl2Bj4jOEZ7L34IGWx147NQnWF+k/PjvXlUwfNbxliB
-         z6UA==
-X-Gm-Message-State: AOJu0YxYkYMHIiICLI4L7/wiSmLt3gCGoM2VlBXOg2Lcd6m0nmsJpX5z
-	mEHdTNSVA6yQULPr8A96eWzQsuIgsgWfv+EipQznKjiVMfhhgagYhJfc
-X-Gm-Gg: ASbGncvtI0nIlwvGz7PdyxmWlvxy69q5lBlQy1mcXxB0gWFQCRabfJbCgt7Pa0QS8BK
-	5ZfoTDekJ8ZNZMTp1hG5sitbmit4cDLRzpk2lWNvIYESpXD8P8JcAWoiS8imPBTEjBzNrUqdA/L
-	cKjaMbXikAI2HLJds6Iq7svgEV5jLwE+23D0IT1e+0F3goHW9krD/wFPI2JMb1Tfz/llfz1SMwO
-	elBrukPwdjdBs/8x/3PdSk5VukfiuJGeuPlCqFJ4CcyxBsd0+1Gaw5EXPHTXRi9x4p7czCXgiTv
-	LsrxkqhJC7VM2F3RQOMxhTqdJPUhCJtdBPzgM9evAXdxBXr3PVn6SRv8+bvCwEVFvGor+vsXaIg
-	jxTeHOJZQL2fmMr61+nN5+ppnIiYzZJLg1HAcke8EHR4WAdLL
-X-Google-Smtp-Source: AGHT+IFVASUMAByOUzxhSZOaC8eWyRPR1v9bRmGRUVLFszgWHEkfj3GYG9eKFdaTPNiM79F1DMo7BQ==
-X-Received: by 2002:a17:903:1b68:b0:264:5c06:4d7b with SMTP id d9443c01a7336-269ba51703cmr21441145ad.32.1758250601071;
-        Thu, 18 Sep 2025 19:56:41 -0700 (PDT)
-Received: from localhost.localdomain ([116.128.244.171])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2698016c08dsm39504675ad.51.2025.09.18.19.56.38
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Thu, 18 Sep 2025 19:56:40 -0700 (PDT)
-From: chengkaitao <pilgrimtao@gmail.com>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	chengkaitao <chengkaitao@kylinos.cn>
-Subject: [PATCH] block/mq-deadline: adjust the timeout period of the per_prio->dispatch
-Date: Fri, 19 Sep 2025 10:56:13 +0800
-Message-ID: <20250919025613.39771-1-pilgrimtao@gmail.com>
-X-Mailer: git-send-email 2.50.1
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ijgrXA4n"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1758254017;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=eQrwM23HsGfKWdvsFTuBJVXHncfoNOQVfb470fO9tiU=;
+	b=ijgrXA4nBv/iJ26DRq3xvAiR+ErT5oFn7mhuexr8tXvCAGnr64ClThAfLZ81N7gdWrfoP3
+	BLrbp7D2w5uZkOkyjwtsykmWXJaVl5OQXVZJaCSPy6gCVKxc6VADSppD2E1ypUnO3zFWB7
+	JSFotHBurF5wcb9cRpBPZNMO671NZZE=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-596-nEh6cxuiPwyutF-Z5CILuQ-1; Thu,
+ 18 Sep 2025 23:53:31 -0400
+X-MC-Unique: nEh6cxuiPwyutF-Z5CILuQ-1
+X-Mimecast-MFC-AGG-ID: nEh6cxuiPwyutF-Z5CILuQ_1758254010
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 239FE180035C;
+	Fri, 19 Sep 2025 03:53:30 +0000 (UTC)
+Received: from fedora (unknown [10.72.120.15])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3ADD818004A3;
+	Fri, 19 Sep 2025 03:53:22 +0000 (UTC)
+Date: Fri, 19 Sep 2025 11:53:17 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Caleb Sander Mateos <csander@purestorage.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 01/17] ublk: remove ubq check in ublk_check_and_get_req()
+Message-ID: <aMzTrazYYfN0eTfM@fedora>
+References: <20250918014953.297897-1-csander@purestorage.com>
+ <20250918014953.297897-2-csander@purestorage.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250918014953.297897-2-csander@purestorage.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-From: chengkaitao <chengkaitao@kylinos.cn>
+On Wed, Sep 17, 2025 at 07:49:37PM -0600, Caleb Sander Mateos wrote:
+> ublk_get_queue() never returns a NULL pointer, so there's no need to
+> check its return value in ublk_check_and_get_req(). Drop the check.
+> 
+> Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
 
-Reference function started_after()
-Before modification:
-	Timeout for dispatch{read}: 9.5s
-	started_after - 0.5s < latest_start - 10s
-	9.5s < latest_start - started_after
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
-	Timeout for dispatch{write}: 5s
-	started_after - 5s < latest_start - 10s
-	5s < latest_start - started_after
 
-At this point, write requests have higher priority than read requests.
-
-After modification:
-	Timeout for dispatch{read/write}: 5s
-	prio_aging_expire / 2 < latest_start - started_after
-
-Signed-off-by: chengkaitao <chengkaitao@kylinos.cn>
----
- block/mq-deadline.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-index b9b7cdf1d3c9..f311168f8dfe 100644
---- a/block/mq-deadline.c
-+++ b/block/mq-deadline.c
-@@ -672,7 +672,8 @@ static void dd_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
- 
- 	if (flags & BLK_MQ_INSERT_AT_HEAD) {
- 		list_add(&rq->queuelist, &per_prio->dispatch);
--		rq->fifo_time = jiffies;
-+		rq->fifo_time = jiffies + dd->fifo_expire[data_dir]
-+				- dd->prio_aging_expire / 2;
- 	} else {
- 		deadline_add_rq_rb(per_prio, rq);
- 
--- 
-2.50.1 (Apple Git-155)
+Thanks,
+Ming
 
