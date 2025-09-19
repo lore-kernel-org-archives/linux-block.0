@@ -1,56 +1,131 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B349253B64;
-	Fri, 19 Sep 2025 15:13:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAFF9316918
+	for <linux-block@vger.kernel.org>; Fri, 19 Sep 2025 15:25:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758294790; cv=none; b=dOM8bmQgPld2icUMpLyI5VrNc6W3sxPlOREhtjHOztJ4Ty2NaSMznD+wxtJTJmeQTsiQEU7TyLGrNK7pJEs/itZo8WcgMDGxn4Bfjvq0RlpzzulwZuvIEKlDBc96itsnOc1gmdUlMCBAJpDH1naPwjaInd8lRR7CwI1Iy4Hh3nI=
+	t=1758295504; cv=none; b=XzxdoZlFqne7zKXqJBTf4EAEiXB+retvNvB6+aWIxscmM8eyWsU1+v9iqL6qy73nOUYpPpdPO7mK4LNGOoK7k2EZXIhRWcLY09yOg0+1qpCEwrvvXDbRLlThzsqZeFHo3zcj+CG2To7uEvctErQ+rcwVzi4l4QCy7OHP5Vt2QJA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758294790; c=relaxed/simple;
-	bh=+W++xGFW/XkT7OUev2dqbvY4PZc3qACNWpXDuV8FA9w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m4oc35p/QgMMVeqtfyS602o+SQKZM8x4hbZexUgbrSc/RcB4+6YpK2xfYv6VAAwJcitjwkVttSj7HoJe7joSjGWWBhnA10mzhCHfx4Mu7+tRovdy+yqAsLCASW47DaFo9Udx3vUrWR3H2I0O+FiJE+NXHABdY6f4+Vgb8QQfakY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id DCF5D68AA6; Fri, 19 Sep 2025 17:13:05 +0200 (CEST)
-Date: Fri, 19 Sep 2025 17:13:05 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Steven Rostedt <rostedt@goodmis.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org, linux-btrace@vger.kernel.org,
-	John Garry <john.g.garry@oracle.com>,
-	Hannes Reinecke <hare@suse.de>, Damien Le Moal <dlemoal@kernel.org>,
-	Christoph Hellwig <hch@lst.de>, Naohiro Aota <naohiro.aota@wdc.com>,
-	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>
-Subject: Re: [PATCH 12/16] blktrace: add block trace commands for zone
- operations
-Message-ID: <20250919151305.GL28352@lst.de>
-References: <20250909110611.75559-1-johannes.thumshirn@wdc.com> <20250909110611.75559-13-johannes.thumshirn@wdc.com>
+	s=arc-20240116; t=1758295504; c=relaxed/simple;
+	bh=tIBWHHOOKfm2qL1G0oNEg1lQ/EY8RTTkm2B9w+25Bvk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=pbMqiDluawR510nIjqOzUl+duz286VrRh/qg4d2NbGYTN7XoyAA/MH0s6wXQ83J6MqEYv0QRy65aIuH237PTH9h1yRRHH8TaWjFt2kvwMVUIAStfwcqwc3OCyVCZbp9xxqLrr3S4o7JqGZMUaShQleGOpXpBaGVznDSh48unku4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=freebox.fr; spf=pass smtp.mailfrom=freebox.fr; dkim=pass (2048-bit key) header.d=freebox-fr.20230601.gappssmtp.com header.i=@freebox-fr.20230601.gappssmtp.com header.b=xbo3W1UF; arc=none smtp.client-ip=209.85.167.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=freebox.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=freebox.fr
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=freebox-fr.20230601.gappssmtp.com header.i=@freebox-fr.20230601.gappssmtp.com header.b="xbo3W1UF"
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-55f7ab2a84eso2641345e87.1
+        for <linux-block@vger.kernel.org>; Fri, 19 Sep 2025 08:25:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=freebox-fr.20230601.gappssmtp.com; s=20230601; t=1758295500; x=1758900300; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=EztjVQ+y07YMfegmHOd0VyK62XkODMWu0LdNE29WAS0=;
+        b=xbo3W1UFpKFkZ1p3cmir9bHExoubmn+zN65uKZIOYM/VNr4k3So7pYfDI6mX/D9Xs7
+         tKrFxrKGsa1OUV4/BaJm81tBW61J4ZGYYxqxZFHL+2WJXFRTEp/mhXDIaLf+cQRcgUXe
+         AYqPNZvLbxLN1AyYo7ig5n8eVxO+iPi1huE+4hW6lV7MZkf7YHIdjHXfXdto2VLmATJZ
+         knqRg3MYiebrHRGL5TV4krfrv3EaVDwqo3YKPYYlEuRSeFOsywbR4G16hcwfzRVUvkmK
+         +8rrea1TuR59LvTS19HlGLqGt+kLHJ+F5+322OVOV6/84SIcgYqHnsi5cc3ulWFd4ja5
+         pnpg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758295500; x=1758900300;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=EztjVQ+y07YMfegmHOd0VyK62XkODMWu0LdNE29WAS0=;
+        b=pJVCv5QTpj+6eiYmZywc3zJm8eFu13jZA9vDd0Jwokv7hBjF7YQwRWxshXhhGjc8Qo
+         lpuDQvlgsAYJOggB09+aLiOzjkjgrSVUHXtITQkpdrLlIqsx7iqkWPv1qnHCD11ESCTO
+         UH7O182/ivtbyjMMk0v5C4Q/fj1v+W4eAtoYE+nfCSydoRklyUa7n6/tqbZND5tbfDDC
+         d1vWnGx9QLvqdwGxc+Rd2k4TyeGtsIIJdk4FgP8C5SODeLhiWupXldbhU0+cg6wixmoi
+         aGlyLFcKpukDM+DIBW1eihERmvZYZBZ+6ECfpeTy/LFhD8hnD2z298IVvIaT8/ZmolPr
+         MwlA==
+X-Forwarded-Encrypted: i=1; AJvYcCW+mMF02eYvf0oREHI0jYfP8Xu12gLqSn06SYBS69eOg8UpsHNMdIlrFGEUaq0Bi26Dynww0nDfkc0WQQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy9v00DvYPT2km42t42Ojzze8N8i9D2onEBLN1+cbUOTRlCiEkE
+	X5RUp0nJSlNDuiIQLDR9ZVdE3ltQkDpv1IoI3Qi/w15aCC8W53lsP1jwNsmdEZ4jiwukaUW4tAP
+	wumNf6QYRKB5Qpb4EIJdK5yL5ZEKugB9LsxSIhkKJPg==
+X-Gm-Gg: ASbGnctbguT9n+nGXvq1FSXFgWWHGP62L+5gNFoZVDYP3FO8KwZ89rTv/QjIgZWI+AM
+	gCIkazvgu3FYCSZWGj4dTnJUlfYu1BJ6ZCVrxnMJLhGNBU6txmda5Ax2sbDoHqqFOiF1crq/pWC
+	7JrOvxTBegkEr2NWeUnNQqLjV5lbtfEdnQnx78oVNc2Mvs3xkWTYgBGUE7+hIbh1FbFbNRtjxcK
+	9k97Cs2teX19MA=
+X-Google-Smtp-Source: AGHT+IHin4gQus9SrkFEog2pTedfunr2Ers950l0f82oxrEtfjemfexmsAorW/Dsqdjvay/GpFMt6pfW/hwC+qBHF14=
+X-Received: by 2002:a05:6512:2c0b:b0:571:b70b:7dbf with SMTP id
+ 2adb3069b0e04-579e2507c81mr1455897e87.17.1758295499599; Fri, 19 Sep 2025
+ 08:24:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250909110611.75559-13-johannes.thumshirn@wdc.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+References: <20250918152830.438554-1-nschichan@freebox.fr> <20250918195806.6337-1-safinaskar@gmail.com>
+In-Reply-To: <20250918195806.6337-1-safinaskar@gmail.com>
+From: Nicolas Schichan <nschichan@freebox.fr>
+Date: Fri, 19 Sep 2025 17:24:48 +0200
+X-Gm-Features: AS18NWBwMqIXE_dMXDlT0ngUIReSbekPPTszWv5gIfg03bAEg3Id33JL3Yqjedw
+Message-ID: <CAHNNwZAzecVcJXZmycX063-=p-M5jVkfStfgYVKJruOFo7y9zg@mail.gmail.com>
+Subject: Re: [PATCH RESEND 00/62] initrd: remove classic initrd support
+To: Askar Safin <safinaskar@gmail.com>
+Cc: akpm@linux-foundation.org, andy.shevchenko@gmail.com, axboe@kernel.dk, 
+	brauner@kernel.org, cyphar@cyphar.com, devicetree@vger.kernel.org, 
+	ecurtin@redhat.com, email2tema@gmail.com, graf@amazon.com, 
+	gregkh@linuxfoundation.org, hca@linux.ibm.com, hch@lst.de, 
+	hsiangkao@linux.alibaba.com, initramfs@vger.kernel.org, jack@suse.cz, 
+	julian.stecklina@cyberus-technology.de, kees@kernel.org, 
+	linux-acpi@vger.kernel.org, linux-alpha@vger.kernel.org, 
+	linux-api@vger.kernel.org, linux-arch@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org, 
+	linux-csky@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-efi@vger.kernel.org, linux-ext4@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, linux-hexagon@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-m68k@lists.linux-m68k.org, 
+	linux-mips@vger.kernel.org, linux-openrisc@vger.kernel.org, 
+	linux-parisc@vger.kernel.org, linux-riscv@lists.infradead.org, 
+	linux-s390@vger.kernel.org, linux-sh@vger.kernel.org, 
+	linux-snps-arc@lists.infradead.org, linux-um@lists.infradead.org, 
+	linuxppc-dev@lists.ozlabs.org, loongarch@lists.linux.dev, mcgrof@kernel.org, 
+	mingo@redhat.com, monstr@monstr.eu, mzxreary@0pointer.de, 
+	patches@lists.linux.dev, rob@landley.net, sparclinux@vger.kernel.org, 
+	thomas.weissschuh@linutronix.de, thorsten.blum@linux.dev, 
+	torvalds@linux-foundation.org, tytso@mit.edu, viro@zeniv.linux.org.uk, 
+	x86@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Sep 09, 2025 at 01:06:07PM +0200, Johannes Thumshirn wrote:
-> Add block trace commands for zone operations. These are added as a
-> separate set of 'block trace commands' shifted by 32bit so that they do
-> not interfere with the old 16bit wide trace command field in 'struct
-> blk_io_trace' action.
+Hello,
 
-This is very confusing.  Why not havve a single enum with the actual
-values with a clearly marked cutoff for v1?
+> > When booting with root=/dev/ram0 in the kernel commandline,
+> > handle_initrd() where the deprecation message resides is never called,
+> > which is rather unfortunate (init/do_mounts_initrd.c):
 
+> Yes, this is unfortunate.
+>
+> I personally still think that initrd should be removed.
+
+Considering that the deprecation message didn't get displayed in some
+configurations, maybe it's a bit early at the very least.
+
+> I suggest using workaround I described in cover letter.
+
+I'm not too keen on having an initramfs just to loop-mount
+/sys/firmware/initrd, after all current kernels are able to handle the
+use case just fine.
+
+It looks like there is a lot of code calling into specific filesystems
+so that the initrd code can guess the size of the file system before
+copying into /dev/ram0, and I believe this is what causes the main
+gripe against initrd today. What is wrong with just copying
+/initrd.image using its actual size into /dev/ram0 instead of guessing
+it with the help of filesystem specific code ?
+
+> Also, for unknown reasons I didn't get your letter in my inbox.
+> (Not even in spam folder.) I ocasionally found it on lore.kernel.org .
+
+Sorry about that, When I used git-send-email yesterday to reply, the
+SMTP server I used wasn't authenticated to google, so all gmail
+recipients were dropped. Hopefully this work better today.
+
+Regards,
+
+-- 
+Nicolas Schichan
