@@ -1,402 +1,226 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4A8E261B78
-	for <linux-block@vger.kernel.org>; Mon, 22 Sep 2025 21:00:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB0B827A906
+	for <linux-block@vger.kernel.org>; Mon, 22 Sep 2025 22:33:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758574849; cv=none; b=IcA1K06Hg1XeLaZKhyM6gni5+mXXCEkANPYPSwzAnr0n/rKz6ieuLadl4N2MauX5bDHhRfFAcY/MbMyFseRVsSZReYJJCo5fi70cAD1ilT4P6KVK6dntHwG592NfzV6sCLmPNkEK9/Kz2qqTucMircXUZLH1eQp09HnDmaMuxbw=
+	t=1758580410; cv=none; b=bPc1iOsY3rOR+DkhZW49HpoKAGE3R7z3JwKFtEbQVYUjhXG+rPQ4rMbPvet9SrAljdFbVbBkZ8xb5OCr19S+Y1pwO9G8dmEPTeDeZBbl6m3Z1jXrwbDKZg+obmJ9Cf0P6flaRCjCvoqzztMjopoycip/p27MOmJJxaYeFvYYLYc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758574849; c=relaxed/simple;
-	bh=r3BZKXh93YGgH/dUToiacxXnRoM0iGzJBY4eyKdtWC8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iOHRp8xnsBvw6ZbHXWXVbDw3dljuwjEhDsbgkBaUcpIOMbydn8q06QzZ7qlkItMh7cwddVgOoITrFS6ym4X+KJjuOiHfE6CgRTKJnB9EIgKDB3hzPauqMevjKzPpY/ElXvyIN09Z83dbLuTgD/raznxMb9pvEufXH1LZve+QGlo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KVzzMELp; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1758580410; c=relaxed/simple;
+	bh=9gUnRWW1xSW7v428HK8QOTPfOJyiCrOBtECJftbi3nM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=sWISGzbdKgB66N+OHbglYczsWxgsTVc1zJn05wTnGXg81kg+TZLkCtB6dc7NyONJdauH7QhpZb+Bk0gfoliVOOHQ7Fui6ATfh3AoVLkH+bvGRvjxaM8dC6pw09zHhWNST9ozOcYIQsVCYYXSiamUca8YSPhzsW1iA9xSBQa2wRY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VGkB4bt6; arc=none smtp.client-ip=209.85.160.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KVzzMELp"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1758574842;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=u976ILMXRioS/uyYdClouLABKNXfjZw/zLt8Qjs8X1U=;
-	b=KVzzMELpWgWsqQDiNWA9G1E2a5oTTvDz4Gh9Wo00/3Z86jUbaH5NmjkpWVlUBXtIu75QdK
-	Jl3MpbRMx+ejOQNHva/NvIM/S0z2AiyQLs50ADROxSGg/+Tnj7TKdA0khcv9qn1RtjySer
-	ytrljgqktLD90dqqEAsnriPsEF4B99I=
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com
- [209.85.166.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-340-3j0WxNiAP-2rctWsPDmXmA-1; Mon, 22 Sep 2025 17:00:37 -0400
-X-MC-Unique: 3j0WxNiAP-2rctWsPDmXmA-1
-X-Mimecast-MFC-AGG-ID: 3j0WxNiAP-2rctWsPDmXmA_1758574837
-Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-42499166998so4711665ab.3
-        for <linux-block@vger.kernel.org>; Mon, 22 Sep 2025 14:00:37 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VGkB4bt6"
+Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-4ce9b5de951so8379811cf.2
+        for <linux-block@vger.kernel.org>; Mon, 22 Sep 2025 15:33:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1758580407; x=1759185207; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tYsm3gMuZ6zP5BwF7VSAmryD1NVeBQnXrzftMRUOM78=;
+        b=VGkB4bt6fwlT+rLFgq6zfTZ4Anb2xkb3iZ4i6emZzxhqOeNvAhwV19ORGowL+uWkER
+         6lwJLevFjnLc4dR/RdHEdsvQEz9BpbIlUeIjro2sd+U7sE6rr5gZHE6pVhFeh9gr/ak1
+         HgHA4MRua+PM49qcZ20TgdKYMqWfh/VRODq5DeA3tICR/IhU1dYRFN/VtZTjo4ku3O7B
+         z6LSCb0FsnOyIrrVxG8wvWpFjgc2dyNXyzFl45/hGFe6Kv5+8LBzZYgipEFSfyKTQyek
+         P+TyI6VlG3DNrLj9x43xy0JLB8j1m4dZGWGuP1SUUxfFW/IF9ZEDXxebhx7vjqNguDjB
+         EtNA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758574837; x=1759179637;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=u976ILMXRioS/uyYdClouLABKNXfjZw/zLt8Qjs8X1U=;
-        b=rcczn2Vdve2rVKyGSU9PO0cxiRtqRZUWU0NJOe8Ypt9odezLOQTYVVU9xZZSnpEBR7
-         s6a49hAcqnuC6uC4nMQgVdE8Yl7Qm0wG0hA+NI9oHbouwH3K6nKh7Ct3BrIuGepS963o
-         jylJ6Fh2HKzG06QwXzZjUt696cSi1eY04Jq2kcfyqHGi7J5lYecIo9p5im9a7qqfTMiJ
-         QcVun6XgFjyF62ayAgGSCUEShMK8QtQPIA2vZUMPSsx0RnIHUDdLrNjMJ05ONYG/GuDW
-         HBe4+Pm65vFhgm5uSsbIIktozdJSYvgEhqFgTBsqcZZtG9LGmoBMgw3ZiBpv9x1NL5A5
-         q2eg==
-X-Forwarded-Encrypted: i=1; AJvYcCVX53LRaAvoSd/h+0o1JhEgpC8aYIeB7djb8MeWSCjG15Aw8kYWrXcUbT90KR0SI5HCQi8VReDz4NE+4A==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy8O2mQuCBD+z59dCuYhstwB6qI+RN8R2RRyBiokwBRT+pi7Zp1
-	5C6Zptqh/dBRXBBx7Zagwcj/s7VwbDeuuUweaqk8gvpYZV/XdKn3GYdF0G1phjQq6ikqAY1F2FH
-	1sw3qDn3DrZCT6BkoTtwuJdROdlRYyneVvmLbFS33u80989b83SUSrcAswUCzsKQs
-X-Gm-Gg: ASbGncs6v4s2dmaa6IiER7LImg6N6xrn8nzmqauBfSrnDl7o0iJmuLsCgz6HlPUKaw7
-	5ekJMEiG6kV0I2BOlXajFFyVUgcpOzCLFWeIodQQ83ga5yVPM8Ejf/iQkUlR2BQ1r3dOqY25p3X
-	IHs3pr6qixD1Zj6o6NrFjaaFS18mgZLcV2J2fL87PF27a1YZ3svLcLfhHVgQTM/GxIBbwR8mM/a
-	DDXx6Us0JmqrXVg5Pw6I9PFBZ8ZnxPAQEBVlqqu535zjAaUna6gYiUFqaXhZd/sktYkmA8g7qm0
-	6N24XDjqR0H/MdZR1aAG9yOd02HslHDxaBuJ4jalBJo=
-X-Received: by 2002:a05:6e02:1564:b0:424:1774:6908 with SMTP id e9e14a558f8ab-42581d411aemr2507395ab.0.1758574836516;
-        Mon, 22 Sep 2025 14:00:36 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEHevCmO0qja9+CaJmqTAnyT70ByyebOs+GgzBvQQPshgkX8jExSjBAAuoPEqWA6rRJFVM2cg==
-X-Received: by 2002:a05:6e02:1564:b0:424:1774:6908 with SMTP id e9e14a558f8ab-42581d411aemr2507095ab.0.1758574835992;
-        Mon, 22 Sep 2025 14:00:35 -0700 (PDT)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-53d3e337bebsm6192605173.28.2025.09.22.14.00.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Sep 2025 14:00:35 -0700 (PDT)
-Date: Mon, 22 Sep 2025 15:00:32 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Leon Romanovsky <leonro@nvidia.com>, Jason Gunthorpe <jgg@nvidia.com>,
- Andrew Morton <akpm@linux-foundation.org>, Bjorn Helgaas
- <bhelgaas@google.com>, Christian =?UTF-8?B?S8O2bmln?=
- <christian.koenig@amd.com>, dri-devel@lists.freedesktop.org,
- iommu@lists.linux.dev, Jens Axboe <axboe@kernel.dk>, Joerg Roedel
- <joro@8bytes.org>, kvm@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-media@vger.kernel.org, linux-mm@kvack.org, linux-pci@vger.kernel.org,
- Logan Gunthorpe <logang@deltatee.com>, Marek Szyprowski
- <m.szyprowski@samsung.com>, Robin Murphy <robin.murphy@arm.com>, Sumit
- Semwal <sumit.semwal@linaro.org>, Vivek Kasireddy
- <vivek.kasireddy@intel.com>, Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v2 03/10] PCI/P2PDMA: Refactor to separate core P2P
- functionality from memory allocation
-Message-ID: <20250922150032.3e3da410.alex.williamson@redhat.com>
-In-Reply-To: <1e2cb89ea76a92949d06a804e3ab97478e7cacbb.1757589589.git.leon@kernel.org>
-References: <cover.1757589589.git.leon@kernel.org>
-	<1e2cb89ea76a92949d06a804e3ab97478e7cacbb.1757589589.git.leon@kernel.org>
-Organization: Red Hat
+        d=1e100.net; s=20230601; t=1758580407; x=1759185207;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tYsm3gMuZ6zP5BwF7VSAmryD1NVeBQnXrzftMRUOM78=;
+        b=U0ddrDBtzCQRwkWSQj12lpuiBBplpdOp3Mm8gPp9uGM2NH93yY6tvG9tSzCXBYH8mC
+         nH1d3r6n17KgLXDVWWyJHymOG152nXVAc/OE1RZBhau7O4oOLelmuJOIKw92neVC2Hij
+         zC9BiYDRk7kTdnUYfFEqj63mntl0jtzElG4slpChLmBJUfET0m1L/1ZWqeXRdkfsf/JY
+         05kKoLOxddfOUArzHne3IqmbVx91TJfsLS6c3XGavcn2uAyadjJzkZGVjDeCeQkNqAr7
+         GWdhCCTK83AdTw8Pzc+zA5E2vPv5IPLClLn/0nIqX30WOcQOIzH4Pevaf/6UXNjjR7vp
+         dPVw==
+X-Forwarded-Encrypted: i=1; AJvYcCWLT76DKFUnf13M11I7j3UCAPdNk9rw1fo2+fEhFEA+CmXb5Q7ZmSwOamotBMSsr6Ttaa6JGp1Sr53NyQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YztacdmsMjlf7qY1qqCGqZc6zi94WriEHyZyEFaYTEHA4lG0kER
+	DCRZpjzzxucXfUsdJiG/BJWwsl8tYKX0i2EBgzGzgqE4U8kp8n4mTK2Wf92JdfWByvskKa8BDNH
+	oZl6LHe3W7UwTqstL0I1nJZOA+obtoGQ=
+X-Gm-Gg: ASbGnct9/GdwRy27FTkMVoa0cScdyrAWzXVh5SSWi//Ka47gqNLwEzQzd0OUPZV6GbU
+	V05sRAHOdQYyhNUhSd9oQWgpEHH0l7oRXCmdKugamnCAjSFiMMBKW3e5dl0XKrgaOj4mnIqaH/x
+	oykZ2PD2sM2qyzvVHFV9FNhepuqOvX6zizTyg2zydaeTfnZ7Xy2L9pv1uZEuFmDfzSUQo6xbWkB
+	7xgI1fEyfdZ58w6+ElxlJ38G9nCkoyZPbiyg0sWqDPcDnL+e/Y=
+X-Google-Smtp-Source: AGHT+IF59spwoCjoNevIOS6EB4EogkJR/RYbcHdd3SU92QEm1R4zLwhxuNE22b2ZQB4jX2aAaCOjGDoVHvUFM8Uxyuo=
+X-Received: by 2002:a05:622a:5490:b0:4b5:e856:2b6 with SMTP id
+ d75a77b69052e-4d368a7f582mr6104971cf.27.1758580406619; Mon, 22 Sep 2025
+ 15:33:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20250916234425.1274735-1-joannelkoong@gmail.com> <20250916234425.1274735-5-joannelkoong@gmail.com>
+In-Reply-To: <20250916234425.1274735-5-joannelkoong@gmail.com>
+From: Joanne Koong <joannelkoong@gmail.com>
+Date: Mon, 22 Sep 2025 15:33:15 -0700
+X-Gm-Features: AS18NWANWqkKm48EgUYQpSCL1ismSoNPpJ2JmzDLzkmpUdQ92ZSUKuvOZrXN2QY
+Message-ID: <CAJnrk1btMBosbCsvfG+jCJCoqQ8zrkjSrqhqp8XSSLU=Es64FQ@mail.gmail.com>
+Subject: Re: [PATCH v3 04/15] iomap: iterate over entire folio in iomap_readpage_iter()
+To: brauner@kernel.org, miklos@szeredi.hu
+Cc: hch@infradead.org, djwong@kernel.org, hsiangkao@linux.alibaba.com, 
+	linux-block@vger.kernel.org, gfs2@lists.linux.dev, 
+	linux-fsdevel@vger.kernel.org, kernel-team@meta.com, 
+	linux-xfs@vger.kernel.org, linux-doc@vger.kernel.org, 
+	Christoph Hellwig <hch@lst.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, 11 Sep 2025 14:33:07 +0300
-Leon Romanovsky <leon@kernel.org> wrote:
-
-> From: Leon Romanovsky <leonro@nvidia.com>
-> 
-> Refactor the PCI P2PDMA subsystem to separate the core peer-to-peer DMA
-> functionality from the optional memory allocation layer. This creates a
-> two-tier architecture:
-> 
-> The core layer provides P2P mapping functionality for physical addresses
-> based on PCI device MMIO BARs and integrates with the DMA API for
-> mapping operations. This layer is required for all P2PDMA users.
-> 
-> The optional upper layer provides memory allocation capabilities
-> including gen_pool allocator, struct page support, and sysfs interface
-> for user space access.
-> 
-> This separation allows subsystems like VFIO to use only the core P2P
-> mapping functionality without the overhead of memory allocation features
-> they don't need. The core functionality is now available through the
-> new pci_p2pdma_enable() function that returns a p2pdma_provider
-> structure.
-> 
-> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+On Tue, Sep 16, 2025 at 4:50=E2=80=AFPM Joanne Koong <joannelkoong@gmail.co=
+m> wrote:
+>
+> Iterate over all non-uptodate ranges in a single call to
+> iomap_readpage_iter() instead of leaving the partial folio iteration to
+> the caller.
+>
+> This will be useful for supporting caller-provided async folio read
+> callbacks (added in later commit) because that will require tracking
+> when the first and last async read request for a folio is sent, in order
+> to prevent premature read completion of the folio.
+>
+> This additionally makes the iomap_readahead_iter() logic a bit simpler.
+>
+> Signed-off-by: Joanne Koong <joannelkoong@gmail.com>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
 > ---
->  drivers/pci/p2pdma.c       | 129 +++++++++++++++++++++++++++----------
->  include/linux/pci-p2pdma.h |   5 ++
->  2 files changed, 100 insertions(+), 34 deletions(-)
-> 
-> diff --git a/drivers/pci/p2pdma.c b/drivers/pci/p2pdma.c
-> index 176a99232fdca..c22cbb3a26030 100644
-> --- a/drivers/pci/p2pdma.c
-> +++ b/drivers/pci/p2pdma.c
-> @@ -25,11 +25,12 @@ struct pci_p2pdma {
->  	struct gen_pool *pool;
->  	bool p2pmem_published;
->  	struct xarray map_types;
-> +	struct p2pdma_provider mem[PCI_STD_NUM_BARS];
->  };
->  
->  struct pci_p2pdma_pagemap {
->  	struct dev_pagemap pgmap;
-> -	struct p2pdma_provider mem;
-> +	struct p2pdma_provider *mem;
->  };
->  
->  static struct pci_p2pdma_pagemap *to_p2p_pgmap(struct dev_pagemap *pgmap)
-> @@ -204,7 +205,7 @@ static void p2pdma_page_free(struct page *page)
->  	struct pci_p2pdma_pagemap *pgmap = to_p2p_pgmap(page_pgmap(page));
->  	/* safe to dereference while a reference is held to the percpu ref */
->  	struct pci_p2pdma *p2pdma = rcu_dereference_protected(
-> -		to_pci_dev(pgmap->mem.owner)->p2pdma, 1);
-> +		to_pci_dev(pgmap->mem->owner)->p2pdma, 1);
->  	struct percpu_ref *ref;
->  
->  	gen_pool_free_owner(p2pdma->pool, (uintptr_t)page_to_virt(page),
-> @@ -227,44 +228,93 @@ static void pci_p2pdma_release(void *data)
->  
->  	/* Flush and disable pci_alloc_p2p_mem() */
->  	pdev->p2pdma = NULL;
-> -	synchronize_rcu();
-> +	if (p2pdma->pool)
-> +		synchronize_rcu();
-> +	xa_destroy(&p2pdma->map_types);
+>  fs/iomap/buffered-io.c | 69 ++++++++++++++++++++----------------------
+>  1 file changed, 32 insertions(+), 37 deletions(-)
+>
+> diff --git a/fs/iomap/buffered-io.c b/fs/iomap/buffered-io.c
+> index 2a1709e0757b..0c4ba2a63490 100644
+> --- a/fs/iomap/buffered-io.c
+> +++ b/fs/iomap/buffered-io.c
+> @@ -420,6 +420,7 @@ static int iomap_readpage_iter(struct iomap_iter *ite=
+r,
+>         loff_t length =3D iomap_length(iter);
+>         struct folio *folio =3D ctx->cur_folio;
+>         size_t poff, plen;
+> +       loff_t count;
+>         int ret;
+>
+>         if (iomap->type =3D=3D IOMAP_INLINE) {
+> @@ -431,39 +432,33 @@ static int iomap_readpage_iter(struct iomap_iter *i=
+ter,
+>
+>         /* zero post-eof blocks as the page may be mapped */
+>         ifs_alloc(iter->inode, folio, iter->flags);
+> -       iomap_adjust_read_range(iter->inode, folio, &pos, length, &poff, =
+&plen);
+> -       if (plen =3D=3D 0)
+> -               goto done;
+>
+> -       if (iomap_block_needs_zeroing(iter, pos)) {
+> -               folio_zero_range(folio, poff, plen);
+> -               iomap_set_range_uptodate(folio, poff, plen);
+> -       } else {
+> -               iomap_bio_read_folio_range(iter, ctx, pos, plen);
+> -       }
+> +       length =3D min_t(loff_t, length,
+> +                       folio_size(folio) - offset_in_folio(folio, pos));
+> +       while (length) {
+> +               iomap_adjust_read_range(iter->inode, folio, &pos, length,=
+ &poff,
+> +                               &plen);
+>
+> -done:
+> -       /*
+> -        * Move the caller beyond our range so that it keeps making progr=
+ess.
+> -        * For that, we have to include any leading non-uptodate ranges, =
+but
+> -        * we can skip trailing ones as they will be handled in the next
+> -        * iteration.
+> -        */
+> -       length =3D pos - iter->pos + plen;
+> -       return iomap_iter_advance(iter, &length);
+> -}
+> +               count =3D pos - iter->pos + plen;
+> +               if (WARN_ON_ONCE(count > length))
+> +                       return -EIO;
+>
+> -static int iomap_read_folio_iter(struct iomap_iter *iter,
+> -               struct iomap_readpage_ctx *ctx)
+> -{
+> -       int ret;
+> +               if (plen =3D=3D 0)
+> +                       return iomap_iter_advance(iter, &count);
+>
+> -       while (iomap_length(iter)) {
+> -               ret =3D iomap_readpage_iter(iter, ctx);
+> +               if (iomap_block_needs_zeroing(iter, pos)) {
+> +                       folio_zero_range(folio, poff, plen);
+> +                       iomap_set_range_uptodate(folio, poff, plen);
+> +               } else {
+> +                       iomap_bio_read_folio_range(iter, ctx, pos, plen);
+> +               }
 > +
-> +	if (!p2pdma->pool)
-> +		return;
->  
->  	gen_pool_destroy(p2pdma->pool);
->  	sysfs_remove_group(&pdev->dev.kobj, &p2pmem_group);
-> -	xa_destroy(&p2pdma->map_types);
+> +               length -=3D count;
+> +               ret =3D iomap_iter_advance(iter, &count);
+>                 if (ret)
+>                         return ret;
+> +               pos =3D iter->pos;
+>         }
+> -
+>         return 0;
 >  }
->  
-> -static int pci_p2pdma_setup(struct pci_dev *pdev)
-> +/**
-> + * pcim_p2pdma_enable - Enable peer-to-peer DMA support for a PCI device
-> + * @pdev: The PCI device to enable P2PDMA for
-> + * @bar: BAR index to get provider
-> + *
-> + * This function initializes the peer-to-peer DMA infrastructure for a PCI
-> + * device. It allocates and sets up the necessary data structures to support
-> + * P2PDMA operations, including mapping type tracking.
-> + */
-> +struct p2pdma_provider *pcim_p2pdma_enable(struct pci_dev *pdev, int bar)
->  {
-> -	int error = -ENOMEM;
->  	struct pci_p2pdma *p2p;
-> +	int i, ret;
-> +
-> +	p2p = rcu_dereference_protected(pdev->p2pdma, 1);
-> +	if (p2p)
-> +		/* PCI device was "rebound" to the driver */
-> +		return &p2p->mem[bar];
->  
+>
+> @@ -482,7 +477,7 @@ int iomap_read_folio(struct folio *folio, const struc=
+t iomap_ops *ops)
+>         trace_iomap_readpage(iter.inode, 1);
+>
+>         while ((ret =3D iomap_iter(&iter, ops)) > 0)
+> -               iter.status =3D iomap_read_folio_iter(&iter, &ctx);
+> +               iter.status =3D iomap_readpage_iter(&iter, &ctx);
+>
+>         iomap_bio_submit_read(&ctx);
+>
+> @@ -504,16 +499,16 @@ static int iomap_readahead_iter(struct iomap_iter *=
+iter,
+>         int ret;
+>
+>         while (iomap_length(iter)) {
+> -               if (ctx->cur_folio &&
+> -                   offset_in_folio(ctx->cur_folio, iter->pos) =3D=3D 0) =
+{
+> -                       if (!ctx->cur_folio_in_bio)
+> -                               folio_unlock(ctx->cur_folio);
+> -                       ctx->cur_folio =3D NULL;
+> -               }
+> -               if (!ctx->cur_folio) {
+> -                       ctx->cur_folio =3D readahead_folio(ctx->rac);
+> -                       ctx->cur_folio_in_bio =3D false;
+> -               }
+> +               if (ctx->cur_folio && !ctx->cur_folio_in_bio)
+> +                       folio_unlock(ctx->cur_folio);
+> +               ctx->cur_folio =3D readahead_folio(ctx->rac);
 
-This seems like two separate functions rolled into one, an 'initialize
-providers' and a 'get provider for BAR'.  The comment above even makes
-it sound like only a driver re-probing a device would encounter this
-branch, but the use case later in vfio-pci shows it to be the common
-case to iterate BARs for a device.
+Unfortunately, this logic simplification here doesn't work. It still
+needs to check "offset_in_folio() =3D=3D 0" because the iomap mapping may
+only map in part of the folio, in which case the next round of
+iomap_iter() should still operate on the same folio. I'll make this
+change in v4.
 
-But then later in patch 8/ and again in 10/ why exactly do we cache
-the provider on the vfio_pci_core_device rather than ask for it on
-demand from the p2pdma?
-
-It also seems like the coordination of a valid provider is ad-hoc
-between p2pdma and vfio-pci.  For example, this only fills providers
-for MMIO BARs and vfio-pci validates that dmabuf operations are for
-MMIO BARs, but it would be more consistent if vfio-pci relied on p2pdma
-to give it a valid provider for a given BAR.  Thanks,
-
-Alex
-
->  	p2p = devm_kzalloc(&pdev->dev, sizeof(*p2p), GFP_KERNEL);
->  	if (!p2p)
-> -		return -ENOMEM;
-> +		return ERR_PTR(-ENOMEM);
->  
->  	xa_init(&p2p->map_types);
-> +	/*
-> +	 * Iterate over all standard PCI BARs and record only those that
-> +	 * correspond to MMIO regions. Skip non-memory resources (e.g. I/O
-> +	 * port BARs) since they cannot be used for peer-to-peer (P2P)
-> +	 * transactions.
-> +	 */
-> +	for (i = 0; i < PCI_STD_NUM_BARS; i++) {
-> +		if (!(pci_resource_flags(pdev, i) & IORESOURCE_MEM))
-> +			continue;
->  
-> -	p2p->pool = gen_pool_create(PAGE_SHIFT, dev_to_node(&pdev->dev));
-> -	if (!p2p->pool)
-> -		goto out;
-> +		p2p->mem[i].owner = &pdev->dev;
-> +		p2p->mem[i].bus_offset =
-> +			pci_bus_address(pdev, i) - pci_resource_start(pdev, i);
-> +	}
->  
-> -	error = devm_add_action_or_reset(&pdev->dev, pci_p2pdma_release, pdev);
-> -	if (error)
-> -		goto out_pool_destroy;
-> +	ret = devm_add_action_or_reset(&pdev->dev, pci_p2pdma_release, pdev);
-> +	if (ret)
-> +		goto out_p2p;
->  
-> -	error = sysfs_create_group(&pdev->dev.kobj, &p2pmem_group);
-> -	if (error)
-> +	rcu_assign_pointer(pdev->p2pdma, p2p);
-> +	return &p2p->mem[bar];
-> +
-> +out_p2p:
-> +	devm_kfree(&pdev->dev, p2p);
-> +	return ERR_PTR(ret);
-> +}
-> +EXPORT_SYMBOL_GPL(pcim_p2pdma_enable);
-> +
-> +static int pci_p2pdma_setup_pool(struct pci_dev *pdev)
-> +{
-> +	struct pci_p2pdma *p2pdma;
-> +	int ret;
-> +
-> +	p2pdma = rcu_dereference_protected(pdev->p2pdma, 1);
-> +	if (p2pdma->pool)
-> +		/* We already setup pools, do nothing, */
-> +		return 0;
-> +
-> +	p2pdma->pool = gen_pool_create(PAGE_SHIFT, dev_to_node(&pdev->dev));
-> +	if (!p2pdma->pool)
-> +		return -ENOMEM;
-> +
-> +	ret = sysfs_create_group(&pdev->dev.kobj, &p2pmem_group);
-> +	if (ret)
->  		goto out_pool_destroy;
->  
-> -	rcu_assign_pointer(pdev->p2pdma, p2p);
->  	return 0;
->  
->  out_pool_destroy:
-> -	gen_pool_destroy(p2p->pool);
-> -out:
-> -	devm_kfree(&pdev->dev, p2p);
-> -	return error;
-> +	gen_pool_destroy(p2pdma->pool);
-> +	p2pdma->pool = NULL;
-> +	return ret;
->  }
->  
->  static void pci_p2pdma_unmap_mappings(void *data)
-> @@ -276,7 +326,7 @@ static void pci_p2pdma_unmap_mappings(void *data)
->  	 * unmap_mapping_range() on the inode, teardown any existing userspace
->  	 * mappings and prevent new ones from being created.
->  	 */
-> -	sysfs_remove_file_from_group(&p2p_pgmap->mem.owner->kobj,
-> +	sysfs_remove_file_from_group(&p2p_pgmap->mem->owner->kobj,
->  				     &p2pmem_alloc_attr.attr,
->  				     p2pmem_group.name);
->  }
-> @@ -295,6 +345,7 @@ int pci_p2pdma_add_resource(struct pci_dev *pdev, int bar, size_t size,
->  			    u64 offset)
->  {
->  	struct pci_p2pdma_pagemap *p2p_pgmap;
-> +	struct p2pdma_provider *mem;
->  	struct dev_pagemap *pgmap;
->  	struct pci_p2pdma *p2pdma;
->  	void *addr;
-> @@ -312,15 +363,25 @@ int pci_p2pdma_add_resource(struct pci_dev *pdev, int bar, size_t size,
->  	if (size + offset > pci_resource_len(pdev, bar))
->  		return -EINVAL;
->  
-> -	if (!pdev->p2pdma) {
-> -		error = pci_p2pdma_setup(pdev);
-> +	p2pdma = rcu_dereference_protected(pdev->p2pdma, 1);
-> +	if (!p2pdma) {
-> +		mem = pcim_p2pdma_enable(pdev, bar);
-> +		if (IS_ERR(mem))
-> +			return PTR_ERR(mem);
-> +
-> +		error = pci_p2pdma_setup_pool(pdev);
->  		if (error)
->  			return error;
-> -	}
-> +
-> +		p2pdma = rcu_dereference_protected(pdev->p2pdma, 1);
-> +	} else
-> +		mem = &p2pdma->mem[bar];
->  
->  	p2p_pgmap = devm_kzalloc(&pdev->dev, sizeof(*p2p_pgmap), GFP_KERNEL);
-> -	if (!p2p_pgmap)
-> -		return -ENOMEM;
-> +	if (!p2p_pgmap) {
-> +		error = -ENOMEM;
-> +		goto free_pool;
-> +	}
->  
->  	pgmap = &p2p_pgmap->pgmap;
->  	pgmap->range.start = pci_resource_start(pdev, bar) + offset;
-> @@ -328,9 +389,7 @@ int pci_p2pdma_add_resource(struct pci_dev *pdev, int bar, size_t size,
->  	pgmap->nr_range = 1;
->  	pgmap->type = MEMORY_DEVICE_PCI_P2PDMA;
->  	pgmap->ops = &p2pdma_pgmap_ops;
-> -	p2p_pgmap->mem.owner = &pdev->dev;
-> -	p2p_pgmap->mem.bus_offset =
-> -		pci_bus_address(pdev, bar) - pci_resource_start(pdev, bar);
-> +	p2p_pgmap->mem = mem;
->  
->  	addr = devm_memremap_pages(&pdev->dev, pgmap);
->  	if (IS_ERR(addr)) {
-> @@ -343,7 +402,6 @@ int pci_p2pdma_add_resource(struct pci_dev *pdev, int bar, size_t size,
->  	if (error)
->  		goto pages_free;
->  
-> -	p2pdma = rcu_dereference_protected(pdev->p2pdma, 1);
->  	error = gen_pool_add_owner(p2pdma->pool, (unsigned long)addr,
->  			pci_bus_address(pdev, bar) + offset,
->  			range_len(&pgmap->range), dev_to_node(&pdev->dev),
-> @@ -359,7 +417,10 @@ int pci_p2pdma_add_resource(struct pci_dev *pdev, int bar, size_t size,
->  pages_free:
->  	devm_memunmap_pages(&pdev->dev, pgmap);
->  pgmap_free:
-> -	devm_kfree(&pdev->dev, pgmap);
-> +	devm_kfree(&pdev->dev, p2p_pgmap);
-> +free_pool:
-> +	sysfs_remove_group(&pdev->dev.kobj, &p2pmem_group);
-> +	gen_pool_destroy(p2pdma->pool);
->  	return error;
->  }
->  EXPORT_SYMBOL_GPL(pci_p2pdma_add_resource);
-> @@ -1008,11 +1069,11 @@ void __pci_p2pdma_update_state(struct pci_p2pdma_map_state *state,
->  {
->  	struct pci_p2pdma_pagemap *p2p_pgmap = to_p2p_pgmap(page_pgmap(page));
->  
-> -	if (state->mem == &p2p_pgmap->mem)
-> +	if (state->mem == p2p_pgmap->mem)
->  		return;
->  
-> -	state->mem = &p2p_pgmap->mem;
-> -	state->map = pci_p2pdma_map_type(&p2p_pgmap->mem, dev);
-> +	state->mem = p2p_pgmap->mem;
-> +	state->map = pci_p2pdma_map_type(p2p_pgmap->mem, dev);
->  }
->  
->  /**
-> diff --git a/include/linux/pci-p2pdma.h b/include/linux/pci-p2pdma.h
-> index eef96636c67e6..888ad7b0c54cf 100644
-> --- a/include/linux/pci-p2pdma.h
-> +++ b/include/linux/pci-p2pdma.h
-> @@ -27,6 +27,7 @@ struct p2pdma_provider {
->  };
->  
->  #ifdef CONFIG_PCI_P2PDMA
-> +struct p2pdma_provider *pcim_p2pdma_enable(struct pci_dev *pdev, int bar);
->  int pci_p2pdma_add_resource(struct pci_dev *pdev, int bar, size_t size,
->  		u64 offset);
->  int pci_p2pdma_distance_many(struct pci_dev *provider, struct device **clients,
-> @@ -45,6 +46,10 @@ int pci_p2pdma_enable_store(const char *page, struct pci_dev **p2p_dev,
->  ssize_t pci_p2pdma_enable_show(char *page, struct pci_dev *p2p_dev,
->  			       bool use_p2pdma);
->  #else /* CONFIG_PCI_P2PDMA */
-> +static inline struct p2pdma_provider *pcim_p2pdma_enable(struct pci_dev *pdev, int bar)
-> +{
-> +	return ERR_PTR(-EOPNOTSUPP);
-> +}
->  static inline int pci_p2pdma_add_resource(struct pci_dev *pdev, int bar,
->  		size_t size, u64 offset)
->  {
-
+> +               /*
+> +                * We should never in practice hit this case since the it=
+er
+> +                * length matches the readahead length.
+> +                */
+> +               if (WARN_ON_ONCE(!ctx->cur_folio))
+> +                       return -EINVAL;
+> +               ctx->cur_folio_in_bio =3D false;
+>                 ret =3D iomap_readpage_iter(iter, ctx);
+>                 if (ret)
+>                         return ret;
+> --
+> 2.47.3
+>
