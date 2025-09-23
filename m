@@ -1,119 +1,93 @@
-Received: from mail-il1-f228.google.com (mail-il1-f228.google.com [209.85.166.228])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 003.mia.mailroute.net (003.mia.mailroute.net [199.89.3.6])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A509D2641EE
-	for <linux-block@vger.kernel.org>; Tue, 23 Sep 2025 15:52:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.228
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5D6724A069
+	for <linux-block@vger.kernel.org>; Tue, 23 Sep 2025 15:59:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.6
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758642777; cv=none; b=bjtEbVoL5Cp9cp7kJzLeeIaBSiSD6SjTzbj489/aX5E2qet/UkvIaR6TDK0QkL1SmKbf7mjUCMNu8uF5GZTkkkTR3okDVNMk4FxaDxptMgyUKESQcfHbVsP7ZbUJ9EuePh8vixS99A2tB+/61VtmJEyidYBZF+g6zZX1aqmh9lA=
+	t=1758643180; cv=none; b=fLzPuQnT/u5v/4guZjY0mo31bWRU2X+KXRl8FGUPKqln5VzpBMkvh/mQiu7dY33xUwL1Uefvx4I5n4F034u5DOMSGvMohsulLlYbTuhdvww9dppzX/20StKwqqyu+DsSh5sT6enpJAOq+KBD4sXwDe8WcCZVudKKj/2AGv/c1Ss=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758642777; c=relaxed/simple;
-	bh=uAKJ5YIXpok4J2HO9I+jHEc/uFeWy79q0BkxKhz4i14=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=T1xUhERBpkTthXjeqTTdfiO9m+lsHZ+tyx8oZbih4zLdymTxWTr6LI2IJEgdasLWKYbfPBZkIAYNxRd2R9HINzZvwLSOUBuH8qNIML3C67MuNyIFTzdxr4/gicDuaXHMfZBkrpE1BhTrTUoiGTGPgjJZzbSpCd09vi1T+rDQ/c0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=QhCEAk9A; arc=none smtp.client-ip=209.85.166.228
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	s=arc-20240116; t=1758643180; c=relaxed/simple;
+	bh=X91FR3w8sKFfIVYpQ7WoSHQf7FUzhUn5Y/Bq/a7bFSE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bZVJCicnG2Vt0IZrNd5CPAyg+Gi97Hmqnrd1XhgErnowohj32+UKJnq1lxEorM69xF20uAyVYxiDTh1XRTX7ecHL0OWYec7w2u/fbZ0dC6wOOHcf9HAQLMhrKI/XVaITQFOdtcxMkE64M/05CV/lkOeolJ1f2TksNjgs1N7VUPI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=rKlaqWVr; arc=none smtp.client-ip=199.89.3.6
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="QhCEAk9A"
-Received: by mail-il1-f228.google.com with SMTP id e9e14a558f8ab-3f472ca07c3so2928595ab.1
-        for <linux-block@vger.kernel.org>; Tue, 23 Sep 2025 08:52:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1758642775; x=1759247575; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=hr2andr6If2MhR9CesjDbJLb+O0VNW92c+JnTqVvT0g=;
-        b=QhCEAk9Agc5GwnTTK1rpkLqjWDIke11C7rceIsE6V+n1ef2yO1zXPU/zmGa8bddV/t
-         gK/N7JI8GFR0YMLGPmfg/HKv3wpkmMe7SviOBXYtK0YN7tkrGor04UNFtEXEEvDXRP0e
-         2VP5CXfVaLayK19pJ2fhqEm/MyuESRMaqLsZfXSIj/AgykSq3pNjVUmIokJB1BeucJ3w
-         vvLEsJYXWHOgnDT2kNMAmoNOjOby+86RCPOBSfxhVNAgjS6KO/2f33DXPnP+5VjAhiSJ
-         lmFWEg8XIk6nwRGuE4lUpGTeMfYtV4/sXkAm92S2glGVzojoXWmPmfaqgTI2g9ngvrhZ
-         Ez+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758642775; x=1759247575;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=hr2andr6If2MhR9CesjDbJLb+O0VNW92c+JnTqVvT0g=;
-        b=rhCYamxB3KDSEAzcLmQDAOZryAXbParA5zuay5scMEBTaxS0FlUsgcga7fN+qsmucC
-         x5TfQcWGL9AjzunMIi6pHzhGQp37QpbCrBotsJfFtyab3fm+UWHZaBVlCaNADxOCPnJs
-         Tfh1eluwP8/qBE8yBD+sle/Ff/qE5bV7qAwElfzM9BlTZFeG1Yk+TbNYuFp9y3Lg6rjc
-         cOCEXGmKLgcqYXPb61Ylxdj7XBtR2+6+mCBNglYE7JvUF1sOFpMEcTGGkxMyYl3zYaQM
-         GRt27UIGI+ceQM/DtRpDBCmYt8LgZtg7yklV5uyUkT9rHb3gqSsYfmzFO9F1Cp3nAYYK
-         v3SQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXhTOyfQ1C+IDhAYKnvgPTTznBJ7wKVnjLZyggniGmFPQjRR731BRbuX+EerCZSEZ6gyoAgqtwGAKbdmg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxP6C1afclJuifZvn5wlbY1jgzmxcZAgg0p/yV50eLmCIiLc2kH
-	0QrMkBh4nj/hYJzINUc1tuDfU8hGdOvjmq0Xqs3VTKTml6imAEupZhHWP05ozxO61ZprLKDC01U
-	z6WYR/P7rDqoqbzrrH6mkOskHCd5gve7Viezi
-X-Gm-Gg: ASbGnctv3X4debFzT6Jn3uJc0kRFGIDZLcdW7161PcNrNiChlUmNVx3ufMlw24SmPjR
-	yKPvr9AidGfVfKlT1l4LbaWI0g8yQntczMfIzVpvwdmxILqmF0TXeVzuYf69AiHzU47OLeAJx9+
-	WaAMjrN/YjPSiOR5oIy8rs5kfxB4OGYc+JB6dvkGF7yv3x0cO7RN/R3MJ2eXy9d67jhaPs8EWNw
-	nBm/c8sVxoIsY00M9oWfKy41E6Lskqii+FYtLmAPYlbAwUP9cRslGHnfzpEmzTJAJBTX+JYR/gM
-	U7Hr3yu1MqOzqPkSq1h23vfQGSOPsK1/MryvSrQXlP5jH0v9UWR7W+XAbwjE8DGVcRIX0pCT
-X-Google-Smtp-Source: AGHT+IEWTzAV4+l++tX2sIXCcXNEeWjLQ9JCB3xpPjwbjd5Z+dIR2mwEOpQQxTO5cYBdtzV5UuM+Ty87VSEF
-X-Received: by 2002:a05:6e02:12ef:b0:405:face:641b with SMTP id e9e14a558f8ab-42581eb0769mr19692455ab.6.1758642774589;
-        Tue, 23 Sep 2025 08:52:54 -0700 (PDT)
-Received: from c7-smtp-2023.dev.purestorage.com ([208.88.159.128])
-        by smtp-relay.gmail.com with ESMTPS id e9e14a558f8ab-4244a369a9dsm10025335ab.8.2025.09.23.08.52.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Sep 2025 08:52:54 -0700 (PDT)
-X-Relaying-Domain: purestorage.com
-Received: from dev-csander.dev.purestorage.com (dev-csander.dev.purestorage.com [10.7.70.37])
-	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 3B9A53401CC;
-	Tue, 23 Sep 2025 09:52:54 -0600 (MDT)
-Received: by dev-csander.dev.purestorage.com (Postfix, from userid 1557716354)
-	id 36094E41BAF; Tue, 23 Sep 2025 09:52:54 -0600 (MDT)
-From: Caleb Sander Mateos <csander@purestorage.com>
-To: Ming Lei <ming.lei@redhat.com>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Caleb Sander Mateos <csander@purestorage.com>,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] ublk: remove redundant zone op check in ublk_setup_iod()
-Date: Tue, 23 Sep 2025 09:52:48 -0600
-Message-ID: <20250923155249.2891305-1-csander@purestorage.com>
-X-Mailer: git-send-email 2.45.2
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="rKlaqWVr"
+Received: from localhost (localhost [127.0.0.1])
+	by 003.mia.mailroute.net (Postfix) with ESMTP id 4cWPmz6PfQzlgqTt;
+	Tue, 23 Sep 2025 15:59:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1758643170; x=1761235171; bh=X91FR3w8sKFfIVYpQ7WoSHQf
+	7FUzhUn5Y/Bq/a7bFSE=; b=rKlaqWVr2Y2RDCp/tO7H4lwlIvfKy/lVHj6aYn40
+	GucDpQ62uBegUWP9eTa2nn4fAYY7d0onCb4E2yWtSM6YCjrWdfRD25LQFz5TSmFo
+	IWY8iYB0go166XQ8wCXwZyEXOawXT6VmvN8uTBuK80VVwAy6MXoeRUE7pW7oGMDA
+	Z2Mx1luuDNl5ZkA4KhBXkgdM/Yr0Wi1PuBLKaCwCXadDhpwd2NlU+MIAxkFIWQFu
+	uR6E8mVjIDNsY7pGtND4AuSLAuU60DwOvagfwj4IHO7qEVf3OOBcg5g6pjdbPMHD
+	y5rOvrMDkGnJC7HXX6SgIOwYGjSNjX3JNbPcNkejnpz80g==
+X-Virus-Scanned: by MailRoute
+Received: from 003.mia.mailroute.net ([127.0.0.1])
+ by localhost (003.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id oJtnKahKNBZF; Tue, 23 Sep 2025 15:59:30 +0000 (UTC)
+Received: from [100.119.48.131] (unknown [104.135.180.219])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4cWPms6rGqzlgqVL;
+	Tue, 23 Sep 2025 15:59:25 +0000 (UTC)
+Message-ID: <3f32e7ee-e532-4d69-8848-43d44693e93a@acm.org>
+Date: Tue, 23 Sep 2025 08:59:24 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] blk-mq: Fix more tag iteration function documentation
+To: John Garry <john.g.garry@oracle.com>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+ Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@infradead.org>
+References: <20250922201324.106701-1-bvanassche@acm.org>
+ <d61889c5-a3e2-4a4c-a569-041c9f3e916e@oracle.com>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <d61889c5-a3e2-4a4c-a569-041c9f3e916e@oracle.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 
-ublk_setup_iod() checks first whether the request is a zoned operation
-issued to a device without zoned support and returns BLK_STS_IOERR if
-so. However, such a request would already hit the default case in the
-subsequent switch statement and fail the ublk_queue_is_zoned() check,
-which also results in a return of BLK_STS_IOERR. So remove the redundant
-early check for unsupported zone ops.
+On 9/23/25 12:51 AM, John Garry wrote:
+> On 22/09/2025 21:13, Bart Van Assche wrote:
+>> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+>> index 0602ca7f1e37..271fa005c51e 100644
+>> --- a/block/blk-mq-tag.c
+>> +++ b/block/blk-mq-tag.c
+>> @@ -297,15 +297,15 @@ static bool bt_iter(struct sbitmap *bitmap,=20
+>> unsigned int bitnr, void *data)
+>> =C2=A0 /**
+>> =C2=A0=C2=A0 * bt_for_each - iterate over the requests associated with=
+ a=20
+>> hardware queue
+>> =C2=A0=C2=A0 * @hctx:=C2=A0=C2=A0=C2=A0 Hardware queue to examine.
+>> - * @q:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Request queue to exa=
+mine.
+>> + * @q:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Request queue @hctx =
+is associated with (@hctx->queue).
+>=20
+> eh, sometimes hctx is NULL, so it is odd to be saying that it is the q=20
+> is associated with that (being NULL)
 
-Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
----
- drivers/block/ublk_drv.c | 5 -----
- 1 file changed, 5 deletions(-)
+Thanks for the feedback John.
 
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 5ab7ff5f03f4..fcc8b3868137 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -1103,17 +1103,12 @@ static inline unsigned int ublk_req_build_flags(struct request *req)
- 
- static blk_status_t ublk_setup_iod(struct ublk_queue *ubq, struct request *req)
- {
- 	struct ublksrv_io_desc *iod = ublk_get_iod(ubq, req->tag);
- 	struct ublk_io *io = &ubq->ios[req->tag];
--	enum req_op op = req_op(req);
- 	u32 ublk_op;
- 
--	if (!ublk_queue_is_zoned(ubq) &&
--	    (op_is_zone_mgmt(op) || op == REQ_OP_ZONE_APPEND))
--		return BLK_STS_IOERR;
--
- 	switch (req_op(req)) {
- 	case REQ_OP_READ:
- 		ublk_op = UBLK_IO_OP_READ;
- 		break;
- 	case REQ_OP_WRITE:
--- 
-2.45.2
+Jens, please let me know whether you want me to address this feedback in
+a follow-up patch or by posting a second version of this patch.
 
+Thank you,
+
+Bart.
