@@ -1,55 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81A9E1E8332;
-	Tue, 23 Sep 2025 17:12:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA0D5263F22;
+	Tue, 23 Sep 2025 17:21:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758647554; cv=none; b=jg703fRmWkIwCL/JzybOhSzJ11OI+r224M+eHcEVLE9BqZidHCSk1NEevujcg9os+uZIHPS80dtjZDz/wJfTcbsKgCTuB+PGiCRnqct5DxGyVug6Pa5NiOzebOc+kvoEgOuaILpMin9Q2trOyjibJ5DD+h9Kl9uQcyonkAzFO+s=
+	t=1758648090; cv=none; b=DHELD/WukC+q5yDIpivdwOTfZwzABVUfD0xYFIuPHuovrQ3EBg1t5j8II95r5z0Yb4Gv+t/VtV57bhHZNz845l4LU6dIeGVx2lxg39ogIO4MBx3xPcqWD7go1dS6LISNXnKFXCFGSwlxZJ4Ps86Oq6GaBwTfSM82IjIeG8j+lJM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758647554; c=relaxed/simple;
-	bh=gmK1CGGOGWIE5mxCSSz01jl9806+Hkknw/PF7Rft5eg=;
+	s=arc-20240116; t=1758648090; c=relaxed/simple;
+	bh=oP8tlhraIaWdzTXvEP4dFveNW3qrIDsYFMBZ6ulMe0E=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fdnOhhDea0rILejYKVh6xD+enTdpmCIrqiWQlLH7L/dTPeXcK0m/x039phcl97D8Hbmf0Ooytn9kGT0bUVMitQfqRmQCYoaS7XRZPONGj6nH08rh8YgAnS2277z5kvPXx0nIPfxVqMJJuihabZ9voe8T1CNgJcR0JHQtwC3InGM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=flQS1hBB; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=VtaPGiznPcPnRS2rop9jqrcmMA77uIffnGGjH3qIAQohStYk0MybIru752GCsKl0j3/E0+090aO2mNm01FOdhlMCS6+1Us+OTOU1ke8PdS3An3ChDm3aCx/8yPVlbMAhrzQwOoeEv+dlYQ5SebjWMxVvS+hGDBO9D2TofP5AvTg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BJWEtBkM; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="flQS1hBB"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7895C4CEF5;
-	Tue, 23 Sep 2025 17:12:33 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BJWEtBkM"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69E84C4CEF7;
+	Tue, 23 Sep 2025 17:21:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758647554;
-	bh=gmK1CGGOGWIE5mxCSSz01jl9806+Hkknw/PF7Rft5eg=;
+	s=k20201202; t=1758648089;
+	bh=oP8tlhraIaWdzTXvEP4dFveNW3qrIDsYFMBZ6ulMe0E=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=flQS1hBBI4YVkOhHIOLPDHNMtlCkyfUNIFD9Y3j56A129eJQ7ulgbOQABWCzap9Hj
-	 rl/VZtmwxWaxs1PMRUvTjPUNwlEZn88V/RLG5Kuc+XdNGA5TeIjqOIi+B4X9/FCt4c
-	 Qx+OujTVF/ZwyQKONCRLVjz52uX0o7GV547cRdBjsiAgj+ycng1QAEkqJ6m+YLzWAq
-	 DCNZoSbiGk6YER29JJC0HRMAOqBwNSUqMZUTv1sjBpzIQQgtNOUDKZTBiXF4eLwe8A
-	 xvmArCpm9L4VMxDuuM+3Hd13ks3PqY62OM41EKtcVNBQBVyEfRahPW/H/CtiWATpbl
-	 ddW7gMC2jEh9A==
-Date: Tue, 23 Sep 2025 20:12:28 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: Jason Gunthorpe <jgg@nvidia.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
-	Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>,
-	kvm@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-media@vger.kernel.org, linux-mm@kvack.org,
-	linux-pci@vger.kernel.org, Logan Gunthorpe <logang@deltatee.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Vivek Kasireddy <vivek.kasireddy@intel.com>,
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v2 03/10] PCI/P2PDMA: Refactor to separate core P2P
- functionality from memory allocation
-Message-ID: <20250923171228.GL10800@unreal>
-References: <cover.1757589589.git.leon@kernel.org>
- <1e2cb89ea76a92949d06a804e3ab97478e7cacbb.1757589589.git.leon@kernel.org>
- <20250922150032.3e3da410.alex.williamson@redhat.com>
+	b=BJWEtBkMjpCDsnob1NQxloDk2nadWXEdKJU5RYhXZxKm5+aaNcxaB3+OG8kDNetCY
+	 T7wCcEYTACupIV6fHSw069+H8kIX8jTkCsQTL6mOj57ZBCKLvY2Tc/y9sBQ0RzVIqt
+	 udtpLnnTqJGUhPjptN/G+5oBQDA2VSymoLJZKmWU0p0LMcX4MhN5MOlT4NYMSssdto
+	 rYEDm2yw01Uf76AyvrD7gsqOUWJLlgqr/MdcUJx91YgL4bD8a+SUc1sDWht0HblXP9
+	 6IT+osvoTQalXai9IhWEj7IXJaGsKe5bOcz6rvRdccNfQXfIek0AnpziLfn+vZZy6D
+	 B1Z3CeojQXEfw==
+Date: Tue, 23 Sep 2025 10:21:28 -0700
+From: "Darrick J. Wong" <djwong@kernel.org>
+To: Miklos Szeredi <miklos@szeredi.hu>
+Cc: Joanne Koong <joannelkoong@gmail.com>, brauner@kernel.org,
+	hch@infradead.org, linux-block@vger.kernel.org,
+	gfs2@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+	linux-xfs@vger.kernel.org, linux-doc@vger.kernel.org,
+	hsiangkao@linux.alibaba.com, kernel-team@meta.com
+Subject: Re: [PATCH v4 13/15] fuse: use iomap for read_folio
+Message-ID: <20250923172128.GD1587915@frogsfrogsfrogs>
+References: <20250923002353.2961514-1-joannelkoong@gmail.com>
+ <20250923002353.2961514-14-joannelkoong@gmail.com>
+ <CAJfpegsBRg6hozmZ1-kfYaOTjn3HYcYMJrGVE_z-gtqXWbT_=w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -58,78 +47,48 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250922150032.3e3da410.alex.williamson@redhat.com>
+In-Reply-To: <CAJfpegsBRg6hozmZ1-kfYaOTjn3HYcYMJrGVE_z-gtqXWbT_=w@mail.gmail.com>
 
-On Mon, Sep 22, 2025 at 03:00:32PM -0600, Alex Williamson wrote:
-> On Thu, 11 Sep 2025 14:33:07 +0300
-> Leon Romanovsky <leon@kernel.org> wrote:
+On Tue, Sep 23, 2025 at 05:39:13PM +0200, Miklos Szeredi wrote:
+> On Tue, 23 Sept 2025 at 02:34, Joanne Koong <joannelkoong@gmail.com> wrote:
 > 
-> > From: Leon Romanovsky <leonro@nvidia.com>
-> > 
-> > Refactor the PCI P2PDMA subsystem to separate the core peer-to-peer DMA
-> > functionality from the optional memory allocation layer. This creates a
-> > two-tier architecture:
-> > 
-> > The core layer provides P2P mapping functionality for physical addresses
-> > based on PCI device MMIO BARs and integrates with the DMA API for
-> > mapping operations. This layer is required for all P2PDMA users.
-> > 
-> > The optional upper layer provides memory allocation capabilities
-> > including gen_pool allocator, struct page support, and sysfs interface
-> > for user space access.
-> > 
-> > This separation allows subsystems like VFIO to use only the core P2P
-> > mapping functionality without the overhead of memory allocation features
-> > they don't need. The core functionality is now available through the
-> > new pci_p2pdma_enable() function that returns a p2pdma_provider
-> > structure.
-> > 
-> > Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-> > ---
-> >  drivers/pci/p2pdma.c       | 129 +++++++++++++++++++++++++++----------
-> >  include/linux/pci-p2pdma.h |   5 ++
-> >  2 files changed, 100 insertions(+), 34 deletions(-)
-
-<...>
-
-> > -static int pci_p2pdma_setup(struct pci_dev *pdev)
-> > +/**
-> > + * pcim_p2pdma_enable - Enable peer-to-peer DMA support for a PCI device
-> > + * @pdev: The PCI device to enable P2PDMA for
-> > + * @bar: BAR index to get provider
-> > + *
-> > + * This function initializes the peer-to-peer DMA infrastructure for a PCI
-> > + * device. It allocates and sets up the necessary data structures to support
-> > + * P2PDMA operations, including mapping type tracking.
-> > + */
-> > +struct p2pdma_provider *pcim_p2pdma_enable(struct pci_dev *pdev, int bar)
+> >  static int fuse_read_folio(struct file *file, struct folio *folio)
 > >  {
-> > -	int error = -ENOMEM;
-> >  	struct pci_p2pdma *p2p;
-> > +	int i, ret;
-> > +
-> > +	p2p = rcu_dereference_protected(pdev->p2pdma, 1);
-> > +	if (p2p)
-> > +		/* PCI device was "rebound" to the driver */
-> > +		return &p2p->mem[bar];
-> >  
+> >         struct inode *inode = folio->mapping->host;
+> > -       int err;
+> > +       struct fuse_fill_read_data data = {
+> > +               .file = file,
+> > +       };
+> > +       struct iomap_read_folio_ctx ctx = {
+> > +               .cur_folio = folio,
+> > +               .ops = &fuse_iomap_read_ops,
+> > +               .read_ctx = &data,
+> >
+> > -       err = -EIO;
+> > -       if (fuse_is_bad(inode))
+> > -               goto out;
+> > +       };
+> >
+> > -       err = fuse_do_readfolio(file, folio, 0, folio_size(folio));
+> > -       if (!err)
+> > -               folio_mark_uptodate(folio);
+> > +       if (fuse_is_bad(inode)) {
+> > +               folio_unlock(folio);
+> > +               return -EIO;
+> > +       }
+> >
+> > +       iomap_read_folio(&fuse_iomap_ops, &ctx);
 > 
-> This seems like two separate functions rolled into one, an 'initialize
-> providers' and a 'get provider for BAR'.  The comment above even makes
-> it sound like only a driver re-probing a device would encounter this
-> branch, but the use case later in vfio-pci shows it to be the common
-> case to iterate BARs for a device.
+> Why is the return value ignored?
+
+There is no return value:
+https://lore.kernel.org/linux-fsdevel/20250923002353.2961514-13-joannelkoong@gmail.com/T/#u
+
+Errors get set on the file/mapping/sb, nobody checks the return value
+of ->read_folio.
+
+--D
+
+> Thanks,
+> Miklos
 > 
-> But then later in patch 8/ and again in 10/ why exactly do we cache
-> the provider on the vfio_pci_core_device rather than ask for it on
-> demand from the p2pdma?
-
-In addition to what Jason said about locking. The whole p2pdma.c is
-written with assumption that "pdev->p2pdma" pointer is assigned only
-once during PCI device lifetime. For example, see how sysfs files
-are exposed and accessed in p2pdma.c.
-
-Once you initialize p2pdma, it is much easier to initialize all BARs at
-the same time.
-
-Thanks
