@@ -1,109 +1,104 @@
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 783008F40
-	for <linux-block@vger.kernel.org>; Tue, 23 Sep 2025 18:27:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B14671D5146;
+	Tue, 23 Sep 2025 18:30:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758652048; cv=none; b=Y28/EvnN9dAiRYVs6bNnILCUFFD3qP2Ny12fvMHEPu394WOWOwGZY/ShvStJtD2isrei6WJF74MfYVni0MCavZmSrotogSIS46X83hyNd/nuYhGRW5GqL5xbVdpA5JHc3Hs52fIBlL333eYlR01eIro+boo9uLqR6s5ZlB/CSYs=
+	t=1758652259; cv=none; b=WZJqfUUL2IakVq+4oL4LUaP67BH94FZXZrValhIKrGP/4gHDzVrySWuwAfabyvZ+4djvXIeJAUP2aqvxltqq5xPLqAlC/7qXR/ZDUkvjdCYkQiSszxXH2mhbrdw4hTeOEOjQyFJvVvw4HCikcdaVAZcSqS5bGtUvelyAupXukyM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758652048; c=relaxed/simple;
-	bh=TIRh66icGgGezgzsqgs7P3L7KfAhtSSEJfm6TyOQI4Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hvx+smefubxEaVJM8jFK03i+k8WUrOAFnKo7JIsAnlcpDVI9OhZzCksUOX3yhsRewWUgceiL0LvJAP/yphZy3l94r5WRxRLOR4nUk+/a+7RUAodo0xEVZnl49e/6SQIjpbYl9siPXJ/43POmLViAO18GXsioKr9o4N7grsA4jSk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=1vltctfr; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1758652259; c=relaxed/simple;
+	bh=gxKH7wZVbZJUgsdcRmV6yXRnCWQ9TqZ9bpedLe1yt7s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uVrFjialsgDG3tOimC/Btv70vsr7w9/2R83f4nqsInRSs4SXZWtaxGCpaHQ8vNJhXlEbazZGXaozHXLQxUMBtguJ3r+haVBUAgFuds+F0DCCBsYgzhdYHUYUaN2CBYA3EsZ83IhH25ctSe4ypkQDyig9QR2eYU3CRYY9i+n5zb0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S4ZXIaWM; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="1vltctfr"
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-46e2826d5c6so1632005e9.1
-        for <linux-block@vger.kernel.org>; Tue, 23 Sep 2025 11:27:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1758652042; x=1759256842; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=2Tpv6P8JmM6lXIi7hhEW08iRJIJzegZma6FTeTqinVs=;
-        b=1vltctfr+cWuUv7aCqwSs/+s9NXOGfpw+Yqg4Kw/Y39QM+zstOBZa6jgzCCtHzVKaK
-         zmfzhm3Ng6kh8lbPo5fcuYudKZLcX+sj4kNsn4Eq1Ko/4NjZIyVXHzipXAI58R66gRZ2
-         pSreK6hjVlILaGaYHlHLOrjGW5Oys1Ij0UGj7GRPTNBUOdUvnRO3/HMih15fKoBh892b
-         0X+S9/z4jZmgJJnEv4FCYtOz1RwuFr73LNRe4AuQt8vhh8ajSbYG8o4Xoa3sci5elwQp
-         MqWvFlIhvk69YperK21NL3HzLu0lWGu5PizaCG3R9AxRrwYKfFvO7PQlOXUg3WDC19Ly
-         qQcg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758652042; x=1759256842;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2Tpv6P8JmM6lXIi7hhEW08iRJIJzegZma6FTeTqinVs=;
-        b=N/Sa3vKH0WRPzCDfO8CfBIjJfugx7jPNaO6ygcUy+x2Tm/0m3QtEaNRkE6McB5KBM/
-         GL7oCyCzawM1rsRIq8GU39ZU5JU4YFo/BAHb4IN7RtPPjDReOaigJwBSkIDvAU8edbjR
-         JGV0aGWVhLU0SJgnui+AVE8vk8CBBEaIg1Jh7FBr/Sz/KgYNFE9v8ldAxevpmwXlsCpz
-         QGrRFU/wNSKqfoldl9eG5/vSVns3mojvbuu0Wx+SjgS6LQ+S+P4kVxNtXI/SpwXMtsMz
-         jBFK9QwZdV4QOEQjMzOc+Y+8IjSGywGbvyUqM5acelORRQ8spxr8dAi8KDu6y5b4OPtd
-         lj6w==
-X-Gm-Message-State: AOJu0YxgZGhHXRyRuSsL+d5bQpQWUePoIy+egtkzBm7ZkubMlBAZ6eGt
-	ni8bjFxpJuTP8AT1jMyqQCuhvNEWxZ4H/5wzokiWGvb3gQAADM6WetwB8PCP9DUrJ/s=
-X-Gm-Gg: ASbGncspqdw7FOwvniNrb0JNS39QHWJZcjwZNBPm3opWuvKd4SrrpB3YEbXrfhJuFuV
-	CkByLDXTU/sQqs7V8Eq/sGmDPxDhb50Sosuw71mxyOgm5oPUanc0+ufeykiRMOUJGXuu/MbJtMG
-	ybvoIHSk1SqC5GcnRmRg6o9Yfb/VUZZ6P5zJq+NugV7lIiLjymi08lX7uBcwOoyZQEPbKtLViKw
-	qHb2pgUSIuymDCzhzxydbZlmg7STPovqwgVXp01D1bprumHkTdK8ILg0VyEtRfbHZorV3oGcZoS
-	/W13VIazkUoGDzafEH7cP0ZXlfmfVOA2D8814iBaXgvoekpPrt3zWZ02RA5/G6aXLZ2vQKOnGWE
-	s4+eOuDEYkRSyANXkyEOn
-X-Google-Smtp-Source: AGHT+IHKGh4qVOyD6LIIIINW3oEE+gJP8wA608qR91ZoF/P1odN6oDrgCoh7tWIYzJ74YfWOMS+n3w==
-X-Received: by 2002:a05:600c:3582:b0:45b:71ac:b45a with SMTP id 5b1f17b1804b1-46e1d980718mr41615935e9.11.1758652041659;
-        Tue, 23 Sep 2025 11:27:21 -0700 (PDT)
-Received: from [172.17.2.81] ([178.208.16.192])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4613ddc01e6sm285145315e9.18.2025.09.23.11.27.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 23 Sep 2025 11:27:21 -0700 (PDT)
-Message-ID: <49377ab3-0e5c-4767-8351-65a8d2340ad2@kernel.dk>
-Date: Tue, 23 Sep 2025 12:27:20 -0600
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S4ZXIaWM"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB030C4CEF5;
+	Tue, 23 Sep 2025 18:30:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758652259;
+	bh=gxKH7wZVbZJUgsdcRmV6yXRnCWQ9TqZ9bpedLe1yt7s=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=S4ZXIaWM41Ablw/mVVeAaJkiSYgUA1XjiTWt5LSH4qwLIacOxMZE3jScnz0xix1Wv
+	 SAp5BLuT2R2dCAYXxRdOCtJez17N/cBe9kv8+xOmcpzYoZ/UpcFkDX5GmNuOLJGCFV
+	 Bcs4RLVyhjVQyFhRGAbe1bDHxUFJbKgGu/3vW1Mt1BkujhZ/XZn25PIvUn5jT3S9nw
+	 YVX4n2lhWFpC/hhBuXD/s3h9/tXRxQArUIgc5V0sUKhDNiOC8ABgtjM7Q3+LQGe+ys
+	 cSfhtq2Jd52bcQy4LLrP2uqO++/e9zs0F7UgxrbinfFgheCfADXwZVzyKQ2yU+i53A
+	 XGP2nnt2Bp5Ig==
+Date: Tue, 23 Sep 2025 12:30:55 -0600
+From: Keith Busch <kbusch@kernel.org>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Leon Romanovsky <leon@kernel.org>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Abdiel Janulgue <abdiel.janulgue@gmail.com>,
+	Alexander Potapenko <glider@google.com>,
+	Alex Gaynor <alex.gaynor@gmail.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Christoph Hellwig <hch@lst.de>, Danilo Krummrich <dakr@kernel.org>,
+	David Hildenbrand <david@redhat.com>, iommu@lists.linux.dev,
+	Jason Wang <jasowang@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+	Joerg Roedel <joro@8bytes.org>, Jonathan Corbet <corbet@lwn.net>,
+	Juergen Gross <jgross@suse.com>, kasan-dev@googlegroups.com,
+	linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+	linux-nvme@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
+	linux-trace-kernel@vger.kernel.org,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	Robin Murphy <robin.murphy@arm.com>, rust-for-linux@vger.kernel.org,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Stefano Stabellini <sstabellini@kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	virtualization@lists.linux.dev, Will Deacon <will@kernel.org>,
+	xen-devel@lists.xenproject.org
+Subject: Re: [PATCH v6 00/16] dma-mapping: migrate to physical address-based
+ API
+Message-ID: <aNLnXwAJveHIqfz0@kbusch-mbp>
+References: <CGME20250909132821eucas1p1051ce9e0270ddbf520e105c913fa8db6@eucas1p1.samsung.com>
+ <cover.1757423202.git.leonro@nvidia.com>
+ <0db9bce5-40df-4cf5-85ab-f032c67d5c71@samsung.com>
+ <20250912090327.GU341237@unreal>
+ <aM1_9cS_LGl4GFC5@kbusch-mbp>
+ <20250920155352.GH10800@unreal>
+ <aM9LH6WSeOPGeleY@kbusch-mbp>
+ <20250923170936.GA2614310@nvidia.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] blk-mq: Fix more tag iteration function documentation
-To: Bart Van Assche <bvanassche@acm.org>, John Garry <john.g.garry@oracle.com>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
- Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@infradead.org>
-References: <20250922201324.106701-1-bvanassche@acm.org>
- <d61889c5-a3e2-4a4c-a569-041c9f3e916e@oracle.com>
- <3f32e7ee-e532-4d69-8848-43d44693e93a@acm.org>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <3f32e7ee-e532-4d69-8848-43d44693e93a@acm.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250923170936.GA2614310@nvidia.com>
 
-On 9/23/25 9:59 AM, Bart Van Assche wrote:
-> On 9/23/25 12:51 AM, John Garry wrote:
->> On 22/09/2025 21:13, Bart Van Assche wrote:
->>> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
->>> index 0602ca7f1e37..271fa005c51e 100644
->>> --- a/block/blk-mq-tag.c
->>> +++ b/block/blk-mq-tag.c
->>> @@ -297,15 +297,15 @@ static bool bt_iter(struct sbitmap *bitmap, unsigned int bitnr, void *data)
->>>   /**
->>>    * bt_for_each - iterate over the requests associated with a hardware queue
->>>    * @hctx:    Hardware queue to examine.
->>> - * @q:        Request queue to examine.
->>> + * @q:        Request queue @hctx is associated with (@hctx->queue).
->>
->> eh, sometimes hctx is NULL, so it is odd to be saying that it is the q is associated with that (being NULL)
+On Tue, Sep 23, 2025 at 02:09:36PM -0300, Jason Gunthorpe wrote:
+> On Sat, Sep 20, 2025 at 06:47:27PM -0600, Keith Busch wrote:
+> > 
+> > One other thing to note, this was runing on arm64 platform using smmu
+> > configured with 64k pages. If your iommu granule is 4k instead, we
+> > wouldn't use the blk_dma_map_direct path.
 > 
-> Thanks for the feedback John.
+> I spent some time looking to see if I could guess what this is and
+> came up empty. It seems most likely we are leaking a dma mapping
+> tracking somehow? The DMA API side is pretty simple here though..
+
+Yeah, nothing stood out to me here either.
+ 
+> Not sure the 64k/4k itself is a cause, but triggering the non-iova
+> flow is probably the issue.
 > 
-> Jens, please let me know whether you want me to address this feedback in
-> a follow-up patch or by posting a second version of this patch.
+> Can you check the output of this debugfs:
 
-As per my applied email, it's already applied. And it's sitting a few
-patches down at this point. I don't think there's a rush in fixing a
-comment, so perhaps just do it next time you're touching that area
-anyway.
+I don't have a system in this state at the moment, so we checked
+previous logs on machines running older kernels. It's extermely
+uncommon, but this error was happening prior to this series, so I don't
+think this introduced any new problem here. I'll keeping looking, but I
+don't think we'll make much progress if I can't find a more reliable
+reproducer.
 
--- 
-Jens Axboe
+Thanks!
