@@ -1,127 +1,104 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f42.google.com (mail-oo1-f42.google.com [209.85.161.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 008DF4502F;
-	Tue, 23 Sep 2025 07:11:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37DF15789D
+	for <linux-block@vger.kernel.org>; Tue, 23 Sep 2025 07:36:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758611481; cv=none; b=f5tSwxtYd7M9ZmzKy3YVjlTsz5mq7fgUG+QTU/bDqj8tlgLXORIUIvPML6Knw/TMeCA3mxhiO+ejMJd9sOYnLPFMjXQH06j2oTMKyspVUH7r7fvEIRRDMPoMWxCbMmDmaP3eD/vGaptFO1RrNgZFoBf/tQQTdu3/wkVW7klM0UM=
+	t=1758613000; cv=none; b=n4VpWQz6T1bEBuTA/GOe+xMP+y7aSG5X0SLkDre0vnwn+1lets3TnMHmMDdzN5x4qgONWBHcw4adF8/bRrJcl6A1tng2bH0shpr8+OSEmakxgj8sVENOB7vzIns1yzi/Zdc+S4AOeQrHyTeNIxpy212hY/L4S95glBEzMK1xo4A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758611481; c=relaxed/simple;
-	bh=waC9dgIqg8z/AIiVMHOz+qm2FlxkiISRWa2YwZxCvBM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=uHgSMV9KDR6J67qCs1bpZAJRVEMRt3rol/giLDisJie+wPfVECFFWyi1I2ihhryA+cUNu48kS9PhdOxCWfc1dH2NG/ET60GHJwPNJIkGn2y5Dy7ijY/iqd1dq0m/uizKcNl0MAuxbZFtAoQpbAYKPBGZ2/eHpQl0enyW6iTokRo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4cWB3L3hclzKHMW3;
-	Tue, 23 Sep 2025 15:11:10 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 568E01A0F60;
-	Tue, 23 Sep 2025 15:11:15 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.104.67])
-	by APP4 (Coremail) with SMTP id gCh0CgD3CGEPSNJofU8hAg--.14578S4;
-	Tue, 23 Sep 2025 15:11:13 +0800 (CST)
-From: Yu Kuai <yukuai1@huaweicloud.com>
-To: axboe@kernel.dk,
-	martin.petersen@oracle.com,
-	hare@suse.de,
-	ming.lei@redhat.com
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	yukuai3@huawei.com,
-	yukuai1@huaweicloud.com,
-	yi.zhang@huawei.com,
-	yangerkun@huawei.com,
-	johnny.chenyi@huawei.com
-Subject: [PATCH] blk-mq: fix null-ptr-deref in blk_mq_free_tags() from error path
-Date: Tue, 23 Sep 2025 15:01:01 +0800
-Message-Id: <20250923070101.3507251-1-yukuai1@huaweicloud.com>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1758613000; c=relaxed/simple;
+	bh=Doy12JHJ1QdbigZcVC8weYmIDB/n15heyBBBZQGSXi8=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=OV8ohRqK3goWqiyULcg17NZ7CoRdlQ2GE9CJKuhwn3Dmwmy+iiisOXL7CtykPP16Nu2Q6+inpJo9YcINbG+bSzHHzRTXFir5INWdtz8z+X5WfTU3LgOqjfs19JrRUJz57CU4SQd229jBO+R5p2+tEhUEDBJKLBk+irwCUCf5wh4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=oWhlp44n; arc=none smtp.client-ip=209.85.161.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="oWhlp44n"
+Received: by mail-oo1-f42.google.com with SMTP id 006d021491bc7-6219257cb0fso689514eaf.2
+        for <linux-block@vger.kernel.org>; Tue, 23 Sep 2025 00:36:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1758612997; x=1759217797; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XZTXYGDWrb7C8J087XBul2Wu+MAhbxhji+L53zCPt8c=;
+        b=oWhlp44nWbXE2cJXE6nEObBKhC2kAzzpixfn/POM0yTXsgkVnkj5eQiJBMz1fW62D2
+         zWz1nhZNrERMUwSgCt/6x0wGRSFlPMpz/BFeIsvHMp+hRjkzFIYttfnRiIzL2RxqZTZf
+         A/MiqyWNkQDC8IH0ZIDC9BeVJs2RLOca4cxSCmIQghE1B30vrk5r19CC11U+3WCgVcvX
+         F1VJvkv/lZkAcBnUFaU3Rg93J212sCCwTeZnj+47HD4JNyxrDxFgibOdnbrVgM2p8wKD
+         GfinpsGMwQuaKCXtYB4utBkNjA237HU4uHpQoPfUiYo6n6MruUBi6sRlLvkDGRsjV5tm
+         HiRA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758612997; x=1759217797;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=XZTXYGDWrb7C8J087XBul2Wu+MAhbxhji+L53zCPt8c=;
+        b=my+2DmRckVDEJJPS8elwPQuQHTC1IgGUsjG58VU7HvQTutTBDu5eXQJ4TxTd8mlx51
+         J1sbFFk/WrOVGSXFV5mSbx3p8Tmzg0SYS1KqjdDvUdQx4tZIv/J7EH76OcWQll399A0N
+         0YoXgUu65hJAI3ElyfHbhRAKR9LuEIHTkrCYmOcbIGp81ml3bcU2MQ6Ar1j35FESlkhp
+         oSFQR7AuUf+1Up8vOFQjJ1NA+YuNFZmVETd3XyXPFHpAaDLn8qpWCbOCCbEHYjjHiAPn
+         fDx7irxEtHDCwHIC9t/xaI/vWwFdmuumwilznpaIm7RL8x+o1uSSq4CR4mdrJcnEGuI+
+         wviQ==
+X-Gm-Message-State: AOJu0Yyx3NEOiepFzXSKXziyfL+wJhOX/Ewu4uVyTYwGpE1iqF3ZgVt2
+	57VGJNa4k2uqtHE2+594gq8CIEMq0yK475zz3z94LcYaibUDRUt4wkrocLe20rUo8L7QL8AwFT7
+	hc3yexoNl1w==
+X-Gm-Gg: ASbGncsHUgCaZiqXDjfrCl0istj8cMcdG9V6u2fjSXUtHCYYmT5Ql+rAV25UibRLGEW
+	yIdu3f/9TknDGI7f9zQgfl4SoHKkvLzTZbiqkBrpa1ewaw5NH+o2D9c3H86XX0+rgXAZqt09LUN
+	LtKBUcJ8GsAaQCxLOFO7HlvxFCAwYroFpdDorc+PDSM8A/TEEKAwH1xIkzkgJzejHJjcTsbSLG/
+	F2ZanWlWB3ux5KxxqlXoit+p4KdmuK/KEWXD6Zy/DYjjbpNStZAxsDEXDXLg71YzyhKcVY+YT3T
+	odG60ua/jQYLtpM2Dy4V26HfLtNQg+CtsDeJ9CaPsaTfhiyebJPc2oZuYVzpbOqITJ1HgZ97CUa
+	qc3BqiIk87EDyakCuYxdV
+X-Google-Smtp-Source: AGHT+IGEnfNa5jqUIAzVSLji+rj40a8Wk8m3DmSZpsHkwIloLFM6TqzxMWEp36PzqFprqp3s5irrnA==
+X-Received: by 2002:a05:6820:1c98:b0:621:9802:d183 with SMTP id 006d021491bc7-6330f72837cmr899233eaf.6.1758612997270;
+        Tue, 23 Sep 2025 00:36:37 -0700 (PDT)
+Received: from [127.0.0.1] ([2600:381:1d02:9377:13f5:b434:ef16:6886])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7691ac53551sm6971622a34.11.2025.09.23.00.36.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Sep 2025 00:36:36 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: martin.petersen@oracle.com, hare@suse.de, ming.lei@redhat.com, 
+ Yu Kuai <yukuai1@huaweicloud.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ yukuai3@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com, 
+ johnny.chenyi@huawei.com
+In-Reply-To: <20250923070101.3507251-1-yukuai1@huaweicloud.com>
+References: <20250923070101.3507251-1-yukuai1@huaweicloud.com>
+Subject: Re: [PATCH] blk-mq: fix null-ptr-deref in blk_mq_free_tags() from
+ error path
+Message-Id: <175861299450.153465.2022974135907413149.b4-ty@kernel.dk>
+Date: Tue, 23 Sep 2025 01:36:34 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgD3CGEPSNJofU8hAg--.14578S4
-X-Coremail-Antispam: 1UD129KBjvJXoW7AFy3Xr4UKrWrGrW5JF15XFb_yoW8uw4UpF
-	W3Ga1UK343KrnrZFsrta9rA340kanYqF4xGas3uw15ZrnxCrWagF1vqr45Zr10vrZ8CFsI
-	gF45tryrA3WDJ37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9Y14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
-	Y2ka0xkIwI1lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x
-	0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2
-	zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF
-	4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWU
-	CwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCT
-	nIWIevJa73UjIFyTuYvjfUonmRUUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3-dev-2ce6c
 
-From: Yu Kuai <yukuai3@huawei.com>
 
-blk_mq_free_tags() can be called after blk_mq_init_tags(), while
-tags->page_list is still not initialized, causing null-ptr-deref.
+On Tue, 23 Sep 2025 15:01:01 +0800, Yu Kuai wrote:
+> blk_mq_free_tags() can be called after blk_mq_init_tags(), while
+> tags->page_list is still not initialized, causing null-ptr-deref.
+> 
+> Fix this problem by initializing tags->page_list at blk_mq_init_tags(),
+> meanwhile, also free tags directly from error path because there is no
+> srcu barrier.
+> 
+> [...]
 
-Fix this problem by initializing tags->page_list at blk_mq_init_tags(),
-meanwhile, also free tags directly from error path because there is no
-srcu barrier.
+Applied, thanks!
 
-Fixes: ad0d05dbddc1 ("blk-mq: Defer freeing of tags page_list to SRCU callback")
-Reported-by: syzbot+5c5d41e80248d610221f@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/all/68d1b079.a70a0220.1b52b.0000.GAE@google.com/
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
- block/blk-mq-tag.c | 9 +++++++++
- block/blk-mq.c     | 2 --
- 2 files changed, 9 insertions(+), 2 deletions(-)
+[1/1] blk-mq: fix null-ptr-deref in blk_mq_free_tags() from error path
+      commit: 670bfe683850cb29957a9d71f997e9774eb24de6
 
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index a63d21a4aab4..23f7731f19d1 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -569,6 +569,8 @@ struct blk_mq_tags *blk_mq_init_tags(unsigned int total_tags,
- 	tags->nr_tags = total_tags;
- 	tags->nr_reserved_tags = reserved_tags;
- 	spin_lock_init(&tags->lock);
-+	INIT_LIST_HEAD(&tags->page_list);
-+
- 	if (bt_alloc(&tags->bitmap_tags, depth, round_robin, node))
- 		goto out_free_tags;
- 	if (bt_alloc(&tags->breserved_tags, reserved_tags, round_robin, node))
-@@ -606,6 +608,13 @@ void blk_mq_free_tags(struct blk_mq_tag_set *set, struct blk_mq_tags *tags)
- {
- 	sbitmap_queue_free(&tags->bitmap_tags);
- 	sbitmap_queue_free(&tags->breserved_tags);
-+
-+	/* if tags pages is not allocated yet, free tags directly */
-+	if (list_empty(&tags->page_list)) {
-+		kfree(tags);
-+		return;
-+	}
-+
- 	call_srcu(&set->tags_srcu, &tags->rcu_head, blk_mq_free_tags_callback);
- }
- 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 4ccf11cadf8c..09f579414161 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -3582,8 +3582,6 @@ static int blk_mq_alloc_rqs(struct blk_mq_tag_set *set,
- 	if (node == NUMA_NO_NODE)
- 		node = set->numa_node;
- 
--	INIT_LIST_HEAD(&tags->page_list);
--
- 	/*
- 	 * rq_size is the size of the request plus driver payload, rounded
- 	 * to the cacheline size
+Best regards,
 -- 
-2.39.2
+Jens Axboe
+
+
 
