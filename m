@@ -1,205 +1,193 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from PH8PR06CU001.outbound.protection.outlook.com (mail-westus3azon11012039.outbound.protection.outlook.com [40.107.209.39])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6A6E30AAAD
-	for <linux-block@vger.kernel.org>; Tue, 23 Sep 2025 20:07:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758658055; cv=none; b=J2AXEQnGeQT0grQf0x3mVX/kTPKSJs8z2Mesju0szpI9gnir/b4o4iinUuCOs9hW6VT38EFUn2DMRMH+hu+YvFy+Aim2pem4BOAk9RDit2B8qhal2yv3E1eX849vZkOFwSeBKeui/z5hcozpCZhMC9GnTsWZ71GFy0CxASnVSXM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758658055; c=relaxed/simple;
-	bh=/cNMCmhs2+2GgzKjW2K7MV1lRjCXVMAS8z1dlxsrJ7Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WNoviBBu9liHU9PSETZLmz1jxy3q3wHVR7v6aILRAg2yEYoAzcI18ZJyv4a3JN780GI6zhah027XAxFO2cZbwuPVNlrS4GZWTZwrl33SYx/29ZivXA5AasuKmQKDLTQHDvZx8cQwzzj+sJZLfEqJuPfVw7r1AitfF47bohCxMp4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=O3OYfyCM; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D236A48;
+	Tue, 23 Sep 2025 22:22:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.209.39
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758666144; cv=fail; b=gyGKYiRTec9EIu9pCsjsaWakLzjyxifV6wibYwnPaZCa7fkegDK4DXb9kGS1FtWDn9JLvfZangDW7GK/9Jh5evaIGDJZqsUxJeVW1xoSG1pRM4TmdxHHCGwAz+LYHqY9gWOSLdzAoIT2i/TPR4Y9xiIgKS7xybnxLXdpwc7RtcQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758666144; c=relaxed/simple;
+	bh=6hQxSPueRjqivytB2WxD4yT9ZIay1EdItgh7HO++yOU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=MZVwsWy9QasZXzbBSVqGY6g4LigfdNMvjmYR98TFp7qLPt4UjYE5X5e5OnHn49ULImnVagP4/joQIVlly2WP2TYpp9ZjNil1BgzkSP2q9XQUWmLoI1HVsqZvMNuWndXHbGCBDPkMr5Dw0OBUkD3TS/7fn9+vKwBLfKYfIvi09eE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=o6lXNIV2; arc=fail smtp.client-ip=40.107.209.39
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O3OYfyCM"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1758658051;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TkF/1TIVCdQ8I35UWInq/5XGtjT7LO6t3DfocUuGzJk=;
-	b=O3OYfyCM0C0c8clLZWn+qQlJQoBIRrglL50p5TcwDCIKXa0ozidZEWQmd7g1Kcgie8SgKi
-	FStXl+SJt4FSJ7nZoGI7JGQQSK06UFe4k8mgHyzV8wvz9P3zcqJROni/GBlRgJRlJRsEGi
-	BC0vvlZJzDhB8750Zqlg26sijLazV2Y=
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com
- [209.85.166.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-528-C1etvRTsOoK6USPUSVfHpw-1; Tue, 23 Sep 2025 16:07:30 -0400
-X-MC-Unique: C1etvRTsOoK6USPUSVfHpw-1
-X-Mimecast-MFC-AGG-ID: C1etvRTsOoK6USPUSVfHpw_1758658049
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-4257fce57faso1713075ab.1
-        for <linux-block@vger.kernel.org>; Tue, 23 Sep 2025 13:07:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758658048; x=1759262848;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TkF/1TIVCdQ8I35UWInq/5XGtjT7LO6t3DfocUuGzJk=;
-        b=bnnHUsUdV6Ss1WPpCRKUB57Agl5C+FiTjmoQVk/ehmtOZV7idcFS27puzBlS/5Sb+O
-         OvVANFv2Y4FUSqv5ALZipQJFteOuA5xMAK5mx6eV1QjSDVieMcjnod80rxuTqIQsenZp
-         xRoX/1bO9PwANiIOP+90b5aoJpPnZVw94Vnb96YRV9G2zrke2YE7YflXpLi6DMxE/yNZ
-         njE5czwSlIVX8k8ONe0Bszejfk0pqA0zKFWlXuTxRyI+DEl2PQ6/vxnXHF7rd6vOZMiy
-         IgVTZketaWLSAaBke7gGBAsZont0ggE1maznqT6g6t70K2dE4tv6MBxw3xl9r+8uTSDM
-         rYow==
-X-Forwarded-Encrypted: i=1; AJvYcCUnR6eBWbF9bug9zCO1fEeS8yh1heNy+66ZkytTyWgKsEXDcR7IO9tqd4tB6z99r/gieAysYKG3qCtP6A==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy2QA04nBwztlC2TzjTzYlXURP6mY9ShLgTKmpaEvml4PeJHP1Y
-	5HalBjHCKM1krHyaaSEVivVk102m3Cai3Q5WaHcZNyt/+r85nvi5dAElSDGXH5Jx4R3rM8ZIGz8
-	3Ba1tI4gntMAzKfBDWvmgK7r/dSHNFcbVfvtQdOOYbdZEEk/do8PorFoWZsgzIDZft94B1gwE
-X-Gm-Gg: ASbGncsREJAMwbwItFhe0Z8H5Uvctbl2m9O4Gt7dECgKCzpCZxU1iLECYN+4HgsETwD
-	vu9rgSVMCM1fSxVevNiaWSMaH9k+1eWLRMEfZDEHc3ga3hFbrtiR7BHDF9kRH/s09UkINV5i01L
-	jlIkYijzc4peNI8EbpdgQFiz/RcDQ3PhwIG/PDyo/RFxbqtCLt2Yv2VH8a8bYDkR98lD+65egmu
-	d4uWbt9+Go4tSisszJucjSgo6ntguBRtgCJbABcKuqnh53tOxfng0lF5EGZoZ7eh2LvOEW7+bqq
-	u7gmtKe2fULdw0m74HJ0Mj6cClJfghJI2JDZBkXNW2w=
-X-Received: by 2002:a05:6e02:b27:b0:423:fd07:d3fe with SMTP id e9e14a558f8ab-42581e0924amr21638595ab.2.1758658048121;
-        Tue, 23 Sep 2025 13:07:28 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEmMxIqHNMDHwq6jPuldjwSxK84807XGPUliuEF5qCvF8SuPWmF0LqQLkrDELCWNHqAt6pi1g==
-X-Received: by 2002:a05:6e02:b27:b0:423:fd07:d3fe with SMTP id e9e14a558f8ab-42581e0924amr21638385ab.2.1758658047638;
-        Tue, 23 Sep 2025 13:07:27 -0700 (PDT)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-425813f3053sm15141865ab.21.2025.09.23.13.07.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Sep 2025 13:07:26 -0700 (PDT)
-Date: Tue, 23 Sep 2025 14:07:23 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Jason Gunthorpe <jgg@nvidia.com>, Andrew Morton
- <akpm@linux-foundation.org>, Bjorn Helgaas <bhelgaas@google.com>, Christian
- =?UTF-8?B?S8O2bmln?= <christian.koenig@amd.com>,
- dri-devel@lists.freedesktop.org, iommu@lists.linux.dev, Jens Axboe
- <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
- linaro-mm-sig@lists.linaro.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
- linux-mm@kvack.org, linux-pci@vger.kernel.org, Logan Gunthorpe
- <logang@deltatee.com>, Marek Szyprowski <m.szyprowski@samsung.com>, Robin
- Murphy <robin.murphy@arm.com>, Sumit Semwal <sumit.semwal@linaro.org>,
- Vivek Kasireddy <vivek.kasireddy@intel.com>, Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v2 03/10] PCI/P2PDMA: Refactor to separate core P2P
- functionality from memory allocation
-Message-ID: <20250923140723.14c63741.alex.williamson@redhat.com>
-In-Reply-To: <20250923171228.GL10800@unreal>
-References: <cover.1757589589.git.leon@kernel.org>
-	<1e2cb89ea76a92949d06a804e3ab97478e7cacbb.1757589589.git.leon@kernel.org>
-	<20250922150032.3e3da410.alex.williamson@redhat.com>
-	<20250923171228.GL10800@unreal>
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="o6lXNIV2"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=iAi4sSpYU9zuO+eSlj02D1mT2vZrlCE9aXEYDzIMmitSqBQN+2VX1ibr/mnZKWw3OrO8UObY54jLJ8nPhouBUlHrKK0TI/5UrLPi6iTMXVIMSDrwPXT54A/HWJST6s9TH8x4fuVHLPtNeQ/GPsgSm8G6Cxrm0oPjOp/dv4CQ2FIev4ns7z6x7ZSAqa/50wrjuoBY13BrPTMGIIvubM/9cKpAyI2F6Zb8ZiHjmKJKykdT6ZCs6cS1iCCfGtYQXg+uE12N+DopvzfWy7JkzScecOd/cT8esGFZZGJblulMzMY7qLbqcAgFogLzfmhiy8juUJnIyLO5vYIHPKdQx4SEBw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=6hQxSPueRjqivytB2WxD4yT9ZIay1EdItgh7HO++yOU=;
+ b=HvIek/lX0cBUYLNPcCkNtxHIxjUBoUl+vCN0NfSnVju3LMp/5msW9gaUGEMk5/HjQWrwPTvU+XIafpSQR75SjAXzCdycH2xD5Vo7bKXuWS3d6I6o7hXuO6lgfG/UrY1JiYp77HsUFLrqxGVq9z4Vb+SH9Q3OYbx4wSR67er4Fp6XCmObaF2iUzMgSxtdPrYx803AN9Pn1acmlVMd1vGI4t2mkGIw9plvILU4jU8XIgIj5o4cWItiXzHgn5+o/iohSI4ff//MX5KCr6Ds3GVi9FCNG5jJOyJgmIs+DqXz1JQI0S7uqoyfvYwo4O7QqfiLZtU1nU4iYSnmvum6bIq+ag==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6hQxSPueRjqivytB2WxD4yT9ZIay1EdItgh7HO++yOU=;
+ b=o6lXNIV2qcDbOVBz3hScRzhykjeJrAvH7uSY94JvgF+nxPIuz0abEbY8ZddkS1WLHE8Xj5MaFxug5Mn8T0Up/ObnQ01ZScIvPOLF/LI8trb/QBejrpCBAsKZXBny0IbHrhbe/p6FJgiesrH8kpLwKipC9Hqiy3t5qi5JIiGG2KOv1tcExgLAzKLXArBLQv2ck5tJtncJzhYxKwESG4lSQpaG1tpUCzf+5p6CloJTmHQBvMBH25Y8qSO84C8Mib4pJUIQeNAhMniB/ntJWYePSk40kipGvmTUOOL6iz3CpmaFQ5IxbBOy+hkdElhG352ld4WLKDZpkALEgbB2VuMWiw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from PH7PR12MB5757.namprd12.prod.outlook.com (2603:10b6:510:1d0::13)
+ by PH7PR12MB7353.namprd12.prod.outlook.com (2603:10b6:510:20c::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9115.22; Tue, 23 Sep
+ 2025 22:22:19 +0000
+Received: from PH7PR12MB5757.namprd12.prod.outlook.com
+ ([fe80::f012:300c:6bf4:7632]) by PH7PR12MB5757.namprd12.prod.outlook.com
+ ([fe80::f012:300c:6bf4:7632%2]) with mapi id 15.20.9137.018; Tue, 23 Sep 2025
+ 22:22:18 +0000
+Date: Tue, 23 Sep 2025 19:22:16 -0300
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Keith Busch <kbusch@kernel.org>
+Cc: Leon Romanovsky <leon@kernel.org>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Abdiel Janulgue <abdiel.janulgue@gmail.com>,
+	Alexander Potapenko <glider@google.com>,
+	Alex Gaynor <alex.gaynor@gmail.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Christoph Hellwig <hch@lst.de>, Danilo Krummrich <dakr@kernel.org>,
+	David Hildenbrand <david@redhat.com>, iommu@lists.linux.dev,
+	Jason Wang <jasowang@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+	Joerg Roedel <joro@8bytes.org>, Jonathan Corbet <corbet@lwn.net>,
+	Juergen Gross <jgross@suse.com>, kasan-dev@googlegroups.com,
+	linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+	linux-nvme@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
+	linux-trace-kernel@vger.kernel.org,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	Robin Murphy <robin.murphy@arm.com>, rust-for-linux@vger.kernel.org,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Stefano Stabellini <sstabellini@kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	virtualization@lists.linux.dev, Will Deacon <will@kernel.org>,
+	xen-devel@lists.xenproject.org
+Subject: Re: [PATCH v6 00/16] dma-mapping: migrate to physical address-based
+ API
+Message-ID: <20250923222216.GC2617119@nvidia.com>
+References: <CGME20250909132821eucas1p1051ce9e0270ddbf520e105c913fa8db6@eucas1p1.samsung.com>
+ <cover.1757423202.git.leonro@nvidia.com>
+ <0db9bce5-40df-4cf5-85ab-f032c67d5c71@samsung.com>
+ <20250912090327.GU341237@unreal>
+ <aM1_9cS_LGl4GFC5@kbusch-mbp>
+ <20250920155352.GH10800@unreal>
+ <aM9LH6WSeOPGeleY@kbusch-mbp>
+ <20250923170936.GA2614310@nvidia.com>
+ <aNLnXwAJveHIqfz0@kbusch-mbp>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aNLnXwAJveHIqfz0@kbusch-mbp>
+X-ClientProxiedBy: SA9PR13CA0121.namprd13.prod.outlook.com
+ (2603:10b6:806:27::6) To PH7PR12MB5757.namprd12.prod.outlook.com
+ (2603:10b6:510:1d0::13)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH7PR12MB5757:EE_|PH7PR12MB7353:EE_
+X-MS-Office365-Filtering-Correlation-Id: 52108b48-523e-4f64-a2fa-08ddfaefa842
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|7416014|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?HiFBaYaRi7DKEeQsmk6X/SYEgHfzNbu+M4du3xz9VIsxZ0oTPo570go6akJ4?=
+ =?us-ascii?Q?2Or3ISNvnQmC1mSqyVZmAV0T2v/xkUXeqZHTEw57a5SxJS8OEIZVRvbzA3M4?=
+ =?us-ascii?Q?zUeDxw3aXP1TqOHp/iiZ2FpshQBy2l8J+Nw9WjaXA/oolcCTguOEMyxKwMt1?=
+ =?us-ascii?Q?VQvnaXFAXLHFEtkOWiUc9U3JBFrQn626RugY1Kx9u1+zZsLfZwURSftiRyJ2?=
+ =?us-ascii?Q?AbRMek5TJ7C/C84eUmGjJf4cI3Fm03XZR7ptnfD76nofpP49hHMx7bOJwLf0?=
+ =?us-ascii?Q?AK87VzDSV2liyg0oxstJCPZJ6zjUzy+pFSI1LRXSIL1mEi2bipw1u0pIvevb?=
+ =?us-ascii?Q?21wu0KiRuiYmYHdR98L56KVV2qvGXUeT0OWnIrXpR6/tJnK0InA4JAK+q5YB?=
+ =?us-ascii?Q?+PNqDo6n/Dz+1BJEAop5huCiDGVdEMB6IUMbGBAAViw6vt+9DYyU+fARydRv?=
+ =?us-ascii?Q?VebmValwMPP+ipL63zSb+8coNQCLdhuzjejtPsEFbmo7sFWdRUHZ+SQicAB/?=
+ =?us-ascii?Q?by9BGvHbm8YEYES6o68SKe0MRz7M/8DLLJWiGy1FEsX08mAJClRA25ASHqOn?=
+ =?us-ascii?Q?9qbt998ToEEpx10C9M08G8UMWKk5IYX9hEmhM6W1XCF3FuIRhHlDniLnnyB/?=
+ =?us-ascii?Q?Y0OBUif48DiAy4Qgmx6adV5z4hqXyOAyDd6xu9HSAjwsEbMv7ebhagxAbaJ8?=
+ =?us-ascii?Q?tbqGDJJwMHSenWkE8Sp7/kTJx4UYgN1N7X6Pe+3Uw3P+yHCuKVhKmY2E+6Zk?=
+ =?us-ascii?Q?r3NpokqBnTBOt6qYL/QF1p/Z/x6u1sKKXW24wlsjStbZNcrk/Ic4iZTA0yp8?=
+ =?us-ascii?Q?Ado4kY7x1S6Ce+/bE9t5OGEIHKqSu1XJZaQY2/SC6J9sGb9xY6arvDY/e9yP?=
+ =?us-ascii?Q?RWMNN2GEO9PPVY7GQ5mGRFbNn9+jd5o2/Pvz+sPyLUjTtng+O5eji2+cuvtZ?=
+ =?us-ascii?Q?t68MCCJgoOVFIxQ4ClfY9/Yu+dqAGIa/AeO+mSDGiCjp4lL5TBWsZdWTubA8?=
+ =?us-ascii?Q?5TkQ1oa6XRJcZrXjCwA30d/52w/7HPD57aOxIeQElVE28aV2LTvn2L60eEb1?=
+ =?us-ascii?Q?X+ahd1MEFeQy+S/eh00gdgnBmIo5mwR+ubove1EtAoBvfJZQq8fJHRrmPQJu?=
+ =?us-ascii?Q?URGBj3q0D1/sVUM+qLwM+taVSl2Q7LWKpCL2sm7O6JkFMotz6AfTRpbA9Xtp?=
+ =?us-ascii?Q?R2sdQvjZ0ZX8/+XlV1oRvcz1DrFf2f+xbcy+McKo8J29DmvfmH+cKe1otjcU?=
+ =?us-ascii?Q?TmSTeKKjU1L1dBbqDD+Ku+EM5WV4FzyWYRDFGQ1b8mL1qdim6VFY0yN/TAcH?=
+ =?us-ascii?Q?DDRNlp83lJc+hT93VKW/mY0ScUrjh61HDhCiPtfRAB43+1vHo7KGLEwIMFwV?=
+ =?us-ascii?Q?vvVy7B2jYyZakP+T8+su0vdooier05WIvIUvvLxjdw5XvhJ/DbrG2Rv2rvUk?=
+ =?us-ascii?Q?aG+ybpQ9Iz8=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB5757.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?eVGNJdmby9Ocx1dT6CLNPZSYywtZ5BQQPj0z919YXfiHa+uvZCqKScTu7K+h?=
+ =?us-ascii?Q?TEhVf3NybTrETxq9+DUNdWg6sUmVul7WgplkbHU8WxcPyscVyqucyWj39Iq9?=
+ =?us-ascii?Q?DIBRmS3r1wvzR+ThMQaAl9M3yWH4pN6WhLRib2oK1rlh4sIZv594wK3XES/i?=
+ =?us-ascii?Q?ppzmrzxmupDAqwLzMdIybgoOe4Q3FHGa1+jpzZQmCa1PqrEWAgXz8w1OxdMD?=
+ =?us-ascii?Q?RqiJd4P4iHVUuNPwNV61LALwTpaQ8wb43sdHVIGPh+WXBNVbn36vYHACN7Wh?=
+ =?us-ascii?Q?lEMAUmtTbu8hqVLBIZ727iR6GXDpGJy90XKuqQmGOTzfpqAKdH5s5nAVm68g?=
+ =?us-ascii?Q?gCekI4E+feogQTAbMMlwcIR8I5D/NvIhwo6poYenL0IgTSapHG5nXBtDBgy+?=
+ =?us-ascii?Q?hLp0loRIWvIQz2FsUDFcxkfGG158SXFVwEmQ7zyKcnwngO3FKZi3ghsoLqQJ?=
+ =?us-ascii?Q?h8Hb/47//9zgVehIZ57TYxVhDgNbwBGmJYxSn5ZPB15AUL2LzYZSqWaOaVVs?=
+ =?us-ascii?Q?1pH0qxN8vFtk8M0Z3zUjIs8wRAZ2ZnT460HWvYV1B0VGgeCFtU7BdJVfxR2P?=
+ =?us-ascii?Q?x4phMDLxNk8HiFuJTLkUvo4PYEeNnO1HWc2Kp6Vt/uQ6K4yuyRFhTO+x0FBf?=
+ =?us-ascii?Q?0IpY4BLkzsCYfaApAZtbvUQzIxbIojvg6D1JOBUoD3azc5mW0NKSrI197gYA?=
+ =?us-ascii?Q?GJBqME/8N/RhwtzSW/tU9Djna9U8SbbeOjM1A+z4ADhfzf4Tz5Y++RN58UQ1?=
+ =?us-ascii?Q?7BneyeEdGNqb3T9E1i4PsGbfTYOREYyhWED0aS4Af4zMcxxZx2yhGsa0hqqT?=
+ =?us-ascii?Q?jDFDoe3YmI5+6T8UAwCbiVMixiVSqn01f603+7MB9V76s3Vfyhw+XR8mVpvl?=
+ =?us-ascii?Q?NrFMuOvp4BECPmrykWHZzeyE6WKEGSxcZ/ES2liREp9ffszRLshxPBH+TC9A?=
+ =?us-ascii?Q?6m7h5pYOfEpB7IMYNxYWiPCtgJ9Gtee/Um9osjzrExO+me55q3Yag8zswFgZ?=
+ =?us-ascii?Q?we1jHVNJPK6WenRlpnFTpkW/mxoLeYL8gNcg6JWDNN6eZr1PEycYp8QIgCBV?=
+ =?us-ascii?Q?RjiWXfHybAR2sszZ58LyRJkQlICq5jDSB0d4ghx0FGv6J24o6O/DcxJS64Of?=
+ =?us-ascii?Q?C5eSS00vfQ/Ydb0l45BZ9TUED86C+Ikm2JIdhnzuuC3Qr4laf95QDbqzWuqH?=
+ =?us-ascii?Q?0kRFLVYcKLGqPsWFAM9ExzmqsaxNXvbAytZ2BvK3RdHvgfciBvrB+4csMTIz?=
+ =?us-ascii?Q?sQDOIiMdUjkn1dtEnC5Z7O5d142aAKRB/RlkMxYETjhYybWAS7qAvgql/Y4e?=
+ =?us-ascii?Q?FQhGrarH+Y0W9rSIm39edFyxw3IMIVAmJ276+/BQYroKqeQ0Swe1Ie87k032?=
+ =?us-ascii?Q?DZvlfF55aIXBy9F5zH57lQbqtVteAYQM1eN9kz2jVVXfTsuGiv2tZY/60JCo?=
+ =?us-ascii?Q?EagVYUGYoylHGbdohYaptXBcK92YyzJmWukOI7tEEIL0SHsClNhzvktkLOMy?=
+ =?us-ascii?Q?bLcjUSWcf6NJUoO+Nz7g3di1JPENGEj44yIOJtSxez3StVK2pe18DCj7Zcld?=
+ =?us-ascii?Q?ncLYB5SOSnXrQKAyoRZJT9Q9bI+rqWwmBAZlW0l2?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 52108b48-523e-4f64-a2fa-08ddfaefa842
+X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB5757.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Sep 2025 22:22:18.6133
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: NGLYkxWEuDdqsEtURp8syALj/D+W0jy8uzr92XEQX0IUKCZEPeugcvMAO9ufQqtp
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7353
 
-On Tue, 23 Sep 2025 20:12:28 +0300
-Leon Romanovsky <leon@kernel.org> wrote:
+On Tue, Sep 23, 2025 at 12:30:55PM -0600, Keith Busch wrote:
+> I don't have a system in this state at the moment, so we checked
+> previous logs on machines running older kernels. It's extermely
+> uncommon, but this error was happening prior to this series, so I don't
+> think this introduced any new problem here. I'll keeping looking, but I
+> don't think we'll make much progress if I can't find a more reliable
+> reproducer.
 
-> On Mon, Sep 22, 2025 at 03:00:32PM -0600, Alex Williamson wrote:
-> > On Thu, 11 Sep 2025 14:33:07 +0300
-> > Leon Romanovsky <leon@kernel.org> wrote:
-> >   
-> > > From: Leon Romanovsky <leonro@nvidia.com>
-> > > 
-> > > Refactor the PCI P2PDMA subsystem to separate the core peer-to-peer DMA
-> > > functionality from the optional memory allocation layer. This creates a
-> > > two-tier architecture:
-> > > 
-> > > The core layer provides P2P mapping functionality for physical addresses
-> > > based on PCI device MMIO BARs and integrates with the DMA API for
-> > > mapping operations. This layer is required for all P2PDMA users.
-> > > 
-> > > The optional upper layer provides memory allocation capabilities
-> > > including gen_pool allocator, struct page support, and sysfs interface
-> > > for user space access.
-> > > 
-> > > This separation allows subsystems like VFIO to use only the core P2P
-> > > mapping functionality without the overhead of memory allocation features
-> > > they don't need. The core functionality is now available through the
-> > > new pci_p2pdma_enable() function that returns a p2pdma_provider
-> > > structure.
-> > > 
-> > > Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-> > > ---
-> > >  drivers/pci/p2pdma.c       | 129 +++++++++++++++++++++++++++----------
-> > >  include/linux/pci-p2pdma.h |   5 ++
-> > >  2 files changed, 100 insertions(+), 34 deletions(-)  
-> 
-> <...>
-> 
-> > > -static int pci_p2pdma_setup(struct pci_dev *pdev)
-> > > +/**
-> > > + * pcim_p2pdma_enable - Enable peer-to-peer DMA support for a PCI device
-> > > + * @pdev: The PCI device to enable P2PDMA for
-> > > + * @bar: BAR index to get provider
-> > > + *
-> > > + * This function initializes the peer-to-peer DMA infrastructure for a PCI
-> > > + * device. It allocates and sets up the necessary data structures to support
-> > > + * P2PDMA operations, including mapping type tracking.
-> > > + */
-> > > +struct p2pdma_provider *pcim_p2pdma_enable(struct pci_dev *pdev, int bar)
-> > >  {
-> > > -	int error = -ENOMEM;
-> > >  	struct pci_p2pdma *p2p;
-> > > +	int i, ret;
-> > > +
-> > > +	p2p = rcu_dereference_protected(pdev->p2pdma, 1);
-> > > +	if (p2p)
-> > > +		/* PCI device was "rebound" to the driver */
-> > > +		return &p2p->mem[bar];
-> > >    
-> > 
-> > This seems like two separate functions rolled into one, an 'initialize
-> > providers' and a 'get provider for BAR'.  The comment above even makes
-> > it sound like only a driver re-probing a device would encounter this
-> > branch, but the use case later in vfio-pci shows it to be the common
-> > case to iterate BARs for a device.
-> > 
-> > But then later in patch 8/ and again in 10/ why exactly do we cache
-> > the provider on the vfio_pci_core_device rather than ask for it on
-> > demand from the p2pdma?  
-> 
-> In addition to what Jason said about locking. The whole p2pdma.c is
-> written with assumption that "pdev->p2pdma" pointer is assigned only
-> once during PCI device lifetime. For example, see how sysfs files
-> are exposed and accessed in p2pdma.c.
+Okay, that's great. It needs to get resolved but it is not this series
+at fault.
 
-Except as Jason identifies in the other thread, the p2pdma is a devm
-object, so it's assigned once during the lifetime of the driver, not
-the device.  It seems that to get the sysfs attributes exposed, a
-driver would need to call pci_p2pdma_add_resource() to setup a pool,
-but that pool setup is only done if pci_p2pdma_add_resource() itself
-calls pcim_p2pdma_enable():
+Very rare is a different perspective, I mis-thought it was happening
+reproducible all the time..
 
-        p2pdma = rcu_dereference_protected(pdev->p2pdma, 1);
-        if (!p2pdma) {
-                mem = pcim_p2pdma_enable(pdev, bar);
-                if (IS_ERR(mem))
-                        return PTR_ERR(mem);
+It seems to me it is actually a legitimate thing for userspace to be
+able to trigger this cache line debug. If you do concurrent O_DIRECT
+to the very same memory it should trigger if I read it right..
 
-                error = pci_p2pdma_setup_pool(pdev);
-		...
-        } else
-                mem = &p2pdma->mem[bar];
+So it may not even be an actual bug???
 
-Therefore as proposed here a device bound to vfio-pci would never have
-these sysfs attributes.
-
-> Once you initialize p2pdma, it is much easier to initialize all BARs at
-> the same time.
-
-I didn't phrase my question above well.  We can setup all the providers
-on the p2pdma at once, that's fine.  My comment is related to the
-awkward API we're creating and what seems to be gratuitously caching
-the providers on the vfio_pci_core_device when it seems much more
-logical to get the provider for a specific dmabuf and cache it on the
-vfio_pci_dma_buf object in the device feature ioctl.  We could also
-validate the provider at that point rather than the ad-hoc, parallel
-checks for MMIO BARs.  Thanks,
-
-Alex
-
+Jason
