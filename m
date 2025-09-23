@@ -1,104 +1,205 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B14671D5146;
-	Tue, 23 Sep 2025 18:30:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6A6E30AAAD
+	for <linux-block@vger.kernel.org>; Tue, 23 Sep 2025 20:07:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758652259; cv=none; b=WZJqfUUL2IakVq+4oL4LUaP67BH94FZXZrValhIKrGP/4gHDzVrySWuwAfabyvZ+4djvXIeJAUP2aqvxltqq5xPLqAlC/7qXR/ZDUkvjdCYkQiSszxXH2mhbrdw4hTeOEOjQyFJvVvw4HCikcdaVAZcSqS5bGtUvelyAupXukyM=
+	t=1758658055; cv=none; b=J2AXEQnGeQT0grQf0x3mVX/kTPKSJs8z2Mesju0szpI9gnir/b4o4iinUuCOs9hW6VT38EFUn2DMRMH+hu+YvFy+Aim2pem4BOAk9RDit2B8qhal2yv3E1eX849vZkOFwSeBKeui/z5hcozpCZhMC9GnTsWZ71GFy0CxASnVSXM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758652259; c=relaxed/simple;
-	bh=gxKH7wZVbZJUgsdcRmV6yXRnCWQ9TqZ9bpedLe1yt7s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uVrFjialsgDG3tOimC/Btv70vsr7w9/2R83f4nqsInRSs4SXZWtaxGCpaHQ8vNJhXlEbazZGXaozHXLQxUMBtguJ3r+haVBUAgFuds+F0DCCBsYgzhdYHUYUaN2CBYA3EsZ83IhH25ctSe4ypkQDyig9QR2eYU3CRYY9i+n5zb0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S4ZXIaWM; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1758658055; c=relaxed/simple;
+	bh=/cNMCmhs2+2GgzKjW2K7MV1lRjCXVMAS8z1dlxsrJ7Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=WNoviBBu9liHU9PSETZLmz1jxy3q3wHVR7v6aILRAg2yEYoAzcI18ZJyv4a3JN780GI6zhah027XAxFO2cZbwuPVNlrS4GZWTZwrl33SYx/29ZivXA5AasuKmQKDLTQHDvZx8cQwzzj+sJZLfEqJuPfVw7r1AitfF47bohCxMp4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=O3OYfyCM; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S4ZXIaWM"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB030C4CEF5;
-	Tue, 23 Sep 2025 18:30:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758652259;
-	bh=gxKH7wZVbZJUgsdcRmV6yXRnCWQ9TqZ9bpedLe1yt7s=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=S4ZXIaWM41Ablw/mVVeAaJkiSYgUA1XjiTWt5LSH4qwLIacOxMZE3jScnz0xix1Wv
-	 SAp5BLuT2R2dCAYXxRdOCtJez17N/cBe9kv8+xOmcpzYoZ/UpcFkDX5GmNuOLJGCFV
-	 Bcs4RLVyhjVQyFhRGAbe1bDHxUFJbKgGu/3vW1Mt1BkujhZ/XZn25PIvUn5jT3S9nw
-	 YVX4n2lhWFpC/hhBuXD/s3h9/tXRxQArUIgc5V0sUKhDNiOC8ABgtjM7Q3+LQGe+ys
-	 cSfhtq2Jd52bcQy4LLrP2uqO++/e9zs0F7UgxrbinfFgheCfADXwZVzyKQ2yU+i53A
-	 XGP2nnt2Bp5Ig==
-Date: Tue, 23 Sep 2025 12:30:55 -0600
-From: Keith Busch <kbusch@kernel.org>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Leon Romanovsky <leon@kernel.org>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Abdiel Janulgue <abdiel.janulgue@gmail.com>,
-	Alexander Potapenko <glider@google.com>,
-	Alex Gaynor <alex.gaynor@gmail.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Christoph Hellwig <hch@lst.de>, Danilo Krummrich <dakr@kernel.org>,
-	David Hildenbrand <david@redhat.com>, iommu@lists.linux.dev,
-	Jason Wang <jasowang@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-	Joerg Roedel <joro@8bytes.org>, Jonathan Corbet <corbet@lwn.net>,
-	Juergen Gross <jgross@suse.com>, kasan-dev@googlegroups.com,
-	linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	linux-nvme@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
-	linux-trace-kernel@vger.kernel.org,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Robin Murphy <robin.murphy@arm.com>, rust-for-linux@vger.kernel.org,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Stefano Stabellini <sstabellini@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	virtualization@lists.linux.dev, Will Deacon <will@kernel.org>,
-	xen-devel@lists.xenproject.org
-Subject: Re: [PATCH v6 00/16] dma-mapping: migrate to physical address-based
- API
-Message-ID: <aNLnXwAJveHIqfz0@kbusch-mbp>
-References: <CGME20250909132821eucas1p1051ce9e0270ddbf520e105c913fa8db6@eucas1p1.samsung.com>
- <cover.1757423202.git.leonro@nvidia.com>
- <0db9bce5-40df-4cf5-85ab-f032c67d5c71@samsung.com>
- <20250912090327.GU341237@unreal>
- <aM1_9cS_LGl4GFC5@kbusch-mbp>
- <20250920155352.GH10800@unreal>
- <aM9LH6WSeOPGeleY@kbusch-mbp>
- <20250923170936.GA2614310@nvidia.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O3OYfyCM"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1758658051;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=TkF/1TIVCdQ8I35UWInq/5XGtjT7LO6t3DfocUuGzJk=;
+	b=O3OYfyCM0C0c8clLZWn+qQlJQoBIRrglL50p5TcwDCIKXa0ozidZEWQmd7g1Kcgie8SgKi
+	FStXl+SJt4FSJ7nZoGI7JGQQSK06UFe4k8mgHyzV8wvz9P3zcqJROni/GBlRgJRlJRsEGi
+	BC0vvlZJzDhB8750Zqlg26sijLazV2Y=
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com
+ [209.85.166.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-528-C1etvRTsOoK6USPUSVfHpw-1; Tue, 23 Sep 2025 16:07:30 -0400
+X-MC-Unique: C1etvRTsOoK6USPUSVfHpw-1
+X-Mimecast-MFC-AGG-ID: C1etvRTsOoK6USPUSVfHpw_1758658049
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-4257fce57faso1713075ab.1
+        for <linux-block@vger.kernel.org>; Tue, 23 Sep 2025 13:07:30 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758658048; x=1759262848;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=TkF/1TIVCdQ8I35UWInq/5XGtjT7LO6t3DfocUuGzJk=;
+        b=bnnHUsUdV6Ss1WPpCRKUB57Agl5C+FiTjmoQVk/ehmtOZV7idcFS27puzBlS/5Sb+O
+         OvVANFv2Y4FUSqv5ALZipQJFteOuA5xMAK5mx6eV1QjSDVieMcjnod80rxuTqIQsenZp
+         xRoX/1bO9PwANiIOP+90b5aoJpPnZVw94Vnb96YRV9G2zrke2YE7YflXpLi6DMxE/yNZ
+         njE5czwSlIVX8k8ONe0Bszejfk0pqA0zKFWlXuTxRyI+DEl2PQ6/vxnXHF7rd6vOZMiy
+         IgVTZketaWLSAaBke7gGBAsZont0ggE1maznqT6g6t70K2dE4tv6MBxw3xl9r+8uTSDM
+         rYow==
+X-Forwarded-Encrypted: i=1; AJvYcCUnR6eBWbF9bug9zCO1fEeS8yh1heNy+66ZkytTyWgKsEXDcR7IO9tqd4tB6z99r/gieAysYKG3qCtP6A==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy2QA04nBwztlC2TzjTzYlXURP6mY9ShLgTKmpaEvml4PeJHP1Y
+	5HalBjHCKM1krHyaaSEVivVk102m3Cai3Q5WaHcZNyt/+r85nvi5dAElSDGXH5Jx4R3rM8ZIGz8
+	3Ba1tI4gntMAzKfBDWvmgK7r/dSHNFcbVfvtQdOOYbdZEEk/do8PorFoWZsgzIDZft94B1gwE
+X-Gm-Gg: ASbGncsREJAMwbwItFhe0Z8H5Uvctbl2m9O4Gt7dECgKCzpCZxU1iLECYN+4HgsETwD
+	vu9rgSVMCM1fSxVevNiaWSMaH9k+1eWLRMEfZDEHc3ga3hFbrtiR7BHDF9kRH/s09UkINV5i01L
+	jlIkYijzc4peNI8EbpdgQFiz/RcDQ3PhwIG/PDyo/RFxbqtCLt2Yv2VH8a8bYDkR98lD+65egmu
+	d4uWbt9+Go4tSisszJucjSgo6ntguBRtgCJbABcKuqnh53tOxfng0lF5EGZoZ7eh2LvOEW7+bqq
+	u7gmtKe2fULdw0m74HJ0Mj6cClJfghJI2JDZBkXNW2w=
+X-Received: by 2002:a05:6e02:b27:b0:423:fd07:d3fe with SMTP id e9e14a558f8ab-42581e0924amr21638595ab.2.1758658048121;
+        Tue, 23 Sep 2025 13:07:28 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEmMxIqHNMDHwq6jPuldjwSxK84807XGPUliuEF5qCvF8SuPWmF0LqQLkrDELCWNHqAt6pi1g==
+X-Received: by 2002:a05:6e02:b27:b0:423:fd07:d3fe with SMTP id e9e14a558f8ab-42581e0924amr21638385ab.2.1758658047638;
+        Tue, 23 Sep 2025 13:07:27 -0700 (PDT)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-425813f3053sm15141865ab.21.2025.09.23.13.07.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Sep 2025 13:07:26 -0700 (PDT)
+Date: Tue, 23 Sep 2025 14:07:23 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Jason Gunthorpe <jgg@nvidia.com>, Andrew Morton
+ <akpm@linux-foundation.org>, Bjorn Helgaas <bhelgaas@google.com>, Christian
+ =?UTF-8?B?S8O2bmln?= <christian.koenig@amd.com>,
+ dri-devel@lists.freedesktop.org, iommu@lists.linux.dev, Jens Axboe
+ <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+ linaro-mm-sig@lists.linaro.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
+ linux-mm@kvack.org, linux-pci@vger.kernel.org, Logan Gunthorpe
+ <logang@deltatee.com>, Marek Szyprowski <m.szyprowski@samsung.com>, Robin
+ Murphy <robin.murphy@arm.com>, Sumit Semwal <sumit.semwal@linaro.org>,
+ Vivek Kasireddy <vivek.kasireddy@intel.com>, Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v2 03/10] PCI/P2PDMA: Refactor to separate core P2P
+ functionality from memory allocation
+Message-ID: <20250923140723.14c63741.alex.williamson@redhat.com>
+In-Reply-To: <20250923171228.GL10800@unreal>
+References: <cover.1757589589.git.leon@kernel.org>
+	<1e2cb89ea76a92949d06a804e3ab97478e7cacbb.1757589589.git.leon@kernel.org>
+	<20250922150032.3e3da410.alex.williamson@redhat.com>
+	<20250923171228.GL10800@unreal>
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250923170936.GA2614310@nvidia.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Sep 23, 2025 at 02:09:36PM -0300, Jason Gunthorpe wrote:
-> On Sat, Sep 20, 2025 at 06:47:27PM -0600, Keith Busch wrote:
+On Tue, 23 Sep 2025 20:12:28 +0300
+Leon Romanovsky <leon@kernel.org> wrote:
+
+> On Mon, Sep 22, 2025 at 03:00:32PM -0600, Alex Williamson wrote:
+> > On Thu, 11 Sep 2025 14:33:07 +0300
+> > Leon Romanovsky <leon@kernel.org> wrote:
+> >   
+> > > From: Leon Romanovsky <leonro@nvidia.com>
+> > > 
+> > > Refactor the PCI P2PDMA subsystem to separate the core peer-to-peer DMA
+> > > functionality from the optional memory allocation layer. This creates a
+> > > two-tier architecture:
+> > > 
+> > > The core layer provides P2P mapping functionality for physical addresses
+> > > based on PCI device MMIO BARs and integrates with the DMA API for
+> > > mapping operations. This layer is required for all P2PDMA users.
+> > > 
+> > > The optional upper layer provides memory allocation capabilities
+> > > including gen_pool allocator, struct page support, and sysfs interface
+> > > for user space access.
+> > > 
+> > > This separation allows subsystems like VFIO to use only the core P2P
+> > > mapping functionality without the overhead of memory allocation features
+> > > they don't need. The core functionality is now available through the
+> > > new pci_p2pdma_enable() function that returns a p2pdma_provider
+> > > structure.
+> > > 
+> > > Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+> > > ---
+> > >  drivers/pci/p2pdma.c       | 129 +++++++++++++++++++++++++++----------
+> > >  include/linux/pci-p2pdma.h |   5 ++
+> > >  2 files changed, 100 insertions(+), 34 deletions(-)  
+> 
+> <...>
+> 
+> > > -static int pci_p2pdma_setup(struct pci_dev *pdev)
+> > > +/**
+> > > + * pcim_p2pdma_enable - Enable peer-to-peer DMA support for a PCI device
+> > > + * @pdev: The PCI device to enable P2PDMA for
+> > > + * @bar: BAR index to get provider
+> > > + *
+> > > + * This function initializes the peer-to-peer DMA infrastructure for a PCI
+> > > + * device. It allocates and sets up the necessary data structures to support
+> > > + * P2PDMA operations, including mapping type tracking.
+> > > + */
+> > > +struct p2pdma_provider *pcim_p2pdma_enable(struct pci_dev *pdev, int bar)
+> > >  {
+> > > -	int error = -ENOMEM;
+> > >  	struct pci_p2pdma *p2p;
+> > > +	int i, ret;
+> > > +
+> > > +	p2p = rcu_dereference_protected(pdev->p2pdma, 1);
+> > > +	if (p2p)
+> > > +		/* PCI device was "rebound" to the driver */
+> > > +		return &p2p->mem[bar];
+> > >    
 > > 
-> > One other thing to note, this was runing on arm64 platform using smmu
-> > configured with 64k pages. If your iommu granule is 4k instead, we
-> > wouldn't use the blk_dma_map_direct path.
+> > This seems like two separate functions rolled into one, an 'initialize
+> > providers' and a 'get provider for BAR'.  The comment above even makes
+> > it sound like only a driver re-probing a device would encounter this
+> > branch, but the use case later in vfio-pci shows it to be the common
+> > case to iterate BARs for a device.
+> > 
+> > But then later in patch 8/ and again in 10/ why exactly do we cache
+> > the provider on the vfio_pci_core_device rather than ask for it on
+> > demand from the p2pdma?  
 > 
-> I spent some time looking to see if I could guess what this is and
-> came up empty. It seems most likely we are leaking a dma mapping
-> tracking somehow? The DMA API side is pretty simple here though..
+> In addition to what Jason said about locking. The whole p2pdma.c is
+> written with assumption that "pdev->p2pdma" pointer is assigned only
+> once during PCI device lifetime. For example, see how sysfs files
+> are exposed and accessed in p2pdma.c.
 
-Yeah, nothing stood out to me here either.
- 
-> Not sure the 64k/4k itself is a cause, but triggering the non-iova
-> flow is probably the issue.
-> 
-> Can you check the output of this debugfs:
+Except as Jason identifies in the other thread, the p2pdma is a devm
+object, so it's assigned once during the lifetime of the driver, not
+the device.  It seems that to get the sysfs attributes exposed, a
+driver would need to call pci_p2pdma_add_resource() to setup a pool,
+but that pool setup is only done if pci_p2pdma_add_resource() itself
+calls pcim_p2pdma_enable():
 
-I don't have a system in this state at the moment, so we checked
-previous logs on machines running older kernels. It's extermely
-uncommon, but this error was happening prior to this series, so I don't
-think this introduced any new problem here. I'll keeping looking, but I
-don't think we'll make much progress if I can't find a more reliable
-reproducer.
+        p2pdma = rcu_dereference_protected(pdev->p2pdma, 1);
+        if (!p2pdma) {
+                mem = pcim_p2pdma_enable(pdev, bar);
+                if (IS_ERR(mem))
+                        return PTR_ERR(mem);
 
-Thanks!
+                error = pci_p2pdma_setup_pool(pdev);
+		...
+        } else
+                mem = &p2pdma->mem[bar];
+
+Therefore as proposed here a device bound to vfio-pci would never have
+these sysfs attributes.
+
+> Once you initialize p2pdma, it is much easier to initialize all BARs at
+> the same time.
+
+I didn't phrase my question above well.  We can setup all the providers
+on the p2pdma at once, that's fine.  My comment is related to the
+awkward API we're creating and what seems to be gratuitously caching
+the providers on the vfio_pci_core_device when it seems much more
+logical to get the provider for a specific dmabuf and cache it on the
+vfio_pci_dma_buf object in the device feature ioctl.  We could also
+validate the provider at that point rather than the ad-hoc, parallel
+checks for MMIO BARs.  Thanks,
+
+Alex
+
