@@ -1,189 +1,136 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E475228314A;
-	Wed, 24 Sep 2025 09:23:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B79D32DC33B
+	for <linux-block@vger.kernel.org>; Wed, 24 Sep 2025 10:05:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758705838; cv=none; b=acWGcE6c1S6Bhebw5pOyd7UPWYHn+4ZayCKMePNYDzvByzi92vcyeBFyEMHm+uUZj3LNQKX41ZcWVMIIMCW9XxwL3irbumIhp9D+/8Agc1PVtkLaHjT8hLpjNs6dMtfloEFlBhglCHlrLJ83GT4EOBCGhgL3ht7SmrH92beDo3I=
+	t=1758708313; cv=none; b=GqRgBrnTk1ahZdgDLy2wysbJemE3mnp/1HxjquEX8Wn+vsp9T7n8g9PJx8b0HHv3wWSKVjJRAhs2wV71VDyaf9Fbc2ntqzyW0cUD/Xl3RcrpGuvPrtNsNNY8bf0eZnTNFmLtBMtkt5VdsfcOkFjCwC7dMHf0qNkwXYCxCRZTh0g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758705838; c=relaxed/simple;
-	bh=k8ls7HJ0NSab/bPbOZ8rD4KwrDpIQu6nSQmh86M3UxE=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=V/D3WdxSmEqdteONW3cYjIUPFcC2gMhHCUmzVYkKcncsHALG4XI2HH0SKpkIIrsbBqhQQ6fw/UOVUjeTcm8F8ytR3bguRiHDDGv2bGyXFLmvSFFckBUrq9Vy5MK36JBSveZN8qpP5gUQhod62p/ZqfVMwb2imGIAg4Q1iNzckUk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4cWrxg69KVzKHMpM;
-	Wed, 24 Sep 2025 17:23:35 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 4D7D71A0CCF;
-	Wed, 24 Sep 2025 17:23:42 +0800 (CST)
-Received: from [10.174.179.143] (unknown [10.174.179.143])
-	by APP4 (Coremail) with SMTP id gCh0CgAHGWGcuNNoLuybAg--.35059S3;
-	Wed, 24 Sep 2025 17:23:42 +0800 (CST)
-Subject: Re: [PATCH v2] block: plug attempts to batch allocate tags multiple
- times
-To: Xue He <xue01.he@samsung.com>, axboe@kernel.dk, akpm@linux-foundation.org
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- "yukuai (C)" <yukuai3@huawei.com>
-References: <CGME20250918075946epcas5p39a6793513e02e446b3e4801ba66b6925@epcas5p3.samsung.com>
- <20250918075511.8197-1-xue01.he@samsung.com>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <7626767b-35c1-4c55-399c-24e21ec81ced@huaweicloud.com>
-Date: Wed, 24 Sep 2025 17:23:40 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.1
+	s=arc-20240116; t=1758708313; c=relaxed/simple;
+	bh=pKcp8RbB9qIjTq//aq8x3wJaE/cjRo/2DCN671q8C4I=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RZqI1uAlVns0qieLbQvW17ZpYB3hdtYzqPjuEcLkTowma7NU0pQ/aJxqWi9osU/yopy28OhJy+SNvrcD+PvoGZihoonfxDq0mZ4wWmtw4rpZuVIrxo51RxxeJmr5y2QRyPakfa1IDKlVOJrA81LaalpC44wkgRk1uDa3htxporA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ErseWRNi; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ErseWRNi"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1758708306;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pKcp8RbB9qIjTq//aq8x3wJaE/cjRo/2DCN671q8C4I=;
+	b=ErseWRNi+6pJT6rKd0Mk78BAFvCuIqVS0VG20GInb8pg6q3dCLsekUUBZ/4kZ2rAlknRKu
+	EA7+Qio9wr3ckp8WfSmNpuSt+/UY8AsY1FM8DgGgdISiK3zWSh8QW+Kx/8YCKAkjp0ysPd
+	sJ0RBJ+OJcnjx1aiDK3NPzOLbBO+h2I=
+Received: from mail-vk1-f199.google.com (mail-vk1-f199.google.com
+ [209.85.221.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-624--D7mvjrmPgOhMdDrK_y8Jw-1; Wed, 24 Sep 2025 06:05:05 -0400
+X-MC-Unique: -D7mvjrmPgOhMdDrK_y8Jw-1
+X-Mimecast-MFC-AGG-ID: -D7mvjrmPgOhMdDrK_y8Jw_1758708305
+Received: by mail-vk1-f199.google.com with SMTP id 71dfb90a1353d-54a7d8436a4so1811954e0c.3
+        for <linux-block@vger.kernel.org>; Wed, 24 Sep 2025 03:05:05 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758708305; x=1759313105;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=pKcp8RbB9qIjTq//aq8x3wJaE/cjRo/2DCN671q8C4I=;
+        b=egZw2mHonm8N4IgwvvHSWbLr2zuQ0RTaUZBdHgz/n1HIVa+lFvrTxwUUfLL3d22FLB
+         e32z/jmx5rDX3+H/DJ8i87htIP9PGxdCtahMvVlWMlURYn+BQ+ubQoQ0zlSiFVfWexXp
+         uUS8qedT8z5J/fec9NOzPb+I0F4x7qwXiYp8qOsYb9sCCITeY0kIZfMJZu0qjhVVhC7b
+         50WjZjABDXnm45An6zQg63s3wjjiCvEwfbZWRKVHYQToJmNWxYwox0NPKz8tyJ9VyQYu
+         K3BcORLS4yjMsKeJwU36Z8yNtXpD8YrVYTg7XlgqzLvA7naqrEBZVPmpAyCD0bfTne02
+         tIIw==
+X-Forwarded-Encrypted: i=1; AJvYcCWBHLMfoKaPRl8Act3NSv1IK3k7oygAvBGsRYyo02GMTtbfEtzbXGaPSzBDMVzeMF2QI0/eAhIlT436sg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyxJLzpxOlX1yKHM/We9zSI03B+a6oI3BihSRVAEpGEXpQDzdMv
+	BqmwjBi1yAVB+Rld/J+H4XncEfVTFTjHQ+AMSPKwR5pHr7bLQ8iDuT/qkU7drgYzKx4MZ+32Nqu
+	8UCnl8ZztS0mbGOqpwDEUGUA2hAUMR3t3AyY8KAM1KlwuJwIUm7iHTrAxfIHEVvTJctPdewio9M
+	8ppbOMwTLNlOAMbBgEoxzp/pAPR0JoDMoTgM+gke0=
+X-Gm-Gg: ASbGnctqB9KIRMpPA93bgrXvwBljyNkvKBJcI1KAhvTAB7KWL2BHjtD7I0SnSrRUAP9
+	lBhhr3A9OvxUJJzpTrQVTWeh3Xe3NVyZumhOdX+lLMfXQYj9veKCASf0z/m/fYatVO3TS3TvOS8
+	0M6hFkehYezFNhANJvlcxt7Q==
+X-Received: by 2002:a05:6122:46a7:b0:54a:a874:6e4e with SMTP id 71dfb90a1353d-54bcb11e0c6mr1653516e0c.8.1758708304812;
+        Wed, 24 Sep 2025 03:05:04 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFPptVrEMQd0wcOTvVhc2Oe3+W+CQLov4+tsA34aiA7Aw3gYYXeQI2LOHtMUYKKnuN1qYBzcewy7H1XCDRJWDE=
+X-Received: by 2002:a05:6122:46a7:b0:54a:a874:6e4e with SMTP id
+ 71dfb90a1353d-54bcb11e0c6mr1653503e0c.8.1758708304461; Wed, 24 Sep 2025
+ 03:05:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20250918075511.8197-1-xue01.he@samsung.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgAHGWGcuNNoLuybAg--.35059S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxGF4xZrW8CF15ur4xJrWDurg_yoWrWFykpr
-	W3Ja13Kryaqr1q9FsxX3yUWr1rtwnrGF17J3WfKr1FvrnrCr1fXr4kGF4FvryIyrWkAF48
-	Xr45JFy3Wr1qqa7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvjb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AF
-	wI0_JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
-	xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1D
-	MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
-	0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWU
-	JVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUwx
-	hLUUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+References: <20250922032915.3924368-1-zhaoyang.huang@unisoc.com>
+ <aNGQ66CD9F82BFP-@infradead.org> <CAGWkznGf1eN-iszG21jGNq13C9yz8S0PW03hLc40Gjhn6LRp0Q@mail.gmail.com>
+ <31091c95-1d0c-4e5a-a53b-929529bf0996@acm.org> <CAGWkznGv3jwTLW2nkBds9NrUeNQ1GHK=2kijDotH=DN762PyEQ@mail.gmail.com>
+In-Reply-To: <CAGWkznGv3jwTLW2nkBds9NrUeNQ1GHK=2kijDotH=DN762PyEQ@mail.gmail.com>
+From: Ming Lei <ming.lei@redhat.com>
+Date: Wed, 24 Sep 2025 18:04:52 +0800
+X-Gm-Features: AS18NWAzS4ovR9ej7R-yAyhG3XtRFr7Vvnznyh6lks2oABccTIKfG0VXhGRlpdg
+Message-ID: <CAFj5m9K4yv4wkX2bhXSOf141dY9O96WdNfjMMYXCOoyM_Fdndg@mail.gmail.com>
+Subject: Re: [RFC PATCH] driver: loop: introduce synchronized read for loop driver
+To: Zhaoyang Huang <huangzhaoyang@gmail.com>
+Cc: Bart Van Assche <bvanassche@acm.org>, Suren Baghdasaryan <surenb@google.com>, Todd Kjos <tkjos@android.com>, 
+	Christoph Hellwig <hch@infradead.org>, "zhaoyang.huang" <zhaoyang.huang@unisoc.com>, 
+	Jens Axboe <axboe@kernel.dk>, linux-mm@kvack.org, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, steve.kang@unisoc.com, 
+	Minchan Kim <minchan@kernel.org>, Ming Lei <ming.lei@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi,
+On Wed, Sep 24, 2025 at 5:13=E2=80=AFPM Zhaoyang Huang <huangzhaoyang@gmail=
+.com> wrote:
+>
+> loop google kernel team. When active_depth of the cgroupv2 is set to
+> 3, the loop device's request I2C will be affected by schedule latency
+> which is introduced by huge numbers of kworker thread corresponding to
+> blkcg for each. What's your opinion on this RFC patch?
 
-I'm not in the cc list, so it can take sometime before I notice this
-patch.
+There are some issues on this RFC patch:
 
-在 2025/09/18 15:55, Xue He 写道:
-> In the existing plug mechanism, tags are allocated in batches based on
-> the number of requests. However, testing has shown that the plug only
-> attempts batch allocation of tags once at the beginning of a batch of
-> I/O operations. Since the tag_mask does not always have enough available
-> tags to satisfy the requested number, a full batch allocation is not
-> guaranteed to succeed each time. The remaining tags are then allocated
-> individually (occurs frequently), leading to multiple single-tag
-> allocation overheads.
-> 
-> This patch aims to retry batch allocation of tags when the initial batch
-> allocation fails to reach the requested number, thereby reducing the
-> overhead of individual allocation attempts.
-> 
-> --------------------------------------------------------------------
-> perf:
-> base code: __blk_mq_alloc_requests() 1.33%
-> patch:__blk_mq_alloc_requests() 0.72%
-> -------------------------------------------------------------------
-> 
-> Signed-off-by: hexue <xue01.he@samsung.com>
-> ---
+- current->plug can't be touched by driver, cause there can be request
+from other devices
 
-Please add change log.
+- you can't sleep in loop_queue_rq()
 
->   block/blk-mq.c | 43 +++++++++++++++++++++++--------------------
->   lib/sbitmap.c  |  7 ++++---
->   2 files changed, 27 insertions(+), 23 deletions(-)
-> 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index ba3a4b77f578..3ed8da176831 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -456,28 +456,31 @@ __blk_mq_alloc_requests_batch(struct blk_mq_alloc_data *data)
->   	struct blk_mq_tags *tags;
->   	struct request *rq;
->   	unsigned long tag_mask;
-> -	int i, nr = 0;
->   
-> -	tag_mask = blk_mq_get_tags(data, data->nr_tags, &tag_offset);
-> -	if (unlikely(!tag_mask))
-> -		return NULL;
-> +	do {
-> +		int i, nr = 0;
->   
-> -	tags = blk_mq_tags_from_data(data);
-> -	for (i = 0; tag_mask; i++) {
-> -		if (!(tag_mask & (1UL << i)))
-> -			continue;
-> -		tag = tag_offset + i;
-> -		prefetch(tags->static_rqs[tag]);
-> -		tag_mask &= ~(1UL << i);
-> -		rq = blk_mq_rq_ctx_init(data, tags, tag);
-> -		rq_list_add_head(data->cached_rqs, rq);
-> -		nr++;
-> -	}
-> -	if (!(data->rq_flags & RQF_SCHED_TAGS))
-> -		blk_mq_add_active_requests(data->hctx, nr);
-> -	/* caller already holds a reference, add for remainder */
-> -	percpu_ref_get_many(&data->q->q_usage_counter, nr - 1);
-> -	data->nr_tags -= nr;
-> +		tag_mask = blk_mq_get_tags(data, data->nr_tags, &tag_offset);
-> +		if (unlikely(!tag_mask))
-> +			return NULL;
-> +
-> +		tags = blk_mq_tags_from_data(data);
-> +		for (i = 0; tag_mask; i++) {
-> +			if (!(tag_mask & (1UL << i)))
-> +				continue;
-> +			tag = tag_offset + i;
-> +			prefetch(tags->static_rqs[tag]);
-> +			tag_mask &= ~(1UL << i);
-> +			rq = blk_mq_rq_ctx_init(data, tags, tag);
-> +			rq_list_add_head(data->cached_rqs, rq);
-> +			nr++;
-> +		}
-> +		if (!(data->rq_flags & RQF_SCHED_TAGS))
-> +			blk_mq_add_active_requests(data->hctx, nr);
-> +		/* caller already holds a reference, add for remainder */
-> +		percpu_ref_get_many(&data->q->q_usage_counter, nr - 1);
+The following patchset should address your issue, and I can rebase & resend
+if no one objects.
 
-This should move outside of the loop, the remainder handling is one time
-thing.
-
-> +		data->nr_tags -= nr;
-> +	} while (data->nr_tags);
->   
->   	return rq_list_pop(data->cached_rqs);
->   }
-> diff --git a/lib/sbitmap.c b/lib/sbitmap.c
-> index 4d188d05db15..4ac303842aec 100644
-> --- a/lib/sbitmap.c
-> +++ b/lib/sbitmap.c
-> @@ -534,10 +534,11 @@ unsigned long __sbitmap_queue_get_batch(struct sbitmap_queue *sbq, int nr_tags,
->   		unsigned int map_depth = __map_depth(sb, index);
->   		unsigned long val;
->   
-> -		sbitmap_deferred_clear(map, 0, 0, 0);
->   		val = READ_ONCE(map->word);
-> -		if (val == (1UL << (map_depth - 1)) - 1)
-> -			goto next;
-> +		if (val == (1UL << (map_depth - 1)) - 1) {
-> +			if (!sbitmap_deferred_clear(map, map_depth, 0, 0))
-> +				goto next;
-
-This looks wrong, you're still using the old val after
-sbitmap_deferred_clear().
-> +		}
->   
->   		nr = find_first_zero_bit(&val, map_depth);
->   		if (nr + nr_tags <= map_depth) {
-> 
-
-And I think if above checking failed, sbitmap_deferred_clear() should be
-called and retry as well.
+https://lore.kernel.org/linux-block/20250322012617.354222-1-ming.lei@redhat=
+.com/
 
 Thanks,
-Kuai
+
+
+>
+> On Wed, Sep 24, 2025 at 12:30=E2=80=AFAM Bart Van Assche <bvanassche@acm.=
+org> wrote:
+> >
+> > On 9/22/25 8:50 PM, Zhaoyang Huang wrote:
+> > > Yes, we have tried to solve this case from the above perspective. As
+> > > to the scheduler, packing small tasks to one core(Big core in ARM)
+> > > instead of spreading them is desired for power-saving reasons. To the
+> > > number of kworker threads, it is upon current design which will creat=
+e
+> > > new work for each blkcg. According to ANDROID's current approach, eac=
+h
+> > > PID takes one cgroup and correspondingly a kworker thread which
+> > > actually induces this scenario.
+> >
+> > More cgroups means more overhead from cgroup-internal tasks, e.g.
+> > accumulating statistics. How about requesting to the Android core team
+> > to review the approach of associating one cgroup with each PID? I'm
+> > wondering whether the approach of one cgroup per aggregate profile
+> > (SCHED_SP_BACKGROUND, SCHED_SP_FOREGROUND, ...) would work.
+> >
+> > Thanks,
+> >
+> > Bart.
+>
 
