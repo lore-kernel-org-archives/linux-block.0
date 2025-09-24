@@ -1,170 +1,128 @@
-Received: from eastern.birch.relay.mailchannels.net (eastern.birch.relay.mailchannels.net [23.83.209.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75C3A1C8603;
-	Wed, 24 Sep 2025 19:26:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=23.83.209.55
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758741976; cv=pass; b=QqwhKov7zOBNob91ZIKleb+x94NIUDCPaN7BZF9uLkBt4kE5xramulnCLAdSdiW0cyVJnFkfObRmVW+2NaPKT+aaJFXgTmWdiNSNwH4hOtb3uGsMVl8mDk1BpbbJvDdvvabhxDwk1NimvAx+JyJdqdQVC0c7wjU8JPNz/YyGJ6c=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758741976; c=relaxed/simple;
-	bh=BHsTkzdWZajDNDK+ioNil3t9QVIX4IumG9TxYgK95/0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EkBWl7S0eZencH7xz9rP5NLYMH3a5x6ctyim2l14bTBbgE/n98yRgcXErmafAn+2jL6RCklgG7CtUkdaWspVo86kuwH0b/6PF+vk44y7fFgu6xQD8K1CGTzLHKUHHPcFcwC6B6nwx4gqzzmoyiOG4U4cGPQxxGZydr1sO2adL+E=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=landley.net; spf=pass smtp.mailfrom=landley.net; dkim=pass (2048-bit key) header.d=landley.net header.i=@landley.net header.b=qP7ktGKp; arc=pass smtp.client-ip=23.83.209.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=landley.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=landley.net
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EB0125FA1D
+	for <linux-block@vger.kernel.org>; Wed, 24 Sep 2025 22:56:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758754596; cv=none; b=NdywhjHBbfEcql9SYLMfv7O7fCPHVrZa/Xu2SaE6ut1Q2YeTMrcsHuhguhuEUz+YyfCGKH2c61TTUfuYja8G+q9OXJODU1k0Gbi82GnFzviZAEUXJp6n2/nED6N8MAaglyFHH6IejfRzCQB5KSuhQlDq6xBSdY48QnefP8D4Pi4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758754596; c=relaxed/simple;
+	bh=Op6DNkPC6eHPtYfufa74RLj648Tv43squgVRXyUVfnc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=LhvJbCdzQ8cnDI2WOyNkC+aXjHH6L2wEvn3jVCaxDxI33hvI6ScpjmUgezWVPcnuffcYU5KbtL2ogX0lppq20Bj22KrkV9A5WH3jlr8tTighYbnZx4iN4HCAgqsaY5p7uh03Zwq/cdlIEzWhbIkbZGhAwpxkpc57y/EGvXtQiBY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DwoJgO5e; arc=none smtp.client-ip=209.85.222.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=landley.net header.i=@landley.net header.b="qP7ktGKp"
-X-Sender-Id: dreamhost|x-authsender|rob@landley.net
-Received: from relay.mailchannels.net (localhost [127.0.0.1])
-	by relay.mailchannels.net (Postfix) with ESMTP id D68F56C2CDF;
-	Wed, 24 Sep 2025 19:20:52 +0000 (UTC)
-Received: from pdx1-sub0-mail-a233.dreamhost.com (trex-blue-5.trex.outbound.svc.cluster.local [100.108.153.55])
-	(Authenticated sender: dreamhost)
-	by relay.mailchannels.net (Postfix) with ESMTPA id 4D82F6C092A;
-	Wed, 24 Sep 2025 19:20:51 +0000 (UTC)
-ARC-Seal: i=1; s=arc-2022; d=mailchannels.net; t=1758741652; a=rsa-sha256;
-	cv=none;
-	b=FIelBRpKbw4XRCXREIY6GrcomZxyh5mPLsvXc2d6FGp/peq6EwuUT5C41+2LA0F+ggX9yV
-	8sDI+KYqBxmckQrPVNV7rWra63fWqq+o5yLlx5MZRnuTdHQZEQgAmgblFxuGyjaNVrHFDk
-	wPn+M2/WQfSpmZ0IkQEEN3MHnMtbF5yhytJwedRo1ogyg8SQR/ZRrsw9DI3lHGj/2mLKAm
-	dj8jGFwnS4OjNKQjH2R6mDLZ7tlU8MommvaAha7o+UWIylY5K2nv2k5iepHunaoM660neK
-	8apwlyJbofcRsA4DvFw4pkrtRAv7P9DWllpqqR+qR+EGkoSllD3i7IkmAH8Mog==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
- d=mailchannels.net;
-	s=arc-2022; t=1758741652;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:dkim-signature;
-	bh=2+5k4o1pMixQXt5VsjL/MYZwcVCEyggOqRD9o8b/qSc=;
-	b=ChRw8wSjyogd2do/v/H6TxZGH/WsiQerw/hid5S8KViit0lwA1gMH0+6UMTmJNQMMIezrz
-	gsCOkeBMJedUyPmRdN0+x/Ibzn4kOtJ+sG57y0ioHbgMKfWThGzPdrmcr4dMMVSyyUw2rk
-	dVBBOmfhJTtYNtYRTDWhwp+mpqmWhEqvL9C8FrlKqiY59ItiMJEd3l6YkcBc//9Lzk6+Fh
-	mvjXUWAyzYxp+VnxExIXavdSHQcTxa/FAQIzz9fgRHT07mtFGrsyWRfq7ZmdI4pGoAxOfN
-	0MoQjrfyn0a4j6aLMBwkDQq4B0YTsphgd54S7yxIuOYwH85l63FNfS25ErSZgQ==
-ARC-Authentication-Results: i=1;
-	rspamd-55b8bfbc7f-nnn52;
-	auth=pass smtp.auth=dreamhost smtp.mailfrom=rob@landley.net
-X-Sender-Id: dreamhost|x-authsender|rob@landley.net
-X-MC-Relay: Neutral
-X-MailChannels-SenderId: dreamhost|x-authsender|rob@landley.net
-X-MailChannels-Auth-Id: dreamhost
-X-Callous-Spill: 350181bf214e86d3_1758741652308_3044232165
-X-MC-Loop-Signature: 1758741652308:255498347
-X-MC-Ingress-Time: 1758741652308
-Received: from pdx1-sub0-mail-a233.dreamhost.com (pop.dreamhost.com
- [64.90.62.162])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384)
-	by 100.108.153.55 (trex/7.1.3);
-	Wed, 24 Sep 2025 19:20:52 +0000
-Received: from [192.168.88.7] (unknown [209.81.127.98])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: rob@landley.net)
-	by pdx1-sub0-mail-a233.dreamhost.com (Postfix) with ESMTPSA id 4cX6Bm0dnXzJl;
-	Wed, 24 Sep 2025 12:20:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=landley.net;
-	s=dreamhost; t=1758741651;
-	bh=2+5k4o1pMixQXt5VsjL/MYZwcVCEyggOqRD9o8b/qSc=;
-	h=Date:Subject:To:Cc:From:Content-Type:Content-Transfer-Encoding;
-	b=qP7ktGKps9suFLn+SvwXNJfmXIq5m7DqxjIn++FPW06rQGLdyFrasnCUUBtJnzZ2L
-	 032Pr1ux0M59Obr3XwUHOtHtLFaEBxNmmkXxqPxYnCt1Q6ZqoWdAD9Q0W04+4gmjQl
-	 ds3vnt+/qY5ti8rpHJ46bodAbnhitDUyLxlQ0tRxKsiwmL7TThWSclVniorsogf6MJ
-	 gohNW1AXGJyGgriupkN0gkhVYK+ork7/6bPtZBHhvaB43HB07jP863XLDHcc31YH0+
-	 wfQhtcquMUPSEA+sEb7jFLcwMpbQdjW0Rd1EFegx855pG/OiLXxmVQR1JAWLIYES88
-	 kVFfZokS8hZqg==
-Message-ID: <de56cabd-05a9-4528-8150-9ad97209640e@landley.net>
-Date: Wed, 24 Sep 2025 14:20:47 -0500
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DwoJgO5e"
+Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-858183680b4so49285685a.2
+        for <linux-block@vger.kernel.org>; Wed, 24 Sep 2025 15:56:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1758754593; x=1759359393; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5B+Zh9yFHo6Xolwu3opD/Diih25AjkCAs1FmMFIzwVU=;
+        b=DwoJgO5e+q5F7FSQnVw9LAiWfS+IXaWOsio72wK7KbLl4ISRKjUKWy07k+nXoumPzQ
+         XwUR1iAMvEtLk9bXe93Z0nYUkHLmCeDwoL7XZz7cbG9D1N+pIlemQb9QtmMtB1nt5u77
+         Mh+V1jxeFH6GolL4b2keHNi6ezr5sqDw8BzVnAQOvzOc/T3F7rIXDoLGlnOx/nsEQi1z
+         Etu0CMs2UtkLIf/vkt10+TVLDSuApGXSQOLfQyFUjfSTEfuDW10lmLYhJQQ9kAZYeecH
+         LZeaUgCX4+dWu8NOJEdOJRge+zg4VTTPusdvjvQNo8tmcc3V53XSbytmrpulQML49EBs
+         ENGQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758754593; x=1759359393;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5B+Zh9yFHo6Xolwu3opD/Diih25AjkCAs1FmMFIzwVU=;
+        b=RUjmzvhK8bXfB1xw24ZxtaY02LmK8PIctfHf3DAonboCJ19SfAjPZGJcErq7eNpvTD
+         pxdMnfho1UJm6HapuamdmmqMixtFqelQu/64oZk5LsVALRETK+v/FPatWZqjM1vCr6wU
+         X7Mrub2jzNjP6qTqrtZIY+9uoHi8/svFojWWTmcpuu8y0vckfha3IcoFMAWJFuKtnriS
+         ReLJCngAjac+Xw6aR202/ruLp41r5ar4S2MWxzZPJ08TO2UeOQwUcntYFViltHrR0zQY
+         56MlNtRdgyhTTNXWrKIZ069+GeloYNsMxqUVNmILA7mFYLubZycYybSIUkNaQQWsPRkx
+         ZFjw==
+X-Forwarded-Encrypted: i=1; AJvYcCWGMWYIWCGj3QuhphlodehfWqdJMctXQAJmmZ0BTjv/hZcdmPY7y1YmYyLrLPWUucsNRGI3yVUHdAaKcQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw4R/iqNrgOmdhg4RwdSVZiEYsi1Jtq0Jx9V2iO3ctfmqO5DtVu
+	VjozCEml14Km9Y3k1lW2pmCkcjVg5GfRfZ/2ZYWlinJJoHf2MZMi5oobNNbi4oyExdYTOSIuWPL
+	YIZ2qioFuDJ4RaNYM6iwpgQrfSVsFEFo=
+X-Gm-Gg: ASbGncteDkY8SX/4F+pmNEooNPe7t6/VIRjtd/AMNPGA6zXjpnEazRj5UTKmESQIHH5
+	meQNkxy8vbhPceISM9l5xE5k6Xj6+72/kom+7i0TQiVMEFaty6BwrCjRNVRWrY6H8Cdbpopr+aj
+	evHe2kuEYrAPDlRCfiiCIy0heOLjo6BXMgTKMoQDHpmBtgBlCZePVleuO9WY9yLznlrB2ALYvOu
+	cnHrORP5V0NJhmiD7NxKPLqax5kxvZvGxz2sXCy
+X-Google-Smtp-Source: AGHT+IGzPzKs0y65h3LIZE6940gB4vV72Qyi3WZ6TBql4rL2B63TcdhnpA6Y4/6LPYw9/CuHLQab903G3U6TadwRTxg=
+X-Received: by 2002:a05:620a:394f:b0:82a:5c45:c625 with SMTP id
+ af79cd13be357-85adec4234emr191180885a.12.1758754593415; Wed, 24 Sep 2025
+ 15:56:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RESEND 00/62] initrd: remove classic initrd support
-To: Alexander Patrakov <patrakov@gmail.com>,
- Christophe Leroy <christophe.leroy@csgroup.eu>
-Cc: Askar Safin <safinaskar@gmail.com>, linux-fsdevel@vger.kernel.org,
- linux-kernel@vger.kernel.org, Linus Torvalds
- <torvalds@linux-foundation.org>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Christian Brauner <brauner@kernel.org>, Al Viro <viro@zeniv.linux.org.uk>,
- Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@lst.de>,
- Jens Axboe <axboe@kernel.dk>, Andy Shevchenko <andy.shevchenko@gmail.com>,
- Aleksa Sarai <cyphar@cyphar.com>,
- =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>,
- Julian Stecklina <julian.stecklina@cyberus-technology.de>,
- Gao Xiang <hsiangkao@linux.alibaba.com>, Art Nikpal <email2tema@gmail.com>,
- Andrew Morton <akpm@linux-foundation.org>, Eric Curtin <ecurtin@redhat.com>,
- Alexander Graf <graf@amazon.com>, Lennart Poettering <mzxreary@0pointer.de>,
- linux-arch@vger.kernel.org, linux-alpha@vger.kernel.org,
- linux-snps-arc@lists.infradead.org, linux-arm-kernel@lists.infradead.org,
- linux-csky@vger.kernel.org, linux-hexagon@vger.kernel.org,
- loongarch@lists.linux.dev, linux-m68k@lists.linux-m68k.org,
- linux-mips@vger.kernel.org, linux-openrisc@vger.kernel.org,
- linux-parisc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
- linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
- linux-sh@vger.kernel.org, sparclinux@vger.kernel.org,
- linux-um@lists.infradead.org, x86@kernel.org, Ingo Molnar
- <mingo@redhat.com>, linux-block@vger.kernel.org, initramfs@vger.kernel.org,
- linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-efi@vger.kernel.org, linux-ext4@vger.kernel.org,
- "Theodore Y . Ts'o" <tytso@mit.edu>, linux-acpi@vger.kernel.org,
- Michal Simek <monstr@monstr.eu>, devicetree@vger.kernel.org,
- Luis Chamberlain <mcgrof@kernel.org>, Kees Cook <kees@kernel.org>,
- Thorsten Blum <thorsten.blum@linux.dev>, Heiko Carstens <hca@linux.ibm.com>,
- patches@lists.linux.dev
-References: <20250913003842.41944-1-safinaskar@gmail.com>
- <ffbf1a04-047d-4787-ac1e-f5362e1ca600@csgroup.eu>
- <CAN_LGv3Opj9RW0atfXODy-Epn++5mt_DLEi-ewxR9Me5x46Bkg@mail.gmail.com>
-Content-Language: en-US
-From: Rob Landley <rob@landley.net>
-In-Reply-To: <CAN_LGv3Opj9RW0atfXODy-Epn++5mt_DLEi-ewxR9Me5x46Bkg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20250916234425.1274735-1-joannelkoong@gmail.com>
+ <20250916234425.1274735-11-joannelkoong@gmail.com> <20250918223018.GY1587915@frogsfrogsfrogs>
+ <aNGWkujhJ7I4SJoT@infradead.org> <aNG3fnlbJhv1cenS@casper.infradead.org>
+In-Reply-To: <aNG3fnlbJhv1cenS@casper.infradead.org>
+From: Joanne Koong <joannelkoong@gmail.com>
+Date: Wed, 24 Sep 2025 15:56:21 -0700
+X-Gm-Features: AS18NWAkh7IUvbVhGBD_bsGuTPZgO9EW5ULTCeoQsEee5-TykTnYOZdbSiLkTe8
+Message-ID: <CAJnrk1ZoZqnX8YOBJBnNpr65FpMO_wNJBg42NCAiB1_c+Zr-ww@mail.gmail.com>
+Subject: Re: [PATCH v3 10/15] iomap: add bias for async read requests
+To: Matthew Wilcox <willy@infradead.org>
+Cc: Christoph Hellwig <hch@infradead.org>, "Darrick J. Wong" <djwong@kernel.org>, brauner@kernel.org, 
+	miklos@szeredi.hu, hsiangkao@linux.alibaba.com, linux-block@vger.kernel.org, 
+	gfs2@lists.linux.dev, linux-fsdevel@vger.kernel.org, kernel-team@meta.com, 
+	linux-xfs@vger.kernel.org, linux-doc@vger.kernel.org, 
+	Ritesh Harjani <ritesh.list@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 9/24/25 11:17, Alexander Patrakov wrote:
->> Therefore is it really initrd you are removing or just some corner case
->> ? If it is really initrd, then how does QEMU still work with that
->> -initrd parameter ?
-> 
-> The QEMU -initrd parameter is a misnomer. It can be used to pass an
-> initrd or an initramfs, and the kernel automatically figures out what
-> it is.
+On Mon, Sep 22, 2025 at 1:54=E2=80=AFPM Matthew Wilcox <willy@infradead.org=
+> wrote:
+>
+> On Mon, Sep 22, 2025 at 11:33:54AM -0700, Christoph Hellwig wrote:
+> > On Thu, Sep 18, 2025 at 03:30:18PM -0700, Darrick J. Wong wrote:
+> > > > + iomap_start_folio_read(folio, 1);
+> > >
+> > > I wonder, could you achieve the same effect by elevating
+> > > read_bytes_pending by the number of bytes that we think we have to re=
+ad,
+> > > and subtracting from it as the completions come in or we decide that =
+no
+> > > read is necessary?
+> >
+> > Weren't we going to look into something like that anyway to stop
+> > the read code from building bios larger than the map to support the
+> > extN boundary conditions?  I'm trying to find the details of that,
 
-It's not a misnomer, initrams has always been able to make use of the 
-existing initrd loading mechanism to read images externally supplied by 
-the bootloader. It's what grub calls it too. I documented it in the 
-"External initramfs images" section of 
-https://kernel.org/doc/Documentation/filesystems/ramfs-rootfs-initramfs.txt 
-back in 2005. The mechanism itself is 30 years old 
-(Documentation/initrd.txt was written by Werner Almsberger in linux 
-1.3.73 from March 7, 1996, ala 
-https://github.com/mpe/linux-fullhistory/commit/afc106342783 ).
+Doesn't the iomap code already currently do this when it uses the
+trimmed iomap length (eg "loff_t length =3D iomap_length(iter)") in
+iomap_readpage_iter() for how much to read in?
 
-Since initrd contents could always be in a bunch of different 
-autodetected formats (and optionally compressed just like the kernel), 
-initramfs just hooked in to the staircase and said "if the format is 
-cpio, call this function to handle it". The patch series proposes 
-removing all the other formats, but not otherwise changing the existing 
-external image loader mechanism. (Personally I think removing the 
-architecture-specific hacks but leaving the generic support under init/ 
-would probably have made more sense as a first step.)
+> > IIRC willy suggested it.  Because once we touch this area for
+> > non-trivial changes it might be a good idea to get that done, or at
+> > least do the prep work.
+>
+> Yes, I did suggest it.  Basically, we would initialise read_bytes_pending
+> to folio_size(), then subtract from it either when a request comes in
+> or we decide to memset a hole.  When it reaches zero, we have decided
+> on the fate of every byte in the folio.
+>
+> It's fewer atomics for folios which contain no holes, which is the case
+> we should be optimising for anyway.
 
-The bootloader hands off an initrd image, initramfs is the boot-time 
-cpio extraction plumbing that's _init tagged and gets freed, and rootfs 
-is the persistent mounted instance of ramfs or tmpfs that's always there 
-and is analogous to the init task (PID 1) except for the mount tree. 
-(And is often overmounted so it's not visible, but it's still there. And 
-is NOT SPECIAL: overmounts aren't a new concept, nor is hiding them in 
-things like "df".)
+I think we can even skip subtracting when we encounter a hole and just
+tally it all up at the end if we just keep track of how many bytes the
+caller asynchronously reads in, and then just do read_bytes_pending -=3D
+folio_size() - bytes_read_in to offset it. Actually, looking at this
+more, I think it must be done this way otherwise handling errors gets
+tricky.
 
-There's a REASON my documentation file was called 
-ramfs-rootfs-initramfs.txt: the naming's always been a bit... layered. 
-(And yes, I have always spelled initmpfs with only one t.)
+I had missed that this approach leads to fewer atomics since now this
+gets rid of the caller having to increment it for every range read in.
+This approach does seem better. I'll make this change for v5. We
+should probably do the same thing for writeback.
 
-Rob
+Thanks,
+Joanne
