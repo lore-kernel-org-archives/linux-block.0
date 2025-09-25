@@ -1,67 +1,67 @@
-Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
+Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 410482D7803
-	for <linux-block@vger.kernel.org>; Thu, 25 Sep 2025 13:55:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF2F32D7817
+	for <linux-block@vger.kernel.org>; Thu, 25 Sep 2025 13:55:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758808540; cv=none; b=ZDoKIyjhBDlLQ4TQMS633ojEpnRpixfyg+/cr4I4XH6KCKSqqNhNhBV7QW7iEOAGbPP9u9VOvJ6v+K4OZFffSmm9f7Ef2xHFT2TxD/mS82Ut5HGdmonVvz8j0qpp09KS3zjer/D0zITCLANfsWsBEIDV6eJlm1rAsXusYk7yPuk=
+	t=1758808546; cv=none; b=AIG6mVOHWVTcq46jnd6+Q/0J3lLEV3vpDKVDUvts5QZYou4CdMJnfY2KPGRkvNoSldoE2ENWCeVLd4GLxJt3m+PR08+B0nj2GkpZLYH8FSF9RQOzkJX8BZ/mct75PcWH0ezBrOPcI5NcQKl7We3RD2EJHxIYrRytyw0z/S8iICs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758808540; c=relaxed/simple;
-	bh=9ZmEu11QXJ8phGJATObrsBrPngKGUQeOptVynfUL8WM=;
+	s=arc-20240116; t=1758808546; c=relaxed/simple;
+	bh=cGT2p8vWeMd9yhCscAqtKB14P0MqjieptZpD6VjuDnQ=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=YJ/3feZ2bqlg+EqLJ291K5pC9ag8yHuuyz/1KxfCsVh4DLLsYQ6BVkTJCpjzalWHUiCQq+VnB+YggCrXnLCFNPk0jgseq9GryK9g070BApf2HGeh0K19sjQWSlPgk+Deanr99cmW9YYTwae8maXXYbr5/CpsjuRnijJtQa2KwUA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OfosiNOI; arc=none smtp.client-ip=209.85.219.49
+	 In-Reply-To:To:Cc; b=ppr+JIiDycu8ohwxTfbl3kuwG0sEWV2U8iz/TCVY5OnyPfqkmtuM0ELiMHK5W8HsGsyjYzFKVLKPMIZNyWQuAy2CsPB1rqPnujCeBiv7iz0pUQD6+9XWqicl7r295Lbb8WjezkP7sxQiV+XB+7x9iSrv+HDUyAu8GOGYPXHF2go=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QNKnXwyx; arc=none smtp.client-ip=209.85.219.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OfosiNOI"
-Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-79599d65f75so7326476d6.2
-        for <linux-block@vger.kernel.org>; Thu, 25 Sep 2025 06:55:38 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QNKnXwyx"
+Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-7f7835f4478so6060106d6.1
+        for <linux-block@vger.kernel.org>; Thu, 25 Sep 2025 06:55:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758808537; x=1759413337; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1758808544; x=1759413344; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=mswzqg1rIlmw6HicVVCtXv0e5vufLTaFX3VKtK98wJ4=;
-        b=OfosiNOI6HdmuS6bpjzcl5fODl9n35fCh7xdTjfT2ExCu+lpF1+YgVYf8Emnwzm+oe
-         +aVYsc2liL0RJevBRu8j8atyTHlxwgscCJvnetkP8tqejNrdr2gVgiWVukDe28fZ/qX9
-         ymyEZ9QZmXmEah5zJTTcF7n7DpNK3v59CsrU635x0fafsNef7B4/zMdU/wsnzaaNEsPP
-         C7P49OuJpFFwOyuU/T6lY/eVYwY9TCEWc32ekvJKVLxqvwEVTaw9b1DWXZv8bJIErqA+
-         JvbkXnwOQPZAWofUX0RdilxVZdsda2j7e112eYDahXdSIo8LEQtJjj1pdP981SVGPGmr
-         iSxQ==
+        bh=WAkOv1RieyKvIfCAhJItgJq0V7Rg1TFOU5lVc6t6PUg=;
+        b=QNKnXwyxRNLHaB0G90cg4piqi+WLlffVo8gyhXvBR0dxXTRIJyhZ47K7ozqeszP2Gc
+         6iZ5dHqRU53CX5dwNOX98mUQb78HSBEC9cBUAYmlWHLDvE+/qIyBiGJjgFEAJ/PSVWIz
+         2dBfhUIFx9pZ4xMclW7yje4dGxt8pV/gXxZL7ynDXmarqR/OGueIIQEppDyAPqst+SKK
+         ckWkTydWSBFrZ6GltJedHN4ms/EuId+U1MlEBk2y3IK2eSDLIAh33O48BxxUK/4ZPega
+         i4v1X2yk5FylPajjOZO9eEpBfzWQEu5pKQqk9S5rbXvyW3hi1FQRg2gK2wwsX3GzXMRG
+         7x/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758808537; x=1759413337;
+        d=1e100.net; s=20230601; t=1758808544; x=1759413344;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=mswzqg1rIlmw6HicVVCtXv0e5vufLTaFX3VKtK98wJ4=;
-        b=aaUQ7+4Kd0aMJt4SY/FI+aylaOtuA6llH8RE0r+IPi3cLd0nlPGnVRJL9lzcGwC6Iq
-         zrRkHrqJYjim5XGhcU398tkHj/RVfQrJmRHDtb42LV2AYecVEjjWqHUmhxeWyM+bNF6E
-         uCDoIvJb143eJ3SDoO9zBJknrBLhi12PpuVp1fL8WN8woW+SGjAM3itO1PGwTjfzqwtv
-         IPcqWXW72DdCHLFw7WD8kAlXKl2AKKTv5UwKJFgvLQX2wJo4Wjyl1ZpNkoEt7amiu7f/
-         7sRYAm0deWwXepeqLgYVqKey6+ZWTh7aIebz9NER3puDIp1XPU7UV8uzoCii74502TWm
-         6bWw==
-X-Forwarded-Encrypted: i=1; AJvYcCVbTcabZtqr/FpF8Vm5jri6Qzl9xoLdlvGeUEy95B/1/0lD5M8Zgxqlp3S6/v7yZQzZBitRAJTqgyahRQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzeD2pprqaR40RukmzjwJXjb+eD8bGo7l3zDvHZ8c3/HkSNQdxX
-	eOLboyJIOGar9rKS2+OMpQ7I77Oq1exDIc/8iqHj0VADBzk/6LjNxrz0
-X-Gm-Gg: ASbGncuNpzz5E/4UH1tQYINVKJBWvARbC8DjG34B7h9o7ODLN//JSyw6+8Sfaa2MwS+
-	d8//6z1TZcwEk7244Q3x6l3Gl9vs3IOh/YLUwc/2pftiWl50R3T0ixrh5Pgs6qYZosO9Miai4Nz
-	ofNFrVyvPXtGnnshykerIyKpCljVVkENgfgEF+xRisBgovAdEZ1bd9CB/TvhgojDso/1u12n1Qv
-	HuAudH9tDhCRxqQuh7F8uD1zbAFow2uOMl6onC+mG1uDChLL5MVDERwDcRuyhDmukKIOITc7Scv
-	knPLJra+iLuLKcxtgiiJcINe51AB+uc+vM63V5JNYkevGniyoyoOKvw5SJ4uq+TI05x1uB/ADOp
-	jsOaU7proam8/7uGD0lr2K79JO+Rqm4Rhi2RlRuIu0Ff6klMifI1dgY0ms2sHNjnLCbqMwV586q
-	iGGsM9YX/oUT+GYFjw0bjSzdw2ss0ID9eUKyJuDir5jGlSf26WfJ/s5DDEZtb5iTjFOFs+
-X-Google-Smtp-Source: AGHT+IG0JSBlGu1RB4uMilSaBh7PnIkXhnuatHF4cSQpYwaqP/zzSQ9G+tSnzQTTn3K53FoLTANywA==
-X-Received: by 2002:a05:6214:4001:b0:70d:6de2:50c0 with SMTP id 6a1803df08f44-7fc43a4e9e0mr40876536d6.61.1758808535790;
-        Thu, 25 Sep 2025 06:55:35 -0700 (PDT)
+        bh=WAkOv1RieyKvIfCAhJItgJq0V7Rg1TFOU5lVc6t6PUg=;
+        b=bkK4QfBk/JHWFBJrnSgk9m5nuSbSwDoRQKaxXLBBAfPUqOh1fPdITJUl/QY4RuirjO
+         Qpju5HHDI/hjAbjzSe/DaQ94jxACOYLpfXbMXqr6pNSSo7RDFXfZpFF5cQd/XysFB0dv
+         /KDpo4zT8V0Dlc//dq6nDU2ia1ZeV6wMZgOlJ8HUkpUjODI9whQa2lyrDQaSHsOt/+YT
+         YebjSu7/ZTRWN0Dc1lPBdBegQLLTo+drhnY2wtrBaluFTGnuW0KXeLMy4jJWmnl2EIxv
+         LJtGi8alb3TLqNrbd7R0zp33xd/2iP7o0WWWvqmQ9krbV77h1O6pPOVjCnZ4kbEa6vHY
+         l4Zw==
+X-Forwarded-Encrypted: i=1; AJvYcCU8XzKNnzMqwUyQQpl5G9SAGEaKmI9WqWX/VeZDeWWdCjvyyBSrxCVeBwGoi/Fdxa376r7kALn3wLICNw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzG16jxZQUkdm4ig+ACeBq1/D2nifNck2VCd6Ag7h9LqPXbjpd/
+	s9ovxTKDJxghfnBznV0rOQacOfpU4MHUGGLvVV/PefqDgi3s15o0b7wh
+X-Gm-Gg: ASbGncuU3PEuWHR1g0vhmV9yCkR6+bACBYpKYBFLHHC1dcfg5wIjonTkEu0yYANb6g+
+	nsm4Do3KSmZXLoWhVya80swNYoa6pkbkCW+1tZFtaUYFTcegVymXVO03/mTefuyo/wOYdYg9VfT
+	NkmY6fhI0PkrJxF6Q7MnD7nBusCGkOaloXOiGuySS9252oH/hKMyp+mR54R+xLosurpSqqLgwiE
+	llL8yAUasNusPARG2oL2oeQY7iCDoyRZtQACJ0MHjeWHJmfoLbAekgHNJVePMME5V3fDDnhgSUx
+	jDNeeldMEO/YUQwsu+2lDOBPaTuXS6QczGh3934d8p3bw3y+ngePo84IjnGGlSY9DMa+DFjbmI2
+	g7D7UgNYSdMnHbMPY+LSIUtCobmKp86Vk46QDbyHQKd757kk4UZX+4AqSLgybjVaDu+Tr7amNXK
+	ID8Z9BhAyeup1jAhb+1JDB2gBASaENsE2tsEkr77xLJs8AOM0/2OKkpFspPQIjTJfQ9Clt
+X-Google-Smtp-Source: AGHT+IHF9UuB9For1/7YW0Qxf6nPTFMieeyDSqN58eT9nYnL6TeBAODoPScd1hJnleJiIi565hDfTQ==
+X-Received: by 2002:ad4:5bc9:0:b0:76a:fcee:97aa with SMTP id 6a1803df08f44-7fc309ec826mr47856686d6.29.1758808543310;
+        Thu, 25 Sep 2025 06:55:43 -0700 (PDT)
 Received: from 137.1.168.192.in-addr.arpa ([2600:4808:6353:5c00:7c:b286:dba3:5ba8])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-80135968d5esm11536916d6.12.2025.09.25.06.55.29
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-80135968d5esm11536916d6.12.2025.09.25.06.55.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Sep 2025 06:55:35 -0700 (PDT)
+        Thu, 25 Sep 2025 06:55:42 -0700 (PDT)
 From: Tamir Duberstein <tamird@gmail.com>
-Date: Thu, 25 Sep 2025 09:54:01 -0400
-Subject: [PATCH v2 13/19] rust: pci: replace `kernel::c_str!` with
+Date: Thu, 25 Sep 2025 09:54:02 -0400
+Subject: [PATCH v2 14/19] rust: platform: replace `kernel::c_str!` with
  C-Strings
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -71,7 +71,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250925-core-cstr-cstrings-v2-13-78e0aaace1cd@gmail.com>
+Message-Id: <20250925-core-cstr-cstrings-v2-14-78e0aaace1cd@gmail.com>
 References: <20250925-core-cstr-cstrings-v2-0-78e0aaace1cd@gmail.com>
 In-Reply-To: <20250925-core-cstr-cstrings-v2-0-78e0aaace1cd@gmail.com>
 To: "Rafael J. Wysocki" <rafael@kernel.org>, 
@@ -111,13 +111,13 @@ Cc: linux-pm@vger.kernel.org, linux-kernel@vger.kernel.org,
  linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
  Tamir Duberstein <tamird@gmail.com>
 X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openssh-sha256; t=1758808438; l=1469;
+X-Developer-Signature: v=1; a=openssh-sha256; t=1758808438; l=6208;
  i=tamird@gmail.com; h=from:subject:message-id;
- bh=9ZmEu11QXJ8phGJATObrsBrPngKGUQeOptVynfUL8WM=;
+ bh=cGT2p8vWeMd9yhCscAqtKB14P0MqjieptZpD6VjuDnQ=;
  b=U1NIU0lHAAAAAQAAADMAAAALc3NoLWVkMjU1MTkAAAAgtYz36g7iDMSkY5K7Ab51ksGX7hJgs
  MRt+XVZTrIzMVIAAAAGcGF0YXR0AAAAAAAAAAZzaGE1MTIAAABTAAAAC3NzaC1lZDI1NTE5AAAA
- QLLvUlNLZLAaXK2MqYDhZdBweEQ8R3sKV9FI/C2n7BV5P0I7OA8y5a1a/1zJuYaQ3obw7TFfFmi
- JTjNJLSMGawU=
+ QAqXnSTSLC5DSGmrQ0rUUvFP5bu0JMFwcjJ+FLO2nGEH20VIfZHuQ47CF/8jOiBsSKPADtt8TtP
+ 7X9bJlhhLGw8=
 X-Developer-Key: i=tamird@gmail.com; a=openssh;
  fpr=SHA256:264rPmnnrb+ERkS7DDS3tuwqcJss/zevJRzoylqMsbc
 
@@ -130,31 +130,155 @@ Reviewed-by: Benno Lossin <lossin@kernel.org>
 Acked-by: Danilo Krummrich <dakr@kernel.org>
 Signed-off-by: Tamir Duberstein <tamird@gmail.com>
 ---
- samples/rust/rust_driver_pci.rs | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ rust/kernel/platform.rs              |  6 +++---
+ samples/rust/rust_driver_faux.rs     |  4 ++--
+ samples/rust/rust_driver_platform.rs | 30 ++++++++++++++----------------
+ 3 files changed, 19 insertions(+), 21 deletions(-)
 
-diff --git a/samples/rust/rust_driver_pci.rs b/samples/rust/rust_driver_pci.rs
-index 606946ff4d7f..e0e9d9fda484 100644
---- a/samples/rust/rust_driver_pci.rs
-+++ b/samples/rust/rust_driver_pci.rs
-@@ -4,7 +4,7 @@
+diff --git a/rust/kernel/platform.rs b/rust/kernel/platform.rs
+index 8f028c76f9fa..d1cc5cee1cf5 100644
+--- a/rust/kernel/platform.rs
++++ b/rust/kernel/platform.rs
+@@ -135,7 +135,7 @@ macro_rules! module_platform_driver {
+ /// # Examples
+ ///
+ ///```
+-/// # use kernel::{acpi, bindings, c_str, device::Core, of, platform};
++/// # use kernel::{acpi, bindings, device::Core, of, platform};
+ ///
+ /// struct MyDriver;
+ ///
+@@ -144,7 +144,7 @@ macro_rules! module_platform_driver {
+ ///     MODULE_OF_TABLE,
+ ///     <MyDriver as platform::Driver>::IdInfo,
+ ///     [
+-///         (of::DeviceId::new(c_str!("test,device")), ())
++///         (of::DeviceId::new(c"test,device"), ())
+ ///     ]
+ /// );
+ ///
+@@ -153,7 +153,7 @@ macro_rules! module_platform_driver {
+ ///     MODULE_ACPI_TABLE,
+ ///     <MyDriver as platform::Driver>::IdInfo,
+ ///     [
+-///         (acpi::DeviceId::new(c_str!("LNUXBEEF")), ())
++///         (acpi::DeviceId::new(c"LNUXBEEF"), ())
+ ///     ]
+ /// );
+ ///
+diff --git a/samples/rust/rust_driver_faux.rs b/samples/rust/rust_driver_faux.rs
+index ecc9fd378cbd..23add3160693 100644
+--- a/samples/rust/rust_driver_faux.rs
++++ b/samples/rust/rust_driver_faux.rs
+@@ -2,7 +2,7 @@
+ 
+ //! Rust faux device sample.
+ 
+-use kernel::{c_str, faux, prelude::*, Module};
++use kernel::{faux, prelude::*, Module};
+ 
+ module! {
+     type: SampleModule,
+@@ -20,7 +20,7 @@ impl Module for SampleModule {
+     fn init(_module: &'static ThisModule) -> Result<Self> {
+         pr_info!("Initialising Rust Faux Device Sample\n");
+ 
+-        let reg = faux::Registration::new(c_str!("rust-faux-sample-device"), None)?;
++        let reg = faux::Registration::new(c"rust-faux-sample-device", None)?;
+ 
+         dev_info!(reg.as_ref(), "Hello from faux device!\n");
+ 
+diff --git a/samples/rust/rust_driver_platform.rs b/samples/rust/rust_driver_platform.rs
+index ad08df0d73f0..b3fe45a43043 100644
+--- a/samples/rust/rust_driver_platform.rs
++++ b/samples/rust/rust_driver_platform.rs
+@@ -63,7 +63,7 @@
  //!
- //! To make this driver probe, QEMU must be run with `-device pci-testdev`.
  
--use kernel::{bindings, c_str, device::Core, devres::Devres, pci, prelude::*, types::ARef};
-+use kernel::{bindings, device::Core, devres::Devres, pci, prelude::*, types::ARef};
+ use kernel::{
+-    acpi, c_str,
++    acpi,
+     device::{
+         self,
+         property::{FwNodeReferenceArgs, NArgs},
+@@ -85,14 +85,14 @@ struct SampleDriver {
+     OF_TABLE,
+     MODULE_OF_TABLE,
+     <SampleDriver as platform::Driver>::IdInfo,
+-    [(of::DeviceId::new(c_str!("test,rust-device")), Info(42))]
++    [(of::DeviceId::new(c"test,rust-device"), Info(42))]
+ );
  
- struct Regs;
+ kernel::acpi_device_table!(
+     ACPI_TABLE,
+     MODULE_ACPI_TABLE,
+     <SampleDriver as platform::Driver>::IdInfo,
+-    [(acpi::DeviceId::new(c_str!("LNUXBEEF")), Info(0))]
++    [(acpi::DeviceId::new(c"LNUXBEEF"), Info(0))]
+ );
  
-@@ -79,7 +79,7 @@ fn probe(pdev: &pci::Device<Core>, info: &Self::IdInfo) -> Result<Pin<KBox<Self>
-         let drvdata = KBox::pin_init(
-             try_pin_init!(Self {
-                 pdev: pdev.into(),
--                bar <- pdev.iomap_region_sized::<{ Regs::END }>(0, c_str!("rust_driver_pci")),
-+                bar <- pdev.iomap_region_sized::<{ Regs::END }>(0, c"rust_driver_pci"),
-                 index: *info,
-             }),
-             GFP_KERNEL,
+ impl platform::Driver for SampleDriver {
+@@ -126,49 +126,47 @@ impl SampleDriver {
+     fn properties_parse(dev: &device::Device) -> Result {
+         let fwnode = dev.fwnode().ok_or(ENOENT)?;
+ 
+-        if let Ok(idx) =
+-            fwnode.property_match_string(c_str!("compatible"), c_str!("test,rust-device"))
+-        {
++        if let Ok(idx) = fwnode.property_match_string(c"compatible", c"test,rust-device") {
+             dev_info!(dev, "matched compatible string idx = {}\n", idx);
+         }
+ 
+-        let name = c_str!("compatible");
++        let name = c"compatible";
+         let prop = fwnode.property_read::<CString>(name).required_by(dev)?;
+         dev_info!(dev, "'{name}'='{prop:?}'\n");
+ 
+-        let name = c_str!("test,bool-prop");
+-        let prop = fwnode.property_read_bool(c_str!("test,bool-prop"));
++        let name = c"test,bool-prop";
++        let prop = fwnode.property_read_bool(c"test,bool-prop");
+         dev_info!(dev, "'{name}'='{prop}'\n");
+ 
+-        if fwnode.property_present(c_str!("test,u32-prop")) {
++        if fwnode.property_present(c"test,u32-prop") {
+             dev_info!(dev, "'test,u32-prop' is present\n");
+         }
+ 
+-        let name = c_str!("test,u32-optional-prop");
++        let name = c"test,u32-optional-prop";
+         let prop = fwnode.property_read::<u32>(name).or(0x12);
+         dev_info!(dev, "'{name}'='{prop:#x}' (default = 0x12)\n");
+ 
+         // A missing required property will print an error. Discard the error to
+         // prevent properties_parse from failing in that case.
+-        let name = c_str!("test,u32-required-prop");
++        let name = c"test,u32-required-prop";
+         let _ = fwnode.property_read::<u32>(name).required_by(dev);
+ 
+-        let name = c_str!("test,u32-prop");
++        let name = c"test,u32-prop";
+         let prop: u32 = fwnode.property_read(name).required_by(dev)?;
+         dev_info!(dev, "'{name}'='{prop:#x}'\n");
+ 
+-        let name = c_str!("test,i16-array");
++        let name = c"test,i16-array";
+         let prop: [i16; 4] = fwnode.property_read(name).required_by(dev)?;
+         dev_info!(dev, "'{name}'='{prop:?}'\n");
+         let len = fwnode.property_count_elem::<u16>(name)?;
+         dev_info!(dev, "'{name}' length is {len}\n");
+ 
+-        let name = c_str!("test,i16-array");
++        let name = c"test,i16-array";
+         let prop: KVec<i16> = fwnode.property_read_array_vec(name, 4)?.required_by(dev)?;
+         dev_info!(dev, "'{name}'='{prop:?}' (KVec)\n");
+ 
+         for child in fwnode.children() {
+-            let name = c_str!("test,ref-arg");
++            let name = c"test,ref-arg";
+             let nargs = NArgs::N(2);
+             let prop: FwNodeReferenceArgs = child.property_get_reference_args(name, nargs, 0)?;
+             dev_info!(dev, "'{name}'='{prop:?}'\n");
 
 -- 
 2.51.0
