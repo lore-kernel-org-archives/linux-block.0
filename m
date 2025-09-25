@@ -1,67 +1,67 @@
-Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
+Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38BF0289E17
-	for <linux-block@vger.kernel.org>; Thu, 25 Sep 2025 13:54:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D832D2900A8
+	for <linux-block@vger.kernel.org>; Thu, 25 Sep 2025 13:54:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758808470; cv=none; b=e2sAmJa6qTrWTgu9QSD/IyJgXToGPFnj1Eg08ruRyP7luE06HAhMUnKT2TtmpEilhLZqOb0+cFGOKsDJO//LzU5W2WNmSXPbS7PSDRETfQZI8pxdDSDNgPNrDjCs4kCCJNAJLe9VuJBZljW4bWMKQYCzvL1TZaK9+zUU8Tocz0s=
+	t=1758808478; cv=none; b=myMFQgHBSKskCBtpA6uutqwzeB2iXlBxDuCItFzqevtA7BpFW4mfWkOq7YMNZoUiXaYpNwt1V5ChwWxd7DTtB5Z+LcfaF6lLLRH9gMviQYxo9YjWva56VAeZmXiPXMaDJUQJ20qvX6Qt/LRw6boZBemIfEQENlkf92iCp4I4GNs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758808470; c=relaxed/simple;
-	bh=a28D2oz73aX2HfdAyFfsKbL334Gi28aqVXRfaJ6AmKs=;
+	s=arc-20240116; t=1758808478; c=relaxed/simple;
+	bh=hAcmGZ1oTJ4jVBQJEYJ6EMTc7nRfLDtEyG/sjigYIyU=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=ANE1qAsp2JDvn0PLqzzmYHKmSQBWvnzT1WqPgl0nPae//e0z8I9YiDJp1qs8XaUY0oOB0ZQfk1L/++UgxKP3oaLDflX/nPF091KKPCrTrciwMVoNYrmAmX/Zu6BeTzXskr1KhI6imreQzZQ9pecaftALJJeBQ+LoHb0GRySSmGk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JyBSanWh; arc=none smtp.client-ip=209.85.160.174
+	 In-Reply-To:To:Cc; b=LGeqMoFLdcDBsHLinJe0qrMneQiV5QKsU9nLSbSDj8JItO9zylfbeeMDB0HqZIPmveWka3j/2SSDI4DOWvoPSg3doQ2w/j968LbQm4fdehdEh1QNFj+8KHyJmWqFvk4TA50XW6J09AQ/5jVE8EqU03nBbu1j6Qk349Jd/G9eFV8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YCL8SM9/; arc=none smtp.client-ip=209.85.219.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JyBSanWh"
-Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-4d7b4b3c06dso4603921cf.1
-        for <linux-block@vger.kernel.org>; Thu, 25 Sep 2025 06:54:28 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YCL8SM9/"
+Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-7f7835f4478so6050306d6.1
+        for <linux-block@vger.kernel.org>; Thu, 25 Sep 2025 06:54:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758808467; x=1759413267; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1758808473; x=1759413273; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=gUijmF9iuJuAB0zjmMxkDhFa2siruE3gGN7H1MY79is=;
-        b=JyBSanWhIqVHtczXr/C06BJjsuqkRhHbMql48boYTQ32gkEZOpJsuQ6rWfL+xNVjAr
-         YWsoQMJH97FKLsoaBsYw0NIw29bWbQCRciYbebnQKoY+Ni3PyI62sPxBXyK89TtcY2d7
-         6TbQkU97tLv0hYvsOofthnMlKpzRVqL+ZzDbxPNQbC9fMG/QXCkm7YQOl9/znwXosUp4
-         DEK3jW7hC9zFrwKq/uvslUuNdWXB1pgVEQUnMuys54qHWIV1uGfzaDvTXQMrYrVE6nXT
-         lqxGwvV0KdRCWqUnqRIwGau9LbCl95dgBoVxnrJEa4y3BhDB7vpHAnQslcxHLc3uwGhE
-         k1Rw==
+        bh=2xzf6OZF5c76vENMOs87EjkdVa89C5AWM8vex+/TLyw=;
+        b=YCL8SM9/Y5iGmyNUrtthO8ujsjjPI9hQklmqkZFxLz22syOPbBir+RKbtzZXae4TUc
+         /lwayXqGjNn+Wp3oAY62+DGxS1mRYUr61GIfoAf4fiBjX/5nuX37c2XMfn6uoRBA3Y2T
+         uR33GlTCKiqRb3E+eH2Q5bdEWpz1pWqYMvCb1y7YJgCuJLXHUbFQprOQLQknt32HWf48
+         INK//k++u/YzrTRCqklcsaHTEGCTAXTtwjRo9cE1eTmTl2jIWJO93IVSP7WA2iAp8sWu
+         ZQB2zJgkfyiK77QA6JDWZm7wW/eojCFxn9eLxpNJ37p+Wg9mEg10MqrV9BIqUXenb9Ji
+         bbDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758808467; x=1759413267;
+        d=1e100.net; s=20230601; t=1758808473; x=1759413273;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=gUijmF9iuJuAB0zjmMxkDhFa2siruE3gGN7H1MY79is=;
-        b=n1rcjfCDZajKW3r9M8+2ITgg92cEqRU/DPU7JqvHXyDm4yImjNmZTp6kZd85FAnLQ1
-         fUrT5g0BtXhtbRtHUnROklchuq09qBRliJcIUu+7ePLv2S2n49AiaWH0nzfn1tT1dNRn
-         Axw9ibj8WilLy8MrOmtnbyOyiW9R5SAozAkE1xZBf8/H39NvRBxFaim1x7c6FaOn2jZo
-         6IAhq8azlNXNp9s3dh9Zc7hKmKeI+egyyyPirKILYxElzsvLJ7pMbzU/ZFzUSJ78RWzL
-         q10Ft2eLHve3SvzBG5N+VIJMZSQxyZ2m1fdApRtQwzMO+v37YUROW0GWe/VKMperggIV
-         GY1A==
-X-Forwarded-Encrypted: i=1; AJvYcCVoKJ8uRI7205Zp9M4ePPESFGZz9Y83wK/u6G94qLm6keTe+1Mo4AkSoMTO2tCb75GkWxHMAMkeOsq7cA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwPtEGjAhTOYQwD0qhfxtySvUNP8IjKsjcotDUXweGfSSaI6Xl7
-	xeRVxFJWLRPul9p+vzUi313Hhp+3WPVt0NcjbbnBcvMpnMTXTPan15fh
-X-Gm-Gg: ASbGncsV6Eptc4FKBzamiI/D6r+0mHt4yWzbdx/N09E0ve29FiRp+dDAimMrGL00KQu
-	OnuyhOJFRLstlMWAgT80fDrjGGlZFw+m0QEbi6JR80bAb5EqfbceSWUqahLAD9AN5ZFHrJmZQWz
-	rsXkxRND86rz8rKXCLWCWYKuY4d375FfozMl6Un0LxkEmjAQng711lLi5SfysmDf1a1S1XJ+/Tb
-	Ma8k57ORLCHnSIzFRUuzxgvX16hzmvnlGIJcfP+z3fuRxHGLbSLTEehI9SNeed5KRiMVfHeo3YQ
-	m33GfHJR2pSypz4nQ+NkyJAiTcPbyeQFkrU976DPsV8dCYOOvhFJDiS0HTDMQwk2Rb198JE53fP
-	EWU4yrzE7ChpkRMeBcB5aNiISyVEhl1ZGT44f4zyXiCeTd1i8N4SIU6W4y6SJi3R1/1SWhk7MDG
-	AzYDH9K7ll7bccmDrzsTKgP2CKu63uRxhbEeW36OR5ntdpVX7We1QELXMJOdGEgBi/wCuX
-X-Google-Smtp-Source: AGHT+IFfyTZ0Kg2oYHDkA6MZ/FXiX6A/UvU5m7OAHMKeDgQlNpiMwRGrpCfne5Uk/q1fSoRc2LB+qg==
-X-Received: by 2002:a05:6214:1301:b0:766:30e3:eb9e with SMTP id 6a1803df08f44-7fc3a0df24fmr47841866d6.37.1758808466670;
-        Thu, 25 Sep 2025 06:54:26 -0700 (PDT)
+        bh=2xzf6OZF5c76vENMOs87EjkdVa89C5AWM8vex+/TLyw=;
+        b=M9fCIbTcFr81iTyWuZHBFsXEg3f3O5CsAi7/Qu6CTdSZA+xAQsnZk0BDzymDe03F3s
+         qAJMOcYu98RfTOMfaP2lN6OGSz31bbxhMIsX6Oei1VlFK8jxKY3stQ+2C65PCwSmoF3m
+         yR3LZ2nfJICRnft900W9BfcASX9IpIUCXFWJ6tLOp7jC3UaPMynODomsLyP8Xl+kKNwx
+         Ct86XtDPnY/LhsW7/yl2LXufZWabHAv3yssbU/29MP1GOekKfIVQEbqkEZjWk7QHtENR
+         OoYUTBJrIExI8OSkLNhA4DSanHk2Vhz19/yZ1HI+GG3kSVuWkEXU0RVwzd4f6x0ypavB
+         hwRA==
+X-Forwarded-Encrypted: i=1; AJvYcCU86zJKZdxaGfgjXXBllT1sZXFDW1ouTmYIV0cEcFCYZcXJF/jiiDeiKJs8oCl4UI/nnBtaPc6RTyybpw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzDXbmE4W7I0nDsBSvCOAnkDkHlL57DWR5uqIrFPdZ5QR7TzkjQ
+	JnMYw76JmbAovFknh+rLkgbpTGbOiAxaRNlStsheF73MdOLgQ71l5zOV
+X-Gm-Gg: ASbGncs6ApnK+fEWUzSkCPLO0oPzzCgJ2jugEXmEmYGGyOi2LjSnUjPgIBWg1dp3LJa
+	LcRVudRK88N95P0fukYRDIAZL9/LegmlBprO0iB64IgkUTdQnAtL0COpnDofuA7TZYWz6CKexIl
+	zdeqp/maKFk2HIE0Plqnqq1jRpmA8yaBIh3P0VVOKGr/pGsQwPX6rVXVT8PFx4+Vlh34/CN65Dm
+	yGjt2J/rvFbfPnZdhKe3hxoFJeCPsOxbHAn6vpLQz9UdY4lSBT1DTuTBC37beDZIuTXvx7gaqLj
+	DsljcAmUD6cu3luly0NdW4Xg/Q08VsAyChRgMYacj4XWgUUsxm2nIGgcIum/2C8UltU3FV3op5p
+	DT8CQEmRQLvDIsqaR/gQs21Ty+ZpLRATs96CLTJelFcsy4/qAaw2XXoiAFH/r/kTKZOVCVxj9wA
+	V36isCGsWiULXpY/80M4blf/F/AMaVY+Mec5/sayWNFESPieUECF8Ns4mkKpYhbA6SgkpJ
+X-Google-Smtp-Source: AGHT+IF/YXOPVFfPbsLgNMSmKy5gMrqFYiERb3qNmBjJICdsnhp8ZUohxvtzmsCi+i1Rv5C0gLGPJg==
+X-Received: by 2002:ad4:5bc9:0:b0:76a:fcee:97aa with SMTP id 6a1803df08f44-7fc309ec826mr47810606d6.29.1758808473264;
+        Thu, 25 Sep 2025 06:54:33 -0700 (PDT)
 Received: from 137.1.168.192.in-addr.arpa ([2600:4808:6353:5c00:7c:b286:dba3:5ba8])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-80135968d5esm11536916d6.12.2025.09.25.06.54.19
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-80135968d5esm11536916d6.12.2025.09.25.06.54.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Sep 2025 06:54:25 -0700 (PDT)
+        Thu, 25 Sep 2025 06:54:32 -0700 (PDT)
 From: Tamir Duberstein <tamird@gmail.com>
-Date: Thu, 25 Sep 2025 09:53:50 -0400
-Subject: [PATCH v2 02/19] gpu: nova-core: replace `kernel::c_str!` with
+Date: Thu, 25 Sep 2025 09:53:51 -0400
+Subject: [PATCH v2 03/19] rust: auxiliary: replace `kernel::c_str!` with
  C-Strings
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -71,7 +71,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250925-core-cstr-cstrings-v2-2-78e0aaace1cd@gmail.com>
+Message-Id: <20250925-core-cstr-cstrings-v2-3-78e0aaace1cd@gmail.com>
 References: <20250925-core-cstr-cstrings-v2-0-78e0aaace1cd@gmail.com>
 In-Reply-To: <20250925-core-cstr-cstrings-v2-0-78e0aaace1cd@gmail.com>
 To: "Rafael J. Wysocki" <rafael@kernel.org>, 
@@ -111,13 +111,13 @@ Cc: linux-pm@vger.kernel.org, linux-kernel@vger.kernel.org,
  linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
  Tamir Duberstein <tamird@gmail.com>
 X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openssh-sha256; t=1758808436; l=2917;
+X-Developer-Signature: v=1; a=openssh-sha256; t=1758808437; l=1276;
  i=tamird@gmail.com; h=from:subject:message-id;
- bh=a28D2oz73aX2HfdAyFfsKbL334Gi28aqVXRfaJ6AmKs=;
+ bh=hAcmGZ1oTJ4jVBQJEYJ6EMTc7nRfLDtEyG/sjigYIyU=;
  b=U1NIU0lHAAAAAQAAADMAAAALc3NoLWVkMjU1MTkAAAAgtYz36g7iDMSkY5K7Ab51ksGX7hJgs
  MRt+XVZTrIzMVIAAAAGcGF0YXR0AAAAAAAAAAZzaGE1MTIAAABTAAAAC3NzaC1lZDI1NTE5AAAA
- QHLcRDKGO1UNO1Fhu+96/NdqIONmVEz9UH+4kwXhhoYDAdY/CR9wCCd91BlfzpgIkfI2NRm4QuH
- Pm2Zu/FAx5Qo=
+ QEE+jmobZ+OS5gJ2DI0z3t4gywTvP6wS/uYHw9wdi8Q0VEYO/oiFsjlDMO0nWijf77etP3ctTic
+ ZfcFfCn7DRwM=
 X-Developer-Key: i=tamird@gmail.com; a=openssh;
  fpr=SHA256:264rPmnnrb+ERkS7DDS3tuwqcJss/zevJRzoylqMsbc
 
@@ -128,72 +128,31 @@ Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 Reviewed-by: Alice Ryhl <aliceryhl@google.com>
 Reviewed-by: Benno Lossin <lossin@kernel.org>
 Acked-by: Danilo Krummrich <dakr@kernel.org>
-Reviewed-by: Alexandre Courbot <acourbot@nvidia.com>
 Signed-off-by: Tamir Duberstein <tamird@gmail.com>
 ---
- drivers/gpu/drm/nova/driver.rs  | 10 +++++-----
- drivers/gpu/nova-core/driver.rs |  6 +++---
- 2 files changed, 8 insertions(+), 8 deletions(-)
+ samples/rust/rust_driver_auxiliary.rs | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/gpu/drm/nova/driver.rs b/drivers/gpu/drm/nova/driver.rs
-index b28b2e05cc15..87480ee8dbae 100644
---- a/drivers/gpu/drm/nova/driver.rs
-+++ b/drivers/gpu/drm/nova/driver.rs
-@@ -1,6 +1,6 @@
- // SPDX-License-Identifier: GPL-2.0
+diff --git a/samples/rust/rust_driver_auxiliary.rs b/samples/rust/rust_driver_auxiliary.rs
+index f2a820683fc3..7c916eb11b64 100644
+--- a/samples/rust/rust_driver_auxiliary.rs
++++ b/samples/rust/rust_driver_auxiliary.rs
+@@ -5,13 +5,13 @@
+ //! To make this driver probe, QEMU must be run with `-device pci-testdev`.
  
--use kernel::{auxiliary, c_str, device::Core, drm, drm::gem, drm::ioctl, prelude::*, types::ARef};
-+use kernel::{auxiliary, device::Core, drm, drm::gem, drm::ioctl, prelude::*, types::ARef};
- 
- use crate::file::File;
- use crate::gem::NovaObject;
-@@ -22,12 +22,12 @@ pub(crate) struct NovaData {
-     major: 0,
-     minor: 0,
-     patchlevel: 0,
--    name: c_str!("nova"),
--    desc: c_str!("Nvidia Graphics"),
-+    name: c"nova",
-+    desc: c"Nvidia Graphics",
+ use kernel::{
+-    auxiliary, bindings, c_str, device::Core, driver, error::Error, pci, prelude::*, InPlaceModule,
++    auxiliary, bindings, device::Core, driver, error::Error, pci, prelude::*, InPlaceModule,
  };
  
--const NOVA_CORE_MODULE_NAME: &CStr = c_str!("NovaCore");
--const AUXILIARY_NAME: &CStr = c_str!("nova-drm");
-+const NOVA_CORE_MODULE_NAME: &CStr = c"NovaCore";
-+const AUXILIARY_NAME: &CStr = c"nova-drm";
+ use pin_init::PinInit;
  
- kernel::auxiliary_device_table!(
-     AUX_TABLE,
-diff --git a/drivers/gpu/nova-core/driver.rs b/drivers/gpu/nova-core/driver.rs
-index 274989ea1fb4..2f1a37be3107 100644
---- a/drivers/gpu/nova-core/driver.rs
-+++ b/drivers/gpu/nova-core/driver.rs
-@@ -1,6 +1,6 @@
- // SPDX-License-Identifier: GPL-2.0
+ const MODULE_NAME: &CStr = <LocalModule as kernel::ModuleMetadata>::NAME;
+-const AUXILIARY_NAME: &CStr = c_str!("auxiliary");
++const AUXILIARY_NAME: &CStr = c"auxiliary";
  
--use kernel::{auxiliary, bindings, c_str, device::Core, pci, prelude::*, sizes::SZ_16M, sync::Arc};
-+use kernel::{auxiliary, bindings, device::Core, pci, prelude::*, sizes::SZ_16M, sync::Arc};
+ struct AuxiliaryDriver;
  
- use crate::gpu::Gpu;
- 
-@@ -35,7 +35,7 @@ fn probe(pdev: &pci::Device<Core>, _info: &Self::IdInfo) -> Result<Pin<KBox<Self
-         pdev.set_master();
- 
-         let bar = Arc::pin_init(
--            pdev.iomap_region_sized::<BAR0_SIZE>(0, c_str!("nova-core/bar0")),
-+            pdev.iomap_region_sized::<BAR0_SIZE>(0, c"nova-core/bar0"),
-             GFP_KERNEL,
-         )?;
- 
-@@ -44,7 +44,7 @@ fn probe(pdev: &pci::Device<Core>, _info: &Self::IdInfo) -> Result<Pin<KBox<Self
-                 gpu <- Gpu::new(pdev, bar)?,
-                 _reg: auxiliary::Registration::new(
-                     pdev.as_ref(),
--                    c_str!("nova-drm"),
-+                    c"nova-drm",
-                     0, // TODO[XARR]: Once it lands, use XArray; for now we don't use the ID.
-                     crate::MODULE_NAME
-                 )?,
 
 -- 
 2.51.0
