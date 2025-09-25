@@ -1,231 +1,214 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+Received: from esa2.hgst.iphmx.com (esa2.hgst.iphmx.com [68.232.143.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ADF12EA16A;
-	Thu, 25 Sep 2025 08:25:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758788758; cv=none; b=jbePAQLJQ255uvU4ag4LoUN/7xRuUELZ/l4yAGj0Sh9QYEmxkn+B9/ajBTql0QZ9kTdzq2+wUbDeqmag5C8E3z0iFjP9LKLQPN7l+g7senEKjATJ/AHIOG/MiGaISHXPXWRBEird51I2M5A2a6Q1ELrZvVyD9s4qZFW/p3QUEgE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758788758; c=relaxed/simple;
-	bh=AaJ1+MMzk64vHzOglRtANSXkg4fvCRkyoL6gtlFsyak=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ekC8+7UWe2lJDvG/NICLeVgz4xK/ZyKCDzSScwl7hNjKr05IlTmQ7OUQ896lDApn+bkCvVgnobU3d/HAfHPnSVweaxHlZWPI1GlmLF3+wCv398L+N3MSfvIYbmOlRFhVQ8weMn+gl/GChcwIFCZ/m73ec+2KwE5jDol/IjDbczk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4cXRcS6FqTzKHN4d;
-	Thu, 25 Sep 2025 16:25:44 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id B76B21A13D3;
-	Thu, 25 Sep 2025 16:25:52 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.104.67])
-	by APP4 (Coremail) with SMTP id gCh0CgCna2OH_NRodTcIAw--.12615S14;
-	Thu, 25 Sep 2025 16:25:52 +0800 (CST)
-From: Yu Kuai <yukuai1@huaweicloud.com>
-To: tj@kernel.org,
-	ming.lei@redhat.com,
-	nilay@linux.ibm.com,
-	hch@lst.de,
-	josef@toxicpanda.com,
-	axboe@kernel.dk,
-	akpm@linux-foundation.org,
-	vgoyal@redhat.com
-Cc: cgroups@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org,
-	yukuai3@huawei.com,
-	yukuai1@huaweicloud.com,
-	yi.zhang@huawei.com,
-	yangerkun@huawei.com,
-	johnny.chenyi@huawei.com
-Subject: [PATCH 10/10] blk-throttle: fix possible deadlock due to queue_lock in timer
-Date: Thu, 25 Sep 2025 16:15:25 +0800
-Message-Id: <20250925081525.700639-11-yukuai1@huaweicloud.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20250925081525.700639-1-yukuai1@huaweicloud.com>
-References: <20250925081525.700639-1-yukuai1@huaweicloud.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBDB01DDDD
+	for <linux-block@vger.kernel.org>; Thu, 25 Sep 2025 08:31:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=68.232.143.124
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758789087; cv=fail; b=Yl6XBif9609NWUZNhJRY5glwwu+BXWivQwl1PW85hGH2VL+EwP4BREnmYE0TY5x93UThRYlk26l1IzUl760zyKiXHKiKoNb8Yb+tGU1rx+14/gzAVlN+qQgY+nR4os9nGQfiy1vzqJHIXahbE4eLu8KDbbvUvkJf832/54PyQCQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758789087; c=relaxed/simple;
+	bh=Am8cX4PukRsAD8Tm/aNxZBYOAZpNDUBtennmkg61V1Q=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=dz+BmGa1mni2bxFz+4MZEBaAQbbImKfxmbEenpfF6o5K7VMXLLi25Cks9nCZirOuy6X/WBDukAWXrpuAU9WVri8QTuQZth7ZLaZITd2PYErnGNzLlwgYBwP7wd7DH+k+bIb1ZaoGE1ePbn1t1UXIQNm8pXKidLLl6SwnHbb9dJA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=rAVjMpf4; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=WBPpwKb7; arc=fail smtp.client-ip=68.232.143.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="rAVjMpf4";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="WBPpwKb7"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1758789085; x=1790325085;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=Am8cX4PukRsAD8Tm/aNxZBYOAZpNDUBtennmkg61V1Q=;
+  b=rAVjMpf4f2fQOEg9thkJ+awv/weGMh2pi/QbvaZ3UZlznnWYlFBQYfWG
+   NT7NzK1kvFtvK5gJB5Xep5piflxzW3UAEx8yToIC+MnY365O2zQacc9eT
+   HwEbg9u5m871YPiiJ5Eq9d3qfF4gYHOm//CbT2kYgD/R8+4Dr9A/ERDCU
+   oHsbC5nX3Fx0Q4Kb2bOB7+4rV5v3i0YDs3iM+fBaNJ54xpaK9UKgKTOWK
+   nm24R/78xGWpuvKCdWoKNRFsgCPeqtUbu7z7FxTCjWE8LVSf1knbP0bnP
+   L1N3TngdjeBzwROMIo0sEpr60z95wkwHuVX2+JJa3sxKAz4XtsWgV8gE4
+   g==;
+X-CSE-ConnectionGUID: qCM84HhPQRGeOpwx6KQt/g==
+X-CSE-MsgGUID: DzCoub1fRaSVLrPz6BnjXw==
+X-IronPort-AV: E=Sophos;i="6.18,292,1751212800"; 
+   d="scan'208";a="130403655"
+Received: from mail-southcentralusazon11012009.outbound.protection.outlook.com (HELO SN4PR2101CU001.outbound.protection.outlook.com) ([40.93.195.9])
+  by ob1.hgst.iphmx.com with ESMTP; 25 Sep 2025 16:31:18 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ovGuHiU2I0OZ5obkphdeM/1/7T2oIsR+3V7VzNBdEvI48JV3n/RuUsbT4QHTNw2FySSJP1D/5FTLoo+l7/Hs7UxCZjIP7qj8f1GCIbSYjQVFcLVCx9a42Xb+t1kqZeGe5vXkR7d445Ddb0RyerBKt/sDV8N1XY3FSrBm+KiQ0ukq2Vo0OdF0olSVu3mGcKMwhdKhd5+TCl7iE6W614/T2WI82t+WK+UK7X/QdW6rdSrywhcXCx/QtYd5BCbKQe5xi9K+wZCphK9zkV3KmASViSY24GEcE1GPw0vYa3AAwEV3O08Zoi3miLnwh4LxTCpwMvZjGr76Yj9Dlmb92YMGEw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=tazciDRMyADue0xtjtGtntuvQctu1agMsuYD/fH6rjE=;
+ b=zGreUJzuldoNEvL8Ht/+SN9FDD1ipKsnEIvk3Ot5oeRuOuzFHLxaqcVp0PdH0RKB71Nip46jVloogCKG39uPnJH4zmqrTM0SGQgr9HNomDHU6LYp7FhebxpXo4D4DNalGETlfdAYdKlJPmZb0Okyls6WGm7uudrabqSbNmp7VINcxAghYtqoT3CtPLCEqK1RdZaAk/OX3jCunqn4NItvp8oOk1YiN0MLHkK6ZVtozFr2SMVh4oi5yHc1W4ICIwQXY0zculzaYvwSJRGXQDIHmUSKbx9AJLuL9nPQvlE/WHKvrOhwhI0J4Sc1lxNoIox6YDjS8asxj1XIjitR2j1wlw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=tazciDRMyADue0xtjtGtntuvQctu1agMsuYD/fH6rjE=;
+ b=WBPpwKb7jkqdfInUr5nhjj0DTLveJxFXu7VxTCzzMgXK5Ya2Vv9rJzlmhJ3k3EU+hX11AUH5j0dIT4Q/vCJVJfPbq23p/ntjZ1kv/ONZTu/UX4BgJps+tnuYEgGMvXLMtja0oc4Xn6rwVkpcA80YguegxY31FpCPDVWfiAaoi70=
+Received: from SN7PR04MB8532.namprd04.prod.outlook.com (2603:10b6:806:350::6)
+ by MN6PR04MB9455.namprd04.prod.outlook.com (2603:10b6:208:4fa::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9160.10; Thu, 25 Sep
+ 2025 08:31:17 +0000
+Received: from SN7PR04MB8532.namprd04.prod.outlook.com
+ ([fe80::4e14:94e7:a9b3:a4d4]) by SN7PR04MB8532.namprd04.prod.outlook.com
+ ([fe80::4e14:94e7:a9b3:a4d4%7]) with mapi id 15.20.9160.008; Thu, 25 Sep 2025
+ 08:31:17 +0000
+From: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+CC: Chaitanya Kulkarni <kch@nvidia.com>, John Garry <john.g.garry@oracle.com>
+Subject: Re: [PATCH blktests 2/5] check, new: introduce test_device_array()
+Thread-Topic: [PATCH blktests 2/5] check, new: introduce test_device_array()
+Thread-Index: AQHcJ8kh4hiGMYaaFE+MZ7LqQ65817SjnfIA
+Date: Thu, 25 Sep 2025 08:31:17 +0000
+Message-ID: <ndp6tijg5r3tiiayshiageylzqbsbepappv67nej6zzsn2btfk@6m63dp6kjdq5>
+References: <20250917114920.142996-1-shinichiro.kawasaki@wdc.com>
+ <20250917114920.142996-3-shinichiro.kawasaki@wdc.com>
+In-Reply-To: <20250917114920.142996-3-shinichiro.kawasaki@wdc.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SN7PR04MB8532:EE_|MN6PR04MB9455:EE_
+x-ms-office365-filtering-correlation-id: 50317a1e-e69f-48dd-3e84-08ddfc0de5a8
+wdcipoutbound: EOP-TRUE
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|366016|1800799024|19092799006|376014|38070700021;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?W4gBVUOivBH5295qWaxDO1cCdTo2bSegIhcwntcqzJnv0RvoqrMG085SHIYn?=
+ =?us-ascii?Q?qEL57TxwpmWqGDD33vttsN+jY4HuefpaO922WU3pGhPtdwNWNIv2fvbgD84E?=
+ =?us-ascii?Q?1KWbFoUWReXIPYFRkHzhgDbrtOekcSFvHcIPHWHOIAZ7rzElhCefXbtX2irt?=
+ =?us-ascii?Q?YAfwIf7wBg3BNwjm1O2+h4f1P2+8WRzhxb2o1sdPv0xayyAnUPkKK6ha//ag?=
+ =?us-ascii?Q?nBEuEpabR+o0NHohXtXvH03Jz2n6c9mf63IeqXZsUWLHRDc1PH7u2g21UlAA?=
+ =?us-ascii?Q?xkUvSJbVJeLNtSQ8uiwXTw0POwqaZTqiHddgdHNlsLnC6IeO/kg+i267QrcL?=
+ =?us-ascii?Q?REunm8eCqO937T2s8j6xSmUmMAg7s61+XBc3mH6icSNlGpNjT7GJjvimzalX?=
+ =?us-ascii?Q?uxEEaBiRiTnfqHyrHOZ2Lwiz19ZUBNS4N11kHorNX3tWS59+fr3dwex8rfTT?=
+ =?us-ascii?Q?rS1/DCQVWMnI6OkrqxdzwGyPQ8kPOf/oCJRkyqZPHg0wLuh83+eC52hc+vxo?=
+ =?us-ascii?Q?6sja+4923w4KcRaV/QqnQb1S2KBwEKUgk0lPmDl9Jrl6/AbcKR+U99kJsyQE?=
+ =?us-ascii?Q?TApVtCvDTRX5bI1Pc4OLKjjx82XRpwZuDsM22h12hKuzNKSzbD+vvCS3tWWc?=
+ =?us-ascii?Q?8qrkQLMBTxiIgr+x1f4MYbBlmk5KFZjGwWU93Czcz5B5/WtYhHDvxKxQ+QO8?=
+ =?us-ascii?Q?TPyMXcxqfTs/14cV36K9AzZK6ExgRPMD0kfLCveAZKWfpiDxutli/N9H1bpW?=
+ =?us-ascii?Q?97YFQ3v2wVfWRMsXoSp+0zRbbfUN+Ha4dzjRsXq4gCQxKmhvO4+Yoi8CzrvI?=
+ =?us-ascii?Q?sYJqtfroKQH3gnZqjNExKA7Xe+ZgxrUMNxzgtNrCCMtaIzhgMtktAgpaOZug?=
+ =?us-ascii?Q?tAZsU9ExJT7Q2nyzSYZ7EQFGSsmd+XguL71qw8XAhuFyX8UWywJaRy+hY9dP?=
+ =?us-ascii?Q?L/qso1gmgodEhmgNAm3EH7pJuD1B3CoRfLMYfbWBy8c4AdWNC+XGDQ1b5Ikz?=
+ =?us-ascii?Q?vjGFDi4qBVAL2wwck90ADI7zicfFgtOIZfpscpgkg5lha/poe0t3Paa82Cfp?=
+ =?us-ascii?Q?pnS3MTchv+YiaJ0DcqC8E7ZH5gvGMSiYTGjFH9B1UmhMJ+ZwhIJwQeovcSto?=
+ =?us-ascii?Q?ZAcs1z6YUqzBDg/RCzG0/EBgbLMxeccHdRpVjxzBO13HOqmlv6HSCWBOAbAe?=
+ =?us-ascii?Q?hK3X8hOt/BdLIgE2M9iRYqzqmlXvF7EZ5FTCCsAXuYUahlosQEddqMJlbjRX?=
+ =?us-ascii?Q?dy7+BOSaNIQ7z46X6BoClCeNg6oKAjG0jHqXMJM8VulqVpB4hwuELZpG3NOa?=
+ =?us-ascii?Q?/uBWyR/vTq+9W2P6JW0ug18KS0ALSMGC0oSK4OXeFVS6OKVNe+Kd1pRropkL?=
+ =?us-ascii?Q?Op1A8WFSgyqwkTP89Ng56G8nPZBNL2fyrVUe7SReZTwFlQNrmiQInkCA8lBC?=
+ =?us-ascii?Q?HijGKzxN/Cb8Hn7++09g7HXeAc/jzg5ljwx81jGXVgcIWlL+ow+LWQRHSdrU?=
+ =?us-ascii?Q?59nlYwmx0RlfaNE=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR04MB8532.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(19092799006)(376014)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?cdJByoiC1AHxjoZ57SakzBAV8KPWWiQ8n1dpA/jbhH8ZYxBqEgk9bQZVQNv0?=
+ =?us-ascii?Q?AaXLWyYsHsZWlMjG9HMvPziEx3hnxdDl2/201BeeYkOaC8ZxvfVQUUw8UFlm?=
+ =?us-ascii?Q?POnAaupv0l+PhvjatqHj/VRVM/cmKNHZySrf/FL6nzoaZ7z2avEOwWLh7dQB?=
+ =?us-ascii?Q?nhWNIzrdGCvrX0hDEhjRnER/EJzBZmHyqNeHWwwCpQmxGYIIthnJZ1agMrCc?=
+ =?us-ascii?Q?N2tpPNhEXZLMGr0p/8/jyIktKRRLxM1wIDQj6x+thkt27/Xqnjq/wbXtl+Ok?=
+ =?us-ascii?Q?edCYYloDZ4UN61jROKVCw0D+XmDdd0nmwkqpanEReWEsE8XS7Wc0uI3bq8fF?=
+ =?us-ascii?Q?caflFt2vrTftrAn4u6zNAZsWQLyRmBCNRg+d7/07g8pOT/yY5PpsxFf808nK?=
+ =?us-ascii?Q?xk7bUj3Q+uKjYsLqCHwgIfotAjCN6HrGu3E9Qanf1h5Oddj2pfw+BhJNTbHp?=
+ =?us-ascii?Q?29JdlKf3InTbaEFE2LVDGz6vvTVP1M4zWeJXGYpzHZxpUAmEXRapiJhf0ul4?=
+ =?us-ascii?Q?xSI2KP01lXvnSbZnOquZmTXEsdmk1+U0l7HjF8Pf9MlEmQE3IBOSqHJK3JaI?=
+ =?us-ascii?Q?zrFb+RpHwaPwJ0x6y7tylrMHR3DYQrx3YW5St+MrF7OE8z9QNpmAeAcYPvRd?=
+ =?us-ascii?Q?rAC0DfaRBVspqhz+yB8wnDV5J2nOaJja8obuz/drAmCXi3BXT9nBYKLxcMfB?=
+ =?us-ascii?Q?jShb1mUEfleaqnEXXWPekAagwg//bUjlfPS9wePa1hC98yFgXNxLhu1RkRIe?=
+ =?us-ascii?Q?1MJ21OdHMoZHlqlPriARsyMONWu34R1tBZlmpLJhonLh9qsUSTc8MYGmJY6Z?=
+ =?us-ascii?Q?7KO+17/E0d+fo1RyT4SZnr1sky0RNchjP5av0aN5ggAX1nUsRXtnissAICkw?=
+ =?us-ascii?Q?0/0OLPl3B++zFiXTBSsx1vX+3DT7iNgXbLB89MmebvJJbgl9nn8OKdTFSbtL?=
+ =?us-ascii?Q?5sd/JoVFOKXH8aKvayEzdYAPK6udUfVsG3t+Sqk7jCj0YNjFWNfpCq0XN/Na?=
+ =?us-ascii?Q?nms/TK3HUpKm7GPP281Or3P7elgguWcdqjkXV3dSJk1+LH39mRthHDWV09sd?=
+ =?us-ascii?Q?Nv465wfUTQj//5LwDCKOid40Xpf6/ekk094ZLlROa5DaU2efSzCVMnQA1ip2?=
+ =?us-ascii?Q?QG/ov7kzOt/ZRP6SRAm66Xg9us8s3XnWBhPx8T68nTd7XOjcsDt6P00B+XKj?=
+ =?us-ascii?Q?y1sCYN4M6IrIqxFrfPwzwaUvJzTVmjXWTTxB8Q85ZRCaiuXdzqElA8Qkewj7?=
+ =?us-ascii?Q?UK7avDWVsFWSS4jz6oR3waNFGEy0ZY6lGj2MqIdSC8OsLjVvrUXTJu6uiRqd?=
+ =?us-ascii?Q?L9DpPO/CkoqONMjfFxWyONayKBwEtKQBoqR7xjvHpWZgpQ/D0zqmfUbeKYdo?=
+ =?us-ascii?Q?xproltbfwEMRxnVQ6e8C9aKP2IWDr9DHtlj+vatiVPrNL8LxJzRx48s7B3v/?=
+ =?us-ascii?Q?POG/sN3fwweAenBm+6yI4YRVTHqAfKKZ9r398vys+dKLbYY5EnKNk5v8XGya?=
+ =?us-ascii?Q?nj3DLaU4+EhGn4UOYuio3y0mWleMXuodDVg0Sv4ntfSF6zeqDjsz4yp+vpNL?=
+ =?us-ascii?Q?JaGAiM13e5Pf9/RPE3XUVctkA6/Gvs6ngLsC4AlHQ+CKGzmJNfhbCq8yeWyI?=
+ =?us-ascii?Q?gNuswEQ814yptv8+DWG0hic=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <986D7601CB9168409B8A6710034D029C@namprd04.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgCna2OH_NRodTcIAw--.12615S14
-X-Coremail-Antispam: 1UD129KBjvJXoWxtFWUCr4rGF13XFy7Ar45GFg_yoW7XryrpF
-	Waga1ayw48Xr4q9r9rG3Wq9FWagw4vg3y5t393Ja13tr4Fvrn8WF1DAFyFvayFvFsruanx
-	Zr4Ut395JF4UA3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUmS14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_JF0E3s1l82xGYI
-	kIc2x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2
-	z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F
-	4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq
-	3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7
-	IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4U
-	M4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2
-	kIc2xKxwCY1x0262kKe7AKxVW8ZVWrXwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkE
-	bVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67
-	AF67kF1VAFwI0_GFv_WrylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVW8JVW5JwCI
-	42IY6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF
-	4lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aVCY1x0267AKxVW8Jr0_Cr1UYxBI
-	daVFxhVjvjDU0xZFpf9x0pRQJ5wUUUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	qNaTOvCl5HVhqQvHfw0+R71T/6YwnqOCernr03zw6VO8ny7M19Lh2rae34Oo4N4S34nu4Y6iZ464PkoQZyypYjqVdaFK8M/xftx7J0YWnbo43/kTJoB+8r6WaApOL2VYg66Pro375knft4pmTjG1wcoKGBCQ889yl6NuKDe1+GCeettujN3qCd7il2KuX/r6gsazDR0QC4hT8vPWBqORWdAtirjne440BF0lAJBJMFv+v+CriQV1frgDazBJ61wdadOWr8mw7zXBYnHWdwdOpccLhadAC1fZ0BCEAluC770jDHnpherHrUWraCzhr629b0LNvcoKsMfVlGt6tgG4UWSoca2TOXtw9xEL1N4L/q8nASEQWZMRSUhz9PCyvaIQ8Wjkrdg0lsupRPrgm03mp1Pzgyr+mQhTQvLtLOcK58BVvsuShYdypw4FiQau3zqaZbcuDqncEytfTwk+I9i38gtrWEuJIJcBqkoul7JYX42aV//yRBNMwYEcH2V1m6D0DW2Iu70PdNGGvj4VIyDd0VTC5cKen7E72TYLp5wgZnggc6MiplkZbIezz0OKeM3cpZrPGwPZhTC1p32PIhKeyyH42gWByPgHvF3BBH3odZaHgeewNclvXOghmVoZdp+3
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SN7PR04MB8532.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 50317a1e-e69f-48dd-3e84-08ddfc0de5a8
+X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Sep 2025 08:31:17.3621
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: iEZh0tuWJGeyJw9yGFv/UluaQB40t5PtuMN7mk77q4EzS42w5D2C8SIQdCTQ+BVXE/YUP0yPJQBsakwn8piN5jXrNlp6O59NcD0h/aWSNx4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN6PR04MB9455
 
-From: Yu Kuai <yukuai3@huawei.com>
+On Sep 17, 2025 / 20:49, Shin'ichiro Kawasaki wrote:
+> As to the test target devices defined in TEST_DEVS variable, blktests
+> assumes that each test case with test_device() function is run for each
+> single device defined in TEST_DEVS. On the other hand, it is suggested
+> to support a test case for not a single device but multiple devices.
+>=20
+> To fulfill this request, introduce a new test function
+> test_device_array() and TEST_CASE_DEV_ARRAY. TEST_CASE_DEV_ARRAY is an
+> associative array. Test case names are the keys, and the lists of block
+> devices are the values of the associative array. When a test case
+> defines test_device_array() and users specify TEST_CASE_DEV_ARRAY in
+> the config file for the test case, the test_device_array() is called.
+> Blktests framework checks that each device in TEST_CASE_DEV_ARRAY is a
+> block device, then call device_requires() and group_device_requires()
+> for it. Blktests prepares TEST_DEV_ARRAY and TEST_DEV_ARRAY_SYSFS_DIRS
+> which contain the list of devices and corresponding sysfs paths, so that
+> test_device_array() can refer to these to run the test.
+>=20
+> Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+> ---
+>  check | 159 ++++++++++++++++++++++++++++++++++++++++++++++++++++++----
+>  1 file changed, 148 insertions(+), 11 deletions(-)
+>=20
+> diff --git a/check b/check
+[...]
+> @@ -637,6 +719,33 @@ _run_group() {
+>  		# Fix the array indices.
+>  		TEST_DEVS=3D("${TEST_DEVS[@]}")
+>  		unset TEST_DEV
+> +
+> +		for test_name in "${!TEST_CASE_DEV_ARRAY[@]}"; do
+> +			if [[ ! $test_name =3D~ ^${group}/ ]]; then
 
-Abusing queue_lock to protect blk-throttle can cause deadlock:
+While I did more confirmation runs, I noticed that the check above is too t=
+ight.
+When $test_name has rather complicated regular expressions like
+"(md/003|meta/020)", the check above fails, and group_device_requries() is =
+not
+called for the group. It should be relaxed as follows:
 
-1) throtl_pending_timer_fn() will hold the lock, while throtl_pd_free()
-   will flush the timer, this is fixed by protecting blkgs with
-   blkcg_mutex instead of queue_lock by previous patches.
-2) queue_lock can be held from hardirq context, hence if
-   throtl_pending_timer_fn() is interrupted by hardirq, deadlock can be
-   triggered as well.
+			if [[ ! $test_name =3D~ ${group} ]]; then
 
-Stop abusing queue_lock to protect blk-throttle, and intorduce a new
-internal lock td->lock for protection. And now that the new lock won't
-be grabbed from hardirq context, it's safe to use spin_lock_bh() from
-thread context and spin_lock() directly from softirq context.
-
-Fixes: 6e1a5704cbbd ("blk-throttle: dispatch from throtl_pending_timer_fn()")
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
- block/blk-throttle.c | 31 +++++++++++++------------------
- 1 file changed, 13 insertions(+), 18 deletions(-)
-
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 2c5b64b1a724..a2fa440559c9 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -33,6 +33,7 @@ static struct workqueue_struct *kthrotld_workqueue;
- 
- struct throtl_data
- {
-+	spinlock_t lock;
- 	/* service tree for active throtl groups */
- 	struct throtl_service_queue service_queue;
- 
-@@ -1140,7 +1141,7 @@ static void throtl_pending_timer_fn(struct timer_list *t)
- 	else
- 		q = td->queue;
- 
--	spin_lock_irq(&q->queue_lock);
-+	spin_lock(&td->lock);
- 
- 	if (!q->root_blkg)
- 		goto out_unlock;
-@@ -1166,9 +1167,9 @@ static void throtl_pending_timer_fn(struct timer_list *t)
- 			break;
- 
- 		/* this dispatch windows is still open, relax and repeat */
--		spin_unlock_irq(&q->queue_lock);
-+		spin_unlock(&td->lock);
- 		cpu_relax();
--		spin_lock_irq(&q->queue_lock);
-+		spin_lock(&td->lock);
- 	}
- 
- 	if (!dispatched)
-@@ -1191,7 +1192,7 @@ static void throtl_pending_timer_fn(struct timer_list *t)
- 		queue_work(kthrotld_workqueue, &td->dispatch_work);
- 	}
- out_unlock:
--	spin_unlock_irq(&q->queue_lock);
-+	spin_unlock(&td->lock);
- }
- 
- /**
-@@ -1207,7 +1208,6 @@ static void blk_throtl_dispatch_work_fn(struct work_struct *work)
- 	struct throtl_data *td = container_of(work, struct throtl_data,
- 					      dispatch_work);
- 	struct throtl_service_queue *td_sq = &td->service_queue;
--	struct request_queue *q = td->queue;
- 	struct bio_list bio_list_on_stack;
- 	struct bio *bio;
- 	struct blk_plug plug;
-@@ -1215,11 +1215,11 @@ static void blk_throtl_dispatch_work_fn(struct work_struct *work)
- 
- 	bio_list_init(&bio_list_on_stack);
- 
--	spin_lock_irq(&q->queue_lock);
-+	spin_lock_bh(&td->lock);
- 	for (rw = READ; rw <= WRITE; rw++)
- 		while ((bio = throtl_pop_queued(td_sq, NULL, rw)))
- 			bio_list_add(&bio_list_on_stack, bio);
--	spin_unlock_irq(&q->queue_lock);
-+	spin_unlock_bh(&td->lock);
- 
- 	if (!bio_list_empty(&bio_list_on_stack)) {
- 		blk_start_plug(&plug);
-@@ -1297,7 +1297,7 @@ static void tg_conf_updated(struct throtl_grp *tg, bool global)
- 	rcu_read_unlock();
- 
- 	/*
--	 * We're already holding queue_lock and know @tg is valid.  Let's
-+	 * We're already holding td->lock and know @tg is valid.  Let's
- 	 * apply the new config directly.
- 	 *
- 	 * Restart the slices for both READ and WRITES. It might happen
-@@ -1324,6 +1324,7 @@ static int blk_throtl_init(struct gendisk *disk)
- 	if (!td)
- 		return -ENOMEM;
- 
-+	spin_lock_init(&td->lock);
- 	INIT_WORK(&td->dispatch_work, blk_throtl_dispatch_work_fn);
- 	throtl_service_queue_init(&td->service_queue);
- 
-@@ -1694,12 +1695,7 @@ void blk_throtl_cancel_bios(struct gendisk *disk)
- 	if (!blk_throtl_activated(q))
- 		return;
- 
--	spin_lock_irq(&q->queue_lock);
--	/*
--	 * queue_lock is held, rcu lock is not needed here technically.
--	 * However, rcu lock is still held to emphasize that following
--	 * path need RCU protection and to prevent warning from lockdep.
--	 */
-+	spin_lock_bh(&q->td->lock);
- 	rcu_read_lock();
- 	blkg_for_each_descendant_post(blkg, pos_css, q->root_blkg) {
- 		/*
-@@ -1713,7 +1709,7 @@ void blk_throtl_cancel_bios(struct gendisk *disk)
- 		tg_flush_bios(blkg_to_tg(blkg));
- 	}
- 	rcu_read_unlock();
--	spin_unlock_irq(&q->queue_lock);
-+	spin_unlock_bh(&q->td->lock);
- }
- 
- static bool tg_within_limit(struct throtl_grp *tg, struct bio *bio, bool rw)
-@@ -1746,7 +1742,6 @@ static bool tg_within_limit(struct throtl_grp *tg, struct bio *bio, bool rw)
- 
- bool __blk_throtl_bio(struct bio *bio)
- {
--	struct request_queue *q = bdev_get_queue(bio->bi_bdev);
- 	struct blkcg_gq *blkg = bio->bi_blkg;
- 	struct throtl_qnode *qn = NULL;
- 	struct throtl_grp *tg = blkg_to_tg(blkg);
-@@ -1756,7 +1751,7 @@ bool __blk_throtl_bio(struct bio *bio)
- 	struct throtl_data *td = tg->td;
- 
- 	rcu_read_lock();
--	spin_lock_irq(&q->queue_lock);
-+	spin_lock_bh(&td->lock);
- 	sq = &tg->service_queue;
- 
- 	while (true) {
-@@ -1832,7 +1827,7 @@ bool __blk_throtl_bio(struct bio *bio)
- 	}
- 
- out_unlock:
--	spin_unlock_irq(&q->queue_lock);
-+	spin_unlock_bh(&td->lock);
- 
- 	rcu_read_unlock();
- 	return throttled;
--- 
-2.39.2
-
+Will fold in this fix.=
