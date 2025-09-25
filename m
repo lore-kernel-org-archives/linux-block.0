@@ -1,139 +1,123 @@
-Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFC8827D77D
-	for <linux-block@vger.kernel.org>; Thu, 25 Sep 2025 01:14:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DAEC1CAA92;
+	Thu, 25 Sep 2025 07:03:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758762867; cv=none; b=dGJxaGPvfb0lgvb55FzxdVxb4KsedswpAqxy3QJSgtza6eYZadCZ2yT9PjxOB9xhWfLkDk7LTWmnUUfDgRYmKqKzznearjeper4iV3gc7DcaCJvpLmw5D9HoAe9O3zlW6wu0/cCkWC154HuMqNANXf0POQ8CY3UuN8FzdbzebwE=
+	t=1758783801; cv=none; b=EhpeZ4N09Bs/KRSdMLJJRB5DSIOypRUcgIdRXhybTs8Id8LrUcnu2BzK3jbkixQpjK1wloVpE7z1eC91yWEQEXTIXYqIfa/nmg8DHm/BG8W7l9bjPSyo8SMLsGWQZR2INcYYY0uOMYK8XpFS1ITUYf13z4GAGclmBNUw1nNBwSc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758762867; c=relaxed/simple;
-	bh=CmJEc8PuIKQeVF/j4Q0UrN5IUEGXQ70xxORlJFMbhVQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oOnYqyYs0+nbrL6r2mmtOTXrJcVA15NwFQUg8n8oh+0IwaNGqJP87x99IBEBhPipgChJhuNe3jEK98yDtffcZlh/SCMADnaoFjaWNJ8rNYloexxlRGk8m/6iky13XcoYNfSaGcw4GrS5HzTay9EFKEBNw7Q7yqvwiimVAil8bCY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fnDr83f4; arc=none smtp.client-ip=209.85.167.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1758783801; c=relaxed/simple;
+	bh=IfFjt1sIn89xjUeeoV2zJsvE3bTjSj86lJ2QWvNYz8w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uT4W4PHEa0T9K2MMhqmpmAcD0+HhmD6HfR60fW77tc5ycyxSNKO4N4exspj2qU2YgjWIOwTnteK3TzHsWOg1fceWB5WZG+LTeGr8ERHp2lTCGi8YNaE0Y8OzBkvzyroKbFODJeFg/zxWWeunTBwYKdC6xT3gJyKcERtFjogIYPI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qHutfg7p; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fnDr83f4"
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-58075580105so66676e87.3
-        for <linux-block@vger.kernel.org>; Wed, 24 Sep 2025 18:14:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758762864; x=1759367664; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CmJEc8PuIKQeVF/j4Q0UrN5IUEGXQ70xxORlJFMbhVQ=;
-        b=fnDr83f48auqbjRYF4Y6KvqdmvKbB3cs6dlVIm7KiM7j1eJ06N3ArCQ4yTz+h07KlU
-         PpVRoYfHeRy9rRVTIK3e/l75MB72N7diH348vv1nUicM4Rh3TQrLTbroojQrQc9zpXsA
-         r0ZqA6bmPTKq82T1TUsmPpMvRhLH6DmN+UXKw7yYf8nh4RQ8ej4AItHW+e9bBVUyoG1m
-         1jBWjQZblmG1lnXWYMKQFlAta+N1FEGPSbiCsrsA0n5k2XfizgjB1k79Kjg4X3JBs6VG
-         5/laSI7st20twiB76eeYzQ2yiETRHiibcN7FoqZvEbVzvCJWp7v8mdgOFw2Gi55MvzhT
-         YNTg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758762864; x=1759367664;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=CmJEc8PuIKQeVF/j4Q0UrN5IUEGXQ70xxORlJFMbhVQ=;
-        b=xVB9M+XPoLkyEPxbOG/zW61ReiBr+8pyQtUyrjzAghIleI6otaF9yac+gsSueNPmkf
-         K1PnBhDrpAcsUEvC5jieW3LwQ2y3nmiPlSNWZO9Xl6LE+j55PfSZ7Bzj8vIi5X2bln/R
-         VOIy58OZ0etbuuYJ9WZNJUSp4yConkoB5wINyEP1dlIL1JDEJHCDKxUb0J/FUnz7oJxk
-         LZl1w1fgsh9cE7XseF2SG2z7cwXpDbE2DbGHJKDmNkrv175zX4FlmVXB7LFZ0q5oU2ug
-         Bh2MhoAs5ubWHDQbuh6Vq2LNwMZcO9GVSfCXEH5SeArkVCHC8Q2FRHWAVd8dH+y4hjRg
-         nVvw==
-X-Forwarded-Encrypted: i=1; AJvYcCWHrsfhktFjbYcGY+n9blNCPd3sP1AYdPDtQk+R6newMRqZIbj/J/9gz7bKMxsU0otbnzvyfU9N0ab8RQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzqYS9EpAmUl4v52TAXX5Iu9n8Dcobml5C9r+K1UbdROLtGnr7j
-	ZySrdHwaJh0qHwK/RpEK+NRb4PepMS09jfBeHv/BaecD3OUBaXuEGFPCDXjTGS3iqqJkB1X1NcG
-	hc5t9ywts73Y1PWtlRH2utaKoYvWAhyw=
-X-Gm-Gg: ASbGncsNzDXIIMmLUn3uTh4pAnSLaY3M0Cc1jwtWldnml3+OsnXOJy4Ghey1fZ6IYX9
-	BEVrtbRRZZn2Br1c0S82MKcU36W377iwxer9u8hPqyKmRDDYX4RvdPcln3SdfMOZ+VQe5P8hbeJ
-	P7tsog2m1Q/QtjPU5bbXVEluU+cgiLkJWU1n+xTWbHsSHyjNyOjSapsAdhEe7Xm1apEtMTzPQtb
-	z1DEZgv
-X-Google-Smtp-Source: AGHT+IEDxOEhug5hAKaoFRD60f715RVpOz3j3GIYEQmZZCl+PN792xxfVmyqR8cZcVtXVUn2rZBzgNmHAva7CXKAXjw=
-X-Received: by 2002:a05:651c:41c5:10b0:365:4fd1:a15b with SMTP id
- 38308e7fff4ca-36f7ff189f4mr1625801fa.7.1758762863690; Wed, 24 Sep 2025
- 18:14:23 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qHutfg7p"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 476E0C4CEF4;
+	Thu, 25 Sep 2025 07:03:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758783799;
+	bh=IfFjt1sIn89xjUeeoV2zJsvE3bTjSj86lJ2QWvNYz8w=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=qHutfg7p0MJiJzKdbXS/d6R3kdEqDhdXcGmgxvkwI4AM6XuKyeIpgR1GSCsEqIGVB
+	 9ZrAilO0Zj59EMAXR1lQlcpWEMA28nquUz1IKkduHGuS4dyD2OJmp5f3UxncKmQ8+I
+	 Dp30uxy2wGUYE3Hja5f4XS00BFzuj+WaXq60qYIzodUdV2tvE04uI5a85RPL6mAqR7
+	 MWKPSQplfkMcH9/nRS03UG60TJBwCq9ZQRhoS60sk8FdhiE0kifJqWTjrMUqN9REZV
+	 kUzpbXtt2XKNZVaDT/F1inIn9vj+we8Gfm9meFs0BUoq+pahNKDPioVkPIFajbcBnM
+	 waHnKaEouWGfQ==
+Date: Thu, 25 Sep 2025 10:03:14 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Jason Gunthorpe <jgg@nvidia.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
+	Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>,
+	kvm@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-media@vger.kernel.org, linux-mm@kvack.org,
+	linux-pci@vger.kernel.org, Logan Gunthorpe <logang@deltatee.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Vivek Kasireddy <vivek.kasireddy@intel.com>,
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v2 03/10] PCI/P2PDMA: Refactor to separate core P2P
+ functionality from memory allocation
+Message-ID: <20250925070314.GA12165@unreal>
+References: <cover.1757589589.git.leon@kernel.org>
+ <1e2cb89ea76a92949d06a804e3ab97478e7cacbb.1757589589.git.leon@kernel.org>
+ <20250922150032.3e3da410.alex.williamson@redhat.com>
+ <20250923150414.GA2608121@nvidia.com>
+ <20250923113041.38bee711.alex.williamson@redhat.com>
+ <20250923174333.GE2608121@nvidia.com>
+ <20250923120932.47df57b2.alex.williamson@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250922032915.3924368-1-zhaoyang.huang@unisoc.com>
- <aNGQ66CD9F82BFP-@infradead.org> <CAGWkznGf1eN-iszG21jGNq13C9yz8S0PW03hLc40Gjhn6LRp0Q@mail.gmail.com>
- <31091c95-1d0c-4e5a-a53b-929529bf0996@acm.org> <CAGWkznGv3jwTLW2nkBds9NrUeNQ1GHK=2kijDotH=DN762PyEQ@mail.gmail.com>
- <CAFj5m9K4yv4wkX2bhXSOf141dY9O96WdNfjMMYXCOoyM_Fdndg@mail.gmail.com>
-In-Reply-To: <CAFj5m9K4yv4wkX2bhXSOf141dY9O96WdNfjMMYXCOoyM_Fdndg@mail.gmail.com>
-From: Zhaoyang Huang <huangzhaoyang@gmail.com>
-Date: Thu, 25 Sep 2025 09:14:12 +0800
-X-Gm-Features: AS18NWBK4dJcK_-7IGtI0VoZd54sZXtNSb7uUlofZ2Iu7nxMDq9z6uDViCFW05A
-Message-ID: <CAGWkznFe4W0M4NE_ZjiSC6+28tHqJoah6dmP+X1aP6oCCTTe2Q@mail.gmail.com>
-Subject: Re: [RFC PATCH] driver: loop: introduce synchronized read for loop driver
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Bart Van Assche <bvanassche@acm.org>, Suren Baghdasaryan <surenb@google.com>, Todd Kjos <tkjos@android.com>, 
-	Christoph Hellwig <hch@infradead.org>, "zhaoyang.huang" <zhaoyang.huang@unisoc.com>, 
-	Jens Axboe <axboe@kernel.dk>, linux-mm@kvack.org, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, steve.kang@unisoc.com, 
-	Minchan Kim <minchan@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250923120932.47df57b2.alex.williamson@redhat.com>
 
-On Wed, Sep 24, 2025 at 6:05=E2=80=AFPM Ming Lei <ming.lei@redhat.com> wrot=
-e:
->
-> On Wed, Sep 24, 2025 at 5:13=E2=80=AFPM Zhaoyang Huang <huangzhaoyang@gma=
-il.com> wrote:
-> >
-> > loop google kernel team. When active_depth of the cgroupv2 is set to
-> > 3, the loop device's request I2C will be affected by schedule latency
-> > which is introduced by huge numbers of kworker thread corresponding to
-> > blkcg for each. What's your opinion on this RFC patch?
->
-> There are some issues on this RFC patch:
->
-> - current->plug can't be touched by driver, cause there can be request
-> from other devices
->
-> - you can't sleep in loop_queue_rq()
->
-> The following patchset should address your issue, and I can rebase & rese=
-nd
-> if no one objects.
->
-> https://lore.kernel.org/linux-block/20250322012617.354222-1-ming.lei@redh=
-at.com/
-Thanks for the patch, that is what I want.
->
-> Thanks,
->
->
-> >
-> > On Wed, Sep 24, 2025 at 12:30=E2=80=AFAM Bart Van Assche <bvanassche@ac=
-m.org> wrote:
-> > >
-> > > On 9/22/25 8:50 PM, Zhaoyang Huang wrote:
-> > > > Yes, we have tried to solve this case from the above perspective. A=
-s
-> > > > to the scheduler, packing small tasks to one core(Big core in ARM)
-> > > > instead of spreading them is desired for power-saving reasons. To t=
-he
-> > > > number of kworker threads, it is upon current design which will cre=
-ate
-> > > > new work for each blkcg. According to ANDROID's current approach, e=
-ach
-> > > > PID takes one cgroup and correspondingly a kworker thread which
-> > > > actually induces this scenario.
-> > >
-> > > More cgroups means more overhead from cgroup-internal tasks, e.g.
-> > > accumulating statistics. How about requesting to the Android core tea=
-m
-> > > to review the approach of associating one cgroup with each PID? I'm
-> > > wondering whether the approach of one cgroup per aggregate profile
-> > > (SCHED_SP_BACKGROUND, SCHED_SP_FOREGROUND, ...) would work.
-> > >
-> > > Thanks,
-> > >
-> > > Bart.
-> >
->
+On Tue, Sep 23, 2025 at 12:09:32PM -0600, Alex Williamson wrote:
+> On Tue, 23 Sep 2025 14:43:33 -0300
+> Jason Gunthorpe <jgg@nvidia.com> wrote:
+> 
+> > On Tue, Sep 23, 2025 at 11:30:41AM -0600, Alex Williamson wrote:
+> > > On Tue, 23 Sep 2025 12:04:14 -0300
+> > > Jason Gunthorpe <jgg@nvidia.com> wrote:
+> > >   
+> > > > On Mon, Sep 22, 2025 at 03:00:32PM -0600, Alex Williamson wrote:  
+> > > > > But then later in patch 8/ and again in 10/ why exactly do we cache
+> > > > > the provider on the vfio_pci_core_device rather than ask for it on
+> > > > > demand from the p2pdma?    
+> > > > 
+> > > > It makes the most sense if the P2P is activated once during probe(),
+> > > > it is just a cheap memory allocation, so no reason not to.
+> > > > 
+> > > > If you try to do it on-demand then it will require more locking.  
+> > > 
+> > > I'm only wondering about splitting to an "initialize/setup" function
+> > > where providers for each BAR are setup, and a "get provider" interface,
+> > > which doesn't really seem to be a hot path anyway.  Batching could
+> > > still be done to setup all BAR providers at once.  
+> > 
+> > I agree it is a weird interface, but it is close to the existing weird
+> > interface :\
+> 
+> Seems like it would help if we just positioned it as a "get provider
+> for BAR" function that happens to initialize all the providers on the
+> first call, rather than an "enable" function with some strange BAR
+> argument and provider return.  pcim_p2pdma_provider(pdev, bar)?
+> 
+> It would at least make sense to me then to store the provider on the
+> vfio_pci_dma_buf object at the time of the get feature call rather than
+> vfio_pci_core_init_dev() though.  That would eliminate patch 08/ and
+> the inline #ifdefs.
+
+I'll change it now. If "enable" function goes to be "get" function, we
+won't need to store anything in vfio_pci_dma_buf too. At the end, we
+have exactly two lines "provider = priv->vdev->provider[priv->bar];",
+which can easily be changed to be "provider = pcim_p2pdma_provider(priv->vdev->pdev, priv->bar)"
+
+> 
+> > > However, the setup isn't really once per probe(), even in the case of a
+> > > new driver probing we re-use the previously setup providers.    
+> > 
+> > It uses devm to call pci_p2pdma_release() which NULL's pdev->p2pdma.
+> 
+> Ah, right.  So the /* PCI device was "rebound" to the driver */ comment
+> is further misleading, a new probe would do a new setup.  Thanks,
+
+I will fix the comment.
+
+Thanks
+
+> 
+> Alex
+> 
