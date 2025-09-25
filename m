@@ -1,89 +1,130 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B7822417E6;
-	Thu, 25 Sep 2025 22:25:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EAC42DE6FF
+	for <linux-block@vger.kernel.org>; Thu, 25 Sep 2025 22:31:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758839133; cv=none; b=UtvPShxdTyrQy98HIfrqQAAgpi/YHCLT/Voiy0YmmF85i53l4HEIDRc1HWqJhnzVQLla9PtLAELVWRwO+HoTFrfyH1z/cujxXyJTjydqmYgFxnXfvNnNAEz8tMthVL+Q0PQ8C5SaSzWEmVknm7CbReALxiYnk0egM8DcKRv4ipQ=
+	t=1758839500; cv=none; b=JlWmlLmQIe6oZwt6V4BIbAsQWQJeL6OeJFrMlcq3Hv3wfGEOV1fMELUW5kjdx2L3x+Zwb1HMrcgQObeRX0p6NG2n2GAnyL+XHPxgzy6y1rbHGFfPOHwLdcaC9/J+l2ay6u7C9RIMjDj6g1kTsBpYIj+CfSf5HAkusRrdcfk68E4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758839133; c=relaxed/simple;
-	bh=My89Bjn9x/oeIFIFuiMOx2L+DJYICs3nInHDnUf4iYE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YxGt/a0PODDDp87UdqYUpYCggSVcEse5yhynvcCaU/n5/785oTzCKyyLItbUx/5eD70olDwRN+HsYFE/Uw8WZeN7kUZJswc2XkQ9ZHWxkr56hOQuHid83qn2vPzGZjBMB5pOHDO/oKdRziUlB02VsYQyYKhVsGJRmVCZ57UcmLI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O2Rzdesp; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1758839500; c=relaxed/simple;
+	bh=0Alswmfe1zq7N80PnOB6XtFxyNuFoZwrMxHbgdTZfVk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=rE2MQIIoy8/+VYjRVhK1BMrJTBX+/PyQXL2WQZfpx9XMJ4h4rBGoIxqRsKRi2pRhCe5QaPqo5Q/mjFyW2ydn3xzv/ksS8D/XpQ4mZXlW2Z4mN7478gEBY7EuGw2uDVyDlB8447BYDCh1ZBVdU9cOamXA/Cbp7FHyFj+cSoRiqPU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=X44MwjAW; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O2Rzdesp"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E9C4C4CEF0;
-	Thu, 25 Sep 2025 22:25:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758839132;
-	bh=My89Bjn9x/oeIFIFuiMOx2L+DJYICs3nInHDnUf4iYE=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=O2RzdespN28+DOiemh/RlFMEIo5UpiImbn0v0A/Z2p/mkztJ9oh7VFzk57XXbaq5Z
-	 p+KgaOFZWH9Im/dM0CtFtEaD3fQF0ueB//MulJsF5rR5FNk2J2wABakYhdHkk1vCs4
-	 Ri73bZI2gG61wJvMn/E6zf33XeM9xUHiQ04nVazJozm9LFpFtoAFphbMnDldwrjj5S
-	 V4XT/xwH4XYcNkyENhRY9BDd0gpiZSesp/2LpwaqL07aCKbOayBF9zTTb3LBzUY0RV
-	 iEFMcvL90Lep+wkY+SV8TA6L+OwPqZ+taj11zbG8zPFADssBHvrMjyaL52qrEO6tg7
-	 g9Gq53DV/KYOQ==
-Message-ID: <8a9a6955-ccb7-4acc-b6ec-7f180126bba5@kernel.org>
-Date: Fri, 26 Sep 2025 00:25:20 +0200
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X44MwjAW"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1758839498;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pPGBYTkBK6lmMsctQg86rFzc+ubUYRnHqSeaFKAdA0w=;
+	b=X44MwjAWo1LMrEV1YfazjVhrWp6iX//uYamFV2BR9SKe5uSMeIG2th2y3Ot0a1S9SWmZPg
+	EOynsZYgNn/2Jwsa9SAQIagkZZOYxpfWDM+QT7RloQHv0QMUREWvPEsrZ7Q6hn/IIyhMTV
+	dY0Qu/ePr3MIEP9UlwlwEm8AfS+pU5A=
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com
+ [209.85.166.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-31-DA4JYZ2AM7y_rmQxicTqog-1; Thu, 25 Sep 2025 18:31:37 -0400
+X-MC-Unique: DA4JYZ2AM7y_rmQxicTqog-1
+X-Mimecast-MFC-AGG-ID: DA4JYZ2AM7y_rmQxicTqog_1758839496
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-42571642af9so5015185ab.0
+        for <linux-block@vger.kernel.org>; Thu, 25 Sep 2025 15:31:37 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758839495; x=1759444295;
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=pPGBYTkBK6lmMsctQg86rFzc+ubUYRnHqSeaFKAdA0w=;
+        b=UvbwbEGS5kg4GM7z4jmSKiZzLsx1OqdqOpDQwEu4V6gmO8VSz/DhvRjKsfjjPYQDtS
+         kYaTZEbXY1XItSdeeAveCepHL9Dn+M286lL5hXezOprpaBZ4UPF92w+W7uPixTmS6a04
+         jHV8anf9xSgEh8efCEj8u9jYtlnobpsuuozz7dfN3xJd/ChcaRtC6ipmwUVcmL4SRjSV
+         XJnUk4JIYZtL5JZbVHykShYMXQ3GIYWme2XrAF56EZ4kjbaRvzCTKSgd0c2XocMYBoZG
+         LaFHOp3NRYDGZCJRw1znI6FKodmRQrgHS6yJ1w3oPfFjK0Js4xAOY/B1voBH+nNh9Zac
+         Hf2A==
+X-Forwarded-Encrypted: i=1; AJvYcCXNbA53j3ZXIU5Veqia3KDL7kemGkaCEYFzUf5dnAyC1TUdTq3hZnBYZCsL500ykg5uL3K7q6LGL3rJtQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzho/pXPSs4KP9397hEutW8qjJQgXUWvtO6x21YZNs7xg5bA9u7
+	KR/XiPnFX0rMY3WuS+lM/7J19iYqYikwVeVBV6e54TePFFzlEt/0e6+MQ8JdNevpWVAtXI7wEX5
+	634XUUcfvbn+3/pAB/swqRd9EwXdJmFMlb1gxLd11Cx+zrLrZNZ6JgMhpaoNaVdJoqEtAucTV
+X-Gm-Gg: ASbGnctuKZDskvndGs3P4iKIijgZI2pbng+JMXdm556WYvpFTifWnllJoct1ktRDBVs
+	wgfbOhc3qctgXLrP+bd5+thrPJb4Kxp06BHAXnhKzFr+FwfgYELZEwRD+UsBGBYPU+aGzw421//
+	EVRAXCmOIOPgBhWZ9N3gIRrb4LmpXhNc60DSG5n02o1ycznBO2tjrj22/iQ4jjusj672xxs5qSI
+	mtpklCg/vwmSLqFn0Oda3OiPGZcalYc0mkm+QihYNclrXefaLouSlESaFTQL74ngfTS8vdo83uc
+	QT/uOi2Pq0eAvBVAGPjkdrETIEV3YcezHIOyVsc7hFg=
+X-Received: by 2002:a92:d987:0:b0:424:80e6:9e8b with SMTP id e9e14a558f8ab-42595661562mr24720155ab.7.1758839495370;
+        Thu, 25 Sep 2025 15:31:35 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGBjWzVlsd5kVvaGcIPZVt9Dy5vtGZ7X7lNybnyhnS6f36pgd3Q/xbJFuK0zszjvTKZaW8Iag==
+X-Received: by 2002:a92:d987:0:b0:424:80e6:9e8b with SMTP id e9e14a558f8ab-42595661562mr24719995ab.7.1758839494991;
+        Thu, 25 Sep 2025 15:31:34 -0700 (PDT)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-56a69a1c574sm1211405173.40.2025.09.25.15.31.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 Sep 2025 15:31:34 -0700 (PDT)
+Date: Thu, 25 Sep 2025 16:31:31 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Leon Romanovsky <leon@kernel.org>, Andrew Morton
+ <akpm@linux-foundation.org>, Bjorn Helgaas <bhelgaas@google.com>, Christian
+ =?UTF-8?B?S8O2bmln?= <christian.koenig@amd.com>,
+ dri-devel@lists.freedesktop.org, iommu@lists.linux.dev, Jens Axboe
+ <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+ linaro-mm-sig@lists.linaro.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
+ linux-mm@kvack.org, linux-pci@vger.kernel.org, Logan Gunthorpe
+ <logang@deltatee.com>, Marek Szyprowski <m.szyprowski@samsung.com>, Robin
+ Murphy <robin.murphy@arm.com>, Sumit Semwal <sumit.semwal@linaro.org>,
+ Vivek Kasireddy <vivek.kasireddy@intel.com>, Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v2 03/10] PCI/P2PDMA: Refactor to separate core P2P
+ functionality from memory allocation
+Message-ID: <20250925163131.22a2c09b.alex.williamson@redhat.com>
+In-Reply-To: <20250925115308.GT2617119@nvidia.com>
+References: <cover.1757589589.git.leon@kernel.org>
+	<1e2cb89ea76a92949d06a804e3ab97478e7cacbb.1757589589.git.leon@kernel.org>
+	<20250922150032.3e3da410.alex.williamson@redhat.com>
+	<20250923150414.GA2608121@nvidia.com>
+	<20250923113041.38bee711.alex.williamson@redhat.com>
+	<20250923174333.GE2608121@nvidia.com>
+	<20250923120932.47df57b2.alex.williamson@redhat.com>
+	<20250925070314.GA12165@unreal>
+	<20250925115308.GT2617119@nvidia.com>
+Organization: Red Hat
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 18/19] rust: io: replace `kernel::c_str!` with
- C-Strings
-To: Tamir Duberstein <tamird@gmail.com>
-Cc: "Rafael J. Wysocki" <rafael@kernel.org>,
- Viresh Kumar <viresh.kumar@linaro.org>, Miguel Ojeda <ojeda@kernel.org>,
- Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>,
- Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?=
- <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>,
- Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>,
- Trevor Gross <tmgross@umich.edu>,
- Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
- Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>,
- David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
- FUJITA Tomonori <fujita.tomonori@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Michael Turquette
- <mturquette@baylibre.com>, Stephen Boyd <sboyd@kernel.org>,
- Breno Leitao <leitao@debian.org>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>,
- Dave Ertman <david.m.ertman@intel.com>, Ira Weiny <ira.weiny@intel.com>,
- Leon Romanovsky <leon@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
- =?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
- Arnd Bergmann <arnd@arndb.de>, Brendan Higgins <brendan.higgins@linux.dev>,
- David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>,
- Jens Axboe <axboe@kernel.dk>, Alexandre Courbot <acourbot@nvidia.com>,
- Alexander Viro <viro@zeniv.linux.org.uk>,
- Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
- Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>,
- linux-pm@vger.kernel.org, linux-kernel@vger.kernel.org,
- rust-for-linux@vger.kernel.org, nouveau@lists.freedesktop.org,
- dri-devel@lists.freedesktop.org, netdev@vger.kernel.org,
- linux-clk@vger.kernel.org, linux-pci@vger.kernel.org,
- linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com,
- linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
-References: <20250925-core-cstr-cstrings-v2-0-78e0aaace1cd@gmail.com>
- <20250925-core-cstr-cstrings-v2-18-78e0aaace1cd@gmail.com>
-From: Danilo Krummrich <dakr@kernel.org>
-Content-Language: en-US
-In-Reply-To: <20250925-core-cstr-cstrings-v2-18-78e0aaace1cd@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On 9/25/25 3:54 PM, Tamir Duberstein wrote:
-> C-String literals were added in Rust 1.77. Replace instances of
-> `kernel::c_str!` with C-String literals where possible.
-> 
-> Signed-off-by: Tamir Duberstein <tamird@gmail.com>
+On Thu, 25 Sep 2025 08:53:08 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-Acked-by: Danilo Krummrich <dakr@kernel.org>
+> On Thu, Sep 25, 2025 at 10:03:14AM +0300, Leon Romanovsky wrote:
+> 
+> > > It would at least make sense to me then to store the provider on the
+> > > vfio_pci_dma_buf object at the time of the get feature call rather than
+> > > vfio_pci_core_init_dev() though.  That would eliminate patch 08/ and
+> > > the inline #ifdefs.  
+> > 
+> > I'll change it now. If "enable" function goes to be "get" function, we
+> > won't need to store anything in vfio_pci_dma_buf too. At the end, we
+> > have exactly two lines "provider = priv->vdev->provider[priv->bar];",
+> > which can easily be changed to be "provider = pcim_p2pdma_provider(priv->vdev->pdev, priv->bar)"  
+> 
+> Not without some kind of locking change. I'd keep the
+> priv->vdev->provider[priv->bar] because setup during probe doesn't
+> need special locking.
+
+Why do we need to store the provider on the vfio_pci_core_device at
+probe though, we can get it later via pcim_p2pdma_provider().  Ideally
+we'd take the opportunity to pull out the setup part of the _provider
+function to give us an initialization interface to use at probe time
+without an unnecessary BAR# arg.  Thanks,
+
+Alex
+
