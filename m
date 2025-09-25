@@ -1,107 +1,87 @@
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from sender4-op-o12.zoho.com (sender4-op-o12.zoho.com [136.143.188.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D99642DE710
-	for <linux-block@vger.kernel.org>; Thu, 25 Sep 2025 16:35:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758818146; cv=none; b=R3THZnvP/+bausjDF1knCxDRF5akXdC6M+xyJ7B7RzBWNEKRVeyoqUaccmrfaP/+WKgejhWF9/bjzCepNcZegUfMmoUvQQKlnTlxPBXRj3OxB2TP+7HDp8Qp30zdgrl5D8Y+x5kFXnP+dmAUgFClUq9PZsBYuvuR4VDXoyIIfTE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758818146; c=relaxed/simple;
-	bh=Fmn7IjoQIv9FRmzL/xrdDgXANZVPEe3JHVjyckWd2C0=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=YTUhDgnEBAoK1RdNfZDZoQO3Nw1e1zyMOz/iIzBE1zR1exm7Y/vL91geYF+llr59aPIBpbmdCZK6jcAsgo3lSayOfjVADNpqymSLmjDFVj+xxQdhjJSkm8JS8utt34QirqWIAVuqzOtPC8s3YHGKEjyGJYPGbWlIQugOojmist8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Y+vnPSkB; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06F6B3081BB;
+	Thu, 25 Sep 2025 17:08:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758820108; cv=pass; b=V/ESndzAN4L9GaENXa918s5GWbUT2pLXzEwhhpHRpbpXYdg+sKKUN71OVaFGbja+juS4CE4xVNJr7QCITnDiDtyAjK7+kZtpj/56rUG//yBkUJiZNFFJ5MCEHXpCzUgCl44s0YdNEUdPeimKPWg+D7y3u+HVxW3zD9fe0GRwvns=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758820108; c=relaxed/simple;
+	bh=xh7K/XJFQ6KkEtm/OLCF3JPZG7ct8pPnp/RtlikI1UA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=l84ZpN8TnsnMUb/VGUkJaVSoqOX//UAM4g/op/s3gp70reg8PugakgaAlz2vzLTDLY6tvhwMNY2AKYxnNMJgInNO3JuF2vgFANIRiD2DbjiCOsIa2Gz2kIuzX7Upv136Sq/VEEVsjx4a8ZcSZ7u+Sw0m9qDfA7F7wrfamCVXn0c=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=yukuai.org.cn; spf=pass smtp.mailfrom=yukuai.org.cn; dkim=pass (1024-bit key) header.d=yukuai.org.cn header.i=hailan@yukuai.org.cn header.b=l5sRIKuV; arc=pass smtp.client-ip=136.143.188.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=yukuai.org.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yukuai.org.cn
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Y+vnPSkB"
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-46e30ef74b0so8725705e9.0
-        for <linux-block@vger.kernel.org>; Thu, 25 Sep 2025 09:35:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1758818142; x=1759422942; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Vj7JjVSC0RoD6Ozw5QK0MUosTSL+RlkeKmfamN53FeY=;
-        b=Y+vnPSkBDEJ5E92f7KWxtO04eJqCLnGFh5EPDLepola92OE9ulwnXfQT9KpAGpgICZ
-         rU7WAXv86dW6Q8afefT6jFr4rDX9fkWdgzsBoq+U5dMSg+/YLIBlcHAZQRI08+JdlWN4
-         Qe1vx/87IiS4/Dy+xEL8U5HwlCzUfqGF7ULk371lA51vv4jghJkkfGTYEjTuAshOrlRH
-         gcU3LMB9XUSYJpzj+3MheENzKaw9vkv5fKUaUlyEzSaySm4yIzgGBIENls3Q1m3K7C5O
-         r5aB6ICg3/uatruJMdIp/A6J38joFw0vEVZsBNueeyeOn+l009qBw57YPjZsoUo9aFjH
-         Oe1g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758818142; x=1759422942;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Vj7JjVSC0RoD6Ozw5QK0MUosTSL+RlkeKmfamN53FeY=;
-        b=ciuZzaM/yFmQ1w/QsmlKbn8gMc0xvDvfuj2F2cBElooLPNhHueE2i+xBvTnc6uQhnA
-         459W6uIa5VgNoTh0l6Ck12SOfWSlO1fOcfVgNmt/ERt76odY7BlA/6k2bIAn5EmIHQ1e
-         ahHaE0SBEPMvC0Rsv4f7LGpSjIa289zltDXE4UT2mfBSFxldxL0QFqZJGQx5Ersi7Iv9
-         wggG0vWVJ8HqD+FMYfuQ/F2F1O8ZYg4W4YRGl6AsxtWhzkVwoaDhFZivBSYJhqOtHO80
-         wfbdp3LrOpox1T45XcrpjwUJ02L3UCfIqKkL5NnMvELdRPcXfNqUgGMINXny+Z2Nu7Nc
-         C5tA==
-X-Gm-Message-State: AOJu0YwzPRh39U4XR6P4GHh2gXrZZhjI+eZUpT22CcIqVgykZ9ug1c+p
-	zpnVseo1gBNJRoyLswNuvUEMph1lRX/T4Fne3A1ddMddVCewHhbFEHE8UX/UtZSjrng=
-X-Gm-Gg: ASbGnctFhJ+fro4kI7ll6B5WwjvK9GSCaEa96imhUqKgmf1dHpTT5JscHqyr/edR5Tl
-	3/JxkKw1qFIC2Knw66Ub970aSc1ObhGAMEtuyUwFuZPF5ijqBzUww7P1WHD4fy1bQbqM3JVm3Jq
-	24O1l1b6P4XWewLErGCDB8pxywOrSt5VNfRKeasls2uCVCMFFYTKj0VbfcTlR3mU8LVfbfbW5G5
-	4QwgVZ2cbADAyXmwYElpmfqW1g3+xRpTeFtJaZRYKVh8HXl9tGVfiIf0nkbI8fBE6UXMV08K1Ek
-	24jpj//I9yKhCJHx3SKF8rlS1XW+yzIKETklEQyuycfRDon57er528SAFmDHvX+lOJFcoCl6b/n
-	vIaJcrHvMtaQNneIvRA==
-X-Google-Smtp-Source: AGHT+IHrhV7zj5vdcJDKTvHq5JEepKwIgmKJXmrvq3j23cyzlH3maYczJFkCYtf1TXqWG8vlrXeEtQ==
-X-Received: by 2002:a05:600c:1c86:b0:46d:5846:df0c with SMTP id 5b1f17b1804b1-46e32a14839mr45102805e9.34.1758818142018;
-        Thu, 25 Sep 2025 09:35:42 -0700 (PDT)
-Received: from [127.0.0.1] ([213.174.118.18])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46e330fbcc5sm20664745e9.4.2025.09.25.09.35.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Sep 2025 09:35:40 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: Stefan Haberland <sth@linux.ibm.com>
-Cc: linux-block@vger.kernel.org, Jan Hoeppner <hoeppner@linux.ibm.com>, 
- linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>, 
- Vasily Gorbik <gor@linux.ibm.com>, Jaehoon Kim <jhkim@linux.ibm.com>, 
- Christian Borntraeger <borntraeger@linux.ibm.com>
-In-Reply-To: <20250925154708.644575-1-sth@linux.ibm.com>
-References: <20250925154708.644575-1-sth@linux.ibm.com>
-Subject: Re: [PATCH 0/2] s390/dasd: fix buffer alignment validation
-Message-Id: <175881814049.459270.12889297398972326270.b4-ty@kernel.dk>
-Date: Thu, 25 Sep 2025 10:35:40 -0600
+	dkim=pass (1024-bit key) header.d=yukuai.org.cn header.i=hailan@yukuai.org.cn header.b="l5sRIKuV"
+ARC-Seal: i=1; a=rsa-sha256; t=1758820071; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=PE5glDIsYYr7d4pKIscD4HkL/+QqyqDxWnAkaQe/NBQ5PEk0Djp/pd3gdknSw5LJ7o2I1kp+xCG4qBtGlCPxIMdBMI0PK4TBNhiG1pcgKOgwku9ffJcNb2KvWK6Aa2X6twhan+OCCTljOGpq389Al6Ckk5OkKHCmGPIMG4zskFs=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1758820071; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=xh7K/XJFQ6KkEtm/OLCF3JPZG7ct8pPnp/RtlikI1UA=; 
+	b=FySJUk52uxt/fWGi5Ma/0yIkUjR5kRBlSaenMNSNfu/UTj+/vcfS+ZVU70Su6VMHRFs8nikDn/hOBEPF8Ut6vfz0M4AK7mLb/Tp7LUYA5sTfNcASQoT3qg/ySZWL8fAmWxZ+ZpvPj1Ay9IusATNIk6LjIxvl9umRhTTWQjGHask=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=yukuai.org.cn;
+	spf=pass  smtp.mailfrom=hailan@yukuai.org.cn;
+	dmarc=pass header.from=<hailan@yukuai.org.cn>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1758820071;
+	s=zmail; d=yukuai.org.cn; i=hailan@yukuai.org.cn;
+	h=Message-ID:Date:Date:MIME-Version:Subject:Subject:To:To:Cc:Cc:References:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=xh7K/XJFQ6KkEtm/OLCF3JPZG7ct8pPnp/RtlikI1UA=;
+	b=l5sRIKuV6EnO3zuk5usTtk3gAlssOPDKZAWjYt6QRJ7KxG0XlH5PAxSXZ9LV4L8P
+	K27KcsZ9I7CceXQPnIzcnspF6yfPE9rxBz/9as7VzwC+v/3j1BIDUEvB85CJyBaY2y6
+	Bslw0a+cYcqbdLEgq9iiIBPlUFpxQLnO7XTs2tbo=
+Received: by mx.zohomail.com with SMTPS id 1758820067677192.5730499183651;
+	Thu, 25 Sep 2025 10:07:47 -0700 (PDT)
+Message-ID: <01e7eccd-3529-4d12-8ad2-fd9e034a026d@yukuai.org.cn>
+Date: Fri, 26 Sep 2025 01:07:39 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-2ce6c
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 01/10] blk-cgroup: use cgroup lock and rcu to protect
+ iterating blkcg blkgs
+To: Bart Van Assche <bvanassche@acm.org>, Yu Kuai <yukuai1@huaweicloud.com>,
+ tj@kernel.org, ming.lei@redhat.com, nilay@linux.ibm.com, hch@lst.de,
+ josef@toxicpanda.com, axboe@kernel.dk, akpm@linux-foundation.org,
+ vgoyal@redhat.com
+Cc: cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-mm@kvack.org, yukuai3@huawei.com,
+ yi.zhang@huawei.com, yangerkun@huawei.com, johnny.chenyi@huawei.com
+References: <20250925081525.700639-1-yukuai1@huaweicloud.com>
+ <20250925081525.700639-2-yukuai1@huaweicloud.com>
+ <bc6fe04d-3245-40dd-aa30-c3a3acb670c2@acm.org>
+From: Yu Kuai <hailan@yukuai.org.cn>
+In-Reply-To: <bc6fe04d-3245-40dd-aa30-c3a3acb670c2@acm.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ZohoMailClient: External
 
+Hi,
 
-On Thu, 25 Sep 2025 17:47:06 +0200, Stefan Haberland wrote:
-> please apply the following two patches that fix buffer alignment
-> handling in the DASD driver.
-> The first patch corrects the error mapping for misaligned requests,
-> and the second enforces proper alignment validation in the block layer.
-> 
-> 
-> Jaehoon Kim (2):
->   s390/dasd: Return BLK_STS_INVAL for EINVAL from do_dasd_request
->   s390/dasd: enforce dma_alignment to ensure proper buffer validation
-> 
-> [...]
+在 2025/9/25 23:57, Bart Van Assche 写道:
+> On 9/25/25 1:15 AM, Yu Kuai wrote:
+>> It's safe to iterate blkgs with cgroup lock or rcu lock held, prevent
+>> nested queue_lock under rcu lock, and prepare to convert protecting
+>> blkcg with blkcg_mutex instead of queuelock.
+>
+> Iterating blkgs without holding q->queue_lock is safe but accessing the
+> blkg members without holding that lock is not safe since q->queue_lock
+> is acquired by all code that modifies blkg members. Should perhaps a new
+> spinlock be introduced to serialize blkg modifications?
+>
+No need for a new lock, I think blkcg->lock can do that.
 
-Applied, thanks!
+Thanks,
+Kuai
 
-[1/2] s390/dasd: Return BLK_STS_INVAL for EINVAL from do_dasd_request
-      (no commit info)
-[2/2] s390/dasd: enforce dma_alignment to ensure proper buffer validation
-      (no commit info)
-
-Best regards,
--- 
-Jens Axboe
-
-
-
+> Thanks,
+>
+> Bart.
+>
