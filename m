@@ -1,67 +1,67 @@
-Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
+Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1CBB2DC35D
-	for <linux-block@vger.kernel.org>; Thu, 25 Sep 2025 13:55:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6FEB2DEA67
+	for <linux-block@vger.kernel.org>; Thu, 25 Sep 2025 13:55:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758808552; cv=none; b=nQ/jqyOodXW6+DPZj414E7xTtJjlI3BDh6Pde+0UydvoXMPG6Zoeqc+EIvQCOXBh9ZJcPfwCOAqYVauG6LSOSAbEYn7cdSp3Re/58TdRIUJZtuHS18HcT4YnWTY9IcD+Aui10216nBHOsDVd4Jj35VrePrd+1cokdJrt5AIre/E=
+	t=1758808557; cv=none; b=qlmZ2tgnNzdAZ+IXp/OGn4dYPzUiQp9BO0J4+k0G/8AUZDCn0QeSYWTnOP+6mA9VWDvLgeZb/K0r1fbOuYrwRnGpqSi2mkRiy092QH7kaFLLckjhTUM5iEhUXrTTMfF/RDCxtUlWrag3ERyh4dxbg/tPA1MxK8SBZWszb4OpNT0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758808552; c=relaxed/simple;
-	bh=/zHlMKa0b7Nk9siO6gKcN+x/h82Zk8zkURVvpzNt6AA=;
+	s=arc-20240116; t=1758808557; c=relaxed/simple;
+	bh=TE76Xl7EtGwiL3k522JoFNelrGIHYPV5uXDUZx193fk=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Bo/1ap/3eqKcOzUkhA4lTiUsLP+x+IPMiQBYHmR/ZOiUIdmR8LNtJuqQdEsCnF8zSXnOMqchXuQr1ub/ITm+P19DnpI2ArseN70XMWsQUSXjAM1yNNxvbQqEqTM/SQmEfegGG6wexuCU5k9ZopRQS8++QHetqfHecwMeZov5F20=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KeuPt+tL; arc=none smtp.client-ip=209.85.219.43
+	 In-Reply-To:To:Cc; b=btJzMGt4cvs4igt9ZyBv7NtkdXJB6Lr23jMJhmom/UuAOx1il2oljt5aEvaZ4brARlpdkKE2rP1hiULDXGocyxfdxIxEj7fd9CoKv8emXAwDFZeDo9JdtbsBYh7GSTh080crrJiuSJTo7Ny5wyT+J3cBCjN/uxNqwetxpreqvhs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kJ1QBzQQ; arc=none smtp.client-ip=209.85.219.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KeuPt+tL"
-Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-70ba7aa131fso9831386d6.2
-        for <linux-block@vger.kernel.org>; Thu, 25 Sep 2025 06:55:50 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kJ1QBzQQ"
+Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-7f7835f4478so6062466d6.1
+        for <linux-block@vger.kernel.org>; Thu, 25 Sep 2025 06:55:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758808549; x=1759413349; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1758808555; x=1759413355; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=YGNwJdiqffAB8BrNoFOc3im0f57lc7sAudNYea1lra0=;
-        b=KeuPt+tLwr0z6WDSP3y7Sd8ARJjyqhBS+8J19v53/oqlcmaVyTjZxFiSaHYUc0eDWv
-         HXtJzPM1aKkv/FaVdl0+9Dg2K1BDc1e+3yquSp9hskiLhew3+7oaC1lAXRBrVixuzxZX
-         2pjos2w+kAiFtnlfKbsuBkq//yKRfyGhmiZuxp/m8RBzcKsDDyzd5YtXMqmH18RCBzpE
-         pVrGH/KYTlH39BJblDgoplC2+0SetRV3N1H6glaSSKPK38tCBu+1/D6Dmnp9U8vmqJLL
-         yQmSg1knJMR6xaj4nUnqodIGwo3vS5nx5G6/+UknyfHYGteUeiVMpFfvIJQRbUqZfm80
-         yDAw==
+        bh=IbRi9B/DaIaW8U9NAWZIVdIpXCsTnUCErxxV4ovxvuk=;
+        b=kJ1QBzQQnod8ikaYW54XssR+CBE3xeOc5hPHb9VMVkm40EXVbG2yI0I4JTy9k7v1V2
+         xPJPBZLVEqpXdWn+b+d+yi/VR3bTT3A8qRWqvvbLrlZC0zK4EMU6eQB6ocCdJL+STxG8
+         rGtjFKtaxLVHEkxVjFk3hqKNTf53DOdJ/cPB31CF3iu9Bo4Jx7+FJJRXun5NuVDK5R0T
+         XEE+P7wWItGg7cidouV0rTIv1sdBr/NZ8eT/ErtQPMdbjvPQ7EMvq41rnAmJkvHTqQpM
+         jsXPHNd26pnlqGcpVzITl7z1hZ4Jm5dKwib+hGhygoPE13itEfZhletKi6i6fRZtxWbx
+         sGZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758808549; x=1759413349;
+        d=1e100.net; s=20230601; t=1758808555; x=1759413355;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=YGNwJdiqffAB8BrNoFOc3im0f57lc7sAudNYea1lra0=;
-        b=XYZD/rk/DUfwCqxm4upqhQHyJRwKoiPlfzuUkacGrWRQBb+QXgeKuVgCRizrGbLpCk
-         nrWGQcWvHlwoHBqctjT8bA1ZOu9mTxsfg6AktONj+f14/WoxXdpLX4WmgSfyKS/C+g5U
-         o7VXUxiEH9XL4JwmSXrIj6a3pvd+vNJvC+mhAGbmi+yH7/1QEZGBSJCG8O0VrAgNU47L
-         tTUo6+ewlvx46UFlnwLLZxT0FSh4ScWyJrhhVjYPMOwTFXq5V8iUjD73flS/3AKlWspF
-         pDUy5KasRtmJvpzEZOPhNC1l1rVo7J5qRMMfnB154emr3EzHeZ5PLuz4rYgHuanxMVp0
-         rTpA==
-X-Forwarded-Encrypted: i=1; AJvYcCWeWxCMooRe+/GADEpgTon3edN3/eKdX9AcKwX1XgivGYXA8dQKXbBVeGfX5FENZh4vKahXfgwyOpkk8Q==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzAjmKJvijZhTqoqJNJU/4XIrb+oybWEmsFxGhUcToKA9ninRKO
-	/R/Uon8f3ERwXSlvFSVYSQG6/6MXwhGHqY3MoV57vFus25G5CuNFmr2H
-X-Gm-Gg: ASbGncvFCDZZr983B6M3M8qj5Vrm1juvu39jphGFYr0WGjinWngfMAmPhgy7j6SFwCl
-	dgCOkZl07i6n2hZy9QLqjxNQQONTUMfAi3gxL9A3FcA1PNea+Mu+1C4xZo5Gi2FZS+7SZg+N4jA
-	9EU+B4hSdpDhHE2hGZUlRm6SYep2UzxLyVnEs1u1NaPZ1LOWAekPmJMrkk4PzjKAjm1bA7xe9/Z
-	Ta18JIAT+Yy7iciIpZsxhttxNN9OhaW0TmWz4+SPad0b11m26XCPVRytMB1DnBwm8SP4JeTLqmf
-	x8OS5DMh4iWU5M2hAaP8cT9N7VYzWcIczbQyDEeVfLIexWBY+HZdp/+DWgimoVM9J3YaMmczoBq
-	1BsZ9Ac8jFlYlo99otL51doqyf9uh15MqwSBV9KN19h7CojUQGIhIoNG4HhUx8nPXcZfTs8zrYV
-	VgnGAETHqyYDyQLqCDvw5zN0IkxqCHMcjV+BJRVZIwNauB44NDv1ecEqR64J0El1eLy9sU
-X-Google-Smtp-Source: AGHT+IHxxrN1qiYt8CkNZDH6mAY2ag9p3EBYWx12nFthYZnZa+rBx1Nas4oNQjITBFEWvlFgd3yNGw==
-X-Received: by 2002:a05:6214:27c3:b0:7f0:e84e:b2b2 with SMTP id 6a1803df08f44-7fc451680aemr56106776d6.57.1758808548877;
-        Thu, 25 Sep 2025 06:55:48 -0700 (PDT)
+        bh=IbRi9B/DaIaW8U9NAWZIVdIpXCsTnUCErxxV4ovxvuk=;
+        b=j5S5X0ARsRvO9AerFCdr1IA34gPU4j90SMc9ARPDJPwyqR7vj/xlALlum0f9QdwLw4
+         PoAYCW9Xus5nksuhSieqsCvpKU86gbFW9+lEVhqgpUyxoIEX5q05zlnS/UHGYy0l8VrZ
+         JC1n1UVKFpYlarirdYtmBGP74U3Tb3cFnYaO1cwMQc8W0TPhNUfpuVkl4AIy7g0+FjI3
+         DKa3vPTV3P1E/pV0bPwXQo6bEjL8DZmy50hSAlxQX4xLZTptD3kkhsMFXCrQzu2jndPr
+         P1ubAz/WwD6MT37KATIv54g0aUXsPOuY8Zvj4jft4q8MZEr7JgkEVKAyKOJ5RrlZmsZp
+         9V1g==
+X-Forwarded-Encrypted: i=1; AJvYcCWOKuiO3XjAwnZiQQ2aTN1Jcpb2K4jU4cdZ0Pkec1nuxsXsIPXJvWiobPzfSSs0JcKBQRX9C+Dhzy4beA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YymrBtM9Mbb7MBUpXOmkX0OIrOewF6vNdOi7j5xhsETpwpbRKQ/
+	I7x+P7kG0UbgDhBV3BGEAAFUAS6zI/OJWfDRxoldIYq6UTdLS7jew1t5
+X-Gm-Gg: ASbGnctkci895NX1ukh52sIUe+S/X9x1Sm6c7IkOZbJNED56WRa9vpDXAc4QV011lkA
+	5Ak3IncuBEuRUOOyOCBf/n8AgvO/LCMQEFw7P74q67D/LeyzML+vZxQJ8PjqtgiqxbZEaQTctfY
+	MyPxWOdd24F/dCsy1nTqGGxK4XLEArlgCSdSbArvPEIEMZZ8GIY9SFBKeW5lTUH8EKiRPkFff9+
+	m+iHkrHx4BEm28YMJO/2HBjqeuPPQvuGYEp+2vanea4VALImRXRORNpPAR49C+I6wrrbqG71VxK
+	+BvjX9RrQUG6K7W0uCnjV0HRAfa7pIAPExf2BRKFQGc7bcAE2s5GOB+bRjFbb41vbjr0XG2b6uX
+	0a4Xzfj2QFmr6UpPsVPqo4tFZ+kbf8EU9Jy9UyjvGw27E0XdRQJlOVSjiefTaNxDFgLeCMFe2DR
+	XQRyPl4Cz8h7mpKEptaVKyolNEiBUJTxfJWyhPBafkcd8IUVToXWMDrl6Q93WhG1WKHomE
+X-Google-Smtp-Source: AGHT+IG7SCiSfqv22MjkqMAx69OdDcsv0d2XWfzHnQ58HqF/5wRLVKKYuW5rQhqneJzNL2eu5F8jIg==
+X-Received: by 2002:a05:6214:5198:b0:77f:4415:6d8b with SMTP id 6a1803df08f44-7fc28076ae1mr36287846d6.8.1758808554316;
+        Thu, 25 Sep 2025 06:55:54 -0700 (PDT)
 Received: from 137.1.168.192.in-addr.arpa ([2600:4808:6353:5c00:7c:b286:dba3:5ba8])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-80135968d5esm11536916d6.12.2025.09.25.06.55.43
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-80135968d5esm11536916d6.12.2025.09.25.06.55.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Sep 2025 06:55:48 -0700 (PDT)
+        Thu, 25 Sep 2025 06:55:53 -0700 (PDT)
 From: Tamir Duberstein <tamird@gmail.com>
-Date: Thu, 25 Sep 2025 09:54:03 -0400
-Subject: [PATCH v2 15/19] rust: seq_file: replace `kernel::c_str!` with
+Date: Thu, 25 Sep 2025 09:54:04 -0400
+Subject: [PATCH v2 16/19] rust: str: replace `kernel::c_str!` with
  C-Strings
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -70,8 +70,8 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250925-core-cstr-cstrings-v2-15-78e0aaace1cd@gmail.com>
+Content-Transfer-Encoding: 8bit
+Message-Id: <20250925-core-cstr-cstrings-v2-16-78e0aaace1cd@gmail.com>
 References: <20250925-core-cstr-cstrings-v2-0-78e0aaace1cd@gmail.com>
 In-Reply-To: <20250925-core-cstr-cstrings-v2-0-78e0aaace1cd@gmail.com>
 To: "Rafael J. Wysocki" <rafael@kernel.org>, 
@@ -111,13 +111,13 @@ Cc: linux-pm@vger.kernel.org, linux-kernel@vger.kernel.org,
  linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
  Tamir Duberstein <tamird@gmail.com>
 X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openssh-sha256; t=1758808438; l=1328;
+X-Developer-Signature: v=1; a=openssh-sha256; t=1758808438; l=1351;
  i=tamird@gmail.com; h=from:subject:message-id;
- bh=/zHlMKa0b7Nk9siO6gKcN+x/h82Zk8zkURVvpzNt6AA=;
+ bh=TE76Xl7EtGwiL3k522JoFNelrGIHYPV5uXDUZx193fk=;
  b=U1NIU0lHAAAAAQAAADMAAAALc3NoLWVkMjU1MTkAAAAgtYz36g7iDMSkY5K7Ab51ksGX7hJgs
  MRt+XVZTrIzMVIAAAAGcGF0YXR0AAAAAAAAAAZzaGE1MTIAAABTAAAAC3NzaC1lZDI1NTE5AAAA
- QAXSvElYTE8YxZCsGrWl/FvFn0PcrKAZK3BdoNzxQTxfQ/m2OpN47pZ17tScZDRCYR8bMK67o/2
- oeQSiKFoeSw0=
+ QNEkH2K217WCJVB+0mC1S+mvJu9BnNI6eCwPt0AKaTiMW7gojiLm71MaiB58vh7llyUCTN8zCSP
+ N0RCtgv8pDgg=
 X-Developer-Key: i=tamird@gmail.com; a=openssh;
  fpr=SHA256:264rPmnnrb+ERkS7DDS3tuwqcJss/zevJRzoylqMsbc
 
@@ -129,31 +129,31 @@ Reviewed-by: Alice Ryhl <aliceryhl@google.com>
 Reviewed-by: Benno Lossin <lossin@kernel.org>
 Signed-off-by: Tamir Duberstein <tamird@gmail.com>
 ---
- rust/kernel/seq_file.rs | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ rust/kernel/str.rs | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/rust/kernel/seq_file.rs b/rust/kernel/seq_file.rs
-index 855e533813a6..518265558d66 100644
---- a/rust/kernel/seq_file.rs
-+++ b/rust/kernel/seq_file.rs
-@@ -4,7 +4,7 @@
- //!
- //! C header: [`include/linux/seq_file.h`](srctree/include/linux/seq_file.h)
- 
--use crate::{bindings, c_str, fmt, str::CStrExt as _, types::NotThreadSafe, types::Opaque};
-+use crate::{bindings, fmt, str::CStrExt as _, types::NotThreadSafe, types::Opaque};
- 
- /// A utility for generating the contents of a seq file.
- #[repr(transparent)]
-@@ -36,7 +36,7 @@ pub fn call_printf(&self, args: fmt::Arguments<'_>) {
-         unsafe {
-             bindings::seq_printf(
-                 self.inner.get(),
--                c_str!("%pA").as_char_ptr(),
-+                c"%pA".as_char_ptr(),
-                 core::ptr::from_ref(&args).cast::<crate::ffi::c_void>(),
-             );
-         }
+diff --git a/rust/kernel/str.rs b/rust/kernel/str.rs
+index 624386cb07be..4203ce34ce98 100644
+--- a/rust/kernel/str.rs
++++ b/rust/kernel/str.rs
+@@ -272,15 +272,14 @@ impl fmt::Display for CStr {
+     /// Formats printable ASCII characters, escaping the rest.
+     ///
+     /// ```
+-    /// # use kernel::c_str;
+     /// # use kernel::prelude::fmt;
+     /// # use kernel::str::CStr;
+     /// # use kernel::str::CString;
+-    /// let penguin = c_str!("🐧");
++    /// let penguin = c"🐧";
+     /// let s = CString::try_from_fmt(fmt!("{penguin}"))?;
+     /// assert_eq!(s.to_bytes_with_nul(), "\\xf0\\x9f\\x90\\xa7\0".as_bytes());
+     ///
+-    /// let ascii = c_str!("so \"cool\"");
++    /// let ascii = c"so \"cool\"";
+     /// let s = CString::try_from_fmt(fmt!("{ascii}"))?;
+     /// assert_eq!(s.to_bytes_with_nul(), "so \"cool\"\0".as_bytes());
+     /// # Ok::<(), kernel::error::Error>(())
 
 -- 
 2.51.0
