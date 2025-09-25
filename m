@@ -1,123 +1,123 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DAEC1CAA92;
-	Thu, 25 Sep 2025 07:03:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D283D28F4;
+	Thu, 25 Sep 2025 08:25:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758783801; cv=none; b=EhpeZ4N09Bs/KRSdMLJJRB5DSIOypRUcgIdRXhybTs8Id8LrUcnu2BzK3jbkixQpjK1wloVpE7z1eC91yWEQEXTIXYqIfa/nmg8DHm/BG8W7l9bjPSyo8SMLsGWQZR2INcYYY0uOMYK8XpFS1ITUYf13z4GAGclmBNUw1nNBwSc=
+	t=1758788753; cv=none; b=QTMqqoX+JA+xqfMQq5tWNBdwgTUbyuzYTDLfnAFShK7IYnjZWBugGhV0wyvx6JDKSj/xffG6itSe+nKcWCoh/PLjgkji8TPSsu8T4IOuLEeUtR35RVtjJI9dPZZLWd8r0U0CnUD4E/PDyR4DRzh/NyVUM3L13ytQsARcISuIWfc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758783801; c=relaxed/simple;
-	bh=IfFjt1sIn89xjUeeoV2zJsvE3bTjSj86lJ2QWvNYz8w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uT4W4PHEa0T9K2MMhqmpmAcD0+HhmD6HfR60fW77tc5ycyxSNKO4N4exspj2qU2YgjWIOwTnteK3TzHsWOg1fceWB5WZG+LTeGr8ERHp2lTCGi8YNaE0Y8OzBkvzyroKbFODJeFg/zxWWeunTBwYKdC6xT3gJyKcERtFjogIYPI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qHutfg7p; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qHutfg7p"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 476E0C4CEF4;
-	Thu, 25 Sep 2025 07:03:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758783799;
-	bh=IfFjt1sIn89xjUeeoV2zJsvE3bTjSj86lJ2QWvNYz8w=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=qHutfg7p0MJiJzKdbXS/d6R3kdEqDhdXcGmgxvkwI4AM6XuKyeIpgR1GSCsEqIGVB
-	 9ZrAilO0Zj59EMAXR1lQlcpWEMA28nquUz1IKkduHGuS4dyD2OJmp5f3UxncKmQ8+I
-	 Dp30uxy2wGUYE3Hja5f4XS00BFzuj+WaXq60qYIzodUdV2tvE04uI5a85RPL6mAqR7
-	 MWKPSQplfkMcH9/nRS03UG60TJBwCq9ZQRhoS60sk8FdhiE0kifJqWTjrMUqN9REZV
-	 kUzpbXtt2XKNZVaDT/F1inIn9vj+we8Gfm9meFs0BUoq+pahNKDPioVkPIFajbcBnM
-	 waHnKaEouWGfQ==
-Date: Thu, 25 Sep 2025 10:03:14 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: Jason Gunthorpe <jgg@nvidia.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
-	Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>,
-	kvm@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-media@vger.kernel.org, linux-mm@kvack.org,
-	linux-pci@vger.kernel.org, Logan Gunthorpe <logang@deltatee.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Vivek Kasireddy <vivek.kasireddy@intel.com>,
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v2 03/10] PCI/P2PDMA: Refactor to separate core P2P
- functionality from memory allocation
-Message-ID: <20250925070314.GA12165@unreal>
-References: <cover.1757589589.git.leon@kernel.org>
- <1e2cb89ea76a92949d06a804e3ab97478e7cacbb.1757589589.git.leon@kernel.org>
- <20250922150032.3e3da410.alex.williamson@redhat.com>
- <20250923150414.GA2608121@nvidia.com>
- <20250923113041.38bee711.alex.williamson@redhat.com>
- <20250923174333.GE2608121@nvidia.com>
- <20250923120932.47df57b2.alex.williamson@redhat.com>
+	s=arc-20240116; t=1758788753; c=relaxed/simple;
+	bh=uyoC33L1mECK04nAwihRRbXpUtfFIt3Cv02wrL29ymk=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=nt+pGh9L0rGTeyJ0vL5mZVS101ZKGgdA6ZEpVb911gRBW4OFgNtcKK943itbYggP5rijov0QG4kB5MhIFuobuS+i3OaH2/qneB6x7dY8fraWSHhrIWh13Gpp9ACSdQN0pUvOryNYZJ1tcAfLo+GQKXphF8CcXB1mfbLPdK6gXNk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4cXRcN2h7bzKHN4Q;
+	Thu, 25 Sep 2025 16:25:40 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 3A3941A0B16;
+	Thu, 25 Sep 2025 16:25:48 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+	by APP4 (Coremail) with SMTP id gCh0CgCna2OH_NRodTcIAw--.12615S7;
+	Thu, 25 Sep 2025 16:25:47 +0800 (CST)
+From: Yu Kuai <yukuai1@huaweicloud.com>
+To: tj@kernel.org,
+	ming.lei@redhat.com,
+	nilay@linux.ibm.com,
+	hch@lst.de,
+	josef@toxicpanda.com,
+	axboe@kernel.dk,
+	akpm@linux-foundation.org,
+	vgoyal@redhat.com
+Cc: cgroups@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org,
+	yukuai3@huawei.com,
+	yukuai1@huaweicloud.com,
+	yi.zhang@huawei.com,
+	yangerkun@huawei.com,
+	johnny.chenyi@huawei.com
+Subject: [PATCH 03/10] blk-cgroup: don't nest queu_lock under rcu in bio_associate_blkg()
+Date: Thu, 25 Sep 2025 16:15:18 +0800
+Message-Id: <20250925081525.700639-4-yukuai1@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20250925081525.700639-1-yukuai1@huaweicloud.com>
+References: <20250925081525.700639-1-yukuai1@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250923120932.47df57b2.alex.williamson@redhat.com>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgCna2OH_NRodTcIAw--.12615S7
+X-Coremail-Antispam: 1UD129KBjvdXoWrKryrGry3KFWkur1rZF4kCrg_yoWkuFX_XF
+	1ku3sYgwn5A3W3try5ZF1YvFW8C3yqqr1qga4Y9a43Cry5AFZFgr9Fyw45ArW5Z3Z7Cryj
+	vrWDXr47Grn2gjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUbkkFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUWwA2048vs2IY02
+	0Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xv
+	wVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UM2
+	8EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2AI
+	xVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20x
+	vE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xv
+	r2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxan2IY04
+	v7MxkF7I0En4kS14v26r4a6rW5MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j
+	6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7
+	AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE
+	2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0x
+	vEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVj
+	vjDU0xZFpf9x0pRl_MsUUUUU=
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On Tue, Sep 23, 2025 at 12:09:32PM -0600, Alex Williamson wrote:
-> On Tue, 23 Sep 2025 14:43:33 -0300
-> Jason Gunthorpe <jgg@nvidia.com> wrote:
-> 
-> > On Tue, Sep 23, 2025 at 11:30:41AM -0600, Alex Williamson wrote:
-> > > On Tue, 23 Sep 2025 12:04:14 -0300
-> > > Jason Gunthorpe <jgg@nvidia.com> wrote:
-> > >   
-> > > > On Mon, Sep 22, 2025 at 03:00:32PM -0600, Alex Williamson wrote:  
-> > > > > But then later in patch 8/ and again in 10/ why exactly do we cache
-> > > > > the provider on the vfio_pci_core_device rather than ask for it on
-> > > > > demand from the p2pdma?    
-> > > > 
-> > > > It makes the most sense if the P2P is activated once during probe(),
-> > > > it is just a cheap memory allocation, so no reason not to.
-> > > > 
-> > > > If you try to do it on-demand then it will require more locking.  
-> > > 
-> > > I'm only wondering about splitting to an "initialize/setup" function
-> > > where providers for each BAR are setup, and a "get provider" interface,
-> > > which doesn't really seem to be a hot path anyway.  Batching could
-> > > still be done to setup all BAR providers at once.  
-> > 
-> > I agree it is a weird interface, but it is close to the existing weird
-> > interface :\
-> 
-> Seems like it would help if we just positioned it as a "get provider
-> for BAR" function that happens to initialize all the providers on the
-> first call, rather than an "enable" function with some strange BAR
-> argument and provider return.  pcim_p2pdma_provider(pdev, bar)?
-> 
-> It would at least make sense to me then to store the provider on the
-> vfio_pci_dma_buf object at the time of the get feature call rather than
-> vfio_pci_core_init_dev() though.  That would eliminate patch 08/ and
-> the inline #ifdefs.
+From: Yu Kuai <yukuai3@huawei.com>
 
-I'll change it now. If "enable" function goes to be "get" function, we
-won't need to store anything in vfio_pci_dma_buf too. At the end, we
-have exactly two lines "provider = priv->vdev->provider[priv->bar];",
-which can easily be changed to be "provider = pcim_p2pdma_provider(priv->vdev->pdev, priv->bar)"
+If bio is already associated with blkg, blkcg is already pinned until
+bio is done, no need for rcu protection; Otherwise protect blkcg_css()
+with rcu independently. Prepare to convert protecting blkcg with
+blkcg_mutex instead of queue_lock.
 
-> 
-> > > However, the setup isn't really once per probe(), even in the case of a
-> > > new driver probing we re-use the previously setup providers.    
-> > 
-> > It uses devm to call pci_p2pdma_release() which NULL's pdev->p2pdma.
-> 
-> Ah, right.  So the /* PCI device was "rebound" to the driver */ comment
-> is further misleading, a new probe would do a new setup.  Thanks,
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+---
+ block/blk-cgroup.c | 18 +++++++++++-------
+ 1 file changed, 11 insertions(+), 7 deletions(-)
 
-I will fix the comment.
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index 9ffc3195f7e4..53a64bfe4a24 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -2165,16 +2165,20 @@ void bio_associate_blkg(struct bio *bio)
+ 	if (blk_op_is_passthrough(bio->bi_opf))
+ 		return;
+ 
+-	rcu_read_lock();
+-
+-	if (bio->bi_blkg)
++	if (bio->bi_blkg) {
+ 		css = bio_blkcg_css(bio);
+-	else
++		bio_associate_blkg_from_css(bio, css);
++	} else {
++		rcu_read_lock();
+ 		css = blkcg_css();
++		if (!css_tryget_online(css))
++			css = NULL;
++		rcu_read_unlock();
+ 
+-	bio_associate_blkg_from_css(bio, css);
+-
+-	rcu_read_unlock();
++		bio_associate_blkg_from_css(bio, css);
++		if (css)
++			css_put(css);
++	}
+ }
+ EXPORT_SYMBOL_GPL(bio_associate_blkg);
+ 
+-- 
+2.39.2
 
-Thanks
-
-> 
-> Alex
-> 
