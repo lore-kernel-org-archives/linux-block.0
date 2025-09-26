@@ -1,105 +1,113 @@
-Received: from 003.mia.mailroute.net (003.mia.mailroute.net [199.89.3.6])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C136B2AD35;
-	Fri, 26 Sep 2025 17:20:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6E2F19CD1B
+	for <linux-block@vger.kernel.org>; Fri, 26 Sep 2025 18:46:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758907220; cv=none; b=pHEwCV570izFffV9TV2TjKD2P8LESNZpr4/Iu+xgW3OoHrFbut5if88mUqmIRG7skQW2JOYU7qEfAZx/q3stKrNyutyN3CxY8NzXS1YmluSW35KviBAIAyc8Wjh94B14U3YhONg/OFHepLesgvm2jiz279KmuydOBFewLSdu5Eo=
+	t=1758912377; cv=none; b=VbBZKLMQEYkV0zaP44LeAFDzErlWXWIHb+M+ogpgrfdxpMXQGlKCx4Bc8LbyFLJZVeiReXEuCYIxihJCRtwU9g67cy2NAYTxrojVKEULbeqgOh7z3n0BQNbBIGt7xPqK9DcO+9lQQ14y696iRWX/H5L8UcOZUbeiKIDfcTpMIPg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758907220; c=relaxed/simple;
-	bh=e5cciZIOlUEd14Nlh9r6UpPh7CEgs/6L/FSJjeP9WoA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Y/ucb4Yp3C6QOQCCDt1gk33a03Tdg3Nb/zV6BvwN6oSPMITOfPA44yHQ87NHYvHkYBvy+dvIybabytIWG5QJVSlphDxtS0dAo9H2NqU0Kh4MUghrE9NlSY4XyFU0DAEexio76z5E8PeRfxUWPsegheMrA03vm+/W1/cR9ZVVv1A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=XBDNDX7k; arc=none smtp.client-ip=199.89.3.6
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1758912377; c=relaxed/simple;
+	bh=99NoFsVWszwLzL0dGnY2jV/Q+uR4we2DXyveOu+4Occ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=eZNfO+Ah41iWuUqWnDBNBtld5r5i6JKKhOZCr+b202yXgLTcAAPa9ADgy97sOfxerSKr/ChD3ES/tjjrPEuBQQWIoGioUjjC8yW6kbCY820Qf+iIo9T4tveBDog+x5/zq8zBEfj8maW3rmJtGYJf1WKaQisbXr1ma863wR4hie4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ir8tCqGS; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="XBDNDX7k"
-Received: from localhost (localhost [127.0.0.1])
-	by 003.mia.mailroute.net (Postfix) with ESMTP id 4cYHQh1MRvzlgqy3;
-	Fri, 26 Sep 2025 17:20:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1758907209; x=1761499210; bh=e5cciZIOlUEd14Nlh9r6UpPh
-	7CEgs/6L/FSJjeP9WoA=; b=XBDNDX7klPhV2LR5Gj/vZnR8shvGvAnsUOjlCkes
-	3lenIfMn+DwuRVIZO+Vbr/D1uJ4gOCAPt8k8ZyGBAbr/4xLQHY4DXNHjFRlN/2pG
-	Ih6HAHDSWbsF3/pj74+qi3zH6Lg7//Esh9EOA4uqXzio29j1fLOKoPhgqywc7P0w
-	sHY8VE/+rJ5hirGz2Thkh5kk4BHltVC7lqIKhJHoyl/MsBET/N6Y+95WmcBsfuk3
-	+QdpPt4gMbce9m1iBQ+/x9yHOzExEf+BzmheZVt+M2pFj0DH4n7UFUT41Kqc3RlN
-	foQEesFSXjuWNV6F42JvSc45kXjABX3SLM62dUcH17Sjfw==
-X-Virus-Scanned: by MailRoute
-Received: from 003.mia.mailroute.net ([127.0.0.1])
- by localhost (003.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id GuQ2MpjtDxTQ; Fri, 26 Sep 2025 17:20:09 +0000 (UTC)
-Received: from [100.119.48.131] (unknown [104.135.180.219])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4cYHQL0WV5zlgqVf;
-	Fri, 26 Sep 2025 17:19:52 +0000 (UTC)
-Message-ID: <66dcdcd1-df71-43b9-a468-2b4aaa8b6dc7@acm.org>
-Date: Fri, 26 Sep 2025 10:19:51 -0700
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ir8tCqGS"
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-269ba651d06so4167335ad.0
+        for <linux-block@vger.kernel.org>; Fri, 26 Sep 2025 11:46:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1758912375; x=1759517175; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=99NoFsVWszwLzL0dGnY2jV/Q+uR4we2DXyveOu+4Occ=;
+        b=Ir8tCqGSjY7fG2+bMbC96eCICN3DWieYr8p8kZM26oAb8TrwhFr29tYMG/ONxQzbhI
+         puWXlM8u0Q/ag9hzXKOcnG1H1gYk+GWzOmRqMqf7QZRDOhSEBjPgwtjTGkIuxzGNe76m
+         senx55Q/JSlzOXZdLQGNP3dWBDTDFPDc9TqBj2LwayJlJSz85XEg6iYkKtAOn6cEcejK
+         gZdDrDv4o0ljXNe4ocrYkDiz0lHnPxTft6uGPnUXIJA0bMU3+UDSpSEkJrLr5/ipVEZ2
+         k8xjcViUkWhGBy4OvfS093phtP+nnKdokgXmth9qax+zdJJNV6oYPZaGVtL6zKq5gg5o
+         Y6NA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758912375; x=1759517175;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=99NoFsVWszwLzL0dGnY2jV/Q+uR4we2DXyveOu+4Occ=;
+        b=jgpyU6YWN7UAQ2zVgblf8PNAMFVKlHrRQAo/ZZdVCJMp4ZfLhb1H4N/jpHBLPGAmp6
+         SZviIb48tqVM6mCTNKUNt6JgQDTHkJ448aBqbxHKWPaWryx6NIHlyPyFn3MALC+7HQ9l
+         mAIC6eJDrJ9CyI44RFzmWCmqOkfaQaQg8GRFQtlNpde7XE9myACsy4fA0WV3ZmFu6S1j
+         Q/3LcG78OHIN3Cfvq1cRAW9CGNxORFYIFsGlXMgzSHt1T+5MuBg8K6mFtRd/do3GNuSA
+         tAsexy0GebIdrefPi+qGrzTmexLYe7361kDVaxieQjaBJeTsaawn8VKwci88yChdWy+x
+         Cbzg==
+X-Forwarded-Encrypted: i=1; AJvYcCWRg6xymEOSoO+DYD/MsVdZSth2ZdvhhJkTkQoY+5rUKTx3EuYDZgzqo3aYxxL9oDWOnWCcCSQPJdSDNQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxikQ+s/eFVqgF9M6u6FgQABSSl5lFHoF2gfPw5JQB46GVmgFs8
+	jFrWMKEIRjHjVEY7INfXHJSI0NoyjTgkJ/Qup5NFr58LAK8naSE8o/jXsR2vy8+EmtTre+hHq7N
+	HE8qLabCGJh8tmQQ+RoFS+ft2Ifsc8Vk=
+X-Gm-Gg: ASbGncsSplPRLgaFQAxSkfzI5hZs+owFifocduFmSRvpsuxERQ3LesmXOA4k38rQhfg
+	TO6OtVhX+uUX9dArR7FsTuz43mvZUGH0MzKwv4VGy6ri9GAQ+9rgzYaYERaKh4GGRzKTay5766w
+	jBQhcmlym1PTtDyuA2781e4kKkKdpe8X7QKkn2v4Uv+4FiR136o5s32IFTPnWKfG7RbY2u+slgI
+	2kyRUPqnaVR1QcyYNIgi3jTGi1gQYzPiYpbQFaXZrFNYQu0GMBIEHx9vE7mni3zFmfMI09LFQol
+	dEN3pyUa3AAhvgI9qQzBVBQifw==
+X-Google-Smtp-Source: AGHT+IGICCMscDDR09yJt5H0iPKTO2HVhFlo2/cy7JDDWeiBMU3GNUjCo5LwRgqW0USPT3MDqhixj3g/rTT4Pi3J0GM=
+X-Received: by 2002:a17:902:d508:b0:269:96d2:9c96 with SMTP id
+ d9443c01a7336-27ed5b0a538mr51481475ad.0.1758912374667; Fri, 26 Sep 2025
+ 11:46:14 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 01/10] blk-cgroup: use cgroup lock and rcu to protect
- iterating blkcg blkgs
-To: Yu Kuai <yukuai1@huaweicloud.com>, Yu Kuai <hailan@yukuai.org.cn>,
- tj@kernel.org, ming.lei@redhat.com, nilay@linux.ibm.com, hch@lst.de,
- josef@toxicpanda.com, axboe@kernel.dk, akpm@linux-foundation.org,
- vgoyal@redhat.com
-Cc: cgroups@vger.kernel.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-mm@kvack.org, yi.zhang@huawei.com,
- yangerkun@huawei.com, johnny.chenyi@huawei.com,
- "yukuai (C)" <yukuai3@huawei.com>
-References: <20250925081525.700639-1-yukuai1@huaweicloud.com>
- <20250925081525.700639-2-yukuai1@huaweicloud.com>
- <bc6fe04d-3245-40dd-aa30-c3a3acb670c2@acm.org>
- <01e7eccd-3529-4d12-8ad2-fd9e034a026d@yukuai.org.cn>
- <688275d5-fbb4-08b3-45e1-798ad8cf77fc@huaweicloud.com>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <688275d5-fbb4-08b3-45e1-798ad8cf77fc@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+References: <20250925-core-cstr-cstrings-v2-0-78e0aaace1cd@gmail.com> <111409f1-33cd-4cd1-b3fd-e38402a82c9f@sirena.org.uk>
+In-Reply-To: <111409f1-33cd-4cd1-b3fd-e38402a82c9f@sirena.org.uk>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Fri, 26 Sep 2025 20:46:02 +0200
+X-Gm-Features: AS18NWDpMwmpfdQtAlAM5mfbOpZzjcwdG8Vuf5peZ5dotzDbBFdbC1UDMcnVE7M
+Message-ID: <CANiq72kNr32NKHGn=gfH52C5VLr9S0Xk0HNzroPqYhx4GngkXA@mail.gmail.com>
+Subject: Re: [PATCH v2 00/19] rust: replace `kernel::c_str!` with C-Strings
+To: Mark Brown <broonie@debian.org>
+Cc: Tamir Duberstein <tamird@gmail.com>, "Rafael J. Wysocki" <rafael@kernel.org>, 
+	Viresh Kumar <viresh.kumar@linaro.org>, Miguel Ojeda <ojeda@kernel.org>, 
+	Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, 
+	Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
+	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
+	Danilo Krummrich <dakr@kernel.org>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
+	Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, 
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
+	FUJITA Tomonori <fujita.tomonori@gmail.com>, Andrew Lunn <andrew@lunn.ch>, 
+	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Michael Turquette <mturquette@baylibre.com>, Stephen Boyd <sboyd@kernel.org>, 
+	Breno Leitao <leitao@debian.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, 
+	Dave Ertman <david.m.ertman@intel.com>, Ira Weiny <ira.weiny@intel.com>, 
+	Leon Romanovsky <leon@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>, 
+	=?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, 
+	Arnd Bergmann <arnd@arndb.de>, Brendan Higgins <brendan.higgins@linux.dev>, 
+	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, Jens Axboe <axboe@kernel.dk>, 
+	Alexandre Courbot <acourbot@nvidia.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, Liam Girdwood <lgirdwood@gmail.com>, 
+	linux-pm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	rust-for-linux@vger.kernel.org, nouveau@lists.freedesktop.org, 
+	dri-devel@lists.freedesktop.org, netdev@vger.kernel.org, 
+	linux-clk@vger.kernel.org, linux-pci@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, 
+	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On 9/25/25 5:57 PM, Yu Kuai wrote:
-> =E5=9C=A8 2025/09/26 1:07, Yu Kuai =E5=86=99=E9=81=93:
->> =E5=9C=A8 2025/9/25 23:57, Bart Van Assche =E5=86=99=E9=81=93:
->>> On 9/25/25 1:15 AM, Yu Kuai wrote:
->>>> It's safe to iterate blkgs with cgroup lock or rcu lock held, preven=
-t
->>>> nested queue_lock under rcu lock, and prepare to convert protecting
->>>> blkcg with blkcg_mutex instead of queuelock.
->>>
->>> Iterating blkgs without holding q->queue_lock is safe but accessing t=
-he
->>> blkg members without holding that lock is not safe since q->queue_loc=
-k
->>> is acquired by all code that modifies blkg members. Should perhaps a =
-new
->>> spinlock be introduced to serialize blkg modifications?
->=20
-> Actually, only blkcg_print_blkgs() is using rcu in this patch, and take
-> a look at the callers, I don't see anyone have to hold queue_lock. Can
-> you explain in detail which field from blkg is problematic in this
-> patch?
+On Thu, Sep 25, 2025 at 4:01=E2=80=AFPM Mark Brown <broonie@debian.org> wro=
+te:
+>
+> Given that we're almost at the merge window isn't it likely that these
+> will get applied once the current rust tree is in mainline?
 
-I'm not a cgroup expert so I cannot answer the above question. But I
-think it's clear that the description of this patch is not sufficient as
-motivation for this patch. Removing the blkg->q->queue_lock lock and
-unlock calls requires a detailed review of all blkcg_print_blkgs() and
-blkcg_print_stat() callers. There is no evidence available in the patch
-description that shows that such a review has happened.
+Yeah, I am submitting the PR to Linus very soon anyway.
 
-Thanks,
-
-Bart.
+Cheers,
+Miguel
