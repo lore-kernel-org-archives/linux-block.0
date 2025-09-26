@@ -1,109 +1,114 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FB8426ACB;
-	Fri, 26 Sep 2025 00:57:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA50325F98B
+	for <linux-block@vger.kernel.org>; Fri, 26 Sep 2025 02:38:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758848232; cv=none; b=WW0/SnLM4kTwAJraz9qobRs/EijtUDr55PM+AtPAFxFFl+yTKXN3eREHTE+0aPeTfgVZRbHZbTK0Hh6eq7TL47TeoRU1aslKAfcNJMj8+vCjCpvhJFN4kCDH1B8q7jhPiFCFOdmHm9vzi6r5wwiwVRUHZkLRDcP/d5b9LoL6yr8=
+	t=1758854311; cv=none; b=c5C/RyNHA+5MPXz6UPEn9yeSdKggKbhRc7iVJcvLCMBGkgK2PTIECXRmuXn5dfvejO3Jx1KfqvWPS+WO2YxDSGOyNnxs+A9mPjc62EK1eeeRzYz7gNGWrGsGQb+9tYkFpEBnityBetukDGU6Cx/g8tsc0xN+5tL+V3kmq8j4qhc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758848232; c=relaxed/simple;
-	bh=4mX3EcmuNBcUPEBlDvx8Usz+XeVEpNdSEwjS9wu5/Aw=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=UHnR1np/J3harX+IE1+Ou/19kDwtsvms2Y5SW4yM0q2bNMCXa0VCnlZe3xTXE0P9bauGq8eWGDmCcz1LqE7wMMB5CkE2ra1Axs4gZRGn+Gf5cIZwnysspc+DXQeuE/utLeBX2edeT5BugOJQOhfHQV6D1797j0Q/r8dsaWTNthk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4cXsc814vfzYQv3Z;
-	Fri, 26 Sep 2025 08:56:56 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 3F0771A13AF;
-	Fri, 26 Sep 2025 08:57:06 +0800 (CST)
-Received: from [10.174.179.143] (unknown [10.174.179.143])
-	by APP4 (Coremail) with SMTP id gCh0CgBHCmLf5NVoUKZVAw--.24830S3;
-	Fri, 26 Sep 2025 08:57:05 +0800 (CST)
-Subject: Re: [PATCH 01/10] blk-cgroup: use cgroup lock and rcu to protect
- iterating blkcg blkgs
-To: Yu Kuai <hailan@yukuai.org.cn>, Bart Van Assche <bvanassche@acm.org>,
- Yu Kuai <yukuai1@huaweicloud.com>, tj@kernel.org, ming.lei@redhat.com,
- nilay@linux.ibm.com, hch@lst.de, josef@toxicpanda.com, axboe@kernel.dk,
- akpm@linux-foundation.org, vgoyal@redhat.com
-Cc: cgroups@vger.kernel.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-mm@kvack.org, yi.zhang@huawei.com,
- yangerkun@huawei.com, johnny.chenyi@huawei.com,
- "yukuai (C)" <yukuai3@huawei.com>
-References: <20250925081525.700639-1-yukuai1@huaweicloud.com>
- <20250925081525.700639-2-yukuai1@huaweicloud.com>
- <bc6fe04d-3245-40dd-aa30-c3a3acb670c2@acm.org>
- <01e7eccd-3529-4d12-8ad2-fd9e034a026d@yukuai.org.cn>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <688275d5-fbb4-08b3-45e1-798ad8cf77fc@huaweicloud.com>
-Date: Fri, 26 Sep 2025 08:57:03 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.1
+	s=arc-20240116; t=1758854311; c=relaxed/simple;
+	bh=xNC4+5vXuGIoP3AubYqeZ73I0t9q26/OKWO/Q7/2G4w=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SDF3PnZwrSjJjPDuY9pmx1pddxxvp42NAb06OmTjo5fA26WRDpUONOGWKcB/AXTM9WbHxSXFNdoOuvyW2IKHNhqujyVxBF6liKNwY3/bpnIJwAUq/bjciRWr7DJSIObPAHHb1EDKlLRrCsz9HQHqcu2WxNrsBfkLiWyDRm2Wk/A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OBXufAkO; arc=none smtp.client-ip=209.85.216.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OBXufAkO"
+Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-32eb45ab7a0so1843294a91.0
+        for <linux-block@vger.kernel.org>; Thu, 25 Sep 2025 19:38:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1758854309; x=1759459109; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ovDud+Upvoitt+mbnx9bJAksUkvB+hvEmFPUqVI4Vww=;
+        b=OBXufAkOX9wFmt2xYTHoz3PtSp3zhL/JB/rSg2FS0vh6DYGQ5hfVFtKi62xGmKCCxs
+         fQvIMcSA5OGD8urMiSBYGud4f8H4cFI4pf7ehf96mX23/hGSJ1yXN7GTsMwZhpKodmUk
+         VTI2MFuNugNgkOjyyZNpvaKAefSqkIjm43uZzGLQnIy77nIFhmlxNCXnMi+DHI8fuz1E
+         OOyxfXoPZDjzROb17aILbPdq09TND44ZMpuSeeq8fVIWT+ZarHEqalRkcgDG0oNv4p7z
+         o8RkCTowkfeUbDyscVniApLsqSklfIautUkfJuyALQAvLXqp6qQ4Ky4clEBSH2KldbmD
+         ouIg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758854309; x=1759459109;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ovDud+Upvoitt+mbnx9bJAksUkvB+hvEmFPUqVI4Vww=;
+        b=gqVn3jCdhDsIOn0WF2g5kHV8m2PzwEGnuV7V9hoFLjB1+8HkuOQ34VGhlSEfbleyfr
+         /EhnVHqUvA87bB9WXtWaAqZoA+zQH1FWRTy8CdL0uYpdEB648kaz9dYN18SnVePooZlz
+         HUmUO6GhTWrDezNV0K/xBaOzR4ckJ2ggU8AiDDJYmRQKy2oIZvQJar2PYHpGon9xFAYA
+         KKwzKuuImi6Y3muAJhxFTcyejQ4O0rPIuhSrlSn+Jov/1VvwDedaXvp8xn5JPshHmlBp
+         qh3IzOf8jhyRHxPeGIzm99D+vgBYtyFcgWrD9oimVT2RqE/Ks1+4qJH1+phhb7glzK9q
+         Y2XQ==
+X-Gm-Message-State: AOJu0YypVY6irF6/Qz1AGX7ipZZIegGAqBBDFC1gUJ/wt5hDPC3m5TQs
+	lqC6q/7k9zcdCayPEQTX2pEYrLIvE67G3JZ8jHE44XFA9XsjM5I+MFYyAaPv9ymTqDQ=
+X-Gm-Gg: ASbGnctBLshZg+NPakIuUQQr5YMo2gJubCg5hyw5+UGxI64I2wLo8uOY6jMkT6KgqAN
+	KyIRm/9qiYC2rNFSxLoaSA/oWMZrcfgV2ZvnycErkcp1XzDXffCRlkhR60hpbdxO7KpctBTAvaM
+	ycI2pCS5AIz5tP44L1bTJf0TF5ncPWGpDuRAsTDDOJTfufrV7YoGsnYZZJ0Jso7EAt73bvRxzu3
+	6S9Ho8YVIsLgdYkTY8HLJcHwFK4jsoTqQiWCMCpRNN4Pz+nrA3pCGFX3ZqoIk+9BEh9IgebDZYv
+	+BJACJ2hhbqqo4IXEcsDKpXklW173BMUecJtBTuU8NC+NHJcrneey4rlhD2wG2IVigqLIFarFiW
+	+upQLvW12E1bHyAStMwCeThUJOSPtvyrNfo+tCrqeguEv33y2clnsR/7uqkiFmWnLwB4=
+X-Google-Smtp-Source: AGHT+IGPME1VnyuxC/3OI/ns6Knvym9zUVDwuAUCOvZznBY1fWWY2dw18nStmCjJ/fzuATnSgkRaxQ==
+X-Received: by 2002:a17:90b:3e8e:b0:32e:ca03:3ba with SMTP id 98e67ed59e1d1-3342a2c2a81mr4911872a91.22.1758854309122;
+        Thu, 25 Sep 2025 19:38:29 -0700 (PDT)
+Received: from localhost.localdomain ([116.128.244.171])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3341be2073dsm7269825a91.19.2025.09.25.19.38.25
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Thu, 25 Sep 2025 19:38:28 -0700 (PDT)
+From: chengkaitao <pilgrimtao@gmail.com>
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	chengkaitao <chengkaitao@kylinos.cn>
+Subject: [PATCH RESEND] block/mq-deadline: adjust the timeout period of the per_prio->dispatch
+Date: Fri, 26 Sep 2025 10:38:18 +0800
+Message-ID: <20250926023818.16223-1-pilgrimtao@gmail.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <01e7eccd-3529-4d12-8ad2-fd9e034a026d@yukuai.org.cn>
-Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgBHCmLf5NVoUKZVAw--.24830S3
-X-Coremail-Antispam: 1UD129KBjvdXoWruF1rXF15Ar4kuw1rAr1UKFg_yoWftwbEva
-	n0y3s7Gw15Wwnaq3WrGrnxJFZ5Ka18XryUCF48AFW7twnxAa45G3ZrurWxZFZYka1qywn2
-	gr1ku348Jr4aqjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUbfAFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-	A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
-	6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-	4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
-	c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxkF7I0En4kS14v26r4a6rW5MxAIw28IcxkI7V
-	AKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCj
-	r7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6x
-	IIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAI
-	w20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x
-	0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7sRidbbtUUUUU==
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-Hi,
+From: chengkaitao <chengkaitao@kylinos.cn>
 
-在 2025/09/26 1:07, Yu Kuai 写道:
-> Hi,
-> 
-> 在 2025/9/25 23:57, Bart Van Assche 写道:
->> On 9/25/25 1:15 AM, Yu Kuai wrote:
->>> It's safe to iterate blkgs with cgroup lock or rcu lock held, prevent
->>> nested queue_lock under rcu lock, and prepare to convert protecting
->>> blkcg with blkcg_mutex instead of queuelock.
->>
->> Iterating blkgs without holding q->queue_lock is safe but accessing the
->> blkg members without holding that lock is not safe since q->queue_lock
->> is acquired by all code that modifies blkg members. Should perhaps a new
->> spinlock be introduced to serialize blkg modifications?
+Reference function started_after()
+Before modification:
+	Timeout for dispatch{read}: 9.5s
+	started_after - 0.5s < latest_start - 10s
+	9.5s < latest_start - started_after
 
-Actually, only blkcg_print_blkgs() is using rcu in this patch, and take
-a look at the callers, I don't see anyone have to hold queue_lock. Can
-you explain in detail which field from blkg is problematic in this
-patch?
+	Timeout for dispatch{write}: 5s
+	started_after - 5s < latest_start - 10s
+	5s < latest_start - started_after
 
-Thanks,
-Kuai
+At this point, write requests have higher priority than read requests.
 
->>
-> No need for a new lock, I think blkcg->lock can do that.
-> 
-> Thanks,
-> Kuai
-> 
->> Thanks,
->>
->> Bart.
->>
-> .
-> 
+After modification:
+	Timeout for dispatch{read/write}: 5s
+	prio_aging_expire / 2 < latest_start - started_after
+
+Signed-off-by: chengkaitao <chengkaitao@kylinos.cn>
+---
+ block/mq-deadline.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/block/mq-deadline.c b/block/mq-deadline.c
+index b9b7cdf1d3c9..f311168f8dfe 100644
+--- a/block/mq-deadline.c
++++ b/block/mq-deadline.c
+@@ -672,7 +672,8 @@ static void dd_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
+ 
+ 	if (flags & BLK_MQ_INSERT_AT_HEAD) {
+ 		list_add(&rq->queuelist, &per_prio->dispatch);
+-		rq->fifo_time = jiffies;
++		rq->fifo_time = jiffies + dd->fifo_expire[data_dir]
++				- dd->prio_aging_expire / 2;
+ 	} else {
+ 		deadline_add_rq_rb(per_prio, rq);
+ 
+-- 
+2.50.1 (Apple Git-155)
 
