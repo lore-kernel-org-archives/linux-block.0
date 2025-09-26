@@ -1,195 +1,189 @@
-Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4FDD2ED846
-	for <linux-block@vger.kernel.org>; Thu, 25 Sep 2025 23:53:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=216.71.153.144
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758844431; cv=fail; b=gLZXmd9kQ8Wk/F5ORK1+8I5pBatnQwEl2vLDZMyeKfVAJXGEj1Aqa/UOhsFqKcAx7mlcvPRbCjOEAyQtUMbWIYho6EaWs8lidN/S2tLulDnvjWoepjyDPiWW+lmx87p4jf5ltAUOgAuBKIJ2JSrke1AEoJ1MP5JQx/1PSYV6V0c=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758844431; c=relaxed/simple;
-	bh=4imtfbIZ44BGn/OIZvRFxuPBIbih7WrJgWSEy2vhx/Y=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=iOVdeUY6IeiHJbLHtFwDHJjdwsjIYr3UWJ9uHqmaHeXrQlOYYRQdN/3sW9AXioKrtNxCeYu0uXSiVw+MHfryIZPlX3XXWZuLqMqUflKVy+2ldzdvPB6CdBtnt2SdAziSdgw+yJMT7UuHhjaG2/oT2o64WVTg//RDfMjpRIg37CU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=rR5MHY+Y; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=G57y4DDs; arc=fail smtp.client-ip=216.71.153.144
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE1D672602
+	for <linux-block@vger.kernel.org>; Fri, 26 Sep 2025 00:29:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758846566; cv=none; b=MR8gBk1K7pk40CFZxD7jjDZyUEknnlZW9UN2R8KP77iyU5+MG5c4HHW9pajdY2UCZ+KTvuD3HWqM2r6YR89+VfvoJJlSHii68i3SgfMbdRwAyWSN5j7XcMRGpcrgQp/ic60op+o97AqUpEhrWWYjaLPpiZIbtNZVJAAd06g7n3w=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758846566; c=relaxed/simple;
+	bh=0W/7hs78HuUmwTCQkUj3WBChFwPbbkB8GVUDQwx06qI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rA6i+16DdNGxDr0SfXt0SpzB6JRwx9SWlKy81oo4lHH+787TlWkLsOPWg1SrsJNho0R5iaSsLGXu6CCtXVCNWCqTWNLDc/IbR2JGJmPQvHUBMARRiBoTsb6roWVdmcSlUSqbagQ1P4VcmKP0RffKRiv4vdTPir0YWBU3Y0Jpi1Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZjtJb4tm; arc=none smtp.client-ip=209.85.215.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="rR5MHY+Y";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="G57y4DDs"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1758844429; x=1790380429;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=4imtfbIZ44BGn/OIZvRFxuPBIbih7WrJgWSEy2vhx/Y=;
-  b=rR5MHY+YFil2Uo65/87fkK9q+CkMGMtHL+68tZ6kDAxZZ4Ag25GB40BQ
-   /snkCU+t9MrM4mqGPa2/iMVhr/CUg9ZLxHYohV/Y864yW8QUTiD7oB4gg
-   gF8czEEnSAa/M9Geo5nWWhqz1LEgmdv5g15Dg3rJCKkeBWvG5bvTi+aAW
-   yYxE9yTxpz8Bhl6D8omE7XWH5/2odpWfbMS4T0/VIWz7OTlVxTNzjAWwQ
-   rI0ISMOLuhwE1GswhFIURTetNQEF2TapoHFqfN8dNXYEFoWiehKNbwGFP
-   gHJJTQbjtrimL00aSgw1zMOflo2bOI5XHlwCCLZwfnpTQhELEAWguEf6T
-   A==;
-X-CSE-ConnectionGUID: 3xoHRq6XTk+5BBMVq0a3mw==
-X-CSE-MsgGUID: FoU+D/bhQZaAHrIE2gUnWw==
-X-IronPort-AV: E=Sophos;i="6.18,293,1751212800"; 
-   d="scan'208";a="130622972"
-Received: from mail-eastusazon11011070.outbound.protection.outlook.com (HELO BL2PR02CU003.outbound.protection.outlook.com) ([52.101.52.70])
-  by ob1.hgst.iphmx.com with ESMTP; 26 Sep 2025 07:53:48 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=L2Uc+AQnAx5avVQlqh6u31DgIwI/DAzmeV3NPGhOhqCXZfOl7kVFC9nhnb2gDRqtQI8iaSQNeKk5h848yWwy8fvEA5aaLxRSkUdvWvYPbgBIo3sxDxBf1QHUXqHQjyK5vI+QKB0vUoPhRjmS5TW4SlbTerUOlgOK/9jhVrMKfRmFxzxKHl4pmr3Mk6c+HBy6ZrQ4pxWdaRUExmuFTiFNc589PwlVL/UPn7q1Yk5F9k69GwpXnrYTvliTsQI8J68HdhzrpCuVhOSBUhBywAd+jjhtCZ/5PKqgzAYUOkxeqBsYlkAsvVD1JRMSAfZtXMOA4FFQ1myXlBQu8gN3xYZ5Qw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=4imtfbIZ44BGn/OIZvRFxuPBIbih7WrJgWSEy2vhx/Y=;
- b=pEl6jhlPff17+X3IMskqp298WegSP4qCQdpKRK9hFwK/80VCOUdJFdjEUo48LPMqOE9gtZDgW0zOLtrwYc/jJiB5KZKQMEkoWb0XyBYNypeH7CNM2VROUUt72cDrfqVWmTYZAY4/yZsEnKYlrp/bYzhi3qRHLhO1+F6LqxLAKi42yjRAM8ldJTz4yuqscPH4PoipSj/B4xS1QAIU/SUdA+B2KZRkdvc1EHYQ3d0ESMfe5fdJyiTDbMBMf31boA67RDW9bBlrSSL/GAPnV6x2rECL4Qi7aVsRc7LH4Qp1E02F/U0VN4NMPEx5GNeYIxhKKEercumtffICziPwwTQ6LQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZjtJb4tm"
+Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-b551350adfaso1490382a12.3
+        for <linux-block@vger.kernel.org>; Thu, 25 Sep 2025 17:29:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4imtfbIZ44BGn/OIZvRFxuPBIbih7WrJgWSEy2vhx/Y=;
- b=G57y4DDsRBgJOCr/dEClAJCYgtjVqIWKPgBLccuNr5RjVS6jp59EfgmehjUTdsySuLuYfMk6MYprVPbakk6cxmWbqnXXK1OHZIDlD087nYsNH5oGZj/IZg1ir/dnT4rY6O4ajFTMgHsj41qlAOycZfaG1FPaz//Ive2UqDC0mHI=
-Received: from SN7PR04MB8532.namprd04.prod.outlook.com (2603:10b6:806:350::6)
- by SA1PR04MB8823.namprd04.prod.outlook.com (2603:10b6:806:38a::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9160.9; Thu, 25 Sep
- 2025 23:53:46 +0000
-Received: from SN7PR04MB8532.namprd04.prod.outlook.com
- ([fe80::4e14:94e7:a9b3:a4d4]) by SN7PR04MB8532.namprd04.prod.outlook.com
- ([fe80::4e14:94e7:a9b3:a4d4%7]) with mapi id 15.20.9160.008; Thu, 25 Sep 2025
- 23:53:46 +0000
-From: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To: John Garry <john.g.garry@oracle.com>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH blktests v2 6/9] md/003: add NVMe atomic write tests for
- stacked devices
-Thread-Topic: [PATCH blktests v2 6/9] md/003: add NVMe atomic write tests for
- stacked devices
-Thread-Index:
- AQHcK6sug4CvHkcG+kqFWi7gggf3erSjmJmAgAAB0gCAAFs1gIAAAF2AgAANo4CAAJRKAA==
-Date: Thu, 25 Sep 2025 23:53:45 +0000
-Message-ID: <6bvdbgojbyrd7cu2jiq7odhb5o7l6nljuqdpjouc7fhcggmspf@ddjteaaow364>
-References: <20250922102433.1586402-1-john.g.garry@oracle.com>
- <20250922102433.1586402-7-john.g.garry@oracle.com>
- <zz4lnyno7yejb33tqqi3vpjbvlvj6nceqciclicrkbqaqwt6oq@nyu7dz7xpwaq>
- <5d9a2005-93cb-47b3-a708-e0db50328142@oracle.com>
- <mlkg5dr4ipq5722ye5owxppp7t7drkvcnijcinsryc2fe4t3y6@n7e4l5hc5zo7>
- <1a108930-59b8-4055-a065-25ce8ede25be@oracle.com>
- <49036bee-c254-46d9-8219-a94ef485ad90@oracle.com>
-In-Reply-To: <49036bee-c254-46d9-8219-a94ef485ad90@oracle.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SN7PR04MB8532:EE_|SA1PR04MB8823:EE_
-x-ms-office365-filtering-correlation-id: e821ff98-5942-4755-3fe4-08ddfc8ec3f9
-wdcipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|19092799006|376014|366016|1800799024|38070700021;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?UrqFJppJwAevkvJOQk6vosQjDW09qUIeX//iZ/x0NgionYHpWfFyCzjSJmEJ?=
- =?us-ascii?Q?RWqODmyDl7ISGEYMuw/9pUcaz/gtLDEF+SRpDKdDGyigDjoe3x73yhryafG9?=
- =?us-ascii?Q?TL7C+Irrvuzfnv0aVFlqA8NgS/OMTpXIKUQb44m57lrAjjRTE5APEbWLbIsu?=
- =?us-ascii?Q?wkr3p5xv7g5IIeasl6er7m4X7xCkRfOC5gc1YbKDOJofr1E69pazfdvGVVwo?=
- =?us-ascii?Q?YHgyR2js1jOry8BKq5bnHW+v3wHJQrhwuv31z5cVntXBY2ZRNvp+95p83Gsi?=
- =?us-ascii?Q?oBVb9WZOm2JOfEUbxpvUmcpNJ7+NQtaIGTW9gBH/Xiat/6888HCdy1Olcekp?=
- =?us-ascii?Q?L0FSS+j1Ml7ctVs8O3+b6/RJy5+X/ilbPOuEVZwYz85jt8TgtShsxZ1lsbxY?=
- =?us-ascii?Q?BYjapXKOm1pup5/OLsfLvSMpZY2lGMWvGWOgxjx0RzQBU+VuihqwWKnJ5So4?=
- =?us-ascii?Q?TEb/m0gQxPdeKq0g0jfc6RlNOIP8ri7MLu9UJAiHeKycNEV1hlAwyKBotR+5?=
- =?us-ascii?Q?USsKZ9XO2wIz/lWTlvsfRkUKTA7jpsap7fVSYh4rqgGfHF5/+7g0KHPK0AnT?=
- =?us-ascii?Q?NpIOxjEGc36CZqtW6yOvrxUu5OZgz8uHqr7qiZGxDUdZNysEBNKgxkvVno3q?=
- =?us-ascii?Q?SjfIdoFu1EejC0/beOmbKb2MEuqLUScsWIwBQHoH55x6S9WIMbRCeYdHEJLb?=
- =?us-ascii?Q?xa9/EsJaYD2qOYKzSMKSHNF8fY9NYYxTfnZcMWx0bz4wlVtJJpXoIa9s+ygr?=
- =?us-ascii?Q?YSMgIhxVVUSA4y6VLYjo9IyiO7e//5hq6MbO+C/7MzgvZT/gu2LT61wkRi/Q?=
- =?us-ascii?Q?wyi7pHrw1sscVKstLaNh2HRctsfniHdUh/hXwuAlHLrg0IRk6myB7BWLzxXt?=
- =?us-ascii?Q?dywvs0EH9G9UpvLDnno25TXQeHNhIOQrD+MUpLQkOYvdM1DQMCP3SlpHkzqO?=
- =?us-ascii?Q?oA6s/9z9kGxRPaJOejcsiTGrLuKwMTXQ/AMdm0X3h9FWhL01WQrP9EDfo7aY?=
- =?us-ascii?Q?Pm5zvjqfqPKmlBMCUNX/QAeGUMB/n1tFp8Fn3t2gexPVrs2ZXBrF80z7ld/j?=
- =?us-ascii?Q?6diczMsqjo0WviMsv791nz9C2789tgRocw9p2WzW4+mm01yKPjdBQqsWSSWH?=
- =?us-ascii?Q?LIYHCW/qf9gbN629iCcFAg/6f53MHnKrUP4ul7EfDnf3a+UWO3unxDhmmSat?=
- =?us-ascii?Q?23BcwTNOKr+XFTU5ht30SBqkQ1BVipNZFKGdIDC15YMTQqLX32Q5rytBUcaE?=
- =?us-ascii?Q?rcFk8EJwhcSO4O7gJiUvpyVA2LNP7Io+wYqPOl0Aj8xhOIyf/8mYxDLw4Ehr?=
- =?us-ascii?Q?24KpJ7cuHDIB5H5KA53G+Bxkrz3eYaUJUafpvbjJlLgIowYCgDLQpYHbSNen?=
- =?us-ascii?Q?Fr0Lsx7Sr6Gydqyb9rsVs/AG+izd1nPFil//PgLU5dsLrmzSjUhKgBiveL/a?=
- =?us-ascii?Q?tGsYw3Lng4BJdCzQhlPb+fou1RvF7HrI+kz5WQ5XqCpEA6mJttXVzye5n8c7?=
- =?us-ascii?Q?PQmr6Sz7j9vF3yQ=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR04MB8532.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(19092799006)(376014)(366016)(1800799024)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?Sq/FltFUehc1jOnMYpkkP9OSLbyD3dUime4t5+RCagIv/EGy7TAdGes6n/Ya?=
- =?us-ascii?Q?ppwpU4WAh58un2QeRT5rimNSZOqUvo+Z4i9Z0TsFoKxqxpJdwFLx4QOUwoNn?=
- =?us-ascii?Q?J9QAvE8q4+VJ8APVmXuo4dl0jeuBqSzdXJ9Oul3CzzV/lwcVrqiRXPCunhjx?=
- =?us-ascii?Q?pLuiffs9bmJrfwA5ifka9m2tKHnPH3pKoMd5/uMkTTZyhRWfVrcynK9/vsnH?=
- =?us-ascii?Q?ry7Y9vn0TxvUl+4D8ixqW/P/a71THPrnHAeh1rFnRNBsIj9116OebY2QiVm0?=
- =?us-ascii?Q?0tq9YG0uClMOzFXAPvYAGBAjMEbEMnmH3NhsuI7daSCGjiufQ5TV8jfgbXAu?=
- =?us-ascii?Q?kz+YPXO1pwAbkCwEthzxYbfba5fdbHGmqS0YrPBqZISAtEbth6tOb8DmDg/x?=
- =?us-ascii?Q?aIo4KtSvUglw+fX+l+WftSTeoeDWhRTvqRXPJtrYLDqJHxZLn0VaNoX/taPP?=
- =?us-ascii?Q?J5Fnh7DZmkiFK+MflZk4olblYFFN7Ku0sUU4JK3XkKR0HVTN3u21i4aGjQ/I?=
- =?us-ascii?Q?6plGLWEq1iZjQ0uADJOpPJK4QlQguGhnixFIXhbmS0d8Ih2fjICCo+7iDSyP?=
- =?us-ascii?Q?MEAEGpJt4x6sPx8eSSXWucDKimwUPUs9lwj0Oy7ruW8u5JDAUqRkLYPDoEBk?=
- =?us-ascii?Q?bj1ynDonhxEVVhKmhLY7zQnqCHSZG7nUwSbCfIAdbiMAdwDXnlWCe27f0SVR?=
- =?us-ascii?Q?ULp/2/z58uoxJEltyD/HlCzmuUeUDYYunZD9hq6tTL6zb9A4+hvzm0qIDC9M?=
- =?us-ascii?Q?lFWcgOpNqydTZman/7dU7fVopNmg5ctWi2s0DJKCAftMoUvu5rJ4NdS11LsV?=
- =?us-ascii?Q?Q8CE0THGOscHwmUN1Xz4XM5rlfuNJ0mHKfWNzal/7SgAFkS9pnfS/jlz0thv?=
- =?us-ascii?Q?VKEZjSZLYo6FCF03tZdCA+iBB1/lsA2YK0MGt30o23llurAoaGpAsPIz9eL4?=
- =?us-ascii?Q?hGM7FyskFFv4cJBjZDSMmuXnAYeqMMLGa5nwFg9EP8VbB2RafvEg5jOhehdU?=
- =?us-ascii?Q?HCysE0iyiQKo92FcbOZRppi8JhFrIGRqqKlIL3kQ669MHdVnngFk0DJ18sMy?=
- =?us-ascii?Q?kytcCMjH/O/HvHtN+SenngwM+0ZdzJGQam6wAthCLRZkC8eKYnkAYcfleAob?=
- =?us-ascii?Q?KII/ar95zh7BZK+77u0DXZeBIyiz0ecS6NAZP1ESDBCcdLkRY0WhCdEcIPH3?=
- =?us-ascii?Q?iw26xM939DxLiVbXjfjQqNo2xdYWuJdSheg9eOT/5aWMA3O+yd994BVaZwnm?=
- =?us-ascii?Q?JMfGPSIfUsk5s7y+IQXrVuOzbAPxUGZp8pQMWIjJCl1R0BHyC4DYaCXDOSIU?=
- =?us-ascii?Q?XE6GBeRYAvfbyQeBUEVfwCr6IL9k5TlyfayVJEqDEqDzrHN0GnnImBISA3Vm?=
- =?us-ascii?Q?FbmORQeREbOemkCFh5KrKfzFi9Tjyo0PO3IrMrJvXfCiDQTiYr0uVSk9aLm5?=
- =?us-ascii?Q?1N0CrVeoz3XMKq4qrq49lmVUksBgMKwf5eXlW0F2KlkJ4jHcfY1nlLnssyag?=
- =?us-ascii?Q?61Wc1WnW+WSuZct35O64I3TdTGY/CeYVmczdjfWNQv2kpVkplW9rJRx2JntB?=
- =?us-ascii?Q?kVLReCg3dmKok2g16FbUim+ietbpRhk+FPCvXksQ9UebKLAVblfcExBDm6zL?=
- =?us-ascii?Q?crRlc+7q9USGVp7wJ8mevcM=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <6F355DEDCBBF074EA13D364213350691@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+        d=gmail.com; s=20230601; t=1758846564; x=1759451364; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=HMJD9Q3ddlq5CyOM+oz055Su9+4BhIKjGA1980+1kzg=;
+        b=ZjtJb4tmQ+8Sf1otFalVt2FYW3yYYOD1XWHW/rmw19AOD7BGG3coOU9qgdfQk3gmBu
+         qin6/N3qTtMiToBGpgide3O7zs7Z6oJAA+04s7HlUkFaljeodWd+TyKVesYXKpZ1IpQi
+         0Jnmz2P5MiMbcwmMdI+/m9VFNjE7GPQdGxtg/5qJlW9hjmBU88OyL6Jm1Q6G9gqhZOGV
+         tbzKJbpDRL4yLbJQfISIIMTF0N9mg0LJ7x2wp1RbFEDpZmUXHq1Kd04viTXor01+7fb4
+         pK6XKMmPvssTDM9HuSv2dZRbSh8irsvuX5PQguwghAagy3eSCu+Ihsa4VM1h1HWMBlga
+         pHhQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758846564; x=1759451364;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=HMJD9Q3ddlq5CyOM+oz055Su9+4BhIKjGA1980+1kzg=;
+        b=tuEYeZlXhCZag5BHjeYPS79qXDOj7b7OOJR4nPmlSmkhasZ6GRq7D7v5FpYLvowvSL
+         TOLxpCwMThbpqGw1WDvoYwty1/wLmk58sc9aMRAlxFCGfq/aycRRBCcojYBez9xasMvJ
+         Q4oJRlBnhS+H3eOhH/Feo0STZRFsTQbmaoV1jVdMCwtkoi3LBYe2RLkqnEpHXePjps9I
+         8K122AFLpokv32Vv+f3MwwDKvWrvZMciGwRFDh0sGdB9ghI1NgpzlqFmQ4OrFRJgyO6h
+         J8UUR/4aIhi4Wl4u+IdL6/+rVDnv72R7yfyjjqQnSc0n0/Fbt9sR9sn+51HiN3WXZFJ8
+         upqA==
+X-Forwarded-Encrypted: i=1; AJvYcCXFApPFDEghfyQ5Hy2xIX33+tIc4aSZa60lo3cnDxo93xJ1SZRP9GQajd9O1yoasC7SiSSx+bFaog2bHA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyLFAzfk7mC65KUhYXx3JNHmwOjBKvSQTKUeah3tPBv2IGEIuj+
+	Jz2jb5aJX2cUIKP7BwItE2OHwmIejo1hDCgzLZuJ2QmxnRqmhAOJYA/+
+X-Gm-Gg: ASbGncu8F/vXFfpiUlcYRUPJM650pk794JOzq9YVxa6LHCfh2uKV8kWkrPx7zbJHdEa
+	7I3DHu8IZCft89YaD4aorg8W2n6pBK/0uZ26bUqwTxY+iBtFc6FZ30Jx5zRcZo2iyCIH5Up+E+M
+	YvCPdCH8WckFL7qqt6zB8GluqIaCbyigKlXU/94bTga1W2Ji8MU+npOS+72Zp0AXSCrTKFYiumF
+	tbu3NVVNkHoYMB0x/V641V0lVxG2JA1ciywHcte+4vv3dbfMg+tX9jsE4uhwWVBALjQUexTrRBq
+	kFhHMilxQ22SisTgtP9r9ZBHkXhZQjKwzjdhq6wfa1ULGoGkxn0gaQDaWetJQMnBxa+3gfzrW29
+	T64p9GgHe/M32/gq2Qf7zbfslcur8GvaqFC3dg2+VvsKB4hoL
+X-Google-Smtp-Source: AGHT+IFBOC7sSbj5IFvRNx7Jv4sa7XYTGAtKLXSj+8uiMY+K39fFGvNnEV8ul9fibW4RMGLttUsXrQ==
+X-Received: by 2002:a17:903:1209:b0:267:44e6:11d3 with SMTP id d9443c01a7336-27ed49d2bf5mr60472315ad.21.1758846563773;
+        Thu, 25 Sep 2025 17:29:23 -0700 (PDT)
+Received: from localhost ([2a03:2880:ff:8::])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-27ed671d8a2sm36696485ad.55.2025.09.25.17.29.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 Sep 2025 17:29:23 -0700 (PDT)
+From: Joanne Koong <joannelkoong@gmail.com>
+To: brauner@kernel.org,
+	miklos@szeredi.hu
+Cc: djwong@kernel.org,
+	hch@infradead.org,
+	hsiangkao@linux.alibaba.com,
+	linux-block@vger.kernel.org,
+	gfs2@lists.linux.dev,
+	linux-fsdevel@vger.kernel.org,
+	kernel-team@meta.com,
+	linux-xfs@vger.kernel.org,
+	linux-doc@vger.kernel.org
+Subject: [PATCH v5 00/14] fuse: use iomap for buffered reads + readahead
+Date: Thu, 25 Sep 2025 17:25:55 -0700
+Message-ID: <20250926002609.1302233-1-joannelkoong@gmail.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	hRRD7WI1tpi9S0PfHurveGHx1iyhfa7Mlazdj+bq1e3hJynIfQhrzGMmoPRtIgnebwDqGiZExQ/NlTkJ6EX93s0YpvCURcKMnk2i1C9xOeYslUM8i0lnPpNWtxaGz0oRW6RgxgSajfdu41ML7codctMoqfHTexRhxZIHeUaL2eYkBSleR/yup26GJQKVIWI4DW9Ymnojfu9fSWoWQjCbZU04zOvBag81ReT62XMqvj6KhjaMPNhBqe6IRhL2UHfF6RVqgdzCfu2YAvODAggHfF60TkWhkuP1+usNmowUYBYCjveFYzIjeXaKEPEYOFHaI16rg1AfkXzHEzQRLunevz+L+hceBVy3xWJqLr4eGp7sNAv4x+U/6hP9ndmHZmyY5YFIZxDA/gW5GrsT+pGZAWyRQtOYRVS6gxtOZ2hZFmIZN8Xgh2l5N4U9XvwAE1I8sLm9MoCKRW77dFRx5w8zFdDN0PHs4slZJY/7O7dvMcgrAUjt8gin5I/hUZzURro9/ZEkxf/Ai+FIHsAbFXrjfJvWMEKDD6cGYD/bOtHnUXkErNwILYbmb8tHzTI6yANukBwNt6lejf5mB455OCRd1cpp7tgv8S1fyISgIAAwnbi1yThVMoOnOnkuCqxsY72i
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SN7PR04MB8532.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e821ff98-5942-4755-3fe4-08ddfc8ec3f9
-X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Sep 2025 23:53:45.9827
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: I0YCWkUCHIx6LOLhdiDVPZ255CZaG7cdHelLByYtrzs7JtBMWfGqSbmTdrCabUEsasT0ogUKK1Vix/wnA9JxeMBrztLdCD7JmVzv+zSAucU=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR04MB8823
+Content-Transfer-Encoding: 8bit
 
-On Sep 25, 2025 / 16:02, John Garry wrote:
-> On 25/09/2025 15:14, John Garry wrote:
-> > On 25/09/2025 15:12, Shinichiro Kawasaki wrote:
-> > > > Let me know if you have a branch you want to test with all your cha=
-nges.
-> > > I did test runs using regular QEMU NVME devices, so I have some
-> > > confidence that
-> > > my changes are good. Your confirmation test on the current blktests
-> > > master
-> > > branch tip will be appreciated.
-> >=20
-> > Will do today/tomorrow
->=20
-> it works ok for md/002 and md/003, thanks!
+This series adds fuse iomap support for buffered reads and readahead.
+This is needed so that granular uptodate tracking can be used in fuse when
+large folios are enabled so that only the non-uptodate portions of the folio
+need to be read in instead of having to read in the entire folio. It also is
+needed in order to turn on large folios for servers that use the writeback
+cache since otherwise there is a race condition that may lead to data
+corruption if there is a partial write, then a read and the read happens
+before the write has undergone writeback, since otherwise the folio will not
+be marked uptodate from the partial write so the read will read in the entire
+folio from disk, which will overwrite the partial write.
 
-It's good to know, thanks!=
+This is on top of two locally-patched iomap patches [1] [2] patched on top of
+commit f1c864be6e88 ("Merge branch 'vfs-6.18.async' into vfs.all") in
+Christian's vfs.all tree.
+
+This series was run through fstests on fuse passthrough_hp with an
+out-of kernel patch enabling fuse large folios.
+
+This patchset does not enable large folios on fuse yet. That will be part
+of a different patchset.
+
+Thanks,
+Joanne
+
+[1] https://lore.kernel.org/linux-fsdevel/20250919214250.4144807-1-joannelkoong@gmail.com/
+[2] https://lore.kernel.org/linux-fsdevel/20250922180042.1775241-1-joannelkoong@gmail.com/
+
+Changelog
+---------
+v4: 
+https://lore.kernel.org/linux-fsdevel/20250923002353.2961514-1-joannelkoong@gmail.com/
+v4 -> v5:
+* Add commit for tracking pending read bytes more optimally (patch 7), which
+  was suggested by Darrick and improves both the performance and the interface
+* Merged "track read/readahead folio ownership internally" patch into patch 7
+* Split iomap iter pos change into its own commit (Darrick) (patch 8)
+
+v3:
+https://lore.kernel.org/linux-fsdevel/20250916234425.1274735-1-joannelkoong@gmail.com/
+v3 -> v4:
+* Rebase this on top of patches [1] and [2]
+* Fix readahead logic back to checking offset == 0 (patch 4)
+* Bias needs to be before/after iomap_iter() (patch 10)
+* Rename cur_folio_owned to folio_owned for read_folio (patch 7) (Darrick)
+
+v2:
+https://lore.kernel.org/linux-fsdevel/20250908185122.3199171-1-joannelkoong@gmail.com/
+v2 -> v3:
+* Incorporate Christoph's feedback
+- Change naming to iomap_bio_* instead of iomap_xxx_bio
+- Take his patch for moving bio logic into its own file (patch 11)
+- Make ->read_folio_range interface not need pos arg (patch 9)
+- Make ->submit_read return void (patch 9)
+- Merge cur_folio_in_bio rename w/ tracking folio_owned internally (patch 7)
+- Drop patch propagating error and replace with void return (patch 12)
+- Make bias code better to read (patch 10)
+* Add WARN_ON_ONCE check in iteration refactoring (patch 4)
+* Rename ->read_submit to ->submit_read (patch 9)
+
+v1:
+https://lore.kernel.org/linux-fsdevel/20250829235627.4053234-1-joannelkoong@gmail.com/
+v1 -> v2:
+* Don't pass in caller-provided arg through iter->private, pass it through
+  ctx->private instead (Darrick & Christoph)
+* Separate 'bias' for ifs->read_bytes_pending into separate patch (Christoph)
+* Rework read/readahead interface to take in struct iomap_read_folio_ctx
+  (Christoph)
+* Add patch for removing fuse fc->blkbits workaround, now that Miklos's tree
+  has been merged into Christian's
+
+Joanne Koong (14):
+  iomap: move bio read logic into helper function
+  iomap: move read/readahead bio submission logic into helper function
+  iomap: store read/readahead bio generically
+  iomap: iterate over folio mapping in iomap_readpage_iter()
+  iomap: rename iomap_readpage_iter() to iomap_read_folio_iter()
+  iomap: rename iomap_readpage_ctx struct to iomap_read_folio_ctx
+  iomap: track pending read bytes more optimally
+  iomap: set accurate iter->pos when reading folio ranges
+  iomap: add caller-provided callbacks for read and readahead
+  iomap: move buffered io bio logic into new file
+  iomap: make iomap_read_folio() a void return
+  fuse: use iomap for read_folio
+  fuse: use iomap for readahead
+  fuse: remove fc->blkbits workaround for partial writes
+
+ .../filesystems/iomap/operations.rst          |  44 +++
+ block/fops.c                                  |   5 +-
+ fs/erofs/data.c                               |   5 +-
+ fs/fuse/dir.c                                 |   2 +-
+ fs/fuse/file.c                                | 288 +++++++++++-------
+ fs/fuse/fuse_i.h                              |   8 -
+ fs/fuse/inode.c                               |  13 +-
+ fs/gfs2/aops.c                                |   6 +-
+ fs/iomap/Makefile                             |   3 +-
+ fs/iomap/bio.c                                |  88 ++++++
+ fs/iomap/buffered-io.c                        | 246 +++++++--------
+ fs/iomap/internal.h                           |  12 +
+ fs/xfs/xfs_aops.c                             |   5 +-
+ fs/zonefs/file.c                              |   5 +-
+ include/linux/iomap.h                         |  63 +++-
+ 15 files changed, 505 insertions(+), 288 deletions(-)
+ create mode 100644 fs/iomap/bio.c
+
+-- 
+2.47.3
+
