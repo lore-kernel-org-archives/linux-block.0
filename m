@@ -1,172 +1,109 @@
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80A9715278E
-	for <linux-block@vger.kernel.org>; Fri, 26 Sep 2025 00:29:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FB8426ACB;
+	Fri, 26 Sep 2025 00:57:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758846588; cv=none; b=C4NRD6F7qoOw0Yv9TFzyRNHiSb4OSwhjqfwArGrN/2G9Q5XUVW3vYDbgoUo1JjcLjDPJzuZkKO3Xsafix2h//axRvo3WrpSgV2kN7UoIwSR+5teZHYhBCXjcn7AcwQMRj4ReBh20vOxQIJkDgLvElwDPdhTLBse7ni81xuCxS7g=
+	t=1758848232; cv=none; b=WW0/SnLM4kTwAJraz9qobRs/EijtUDr55PM+AtPAFxFFl+yTKXN3eREHTE+0aPeTfgVZRbHZbTK0Hh6eq7TL47TeoRU1aslKAfcNJMj8+vCjCpvhJFN4kCDH1B8q7jhPiFCFOdmHm9vzi6r5wwiwVRUHZkLRDcP/d5b9LoL6yr8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758846588; c=relaxed/simple;
-	bh=douu/OH3JOBJbcNCPjglBlefsScRwWQQRJejY8Y8034=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pnLWb8iQnw7eAPVyryMTwvAD5YdRsdciFM7jSDMgBNXXguCgJM00v+18lzp2+I2qbqWPZMZpyWwrr81V+gQxY0GtYEdxVWsLDF9ZpIVH7o7vwDIkcadkiUa70Qxq1vIfCTm0/SuOHiX/3Kv+WOvX7qCk1UTbVPy+zrnnTEYWRyo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nGx+iQR+; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nGx+iQR+"
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-27c369f898fso18531265ad.3
-        for <linux-block@vger.kernel.org>; Thu, 25 Sep 2025 17:29:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758846587; x=1759451387; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4mZBfvjKH+a+qnWQMQA8rEgrcPJHuMhz3ff1QpWHtCw=;
-        b=nGx+iQR+qyqgjlVxNjOWNBRQBARpkHQDu8nvzKY8sI4/iGRIysq+WxDBaiUtcCRVZQ
-         sn/jmfQK3uI3YTQNhlEi1C6qxr6rIeQBi6HZcldgaGdDp95lKGda90OXEUEtKsy9u9sw
-         jg2FoVq4NIM4qt4JsV7zE7hdEC59+KQWnoZdKunCOHLnwaeDB1xzVAuFjVeNruq/3Woc
-         zBzEtY50E5UCd3GgxxOnlyhduMwhrZJI5Bx9HrhWkz/sLecZg0hGQ9dGryc8w32QRLqo
-         e4dpF89L6vwq3Qdafy1FyNFRCIC5QtK/EuGNkYeSs3A5YhEJFefmSwE1wJlGS5/iBvLY
-         MivQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758846587; x=1759451387;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4mZBfvjKH+a+qnWQMQA8rEgrcPJHuMhz3ff1QpWHtCw=;
-        b=d9sAKM3NHz5yKnGDJPxtzQissidpFZfiRjqbDUTPZhs4PDWXur4GW9N6X74D4u+lkr
-         5PGsPzM0TVniHeunBx2WFOLAcItIAYV01tgf5dChvHmCXqOmVSyjggJspsVsfsBKgGOU
-         fFVL8UnY3g+/wHopeJNece9LMGUs6OFosX82Ty3bnq8574pTw3z+QLlWIkerbNRU5BPF
-         ZXbHi8QfmBeE5fPBvSZmvwUkCK8dlve4yHur90XNMMZKHfRHDK79Xmg//FPU8iZd8sZg
-         ywxqzDcksg5Dn+egoaZbYEpZcsKjWDXBx4rw8PNsJBvTf3oVjMobzpY/umoQoT9TSmvG
-         YLGw==
-X-Forwarded-Encrypted: i=1; AJvYcCUUEtbHilQMSnYH2AWV6l2NfgSvFfUGSnH+NJElt8Q/QwpAQsgtL89sOhhSZuzvdgGKCxYv6BH8wm8HcQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YznhbJmw+QeFrePjhhQmqPh2WmTvW0WD7yFCUuZAdNDFttyB2od
-	OIU/AK71dejAFAxjzkL8l/kVIRf9b0cv+R7gtlyJkcnCwE+NTkiYTMWN
-X-Gm-Gg: ASbGncsTrX5Y2+H2s6NxFd8pdPCqp5uSICceQNm5Ur0oSFOcQFnOt14iLKxYPTSk8Vv
-	ik6BFLTCaZXPKNlNG7v8YBy1fvBTN0RrkXjX1kN9W5V8zBjKX/2fDNaThOeHDtchs9b/s0njkDh
-	RhB8KNaQx5z6RnGLKkXbWMxGqZi7Qlzc8uSe9QwyNS2TPpx7mz0eJ1FbSuaNtzx8dHOJLh9cejh
-	Yets0MgmVhu4mZ/C+FLhoVn9+qZhQ7YWaXn3n8ijvwh8WOZOpoqA020FARLk7NLa9VMeLtzj+BF
-	+jj3dyM9iIGmV5x4Bndi3VqoO6TclFgnu4JSDhv65ETUe3Hw/xBziP/AfwxW3srk8C8uSdEuSel
-	/AzUInHU4Qe4KeiF+ArwqjWkKnxWGa7exKbAZFk7czZ4ZQZP8JFaU5cWgZdI=
-X-Google-Smtp-Source: AGHT+IEMH5lJf7DHsnuKCyqZaYo7vRM2tcWdcLIid+23yMPPfujKM5L9NhzST+ddt/eFTEXbRRQDiA==
-X-Received: by 2002:a17:903:32c2:b0:24c:c8e7:60b5 with SMTP id d9443c01a7336-27ed49dd7d2mr60037595ad.16.1758846586702;
-        Thu, 25 Sep 2025 17:29:46 -0700 (PDT)
-Received: from localhost ([2a03:2880:ff:3::])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-27ed6716081sm36552055ad.53.2025.09.25.17.29.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Sep 2025 17:29:46 -0700 (PDT)
-From: Joanne Koong <joannelkoong@gmail.com>
-To: brauner@kernel.org,
-	miklos@szeredi.hu
-Cc: djwong@kernel.org,
-	hch@infradead.org,
-	hsiangkao@linux.alibaba.com,
-	linux-block@vger.kernel.org,
-	gfs2@lists.linux.dev,
-	linux-fsdevel@vger.kernel.org,
-	kernel-team@meta.com,
-	linux-xfs@vger.kernel.org,
-	linux-doc@vger.kernel.org
-Subject: [PATCH v5 14/14] fuse: remove fc->blkbits workaround for partial writes
-Date: Thu, 25 Sep 2025 17:26:09 -0700
-Message-ID: <20250926002609.1302233-15-joannelkoong@gmail.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20250926002609.1302233-1-joannelkoong@gmail.com>
-References: <20250926002609.1302233-1-joannelkoong@gmail.com>
+	s=arc-20240116; t=1758848232; c=relaxed/simple;
+	bh=4mX3EcmuNBcUPEBlDvx8Usz+XeVEpNdSEwjS9wu5/Aw=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=UHnR1np/J3harX+IE1+Ou/19kDwtsvms2Y5SW4yM0q2bNMCXa0VCnlZe3xTXE0P9bauGq8eWGDmCcz1LqE7wMMB5CkE2ra1Axs4gZRGn+Gf5cIZwnysspc+DXQeuE/utLeBX2edeT5BugOJQOhfHQV6D1797j0Q/r8dsaWTNthk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4cXsc814vfzYQv3Z;
+	Fri, 26 Sep 2025 08:56:56 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 3F0771A13AF;
+	Fri, 26 Sep 2025 08:57:06 +0800 (CST)
+Received: from [10.174.179.143] (unknown [10.174.179.143])
+	by APP4 (Coremail) with SMTP id gCh0CgBHCmLf5NVoUKZVAw--.24830S3;
+	Fri, 26 Sep 2025 08:57:05 +0800 (CST)
+Subject: Re: [PATCH 01/10] blk-cgroup: use cgroup lock and rcu to protect
+ iterating blkcg blkgs
+To: Yu Kuai <hailan@yukuai.org.cn>, Bart Van Assche <bvanassche@acm.org>,
+ Yu Kuai <yukuai1@huaweicloud.com>, tj@kernel.org, ming.lei@redhat.com,
+ nilay@linux.ibm.com, hch@lst.de, josef@toxicpanda.com, axboe@kernel.dk,
+ akpm@linux-foundation.org, vgoyal@redhat.com
+Cc: cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-mm@kvack.org, yi.zhang@huawei.com,
+ yangerkun@huawei.com, johnny.chenyi@huawei.com,
+ "yukuai (C)" <yukuai3@huawei.com>
+References: <20250925081525.700639-1-yukuai1@huaweicloud.com>
+ <20250925081525.700639-2-yukuai1@huaweicloud.com>
+ <bc6fe04d-3245-40dd-aa30-c3a3acb670c2@acm.org>
+ <01e7eccd-3529-4d12-8ad2-fd9e034a026d@yukuai.org.cn>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <688275d5-fbb4-08b3-45e1-798ad8cf77fc@huaweicloud.com>
+Date: Fri, 26 Sep 2025 08:57:03 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+In-Reply-To: <01e7eccd-3529-4d12-8ad2-fd9e034a026d@yukuai.org.cn>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgBHCmLf5NVoUKZVAw--.24830S3
+X-Coremail-Antispam: 1UD129KBjvdXoWruF1rXF15Ar4kuw1rAr1UKFg_yoWftwbEva
+	n0y3s7Gw15Wwnaq3WrGrnxJFZ5Ka18XryUCF48AFW7twnxAa45G3ZrurWxZFZYka1qywn2
+	gr1ku348Jr4aqjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUbfAFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+	A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
+	6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
+	c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxkF7I0En4kS14v26r4a6rW5MxAIw28IcxkI7V
+	AKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCj
+	r7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6x
+	IIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAI
+	w20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x
+	0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7sRidbbtUUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-Now that fuse is integrated with iomap for read/readahead, we can remove
-the workaround that was added in commit bd24d2108e9c ("fuse: fix fuseblk
-i_blkbits for iomap partial writes"), which was previously needed to
-avoid a race condition where an iomap partial write may be overwritten
-by a read if blocksize < PAGE_SIZE. Now that fuse does iomap
-read/readahead, this is protected against since there is granular
-uptodate tracking of blocks, which means this workaround can be removed.
+Hi,
 
-Signed-off-by: Joanne Koong <joannelkoong@gmail.com>
-Reviewed-by: "Darrick J. Wong" <djwong@kernel.org>
----
- fs/fuse/dir.c    |  2 +-
- fs/fuse/fuse_i.h |  8 --------
- fs/fuse/inode.c  | 13 +------------
- 3 files changed, 2 insertions(+), 21 deletions(-)
+在 2025/09/26 1:07, Yu Kuai 写道:
+> Hi,
+> 
+> 在 2025/9/25 23:57, Bart Van Assche 写道:
+>> On 9/25/25 1:15 AM, Yu Kuai wrote:
+>>> It's safe to iterate blkgs with cgroup lock or rcu lock held, prevent
+>>> nested queue_lock under rcu lock, and prepare to convert protecting
+>>> blkcg with blkcg_mutex instead of queuelock.
+>>
+>> Iterating blkgs without holding q->queue_lock is safe but accessing the
+>> blkg members without holding that lock is not safe since q->queue_lock
+>> is acquired by all code that modifies blkg members. Should perhaps a new
+>> spinlock be introduced to serialize blkg modifications?
 
-diff --git a/fs/fuse/dir.c b/fs/fuse/dir.c
-index 5c569c3cb53f..ebee7e0b1cd3 100644
---- a/fs/fuse/dir.c
-+++ b/fs/fuse/dir.c
-@@ -1199,7 +1199,7 @@ static void fuse_fillattr(struct mnt_idmap *idmap, struct inode *inode,
- 	if (attr->blksize != 0)
- 		blkbits = ilog2(attr->blksize);
- 	else
--		blkbits = fc->blkbits;
-+		blkbits = inode->i_sb->s_blocksize_bits;
- 
- 	stat->blksize = 1 << blkbits;
- }
-diff --git a/fs/fuse/fuse_i.h b/fs/fuse/fuse_i.h
-index cc428d04be3e..1647eb7ca6fa 100644
---- a/fs/fuse/fuse_i.h
-+++ b/fs/fuse/fuse_i.h
-@@ -975,14 +975,6 @@ struct fuse_conn {
- 		/* Request timeout (in jiffies). 0 = no timeout */
- 		unsigned int req_timeout;
- 	} timeout;
--
--	/*
--	 * This is a workaround until fuse uses iomap for reads.
--	 * For fuseblk servers, this represents the blocksize passed in at
--	 * mount time and for regular fuse servers, this is equivalent to
--	 * inode->i_blkbits.
--	 */
--	u8 blkbits;
- };
- 
- /*
-diff --git a/fs/fuse/inode.c b/fs/fuse/inode.c
-index 7485a41af892..a1b9e8587155 100644
---- a/fs/fuse/inode.c
-+++ b/fs/fuse/inode.c
-@@ -292,7 +292,7 @@ void fuse_change_attributes_common(struct inode *inode, struct fuse_attr *attr,
- 	if (attr->blksize)
- 		fi->cached_i_blkbits = ilog2(attr->blksize);
- 	else
--		fi->cached_i_blkbits = fc->blkbits;
-+		fi->cached_i_blkbits = inode->i_sb->s_blocksize_bits;
- 
- 	/*
- 	 * Don't set the sticky bit in i_mode, unless we want the VFS
-@@ -1810,21 +1810,10 @@ int fuse_fill_super_common(struct super_block *sb, struct fuse_fs_context *ctx)
- 		err = -EINVAL;
- 		if (!sb_set_blocksize(sb, ctx->blksize))
- 			goto err;
--		/*
--		 * This is a workaround until fuse hooks into iomap for reads.
--		 * Use PAGE_SIZE for the blocksize else if the writeback cache
--		 * is enabled, buffered writes go through iomap and a read may
--		 * overwrite partially written data if blocksize < PAGE_SIZE
--		 */
--		fc->blkbits = sb->s_blocksize_bits;
--		if (ctx->blksize != PAGE_SIZE &&
--		    !sb_set_blocksize(sb, PAGE_SIZE))
--			goto err;
- #endif
- 	} else {
- 		sb->s_blocksize = PAGE_SIZE;
- 		sb->s_blocksize_bits = PAGE_SHIFT;
--		fc->blkbits = sb->s_blocksize_bits;
- 	}
- 
- 	sb->s_subtype = ctx->subtype;
--- 
-2.47.3
+Actually, only blkcg_print_blkgs() is using rcu in this patch, and take
+a look at the callers, I don't see anyone have to hold queue_lock. Can
+you explain in detail which field from blkg is problematic in this
+patch?
+
+Thanks,
+Kuai
+
+>>
+> No need for a new lock, I think blkcg->lock can do that.
+> 
+> Thanks,
+> Kuai
+> 
+>> Thanks,
+>>
+>> Bart.
+>>
+> .
+> 
 
