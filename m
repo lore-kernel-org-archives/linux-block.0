@@ -1,63 +1,96 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50644307AD5
-	for <linux-block@vger.kernel.org>; Fri, 26 Sep 2025 20:44:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63F9A1D7E4A
+	for <linux-block@vger.kernel.org>; Sat, 27 Sep 2025 20:43:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758919465; cv=none; b=pc8omEZMrM4FISXHgI6jTpnHI86RFsl0fe5MPB9yxq+7WHruvFCLJ0lrG53m5OQvP79gWHdm+bUpVGcxLXuZf3+Lk/uJbIbxb3CfQLaZn38VlVPPG/PkSbM3d9JgH4qGdBfnhhvas9taznEr243B1+RxyNjVQeV2bPBOqjlQb0w=
+	t=1759005813; cv=none; b=O8xZtfBHHyrbiFyBYqMlUT1Bl3lx27RGiZ0rTI3Gdl6r7wEZiaQ1Ypsugri3CdyYEr1+9RGirpewJzieaKUbxTVow/0s04fRO5kBp5KZSeqHVq9QNb3RP1SD4CQlpwNK312Kq5mpNwPdtYlvSdrXdNyJISqX1Itx6NXdPkAhdZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758919465; c=relaxed/simple;
-	bh=ggXxOLHkednufMcfZ3i4B+GLGkB8uVFX8KhTqndbYqw=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=c4yWhHKGhoyadINcqnGxtmQgnOxGqHMLsL0a4SMgOPA/TvcdYEhTlCTSfU/Y+IksGnnP9iXvJEJQYasHYVpJaTR9D+YyKQ1+9LgEc1OUtRhy2/CR/NzmPdh33IKlw8f3kE3frwuICHdJxWE2kZxhiMrgR83dMxAuLlmL0HI9mo8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eu09KNCw; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eu09KNCw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2FE2EC4CEF8;
-	Fri, 26 Sep 2025 20:44:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758919465;
-	bh=ggXxOLHkednufMcfZ3i4B+GLGkB8uVFX8KhTqndbYqw=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=eu09KNCwZkYiCwWY6c3u5WLRbpwlk6UcpOGHj0g9EbZ3+66M9T3QMovnk9Ax4kzFD
-	 2QnvftkApa0nEzBwJ9fECHiuXm77NHXqFpF6x0wS1vzITDY2EcQRgbi989kX37hFhY
-	 GjNxe7T23yJ5pfHhiO3g4INa+Wpw5E8gr+Z1YM9U6SqwdHpT1nxDiK6FtrP1uttAkR
-	 tfFRrg2/q2gy1x/V6BJaiEo4rLrM4CIi/RtCvKB9QO1tQV7qzGWDwYI0mrQxI1slDs
-	 JwKp9bqMqfNMePFFfpM4/YTM/J8sKBlac34mwFOe1/eplEdlRskvZ4CpYMrlSE/4Y/
-	 odvlKyu/39ZJg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD8F39D0C3F;
-	Fri, 26 Sep 2025 20:44:21 +0000 (UTC)
-Subject: Re: [GIT PULL] Block fixes for 6.17 final
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <c993fdf7-df9a-4689-a547-313b4cfde4b8@kernel.dk>
-References: <c993fdf7-df9a-4689-a547-313b4cfde4b8@kernel.dk>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <c993fdf7-df9a-4689-a547-313b4cfde4b8@kernel.dk>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git tags/block-6.17-20250925
-X-PR-Tracked-Commit-Id: 285213a65e91d0295751d740e2320d8fcd75d56e
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 3a654ee549210f8aecfbebc7c699557666d17a4b
-Message-Id: <175891946022.51956.10614783777127789950.pr-tracker-bot@kernel.org>
-Date: Fri, 26 Sep 2025 20:44:20 +0000
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+	s=arc-20240116; t=1759005813; c=relaxed/simple;
+	bh=VF9+/08UrQyGYkSmyG+Qk1tbK6/TiYCHA02wWiFDAbE=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=JnUbTg426tYJjTMD6xQfKIhthtkHKtUFz5tdudCXkGSbCiYO6ZxpMXbA1hsHYh8UpMzLsq5ly4cXY/Cof/ATwCNebtvalH42xkWlbx1tc/SRjme6jeH0JfnJtH3UdY0l1blxLBNwCbkJZydQcrzX6A+e/iTUoDuKgaQREk50eR8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-887ee7475faso853337339f.0
+        for <linux-block@vger.kernel.org>; Sat, 27 Sep 2025 13:43:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759005811; x=1759610611;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=XnbVeuxyJuDhtaz+8EpGwocy6j6R3G98UG3mDObVIjg=;
+        b=N+wEOVArjOZjgnKL76gGHtYQGdTfpRwynGrmv9hfDNfUfwXtB76NxP6BNyyEX3dU5h
+         TWeVIYoV13NTcVnxDZvg/rR6II7LYo8TPMtJ4IedLgaq3lyk7PL3PEHf+ZFq7VbkQ2EW
+         ts0DKqVhTKtVCmkkRghoDzbtVHTa+VoyflNYki950p2URkGKh/6fHpE3enqSy4piffbU
+         WqyBd8LvcOa6+ac+206i8LgIjQjueczqRqP3trGeegJeJW55KbGMGob5K/ktDjoDiIdk
+         PNXBeQMz/480erjyPPdLAAZHJE2lJMsYcxkbfQ7S6CHUGiGqgqThMm880bKHzOhO1wog
+         UnAA==
+X-Gm-Message-State: AOJu0YyKrk0NX7DhdzypG4R6OAHhIWfsSjxc5c5rvrZDzsLnB2rhKytQ
+	dcMF46NRTkEZGntzKSGSyx0fAEyAT1dfAnyFibIN5cZDyiNbnWkm/Ozokh6NYJdc36JgNVZt1ty
+	TEM/RYvQEJOE9CfzaYnVB0MDWcSO3oam16IZiroyL5QQKIk7m/q2E5Bh6/9k=
+X-Google-Smtp-Source: AGHT+IEgAb6RUoUuUU6+VNUs0Cd19ohLNg0qyy6d4iLZhugK2w+73jMiz73PKLRfta/zoGVthLjHt3qE5iSNH5xXM3eJhiT2yG+r
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+X-Received: by 2002:a05:6e02:3e93:b0:418:3b13:d810 with SMTP id
+ e9e14a558f8ab-425955fb6a0mr178031145ab.9.1759005811598; Sat, 27 Sep 2025
+ 13:43:31 -0700 (PDT)
+Date: Sat, 27 Sep 2025 13:43:31 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68d84c73.a00a0220.102ee.001a.GAE@google.com>
+Subject: [syzbot] Monthly block report (Sep 2025)
+From: syzbot <syzbot+liste73e8cca2b92b2455106@syzkaller.appspotmail.com>
+To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-The pull request you sent on Thu, 25 Sep 2025 23:54:32 -0600:
+Hello block maintainers/developers,
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git tags/block-6.17-20250925
+This is a 31-day syzbot report for the block subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/block
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/3a654ee549210f8aecfbebc7c699557666d17a4b
+During the period, 1 new issues were detected and 0 were fixed.
+In total, 44 issues are still open and 104 have already been fixed.
 
-Thank you!
+Some of the still happening issues:
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Ref  Crashes Repro Title
+<1>  44250   Yes   possible deadlock in blk_mq_update_nr_hw_queues
+                   https://syzkaller.appspot.com/bug?extid=6279b273d888c2017726
+<2>  43987   Yes   possible deadlock in __del_gendisk
+                   https://syzkaller.appspot.com/bug?extid=2e9e529ac0b319316453
+<3>  7133    Yes   KMSAN: kernel-infoleak in filemap_read
+                   https://syzkaller.appspot.com/bug?extid=905d785c4923bea2c1db
+<4>  3286    No    INFO: task hung in read_part_sector (2)
+                   https://syzkaller.appspot.com/bug?extid=82de77d3f217960f087d
+<5>  2746    Yes   BUG: MAX_LOCKDEP_CHAIN_HLOCKS too low! (7)
+                   https://syzkaller.appspot.com/bug?extid=74f79df25c37437e4d5a
+<6>  2614    Yes   INFO: task hung in bdev_release
+                   https://syzkaller.appspot.com/bug?extid=4da851837827326a7cd4
+<7>  1688    Yes   INFO: task hung in blkdev_fallocate
+                   https://syzkaller.appspot.com/bug?extid=39b75c02b8be0a061bfc
+<8>  1586    Yes   INFO: task hung in bdev_open
+                   https://syzkaller.appspot.com/bug?extid=5c6179f2c4f1e111df11
+<9>  1007    Yes   INFO: task hung in sync_bdevs (3)
+                   https://syzkaller.appspot.com/bug?extid=97bc0b256218ed6df337
+<10> 606     Yes   possible deadlock in elevator_change
+                   https://syzkaller.appspot.com/bug?extid=ccae337393ac17091c34
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
+
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
