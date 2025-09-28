@@ -1,221 +1,143 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mout.web.de (mout.web.de [212.227.15.3])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D72D24467A
-	for <linux-block@vger.kernel.org>; Sun, 28 Sep 2025 13:30:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5D344C98;
+	Sun, 28 Sep 2025 13:48:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.3
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759066212; cv=none; b=H6f/oevuBN9CqbAV683mQGROX2Eso8od2pS1xMCNGUv+7GMHnWfNGPBp/kpZXJgy1zknmYP8VabKRqCApUh57Vfk/5D4VARhV1XyOWDT5+tdLqADSXboVytzf4JBXd/T2xCubvZhqj714X5Tj+Vhu3pO7BBb9Sn+kRk/32D91e4=
+	t=1759067322; cv=none; b=D9TXYPLhKx6G3y6UVjYTBEI7TKt1BsLJAwroh0BHYZoKBrINnjyEe2BLRNoFliL8FFbHM7RFCxtsXQiM/5eLig5p/DhfXkrwwBVWk4UE/PT+9WcR4etL5Yum81Bc9wH4lOXXVVTYViNJnWcbSM9zcEVItpbUFbNXTcz0PR0PRFw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759066212; c=relaxed/simple;
-	bh=QpPECCJJWocogr1hmmxxbjw8juMtrhfzGpQIv4fnoU0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PrP9sH/3R3gkudZ8TOdMVHsVklKy/rnlK5bflqdX50nX8UmnRSrOYhmz09qhUoMeoBuuY3zX6+kRnoMBw4uTtjsvdInPTjS1tkc8HZ0fOc7MSU1B0pjwSJ5MAdW2DxY7W6PXwJlcZydBgEE2UYzrqhU6mcybT0TE22agZ8tSHpI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=APrJUZlh; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1759067322; c=relaxed/simple;
+	bh=T78lkvz4NHBEAD/qi90ZP6MFj9B9bdxbDxvA1l5EPYQ=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
+	 In-Reply-To:Content-Type; b=XT5tT0kPQc/C4h5r7mLzxKoef4aKEUosP1ULzoRKdw6QWW9nAWPlL+HrShuUMXgeGrOjCu/+RX7FduWRcQkT4c/auK9I1AgCfiao0E7O4kwdl2VFJNIRjxTMpAb/NX8qVhrs5N/vm4C/cP/QXgAZTxJ1f0ZNdbOwfxG+6+U+2pE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=smEp3eel; arc=none smtp.client-ip=212.227.15.3
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="APrJUZlh"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1759066209;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NO2W5I0YfcFhRbUTchpDwdQv7olqZScIsLA3MOvRxJk=;
-	b=APrJUZlhSYlt9E/MoshqWVD/yjN7HgZRK+BXgZOhuSVp5dAhWsLORwxSlXTLgRs0elbLk9
-	WMWwL5HoIJSRnTn20QWjSlUBBvgcHOuDPkdPMeX6EH+PxI3lKyz19DT7JhfnpCFIk+IIDi
-	Y1bSn8uSEqBcgItoCbHIsNRApNvzQQM=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-685-lRnRoxC8MM67EBaNQiil4w-1; Sun,
- 28 Sep 2025 09:30:05 -0400
-X-MC-Unique: lRnRoxC8MM67EBaNQiil4w-1
-X-Mimecast-MFC-AGG-ID: lRnRoxC8MM67EBaNQiil4w_1759066203
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3C156195608C;
-	Sun, 28 Sep 2025 13:30:03 +0000 (UTC)
-Received: from localhost (unknown [10.72.120.3])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 2CA4230001A4;
-	Sun, 28 Sep 2025 13:30:01 +0000 (UTC)
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: Mikulas Patocka <mpatocka@redhat.com>,
-	Zhaoyang Huang <zhaoyang.huang@unisoc.com>,
-	Dave Chinner <dchinner@redhat.com>,
-	linux-fsdevel@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V4 6/6] loop: add hint for handling aio via IOCB_NOWAIT
-Date: Sun, 28 Sep 2025 21:29:25 +0800
-Message-ID: <20250928132927.3672537-7-ming.lei@redhat.com>
-In-Reply-To: <20250928132927.3672537-1-ming.lei@redhat.com>
-References: <20250928132927.3672537-1-ming.lei@redhat.com>
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="smEp3eel"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1759067308; x=1759672108; i=markus.elfring@web.de;
+	bh=T78lkvz4NHBEAD/qi90ZP6MFj9B9bdxbDxvA1l5EPYQ=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
+	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
+	 cc:content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=smEp3eelS7nI2eoZBF59ySuF551SY0kW4gEHtvHC9ZB/DDohJYvEdOTjUCLsHJVi
+	 CBMqRkv0HWXIbiCQoYp3qLTXYlHusmX+r93XUUIzzsi2KV4HQWatL0Fj4RLNWCKpJ
+	 m3AUDsjeWwmRYIOE1swuV1P4xkoRjIixS5KzqjD5dNG2o97JOQr0BM/n4WDnVN+ZP
+	 qEqqu4D55Sp7xyz/uJxytlIcaZaOFapiEHN4KbHP4wxALEYjIPVPcZ1IQ+H9v8D5S
+	 GMh2qDud7SNaA2MdlOidhCwF0zdKWXDMlMKhXN26CWeo+mvNMVxIx5+hRYYpVqot6
+	 oiOCkjAm0EnNhmC4rA==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.29] ([94.31.69.189]) by smtp.web.de (mrweb005
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1MPrPT-1uhCJj0Ivz-00POMY; Sun, 28
+ Sep 2025 15:48:28 +0200
+Message-ID: <9f6acb84-02cb-4f76-bf37-e79b87157f1e@web.de>
+Date: Sun, 28 Sep 2025 15:48:23 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+User-Agent: Mozilla Thunderbird
+To: Li Chen <chenl311@chinatelecom.cn>, linux-block@vger.kernel.org,
+ Jens Axboe <axboe@kernel.dk>
+Cc: Li Chen <me@linux.beauty>, LKML <linux-kernel@vger.kernel.org>,
+ Yang Erkun <yangerkun@huawei.com>
+References: <20250926121231.32549-1-me@linux.beauty>
+Subject: Re: [PATCH] loop: fix backing file reference leak on validation error
+Content-Language: en-GB, de-DE
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <20250926121231.32549-1-me@linux.beauty>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:liPxP31WF6bcH2oVDd71Kwmdl99u1cejFWuz250Xmci+b27l/U3
+ Izn5Pd561zBVfLZKhHDj7jf1ryaGpU52Efnaxzqcp9YxaklAUjNz+ygdsucAvL5KjspJHG3
+ 9UZ9ZfUSA1tAib6BNqnhI3yyEJP+OtNt9niBDD+Nm1I2OVg6oeZPRuJaE0i0bFwMhevU2NL
+ GEOh/KrG+dt4LUsr4kuFA==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:VdPELCcMQ98=;1EcnOCdY9O8tibBxkvoZ11h+cbk
+ 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
 
-Add hint for using IOCB_NOWAIT to handle loop aio command for avoiding
-to cause write(especially randwrite) perf regression on sparse backed file.
+=E2=80=A6
+> Fix this by calling fput(file) before returning the error.
+=E2=80=A6
+> +++ b/drivers/block/loop.c
+=E2=80=A6
 
-Try IOCB_NOWAIT in the following situations:
+How do you think about to increase the application of scope-based resource=
+ management?
+https://elixir.bootlin.com/linux/v6.17-rc7/source/include/linux/file.h#L97
 
-- backing file is block device
-
-OR
-
-- READ aio command
-
-OR
-
-- there isn't any queued blocking async WRITEs, because NOWAIT won't cause
-contention with blocking WRITE, which often implies exclusive lock
-
-With this simple policy, perf regression of randwrite/write on sparse
-backing file is fixed.
-
-Link: https://lore.kernel.org/dm-devel/7d6ae2c9-df8e-50d0-7ad6-b787cb3cfab4@redhat.com/
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/block/loop.c | 61 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 61 insertions(+)
-
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 57e33553695b..911262b648ce 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -68,6 +68,7 @@ struct loop_device {
- 	struct rb_root          worker_tree;
- 	struct timer_list       timer;
- 	bool			sysfs_inited;
-+	unsigned 		lo_nr_blocking_writes;
- 
- 	struct request_queue	*lo_queue;
- 	struct blk_mq_tag_set	tag_set;
-@@ -462,6 +463,33 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
- 	return -EIOCBQUEUED;
- }
- 
-+static inline bool lo_aio_try_nowait(struct loop_device *lo,
-+		struct loop_cmd *cmd)
-+{
-+	struct file *file = lo->lo_backing_file;
-+	struct inode *inode = file->f_mapping->host;
-+	struct request *rq = blk_mq_rq_from_pdu(cmd);
-+
-+	/* NOWAIT works fine for backing block device */
-+	if (S_ISBLK(inode->i_mode))
-+		return true;
-+
-+	/*
-+	 * NOWAIT is supposed to be fine for READ without contending with
-+	 * blocking WRITE
-+	 */
-+	if (req_op(rq) == REQ_OP_READ)
-+		return true;
-+
-+	/*
-+	 * If there is any queued non-NOWAIT async WRITE , don't try new
-+	 * NOWAIT WRITE for avoiding contention
-+	 *
-+	 * Here we focus on handling stable FS block mapping via NOWAIT
-+	 */
-+	return READ_ONCE(lo->lo_nr_blocking_writes) == 0;
-+}
-+
- static int lo_rw_aio_nowait(struct loop_device *lo, struct loop_cmd *cmd,
- 			    int rw)
- {
-@@ -473,6 +501,9 @@ static int lo_rw_aio_nowait(struct loop_device *lo, struct loop_cmd *cmd,
- 	if (unlikely(ret))
- 		goto fail;
- 
-+	if (!lo_aio_try_nowait(lo, cmd))
-+		return -EAGAIN;
-+
- 	cmd->iocb.ki_flags |= IOCB_NOWAIT;
- 	ret = lo_submit_rw_aio(lo, cmd, nr_bvec, rw);
- fail:
-@@ -773,12 +804,19 @@ static ssize_t loop_attr_dio_show(struct loop_device *lo, char *buf)
- 	return sysfs_emit(buf, "%s\n", dio ? "1" : "0");
- }
- 
-+static ssize_t loop_attr_nr_blocking_writes_show(struct loop_device *lo,
-+						 char *buf)
-+{
-+	return sysfs_emit(buf, "%u\n", lo->lo_nr_blocking_writes);
-+}
-+
- LOOP_ATTR_RO(backing_file);
- LOOP_ATTR_RO(offset);
- LOOP_ATTR_RO(sizelimit);
- LOOP_ATTR_RO(autoclear);
- LOOP_ATTR_RO(partscan);
- LOOP_ATTR_RO(dio);
-+LOOP_ATTR_RO(nr_blocking_writes);
- 
- static struct attribute *loop_attrs[] = {
- 	&loop_attr_backing_file.attr,
-@@ -787,6 +825,7 @@ static struct attribute *loop_attrs[] = {
- 	&loop_attr_autoclear.attr,
- 	&loop_attr_partscan.attr,
- 	&loop_attr_dio.attr,
-+	&loop_attr_nr_blocking_writes.attr,
- 	NULL,
- };
- 
-@@ -862,6 +901,24 @@ static inline int queue_on_root_worker(struct cgroup_subsys_state *css)
- }
- #endif
- 
-+static inline void loop_inc_blocking_writes(struct loop_device *lo,
-+		struct loop_cmd *cmd)
-+{
-+	lockdep_assert_held(&lo->lo_mutex);
-+
-+	if (req_op(blk_mq_rq_from_pdu(cmd)) == REQ_OP_WRITE)
-+		lo->lo_nr_blocking_writes += 1;
-+}
-+
-+static inline void loop_dec_blocking_writes(struct loop_device *lo,
-+		struct loop_cmd *cmd)
-+{
-+	lockdep_assert_held(&lo->lo_mutex);
-+
-+	if (req_op(blk_mq_rq_from_pdu(cmd)) == REQ_OP_WRITE)
-+		lo->lo_nr_blocking_writes -= 1;
-+}
-+
- static void loop_queue_work(struct loop_device *lo, struct loop_cmd *cmd)
- {
- 	struct request __maybe_unused *rq = blk_mq_rq_from_pdu(cmd);
-@@ -944,6 +1001,8 @@ static void loop_queue_work(struct loop_device *lo, struct loop_cmd *cmd)
- 		work = &lo->rootcg_work;
- 		cmd_list = &lo->rootcg_cmd_list;
- 	}
-+	if (cmd->use_aio)
-+		loop_inc_blocking_writes(lo, cmd);
- 	list_add_tail(&cmd->list_entry, cmd_list);
- 	queue_work(lo->workqueue, work);
- 	spin_unlock_irq(&lo->lo_work_lock);
-@@ -2042,6 +2101,8 @@ static void loop_process_work(struct loop_worker *worker,
- 		cond_resched();
- 
- 		spin_lock_irq(&lo->lo_work_lock);
-+		if (cmd->use_aio)
-+			loop_dec_blocking_writes(lo, cmd);
- 	}
- 
- 	/*
--- 
-2.47.0
-
+Regards,
+Markus
