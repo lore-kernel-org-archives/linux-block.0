@@ -1,143 +1,171 @@
-Received: from mout.web.de (mout.web.de [212.227.15.3])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5D344C98;
-	Sun, 28 Sep 2025 13:48:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F34170830;
+	Sun, 28 Sep 2025 14:51:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759067322; cv=none; b=D9TXYPLhKx6G3y6UVjYTBEI7TKt1BsLJAwroh0BHYZoKBrINnjyEe2BLRNoFliL8FFbHM7RFCxtsXQiM/5eLig5p/DhfXkrwwBVWk4UE/PT+9WcR4etL5Yum81Bc9wH4lOXXVVTYViNJnWcbSM9zcEVItpbUFbNXTcz0PR0PRFw=
+	t=1759071064; cv=none; b=qq4+clprPUydh0FZE/owhm/cGCzzg1C7v0gZY4SBSDHYv7kPkuPj8DyoQc9V5I4zdIA3MciYmB4bpSchIlYz8mrw4ittDkVV/nvh2tMIvY9fIbBlPEvqn0mCsG24QUv/SznsF0Jrjs6UyRPmq4adOsJKuLkCETykDD675XZPCqY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759067322; c=relaxed/simple;
-	bh=T78lkvz4NHBEAD/qi90ZP6MFj9B9bdxbDxvA1l5EPYQ=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
-	 In-Reply-To:Content-Type; b=XT5tT0kPQc/C4h5r7mLzxKoef4aKEUosP1ULzoRKdw6QWW9nAWPlL+HrShuUMXgeGrOjCu/+RX7FduWRcQkT4c/auK9I1AgCfiao0E7O4kwdl2VFJNIRjxTMpAb/NX8qVhrs5N/vm4C/cP/QXgAZTxJ1f0ZNdbOwfxG+6+U+2pE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=smEp3eel; arc=none smtp.client-ip=212.227.15.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+	s=arc-20240116; t=1759071064; c=relaxed/simple;
+	bh=VONrYQxoP8oMQLxNnSkk6QmAw8wYtiFvRYSA+pjUd/Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=sZmij0jjpvkNeM0ghoVpmPiRydEyup2E7JAzvCM4ZvVat5ApLYe6zgjSCTQTya6j30d7t74+LkovXUc6Zlhxdi7v/9nFO4h20IeyT5JvNh1FJO/0nKFUN+JNEPTgVGKzcsWIJK6PlLyiFsxfXwN0jMz8OyIyWiYoS8S7c7rOe9c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p1lrDqVG; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="smEp3eel"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1759067308; x=1759672108; i=markus.elfring@web.de;
-	bh=T78lkvz4NHBEAD/qi90ZP6MFj9B9bdxbDxvA1l5EPYQ=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
-	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
-	 cc:content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=smEp3eelS7nI2eoZBF59ySuF551SY0kW4gEHtvHC9ZB/DDohJYvEdOTjUCLsHJVi
-	 CBMqRkv0HWXIbiCQoYp3qLTXYlHusmX+r93XUUIzzsi2KV4HQWatL0Fj4RLNWCKpJ
-	 m3AUDsjeWwmRYIOE1swuV1P4xkoRjIixS5KzqjD5dNG2o97JOQr0BM/n4WDnVN+ZP
-	 qEqqu4D55Sp7xyz/uJxytlIcaZaOFapiEHN4KbHP4wxALEYjIPVPcZ1IQ+H9v8D5S
-	 GMh2qDud7SNaA2MdlOidhCwF0zdKWXDMlMKhXN26CWeo+mvNMVxIx5+hRYYpVqot6
-	 oiOCkjAm0EnNhmC4rA==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.29] ([94.31.69.189]) by smtp.web.de (mrweb005
- [213.165.67.108]) with ESMTPSA (Nemesis) id 1MPrPT-1uhCJj0Ivz-00POMY; Sun, 28
- Sep 2025 15:48:28 +0200
-Message-ID: <9f6acb84-02cb-4f76-bf37-e79b87157f1e@web.de>
-Date: Sun, 28 Sep 2025 15:48:23 +0200
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p1lrDqVG"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C12B8C4CEF0;
+	Sun, 28 Sep 2025 14:51:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1759071063;
+	bh=VONrYQxoP8oMQLxNnSkk6QmAw8wYtiFvRYSA+pjUd/Y=;
+	h=From:To:Cc:Subject:Date:From;
+	b=p1lrDqVGm2h+IqmbzC4UeijKf/SHWc96sqEQB14/cn33jk/4ux8kg2qVwIdK4UCpD
+	 IMdOltqVGarClLfgYb5XVTOwWA+k8XuhwlcMjKhmhXpYAfmib613trJBppLraR6Wu8
+	 c2kfH5kMirZCHheP+4wFCx7QF/33w6BTMVk7ga7F7wtVipUwR6ihbsyuG20ou8kDk1
+	 n7Yk0lGafNQ2GKdPzJIcwuNthHp5p1B2AtWUTZz/ZrBu585+LFPUMVt4+9TRGc2k8d
+	 iS7qUSt1b8trgjdkGXO9SBYuFHbCnFJCHOBZgNPacPxJDLTo6w3CwRMHhp3uvPGGod
+	 1b5YsB3cm6Bbg==
+From: Leon Romanovsky <leon@kernel.org>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Jason Gunthorpe <jgg@nvidia.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	=?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
+	dri-devel@lists.freedesktop.org,
+	iommu@lists.linux.dev,
+	Jens Axboe <axboe@kernel.dk>,
+	Joerg Roedel <joro@8bytes.org>,
+	kvm@vger.kernel.org,
+	linaro-mm-sig@lists.linaro.org,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-media@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-pci@vger.kernel.org,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Vivek Kasireddy <vivek.kasireddy@intel.com>,
+	Will Deacon <will@kernel.org>
+Subject: [PATCH v4 00/10] vfio/pci: Allow MMIO regions to be exported through dma-buf
+Date: Sun, 28 Sep 2025 17:50:10 +0300
+Message-ID: <cover.1759070796.git.leon@kernel.org>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: Li Chen <chenl311@chinatelecom.cn>, linux-block@vger.kernel.org,
- Jens Axboe <axboe@kernel.dk>
-Cc: Li Chen <me@linux.beauty>, LKML <linux-kernel@vger.kernel.org>,
- Yang Erkun <yangerkun@huawei.com>
-References: <20250926121231.32549-1-me@linux.beauty>
-Subject: Re: [PATCH] loop: fix backing file reference leak on validation error
-Content-Language: en-GB, de-DE
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <20250926121231.32549-1-me@linux.beauty>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:liPxP31WF6bcH2oVDd71Kwmdl99u1cejFWuz250Xmci+b27l/U3
- Izn5Pd561zBVfLZKhHDj7jf1ryaGpU52Efnaxzqcp9YxaklAUjNz+ygdsucAvL5KjspJHG3
- 9UZ9ZfUSA1tAib6BNqnhI3yyEJP+OtNt9niBDD+Nm1I2OVg6oeZPRuJaE0i0bFwMhevU2NL
- GEOh/KrG+dt4LUsr4kuFA==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:VdPELCcMQ98=;1EcnOCdY9O8tibBxkvoZ11h+cbk
- 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
+Content-Transfer-Encoding: 8bit
 
-=E2=80=A6
-> Fix this by calling fput(file) before returning the error.
-=E2=80=A6
-> +++ b/drivers/block/loop.c
-=E2=80=A6
+Changelog:
+v4:
+ * Split pcim_p2pdma_provider() to two functions, one that initializes
+   array of providers and another to return right provider pointer.
+v3: https://lore.kernel.org/all/cover.1758804980.git.leon@kernel.org
+ * Changed pcim_p2pdma_enable() to be pcim_p2pdma_provider().
+ * Cache provider in vfio_pci_dma_buf struct instead of BAR index.
+ * Removed misleading comment from pcim_p2pdma_provider().
+ * Moved MMIO check to be in pcim_p2pdma_provider().
+v2: https://lore.kernel.org/all/cover.1757589589.git.leon@kernel.org/
+ * Added extra patch which adds new CONFIG, so next patches can reuse it.
+ * Squashed "PCI/P2PDMA: Remove redundant bus_offset from map state"
+   into the other patch.
+ * Fixed revoke calls to be aligned with true->false semantics.
+ * Extended p2pdma_providers to be per-BAR and not global to whole device.
+ * Fixed possible race between dmabuf states and revoke.
+ * Moved revoke to PCI BAR zap block.
+v1: https://lore.kernel.org/all/cover.1754311439.git.leon@kernel.org
+ * Changed commit messages.
+ * Reused DMA_ATTR_MMIO attribute.
+ * Returned support for multiple DMA ranges per-dMABUF.
+v0: https://lore.kernel.org/all/cover.1753274085.git.leonro@nvidia.com
 
-How do you think about to increase the application of scope-based resource=
- management?
-https://elixir.bootlin.com/linux/v6.17-rc7/source/include/linux/file.h#L97
+---------------------------------------------------------------------------
+Based on "[PATCH v6 00/16] dma-mapping: migrate to physical address-based API"
+https://lore.kernel.org/all/cover.1757423202.git.leonro@nvidia.com/ series.
+---------------------------------------------------------------------------
 
-Regards,
-Markus
+This series extends the VFIO PCI subsystem to support exporting MMIO
+regions from PCI device BARs as dma-buf objects, enabling safe sharing of
+non-struct page memory with controlled lifetime management. This allows RDMA
+and other subsystems to import dma-buf FDs and build them into memory regions
+for PCI P2P operations.
+
+The series supports a use case for SPDK where a NVMe device will be
+owned by SPDK through VFIO but interacting with a RDMA device. The RDMA
+device may directly access the NVMe CMB or directly manipulate the NVMe
+device's doorbell using PCI P2P.
+
+However, as a general mechanism, it can support many other scenarios with
+VFIO. This dmabuf approach can be usable by iommufd as well for generic
+and safe P2P mappings.
+
+In addition to the SPDK use-case mentioned above, the capability added
+in this patch series can also be useful when a buffer (located in device
+memory such as VRAM) needs to be shared between any two dGPU devices or
+instances (assuming one of them is bound to VFIO PCI) as long as they
+are P2P DMA compatible.
+
+The implementation provides a revocable attachment mechanism using dma-buf
+move operations. MMIO regions are normally pinned as BARs don't change
+physical addresses, but access is revoked when the VFIO device is closed
+or a PCI reset is issued. This ensures kernel self-defense against
+potentially hostile userspace.
+
+The series includes significant refactoring of the PCI P2PDMA subsystem
+to separate core P2P functionality from memory allocation features,
+making it more modular and suitable for VFIO use cases that don't need
+struct page support.
+
+-----------------------------------------------------------------------
+The series is based originally on
+https://lore.kernel.org/all/20250307052248.405803-1-vivek.kasireddy@intel.com/
+but heavily rewritten to be based on DMA physical API.
+-----------------------------------------------------------------------
+The WIP branch can be found here:
+https://git.kernel.org/pub/scm/linux/kernel/git/leon/linux-rdma.git/log/?h=dmabuf-vfio-v4
+
+Thanks
+
+Leon Romanovsky (8):
+  PCI/P2PDMA: Separate the mmap() support from the core logic
+  PCI/P2PDMA: Simplify bus address mapping API
+  PCI/P2PDMA: Refactor to separate core P2P functionality from memory
+    allocation
+  PCI/P2PDMA: Export pci_p2pdma_map_type() function
+  types: move phys_vec definition to common header
+  vfio/pci: Add dma-buf export config for MMIO regions
+  vfio/pci: Enable peer-to-peer DMA transactions by default
+  vfio/pci: Add dma-buf export support for MMIO regions
+
+Vivek Kasireddy (2):
+  vfio: Export vfio device get and put registration helpers
+  vfio/pci: Share the core device pointer while invoking feature
+    functions
+
+ block/blk-mq-dma.c                 |   7 +-
+ drivers/iommu/dma-iommu.c          |   4 +-
+ drivers/pci/p2pdma.c               | 177 +++++++++----
+ drivers/vfio/pci/Kconfig           |  20 ++
+ drivers/vfio/pci/Makefile          |   2 +
+ drivers/vfio/pci/vfio_pci_config.c |  22 +-
+ drivers/vfio/pci/vfio_pci_core.c   |  56 ++--
+ drivers/vfio/pci/vfio_pci_dmabuf.c | 398 +++++++++++++++++++++++++++++
+ drivers/vfio/pci/vfio_pci_priv.h   |  23 ++
+ drivers/vfio/vfio_main.c           |   2 +
+ include/linux/pci-p2pdma.h         | 120 +++++----
+ include/linux/types.h              |   5 +
+ include/linux/vfio.h               |   2 +
+ include/linux/vfio_pci_core.h      |   3 +
+ include/uapi/linux/vfio.h          |  25 ++
+ kernel/dma/direct.c                |   4 +-
+ mm/hmm.c                           |   2 +-
+ 17 files changed, 750 insertions(+), 122 deletions(-)
+ create mode 100644 drivers/vfio/pci/vfio_pci_dmabuf.c
+
+-- 
+2.51.0
+
