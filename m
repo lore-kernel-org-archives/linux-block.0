@@ -1,159 +1,150 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C78F81ADC97
-	for <linux-block@vger.kernel.org>; Sun, 28 Sep 2025 15:09:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EA9B256C6F
+	for <linux-block@vger.kernel.org>; Sun, 28 Sep 2025 18:42:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759072184; cv=none; b=phzOb+5i+D8FTV4YzxaZ3EDmHjxRcJrQok54/n7A0MT1jy2er5Bir7bf81wj1fyqXwTqUbWTwmlEe/VAJaXdweVtwNhhyh2E8eJLhfqnuD5wJiZ4SQIbLCi7tV8XXXqBarAfZ99eKjqkkz8AzsA5VwlpYAU+pUjLlZNm90KiXGM=
+	t=1759084944; cv=none; b=P+UvrplznRHlUOI/g5WxxaZam0ibSEMuIdNBCdJrxB2US0b9ovuPOoEyGOX507tYZmlF4mK8oTY1FeVNw7V3Qc+CMxv9f2MK3Er2hB9oqpMAFaiJEEkNk3b1vD2222k89+1eKaZWBhYxAcz6aXdplfTJrLKStqoUHbKzTNCqhRQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759072184; c=relaxed/simple;
-	bh=0Di0pr/Zg1D96T9Yo31r9mpw4j/uSvia4tTYhzGVfVw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OH4URfw+MAe+fz+o/7lPAeXCRLmOuzOTm5S9kHjn/cy1B/YK1XbseasAkxQunU97tInVe2xmOKVpo/KZvmDC5lmCq+PV90sA/mr9M4MHuimeseL4/gfB0fIb/nrSLaPXlW33k9AOmLkJWaPjgPuIou43VlTu6OO9SybRtVUBMic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Gg4EgO6D; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Gg4EgO6D"
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58S7U4t2026791;
-	Sun, 28 Sep 2025 15:09:31 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=JNpeYR
-	+IfQUFp0FlIyW2XW1Up7YQWvi6w8S3hBXfZ0Q=; b=Gg4EgO6DgbVe6ofWZakAQF
-	z4nxx0jfYGogJddxFPpBL2fm/ntBC8aWHuye7HTJunxC5SxziH2k9lrBxxwywh6S
-	vS4vLitQNTFxjK/tpvvfYhFfzw05r580deVaVoJ6argfAi1fcqb/Ld7DwbTU2jjh
-	r9rsX6fGlWS1Yv/BlSKpcA/XxI5AC2+Kb2XxOrlLiABr+s66GJHaTtZYkDSJKATP
-	R8bQU1JhIHt3GUMXXV90kC99uu1EdcKn2WQqBORmiUlSlzDAuga3sGAOQlTece/f
-	49XWqgDxK+DsHNkkIqFrfT4xArJCwak99qKpbHiHOwX3vNqvhwvkqcPfN79P+7SQ
-	==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 49e7ktx0d5-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sun, 28 Sep 2025 15:09:30 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 58SCCvRv003314;
-	Sun, 28 Sep 2025 15:09:29 GMT
-Received: from smtprelay05.wdc07v.mail.ibm.com ([172.16.1.72])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 49etmxj80x-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sun, 28 Sep 2025 15:09:29 +0000
-Received: from smtpav04.wdc07v.mail.ibm.com (smtpav04.wdc07v.mail.ibm.com [10.39.53.231])
-	by smtprelay05.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 58SF9T6N27656782
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Sun, 28 Sep 2025 15:09:29 GMT
-Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1CE0358045;
-	Sun, 28 Sep 2025 15:09:29 +0000 (GMT)
-Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C56C158052;
-	Sun, 28 Sep 2025 15:09:23 +0000 (GMT)
-Received: from [9.43.71.234] (unknown [9.43.71.234])
-	by smtpav04.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Sun, 28 Sep 2025 15:09:23 +0000 (GMT)
-Message-ID: <d9548c38-9e33-48c2-9ecc-b942a84dcfaa@linux.ibm.com>
-Date: Sun, 28 Sep 2025 20:39:20 +0530
+	s=arc-20240116; t=1759084944; c=relaxed/simple;
+	bh=ccQZincAL5ZyhGpKgORekV1QNw66LXSPLwp++bMwA+o=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=E6V9vE5MXD5Dwv1kRj7SEIhJcuCB0wZun54ZzAtA2ZA4kG4dgOb422wx0kJfrxOYIRcu9qYHV9EdS06p7JdOmxS8lhaITxm6sle5wwtJ+r9UwszoXDIrsXKj/qcGiAZC2bzioBdpvkF6YhHl+YuUKPydmj72LcRQkYkvTVMeLgg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-42594b7f324so72782605ab.1
+        for <linux-block@vger.kernel.org>; Sun, 28 Sep 2025 11:42:21 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759084940; x=1759689740;
+        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=UsjAgiyqvCt+9DZGFMPpXrkpwO3vzJ5qTcEbSGKlpi8=;
+        b=k2xurJjcN2Zq3N/PhKDxZ2Va4yacyE+5mSPrEcriuYgDV8DNVNNMgV6TOeDDkdpUpB
+         SAEZ/gpUdo0RwQeLuswHivH5p/WYX8wfTRqstPi/REFVIXC2L9o5lwfjtdyTLFkWOrMT
+         1srchAHUXXN47M9DcRzNt5dj2omqEGJXPRdD+Xo8+bv70OTK87lImRPwkXbiB8c3zxqx
+         Uhd123baYhP7NXIBAuqmJzAWo7J5F6iV9LMc7gzh6nM4hIaq7qYurHBidrR7VlKb1J/c
+         pdoLGpFPdyP3PNHzdw36we9GYeEmjYy7oGW071n+eSr4128ujGqY/PRsJqbF/qDeIRwi
+         tRBA==
+X-Forwarded-Encrypted: i=1; AJvYcCVbD0n2JF9Q9AU1BZaOD7dLhK7wzSdXcIlG/+hETYplbwZ7vCJiUDOjEunZMimPZ8xWByUK2GKYtvn/HA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwjXqs2vQ2mH/jUICtynupL6hxa5JEGcbBIFNmhtUzRVuI5KqMP
+	zpxx2cnBL/j3eKqL5wxFP+5P1b7BbMcTCH4f+kj6YvIT8NKLNlyFkgeIqlaP7nRGPTm2VE7iCvK
+	9w2YMr+XVeEFFmv5sBh+/xZXcmrQqB9B/zypENxy/kviO50jV2ILecDuPT9A=
+X-Google-Smtp-Source: AGHT+IFOMgny6AZoeKClnUtWwvvWlBtfpV/YOGECAMlY6kCDL9+DCaNziVGkIJErsIkHssksFdIXB1lS9Df2ZzUnKrqroofJYo46
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [BUG] Double-free in blk_mq_free_sched_tags() after commit
- f5a6604f7a44
-To: Ming Lei <ming.lei@redhat.com>, Niklas Fischer <niklas@niklasfi.de>
-Cc: linux-mm@kvack.org, linux-block@vger.kernel.org, vbabka@suse.cz,
-        akpm@linux-foundation.org, axboe@kernel.dk
-References: <37087b24-24f7-46a9-95c4-2a2f3dced09b@niklasfi.de>
- <CAFj5m9K+ct=ioJUz8v78Wr_myC7pjVnB1SAKRXc-CLysHV_5ww@mail.gmail.com>
-Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <CAFj5m9K+ct=ioJUz8v78Wr_myC7pjVnB1SAKRXc-CLysHV_5ww@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=T7WBjvKQ c=1 sm=1 tr=0 ts=68d94faa cx=c_pps
- a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
- a=IkcTkHD0fZMA:10 a=yJojWOMRYYMA:10 a=VwQbUJbxAAAA:8 a=BNlTfnLp_OdMHRcVVn4A:9
- a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10 a=cPQSjfK2_nFv0Q5t_7PE:22
- a=HhbK4dLum7pmb74im6QT:22 a=pHzHmUro8NiASowvMSCR:22 a=Ew2E2A-JSTLzCXPT_086:22
-X-Proofpoint-GUID: OUPLr9phSgYtTV7jg1Aq2OZUhzGes3_m
-X-Proofpoint-ORIG-GUID: OUPLr9phSgYtTV7jg1Aq2OZUhzGes3_m
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTI3MDAyNSBTYWx0ZWRfXx2ileBIFQfyt
- MTweuzUniWlioSf9ptg9rzOr3DPcLp5rnPZ1DxGjR4YOHVg8n8okNlzreGYIjTB/vueABS0ay1u
- I914xBZFgQvKlpan6zDV03iPgcUozEIHx+D/SS2SI7EgJ/nIMggaa3Dhmdiw92fv49L9rqURoWT
- Xqj/+9ZkmZhhqBq+6fyz/Ug6K6qvEEdsuLnqJcJjmLKDCqZNsNNA5MS6svlFZa1nun2W4PrKL03
- v5n5hx3gR4r6SKoDtd8b/cGm8E0/a4XtOOOsnFTVbN7XGq5o6Wl2cd6Utv6XMbY1720wwaEdne+
- gz79d0+jczXD2EP6syUfv1HMFsOagLfnntVggC0lqh+RoxfmiRNcforXgl12mzLfEbMV6GGsbmF
- 8e1oTYDknkPigXYoovbz3kOJn2jGCw==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-09-28_05,2025-09-26_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 clxscore=1011 spamscore=0 suspectscore=0 priorityscore=1501
- bulkscore=0 adultscore=0 lowpriorityscore=0 malwarescore=0 phishscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2509150000 definitions=main-2509270025
+X-Received: by 2002:a05:6e02:230a:b0:425:7788:871 with SMTP id
+ e9e14a558f8ab-42875791953mr109399565ab.12.1759084940438; Sun, 28 Sep 2025
+ 11:42:20 -0700 (PDT)
+Date: Sun, 28 Sep 2025 11:42:20 -0700
+In-Reply-To: <20250928132927.3672537-1-ming.lei@redhat.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68d9818c.a00a0220.102ee.002d.GAE@google.com>
+Subject: [syzbot ci] Re: loop: improve loop aio perf by IOCB_NOWAIT
+From: syzbot ci <syzbot+ci7622762f075d3fa0@syzkaller.appspotmail.com>
+To: axboe@kernel.dk, dchinner@redhat.com, hch@lst.de, 
+	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	ming.lei@redhat.com, mpatocka@redhat.com, zhaoyang.huang@unisoc.com
+Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+
+syzbot ci has tested the following series
+
+[v1] loop: improve loop aio perf by IOCB_NOWAIT
+https://lore.kernel.org/all/20250928132927.3672537-1-ming.lei@redhat.com
+* [PATCH V4 1/6] loop: add helper lo_cmd_nr_bvec()
+* [PATCH V4 2/6] loop: add helper lo_rw_aio_prep()
+* [PATCH V4 3/6] loop: add lo_submit_rw_aio()
+* [PATCH V4 4/6] loop: move command blkcg/memcg initialization into loop_queue_work
+* [PATCH V4 5/6] loop: try to handle loop aio command via NOWAIT IO first
+* [PATCH V4 6/6] loop: add hint for handling aio via IOCB_NOWAIT
+
+and found the following issue:
+WARNING in lo_submit_rw_aio
+
+Full report is available here:
+https://ci.syzbot.org/series/0ffdb6b4-a5fe-48da-9473-d2a926e780bd
+
+***
+
+WARNING in lo_submit_rw_aio
+
+tree:      torvalds
+URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/torvalds/linux
+base:      07e27ad16399afcd693be20211b0dfae63e0615f
+arch:      amd64
+compiler:  Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+config:    https://ci.syzbot.org/builds/3aba003b-2400-4e88-9a31-c09ab4e41a84/config
+C repro:   https://ci.syzbot.org/findings/dc97454c-d87b-41f5-a44a-7182e666cfd5/c_repro
+syz repro: https://ci.syzbot.org/findings/dc97454c-d87b-41f5-a44a-7182e666cfd5/syz_repro
+
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 5958 at drivers/block/loop.c:907 loop_inc_blocking_writes drivers/block/loop.c:907 [inline]
+WARNING: CPU: 0 PID: 5958 at drivers/block/loop.c:907 loop_queue_work+0xb3b/0xc30 drivers/block/loop.c:1005
+Modules linked in:
+CPU: 0 UID: 0 PID: 5958 Comm: udevd Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+RIP: 0010:loop_inc_blocking_writes drivers/block/loop.c:907 [inline]
+RIP: 0010:loop_queue_work+0xb3b/0xc30 drivers/block/loop.c:1005
+Code: 33 bf 08 00 00 00 4c 89 ea e8 c1 89 7e fb 4c 89 f7 48 83 c4 30 5b 41 5c 41 5d 41 5e 41 5f 5d e9 cb 87 71 05 e8 26 36 b4 fb 90 <0f> 0b 90 e9 4e fe ff ff e8 18 36 b4 fb 48 83 c5 18 48 89 e8 48 c1
+RSP: 0018:ffffc9000340ef38 EFLAGS: 00010093
+RAX: ffffffff860b776a RBX: ffff88802187c000 RCX: ffff88810cee3980
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+RBP: 0000000000000000 R08: 0000000000000003 R09: 0000000000000004
+R10: dffffc0000000000 R11: fffff52000681dc4 R12: ffff88802187c158
+R13: ffff88802187c110 R14: ffff888021989460 R15: ffff888021989418
+FS:  00007f649c5a4c80(0000) GS:ffff8880b8612000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000056520d53f000 CR3: 0000000109e48000 CR4: 00000000000006f0
+Call Trace:
+ <TASK>
+ lo_submit_rw_aio+0x493/0x620 drivers/block/loop.c:441
+ lo_rw_aio_nowait drivers/block/loop.c:508 [inline]
+ loop_queue_rq+0x64d/0x840 drivers/block/loop.c:2026
+ __blk_mq_issue_directly block/blk-mq.c:2695 [inline]
+ blk_mq_request_issue_directly+0x3c1/0x710 block/blk-mq.c:2782
+ blk_mq_issue_direct+0x2a0/0x660 block/blk-mq.c:2803
+ blk_mq_dispatch_queue_requests+0x621/0x800 block/blk-mq.c:2878
+ blk_mq_flush_plug_list+0x432/0x550 block/blk-mq.c:2961
+ __blk_flush_plug+0x3d3/0x4b0 block/blk-core.c:1220
+ blk_finish_plug+0x5e/0x90 block/blk-core.c:1247
+ read_pages+0x3b2/0x580 mm/readahead.c:173
+ page_cache_ra_unbounded+0x6b0/0x7b0 mm/readahead.c:297
+ do_page_cache_ra mm/readahead.c:327 [inline]
+ force_page_cache_ra mm/readahead.c:356 [inline]
+ page_cache_sync_ra+0x3b9/0xb10 mm/readahead.c:572
+ filemap_get_pages+0x43c/0x1ea0 mm/filemap.c:2603
+ filemap_read+0x3f6/0x11a0 mm/filemap.c:2712
+ blkdev_read_iter+0x30a/0x440 block/fops.c:852
+ new_sync_read fs/read_write.c:491 [inline]
+ vfs_read+0x55a/0xa30 fs/read_write.c:572
+ ksys_read+0x145/0x250 fs/read_write.c:715
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f649c116b6a
+Code: 00 3d 00 00 41 00 75 0d 50 48 8d 3d 2d 08 0a 00 e8 ea 7d 01 00 31 c0 e9 07 ff ff ff 64 8b 04 25 18 00 00 00 85 c0 75 1b 0f 05 <48> 3d 00 f0 ff ff 76 6c 48 8b 15 8f a2 0d 00 f7 d8 64 89 02 48 83
+RSP: 002b:00007ffd6597a888 EFLAGS: 00000246 ORIG_RAX: 0000000000000000
+RAX: ffffffffffffffda RBX: 0000000000040000 RCX: 00007f649c116b6a
+RDX: 0000000000040000 RSI: 000056520d500438 RDI: 0000000000000009
+RBP: 0000000000040000 R08: 000056520d500410 R09: 0000000000000010
+R10: 0000000000004011 R11: 0000000000000246 R12: 000056520d500410
+R13: 000056520d500428 R14: 000056520d3cf9c8 R15: 000056520d3cf970
+ </TASK>
 
 
+***
 
-On 9/28/25 6:48 PM, Ming Lei wrote:
-> On Sun, Sep 28, 2025 at 8:18 PM Niklas Fischer <niklas@niklasfi.de> wrote:
->>
->> Hello,
->>
->> I'm reporting a kernel crash that occurs during boot on systems with
->> multiple storage devices. The issue manifests as a double-free bug in
->> the SLUB allocator, triggered by block layer elevator switching code.
->>
->> === Problem Summary ===
->>
->> The system crashes during early boot when udev configures I/O schedulers
->> on multiple storage devices. The crash occurs in mm/slub.c with a
->> double-free detection, traced back to blk_mq_free_sched_tags().
->>
->> === Crash Details ===
->>
->> Multiple crashes occur during boot, showing a severe race condition.
->> Seven separate kernel oops/panics are observed:
->>
->> * Oops #1 (CPU 13, PID 928): General protection fault in
->> kfree+0x69/0x3b0 - corrupted address 0x14b9d856a995288
->> * Oops #2-4, #6-7 (multiple CPUs/PIDs): kernel BUG at mm/slub.c:546 in
->> __slab_free+0x111/0x2a0 - SLUB double-free detection
->> * Oops #5 (CPU 1, PID 952): General protection fault in kfree+0x69/0x3b0
->>     - corrupted address 0x2480af562995288
->>
->> All crashes share the same call stack pattern:
->>
->> elv_iosched_store+0x149/0x180
->> elevator_change+0xdb/0x180
->> elevator_change_done+0x4a/0x1f0
->> blk_mq_free_sched_tags+0x34/0x70
->> blk_mq_free_tags+0x4b/0x60
->> kfree+0x334/0x3b0  <-- crash here
->>
->> === Bisection Results ===
->>
->> I bisected the issue to this commit:
->>
->> commit f5a6604f7a4405450e4a1f54e5430f47290c500f
-> 
-> It should be solved by the following commit:
-> 
-> https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git/commit/?h=for-6.18/block&id=ba28afbd9eff2a6370f23ef4e6a036ab0cfda409
-> 
-> Thanks,
-> 
-Oh, I hadn’t noticed this message before sending my previous email.
-It’s quite possible that this could address the observed symptom, though 
-I didn’t see any traces of nr_request being modified in the provided 
-dmesg.txt. Nonetheless, this change could be a potential fix and may be
-worth trying out in a custom kernel.
+If these findings have caused you to resend the series or submit a
+separate fix, please add the following tag to your commit message:
+  Tested-by: syzbot@syzkaller.appspotmail.com
 
-Thanks,
---Nilay
-
+---
+This report is generated by a bot. It may contain errors.
+syzbot ci engineers can be reached at syzkaller@googlegroups.com.
