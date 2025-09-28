@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 827B9225760;
-	Sun, 28 Sep 2025 14:51:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A0B0225760;
+	Sun, 28 Sep 2025 14:51:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759071083; cv=none; b=nc0uNmpJlIzmyZrJhQH2vVOWyZXNyL+aIJ5Sf+xUYw4k0wYjUGwItCwAs5vmZGu/z8CAKz84JuQAbAzln3r9Fu3+uhn2KhoKST8JHzISiC9QLvQuNbU2Pr/f4MEFFwbsYufiJvZu6BpoNofeavPlFRvgLw16KJXNtcydKt1gMfg=
+	t=1759071087; cv=none; b=hjVJ0GN1FpF4ESCW9EnFga7WqrUIXOusYEYAUnNSMLBVb4KsPwWBvM153NciUSHCrhAw/HX5KFs3fMslqzcUSXFwKSZgO1pX1e8/lnUW2yxbAWOKfN9Ftt/sNdlh7+e5xOR4gjuLAPj+bCDRXKUZU6+sImc7s0wL4jZd4GLq2Gg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759071083; c=relaxed/simple;
-	bh=fAY5V8PbsSKOA8DvUuCvu1FfIH+Qj+BY2oelYoa+EDY=;
+	s=arc-20240116; t=1759071087; c=relaxed/simple;
+	bh=DKvwpCnqloOQP4gNjx4LpWv4LaALSpED/WAUwRqb9RQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=aLrzmO0bfzTuQvV+xNC2e20m/soSJtfLdtxiiNXvfoPvAZT+mx8wWryMuRsgJLHGdXcqcFYNlFAh4NYXUyDsARW98UigigYXEzsJx3UwOrovtvVi92oW+oNQTlO9pWRU1DR9hTmIrrU8Ei9Cpm0kbli49wAeLhJSVoIBYCMHLUw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=diwHskkp; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=buBqCu8Xx4mCOmc5+fykejaEs5bpWOzcC6PtGWqudcbIkc7G/WtKihXxRXNu4kjgjqswhynPcit/Ff/Y/Q/79idBsP4yRD7KEH4ZLQZ8MJ/HRIzpB9TTeBtSkkTG2bXVXdyJ4OXa32RdSYvmU5hkBoMLodpXvUUcHIhBJgaH48A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NLB5tQ50; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="diwHskkp"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9921FC16AAE;
-	Sun, 28 Sep 2025 14:51:22 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NLB5tQ50"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23892C4CEF0;
+	Sun, 28 Sep 2025 14:51:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759071083;
-	bh=fAY5V8PbsSKOA8DvUuCvu1FfIH+Qj+BY2oelYoa+EDY=;
+	s=k20201202; t=1759071086;
+	bh=DKvwpCnqloOQP4gNjx4LpWv4LaALSpED/WAUwRqb9RQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=diwHskkpa3p6F4VdCvgJNy/EuzDJs4pXPl6RrEDbNLJ+BIsyiUDIM19XjnlhulysH
-	 rUff5YhqMltcMVJB8vUQ8Hbls521E8SrbV2SSi9Ruen5VCuHXGzT6sOu5E0mM+Ha64
-	 AepfPnBfeSdUyrOCOcJXHT7GrTbHMCj7ayn8AI2JoHGjacPO43FjSGoZfZcrEvO0a6
-	 j8QcyHFEQqhTjoLomr+sI5S935XCMN+Zvin9FCunYI3SU3xX3h9kb8BtQHMobl7ftQ
-	 KQl4xsyBqIGAdnDA7itSE7WXLU2A5NvszEpo7tp7WMHg5UmpFoTFgJOxr+KTHl2v7+
-	 R/puZG9ARaI+A==
+	b=NLB5tQ504wyZ06bziwpYmGZs7d/65HLAkuIuZ2w4wn63OQWzA8bn3uwK2vY1fgyI7
+	 YteGOFAlizroxNAAuzQVXbCY9BcNIxlVfue87ttl/p7PYCe+EKehOJBOf/gVZL7//D
+	 n0laClD+mHZgAZM/Osi+VvseOvikIkXb3YMq3iu8apoVM0OBIeMSkcTfGVuSjG+EE9
+	 3kEM4QUMzbWESQaHowjOKmhur2RNOJQhGfp4qdw9S7QyYrhUnGD0GXrNplr9mN60YV
+	 6Lr/kXRnTMWDPREa03fJk816RxmBwA7pvVuO5H7m9HKib+l/yxguspmf3YaWOSj33n
+	 pNZ5pv/0Y7MIw==
 From: Leon Romanovsky <leon@kernel.org>
 To: Alex Williamson <alex.williamson@redhat.com>
 Cc: Leon Romanovsky <leonro@nvidia.com>,
@@ -50,9 +50,9 @@ Cc: Leon Romanovsky <leonro@nvidia.com>,
 	Sumit Semwal <sumit.semwal@linaro.org>,
 	Vivek Kasireddy <vivek.kasireddy@intel.com>,
 	Will Deacon <will@kernel.org>
-Subject: [PATCH v4 02/10] PCI/P2PDMA: Simplify bus address mapping API
-Date: Sun, 28 Sep 2025 17:50:12 +0300
-Message-ID: <ce571cf4ddad1f9d4876365fc3c6ffb9321558a4.1759070796.git.leon@kernel.org>
+Subject: [PATCH v4 07/10] vfio/pci: Add dma-buf export config for MMIO regions
+Date: Sun, 28 Sep 2025 17:50:17 +0300
+Message-ID: <b1b44823f93fd9e7fa73dc165141d716cb74fa90.1759070796.git.leon@kernel.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <cover.1759070796.git.leon@kernel.org>
 References: <cover.1759070796.git.leon@kernel.org>
@@ -66,106 +66,45 @@ Content-Transfer-Encoding: 8bit
 
 From: Leon Romanovsky <leonro@nvidia.com>
 
-Update the pci_p2pdma_bus_addr_map() function to take a direct pointer
-to the p2pdma_provider structure instead of the pci_p2pdma_map_state.
-This simplifies the API by removing the need for callers to extract
-the provider from the state structure.
-
-The change updates all callers across the kernel (block layer, IOMMU,
-DMA direct, and HMM) to pass the provider pointer directly, making
-the code more explicit and reducing unnecessary indirection. This
-also removes the runtime warning check since callers now have direct
-control over which provider they use.
+Add new kernel config which indicates support for dma-buf export
+of MMIO regions, which implementation is provided in next patches.
 
 Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
 ---
- block/blk-mq-dma.c         | 2 +-
- drivers/iommu/dma-iommu.c  | 4 ++--
- include/linux/pci-p2pdma.h | 7 +++----
- kernel/dma/direct.c        | 4 ++--
- mm/hmm.c                   | 2 +-
- 5 files changed, 9 insertions(+), 10 deletions(-)
+ drivers/vfio/pci/Kconfig | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
-diff --git a/block/blk-mq-dma.c b/block/blk-mq-dma.c
-index d415088ed9fd..430e51ec494a 100644
---- a/block/blk-mq-dma.c
-+++ b/block/blk-mq-dma.c
-@@ -79,7 +79,7 @@ static inline bool blk_can_dma_map_iova(struct request *req,
+diff --git a/drivers/vfio/pci/Kconfig b/drivers/vfio/pci/Kconfig
+index 2b0172f54665..55ae888bf26a 100644
+--- a/drivers/vfio/pci/Kconfig
++++ b/drivers/vfio/pci/Kconfig
+@@ -55,6 +55,26 @@ config VFIO_PCI_ZDEV_KVM
  
- static bool blk_dma_map_bus(struct blk_dma_iter *iter, struct phys_vec *vec)
- {
--	iter->addr = pci_p2pdma_bus_addr_map(&iter->p2pdma, vec->paddr);
-+	iter->addr = pci_p2pdma_bus_addr_map(iter->p2pdma.mem, vec->paddr);
- 	iter->len = vec->len;
- 	return true;
- }
-diff --git a/drivers/iommu/dma-iommu.c b/drivers/iommu/dma-iommu.c
-index 7944a3af4545..e52d19d2e833 100644
---- a/drivers/iommu/dma-iommu.c
-+++ b/drivers/iommu/dma-iommu.c
-@@ -1439,8 +1439,8 @@ int iommu_dma_map_sg(struct device *dev, struct scatterlist *sg, int nents,
- 			 * as a bus address, __finalise_sg() will copy the dma
- 			 * address into the output segment.
- 			 */
--			s->dma_address = pci_p2pdma_bus_addr_map(&p2pdma_state,
--						sg_phys(s));
-+			s->dma_address = pci_p2pdma_bus_addr_map(
-+				p2pdma_state.mem, sg_phys(s));
- 			sg_dma_len(s) = sg->length;
- 			sg_dma_mark_bus_address(s);
- 			continue;
-diff --git a/include/linux/pci-p2pdma.h b/include/linux/pci-p2pdma.h
-index 27a2c399f47d..eef96636c67e 100644
---- a/include/linux/pci-p2pdma.h
-+++ b/include/linux/pci-p2pdma.h
-@@ -186,16 +186,15 @@ pci_p2pdma_state(struct pci_p2pdma_map_state *state, struct device *dev,
- /**
-  * pci_p2pdma_bus_addr_map - Translate a physical address to a bus address
-  *			     for a PCI_P2PDMA_MAP_BUS_ADDR transfer.
-- * @state:	P2P state structure
-+ * @provider:	P2P provider structure
-  * @paddr:	physical address to map
-  *
-  * Map a physically contiguous PCI_P2PDMA_MAP_BUS_ADDR transfer.
-  */
- static inline dma_addr_t
--pci_p2pdma_bus_addr_map(struct pci_p2pdma_map_state *state, phys_addr_t paddr)
-+pci_p2pdma_bus_addr_map(struct p2pdma_provider *provider, phys_addr_t paddr)
- {
--	WARN_ON_ONCE(state->map != PCI_P2PDMA_MAP_BUS_ADDR);
--	return paddr + state->mem->bus_offset;
-+	return paddr + provider->bus_offset;
- }
+ 	  To enable s390x KVM vfio-pci extensions, say Y.
  
- #endif /* _LINUX_PCI_P2P_H */
-diff --git a/kernel/dma/direct.c b/kernel/dma/direct.c
-index 1062caac47e7..3e058c99fe85 100644
---- a/kernel/dma/direct.c
-+++ b/kernel/dma/direct.c
-@@ -484,8 +484,8 @@ int dma_direct_map_sg(struct device *dev, struct scatterlist *sgl, int nents,
- 			}
- 			break;
- 		case PCI_P2PDMA_MAP_BUS_ADDR:
--			sg->dma_address = pci_p2pdma_bus_addr_map(&p2pdma_state,
--					sg_phys(sg));
-+			sg->dma_address = pci_p2pdma_bus_addr_map(
-+				p2pdma_state.mem, sg_phys(sg));
- 			sg_dma_mark_bus_address(sg);
- 			continue;
- 		default:
-diff --git a/mm/hmm.c b/mm/hmm.c
-index 6556c0e074ba..012b78688fa1 100644
---- a/mm/hmm.c
-+++ b/mm/hmm.c
-@@ -751,7 +751,7 @@ dma_addr_t hmm_dma_map_pfn(struct device *dev, struct hmm_dma_map *map,
- 		break;
- 	case PCI_P2PDMA_MAP_BUS_ADDR:
- 		pfns[idx] |= HMM_PFN_P2PDMA_BUS | HMM_PFN_DMA_MAPPED;
--		return pci_p2pdma_bus_addr_map(p2pdma_state, paddr);
-+		return pci_p2pdma_bus_addr_map(p2pdma_state->mem, paddr);
- 	default:
- 		return DMA_MAPPING_ERROR;
- 	}
++config VFIO_PCI_DMABUF
++	bool "VFIO PCI extensions for DMA-BUF"
++	depends on VFIO_PCI_CORE
++	depends on PCI_P2PDMA && DMA_SHARED_BUFFER
++	default y
++	help
++	  Enable support for VFIO PCI extensions that allow exporting
++	  device MMIO regions as DMA-BUFs for peer devices to access via
++	  peer-to-peer (P2P) DMA.
++
++	  This feature enables a VFIO-managed PCI device to export a portion
++	  of its MMIO BAR as a DMA-BUF file descriptor, which can be passed
++	  to other userspace drivers or kernel subsystems capable of
++	  initiating DMA to that region.
++
++	  Say Y here if you want to enable VFIO DMABUF-based MMIO export
++	  support for peer-to-peer DMA use cases.
++
++	  If unsure, say N.
++
+ source "drivers/vfio/pci/mlx5/Kconfig"
+ 
+ source "drivers/vfio/pci/hisilicon/Kconfig"
 -- 
 2.51.0
 
