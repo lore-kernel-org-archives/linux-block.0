@@ -1,150 +1,78 @@
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EA9B256C6F
-	for <linux-block@vger.kernel.org>; Sun, 28 Sep 2025 18:42:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E34B275B16
+	for <linux-block@vger.kernel.org>; Sun, 28 Sep 2025 20:12:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759084944; cv=none; b=P+UvrplznRHlUOI/g5WxxaZam0ibSEMuIdNBCdJrxB2US0b9ovuPOoEyGOX507tYZmlF4mK8oTY1FeVNw7V3Qc+CMxv9f2MK3Er2hB9oqpMAFaiJEEkNk3b1vD2222k89+1eKaZWBhYxAcz6aXdplfTJrLKStqoUHbKzTNCqhRQ=
+	t=1759090324; cv=none; b=dyUGs0IiU43RiErTbMJm8mC4eKBjA50cfnjfxdMSshDYU+KshpcpWQcQyXF97PO/F0KE7djr1jo+FJi5eR0img5/PcbvGIzKGq9A1tnCmkvxyfOsRxnVzdCTOjHvWAgOTMGpfJ6ejvKngMaqzUn+i9PHWEkUuBBTIZParVgbr7I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759084944; c=relaxed/simple;
-	bh=ccQZincAL5ZyhGpKgORekV1QNw66LXSPLwp++bMwA+o=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=E6V9vE5MXD5Dwv1kRj7SEIhJcuCB0wZun54ZzAtA2ZA4kG4dgOb422wx0kJfrxOYIRcu9qYHV9EdS06p7JdOmxS8lhaITxm6sle5wwtJ+r9UwszoXDIrsXKj/qcGiAZC2bzioBdpvkF6YhHl+YuUKPydmj72LcRQkYkvTVMeLgg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
+	s=arc-20240116; t=1759090324; c=relaxed/simple;
+	bh=0RbFeTDokiBIDFXYwXhTqeTngrPJxIKeMT9v6nJhPYk=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=u+3NE+3aAOAwkT86NO/gq40iU9sLNzCJ2Cp0f8H/hkh/fQ/+pCbx8xskVr+N2QWbLlIoqI289ShIhBEb85Ch4i+d8rA+nJ2SoqcLHk2lA4hSB5aVh8pe5HPYDFHM6KcRBRgbbdc1YJScQTC0+h664zH+Mxl+MlvkpHMMSG0FwA8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-42594b7f324so72782605ab.1
-        for <linux-block@vger.kernel.org>; Sun, 28 Sep 2025 11:42:21 -0700 (PDT)
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-4294d3057ffso16054795ab.0
+        for <linux-block@vger.kernel.org>; Sun, 28 Sep 2025 13:12:02 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759084940; x=1759689740;
-        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
+        d=1e100.net; s=20230601; t=1759090322; x=1759695122;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UsjAgiyqvCt+9DZGFMPpXrkpwO3vzJ5qTcEbSGKlpi8=;
-        b=k2xurJjcN2Zq3N/PhKDxZ2Va4yacyE+5mSPrEcriuYgDV8DNVNNMgV6TOeDDkdpUpB
-         SAEZ/gpUdo0RwQeLuswHivH5p/WYX8wfTRqstPi/REFVIXC2L9o5lwfjtdyTLFkWOrMT
-         1srchAHUXXN47M9DcRzNt5dj2omqEGJXPRdD+Xo8+bv70OTK87lImRPwkXbiB8c3zxqx
-         Uhd123baYhP7NXIBAuqmJzAWo7J5F6iV9LMc7gzh6nM4hIaq7qYurHBidrR7VlKb1J/c
-         pdoLGpFPdyP3PNHzdw36we9GYeEmjYy7oGW071n+eSr4128ujGqY/PRsJqbF/qDeIRwi
-         tRBA==
-X-Forwarded-Encrypted: i=1; AJvYcCVbD0n2JF9Q9AU1BZaOD7dLhK7wzSdXcIlG/+hETYplbwZ7vCJiUDOjEunZMimPZ8xWByUK2GKYtvn/HA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwjXqs2vQ2mH/jUICtynupL6hxa5JEGcbBIFNmhtUzRVuI5KqMP
-	zpxx2cnBL/j3eKqL5wxFP+5P1b7BbMcTCH4f+kj6YvIT8NKLNlyFkgeIqlaP7nRGPTm2VE7iCvK
-	9w2YMr+XVeEFFmv5sBh+/xZXcmrQqB9B/zypENxy/kviO50jV2ILecDuPT9A=
-X-Google-Smtp-Source: AGHT+IFOMgny6AZoeKClnUtWwvvWlBtfpV/YOGECAMlY6kCDL9+DCaNziVGkIJErsIkHssksFdIXB1lS9Df2ZzUnKrqroofJYo46
+        bh=DaduVv8+j9xG9g2Olc4KfHdOBiR7JfOMthlP5Ksd0K8=;
+        b=qPhaRT/YT0x71x88pVi7dS2WFRbE3jU0xWENQc9lZzKwsjAfEg/X74UZahOuVpIItW
+         HhnN3X8hSv/id0Vqxj4MQ6kcL/bmu7k0Ulv3vEy3O2CzflBhSsy5nolx5lZiaglZ2ZeI
+         M39WnqSxQr4xUkyCsyvzi6mTavEq1mNgCSuMu3byMxuFiB3J09lrNH5D8Bp3qBCbYQ7D
+         O7OzLJMmr+Uesr34xyvg5KEJIpXAYBl7phTtX2QtwHg+Q18MxGmqr6qBCfspzJURNCZJ
+         huNC0Sf39aRV5H8v+VcaKMdCSQ1TxR5MmdQkIR9U4FDvJ9GsMRfQqnKY8n3C+oxpO1HE
+         B4GA==
+X-Forwarded-Encrypted: i=1; AJvYcCUAhMPTsPwoaijFCzPGSUhbxbW1RhxlnJ44FUvx1FfawLYaTc2843Zc3OdJ9KOIox9WaC5+GN9BXQuZ3w==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxaeg3zyhTjMK0HDPJOH9pZfoxf5rNPDUCW2APN23BeCr3o2yb3
+	4ZqU8S00MNOHyZtZ/fvLmRKptNKrKQ4IBYodxORR4VrKtHwFtE0wiC0/s+mnJinzO98EHB9xoNd
+	Uk/Nl/sTJW2GQIKgJmp1e6uWUCbYuN/jMpuCVD9sJZDR2APLG9umxToaQl8c=
+X-Google-Smtp-Source: AGHT+IFe1cPN5hHZibJvP6cJECKOPK7CIGqP3ONZivzTbEMVJkCeWmbblnq11+o6oAttzrZ2589qumHKCObY7OyIrrC974/LLSD2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:230a:b0:425:7788:871 with SMTP id
- e9e14a558f8ab-42875791953mr109399565ab.12.1759084940438; Sun, 28 Sep 2025
- 11:42:20 -0700 (PDT)
-Date: Sun, 28 Sep 2025 11:42:20 -0700
-In-Reply-To: <20250928132927.3672537-1-ming.lei@redhat.com>
+X-Received: by 2002:a05:6e02:3c83:b0:426:c373:25db with SMTP id
+ e9e14a558f8ab-426c3732a86mr162405485ab.4.1759090322279; Sun, 28 Sep 2025
+ 13:12:02 -0700 (PDT)
+Date: Sun, 28 Sep 2025 13:12:02 -0700
+In-Reply-To: <68769347.a70a0220.693ce.0013.GAE@google.com>
 X-Google-Appengine-App-Id: s~syzkaller
 X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68d9818c.a00a0220.102ee.002d.GAE@google.com>
-Subject: [syzbot ci] Re: loop: improve loop aio perf by IOCB_NOWAIT
-From: syzbot ci <syzbot+ci7622762f075d3fa0@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, dchinner@redhat.com, hch@lst.de, 
-	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	ming.lei@redhat.com, mpatocka@redhat.com, zhaoyang.huang@unisoc.com
-Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
+Message-ID: <68d99692.a70a0220.10c4b.0027.GAE@google.com>
+Subject: Re: [syzbot] [block?] [trace?] INFO: task hung in blk_trace_setup (4)
+From: syzbot <syzbot+9c1ebb9957045e00ac63@syzkaller.appspotmail.com>
+To: axboe@kernel.dk, davem@davemloft.net, jiri@nvidia.com, kuba@kernel.org, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-trace-kernel@vger.kernel.org, mathieu.desnoyers@efficios.com, 
+	mhiramat@kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	rostedt@goodmis.org, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
 
-syzbot ci has tested the following series
+syzbot has bisected this issue to:
 
-[v1] loop: improve loop aio perf by IOCB_NOWAIT
-https://lore.kernel.org/all/20250928132927.3672537-1-ming.lei@redhat.com
-* [PATCH V4 1/6] loop: add helper lo_cmd_nr_bvec()
-* [PATCH V4 2/6] loop: add helper lo_rw_aio_prep()
-* [PATCH V4 3/6] loop: add lo_submit_rw_aio()
-* [PATCH V4 4/6] loop: move command blkcg/memcg initialization into loop_queue_work
-* [PATCH V4 5/6] loop: try to handle loop aio command via NOWAIT IO first
-* [PATCH V4 6/6] loop: add hint for handling aio via IOCB_NOWAIT
+commit c2368b19807affd7621f7c4638cd2e17fec13021
+Author: Jiri Pirko <jiri@nvidia.com>
+Date:   Fri Jul 29 07:10:35 2022 +0000
 
-and found the following issue:
-WARNING in lo_submit_rw_aio
+    net: devlink: introduce "unregistering" mark and use it during devlinks iteration
 
-Full report is available here:
-https://ci.syzbot.org/series/0ffdb6b4-a5fe-48da-9473-d2a926e780bd
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=12620ae2580000
+start commit:   347e9f5043c8 Linux 6.16-rc6
+git tree:       upstream
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=11620ae2580000
+console output: https://syzkaller.appspot.com/x/log.txt?x=16620ae2580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=f62a2ef17395702a
+dashboard link: https://syzkaller.appspot.com/bug?extid=9c1ebb9957045e00ac63
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=138dfd82580000
 
-***
+Reported-by: syzbot+9c1ebb9957045e00ac63@syzkaller.appspotmail.com
+Fixes: c2368b19807a ("net: devlink: introduce "unregistering" mark and use it during devlinks iteration")
 
-WARNING in lo_submit_rw_aio
-
-tree:      torvalds
-URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/torvalds/linux
-base:      07e27ad16399afcd693be20211b0dfae63e0615f
-arch:      amd64
-compiler:  Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-config:    https://ci.syzbot.org/builds/3aba003b-2400-4e88-9a31-c09ab4e41a84/config
-C repro:   https://ci.syzbot.org/findings/dc97454c-d87b-41f5-a44a-7182e666cfd5/c_repro
-syz repro: https://ci.syzbot.org/findings/dc97454c-d87b-41f5-a44a-7182e666cfd5/syz_repro
-
-------------[ cut here ]------------
-WARNING: CPU: 0 PID: 5958 at drivers/block/loop.c:907 loop_inc_blocking_writes drivers/block/loop.c:907 [inline]
-WARNING: CPU: 0 PID: 5958 at drivers/block/loop.c:907 loop_queue_work+0xb3b/0xc30 drivers/block/loop.c:1005
-Modules linked in:
-CPU: 0 UID: 0 PID: 5958 Comm: udevd Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-RIP: 0010:loop_inc_blocking_writes drivers/block/loop.c:907 [inline]
-RIP: 0010:loop_queue_work+0xb3b/0xc30 drivers/block/loop.c:1005
-Code: 33 bf 08 00 00 00 4c 89 ea e8 c1 89 7e fb 4c 89 f7 48 83 c4 30 5b 41 5c 41 5d 41 5e 41 5f 5d e9 cb 87 71 05 e8 26 36 b4 fb 90 <0f> 0b 90 e9 4e fe ff ff e8 18 36 b4 fb 48 83 c5 18 48 89 e8 48 c1
-RSP: 0018:ffffc9000340ef38 EFLAGS: 00010093
-RAX: ffffffff860b776a RBX: ffff88802187c000 RCX: ffff88810cee3980
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
-RBP: 0000000000000000 R08: 0000000000000003 R09: 0000000000000004
-R10: dffffc0000000000 R11: fffff52000681dc4 R12: ffff88802187c158
-R13: ffff88802187c110 R14: ffff888021989460 R15: ffff888021989418
-FS:  00007f649c5a4c80(0000) GS:ffff8880b8612000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000056520d53f000 CR3: 0000000109e48000 CR4: 00000000000006f0
-Call Trace:
- <TASK>
- lo_submit_rw_aio+0x493/0x620 drivers/block/loop.c:441
- lo_rw_aio_nowait drivers/block/loop.c:508 [inline]
- loop_queue_rq+0x64d/0x840 drivers/block/loop.c:2026
- __blk_mq_issue_directly block/blk-mq.c:2695 [inline]
- blk_mq_request_issue_directly+0x3c1/0x710 block/blk-mq.c:2782
- blk_mq_issue_direct+0x2a0/0x660 block/blk-mq.c:2803
- blk_mq_dispatch_queue_requests+0x621/0x800 block/blk-mq.c:2878
- blk_mq_flush_plug_list+0x432/0x550 block/blk-mq.c:2961
- __blk_flush_plug+0x3d3/0x4b0 block/blk-core.c:1220
- blk_finish_plug+0x5e/0x90 block/blk-core.c:1247
- read_pages+0x3b2/0x580 mm/readahead.c:173
- page_cache_ra_unbounded+0x6b0/0x7b0 mm/readahead.c:297
- do_page_cache_ra mm/readahead.c:327 [inline]
- force_page_cache_ra mm/readahead.c:356 [inline]
- page_cache_sync_ra+0x3b9/0xb10 mm/readahead.c:572
- filemap_get_pages+0x43c/0x1ea0 mm/filemap.c:2603
- filemap_read+0x3f6/0x11a0 mm/filemap.c:2712
- blkdev_read_iter+0x30a/0x440 block/fops.c:852
- new_sync_read fs/read_write.c:491 [inline]
- vfs_read+0x55a/0xa30 fs/read_write.c:572
- ksys_read+0x145/0x250 fs/read_write.c:715
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f649c116b6a
-Code: 00 3d 00 00 41 00 75 0d 50 48 8d 3d 2d 08 0a 00 e8 ea 7d 01 00 31 c0 e9 07 ff ff ff 64 8b 04 25 18 00 00 00 85 c0 75 1b 0f 05 <48> 3d 00 f0 ff ff 76 6c 48 8b 15 8f a2 0d 00 f7 d8 64 89 02 48 83
-RSP: 002b:00007ffd6597a888 EFLAGS: 00000246 ORIG_RAX: 0000000000000000
-RAX: ffffffffffffffda RBX: 0000000000040000 RCX: 00007f649c116b6a
-RDX: 0000000000040000 RSI: 000056520d500438 RDI: 0000000000000009
-RBP: 0000000000040000 R08: 000056520d500410 R09: 0000000000000010
-R10: 0000000000004011 R11: 0000000000000246 R12: 000056520d500410
-R13: 000056520d500428 R14: 000056520d3cf9c8 R15: 000056520d3cf970
- </TASK>
-
-
-***
-
-If these findings have caused you to resend the series or submit a
-separate fix, please add the following tag to your commit message:
-  Tested-by: syzbot@syzkaller.appspotmail.com
-
----
-This report is generated by a bot. It may contain errors.
-syzbot ci engineers can be reached at syzkaller@googlegroups.com.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
