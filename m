@@ -1,112 +1,112 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7698E555
-	for <linux-block@vger.kernel.org>; Mon, 29 Sep 2025 15:02:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE3E1245014
+	for <linux-block@vger.kernel.org>; Mon, 29 Sep 2025 19:57:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759158137; cv=none; b=FqnscDCTL1OApshbSak3fpSGpvFZdqG2/giiKbpXjXzjAdM3suebNz85QlibwLTuEAKKzc+mds6+KgTiFduGLH9RpoMcQ946F+1WQU1g8pLOERoL5nJw+AeHwwHLvaiBE25dVNw/WQz8kdCaZJj+3pRmBAO/cZD0oSv4yy6FnBw=
+	t=1759175864; cv=none; b=EN2H8e6QwdnLuy0xHEgYWCVaJTSREtZwGVQAV/pPNZTO7jEitsPpEcepPJnHUor/KdP/Njmpi9FOIiGHlB3rOI+/9SR5RCOJ8YcN1lcJsHm9NTq9Bio8CWLvGIJrzzZLfKOC51G99ps//wteSMqta8JOrUXDoVnMhmd3KYv8UuU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759158137; c=relaxed/simple;
-	bh=5mApbppp98IoLmLnjxv5jLlE73kH0Xbow0oj0C24KuM=;
+	s=arc-20240116; t=1759175864; c=relaxed/simple;
+	bh=ILAe+VRfX0Fc+b5qLvaJzfBUJ4qz7jOpbJP92apYs7g=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Yjyc7jR+f+ZgZVd4w+bwai1fE7lFHCWY7NPnZMrBfsCf0yzxf3DrKADlqZuV626l2tbNU+4a9SRwo7PnygciDQvEJ6gbGwc6cHIZ79GpeE1KlajTndXaM05/IKQStWHPU3wHiQkoSufw42DqBEWG/RfZfkPqsmDBxeDDtqEURxQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZxJ4zkZ3; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 To:Cc:Content-Type; b=WQMGpaVXlabeFR1oYqUaQLh5XVI1d4V0eK2CMFZj/xn+jUa1b6iiFe++vfVqWGl13mxtUlp5d/sWDszmp9zEPUOWQ1NuBFOkV4hhmGujV3t7WpQdjNkpQPxHLQDh+TDmIbSHAliyjEPzatLRv5UgWsRXGp7GbaQx5sltI60RKVY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U5RB08Jd; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZxJ4zkZ3"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1759158134;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qUZ+nrFNJvugmnH/mfkTXbsSGFlwrwfUzJJqGCuNdv4=;
-	b=ZxJ4zkZ3KQ/1NkDsHx+ENfpWnzeN5nsOExKcWHLiBT3z7Rz/Jwe7gKxySrddz+RZih9V6f
-	uYUaj2VS6XDK+c6TZppGq52bSk5hnjq/AgPirNyUTiJQwZf+2PtF18/yr7LmbmV+v+pYgg
-	2NCtXIdlwKOckVa4RQMrGiEoHGeddn4=
-Received: from mail-vs1-f71.google.com (mail-vs1-f71.google.com
- [209.85.217.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-457-NJ9tJ2ZCMma8jKSN6DMz1g-1; Mon, 29 Sep 2025 11:02:13 -0400
-X-MC-Unique: NJ9tJ2ZCMma8jKSN6DMz1g-1
-X-Mimecast-MFC-AGG-ID: NJ9tJ2ZCMma8jKSN6DMz1g_1759158132
-Received: by mail-vs1-f71.google.com with SMTP id ada2fe7eead31-5b3e57d9e37so5078171137.0
-        for <linux-block@vger.kernel.org>; Mon, 29 Sep 2025 08:02:13 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U5RB08Jd"
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2680ee37b21so9800645ad.0
+        for <linux-block@vger.kernel.org>; Mon, 29 Sep 2025 12:57:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1759175862; x=1759780662; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ILAe+VRfX0Fc+b5qLvaJzfBUJ4qz7jOpbJP92apYs7g=;
+        b=U5RB08Jdp+02qM+f5Mp+vuiVmfSvgvAx9OiS9eb/dfT+moX3pfMb+UYBBkKAocEnWD
+         lb08aQk8t3PnXYbC6FKFPEpeNN+0C3ZK5K8O+tVbR+xM/l1tcssKZVmm03IKwOTCHEle
+         otJ3pGwplRt2pfEJJEZvwsiu9yLStl62IrDFTM2XX7CeRRpwmQk921H0CmTYR3OS71XF
+         NekIyiGHf8khHUgEJ7/Wg2ZlzVBCZ0wFeOg6ADpKhHUA9qnm0NL23qr46rSElBRBhtmX
+         ruanjoQ1J/SgQ4bkiNZDbqTlMP5Xkn+l9J62YsWvCV6Vi6j5khk+VeQK0XuWqSD6UIog
+         WvXg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759158132; x=1759762932;
+        d=1e100.net; s=20230601; t=1759175862; x=1759780662;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=qUZ+nrFNJvugmnH/mfkTXbsSGFlwrwfUzJJqGCuNdv4=;
-        b=btViouJuVX41zIXg9NSyV/EPgvCYlmxFXtwOp4HVaNwi2t7mhrophVdLRrvezpHzNh
-         VGAY4QQTD+mB1Jp6I7HqsqAiYBS+D5dp+8yPVKnucdlxPad7KrcvtllBYaDQl9Qasb17
-         C1cMrKclvYXNUrKE7vXfxXNb12K5k5VapQb0UIRpswyjhij1dYyh+uN4/C7lXx+qp7Zs
-         HZ4llko37Pw8Udor8cm/e5ANcVPPrTMPl+XS9THhnPu6UMNeEUzuM2XjxLqXG90rBCcz
-         tfSjvyvf95txeGzwJDeHefMsSnVA9N0+yoL4NC6KBYgMiIGrKjbWAtxIjKGKTpIfqu5L
-         Z5Nw==
-X-Forwarded-Encrypted: i=1; AJvYcCWdgaqRZB3LlAaKdx9w3BZ8bjKkeCY3DZTTU6m7qKh/ll3v2TjO0++zxk/Tivg4O1J5RwZNkxW9n5C8Jg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyUtA82mLmjV4SCgAIBaz4FZwtPpIYGN3W3ArZUuiyKm2G2jQzc
-	KhBY1ReTslpYsh6ka9pge2DwBRLfGziPzbuy4Xdzw4A7pTLMNIKl1MDllS1qwzAT/roybRM8gMS
-	ppwIbuSH9DZIwoxQhPcvqfBzEW+XFQ9Xcudgx4WAip5onZOm3Eynbrj0JEQC49PxOpUNohqxAl4
-	u5cA8iefJZqfC7DLIFEgnQYd+zT6l7UkZfQTwJJtc=
-X-Gm-Gg: ASbGncubOXVQ1vANoTUQBR9J7e5ubxQVUHdpkxBmDlwiRjmxnhHrLti12Nfwkt7D5HF
-	G89ZXwMBAoR72XdrmMMjg2S4qyw/9Jh4IqhEfV9LnZATzeLsLM8FxMFsvVQdUp5pH83ZiXCSYG3
-	o+Srb+W+nFeZG4As5GosfF8Q==
-X-Received: by 2002:a05:6102:2907:b0:523:d0d7:b963 with SMTP id ada2fe7eead31-5accfbb9a41mr4570254137.22.1759158128584;
-        Mon, 29 Sep 2025 08:02:08 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE5o3Fh5NHpfh14EAFku8FFD1FNX9jDym8l+iTw0lA93A8OiLv/2ttBnLrVEyNpSA/mfjaMgdkDvrTr7K9j8E0=
-X-Received: by 2002:a05:6102:2907:b0:523:d0d7:b963 with SMTP id
- ada2fe7eead31-5accfbb9a41mr4569412137.22.1759158121642; Mon, 29 Sep 2025
- 08:02:01 -0700 (PDT)
+        bh=ILAe+VRfX0Fc+b5qLvaJzfBUJ4qz7jOpbJP92apYs7g=;
+        b=oJKD1sus75Cil/9qVaCsKlgdUx8xW8n6X8/qNS/0EiFCzan9wrJws5AMnb894lYoW6
+         dzcEJy6zCaZ0O3BQc+8HSgqiQhPH0DeANr6qZitryVGqkp281rCJLKmKJs62LQwedIrA
+         e0W6BP1iQsfV4y4QlCRsVX1XX/0B5qvE/4vVjgRjnTTGaO8kgmU3oQYV4jKt5j6ijgzt
+         vN6OfjXvfzn8b4KeT0p7w3Sa8pxKaq8jluVzUbR2lJO7PR8J54qPEB9lv/o6Vvugs6X+
+         23msO5z3hhhB6PXMkjXTarcgAR5Ytyjy4riwldsEy6xjWCuan6uvmyTMlnzUU+x5aBAZ
+         cDOw==
+X-Forwarded-Encrypted: i=1; AJvYcCU4Ly+lEYawcifs5f+KOTTvUBb8uatbbffI0WxUSCMfi3gGkFbFQ7WH4hWbaTyPULW0KvLvtZ990XbnUQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwgY8CZbKOJLV2SkumDOS1VrXW2RuTYKEARRvKepFNmplCcHcMH
+	eXhSkXpK1hRNwKRb5fVF5cj1f+ZHgqEScZbaes4dc+VPUNVr8/m9zPZcbLjH+bq7VniArtRdAie
+	wt/oAaf/9y91leDNlXfKqby6F440uk+w=
+X-Gm-Gg: ASbGnctGyL9CWiagTSbSacQFdGCM6q5y6ADHr/qZKjXLiQES4LxQ9r+9uk1wHIPKZuH
+	QAWGH6iO3nPGShTigdJASVPASAq8abf3BvewOEgC+gjm0KwvepPFQrfWDk4ZH3rfYG2sXali/PP
+	yx3LAUFexGGB0Bob1na8SQpyCgXiVP+1MypF6FBrKMb7I3ST1ff9NQ8j8qlc1qNhOUGio5aBI5j
+	ZjQvwL/CEB0BbAb/PBkKy+Fr5FOQ78u5M7OckvNB0Fyh8cbqqtxZJZ9oM4hhIyVr6g045SONHPS
+	qzsrR9VvwTkSDRkxFrfOcWvXlaxrO6I+awl9
+X-Google-Smtp-Source: AGHT+IGYfATe7mmNTC4A+jEkwD5MzSelb1z0lWF68kS0t/NWgoEWKg6nD9jI4X3FoSNWbDyeH2i7qWWFajxt0X+1x5w=
+X-Received: by 2002:a17:902:d501:b0:277:c230:bfc7 with SMTP id
+ d9443c01a7336-27ed4a5d82bmr113039375ad.11.1759175862141; Mon, 29 Sep 2025
+ 12:57:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250926121231.32549-1-me@linux.beauty> <9f6acb84-02cb-4f76-bf37-e79b87157f1e@web.de>
- <1999588f143.5af31c76548207.2814872385181806897@linux.beauty>
-In-Reply-To: <1999588f143.5af31c76548207.2814872385181806897@linux.beauty>
-From: Ming Lei <ming.lei@redhat.com>
-Date: Mon, 29 Sep 2025 23:01:50 +0800
-X-Gm-Features: AS18NWC9hza2cJywOXBBWmRD7SoOIndJhptqTfOzlEwDEiiwkjBlTEbkxaGHAk8
-Message-ID: <CAFj5m9+FGzRV+fsWtsVSHV4JFh9Pit-KFHiKRWtMKBpM9LWBhQ@mail.gmail.com>
-Subject: Re: [PATCH] loop: fix backing file reference leak on validation error
-To: Li Chen <me@linux.beauty>
-Cc: Markus Elfring <Markus.Elfring@web.de>, Li Chen <chenl311@chinatelecom.cn>, 
-	linux-block <linux-block@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>, 
-	LKML <linux-kernel@vger.kernel.org>, Yang Erkun <yangerkun@huawei.com>
+References: <20250925-core-cstr-cstrings-v2-0-78e0aaace1cd@gmail.com>
+In-Reply-To: <20250925-core-cstr-cstrings-v2-0-78e0aaace1cd@gmail.com>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Mon, 29 Sep 2025 21:57:28 +0200
+X-Gm-Features: AS18NWCM9kbfT7mylXQdGB8ZyL_b6RmUa1M3XR6zo5RoraO0TPm_DutHWVTmZ7c
+Message-ID: <CANiq72m=TJMWFZhHSSU_-A3+tr5h8vA+X+oKb9TcieXQ6gHyJg@mail.gmail.com>
+Subject: Re: [PATCH v2 00/19] rust: replace `kernel::c_str!` with C-Strings
+To: Tamir Duberstein <tamird@gmail.com>
+Cc: "Rafael J. Wysocki" <rafael@kernel.org>, Viresh Kumar <viresh.kumar@linaro.org>, 
+	Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
+	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
+	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
+	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
+	Danilo Krummrich <dakr@kernel.org>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
+	Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, 
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
+	FUJITA Tomonori <fujita.tomonori@gmail.com>, Andrew Lunn <andrew@lunn.ch>, 
+	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Michael Turquette <mturquette@baylibre.com>, Stephen Boyd <sboyd@kernel.org>, 
+	Breno Leitao <leitao@debian.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, 
+	Dave Ertman <david.m.ertman@intel.com>, Ira Weiny <ira.weiny@intel.com>, 
+	Leon Romanovsky <leon@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>, 
+	=?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, 
+	Arnd Bergmann <arnd@arndb.de>, Brendan Higgins <brendan.higgins@linux.dev>, 
+	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, Jens Axboe <axboe@kernel.dk>, 
+	Alexandre Courbot <acourbot@nvidia.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, Liam Girdwood <lgirdwood@gmail.com>, 
+	Mark Brown <broonie@kernel.org>, linux-pm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	rust-for-linux@vger.kernel.org, nouveau@lists.freedesktop.org, 
+	dri-devel@lists.freedesktop.org, netdev@vger.kernel.org, 
+	linux-clk@vger.kernel.org, linux-pci@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, 
+	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Sep 29, 2025 at 8:54=E2=80=AFPM Li Chen <me@linux.beauty> wrote:
+On Thu, Sep 25, 2025 at 3:54=E2=80=AFPM Tamir Duberstein <tamird@gmail.com>=
+ wrote:
 >
-> Hi Markus,
->
->  ---- On Sun, 28 Sep 2025 21:48:23 +0800  Markus Elfring <Markus.Elfring@=
-web.de> wrote ---
->  > =E2=80=A6
->  > > Fix this by calling fput(file) before returning the error.
->  > =E2=80=A6
->  > > +++ b/drivers/block/loop.c
->  > =E2=80=A6
->  >
->  > How do you think about to increase the application of scope-based reso=
-urce management?
->  > https://elixir.bootlin.com/linux/v6.17-rc7/source/include/linux/file.h=
-#L97
->
-> Looks good; I will add a commit to switch to scope-based resource managem=
-ent in v2.
-> Thanks for your suggestion!
+> Changes in v2:
 
-Please don't do it as one bug fix, the whole fix chain needs to
-backport, and scope-based
-fput is just added in v6.15.
+For future reference, this is v3.
 
-However, you can do it as one cleanup after the fix is merged.
-
-Thanks,
-
+Cheers,
+Miguel
