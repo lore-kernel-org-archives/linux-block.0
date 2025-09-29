@@ -1,113 +1,132 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0330F1CAA79;
-	Mon, 29 Sep 2025 01:11:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCF597D07D
+	for <linux-block@vger.kernel.org>; Mon, 29 Sep 2025 01:13:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759108271; cv=none; b=f37OwsjqUBEN77wTxFX5odC4Ea8BnuRkr1T3RtVWnsTxlDVKDIOs/FudQBfVmpydnmHWQQt1HWaAEauC2C8rjO/x0zvhXMg6+B41lturpYuN397qG0S+AkIvf5twJ4KjOQEWr+oqzFb0gMxnqGHZQcX1NEhjPCpzS4ty6Oaolbo=
+	t=1759108438; cv=none; b=EjG5D5Uk0Sr9hgzgI5n+qVyzPFLCGmovGXYwobv2Rk4SjqmfJ48N+0o8v79YkZpH6bvmZhIH/ZQxw4gQNkxyJVOdA2kbUW3i2FAi8bfN5vl5UrR5vC5ZpCaVA523+ihiYeewSDwFYO2c2zLwAxlI/7wUAnaHH5YD6M7PGQAshI8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759108271; c=relaxed/simple;
-	bh=zK+peQS50yshv5/8hVeXqEq7UD+wV8fEUWoRCT8jRwM=;
-	h=Subject:To:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=PK9uvEghna3IariGl5Y+J4NSPOkxiKQLtYRb57IUE/NEXCMbq75rohI/Ej050Bggy+KyoLm6q/jyezR92gLiZRbYh5EAPz2J18409T+3tVFlHzX9MOcmk6n9JCOdN6t+D5xh9euSBc5D1myIyc9l0U5dj7QPOpDD7AFmWzV1xoA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=none smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4cZjmp2HsJzYQv6b;
-	Mon, 29 Sep 2025 09:10:50 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 7475C1A12C9;
-	Mon, 29 Sep 2025 09:11:05 +0800 (CST)
-Received: from [10.174.179.143] (unknown [10.174.179.143])
-	by APP4 (Coremail) with SMTP id gCh0CgCHS2Oo3Nlo5HWqBA--.20175S3;
-	Mon, 29 Sep 2025 09:11:05 +0800 (CST)
-Subject: Re: [PATCH] loop: fix backing file reference leak on validation error
-To: Li Chen <me@linux.beauty>, Jens Axboe <axboe@kernel.dk>,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- "yukuai (C)" <yukuai3@huawei.com>
-References: <20250926121231.32549-1-me@linux.beauty>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <68aebe91-4dcd-925f-4232-1c432fe6899d@huaweicloud.com>
-Date: Mon, 29 Sep 2025 09:11:04 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.1
+	s=arc-20240116; t=1759108438; c=relaxed/simple;
+	bh=JHEuqYRjf1RRJ48dY59Weg1760fE7v+8BM+mJAyCO/U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=USgk9D2eff7mAk7A0NbGYn7vd0B3dq2+D/feIrgbLQBIlB4htQu7CSFARZQaEevcj9yY/cFmqfEBZOlhBNDzX0Zbrpd/lZGm6PgixY8lPcYCaDy653TqFuuTKTuJNEstVnwHrj+JPCGB2q+K72mC1TbboebEsrUhqY/hvrx59VU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Hfbn7RoO; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Hfbn7RoO"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1759108435;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=98UYUEll18IAUNdOSPwLWJ4Ut+5BsagdOfpfon2x9Lo=;
+	b=Hfbn7RoO36sMa85r1dGeOFGMa+PwpL4aVjHiRn7cyzLuRX3tJb5YqiWCyTI7RPYgfzLQ1m
+	g6MHrKH2DH/Fvyu5TQv0ibNrhuImlF1+TQMFqBUOeIFKqLtdGaU2010llwbSdPo60UF1sj
+	vftBbSMUOM+wFN0wpiScG8yZnI3wfE4=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-462-uXmKcoviPzyv_SelnV5isw-1; Sun,
+ 28 Sep 2025 21:13:49 -0400
+X-MC-Unique: uXmKcoviPzyv_SelnV5isw-1
+X-Mimecast-MFC-AGG-ID: uXmKcoviPzyv_SelnV5isw_1759108428
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id F167F19560B1;
+	Mon, 29 Sep 2025 01:13:46 +0000 (UTC)
+Received: from fedora (unknown [10.72.120.21])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 30D1030001BD;
+	Mon, 29 Sep 2025 01:13:39 +0000 (UTC)
+Date: Mon, 29 Sep 2025 09:13:34 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: syzbot ci <syzbot+ci7622762f075d3fa0@syzkaller.appspotmail.com>
+Cc: axboe@kernel.dk, dchinner@redhat.com, hch@lst.de,
+	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	mpatocka@redhat.com, zhaoyang.huang@unisoc.com,
+	syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot ci] Re: loop: improve loop aio perf by IOCB_NOWAIT
+Message-ID: <aNndPs6kom-n4HSs@fedora>
+References: <20250928132927.3672537-1-ming.lei@redhat.com>
+ <68d9818c.a00a0220.102ee.002d.GAE@google.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20250926121231.32549-1-me@linux.beauty>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgCHS2Oo3Nlo5HWqBA--.20175S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7uw1xJFWUWFyfKw4xGFykXwb_yoW8GF1DpF
-	45Gas0yFWDKF4rKanFq393uw15Z3WxKrWS9a4DC3W09r1rArZakryrCr90gr1qqrWDGa4a
-	q3WUKFyDuF1UCF7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvjb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-	6I80ewAv7VC0I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AF
-	wI0_JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
-	xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1D
-	MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
-	0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWU
-	JVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUwz
-	uWDUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <68d9818c.a00a0220.102ee.002d.GAE@google.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-Hi,
+On Sun, Sep 28, 2025 at 11:42:20AM -0700, syzbot ci wrote:
+> syzbot ci has tested the following series
+> 
+> [v1] loop: improve loop aio perf by IOCB_NOWAIT
+> https://lore.kernel.org/all/20250928132927.3672537-1-ming.lei@redhat.com
+> * [PATCH V4 1/6] loop: add helper lo_cmd_nr_bvec()
+> * [PATCH V4 2/6] loop: add helper lo_rw_aio_prep()
+> * [PATCH V4 3/6] loop: add lo_submit_rw_aio()
+> * [PATCH V4 4/6] loop: move command blkcg/memcg initialization into loop_queue_work
+> * [PATCH V4 5/6] loop: try to handle loop aio command via NOWAIT IO first
+> * [PATCH V4 6/6] loop: add hint for handling aio via IOCB_NOWAIT
+> 
+> and found the following issue:
+> WARNING in lo_submit_rw_aio
+> 
+> Full report is available here:
+> https://ci.syzbot.org/series/0ffdb6b4-a5fe-48da-9473-d2a926e780bd
+> 
+> ***
+> 
+> WARNING in lo_submit_rw_aio
+> 
+> tree:      torvalds
+> URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/torvalds/linux
+> base:      07e27ad16399afcd693be20211b0dfae63e0615f
+> arch:      amd64
+> compiler:  Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+> config:    https://ci.syzbot.org/builds/3aba003b-2400-4e88-9a31-c09ab4e41a84/config
+> C repro:   https://ci.syzbot.org/findings/dc97454c-d87b-41f5-a44a-7182e666cfd5/c_repro
+> syz repro: https://ci.syzbot.org/findings/dc97454c-d87b-41f5-a44a-7182e666cfd5/syz_repro
+> 
+> ------------[ cut here ]------------
+> WARNING: CPU: 0 PID: 5958 at drivers/block/loop.c:907 loop_inc_blocking_writes drivers/block/loop.c:907 [inline]
 
-ÔÚ 2025/09/26 20:12, Li Chen Ð´µÀ:
-> loop_change_fd() and loop_configure() call loop_check_backing_file()
-> to validate the new backing file. If validation fails, the reference
-> acquired by fget() was not dropped, leaking a file reference.
-> 
-> Fix this by calling fput(file) before returning the error.
-> 
-> Signed-off-by: Li Chen <chenl311@chinatelecom.cn>
-> ---
->   drivers/block/loop.c | 8 ++++++--
->   1 file changed, 6 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-> index 053a086d547e..94ec7f747f36 100644
-> --- a/drivers/block/loop.c
-> +++ b/drivers/block/loop.c
-> @@ -551,8 +551,10 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
->   		return -EBADF;
->   
->   	error = loop_check_backing_file(file);
-> -	if (error)
-> +	if (error) {
-> +		fput(file);
->   		return error;
-> +	}
->   
->   	/* suppress uevents while reconfiguring the device */
->   	dev_set_uevent_suppress(disk_to_dev(lo->lo_disk), 1);
-> @@ -993,8 +995,10 @@ static int loop_configure(struct loop_device *lo, blk_mode_t mode,
->   		return -EBADF;
->   
->   	error = loop_check_backing_file(file);
-> -	if (error)
-> +	if (error) {
-> +		fput(file);
->   		return error;
-> +	}
->   
->   	is_loop = is_loop_device(file);
->   
-> 
+Thanks for your report!
 
-The changes look correct, however, I'll prefer to change the error path
-to the reverse order and add a new error tag.
+Looks wrong lock is asserted, and the following change can fix it:
+
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 911262b648ce..f3372bf35fd5 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -904,7 +904,7 @@ static inline int queue_on_root_worker(struct cgroup_subsys_state *css)
+ static inline void loop_inc_blocking_writes(struct loop_device *lo,
+                struct loop_cmd *cmd)
+ {
+-       lockdep_assert_held(&lo->lo_mutex);
++       lockdep_assert_held(&lo->lo_work_lock);
+
+        if (req_op(blk_mq_rq_from_pdu(cmd)) == REQ_OP_WRITE)
+                lo->lo_nr_blocking_writes += 1;
+@@ -913,7 +913,7 @@ static inline void loop_inc_blocking_writes(struct loop_device *lo,
+ static inline void loop_dec_blocking_writes(struct loop_device *lo,
+                struct loop_cmd *cmd)
+ {
+-       lockdep_assert_held(&lo->lo_mutex);
++       lockdep_assert_held(&lo->lo_work_lock);
+
+        if (req_op(blk_mq_rq_from_pdu(cmd)) == REQ_OP_WRITE)
+                lo->lo_nr_blocking_writes -= 1;
+
+
+
 
 Thanks,
-Kuai
+Ming
 
