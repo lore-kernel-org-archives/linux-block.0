@@ -1,177 +1,115 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 631C934BA41
-	for <linux-block@vger.kernel.org>; Mon, 29 Sep 2025 09:19:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E086C2C3250;
+	Mon, 29 Sep 2025 09:39:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759137550; cv=none; b=oMMGGG4VBuWSRU0uoZkkpTh3vWnRaCZUWJsFxRe5DiHhM0vusm+eKG+YrBahOML+lz7lItX7YfU8uktCj7jDwMM6SPrfwzH80JSXiQc6B47KcAJOYY+Vaos40CVseduVjmUe4A6rYN1z7nDxhZFiOTZhVEanfQY1XkC9mynpcR0=
+	t=1759138745; cv=none; b=LYpf8COBsB5qmx6M4i7ZMaDyd+lVNHJ0OzFCyZWVzenL8ClbVvwMZh410ywuXRJIghYbBbtHg9buuuWweNh5fZ3MsYpw32mfoT9lEGv0uCjeN/0rrvurgRfHY6DnxpyvBoRKgF+yz0jO1EpMwYeBXi0J6ExmbNHYD4MBHU8V80o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759137550; c=relaxed/simple;
-	bh=aJIXFbQzD7C3Q3cbP/Y2zZW3bB3oSP9uA7tGjZg9Ygw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=X23Vh7qLwxOp3ScI7ARJe//hTGtq1eDIKzTMBC7OWYMC3+WYRBJx5c5+VxgDsJlXq86dHs0kCSrVLY9bGYcy+s1Vzsi8zA8bk0rfqz9Tf8adYx1q6fyB5P1teB8h/LKOYsoT7+XC7HN/kqsvNBj8GwJBFbuioFB/Ddmp1/UxhBI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=A2M/ATRQ; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1759138745; c=relaxed/simple;
+	bh=oug/PLMLLW7/ZVdQh5G7ABppQ7HlQRSRolzg1A9Qm7s=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=n1oqvBmLEKdqYyTW0ZJtfIII3lhRdsqRNN+uS4lI5fU2C8qRGIpqR8O6hr4//FJcI3ntVC4sDLPVgZr5tjhymQGetB5qbNlmIFUPyUPg4f4W41QQilCmOZ6NyVdXor5hC8obWcW2UnrbYf43k8TiCkCbAVjeTqyfqITGDZjcABA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IjdRWxta; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A2M/ATRQ"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1759137547;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=m14nFMin7/94WpJU41b6+xjuPj85lzMdm8NE7gofAB4=;
-	b=A2M/ATRQ+1n402Acpzb8z9KQyeW4BeTKvYpDtBHKSLVqGMRlqGYbKwMye0OGJV/zG48JFo
-	T33sS45RoJMM0kd9lQFm9Y+tYPLmb+jMeJk+4on7OAHfVFXkKQUIfKCglmYnVlB9UwWzrS
-	9mfYllxqTm+XsaVnMZnGXE39heh14Rw=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-340-itVRuzJYO8qR-gRmwG7xDA-1; Mon,
- 29 Sep 2025 05:19:05 -0400
-X-MC-Unique: itVRuzJYO8qR-gRmwG7xDA-1
-X-Mimecast-MFC-AGG-ID: itVRuzJYO8qR-gRmwG7xDA_1759137543
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 13CEB19560B3;
-	Mon, 29 Sep 2025 09:19:03 +0000 (UTC)
-Received: from fedora (unknown [10.72.120.12])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 206F530001A4;
-	Mon, 29 Sep 2025 09:18:56 +0000 (UTC)
-Date: Mon, 29 Sep 2025 17:18:51 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Yu Kuai <yukuai1@huaweicloud.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Mikulas Patocka <mpatocka@redhat.com>,
-	Zhaoyang Huang <zhaoyang.huang@unisoc.com>,
-	Dave Chinner <dchinner@redhat.com>, linux-fsdevel@vger.kernel.org,
-	"yukuai (C)" <yukuai3@huawei.com>
-Subject: Re: [PATCH V4 5/6] loop: try to handle loop aio command via NOWAIT
- IO first
-Message-ID: <aNpOiQbgrSukFaUT@fedora>
-References: <20250928132927.3672537-1-ming.lei@redhat.com>
- <20250928132927.3672537-6-ming.lei@redhat.com>
- <d043680f-1d7a-bcb8-2588-4eae403f050d@huaweicloud.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IjdRWxta"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1F0EC4CEF4;
+	Mon, 29 Sep 2025 09:39:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1759138744;
+	bh=oug/PLMLLW7/ZVdQh5G7ABppQ7HlQRSRolzg1A9Qm7s=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=IjdRWxtaUXAOawilIoA5EK1zaNWzq8SuG/RGnayTEvvTw8zkBFRbc95h1U8UXOXtI
+	 o+ChdWCOB1cSxsYTmhEnF4EZvWega7fq9Q5hvzFnoW/4vjE2MrI4IG5yeRG/g18Kp8
+	 gvohG7Zo7gpwrczplAyjI1Bsbj7IcC2iEs/HHL3fNdJRECFzrJnxHGS85figtNoTTA
+	 G/sSMaqFdX1Ohy+mgONJzGFTPJ6Tj3xM+34a0qPEkFNl8UKzwfbwSK9qeMto4zgEj3
+	 57f/S1bg5BHZsmE1HoHkUD56LCkL2l6h69d5wjUgsMUnyn3fypZtpxRVJ1itvbpKr3
+	 HiGZLKyS/z25w==
+From: Christian Brauner <brauner@kernel.org>
+To: miklos@szeredi.hu,
+	Joanne Koong <joannelkoong@gmail.com>
+Cc: Christian Brauner <brauner@kernel.org>,
+	djwong@kernel.org,
+	hch@infradead.org,
+	linux-block@vger.kernel.org,
+	gfs2@lists.linux.dev,
+	linux-fsdevel@vger.kernel.org,
+	kernel-team@meta.com,
+	linux-xfs@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	Gao Xiang <xiang@kernel.org>
+Subject: Re: [PATCH v5 00/14] fuse: use iomap for buffered reads + readahead
+Date: Mon, 29 Sep 2025 11:38:52 +0200
+Message-ID: <20250929-salzbergwerk-ungnade-8a16d724415e@brauner>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20250926002609.1302233-1-joannelkoong@gmail.com>
+References: <20250926002609.1302233-1-joannelkoong@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Type: text/plain; charset="utf-8"
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3113; i=brauner@kernel.org; h=from:subject:message-id; bh=oug/PLMLLW7/ZVdQh5G7ABppQ7HlQRSRolzg1A9Qm7s=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWTcCt4U9G+2seCNkLbaHYktsafTZ5w7c6Oz0+SjoPRM9 4sH77rs7ShlYRDjYpAVU2RxaDcJl1vOU7HZKFMDZg4rE8gQBi5OAZhIpjLDb/ZKb+HfvbbTPqW+ 7T4i9pm515tNlnXnxUVa0/f1bd5RNZvhn/WbmlifgLUasz7qfTzIrLqL8UR9ReulTOaO2bv3S8m +ZAcA
+X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <d043680f-1d7a-bcb8-2588-4eae403f050d@huaweicloud.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Mon, Sep 29, 2025 at 02:44:53PM +0800, Yu Kuai wrote:
-> Hi,
+On Thu, 25 Sep 2025 17:25:55 -0700, Joanne Koong wrote:
+> This series adds fuse iomap support for buffered reads and readahead.
+> This is needed so that granular uptodate tracking can be used in fuse when
+> large folios are enabled so that only the non-uptodate portions of the folio
+> need to be read in instead of having to read in the entire folio. It also is
+> needed in order to turn on large folios for servers that use the writeback
+> cache since otherwise there is a race condition that may lead to data
+> corruption if there is a partial write, then a read and the read happens
+> before the write has undergone writeback, since otherwise the folio will not
+> be marked uptodate from the partial write so the read will read in the entire
+> folio from disk, which will overwrite the partial write.
 > 
-> 在 2025/09/28 21:29, Ming Lei 写道:
-> > Try to handle loop aio command via NOWAIT IO first, then we can avoid to
-> > queue the aio command into workqueue. This is usually one big win in
-> > case that FS block mapping is stable, Mikulas verified [1] that this way
-> > improves IO perf by close to 5X in 12jobs sequential read/write test,
-> > in which FS block mapping is just stable.
-> > 
-> > Fallback to workqueue in case of -EAGAIN. This way may bring a little
-> > cost from the 1st retry, but when running the following write test over
-> > loop/sparse_file, the actual effect on randwrite is obvious:
-> > 
-> > ```
-> > truncate -s 4G 1.img    #1.img is created on XFS/virtio-scsi
-> > losetup -f 1.img --direct-io=on
-> > fio --direct=1 --bs=4k --runtime=40 --time_based --numjobs=1 --ioengine=libaio \
-> > 	--iodepth=16 --group_reporting=1 --filename=/dev/loop0 -name=job --rw=$RW
-> > ```
-> > 
-> > - RW=randwrite: obvious IOPS drop observed
-> > - RW=write: a little drop(%5 - 10%)
-> > 
-> > This perf drop on randwrite over sparse file will be addressed in the
-> > following patch.
-> > 
-> > BLK_MQ_F_BLOCKING has to be set for calling into .read_iter() or .write_iter()
-> > which might sleep even though it is NOWAIT, and the only effect is that rcu read
-> > lock is replaced with srcu read lock.
-> > 
-> > Link: https://lore.kernel.org/linux-block/a8e5c76a-231f-07d1-a394-847de930f638@redhat.com/ [1]
-> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > ---
-> >   drivers/block/loop.c | 62 ++++++++++++++++++++++++++++++++++++++++----
-> >   1 file changed, 57 insertions(+), 5 deletions(-)
-> > 
-> > diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-> > index 99eec0a25dbc..57e33553695b 100644
-> > --- a/drivers/block/loop.c
-> > +++ b/drivers/block/loop.c
-> > @@ -90,6 +90,8 @@ struct loop_cmd {
-> >   #define LOOP_IDLE_WORKER_TIMEOUT (60 * HZ)
-> >   #define LOOP_DEFAULT_HW_Q_DEPTH 128
-> > +static void loop_queue_work(struct loop_device *lo, struct loop_cmd *cmd);
-> > +
-> >   static DEFINE_IDR(loop_index_idr);
-> >   static DEFINE_MUTEX(loop_ctl_mutex);
-> >   static DEFINE_MUTEX(loop_validate_mutex);
-> > @@ -321,6 +323,15 @@ static void lo_rw_aio_do_completion(struct loop_cmd *cmd)
-> >   	if (!atomic_dec_and_test(&cmd->ref))
-> >   		return;
-> > +
-> > +	/* -EAGAIN could be returned from bdev's ->ki_complete */
-> > +	if (cmd->ret == -EAGAIN) {
-> > +		struct loop_device *lo = rq->q->queuedata;
-> > +
-> > +		loop_queue_work(lo, cmd);
-> > +		return;
-> > +	}
-> > +
-> >   	kfree(cmd->bvec);
-> >   	cmd->bvec = NULL;
-> >   	if (req_op(rq) == REQ_OP_WRITE)
-> > @@ -436,16 +447,40 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
-> >   	int nr_bvec = lo_cmd_nr_bvec(cmd);
-> >   	int ret;
-> > -	ret = lo_rw_aio_prep(lo, cmd, nr_bvec, pos);
-> > -	if (unlikely(ret))
-> > -		return ret;
-> > +	/* prepared already for aio from nowait code path */
-> > +	if (!cmd->use_aio) {
-> > +		ret = lo_rw_aio_prep(lo, cmd, nr_bvec, pos);
-> > +		if (unlikely(ret))
-> > +			goto fail;
-> > +	}
-> > +	cmd->iocb.ki_flags &= ~IOCB_NOWAIT;
-> >   	ret = lo_submit_rw_aio(lo, cmd, nr_bvec, rw);
-> > +fail:
-> >   	if (ret != -EIOCBQUEUED)
-> >   		lo_rw_aio_complete(&cmd->iocb, ret);
-> >   	return -EIOCBQUEUED;
-> >   }
-> > +static int lo_rw_aio_nowait(struct loop_device *lo, struct loop_cmd *cmd,
-> > +			    int rw)
-> > +{
-> > +	struct request *rq = blk_mq_rq_from_pdu(cmd);
-> > +	loff_t pos = ((loff_t) blk_rq_pos(rq) << 9) + lo->lo_offset;
-> > +	int nr_bvec = lo_cmd_nr_bvec(cmd);
-> > +	int ret = lo_rw_aio_prep(lo, cmd, nr_bvec, pos);
-> > +
-> > +	if (unlikely(ret))
-> > +		goto fail;
-> > +
-> > +	cmd->iocb.ki_flags |= IOCB_NOWAIT;
-> > +	ret = lo_submit_rw_aio(lo, cmd, nr_bvec, rw);
-> 
-> Should you also check if backing device/file support nowait? Otherwise
-> bio will fail with BLK_STS_NOTSUPP from submit_bio_noacct().
+> [...]
 
-Good catch, nowait should only be applied in case of FMODE_NOWAIT, will add the
-check.
+Applied to the vfs-6.19.iomap branch of the vfs/vfs.git tree.
+Patches in the vfs-6.19.iomap branch should appear in linux-next soon.
 
+Please report any outstanding bugs that were missed during review in a
+new review to the original patch series allowing us to drop it.
 
-Thanks,
-Ming
+It's encouraged to provide Acked-bys and Reviewed-bys even though the
+patch has now been applied. If possible patch trailers will be updated.
 
+Note that commit hashes shown below are subject to change due to rebase,
+trailer updates or similar. If in doubt, please check the listed branch.
+
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
+branch: vfs-6.19.iomap
+
+[01/14] iomap: move bio read logic into helper function
+        https://git.kernel.org/vfs/vfs/c/4b1f54633425
+[02/14] iomap: move read/readahead bio submission logic into helper function
+        https://git.kernel.org/vfs/vfs/c/22159441469a
+[03/14] iomap: store read/readahead bio generically
+        https://git.kernel.org/vfs/vfs/c/7c732b99c04f
+[04/14] iomap: iterate over folio mapping in iomap_readpage_iter()
+        https://git.kernel.org/vfs/vfs/c/3b404627d3e2
+[05/14] iomap: rename iomap_readpage_iter() to iomap_read_folio_iter()
+        https://git.kernel.org/vfs/vfs/c/bf8b9f4ce6a9
+[06/14] iomap: rename iomap_readpage_ctx struct to iomap_read_folio_ctx
+        https://git.kernel.org/vfs/vfs/c/abea60c60330
+[07/14] iomap: track pending read bytes more optimally
+        https://git.kernel.org/vfs/vfs/c/13cc90f6c38e
+[08/14] iomap: set accurate iter->pos when reading folio ranges
+        https://git.kernel.org/vfs/vfs/c/63adb033604e
+[09/14] iomap: add caller-provided callbacks for read and readahead
+        https://git.kernel.org/vfs/vfs/c/56b6f5d3792b
+[10/14] iomap: move buffered io bio logic into new file
+        https://git.kernel.org/vfs/vfs/c/80cd9857c47f
+[11/14] iomap: make iomap_read_folio() a void return
+        https://git.kernel.org/vfs/vfs/c/434651f1a9b7
+[12/14] fuse: use iomap for read_folio
+        https://git.kernel.org/vfs/vfs/c/12cae30dc565
+[13/14] fuse: use iomap for readahead
+        https://git.kernel.org/vfs/vfs/c/0853f58ed0b4
+[14/14] fuse: remove fc->blkbits workaround for partial writes
+        https://git.kernel.org/vfs/vfs/c/bb944dc82db1
