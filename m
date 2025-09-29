@@ -1,112 +1,152 @@
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE3E1245014
-	for <linux-block@vger.kernel.org>; Mon, 29 Sep 2025 19:57:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 588351B87C0
+	for <linux-block@vger.kernel.org>; Mon, 29 Sep 2025 21:17:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759175864; cv=none; b=EN2H8e6QwdnLuy0xHEgYWCVaJTSREtZwGVQAV/pPNZTO7jEitsPpEcepPJnHUor/KdP/Njmpi9FOIiGHlB3rOI+/9SR5RCOJ8YcN1lcJsHm9NTq9Bio8CWLvGIJrzzZLfKOC51G99ps//wteSMqta8JOrUXDoVnMhmd3KYv8UuU=
+	t=1759180669; cv=none; b=jD2rO0zUPc4GvWpeBQW0pRp/IR0DyT9EKTtYhg3nf0do3Y7iCd/tMK+Zgyx/7oa6r87cSiL5XNetYRbLxZ6f1TcECkmcaPGxXNt+UL2+mZOYwX97gOnMApbyzqVuDymf82OTmNxPDiPeSZgewlud8ddW5BRuVScYFuFtI4Io1hA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759175864; c=relaxed/simple;
-	bh=ILAe+VRfX0Fc+b5qLvaJzfBUJ4qz7jOpbJP92apYs7g=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WQMGpaVXlabeFR1oYqUaQLh5XVI1d4V0eK2CMFZj/xn+jUa1b6iiFe++vfVqWGl13mxtUlp5d/sWDszmp9zEPUOWQ1NuBFOkV4hhmGujV3t7WpQdjNkpQPxHLQDh+TDmIbSHAliyjEPzatLRv5UgWsRXGp7GbaQx5sltI60RKVY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U5RB08Jd; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1759180669; c=relaxed/simple;
+	bh=fo8uROp6Yd4p51oNun07BdvS3ckFl/pgBYhRp5v8n58=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=cUqyDXDIDsPQSVeBDd3cwPpqQCCVDHRSJilElBw2cE7UxWUY/WkJTfs5G9x36ZCh5hb1EHjp3bnPtgskj5pDBN+DWxSZFCTfR3EeZF7MsTYGJzEYv2NDD7PH5WpJS7cEqWeSYC6IgcqH/hs8Z7iH/fyoSMOvetdLyMBK/K9pgyg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PRqBoWWm; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U5RB08Jd"
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2680ee37b21so9800645ad.0
-        for <linux-block@vger.kernel.org>; Mon, 29 Sep 2025 12:57:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1759175862; x=1759780662; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ILAe+VRfX0Fc+b5qLvaJzfBUJ4qz7jOpbJP92apYs7g=;
-        b=U5RB08Jdp+02qM+f5Mp+vuiVmfSvgvAx9OiS9eb/dfT+moX3pfMb+UYBBkKAocEnWD
-         lb08aQk8t3PnXYbC6FKFPEpeNN+0C3ZK5K8O+tVbR+xM/l1tcssKZVmm03IKwOTCHEle
-         otJ3pGwplRt2pfEJJEZvwsiu9yLStl62IrDFTM2XX7CeRRpwmQk921H0CmTYR3OS71XF
-         NekIyiGHf8khHUgEJ7/Wg2ZlzVBCZ0wFeOg6ADpKhHUA9qnm0NL23qr46rSElBRBhtmX
-         ruanjoQ1J/SgQ4bkiNZDbqTlMP5Xkn+l9J62YsWvCV6Vi6j5khk+VeQK0XuWqSD6UIog
-         WvXg==
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PRqBoWWm"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1759180666;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pvJsfDbbmraa6iCCkjoqVoBB3Mb9XdjPoCcVP3qHFzU=;
+	b=PRqBoWWmZf9bx5sAghO/yeCFDa5/DCJV29BNJOZgQLBDdtur8MTCn2aL82tGx5VSg4BjpN
+	69uZtADX1TPTW6es+SlAUKdZaSk3Mr+Y0u+HfSpnHONjIflQ46OV0LnGkEzg5hRih9K1EJ
+	kugIpO5FE+bgDTpyByJUKJCCmdjd4u8=
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
+ [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-363-_0i1j89YMM29GJw1O3MYfQ-1; Mon, 29 Sep 2025 17:17:45 -0400
+X-MC-Unique: _0i1j89YMM29GJw1O3MYfQ-1
+X-Mimecast-MFC-AGG-ID: _0i1j89YMM29GJw1O3MYfQ_1759180664
+Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-42b2a51fab6so3496125ab.0
+        for <linux-block@vger.kernel.org>; Mon, 29 Sep 2025 14:17:44 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759175862; x=1759780662;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1759180664; x=1759785464;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ILAe+VRfX0Fc+b5qLvaJzfBUJ4qz7jOpbJP92apYs7g=;
-        b=oJKD1sus75Cil/9qVaCsKlgdUx8xW8n6X8/qNS/0EiFCzan9wrJws5AMnb894lYoW6
-         dzcEJy6zCaZ0O3BQc+8HSgqiQhPH0DeANr6qZitryVGqkp281rCJLKmKJs62LQwedIrA
-         e0W6BP1iQsfV4y4QlCRsVX1XX/0B5qvE/4vVjgRjnTTGaO8kgmU3oQYV4jKt5j6ijgzt
-         vN6OfjXvfzn8b4KeT0p7w3Sa8pxKaq8jluVzUbR2lJO7PR8J54qPEB9lv/o6Vvugs6X+
-         23msO5z3hhhB6PXMkjXTarcgAR5Ytyjy4riwldsEy6xjWCuan6uvmyTMlnzUU+x5aBAZ
-         cDOw==
-X-Forwarded-Encrypted: i=1; AJvYcCU4Ly+lEYawcifs5f+KOTTvUBb8uatbbffI0WxUSCMfi3gGkFbFQ7WH4hWbaTyPULW0KvLvtZ990XbnUQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwgY8CZbKOJLV2SkumDOS1VrXW2RuTYKEARRvKepFNmplCcHcMH
-	eXhSkXpK1hRNwKRb5fVF5cj1f+ZHgqEScZbaes4dc+VPUNVr8/m9zPZcbLjH+bq7VniArtRdAie
-	wt/oAaf/9y91leDNlXfKqby6F440uk+w=
-X-Gm-Gg: ASbGnctGyL9CWiagTSbSacQFdGCM6q5y6ADHr/qZKjXLiQES4LxQ9r+9uk1wHIPKZuH
-	QAWGH6iO3nPGShTigdJASVPASAq8abf3BvewOEgC+gjm0KwvepPFQrfWDk4ZH3rfYG2sXali/PP
-	yx3LAUFexGGB0Bob1na8SQpyCgXiVP+1MypF6FBrKMb7I3ST1ff9NQ8j8qlc1qNhOUGio5aBI5j
-	ZjQvwL/CEB0BbAb/PBkKy+Fr5FOQ78u5M7OckvNB0Fyh8cbqqtxZJZ9oM4hhIyVr6g045SONHPS
-	qzsrR9VvwTkSDRkxFrfOcWvXlaxrO6I+awl9
-X-Google-Smtp-Source: AGHT+IGYfATe7mmNTC4A+jEkwD5MzSelb1z0lWF68kS0t/NWgoEWKg6nD9jI4X3FoSNWbDyeH2i7qWWFajxt0X+1x5w=
-X-Received: by 2002:a17:902:d501:b0:277:c230:bfc7 with SMTP id
- d9443c01a7336-27ed4a5d82bmr113039375ad.11.1759175862141; Mon, 29 Sep 2025
- 12:57:42 -0700 (PDT)
+        bh=pvJsfDbbmraa6iCCkjoqVoBB3Mb9XdjPoCcVP3qHFzU=;
+        b=IRuC8nY40K5qLhiniNhfeTNlwj6eXAYS3dyTY94S/tJazFIUkf+QTpHVQbhuZzg1cj
+         prGPDDQI8clNkntjs4Kk+9bZXspWdXAPZSN3kYHk1d/340vx2N9gnitu0hcbZUxJoRKg
+         2MNLgShQhvujK+ktSSsGfrvQ6eLW+CdfXVV/pVxBxEBbGw8zOKt62Q2bxppIb8mBULpp
+         IXAsNhH3Lsrrc8rim/mlG3pNYsRcOGyejidgpkAIp6Ksi3QYfqj0pmO9AOmVvI+3cXRB
+         Dt6WUnhtWbWHtoabrOPaPZKhnUJiZAfBy+0L/xvoW+dvWzwubY50aUIbWmDUORTfdEBT
+         ZSHA==
+X-Forwarded-Encrypted: i=1; AJvYcCXOqesLQZZGeETuVIlLpLAXNPktnvPzkARWeQdV7pqEKHTy6CbTnEK/w1NySyuX89V3EH5zcLpHTH3EXA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzCWuZ+0yxS7EF+Z9QllVqGB7Z/yA4XPWkbRYG5336c51gYm78e
+	3jqx8BycvhWwdeZVJvZoH4yuSWeYcQDV30Ki7aWD3mbcPZTKXH9jAE1GQvDxaD7VxVLxLSaD8qw
+	EAluB1mKB6ohQDUshWgq9j2eHMHexIhmsUldfKu2UdQgO568hYiz4brcyiKFwXGz2
+X-Gm-Gg: ASbGnctiB+m4Iq1xIR9L0p+8ilmaRoq2SQ9CZOO5dsh6e7K3R6afceB80oPg67y6KoX
+	aaJguYEBUdZqZtXDQBsXDqC2ZdKkalQcle+3EdwJDFxzF3bi04lhJLqEESXCxtx4/tdoCEs6lTD
+	GHm7iSPHDiEFHDDeHf0J3wZWQJPAzTpTXBNope6oGZdfKDlHAbZxZwmRsqqJOdD+LdUT/HTAofx
+	G8SlWpYQJkjcEYURi6gaJQG1RX+/pcFFeskfdiZ6azDKnvMYNtlriPoehv9k1lCHVCbgneloKFh
+	wK38dihMPgsdFMSEg1Ilwo7sUk3UdSu5VIZDgzs7qWk=
+X-Received: by 2002:a05:6e02:1525:b0:408:1624:b2ee with SMTP id e9e14a558f8ab-425955e4f60mr87964835ab.1.1759180664135;
+        Mon, 29 Sep 2025 14:17:44 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG3VrvxaH7k00bkTZJWrxcv/Xeuv7Ik/zOnPnH3ASkfKmA5ptZ34qoyLfGaDXRfunQjFfs8kg==
+X-Received: by 2002:a05:6e02:1525:b0:408:1624:b2ee with SMTP id e9e14a558f8ab-425955e4f60mr87964675ab.1.1759180663680;
+        Mon, 29 Sep 2025 14:17:43 -0700 (PDT)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-57269f5d0c5sm1963571173.13.2025.09.29.14.17.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 29 Sep 2025 14:17:42 -0700 (PDT)
+Date: Mon, 29 Sep 2025 15:17:40 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Leon Romanovsky <leonro@nvidia.com>, Jason Gunthorpe <jgg@nvidia.com>,
+ Andrew Morton <akpm@linux-foundation.org>, Bjorn Helgaas
+ <bhelgaas@google.com>, Christian =?UTF-8?B?S8O2bmln?=
+ <christian.koenig@amd.com>, dri-devel@lists.freedesktop.org,
+ iommu@lists.linux.dev, Jens Axboe <axboe@kernel.dk>, Joerg Roedel
+ <joro@8bytes.org>, kvm@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-media@vger.kernel.org, linux-mm@kvack.org, linux-pci@vger.kernel.org,
+ Logan Gunthorpe <logang@deltatee.com>, Marek Szyprowski
+ <m.szyprowski@samsung.com>, Robin Murphy <robin.murphy@arm.com>, Sumit
+ Semwal <sumit.semwal@linaro.org>, Vivek Kasireddy
+ <vivek.kasireddy@intel.com>, Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v4 07/10] vfio/pci: Add dma-buf export config for MMIO
+ regions
+Message-ID: <20250929151740.21f001e3.alex.williamson@redhat.com>
+In-Reply-To: <b1b44823f93fd9e7fa73dc165141d716cb74fa90.1759070796.git.leon@kernel.org>
+References: <cover.1759070796.git.leon@kernel.org>
+	<b1b44823f93fd9e7fa73dc165141d716cb74fa90.1759070796.git.leon@kernel.org>
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250925-core-cstr-cstrings-v2-0-78e0aaace1cd@gmail.com>
-In-Reply-To: <20250925-core-cstr-cstrings-v2-0-78e0aaace1cd@gmail.com>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Mon, 29 Sep 2025 21:57:28 +0200
-X-Gm-Features: AS18NWCM9kbfT7mylXQdGB8ZyL_b6RmUa1M3XR6zo5RoraO0TPm_DutHWVTmZ7c
-Message-ID: <CANiq72m=TJMWFZhHSSU_-A3+tr5h8vA+X+oKb9TcieXQ6gHyJg@mail.gmail.com>
-Subject: Re: [PATCH v2 00/19] rust: replace `kernel::c_str!` with C-Strings
-To: Tamir Duberstein <tamird@gmail.com>
-Cc: "Rafael J. Wysocki" <rafael@kernel.org>, Viresh Kumar <viresh.kumar@linaro.org>, 
-	Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
-	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
-	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
-	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
-	Danilo Krummrich <dakr@kernel.org>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
-	Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, 
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
-	FUJITA Tomonori <fujita.tomonori@gmail.com>, Andrew Lunn <andrew@lunn.ch>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Michael Turquette <mturquette@baylibre.com>, Stephen Boyd <sboyd@kernel.org>, 
-	Breno Leitao <leitao@debian.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, 
-	Dave Ertman <david.m.ertman@intel.com>, Ira Weiny <ira.weiny@intel.com>, 
-	Leon Romanovsky <leon@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>, 
-	=?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, 
-	Arnd Bergmann <arnd@arndb.de>, Brendan Higgins <brendan.higgins@linux.dev>, 
-	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, Jens Axboe <axboe@kernel.dk>, 
-	Alexandre Courbot <acourbot@nvidia.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, Liam Girdwood <lgirdwood@gmail.com>, 
-	Mark Brown <broonie@kernel.org>, linux-pm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	rust-for-linux@vger.kernel.org, nouveau@lists.freedesktop.org, 
-	dri-devel@lists.freedesktop.org, netdev@vger.kernel.org, 
-	linux-clk@vger.kernel.org, linux-pci@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, 
-	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Sep 25, 2025 at 3:54=E2=80=AFPM Tamir Duberstein <tamird@gmail.com>=
- wrote:
->
-> Changes in v2:
+On Sun, 28 Sep 2025 17:50:17 +0300
+Leon Romanovsky <leon@kernel.org> wrote:
 
-For future reference, this is v3.
+> From: Leon Romanovsky <leonro@nvidia.com>
+> 
+> Add new kernel config which indicates support for dma-buf export
+> of MMIO regions, which implementation is provided in next patches.
+> 
+> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+> ---
+>  drivers/vfio/pci/Kconfig | 20 ++++++++++++++++++++
+>  1 file changed, 20 insertions(+)
+> 
+> diff --git a/drivers/vfio/pci/Kconfig b/drivers/vfio/pci/Kconfig
+> index 2b0172f54665..55ae888bf26a 100644
+> --- a/drivers/vfio/pci/Kconfig
+> +++ b/drivers/vfio/pci/Kconfig
+> @@ -55,6 +55,26 @@ config VFIO_PCI_ZDEV_KVM
+>  
+>  	  To enable s390x KVM vfio-pci extensions, say Y.
+>  
+> +config VFIO_PCI_DMABUF
+> +	bool "VFIO PCI extensions for DMA-BUF"
+> +	depends on VFIO_PCI_CORE
+> +	depends on PCI_P2PDMA && DMA_SHARED_BUFFER
+> +	default y
+> +	help
+> +	  Enable support for VFIO PCI extensions that allow exporting
+> +	  device MMIO regions as DMA-BUFs for peer devices to access via
+> +	  peer-to-peer (P2P) DMA.
+> +
+> +	  This feature enables a VFIO-managed PCI device to export a portion
+> +	  of its MMIO BAR as a DMA-BUF file descriptor, which can be passed
+> +	  to other userspace drivers or kernel subsystems capable of
+> +	  initiating DMA to that region.
+> +
+> +	  Say Y here if you want to enable VFIO DMABUF-based MMIO export
+> +	  support for peer-to-peer DMA use cases.
+> +
+> +	  If unsure, say N.
+> +
+>  source "drivers/vfio/pci/mlx5/Kconfig"
+>  
+>  source "drivers/vfio/pci/hisilicon/Kconfig"
 
-Cheers,
-Miguel
+This is only necessary if we think there's a need to build a kernel with
+P2PDMA and VFIO_PCI, but not VFIO_PCI_DMABUF.  Does that need really
+exist?
+
+I also find it unusual to create the Kconfig before adding the
+supporting code.  Maybe this could be popped to the end or rolled into
+the last patch if we decided to keep it.  Thanks,
+
+Alex
+
