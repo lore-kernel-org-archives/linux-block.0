@@ -1,115 +1,84 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from sender4-pp-f112.zoho.com (sender4-pp-f112.zoho.com [136.143.188.112])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E086C2C3250;
-	Mon, 29 Sep 2025 09:39:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759138745; cv=none; b=LYpf8COBsB5qmx6M4i7ZMaDyd+lVNHJ0OzFCyZWVzenL8ClbVvwMZh410ywuXRJIghYbBbtHg9buuuWweNh5fZ3MsYpw32mfoT9lEGv0uCjeN/0rrvurgRfHY6DnxpyvBoRKgF+yz0jO1EpMwYeBXi0J6ExmbNHYD4MBHU8V80o=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759138745; c=relaxed/simple;
-	bh=oug/PLMLLW7/ZVdQh5G7ABppQ7HlQRSRolzg1A9Qm7s=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=n1oqvBmLEKdqYyTW0ZJtfIII3lhRdsqRNN+uS4lI5fU2C8qRGIpqR8O6hr4//FJcI3ntVC4sDLPVgZr5tjhymQGetB5qbNlmIFUPyUPg4f4W41QQilCmOZ6NyVdXor5hC8obWcW2UnrbYf43k8TiCkCbAVjeTqyfqITGDZjcABA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IjdRWxta; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D8132EC0B3;
+	Mon, 29 Sep 2025 12:53:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.112
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1759150430; cv=pass; b=ETUFeOrOM30Wdtej1bSIBsS2oadjm5yk6NdEoAkLbM1gnfT4fahGPNBqLV9ttSrsEyJCBNNScDmrsOhorNU6VTC65Jd5Zu7Y31HJG6ttDrCpTOISubv4ouRNKaT50WcvzyyxSLI7dz3kMkm//4V3cSXhPK9w2dUsPzyiuNT14Q0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1759150430; c=relaxed/simple;
+	bh=eBKxTtwMbWWsVmRTK8+SCP8Efd4jfs62T+R7mc64XII=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 MIME-Version:Content-Type; b=Vqq7YbaUxx3bFOlEJHVYQQxcJX0KgGUZoWwrOeZHpDX6r9nL+OCGrR7u8NdMvE1MB6pyQBHV5QwTwzEAlBwzuN9s8q47AsxHcbLnROTz9D83+Ma/5GwWg5ne40Oon4caVgfCIuUxk1k7DwIuSzlV03VxB7YYzqd1V+J+vzDPBso=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux.beauty; spf=pass smtp.mailfrom=linux.beauty; dkim=pass (1024-bit key) header.d=linux.beauty header.i=me@linux.beauty header.b=K9Dvhsws; arc=pass smtp.client-ip=136.143.188.112
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux.beauty
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.beauty
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IjdRWxta"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1F0EC4CEF4;
-	Mon, 29 Sep 2025 09:39:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759138744;
-	bh=oug/PLMLLW7/ZVdQh5G7ABppQ7HlQRSRolzg1A9Qm7s=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=IjdRWxtaUXAOawilIoA5EK1zaNWzq8SuG/RGnayTEvvTw8zkBFRbc95h1U8UXOXtI
-	 o+ChdWCOB1cSxsYTmhEnF4EZvWega7fq9Q5hvzFnoW/4vjE2MrI4IG5yeRG/g18Kp8
-	 gvohG7Zo7gpwrczplAyjI1Bsbj7IcC2iEs/HHL3fNdJRECFzrJnxHGS85figtNoTTA
-	 G/sSMaqFdX1Ohy+mgONJzGFTPJ6Tj3xM+34a0qPEkFNl8UKzwfbwSK9qeMto4zgEj3
-	 57f/S1bg5BHZsmE1HoHkUD56LCkL2l6h69d5wjUgsMUnyn3fypZtpxRVJ1itvbpKr3
-	 HiGZLKyS/z25w==
-From: Christian Brauner <brauner@kernel.org>
-To: miklos@szeredi.hu,
-	Joanne Koong <joannelkoong@gmail.com>
-Cc: Christian Brauner <brauner@kernel.org>,
-	djwong@kernel.org,
-	hch@infradead.org,
-	linux-block@vger.kernel.org,
-	gfs2@lists.linux.dev,
-	linux-fsdevel@vger.kernel.org,
-	kernel-team@meta.com,
-	linux-xfs@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	Gao Xiang <xiang@kernel.org>
-Subject: Re: [PATCH v5 00/14] fuse: use iomap for buffered reads + readahead
-Date: Mon, 29 Sep 2025 11:38:52 +0200
-Message-ID: <20250929-salzbergwerk-ungnade-8a16d724415e@brauner>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20250926002609.1302233-1-joannelkoong@gmail.com>
-References: <20250926002609.1302233-1-joannelkoong@gmail.com>
+	dkim=pass (1024-bit key) header.d=linux.beauty header.i=me@linux.beauty header.b="K9Dvhsws"
+ARC-Seal: i=1; a=rsa-sha256; t=1759150406; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=XKs8IiVjPegrhhG0vEVkbIx0k3SKSv7NZ+RDhF5T9hPHatVs9ElF10F6rEF/za72TRkviTJhboelBur8bj9usRMhZoy9WyVb+MwnxIDlEG/1JdCUUmQ0KYKSlhQyUKJheNyXNTPYWDx+wHCKjLhQDYswRe3F2+EcXjT84NUJLLw=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1759150406; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=uOmVlFLdpvtEjwlJedRpqA8qvL1y14ne4vIVGveE6s4=; 
+	b=PXRh6+UX8zFMydyoVAaYS7Lzeots4HyiWi5Se7K7Wg2S86j3fJUM8ekQOyoEUg5S3U2qAq2uPtYSOGb3VF8yIoxxpvOqJXyL+HUb4UM/qNbr7K0suCMIReDmmOximXiLkim45+RBMtlHcnovCuccCbPURUTlr+gd4f9Da41AN+c=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=linux.beauty;
+	spf=pass  smtp.mailfrom=me@linux.beauty;
+	dmarc=pass header.from=<me@linux.beauty>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1759150406;
+	s=zmail; d=linux.beauty; i=me@linux.beauty;
+	h=Date:Date:From:From:To:To:Cc:Cc:Message-ID:In-Reply-To:References:Subject:Subject:MIME-Version:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=uOmVlFLdpvtEjwlJedRpqA8qvL1y14ne4vIVGveE6s4=;
+	b=K9Dvhswss/WDdeSocR3mM4hJ6dOPmMkp4JArX2Gj5I5zRvVqlm1hbqKCNFFYD4vC
+	gmpVbgwTtREtNzUU7A+ki27uZmBXeJFIxJytvWy7Q3HyHJXLlXlt+1L7gKPGhBx/uRn
+	Jf2ND4WG8qP1SBPO23NilVIQlqkUsg0ndieGAXNM=
+Received: from mail.zoho.com by mx.zohomail.com
+	with SMTP id 1759150403924705.9548897883606; Mon, 29 Sep 2025 05:53:23 -0700 (PDT)
+Date: Mon, 29 Sep 2025 20:53:23 +0800
+From: Li Chen <me@linux.beauty>
+To: "Markus Elfring" <Markus.Elfring@web.de>
+Cc: "Li Chen" <chenl311@chinatelecom.cn>,
+	"linux-block" <linux-block@vger.kernel.org>,
+	"Jens Axboe" <axboe@kernel.dk>,
+	"LKML" <linux-kernel@vger.kernel.org>,
+	"Yang Erkun" <yangerkun@huawei.com>
+Message-ID: <1999588f143.5af31c76548207.2814872385181806897@linux.beauty>
+In-Reply-To: <9f6acb84-02cb-4f76-bf37-e79b87157f1e@web.de>
+References: <20250926121231.32549-1-me@linux.beauty> <9f6acb84-02cb-4f76-bf37-e79b87157f1e@web.de>
+Subject: Re: [PATCH] loop: fix backing file reference leak on validation
+ error
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3113; i=brauner@kernel.org; h=from:subject:message-id; bh=oug/PLMLLW7/ZVdQh5G7ABppQ7HlQRSRolzg1A9Qm7s=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWTcCt4U9G+2seCNkLbaHYktsafTZ5w7c6Oz0+SjoPRM9 4sH77rs7ShlYRDjYpAVU2RxaDcJl1vOU7HZKFMDZg4rE8gQBi5OAZhIpjLDb/ZKb+HfvbbTPqW+ 7T4i9pm515tNlnXnxUVa0/f1bd5RNZvhn/WbmlifgLUasz7qfTzIrLqL8UR9ReulTOaO2bv3S8m +ZAcA
-X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Importance: Medium
+User-Agent: Zoho Mail
+X-Mailer: Zoho Mail
 
-On Thu, 25 Sep 2025 17:25:55 -0700, Joanne Koong wrote:
-> This series adds fuse iomap support for buffered reads and readahead.
-> This is needed so that granular uptodate tracking can be used in fuse when
-> large folios are enabled so that only the non-uptodate portions of the folio
-> need to be read in instead of having to read in the entire folio. It also is
-> needed in order to turn on large folios for servers that use the writeback
-> cache since otherwise there is a race condition that may lead to data
-> corruption if there is a partial write, then a read and the read happens
-> before the write has undergone writeback, since otherwise the folio will not
-> be marked uptodate from the partial write so the read will read in the entire
-> folio from disk, which will overwrite the partial write.
-> 
-> [...]
+Hi Markus,
 
-Applied to the vfs-6.19.iomap branch of the vfs/vfs.git tree.
-Patches in the vfs-6.19.iomap branch should appear in linux-next soon.
+ ---- On Sun, 28 Sep 2025 21:48:23 +0800  Markus Elfring <Markus.Elfring@we=
+b.de> wrote ---=20
+ > =E2=80=A6
+ > > Fix this by calling fput(file) before returning the error.
+ > =E2=80=A6
+ > > +++ b/drivers/block/loop.c
+ > =E2=80=A6
+ >=20
+ > How do you think about to increase the application of scope-based resour=
+ce management?
+ > https://elixir.bootlin.com/linux/v6.17-rc7/source/include/linux/file.h#L=
+97
 
-Please report any outstanding bugs that were missed during review in a
-new review to the original patch series allowing us to drop it.
+Looks good; I will add a commit to switch to scope-based resource managemen=
+t in v2.
+Thanks for your suggestion!
 
-It's encouraged to provide Acked-bys and Reviewed-bys even though the
-patch has now been applied. If possible patch trailers will be updated.
-
-Note that commit hashes shown below are subject to change due to rebase,
-trailer updates or similar. If in doubt, please check the listed branch.
-
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
-branch: vfs-6.19.iomap
-
-[01/14] iomap: move bio read logic into helper function
-        https://git.kernel.org/vfs/vfs/c/4b1f54633425
-[02/14] iomap: move read/readahead bio submission logic into helper function
-        https://git.kernel.org/vfs/vfs/c/22159441469a
-[03/14] iomap: store read/readahead bio generically
-        https://git.kernel.org/vfs/vfs/c/7c732b99c04f
-[04/14] iomap: iterate over folio mapping in iomap_readpage_iter()
-        https://git.kernel.org/vfs/vfs/c/3b404627d3e2
-[05/14] iomap: rename iomap_readpage_iter() to iomap_read_folio_iter()
-        https://git.kernel.org/vfs/vfs/c/bf8b9f4ce6a9
-[06/14] iomap: rename iomap_readpage_ctx struct to iomap_read_folio_ctx
-        https://git.kernel.org/vfs/vfs/c/abea60c60330
-[07/14] iomap: track pending read bytes more optimally
-        https://git.kernel.org/vfs/vfs/c/13cc90f6c38e
-[08/14] iomap: set accurate iter->pos when reading folio ranges
-        https://git.kernel.org/vfs/vfs/c/63adb033604e
-[09/14] iomap: add caller-provided callbacks for read and readahead
-        https://git.kernel.org/vfs/vfs/c/56b6f5d3792b
-[10/14] iomap: move buffered io bio logic into new file
-        https://git.kernel.org/vfs/vfs/c/80cd9857c47f
-[11/14] iomap: make iomap_read_folio() a void return
-        https://git.kernel.org/vfs/vfs/c/434651f1a9b7
-[12/14] fuse: use iomap for read_folio
-        https://git.kernel.org/vfs/vfs/c/12cae30dc565
-[13/14] fuse: use iomap for readahead
-        https://git.kernel.org/vfs/vfs/c/0853f58ed0b4
-[14/14] fuse: remove fc->blkbits workaround for partial writes
-        https://git.kernel.org/vfs/vfs/c/bb944dc82db1
+Regards,
+Li
