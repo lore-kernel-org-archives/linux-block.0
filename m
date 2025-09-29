@@ -1,78 +1,115 @@
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E34B275B16
-	for <linux-block@vger.kernel.org>; Sun, 28 Sep 2025 20:12:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B2B5A31;
+	Mon, 29 Sep 2025 01:02:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759090324; cv=none; b=dyUGs0IiU43RiErTbMJm8mC4eKBjA50cfnjfxdMSshDYU+KshpcpWQcQyXF97PO/F0KE7djr1jo+FJi5eR0img5/PcbvGIzKGq9A1tnCmkvxyfOsRxnVzdCTOjHvWAgOTMGpfJ6ejvKngMaqzUn+i9PHWEkUuBBTIZParVgbr7I=
+	t=1759107758; cv=none; b=BIClGgCX4Cr+xxb/4NAxRLcdznYfFo+orGBr3uNFaMGahLatyGcsMJI6V2cu0TeDEzFo2o3i2e9DGGfpKQYoP7c7UgvuV0Gav7tE4ZZw0yb8lL7KHVU7KjyJ9eLUZW7S9HjKguh3lzFPXth44ytQfpUlK9xvrX+Tj4kJeZBeceo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759090324; c=relaxed/simple;
-	bh=0RbFeTDokiBIDFXYwXhTqeTngrPJxIKeMT9v6nJhPYk=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=u+3NE+3aAOAwkT86NO/gq40iU9sLNzCJ2Cp0f8H/hkh/fQ/+pCbx8xskVr+N2QWbLlIoqI289ShIhBEb85Ch4i+d8rA+nJ2SoqcLHk2lA4hSB5aVh8pe5HPYDFHM6KcRBRgbbdc1YJScQTC0+h664zH+Mxl+MlvkpHMMSG0FwA8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-4294d3057ffso16054795ab.0
-        for <linux-block@vger.kernel.org>; Sun, 28 Sep 2025 13:12:02 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759090322; x=1759695122;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DaduVv8+j9xG9g2Olc4KfHdOBiR7JfOMthlP5Ksd0K8=;
-        b=qPhaRT/YT0x71x88pVi7dS2WFRbE3jU0xWENQc9lZzKwsjAfEg/X74UZahOuVpIItW
-         HhnN3X8hSv/id0Vqxj4MQ6kcL/bmu7k0Ulv3vEy3O2CzflBhSsy5nolx5lZiaglZ2ZeI
-         M39WnqSxQr4xUkyCsyvzi6mTavEq1mNgCSuMu3byMxuFiB3J09lrNH5D8Bp3qBCbYQ7D
-         O7OzLJMmr+Uesr34xyvg5KEJIpXAYBl7phTtX2QtwHg+Q18MxGmqr6qBCfspzJURNCZJ
-         huNC0Sf39aRV5H8v+VcaKMdCSQ1TxR5MmdQkIR9U4FDvJ9GsMRfQqnKY8n3C+oxpO1HE
-         B4GA==
-X-Forwarded-Encrypted: i=1; AJvYcCUAhMPTsPwoaijFCzPGSUhbxbW1RhxlnJ44FUvx1FfawLYaTc2843Zc3OdJ9KOIox9WaC5+GN9BXQuZ3w==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxaeg3zyhTjMK0HDPJOH9pZfoxf5rNPDUCW2APN23BeCr3o2yb3
-	4ZqU8S00MNOHyZtZ/fvLmRKptNKrKQ4IBYodxORR4VrKtHwFtE0wiC0/s+mnJinzO98EHB9xoNd
-	Uk/Nl/sTJW2GQIKgJmp1e6uWUCbYuN/jMpuCVD9sJZDR2APLG9umxToaQl8c=
-X-Google-Smtp-Source: AGHT+IFe1cPN5hHZibJvP6cJECKOPK7CIGqP3ONZivzTbEMVJkCeWmbblnq11+o6oAttzrZ2589qumHKCObY7OyIrrC974/LLSD2
+	s=arc-20240116; t=1759107758; c=relaxed/simple;
+	bh=OQ2MWIMo+ifV9PZd1sYqy7TBioUTpaaT/nClxx4qxOk=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=G7nRktuVimx2NEXc/gQyo4p1c0WrZPvwiaoKswKTnHHdGNmvWYw3pWGAN2YdtbFffJZpqtfNa2DH8l/+7L12TVRGXsQnaTLL+SLCc5YGe5jM8KnEHukxOsaoiYRrdDBexoxAGb/kD9XiTpp8R1Uqjj0ScU0ZtxqPCDAwrR7FsTk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4cZjZz3DY2zKHMpf;
+	Mon, 29 Sep 2025 09:02:19 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id BC1AD1A1286;
+	Mon, 29 Sep 2025 09:02:32 +0800 (CST)
+Received: from [10.174.179.143] (unknown [10.174.179.143])
+	by APP4 (Coremail) with SMTP id gCh0CgDHi2Om2tlog8ipBA--.21198S3;
+	Mon, 29 Sep 2025 09:02:32 +0800 (CST)
+Subject: Re: [PATCH 01/10] blk-cgroup: use cgroup lock and rcu to protect
+ iterating blkcg blkgs
+To: Bart Van Assche <bvanassche@acm.org>, Yu Kuai <yukuai1@huaweicloud.com>,
+ Yu Kuai <hailan@yukuai.org.cn>, tj@kernel.org, ming.lei@redhat.com,
+ nilay@linux.ibm.com, hch@lst.de, josef@toxicpanda.com, axboe@kernel.dk,
+ akpm@linux-foundation.org, vgoyal@redhat.com
+Cc: cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-mm@kvack.org, yi.zhang@huawei.com,
+ yangerkun@huawei.com, johnny.chenyi@huawei.com,
+ "yukuai (C)" <yukuai3@huawei.com>
+References: <20250925081525.700639-1-yukuai1@huaweicloud.com>
+ <20250925081525.700639-2-yukuai1@huaweicloud.com>
+ <bc6fe04d-3245-40dd-aa30-c3a3acb670c2@acm.org>
+ <01e7eccd-3529-4d12-8ad2-fd9e034a026d@yukuai.org.cn>
+ <688275d5-fbb4-08b3-45e1-798ad8cf77fc@huaweicloud.com>
+ <66dcdcd1-df71-43b9-a468-2b4aaa8b6dc7@acm.org>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <9cf50e70-d2e4-cfd7-da2e-3701da0814b4@huaweicloud.com>
+Date: Mon, 29 Sep 2025 09:02:30 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:3c83:b0:426:c373:25db with SMTP id
- e9e14a558f8ab-426c3732a86mr162405485ab.4.1759090322279; Sun, 28 Sep 2025
- 13:12:02 -0700 (PDT)
-Date: Sun, 28 Sep 2025 13:12:02 -0700
-In-Reply-To: <68769347.a70a0220.693ce.0013.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68d99692.a70a0220.10c4b.0027.GAE@google.com>
-Subject: Re: [syzbot] [block?] [trace?] INFO: task hung in blk_trace_setup (4)
-From: syzbot <syzbot+9c1ebb9957045e00ac63@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, davem@davemloft.net, jiri@nvidia.com, kuba@kernel.org, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-trace-kernel@vger.kernel.org, mathieu.desnoyers@efficios.com, 
-	mhiramat@kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	rostedt@goodmis.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <66dcdcd1-df71-43b9-a468-2b4aaa8b6dc7@acm.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgDHi2Om2tlog8ipBA--.21198S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7KrW5urWxuryfZw4DJr17Awb_yoW8Xr47p3
+	yFq3W2kr4DtF4q93sFga1jvF1F9an7Gr98Jr4kXry5Aa4qvr1YqFsFyFWqkF1vqanrt3Wq
+	k34jkrZ3Jw10vaUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUBF14x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
+	0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AKxVW8ZVWrXwCF04k20xvY0x
+	0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E
+	7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_GFv_WrylIxkGc2Ij64vIr41lIxAIcV
+	C0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF
+	04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7
+	CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0pRHUDLUUUUU=
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-syzbot has bisected this issue to:
+Hi,
 
-commit c2368b19807affd7621f7c4638cd2e17fec13021
-Author: Jiri Pirko <jiri@nvidia.com>
-Date:   Fri Jul 29 07:10:35 2022 +0000
+在 2025/09/27 1:19, Bart Van Assche 写道:
+> On 9/25/25 5:57 PM, Yu Kuai wrote:
+>> 在 2025/09/26 1:07, Yu Kuai 写道:
+>>> 在 2025/9/25 23:57, Bart Van Assche 写道:
+>>>> On 9/25/25 1:15 AM, Yu Kuai wrote:
+>>>>> It's safe to iterate blkgs with cgroup lock or rcu lock held, prevent
+>>>>> nested queue_lock under rcu lock, and prepare to convert protecting
+>>>>> blkcg with blkcg_mutex instead of queuelock.
+>>>>
+>>>> Iterating blkgs without holding q->queue_lock is safe but accessing the
+>>>> blkg members without holding that lock is not safe since q->queue_lock
+>>>> is acquired by all code that modifies blkg members. Should perhaps a 
+>>>> new
+>>>> spinlock be introduced to serialize blkg modifications?
+>>
+>> Actually, only blkcg_print_blkgs() is using rcu in this patch, and take
+>> a look at the callers, I don't see anyone have to hold queue_lock. Can
+>> you explain in detail which field from blkg is problematic in this
+>> patch?
+> 
+> I'm not a cgroup expert so I cannot answer the above question. But I
+> think it's clear that the description of this patch is not sufficient as
+> motivation for this patch. Removing the blkg->q->queue_lock lock and
+> unlock calls requires a detailed review of all blkcg_print_blkgs() and
+> blkcg_print_stat() callers. There is no evidence available in the patch
+> description that shows that such a review has happened.
+> 
 
-    net: devlink: introduce "unregistering" mark and use it during devlinks iteration
+Ok, I'll explain more in details in commit message.
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=12620ae2580000
-start commit:   347e9f5043c8 Linux 6.16-rc6
-git tree:       upstream
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=11620ae2580000
-console output: https://syzkaller.appspot.com/x/log.txt?x=16620ae2580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=f62a2ef17395702a
-dashboard link: https://syzkaller.appspot.com/bug?extid=9c1ebb9957045e00ac63
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=138dfd82580000
+Thanks,
+Kuai
 
-Reported-by: syzbot+9c1ebb9957045e00ac63@syzkaller.appspotmail.com
-Fixes: c2368b19807a ("net: devlink: introduce "unregistering" mark and use it during devlinks iteration")
+> Thanks,
+> 
+> Bart.
+> .
+> 
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
