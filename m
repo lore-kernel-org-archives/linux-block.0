@@ -1,132 +1,99 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCF597D07D
-	for <linux-block@vger.kernel.org>; Mon, 29 Sep 2025 01:13:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFDEF19F43A
+	for <linux-block@vger.kernel.org>; Mon, 29 Sep 2025 05:14:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759108438; cv=none; b=EjG5D5Uk0Sr9hgzgI5n+qVyzPFLCGmovGXYwobv2Rk4SjqmfJ48N+0o8v79YkZpH6bvmZhIH/ZQxw4gQNkxyJVOdA2kbUW3i2FAi8bfN5vl5UrR5vC5ZpCaVA523+ihiYeewSDwFYO2c2zLwAxlI/7wUAnaHH5YD6M7PGQAshI8=
+	t=1759122870; cv=none; b=HvxpiEDsIfbI0n1e66VYQqabrNCIjEe9AnTp2pjkcyKr7PNlXLjsxa+dVXF4nEhvVlBRT+1nbMe78TT5TxgDkr9ISwyJMQFoCA4eti7pPxhJaqN14FNTIrLLuskna8LqDowYSWQrbL2hGuE5EmOUL2Q7MBMX43xi3kJJaksWIr8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759108438; c=relaxed/simple;
-	bh=JHEuqYRjf1RRJ48dY59Weg1760fE7v+8BM+mJAyCO/U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=USgk9D2eff7mAk7A0NbGYn7vd0B3dq2+D/feIrgbLQBIlB4htQu7CSFARZQaEevcj9yY/cFmqfEBZOlhBNDzX0Zbrpd/lZGm6PgixY8lPcYCaDy653TqFuuTKTuJNEstVnwHrj+JPCGB2q+K72mC1TbboebEsrUhqY/hvrx59VU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Hfbn7RoO; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1759122870; c=relaxed/simple;
+	bh=2nWBXd4KZrZn3Kozyj/dcu9GKU3e+h/EJFrqN3KQUNk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Htu8lV7YRUSb24rZW4erLgAAJaqhXHJ+SHzBabIJcXK1bWKZjHA9SKBtM6qFqBz/sKqEUqzOgghzW+qiDUa+d6tEIM0OmxybuxYaiVXR0dFirHi37A2ijstiEP8skZGWMtUDgC79u7Bw9vPIOZb8NUgjXTwwSEoHLfzhr6yn6WI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XDQcmykL; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Hfbn7RoO"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XDQcmykL"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1759108435;
+	s=mimecast20190719; t=1759122867;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=98UYUEll18IAUNdOSPwLWJ4Ut+5BsagdOfpfon2x9Lo=;
-	b=Hfbn7RoO36sMa85r1dGeOFGMa+PwpL4aVjHiRn7cyzLuRX3tJb5YqiWCyTI7RPYgfzLQ1m
-	g6MHrKH2DH/Fvyu5TQv0ibNrhuImlF1+TQMFqBUOeIFKqLtdGaU2010llwbSdPo60UF1sj
-	vftBbSMUOM+wFN0wpiScG8yZnI3wfE4=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-462-uXmKcoviPzyv_SelnV5isw-1; Sun,
- 28 Sep 2025 21:13:49 -0400
-X-MC-Unique: uXmKcoviPzyv_SelnV5isw-1
-X-Mimecast-MFC-AGG-ID: uXmKcoviPzyv_SelnV5isw_1759108428
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id F167F19560B1;
-	Mon, 29 Sep 2025 01:13:46 +0000 (UTC)
-Received: from fedora (unknown [10.72.120.21])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 30D1030001BD;
-	Mon, 29 Sep 2025 01:13:39 +0000 (UTC)
-Date: Mon, 29 Sep 2025 09:13:34 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: syzbot ci <syzbot+ci7622762f075d3fa0@syzkaller.appspotmail.com>
-Cc: axboe@kernel.dk, dchinner@redhat.com, hch@lst.de,
-	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	mpatocka@redhat.com, zhaoyang.huang@unisoc.com,
-	syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot ci] Re: loop: improve loop aio perf by IOCB_NOWAIT
-Message-ID: <aNndPs6kom-n4HSs@fedora>
-References: <20250928132927.3672537-1-ming.lei@redhat.com>
- <68d9818c.a00a0220.102ee.002d.GAE@google.com>
+	bh=2nWBXd4KZrZn3Kozyj/dcu9GKU3e+h/EJFrqN3KQUNk=;
+	b=XDQcmykLZLgz8KA0akEWu5WgSUlHt2N5eU+lvtNzoaR6rLbdQEjP3nna70dIWralupdLQ4
+	ex0L54KM+KFikmUphfrn5xRSIwA1isq5Zadg25hp64RC9TeZhORE7Htvxmgo5jaRmtEFxq
+	DvHnbXbxP2Fx5BDiTcvCNR0Qu0Uhv48=
+Received: from mail-vs1-f72.google.com (mail-vs1-f72.google.com
+ [209.85.217.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-370-DpGw2pooOqCZaYDnGbH5Nw-1; Mon, 29 Sep 2025 01:14:25 -0400
+X-MC-Unique: DpGw2pooOqCZaYDnGbH5Nw-1
+X-Mimecast-MFC-AGG-ID: DpGw2pooOqCZaYDnGbH5Nw_1759122864
+Received: by mail-vs1-f72.google.com with SMTP id ada2fe7eead31-581daecc31dso1646511137.1
+        for <linux-block@vger.kernel.org>; Sun, 28 Sep 2025 22:14:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759122864; x=1759727664;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2nWBXd4KZrZn3Kozyj/dcu9GKU3e+h/EJFrqN3KQUNk=;
+        b=TmiL24H7+2vdmGrDzYiLhHdoCZFoHFr4yC7qSFwVmyCIg4DmKXWUyYg75ahtX3tqlQ
+         zJueuYJgwY3MEE5cmCNB68IbV3Ck9elyiztwRZoXou8T1rw5ImcdBN5+jTFtlRw+MFXl
+         S3dRh6LQSgUtfhxE1qYWvdtkNKPGPx02GCQW2QdqRcEbHeCq6wC+a9af/1AgJ3Rl5dT8
+         X2rPMKRPZe30WUmaCAkN3XFdUQytYIMFLlZ0ZwHcZz9XItLBqo6utq2uMWsNDrf7J4Fl
+         CfSm13JaIsBfHHSxuNoH2rPHW0rw+VSbd/1XVQ4RO92ehoHBw8oaj7+zXmY8UkpaiT+p
+         UnzA==
+X-Forwarded-Encrypted: i=1; AJvYcCWGdEpOM8VWjoQLdbWRBDIDAxpPE5/3nXDLPde/FirbhXg2Cou+a3iUqMlRq/dZC31lCUTLrn0+t30xNg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzsUDe8skg1AkoJ5Go35SxbX+ZhWHCnWS3d6e5woZ5C2OvL5huW
+	0GKcS3vH52n75rqmL0yQeqEYShuY6j/cYaOLpBAbhvaA1sMDJjiKSu5wjxLIfc2GN76DstlpmAR
+	64v8QT+u0J6NDgoKOERgOqFQMpt0mT2JdSObQCHWoz14NpS3JkADznpT9ax3f2/wifddqVSdY4R
+	5vlSn+OHt++BaPWkd0fOoEvHJ8gK5LRrOIZhmZbJ0=
+X-Gm-Gg: ASbGncu5zciZjxIs1NVdSar9PQbMOO5v50R/NZLNoG2x3CuSMSOk6HzwNfEfemUm+a6
+	q/g9mCeF6Uf165vDmuizgSiQbipy8B2qopzKvYxJ9dG+w7HZKxtmqEukVuhJ9JOvi6hXaU6HWwl
+	ypDunaen1fk2iWyJNVtl6/3w==
+X-Received: by 2002:a05:6102:e0b:b0:4f9:d929:8558 with SMTP id ada2fe7eead31-5acc83f70fbmr5692681137.10.1759122864373;
+        Sun, 28 Sep 2025 22:14:24 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEBBAQ7Gy8XVwAW8aHjkNgwg3zjuam2zWgWYcrltjztGrwXHhbkc163/MD/lKu5otxjmKnF0CE/e5UEeiuG7UY=
+X-Received: by 2002:a05:6102:e0b:b0:4f9:d929:8558 with SMTP id
+ ada2fe7eead31-5acc83f70fbmr5692675137.10.1759122864049; Sun, 28 Sep 2025
+ 22:14:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <68d9818c.a00a0220.102ee.002d.GAE@google.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+References: <20250926121231.32549-1-me@linux.beauty>
+In-Reply-To: <20250926121231.32549-1-me@linux.beauty>
+From: Ming Lei <ming.lei@redhat.com>
+Date: Mon, 29 Sep 2025 13:14:13 +0800
+X-Gm-Features: AS18NWDXKiUqoWOcUr7IEczOPRgfBRc3SIC3-S6lJC4tqxwzN33sIh-Pgku9MGg
+Message-ID: <CAFj5m9LN80E3xyNY+3nGjncr8WauoUi4QUKEX-vtmGfHrzE48A@mail.gmail.com>
+Subject: Re: [PATCH] loop: fix backing file reference leak on validation error
+To: Li Chen <me@linux.beauty>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sun, Sep 28, 2025 at 11:42:20AM -0700, syzbot ci wrote:
-> syzbot ci has tested the following series
-> 
-> [v1] loop: improve loop aio perf by IOCB_NOWAIT
-> https://lore.kernel.org/all/20250928132927.3672537-1-ming.lei@redhat.com
-> * [PATCH V4 1/6] loop: add helper lo_cmd_nr_bvec()
-> * [PATCH V4 2/6] loop: add helper lo_rw_aio_prep()
-> * [PATCH V4 3/6] loop: add lo_submit_rw_aio()
-> * [PATCH V4 4/6] loop: move command blkcg/memcg initialization into loop_queue_work
-> * [PATCH V4 5/6] loop: try to handle loop aio command via NOWAIT IO first
-> * [PATCH V4 6/6] loop: add hint for handling aio via IOCB_NOWAIT
-> 
-> and found the following issue:
-> WARNING in lo_submit_rw_aio
-> 
-> Full report is available here:
-> https://ci.syzbot.org/series/0ffdb6b4-a5fe-48da-9473-d2a926e780bd
-> 
-> ***
-> 
-> WARNING in lo_submit_rw_aio
-> 
-> tree:      torvalds
-> URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/torvalds/linux
-> base:      07e27ad16399afcd693be20211b0dfae63e0615f
-> arch:      amd64
-> compiler:  Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-> config:    https://ci.syzbot.org/builds/3aba003b-2400-4e88-9a31-c09ab4e41a84/config
-> C repro:   https://ci.syzbot.org/findings/dc97454c-d87b-41f5-a44a-7182e666cfd5/c_repro
-> syz repro: https://ci.syzbot.org/findings/dc97454c-d87b-41f5-a44a-7182e666cfd5/syz_repro
-> 
-> ------------[ cut here ]------------
-> WARNING: CPU: 0 PID: 5958 at drivers/block/loop.c:907 loop_inc_blocking_writes drivers/block/loop.c:907 [inline]
+On Fri, Sep 26, 2025 at 8:13=E2=80=AFPM Li Chen <me@linux.beauty> wrote:
+>
+> loop_change_fd() and loop_configure() call loop_check_backing_file()
+> to validate the new backing file. If validation fails, the reference
+> acquired by fget() was not dropped, leaking a file reference.
+>
+> Fix this by calling fput(file) before returning the error.
+>
+> Signed-off-by: Li Chen <chenl311@chinatelecom.cn>
 
-Thanks for your report!
+Good catch:
 
-Looks wrong lock is asserted, and the following change can fix it:
+Fixes: f5c84eff634b ("loop: Add sanity check for read/write_iter")
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 911262b648ce..f3372bf35fd5 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -904,7 +904,7 @@ static inline int queue_on_root_worker(struct cgroup_subsys_state *css)
- static inline void loop_inc_blocking_writes(struct loop_device *lo,
-                struct loop_cmd *cmd)
- {
--       lockdep_assert_held(&lo->lo_mutex);
-+       lockdep_assert_held(&lo->lo_work_lock);
-
-        if (req_op(blk_mq_rq_from_pdu(cmd)) == REQ_OP_WRITE)
-                lo->lo_nr_blocking_writes += 1;
-@@ -913,7 +913,7 @@ static inline void loop_inc_blocking_writes(struct loop_device *lo,
- static inline void loop_dec_blocking_writes(struct loop_device *lo,
-                struct loop_cmd *cmd)
- {
--       lockdep_assert_held(&lo->lo_mutex);
-+       lockdep_assert_held(&lo->lo_work_lock);
-
-        if (req_op(blk_mq_rq_from_pdu(cmd)) == REQ_OP_WRITE)
-                lo->lo_nr_blocking_writes -= 1;
-
-
-
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
 Thanks,
-Ming
 
