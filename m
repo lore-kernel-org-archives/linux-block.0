@@ -1,32 +1,44 @@
-Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 005862BCF41;
-	Tue, 30 Sep 2025 06:49:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9611CC8FE;
+	Tue, 30 Sep 2025 07:00:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759214963; cv=none; b=YZj8tSjaDi7Q7+yk0C9TexHXSn+OzvawQcgxajmS4mx3xZS/GmbcuYFaNhLMEMVzB63X4cHQXEdVRnkXXyurLTSl87jnueDIdMtzfiBdGAgFErQsnf6YhhB/IEy1iPODzcmZotD9KD5CM23BaHQu49Aa5DBvLhEeadxeNtZNCsg=
+	t=1759215619; cv=none; b=m269s4YGHSj6483O1ynqJ05+RlbGqGhfPc3jn63rb9JYxtJaDp00fcOb5vN16R2tkSnZ4KaMm+X1YR9A5OmU5mRfzNIvfxk4OIGI7AVGNzfK0nfllbY2s9RZU1R/gVrT8nH1rBCWNAPx0AM2sqyVq2W4Yy/JYHy6YxbLtxOCOn8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759214963; c=relaxed/simple;
-	bh=Q3oX87+S5LYZOR/oT6E1uzNT2xUerQH+hR+eqFMB1T0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TaSNM8e1cs79uJ5+JjaxywLFNVEaOePnkFgjOtvUpB7TuDuEnyOPeXTCp1WagTyz9qggEnHRpRpzMi+swG0BbSGfu5//Lo4UbbjaIEEYdXp6myHQ7hURZ/fqmSXrk4iM7MYJft8uRFHnWEmLlIv2QQs45FBDvl+8EVn37OAnLr0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from DESKTOP-L0HPE2S (unknown [124.16.141.245])
-	by APP-03 (Coremail) with SMTP id rQCowAB3w31afdtolgQ2CQ--.35090S2;
-	Tue, 30 Sep 2025 14:48:59 +0800 (CST)
-From: Haotian Zhang <vulab@iscas.ac.cn>
-To: stable@vger.kernel.org
-Cc: gregkh@linuxfoundation.org,
-	sashal@kernel.org,
+	s=arc-20240116; t=1759215619; c=relaxed/simple;
+	bh=1nRzo+4if6eps77k90YPPpU5HTbEPWG80Uu568W2D4c=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=UjVXEm6HWwQJpq3O/RwJbLbtSatOrbCHM1+6f3W6dMEWY6L7ATPgrURlI530hQujJ+oVN1/ozC4+8zhure766j3uH/Lait6+rgYtjaMon4Tsv6Qa7ktbcLcGu0tfsshYwQZGGXMc5CmZ9kDyLjw1wT3mBsXg5WlcQ7y+2qlo/I0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4cbTT86GP1zYQtvr;
+	Tue, 30 Sep 2025 14:59:56 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 166801A0F03;
+	Tue, 30 Sep 2025 15:00:14 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+	by APP4 (Coremail) with SMTP id gCh0CgAn6mH5f9tojSc3BQ--.45680S4;
+	Tue, 30 Sep 2025 15:00:11 +0800 (CST)
+From: Zheng Qixing <zhengqixing@huaweicloud.com>
+To: axboe@kernel.dk
+Cc: linux-fsdevel@vger.kernel.org,
 	linux-block@vger.kernel.org,
-	axboe@kernel.dk,
-	vulab@iscas.ac.cn
-Subject: [PATCH 6.12 stable] pktcdvd: Handle bio_split() failure
-Date: Tue, 30 Sep 2025 14:48:50 +0800
-Message-ID: <20250930064850.1682-1-vulab@iscas.ac.cn>
-X-Mailer: git-send-email 2.50.1.windows.1
+	stable@vger.kernel.org,
+	jack@suse.cz,
+	gregkh@linuxfoundation.org,
+	sashal@kernel.org,
+	yukuai3@huawei.com,
+	yi.zhang@huawei.com,
+	yangerkun@huawei.com,
+	houtao1@huawei.com,
+	zhengqixing@huawei.com
+Subject: [PATCH 6.6.y] loop: Avoid updating block size under exclusive owner
+Date: Tue, 30 Sep 2025 14:49:33 +0800
+Message-Id: <20250930064933.1188006-1-zhengqixing@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -34,55 +46,134 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:rQCowAB3w31afdtolgQ2CQ--.35090S2
-X-Coremail-Antispam: 1UD129KBjvdXoW7Gw4UCr48Gw1xXw1rJw15XFb_yoWDWFg_Wa
-	4rXry3WrWkCwsYkw17KFsFvrZF9rn5W34rurn3t3yfGa9rXan7XryYvF93ZryUJrs7WF1U
-	A34UZr4rJFnxZjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUb48FF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr0_
-	Cr1l84ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
-	0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
-	jxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr0_Gr
-	1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7MxkF7I0En4kS14v26r12
-	6r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI
-	0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUAVWUtwCIc40Y
-	0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxV
-	WUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1l
-	IxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUjO6pDUUUU
-	U==
-X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiDAYBA2jbaP9D8wAAsc
+X-CM-TRANSID:gCh0CgAn6mH5f9tojSc3BQ--.45680S4
+X-Coremail-Antispam: 1UD129KBjvJXoWxAFWDGryxtF45AF1UGrWUCFg_yoW5Kw13pF
+	42gFW5trWvgFW2gFWavw1vvry5Gw1xG3y7GFy2gw1j9ayUJ3sI9w1xJr90grW0qr93WFZ8
+	X39xJFW8uF1UJ3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvFb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
+	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
+	x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
+	0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAa
+	w2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxV
+	Aqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q
+	6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6x
+	kF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AK
+	xVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvj
+	xUF1v3UUUUU
+X-CM-SenderInfo: x2kh0wptl0x03j6k3tpzhluzxrxghudrp/
 
-The error return from bio_split() is not checked before
-being passed to bio_chain(), leading to a kernel panic
-from an invalid pointer dereference.
+From: Zheng Qixing <zhengqixing@huawei.com>
 
-Add a check with IS_ERR() to handle the allocation failure
-and prevent the crash.
+From: Jan Kara <jack@suse.cz>
 
-This patch fixes a bug in the pktcdvd driver, which was removed
-from the mainline kernel but still exists in stable branches.
+[ Upstream commit 7e49538288e523427beedd26993d446afef1a6fb ]
 
-Fixes: 4b83e99ee7092 ("Revert "pktcdvd: remove driver."")
-Cc: stable@vger.kernel.org
-Signed-off-by: Haotian Zhang <vulab@iscas.ac.cn>
+Syzbot came up with a reproducer where a loop device block size is
+changed underneath a mounted filesystem. This causes a mismatch between
+the block device block size and the block size stored in the superblock
+causing confusion in various places such as fs/buffer.c. The particular
+issue triggered by syzbot was a warning in __getblk_slow() due to
+requested buffer size not matching block device block size.
+
+Fix the problem by getting exclusive hold of the loop device to change
+its block size. This fails if somebody (such as filesystem) has already
+an exclusive ownership of the block device and thus prevents modifying
+the loop device under some exclusive owner which doesn't expect it.
+
+Reported-by: syzbot+01ef7a8da81a975e1ccd@syzkaller.appspotmail.com
+Signed-off-by: Jan Kara <jack@suse.cz>
+Tested-by: syzbot+01ef7a8da81a975e1ccd@syzkaller.appspotmail.com
+Link: https://lore.kernel.org/r/20250711163202.19623-2-jack@suse.cz
+Signed-off-by: Zheng Qixing <zhengqixing@huawei.com>
 ---
- drivers/block/pktcdvd.c | 2 ++
- 1 file changed, 2 insertions(+)
+ drivers/block/loop.c | 40 +++++++++++++++++++++++++++++++---------
+ 1 file changed, 31 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
-index 65b96c083b3c..c0999c3d167a 100644
---- a/drivers/block/pktcdvd.c
-+++ b/drivers/block/pktcdvd.c
-@@ -2466,6 +2466,8 @@ static void pkt_submit_bio(struct bio *bio)
- 			split = bio_split(bio, last_zone -
- 					  bio->bi_iter.bi_sector,
- 					  GFP_NOIO, &pkt_bio_set);
-+			if (IS_ERR(split))
-+				goto end_io;
- 			bio_chain(split, bio);
- 		} else {
- 			split = bio;
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 455e2a2b149f..6fe9180aafb3 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -1472,19 +1472,36 @@ static int loop_set_dio(struct loop_device *lo, unsigned long arg)
+ 	return error;
+ }
+ 
+-static int loop_set_block_size(struct loop_device *lo, unsigned long arg)
++static int loop_set_block_size(struct loop_device *lo, blk_mode_t mode,
++			       struct block_device *bdev, unsigned long arg)
+ {
+ 	int err = 0;
+ 
+-	if (lo->lo_state != Lo_bound)
+-		return -ENXIO;
++	/*
++	 * If we don't hold exclusive handle for the device, upgrade to it
++	 * here to avoid changing device under exclusive owner.
++	 */
++	if (!(mode & BLK_OPEN_EXCL)) {
++		err = bd_prepare_to_claim(bdev, loop_set_block_size, NULL);
++		if (err)
++			return err;
++	}
++
++	err = mutex_lock_killable(&lo->lo_mutex);
++	if (err)
++		goto abort_claim;
++
++	if (lo->lo_state != Lo_bound) {
++		err = -ENXIO;
++		goto unlock;
++	}
+ 
+ 	err = blk_validate_block_size(arg);
+ 	if (err)
+-		return err;
++		goto unlock;
+ 
+ 	if (lo->lo_queue->limits.logical_block_size == arg)
+-		return 0;
++		goto unlock;
+ 
+ 	sync_blockdev(lo->lo_device);
+ 	invalidate_bdev(lo->lo_device);
+@@ -1496,6 +1513,11 @@ static int loop_set_block_size(struct loop_device *lo, unsigned long arg)
+ 	loop_update_dio(lo);
+ 	blk_mq_unfreeze_queue(lo->lo_queue);
+ 
++unlock:
++	mutex_unlock(&lo->lo_mutex);
++abort_claim:
++	if (!(mode & BLK_OPEN_EXCL))
++		bd_abort_claiming(bdev, loop_set_block_size);
+ 	return err;
+ }
+ 
+@@ -1514,9 +1536,6 @@ static int lo_simple_ioctl(struct loop_device *lo, unsigned int cmd,
+ 	case LOOP_SET_DIRECT_IO:
+ 		err = loop_set_dio(lo, arg);
+ 		break;
+-	case LOOP_SET_BLOCK_SIZE:
+-		err = loop_set_block_size(lo, arg);
+-		break;
+ 	default:
+ 		err = -EINVAL;
+ 	}
+@@ -1571,9 +1590,12 @@ static int lo_ioctl(struct block_device *bdev, blk_mode_t mode,
+ 		break;
+ 	case LOOP_GET_STATUS64:
+ 		return loop_get_status64(lo, argp);
++	case LOOP_SET_BLOCK_SIZE:
++		if (!(mode & BLK_OPEN_WRITE) && !capable(CAP_SYS_ADMIN))
++			return -EPERM;
++		return loop_set_block_size(lo, mode, bdev, arg);
+ 	case LOOP_SET_CAPACITY:
+ 	case LOOP_SET_DIRECT_IO:
+-	case LOOP_SET_BLOCK_SIZE:
+ 		if (!(mode & BLK_OPEN_WRITE) && !capable(CAP_SYS_ADMIN))
+ 			return -EPERM;
+ 		fallthrough;
 -- 
-2.25.1
+2.39.2
 
