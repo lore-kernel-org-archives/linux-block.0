@@ -1,58 +1,89 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from canpmsgout11.his.huawei.com (canpmsgout11.his.huawei.com [113.46.200.226])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B333B22EE5;
-	Tue, 30 Sep 2025 07:34:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2379121FF35;
+	Tue, 30 Sep 2025 07:46:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.226
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759217692; cv=none; b=e/dVZhAfv7xWtT0hTFPI7QwUln9DkfOdyyrld8CbePVYYjFZnHnd/t7KKztrgI5UJCZIExTiuXvfcYpTI//x/Y39EVAtoiM6xuwDwCcopZSe+FPg1vnM0ZoXO8ovL71H4x8JB49a+/kPytT5v/uwdm6NbXgwWWIWy21fZ8PN+e4=
+	t=1759218412; cv=none; b=mIXm7YORz8Ew2um3HEsZgkYn1KPOVMb3IlehiatibaQKa3m1rij1u2l26sJE5FdnxZmw+qkS4ufN5xyx4UDb302jWwO5HN4iVksNbQDDpd39ZUHMPy0Jb1MtZwe6pI8skXBcFFx7+LihndZRkxY4v17MJ/ZRp+lGcz2pxuzbqWY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759217692; c=relaxed/simple;
-	bh=xyMCZ0DmVoh2j331NzXRy+v1+TC8o4J8u66Uk6VAjyc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=i+qbt2BPbIYZ8CXQtvsncpZcdSUWRevFz4ylmm+whGZ869uTESbjh5ZyM2wunygggM54A6sJIfkKsDXeTnh9rJxiSXDpE4KopAS10+SfyIM3ZO6B0v/xEM5g4wEaL03T6WN19zRtsZCl3s1+zY5nxWyrDC8eXea/MulNI6pZjMA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=qTDbrtiz; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1759218412; c=relaxed/simple;
+	bh=95fMoTQh0bo0BzmYci/Zzv5/hRiWx+7onjHlNikE3YY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=iQ5SuGU/V+fOmkKNZj2ZRkfnukZUbg7y7dLr8PN2KHRwY+UEt6cjUjSeCBJU+8DkBpIBIlx9ExbGmEPGOCSkx48o561b+ng/m6p/5HNVUHWVv/0kPQo09a3xgA3mNoKbysGs+S9T88SAQDNrMs90ZY4R3vuyLeAabcfeY7RtHwE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=UTmMmVsO; arc=none smtp.client-ip=113.46.200.226
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="qTDbrtiz"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DAF5AC4CEF0;
-	Tue, 30 Sep 2025 07:34:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1759217692;
-	bh=xyMCZ0DmVoh2j331NzXRy+v1+TC8o4J8u66Uk6VAjyc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=qTDbrtizxlxY+K5TiLoPLdPXV8VDSRBK597kknM3dVj37ChSeljgL3QvfP8FYX/oM
-	 vnoWhd97qLMrt+fG/XFe6UIEiSeO1w3pNHqAUrgXQshDXBXC6putUhps9ryC3V9I5H
-	 yprwo1SH2LC2799q+S+kveUMPDUTCQ2v+60G89U8=
-Date: Tue, 30 Sep 2025 09:34:49 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Zheng Qixing <zhengqixing@huaweicloud.com>
-Cc: axboe@kernel.dk, linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org, stable@vger.kernel.org, jack@suse.cz,
-	sashal@kernel.org, yukuai3@huawei.com, yi.zhang@huawei.com,
-	yangerkun@huawei.com, houtao1@huawei.com, zhengqixing@huawei.com
-Subject: Re: [PATCH 6.6.y] loop: Avoid updating block size under exclusive
- owner
-Message-ID: <2025093029-clavicle-landline-0a31@gregkh>
-References: <20250930064933.1188006-1-zhengqixing@huaweicloud.com>
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="UTmMmVsO"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=4yVBWN40KFRCJyogD6bEHezduKbNYUszb3revB5puE4=;
+	b=UTmMmVsOlCafkjb9SR77hPSgp5RCV+u79zh0qkYxIzTVZIivSP0AKeBOHluWQ0iMlBuGiZ8an
+	rMr/h2Vhc8XgkLz5jfHBLuWC6HEIB1PEDvQ7QeS8u7vFhzGkiYoK58U0S3JY9pWGzIZlUooky0S
+	zVwcRwCnlst3hzhH0SVWWxk=
+Received: from mail.maildlp.com (unknown [172.19.163.17])
+	by canpmsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4cbVVy2QzNzKmcs;
+	Tue, 30 Sep 2025 15:46:34 +0800 (CST)
+Received: from kwepemf100006.china.huawei.com (unknown [7.202.181.220])
+	by mail.maildlp.com (Postfix) with ESMTPS id 478741A0188;
+	Tue, 30 Sep 2025 15:46:45 +0800 (CST)
+Received: from [10.174.177.210] (10.174.177.210) by
+ kwepemf100006.china.huawei.com (7.202.181.220) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 30 Sep 2025 15:46:44 +0800
+Message-ID: <4710f8cf-4abe-0f3b-fac0-74379a755824@huawei.com>
+Date: Tue, 30 Sep 2025 15:46:44 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250930064933.1188006-1-zhengqixing@huaweicloud.com>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.1
+Subject: Re: [PATCH 6.6.y] loop: Avoid updating block size under exclusive
+ owner
+To: Greg KH <gregkh@linuxfoundation.org>, Zheng Qixing
+	<zhengqixing@huaweicloud.com>
+CC: <axboe@kernel.dk>, <linux-fsdevel@vger.kernel.org>,
+	<linux-block@vger.kernel.org>, <stable@vger.kernel.org>, <jack@suse.cz>,
+	<sashal@kernel.org>, <yukuai3@huawei.com>, <yi.zhang@huawei.com>,
+	<houtao1@huawei.com>, <zhengqixing@huawei.com>
+References: <20250930064933.1188006-1-zhengqixing@huaweicloud.com>
+ <2025093029-clavicle-landline-0a31@gregkh>
+From: yangerkun <yangerkun@huawei.com>
+In-Reply-To: <2025093029-clavicle-landline-0a31@gregkh>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: kwepems200001.china.huawei.com (7.221.188.67) To
+ kwepemf100006.china.huawei.com (7.202.181.220)
 
-On Tue, Sep 30, 2025 at 02:49:33PM +0800, Zheng Qixing wrote:
-> From: Zheng Qixing <zhengqixing@huawei.com>
+
+
+在 2025/9/30 15:34, Greg KH 写道:
+> On Tue, Sep 30, 2025 at 02:49:33PM +0800, Zheng Qixing wrote:
+>> From: Zheng Qixing <zhengqixing@huawei.com>
+>>
+>> From: Jan Kara <jack@suse.cz>
+>>
+>> [ Upstream commit 7e49538288e523427beedd26993d446afef1a6fb ]
 > 
-> From: Jan Kara <jack@suse.cz>
+> This is already in the 6.6.103 release, so how can we apply it again?
+
+147338df3487 (tag: v6.6.108, origin/linux-6.6.y) Linux 6.6.108
+42a6aeb4b238 Revert "loop: Avoid updating block size under exclusive owner"
+
+We revert this in 6.6.108 since this incorrect adaptation will introduce 
+some hungtask bug. And patch from Qixing is correct.
+
+Thanks,
+Erkun.
+
+
 > 
-> [ Upstream commit 7e49538288e523427beedd26993d446afef1a6fb ]
-
-This is already in the 6.6.103 release, so how can we apply it again?
-
-thanks,
-
-greg k-h
+> thanks,
+> 
+> greg k-h
+> 
