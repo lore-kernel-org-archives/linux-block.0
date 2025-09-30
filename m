@@ -1,113 +1,234 @@
-Received: from sender3-pp-f112.zoho.com (sender3-pp-f112.zoho.com [136.143.184.112])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5512B140E5F;
-	Tue, 30 Sep 2025 00:36:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.184.112
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759192604; cv=pass; b=mXx6OPuSJKyyOMvoRkWvc7gUlHLnBQtUh76+sFpNRORonVlHBP1GKizXzhdSfxRlo5ykb+p41sJvpDQoO7lJAV+5QH7i7SrXFm4DfVwe10IO+x6HE36pFw6Wt0jTP5qT+xtZsDcFQP3oYdsCCMWzuJ5wS5wZYqneDjxiurALaG8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759192604; c=relaxed/simple;
-	bh=0dmw+NX0SV+++5sYlZaNjj5lFZzOb2zEdPom2w5GJ28=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KXfKivLQd/f72G8PeIvKXqBwgNvx/ooZ74DKSQ7FlLHG/FfA4Ucq2/AO4MyNprIeM4MtdJi2/Ft1JNzCBaxeqJvCGLg6twVUFT/p2pVIK8FUC29RJdjnEN5H4MLCiiLWPhLF4QOEblLUthHgsaxvls1QgUByzdkndz2U4lXOewg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux.beauty; spf=pass smtp.mailfrom=linux.beauty; dkim=pass (1024-bit key) header.d=linux.beauty header.i=me@linux.beauty header.b=O3Ji+s0t; arc=pass smtp.client-ip=136.143.184.112
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux.beauty
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.beauty
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.beauty header.i=me@linux.beauty header.b="O3Ji+s0t"
-ARC-Seal: i=1; a=rsa-sha256; t=1759192572; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=Gzzvatf2+sOjcLRAR35rfF6PyBpIAs2zctN6lNO2evh/mpIP7fD1GVTcbKuJECN9VPY3dG4T+kgi97611gXES0990c2xlbSrmT9lgscxazjJ3We7DQV7JP6U7hVS1x/mboZp4vRetKQzCYWI0C8SqBV37GMDc4ayN/vN9r9Gsl4=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1759192572; h=Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=hydiAdnjg/6bowrEjqyPCxKqacoOwPu3GjH+2V9IjnI=; 
-	b=N072Nz1wP8msVfX2z6Vb4QI8eM7xVRQCzU+3xnOuAiKtpjL1+OszzPlYWmQQMRVJoxi1NdgnR2U2n/6gz3dL8YG2cXqFWo0lv0z8r0KXvKo/Ik2hZc/13/5Xh8/gCSOoETVkLBPpUVVkK5m+tDVjFI2hKPOv+eNnjjBxSctdPlo=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=linux.beauty;
-	spf=pass  smtp.mailfrom=me@linux.beauty;
-	dmarc=pass header.from=<me@linux.beauty>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1759192571;
-	s=zmail; d=linux.beauty; i=me@linux.beauty;
-	h=From:From:To:To:Cc:Cc:Subject:Subject:Date:Date:Message-ID:MIME-Version:Content-Transfer-Encoding:Message-Id:Reply-To;
-	bh=hydiAdnjg/6bowrEjqyPCxKqacoOwPu3GjH+2V9IjnI=;
-	b=O3Ji+s0tXa3c2jQrZHN7aZtOznofbmue9EnDAJIFiXn9A16jwC4x8w+bzihQDdwq
-	/QlgieInSYZMTKQMDYqtT4GTl5vJPUpPQ2him4WI4mKmWeGSLHY4e8APRLTjMWlIKCL
-	fbA53BHKKcsPHj9oMc6d43EdZVsdDry9A8LBBq4U=
-Received: by mx.zohomail.com with SMTPS id 1759192569234211.8709219622018;
-	Mon, 29 Sep 2025 17:36:09 -0700 (PDT)
-From: Li Chen <me@linux.beauty>
-To: Jens Axboe <axboe@kernel.dk>,
-	Lizhi Xu <lizhi.xu@windriver.com>,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: stable@vger.kernel.org,
-	"Markus Elfring" <Markus.Elfring@web.de>,
-	"Yang Erkun" <yangerkun@huawei.com>,
-	"Ming Lei" <ming.lei@redhat.com>,
-	"Yu Kuai" <yukuai1@huaweicloud.com>
-Subject: [PATCH v2] loop: fix backing file reference leak on validation error
-Date: Tue, 30 Sep 2025 08:35:59 +0800
-Message-ID: <20250930003559.708798-1-me@linux.beauty>
-X-Mailer: git-send-email 2.51.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14D0C1547EE;
+	Tue, 30 Sep 2025 01:11:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1759194716; cv=none; b=mL/2sUg+rQJYZhPQg9ItiGYmSAyupfLKf3TzXjmAewCi8fllVievsx7po16Oai43tXjmY9WoNkUoNM/sFcxQgk6q8ihyyiKPdMGtqHhT4xfJLHBbMaMB4txp2pFFrQn3tCT/QmszvSqL1FIcQwXarmz3qUNl8TvGqdxFwBYzerI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1759194716; c=relaxed/simple;
+	bh=smQWXVrEipLiSnyezzEM2x3kB70lA++LqA2mlbqAh+I=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=lNrpPREFhxcLPNHcz6fCa6m30JUJqtXIAweI0r8DbIL2+a/kQLKo6+qx9RvYul/COB+Zp5w/LkC8JM9pcl0cOcjjTfp6G78W7KRqlMhNN9Avszcwjz6e+dxjl/CI1Kze4jf5Uk9dNgwsLGhy4voaqu9LoBF61P8pJWQ+CrHKB0c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4cbKl92cClzYQtxC;
+	Tue, 30 Sep 2025 09:11:33 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 2D55B1A16CB;
+	Tue, 30 Sep 2025 09:11:50 +0800 (CST)
+Received: from [10.174.179.143] (unknown [10.174.179.143])
+	by APP4 (Coremail) with SMTP id gCh0CgA3+mFULttoaZEbBQ--.38707S3;
+	Tue, 30 Sep 2025 09:11:50 +0800 (CST)
+Subject: Re: [PATCH v3] block: plug attempts to batch allocate tags multiple
+ times
+To: Xue He <xue01.he@samsung.com>, axboe@kernel.dk,
+ akpm@linux-foundation.org, yukuai1@huaweicloud.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ "yukuai (C)" <yukuai3@huawei.com>
+References: <CGME20250929091034epcas5p2810fc25ca2fec7a640d4121ec61478f4@epcas5p2.samsung.com>
+ <20250929090602.6102-1-xue01.he@samsung.com>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <35b513ba-5bd5-3411-0362-06e5b29857ab@huaweicloud.com>
+Date: Tue, 30 Sep 2025 09:11:47 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+In-Reply-To: <20250929090602.6102-1-xue01.he@samsung.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-ZohoMailClient: External
+X-CM-TRANSID:gCh0CgA3+mFULttoaZEbBQ--.38707S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxKw47JF13tw47tw1rZr1fJFb_yoW7WrWUpr
+	ZxJa13GrWrXry29Fs3J3yDXr1rtws7GF1xGr4ftr1Fy3s7Cr1Sqr48JF4SvFyxArWDAF48
+	Wrs8JFy3ur4qqrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvC14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7I2V7IY0VAS07AlzVAY
+	IcxG8wCY1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbV
+	WUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF
+	67kF1VAFwI0_JF0_Jw1lIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42
+	IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF
+	0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2Kf
+	nxnUUI43ZEXa7VUbSfO7UUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-loop_change_fd() and loop_configure() call loop_check_backing_file()
-to validate the new backing file. If validation fails, the reference
-acquired by fget() was not dropped, leaking a file reference.
+Hi,
 
-Fix this by calling fput(file) before returning the error.
+在 2025/09/29 17:06, Xue He 写道:
+> In the existing plug mechanism, tags are allocated in batches based on
+> the number of requests. However, testing has shown that the plug only
+> attempts batch allocation of tags once at the beginning of a batch of
+> I/O operations. Since the tag_mask does not always have enough available
+> tags to satisfy the requested number, a full batch allocation is not
+> guaranteed to succeed each time. The remaining tags are then allocated
+> individually (occurs frequently), leading to multiple single-tag
+> allocation overheads.
+> 
+> This patch aims to retry batch allocation of tags when the initial batch
+> allocation fails to reach the requested number, thereby reducing the
+> overhead of individual allocation attempts.
+> 
+> --------------------------------------------------------------------
+> perf:
+> base code: __blk_mq_alloc_requests() 1.35%
+> patch:__blk_mq_alloc_requests() 0.73%
+> -------------------------------------------------------------------
+> 
+> ---
+> changes since v1:
+> - Modify multiple batch registrations into a single loop to achieve
+>    the batch quantity
+> 
+> changes since v2:
+> - Modify the call location of remainder handling
+> - Refactoring sbitmap cleanup time
+> 
+> Signed-off-by: hexue <xue01.he@samsung.com>
+> ---
+>   block/blk-mq.c | 44 +++++++++++++++++++++++++-------------------
+>   lib/sbitmap.c  | 44 ++++++++++++++++++++++++++------------------
+>   2 files changed, 51 insertions(+), 37 deletions(-)
+> 
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index ba3a4b77f578..bf9d288e3411 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -456,28 +456,34 @@ __blk_mq_alloc_requests_batch(struct blk_mq_alloc_data *data)
+>   	struct blk_mq_tags *tags;
+>   	struct request *rq;
+>   	unsigned long tag_mask;
+> -	int i, nr = 0;
+> +	int nr_tags = data->nr_tags;
+>   
+> -	tag_mask = blk_mq_get_tags(data, data->nr_tags, &tag_offset);
+> -	if (unlikely(!tag_mask))
+> -		return NULL;
+> +	do {
+> +		int i, nr = 0;
+> +
+> +		tag_mask = blk_mq_get_tags(data, data->nr_tags, &tag_offset);
+> +		if (unlikely(!tag_mask))
+> +			return NULL;
 
-Cc: stable@vger.kernel.org
-Cc: "Markus Elfring"<Markus.Elfring@web.de>
-CC: "Yang Erkun" <yangerkun@huawei.com>
-Cc: "Ming Lei"<ming.lei@redhat.com>
-Cc: "Yu Kuai"<yukuai1@huaweicloud.com>
-Fixes: f5c84eff634b ("loop: Add sanity check for read/write_iter")
-Signed-off-by: Li Chen <chenl311@chinatelecom.cn>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-Reviewed-by: Yang Erkun <yangerkun@huawei.com>
----
-changelog:
-v2: add review by, Fixes and cc stable tags.
+You should break and handle allocated tags from previous loop. This leak
+looks really possible if you run some tests.
 
- drivers/block/loop.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+> +
+> +		tags = blk_mq_tags_from_data(data);
+> +		for (i = 0; tag_mask; i++) {
+> +			if (!(tag_mask & (1UL << i)))
+> +				continue;
+> +			tag = tag_offset + i;
+> +			prefetch(tags->static_rqs[tag]);
+> +			tag_mask &= ~(1UL << i);
+> +			rq = blk_mq_rq_ctx_init(data, tags, tag);
+> +			rq_list_add_head(data->cached_rqs, rq);
+> +			nr++;
+> +		}
+> +		if (!(data->rq_flags & RQF_SCHED_TAGS))
+> +			blk_mq_add_active_requests(data->hctx, nr);
+> +
+> +		data->nr_tags -= nr;
+> +	} while (data->nr_tags);
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 053a086d547e..94ec7f747f36 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -551,8 +551,10 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
- 		return -EBADF;
- 
- 	error = loop_check_backing_file(file);
--	if (error)
-+	if (error) {
-+		fput(file);
- 		return error;
-+	}
- 
- 	/* suppress uevents while reconfiguring the device */
- 	dev_set_uevent_suppress(disk_to_dev(lo->lo_disk), 1);
-@@ -993,8 +995,10 @@ static int loop_configure(struct loop_device *lo, blk_mode_t mode,
- 		return -EBADF;
- 
- 	error = loop_check_backing_file(file);
--	if (error)
-+	if (error) {
-+		fput(file);
- 		return error;
-+	}
- 
- 	is_loop = is_loop_device(file);
- 
--- 
-2.51.0
+And perhaps you shoud update the local variable nr_tags to the real
+allocated tags.
+
+>   
+> -	tags = blk_mq_tags_from_data(data);
+> -	for (i = 0; tag_mask; i++) {
+> -		if (!(tag_mask & (1UL << i)))
+> -			continue;
+> -		tag = tag_offset + i;
+> -		prefetch(tags->static_rqs[tag]);
+> -		tag_mask &= ~(1UL << i);
+> -		rq = blk_mq_rq_ctx_init(data, tags, tag);
+> -		rq_list_add_head(data->cached_rqs, rq);
+> -		nr++;
+> -	}
+> -	if (!(data->rq_flags & RQF_SCHED_TAGS))
+> -		blk_mq_add_active_requests(data->hctx, nr);
+>   	/* caller already holds a reference, add for remainder */
+> -	percpu_ref_get_many(&data->q->q_usage_counter, nr - 1);
+> -	data->nr_tags -= nr;
+> +	percpu_ref_get_many(&data->q->q_usage_counter, nr_tags - 1);
+>   
+>   	return rq_list_pop(data->cached_rqs);
+>   }
+> diff --git a/lib/sbitmap.c b/lib/sbitmap.c
+> index 4d188d05db15..457d18650950 100644
+> --- a/lib/sbitmap.c
+> +++ b/lib/sbitmap.c
+> @@ -534,26 +534,34 @@ unsigned long __sbitmap_queue_get_batch(struct sbitmap_queue *sbq, int nr_tags,
+>   		unsigned int map_depth = __map_depth(sb, index);
+>   		unsigned long val;
+>   
+> -		sbitmap_deferred_clear(map, 0, 0, 0);
+>   		val = READ_ONCE(map->word);
+> -		if (val == (1UL << (map_depth - 1)) - 1)
+> -			goto next;
+> -
+> -		nr = find_first_zero_bit(&val, map_depth);
+> -		if (nr + nr_tags <= map_depth) {
+> -			atomic_long_t *ptr = (atomic_long_t *) &map->word;
+> -
+> -			get_mask = ((1UL << nr_tags) - 1) << nr;
+> -			while (!atomic_long_try_cmpxchg(ptr, &val,
+> -							  get_mask | val))
+> -				;
+> -			get_mask = (get_mask & ~val) >> nr;
+> -			if (get_mask) {
+> -				*offset = nr + (index << sb->shift);
+> -				update_alloc_hint_after_get(sb, depth, hint,
+> -							*offset + nr_tags - 1);
+> -				return get_mask;
+> +		while (1) {
+> +			if (val == (1UL << (map_depth - 1)) - 1) {
+> +				if (!sbitmap_deferred_clear(map, 0, 0, 0))
+> +					goto next;
+> +				val = READ_ONCE(map->word);
+>   			}
+> +			nr = find_first_zero_bit(&val, map_depth);
+> +			if (nr + nr_tags <= map_depth)
+> +				break;
+> +
+> +			if (!sbitmap_deferred_clear(map, 0, 0, 0))
+> +				goto next;
+> +
+> +			val = READ_ONCE(map->word);
+> +		}
+
+Can you also add a helper like sbitmap_find_bits_in_word() ?
+
+Thanks,
+Kuai
+
+> +		atomic_long_t *ptr = (atomic_long_t *) &map->word;
+> +
+> +		get_mask = ((1UL << nr_tags) - 1) << nr;
+> +		while (!atomic_long_try_cmpxchg(ptr, &val,
+> +						  get_mask | val))
+> +			;
+> +		get_mask = (get_mask & ~val) >> nr;
+> +		if (get_mask) {
+> +			*offset = nr + (index << sb->shift);
+> +			update_alloc_hint_after_get(sb, depth, hint,
+> +						*offset + nr_tags - 1);
+> +			return get_mask;
+>   		}
+>   next:
+>   		/* Jump to next index. */
+> 
 
