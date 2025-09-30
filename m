@@ -1,183 +1,100 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from sender4-pp-f112.zoho.com (sender4-pp-f112.zoho.com [136.143.188.112])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6837263F30
-	for <linux-block@vger.kernel.org>; Mon, 29 Sep 2025 21:17:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759180677; cv=none; b=NeoPQFP/CbWlOCBxJWO533lG4CTiAQtoDAqritVoMHeY1QJsRhvG8m1eYDqZB4OcEERMXO3WG91k6QcvCTTbPPrbzJPZl5DlTTAZX7GpJzBwUk7pkFzyUPwehwcsqTuG2aE6uR0hz63/HISSWPrTDbRmPfTZKB0HkztiF5P4SYs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759180677; c=relaxed/simple;
-	bh=pkxsk78IHog0vv+IBSdn+sUVFtS8RfXXuKpUO43hniM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Qmn81pnFdMHwK1qch/azVJ1j4A9j+zPUoq71P+mtCgJRZws6uBC+08scXPorGMxNK4pzcorlzRsaem+beGfOiv7bCkL+DvBUx+MpDslMS7BQzlk18EeeSQ2m7+h2WT0K97YhbmHhHvMk+//0uT1pa4q5jcYasMzgeg2CxoHkV4Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AoVB7n49; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DDFC1C01;
+	Tue, 30 Sep 2025 00:05:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.112
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1759190746; cv=pass; b=GHBTVHcglSadThYO9ZSBIhujxawwom00UseBnorKo+hCrZkNeubqwES6Br4Uqe0Jd7DLzZdbpNSV4iKSoFhRsBBuZ034zyMwPYAKbfUq9YmYBuYDMiWSqRg23TYzM/FXG6+rd7gs/inYGs6Pg3zYEhJmTtVNxFkOeGWkKTffD5Y=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1759190746; c=relaxed/simple;
+	bh=XGFVqGyz9X5OVm2kXmZ85c4YOsRXKyQlFL7nb3VNk4c=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 MIME-Version:Content-Type; b=IKLfwuIBVYdLF8w/ZZaJr9QOlQiG8MMkn83Z8Q6B+vsUvGSO2FiozrQBjFSxAvxA2YmcKX2QPbjOsLeoHW2TrW8zNXCvE3Ydi+CX0JJ6/JT3Q04GI25JVduKs1r0kyPdoxpI8C3rpaEoAllEi6jk12bhx0nKEKSoGVC5pWYB0bI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux.beauty; spf=pass smtp.mailfrom=linux.beauty; dkim=pass (1024-bit key) header.d=linux.beauty header.i=me@linux.beauty header.b=YcMEmr7Z; arc=pass smtp.client-ip=136.143.188.112
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux.beauty
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.beauty
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AoVB7n49"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1759180674;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=tBEzt7vDi7cQon8pe4PxgzLkANUC3bHfRN0ntBJldU8=;
-	b=AoVB7n49DgHSo37MjaQllW4eGuNjjEw5pl3xaRFAwSHzydcdRsI6sMss4RD3X8SS9MbZgr
-	XZjqXGZhRDPmC5on4UlhesH1Z1cmoVeZeeGJ4si/ZvLfQ+Or70e550TUXxBebcIQnGCqyI
-	KZHynBGNJ8c9VOBpXNpr1FY54WZH/XA=
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
- [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-573--StfLqKFNlCtVV3SuErjwg-1; Mon, 29 Sep 2025 17:17:53 -0400
-X-MC-Unique: -StfLqKFNlCtVV3SuErjwg-1
-X-Mimecast-MFC-AGG-ID: -StfLqKFNlCtVV3SuErjwg_1759180673
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-4272d0bebf0so9061265ab.0
-        for <linux-block@vger.kernel.org>; Mon, 29 Sep 2025 14:17:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759180673; x=1759785473;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tBEzt7vDi7cQon8pe4PxgzLkANUC3bHfRN0ntBJldU8=;
-        b=tZRyR9uwlNWcgyNdVR/uHxtvAaOy5ut040dHlohxD9IcI+kWTZOFjqW3wxgW7W/CzW
-         v9Nx+1cnvobR3yIfACNkQTchn3yhglrG5hqOHYXPGbY5kywLMPuzaG/JFaOxC81yR4p3
-         CNpqzhWe1GdlS9sNQUk1b4DFXVWXlhyScinSTNpRqh8aQUSrbUvAump6OH42y5AN+BO8
-         ZYoP6OeHvNnuuJG0j/Nu7I8Y+ljaAk41XZTnNhsg0+MTE/VxIZLagWbVqDGWkChV3GjK
-         eVhF7PT4VlDOmkV45Rnz8bJZF2f7z44/23wrXRKx4DFu38yeI72kY6nQnmfeqa2o63Gm
-         2lsg==
-X-Forwarded-Encrypted: i=1; AJvYcCVNfmIbJYnRy5LJh0FkJi9vFZkhL8UzWV9Z1TZQjnzKjPTwS0olS8V15GV6cYMvyQqbKdJXyhsklEuWzQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx/xtH2gdwks7k4bfkWj7WU4hOKsmCDBlf37azVmsIJWRWi+/cf
-	4txU8htoYz89r/LhcTNy52aytX6/daxJFuQGecnEBULhyJEFKG1etBKMz1tL4ySZ6PfXqrNTAVy
-	h8jXj+vhzMp0mWrnMzsmzFA6q13BQJomRKBjNGCzQU8rEpuXvsFrV0NBtEwk6MeYX
-X-Gm-Gg: ASbGncsJUZQOd/Cv3Nd7pThGZiPIY3WcnqxZFmZZLMk14/9w6U82cr7QwPUKjCQ6aTD
-	XMEVoYTp8GAlOC7YMOCODqtjHNV+XzrQp2+PP+rX3EPQWJ6H3ORZ+YKcSYEBwrHdauKKJrQDy7b
-	/YSHo9irMp7+aqsdx7XVEuQuOHen8ya7F80g/uc4m+JxvFW8SKyXlm6Tn9JSYlxPUipYvKJeC9s
-	V5+qL6PDVtgYS6SFFQVn6P7ENleRpwZ3/s/pp6jqo/vexqaC14alhku3WNbuLWu9zIrkWKZN0ll
-	ZR+ctERTsneu2zJw61/NsunPixoS42ONAA+ZtJRM9Uk=
-X-Received: by 2002:a05:6e02:1523:b0:425:9068:4ff with SMTP id e9e14a558f8ab-425955c8eb5mr97782355ab.1.1759180672723;
-        Mon, 29 Sep 2025 14:17:52 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFTF4nahZRRX2gicTqxhxWdWKeUzRDCgsQQuCRfxHGJ4HNrczL75firr5hrFe4LKeaKRuPCNA==
-X-Received: by 2002:a05:6e02:1523:b0:425:9068:4ff with SMTP id e9e14a558f8ab-425955c8eb5mr97782155ab.1.1759180672251;
-        Mon, 29 Sep 2025 14:17:52 -0700 (PDT)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-425c05476fasm62141985ab.43.2025.09.29.14.17.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Sep 2025 14:17:51 -0700 (PDT)
-Date: Mon, 29 Sep 2025 15:17:49 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Leon Romanovsky <leonro@nvidia.com>, Jason Gunthorpe <jgg@nvidia.com>,
- Andrew Morton <akpm@linux-foundation.org>, Bjorn Helgaas
- <bhelgaas@google.com>, Christian =?UTF-8?B?S8O2bmln?=
- <christian.koenig@amd.com>, dri-devel@lists.freedesktop.org,
- iommu@lists.linux.dev, Jens Axboe <axboe@kernel.dk>, Joerg Roedel
- <joro@8bytes.org>, kvm@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-media@vger.kernel.org, linux-mm@kvack.org, linux-pci@vger.kernel.org,
- Logan Gunthorpe <logang@deltatee.com>, Marek Szyprowski
- <m.szyprowski@samsung.com>, Robin Murphy <robin.murphy@arm.com>, Sumit
- Semwal <sumit.semwal@linaro.org>, Vivek Kasireddy
- <vivek.kasireddy@intel.com>, Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v4 10/10] vfio/pci: Add dma-buf export support for MMIO
- regions
-Message-ID: <20250929151749.2007b192.alex.williamson@redhat.com>
-In-Reply-To: <53f3ea1947919a5e657b4f83e74ca53aa45814d4.1759070796.git.leon@kernel.org>
-References: <cover.1759070796.git.leon@kernel.org>
-	<53f3ea1947919a5e657b4f83e74ca53aa45814d4.1759070796.git.leon@kernel.org>
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	dkim=pass (1024-bit key) header.d=linux.beauty header.i=me@linux.beauty header.b="YcMEmr7Z"
+ARC-Seal: i=1; a=rsa-sha256; t=1759190724; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=kd2Zqd1/SDnVfLINyXfQK9f0jBNpQuNU+vbTOseKt/jadwjeHyErHzfSd5DgdhuldLRSwrMYiN78ZdvQspxbprcjVWuhq9qyIzesW6wCoSE1llYIN9NLqFLXo+4uzA5o8EHxq8NkHdo7GVK+WyTtVZXB0Gmv9+DYeLROLBui9QM=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1759190724; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=C5DRleCdQ5tUtCjl2Aict7jDwzn5CPZumXDtwTbTA3s=; 
+	b=FppAQbvRrH29KDaA+5FsQCYfFLzG38oAySrQ9erUpy0M2dOPvk7LdE8UZ8tUDiHfDJv6wHNAbtYuJJYmc5zk4/pa8SpR8+pE3SIidzHS86A9Wj9n77ZDQ3HPEcNULOqk0DOup60/kA4fIxT5VH8t4U7i1ax+gKEQ3WZEtZcUut0=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=linux.beauty;
+	spf=pass  smtp.mailfrom=me@linux.beauty;
+	dmarc=pass header.from=<me@linux.beauty>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1759190724;
+	s=zmail; d=linux.beauty; i=me@linux.beauty;
+	h=Date:Date:From:From:To:To:Cc:Cc:Message-ID:In-Reply-To:References:Subject:Subject:MIME-Version:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=C5DRleCdQ5tUtCjl2Aict7jDwzn5CPZumXDtwTbTA3s=;
+	b=YcMEmr7ZQ7DWc2t17JJcipR9nTQS4G6XATjgVmUtAx2FZvR7z5EpTVPqCTMC6SrS
+	Q6MYRhVV4oRzfVofRt3UKiqsmKh2vtEibbuwl88Kx8hnnl8lzeXGm6era+ZAcFw4ol9
+	mwe9WjjVfd+R7ot3TL/PXP/JMk0+/tV3SlFrop4o=
+Received: from mail.zoho.com by mx.zohomail.com
+	with SMTP id 1759190721130614.1293756204246; Mon, 29 Sep 2025 17:05:21 -0700 (PDT)
+Date: Tue, 30 Sep 2025 08:05:21 +0800
+From: Li Chen <me@linux.beauty>
+To: "Ming Lei" <ming.lei@redhat.com>
+Cc: "Markus Elfring" <Markus.Elfring@web.de>,
+	"Li Chen" <chenl311@chinatelecom.cn>,
+	"linux-block" <linux-block@vger.kernel.org>,
+	"Jens Axboe" <axboe@kernel.dk>,
+	"LKML" <linux-kernel@vger.kernel.org>,
+	"Yang Erkun" <yangerkun@huawei.com>
+Message-ID: <19997f021ec.1a9fd75f968161.8895471846650325801@linux.beauty>
+In-Reply-To: <CAFj5m9+FGzRV+fsWtsVSHV4JFh9Pit-KFHiKRWtMKBpM9LWBhQ@mail.gmail.com>
+References: <20250926121231.32549-1-me@linux.beauty> <9f6acb84-02cb-4f76-bf37-e79b87157f1e@web.de>
+ <1999588f143.5af31c76548207.2814872385181806897@linux.beauty> <CAFj5m9+FGzRV+fsWtsVSHV4JFh9Pit-KFHiKRWtMKBpM9LWBhQ@mail.gmail.com>
+Subject: Re: [PATCH] loop: fix backing file reference leak on validation
+ error
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Importance: Medium
+User-Agent: Zoho Mail
+X-Mailer: Zoho Mail
 
-On Sun, 28 Sep 2025 17:50:20 +0300
-Leon Romanovsky <leon@kernel.org> wrote:
-> +static int validate_dmabuf_input(struct vfio_pci_core_device *vdev,
-> +				 struct vfio_device_feature_dma_buf *dma_buf,
-> +				 struct vfio_region_dma_range *dma_ranges,
-> +				 struct p2pdma_provider **provider)
-> +{
-> +	struct pci_dev *pdev = vdev->pdev;
-> +	u32 bar = dma_buf->region_index;
-> +	resource_size_t bar_size;
-> +	u64 sum;
-> +	int i;
-> +
-> +	if (dma_buf->flags)
-> +		return -EINVAL;
-> +	/*
-> +	 * For PCI the region_index is the BAR number like  everything else.
-> +	 */
-> +	if (bar >= VFIO_PCI_ROM_REGION_INDEX)
-> +		return -ENODEV;
-> +
-> +	*provider = pcim_p2pdma_provider(pdev, bar);
-> +	if (!provider)
+Hi Ming,
 
-This needs to be IS_ERR_OR_NULL() or the function needs to settle on a
-consistent error return value regardless of CONFIG_PCI_P2PDMA.
+ ---- On Mon, 29 Sep 2025 23:01:50 +0800  Ming Lei <ming.lei@redhat.com> wr=
+ote ---=20
+ > On Mon, Sep 29, 2025 at 8:54=E2=80=AFPM Li Chen <me@linux.beauty> wrote:
+ > >
+ > > Hi Markus,
+ > >
+ > >  ---- On Sun, 28 Sep 2025 21:48:23 +0800  Markus Elfring <Markus.Elfri=
+ng@web.de> wrote ---
+ > >  > =E2=80=A6
+ > >  > > Fix this by calling fput(file) before returning the error.
+ > >  > =E2=80=A6
+ > >  > > +++ b/drivers/block/loop.c
+ > >  > =E2=80=A6
+ > >  >
+ > >  > How do you think about to increase the application of scope-based r=
+esource management?
+ > >  > https://elixir.bootlin.com/linux/v6.17-rc7/source/include/linux/fil=
+e.h#L97
+ > >
+ > > Looks good; I will add a commit to switch to scope-based resource mana=
+gement in v2.
+ > > Thanks for your suggestion!
+ >=20
+ > Please don't do it as one bug fix, the whole fix chain needs to
+ > backport, and scope-based
+ > fput is just added in v6.15.
+ >=20
+ > However, you can do it as one cleanup after the fix is merged.
 
-> +		return -EINVAL;
-> +
-> +	bar_size = pci_resource_len(pdev, bar);
+Noted, thanks for your tip.
 
-We get to this feature via vfio_pci_core_ioctl_feature(), which is used
-by several variant drivers, some of which mangle the BAR size exposed
-to the user, ex. hisi_acc.  I'm afraid this might actually be giving
-dmabuf access to a portion of the BAR that isn't exposed otherwise.
-
-> +	for (i = 0; i < dma_buf->nr_ranges; i++) {
-> +		u64 offset = dma_ranges[i].offset;
-> +		u64 len = dma_ranges[i].length;
-> +
-> +		if (!PAGE_ALIGNED(offset) || !PAGE_ALIGNED(len))
-> +			return -EINVAL;
-> +
-> +		if (check_add_overflow(offset, len, &sum) || sum > bar_size)
-> +			return -EINVAL;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +int vfio_pci_core_feature_dma_buf(struct vfio_pci_core_device *vdev, u32 flags,
-> +				  struct vfio_device_feature_dma_buf __user *arg,
-> +				  size_t argsz)
-> +{
-> +	struct vfio_device_feature_dma_buf get_dma_buf = {};
-> +	struct vfio_region_dma_range *dma_ranges;
-> +	DEFINE_DMA_BUF_EXPORT_INFO(exp_info);
-> +	struct p2pdma_provider *provider;
-> +	struct vfio_pci_dma_buf *priv;
-> +	int ret;
-> +
-> +	ret = vfio_check_feature(flags, argsz, VFIO_DEVICE_FEATURE_GET,
-> +				 sizeof(get_dma_buf));
-> +	if (ret != 1)
-> +		return ret;
-> +
-> +	if (copy_from_user(&get_dma_buf, arg, sizeof(get_dma_buf)))
-> +		return -EFAULT;
-> +
-> +	if (!get_dma_buf.nr_ranges)
-> +		return -EINVAL;
-> +
-> +	dma_ranges = memdup_array_user(&arg->dma_ranges, get_dma_buf.nr_ranges,
-> +				       sizeof(*dma_ranges));
-> +	if (IS_ERR(dma_ranges))
-> +		return PTR_ERR(dma_ranges);
-> +
-> +	ret = validate_dmabuf_input(vdev, &get_dma_buf, dma_ranges, &provider);
-> +	if (ret)
-> +		return ret;
-
-goto err_free_ranges;
-
-Thanks,
-Alex
-
+Regards,
+Li
