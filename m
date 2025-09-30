@@ -1,103 +1,131 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6C082C027D;
-	Tue, 30 Sep 2025 07:21:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 018BDBA3D;
+	Tue, 30 Sep 2025 07:30:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759216918; cv=none; b=CvujhoSljMqtXHagwhP3UIsMtS4lpFlTHLcUB330VxwzO/7A25TjA3BLfczvxGkvh8xMJ/fokCujIsG2bGEuNjzUABkE6AenHdPpxpdosyXTJSRs1/MLZB6HOS622j4H+9RTuhvFzMifjBarKPw6z9tpPzM63lsWqDZWEFaC79s=
+	t=1759217459; cv=none; b=YzmVcfk5H6gflqZSsQ8VRyMK7ZkWCy76UzvWinNT3TPtz1bXM0mFe/XsmQ9waHqHJczaN3G//O5IQ1rERe8AVz3f/1P+MWMI/H6DnEA42DevUymal1SvucB3Vf1PyYNHSR9Tcms07m0wdxx9I60gJvBU0McP81aN3mWPEH56D9I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759216918; c=relaxed/simple;
-	bh=xnPYgdSTZcvH2V/KsDQCUBMVx8+oZQ4daHbrCqvMGgw=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Calhrl8edrcR9XGaK0wC3Z9rEX2ZqcBHypZMDwAck5Yb6p6nhIyMASpDud7yndgI/QaMc1PyeSUYA8Gyyi2HCxJknjmqDbdYFR33ymW7mEmE3mu7J4mkFbmbSU+sQBxfbyKlhGGxYKBgpmIoHk3Ejg+N42IrBRWiM+ZX3YjWnXo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4cbTy80VWLzYQtnm;
-	Tue, 30 Sep 2025 15:21:36 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 4E6B81A1B09;
-	Tue, 30 Sep 2025 15:21:53 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.104.67])
-	by APP4 (Coremail) with SMTP id gCh0CgDHjGQLhdtoC9s4BQ--.44849S11;
-	Tue, 30 Sep 2025 15:21:53 +0800 (CST)
-From: Yu Kuai <yukuai1@huaweicloud.com>
-To: axboe@kernel.dk,
-	bvanassche@acm.org,
-	ming.lei@redhat.com,
-	nilay@linux.ibm.com
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	yukuai3@huawei.com,
-	yukuai1@huaweicloud.com,
-	yi.zhang@huawei.com,
-	yangerkun@huawei.com,
-	johnny.chenyi@huawei.com
-Subject: [PATCH 7/7] blk-mq: add documentation for new queue attribute async_dpeth
-Date: Tue, 30 Sep 2025 15:11:11 +0800
-Message-Id: <20250930071111.1218494-8-yukuai1@huaweicloud.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20250930071111.1218494-1-yukuai1@huaweicloud.com>
-References: <20250930071111.1218494-1-yukuai1@huaweicloud.com>
+	s=arc-20240116; t=1759217459; c=relaxed/simple;
+	bh=JQzf0lGVVh7uBp1GGrgRG3aOLt81vd3Z1vJ+MdzJaUg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=liNKTLWhH+ox50z3sjtdGyXBna/TH27JIFAgnxdKw9PE1vjJSM5hvUshtkDLgVyO87J3mA7ofW6OH+hxgShUePjTJ8tP24cVxOtoJQYUjmHxQ9KCderE8mFCabyr9cULVsPuMnVo+nNKCu6jJ3E4xKJXUoThfdHMb1RG4cfS1Js=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F87Yad04; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F87Yad04"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B71C8C113D0;
+	Tue, 30 Sep 2025 07:30:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1759217458;
+	bh=JQzf0lGVVh7uBp1GGrgRG3aOLt81vd3Z1vJ+MdzJaUg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=F87Yad04oYGKqR0yrv700Kdv7cMA7yYANQZWxSzZfBGzhhGL/AY0n38vF/CbS1+uS
+	 xoHf7BEDW8mOIaQN7Wk/lwIKl4Yr4ZCcSIRmUMKAIta02I34naQImlmh2K8ES0+J0J
+	 37JGfcZ5Fcjrg+XvYNzoB1zs1jcuvaeDiG8rOpUd6KE1U67TY/2JY6hYEFcEF+3s0j
+	 KRocY0sJEKrIBIPmUsJmcRcbzwrkU9tKLg/YjlOL+FaI0JgPnlof0Me1fLbHLHzT1r
+	 DpZwl2Lrtc0E2Q7+85ZBPdg92JKatMeAQHBu3PCoTknvQScfYkwgCaBKVjyqnL/Fk+
+	 VbrIksbpXUNYQ==
+Date: Tue, 30 Sep 2025 10:30:53 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Jason Gunthorpe <jgg@nvidia.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
+	Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>,
+	kvm@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-media@vger.kernel.org, linux-mm@kvack.org,
+	linux-pci@vger.kernel.org, Logan Gunthorpe <logang@deltatee.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Vivek Kasireddy <vivek.kasireddy@intel.com>,
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v4 08/10] vfio/pci: Enable peer-to-peer DMA transactions
+ by default
+Message-ID: <20250930073053.GE324804@unreal>
+References: <cover.1759070796.git.leon@kernel.org>
+ <ac8c6ccd792e79f9424217d4bca23edd249916ca.1759070796.git.leon@kernel.org>
+ <20250929151745.439be1ec.alex.williamson@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgDHjGQLhdtoC9s4BQ--.44849S11
-X-Coremail-Antispam: 1UD129KBjvdXoW7Jr1UAFykJr15uF13ur4Durg_yoWDuFXEgF
-	WDGF1vg3ykAF15ZFW2yF4kAF12g3y5Kry8G3WkAr15Zry3t3WSka98XrZ8CFZrXF4I9rn3
-	Zws5XrWUKrnxtjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUbvxFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUAVCq3wA2048vs2
-	IY020Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28E
-	F7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr
-	1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0D
-	M2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjx
-	v20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1l
-	F7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxan2
-	IY04v7MxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY
-	6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17
-	CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1I6r4UMIIF
-	0xvE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMI
-	IF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVF
-	xhVjvjDU0xZFpf9x0JUQFxUUUUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250929151745.439be1ec.alex.williamson@redhat.com>
 
-From: Yu Kuai <yukuai3@huawei.com>
+On Mon, Sep 29, 2025 at 03:17:45PM -0600, Alex Williamson wrote:
+> On Sun, 28 Sep 2025 17:50:18 +0300
+> Leon Romanovsky <leon@kernel.org> wrote:
+> 
+> > From: Leon Romanovsky <leonro@nvidia.com>
+> > 
+> > Make sure that all VFIO PCI devices have peer-to-peer capabilities
+> > enables, so we would be able to export their MMIO memory through DMABUF,
+> > 
+> > Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+> > ---
+> >  drivers/vfio/pci/vfio_pci_core.c | 9 +++++++++
+> >  1 file changed, 9 insertions(+)
+> > 
+> > diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+> > index 7dcf5439dedc..608af135308e 100644
+> > --- a/drivers/vfio/pci/vfio_pci_core.c
+> > +++ b/drivers/vfio/pci/vfio_pci_core.c
+> > @@ -28,6 +28,9 @@
+> >  #include <linux/nospec.h>
+> >  #include <linux/sched/mm.h>
+> >  #include <linux/iommufd.h>
+> > +#ifdef CONFIG_VFIO_PCI_DMABUF
+> > +#include <linux/pci-p2pdma.h>
+> > +#endif
+> >  #if IS_ENABLED(CONFIG_EEH)
+> >  #include <asm/eeh.h>
+> >  #endif
+> > @@ -2085,6 +2088,7 @@ int vfio_pci_core_init_dev(struct vfio_device *core_vdev)
+> >  {
+> >  	struct vfio_pci_core_device *vdev =
+> >  		container_of(core_vdev, struct vfio_pci_core_device, vdev);
+> > +	int __maybe_unused ret;
+> >  
+> >  	vdev->pdev = to_pci_dev(core_vdev->dev);
+> >  	vdev->irq_type = VFIO_PCI_NUM_IRQS;
+> > @@ -2094,6 +2098,11 @@ int vfio_pci_core_init_dev(struct vfio_device *core_vdev)
+> >  	INIT_LIST_HEAD(&vdev->dummy_resources_list);
+> >  	INIT_LIST_HEAD(&vdev->ioeventfds_list);
+> >  	INIT_LIST_HEAD(&vdev->sriov_pfs_item);
+> > +#ifdef CONFIG_VFIO_PCI_DMABUF
+> > +	ret = pcim_p2pdma_init(vdev->pdev);
+> > +	if (ret)
+> > +		return ret;
+> > +#endif
+> >  	init_rwsem(&vdev->memory_lock);
+> >  	xa_init(&vdev->ctx);
+> >  
+> 
+> What breaks if we don't test the return value and remove all the
+> #ifdefs?  The feature call should fail if we don't have a provider but
+> that seems more robust than failing to register the device.  Thanks,
 
-Explain the attribute and the default value in different case.
+pcim_p2pdma_init() fails if memory allocation fails, which is worth to check.
+Such failure will most likely cause to non-working vfio-pci module anyway,
+as failure in pcim_p2pdma_init() will trigger OOM. It is better to fail early
+and help for the system to recover from OOM, instead of delaying to the
+next failure while trying to load vfio-pci.
 
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
- Documentation/ABI/stable/sysfs-block | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+CONFIG_VFIO_PCI_DMABUF is mostly for next line "INIT_LIST_HEAD(&vdev->dmabufs);"
+from the following patch. Because that pcim_p2pdma_init() and dmabufs list are
+coupled, I put CONFIG_VFIO_PCI_DMABUF on both of them.
 
-diff --git a/Documentation/ABI/stable/sysfs-block b/Documentation/ABI/stable/sysfs-block
-index 0ed10aeff86b..09b9b3db9a1f 100644
---- a/Documentation/ABI/stable/sysfs-block
-+++ b/Documentation/ABI/stable/sysfs-block
-@@ -609,6 +609,16 @@ Description:
- 		enabled, and whether tags are shared.
- 
- 
-+What:		/sys/block/<disk>/queue/async_depth
-+Date:		August 2025
-+Contact:	linux-block@vger.kernel.org
-+Description:
-+		[RW] This controls how many async requests may be allocated in the
-+		block layer. If elevator is none, then this value is nr_requests.
-+		By default, this value is 75% of nr_requests for bfq and kyber,
-+		abd nr_requests for mq-deadline.
-+
-+
- What:		/sys/block/<disk>/queue/nr_zones
- Date:		November 2018
- Contact:	Damien Le Moal <damien.lemoal@wdc.com>
--- 
-2.39.2
+Thanks
 
+> 
+> Alex
+> 
+> 
