@@ -1,104 +1,79 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx.swemel.ru (mx.swemel.ru [95.143.211.150])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ED8023507C;
-	Wed,  1 Oct 2025 10:23:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A23C275111
+	for <linux-block@vger.kernel.org>; Wed,  1 Oct 2025 10:26:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.143.211.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759314211; cv=none; b=fBtWmAa0wYh+85aXN6cOiEfm8TefKQEdrQMkDBWPWxWHpgv/QCYD4w+nfB4K29wUmvYDP3N0+JZpUTDSGm+15zBG7HC+qjDKgrqIjbwBjkQ3JkK0WwmHA6ICk2/fqM3qxSz8jhDjb6g4pAf8LkQuhxa7B6qYnS5nk/9w7lwGFKM=
+	t=1759314387; cv=none; b=l9rjvmsHoMPClTi0DqyPBwEIrk/yHC3duWwvp4Y5S+2jPPYj9gtBwkGtdjhr5cksdKf53vAyl883ZjJ1V4t9P8gehGI8un1qtOYIKLIRflOwIEnnPLG/+xug+dJzksF2RR7hYTQ/FirNOpve8ti+AfgLq/y+wouutv8kuN778fk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759314211; c=relaxed/simple;
-	bh=AALh+QgcdxTgVsm2Rm8hI3nipsDKnmlWFJxhPOr+liI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uXnoWX54cfRAjxtj7+xdiMhiJ5b5Ov71kOY3925xGl/e2OhYmjpY4kpqHZBgkXni15jfYH0J2jyBzVvYsMKOEFpJANv7tej+Zdaff2klbEkIoNmuJ6zSVxk7nyZYO2orRU6Hk8pyHZlU7sa5rgKjURGwahD+AveuU4+c0zo4uKI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IEi0leiv; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1759314387; c=relaxed/simple;
+	bh=COvwm5jaQfs3tpP+sakmTLvUO/bpe6L/ZoDkK1VYm24=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dU3bvCdl9DQEdok3KGoWrld9RfuZVrmVHqgwHkWoOKoGorbK0Of5jbMhyGZ7zDx8iBTJNtBA6OI7Z4CdG+QnPjgZgLzDlMnRtJzCJGD4jUvKwLjkVO59HfNRhjeRH50RYHOQq2dsUhnDQzoM7xN9k9KZ8QRYbMVLxwvlBrITPko=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=swemel.ru; spf=pass smtp.mailfrom=swemel.ru; dkim=pass (1024-bit key) header.d=swemel.ru header.i=@swemel.ru header.b=Y3Kx4jJt; arc=none smtp.client-ip=95.143.211.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=swemel.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=swemel.ru
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IEi0leiv"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49CD4C4CEF4;
-	Wed,  1 Oct 2025 10:23:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759314210;
-	bh=AALh+QgcdxTgVsm2Rm8hI3nipsDKnmlWFJxhPOr+liI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=IEi0leivXfyS1pd8i+p/LooJS581IdRk5OJvdTAXrn4Fpg1Nmwb3H2AWg39+CV+ZA
-	 AUcfAWJf19mMvPxjtL4iIl7KzvkQu4eiXu+/mLr//i1bx4WF3bhrs/E4JbJcaZzMxl
-	 b76OCiKNnWVWS9XXpp6sl7QE/NRGadnJNiPee9eXHp1udXYHOhDclqheHydPwEHgnH
-	 86WusEtL4z6txIqRAxGvABsgz9ayBD86d3M2lB7MldiNxwfcp1I0PTtRHQKMpH2wcz
-	 jt+/3+0/4oIoNGl9VqHbxmpUxDZUUZVhswEyk6d8ChvxoGnZEjneaVAu6K4adsORTA
-	 P4WQ+/bo9ixPA==
-Date: Wed, 1 Oct 2025 11:23:27 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Naresh Kamboju <naresh.kamboju@linaro.org>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, stable@vger.kernel.org,
-	patches@lists.linux.dev, linux-kernel@vger.kernel.org,
-	torvalds@linux-foundation.org, akpm@linux-foundation.org,
-	linux@roeck-us.net, shuah@kernel.org, patches@kernelci.org,
-	lkft-triage@lists.linaro.org, pavel@denx.de, jonathanh@nvidia.com,
-	f.fainelli@gmail.com, sudipm.mukherjee@gmail.com, rwarsow@gmx.de,
-	conor@kernel.org, hargar@microsoft.com, achill@achill.org,
-	Dan Carpenter <dan.carpenter@linaro.org>,
-	Arnd Bergmann <arnd@arndb.de>, linux-fsdevel@vger.kernel.org,
-	linux-block <linux-block@vger.kernel.org>,
-	Anders Roxell <anders.roxell@linaro.org>,
-	Ben Copeland <benjamin.copeland@linaro.org>
-Subject: Re: [PATCH 5.10 000/122] 5.10.245-rc1 review
-Message-ID: <aN0BH9j_TJkFg2pM@finisterre.sirena.org.uk>
-References: <20250930143822.939301999@linuxfoundation.org>
- <CA+G9fYvhoeNWOsYMvWRh+BA5dKDkoSRRGBuw5aeFTRzR_ofCvg@mail.gmail.com>
+	dkim=pass (1024-bit key) header.d=swemel.ru header.i=@swemel.ru header.b="Y3Kx4jJt"
+From: Denis Arefev <arefev@swemel.ru>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=swemel.ru; s=mail;
+	t=1759314379;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=nfgEVOB3DZQ6/kGEtKzVJBDpgTIVIwUcLDFO2qRH4V4=;
+	b=Y3Kx4jJtMijcjrfdGyIl1ZbwTNaaOMfm8177xkBDBVYvTOPoeujjuxwTlvo2lEj0ZQFn1F
+	mNYctUeqTJuu4MZciKvB2Ai8YqECPNxjB2AX7CZ3iQimhxvuU6c0Olu8bKyWkq6Fzhf+Rt
+	Fg0BMN5YVPCkUTrbO9+dTCTYT0yhzdU=
+To: Philipp Reisner <philipp.reisner@linbit.com>,
+	Lars Ellenberg <lars.ellenberg@linbit.com>,
+	=?UTF-8?q?Christoph=20B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>
+Cc: Jens Axboe <axboe@kernel.dk>,
+	drbd-dev@lists.linbit.com,
+	linux-block@vger.kernel.org,
+	lvc-project@linuxtesting.org
+Subject: [bug-report] NULL pointer dereference in __drbd_change_sync()
+Date: Wed,  1 Oct 2025 13:26:14 +0300
+Message-ID: <20251001102619.8912-1-arefev@swemel.ru>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="Csa2GXldnUFay7IA"
-Content-Disposition: inline
-In-Reply-To: <CA+G9fYvhoeNWOsYMvWRh+BA5dKDkoSRRGBuw5aeFTRzR_ofCvg@mail.gmail.com>
-X-Cookie: If in doubt, mumble.
+Content-Transfer-Encoding: 8bit
 
+In the Linux kernel, there's an unpatched bug in the DRBD code in the __drbd_change_sync() function,
+a NULL pointer dereference.
 
---Csa2GXldnUFay7IA
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+The call stack that leads to this error looks like this:
 
-On Wed, Oct 01, 2025 at 12:57:27AM +0530, Naresh Kamboju wrote:
-> On Tue, 30 Sept 2025 at 20:24, Greg Kroah-Hartman
+drbd_request_endio
+|-> __req_mod(req, what, NULL, &m);
+    |-> case READ_COMPLETED_WITH_ERROR:
+    |-> drbd_set_out_of_sync(NULL, ... )
+    	|-> __drbd_change_sync(NULL, ... );
+            |-> peer_device->device (NULL->device)
 
-> The following LTP syscalls failed on stable-rc 5.10.
-> Noticed on both 5.10.243-rc1 and 5.10.245-rc1
->=20
-> First seen on 5.10.243-rc1.
->=20
->  ltp-syscalls
->   - fanotify13
->   - fanotify14
->   - fanotify15
->   - fanotify16
->   - fanotify21
->   - landlock04
->   - ioctl_ficlone02
+This bug has already been fixed here [1], but porting this commit to the kernel will be quite
+difficult, since the DRBD code in the Linux kernel and on GitHub [2] differs significantly.
 
-> Test regression: LTP syscalls fanotify13/14/15/16/21 TBROK: mkfs.vfat
-> failed with exit code 1
+But ignoring it is also not a good idea.
 
-I'm also seeing some issues with fcntl34, but that's a timeout so I'm
-not convinced it's real.  The bisect looked like noise.
+The blamed kernel commit is 0d11f3cf279c ("drbd: Pass a peer device to the resync and online verify functions")
+which came with series [3].
 
---Csa2GXldnUFay7IA
-Content-Type: application/pgp-signature; name="signature.asc"
+One possible solution is to reverse the patch series [3] because "it is mainly no-ops, pretty much just 
+preparation for future upstreaming work" as its cover letter says.  
 
------BEGIN PGP SIGNATURE-----
+However, there seems to be no active drbd module development in mainline kernel since that series was posted in 2023.
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmjdAR4ACgkQJNaLcl1U
-h9Dv4Qf/Whchx7Nr2OJDScQUh+gNKZqjJR0pdJ/Fa+srX8GaUMVNqceDTnhu3UWd
-JmT04jEJYcKw4g5Gs5yy2uS6kkzXrYGLzVmGSVbRmll9w9fKLiSXYM0s0vUbzyhj
-0pqX3f5PtWyc8F5o/bM82n0OjFa50FF2DLpt288ZkRiR0PBoiVdEPTdOFsmpCMZt
-/fxmfxcs/h+Gf78+Vig+ek27lM0Zfst2Cuw8pp91o2Vf2aWxZ3zsLdF6zGNkWeBV
-WstLE2hM7BCc7vYGO86AmqcOuOeW08YwCq+n4YcI0R0H+MxctP7rY7TOv87sThEg
-A4YUm2S5/slLao4oF58XgQP1bYm0yA==
-=KUL6
------END PGP SIGNATURE-----
+[1]: https://github.com/LINBIT/drbd/commit/effc7281bf1a7922daa6393632fc6eeac1732bfa
+[2]: https://github.com/LINBIT/drbd
+[3]: https://lore.kernel.org/all/20230330102744.2128122-1-christoph.boehmwalder@linbit.com/
 
---Csa2GXldnUFay7IA--
+Found by Linux Verification Center (linuxtesting.org) with SVACE.
+
+-- 
+2.43.0
+
