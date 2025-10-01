@@ -1,130 +1,125 @@
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 635C827E048
-	for <linux-block@vger.kernel.org>; Wed,  1 Oct 2025 12:23:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A17621773F
+	for <linux-block@vger.kernel.org>; Wed,  1 Oct 2025 13:05:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759321385; cv=none; b=Kp07/8i47FzfM4PVRLByo+nt44sPomdzDDFDKRej209n1IpBYcnJC13auNPQDrfvnTvJ+FvOBSHVnYCb8fMB1UpEFvhuYOR/8vY3GTI0FDTCMEbPA/bmYKNs2dE6CS/C5qA1OPN5V8ZqSi7BBG0McnI5yQiKpTm3zVtuik75/Ho=
+	t=1759323932; cv=none; b=c48kHqt4JNkKvHlWlzP/VOeQH44iMAa8/nY0oBpmwV87nMvNV2FxEZ23jrsxksxhKAfIOhBE4lBgU+8joo8r6e5hThAuqILH3GvqkFPQIqirI//ozBegzJSJFcqGdEos24GvAvSthbsLLdj/Pod2uXS2UaitfI9uUh6+ecwyJj4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759321385; c=relaxed/simple;
-	bh=jm7QjsEYN3o9NREvDIVoGhoSvlRo/JHErcAuGoWOiRs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MK4JH3WwQXs0DFQEwpbPSMb/li6AY7j02nYshhTMGlSuQk6CsQTLEImPLKm4AdZia6atjsk38aTFt0ko3eAw8WRnnSzacvfJewLjPQVEhNQGljwdRvo9LHB+xX2u1tbXSFh1KZ/KTOkd8lw6ZMJMv4s9jM+ShB+DUHvFnuDQC5o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=dhAQPDxD; arc=none smtp.client-ip=209.85.210.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1759323932; c=relaxed/simple;
+	bh=jBmuWH0YUH02uvaUnpyESyNBWMLetO9tuvs3IcDBVZQ=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=m5J71BwfPZN2is5hdvy835WtQ0lUqaYFMJWAjC1YNEgyoLJ3pUJ+8oAbF7O3C42oCAq+oK0mcACZS1CPSL6GzCKBv7NCNXznKDIokhce6yh1lWP0acWdNLL4iXROLFNsrS/xY4zXVraOIH72kDlwFShb6qSIf5F1XdYl3r9RPbU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Se7Sz0lV; arc=none smtp.client-ip=209.85.215.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dhAQPDxD"
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-782e93932ffso3861250b3a.3
-        for <linux-block@vger.kernel.org>; Wed, 01 Oct 2025 05:23:03 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Se7Sz0lV"
+Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-b47174b335bso820116a12.2
+        for <linux-block@vger.kernel.org>; Wed, 01 Oct 2025 06:05:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1759321383; x=1759926183; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=G6ekdHDmWVv9FcHQZlrQj5iI/vOkg8zYvOska5GK10c=;
-        b=dhAQPDxDfgnqpA2S01DC+hFkGDJRYz3maVwiXV/VKcI5p+YhACTvwHXZLyb5sCHB0I
-         up1nksKL+rcClHSn+vb7AVgYcGHNcYgEI3/cBU959c7+XgA/+yCCoQSyYp/LAVTUExus
-         NsitKrWlltZd/w8x/BnWkyd9a9O+0jgAdpcWeeBdt/lZilo4RZGic1umn6IsN6gnbB7W
-         MWTKrA96PgPf3iSkUWbW8Hz5kNiahCigYvLlU0BTAduyrZXo9sNhPgXTKqhTAoAn6ESY
-         iM/g38tSRaBgdii0dTbqux3RpNyFBQ1cOE0mNh3ki2DAVPS7mbBpVzY3YQNcPs9GTY63
-         0Tqg==
+        d=gmail.com; s=20230601; t=1759323930; x=1759928730; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=OW6l6wKrmChiKbh7o74M96nQdgGsULiYNKDhud2+Lm0=;
+        b=Se7Sz0lVmzUHFL7SsLjlQGxP0QJykPNzaNC0heYDRZkQHijNIQeJm8ud/pKzvfPwvy
+         s6HOgrWLdXNNJmEjRTrA8cbq0eMzo9kXgmye38cuuxlEtpzulRQGZflPMn3dXl8KEyb/
+         w5RzSPChuKTODquLAL6bAXpm433q6Ffi/X5v8czctQ7TjgLTr54mrlWNQ/DLJKmI9Y0k
+         ogxI2rlwLCyshPXOHrP/I8wPezbT2E+okvex62ukiYTqb20lrnLcVPJroRox8T8nDO3Q
+         2cbKRBF/mpBdpGOBxMWqLBf6feE7iJ0lJg1lQcUEBqNS4r5q4eqzdNcUe2e69BSlNj69
+         n6eg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759321383; x=1759926183;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=G6ekdHDmWVv9FcHQZlrQj5iI/vOkg8zYvOska5GK10c=;
-        b=o85CJOLTOkHRA9jmUyBVQk0zcRTTjGERSmaAjKd4SMNZ+pP97TRPiQEIFtjBeMwjJZ
-         btD18R77NFhp7cd/omVG//kRVge79YmY7DTik/tu5q1aMl3x2E1LIG+CBsEGFSWrqb95
-         WrbC+OIydVTdvvv48qazflnoDtNrPSaYMKkHOaNAGxEzSyuDzBoZhUOtNV/ReSOnKAlE
-         opBrGGpG3siQiYEhBESrmarZ8F/Ezfl8poiWzYEBhyWU4QXjcNAT+y7UXoQjYS4VBZ11
-         D6qmbneHkNZkr4EnEG3VsSzussv/FjYCfYza+/y4q4pyLfhYLOlCrZLRsrY+7D9WMIOy
-         2mQA==
-X-Forwarded-Encrypted: i=1; AJvYcCU3vERYX5sL2tvSKseO+YQsrE9WlmcGkj2xqZiL8gI320DAh4MY+XRNBKDK11W2LCbIAJ392/Gz9TEbdg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwJM9uF+PC0EYMsYsQHvqnKuI+4ZfIavCh5XNNagl41u/dIKT2M
-	9T4F+NdTv2JgmzGiGovdoKWm8JyjdMY91XMOkVV/LItXWYifzTSrAFDpoENo4I9k+mxZKNTJZVW
-	P8gaTjNM62qU8JWDBtiWnMo20tdjNVwbzGs7id9I/YA==
-X-Gm-Gg: ASbGncukvsRofB5bAv3Y3arV/y5fIvEs05y8Vljr4HDvkTSBe0itLx402qYcAZ3MWdt
-	R3vvWH/94UWPK5gTwh/AOKpdWxQMnefX2YCMJFaZVd98JTlt0H0bUkdArekc1y+R6ZAVTW5fqMI
-	7kc4FsYAcukokjRGvkfTWJ/u6DcLxahBsrj4TxXvg28vzjD/HFc9qpFl8rzidJRXQn4eHaQRtSP
-	c2EFrcUgjCa8JnzHWNDOoso6tdd378pDFDzPwiNvMS+qQxX2tuNI50CVDdo0n6IyhE4MoW87wlS
-	gDjB1dRTvWxB5oJaTYCt
-X-Google-Smtp-Source: AGHT+IG3y0LpyILSJk25wSg4EzJQnje8BCP0qYej1zbXdtuiF/6h3Ys2FwvbgoPmiH3pc5MHl/M3OJoRN2I5jM7mBd8=
-X-Received: by 2002:a17:903:1b2c:b0:27e:f018:d2fb with SMTP id
- d9443c01a7336-28e7f27db93mr43354285ad.6.1759321382673; Wed, 01 Oct 2025
- 05:23:02 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1759323930; x=1759928730;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OW6l6wKrmChiKbh7o74M96nQdgGsULiYNKDhud2+Lm0=;
+        b=qFvgKM/SgTpm9OinKzOxpLjW+vi2mHnHNtxP0uGUzMkH9TztZv3yYutsvhwtYNHCF+
+         6e9Qpdn8Bs3tCfqz/4MjRifU4zoTRa/AMR912Zy/kfN0tTU97N2Cq1Wyc2JK1uZPvooT
+         8CZ5HkBGd8wtEfunuZ5JLwoPrHPDsmP5O1/YPhLdlWXHxs1Iu1nHrGYs5+/ui2+TNU0R
+         Jg6fMW1WVNT7uzQwmz1c9cBzFWj53T7eFMG/N3MX5cYO+ZmjIaOysp7nfYbh0F5gbRi2
+         qqO9VvZZBhIvHOD5wbvw0UPCv+pT7aoipYzdGNn9FOADyOxPLqiKcIXsFfFvYeB/f94h
+         RLAg==
+X-Forwarded-Encrypted: i=1; AJvYcCVAtXj5UjLuuPJ2kAv8tmZmHfS3IBcrIDnH/FaeFWWGk+Qx34ZOWXslzFHA/5RmVLcH592NS4xZc3pdsw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxfyG+RltqVHQZ31SIuCuQ0BqdQB/uHcWJIzsPqFQwuwX1cmpOP
+	HI2E+5wTJq675QMMJ0e6nOrq+EJHQvBwKeDFBcR8gEuzhj3mYErpYCYvoesos7fD
+X-Gm-Gg: ASbGncvwplHsGSti5W+I3sSa63h8j+UMZgoi2Wo+eM8MoQ0+lTbrRGUO4NcmecuO7Lh
+	rqdAraeit1ag464mGVxO+RN9lO2Fv8Y4NWrGDVgetHnT5R5R3DNZbnokmrkir2xYlWiIBSINuKF
+	uedX0umLsOdqXnNoXqpiGvcFKXVE3DaCmwFVKOrI7dW9Oq/7qPAv7u1D5g4suUCovUf01IkhC08
+	wsT5vj9DFXFZqHLxK9rzC8nzIan+9t9l8r00aFMf71BXnvYmXHG50bQxfL2KaL1HE5A8bFkyKVb
+	R2rrbLf0CO2cedn41pTfMbgEgTDww88oUM43TAKCvp30z+V5dhNnSmopM5C14GIu39Z27yBDT3D
+	9gu6BtrcvR2aAGqez5f3yxDaJZRWXN0ZysmeHnMfEJbDL495NMPxsjXIadrIWunsL8fmT0v1exs
+	BHjkzq2/dISxf0gr9UAwk=
+X-Google-Smtp-Source: AGHT+IHoa5xa4f1XTAIYI78HgS2grI+zOJxKw/L/F6af+N9ErpstXh/VbzIlNsFq6puzwXgpQewq9A==
+X-Received: by 2002:a05:6a21:32a0:b0:2e3:a914:aabe with SMTP id adf61e73a8af0-321d882a178mr2574832637.2.1759323929715;
+        Wed, 01 Oct 2025 06:05:29 -0700 (PDT)
+Received: from [172.20.45.103] (S0106a85e45f3df00.vc.shawcable.net. [174.7.235.4])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b57c557500dsm16012934a12.34.2025.10.01.06.05.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 01 Oct 2025 06:05:29 -0700 (PDT)
+Message-ID: <bfba2ef9-ecb7-4917-a7db-01b252d7be04@gmail.com>
+Date: Wed, 1 Oct 2025 06:05:28 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250930143822.939301999@linuxfoundation.org> <CA+G9fYvhoeNWOsYMvWRh+BA5dKDkoSRRGBuw5aeFTRzR_ofCvg@mail.gmail.com>
- <2025100105-strewn-waving-35de@gregkh> <aN0aMyU1D3N4WQy4@stanley.mountain>
-In-Reply-To: <aN0aMyU1D3N4WQy4@stanley.mountain>
-From: Naresh Kamboju <naresh.kamboju@linaro.org>
-Date: Wed, 1 Oct 2025 17:52:51 +0530
-X-Gm-Features: AS18NWA6cyT7LVY1PGpPsb3wxOlSJ03i0aRVQJ0RG446XB-O0skidiXBbZlceZU
-Message-ID: <CA+G9fYsRCN8f5n4dsbQAq73t7f5pzbHVT5Hp1rxYQzpxqvLWXA@mail.gmail.com>
-Subject: Re: [PATCH 5.10 000/122] 5.10.245-rc1 review
-To: Dan Carpenter <dan.carpenter@linaro.org>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, stable@vger.kernel.org, 
-	patches@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	torvalds@linux-foundation.org, akpm@linux-foundation.org, linux@roeck-us.net, 
-	shuah@kernel.org, patches@kernelci.org, lkft-triage@lists.linaro.org, 
-	pavel@denx.de, jonathanh@nvidia.com, f.fainelli@gmail.com, 
-	sudipm.mukherjee@gmail.com, rwarsow@gmx.de, conor@kernel.org, 
-	hargar@microsoft.com, broonie@kernel.org, achill@achill.org, 
-	Arnd Bergmann <arnd@arndb.de>, linux-fsdevel@vger.kernel.org, 
-	linux-block <linux-block@vger.kernel.org>, Anders Roxell <anders.roxell@linaro.org>, 
-	Ben Copeland <benjamin.copeland@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [6.16.9 / 6.17.0 PANIC REGRESSION] block: fix lockdep warning
+ caused by lock dependency in elv_iosched_store
+From: Kyle Sanderson <kyle.leet@gmail.com>
+To: Nilay Shroff <nilay@linux.ibm.com>, linux-block@vger.kernel.org,
+ Linus Torvalds <torvalds@linux-foundation.org>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, axboe@kernel.dk
+Cc: hch@lst.de, ming.lei@redhat.com, hare@suse.de, sth@linux.ibm.com,
+ gjoyce@ibm.com, linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250730074614.2537382-1-nilay@linux.ibm.com>
+ <20250730074614.2537382-3-nilay@linux.ibm.com>
+ <25a87311-70fd-4248-86e4-dd5fecf6cc99@gmail.com>
+Content-Language: en-CA
+In-Reply-To: <25a87311-70fd-4248-86e4-dd5fecf6cc99@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, 1 Oct 2025 at 17:40, Dan Carpenter <dan.carpenter@linaro.org> wrote:
->
-> On Wed, Oct 01, 2025 at 12:50:13PM +0200, Greg Kroah-Hartman wrote:
-> > On Wed, Oct 01, 2025 at 12:57:27AM +0530, Naresh Kamboju wrote:
-> > > On Tue, 30 Sept 2025 at 20:24, Greg Kroah-Hartman
-> > > <gregkh@linuxfoundation.org> wrote:
-> > > >
-> > > > This is the start of the stable review cycle for the 5.10.245 release.
-> > > > There are 122 patches in this series, all will be posted as a response
-> > > > to this one.  If anyone has any issues with these being applied, please
-> > > > let me know.
-> > > >
-> > > > Responses should be made by Thu, 02 Oct 2025 14:37:59 +0000.
-> > > > Anything received after that time might be too late.
-> > > >
-> > > > The whole patch series can be found in one patch at:
-> > > >         https://www.kernel.org/pub/linux/kernel/v5.x/stable-review/patch-5.10.245-rc1.gz
-> > > > or in the git tree and branch at:
-> > > >         git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable-rc.git linux-5.10.y
-> > > > and the diffstat can be found below.
-> > > >
-> > > > thanks,
-> > > >
-> > > > greg k-h
-> > >
-> > > The following LTP syscalls failed on stable-rc 5.10.
-> > > Noticed on both 5.10.243-rc1 and 5.10.245-rc1
-> > >
-> > > First seen on 5.10.243-rc1.
-> > >
-> > >  ltp-syscalls
-> > >   - fanotify13
-> > >   - fanotify14
-> > >   - fanotify15
-> > >   - fanotify16
-> > >   - fanotify21
-> > >   - landlock04
-> > >   - ioctl_ficlone02
-> > >
-> > > Test regression: LTP syscalls fanotify13/14/15/16/21 TBROK: mkfs.vfat
-> > > failed with exit code 1
+On 9/30/2025 10:20 PM, Kyle Sanderson wrote:
+> On 7/30/2025 12:46 AM, Nilay Shroff wrote:
+>> To address this, move all sched_tags allocations and deallocations 
+>> outside
+>> of both the ->elevator_lock and the ->freeze_lock.
+> 
+> Hi Nilay,
+> 
+> I am coming off of a 36 hour travel stint, and 6.16.7 (I do not have 
+> that log, and it mightily messed up my xfs root requiring offline 
+> repair), 6.16.9, and 6.17.0 simply do not boot on my system. After 
+> unlocking with LUKS I get this panic consistently and immediately, and I 
+> believe this is the problematic commit which was unfortunately carried 
+> to the previous and current stable. I am using this udev rule: 
+> `ACTION=="add|change", KERNEL=="sd*[!0-9]|sr*|nvme*", ATTR{queue/ 
+> scheduler}="bfq"`
 
-I have re-tested for 12 times and reported test failures are getting
-passed 12 times.
-However, I will keep monitoring test results.
+Hi Greg,
 
- - Naresh
+Slept for a couple hours. This appears to be well known in block (the 
+fix is in the 6.18 pull) that it is causing panics on stable, and didn't 
+make it back to 6.17 past the initial merge window (as well as 6.16).
+
+Presumably adjusting the request depth isn't common (if this is indeed 
+the problem)?
+
+I also have ACTION=="add|change", KERNEL=="sd*[!0-9]|sr*|nvme*", 
+ATTR{queue/nr_requests}="1024" as a udev rule.
+
+Jens, is this the only patch from August that is needed to fix this panic?
+
+https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git/commit/?h=for-6.18/block&id=ba28afbd9eff2a6370f23ef4e6a036ab0cfda409
+
+Kyle.
+
+https://lore.kernel.org/all/37087b24-24f7-46a9-95c4-2a2f3dced09b@niklasfi.de/
+
+https://lore.kernel.org/all/175710207227.395498.3249940818566938241.b4-ty@kernel.dk/
+
