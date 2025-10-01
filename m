@@ -1,296 +1,106 @@
-Received: from mail-24416.protonmail.ch (mail-24416.protonmail.ch [109.224.244.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C9C12DE6ED;
-	Wed,  1 Oct 2025 09:04:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.224.244.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E79552DAFA5
+	for <linux-block@vger.kernel.org>; Wed,  1 Oct 2025 09:12:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759309482; cv=none; b=ejdWgYQSrgAomegTQPA3MHnRYAOVZck7HEVPgFPtg43/XFmIrbS++vmbnafJ0snCbdbVnsj5O9FCXhAzzdVhQkfC2iqyEeNvuq+YUFjfGRvz9eRuCxWi6c21DMUgfCNOrbGU0At8lS1/BTlcP+todygTSmBPbAlMWhZLCF4MDGM=
+	t=1759309952; cv=none; b=Qolp58oDPySTGmg96Brqn2Re5hRPlN0Ao6v4I5j67z6BFz+DNLE8jodLFb/5w09vnusfOd0c9v3SxdQ5x598SmQg+pqYJrweX5nWKsf2FovBTbfIBvh5uBwQhxWu8EQUnb7FKR76K3I/ChTcBkhJNLMURPGbscrAoyxnkXT5PiI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759309482; c=relaxed/simple;
-	bh=wGzu/YJLmjjXeXLIWypdaKjxbslobXvvvheND7JZWhY=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bQH/xCbnsBNDbYU8iuD44L8tZkuYWQv1C4JJqpijUxgpftCYtiw5uvDqsEUn/v3gvfCYw6fW7qIS9iE1uJpilSSZNpcnmJ8WBLxnIEoKYJ0zVjTIeu2UoDrPDbIiwE548s5lj1NetMsYWQkSGV7rvsYIUzgpSv3g9bl9jAMP8DQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pm.me; spf=pass smtp.mailfrom=pm.me; dkim=pass (2048-bit key) header.d=pm.me header.i=@pm.me header.b=rKJ0zo80; arc=none smtp.client-ip=109.224.244.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pm.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pm.me
+	s=arc-20240116; t=1759309952; c=relaxed/simple;
+	bh=pcPGB/dkNVmNUPRNo+DXzWGtd/nCSRGlepjtH4sr4w0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=cwNNj7/nDEAUDZPazkVBBhYGXemQbLYlkhZivtD6andB9vIe7wh/R5pZ9I5JoezCjjQwZh0nO323dJQZdiiXymUrko6QmOqAO/HkwLA6hHrHXesTu3GbTi7yJOxl4BvS2svPwfd687Y1MShh7kBMD1ZD5QuxOWfCsBZzyESuvwU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h7+OTDyV; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=pm.me header.i=@pm.me header.b="rKJ0zo80"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pm.me;
-	s=protonmail3; t=1759309474; x=1759568674;
-	bh=yp/Ky9qZB+Lu2rfaJfq2n9npeG17/rIKND2/1FJbPUU=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=rKJ0zo808K9+5xv+W+fbxwG7qVsIwuWt2mbyuJGFLiXXCoVZoeZVu3SLq6+wnhkS6
-	 9zijPkbcHDElLMm9/Bee795eT9ukcv732jQW0DzyAcKr2VRZ1+2dtJnGpOLuFZrPqN
-	 aPNucRfz0HQpb322WmUDY63i/Vgx6HMh7ngXDaU0QPiQuiwBDxzSCL6yPIZAFw1GeA
-	 nDhkHM9HYJpYUij3nie0NTuQ1iweAHh3D6/dswrnS/XIriKSAwKVWOynLjJPuGuqOd
-	 x3yAkCadMoBGsr2QK3jsBXIvGOJqiwutO+rPE/LLNa83zA4uTWVa6Oy2Ri/h1QqHs3
-	 QzBkgjOw5SMzw==
-Date: Wed, 01 Oct 2025 09:04:27 +0000
-To: Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, =?utf-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, Benno Lossin <lossin@kernel.org>, Danilo Krummrich <dakr@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Dave Ertman <david.m.ertman@intel.com>, Ira Weiny <ira.weiny@intel.com>, Leon Romanovsky <leon@kernel.org>, "Rafael J. Wysocki" <rafael@kernel.org>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, "Liam R. Howlett" <Liam.Howlett@oracle.com>, Viresh Kumar
-	<vireshk@kernel.org>, Nishanth Menon <nm@ti.com>, Stephen Boyd <sboyd@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>, =?utf-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, Asahi Lina <lina+kernel@asahilina.net>
-From: Oliver Mangold <oliver.mangold@pm.me>
-Cc: rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, dri-devel@lists.freedesktop.org, linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, linux-pm@vger.kernel.org, linux-pci@vger.kernel.org, Oliver Mangold <oliver.mangold@pm.me>
-Subject: [PATCH v12 4/4] rust: Add `OwnableRefCounted`
-Message-ID: <20251001-unique-ref-v12-4-fa5c31f0c0c4@pm.me>
-In-Reply-To: <20251001-unique-ref-v12-0-fa5c31f0c0c4@pm.me>
-References: <20251001-unique-ref-v12-0-fa5c31f0c0c4@pm.me>
-Feedback-ID: 31808448:user:proton
-X-Pm-Message-ID: 273bbd2e0c664caf1e93c782e9d3dde288208540
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h7+OTDyV"
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-27eceb38eb1so83044875ad.3
+        for <linux-block@vger.kernel.org>; Wed, 01 Oct 2025 02:12:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1759309950; x=1759914750; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=+HpzxFyHZ2ZMy/pC4mNA7Ri5h9xiXLEXZ6WUw3XUfTw=;
+        b=h7+OTDyVoIL24waxbOivVa5UWbsSaVD+23bqdi8RTSrGRXW44ut3wCCVknyNAQeqCg
+         3MKTASkX5ZwN7PRx4xzsrjWSQ8t3DS9k/pFayibTsnvdYU1As/fyP1HUWd4sBf78EB44
+         7obd5wiQgz6hyqmFGJvMyj5DwkC3j4tTHZlbRw63/p17eDjaCqYEFiicLxvzhB8T8a4y
+         W6r6lrz53QGqOSn+6NkuZEgErCUhR/Xc0YegONeVTFOhLo8GwlgkrBOXAms+PEUc9P1n
+         KGu/ZvWDBMVBJo5W4zo04yMwNAikxIXiLESaHogiJ6ppKsL7gmH3DQld+6InV77TIXhp
+         iK/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759309950; x=1759914750;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+HpzxFyHZ2ZMy/pC4mNA7Ri5h9xiXLEXZ6WUw3XUfTw=;
+        b=dj/4TPWMWtaT9eEnUrtZm3cOcSqrJLd5lZankCIaeRVY6kGHWnZwI//iD5c+mrWQUB
+         uVe1EbRWE3ko0ZoTEkJAuaVQeqI3cgFIBDHBxrsnsmDEID/rqnxTtSlewV2R/kAZZcDq
+         1/lJ3a4GzjYrpFpjOyofbCQol4ehWEokxnFjI7vnHp6iPonpvx0weWd/PnAPAji/LkrD
+         EMbT9u9tyZLfcQe4/ExAOf351+fDkL29CNSRcYUt7FIZlFG/2vzA+pfm4dSrcjJRzF/q
+         9Tkcj/UUI9AXhoyVvY33DjFpZO5q94cvoW3101WqmleYZO6vxHue+p7rH6fMUgGcsx01
+         5RXQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWKkWOuUp4xCPxRRHtzVGSPV4FJzN6aNV1D1ZFiVyTz+AwxgcKEkU5wtW+0b1sm2LIH4zXonX2KtMWB0g==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwKPBNv+6b2GlKzJarzQvPQuXMcACEXJ6ICHuTbf81mcJhAQeWf
+	qVO5KJOwBgSNbcc0M63eQR869LD5kBBkckyLdOb8M6Cmbp0rBP6qugRq
+X-Gm-Gg: ASbGncvr0twQCgAJi7i95BCZPnWfvLR++0TgTXRDWSVlVMTHejGg9LAD2pNaBC0YVRf
+	eSlkNF+cUxjSL3CmgaGX+BrBU+mPPtQ3Z9ye0AhVmW48dE3BBbEIrSrsvXzZX+e6jdwEpLjg/03
+	SB6ILgrQSzk7qGNQexoNFM74eOZOjh+KvxA/KcMtalOrt0XeaS5owL24qm+b6CSKfwPPXhCAIAI
+	s9yY5EmIxdU0VQkuBYKCKA9Ga9tF/7HQj38x+zJcHvoTateHWd1EzuNvmz7k44mFMK7v1gzn03d
+	f1/MxjufZ2rfsJN7JyO/64DwuYRCmi9CI2dWW0lZN2iQ/DaCvc6rlgSbHSMx+L+73D4BJNsc/cs
+	hbMy15ALTpSmrojZ66aIPl88yVyMK3NezP3EOOtGQ7Q/XMO7/1zuh7HHkq19dHG04/lw8cWfDmw
+	==
+X-Google-Smtp-Source: AGHT+IFhUZ/mGMyT3exSWSnoljUD1zZiQFnygIrQDjToqp+r+F99aKI9B8d5mZOODf5Cfr3g259Sdw==
+X-Received: by 2002:a17:902:ce0f:b0:27e:f16f:618b with SMTP id d9443c01a7336-28e7f2a6437mr33385785ad.24.1759309950202;
+        Wed, 01 Oct 2025 02:12:30 -0700 (PDT)
+Received: from ti-am64x-sdk.. ([157.50.93.46])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-281fd60835bsm120299255ad.19.2025.10.01.02.12.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 01 Oct 2025 02:12:29 -0700 (PDT)
+From: Bhanu Seshu Kumar Valluri <bhanuseshukumar@gmail.com>
+To: Tejun Heo <tj@kernel.org>,
+	Josef Bacik <josef@toxicpanda.com>,
+	Jens Axboe <axboe@kernel.dk>
+Cc: bhanuseshukumar@gmail.com,
+	cgroups@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-kernel-mentees@lists.linuxfoundation.org,
+	skhan@linuxfoundation.org,
+	david.hunter.linux@gmail.com
+Subject: [PATCH] block: Fix typo in doc comments
+Date: Wed,  1 Oct 2025 14:42:20 +0530
+Message-Id: <20251001091220.46343-1-bhanuseshukumar@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Types implementing one of these traits can safely convert between an
-`ARef<T>` and an `Owned<T>`.
+heirarchy => hierarchy
 
-This is useful for types which generally are accessed through an `ARef`
-but have methods which can only safely be called when the reference is
-unique, like e.g. `block::mq::Request::end_ok()`.
-
-Signed-off-by: Oliver Mangold <oliver.mangold@pm.me>
-Reviewed-by: Andreas Hindborg <a.hindborg@kernel.org>
+Signed-off-by: Bhanu Seshu Kumar Valluri <bhanuseshukumar@gmail.com>
 ---
- rust/kernel/owned.rs     | 125 +++++++++++++++++++++++++++++++++++++++++++=
-+++-
- rust/kernel/sync/aref.rs |  11 ++++-
- rust/kernel/types.rs     |   2 +-
- 3 files changed, 135 insertions(+), 3 deletions(-)
+ Note: No functionality change is intended.
+ block/blk-iolatency.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/rust/kernel/owned.rs b/rust/kernel/owned.rs
-index 466b7ecda6d9f4f54852ca0b59b36ac882ab3f47..ad38a4d378fa8fcf934f1c41cd9=
-02d79a2c8baa5 100644
---- a/rust/kernel/owned.rs
-+++ b/rust/kernel/owned.rs
-@@ -3,6 +3,7 @@
- //! Unique reference types for objects with custom destructors. They shoul=
-d be used for C-allocated
- //! objects which by API-contract are owned by Rust, but need to be freed =
-through the C API.
-=20
-+use crate::sync::aref::{ARef, RefCounted};
- use core::{
-     marker::PhantomData,
-     mem::ManuallyDrop,
-@@ -19,7 +20,8 @@
- ///
- /// Note: The underlying object is not required to provide internal refere=
-nce counting, because it
- /// represents a unique, owned reference. If reference counting (on the Ru=
-st side) is required,
--/// [`RefCounted`](crate::types::RefCounted) should be implemented.
-+/// [`RefCounted`] should be implemented. [`OwnableRefCounted`] should be =
-implemented if conversion
-+/// between unique and shared (reference counted) ownership is needed.
- ///
- /// # Safety
- ///
-@@ -193,3 +195,124 @@ fn drop(&mut self) {
-         unsafe { T::release(self.ptr) };
-     }
- }
-+
-+/// A trait for objects that can be wrapped in either one of the reference=
- types [`Owned`] and
-+/// [`ARef`].
-+///
-+/// # Examples
-+///
-+/// A minimal example implementation of [`OwnableRefCounted`], [`Ownable`]=
- and its usage with
-+/// [`ARef`] and [`Owned`] looks like this:
-+///
-+/// ```
-+/// # #![expect(clippy::disallowed_names)]
-+/// use core::cell::Cell;
-+/// use core::ptr::NonNull;
-+/// use kernel::alloc::{flags, kbox::KBox, AllocError};
-+/// use kernel::sync::aref::{ARef, RefCounted};
-+/// use kernel::types::{Owned, Ownable, OwnableRefCounted};
-+///
-+/// // Example internally refcounted struct.
-+/// //
-+/// // # Invariants
-+/// //
-+/// // - `refcount` is always non-zero for a valid object.
-+/// // - `refcount` is >1 if there are more then 1 Rust references to it.
-+/// //
-+/// struct Foo {
-+///     refcount: Cell<usize>,
-+/// }
-+///
-+/// impl Foo {
-+///     fn new() -> Result<Owned<Self>, AllocError> {
-+///         // We are just using a `KBox` here to handle the actual alloca=
-tion, as our `Foo` is
-+///         // not actually a C-allocated object.
-+///         let result =3D KBox::new(
-+///             Foo {
-+///                 refcount: Cell::new(1),
-+///             },
-+///             flags::GFP_KERNEL,
-+///         )?;
-+///         let result =3D NonNull::new(KBox::into_raw(result))
-+///             .expect("Raw pointer to newly allocation KBox is null, thi=
-s should never happen.");
-+///         // SAFETY: We just allocated the `Self`, thus it is valid and =
-there cannot be any other
-+///         // Rust references. Calling `into_raw()` makes us responsible =
-for ownership and
-+///         // we won't use the raw pointer anymore, thus we can transfer =
-ownership to the `Owned`.
-+///         Ok(unsafe { Owned::from_raw(result) })
-+///     }
-+/// }
-+///
-+/// // SAFETY: We increment and decrement each time the respective functio=
-n is called and only free
-+/// // the `Foo` when the refcount reaches zero.
-+/// unsafe impl RefCounted for Foo {
-+///     fn inc_ref(&self) {
-+///         self.refcount.replace(self.refcount.get() + 1);
-+///     }
-+///
-+///     unsafe fn dec_ref(this: NonNull<Self>) {
-+///         // SAFETY: By requirement on calling this function, the refcou=
-nt is non-zero,
-+///         // implying the underlying object is valid.
-+///         let refcount =3D unsafe { &this.as_ref().refcount };
-+///         let new_refcount =3D refcount.get() - 1;
-+///         if new_refcount =3D=3D 0 {
-+///             // The `Foo` will be dropped when `KBox` goes out of scope=
-.
-+///             // SAFETY: The [`KBox<Foo>`] is still alive as the old ref=
-count is 1. We can pass
-+///             // ownership to the [`KBox`] as by requirement on calling =
-this function,
-+///             // the `Self` will no longer be used by the caller.
-+///             unsafe { KBox::from_raw(this.as_ptr()) };
-+///         } else {
-+///             refcount.replace(new_refcount);
-+///         }
-+///     }
-+/// }
-+///
-+/// impl OwnableRefCounted for Foo {
-+///     fn try_from_shared(this: ARef<Self>) -> Result<Owned<Self>, ARef<S=
-elf>> {
-+///         if this.refcount.get() =3D=3D 1 {
-+///             // SAFETY: The `Foo` is still alive and has no other Rust =
-references as the refcount
-+///             // is 1.
-+///             Ok(unsafe { Owned::from_raw(ARef::into_raw(this)) })
-+///         } else {
-+///             Err(this)
-+///         }
-+///     }
-+/// }
-+///
-+/// // SAFETY: What out `release()` function does is safe of any valid `Se=
-lf`.
-+/// unsafe impl Ownable for Foo {
-+///     unsafe fn release(this: NonNull<Self>) {
-+///         // SAFETY: Using `dec_ref()` from [`RefCounted`] to release is=
- okay, as the refcount is
-+///         // always 1 for an [`Owned<Foo>`].
-+///         unsafe{ Foo::dec_ref(this) };
-+///     }
-+/// }
-+///
-+/// let foo =3D Foo::new().expect("Failed to allocate a Foo. This shouldn'=
-t happen");
-+/// let mut foo =3D ARef::from(foo);
-+/// {
-+///     let bar =3D foo.clone();
-+///     assert!(Owned::try_from(bar).is_err());
-+/// }
-+/// assert!(Owned::try_from(foo).is_ok());
-+/// ```
-+pub trait OwnableRefCounted: RefCounted + Ownable + Sized {
-+    /// Checks if the [`ARef`] is unique and convert it to an [`Owned`] it=
- that is that case.
-+    /// Otherwise it returns again an [`ARef`] to the same underlying obje=
-ct.
-+    fn try_from_shared(this: ARef<Self>) -> Result<Owned<Self>, ARef<Self>=
->;
-+
-+    /// Converts the [`Owned`] into an [`ARef`].
-+    fn into_shared(this: Owned<Self>) -> ARef<Self> {
-+        // SAFETY: Safe by the requirements on implementing the trait.
-+        unsafe { ARef::from_raw(Owned::into_raw(this)) }
-+    }
-+}
-+
-+impl<T: OwnableRefCounted> TryFrom<ARef<T>> for Owned<T> {
-+    type Error =3D ARef<T>;
-+    /// Tries to convert the [`ARef`] to an [`Owned`] by calling
-+    /// [`try_from_shared()`](OwnableRefCounted::try_from_shared). In case=
- the [`ARef`] is not
-+    /// unique, it returns again an [`ARef`] to the same underlying object=
-.
-+    fn try_from(b: ARef<T>) -> Result<Owned<T>, Self::Error> {
-+        T::try_from_shared(b)
-+    }
-+}
-diff --git a/rust/kernel/sync/aref.rs b/rust/kernel/sync/aref.rs
-index 97cfddd9ec2ad788a4a659f404a9b6790da08e29..605c56b3d634e048cdfe1524881=
-ab1e2e76ae3a4 100644
---- a/rust/kernel/sync/aref.rs
-+++ b/rust/kernel/sync/aref.rs
-@@ -15,7 +15,10 @@
- /// Note: Implementing this trait allows types to be wrapped in an [`ARef<=
-Self>`]. It requires an
- /// internal reference count and provides only shared references. If uniqu=
-e references are required
- /// [`Ownable`](crate::types::Ownable) should be implemented which allows =
-types to be wrapped in an
--/// [`Owned<Self>`](crate::types::Owned).
-+/// [`Owned<Self>`](crate::types::Owned). Implementing the trait
-+/// [`OwnableRefCounted`](crate::types::OwnableRefCounted) allows to conve=
-rt between unique and
-+/// shared references (i.e. [`Owned<Self>`](crate::types::Owned) and
-+/// [`ARef<Self>`](crate::types::Owned)).
- ///
- /// # Safety
- ///
-@@ -165,6 +168,12 @@ fn from(b: &T) -> Self {
-     }
- }
-=20
-+impl<T: crate::types::OwnableRefCounted> From<crate::types::Owned<T>> for =
-ARef<T> {
-+    fn from(b: crate::types::Owned<T>) -> Self {
-+        T::into_shared(b)
-+    }
-+}
-+
- impl<T: RefCounted> Drop for ARef<T> {
-     fn drop(&mut self) {
-         // SAFETY: The type invariants guarantee that the `ARef` owns the =
-reference we're about to
-diff --git a/rust/kernel/types.rs b/rust/kernel/types.rs
-index 8ef01393352bb2510524bf070ad4141147ed945f..a9b72709d0d3c7fc58444a19fae=
-896aed7506128 100644
---- a/rust/kernel/types.rs
-+++ b/rust/kernel/types.rs
-@@ -11,7 +11,7 @@
- };
- use pin_init::{PinInit, Wrapper, Zeroable};
-=20
--pub use crate::owned::{Ownable, Owned};
-+pub use crate::owned::{Ownable, OwnableRefCounted, Owned};
-=20
- pub use crate::sync::aref::{ARef, AlwaysRefCounted, RefCounted};
-=20
-
---=20
-2.51.0
-
+diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
+index 2f8fdecdd7a9..f2e65fad71da 100644
+--- a/block/blk-iolatency.c
++++ b/block/blk-iolatency.c
+@@ -34,7 +34,7 @@
+  * throttle "unloved", but nobody else.
+  *
+  * In this example "fast", "slow", and "normal" will be the only groups actually
+- * accounting their io latencies.  We have to walk up the heirarchy to the root
++ * accounting their io latencies.  We have to walk up the hierarchy to the root
+  * on every submit and complete so we can do the appropriate stat recording and
+  * adjust the queue depth of ourselves if needed.
+  *
+-- 
+2.34.1
 
