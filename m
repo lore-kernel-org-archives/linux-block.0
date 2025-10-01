@@ -1,110 +1,104 @@
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6CCC218AAF
-	for <linux-block@vger.kernel.org>; Wed,  1 Oct 2025 09:29:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ED8023507C;
+	Wed,  1 Oct 2025 10:23:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759310964; cv=none; b=UE+BSW8T9gEykjWwvyVn0PWFfgG7Xx9R8x8dF7BS3PN4VYiXKixVgu8LUtYkfyp4d8hHjbRQjmb2PWRRF6o50RKB9n0MiUNKM9Avz5U3+yOWIUgjHiplw8wOgR/0XtxRE11VGIw7jDdbIyRoqcNZ6Ioc4nrosIWF6rqU+XBP7C8=
+	t=1759314211; cv=none; b=fBtWmAa0wYh+85aXN6cOiEfm8TefKQEdrQMkDBWPWxWHpgv/QCYD4w+nfB4K29wUmvYDP3N0+JZpUTDSGm+15zBG7HC+qjDKgrqIjbwBjkQ3JkK0WwmHA6ICk2/fqM3qxSz8jhDjb6g4pAf8LkQuhxa7B6qYnS5nk/9w7lwGFKM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759310964; c=relaxed/simple;
-	bh=eWhaWIh1Ch5W+HrhvE/7nWxIJ4BqD2s5kUI/3gBmyEA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Nb48X/aV2FfmR1vpSVXjJPbtZyXyIhPwxLjNIr4xN+D0YYOzMWDAwmEo4ZLaw8CrM7P8VzxUN2y79H6RZkxMdhiNHC3eRLYfPHQyikRB/W6AnlB4A1JH8hyEa/Ri0MMAkZHGQrAEMZAADnDb1PMaxgC4ygkqCQjRD8av3jn7ypI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TVBaEkyI; arc=none smtp.client-ip=209.85.221.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1759314211; c=relaxed/simple;
+	bh=AALh+QgcdxTgVsm2Rm8hI3nipsDKnmlWFJxhPOr+liI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uXnoWX54cfRAjxtj7+xdiMhiJ5b5Ov71kOY3925xGl/e2OhYmjpY4kpqHZBgkXni15jfYH0J2jyBzVvYsMKOEFpJANv7tej+Zdaff2klbEkIoNmuJ6zSVxk7nyZYO2orRU6Hk8pyHZlU7sa5rgKjURGwahD+AveuU4+c0zo4uKI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IEi0leiv; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TVBaEkyI"
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-3f44000626bso4201835f8f.3
-        for <linux-block@vger.kernel.org>; Wed, 01 Oct 2025 02:29:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1759310961; x=1759915761; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eWhaWIh1Ch5W+HrhvE/7nWxIJ4BqD2s5kUI/3gBmyEA=;
-        b=TVBaEkyIVsWpPgc25PthN0dgMizQ6ejHVgbgY4cBzyNmtAMFUxALL2/XSvvKJkBJsb
-         nDMVrtUeFd3OpEfW3EoEcn7zKGgKwSzKK6TBOSXbDglCX4YaAdh419jxyWs9gSIew1u7
-         br3pPtBGPK+11HqzUpIOPf0//hSkV2Qmie5YLPhJ5K/5BYBVZH17YsA1yhe0dQRlNJti
-         Rp26I6LcqZUn5saUboAhSALCKrU0y0bvtQl3gk/xIzSlF6laY9r6Y6+h2zODmLkxIDEm
-         Yul6SYPIAC96/iUa230+xFVkC1Ne7w6ghfm0lj7XZyxe0v7vCRrHZWnlBDr0k3Plu8Ci
-         C4KQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759310961; x=1759915761;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=eWhaWIh1Ch5W+HrhvE/7nWxIJ4BqD2s5kUI/3gBmyEA=;
-        b=WbtwYgznAGem5smwVoI5xC8MwFl3CHvxRnc64d/JumpK/8CDFCoxQ1i6pLmUa3M6qd
-         H3frEEE8h2S/8FMuQaAzPtB5mqaMcFIXZexwmhbz+MIM+LFTw6Cqkf3JWoLsLFLhNNdy
-         XGVgBOEwUqNeDS7w2edNGs8/qhzLKUs3AOKXuFGDoaApRcIvZUdy5pFZD21THQqb82sS
-         N7I7sYdveq/eXLchMZ0QFHhWaOLd/DjgSK4zNBr913MoAmBBP68QNkVTr6Jo+d0EmZMp
-         zxZZ+l3TD76NYmYfoA6S60Bwqs5f++nis2I7XhBjgDQe9CydccKeGrSPwCLGpKot71PC
-         Ml0w==
-X-Forwarded-Encrypted: i=1; AJvYcCWW6q0SpbswUueNmjJzpnuuEcMouyZO6F1TG+4ij8BzmJWrknANNO90t6hOJJ3aNThx8X6H+tTyJHvx6w==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzBwiBuANSRqRQDKGz/9ZTTnPv2UOnCnFVEqKhiHlIT/WKwQ2P7
-	AY4AaFjFXKiNXrnwF8PTXid6u4ZWL1s7n5gpAi7JGMGMw4eHlCtg+6v4dxGI5vnoLWHLYVMA8zJ
-	tYu2frUDYUqtjCJPswBdAeJgllI0vTViplrJNjujH
-X-Gm-Gg: ASbGncsGsQ2wzUULx9zhQ5SpuNqq+/1l29oflxpUD+CKa5Ubro9NpJ8bQR7dMyd0Q5F
-	yqTgJfPxhNdcCLbSM2Pq1aJ/WeNiAPPJ96oXqdZiM6IXHTTXj0quz2128+neIFGrKXNxDT/PUD5
-	wgXLzpm49YvYnkH7UfJE80fL+U5OVl4Y/2GqFU0AbWTZOxL/M5tvZlu18BOr8Itc+y+AGktkPOm
-	iFiWtoqItH3R+PgRQrdq5m2Ps6xxd19Na+ixOGgxoBqDsNF17Jd3STxLkOMG6OISztr
-X-Google-Smtp-Source: AGHT+IEGTvzQBJ51h7EDzxRa/Kisf+BfY+7cpvTrlEhl/iMUN4+q2HPEwsb4ysW4cM34kR4mPUadGwVDBMTe2U90ivY=
-X-Received: by 2002:a05:6000:610:b0:408:9c48:e27b with SMTP id
- ffacd0b85a97d-42557820c81mr2042096f8f.62.1759310960773; Wed, 01 Oct 2025
- 02:29:20 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IEi0leiv"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49CD4C4CEF4;
+	Wed,  1 Oct 2025 10:23:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1759314210;
+	bh=AALh+QgcdxTgVsm2Rm8hI3nipsDKnmlWFJxhPOr+liI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=IEi0leivXfyS1pd8i+p/LooJS581IdRk5OJvdTAXrn4Fpg1Nmwb3H2AWg39+CV+ZA
+	 AUcfAWJf19mMvPxjtL4iIl7KzvkQu4eiXu+/mLr//i1bx4WF3bhrs/E4JbJcaZzMxl
+	 b76OCiKNnWVWS9XXpp6sl7QE/NRGadnJNiPee9eXHp1udXYHOhDclqheHydPwEHgnH
+	 86WusEtL4z6txIqRAxGvABsgz9ayBD86d3M2lB7MldiNxwfcp1I0PTtRHQKMpH2wcz
+	 jt+/3+0/4oIoNGl9VqHbxmpUxDZUUZVhswEyk6d8ChvxoGnZEjneaVAu6K4adsORTA
+	 P4WQ+/bo9ixPA==
+Date: Wed, 1 Oct 2025 11:23:27 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Naresh Kamboju <naresh.kamboju@linaro.org>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, stable@vger.kernel.org,
+	patches@lists.linux.dev, linux-kernel@vger.kernel.org,
+	torvalds@linux-foundation.org, akpm@linux-foundation.org,
+	linux@roeck-us.net, shuah@kernel.org, patches@kernelci.org,
+	lkft-triage@lists.linaro.org, pavel@denx.de, jonathanh@nvidia.com,
+	f.fainelli@gmail.com, sudipm.mukherjee@gmail.com, rwarsow@gmx.de,
+	conor@kernel.org, hargar@microsoft.com, achill@achill.org,
+	Dan Carpenter <dan.carpenter@linaro.org>,
+	Arnd Bergmann <arnd@arndb.de>, linux-fsdevel@vger.kernel.org,
+	linux-block <linux-block@vger.kernel.org>,
+	Anders Roxell <anders.roxell@linaro.org>,
+	Ben Copeland <benjamin.copeland@linaro.org>
+Subject: Re: [PATCH 5.10 000/122] 5.10.245-rc1 review
+Message-ID: <aN0BH9j_TJkFg2pM@finisterre.sirena.org.uk>
+References: <20250930143822.939301999@linuxfoundation.org>
+ <CA+G9fYvhoeNWOsYMvWRh+BA5dKDkoSRRGBuw5aeFTRzR_ofCvg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250925-core-cstr-cstrings-v2-0-78e0aaace1cd@gmail.com> <20250925-core-cstr-cstrings-v2-19-78e0aaace1cd@gmail.com>
-In-Reply-To: <20250925-core-cstr-cstrings-v2-19-78e0aaace1cd@gmail.com>
-From: Alice Ryhl <aliceryhl@google.com>
-Date: Wed, 1 Oct 2025 11:29:08 +0200
-X-Gm-Features: AS18NWCOfBcX2Vbfhr-fnk5GPcApSeOL4C5SAm45sMYmzlcHM8gTiQQ5VZSiyfk
-Message-ID: <CAH5fLggd09hodiDAdNRy6aXK9ANCP==YSJwy-GMbhNAAMm731A@mail.gmail.com>
-Subject: Re: [PATCH v2 19/19] rust: regulator: replace `kernel::c_str!` with C-Strings
-To: Tamir Duberstein <tamird@gmail.com>
-Cc: "Rafael J. Wysocki" <rafael@kernel.org>, Viresh Kumar <viresh.kumar@linaro.org>, 
-	Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
-	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
-	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
-	Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, 
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
-	Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
-	FUJITA Tomonori <fujita.tomonori@gmail.com>, Andrew Lunn <andrew@lunn.ch>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Michael Turquette <mturquette@baylibre.com>, Stephen Boyd <sboyd@kernel.org>, 
-	Breno Leitao <leitao@debian.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, 
-	Dave Ertman <david.m.ertman@intel.com>, Ira Weiny <ira.weiny@intel.com>, 
-	Leon Romanovsky <leon@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>, 
-	=?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, 
-	Arnd Bergmann <arnd@arndb.de>, Brendan Higgins <brendan.higgins@linux.dev>, 
-	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, Jens Axboe <axboe@kernel.dk>, 
-	Alexandre Courbot <acourbot@nvidia.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, Liam Girdwood <lgirdwood@gmail.com>, 
-	Mark Brown <broonie@kernel.org>, linux-pm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	rust-for-linux@vger.kernel.org, nouveau@lists.freedesktop.org, 
-	dri-devel@lists.freedesktop.org, netdev@vger.kernel.org, 
-	linux-clk@vger.kernel.org, linux-pci@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, 
-	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="Csa2GXldnUFay7IA"
+Content-Disposition: inline
+In-Reply-To: <CA+G9fYvhoeNWOsYMvWRh+BA5dKDkoSRRGBuw5aeFTRzR_ofCvg@mail.gmail.com>
+X-Cookie: If in doubt, mumble.
+
+
+--Csa2GXldnUFay7IA
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Sep 25, 2025 at 3:56=E2=80=AFPM Tamir Duberstein <tamird@gmail.com>=
- wrote:
->
-> C-String literals were added in Rust 1.77. Replace instances of
-> `kernel::c_str!` with C-String literals where possible.
->
-> Signed-off-by: Tamir Duberstein <tamird@gmail.com>
+On Wed, Oct 01, 2025 at 12:57:27AM +0530, Naresh Kamboju wrote:
+> On Tue, 30 Sept 2025 at 20:24, Greg Kroah-Hartman
 
-Reviewed-by: Alice Ryhl <aliceryhl@google.com>
+> The following LTP syscalls failed on stable-rc 5.10.
+> Noticed on both 5.10.243-rc1 and 5.10.245-rc1
+>=20
+> First seen on 5.10.243-rc1.
+>=20
+>  ltp-syscalls
+>   - fanotify13
+>   - fanotify14
+>   - fanotify15
+>   - fanotify16
+>   - fanotify21
+>   - landlock04
+>   - ioctl_ficlone02
+
+> Test regression: LTP syscalls fanotify13/14/15/16/21 TBROK: mkfs.vfat
+> failed with exit code 1
+
+I'm also seeing some issues with fcntl34, but that's a timeout so I'm
+not convinced it's real.  The bisect looked like noise.
+
+--Csa2GXldnUFay7IA
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmjdAR4ACgkQJNaLcl1U
+h9Dv4Qf/Whchx7Nr2OJDScQUh+gNKZqjJR0pdJ/Fa+srX8GaUMVNqceDTnhu3UWd
+JmT04jEJYcKw4g5Gs5yy2uS6kkzXrYGLzVmGSVbRmll9w9fKLiSXYM0s0vUbzyhj
+0pqX3f5PtWyc8F5o/bM82n0OjFa50FF2DLpt288ZkRiR0PBoiVdEPTdOFsmpCMZt
+/fxmfxcs/h+Gf78+Vig+ek27lM0Zfst2Cuw8pp91o2Vf2aWxZ3zsLdF6zGNkWeBV
+WstLE2hM7BCc7vYGO86AmqcOuOeW08YwCq+n4YcI0R0H+MxctP7rY7TOv87sThEg
+A4YUm2S5/slLao4oF58XgQP1bYm0yA==
+=KUL6
+-----END PGP SIGNATURE-----
+
+--Csa2GXldnUFay7IA--
