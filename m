@@ -1,57 +1,82 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB09C22A4FE;
-	Wed,  1 Oct 2025 11:39:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3383270EDE
+	for <linux-block@vger.kernel.org>; Wed,  1 Oct 2025 12:10:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759318783; cv=none; b=EUrxrOiVGTUYbyKgMCX0lsWY4kbkzw/n665X7Efc6tQtWs2OZWLoHnXe1AKLVeJjwjGiT9uyQg/l+cMEx4dpB/OV0/YnyOGLRfKxjJGJ3aq5UVNntEyzKQWGnT651MUn+OzkvDCmtA30Aj2Qgct2D/YjpoKGZS7FLOIt+yfI79U=
+	t=1759320634; cv=none; b=BVuil1bFrADo57rUS2pWf1dUXoPldrih3FqLAQeeSSJoB5NVhmgBXPLhFfSljQBw4PmTI/km3LQj/8FMQMAl2tBXiBD/WhijoG0J3W7StnvgNwPk594MrahN6G2W+9aqtnN6KVqvxYQ7v/mckccUd47loIWZFCuE8mGP6K3p2g8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759318783; c=relaxed/simple;
-	bh=Ezy7+mtT4eps9wTpBlbZkP1mFfCZBHTp5E+V6UHQD4c=;
+	s=arc-20240116; t=1759320634; c=relaxed/simple;
+	bh=pvMGaqY63vMpQ2YYUKa3njQxeuJ6aYGwkhm8mUrKcsE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UwuXmc6Gw7PvyRhIKXx+GtxFV0pLRzXaimW09uqODJCjKS92sOXfwvajbyOzBUtpFaW+ikS6vGbi/1tq833zIkrIIRSdeLa/GlxNzMda4V65pfKF16Hwl1pcssZI+6I6q0GN2GYxNoKHW25+yaOI2hwHBzaHPPBICdn2o5CT8yU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hyfhWXjK; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=Qk+FxsJR9OxkJuPoiBFpy+bPqipV6J2PSF+zMz8mD2XE3D0GCnmlaO+ReYdRd51676bWaYJsfGmI9uWfhYM9rSGxBevVQo6zfukzOZANdO0+M/xnDB6gDjeUGIti1ohTxZLi9orjpg0L9/MatlQ0BmG97/5FGjbKsXKSX7/Sz/o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=IxmtHI7Y; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hyfhWXjK"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB4B8C4CEF4;
-	Wed,  1 Oct 2025 11:39:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759318782;
-	bh=Ezy7+mtT4eps9wTpBlbZkP1mFfCZBHTp5E+V6UHQD4c=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hyfhWXjKKeqTsPAKqst9VMRZTuHnr79Sn85JR9oApnhJZe1TO5oXMimv1OZ2K5t1Q
-	 9MiMpANH+0eOS4bcbwboljFqvrlf7T7uAAqpI3hYX8SgDpEKW89XvVN/UZ5DYJEoku
-	 FCsdu0jIgr5dBxYfu2TGJvAqsoQRkfMXMl/1F9lyU95/QyzDKaMdhpvL1V7Ya/B2mh
-	 pfedbt0u93fTYkQVaxWkIHD9fK5BbrTidNe/CqVFgP1WMiwVDvBVcc7cf3aq3rnWzp
-	 eISxrrXcYtNF0j6R+nLIOAcxLwM1v6bQ7c0J8gD109M3HZIzW3eQE3Urg+TrWFUG6k
-	 2FEfVcfX3pxjQ==
-Date: Wed, 1 Oct 2025 14:39:37 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: Jason Gunthorpe <jgg@nvidia.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
-	Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>,
-	kvm@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-media@vger.kernel.org, linux-mm@kvack.org,
-	linux-pci@vger.kernel.org, Logan Gunthorpe <logang@deltatee.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Vivek Kasireddy <vivek.kasireddy@intel.com>,
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v4 07/10] vfio/pci: Add dma-buf export config for MMIO
- regions
-Message-ID: <20251001113937.GH324804@unreal>
-References: <cover.1759070796.git.leon@kernel.org>
- <b1b44823f93fd9e7fa73dc165141d716cb74fa90.1759070796.git.leon@kernel.org>
- <20250929151740.21f001e3.alex.williamson@redhat.com>
- <20250930075748.GF324804@unreal>
- <20250930100758.1605d5a5.alex.williamson@redhat.com>
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IxmtHI7Y"
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-46e48d6b95fso45430935e9.3
+        for <linux-block@vger.kernel.org>; Wed, 01 Oct 2025 05:10:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1759320631; x=1759925431; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=yt2/RiqsQaPl/L3x5B+o48QDSFj5vHrC7SC05R42/Fw=;
+        b=IxmtHI7Y69zAjJ/ziiSmBhgdrCkeVRXMqEXyJy2a/Ix8jn1NlGTTQRWSKvc0MnQzC2
+         cLtCM559tjNu2ckFN/xBUiBzhD5QQThxV7HwGUFDwrn0GPhE+kCJNBjvH62sJUBtuhDi
+         YbN/4dx9pSOPIb/P+G2iYvnLn3fEVx59So7sMeiH/INXclr8csTh/IB/GwsoUAq5XTDt
+         59D0p/liLSCx32xAXIBK7vqanTk5f2OunXaOHeMaiGItIgq7UDx9UlHe4KY3n2aY1s/R
+         DZcBFsBIa1t1HWuTJZ1lNk+xsfve+rG6IXpClj513KxKybUHANqI9wgL5yrthLhsiTKS
+         DLew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759320631; x=1759925431;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yt2/RiqsQaPl/L3x5B+o48QDSFj5vHrC7SC05R42/Fw=;
+        b=Oxi22DDcysK0EfNgS0l8oZhO+kzRfidkjVXb4C4QjDK2XfDBCoHr6g32Zf1GWq+6Rt
+         gaoo3kujnHu7nr5gJ4minOqMR+1TEYLVNJeVBK/Y7jQ2Qk7Ns8WGQFKa0mRyld8wDTQO
+         O1DapzLst/R59fxBZgFSDzyPn6zm3ytmyPWsb9sU3C+p9+0TGvvcOh1VZ+BG5XQ1JuIp
+         X0J72jEQ/BUii7yO5X1+caMtRf978m4pfx2jZmyDQqSyxJ1yLKioyq8SAh1vig68e0Sb
+         UJzvCVoGaX5Oxs6EEBs+/bg8bqSUTXy2+pec3jDBAxI2tlq4YpbH6PzDr7niIOOf/0ft
+         UC6Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWonS0yHd3xZbijNuMdsZG4MoI0E1UV3Ww3ZoVwMvcJkyKwbsrJ3Msx3GV45AbXjmuTzzb2nmNlWyZ8mQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxyWwAq8Q6G1HPfcr81DeSwDs0SbDDKtdlpnwM1CGB+o0uFtenb
+	X7b6Dq6np15g7tL4d8M3JR7V/0R9d5Vuj8n2hrDfjPvBKOXhOcCylvx+z3FSNpSeJoI=
+X-Gm-Gg: ASbGncsBxjk08BUWigimiJ0TcwmFgiKxiTW5v21FXmcVneEIK3qGSsjHvCdifsHLsms
+	Gjmi+7zUiYlsxrsZhiexLPezYiZX0diyuvrk2FDkClroVC/ZnA+iug9QlS42pLISIqYAMaiZn2/
+	QsmdWgaCLbCT5oVB4mDJIxBO9qxQKSErcscRDy9dTkVV7ChpRcYVHMd5kxFZ6/i2J5h9KpQh/bk
+	7sNVULPXlfiZbF9Ic570ETotjIRmkNYVHwDp4sNZB4g83w0XiOvoppzIfto9itULIGVHxHc1YlL
+	1yWYq/YRhZTWD6ptcepIguH1iIf/2HH2eQhCLav+jyfY3q0X4hNwl8sQhtKwr5030VQqm9XRVKQ
+	FGgP5iPMG63HLaSp9po62MwQdKl8z7/uP9+sBzT8loBBAJ/U3Ofc6nzF91BF4C5w=
+X-Google-Smtp-Source: AGHT+IG4Fv3Ws0T0hfn9FRi9J8Hy8qhXiWqsQ+7mqBAvBUVbcM7w8H1ZOknsFTXOA3cvm76Wrim5lg==
+X-Received: by 2002:a05:600c:8206:b0:45b:88d6:8db5 with SMTP id 5b1f17b1804b1-46e612192d5mr31099915e9.12.1759320630850;
+        Wed, 01 Oct 2025 05:10:30 -0700 (PDT)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-40fb72fb21esm26937295f8f.7.2025.10.01.05.10.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 01 Oct 2025 05:10:30 -0700 (PDT)
+Date: Wed, 1 Oct 2025 15:10:27 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Naresh Kamboju <naresh.kamboju@linaro.org>, stable@vger.kernel.org,
+	patches@lists.linux.dev, linux-kernel@vger.kernel.org,
+	torvalds@linux-foundation.org, akpm@linux-foundation.org,
+	linux@roeck-us.net, shuah@kernel.org, patches@kernelci.org,
+	lkft-triage@lists.linaro.org, pavel@denx.de, jonathanh@nvidia.com,
+	f.fainelli@gmail.com, sudipm.mukherjee@gmail.com, rwarsow@gmx.de,
+	conor@kernel.org, hargar@microsoft.com, broonie@kernel.org,
+	achill@achill.org, Arnd Bergmann <arnd@arndb.de>,
+	linux-fsdevel@vger.kernel.org,
+	linux-block <linux-block@vger.kernel.org>,
+	Anders Roxell <anders.roxell@linaro.org>,
+	Ben Copeland <benjamin.copeland@linaro.org>
+Subject: Re: [PATCH 5.10 000/122] 5.10.245-rc1 review
+Message-ID: <aN0aMyU1D3N4WQy4@stanley.mountain>
+References: <20250930143822.939301999@linuxfoundation.org>
+ <CA+G9fYvhoeNWOsYMvWRh+BA5dKDkoSRRGBuw5aeFTRzR_ofCvg@mail.gmail.com>
+ <2025100105-strewn-waving-35de@gregkh>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -60,97 +85,79 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250930100758.1605d5a5.alex.williamson@redhat.com>
+In-Reply-To: <2025100105-strewn-waving-35de@gregkh>
 
-On Tue, Sep 30, 2025 at 10:07:58AM -0600, Alex Williamson wrote:
-> On Tue, 30 Sep 2025 10:57:48 +0300
-> Leon Romanovsky <leon@kernel.org> wrote:
-> 
-> > On Mon, Sep 29, 2025 at 03:17:40PM -0600, Alex Williamson wrote:
-> > > On Sun, 28 Sep 2025 17:50:17 +0300
-> > > Leon Romanovsky <leon@kernel.org> wrote:
-> > >   
-> > > > From: Leon Romanovsky <leonro@nvidia.com>
-> > > > 
-> > > > Add new kernel config which indicates support for dma-buf export
-> > > > of MMIO regions, which implementation is provided in next patches.
-> > > > 
-> > > > Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-> > > > ---
-> > > >  drivers/vfio/pci/Kconfig | 20 ++++++++++++++++++++
-> > > >  1 file changed, 20 insertions(+)
-> > > > 
-> > > > diff --git a/drivers/vfio/pci/Kconfig b/drivers/vfio/pci/Kconfig
-> > > > index 2b0172f54665..55ae888bf26a 100644
-> > > > --- a/drivers/vfio/pci/Kconfig
-> > > > +++ b/drivers/vfio/pci/Kconfig
-> > > > @@ -55,6 +55,26 @@ config VFIO_PCI_ZDEV_KVM
-> > > >  
-> > > >  	  To enable s390x KVM vfio-pci extensions, say Y.
-> > > >  
-> > > > +config VFIO_PCI_DMABUF
-> > > > +	bool "VFIO PCI extensions for DMA-BUF"
-> > > > +	depends on VFIO_PCI_CORE
-> > > > +	depends on PCI_P2PDMA && DMA_SHARED_BUFFER
-> > > > +	default y
-> > > > +	help
-> > > > +	  Enable support for VFIO PCI extensions that allow exporting
-> > > > +	  device MMIO regions as DMA-BUFs for peer devices to access via
-> > > > +	  peer-to-peer (P2P) DMA.
-> > > > +
-> > > > +	  This feature enables a VFIO-managed PCI device to export a portion
-> > > > +	  of its MMIO BAR as a DMA-BUF file descriptor, which can be passed
-> > > > +	  to other userspace drivers or kernel subsystems capable of
-> > > > +	  initiating DMA to that region.
-> > > > +
-> > > > +	  Say Y here if you want to enable VFIO DMABUF-based MMIO export
-> > > > +	  support for peer-to-peer DMA use cases.
-> > > > +
-> > > > +	  If unsure, say N.
-> > > > +
-> > > >  source "drivers/vfio/pci/mlx5/Kconfig"
-> > > >  
-> > > >  source "drivers/vfio/pci/hisilicon/Kconfig"  
-> > > 
-> > > This is only necessary if we think there's a need to build a kernel with
-> > > P2PDMA and VFIO_PCI, but not VFIO_PCI_DMABUF.  Does that need really
-> > > exist?  
+On Wed, Oct 01, 2025 at 12:50:13PM +0200, Greg Kroah-Hartman wrote:
+> On Wed, Oct 01, 2025 at 12:57:27AM +0530, Naresh Kamboju wrote:
+> > On Tue, 30 Sept 2025 at 20:24, Greg Kroah-Hartman
+> > <gregkh@linuxfoundation.org> wrote:
+> > >
+> > > This is the start of the stable review cycle for the 5.10.245 release.
+> > > There are 122 patches in this series, all will be posted as a response
+> > > to this one.  If anyone has any issues with these being applied, please
+> > > let me know.
+> > >
+> > > Responses should be made by Thu, 02 Oct 2025 14:37:59 +0000.
+> > > Anything received after that time might be too late.
+> > >
+> > > The whole patch series can be found in one patch at:
+> > >         https://www.kernel.org/pub/linux/kernel/v5.x/stable-review/patch-5.10.245-rc1.gz
+> > > or in the git tree and branch at:
+> > >         git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable-rc.git linux-5.10.y
+> > > and the diffstat can be found below.
+> > >
+> > > thanks,
+> > >
+> > > greg k-h
 > > 
-> > It is used to filter build of vfio_pci_dmabuf.c - drivers/vfio/pci/Makefile:
-> > vfio-pci-core-$(CONFIG_VFIO_PCI_DMABUF) += vfio_pci_dmabuf.o
-> 
-> Maybe my question of whether it needs to exist at all is too broad.
-> Does it need to be a user visible Kconfig option?  Where do we see the
-> need to preclude this feature from vfio-pci if the dependencies are
-> enabled?
-
-The dependencies are for the platform and not for the devices. For
-example, hisilicon device mentioned in other email doesn't support
-p2p, but the platform most likely support.
-
-I don't have strong feelings about this config and at least for our use
-case will always be enabled. I can hide it from the users.
-
-> 
-> > > I also find it unusual to create the Kconfig before adding the
-> > > supporting code.  Maybe this could be popped to the end or rolled into
-> > > the last patch if we decided to keep it.  Thanks,  
+> > The following LTP syscalls failed on stable-rc 5.10.
+> > Noticed on both 5.10.243-rc1 and 5.10.245-rc1
 > > 
-> > It is leftover from previous version, I can squash it, but first we need
-> > to decide what to do with pcim_p2pdma_init() call, if it needs to be
-> > guarded or not.
+> > First seen on 5.10.243-rc1.
+> > 
+> >  ltp-syscalls
+> >   - fanotify13
+> >   - fanotify14
+> >   - fanotify15
+> >   - fanotify16
+> >   - fanotify21
+> >   - landlock04
+> >   - ioctl_ficlone02
+> > 
+> > Test regression: LTP syscalls fanotify13/14/15/16/21 TBROK: mkfs.vfat
+> > failed with exit code 1
+> > 
+> > Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
+> > 
+> > We are investigating and running bisections.
+> > 
+> > ### Test log
+> > tst_test.c:1888: TINFO: === Testing on vfat ===
+> > tst_test.c:1217: TINFO: Formatting /dev/loop0 with vfat opts='' extra opts=''
+> > mkfs.vfat: Partitions or virtual mappings on device '/dev/loop0', not
+> > making filesystem (use -I to override)
+> > tst_test.c:1217: TBROK: mkfs.vfat failed with exit code 1
+> > HINT: You _MAY_ be missing kernel fixes:
+> > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=c285a2f01d69
 > 
-> As in the other thread, I think it would be cleaner in an IS_ENABLED
-> branch.  I'm tempted to suggest we filter out EOPNOTSUPP to allow it to
-> be unconditional, but I understand your point with the list_head
-> initialization.  Thanks,
+> You are not missing this "fix".
+> 
+> > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=bc2473c90fca
+> 
+> You are missing that one, but why is a overlayfs commit being cared
+> about for vfat?
+> 
+> > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=c45beebfde34a
+> 
+> Another overlayfs patch that is not backported that far.  Again, why is
+> this a hint for vfat?
 
-We can add dmabuf list to struct unconditionally, as memory overhead is
-negligible. It will allow us to drop IS_ENABLED() too.
+That's test output, not something we added.  LTP tests can have a list
+of suggested commits.  LTP doesn't know what kernel you're running, it
+just prints out the list of commits.
 
-Thanks
+https://github.com/linux-test-project/ltp/blob/master/testcases/kernel/syscalls/fanotify/fanotify13.c#L436
 
-> 
-> Alex
-> 
-> 
+regards,
+dan carpenter
+
