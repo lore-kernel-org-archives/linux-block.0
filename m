@@ -1,17 +1,17 @@
-Received: from invmail4.hynix.com (exvmail4.hynix.com [166.125.252.92])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8F6E311C2A;
-	Thu,  2 Oct 2025 08:14:06 +0000 (UTC)
+Received: from invmail4.hynix.com (exvmail4.skhynix.com [166.125.252.92])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DD6930F945;
+	Thu,  2 Oct 2025 08:14:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759392854; cv=none; b=WZPeOKkIotPpFX+3kR8D6L1N9/kwJ21d7xSrYdu/huG9Kf/K9sKBGFuJRL7e+BpTLexgkJ9WpY6Vil0VvozC+QClZazkZLtMP/zCEFKp8I5Z7eu9ZT8pd4n5Mn3oXQjHSETVrNpuqQVwtO++sECpsIPuZp2ZHznmdKepgYMDfeI=
+	t=1759392855; cv=none; b=TZktTbZW44KtqF8kEiPWE4WgneX6fauG8Va73Bggc66Yh7UvHN8nQACDiShtJM5Z8pJa3ASV05eCzKpCvLH8CVKK9k9K9KFNTBxzZVC5P7MLfK+vz4KG69jGPGvCuVH0lYlHnt7Zck2iyfFXzG+b/jydLI4lGiKOjg1qrACcf3Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759392854; c=relaxed/simple;
-	bh=Maxqvp8M2/Mbhj5qDNZmaX54vuIa2E/KjRgY0LGmkyY=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=eOF9Tvpu/qb2IGaios3YBkQ1qO5xIoLYommvyVhc2n3fs9D3/PHnboOSUkxUHNxHuMe+nUrnm7uTgbK1c0JQetwMBgU7uUysXkIS5Hz29yNv+dcCSfVAZA0WL5DIjzajl3lihKD3Yz8GForrNkh5EY6OpNsq3MVY7b+BsQsfvYc=
+	s=arc-20240116; t=1759392855; c=relaxed/simple;
+	bh=L0WtlCojLK6wupXqZkGVRPFE9pJaG7p+Z4/jZGhFssk=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=fj6QOLkACt3JDOHgR1xcoMTC5ShN/DiJrRXmgj0uFar3KxBZ6AuvZE/yU3XfwpLyGq9S3XNf0Fq9qMOoKlprPMJLnpMjJbMPVAJwklQr0Zv5+mQ8xflILP9NLwtaViHnY3PQDHF9/8VKALzefdRrdpggWD13FRn1mPVviNZ5LZY=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
-X-AuditID: a67dfc5b-c45ff70000001609-96-68de34150086
+X-AuditID: a67dfc5b-c45ff70000001609-f4-68de34196ec3
 From: Byungchul Park <byungchul@sk.com>
 To: linux-kernel@vger.kernel.org
 Cc: kernel_team@skhynix.com,
@@ -162,43 +162,43 @@ Cc: kernel_team@skhynix.com,
 	rcu@vger.kernel.org,
 	linux-nfs@vger.kernel.org,
 	linux-rt-devel@lists.linux.dev
-Subject: [PATCH v17 42/47] dept: call dept_hardirqs_off() in local_irq_*() regardless of irq state
-Date: Thu,  2 Oct 2025 17:12:42 +0900
-Message-Id: <20251002081247.51255-43-byungchul@sk.com>
+Subject: [PATCH v17 45/47] dept: track PG_writeback with dept
+Date: Thu,  2 Oct 2025 17:12:45 +0900
+Message-Id: <20251002081247.51255-46-byungchul@sk.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20251002081247.51255-1-byungchul@sk.com>
 References: <20251002081247.51255-1-byungchul@sk.com>
-X-Brightmail-Tracker: H4sIAAAAAAAAAzWSXVBMcRjG/c/5n7OnZaczq3TI55qmEaKs5mUMbsycCxfowqgLls60O7aV
-	7ZthdkfRxyhlqiE1W+m7yMaoVFMhTDQbqWU69J2GPqx2iyJbxt1vfs/zvFcvQ8qTqDWMRhcp
-	6HUqrYKWYun4ivzt7spP6p2GxtVgn07EkGi+RUFm/xAN2WNGDAviKAE9jm8IsjMtCPL7RRK6
-	7JM0vMpMoSE3JwNBVq4ZQ11fvcS5oOF1YS+GtopRCYhpmRi+jmTQkFhvx9D4cSvkX73rDGsH
-	CLg/aiWgve0lhqKeTgIcqZ5gSb9OgfXGMIKqiQIavjqKSSi2T0qgzbQKMkZsErDddWB4k9NB
-	QVNiHwE335po+CXWUmDL/UNBRSeGHGMqgpSELAzV30toMP74jGBu9g4Ns9WDFORO+0HV7250
-	cCdfmVeJ+OmiKyQfXxPD/7K/p/lGhwnz6W+283W3RQkf3/RRwpvMUXz8s3GKryn14Qsbxgje
-	XJ5E8xMdHRJ+qCub4PNeHT3iESTdFyJoNdGCfsf+U1L1QvNDKtzoGpvwxIYNaHx5MnJhOFbJ
-	Fd0zUv85r2RyiWnWm7Naf5KL7MZu5Gqujyx5km1fy3V3bktGDLOSPc2V96sXNWa9uMKq8aW6
-	jA3gnr0YJP6d3MBVVDcveRenf9ffjhdZzu7mEibjnR2ps1Piwg33ppH/Bqu5llIrvoFkJrSs
-	HMk1uugwlUar9FXH6TSxvmfOhZmR80GKL80H1yKbJbAVsQxSrJBZvES1nFJFR8SFtSKOIRVu
-	slOlvWq5LEQVd0HQnzupj9IKEa3Ik8EKD5m/IyZEzoaqIoWzghAu6P+nBOOyxoDcNu/VBko4
-	Nr1JNeCuXNvSIU5pGq/h34FbfA5tCjjruq7BkpXnfnJCGNxQZR9IL9MX2MUHX2a6jp/+cGxz
-	SPDR8uGkE+GGWDHUloYHlakG/+m5y31ljxMupjoC1jsip2bEoOcHakYeHTZMnV/vdWJqYpf3
-	nqf59x95NT88gs8kzStwhFrl50PqI1R/ARPICcEcAwAA
-X-Brightmail-Tracker: H4sIAAAAAAAAAzWSW0xTaRSF/c/5z4WOlTMdMp4oidqEkMwgagJmZ2qMzosnRo0ao4kvUvA4
-	rdxMiwwYTbg1EEaUNrZEqlghFqSACGjEWiSg9YIItSPgQGWqHbxArVGQIIVOwfiys/a3VnbW
-	w2ZJ2Q1qBavOyBI1Gco0OS3Bkl2KwrVRCS9V659bEmEgvxPD1GQJhgvXGmgoaTlPQX+TDcHo
-	VAmC6VkzCbr2EIY5g5OByZlhBkIOJwKTy0BCQ1s+AZ+b52kY7/6EwOj10VDxLh9DwHoaQeWY
-	mYF397eBf9ROQcjzhoDBLxMIrL55AnydxQjmTKlwqbqVhtnePhIqjP0ILns9JLxtDpttzpcI
-	HHUFNPxXfoMEt28Z/D0VoOGR8S8a/K4LBHxopsFS4KDgotmAoLDmGg2miy0Y2v+9zYBrPEjA
-	iMlAgK1lJ4xaxzD0lFcT4X7h1PXlYK4oJMLjLQHGRjsBM9Z6Bp7UjGCw5sWAuddNwau6SgaC
-	3g0QsmSC0/aGAc9ZI4Ymfx+1xYiEad0ZLNS33iQE3bM5WmioakDC7FcDEiavFJKCrjy8dk8E
-	SKGo9U/hSs8ELXydek4Lji8WLDyu5gV971qhvdLDCEUd/zC7fzso2XRYTFNni5p1m5MkqlBn
-	G3UsPzJHZ/+E85D/h1IUwfJcAl9VG6AWNM3F8kNDM+SCjuJW861lY4uc5Hqi+QFXXCli2Z+4
-	ZL7eq1rAmIvhaxr9i3Ept5G/9+A18e3kKt7W3LnII8Lc7e3BC1rGJfK6QBFRjiQWtKQeRakz
-	stOV6rTEeG2qKjdDnROfkpnegsLPZD0V1N9Ck+5tXYhjkXyp1BXjUckoZbY2N70L8Swpj5Im
-	1Y2oZNLDytwToibzkOZ4mqjtQitZLF8u3X5ATJJxfyizxFRRPCZqvrsEG7EiD+XK++ePDA25
-	dt8sS0k5nfJsP467e3lHxL41YvKDvuBt51XFj47pO9EF9u2xOabk8TNPi4cteved4sFh/b5V
-	8ZEKf+T10ljS1ntu696f4371lH2kqjpifFxAR++piHcpqj+4DO83js09VKjHT9b+3mTX9ye8
-	aHwaLe4J7tVlzcQelWOtSrnhF1KjVf4P8xIkJkgDAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAAzWSa0hTcRjG+5+dc3YcDQ5L6mhBOZDAvNaMF7ogffqDEYlIUFSOPLjl1Nq8
+	RtJELS9Yac1oa7oKzZyUbJpKGToz0OXSykvq8hLZ1UvmJdfFNqUvLz+e93me98vLCCT5lC+j
+	TErh1UlylZQWkaKp9beDfGTvFKHWKSn0Z7eSsDCfT0K+5SYFPQ/MCPKaV0iYXx4WQm19NgH6
+	SYMQVpwfCfhTlgAVd6w0dOqKaJjqvUXAdB0NRkMpgjKjhYTRqkkSDDdyCPf4RECV1h8M3a8p
+	mKjWC+H3eBg4r+hIaNSOCcHytgNBy9AO0BqW3Hdb7RR06u+TUDnQS8D42CAF1u4XAugpKabg
+	VauJgOemjdBtcLh1i04ALmcTBf2lFTS47rmLulxdBMwZ/1JQlFdGQkPHkhByR8LhZ917Cozz
+	YRGhuMb6iMC15bUI51rTcaX9G41LuoNws94pxHeffCbw7bkFCltqCmg87XAIcXlnFC7Omabx
+	9w9DJJ552kfjvvsB+IXpmfCw91HR3jhepUzj1SH7Y0WKiccT9JkH2zJcXTmUFl3eXIi8GI6V
+	ca47U6gQMau8UhHtkWl2Ozc4uCzwsDe7jbMWT1IeFrD2LVx/b6CHN7D7uLHRcsLDJOvPzWqN
+	qx4xu5trM/9Ca/VbOXNd62qPl1t/PW4nPSxhw7m8mVx3VuT2GLy4vB8L5FrAh2urHiSvIrEJ
+	ratBEmVSWqJcqZIFKzKTlBnBp5ITLcj9H1VZv481obmeaBtiGSRdL+7xdyoklDxNk5loQxwj
+	kHqLY6tHFBJxnDzzHK9OPqlOVfEaG9rMkNJN4p2L6XESNl6ewifw/Ble/X9LMF6+WnRt185Z
+	bqaTPxtnbo/ZNxKoLwuOdQT5OS9dZ3UXJHMt8fIDMVGRLxvb96S+GX64mBthGvljvqLr25Vz
+	6mtQdvSxg0UnCpKd5/sifZYPPR/qV2lse9Ky/JZnZ9KZgZClaj+s3Fv5ZZ3Mz3Zk4rS9/Ryq
+	P14v+xJ/cTS9oqFhIcDxUEpqFPKwAIFaI/8HSIhoXhsDAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAAzWSa0iTcRTG+793R4u3ZfWaQTYQ6aLN0Dh0o2++SEUQ0VV05EtbOq2tLINq
+	NkdmZdtoSk7LSw1zprZlZKJ4ISFNdJkW5byMZVqaUbPy1tqCvhx+5zwPD8+Hw+CSOnIVo0w7
+	I6jT5KlSSkSI9m7TRYbEDCpkRgcJ/VnNBEx7cwgoqqmiIMd+h4SeahuCoekcBL/mLDjo630E
+	LJjaafDOfKDB19iOIN9pwqHqSRYGP2r/UPCl7TsC84iHgoLxLAKmrDcQFI5aaBh/EQeTQw0k
+	+FyfMHj7cwKB1fMHA0/zVQQL+Slwr8xBwVxXNw4F5h4EpSMuHMZq/eKT9kEEjRVXKPhoqMOh
+	17ME3kxPUfDSfJ2CSWcRBl9rKSi50khCscWEQFdeQ0F+sZ2A+uHnNDi/zGMwkG/CwGbfA0PW
+	UQI6DWWYv5/f9XglWAp0mH+MYWB+1IDBjLWShlflAwRYteFg6eolwV1RSMP8SDT4StKh3faJ
+	BtctMwHVk93kLjPif+nzCL7S8RTj9a8XKL7qbhXi52ZNiPc+0OG83uBf2yamcD7bcY5/0DlB
+	8bPTfRTf+LOE4DvKON7YFcnXF7poPrvpPb1v6xHR9mQhVZkhqDftTBIp3A1u6lR12PnZDh2p
+	RXmhuYhhODaG893bn4uCGIqN4N69m8EDHMyGcY6bo2SAcbZzNdfv3BjgZewObnjoLhZggg3n
+	vmmL/3nE7BauxTaHAsyxazhbbfO/nCD/vXekkwiwhI3l9FPZmAGJStCiShSsTMtQyZWpsVGa
+	FEVmmvJ81PF0lR35n8l6cd74DHl741oRyyDpYrEz3KWQkPIMTaaqFXEMLg0WJ1UMKCTiZHnm
+	BUGdnqg+mypoWlEoQ0hXiuMPCkkS9oT8jJAiCKcE9X8VY4JWaVGE0xM23p87fjw2frvJebTm
+	5KVEo8ouG1xxbd3l+Cg8JLRUtnpDgipcveVVQ9OxQ7e9wxpJzIXTLQlbzUcPX+8parofZ6or
+	8zwe+x0ilt9pdicYuq/Sss2K5Et5QSjlUMT+xHLf7AFZf9/y3Q/dkuf2z+u129KNSy/e3txy
+	Y+17RZuU0Cjk0etxtUb+F1bYeZtIAwAA
 X-CFilter-Loop: Reflected
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -206,63 +206,116 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 
-For dept to function properly, dept_task()->hardirqs_enabled must be set
-correctly.  If it fails to set this value to false, for example, dept
-may mistakenly think irq is still enabled even when it's not.
-
-Do dept_hardirqs_off() regardless of irq state not to miss any
-unexpected cases by any chance e.g. changes of the state by asm code.
+Makes dept able to track PG_writeback waits and events, which will be
+useful in practice.
 
 Signed-off-by: Byungchul Park <byungchul@sk.com>
 ---
- include/linux/irqflags.h | 14 ++++++++++++++
- kernel/dependency/dept.c |  1 +
- 2 files changed, 15 insertions(+)
+ include/linux/mm_types.h   |  1 +
+ include/linux/page-flags.h |  7 +++++++
+ mm/filemap.c               | 11 +++++++++++
+ mm/mm_init.c               |  1 +
+ 4 files changed, 20 insertions(+)
 
-diff --git a/include/linux/irqflags.h b/include/linux/irqflags.h
-index d8b9cf093f83..586f5bad4da7 100644
---- a/include/linux/irqflags.h
-+++ b/include/linux/irqflags.h
-@@ -214,6 +214,13 @@ extern void warn_bogus_irq_restore(void);
- 		raw_local_irq_disable();		\
- 		if (!was_disabled)			\
- 			trace_hardirqs_off();		\
-+		/*					\
-+		 * Just in case that C code has missed	\
-+		 * trace_hardirqs_off() at the first	\
-+		 * place e.g. disabling irq at asm code.\
-+		 */					\
-+		else					\
-+			dept_hardirqs_off();		\
- 	} while (0)
+diff --git a/include/linux/mm_types.h b/include/linux/mm_types.h
+index 8ccbb030500c..bed1a3bc81e1 100644
+--- a/include/linux/mm_types.h
++++ b/include/linux/mm_types.h
+@@ -226,6 +226,7 @@ struct page {
+ #endif
+ 	struct dept_page_usage usage;
+ 	struct dept_ext_wgen pg_locked_wgen;
++	struct dept_ext_wgen pg_writeback_wgen;
+ } _struct_page_alignment;
  
- #define local_irq_save(flags)				\
-@@ -221,6 +228,13 @@ extern void warn_bogus_irq_restore(void);
- 		raw_local_irq_save(flags);		\
- 		if (!raw_irqs_disabled_flags(flags))	\
- 			trace_hardirqs_off();		\
-+		/*					\
-+		 * Just in case that C code has missed	\
-+		 * trace_hardirqs_off() at the first	\
-+		 * place e.g. disabling irq at asm code.\
-+		 */					\
-+		else					\
-+			dept_hardirqs_off();		\
- 	} while (0)
+ /*
+diff --git a/include/linux/page-flags.h b/include/linux/page-flags.h
+index 3fd3660ddc6f..b965b16c8cee 100644
+--- a/include/linux/page-flags.h
++++ b/include/linux/page-flags.h
+@@ -203,6 +203,7 @@ enum pageflags {
+ #include <linux/dept.h>
  
- #define local_irq_restore(flags)			\
-diff --git a/kernel/dependency/dept.c b/kernel/dependency/dept.c
-index 0f4464657288..a17b185d6a6a 100644
---- a/kernel/dependency/dept.c
-+++ b/kernel/dependency/dept.c
-@@ -2248,6 +2248,7 @@ void noinstr dept_hardirqs_off(void)
- 	 */
- 	dept_task()->hardirqs_enabled = false;
+ extern struct dept_map pg_locked_map;
++extern struct dept_map pg_writeback_map;
+ 
+ static inline int dept_set_page_usage(struct page *p,
+ 		unsigned int new_type)
+@@ -279,6 +280,8 @@ static inline void dept_page_set_bit(struct page *p, int bit_nr)
+ 	dept_update_page_usage(p);
+ 	if (bit_nr == PG_locked)
+ 		dept_request_event(&pg_locked_map, &p->pg_locked_wgen);
++	else if (bit_nr == PG_writeback)
++		dept_request_event(&pg_writeback_map, &p->pg_writeback_wgen);
  }
-+EXPORT_SYMBOL_GPL(dept_hardirqs_off);
  
- void noinstr dept_update_cxt(void)
+ static inline void dept_page_clear_bit(struct page *p, int bit_nr)
+@@ -288,6 +291,8 @@ static inline void dept_page_clear_bit(struct page *p, int bit_nr)
+ 	evt_f = dept_event_flags(p, false);
+ 	if (bit_nr == PG_locked)
+ 		dept_event(&pg_locked_map, evt_f, _RET_IP_, __func__, &p->pg_locked_wgen);
++	else if (bit_nr == PG_writeback)
++		dept_event(&pg_writeback_map, evt_f, _RET_IP_, __func__, &p->pg_writeback_wgen);
+ }
+ 
+ static inline void dept_page_wait_on_bit(struct page *p, int bit_nr)
+@@ -298,6 +303,8 @@ static inline void dept_page_wait_on_bit(struct page *p, int bit_nr)
+ 	evt_f = dept_event_flags(p, true);
+ 	if (bit_nr == PG_locked)
+ 		dept_wait(&pg_locked_map, evt_f, _RET_IP_, __func__, 0, -1L);
++	else if (bit_nr == PG_writeback)
++		dept_wait(&pg_writeback_map, evt_f, _RET_IP_, __func__, 0, -1L);
+ }
+ 
+ static inline void dept_folio_set_bit(struct folio *f, int bit_nr)
+diff --git a/mm/filemap.c b/mm/filemap.c
+index edb0710ddb3f..d8f1816dc6c2 100644
+--- a/mm/filemap.c
++++ b/mm/filemap.c
+@@ -1187,6 +1187,13 @@ static void folio_wake_bit(struct folio *folio, int bit_nr)
+ 	key.bit_nr = bit_nr;
+ 	key.page_match = 0;
+ 
++	/*
++	 * dept_page_clear_bit() being called multiple times is harmless.
++	 * The worst case is to miss some dependencies but it's okay.
++	 */
++	if (bit_nr == PG_locked || bit_nr == PG_writeback)
++		dept_page_clear_bit(&folio->page, bit_nr);
++
+ 	spin_lock_irqsave(&q->lock, flags);
+ 	__wake_up_locked_key(q, TASK_NORMAL, &key);
+ 
+@@ -1241,6 +1248,9 @@ static inline bool folio_trylock_flag(struct folio *folio, int bit_nr,
+ struct dept_map __maybe_unused pg_locked_map = DEPT_MAP_INITIALIZER(pg_locked_map, NULL);
+ EXPORT_SYMBOL(pg_locked_map);
+ 
++struct dept_map __maybe_unused pg_writeback_map = DEPT_MAP_INITIALIZER(pg_writeback_map, NULL);
++EXPORT_SYMBOL(pg_writeback_map);
++
+ static inline int folio_wait_bit_common(struct folio *folio, int bit_nr,
+ 		int state, enum behavior behavior)
  {
+@@ -1683,6 +1693,7 @@ void folio_end_writeback(struct folio *folio)
+ 	 * reused before the folio_wake_bit().
+ 	 */
+ 	folio_get(folio);
++	dept_page_clear_bit(&folio->page, PG_writeback);
+ 	if (__folio_end_writeback(folio))
+ 		folio_wake_bit(folio, PG_writeback);
+ 
+diff --git a/mm/mm_init.c b/mm/mm_init.c
+index 09e4ac6a73c7..fd2bf6689afa 100644
+--- a/mm/mm_init.c
++++ b/mm/mm_init.c
+@@ -589,6 +589,7 @@ void __meminit __init_single_page(struct page *page, unsigned long pfn,
+ 	page_cpupid_reset_last(page);
+ 	page_kasan_tag_reset(page);
+ 	dept_ext_wgen_init(&page->pg_locked_wgen);
++	dept_ext_wgen_init(&page->pg_writeback_wgen);
+ 
+ 	INIT_LIST_HEAD(&page->lru);
+ #ifdef WANT_PAGE_VIRTUAL
 -- 
 2.17.1
 
