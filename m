@@ -1,98 +1,105 @@
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+Received: from mail-io1-f41.google.com (mail-io1-f41.google.com [209.85.166.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 658AA1D88A6
-	for <linux-block@vger.kernel.org>; Thu,  2 Oct 2025 16:49:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A16D323E342
+	for <linux-block@vger.kernel.org>; Thu,  2 Oct 2025 16:54:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759423780; cv=none; b=fClEO84ERdqoleFFtDkHDClsXU2egDDLpJQJeHT1BYKBHBPNVQMjE5ixjUYki7gcSCTs3AyWsyJnKsyUINIx7CZK9cLBmPXaBOOQ8trhxhc9oEi8tNlQDuL2rcj9qXDYtBIl8In1xqOb/zbQRp8fgyEsoC2dla2qxD5Gyw6QpHc=
+	t=1759424059; cv=none; b=riRcP8uzB2Dj5GB3HwfTyqn1oPbsMgeAu9A1g0C4DtxF2xpq4gSTT+ENAomMDlJCHxYlKOjXsHERjXpphnpES93LB0oV/6AQBgx1g8/A5qDFuFFmkKHBgBPdlhiR8ueWsX7kljxy7lLvqXssVS2qspaDh9VyT7Ohrjmn0AAWgAg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759423780; c=relaxed/simple;
-	bh=GPNKqk2IjCezt+iOiIGHZBvYwRYM9eI/at8SyT0aJvg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dhv2SKs4HyGzo+oEFUHNXUsR+vUG8XzbC1R+GybU88owL9R3zUNCMNNumjA6SEcwYKmyq//3us+wP+/B87zF2MKuv6UhHyJYJ2BYRhyZtZWoQO17yH/w8SNls7sHg6yMwivz2KUJRNf21V8Q/e126ASAPuzDkujaDSzZA/FoC4E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=gUhrz9Ub; arc=none smtp.client-ip=209.85.218.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+	s=arc-20240116; t=1759424059; c=relaxed/simple;
+	bh=DWu5dR4Lz86S2AgggcpTnA6S7OA/C7uP7lj7+WsDpqs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gfPYGtIj4ZPwwZq5v1bYbUmday0jEOlSJm0i1N3jRvlWc0rl0FXxk2x4Xc0gN7WI8WdVQDpcHiD7UdE8pvfjOI9ZyAHcSEkEpxsTE5or+p+lHmLDeHno/I3r0QMoovw9A00DUedrYCUmdYBCYP4cc6kIpNkYRnHvoQmUfRcGvyM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=FY3HUZKr; arc=none smtp.client-ip=209.85.166.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="gUhrz9Ub"
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-b3e25a4bfd5so249113966b.2
-        for <linux-block@vger.kernel.org>; Thu, 02 Oct 2025 09:49:38 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="FY3HUZKr"
+Received: by mail-io1-f41.google.com with SMTP id ca18e2360f4ac-938bf212b72so41734039f.1
+        for <linux-block@vger.kernel.org>; Thu, 02 Oct 2025 09:54:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1759423776; x=1760028576; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ri4QyfvFryudbRTr4zjJak2/cwqBuXGVPepccBH1HNc=;
-        b=gUhrz9UbfOdDJBrCyPUJRPx3zM+SAT9D9jE3dSCVTyDEIYB9tZXsih8O+cyEc5sYgc
-         jgpoIoviizQHxyH5NsX1UJ/NSPFTlx6mkMb3ecJKBYL2cWz1egAfZfbGm0KJyQ+JNQLS
-         umkEo4+Z8Urgdew7nbyf3I4qhSkqPWeFuYN6M=
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1759424056; x=1760028856; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=AFqI3aHr2jj4uIbXpxHrhOEHaGHnaMLl/UipyF4uEpg=;
+        b=FY3HUZKrjXbRq3WYTVv67dRMW4u+ydDODm4vlKWtOezuDNistJfyte0yLQxdnNZd6b
+         YkC3zOH9GvXEw2+wHvVFepKTMLuoKjLOn4GAnX/NXX1whdFh2dFWk/HTrlBSZj+33PT9
+         MpZfbbwKDViQq42JVyog79bW9VCbdpXO5Rg09uPl18x4vATRlwriw+tkvE6PWxKpydKI
+         wKMkQQ4GTWYaGVyFAtSEHh0doLB2XdnR7WoPZedm5ihdmfHIpcUhgGzToQLOz5heMnBK
+         AEyrruTVurB1HI6tHWc5sn+VUJXdaPizc3SCwQNY2wcZ+MV8Jyq1XIMskQHo+d/1MynD
+         BkvA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759423776; x=1760028576;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Ri4QyfvFryudbRTr4zjJak2/cwqBuXGVPepccBH1HNc=;
-        b=sCbWcZJagKbjOHt8ItRh9bsJpnpfjlcVLLLZyqjhZfHJHCZVv5ruJr/jjePZNJfIXN
-         LAWPkD25Qp56aICRRQWA7t20NCj4UfEOgqLsbmc0aLPnlkIiyZ8WkFKczoivOsvl6Ymt
-         mSCMRzyLMr1uiw0fEMo7gAPeMcH0ezgDdp7qwwWnRzTU86PZ5ypp1lzddUZBd4Wi5uTf
-         PtS7HBLf8hQsz+FLLxuljExCAx0JQCR/2HTvE2QjFfFqT8NNQE+iIT+9MDVXM5j25VJq
-         wrN20WJUpANP/ff91ccGXBPjUH8PXxNKuh9MA8d3H/gT+L/tC3Sq/3WqXdpR0fS1KCkr
-         3XAA==
-X-Forwarded-Encrypted: i=1; AJvYcCXItTvnrAt874oVRNrpQQVE1S8QKvoaLvKHq15WnUk/XVup4713sgfwp3ZYN1iFVlMaXKW/4SV5VJdilA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YziXqtjG238c7V6KceU1jAHWiTcqvA1PrsiV95CxuIggvu8JYfE
-	jAc6OLVHYeWl5bmXUoArc1vnrhiR9d9/ByHcy+bL53IEXrDdrLS2fyEBPzSPuyMKuLGpWhCah2G
-	sYbnK3ew=
-X-Gm-Gg: ASbGncsuSYQ6nEredREPpFL0ya9pJrI9wlSQ0M2N3//UDAs1eO2gtW7iCbOFPsvEry3
-	aea/lCsOaPxlYeVZgns+ZIiWVhjG7nol/ky4WCl7F+03K6Ww0ljEEMFGWLDQ+rFqVbyNu7VA0gz
-	+NWKwIl9ifw5FaPF7ScqjJ/NYWF+EM2Bhiy2ZJtPmCv9CdnDjm+r0FvsMGpFxnTNKnZiDU4SDRJ
-	zPISNzd1ay+w0e/t1IVhjadyKtVAG9laN6b5muZsSPDLsudYfFHsXP4ZqoJTFgb4HGoYUQec/52
-	V13aiveZonXyXIuMLgwDG2gFlzpecXxx5jvBup0Kkd0VWbTYXGsz2zKUciQSq3YtYtn/hM6NKro
-	O5kVAcp/FS0ewP+pTJHTUML4FKsWy15FlVZF6RabX31C3K+OddqlSR0DY66YaOPdtQGBEvnE85w
-	Pd1PGKz15q1kbH149bQUtU
-X-Google-Smtp-Source: AGHT+IFrppRavRQceyNtqHwqt7OVwsyqrbVs9x3nFQa/UU0FoP/I2HPlKfrF09Hrcrtsp9s/r+E0SA==
-X-Received: by 2002:a17:907:7f25:b0:af9:eace:8a52 with SMTP id a640c23a62f3a-b49c3f7ed2amr12491766b.50.1759423776473;
-        Thu, 02 Oct 2025 09:49:36 -0700 (PDT)
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com. [209.85.218.52])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b486970b36fsm238133066b.62.2025.10.02.09.49.34
-        for <linux-block@vger.kernel.org>
+        d=1e100.net; s=20230601; t=1759424056; x=1760028856;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AFqI3aHr2jj4uIbXpxHrhOEHaGHnaMLl/UipyF4uEpg=;
+        b=m9S3xKdv+8tYWeis3WnV8iOpWG3TTd1xReQM3sYoR608YLZ67DXFWK6hF2ThbfxBWU
+         LAZBU7W5nUP6jeHr2+MOw0fWXZLcsnZlUA7qKku98uvoJlKmSOq8kFXf4Lz8TRJ/OcAa
+         V0vCEVe+wy2SFEtj+AHZGesl0BKyXBLn8rzbwe0MUXpabhD7eWyTgj+4x7JluNF3Ukqn
+         +8FIn0yLHj9/8K47nJVd+N2SdVqRHmuNCRtb/t966acxLtd+zsoqyoNSFJiWk3e4Jxqm
+         MSYfp8dEvPQLvRDazXW+f6mQCAhtcBkRHD3bWct5rdqVrOEZRRqzjBCCvbznVBcyZ1qA
+         sc0w==
+X-Forwarded-Encrypted: i=1; AJvYcCWGT8hzMDiSe8mcIwEzW0uGETqsltIvGvjYWvkOtf1h4lL20T4lfjQU1B9m30v+UI6vSC+V1Ltqt/GeNQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyoB+yICDiVff78T0+nQM/SZX6sjCHAYVyZx2bnDYFwLnZdQb5k
+	W97dBCfyKuOh/edG6VzmadMtIpsn/aL7ipyEXEFJlHjQOYCbZDH5pEu9EC4x1XIqzp8=
+X-Gm-Gg: ASbGncvfLXDxcIsKhsQZxTF80CcuR0SU0mnwz4R7uErIGJzra7jMYIYeIQxS6navrgt
+	m2hK3Fawb2beaJp0AVPtzNa21yP3J1huBtxi7GM/R1qCzx1quLGNsHkLsctMOgSZ29gcHI9GiwU
+	B0I21kBs+YXTNrXdtd3hDFE4fs6tQF/z49ndENLduTvQETdQwdeG2Q5Ob8QJARv24v7/7vIrnWE
+	XJe9N4mAJtKffSZUdCAzzLBlb8SGtcOnZtwztYEnqXowicrQNzYTPcE4MQydgXqP5bEVLrLCjTh
+	l0aR9zUitLCAE3ti6QAIsZojEerVpoJTo/gCDMF8BRNfNplKnOsRRjIWsd48wjXUIB2f4vrpLil
+	ISQtsa+iGjmHQlDfpUs1N+Dw/T+A1+G+NW8WNpD0Cmqmr
+X-Google-Smtp-Source: AGHT+IHH+bU75feOc3kd43cHHM5DdNH15l/a1Pxl+MA4svn7zHgpfz9FVBhHlZNAnl8YqGJNYlTTlQ==
+X-Received: by 2002:a05:6e02:1988:b0:424:80f2:2a8 with SMTP id e9e14a558f8ab-42e7acef8bdmr2852995ab.3.1759424055705;
+        Thu, 02 Oct 2025 09:54:15 -0700 (PDT)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-57b5ea805c7sm1005335173.32.2025.10.02.09.54.14
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 02 Oct 2025 09:49:35 -0700 (PDT)
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-b3f5e0e2bf7so244963266b.3
-        for <linux-block@vger.kernel.org>; Thu, 02 Oct 2025 09:49:34 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUsQGF/cAL/vPVn3Ak9ECfOTS8rPyUorawLV2HfZ3JRqH5IEcTWOEIqGLMNXKivSgn+YOTCGQsuSWzYSA==@vger.kernel.org
-X-Received: by 2002:a17:906:6a25:b0:b3e:c7d5:4cc2 with SMTP id
- a640c23a62f3a-b49c39360f6mr14187866b.38.1759423774528; Thu, 02 Oct 2025
- 09:49:34 -0700 (PDT)
+        Thu, 02 Oct 2025 09:54:15 -0700 (PDT)
+Message-ID: <4054d4b9-29ca-4164-933a-49143755089f@kernel.dk>
+Date: Thu, 2 Oct 2025 10:54:14 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250730074614.2537382-1-nilay@linux.ibm.com> <20250730074614.2537382-3-nilay@linux.ibm.com>
- <25a87311-70fd-4248-86e4-dd5fecf6cc99@gmail.com> <bfba2ef9-ecb7-4917-a7db-01b252d7be04@gmail.com>
- <05b105b8-1382-4ef3-aaaa-51b7b1927036@linux.ibm.com> <1b952f48-2808-4da8-ada2-84a62ae1b124@kernel.dk>
-In-Reply-To: <1b952f48-2808-4da8-ada2-84a62ae1b124@kernel.dk>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Thu, 2 Oct 2025 09:49:17 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wjf1HX1WwREHPs7V_1Hg_54sqOVSr9rNObudEpT9VgQDw@mail.gmail.com>
-X-Gm-Features: AS18NWAX_XbsCSn1cSvTBt8Jd93mNINtxqs7sE9J-usQvnLgAAKgdff6fAuW3Hk
-Message-ID: <CAHk-=wjf1HX1WwREHPs7V_1Hg_54sqOVSr9rNObudEpT9VgQDw@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
 Subject: Re: [6.16.9 / 6.17.0 PANIC REGRESSION] block: fix lockdep warning
  caused by lock dependency in elv_iosched_store
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Nilay Shroff <nilay@linux.ibm.com>, Kyle Sanderson <kyle.leet@gmail.com>, 
-	linux-block@vger.kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, hch@lst.de, 
-	ming.lei@redhat.com, hare@suse.de, sth@linux.ibm.com, gjoyce@ibm.com, 
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Nilay Shroff <nilay@linux.ibm.com>, Kyle Sanderson <kyle.leet@gmail.com>,
+ linux-block@vger.kernel.org, Greg Kroah-Hartman
+ <gregkh@linuxfoundation.org>, hch@lst.de, ming.lei@redhat.com, hare@suse.de,
+ sth@linux.ibm.com, gjoyce@ibm.com, linux-fsdevel@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20250730074614.2537382-1-nilay@linux.ibm.com>
+ <20250730074614.2537382-3-nilay@linux.ibm.com>
+ <25a87311-70fd-4248-86e4-dd5fecf6cc99@gmail.com>
+ <bfba2ef9-ecb7-4917-a7db-01b252d7be04@gmail.com>
+ <05b105b8-1382-4ef3-aaaa-51b7b1927036@linux.ibm.com>
+ <1b952f48-2808-4da8-ada2-84a62ae1b124@kernel.dk>
+ <CAHk-=wjf1HX1WwREHPs7V_1Hg_54sqOVSr9rNObudEpT9VgQDw@mail.gmail.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <CAHk-=wjf1HX1WwREHPs7V_1Hg_54sqOVSr9rNObudEpT9VgQDw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, 2 Oct 2025 at 08:58, Jens Axboe <axboe@kernel.dk> wrote:
->
-> Sorry missed thit - yes that should be enough, and agree we should get
-> it into stable. Still waiting on Linus to actually pull my trees though,
-> so we'll have to wait for that to happen first.
+On 10/2/25 10:49 AM, Linus Torvalds wrote:
+> On Thu, 2 Oct 2025 at 08:58, Jens Axboe <axboe@kernel.dk> wrote:
+>>
+>> Sorry missed thit - yes that should be enough, and agree we should get
+>> it into stable. Still waiting on Linus to actually pull my trees though,
+>> so we'll have to wait for that to happen first.
+> 
+> Literally next in my queue, so that will happen in minutes..
 
-Literally next in my queue, so that will happen in minutes..
+Perfect, thanks! That's what I get for not being able to send things
+out early :-)
 
-           Linus
+-- 
+Jens Axboe
+
