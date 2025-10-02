@@ -1,17 +1,17 @@
 Received: from invmail4.hynix.com (exvmail4.skhynix.com [166.125.252.92])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FD4F2FF14E;
-	Thu,  2 Oct 2025 08:13:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86FA22FF678;
+	Thu,  2 Oct 2025 08:13:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759392831; cv=none; b=q7UEcixXtUoVwDBD6MjskcJVrS+I8THfboiM243RUqXKvAjxfkqDgAk1VxiheYS7fGVJW92nc50VTSM5/l4IeQoKZwpIX953aGAtgYKfRhvZ+BGMfDfN49zJiwK9+MPMZc8Fe0MfeuK2n13C61IEgekHc/EOnuz+eO0ko+Yikcc=
+	t=1759392832; cv=none; b=YaGCHwMJ5ZIuL6xhO/wOhvfetp18DjJMvaoo9nNd8WEO2m1cJxiz8DIS886JSRewfq9FzDc+4QKDJr4Wga5YLGAl7VdjNSvwDVoPZio3P21l4h58Mvj0V/pqBJx3tMTrhuV6jeEXhaa0QzhzFo8rfG2rSwBHh4zfXZEGHaW9jNQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759392831; c=relaxed/simple;
-	bh=iO2KW71ND81fGxMUwRQjjDiFJuENFPAoI9mwHgSPbpI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=OEgMeSHl7og02yMfZhFTjc9k+vVF8Oa09Gr92ThaQni6MrwQ3rIiYegarX/+F9b+31QV/Qn31yN4ySdrlKPv7SBnXgC8QdqRKsN6C9dmpOaBIOhehPCWZ9tNvcOSCzmvFF0pPk4LRImKeQmLznESfjukG8whmfCSnIPQuBdh5o4=
+	s=arc-20240116; t=1759392832; c=relaxed/simple;
+	bh=NR59yXk0VhmzqvBwuz7ZNKYjLJtlk1nNdLpsiROVe3k=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=scfS7vnAxxCqlAmgXUsFvbfGEwINPPdNHX7R+Si6wFTCcD6bKMihBNIL7hV6JogETglj6tY/nDuu3LkHAEiZpXhHa5qTJscokN7QfRgQfi/AtQkYmojtiG+Q6aZkWjw+OcTm30KjI/31JSg10uBnn/vgbYgEkLxMAKX+n5TDDDE=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
-X-AuditID: a67dfc5b-c2dff70000001609-ee-68de340feceb
+X-AuditID: a67dfc5b-c45ff70000001609-2f-68de3410a6d5
 From: Byungchul Park <byungchul@sk.com>
 To: linux-kernel@vger.kernel.org
 Cc: kernel_team@skhynix.com,
@@ -162,45 +162,43 @@ Cc: kernel_team@skhynix.com,
 	rcu@vger.kernel.org,
 	linux-nfs@vger.kernel.org,
 	linux-rt-devel@lists.linux.dev
-Subject: [PATCH v17 21/47] dept: apply timeout consideration to waitqueue wait
-Date: Thu,  2 Oct 2025 17:12:21 +0900
-Message-Id: <20251002081247.51255-22-byungchul@sk.com>
+Subject: [PATCH v17 23/47] dept: apply timeout consideration to dma fence wait
+Date: Thu,  2 Oct 2025 17:12:23 +0900
+Message-Id: <20251002081247.51255-24-byungchul@sk.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20251002081247.51255-1-byungchul@sk.com>
 References: <20251002081247.51255-1-byungchul@sk.com>
-X-Brightmail-Tracker: H4sIAAAAAAAAAzWSbUxTdxTG/d/7v/e2nTV3HZE7ZyJpQkjw3TBzMrdl2ZfdLzNLluwDJmq1
-	N2u1gLYKVF3GSzs6N5l0g2aUTV6EVFp5aUWlAvIyq6wSW8FSlReZ2EKQaYBKZIzulm1fTn7n
-	Oc95zpcjIRUhaoNEm31C0GerdEpahmWza2u2vpkxptnxmIZQYTeG2IIFg8X9MwWBJieC8ZgF
-	gbk9jmHh9WMG4p0+BBVBKwnzLSs0zPTNIbBNF2KYHb9BQXw0SkDD5AoBk90lCC7Uemj4a+Ae
-	CVMtYnvFN4ag01FEw7PzbSQMTq6D/vLvaJgNVhHwZwsNv9itCIrrmmlof+JlIDizTMBIhZUA
-	p/tTGG+IYKhoTQa7rZgQyxQB5ZdviOcKUsE+MEjBH45KBpYndkK8Ogd8zigDoz+UY+gfC1Ew
-	E7HScK3gCQPuh7cQLAxNEOD6PkKCxRvD4H4qWjofbYaaby5i6OjsxzDoraJhzBWnoDkaJsDv
-	uyMmVV7CcM97mYL64SABnoG7JATKzlEfqflFcynmGz1XCd58/2+ad/3qQvxCfTHJ9z1/QfIm
-	Tx5f739O80uxBzT/ey3Hlw1s5dsrRxm+2n2SN/02S/EeRzpf1zFNfLY9U/a+WtBpcwX99g8P
-	yjQB2xR5rI3JtztrmQJkos8iqYRjM7jhWJA4iySrbI5/kZBpNo0Lh1+TCU5iUzjPuQiVYJL1
-	b+RCwS0Jfovdy02WxlZjMJvK+UMVRILl7G7OtBRm/o3fxDlbuldzpKI+OOHHCVaw73LmFybR
-	LxM9TinXVtP138LbXI8jjM8jeTVa04gU2uzcLJVWl7FNY8zW5m87nJPlRuK3NXy1vO86mgt8
-	3otYCVKulQdSRzUKSpVrMGb1Ik5CKpPkBx0jGoVcrTKeEvQ5B/QndYKhF70jwcpk+a5XeWoF
-	+6XqhHBUEI4J+v+nhES6oQAdSTn1aDGZ2980/snDFev0lmvDeQ51z5GXOunSB/Ono3ct6/tS
-	Wu9XnhmyFf1Y1r0psOfSdNpPpR2tdE3DoRSDd4/RNh+bicyR64eSGl8Vur5Nq2suORrNtB9Y
-	cztk6C38eNdx7r2RN7q+dtzMTM+/rulZ3FtctbHr5SGhxFndVOQzKrFBo9qZTuoNqn8Ac/ga
-	U2kDAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAAzXSe0xTZxQAcL97b797aazedExvUNQ0IRqjMDNYTnQa/zDziwY1RjFZ4qTR
-	W9rxXMuYbFks0mqjm2JjS6SCBUPD2k5YC8uAlfDIyLaOQMUhKhUwHUIA8UFRXnatif+c/M4j
-	J+ePw9HyJkkCp8krFLV5yhwFljLSQ7tKt69Ofaz+6ILzYxgoaWcgPGti4Ga9G4PJc0MCfXdc
-	CIbDJgSvF200GJsjDCybu1mYnX/EQsTXjcAaMNPgbiyh4FXDWwyTXS8RWEZDGMonShiYcfyA
-	oGLMxsLEH/therhVApHgUwruz00hcITeUhBqv4hg2ZoNt2q8GBZ7emkot/QhqB4N0jDeEG02
-	dj9G4Ks7j+G/siYa+kOr4F54BsNflssYpgM3KXjWgMF+3ieBSpsZQentegzWSg8DzSMtLAQm
-	lygYspopcHnSYdgxxoC/rIaK3hed+mUt2MpLqWgYp8DycysF8w4nC//cHmLAoU8CW0+/BJ7U
-	VbCwNLoDIvZ86HY9ZSF41cLAneleyV4LIq+NVxji9P5KEePdZUzcVW5EFhfMiMzWltLEWBZN
-	u6ZmaGLwfkNq/VOYLIT/xcQ3Z2fI3zUCudaznTRXBFliaHvIHtn5ufTTM2KOpkjUpuzJlKr7
-	ysfpgib2rM1Vw+qRAV9CHCfwqYIxknEJxXGY3ywMDs7TMcfzmwTvj2OSmGnev14YCGyL+QP+
-	kBC6EsYxM3yS4B+wUjHL+E8Ew8IgG7PAbxRcDe3v9sRF6/2jfiZmOZ8mGGcMVBmS2tEKJ4rX
-	5BXlKjU5acm6bHVxnuZs8un8XA+KPpPj+6Vrv6HZ/v2diOeQYqUskBRUyyXKIl1xbicSOFoR
-	L8usG1LLZWeUxd+K2vxT2q9zRF0nWscxirWyAyfETDmfpSwUs0WxQNS+71JcXIIejVSrPsMr
-	H6hedOih+uizLwq+3L3meJtqzpK4oUPRtSj+mdWjYg+e3JbB6WQ+cnTnljeXPe6f2us7r7ec
-	aP1uNaieHG9cvpDaWzUyaD+Xvuv3FKV5T1Jl8+FkF7E+T5xY410VkrGJRxKcX+07mGLyX0xX
-	TfL6Y6evmj7cwD9PuD6vYHRq5Y6ttFan/B8Rux29SAMAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAAzWSbUhTYRTHe+597t1cLq5L82ZJMbDATDOsDvRC0IcuQREFRfUhh17caE6Z
+	L2URaM3yJdPQSu1tZslw1samptOZaVhOxdViiTizSNN0mrklpmhq9e3H7/z/53w5QlKSSwUJ
+	FapkXq2SKaW0CIvcvmVb/aL65dtsrRicGc0YvJ4sDFmmEgrsz/UIqqozCJgyztMw2voTwYLr
+	GwGzXd0kWHVXaBgsqCHB8XUVfPBO0OB+d5+AcSMNV8sNNNQPWASgNx2GTxVDGG4/ayDgi65U
+	AAvaBHDl38bQ3u+kIMvixWDt3QJl155gaLS2Y2ir+0LADWMNBeauThLst/Io6CkYRFA4PoSg
+	wjshgPfNWgLatGvgqWechOvDDTQ0ZQ0QYHNNCaDwvZYG22/b4r2bbgHkZt7BoOnbAR59JQ3j
+	BR5q/zZuOvMm5irNtQRX9bAKca1jEySnMZ/nnnaM0Vx9qUvAaZp6BZzWlMKVN44QXO/oXs5U
+	mU1zZbPDJJfj/kBwfc5GmntbPIuPBp8W7YnllYpUXh2xL1okf9EwQyY6hBdsDg+ZjvSCHOQj
+	ZJko9lGFhf7PY/bJZU8zm9menhlyif2Zjaw5b4haYpLpWM8634Ut8WrmCGuYyl3uYiaEdb42
+	LOfFzE62SFP9b/8GVm9sXvY+i97xuQMvsYTZwWZOaIgcJFrM3PNhve4F4m9hLftK14MLkFiL
+	VlQiiUKVGi9TKKPC5WkqxYXwmIR4E1p8kYrLc2fq0E/78RbECJHUV2wPcckllCw1KS2+BbFC
+	Uuovjtb1ySXiWFnaRV6dcFadouSTWtA6IZYGirf/Oh8rYeJkyfw5nk/k1f+nhNAnKB09yh75
+	MVe6q91muzr5wNZ1zHnHHVXtfyjgyEFvXz/b2r3x7glDZNgK3+nozlOXqE0n/UZmNrxRzekC
+	NJ37I8zGWyqrbH73gfA4FMqsfGkp+ejIRwdWl9f+snp1g2PBeZNbxVV1+bWPh4Mmp4tCivWG
+	wGeWqYEYp3Kl5WjJd9fxESlOkssiQ0l1kuwPH8VlUB4DAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAAzWSa0iTcRTG+7/XuVq8LMW3C1QDKSKzION0pcsH34Qi6ENRoI58a8Mrm1kG
+	kTpXll10tUlOyyyXOM21mbVkYquMNHVrZVJOmy2tnNllJqZmm9SXw+88z8Ph+XAEuLiBXCCQ
+	p2bwilRpsoQSEsLdG1WRzNpe2WqvYz505TQTMOrPJ6C0roaCfPNVEhx3jAj6RvMRjE3ocVBb
+	pwmY0rTQ4B9/R8O0rQWBzqnBoaY+B4Ofpj8UDD3+gUDr8VJQ/DmHgBHDeQQlA3oaPj+NgeG+
+	RhKm3YMYvPnlQ2Dw/sHA23wGwZQuCa5XWCiYaO/EoVjrQHDD48bhkylg1rf0IrBV5VLwsfAe
+	Di7vXHg1OkLBc20BBcPOUgy+migoz7WRUKbXIFDdrKNAV2YmwPr+IQ3OoUkMenQaDIzmXdBn
+	GCCgrbACC/QLpO6Gg75YhQXGJwy0tY0YjBuqaXhxs4cAQ3YE6NtdJPRXldAw6VkD0+Vp0GIc
+	pMF9SUvAneFOcqsWcWPqiwRXbWnAOPXLKYqruVaDuInfGsT5K1U4py4MrI99IziXZznGVbb5
+	KO736GuKs/0qJ7jWCpYrao/krCVumstrekvv2XBAuCmRT5Zn8oqoLQlC2f3GcTzdJTje6vLj
+	2chIn0MhApZZy/oc32eYYpax3d3jeJBDmSWs5cIAGWScaVvEdjlXBnkes5ut+1lABZlgItiu
+	J3UzeRGzjr2SV//v5mLWaGqe0UMCusvTRgRZzESz6pE8rBAJy9GsahQqT81MkcqTo1cpk2RZ
+	qfLjqw6lpZhR4JsMJyeLHiC/K8aOGAGSzBE5I9wyMSnNVGal2BErwCWhooSqHplYlCjNOsEr
+	0uIVR5N5pR0tFBCScFHsPj5BzByRZvBJPJ/OK/67mCBkQTbK5S9uxroPl3TIJLMJa9SLvcrE
+	+1k/uvfN3ryn9rTXNLB3u6WCNJK3dqw4cWhrf3x4QX9sxFTSw+F71cW+LUtxT/qzs/vLBsNu
+	L47KHdpeH2dtCmuy23u/vquNS1F7x/aTB+N2xjwSr1dc/lDLnkqUbHN0DJU+Zb58WK4KMX/T
+	2aokhFImXbMCVyilfwG1nG8USQMAAA==
 X-CFilter-Loop: Reflected
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -209,27 +207,35 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 
 Now that CONFIG_DEPT_AGGRESSIVE_TIMEOUT_WAIT was introduced, apply the
-consideration to waitqueue wait, assuming an input 'ret' in
-___wait_event() macro is used as a timeout value.
+consideration to dma fence wait.
 
 Signed-off-by: Byungchul Park <byungchul@sk.com>
 ---
- include/linux/wait.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/dma-buf/dma-fence.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/include/linux/wait.h b/include/linux/wait.h
-index 65dd50f25e54..902a2e5381db 100644
---- a/include/linux/wait.h
-+++ b/include/linux/wait.h
-@@ -306,7 +306,7 @@ extern void init_wait_entry(struct wait_queue_entry *wq_entry, int flags);
- 	struct wait_queue_entry __wq_entry;					\
- 	long __ret = ret;	/* explicit shadow */				\
- 										\
--	sdt_might_sleep_start(NULL);						\
-+	sdt_might_sleep_start_timeout(NULL, __ret);				\
- 	init_wait_entry(&__wq_entry, exclusive ? WQ_FLAG_EXCLUSIVE : 0);	\
- 	for (;;) {								\
- 		long __int = prepare_to_wait_event(&wq_head, &__wq_entry, state);\
+diff --git a/drivers/dma-buf/dma-fence.c b/drivers/dma-buf/dma-fence.c
+index 787fa10a49f1..0a4b519e3351 100644
+--- a/drivers/dma-buf/dma-fence.c
++++ b/drivers/dma-buf/dma-fence.c
+@@ -801,7 +801,7 @@ dma_fence_default_wait(struct dma_fence *fence, bool intr, signed long timeout)
+ 	cb.task = current;
+ 	list_add(&cb.base.node, &fence->cb_list);
+ 
+-	sdt_might_sleep_start(NULL);
++	sdt_might_sleep_start_timeout(NULL, timeout);
+ 	while (!test_bit(DMA_FENCE_FLAG_SIGNALED_BIT, &fence->flags) && ret > 0) {
+ 		if (intr)
+ 			__set_current_state(TASK_INTERRUPTIBLE);
+@@ -905,7 +905,7 @@ dma_fence_wait_any_timeout(struct dma_fence **fences, uint32_t count,
+ 		}
+ 	}
+ 
+-	sdt_might_sleep_start(NULL);
++	sdt_might_sleep_start_timeout(NULL, timeout);
+ 	while (ret > 0) {
+ 		if (intr)
+ 			set_current_state(TASK_INTERRUPTIBLE);
 -- 
 2.17.1
 
