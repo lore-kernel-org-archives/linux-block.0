@@ -1,67 +1,65 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f180.google.com (mail-il1-f180.google.com [209.85.166.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 345EA2264B2;
-	Thu,  2 Oct 2025 15:30:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE12F2376FC
+	for <linux-block@vger.kernel.org>; Thu,  2 Oct 2025 15:58:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759419057; cv=none; b=CsE5Z37ct3dWfsZlbZhryRFN0NMDbhX7ZQ3YDOSMvZIaISa6C6+k5Sqv1UOo5IEUC6MPyLaE6CUsRI0aiNZCMUwE0OT5CrMgEzG5Wg07ArmRVaRgIoquOJdEOwAVq1UMi2wgB4DuSw7HjXua9af9P+aRqw/7nvc6dZggzJRERvE=
+	t=1759420713; cv=none; b=S+JfRa4Jl4M/d8gmOjVwy/PRTo5wruUPc/tjRN7bw6hXOgLyfc3O/zzJ6CKHKWjmExLw/FpJgryJofDPfMXhMRSzQBkcrbx1kJG/MiQceeWFF3LUijdiktcdPhPDz/K7of+v5JqHpxAUuGwWwYDDpvXWYi1YBlUmorVP+Da+mf0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759419057; c=relaxed/simple;
-	bh=nSOZHkedgoi+vn8yqycPcjnC2rTm/1Y7IRlM0OjwTg4=;
+	s=arc-20240116; t=1759420713; c=relaxed/simple;
+	bh=0AOCr6BPvIm1M5pnw2VjYpyLZxGSVwWCediy8evOiuM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lz8UUNx3tc6jvZ3GImzR7tPNFixzfsMxvE1gU8dsDEjOrdnosavdMNDwpjMp0lH774qj3w8jTZjMxXAIQEVrXNpUJn3hkYkl4gy8qgUzI55XKfs53nsJf3iCGPcQPk68aWRncIr+CALPbQA87FB1LdEy8BHmxiYePG7d2vlR+YI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=ZdKRmhI0; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	 In-Reply-To:Content-Type; b=C6CrbWoqjTmpYx+H99OXZcXNZdw4sLdnlZd0h1vP/QjyG93ZvdvHQw4MByr4uA0eOEaK1KuOnrvLTQgHnhUuGCyI3sj4KYTggQtpQKKW/gUPQXFc5WrT7AQh+duanOo1dZ4YhLhhBPEvUDGQoerB3YyVoI6DtRtTD+pYh/U5TMg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=rCUGi3+6; arc=none smtp.client-ip=209.85.166.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ZdKRmhI0"
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 592C72Ej007741;
-	Thu, 2 Oct 2025 15:30:45 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=68awHT
-	wvfNWSifEoUYe+z7wdZ54JP/tr2nfG3khpqVQ=; b=ZdKRmhI0BddXUnQ/7Zo/uN
-	yHxFEDMmfxwOz5/MUlFQLVaRUKdFlnUxBtJI3O+nXGNzAHOSEFQ1jU4rP8EgrFVc
-	zrrigUHLpvoQ5FAcOYCjnzVZJpRSlR4Q5xhDTEiAGds3ce4gDWDZaRoZW9sQC4cs
-	vfO5GVhmfSZ1mHYheemZ2MNDXSCkjD+woHRRu25U+Fh7akyZEZrKuM3kI2opbiFg
-	1ky+hAj/2Q4JShxEn94DtSaERVTjylyPcjD/GjfoJ+QQsoysh5b0Q0x005nnRT6w
-	VHpuFPMC2E/VLGMH7t3fFDdHTyNZrT+U+jRQp4wFrkAtHBvCVRXXMkgbkdrZwlZQ
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 49e7n868c0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 02 Oct 2025 15:30:45 +0000 (GMT)
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 592F6EM5007421;
-	Thu, 2 Oct 2025 15:30:45 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 49e7n868bu-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 02 Oct 2025 15:30:44 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 592D3uTD007331;
-	Thu, 2 Oct 2025 15:30:43 GMT
-Received: from smtprelay02.wdc07v.mail.ibm.com ([172.16.1.69])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 49eurk6h8b-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 02 Oct 2025 15:30:43 +0000
-Received: from smtpav06.dal12v.mail.ibm.com (smtpav06.dal12v.mail.ibm.com [10.241.53.105])
-	by smtprelay02.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 592FUgBp13894188
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 2 Oct 2025 15:30:42 GMT
-Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 01B6958043;
-	Thu,  2 Oct 2025 15:30:42 +0000 (GMT)
-Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id DD80458059;
-	Thu,  2 Oct 2025 15:30:36 +0000 (GMT)
-Received: from [9.43.27.61] (unknown [9.43.27.61])
-	by smtpav06.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Thu,  2 Oct 2025 15:30:36 +0000 (GMT)
-Message-ID: <05b105b8-1382-4ef3-aaaa-51b7b1927036@linux.ibm.com>
-Date: Thu, 2 Oct 2025 21:00:34 +0530
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="rCUGi3+6"
+Received: by mail-il1-f180.google.com with SMTP id e9e14a558f8ab-42861442ec5so11391465ab.0
+        for <linux-block@vger.kernel.org>; Thu, 02 Oct 2025 08:58:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1759420709; x=1760025509; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=YNilpGtwunxhkKhtHuanByyeVgHiZ0tzBGIYdEYkGmA=;
+        b=rCUGi3+6k/j40dTyvQH3OV2lP/wGRecIhNLRpRqpAjP3rTSbC6ZlZTqX/23Rv8OTxE
+         lAXg3oAFeBwvEsOIiQAZ5bGrwIl5b9PKt1+HAnLnIkZOyUO0NAtf0qd7QcgRDnIAG9Q4
+         4oYrC8qa5cqYfpGHXj9Xh0ABqZJ2K7sb6EWTmhBuzy9oUVH1FGlodlRuFTQ/Z9yjItBN
+         azg05OJJK2OIj4gVRznFwJkjz0DxaOaRC/p7gjo3XOQpVWuSetBZxB8kIRN6LDviq03d
+         TwjauBeTs3hITnB614ZKj1h3Kp/cftbcqKKRqWVRYMletv7t/QZz+mYSDU8+8F7fxr3v
+         C0+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759420709; x=1760025509;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=YNilpGtwunxhkKhtHuanByyeVgHiZ0tzBGIYdEYkGmA=;
+        b=peHVQzEj+Q1/abWPhoyMYPekVEUqc1ZczUUhZHlEw06wapuGgNRx1msMg2+zEOr2N8
+         dMPrRxVaTfsxaxLENeTqbNjK1evl+y7tKtQbQz2hwT8wNgyHkUJnStia9r9EZf9YknJO
+         0RAG6gyeml5gKRjKoa5SPpPxi0T855EJMeavQ6tULdGSS9aDGXRH1HEZ7tC2pFJZdm3I
+         VITm6bBl+MGquvZiJ2d1pSY/hvEdcdJy+gfjT9lpzEKGGrrkC7vmrkjMkWfrAu9ho9Z6
+         Fw1RlNczVpaKZjKZnanV/5V7MUYo26OYmOtA/ffYxaurKtH3ozkyiWLzs+tGkSE7yIW/
+         LWTw==
+X-Forwarded-Encrypted: i=1; AJvYcCWAhCYL3/GogVQJmvoKs5ktDFIyQSQ4Be5Dn8hbg7fIae5jbZiBs5DEInVtsQ1ckSYjcOt9b2vIVQRrmw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzvPu4GFVOk0Bapco4TOq6/O4Zp3aS/rRaNjyL7dVg+woqESZKi
+	/M7Y9USTymVEInNcnb34Che0u5h7hNVYOiaQGolrBnEv6Ha3Afgzz+EC50AYmygbW0E=
+X-Gm-Gg: ASbGncuDnfrKVKR6M0n2AXWurl7X36iAfH81W5NV+m05uFZtpX08TBz02/bRPItwFuG
+	4y3dRMvlS3kNrK/o/zKulweYTl/wHT+nOL6FoItb7+IixYR2ITkjT+rb19wZDNcPT7R+J4OI9U4
+	FAvzwwZGL8lVAUG6BtVa7+I1THrc41+cLCszPCMfQzWA05x3YJw02dbCYgEgSx31JptFlcOlj5Y
+	a+SlW2OC8AyZ8CyvxPTHqC0AWn0grq1BmMT62oZnMCpOaoVZZE8TMirTtyALQXYCHlkUENN7lqK
+	Nsezzkq+9/tln3cv4uXjNxEL2IGrj6DMDWU9cO7g3d/M9TnxrgH7HuO5w/vs+KHfS72x0rbIXVy
+	ZZ0f8nPc23jSa8Sd0gzF6ruqbuYSu5GFi72mzkNLhqhlL
+X-Google-Smtp-Source: AGHT+IGEiHZSumtbEx41vubwodqOoT5aOYw9eNQC8MCndLsgVDLYkboIsl41CSo6vL17oHiISA8Lew==
+X-Received: by 2002:a05:6e02:16ca:b0:42e:741f:b626 with SMTP id e9e14a558f8ab-42e7ad021eemr1269845ab.13.1759420708846;
+        Thu, 02 Oct 2025 08:58:28 -0700 (PDT)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-42d8b1f4f0asm10924825ab.2.2025.10.02.08.58.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 02 Oct 2025 08:58:28 -0700 (PDT)
+Message-ID: <1b952f48-2808-4da8-ada2-84a62ae1b124@kernel.dk>
+Date: Thu, 2 Oct 2025 09:58:27 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -71,74 +69,43 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [6.16.9 / 6.17.0 PANIC REGRESSION] block: fix lockdep warning
  caused by lock dependency in elv_iosched_store
-To: Kyle Sanderson <kyle.leet@gmail.com>, linux-block@vger.kernel.org,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>, axboe@kernel.dk
+To: Nilay Shroff <nilay@linux.ibm.com>, Kyle Sanderson <kyle.leet@gmail.com>,
+ linux-block@vger.kernel.org, Linus Torvalds <torvalds@linux-foundation.org>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 Cc: hch@lst.de, ming.lei@redhat.com, hare@suse.de, sth@linux.ibm.com,
-        gjoyce@ibm.com, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org
+ gjoyce@ibm.com, linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
 References: <20250730074614.2537382-1-nilay@linux.ibm.com>
  <20250730074614.2537382-3-nilay@linux.ibm.com>
  <25a87311-70fd-4248-86e4-dd5fecf6cc99@gmail.com>
  <bfba2ef9-ecb7-4917-a7db-01b252d7be04@gmail.com>
+ <05b105b8-1382-4ef3-aaaa-51b7b1927036@linux.ibm.com>
 Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <bfba2ef9-ecb7-4917-a7db-01b252d7be04@gmail.com>
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <05b105b8-1382-4ef3-aaaa-51b7b1927036@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 9dte93drl-1B0LFvztQZJ89iO5zNAYuW
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTI3MDAyNSBTYWx0ZWRfX1gLMbr02FcTW
- sAbm4ymqrLLg5wQYWv7Q16d8yBWW9OtOiT59zCVBjc5HWNl/rC01kDsUEkwyUe6t7ZoNX7eU/cM
- IPbzTt3DMKCqogaljfbWpBuyG0+A+xjRBsHwTbVkCNsBCQ+3CHEAWHjyl7URr3G/BALDu18HIXv
- MF+lG9bZrbMjt8s4uV0im2bLKXoU4/rRo8w58iYJ5Ysettowg1POTRse8CTIV+KI6GXOX8mVj9u
- hUT8HNyry0xoLLlWGY6MfPydtxLYSYlBoZLMHAyFV7rXvAdR988hM/X8soJAZM57ofCw9KPXSio
- l2w5031G1IOVa4q/CqHsGbyafz+5qUtW4nmaNqiyZ/DXgvu5oiGES+CcoABOi9Evs3HKAxjmjmv
- jOUEc363uvBAbGvCyE4jlRKCWIUf/w==
-X-Proofpoint-GUID: 7h9h4MsZI86IyclypeXsxfvMSyco83Z2
-X-Authority-Analysis: v=2.4 cv=T7qBjvKQ c=1 sm=1 tr=0 ts=68de9aa5 cx=c_pps
- a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
- a=IkcTkHD0fZMA:10 a=x6icFKpwvdMA:10 a=VwQbUJbxAAAA:8 a=SU-AqdwiyQoJ0AQ-xJMA:9
- a=QEXdDO2ut3YA:10 a=cPQSjfK2_nFv0Q5t_7PE:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-10-02_05,2025-10-02_03,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- adultscore=0 impostorscore=0 lowpriorityscore=0 malwarescore=0 spamscore=0
- clxscore=1011 suspectscore=0 bulkscore=0 phishscore=0 priorityscore=1501
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2509150000 definitions=main-2509270025
 
-
-
-On 10/1/25 6:35 PM, Kyle Sanderson wrote:
-> On 9/30/2025 10:20 PM, Kyle Sanderson wrote:
->> On 7/30/2025 12:46 AM, Nilay Shroff wrote:
->>> To address this, move all sched_tags allocations and deallocations outside
->>> of both the ->elevator_lock and the ->freeze_lock.
+On 10/2/25 9:30 AM, Nilay Shroff wrote:
+>> Slept for a couple hours. This appears to be well known in block (the fix is in the 6.18 pull) that it is causing panics on stable, and didn't make it back to 6.17 past the initial merge window (as well as 6.16).
 >>
->> Hi Nilay,
+>> Presumably adjusting the request depth isn't common (if this is indeed the problem)?
 >>
->> I am coming off of a 36 hour travel stint, and 6.16.7 (I do not have that log, and it mightily messed up my xfs root requiring offline repair), 6.16.9, and 6.17.0 simply do not boot on my system. After unlocking with LUKS I get this panic consistently and immediately, and I believe this is the problematic commit which was unfortunately carried to the previous and current stable. I am using this udev rule: `ACTION=="add|change", KERNEL=="sd*[!0-9]|sr*|nvme*", ATTR{queue/ scheduler}="bfq"`
+>> I also have ACTION=="add|change", KERNEL=="sd*[!0-9]|sr*|nvme*", ATTR{queue/nr_requests}="1024" as a udev rule.
+>>
+> So the above udev rule suggests that you're updating
+> nr_requests which do update the queue depth. 
 > 
-> Hi Greg,
-> 
-> Slept for a couple hours. This appears to be well known in block (the fix is in the 6.18 pull) that it is causing panics on stable, and didn't make it back to 6.17 past the initial merge window (as well as 6.16).
-> 
-> Presumably adjusting the request depth isn't common (if this is indeed the problem)?
-> 
-> I also have ACTION=="add|change", KERNEL=="sd*[!0-9]|sr*|nvme*", ATTR{queue/nr_requests}="1024" as a udev rule.
-> 
-So the above udev rule suggests that you're updating
-nr_requests which do update the queue depth. 
+>> Jens, is this the only patch from August that is needed to fix this panic?
+>>
+>> https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git/commit/?h=for-6.18/block&id=ba28afbd9eff2a6370f23ef4e6a036ab0cfda409
+>>
+> Greg, I think we should have the above commit ba28afbd9eff ("blk-mq: fix 
+> blk_mq_tags double free while nr_requests grown") backported to the 6.16.x
+> stable kernel, if it hasn't yet queued up. 
 
-> Jens, is this the only patch from August that is needed to fix this panic?
-> 
-> https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git/commit/?h=for-6.18/block&id=ba28afbd9eff2a6370f23ef4e6a036ab0cfda409
-> 
-Greg, I think we should have the above commit ba28afbd9eff ("blk-mq: fix 
-blk_mq_tags double free while nr_requests grown") backported to the 6.16.x
-stable kernel, if it hasn't yet queued up. 
+Sorry missed thit - yes that should be enough, and agree we should get
+it into stable. Still waiting on Linus to actually pull my trees though,
+so we'll have to wait for that to happen first.
 
-Thanks,
---Nilay
+-- 
+Jens Axboe
