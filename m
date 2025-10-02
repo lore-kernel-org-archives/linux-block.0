@@ -1,79 +1,124 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f175.google.com (mail-il1-f175.google.com [209.85.166.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B14627B35F
-	for <linux-block@vger.kernel.org>; Thu,  2 Oct 2025 18:56:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 138FB13C8E8
+	for <linux-block@vger.kernel.org>; Thu,  2 Oct 2025 21:27:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759431390; cv=none; b=MQoo3I8341qsu/Y4nH1mKu8un3tLIxu/AEkX+J9cHtBBFY80fPe4KCf7qZtczaU0vWlrSguWYX5urqniOGPQNF9ihfcrH/iZXDXK7qfjt6qMc5n03qQUmNBCfGTRtSZw/3HE3djLfIBuRD47oqnX+CzaOTGBME7h2yhtzx6FXjc=
+	t=1759440436; cv=none; b=NgnBnPUHeatnPSh9U5vDY8QsfwoNtjEcvv1+FxLJKgRT4tHWlDq2Fg8DmzORbSeR+Er1/4hPzpdzUQ1OkAjr2silI+xffn3/CexMF23IVbwishNGO1bi4MjHDezKQBRLtNqBquRuF7ZBs1+MHxFdXMWqm+rdXMBegoY6weQLKrs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759431390; c=relaxed/simple;
-	bh=Jd/Nxn/77U6TKr3gxOFcE8YnPSlSF0Yo3DPxfKgZNLc=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=CErg3sx17jP2F5okiyrlhLIH6XdL8955GQFlU9Jmbqgn25HGrXJ0Tz/N2jwRvC00lbWzfN2TH/u0N/QKPQwlaaR4PucwKUG4eLhU/QVaKZpJ9w6oGravCHRTfGeyS3asrQ4N46vO0RZDHYTti6t389J3p6SXXz55bNsPNKn+U7o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aYYGMvKu; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1759440436; c=relaxed/simple;
+	bh=KmY2Xi1NF6SDwK564ejY9ttxqcQo9DMaKBxSnm8s1Tk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=inKwUesROMzceBI/qgRtCWX5qunhuwklhowJBXtVP2hDwyuNRO+0vWbJ+BCGwz93pDpRgtxIoJmwAo93uakBrNoabDJdoTUtaXT8EGHAmBh8EFHv02dgJWuomnj/ONKHEMYOEcE5moAAaP6DJCECptRveWNbmspfGT7Yy8zY6to=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=z3yOlx5S; arc=none smtp.client-ip=209.85.166.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aYYGMvKu"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1759431387;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=LeBvsXJbZKRcWekwLFv1GcSEyAVQd9KaZvQLUBpujv4=;
-	b=aYYGMvKulg0jSMmitjnal5/RoJRUP7eWPGdpiUsNNeV/DRH+qIui8BG8m/Mx3C49KfXOJb
-	xki6Zk9BRkFjyjN6Cp0k4+6MMyDhKV1IReRqCVeHr5iWRRiZTF7ieK5bNK0uK21hznsz/r
-	sR1OmZWO4sHxKyj6pAkCHuE7CPL7SfU=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-20-OOC1aUQdOwav8N3yFB6xAA-1; Thu,
- 02 Oct 2025 14:56:22 -0400
-X-MC-Unique: OOC1aUQdOwav8N3yFB6xAA-1
-X-Mimecast-MFC-AGG-ID: OOC1aUQdOwav8N3yFB6xAA_1759431379
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9A30619560BB;
-	Thu,  2 Oct 2025 18:56:18 +0000 (UTC)
-Received: from segfault.usersys.redhat.com (unknown [10.22.65.113])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 956D5300018D;
-	Thu,  2 Oct 2025 18:56:14 +0000 (UTC)
-From: Jeff Moyer <jmoyer@redhat.com>
-To: Yu Kuai <yukuai1@huaweicloud.com>
-Cc: axboe@kernel.dk,  bvanassche@acm.org,  ming.lei@redhat.com,
-  nilay@linux.ibm.com,  linux-block@vger.kernel.org,
-  linux-kernel@vger.kernel.org,  yukuai3@huawei.com,  yi.zhang@huawei.com,
-  yangerkun@huawei.com,  johnny.chenyi@huawei.com
-Subject: Re: [PATCH 5/7] mq-deadline: covert to use request_queue->async_depth
-References: <20250930071111.1218494-1-yukuai1@huaweicloud.com>
-	<20250930071111.1218494-6-yukuai1@huaweicloud.com>
-X-PGP-KeyID: 1F78E1B4
-X-PGP-CertKey: F6FE 280D 8293 F72C 65FD  5A58 1FF8 A7CA 1F78 E1B4
-Date: Thu, 02 Oct 2025 14:56:11 -0400
-In-Reply-To: <20250930071111.1218494-6-yukuai1@huaweicloud.com> (Yu Kuai's
-	message of "Tue, 30 Sep 2025 15:11:09 +0800")
-Message-ID: <x497bxdrv3o.fsf@segfault.usersys.redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.3 (gnu/linux)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="z3yOlx5S"
+Received: by mail-il1-f175.google.com with SMTP id e9e14a558f8ab-428fabe2175so5649695ab.0
+        for <linux-block@vger.kernel.org>; Thu, 02 Oct 2025 14:27:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1759440429; x=1760045229; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=V+0Omx3Aw6Oe9Sj7rxnSGR619M3i1DKj3Yy9f6zCKUQ=;
+        b=z3yOlx5S34ab2E0UNSC7JO/FkuZre/J0c7kyxDGPVx35hMcIdeZqC+JxOs0fLsjTth
+         +IHRehInFZJi61kOobfVQbIR8h9924aDAXNbsZribOrJlVBxZHCEdd2TA6uUMmiXOhY7
+         5BmZ/tVTxtsFc2Om7QDl2L6G5O2NPshaNDUFxHIw/9mFcT9ndJLGI4+4A6Lw+F9lQXJD
+         itUYYpVHEEbTLET7LrTKfbv1SU+4F4BY201B9MCiP9phZ1JTRs/j9bqEbOFWNPDfkCWR
+         HKGg1joqNI8Tq69ig7aNlBQ3cDPGxwqdbMztp442zhNhgdMtRocnpH8fTmAGyTlzICG/
+         aq+Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759440429; x=1760045229;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=V+0Omx3Aw6Oe9Sj7rxnSGR619M3i1DKj3Yy9f6zCKUQ=;
+        b=iRs8MDmdX9PIjEk/zT3NNsDzxdQkIMWgYCr4VZms7x7nYIgMBTfJ980jEQcdxmBFEJ
+         hGmT/xXqIUnV7Ghv+Sp1UOtVYreUvP8eifndIF4cdbYzBXfhTwX/7Q1mjFjJXTG4t0Ug
+         EfOVfhIngf/uwpJiCaytFpt+TgiN6nQa3qVCB6kSeknM7occOLPgfaJTSdbFHF2aUyzC
+         kqnHimfn/BgHotEIRZyc3I6uxjD2g777L6nj39ao5kTEodk/va9/JC5xONqTFoCXFznj
+         thqkf41bd61IDKJGJSJQsnSe/UFO1XIN34eOM9GpTX3xvUbHBE9cTr+ZIehwf1sScdC5
+         NYRQ==
+X-Gm-Message-State: AOJu0Yzf9K48i8oMvXL54Tdcc7YkY32r8LLzH8+297ryuz4qoKFZIoox
+	7VOkRwlX1JkyR9g+6EHhVTEzu3lbUqdzI3/jFejtRG2BExcLku1yL6a+ClvCy5Kl02o=
+X-Gm-Gg: ASbGncufGFRw+YNBe8I+OrMI44iUSMTMbq7lRLZV5Lez4asCsSXZQ8xcyHrdBFUV1Tg
+	uDFXnZ3ox1u+qOR0bIKdYHyNPORTstzo/KxOAZLRc5fv06Z4bwpQjmCmxXlfPOucL2O52lCS7gf
+	SkkTCMQ790nJpS8hK75Ygn8s/mRJrmaGtnRUWY8YRrwufFvxdnB2TIgxoNr6jIxGKAM2ApCzgqM
+	oDmCgFbBLkfGRSrjmEwuUTwHMalg8qrIq5D6HsZnsolJ0m93VnrE9yCdZb9igGGzgmyT3HV2MxZ
+	l1nFNMGVnK7cKkyyve1lfW50gm2LYHUWwDkcAB8HF1LlZ/d5UkZDb1jMEZij0uODoHmNqbNF/5e
+	nLI9WV07Oz5T82x7zG7JFHVfArHSNO7tdsSTsb6KHHs6Z
+X-Google-Smtp-Source: AGHT+IGhqd6Z53c32AZqu1NEKDE2nlxWfrpFbaZI+/ZfB1uxj7scJTwTPcWlWpTCix7Xy2FOBx6deQ==
+X-Received: by 2002:a05:6e02:3a04:b0:42d:84ec:b5da with SMTP id e9e14a558f8ab-42e7ad16f9cmr10307325ab.10.1759440429017;
+        Thu, 02 Oct 2025 14:27:09 -0700 (PDT)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-57b5ea31448sm1215916173.29.2025.10.02.14.27.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 02 Oct 2025 14:27:08 -0700 (PDT)
+Message-ID: <ad0f4a85-d7cc-4f47-b469-6903168c062a@kernel.dk>
+Date: Thu, 2 Oct 2025 15:27:07 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RESEND] block/mq-deadline: adjust the timeout period of
+ the per_prio->dispatch
+To: chengkaitao <pilgrimtao@gmail.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ chengkaitao <chengkaitao@kylinos.cn>, Damien Le Moal <dlemoal@kernel.org>
+References: <20250926023818.16223-1-pilgrimtao@gmail.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20250926023818.16223-1-pilgrimtao@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Yu Kuai <yukuai1@huaweicloud.com> writes:
+On 9/25/25 8:38 PM, chengkaitao wrote:
+> From: chengkaitao <chengkaitao@kylinos.cn>
+> 
+> Reference function started_after()
+> Before modification:
+> 	Timeout for dispatch{read}: 9.5s
+> 	started_after - 0.5s < latest_start - 10s
+> 	9.5s < latest_start - started_after
+> 
+> 	Timeout for dispatch{write}: 5s
+> 	started_after - 5s < latest_start - 10s
+> 	5s < latest_start - started_after
+> 
+> At this point, write requests have higher priority than read requests.
+> 
+> After modification:
+> 	Timeout for dispatch{read/write}: 5s
+> 	prio_aging_expire / 2 < latest_start - started_after
+> 
+> Signed-off-by: chengkaitao <chengkaitao@kylinos.cn>
+> ---
+>  block/mq-deadline.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/block/mq-deadline.c b/block/mq-deadline.c
+> index b9b7cdf1d3c9..f311168f8dfe 100644
+> --- a/block/mq-deadline.c
+> +++ b/block/mq-deadline.c
+> @@ -672,7 +672,8 @@ static void dd_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
+>  
+>  	if (flags & BLK_MQ_INSERT_AT_HEAD) {
+>  		list_add(&rq->queuelist, &per_prio->dispatch);
+> -		rq->fifo_time = jiffies;
+> +		rq->fifo_time = jiffies + dd->fifo_expire[data_dir]
+> +				- dd->prio_aging_expire / 2;
+>  	} else {
+>  		deadline_add_rq_rb(per_prio, rq);
+>  
 
-> Fix this problem by converting to request_queue->async_depth, where
-> min_shallow_depth is set each time async_depth is updated.
+Adding Damien as he's worked on mq-deadline the most recently.
 
-Removing the iosched/async_depth attribute may cause problems for
-existing scripts or udev rules.  I'm not sure if we care, but the
-changelog does not seem to address this.
-
--Jeff
+-- 
+Jens Axboe
 
