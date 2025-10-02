@@ -1,17 +1,17 @@
 Received: from invmail4.hynix.com (exvmail4.skhynix.com [166.125.252.92])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89CC32DA77F;
-	Thu,  2 Oct 2025 08:13:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E461630101A;
+	Thu,  2 Oct 2025 08:13:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759392833; cv=none; b=b8qb09bVwd0qs3PulX4qn2Y1vMLah61DzECPE93m8AsCUKxG+V5ecE4I9pIsI2k7g11l/mDY/OjENM8GiW2hiQORIHB30T8vlw3RXiFAcNHmL+wXgndGCOhnv4/JvpScQAyzwe6ftVNB4TZdDWo/LktudFmESqhjb6QwRnoFjAI=
+	t=1759392836; cv=none; b=qG2MKtC0xM/Ii3MfswAb4cxHH5l3cuOAp4LhxFbyCM+NqMO/V5nT8sF8gz/nm9txrumMFZw2BmXCt1dj+aTjpvcC0H7l1F34AwwJV850Ccp5IC34G7baMNcRRHzxCzQ4U9TOQxjDLD3ibBk5MDd9gTaaZXIOBDcGlDdVI5H4vqg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759392833; c=relaxed/simple;
-	bh=sXq6ZG2FCPgGrD/93i05yDVFGWV/kuOXrwRc2Zt22go=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=JV/EiM3l/tWvooZ0kdl+SEm9By5KbPtA4jwMt4Iim8KAIOzLVXp+HjRIp7wuLNMTpSqg/toW1GRTk17eZ3BdJPvb0neSi3pzQf+yWv23pt/vBNsZEg6GaEk+DAFdrevpTJ3Hdc0YoXiPA44g78GPsgn1leKGb89/tMKSMt3RUSw=
+	s=arc-20240116; t=1759392836; c=relaxed/simple;
+	bh=kq6nzJCqCAUp+/7t0l3JPIm1vcvrQsYOUfRYA0jtEa0=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=iANKv6wUa3G6SWA4wygIU32LWqn3VhSqPZO5BER30l9CGQV0Q+H8nDLunx7tGlSS5EB1yMa2fK+gbA0/XqOHU+TCppGieZ9J2jh/3RMJU5XvHm8zBjeFBxYoKB2t4AZaqesauFZV/Af5EFF+VXcdN0bhQPW5S+knaKLQ7m5bWzA=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
-X-AuditID: a67dfc5b-c2dff70000001609-10-68de3410e76d
+X-AuditID: a67dfc5b-c2dff70000001609-4c-68de3410abf8
 From: Byungchul Park <byungchul@sk.com>
 To: linux-kernel@vger.kernel.org
 Cc: kernel_team@skhynix.com,
@@ -162,44 +162,44 @@ Cc: kernel_team@skhynix.com,
 	rcu@vger.kernel.org,
 	linux-nfs@vger.kernel.org,
 	linux-rt-devel@lists.linux.dev
-Subject: [PATCH v17 22/47] dept: apply timeout consideration to hashed-waitqueue wait
-Date: Thu,  2 Oct 2025 17:12:22 +0900
-Message-Id: <20251002081247.51255-23-byungchul@sk.com>
+Subject: [PATCH v17 24/47] dept: make dept able to work with an external wgen
+Date: Thu,  2 Oct 2025 17:12:24 +0900
+Message-Id: <20251002081247.51255-25-byungchul@sk.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20251002081247.51255-1-byungchul@sk.com>
 References: <20251002081247.51255-1-byungchul@sk.com>
-X-Brightmail-Tracker: H4sIAAAAAAAAAzWSb0wTdxjH97v73V3prDkPEg9103QSjWwoG7onwcxtWeK9GAmJMQaNwcZe
-	aEMBLUjBxaSZYAqiQwJoKE5WhCAtUltQQUuwjLpaDIVuyDr+C1WHhcSsgiBxLcY3Tz55nu/z
-	efWVkJyP2iBRZ+eJ2myFRk5LsTS4xvTFuqQx1a5a58cQ+s+AobbVQoP3phnBeMiAYGHZSMJK
-	hYuBdw4XgtmeVwiqJqdpmG8sQ1ATMDLwonc/BMfvUbBSnQnXTHYaLld5EbS5xhDMlLeT4Jte
-	C3+G5mlwV52nIThQS8CclYa6nx0UnK1vpaH6qg1Dx0QnAyPVFQSYbSngKTcRUH1rPRgvnyXC
-	4zkBffUjGBr1cfB2MhHe1eWAy/yMgdFfqjDcDPZT4B4bomA2UEHD+MNzFNzRTzBg+7sXgaUs
-	QIKhM4TB9jQccfjj4bdz1zHcd7gxuO5OEeDrrKWhzNpOgd64QMGg2YvB4/oDg7vmBob+zhYK
-	Gp4MEGB/3EfC64sbwXvpAgUtcyb6W6XQbL9NCMWDK7Rg+dWChOWlCiQUl4ep5+U8KRTZdUKD
-	5yUtLIX+ooVHJl7oqBllhKIuPyPU2U4JRb8HKcHetEOov/+CSI0/LN2rFDXqfFG785tjUtXC
-	+ZQTF5mCGeslSo8mqVIkkfBsEj/Xk1qKolaxb+IOijDNbuOHh9+QEY5ht/D2CwEqwiTr2cQP
-	DXwe4Wj2IG9w3sARDWbj+PHQqkbG7uEd/jH0XrmZN1u7VzVR4b1v0oMjzLG7+eL5IqIUScOZ
-	a1H8v3NP8PuHWP5B0zAuR7I69FEz4tTZ+VkKtSYpQVWYrS5IOJ6TZUPhqjWeeXvkLnrlPeBE
-	rATJ18i8caMqjlLk5xZmOREvIeUxsmNNIypOplQUnha1OenaUxox14k2SrB8vezL1zolx2Yo
-	8sRMUTwhaj9cCUnUBj062pd8PGB9Yx5Njs3bk3olb3HTZqp5LX2PMSZeme342rL1ZLe0Wadp
-	O3y190B69/XK9JTbJWmGkv2hSvfuWO67xU8GY/ivkqeW/3leEs+4/aR/e5d9JvFQ5WdDP/R8
-	37q3wfww+oz2xywf1ygk6DL6H3+asm8LlyZKOeVPS57hZzo5zlUpEneQ2lzF/0qFRe9mAwAA
-X-Brightmail-Tracker: H4sIAAAAAAAAAzWSa0hTcRjG/Z/zPxdHi9OSOllQTCwIzYSMl7LLtw7diC4EEeTIU1tOV5uZ
-	BpW31SqruZiWs1pGw6bVmnYxW8iidTGpaTfKuRZqRi6pNsVbthV9efm9z/Pw8H54WVLWSMWz
-	qpxcUZujUMtpCZasX1qSzC3qUi7seYzhbVELhnDIgKH6Zj0NBud5Cl7dqEPgDxsQDI1aSNA3
-	TWAYN3kYCA1/ZGDC5UFQ4TWRUN9YRMAvx28avj36icAc6Kah8msRhgFbGYKqXgsDXx+vgqC/
-	mYIJ3xcC3g32I7B1/yagu+UYgvGKLLhU00DDaNtLEirNrxBcDvhI6HNEzEZPFwJXbTENPcbb
-	JHR0T4bX4QEanplP0hD0VhPw3UGDtdhFwQWLCUHJlZs0VFxwYmj6dJ8B77cxAjorTATUOdeB
-	39aLodVYQ0Tui6RuTQdLZQkRGX0EmK83EzBsszPw4konBlthIljaOij4XFvFwFggFSasGvDU
-	fWHAd8aM4UbwJbXSjIQh/Wks2BvuEIK+fZwW6i/WI2F0xISE0NUSUtAbI+uj/gFSKG04IFxt
-	7aeFkfAbWnANWrHwvIYXytuShaYqHyOUPvzAbFiyTZKeKapVeaI2ZXmGRDl0ct3e00x+j6Oc
-	KkQB6gSKZXluEf/i010UZZqbx79/P0xGOY6bwzec6v2bIbnWWfxbb1KUp3JbeIP7Gj6BWBZz
-	ibw/vCEqS7nFvOtDF/pXOZuvc7T8rYmN6B2BVhxlGZfG6wdKCSOSWFGMHcWpcvKyFSp12gJd
-	lrIgR5W/YKcm24kiv2Q7NFZ+D4U6VrkRxyL5JKk30aeUUYo8XUG2G/EsKY+TZtR2KmXSTEXB
-	QVGr2aHdrxZ1bjSTxfLp0tVbxQwZt1uRK2aJ4l5R+98l2Nj4QpReusY6edfS8I6spw8SypKM
-	6rl9M+5Mur9xGQQ2JVSnNAXPlrmOJ6wPZPoT3bI9aUdU22OC16uneqalJgeOHko5p7GP5cZf
-	2i+nvUeGRpL2TRm0zmw/vGtLXLNz94/Q+AO7/N6y/BkrtxaPPJmtUayI6TdU6ds3b9ak58vS
-	5iwxrj0vxzqlInU+qdUp/gDN8B3kRwMAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAAzXSbUxTZxQHcJ97n3tvaWi865y7yuJLDTFBwWnYPMnYQvyyq7GJxi9GAqNZ
+	72wFiiuCssyIgwpRVCSpxBYRQUuhRZo2btYBQdROrIRWCFYEoaJtHFa042VQFKHGb7/8z/+c
+	T0dESh9RK0VqzSFBq1Fky2gxFodi6xI/S36q+vrsk3joP96BYXKiDEN1i5UGzzULguHJMgTT
+	ESMJOuc8homZJwyc91aS8J/tPQ1jt8MI9P7nNIybyhEYAkYGXt79EULDf1PwvKMUwbvzWXCp
+	zkFDpLuHhCq9B0Gb+Q8aXlRcJ6FLf4qGkLeagNc2Gi4aKxEU17fQ4By5yYB3bI4Ai10Ow6YA
+	BmNVMQEzpiYGjN29FDwzGxiY82+G+dpccFmCDAyd1WO4FuqhYCxQScNfRSMM2B/fRTDR5yfA
+	PtpPQdvABrh84gqGCzWDNLS2dWEot12n4Kl1ngJPh5uChxYPhpagjwC36x6GLkMjhp6bzRRc
+	feQlwD/io2DqTBx4zp2mwFfxAkHz6zo6VclP685gvsnxJ8HrHr6jeWuNFfETV4tJXlexoNuv
+	xkm+xHGYP9edyDsNQwxf0j7A8LX2fL7kTojiHeYEvr71JcEPjH2/K2GfOEUpZKsLBO2mHzLF
+	qvr7Ow52ph5pKz+Oi5Az+SSKEXFsMmcbtVOfHI6Ukoum2fWczzcT9TJ2Dec4HYh2SNb9Fdfv
+	3bjoz1k5V/d2LppjNp7z/x/Gi5aw33LP2g3kx5urOYutI+qYhbzX7452pOw3nG68hDiJxAud
+	hhgu2B1CHxdWcLfMPlyBJLVoSROSqjUFOQp1dnKSqlCjPpL0c26OHS28m+noXNoNFPbs6USs
+	CMliJZ74IZWUUhTkFeZ0Ik5EypZJMs2DKqlEqSj8TdDm/qTNzxbyOlGcCMu+lGyZOqyUsvsV
+	h4QsQTgoaD9NCVHMyiK0PHxj26rAiQfBRmGp/BhWSp2jfXGZ71tCNe3p2/8JptldWYJ8q1lW
+	MLtk3eAvpbGaKp+jd2trZOdGZdqBx9Z7jbvTi4+69+YbM3I2NXAbvCntJm1fkuu++9SF3LLZ
+	0K/rrStSUvetW+v8PdYy/F3Xg8RRErmqv0jMkOsjbwqD/8pwnkqxOYHU5ik+AN+FRIpqAwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAAzWSbUxTdxTG/d/XUi3cVRLvUIOpIzNz+JKAOVFizGLkhugmJoPIB203btaG
+	N9NiFbIlIFSJRYXGglBRLLEhbYUO0NiRMlKyTq1Eaxk6bcGSCigwFKlaKGJh8cvJ7zzPk5Pn
+	wxHg4ptkgkBRWMwrC2X5EkpICL/fVZHMpAzJt9V2bYLB8l4CQrNVBFxut1JQ1dFAwsM2C4Lh
+	UBWC9/MGHDT2RQIWdC4aZsPPaFh0uBDUeXQ4WLvKMXhr+0jBRN8MAn0gSEH9y3ICpk3VCBpH
+	DTS8/Csdpoa7SVj0j2Hw+N0kAlPwIwbB3jMIFury4Kqxk4L5/gc41OsfIrgW8OMwbouaXa4h
+	BI7WUxS8qLmJgzcYCwOhaQru6rUUTHkuY/CfjYLmUw4Smgw6BBUt7RTUNXUQYH/+Bw2eiQgG
+	vjodBpaOAzBsGiXAXWPEov2iqd/XgKG+AouOcQz0N7oxCJvMNNxv8RFgKksCQ7+XhJHWRhoi
+	ge2w2FwELssYDf4LegLaph6Qe/SIe685T3DmzlsYp3m0QHHWK1bEzc/pEDd7vQLnNDXRtW9y
+	GucqO09w192TFDcX+ofiHO+aCe6ekeVq+5M5e6Of5ip7ntIHd+YI03L5fIWaV27dLRXKW+5l
+	HHPuOemoLifKkD3lLIoRsEwKOzN/Bl9iivmaffIkvMzxzAa289woucQ4417HDnq+XeLVzAHW
+	+CayrBNMEhv4MEMssYjZwY70NOL/30xkLbbeZY6J6t6AezkjZlJZzXQlVoOEzWiFGcUrCtUF
+	MkV+6hZVnrykUHFyy89FBR0o+kym3yK1t9GsN92JGAGSrBJ5kvxyMSlTq0oKnIgV4JJ4kbTV
+	JxeLcmUlpbyy6KjyeD6vcqK1AkKyRpSRzUvFzC+yYj6P54/xys8uJohJKEOSjdlN4z9uzqq/
+	vSLT8mfm0QsRbborsXtAt6+vwXrph6zXXx02lb664/ZuHtnv+27X6dXOqbnqcPK2L+6e2Dlh
+	kZaMkb+GjU1DIwmlcYd+WnXL9q9vpeVFqCdBn3lRm3bRu6C2a8M5cY/bgn8z4cGBWOmRuNw5
+	9ZeHilP3mgNp5vVaCaGSy7Z/gytVsk/TNWVUSAMAAA==
 X-CFilter-Loop: Reflected
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -207,28 +207,221 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 
-Now that CONFIG_DEPT_AGGRESSIVE_TIMEOUT_WAIT was introduced, apply the
-consideration to hashed-waitqueue wait, assuming an input 'ret' in
-___wait_var_event() macro is used as a timeout value.
+There is a case where the total map size of waits of a class is so large.
+For instance, PG_locked is the case if every struct page embeds its
+regular map for PG_locked.  The total size for the maps will be 'the #
+of pages * sizeof(struct dept_map)', which is too big to accept.
+
+Keep the minimum data in the case, timestamp called 'wgen', that dept
+uses.  Make dept able to work with the wgen instead of whole regular map.
 
 Signed-off-by: Byungchul Park <byungchul@sk.com>
 ---
- include/linux/wait_bit.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ include/linux/dept.h     | 18 ++++++++++++++----
+ include/linux/dept_sdt.h |  6 +++---
+ kernel/dependency/dept.c | 30 +++++++++++++++++++++---------
+ 3 files changed, 38 insertions(+), 16 deletions(-)
 
-diff --git a/include/linux/wait_bit.h b/include/linux/wait_bit.h
-index 179a616ad245..9885ac4e1ded 100644
---- a/include/linux/wait_bit.h
-+++ b/include/linux/wait_bit.h
-@@ -258,7 +258,7 @@ extern wait_queue_head_t *__var_waitqueue(void *p);
- 	struct wait_bit_queue_entry __wbq_entry;			\
- 	long __ret = ret; /* explicit shadow */				\
- 									\
--	sdt_might_sleep_start(NULL);					\
-+	sdt_might_sleep_start_timeout(NULL, __ret);			\
- 	init_wait_var_entry(&__wbq_entry, var,				\
- 			    exclusive ? WQ_FLAG_EXCLUSIVE : 0);		\
- 	for (;;) {							\
+diff --git a/include/linux/dept.h b/include/linux/dept.h
+index 49f457390521..236e4f06e5c8 100644
+--- a/include/linux/dept.h
++++ b/include/linux/dept.h
+@@ -372,6 +372,13 @@ struct dept_wait_hist {
+ 	unsigned int			ctxt_id;
+ };
+ 
++/*
++ * for subsystems that requires compact use of memory e.g. struct page
++ */
++struct dept_ext_wgen {
++	unsigned int wgen;
++};
++
+ extern void dept_on(void);
+ extern void dept_off(void);
+ extern void dept_init(void);
+@@ -381,6 +388,7 @@ extern void dept_free_range(void *start, unsigned int sz);
+ 
+ extern void dept_map_init(struct dept_map *m, struct dept_key *k, int sub_u, const char *n);
+ extern void dept_map_reinit(struct dept_map *m, struct dept_key *k, int sub_u, const char *n);
++extern void dept_ext_wgen_init(struct dept_ext_wgen *ewg);
+ extern void dept_map_copy(struct dept_map *to, struct dept_map *from);
+ extern void dept_wait(struct dept_map *m, unsigned long w_f, unsigned long ip, const char *w_fn, int sub_l, long timeout);
+ extern void dept_stage_wait(struct dept_map *m, struct dept_key *k, unsigned long ip, const char *w_fn, long timeout);
+@@ -389,8 +397,8 @@ extern void dept_clean_stage(void);
+ extern void dept_ttwu_stage_wait(struct task_struct *t, unsigned long ip);
+ extern void dept_ecxt_enter(struct dept_map *m, unsigned long e_f, unsigned long ip, const char *c_fn, const char *e_fn, int sub_l);
+ extern bool dept_ecxt_holding(struct dept_map *m, unsigned long e_f);
+-extern void dept_request_event(struct dept_map *m);
+-extern void dept_event(struct dept_map *m, unsigned long e_f, unsigned long ip, const char *e_fn);
++extern void dept_request_event(struct dept_map *m, struct dept_ext_wgen *ewg);
++extern void dept_event(struct dept_map *m, unsigned long e_f, unsigned long ip, const char *e_fn, struct dept_ext_wgen *ewg);
+ extern void dept_ecxt_exit(struct dept_map *m, unsigned long e_f, unsigned long ip);
+ extern void dept_sched_enter(void);
+ extern void dept_sched_exit(void);
+@@ -417,6 +425,7 @@ extern void dept_hardirqs_off(void);
+ #else /* !CONFIG_DEPT */
+ struct dept_key { };
+ struct dept_map { };
++struct dept_ext_wgen { };
+ 
+ #define DEPT_MAP_INITIALIZER(n, k) { }
+ 
+@@ -429,6 +438,7 @@ struct dept_map { };
+ 
+ #define dept_map_init(m, k, su, n)			do { (void)(n); (void)(k); } while (0)
+ #define dept_map_reinit(m, k, su, n)			do { (void)(n); (void)(k); } while (0)
++#define dept_ext_wgen_init(wg)				do { } while (0)
+ #define dept_map_copy(t, f)				do { } while (0)
+ #define dept_wait(m, w_f, ip, w_fn, sl, t)		do { (void)(w_fn); } while (0)
+ #define dept_stage_wait(m, k, ip, w_fn, t)		do { (void)(k); (void)(w_fn); } while (0)
+@@ -437,8 +447,8 @@ struct dept_map { };
+ #define dept_ttwu_stage_wait(t, ip)			do { } while (0)
+ #define dept_ecxt_enter(m, e_f, ip, c_fn, e_fn, sl)	do { (void)(c_fn); (void)(e_fn); } while (0)
+ #define dept_ecxt_holding(m, e_f)			false
+-#define dept_request_event(m)				do { } while (0)
+-#define dept_event(m, e_f, ip, e_fn)			do { (void)(e_fn); } while (0)
++#define dept_request_event(m, wg)			do { } while (0)
++#define dept_event(m, e_f, ip, e_fn, wg)		do { (void)(e_fn); } while (0)
+ #define dept_ecxt_exit(m, e_f, ip)			do { } while (0)
+ #define dept_sched_enter()				do { } while (0)
+ #define dept_sched_exit()				do { } while (0)
+diff --git a/include/linux/dept_sdt.h b/include/linux/dept_sdt.h
+index 14917df0cc30..9cd70affaf35 100644
+--- a/include/linux/dept_sdt.h
++++ b/include/linux/dept_sdt.h
+@@ -25,7 +25,7 @@
+ 
+ #define sdt_wait_timeout(m, t)						\
+ 	do {								\
+-		dept_request_event(m);					\
++		dept_request_event(m, NULL);				\
+ 		dept_wait(m, 1UL, _THIS_IP_, __func__, 0, t);		\
+ 	} while (0)
+ #define sdt_wait(m) sdt_wait_timeout(m, -1L)
+@@ -49,9 +49,9 @@
+ #define sdt_might_sleep_end()		dept_clean_stage()
+ 
+ #define sdt_ecxt_enter(m)		dept_ecxt_enter(m, 1UL, _THIS_IP_, "start", "event", 0)
+-#define sdt_event(m)			dept_event(m, 1UL, _THIS_IP_, __func__)
++#define sdt_event(m)			dept_event(m, 1UL, _THIS_IP_, __func__, NULL)
+ #define sdt_ecxt_exit(m)		dept_ecxt_exit(m, 1UL, _THIS_IP_)
+-#define sdt_request_event(m)		dept_request_event(m)
++#define sdt_request_event(m)		dept_request_event(m, NULL)
+ #else /* !CONFIG_DEPT */
+ #define sdt_map_init(m)			do { } while (0)
+ #define sdt_map_init_key(m, k)		do { (void)(k); } while (0)
+diff --git a/kernel/dependency/dept.c b/kernel/dependency/dept.c
+index 519b2151403e..f928c12111fe 100644
+--- a/kernel/dependency/dept.c
++++ b/kernel/dependency/dept.c
+@@ -2172,6 +2172,11 @@ void dept_map_reinit(struct dept_map *m, struct dept_key *k, int sub_u,
+ }
+ EXPORT_SYMBOL_GPL(dept_map_reinit);
+ 
++void dept_ext_wgen_init(struct dept_ext_wgen *ewg)
++{
++	ewg->wgen = 0U;
++}
++
+ void dept_map_copy(struct dept_map *to, struct dept_map *from)
+ {
+ 	if (unlikely(!dept_working())) {
+@@ -2355,7 +2360,7 @@ static void __dept_wait(struct dept_map *m, unsigned long w_f,
+  */
+ static void __dept_event(struct dept_map *m, struct dept_map *real_m,
+ 		unsigned long e_f, unsigned long ip, const char *e_fn,
+-		bool sched_map)
++		bool sched_map, unsigned int wg)
+ {
+ 	struct dept_class *c;
+ 	struct dept_key *k;
+@@ -2377,7 +2382,7 @@ static void __dept_event(struct dept_map *m, struct dept_map *real_m,
+ 	c = check_new_class(&m->map_key, k, sub_id(m, e), m->name, sched_map);
+ 
+ 	if (c)
+-		do_event(m, real_m, c, READ_ONCE(m->wgen), ip, e_fn);
++		do_event(m, real_m, c, wg, ip, e_fn);
+ }
+ 
+ void dept_wait(struct dept_map *m, unsigned long w_f,
+@@ -2602,7 +2607,7 @@ void dept_ttwu_stage_wait(struct task_struct *requestor, unsigned long ip)
+ 	if (!m.keys)
+ 		goto exit;
+ 
+-	__dept_event(&m, real_m, 1UL, ip, "try_to_wake_up", sched_map);
++	__dept_event(&m, real_m, 1UL, ip, "try_to_wake_up", sched_map, m.wgen);
+ exit:
+ 	dept_exit(flags);
+ }
+@@ -2781,10 +2786,11 @@ bool dept_ecxt_holding(struct dept_map *m, unsigned long e_f)
+ }
+ EXPORT_SYMBOL_GPL(dept_ecxt_holding);
+ 
+-void dept_request_event(struct dept_map *m)
++void dept_request_event(struct dept_map *m, struct dept_ext_wgen *ewg)
+ {
+ 	unsigned long flags;
+ 	unsigned int wg;
++	unsigned int *wg_p;
+ 
+ 	if (unlikely(!dept_working()))
+ 		return;
+@@ -2797,18 +2803,22 @@ void dept_request_event(struct dept_map *m)
+ 	 */
+ 	flags = dept_enter_recursive();
+ 
++	wg_p = ewg ? &ewg->wgen : &m->wgen;
++
+ 	wg = next_wgen();
+-	WRITE_ONCE(m->wgen, wg);
++	WRITE_ONCE(*wg_p, wg);
+ 
+ 	dept_exit_recursive(flags);
+ }
+ EXPORT_SYMBOL_GPL(dept_request_event);
+ 
+ void dept_event(struct dept_map *m, unsigned long e_f,
+-		unsigned long ip, const char *e_fn)
++		unsigned long ip, const char *e_fn,
++		struct dept_ext_wgen *ewg)
+ {
+ 	struct dept_task *dt = dept_task();
+ 	unsigned long flags;
++	unsigned int *wg_p;
+ 
+ 	if (unlikely(!dept_working()))
+ 		return;
+@@ -2816,24 +2826,26 @@ void dept_event(struct dept_map *m, unsigned long e_f,
+ 	if (m->nocheck)
+ 		return;
+ 
++	wg_p = ewg ? &ewg->wgen : &m->wgen;
++
+ 	if (dt->recursive) {
+ 		/*
+ 		 * Dept won't work with this even though an event
+ 		 * context has been asked. Don't make it confused at
+ 		 * handling the event. Disable it until the next.
+ 		 */
+-		WRITE_ONCE(m->wgen, 0U);
++		WRITE_ONCE(*wg_p, 0U);
+ 		return;
+ 	}
+ 
+ 	flags = dept_enter();
+ 
+-	__dept_event(m, m, e_f, ip, e_fn, false);
++	__dept_event(m, m, e_f, ip, e_fn, false, READ_ONCE(*wg_p));
+ 
+ 	/*
+ 	 * Keep the map diabled until the next sleep.
+ 	 */
+-	WRITE_ONCE(m->wgen, 0U);
++	WRITE_ONCE(*wg_p, 0U);
+ 
+ 	dept_exit(flags);
+ }
 -- 
 2.17.1
 
