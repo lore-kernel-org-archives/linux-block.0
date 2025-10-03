@@ -1,45 +1,39 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0513212572;
-	Fri,  3 Oct 2025 07:06:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7351239E67;
+	Fri,  3 Oct 2025 07:29:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759475207; cv=none; b=S3X8UY0X76ooLLmz1lq46oDcP/HVLo1265P3xgDX5cQfA4Q4xhiE7mPcT4R+MxiVlRvWx3ug7CAAEw56rgDjsz3+MNKf58PM4PlGJxy4iSmdfulUGwoZL3tNjeTm6ldgxRZ1RSMSPjInUxlqVHxQKpL6hNOGrQ/5JHL384vukX8=
+	t=1759476554; cv=none; b=t3SIisr3KktL22f0bJJny63dTFj3C2Z9HZTtTWI6TL9ZM/W6ZEoPHE5WMRYe/zgtdB5VCYts3txLBClVwPiuvLtygBlGFx8U6x+CPREHpdcR5l5b5x5HWGSvWjgVPu1gxVLOcrl042Lcpx113Ka0lZgj0RCIZrIZzf9K30KdtXk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759475207; c=relaxed/simple;
-	bh=os3rKQ2WuQcD1FARsrp7dqkTOHG0az9xBxuDqD0SXH4=;
+	s=arc-20240116; t=1759476554; c=relaxed/simple;
+	bh=bl1jRVoGSDpZtB8COcjqPGx5tLsBwXYpBWri+Bzff8w=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RS+m15RpPzgjiHZBeRCMLOKekeLWnyPjli85a1ReCn85Kp3FOYhrSryiSvpRl23WUvA67dj3uRVgjgd0socXoYIt0hRvEBDyxHKCLqHWiGm7B6MjfNG1bWp8q2b3XPCJAKqk8AZ0/jvJ0B3vzvK1ljdCgpsftVZZuk1610bxBI4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=gBdh5iDH; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="gBdh5iDH"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=os3rKQ2WuQcD1FARsrp7dqkTOHG0az9xBxuDqD0SXH4=; b=gBdh5iDHd8gW9zlFw9o0EcNzjo
-	X7i0PGAoW/Psmt0nxLoKgFCj3GEvGO3uKicUfiTbSeKyBCc8ooP4HaQZJL3PzGyxpVjvQBHAikynR
-	5VcOteHyLMqvqgoGb5E2SG7ToU3sGq0O78KxbvFZYhsEsn8ANMLD8Jc9xZjUy+QfxIoNTrqzND21d
-	dmtzKegq77CP+RTXjh3jtqOpQ/w9bWlbJxRCi+Ouoh6Fv+RDfxV2UjIGcQwgkHzfIo/40My0mws0C
-	SM7jGQdzuSDbcuyY+eq9ctBKUbzUvKcHFSscjLjzFfmU/fLbP3BrIsLJLQlT3Dso+JpFkCeJdiZPE
-	/8g1cRaA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1v4ZsK-0000000Bn3W-2x6P;
-	Fri, 03 Oct 2025 07:06:44 +0000
-Date: Fri, 3 Oct 2025 00:06:44 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Mikulas Patocka <mpatocka@redhat.com>,
-	Zhaoyang Huang <zhaoyang.huang@unisoc.com>,
-	Dave Chinner <dchinner@redhat.com>, linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH V4 6/6] loop: add hint for handling aio via IOCB_NOWAIT
-Message-ID: <aN92BCY1GQZr9YB-@infradead.org>
-References: <20250928132927.3672537-1-ming.lei@redhat.com>
- <20250928132927.3672537-7-ming.lei@redhat.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=UtKxfiWJqJIvgcr4OnHDvqI8EW1miUpbuwdpR8HyW0Mx+1n9MWBToGSH2e//EdB5e8+XktMxxZzXoxwDBObwhxXeMLLJ+iIBAgnaxywhH3OgmGjifd/5OoIZClkwU82tsuKiTf4DQjHTlz+RxNnta/PFE18GS1e3A2O/b3/xi/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 4CB09227AB1; Fri,  3 Oct 2025 09:29:09 +0200 (CEST)
+Date: Fri, 3 Oct 2025 09:29:09 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org, linux-btrace@vger.kernel.org,
+	John Garry <john.g.garry@oracle.com>,
+	Hannes Reinecke <hare@suse.de>, Damien Le Moal <dlemoal@kernel.org>,
+	Christoph Hellwig <hch@lst.de>, Naohiro Aota <naohiro.aota@wdc.com>,
+	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>
+Subject: Re: [PATCH v2 07/15] blktrace: add definitions for
+ blk_user_trace_setup2
+Message-ID: <20251003072909.GC12624@lst.de>
+References: <20250925150231.67342-1-johannes.thumshirn@wdc.com> <20250925150231.67342-8-johannes.thumshirn@wdc.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -48,13 +42,14 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250928132927.3672537-7-ming.lei@redhat.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20250925150231.67342-8-johannes.thumshirn@wdc.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Sun, Sep 28, 2025 at 09:29:25PM +0800, Ming Lei wrote:
-> - there isn't any queued blocking async WRITEs, because NOWAIT won't cause
-> contention with blocking WRITE, which often implies exclusive lock
+On Thu, Sep 25, 2025 at 05:02:23PM +0200, Johannes Thumshirn wrote:
+> +struct blk_user_trace_setup2 {
+> +	char name[32];		/* output */
 
-Isn't this a generic thing we should be doing in core code so that
-it applies to io_uring I/O as well?
+Is 32 still a good size limit?  Or would this be a time to
+allow for more?
 
+Otherwise this looks fine.
