@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E111313A3ED;
-	Fri,  3 Oct 2025 04:17:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 341F913A3ED;
+	Fri,  3 Oct 2025 04:19:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759465030; cv=none; b=Q18Gaek1ZzXLRdp9izuPPRGIncbWsS2oUqLQX8czmTSOy1DCGEMkJ6HCtIoiAjscVXq9w/wWKFwv1k1Jb8owpW4fx8gNjfDikGNUuthum38zpquR1uLSSohWyh8OPE9vNj480RcxYivLtgrWDsOkhwiWyjKpWsHpf6HF6R3MoL8=
+	t=1759465195; cv=none; b=LDaDtxPj/slutzq4PetfgCGiO+QoUkXkTa5iiMpYfrdmgDOrensYF1pjNMu6Ubb67/JrHqF9RMCgY0bEs1969cLIKZb0NbLUBEDAl64bCI164+JV/n0/xOYO91p+uv3xZgxbk9Q8v9YqjSTK5Qi+ix9y5tG3rpcwx135hgm7gBk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759465030; c=relaxed/simple;
-	bh=WNhe/bSy1mRmeQ6EZEve+nGVfcnJGUPr+thX6Fl59+w=;
+	s=arc-20240116; t=1759465195; c=relaxed/simple;
+	bh=tJF1eZNNuOE1+lkH9NxBrXzi38f2k9l7zWGgnC6Wnis=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=h+1qbecE+fLmNEuH1bOFzbGlRIOyBvWJw9KtlERnqhclEfjG6ZAsmU/YlXuwJ1UppuQrt2zdserfp1XG5kciEoXpFMahtpEjY3QykVthnDHBoLeX2GueOARznWnkF1iXH9BO8L6AtyP0afjobhxRgcbq7naA8txs4JA1OOAamuE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WKPHqoZD; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:Content-Type; b=TUxqONKBdv91QRTfL5F+os0anbCqWaDpG0vU1paY6rOrVB69+0F1SlKupmJUVykr7zBx4f17cY3vurUFF6HrqfnlRQWTKzUvjV5LQ7nv7a9Gh+eo8xqTwjmbdJWr0yJCDhuVUsnyUxM1p/Y+cnoLM8zuhbxPmPqRyfQi7Py6U5Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TxIpnjre; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WKPHqoZD"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F071C4CEF5;
-	Fri,  3 Oct 2025 04:17:07 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TxIpnjre"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83F3DC4CEF5;
+	Fri,  3 Oct 2025 04:19:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759465029;
-	bh=WNhe/bSy1mRmeQ6EZEve+nGVfcnJGUPr+thX6Fl59+w=;
+	s=k20201202; t=1759465194;
+	bh=tJF1eZNNuOE1+lkH9NxBrXzi38f2k9l7zWGgnC6Wnis=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=WKPHqoZDRc3T2p6r2Ct6lcvb1WnkjgoVtIkcZm+7kfQ5c4MgSMninQ22dEub6B/Hp
-	 dV5eI4hXkj99Ozf0SUgr/rI29etVWF1Mj25InIngWY/vXlRzIm1c04AuVanumt4RKv
-	 sMDcha5/VZZXCxYZNV9Z6M6E4uN+hvnhFwn6dt1MhID88bOqNhicAZila0ocykT5Cn
-	 bSjOcGXH0iHgn+bTjOqoHojlb1qvQo3UK8Zzkglx6a7AwZ29F4Xk+RiRMoLY57pbMX
-	 r9uGVn7trtVp0nd5N/PFY2/A4UC0dw9KUQevkpWbl0J0UwKAvd28bXt045rS345Rdl
-	 ou0QobphvcDYQ==
-Message-ID: <836230c2-44d6-45e3-a25b-0ec5d56c5f7a@kernel.org>
-Date: Fri, 3 Oct 2025 13:17:05 +0900
+	b=TxIpnjre3Uz7q7thqMtcpFWf/u9n2iigg5OhhnpNobyZ2XkVmjiwCwGu120GuwQo9
+	 X5TCk4CjfvukJXz1iA3Yn2Wc6VDjeUBa8EgptJidMHicSnLXaDQXwlPIfJOUudTeRY
+	 JMURnn5Wj/TQYNwfKyWnEZHg5IhgpW17C4hsGEFiUx+VRsWX8cjJpW0OErwhqgGlo/
+	 BYtab3RB6NGmtCj70hKJ7ACNoadtPrfARicBBLmVZHfydodxOoyt9p9XSYypsUrzA2
+	 nj7Ax5ViQn0kqaGdf6VI3PNK8FqFCX8fXxIOpU0MgqLu7NTigwLS9D1PnZ2+doLcxg
+	 lrJIz2tUkwjtA==
+Message-ID: <b3a1cf17-a739-477c-acee-ac61a0d8e2a9@kernel.org>
+Date: Fri, 3 Oct 2025 13:19:31 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -52,9 +52,6 @@ On 9/26/25 11:38, chengkaitao wrote:
 > From: chengkaitao <chengkaitao@kylinos.cn>
 > 
 > Reference function started_after()
-
-What does this mean ?
-
 > Before modification:
 > 	Timeout for dispatch{read}: 9.5s
 > 	started_after - 0.5s < latest_start - 10s
@@ -69,15 +66,13 @@ What does this mean ?
 > After modification:
 > 	Timeout for dispatch{read/write}: 5s
 > 	prio_aging_expire / 2 < latest_start - started_after
-
-This is extremely hard to parse and understand. Can you please make full
-sentences that explain what the problem is, and for your example, the starting
-situation/state you are in ? E.g "If there are a lot of request inserted at
-head, then ... Blah"
-
-Also, in the title, s/timeout period/timeout
-
+> 
 > Signed-off-by: chengkaitao <chengkaitao@kylinos.cn>
+
+Also please write your name correctly here, separating first and last names with
+a capital first letter for each (unless of course if this is your only
+name/firstname, but still missing the capital letter).
+
 > ---
 >  block/mq-deadline.c | 3 ++-
 >  1 file changed, 2 insertions(+), 1 deletion(-)
@@ -93,15 +88,6 @@ Also, in the title, s/timeout period/timeout
 > -		rq->fifo_time = jiffies;
 > +		rq->fifo_time = jiffies + dd->fifo_expire[data_dir]
 > +				- dd->prio_aging_expire / 2;
-
-The request is inserted to the dispatch list directly here. So why do we need to
-change the timeout to switch to fifo ? Your commit message does not explain that
-at all, and I do not see a trivial explanation for it myself. Please clarify.
-I suspect that you have a situation where you see a lot of requeue at head and
-that completely skew the fifo/prio aging ? I am memrely guessing here. Please
-resend your patch with a clear commit message, and also a comment for the change
-above explaining what is being done.
-
 >  	} else {
 >  		deadline_add_rq_rb(per_prio, rq);
 >  
