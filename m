@@ -1,148 +1,127 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mail.zeus03.de (zeus03.de [194.117.254.33])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F726221FBD
-	for <linux-block@vger.kernel.org>; Sat,  4 Oct 2025 14:42:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D4271917CD
+	for <linux-block@vger.kernel.org>; Sat,  4 Oct 2025 16:39:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.117.254.33
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759588957; cv=none; b=R3EvBSNURHLD37MHBx291E0ZphvcdG3Uo4+unZtnUu5DjrDEvEcSXvrvWONxQuaRd5j1W1vqaBdmAQoPExxPysxvAgSAhLu0m35ulY4GX21CKG8YbDKfneNUeq7Ze3OnrJE187gnwfqxZaVYj5iaN8kq4Qx+0jLR19ThSSHP7js=
+	t=1759595994; cv=none; b=EMdgwUzJIUTG7OtSfZVXc4XWiDkYhvl0jVHsxVs5car6q5PBt3GOYZO67+hXeO7fEOcTbGKks/gn65DFpWpuynSi5fvTw6Hhk/pA4MTt5TsaUVHIpt71DCMXqTBS3r2EloRZkvVfaxaV62fDLEk5rNeg03VVRBDUjv9w6V6eqBs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759588957; c=relaxed/simple;
-	bh=NANl0qhN8cP6dUJGh6KczJhxCiKXgeWk3FtwYPrEs1E=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QXan98dtL8tpw6jbpsCg9Q7VBzJO+zvo05FHa+Jox7x2GNFSh4NCeEhLAzcaxxqKFHLkhbbIrD/DAfq8VGwT1ynpr0U5rWptBVmprrP4ra6IT83fzWUth6oq03mfEccbATjt5JNGWT2uJ+i8XZOwNrVRakIamTOHQ7G641RrT5w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DcKyi4/D; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1759595994; c=relaxed/simple;
+	bh=RpD4KNUBmJSgm0bHWcZ0DvqxhqkKLHESkzxfIrCF35M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=B4eHLRecxEBqO9evah2OdBYFaTth4n7KXozOLZahanmTPmK3PQcJKzAMZ2/rh2weT61c3EOj1tk2kM7buPDcBt25YCyjgO/6XZt2pfQNl+BPK9aKbN4kVK/XCyqYYlcpL+96OdNQAEKtMueMTn8WqWms7uVH/ncWTTpVdb//P2E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sang-engineering.com; spf=pass smtp.mailfrom=sang-engineering.com; dkim=pass (2048-bit key) header.d=sang-engineering.com header.i=@sang-engineering.com header.b=PNedKPiX; arc=none smtp.client-ip=194.117.254.33
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sang-engineering.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sang-engineering.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DcKyi4/D"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1759588954;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CyNXhoET8XBzKUh2zjz0wNQO0kAUQdnWpZGZ78YY6qY=;
-	b=DcKyi4/DPmWMXlHnfW7ss+M+EMPJNcjglLy6BCStAiEy+0YUu/Mw808kIwRv84gupx896e
-	2Jt6LBlAC7WTwiQIYxKa+xC3M4yGMq7KeJsfWP9Ue+h7nvg2AIjO1sEkS9gKh9ldQTePQ6
-	spq/8vNiySW2PeohP4dTPoMX78UteTw=
-Received: from mail-ua1-f72.google.com (mail-ua1-f72.google.com
- [209.85.222.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-127-94y5QHm0M5qKNluvGUNfPQ-1; Sat, 04 Oct 2025 10:42:32 -0400
-X-MC-Unique: 94y5QHm0M5qKNluvGUNfPQ-1
-X-Mimecast-MFC-AGG-ID: 94y5QHm0M5qKNluvGUNfPQ_1759588952
-Received: by mail-ua1-f72.google.com with SMTP id a1e0cc1a2514c-90bceb0908eso4360602241.0
-        for <linux-block@vger.kernel.org>; Sat, 04 Oct 2025 07:42:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759588952; x=1760193752;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=CyNXhoET8XBzKUh2zjz0wNQO0kAUQdnWpZGZ78YY6qY=;
-        b=q389YdVh4BbfFMgtAnQlgYXqODWh8fOtfn6SQRTpLJFXA7SO7r7m9tiN82F6Aa1WfG
-         05L+6UQEYxqIBEul5W+TdzJA4SwHJtheewWHb+Ui4+lOS52x9dxlYwvLKOnpF5Hyi+vD
-         +ojP45sQCYne5MTC3KXWK9twnpieyvPFcYsyP1r6n11RI+kFOInJs9QOzizLmND/4KIy
-         PHMtU4AeITCgabNey6YHRjCezYWM5Mntf/6p2IHd5nidfNjhbIkYx6mKJwJ6wX4VLamr
-         7TvGEhhLkih68Rus3PCNJxSmWG0jOYDNG2qSYv+PhY886vDXFsKeKtSRDJJ6Kqq7QcoC
-         OYSA==
-X-Forwarded-Encrypted: i=1; AJvYcCXItodXaupfMSzPi/J0JtdGl6Mq4sePQAvNfLaw8Z2isAQWdLL100F1lkS26AshelC6NyptPpp8CbAMcQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyKOcSWi412o5cjzmOQ7qqyGQWehEnG9ygFTzS6Z6CIGDfe6mcZ
-	qgleeJRmgKk1Ahl02GgnCbe0NmA0QatEtsi2qRVfrWNbwaL5YI8ziqQzBqOlUW91zHMofRzJE1j
-	9yaQaE7TH5GVNchQwLDGKxq8OkLnWSOlOCo0+lSFVHC89ov0Y6Kuz4XmuMh1Br1daY/aE/dmPPC
-	yWkfLzaxBKY5WoKkTaTEUoWvdo3SCSrjb1kvVug1g=
-X-Gm-Gg: ASbGncu6AxtwR6KODV/iKaDmFl/9v2Ch8yt9VVxWLOmI8GzHKbT1J/yEX6FNV4owr/F
-	EBmRf5Ga+t1wjXb6rNM4IiPR2X7WxVxvTEfC0XZxdb1chXuvvo6ja3WKBydU2HZAcnY6CQvPfTX
-	EJ2x9zZp3DO4aMg7JKJp+ddnKKU88=
-X-Received: by 2002:a05:6102:14a8:b0:52a:1104:3029 with SMTP id ada2fe7eead31-5d41c17fc59mr3321316137.17.1759588951968;
-        Sat, 04 Oct 2025 07:42:31 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE674zB73YsI/pAPw0bIwRieKGfGydQY5l1hK3XQdGD80Jtss5WI0eIO6jsU5dAUs3XNCmSrqmU+56s4D9SKSQ=
-X-Received: by 2002:a05:6102:14a8:b0:52a:1104:3029 with SMTP id
- ada2fe7eead31-5d41c17fc59mr3321306137.17.1759588951602; Sat, 04 Oct 2025
- 07:42:31 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=sang-engineering.com header.i=@sang-engineering.com header.b="PNedKPiX"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	sang-engineering.com; h=date:from:to:cc:subject:message-id
+	:references:mime-version:content-type:in-reply-to; s=k1; bh=oYWX
+	AVcToZjL216N14wevIUTr5XEGs+BI72TKUQOPN8=; b=PNedKPiX4oCj4bpedhVz
+	E+/1zG4RS6etGvHx7daU2DUWMNccTF0z1BMx94C/uGTZ5muouJ1sCi+Rrrn+I0yb
+	QX0tCQTPUifcb+5NvLnilNYtzPuaMC9afpJzRPyfpW8YSMz2Kk2sAGveGofpt2/U
+	FgjEfDef1ztsgRt/i/fhnznfm7TM0Tf+A/tZDrAPd+4jSPssQfBLtqCfRE58HIfm
+	D8PcLW9fA6b0Ln4SDcQwSOwdrXhoroqBaJXPWi2lQd/dVTkvYzyJpOcaiTLwaahq
+	J+U+4x2W131yohhie5t+CaEw/7wpjC2Zja7YEDIcma8nk3Y5vfr5rBO/vRmlQllV
+	Rw==
+Received: (qmail 1087916 invoked from network); 4 Oct 2025 18:39:44 +0200
+Received: by mail.zeus03.de with UTF8SMTPSA (TLS_AES_256_GCM_SHA384 encrypted, authenticated); 4 Oct 2025 18:39:44 +0200
+X-UD-Smtp-Session: l3s3148p1@ZNCL3VdA3IqSRnW9
+Date: Sat, 4 Oct 2025 18:39:43 +0200
+From: Wolfram Sang <wsa+renesas@sang-engineering.com>
+To: Byungchul Park <byungchul@sk.com>
+Cc: linux-kernel@vger.kernel.org, kernel_team@skhynix.com,
+	torvalds@linux-foundation.org, damien.lemoal@opensource.wdc.com,
+	linux-ide@vger.kernel.org, adilger.kernel@dilger.ca,
+	linux-ext4@vger.kernel.org, mingo@redhat.com, peterz@infradead.org,
+	will@kernel.org, tglx@linutronix.de, rostedt@goodmis.org,
+	joel@joelfernandes.org, sashal@kernel.org, daniel.vetter@ffwll.ch,
+	duyuyang@gmail.com, johannes.berg@intel.com, tj@kernel.org,
+	tytso@mit.edu, willy@infradead.org, david@fromorbit.com,
+	amir73il@gmail.com, gregkh@linuxfoundation.org, kernel-team@lge.com,
+	linux-mm@kvack.org, akpm@linux-foundation.org, mhocko@kernel.org,
+	minchan@kernel.org, hannes@cmpxchg.org, vdavydov.dev@gmail.com,
+	sj@kernel.org, jglisse@redhat.com, dennis@kernel.org, cl@linux.com,
+	penberg@kernel.org, rientjes@google.com, vbabka@suse.cz,
+	ngupta@vflare.org, linux-block@vger.kernel.org,
+	josef@toxicpanda.com, linux-fsdevel@vger.kernel.org, jack@suse.cz,
+	jlayton@kernel.org, dan.j.williams@intel.com, hch@infradead.org,
+	djwong@kernel.org, dri-devel@lists.freedesktop.org,
+	rodrigosiqueiramelo@gmail.com, melissa.srw@gmail.com,
+	hamohammed.sa@gmail.com, harry.yoo@oracle.com,
+	chris.p.wilson@intel.com, gwan-gyeong.mun@intel.com,
+	max.byungchul.park@gmail.com, boqun.feng@gmail.com,
+	longman@redhat.com, yunseong.kim@ericsson.com, ysk@kzalloc.com,
+	yeoreum.yun@arm.com, netdev@vger.kernel.org,
+	matthew.brost@intel.com, her0gyugyu@gmail.com, corbet@lwn.net,
+	catalin.marinas@arm.com, bp@alien8.de, dave.hansen@linux.intel.com,
+	x86@kernel.org, hpa@zytor.com, luto@kernel.org,
+	sumit.semwal@linaro.org, gustavo@padovan.org,
+	christian.koenig@amd.com, andi.shyti@kernel.org, arnd@arndb.de,
+	lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com,
+	rppt@kernel.org, surenb@google.com, mcgrof@kernel.org,
+	petr.pavlu@suse.com, da.gomez@kernel.org, samitolvanen@google.com,
+	paulmck@kernel.org, frederic@kernel.org, neeraj.upadhyay@kernel.org,
+	joelagnelf@nvidia.com, josh@joshtriplett.org, urezki@gmail.com,
+	mathieu.desnoyers@efficios.com, jiangshanlai@gmail.com,
+	qiang.zhang@linux.dev, juri.lelli@redhat.com,
+	vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
+	bsegall@google.com, mgorman@suse.de, vschneid@redhat.com,
+	chuck.lever@oracle.com, neil@brown.name, okorniev@redhat.com,
+	Dai.Ngo@oracle.com, tom@talpey.com, trondmy@kernel.org,
+	anna@kernel.org, kees@kernel.org, bigeasy@linutronix.de,
+	clrkwllms@kernel.org, mark.rutland@arm.com, ada.coupriediaz@arm.com,
+	kristina.martsenko@arm.com, wangkefeng.wang@huawei.com,
+	broonie@kernel.org, kevin.brodsky@arm.com, dwmw@amazon.co.uk,
+	shakeel.butt@linux.dev, ast@kernel.org, ziy@nvidia.com,
+	yuzhao@google.com, baolin.wang@linux.alibaba.com,
+	usamaarif642@gmail.com, joel.granados@kernel.org,
+	richard.weiyang@gmail.com, geert+renesas@glider.be,
+	tim.c.chen@linux.intel.com, linux@treblig.org,
+	alexander.shishkin@linux.intel.com, lillian@star-ark.net,
+	chenhuacai@kernel.org, francesco@valla.it,
+	guoweikang.kernel@gmail.com, link@vivo.com, jpoimboe@kernel.org,
+	masahiroy@kernel.org, brauner@kernel.org,
+	thomas.weissschuh@linutronix.de, oleg@redhat.com, mjguzik@gmail.com,
+	andrii@kernel.org, wangfushuai@baidu.com, linux-doc@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-media@vger.kernel.org,
+	linaro-mm-sig@lists.linaro.org, linux-i2c@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-modules@vger.kernel.org,
+	rcu@vger.kernel.org, linux-nfs@vger.kernel.org,
+	linux-rt-devel@lists.linux.dev
+Subject: Re: [PATCH v17 35/47] i2c: rename wait_for_completion callback to
+ wait_for_completion_cb
+Message-ID: <aOFNz2mKXCXUImwO@shikoro>
+References: <20251002081247.51255-1-byungchul@sk.com>
+ <20251002081247.51255-36-byungchul@sk.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250830021825.2859325-1-ming.lei@redhat.com> <20250830021825.2859325-6-ming.lei@redhat.com>
- <pnezafputodmqlpumwfbn644ohjybouveehcjhz2hmhtcf2rka@sdhoiivync4y>
-In-Reply-To: <pnezafputodmqlpumwfbn644ohjybouveehcjhz2hmhtcf2rka@sdhoiivync4y>
-From: Ming Lei <ming.lei@redhat.com>
-Date: Sat, 4 Oct 2025 22:42:20 +0800
-X-Gm-Features: AS18NWDHJgRWziKexb0Mjrgc7I5f0NwDaDeOyWw9X3169ZFewY53f1xPhcN8YcQ
-Message-ID: <CAFj5m9Ki1U6N4N6-=HYy49KfvYAbegmwcXLuKCxjX4E+qy7u7Q@mail.gmail.com>
-Subject: Re: [PATCH V2 5/5] blk-mq: Replace tags->lock with SRCU for tag
- iterators - Rockchip UFS regression
-To: Sebastian Reichel <sebastian.reichel@collabora.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
-	Hannes Reinecke <hare@suse.de>, Yu Kuai <yukuai3@huawei.com>, kernel@collabora.com, 
-	linux-rockchip@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251002081247.51255-36-byungchul@sk.com>
 
-On Sat, Oct 4, 2025 at 1:18=E2=80=AFAM Sebastian Reichel
-<sebastian.reichel@collabora.com> wrote:
->
-> Hi,
->
-> On Sat, Aug 30, 2025 at 10:18:23AM +0800, Ming Lei wrote:
-> > Replace the spinlock in blk_mq_find_and_get_req() with an SRCU read loc=
-k
-> > around the tag iterators.
-> >
-> > This is done by:
-> >
-> > - Holding the SRCU read lock in blk_mq_queue_tag_busy_iter(),
-> > blk_mq_tagset_busy_iter(), and blk_mq_hctx_has_requests().
-> >
-> > - Removing the now-redundant tags->lock from blk_mq_find_and_get_req().
-> >
-> > This change fixes lockup issue in scsi_host_busy() in case of shost->ho=
-st_blocked.
-> >
-> > Also avoids big tags->lock when reading disk sysfs attribute `inflight`=
-.
-> >
-> > Reviewed-by: Hannes Reinecke <hare@suse.de>
-> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > ---
->
-> This patch landed in the last few hours and I now see the following
-> fatal error on the Radxa ROCK 4D (most likely Rockchip UFS in
-> general). After reverting this patch the error is gone and things
-> are working as expected:
->
-> [    2.713204] CPU: 7 UID: 0 PID: 1 Comm: swapper/0 Not tainted 6.17.0-g4=
-72ea195cdf3 #1 PREEMPT
-> [    2.713956] Hardware name: Radxa ROCK 4D (DT)
-> [    2.714342] pstate: 60000005 (nZCv daif -PAN -UAO -TCO -DIT -SSBS BTYP=
-E=3D--)
-> [    2.714955] pc : __srcu_read_lock+0x30/0x80
+On Thu, Oct 02, 2025 at 05:12:35PM +0900, Byungchul Park wrote:
+> Functionally no change.  This patch is a preparation for DEPT(DEPendency
+> Tracker) to track dependencies related to a scheduler API,
+> wait_for_completion().
+> 
+> Unfortunately, struct i2c_algo_pca_data has a callback member named
+> wait_for_completion, that is the same as the scheduler API, which makes
+> it hard to change the scheduler API to a macro form because of the
+> ambiguity.
+> 
+> Add a postfix _cb to the callback member to remove the ambiguity.
+> 
+> Signed-off-by: Byungchul Park <byungchul@sk.com>
 
-  The problem: scsi_host_busy() tries to use tags_srcu before it's
-initialized by init_srcu_struct().
+This patch seems reasonable in any case. I'll pick it, so you have one
+dependency less. Good luck with the series!
 
-  The warning at __srcu_read_lock+0x30/0x80 indicates that the SRCU
-structure (tags_srcu) has not been properly initialized yet. The code
-   at line 754 in srcutree.c tries to read ssp->srcu_ctrp, but this
-pointer is likely NULL or contains garbage because init_srcu_struct()
-   hasn't been called yet.
-
-  Solution
-
-  The scsi_host_busy() call should only happen after the SCSI host has
-been added and the tag_set has been initialized. The fix would be
-  to check if the tag_set is initialized before calling
-scsi_host_busy(), or to defer the printing of host state until after
-the host is
-  fully initialized.
-
-  One possible fix is to check hba->scsi_host_added before calling
-scsi_host_busy():
-
-  dev_err(hba->dev, "%d outstanding reqs, tasks=3D0x%lx\n",
-      hba->scsi_host_added ? scsi_host_busy(hba->host) : 0,
-      hba->outstanding_tasks);
+Applied to for-next, thanks!
 
