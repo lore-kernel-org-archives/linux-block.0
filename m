@@ -1,88 +1,100 @@
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 003.mia.mailroute.net (003.mia.mailroute.net [199.89.3.6])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD90223F42D
-	for <linux-block@vger.kernel.org>; Mon,  6 Oct 2025 17:29:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FEAB846F
+	for <linux-block@vger.kernel.org>; Mon,  6 Oct 2025 18:02:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.6
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759771770; cv=none; b=e6RPgBogFnpfohtGS0h+Fakx8PGd9obKlIMiSYtT4nV/PLZMfBf/Vk90O/U0S3vwqVD82XVbAaM6MfjKIcikH5uOi6O6TBvJ5ER2273DkARivjffmGTRbObI1raTR+puZruMZkggQdWoyot4Cqmb1Y2HdpXhTA9StCquP/uzRnY=
+	t=1759773735; cv=none; b=HoIhLeqq6KjNjfs4cN/u21RebJpWrinaF2FsXvPKZU3g6rKiVckBzu/G/JU4l5kdSyJ0Y3tgJ2NLLipjuxtI3N435J7qHfUuP7u/DoggOiHtCoEM9SwABkVNHSpqdeerk5LbE07wfJd8ymoYxF0jJ+0Pm5m3Ggtooo9//KuL1W0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759771770; c=relaxed/simple;
-	bh=UfYkNlIqJ0UOcXUYMjPVrcZj2rIGaSllfBYPjdPn8fU=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=LrMkaoV2tvYqkCmG74lWl5uIDpOjkeOi46WM/39/KhSMWDW9CuMu5qcU7knSFl9lwUOHCAgkO0qm+3TOxEDm/2WqWyVNgxOkdgT/JUvnlhSmw2luCGydrlt2NenCxzV4zpij8KAeotyNFd7O638qHdl98wdznuOvZvFs4IZ7WAs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-911c5f72370so570116639f.0
-        for <linux-block@vger.kernel.org>; Mon, 06 Oct 2025 10:29:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759771768; x=1760376568;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=qYSGI+wm950aF63lFDgqtSx38FxRnb1uTcZG6/4yc3Y=;
-        b=NTRp5XNzs0Kp1mYcU4fJ16kbmB4dqZd76v/LeFOMAQ8Oz7ZJTiR9cOF4ywKbLaexTu
-         62CUdtH94EKAiSmHe/tlohKb7ehxDYSERk+9wan1jYSKn4otl8FaTROs6iE0eQZMeGKO
-         gpVuk9/QNX2saa2vdkX/ja8qRlKjWur5+RgGyNSpsgAzu3EGfP+weJ8QJAfwu7cydp2N
-         DKLrGJG1J1yn5ifav91P8//P7ilbJ7UDG2LmRqaxn7Iz+NOPske+qd/PXBdZrxzbQqYl
-         sX1RWcGxsRfMXOU8MG7AO0j21zMeUtFYxKtPbdjcHFi/AU1I1bG4yWycM2ra63PW1+OC
-         CJ2w==
-X-Forwarded-Encrypted: i=1; AJvYcCWQ76ZPA0hSQndsxI0AtiNdpnEjP8pW9etp+wK8UaOlQpZCz2SKLqGVRedwcLdSDErrz1Hw8ti0EGOHWw==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy1WNPKqBsFmRRCs89Z3oeQkMRCZpiSDne2C8yvT7gbMMzIuMMI
-	SUe0w4VesXbABNMVWp4GyPhoYSNqt3eP79C39lvgDsdXaHCBGCsTh73YCx2lk26EHJFMjvv64bB
-	XqzawZuaOLvMCA2h5SvXvj6xVrgCYSY2ncn0zcYr/6v9jBE/8SEzj4w6IrUo=
-X-Google-Smtp-Source: AGHT+IFU19mSImJx6lton1MLSZgMp/idojUMivv0dv20oP6EqORkEcAASG3o4o0SdtLiJarrNuwleMsqT6tgK4XpkuHhHS6TQiiM
+	s=arc-20240116; t=1759773735; c=relaxed/simple;
+	bh=7+gNMJgsHSkD1AEvujqNJ+u6tKXAd+Qn6h1sHijskCE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NYH3ZqQkbLRxdzb0saQpvQXrNlP+dPhygKSLMJvLYC6BDbHPXo9KgcC0WzTDeaYBD2XFXHGtmw8w4CD39Omk5UO0nLndG65dZ3pd5M4+orWbm+tQko0SUHvrtDaH0m8Pn/ePSiVEPe/h6AXuF6KT9Ci1xAlwzRVvHNB8Cr8pX/M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=rlSVdzds; arc=none smtp.client-ip=199.89.3.6
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="rlSVdzds"
+Received: from localhost (localhost [127.0.0.1])
+	by 003.mia.mailroute.net (Postfix) with ESMTP id 4cgRtY0S4Pzlgqy1;
+	Mon,  6 Oct 2025 18:02:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1759773731; x=1762365732; bh=fvK3RsS4VJinv86tNMu8mj4+
+	OOC7NIwmRtKkVfmPlRQ=; b=rlSVdzdsLZw/xGq84IXoP4TZJKt4qVzw3G37TWle
+	Wtaef862t18jfY4rPPpInmuHQFg3aob8r+P5X9uw+nXgMN9FJcs/BiJDdJoJYEcn
+	siKLFvrFHYqfDpswIpzcn41QCUM78gAADHHS7vZso6oW3pRD1XSiPX6d7F2Dtc5y
+	x/TLQoCmopSJvR+wdBr+otfCULog0787Hr0ICYWVLryU0SxRwGlGDZup1G1t4euP
+	GtsveaOEIk0pAhy/Yicqt2cJ+4csBqAqLzuJxLVOqdkr8wZ2/yxz9hZkqZBFuD1/
+	flnkuaQ1yiDQ+grPk6fAz50I7CZ4+XZMdnib+4XeLY6Y6w==
+X-Virus-Scanned: by MailRoute
+Received: from 003.mia.mailroute.net ([127.0.0.1])
+ by localhost (003.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id zOKoR4wDiUhw; Mon,  6 Oct 2025 18:02:11 +0000 (UTC)
+Received: from [100.119.48.131] (unknown [104.135.180.219])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4cgRtN33T7zlgqxl;
+	Mon,  6 Oct 2025 18:02:03 +0000 (UTC)
+Message-ID: <4f16e17d-796b-4896-9d4c-6d227514f1ca@acm.org>
+Date: Mon, 6 Oct 2025 11:02:02 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1889:b0:42e:4c23:5363 with SMTP id
- e9e14a558f8ab-42e7adb29a1mr189932465ab.29.1759771767957; Mon, 06 Oct 2025
- 10:29:27 -0700 (PDT)
-Date: Mon, 06 Oct 2025 10:29:27 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68e3fc77.a70a0220.160221.0006.GAE@google.com>
-Subject: [syzbot] Monthly nbd report (Oct 2025)
-From: syzbot <syzbot+listddef0da3f5f843882aee@syzkaller.appspotmail.com>
-To: josef@toxicpanda.com, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, nbd@other.debian.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V2 5/5] blk-mq: Replace tags->lock with SRCU for tag
+ iterators - Rockchip UFS regression
+To: Ming Lei <ming.lei@redhat.com>,
+ Sebastian Reichel <sebastian.reichel@collabora.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+ Hannes Reinecke <hare@suse.de>, Yu Kuai <yukuai3@huawei.com>,
+ kernel@collabora.com, linux-rockchip@lists.infradead.org
+References: <20250830021825.2859325-1-ming.lei@redhat.com>
+ <20250830021825.2859325-6-ming.lei@redhat.com>
+ <pnezafputodmqlpumwfbn644ohjybouveehcjhz2hmhtcf2rka@sdhoiivync4y>
+ <CAFj5m9Ki1U6N4N6-=HYy49KfvYAbegmwcXLuKCxjX4E+qy7u7Q@mail.gmail.com>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <CAFj5m9Ki1U6N4N6-=HYy49KfvYAbegmwcXLuKCxjX4E+qy7u7Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hello nbd maintainers/developers,
+On 10/4/25 7:42 AM, Ming Lei wrote:
+>    One possible fix is to check hba->scsi_host_added before calling
+> scsi_host_busy():
+> 
+>    dev_err(hba->dev, "%d outstanding reqs, tasks=0x%lx\n",
+>        hba->scsi_host_added ? scsi_host_busy(hba->host) : 0,
+>        hba->outstanding_tasks);
 
-This is a 31-day syzbot report for the nbd subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/nbd
+My preference is to add a check inside scsi_host_busy(), e.g. as follows
+(entirely untested):
 
-During the period, 0 new issues were detected and 0 were fixed.
-In total, 7 issues are still open and 8 have already been fixed.
+diff --git a/drivers/scsi/hosts.c b/drivers/scsi/hosts.c
+index cc5d05dc395c..17173239301e 100644
+--- a/drivers/scsi/hosts.c
++++ b/drivers/scsi/hosts.c
+@@ -611,8 +611,9 @@ int scsi_host_busy(struct Scsi_Host *shost)
+  {
+  	int cnt = 0;
 
-Some of the still happening issues:
+-	blk_mq_tagset_busy_iter(&shost->tag_set,
+-				scsi_host_check_in_flight, &cnt);
++	if (shost->tag_set.ops)
++		blk_mq_tagset_busy_iter(&shost->tag_set,
++					scsi_host_check_in_flight, &cnt);
+  	return cnt;
+  }
+  EXPORT_SYMBOL(scsi_host_busy);
 
-Ref Crashes Repro Title
-<1> 2150    Yes   possible deadlock in pcpu_alloc_noprof (2)
-                  https://syzkaller.appspot.com/bug?extid=91771b3fb86ec2dd7227
-<2> 310     Yes   INFO: task hung in nbd_queue_rq
-                  https://syzkaller.appspot.com/bug?extid=30c16035531e3248dcbc
-<3> 146     Yes   INFO: task hung in nbd_ioctl (3)
-                  https://syzkaller.appspot.com/bug?extid=fe03c50d25c0188f7487
-<4> 88      No    INFO: task hung in nbd_disconnect_and_put
-                  https://syzkaller.appspot.com/bug?extid=aa56a8f25e07970eef7f
-<5> 62      Yes   possible deadlock in nbd_queue_rq
-                  https://syzkaller.appspot.com/bug?extid=3dbc6142c85cc77eaf04
+Thanks,
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
-
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
+Bart.
