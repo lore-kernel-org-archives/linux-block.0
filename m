@@ -1,47 +1,47 @@
 Received: from outpost1.zedat.fu-berlin.de (outpost1.zedat.fu-berlin.de [130.133.4.66])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E870419067C;
-	Mon,  6 Oct 2025 10:03:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89D9B1F4CB3;
+	Mon,  6 Oct 2025 10:06:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=130.133.4.66
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759744989; cv=none; b=gtJ4WrYPU6mm1j9scCB7E3doarIJa+LdVnmMtbfaBujPppzF4RNw9rh6GuU2QT4gAN9WBcEc0nFQ8rZ++GxSVt1kBcrSMShmE7a7N00Ukv3W/dn+tPNn2eHb2Zd/4oZuvrU9JkGDdjyt0rGjVXzCYxfgk1wQQ2v2X35OIDlzghM=
+	t=1759745214; cv=none; b=cLm4xF5Sl5LjRhXsIOJI6tf4xao6HeOklmbbcEJB+eyCmFHhdD8DhPCnHBI4peFSKr5nlQh7naaVyOyavPIgVZQZFUKX0HyU4+MfXY5pOufgtlJJe8urAVpGSKOZ3hkunLAMBdwPyd8COnQ8HDgw0eYXqwRl/Xp7ixCziC0uPlg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759744989; c=relaxed/simple;
-	bh=0xkFkIFtnjQEGwwUdi3WgGkOeaYx/drZLQoCWnU5p+g=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gNag0vnyoGoBF33qL6R1Bvx38LXZcHHWLqvn8ru3fhuNpkS4RHXZYN8CwYr7MeOYzUb4LUAd9a0xeE0h++LM+24por0qTtH0rAgBGCzJ/is5gaqqrz5BwEupFmfk2k7Bkc/PjRd2MSZSyRSgewbg58z6wUnILtg/0W9SkdR+OYk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=physik.fu-berlin.de; spf=pass smtp.mailfrom=zedat.fu-berlin.de; dkim=pass (2048-bit key) header.d=fu-berlin.de header.i=@fu-berlin.de header.b=UQQs/TXr; arc=none smtp.client-ip=130.133.4.66
+	s=arc-20240116; t=1759745214; c=relaxed/simple;
+	bh=RqgAW9lbqtckIbXNmjORUUqpdakAcL+TaSmrw3Jzu/M=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=P2De6LJs6cyIMBW1PB0QrPuIssiy/ZB/zz5xwsDSaJXSDnp8eK4KLCRCekDwIbgjIMZ7/iqS94KqZmBdjkFzTQ6maLR+EKJk++K6NYnhWKtSlJSr647FPXWwX1hIyWeOe8aSBika00lxn4KrXcUw2hCnbpBrnZZO9scSkO9Un4Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=physik.fu-berlin.de; spf=pass smtp.mailfrom=zedat.fu-berlin.de; dkim=pass (2048-bit key) header.d=fu-berlin.de header.i=@fu-berlin.de header.b=YRe9Turp; arc=none smtp.client-ip=130.133.4.66
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=physik.fu-berlin.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zedat.fu-berlin.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fu-berlin.de header.i=@fu-berlin.de header.b="UQQs/TXr"
+	dkim=pass (2048-bit key) header.d=fu-berlin.de header.i=@fu-berlin.de header.b="YRe9Turp"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=fu-berlin.de; s=fub01; h=Content-Transfer-Encoding:MIME-Version:Message-ID:
 	Date:Subject:Cc:To:From:From:Reply-To:Subject:Date:Message-ID:To:Cc:
 	MIME-Version:Content-Type:Content-Transfer-Encoding:Content-ID:
 	Content-Description:In-Reply-To:References;
-	bh=NlQ6RCgH5WimmF64AW0550GztKYD0qltZSKMbkkqcek=; t=1759744987; x=1760349787; 
-	b=UQQs/TXrXwsyAc0bvmzr3fVFsKcdoluFpaoTvzA55MtGLovoWArXuw5TQDFK2kneJdjm4lwHy9K
-	RQfWapwXXMtaoXDHCbNrlug3mw4HqaEdJwko5RA4CKLaNKLSwV2BHS3QE6XEl+DV4Ae8D45cUvggr
-	sMyUMCxPPa+ERrWHG3tj9CT2pCTU0pnK0o0xEoFteDr7btCIdYVk1DJhKTpT0XDCrEaVBxAqQNHzk
-	pBnSMtzHZu7S/W8V9NxVcu/nd5C8cBSl7kWo8DjmPyJcvR51UN+ALYa/X+SOqGtH4PJTKquyJvsHT
-	jEOoVYkQ+oMrASTaC8rvtd3Ekq9H0DrU9rlA==;
+	bh=HORcpKNl5P77OslotDTpzvdXhKvc79Dm6vcBc2f2Cfw=; t=1759745211; x=1760350011; 
+	b=YRe9TurpPZqO+QFE4ADnowcxhQD6cXtOHYtMzOGEemPpQ2T9KMoAqIt+9wKPIRMFdpFjQPxxW/D
+	rlI5N5B2O9Huv4PLCXhJI3YPZ6rAraBNQUKa6lHpKz0uJwYAy5guDC3QH2gbHotMxCFWFQup0ynZN
+	X+WCLtW3tPDuAteMqIrumkgOzE8YfkAS3CnjM0nTamOpPhCM6GcS61m6gvwLZehe/HaKELiZhZDNC
+	4u3a1Nbas9LkDtQ50CXsjSjSoCP3KYfLzZ+lhZuEBl/AqAHIUQvsJiyKkbt82kVFYfg2Aan15d4dA
+	+jTh0L1bbdUHHb8qj+d5VZwy8Mn+2bRGV3aA==;
 Received: from inpost2.zedat.fu-berlin.de ([130.133.4.69])
           by outpost.zedat.fu-berlin.de (Exim 4.98)
           with esmtps (TLS1.3)
           tls TLS_AES_256_GCM_SHA384
           (envelope-from <glaubitz@zedat.fu-berlin.de>)
-          id 1v5hzC-00000002lzh-2gAs; Mon, 06 Oct 2025 11:58:30 +0200
+          id 1v5i7E-00000002s6d-3DKw; Mon, 06 Oct 2025 12:06:48 +0200
 Received: from p5b13aa34.dip0.t-ipconnect.de ([91.19.170.52] helo=z6.fritz.box)
           by inpost2.zedat.fu-berlin.de (Exim 4.98)
           with esmtpsa (TLS1.3)
           tls TLS_AES_256_GCM_SHA384
           (envelope-from <glaubitz@physik.fu-berlin.de>)
-          id 1v5hzC-00000002aJ1-1c9N; Mon, 06 Oct 2025 11:58:30 +0200
+          id 1v5i7E-00000002bP1-29Iz; Mon, 06 Oct 2025 12:06:48 +0200
 Received: from glaubitz by z6.fritz.box with local (Exim 4.98.2)
 	(envelope-from <glaubitz@physik.fu-berlin.de>)
-	id 1v5hzC-000000000xV-035o;
-	Mon, 06 Oct 2025 11:58:30 +0200
+	id 1v5i7E-0000000019q-0cDx;
+	Mon, 06 Oct 2025 12:06:48 +0200
 From: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
 To: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org,
@@ -53,9 +53,9 @@ Cc: Andreas Larsson <andreas@gaisler.com>,
 	Michael Karcher <kernel@mkarcher.dialup.fu-berlin.de>,
 	sparclinux@vger.kernel.org,
 	John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
-Subject: [PATCH] Revert "sunvdc: Do not spin in an infinite loop when vio_ldc_send() returns EAGAIN"
-Date: Mon,  6 Oct 2025 11:58:27 +0200
-Message-ID: <20251006095827.3666-1-glaubitz@physik.fu-berlin.de>
+Subject: [PATCH v2] Revert "sunvdc: Do not spin in an infinite loop when vio_ldc_send() returns EAGAIN"
+Date: Mon,  6 Oct 2025 12:02:26 +0200
+Message-ID: <20251006100226.4246-2-glaubitz@physik.fu-berlin.de>
 X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -89,18 +89,21 @@ inside a logical domain on Solaris 11.4:
 Since this change seems to have only been justified by reading the code which
 becomes evident by the reference to adddc32d6fde ("sunvnet: Do not spin in an
 infinite loop when vio_ldc_send() returns EAGAIN") in the commit message, it
-can be safely assumed the change was neither properly tested nor motivated by
-actual bug reports.
+can be safely assumed that the change was neither properly tested nor motivated
+by any actual bug reports.
 
 Thus, let's revert this change to address the disk I/O errors above.
 
 Signed-off-by: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
 ---
+Changes since v1:
+- Rephrase commit message
+---
  drivers/block/sunvdc.c | 5 -----
  1 file changed, 5 deletions(-)
 
 diff --git a/drivers/block/sunvdc.c b/drivers/block/sunvdc.c
-index db1fe9772a4d..a2aaa4cca676 100644
+index 282f81616a78..f56023c2b033 100644
 --- a/drivers/block/sunvdc.c
 +++ b/drivers/block/sunvdc.c
 @@ -45,8 +45,6 @@ MODULE_VERSION(DRV_MODULE_VERSION);
@@ -112,7 +115,7 @@ index db1fe9772a4d..a2aaa4cca676 100644
  static struct workqueue_struct *sunvdc_wq;
  
  struct vdc_req_entry {
-@@ -436,7 +434,6 @@ static int __vdc_tx_trigger(struct vdc_port *port)
+@@ -437,7 +435,6 @@ static int __vdc_tx_trigger(struct vdc_port *port)
  		.end_idx		= dr->prod,
  	};
  	int err, delay;
@@ -120,7 +123,7 @@ index db1fe9772a4d..a2aaa4cca676 100644
  
  	hdr.seq = dr->snd_nxt;
  	delay = 1;
-@@ -449,8 +446,6 @@ static int __vdc_tx_trigger(struct vdc_port *port)
+@@ -450,8 +447,6 @@ static int __vdc_tx_trigger(struct vdc_port *port)
  		udelay(delay);
  		if ((delay <<= 1) > 128)
  			delay = 128;
