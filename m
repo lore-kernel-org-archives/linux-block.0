@@ -1,146 +1,99 @@
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5C362E889C
-	for <linux-block@vger.kernel.org>; Tue,  7 Oct 2025 17:53:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADD9621D3E8
+	for <linux-block@vger.kernel.org>; Tue,  7 Oct 2025 18:14:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759859606; cv=none; b=f2DSEOATH3kGC41mwCXSacKWWgFuO1TzWw6aXUQXn+Cht+o/VNS6A1i0t/qH603uu1X2zhp3cwUgXrmbM3j77HAIm8vJ8l8Iib3272fNw0hZWqeLlG3coH84AD7vuIp+zznd8x6wwsHuT2uej4448+nK/6WcumTf/eREquPMenM=
+	t=1759860843; cv=none; b=XdfKy1YKbE7mYjer+YcVG/OHd+C9+/L6/nr2vS4OKxcyHY3RxgAUv2BGNf8l7/2mdSTAH5kFSgPxsovV57t9F8WqKjZqxxxK2PqVaCuPbkmtVIjY7Q5hazlfKTpLBIo4/SJ98VGZT5e1mAnEAhLUIIiAD+o5hQnbIxiBU2Ns9Ms=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759859606; c=relaxed/simple;
-	bh=qyQ69O9FPIQ/2fLg1OdSIlU4qOEFRUveC46KPIyPHgw=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ZXTH2E8TAzSME7lYzrL3MCDJA5EIBS8BR8CQlhOZeehtc1Usgw98BIZ0WoQgdF2P3ZVpmboOtWrdGRFA9gBNryIoqNdwz5kBmZ47WwURs8yrK/sL+iuJzm4ms7XtEiEIp2zKnSRx6xvTAMJiaP2yvzr2CEyzGOPdbMyGX1rLwws=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=Sw1e+Gl5; arc=none smtp.client-ip=67.231.145.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+	s=arc-20240116; t=1759860843; c=relaxed/simple;
+	bh=Q1mlWwYaLkVluPXmDrFeV3qn9UNrPlRNx3tBAwvjXGs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=djgXj5b9CflZnoon/n2DiljxQJs6CAUkVO2l6rVBIma+0YKBW/ydswrmUYHb2BCqnSCnrL/0PJ1WmZMYWdaLoSqCNZN9X70xxVLlz5EJHxWSMwf6ZqJhfnoq0T/zn14/QsfELdeDzZ1SGYLAxrSCSAX2KKN0P9K7PanfckpA41s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PZDqi0Wg; arc=none smtp.client-ip=209.85.210.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="Sw1e+Gl5"
-Received: from pps.filterd (m0109333.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 597FSQcG3665456
-	for <linux-block@vger.kernel.org>; Tue, 7 Oct 2025 10:53:24 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
-	:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=s2048-2025-q2; bh=N+hNHTQnK6A8zF0Brm
-	JylzXaFw/77S9mJ3a2IKnV200=; b=Sw1e+Gl5jE2har88tADSYc6lnl6Q2g/kAH
-	f8MUgavWrAHpX9XfJGNrz+qkwgpXG7GmHBfnONaCut4/QjdE/trtP9rJ0yw/0BEh
-	JJ93Uar58W24vP+c9mDOrLFLJJbldOttsMneuxBBaB+roZ/5fsNDwCe72nVMd8FO
-	aaGS0TEFqb6AOiZeiOMCr83qd5Zwl63fSDRKM3VG9QtwIqcyja4BkfWAex4ozS2f
-	VdTaCrymUXH7jcT/1lWdoqMAe1pa1l0TYUubO/ib+F5dfwt5OXqRViMEuJc7Lgfu
-	ILP9yHF4uRIsAjrXRjZFdDhOs7K25qXL9sNXTQGo/0vOal8MGwSA==
-Received: from maileast.thefacebook.com ([163.114.135.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 49mwg6ms78-16
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Tue, 07 Oct 2025 10:53:23 -0700 (PDT)
-Received: from twshared25257.02.ash9.facebook.com (2620:10d:c0a8:fe::f072) by
- mail.thefacebook.com (2620:10d:c0a9:6f::237c) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.20; Tue, 7 Oct 2025 17:53:03 +0000
-Received: by devbig197.nha3.facebook.com (Postfix, from userid 544533)
-	id 0AE26278193A; Tue,  7 Oct 2025 10:52:47 -0700 (PDT)
-From: Keith Busch <kbusch@meta.com>
-To: <linux-block@vger.kernel.org>, <linux-nvme@lists.infradead.org>
-CC: <hch@lst.de>, <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>
-Subject: [PATCHv4 0/2] block+nvme: removing virtual boundary mask reliance
-Date: Tue, 7 Oct 2025 10:52:43 -0700
-Message-ID: <20251007175245.3898972-1-kbusch@meta.com>
-X-Mailer: git-send-email 2.47.3
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PZDqi0Wg"
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-793021f348fso868410b3a.1
+        for <linux-block@vger.kernel.org>; Tue, 07 Oct 2025 11:14:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1759860840; x=1760465640; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=lNH7CpxZO3HtMj7WjMvzIrMn+R/eBczieyRcit2i4aA=;
+        b=PZDqi0Wg96vMPhqQbb+0yiL/twuzY/t9JZecBj8oGdTEWSTmf9n0TO3zdfZOF5gR9W
+         8F80uQZJqrMuZFxFA441Tza4PoiwQBg5E0SXqgpI+IM5XDULiNBfIc6a+Kno2uIiWj5Z
+         gpNP8aiNuS8zEwzuOAvTqqzrrhGhlFrzebmq9IOwpbwCQxbSOVx01FU3amrdlD5b1DOI
+         Kz06EmNt3PqMO+/r4uzmQKe9TPyob7Zi6NNRBSDSVA1hbHgun9d6wehP7DgqqnzXTZwF
+         1aVLtJ4fMEIjy56qHfXKwkTOcll161fCRQ4mcRvC7cRDFBLG7BbebJ9vWDD4aadDIGJy
+         nmEw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759860840; x=1760465640;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=lNH7CpxZO3HtMj7WjMvzIrMn+R/eBczieyRcit2i4aA=;
+        b=anljTfozcv7WqHL5HaGlI0/ZF5HmBTvYJrA6B48ec3fNamx5tDU3E7jNtrNuFoFrw4
+         BZi6fb0UoS77whlJpHki3pSm2jzrXsZzQ5MRbLqxS6/7aOxXNe4pUUTtsaRhaE8Ex3kZ
+         ja2upTo/Deoc5/tc8EDb+yigfM3qA6pK/pxDiPyvKwFR/vNO+Ds3Swxs1QRXh44WylwZ
+         2HobZOWWbJ++yYE6taNX23NhjcC/rmH1d+KecKWtEHWq+8QbgjB7iaE7KXVnKaBWExF6
+         /J2Dh+RkyG+9+7FuNlI+btwpFewCvarB3mUCilEy68ntBZlGboMOU963dmokYBrX9Tc3
+         EWow==
+X-Gm-Message-State: AOJu0YzwqbFINkm6rKGQJl98VlU3MEc6PbfX5nWUeskKOXRwb2hm0yFP
+	4HwpKPf3Ehr/jSqiDem09Vi8UixdxUB+Axn3XgVHS5c9inH6fCcwO7ARi0O4BoV1
+X-Gm-Gg: ASbGnctgDJ3hh3ZauQV3c8IEtQRfcMOuVkzJpQAI6igkge51msihwOhHSEpvht8cuTM
+	5/5SxGEHgnH/kPEMsWtTPvk5RBTIS+wKiT8tiHNC+7P84p5VEVZIYlhntMH+odTLD2qWYtUMVNt
+	6hiFtKiyzB8/P5wDofKgn2a/829wOe59lW909mBTeuq2cIGe84hgphUMuQuHtzNT8fJeWv6pHj4
+	vzqyLlgv7MCAINAwbf/wsA7Pj9kTzWVR+0lecj623azv5az4kARB0Ecyv1DEjNZRNtYgKoORBl1
+	EiDxsZZY7XLb3ujrFds5zvJtAQTDX3mRk0J3as2SrdBoTH4Blok+D2KgxXl1IGpT2ryyYNFZScV
+	mZXm464H6dsLgRfN5XueC6tQDSOLAq9pwhzV+NNq64DzI1Ei5jSh1alXHzSt1xg+VhAZKEb1i16
+	Q=
+X-Google-Smtp-Source: AGHT+IGEoaS30JkexbczCkER0b0ny9qzXgkbHht7xAbLrqWH1QGS1GjhAeCdWjt9DWYhbnAnZJI8QA==
+X-Received: by 2002:a17:903:3d0e:b0:25c:46cd:1dc1 with SMTP id d9443c01a7336-2902734491dmr6799305ad.33.1759860839964;
+        Tue, 07 Oct 2025 11:13:59 -0700 (PDT)
+Received: from weg-ThinkPad-P16v-Gen-2.. ([2804:30c:166c:ce00:71cf:b339:3993:4f8a])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-28e8d1b844fsm172349505ad.69.2025.10.07.11.13.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 07 Oct 2025 11:13:59 -0700 (PDT)
+From: Pedro Demarchi Gomes <pedrodemargomes@gmail.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Pedro Demarchi Gomes <pedrodemargomes@gmail.com>
+Subject: [PATCH] loop: remove redundant __GFP_NOWARN flag
+Date: Tue,  7 Oct 2025 15:12:05 -0300
+Message-ID: <20251007181205.228473-1-pedrodemargomes@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-FB-Internal: Safe
-Content-Type: text/plain
-X-Proofpoint-GUID: RqFGQHw-IM2j3lJ9dO0lMLV_xg1dBe09
-X-Proofpoint-ORIG-GUID: RqFGQHw-IM2j3lJ9dO0lMLV_xg1dBe09
-X-Authority-Analysis: v=2.4 cv=PsSergM3 c=1 sm=1 tr=0 ts=68e55393 cx=c_pps
- a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17
- a=x6icFKpwvdMA:10 a=VwQbUJbxAAAA:8 a=VabnemYjAAAA:8 a=D3lQaUfW4OkPWDUkTUkA:9
- a=gKebqoRLp9LExxC7YDUY:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDA3MDE0MSBTYWx0ZWRfX+h9H1FGfjp8r
- 13Jy333YIuzP6Y1kCQpshpfodcAbv7Ba4p8h1mgjncxkCX0+duhU9RYjNyhyguRC+RWWA/AuznC
- isjl0wDNWuqH2NI7uyC2e4hajo/rgQqHWvuCAdZ+ua7Yo2vFffThCGJrnh6HMBwMzuLpjCQN9eB
- FHCgrN8xAblbByFd2uE7VoJHpExh3gbUYLtcBFVbLSplo9c8AFmd+4LAeDveMzXEke9EcGw7CC/
- 4gBfKBL0eSzgmHKnWw0mYorVT7R4ZWcxPYoJed3aqNghI+FSNzKBYpQczxafv4H6S6WfXFB8Ckg
- 2y4CFwpLDwZ/RV1+GRZ87hfgSGgk994q8KVyf4IDzBLTeB6yjGJSAweQVnlr3nhgCPg1Uve3ied
- h/GuN84Ty6wu+UagR62V5/ilHjDCBA==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-10-07_02,2025-10-06_01,2025-03-28_01
+Content-Transfer-Encoding: 8bit
 
-From: Keith Busch <kbusch@kernel.org>
+GFP_NOWAIT already includes __GFP_NOWARN, so let's remove the
+redundant __GFP_NOWARN.
 
-Previous version here:
+Signed-off-by: Pedro Demarchi Gomes <pedrodemargomes@gmail.com>
+---
+ drivers/block/loop.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-  https://lore.kernel.org/linux-nvme/20250821204420.2267923-1-kbusch@meta=
-.com/
-
-The purpose is to allow optimization decisions to happen per IO, and
-flexibility to utilize unaligned buffers for hardware that supports it.
-
-The virtual boundary that NVMe uses provides specific guarantees about
-the data alignment, but that might not be large enough for some CPU
-architectures to take advantage of even if an applications uses aligned
-data buffers that could use it.
-
-At the same time, the virtual boundary prevents the driver from directly
-using memory in ways the hardware may be capable of accessing. This
-creates unnecessary needs on applications to double buffer their data
-into a more restrictive virtually contiguous format.
-
-This patch series provides an efficient way to track segment  boundary
-gaps per-IO so that the optimizations can be decided per-IO. This
-provides flexibility to use all hardware to their abilities beyond what
-the virtual boundary mask can provide.
-
-Note, abuse of this capability may result in worse performance compared
-to the bounce buffer solutions. Sending a bunch of tiny vectors for one
-IO incurs significant protocol overhead, so while this patch set allows
-you to do that, I recommend that you don't. We can't enforce a minimum
-size though because vectors may straddle pages with only a few words in
-the first and/or last pages, which we do need to support.
-
-Changes from v3:
-
- - More comments explaining what the new fields are for
-
- - A bit of refactoring to reuse the bvec gap code
-
- - Also count gaps for passthrough commands, as it's possible to send
-   vectored IO through that interface too.
-
- - The nvme side has all the transport ops specify a callback to get the
-   desired virtual boundary. PCI supports no boundary for SGL capable
-   devices, while TCP and FC never needed it. RDMA and Apple continue to
-   use current virtual boundary mask as it's not clear if its safe to
-   remove it for those.
-
-Keith Busch (2):
-  block: accumulate memory segment gaps per bio
-  nvme: remove virtual boundary for sgl capable devices
-
- block/bio.c                 |  1 +
- block/blk-map.c             |  3 +++
- block/blk-merge.c           | 39 ++++++++++++++++++++++++++++++++++---
- block/blk-mq-dma.c          |  3 +--
- block/blk-mq.c              | 10 ++++++++++
- block/blk.h                 |  9 +++++++--
- drivers/nvme/host/apple.c   |  1 +
- drivers/nvme/host/core.c    | 10 +++++-----
- drivers/nvme/host/fabrics.h |  6 ++++++
- drivers/nvme/host/fc.c      |  1 +
- drivers/nvme/host/nvme.h    |  7 +++++++
- drivers/nvme/host/pci.c     | 28 +++++++++++++++++++++++---
- drivers/nvme/host/rdma.c    |  1 +
- drivers/nvme/host/tcp.c     |  1 +
- drivers/nvme/target/loop.c  |  1 +
- include/linux/bio.h         |  2 ++
- include/linux/blk-mq.h      |  8 ++++++++
- include/linux/blk_types.h   | 12 ++++++++++++
- 18 files changed, 128 insertions(+), 15 deletions(-)
-
---=20
-2.47.3
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 94ec7f747f36..13ce229d450c 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -824,7 +824,7 @@ static void loop_queue_work(struct loop_device *lo, struct loop_cmd *cmd)
+ 	if (worker)
+ 		goto queue_work;
+ 
+-	worker = kzalloc(sizeof(struct loop_worker), GFP_NOWAIT | __GFP_NOWARN);
++	worker = kzalloc(sizeof(struct loop_worker), GFP_NOWAIT);
+ 	/*
+ 	 * In the event we cannot allocate a worker, just queue on the
+ 	 * rootcg worker and issue the I/O as the rootcg
+-- 
+2.43.0
 
