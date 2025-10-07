@@ -1,121 +1,84 @@
-Received: from mail-il1-f177.google.com (mail-il1-f177.google.com [209.85.166.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC8F61F3FF8
-	for <linux-block@vger.kernel.org>; Mon,  6 Oct 2025 23:03:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E39EC1D7E41;
+	Tue,  7 Oct 2025 06:33:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759791807; cv=none; b=Giatae5HT0x3WHRoQEqcbnuNmqr0ritvU0Qg0kbAwbmsjundAumvciVGqSgsa5mywkEPkgxPtZVxkGgcCZU907UIn0QPfhmoc24fIfIMc0OzY+z+0vbxXVLpsLlp7PlH+dsuBjeWR3b5qa8Vd1fAgotCtuTS/bnnrqn+1Eutbbk=
+	t=1759818802; cv=none; b=lPiXWB7j6m0AdsrTvKJm5EYuYm/uxHoShYkpdtQI8+q0kaeLaANAHOdACvSrCZHQOE6MaV5kOdFweMKwFODqcdb68CH2JAVWBFXu4SAQ2/ts8s7ZR0F/fucVBLsZCs7aRmlJicClElcQrwGEee3iTXc9Dt5lDIlDjkA+b04ZPJo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759791807; c=relaxed/simple;
-	bh=/Ai/7CXD6I4InkkM/H6YZi8skp/FKhTv3iQ1U2MW7KE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pw5gkYizEbVv5YBPSrDuJS/ptrJNc8sTm9Hzbgn9kDyervoLgwBZ135/YGQWYBDyOu5COnwCbi3nEUAiv+ggorCyFO/BEtsJ1yjHq1bK3Z6E0ERaEmFewKO8A1GL5qQXp7dKRr2DTbR1NmrwY/6P8HHSmwldtNFZCPv0c2j+Q9I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=gsDuqWuD; arc=none smtp.client-ip=209.85.166.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1759818802; c=relaxed/simple;
+	bh=6WXeHyLqz/3hzI1qpD8zClbG7l4RzXiMFgiQMqQvHdo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EAea3eDzC6btOs/m3i8TwkJEeLPHxbWI01+C8ypcCrgVqm6cW+ptPYKYsSnOFkR8cZ/e8HqoT/jHsb92NUzyU9pU94+SlOPL9xfPo7f+gaS8/+UXE833ZppbiDL1kGJBZqT8PEWeOYNxs7qqy8TUbMOmO+0b0psz+QBcRaswu0s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=XlGBxVrO; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="gsDuqWuD"
-Received: by mail-il1-f177.google.com with SMTP id e9e14a558f8ab-42e7b22e007so17218625ab.3
-        for <linux-block@vger.kernel.org>; Mon, 06 Oct 2025 16:03:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1759791802; x=1760396602; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=UhKOB1LeZ+mbxoao/sRZ8yxswtEf+MPffXFWfBjnldQ=;
-        b=gsDuqWuDyOy0PDgWR/Xqx1vHmUST8CPmUyE/ciimLbJVtTJUf02T4JEuj5shc+V85N
-         OObEuXkCp8nCMtad10QeDMDq4rsxwOjQMjtxYuEIVrUclep9nSTSCH+aDcN7pow2OlfP
-         VmwQ76pC/jxlSU5KKKezNbTUTMuWM0dmQbt41PcNEJVauJ+XNuZqL475YqsB/8tG1Kup
-         /BMRO+7pVovlzJqKS4Gxx2aSssqfkoWu69IimajsS2lTBEfhxqcCWukjeX868SVCYihF
-         LheBDzZfN0Y3uqo8nGTAxiHm+50IrOemqDcU2VS9B8d6XQry3c+spidDdf4vyR7Yvazw
-         KSOQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759791802; x=1760396602;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UhKOB1LeZ+mbxoao/sRZ8yxswtEf+MPffXFWfBjnldQ=;
-        b=e6vehlmk94Qy4rB5O8wlLnd6CRdMvjyjJJmajC7mWYNYtg3Bn7E5WS0kRhUYuy/psy
-         LODvbFPd+k2k/sC+nbk0Pck5IxnVOfBySI50Q6pr7kkVAjxswIOLi/Vvp/VEaWAB4FHE
-         YUZnk7sk09QrT5cO5qhhAH58ks/rHQECZ87n6kWZqKUmUoIEFF2zOPJyGh8tGnPRH/RB
-         GPuTjcXieRjAPVoisGwz9GtbKjE093k/U5H21KweyMcXlyMt1wzXhU0Rb1vngPY7G+Ek
-         e1qTfIzwdvuq7ZkTbmW13i1oxPpZEPJt2LS8Ydklx+1h27FESUI6Ws8qSxLHl8fAG6f2
-         tLTQ==
-X-Gm-Message-State: AOJu0Yybzn92tQdXBqq117MWKWCGrzhd6TXNzmJZNzkM0NkrkE/QKdMw
-	vhq0X/Ms3nZP0Ij/dGmfbhKRdLphaw34w7ziSUnRZJ4NcWIZyK7ks1jKN+e3hHXzUNw=
-X-Gm-Gg: ASbGnctjuQp6fGf2Wa23FpGsenBXtyjSFImeENIovM+lcluGQ1QWKIMrF5aT60IWNZY
-	WnqlaVv01b+oofdjpOkLC2Si8SIUDs9FXeL6uuB/Yt5y833A5O7LtCVwH+AvuTgjxurivTaqOMX
-	9gxS1gGdBjWAz7DSUVegqoGeryU2kLL+3CufqOmEOma5xJYfgZEowj/QeFgwVpqM9TQcdAPrgYb
-	/S/XVSNWCMquI8SFq+12KJg1epXa0DeVIP3g/AAhHW+M6G9BAkIobNIplSc26LYM8LsjCSx85BM
-	2sBaOAXqvSZygi+I7Glu6jTbh1y1kut69do/u5t7dXLyillsb5XIfH7cVxf5sMo0U2BMvSJhQs3
-	Okyx7V/GyrKfwi1nbb4y9dUIesLyTuXI4pig+HpoYuY2i
-X-Google-Smtp-Source: AGHT+IFZki8yvjWv0uD3MZa7HW3OsFV/V9Dt5t19qdy0NZq9NMgc+HgsCv9T6/dPQODY9Y8Dxfff9g==
-X-Received: by 2002:a05:6e02:164f:b0:42a:f84b:9e7f with SMTP id e9e14a558f8ab-42e7ad95e38mr204069925ab.15.1759791801853;
-        Mon, 06 Oct 2025 16:03:21 -0700 (PDT)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-57b5ec07eaasm5137984173.53.2025.10.06.16.03.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 06 Oct 2025 16:03:21 -0700 (PDT)
-Message-ID: <07dbe66c-86d4-4a2d-ab7d-e0a351b3ae9f@kernel.dk>
-Date: Mon, 6 Oct 2025 17:03:19 -0600
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="XlGBxVrO"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=8nHrEDFMgU2PWvCGKXkRqt0J6PV5fTZTmGr4X1Gx/wM=; b=XlGBxVrO/oeHup++rky/KRKst1
+	/QBvNwL9RcmvU7llfXtCT7s3vkglGimotL3mBCaNN2FMNPWvAZWJCSJ6EgIcXlzOZHrCGnHi/RICK
+	lCRC3Bd0BZnRM/NoK5AhmmoIOU54bbK/OkjLK2mWzW26FrV1e2mqbU10QLwoZ+ORXZ9+5M68JJ9vI
+	HIj17T6l+pvCPONdPSkeji+VoY2bmF2MJW3xmmfXp9wJ/IeKKfUNg1CQ0zu2ndT5ImO9tlTnaL1Hx
+	b6CblLMKCRIAoo9by1fzNUR8HjrdfOxNVFPFdT/4vNZD/5cw9ORRzHzcoIfRP9akerZu1hg/x/ADO
+	HnnGHfVw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1v61G9-00000001N5L-3jLs;
+	Tue, 07 Oct 2025 06:33:17 +0000
+Date: Mon, 6 Oct 2025 23:33:17 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org, Mikulas Patocka <mpatocka@redhat.com>,
+	Zhaoyang Huang <zhaoyang.huang@unisoc.com>,
+	Dave Chinner <dchinner@redhat.com>, linux-fsdevel@vger.kernel.org,
+	io-uring@vger.kernel.org
+Subject: Re: [PATCH V4 6/6] loop: add hint for handling aio via IOCB_NOWAIT
+Message-ID: <aOS0LdM6nMVcLPv_@infradead.org>
+References: <20250928132927.3672537-1-ming.lei@redhat.com>
+ <20250928132927.3672537-7-ming.lei@redhat.com>
+ <aN92BCY1GQZr9YB-@infradead.org>
+ <aOPPpEPnClM-4CSy@fedora>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V2 5/5] blk-mq: Replace tags->lock with SRCU for tag
- iterators - Rockchip UFS regression
-To: Bart Van Assche <bvanassche@acm.org>, Ming Lei <ming.lei@redhat.com>,
- Sebastian Reichel <sebastian.reichel@collabora.com>
-Cc: linux-block@vger.kernel.org, Hannes Reinecke <hare@suse.de>,
- Yu Kuai <yukuai3@huawei.com>, kernel@collabora.com,
- linux-rockchip@lists.infradead.org
-References: <20250830021825.2859325-1-ming.lei@redhat.com>
- <20250830021825.2859325-6-ming.lei@redhat.com>
- <pnezafputodmqlpumwfbn644ohjybouveehcjhz2hmhtcf2rka@sdhoiivync4y>
- <CAFj5m9Ki1U6N4N6-=HYy49KfvYAbegmwcXLuKCxjX4E+qy7u7Q@mail.gmail.com>
- <4f16e17d-796b-4896-9d4c-6d227514f1ca@acm.org>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <4f16e17d-796b-4896-9d4c-6d227514f1ca@acm.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aOPPpEPnClM-4CSy@fedora>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On 10/6/25 12:02 PM, Bart Van Assche wrote:
-> On 10/4/25 7:42 AM, Ming Lei wrote:
->>    One possible fix is to check hba->scsi_host_added before calling
->> scsi_host_busy():
->>
->>    dev_err(hba->dev, "%d outstanding reqs, tasks=0x%lx\n",
->>        hba->scsi_host_added ? scsi_host_busy(hba->host) : 0,
->>        hba->outstanding_tasks);
+On Mon, Oct 06, 2025 at 10:18:12PM +0800, Ming Lei wrote:
+> On Fri, Oct 03, 2025 at 12:06:44AM -0700, Christoph Hellwig wrote:
+> > On Sun, Sep 28, 2025 at 09:29:25PM +0800, Ming Lei wrote:
+> > > - there isn't any queued blocking async WRITEs, because NOWAIT won't cause
+> > > contention with blocking WRITE, which often implies exclusive lock
+> > 
+> > Isn't this a generic thing we should be doing in core code so that
+> > it applies to io_uring I/O as well?
 > 
-> My preference is to add a check inside scsi_host_busy(), e.g. as follows
-> (entirely untested):
+> No.
 > 
-> diff --git a/drivers/scsi/hosts.c b/drivers/scsi/hosts.c
-> index cc5d05dc395c..17173239301e 100644
-> --- a/drivers/scsi/hosts.c
-> +++ b/drivers/scsi/hosts.c
-> @@ -611,8 +611,9 @@ int scsi_host_busy(struct Scsi_Host *shost)
->  {
->      int cnt = 0;
+> It is just policy of using NOWAIT or not, so far:
 > 
-> -    blk_mq_tagset_busy_iter(&shost->tag_set,
-> -                scsi_host_check_in_flight, &cnt);
-> +    if (shost->tag_set.ops)
-> +        blk_mq_tagset_busy_iter(&shost->tag_set,
-> +                    scsi_host_check_in_flight, &cnt);
->      return cnt;
->  }
->  EXPORT_SYMBOL(scsi_host_busy);
+> - RWF_NOWAIT can be set from preadv/pwritev
+> 
+> - used for handling io_uring FS read/write
+> 
+> Even though loop's situation is similar with io-uring, however, both two are
+> different subsystem, and there is nothing `core code` for both, more importantly
+> it is just one policy: use it or not use it, each subsystem can make its
+> own decision based on subsystem internal.
 
-Agree, that's a nicer way to solve it, putting that stuff outside
-of actual drivers.
-
--- 
-Jens Axboe
+I fail to parse what you say here.  You are encoding special magic
+about what underlying file systems do in an upper layer.  I'd much
+rather have a flag similar FOP_DIO_PARALLEL_WRITE that makes this
+limitation clear rather then opencoding it in the loop driver while
+leabing the primary user of RWF_NOWAIT out in the cold.
 
