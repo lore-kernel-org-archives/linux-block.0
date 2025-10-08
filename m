@@ -1,50 +1,42 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F33E14A09C;
-	Wed,  8 Oct 2025 05:56:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 872E629D292;
+	Wed,  8 Oct 2025 06:14:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759902972; cv=none; b=AbHUbSliu/YcxMOffBlHdEeQbBWI0koy9paHrvKiZ1TqjhfbdeR1vdoHCEhpn+ggGiGwXdSVxL1nuIrwpGorhaXn1brOySj+/hVFbVlLD8fAyxd7hB6Ptuhf2qrG/Cr2UmeH8OAKXXlQKCuFsr/jMFy46Hj4bdyK1HclPQQDZQY=
+	t=1759904057; cv=none; b=BqxSn11QM7pn8ZK+8gVtiGGZFpWqIUHJDo+Yf/ajMKT+G7oTXOdlWk/7gkpnjq7/dbtimAXcd3tSNH9RVRge87oCLWSpc8c2OGpJIJydZvv5nDcpMn4tgHgD6IuKx6WfFnySI4yBaCTf7Dp6b5RxKPsRj1C+f/ZmUZYvYRoLRZ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759902972; c=relaxed/simple;
-	bh=F38Mt2goSKLUsaf0mqFqP8niI3l76+ZAo94FJ+L4YVU=;
+	s=arc-20240116; t=1759904057; c=relaxed/simple;
+	bh=WswQbeUWBAMV25CA4i+SPcySveFy4PoQ1NaxzzlS4Fg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cwgfq/TwtmVYcKE+ErLeNM+fKmwSBcmHE1I6AKVjBWcVv6k45R6tpk9sTMh3untlRwDgHxV8heLiu/w1nLgZ05ZatYHSreui1i/Xocifk2BBQWbcu2m5LoInVWac3dSFThjX2ePSuqI360O0FLvMQBs2lzSonGUMEeVZIkaT3Ec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=lmszr0oj; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="lmszr0oj"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=/X26947JAoSSaLr+voBnU4Dp3KYTt3aLBJ6Xsf1gpD0=; b=lmszr0ojI9mQdYgfTYqnyaoeHV
-	9ZDvvcG3tOTjG4m5X+YgY2l+cotTuwVfNFCSJ0oY3t4t6nuMw3e4jIUbAaw3+UFeDdb4vYLIY1w80
-	1NsL6VX0phUO20oqAkI3GLSsAEctWdqAz6Fzw17jbq1yyEhomCwDI18NSeD3QTjfX2bPO7kA/V6ZQ
-	vfHiHgIpY6hUSUxD5QWSGLRjPvP1h6pleDH5NuufJKKDU3pcr+n/7/E9ca4jaYM+bq67TktXyxzQV
-	g9A11TCh5ni3ICAnfs8oZ4I8GNg6QJfM4GvvV+I/d6WYARHXzXBuSoqAFu8fuOEBGm9a/2Sdmfx7r
-	qy8odKEw==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1v6N9d-00000003Ez0-18fd;
-	Wed, 08 Oct 2025 05:56:01 +0000
-Date: Tue, 7 Oct 2025 22:56:01 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org, Mikulas Patocka <mpatocka@redhat.com>,
-	Zhaoyang Huang <zhaoyang.huang@unisoc.com>,
-	Dave Chinner <dchinner@redhat.com>, linux-fsdevel@vger.kernel.org,
-	io-uring@vger.kernel.org
-Subject: Re: [PATCH V4 6/6] loop: add hint for handling aio via IOCB_NOWAIT
-Message-ID: <aOX88d7GrbhBkC51@infradead.org>
-References: <20250928132927.3672537-1-ming.lei@redhat.com>
- <20250928132927.3672537-7-ming.lei@redhat.com>
- <aN92BCY1GQZr9YB-@infradead.org>
- <aOPPpEPnClM-4CSy@fedora>
- <aOS0LdM6nMVcLPv_@infradead.org>
- <aOUESdhW-joMHvyW@fedora>
+	 Content-Type:Content-Disposition:In-Reply-To; b=k2jbHiwmJQRpW0Xj1Y/a9Nfv26ojY42J5fJi79r8Fj7veLkhDLhRGY+DfGb+MNavL2taX12qASvnMpeWNjzea6bndaEwYNNZrXrsFe/i8R6N8u7TN3UnC5xSC5i9yBhpfOSDdol4ZxH029WfeofLMZ36LZPOHf9+dUtXGNtzyuU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 35396227AAE; Wed,  8 Oct 2025 08:14:04 +0200 (CEST)
+Date: Wed, 8 Oct 2025 08:14:04 +0200
+From: hch <hch@lst.de>
+To: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+Cc: hch <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-trace-kernel@vger.kernel.org" <linux-trace-kernel@vger.kernel.org>,
+	"linux-btrace@vger.kernel.org" <linux-btrace@vger.kernel.org>,
+	John Garry <john.g.garry@oracle.com>,
+	Hannes Reinecke <hare@suse.de>, Damien Le Moal <dlemoal@kernel.org>,
+	Naohiro Aota <Naohiro.Aota@wdc.com>,
+	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>
+Subject: Re: [PATCH v2 11/15] blktrace: add block trace commands for zone
+ operations
+Message-ID: <20251008061403.GA13979@lst.de>
+References: <20250925150231.67342-1-johannes.thumshirn@wdc.com> <20250925150231.67342-12-johannes.thumshirn@wdc.com> <20251003073257.GE12624@lst.de> <4638c185-ac5c-41e3-8c79-5c995228ec0e@wdc.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -53,60 +45,17 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aOUESdhW-joMHvyW@fedora>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <4638c185-ac5c-41e3-8c79-5c995228ec0e@wdc.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Tue, Oct 07, 2025 at 08:15:05PM +0800, Ming Lei wrote:
-> NOWAIT is obviously interface provided by FS, here loop just wants to try
-> NOWAIT first in block layer dispatch context for avoiding the extra wq
-> schedule latency.
+On Tue, Oct 07, 2025 at 01:08:00PM +0000, Johannes Thumshirn wrote:
+> Sure for the old commands everything is still in the lower 32bits, this 
+> has the nice property that we don't need to duplicate all the code for 
+> v1 and v2.
 
-Yes.
-
-> But for write on sparse file, trying NOWAIT first may bring extra retry
-> cost, that is why the hint is added. It is very coarse, but potential
-> regression can be avoided.
-
-And that is absolutely not a property of loop, and loop should not have
-to know about.  So this logic needs to be in common code, preferably
-triggered by a fs flag.  Note that this isn't about holes - it is about
-allocating blocks.  For most file systems filling holes or extending
-past i_size is what requires allocating blocks.  But for a out of place
-write file systems like btrfs, or zoned xfs we always need to allocate
-blocks for now.  But I have work that I need to finish off that allows
-for non-blocking block allocation in zoned XFS, at which point you
-don't need this.  I think some of this might be true for network file
-systems already.
-
-> 
-> > rather have a flag similar FOP_DIO_PARALLEL_WRITE that makes this
-> > limitation clear rather then opencoding it in the loop driver while
-> 
-> What is the limitation?
-
-See above.
-
-> > leabing the primary user of RWF_NOWAIT out in the cold.
-> 
-> FOP_DIO_PARALLEL_WRITE is one static FS feature,
-
-It actually isn't :( I need to move it to be a bit more dynamic on a
-per-file basis.
-
-> but here it is FS
-> runtime behavior, such as if the write can be blocked because of space
-> allocation, so it can't be done by one static flag.
-
-Yes, that's why you want a flag to indicate that a file, or maybe file
-operations instance can do non-blocking fill of blocks.  But that's
-for the future, for now I just want your logic lifted to common code
-and shared with io_uring so that we don't have weird hardcoded
-assumptions about file system behavior inside the loop driver.
-
-> io-uring shares nothing with loop in this area, it is just one policy wrt.
-> use NOWAIT or not. I don't understand why you insist on covering both
-> from FS internal...
-
-It's really about all IOCB_NOWAIT users, io_uring being the prime one,
-and the one that we can actually easily write tests for.
+I don't think you need to duplicate anything, just have a little
+function that maps from the free-form v2 commands and flags to the
+v1 field.  Preferably including a mapping of all unsupported ones to
+a catchall unsupported command and flag each to indicate that the
+trace includes something only visible with v2.
 
