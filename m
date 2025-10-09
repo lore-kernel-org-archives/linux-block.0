@@ -1,115 +1,117 @@
-Received: from mail-yx1-f44.google.com (mail-yx1-f44.google.com [74.125.224.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 800AD2DF3F9
-	for <linux-block@vger.kernel.org>; Thu,  9 Oct 2025 11:19:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 361EB2C21F1;
+	Thu,  9 Oct 2025 11:20:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760008783; cv=none; b=Eq2kEyZv03X/23thX5fDIVgc4dKJV9L0P0hdLbNvcqHP+bVRQYIqA58scG4Cy2XA061JRGhbCif3EQeJRR0/KVyV0yDhAGTrcq8rvDe3V/0QAu5XWYe6UDfRJaDJkV8UbuJpYS/FKqBHeSvX4wdCmnkjBqa9KenpVA2WNkpDRoo=
+	t=1760008828; cv=none; b=eUlMN1bh0BUwzQ9JL5o3YNrTyb64xK+BdvCJO4d6Dusa2dTzPenQohvIIpG4xnwudJVsdSlQC1dt0VClKc7xvKpFp5mije58Nv9UwRcNnmmeSOroK8d2EK2VjuQsBvRoL1x4KsCA5xqfrlteNuvPyBvluey5h01EJuZ1HoZlXcU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760008783; c=relaxed/simple;
-	bh=mzeWOdj3lBj+Ke0QviDFWI2aF1kcLsskxWN0A79AnHU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tKlocSxO9O6ESL9ru4p2EL2BsQLu2IgRhCW6g4xKZAlnKCVpJr1S/NzcmbijVR+Y1ENBqi6nLOjwAVBTAYN+m93NG6Q12Etm2R1rycwihGJcz/dAw08esuVcaweCM+gIEtm6Fic71Djk4FmYUBQRhMxCIkFgUK4uupHzuw88QI0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jNoiJ37l; arc=none smtp.client-ip=74.125.224.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1760008828; c=relaxed/simple;
+	bh=QjcEKf99YwFjnzXuDCEeH98lWD1QPHRc5zZlVu3YH34=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rgNcjiLOp9fRe18q6V6F5gt4P5ReGlRejQpASyMkQfIdYaW53Mde7aXRVW3bbjkwMIno8OEyr3ufGWb4UbVdS4qIhTcCzMQnOYc/6iBEsscn/2AwtjwAPCpj7XeL033lfg6/2lxoNEsQHSoC1ZidfSbJFRehwZF5rBLP7vV71qI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=LzBCUEyg; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jNoiJ37l"
-Received: by mail-yx1-f44.google.com with SMTP id 956f58d0204a3-63606491e66so638694d50.2
-        for <linux-block@vger.kernel.org>; Thu, 09 Oct 2025 04:19:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760008779; x=1760613579; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mzeWOdj3lBj+Ke0QviDFWI2aF1kcLsskxWN0A79AnHU=;
-        b=jNoiJ37lCUQ9Hrm2hMpur0n3OpmXylsTAvQFzFo0gEHLdPW1H7xLOEfZx9IMP3xJGG
-         VvaFojxgSsr0dFIBvT0p9gx6C2qVKiKNUQeCfRio9yhV6GZjq9rpyyrteqxqW9Ew3dBm
-         wtvaqMjirKwpcBo4MgJpiCLn7sWEkQpEyqFiwGTjc5zHrlT4QCRizWiXWVk6zMf3FYYn
-         bzUTIQSKLADIffCIHWelPhf43EqQYtzVSfMGzuGbrzIwj9QJsP6FN+oluyC+bzTKhDgF
-         5nZ3Uo6yeEy5h0e9DLaazODqWGp9Q080LEkzOtn2P2FcQKQiw+6Kon0LQ4PFBZDDcg2+
-         Grtw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760008779; x=1760613579;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mzeWOdj3lBj+Ke0QviDFWI2aF1kcLsskxWN0A79AnHU=;
-        b=GClMBBhNPPlO8f80cpaRjpNsFzKVBnQCriulhbyJsPFoZSwb/sDv52nuGv86H8hcLg
-         tqV45Na6Kvm8kdDyEUb14JPMA39I2c5VK05MD0Df9fTB0d1YkPjVOFhM986BO2+Wi9AK
-         9gs95gFDoaNX/aXlwVnP12T5tOprIthd5YLEj4UJ1aq79R5EfGRXt2oE6cTQinN7dN30
-         dSPm4E3ahxxnW6FLFAJiEKIyCqDVGfnTFnVqzJh1GzWCRllWk8tUQlQlWgHvD1K7FH68
-         VliNOWAA7AnxsJ4chyoWUvh5vDN8B+DYdULPzdJxSO8icEZSBOgGJdzHjAYDLEsOJyPh
-         ADOQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU3HYMFxzmEZfWFCPyoH9pvSget2Dz6R2vQoKjTzfCb+Kz4qma6Qaat+A+fBn+vnjywz2URShxFMFugBg==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz59Vy5b9dSTCZsnp3LL4c76m+Xy8eMn80+fmTcusWNJ557lRLL
-	Ent07mqbcg02F9QFLeHpPhNCCOZpvbWNwQpNzSsz2QV1R/ax7RYJ+YNoKAt2wW9drOVHW3fubsg
-	I33oyjP8lBD3FDCrB4+FjS1cbCxXNSkA=
-X-Gm-Gg: ASbGncsr6Wphz0e4FAiSUgMZOaqvsxy2nQYctPkyUXxsh7XgrdxQH69p1qvTfRW83J5
-	w6mZpYreQwlEO8hR2gXhdvRhacz9nLYNwvn3uNARYIc4ggZiie+M3Gl1XIGkh4J7AfDmbFYA1lt
-	LmcNEhk4vHGoWq4TrLs/iTvCUHIiUj8pvzEbLeSnvHWhGOeDFokOdR4g/JmM7kwg0U6bCZRm4Vx
-	M0Fh5YaRsi28xcnzzN7fNM+RexU3A4=
-X-Google-Smtp-Source: AGHT+IE5U7JyGi1AmeLjDi25hUOta+sU2hpJbVTN9Ai63ARDyOdLqRjdCN3h5Wr4u+tqZlHZJ+/pg/7Xr5jCWFq4BIc=
-X-Received: by 2002:a53:d048:0:10b0:63b:8e80:c017 with SMTP id
- 956f58d0204a3-63ccb672a0emr6807745d50.0.1760008779377; Thu, 09 Oct 2025
- 04:19:39 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="LzBCUEyg"
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5993GvX1002693;
+	Thu, 9 Oct 2025 11:20:10 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=oSyewR
+	1O86+iaGQRpRAhZnh2rN7TGtmaoIS6vlfie/8=; b=LzBCUEygy0jERqJm6s5HZB
+	5GaaPnjnepPcT6J6Nih7su9AnJd9BoyeEB/xOjRV3yDyYZDHEuXbBDNI1pm7WIVy
+	RZ/63cLpQRqsm0k/e0khIixj/z9TM1oTUYeeJIeULsXzEGr32vOJcjzwfkfaZsKY
+	6Uwc7Soekl3VIJaNm/dbeT3hbHbunVI2YuvD2q4TNAj5iG8RdvUCwNQjADu8L/1l
+	kixdPuSOtjxOtb/saXuIX0Ex9Yc+hIjArm0wsypC9XfnWP/FAxrwoPFY4bosHUkf
+	0hKcE64h0IPFFtRixIgMRf9u2UhAhkRHGzRvwhj5xzVGywAZGeX1naXDEnZfGpsg
+	==
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 49nv86vawq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 09 Oct 2025 11:20:10 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5998LJm3020997;
+	Thu, 9 Oct 2025 11:20:09 GMT
+Received: from smtprelay06.dal12v.mail.ibm.com ([172.16.1.8])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 49nv9mv7dm-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 09 Oct 2025 11:20:09 +0000
+Received: from smtpav06.dal12v.mail.ibm.com (smtpav06.dal12v.mail.ibm.com [10.241.53.105])
+	by smtprelay06.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 599BK96D22217458
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 9 Oct 2025 11:20:09 GMT
+Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 199A158055;
+	Thu,  9 Oct 2025 11:20:09 +0000 (GMT)
+Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id F22E658043;
+	Thu,  9 Oct 2025 11:20:05 +0000 (GMT)
+Received: from [9.109.198.200] (unknown [9.109.198.200])
+	by smtpav06.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Thu,  9 Oct 2025 11:20:05 +0000 (GMT)
+Message-ID: <a79cb3bf-d9e4-4c29-85f8-e7bfc504b190@linux.ibm.com>
+Date: Thu, 9 Oct 2025 16:50:04 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250913003842.41944-1-safinaskar@gmail.com> <20250913003842.41944-29-safinaskar@gmail.com>
- <20250913054837.GAaMUFtd4YlaPqL2Ov@fat_crate.local> <20250913055851.GBaMUIGyF8VhpUsOZg@fat_crate.local>
-In-Reply-To: <20250913055851.GBaMUIGyF8VhpUsOZg@fat_crate.local>
-From: Askar Safin <safinaskar@gmail.com>
-Date: Thu, 9 Oct 2025 14:19:03 +0300
-X-Gm-Features: AS18NWAGN6ExXhEWeXK-ERFvGpf6JdjWShiWpIPYOnPjMCR9bXVHwIY8E_1WxIc
-Message-ID: <CAPnZJGBwFqNAybORpTtRfjtGwMQiBtd+rATD=mh8ZgE3owT_ow@mail.gmail.com>
-Subject: Re: [PATCH RESEND 28/62] init: alpha, arc, arm, arm64, csky, m68k,
- microblaze, mips, nios2, openrisc, parisc, powerpc, s390, sh, sparc, um, x86,
- xtensa: rename initrd_{start,end} to virt_external_initramfs_{start,end}
-To: Borislav Petkov <bp@alien8.de>
-Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Linus Torvalds <torvalds@linux-foundation.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Christian Brauner <brauner@kernel.org>, 
-	Al Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@lst.de>, 
-	Jens Axboe <axboe@kernel.dk>, Andy Shevchenko <andy.shevchenko@gmail.com>, 
-	Aleksa Sarai <cyphar@cyphar.com>, =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>, 
-	Julian Stecklina <julian.stecklina@cyberus-technology.de>, 
-	Gao Xiang <hsiangkao@linux.alibaba.com>, Art Nikpal <email2tema@gmail.com>, 
-	Andrew Morton <akpm@linux-foundation.org>, Alexander Graf <graf@amazon.com>, 
-	Rob Landley <rob@landley.net>, Lennart Poettering <mzxreary@0pointer.de>, linux-arch@vger.kernel.org, 
-	linux-alpha@vger.kernel.org, linux-snps-arc@lists.infradead.org, 
-	linux-arm-kernel@lists.infradead.org, linux-csky@vger.kernel.org, 
-	linux-hexagon@vger.kernel.org, loongarch@lists.linux.dev, 
-	linux-m68k@lists.linux-m68k.org, linux-mips@vger.kernel.org, 
-	linux-openrisc@vger.kernel.org, linux-parisc@vger.kernel.org, 
-	linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org, 
-	linux-s390@vger.kernel.org, linux-sh@vger.kernel.org, 
-	sparclinux@vger.kernel.org, linux-um@lists.infradead.org, x86@kernel.org, 
-	Ingo Molnar <mingo@redhat.com>, linux-block@vger.kernel.org, initramfs@vger.kernel.org, 
-	linux-api@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-efi@vger.kernel.org, linux-ext4@vger.kernel.org, 
-	"Theodore Y . Ts'o" <tytso@mit.edu>, linux-acpi@vger.kernel.org, Michal Simek <monstr@monstr.eu>, 
-	devicetree@vger.kernel.org, Luis Chamberlain <mcgrof@kernel.org>, Kees Cook <kees@kernel.org>, 
-	Thorsten Blum <thorsten.blum@linux.dev>, Heiko Carstens <hca@linux.ibm.com>, patches@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [patch v2 3/7] blk-mq: add a new queue sysfs attribute
+ async_depth
+To: Yu Kuai <yukuai1@huaweicloud.com>, axboe@kernel.dk, bvanassche@acm.org,
+        ming.lei@redhat.com, jmoyer@redhat.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yukuai3@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com,
+        johnny.chenyi@huawei.com
+References: <20251009074634.527661-1-yukuai1@huaweicloud.com>
+ <20251009074634.527661-4-yukuai1@huaweicloud.com>
+Content-Language: en-US
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <20251009074634.527661-4-yukuai1@huaweicloud.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 3tSKUwcYMoDv2i0tC-7RPFnCX42ydJgl
+X-Proofpoint-ORIG-GUID: 3tSKUwcYMoDv2i0tC-7RPFnCX42ydJgl
+X-Authority-Analysis: v=2.4 cv=MKNtWcZl c=1 sm=1 tr=0 ts=68e79a6a cx=c_pps
+ a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
+ a=IkcTkHD0fZMA:10 a=x6icFKpwvdMA:10 a=i0EeH86SAAAA:8 a=VnNF1IyMAAAA:8
+ a=DGc0GZ7HoTz3mdxrIMAA:9 a=QEXdDO2ut3YA:10 a=cPQSjfK2_nFv0Q5t_7PE:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDA4MDEyMSBTYWx0ZWRfXwNyuhdlbddr8
+ /FG8OzwqNwedSBHu4YbDjLN1vzxIIZ/BOwm2OfenPOaAsPLjYbov7RkWv9q2z7bjQb1FVKNpY0q
+ OAynECB4KjVWjrgWmpu4tSrBWIoSPBLCxgAL4SLgqu5PjE8Mv4SMJSDTBOgPyNlVAoc8m8/JeRB
+ Lbz5v2NHcuHLcqcdd3fN8PMiFYOiwN2gJ08vKdb39m/xW3xM84gOYSA6eFv2/0soUScivDdtLmv
+ ZyQtCdatFQwdicsUuoszJCiWDo2TdfXUjnlFELu3eybOV7PA662tL41a5OKfN/hoZ7CGS2oj+rU
+ tustneQ0Utvg+5T+Lmrm3yDMPlTgwzOmG1PPmo3lIsdULN3fWyPBIQ6Pb5hCDr78a3aKnJchWiX
+ T52gJpKnqLo/fY35s0no8GPL5/nTsQ==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-10-09_03,2025-10-06_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ adultscore=0 phishscore=0 malwarescore=0 bulkscore=0 spamscore=0
+ priorityscore=1501 suspectscore=0 lowpriorityscore=0 clxscore=1011
+ impostorscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2510020000
+ definitions=main-2510080121
 
-On Sat, Sep 13, 2025 at 9:00=E2=80=AFAM Borislav Petkov <bp@alien8.de> wrot=
-e:
-> Ooh, now I see it - you have virtual and physical initramfs address thing=
-s. We
-> usually call those "va" and "pa". So
->
-> initramfs_{va,pa}_{start,end}
 
-Okay, I will call external_initramfs_{va,pa}_{start,end}
-(after I will remove initrd, which will happen after a year)
 
-"external" means "bootloader-supplied" as opposed to builtin initramfs.
+On 10/9/25 1:16 PM, Yu Kuai wrote:
+> From: Yu Kuai <yukuai3@huawei.com>
+> 
+> Add a new field async_depth to request_queue and related APIs, this is
+> currently not used, following patches will convert elevators to use
+> this instead of internal async_depth.
+> 
+> Also factor out a helper blk_mq_limit_depth() to make code cleaner.
+> 
+> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 
---=20
-Askar Safin
+Looks good to me:
+Reviewed-by: Nilay Shroff <nilay@linux.ibm.com>
