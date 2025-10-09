@@ -1,48 +1,48 @@
 Received: from 004.mia.mailroute.net (004.mia.mailroute.net [199.89.3.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25DD870830;
-	Thu,  9 Oct 2025 17:02:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2440323D2AB;
+	Thu,  9 Oct 2025 17:05:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760029371; cv=none; b=WuDvwxj5DMfNMnSslKeXNLLBR/60CndLq9KezGJT7C3iCMtV+oFUYHeA0YilFl61HsouXuBEcJ1hKui/CzHtddWjKcrVHukx1HmAAWQzewsjqtm5dWwaiUoALS3jqq9lAhmEoqP7iOaiYEO0qkclN/BE3IxapNLWiXoLHayPPpM=
+	t=1760029542; cv=none; b=sMAV4B/e9LdUz3HxL8/QLaWR2cpB/rlZquVbDp2+GPIlYaM5Wy4QNqErSwGpDpWl572n1hosQdwo+tIhUI9pO/CjD0tpaLntpIcqsbauRnAg9ofeFCb9UdK/gULgNHEVwovS0U+hKTLxg/1zRXjjm/AjZ54gZKRtHYkHIXEFmj0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760029371; c=relaxed/simple;
-	bh=Vk0WZne0ckcXOS9aSDqZ/e8QPHNPr4IH+y0smiVWHaM=;
+	s=arc-20240116; t=1760029542; c=relaxed/simple;
+	bh=0ZE/jGvm6aL4wVZv112il9NPd7AW4QAQ9v7SEMKi9Sk=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ItMgi20P+f8scLhZhzYvl3LuOkdqmBvzquPW4QuKT9wD7cRqWl+GK5t4j/YZJ0kDokLEBkzfwB36KpLhZRFtJ9Jdd68MT28tTtn8SCim+fv+9fqjo25rnha7kz490Q6Nr++RokS0zIw2j5+lGYfiIxS32oeagRC27eTJrIlI8zs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=iOxEOv+i; arc=none smtp.client-ip=199.89.3.7
+	 In-Reply-To:Content-Type; b=n/93pemR7g4XAjv+yyDSBzUDa2lYIlCdFxmQ7C3Y9Dp9WaRjR2SPlPJ/UNX24CWwrIRNk8416kjbt9H6HLS8xpJlMa5wsrs/SovRCQ8bPvNkrsM18DYNc2WMFzXxQXByrjlo0HH8J+9/WBE9FxJHppG1i00URdlo/tM9u5tIi3A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=K5lAT7o+; arc=none smtp.client-ip=199.89.3.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="iOxEOv+i"
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="K5lAT7o+"
 Received: from localhost (localhost [127.0.0.1])
-	by 004.mia.mailroute.net (Postfix) with ESMTP id 4cjGQd0tqnzm16km;
-	Thu,  9 Oct 2025 17:02:49 +0000 (UTC)
+	by 004.mia.mailroute.net (Postfix) with ESMTP id 4cjGTw1C60zm0ytn;
+	Thu,  9 Oct 2025 17:05:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
 	content-transfer-encoding:content-type:content-type:in-reply-to
 	:from:from:content-language:references:subject:subject
 	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1760029367; x=1762621368; bh=4fiahecIXq1djVixNOIamEFh
-	sM6eRYvOL0gCjVWJ8uc=; b=iOxEOv+ix+f9gnzaB/X06IkAwHlgmBZDjk5D44Nw
-	p7LlJmM9jfMZDVqSVOse3D8QREDT2xfdOXSnkbotwkQr7QwRgV0KayrQHS9JJzYs
-	4yhWM+sxFJxbLcX4etsXf/tcjrc1JhncA1oBf6xQqBLsO1KLqXPIIUSaThRfuyIS
-	ndOGgpcEKumEcZWH0AUL3OprD1brSCroS5vdaX7G+AKwQ5XQR3PG/fotggGHWoun
-	I24hGR/Z4+4+ZYAkBWt/F6lwkjr+hLs/M9/GAKebVYPCahyDjgMJ31NzwU4/pRGb
-	IcnuXFQWnHjczUt2x66e+pRqNb2EZw03pfWr+2BMsYArVw==
+	 s=mr01; t=1760029538; x=1762621539; bh=ASbHD4hHgKK4/wqMUDMSHNZq
+	gmJoYXs6WYurcxNLSO8=; b=K5lAT7o+zrUYz2s5JXVTFJd2+KRR6up+NnKogSK7
+	cxwXJPWI9TiOpWyfXjFUHSgPBSMDN5h3Hd6+t6hlCcz0zPYrP9/O5v95MyGDj4Ob
+	S4Ktt4dfXSmh/k8HvxRiB3TVWxazsrHQ1bcDXimCXrQdN0ynq5udfY/inlp3YOT2
+	+T3GPF4SYe7bXCz41O17nB7ze6+QDPzKUSR2BHTZc/ypSnc7PDT6TFjWDRZ0hTb9
+	uqT2CDYYawAI4C/wHcf0XSLFzl6Y9Ja6gk8R3L5LB8PkZV+qDNSi80etkMbFsyND
+	/RREh8UPSZrO/i5iLmu7/yLKzzbtZkaW6yWdj+JGTFMGhA==
 X-Virus-Scanned: by MailRoute
 Received: from 004.mia.mailroute.net ([127.0.0.1])
  by localhost (004.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id UStVePItFUTU; Thu,  9 Oct 2025 17:02:47 +0000 (UTC)
+ id 7Q1p1ARXfwZu; Thu,  9 Oct 2025 17:05:38 +0000 (UTC)
 Received: from [100.119.48.131] (unknown [104.135.180.219])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: bvanassche@acm.org)
-	by 004.mia.mailroute.net (Postfix) with ESMTPSA id 4cjGQM2GpKzm16kl;
-	Thu,  9 Oct 2025 17:02:34 +0000 (UTC)
-Message-ID: <c7ce7e7b-3195-4609-807d-fedc87515740@acm.org>
-Date: Thu, 9 Oct 2025 10:02:33 -0700
+	by 004.mia.mailroute.net (Postfix) with ESMTPSA id 4cjGTj2hK6zm0ytk;
+	Thu,  9 Oct 2025 17:05:28 +0000 (UTC)
+Message-ID: <49647ccf-5d19-4ede-87b4-0f7ff8e9f5ea@acm.org>
+Date: Thu, 9 Oct 2025 10:05:27 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -50,30 +50,34 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [patch v2 2/7] blk-mq-sched: unify elevators checking for async
- requests
+Subject: Re: [patch v2 3/7] blk-mq: add a new queue sysfs attribute
+ async_depth
 To: Yu Kuai <yukuai1@huaweicloud.com>, axboe@kernel.dk, ming.lei@redhat.com,
  nilay@linux.ibm.com, jmoyer@redhat.com
 Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
  yukuai3@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com,
  johnny.chenyi@huawei.com
 References: <20251009074634.527661-1-yukuai1@huaweicloud.com>
- <20251009074634.527661-3-yukuai1@huaweicloud.com>
+ <20251009074634.527661-4-yukuai1@huaweicloud.com>
 Content-Language: en-US
 From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20251009074634.527661-3-yukuai1@huaweicloud.com>
+In-Reply-To: <20251009074634.527661-4-yukuai1@huaweicloud.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 10/9/25 12:46 AM, Yu Kuai wrote:
-> +static inline bool blk_mq_sched_sync_request(blk_opf_t opf)
+> +static ssize_t queue_async_depth_show(struct gendisk *disk, char *page)
 > +{
-> +	return op_is_sync(opf) && !op_is_write(opf);
+> +	ssize_t ret;
+> +
+> +	mutex_lock(&disk->queue->elevator_lock);
+> +	ret = queue_var_show(disk->queue->async_depth, page);
+> +	mutex_unlock(&disk->queue->elevator_lock);
+> +	return ret;
 > +}
 
-The "sched" part in the function name suggests that this function
-schedules something while it only tests something. Maybe
-"blk_mq_is_sync_read()" is a better function name?
+Functions like the above can be simplified by using guard(mutex)(...) or
+scoped_guard(mutex, ...).
 
 Thanks,
 
