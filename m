@@ -1,117 +1,229 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BC2E2D7DE5;
-	Thu,  9 Oct 2025 11:27:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CB081E47A3
+	for <linux-block@vger.kernel.org>; Thu,  9 Oct 2025 13:45:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760009225; cv=none; b=vGfp6iyyRwMjWiNMSa8mM6TvinvIU3Zph4TiLsiL4VumFdYNNG/TmEX9ANoPhJ+5q/gfgRBwHXakzEUXybH8cktva8rjL6zYUNKSRjalUm4qTQDUZGDNESAQRsMtQWoB6G6l3aa7ChtAHYduUZwMyRjtm2DOZjDzdlWVUkZ4L8o=
+	t=1760017551; cv=none; b=gmfQdRm7rk2V9/44zMhaAar6ZK6Vfp/asbvHUoJ+Gb9Kt+pJuQbNCzsGfechz81747elhG+6xMQrSof/I+JgAhGCLgNF74ybzypeL4UHBsEX79JPqy3rH7OpBB51DBotXnMuE/VyXyL8jnjzOvimTshjK4yktDWjFYT3mUfRB6M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760009225; c=relaxed/simple;
-	bh=KBQEGWpCXM52AVpHce0jra0MILJNrs8zPY54Cq818DE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qqVpIX8Chu1WwAH3XdYtKn6ima+DlfClzR+Fasc6kiluHVa3JPqI/m/LCJrUhZOcNPLTp0W2DeDGpLLY9Dyu4+C10NR08TCRVnvvdxh5DHQ3JdBgUmU8Z1qvNjAR0iM7qxbBzlETtgR1aqkUhGEX7O0Br/XTybx6u5/aao1/2Cs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=coOu6h2h; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1760017551; c=relaxed/simple;
+	bh=Fw6HmamUNQVj03SSnFZ0JjwwpW2Unuuyy0L9OvC5+Dg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ey6paUnTOH6G98JlXb/BSacscJNNf0IiTrlxwWUXlmnn97PbZmrbQjQL30U2pUMU2WIgpDhmicHKz5QulppKQRA2awvaBS4YPRaGDewKKoADuGXaKH5XED8BpJIJk8nCdoXxL3cm0eAsl/uPzViGabuJtQjdXMFFJ9bhzJr5OcM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=A1vTMRXU; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="coOu6h2h"
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 59965po5030347;
-	Thu, 9 Oct 2025 11:21:39 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=XnR/BE
-	y7+63dJxgajRBAjuhxIvapUlAjMvDTKRzjSsA=; b=coOu6h2hpC5TS4cS+jbVkB
-	4EZ15tTgZflDGDSVxZf5PJY1ay5NTNu/3wUnj2wyxcjGHHutkp6MtPYNuMcdHU3q
-	/1ZXETKfTbBcrrv9TgmceHaD3oRVzISIiNh7CB60aKs9Uod1G757jB3a16e88UtP
-	XmZzNO2Ww6bYvHvRVxe21A27WMgCGrSaAls9G5BcWH53EbePo5u9mGnpvKPCOyMn
-	R+u6rtopiwH2pbBZrsjxUNkq4O5oeQJhvAds1l/y3T47leRf/zGq0lfod+k5eafJ
-	dbvLpT2hb+oft7t2XlFWOl5E11GYlWe+FTWuQKIxw0CSvFz48m3kEW3PolbvToCg
-	==
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 49nv81ma4t-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 09 Oct 2025 11:21:39 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5998MNAC026019;
-	Thu, 9 Oct 2025 11:21:38 GMT
-Received: from smtprelay02.wdc07v.mail.ibm.com ([172.16.1.69])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 49nvamm76h-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 09 Oct 2025 11:21:38 +0000
-Received: from smtpav04.dal12v.mail.ibm.com (smtpav04.dal12v.mail.ibm.com [10.241.53.103])
-	by smtprelay02.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 599BLbF230016044
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 9 Oct 2025 11:21:37 GMT
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 50A5458056;
-	Thu,  9 Oct 2025 11:21:37 +0000 (GMT)
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 94D1258052;
-	Thu,  9 Oct 2025 11:21:33 +0000 (GMT)
-Received: from [9.109.198.200] (unknown [9.109.198.200])
-	by smtpav04.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Thu,  9 Oct 2025 11:21:33 +0000 (GMT)
-Message-ID: <6b43dd1e-d128-4d07-b589-8d683735d92e@linux.ibm.com>
-Date: Thu, 9 Oct 2025 16:51:32 +0530
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A1vTMRXU"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1760017548;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=LuKvTV/ZvxsZcI+HNaWfxeETY2vb8WWG5aZ1soizNHk=;
+	b=A1vTMRXUt7ewQ1l2HvGSAi3JzsfHn6KuMcBMyRqvln+JanBMOVmeH5+/s3m8ybpZFCF473
+	XKS0uIq2/G3m5JfhhUC23RnmbgP9YmqjSLx0F5gGcYl2vaUD84L0dclYzPjJ6WwflKc3Da
+	bYj3J6dbf0vwKxwTO/Xf/N5vxrVl2hk=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-561-TPFCb6CKP1-HftRCss5PEQ-1; Thu, 09 Oct 2025 09:45:46 -0400
+X-MC-Unique: TPFCb6CKP1-HftRCss5PEQ-1
+X-Mimecast-MFC-AGG-ID: TPFCb6CKP1-HftRCss5PEQ_1760017545
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-46e3e177893so5798205e9.2
+        for <linux-block@vger.kernel.org>; Thu, 09 Oct 2025 06:45:45 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760017544; x=1760622344;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=LuKvTV/ZvxsZcI+HNaWfxeETY2vb8WWG5aZ1soizNHk=;
+        b=qXg2lx1qJqqGEpMUL0p+meT4MFBIrX9WNY8cq/E1LND+LLShpHFIq9/Z/ccrtled1d
+         xnGPPlX0rhpVNj8YHA0FQrg5KhFn9MPW3kx8SZG1ieFZWo4xe8droHfbBu8PDFHgHYJz
+         ysk0VVbnqLah2twS59Ers2uL2iVHpNTJDtxWjmwhuBm6Vt0at0gUBYMuZSWTcxPXRpy3
+         iGSu6syYZS4XHIHhbD0XUBFuysCVONinZVxig57ZkUmRDgIi+BgQyxYGMf6wy/DtOYcI
+         Y128/5nD8/XRxcyVvk9+X28+MIKHX+9h1lzCN9E5wxB4+OvY9aAEUnVeSs9ELMnnh2vl
+         zV5w==
+X-Gm-Message-State: AOJu0Yyc+qiPmFJP6YYflzziQucJ87RzxcYeR2wgodba6nfLodsACtk7
+	c6hHmZGwUWgGzHv9I+DMfukUzOe/VSLdLOJnkfeMkekTz9tCBSD6HA3/wpSH92PtnvBzsuRuT1T
+	DF21I8SSPDCfw1kthhHQfuRDeerz0otgqyYHxs0NufeBmCIONhCj3kgRo76Y8gNF2B6MDqNbg8j
+	c=
+X-Gm-Gg: ASbGncs0VpZIWnB3AbCn61DjqzcRj8FyaB+uMwV9XybB3DSPCTAhjeCAAyGH4Q2Mnzn
+	2ToLCQd+52Cw5CoBB7YxqB6wDOVdV8HQAcDB5USzQmLFQwzxlxMyC6aeDX73fppX5jbntQVEkey
+	Hy21gMzqDA9nn5NuVbMvkJqFtWBaKJpI3Ez6kV0dFQ2HcEFrDj5YQ+oU2y28SgCsg6GPeZE0z/7
+	4z67YyZzMacu1KgGc2yj7H46iIdIzHmKDMAHk8Od4mcOZKgpUYM1VI814TpKuZ5sYKLNuHhoV+s
+	v+caWbLh57qjg4JygaFk49EWCjOpl9sQst63
+X-Received: by 2002:a05:600c:8288:b0:46e:448a:1235 with SMTP id 5b1f17b1804b1-46fa9aadeedmr76517295e9.16.1760017544444;
+        Thu, 09 Oct 2025 06:45:44 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGfgpeOYz8rB6dmj0SJ47sQixPMa8U/4+cKkDJEI0Y54hBFNm63lOaoILSZN0gkfmu+whVYIg==
+X-Received: by 2002:a05:600c:8288:b0:46e:448a:1235 with SMTP id 5b1f17b1804b1-46fa9aadeedmr76517105e9.16.1760017544025;
+        Thu, 09 Oct 2025 06:45:44 -0700 (PDT)
+Received: from fedora ([85.93.96.130])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46faf16ac01sm50840625e9.11.2025.10.09.06.45.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Oct 2025 06:45:43 -0700 (PDT)
+From: Ondrej Mosnacek <omosnace@redhat.com>
+To: Josef Bacik <josef@toxicpanda.com>,
+	Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	nbd@other.debian.org,
+	linux-security-module@vger.kernel.org,
+	selinux@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH] nbd: override creds to kernel when calling sock_{send,recv}msg()
+Date: Thu,  9 Oct 2025 15:45:42 +0200
+Message-ID: <20251009134542.1529148-1-omosnace@redhat.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [patch v2 5/7] mq-deadline: covert to use
- request_queue->async_depth
-To: Yu Kuai <yukuai1@huaweicloud.com>, axboe@kernel.dk, bvanassche@acm.org,
-        ming.lei@redhat.com, jmoyer@redhat.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yukuai3@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com,
-        johnny.chenyi@huawei.com
-References: <20251009074634.527661-1-yukuai1@huaweicloud.com>
- <20251009074634.527661-6-yukuai1@huaweicloud.com>
-Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <20251009074634.527661-6-yukuai1@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: gJclL4_SbgAAFfPhzu_tuzUnbj6cSF36
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDA4MDEyMSBTYWx0ZWRfXzQtows2qI/CD
- AhN6usJKlKYaO+Ics6nDJ5vBml/L+1+aPTj9mmAd4dJlW/HaHM3W9kjn1FvsyCdCnYrWBJwCuep
- y34tayVVbyYeNiE/gsZlw4PmqJQt3JKsX4dYUuOHo6S4oaURhz5/eNANwgEyctapOPIX7FEy1MH
- Eg7s7+O3MW1eewntrN9bk/Nlyz4zbJlHbDWKiSLq5pXlMi1roKTHtt63S7G53lJElSWDKWp1vXL
- Yw19wL9bsoF5i2vKx7hneyDU33x5YPHyrKilOyhSjpQa2sFuV7XbUaN/sHjJMhxqFC1Z9Xvpw45
- 46M9CWbZPkl1n8IdEPduz4n6nVEC/MUfDrDNJU47p9kYwjo/+hhP+DLkXfyYW702jMSw+h7Mlvf
- qOKq6WlbD6acqd9hc72llb72wik0XQ==
-X-Authority-Analysis: v=2.4 cv=cKntc1eN c=1 sm=1 tr=0 ts=68e79ac3 cx=c_pps
- a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
- a=IkcTkHD0fZMA:10 a=x6icFKpwvdMA:10 a=i0EeH86SAAAA:8 a=VnNF1IyMAAAA:8
- a=uRv04f0bpIKDJRt5AmAA:9 a=QEXdDO2ut3YA:10 a=cPQSjfK2_nFv0Q5t_7PE:22
-X-Proofpoint-GUID: gJclL4_SbgAAFfPhzu_tuzUnbj6cSF36
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-10-09_03,2025-10-06_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 impostorscore=0 adultscore=0 lowpriorityscore=0 malwarescore=0
- suspectscore=0 bulkscore=0 phishscore=0 spamscore=0 priorityscore=1501
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2510020000 definitions=main-2510080121
+Content-Transfer-Encoding: 8bit
 
+sock_{send,recv}msg() internally calls security_socket_{send,recv}msg(),
+which does security checks (e.g. SELinux) for socket access against the
+current task. However, _sock_xmit() in drivers/block/nbd.c may be called
+indirectly from a userspace syscall, where the NBD socket access would
+be incorrectly checked against the calling userspace task (which simply
+tries to read/write a file that happens to reside on an NBD device).
 
-On 10/9/25 1:16 PM, Yu Kuai wrote:
-> From: Yu Kuai <yukuai3@huawei.com>
+To fix this, temporarily override creds to kernel ones before calling
+the sock_*() functions. This allows the security modules to recognize
+this as internal access by the kernel, which will normally be allowed.
 
-> Fix this problem by converting to request_queue->async_depth, where
-> min_shallow_depth is set each time async_depth is updated.
-> 
-> Noted elevator attribute async_depth is now removed, queue attribute
-> with the same name is used instead.
-> 
-> Fixes: 39823b47bbd4 ("block/mq-deadline: Fix the tag reservation code")
-> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+A way to trigger the issue is to do the following (on a system with
+SELinux set to enforcing):
 
-Looks good to me:
-Reviewed-by: Nilay Shroff <nilay@linux.ibm.com>
+    ### Create nbd device:
+    truncate -s 256M /tmp/testfile
+    nbd-server localhost:10809 /tmp/testfile
+
+    ### Connect to the nbd server:
+    nbd-client localhost
+
+    ### Create mdraid array
+    mdadm --create -l 1 -n 2 /dev/md/testarray /dev/nbd0 missing
+
+    ### Stop the array
+    mdadm --stop /dev/md/testarray
+
+    ### Disconnect the nbd device
+    nbd-client -d /dev/nbd0
+
+    ### Reconnect to nbd devices:
+    nbd-client localhost
+
+After these steps, assuming the SELinux policy doesn't allow the
+unexpected access pattern, errors will be visible on the kernel console:
+
+[   93.997980] nbd2: detected capacity change from 0 to 524288
+[  100.314271] md/raid1:md126: active with 1 out of 2 mirrors
+[  100.314301] md126: detected capacity change from 0 to 522240
+[  100.317288] block nbd2: Send control failed (result -13)           <-----
+[  100.317306] block nbd2: Request send failed, requeueing            <-----
+[  100.318765] block nbd2: Receive control failed (result -32)        <-----
+[  100.318783] block nbd2: Dead connection, failed to find a fallback
+[  100.318794] block nbd2: shutting down sockets
+[  100.318802] I/O error, dev nbd2, sector 2048 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 0
+[  100.318817] Buffer I/O error on dev md126, logical block 0, async page read
+[  100.322000] I/O error, dev nbd2, sector 2048 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 0
+[  100.322016] Buffer I/O error on dev md126, logical block 0, async page read
+[  100.323244] I/O error, dev nbd2, sector 2048 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 0
+[  100.323253] Buffer I/O error on dev md126, logical block 0, async page read
+[  100.324436] I/O error, dev nbd2, sector 2048 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 0
+[  100.324444] Buffer I/O error on dev md126, logical block 0, async page read
+[  100.325621] I/O error, dev nbd2, sector 2048 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 0
+[  100.325630] Buffer I/O error on dev md126, logical block 0, async page read
+[  100.326813] I/O error, dev nbd2, sector 2048 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 0
+[  100.326822] Buffer I/O error on dev md126, logical block 0, async page read
+[  100.326834]  md126: unable to read partition table
+[  100.329872] I/O error, dev nbd2, sector 0 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 0
+[  100.329889] Buffer I/O error on dev nbd2, logical block 0, async page read
+[  100.331186] I/O error, dev nbd2, sector 0 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 0
+[  100.331195] Buffer I/O error on dev nbd2, logical block 0, async page read
+[  100.332371] I/O error, dev nbd2, sector 0 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 0
+[  100.332379] Buffer I/O error on dev nbd2, logical block 0, async page read
+[  100.333550] I/O error, dev nbd2, sector 0 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 0
+[  100.333559] Buffer I/O error on dev nbd2, logical block 0, async page read
+[  100.334721]  nbd2: unable to read partition table
+[  100.350993]  nbd2: unable to read partition table
+
+The corresponding SELinux denial on Fedora/RHEL will look like this
+(assuming it's not silenced):
+type=AVC msg=audit(1758104872.510:116): avc:  denied  { write } for  pid=1908 comm="mdadm" laddr=::1 lport=32772 faddr=::1 fport=10809 scontext=system_u:system_r:mdadm_t:s0-s0:c0.c1023 tcontext=unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023 tclass=tcp_socket permissive=0
+
+Cc: Ming Lei <ming.lei@redhat.com>
+Link: https://bugzilla.redhat.com/show_bug.cgi?id=2348878
+Signed-off-by: Ondrej Mosnacek <omosnace@redhat.com>
+---
+ drivers/block/nbd.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index 6463d0e8d0cef..d50055c974a6b 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -52,6 +52,7 @@
+ static DEFINE_IDR(nbd_index_idr);
+ static DEFINE_MUTEX(nbd_index_mutex);
+ static struct workqueue_struct *nbd_del_wq;
++static struct cred *nbd_cred;
+ static int nbd_total_devices = 0;
+ 
+ struct nbd_sock {
+@@ -554,6 +555,7 @@ static int __sock_xmit(struct nbd_device *nbd, struct socket *sock, int send,
+ 	int result;
+ 	struct msghdr msg = {} ;
+ 	unsigned int noreclaim_flag;
++	const struct cred *old_cred;
+ 
+ 	if (unlikely(!sock)) {
+ 		dev_err_ratelimited(disk_to_dev(nbd->disk),
+@@ -562,6 +564,8 @@ static int __sock_xmit(struct nbd_device *nbd, struct socket *sock, int send,
+ 		return -EINVAL;
+ 	}
+ 
++	old_cred = override_creds(nbd_cred);
++
+ 	msg.msg_iter = *iter;
+ 
+ 	noreclaim_flag = memalloc_noreclaim_save();
+@@ -586,6 +590,8 @@ static int __sock_xmit(struct nbd_device *nbd, struct socket *sock, int send,
+ 
+ 	memalloc_noreclaim_restore(noreclaim_flag);
+ 
++	revert_creds(old_cred);
++
+ 	return result;
+ }
+ 
+@@ -2669,7 +2675,15 @@ static int __init nbd_init(void)
+ 		return -ENOMEM;
+ 	}
+ 
++	nbd_cred = prepare_kernel_cred(&init_task);
++	if (!nbd_cred) {
++		destroy_workqueue(nbd_del_wq);
++		unregister_blkdev(NBD_MAJOR, "nbd");
++		return -ENOMEM;
++	}
++
+ 	if (genl_register_family(&nbd_genl_family)) {
++		put_cred(nbd_cred);
+ 		destroy_workqueue(nbd_del_wq);
+ 		unregister_blkdev(NBD_MAJOR, "nbd");
+ 		return -EINVAL;
+@@ -2706,6 +2720,8 @@ static void __exit nbd_cleanup(void)
+ 
+ 	nbd_dbg_close();
+ 
++	put_cred(nbd_cred);
++
+ 	mutex_lock(&nbd_index_mutex);
+ 	idr_for_each(&nbd_index_idr, &nbd_exit_cb, &del_list);
+ 	mutex_unlock(&nbd_index_mutex);
+-- 
+2.51.0
 
