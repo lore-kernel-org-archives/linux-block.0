@@ -1,129 +1,123 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ADC12D46DD;
-	Thu,  9 Oct 2025 07:53:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A99F52D23A5
+	for <linux-block@vger.kernel.org>; Thu,  9 Oct 2025 08:43:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759996403; cv=none; b=n7gAgcQiB+0bbxIGyiBI/DLxcdjLcaQg7N+KeNwJeMDi4gQ/GsphGquSp8IkjnK8D33aU0fcZZOzZF0RYx6c6mt7YYQLyhfhqBXL89IFPgVgvKuXKftykKe99uEdMQyojKoC3cQEf8DT4gQXLlTm/ZaHWEtlxd6FGBTfkjqdL/c=
+	t=1759999420; cv=none; b=sLIaVB3BKngfhW7+oQmfYEPW8pkWqvL9zdJtcjtqeLYwBZ4pzfhESeiI6aJ9RFPWbc8ecuGQ/WXzT9+6aiUIhM5YcJFQ0LlP2JjeDp2QAsRzJr5+iBuykvGndR9xn9cE63mkE0wZLgTPR8Y6uNcfb2vWlMq/+93G1MEQyKh9Vho=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759996403; c=relaxed/simple;
-	bh=DWJV6xc4X74tdFQ7VC3xAlPi68hmaXItok1qFJhL6Ec=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fAHoS50VZxnnNbZHcaFFwf1o735Yv8y8bwep/m30sCzTe52kZqDGLw2E1IKhAeXwq3rhHOREwPYoc3iKeEW0rgK6Yi3qYcHSSUTbBcPeiB7OtKbQn9Wf4JHh4VpKkdUqoSv/mUpLSHJzowvnzS5JCEURcn0yAo4V7OiHonTEFsE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=none smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4cj2Cz61m2zKHMh1;
-	Thu,  9 Oct 2025 15:52:47 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 61CBE1A15C8;
-	Thu,  9 Oct 2025 15:53:16 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.50.159.234])
-	by APP4 (Coremail) with SMTP id gCh0CgA3+mHqaedo7Fo7CQ--.38248S11;
-	Thu, 09 Oct 2025 15:53:16 +0800 (CST)
-From: Yu Kuai <yukuai1@huaweicloud.com>
-To: axboe@kernel.dk,
-	bvanassche@acm.org,
-	ming.lei@redhat.com,
-	nilay@linux.ibm.com,
-	jmoyer@redhat.com
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	yukuai3@huawei.com,
-	yukuai1@huaweicloud.com,
-	yi.zhang@huawei.com,
-	yangerkun@huawei.com,
-	johnny.chenyi@huawei.com
-Subject: [patch v2 7/7] blk-mq: add documentation for new queue attribute async_dpeth
-Date: Thu,  9 Oct 2025 15:46:34 +0800
-Message-Id: <20251009074634.527661-8-yukuai1@huaweicloud.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20251009074634.527661-1-yukuai1@huaweicloud.com>
-References: <20251009074634.527661-1-yukuai1@huaweicloud.com>
+	s=arc-20240116; t=1759999420; c=relaxed/simple;
+	bh=oOmLRNO4yxmZr9GGl+AUsKcQlyU35gqHSeHKaWhtPwQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=DLTaoTkW4snS3CaUcizGXNuq5eLstR+bMUlvQgi39ue4uckhM1Nj6XuH1HUo/QMcbjWQmiQKVgXnI/nsnTpoaaERCsDLyaHoGE1JUlcm23x++v3edYzEyxg9tolwaVVSopebQkp2tQTM8IkFqbH89XMrX7JkUxOctaFKx9LhWoc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Sd1CQWr6; arc=none smtp.client-ip=209.85.128.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Sd1CQWr6"
+Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-71d603a269cso7057187b3.1
+        for <linux-block@vger.kernel.org>; Thu, 09 Oct 2025 01:43:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1759999416; x=1760604216; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oOmLRNO4yxmZr9GGl+AUsKcQlyU35gqHSeHKaWhtPwQ=;
+        b=Sd1CQWr65JLYzY9EVKrEmyokZCi5vMbs6EjxpG+7QH6YGT3tDWbcej0s4cZgoeqQuS
+         JarC6ZTWUL+kjcHPGBPAUN8Ppb1QBAPtlSxQfjpNRglhJxMMypRIPnB6rYYKLQvZjKiN
+         y72xO5wzZc7AAEZk+IBKqraBb7+6wC4+Imv7nbjEtku9PO6PAKcYEb1vRHgafdvgR9U2
+         dCS1DB4VwniCeBOnc8XLvNltoejI4ecSgvo1PpGG1tSl6PrUxnfallIONRoeLTNOEzbX
+         FvDKAaN4VsNHkaBPKCCqR4S+rBMFmJJlJYY4H+OBfaZXGyq7o1ppfnH/vgJ3jgRm0T4d
+         tz9Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759999416; x=1760604216;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=oOmLRNO4yxmZr9GGl+AUsKcQlyU35gqHSeHKaWhtPwQ=;
+        b=sPrOw0FtrqwcSXo+GCBdc+RpL5cdi3LP6fQy5Km+9hZKZkvHBOPSwLzVm6uOozcrmd
+         LBKh0U/kh+FWoBy9Jo3+3kn7zKmU9R8rHUvKNEAo24faZ3BHpSuM6nv0aHe+s0vI2mAe
+         TwB1APtglyyaNsuq6aToG+xHZvH3cqM31uHmfa9VaODLeSJQ2VPVKgBZqo1QjHNAtRWf
+         8b22cEscgpp8CCOUT7HMgs3CpLRa8k8rjNrHAOG+SeRVIUr0VNsoa7+4ONdpaVfMoIx3
+         Cmtwvqh7iUPBIo/G2X5ftHMmq2JcbB6bl/2crhQ2sRQ06Dcbhy9nJyMgackbdSBg7RAD
+         wpzw==
+X-Forwarded-Encrypted: i=1; AJvYcCUET3rLvaFsSu6TEUOYWK3TZSceE6YQnjPbJtmNzMUbOWmWTl41OQON68NXz+C8zuUXMumnESpeWdEAjw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxLULWSZqrSKuzL4lDvi/N32d91qoDzT7VA27fKbUOr2jENzyV4
+	YguAz5cTlHGBsb5DznRUr+ptEPhyrgd7ZfEjxrJisgZa6/orm3N6WdQK7GugXt4DO7EGYhtrq/4
+	ogCs1KNuI7bZAWI1PUfvpUpEUsTPlhEY=
+X-Gm-Gg: ASbGnctgF23H0a5qrSYiSSfkA5aKyPJGrBs0apMH8NdUGD/hWGW4Avi4fLEQhqM/t2Y
+	+x/ITfg6waxJGyqD+Y0unImB7XTlz+tIuuXCK39zFdhufTsyBXFTXyT3SnpGFO9n5+6McVWislK
+	bK+sVt+t7llnhueqQrI5Ye3+UtYA1u1FRBXBHkpC2G98pKAtpuoAY6a9UJkDYrf2xzG7MbCQ33R
+	LBScY/KhbCnpdm4ns1dtuwIIqOqSZncjmA+dVLH0g==
+X-Google-Smtp-Source: AGHT+IHqqt7JHMFlL5DEMxX8/4fuWke6o7x715NV65SuEycRYAp5q8y3uA9SPr+Cccah/gPAgRpT2LfWBS7AmxUm0/4=
+X-Received: by 2002:a05:690e:146:b0:635:4ece:20a9 with SMTP id
+ 956f58d0204a3-63ccb91d5e0mr4410660d50.46.1759999415603; Thu, 09 Oct 2025
+ 01:43:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgA3+mHqaedo7Fo7CQ--.38248S11
-X-Coremail-Antispam: 1UD129KBjvJXoW7uFW7Xr4rAF1kJw4kXF1DZFb_yoW8ur1Up3
-	yrtr47Ka4rXF17uryfAr1S9r4ft395Xr17Grsxt3WUXr98uwnrGFZaqr45XFn7ZryfJw4j
-	9rWDuF98Ga42yw7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUma14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_JF0E3s1l82xGYI
-	kIc2x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2
-	z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F
-	4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq
-	3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7
-	IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4U
-	M4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2
-	kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkE
-	bVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67
-	AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUCVW8JwCI
-	42IY6xIIjxv20xvEc7CjxVAFwI0_Cr0_Gr1UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCw
-	CI42IY6I8E87Iv67AKxVW8JVWxJwCI42IY6I8E87Iv6xkF7I0E14v26r4UJVWxJrUvcSsG
-	vfC2KfnxnUUI43ZEXa7VUbPC7UUUUUU==
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+References: <20250918152830.438554-1-nschichan@freebox.fr> <20250918195806.6337-1-safinaskar@gmail.com>
+ <CAHNNwZAzecVcJXZmycX063-=p-M5jVkfStfgYVKJruOFo7y9zg@mail.gmail.com>
+ <CAPnZJGDwETQVVURezSRxZB8ZAwBETQ5fwbXyeMpfDLuLW4rVdg@mail.gmail.com> <CAHNNwZC7gC7zaZGiSBhobSAb4m2O1BuoZ4r=SQBF-tCQyuAPvw@mail.gmail.com>
+In-Reply-To: <CAHNNwZC7gC7zaZGiSBhobSAb4m2O1BuoZ4r=SQBF-tCQyuAPvw@mail.gmail.com>
+From: Askar Safin <safinaskar@gmail.com>
+Date: Thu, 9 Oct 2025 11:42:59 +0300
+X-Gm-Features: AS18NWA7xuLtf9pobQHoPGHI9uL9SjsnEaZg-EuuD52zBO81KbUszIYBPPZ5wRY
+Message-ID: <CAPnZJGAp-wG+9wDmmisfpxvFbRtXkG-RipAuZe=fi1BWy-3G-Q@mail.gmail.com>
+Subject: Re: [PATCH RESEND 00/62] initrd: remove classic initrd support
+To: Nicolas Schichan <nschichan@freebox.fr>
+Cc: akpm@linux-foundation.org, andy.shevchenko@gmail.com, axboe@kernel.dk, 
+	brauner@kernel.org, cyphar@cyphar.com, devicetree@vger.kernel.org, 
+	ecurtin@redhat.com, email2tema@gmail.com, graf@amazon.com, 
+	gregkh@linuxfoundation.org, hca@linux.ibm.com, hch@lst.de, 
+	hsiangkao@linux.alibaba.com, initramfs@vger.kernel.org, jack@suse.cz, 
+	julian.stecklina@cyberus-technology.de, kees@kernel.org, 
+	linux-acpi@vger.kernel.org, linux-alpha@vger.kernel.org, 
+	linux-api@vger.kernel.org, linux-arch@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org, 
+	linux-csky@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-efi@vger.kernel.org, linux-ext4@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, linux-hexagon@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-m68k@lists.linux-m68k.org, 
+	linux-mips@vger.kernel.org, linux-openrisc@vger.kernel.org, 
+	linux-parisc@vger.kernel.org, linux-riscv@lists.infradead.org, 
+	linux-s390@vger.kernel.org, linux-sh@vger.kernel.org, 
+	linux-snps-arc@lists.infradead.org, linux-um@lists.infradead.org, 
+	linuxppc-dev@lists.ozlabs.org, loongarch@lists.linux.dev, mcgrof@kernel.org, 
+	mingo@redhat.com, monstr@monstr.eu, mzxreary@0pointer.de, 
+	patches@lists.linux.dev, rob@landley.net, sparclinux@vger.kernel.org, 
+	thomas.weissschuh@linutronix.de, thorsten.blum@linux.dev, 
+	torvalds@linux-foundation.org, tytso@mit.edu, viro@zeniv.linux.org.uk, 
+	x86@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Yu Kuai <yukuai3@huawei.com>
+On Mon, Sep 22, 2025 at 5:29=E2=80=AFPM Nicolas Schichan <nschichan@freebox=
+.fr> wrote:
+> > Then in September 2026 I will fully remove initrd.
+>
+> Is there a way to find some kind of middle ground here ?
 
-Explain the attribute and the default value in different case.
+I still plan to fully remove initrd in September 2026.
+Maintainers will decide whether they will merge my patchset.
+You may try to convince them.
 
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
- Documentation/ABI/stable/sysfs-block | 34 ++++++++++++++++++++++++++++
- 1 file changed, 34 insertions(+)
+> I can send a patch for that but first I need to sort out my SMTP
+> issues from the other day.
 
-diff --git a/Documentation/ABI/stable/sysfs-block b/Documentation/ABI/stable/sysfs-block
-index 0ed10aeff86b..aa1e94169666 100644
---- a/Documentation/ABI/stable/sysfs-block
-+++ b/Documentation/ABI/stable/sysfs-block
-@@ -609,6 +609,40 @@ Description:
- 		enabled, and whether tags are shared.
- 
- 
-+What:		/sys/block/<disk>/queue/async_depth
-+Date:		August 2025
-+Contact:	linux-block@vger.kernel.org
-+Description:
-+		[RW] Controls how many asynchronous requests may be allocated in the
-+		block layer. The value is always capped at nr_requests.
-+
-+		When no elevator is active (none):
-+		- async_depth is always equal to nr_requests.
-+
-+		For bfq scheduler:
-+		- By default, async_depth is set to 75% of nr_requests.
-+		  Internal limits are then derived from this value:
-+		  * Sync writes: limited to async_depth (≈75% of nr_requests).
-+		  * Async I/O: limited to ~2/3 of async_depth (≈50% of nr_requests).
-+
-+		  If a bfq_queue is weight-raised:
-+		  * Sync writes: limited to ~1/2 of async_depth (≈37% of nr_requests).
-+		  * Async I/O: limited to ~1/4 of async_depth (≈18% of nr_requests).
-+
-+		- If the user writes a custom value to async_depth, BFQ will recompute
-+		  these limits proportionally based on the new value.
-+
-+		For Kyber:
-+		- By default async_depth is set to 75% of nr_requests.
-+		- If the user writes a custom value to async_depth, then it override the
-+		  default and directly control the limit for writes and async I/O.
-+
-+		For mq-deadline:
-+		- By default async_depth is set to nr_requests.
-+		- If the user writes a custom value to async_depth, then it override the
-+		  default and directly control the limit for writes and async I/O.
-+
-+
- What:		/sys/block/<disk>/queue/nr_zones
- Date:		November 2018
- Contact:	Damien Le Moal <damien.lemoal@wdc.com>
--- 
-2.39.2
+If you still have mail issues, consider applying for @linux.dev email,
+they are free for Linux devs ( https://linux.dev/ ).
 
+Also, I just tried to test whether your use case is still supported in
+mainline (i. e. uncompressed initrd with root=3D/dev/ram0).
+It turned out that on modern kernels you need to enable
+recently introduced CONFIG_BLK_DEV_WRITE_MOUNTED to
+make this work.
+So, make sure to enable this when upgrading kernel.
+
+--=20
+Askar Safin
