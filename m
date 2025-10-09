@@ -1,48 +1,48 @@
 Received: from 003.mia.mailroute.net (003.mia.mailroute.net [199.89.3.6])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 409122882C9
-	for <linux-block@vger.kernel.org>; Thu,  9 Oct 2025 23:29:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C53728850F;
+	Thu,  9 Oct 2025 23:40:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.6
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760052572; cv=none; b=DRnfOXAhujQdlKFxDRltU8UIcsq1YsJrsL8Z7kOlwl4gq8W/qF8UsaUVXF/aOLsRpJkjW3E2E6CB8Nvui54xWndXnZa+ZAcFObIkzfuJpWmiqpy3f8v7eYyP0dZeeGbp3zAlEZaqsNyPS7cBgOAcxJrhpTZN1LixEvZzHIxHWVo=
+	t=1760053228; cv=none; b=eQYVylonX4EE4s7EJapBCo8MhhgfKzx2NYIHXhwVygSu1kOhUCmey/+xtXINSvRVx7qeerX3KZuXqsOmoojitdTNzhogwWEgBdu+ZTGPw/OB1AWgsApEUbvDVeBeaDpmy4Wd02dgGAzVIavjc4LjZNnbCB4zWv1I7IgizkorNnI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760052572; c=relaxed/simple;
-	bh=Puj5bzBwPmZcelM0ZE9ITN4oZJ26SD2JEHSS8Uc2bvU=;
+	s=arc-20240116; t=1760053228; c=relaxed/simple;
+	bh=jbXf+oYCbVfnN9hCBEoXYickNFcUbhVgCGfXK6UgfYs=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kwHPrbWkkkTlk2cbdIDIl87mGtdvSQUq0q0GD39YwN9RIgovN++CGItadeI+8ykHbW+JdhWMMaOzeZ9vC2lVsF0SOdt2FJmBvbw36m7mi3gZG0Q0xhLt1SfpTfEDqdtswGq8FBgxL7Pty711enmp/81zrIA3uBzOfGcAdVGfqpE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=C0qYgq1T; arc=none smtp.client-ip=199.89.3.6
+	 In-Reply-To:Content-Type; b=EliBa+lSXMIBYiVLpzcILH+CTdPJ++oOuuEj069A/FVFgqVKJXqZkqxxnOWblFonQ9dQpZ+shyTFKtZYz1244vPfba+RyI9t50J4JS0UGqSHf29meGMZEcdIgS+ckdaDI4KHFuxB0BMmHKHFKeHqIWuG7gjiEKiyO4zZgs5ySXQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=dSAyVX7V; arc=none smtp.client-ip=199.89.3.6
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="C0qYgq1T"
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="dSAyVX7V"
 Received: from localhost (localhost [127.0.0.1])
-	by 003.mia.mailroute.net (Postfix) with ESMTP id 4cjR0p0SvpzlgqVQ;
-	Thu,  9 Oct 2025 23:29:30 +0000 (UTC)
+	by 003.mia.mailroute.net (Postfix) with ESMTP id 4cjRFP75nDzltKFn;
+	Thu,  9 Oct 2025 23:40:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
 	content-transfer-encoding:content-type:content-type:in-reply-to
 	:from:from:content-language:references:subject:subject
 	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1760052568; x=1762644569; bh=t9JIKO9hp+2hB33E7lyqCEmf
-	XpCNYq14w/Ac9cHH/1c=; b=C0qYgq1TAX10ak5tbMDQaIF3Ro7xjrR1PuHDHpk0
-	J0AN/aAd4vfNKw4LbTjg0oT6pitU2WgR4RehlWu0LjLQ7W/goR3JaycFNxL73y9a
-	ztVn2wkqvoNi0w/pxm6+Cs32kWk3MYZgVVhH95lNWbNzlCIh1/EoRJDcra3NqGTL
-	szTUZc5KlF5sL0P00/6pKMUq3CnBjhWdZLx406fTknjIAF1oBlc+PG90tUB35TbP
-	bR+VHWWYNCnHWMoBIY1iJZvorbkiRG5uWMRKOyNALyny/xobo/9QAJUxwLOX7Dou
-	ESYIcks9ntaBckoQ2hKa3eQ3pEwPssr2ZIENGPXgiSPF2g==
+	 s=mr01; t=1760053224; x=1762645225; bh=yTHDZEo4xkKcumLOfsHylHgL
+	/jrJwym+SE4lLdqXNgY=; b=dSAyVX7VZCVHuOzIqDyd7VcdjRatL6Aozqzh9sIp
+	sJtazL044OBVOflbfKOzza/CVOClB/cbBYwhWMyTy4zEwNUtpB1r6Z8yxx9nb7gP
+	D+Af2eLm+l2orUmsjxGoPyZPNtdVmTE9AgbewybZcwOEs32iyhvNiQM0gOyxktwe
+	P3ixyOdiT/gOjCtpDce3Ja1MZRKTE0DDkNJEpOR1QFtgSSOVxkrYsnKR7fm1aP1M
+	7F3+Pu2FK5CKuNnNIojW0AJblLqESFonsd4jRX5IOneXycDskWoefcykcU5gjCUB
+	yUIRaZtKzlETwT/xwWP8TkXwabotz7nIUHj1WbKJFr0EyA==
 X-Virus-Scanned: by MailRoute
 Received: from 003.mia.mailroute.net ([127.0.0.1])
  by localhost (003.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id 1qQ13vPvviAN; Thu,  9 Oct 2025 23:29:28 +0000 (UTC)
+ id IxN8B9_CWxTr; Thu,  9 Oct 2025 23:40:24 +0000 (UTC)
 Received: from [192.168.51.14] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: bvanassche@acm.org)
-	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4cjR0g6B2wzlgqVF;
-	Thu,  9 Oct 2025 23:29:22 +0000 (UTC)
-Message-ID: <033ca444-4c68-4a4f-bc2b-32232e80e848@acm.org>
-Date: Thu, 9 Oct 2025 16:29:21 -0700
+	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4cjRFH0Lsdzlgqyn;
+	Thu,  9 Oct 2025 23:40:18 +0000 (UTC)
+Message-ID: <8406f13d-d8be-4957-b1ec-6996f19d32e9@acm.org>
+Date: Thu, 9 Oct 2025 16:40:16 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -50,32 +50,46 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] dm: Fix deadlock when reloading a multipath table
-To: Martin Wilck <mwilck@suse.com>, Benjamin Marzinski <bmarzins@redhat.com>,
- Mikulas Patocka <mpatocka@redhat.com>, Mike Snitzer <snitzer@kernel.org>
-Cc: dm-devel@lists.linux.dev, linux-block@vger.kernel.org
-References: <20251009030431.2895495-1-bmarzins@redhat.com>
- <ed792d72a1ca47937631af6e12098d9a20626bcf.camel@suse.com>
+Subject: Re: [PATCH v2] block/mq-deadline: adjust the timeout period of the
+ per_prio->dispatch
+To: Damien Le Moal <dlemoal@kernel.org>, chengkaitao <pilgrimtao@gmail.com>,
+ axboe@kernel.dk
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Chengkaitao <chengkaitao@kylinos.cn>
+References: <20251009155253.14611-1-pilgrimtao@gmail.com>
+ <db87a85d-e433-4daf-97c7-d5156849db0f@acm.org>
+ <bb362d12-b942-48f3-8414-e859cebb8862@kernel.org>
 Content-Language: en-US
 From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <ed792d72a1ca47937631af6e12098d9a20626bcf.camel@suse.com>
+In-Reply-To: <bb362d12-b942-48f3-8414-e859cebb8862@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 10/9/25 2:57 AM, Martin Wilck wrote:
-> In general, I'm wondering whether we need a more generic solution to
-> this problem. Therefore I've added linux-block to cc.
+
+On 10/9/25 1:21 PM, Damien Le Moal wrote:
+> There is still something bothering me with this: the request is added to the
+> dispatch list, and *NOT* to the fifo/sort list. So this should be considered as
+> a scheduling decision in itself, and __dd_dispatch_request() reflects that as
+> the first thing it does is pick the requests that are in the dispatch list
+> already. However, __dd_dispatch_request() also has the check:
 > 
-> The way I see it, if a device has queued IO without any means to
-> perform the IO, it can't be frozen. We'd either need to fail all queued
-> IO in this case, or refuse attempts to freeze the queue.
+> 		if (started_after(dd, rq, latest_start))
+>                          return NULL;
+> 
+> for requests that are already in the dispatch list. That is what does not make
+> sense to me. Why ? There is no comment describing this. And I do not understand
+> why we should bother with any time for requests that are in the dispatch list
+> already. These should be sent to the drive first, always.
+> 
+> This patch seems to be fixing a problem that is introduced by the above check.
+> But why this check ? What am I missing here ?
 
-If a device has queued I/O and the I/O can't make progress then it isn't
-necessary to call blk_mq_freeze_queue(), isn't it? See also "[PATCH 0/3] 
-Fix a deadlock related to modifying queue attributes"
-(https://lore.kernel.org/linux-block/20250702182430.3764163-1-bvanassche@acm.org/).
+Is my conclusion from the above correct that there is agreement that the 
+I/O priority should be ignored for AT HEAD requests and that AT HEAD
+requests should always be dispatched first? If so, how about merging the
+three per I/O priority dispatch lists into a single dispatch list and
+not to call started_after() at all for the dispatch list?
 
-BTW, that patch series is not upstream. I apply it manually every time
-before I run blktests.
+Thanks,
 
 Bart.
