@@ -1,222 +1,123 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from 004.mia.mailroute.net (004.mia.mailroute.net [199.89.3.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B655023ABBD;
-	Thu,  9 Oct 2025 16:00:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F5251E51EE;
+	Thu,  9 Oct 2025 16:50:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760025655; cv=none; b=ZtgGSWNX+1lfdv5gQ8LMKLbGyfABavvMMOQb+kkHvnjNMtQrq1DIrs3bXbHxzy/QXRqsJsZxxgNyXvHi7NbJ/5wHLFGZqo1mLdyDQp56ezDMQVn4i5WoWjpMq4m9Xo6iVLcO8cRcPY1/ic0hcELHleP77JtnwkKNk0JRCd41pIU=
+	t=1760028656; cv=none; b=MZhGaBDnmJHC6nnIZnJCzR3LrJP3nXeO4qt0s0dqNVk0IbWnd0yCc+UCn4yTjsw7IIi2NWVHqi6wYxlLiXslWgLB/gI0zkGTKXlp7D63pj6Bq2vfzFMCoCTsclYDsuAEoLUpEt79a8uZqEGzPEWGRDBN/Z6bD8nDGey8nqFn7EQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760025655; c=relaxed/simple;
-	bh=0jJsxHPjAHJUlM4jFdpTzq6CmwynweOeApAk3TLqR5g=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JQzt6UjZsT+GyrG/s/jh5Ke4hbKpLOtbwl0kEJpilu0KxnEV2VQ7Sek7RttIxIs2oVPpYBRSaaRkwIqphVMAhfaTWAyss10+CPYAWcd2oawpaNVOoHItDdm3jlZWqyGBQc4XoTUpZWw+RRLNXBfkn/AI6HJIE15qv2Kus775wWo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tp3LIm0l; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1760028656; c=relaxed/simple;
+	bh=NYi5PAvlfnKY1DvsY5vuZzaGmwqQOQ9FHnu1NBXQeoQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=IO1KBmGu9Vk5xw8UP10szRnUx3lpjWDuirtuh+26zklun3aX6sST9aglfjcvg7qPPeBDyF6An5Lkh45mKNDRBQgfdOK9JJ+H0Bq4srGz5MYRXDXZuLuVm9yWHLi+AgzC3/s5o/W9ojn7R4lpuIIt+EKZ24IVmKb8T79H68lX4F4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=Sa1ikTbF; arc=none smtp.client-ip=199.89.3.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tp3LIm0l"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1F54C4CEE7;
-	Thu,  9 Oct 2025 16:00:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760025655;
-	bh=0jJsxHPjAHJUlM4jFdpTzq6CmwynweOeApAk3TLqR5g=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=tp3LIm0lx1J3iKFmtIbFKI9fVp4l5crUOsTcI3l1W3/zZAwEiGdpan+9a+vpJy0Qd
-	 4qtuVKXBTRqTb8O6wIcoWLCW8A7K1tq3HGzOrwfvUJRUZ70IjOB9/d617gWlpgUx+B
-	 azvJD8PGlg/SQ5GiXnDr2dRXfN/3dUknDisdOTbQ7qW/xqe5v2kZrtYc1SAeK2jFAl
-	 eJp+SF0sXIRo21v/Pz0PaqCryZ9wUfOgE9g6bdPiywM6g/QE7i/zjkk+jXJM993hND
-	 pIcuVeRNCKVPNv5MHdJawJFTLzSW3toQKsQFjZsmuE3ed2gwRsmsEs3osG518f9CHu
-	 +wzOLCTPThZ4g==
-From: Sasha Levin <sashal@kernel.org>
-To: patches@lists.linux.dev,
-	stable@vger.kernel.org
-Cc: Keith Busch <kbusch@kernel.org>,
-	Christoph Hellwig <hch@lst.de>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Sasha Levin <sashal@kernel.org>,
-	linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.17-6.16] block: check for valid bio while splitting
-Date: Thu,  9 Oct 2025 11:56:04 -0400
-Message-ID: <20251009155752.773732-98-sashal@kernel.org>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20251009155752.773732-1-sashal@kernel.org>
-References: <20251009155752.773732-1-sashal@kernel.org>
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="Sa1ikTbF"
+Received: from localhost (localhost [127.0.0.1])
+	by 004.mia.mailroute.net (Postfix) with ESMTP id 4cjG8l3NvSzm0ytC;
+	Thu,  9 Oct 2025 16:50:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1760028646; x=1762620647; bh=/GOWrB6jzDLFvXNtk0gb/YYh
+	jQAdm2THxLGGEUr+Uvw=; b=Sa1ikTbFVOWoL5UYuOfhlORuK1dRdutGahS5fwsO
+	2U7+6fB17Odwr2us4eHd1UvnJOxTB74HBNGg/q+2O/tFETLc+xS7/apDUa672uJY
+	uVwP/ns7S7PRtLbkNbIbVafT9Z55T5fCdJEShfgReMsGeaszpsgyRJaEOIo5mARR
+	MdyoWnwNAwvtIo/iky/zK3ezBK9YJ5BLhcAb3Zhg7ZXeJljldR/45Ojf0jfqTWqA
+	jXqduenD39qn03VyYhBbrDmfLr+K1AbuKsH5+6NU/8FtvxOBoYGhR4b27ro6e0IW
+	f72jCvL5JqixVVLjsTvC5T8hh+6mfJBVb70lJko/NyxWbg==
+X-Virus-Scanned: by MailRoute
+Received: from 004.mia.mailroute.net ([127.0.0.1])
+ by localhost (004.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id XXitJ0JI_MUQ; Thu,  9 Oct 2025 16:50:46 +0000 (UTC)
+Received: from [100.119.48.131] (unknown [104.135.180.219])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 004.mia.mailroute.net (Postfix) with ESMTPSA id 4cjG8d5L7Zzm0ytk;
+	Thu,  9 Oct 2025 16:50:40 +0000 (UTC)
+Message-ID: <db87a85d-e433-4daf-97c7-d5156849db0f@acm.org>
+Date: Thu, 9 Oct 2025 09:50:39 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.17.1
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] block/mq-deadline: adjust the timeout period of the
+ per_prio->dispatch
+To: chengkaitao <pilgrimtao@gmail.com>, axboe@kernel.dk, dlemoal@kernel.org
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Chengkaitao <chengkaitao@kylinos.cn>
+References: <20251009155253.14611-1-pilgrimtao@gmail.com>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20251009155253.14611-1-pilgrimtao@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-From: Keith Busch <kbusch@kernel.org>
+On 10/9/25 8:52 AM, chengkaitao wrote:
+> On the other hand, the Commit (725f22a1477c) merges the effects of
+> fifo_expire and prio_aging_expire on the same code behavior, creating
+> redundant interactions. To address this, our new patch introduces
+> numerical compensation for {dd->fifo_expire[data_dir]} when adding
+> requests to dispatch lists. To maintain original logic as much as
+> possible while enhancing dispatch list priority, we additionally
+> subtract {dd->prio_aging_expire / 2} from the fifo_time, with default
+> values, {dd->prio_aging_expire / 2} equals {dd->fifo_expire[DD_WRITE]}.
 
-[ Upstream commit fec2e705729dc93de5399d8b139e4746805c3d81 ]
+No assumptions should be made about the relative values of
+dd->prio_aging_expire and dd->fifo_expire[DD_WRITE] since these values
+can be modified via sysfs.
 
-We're already iterating every segment, so check these for a valid IO
-lengths at the same time. Individual segment lengths will not be checked
-on passthrough commands. The read/write command segments must be sized
-to the dma alignment.
+> diff --git a/block/mq-deadline.c b/block/mq-deadline.c
+> index 3e741d33142d..fedc66187150 100644
+> --- a/block/mq-deadline.c
+> +++ b/block/mq-deadline.c
+> @@ -659,7 +659,8 @@ static void dd_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
+>   
+>   	if (flags & BLK_MQ_INSERT_AT_HEAD) {
+>   		list_add(&rq->queuelist, &per_prio->dispatch);
+> -		rq->fifo_time = jiffies;
+> +		rq->fifo_time = jiffies + dd->fifo_expire[data_dir]
+> +				- dd->prio_aging_expire / 2;
+>   	} else {
+>   		deadline_add_rq_rb(per_prio, rq);
 
-Signed-off-by: Keith Busch <kbusch@kernel.org>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
+Thanks for having added a detailed patch description. Please remove
+"/ 2" from the above patch to make sure that BLK_MQ_INSERT_AT_HEAD
+requests are submitted to the block driver before other requests. This
+is important if a request is requeued. Additionally, a comment should be
+added above the modified line of code that explains the purpose of the
+calculation. How about this untested patch?
 
-LLM Generated explanations, may be completely bogus:
+diff --git a/block/mq-deadline.c b/block/mq-deadline.c
+index 3e741d33142d..566646591ddd 100644
+--- a/block/mq-deadline.c
++++ b/block/mq-deadline.c
+@@ -659,7 +659,14 @@ static void dd_insert_request(struct blk_mq_hw_ctx 
+*hctx, struct request *rq,
 
-YES - Enforcing queue_dma_alignment during bio splitting plugs a real
-correctness hole.
+  	if (flags & BLK_MQ_INSERT_AT_HEAD) {
+  		list_add(&rq->queuelist, &per_prio->dispatch);
+-		rq->fifo_time = jiffies;
++		/*
++		 * started_after() subtracts dd->fifo_expire[data_dir] from
++		 * rq->fifo_time. Hence, add it here. Subtract
++		 * dd->prio_aging_expire to ensure that AT HEAD requests are
++		 * submitted before higher priority requests.
++		 */
++		rq->fifo_time = jiffies + dd->fifo_expire[data_dir] -
++				dd->prio_aging_expire;
+  	} else {
+  		deadline_add_rq_rb(per_prio, rq);
 
-- block/blk-merge.c:304-314 now aborts splitting whenever a segment’s
-  offset or length violates `rq->q->limits.dma_alignment`, so we stop
-  generating tail bios that hardware simply cannot DMA. Today
-  `bio_split_rw_at()` only rounds down to the logical block size; on
-  controllers whose `max_hw_sectors` isn’t a multiple of the required
-  DMA alignment (common with 4 KiB-aligned gear or dm layers that
-  inherit large masks), the old code could emit a second bio whose first
-  bvec started at an unaligned byte boundary—drivers would then fail the
-  map or, worse, hit data corruption.
-- The new zero-length guard at block/blk-merge.c:341–343 fixes another
-  latent failure where alignment rounding reduced the “bytes that fit”
-  to 0, causing us to claim “no split needed” and proceed with an IO
-  layout the device cannot use.
-- include/linux/blkdev.h:1860-1866 keeps the public helper name but
-  funneled read/write callers through the new alignment-aware helper, so
-  all filesystem and block callers pick up the fix with no signature
-  churn. Passthrough stays untouched via the explicit `len_align_mask =
-  0` in block/blk-map.c:446, avoiding false positives on commands that
-  manage their own SG formatting.
-- The change is tightly scoped (four files), doesn’t relax any limit,
-  and only rejects bios that already violate documented queue
-  constraints—practical risk is low compared to the hard device failures
-  it prevents.
+Thanks,
 
-Given the potential for real-world DMA faults and the minimal, targeted
-nature of the patch, it’s a solid candidate for stable backport.
-
- block/blk-map.c        |  2 +-
- block/blk-merge.c      | 21 +++++++++++++++++----
- include/linux/bio.h    |  4 ++--
- include/linux/blkdev.h |  7 +++++++
- 4 files changed, 27 insertions(+), 7 deletions(-)
-
-diff --git a/block/blk-map.c b/block/blk-map.c
-index 23e5d5ebe59ec..6d1268aa82715 100644
---- a/block/blk-map.c
-+++ b/block/blk-map.c
-@@ -443,7 +443,7 @@ int blk_rq_append_bio(struct request *rq, struct bio *bio)
- 	int ret;
- 
- 	/* check that the data layout matches the hardware restrictions */
--	ret = bio_split_rw_at(bio, lim, &nr_segs, max_bytes);
-+	ret = bio_split_io_at(bio, lim, &nr_segs, max_bytes, 0);
- 	if (ret) {
- 		/* if we would have to split the bio, copy instead */
- 		if (ret > 0)
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 70d704615be52..cffc0fe48d8a3 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -279,25 +279,30 @@ static unsigned int bio_split_alignment(struct bio *bio,
- }
- 
- /**
-- * bio_split_rw_at - check if and where to split a read/write bio
-+ * bio_split_io_at - check if and where to split a bio
-  * @bio:  [in] bio to be split
-  * @lim:  [in] queue limits to split based on
-  * @segs: [out] number of segments in the bio with the first half of the sectors
-  * @max_bytes: [in] maximum number of bytes per bio
-+ * @len_align_mask: [in] length alignment mask for each vector
-  *
-  * Find out if @bio needs to be split to fit the queue limits in @lim and a
-  * maximum size of @max_bytes.  Returns a negative error number if @bio can't be
-  * split, 0 if the bio doesn't have to be split, or a positive sector offset if
-  * @bio needs to be split.
-  */
--int bio_split_rw_at(struct bio *bio, const struct queue_limits *lim,
--		unsigned *segs, unsigned max_bytes)
-+int bio_split_io_at(struct bio *bio, const struct queue_limits *lim,
-+		unsigned *segs, unsigned max_bytes, unsigned len_align_mask)
- {
- 	struct bio_vec bv, bvprv, *bvprvp = NULL;
- 	struct bvec_iter iter;
- 	unsigned nsegs = 0, bytes = 0;
- 
- 	bio_for_each_bvec(bv, bio, iter) {
-+		if (bv.bv_offset & lim->dma_alignment ||
-+		    bv.bv_len & len_align_mask)
-+			return -EINVAL;
-+
- 		/*
- 		 * If the queue doesn't support SG gaps and adding this
- 		 * offset would create a gap, disallow it.
-@@ -339,8 +344,16 @@ int bio_split_rw_at(struct bio *bio, const struct queue_limits *lim,
- 	 * Individual bvecs might not be logical block aligned. Round down the
- 	 * split size so that each bio is properly block size aligned, even if
- 	 * we do not use the full hardware limits.
-+	 *
-+	 * It is possible to submit a bio that can't be split into a valid io:
-+	 * there may either be too many discontiguous vectors for the max
-+	 * segments limit, or contain virtual boundary gaps without having a
-+	 * valid block sized split. A zero byte result means one of those
-+	 * conditions occured.
- 	 */
- 	bytes = ALIGN_DOWN(bytes, bio_split_alignment(bio, lim));
-+	if (!bytes)
-+		return -EINVAL;
- 
- 	/*
- 	 * Bio splitting may cause subtle trouble such as hang when doing sync
-@@ -350,7 +363,7 @@ int bio_split_rw_at(struct bio *bio, const struct queue_limits *lim,
- 	bio_clear_polled(bio);
- 	return bytes >> SECTOR_SHIFT;
- }
--EXPORT_SYMBOL_GPL(bio_split_rw_at);
-+EXPORT_SYMBOL_GPL(bio_split_io_at);
- 
- struct bio *bio_split_rw(struct bio *bio, const struct queue_limits *lim,
- 		unsigned *nr_segs)
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 46ffac5caab78..519a1d59805f8 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -322,8 +322,8 @@ static inline void bio_next_folio(struct folio_iter *fi, struct bio *bio)
- void bio_trim(struct bio *bio, sector_t offset, sector_t size);
- extern struct bio *bio_split(struct bio *bio, int sectors,
- 			     gfp_t gfp, struct bio_set *bs);
--int bio_split_rw_at(struct bio *bio, const struct queue_limits *lim,
--		unsigned *segs, unsigned max_bytes);
-+int bio_split_io_at(struct bio *bio, const struct queue_limits *lim,
-+		unsigned *segs, unsigned max_bytes, unsigned len_align);
- 
- /**
-  * bio_next_split - get next @sectors from a bio, splitting if necessary
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index fe1797bbec420..d75c77eb8cb97 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1870,6 +1870,13 @@ bdev_atomic_write_unit_max_bytes(struct block_device *bdev)
- 	return queue_atomic_write_unit_max_bytes(bdev_get_queue(bdev));
- }
- 
-+static inline int bio_split_rw_at(struct bio *bio,
-+		const struct queue_limits *lim,
-+		unsigned *segs, unsigned max_bytes)
-+{
-+	return bio_split_io_at(bio, lim, segs, max_bytes, lim->dma_alignment);
-+}
-+
- #define DEFINE_IO_COMP_BATCH(name)	struct io_comp_batch name = { }
- 
- #endif /* _LINUX_BLKDEV_H */
--- 
-2.51.0
-
+Bart.
