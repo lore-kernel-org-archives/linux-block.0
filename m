@@ -1,27 +1,27 @@
 Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA3992D0C68;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA4622D0C7A;
 	Thu,  9 Oct 2025 07:53:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759996400; cv=none; b=Izvv88Zr/Xhscv1COIShjEHb4vRhb0oE6fQUxxZyotEVrs2n0iC8gqS+jz6RnvnjUKVWewMjJMxQ1JDd6OLwSo6GZcfEyj55c2nyjCeyo8AyW/whCgvtJGCIVECHDiDZxgZOuGEyNQYHaNbjgFhQo2Cpe6MRp2Cs7qm+LIjcJWg=
+	t=1759996402; cv=none; b=Y3Hv+01QU19Hq03uIIK6jMbpkB/ipcEZQyuUbrrUK7aY/STRCMn9QBwkZqSnXETUuCm0YB1PQWWWrfmW55XjHcHB1bjtx8heIUw4V0X1YM/i4NIcaHT1ML1vW44BAVajva7b2/z89fjyYrOkZXsnOlwR/SRhDdX8HcBr/8Y0PJo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759996400; c=relaxed/simple;
-	bh=7KPyHhtyNalJb+NFZ3Be+iCWK2RwkLvC6hYbnbWvk5U=;
+	s=arc-20240116; t=1759996402; c=relaxed/simple;
+	bh=rJCmr2vRxpQvqOBs2AdVE9J+V9zwFHJ2Ch8Tsy991vM=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=WFIQAZItcmz1ei5bLeDnhTdekLRxr2Q1Jz8qSFcLRgCOlD1nnsBkh3f8fz0HAxBrzPTdYMdOkGaLkja1y8rVP8tHyH+cIwkSJVwavYbzw6P28xTzDeCrSSHgJz+IOuGXwGW2/7BnFZD5tx+tIb9rH+SMIs3rOUXQbaVWn6cErwY=
+	 MIME-Version; b=MZHK7pE0mJkQK7MNjVavg5KYIq2JeObriC19QncYQQ4owNp+Ab06ghcB54RIIdj/CR6iYDov8pVdX5bl55KDH2oDHHc/SAGcQ527XCxSy2MNXnUHwWilEuCDZum4EFOa9Chmrez7R4+HcEusvZ8vHiY2mGu528LHBuQIPuSaZZg=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
 Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4cj2Cw0CPCzYQv6Z;
-	Thu,  9 Oct 2025 15:52:44 +0800 (CST)
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4cj2Cv6H72zYQv5h;
+	Thu,  9 Oct 2025 15:52:43 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 58F0E1A1515;
+	by mail.maildlp.com (Postfix) with ESMTP id 3663F1A0F45;
 	Thu,  9 Oct 2025 15:53:16 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.50.159.234])
-	by APP4 (Coremail) with SMTP id gCh0CgA3+mHqaedo7Fo7CQ--.38248S10;
+	by APP4 (Coremail) with SMTP id gCh0CgA3+mHqaedo7Fo7CQ--.38248S8;
 	Thu, 09 Oct 2025 15:53:16 +0800 (CST)
 From: Yu Kuai <yukuai1@huaweicloud.com>
 To: axboe@kernel.dk,
@@ -36,9 +36,9 @@ Cc: linux-block@vger.kernel.org,
 	yi.zhang@huawei.com,
 	yangerkun@huawei.com,
 	johnny.chenyi@huawei.com
-Subject: [patch v2 6/7] block, bfq: convert to use request_queue->async_depth
-Date: Thu,  9 Oct 2025 15:46:33 +0800
-Message-Id: <20251009074634.527661-7-yukuai1@huaweicloud.com>
+Subject: [patch v2 4/7] kyber: covert to use request_queue->async_depth
+Date: Thu,  9 Oct 2025 15:46:31 +0800
+Message-Id: <20251009074634.527661-5-yukuai1@huaweicloud.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20251009074634.527661-1-yukuai1@huaweicloud.com>
 References: <20251009074634.527661-1-yukuai1@huaweicloud.com>
@@ -49,11 +49,11 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgA3+mHqaedo7Fo7CQ--.38248S10
-X-Coremail-Antispam: 1UD129KBjvJXoWxXr4xuFy8tr45tF4xCF1kAFb_yoW5Ar4xp3
-	y3tanxKr18JF429w1rAw1agryrKwn5uryfJF13tryxJrZ8ZFn7ZF1YqF1rXr97Xr97Aw4U
-	XrWDZa95W3WIqF7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUma14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+X-CM-TRANSID:gCh0CgA3+mHqaedo7Fo7CQ--.38248S8
+X-Coremail-Antispam: 1UD129KBjvJXoWxuF1UtF4xCr4DAw1kAFy3twb_yoW5tr18pF
+	Z5ZanIyF1Utr429rykJ3y7Zw1fWr9Fgr13JFs5t34fKryDt3Z7X3WrtFy0qFWIvryrAwsr
+	urZ8ta9rJFn7tF7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUmI14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
 	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_JF0E3s1l82xGYI
 	kIc2x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2
 	z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F
@@ -63,89 +63,112 @@ X-Coremail-Antispam: 1UD129KBjvJXoWxXr4xuFy8tr45tF4xCF1kAFb_yoW5Ar4xp3
 	M4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2
 	kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkE
 	bVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67
-	AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUCVW8JwCI
+	AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI
 	42IY6xIIjxv20xvEc7CjxVAFwI0_Cr0_Gr1UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCw
-	CI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4UJVWxJrUvcSsG
-	vfC2KfnxnUUI43ZEXa7VUbPC7UUUUUU==
+	CI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnI
+	WIevJa73UjIFyTuYvjfUOyIUUUUUU
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
 From: Yu Kuai <yukuai3@huawei.com>
 
-The default limits is unchanged, and user can configure async_depth now.
+Instead of the internal async_depth, remove kqd->async_depth and related
+helpers.
+
+Noted elevator attribute async_depth is now removed, queue attribute
+with the same name is used instead.
 
 Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 ---
- block/bfq-iosched.c | 43 +++++++++++++++++--------------------------
- 1 file changed, 17 insertions(+), 26 deletions(-)
+ block/kyber-iosched.c | 33 +++++----------------------------
+ 1 file changed, 5 insertions(+), 28 deletions(-)
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 63452e791f98..9e0eee9aba5c 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -7112,39 +7112,29 @@ void bfq_put_async_queues(struct bfq_data *bfqd, struct bfq_group *bfqg)
- static void bfq_depth_updated(struct request_queue *q)
- {
- 	struct bfq_data *bfqd = q->elevator->elevator_data;
--	unsigned int nr_requests = q->nr_requests;
-+	unsigned int async_depth = q->async_depth;
- 
- 	/*
--	 * In-word depths if no bfq_queue is being weight-raised:
--	 * leaving 25% of tags only for sync reads.
-+	 * By default:
-+	 *  - sync reads are not limited
-+	 * If bfqq is not being weight-raised:
-+	 *  - sync writes are limited to 75%(async depth default value)
-+	 *  - async IO are limited to 50%
-+	 * If bfqq is being weight-raised:
-+	 *  - sync writes are limited to ~37%
-+	 *  - async IO are limited to ~18
- 	 *
--	 * In next formulas, right-shift the value
--	 * (1U<<bt->sb.shift), instead of computing directly
--	 * (1U<<(bt->sb.shift - something)), to be robust against
--	 * any possible value of bt->sb.shift, without having to
--	 * limit 'something'.
-+	 * If request_queue->async_depth is updated by user, all limit are
-+	 * updated relatively.
+diff --git a/block/kyber-iosched.c b/block/kyber-iosched.c
+index cf243a457175..469dad8a981c 100644
+--- a/block/kyber-iosched.c
++++ b/block/kyber-iosched.c
+@@ -47,9 +47,8 @@ enum {
+ 	 * asynchronous requests, we reserve 25% of requests for synchronous
+ 	 * operations.
  	 */
--	/* no more than 50% of tags for async I/O */
--	bfqd->async_depths[0][0] = max(nr_requests >> 1, 1U);
--	/*
--	 * no more than 75% of tags for sync writes (25% extra tags
--	 * w.r.t. async I/O, to prevent async I/O from starving sync
--	 * writes)
--	 */
--	bfqd->async_depths[0][1] = max((nr_requests * 3) >> 2, 1U);
-+	bfqd->async_depths[0][1] = async_depth;
-+	bfqd->async_depths[0][0] = max(async_depth * 2 / 3, 1U);
-+	bfqd->async_depths[1][1] = max(async_depth >> 1, 1U);
-+	bfqd->async_depths[1][0] = max(async_depth >> 2, 1U);
- 
- 	/*
--	 * In-word depths in case some bfq_queue is being weight-
--	 * raised: leaving ~63% of tags for sync reads. This is the
--	 * highest percentage for which, in our tests, application
--	 * start-up times didn't suffer from any regression due to tag
--	 * shortage.
-+	 * Due to cgroup qos, the allowed request for bfqq might be 1
- 	 */
--	/* no more than ~18% of tags for async I/O */
--	bfqd->async_depths[1][0] = max((nr_requests * 3) >> 4, 1U);
--	/* no more than ~37% of tags for sync writes (~20% extra tags) */
--	bfqd->async_depths[1][1] = max((nr_requests * 6) >> 4, 1U);
+-	KYBER_ASYNC_PERCENT = 75,
++	KYBER_DEFAULT_ASYNC_PERCENT = 75,
+ };
 -
- 	blk_mq_set_min_shallow_depth(q, 1);
+ /*
+  * Maximum device-wide depth for each scheduling domain.
+  *
+@@ -157,9 +156,6 @@ struct kyber_queue_data {
+ 	 */
+ 	struct sbitmap_queue domain_tokens[KYBER_NUM_DOMAINS];
+ 
+-	/* Number of allowed async requests. */
+-	unsigned int async_depth;
+-
+ 	struct kyber_cpu_latency __percpu *cpu_latency;
+ 
+ 	/* Timer for stats aggregation and adjusting domain tokens. */
+@@ -401,10 +397,7 @@ static struct kyber_queue_data *kyber_queue_data_alloc(struct request_queue *q)
+ 
+ static void kyber_depth_updated(struct request_queue *q)
+ {
+-	struct kyber_queue_data *kqd = q->elevator->elevator_data;
+-
+-	kqd->async_depth = q->nr_requests * KYBER_ASYNC_PERCENT / 100U;
+-	blk_mq_set_min_shallow_depth(q, kqd->async_depth);
++	blk_mq_set_min_shallow_depth(q, q->async_depth);
  }
  
-@@ -7365,6 +7355,7 @@ static int bfq_init_queue(struct request_queue *q, struct elevator_queue *eq)
- 	blk_queue_flag_set(QUEUE_FLAG_DISABLE_WBT_DEF, q);
- 	wbt_disable_default(q->disk);
- 	blk_stat_enable_accounting(q);
-+	q->async_depth = (q->nr_requests * 3) >> 2;
+ static int kyber_init_sched(struct request_queue *q, struct elevator_queue *eq)
+@@ -421,6 +414,7 @@ static int kyber_init_sched(struct request_queue *q, struct elevator_queue *eq)
+ 
+ 	eq->elevator_data = kqd;
+ 	q->elevator = eq;
++	q->async_depth = q->nr_requests * KYBER_DEFAULT_ASYNC_PERCENT / 100;
+ 	kyber_depth_updated(q);
  
  	return 0;
+@@ -540,15 +534,8 @@ static void rq_clear_domain_token(struct kyber_queue_data *kqd,
  
+ static void kyber_limit_depth(blk_opf_t opf, struct blk_mq_alloc_data *data)
+ {
+-	/*
+-	 * We use the scheduler tags as per-hardware queue queueing tokens.
+-	 * Async requests can be limited at this stage.
+-	 */
+-	if (!blk_mq_sched_sync_request(opf)) {
+-		struct kyber_queue_data *kqd = data->q->elevator->elevator_data;
+-
+-		data->shallow_depth = kqd->async_depth;
+-	}
++	if (!blk_mq_sched_sync_request(opf))
++		data->shallow_depth = data->q->async_depth;
+ }
+ 
+ static bool kyber_bio_merge(struct request_queue *q, struct bio *bio,
+@@ -944,15 +931,6 @@ KYBER_DEBUGFS_DOMAIN_ATTRS(KYBER_DISCARD, discard)
+ KYBER_DEBUGFS_DOMAIN_ATTRS(KYBER_OTHER, other)
+ #undef KYBER_DEBUGFS_DOMAIN_ATTRS
+ 
+-static int kyber_async_depth_show(void *data, struct seq_file *m)
+-{
+-	struct request_queue *q = data;
+-	struct kyber_queue_data *kqd = q->elevator->elevator_data;
+-
+-	seq_printf(m, "%u\n", kqd->async_depth);
+-	return 0;
+-}
+-
+ static int kyber_cur_domain_show(void *data, struct seq_file *m)
+ {
+ 	struct blk_mq_hw_ctx *hctx = data;
+@@ -978,7 +956,6 @@ static const struct blk_mq_debugfs_attr kyber_queue_debugfs_attrs[] = {
+ 	KYBER_QUEUE_DOMAIN_ATTRS(write),
+ 	KYBER_QUEUE_DOMAIN_ATTRS(discard),
+ 	KYBER_QUEUE_DOMAIN_ATTRS(other),
+-	{"async_depth", 0400, kyber_async_depth_show},
+ 	{},
+ };
+ #undef KYBER_QUEUE_DOMAIN_ATTRS
 -- 
 2.39.2
 
