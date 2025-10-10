@@ -1,108 +1,142 @@
-Received: from mail-yx1-f51.google.com (mail-yx1-f51.google.com [74.125.224.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E06DA4C9D
-	for <linux-block@vger.kernel.org>; Fri, 10 Oct 2025 04:09:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AF7F235041;
+	Fri, 10 Oct 2025 04:48:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760069382; cv=none; b=dyiIS//E1WfuZ6X0lug0e0jH04lJyOTr3TrZRdfwZWm193/974wmc7fdLhU9+5aNiEa4lyFqLySYgRgJcGhaXstOCm6xQPQDVn+ToR7rxiiMrjrKvYiv+wpwYPpu1ANHtQ4TQXRC5p+64ZhtMiZfjnYI54zIluygiPCtX0AWS8Y=
+	t=1760071730; cv=none; b=i9qXQP4NDUdE5KVAfPvOzs9Nc0ywAtRyEXdMxWMGbmk6hdcJsw71lKQOTx461R7tyzlKHjGYy5XkXmwuBxAsP/KcXhKqet7H0g1M3grxzl7jnTxyaY3FL3UBjYivyE+yIPrrpRscvkQUHnaLpebeYgKv3Vlua3oRmoYff4ode3c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760069382; c=relaxed/simple;
-	bh=QekwWSNZM13jRboBgI+VcoYsXugGuoxwasNpiteDkcg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NDGmlHw8OTcWu2JZzP3boY8EIydOy5T5UGmD95Zcuw2yOifvCU6bACGvRcXutFLx0yRZqUjLhiDJeEiZw24XtX53CFW8XYEgqRvBk/uaQmR6GWH/g7m5WNkQpmykEcQOX1VPD4SaAXhA7mZQjCe+qYOl72t9DHzsS227vc/+x9g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nDuL5tqL; arc=none smtp.client-ip=74.125.224.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1760071730; c=relaxed/simple;
+	bh=phRHx/VwWkrpOoRQmlu4l7O8Qm607TEQdv9DuALw9sw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FbhM9twyI6x9OJP3uh2Q2em3p7Uy/HZNumr2bs3i170L/wSCvPcjOyhTNI7lER6Qx1MySNC3X/6NTSVtp4Y7EV8xNA4A5o12TcFL3hh1Y+BEVOR+P6N/5kV/HqaQ41uRuxZlFaSJxlv8SzfbI/GA3Jc0Tb6iFkrkkr6JzeRe8kw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=PNhnxSES; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nDuL5tqL"
-Received: by mail-yx1-f51.google.com with SMTP id 956f58d0204a3-635355713d9so1612548d50.3
-        for <linux-block@vger.kernel.org>; Thu, 09 Oct 2025 21:09:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760069379; x=1760674179; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QekwWSNZM13jRboBgI+VcoYsXugGuoxwasNpiteDkcg=;
-        b=nDuL5tqLs6F/bqWcdATCSw3q6sR4xH9PojO9qOD+5CVFhCKnIdXYLqb6N9qP3a90AK
-         XcWKwh2rGBNpBKIw4DXxov8U2qs0Dzy6gXk8vFfvDusYiZmPGdnri/OyTQj/4/Q9hjBA
-         AP9cRpfxElOVTqf47iRfDxq23HPr72skNOU/r2V/uYwO0u5rdlLaDJlfE0FHTHhwxXRY
-         CxV+l2MjGbd2BdsN32iKqGDmRkhB4tNQBtMagkevAiwpNidXH4OagDZ/3oHz+Ju9tDVq
-         V/7yZAk0s3YGeHhlLGi653f8C0CT7tXpjc3Ab8zbhGaCEogKGwXedDHs/+NW7Be9ThrK
-         SjAg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760069379; x=1760674179;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QekwWSNZM13jRboBgI+VcoYsXugGuoxwasNpiteDkcg=;
-        b=jICiAAKg2u3Id1F7wbuXrAxtott7COK2quO86c9bd0VE+nrGTFDvLjBqiYscK8hK9K
-         pTvYtk0Aa+27BUvR3hubZCcTt++MZPeVO5N2D3SlctWOYa/UUTCYyK8Q992ihvK+U56g
-         jNJJ4zvJXOUT06m0NxXUneUUCtlVRaCgD8g6/SerxQqbS39P1E03wpGLDVMR57eSJsmI
-         iztKlfc0tRP4xmNwavoKjmQZELrufeVGInBVw8cWOWkEXyz9+2ldIrJzcPzgknIS8kCX
-         NHhfupBp9Zt/n/AaO9j1yVYFMv2aNBaO8SEL3koFZyO3cbS6583sjh4ToMfgXzcXJsqG
-         a+rw==
-X-Forwarded-Encrypted: i=1; AJvYcCXm8J/8P61mfkn6pJJzUWz4ASiix0KnR6QUpHg4PI0LUzTQIUxnZ5kKYjT/9MQq77TDBdG6Fax28ytkpg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwMWRAgwSKJ0KhzVEbLIGp4U039/ncQnNEqT1wcxnlFAGWCxVux
-	ARcwous4Tr4VYaaOJMBi5COiehw7Go1wJLkPtj7BmGip87OGeVG/UZ3sMUQMCHRBYCq/GiGFlhZ
-	2B2IAN4FMY6FyNQ/v9i+QzOIC+tffWFQ=
-X-Gm-Gg: ASbGncvYAR32/sNoEdP15REcMMAJAc7JnC6FcH8Nrd8CrvOZOt+ZnFjTO1IZ3O/0Pje
-	dy+vtS9d9jUw+P8bMmObUI02zAlzASeaSZZIxzJsxB3lRPDkLvrW8v/a5ZhHReKhJF2eyyBWXWa
-	GBh9s6D2OFwQQxxWg6GP9uoI1njKrOH1nGfUzl52z/Lh7jcVqdqMgc4Ves4Cq+J4CvXEMnL2pFT
-	ztUO2cQ7Ua7j2ryfp97lo2l+qvmrTCd7Owy
-X-Google-Smtp-Source: AGHT+IEKzDZJ3mg1FFWOqowFJqWLj/+dmJPdM199pmmtVcavFH/YLuoH0hEdsvn7dHSOiTNw/3Aomiv0DcOjJivXzrY=
-X-Received: by 2002:a53:e946:0:b0:636:17d6:a30 with SMTP id
- 956f58d0204a3-63ccb82410bmr7618496d50.15.1760069378763; Thu, 09 Oct 2025
- 21:09:38 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="PNhnxSES"
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 599H7NBD016972;
+	Fri, 10 Oct 2025 04:48:16 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=9Ur/6w
+	0hOmkNV21C6M65ov7/SvzsTHLXyOAAfFKYIgU=; b=PNhnxSESXjG+tUH6bBIleH
+	WP9Iy8PLZMXcAe41FQlf5yzOrz4xSDtcCBw55B3G+0X3837llpy21i4oVV3bzFNM
+	0NwjmJOLSsQjbbk1Rf3tBynvvCLQHTf1xURzdNgYssfsJirY9JS0u97f2yQ4UyC3
+	ESe0kv3OsHXfH9cLgXomZfQG+/ViPNm1MErMo38420LTX5A8mzQlRZWfOqY20u8y
+	R2jJLZte/d9nj9ja+qqMaw1Jm6HM5X2vzddb8qTBsLnccisq4OUg1p9MyFTS/e7s
+	asiOyS6I2XO8I0AIv1ViyLDhsJ34FNz7S7ShxxDHzMOX+aorqyKkG9Sc+oQ3bcuw
+	==
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 49nv84rj3t-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 10 Oct 2025 04:48:15 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 59A31Krp026015;
+	Fri, 10 Oct 2025 04:48:15 GMT
+Received: from smtprelay07.wdc07v.mail.ibm.com ([172.16.1.74])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 49nvamr4rc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 10 Oct 2025 04:48:15 +0000
+Received: from smtpav02.dal12v.mail.ibm.com (smtpav02.dal12v.mail.ibm.com [10.241.53.101])
+	by smtprelay07.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 59A4mExK63504696
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 10 Oct 2025 04:48:14 GMT
+Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 176065805C;
+	Fri, 10 Oct 2025 04:48:14 +0000 (GMT)
+Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id BB6CC5805A;
+	Fri, 10 Oct 2025 04:48:10 +0000 (GMT)
+Received: from [9.43.29.178] (unknown [9.43.29.178])
+	by smtpav02.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Fri, 10 Oct 2025 04:48:10 +0000 (GMT)
+Message-ID: <b6518c17-e65f-4410-930c-04d3be364f9e@linux.ibm.com>
+Date: Fri, 10 Oct 2025 10:17:47 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250913003842.41944-1-safinaskar@gmail.com> <A08066E1-A57E-4980-B15A-8FB00AC747CC@jrtc27.com>
-In-Reply-To: <A08066E1-A57E-4980-B15A-8FB00AC747CC@jrtc27.com>
-From: Askar Safin <safinaskar@gmail.com>
-Date: Fri, 10 Oct 2025 07:09:02 +0300
-X-Gm-Features: AS18NWDxe32nrD4BfQQFhIe3tEEfxrwgJsYQo_BWhSUPsy5CceSv7QOcZ20roI0
-Message-ID: <CAPnZJGAKmgySY_RK0kmGTgwUh9hw4FSrVR+LoJCbD_RmJZe6RA@mail.gmail.com>
-Subject: Re: [PATCH RESEND 00/62] initrd: remove classic initrd support
-To: Jessica Clarke <jrtc27@jrtc27.com>
-Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Linus Torvalds <torvalds@linux-foundation.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Christian Brauner <brauner@kernel.org>, 
-	Al Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@lst.de>, 
-	Jens Axboe <axboe@kernel.dk>, Andy Shevchenko <andy.shevchenko@gmail.com>, 
-	Aleksa Sarai <cyphar@cyphar.com>, =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>, 
-	Julian Stecklina <julian.stecklina@cyberus-technology.de>, 
-	Gao Xiang <hsiangkao@linux.alibaba.com>, Art Nikpal <email2tema@gmail.com>, 
-	Andrew Morton <akpm@linux-foundation.org>, Eric Curtin <ecurtin@redhat.com>, 
-	Alexander Graf <graf@amazon.com>, Rob Landley <rob@landley.net>, 
-	Lennart Poettering <mzxreary@0pointer.de>, linux-arch@vger.kernel.org, 
-	linux-alpha@vger.kernel.org, linux-snps-arc@lists.infradead.org, 
-	linux-arm-kernel@lists.infradead.org, linux-csky@vger.kernel.org, 
-	linux-hexagon@vger.kernel.org, loongarch@lists.linux.dev, 
-	linux-m68k@lists.linux-m68k.org, linux-mips@vger.kernel.org, 
-	linux-openrisc@vger.kernel.org, linux-parisc@vger.kernel.org, 
-	linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org, 
-	linux-s390@vger.kernel.org, linux-sh@vger.kernel.org, 
-	sparclinux@vger.kernel.org, linux-um@lists.infradead.org, x86@kernel.org, 
-	Ingo Molnar <mingo@redhat.com>, linux-block@vger.kernel.org, initramfs@vger.kernel.org, 
-	linux-api@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-efi@vger.kernel.org, linux-ext4@vger.kernel.org, 
-	"Theodore Y . Ts'o" <tytso@mit.edu>, linux-acpi@vger.kernel.org, Michal Simek <monstr@monstr.eu>, 
-	devicetree@vger.kernel.org, Luis Chamberlain <mcgrof@kernel.org>, Kees Cook <kees@kernel.org>, 
-	Thorsten Blum <thorsten.blum@linux.dev>, Heiko Carstens <hca@linux.ibm.com>, patches@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 3/7] blk-mq: add a new queue sysfs attribute
+ async_depth
+To: Yu Kuai <yukuai@kernel.org>, axboe@kernel.dk, bvanassche@acm.org
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yukuai3@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com,
+        johnny.chenyi@huawei.com
+References: <20251010022812.2985286-1-yukuai@kernel.org>
+ <20251010022812.2985286-4-yukuai@kernel.org>
+Content-Language: en-US
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <20251010022812.2985286-4-yukuai@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Authority-Analysis: v=2.4 cv=HKPO14tv c=1 sm=1 tr=0 ts=68e89010 cx=c_pps
+ a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
+ a=IkcTkHD0fZMA:10 a=x6icFKpwvdMA:10 a=VnNF1IyMAAAA:8 a=cHuC2WqR6wHazkE0P-8A:9
+ a=QEXdDO2ut3YA:10 a=cPQSjfK2_nFv0Q5t_7PE:22
+X-Proofpoint-GUID: 99dCmogKHKYFfp0IG1KEOinpd3QmFxqY
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDA4MDEyMSBTYWx0ZWRfXwQM3DYYaY6QJ
+ by83CHB0GzauMZmc7O6SU/TwvqShxdhcKR979tQhkq5CamBe/Uu6gjY0DH2Z/eYaBTytvazmnYj
+ +VNHk4l/fc7CWxARJFfe99XdLynrwqEsWSKJBgN2QEtVobrMZ1GJIBREAq/8TwJWfAx/hxO1dCX
+ h+n92KZ+QNfVUP+guXqXqJdryVG5pHNVqpLXT7lHZnN51Np4SwETNU9dSgCWmzPTn4o6Swd2Hn0
+ cDQbZMZ818WToUlwkvVNpsYS0XkekAo1cy6wmKMZJwXw8vJM+gAtbVoCClKY/jthCXtV3tsyXS0
+ MsOsvVu0kmiH6qTNRjkyUG/oyw3sum4LPwHUdGw1gSxl80FEWFhs+4tMuXFvnsYSdC3bfX4hTPC
+ LrbHv2m1zSDNGiW7GMfLC8LF4SPGOA==
+X-Proofpoint-ORIG-GUID: 99dCmogKHKYFfp0IG1KEOinpd3QmFxqY
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-10-10_01,2025-10-06_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ suspectscore=0 impostorscore=0 lowpriorityscore=0 bulkscore=0 spamscore=0
+ adultscore=0 clxscore=1011 phishscore=0 priorityscore=1501 malwarescore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2510020000 definitions=main-2510080121
 
-On Tue, Sep 16, 2025 at 8:08=E2=80=AFPM Jessica Clarke <jrtc27@jrtc27.com> =
-wrote:
-> I strongly suggest picking different names given __builtin_foo is the
-> naming scheme used for GNU C builtins/intrinsics. I leave you and
-> others to bikeshed that one.
 
-Thank you! I will fix this.
 
---=20
-Askar Safin
+On 10/10/25 7:58 AM, Yu Kuai wrote:
+> +static ssize_t
+> +queue_async_depth_store(struct gendisk *disk, const char *page, size_t count)
+> +{
+> +	struct request_queue *q = disk->queue;
+> +	unsigned int memflags;
+> +	unsigned long nr;
+> +	int ret;
+> +
+> +	if (!queue_is_mq(q))
+> +		return -EINVAL;
+> +
+> +	ret = queue_var_store(&nr, page, count);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	if (nr == 0)
+> +		return -EINVAL;
+> +
+> +	memflags = blk_mq_freeze_queue(q);
+> +	scoped_guard(mutex, &q->elevator_lock) {
+> +		if (q->elevator) {
+> +			q->async_depth = min(q->nr_requests, nr);
+> +			if (q->elevator->type->ops.depth_updated)
+> +				q->elevator->type->ops.depth_updated(q);
+> +		} else {
+> +			ret = -EINVAL;
+> +		}
+> +	}
+> +	blk_mq_unfreeze_queue(q, memflags);
+> +
+> +	return ret;
+> +}
+> +
+With this change, we've got the first user of scoped_guard() in the 
+block subsystem!
+
+Looks good to me:
+Reviewed-by: Nilay Shroff <nilay@linux.ibm.com>
+
