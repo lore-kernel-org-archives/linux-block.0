@@ -1,95 +1,137 @@
-Received: from 003.mia.mailroute.net (003.mia.mailroute.net [199.89.3.6])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C53728850F;
-	Thu,  9 Oct 2025 23:40:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B8E82AD22
+	for <linux-block@vger.kernel.org>; Fri, 10 Oct 2025 00:39:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760053228; cv=none; b=eQYVylonX4EE4s7EJapBCo8MhhgfKzx2NYIHXhwVygSu1kOhUCmey/+xtXINSvRVx7qeerX3KZuXqsOmoojitdTNzhogwWEgBdu+ZTGPw/OB1AWgsApEUbvDVeBeaDpmy4Wd02dgGAzVIavjc4LjZNnbCB4zWv1I7IgizkorNnI=
+	t=1760056786; cv=none; b=Q21u4/LRGVfzWilpOBCbKobQKQyao6AVNjonetozsquqxRjBmKRMBFdhGjvQK+leUhhMombfE65eMUH0hxhv741HMkL+fVQcO2f+mibggyFcxkjMjTuPN7ZyuaW3Yh7E7DqF8pnhwpNtVj4I8gNdNt0EIqBiB72oBLVKdWbyuoQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760053228; c=relaxed/simple;
-	bh=jbXf+oYCbVfnN9hCBEoXYickNFcUbhVgCGfXK6UgfYs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EliBa+lSXMIBYiVLpzcILH+CTdPJ++oOuuEj069A/FVFgqVKJXqZkqxxnOWblFonQ9dQpZ+shyTFKtZYz1244vPfba+RyI9t50J4JS0UGqSHf29meGMZEcdIgS+ckdaDI4KHFuxB0BMmHKHFKeHqIWuG7gjiEKiyO4zZgs5ySXQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=dSAyVX7V; arc=none smtp.client-ip=199.89.3.6
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1760056786; c=relaxed/simple;
+	bh=epacj6aKs+5PtWKm4XZ10BX+XGQk9N7DSXmKbFHLrZM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mgIMRn9cSWxJtoSnUhjtD7bEWjN4sRJLF4KkFFoR2NB85t1ByJTN5HBM786b8yfsw5OHPzRxqJJm0HmGzUdcUF0lnT/jElB1odyewspLZF0UCUx93WzAQJPPtQMcohdfccYEr1zv0exsWGujG+cRefsh7fnH2ODlQ38mmkJSNhw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=jDCRwdlB; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="dSAyVX7V"
-Received: from localhost (localhost [127.0.0.1])
-	by 003.mia.mailroute.net (Postfix) with ESMTP id 4cjRFP75nDzltKFn;
-	Thu,  9 Oct 2025 23:40:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1760053224; x=1762645225; bh=yTHDZEo4xkKcumLOfsHylHgL
-	/jrJwym+SE4lLdqXNgY=; b=dSAyVX7VZCVHuOzIqDyd7VcdjRatL6Aozqzh9sIp
-	sJtazL044OBVOflbfKOzza/CVOClB/cbBYwhWMyTy4zEwNUtpB1r6Z8yxx9nb7gP
-	D+Af2eLm+l2orUmsjxGoPyZPNtdVmTE9AgbewybZcwOEs32iyhvNiQM0gOyxktwe
-	P3ixyOdiT/gOjCtpDce3Ja1MZRKTE0DDkNJEpOR1QFtgSSOVxkrYsnKR7fm1aP1M
-	7F3+Pu2FK5CKuNnNIojW0AJblLqESFonsd4jRX5IOneXycDskWoefcykcU5gjCUB
-	yUIRaZtKzlETwT/xwWP8TkXwabotz7nIUHj1WbKJFr0EyA==
-X-Virus-Scanned: by MailRoute
-Received: from 003.mia.mailroute.net ([127.0.0.1])
- by localhost (003.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id IxN8B9_CWxTr; Thu,  9 Oct 2025 23:40:24 +0000 (UTC)
-Received: from [192.168.51.14] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jDCRwdlB"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1760056784;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=qOZL046Blo3kEtnXR5GG66Ol5QYGrAEgmB+JhvM7L6I=;
+	b=jDCRwdlBuqJw1i3cXcmRoCYLwiu5MGqRCjv9GVjrl8wCte32YNHqFHSXv59JoDv+L3G+yf
+	/lijSXHenjHXaXXeaY+NXPx8lQvACBQBgQVFv/BGCbh4goj43uUB9vjFnmsrMf/V+S/rnt
+	kJrh2eI1xcxTUadgrwA9gvikV2RVIi8=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-629-BqcHMXKKPgGo1k3ctagMJQ-1; Thu,
+ 09 Oct 2025 20:39:38 -0400
+X-MC-Unique: BqcHMXKKPgGo1k3ctagMJQ-1
+X-Mimecast-MFC-AGG-ID: BqcHMXKKPgGo1k3ctagMJQ_1760056777
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4cjRFH0Lsdzlgqyn;
-	Thu,  9 Oct 2025 23:40:18 +0000 (UTC)
-Message-ID: <8406f13d-d8be-4957-b1ec-6996f19d32e9@acm.org>
-Date: Thu, 9 Oct 2025 16:40:16 -0700
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6F79919560AE;
+	Fri, 10 Oct 2025 00:39:37 +0000 (UTC)
+Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (unknown [10.6.23.247])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D51841955F22;
+	Fri, 10 Oct 2025 00:39:36 +0000 (UTC)
+Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (localhost [127.0.0.1])
+	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.17.1) with ESMTPS id 59A0dZqC2933052
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Thu, 9 Oct 2025 20:39:35 -0400
+Received: (from bmarzins@localhost)
+	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.18.1/Submit) id 59A0dZEF2933051;
+	Thu, 9 Oct 2025 20:39:35 -0400
+Date: Thu, 9 Oct 2025 20:39:35 -0400
+From: Benjamin Marzinski <bmarzins@redhat.com>
+To: Bart Van Assche <bvanassche@acm.org>
+Cc: Martin Wilck <mwilck@suse.com>, Mikulas Patocka <mpatocka@redhat.com>,
+        Mike Snitzer <snitzer@kernel.org>, dm-devel@lists.linux.dev,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH] dm: Fix deadlock when reloading a multipath table
+Message-ID: <aOhVx3J2ahZQuS28@redhat.com>
+References: <20251009030431.2895495-1-bmarzins@redhat.com>
+ <ed792d72a1ca47937631af6e12098d9a20626bcf.camel@suse.com>
+ <033ca444-4c68-4a4f-bc2b-32232e80e848@acm.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] block/mq-deadline: adjust the timeout period of the
- per_prio->dispatch
-To: Damien Le Moal <dlemoal@kernel.org>, chengkaitao <pilgrimtao@gmail.com>,
- axboe@kernel.dk
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- Chengkaitao <chengkaitao@kylinos.cn>
-References: <20251009155253.14611-1-pilgrimtao@gmail.com>
- <db87a85d-e433-4daf-97c7-d5156849db0f@acm.org>
- <bb362d12-b942-48f3-8414-e859cebb8862@kernel.org>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <bb362d12-b942-48f3-8414-e859cebb8862@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <033ca444-4c68-4a4f-bc2b-32232e80e848@acm.org>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-
-On 10/9/25 1:21 PM, Damien Le Moal wrote:
-> There is still something bothering me with this: the request is added to the
-> dispatch list, and *NOT* to the fifo/sort list. So this should be considered as
-> a scheduling decision in itself, and __dd_dispatch_request() reflects that as
-> the first thing it does is pick the requests that are in the dispatch list
-> already. However, __dd_dispatch_request() also has the check:
+On Thu, Oct 09, 2025 at 04:29:21PM -0700, Bart Van Assche wrote:
+> On 10/9/25 2:57 AM, Martin Wilck wrote:
+> > In general, I'm wondering whether we need a more generic solution to
+> > this problem. Therefore I've added linux-block to cc.
+> > 
+> > The way I see it, if a device has queued IO without any means to
+> > perform the IO, it can't be frozen. We'd either need to fail all queued
+> > IO in this case, or refuse attempts to freeze the queue.
 > 
-> 		if (started_after(dd, rq, latest_start))
->                          return NULL;
+> If a device has queued I/O and the I/O can't make progress then it isn't
+> necessary to call blk_mq_freeze_queue(), isn't it? See also "[PATCH 0/3] Fix
+> a deadlock related to modifying queue attributes"
+> (https://lore.kernel.org/linux-block/20250702182430.3764163-1-bvanassche@acm.org/).
 > 
-> for requests that are already in the dispatch list. That is what does not make
-> sense to me. Why ? There is no comment describing this. And I do not understand
-> why we should bother with any time for requests that are in the dispatch list
-> already. These should be sent to the drive first, always.
+> BTW, that patch series is not upstream. I apply it manually every time
+> before I run blktests.
+
+Timing out the queue freeze looks like a good solution to me.
+
+Also, looking at that thread, I should point out that bio-based
+multipath does not suffer from this, since it doesn't queue requests. It
+queues bios. The reason you still got the hang with your blktests patch
+is that it didn't actually configure bio-based multipath ("queue_mode"
+is not a valid multipath.conf option). That would look something like
+this:
+
+===================
+diff --git a/common/multipath-over-rdma b/common/multipath-over-rdma
+index e157e0a..1084f80 100644
+--- a/common/multipath-over-rdma
++++ b/common/multipath-over-rdma
+@@ -267,9 +267,7 @@ mpath_has_stale_dev() {
+ # Check whether multipath definition $1 includes the queue_if_no_path keyword.
+ is_qinp_def() {
+ 	case "$1" in
+-		*" 3 queue_if_no_path queue_mode mq "*)
+-			return 0;;
+-		*" 1 queue_if_no_path "*)
++		*" queue_if_no_path "*)
+ 			return 0;;
+ 		*)
+ 			return 1;;
+diff --git a/tests/srp/multipath.conf b/tests/srp/multipath.conf
+index e0da32e..aad8e56 100644
+--- a/tests/srp/multipath.conf
++++ b/tests/srp/multipath.conf
+@@ -9,6 +9,7 @@ devices {
+ 		product		".*"
+ 		no_path_retry	queue
+ 		path_checker	tur
++		features "2 queue_mode bio"
+ 	}
+ }
+ blacklist {
+==================
+
+But you are correct that unless we can get bio-based multipath to
+something like performance parity with request-based multipath,
+customers aren't interested it in.
+
+-Ben
+
 > 
-> This patch seems to be fixing a problem that is introduced by the above check.
-> But why this check ? What am I missing here ?
+> Bart.
 
-Is my conclusion from the above correct that there is agreement that the 
-I/O priority should be ignored for AT HEAD requests and that AT HEAD
-requests should always be dispatched first? If so, how about merging the
-three per I/O priority dispatch lists into a single dispatch list and
-not to call started_after() at all for the dispatch list?
-
-Thanks,
-
-Bart.
