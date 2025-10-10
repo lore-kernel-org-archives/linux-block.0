@@ -1,269 +1,181 @@
-Received: from esa6.hgst.iphmx.com (esa6.hgst.iphmx.com [216.71.154.45])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08F26246BDE
-	for <linux-block@vger.kernel.org>; Fri, 10 Oct 2025 08:20:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.71.154.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0C1326658A
+	for <linux-block@vger.kernel.org>; Fri, 10 Oct 2025 08:42:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760084409; cv=none; b=KG19d/ZEF7s1cNqIaVPLY7HOCSeRWgWoeqcf/vNoRMZpb+DNJgBog7cxnfT/9wb4yADSTFixJm6zJV0ckeGXWqJCx70Zl/fHZ/fG6928c6J3Ddsv0QSm/V/6Ya8oXfrU+ikHplSmWS37TdM4Wsqe504sgtof+yV4iAcVfEq6dXc=
+	t=1760085779; cv=none; b=r70IvFJdefe3OPx7eRVzTENsViQ8w8tC3HIVFEn/XaM9iCCkWsRVJGxcCUqAIfe5Bt3fSbcFJUSf/xpvvR0qikSRZWeVLd8kQI9OgrTcJEghdZJZzlG1olPXVbwCX5GLJ8qAp5uC/NzSTVkqKhLqPOUmI5Dq+EbqqrsUIzOROkk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760084409; c=relaxed/simple;
-	bh=fQhrbWry1m36ZBFywyj1t+nNDPAvr0m6s5bxIf27sDg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=INpY753WQ3zTEcgUYU80FhMUwY7VTLPYXGfGksXjK4rZTb4oPxa9+7/a5Bwsmnne3rogebIkrqSwgunwEJh6h+35O0965GNsdMWFTPmNObiFrKLD2P43hZopPFbPfr9yqRT6XGomw3fcF8n7jj1rW9xMsHpjHAmQfmvW0yKk8o8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=A6Dntn3P; arc=none smtp.client-ip=216.71.154.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
+	s=arc-20240116; t=1760085779; c=relaxed/simple;
+	bh=eQsI0jyRbkijEv+RlLHYgeqpobRdTnAFoO4jfMvVt2w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=N9lariDaOnt1uvBAmj8gsxVhrLwLs3k4Rjmb6Cw3yYi478kn7OchR2yX3w/fr8oODxImnUaH4yx2IGx14b9GizoNTOMNewBzlHLC4spI0jHJMBhi3FiD77jHEKmzUVLGwNjeynupgc/P+g6ZSGUXSLE/geaGljfOY4OjiytoQMs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=I0Xc/qAN; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="A6Dntn3P"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1760084407; x=1791620407;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=fQhrbWry1m36ZBFywyj1t+nNDPAvr0m6s5bxIf27sDg=;
-  b=A6Dntn3PaReMwNfbl0+/Je8fj8HGHK8/7K4UEXGxPLvgqmJMDgo1VIOf
-   OEGPI2+anOXte50vpqilTjJWiWatepybOTtqJkN1XCN+HWzeY9WfAVsgO
-   F8EQUF5fgZPNp+9IJVseYxTFfYWFmYnJVzSAm+9E5q9ZTCBrOYCm8xx0z
-   r5WI7CRxSD5cosjJWpQC72Bz0rsg4JAQjjS704h9tFKakv7o8a5NPhfkj
-   L98QS3PGtoNxzuC8jqn08N0JdWNJaFMKcc0i6yM76h8JXoFLYZBiziHMU
-   H2vpPFp1Nuf9npg7L1VqCqq2LK56OJ21pR0OrGIhPe+sgXpNJ0r6KpQ/o
-   w==;
-X-CSE-ConnectionGUID: kfX9D90lSGehKHumM/kjqg==
-X-CSE-MsgGUID: uxm680nmRrGeByV0utfc1A==
-X-IronPort-AV: E=Sophos;i="6.19,218,1754928000"; 
-   d="scan'208";a="132653548"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 10 Oct 2025 16:19:57 +0800
-IronPort-SDR: 68e8c1ad_5tMVbSqoa4DsAnn4MdC7CMK8vLLpvjdhlcyU1l8CbihuI0l
- A1AyrGi3Om0NmA9XJEk7O1mqPZOjC2xUzf4uBMg==
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 10 Oct 2025 01:19:58 -0700
-WDCIronportException: Internal
-Received: from 5cg2148fq4.ad.shared (HELO shinmob.wdc.com) ([10.224.163.88])
-  by uls-op-cesaip02.wdc.com with ESMTP; 10 Oct 2025 01:19:57 -0700
-From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To: linux-block@vger.kernel.org,
-	Yu Kuai <yukuai1@huaweicloud.com>
-Cc: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: [PATCH blktests 4/4] throtl: support tests with both null_blk and scsi_debug in a single run
-Date: Fri, 10 Oct 2025 17:19:52 +0900
-Message-ID: <20251010081952.187064-5-shinichiro.kawasaki@wdc.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20251010081952.187064-1-shinichiro.kawasaki@wdc.com>
-References: <20251010081952.187064-1-shinichiro.kawasaki@wdc.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I0Xc/qAN"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1760085776;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tj95A7CoAoXwd9E9yUvXB1VX2Vc0uT0vBy1AY/58rzQ=;
+	b=I0Xc/qANOxg5rdXj9GHbm2zBjC36gVNKdLizDtTApzd3qpU9csPaMIE2EKxMIfn/Mfzidp
+	sP+sGo/wtMiYnsKX77JFD1DeJeDWTtd2hY3rNWHkFMhU249zbDPMpeyvCeH7cXukXZdbis
+	BI7iSuE8fgPzxCsM87lLSKzaI22Nddw=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-471-NS3_-tnANSyyVfn5eMae5Q-1; Fri,
+ 10 Oct 2025 04:42:53 -0400
+X-MC-Unique: NS3_-tnANSyyVfn5eMae5Q-1
+X-Mimecast-MFC-AGG-ID: NS3_-tnANSyyVfn5eMae5Q_1760085772
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E7A3B19560B3;
+	Fri, 10 Oct 2025 08:42:51 +0000 (UTC)
+Received: from fedora (unknown [10.72.120.27])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B65871800447;
+	Fri, 10 Oct 2025 08:42:46 +0000 (UTC)
+Date: Fri, 10 Oct 2025 16:42:41 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Ondrej Mosnacek <omosnace@redhat.com>
+Cc: Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org, nbd@other.debian.org,
+	linux-security-module@vger.kernel.org, selinux@vger.kernel.org
+Subject: Re: [PATCH v2] nbd: override creds to kernel when calling
+ sock_{send,recv}msg()
+Message-ID: <aOjHAfviTrT5RIRi@fedora>
+References: <20251010080900.1680512-1-omosnace@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251010080900.1680512-1-omosnace@redhat.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-The previous commit introduced the global variable throtl_blkdev_type to
-specify the type of block device for the throtl group. However, users
-need to run tests twice modifying the variable's value each time to test
-against both device types null_blk and scsi_debug. This workflow is
-cumbersome.
+On Fri, Oct 10, 2025 at 10:09:00AM +0200, Ondrej Mosnacek wrote:
+> sock_{send,recv}msg() internally calls security_socket_{send,recv}msg(),
+> which does security checks (e.g. SELinux) for socket access against the
+> current task. However, _sock_xmit() in drivers/block/nbd.c may be called
+> indirectly from a userspace syscall, where the NBD socket access would
+> be incorrectly checked against the calling userspace task (which simply
+> tries to read/write a file that happens to reside on an NBD device).
+> 
+> To fix this, temporarily override creds to kernel ones before calling
+> the sock_*() functions. This allows the security modules to recognize
+> this as internal access by the kernel, which will normally be allowed.
+> 
+> A way to trigger the issue is to do the following (on a system with
+> SELinux set to enforcing):
+> 
+>     ### Create nbd device:
+>     truncate -s 256M /tmp/testfile
+>     nbd-server localhost:10809 /tmp/testfile
+> 
+>     ### Connect to the nbd server:
+>     nbd-client localhost
+> 
+>     ### Create mdraid array
+>     mdadm --create -l 1 -n 2 /dev/md/testarray /dev/nbd0 missing
+> 
+> After these steps, assuming the SELinux policy doesn't allow the
+> unexpected access pattern, errors will be visible on the kernel console:
+> 
+> [  142.204243] nbd0: detected capacity change from 0 to 524288
+> [  165.189967] md: async del_gendisk mode will be removed in future, please upgrade to mdadm-4.5+
+> [  165.252299] md/raid1:md127: active with 1 out of 2 mirrors
+> [  165.252725] md127: detected capacity change from 0 to 522240
+> [  165.255434] block nbd0: Send control failed (result -13)
+> [  165.255718] block nbd0: Request send failed, requeueing
+> [  165.256006] block nbd0: Dead connection, failed to find a fallback
+> [  165.256041] block nbd0: Receive control failed (result -32)
+> [  165.256423] block nbd0: shutting down sockets
+> [  165.257196] I/O error, dev nbd0, sector 2048 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 2
+> [  165.257736] Buffer I/O error on dev md127, logical block 0, async page read
+> [  165.258263] I/O error, dev nbd0, sector 2048 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 2
+> [  165.259376] Buffer I/O error on dev md127, logical block 0, async page read
+> [  165.259920] I/O error, dev nbd0, sector 2048 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 2
+> [  165.260628] Buffer I/O error on dev md127, logical block 0, async page read
+> [  165.261661] ldm_validate_partition_table(): Disk read failed.
+> [  165.262108] I/O error, dev nbd0, sector 2048 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 2
+> [  165.262769] Buffer I/O error on dev md127, logical block 0, async page read
+> [  165.263697] I/O error, dev nbd0, sector 2048 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 2
+> [  165.264412] Buffer I/O error on dev md127, logical block 0, async page read
+> [  165.265412] I/O error, dev nbd0, sector 2048 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 2
+> [  165.265872] Buffer I/O error on dev md127, logical block 0, async page read
+> [  165.266378] I/O error, dev nbd0, sector 2048 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 2
+> [  165.267168] Buffer I/O error on dev md127, logical block 0, async page read
+> [  165.267564]  md127: unable to read partition table
+> [  165.269581] I/O error, dev nbd0, sector 0 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 2
+> [  165.269960] Buffer I/O error on dev nbd0, logical block 0, async page read
+> [  165.270316] I/O error, dev nbd0, sector 0 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 2
+> [  165.270913] Buffer I/O error on dev nbd0, logical block 0, async page read
+> [  165.271253] I/O error, dev nbd0, sector 0 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 2
+> [  165.271809] Buffer I/O error on dev nbd0, logical block 0, async page read
+> [  165.272074] ldm_validate_partition_table(): Disk read failed.
+> [  165.272360]  nbd0: unable to read partition table
+> [  165.289004] ldm_validate_partition_table(): Disk read failed.
+> [  165.289614]  nbd0: unable to read partition table
+> 
+> The corresponding SELinux denial on Fedora/RHEL will look like this
+> (assuming it's not silenced):
+> type=AVC msg=audit(1758104872.510:116): avc:  denied  { write } for  pid=1908 comm="mdadm" laddr=::1 lport=32772 faddr=::1 fport=10809 scontext=system_u:system_r:mdadm_t:s0-s0:c0.c1023 tcontext=unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023 tclass=tcp_socket permissive=0
+> 
+> The respective backtrace looks like this:
+> @security[mdadm, -13,
+>         handshake_exit+221615650
+>         handshake_exit+221615650
+>         handshake_exit+221616465
+>         security_socket_sendmsg+5
+>         sock_sendmsg+106
+>         handshake_exit+221616150
+>         sock_sendmsg+5
+>         __sock_xmit+162
+>         nbd_send_cmd+597
+>         nbd_handle_cmd+377
+>         nbd_queue_rq+63
+>         blk_mq_dispatch_rq_list+653
+>         __blk_mq_do_dispatch_sched+184
+>         __blk_mq_sched_dispatch_requests+333
+>         blk_mq_sched_dispatch_requests+38
+>         blk_mq_run_hw_queue+239
+>         blk_mq_dispatch_plug_list+382
+>         blk_mq_flush_plug_list.part.0+55
+>         __blk_flush_plug+241
+>         __submit_bio+353
+>         submit_bio_noacct_nocheck+364
+>         submit_bio_wait+84
+>         __blkdev_direct_IO_simple+232
+>         blkdev_read_iter+162
+>         vfs_read+591
+>         ksys_read+95
+>         do_syscall_64+92
+>         entry_SYSCALL_64_after_hwframe+120
+> ]: 1
+> 
+> The issue has started to appear since commit 060406c61c7c ("block: add
+> plug while submitting IO").
+> 
+> Cc: Ming Lei <ming.lei@redhat.com>
+> Link: https://bugzilla.redhat.com/show_bug.cgi?id=2348878
+> Fixes: 060406c61c7c ("block: add plug while submitting IO")
+> Signed-off-by: Ondrej Mosnacek <omosnace@redhat.com>
 
-To run the throtl group for both null_blk and scsi_debug in a single
-run, introduce the global variable THROTL_BLKDEV_TYPES instead of
-throtl_blkdev_type. When THROTL_BLKDEV_TYPES is set to 'nullb sdebug',
-the blktests framework executes each test case in the throtl group for
-both null_blk and scsi_debug sequentially. For this purpose, introduce
-the helper function _set_throtl_blkdev_type() and call it in
-set_conditions() hooks of the test cases.
+Looks fine:
 
-The command line below runs the throtl group with both null_blk and
-scsi_debug:
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Tested-by: Ming Lei <ming.lei@redhat.com>
 
-  $ sudo bash -c "THROTL_BLKDEV_TYPES='nullb sdebug' ./check throtl/"
 
-Of note is that the default value of THROTL_BLKDEV_TYPES is 'nullb'
-since throtl/002 currently fails for scsi_debug. While the default of
-'nullb sdebug' would provide broader coverage, 'nullb' is chosen to
-avoid the potential user confusion because of the failure.
-
-Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
----
- Documentation/running-tests.md | 17 +++++++++++++++++
- tests/throtl/001               |  4 ++++
- tests/throtl/002               |  4 ++++
- tests/throtl/003               |  4 ++++
- tests/throtl/004               |  4 ++++
- tests/throtl/005               |  4 ++++
- tests/throtl/006               |  4 ++++
- tests/throtl/007               |  4 ++++
- tests/throtl/rc                | 16 ++++++++++++++++
- 9 files changed, 61 insertions(+)
-
-diff --git a/Documentation/running-tests.md b/Documentation/running-tests.md
-index 8ccd739..a22043c 100644
---- a/Documentation/running-tests.md
-+++ b/Documentation/running-tests.md
-@@ -167,6 +167,23 @@ USE_RXE=1 ./check srp/
- 'USE_RXE' had the old name 'use_rxe'. The old name is still usable but not
- recommended.
- 
-+### Blk-throttle tests
-+
-+The blk-throttle tests has one environment variable below:
-+
-+- THROTL_BLKDEV_TYPES: 'nullb' 'sdebug'
-+  Set up test target block device based on this environment variable value. To
-+  test with null_blk, set 'nullb'. To test with scsi_debug, set 'sdebug'. To
-+  test with both, set 'nullb sdebug'. Default value is 'nullb'.
-+
-+```sh
-+To run with scsi_debug:
-+THROTL_BLKDEV_TYPES="sdebug" ./check throtl/
-+
-+To run with both null_blk and scsi_debug:
-+THROTL_BLKDEV_TYPES="nullb sdebug" ./check throtl/
-+```
-+
- ### Normal user
- 
- To run test cases which require normal user privilege, prepare a user and
-diff --git a/tests/throtl/001 b/tests/throtl/001
-index 835cac2..89a5892 100755
---- a/tests/throtl/001
-+++ b/tests/throtl/001
-@@ -9,6 +9,10 @@
- DESCRIPTION="basic functionality"
- QUICK=1
- 
-+set_conditions() {
-+	_set_throtl_blkdev_type "$@"
-+}
-+
- test() {
- 	echo "Running ${TEST_NAME}"
- 
-diff --git a/tests/throtl/002 b/tests/throtl/002
-index bed876d..b082b99 100755
---- a/tests/throtl/002
-+++ b/tests/throtl/002
-@@ -10,6 +10,10 @@
- DESCRIPTION="iops limit over IO split"
- QUICK=1
- 
-+set_conditions() {
-+	_set_throtl_blkdev_type "$@"
-+}
-+
- test() {
- 	echo "Running ${TEST_NAME}"
- 
-diff --git a/tests/throtl/003 b/tests/throtl/003
-index d76a0d5..700e9e6 100755
---- a/tests/throtl/003
-+++ b/tests/throtl/003
-@@ -10,6 +10,10 @@
- DESCRIPTION="bps limit over IO split"
- QUICK=1
- 
-+set_conditions() {
-+	_set_throtl_blkdev_type "$@"
-+}
-+
- test() {
- 	echo "Running ${TEST_NAME}"
- 
-diff --git a/tests/throtl/004 b/tests/throtl/004
-index 777afcf..b1f6110 100755
---- a/tests/throtl/004
-+++ b/tests/throtl/004
-@@ -11,6 +11,10 @@
- DESCRIPTION="delete disk while IO is throttled"
- QUICK=1
- 
-+set_conditions() {
-+	_set_throtl_blkdev_type "$@"
-+}
-+
- test() {
- 	echo "Running ${TEST_NAME}"
- 
-diff --git a/tests/throtl/005 b/tests/throtl/005
-index 86e52b3..7691ad1 100755
---- a/tests/throtl/005
-+++ b/tests/throtl/005
-@@ -10,6 +10,10 @@
- DESCRIPTION="change config with throttled IO"
- QUICK=1
- 
-+set_conditions() {
-+	_set_throtl_blkdev_type "$@"
-+}
-+
- test() {
- 	echo "Running ${TEST_NAME}"
- 
-diff --git a/tests/throtl/006 b/tests/throtl/006
-index 263415f..2dcf3a3 100755
---- a/tests/throtl/006
-+++ b/tests/throtl/006
-@@ -15,6 +15,10 @@ requires() {
- 	_have_driver ext4
- }
- 
-+set_conditions() {
-+	_set_throtl_blkdev_type "$@"
-+}
-+
- test_meta_io() {
- 	local path="$1"
- 	local start_time
-diff --git a/tests/throtl/007 b/tests/throtl/007
-index 83d8dc7..97dece6 100755
---- a/tests/throtl/007
-+++ b/tests/throtl/007
-@@ -11,6 +11,10 @@
- DESCRIPTION="bps limit with iops limit over io split"
- QUICK=1
- 
-+set_conditions() {
-+	_set_throtl_blkdev_type "$@"
-+}
-+
- test() {
- 	echo "Running ${TEST_NAME}"
- 
-diff --git a/tests/throtl/rc b/tests/throtl/rc
-index c7539aa..70254f7 100644
---- a/tests/throtl/rc
-+++ b/tests/throtl/rc
-@@ -10,6 +10,7 @@
- . common/cgroup
- 
- THROTL_DIR=$(echo "$TEST_NAME" | tr '/' '_')
-+THROTL_BLKDEV_TYPES=${THROTL_BLKDEV_TYPES:-"nullb"}
- throtl_blkdev_type=${throtl_blkdev_type:-"nullb"}
- THROTL_NULL_DEV=dev_nullb
- declare THROTL_DEV
-@@ -25,6 +26,21 @@ group_requires() {
- 	_have_program bc
- }
- 
-+_set_throtl_blkdev_type() {
-+	local index=$1
-+	local -a types
-+
-+	read -r -a types <<< "${THROTL_BLKDEV_TYPES[@]}"
-+
-+	if [[ -z $index ]]; then
-+		echo ${#types[@]}
-+		return
-+	fi
-+
-+	throtl_blkdev_type=${types[index]}
-+	COND_DESC="${throtl_blkdev_type}"
-+}
-+
- # Prepare null_blk or scsi_debug device to test, based on throtl_blkdev_type.
- _configure_throtl_blkdev() {
- 	local sector_size=0 memory_backed=0
--- 
-2.51.0
+Thanks,
+Ming
 
