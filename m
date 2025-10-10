@@ -1,127 +1,170 @@
-Received: from s1.sapience.com (s1.sapience.com [72.84.236.66])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B3FC2F3C13;
-	Fri, 10 Oct 2025 14:37:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=72.84.236.66
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760107056; cv=fail; b=G+wQCUZBfsexp+g0Z4NV6ws2wylAqfTQSPu5a8WHgtaQ59R8JqQYQpTdi7vG+ty4vAgIlEnh475djx2fd12sfpZCy16mCrvssCX0STwA9140YKDXdwi0GS5oShRYroBiS4mkAkRqEf8UjSrLXLLCybgNWcQXcKC0hYPeauCTvh8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760107056; c=relaxed/simple;
-	bh=MTLbX/igiP4DDhf0AdTdsrfQICui0FHb/8fIU86/M44=;
-	h=Message-ID:Subject:From:To:Date:Content-Type:MIME-Version; b=KXplpZuTRSeCFrthvrCemPvL31HsuKZGD6Iw/qQYn6zD2ontco9Rp0j9UkkGi4Hvvzw+CODlZKZmKBVaexQ7qk48diuY7jmkd0hTSAE133OQKP9z+G7/Ua/5lc7SmEICkGBA7QOfiwx7298cAk14URR8M3KqoA5XMT7GS+A9zmY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sapience.com; spf=pass smtp.mailfrom=sapience.com; dkim=permerror (0-bit key) header.d=sapience.com header.i=@sapience.com header.b=JUq0P8RP; dkim=pass (2048-bit key) header.d=sapience.com header.i=@sapience.com header.b=cCe/anBN; arc=fail smtp.client-ip=72.84.236.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sapience.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sapience.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BEC32F656B
+	for <linux-block@vger.kernel.org>; Fri, 10 Oct 2025 14:54:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1760108051; cv=none; b=jSj9zQOaAw74v6mE/YcGcJl1kmbNM7BS2EDr0M/bZ0fLY0rA+exdZUC5V+RE+dpFKXOyGqtCZ3hZaTUIHlyjEzyMfg7jGjRLsg+j38WDa9TrtPcECoicxB2pMF4UjH695pPIp3vqE95t8Wx7t4oblvTZhiCmEqqXicaqle8lvag=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1760108051; c=relaxed/simple;
+	bh=DC7x9YWROCenDmlSc1FcZsUca68HCfG/mUx/W7rmzrA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=NRNlpiPNLidQWOfKdManRU4fLtE3ZydRiKTa4tzsDdeN5FUqzwccDX5kJgIUYbe/fJm3YP5rtqW0JNpmXnsS806qVasF2SQ32BmPvQsqjHup/4Wbl0O+l570z0aO3lFphHx03Y/4sBOItho5IHCY9Wo5QLqXY9hPnoHDHvD5ddo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VTnmIb1T; arc=none smtp.client-ip=209.85.160.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=permerror (0-bit key) header.d=sapience.com header.i=@sapience.com header.b="JUq0P8RP";
-	dkim=pass (2048-bit key) header.d=sapience.com header.i=@sapience.com header.b="cCe/anBN"
-Authentication-Results: dkim-srvy7; dkim=pass (Good ed25519-sha256 
-   signature) header.d=sapience.com header.i=@sapience.com 
-   header.a=ed25519-sha256; dkim=pass (Good 2048 bit rsa-sha256 signature) 
-   header.d=sapience.com header.i=@sapience.com header.a=rsa-sha256
-Received: from srv8.sapience.com (srv8.sapience.com [x.x.x.x])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature ECDSA (secp384r1) server-digest SHA384)
-	(No client certificate requested)
-	by s1.sapience.com (Postfix) with ESMTPS id 77F3A480BCD;
-	Fri, 10 Oct 2025 10:29:03 -0400 (EDT)
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=sapience.com;
- i=@sapience.com; q=dns/txt; s=dk-ed25519-220413; t=1760106543;
- h=message-id : subject : from : to : date : content-type :
- mime-version : from; bh=jdIjHOIc+x1UmurbwfxAvNk4r5qMzupSwQTHANWUImk=;
- b=JUq0P8RPw2RpOtgJnYRlZULthj1xYkv8QGlaNPee3FSZIV11AbOGLGVMdgwM36ezR+bXm
- 6RJNjpJHv41Q9IHAA==
-ARC-Seal: i=1; a=rsa-sha256; d=sapience.com; s=arc6-rsa-220412; t=1760106543;
-	cv=none; b=VYlVL79n5em/yJi2IeWsq0zjsuh8yJnuEbxJazzwTRdlqsrJG8DAF0pua8Jx7YjZIzYbPnX0X5zSQ4r9OE7QEqygMrKkwvVH41d9Da9RQlr+kh37XKv7DZ1iizAPvsvaDd1JP8Q6wDm5H1dCOqH8nZDWCw/RsTz1alKtEjly1Xg4L5xRO+9lSsiKWRaXWg81cGhoxKhpg21yUKKNEX5xjfm71b5ZoRnsw+79tLeOQIXWwF2CPCJErzuoj3gZZ6Uzug7XWNEbO6fKhxKLb3a+YSaNcc9u0RyEfc5/sBQavAnRukvBlqmZVuljtMq/DKWg7CcHhAiidWf1v4ic1aILoQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; d=sapience.com; s=arc6-rsa-220412;
-	t=1760106543; c=relaxed/simple;
-	bh=MTLbX/igiP4DDhf0AdTdsrfQICui0FHb/8fIU86/M44=;
-	h=DKIM-Signature:DKIM-Signature:Message-ID:Subject:From:To:Date:
-	 Autocrypt:Content-Type:User-Agent:MIME-Version; b=UA8uJUK0ugkS9f3felOPhZ2Q0Cu6recwNac4Yj9MVFdxgLR4nIt1gC+o6rglsYbY70TSOiL7MkbLtVxv7p54cI2OQ7L0/yQILa0RqMB/xkmsHRLiN99neBNp2jTLHulz4z+03p7LnGKQ8fDhQSB4YCQr+4AmZ4vJFSUlnbrAeznObCiqcfpqWoJ6N5RRO0k+soKWTnlr5GEMxmnG2W8LQlWCSaHLKSsQeQMozcwQxNrrlWpPTK0bDT6cErprFZpBMNu5ThTG/93o/lgN47lalQBx8z6oJ31dhoJoT8svk1dL45AlTBO3bpvLBm75pvOEudcwFXpyDxhxwGHNSnlIpg==
-ARC-Authentication-Results: i=1; arc-srv8.sapience.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sapience.com;
- i=@sapience.com; q=dns/txt; s=dk-rsa-220413; t=1760106543;
- h=message-id : subject : from : to : date : content-type :
- mime-version : from; bh=jdIjHOIc+x1UmurbwfxAvNk4r5qMzupSwQTHANWUImk=;
- b=cCe/anBNY3Etb5L81JqhmlZpLIq7yvjwyYrkb8rnw6j9BZliA8KDgA7qbCy5SAemyYCNK
- CJPJUF7FN3uSMcj/0e3z+swc3MxR2I6xbSdR+OoeSlrBLXJo/Ewbs7x7HyKu3kGSpYfZSNZ
- jhwSBoVFWX2cPuq00zBsid6LorZt18lVq9KC1EdN1KdoT67XMuaCY67SAcCtCeGpGlJdiDD
- 3PthPumn8Bcv6WXEK4rRcI+5iY8LUDElIo9IfqVb2bBfZspaRBGmXpV4A8fd0svDDnzi6UX
- TtxQ5rNiD3kYSxNPwNPWLPdn28/ySp24/HqIcKG5FimV2X/OOkYqQ9OVZtwQ==
-Received: by srv8.prv.sapience.com (Postfix) id 51B7528003F;
-	Fri, 10 Oct 2025 10:29:03 -0400 (EDT)
-Message-ID: <4b392af8847cc19720ffcd53865f60ab3edc56b3.camel@sapience.com>
-Subject: mainline boot fail nvme/block?
-From: Genes Lists <lists@sapience.com>
-To: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org
-Date: Fri, 10 Oct 2025 10:29:02 -0400
-Autocrypt: addr=lists@sapience.com; prefer-encrypt=mutual;
- keydata=mDMEXSY9GRYJKwYBBAHaRw8BAQdAwzFfmp+m0ldl2vgmbtPC/XN7/k5vscpADq3BmRy5R
- 7y0LU1haWwgTGlzdHMgKEwwIDIwMTkwNzEwKSA8bGlzdHNAc2FwaWVuY2UuY29tPoiWBBMWCAA+Ah
- sBBQsJCAcCBhUKCQgLAgQWAgMBAh4BAheAFiEE5YMoUxcbEgQOvOMKc+dlCv6PxQAFAmPJfooFCRl
- vRHEACgkQc+dlCv6PxQAc/wEA/Dbmg91DOGXll0OW1GKaZQGQDl7fHibMOKRGC6X/emoA+wQR5FIz
- BnV/PrXbao8LS/h0tSkeXgPsYxrzvfZInIAC
-Content-Type: multipart/signed; micalg="pgp-sha384";
-	protocol="application/pgp-signature"; boundary="=-cDtzTbyIsJ0vqi01o7jJ"
-User-Agent: Evolution 3.58.0 
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VTnmIb1T"
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-4e6ec0d1683so314511cf.0
+        for <linux-block@vger.kernel.org>; Fri, 10 Oct 2025 07:54:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1760108048; x=1760712848; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0DpdiimUJLGEL9YZv8OhwGPgsBnQcaD8Xj4apakBfn0=;
+        b=VTnmIb1TlHElKTohVvdtRHx7HEmeqrB8hSvmF22DJB+mQqqZZk+wvsDuz4uln9V7FU
+         dpsQgLT/r6jgDPFmApUUPclup6rNvOlQo0ZBmnDUNevAy0Zisy9ZysmhlASpSd4Rc+w1
+         UlL5OoGSVmhMYUtrcg8PpuJ5/J5BCFolzz31lFG/HMjjS7/pk80KXDRttm9jhNG34XxI
+         y42d9fImcgtux4nhQ7EP8Q2jXzWGqDHaxpe/P/Sck42KrtcdBO5PGk1kL/VeEL5tIWyF
+         /sauTiZHoQFdaXa8Z681DWvHC8T3LFGFuTu+3Zdya2+6jVwPi1yIjMqIFriwTRqAu6Ku
+         DWSw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760108048; x=1760712848;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0DpdiimUJLGEL9YZv8OhwGPgsBnQcaD8Xj4apakBfn0=;
+        b=lHFM5iK49enAvgNKk2IXsl2lLyUNwzpmxZL5LUOMLrMdDsa43NKNwaXNtyb0iiGE0v
+         CPkqy0oSVp4EFpQQe4CRlpy9B4VRpif1nC6jI2wabbAtrRMzMRCRLbshX5iT1TMn2YPt
+         TPYsN9kGCR5yax86LsjYPpGw5w9AhQQ6AWS7Vt+GLcpGBt8qvjjT5zEr0sSNCjNiX3x9
+         aAr/bMEGDo9pVdndun1A41T4jZBziF4yx2cXeRaeZb2OTcIwYdIm4EKDKCcCsosNC8Tm
+         gGJr1ox//VLYRnVJKZpDXqH9C41/6K6w9S2JLeRsLmh4NbIxrfRnBqNtCMScwibiTb+c
+         9LpA==
+X-Forwarded-Encrypted: i=1; AJvYcCWWPWdTUKvA2l2Z6HgpSEgSk+djCCcxDj9r7wN+S1AA6d2WO8f5Ab0yQVVQqHJA9vS/hotH3sRE6qwj5A==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw1CvGPcaugn7Z8j2ZTckdPPAto6lzrRn438BOpF7gsWcwvqJEd
+	2OHb+7ljmPJTFThwfzpPT12W7NZGSL4fndvh79JNQsYNOpDJkbbSts5q8mQ5KwxoqvNJf7sl7tu
+	cyJCwjvtww72fobkhHk4VMMlztr/Q3z9gfHdF7rGT
+X-Gm-Gg: ASbGnctUmWK8r7I98zoEHgsyMYSwtUsJ6q7msR/D/hZfV7CRGYtP2ValkDEwybG3jaq
+	t3Pm5+Ozr1s5xuY5HhEDEQg+nu5a48ldQULzeEO0/qTFFrTfCDmYwNaNnDMlly8nCD9KF63aZsB
+	7f+ZTBDu+VCIb1eSX6wUVLCy+xaizjhFCBoieXOMDxgz00IGCudqNwIzDaw+oiIOe+Qwk5PQbZD
+	CBlSTT3zjyQhYhPT+q+Xby14O6g7JBepKERtxP/gJ5dwihaAuqF
+X-Google-Smtp-Source: AGHT+IELG1HO5re9l71qV16AXiLCV5TxV3n/x4fv7b1UlE7oKp+shLXPJ4Ui15bl56g81Rjif4tTmM3A2oXDy0V1pv8=
+X-Received: by 2002:a05:622a:50:b0:4d0:dff9:9518 with SMTP id
+ d75a77b69052e-4e6eabcf616mr24839371cf.12.1760108047605; Fri, 10 Oct 2025
+ 07:54:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-
-
---=-cDtzTbyIsJ0vqi01o7jJ
+References: <20251010011951.2136980-1-surenb@google.com> <20251010011951.2136980-2-surenb@google.com>
+ <aOhx9Zj1a6feN8wC@casper.infradead.org>
+In-Reply-To: <aOhx9Zj1a6feN8wC@casper.infradead.org>
+From: Suren Baghdasaryan <surenb@google.com>
+Date: Fri, 10 Oct 2025 07:53:56 -0700
+X-Gm-Features: AS18NWBSQfAZ95bfn8zHE7YuLwgx02HxJfLsEBTBLUde_yaDHMul1ATmajxkrCY
+Message-ID: <CAJuCfpH85Ns8_+JNG4HS6TnFMUN0si+mcLXxUxedhQh1c0CSEw@mail.gmail.com>
+Subject: Re: [PATCH 1/8] mm: implement cleancache
+To: Matthew Wilcox <willy@infradead.org>
+Cc: akpm@linux-foundation.org, david@redhat.com, lorenzo.stoakes@oracle.com, 
+	Liam.Howlett@oracle.com, vbabka@suse.cz, alexandru.elisei@arm.com, 
+	peterx@redhat.com, sj@kernel.org, rppt@kernel.org, mhocko@suse.com, 
+	corbet@lwn.net, axboe@kernel.dk, viro@zeniv.linux.org.uk, brauner@kernel.org, 
+	hch@infradead.org, jack@suse.cz, m.szyprowski@samsung.com, 
+	robin.murphy@arm.com, hannes@cmpxchg.org, zhengqi.arch@bytedance.com, 
+	shakeel.butt@linux.dev, axelrasmussen@google.com, yuanchu@google.com, 
+	weixugc@google.com, minchan@kernel.org, linux-mm@kvack.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	iommu@lists.linux.dev, Minchan Kim <minchan@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Mainline fails to boot - 6.17.1 works fine.
-Same kernel on an older laptop without any nvme works just fine.
+On Thu, Oct 9, 2025 at 7:39=E2=80=AFPM Matthew Wilcox <willy@infradead.org>=
+ wrote:
+>
+> On Thu, Oct 09, 2025 at 06:19:44PM -0700, Suren Baghdasaryan wrote:
+> > +     /*
+> > +      * 99% of the time, we don't need to flush the cleancache on the =
+bdev.
+> > +      * But, for the strange corners, lets be cautious
+> > +      */
+> > +     cleancache_invalidate_inode(mapping, mapping->host);
+>
+> Why do we need to pass in both address_space and inode?
 
-It seems to get stuck enumerating disks within the initramfs created by
-dracut.
+Ah, you mean why I don't use inode->i_mapping to get to its address
+space? I think I can. I'll try, and unless something blows up, I'll
+apply the change in the next version.
 
-Subject to bisect verification, it may have started after commit
+>
+> > +/*
+> > + * Backend API
+> > + *
+> > + * Cleancache does not touch page reference. Page refcount should be 1=
+ when
+> > + * page is placed or returned into cleancache and pages obtained from
+> > + * cleancache will also have their refcount at 1.
+>
+> I don't like these references to page refcount.  Surely you mean folio
+> refcount?
 
-  e1b1d03ceec343362524318c076b110066ffe305
+Yes, mea culpa :) Will fix.
 
-  Merge tag 'for-6.18/block-20250929' of=20
-  git://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux
+>
+> > +     help
+> > +       Cleancache can be thought of as a page-granularity victim cache
+> > +       for clean pages that the kernel's pageframe replacement algorit=
+hm
+> > +       (PFRA) would like to keep around, but can't since there isn't e=
+nough
+>
+> PFRA seems to be an acronym you've just made up.  Why?
 
-Machine is dell xps 9320 laptop (firmware 2.23.0) with nvme
-partitioned:
+Inherited from the original cleancache documentation. Will remove.
 
-    # lsblk -f
-    NAME        FSTYPE      FSVER LABEL FSAVAIL FSUSE% MOUNTPOINTS   =20
-    sr0
-    nvme0n1
-    =E2=94=9C=E2=94=80nvme0n1p1 vfat        FAT32 ESP   2.6G    12% /boot
-    =E2=94=9C=E2=94=80nvme0n1p2 ext4        1.0   root  77.7G    42% /=20
-    =E2=94=94=E2=94=80nvme0n1p3 crypto_LUKS 2                         =20
-      =E2=94=94=E2=94=80home    btrfs             home  1.3T    26% /opt
-                                                    /home            =20
+>
+> > +struct cleancache_inode {
+> > +     struct inode *inode;
+> > +     struct hlist_node hash;
+> > +     refcount_t ref_count;
+> > +     struct xarray folios; /* protected by folios.xa_lock */
+>
+> This is a pointless comment.  All xarrays are protected by their own
+> xa_lock.
 
+Ack.
 
+>
+> > +static DEFINE_IDR(fs_idr);
+>
+> No.  The IDR is deprecated.  Use an allocating XArray.
 
-Will try do bisect over the weekend.
+Ah, good to know. I'll change to xarray.
 
+>
+> > +/*
+> > + * Folio attributes:
+> > + *   folio->_mapcount - pool_id
+> > + *   folio->mapping - ccinode reference or NULL if folio is unused
+> > + *   folio->index - file offset
+>
+> No.  Don't reuse fields for something entirely different.  Put a
+> properly named field in the union.
 
---=20
-Gene
+Ack.
 
---=-cDtzTbyIsJ0vqi01o7jJ
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
+>
+> > +static void folio_attachment(struct folio *folio, struct cleancache_in=
+ode **ccinode,
+>
+> Unnecessarily long line
 
------BEGIN PGP SIGNATURE-----
+Ack.
 
-iHUEABYJAB0WIQRByXNdQO2KDRJ2iXo5BdB0L6Ze2wUCaOkYLgAKCRA5BdB0L6Ze
-2/qsAP4lLRpZ6r2E5shHmQZVzY2BFM+HT8xJAkQrIIjtipIW5AEAoFZg3GMMBWlO
-1nQd0PPxtwczQ/5XLQzf2WRiQqftGAE=
-=ZfXG
------END PGP SIGNATURE-----
+Thanks for the feedback, Matthew!
 
---=-cDtzTbyIsJ0vqi01o7jJ--
+>
