@@ -1,228 +1,109 @@
-Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 330117405A
-	for <linux-block@vger.kernel.org>; Fri, 10 Oct 2025 15:00:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 285F62F363E
+	for <linux-block@vger.kernel.org>; Fri, 10 Oct 2025 15:02:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760108451; cv=none; b=R7mtMzFdt1kxc92t9/2h0DlAxGmm8js2z2OXVvWSFQTPAOhSHt/JVDk5Mp1n2ikkHE/nq/b1HN/0n7atRrG7EUZm0NQNscvosGacGmNuu6C96l6DR6gGcWP4ZyucbdXwyIE0zVOg4vx8dxYIFowiFWNiQiKPtfUMze2kTFRB6UE=
+	t=1760108561; cv=none; b=XVybHFO3lrulr9NxPttYuRtoqEZMj4aDOX0QVsCebezac/XXBeppxMiqWQwMyU25MgidQYVXYLU2En7xUp58LYmRhWiCKl+ey/gJr49EhYTSrk5QC4+7QSIcBoGDbN948VArPYB7NOUzBjqSXlWZHd7PLhWSDB5cmqqByiPPbcw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760108451; c=relaxed/simple;
-	bh=pp246uTerFZJog/e4hjFA9+XB/z68RB5I0evQ/CPXSw=;
+	s=arc-20240116; t=1760108561; c=relaxed/simple;
+	bh=lLjhJqbBDQ/a2E91zif4RZ281K6W6HFigWXT0cxbz3M=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=EL09/nXUvkJNQcSE4qep8JRWc/ViTcxVuWGGCOEiC0UMfigoGk1Prewuk1yAkL0hShPGZAOC+LsmIzU/MKyNDYrG9PaSh1Prvcj98q5MuK2lBHbmNksAQ8EZJ/YFmQ72JSVs0ZMsIGXQukxSZlkB2X3jNYe0p+G6vAENkAPZfII=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=DxekZ+5s; arc=none smtp.client-ip=209.85.216.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
+	 To:Cc:Content-Type; b=OTeXRCXWQ1HJEVW+Ejq/u48Igoxc6TYCIOtV3pHB3El4NEEUwO8cw1cgQa+sqRLFHiCaFbCwGHxEo9PJujo20veZD8gPLf6u5nNYvfSFGw9Jdl/35N0Lp8JRAtz3I83Hf5b6aekbzRNIZdBWdMRljDWUOLd/SJuC/LqSuo8jbE0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aFLDqTBw; arc=none smtp.client-ip=209.85.218.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="DxekZ+5s"
-Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-32eb45ab7a0so2357323a91.0
-        for <linux-block@vger.kernel.org>; Fri, 10 Oct 2025 08:00:50 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aFLDqTBw"
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-b4736e043f9so318899766b.0
+        for <linux-block@vger.kernel.org>; Fri, 10 Oct 2025 08:02:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1760108449; x=1760713249; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1760108558; x=1760713358; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=PrnkWgVz/Z49/J8nG6GzbbPnjpZrG1a+SrZMq+zyDL0=;
-        b=DxekZ+5skgFkvqgU6WuwVzk9hY7rSewoNtCFzppYRPWjIxh5GzTEljyVUZH+zG0fUb
-         mNbSnfsT3gM61WkBPbG7ZSB2qr9hXH2nm6pJ+nTZePkudmQr78Iis9g3AQl3/h3pq8Dz
-         pSqLfqloidh1Ew1IkVMEYedvW52lZQQhic9EKnGoCnJ+oRiJeGw9FWkwQbguZY63hMU0
-         uaFPItLW5lnDXs9+HGt0kQpkc9hYwWPCeMP63rWssiRCaUsEqP6CLzXOUGVySQHr9tzH
-         Zd+L8scuSAAI7AQSwvqWMepbDCkuDpwimVCkpuozVbyOx5RkkEtolGqju/2cnJiTDqKZ
-         n3+A==
+        bh=lLjhJqbBDQ/a2E91zif4RZ281K6W6HFigWXT0cxbz3M=;
+        b=aFLDqTBwDW9/tslHGMMpz/fDXm/8YFeWeEqOIcghoh/WbHIq4K/0SzxFSFr2C8rGcg
+         FzfA6mauz29MwswTSj8YO3mq3cxhh5u7GFdf5ExSSfl6BXbILBg23XGuvlNp3mANuW6S
+         eel9qNFJhrnpSPxNuvU8zfBQImKbaXpPm7yI2z/z99IQuraI1weEKXaWKAoKN2dn1Fia
+         VeA9V8C1Loi2AzEhqtTtkmVxXU3/XSg2XO66Oqk58zTi4gP34AT/wGmHBqeZyuMiW54A
+         2nUtDEww8Cwcun3qpGWQvCqHEXtidVmA+q8Oy3lJypcr/DIo7Im2rac59BUjorWx/gNF
+         KEvw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760108449; x=1760713249;
+        d=1e100.net; s=20230601; t=1760108558; x=1760713358;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=PrnkWgVz/Z49/J8nG6GzbbPnjpZrG1a+SrZMq+zyDL0=;
-        b=ve6JQ11MGyDnOArFcbyvX9s+1T+qGLKc/aQz1gD/mzcKt1zMqh4Qt5XMa4WkvdJ+P5
-         KqjIgDpivuOR10ZYfnZExLCM02mUrLcZSKbSfE119bQ9f6JqXQG+WojSX5mrdVIa8CRM
-         QUztS2FAYFOJM8QDxd/7vdM2ePz3Bph722pBdJxkB7A5m+D4AsllAEwW8oe0jELPJoEC
-         eJ0e5GWJm8xjLG2uZUmOxWF4sJYyI6+lwvDIOuBnI/hvtbbxahCe8IjGwBUl3K8TnckU
-         ODZrVTYBeHGKJn5NjyqzmewHIVEXXfop24Q+GZFDDIUfhXe/PzjLbCdosFQIUqld9EY7
-         0b1g==
-X-Forwarded-Encrypted: i=1; AJvYcCVrysAq9wZnmt32rzB8MKwrXSjoq0Okbz+N6hrcc3tIOEfbcetetCNJvREK4wmS6ZTIIL4xviC5c6UjRQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwmGIGH9hcuLbpqH6ZYmG5jokGnwXltBGrTHgiE0XFdPgIpgQrQ
-	rwPlEL9kz4b1fIOxt49A2yIVXEnM7XwNKgHmcMYXVMFM2Rig14+bHOBB277afMtznoMIgWeHb2/
-	m9yIgOx26Hxu2dgQ30l661GC+A2tbphAKM3/e5MQs
-X-Gm-Gg: ASbGncs2dDASkF7Cy8j8q3s60n3Z7R5eW+gm51mqDoUIq1+1KQqILk8hPPKGxO+RVWN
-	sbAxvPul+713dKWhZINXJNsAFGmiLMVV47wbjYwnJuPHDsgap5tV59PDiLYO5w1MFYwBMXhvZuU
-	wPPLQnQGkNeKb4sORZ6q0+4ykan7FpUPFu8FV3WjKoAVfv4bs+FVsZaAhfJfqpbRSfxdVYXj7P0
-	iMwDrXsdRi08gjJB1m9O7gBkw==
-X-Google-Smtp-Source: AGHT+IHTYyhEFkKDD3X150o5MD7ZP8eFJxfaJJZoy46BgzM/dN96rHz0DqKMzJSZ8COyShPASIiBWoiLtZwKUFbGRtg=
-X-Received: by 2002:a17:90b:1d8b:b0:32b:355a:9de with SMTP id
- 98e67ed59e1d1-33b513d005amr16427754a91.32.1760108448726; Fri, 10 Oct 2025
- 08:00:48 -0700 (PDT)
+        bh=lLjhJqbBDQ/a2E91zif4RZ281K6W6HFigWXT0cxbz3M=;
+        b=cvcdcjCOBXL9qccAGD14Jsq7CNif+m9yyHLW3ow4t9tQX2+pIEW0gBTnoZJT8BsNwG
+         A9iJU6xE5KcIBU2l7ShpVcUUg1UxTVtwS9cdw8m22MTmbKh/hmuZ62U/jj9++nkRrFns
+         OGYMOMfBjuauH3hFANFHcKtAyUs9U3XzUsDSwmifSJ5g39NWtjFxZ+1tCpXN84JeL5X/
+         XPqfrWgJYIBop1BWYfUwHLxcVrLU1ueBfd63WzOjqq+932AOrK5tCAl1cxrAgNnbssq8
+         bpqu7O8aPSK/88OzfXtSFehmUdLSm0kYAitOVt24KPttCbTuT7Hc9I9FLLnmt9f824+J
+         SO5w==
+X-Forwarded-Encrypted: i=1; AJvYcCXxx6sNNRT4gKXobZY6eaNh/X7iKLp7v/DVcf6zv3ot3RxWlkiXDfbt+nM3k5g3Fr+iYvHUSO5Cd8IGGA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzPV0pqqs7OrH+DcK/7eFMZqIJr7o42cYbzRT3e9uNoDKz5/8c7
+	vZWouCRS04IAxJDYlHcjBT4UtQvzso3YTNG0BeklNfuHnkTzLmL1rWpFjMvoBmIcv78t7Y6k9kM
+	295D4kkKA6JCebaErLfZyUmXUTmdFTko=
+X-Gm-Gg: ASbGncs+V/qD9t+5CGq/EraFbzhlb7jWmP7XedBthhACmpb9piwHldNlD1hBwk2ng2D
+	5F5gj8OAUvO4SXYOBGM480kOQdWpkVY/br6VbdVEKCnepA0X0qw3jVfEZ/ivzyOBIQrb7uohIQB
+	YJjWYB7mKrdNIeqh2oAe3O+WNMoWfsfoAa70dt3MmYKo/R54yCBCgArgPzE/OIBzXDbaCH0e3QP
+	tb/xCBk7spH7MBGp8JHzb6YXQ==
+X-Google-Smtp-Source: AGHT+IGa/polL6/8Ynsft44cUD0O1NPKwafCC8Smc6nmBnm4TDK7NhR64Y4hIQgBMI+z098vLRzD8f+sU8sdugojvoo=
+X-Received: by 2002:a17:906:c104:b0:b04:9ad9:5b29 with SMTP id
+ a640c23a62f3a-b50ac5d1e3bmr1407180966b.54.1760108556823; Fri, 10 Oct 2025
+ 08:02:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251010080900.1680512-1-omosnace@redhat.com>
-In-Reply-To: <20251010080900.1680512-1-omosnace@redhat.com>
-From: Paul Moore <paul@paul-moore.com>
-Date: Fri, 10 Oct 2025 11:00:37 -0400
-X-Gm-Features: AS18NWDk8nitfjQpo1v3aBdPKBaoi907QLUPlKp_SF-2hEkCLZTSq-1OKrB7XMM
-Message-ID: <CAHC9VhQxnTsZV=vjf1Wk5po16mLuKNPoi3UR-7gN6PxodncgxQ@mail.gmail.com>
-Subject: Re: [PATCH v2] nbd: override creds to kernel when calling sock_{send,recv}msg()
-To: Ondrej Mosnacek <omosnace@redhat.com>
-Cc: Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
-	nbd@other.debian.org, linux-security-module@vger.kernel.org, 
-	selinux@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
+References: <20251010094047.3111495-1-safinaskar@gmail.com> <20251010094047.3111495-2-safinaskar@gmail.com>
+In-Reply-To: <20251010094047.3111495-2-safinaskar@gmail.com>
+From: Andy Shevchenko <andy.shevchenko@gmail.com>
+Date: Fri, 10 Oct 2025 18:02:00 +0300
+X-Gm-Features: AS18NWAoVP5WYC_07QqSXrvsFY0nBG5PiGs9ESaeN2ZfR7dfSMsKUbHhpVYPARc
+Message-ID: <CAHp75VeJM_OoCWDX20FhphRi6e7rG9Z4X6zkjx9vFF12n7Ef7A@mail.gmail.com>
+Subject: Re: [PATCH v2 1/3] init: remove deprecated "load_ramdisk" and
+ "prompt_ramdisk" command line parameters
+To: Askar Safin <safinaskar@gmail.com>
+Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Linus Torvalds <torvalds@linux-foundation.org>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Christian Brauner <brauner@kernel.org>, 
+	Al Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@lst.de>, 
+	Jens Axboe <axboe@kernel.dk>, Aleksa Sarai <cyphar@cyphar.com>, 
+	=?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>, 
+	Julian Stecklina <julian.stecklina@cyberus-technology.de>, 
+	Gao Xiang <hsiangkao@linux.alibaba.com>, Art Nikpal <email2tema@gmail.com>, 
+	Andrew Morton <akpm@linux-foundation.org>, Alexander Graf <graf@amazon.com>, 
+	Rob Landley <rob@landley.net>, Lennart Poettering <mzxreary@0pointer.de>, linux-arch@vger.kernel.org, 
+	linux-block@vger.kernel.org, initramfs@vger.kernel.org, 
+	linux-api@vger.kernel.org, linux-doc@vger.kernel.org, 
+	Michal Simek <monstr@monstr.eu>, Luis Chamberlain <mcgrof@kernel.org>, Kees Cook <kees@kernel.org>, 
+	Thorsten Blum <thorsten.blum@linux.dev>, Heiko Carstens <hca@linux.ibm.com>, 
+	Arnd Bergmann <arnd@arndb.de>, Dave Young <dyoung@redhat.com>, 
+	Christophe Leroy <christophe.leroy@csgroup.eu>, Krzysztof Kozlowski <krzk@kernel.org>, 
+	Borislav Petkov <bp@alien8.de>, Jessica Clarke <jrtc27@jrtc27.com>, 
+	Nicolas Schichan <nschichan@freebox.fr>, David Disseldorp <ddiss@suse.de>, patches@lists.linux.dev
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Oct 10, 2025 at 4:09=E2=80=AFAM Ondrej Mosnacek <omosnace@redhat.co=
-m> wrote:
+On Fri, Oct 10, 2025 at 12:42=E2=80=AFPM Askar Safin <safinaskar@gmail.com>=
+ wrote:
 >
-> sock_{send,recv}msg() internally calls security_socket_{send,recv}msg(),
-> which does security checks (e.g. SELinux) for socket access against the
-> current task. However, _sock_xmit() in drivers/block/nbd.c may be called
-> indirectly from a userspace syscall, where the NBD socket access would
-> be incorrectly checked against the calling userspace task (which simply
-> tries to read/write a file that happens to reside on an NBD device).
->
-> To fix this, temporarily override creds to kernel ones before calling
-> the sock_*() functions. This allows the security modules to recognize
-> this as internal access by the kernel, which will normally be allowed.
->
-> A way to trigger the issue is to do the following (on a system with
-> SELinux set to enforcing):
->
->     ### Create nbd device:
->     truncate -s 256M /tmp/testfile
->     nbd-server localhost:10809 /tmp/testfile
->
->     ### Connect to the nbd server:
->     nbd-client localhost
->
->     ### Create mdraid array
->     mdadm --create -l 1 -n 2 /dev/md/testarray /dev/nbd0 missing
->
-> After these steps, assuming the SELinux policy doesn't allow the
-> unexpected access pattern, errors will be visible on the kernel console:
->
-> [  142.204243] nbd0: detected capacity change from 0 to 524288
-> [  165.189967] md: async del_gendisk mode will be removed in future, plea=
-se upgrade to mdadm-4.5+
-> [  165.252299] md/raid1:md127: active with 1 out of 2 mirrors
-> [  165.252725] md127: detected capacity change from 0 to 522240
-> [  165.255434] block nbd0: Send control failed (result -13)
-> [  165.255718] block nbd0: Request send failed, requeueing
-> [  165.256006] block nbd0: Dead connection, failed to find a fallback
-> [  165.256041] block nbd0: Receive control failed (result -32)
-> [  165.256423] block nbd0: shutting down sockets
-> [  165.257196] I/O error, dev nbd0, sector 2048 op 0x0:(READ) flags 0x0 p=
-hys_seg 1 prio class 2
-> [  165.257736] Buffer I/O error on dev md127, logical block 0, async page=
- read
-> [  165.258263] I/O error, dev nbd0, sector 2048 op 0x0:(READ) flags 0x0 p=
-hys_seg 1 prio class 2
-> [  165.259376] Buffer I/O error on dev md127, logical block 0, async page=
- read
-> [  165.259920] I/O error, dev nbd0, sector 2048 op 0x0:(READ) flags 0x0 p=
-hys_seg 1 prio class 2
-> [  165.260628] Buffer I/O error on dev md127, logical block 0, async page=
- read
-> [  165.261661] ldm_validate_partition_table(): Disk read failed.
-> [  165.262108] I/O error, dev nbd0, sector 2048 op 0x0:(READ) flags 0x0 p=
-hys_seg 1 prio class 2
-> [  165.262769] Buffer I/O error on dev md127, logical block 0, async page=
- read
-> [  165.263697] I/O error, dev nbd0, sector 2048 op 0x0:(READ) flags 0x0 p=
-hys_seg 1 prio class 2
-> [  165.264412] Buffer I/O error on dev md127, logical block 0, async page=
- read
-> [  165.265412] I/O error, dev nbd0, sector 2048 op 0x0:(READ) flags 0x0 p=
-hys_seg 1 prio class 2
-> [  165.265872] Buffer I/O error on dev md127, logical block 0, async page=
- read
-> [  165.266378] I/O error, dev nbd0, sector 2048 op 0x0:(READ) flags 0x0 p=
-hys_seg 1 prio class 2
-> [  165.267168] Buffer I/O error on dev md127, logical block 0, async page=
- read
-> [  165.267564]  md127: unable to read partition table
-> [  165.269581] I/O error, dev nbd0, sector 0 op 0x0:(READ) flags 0x0 phys=
-_seg 1 prio class 2
-> [  165.269960] Buffer I/O error on dev nbd0, logical block 0, async page =
-read
-> [  165.270316] I/O error, dev nbd0, sector 0 op 0x0:(READ) flags 0x0 phys=
-_seg 1 prio class 2
-> [  165.270913] Buffer I/O error on dev nbd0, logical block 0, async page =
-read
-> [  165.271253] I/O error, dev nbd0, sector 0 op 0x0:(READ) flags 0x0 phys=
-_seg 1 prio class 2
-> [  165.271809] Buffer I/O error on dev nbd0, logical block 0, async page =
-read
-> [  165.272074] ldm_validate_partition_table(): Disk read failed.
-> [  165.272360]  nbd0: unable to read partition table
-> [  165.289004] ldm_validate_partition_table(): Disk read failed.
-> [  165.289614]  nbd0: unable to read partition table
->
-> The corresponding SELinux denial on Fedora/RHEL will look like this
-> (assuming it's not silenced):
-> type=3DAVC msg=3Daudit(1758104872.510:116): avc:  denied  { write } for  =
-pid=3D1908 comm=3D"mdadm" laddr=3D::1 lport=3D32772 faddr=3D::1 fport=3D108=
-09 scontext=3Dsystem_u:system_r:mdadm_t:s0-s0:c0.c1023 tcontext=3Dunconfine=
-d_u:unconfined_r:unconfined_t:s0-s0:c0.c1023 tclass=3Dtcp_socket permissive=
-=3D0
->
-> The respective backtrace looks like this:
-> @security[mdadm, -13,
->         handshake_exit+221615650
->         handshake_exit+221615650
->         handshake_exit+221616465
->         security_socket_sendmsg+5
->         sock_sendmsg+106
->         handshake_exit+221616150
->         sock_sendmsg+5
->         __sock_xmit+162
->         nbd_send_cmd+597
->         nbd_handle_cmd+377
->         nbd_queue_rq+63
->         blk_mq_dispatch_rq_list+653
->         __blk_mq_do_dispatch_sched+184
->         __blk_mq_sched_dispatch_requests+333
->         blk_mq_sched_dispatch_requests+38
->         blk_mq_run_hw_queue+239
->         blk_mq_dispatch_plug_list+382
->         blk_mq_flush_plug_list.part.0+55
->         __blk_flush_plug+241
->         __submit_bio+353
->         submit_bio_noacct_nocheck+364
->         submit_bio_wait+84
->         __blkdev_direct_IO_simple+232
->         blkdev_read_iter+162
->         vfs_read+591
->         ksys_read+95
->         do_syscall_64+92
->         entry_SYSCALL_64_after_hwframe+120
-> ]: 1
->
-> The issue has started to appear since commit 060406c61c7c ("block: add
-> plug while submitting IO").
->
-> Cc: Ming Lei <ming.lei@redhat.com>
-> Link: https://bugzilla.redhat.com/show_bug.cgi?id=3D2348878
-> Fixes: 060406c61c7c ("block: add plug while submitting IO")
-> Signed-off-by: Ondrej Mosnacek <omosnace@redhat.com>
-> ---
->
-> Changes in v2:
->  * Move put_cred() after destroy_workqueue() in nbd_cleanup() to avoid a =
-UAF
->  * Add some more details into the commit message
->  * Add a Fixes: tag
->
-> v1: https://lore.kernel.org/linux-block/20251009134542.1529148-1-omosnace=
-@redhat.com/
->
->  drivers/block/nbd.c | 15 +++++++++++++++
->  1 file changed, 15 insertions(+)
+> ...which do nothing. They were deprecated (in documentation) in
+> 6b99e6e6aa62 ("Documentation/admin-guide: blockdev/ramdisk: remove use of
+> "rdev"") and in kernel messages in c8376994c86c ("initrd: remove support
+> for multiple floppies")
 
-Acked-by: Paul Moore <paul@paul-moore.com>
+With all the respect to the work and the series I have noted this:
+1) often the last period is missing in the commit messages;
+2) in this change it's unclear for how long (years) the feature was
+deprecated, i.e. the other patch states that 2020 for something else.
+I wonder if this one has the similar order of oldness.
 
 --=20
-paul-moore.com
+With Best Regards,
+Andy Shevchenko
