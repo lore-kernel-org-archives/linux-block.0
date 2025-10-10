@@ -1,339 +1,135 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E27A428153A;
-	Fri, 10 Oct 2025 09:15:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB5201F7580
+	for <linux-block@vger.kernel.org>; Fri, 10 Oct 2025 09:23:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760087747; cv=none; b=SF/lkeYZQpxULZVZaYZwtpV/0Tk9lYVdGCrz3UHV4a3/yjH8gT1Z1jmGY0SYl723VrwtIQHyVpocPi/+twSrtLStr1i1St2SpMZt0+N5ByAcxL/3K4Qvb87MQLVMmEQV/Ef39bv8Bzn/P6XS17WDlNSeuTxRea1e8GvsEANKSxY=
+	t=1760088225; cv=none; b=Kw43bebGTU+npcyM8BYnVIlXwNNMJEFlZVN+Ve6VKzbNk5f7wxNterP+lwTtK5Z1Hm3SQO7FKs0pFoqUpLCNPaLlQsqyfib967wseCKO3lEc9P/R6jVgfa6gVRYDPF4MT/mpWolFuk8eevmQ6m8pBcSjKj/bALT4NPAj+Z4k0TQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760087747; c=relaxed/simple;
-	bh=cJvhoPRiXOlxs+zH/XVaJ4God3JTKZGfA+vj8Ps5Zvc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cxFBwBQ997lFr6AXS0cTQT4uQh59+9unSuJf3dcICH1dXowUzs1GErzHqM8YO8T47V0yYbSTT2c1O5/ZSQ/V+8tccYbNPT//vOYMYQHcnyb2VRnSMk6vTKSFYns8HvhX6NsGgxvdKnwSExNecGc4cX8yhHce1OUkh+eRSZyPF+s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tGveJ0K3; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1760088225; c=relaxed/simple;
+	bh=80cSl6WLnIDgmk7nk97BKMcUP5a5qgH1Osl1UeO1R/M=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=urncETcZtOimM1xGMu10s3HaKUSePJqlYwRLyWTJNKRVWE4D0JQ4FBOH/xJAlDsE0eg3fPLKHEy23OgssgDfysfWXPESK+nR2O1D3TglhHNUHd3QZGb6d3KrBF98MvblonmQQxq43O1XifIaaiLTpiMbePIYOgmkcxypUJvJuZs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=RwDuDczQ; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=ZCWlJM0T; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tGveJ0K3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 919E7C4CEF1;
-	Fri, 10 Oct 2025 09:15:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760087746;
-	bh=cJvhoPRiXOlxs+zH/XVaJ4God3JTKZGfA+vj8Ps5Zvc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=tGveJ0K3n9rjtc9cLpwOOkTxehk838nZLm/2mI3EY2pKs8/pdEzRwM1lST9GyRequ
-	 Z9Cglgz0UXnPaTS8DNnpXmgjB9nroM3FMi0Ry9OZW61u8ufYcZAVIBfjtU6/URgOHs
-	 BcJJA/xXtUTstv5ota6E0RsByeGbsVF/RDGHfR4UUkvZRmbupT3ebNwZg11P1OKLKf
-	 05QYAz+9Z7mtIkWhUwHFX52gnNTNTD4X/eUaRnhKIXDhiEpgULHajRIvLCCLy2Hid2
-	 hSbjoKqHP86kLB7bvNLzS/8yyqrzGL7eTBuushkecsl0cQUTN0OThYkxiojnv/S6Qz
-	 4vT1hKFRznFiA==
-From: Yu Kuai <yukuai@kernel.org>
-To: axboe@kernel.dk,
-	tj@kernel.org,
-	linux-block@vger.kernel.org,
-	cgroups@vger.kernel.org,
-	nilay@linux.ibm.com,
-	bvanassche@acm.org,
-	ming.lei@redhat.com,
-	hch@lst.de
-Cc: linux-kernel@vger.kernel.org,
-	Yu Kuai <yukuai3@huawei.com>
-Subject: [PATCH v2 19/19] blk-cgroup: remove unsed blkg configuration helpers
-Date: Fri, 10 Oct 2025 17:14:44 +0800
-Message-ID: <20251010091446.3048529-20-yukuai@kernel.org>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20251010091446.3048529-1-yukuai@kernel.org>
-References: <20251010091446.3048529-1-yukuai@kernel.org>
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="RwDuDczQ";
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="ZCWlJM0T"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id EE85F1F393;
+	Fri, 10 Oct 2025 09:23:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+	t=1760088222; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5SIAekBBOYUo+5eRdztJ2ECo0oWKXtIh6DdmvZq7JLY=;
+	b=RwDuDczQtlplijL8LIHQNNL7Wn8uh5fUiriHObPIbw9XXVJAIK++UG14l+jyPRdcYWgyGw
+	R2twdIZ6yKQ9Vrwo3Bb4B1HJjELv3JFop0/rWomWVcj5x9e4WSscXlBpFo1HNy6jkGiOqA
+	BkEni9zteHXa5JOpsorwGFpCWeOi/0k=
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+	t=1760088221; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5SIAekBBOYUo+5eRdztJ2ECo0oWKXtIh6DdmvZq7JLY=;
+	b=ZCWlJM0TB1U3iZgKkrVKnw7egJUiPgJfZgX3ga1JmT12qOr1z/n7/EIlSWVdcKuDnweGLQ
+	JZ964ZNoAZF+eKlB5pV51X7pKcJQpDVEq5b6uqmBgD1CJMpW1+9a1N9LEJuh2usBlFHY4K
+	wiM3rtJR2GSvQyYLG9RGEMKk1LVwTCg=
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id C46401375D;
+	Fri, 10 Oct 2025 09:23:41 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id il/JLp3Q6GjCbQAAD6G6ig
+	(envelope-from <mwilck@suse.com>); Fri, 10 Oct 2025 09:23:41 +0000
+Message-ID: <515e1af3312710d17fa5f4a3ab11ff4b7a244eaa.camel@suse.com>
+Subject: Re: [PATCH] dm: Fix deadlock when reloading a multipath table
+From: Martin Wilck <mwilck@suse.com>
+To: Bart Van Assche <bvanassche@acm.org>, Benjamin Marzinski
+	 <bmarzins@redhat.com>, Mikulas Patocka <mpatocka@redhat.com>, Mike Snitzer
+	 <snitzer@kernel.org>
+Cc: dm-devel@lists.linux.dev, linux-block@vger.kernel.org
+Date: Fri, 10 Oct 2025 11:23:41 +0200
+In-Reply-To: <033ca444-4c68-4a4f-bc2b-32232e80e848@acm.org>
+References: <20251009030431.2895495-1-bmarzins@redhat.com>
+	 <ed792d72a1ca47937631af6e12098d9a20626bcf.camel@suse.com>
+	 <033ca444-4c68-4a4f-bc2b-32232e80e848@acm.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.2 
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-Spam-Level: 
+X-Spamd-Result: default: False [-4.30 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-0.999];
+	MIME_GOOD(-0.10)[text/plain];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.com:s=susede1];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.com:mid]
+X-Spam-Flag: NO
+X-Spam-Score: -4.30
 
-From: Yu Kuai <yukuai3@huawei.com>
+Hi Bart,
 
-Remove followings helpers that is now unused:
+On Thu, 2025-10-09 at 16:29 -0700, Bart Van Assche wrote:
+> On 10/9/25 2:57 AM, Martin Wilck wrote:
+> > In general, I'm wondering whether we need a more generic solution
+> > to
+> > this problem. Therefore I've added linux-block to cc.
+> >=20
+> > The way I see it, if a device has queued IO without any means to
+> > perform the IO, it can't be frozen. We'd either need to fail all
+> > queued
+> > IO in this case, or refuse attempts to freeze the queue.
+>=20
+> If a device has queued I/O and the I/O can't make progress then it
+> isn't
+> necessary to call blk_mq_freeze_queue(), isn't it?=C2=A0
 
-- blkg_conf_open_bdev()
-- blkg_conf_open_bdev_frozen()
-- blkg_conf_prep()
-- blkg_conf_exit()
-- blkg_conf_exit_frozen()
+Good point. Even if the queue limits were changed while the IO was in
+the queue,  they'd be re-checked in blk_insert_cloned_request(). That
+might cause IO failures, but if you modify queue limits while IO is in
+flight, that's part of the risk, I suppose.
 
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
- block/blk-cgroup.c | 224 +--------------------------------------------
- block/blk-cgroup.h |   6 --
- 2 files changed, 1 insertion(+), 229 deletions(-)
+> See also "[PATCH 0/3]=20
+> Fix a deadlock related to modifying queue attributes"
+> (
+> https://lore.kernel.org/linux-block/20250702182430.3764163-1-bvanassche@a=
+cm.org
+> /).
+>=20
+> BTW, that patch series is not upstream. I apply it manually every
+> time
+> before I run blktests.
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 4b7324c1d0d5..d93654334854 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -729,8 +729,7 @@ EXPORT_SYMBOL_GPL(__blkg_prfill_u64);
-  * @input: input string
-  *
-  * Initialize @ctx which can be used to parse blkg config input string @input.
-- * Once initialized, @ctx can be used with blkg_conf_open_bdev() and
-- * blkg_conf_prep(), and must be cleaned up with blkg_conf_exit().
-+ * Once initialized, @ctx can be used with blkg_conf_start().
-  */
- void blkg_conf_init(struct blkg_conf_ctx *ctx, char *input)
- {
-@@ -738,92 +737,6 @@ void blkg_conf_init(struct blkg_conf_ctx *ctx, char *input)
- }
- EXPORT_SYMBOL_GPL(blkg_conf_init);
- 
--/**
-- * blkg_conf_open_bdev - parse and open bdev for per-blkg config update
-- * @ctx: blkg_conf_ctx initialized with blkg_conf_init()
-- *
-- * Parse the device node prefix part, MAJ:MIN, of per-blkg config update from
-- * @ctx->input and get and store the matching bdev in @ctx->bdev. @ctx->body is
-- * set to point past the device node prefix.
-- *
-- * This function may be called multiple times on @ctx and the extra calls become
-- * NOOPs. blkg_conf_prep() implicitly calls this function. Use this function
-- * explicitly if bdev access is needed without resolving the blkcg / policy part
-- * of @ctx->input. Returns -errno on error.
-- */
--int blkg_conf_open_bdev(struct blkg_conf_ctx *ctx)
--{
--	char *input = ctx->input;
--	unsigned int major, minor;
--	struct block_device *bdev;
--	int key_len;
--
--	if (ctx->bdev)
--		return 0;
--
--	if (sscanf(input, "%u:%u%n", &major, &minor, &key_len) != 2)
--		return -EINVAL;
--
--	input += key_len;
--	if (!isspace(*input))
--		return -EINVAL;
--	input = skip_spaces(input);
--
--	bdev = blkdev_get_no_open(MKDEV(major, minor), false);
--	if (!bdev)
--		return -ENODEV;
--	if (bdev_is_partition(bdev)) {
--		blkdev_put_no_open(bdev);
--		return -ENODEV;
--	}
--
--	mutex_lock(&bdev->bd_queue->rq_qos_mutex);
--	if (!disk_live(bdev->bd_disk)) {
--		blkdev_put_no_open(bdev);
--		mutex_unlock(&bdev->bd_queue->rq_qos_mutex);
--		return -ENODEV;
--	}
--
--	ctx->body = input;
--	ctx->bdev = bdev;
--	return 0;
--}
--/*
-- * Similar to blkg_conf_open_bdev, but additionally freezes the queue,
-- * acquires q->elevator_lock, and ensures the correct locking order
-- * between q->elevator_lock and q->rq_qos_mutex.
-- *
-- * This function returns negative error on failure. On success it returns
-- * memflags which must be saved and later passed to blkg_conf_exit_frozen
-- * for restoring the memalloc scope.
-- */
--unsigned long __must_check blkg_conf_open_bdev_frozen(struct blkg_conf_ctx *ctx)
--{
--	int ret;
--	unsigned long memflags;
--
--	if (ctx->bdev)
--		return -EINVAL;
--
--	ret = blkg_conf_open_bdev(ctx);
--	if (ret < 0)
--		return ret;
--	/*
--	 * At this point, we haven’t started protecting anything related to QoS,
--	 * so we release q->rq_qos_mutex here, which was first acquired in blkg_
--	 * conf_open_bdev. Later, we re-acquire q->rq_qos_mutex after freezing
--	 * the queue and acquiring q->elevator_lock to maintain the correct
--	 * locking order.
--	 */
--	mutex_unlock(&ctx->bdev->bd_queue->rq_qos_mutex);
--
--	memflags = blk_mq_freeze_queue(ctx->bdev->bd_queue);
--	mutex_lock(&ctx->bdev->bd_queue->elevator_lock);
--	mutex_lock(&ctx->bdev->bd_queue->rq_qos_mutex);
--
--	return memflags;
--}
--
- void blkg_conf_end(struct blkg_conf_ctx *ctx)
- {
- 	struct request_queue *q = bdev_get_queue(ctx->bdev);
-@@ -885,141 +798,6 @@ int blkg_conf_start(struct blkcg *blkcg, struct blkg_conf_ctx *ctx)
- }
- EXPORT_SYMBOL_GPL(blkg_conf_start);
- 
--/**
-- * blkg_conf_prep - parse and prepare for per-blkg config update
-- * @blkcg: target block cgroup
-- * @pol: target policy
-- * @ctx: blkg_conf_ctx initialized with blkg_conf_init()
-- *
-- * Parse per-blkg config update from @ctx->input and initialize @ctx
-- * accordingly. On success, @ctx->body points to the part of @ctx->input
-- * following MAJ:MIN, @ctx->bdev points to the target block device and
-- * @ctx->blkg to the blkg being configured.
-- *
-- * blkg_conf_open_bdev() may be called on @ctx beforehand. On success, this
-- * function returns with queue lock held and must be followed by
-- * blkg_conf_exit().
-- */
--int blkg_conf_prep(struct blkcg *blkcg, const struct blkcg_policy *pol,
--		   struct blkg_conf_ctx *ctx)
--	__acquires(&bdev->bd_queue->blkcg_mutex)
--{
--	struct gendisk *disk;
--	struct request_queue *q;
--	struct blkcg_gq *blkg;
--	int ret;
--
--	ret = blkg_conf_open_bdev(ctx);
--	if (ret)
--		return ret;
--
--	disk = ctx->bdev->bd_disk;
--	q = disk->queue;
--
--	/* Prevent concurrent with blkcg_deactivate_policy() */
--	mutex_lock(&q->blkcg_mutex);
--
--	if (!blkcg_policy_enabled(q, pol)) {
--		ret = -EOPNOTSUPP;
--		goto fail_unlock;
--	}
--
--	blkg = blkg_lookup(blkcg, q);
--	if (blkg)
--		goto success;
--
--	/*
--	 * Create blkgs walking down from blkcg_root to @blkcg, so that all
--	 * non-root blkgs have access to their parents.
--	 */
--	while (true) {
--		struct blkcg *pos = blkcg;
--		struct blkcg *parent;
--
--		parent = blkcg_parent(blkcg);
--		while (parent && !blkg_lookup(parent, q)) {
--			pos = parent;
--			parent = blkcg_parent(parent);
--		}
--
--		if (!blkcg_policy_enabled(q, pol)) {
--			ret = -EOPNOTSUPP;
--			goto fail_unlock;
--		}
--
--		blkg = blkg_lookup(pos, q);
--		if (!blkg) {
--			blkg = blkg_create(pos, disk);
--			if (IS_ERR(blkg)) {
--				ret = PTR_ERR(blkg);
--				goto fail_unlock;
--			}
--		}
--
--		if (pos == blkcg)
--			goto success;
--	}
--success:
--	ctx->blkg = blkg;
--	return 0;
--
--fail_unlock:
--	mutex_unlock(&q->blkcg_mutex);
--	/*
--	 * If queue was bypassing, we should retry.  Do so after a
--	 * short msleep().  It isn't strictly necessary but queue
--	 * can be bypassing for some time and it's always nice to
--	 * avoid busy looping.
--	 */
--	if (ret == -EBUSY) {
--		msleep(10);
--		ret = restart_syscall();
--	}
--	return ret;
--}
--EXPORT_SYMBOL_GPL(blkg_conf_prep);
--
--/**
-- * blkg_conf_exit - clean up per-blkg config update
-- * @ctx: blkg_conf_ctx initialized with blkg_conf_init()
-- *
-- * Clean up after per-blkg config update. This function must be called on all
-- * blkg_conf_ctx's initialized with blkg_conf_init().
-- */
--void blkg_conf_exit(struct blkg_conf_ctx *ctx)
--	__releases(&ctx->bdev->bd_queue->blkcg_mutex)
--	__releases(&ctx->bdev->bd_queue->rq_qos_mutex)
--{
--	if (ctx->blkg) {
--		mutex_unlock(&bdev_get_queue(ctx->bdev)->blkcg_mutex);
--		ctx->blkg = NULL;
--	}
--
--	if (ctx->bdev) {
--		mutex_unlock(&ctx->bdev->bd_queue->rq_qos_mutex);
--		blkdev_put_no_open(ctx->bdev);
--		ctx->body = NULL;
--		ctx->bdev = NULL;
--	}
--}
--EXPORT_SYMBOL_GPL(blkg_conf_exit);
--
--/*
-- * Similar to blkg_conf_exit, but also unfreezes the queue and releases
-- * q->elevator_lock. Should be used when blkg_conf_open_bdev_frozen
-- * is used to open the bdev.
-- */
--void blkg_conf_exit_frozen(struct blkg_conf_ctx *ctx, unsigned long memflags)
--{
--	if (ctx->bdev) {
--		struct request_queue *q = ctx->bdev->bd_queue;
--
--		blkg_conf_exit(ctx);
--		mutex_unlock(&q->elevator_lock);
--		blk_mq_unfreeze_queue(q, memflags);
--	}
--}
--
- static void blkg_iostat_add(struct blkg_iostat *dst, struct blkg_iostat *src)
- {
- 	int i;
-diff --git a/block/blk-cgroup.h b/block/blk-cgroup.h
-index c3d16d52c275..aec801255821 100644
---- a/block/blk-cgroup.h
-+++ b/block/blk-cgroup.h
-@@ -221,12 +221,6 @@ struct blkg_conf_ctx {
- };
- 
- void blkg_conf_init(struct blkg_conf_ctx *ctx, char *input);
--int blkg_conf_open_bdev(struct blkg_conf_ctx *ctx);
--unsigned long blkg_conf_open_bdev_frozen(struct blkg_conf_ctx *ctx);
--int blkg_conf_prep(struct blkcg *blkcg, const struct blkcg_policy *pol,
--		   struct blkg_conf_ctx *ctx);
--void blkg_conf_exit(struct blkg_conf_ctx *ctx);
--void blkg_conf_exit_frozen(struct blkg_conf_ctx *ctx, unsigned long memflags);
- void blkg_conf_end(struct blkg_conf_ctx *ctx);
- int blkg_conf_start(struct blkcg *blkcg, struct blkg_conf_ctx *ctx);
- 
--- 
-2.51.0
+Will you make another attempt to get it merged?
 
+Martin
