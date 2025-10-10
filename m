@@ -1,143 +1,101 @@
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D9621DEFE8
-	for <linux-block@vger.kernel.org>; Fri, 10 Oct 2025 02:03:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4005522F16E;
+	Fri, 10 Oct 2025 02:28:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760061825; cv=none; b=FrATsIaBGJM4fJd4nyV8FHDxv/1s+hfXBU0JoUHII8wCMXvmB3w7Di5Zs1KskiQsDMomhoKWHMX3eaQP5XWh7AuIlPqzwg7llJvXw9mY8CO4xY2DshLFXMNRpCabfnhHvC7ZNqdhkF8HalcXw384RDJUCGrABL3v0XEJotQftmo=
+	t=1760063300; cv=none; b=X6sW2z6aepT0S9BimWWUfcaCzSB1ak5rWU/Ulf+SMl3dcrW4N7D5DDeqo5hQnMpF5zlJ+4ZT+jVWEmReDk5t6V/l/N79QVjk98SvsDdh0hUm/w/5kGP+8J3UK47epvnlix3pR6utm+NWfuB+pkQ9NKeqqeRNDxbKgVbxz9uda1U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760061825; c=relaxed/simple;
-	bh=zYsqa3guwWVAVB1C5gyhw93AF5/olsVvy/KECbkUpJU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=T0JIe4dKVTMBWBgbxuKT9lY8u4DRxbT2dhCP8/aPgTD8IYBkZBQ62KZMXGHCxq2SWDbWym4QMhxWYS+s3XvNzZ+/yyRaxkPtl7DgsS/5GmxMLopFApS9+1/7dbWojvzXHq2joIBbJ+bVx8yV02PEj/4Yd+7pX8BU/QdUqReOmwI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bxBpXPQb; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1760063300; c=relaxed/simple;
+	bh=PkHlXZp6ScUnG3D1az7EMmTZEmssxrzEjpBBdh1XINA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KfXlxMLl+4Wpx2YWna0HFK0Bid2rU0OqoH83VWBI6C9iyTyz0tvXhDBZh3pLNCZx0MbR+ZtY5vBYZlq4VFjZkMHVzTGHWvSUk2Fag5h4cPh4NhuyrP99M3ik5f/pRw61E9FZiCAjy9RYUY9h2kLiuL+/NQEtyOSXbHW3VqunLXo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VzDYBwhK; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bxBpXPQb"
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-27edcbcd158so18853165ad.3
-        for <linux-block@vger.kernel.org>; Thu, 09 Oct 2025 19:03:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760061823; x=1760666623; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=a/zrolnPflEL/cxQ6mOTWr2Yo13vs/nPffcZaQ7JvMU=;
-        b=bxBpXPQbP4XYynWR0qWqroDUJYS6jH+7+rBS01RXhcRfrkkGLUM8iSGtLxPN6XbuO2
-         2J3CUv+3mbK7CcGA1/T7mfS/4HrpFiY6DOs+XTBxcsyyQJouvlyIBKEWr2C1q2QBcfnY
-         /Ska7X8kxj2qsMTgvKMeLbBdNiODTEiRy4JCmTjuLVAur2ZauNRf+1WUA4qSJgkxqcB1
-         k6HwIemmGKocVSE8QWpHbj2d6pUITLabXQXUTtyW5jLOwDfg2K4+/XyokUuxSeNvBzCM
-         /2/b1SZ1zi65uETtuJ3RPRYtergm3bV7F93B/QxdDzbaUe2R9Jpnc31MxlfiBfiMu/zA
-         ccaA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760061823; x=1760666623;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=a/zrolnPflEL/cxQ6mOTWr2Yo13vs/nPffcZaQ7JvMU=;
-        b=JlCs3XECRrNU+jwpIRrSX3fvTQcy3PUtQ3dP7QMvJSNXsBji8iIbuMSkQpU2cjQFek
-         a3xP8dpTteVx/obsRXgtWE9DLjsHlB63MS+l1+c9kmyk0SzjVQF/eVdfdKx4EaIyTcpT
-         WywJWJr9bvqeuOtCt1mpmZB4G4onC3nQngUICnt9kR4VpVJE6ehsoLfMSJPc7x+QnUXp
-         PTsppJAKFewhZmXISQP+s9239W9Yn3fqO594dAiT9f6l6L3l5LQv82ZojckiPdLd2yq3
-         S/a8wIESXKZP1eMdPu1afVoukG3w0yivcdYnGIezXzKZ3rR4ccURsSktNgPK6hCYgTH/
-         Tzqw==
-X-Forwarded-Encrypted: i=1; AJvYcCXShI5/GXLkaoTJz5SUhHjAQWd7ZYKbY4bJRwLrcpKZGkFuRCsNfbYFF7ZW2VHfNmKN5jrK+QDeci/z5Q==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxYHDftWORzQIJV66Cnd7dhLf3Yv946egdrj6q1JQD0TnWRNi8T
-	XtC/LeVxBr6VdtzUsFQwHp6RLpnfjRBh4CNBgCiWvi6Fnszip7FxTWd3wMZyCf6agx3p0qB9+o/
-	lqALiEEDv5pJ1jlXkx6sZH73s2p7/oNI=
-X-Gm-Gg: ASbGncsqoQTKHMqFCgtrXiYhM51BeND7EUQGJyAymwaRNfynjT4ZMjMgStrWvEJSR/C
-	9M6yra5KRsrDJKspjHgNHTXAF9g+5eagg8JyQArpRXLhFi6Rxz9caJwZlJCTxjslvdWgRB7oqtg
-	XThFAasVcuzflTdH/1v6axdc8gCxFrtzwBIANNPqJBKLHAXnTJjuAByakREoL4/wXFNCm2OqMEe
-	4tHnzv5OJm45R4GTwB0bxpXkRk+MTVjJfo=
-X-Google-Smtp-Source: AGHT+IFEUYwRs/06WdVaUUjfO8hT0w8wh3XXO/RSsrjN9zpFaHGINW0byPHZ6Uz0KFaQhM7z5Rwr8o4nltVV8o5Yy9w=
-X-Received: by 2002:a17:902:e787:b0:269:a2bc:799f with SMTP id
- d9443c01a7336-290272b54b6mr109437225ad.29.1760061823154; Thu, 09 Oct 2025
- 19:03:43 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VzDYBwhK"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42CB8C4CEE7;
+	Fri, 10 Oct 2025 02:28:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1760063300;
+	bh=PkHlXZp6ScUnG3D1az7EMmTZEmssxrzEjpBBdh1XINA=;
+	h=From:To:Cc:Subject:Date:From;
+	b=VzDYBwhKPHvvTQUKR+PRRDTEW8MvERkNZ4Mzhe39Q2AQhK8wfzXvW12ObtHSQSCZb
+	 yNp9lBMrAhiY0euE5tUT4u2fVgfHLCB8MuNVOL2Lchw/s4AtKtkCiaJuGWFTBK3Pq3
+	 O10J7twAr/PQcRX773OPSjX/VmqQpQoR3hosTTyownQhadDunp+YEQwiRi4wr7rJzq
+	 wZOif4my8TcqpH13skUzS3U6PQkipcluQVxWmmifyqvAK1m8/jppPHnWVbsdTXQRIH
+	 BJgTaOwp+muMjkxsJz5kO92Comxmdtz/UZL/gw6wjEDd0omuA1BfqBIikowenZchR6
+	 SVX7K+WqST8PA==
+From: Yu Kuai <yukuai@kernel.org>
+To: axboe@kernel.dk,
+	bvanassche@acm.org,
+	nilay@linux.ibm.com
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	yukuai3@huawei.com,
+	yi.zhang@huawei.com,
+	yangerkun@huawei.com,
+	johnny.chenyi@huawei.com
+Subject: [PATCH v3 0/7] blk-mq: introduce new queue attribute async_depth
+Date: Fri, 10 Oct 2025 10:28:02 +0800
+Message-ID: <20251010022812.2985286-1-yukuai@kernel.org>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251009155253.14611-1-pilgrimtao@gmail.com> <db87a85d-e433-4daf-97c7-d5156849db0f@acm.org>
- <bb362d12-b942-48f3-8414-e859cebb8862@kernel.org> <8406f13d-d8be-4957-b1ec-6996f19d32e9@acm.org>
-In-Reply-To: <8406f13d-d8be-4957-b1ec-6996f19d32e9@acm.org>
-From: Tao pilgrim <pilgrimtao@gmail.com>
-Date: Fri, 10 Oct 2025 10:03:31 +0800
-X-Gm-Features: AS18NWA8-QkeJl6faOsweI-nr4XveIcXeAyxDMg1xwqMwXRGapTRjcExMGBBJq4
-Message-ID: <CAAWJmAZ5CdqmbJJBptDzE5pgfEghLZ+q9oMqH=L+_-SPu5CB7A@mail.gmail.com>
-Subject: Re: [PATCH v2] block/mq-deadline: adjust the timeout period of the per_prio->dispatch
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: Damien Le Moal <dlemoal@kernel.org>, axboe@kernel.dk, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Chengkaitao <chengkaitao@kylinos.cn>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Fri, Oct 10, 2025 at 7:40=E2=80=AFAM Bart Van Assche <bvanassche@acm.org=
-> wrote:
->
->
-> On 10/9/25 1:21 PM, Damien Le Moal wrote:
-> > There is still something bothering me with this: the request is added t=
-o the
-> > dispatch list, and *NOT* to the fifo/sort list. So this should be consi=
-dered as
-> > a scheduling decision in itself, and __dd_dispatch_request() reflects t=
-hat as
-> > the first thing it does is pick the requests that are in the dispatch l=
-ist
-> > already. However, __dd_dispatch_request() also has the check:
-> >
-> >               if (started_after(dd, rq, latest_start))
-> >                          return NULL;
-> >
-> > for requests that are already in the dispatch list. That is what does n=
-ot make
-> > sense to me. Why ? There is no comment describing this. And I do not un=
-derstand
-> > why we should bother with any time for requests that are in the dispatc=
-h list
-> > already. These should be sent to the drive first, always.
-> >
-> > This patch seems to be fixing a problem that is introduced by the above=
- check.
-> > But why this check ? What am I missing here ?
->
-> Is my conclusion from the above correct that there is agreement that the
-> I/O priority should be ignored for AT HEAD requests and that AT HEAD
-> requests should always be dispatched first? If so, how about merging the
-> three per I/O priority dispatch lists into a single dispatch list and
-> not to call started_after() at all for the dispatch list?
+From: Yu Kuai <yukuai3@huawei.com>
 
-From the current kernel strategy perspective, the dispatch list does
-not fundamentally
-differ from the fifo/sort list. It essentially treats AT HEAD requests
-as higher-priority
-requests compared to regular ones, storing them separately in the
-dispatch list. When
-I/O scheduling is triggered, the kernel's priority consideration
-follows this hierarchy:
-     (rt/be/idle priorities) > (expired requests in dispatch list)
-      > (expired requests in fifo/sort list) > (non-expired requests
-in dispatch list)
-      > (non-expired requests in fifo/sort list).
+Changes in v3:
+ - use guard()/scope_guard() in patch 3;
+ - add review tag other than patch 3;
+Changes in v2:
+ - keep limit_depth() method for kyber and mq-deadline in patch 3;
+ - add description about sysfs api change for kyber and mq-deadline;
+ - improve documentation in patch 7;
+ - add review tag for patch 1;
 
-I speculate the original design intent addresses scenarios where
-requests accumulate
-in the dispatch list. The kernel must first scan for expired requests
-within the dispatch
-list for prioritized processing, while also positioning expired
-requests from the fifo/sort
-list higher in priority than non-expired requests in the dispatch list.
+Background and motivation:
 
-To merge the three per I/O priority dispatch lists into a single
-dispatch list, prerequisite
-conditions must be met: ensuring no request backlog occurs in the
-dispatch list that
-could cause starvation or frequent deadline violations for requests in
-the fifo/sort lists.
+At first, we test a performance regression from 5.10 to 6.6 in
+downstream kernel(described in patch 5), the regression is related to
+async_depth in mq-dealine.
 
---=20
-Yours,
-Kaitao Cheng
+While trying to fix this regression, Bart suggests add a new attribute
+to request_queue, and I think this is a good idea because all elevators
+have similar logical, however only mq-deadline allow user to configure
+async_depth.
+
+patch 1-3 add new queue attribute async_depth;
+patch 4 convert kyber to use request_queue->async_depth;
+patch 5 covnert mq-dedaline to use request_queue->async_depth, also the
+performance regression will be fixed;
+patch 6 convert bfq to use request_queue->async_depth;
+
+Yu Kuai (7):
+  block: convert nr_requests to unsigned int
+  blk-mq-sched: unify elevators checking for async requests
+  blk-mq: add a new queue sysfs attribute async_depth
+  kyber: covert to use request_queue->async_depth
+  mq-deadline: covert to use request_queue->async_depth
+  block, bfq: convert to use request_queue->async_depth
+  blk-mq: add documentation for new queue attribute async_dpeth
+
+ Documentation/ABI/stable/sysfs-block | 34 +++++++++++++++
+ block/bfq-iosched.c                  | 45 ++++++++-----------
+ block/blk-core.c                     |  1 +
+ block/blk-mq-sched.h                 |  5 +++
+ block/blk-mq.c                       | 64 +++++++++++++++++-----------
+ block/blk-sysfs.c                    | 42 ++++++++++++++++++
+ block/elevator.c                     |  1 +
+ block/kyber-iosched.c                | 33 +++-----------
+ block/mq-deadline.c                  | 39 +++--------------
+ include/linux/blkdev.h               |  3 +-
+ 10 files changed, 152 insertions(+), 115 deletions(-)
+
+-- 
+2.51.0
+
