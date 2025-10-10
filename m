@@ -1,54 +1,54 @@
 Received: from esa6.hgst.iphmx.com (esa6.hgst.iphmx.com [216.71.154.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7540925A2B5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08F26246BDE
 	for <linux-block@vger.kernel.org>; Fri, 10 Oct 2025 08:20:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.71.154.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760084406; cv=none; b=Y0lDOM/sThGdTpj02kfgWmhDfp04E06xdNm6/umfE7ypd1PtzSx9AhCorkk+VGpbQQcxGRTYmM/ObEoIYIQzgq7fxs+zmYaDaASMWHc305jSB8O8+XV+MdYRG7LdGObeP/aJvad5ivV0rioSi+s7arixb6bVkbr0P8muOT7ivqs=
+	t=1760084409; cv=none; b=KG19d/ZEF7s1cNqIaVPLY7HOCSeRWgWoeqcf/vNoRMZpb+DNJgBog7cxnfT/9wb4yADSTFixJm6zJV0ckeGXWqJCx70Zl/fHZ/fG6928c6J3Ddsv0QSm/V/6Ya8oXfrU+ikHplSmWS37TdM4Wsqe504sgtof+yV4iAcVfEq6dXc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760084406; c=relaxed/simple;
-	bh=A8DfMVPwSiFWRrl5f+M0dhPgeLwYCsX8HWAvLqdseU8=;
+	s=arc-20240116; t=1760084409; c=relaxed/simple;
+	bh=fQhrbWry1m36ZBFywyj1t+nNDPAvr0m6s5bxIf27sDg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=RoBQOfENcwzmEkQt6hEA0BotMYsK/yVqfIfr3YVFcGvuYuc6nUZyRy8iDfF+sV0/XIhQbSzBvoa7NnWGsbpGYXO+uAdwZYaRnd2gSZ4+svYoqYWItpbluGcxcHRE6FS7+uO/7HNK/A6b9PjU9q2HzR6gznI58BlCDlZavr/Vbbo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=L3LmM32C; arc=none smtp.client-ip=216.71.154.45
+	 MIME-Version; b=INpY753WQ3zTEcgUYU80FhMUwY7VTLPYXGfGksXjK4rZTb4oPxa9+7/a5Bwsmnne3rogebIkrqSwgunwEJh6h+35O0965GNsdMWFTPmNObiFrKLD2P43hZopPFbPfr9yqRT6XGomw3fcF8n7jj1rW9xMsHpjHAmQfmvW0yKk8o8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=A6Dntn3P; arc=none smtp.client-ip=216.71.154.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="L3LmM32C"
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="A6Dntn3P"
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1760084404; x=1791620404;
+  t=1760084407; x=1791620407;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=A8DfMVPwSiFWRrl5f+M0dhPgeLwYCsX8HWAvLqdseU8=;
-  b=L3LmM32CyN4Y5t5TsR4vH5tSZ+KDuvTd/BLrbFO/AbgvQbsom2uGJVay
-   vYiaiJL+LapUAIIPyShORSSm0jbR3kd03dBzdN2IE2a6sV64HP+HHM8XR
-   PBBqHUcQiIlvd+Dp8Exswip7w6gFpzGIIqlDBH1bM57jqujBOPj7PBDSh
-   YWbGrrA/tqmuewYUNHPxrQPuWfdNzJUTPunk2w2W1cW1u8zU+t3SctZLA
-   q+yTLoLibeJfEVd3vZJ5xrI7ztzcXgH7+Fb/RZqAauU3vV92XwTQjiQ3i
-   7xwOIhSNiMFtuMFcTsQbDQFrF6SSTpNVQnY7wYXg97S3WQu0OHKVyP6q9
-   g==;
-X-CSE-ConnectionGUID: NBveX24kSNyO2vGNR0GGQg==
-X-CSE-MsgGUID: gR2xAHLKRkOvbU8/2dv1hg==
+  bh=fQhrbWry1m36ZBFywyj1t+nNDPAvr0m6s5bxIf27sDg=;
+  b=A6Dntn3PaReMwNfbl0+/Je8fj8HGHK8/7K4UEXGxPLvgqmJMDgo1VIOf
+   OEGPI2+anOXte50vpqilTjJWiWatepybOTtqJkN1XCN+HWzeY9WfAVsgO
+   F8EQUF5fgZPNp+9IJVseYxTFfYWFmYnJVzSAm+9E5q9ZTCBrOYCm8xx0z
+   r5WI7CRxSD5cosjJWpQC72Bz0rsg4JAQjjS704h9tFKakv7o8a5NPhfkj
+   L98QS3PGtoNxzuC8jqn08N0JdWNJaFMKcc0i6yM76h8JXoFLYZBiziHMU
+   H2vpPFp1Nuf9npg7L1VqCqq2LK56OJ21pR0OrGIhPe+sgXpNJ0r6KpQ/o
+   w==;
+X-CSE-ConnectionGUID: kfX9D90lSGehKHumM/kjqg==
+X-CSE-MsgGUID: uxm680nmRrGeByV0utfc1A==
 X-IronPort-AV: E=Sophos;i="6.19,218,1754928000"; 
-   d="scan'208";a="132653547"
+   d="scan'208";a="132653548"
 Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 10 Oct 2025 16:19:56 +0800
-IronPort-SDR: 68e8c1ac_NEN/qO8WJAWVaAJ7z6jlkwM8I/dDuY56vVFdFQS6Cy8vdAm
- KchohBFe2HV5wTRN8cixLiu2leihCkBT1SWVLiQ==
+  by ob1.hgst.iphmx.com with ESMTP; 10 Oct 2025 16:19:57 +0800
+IronPort-SDR: 68e8c1ad_5tMVbSqoa4DsAnn4MdC7CMK8vLLpvjdhlcyU1l8CbihuI0l
+ A1AyrGi3Om0NmA9XJEk7O1mqPZOjC2xUzf4uBMg==
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 10 Oct 2025 01:19:57 -0700
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 10 Oct 2025 01:19:58 -0700
 WDCIronportException: Internal
 Received: from 5cg2148fq4.ad.shared (HELO shinmob.wdc.com) ([10.224.163.88])
-  by uls-op-cesaip02.wdc.com with ESMTP; 10 Oct 2025 01:19:56 -0700
+  by uls-op-cesaip02.wdc.com with ESMTP; 10 Oct 2025 01:19:57 -0700
 From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 To: linux-block@vger.kernel.org,
 	Yu Kuai <yukuai1@huaweicloud.com>
 Cc: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: [PATCH blktests 3/4] throtl/rc: support test with scsi_debug
-Date: Fri, 10 Oct 2025 17:19:51 +0900
-Message-ID: <20251010081952.187064-4-shinichiro.kawasaki@wdc.com>
+Subject: [PATCH blktests 4/4] throtl: support tests with both null_blk and scsi_debug in a single run
+Date: Fri, 10 Oct 2025 17:19:52 +0900
+Message-ID: <20251010081952.187064-5-shinichiro.kawasaki@wdc.com>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251010081952.187064-1-shinichiro.kawasaki@wdc.com>
 References: <20251010081952.187064-1-shinichiro.kawasaki@wdc.com>
@@ -60,151 +60,210 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Currently, the throtl test cases set up null_blk devices as test
-targets. It is desired to run the tests with scsi_debug devices also
-to expand test coverage and identify failures that do not surface with
-null_blk as shown in the Link.
+The previous commit introduced the global variable throtl_blkdev_type to
+specify the type of block device for the throtl group. However, users
+need to run tests twice modifying the variable's value each time to test
+against both device types null_blk and scsi_debug. This workflow is
+cumbersome.
 
-Introduce the global variable throtl_blkdev_type to choose the test
-target block device type. When 'nullb' is set to it, run the tests
-with null_blk. When 'sdebug' is set, run with scsi_debug. The command
-line below runs the throtl group with scsi_debug.
+To run the throtl group for both null_blk and scsi_debug in a single
+run, introduce the global variable THROTL_BLKDEV_TYPES instead of
+throtl_blkdev_type. When THROTL_BLKDEV_TYPES is set to 'nullb sdebug',
+the blktests framework executes each test case in the throtl group for
+both null_blk and scsi_debug sequentially. For this purpose, introduce
+the helper function _set_throtl_blkdev_type() and call it in
+set_conditions() hooks of the test cases.
 
-  $ sudo bash -c "throtl_blkdev_type=sdebug ./check throtl"
+The command line below runs the throtl group with both null_blk and
+scsi_debug:
 
-Modify the helper functions _configure_throtl_blkdev(),
-_delete_throtl_blkdev() and _exit_throtl_blkdev() to support both
-null_blk and scsi_debug. After this change, the global variable
-THROTL_DEV is no longer constant then shellcheck warns about its
-references. Add double quotations to suppress the shellcheck warnings.
+  $ sudo bash -c "THROTL_BLKDEV_TYPES='nullb sdebug' ./check throtl/"
 
-Link: https://lore.kernel.org/linux-block/20250918085341.3686939-1-yukuai1@huaweicloud.com/
+Of note is that the default value of THROTL_BLKDEV_TYPES is 'nullb'
+since throtl/002 currently fails for scsi_debug. While the default of
+'nullb sdebug' would provide broader coverage, 'nullb' is chosen to
+avoid the potential user confusion because of the failure.
+
 Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 ---
- tests/throtl/rc | 63 +++++++++++++++++++++++++++++++++++++++----------
- 1 file changed, 50 insertions(+), 13 deletions(-)
+ Documentation/running-tests.md | 17 +++++++++++++++++
+ tests/throtl/001               |  4 ++++
+ tests/throtl/002               |  4 ++++
+ tests/throtl/003               |  4 ++++
+ tests/throtl/004               |  4 ++++
+ tests/throtl/005               |  4 ++++
+ tests/throtl/006               |  4 ++++
+ tests/throtl/007               |  4 ++++
+ tests/throtl/rc                | 16 ++++++++++++++++
+ 9 files changed, 61 insertions(+)
 
+diff --git a/Documentation/running-tests.md b/Documentation/running-tests.md
+index 8ccd739..a22043c 100644
+--- a/Documentation/running-tests.md
++++ b/Documentation/running-tests.md
+@@ -167,6 +167,23 @@ USE_RXE=1 ./check srp/
+ 'USE_RXE' had the old name 'use_rxe'. The old name is still usable but not
+ recommended.
+ 
++### Blk-throttle tests
++
++The blk-throttle tests has one environment variable below:
++
++- THROTL_BLKDEV_TYPES: 'nullb' 'sdebug'
++  Set up test target block device based on this environment variable value. To
++  test with null_blk, set 'nullb'. To test with scsi_debug, set 'sdebug'. To
++  test with both, set 'nullb sdebug'. Default value is 'nullb'.
++
++```sh
++To run with scsi_debug:
++THROTL_BLKDEV_TYPES="sdebug" ./check throtl/
++
++To run with both null_blk and scsi_debug:
++THROTL_BLKDEV_TYPES="nullb sdebug" ./check throtl/
++```
++
+ ### Normal user
+ 
+ To run test cases which require normal user privilege, prepare a user and
+diff --git a/tests/throtl/001 b/tests/throtl/001
+index 835cac2..89a5892 100755
+--- a/tests/throtl/001
++++ b/tests/throtl/001
+@@ -9,6 +9,10 @@
+ DESCRIPTION="basic functionality"
+ QUICK=1
+ 
++set_conditions() {
++	_set_throtl_blkdev_type "$@"
++}
++
+ test() {
+ 	echo "Running ${TEST_NAME}"
+ 
+diff --git a/tests/throtl/002 b/tests/throtl/002
+index bed876d..b082b99 100755
+--- a/tests/throtl/002
++++ b/tests/throtl/002
+@@ -10,6 +10,10 @@
+ DESCRIPTION="iops limit over IO split"
+ QUICK=1
+ 
++set_conditions() {
++	_set_throtl_blkdev_type "$@"
++}
++
+ test() {
+ 	echo "Running ${TEST_NAME}"
+ 
+diff --git a/tests/throtl/003 b/tests/throtl/003
+index d76a0d5..700e9e6 100755
+--- a/tests/throtl/003
++++ b/tests/throtl/003
+@@ -10,6 +10,10 @@
+ DESCRIPTION="bps limit over IO split"
+ QUICK=1
+ 
++set_conditions() {
++	_set_throtl_blkdev_type "$@"
++}
++
+ test() {
+ 	echo "Running ${TEST_NAME}"
+ 
+diff --git a/tests/throtl/004 b/tests/throtl/004
+index 777afcf..b1f6110 100755
+--- a/tests/throtl/004
++++ b/tests/throtl/004
+@@ -11,6 +11,10 @@
+ DESCRIPTION="delete disk while IO is throttled"
+ QUICK=1
+ 
++set_conditions() {
++	_set_throtl_blkdev_type "$@"
++}
++
+ test() {
+ 	echo "Running ${TEST_NAME}"
+ 
+diff --git a/tests/throtl/005 b/tests/throtl/005
+index 86e52b3..7691ad1 100755
+--- a/tests/throtl/005
++++ b/tests/throtl/005
+@@ -10,6 +10,10 @@
+ DESCRIPTION="change config with throttled IO"
+ QUICK=1
+ 
++set_conditions() {
++	_set_throtl_blkdev_type "$@"
++}
++
+ test() {
+ 	echo "Running ${TEST_NAME}"
+ 
+diff --git a/tests/throtl/006 b/tests/throtl/006
+index 263415f..2dcf3a3 100755
+--- a/tests/throtl/006
++++ b/tests/throtl/006
+@@ -15,6 +15,10 @@ requires() {
+ 	_have_driver ext4
+ }
+ 
++set_conditions() {
++	_set_throtl_blkdev_type "$@"
++}
++
+ test_meta_io() {
+ 	local path="$1"
+ 	local start_time
+diff --git a/tests/throtl/007 b/tests/throtl/007
+index 83d8dc7..97dece6 100755
+--- a/tests/throtl/007
++++ b/tests/throtl/007
+@@ -11,6 +11,10 @@
+ DESCRIPTION="bps limit with iops limit over io split"
+ QUICK=1
+ 
++set_conditions() {
++	_set_throtl_blkdev_type "$@"
++}
++
+ test() {
+ 	echo "Running ${TEST_NAME}"
+ 
 diff --git a/tests/throtl/rc b/tests/throtl/rc
-index d20dc94..c7539aa 100644
+index c7539aa..70254f7 100644
 --- a/tests/throtl/rc
 +++ b/tests/throtl/rc
-@@ -6,21 +6,26 @@
- 
- . common/rc
- . common/null_blk
-+. common/scsi_debug
+@@ -10,6 +10,7 @@
  . common/cgroup
  
  THROTL_DIR=$(echo "$TEST_NAME" | tr '/' '_')
--THROTL_DEV=dev_nullb
-+throtl_blkdev_type=${throtl_blkdev_type:-"nullb"}
-+THROTL_NULL_DEV=dev_nullb
-+declare THROTL_DEV
- declare THROTL_CLEAR_BASE_SUBTREE_CONTROL_IO
- declare THROTL_CLEAR_CGROUP2_DIR_CONTROL_IO
- 
- group_requires() {
- 	_have_root
- 	_have_null_blk
-+	_have_scsi_debug
- 	_have_kernel_option BLK_DEV_THROTTLING
- 	_have_cgroup2_controller io
++THROTL_BLKDEV_TYPES=${THROTL_BLKDEV_TYPES:-"nullb"}
+ throtl_blkdev_type=${throtl_blkdev_type:-"nullb"}
+ THROTL_NULL_DEV=dev_nullb
+ declare THROTL_DEV
+@@ -25,6 +26,21 @@ group_requires() {
  	_have_program bc
  }
  
-+# Prepare null_blk or scsi_debug device to test, based on throtl_blkdev_type.
++_set_throtl_blkdev_type() {
++	local index=$1
++	local -a types
++
++	read -r -a types <<< "${THROTL_BLKDEV_TYPES[@]}"
++
++	if [[ -z $index ]]; then
++		echo ${#types[@]}
++		return
++	fi
++
++	throtl_blkdev_type=${types[index]}
++	COND_DESC="${throtl_blkdev_type}"
++}
++
+ # Prepare null_blk or scsi_debug device to test, based on throtl_blkdev_type.
  _configure_throtl_blkdev() {
  	local sector_size=0 memory_backed=0
- 	local -a args
-@@ -42,21 +47,53 @@ _configure_throtl_blkdev() {
- 		esac
- 	done
- 
--	args=("$THROTL_DEV")
--	((sector_size)) && args+=(max_sectors="$((sector_size / 512))")
--	((memory_backed)) && args+=(memory_backed=1)
--	if _configure_null_blk "${args[@]}" power=1; then
--		return
--	fi
-+	THROTL_DEV=
-+	case "$throtl_blkdev_type" in
-+	nullb)
-+		args=("$THROTL_NULL_DEV")
-+		((sector_size)) && args+=(max_sectors="$((sector_size / 512))")
-+		((memory_backed)) && args+=(memory_backed=1)
-+		if _configure_null_blk "${args[@]}" power=1; then
-+			THROTL_DEV=$THROTL_NULL_DEV
-+			return
-+		fi
-+		;;
-+	sdebug)
-+		args=(dev_size_mb=1024)
-+		((sector_size)) && args+=(sector_size="${sector_size}")
-+		if _configure_scsi_debug "${args[@]}"; then
-+			THROTL_DEV=${SCSI_DEBUG_DEVICES[0]}
-+			return
-+		fi
-+		;;
-+	*)
-+		echo "Invalid block device type: ${throtl_blkdev_type}" ;;
-+	esac
- 	return 1
- }
- 
- _delete_throtl_blkdev() {
--	echo 0 > "/sys/kernel/config/nullb/$THROTL_DEV/power"
-+	case "$throtl_blkdev_type" in
-+	nullb)
-+		echo 0 > "/sys/kernel/config/nullb/$THROTL_DEV/power"
-+		;;
-+	sdebug)
-+		echo 1 > "/sys/block/$THROTL_DEV/device/delete"
-+		;;
-+	*)
-+		echo "Invalid block device type: ${throtl_blkdev_type}" ;;
-+	esac
- }
- 
- _exit_throtl_blkdev() {
--	_exit_null_blk
-+	case "$throtl_blkdev_type" in
-+	nullb)
-+		_exit_null_blk ;;
-+	sdebug)
-+		_exit_scsi_debug ;;
-+	*)
-+		echo "Invalid block device type: ${throtl_blkdev_type}" ;;
-+	esac
- 	unset THROTL_DEV
- }
- 
-@@ -101,12 +138,12 @@ _clean_up_throtl() {
- }
- 
- _throtl_set_limits() {
--	echo "$(cat /sys/block/$THROTL_DEV/dev) $*" > \
-+	echo "$(cat /sys/block/"$THROTL_DEV"/dev) $*" > \
- 		"$CGROUP2_DIR/$THROTL_DIR/io.max"
- }
- 
- _throtl_remove_limits() {
--	echo "$(cat /sys/block/$THROTL_DEV/dev) rbps=max wbps=max riops=max wiops=max" > \
-+	echo "$(cat /sys/block/"$THROTL_DEV"/dev) rbps=max wbps=max riops=max wiops=max" > \
- 		"$CGROUP2_DIR/$THROTL_DIR/io.max"
- }
- 
-@@ -141,9 +178,9 @@ _throtl_issue_io() {
- 	start_time=$(date +%s.%N)
- 
- 	if [ "$1" == "read" ]; then
--		dd if=/dev/$THROTL_DEV of=/dev/null bs="$2" count="$3" iflag=direct status=none
-+		dd if=/dev/"$THROTL_DEV" of=/dev/null bs="$2" count="$3" iflag=direct status=none
- 	elif [ "$1" == "write" ]; then
--		dd of=/dev/$THROTL_DEV if=/dev/zero bs="$2" count="$3" oflag=direct status=none
-+		dd of=/dev/"$THROTL_DEV" if=/dev/zero bs="$2" count="$3" oflag=direct status=none
- 	fi
- 
- 	end_time=$(date +%s.%N)
 -- 
 2.51.0
 
