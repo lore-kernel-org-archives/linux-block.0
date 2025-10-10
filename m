@@ -1,142 +1,114 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f48.google.com (mail-yx1-f48.google.com [74.125.224.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AF7F235041;
-	Fri, 10 Oct 2025 04:48:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DECBF262FF3
+	for <linux-block@vger.kernel.org>; Fri, 10 Oct 2025 04:57:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760071730; cv=none; b=i9qXQP4NDUdE5KVAfPvOzs9Nc0ywAtRyEXdMxWMGbmk6hdcJsw71lKQOTx461R7tyzlKHjGYy5XkXmwuBxAsP/KcXhKqet7H0g1M3grxzl7jnTxyaY3FL3UBjYivyE+yIPrrpRscvkQUHnaLpebeYgKv3Vlua3oRmoYff4ode3c=
+	t=1760072282; cv=none; b=NFhnntX2oKXU0XjbGvswtH6mAWhgN/CN96gtWFqNfdAAWq+XUzAZf21PzI2Kb2N7IMcdlmG3+cjM8mJ62oEbdNspglLSIPdSdmjiGOA3Ng9Ip/OXw5Eb0AWK1t9NkMt058XS8BHuOYiCHmzYfzj6eHb5XffdDsud88HB4IykJUc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760071730; c=relaxed/simple;
-	bh=phRHx/VwWkrpOoRQmlu4l7O8Qm607TEQdv9DuALw9sw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FbhM9twyI6x9OJP3uh2Q2em3p7Uy/HZNumr2bs3i170L/wSCvPcjOyhTNI7lER6Qx1MySNC3X/6NTSVtp4Y7EV8xNA4A5o12TcFL3hh1Y+BEVOR+P6N/5kV/HqaQ41uRuxZlFaSJxlv8SzfbI/GA3Jc0Tb6iFkrkkr6JzeRe8kw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=PNhnxSES; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1760072282; c=relaxed/simple;
+	bh=20zVq/I1A85ImSdUuzZ7bh9Qs7dqD4eEIEsQzzw5Ci4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hqX4TBrHJxPLRLmQaGHu29WCXsOVJppzidDal/wGIUAs9f+tr5LBK7Bgx3hemMVzNYRvsTyyA8T+fPrgGUhQVcqDP/WJGrJCNs1v15XEPvWVmiYU8kAiulSy9Mh/ivpEV7ErlbHJOfp4FGB7Rpban8OnJ5TXMWSjHtc8SP0KCKk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GrdiTzbT; arc=none smtp.client-ip=74.125.224.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="PNhnxSES"
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 599H7NBD016972;
-	Fri, 10 Oct 2025 04:48:16 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=9Ur/6w
-	0hOmkNV21C6M65ov7/SvzsTHLXyOAAfFKYIgU=; b=PNhnxSESXjG+tUH6bBIleH
-	WP9Iy8PLZMXcAe41FQlf5yzOrz4xSDtcCBw55B3G+0X3837llpy21i4oVV3bzFNM
-	0NwjmJOLSsQjbbk1Rf3tBynvvCLQHTf1xURzdNgYssfsJirY9JS0u97f2yQ4UyC3
-	ESe0kv3OsHXfH9cLgXomZfQG+/ViPNm1MErMo38420LTX5A8mzQlRZWfOqY20u8y
-	R2jJLZte/d9nj9ja+qqMaw1Jm6HM5X2vzddb8qTBsLnccisq4OUg1p9MyFTS/e7s
-	asiOyS6I2XO8I0AIv1ViyLDhsJ34FNz7S7ShxxDHzMOX+aorqyKkG9Sc+oQ3bcuw
-	==
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 49nv84rj3t-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 10 Oct 2025 04:48:15 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 59A31Krp026015;
-	Fri, 10 Oct 2025 04:48:15 GMT
-Received: from smtprelay07.wdc07v.mail.ibm.com ([172.16.1.74])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 49nvamr4rc-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 10 Oct 2025 04:48:15 +0000
-Received: from smtpav02.dal12v.mail.ibm.com (smtpav02.dal12v.mail.ibm.com [10.241.53.101])
-	by smtprelay07.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 59A4mExK63504696
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 10 Oct 2025 04:48:14 GMT
-Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 176065805C;
-	Fri, 10 Oct 2025 04:48:14 +0000 (GMT)
-Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id BB6CC5805A;
-	Fri, 10 Oct 2025 04:48:10 +0000 (GMT)
-Received: from [9.43.29.178] (unknown [9.43.29.178])
-	by smtpav02.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 10 Oct 2025 04:48:10 +0000 (GMT)
-Message-ID: <b6518c17-e65f-4410-930c-04d3be364f9e@linux.ibm.com>
-Date: Fri, 10 Oct 2025 10:17:47 +0530
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GrdiTzbT"
+Received: by mail-yx1-f48.google.com with SMTP id 956f58d0204a3-6361a421b67so1833576d50.2
+        for <linux-block@vger.kernel.org>; Thu, 09 Oct 2025 21:57:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1760072278; x=1760677078; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=j7qS0AM3lX7OGhXSFEYS6mkC3EKNzPxshbg7hLZcah0=;
+        b=GrdiTzbTpmXrgj0/PjkohCZ6LgFNbxV45gb5L/ZVbzaWKAHJgA12/mfFqFdtOpY72m
+         bZZCyt4k8jRvQo4unsWw4ZeaFcU/eOYR2U/wcLgsvZR/RYdUoV9fmyuViF8Of5PYj/l4
+         634Gm0JHXypxB9ycdlhLckuOP80mjqw4wIO9HLiTQ6purdE8gu3SXgXaNMsYndjRbf75
+         1dPvVv1bpLUsn7UsoLTsiGPIZ2KQmnwtMFB4nrm8RHlzLeSFwrO7OIHtu7G4t0f6Q3Az
+         maevl8wn3jZRwLsUqzTevJOM0Q45hnxhlAkendZd7mXKlZsyaRmG6ugJRYjmZ1sxfyiy
+         qCrQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760072278; x=1760677078;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=j7qS0AM3lX7OGhXSFEYS6mkC3EKNzPxshbg7hLZcah0=;
+        b=As+FZ5SvsYSNTikh6cxPXyX3AXDWZ/owqWr8lNlrS4rX/4ThEf2X2NSbv5+W1gmQtV
+         a2z1NZMZ8OaO0NjjTpOn9JKTWKclTfmyWnrSqvu8Xr2hSp8EIDf2vtORfxsClr3msivN
+         IPFVCe/8fdkE6FXKTFGEpLsVNj39LBVCpR/7d9bxKWU0HdX/WCrprycZI7qezv7kM1kH
+         4J1HugwApVukIfFfJzn4bmVO2STkm8T1JP0bP2Gi058CJoexdmU6i7yv8yoZPBL14x7n
+         hwLR+pXFEgPv4+QqEUE+VLOkh2j0o98kG+c2YD9wBnQ13vNOxzHifXDz0mCphgOZoQ1P
+         EB/A==
+X-Forwarded-Encrypted: i=1; AJvYcCX949Dy5+8V1EVTn1EJ4gsr7uZzlJu7s4fA5EYGo+9N8cLhHN+vqlKzws2XLRhH4VlrTxHyRifXTgjsvA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzoxqx7odB4PvZ3EnumqhArhIP5FKAQG1wLhn9nJYzyheACTLMo
+	MyZ0Xr+e/Ddvh0iNcaRV6oCMURSXDGq8xlmFW33GceQwf6h7kVWJLSSw8pk9k9RyT92ybsMwkji
+	pmoezBm9SBlpu0NL9MOQom1sJyLtMmB0=
+X-Gm-Gg: ASbGnctiicqT5YtN2n5FbpaekitkNV/1yQngeUxMIhgSChMCc05Vr1tMEnyiGyO/ddw
+	dzlWomH4mwXQGLmnw/B1WUFsuiCK+OPWktudwmSlUL2KdDERpdPly4Zr44ck4xPvW9DZmcZeod4
+	mwAC3eJE3JDfRXTi9BIXMf0O7LjhTthneUq0waHxR6pK2Ghg5fyXXntaVLQmlQFUcyfutW9z4f0
+	6ODMcZ9uFM32tSq7msbayJ59A==
+X-Google-Smtp-Source: AGHT+IHqDciv7GAPYfMGdKr9Fwuo5GT168N8GcrpsJ5KozP5HqYqg/LDALxuogvzJXgNCm6zrA+DoCqu7lr8uhQrVc0=
+X-Received: by 2002:a53:5009:0:b0:636:2420:d3ce with SMTP id
+ 956f58d0204a3-63ccb93456dmr7466309d50.51.1760072277565; Thu, 09 Oct 2025
+ 21:57:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 3/7] blk-mq: add a new queue sysfs attribute
- async_depth
-To: Yu Kuai <yukuai@kernel.org>, axboe@kernel.dk, bvanassche@acm.org
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yukuai3@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com,
-        johnny.chenyi@huawei.com
-References: <20251010022812.2985286-1-yukuai@kernel.org>
- <20251010022812.2985286-4-yukuai@kernel.org>
-Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <20251010022812.2985286-4-yukuai@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=HKPO14tv c=1 sm=1 tr=0 ts=68e89010 cx=c_pps
- a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
- a=IkcTkHD0fZMA:10 a=x6icFKpwvdMA:10 a=VnNF1IyMAAAA:8 a=cHuC2WqR6wHazkE0P-8A:9
- a=QEXdDO2ut3YA:10 a=cPQSjfK2_nFv0Q5t_7PE:22
-X-Proofpoint-GUID: 99dCmogKHKYFfp0IG1KEOinpd3QmFxqY
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDA4MDEyMSBTYWx0ZWRfXwQM3DYYaY6QJ
- by83CHB0GzauMZmc7O6SU/TwvqShxdhcKR979tQhkq5CamBe/Uu6gjY0DH2Z/eYaBTytvazmnYj
- +VNHk4l/fc7CWxARJFfe99XdLynrwqEsWSKJBgN2QEtVobrMZ1GJIBREAq/8TwJWfAx/hxO1dCX
- h+n92KZ+QNfVUP+guXqXqJdryVG5pHNVqpLXT7lHZnN51Np4SwETNU9dSgCWmzPTn4o6Swd2Hn0
- cDQbZMZ818WToUlwkvVNpsYS0XkekAo1cy6wmKMZJwXw8vJM+gAtbVoCClKY/jthCXtV3tsyXS0
- MsOsvVu0kmiH6qTNRjkyUG/oyw3sum4LPwHUdGw1gSxl80FEWFhs+4tMuXFvnsYSdC3bfX4hTPC
- LrbHv2m1zSDNGiW7GMfLC8LF4SPGOA==
-X-Proofpoint-ORIG-GUID: 99dCmogKHKYFfp0IG1KEOinpd3QmFxqY
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-10-10_01,2025-10-06_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0 impostorscore=0 lowpriorityscore=0 bulkscore=0 spamscore=0
- adultscore=0 clxscore=1011 phishscore=0 priorityscore=1501 malwarescore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2510020000 definitions=main-2510080121
+References: <CAHNNwZC7gC7zaZGiSBhobSAb4m2O1BuoZ4r=SQBF-tCQyuAPvw@mail.gmail.com>
+ <20250925131055.3933381-1-nschichan@freebox.fr>
+In-Reply-To: <20250925131055.3933381-1-nschichan@freebox.fr>
+From: Askar Safin <safinaskar@gmail.com>
+Date: Fri, 10 Oct 2025 07:57:21 +0300
+X-Gm-Features: AS18NWAQwCKadWHXCZjVUBNaD3TaKIilJiJAQzSbvGFaYuFuE8UDpW1_H3riB-k
+Message-ID: <CAPnZJGBPyONjJoM6cskxysDnN4pxWuWJCK5A6TgikR2xHsrN5Q@mail.gmail.com>
+Subject: Re: [PATCH-RFC] init: simplify initrd code (was Re: [PATCH RESEND
+ 00/62] initrd: remove classic initrd support).
+To: nschichan@freebox.fr
+Cc: akpm@linux-foundation.org, andy.shevchenko@gmail.com, axboe@kernel.dk, 
+	brauner@kernel.org, cyphar@cyphar.com, devicetree@vger.kernel.org, 
+	ecurtin@redhat.com, email2tema@gmail.com, graf@amazon.com, 
+	gregkh@linuxfoundation.org, hca@linux.ibm.com, hch@lst.de, 
+	hsiangkao@linux.alibaba.com, initramfs@vger.kernel.org, jack@suse.cz, 
+	julian.stecklina@cyberus-technology.de, kees@kernel.org, 
+	linux-acpi@vger.kernel.org, linux-alpha@vger.kernel.org, 
+	linux-api@vger.kernel.org, linux-arch@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org, 
+	linux-csky@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-efi@vger.kernel.org, linux-ext4@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, linux-hexagon@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-m68k@lists.linux-m68k.org, 
+	linux-mips@vger.kernel.org, linux-openrisc@vger.kernel.org, 
+	linux-parisc@vger.kernel.org, linux-riscv@lists.infradead.org, 
+	linux-s390@vger.kernel.org, linux-sh@vger.kernel.org, 
+	linux-snps-arc@lists.infradead.org, linux-um@lists.infradead.org, 
+	linuxppc-dev@lists.ozlabs.org, loongarch@lists.linux.dev, mcgrof@kernel.org, 
+	mingo@redhat.com, monstr@monstr.eu, mzxreary@0pointer.de, 
+	patches@lists.linux.dev, rob@landley.net, sparclinux@vger.kernel.org, 
+	thomas.weissschuh@linutronix.de, thorsten.blum@linux.dev, 
+	torvalds@linux-foundation.org, tytso@mit.edu, viro@zeniv.linux.org.uk, 
+	x86@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Thu, Sep 25, 2025 at 4:12=E2=80=AFPM <nschichan@freebox.fr> wrote:
+> - drop prompt_ramdisk and ramdisk_start kernel parameters
+> - drop compression support
+> - drop image autodetection, the whole /initrd.image content is now
+>   copied into /dev/ram0
+> - remove rd_load_disk() which doesn't seem to be used anywhere.
 
+I welcome any initrd simplification!
 
-On 10/10/25 7:58 AM, Yu Kuai wrote:
-> +static ssize_t
-> +queue_async_depth_store(struct gendisk *disk, const char *page, size_t count)
-> +{
-> +	struct request_queue *q = disk->queue;
-> +	unsigned int memflags;
-> +	unsigned long nr;
-> +	int ret;
-> +
-> +	if (!queue_is_mq(q))
-> +		return -EINVAL;
-> +
-> +	ret = queue_var_store(&nr, page, count);
-> +	if (ret < 0)
-> +		return ret;
-> +
-> +	if (nr == 0)
-> +		return -EINVAL;
-> +
-> +	memflags = blk_mq_freeze_queue(q);
-> +	scoped_guard(mutex, &q->elevator_lock) {
-> +		if (q->elevator) {
-> +			q->async_depth = min(q->nr_requests, nr);
-> +			if (q->elevator->type->ops.depth_updated)
-> +				q->elevator->type->ops.depth_updated(q);
-> +		} else {
-> +			ret = -EINVAL;
-> +		}
-> +	}
-> +	blk_mq_unfreeze_queue(q, memflags);
-> +
-> +	return ret;
-> +}
-> +
-With this change, we've got the first user of scoped_guard() in the 
-block subsystem!
+> Hopefully my email config is now better and reaches gmail users
+> correctly.
 
-Looks good to me:
-Reviewed-by: Nilay Shroff <nilay@linux.ibm.com>
+Yes, I got this email.
 
+--
+Askar Safin
