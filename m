@@ -1,137 +1,178 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B8E82AD22
-	for <linux-block@vger.kernel.org>; Fri, 10 Oct 2025 00:39:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90EBE34BA24
+	for <linux-block@vger.kernel.org>; Fri, 10 Oct 2025 01:19:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760056786; cv=none; b=Q21u4/LRGVfzWilpOBCbKobQKQyao6AVNjonetozsquqxRjBmKRMBFdhGjvQK+leUhhMombfE65eMUH0hxhv741HMkL+fVQcO2f+mibggyFcxkjMjTuPN7ZyuaW3Yh7E7DqF8pnhwpNtVj4I8gNdNt0EIqBiB72oBLVKdWbyuoQ=
+	t=1760059198; cv=none; b=PNjKrlPKFdnHLFnfdnmJTI0hF9PSXFV1aB8SD0VrsOW3cufNQQVe1iYtdd+qT8wC0dFiDT2tdC4MOZGA6Xw9zkwb8kgVxFukngoAMZLX8iLPMElpvuCKoy+HSTlIXjnQo9y05UHMRhWGOLkD03hDRtEDMjx7ounNQ9IlFXGtKjw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760056786; c=relaxed/simple;
-	bh=epacj6aKs+5PtWKm4XZ10BX+XGQk9N7DSXmKbFHLrZM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mgIMRn9cSWxJtoSnUhjtD7bEWjN4sRJLF4KkFFoR2NB85t1ByJTN5HBM786b8yfsw5OHPzRxqJJm0HmGzUdcUF0lnT/jElB1odyewspLZF0UCUx93WzAQJPPtQMcohdfccYEr1zv0exsWGujG+cRefsh7fnH2ODlQ38mmkJSNhw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=jDCRwdlB; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1760059198; c=relaxed/simple;
+	bh=uaTvHrHRLctEDmqgKU6Co6gfADnqxXrJ/YLmUpeeOrY=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=oN2hZt9/kaWqWirH34ULzIDB+quUqi+QOkg5QVNlbB8AmL9HsSbP389EfQiEx7wRAapRd5171qAcXgXUET2MGI5MPTxdbh06EXoqFyVETuXavRGXpXgosI5ZWRUkQNEQDW5vdY/2iGZfGRMBlCo3a3Q9izuARnLEJ0PKhus8P78=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--surenb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Mfd/hyml; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--surenb.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jDCRwdlB"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1760056784;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qOZL046Blo3kEtnXR5GG66Ol5QYGrAEgmB+JhvM7L6I=;
-	b=jDCRwdlBuqJw1i3cXcmRoCYLwiu5MGqRCjv9GVjrl8wCte32YNHqFHSXv59JoDv+L3G+yf
-	/lijSXHenjHXaXXeaY+NXPx8lQvACBQBgQVFv/BGCbh4goj43uUB9vjFnmsrMf/V+S/rnt
-	kJrh2eI1xcxTUadgrwA9gvikV2RVIi8=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-629-BqcHMXKKPgGo1k3ctagMJQ-1; Thu,
- 09 Oct 2025 20:39:38 -0400
-X-MC-Unique: BqcHMXKKPgGo1k3ctagMJQ-1
-X-Mimecast-MFC-AGG-ID: BqcHMXKKPgGo1k3ctagMJQ_1760056777
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6F79919560AE;
-	Fri, 10 Oct 2025 00:39:37 +0000 (UTC)
-Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (unknown [10.6.23.247])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D51841955F22;
-	Fri, 10 Oct 2025 00:39:36 +0000 (UTC)
-Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (localhost [127.0.0.1])
-	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.17.1) with ESMTPS id 59A0dZqC2933052
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Thu, 9 Oct 2025 20:39:35 -0400
-Received: (from bmarzins@localhost)
-	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.18.1/Submit) id 59A0dZEF2933051;
-	Thu, 9 Oct 2025 20:39:35 -0400
-Date: Thu, 9 Oct 2025 20:39:35 -0400
-From: Benjamin Marzinski <bmarzins@redhat.com>
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: Martin Wilck <mwilck@suse.com>, Mikulas Patocka <mpatocka@redhat.com>,
-        Mike Snitzer <snitzer@kernel.org>, dm-devel@lists.linux.dev,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH] dm: Fix deadlock when reloading a multipath table
-Message-ID: <aOhVx3J2ahZQuS28@redhat.com>
-References: <20251009030431.2895495-1-bmarzins@redhat.com>
- <ed792d72a1ca47937631af6e12098d9a20626bcf.camel@suse.com>
- <033ca444-4c68-4a4f-bc2b-32232e80e848@acm.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Mfd/hyml"
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-27ee214108cso55391385ad.0
+        for <linux-block@vger.kernel.org>; Thu, 09 Oct 2025 18:19:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1760059196; x=1760663996; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Umr72UDM+ef/eu/5GGg59+M3j2MSWUMKK6kjEtNqzt4=;
+        b=Mfd/hymlEn1QCs5BP6bx7Kp6cGxJm9jMAT13K+BusQRgl6R12p+te46wjuQ5f+tbdD
+         a3QVIXbAIjXDEJCzVgdut99Se5An64wmMBYIEeZ2ARMly2xH/V2xl+9IwDPTk0zc5j/C
+         1lkdwg6boq/B2oIuTNmQl/mchTV9tchS72oesmfIePZboNjc0aE/XtKX/tvtjxYWmz8S
+         VarjtKkaNF2x3RetsYD2UGHiRK2m3pAKbdonc30ZEUV8rmpAy+NzbsgEbvUTG3ibZJDj
+         x+DIzwNWGW+eel3Q2btWQyyxFw5NnoalaJ4HSL09CX2Ry/v7Aje3WqjYXKjbX1NscgQt
+         jkkA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760059196; x=1760663996;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Umr72UDM+ef/eu/5GGg59+M3j2MSWUMKK6kjEtNqzt4=;
+        b=koXYHiGtdXYf7lbz2lO2hTRDoVFYVGU6ZxIITPv2Xmq82STZ5+rbXR23mNdag17Chn
+         6zOzcV2kCXXJnLdEoX8w5fogBksUVlSVjvrfg19T4I1bp45avpFzEqTk2V0N1+9oWmVP
+         BRtmzZmxq/+pi3K2R28S0Is9r15P+EcyiZvnWcGCF+7wxSztDLJbn24xKB1x24SKJtq5
+         biVYx8Gof/GDaW3OnTxRm7+VEl8vcbk9qcNU5TR7soq3ZUGXvxhHEFvdajTjGpQzH6PS
+         nXNftAL6B++0hnxRB8hM/Zu2NC7Z41fLrrQymtsiiR4p0q4FpDNUDAS+bWAaeczbF48X
+         7v4A==
+X-Forwarded-Encrypted: i=1; AJvYcCUBEAwCegwDyGkockSRRkreDXydTJcZZcn5aC1sN+VHERhXeq1OCasKh/xgztwD7GsSF22oWQMkk5C7xA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyaOKLN8VY9eOCbbkpmh98J1N17BiAaSIQ2Kwxf9Jfnp2NdrZJN
+	qcwxERS7Q3z5Sk2giDVDpYyluH2UKKZt9B8rFlczjs+OVXjnuOmAEzlqlGChM+SLey/zt1Ozf8x
+	DIdj3Nw==
+X-Google-Smtp-Source: AGHT+IE27KyVOHtRVs+A0lEatoDCera078aKUGcBNIuc3h+4WOD0YdO+2yFbdCIN2uDuSh9GKzfzUmBfEEw=
+X-Received: from plbml5.prod.google.com ([2002:a17:903:34c5:b0:28e:7f4e:dd17])
+ (user=surenb job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:ec83:b0:267:d2f9:2327
+ with SMTP id d9443c01a7336-2902739b36dmr131881235ad.27.1760059195894; Thu, 09
+ Oct 2025 18:19:55 -0700 (PDT)
+Date: Thu,  9 Oct 2025 18:19:43 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <033ca444-4c68-4a4f-bc2b-32232e80e848@acm.org>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.0.740.g6adb054d12-goog
+Message-ID: <20251010011951.2136980-1-surenb@google.com>
+Subject: [PATCH 0/8] Guaranteed CMA
+From: Suren Baghdasaryan <surenb@google.com>
+To: akpm@linux-foundation.org
+Cc: david@redhat.com, lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com, 
+	vbabka@suse.cz, alexandru.elisei@arm.com, peterx@redhat.com, sj@kernel.org, 
+	rppt@kernel.org, mhocko@suse.com, corbet@lwn.net, axboe@kernel.dk, 
+	viro@zeniv.linux.org.uk, brauner@kernel.org, hch@infradead.org, jack@suse.cz, 
+	willy@infradead.org, m.szyprowski@samsung.com, robin.murphy@arm.com, 
+	hannes@cmpxchg.org, zhengqi.arch@bytedance.com, shakeel.butt@linux.dev, 
+	axelrasmussen@google.com, yuanchu@google.com, weixugc@google.com, 
+	minchan@kernel.org, surenb@google.com, linux-mm@kvack.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	iommu@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Oct 09, 2025 at 04:29:21PM -0700, Bart Van Assche wrote:
-> On 10/9/25 2:57 AM, Martin Wilck wrote:
-> > In general, I'm wondering whether we need a more generic solution to
-> > this problem. Therefore I've added linux-block to cc.
-> > 
-> > The way I see it, if a device has queued IO without any means to
-> > perform the IO, it can't be frozen. We'd either need to fail all queued
-> > IO in this case, or refuse attempts to freeze the queue.
-> 
-> If a device has queued I/O and the I/O can't make progress then it isn't
-> necessary to call blk_mq_freeze_queue(), isn't it? See also "[PATCH 0/3] Fix
-> a deadlock related to modifying queue attributes"
-> (https://lore.kernel.org/linux-block/20250702182430.3764163-1-bvanassche@acm.org/).
-> 
-> BTW, that patch series is not upstream. I apply it manually every time
-> before I run blktests.
+Guaranteed CMA (GCMA) is designed to improve utilization of reserved
+memory carveouts without compromising their advantages of:
+1. Guaranteed success of allocation (as long as total allocation size is
+below the size of the reservation.
+2. Low allocation latency.
+The idea is that carved out memory when not used for its primary purpose
+can be donated and used as an extension of the pagecache and any donated
+folio can be taken back at any moment with minimal latency and guaranteed
+success.
 
-Timing out the queue freeze looks like a good solution to me.
+To achieve this, GCMA needs to use memory that is not addressable by the
+kernel (can't be pinned) and that contains content that can be discarded.
+To provide such memory we reintroduce cleancache idea [1] with two major
+changes. New implementation:
+1. Avoids intrusive hooks into filesystem code, limiting them to two hooks
+for filesystem mount/unmount events and a hook for bdev invalidation.
+2. Manages inode to folio association and handles pools of donated folios
+inside cleancache itself, freeing backends of this burden.
 
-Also, looking at that thread, I should point out that bio-based
-multipath does not suffer from this, since it doesn't queue requests. It
-queues bios. The reason you still got the hang with your blktests patch
-is that it didn't actually configure bio-based multipath ("queue_mode"
-is not a valid multipath.conf option). That would look something like
-this:
+Cleancache provides a simple interface to its backends which lets them
+donate folios to cleancache, take a folio back for own use and return the
+folio back to cleancache when not needed.
 
-===================
-diff --git a/common/multipath-over-rdma b/common/multipath-over-rdma
-index e157e0a..1084f80 100644
---- a/common/multipath-over-rdma
-+++ b/common/multipath-over-rdma
-@@ -267,9 +267,7 @@ mpath_has_stale_dev() {
- # Check whether multipath definition $1 includes the queue_if_no_path keyword.
- is_qinp_def() {
- 	case "$1" in
--		*" 3 queue_if_no_path queue_mode mq "*)
--			return 0;;
--		*" 1 queue_if_no_path "*)
-+		*" queue_if_no_path "*)
- 			return 0;;
- 		*)
- 			return 1;;
-diff --git a/tests/srp/multipath.conf b/tests/srp/multipath.conf
-index e0da32e..aad8e56 100644
---- a/tests/srp/multipath.conf
-+++ b/tests/srp/multipath.conf
-@@ -9,6 +9,7 @@ devices {
- 		product		".*"
- 		no_path_retry	queue
- 		path_checker	tur
-+		features "2 queue_mode bio"
- 	}
- }
- blacklist {
-==================
+With cleancache in place, GCMA becomes a thin layer linking CMA allocator
+to cleancache, which allows existing CMA API to be used for continuous
+memory allocations with additional guarantees listed above.
+The limitation of GCMA is that its donated memory can be used only to
+extend file-backed pagecache. Note that both CMA and GCMA can be used
+at the same time.
 
-But you are correct that unless we can get bio-based multipath to
-something like performance parity with request-based multipath,
-customers aren't interested it in.
+Accounting for folios allocated from GCMA is implemented the same way as
+for CMA. The reasoning is that both CMA and GCMA use reserved memory for
+contiguous allocations with the only difference in how that memory gets
+donated while not in use. CMA donates its memory to the system for movable
+allocations with expectation that it will be returned when it is needed.
+GCMA donatest its memory to cleancache with the same expectation. Once CMA
+or GCMA use that memory for contiguous allocation, the difference between
+them disappears, therefore accounting at that point should not differ.
 
--Ben
+The patchset borrows some ideas and code from previous implementations of
+the cleancache and GCMA [2] as well as Android's reference patchset [3]
+implemented by Minchan Kim and used by many Android vendors.
 
-> 
-> Bart.
+[1] https://elixir.bootlin.com/linux/v5.16.20/source/Documentation/vm/cleancache.rst
+[2] https://lore.kernel.org/lkml/1424721263-25314-1-git-send-email-sj38.park@gmail.com/
+[3] https://android-review.googlesource.com/q/topic:%22gcma_6.12%22
+
+Patchset is based on mm-new.
+
+Minchan Kim (1):
+  mm: introduce GCMA
+
+Suren Baghdasaryan (7):
+  mm: implement cleancache
+  mm/cleancache: add cleancache LRU for folio aging
+  mm/cleancache: readahead support
+  mm/cleancache: add sysfs interface
+  mm/tests: add cleancache kunit test
+  add cleancache documentation
+  mm: integrate GCMA with CMA using dt-bindings
+
+ Documentation/mm/cleancache.rst |  112 +++
+ MAINTAINERS                     |   13 +
+ block/bdev.c                    |    6 +
+ fs/super.c                      |    3 +
+ include/linux/cleancache.h      |   84 +++
+ include/linux/cma.h             |   11 +-
+ include/linux/fs.h              |    6 +
+ include/linux/gcma.h            |   36 +
+ include/linux/pagemap.h         |    1 +
+ kernel/dma/contiguous.c         |   11 +-
+ mm/Kconfig                      |   40 ++
+ mm/Kconfig.debug                |   13 +
+ mm/Makefile                     |    4 +
+ mm/cleancache.c                 | 1144 +++++++++++++++++++++++++++++++
+ mm/cleancache_sysfs.c           |  209 ++++++
+ mm/cleancache_sysfs.h           |   58 ++
+ mm/cma.c                        |   37 +-
+ mm/cma.h                        |    1 +
+ mm/cma_sysfs.c                  |   10 +
+ mm/filemap.c                    |   26 +
+ mm/gcma.c                       |  231 +++++++
+ mm/readahead.c                  |   55 ++
+ mm/tests/Makefile               |    6 +
+ mm/tests/cleancache_kunit.c     |  425 ++++++++++++
+ mm/truncate.c                   |    4 +
+ mm/vmscan.c                     |    1 +
+ 26 files changed, 2534 insertions(+), 13 deletions(-)
+ create mode 100644 Documentation/mm/cleancache.rst
+ create mode 100644 include/linux/cleancache.h
+ create mode 100644 include/linux/gcma.h
+ create mode 100644 mm/cleancache.c
+ create mode 100644 mm/cleancache_sysfs.c
+ create mode 100644 mm/cleancache_sysfs.h
+ create mode 100644 mm/gcma.c
+ create mode 100644 mm/tests/Makefile
+ create mode 100644 mm/tests/cleancache_kunit.c
+
+
+base-commit: 70478cb9da6fc4e7b987219173ba1681d5f7dd3d
+-- 
+2.51.0.740.g6adb054d12-goog
 
