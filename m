@@ -1,111 +1,112 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AB8C268C42;
-	Fri, 10 Oct 2025 02:28:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6FB521CC4B;
+	Fri, 10 Oct 2025 02:40:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760063322; cv=none; b=K0rvQchN8n9UDpP2da427Gg61aijrhzrQMKKNWO6A/NF0FzBopSjbVAe51z2tcVZ0KxrPFUWTnl2PsQmX+Tp4KJIiy48YjnYyYlGEIPZE1pAAxXbW0kNr1dt1umdQ0OFHGTl7PWBjLWDAhkcj+eAiqrf0bACoIsUgTqTc1JmDLc=
+	t=1760064015; cv=none; b=Un5SiGBvQrCHGiABVQT9HyaesTF4K8PdjVsI+e8fKi3woAWksv59a+pn7nJMpGf/3ch3fuUzD7z166YwIO9SrziT9GFdSrlB8CQNpTenubc7TAMjFWz0TiEctVD8WX2s/XqjXNne6o73jrp7EMs++5N/ihwKxUEjnCQ/wYh9yIU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760063322; c=relaxed/simple;
-	bh=FK9xKviTcI/C/LX0yN/JGLOVejrI+c9f1E6gl9PnytQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gtPum16gswonQPC3YSA3KWLoS4peJmd/EZZEJ5Tk0j64cvn+mQKTC01Sck4D3jLqJDVMEoyOlJzUQGSymYpTmxz32s1eQRYp8SarLpnsILKBUKwEkukiFyApQe4w3bWr0E7BAbUeBiRWBs3E1TJzmaGisLOV3z9BXRDkSWWzP2g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Bndp/sPY; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1760064015; c=relaxed/simple;
+	bh=+O5fD/fAvfcINgglSqBg1fQcHMPTu+YnoaXoYPykJP4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PGA9/OB7NuYsrwoLCGb+PDFKW8HGYixefzdH7PW3NbISOE9D72Mj3Nrb4qlLqTtbz3cM5nJ9QPGSQ5lOcMNENFUoOr4bJapseKb3UcLcWCc/p0WHFAnKTllky3qyBH8cXDBByCyqikOPDGWHYg8rXcooHHdoVC9vgiqs1F4H9ms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=v2KuPb7+; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bndp/sPY"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED887C4CEF7;
-	Fri, 10 Oct 2025 02:28:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760063322;
-	bh=FK9xKviTcI/C/LX0yN/JGLOVejrI+c9f1E6gl9PnytQ=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Bndp/sPYydcCNDbqrXtjVXk/W675XXogzGiv+wYQO7RUr4O7Qb323sK7694qpUdEB
-	 j5Wmyok32ASruvnzXq2Wju1+WutiK3Ql+cvY9VIgTVJ0fSOggPEiK2pOUL2LnZrGXP
-	 7MV0NvitQ8m8fJYIVrQHQCcSbwmVP5PJqlMGkaWVb0ptGQRoafeCgF7qyLELfyXdD9
-	 mGDKGey91KwMJTKM21onErVPUAVbS/Cke52c6KzTNY0IR6A74dHjFVE2Z6RxKzuR9R
-	 1EmjpsdWk6l62UzbYDrcD7uHVguKiwM9BwNkgf9sSoM3Kxohizt46BF2+kVK5eyAy1
-	 QeYbPuk8Cz35Q==
-From: Yu Kuai <yukuai@kernel.org>
-To: axboe@kernel.dk,
-	bvanassche@acm.org,
-	nilay@linux.ibm.com
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	yukuai3@huawei.com,
-	yi.zhang@huawei.com,
-	yangerkun@huawei.com,
-	johnny.chenyi@huawei.com
-Subject: [PATCH v3 7/7] blk-mq: add documentation for new queue attribute async_dpeth
-Date: Fri, 10 Oct 2025 10:28:09 +0800
-Message-ID: <20251010022812.2985286-8-yukuai@kernel.org>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20251010022812.2985286-1-yukuai@kernel.org>
-References: <20251010022812.2985286-1-yukuai@kernel.org>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="v2KuPb7+"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=5nEgPiwNZqJY/+pI9FIhkXYcYvcHnRfvZ3w5CnVMM8Q=; b=v2KuPb7+X3CquJ8kc7LUjH9LyU
+	lXhmAD0NZIy8B9cVZIjPqtRCU/mTL197+QHuEWB+JvZi2dHdt8x+oVEoohFVJ/5/bofowuOY8cw1+
+	W34mQIV8jcJfn7f+m/Le//QjkQPy8/PTr/EH9kIbgc34HGov9DcIe1eG1s+6P0btLYxQ8YZcmk7UI
+	CpP7lSE3KDiwpMZo11L++VW+5WIapejtvBwxr8R5ZrvfooDPB3H0NRJmmcxHYoeiCiHwvFL4jJ/V+
+	w3dCKWfggOWZqSlGPX4XpmPp85/yLo1n6Gd3tA62nu50W5JHRYbTv6ucOwQ847lT4yro+jr1hgrmG
+	YWdN3oBA==;
+Received: from willy by casper.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1v732r-00000002Scf-3b0v;
+	Fri, 10 Oct 2025 02:39:49 +0000
+Date: Fri, 10 Oct 2025 03:39:49 +0100
+From: Matthew Wilcox <willy@infradead.org>
+To: Suren Baghdasaryan <surenb@google.com>
+Cc: akpm@linux-foundation.org, david@redhat.com, lorenzo.stoakes@oracle.com,
+	Liam.Howlett@oracle.com, vbabka@suse.cz, alexandru.elisei@arm.com,
+	peterx@redhat.com, sj@kernel.org, rppt@kernel.org, mhocko@suse.com,
+	corbet@lwn.net, axboe@kernel.dk, viro@zeniv.linux.org.uk,
+	brauner@kernel.org, hch@infradead.org, jack@suse.cz,
+	m.szyprowski@samsung.com, robin.murphy@arm.com, hannes@cmpxchg.org,
+	zhengqi.arch@bytedance.com, shakeel.butt@linux.dev,
+	axelrasmussen@google.com, yuanchu@google.com, weixugc@google.com,
+	minchan@kernel.org, linux-mm@kvack.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, iommu@lists.linux.dev,
+	Minchan Kim <minchan@google.com>
+Subject: Re: [PATCH 1/8] mm: implement cleancache
+Message-ID: <aOhx9Zj1a6feN8wC@casper.infradead.org>
+References: <20251010011951.2136980-1-surenb@google.com>
+ <20251010011951.2136980-2-surenb@google.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251010011951.2136980-2-surenb@google.com>
 
-From: Yu Kuai <yukuai3@huawei.com>
+On Thu, Oct 09, 2025 at 06:19:44PM -0700, Suren Baghdasaryan wrote:
+> +	/*
+> +	 * 99% of the time, we don't need to flush the cleancache on the bdev.
+> +	 * But, for the strange corners, lets be cautious
+> +	 */
+> +	cleancache_invalidate_inode(mapping, mapping->host);
 
-Explain the attribute and the default value in different case.
+Why do we need to pass in both address_space and inode?
 
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
-Reviewed-by: Nilay Shroff <nilay@linux.ibm.com>
----
- Documentation/ABI/stable/sysfs-block | 34 ++++++++++++++++++++++++++++
- 1 file changed, 34 insertions(+)
+> +/*
+> + * Backend API
+> + *
+> + * Cleancache does not touch page reference. Page refcount should be 1 when
+> + * page is placed or returned into cleancache and pages obtained from
+> + * cleancache will also have their refcount at 1.
 
-diff --git a/Documentation/ABI/stable/sysfs-block b/Documentation/ABI/stable/sysfs-block
-index 0ed10aeff86b..aa1e94169666 100644
---- a/Documentation/ABI/stable/sysfs-block
-+++ b/Documentation/ABI/stable/sysfs-block
-@@ -609,6 +609,40 @@ Description:
- 		enabled, and whether tags are shared.
- 
- 
-+What:		/sys/block/<disk>/queue/async_depth
-+Date:		August 2025
-+Contact:	linux-block@vger.kernel.org
-+Description:
-+		[RW] Controls how many asynchronous requests may be allocated in the
-+		block layer. The value is always capped at nr_requests.
-+
-+		When no elevator is active (none):
-+		- async_depth is always equal to nr_requests.
-+
-+		For bfq scheduler:
-+		- By default, async_depth is set to 75% of nr_requests.
-+		  Internal limits are then derived from this value:
-+		  * Sync writes: limited to async_depth (≈75% of nr_requests).
-+		  * Async I/O: limited to ~2/3 of async_depth (≈50% of nr_requests).
-+
-+		  If a bfq_queue is weight-raised:
-+		  * Sync writes: limited to ~1/2 of async_depth (≈37% of nr_requests).
-+		  * Async I/O: limited to ~1/4 of async_depth (≈18% of nr_requests).
-+
-+		- If the user writes a custom value to async_depth, BFQ will recompute
-+		  these limits proportionally based on the new value.
-+
-+		For Kyber:
-+		- By default async_depth is set to 75% of nr_requests.
-+		- If the user writes a custom value to async_depth, then it override the
-+		  default and directly control the limit for writes and async I/O.
-+
-+		For mq-deadline:
-+		- By default async_depth is set to nr_requests.
-+		- If the user writes a custom value to async_depth, then it override the
-+		  default and directly control the limit for writes and async I/O.
-+
-+
- What:		/sys/block/<disk>/queue/nr_zones
- Date:		November 2018
- Contact:	Damien Le Moal <damien.lemoal@wdc.com>
--- 
-2.51.0
+I don't like these references to page refcount.  Surely you mean folio
+refcount?
+
+> +	help
+> +	  Cleancache can be thought of as a page-granularity victim cache
+> +	  for clean pages that the kernel's pageframe replacement algorithm
+> +	  (PFRA) would like to keep around, but can't since there isn't enough
+
+PFRA seems to be an acronym you've just made up.  Why?
+
+> +struct cleancache_inode {
+> +	struct inode *inode;
+> +	struct hlist_node hash;
+> +	refcount_t ref_count;
+> +	struct xarray folios; /* protected by folios.xa_lock */
+
+This is a pointless comment.  All xarrays are protected by their own
+xa_lock.
+
+> +static DEFINE_IDR(fs_idr);
+
+No.  The IDR is deprecated.  Use an allocating XArray.
+
+> +/*
+> + * Folio attributes:
+> + *	folio->_mapcount - pool_id
+> + *	folio->mapping - ccinode reference or NULL if folio is unused
+> + *	folio->index - file offset
+
+No.  Don't reuse fields for something entirely different.  Put a
+properly named field in the union.
+
+> +static void folio_attachment(struct folio *folio, struct cleancache_inode **ccinode,
+
+Unnecessarily long line
 
