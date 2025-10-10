@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14FE7258EE8;
-	Fri, 10 Oct 2025 02:28:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1BA2261573;
+	Fri, 10 Oct 2025 02:28:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760063317; cv=none; b=dppcpDCIYdcmVDNfa4bm29q1ZusYOAobHKDuu+xt7P6wxqIY1VKQy5pV2H5dRpNlwr5K/Ur0Tn2aVzV1rFE/DUNzuJf2L+lYCJ7YN/BheIphOdaJqLjjmKNI2EdnSF0U/lnZ/BFusH5/ilZLDTMQoP9nKCA2hQh9R7bajGm6BrA=
+	t=1760063320; cv=none; b=C0ZY48VT+Xo5HurLracQ4uyb0gd+JGEmoaF/PSMQLR0z6vEzXPWaiAmzQeOHEZEPxWRrRBznAlMkL3r5qnkazKBckMmfAnuJVkZxXVftiy69JMJhs5e6c06NWw1lfF8f+VvknkcODf9sTc1nOcYaErRBN/VNp4mrmDNFIYBLBXo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760063317; c=relaxed/simple;
-	bh=/mAxT00KI2ghSwm4SaZ4d2nka0Re3OeQKZg+SA5dhJM=;
+	s=arc-20240116; t=1760063320; c=relaxed/simple;
+	bh=o0IxMr8K7Z/aTz7NIdtgsbeN4pEuzaoBeum3uxdXMjA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hLfYhASv6PH1/suTYVj1pXGrq/R3aiCnw+CJcNw0sqG+9X+nkUUVAzID0ahANeFh7Lx4yyf1wXLUGLNKCZP7bGEDqCk8/5TRy3xDwoOZtT8Ip4J6CUIiSVEwO3Uy/LlKDISRnzedfcF+/G8rAfC6ZYuIe4J2vQDuB0S6uAOYPCY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p+ffXItH; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=H73PmbzKA7vmH9TFsTHdp+f90w1aM0RDBfUBqWTkU8/BcaFjaF2xSL8NxoN7w1wDEAYUSfh9zYPAw5WSyoE326P8EJam6Kw0AUSP17lhAUcXI/E/OzfuKE7ssZHJBpWtkLic2Jh8QcDef5J69ZT8dsjrubYjn6rEREuuRGlUgQQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P9zWguNB; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p+ffXItH"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63B0AC4CEE7;
-	Fri, 10 Oct 2025 02:28:34 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P9zWguNB"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77C1FC4CEE7;
+	Fri, 10 Oct 2025 02:28:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760063316;
-	bh=/mAxT00KI2ghSwm4SaZ4d2nka0Re3OeQKZg+SA5dhJM=;
+	s=k20201202; t=1760063319;
+	bh=o0IxMr8K7Z/aTz7NIdtgsbeN4pEuzaoBeum3uxdXMjA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=p+ffXItHEPmhxVkHDv4E4DyHyvygf7n+60bvAwHJmTU1CKvQRfusVuJu1gRtcgddB
-	 VqV9BaVgHa7c6wNd0iR2MxPwYKvVUyc5HIg/SXPmdPsATHRRAwbbRWGgBWnSPm20jZ
-	 utFpW4r9Wf6oNQ7mlcC9IgF+OB3p7nUUVIss1Gn62itUmjQybxqJwmQmMDwF7EMgyJ
-	 FhoHECZBxgPXRkZr4dZidwQj850LSzbXw5q3r6Pj0RVpapDDlTZjstgKgPiTQojr4G
-	 vofuIspYp3b4UkezgsafXpZ7BK+wQkMLXYplmZvzwNjUsvMV2XHUfis5DUWqkj4qur
-	 vevNxWmCelNWg==
+	b=P9zWguNBwB1KHs7SRoJzi0uQ/GcH8J/kfUrauICCDDKKHXzojix+m0OVwsljUdNe3
+	 xdwXbz6+HORzdZe5tIxjeOdRj5NzXKd4U5IdbAvGojGHTmR/8Xu5w5zsGUZBFToYaA
+	 YfY4T7XmtXKCLYI8yXI2SYhDWDcdIJcfimSG6CepGNXnPdsSIVDCYSuTYurTOYHwIk
+	 //ZsRylSWst0xLU/VKag16vDotCIypjJI1HUuSpuybsgKGt/0/D8Ft/veie6YDsijI
+	 Qmi2HkL+GB/qKIY4hc9iFa/77+JJBz3dl3TEr5AklWofCJSmqFlOOz3IPVDJguXGp7
+	 OcoWxsaJGev8w==
 From: Yu Kuai <yukuai@kernel.org>
 To: axboe@kernel.dk,
 	bvanassche@acm.org,
@@ -36,9 +36,9 @@ Cc: linux-block@vger.kernel.org,
 	yi.zhang@huawei.com,
 	yangerkun@huawei.com,
 	johnny.chenyi@huawei.com
-Subject: [PATCH v3 5/7] mq-deadline: covert to use request_queue->async_depth
-Date: Fri, 10 Oct 2025 10:28:07 +0800
-Message-ID: <20251010022812.2985286-6-yukuai@kernel.org>
+Subject: [PATCH v3 6/7] block, bfq: convert to use request_queue->async_depth
+Date: Fri, 10 Oct 2025 10:28:08 +0800
+Message-ID: <20251010022812.2985286-7-yukuai@kernel.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251010022812.2985286-1-yukuai@kernel.org>
 References: <20251010022812.2985286-1-yukuai@kernel.org>
@@ -52,156 +52,82 @@ Content-Transfer-Encoding: 8bit
 
 From: Yu Kuai <yukuai3@huawei.com>
 
-In downstream kernel, we test with mq-deadline with many fio workloads, and
-we found a performance regression after commit 39823b47bbd4
-("block/mq-deadline: Fix the tag reservation code") with following test:
+The default limits is unchanged, and user can configure async_depth now.
 
-[global]
-rw=randread
-direct=1
-ramp_time=1
-ioengine=libaio
-iodepth=1024
-numjobs=24
-bs=1024k
-group_reporting=1
-runtime=60
-
-[job1]
-filename=/dev/sda
-
-Root cause is that mq-deadline now support configuring async_depth,
-although the default value is nr_request, however the minimal value is
-1, hence min_shallow_depth is set to 1, causing wake_batch to be 1. For
-consequence, sbitmap_queue will be waken up after each IO instead of
-8 IO.
-
-In this test case, sda is HDD and max_sectors is 128k, hence each
-submitted 1M io will be splited into 8 sequential 128k requests, however
-due to there are 24 jobs and total tags are exhausted, the 8 requests are
-unlikely to be dispatched sequentially, and changing wake_batch to 1
-will make this much worse, accounting blktrace D stage, the percentage
-of sequential io is decreased from 8% to 0.8%.
-
-Fix this problem by converting to request_queue->async_depth, where
-min_shallow_depth is set each time async_depth is updated.
-
-Noted elevator attribute async_depth is now removed, queue attribute
-with the same name is used instead.
-
-Fixes: 39823b47bbd4 ("block/mq-deadline: Fix the tag reservation code")
 Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 Reviewed-by: Nilay Shroff <nilay@linux.ibm.com>
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
 ---
- block/mq-deadline.c | 39 +++++----------------------------------
- 1 file changed, 5 insertions(+), 34 deletions(-)
+ block/bfq-iosched.c | 43 +++++++++++++++++--------------------------
+ 1 file changed, 17 insertions(+), 26 deletions(-)
 
-diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-index 592dd853f6e5..87c7b7378397 100644
---- a/block/mq-deadline.c
-+++ b/block/mq-deadline.c
-@@ -98,7 +98,6 @@ struct deadline_data {
- 	int fifo_batch;
- 	int writes_starved;
- 	int front_merges;
--	u32 async_depth;
- 	int prio_aging_expire;
- 
- 	spinlock_t lock;
-@@ -483,32 +482,16 @@ static struct request *dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
- 	return rq;
- }
- 
--/*
-- * Called by __blk_mq_alloc_request(). The shallow_depth value set by this
-- * function is used by __blk_mq_get_tag().
-- */
- static void dd_limit_depth(blk_opf_t opf, struct blk_mq_alloc_data *data)
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index 63452e791f98..9e0eee9aba5c 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -7112,39 +7112,29 @@ void bfq_put_async_queues(struct bfq_data *bfqd, struct bfq_group *bfqg)
+ static void bfq_depth_updated(struct request_queue *q)
  {
--	struct deadline_data *dd = data->q->elevator->elevator_data;
--
--	/* Do not throttle synchronous reads. */
--	if (blk_mq_sched_sync_request(opf))
--		return;
--
+ 	struct bfq_data *bfqd = q->elevator->elevator_data;
+-	unsigned int nr_requests = q->nr_requests;
++	unsigned int async_depth = q->async_depth;
+ 
+ 	/*
+-	 * In-word depths if no bfq_queue is being weight-raised:
+-	 * leaving 25% of tags only for sync reads.
++	 * By default:
++	 *  - sync reads are not limited
++	 * If bfqq is not being weight-raised:
++	 *  - sync writes are limited to 75%(async depth default value)
++	 *  - async IO are limited to 50%
++	 * If bfqq is being weight-raised:
++	 *  - sync writes are limited to ~37%
++	 *  - async IO are limited to ~18
+ 	 *
+-	 * In next formulas, right-shift the value
+-	 * (1U<<bt->sb.shift), instead of computing directly
+-	 * (1U<<(bt->sb.shift - something)), to be robust against
+-	 * any possible value of bt->sb.shift, without having to
+-	 * limit 'something'.
++	 * If request_queue->async_depth is updated by user, all limit are
++	 * updated relatively.
+ 	 */
+-	/* no more than 50% of tags for async I/O */
+-	bfqd->async_depths[0][0] = max(nr_requests >> 1, 1U);
 -	/*
--	 * Throttle asynchronous requests and writes such that these requests
--	 * do not block the allocation of synchronous requests.
+-	 * no more than 75% of tags for sync writes (25% extra tags
+-	 * w.r.t. async I/O, to prevent async I/O from starving sync
+-	 * writes)
 -	 */
--	data->shallow_depth = dd->async_depth;
-+	if (!blk_mq_sched_sync_request(opf))
-+		data->shallow_depth = data->q->async_depth;
- }
+-	bfqd->async_depths[0][1] = max((nr_requests * 3) >> 2, 1U);
++	bfqd->async_depths[0][1] = async_depth;
++	bfqd->async_depths[0][0] = max(async_depth * 2 / 3, 1U);
++	bfqd->async_depths[1][1] = max(async_depth >> 1, 1U);
++	bfqd->async_depths[1][0] = max(async_depth >> 2, 1U);
  
--/* Called by blk_mq_update_nr_requests(). */
-+/* Called by blk_mq_init_sched() and blk_mq_update_nr_requests(). */
- static void dd_depth_updated(struct request_queue *q)
- {
--	struct deadline_data *dd = q->elevator->elevator_data;
+ 	/*
+-	 * In-word depths in case some bfq_queue is being weight-
+-	 * raised: leaving ~63% of tags for sync reads. This is the
+-	 * highest percentage for which, in our tests, application
+-	 * start-up times didn't suffer from any regression due to tag
+-	 * shortage.
++	 * Due to cgroup qos, the allowed request for bfqq might be 1
+ 	 */
+-	/* no more than ~18% of tags for async I/O */
+-	bfqd->async_depths[1][0] = max((nr_requests * 3) >> 4, 1U);
+-	/* no more than ~37% of tags for sync writes (~20% extra tags) */
+-	bfqd->async_depths[1][1] = max((nr_requests * 6) >> 4, 1U);
 -
--	dd->async_depth = q->nr_requests;
--	blk_mq_set_min_shallow_depth(q, 1);
-+	blk_mq_set_min_shallow_depth(q, q->async_depth);
+ 	blk_mq_set_min_shallow_depth(q, 1);
  }
  
- static void dd_exit_sched(struct elevator_queue *e)
-@@ -573,6 +556,7 @@ static int dd_init_sched(struct request_queue *q, struct elevator_queue *eq)
- 	blk_queue_flag_set(QUEUE_FLAG_SQ_SCHED, q);
+@@ -7365,6 +7355,7 @@ static int bfq_init_queue(struct request_queue *q, struct elevator_queue *eq)
+ 	blk_queue_flag_set(QUEUE_FLAG_DISABLE_WBT_DEF, q);
+ 	wbt_disable_default(q->disk);
+ 	blk_stat_enable_accounting(q);
++	q->async_depth = (q->nr_requests * 3) >> 2;
  
- 	q->elevator = eq;
-+	q->async_depth = q->nr_requests;
- 	dd_depth_updated(q);
  	return 0;
- }
-@@ -758,7 +742,6 @@ SHOW_JIFFIES(deadline_write_expire_show, dd->fifo_expire[DD_WRITE]);
- SHOW_JIFFIES(deadline_prio_aging_expire_show, dd->prio_aging_expire);
- SHOW_INT(deadline_writes_starved_show, dd->writes_starved);
- SHOW_INT(deadline_front_merges_show, dd->front_merges);
--SHOW_INT(deadline_async_depth_show, dd->async_depth);
- SHOW_INT(deadline_fifo_batch_show, dd->fifo_batch);
- #undef SHOW_INT
- #undef SHOW_JIFFIES
-@@ -788,7 +771,6 @@ STORE_JIFFIES(deadline_write_expire_store, &dd->fifo_expire[DD_WRITE], 0, INT_MA
- STORE_JIFFIES(deadline_prio_aging_expire_store, &dd->prio_aging_expire, 0, INT_MAX);
- STORE_INT(deadline_writes_starved_store, &dd->writes_starved, INT_MIN, INT_MAX);
- STORE_INT(deadline_front_merges_store, &dd->front_merges, 0, 1);
--STORE_INT(deadline_async_depth_store, &dd->async_depth, 1, INT_MAX);
- STORE_INT(deadline_fifo_batch_store, &dd->fifo_batch, 0, INT_MAX);
- #undef STORE_FUNCTION
- #undef STORE_INT
-@@ -802,7 +784,6 @@ static const struct elv_fs_entry deadline_attrs[] = {
- 	DD_ATTR(write_expire),
- 	DD_ATTR(writes_starved),
- 	DD_ATTR(front_merges),
--	DD_ATTR(async_depth),
- 	DD_ATTR(fifo_batch),
- 	DD_ATTR(prio_aging_expire),
- 	__ATTR_NULL
-@@ -889,15 +870,6 @@ static int deadline_starved_show(void *data, struct seq_file *m)
- 	return 0;
- }
  
--static int dd_async_depth_show(void *data, struct seq_file *m)
--{
--	struct request_queue *q = data;
--	struct deadline_data *dd = q->elevator->elevator_data;
--
--	seq_printf(m, "%u\n", dd->async_depth);
--	return 0;
--}
--
- static int dd_queued_show(void *data, struct seq_file *m)
- {
- 	struct request_queue *q = data;
-@@ -1007,7 +979,6 @@ static const struct blk_mq_debugfs_attr deadline_queue_debugfs_attrs[] = {
- 	DEADLINE_NEXT_RQ_ATTR(write2),
- 	{"batching", 0400, deadline_batching_show},
- 	{"starved", 0400, deadline_starved_show},
--	{"async_depth", 0400, dd_async_depth_show},
- 	{"dispatch0", 0400, .seq_ops = &deadline_dispatch0_seq_ops},
- 	{"dispatch1", 0400, .seq_ops = &deadline_dispatch1_seq_ops},
- 	{"dispatch2", 0400, .seq_ops = &deadline_dispatch2_seq_ops},
 -- 
 2.51.0
 
