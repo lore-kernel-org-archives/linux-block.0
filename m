@@ -1,269 +1,248 @@
-Received: from s1.sapience.com (s1.sapience.com [72.84.236.66])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vs1-f46.google.com (mail-vs1-f46.google.com [209.85.217.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EF9B2E9755;
-	Fri, 10 Oct 2025 23:49:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=72.84.236.66
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760140178; cv=fail; b=QV/Qi6zZSiUY+0FfBAxn/v3+90/X4Zq2B6uPzPevC5BLSaESHOREjN2Gx/9B9Q4HgUFQR2O9ckSa4yjaOpjXypdI5t6dU7u63yWrQgyP2LX/QSBc0WXG8OxfLXUQ1Na6CXhVxU1dIg5aYuLjFAuLH0AMZomfc7TfYQjU7FbrStA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760140178; c=relaxed/simple;
-	bh=1Y68sADJlVcz3CTM1RhBuA8huX1jYz6MJFnmx1aqQEg=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=nPMTO8kU+EdHbEY43cpbseZbbWtIMbNGfGgjzTiEfUIyUZCqvA2AGNwLdFTYWLEU6WVHWPenB5fOGaDgeKzRfBJ+n9Nqgw32lmpouRusa6+ikQePiAkaevZwUw/u2HlB64NjLPnqp/spvIVtiKmOQWX/uHdL+gV1T09tQJ3jhZ0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sapience.com; spf=pass smtp.mailfrom=sapience.com; dkim=permerror (0-bit key) header.d=sapience.com header.i=@sapience.com header.b=bBsgZB7j; dkim=pass (2048-bit key) header.d=sapience.com header.i=@sapience.com header.b=BjlxOxh/; arc=fail smtp.client-ip=72.84.236.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sapience.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sapience.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0943B131E49
+	for <linux-block@vger.kernel.org>; Sat, 11 Oct 2025 01:44:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.46
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1760147044; cv=none; b=jrvTnRkFzUqTTMiNwhm+VSqElyVVYkYDSoDB3gPijtpy/xu14HPtwaDLN99BbU/PTsLCz3cYkhfn53VAEkB372775ZGFWh4anYQP3Q69qJyaACBVvQ0z/WSEEGMh93GdBczYmVl/NWZFUyGHhtMTBPSl53ZzCccoakqLq7ibM6I=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1760147044; c=relaxed/simple;
+	bh=T+IdLzRTTxOQ0Z7SCLa56SnM6nhwUwKs07m9AmkVVyE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=E0VEzaSOlh9GjgdIUy3sMqIXcgI3MOW4M0KO/bRNj2P9+qFAdXbE1XKv2YDnj+3rOfFZTvfJjTuHwBmXVJdVpBdBSusGRGvnA/pRXzlPqfTSdN9j4umwJc/disegSdDweRaBxuaJK/8JF/3Z2UR53lGxdKG0H16pDZMimBEuk5Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J7Vq8n/8; arc=none smtp.client-ip=209.85.217.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=permerror (0-bit key) header.d=sapience.com header.i=@sapience.com header.b="bBsgZB7j";
-	dkim=pass (2048-bit key) header.d=sapience.com header.i=@sapience.com header.b="BjlxOxh/"
-Authentication-Results: dkim-srvy7; dkim=pass (Good ed25519-sha256 
-   signature) header.d=sapience.com header.i=@sapience.com 
-   header.a=ed25519-sha256; dkim=pass (Good 2048 bit rsa-sha256 signature) 
-   header.d=sapience.com header.i=@sapience.com header.a=rsa-sha256
-Received: from srv8.sapience.com (srv8.sapience.com [x.x.x.x])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature ECDSA (secp384r1) server-digest SHA384)
-	(No client certificate requested)
-	by s1.sapience.com (Postfix) with ESMTPS id 13548480A19;
-	Fri, 10 Oct 2025 19:49:34 -0400 (EDT)
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=sapience.com;
- i=@sapience.com; q=dns/txt; s=dk-ed25519-220413; t=1760140174;
- h=message-id : subject : from : to : cc : date : in-reply-to :
- references : content-type : mime-version : from;
- bh=lITNrOoYlz5NtF0dTO17OVkT1HBT4ddwp1sL9fNtp1M=;
- b=bBsgZB7jkggR+GCu7jBiVn9b74/8Xb8eJpe86L3v7lw8CTLvTVFITv9TsiqOvP5Vxxael
- +QF3DRp2o16+LVpCw==
-ARC-Seal: i=1; a=rsa-sha256; d=sapience.com; s=arc6-rsa-220412; t=1760140174;
-	cv=none; b=Yqtmvavk2akNencssa/kz6cWMHQWRqeh8nsLKCJf33MFVYbTEj1+N1ububAEZ4YU7AC1SLzVkJcSiZW8IMr8bfbxuN/FvulGrq+scSncBIJ5a1hIfdVnhVK+z080aGoKh4fvFEbpZFxewabNGvveXmIh3ewnAf5/EQCRxra2F6G/cZVa/eqzVZDjY+zg8/yMNeYtQ/tWhZ3vd4gC2vhXclE5K4l6rusDUQvAhoFMcVGyzh3Afey57t/HOjvIO0SOHdu1Zd+XvGrWTZt/RcSPRXGgoeuqwJ+V95EhTeXDwaxeQmqIigJXAP/t0Ir5kcrMIZ2LLrJC+57rGv5/6lEbKg==
-ARC-Message-Signature: i=1; a=rsa-sha256; d=sapience.com; s=arc6-rsa-220412;
-	t=1760140174; c=relaxed/simple;
-	bh=1Y68sADJlVcz3CTM1RhBuA8huX1jYz6MJFnmx1aqQEg=;
-	h=DKIM-Signature:DKIM-Signature:Message-ID:Subject:From:To:Cc:Date:
-	 In-Reply-To:References:Autocrypt:Content-Type:User-Agent:
-	 MIME-Version; b=P77in1VfHX8zHPeeR5Hf07CULZqINUEQn6/1eyXYXEVerUcWBZhGY8411GNvX9EyI+/bJ0het/kc341NjkPqPQquEKKxqRYzbqX7++2FfoReKq/DYbNzGvF/a9HI8GyKtktRs37mWAtkUwGz1OWaoiBA8g+5dpv3P+cduyc+8PgG6NYHw9pg7p8n4xR+p5aG0q40eV5OXzwxsUyWCSbHo2LXscndZn53TgaTMJ4k6F4rTTU3Y05JCw8FeyxVZ6UjWzkFj8PvuyERCYfmCku6nQ94VHh7js37kFdKYdWbjv74mMySeiL+adqBCkT9HEIGT4ccHi4nfXNvB7HZ+7MsPQ==
-ARC-Authentication-Results: i=1; arc-srv8.sapience.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sapience.com;
- i=@sapience.com; q=dns/txt; s=dk-rsa-220413; t=1760140174;
- h=message-id : subject : from : to : cc : date : in-reply-to :
- references : content-type : mime-version : from;
- bh=lITNrOoYlz5NtF0dTO17OVkT1HBT4ddwp1sL9fNtp1M=;
- b=BjlxOxh/xZqgY78K8vukPyiZB3vzRYIkAZtb+6Vck7kRTUirlkr5L/Xzqu4ZLAUiHCq5q
- a0ElUTTLEwgi04p+XspT10KJWuCUrS01A6WGq+WDQV8NY1bOKGSS0IZug5CLjo3pXjAi/SH
- BR1efEgh0UPCWZ0gurzgtzDHKWfcVRL44/oqEFr1sD+FoV1C473t5mWhOhJRs5bIkQylQnI
- Do7EZg3CfSNEKA/t/mJAmVitTgny3jq9n+HQkzHIu3CQr5YxECalYmYzU1rzUFjZeSyenof
- 8Idbm+DxULbFQa02dSfLh+ITpT7q7P0GGbhDk1u1laG0zwE/qmlkO/EWRxVg==
-Received: by srv8.prv.sapience.com (Postfix) id C8A53284286;
-	Fri, 10 Oct 2025 19:49:34 -0400 (EDT)
-Message-ID: <3152ca947e89ee37264b90c422e77bb0e3d575b9.camel@sapience.com>
-Subject: Re: mainline boot fail nvme/block? [BISECTED]
-From: Genes Lists <lists@sapience.com>
-To: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org
-Cc: linux-pci@vger.kernel.org
-Date: Fri, 10 Oct 2025 19:49:34 -0400
-In-Reply-To: <cf4e88c6-0319-4084-8311-a7ca28a78c81@kernel.dk>
-References: <4b392af8847cc19720ffcd53865f60ab3edc56b3.camel@sapience.com>
-	 <cf4e88c6-0319-4084-8311-a7ca28a78c81@kernel.dk>
-Autocrypt: addr=lists@sapience.com; prefer-encrypt=mutual;
- keydata=mDMEXSY9GRYJKwYBBAHaRw8BAQdAwzFfmp+m0ldl2vgmbtPC/XN7/k5vscpADq3BmRy5R
- 7y0LU1haWwgTGlzdHMgKEwwIDIwMTkwNzEwKSA8bGlzdHNAc2FwaWVuY2UuY29tPoiWBBMWCAA+Ah
- sBBQsJCAcCBhUKCQgLAgQWAgMBAh4BAheAFiEE5YMoUxcbEgQOvOMKc+dlCv6PxQAFAmPJfooFCRl
- vRHEACgkQc+dlCv6PxQAc/wEA/Dbmg91DOGXll0OW1GKaZQGQDl7fHibMOKRGC6X/emoA+wQR5FIz
- BnV/PrXbao8LS/h0tSkeXgPsYxrzvfZInIAC
-Content-Type: multipart/signed; micalg="pgp-sha384";
-	protocol="application/pgp-signature"; boundary="=-EzuXFgResxDP94lPU5BL"
-User-Agent: Evolution 3.58.1 
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J7Vq8n/8"
+Received: by mail-vs1-f46.google.com with SMTP id ada2fe7eead31-55784771e9dso1248279137.1
+        for <linux-block@vger.kernel.org>; Fri, 10 Oct 2025 18:44:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1760147042; x=1760751842; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lZhc66zsxEtV1w8Yg5Xh9+RLE7pB3ih7eNk7XgCUWWk=;
+        b=J7Vq8n/8XeoyYAq6UM7v4iusmsqiPV3dCbTwxuZw7EXzoIcuILlPXwCC+KlCQZ5uLA
+         RrPq/PfJzICjcTOM7U15uj/kqrVbmGvV+ZZ0S8BAAaSCEblz4QFq+Mo8r1cf8HUwamwf
+         Pdom9uwpmo5vTEYs/90loRY1KGL1f+WJFWHv8pk5GSAgW5CLPKc7LiI2XcIFC4W5dDER
+         opbcR008ve17+P/H7s2h16+MZd3iKSf+QlEnK7eP+JVRMUNBV4wEKBjbv85SocJa1UVa
+         t1whWnojqaNG0oUQ9cb2TlRJ0gBoVGnt8u+/JpD31c1K6jfgRxTz9vpBTEqFvAfOEyvc
+         IQWw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760147042; x=1760751842;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lZhc66zsxEtV1w8Yg5Xh9+RLE7pB3ih7eNk7XgCUWWk=;
+        b=saVOI6NZTfMbQmUMbaUwwRVoFbgzVPsXPNCVFdYJlraskCxeZL7xCQKrkvKHvSw9kw
+         bUHJ+s457fIxafvnbPDaqUnPGhTA1/XmwwFbWBY/H1teQykoH1AF9KZb/wNIpeZqtBS9
+         RBiYx0FHkUIeHi/qvBZ5cbt7Frfir0g9ajn7iq60UPoCCnmw/3N9k3Chct8WAmcecHDz
+         KXk/cb719E5TUAqh0swRkM/w9swO4hw3pDAZ7LaaNtMlJd6h8iyVx9PxAGrMfFRI3a95
+         cRRn/yhpgNblwdyqnino54NCnl5gIN6r7iHMSslr4vQ/7MQPs0hHpcKu91lCBNq60Pw/
+         MQfg==
+X-Forwarded-Encrypted: i=1; AJvYcCVL7cAC9Q7TS495U1dSG6SKTWzYseNNedvSjTLXM/6DUqzcPiYL7WlGWCsOBW1i3TqqsxoV/ndKxduIEQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxHRZY+lQRXyQV4MEdAI6L6XaVTHEXSukrU6NT5aGTMe7qxMwQA
+	PBEkr7EgrkGbg84fAUkLJR5X1NP+woPIV1YwcJxjdNWa8CoT5JM2SYztsh8oqeb9fP8f0sqTStp
+	KeXskkuty96EdfxuUBek69BrwLnz0ys0=
+X-Gm-Gg: ASbGncvEWsfDWFDZGF1FmK2W6IUfRxqMF5GTq1Ki+P/rt6sWGAMlsOa84Vp5vyWAsBk
+	ThBuXKruzvt9M+RFlSSS5eNyPgnfLMkwZNPnNZn4NRwFQVO4w9Jaqloi4gniu6Ku6PsXorF8KW2
+	3pCMiJhSEY/0YN8gcxf3E03UyHp6LWbQR1pbr0Xg6Eb8OVoTrpJbWikNuoXMSv7Z4J38D5XkuJ5
+	nMIQJKR+xPNATR5HYMHFda+mkD4/bNR
+X-Google-Smtp-Source: AGHT+IE7mG3LNkxY+CyodDwm/x4ptJOMQVJ+H4EmrH8p/RVIObpZc3vVfG1SaOV6rlrj3vGwgT1jiZxnhaAD3dJIuBQ=
+X-Received: by 2002:a05:6102:6cf:b0:524:b344:748d with SMTP id
+ ada2fe7eead31-5d5e23474fcmr5780092137.17.1760147041875; Fri, 10 Oct 2025
+ 18:44:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-
-
---=-EzuXFgResxDP94lPU5BL
+References: <20251011013312.20698-1-changfengnan@bytedance.com> <CALWNXx-gGbAFCNywLZZUNmenTHQGFuapvNe-7irRGnRFJuNUcA@mail.gmail.com>
+In-Reply-To: <CALWNXx-gGbAFCNywLZZUNmenTHQGFuapvNe-7irRGnRFJuNUcA@mail.gmail.com>
+From: fengnan chang <fengnanchang@gmail.com>
+Date: Sat, 11 Oct 2025 09:43:51 +0800
+X-Gm-Features: AS18NWCBO3jy7FdLyGcQVogGXlatyQB1qaqtXtY1KzxOp2alt1gh71U3rIH7rWo
+Message-ID: <CALWNXx_Lt1CLTaxh+xcd24_nTp-DOaOezUkQ=Vv_Snq3vx2MuA@mail.gmail.com>
+Subject: Re: [PATCH] block: enable per-cpu bio cache by default
+To: Fengnan Chang <changfengnan@bytedance.com>, linux-block@vger.kernel.org
+Cc: axboe@kernel.dk, viro@zeniv.linux.org.uk, brauner@kernel.org, jack@suse.cz, 
+	asml.silence@gmail.com, willy@infradead.org, djwong@kernel.org, 
+	hch@infradead.org, ritesh.list@gmail.com, linux-fsdevel@vger.kernel.org, 
+	io-uring@vger.kernel.org, linux-xfs@vger.kernel.org, 
+	linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, 2025-10-10 at 08:54 -0600, Jens Axboe wrote:
-> On 10/10/25 8:29 AM, Genes Lists wrote:
-> > Mainline fails to boot - 6.17.1 works fine.
-> > Same kernel on an older laptop without any nvme works just fine.
-> >=20
-> > It seems to get stuck enumerating disks within the initramfs
-> > created by
-> > dracut.
-> >=20
-> > ,,,
-> >=20
-> > Machine is dell xps 9320 laptop (firmware 2.23.0) with nvme
-> > partitioned:
-> >=20
-> > =C2=A0=C2=A0=C2=A0 # lsblk -f
-> > =C2=A0=C2=A0=C2=A0 NAME=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 FSTYP=
-E=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 FSVER LABEL FSAVAIL FSUSE%
-> > MOUNTPOINTS=C2=A0=C2=A0=C2=A0=20
-> > =C2=A0=C2=A0=C2=A0 sr0
-> > =C2=A0=C2=A0=C2=A0 nvme0n1
-> > =C2=A0=C2=A0=C2=A0 =E2=94=9C=E2=94=80nvme0n1p1 vfat=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 FAT32 ESP=C2=A0=C2=A0 2.6G=C2=A0=C2=A0=C2=A0 12% /=
-boot
-> > =C2=A0=C2=A0=C2=A0 =E2=94=9C=E2=94=80nvme0n1p2 ext4=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 1.0=C2=A0=C2=A0 root=C2=A0 77.7G=C2=A0=C2=A0=C2=A0=
- 42% /=20
-> > =C2=A0=C2=A0=C2=A0 =E2=94=94=E2=94=80nvme0n1p3 crypto_LUKS 2=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=20
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =E2=94=94=E2=94=80home=C2=A0=C2=A0=C2=A0=
- btrfs=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 home=C2=A0 1.3T=C2=A0=C2=A0=C2=A0 26% /opt
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0
-> > /home=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=20
-> >=20
-> >=20
-> >=20
-> > Will try do bisect over the weekend.
->=20
-> That'd be great, because there's really not much to glean from this
-> bug
-> report.
+cc more maillist
 
-Bisect landed here. (cc linux-pci@vger.kernel.org)
-Hopefully it is helpful, even though I don't see MSI in lspci output
-(which is provided below).
-
-gene
-
-
-54f45a30c0d0153d2be091ba2d683ab6db6d1d5b is the first bad commit
-commit 54f45a30c0d0153d2be091ba2d683ab6db6d1d5b (HEAD)
-Author: Inochi Amaoto <inochiama@gmail.com>
-Date:   Thu Aug 14 07:28:32 2025 +0800
-
-    PCI/MSI: Add startup/shutdown for per device domains
-
-    As the RISC-V PLIC cannot apply affinity settings without invoking
-    irq_enable(), it will make the interrupt unavailble when used as an
-    underlying interrupt chip for the MSI controller.
-
-    Implement the irq_startup() and irq_shutdown() callbacks for the
-PCI MSI
-    and MSI-X templates.
-
-    For chips that specify MSI_FLAG_PCI_MSI_STARTUP_PARENT, the parent
-startup
-    and shutdown functions are invoked. That allows the interrupt on
-the parent
-    chip to be enabled if the interrupt has not been enabled during
-    allocation. This is necessary for MSI controllers which use PLIC as
-    underlying parent interrupt chip.
-
-    Suggested-by: Thomas Gleixner <tglx@linutronix.de>
-    Signed-off-by: Inochi Amaoto <inochiama@gmail.com>
-    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
-    Tested-by: Chen Wang <unicorn_wang@outlook.com> # Pioneerbox
-    Reviewed-by: Chen Wang <unicorn_wang@outlook.com>
-    Acked-by: Bjorn Helgaas <bhelgaas@google.com>
-    Link: https://lore.kernel.org/all/20250813232835.43458-3-
-inochiama@gmail.com
-
- drivers/pci/msi/irqdomain.c | 52
-++++++++++++++++++++++++++++++++++++++++++++++++++++
- include/linux/msi.h         |  2 ++
- 2 files changed, 54 insertions(+)
-
-
------------------------------------------ lspci output ----------------
-In case helpful here's lspci output:
-
-0000:00:00.0 Host bridge: Intel Corporation Raptor Lake-P/U 4p+8e cores
-Host Bridge/DRAM Controller
-0000:00:02.0 VGA compatible controller: Intel Corporation Raptor Lake-P
-[Iris Xe Graphics] (rev 04)
-0000:00:04.0 Signal processing controller: Intel Corporation Raptor
-Lake Dynamic Platform and Thermal Framework Processor Participant
-0000:00:05.0 Multimedia controller: Intel Corporation Raptor Lake IPU
-0000:00:06.0 System peripheral: Intel Corporation RST VMD Managed
-Controller
-0000:00:07.0 PCI bridge: Intel Corporation Raptor Lake-P Thunderbolt 4
-PCI Express Root Port #0
-0000:00:07.2 PCI bridge: Intel Corporation Raptor Lake-P Thunderbolt 4
-PCI Express Root Port #2
-0000:00:08.0 System peripheral: Intel Corporation GNA Scoring
-Accelerator module
-0000:00:0a.0 Signal processing controller: Intel Corporation Raptor
-Lake Crashlog and Telemetry (rev 01)
-0000:00:0d.0 USB controller: Intel Corporation Raptor Lake-P
-Thunderbolt 4 USB Controller
-0000:00:0d.2 USB controller: Intel Corporation Raptor Lake-P
-Thunderbolt 4 NHI #0
-0000:00:0d.3 USB controller: Intel Corporation Raptor Lake-P
-Thunderbolt 4 NHI #1
-0000:00:0e.0 RAID bus controller: Intel Corporation Volume Management
-Device NVMe RAID Controller Intel Corporation
-0000:00:12.0 Serial controller: Intel Corporation Alder Lake-P
-Integrated Sensor Hub (rev 01)
-0000:00:14.0 USB controller: Intel Corporation Alder Lake PCH USB 3.2
-xHCI Host Controller (rev 01)
-0000:00:14.2 RAM memory: Intel Corporation Alder Lake PCH Shared SRAM
-(rev 01)
-0000:00:14.3 Network controller: Intel Corporation Raptor Lake PCH CNVi
-WiFi (rev 01)
-0000:00:15.0 Serial bus controller: Intel Corporation Alder Lake PCH
-Serial IO I2C Controller #0 (rev 01)
-0000:00:15.1 Serial bus controller: Intel Corporation Alder Lake PCH
-Serial IO I2C Controller #1 (rev 01)
-0000:00:16.0 Communication controller: Intel Corporation Alder Lake PCH
-HECI Controller (rev 01)
-0000:00:1e.0 Communication controller: Intel Corporation Alder Lake PCH
-UART #0 (rev 01)
-0000:00:1e.3 Serial bus controller: Intel Corporation Alder Lake SPI
-Controller (rev 01)
-0000:00:1f.0 ISA bridge: Intel Corporation Raptor Lake LPC/eSPI
-Controller (rev 01)
-0000:00:1f.3 Multimedia audio controller: Intel Corporation Raptor
-Lake-P/U/H cAVS (rev 01)
-0000:00:1f.4 SMBus: Intel Corporation Alder Lake PCH-P SMBus Host
-Controller (rev 01)
-0000:00:1f.5 Serial bus controller: Intel Corporation Alder Lake-P PCH
-SPI Controller (rev 01)
-0000:01:00.0 PCI bridge: Intel Corporation Thunderbolt 4 Bridge [Goshen
-Ridge 2020] (rev 02)
-0000:02:00.0 PCI bridge: Intel Corporation Thunderbolt 4 Bridge [Goshen
-Ridge 2020] (rev 02)
-0000:02:01.0 PCI bridge: Intel Corporation Thunderbolt 4 Bridge [Goshen
-Ridge 2020] (rev 02)
-0000:02:02.0 PCI bridge: Intel Corporation Thunderbolt 4 Bridge [Goshen
-Ridge 2020] (rev 02)
-0000:02:03.0 PCI bridge: Intel Corporation Thunderbolt 4 Bridge [Goshen
-Ridge 2020] (rev 02)
-0000:02:04.0 PCI bridge: Intel Corporation Thunderbolt 4 Bridge [Goshen
-Ridge 2020] (rev 02)
-10000:e0:06.0 PCI bridge: Intel Corporation Raptor Lake PCIe 4.0
-Graphics Port
-10000:e1:00.0 Non-Volatile memory controller: SK hynix Platinum
-P41/PC801 NVMe Solid State Drive
-
-
---=20
-Gene
-
---=-EzuXFgResxDP94lPU5BL
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYJAB0WIQRByXNdQO2KDRJ2iXo5BdB0L6Ze2wUCaOmbjgAKCRA5BdB0L6Ze
-298VAQCrzY8P7s8NGYPCxJ67f9kebbbfRXANLOptITSfMlvWpQEA4BCMploFlid4
-nlm45XFlxw363kivOWeDbAY9yx6Gyww=
-=j5Lv
------END PGP SIGNATURE-----
-
---=-EzuXFgResxDP94lPU5BL--
+On Sat, Oct 11, 2025 at 9:36=E2=80=AFAM fengnan chang <fengnanchang@gmail.c=
+om> wrote:
+>
+> The attachment is result of fio test ext4/xfs with
+> libaio/sync/io_uring on null_blk and
+>  nvme.
+>
+> On Sat, Oct 11, 2025 at 9:33=E2=80=AFAM Fengnan Chang
+> <changfengnan@bytedance.com> wrote:
+> >
+> > Per cpu bio cache was only used in the io_uring + raw block device,
+> > after commit 12e4e8c7ab59 ("io_uring/rw: enable bio caches for IRQ
+> > rw"),  bio_put is safe for task and irq context, bio_alloc_bioset is
+> > safe for task context and no one calls in irq context, so we can enable
+> > per cpu bio cache by default.
+> >
+> > Benchmarked with t/io_uring and ext4+nvme:
+> > taskset -c 6 /root/fio/t/io_uring  -p0 -d128 -b4096 -s1 -c1 -F1 -B1 -R1
+> > -X1 -n1 -P1  /mnt/testfile
+> > base IOPS is 562K, patch IOPS is 574K. The CPU usage of bio_alloc_biose=
+t
+> > decrease from 1.42% to 1.22%.
+> >
+> > The worst case is allocate bio in CPU A but free in CPU B, still use
+> > t/io_uring and ext4+nvme:
+> > base IOPS is 648K, patch IOPS is 647K.
+> >
+> > Also use fio test ext4/xfs with libaio/sync/io_uring on null_blk and
+> > nvme, no obvious performance regression.
+> >
+> > Signed-off-by: Fengnan Chang <changfengnan@bytedance.com>
+> > ---
+> >  block/bio.c        | 26 ++++++++++++--------------
+> >  block/blk-map.c    |  4 ++++
+> >  block/fops.c       |  4 ----
+> >  include/linux/fs.h |  3 ---
+> >  io_uring/rw.c      |  1 -
+> >  5 files changed, 16 insertions(+), 22 deletions(-)
+> >
+> > diff --git a/block/bio.c b/block/bio.c
+> > index 3b371a5da159..16b20c10cab7 100644
+> > --- a/block/bio.c
+> > +++ b/block/bio.c
+> > @@ -513,20 +513,18 @@ struct bio *bio_alloc_bioset(struct block_device =
+*bdev, unsigned short nr_vecs,
+> >         if (WARN_ON_ONCE(!mempool_initialized(&bs->bvec_pool) && nr_vec=
+s > 0))
+> >                 return NULL;
+> >
+> > -       if (opf & REQ_ALLOC_CACHE) {
+> > -               if (bs->cache && nr_vecs <=3D BIO_INLINE_VECS) {
+> > -                       bio =3D bio_alloc_percpu_cache(bdev, nr_vecs, o=
+pf,
+> > -                                                    gfp_mask, bs);
+> > -                       if (bio)
+> > -                               return bio;
+> > -                       /*
+> > -                        * No cached bio available, bio returned below =
+marked with
+> > -                        * REQ_ALLOC_CACHE to particpate in per-cpu all=
+oc cache.
+> > -                        */
+> > -               } else {
+> > -                       opf &=3D ~REQ_ALLOC_CACHE;
+> > -               }
+> > -       }
+> > +       opf |=3D REQ_ALLOC_CACHE;
+> > +       if (bs->cache && nr_vecs <=3D BIO_INLINE_VECS) {
+> > +               bio =3D bio_alloc_percpu_cache(bdev, nr_vecs, opf,
+> > +                                            gfp_mask, bs);
+> > +               if (bio)
+> > +                       return bio;
+> > +               /*
+> > +                * No cached bio available, bio returned below marked w=
+ith
+> > +                * REQ_ALLOC_CACHE to participate in per-cpu alloc cach=
+e.
+> > +                */
+> > +       } else
+> > +               opf &=3D ~REQ_ALLOC_CACHE;
+> >
+> >         /*
+> >          * submit_bio_noacct() converts recursion to iteration; this me=
+ans if
+> > diff --git a/block/blk-map.c b/block/blk-map.c
+> > index 23e5d5ebe59e..570a7ca6edd1 100644
+> > --- a/block/blk-map.c
+> > +++ b/block/blk-map.c
+> > @@ -255,6 +255,10 @@ static struct bio *blk_rq_map_bio_alloc(struct req=
+uest *rq,
+> >  {
+> >         struct bio *bio;
+> >
+> > +       /*
+> > +        * Even REQ_ALLOC_CACHE is enabled by default, we still need th=
+is to
+> > +        * mark bio is allocated by bio_alloc_bioset.
+> > +        */
+> >         if (rq->cmd_flags & REQ_ALLOC_CACHE && (nr_vecs <=3D BIO_INLINE=
+_VECS)) {
+> >                 bio =3D bio_alloc_bioset(NULL, nr_vecs, rq->cmd_flags, =
+gfp_mask,
+> >                                         &fs_bio_set);
+> > diff --git a/block/fops.c b/block/fops.c
+> > index ddbc69c0922b..090562a91b4c 100644
+> > --- a/block/fops.c
+> > +++ b/block/fops.c
+> > @@ -177,8 +177,6 @@ static ssize_t __blkdev_direct_IO(struct kiocb *ioc=
+b, struct iov_iter *iter,
+> >         loff_t pos =3D iocb->ki_pos;
+> >         int ret =3D 0;
+> >
+> > -       if (iocb->ki_flags & IOCB_ALLOC_CACHE)
+> > -               opf |=3D REQ_ALLOC_CACHE;
+> >         bio =3D bio_alloc_bioset(bdev, nr_pages, opf, GFP_KERNEL,
+> >                                &blkdev_dio_pool);
+> >         dio =3D container_of(bio, struct blkdev_dio, bio);
+> > @@ -326,8 +324,6 @@ static ssize_t __blkdev_direct_IO_async(struct kioc=
+b *iocb,
+> >         loff_t pos =3D iocb->ki_pos;
+> >         int ret =3D 0;
+> >
+> > -       if (iocb->ki_flags & IOCB_ALLOC_CACHE)
+> > -               opf |=3D REQ_ALLOC_CACHE;
+> >         bio =3D bio_alloc_bioset(bdev, nr_pages, opf, GFP_KERNEL,
+> >                                &blkdev_dio_pool);
+> >         dio =3D container_of(bio, struct blkdev_dio, bio);
+> > diff --git a/include/linux/fs.h b/include/linux/fs.h
+> > index 601d036a6c78..18ec41732186 100644
+> > --- a/include/linux/fs.h
+> > +++ b/include/linux/fs.h
+> > @@ -365,8 +365,6 @@ struct readahead_control;
+> >  /* iocb->ki_waitq is valid */
+> >  #define IOCB_WAITQ             (1 << 19)
+> >  #define IOCB_NOIO              (1 << 20)
+> > -/* can use bio alloc cache */
+> > -#define IOCB_ALLOC_CACHE       (1 << 21)
+> >  /*
+> >   * IOCB_DIO_CALLER_COMP can be set by the iocb owner, to indicate that=
+ the
+> >   * iocb completion can be passed back to the owner for execution from =
+a safe
+> > @@ -399,7 +397,6 @@ struct readahead_control;
+> >         { IOCB_WRITE,           "WRITE" }, \
+> >         { IOCB_WAITQ,           "WAITQ" }, \
+> >         { IOCB_NOIO,            "NOIO" }, \
+> > -       { IOCB_ALLOC_CACHE,     "ALLOC_CACHE" }, \
+> >         { IOCB_DIO_CALLER_COMP, "CALLER_COMP" }, \
+> >         { IOCB_AIO_RW,          "AIO_RW" }, \
+> >         { IOCB_HAS_METADATA,    "AIO_HAS_METADATA" }
+> > diff --git a/io_uring/rw.c b/io_uring/rw.c
+> > index af5a54b5db12..fa7655ab9097 100644
+> > --- a/io_uring/rw.c
+> > +++ b/io_uring/rw.c
+> > @@ -856,7 +856,6 @@ static int io_rw_init_file(struct io_kiocb *req, fm=
+ode_t mode, int rw_type)
+> >         ret =3D kiocb_set_rw_flags(kiocb, rw->flags, rw_type);
+> >         if (unlikely(ret))
+> >                 return ret;
+> > -       kiocb->ki_flags |=3D IOCB_ALLOC_CACHE;
+> >
+> >         /*
+> >          * If the file is marked O_NONBLOCK, still allow retry for it i=
+f it
+> > --
+> > 2.39.5 (Apple Git-154)
+> >
+> >
