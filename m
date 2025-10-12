@@ -1,108 +1,138 @@
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC42D41A8F
-	for <linux-block@vger.kernel.org>; Sun, 12 Oct 2025 18:01:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37DAC25A354
+	for <linux-block@vger.kernel.org>; Sun, 12 Oct 2025 18:40:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760292095; cv=none; b=rP92Hy+ghBwJPzjoPsEuP33dOLPvQNFKN4DkcbRnjRn30yVlUhWzSkNF0BoES/VKlsgVZtwcDuu5oheXZa8alpSKWOo+PXARwz5UZxTBs6AaCEtuz1CFzpa7yC1By//Wqd/DYgEcWK02jqunO06ENSz+qFHi7zHokEM+axKT7pM=
+	t=1760294454; cv=none; b=Ex31I/t8vehepOMPEt2C1ZE9qqEw0Qzw3CTC6ywMGkwCD0A52aA8OBGgAiAkJBq+n1sRcO1NhuVydQToVxC6+AnL/OYwNuK1cPc6ukmvjM9CSomxSf+L3AykoPkryLuf1iEg7Vy5uxtajkQlYH6BFQkPL2RaLUtv20M4bOPNVhk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760292095; c=relaxed/simple;
-	bh=4fayUwMhvNCuwkW+8rNVem+fLCn52jNvzMtaSiWAkLg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kjv6DUbxa3Webp3U+2Mm9VNdYDGNKSwtLhk9wJiYRPhtKOj2uphHuLUXqzkSksvx3tehLQcmzQRlKiN2YEriOngPJhOE357rOUx5MBkCobaf73qJd4QlxWRupIU3w7m49pngM39oJEbXxbPHVQjYEVYuAarAYOkxZjwFAGdRgY4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KOwgGBbw; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1760294454; c=relaxed/simple;
+	bh=jPAdJQCpBQEnf+PFZT9rv3bkEEiZW89ug2y1tCqYIMQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BHEQkRzEgGr8ssaugFVgHZGWv5dNfW9QEyk/LaGCEhy+pfc+Kq8M0jLpG9b0n9UJT/Cq6h3wr6wsuHUPwEodbTriwwy4FvOlIaC9G6Uca+6vGLKQgjMe1K4IvnjfG9pTjMNVIRiPLD3uRhnVXBWjoxSEFNzQ56s+FnR1AKaI5/A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=RPr6lUCf; arc=none smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KOwgGBbw"
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-26e81c17d60so7854845ad.0
-        for <linux-block@vger.kernel.org>; Sun, 12 Oct 2025 11:01:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760292092; x=1760896892; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4fayUwMhvNCuwkW+8rNVem+fLCn52jNvzMtaSiWAkLg=;
-        b=KOwgGBbwqNWEeHxP/ZMjx2TuWDiRiVnut5hGcNGRblR4r7qC26m97EL0/LM5DwxLLx
-         0+ASJqz9LrjseUtmTtV903OQyg2WH5bDmo5IeaCLY/dHK+8BRnVNGQFreiTHQabvrq5Y
-         QaOh/o7K+zojYNHDBNVAP5Mwl1N15Olw7cCdVXbez1SZ2BgaC9r/Ynvr1iNlSrqs+5sv
-         gEad0pnv5ldo4tYa4wcMuVbJSC388Z/2Pw6Q0ryBXBHeERGKFlmOvypcqy4TNx1uPXjS
-         k1EDkgtDKd1V2PWQuxPrQd2mBO//nSpGsLrWQVD0Hr26lMMbA38MeqzwrLYShX3VbTcv
-         wFKQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760292092; x=1760896892;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4fayUwMhvNCuwkW+8rNVem+fLCn52jNvzMtaSiWAkLg=;
-        b=OWU3BSw/3j3U/520Sg2qRSpiXnJwpbd0Me7cAZhFlaZ52/oNKGFrDbumnVG7vwVmQD
-         +NUlQX6Cg5eyfYF/VbHtvr9V/scRRkOWGBxhhHlTdc+eSlig7OcvY/TGbjIj8AZhv9HC
-         cqJVbJsPLDCiNwJhjjYrvc82a9Xvnq2HSkJRhfY3upXd2CgigchPlkvC83c0B6wOTsqg
-         /ABKc+/gws70hgQhffwIFUxGH3znIfAoPf/e+Ml5egH5glWyIpNYMKWLFBcntag04V+Z
-         35Snb/T5L8cZjl1Zaew3DG9RoJ1NTWjAtyWI7irT+DKf7tr+iZWqbX8ymKMMXn1niluo
-         IDig==
-X-Forwarded-Encrypted: i=1; AJvYcCVc7lpnmURBdRsO6BLp9jjhNbgup3d6756QLgtosbhHr9sk6uRrIwX0puNiNksnKbR8Ov/gYUdYbjbNkw==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx9ZyOEaPh2GA3oCpqYnvF8VQww9zbFqp3Oet1Pj/ICynGIRBcy
-	J9WU10U0Ve23wHFS5Au0oThR8c3MFo1LhWuGtCz+8FGSK0r0WFRXriPP8H3PdHTojyU1oaOvIVI
-	nbBj5yTksZGG6iOsRTFP7COlUY5iNsgU=
-X-Gm-Gg: ASbGncsU1oO4GkUyYImGRpOj6/5qgmjm4KGDy0mcYLf3Opw5L5k0MJVq5EYMJXVRvTS
-	nawezMBZnv3yEacMw1WWGsawann/6W70kJEEgFoMR3tviSS4J/cPzMrFoztqs50/VkK0dNpOphg
-	P8ViN2MT1ds6igK3/i5F8jw04iuDi34ZPg5Yl8wuNU5SlVr4yx3ndbKnXmkPQ8RcyrBKZON/xT0
-	YJW7YAn2Wq+YUQwwc6KHL37/TcWKyQLjOkosYXSF6Ghn3RI49O/Iqg6qdKKIlScA+wpM4SGhzr+
-	tdSCqn8nbFNL6VHGXyEiBwxETotvB2A3tkPpDZqNa1H2
-X-Google-Smtp-Source: AGHT+IHYH8KB551DFy/1CS7sVwLsfOMU6Z0zgv1Of6oPsAllrb8RWF6/5SDkS+dRRNp5FM5qU9kgMEXU6hEBhHvJ/v0=
-X-Received: by 2002:a17:902:d2c4:b0:273:a653:bacf with SMTP id
- d9443c01a7336-2902725d2ebmr144860115ad.0.1760292091934; Sun, 12 Oct 2025
- 11:01:31 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="RPr6lUCf"
+Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 59CIdsPa014773;
+	Sun, 12 Oct 2025 18:40:41 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=corp-2025-04-25; bh=PR+j9XQlb20kzlvou4CGq3b4wJvPT
+	Ma5KvHeINjEI6E=; b=RPr6lUCfDsSaTd1rjVydseX3uyyXXGbCM1QvX4JjvOPpy
+	wHGAOacDSCTrkwLJWVlun98cWyvI9kmmgWmWjqzGG/kPmV7+Y/BdSqF+0XjFCgUJ
+	5+k1m8D6tIN0DmjhrMmVQ0nJ95mD81PfEUEbkn86mQiKnIZuy2LY+0frTs1rhfUJ
+	pL8APHKxedoOtkmKlPrBlpdqC1wcFhkrZl9lTXoSKLPCLA5pn2ck4m4OKhKZnP1v
+	1N9dOpDtrzrzEIFADvu6KJ0dYqw6QGPUPHsHjZ8TDK7VrCbm1YDezKjhB9QOggxZ
+	sE3n1eoNkbHjk8dfXK2SMSPRsNtJuaecm5+xbBcbw==
+Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 49qdnc156c-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Sun, 12 Oct 2025 18:40:41 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 59CEKRtD038326;
+	Sun, 12 Oct 2025 18:40:40 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 49qdpcsxee-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Sun, 12 Oct 2025 18:40:40 +0000
+Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 59CIeepH022304;
+	Sun, 12 Oct 2025 18:40:40 GMT
+Received: from ca-dev110.us.oracle.com (ca-dev110.us.oracle.com [10.129.136.45])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 49qdpcsxeb-1;
+	Sun, 12 Oct 2025 18:40:40 +0000
+From: Alok Tiwari <alok.a.tiwari@oracle.com>
+To: axboe@kernel.dk, andriy.shevchenko@linux.intel.com, phasta@kernel.org,
+        fourier.thomas@gmail.com, viro@zeniv.linux.org.uk,
+        martin.petersen@oracle.com
+Cc: alok.a.tiwari@oracle.com, linux-block@vger.kernel.org
+Subject: [PATCH] block: mtip32xx: Fix typos in comments and log messages
+Date: Sun, 12 Oct 2025 11:40:03 -0700
+Message-ID: <20251012184010.198891-1-alok.a.tiwari@oracle.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CANiq72=ox809CAhMijbvxvy_-tx4QgJ=pGbbWfCcZR8J8XFrkg@mail.gmail.com>
- <20251012140451.155219-1-shankari.ak0208@gmail.com>
-In-Reply-To: <20251012140451.155219-1-shankari.ak0208@gmail.com>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Sun, 12 Oct 2025 20:01:19 +0200
-X-Gm-Features: AS18NWDeTKrh-JDZioC1DogND9yn9-Ck_Lq9XxawqjsuxcO889ag6EhHA-dF5Qk
-Message-ID: <CANiq72=hSTpAj7w8bvcwoJkivxD_FPKnx9jD6iNvhsENnnXBzg@mail.gmail.com>
-Subject: Re: [PATCH 1/7] rust: block: update ARef and AlwaysRefCounted imports
- from sync::aref
-To: Shankari Anand <shankari.ak0208@gmail.com>
-Cc: Andreas Hindborg <a.hindborg@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
-	Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, linux-block@vger.kernel.org, 
-	rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
-	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <lossin@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
-	Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-10-12_07,2025-10-06_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 mlxlogscore=999
+ malwarescore=0 mlxscore=0 spamscore=0 suspectscore=0 phishscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2510020000 definitions=main-2510120099
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDExMDAwNiBTYWx0ZWRfX4vB8Z15FE5Pd
+ b0yVoizpc0jK05S67WP9OHqZr16qBPh+f/2TuK1w2oFd+CDky2kraSn15MRJw0C7ro6d0YXy1jH
+ PX/KL40dfMcTsD29DveBr9nPoQFEuuCqdH/FUYL+KXTxkoFtjTRTehQ10I80KcvP52e7OmwNpDa
+ J1C+QQsc3ynQQULZUy/lzmRU24rPiatcLiZot2QU71g+aKjXLwistmDDtZlfUdAmmEClNFt99HE
+ 58eiOq5F8veh/SdCwbOVqnsp7tqHcb+PPFFLncttDhzA55zA6oLZ21qIkHrU14nc/iEg1hgQ2jE
+ 6T5vxk67/5h/UcHLD0Q/JoVE12TeFAJ1PberO9XAczzzdp+QOyVlaHuEZwIwtKK8uQHJabitAVA
+ 2pA2qxMTQJZdVi91kRnEBAdh0Js00i0txNyYkFXm1SAHVe6jJa0=
+X-Proofpoint-GUID: a9jlqaiwJszkxNFaF4i-T9ywRgSKpSkL
+X-Authority-Analysis: v=2.4 cv=ReCdyltv c=1 sm=1 tr=0 ts=68ebf629 b=1 cx=c_pps
+ a=zPCbziy225d3KhSqZt3L1A==:117 a=zPCbziy225d3KhSqZt3L1A==:17
+ a=x6icFKpwvdMA:10 a=yPCof4ZbAAAA:8 a=RXALipHn05_ar3t3B5QA:9 cc=ntf
+ awl=host:12091
+X-Proofpoint-ORIG-GUID: a9jlqaiwJszkxNFaF4i-T9ywRgSKpSkL
 
-On Sun, Oct 12, 2025 at 4:05=E2=80=AFPM Shankari Anand
-<shankari.ak0208@gmail.com> wrote:
->
-> I'll resend it on top of -rc1.
+This patch corrects several minor typos and spelling errors in mtip32xx.c
+- Fixing "ge" -> "get" in a warning message.
+- Correcting "kernrel" -> "kernel", "progess" -> "progress"
+  "strucutre" -> "structure" in comments.
 
-Yeah, please, thanks! (in v2 I think you say it is on top of
-linux-next -- did you mean -rc1?).
+no functional impact.
 
-> I also noticed that several files have received new commits using
-> types::ARef or types::AlwaysRefCounted.
-> I wanted to check if it would make sense to update the documentation
-> to reflect their new file location.
-> Without clear documentation, it might become increasingly difficult
-> to remove the re-export as soon as possible, especially as more such comm=
-its are added.
->
-> Let me know what you think.
+Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
+---
+ drivers/block/mtip32xx/mtip32xx.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-I think it is simpler if I apply (even if temporarily) a commit that
-moves everything and removes the re-export in linux-next -- that way
-people will notice when they try to introduce the code during the
-cycle.
+diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/mtip32xx.c
+index 567192e371a8..df184a9f006f 100644
+--- a/drivers/block/mtip32xx/mtip32xx.c
++++ b/drivers/block/mtip32xx/mtip32xx.c
+@@ -1337,7 +1337,7 @@ static int mtip_get_smart_attr(struct mtip_port *port, unsigned int id,
+ 	memset(port->smart_buf, 0, ATA_SECT_SIZE);
+ 	rv = mtip_get_smart_data(port, port->smart_buf, port->smart_buf_dma);
+ 	if (rv) {
+-		dev_warn(&port->dd->pdev->dev, "Failed to ge SMART data\n");
++		dev_warn(&port->dd->pdev->dev, "Failed to get SMART data\n");
+ 		return rv;
+ 	}
+ 
+@@ -2127,7 +2127,7 @@ static int mtip_hw_submit_io(struct driver_data *dd, struct request *rq,
+ /*
+  * Sysfs status dump.
+  *
+- * @dev  Pointer to the device structure, passed by the kernrel.
++ * @dev  Pointer to the device structure, passed by the kernel.
+  * @attr Pointer to the device_attribute structure passed by the kernel.
+  * @buf  Pointer to the char buffer that will receive the stats info.
+  *
+@@ -2679,7 +2679,7 @@ static int mtip_hw_get_identify(struct driver_data *dd)
+ 		}
+ 	}
+ 
+-	/* get write protect progess */
++	/* get write protect progress */
+ 	memset(&attr242, 0, sizeof(struct smart_attr));
+ 	if (mtip_get_smart_attr(dd->port, 242, &attr242))
+ 		dev_warn(&dd->pdev->dev,
+@@ -3148,7 +3148,7 @@ static int mtip_block_compat_ioctl(struct block_device *dev,
+  * that each partition is also 4KB aligned. Non-aligned partitions adversely
+  * affects performance.
+  *
+- * @disk Pointer to the gendisk strucutre.
++ * @disk Pointer to the gendisk structure.
+  * @geo Pointer to a hd_geometry structure.
+  *
+  * return value
+-- 
+2.50.1
 
-Cheers,
-Miguel
