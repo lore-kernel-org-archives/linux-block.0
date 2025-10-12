@@ -1,248 +1,114 @@
-Received: from mail-vs1-f46.google.com (mail-vs1-f46.google.com [209.85.217.46])
+Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0943B131E49
-	for <linux-block@vger.kernel.org>; Sat, 11 Oct 2025 01:44:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D0C4276054
+	for <linux-block@vger.kernel.org>; Sun, 12 Oct 2025 14:05:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760147044; cv=none; b=jrvTnRkFzUqTTMiNwhm+VSqElyVVYkYDSoDB3gPijtpy/xu14HPtwaDLN99BbU/PTsLCz3cYkhfn53VAEkB372775ZGFWh4anYQP3Q69qJyaACBVvQ0z/WSEEGMh93GdBczYmVl/NWZFUyGHhtMTBPSl53ZzCccoakqLq7ibM6I=
+	t=1760277902; cv=none; b=ZPcn7sNahes4ja/avsxJil8/aaYRvyIgbjIMwSYxtT88d+1hs1pKvAP9a3LWRS1znjW3r4yRGX8acZ4iW/twS/xa/49Qt4RVOBXiLO/vsG0hG2Pibi+VMDvhXr1511wX/oqiShu8SxSWxPrvGpq3YWFhKuvWJYJ6OPHvCKjJucw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760147044; c=relaxed/simple;
-	bh=T+IdLzRTTxOQ0Z7SCLa56SnM6nhwUwKs07m9AmkVVyE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=E0VEzaSOlh9GjgdIUy3sMqIXcgI3MOW4M0KO/bRNj2P9+qFAdXbE1XKv2YDnj+3rOfFZTvfJjTuHwBmXVJdVpBdBSusGRGvnA/pRXzlPqfTSdN9j4umwJc/disegSdDweRaBxuaJK/8JF/3Z2UR53lGxdKG0H16pDZMimBEuk5Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J7Vq8n/8; arc=none smtp.client-ip=209.85.217.46
+	s=arc-20240116; t=1760277902; c=relaxed/simple;
+	bh=SUCKplIlV9GbXZf1FJNwlR6/8RVMJUgrM/szCfbpnQI=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=sM+/IA1pvcIN52dnNHCFZQlzi+9B2MRklYn0ugT0yjSxwS/QIv80K726d+s/CCxM3TTRIKy6cKwcd7JADh4OorZ+D0ge1F/BiqfdZP/0HRpkDrKE6Ns/CPa8m77HwcAx+Ch/Jdb3pev27cnrsv+o3yH/dYeKEKofU70ae8I1vpI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QzAvT7MF; arc=none smtp.client-ip=209.85.215.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J7Vq8n/8"
-Received: by mail-vs1-f46.google.com with SMTP id ada2fe7eead31-55784771e9dso1248279137.1
-        for <linux-block@vger.kernel.org>; Fri, 10 Oct 2025 18:44:02 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QzAvT7MF"
+Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-b63148d25c3so2347428a12.1
+        for <linux-block@vger.kernel.org>; Sun, 12 Oct 2025 07:05:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760147042; x=1760751842; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1760277901; x=1760882701; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=lZhc66zsxEtV1w8Yg5Xh9+RLE7pB3ih7eNk7XgCUWWk=;
-        b=J7Vq8n/8XeoyYAq6UM7v4iusmsqiPV3dCbTwxuZw7EXzoIcuILlPXwCC+KlCQZ5uLA
-         RrPq/PfJzICjcTOM7U15uj/kqrVbmGvV+ZZ0S8BAAaSCEblz4QFq+Mo8r1cf8HUwamwf
-         Pdom9uwpmo5vTEYs/90loRY1KGL1f+WJFWHv8pk5GSAgW5CLPKc7LiI2XcIFC4W5dDER
-         opbcR008ve17+P/H7s2h16+MZd3iKSf+QlEnK7eP+JVRMUNBV4wEKBjbv85SocJa1UVa
-         t1whWnojqaNG0oUQ9cb2TlRJ0gBoVGnt8u+/JpD31c1K6jfgRxTz9vpBTEqFvAfOEyvc
-         IQWw==
+        bh=wi4T0TH8A0fKPF3Zs0o2a/X6S5Z36f1SXjrYZd4ibpk=;
+        b=QzAvT7MFQDWnd6+ebDn9P8mvAQlhCqGZCgvF/XfWUwXBjJRGE28M++c+1qQy07cX/l
+         8HCZJTHSvBUvSEqQDb1j5ebax03wetg8ZF8oqQnEKm4cWYXuzD0zGqh91giWFS+zmayq
+         dGpmKlz1Cv7v4/RwhgYTDckXhD/715PfCqsNXTuDLmyBLh31887P1EcRNM8cw7LpSJhI
+         DmhU1a9JQB2fblefacXZoj2ftFmgMMSjVlafx+0QdeaVQ7UwM9mGp4DJUWYblhYF+Esl
+         teVbvddceYsFKPX+OAbyDyTAVczHEGoMotrJrzv8Eb8bSVl6Lj3rijROdoocazGiPoWW
+         XUyA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760147042; x=1760751842;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1760277901; x=1760882701;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=lZhc66zsxEtV1w8Yg5Xh9+RLE7pB3ih7eNk7XgCUWWk=;
-        b=saVOI6NZTfMbQmUMbaUwwRVoFbgzVPsXPNCVFdYJlraskCxeZL7xCQKrkvKHvSw9kw
-         bUHJ+s457fIxafvnbPDaqUnPGhTA1/XmwwFbWBY/H1teQykoH1AF9KZb/wNIpeZqtBS9
-         RBiYx0FHkUIeHi/qvBZ5cbt7Frfir0g9ajn7iq60UPoCCnmw/3N9k3Chct8WAmcecHDz
-         KXk/cb719E5TUAqh0swRkM/w9swO4hw3pDAZ7LaaNtMlJd6h8iyVx9PxAGrMfFRI3a95
-         cRRn/yhpgNblwdyqnino54NCnl5gIN6r7iHMSslr4vQ/7MQPs0hHpcKu91lCBNq60Pw/
-         MQfg==
-X-Forwarded-Encrypted: i=1; AJvYcCVL7cAC9Q7TS495U1dSG6SKTWzYseNNedvSjTLXM/6DUqzcPiYL7WlGWCsOBW1i3TqqsxoV/ndKxduIEQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxHRZY+lQRXyQV4MEdAI6L6XaVTHEXSukrU6NT5aGTMe7qxMwQA
-	PBEkr7EgrkGbg84fAUkLJR5X1NP+woPIV1YwcJxjdNWa8CoT5JM2SYztsh8oqeb9fP8f0sqTStp
-	KeXskkuty96EdfxuUBek69BrwLnz0ys0=
-X-Gm-Gg: ASbGncvEWsfDWFDZGF1FmK2W6IUfRxqMF5GTq1Ki+P/rt6sWGAMlsOa84Vp5vyWAsBk
-	ThBuXKruzvt9M+RFlSSS5eNyPgnfLMkwZNPnNZn4NRwFQVO4w9Jaqloi4gniu6Ku6PsXorF8KW2
-	3pCMiJhSEY/0YN8gcxf3E03UyHp6LWbQR1pbr0Xg6Eb8OVoTrpJbWikNuoXMSv7Z4J38D5XkuJ5
-	nMIQJKR+xPNATR5HYMHFda+mkD4/bNR
-X-Google-Smtp-Source: AGHT+IE7mG3LNkxY+CyodDwm/x4ptJOMQVJ+H4EmrH8p/RVIObpZc3vVfG1SaOV6rlrj3vGwgT1jiZxnhaAD3dJIuBQ=
-X-Received: by 2002:a05:6102:6cf:b0:524:b344:748d with SMTP id
- ada2fe7eead31-5d5e23474fcmr5780092137.17.1760147041875; Fri, 10 Oct 2025
- 18:44:01 -0700 (PDT)
+        bh=wi4T0TH8A0fKPF3Zs0o2a/X6S5Z36f1SXjrYZd4ibpk=;
+        b=iZh504Id4sR6EooQJJOnUHu+30VUHv1tF1j3VSNvOknFABGBmZ1Xa7DILkZ6mAV2H/
+         kwzftd2v/Z4YCk5V/NzGvb0g+2uActLUj5s1BJIIimrxSBt6xOKz9FI+0EoAlrvqtTY3
+         pI3ie0ySooe1gMgfFQYHZlKHfJVL28CxQYZqtTjPxo9e7BjNwwVyJ35SjlO1vFOgN9UF
+         znFa7qk2DSgGqex6hMfh784cKdIRfiA+P+mqketTcocpDX6DuS0YBfpoPEJtosRj4xjJ
+         KAnONjka+E4SYD5ipiG7MFR+lw+fVONUx485scTIhNIohJiT8fF03IpR479qzisaoEgv
+         Fr0Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWfVKvIs7xcGURqhJ8554mdWEq5QhNOBdZGEtQqFFjEsReTX1G4YsWdrcOjpAxA39BikCTfPvC9BMCKnA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YycalmRdtK+Bpz+8QQxD6sBGVkqaBxzNcjkGrwLps3c1DvaK9N/
+	OUEc9b/nWfZoIdQ7Y/Xyhu3Z7rvm9ZUD9JtRCwiIUDDGKKbFHyr+MDgh
+X-Gm-Gg: ASbGncstJ54nG2tnPQPYoq3XUo1ZogAJBtYXf1HXnUmJ7v4KTwnP4RyM+YG4Xtsszto
+	sbLellK+x0t7sjTWxYHm9KRSaSwG0MD25MQqUm7Ttkfq7wYde8c7F2tNgKm7v6kbFzrSaCy4K9y
+	JO+Q75I31+RESBm8L3D7vMwg7ZFAtIyx9dO2uo6O33fGghGzcdfim1fgRMvl5bYqEJ0lZScc6FN
+	jcXrClQS3fRariBOW69Rv1Nh/hcNLwWPZfuEkm45g9+MhT4A4WISZNBSXUnJUr+rGmHSRRfhSFs
+	0JegkQHwEm1sRZYERIlMOp7bYn3afxYYq/VGNjT0CKppOa2ueDA5tac1JtFmV8u8A0yyBJe4R+I
+	nWpOy7zjILbwgcX7pSte68XJsRUWAnQ+iQgZrp7bInHOX468jipLSZ0Go1Wa0tTfrgDWm
+X-Google-Smtp-Source: AGHT+IGavuFKFawAItq7cPjSq7/3icbEiNsjEbDay5mb/KvWr80bnaNSCF+3IOgnuF8amEVi9WUINg==
+X-Received: by 2002:a17:902:db09:b0:25c:43f7:7e40 with SMTP id d9443c01a7336-29027e788c9mr237734005ad.10.1760277900591;
+        Sun, 12 Oct 2025 07:05:00 -0700 (PDT)
+Received: from shankari-IdeaPad.. ([49.128.169.246])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29034e4930esm106828495ad.54.2025.10.12.07.04.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 12 Oct 2025 07:04:59 -0700 (PDT)
+From: Shankari Anand <shankari.ak0208@gmail.com>
+To: Andreas Hindborg <a.hindborg@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	Alex Gaynor <alex.gaynor@gmail.com>,
+	linux-block@vger.kernel.org,
+	rust-for-linux@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Boqun Feng <boqun.feng@gmail.com>,
+	Gary Guo <gary@garyguo.net>,
+	=?UTF-8?q?Bj=C3=B6rn=20Roy=20Baron?= <bjorn3_gh@protonmail.com>,
+	Benno Lossin <lossin@kernel.org>,
+	Alice Ryhl <aliceryhl@google.com>,
+	Trevor Gross <tmgross@umich.edu>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Shankari Anand <shankari.ak0208@gmail.com>
+Subject: Re: [PATCH 1/7] rust: block: update ARef and AlwaysRefCounted imports from sync::aref
+Date: Sun, 12 Oct 2025 19:34:51 +0530
+Message-Id: <20251012140451.155219-1-shankari.ak0208@gmail.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <CANiq72=ox809CAhMijbvxvy_-tx4QgJ=pGbbWfCcZR8J8XFrkg@mail.gmail.com>
+References: <CANiq72=ox809CAhMijbvxvy_-tx4QgJ=pGbbWfCcZR8J8XFrkg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251011013312.20698-1-changfengnan@bytedance.com> <CALWNXx-gGbAFCNywLZZUNmenTHQGFuapvNe-7irRGnRFJuNUcA@mail.gmail.com>
-In-Reply-To: <CALWNXx-gGbAFCNywLZZUNmenTHQGFuapvNe-7irRGnRFJuNUcA@mail.gmail.com>
-From: fengnan chang <fengnanchang@gmail.com>
-Date: Sat, 11 Oct 2025 09:43:51 +0800
-X-Gm-Features: AS18NWCBO3jy7FdLyGcQVogGXlatyQB1qaqtXtY1KzxOp2alt1gh71U3rIH7rWo
-Message-ID: <CALWNXx_Lt1CLTaxh+xcd24_nTp-DOaOezUkQ=Vv_Snq3vx2MuA@mail.gmail.com>
-Subject: Re: [PATCH] block: enable per-cpu bio cache by default
-To: Fengnan Chang <changfengnan@bytedance.com>, linux-block@vger.kernel.org
-Cc: axboe@kernel.dk, viro@zeniv.linux.org.uk, brauner@kernel.org, jack@suse.cz, 
-	asml.silence@gmail.com, willy@infradead.org, djwong@kernel.org, 
-	hch@infradead.org, ritesh.list@gmail.com, linux-fsdevel@vger.kernel.org, 
-	io-uring@vger.kernel.org, linux-xfs@vger.kernel.org, 
-	linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-cc more maillist
+On Tue, Sep 30, 2025 at 06:00:41PM +0200, Miguel Ojeda wrote:
+>  
+> Thanks, that would be appreciated -- if you can, please rebase it and
+> send it on top of -rc1 when it gets published in less than 2 weeks,
+> then we can apply it soon after.
+> 
+> Cheers,
+> Miguel
 
-On Sat, Oct 11, 2025 at 9:36=E2=80=AFAM fengnan chang <fengnanchang@gmail.c=
-om> wrote:
->
-> The attachment is result of fio test ext4/xfs with
-> libaio/sync/io_uring on null_blk and
->  nvme.
->
-> On Sat, Oct 11, 2025 at 9:33=E2=80=AFAM Fengnan Chang
-> <changfengnan@bytedance.com> wrote:
-> >
-> > Per cpu bio cache was only used in the io_uring + raw block device,
-> > after commit 12e4e8c7ab59 ("io_uring/rw: enable bio caches for IRQ
-> > rw"),  bio_put is safe for task and irq context, bio_alloc_bioset is
-> > safe for task context and no one calls in irq context, so we can enable
-> > per cpu bio cache by default.
-> >
-> > Benchmarked with t/io_uring and ext4+nvme:
-> > taskset -c 6 /root/fio/t/io_uring  -p0 -d128 -b4096 -s1 -c1 -F1 -B1 -R1
-> > -X1 -n1 -P1  /mnt/testfile
-> > base IOPS is 562K, patch IOPS is 574K. The CPU usage of bio_alloc_biose=
-t
-> > decrease from 1.42% to 1.22%.
-> >
-> > The worst case is allocate bio in CPU A but free in CPU B, still use
-> > t/io_uring and ext4+nvme:
-> > base IOPS is 648K, patch IOPS is 647K.
-> >
-> > Also use fio test ext4/xfs with libaio/sync/io_uring on null_blk and
-> > nvme, no obvious performance regression.
-> >
-> > Signed-off-by: Fengnan Chang <changfengnan@bytedance.com>
-> > ---
-> >  block/bio.c        | 26 ++++++++++++--------------
-> >  block/blk-map.c    |  4 ++++
-> >  block/fops.c       |  4 ----
-> >  include/linux/fs.h |  3 ---
-> >  io_uring/rw.c      |  1 -
-> >  5 files changed, 16 insertions(+), 22 deletions(-)
-> >
-> > diff --git a/block/bio.c b/block/bio.c
-> > index 3b371a5da159..16b20c10cab7 100644
-> > --- a/block/bio.c
-> > +++ b/block/bio.c
-> > @@ -513,20 +513,18 @@ struct bio *bio_alloc_bioset(struct block_device =
-*bdev, unsigned short nr_vecs,
-> >         if (WARN_ON_ONCE(!mempool_initialized(&bs->bvec_pool) && nr_vec=
-s > 0))
-> >                 return NULL;
-> >
-> > -       if (opf & REQ_ALLOC_CACHE) {
-> > -               if (bs->cache && nr_vecs <=3D BIO_INLINE_VECS) {
-> > -                       bio =3D bio_alloc_percpu_cache(bdev, nr_vecs, o=
-pf,
-> > -                                                    gfp_mask, bs);
-> > -                       if (bio)
-> > -                               return bio;
-> > -                       /*
-> > -                        * No cached bio available, bio returned below =
-marked with
-> > -                        * REQ_ALLOC_CACHE to particpate in per-cpu all=
-oc cache.
-> > -                        */
-> > -               } else {
-> > -                       opf &=3D ~REQ_ALLOC_CACHE;
-> > -               }
-> > -       }
-> > +       opf |=3D REQ_ALLOC_CACHE;
-> > +       if (bs->cache && nr_vecs <=3D BIO_INLINE_VECS) {
-> > +               bio =3D bio_alloc_percpu_cache(bdev, nr_vecs, opf,
-> > +                                            gfp_mask, bs);
-> > +               if (bio)
-> > +                       return bio;
-> > +               /*
-> > +                * No cached bio available, bio returned below marked w=
-ith
-> > +                * REQ_ALLOC_CACHE to participate in per-cpu alloc cach=
-e.
-> > +                */
-> > +       } else
-> > +               opf &=3D ~REQ_ALLOC_CACHE;
-> >
-> >         /*
-> >          * submit_bio_noacct() converts recursion to iteration; this me=
-ans if
-> > diff --git a/block/blk-map.c b/block/blk-map.c
-> > index 23e5d5ebe59e..570a7ca6edd1 100644
-> > --- a/block/blk-map.c
-> > +++ b/block/blk-map.c
-> > @@ -255,6 +255,10 @@ static struct bio *blk_rq_map_bio_alloc(struct req=
-uest *rq,
-> >  {
-> >         struct bio *bio;
-> >
-> > +       /*
-> > +        * Even REQ_ALLOC_CACHE is enabled by default, we still need th=
-is to
-> > +        * mark bio is allocated by bio_alloc_bioset.
-> > +        */
-> >         if (rq->cmd_flags & REQ_ALLOC_CACHE && (nr_vecs <=3D BIO_INLINE=
-_VECS)) {
-> >                 bio =3D bio_alloc_bioset(NULL, nr_vecs, rq->cmd_flags, =
-gfp_mask,
-> >                                         &fs_bio_set);
-> > diff --git a/block/fops.c b/block/fops.c
-> > index ddbc69c0922b..090562a91b4c 100644
-> > --- a/block/fops.c
-> > +++ b/block/fops.c
-> > @@ -177,8 +177,6 @@ static ssize_t __blkdev_direct_IO(struct kiocb *ioc=
-b, struct iov_iter *iter,
-> >         loff_t pos =3D iocb->ki_pos;
-> >         int ret =3D 0;
-> >
-> > -       if (iocb->ki_flags & IOCB_ALLOC_CACHE)
-> > -               opf |=3D REQ_ALLOC_CACHE;
-> >         bio =3D bio_alloc_bioset(bdev, nr_pages, opf, GFP_KERNEL,
-> >                                &blkdev_dio_pool);
-> >         dio =3D container_of(bio, struct blkdev_dio, bio);
-> > @@ -326,8 +324,6 @@ static ssize_t __blkdev_direct_IO_async(struct kioc=
-b *iocb,
-> >         loff_t pos =3D iocb->ki_pos;
-> >         int ret =3D 0;
-> >
-> > -       if (iocb->ki_flags & IOCB_ALLOC_CACHE)
-> > -               opf |=3D REQ_ALLOC_CACHE;
-> >         bio =3D bio_alloc_bioset(bdev, nr_pages, opf, GFP_KERNEL,
-> >                                &blkdev_dio_pool);
-> >         dio =3D container_of(bio, struct blkdev_dio, bio);
-> > diff --git a/include/linux/fs.h b/include/linux/fs.h
-> > index 601d036a6c78..18ec41732186 100644
-> > --- a/include/linux/fs.h
-> > +++ b/include/linux/fs.h
-> > @@ -365,8 +365,6 @@ struct readahead_control;
-> >  /* iocb->ki_waitq is valid */
-> >  #define IOCB_WAITQ             (1 << 19)
-> >  #define IOCB_NOIO              (1 << 20)
-> > -/* can use bio alloc cache */
-> > -#define IOCB_ALLOC_CACHE       (1 << 21)
-> >  /*
-> >   * IOCB_DIO_CALLER_COMP can be set by the iocb owner, to indicate that=
- the
-> >   * iocb completion can be passed back to the owner for execution from =
-a safe
-> > @@ -399,7 +397,6 @@ struct readahead_control;
-> >         { IOCB_WRITE,           "WRITE" }, \
-> >         { IOCB_WAITQ,           "WAITQ" }, \
-> >         { IOCB_NOIO,            "NOIO" }, \
-> > -       { IOCB_ALLOC_CACHE,     "ALLOC_CACHE" }, \
-> >         { IOCB_DIO_CALLER_COMP, "CALLER_COMP" }, \
-> >         { IOCB_AIO_RW,          "AIO_RW" }, \
-> >         { IOCB_HAS_METADATA,    "AIO_HAS_METADATA" }
-> > diff --git a/io_uring/rw.c b/io_uring/rw.c
-> > index af5a54b5db12..fa7655ab9097 100644
-> > --- a/io_uring/rw.c
-> > +++ b/io_uring/rw.c
-> > @@ -856,7 +856,6 @@ static int io_rw_init_file(struct io_kiocb *req, fm=
-ode_t mode, int rw_type)
-> >         ret =3D kiocb_set_rw_flags(kiocb, rw->flags, rw_type);
-> >         if (unlikely(ret))
-> >                 return ret;
-> > -       kiocb->ki_flags |=3D IOCB_ALLOC_CACHE;
-> >
-> >         /*
-> >          * If the file is marked O_NONBLOCK, still allow retry for it i=
-f it
-> > --
-> > 2.39.5 (Apple Git-154)
-> >
-> >
+Hi Miguel,
+
+I'll resend it on top of -rc1.
+
+I also noticed that several files have received new commits using 
+types::ARef or types::AlwaysRefCounted.
+I wanted to check if it would make sense to update the documentation
+to reflect their new file location.
+Without clear documentation, it might become increasingly difficult
+to remove the re-export as soon as possible, especially as more such commits are added.
+
+Let me know what you think.
+
+Best regards,
+Shankari
