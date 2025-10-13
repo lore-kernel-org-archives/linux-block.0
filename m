@@ -1,62 +1,85 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from 004.mia.mailroute.net (004.mia.mailroute.net [199.89.3.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4FCB194A73;
-	Mon, 13 Oct 2025 19:01:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 919A02D97BD
+	for <linux-block@vger.kernel.org>; Mon, 13 Oct 2025 19:28:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760382080; cv=none; b=QqQA8Z+nd4Zp8GSDrI7oxbJJYWJQ6MOKpgONcIuV3fbR9sp4SK2uj829UiLo1J77SLmoV5zlnRqsEz5Wn/LiIBSga2V1pFOZlfeymsgWCTFT9SKEy5fdAgrzm+QnZfbxYFNIkVqbwx9l/EshWnFk7+PkN8xjrUvTStnX8iQupgU=
+	t=1760383702; cv=none; b=LNrfsETpIkpsamw0OBOyZ6x0l1MuBX1pmdBAQeo6wV77AolOfsGvSCQi7SWC5EWtN0zGx6k+WJXBdtFBWBiUyrCgLQLtkecafwkehzFpUJBiRlTmOzshtytN+zErfyU+bfdgmjHoqeyfIzZPKiNd9F5uu8I/pRgydpiTD4/INNs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760382080; c=relaxed/simple;
-	bh=XQDkE/8tBk6nehhOH0iQzIUwEp3GEInWpkiI99TIOQg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZkGsGU8QDygWZ3eyvgI6020B0jdybJ8rSekxJgfuygp9HQm76GXBTXbYIr8chx+9q99N+FyhqjGbIhpSGuHgVwyeV2B0xHG6uXgKVtx0Mei0RJj7O93+g/6tKNrc/nM63aGjn6dr4aIhGXLnbdG0dZ+uBhcCu9yzvOLF6F4D2P4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Qhaz/Tnw; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1760383702; c=relaxed/simple;
+	bh=ANSDfvvEmdp2eTq5092OB+KXtxwLop0sFn+kfgouwMg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hl3j3hOQSgb5yN/YFm4cNMNRrIkqUGtvrwCMqm6ssz6WIVRl9Ry2/nHqw8GZMB/JQrS4ksmB05kZeZCqnHJGpXVcNagniPn1fRepS5sejdYwxEeoHGQz5oiTrW9EczIATlrQ34vbzAnDNL9QKtHlGqKO4pyPsoH+rW/E3JkQk0s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=qMCveOyF; arc=none smtp.client-ip=199.89.3.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Qhaz/Tnw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43C89C4CEE7;
-	Mon, 13 Oct 2025 19:01:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760382080;
-	bh=XQDkE/8tBk6nehhOH0iQzIUwEp3GEInWpkiI99TIOQg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Qhaz/TnwVyoz6uNWfuBZZDGSDBBQT6YiFDSTiw6kj9qLlFOT5yPCC3xtvMC1oXAK+
-	 CntVwTbpTyhaLvipsZtw0+6KlWL0FHX5K1/R3VcP38joXFPoXKLLlag80ONETCfTjY
-	 09I8r/dX4oNga1FjMvtD6c64E9nTjuF2naqiXX/IXQb0Xp68Q2n8M+nNr4mysTueJU
-	 vLgiUWhc/QVS9cuquDY4/nQ/Erv9bPgkja5lOUhvO37poGzsK0+J793cIGg85RqJ/X
-	 keI5PZM5HeXEtGD2dk9F1bOioWxlrxIQstXRzaGt9t1SfdcZntRWMXzcbnlMzvLtDE
-	 tCLNIpfS2yW0A==
-Date: Mon, 13 Oct 2025 13:01:18 -0600
-From: Keith Busch <kbusch@kernel.org>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-	Leon Romanovsky <leonro@nvidia.com>,
-	Jason Gunthorpe <jgg@nvidia.com>, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-	Sagi Grimberg <sagi@grimberg.me>
-Subject: Re: [PATCH 3/4] block-dma: properly take MMIO path
-Message-ID: <aO1MfsuWeteOsBve@kbusch-mbp>
-References: <cover.1760369219.git.leon@kernel.org>
- <cf4f6dfee380351e68932d4d114422364097dda5.1760369219.git.leon@kernel.org>
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="qMCveOyF"
+Received: from localhost (localhost [127.0.0.1])
+	by 004.mia.mailroute.net (Postfix) with ESMTP id 4clnSg3LBHzm0yT9;
+	Mon, 13 Oct 2025 19:28:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:mime-version:x-mailer:message-id:date
+	:date:subject:subject:from:from:received:received; s=mr01; t=
+	1760383698; x=1762975699; bh=SsyGSiiFdmAXcVa8gwtyyaHwfeWNEP7tMDo
+	lrsDVeRI=; b=qMCveOyFZ5epy6tbn0hxQQAlf3lX2Frhz4ZPDky3rJoL37zMeK4
+	4XZmoWxqR/D699J60DMD9jkqZYqoIm29CJMKxwv6gL6AwU9JvBjyH2GtAz/d8Bdo
+	ehxtJhthZsGoeNO9OgDFyU5QxO6TAkHCrKnwhnmVCATh5uX5Q6lwhMwspYKCLqur
+	nieLEdI1PmNnMtTjQaVp6gGKX+9LcEq00ZtIUOk+IndmP0uXInV98V0z5X2QiStf
+	qD2rbKry3yNn37wZCfrLLfTz5NiE6sPhqn1UWraaXZRM6xz7+Jl3IY55yX3O4w6T
+	f67Vv/T6Vd2/R21pfMbkRZjodp02RmvhoLw==
+X-Virus-Scanned: by MailRoute
+Received: from 004.mia.mailroute.net ([127.0.0.1])
+ by localhost (004.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id XR4z8Ebghk1t; Mon, 13 Oct 2025 19:28:18 +0000 (UTC)
+Received: from bvanassche.mtv.corp.google.com (unknown [104.135.180.219])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 004.mia.mailroute.net (Postfix) with ESMTPSA id 4clnSb74Kyzm0yTF;
+	Mon, 13 Oct 2025 19:28:14 +0000 (UTC)
+From: Bart Van Assche <bvanassche@acm.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bvanassche@acm.org>
+Subject: [PATCH 0/2] block/mq-deadline: Fix BLK_MQ_INSERT_AT_HEAD support
+Date: Mon, 13 Oct 2025 12:28:01 -0700
+Message-ID: <20251013192803.4168772-1-bvanassche@acm.org>
+X-Mailer: git-send-email 2.51.0.760.g7b8bcc2412-goog
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cf4f6dfee380351e68932d4d114422364097dda5.1760369219.git.leon@kernel.org>
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Oct 13, 2025 at 06:34:11PM +0300, Leon Romanovsky wrote:
->  static bool blk_dma_map_direct(struct request *req, struct device *dma_dev,
->  		struct blk_dma_iter *iter, struct phys_vec *vec)
->  {
-> +	unsigned int attrs = 0;
-> +
-> +	if (req->cmd_flags & REQ_MMIO)
-> +		attrs |= DMA_ATTR_MMIO;
+Hi Jens,
 
-Since data and integrity paylods use these same functions and may point
-to different kinds of memory, I think you'd have to pass the 'attrs'
-from the caller since it knows which flags to check for MMIO dma.
+Commit c807ab520fc3 ("block/mq-deadline: Add I/O priority support")
+modified the behavior of request flag BLK_MQ_INSERT_AT_HEAD from
+dispatching a request before other requests into dispatching a request
+before other requests with the same I/O priority. This is not correct sin=
+ce
+BLK_MQ_INSERT_AT_HEAD is used when requeuing requests and also when a flu=
+sh
+request is inserted. Both types of requests should be dispatched as soon
+as possible. Hence this patch series that makes the mq-deadline I/O sched=
+uler
+again ignore the I/O priority for BLK_MQ_INSERT_AT_HEAD requests.
+
+Please consider this patch series for the next merge window.
+
+Thanks,
+
+Bart.
+
+Bart Van Assche (2):
+  block/mq-deadline: Introduce dd_start_request()
+  block/mq-deadline: Switch back to a single dispatch list
+
+ block/mq-deadline.c | 129 +++++++++++++++++++++-----------------------
+ 1 file changed, 61 insertions(+), 68 deletions(-)
+
