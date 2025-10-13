@@ -1,28 +1,28 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8F8C3093AD;
-	Mon, 13 Oct 2025 14:58:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B7D03093C9;
+	Mon, 13 Oct 2025 15:08:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760367514; cv=none; b=kv7NDtL0zHNUxl68mpln3uq/2qsbw82R8V0Jly2w39QY0KcjXneglGcz234X2DpCvaIXgT8Xkcy1a06rm55boqeclxFN7pNeyaU5uRejWSGvijdAopghgRkFIHoct1YcVvkz92JCv2zGyuzwk1UunO2fqSjDXhz/zG4oiOIkNNQ=
+	t=1760368127; cv=none; b=m3/xZ0hULEBw5FQneaM3480NOXfVuvaIIcjEd0a2de4RPIipvlOTsx8h4pYo8Qni8Sh85TZ+KDDHhV4OhMe0ZU3/ZaKf2k18jLQaXmf1VRYodctsAOAHX+74KCwqDcf7fl1Z7D9L4sdLMWwfTY/5UxdaQC/cYDsmHVNBEb6rWjE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760367514; c=relaxed/simple;
-	bh=7/6GbFERhTH+yGL94A/7UvmXfOTUjwQfbxkmJgUrViQ=;
+	s=arc-20240116; t=1760368127; c=relaxed/simple;
+	bh=c52cp2Mq362xHgpMzwKWS5joqtAlHPq8sZ/xvOXwK24=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bW0W7hjmKle0HaaXFaW+jCj2VhmImsPPyTbZBbDN2MQIFTp5zU2KMW3ly+sP26NE8wD7H4sQAp4SEXtkuaLprgfQTDvc5ua6ZHpYxc2BOVrnIXzF2//AXSBiRNtjSiUgTmyKv6TNkPJy0as/183Gh2n8cEvbzZ1b+XQePaF6nsk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=oZ4nm5x4; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=RgCEBUfcok3cpQCSYxCitzteNqQzitle8NzzdXCcYGShhpS2kA+B/JSLxT702diY4M6iV5zy/U/SJ8j7wirI+PL1+wInwX5PSkhiKh4Ie1Rd3xVYIPlmEgZ+ThTmQ52Kmgx/YwLxTMrVI0oplaFoYK0Y2k9xRWd2wXd879T4p0M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=aJxKLbA0; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="oZ4nm5x4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA9DAC4CEFE;
-	Mon, 13 Oct 2025 14:58:33 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="aJxKLbA0"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E984AC4CEE7;
+	Mon, 13 Oct 2025 15:08:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1760367514;
-	bh=7/6GbFERhTH+yGL94A/7UvmXfOTUjwQfbxkmJgUrViQ=;
+	s=korg; t=1760368127;
+	bh=c52cp2Mq362xHgpMzwKWS5joqtAlHPq8sZ/xvOXwK24=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=oZ4nm5x4pm1SdHQSaVeOYkHkZk95hECpneUjdxzE4SM9QYSz6KTMzfxTEJ7PmsJUG
-	 689Np+nQhgPvY9U94sJMaUSbMVmfXDLyJjtSOr1w7Oqvn/n0zL3XTXytUmLM/qXVeC
-	 lyVtlo7Wv2M6aqG9UZscoxfdvgVPTZ8JX31B+O+I=
+	b=aJxKLbA0nWhBNpVz99PKT3emcCD1IRwFkbkumzSCbivaqleU6SVLi1yxySlleW2ck
+	 k80O2909vWIlR3zTwU8VBB6iVWNv3fvnldKsLyuFtKt/pNrOhtEzPrMwcHRniXvlyJ
+	 a/o40+blZ1pSwEREqTzpuJB7f5A6SnmFvo8zXmLk=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -36,12 +36,12 @@ Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	linux-block@vger.kernel.org,
 	nbd@other.debian.org,
 	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.6 039/196] nbd: restrict sockets to TCP and UDP
-Date: Mon, 13 Oct 2025 16:43:50 +0200
-Message-ID: <20251013144316.615991401@linuxfoundation.org>
+Subject: [PATCH 6.12 053/262] nbd: restrict sockets to TCP and UDP
+Date: Mon, 13 Oct 2025 16:43:15 +0200
+Message-ID: <20251013144328.039218970@linuxfoundation.org>
 X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20251013144315.184275491@linuxfoundation.org>
-References: <20251013144315.184275491@linuxfoundation.org>
+In-Reply-To: <20251013144326.116493600@linuxfoundation.org>
+References: <20251013144326.116493600@linuxfoundation.org>
 User-Agent: quilt/0.69
 X-stable: review
 X-Patchwork-Hint: ignore
@@ -53,7 +53,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-6.6-stable review patch.  If anyone has any objections, please let me know.
+6.12-stable review patch.  If anyone has any objections, please let me know.
 
 ------------------
 
@@ -85,10 +85,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 8 insertions(+)
 
 diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 3742ddf46c55a..27a05b1521f69 100644
+index c705acc4d6f4b..de692eed98740 100644
 --- a/drivers/block/nbd.c
 +++ b/drivers/block/nbd.c
-@@ -1128,6 +1128,14 @@ static struct socket *nbd_get_socket(struct nbd_device *nbd, unsigned long fd,
+@@ -1156,6 +1156,14 @@ static struct socket *nbd_get_socket(struct nbd_device *nbd, unsigned long fd,
  	if (!sock)
  		return NULL;
  
