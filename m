@@ -1,52 +1,54 @@
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 854272E0902;
-	Mon, 13 Oct 2025 06:26:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DCB22E2F1A;
+	Mon, 13 Oct 2025 06:45:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760336789; cv=none; b=rdxJyvhZJ8QkCApr9asqaPBOMpIgyTz5uZrK6aZ915dtqnQEBSEQm+07vilC5oSij5BUify6vXg5HESRqvpIPI6SnixcRE+UL9cwoIN9TnGLcOaDjryykDYRUj2J4lIgTTcjMzy+PqCN5YRwzUqfGD1aiJR54qPcVcD3wZXROqI=
+	t=1760337904; cv=none; b=rRcNJybkAkdHfQ31Luc1m/SpzBUYlZuoPFHMTaIsrOZ82zuFKrSMJGXsNA7VcJoz9nMxSecqGK3MUvC6N5ABfgTKXZR+3qu4cVhQumIXtqiOJ93poBSWQDSy4UYY38WstGkJwaXK/4P9IDm8kECnTsFSBte9KaIi419b7gJZ9Us=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760336789; c=relaxed/simple;
-	bh=vbKncTUnW0SDgxIMV/xZOHOGhSy4m/PbQfk2ZEL7F34=;
+	s=arc-20240116; t=1760337904; c=relaxed/simple;
+	bh=FgRFBbP8P5fV8E314WVTZ5BzxJCmZ5LLaCDYigU4+TI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Y56F6iFDTuTDqNEy2of7O52MMuGb7Lvn3SrFi7laB+49vg1eiEao5oBbUOspbkfFtEjjIG8kwhXEv46CFM7aEieOWYqnr86ky/5W1gbLCO744Et5wR3fYTpbhHgvdlh2yaiOB8yJFf8WRH8Dwek67yETvg+dVOFvaAVOMVQ2GTU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=i9gLTuyT; arc=none smtp.client-ip=198.137.202.133
+	 Content-Type:Content-Disposition:In-Reply-To; b=mujny9BDxMcetNGN/orpMlZbmIugtZRM72qN0DvmNK7iKfB9kIfZSMU76KA5FuQ848dZ/kQLZvI2qBzV8zcFZcKWB2Ktx+Y5N/aJQ1vuYjWDAg/rolQHj/bSFVIUaAXIRWYeCL9A8oMb5B7JDk6+kXN1tacQbGaJZyg/v4kOxc4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=g52eOs+T; arc=none smtp.client-ip=198.137.202.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="i9gLTuyT"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="g52eOs+T"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
 	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=kIugL04z9TJ0M/06doyNc0me9LOxYYhXKGY7hU7qIYs=; b=i9gLTuyTpsPUOnpl7T1yAsaW6n
-	apUI7yby3tuZZLYxHc5Vzgon9ZxSdrRB3N1XrDjdXLW7FsfksXepGLIjppFDMzW9PXBemX9rDVFnu
-	cq8+uaMukIUxQcjHTBWzAjE8MlzPVSUJnYYISZbUo8A8Nld0RYl3gJ9/h4gDpvDhVA2KH1/5mvCd5
-	BqeY0lULi2AN32ybEl13VTyfwAgw1wxOZdzer7SSr75URabqpa6NsQyobqi/m80y3g7hv2hZSgBPo
-	btWHV0mz6wf4QMD3NIUL9z96dkO8094QlUMAJm8u6U34E/ZooV2iDms4HgZzGPC18kUNVSjC2Otg7
-	TjIIV5DQ==;
+	bh=CK6xCOG1HC+zooaL67URetqqCyoarWjYFpW68lZJ0Jg=; b=g52eOs+TJooN70t73Ap5LaWvb/
+	tDW2aFYo1hCGOfJNG56k9V76XHyv8t9sdwaVxNXaIjgUWyTSWXRyihXJNsYgIhrSdF0r7F8n2mf48
+	KyKVu9Xd29YJFNTqgMkLBFOt96lGLeP0TLf1DNGQ4Ke6fUUEMO8tGmt6uCiU154rphKsXG7zMIrTq
+	y1ctylhYAgkk4jxJSpagC+OOngT90ufONdearUKda+EaFjmd7kAjf64XDCou3dQHP37VbApXtYZPw
+	663yF/gmCorKESypTCX50kkSPDGtlr361yfhYYr9aLEmfBXX5g+9ocAZzLwu7a3yC1RUqEpEYApXC
+	0krra5gw==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1v8C0m-0000000CNjo-2bVN;
-	Mon, 13 Oct 2025 06:26:24 +0000
-Date: Sun, 12 Oct 2025 23:26:24 -0700
+	id 1v8CIe-0000000CQN3-19Sa;
+	Mon, 13 Oct 2025 06:44:52 +0000
+Date: Sun, 12 Oct 2025 23:44:52 -0700
 From: Christoph Hellwig <hch@infradead.org>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org, Mikulas Patocka <mpatocka@redhat.com>,
-	Zhaoyang Huang <zhaoyang.huang@unisoc.com>,
-	Dave Chinner <dchinner@redhat.com>, linux-fsdevel@vger.kernel.org,
-	io-uring@vger.kernel.org
-Subject: Re: [PATCH V4 6/6] loop: add hint for handling aio via IOCB_NOWAIT
-Message-ID: <aOybkCmOCsOJ4KqQ@infradead.org>
-References: <20250928132927.3672537-1-ming.lei@redhat.com>
- <20250928132927.3672537-7-ming.lei@redhat.com>
- <aN92BCY1GQZr9YB-@infradead.org>
- <aOPPpEPnClM-4CSy@fedora>
- <aOS0LdM6nMVcLPv_@infradead.org>
- <aOUESdhW-joMHvyW@fedora>
- <aOX88d7GrbhBkC51@infradead.org>
- <aOcPG2wHcc7Gfmt9@fedora>
+To: Suren Baghdasaryan <surenb@google.com>
+Cc: akpm@linux-foundation.org, david@redhat.com, lorenzo.stoakes@oracle.com,
+	Liam.Howlett@oracle.com, vbabka@suse.cz, alexandru.elisei@arm.com,
+	peterx@redhat.com, sj@kernel.org, rppt@kernel.org, mhocko@suse.com,
+	corbet@lwn.net, axboe@kernel.dk, viro@zeniv.linux.org.uk,
+	brauner@kernel.org, hch@infradead.org, jack@suse.cz,
+	willy@infradead.org, m.szyprowski@samsung.com, robin.murphy@arm.com,
+	hannes@cmpxchg.org, zhengqi.arch@bytedance.com,
+	shakeel.butt@linux.dev, axelrasmussen@google.com,
+	yuanchu@google.com, weixugc@google.com, minchan@kernel.org,
+	linux-mm@kvack.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, iommu@lists.linux.dev,
+	Minchan Kim <minchan@google.com>
+Subject: Re: [PATCH 1/8] mm: implement cleancache
+Message-ID: <aOyf5FxH8rXmCxLX@infradead.org>
+References: <20251010011951.2136980-1-surenb@google.com>
+ <20251010011951.2136980-2-surenb@google.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -55,17 +57,11 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aOcPG2wHcc7Gfmt9@fedora>
+In-Reply-To: <20251010011951.2136980-2-surenb@google.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Thu, Oct 09, 2025 at 09:25:47AM +0800, Ming Lei wrote:
-> Firstly this FS flag isn't available, if it is added, we may take it into
-> account, and it is just one check, which shouldn't be blocker for this
-> loop perf improvement.
-> 
-> Secondly it isn't enough to replace nowait decision from user side, one
-> case is overwrite, which is a nice usecase for nowait.
-
-Yes.  But right now you are hardcoding heuristics which is overall a
-very minor user of RWF_NOWAIT instead of sorting this out properly.
+Please don't add abstractions just because you can.  Just call directly
+into your gcma code instead of adding a costly abstraction with a single
+user.  That'll also make it much eaiser to review what GCMA actually
+does.
 
