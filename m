@@ -1,158 +1,110 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A6C2271468
-	for <linux-block@vger.kernel.org>; Mon, 13 Oct 2025 12:50:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 024762BF009;
+	Mon, 13 Oct 2025 14:50:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760359833; cv=none; b=FTaf6D/pewWevzCYAVwpnnKozW34v2D4mx51ejQc+VBJwWyt8KEwSE4cQCWl+yPdh4isjrUq94m1XSTCiTE8PC+3bopXrwHWtrdVNZxNW3GPQGh2JGJreEN2g64Tmy2YmToeFNAycAe9nCJGutMxLcJvAUsCsZ09OY7DRCCrwT4=
+	t=1760367044; cv=none; b=nkukHzdepdQyUVb56YaMy8TU3ZqR+MpuGC9umPxPiDUdw8m9X+8Mn/D0RsrE0uL/EoYGkhtE8eypjYrLQYrvyydT8VUg6bbGfBUWOMhx7wF5UZXsZaSRw/J0blsgtBfnojijbeKad/CBHT857JO2wFENf+raeyJcPT0goOgh5K4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760359833; c=relaxed/simple;
-	bh=/vbJN+GTFa73FryYW5KO21cm50erek3RkwQo2KmYHuE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=K0xbZAHXkBtUslMknfeqZJKDwRVniXll3OW0pXd9pG5KKwJu2UbwQWTHb6hwdhasSfnFIzRnw2roJgyyEwyUyb43xHO72GKQ5WmqfQtwTKfW7EAwTMYgfFkPraq0gCF6wIfNOiGx9V0nCdDik9wES5IfaqD+hp0FVx2Y3KIAOOE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ApjK8+TF; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1760367044; c=relaxed/simple;
+	bh=R89kp0iLYdk1U26/++/e06fNrPuyMTwTnm1iRfn6sSg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=o95OBXT9g1DO8FzoNEXc8I/jyMn327K2LyCkUZL84IhNcvpPQOAxmoBr1epViSCtoRhSOPDiw8Una4Q7ZBepY850xPpCee7zLPvCKpZSuHygBEaVkCgqXMlpM97CuSWsHxUDV3xjpqS4B0OlE78kmdJJhdVEyH5uClzcLIh1k6w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=P3FjiUPi; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ApjK8+TF"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1760359830;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=fmLpGViBdbcMLzx1bb+Kxqb3+3UtyUNscErHdno+a+c=;
-	b=ApjK8+TFmj8PXajDObDIt9yfNi3EoONxgd2NJAwnKwimYfnsS5Oir/jBFUCDgIB+kXO8Bd
-	hsEiNDymu2Eb70hbPA/2uDUyE3j1Hld+btEopoW/4UU4jt88msJmn0VS3QcDn/KIAjykAZ
-	pVUXyuQrVIsA8qlwe/Q2TGF5t5bpQPY=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-453-Tc4CH4YFMUKOG4Ni1-mgHw-1; Mon, 13 Oct 2025 08:50:29 -0400
-X-MC-Unique: Tc4CH4YFMUKOG4Ni1-mgHw-1
-X-Mimecast-MFC-AGG-ID: Tc4CH4YFMUKOG4Ni1-mgHw_1760359828
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-46e3ef2dd66so27406355e9.1
-        for <linux-block@vger.kernel.org>; Mon, 13 Oct 2025 05:50:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760359828; x=1760964628;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=fmLpGViBdbcMLzx1bb+Kxqb3+3UtyUNscErHdno+a+c=;
-        b=PyQgHSZEffEDAhLgG3GeJLJT0U61RYvPUnFeZyRbCg/W9rP0EAGErPG8ekH/0Ii6OP
-         8U+0BV7Hdm9GY5Q67SLZE1PvGArO94lg2yvcFGUHIvkb8b8f2joaLTPvaXZTH4yY4PS3
-         QBPjgBfLclKIIlUP1plEYNYjp8v6aCQWAY0Ad00ejvsMrHoNpgqeBPXuqBQIKRIHMJQV
-         uOpTywPldFbHekvcSUcMPER8OQ0+yp/kee2EgTJEuR0xOmgCd8limgzxWIz1d1BZ1mOW
-         JHHx/IPPTks3Guza+MsN2aKwzDkpQYdp4b7Fs2gKheHhBSnWXnvwJLduHn75LHuYi6hb
-         G4mA==
-X-Forwarded-Encrypted: i=1; AJvYcCV+fobArvHLQ2iyR5viZcIsqqGnTE9fR/ha4uSkTKfu3o3V3ZTCuX/9GscDqKvldKnY5ZPxNS42R1ZPCg==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz9T6lvdSLC4Dudj1VC9AKuz5iDtYu85jcoetA+M0dT8037DGWK
-	/Rn0hhZ2OyouLvYKuEB1CiJAyFhDTzJLmIwefWA2opR5Vat7+W1xonFX+VymLQLHT3M484vLQzi
-	+XQkNno5dL6BNzusOvsPs/204Jm4MI376wXLp98wkXzoWTXrkL/PUysIgwFmmQVZG
-X-Gm-Gg: ASbGncst2QxrH7jBaVfzQ1rF+pd1Qrd/g9V5QGgqlyIc3ImoUpQ0KJiSTcSr9tTnt7P
-	CEcX9KjudTJcKEW8ii53NW+lURjbk33RMEgXu1GsH3a18HTEk0BqZOVK4Csmh3u8irpcxCqAPhX
-	taUWBetK+oZSbJL0AqhK2Oiv8orFXL/HKJOUCgps3ImUWGcrr22xhLb3wo24EJxOJsz/XOITogk
-	M+GTOPsYGCd7Qr7yjZb+bK9ftg9fvltmpoN1XZxudh3fY+Z0OML6Bp8jaiPexxdHf6/Pre333PX
-	nWgZ7uuUGUdSpxoNqqE9iInIfQMzDu6R5Jxg1DbD7uq5fr/o3QG5ATd2Bp6OMtPyaNIBpqDiCC3
-	FGWo=
-X-Received: by 2002:a05:600c:6011:b0:45c:b642:87a6 with SMTP id 5b1f17b1804b1-46fa28bbca1mr126817185e9.0.1760359827997;
-        Mon, 13 Oct 2025 05:50:27 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGMMoKs4VS2gHV3gKsNnQk9DNjQ77BVoRLFBciblN4uYmPY7ldMdNRqp+3ZL0M1o/a3ErG8+Q==
-X-Received: by 2002:a05:600c:6011:b0:45c:b642:87a6 with SMTP id 5b1f17b1804b1-46fa28bbca1mr126817005e9.0.1760359827614;
-        Mon, 13 Oct 2025 05:50:27 -0700 (PDT)
-Received: from [192.168.3.141] (tmo-083-189.customers.d1-online.com. [80.187.83.189])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46fb49c3e49sm183435545e9.16.2025.10.13.05.50.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 13 Oct 2025 05:50:27 -0700 (PDT)
-Message-ID: <3fdede63-0bb7-4618-af45-6605ed25b6c0@redhat.com>
-Date: Mon, 13 Oct 2025 14:50:24 +0200
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="P3FjiUPi"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80328C4CEE7;
+	Mon, 13 Oct 2025 14:50:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1760367043;
+	bh=R89kp0iLYdk1U26/++/e06fNrPuyMTwTnm1iRfn6sSg=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=P3FjiUPiiXXMVThDwxC9HwMY7q+1UACKF9/ezuyfgqW2vmDsx69VhNNFduFVkFf9t
+	 iL/iRTJLWXjyNMoulOEVh/AB8ULteeih+vlqVVpJm+fX/tTlrQfhiNPymsg7AoWNfm
+	 YmAV2wjD/FXz4d4J+wm3+5lMjsqletEisZcrWESo=
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: stable@vger.kernel.org
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	patches@lists.linux.dev,
+	syzbot+e1cd6bd8493060bd701d@syzkaller.appspotmail.com,
+	Eric Dumazet <edumazet@google.com>,
+	Mike Christie <mchristi@redhat.com>,
+	"Richard W.M. Jones" <rjones@redhat.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Yu Kuai <yukuai1@huaweicloud.com>,
+	linux-block@vger.kernel.org,
+	nbd@other.debian.org,
+	Sasha Levin <sashal@kernel.org>
+Subject: [PATCH 6.1 072/196] nbd: restrict sockets to TCP and UDP
+Date: Mon, 13 Oct 2025 16:44:05 +0200
+Message-ID: <20251013144317.182186217@linuxfoundation.org>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20251013144314.549284796@linuxfoundation.org>
+References: <20251013144314.549284796@linuxfoundation.org>
+User-Agent: quilt/0.69
+X-stable: review
+X-Patchwork-Hint: ignore
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 08/10] mm: remove filemap_fdatawrite_wbc
-To: Christoph Hellwig <hch@lst.de>,
- "Matthew Wilcox (Oracle)" <willy@infradead.org>,
- Eric Van Hensbergen <ericvh@kernel.org>, Latchesar Ionkov
- <lucho@ionkov.net>, Dominique Martinet <asmadeus@codewreck.org>,
- Christian Schoenebeck <linux_oss@crudebyte.com>, Chris Mason <clm@fb.com>,
- David Sterba <dsterba@suse.com>, Mark Fasheh <mark@fasheh.com>,
- Joel Becker <jlbec@evilplan.org>, Joseph Qi <joseph.qi@linux.alibaba.com>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
- Christian Brauner <brauner@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
- Jan Kara <jack@suse.cz>, linux-block@vger.kernel.org, v9fs@lists.linux.dev,
- linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, jfs-discussion@lists.sourceforge.net,
- ocfs2-devel@lists.linux.dev, linux-xfs@vger.kernel.org, linux-mm@kvack.org
-References: <20251013025808.4111128-1-hch@lst.de>
- <20251013025808.4111128-9-hch@lst.de>
-From: David Hildenbrand <david@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- qIws/H2t
-In-Reply-To: <20251013025808.4111128-9-hch@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 13.10.25 04:58, Christoph Hellwig wrote:
-> Replace filemap_fdatawrite_wbc, which exposes a writeback_control to the
-> callers with a __filemap_fdatawrite helper that takes all the possible
-> arguments and declares the writeback_control itself.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
+6.1-stable review patch.  If anyone has any objections, please let me know.
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+------------------
 
+From: Eric Dumazet <edumazet@google.com>
+
+[ Upstream commit 9f7c02e031570e8291a63162c6c046dc15ff85b0 ]
+
+Recently, syzbot started to abuse NBD with all kinds of sockets.
+
+Commit cf1b2326b734 ("nbd: verify socket is supported during setup")
+made sure the socket supported a shutdown() method.
+
+Explicitely accept TCP and UNIX stream sockets.
+
+Fixes: cf1b2326b734 ("nbd: verify socket is supported during setup")
+Reported-by: syzbot+e1cd6bd8493060bd701d@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/netdev/CANn89iJ+76eE3A_8S_zTpSyW5hvPRn6V57458hCZGY5hbH_bFA@mail.gmail.com/T/#m081036e8747cd7e2626c1da5d78c8b9d1e55b154
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Cc: Mike Christie <mchristi@redhat.com>
+Cc: Richard W.M. Jones <rjones@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: Yu Kuai <yukuai1@huaweicloud.com>
+Cc: linux-block@vger.kernel.org
+Cc: nbd@other.debian.org
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/block/nbd.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index 120b75ee703d1..2a959c08bd3cb 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -1107,6 +1107,14 @@ static struct socket *nbd_get_socket(struct nbd_device *nbd, unsigned long fd,
+ 	if (!sock)
+ 		return NULL;
+ 
++	if (!sk_is_tcp(sock->sk) &&
++	    !sk_is_stream_unix(sock->sk)) {
++		dev_err(disk_to_dev(nbd->disk), "Unsupported socket: should be TCP or UNIX.\n");
++		*err = -EINVAL;
++		sockfd_put(sock);
++		return NULL;
++	}
++
+ 	if (sock->ops->shutdown == sock_no_shutdown) {
+ 		dev_err(disk_to_dev(nbd->disk), "Unsupported socket: shutdown callout must be supported.\n");
+ 		*err = -EINVAL;
 -- 
-Cheers
+2.51.0
 
-David / dhildenb
+
 
