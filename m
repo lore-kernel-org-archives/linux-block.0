@@ -1,109 +1,169 @@
-Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2F302FF16F
-	for <linux-block@vger.kernel.org>; Mon, 13 Oct 2025 10:29:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A42924A079
+	for <linux-block@vger.kernel.org>; Mon, 13 Oct 2025 11:32:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760351386; cv=none; b=gwTwl2hVNn1QfDmdJx0gxt2EXP2/B5m1+M9t4PTUMJw2r6d0ZQBWzfU+GJRA/gFGn9/fMPVL5mYmJEG4Z+5JjL/uVzas4nJeqYkQ+LkWhJiLqzyzGVPGBuHgAOuKj+r2WcPbuaSMR/WU04ZRSvDt0TtqlOgvEVI8AHqmIciprYE=
+	t=1760355143; cv=none; b=V/y+iy6SKG+MkEo0aS1QY0YqzbnhGHHB1KCf7XHn3blUQPVrFz6uH8kRFwmbqLpJlIqcksiLm+PFgRlYZoij6rpMRL725tj5hAHfFo/0GkUQwnv+FoyUZcQVcpslKtCZ/aXWzQ7Opds+oOWWkYZ5+FmaPOQNWlaNYlgFn7Qet9k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760351386; c=relaxed/simple;
-	bh=SVPUlK6sYHZahK5O3+GOTdw6Bx0G0qiDlm5PKLNZXQA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oMPEr+Ybd5Sb6a3aZjQyD04bXhejibpwnY1WtChMDasoNtKaLJUSvo255r0ehdACMz16x5r04hoZYnYwLH5nh0IEbv/7/T2y8M5IME1FPxrrSOLpen0a2GRa7YGv7SHB/ySKympkBz6zcrN1rnYguF/+A/KraN+ArHn0zHBUNKQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZIQhb/oU; arc=none smtp.client-ip=209.85.128.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1760355143; c=relaxed/simple;
+	bh=0xosZGkTXmSnEMdEcfXUoHuhuRB8W/qpykqw2fzqVZ0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=U39RhNzhw86FX7TUZeyihzoLCO/uGVd0WoRPHvuXB8BHeSkazDP3iheirj60YkobDEpqkvxgB0l9H/Lc+gEKt0daqp7ISt+ToYFLbdc5FRX0UfkVyXLiTFXcjADfkd9/E/Y1Tt1z4LMGcai5w1FKGnnyKD2e2eS8mCc8z3kTYLw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=c2pY3Q60; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=PKyKaGFX; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=c2pY3Q60; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=PKyKaGFX; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZIQhb/oU"
-Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-78113fdfd07so13815547b3.2
-        for <linux-block@vger.kernel.org>; Mon, 13 Oct 2025 03:29:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760351384; x=1760956184; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SVPUlK6sYHZahK5O3+GOTdw6Bx0G0qiDlm5PKLNZXQA=;
-        b=ZIQhb/oUlO3F9MEPUxurf/mgWI7Y1g8uHfT6SNbxuv/4xY5+m/YraZW/5KqmjRIwzX
-         rdTRUXUR5ZYcRqHAcjEXbyqp9QPzrQjcU/+tE2lLY7zsYf9eKvPgMh7Yb+eG+DeMYl1A
-         NNkv7u+ELQLfd91UVqU5n/EDVbx6VQywzqTdWGNVo8cwyfdUj0VZFPUXp9En5uePFJsJ
-         B8tJ7rKH5YlpW+Pq8nGhj+PB2fjPaXocpEbEosY0ETAXl+QzWKYisCRZclqHs3mpy0wb
-         S17h9fT1i/DEuznIcB2PXT67kVi/TGa5zjTd/jM4v9YckG+ajQAB0eFRwEULsu95liHd
-         eM0A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760351384; x=1760956184;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=SVPUlK6sYHZahK5O3+GOTdw6Bx0G0qiDlm5PKLNZXQA=;
-        b=hpuex1SQz1Y2vSO6hh0JgpBoCnno1BlK3wUKfs2NcdivfCWIhuNlB8pQpHmwbtleXW
-         Jr2Xb4gr67mqxW/7jCCLoqH7oAXVia77cTgH41cBZwLWotVajktYIiwAvkapMyqFsWfC
-         L7+i0cAJxwaHstw/ZxljvJhma4Umy7LPSVV7SiEsvO0w3yo6SIMk3r/jGC8gMJ/jnk1C
-         /CcMOheOaRbz+3D/RgG9n5HnfI6uAIbOGjiH8spgijunxdoPvzGtzLK/C67o1KKKxCZ/
-         l+vpDp/7HXVDstKsV0ZWDV7wK/UpKrYytmkrgATrL8MzXiOxXAbQSKyZ2yqxXKlLiWS5
-         +XrQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUu7EjlthPQX5u0xR4Xg/cb5iiGal9Kl1h7d0oEx+ry2F6UY6LllY+yPKAEy878S51yoWJMhHnTFpwC3Q==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx1STKtv+VUn/2hjah+QhWpeWbxwmWJMOLgDkl79uo2/2bldxRr
-	O0Q5G4zXj+dZrQGnteTzGqZFc72mlgA8v4Z91btDspTS1u5xEtZoGv48yuDfgpkamOFv88nv82X
-	yOqgMavVMvFJlkPMmKZnYGjCVm8OxFEc=
-X-Gm-Gg: ASbGnctTQWzWoleUBYbmVkuLNLNbZzveEH6jiLIBgeaUkCsJJb/16qG4D5RTRRDnyfK
-	u+XWiUB1/LaOrewOBe0VyZyxsRSRrHFGLHTEnb6bGSRgQ4c4v5ORkexfRxJQEeB4rHpUDvshgQ0
-	a3ABFLTDjcIiarQQXqT1FquhEKY9A34xLhkA1TkoS+yWBrc7EBXSkjN2qNTcYX/OyTsMKeEY5wl
-	6UqCCbF0YYz8ny+K1LjKv1bo/pf37Fu5buF
-X-Google-Smtp-Source: AGHT+IF7gB/uIYJ4y7t+OLiZ00mCO9lllMt+QoIyqpZ385m2NgZqSy+lqlMIQpqL29tGtjodZ9h+RUr8WRjGSui6l/0=
-X-Received: by 2002:a05:690e:4186:b0:63c:f5a6:f2f0 with SMTP id
- 956f58d0204a3-63cf5a7080fmr6997775d50.66.1760351383745; Mon, 13 Oct 2025
- 03:29:43 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="c2pY3Q60";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="PKyKaGFX";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="c2pY3Q60";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="PKyKaGFX"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 4135121A0B;
+	Mon, 13 Oct 2025 11:32:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1760355139; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=OJD2D5sOD1UwFVRnLiisA06ok66jFshkpFT7U5auYaU=;
+	b=c2pY3Q60rdySkJnHio1esw2RtxdDS1I/ROgZuToYDooNtM5rlAyGD3QtN3IG5Biyk9zkDd
+	okc+vn2gfnqpE+l51QceqRYB1D59POM0BcYhL7iEbOXycj1ovhLT9DyS1f8xJx6reFNUId
+	CuxNanTwAusOc1HkfPI2SLlSS1FzxMY=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1760355139;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=OJD2D5sOD1UwFVRnLiisA06ok66jFshkpFT7U5auYaU=;
+	b=PKyKaGFXDxUdTiiurMffn9aZFLjkmr8MgiOPS9YDScwKazJYvsQqAb+UV2lM1fMEPkFYXF
+	1HdhYBXBMD1JZjAw==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1760355139; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=OJD2D5sOD1UwFVRnLiisA06ok66jFshkpFT7U5auYaU=;
+	b=c2pY3Q60rdySkJnHio1esw2RtxdDS1I/ROgZuToYDooNtM5rlAyGD3QtN3IG5Biyk9zkDd
+	okc+vn2gfnqpE+l51QceqRYB1D59POM0BcYhL7iEbOXycj1ovhLT9DyS1f8xJx6reFNUId
+	CuxNanTwAusOc1HkfPI2SLlSS1FzxMY=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1760355139;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=OJD2D5sOD1UwFVRnLiisA06ok66jFshkpFT7U5auYaU=;
+	b=PKyKaGFXDxUdTiiurMffn9aZFLjkmr8MgiOPS9YDScwKazJYvsQqAb+UV2lM1fMEPkFYXF
+	1HdhYBXBMD1JZjAw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 327D61374A;
+	Mon, 13 Oct 2025 11:32:19 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id C3H+C0Pj7GgJZwAAD6G6ig
+	(envelope-from <jack@suse.cz>); Mon, 13 Oct 2025 11:32:19 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+	id CD496A0A58; Mon, 13 Oct 2025 13:32:03 +0200 (CEST)
+Date: Mon, 13 Oct 2025 13:32:03 +0200
+From: Jan Kara <jack@suse.cz>
+To: Christoph Hellwig <hch@lst.de>
+Cc: "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
+	Eric Van Hensbergen <ericvh@kernel.org>, Latchesar Ionkov <lucho@ionkov.net>, 
+	Dominique Martinet <asmadeus@codewreck.org>, Christian Schoenebeck <linux_oss@crudebyte.com>, 
+	Chris Mason <clm@fb.com>, David Sterba <dsterba@suse.com>, Mark Fasheh <mark@fasheh.com>, 
+	Joel Becker <jlbec@evilplan.org>, Joseph Qi <joseph.qi@linux.alibaba.com>, 
+	Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, 
+	Josef Bacik <josef@toxicpanda.com>, Jan Kara <jack@suse.cz>, linux-block@vger.kernel.org, 
+	v9fs@lists.linux.dev, linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, jfs-discussion@lists.sourceforge.net, 
+	ocfs2-devel@lists.linux.dev, linux-xfs@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [PATCH 01/10] mm: don't opencode filemap_fdatawrite_range in
+ filemap_invalidate_inode
+Message-ID: <wxziorjgzpc5nlktnl53ctsroriqvwjkuvwsgznl63oeid4cvp@p7mkzimdgltg>
+References: <20251013025808.4111128-1-hch@lst.de>
+ <20251013025808.4111128-2-hch@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251010094047.3111495-1-safinaskar@gmail.com>
- <20251010094047.3111495-3-safinaskar@gmail.com> <07ae142e-4266-44a3-9aa1-4b2acbd72c1b@infradead.org>
-In-Reply-To: <07ae142e-4266-44a3-9aa1-4b2acbd72c1b@infradead.org>
-From: Askar Safin <safinaskar@gmail.com>
-Date: Mon, 13 Oct 2025 13:29:07 +0300
-X-Gm-Features: AS18NWAYGkNu7BjeCT0jHGno_eA5ARoSWF2j7yYdLIuVOnrJP74yF3CsWnjM_B4
-Message-ID: <CAPnZJGDe+sDCsCngHyF6+=3=A9pYwQ1+N87jpq-ZdsSvVbQuNw@mail.gmail.com>
-Subject: Re: [PATCH v2 2/3] initrd: remove deprecated code path (linuxrc)
-To: Randy Dunlap <rdunlap@infradead.org>
-Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Linus Torvalds <torvalds@linux-foundation.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Christian Brauner <brauner@kernel.org>, 
-	Al Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@lst.de>, 
-	Jens Axboe <axboe@kernel.dk>, Andy Shevchenko <andy.shevchenko@gmail.com>, 
-	Aleksa Sarai <cyphar@cyphar.com>, =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>, 
-	Julian Stecklina <julian.stecklina@cyberus-technology.de>, 
-	Gao Xiang <hsiangkao@linux.alibaba.com>, Art Nikpal <email2tema@gmail.com>, 
-	Andrew Morton <akpm@linux-foundation.org>, Alexander Graf <graf@amazon.com>, 
-	Rob Landley <rob@landley.net>, Lennart Poettering <mzxreary@0pointer.de>, linux-arch@vger.kernel.org, 
-	linux-block@vger.kernel.org, initramfs@vger.kernel.org, 
-	linux-api@vger.kernel.org, linux-doc@vger.kernel.org, 
-	Michal Simek <monstr@monstr.eu>, Luis Chamberlain <mcgrof@kernel.org>, Kees Cook <kees@kernel.org>, 
-	Thorsten Blum <thorsten.blum@linux.dev>, Heiko Carstens <hca@linux.ibm.com>, 
-	Arnd Bergmann <arnd@arndb.de>, Dave Young <dyoung@redhat.com>, 
-	Christophe Leroy <christophe.leroy@csgroup.eu>, Krzysztof Kozlowski <krzk@kernel.org>, 
-	Borislav Petkov <bp@alien8.de>, Jessica Clarke <jrtc27@jrtc27.com>, 
-	Nicolas Schichan <nschichan@freebox.fr>, David Disseldorp <ddiss@suse.de>, patches@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251013025808.4111128-2-hch@lst.de>
+X-Spamd-Result: default: False [-3.80 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[24];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	RCVD_TLS_LAST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email,imap1.dmz-prg2.suse.org:helo]
+X-Spam-Flag: NO
+X-Spam-Score: -3.80
+X-Spam-Level: 
 
-On Fri, Oct 10, 2025 at 10:31=E2=80=AFPM Randy Dunlap <rdunlap@infradead.or=
-g> wrote:
-> There are more places in Documentation/ that refer to "linuxrc".
-> Should those also be removed or fixed?
->
-> accounting/delay-accounting.rst
-> admin-guide/initrd.rst
-> driver-api/early-userspace/early_userspace_support.rst
-> power/swsusp-dmcrypt.rst
-> translations/zh_CN/accounting/delay-accounting.rst
+On Mon 13-10-25 11:57:56, Christoph Hellwig wrote:
+> Use filemap_fdatawrite_range instead of opencoding the logic using
+> filemap_fdatawrite_wbc.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-Yes, they should be removed.
-I made this patchset minimal to be sure it is easy to revert.
-I will remove these linuxrc mentions in cleanup patchset.
+Looks good. Feel free to add:
 
---=20
-Askar Safin
+Reviewed-by: Jan Kara <jack@suse.cz>
+
+								Honza
+
+> ---
+>  mm/filemap.c | 12 ++----------
+>  1 file changed, 2 insertions(+), 10 deletions(-)
+> 
+> diff --git a/mm/filemap.c b/mm/filemap.c
+> index 13f0259d993c..99d6919af60d 100644
+> --- a/mm/filemap.c
+> +++ b/mm/filemap.c
+> @@ -4457,16 +4457,8 @@ int filemap_invalidate_inode(struct inode *inode, bool flush,
+>  	unmap_mapping_pages(mapping, first, nr, false);
+>  
+>  	/* Write back the data if we're asked to. */
+> -	if (flush) {
+> -		struct writeback_control wbc = {
+> -			.sync_mode	= WB_SYNC_ALL,
+> -			.nr_to_write	= LONG_MAX,
+> -			.range_start	= start,
+> -			.range_end	= end,
+> -		};
+> -
+> -		filemap_fdatawrite_wbc(mapping, &wbc);
+> -	}
+> +	if (flush)
+> +		filemap_fdatawrite_range(mapping, start, end);
+>  
+>  	/* Wait for writeback to complete on all folios and discard. */
+>  	invalidate_inode_pages2_range(mapping, start / PAGE_SIZE, end / PAGE_SIZE);
+> -- 
+> 2.47.3
+> 
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
