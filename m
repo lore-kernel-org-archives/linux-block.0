@@ -1,111 +1,116 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA46F2F362E
-	for <linux-block@vger.kernel.org>; Mon, 13 Oct 2025 08:26:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1338C2F9D84
+	for <linux-block@vger.kernel.org>; Mon, 13 Oct 2025 08:44:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760343986; cv=none; b=DxLeSzuIjcNfo7A9GCaUh+83H32I87UO+xJ5g/y9F4YGWn4naaH/kwt/vugeKdm+/VqQFH7rwXe+raKZtb/pYf1/2640YLrtahZuztC64WOcDB5XP+VAX/Mxt3fu42McjdY+rt9HGRZ3N2rQSRlRr4NkZZfQB0GJQVCl20drCPY=
+	t=1760345054; cv=none; b=hpbYvXb26jqkYeGsyKfOGZG1gsmtIph6fLE+3mp9n+Dm2FBzTJX8yH8w8FhEq4ViyWIKb72Pj6C187rdrPxlXMmk5yyEflDDyx8SfatZ5D9EW49jam0P1jC28huo8aGSxH/Bb52N3y6Crg1OCoVbDDgA6HOdz4P1nob5uGihWo0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760343986; c=relaxed/simple;
-	bh=aeTrMwmyr4idjATE535SD4+VwHKBvnF3DmVfBmeSGIc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OpxfyRLpPjpuAaDlzBnk9+mJ2jE5+bUqYs7uG910c5z3ICBxLHk4DfwWAuCrKM69gVIiNQKvFJNaA9Vr/MsV0jv6agVt0kC8+DCHZ/kzUUq0Y4kSvmkr3KTxvU80V8wMHSt0EuTTszPF315+Z1HvDHSfHi51z+nDtfV7BtCim6s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=evINQi4I; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1760345054; c=relaxed/simple;
+	bh=CCiwcbz0Xa80/3Iu0vLGj45hC3B+HOSp/IJLkFWl8I0=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=crZe8VzvctQv8HQfp3F36D1JFpy7qHcqGK8B4tW8O+SamKxdE0sxWbmnS3Eln+bz/ZbIs/MHWeEkcUE7Qs4AKj9O0JYA4snbfjyyuASxQunrfvDXCNnzXrFDAxEl5/Y9SbquNZ9p0Wm1XSoJI04HwPKlWUDoMuSkGLEOKR8+yis=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZFzSL+Ku; arc=none smtp.client-ip=209.85.210.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="evINQi4I"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1760343983;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=f9h2lc52spfsqI+nujAwhGun9J88DEF1peaurIn3jpI=;
-	b=evINQi4IcyDz3fBL4CzS71mdZYAh+NCUSxAQqsqS2U54pk0Vh+LU+GKNVLNSfWA1ylDuv/
-	bvU9xoSNZpiqkSQ/YgE5snas2lXwnSLSzPL3On1AQj/5uK49FuG1XDnNeccmqC+NObtHzh
-	LffbIUZf+sThPVma1li24p9LC9MTTzQ=
-Received: from mail-ua1-f70.google.com (mail-ua1-f70.google.com
- [209.85.222.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-221-x4dQTfOEOue5j0PsAx2Rmg-1; Mon, 13 Oct 2025 04:26:22 -0400
-X-MC-Unique: x4dQTfOEOue5j0PsAx2Rmg-1
-X-Mimecast-MFC-AGG-ID: x4dQTfOEOue5j0PsAx2Rmg_1760343982
-Received: by mail-ua1-f70.google.com with SMTP id a1e0cc1a2514c-930bc148794so1648700241.2
-        for <linux-block@vger.kernel.org>; Mon, 13 Oct 2025 01:26:22 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZFzSL+Ku"
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-782e93932ffso3569830b3a.3
+        for <linux-block@vger.kernel.org>; Mon, 13 Oct 2025 01:44:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1760345052; x=1760949852; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HEm8mSyxrlTqcu1WsEF7ZOgpa+/kS2dzVEZPsYbteWY=;
+        b=ZFzSL+KuxWJW5hNFcUUZTqcKt090DExRs4NV9BsWW7oBBGyciz/+hW3vbrjppyBcFc
+         hWfSGymMZ1rz8vy6+P3t8oz0Tp9naxxNY/h0965DOCcVHqB2o3UEzKTfw/FjnWPB/Z3v
+         iyyFB5d6Dtv5H5KqB2aTZHHejSmSc2aMVBh8Tvm8EIT96dQVMGLDVsHycPgFj3YsR/vr
+         tXXSklCvYEXDrJiQbhp4/z1mCbJIBA75SxlVGotuChWshIu8T+QGn4vlDB/JuHz+hDac
+         ViYg1kkoqTpIxKz06WxE4qxpXe0RgMN8RdYtGv6Lx8AHLHx8UnOavSuUW6cng+HbYtO5
+         6/ow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760343982; x=1760948782;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1760345052; x=1760949852;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=f9h2lc52spfsqI+nujAwhGun9J88DEF1peaurIn3jpI=;
-        b=WSnk6+ZmcHTi2v7qCd6EiuyffjBB9iApB9DcSmHeDQrMQH3E3YavUUktLUvnuU770J
-         keFGzOa8iavl/wANxuYnb/G+aNjiN44vbM9Atc5kdkLKFxJRjkxfDdLOIne1f1AuRI9k
-         mh0xeUNYq7NTlk1vw+OWgLH1pKEuxIyzq03QkBU/J2BAFKHqsTMYjwf12j+K3UNnYb2K
-         fcHeU4c/gYRqtwMkSfVBsh71tX94RtQ7DAcpxXJxFAa3bUDjsBzxvjfl6DN48qXdPPpo
-         p96jDLhMkXjdY29/p11Bdu5ScDUNt+2Z42SkcKRfJZneHwjYwysbbrJ766tnSI16/I/s
-         V4zQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXWhTjbwGXPGN49v2rgGDDM+jzkpoijMbBi911l/zksNZlm98gMOkoJumvtuVrXyHlejZ3Vapbrqco0tA==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy3YzMKGIp86i2Xnn0rjqiSK3vRMYVXtpmnrsRAdAidHMOmuM4Y
-	CBpKhAIMFR34WPprQcoG55FJ46Lhom8sc/nr1J3GT26T2d2H9qSdVmSij4jh9e7Lpu71OV/wJoK
-	FazGnjC0UqYW7RwyLHGXerlp8VIXINaIDdNz+yBs7jjL+HtM6YJVlYgkrhLpOR53ouuteNMVv7k
-	KrWMveVf0cvCfLkMm8DHgaZYzz6mP9IyPmYYNKNho=
-X-Gm-Gg: ASbGncvPMgs2vDNTG2YFfnQM9g/mbJFERcCDYIsYK7EHFS5s1PSRF5Os2J0hd+GGZk/
-	CCeTMSXFo4atvt4gCNSzy331HIyuGox4OKHOvD9x1Q4CjTrtKtr7VkMymnJFUdxE7/UE1G58aZt
-	/WMN4Ov9+o8eiC7SCdwFq2qw==
-X-Received: by 2002:a05:6102:8399:10b0:5d6:bbe:fe00 with SMTP id ada2fe7eead31-5d60bbf01ccmr1298634137.10.1760343981911;
-        Mon, 13 Oct 2025 01:26:21 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEqxQ3r8mKG19gkUS7w6zdeOC2dbsppCKLD7LIyf0aaxI4o4mEw27yhWt4MDd3wyBHEFiKHvB7PUDNAXpEj720=
-X-Received: by 2002:a05:6102:8399:10b0:5d6:bbe:fe00 with SMTP id
- ada2fe7eead31-5d60bbf01ccmr1298632137.10.1760343981594; Mon, 13 Oct 2025
- 01:26:21 -0700 (PDT)
+        bh=HEm8mSyxrlTqcu1WsEF7ZOgpa+/kS2dzVEZPsYbteWY=;
+        b=L0uDdDRwJJ/yBx8vfmSBBFmijCDxi/i1MKnLTcrorvmgK+ABNhnFpj6xxehEcfU0Bs
+         KCpcajlrsvKxHGYPPWvYZINx0T1ufCZAhpGWchRNbLwH4p22w0p0nmjelvvI/17CmuUh
+         KRWj+R3HvwTTUpqjJL1UMpglr+OSMaIRVbFHony3vJY171ZClSSASn78smZzwBI5x9g0
+         2bOEbA9vxt+xhpF4oFRdkJGkF3fJDesQiCp31AQc/cipUgec5Gv/ICrrXLJr+e5yjyLK
+         sOZtLdOpMrlVI6zE3c7RWb6onWdgsBCjteaJlOlRdYh2r3XUwZ91KgKAl39tCg9JEyYT
+         gCIg==
+X-Forwarded-Encrypted: i=1; AJvYcCU+00aLGQeQvgL9eJ0ikafsejlKqFzvyZVlySTkH2FDS0B4CZPPfpNd6fEoMKDNfF6WqhndS9Qi7wCP2Q==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwWp3dCHf0jJkcEd/c4E0cNJthsbVJ9IhY/5ElvpcfDKdmd5Exz
+	2Uw0mX26HBgaDUDunU1iuqxz9QX5sCgUGzBnM/p2eet2xyOsKFJOtnI4
+X-Gm-Gg: ASbGncssh6ilJjU1wAoFBWUap+h83FYf7GeDHA/aONhnGPCfbyuzltCFkpUYtvlHsms
+	ofRR5nDdJ3EKkY57MejW/Kj6wCSsqtelaKhv6qSNciR8cIgBUH4zhfdF4GeMX4jaEtRcKcvk1rm
+	OOmf0zwuJouu4RFzUaIQuioxq+12yQjeXoMHXgvouJSshGiSjLOtE8qA5JFwXMIAC0BcVatfv9W
+	gNHX2Mi7KELjDdBLS5sszeosGRKK0wMfWjNNiIyqBa4lPxvZ/3M7muhFCAqo01k74CwOIvDMPaU
+	YCmYG/21gxsY8sTv3CiXtbB5ow2ewWBPAk49vW685MCXeL7ZmxRDR7sKzSAOomVkWGcj9rfUKj+
+	/JiLqaO6CRyeHjZndjw0fVWIRi/ObR9rQQpvTFGRgodVdJo0aNScS4Wtygg==
+X-Google-Smtp-Source: AGHT+IH8BLldBUPUKFQibBJX7aY+OAIgjY1foYAVc8whufp2ZR2zdRzdCGMjbGvERedS1YiA3XEzRw==
+X-Received: by 2002:a05:6a20:a123:b0:2fd:71cb:e908 with SMTP id adf61e73a8af0-32da839f7bdmr27396737637.39.1760345052180;
+        Mon, 13 Oct 2025 01:44:12 -0700 (PDT)
+Received: from shankari-IdeaPad.. ([49.128.169.246])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7992d9992ddsm10777474b3a.80.2025.10.13.01.44.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Oct 2025 01:44:11 -0700 (PDT)
+From: Shankari Anand <shankari.ak0208@gmail.com>
+To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Cc: Andreas Hindborg <a.hindborg@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	Alex Gaynor <alex.gaynor@gmail.com>,
+	linux-block@vger.kernel.org,
+	rust-for-linux@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Gary Guo <gary@garyguo.net>,
+	=?UTF-8?q?Bj=C3=B6rn=20Roy=20Baron?= <bjorn3_gh@protonmail.com>,
+	Benno Lossin <lossin@kernel.org>,
+	Alice Ryhl <aliceryhl@google.com>,
+	Trevor Gross <tmgross@umich.edu>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Shankari Anand <shankari.ak0208@gmail.com>
+Subject: Re: [PATCH 1/7] rust: block: update ARef and AlwaysRefCounted imports from sync::aref
+Date: Mon, 13 Oct 2025 14:14:02 +0530
+Message-Id: <20251013084402.300397-1-shankari.ak0208@gmail.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <CANiq72=hSTpAj7w8bvcwoJkivxD_FPKnx9jD6iNvhsENnnXBzg@mail.gmail.com>
+References: <CANiq72=hSTpAj7w8bvcwoJkivxD_FPKnx9jD6iNvhsENnnXBzg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250928132927.3672537-1-ming.lei@redhat.com> <20250928132927.3672537-7-ming.lei@redhat.com>
- <aN92BCY1GQZr9YB-@infradead.org> <aOPPpEPnClM-4CSy@fedora>
- <aOS0LdM6nMVcLPv_@infradead.org> <aOUESdhW-joMHvyW@fedora>
- <aOX88d7GrbhBkC51@infradead.org> <aOcPG2wHcc7Gfmt9@fedora> <aOybkCmOCsOJ4KqQ@infradead.org>
-In-Reply-To: <aOybkCmOCsOJ4KqQ@infradead.org>
-From: Ming Lei <ming.lei@redhat.com>
-Date: Mon, 13 Oct 2025 16:26:08 +0800
-X-Gm-Features: AS18NWCWxgbBN23g61iYzMfQYeFdjbQ0IHgI_c-2448u3QBnJ6IKRiHfJ5F8vfs
-Message-ID: <CAFj5m9+6aXjWV6K4Y6ZU=X9NogD5Z4ia1=YDgrRRxxfg6yEv5w@mail.gmail.com>
-Subject: Re: [PATCH V4 6/6] loop: add hint for handling aio via IOCB_NOWAIT
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
-	Mikulas Patocka <mpatocka@redhat.com>, Zhaoyang Huang <zhaoyang.huang@unisoc.com>, 
-	Dave Chinner <dchinner@redhat.com>, linux-fsdevel@vger.kernel.org, 
-	io-uring@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Mon, Oct 13, 2025 at 2:28=E2=80=AFPM Christoph Hellwig <hch@infradead.or=
-g> wrote:
->
-> On Thu, Oct 09, 2025 at 09:25:47AM +0800, Ming Lei wrote:
-> > Firstly this FS flag isn't available, if it is added, we may take it in=
-to
-> > account, and it is just one check, which shouldn't be blocker for this
-> > loop perf improvement.
+On Sun, Oct 12, 2025 at 08:01:19PM +0200, Miguel Ojeda wrote:
+> On Sun, Oct 12, 2025 at 4:05 PM Shankari Anand
+> <shankari.ak0208@gmail.com> wrote:
 > >
-> > Secondly it isn't enough to replace nowait decision from user side, one
-> > case is overwrite, which is a nice usecase for nowait.
+> > I'll resend it on top of -rc1.
+> 
+> Yeah, please, thanks! (in v2 I think you say it is on top of
+> linux-next -- did you mean -rc1?).
 >
-> Yes.  But right now you are hardcoding heuristics which is overall a
-> very minor user of RWF_NOWAIT instead of sorting this out properly.
+I've rebased it on linux-next, and I've included the exact base commit at the end for reference.
 
-Yes, that is why I call the hint as loop specific, it isn't perfect, just f=
-or
-avoiding potential regression by taking nowait.
+Let me know if you'd prefer it to be rebased onto the latest mainline instead.
 
-Given the improvement is big, and the perf issue has been
-reported several times, I'd suggest taking it this way first, and
-document it can be improved in future.
+> 
+> I think it is simpler if I apply (even if temporarily) a commit that
+> moves everything and removes the re-export in linux-next -- that way
+> people will notice when they try to introduce the code during the
+> cycle.
+> 
 
-Thanks,
+That sounds good. Just to confirm - since this spans multiple drivers/subsystems,
+is it still okay to send it as a single patch?
 
+Thanks and regards,
+Shankari
