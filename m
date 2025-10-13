@@ -1,138 +1,151 @@
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37DAC25A354
-	for <linux-block@vger.kernel.org>; Sun, 12 Oct 2025 18:40:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
+Received: from invmail4.hynix.com (exvmail4.skhynix.com [166.125.252.92])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E48D612B94;
+	Mon, 13 Oct 2025 01:18:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760294454; cv=none; b=Ex31I/t8vehepOMPEt2C1ZE9qqEw0Qzw3CTC6ywMGkwCD0A52aA8OBGgAiAkJBq+n1sRcO1NhuVydQToVxC6+AnL/OYwNuK1cPc6ukmvjM9CSomxSf+L3AykoPkryLuf1iEg7Vy5uxtajkQlYH6BFQkPL2RaLUtv20M4bOPNVhk=
+	t=1760318322; cv=none; b=Q9aoteCNeoZf8VI+3K2woke2DkGmcDOgt3cNjVwuBnLrr8LAkWaJAKW7LbgTMN8H2JoTdnFr9juD8oAgp1+JUSaAOb09wbQM/7RLNflCg3tBINJV0VXWa4kTIgiOGCeYEAJGvdxILJ1dcqFkdI+Ez0IL6A8jUr9xkgVIdBb5Zy0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760294454; c=relaxed/simple;
-	bh=jPAdJQCpBQEnf+PFZT9rv3bkEEiZW89ug2y1tCqYIMQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BHEQkRzEgGr8ssaugFVgHZGWv5dNfW9QEyk/LaGCEhy+pfc+Kq8M0jLpG9b0n9UJT/Cq6h3wr6wsuHUPwEodbTriwwy4FvOlIaC9G6Uca+6vGLKQgjMe1K4IvnjfG9pTjMNVIRiPLD3uRhnVXBWjoxSEFNzQ56s+FnR1AKaI5/A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=RPr6lUCf; arc=none smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="RPr6lUCf"
-Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 59CIdsPa014773;
-	Sun, 12 Oct 2025 18:40:41 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=corp-2025-04-25; bh=PR+j9XQlb20kzlvou4CGq3b4wJvPT
-	Ma5KvHeINjEI6E=; b=RPr6lUCfDsSaTd1rjVydseX3uyyXXGbCM1QvX4JjvOPpy
-	wHGAOacDSCTrkwLJWVlun98cWyvI9kmmgWmWjqzGG/kPmV7+Y/BdSqF+0XjFCgUJ
-	5+k1m8D6tIN0DmjhrMmVQ0nJ95mD81PfEUEbkn86mQiKnIZuy2LY+0frTs1rhfUJ
-	pL8APHKxedoOtkmKlPrBlpdqC1wcFhkrZl9lTXoSKLPCLA5pn2ck4m4OKhKZnP1v
-	1N9dOpDtrzrzEIFADvu6KJ0dYqw6QGPUPHsHjZ8TDK7VrCbm1YDezKjhB9QOggxZ
-	sE3n1eoNkbHjk8dfXK2SMSPRsNtJuaecm5+xbBcbw==
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 49qdnc156c-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Sun, 12 Oct 2025 18:40:41 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 59CEKRtD038326;
-	Sun, 12 Oct 2025 18:40:40 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 49qdpcsxee-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Sun, 12 Oct 2025 18:40:40 +0000
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 59CIeepH022304;
-	Sun, 12 Oct 2025 18:40:40 GMT
-Received: from ca-dev110.us.oracle.com (ca-dev110.us.oracle.com [10.129.136.45])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 49qdpcsxeb-1;
-	Sun, 12 Oct 2025 18:40:40 +0000
-From: Alok Tiwari <alok.a.tiwari@oracle.com>
-To: axboe@kernel.dk, andriy.shevchenko@linux.intel.com, phasta@kernel.org,
-        fourier.thomas@gmail.com, viro@zeniv.linux.org.uk,
-        martin.petersen@oracle.com
-Cc: alok.a.tiwari@oracle.com, linux-block@vger.kernel.org
-Subject: [PATCH] block: mtip32xx: Fix typos in comments and log messages
-Date: Sun, 12 Oct 2025 11:40:03 -0700
-Message-ID: <20251012184010.198891-1-alok.a.tiwari@oracle.com>
-X-Mailer: git-send-email 2.50.1
+	s=arc-20240116; t=1760318322; c=relaxed/simple;
+	bh=NiasNDnL7bI+RWAs1WgZxXifIHYVm8cB4osG/bTqMcU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gHSaoesihppeT2n1hGOeCFjJA9l1DOwhA3UjLXJlu+pwTSyXs4yPQnHE3a1UZhPZ/JJ5PDFTTZTXDKlslIGXSVpEETgPHDfUwhkeowRVxx9LnTV21iL3NplYOQ8jZxmGaLwLEFke+g2R8bnxwR4CDEaiehrKqSJRy7yzkM792H0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
+X-AuditID: a67dfc5b-c45ff70000001609-66-68ec4fde3b26
+Date: Mon, 13 Oct 2025 10:03:21 +0900
+From: Byungchul Park <byungchul@sk.com>
+To: Jonathan Corbet <corbet@lwn.net>
+Cc: linux-kernel@vger.kernel.org, kernel_team@skhynix.com,
+	torvalds@linux-foundation.org, damien.lemoal@opensource.wdc.com,
+	linux-ide@vger.kernel.org, adilger.kernel@dilger.ca,
+	linux-ext4@vger.kernel.org, mingo@redhat.com, peterz@infradead.org,
+	will@kernel.org, tglx@linutronix.de, rostedt@goodmis.org,
+	joel@joelfernandes.org, sashal@kernel.org, daniel.vetter@ffwll.ch,
+	duyuyang@gmail.com, johannes.berg@intel.com, tj@kernel.org,
+	tytso@mit.edu, willy@infradead.org, david@fromorbit.com,
+	amir73il@gmail.com, gregkh@linuxfoundation.org, kernel-team@lge.com,
+	linux-mm@kvack.org, akpm@linux-foundation.org, mhocko@kernel.org,
+	minchan@kernel.org, hannes@cmpxchg.org, vdavydov.dev@gmail.com,
+	sj@kernel.org, jglisse@redhat.com, dennis@kernel.org, cl@linux.com,
+	penberg@kernel.org, rientjes@google.com, vbabka@suse.cz,
+	ngupta@vflare.org, linux-block@vger.kernel.org,
+	josef@toxicpanda.com, linux-fsdevel@vger.kernel.org, jack@suse.cz,
+	jlayton@kernel.org, dan.j.williams@intel.com, hch@infradead.org,
+	djwong@kernel.org, dri-devel@lists.freedesktop.org,
+	rodrigosiqueiramelo@gmail.com, melissa.srw@gmail.com,
+	hamohammed.sa@gmail.com, harry.yoo@oracle.com,
+	chris.p.wilson@intel.com, gwan-gyeong.mun@intel.com,
+	max.byungchul.park@gmail.com, boqun.feng@gmail.com,
+	longman@redhat.com, yunseong.kim@ericsson.com, ysk@kzalloc.com,
+	yeoreum.yun@arm.com, netdev@vger.kernel.org,
+	matthew.brost@intel.com, her0gyugyu@gmail.com,
+	catalin.marinas@arm.com, bp@alien8.de, dave.hansen@linux.intel.com,
+	x86@kernel.org, hpa@zytor.com, luto@kernel.org,
+	sumit.semwal@linaro.org, gustavo@padovan.org,
+	christian.koenig@amd.com, andi.shyti@kernel.org, arnd@arndb.de,
+	lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com,
+	rppt@kernel.org, surenb@google.com, mcgrof@kernel.org,
+	petr.pavlu@suse.com, da.gomez@kernel.org, samitolvanen@google.com,
+	paulmck@kernel.org, frederic@kernel.org, neeraj.upadhyay@kernel.org,
+	joelagnelf@nvidia.com, josh@joshtriplett.org, urezki@gmail.com,
+	mathieu.desnoyers@efficios.com, jiangshanlai@gmail.com,
+	qiang.zhang@linux.dev, juri.lelli@redhat.com,
+	vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
+	bsegall@google.com, mgorman@suse.de, vschneid@redhat.com,
+	chuck.lever@oracle.com, neil@brown.name, okorniev@redhat.com,
+	Dai.Ngo@oracle.com, tom@talpey.com, trondmy@kernel.org,
+	anna@kernel.org, kees@kernel.org, bigeasy@linutronix.de,
+	clrkwllms@kernel.org, mark.rutland@arm.com, ada.coupriediaz@arm.com,
+	kristina.martsenko@arm.com, wangkefeng.wang@huawei.com,
+	broonie@kernel.org, kevin.brodsky@arm.com, dwmw@amazon.co.uk,
+	shakeel.butt@linux.dev, ast@kernel.org, ziy@nvidia.com,
+	yuzhao@google.com, baolin.wang@linux.alibaba.com,
+	usamaarif642@gmail.com, joel.granados@kernel.org,
+	richard.weiyang@gmail.com, geert+renesas@glider.be,
+	tim.c.chen@linux.intel.com, linux@treblig.org,
+	alexander.shishkin@linux.intel.com, lillian@star-ark.net,
+	chenhuacai@kernel.org, francesco@valla.it,
+	guoweikang.kernel@gmail.com, link@vivo.com, jpoimboe@kernel.org,
+	masahiroy@kernel.org, brauner@kernel.org,
+	thomas.weissschuh@linutronix.de, oleg@redhat.com, mjguzik@gmail.com,
+	andrii@kernel.org, wangfushuai@baidu.com, linux-doc@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-media@vger.kernel.org,
+	linaro-mm-sig@lists.linaro.org, linux-i2c@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-modules@vger.kernel.org,
+	rcu@vger.kernel.org, linux-nfs@vger.kernel.org,
+	linux-rt-devel@lists.linux.dev
+Subject: Re: [PATCH v17 28/47] dept: add documentation for dept
+Message-ID: <20251013010321.GA52546@system.software.com>
+References: <20251002081247.51255-1-byungchul@sk.com>
+ <20251002081247.51255-29-byungchul@sk.com>
+ <87ldlssg1b.fsf@trenco.lwn.net>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-10-12_07,2025-10-06_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 mlxlogscore=999
- malwarescore=0 mlxscore=0 spamscore=0 suspectscore=0 phishscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2510020000 definitions=main-2510120099
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDExMDAwNiBTYWx0ZWRfX4vB8Z15FE5Pd
- b0yVoizpc0jK05S67WP9OHqZr16qBPh+f/2TuK1w2oFd+CDky2kraSn15MRJw0C7ro6d0YXy1jH
- PX/KL40dfMcTsD29DveBr9nPoQFEuuCqdH/FUYL+KXTxkoFtjTRTehQ10I80KcvP52e7OmwNpDa
- J1C+QQsc3ynQQULZUy/lzmRU24rPiatcLiZot2QU71g+aKjXLwistmDDtZlfUdAmmEClNFt99HE
- 58eiOq5F8veh/SdCwbOVqnsp7tqHcb+PPFFLncttDhzA55zA6oLZ21qIkHrU14nc/iEg1hgQ2jE
- 6T5vxk67/5h/UcHLD0Q/JoVE12TeFAJ1PberO9XAczzzdp+QOyVlaHuEZwIwtKK8uQHJabitAVA
- 2pA2qxMTQJZdVi91kRnEBAdh0Js00i0txNyYkFXm1SAHVe6jJa0=
-X-Proofpoint-GUID: a9jlqaiwJszkxNFaF4i-T9ywRgSKpSkL
-X-Authority-Analysis: v=2.4 cv=ReCdyltv c=1 sm=1 tr=0 ts=68ebf629 b=1 cx=c_pps
- a=zPCbziy225d3KhSqZt3L1A==:117 a=zPCbziy225d3KhSqZt3L1A==:17
- a=x6icFKpwvdMA:10 a=yPCof4ZbAAAA:8 a=RXALipHn05_ar3t3B5QA:9 cc=ntf
- awl=host:12091
-X-Proofpoint-ORIG-GUID: a9jlqaiwJszkxNFaF4i-T9ywRgSKpSkL
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87ldlssg1b.fsf@trenco.lwn.net>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa2xLYRjH8557G7Wjbi+ND+oWwzbiw/NBXOJ2hCAk4hpO7EQb3UjH2Fhi
+	MjVzqy626EzGhtpq6MxmVGbXLLbqZqZmVruobbSJmY6xhTMRvv3yf/75Pc+HhyPVDfRETh99
+	QDJGiwYto6SU/hHX5njXfdJFBGvGQlNiKQX9PzJIGLRUsZBWbyHBfj+RgIttnQxYfRksdFeu
+	BL/3EQ2vgp8QpF90I3DajjPw3lxIQuAuA1nHnTSkZTooePiuhIWWNAsB3hs+CmqzWyj42TYX
+	alqbaPBWm2joa2wjwH7GR4KzeRYkD/YhqCpuJ6Ahz03B85LbNFx/VU9A8JwG3BfO0pAa8CGw
+	+HpZMH0ZoqH6bCkBdRkuGlrO9VBgyrlHQMWdIgKu2/w0DLwtpuH0iTQKkiuCJBRW9rOQ+MWL
+	IGDuoxdHCCcaBhnBfsWOhB8DFiQ8tL5lhSzHQSGpwk8LBbZQIftxNyE4ck8xQoq/kRBamh4z
+	QsDlYoXOxnRCeDPUQQpdBZeQ8Pl9M7V+/FblgkjJoI+VjOELdyl15c5Wan82c9jWueEYMtEp
+	SMFhfj4OfC1lUxA3zJ6rRjmm+Gm4dqCQkZnhZ2CP5zspV8bwU3HPqU0pSMmR/E0NTvVlDndG
+	84uw66UdyaziAWfWlw+zmk9C+HOt+CcfhWsudVIyk3wo9gx1E7KT5DX45hAnxwp+Nu43t5My
+	j+Wn4NIH1YS8C/M+Bb6c2Ir+nDwBP7V5KDPirf9prf9prf+0WYjMRWp9dGyUqDfMD9PFResP
+	h+3eF+VAvz/tRsLPbcWo172xDPEc0o5Q6R591KlpMTYmLqoMYY7UjlFdMHXp1KpIMS5eMu7b
+	aTxokGLKkIajtONV84KHItX8HvGAtFeS9kvGv1OCU0w8hpTT67xosL2D7uppWDp77a5NJx3z
+	NEnqcbdWxJqn561cHlblNoanJ0z9Fv68K/7I69bXmi27paJlCQUvaotylWsUzSXe/MuTR98R
+	DQs8YIiYZDB/WN0b8q48dceVkUtyvjZHLtdsT161In9vZcjMujNPnp6XnnUfrXKyt1zB+JDN
+	wQ4tFaMT54aSxhjxFy7b3xBlAwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA02SbUxbZRTHfe7Lc28bO68VtycjfrDuJRJBl+k8cUaXqNkNUXQz2Xxjrt2u
+	tuGlyy3D4WLCWxFxaqlp2dp1MtgKgbJ1BRaRdEEaWbaBDJFRdYV1qQxGkaiwhgLFdsa4Lye/
+	8z///8n5cHhaHWfX8obCIkku1OZrsJJR5mytyBx7Pap/ytWWBdfKehiYn6tm4PhZD4Zq3zEW
+	rp5pRTA+X40gtuikwdy1wsCytY+DuYXfOFjx9yGwD1lp8HSUUfC3N4FhOvAXAls4gqFuqoyB
+	WfcRBI4JJwdTP2yHmfFuFlZCtygYvRNF4I4kKIj0fIpg2Z4H3zS0Y1gcGKShznYVwclwiIZJ
+	b3LY0TeGwN9cjuF3SycNw5FV8PP8LIZLts8xzAwdp+APL4b6cj8LLqcVQUXjWQx2l4+Brhvf
+	cTA0vUTBdbuVglbfazDunmDgiqWBSt6XdJ1bA866CipZJimwtXVTsOBu4aC/8ToD7tL14BwY
+	ZuFms4ODpfAmWKk3Ql/rLQ5CX9kYODMzyG6zITFm/pIRW9rPU6L5p2Usek54kLgYtyJx7nQF
+	LZotyTYQnaXFyvaPxNNXoliMz49g0X+nnhEvNxCxdiBT7HKEOLHywq/cG8+9o3x+v5RvKJbk
+	J1/Yq9QH/GPMgUZ8qDmysxRVsTWI54nwNAmelGuQgmeE9aQ/3olTjIWNJBhcoFOWNGEduf3Z
+	rhqk5GmhKZ18PeG663lIeJH8OOJBKVYJQFxDgbusFioR+bNf+6/+ILl0LMKkmBYySDAxRaV2
+	0kI6aUrwKVkhPEFilpt0ih8WHiM95y9SFqRy3JN23JN2/J+uR3QLSjMUFhdoDfnPZJny9CWF
+	hkNZ+4wFPpT8SPcnS7Xfornh7b1I4JHmfpW+e1qvZrXFppKCXkR4WpOmqq2a1KtV+7UlH0uy
+	8X35YL5k6kXpPKNZo8reLe1VCx9qi6Q8STogyf9NKV6xthS5r+VIl2U245eD0cAjh+/b4jWe
+	em/j6Pe6dFfuznc/CDlWb6jLzlzep9PZSXlr7aPPvt0SfOXwjuwLqzdn9DpHXlLciK17tWkC
+	F9U8MCX4ir2d4qqcPbmzm31HwqNuz+Dtl+UtRp05trVKEX/z8Q7YlgiVNOTKF0+95Qwf5dp0
+	G77QMCa9dlMGLZu0/wCekX8tjQMAAA==
+X-CFilter-Loop: Reflected
 
-This patch corrects several minor typos and spelling errors in mtip32xx.c
-- Fixing "ge" -> "get" in a warning message.
-- Correcting "kernrel" -> "kernel", "progess" -> "progress"
-  "strucutre" -> "structure" in comments.
+On Thu, Oct 02, 2025 at 11:36:16PM -0600, Jonathan Corbet wrote:
+> Byungchul Park <byungchul@sk.com> writes:
+> 
+> > This document describes the concept and APIs of dept.
+> >
+> > Signed-off-by: Byungchul Park <byungchul@sk.com>
+> > ---
+> >  Documentation/dependency/dept.txt     | 735 ++++++++++++++++++++++++++
+> >  Documentation/dependency/dept_api.txt | 117 ++++
+> >  2 files changed, 852 insertions(+)
+> >  create mode 100644 Documentation/dependency/dept.txt
+> >  create mode 100644 Documentation/dependency/dept_api.txt
+> 
+> As already suggested, this should be in RST; you're already 95% of the
+> way there.  Also, please put it under Documentation/dev-tools; we don't
+> need another top-level directory for this.
 
-no functional impact.
+Sure.  I will.  Thanks!
 
-Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
----
- drivers/block/mtip32xx/mtip32xx.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/mtip32xx.c
-index 567192e371a8..df184a9f006f 100644
---- a/drivers/block/mtip32xx/mtip32xx.c
-+++ b/drivers/block/mtip32xx/mtip32xx.c
-@@ -1337,7 +1337,7 @@ static int mtip_get_smart_attr(struct mtip_port *port, unsigned int id,
- 	memset(port->smart_buf, 0, ATA_SECT_SIZE);
- 	rv = mtip_get_smart_data(port, port->smart_buf, port->smart_buf_dma);
- 	if (rv) {
--		dev_warn(&port->dd->pdev->dev, "Failed to ge SMART data\n");
-+		dev_warn(&port->dd->pdev->dev, "Failed to get SMART data\n");
- 		return rv;
- 	}
- 
-@@ -2127,7 +2127,7 @@ static int mtip_hw_submit_io(struct driver_data *dd, struct request *rq,
- /*
-  * Sysfs status dump.
-  *
-- * @dev  Pointer to the device structure, passed by the kernrel.
-+ * @dev  Pointer to the device structure, passed by the kernel.
-  * @attr Pointer to the device_attribute structure passed by the kernel.
-  * @buf  Pointer to the char buffer that will receive the stats info.
-  *
-@@ -2679,7 +2679,7 @@ static int mtip_hw_get_identify(struct driver_data *dd)
- 		}
- 	}
- 
--	/* get write protect progess */
-+	/* get write protect progress */
- 	memset(&attr242, 0, sizeof(struct smart_attr));
- 	if (mtip_get_smart_attr(dd->port, 242, &attr242))
- 		dev_warn(&dd->pdev->dev,
-@@ -3148,7 +3148,7 @@ static int mtip_block_compat_ioctl(struct block_device *dev,
-  * that each partition is also 4KB aligned. Non-aligned partitions adversely
-  * affects performance.
-  *
-- * @disk Pointer to the gendisk strucutre.
-+ * @disk Pointer to the gendisk structure.
-  * @geo Pointer to a hd_geometry structure.
-  *
-  * return value
--- 
-2.50.1
-
+	Byungchul
+> 
+> Thanks,
+> 
+> jon
