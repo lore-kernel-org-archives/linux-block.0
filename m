@@ -1,337 +1,197 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E65C1F5423;
-	Mon, 13 Oct 2025 02:59:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+Received: from invmail4.hynix.com (exvmail4.skhynix.com [166.125.252.92])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F05F27F747;
+	Mon, 13 Oct 2025 04:28:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760324377; cv=none; b=AS4XGxbIeDRmu+Q/bL7EUcXS4LSai9+lpl+3GpGfZzuK685mIEx+nqRMpwyIE/cbJbz7GxVIESLDCvwibL/jXkVMWiWRVk76zwYdueZ/XFQmxCA8XToN9igcXcbJQYyVyzmnjb00j5puU/ldQnVP2uoHfPi7k4ySUIQ/LRLnbLs=
+	t=1760329701; cv=none; b=PYgZtWkzDh0N9dey5uLEKcs3VPiGhY0Rlapowr5S3FBU8NlLLs6Kl0P9pEhCsjVU2177c+euePw/M31/gIq8kI+q0I5yTmrf0IYG4/ilE8x1LV85H/L/fyUCTY4fUsWSTnTWFUval754ME1Dq8EH7zrmXfYwxtGhFlLyIIRympI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760324377; c=relaxed/simple;
-	bh=N9cvdF9ZWC3JHp3NMG+9zlaQlHLHShhH0gCBVFmGPh0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WC+a0KGG9Yrz1LJw/90Qr8ZEmS+SaDM4B3nHroNS9DDKghAcMo6PpvPZ3rG0SVH06y1IWKcXF6XOJyBucHkk1aM0S7gJ50kASsJ4xLXqbTVnTt6X6jPlhKbL3A0Pci5+q9G0EX4g+wdaMmbVxDOzOjCjqWwOElOlakpXnPEGc4c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=IaTnSPQF; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="IaTnSPQF"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
-	:Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=HdnyQGqrNCayWqrk6FmNGitJaDaql2Ia+2Cy7TiImxs=; b=IaTnSPQF1Yn6B4lp14WfnvVTFo
-	7MHe/bnlcZDqhOwu2i+/VZeNdamAtyIbCtnKoiyu4PAeAvz+wWZyCBW+qsOBXAl95Tn3OrM5TH7ln
-	BWkp9Ksp9vLnC4dgzzYhfQ4XE8FEWdayjc504eXPuG2BImWR8Dri0wsenaaT1ORZVtx8100PbkrBv
-	oa0+qtWQj+8MLdEDawVjUOdDwft+/cmgomFWNM/y5bprbUjaq2zDtWjIb5LatVIoHkLdOzcEfjBtO
-	chNK5tiFJvo3g1quERws/1j0h1+IvldPD6Zc1sIqOUdgO6HOgVT4o7Ghdz74w9RlccJUzUNcGQAe7
-	E5j+WuCA==;
-Received: from [220.85.59.196] (helo=localhost)
-	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1v88ma-0000000C8Rv-11QA;
-	Mon, 13 Oct 2025 02:59:32 +0000
-From: Christoph Hellwig <hch@lst.de>
-To: "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-	Eric Van Hensbergen <ericvh@kernel.org>,
-	Latchesar Ionkov <lucho@ionkov.net>,
-	Dominique Martinet <asmadeus@codewreck.org>,
-	Christian Schoenebeck <linux_oss@crudebyte.com>,
-	Chris Mason <clm@fb.com>,
-	David Sterba <dsterba@suse.com>,
-	Mark Fasheh <mark@fasheh.com>,
-	Joel Becker <jlbec@evilplan.org>,
-	Joseph Qi <joseph.qi@linux.alibaba.com>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>,
-	Josef Bacik <josef@toxicpanda.com>,
-	Jan Kara <jack@suse.cz>,
-	linux-block@vger.kernel.org,
-	v9fs@lists.linux.dev,
-	linux-btrfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	jfs-discussion@lists.sourceforge.net,
-	ocfs2-devel@lists.linux.dev,
-	linux-xfs@vger.kernel.org,
-	linux-mm@kvack.org
-Subject: [PATCH 10/10] mm: rename filemap_flush to filemap_fdatawrite_kick
-Date: Mon, 13 Oct 2025 11:58:05 +0900
-Message-ID: <20251013025808.4111128-11-hch@lst.de>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20251013025808.4111128-1-hch@lst.de>
-References: <20251013025808.4111128-1-hch@lst.de>
+	s=arc-20240116; t=1760329701; c=relaxed/simple;
+	bh=D2j4VRk7a14GHI55HmxdAs/3Rt4Jbr/RtZrqE5xz2U0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qsvJhXRo4vBV0qGcIBJjqCwqRpdsjhCjAgj4+kEvjQGSfvNSxe+y8Z4ti8eW5gPPemLRhkNYhYNyLLivG9yE2si+OwBnZJK9yQ6PhhlgHvxTNf5F9w/feQb+Pk4KlpffXv43fXFYvkuJm164osWeLd8yB7fCZgwGZALhQYDXeXk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
+X-AuditID: a67dfc5b-c2dff70000001609-b8-68ec7fdc6e98
+Date: Mon, 13 Oct 2025 13:28:07 +0900
+From: Byungchul Park <byungchul@sk.com>
+To: Mark Rutland <mark.rutland@arm.com>
+Cc: linux-kernel@vger.kernel.org, kernel_team@skhynix.com,
+	torvalds@linux-foundation.org, damien.lemoal@opensource.wdc.com,
+	linux-ide@vger.kernel.org, adilger.kernel@dilger.ca,
+	linux-ext4@vger.kernel.org, mingo@redhat.com, peterz@infradead.org,
+	will@kernel.org, tglx@linutronix.de, rostedt@goodmis.org,
+	joel@joelfernandes.org, sashal@kernel.org, daniel.vetter@ffwll.ch,
+	duyuyang@gmail.com, johannes.berg@intel.com, tj@kernel.org,
+	tytso@mit.edu, willy@infradead.org, david@fromorbit.com,
+	amir73il@gmail.com, gregkh@linuxfoundation.org, kernel-team@lge.com,
+	linux-mm@kvack.org, akpm@linux-foundation.org, mhocko@kernel.org,
+	minchan@kernel.org, hannes@cmpxchg.org, vdavydov.dev@gmail.com,
+	sj@kernel.org, jglisse@redhat.com, dennis@kernel.org, cl@linux.com,
+	penberg@kernel.org, rientjes@google.com, vbabka@suse.cz,
+	ngupta@vflare.org, linux-block@vger.kernel.org,
+	josef@toxicpanda.com, linux-fsdevel@vger.kernel.org, jack@suse.cz,
+	jlayton@kernel.org, dan.j.williams@intel.com, hch@infradead.org,
+	djwong@kernel.org, dri-devel@lists.freedesktop.org,
+	rodrigosiqueiramelo@gmail.com, melissa.srw@gmail.com,
+	hamohammed.sa@gmail.com, harry.yoo@oracle.com,
+	chris.p.wilson@intel.com, gwan-gyeong.mun@intel.com,
+	max.byungchul.park@gmail.com, boqun.feng@gmail.com,
+	longman@redhat.com, yunseong.kim@ericsson.com, ysk@kzalloc.com,
+	yeoreum.yun@arm.com, netdev@vger.kernel.org,
+	matthew.brost@intel.com, her0gyugyu@gmail.com, corbet@lwn.net,
+	catalin.marinas@arm.com, bp@alien8.de, dave.hansen@linux.intel.com,
+	x86@kernel.org, hpa@zytor.com, luto@kernel.org,
+	sumit.semwal@linaro.org, gustavo@padovan.org,
+	christian.koenig@amd.com, andi.shyti@kernel.org, arnd@arndb.de,
+	lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com,
+	rppt@kernel.org, surenb@google.com, mcgrof@kernel.org,
+	petr.pavlu@suse.com, da.gomez@kernel.org, samitolvanen@google.com,
+	paulmck@kernel.org, frederic@kernel.org, neeraj.upadhyay@kernel.org,
+	joelagnelf@nvidia.com, josh@joshtriplett.org, urezki@gmail.com,
+	mathieu.desnoyers@efficios.com, jiangshanlai@gmail.com,
+	qiang.zhang@linux.dev, juri.lelli@redhat.com,
+	vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
+	bsegall@google.com, mgorman@suse.de, vschneid@redhat.com,
+	chuck.lever@oracle.com, neil@brown.name, okorniev@redhat.com,
+	Dai.Ngo@oracle.com, tom@talpey.com, trondmy@kernel.org,
+	anna@kernel.org, kees@kernel.org, bigeasy@linutronix.de,
+	clrkwllms@kernel.org, ada.coupriediaz@arm.com,
+	kristina.martsenko@arm.com, wangkefeng.wang@huawei.com,
+	broonie@kernel.org, kevin.brodsky@arm.com, dwmw@amazon.co.uk,
+	shakeel.butt@linux.dev, ast@kernel.org, ziy@nvidia.com,
+	yuzhao@google.com, baolin.wang@linux.alibaba.com,
+	usamaarif642@gmail.com, joel.granados@kernel.org,
+	richard.weiyang@gmail.com, geert+renesas@glider.be,
+	tim.c.chen@linux.intel.com, linux@treblig.org,
+	alexander.shishkin@linux.intel.com, lillian@star-ark.net,
+	chenhuacai@kernel.org, francesco@valla.it,
+	guoweikang.kernel@gmail.com, link@vivo.com, jpoimboe@kernel.org,
+	masahiroy@kernel.org, brauner@kernel.org,
+	thomas.weissschuh@linutronix.de, oleg@redhat.com, mjguzik@gmail.com,
+	andrii@kernel.org, wangfushuai@baidu.com, linux-doc@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-media@vger.kernel.org,
+	linaro-mm-sig@lists.linaro.org, linux-i2c@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-modules@vger.kernel.org,
+	rcu@vger.kernel.org, linux-nfs@vger.kernel.org,
+	linux-rt-devel@lists.linux.dev
+Subject: Re: [PATCH v17 09/47] arm64, dept: add support
+ CONFIG_ARCH_HAS_DEPT_SUPPORT to arm64
+Message-ID: <20251013042807.GB6925@system.software.com>
+References: <20251002081247.51255-1-byungchul@sk.com>
+ <20251002081247.51255-10-byungchul@sk.com>
+ <aN_fel4Rpqz6TPsD@J2N7QTR9R3>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aN_fel4Rpqz6TPsD@J2N7QTR9R3>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa0xTZxjH955bTxs7zgoLr/bDTHfLcDpd3HhY3C0m28lwcXMJHxgJduPM
+	NkIhBVFmGBUpwSmsuhRCi6yI3KuwUycC6+LYwLFLrEJGdbSIVDqyFqaDEjJod4ox89sv//+T
+	3/s8ycuSqkZmA6s3FAlGgzZXwygoRXhd02ZfWUi3tXkaw+JCFQUN3U4GqsR6GiYXqxAs/Wsn
+	wdwXo2Bh+Q8ZxNzDCJwXjhDwT0+UAetUgIG62SMUzA69DeHJARpiviAB45EQgtZAlIDV2v1Q
+	Z/UgaJrykXBh2I9gNPAojC3OMzBiPc5A+FoDAXM9DDjK3TTUnhYp6LvVL4OJ2lMEdInvwi+W
+	M4T0BgO1XyeDve4oAdZzAwQst3bK4NfmCQrsv43SsDK1DWKOfBjuCsrA94WVgvPhqzSM+H+X
+	DrlSSUOv6ZYMxBtD0vonZkgQp6XCfXMT1DdOMDDa38CA3xmjwWRfouF6l4eC7qCXgBFbBwVX
+	+8/R0DJ+jYBIjRo8J6tp8FruIPhybga9kcMvmWsovtN1keDN11cZ3tnoRPxCy1GSN1sk+iE0
+	T/IVroO8O+Kg+J/PYL7P5pPxFd/dlPEO8QBf8WOY5l3tKXzzt7PEe5szFTtyhFx9sWB84bW9
+	Ct3tmctUgZh0qP3YSdqEwgmfIzmLue249/i47AF/1VtBxZninsZtkbY1Zrhnsde7TMY5SeIT
+	/QtSrmBJrkmN3U7PWpHIZeOVjjEizkouFU+Id4n4kIorR9jUXUXeLx7DI/WBNSvJpWBvdFYa
+	YiVW47YoG4/lUtzU9zcd58e5J/Hli1fWPJjzy/HdOTO6v+l6/H27l7IgzvaQ1vaQ1va/1oHI
+	TqTSG4rztPrc7Vt0JQb9oS0f5+eJSPq1raUrH15C9zwfDCKORZp1St3AXzoVrS0uLMkbRJgl
+	NUnK1MMhnUqZoy35VDDmZxsP5AqFg0jNUppk5YuRgzkqbp+2SNgvCAWC8UFLsPINJlS9983s
+	V7LuZUxmvmNK3Ply2cb1cKeydVfm9NDu51MyDD07nxrPHpUv1Rx7HSWESlejRQmVrtOB6vLP
+	yiqf+cTu7T7vGXt/Y2MgTRfanTaf9lFBerDouX2JHX9Sb/lte3akcq5HnuBb1D1jP5VmWFZv
+	n33p8KWsG1vTs4Lpm745pUxefFVDFeq021JIY6H2P46klOixAwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA02SbUxTZxTH89z73Bc6ul07jDeQJUs3Y8SoM7p4Msxi/KB3LDP7sMTMxGAz
+	b2zDm2kRxcUIFCI6o7SzdLSKFEep0AkWlCHpJBjrgFWpVGWOipgKVNoxWYtDSvGWZZlfTn7n
+	/3LyfHhYUpGg0llNQZGoLVDlKWkZlu3M0q8dORZWf/T7i9XwoKwHQyxaheFcq5OGKlctBYOX
+	WxCMxqoQvJy3klDZtYhhwehhIDr3BwOLbg+CGp+RBGdHGQF/tyVomLo5g8A0FqTBHCrDMG0/
+	hcAybmUgdGsHREa7KVgMTBDwcDaMwB5MEBDsOY5goSYXLjS00zDvvUuC2TSIwDYWIGGyTTI7
+	PI8RuB3lNDyrvkrCUPBt8MemaegzfUdDxHeOgD/baKgvd1Nw3mpEoL/YSkPNeReGrifXGfBN
+	xQkYqTES0OL6Akbt4xgGqhsI6X1S6soKsJr1hDQmCTD91E3AnL2Zgd8ujmCwl64Eq3eIgqcO
+	CwPxsQ2wWF8InpYJBgJnTBguR+5SW01IeFl5GgvN7dcIofLeAi0465xImH9lREK0UU8KldXS
+	ejM8TQoV7YeExoEwLbyK3acF92w9FvobeMHgXSt0WQKMUPHLI+bLT3bLtuwT8zTFonb9p3tl
+	6qfjPfiAK+2w44SBKkWRd06iFJbnNvEXOitwkjG3km+abVpimlvFDw/PkUlOk/jU9aiky1iS
+	s2XwbufgkvEul8PHL/mJJMu5zfyI6wWRDCm4csSXtlaR/xrL+L7a4NJVksvkhxMhKcRKnME3
+	JdiknCLJtq6/qCQv5z7ge67dJqqR3PJG2/JG2/J/ux6RzShNU1Ccr9LkfbxOl6suKdAcXvdN
+	Yb4LSb/SfjRu+BlFh3b0Io5FylS5untKraBUxbqS/F7Es6QyTb7527BaId+nKjkiagtztAfz
+	RF0vymCxcoU8e5e4V8HtVxWJuaJ4QNT+5xJsSnopavznkR+fyDkZOHtcf+f5j1lnFRMtX7X2
+	RTfKfP2h9DX+eXJLaNuRnbHs3u3esgann+Ft34/1v0cdelY3MGNYvudewKCd+GxyTXnEQXm3
+	vu/+nMlMXWa+6nqr88YuWx16/uuxBarzccfMDxXZDl+7L27+8ODXp4n81LmsGY/PXlukxDq1
+	akMmqdWpXgMpcDDEkQMAAA==
+X-CFilter-Loop: Reflected
 
-Make the naming consistent with the other helpers and get away from
-the flush terminology that is way to overloaded.
+On Fri, Oct 03, 2025 at 03:36:42PM +0100, Mark Rutland wrote:
+> On Thu, Oct 02, 2025 at 05:12:09PM +0900, Byungchul Park wrote:
+> > dept needs to notice every entrance from user to kernel mode to treat
+> > every kernel context independently when tracking wait-event dependencies.
+> > Roughly, system call and user oriented fault are the cases.
+> >
+> > Make dept aware of the entrances of arm64 and add support
+> > CONFIG_ARCH_HAS_DEPT_SUPPORT to arm64.
+> >
+> > Signed-off-by: Byungchul Park <byungchul@sk.com>
+> > ---
+> >  arch/arm64/Kconfig          | 1 +
+> >  arch/arm64/kernel/syscall.c | 7 +++++++
+> >  arch/arm64/mm/fault.c       | 7 +++++++
+> >  3 files changed, 15 insertions(+)
+> >
+> > diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+> > index e9bbfacc35a6..a8fab2c052dc 100644
+> > --- a/arch/arm64/Kconfig
+> > +++ b/arch/arm64/Kconfig
+> > @@ -281,6 +281,7 @@ config ARM64
+> >       select USER_STACKTRACE_SUPPORT
+> >       select VDSO_GETRANDOM
+> >       select VMAP_STACK
+> > +     select ARCH_HAS_DEPT_SUPPORT
+> >       help
+> >         ARM 64-bit (AArch64) Linux support.
+> >
+> > diff --git a/arch/arm64/kernel/syscall.c b/arch/arm64/kernel/syscall.c
+> > index c442fcec6b9e..bbd306335179 100644
+> > --- a/arch/arm64/kernel/syscall.c
+> > +++ b/arch/arm64/kernel/syscall.c
+> > @@ -7,6 +7,7 @@
+> >  #include <linux/ptrace.h>
+> >  #include <linux/randomize_kstack.h>
+> >  #include <linux/syscalls.h>
+> > +#include <linux/dept.h>
+> >
+> >  #include <asm/debug-monitors.h>
+> >  #include <asm/exception.h>
+> > @@ -96,6 +97,12 @@ static void el0_svc_common(struct pt_regs *regs, int scno, int sc_nr,
+> >        * (Similarly for HVC and SMC elsewhere.)
+> >        */
+> >
+> > +     /*
+> > +      * This is a system call from user mode.  Make dept work with a
+> > +      * new kernel mode context.
+> > +      */
+> > +     dept_update_cxt();
+> 
+> As Mark Brown pointed out in his replies, this patch is missing a whole
+> bunch of cases and does not work correctly as-is.
+> 
+> As Dave Hansen pointed out on the x86 patch, you shouldn't do this
+> piecemeal in architecture code, and should instead work with the
+> existing context tracking, e.g. by adding logic to
+> enter_from_user_mode() and exit_to_user_mode(), or by reusing some
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/bdev.c            | 2 +-
- fs/btrfs/defrag.c       | 4 ++--
- fs/btrfs/extent_io.c    | 3 ++-
- fs/btrfs/file.c         | 2 +-
- fs/btrfs/inode.c        | 6 +++---
- fs/btrfs/reflink.c      | 2 +-
- fs/btrfs/super.c        | 2 +-
- fs/ext4/inline.c        | 2 +-
- fs/ext4/inode.c         | 6 +++---
- fs/fat/inode.c          | 2 +-
- fs/jfs/jfs_logmgr.c     | 2 +-
- fs/xfs/xfs_file.c       | 2 +-
- include/linux/pagemap.h | 2 +-
- mm/filemap.c            | 6 +++---
- mm/khugepaged.c         | 2 +-
- 15 files changed, 23 insertions(+), 22 deletions(-)
+I will consider it.  However, I need to check if there are not any waits
+and events before enter_from_user_mode(), or after exit_to_user_mode()
+since those functions aren't the outmost functions for kernel mode C
+code anyway.
 
-diff --git a/block/bdev.c b/block/bdev.c
-index 810707cca970..e8a564120ac7 100644
---- a/block/bdev.c
-+++ b/block/bdev.c
-@@ -245,7 +245,7 @@ int sync_blockdev_nowait(struct block_device *bdev)
- {
- 	if (!bdev)
- 		return 0;
--	return filemap_flush(bdev->bd_mapping);
-+	return filemap_fdatawrite_kick(bdev->bd_mapping);
- }
- EXPORT_SYMBOL_GPL(sync_blockdev_nowait);
- 
-diff --git a/fs/btrfs/defrag.c b/fs/btrfs/defrag.c
-index 7b277934f66f..e2f3027060db 100644
---- a/fs/btrfs/defrag.c
-+++ b/fs/btrfs/defrag.c
-@@ -1483,10 +1483,10 @@ int btrfs_defrag_file(struct btrfs_inode *inode, struct file_ra_state *ra,
- 		 * need to be written back immediately.
- 		 */
- 		if (range->flags & BTRFS_DEFRAG_RANGE_START_IO) {
--			filemap_flush(inode->vfs_inode.i_mapping);
-+			filemap_fdatawrite_kick(inode->vfs_inode.i_mapping);
- 			if (test_bit(BTRFS_INODE_HAS_ASYNC_EXTENT,
- 				     &inode->runtime_flags))
--				filemap_flush(inode->vfs_inode.i_mapping);
-+				filemap_fdatawrite_kick(inode->vfs_inode.i_mapping);
- 		}
- 		if (range->compress_type == BTRFS_COMPRESS_LZO)
- 			btrfs_set_fs_incompat(fs_info, COMPRESS_LZO);
-diff --git a/fs/btrfs/extent_io.c b/fs/btrfs/extent_io.c
-index c123a3ef154a..c86cb27876a4 100644
---- a/fs/btrfs/extent_io.c
-+++ b/fs/btrfs/extent_io.c
-@@ -2450,7 +2450,8 @@ static int extent_write_cache_pages(struct address_space *mapping,
- 
- 	/*
- 	 * We do the tagged writepage as long as the snapshot flush bit is set
--	 * and we are the first one who do the filemap_flush() on this inode.
-+	 * and we are the first one who do the filemap_fdatawrite_kick() on this
-+	 * inode.
- 	 *
- 	 * The nr_to_write == LONG_MAX is needed to make sure other flushers do
- 	 * not race in and drop the bit.
-diff --git a/fs/btrfs/file.c b/fs/btrfs/file.c
-index 7efd1f8a1912..9190488f1aae 100644
---- a/fs/btrfs/file.c
-+++ b/fs/btrfs/file.c
-@@ -1498,7 +1498,7 @@ int btrfs_release_file(struct inode *inode, struct file *filp)
- 	 */
- 	if (test_and_clear_bit(BTRFS_INODE_FLUSH_ON_CLOSE,
- 			       &BTRFS_I(inode)->runtime_flags))
--			filemap_flush(inode->i_mapping);
-+			filemap_fdatawrite_kick(inode->i_mapping);
- 	return 0;
- }
- 
-diff --git a/fs/btrfs/inode.c b/fs/btrfs/inode.c
-index b63d77154c45..4192056f4d42 100644
---- a/fs/btrfs/inode.c
-+++ b/fs/btrfs/inode.c
-@@ -8434,7 +8434,7 @@ static int btrfs_rename(struct mnt_idmap *idmap,
- 	 * now so  we don't add too much work to the end of the transaction
- 	 */
- 	if (new_inode && S_ISREG(old_inode->i_mode) && new_inode->i_size)
--		filemap_flush(old_inode->i_mapping);
-+		filemap_fdatawrite_kick(old_inode->i_mapping);
- 
- 	if (flags & RENAME_WHITEOUT) {
- 		whiteout_args.inode = new_whiteout_inode(idmap, old_dir);
-@@ -8680,10 +8680,10 @@ static void btrfs_run_delalloc_work(struct btrfs_work *work)
- 	delalloc_work = container_of(work, struct btrfs_delalloc_work,
- 				     work);
- 	inode = delalloc_work->inode;
--	filemap_flush(inode->i_mapping);
-+	filemap_fdatawrite_kick(inode->i_mapping);
- 	if (test_bit(BTRFS_INODE_HAS_ASYNC_EXTENT,
- 				&BTRFS_I(inode)->runtime_flags))
--		filemap_flush(inode->i_mapping);
-+		filemap_fdatawrite_kick(inode->i_mapping);
- 
- 	iput(inode);
- 	complete(&delalloc_work->completion);
-diff --git a/fs/btrfs/reflink.c b/fs/btrfs/reflink.c
-index 5465a5eae9b2..72f9b5faa2e8 100644
---- a/fs/btrfs/reflink.c
-+++ b/fs/btrfs/reflink.c
-@@ -834,7 +834,7 @@ static int btrfs_remap_file_range_prep(struct file *file_in, loff_t pos_in,
- 	 * Also we don't need to check ASYNC_EXTENT, as async extent will be
- 	 * CoWed anyway, not affecting nocow part.
- 	 */
--	ret = filemap_flush(inode_in->vfs_inode.i_mapping);
-+	ret = filemap_fdatawrite_kick(inode_in->vfs_inode.i_mapping);
- 	if (ret < 0)
- 		return ret;
- 
-diff --git a/fs/btrfs/super.c b/fs/btrfs/super.c
-index d6e496436539..e634d93a908c 100644
---- a/fs/btrfs/super.c
-+++ b/fs/btrfs/super.c
-@@ -1022,7 +1022,7 @@ int btrfs_sync_fs(struct super_block *sb, int wait)
- 	trace_btrfs_sync_fs(fs_info, wait);
- 
- 	if (!wait) {
--		filemap_flush(fs_info->btree_inode->i_mapping);
-+		filemap_fdatawrite_kick(fs_info->btree_inode->i_mapping);
- 		return 0;
- 	}
- 
-diff --git a/fs/ext4/inline.c b/fs/ext4/inline.c
-index 1b094a4f3866..692d28dbee64 100644
---- a/fs/ext4/inline.c
-+++ b/fs/ext4/inline.c
-@@ -1951,7 +1951,7 @@ int ext4_convert_inline_data(struct inode *inode)
- 		 * inline data to delay allocated block. Just force writeout
- 		 * here to finish conversion.
- 		 */
--		error = filemap_flush(inode->i_mapping);
-+		error = filemap_fdatawrite_kick(inode->i_mapping);
- 		if (error)
- 			return error;
- 		if (!ext4_has_inline_data(inode))
-diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c
-index f9e4ac87211e..f4bcbcfd4531 100644
---- a/fs/ext4/inode.c
-+++ b/fs/ext4/inode.c
-@@ -3302,7 +3302,7 @@ int ext4_alloc_da_blocks(struct inode *inode)
- 		return 0;
- 
- 	/*
--	 * We do something simple for now.  The filemap_flush() will
-+	 * We do something simple for now.  The filemap_fdatawrite_kick() will
- 	 * also start triggering a write of the data blocks, which is
- 	 * not strictly speaking necessary (and for users of
- 	 * laptop_mode, not even desirable).  However, to do otherwise
-@@ -3328,11 +3328,11 @@ int ext4_alloc_da_blocks(struct inode *inode)
- 	 * logical block extents, call the multi-block allocator, and
- 	 * then update the buffer heads with the block allocations.
- 	 *
--	 * For now, though, we'll cheat by calling filemap_flush(),
-+	 * For now, though, we'll cheat by calling filemap_fdatawrite_kick(),
- 	 * which will map the blocks, and start the I/O, but not
- 	 * actually wait for the I/O to complete.
- 	 */
--	return filemap_flush(inode->i_mapping);
-+	return filemap_fdatawrite_kick(inode->i_mapping);
- }
- 
- /*
-diff --git a/fs/fat/inode.c b/fs/fat/inode.c
-index 9648ed097816..f1ecb4c211bc 100644
---- a/fs/fat/inode.c
-+++ b/fs/fat/inode.c
-@@ -1877,7 +1877,7 @@ static int writeback_inode(struct inode *inode)
-  * write data and metadata corresponding to i1 and i2.  The io is
-  * started but we do not wait for any of it to finish.
-  *
-- * filemap_flush is used for the block device, so if there is a dirty
-+ * filemap_fdatawrite_kick is used for the block device, so if there is a dirty
-  * page for a block already in flight, we will not wait and start the
-  * io over again
-  */
-diff --git a/fs/jfs/jfs_logmgr.c b/fs/jfs/jfs_logmgr.c
-index b343c5ea1159..4cdb0bb6c921 100644
---- a/fs/jfs/jfs_logmgr.c
-+++ b/fs/jfs/jfs_logmgr.c
-@@ -934,7 +934,7 @@ static int lmLogSync(struct jfs_log * log, int hard_sync)
- 	if (hard_sync)
- 		write_special_inodes(log, filemap_fdatawrite);
- 	else
--		write_special_inodes(log, filemap_flush);
-+		write_special_inodes(log, filemap_fdatawrite_kick);
- 
- 	/*
- 	 *	forward syncpt
-diff --git a/fs/xfs/xfs_file.c b/fs/xfs/xfs_file.c
-index 2702fef2c90c..bf39bfd4a8cd 100644
---- a/fs/xfs/xfs_file.c
-+++ b/fs/xfs/xfs_file.c
-@@ -1615,7 +1615,7 @@ xfs_file_release(
- 	if (xfs_iflags_test_and_clear(ip, XFS_ITRUNCATED)) {
- 		xfs_iflags_clear(ip, XFS_EOFBLOCKS_RELEASED);
- 		if (ip->i_delayed_blks > 0)
--			filemap_flush(inode->i_mapping);
-+			filemap_fdatawrite_kick(inode->i_mapping);
- 	}
- 
- 	/*
-diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h
-index 664f23f2330a..e7c4d8bba952 100644
---- a/include/linux/pagemap.h
-+++ b/include/linux/pagemap.h
-@@ -37,7 +37,7 @@ int filemap_invalidate_pages(struct address_space *mapping,
- 
- int write_inode_now(struct inode *, int sync);
- int filemap_fdatawrite(struct address_space *);
--int filemap_flush(struct address_space *);
-+int filemap_fdatawrite_kick(struct address_space *);
- int filemap_fdatawrite_kick_nr(struct address_space *mapping,
- 		long *nr_to_write);
- int filemap_fdatawait_keep_errors(struct address_space *mapping);
-diff --git a/mm/filemap.c b/mm/filemap.c
-index ec19ed127de2..3ad6698c39c9 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -437,7 +437,7 @@ int filemap_fdatawrite_range_kick(struct address_space *mapping, loff_t start,
- EXPORT_SYMBOL_GPL(filemap_fdatawrite_range_kick);
- 
- /**
-- * filemap_flush - mostly a non-blocking flush
-+ * filemap_fdatawrite_kick - mostly a non-blocking flush
-  * @mapping:	target address_space
-  *
-  * This is a mostly non-blocking flush.  Not suitable for data-integrity
-@@ -445,11 +445,11 @@ EXPORT_SYMBOL_GPL(filemap_fdatawrite_range_kick);
-  *
-  * Return: %0 on success, negative error code otherwise.
-  */
--int filemap_flush(struct address_space *mapping)
-+int filemap_fdatawrite_kick(struct address_space *mapping)
- {
- 	return filemap_fdatawrite_range_kick(mapping, 0, LLONG_MAX);
- }
--EXPORT_SYMBOL(filemap_flush);
-+EXPORT_SYMBOL(filemap_fdatawrite_kick);
- 
- /*
-  * Start writeback on @nr_to_write pages from @mapping.  No one but the existing
-diff --git a/mm/khugepaged.c b/mm/khugepaged.c
-index abe54f0043c7..5a4a43e979c4 100644
---- a/mm/khugepaged.c
-+++ b/mm/khugepaged.c
-@@ -1949,7 +1949,7 @@ static int collapse_file(struct mm_struct *mm, unsigned long addr,
- 				 * forcing writeback in loop.
- 				 */
- 				xas_unlock_irq(&xas);
--				filemap_flush(mapping);
-+				filemap_fdatawrite_kick(mapping);
- 				result = SCAN_FAIL;
- 				goto xa_unlocked;
- 			} else if (folio_test_writeback(folio)) {
--- 
-2.47.3
+	Byungchul
 
+> existing context tracking logic that's called there.
+> 
+> Mark.
