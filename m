@@ -1,98 +1,119 @@
-Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f48.google.com (mail-yx1-f48.google.com [74.125.224.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 788AB22157B;
-	Mon, 13 Oct 2025 08:59:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.118
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF0FA2FE07F
+	for <linux-block@vger.kernel.org>; Mon, 13 Oct 2025 09:59:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760345963; cv=none; b=Z1sgO8RyEdajwvfvbQzNKebQtQisJ+mAvoih0zQ8G7rANvpr5EYO6L8k+Ega9ihbQZ2LwMbl1yJURS+Pn0QQPQITRzf/DzVEthH2m6+m1LOVCc61z8tKCoNgL8BQgvfVuRgM50eGCgbFLCJKTMuwVUtY9koa2Fqw/o/z6hf0bt4=
+	t=1760349601; cv=none; b=uzs3nUdBdciNbKd/vmUgr3izB72GKYHFhgO8f99asey/RT4y6zbTEod13o7jZtCraJjqipcHpySuKUvytTbdxs/EvHXu9i60cQ4/L8lk0afpiWmYNHMegycM1UdEHbkyKNVv+dHJdGBVd3eWDsYUk9nSVGHXmmEc/vHFiRiUwyU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760345963; c=relaxed/simple;
-	bh=EXvJRkz0VSwDTyo3GX8GBzx1dSMrLhm3KkeVbCu6644=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=F1TcnuwrrGMjNiI/PhpY9nMEb87QudbrihmDBUH9jENXRo9/LhVnQBB0qO6p92roURWrei7tIFy25QsZiH7hRA3bqfF7jGAf/QRBTZl/rwCA+m7JcsLxuhS72x4/CkhxGH/nHIUzlNVhAslYGcV3OCLeDBTNwFWIo7yJiKs6XrU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=h3LaqdNR; arc=none smtp.client-ip=115.124.30.118
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+	s=arc-20240116; t=1760349601; c=relaxed/simple;
+	bh=+zOuCBbttI2pym4Pdpz046IX8ZPwrX2sj4yc80Raf0c=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jnNWvvWOjsBO7WcdZZkbhIiPrRyC/2CIDMCMnA7sUIvCqiioxTeM+uY3ZHD+PEWkr8Y4XAUt89VS7OWFvotz/tr2WBEFB1qxVJolxvx3Wtqgz0aGnU3rTN1yvgIiMMGvQf5krllxVHgSE/roJ+RgrJGdqiPJVZalBBOmqio4pwc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lYGb4s7P; arc=none smtp.client-ip=74.125.224.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="h3LaqdNR"
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1760345956; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=gGIOd7Ex2m90KckglAwHsiXkn+YFnTKWdf60l+zhCdc=;
-	b=h3LaqdNRHndzkRMufqmKcgJ7nMw9gmr2DxCZkxLSn3tWuuMOUs5UOAOrxr7OSasAqIqROY4s+gg5v27gKZvRZjfwJPoEox0HTVXN/EeCGzzliOwlBrqVy3lSbuTOloh2RYeLZSiQMEQHDszJQlShZYIONDMhzIq8OPMurstPjV4=
-Received: from 30.221.129.221(mailfrom:joseph.qi@linux.alibaba.com fp:SMTPD_---0Wq2ERPx_1760345954 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Mon, 13 Oct 2025 16:59:15 +0800
-Message-ID: <9b8abc79-8605-4c13-9d9f-972f90418cd2@linux.alibaba.com>
-Date: Mon, 13 Oct 2025 16:59:14 +0800
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lYGb4s7P"
+Received: by mail-yx1-f48.google.com with SMTP id 956f58d0204a3-6348447d5easo3766432d50.0
+        for <linux-block@vger.kernel.org>; Mon, 13 Oct 2025 02:59:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1760349599; x=1760954399; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hZsaCMPk0e7xOahYxc9B2HTwzlp/3SZdj7OzfRUl7Tc=;
+        b=lYGb4s7PFPtlQAqGLwjY6C3BoptYCrvsiQTPmRJWe0jrmue4kzt875LXGc+nwMus5e
+         gg/dRRivympKqj/Xbh/kqv4jfo3sNkaRAWWH4kZP7QO+EYk91Xl5ZvumS/kg92GHtPjk
+         j1DbxG/Dgk3vmqFQjqZbS6cxMNqHU4DeIsE2rSdChE2dhflRSZVNKpBaEr6XVXJ3d+35
+         Uw6w91MZJuEBrgw2xCsk0gcBTZMcncRHXUPfRkRDe21ahILoyvU3E/QbhqdS6KHwrvfA
+         79Um23YLTNO6t/m7Vr/uQlJA0nZ6SxJWNCgTAeqdZEx/sH8Vu9rR490wZ3vArZnHDyqH
+         MjnQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760349599; x=1760954399;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hZsaCMPk0e7xOahYxc9B2HTwzlp/3SZdj7OzfRUl7Tc=;
+        b=h/sY69F1Uah4IcFJ4MLA1RqGn/DcPWUQ+6XiwktrJr1vlMQrveB+tDvbt/JTfOSSaz
+         0WtZS02xNAwp1zUlUKe7vwd4oSpmZH2TQwKoPTti+qSoDLpzCbf0VcyhJDIUQOZZ27UA
+         cOyhmm/vIW1MKcjrxaHlinyFUtsecQ0tOItsJFpVBJR2Y5oDgFk4+JOfNwQV6CFhrQVu
+         jCoXwjSbwvcK7ZDJGA72e/8AvVZGMNVvo5v1AKzFOBjJsO51NeDmMQM3TuIFLNuJ7nd/
+         8gLB0yUgQAjnRLhLGlwsaZXSyr2pkn0auQxLnfoncTiqgp3SWFESqsbsr9ZAocTpsM8V
+         FVVA==
+X-Forwarded-Encrypted: i=1; AJvYcCV23NZ9Ul+EsC3dXddqGSeXzR0izBnNPVXTR2xs4LoJXJxNwR41sAQyPqps6ag+aAhy53jzp8mPU2K3Kg==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz0/SSGjgjZEag3Mx74rXLebDSXs6xR8GVsn2HiTPXUMT39+Q2E
+	OvzaLWp2NMaWU+Cz2oMVYJv3A/5VXTaczcawcBfyobIPZGaLTNdepW/vdIS+7ExVOJ0vzKtUERn
+	x/onZ5K+bJEEA5hWheueP5kIcZXVK+0g=
+X-Gm-Gg: ASbGncs46qW3gHqZAFTyVdUexS4XAS82Qv1E0A4PTazp8tmZ24ne6nGsHHvoKuR19yQ
+	lQDRUNtyHTtX9ErW4VAUjiwsBlRQO26CRw72xmj0DEsLwnmxg/QoNPgaUjCCu5g5AFkR+gQiW0Q
+	BxWt+b/d+UuRJurODm8btvEuX+Cx/vJQNo2cN4sOkgfWzWsiy47D9tWgAsqGB/vCcjoR9yOtjLQ
+	xDlBNhQlcNPiHyLkCWytzxOLfNCICe/MUXb
+X-Google-Smtp-Source: AGHT+IEjiQMnhpQ/Kb5hfGFGrybCEQQLnH8Bm2H6/rcdu7ghvXP+Te8kpl6LHQn/PIgvNHwUMvVrGJdsfOorS0mdutU=
+X-Received: by 2002:a53:ee07:0:b0:63c:daf9:bf21 with SMTP id
+ 956f58d0204a3-63cdaf9fa65mr11783686d50.24.1760349598638; Mon, 13 Oct 2025
+ 02:59:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 03/10] ocfs2: don't opencode filemap_fdatawrite_range in
- ocfs2_journal_submit_inode_data_buffers
-To: Christoph Hellwig <hch@lst.de>,
- "Matthew Wilcox (Oracle)" <willy@infradead.org>,
- Eric Van Hensbergen <ericvh@kernel.org>, Latchesar Ionkov
- <lucho@ionkov.net>, Dominique Martinet <asmadeus@codewreck.org>,
- Christian Schoenebeck <linux_oss@crudebyte.com>, Chris Mason <clm@fb.com>,
- David Sterba <dsterba@suse.com>, Mark Fasheh <mark@fasheh.com>,
- Joel Becker <jlbec@evilplan.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
- Christian Brauner <brauner@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
- Jan Kara <jack@suse.cz>, linux-block@vger.kernel.org, v9fs@lists.linux.dev,
- linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, jfs-discussion@lists.sourceforge.net,
- ocfs2-devel@lists.linux.dev, linux-xfs@vger.kernel.org, linux-mm@kvack.org
-References: <20251013025808.4111128-1-hch@lst.de>
- <20251013025808.4111128-4-hch@lst.de>
-From: Joseph Qi <joseph.qi@linux.alibaba.com>
-In-Reply-To: <20251013025808.4111128-4-hch@lst.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20251010094047.3111495-1-safinaskar@gmail.com>
+ <20251010094047.3111495-3-safinaskar@gmail.com> <CAHp75VezkZ7A1VOP8cBH8h0DKVumP66jjUbepMCP87wGOrh+MQ@mail.gmail.com>
+In-Reply-To: <CAHp75VezkZ7A1VOP8cBH8h0DKVumP66jjUbepMCP87wGOrh+MQ@mail.gmail.com>
+From: Askar Safin <safinaskar@gmail.com>
+Date: Mon, 13 Oct 2025 12:59:21 +0300
+X-Gm-Features: AS18NWA-897xF_-UIFWa7pg6NN4-821ID7y01MXNqW6009NHHhcR0gsdnks-4OY
+Message-ID: <CAPnZJGBAc-kqZ-MAKRGrk1big=N_GZupxKgM_+TodqgteffLvw@mail.gmail.com>
+Subject: Re: [PATCH v2 2/3] initrd: remove deprecated code path (linuxrc)
+To: Andy Shevchenko <andy.shevchenko@gmail.com>
+Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Linus Torvalds <torvalds@linux-foundation.org>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Christian Brauner <brauner@kernel.org>, 
+	Al Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@lst.de>, 
+	Jens Axboe <axboe@kernel.dk>, Aleksa Sarai <cyphar@cyphar.com>, 
+	=?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>, 
+	Julian Stecklina <julian.stecklina@cyberus-technology.de>, 
+	Gao Xiang <hsiangkao@linux.alibaba.com>, Art Nikpal <email2tema@gmail.com>, 
+	Andrew Morton <akpm@linux-foundation.org>, Alexander Graf <graf@amazon.com>, 
+	Rob Landley <rob@landley.net>, Lennart Poettering <mzxreary@0pointer.de>, linux-arch@vger.kernel.org, 
+	linux-block@vger.kernel.org, initramfs@vger.kernel.org, 
+	linux-api@vger.kernel.org, linux-doc@vger.kernel.org, 
+	Michal Simek <monstr@monstr.eu>, Luis Chamberlain <mcgrof@kernel.org>, Kees Cook <kees@kernel.org>, 
+	Thorsten Blum <thorsten.blum@linux.dev>, Heiko Carstens <hca@linux.ibm.com>, 
+	Arnd Bergmann <arnd@arndb.de>, Dave Young <dyoung@redhat.com>, 
+	Christophe Leroy <christophe.leroy@csgroup.eu>, Krzysztof Kozlowski <krzk@kernel.org>, 
+	Borislav Petkov <bp@alien8.de>, Jessica Clarke <jrtc27@jrtc27.com>, 
+	Nicolas Schichan <nschichan@freebox.fr>, David Disseldorp <ddiss@suse.de>, patches@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Fri, Oct 10, 2025 at 6:05=E2=80=AFPM Andy Shevchenko
+<andy.shevchenko@gmail.com> wrote:
+> > -       noinitrd        [RAM] Tells the kernel not to load any configur=
+ed
+> > +       noinitrd        [Deprecated,RAM] Tells the kernel not to load a=
+ny configured
+> >                         initial RAM disk.
+>
+> How one is supposed to run this when just having a kernel is enough?
+> At least (ex)colleague of mine was a heavy user of this option for
+> testing kernel builds on the real HW.
 
+This option applies to initrd only, not to initramfs.
+Except for EFI mode, when it applies to both.
 
-On 2025/10/13 10:57, Christoph Hellwig wrote:
-> Use filemap_fdatawrite_range instead of opencoding the logic using
-> filemap_fdatawrite_wbc.  There is a slight change in the conversion
-> as nr_to_write is now set to LONG_MAX instead of double the number
-> of the pages in the range.  LONG_MAX is the usual nr_to_write for
-> WB_SYNC_ALL writeback, and the value expected by lower layers here.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+I will remove this option when I remove initrd.
 
-Looks fine to me.
-Reviewed-by: Joseph Qi <joseph.qi@linux.alibaba.com>
+In EFI mode it is easy just not to pass initramfs, so all is okay.
 
-> ---
->  fs/ocfs2/journal.c | 11 ++---------
->  1 file changed, 2 insertions(+), 9 deletions(-)
-> 
-> diff --git a/fs/ocfs2/journal.c b/fs/ocfs2/journal.c
-> index e5f58ff2175f..85239807dec7 100644
-> --- a/fs/ocfs2/journal.c
-> +++ b/fs/ocfs2/journal.c
-> @@ -902,15 +902,8 @@ int ocfs2_journal_alloc(struct ocfs2_super *osb)
->  
->  static int ocfs2_journal_submit_inode_data_buffers(struct jbd2_inode *jinode)
->  {
-> -	struct address_space *mapping = jinode->i_vfs_inode->i_mapping;
-> -	struct writeback_control wbc = {
-> -		.sync_mode =  WB_SYNC_ALL,
-> -		.nr_to_write = mapping->nrpages * 2,
-> -		.range_start = jinode->i_dirty_start,
-> -		.range_end = jinode->i_dirty_end,
-> -	};
-> -
-> -	return filemap_fdatawrite_wbc(mapping, &wbc);
-> +	return filemap_fdatawrite_range(jinode->i_vfs_inode->i_mapping,
-> +			jinode->i_dirty_start, jinode->i_dirty_end);
->  }
->  
->  int ocfs2_journal_init(struct ocfs2_super *osb, int *dirty)
+Also I will clarify docs in v3.
 
+Also, please, answer here:
+https://lore.kernel.org/regressions/20250918183336.5633-1-safinaskar@gmail.=
+com/
+
+--=20
+Askar Safin
