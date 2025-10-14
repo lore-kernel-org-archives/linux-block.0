@@ -1,60 +1,73 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 861B42FC87F;
-	Tue, 14 Oct 2025 10:58:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BD172EC082
+	for <linux-block@vger.kernel.org>; Tue, 14 Oct 2025 11:04:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760439529; cv=none; b=f4ZJRAR8WcAJLNy1AKP3rnasGPkFeobk243ea1E08APjQhK+5eGOeQ1IxhzRAsrBLfmu/4QwCfoahBQu2DwpDXA9S+s6edqpCUzfdbXvxjKAwGRuR1Nrs06tN4X4ExUXFaVe2nC6t12+2T9SJPqH0HzMLfehzvibXHkmdpYT8FA=
+	t=1760439895; cv=none; b=EbpHPNxB4BP0PG+EW7ZOrUeBedKic3t5lahQez+a5I6UCJ8LuFgjLCEPRf9xWvvFpwJ2T7RqgG/f22Bghk1KtC547nN/zmlhZCwRMMBhtYm/UKZwTKJzWR7tUrhUwu+Vnj8RAzMliPbSTeF9VcVbSOHWezmgVosjuflL4hE1/XA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760439529; c=relaxed/simple;
-	bh=5rqwZvjKItbDOtzZ0xHughjl/U2NF1KesCWEd0aoUlc=;
+	s=arc-20240116; t=1760439895; c=relaxed/simple;
+	bh=h5AS+Zjy6zDJe2tBjWwkhuIXONAErINCK4EC2Qd/Awk=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=I/q1m++K/Jl1bfn77b0G/Qg/MF8ACZvGMUF3LPdFVhX6gOcUjX9k9OyAT08+hxDZFVrbuC+e+ryqH1FMLQjJ17NhpnC/CG1oRjs/Bvjha/N7jUBp/3ob+RdRtcrJ2LzSk4Nb4+3ywHHRzQ1Z5U+n2cwWh0UmuRwPvtxNv5qlSVI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=H/Vlu1n3; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	 In-Reply-To:Content-Type; b=C/4cBHaO09jA0zjeJBT6dXwqW1c50eKZ9VXr3vm6q2/hL+W1qIFfNGZLUo60kWPX8aKSbeI9aDmoolvipD3kDLO2XcxIIxWF6LBEgUnGMoPsZnuK8CFO8rNzigFHpRRFbhW/eDgIO2se5Lfxb0gKVEfbrhDikBn0XcT9ofd+Z2E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ICFBk2in; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="H/Vlu1n3"
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 59E6YYhZ007910;
-	Tue, 14 Oct 2025 10:58:26 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=F7V/Rx
-	o+tXczlthz44MQCgbOQzSNuAsO8TQ1Q1KuhA0=; b=H/Vlu1n3ELLfLyr5CKfojW
-	EuqBNuwwW6n9D9f3GDVTdFdAs9kRMtEzPmCfSf848a2tXGudiJBVSIzt8mPa7uQj
-	HaEggFsb2w1wIR35YJdbXM+vmP8c7/OOOYrSP1pMxuw6Lsqxy9yIFxPhH6dNVZOs
-	BFgYXeEms0pOR4AvLIqGsppjAYVsI3IDKgIsTtR1Sef2/NQ4fqu+OTPLS8aKXllK
-	qvfh1m/3xRQgkrK+TaBGu2HBHaBGGsSKvD1mpe1SRw1ME69zCw5kYXElGYbFRuO8
-	K74K/ZyThYJfss4leS3aVJWYwp5+euvIRKlpkE8ytUIOYZOiCystMNrBc7Wc28aQ
-	==
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 49rfp7rysg-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 14 Oct 2025 10:58:25 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 59E7hOEj016759;
-	Tue, 14 Oct 2025 10:58:24 GMT
-Received: from smtprelay07.dal12v.mail.ibm.com ([172.16.1.9])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 49r32jtds9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 14 Oct 2025 10:58:24 +0000
-Received: from smtpav06.dal12v.mail.ibm.com (smtpav06.dal12v.mail.ibm.com [10.241.53.105])
-	by smtprelay07.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 59EAwN6e10617642
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 14 Oct 2025 10:58:24 GMT
-Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E4AC958043;
-	Tue, 14 Oct 2025 10:58:23 +0000 (GMT)
-Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2220E58059;
-	Tue, 14 Oct 2025 10:58:20 +0000 (GMT)
-Received: from [9.109.198.148] (unknown [9.109.198.148])
-	by smtpav06.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 14 Oct 2025 10:58:19 +0000 (GMT)
-Message-ID: <d4fe218b-9fc5-4466-ac56-0d4c5a8ccd96@linux.ibm.com>
-Date: Tue, 14 Oct 2025 16:28:18 +0530
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ICFBk2in"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1760439892;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=9Mvh4ql8Y8BBLDK18emWlEI/npE8s1LEzxvuBeQPUok=;
+	b=ICFBk2inemDdyTwCJguCPxlNcWAvlsFG5w+4YhfSqyq2yl9lPGx+JqRDhkWTO6cqZGAob4
+	3dUBTrW9iokEJg4Og5iBrwty1rVe0wsgfOWs41AHdTUexrtNktDZWwezQekWE+5fJrCtZj
+	j5zPrgmfDatJG5nYIjR/uHx75IUWZrI=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-199-1emo4w-BOGmfmXftPgm5Zw-1; Tue, 14 Oct 2025 07:04:51 -0400
+X-MC-Unique: 1emo4w-BOGmfmXftPgm5Zw-1
+X-Mimecast-MFC-AGG-ID: 1emo4w-BOGmfmXftPgm5Zw_1760439890
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-46e31191379so37952115e9.3
+        for <linux-block@vger.kernel.org>; Tue, 14 Oct 2025 04:04:51 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760439890; x=1761044690;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=9Mvh4ql8Y8BBLDK18emWlEI/npE8s1LEzxvuBeQPUok=;
+        b=ZCnkyBYM/oTy4JLnmoyFbOh/2wfrT0hZ3W2P/t1zUF/EhMKC82lHXdCFYdjS45w6hG
+         Le+lI2CDw4yRXZbaCAMxG34Y4LeKqVZT8w7wwHkVrTQ9stJ6RPTgM7+1WyIR/Oeh5VQe
+         +z2v4hSB4xRGr7wL1j/yfwNvj6G33J6Uwf5ilBjo9wBLkgXM6H/ZUEYzSTidaWvRsJ9p
+         CvDrcVIrIa3iHm5V0cSopG4JmwqSkVby/JwQk0Yo3XF9zT3evuxwv229IcH8+IqoCtJ7
+         TPdWuD4o7BYKWnU1Dn9fYzJAk3zMbKxP4Y7VSCwKX1Lloz/313JzYEt4hvP1EprijIVC
+         Zw8w==
+X-Forwarded-Encrypted: i=1; AJvYcCW0JDYnqqnAPFaGYzEjoSaBGCIiSMrCuFn4nwKoJLIjCL0oC84hMQRtp9Sk2zUAFlRp4AwFBOT8a6/3aQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxZVCyKYueBqtJlyFLwlh3oAdxPtSnIM60wGZkzJUmbK370lpSg
+	phhUUoITpWHN+7aBLzYmyHpfuJQjLoujL5DoYtBa+bwUclP6/cgMqFdt/RJ/azAUgUxAT9bMDlQ
+	XN3nD8clx/RZNEUSPbxRoz0XOoFPoYv3c7z1WTSpUNmV8PZIosKB9niFW7Vlm+j+v
+X-Gm-Gg: ASbGncsShKwhKdmAc68J9XciM1TYE2PmAKyGIjaunSIQNsTBEoyV4CTCKqIFXUkl5/g
+	jfqvie1+CsVUVHd4DS+EAP7MI+C2jcmTGxo2YChydCbrpzGQAPE3rEtoAb4QmpP5Qo+BVzQ+ifH
+	todJq3d7mXp7aY2F0RllVMxyiAGGlC0sT0/cJkyeKAvrPcdUfryAbtz27v1jKM7Gbfueg5HfciS
+	untodcDEiyXRNb3Fi3+TvQ+c0jYJslzMidgu5k9yNNFHcFFOzfboTu5M2BukmsBWS9MQBRhxdwy
+	gLyzVpaKt+PbKFjfABDbUhHX8ek7Urd3NwzfH58X8VAQSm2aQHhD4JfcvHKzTSM7m37kArX3CQ=
+	=
+X-Received: by 2002:a05:600c:3b07:b0:46e:1fb9:5497 with SMTP id 5b1f17b1804b1-46fa9af84fdmr170865755e9.18.1760439890108;
+        Tue, 14 Oct 2025 04:04:50 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEzx/Z7wqxSbdzibLnTtJ/UYmUM/D1LJV37loBqc1rTNfI1+V20N8hWD4xaH9pYVYV0jbb3AQ==
+X-Received: by 2002:a05:600c:3b07:b0:46e:1fb9:5497 with SMTP id 5b1f17b1804b1-46fa9af84fdmr170865285e9.18.1760439889704;
+        Tue, 14 Oct 2025 04:04:49 -0700 (PDT)
+Received: from ?IPV6:2a09:80c0:192:0:5dac:bf3d:c41:c3e7? ([2a09:80c0:192:0:5dac:bf3d:c41:c3e7])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46fb48a5bf9sm235616575e9.18.2025.10.14.04.04.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 14 Oct 2025 04:04:49 -0700 (PDT)
+Message-ID: <34b482e6-2360-4d65-9996-1513bcf12ffb@redhat.com>
+Date: Tue, 14 Oct 2025 13:04:47 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -62,68 +75,96 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/4] blk-rq-qos: fix possible deadlock
-To: Yu Kuai <yukuai3@huawei.com>, ming.lei@redhat.com, tj@kernel.org,
-        josef@toxicpanda.com, axboe@kernel.dk
-Cc: cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yukuai1@huaweicloud.com,
-        yi.zhang@huawei.com, yangerkun@huawei.com, johnny.chenyi@huawei.com
-References: <20251014022149.947800-1-yukuai3@huawei.com>
+Subject: Re: [PATCH 06/10] mm,btrfs: add a filemap_fdatawrite_kick_nr helper
+To: Christoph Hellwig <hch@lst.de>
+Cc: "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+ Eric Van Hensbergen <ericvh@kernel.org>, Latchesar Ionkov
+ <lucho@ionkov.net>, Dominique Martinet <asmadeus@codewreck.org>,
+ Christian Schoenebeck <linux_oss@crudebyte.com>, Chris Mason <clm@fb.com>,
+ David Sterba <dsterba@suse.com>, Mark Fasheh <mark@fasheh.com>,
+ Joel Becker <jlbec@evilplan.org>, Joseph Qi <joseph.qi@linux.alibaba.com>,
+ Alexander Viro <viro@zeniv.linux.org.uk>,
+ Christian Brauner <brauner@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
+ Jan Kara <jack@suse.cz>, linux-block@vger.kernel.org, v9fs@lists.linux.dev,
+ linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, jfs-discussion@lists.sourceforge.net,
+ ocfs2-devel@lists.linux.dev, linux-xfs@vger.kernel.org, linux-mm@kvack.org
+References: <20251013025808.4111128-1-hch@lst.de>
+ <20251013025808.4111128-7-hch@lst.de>
+ <41f5cd92-6bd8-46d4-afce-3c14a1cd48dc@redhat.com>
+ <20251014044906.GB30978@lst.de>
+From: David Hildenbrand <david@redhat.com>
 Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <20251014022149.947800-1-yukuai3@huawei.com>
-Content-Type: text/plain; charset=UTF-8
+Autocrypt: addr=david@redhat.com; keydata=
+ xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
+ dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
+ QZLQMzNE74ap+GDK0wnacPQFpcG1AE9RMq3aeErY5tujekBS32jfC/7AnH7I0v1v1TbbK3Gp
+ XNeiN4QroO+5qaSr0ID2sz5jtBLRb15RMre27E1ImpaIv2Jw8NJgW0k/D1RyKCwaTsgRdwuK
+ Kx/Y91XuSBdz0uOyU/S8kM1+ag0wvsGlpBVxRR/xw/E8M7TEwuCZQArqqTCmkG6HGcXFT0V9
+ PXFNNgV5jXMQRwU0O/ztJIQqsE5LsUomE//bLwzj9IVsaQpKDqW6TAPjcdBDPLHvriq7kGjt
+ WhVhdl0qEYB8lkBEU7V2Yb+SYhmhpDrti9Fq1EsmhiHSkxJcGREoMK/63r9WLZYI3+4W2rAc
+ UucZa4OT27U5ZISjNg3Ev0rxU5UH2/pT4wJCfxwocmqaRr6UYmrtZmND89X0KigoFD/XSeVv
+ jwBRNjPAubK9/k5NoRrYqztM9W6sJqrH8+UWZ1Idd/DdmogJh0gNC0+N42Za9yBRURfIdKSb
+ B3JfpUqcWwE7vUaYrHG1nw54pLUoPG6sAA7Mehl3nd4pZUALHwARAQABzSREYXZpZCBIaWxk
+ ZW5icmFuZCA8ZGF2aWRAcmVkaGF0LmNvbT7CwZoEEwEIAEQCGwMCF4ACGQEFCwkIBwICIgIG
+ FQoJCAsCBBYCAwECHgcWIQQb2cqtc1xMOkYN/MpN3hD3AP+DWgUCaJzangUJJlgIpAAKCRBN
+ 3hD3AP+DWhAxD/9wcL0A+2rtaAmutaKTfxhTP0b4AAp1r/eLxjrbfbCCmh4pqzBhmSX/4z11
+ opn2KqcOsueRF1t2ENLOWzQu3Roiny2HOU7DajqB4dm1BVMaXQya5ae2ghzlJN9SIoopTWlR
+ 0Af3hPj5E2PYvQhlcqeoehKlBo9rROJv/rjmr2x0yOM8qeTroH/ZzNlCtJ56AsE6Tvl+r7cW
+ 3x7/Jq5WvWeudKrhFh7/yQ7eRvHCjd9bBrZTlgAfiHmX9AnCCPRPpNGNedV9Yty2Jnxhfmbv
+ Pw37LA/jef8zlCDyUh2KCU1xVEOWqg15o1RtTyGV1nXV2O/mfuQJud5vIgzBvHhypc3p6VZJ
+ lEf8YmT+Ol5P7SfCs5/uGdWUYQEMqOlg6w9R4Pe8d+mk8KGvfE9/zTwGg0nRgKqlQXrWRERv
+ cuEwQbridlPAoQHrFWtwpgYMXx2TaZ3sihcIPo9uU5eBs0rf4mOERY75SK+Ekayv2ucTfjxr
+ Kf014py2aoRJHuvy85ee/zIyLmve5hngZTTe3Wg3TInT9UTFzTPhItam6dZ1xqdTGHZYGU0O
+ otRHcwLGt470grdiob6PfVTXoHlBvkWRadMhSuG4RORCDpq89vu5QralFNIf3EysNohoFy2A
+ LYg2/D53xbU/aa4DDzBb5b1Rkg/udO1gZocVQWrDh6I2K3+cCs7BTQRVy5+RARAA59fefSDR
+ 9nMGCb9LbMX+TFAoIQo/wgP5XPyzLYakO+94GrgfZjfhdaxPXMsl2+o8jhp/hlIzG56taNdt
+ VZtPp3ih1AgbR8rHgXw1xwOpuAd5lE1qNd54ndHuADO9a9A0vPimIes78Hi1/yy+ZEEvRkHk
+ /kDa6F3AtTc1m4rbbOk2fiKzzsE9YXweFjQvl9p+AMw6qd/iC4lUk9g0+FQXNdRs+o4o6Qvy
+ iOQJfGQ4UcBuOy1IrkJrd8qq5jet1fcM2j4QvsW8CLDWZS1L7kZ5gT5EycMKxUWb8LuRjxzZ
+ 3QY1aQH2kkzn6acigU3HLtgFyV1gBNV44ehjgvJpRY2cC8VhanTx0dZ9mj1YKIky5N+C0f21
+ zvntBqcxV0+3p8MrxRRcgEtDZNav+xAoT3G0W4SahAaUTWXpsZoOecwtxi74CyneQNPTDjNg
+ azHmvpdBVEfj7k3p4dmJp5i0U66Onmf6mMFpArvBRSMOKU9DlAzMi4IvhiNWjKVaIE2Se9BY
+ FdKVAJaZq85P2y20ZBd08ILnKcj7XKZkLU5FkoA0udEBvQ0f9QLNyyy3DZMCQWcwRuj1m73D
+ sq8DEFBdZ5eEkj1dCyx+t/ga6x2rHyc8Sl86oK1tvAkwBNsfKou3v+jP/l14a7DGBvrmlYjO
+ 59o3t6inu6H7pt7OL6u6BQj7DoMAEQEAAcLBfAQYAQgAJgIbDBYhBBvZyq1zXEw6Rg38yk3e
+ EPcA/4NaBQJonNqrBQkmWAihAAoJEE3eEPcA/4NaKtMQALAJ8PzprBEXbXcEXwDKQu+P/vts
+ IfUb1UNMfMV76BicGa5NCZnJNQASDP/+bFg6O3gx5NbhHHPeaWz/VxlOmYHokHodOvtL0WCC
+ 8A5PEP8tOk6029Z+J+xUcMrJClNVFpzVvOpb1lCbhjwAV465Hy+NUSbbUiRxdzNQtLtgZzOV
+ Zw7jxUCs4UUZLQTCuBpFgb15bBxYZ/BL9MbzxPxvfUQIPbnzQMcqtpUs21CMK2PdfCh5c4gS
+ sDci6D5/ZIBw94UQWmGpM/O1ilGXde2ZzzGYl64glmccD8e87OnEgKnH3FbnJnT4iJchtSvx
+ yJNi1+t0+qDti4m88+/9IuPqCKb6Stl+s2dnLtJNrjXBGJtsQG/sRpqsJz5x1/2nPJSRMsx9
+ 5YfqbdrJSOFXDzZ8/r82HgQEtUvlSXNaXCa95ez0UkOG7+bDm2b3s0XahBQeLVCH0mw3RAQg
+ r7xDAYKIrAwfHHmMTnBQDPJwVqxJjVNr7yBic4yfzVWGCGNE4DnOW0vcIeoyhy9vnIa3w1uZ
+ 3iyY2Nsd7JxfKu1PRhCGwXzRw5TlfEsoRI7V9A8isUCoqE2Dzh3FvYHVeX4Us+bRL/oqareJ
+ CIFqgYMyvHj7Q06kTKmauOe4Nf0l0qEkIuIzfoLJ3qr5UyXc2hLtWyT9Ir+lYlX9efqh7mOY
+ qIws/H2t
+In-Reply-To: <20251014044906.GB30978@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: HILzvO3m92YdpNkRJP-yfc3N3mCh1eXG
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDEyMDA4NCBTYWx0ZWRfXwlT+flw60rH5
- L9DmuLWcTn1ryN2smAC9aKRM6GrHX95Hp+IuiRVXk/Xl33CwEebNSwZ/ir+Md+vx6TmMmY6kzXG
- NyuRt/EvOl846ECK6NCH7uDtagi0vHN4Y6Zfm40K6TXc0fjAiUvMSe/dHadaCmCbM95uDvHqYte
- gMbw5PpZkaymC8LGTsBh/wAb5hvJTjVtJqGs3abCyizSWIQ0ApKYSEqQKUl6E+vTnOZJzbgjDA1
- WlXsWJiSbaXKy5ZUT7Z1LEW0qXSr41zeLwtdCaSRU87o+QxW/QBemxgMlzMKLYwTMKuph1/ymAY
- /xP+SdLzzozWXRzK90dNeJqr52WK92tjUf7HeG6U/mzE7+ozLj0FHwI9mOvgrfYJ9kz/hI6eV/g
- w+ExbyDow4vsEre7xhiJVzxdt+/7cA==
-X-Proofpoint-GUID: HILzvO3m92YdpNkRJP-yfc3N3mCh1eXG
-X-Authority-Analysis: v=2.4 cv=af5sXBot c=1 sm=1 tr=0 ts=68ee2cd1 cx=c_pps
- a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
- a=IkcTkHD0fZMA:10 a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=VwQbUJbxAAAA:8 a=9q18dwRBEjaL5AJRs_kA:9 a=QEXdDO2ut3YA:10
- a=cPQSjfK2_nFv0Q5t_7PE:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-10-14_02,2025-10-13_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1011 priorityscore=1501 spamscore=0 adultscore=0 suspectscore=0
- bulkscore=0 phishscore=0 lowpriorityscore=0 malwarescore=0 impostorscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2510020000 definitions=main-2510120084
+
+On 14.10.25 06:49, Christoph Hellwig wrote:
+> On Mon, Oct 13, 2025 at 02:48:48PM +0200, David Hildenbrand wrote:
+>>>    +/*
+>>> + * Start writeback on @nr_to_write pages from @mapping.  No one but the existing
+>>> + * btrfs caller should be using this.  Talk to linux-mm if you think adding a
+>>> + * new caller is a good idea.
+>>> + */
+>>
+>> Nit: We seem to prefer proper kerneldoc for filemap_fdatawrite* functions.
+> 
+> Because this is mentioned as only export for btrfs and using
+> EXPORT_SYMBOL_FOR_MODULES I explicitly do not want it to show up in
+> the generated documentation, so this was intentional.  Unless we want
+> to make this a fully supported part of the API, in which case the export
+> type should change, and it should grow a kerneldoc comment.
 
 
+Ah okay, mentioning the intention with not adding kernel doc in the 
+patch description would have been nice :)
 
-On 10/14/25 7:51 AM, Yu Kuai wrote:
-> Currently rq-qos debugfs entries is created from rq_qos_add(), while
-> rq_qos_add() requires queue to be freezed. This can deadlock because
-> 
-> creating new entries can trigger fs reclaim.
-> 
-> Fix this problem by delaying creating rq-qos debugfs entries until
-> it's initialization is complete.
-> 
-> - For wbt, it can be initialized by default of by blk-sysfs, fix it by
->   delaying after wbt_init();
-> - For other policies, they can only be initialized by blkg configuration,
->   fix it by delaying to blkg_conf_end();
-> 
-> Noted this set is cooked on the top of my other thread:
-> https://lore.kernel.org/all/20251010091446.3048529-1-yukuai@kernel.org/
-> 
-> And the deadlock can be reporduced with above thead, by running blktests
-> throtl/001 with wbt enabled by default. While the deadlock is really a
-> long term problem.
-> 
-While freezing the queue we also mark GFP_NOIO scope, so doesn't that
-help avoid fs-reclaim? Or maybe if you can share the lockdep splat 
-encountered running throtl/001?
+-- 
+Cheers
 
-Thanks,
---Nilay
+David / dhildenb
+
