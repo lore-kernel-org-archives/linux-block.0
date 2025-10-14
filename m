@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45A1CF9C0
-	for <linux-block@vger.kernel.org>; Tue, 14 Oct 2025 04:17:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98AB23074A4
+	for <linux-block@vger.kernel.org>; Tue, 14 Oct 2025 04:19:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760415423; cv=none; b=IgKk2WiYRa9KsNv32dzKa031IqkTvHgWI7eBUfzlmSLWjctE+DZsh+6D7svNL+ABanGZVEGnHZ/FABBlucZXTLddStsHJGuc+sN5jI6LOwqjO1Tx1ETxONGg9QULx/6CWssB15z3IRE+psYRL/cG0bn6QmAz/iAdw7bpQTyEisY=
+	t=1760415591; cv=none; b=tMuXCkyMepsbbHzcV1c+uci5c/vNB6ui8sIm/UZxc7l7K2I42JNBUQLE0+YXQfmIeb2+qesD7W416PIJrThG73f3Pe5YkRjS/M91opTem9VOpAw+vt+tAKiMUOPUiusYaXEnBA2vnpj7ya1BIPkrlu8O9J+sZzIIfMNxBza3SvI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760415423; c=relaxed/simple;
-	bh=FpL06gZb1uaSAD7UGS5WtuCLiRdDkf6wCanwloMbn5M=;
+	s=arc-20240116; t=1760415591; c=relaxed/simple;
+	bh=efRncSBox4EGtM3nSmQtO2KgUENSolfoFMtV3iP5wsg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dQpIHNyUDEVkx63Ppd9oemVgz978lcOwX7o5AFHKNbfg15FYeg5z4z17ni/qBVE+HUID3EF0JELkj9TJGnKBDAzjFPSvG5+ZOWTCQ3YxBFeepiMgJGFY48KPbW3hEfiooBFQRnVcdCUTuQLVVR75JNnAaTAAEHP+UwQSG3PtT/g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MeYFGUBK; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:Content-Type; b=t0SNZ9UthVCIYNKcXOVdrA5gaMi2c/i213lCJlPF02hzPqBuHOVIGHqeXZ0ZAzMtRmNzWVJzUTJQB/0zGL1IveTttIz2mUC5KGDDHoH4lY9AoAzF99Wzg5kvATAzQDpaGM/z+RndHRhlRFpJ0Cx40QbamRz/PYu0yzI81Pk7GOs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tvwrugtq; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MeYFGUBK"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ACC70C4CEE7;
-	Tue, 14 Oct 2025 04:17:01 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tvwrugtq"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56663C4CEE7;
+	Tue, 14 Oct 2025 04:19:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760415422;
-	bh=FpL06gZb1uaSAD7UGS5WtuCLiRdDkf6wCanwloMbn5M=;
+	s=k20201202; t=1760415591;
+	bh=efRncSBox4EGtM3nSmQtO2KgUENSolfoFMtV3iP5wsg=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=MeYFGUBKo+Ds0ypzgOpzd9GW7UIOk6J4Vu3FvgtJGcMRNrNZMDw+mjZA1GhXmVXaz
-	 TVVCXHjtzDgG7fTlarsiz/ttUf6C7V4skjcnk6vmyN6YL1QO3Nn0qT7ZTTYQW84wor
-	 LSZR7kJ020XvE1UHYBTnPj4ac7Robn6n1uR6Otkm3HHmz+bGE/v8peloRyNMT70Y1I
-	 51b/NMgTMq186cxumL8vXT707jCRq2UL4EKbtW7jC1cvCXwXFttVyaaX2fdfJgMwTB
-	 i45RPeSKbQAxUMRPUNCz+64irMXFv9PjJwQ+iDJAjOKZtLscAJDc7cfRx24hbNKSCk
-	 BtC/yFf/xR/DQ==
-Message-ID: <063353d7-9d79-461e-a974-4419a5b6421c@kernel.org>
-Date: Tue, 14 Oct 2025 13:16:58 +0900
+	b=TvwrugtqZ23dFB/les8IOa7mhmzv/nj3tlgQQrlZCXnB3w49BZ2AL3pCKxQ5OV3tn
+	 2NkaK0c4h5lT9/L6Ug6cxKhBvKmGCFswTn3cy90uuJ6GrB6QSNtOHtFkNXPgw6Z0gF
+	 LlnxwmIF+ERrzreOWXOC7/cfwHzI2PqjplN4Oed3/K9P26kpJp+HAiOt/WOJweS3dk
+	 UPy4NyC+9yKmv0m5QQSSlf5muRfTucRqK3p4nWefo/fTOnOkNEZgh7/GFD3YjuNR8f
+	 dEbDt5ZXqjF86goXzuSXC+ZrQPty0Kqf4J6VfTnVk4kz2RqGejKCnkYG13ttJ2Ryq8
+	 riHJsMocM5ZwA==
+Message-ID: <19be10e7-3140-4571-bf0e-e8eec1188fec@kernel.org>
+Date: Tue, 14 Oct 2025 13:19:47 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -35,63 +35,40 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] block/mq-deadline: Introduce dd_start_request()
+Subject: Re: [PATCH 2/2] block/mq-deadline: Switch back to a single dispatch
+ list
 To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
  Yu Kuai <yukuai@kernel.org>, chengkaitao <chengkaitao@kylinos.cn>
 References: <20251013192803.4168772-1-bvanassche@acm.org>
- <20251013192803.4168772-2-bvanassche@acm.org>
+ <20251013192803.4168772-3-bvanassche@acm.org>
 From: Damien Le Moal <dlemoal@kernel.org>
 Content-Language: en-US
 Organization: Western Digital Research
-In-Reply-To: <20251013192803.4168772-2-bvanassche@acm.org>
+In-Reply-To: <20251013192803.4168772-3-bvanassche@acm.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 2025/10/14 4:28, Bart Van Assche wrote:
-> Prepare for adding a second caller of this function. No functionality
-> has been changed.
+> Commit c807ab520fc3 ("block/mq-deadline: Add I/O priority support")
+> modified the behavior of request flag BLK_MQ_INSERT_AT_HEAD from
+> dispatching a request before other requests into dispatching a request
+> before other requests with the same I/O priority. This is not correct since
+> BLK_MQ_INSERT_AT_HEAD is used when requeuing requests and also when a flush
+> request is inserted.  Both types of requests should be dispatched as soon
+> as possible. Hence, make the mq-deadline I/O scheduler again ignore the I/O
+> priority for BLK_MQ_INSERT_AT_HEAD requests.
 > 
 > Cc: Damien Le Moal <dlemoal@kernel.org>
 > Cc: Yu Kuai <yukuai@kernel.org>
-> Cc: chengkaitao <chengkaitao@kylinos.cn>
+> Reported-by: chengkaitao <chengkaitao@kylinos.cn>
+> Closes: https://lore.kernel.org/linux-block/20251009155253.14611-1-pilgrimtao@gmail.com/
+> Fixes: c807ab520fc3 ("block/mq-deadline: Add I/O priority support")
 > Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 
-One nit below.
+Nice cleanup !
 
-Other than that, looks fine to me.
-
-Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
-
-> ---
->  block/mq-deadline.c | 22 ++++++++++++++--------
->  1 file changed, 14 insertions(+), 8 deletions(-)
-> 
-> diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-> index 3e741d33142d..647a45f6d935 100644
-> --- a/block/mq-deadline.c
-> +++ b/block/mq-deadline.c
-> @@ -306,6 +306,19 @@ static bool started_after(struct deadline_data *dd, struct request *rq,
->  	return time_after(start_time, latest_start);
->  }
->  
-> +static struct request *dd_start_request(struct deadline_data *dd,
-> +					enum dd_data_dir data_dir,
-> +					struct request *rq)
-
-Why return the request that is passed ? Not sure that is necessary.
-
-
-> +{
-> +	u8 ioprio_class = dd_rq_ioclass(rq);
-> +	enum dd_prio prio = ioprio_class_to_prio[ioprio_class];
-> +
-> +	dd->per_prio[prio].latest_pos[data_dir] = blk_rq_pos(rq);
-> +	dd->per_prio[prio].stats.dispatched++;
-> +	rq->rq_flags |= RQF_STARTED;
-> +	return rq;
-> +}
-
+Reviewed-by: Damien Le Moalv <dlemoal@kernel.org>
 
 
 -- 
