@@ -1,73 +1,43 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from sender4-op-o12.zoho.com (sender4-op-o12.zoho.com [136.143.188.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BD172EC082
-	for <linux-block@vger.kernel.org>; Tue, 14 Oct 2025 11:04:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760439895; cv=none; b=EbpHPNxB4BP0PG+EW7ZOrUeBedKic3t5lahQez+a5I6UCJ8LuFgjLCEPRf9xWvvFpwJ2T7RqgG/f22Bghk1KtC547nN/zmlhZCwRMMBhtYm/UKZwTKJzWR7tUrhUwu+Vnj8RAzMliPbSTeF9VcVbSOHWezmgVosjuflL4hE1/XA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760439895; c=relaxed/simple;
-	bh=h5AS+Zjy6zDJe2tBjWwkhuIXONAErINCK4EC2Qd/Awk=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03176305043;
+	Tue, 14 Oct 2025 11:14:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1760440493; cv=pass; b=D0UBNesTpaE9ic192AIMowv8Yvb2iT5x7UePsUTVt/oFox9gKgLk+onAaLwfNnHzuFh6xLq1CUNVOGDKvFAAOZy/LLrdLjWJvLDTteeJSe0F3ZRHhYvWxEPF2txiAoLL+NDj89njkGZgTGVdV3eJDoZdjfLSs392FTCGENL2S+E=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1760440493; c=relaxed/simple;
+	bh=52ZOm/u6j3g+rm+L+jzd8u9OixGlgrHxOrKeBgXbQFU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=C/4cBHaO09jA0zjeJBT6dXwqW1c50eKZ9VXr3vm6q2/hL+W1qIFfNGZLUo60kWPX8aKSbeI9aDmoolvipD3kDLO2XcxIIxWF6LBEgUnGMoPsZnuK8CFO8rNzigFHpRRFbhW/eDgIO2se5Lfxb0gKVEfbrhDikBn0XcT9ofd+Z2E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ICFBk2in; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 In-Reply-To:Content-Type; b=livuMskAih3M7pT3t5d1pmpzjcHrrcnPrjWOa91nP70ouD50kvs88J2eeTb03CnAQ/YAnqeDnLBM6SkBV1YSw2otTPhWBTbGP2zzgP0CjK2kgXNAOUu2iO6NJhIJQXnOG4gVaE5K1vXzsBHswoOv2FGT8mMks9hN36nlNWwWGI4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=yukuai.org.cn; spf=pass smtp.mailfrom=yukuai.org.cn; dkim=pass (1024-bit key) header.d=yukuai.org.cn header.i=hailan@yukuai.org.cn header.b=YdJH7OHo; arc=pass smtp.client-ip=136.143.188.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=yukuai.org.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yukuai.org.cn
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ICFBk2in"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1760439892;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=9Mvh4ql8Y8BBLDK18emWlEI/npE8s1LEzxvuBeQPUok=;
-	b=ICFBk2inemDdyTwCJguCPxlNcWAvlsFG5w+4YhfSqyq2yl9lPGx+JqRDhkWTO6cqZGAob4
-	3dUBTrW9iokEJg4Og5iBrwty1rVe0wsgfOWs41AHdTUexrtNktDZWwezQekWE+5fJrCtZj
-	j5zPrgmfDatJG5nYIjR/uHx75IUWZrI=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-199-1emo4w-BOGmfmXftPgm5Zw-1; Tue, 14 Oct 2025 07:04:51 -0400
-X-MC-Unique: 1emo4w-BOGmfmXftPgm5Zw-1
-X-Mimecast-MFC-AGG-ID: 1emo4w-BOGmfmXftPgm5Zw_1760439890
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-46e31191379so37952115e9.3
-        for <linux-block@vger.kernel.org>; Tue, 14 Oct 2025 04:04:51 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760439890; x=1761044690;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=9Mvh4ql8Y8BBLDK18emWlEI/npE8s1LEzxvuBeQPUok=;
-        b=ZCnkyBYM/oTy4JLnmoyFbOh/2wfrT0hZ3W2P/t1zUF/EhMKC82lHXdCFYdjS45w6hG
-         Le+lI2CDw4yRXZbaCAMxG34Y4LeKqVZT8w7wwHkVrTQ9stJ6RPTgM7+1WyIR/Oeh5VQe
-         +z2v4hSB4xRGr7wL1j/yfwNvj6G33J6Uwf5ilBjo9wBLkgXM6H/ZUEYzSTidaWvRsJ9p
-         CvDrcVIrIa3iHm5V0cSopG4JmwqSkVby/JwQk0Yo3XF9zT3evuxwv229IcH8+IqoCtJ7
-         TPdWuD4o7BYKWnU1Dn9fYzJAk3zMbKxP4Y7VSCwKX1Lloz/313JzYEt4hvP1EprijIVC
-         Zw8w==
-X-Forwarded-Encrypted: i=1; AJvYcCW0JDYnqqnAPFaGYzEjoSaBGCIiSMrCuFn4nwKoJLIjCL0oC84hMQRtp9Sk2zUAFlRp4AwFBOT8a6/3aQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxZVCyKYueBqtJlyFLwlh3oAdxPtSnIM60wGZkzJUmbK370lpSg
-	phhUUoITpWHN+7aBLzYmyHpfuJQjLoujL5DoYtBa+bwUclP6/cgMqFdt/RJ/azAUgUxAT9bMDlQ
-	XN3nD8clx/RZNEUSPbxRoz0XOoFPoYv3c7z1WTSpUNmV8PZIosKB9niFW7Vlm+j+v
-X-Gm-Gg: ASbGncsShKwhKdmAc68J9XciM1TYE2PmAKyGIjaunSIQNsTBEoyV4CTCKqIFXUkl5/g
-	jfqvie1+CsVUVHd4DS+EAP7MI+C2jcmTGxo2YChydCbrpzGQAPE3rEtoAb4QmpP5Qo+BVzQ+ifH
-	todJq3d7mXp7aY2F0RllVMxyiAGGlC0sT0/cJkyeKAvrPcdUfryAbtz27v1jKM7Gbfueg5HfciS
-	untodcDEiyXRNb3Fi3+TvQ+c0jYJslzMidgu5k9yNNFHcFFOzfboTu5M2BukmsBWS9MQBRhxdwy
-	gLyzVpaKt+PbKFjfABDbUhHX8ek7Urd3NwzfH58X8VAQSm2aQHhD4JfcvHKzTSM7m37kArX3CQ=
-	=
-X-Received: by 2002:a05:600c:3b07:b0:46e:1fb9:5497 with SMTP id 5b1f17b1804b1-46fa9af84fdmr170865755e9.18.1760439890108;
-        Tue, 14 Oct 2025 04:04:50 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEzx/Z7wqxSbdzibLnTtJ/UYmUM/D1LJV37loBqc1rTNfI1+V20N8hWD4xaH9pYVYV0jbb3AQ==
-X-Received: by 2002:a05:600c:3b07:b0:46e:1fb9:5497 with SMTP id 5b1f17b1804b1-46fa9af84fdmr170865285e9.18.1760439889704;
-        Tue, 14 Oct 2025 04:04:49 -0700 (PDT)
-Received: from ?IPV6:2a09:80c0:192:0:5dac:bf3d:c41:c3e7? ([2a09:80c0:192:0:5dac:bf3d:c41:c3e7])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46fb48a5bf9sm235616575e9.18.2025.10.14.04.04.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 14 Oct 2025 04:04:49 -0700 (PDT)
-Message-ID: <34b482e6-2360-4d65-9996-1513bcf12ffb@redhat.com>
-Date: Tue, 14 Oct 2025 13:04:47 +0200
+	dkim=pass (1024-bit key) header.d=yukuai.org.cn header.i=hailan@yukuai.org.cn header.b="YdJH7OHo"
+ARC-Seal: i=1; a=rsa-sha256; t=1760440469; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=gj42B7P2c/+4PCXi9Gn8ns4I+X+2F2qA7ztR4W+hccODcFL+pcReYL9t8ArVpyUxw6qRMmhNbF28Y+jwI1XpoQcZ+61YH+djZbd3b0KbAB/CQGfRGKF4r9R2KxH4PXVBBx83fjcmvVGon6jeODzg+d3QjYqaCTl1unRqMgXzJ4U=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1760440469; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=vua/xBgTR2fR18mmmIK6sZpLHUCnlu3gaewv3GrqrBM=; 
+	b=PUTLGNZXhagPLgqIVr8Dd1EKtHEPDsPx0j2vdlD0DuBuykfBQ30qCyAMPIeKnKgkyK8anjSw/J8z3PyxM4p27IpsMtdUUxJqbQUFt4DdccZhPqcOY6MejVIiOUpBxt0j6aNU5hTaVIMPp8VfOYbP4PiW2PORG4NxcOIQFKNzFfU=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=yukuai.org.cn;
+	spf=pass  smtp.mailfrom=hailan@yukuai.org.cn;
+	dmarc=pass header.from=<hailan@yukuai.org.cn>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1760440469;
+	s=zmail; d=yukuai.org.cn; i=hailan@yukuai.org.cn;
+	h=Message-ID:Date:Date:MIME-Version:Subject:Subject:To:To:Cc:Cc:References:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=vua/xBgTR2fR18mmmIK6sZpLHUCnlu3gaewv3GrqrBM=;
+	b=YdJH7OHoXt7KhmlrFJNvGUKU0mHi9eDLFgPbE6x51he8yuxBM7sKe4e8pRcPDgyO
+	q6FgDHcNFXJjqX6w5JfMQkUjxd5FS1SM1krJ9o5pKq+ChtgNtr2+tk/0VmHDdlCV0uV
+	52I37kVoVU63gMCrTuxREdugaxYCzgEKxUb3kfrs=
+Received: by mx.zohomail.com with SMTPS id 1760440464980895.2888241423565;
+	Tue, 14 Oct 2025 04:14:24 -0700 (PDT)
+Message-ID: <e5e7ac3f-2063-473a-aafb-4d8d43e5576e@yukuai.org.cn>
+Date: Tue, 14 Oct 2025 19:14:16 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -75,96 +45,196 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 06/10] mm,btrfs: add a filemap_fdatawrite_kick_nr helper
-To: Christoph Hellwig <hch@lst.de>
-Cc: "Matthew Wilcox (Oracle)" <willy@infradead.org>,
- Eric Van Hensbergen <ericvh@kernel.org>, Latchesar Ionkov
- <lucho@ionkov.net>, Dominique Martinet <asmadeus@codewreck.org>,
- Christian Schoenebeck <linux_oss@crudebyte.com>, Chris Mason <clm@fb.com>,
- David Sterba <dsterba@suse.com>, Mark Fasheh <mark@fasheh.com>,
- Joel Becker <jlbec@evilplan.org>, Joseph Qi <joseph.qi@linux.alibaba.com>,
- Alexander Viro <viro@zeniv.linux.org.uk>,
- Christian Brauner <brauner@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
- Jan Kara <jack@suse.cz>, linux-block@vger.kernel.org, v9fs@lists.linux.dev,
- linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, jfs-discussion@lists.sourceforge.net,
- ocfs2-devel@lists.linux.dev, linux-xfs@vger.kernel.org, linux-mm@kvack.org
-References: <20251013025808.4111128-1-hch@lst.de>
- <20251013025808.4111128-7-hch@lst.de>
- <41f5cd92-6bd8-46d4-afce-3c14a1cd48dc@redhat.com>
- <20251014044906.GB30978@lst.de>
-From: David Hildenbrand <david@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
- dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
- QZLQMzNE74ap+GDK0wnacPQFpcG1AE9RMq3aeErY5tujekBS32jfC/7AnH7I0v1v1TbbK3Gp
- XNeiN4QroO+5qaSr0ID2sz5jtBLRb15RMre27E1ImpaIv2Jw8NJgW0k/D1RyKCwaTsgRdwuK
- Kx/Y91XuSBdz0uOyU/S8kM1+ag0wvsGlpBVxRR/xw/E8M7TEwuCZQArqqTCmkG6HGcXFT0V9
- PXFNNgV5jXMQRwU0O/ztJIQqsE5LsUomE//bLwzj9IVsaQpKDqW6TAPjcdBDPLHvriq7kGjt
- WhVhdl0qEYB8lkBEU7V2Yb+SYhmhpDrti9Fq1EsmhiHSkxJcGREoMK/63r9WLZYI3+4W2rAc
- UucZa4OT27U5ZISjNg3Ev0rxU5UH2/pT4wJCfxwocmqaRr6UYmrtZmND89X0KigoFD/XSeVv
- jwBRNjPAubK9/k5NoRrYqztM9W6sJqrH8+UWZ1Idd/DdmogJh0gNC0+N42Za9yBRURfIdKSb
- B3JfpUqcWwE7vUaYrHG1nw54pLUoPG6sAA7Mehl3nd4pZUALHwARAQABzSREYXZpZCBIaWxk
- ZW5icmFuZCA8ZGF2aWRAcmVkaGF0LmNvbT7CwZoEEwEIAEQCGwMCF4ACGQEFCwkIBwICIgIG
- FQoJCAsCBBYCAwECHgcWIQQb2cqtc1xMOkYN/MpN3hD3AP+DWgUCaJzangUJJlgIpAAKCRBN
- 3hD3AP+DWhAxD/9wcL0A+2rtaAmutaKTfxhTP0b4AAp1r/eLxjrbfbCCmh4pqzBhmSX/4z11
- opn2KqcOsueRF1t2ENLOWzQu3Roiny2HOU7DajqB4dm1BVMaXQya5ae2ghzlJN9SIoopTWlR
- 0Af3hPj5E2PYvQhlcqeoehKlBo9rROJv/rjmr2x0yOM8qeTroH/ZzNlCtJ56AsE6Tvl+r7cW
- 3x7/Jq5WvWeudKrhFh7/yQ7eRvHCjd9bBrZTlgAfiHmX9AnCCPRPpNGNedV9Yty2Jnxhfmbv
- Pw37LA/jef8zlCDyUh2KCU1xVEOWqg15o1RtTyGV1nXV2O/mfuQJud5vIgzBvHhypc3p6VZJ
- lEf8YmT+Ol5P7SfCs5/uGdWUYQEMqOlg6w9R4Pe8d+mk8KGvfE9/zTwGg0nRgKqlQXrWRERv
- cuEwQbridlPAoQHrFWtwpgYMXx2TaZ3sihcIPo9uU5eBs0rf4mOERY75SK+Ekayv2ucTfjxr
- Kf014py2aoRJHuvy85ee/zIyLmve5hngZTTe3Wg3TInT9UTFzTPhItam6dZ1xqdTGHZYGU0O
- otRHcwLGt470grdiob6PfVTXoHlBvkWRadMhSuG4RORCDpq89vu5QralFNIf3EysNohoFy2A
- LYg2/D53xbU/aa4DDzBb5b1Rkg/udO1gZocVQWrDh6I2K3+cCs7BTQRVy5+RARAA59fefSDR
- 9nMGCb9LbMX+TFAoIQo/wgP5XPyzLYakO+94GrgfZjfhdaxPXMsl2+o8jhp/hlIzG56taNdt
- VZtPp3ih1AgbR8rHgXw1xwOpuAd5lE1qNd54ndHuADO9a9A0vPimIes78Hi1/yy+ZEEvRkHk
- /kDa6F3AtTc1m4rbbOk2fiKzzsE9YXweFjQvl9p+AMw6qd/iC4lUk9g0+FQXNdRs+o4o6Qvy
- iOQJfGQ4UcBuOy1IrkJrd8qq5jet1fcM2j4QvsW8CLDWZS1L7kZ5gT5EycMKxUWb8LuRjxzZ
- 3QY1aQH2kkzn6acigU3HLtgFyV1gBNV44ehjgvJpRY2cC8VhanTx0dZ9mj1YKIky5N+C0f21
- zvntBqcxV0+3p8MrxRRcgEtDZNav+xAoT3G0W4SahAaUTWXpsZoOecwtxi74CyneQNPTDjNg
- azHmvpdBVEfj7k3p4dmJp5i0U66Onmf6mMFpArvBRSMOKU9DlAzMi4IvhiNWjKVaIE2Se9BY
- FdKVAJaZq85P2y20ZBd08ILnKcj7XKZkLU5FkoA0udEBvQ0f9QLNyyy3DZMCQWcwRuj1m73D
- sq8DEFBdZ5eEkj1dCyx+t/ga6x2rHyc8Sl86oK1tvAkwBNsfKou3v+jP/l14a7DGBvrmlYjO
- 59o3t6inu6H7pt7OL6u6BQj7DoMAEQEAAcLBfAQYAQgAJgIbDBYhBBvZyq1zXEw6Rg38yk3e
- EPcA/4NaBQJonNqrBQkmWAihAAoJEE3eEPcA/4NaKtMQALAJ8PzprBEXbXcEXwDKQu+P/vts
- IfUb1UNMfMV76BicGa5NCZnJNQASDP/+bFg6O3gx5NbhHHPeaWz/VxlOmYHokHodOvtL0WCC
- 8A5PEP8tOk6029Z+J+xUcMrJClNVFpzVvOpb1lCbhjwAV465Hy+NUSbbUiRxdzNQtLtgZzOV
- Zw7jxUCs4UUZLQTCuBpFgb15bBxYZ/BL9MbzxPxvfUQIPbnzQMcqtpUs21CMK2PdfCh5c4gS
- sDci6D5/ZIBw94UQWmGpM/O1ilGXde2ZzzGYl64glmccD8e87OnEgKnH3FbnJnT4iJchtSvx
- yJNi1+t0+qDti4m88+/9IuPqCKb6Stl+s2dnLtJNrjXBGJtsQG/sRpqsJz5x1/2nPJSRMsx9
- 5YfqbdrJSOFXDzZ8/r82HgQEtUvlSXNaXCa95ez0UkOG7+bDm2b3s0XahBQeLVCH0mw3RAQg
- r7xDAYKIrAwfHHmMTnBQDPJwVqxJjVNr7yBic4yfzVWGCGNE4DnOW0vcIeoyhy9vnIa3w1uZ
- 3iyY2Nsd7JxfKu1PRhCGwXzRw5TlfEsoRI7V9A8isUCoqE2Dzh3FvYHVeX4Us+bRL/oqareJ
- CIFqgYMyvHj7Q06kTKmauOe4Nf0l0qEkIuIzfoLJ3qr5UyXc2hLtWyT9Ir+lYlX9efqh7mOY
- qIws/H2t
-In-Reply-To: <20251014044906.GB30978@lst.de>
+Subject: Re: [PATCH 0/4] blk-rq-qos: fix possible deadlock
+To: Nilay Shroff <nilay@linux.ibm.com>, Yu Kuai <yukuai3@huawei.com>,
+ ming.lei@redhat.com, tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk
+Cc: cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, yukuai1@huaweicloud.com, yi.zhang@huawei.com,
+ yangerkun@huawei.com, johnny.chenyi@huawei.com
+References: <20251014022149.947800-1-yukuai3@huawei.com>
+ <d4fe218b-9fc5-4466-ac56-0d4c5a8ccd96@linux.ibm.com>
+From: Yu Kuai <hailan@yukuai.org.cn>
+In-Reply-To: <d4fe218b-9fc5-4466-ac56-0d4c5a8ccd96@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-ZohoMailClient: External
 
-On 14.10.25 06:49, Christoph Hellwig wrote:
-> On Mon, Oct 13, 2025 at 02:48:48PM +0200, David Hildenbrand wrote:
->>>    +/*
->>> + * Start writeback on @nr_to_write pages from @mapping.  No one but the existing
->>> + * btrfs caller should be using this.  Talk to linux-mm if you think adding a
->>> + * new caller is a good idea.
->>> + */
+Hi,
+
+在 2025/10/14 18:58, Nilay Shroff 写道:
+>
+> On 10/14/25 7:51 AM, Yu Kuai wrote:
+>> Currently rq-qos debugfs entries is created from rq_qos_add(), while
+>> rq_qos_add() requires queue to be freezed. This can deadlock because
 >>
->> Nit: We seem to prefer proper kerneldoc for filemap_fdatawrite* functions.
-> 
-> Because this is mentioned as only export for btrfs and using
-> EXPORT_SYMBOL_FOR_MODULES I explicitly do not want it to show up in
-> the generated documentation, so this was intentional.  Unless we want
-> to make this a fully supported part of the API, in which case the export
-> type should change, and it should grow a kerneldoc comment.
+>> creating new entries can trigger fs reclaim.
+>>
+>> Fix this problem by delaying creating rq-qos debugfs entries until
+>> it's initialization is complete.
+>>
+>> - For wbt, it can be initialized by default of by blk-sysfs, fix it by
+>>    delaying after wbt_init();
+>> - For other policies, they can only be initialized by blkg configuration,
+>>    fix it by delaying to blkg_conf_end();
+>>
+>> Noted this set is cooked on the top of my other thread:
+>> https://lore.kernel.org/all/20251010091446.3048529-1-yukuai@kernel.org/
+>>
+>> And the deadlock can be reporduced with above thead, by running blktests
+>> throtl/001 with wbt enabled by default. While the deadlock is really a
+>> long term problem.
+>>
+> While freezing the queue we also mark GFP_NOIO scope, so doesn't that
+> help avoid fs-reclaim? Or maybe if you can share the lockdep splat
+> encountered running throtl/001?
+
+Yes, we can avoid fs-reclaim if queue is freezing, however,
+because debugfs is a generic file system, and we can't avoid fs reclaim from
+all context. There is still
+
+Following is the log with above set and wbt enabled by default, the set acquire
+lock order by:
+
+freeze queue -> elevator lock -> rq_qos_mutex -> blkcg_mutex
+
+However, fs-reclaim from other context cause the deadlock report.
 
 
-Ah okay, mentioning the intention with not adding kernel doc in the 
-patch description would have been nice :)
+[   45.632372][  T531] ======================================================
+[   45.633734][  T531] WARNING: possible circular locking dependency detected
+[   45.635062][  T531] 6.17.0-gfd4a560a0864-dirty #30 Not tainted
+[   45.636220][  T531] ------------------------------------------------------
+[   45.637587][  T531] check/531 is trying to acquire lock:
+[   45.638626][  T531] ffff9473884382b0 (&q->rq_qos_mutex){+.+.}-{4:4}, at: blkg_
+conf_start+0x116/0x190
+[   45.640416][  T531]
+[   45.640416][  T531] but task is already holding lock:
+[   45.641828][  T531] ffff9473884385d8 (&q->elevator_lock){+.+.}-{4:4}, at: blkg
+_conf_start+0x108/0x190
+[   45.643322][  T531]
+[   45.643322][  T531] which lock already depends on the new lock.
+[   45.643322][  T531]
+[   45.644862][  T531]
+[   45.644862][  T531] the existing dependency chain (in reverse order) is:
+[   45.646046][  T531]
+[   45.646046][  T531] -> #5 (&q->elevator_lock){+.+.}-{4:4}:
+[   45.647052][  T531]        __mutex_lock+0xd3/0x8d0
+[   45.647716][  T531]        blkg_conf_start+0x108/0x190
+[   45.648395][  T531]        tg_set_limit+0x74/0x300
+[   45.649046][  T531]        kernfs_fop_write_iter+0x14a/0x210
+[   45.649813][  T531]        vfs_write+0x29e/0x550
+[   45.650413][  T531]        ksys_write+0x74/0xf0
+[   45.651032][  T531]        do_syscall_64+0xbb/0x380
+[   45.651730][  T531] entry_SYSCALL_64_after_hwframe+0x77/0x7f
+[   45.652533][  T531]
+[   45.652533][  T531] -> #4 (&q->q_usage_counter(io)#3){++++}-{0:0}:
+[   45.653297][  T531]        blk_alloc_queue+0x30b/0x350
+[   45.653807][  T531]        blk_mq_alloc_queue+0x5d/0xd0
+[   45.654300][  T531]        __blk_mq_alloc_disk+0x13/0x60
+[   45.654810][  T531]        null_add_dev+0x2f8/0x660 [null_blk]
+[   45.655374][  T531] nullb_device_power_store+0x88/0x130 [null_blk]
+[   45.656009][  T531]        configfs_write_iter+0xcb/0x130 [configfs]
+[   45.656614][  T531]        vfs_write+0x29e/0x550
+[   45.657045][  T531]        ksys_write+0x74/0xf0
+[   45.657497][  T531]        do_syscall_64+0xbb/0x380
+[   45.657958][  T531] entry_SYSCALL_64_after_hwframe+0x77/0x7f
+[   45.658595][  T531]
+[   45.658595][  T531] -> #3 (fs_reclaim){+.+.}-{0:0}:
+[   45.659266][  T531]        fs_reclaim_acquire+0xa4/0xe0
+[   45.659783][  T531] kmem_cache_alloc_lru_noprof+0x3b/0x2a0
+[   45.660369][  T531]        alloc_inode+0x1a/0x60
+[   45.660873][  T531]        new_inode+0xd/0x90
+[   45.661291][  T531]        debugfs_create_dir+0x38/0x160
+[   45.661806][  T531]        component_debug_init+0x12/0x20
+[   45.662316][  T531]        do_one_initcall+0x68/0x2b0
+[   45.662807][  T531]        kernel_init_freeable+0x238/0x290
+[   45.663241][  T531]        kernel_init+0x15/0x130
+[   45.663659][  T531]        ret_from_fork+0x182/0x1d0
+[   45.664054][  T531]        ret_from_fork_asm+0x1a/0x30
+[   45.664601][  T531]
+[   45.664601][  T531] -> #2 (&sb->s_type->i_mutex_key#2){+.+.15:25:59 [194/1936]
+[   45.665274][  T531]        down_write+0x3a/0xb0
+[   45.665669][  T531]        simple_start_creating+0x51/0x110
+[   45.666097][  T531]        debugfs_start_creating+0x68/0xd0
+[   45.666561][  T531]        debugfs_create_dir+0x10/0x160
+[   45.666970][  T531]        blk_register_queue+0x8b/0x1e0
+[   45.667386][  T531]        __add_disk+0x253/0x3f0
+[   45.667804][  T531]        add_disk_fwnode+0x71/0x180
+[   45.668205][  T531]        virtblk_probe+0x9c2/0xb50
+[   45.668603][  T531]        virtio_dev_probe+0x223/0x380
+[   45.669004][  T531]        really_probe+0xc2/0x260
+[   45.669369][  T531]        __driver_probe_device+0x6e/0x100
+[   45.669856][  T531]        driver_probe_device+0x1a/0xd0
+[   45.670263][  T531]        __driver_attach+0x93/0x1a0
+[   45.670672][  T531]        bus_for_each_dev+0x87/0xe0
+[   45.671063][  T531]        bus_add_driver+0xe0/0x1d0
+[   45.671469][  T531]        driver_register+0x70/0xe0
+[   45.671856][  T531]        virtio_blk_init+0x53/0x80
+[   45.672258][  T531]        do_one_initcall+0x68/0x2b0
+[   45.672661][  T531]        kernel_init_freeable+0x238/0x290
+[   45.673097][  T531]        kernel_init+0x15/0x130
+[   45.673510][  T531]        ret_from_fork+0x182/0x1d0
+[   45.673907][  T531]        ret_from_fork_asm+0x1a/0x30
+[   45.674319][  T531]
+[   45.674319][  T531] -> #1 (&q->debugfs_mutex){+.+.}-{4:4}:
+[   45.674929][  T531]        __mutex_lock+0xd3/0x8d0
+[   45.675315][  T531]        rq_qos_add+0xe0/0x130
+[   45.675717][  T531]        wbt_init+0x183/0x210
+[   45.676062][  T531]        blk_register_queue+0xdf/0x1e0
+[   45.676490][  T531]        __add_disk+0x253/0x3f0
+[   45.676844][  T531]        add_disk_fwnode+0x71/0x180
+[   45.677247][  T531]        virtblk_probe+0x9c2/0xb50
+[   45.677648][  T531]        virtio_dev_probe+0x223/0x380
+[   45.678044][  T531]        really_probe+0xc2/0x260
+[   45.678411][  T531]        __driver_probe_device+0x6e/0x100
+[   45.678875][  T531]        driver_probe_device+0x1a/0xd0
+[   45.679282][  T531]        __driver_attach+0x93/0x1a0
+[   45.679678][  T531]        bus_for_each_dev+0x87/0xe0
+[   45.680053][  T531]        bus_add_driver+0xe0/0x1d0
+[   45.680458][  T531]        driver_register+0x70/0xe0
+[   45.680823][  T531]        virtio_blk_init+0x53/0x80
+[   45.681208][  T531]        do_one_initcall+0x68/0x2b0
+[   45.681611][  T531]        kernel_init_freeable+0x238/0x290
+[   45.682027][  T531]        kernel_init+0x15/0x130
+[   45.682392][  T531]        ret_from_fork+0x182/0x1d0
+[   45.682829][  T531]        ret_from_fork_asm+0x1a/0x30
+[   45.683240][  T531]
+[   45.683240][  T531] -> #0 (&q->rq_qos_mutex){+.+.}-{4:4}:
+[   45.683867][  T531]        __lock_acquire+0x103d/0x1650
+[   45.684411][  T531]        lock_acquire+0xbc/0x2c0
+[   45.684798][  T531]        __mutex_lock+0xd3/0x8d0
+[   45.685172][  T531]        blkg_conf_start+0x116/0x190
+[   45.685623][  T531]        tg_set_limit+0x74/0x300
+[   45.685986][  T531]        kernfs_fop_write_iter+0x14a/0x210
+[   45.686405][  T531]        vfs_write+0x29e/0x550
+[   45.686771][  T531]        ksys_write+0x74/0xf0
+[   45.687112][  T531]        do_syscall_64+0xbb/0x380
+[   45.687514][  T531] entry_SYSCALL_64_after_hwframe+0x77/0x7f
+[   45.687983][  T531]
+[   45.687983][  T531] other info that might help us debug this:
+[   45.687983][  T531]
+[   45.688760][  T531] Chain exists of:
+[   45.688760][  T531]   &q->rq_qos_mutex --> &q->q_usage_counter(io)#3 --> &q->e
+levator_lock
+[   45.688760][  T531]
+[   45.689817][  T531]  Possible unsafe locking scenario:
+[   45.689817][  T531]
+[   45.690359][  T531]        CPU0                    CPU1
+[   45.690764][  T531]        ----                    ----
+[   45.691172][  T531]   lock(&q->elevator_lock);
+[   45.691544][  T531] lock(&q->q_usage_counter(io
+)#3);
+[   45.692108][  T531] lock(&q->elevator_lock);
+[   45.692659][  T531]   lock(&q->rq_qos_mutex);
+[   45.692994][  T531]
+[   45.692994][  T531]  *** DEADLOCK ***
 
--- 
-Cheers
+Thanks, Kuai
 
-David / dhildenb
 
+
+
+>
+> Thanks,
+> --Nilay
+>
