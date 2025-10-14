@@ -1,1154 +1,212 @@
-Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B97C2EFDA2
-	for <linux-block@vger.kernel.org>; Tue, 14 Oct 2025 20:54:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760475270; cv=none; b=BToDYYjkqnl/fOCswuRQ30PHIk0I/ba+ht4QYM/qT6aSeIGiJGsY5ywoI1dphIyFWbC621YDRds9IGxxHg4OG4D8QzzlS5pf6IP5hl5Den2+mfZKCGsJYgMlQIsXWwwu0Y8KJltAA/oWgLHW0NiaUFmXf0eySXj3706/VmCkTa0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760475270; c=relaxed/simple;
-	bh=9UDdYmu78pymCopZX5GUa1gbACoq/Wf4nvxRukkVRP0=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=qWc7Hg/vunEOytgCQXoj9O5SMq2uQEMPqu2i5wVCo2IpA3Rn9f4uFN4JfH6/9jDtzuYZfYx8aIkKfsp4Cxq+DFGRv8gyL9irpAPpbyEtU2+YkSO+0GfGWzX2tOvpgzu+4fsmGDfhx+lY+SXbvC5yV7QEVpXtbMmhcR4Eu1D+Chc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=cbV2osAB; arc=none smtp.client-ip=67.231.153.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 172BB24A046
+	for <linux-block@vger.kernel.org>; Tue, 14 Oct 2025 21:18:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1760476717; cv=fail; b=Ilb+3crROdzLyY9DZFxlhHsxh6f0jEQ/ztrAc38A7tEKBu9aZejZzF/P9wDTCqZhE7xzWf2dJPfRAItdZXBLUey6GvOWJ07vvlFpU7P0TXwEqbhRIuxDT1j4UyHFj/WOKIPNrv3foSgmp35B7el0IFGb21Xn6m90b1a4vhJHop4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1760476717; c=relaxed/simple;
+	bh=RnRsq7s5Fy16NSaPIy1fINTzl/sTLkZuCc8/mTTmyz8=;
+	h=To:Cc:Subject:From:In-Reply-To:Message-ID:References:Date:
+	 Content-Type:MIME-Version; b=Nm16xT5Ar9DNIf+wuCJS00wk/LCM0q3JZ+j6NNAa+f4oQxbs4ZQlcmMMdABWoacYEOL6e1S2UN2VQqi/Wd4EPLYp5y9OCuwMKfKh14TwKP9S+DPYKT9W6hRaYfMpvnguy2xrYMj5Srq9cIz+GYd850LwxgwcTGRfWwWT0XdHiss=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=d+EW0F/7; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=hJ9rX/EM; arc=fail smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="cbV2osAB"
-Received: from pps.filterd (m0109332.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 59EHMH6c3684087
-	for <linux-block@vger.kernel.org>; Tue, 14 Oct 2025 13:54:27 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
-	:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=s2048-2025-q2; bh=dwNjWkCb0H6cf7GbQc
-	xNarnMGjmWoV/zVqQp7ph99mA=; b=cbV2osABWVRFtS5pSySonPFzs/V8inAd8V
-	0uHnwmt9j3gdH+TkNlLQis1lxXaQCm42mVUv7jSS/mxWOalTMuIOVFUY3PGA+OBz
-	7/8mto+wfHs83h6J4A7Xm85nlwsMuSF4G0op94EZzsOZvn2d6pp4wMxTHenl+/B4
-	b14NZyFJ3eOyiGp9kcyRIPKeGfNRPAVY+XxMAbMxbaRws3JX0aDTL55UYgj5xPWN
-	n1z+dkJvWyhRPfMMy0Opom2mD+eBlS0aFLtfVpXs7nYcd2CYrL8NToJTiT+u4rS/
-	y6+6XTGo7Y10lFN61DXRKEacgFtyJNGBL9UARw4Irbo4oBoCo46Q==
-Received: from maileast.thefacebook.com ([163.114.135.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 49stuwa0k6-3
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Tue, 14 Oct 2025 13:54:26 -0700 (PDT)
-Received: from twshared28390.17.frc2.facebook.com (2620:10d:c0a8:1b::2d) by
- mail.thefacebook.com (2620:10d:c0a9:6f::8fd4) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.20; Tue, 14 Oct 2025 20:54:25 +0000
-Received: by devbig197.nha3.facebook.com (Postfix, from userid 544533)
-	id F384E2B5AA03; Tue, 14 Oct 2025 13:54:21 -0700 (PDT)
-From: Keith Busch <kbusch@meta.com>
-To: <linux-block@vger.kernel.org>, <shinichiro.kawasaki@wdc.com>
-CC: Keith Busch <kbusch@kernel.org>
-Subject: [PATCH blktests] create a test for direct io offsets
-Date: Tue, 14 Oct 2025 13:54:20 -0700
-Message-ID: <20251014205420.941424-1-kbusch@meta.com>
-X-Mailer: git-send-email 2.47.3
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="d+EW0F/7";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="hJ9rX/EM"
+Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 59EEf6J5005812;
+	Tue, 14 Oct 2025 21:18:22 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=corp-2025-04-25; bh=yfkXv8qO1xI3cRXn7E
+	wDcTZByOdfogkMKSAtzHQouWM=; b=d+EW0F/7IaMUWH/b6w/9L6gZ4bvOuExzK/
+	HaCA+9RpItexJjHW0IC5TSlbpg+597v3r/Arp3bWXHKFA05wz+cLKX8bnOM3IfAC
+	PcVW61MAakRQHEiE9mWXrAQugSMCkshzTV5iJIDEnv0RU1ewaYr3H4uT8+mfrpq9
+	EBXs/INPFJnOPtBSNTxxoZrelPm6JdMwai4MINkcIgc5E5Ck/2RcGTgaPasM40Rz
+	ANeO3GwSJDJ7qIjuUF8NJsNL64jqDz4qSsayzAp+UzywIUztNZmUvcUl636Ox8nr
+	NeNp2unopdMtv0w+umPYxhSR9DEcMhano+LUPExIPSXJn7897I5Q==
+Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 49qeuswa9d-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 14 Oct 2025 21:18:22 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 59EKBQPD009930;
+	Tue, 14 Oct 2025 21:18:21 GMT
+Received: from sj2pr03cu001.outbound.protection.outlook.com (mail-westusazon11012010.outbound.protection.outlook.com [52.101.43.10])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 49qdpfge1m-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 14 Oct 2025 21:18:21 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=DQECH92tbKpJOu0KtKSbIY/XzzQbY9A3Q9f1a4t+iQFftJ0hfOBS6pFPR3ar0hqVaVleOfqUmxg1HHnnCm63Yg7u3NRkrR5fhOXug39FCYwcjgZQmb8gr8UshcpRmmiyNuQiq2fGuJPzB6WfERo8yz1cpMOxrIo9Lk5/P9MwA5hiuDz55qEtK4RFWUpJ5jYL3vsT0iCCnwl5rUwzedHewrThY7ar+pt5SADTbEoWoveM/Q01XEDhY85a/ubvyl/lCr3g3PFtezIRFlnYay8m/vrF6MUS6yHvbcbTy2gCmjUPtpvq7mXIwE+Z/V4UD8GygzlOcg1oOR1zY486N+91Qw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=yfkXv8qO1xI3cRXn7EwDcTZByOdfogkMKSAtzHQouWM=;
+ b=D9MwS4LXWP68CFtNZDstyoPUGszEz4PxZqcl1r9zw26S7Kx/iALAcdA3f1WMp1qjczmh/KigK8upHYfjNyS1teYyh/hFd43d8q/n59OLKM8IYq3PEXr+9YBahEO8/nOL0QfbT6O9YSF+xRKsVvOvUfdHsNDY+/XUFqTzmUaV1n0YxUsOpwgBiOrez2Spv4Hv7UnggEFifTZ0aCL5w5pk0JJA0uEl0tw54umuPkeLN0XxR3RGeuAhokbiuQdjNY2BEXIz/kZ87yWXOx31Jxi2iI5F2KKpEDQYouCDlEXgSG35wmgm/Q0KwRqfznGubiGMzFu9Etc2V6m09/ZPza9bSQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=yfkXv8qO1xI3cRXn7EwDcTZByOdfogkMKSAtzHQouWM=;
+ b=hJ9rX/EMuehkMsIVTtiUMTEJoI9nMb0CyZsyjHkbe9XtrLKboeypwW2B9SSXibsM3uhtD+tgP1wmW6OjHCyDRySeMbby8rUW7186yJsYnPaPZLq2RpHwCARxSZtrJa3cfow75LCwEt/zlFcMMZKPkUxKKJ748GKLMR7xfeStNHg=
+Received: from CH0PR10MB5338.namprd10.prod.outlook.com (2603:10b6:610:cb::8)
+ by CY8PR10MB7316.namprd10.prod.outlook.com (2603:10b6:930:7a::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9228.10; Tue, 14 Oct
+ 2025 21:18:17 +0000
+Received: from CH0PR10MB5338.namprd10.prod.outlook.com
+ ([fe80::5cca:2bcc:cedb:d9bf]) by CH0PR10MB5338.namprd10.prod.outlook.com
+ ([fe80::5cca:2bcc:cedb:d9bf%6]) with mapi id 15.20.9228.009; Tue, 14 Oct 2025
+ 21:18:17 +0000
+To: Keith Busch <kbusch@meta.com>
+Cc: <hch@lst.de>, <linux-nvme@lists.infradead.org>,
+        <linux-block@vger.kernel.org>, <axboe@kernel.dk>,
+        Keith Busch
+ <kbusch@kernel.org>
+Subject: Re: [PATCHv5 1/2] block: accumulate memory segment gaps per bio
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+In-Reply-To: <20251014150456.2219261-2-kbusch@meta.com> (Keith Busch's message
+	of "Tue, 14 Oct 2025 08:04:55 -0700")
+Organization: Oracle Corporation
+Message-ID: <yq18qhdchdv.fsf@ca-mkp.ca.oracle.com>
+References: <20251014150456.2219261-1-kbusch@meta.com>
+	<20251014150456.2219261-2-kbusch@meta.com>
+Date: Tue, 14 Oct 2025 17:18:15 -0400
+Content-Type: text/plain
+X-ClientProxiedBy: YQBPR01CA0102.CANPRD01.PROD.OUTLOOK.COM
+ (2603:10b6:c01:3::38) To CH0PR10MB5338.namprd10.prod.outlook.com
+ (2603:10b6:610:cb::8)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-FB-Internal: Safe
-Content-Type: text/plain
-X-Authority-Analysis: v=2.4 cv=BK6+bVQG c=1 sm=1 tr=0 ts=68eeb882 cx=c_pps
- a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17
- a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=VwQbUJbxAAAA:8
- a=paeA-XSnAucybtUitt4A:9
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDE0MDE0NCBTYWx0ZWRfX5trdTT9ZkPiK
- vKN7tSSYyfXwXnGo/UU08bQO8wJgzyzpv9jh05+mM+JNXUQn0B+gBCMyYA4wbgV+fbVP1OPLsSZ
- b86cIDYO3ckD0eWjlugY6k/CkCDlRlWu3AbA7t4LIvXCPgDdaiKOIRaTCOm3aB5jF+zZOOIVy2b
- eGuVgFBDBPcRruMOlfJkTeLSBA/G6skcOpB6wm2oPUsI//BkPOovFCmVeAKD13RBe0zvC057QBr
- P9nc+/taXqYS0Evn0Zsh3fWsDzxrw/29IcSKC1skAvn60kzCZQYQzs12FpHWEvu8O3twmvb8u60
- ipl+E6TeGgXwY1QOnw4GSmmDkjtulwQ/cP0Y0y61x/Ulxd+KLGafkwrlfc3oqZ/glxRlUQJ54tY
- IeBh2kcE+udxIrPbq+id869ls9dGGg==
-X-Proofpoint-GUID: -PTlDsGbI_HXb547NxxjjJ1Wluzqlp1f
-X-Proofpoint-ORIG-GUID: -PTlDsGbI_HXb547NxxjjJ1Wluzqlp1f
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH0PR10MB5338:EE_|CY8PR10MB7316:EE_
+X-MS-Office365-Filtering-Correlation-Id: da0c0b5f-73a5-49b6-df65-08de0b6731b4
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?xdS1Ov5+Gix+z9av2aN1c4GKkJCt5LXJxMXcZnZHGEYjgNfgztHqyx1RXOcV?=
+ =?us-ascii?Q?DBJTNoLJ7eyCqIhogRf6zS4VnYI50ic09IV2yW5yVxo/Ak+AmLpgYTSwlRDC?=
+ =?us-ascii?Q?TeFGfGCM/HcmsS0vkwZyJjyfWLNux5I17xHdMbnlzFmnxwtfn8yRYynDbM09?=
+ =?us-ascii?Q?t15guE01I72fSJl6I08LUZQYq7RusJPJvUxa4RG1AkU15CNewPaxJnlerHA1?=
+ =?us-ascii?Q?mkfYcZthS0s141lL1NI1ybja30Ju9TuNWtP0rQRBvtDdcloEyraoGMYkjtqy?=
+ =?us-ascii?Q?DWfODXnMoWdZ7mt9Y6bSWkLu3WxNO0z+iTYyg6ymu0ZJUhlw55iLUHVLxJdX?=
+ =?us-ascii?Q?Oe3QoA6hhBQ+lmWY/MDGBXY/z9d9EHGY990zXwx++jFGWERgrkBtc8spPaI1?=
+ =?us-ascii?Q?MmSR17r4j5cREK+ybpbUY4D/gGQHOtz+SGkrE23A0Lb2sgRDrHUQSAAsCriR?=
+ =?us-ascii?Q?r7W49vQYPGFGQtOmkA2DiHZYN8Mo7ZoCAO5rDYn4RCNy/yWqwqigHc/BjjHe?=
+ =?us-ascii?Q?QdLHiVdknUIKlyx8p150Aak4J1rnyOHUsh0/M/bzb3ewjhalGowENr4IV7HG?=
+ =?us-ascii?Q?aMyNBiQOcglhHojifwyoJEWJ7FFFUhr9j0AmPDojhGe4CkywSZnj62fwfzz3?=
+ =?us-ascii?Q?EjAZmEphDqYgNgDviweOl8W0vzcf0V5Z1jGufXfiVdvuRxgnzEU1w9cd2wR3?=
+ =?us-ascii?Q?AZEW7R2eGYKuLakevO8M68s7w86muyxLVCFVcDFPolz7e+5QR+Boqq9nVCrM?=
+ =?us-ascii?Q?A/JmWeMR5baNHjzK/ieo4gFv9pkGExquc0D0Xuhv2Z1p6VgmazeOnrnkRuWM?=
+ =?us-ascii?Q?1wnM34y9AFbDhjie37bXo3HqHuOwD1NHHqwBW7hjmlr6+tBbF4osXvr5A4R/?=
+ =?us-ascii?Q?1eA5K55c5MwRWxh34IooWvRDTQM6AvIz/0Di9QMgWsnL/EnJqlWIJrWgBRK/?=
+ =?us-ascii?Q?G1doKEtihrpofB/TWAlQ1suou7WS3NH+nZrlIFquKhxLbvvhAioV7sio2AHU?=
+ =?us-ascii?Q?ONjHnsY9mXBq59OLbAlaFOffLSmylpB8SLfUIAmDzbEayvUapbVnmMyuGZhV?=
+ =?us-ascii?Q?uaJ2yBvVpxuf3N2WPxkOeaBOiR9bolgZNyJXesVvQP3HP8WXuUoj+VlDn+eH?=
+ =?us-ascii?Q?u5OTYYCNCGWbAZDDZwAx7ljxNpTgYl8iTPLOdmffMky6iMbPC0rs+VLNS/gr?=
+ =?us-ascii?Q?w3h+npKySC4vO0wkGkwmGwstQuHJN8KQhczUUfczly5QBoMavDLzVpTCU7DT?=
+ =?us-ascii?Q?G3wY1lIuCz9gTQrkuojfz3D+8bPqX3PN3Vljb4SDfXOj57+gEuxZXGszbmmZ?=
+ =?us-ascii?Q?zx2FUtoXYLGIsgBmdIzmSx3TI4ccsKUYWjW9n6k6LWXDKLdU6YVOjyhrLrDg?=
+ =?us-ascii?Q?bEMrMbIczfpetkNEp7y0KTcrkOdrQybxIpbM4QwSF/HJA1rIm1P71Ljtv4QB?=
+ =?us-ascii?Q?3lm/ec5GP9A9F4wHHyM8toVq/ns6XwDV?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH0PR10MB5338.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?k0JYBFKCbsBNMYSYDh9tgxZd8YqHZM3dM0X2gN3+HJU8bNuWCKYsEjD1tK+0?=
+ =?us-ascii?Q?5zMRscCwIed2069y/Mmkt8j0ZCR0jd4bDvfWidAETw/nNX22j2ELAI8rsqIe?=
+ =?us-ascii?Q?6UwJj0Purp3+U+ufutd1WeS46+XTc4KbDJA2jnueAPQyBhng1LTwleJo/UuA?=
+ =?us-ascii?Q?tmQe4q6ohefEcaGDQ30ODqSd4cSzoy+sjoxZx/ZE+/+xVj2KTevH/QS7ErNN?=
+ =?us-ascii?Q?e6su6H5YNtbJ9bcfEja//qEpxhUjGfWkm+v+r7rtjUNYLF66D5pB74XPv1ga?=
+ =?us-ascii?Q?26UwukiBsGq1lJ0UdXzXaF4JX4WJIWTd4w7bkdQqeV2me021z9Q6/tmpuq6t?=
+ =?us-ascii?Q?SITVxoah1T+51ODB07OVXgPGf/cXbqSl8CO4mmmP59bp0CoyFgT1e+So9/3f?=
+ =?us-ascii?Q?fKTMsCbAMjfjygBmCJwGrDZvHglfoR2cRo8KVCuJ6tnZjuzr8iQuSjHZKtBC?=
+ =?us-ascii?Q?z2ELyzIwx1wPzJRrBnnfGpQczI4+gYcgEho6qdwJcJnkElNooo/Pm0+VCUmf?=
+ =?us-ascii?Q?+ldTboL9T2sXWxVUz/fAxKOiKEoreI59pbvss84cvXOCQOV0rrJaXs/z8CSy?=
+ =?us-ascii?Q?5H5ijVWEn9xJu4Ydmes7wvFm6TrZFr/nT19d2/NWg9C8Q3pXvBFwQKqWT6mJ?=
+ =?us-ascii?Q?qtm4qn1zN4urQSTsWp6M/zs6Ce/mqMWKJNzkDQEbWsatZXYhDRAyDMc3CJ0L?=
+ =?us-ascii?Q?v/PfZG+eCYUe8U8uVWJwjR+2clZSQMSKPY9jP5X8oq2hokNu7NaOo8wZUin1?=
+ =?us-ascii?Q?UFEG/+Gd8uKH4SEHZspNnZiD07d9k3cDj9mst0m8yoUcXKankfpFqhVO13mX?=
+ =?us-ascii?Q?HNNQ9JlcJwv4xner0ktCDwc8p1eYK/9FbQAdhkN0F6ajT5rseiHSfnNyR6KW?=
+ =?us-ascii?Q?ewzpr9BSYEsZ/E8pfD+3C/epGD+RoeQYQMiQFlBCN456qSEFOZrl44xETTka?=
+ =?us-ascii?Q?9TMVoDDgF037eQft2rGbms5zKx7e6LtZG30LIjgujnSgMqPE4fhtZBaZpv1z?=
+ =?us-ascii?Q?BrtAJIXwNW0x5NyrjYVtXG+ZBj0ftOQf54Q+/NTo6K9V0EtfKFqg5Lzu8h0o?=
+ =?us-ascii?Q?j100UtYJlyxD1GtX/jl2E17y6RUom6z7hF1mwnCbBnjIGx0atJd+H8Ozju76?=
+ =?us-ascii?Q?zHyZfhQItpKs0wFA0rfcc7uWP2ui83cOb5qiolssfZLEmdC6GBW5znug9PsA?=
+ =?us-ascii?Q?uop4k1fOcvGQchDTZ9fp6PnRFFe5rieC+mLbYo9lDd7TVBgKFGgQqdQ2VtEE?=
+ =?us-ascii?Q?9Fg9DexsLUEHHxWue06ALpZuGD5Y589AOAF3+tX8qvlDBe/VEdvuQY3R+FXt?=
+ =?us-ascii?Q?K5KVivUZA2up1ViTiBnjHcRWsJKXEP4+uZeLLxPFU+mHBneunKAOz4mTNCwu?=
+ =?us-ascii?Q?prXrdLaySYq1BW6UxMIDU7vzFTg5Qf2pSryRw3GAxtmt74RTY2fVUCTS6U01?=
+ =?us-ascii?Q?EevNlJBJAvjpXbgEMLvoLgoZh3JKm2T2ISW5+BZNi4V/3XOi3xOmvoKdwsgv?=
+ =?us-ascii?Q?BpZbbE6fiopF+vw6c9raYvMsVV6iyTrf2OAxvB+YfpnPmiwNIMlNtPVQ8Nz8?=
+ =?us-ascii?Q?uPf1DnrQ94UhhHnY2XnVsBvWcy5aqJD4JJuZ0WNh04+ri8jcYK2whUCs/mYk?=
+ =?us-ascii?Q?HQ=3D=3D?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	uGqY5bWbZDf6EDc8Od7lA9XWfqCy65xTyfvSk9e+zK+pgGsnank2n6LJt3lNAiG3+EsE1xxKFRtPkEJL25wS7cSSsD3jJkoTmO8dtrTL1hli0nFR9de/s3+jNnBMYiuRNYkeYioN66hqUA0+sEn+mZwy4HDZQw/0CSBN8MWI2/gbF6mN4YBvATa7NvWhgpgj6Xle6OvPVS0wQ4iG0/z737X/XFv0+yEuNH/KDUSMYe6M4evraHGfpBn7LmOzhFXahtuHoTuryGAUvhxh8OXTaNmpy+stQ3UeeTgPc+sh9CVOKcMl8p6TV9ikFZ0J01KMmVWbgt+cVSgFOEqHkFLhfBq51TsiO/hHRuQlzS9e8W1crIZmlDz94ZPK4BN8M/CWeRHUO5FHP7eJnv8JsYulLCnatH1OY8LxzLda6U8LXZ6k0s1uoesY/CGzQnWP8G7uZx2euSLshhubfHR+zgdZJdgziwDbRxxUh/wEnQkEpNWitefHZbtZmk6tAMRNM6nXck+EomfDP9FnF8n8sCGdLlhkintdPi+xhldUNLZjC3bwPfT99vMib1jM5ziQ629Sa6X88yrcR+kPK+6/J80zEE4/nXqT4A24vQjOE4I3CEI=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: da0c0b5f-73a5-49b6-df65-08de0b6731b4
+X-MS-Exchange-CrossTenant-AuthSource: CH0PR10MB5338.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Oct 2025 21:18:17.8705
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: x+KM8ckBjrP1604RWHynL6I9H6NLxNX7hp8AZP9++Hj/a34BqApXmFbgu4MGN+c/cmvHtXOACuY9lcu8tcTQU4OJlKBakaOQeZyMZZZHew4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR10MB7316
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
  definitions=2025-10-14_04,2025-10-13_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 suspectscore=0 phishscore=0
+ adultscore=0 malwarescore=0 mlxscore=0 mlxlogscore=999 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2510020000
+ definitions=main-2510140145
+X-Proofpoint-ORIG-GUID: e0VAxB8IT7bMzdYD0-N_PMzA58beZyCE
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDExMDAxNCBTYWx0ZWRfX3/gbB/vshLV9
+ gV5E4tS521snzyrphGDk9BMV3me0o7vZ0klcWxUr+dOz/CFDAHtgJMD6TOFLcBKHCvf5y4pZzDY
+ ispnce8/2upLBvsFTwoGSTH9fSh8lBw+aCFv3wiGmRhByNlHfgALvS9n6APLAp+DON9dNm6jQ70
+ yTlD9orCSj0kiFL6zx9YxfUe+R1u+7/k4RmylQZFiureH/Vavy5DBayp20qB5VoYM5baL6m0bmc
+ MvuA260ZuOZgSvcH6uqHO0Yc24sijlL85kebJJEOZUUyQ2f8k1dFyILGmGrT1k9LJYOzmxlcqbG
+ 0Sfk4/POq7OQbK7hU4DQvGWA0dJceb0xhALVs3AdQTbcjy7jJla2dxBiDUe9DDnR30gezSFe3sW
+ Ec+aFeSVR2tQ0hiDzmJPe6fHnKOFYIPpwT2YMuiFd3KHrRY6xjo=
+X-Authority-Analysis: v=2.4 cv=E7TAZKdl c=1 sm=1 tr=0 ts=68eebe1e b=1 cx=c_pps
+ a=qoll8+KPOyaMroiJ2sR5sw==:117 a=qoll8+KPOyaMroiJ2sR5sw==:17
+ a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19
+ a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=xqWC_Br6kY4A:10 a=x6icFKpwvdMA:10
+ a=GoEa3M9JfhUA:10 a=VkNPw1HP01LnGYTKEx00:22 a=yPCof4ZbAAAA:8
+ a=fadctHfkj4wiuBWLsVoA:9 a=zgiPjhLxNE0A:10 cc=ntf awl=host:12092
+X-Proofpoint-GUID: e0VAxB8IT7bMzdYD0-N_PMzA58beZyCE
 
-From: Keith Busch <kbusch@kernel.org>
 
-Tests direct IO using various memory and length alignments against the
-device's queue limits.
+Keith,
 
-This should work on raw block devices, their partitions, or through
-files on mounted filesystems. Much of the code is dedicated to
-automatically finding the underlying block device's queue limits so that
-it can work in a variety of environments.
+> The blk-mq dma iterator has an optimization for requests that align to
+> the device's iommu merge boundary. This boundary may be larger than
+> the device's virtual boundary, but the code had been depending on that
+> queue limit to know ahead of time if the request is guaranteed to
+> align to that optimization.
+>
+> Rather than rely on that queue limit, which many devices may not
+> report, save the lowest set bit of any boundary gap between each
+> segment in the bio while checking the segments. The request stores the
+> value for merging and quickly checking per io if the request can use
+> iova optimizations.
 
-Signed-off-by: Keith Busch <kbusch@kernel.org>
----
- src/.gitignore      |   1 +
- src/Makefile        |   1 +
- src/dio-offsets.c   | 952 ++++++++++++++++++++++++++++++++++++++++++++
- tests/block/042     |  20 +
- tests/block/042.out |   2 +
- 5 files changed, 976 insertions(+)
- create mode 100644 src/dio-offsets.c
- create mode 100644 tests/block/042
- create mode 100644 tests/block/042.out
+Looks OK to me.
 
-diff --git a/src/.gitignore b/src/.gitignore
-index 2ece754..865675c 100644
---- a/src/.gitignore
-+++ b/src/.gitignore
-@@ -1,3 +1,4 @@
-+/dio-offsets
- /discontiguous-io
- /loblksize
- /loop_change_fd
-diff --git a/src/Makefile b/src/Makefile
-index ba0d9b7..179a673 100644
---- a/src/Makefile
-+++ b/src/Makefile
-@@ -9,6 +9,7 @@ HAVE_C_MACRO =3D $(shell if echo "$(H)include <$(1)>" |	\
- 		then echo 1;else echo 0; fi)
-=20
- C_TARGETS :=3D \
-+	dio-offsets \
- 	loblksize \
- 	loop_change_fd \
- 	loop_get_status_null \
-diff --git a/src/dio-offsets.c b/src/dio-offsets.c
-new file mode 100644
-index 0000000..5961232
---- /dev/null
-+++ b/src/dio-offsets.c
-@@ -0,0 +1,952 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright (c) 2025 Meta Platforms, Inc.  All Rights Reserved.
-+ */
-+
-+#ifndef _GNU_SOURCE
-+#define _GNU_SOURCE
-+#endif
-+
-+#include <err.h>
-+#include <errno.h>
-+#include <fcntl.h>
-+#include <libgen.h>
-+#include <limits.h>
-+#include <mntent.h>
-+#include <stdlib.h>
-+#include <stdio.h>
-+#include <string.h>
-+#include <unistd.h>
-+#include <stdbool.h>
-+
-+#include <sys/stat.h>
-+#include <sys/statfs.h>
-+#include <sys/sysmacros.h>
-+#include <sys/uio.h>
-+#include <sys/utsname.h>
-+
-+#define power_of_2(x) ((x) && !((x) & ((x) - 1)))
-+
-+static unsigned long logical_block_size;
-+static unsigned long dma_alignment;
-+static unsigned long virt_boundary;
-+static unsigned long max_segments;
-+static unsigned long max_bytes;
-+static int kernel_major;
-+static int kernel_minor;
-+static size_t buf_size;
-+static long pagesize;
-+static void *out_buf;
-+static void *in_buf;
-+static int test_fd;
-+
-+static void init_kernel_version()
-+{
-+	struct utsname buffer;
-+	char *major_version_str;
-+	char *minor_version_str;
-+	if (uname(&buffer) !=3D 0)
-+		err(errno, "uname");
-+
-+	major_version_str =3D strtok(buffer.release, ".");
-+	minor_version_str =3D strtok(NULL, ".");
-+
-+	kernel_major =3D strtol(major_version_str, NULL, 0);
-+	kernel_minor =3D strtol(minor_version_str, NULL, 0);
-+}
-+
-+static void find_mount_point(const char *filepath, char *mount_point,
-+			     size_t mp_len)
-+{
-+	char path[PATH_MAX - 1], abs_path[PATH_MAX], *pos;
-+	struct stat file_stat, mp_stat, parent_stat;
-+
-+	if (stat(filepath, &file_stat) !=3D 0)
-+		err(errno, "stat");
-+
-+	strncpy(path, filepath, sizeof(path) - 1);
-+	path[sizeof(path) - 1] =3D '\0';
-+	if (realpath(path, abs_path) =3D=3D NULL)
-+		err(ENOENT, "realpath");
-+
-+	strncpy(path, abs_path, sizeof(path) - 1);
-+	path[sizeof(path) - 1] =3D '\0';
-+	while (1) {
-+		if (stat(path, &mp_stat))
-+			err(errno, "stat on path");
-+
-+		pos =3D strrchr(path, '/');
-+		if (pos =3D=3D path) {
-+			strcpy(path, "/");
-+			break;
-+		}
-+
-+		if (pos =3D=3D NULL)
-+			break;
-+
-+		*pos =3D '\0';
-+		if (path[0] =3D=3D '\0')
-+			strcpy(path, "/");
-+
-+		if (stat(path, &parent_stat))
-+			err(errno, "stat on parent");
-+
-+		if (parent_stat.st_dev !=3D mp_stat.st_dev) {
-+			*pos =3D '/';
-+			break;
-+		}
-+	}
-+
-+	strncpy(mount_point, path, mp_len - 1);
-+	mount_point[mp_len - 1] =3D '\0';
-+}
-+
-+static void find_block_device_from_mount(const char *mount_point, char *=
-block_dev,
-+					 size_t bd_len)
-+{
-+	struct mntent *ent;
-+	FILE *mounts;
-+
-+	mounts =3D setmntent("/proc/mounts", "r");
-+	if (!mounts)
-+		err(ENOENT, "setmntent");
-+
-+	while ((ent =3D getmntent(mounts)) !=3D NULL) {
-+		if (strcmp(ent->mnt_dir, mount_point) =3D=3D 0) {
-+			strncpy(block_dev, ent->mnt_fsname, bd_len - 1);
-+			block_dev[bd_len - 1] =3D '\0';
-+			endmntent(mounts);
-+			return;
-+		}
-+	}
-+
-+	endmntent(mounts);
-+	err(ENOENT, "%s: not found", __func__);
-+}
-+
-+static void resolve_to_sysblock(const char *dev_path, char *path, size_t=
- path_len)
-+{
-+	char resolved[PATH_MAX], class[PATH_MAX], target[PATH_MAX], base[256];
-+	char *dev_name, *p, *slash, *block_pos;
-+	struct stat st;
-+	size_t len;
-+
-+	if (realpath(dev_path, resolved) !=3D NULL)
-+		dev_path =3D resolved;
-+
-+	dev_name =3D strrchr(dev_path, '/');
-+	if (dev_name)
-+		dev_name++;
-+	else
-+		dev_name =3D (char *)dev_path;
-+
-+	strncpy(base, dev_name, sizeof(base) - 1);
-+	base[sizeof(base) - 1] =3D '\0';
-+
-+	len =3D strlen(base);
-+	p =3D base + len - 1;
-+	while (p > base && *p >=3D '0' && *p <=3D '9')
-+		p--;
-+
-+	if (p > base && *p =3D=3D 'p' && *(p + 1) !=3D '\0')
-+		*p =3D '\0';
-+	else if (len >=3D 4 && p > base && p < base + len - 1) {
-+		if ((strncmp(base, "sd", 2) =3D=3D 0 ||
-+		     strncmp(base, "hd", 2) =3D=3D 0 ||
-+		     strncmp(base, "vd", 2) =3D=3D 0) &&
-+		     (*p >=3D 'a' && *p <=3D 'z'))
-+			*(p + 1) =3D '\0';
-+	}
-+
-+	if (snprintf(path, path_len, "/sys/block/%s/queue", base) < 0)
-+		err(errno, "base too long");
-+	if (stat(path, &st) =3D=3D 0 && S_ISDIR(st.st_mode))
-+		return;
-+
-+	if (snprintf(class, sizeof(class), "/sys/class/block/%s", dev_name) < 0=
-)
-+		err(errno, "class too long");
-+	if (stat(class, &st) =3D=3D 0) {
-+		len =3D readlink(class, target, sizeof(target) - 1);
-+		if (len !=3D -1) {
-+			target[len] =3D '\0';
-+			block_pos =3D strstr(target, "/block/");
-+			if (block_pos) {
-+				block_pos +=3D 7;
-+				slash =3D strchr(block_pos, '/');
-+				if (slash) {
-+					len =3D slash - block_pos;
-+					if (len < sizeof(base)) {
-+						strncpy(base, block_pos, len);
-+						base[len] =3D '\0';
-+						snprintf(path, path_len,
-+							 "/sys/block/%s/queue", base);
-+						if (stat(path, &st) =3D=3D 0 &&
-+						    S_ISDIR(st.st_mode))
-+							return;
-+					}
-+				} else {
-+					snprintf(path, path_len,
-+						 "/sys/block/%s/queue", block_pos);
-+					if (stat(path, &st) =3D=3D 0 &&
-+					    S_ISDIR(st.st_mode)) {
-+						return;
-+					}
-+				}
-+			}
-+		}
-+	}
-+
-+	if (strncmp(dev_name, "dm-", 3) =3D=3D 0) {
-+		if (snprintf(path, path_len, "/sys/block/%s/queue", dev_name) < 0)
-+			err(errno, "%s", dev_name);
-+		if (stat(path, &st) =3D=3D 0 && S_ISDIR(st.st_mode))
-+			return;
-+	}
-+
-+	err(ENOENT, "%s: not found", dev_name);
-+}
-+
-+static void find_block_device(const char *filepath, char *path, size_t p=
-ath_len)
-+{
-+	char mount_point[PATH_MAX], block_dev[PATH_MAX];
-+	struct stat st;
-+
-+	if (stat(filepath, &st) =3D=3D 0 && S_ISBLK(st.st_mode)) {
-+		resolve_to_sysblock(filepath, path, path_len);
-+		return;
-+	}
-+
-+	find_mount_point(filepath, mount_point, sizeof(mount_point));
-+	find_block_device_from_mount(mount_point, block_dev, sizeof(block_dev))=
-;
-+	resolve_to_sysblock(block_dev, path, path_len);
-+}
-+
-+static void read_sysfs_attr(char *path, unsigned long *value)
-+{
-+	FILE *f;
-+	int ret;
-+
-+	f =3D fopen(path, "r");
-+	if (!f)
-+		err(ENOENT, "%s", path);
-+
-+	ret =3D fscanf(f, "%lu", value);
-+	fclose(f);
-+	if (ret !=3D 1)
-+		err(ENOENT, "%s", basename(path));
-+}
-+
-+static void read_queue_attrs(const char *path)
-+{
-+	char attr[PATH_MAX];
-+
-+	if (snprintf(attr, sizeof(attr), "%s/max_segments", path) < 0)
-+		err(errno, "max_segments");
-+	read_sysfs_attr(attr, &max_segments);
-+
-+	if (snprintf(attr, sizeof(attr), "%s/dma_alignment", path) < 0)
-+		err(errno, "dma_alignment");
-+	read_sysfs_attr(attr, &dma_alignment);
-+
-+	if (snprintf(attr, sizeof(attr), "%s/virt_boundary_mask", path) < 0)
-+		err(errno, "virt_boundary_mask");
-+	read_sysfs_attr(attr, &virt_boundary);
-+
-+	if (snprintf(attr, sizeof(attr), "%s/logical_block_size", path) < 0)
-+		err(errno, "logical_block_size");
-+	read_sysfs_attr(attr, &logical_block_size);
-+
-+	if (snprintf(attr, sizeof(attr), "%s/max_sectors_kb", path) < 0)
-+		err(errno, "max_sectors_kb");
-+	read_sysfs_attr(attr, &max_bytes);
-+
-+	max_bytes *=3D 1024;
-+	dma_alignment++;
-+	virt_boundary++;
-+
-+	/*
-+	printf("logical_block_size:%lu dma_alignment:%lu virt_boundary:%lu max_=
-segments:%lu max_bytes:%lu\n",
-+		logical_block_size, dma_alignment, virt_boundary, max_segments, max_by=
-tes);
-+	*/
-+}
-+
-+static void init_args(char **argv)
-+{
-+	char sys_path[PATH_MAX];
-+
-+        test_fd =3D open(argv[1], O_RDWR | O_CREAT | O_TRUNC | O_DIRECT)=
-;
-+        if (test_fd < 0)
-+		err(errno, "%s: failed to open %s", __func__, argv[1]);
-+
-+	init_kernel_version();
-+	find_block_device(argv[1], sys_path, sizeof(sys_path));
-+	read_queue_attrs(sys_path);
-+
-+	if (!power_of_2(virt_boundary) ||
-+	    !power_of_2(dma_alignment) ||
-+	    !power_of_2(logical_block_size))
-+		err(EINVAL, "%s: bad parameters", __func__);
-+
-+	if (virt_boundary > 1 && virt_boundary < logical_block_size)
-+		err(EINVAL, "%s: virt_boundary:%lu logical_block_size:%lu", __func__,
-+			virt_boundary, logical_block_size);
-+
-+	if (dma_alignment > logical_block_size)
-+		err(EINVAL, "%s: dma_alignment:%lu logical_block_size:%lu", __func__,
-+			dma_alignment, logical_block_size);
-+
-+	if (max_segments > 4096)
-+		max_segments =3D 4096;
-+	if (max_bytes > 16384 * 1024)
-+		max_bytes =3D 16384 * 1024;
-+	if (max_bytes & (logical_block_size - 1))
-+		max_bytes -=3D max_bytes & (logical_block_size - 1);
-+	pagesize =3D sysconf(_SC_PAGE_SIZE);
-+}
-+
-+static void init_buffers()
-+{
-+	unsigned long lb_mask =3D logical_block_size - 1;
-+	int fd, ret;
-+
-+	buf_size =3D max_bytes * max_segments / 2;
-+	if (buf_size < logical_block_size * max_segments)
-+		err(EINVAL, "%s: logical block size is too big", __func__);
-+
-+	if (buf_size < logical_block_size * 1024 * 4)
-+		buf_size =3D logical_block_size * 1024 * 4;
-+
-+	if (buf_size & lb_mask)
-+		buf_size =3D (buf_size + lb_mask) & ~(lb_mask);
-+
-+        ret =3D posix_memalign((void **)&in_buf, pagesize, buf_size);
-+        if (ret)
-+		err(EINVAL, "%s: failed to allocate in-buf", __func__);
-+
-+        ret =3D posix_memalign((void **)&out_buf, pagesize, buf_size);
-+        if (ret)
-+		err(EINVAL, "%s: failed to allocate out-buf", __func__);
-+
-+	fd =3D open("/dev/urandom", O_RDONLY);
-+	if (fd < 0)
-+		err(EINVAL, "%s: failed to open urandom", __func__);
-+
-+	ret =3D read(fd, out_buf, buf_size);
-+	if (ret < 0)
-+		err(EINVAL, "%s: failed to randomize output buffer", __func__);
-+
-+	close(fd);
-+}
-+
-+static void __compare(void *a, void *b, size_t size, const char *test)
-+{
-+	if (!memcmp(a, b, size))
-+		return;
-+	err(EIO, "%s: data corruption", test);
-+}
-+#define compare(a, b, size) __compare(a, b, size, __func__)
-+
-+/*
-+ * Test using page aligned buffers, single source
-+ *
-+ * Total size is aligned to a logical block size and exceeds the max tra=
-nsfer
-+ * size as well as the max segments. This should test the kernel's split=
- bio
-+ * construction and bio splitting for exceeding these limits.
-+ */
-+static void test_full_size_aligned()
-+{
-+	int ret;
-+
-+	memset(in_buf, 0, buf_size);
-+	ret =3D pwrite(test_fd, out_buf, buf_size, 0);
-+	if (ret < 0)
-+		err(errno, "%s: failed to write buf", __func__);
-+
-+	ret =3D pread(test_fd, in_buf, buf_size, 0);
-+	if (ret < 0)
-+		err(errno, "%s: failed to read buf", __func__);
-+
-+	compare(out_buf, in_buf, buf_size);
-+}
-+
-+/*
-+ * Test using dma aligned buffers, single source
-+ *
-+ * This tests the kernel's dio memory alignment
-+ */
-+static void test_dma_aligned()
-+{
-+	int ret;
-+
-+	memset(in_buf, 0, buf_size);
-+	ret =3D pwrite(test_fd, out_buf + dma_alignment, max_bytes, 0);
-+	if (ret < 0)
-+		err(errno, "%s: failed to write buf", __func__);
-+
-+	ret =3D pread(test_fd, in_buf + dma_alignment, max_bytes, 0);
-+	if (ret < 0)
-+		err(errno, "%s: failed to read buf", __func__);
-+
-+	compare(out_buf + dma_alignment, in_buf + dma_alignment, max_bytes);
-+}
-+
-+/*
-+ * Test using page aligned buffers + logicaly block sized vectored sourc=
-e
-+ *
-+ * This tests discontiguous vectored sources
-+ */
-+static void test_page_aligned_vectors()
-+{
-+	const int vecs =3D 4;
-+
-+	int i, ret, offset;
-+	struct iovec iov[vecs];
-+
-+	memset(in_buf, 0, buf_size);
-+	for (i =3D 0; i < vecs; i++) {
-+		offset =3D logical_block_size * i * 4;
-+		iov[i].iov_base =3D out_buf + offset;
-+		iov[i].iov_len =3D logical_block_size * 2;
-+	}
-+
-+        ret =3D pwritev(test_fd, iov, vecs, 0);
-+        if (ret < 0)
-+		err(errno, "%s: failed to write buf", __func__);
-+
-+	for (i =3D 0; i < vecs; i++) {
-+		offset =3D logical_block_size * i * 4;
-+		iov[i].iov_base =3D in_buf + offset;
-+		iov[i].iov_len =3D logical_block_size * 2;
-+	}
-+
-+        ret =3D preadv(test_fd, iov, vecs, 0);
-+        if (ret < 0)
-+		err(errno, "%s: failed to read buf", __func__);
-+
-+	for (i =3D 0; i < vecs; i++) {
-+		offset =3D logical_block_size * i * 4;
-+		compare(in_buf + offset, out_buf + offset, logical_block_size * 2);
-+	}
-+}
-+
-+/*
-+ * Test using dma aligned buffers, vectored source
-+ *
-+ * This tests discontiguous vectored sources with incrementing dma align=
-ed
-+ * offsets
-+ */
-+static void test_dma_aligned_vectors()
-+{
-+	const int vecs =3D 4;
-+
-+	int i, ret, offset;
-+	struct iovec iov[vecs];
-+
-+	memset(in_buf, 0, buf_size);
-+	for (i =3D 0; i < vecs; i++) {
-+		offset =3D logical_block_size * i * 8 + dma_alignment * (i + 1);
-+		iov[i].iov_base =3D out_buf + offset;
-+		iov[i].iov_len =3D logical_block_size * 2;
-+	}
-+
-+        ret =3D pwritev(test_fd, iov, vecs, 0);
-+        if (ret < 0)
-+		err(errno, "%s: failed to write buf", __func__);
-+
-+	for (i =3D 0; i < vecs; i++) {
-+		offset =3D logical_block_size * i * 8 + dma_alignment * (i + 1);
-+		iov[i].iov_base =3D in_buf + offset;
-+		iov[i].iov_len =3D logical_block_size * 2;
-+	}
-+
-+        ret =3D preadv(test_fd, iov, vecs, 0);
-+        if (ret < 0)
-+		err(errno, "%s: failed to read buf", __func__);
-+
-+	for (i =3D 0; i < vecs; i++) {
-+		offset =3D logical_block_size * i * 8 + dma_alignment * (i + 1);
-+		compare(in_buf + offset, out_buf + offset, logical_block_size * 2);
-+	}
-+}
-+
-+/*
-+ * Test vectored read with a total size aligned to a block, but some ind=
-ividual
-+ * vectors will not be aligned to to the block size.
-+ *
-+ * All the middle vectors start and end on page boundaries which should
-+ * satisfy any virt_boundary condition. This test will fail prior to ker=
-nel
-+ * 6.18.
-+ */
-+static void test_unaligned_page_vectors()
-+{
-+	const int vecs =3D 4;
-+
-+	int i, ret, offset, mult;
-+	struct iovec iov[vecs];
-+	bool should_fail =3D true;
-+
-+	if (kernel_major > 6 || (kernel_major =3D=3D 6 && kernel_minor >=3D 18)=
-)
-+		should_fail =3D false;
-+
-+	i =3D 0;
-+	memset(in_buf, 0, buf_size);
-+	mult =3D pagesize / logical_block_size;
-+	if (mult < 2)
-+		mult =3D 2;
-+
-+	offset =3D pagesize - (logical_block_size / 4);
-+	if (offset & (dma_alignment - 1))
-+		offset =3D pagesize - dma_alignment;
-+
-+	iov[i].iov_base =3D out_buf + offset;
-+	iov[i].iov_len =3D pagesize - offset;
-+
-+	for (i =3D 1; i < vecs - 1; i++) {
-+		offset =3D logical_block_size * i * 8 * mult;
-+		iov[i].iov_base =3D out_buf + offset;
-+		iov[i].iov_len =3D logical_block_size * mult;
-+	}
-+
-+	offset =3D logical_block_size * i * 8 * mult;
-+	iov[i].iov_base =3D out_buf + offset;
-+	iov[i].iov_len =3D logical_block_size * mult - iov[0].iov_len;
-+
-+        ret =3D pwritev(test_fd, iov, vecs, 0);
-+        if (ret < 0) {
-+		if (should_fail)
-+			return;
-+		err(errno, "%s: failed to write buf", __func__);
-+	}
-+
-+	i =3D 0;
-+	offset =3D pagesize - (logical_block_size / 4);
-+	if (offset & (dma_alignment - 1))
-+		offset =3D pagesize - dma_alignment;
-+
-+	iov[i].iov_base =3D in_buf + offset;
-+	iov[i].iov_len =3D pagesize - offset;
-+
-+	for (i =3D 1; i < vecs - 1; i++) {
-+		offset =3D logical_block_size * i * 8 * mult;
-+		iov[i].iov_base =3D in_buf + offset;
-+		iov[i].iov_len =3D logical_block_size * mult;
-+	}
-+
-+	offset =3D logical_block_size * i * 8 * mult;
-+	iov[i].iov_base =3D in_buf + offset;
-+	iov[i].iov_len =3D logical_block_size * mult - iov[0].iov_len;
-+
-+        ret =3D preadv(test_fd, iov, vecs, 0);
-+        if (ret < 0)
-+		err(errno, "%s: failed to read buf", __func__);
-+
-+	i =3D 0;
-+	offset =3D pagesize - (logical_block_size / 4);
-+	if (offset & (dma_alignment - 1))
-+		offset =3D pagesize - dma_alignment;
-+
-+	compare(in_buf + offset, out_buf + offset, iov[i].iov_len);
-+	for (i =3D 1; i < vecs - 1; i++) {
-+		offset =3D logical_block_size * i * 8 * mult;
-+		compare(in_buf + offset, out_buf + offset, iov[i].iov_len);
-+	}
-+	offset =3D logical_block_size * i * 8 * mult;
-+	compare(in_buf + offset, out_buf + offset, iov[i].iov_len);
-+}
-+
-+/*
-+ * Total size is a logical block size multiple, but none of the vectors =
-are.
-+ *
-+ * Total vectors will be less than the max. The vectors will be dma alig=
-ned. If
-+ * a virtual boundary exists, this should fail, otherwise it should succ=
-ceed on
-+ * kernels 6.18 and newer.
-+ */
-+static void test_unaligned_vectors()
-+{
-+	const int vecs =3D 4;
-+
-+	bool should_fail =3D true;
-+	struct iovec iov[vecs];
-+	int i, ret, offset;
-+
-+	if ((kernel_major > 6 || (kernel_major =3D=3D 6 && kernel_minor >=3D 18=
-)) &&
-+	    virt_boundary <=3D 1)
-+		should_fail =3D false;
-+
-+	memset(in_buf, 0, buf_size);
-+	for (i =3D 0; i < vecs; i++) {
-+		offset =3D logical_block_size * i * 8;
-+		iov[i].iov_base =3D out_buf + offset;
-+		iov[i].iov_len =3D logical_block_size / 2;
-+	}
-+
-+        ret =3D pwritev(test_fd, iov, vecs, 0);
-+        if (ret < 0) {
-+		if (should_fail)
-+			return;
-+		err(errno, "%s: failed to write buf", __func__);
-+	}
-+
-+	if (should_fail)
-+		err(ENOTSUP, "%s: write buf unexpectedly succeeded ret:%d",
-+			__func__, ret);
-+
-+	for (i =3D 0; i < vecs; i++) {
-+		offset =3D logical_block_size * i * 8;
-+		iov[i].iov_base =3D in_buf + offset;
-+		iov[i].iov_len =3D logical_block_size / 2;
-+	}
-+
-+        ret =3D preadv(test_fd, iov, vecs, 0);
-+        if (ret < 0)
-+		err(errno, "%s: failed to read buf", __func__);
-+
-+	for (i =3D 0; i < vecs; i++) {
-+		offset =3D logical_block_size * i * 8;
-+		compare(in_buf + offset, out_buf + offset, logical_block_size / 2);
-+	}
-+}
-+
-+/*
-+ * Provide an invalid iov_base at the beginning to test the kernel catch=
-ing it
-+ * while building a bio.
-+ */
-+static void test_invalid_starting_addr()
-+{
-+	const int vecs =3D 4;
-+
-+	int i, ret, offset;
-+	struct iovec iov[vecs];
-+
-+	i =3D 0;
-+	iov[i].iov_base =3D 0;
-+	iov[i].iov_len =3D logical_block_size;
-+
-+	for (i =3D 1; i < vecs; i++) {
-+		offset =3D logical_block_size * i * 8;
-+		iov[i].iov_base =3D out_buf + offset;
-+		iov[i].iov_len =3D logical_block_size;
-+	}
-+
-+        ret =3D pwritev(test_fd, iov, vecs, 0);
-+        if (ret < 0)
-+		return;
-+
-+	err(ENOTSUP, "%s: write buf unexpectedly succeeded with NULL address re=
-t:%d",
-+		__func__, ret);
-+}
-+
-+/*
-+ * Provide an invalid iov_base in the middle to test the kernel catching=
- it
-+ * while building split bios. Ensure it is split by sending enough vecto=
-rs to
-+ * exceed bio's MAX_VEC; this should cause part of the io to dispatch.
-+ */
-+static void test_invalid_middle_addr()
-+{
-+	const int vecs =3D 1024;
-+
-+	int i, ret, offset;
-+	struct iovec iov[vecs];
-+
-+	for (i =3D 0; i < vecs / 2 + 1; i++) {
-+		offset =3D logical_block_size * i * 2;
-+		iov[i].iov_base =3D out_buf + offset;
-+		iov[i].iov_len =3D logical_block_size;
-+	}
-+
-+	offset =3D logical_block_size * i * 2;
-+	iov[i].iov_base =3D 0;
-+	iov[i].iov_len =3D logical_block_size;
-+
-+	for (++i; i < vecs; i++) {
-+		offset =3D logical_block_size * i * 2;
-+		iov[i].iov_base =3D out_buf + offset;
-+		iov[i].iov_len =3D logical_block_size;
-+	}
-+
-+        ret =3D pwritev(test_fd, iov, vecs, 0);
-+        if (ret < 0)
-+		return;
-+
-+	err(ENOTSUP, "%s: write buf unexpectedly succeeded with NULL address re=
-t:%d",
-+		__func__, ret);
-+}
-+
-+/*
-+ * Test with an invalid DMA address. Should get caught early when splitt=
-ing. If
-+ * the device supports byte aligned memory (which is unusual), then this=
- should
-+ * be successful.
-+ */
-+static void test_invalid_dma_alignment()
-+{
-+	int ret, offset;
-+	size_t size;
-+	bool should_fail =3D dma_alignment > 1;
-+
-+	memset(in_buf, 0, buf_size);
-+	offset =3D 2 * dma_alignment - 1;
-+	size =3D logical_block_size * 256;
-+	ret =3D pwrite(test_fd, out_buf + offset, size, 0);
-+	if (ret < 0) {
-+		if (should_fail)
-+			return;
-+		err(errno, "%s: failed to write buf", __func__);
-+	}
-+
-+	if (should_fail)
-+		err(ENOTSUP, "%s: write buf unexpectedly succeeded with invalid DMA of=
-fset address, ret:%d",
-+			__func__, ret);
-+
-+	ret =3D pread(test_fd, in_buf + offset, size, 0);
-+	if (ret < 0)
-+		err(errno, "%s: failed to read buf", __func__);
-+
-+	compare(out_buf + offset, in_buf + offset, size);
-+}
-+
-+/*
-+ * Test with invalid DMA alignment in the middle. This should get split =
-with
-+ * the first part being dispatched, and the 2nd one failing without disp=
-atch.
-+ */
-+static void test_invalid_dma_vector_alignment()
-+{
-+	const int vecs =3D 5;
-+
-+	bool should_fail =3D dma_alignment > 1;
-+	struct iovec iov[vecs];
-+	int ret, offset;
-+
-+	offset =3D dma_alignment * 2 - 1;
-+	memset(in_buf, 0, buf_size);
-+
-+	iov[0].iov_base =3D out_buf;
-+	iov[0].iov_len =3D max_bytes;
-+
-+	iov[1].iov_base =3D out_buf + max_bytes * 2;
-+	iov[1].iov_len =3D max_bytes;
-+
-+	iov[2].iov_base =3D out_buf + max_bytes * 4 + offset;
-+	iov[2].iov_len =3D max_bytes;
-+
-+	iov[3].iov_base =3D out_buf + max_bytes * 6;
-+	iov[3].iov_len =3D max_bytes;
-+
-+	iov[4].iov_base =3D out_buf + max_bytes * 8;
-+	iov[4].iov_len =3D max_bytes;
-+
-+        ret =3D pwritev(test_fd, iov, vecs, 0);
-+        if (ret < 0) {
-+		if (should_fail)
-+			return;
-+		err(errno, "%s: failed to write buf", __func__);
-+	}
-+	if (should_fail)
-+		err(ENOTSUP, "%s: write buf unexpectedly succeeded with invalid DMA of=
-fset address ret:%d",
-+			__func__, ret);
-+
-+	iov[0].iov_base =3D in_buf;
-+	iov[0].iov_len =3D max_bytes;
-+
-+	iov[1].iov_base =3D in_buf + max_bytes * 2;
-+	iov[1].iov_len =3D max_bytes;
-+
-+	iov[2].iov_base =3D in_buf + max_bytes * 4 + offset;
-+	iov[2].iov_len =3D max_bytes;
-+
-+	iov[3].iov_base =3D in_buf + max_bytes * 6;
-+	iov[3].iov_len =3D max_bytes;
-+
-+	iov[4].iov_base =3D in_buf + max_bytes * 8;
-+	iov[4].iov_len =3D max_bytes;
-+
-+        ret =3D preadv(test_fd, iov, vecs, 0);
-+        if (ret < 0)
-+		err(errno, "%s: failed to read buf", __func__);
-+
-+	compare(out_buf, in_buf, max_bytes);
-+	compare(out_buf + max_bytes * 2, in_buf + max_bytes * 2, max_bytes);
-+	compare(out_buf + max_bytes * 4 + offset, in_buf + max_bytes * 4 + offs=
-et, max_bytes);
-+	compare(out_buf + max_bytes * 6, in_buf + max_bytes * 6, max_bytes);
-+	compare(out_buf + max_bytes * 8, in_buf + max_bytes * 8, max_bytes);
-+}
-+
-+/*
-+ * Test a bunch of small vectors if the device dma alignemnt allows it. =
-We'll
-+ * try to force a MAX_IOV split that can't form a valid IO so expect a f=
-ailure.
-+ */
-+static void test_max_vector_limits()
-+{
-+	const int vecs =3D 320;
-+
-+	int ret, i, offset, iovpb, iov_size;
-+	bool should_fail =3D true;
-+	struct iovec iov[vecs];
-+
-+	memset(in_buf, 0, buf_size);
-+	iovpb =3D logical_block_size / dma_alignment;
-+	iov_size =3D logical_block_size / iovpb;
-+
-+	if ((pagesize  / iov_size) < 256 &&
-+	    iov_size >=3D virt_boundary)
-+		should_fail =3D false;
-+
-+	for (i =3D 0; i < vecs; i++) {
-+		offset =3D i * iov_size * 2;
-+		iov[i].iov_base =3D out_buf + offset;
-+		iov[i].iov_len =3D iov_size;
-+	}
-+
-+        ret =3D pwritev(test_fd, iov, vecs, 0);
-+        if (ret < 0) {
-+		if (should_fail)
-+			return;
-+		err(errno, "%s: failed to write buf", __func__);
-+	}
-+
-+	if (should_fail)
-+		err(ENOTSUP, "%s: write buf unexpectedly succeeded with excess vectors=
- ret:%d",
-+			__func__, ret);
-+
-+	for (i =3D 0; i < vecs; i++) {
-+		offset =3D i * iov_size * 2;
-+		iov[i].iov_base =3D in_buf + offset;
-+		iov[i].iov_len =3D iov_size;
-+	}
-+
-+        ret =3D preadv(test_fd, iov, vecs, 0);
-+        if (ret < 0)
-+		err(errno, "%s: failed to read buf", __func__);
-+
-+	for (i =3D 0; i < vecs; i++) {
-+		offset =3D i * iov_size * 2;
-+		compare(in_buf + offset, out_buf + offset, logical_block_size / 2);
-+	}
-+}
-+
-+/*
-+ * Start with a valid vector that can be split into a dispatched IO, but=
- poison
-+ * the rest with an invalid DMA offset testing the kernel's late catch.
-+ */
-+static void test_invalid_dma_vector_alignment_large()
-+{
-+	const int vecs =3D 4;
-+
-+	struct iovec iov[vecs];
-+	int i, ret;
-+
-+	i =3D 0;
-+	iov[i].iov_base =3D out_buf;
-+	iov[i].iov_len =3D max_bytes - logical_block_size;
-+
-+	i++;
-+	iov[i].iov_base =3D out_buf + max_bytes + logical_block_size;
-+	iov[i].iov_len =3D logical_block_size;
-+
-+	i++;
-+	iov[i].iov_base =3D iov[1].iov_base + pagesize * 2 + (dma_alignment - 1=
-);
-+	iov[i].iov_len =3D logical_block_size;
-+
-+	i++;
-+	iov[i].iov_base =3D out_buf + max_bytes * 8;
-+	iov[i].iov_len =3D logical_block_size;
-+
-+        ret =3D pwritev(test_fd, iov, vecs, 0);
-+        if (ret < 0)
-+		return;
-+
-+	err(ENOTSUP, "%s: write buf unexpectedly succeeded with NULL address re=
-t:%d",
-+		__func__, ret);
-+}
-+
-+/*
-+ * Total size is block aligned, addresses are dma aligned, but invidual =
-vector
-+ * sizes may not be dma aligned. If device has byte sized dma alignment,=
- this
-+ * should succeed. If not, part of this should get dispatched, and the o=
-ther
-+ * part should fail.
-+ */
-+static void test_invalid_dma_vector_length()
-+{
-+	const int vecs =3D 4;
-+
-+	bool should_fail =3D dma_alignment > 1;
-+	struct iovec iov[vecs];
-+	int ret;
-+
-+	iov[0].iov_base =3D out_buf;
-+	iov[0].iov_len =3D max_bytes * 2 - max_bytes / 2;
-+
-+	iov[1].iov_base =3D out_buf + max_bytes * 4;
-+	iov[1].iov_len =3D logical_block_size * 2 - (dma_alignment + 1);
-+
-+	iov[2].iov_base =3D out_buf + max_bytes * 8;
-+	iov[2].iov_len =3D logical_block_size * 2 + (dma_alignment + 1);
-+
-+	iov[3].iov_base =3D out_buf + max_bytes * 12;
-+	iov[3].iov_len =3D max_bytes - max_bytes / 2;
-+
-+        ret =3D pwritev(test_fd, iov, vecs, 0);
-+        if (ret < 0) {
-+		if (should_fail)
-+			return;
-+		err(errno, "%s: failed to write buf", __func__);
-+	}
-+
-+	if (should_fail)
-+		err(ENOTSUP, "%s: write buf unexpectedly succeeded with invalid DMA of=
-fset address ret:%d",
-+			__func__, ret);
-+
-+	iov[0].iov_base =3D in_buf;
-+	iov[0].iov_len =3D max_bytes * 2 - max_bytes / 2;
-+
-+	iov[1].iov_base =3D in_buf + max_bytes * 4;
-+	iov[1].iov_len =3D logical_block_size * 2 - (dma_alignment + 1);
-+
-+	iov[2].iov_base =3D in_buf + max_bytes * 8;
-+	iov[2].iov_len =3D logical_block_size * 2 + (dma_alignment + 1);
-+
-+	iov[3].iov_base =3D in_buf + max_bytes * 12;
-+	iov[3].iov_len =3D max_bytes - max_bytes / 2;
-+
-+        ret =3D pwritev(test_fd, iov, vecs, 0);
-+        if (ret < 0)
-+		err(errno, "%s: failed to read buf", __func__);
-+
-+	compare(out_buf, in_buf, iov[0].iov_len);
-+	compare(out_buf + max_bytes * 4, in_buf + max_bytes * 4, iov[1].iov_len=
-);
-+	compare(out_buf + max_bytes * 8, in_buf + max_bytes * 8, iov[2].iov_len=
-);
-+	compare(out_buf + max_bytes * 12, in_buf + max_bytes * 12, iov[3].iov_l=
-en);
-+}
-+
-+static void run_tests()
-+{
-+	test_full_size_aligned();
-+	test_dma_aligned();
-+	test_page_aligned_vectors();
-+	test_dma_aligned_vectors();
-+	test_unaligned_page_vectors();
-+	test_unaligned_vectors();
-+	test_invalid_starting_addr();
-+	test_invalid_middle_addr();
-+	test_invalid_dma_alignment();
-+	test_invalid_dma_vector_alignment();
-+	test_max_vector_limits();
-+	test_invalid_dma_vector_alignment_large();
-+	test_invalid_dma_vector_length();
-+}
-+
-+/* ./$prog-name file */
-+int main(int argc, char **argv)
-+{
-+        if (argc < 2)
-+                errx(EINVAL, "expect argments: file");
-+
-+	init_args(argv);
-+	init_buffers();
-+	run_tests();
-+	close(test_fd);
-+	free(out_buf);
-+	free(in_buf);
-+
-+	return 0;
-+}
-+
-diff --git a/tests/block/042 b/tests/block/042
-new file mode 100644
-index 0000000..9c05643
---- /dev/null
-+++ b/tests/block/042
-@@ -0,0 +1,20 @@
-+#!/bin/bash
-+
-+. tests/block/rc
-+
-+DESCRIPTION=3D"Test unusual direct-io offsets"
-+QUICK=3D1
-+
-+device_requires() {
-+        _require_test_dev_sysfs
-+}
-+
-+test_device() {
-+	echo "Running ${TEST_NAME}"
-+
-+	if ! src/dio-offsets ${TEST_DEV}; then
-+		echo "src/dio-offsets failed"
-+	fi
-+
-+	echo "Test complete"
-+}
-diff --git a/tests/block/042.out b/tests/block/042.out
-new file mode 100644
-index 0000000..b35c7ce
---- /dev/null
-+++ b/tests/block/042.out
-@@ -0,0 +1,2 @@
-+Running block/042
-+Test complete
---=20
-2.47.3
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
 
+-- 
+Martin K. Petersen
