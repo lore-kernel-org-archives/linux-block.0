@@ -1,113 +1,195 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB9F6134BD
-	for <linux-block@vger.kernel.org>; Mon, 13 Oct 2025 21:33:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65B821DF75A
+	for <linux-block@vger.kernel.org>; Tue, 14 Oct 2025 00:55:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760391212; cv=none; b=gYZLhMCo6vj3UQEToYvJTqaD/+jduEvpsP1YyqxSrUEO/K7DH3Wtp88JtOM9aJ/79oEcbbUPDU2gzyiVnYNi5Wmy4aK83UMi9uFT+DE/351M8xm/xS2FJhZUP33nAaaZWPYvhM1o3Tt38rrPVcq/M+3ael75YxbRWAzqqyRG+GM=
+	t=1760403337; cv=none; b=b1acPWBWnXB9fAJy34vl4b4QnI6Y60KlVNCOVI0Eekx5u0KoLuCMzDmu/mdeV5N3G+BMok6eTPjwPqkHsa2dmQyKU4mUbMM4aN+FaL/dVGVEvfKSgOHhQiJ8DDPl8e76ZyUKQ4Zcp6VZ3xjfupTJx0Xjc0CTWY3ioH6atCuh6V4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760391212; c=relaxed/simple;
-	bh=fVjAtspCNb2rqf+Y3yjxYHV27MVAQ3+/wEk9FKkdcR0=;
+	s=arc-20240116; t=1760403337; c=relaxed/simple;
+	bh=kf9j/5BzOVdGxyqzzdIuSEzvc4B6q5OLpRyAAP0moXI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PsLymPRkPi1Y4zuSXpbsntak/Lyts+KlLJm8eg+4Jkn1dcnZkTKJA5ngYsOnbGx/dysa/XImcNN14YmMmkUISnMuPGrhM+i24kARl7XVTrkQVdbkbgSwClqMIP3DttJ7X7GvDLjxK1Q6r5OxLPwlL5kEuSfZPDxPhH6BKIqX/lI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vQh7sJ5W; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=hcIHgOpUk4Xe7Al4WbJ62KlcW4CezEJNbPb7111QqKLeLN+xy7c8qWJHvYdjdQLahC820IwXCbFTRF6R+QTysJ4ut7CulIgbVuyFiAUya9QTzvbs3jc4Pi+AsG32WD7KQoFmU4SdQgCfH6NxYF3jucsH7zSRyJ+dk91NGYZsTWY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Dp/nzGin; arc=none smtp.client-ip=209.85.215.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vQh7sJ5W"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1989C4CEE7;
-	Mon, 13 Oct 2025 21:33:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760391212;
-	bh=fVjAtspCNb2rqf+Y3yjxYHV27MVAQ3+/wEk9FKkdcR0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=vQh7sJ5WpoOuXY6jMTLJr9zMVD9AKDpQq702xFMMD9FUym+FU1riSlFON7Pl/JCFP
-	 syOzlJZi5yNkPXdqjMrtZKYvG8ZjYfsCI4QCHs51YkC5CjnpICTlEFvpU9BXPnZ4m7
-	 kRo5jAKijTSEJulO2Ec3tfehzIlOdmD30cXzytu1GW4+NYLzQlv4YcA0ppiXttJ7DK
-	 OW3mOG307fGWfHcTCGtkR9yylve6B0//JL2puObj4FLX/RaDUJx8tOlv/tTOgmcJvq
-	 tV/j9UGPCNkePo6I0Xjc8iUyg5sx94zBYSbZO8jAQNl8CnbZqvQe/vZoaMIG77XwhQ
-	 c3qbFRxgxKwOg==
-Date: Mon, 13 Oct 2025 15:33:30 -0600
-From: Keith Busch <kbusch@kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org, axboe@kernel.dk
-Subject: Re: [PATCHv4 1/2] block: accumulate memory segment gaps per bio
-Message-ID: <aO1wKjAeaOmFySCC@kbusch-mbp>
-References: <20251007175245.3898972-1-kbusch@meta.com>
- <20251007175245.3898972-2-kbusch@meta.com>
- <20251010053422.GA16037@lst.de>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Dp/nzGin"
+Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-b55517e74e3so5248098a12.2
+        for <linux-block@vger.kernel.org>; Mon, 13 Oct 2025 17:55:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1760403335; x=1761008135; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=0qomT1ZkVPDmIuCEoNEUDG95EzuPyhJMmV7fO0hnOBs=;
+        b=Dp/nzGinqJbErOFevH4DuXU7a9qWYxzk5/0egQDjyZVadUBAsgJX3zbARfcPqFRPc6
+         6vLsn8lo6g1h9Hzm/mGCbM0im77mEO4xP4ZwihvtvGN4D1ZKR+nsCgIMYCVDj9e1PvTu
+         ra9vlSZF0EnZxwO3iBfSa47CLPjZFSGU7ar+6rqn2Mepz772MNWmSbrOYtA2/tAEjeL6
+         cJIkDbrr9oHQynV9qb8Zx/LBLvIFvty1RSetl/aniHjI9sgWC7hJ54gxGQhJlQhE2lK3
+         El2HJ5iDBalYKuf2Yp7tfcmeu304xGPSdPg/RUSh4bQMYJ0ceW9czzLimlAmxvFxVesb
+         UyYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760403335; x=1761008135;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0qomT1ZkVPDmIuCEoNEUDG95EzuPyhJMmV7fO0hnOBs=;
+        b=bRhmJOjDzAd0KCO+zUhBnlseXqUzVbKb5TrPP/qHb6cZs7Eny8DN3KdFNFQbtizhBA
+         S1P1cajs6qrxl017HXnKyS9v4cCU9eYYyQdz9Mk/K93BO6aZiyJyQqavKul/K1DCCfPn
+         DYWiQ7/avxain/nhFSxEquTtHJFqA7yGU6iN2M0UstsucKdqbTLeO/w5prH6KSEVURjg
+         WdfMlLJg2AqmYp58STHG2b1TOukpqfZFHRyMoyN8K6lSpySIDbA6oljRMnI1by+b0wvH
+         IwS0tyXTNjDXh7kATtst4SM8P1Q67Pp+22CwoYpDdhXBIuOb50bhjUal+2TMkx5nIf/n
+         LDxw==
+X-Forwarded-Encrypted: i=1; AJvYcCVN56bx9DkNqeYaPZQeum7G6IRDk0yjOgYE4O78Ud5ohfwHFi4+UGNroqJCklOiSICVlsjriz8yQtZPVw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxfcfC1NdOaRsaWIJ2/ofH6wgf7CU8xdhjfAIQGeIloWCJTMN1q
+	Py5uCpsSgFk2cq7XHiODh34qBxRwU4I2OO+QPLZxzZQLTzi7Sw88K9ly
+X-Gm-Gg: ASbGnct0sR5fuY7HxTS0KC/qdiqAKQEd+yqgvXTOEyqW6QpFwRBAQAHXHpUxwx13XY1
+	K6N8Te6VQcyB25mzaZ+Y/AxB0KUEN2Eaz+LTzduI0xescxs2dIS5TtSibsIbxgRsLFv9YOOkSyU
+	elrk2sR0jY7lEpLQGzZdODledr/OJuW+EeVi9QGic28Kmr8hQvIG2kKzXtjTncDIWU07gfbYJp1
+	2Bam77ienz/qY2RVj1jFezpoXAF2SjikEVnTNSBPgtBEF0tcsQbHtv6hk7qPGzNrSZXH0pwB7ZN
+	oTvJ3wT2VodyjEP+aw6qhx9STyKSymO3xRJZXBfWb94TvMJuGiEj7YdN3PF+BVGQwDLs//jyItk
+	8LQqD/DOaNrANVLzxRNED23PcP2BRGBgZrN6hysgF
+X-Google-Smtp-Source: AGHT+IGniqk01IgDaiRJwaKVGBcopVfs/CxGUBowAuplH5VoT3lCcXuXMawjfUp7c/hF1vuAQ69KrA==
+X-Received: by 2002:a17:902:e5c6:b0:268:db2:b78f with SMTP id d9443c01a7336-29027402c15mr322158845ad.44.1760403334516;
+        Mon, 13 Oct 2025 17:55:34 -0700 (PDT)
+Received: from localhost ([2001:19f0:ac00:4eb8:5400:5ff:fe30:7df3])
+        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-29040e02648sm112012925ad.116.2025.10.13.17.55.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Oct 2025 17:55:34 -0700 (PDT)
+Date: Tue, 14 Oct 2025 08:54:49 +0800
+From: Inochi Amaoto <inochiama@gmail.com>
+To: Genes Lists <lists@sapience.com>, Inochi Amaoto <inochiama@gmail.com>, 
+	Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-nvme@lists.infradead.org
+Cc: linux-pci@vger.kernel.org
+Subject: Re: mainline boot fail nvme/block? [BISECTED]
+Message-ID: <xfzcvv6ezleds24wvha2apkz5kirhcmoydm3on2hnfrxcwuc3g@koj6plovnvbd>
+References: <4b392af8847cc19720ffcd53865f60ab3edc56b3.camel@sapience.com>
+ <cf4e88c6-0319-4084-8311-a7ca28a78c81@kernel.dk>
+ <3152ca947e89ee37264b90c422e77bb0e3d575b9.camel@sapience.com>
+ <trdjd7zhpldyeurmpvx4zpgjoz7hmf3ugayybz4gagu2iue56c@zswmzvauqnxk>
+ <622d6d7401b5cfd4bd5f359c7d7dc5b3bf8785d5.camel@sapience.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20251010053422.GA16037@lst.de>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <622d6d7401b5cfd4bd5f359c7d7dc5b3bf8785d5.camel@sapience.com>
 
-On Fri, Oct 10, 2025 at 07:34:22AM +0200, Christoph Hellwig wrote:
-> On Tue, Oct 07, 2025 at 10:52:44AM -0700, Keith Busch wrote:
-> > +static inline unsigned int bvec_seg_gap(struct bio_vec *bvprv,
-> > +					struct bio_vec *bv)
-> > +{
-> > +	return __bvec_gap(bvprv, bv->bv_offset, U32_MAX);
-> > +}
+On Mon, Oct 13, 2025 at 07:45:05AM -0400, Genes Lists wrote:
+> On Mon, 2025-10-13 at 16:46 +0800, Inochi Amaoto wrote:
+> > On Fri, Oct 10, 2025 at 07:49:34PM -0400, Genes Lists wrote:
+> > > On Fri, 2025-10-10 at 08:54 -0600, Jens Axboe wrote:
+> > > > On 10/10/25 8:29 AM, Genes Lists wrote:
+> > > > > Mainline fails to boot - 6.17.1 works fine.
+> > > > > Same kernel on an older laptop without any nvme works just
+> > > > > fine.
+> > > > > 
+> > > > > It seems to get stuck enumerating disks within the initramfs
+> > > > > created by
+> > > > > dracut.
+> > > > > 
+> > > > > ,
+> ...
 > 
-> I find this helper (and the existing __bvec_gap* ones, but I'll send
-> patches to clean that up in a bit..) very confusing.  Just open coding
-> it in the callers like:
+> > > Bisect landed here. (cc linux-pci@vger.kernel.org)
+> > > Hopefully it is helpful, even though I don't see MSI in lspci
+> > > output
+> > > (which is provided below).
+> > > 
+> > > gene
+> > > 
+> > > 
+> > > 54f45a30c0d0153d2be091ba2d683ab6db6d1d5b is the first bad commit
+> > > commit 54f45a30c0d0153d2be091ba2d683ab6db6d1d5b (HEAD)
+> > > Author: Inochi Amaoto <inochiama@gmail.com>
+> > > Date:   Thu Aug 14 07:28:32 2025 +0800
+> > > 
+> > >     PCI/MSI: Add startup/shutdown for per device domains
+> > > 
+> > >     As the RISC-V PLIC cannot apply affinity settings without
+> > > invoking
+> > >     irq_enable(), it will make the interrupt unavailble when used
+> > > as an
+> > >     underlying interrupt chip for the MSI controller.
+> > > 
+> > >     Implement the irq_startup() and irq_shutdown() callbacks for
+> > > the
+> > > PCI MSI
+> > >     and MSI-X templates.
+> > > 
+> > >     For chips that specify MSI_FLAG_PCI_MSI_STARTUP_PARENT, the
+> > > parent
+> > > startup
+> > >     and shutdown functions are invoked. That allows the interrupt
+> > > on
+> > > the parent
+> > >     chip to be enabled if the interrupt has not been enabled during
+> > >     allocation. This is necessary for MSI controllers which use
+> > > PLIC as
+> > >     underlying parent interrupt chip.
+> > > 
+> > >     Suggested-by: Thomas Gleixner <tglx@linutronix.de>
+> > >     Signed-off-by: Inochi Amaoto <inochiama@gmail.com>
+> > >     Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+> > >     Tested-by: Chen Wang <unicorn_wang@outlook.com> # Pioneerbox
+> > >     Reviewed-by: Chen Wang <unicorn_wang@outlook.com>
+> > >     Acked-by: Bjorn Helgaas <bhelgaas@google.com>
+> > >     Link: https://lore.kernel.org/all/20250813232835.43458-3-
+> > > inochiama@gmail.com
+> > > 
+> > >  drivers/pci/msi/irqdomain.c | 52
+> > > ++++++++++++++++++++++++++++++++++++++++++++++++++++
+> > >  include/linux/msi.h         |  2 ++
+> > >  2 files changed, 54 insertions(+)
+> > > 
+> > > 
+> ...
 > 
-> 	 gaps |= (bvprvp->bv_offset + bvprvp->bv_len);
-> 	 gaps |= bv.bv_offset;
+> > 
+> > 
+> > I think this is caused by VMD device, which I have a temporary
+> > solution
+> > here [1]. Since I have no idea about how VMD works, I hope if anyone
+> > can help to convert this as an formal fix.
+> > 
+> > [1]
+> > https://lore.kernel.org/all/qs2vydzm6xngul77xuwjli7h757gzfhmb4siiklzo
+> > gihz5oplw@gsvgn75lib6t/
+> > 
+> > Regards,
+> > Inochi
 > 
-> makes the intent clear, and also removes the pointless masking by 
-> U32_MAX.
+> Thank you Inochi
+> 
+> I tried this patch over 6.18-rc1.
+> 
+>  It get's further than without the patch but around the time I get
+> prompted for passphrase for the luks partition
+> (root is not encrypted) it crashes. 
+> 
+> I have uploaded 2 images I took of the screen when this happens and
+> uploaded them to here:
+> 
+>     https://0x0.st/KSNz.jpg
+>     https://0x0.st/KSNi.jpg
+> 
 
-Sounds good, I'll rebase on your cleanup patch.
+This picture is only a WARNING from perf_get_x86_pmu_capability,
+and no other information. So I am not sure whether it is caused
+by this change. But from the original report I have, it solves
+the problem at that time.
 
-> > +	/*
-> > +	 * A mask that contains bits set for virtual address gaps between
-> > +	 * physical segments. This provides information necessary for dma
-> > +	 * optimization opprotunities, like for testing if the segments can be
-> > +	 * coalesced against the device's iommu granule.
-> > +	 */
-> > +	unsigned int phys_gap;
-> 
-> Any reason this is not a mask like in the bio?  Having the representation
-> and naming match between the bio and request should make the code a bit
-> easier to understand.
+By the way, can you test the following change?
+https://lore.kernel.org/all/2hyxqqdootjw5yepbimacuuapfsf26c5mmu5w2jsdmamxvsjdq@gnibocldkuz5/
 
-I thought it easier for the users to deal with the mask rather than a
-set bit value. Not a big deal, I'll just introduce a helper to return a
-mask from the value.
- 
-> > +
-> > +	/*
-> > +	 * The bvec gap bit indicates the lowest set bit in any address offset
-> > +	 * between all bi_io_vecs. This field is initialized only after
-> > +	 * splitting to the hardware limits. It may be used to consider DMA
-> > +	 * optimization when performing that mapping. The value is compared to
-> > +	 * a power of two mask where the result depends on any bit set within
-> > +	 * the mask, so saving the lowest bit is sufficient to know if any
-> > +	 * segment gap collides with the mask.
-> > +	 */
-> 
-> This should grow a sentence explaining that the field is only set by
-> bio_split_io_at, and not valid before as that's very different from the
-> other bio fields.
+If it is OK, I will send a patch for it.
 
-I didn't mention the function by name, but the comment does say it's not
-initialized until you split to limits. I'll add a pointer to
-bio_split_io_at().
-
-> > +	u8			bi_bvec_gap_bit;
-> 
-> Aren't we normally calling something like this _mask, i.e., something
-> like:
-> 
-> 		bi_bvec_page_gap_mask;
-
-A "mask" suffix in the name suggests you can AND it directly with
-another value to get a useful result, but that's not how this is
-encoded. You have to shift it to generate the intended mask.
+Regards,
+Inochi
