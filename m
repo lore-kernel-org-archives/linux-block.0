@@ -1,76 +1,67 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98AB23074A4
-	for <linux-block@vger.kernel.org>; Tue, 14 Oct 2025 04:19:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9984519C54F;
+	Tue, 14 Oct 2025 04:44:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760415591; cv=none; b=tMuXCkyMepsbbHzcV1c+uci5c/vNB6ui8sIm/UZxc7l7K2I42JNBUQLE0+YXQfmIeb2+qesD7W416PIJrThG73f3Pe5YkRjS/M91opTem9VOpAw+vt+tAKiMUOPUiusYaXEnBA2vnpj7ya1BIPkrlu8O9J+sZzIIfMNxBza3SvI=
+	t=1760417070; cv=none; b=BjjMA+Yx3dpwHpEROdMmQArdyDkPv7q5icVxSoddCbZ1Yqt8GoZU38lJR45kVo5f4n2aW0RVwGK+p9JFhOP7444v0rUaHs3caKTfhHL475uSG4eEwm84HiY7j/3kIHZCpQ3nQ/Vlrm68s23H66tSK1q3vQcqOdGupuLVsw+Dp1A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760415591; c=relaxed/simple;
-	bh=efRncSBox4EGtM3nSmQtO2KgUENSolfoFMtV3iP5wsg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=t0SNZ9UthVCIYNKcXOVdrA5gaMi2c/i213lCJlPF02hzPqBuHOVIGHqeXZ0ZAzMtRmNzWVJzUTJQB/0zGL1IveTttIz2mUC5KGDDHoH4lY9AoAzF99Wzg5kvATAzQDpaGM/z+RndHRhlRFpJ0Cx40QbamRz/PYu0yzI81Pk7GOs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tvwrugtq; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tvwrugtq"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56663C4CEE7;
-	Tue, 14 Oct 2025 04:19:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760415591;
-	bh=efRncSBox4EGtM3nSmQtO2KgUENSolfoFMtV3iP5wsg=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=TvwrugtqZ23dFB/les8IOa7mhmzv/nj3tlgQQrlZCXnB3w49BZ2AL3pCKxQ5OV3tn
-	 2NkaK0c4h5lT9/L6Ug6cxKhBvKmGCFswTn3cy90uuJ6GrB6QSNtOHtFkNXPgw6Z0gF
-	 LlnxwmIF+ERrzreOWXOC7/cfwHzI2PqjplN4Oed3/K9P26kpJp+HAiOt/WOJweS3dk
-	 UPy4NyC+9yKmv0m5QQSSlf5muRfTucRqK3p4nWefo/fTOnOkNEZgh7/GFD3YjuNR8f
-	 dEbDt5ZXqjF86goXzuSXC+ZrQPty0Kqf4J6VfTnVk4kz2RqGejKCnkYG13ttJ2Ryq8
-	 riHJsMocM5ZwA==
-Message-ID: <19be10e7-3140-4571-bf0e-e8eec1188fec@kernel.org>
-Date: Tue, 14 Oct 2025 13:19:47 +0900
+	s=arc-20240116; t=1760417070; c=relaxed/simple;
+	bh=3xzfzkbgYIg9IfR3Ir94hE3O8Ov0sXJ49fRS3a8QW2U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZfTpAj+lcDKIucQK1ecMBf6PUYBTqHjpQoVQi04q3IqZk3Cw5oH7bG/4KzoV14jDofyEH4nTQFp5FfFmagFS47HSbxL8Znh509JxKQYAK5l0TTSfCtBaPgRrNXbDjrx3gJkM/rgJZ/8PAf1JUgZufmCEOrOufniPluF+Vi+h4vE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 26F11227A87; Tue, 14 Oct 2025 06:44:22 +0200 (CEST)
+Date: Tue, 14 Oct 2025 06:44:21 +0200
+From: hch <hch@lst.de>
+To: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+Cc: hch <hch@lst.de>, "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Latchesar Ionkov <lucho@ionkov.net>,
+	Dominique Martinet <asmadeus@codewreck.org>,
+	Christian Schoenebeck <linux_oss@crudebyte.com>,
+	Chris Mason <clm@fb.com>, David Sterba <dsterba@suse.com>,
+	Mark Fasheh <mark@fasheh.com>, Joel Becker <jlbec@evilplan.org>,
+	Joseph Qi <joseph.qi@linux.alibaba.com>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>,
+	Josef Bacik <josef@toxicpanda.com>, Jan Kara <jack@suse.cz>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"v9fs@lists.linux.dev" <v9fs@lists.linux.dev>,
+	"linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
+	"linux-ext4@vger.kernel.org" <linux-ext4@vger.kernel.org>,
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+	"jfs-discussion@lists.sourceforge.net" <jfs-discussion@lists.sourceforge.net>,
+	"ocfs2-devel@lists.linux.dev" <ocfs2-devel@lists.linux.dev>,
+	"linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
+	"linux-mm@kvack.org" <linux-mm@kvack.org>
+Subject: Re: [PATCH 04/10] btrfs: use the local tmp_inode variable in
+ start_delalloc_inodes
+Message-ID: <20251014044421.GA30920@lst.de>
+References: <20251013025808.4111128-1-hch@lst.de> <20251013025808.4111128-5-hch@lst.de> <aae79ea0-f056-4da7-8a87-4d4fd6aea85f@wdc.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] block/mq-deadline: Switch back to a single dispatch
- list
-To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
- Yu Kuai <yukuai@kernel.org>, chengkaitao <chengkaitao@kylinos.cn>
-References: <20251013192803.4168772-1-bvanassche@acm.org>
- <20251013192803.4168772-3-bvanassche@acm.org>
-From: Damien Le Moal <dlemoal@kernel.org>
-Content-Language: en-US
-Organization: Western Digital Research
-In-Reply-To: <20251013192803.4168772-3-bvanassche@acm.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aae79ea0-f056-4da7-8a87-4d4fd6aea85f@wdc.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On 2025/10/14 4:28, Bart Van Assche wrote:
-> Commit c807ab520fc3 ("block/mq-deadline: Add I/O priority support")
-> modified the behavior of request flag BLK_MQ_INSERT_AT_HEAD from
-> dispatching a request before other requests into dispatching a request
-> before other requests with the same I/O priority. This is not correct since
-> BLK_MQ_INSERT_AT_HEAD is used when requeuing requests and also when a flush
-> request is inserted.  Both types of requests should be dispatched as soon
-> as possible. Hence, make the mq-deadline I/O scheduler again ignore the I/O
-> priority for BLK_MQ_INSERT_AT_HEAD requests.
+On Mon, Oct 13, 2025 at 08:11:35AM +0000, Johannes Thumshirn wrote:
+> If you have to repost this for some reason, can you rename tmp_inode to 
+> vfs_inode or sth like that?
 > 
-> Cc: Damien Le Moal <dlemoal@kernel.org>
-> Cc: Yu Kuai <yukuai@kernel.org>
-> Reported-by: chengkaitao <chengkaitao@kylinos.cn>
-> Closes: https://lore.kernel.org/linux-block/20251009155253.14611-1-pilgrimtao@gmail.com/
-> Fixes: c807ab520fc3 ("block/mq-deadline: Add I/O priority support")
-> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+> The name is really confusing and the commit introducing it doesn't 
+> describe it really either.
 
-Nice cleanup !
+It is.  vfs_inode is kinda weird, too.  The problem is that inode
+is used for the btrfs_inode.  But if there's consensus on a name
+I'll happily change it.
 
-Reviewed-by: Damien Le Moalv <dlemoal@kernel.org>
-
-
--- 
-Damien Le Moal
-Western Digital Research
