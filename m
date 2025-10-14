@@ -1,141 +1,143 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FFBF313E2D;
-	Tue, 14 Oct 2025 13:29:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 880EA3019D0
+	for <linux-block@vger.kernel.org>; Tue, 14 Oct 2025 15:05:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760448574; cv=none; b=fxHpKTkCu4txXp3bgB2b0G/2xP1zBiCV/Z0ZZLOb47WOCLdDhMNA632S6uVc6b+E6VN+3lcxALvDp5SODP1KdjMqDb/Cd+yeQGWxTLCkeUTthrhXpZ+SDTvs4P3HMpjm/n8U1QRVFFxaAhw6zsPeglfzm3KQRbh4cQ1825E+nvs=
+	t=1760454315; cv=none; b=sI4qNc2HlKNXROEptbaQ/1Py0c7KYrd6/76OVMw7juCdVdrGjNwkgfBRfdh6Aw2GFABU4WxlWo7dY561veTmp4I5PApaI+RktDBqP87UmFf0Czjovl37Kxz8CaXshb7qhIR5lugxW5nEnWAclOHTcxnVI2dlBKkGAVK6dxA7yVw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760448574; c=relaxed/simple;
-	bh=7HV8DsFk4LJDeobEMJ2ek8/UQi2Yz+tHf6C1svO2rHw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JPupmJy4ISYEZBsXuXppmPD+6LULDXjQSJ8h/ZtUPr6e6z7UKGEaFzmenQpnNVrimwtoEbfoQc0tFgq7aW9rQFzstiPhSC119PDpYI0RyZ7YSXD2H5Qy9TSM0DE1mNqppUPTc1HpzjjnyoARztHnoN/AK+7KYoMmG0r1ZpXFx+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4cmFRM5NZGzYQtpy;
-	Tue, 14 Oct 2025 21:28:47 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.75])
-	by mail.maildlp.com (Postfix) with ESMTP id C64611A093A;
-	Tue, 14 Oct 2025 21:29:28 +0800 (CST)
-Received: from [10.67.111.176] (unknown [10.67.111.176])
-	by APP2 (Coremail) with SMTP id Syh0CgBnCUI3UO5o6+FkAQ--.29891S2;
-	Tue, 14 Oct 2025 21:29:28 +0800 (CST)
-Message-ID: <b94f6159-a280-4890-a02a-f19ff808de5b@huaweicloud.com>
-Date: Tue, 14 Oct 2025 21:29:25 +0800
+	s=arc-20240116; t=1760454315; c=relaxed/simple;
+	bh=UpYas62rPORtfEY+YrvuB+eCVAONAIMVPz6Kz3WI910=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=s0+deNWm/rK0maF1WlZjwXaZXg7CAV3yzOxrlHge2Y9N8e442N/zk3tkudopXsdcCUtfx5EHEUpO09x96vER6q4N6v7agMX6buoEYvbCQ+z2rWHBr+ixsWV1a0+lBIAFSdpqNrdno8gSZ6XsS1r27rUbXRY3qb3UDhu4qqIHdKo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=gwgfMs1/; arc=none smtp.client-ip=67.231.145.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="gwgfMs1/"
+Received: from pps.filterd (m0109334.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 59E9movL2010951
+	for <linux-block@vger.kernel.org>; Tue, 14 Oct 2025 08:05:12 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=s2048-2025-q2; bh=wJt9aA7Z2dipsC5sJf
+	brKnoSz9SDb71SUd6mhYZTWdA=; b=gwgfMs1/uCImlrog1yCeRcx4aHJlxkAfoQ
+	3IaJ8WemXj+cW+pl/DnISmc1zWGW2DMGyM/FyveZ/2s8wg/8hYfhpW1eidbh7Tie
+	evcfWeXUzqwLenRk37BKtBflfYJ9w0Dy8wwt5Wio/Lm17QoKXATMOTYPe5J9tQzV
+	4UZ0KE0BIhgEDhmyDl67eZzOBskP/7drO+LhmZ/Qk/8qbnjgY1nosBhrfvaWGQKU
+	oEjI7fyevxDxbov53LE80LvfQ0QeTzrjdlbf31j/xDq6JkFR/KDr2AjOye+VsMvx
+	l3ZWP7mOF7W7qGz9KHZrtZRIYU7iaA2gDYg5WupQ7b0uhqBwfmgQ==
+Received: from mail.thefacebook.com ([163.114.134.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 49sm7f2032-2
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <linux-block@vger.kernel.org>; Tue, 14 Oct 2025 08:05:12 -0700 (PDT)
+Received: from twshared7571.34.frc3.facebook.com (2620:10d:c085:108::150d) by
+ mail.thefacebook.com (2620:10d:c08b:78::2ac9) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.20; Tue, 14 Oct 2025 15:05:11 +0000
+Received: by devbig197.nha3.facebook.com (Postfix, from userid 544533)
+	id 4E7932B305DB; Tue, 14 Oct 2025 08:05:08 -0700 (PDT)
+From: Keith Busch <kbusch@meta.com>
+To: <hch@lst.de>, <linux-nvme@lists.infradead.org>,
+        <linux-block@vger.kernel.org>, <axboe@kernel.dk>
+CC: Keith Busch <kbusch@kernel.org>
+Subject: [PATCHv5 0/2] block, nvme: removing virtual boundary mask reliance
+Date: Tue, 14 Oct 2025 08:04:54 -0700
+Message-ID: <20251014150456.2219261-1-kbusch@meta.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 11/33] cpuset: Provide lockdep check for cpuset lock held
-To: Frederic Weisbecker <frederic@kernel.org>,
- LKML <linux-kernel@vger.kernel.org>
-Cc: =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- Bjorn Helgaas <bhelgaas@google.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Danilo Krummrich
- <dakr@kernel.org>, "David S . Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Gabriele Monaco <gmonaco@redhat.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
- Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
- Lai Jiangshan <jiangshanlai@gmail.com>,
- Marco Crivellari <marco.crivellari@suse.com>, Michal Hocko
- <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
- Paolo Abeni <pabeni@redhat.com>, Peter Zijlstra <peterz@infradead.org>,
- Phil Auld <pauld@redhat.com>, "Rafael J . Wysocki" <rafael@kernel.org>,
- Roman Gushchin <roman.gushchin@linux.dev>,
- Shakeel Butt <shakeel.butt@linux.dev>, Simon Horman <horms@kernel.org>,
- Tejun Heo <tj@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
- Vlastimil Babka <vbabka@suse.cz>, Waiman Long <longman@redhat.com>,
- Will Deacon <will@kernel.org>, cgroups@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
- linux-mm@kvack.org, linux-pci@vger.kernel.org, netdev@vger.kernel.org
-References: <20251013203146.10162-1-frederic@kernel.org>
- <20251013203146.10162-12-frederic@kernel.org>
-Content-Language: en-US
-From: Chen Ridong <chenridong@huaweicloud.com>
-In-Reply-To: <20251013203146.10162-12-frederic@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-CM-TRANSID:Syh0CgBnCUI3UO5o6+FkAQ--.29891S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7WFW3Jw18tw15JFWUWw1fXrb_yoW8XFyxpF
-	90krWrG3yFvr4Uua9rGw17ur1vgw4kWF1UKFn8Kr1rXa42vFn2vr1q9FnIqr10q397Gw40
-	qF9xWa1Y9rWDArDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvYb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0En4kS
-	14v26rWY6Fy7MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I
-	8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWrXVW8
-	Jr1lIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7
-	CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v2
-	6r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07
-	j6a0PUUUUU=
-X-CM-SenderInfo: hfkh02xlgr0w46kxt4xhlfz01xgou0bp/
+Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+Content-Type: text/plain
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDE0MDExNCBTYWx0ZWRfX8nZ18eKoZ15+
+ Uvjr2IdkDb6Eko++e8bvDOMAjGRH9+ZsT5xJO56VjBIhFVduOfCZvb+qdD5FNvb9nxP7om4SzNS
+ pngc4MGX+hU62hw3trfv/V+29LTJ+vo7//X4F/2EwzEhT/Ret0HyHi5mfiA22eLh8l2Kf8u2HWE
+ XjuBgSxWgIiLZ1v25XA7nD3bCVLMCi3DNy9ymMhd0espIrU1Ljg/at077VWe/BIfbREX20skLXy
+ ivaVnGKbGyrj5yMA+wAFnk8dNiXQOUyfJCZiiKm7lHSZG9XfRrgDj3k8/tLcFYMz7WSw/hLLShS
+ WxVFzMZ1VDEi79lWAkMeX8wzEoMsvTcF+5dzW9l1kziKFxTyrT4ehvliNhZm4fEZQB+UPrQrQ5A
+ S1jwkssY+Vb+ivlOcjE72E6Zfrm97Q==
+X-Proofpoint-ORIG-GUID: bRnWC4Twx_3m8_eLGfQ3bk0vbN0X5qhD
+X-Proofpoint-GUID: bRnWC4Twx_3m8_eLGfQ3bk0vbN0X5qhD
+X-Authority-Analysis: v=2.4 cv=MMJtWcZl c=1 sm=1 tr=0 ts=68ee66a8 cx=c_pps
+ a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17
+ a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=VwQbUJbxAAAA:8 a=VabnemYjAAAA:8
+ a=D3lQaUfW4OkPWDUkTUkA:9 a=gKebqoRLp9LExxC7YDUY:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-10-14_03,2025-10-13_01,2025-03-28_01
 
+From: Keith Busch <kbusch@kernel.org>
 
+Previous version here:
 
-On 2025/10/14 4:31, Frederic Weisbecker wrote:
-> cpuset modifies partitions, including isolated, while holding the cpuset
-> mutex.
-> 
-> This means that holding the cpuset mutex is safe to synchronize against
-> housekeeping cpumask changes.
-> 
-> Provide a lockdep check to validate that.
-> 
-> Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
-> ---
->  include/linux/cpuset.h | 2 ++
->  kernel/cgroup/cpuset.c | 7 +++++++
->  2 files changed, 9 insertions(+)
-> 
-> diff --git a/include/linux/cpuset.h b/include/linux/cpuset.h
-> index 2ddb256187b5..051d36fec578 100644
-> --- a/include/linux/cpuset.h
-> +++ b/include/linux/cpuset.h
-> @@ -18,6 +18,8 @@
->  #include <linux/mmu_context.h>
->  #include <linux/jump_label.h>
->  
-> +extern bool lockdep_is_cpuset_held(void);
-> +
->  #ifdef CONFIG_CPUSETS
->  
->  /*
-> diff --git a/kernel/cgroup/cpuset.c b/kernel/cgroup/cpuset.c
-> index 8595f1eadf23..aa1ac7bcf2ea 100644
-> --- a/kernel/cgroup/cpuset.c
-> +++ b/kernel/cgroup/cpuset.c
-> @@ -279,6 +279,13 @@ void cpuset_full_unlock(void)
->  	cpus_read_unlock();
->  }
->  
-> +#ifdef CONFIG_LOCKDEP
-> +bool lockdep_is_cpuset_held(void)
-> +{
-> +	return lockdep_is_held(&cpuset_mutex);
-> +}
-> +#endif
-> +
->  static DEFINE_SPINLOCK(callback_lock);
->  
->  void cpuset_callback_lock_irq(void)
+  https://lore.kernel.org/linux-block/20251007175245.3898972-1-kbusch@met=
+a.com/
 
-Is the lockdep_is_cpuset_held function actually being used?
-If CONFIG_LOCKDEP is disabled, compilation would fail with an "undefined reference to
-lockdep_is_cpuset_held" error.
+The purpose is to allow optimization decisions to happen per IO, and
+flexibility to utilize unaligned buffers for hardware that supports it.
 
--- 
-Best regards,
-Ridong
+The virtual boundary that NVMe uses provides specific guarantees about
+the data alignment, but that might not be large enough for some CPU
+architectures to take advantage of even if an applications uses aligned
+data buffers that could use it.
+
+At the same time, the virtual boundary prevents the driver from directly
+using memory in ways the hardware may be capable of accessing. This
+creates unnecessary needs on applications to double buffer their data
+into a more restrictive virtually contiguous format.
+
+This patch series provides an efficient way to track segment boundary
+gaps per-IO so that the optimizations can be decided per-IO. This
+provides flexibility to use all hardware to their abilities beyond what
+the virtual boundary mask can provide.
+
+Note, abuse of this capability may result in worse performance compared
+to the bounce buffer solutions. Sending a bunch of tiny vectors for one
+IO incurs significant protocol overhead, so while this patch set allows
+you to do that, I recommend that you don't. We can't enforce a minimum
+size though because vectors may straddle pages with only a few words in
+the first and/or last pages, which we do need to support.
+
+Changes from v4:
+
+ * Keep the same lowest-set-bit representation in the request as the
+   bio; provide a helper to turn it into a mask
+
+ * Open-code the bvec gaps calculation since the helper is being removed
+
+ * Additional code comments
+
+ * Keeping the virt boundary unchanged for the loop target for now. Only
+   pci, tcp, and fc are not reporting such a boundary.
+
+Keith Busch (2):
+  block: accumulate memory segment gaps per bio
+  nvme: remove virtual boundary for sgl capable devices
+
+ block/bio.c                 |  1 +
+ block/blk-map.c             |  3 +++
+ block/blk-merge.c           | 39 ++++++++++++++++++++++++++++++++++---
+ block/blk-mq-dma.c          |  3 +--
+ block/blk-mq.c              |  6 ++++++
+ drivers/nvme/host/apple.c   |  1 +
+ drivers/nvme/host/core.c    | 10 +++++-----
+ drivers/nvme/host/fabrics.h |  6 ++++++
+ drivers/nvme/host/fc.c      |  1 +
+ drivers/nvme/host/nvme.h    |  7 +++++++
+ drivers/nvme/host/pci.c     | 28 +++++++++++++++++++++++---
+ drivers/nvme/host/rdma.c    |  1 +
+ drivers/nvme/host/tcp.c     |  1 +
+ drivers/nvme/target/loop.c  |  1 +
+ include/linux/bio.h         |  2 ++
+ include/linux/blk-mq.h      | 16 +++++++++++++++
+ include/linux/blk_types.h   | 12 ++++++++++++
+ 17 files changed, 125 insertions(+), 13 deletions(-)
+
+--=20
+2.47.3
 
