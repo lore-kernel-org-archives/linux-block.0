@@ -1,177 +1,138 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA4C77083C;
-	Tue, 14 Oct 2025 18:04:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3576927F01E
+	for <linux-block@vger.kernel.org>; Tue, 14 Oct 2025 20:45:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760465070; cv=none; b=Srf3hfNLBFd5iGPsksQtlsGwPEiZFGGeFzGak6rzFrxMS7NCcV1rOURQLFCpRKQUdcckxqOW09kKXKszfY8GtHkbQKEOhzPrjWGhypS/ypaS7v+FZfNmXbpHFc2XKEc7nOaK99vHBV8UR2PxOuVk5T9nL4EsNpJcSzn+fo8hums=
+	t=1760474756; cv=none; b=nQGHh/nnWxbeiA86FH/mRWWEkwvS4ouYNO6aVKZaKm8bhjyj+jxtcqhin13fp6MyiMemE4sKexCC3C7ujUkbshGkthKAIqwPnTzHQmHnnrdO/9r1Cj4soDkIW42viwWFICjCSB7l/9cwmbYLilcdW/6bqrhpAzKaKlbpcSzlh9M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760465070; c=relaxed/simple;
-	bh=n2FCB5tt5tMyA+B5nwTcqy+mEYLw/yBWRjGp55xPFHk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oM4XKyXf+GIfgNWeIgAdmKVAu2Ju9lDy6n7+pKTx9uCQ/Asj1xJ/Ekx85hYn7y1giCzJMDL1Z858USqOnZw6jjiEguRlJT2nzPjB9jFk9Mg6CUCb16lqpwisPnjS6SVaaRlZxHEQm1MM/4WfKngIv7o7F7kxn1+trNQKIH+wzhU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=JQ+bdyts; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1760474756; c=relaxed/simple;
+	bh=mLMiOvkuQ1waPsYJBAJdPUyickusJQ8ORxj4y3Zep3Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BP+K++VmIgvC14Eu0ip+2aTyDEZRdGmaH05GvE+D2OCdMUZh+6ylst0qTuHQe7t3otGXpBgo1bovf9KvoAhw/y2QlSjysTY5uVEYCtR3dYNb+uC0VGWqyMcal4owdbtPwPFuFvXXOD8yhvO0KseNrPOhn2p3op1uVvex5PsT4+g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com; spf=pass smtp.mailfrom=fromorbit.com; dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b=D74hUHsV; arc=none smtp.client-ip=209.85.216.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fromorbit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="JQ+bdyts"
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 59EDPVQj006319;
-	Tue, 14 Oct 2025 18:04:08 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=DacPw1
-	CbKLF2YCyDjHDBfMd5Vp0p0mGeiySJXxtK8zE=; b=JQ+bdytsz7N+XWm/Ydo2pa
-	224Jun3b5wgpo50zRxB+TFUVJPJ1j3PmZoA4zXYanaYcusO6x/pqnvkqPd1v/q5C
-	6YaAFiETqKTiIg+TBzozzeJtDyX4+1xP9Zvwku0mww/joZD944d1B99pvBAMBHg2
-	PhcArbQnlG9HoWXgFaclep0p/+3H6OcW7dUwIq2EzC0N97ZD2M8LtdqDh6rK70fV
-	nZRTQzO4TnTEOFhTI5B4jAWfM1VtjUVotaFZETZgaojvHGKe6pBWjyTvWkoopbzk
-	BkxtYNt7w/3v0utvu88RwnA2PrQ515s8JAp/2uqra1gO53QQ6iM94M2RfXtvcQTQ
-	==
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 49qdnpfub0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 14 Oct 2025 18:04:08 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 59EHBWGp015219;
-	Tue, 14 Oct 2025 18:04:07 GMT
-Received: from smtprelay07.dal12v.mail.ibm.com ([172.16.1.9])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 49r1js4j5g-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 14 Oct 2025 18:04:07 +0000
-Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
-	by smtprelay07.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 59EI471x4850650
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 14 Oct 2025 18:04:07 GMT
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3EBC058057;
-	Tue, 14 Oct 2025 18:04:07 +0000 (GMT)
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1C28B58061;
-	Tue, 14 Oct 2025 18:04:04 +0000 (GMT)
-Received: from [9.61.43.11] (unknown [9.61.43.11])
-	by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 14 Oct 2025 18:04:03 +0000 (GMT)
-Message-ID: <fd66fda2-8dd9-4009-9c4b-7cebaac64c05@linux.ibm.com>
-Date: Tue, 14 Oct 2025 23:34:02 +0530
+	dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b="D74hUHsV"
+Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-33067909400so4290293a91.2
+        for <linux-block@vger.kernel.org>; Tue, 14 Oct 2025 13:45:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1760474754; x=1761079554; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ProMLWdJiYhd+ReUg4Q/nfu5OGup3NKBCnvPEIlS8hk=;
+        b=D74hUHsVIAuXAszKT9OyaSP01aDFJeS4dtESAdmyVJsGXoAAl6SoLYFzgqG8sO3LVj
+         6ERxo1FSU1Y3JKmYIIaOBI7kPi3x4Gpy/qkXd2rlwvWCRrTYb1eyGj+5O2baZ6fukQik
+         Gb4qo2yhiBLvajFZ1uKdHX00YcoaXpBLLYt1ZH+9jgc4mxK3LSaG3HibkB4KlKCev0e7
+         3Xiuj63FONPcDeoK99vIV5AkSYSkhgQq6jbXRMFs8xps1Rd79gaHNdZeCeH0pQZyYIlX
+         43GH4VKUCNcsCnnFnPE93PllXNK2XvANDk2T9wezW0mBUN0nkZ9WgYK8q0nQIF3CpbgA
+         CMfA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760474754; x=1761079554;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ProMLWdJiYhd+ReUg4Q/nfu5OGup3NKBCnvPEIlS8hk=;
+        b=sO3PLRkFSlXsqproTfeaXxwaiM0HHu+Awp8PZ0GowTUoKEBWkW6P9W07XSJ6PukpNS
+         5j8kkCAwRmy6KIcNy+R8pmd8AKtkd+OAw7lEFEfr19Om1bMtCxTpSVLJkaccP+rtgirX
+         gN9+NWJuM2zGUt6aTjraWafmAo8eNJreQ6YvCnuD6qbFzZ83WIUkQUIahvo0kSVi54LO
+         CF89vxCi3jcVZ6YCnzW+sTj0egq6InIt1cECz9rOqDrRZDvxGHf57rfuQkXmba/jX4aP
+         2HmxM2BaoiACbLdGNLd1qpgO4lsDUpSraai8FmSsNgfwPauoa2Qf+m/FakYDfK28Dqxm
+         loGw==
+X-Forwarded-Encrypted: i=1; AJvYcCVYGXS06PUsrna0wNcTTgegV+UqROi//VQN1poi/cRfT9vGN9XyuYoYVZdR6Qvli23Q12f/DdJQvYnCRg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxdDww0tpw5FOapnwQ9ZQGa2sA5E0lNLDuO3dCw8cRivLCbYY/i
+	hJEWEDCD30fTCFfjZU7zjw9LyTbvNVbfDXYxM+KA1sUXFLLNXS810JiPorUE+MHUOTo=
+X-Gm-Gg: ASbGnctziUXAQM0LUbtroMVHcWuELBgLtxGIXxrJ+BD1pUqsmmgDA19fUTL39M6XV12
+	UP5nux/EtuSY3ap/Sj+Ba6/s6ob5stRZevqCYOWJmTvP55L4f9uK+TCHb1aU3ZmkSHBpWs77YOY
+	h3OgJ8FzXZeIpaRm9yYH9qe3iPJvOZel5JuMXW8KLu+76/QNbhEmpUb0osFc+yAvIBliwHVB2xO
+	rSo6r3fP7pp3feDK6c1e8dfk7Ji87RS1W7ogZhc0UzGoWsB7Ju/3aiFEqbywrOFzeeyvuQLvS5h
+	V6k/7LENedQ3ROZQgzI/7b1AjLDPgeq6ANfzIRfFewePCnnoOnwel3SfBmpCGvWYK1q1i+62FCd
+	OwY6y/6wGOdQOXntwRrM90PCt0juDLoYS2LWUi6cXccOFBsE4GACv/0J/JIwuxl2nYZIP7LEwCK
+	8fVV9MpltWsbOCFmDC
+X-Google-Smtp-Source: AGHT+IEha/464YLIDe1S05FMmmIwJiiHJqNozxP/E/7ahWiUSHSloNCgr/S9uHudRNKH/rfSTuG4WQ==
+X-Received: by 2002:a17:90b:3947:b0:31e:c95a:cef8 with SMTP id 98e67ed59e1d1-33b5139a259mr32044929a91.32.1760474754350;
+        Tue, 14 Oct 2025 13:45:54 -0700 (PDT)
+Received: from dread.disaster.area (pa49-180-91-142.pa.nsw.optusnet.com.au. [49.180.91.142])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-33b62631266sm16839994a91.3.2025.10.14.13.45.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Oct 2025 13:45:53 -0700 (PDT)
+Received: from dave by dread.disaster.area with local (Exim 4.98.2)
+	(envelope-from <david@fromorbit.com>)
+	id 1v8lu3-0000000Es6g-0Y5G;
+	Wed, 15 Oct 2025 07:45:51 +1100
+Date: Wed, 15 Oct 2025 07:45:51 +1100
+From: Dave Chinner <david@fromorbit.com>
+To: Jan Kara <jack@suse.cz>
+Cc: Christoph Hellwig <hch@lst.de>, Damien Le Moal <dlemoal@kernel.org>,
+	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Latchesar Ionkov <lucho@ionkov.net>,
+	Dominique Martinet <asmadeus@codewreck.org>,
+	Christian Schoenebeck <linux_oss@crudebyte.com>,
+	Chris Mason <clm@fb.com>, David Sterba <dsterba@suse.com>,
+	Mark Fasheh <mark@fasheh.com>, Joel Becker <jlbec@evilplan.org>,
+	Joseph Qi <joseph.qi@linux.alibaba.com>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>,
+	Josef Bacik <josef@toxicpanda.com>, linux-block@vger.kernel.org,
+	v9fs@lists.linux.dev, linux-btrfs@vger.kernel.org,
+	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	jfs-discussion@lists.sourceforge.net, ocfs2-devel@lists.linux.dev,
+	linux-xfs@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [PATCH 06/10] mm,btrfs: add a filemap_fdatawrite_kick_nr helper
+Message-ID: <aO62fx2B5ZZLsRVM@dread.disaster.area>
+References: <20251013025808.4111128-1-hch@lst.de>
+ <20251013025808.4111128-7-hch@lst.de>
+ <74593bac-929b-4496-80e0-43d0f54d6b4c@kernel.org>
+ <4bcpiwrhbrraau7nlp6mxbffprtnlv3piqyn7xkm7j2txxqlmn@3knyilc526ts>
+ <20251014044723.GA30978@lst.de>
+ <qh7xhmefm54k3hgny3iwkxbdrgjf35swqokiiicu5gg3ahvf4s@xhyw4sfagjgw>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 for-6.18/block 05/10] blk-mq: cleanup shared tags case
- in blk_mq_update_nr_requests()
-To: Chris Mason <clm@meta.com>, Yu Kuai <yukuai1@huaweicloud.com>
-Cc: axboe@kernel.dk, ming.lei@redhat.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yukuai3@huawei.com, yi.zhang@huawei.com,
-        yangerkun@huawei.com, johnny.chenyi@huawei.com
-References: <20251014130507.4187235-2-clm@meta.com>
-Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <20251014130507.4187235-2-clm@meta.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDExMDAwNSBTYWx0ZWRfXzVjZz0cd/wV7
- VqYXxl1kAM4SjdUmlWx3Yey0aon3u44fkHtSLlkLxaINNosKh3O/E62XFWpLzvoGHB2XB2NAeuk
- nse2WuDKxDmWgYhI5chMhMObRH1cptlfqYx3gwvheMrmPNvzgVBeOZpu4d2ierk3PSPBvaHQdJr
- 7MyQOOPzG4QZaT4ayJOw39CUUW88izbfZhtAR6sAtuBb11daUaZp+MGkYB42VV6dRz7wcZLhKM6
- PyxWaTVSspDI4JGeLGPw4bqR6iCqEnPTsIsLy6PFJzpHOkW0Vuiwj2DuP9hDHw/0vh5vdo2vF65
- 6t1jYdgsY5bqM0ZiqsDpR6WoyRANcVtkApkrburnEA5jvTC6bJWLjWjReXtQ8vMwaWmoMwWG5gT
- z/oVSflyTbsquBcJzAYTxBDVr6MfXQ==
-X-Proofpoint-ORIG-GUID: XzKbISpeDbXNuHQQVU5viZkuYy8GjKpV
-X-Proofpoint-GUID: XzKbISpeDbXNuHQQVU5viZkuYy8GjKpV
-X-Authority-Analysis: v=2.4 cv=MoxfKmae c=1 sm=1 tr=0 ts=68ee9098 cx=c_pps
- a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
- a=IkcTkHD0fZMA:10 a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=AiHppB-aAAAA:8 a=i0EeH86SAAAA:8 a=6GnhMWMtFsEvWEXV5ikA:9 a=QEXdDO2ut3YA:10
- a=cPQSjfK2_nFv0Q5t_7PE:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-10-14_03,2025-10-13_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 spamscore=0 lowpriorityscore=0 suspectscore=0 phishscore=0
- bulkscore=0 priorityscore=1501 malwarescore=0 clxscore=1011 adultscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2510020000 definitions=main-2510110005
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <qh7xhmefm54k3hgny3iwkxbdrgjf35swqokiiicu5gg3ahvf4s@xhyw4sfagjgw>
 
+On Tue, Oct 14, 2025 at 11:33:26AM +0200, Jan Kara wrote:
+> On Tue 14-10-25 06:47:23, Christoph Hellwig wrote:
+> > On Mon, Oct 13, 2025 at 01:58:15PM +0200, Jan Kara wrote:
+> > > I don't love filemap_fdatawrite_kick_nr() either. Your
+> > > filemap_fdatawrite_nrpages() is better but so far we had the distinction
+> > > that filemap_fdatawrite* is for data integrity writeback and filemap_flush
+> > > is for memory cleaning writeback. And in some places this is important
+> > > distinction which I'd like to keep obvious in the naming. So I'd prefer
+> > > something like filemap_flush_nrpages() (to stay consistent with previous
+> > > naming) or if Christoph doesn't like flush (as that's kind of overloaded
+> > > word) we could have filemap_writeback_nrpages().
+> > 
+> > Not a big fan of flush, but the important point in this series is
+> > to have consistent naming.
+> 
+> I fully agree on that.
 
+*nod*
 
-On 10/14/25 6:35 PM, Chris Mason wrote:
-> Hi everyone,
+> >  If we don't like the kick naming we should standardize on _flush (or
+> >  whatever) and have the _range and _nrpages variants of whatever we pick
+> >  for the base name.
+> > 
+> > Anyone with strong feelings and or good ideas about naming please speak
+> > up now.
 > 
-> My review automation flagged this one in linux-next, and it looks like a
-> valid bug to me:
-> 
-> On Wed, 10 Sep 2025 16:04:40 +0800 Yu Kuai <yukuai1@huaweicloud.com> wrote:
-> 
->> From: Yu Kuai <yukuai3@huawei.com>
->>
->> For shared tags case, all hctx->sched_tags/tags are the same, it doesn't
->> make sense to call into blk_mq_tag_update_depth() multiple times for the
->> same tags.
->>
-> 
-> [ ... ]
-> 
->> diff --git a/block/blk-mq.c b/block/blk-mq.c
->> index 9b97f2f3f2c9..80c20700bce8 100644
->> --- a/block/blk-mq.c
->> +++ b/block/blk-mq.c
->> @@ -4935,34 +4935,35 @@ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
->>
->>  	blk_mq_quiesce_queue(q);
->>
->> -	queue_for_each_hw_ctx(q, hctx, i) {
->> -		if (!hctx->tags)
->> -			continue;
->> -		/*
->> -		 * If we're using an MQ scheduler, just update the scheduler
->> -		 * queue depth. This is similar to what the old code would do.
->> -		 */
->> -		if (hctx->sched_tags) {
->> -			ret = blk_mq_tag_update_depth(hctx, &hctx->sched_tags,
->> -						      nr);
->> -		} else {
->> -			ret = blk_mq_tag_update_depth(hctx, &hctx->tags, nr);
->> -		}
->> -		if (ret)
->> -			goto out;
->> -	}
->> -
->> -	q->nr_requests = nr;
->> -	if (q->elevator && q->elevator->type->ops.depth_updated)
->> -		q->elevator->type->ops.depth_updated(q);
->> -
->>  	if (blk_mq_is_shared_tags(set->flags)) {
->>  		if (q->elevator)
->>  			blk_mq_tag_update_sched_shared_tags(q);
->                         ^^^^
-> 
-> Does blk_mq_tag_update_sched_shared_tags() use the wrong value here?
-> 
-> In the old code, q->nr_requests was updated to nr before calling
-> blk_mq_tag_update_sched_shared_tags(). But in the new code, this
-> function is called while q->nr_requests still contains the old value.
-> 
-> Looking at blk_mq_tag_update_sched_shared_tags():
-> 
->     void blk_mq_tag_update_sched_shared_tags(struct request_queue *q)
->     {
->         sbitmap_queue_resize(&q->sched_shared_tags->bitmap_tags,
->                              q->nr_requests - q->tag_set->reserved_tags);
->     }
-> 
-> It reads q->nr_requests to calculate the new sbitmap size. With the
-> reordering, this will resize the sbitmap to the old depth instead of
-> the new depth passed in nr.
-> 
-Good catch! Yes, I think this needs to be fixed...
+> I agree with either keeping filemap_flush* or using filemap_writeback* (and
+> renaming filemap_flush to filemap_writeback).
 
-Thanks,
---Nilay
+I'd prefer filemap_flush* because most people are already familiar
+with that naming and the expected semnatics. But I could live with
+filemap_writebacki*, too. Both are better than "kick", IMO.
 
-
+-Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
