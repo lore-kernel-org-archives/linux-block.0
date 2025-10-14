@@ -1,168 +1,303 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71B03274B58
-	for <linux-block@vger.kernel.org>; Tue, 14 Oct 2025 17:37:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13D79307AC8;
+	Tue, 14 Oct 2025 17:58:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760463432; cv=none; b=dVWsd13DXLDkabvLSAhm0SZBfyfw6fiv84kjsFbN/sTn/+oNgYOVXFvhe2ycCodxVsvYm18a/V/bCrBx9q6gKARX53z+64sYraefYjzk3FEZvXJ77ABYQ+5veAtPognZ9uC51riXEKUk1eiYdSFMY+ZOlaax0YSq7Dxs1QyY9gc=
+	t=1760464684; cv=none; b=Z54w9nWWwrbo6LKoAw7z9afpAexhqUNVgq+X0rSHcYyxVfQeXCS5HR30tBGVEzZBXHElISDf2A5LA7g2eVU237qXkRFN8aWHematHHdIGen96Jim5YLtistTu4YOGseq+gud3CMZ6GFaNMITBn9mDXPbXxN+fjCSuhOl1JT8Wdc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760463432; c=relaxed/simple;
-	bh=dY/RFrbmWlt8IeoS8JhQFRVZS62JakHON7QI05BM5Pc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cePG7T6lBqaBiJnvSjrEGJtxttLvVNLvIa4+odyymDSSpuZ8hTEouu+/1Ffh6q4fxu/zeyoZoxjezlFdyt0yXM2ucvMFPE9U+PLhVFESzGxez8sXZbNIKQJgptqpQc1AduRI+5NXHg1pHS0nAYwTsbB42rj5O0Kg7IZizMov6Ps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=yDmoKVMt; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=2WM08dl6; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=yDmoKVMt; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=2WM08dl6; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	s=arc-20240116; t=1760464684; c=relaxed/simple;
+	bh=GeasJ1k8goW5lf5YOrSR9SoZPMr2dV8i4vuFwQTf6kI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DRp3pfmL00+FYDFUswi1983cgsCROMGcNRBm87sLZTzevo/7MIJ7SN7LgpkkNHQnc/qnL4Z/ocmDs6bJMPlNfTuZsi1kpGie4+I63cQhkxPKlTLnPSBhRfCtX/PfHvcRgMb5UBWiZwwyqwYO6gPcirTIjYzexLux+dJYqG+gvRo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=ZMy1RhxA; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="yDmoKVMt";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="2WM08dl6";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="yDmoKVMt";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="2WM08dl6"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 76C2C203BB;
-	Tue, 14 Oct 2025 17:37:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1760463428;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=AAlEg30Xh123ICsXxHR1i8eLACocDbvHskeA1BeozEc=;
-	b=yDmoKVMtwLRJOBlla660Ag05yHaNOU1W1IV4a81qJLQLwqxGC/tzhmPsEY7YTuWQLSSusc
-	2291jCfcaCjyFff6ysHIWs13HLYVAPOEznX0vps0yRRO4+BBD3fZAwaTxqQOW1HbUGxcjb
-	+ZEbO3Vcv2kGHiKZVUmyXj5b7OVr+N4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1760463428;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=AAlEg30Xh123ICsXxHR1i8eLACocDbvHskeA1BeozEc=;
-	b=2WM08dl6lr7hfNBq0u+y+9D4Fb7mJE8UhxacJqdxQbZMxWliQxqE7oANIJuKqumg4DkUsY
-	rcpsVna643JvdGBQ==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=yDmoKVMt;
-	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=2WM08dl6
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1760463428;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=AAlEg30Xh123ICsXxHR1i8eLACocDbvHskeA1BeozEc=;
-	b=yDmoKVMtwLRJOBlla660Ag05yHaNOU1W1IV4a81qJLQLwqxGC/tzhmPsEY7YTuWQLSSusc
-	2291jCfcaCjyFff6ysHIWs13HLYVAPOEznX0vps0yRRO4+BBD3fZAwaTxqQOW1HbUGxcjb
-	+ZEbO3Vcv2kGHiKZVUmyXj5b7OVr+N4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1760463428;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=AAlEg30Xh123ICsXxHR1i8eLACocDbvHskeA1BeozEc=;
-	b=2WM08dl6lr7hfNBq0u+y+9D4Fb7mJE8UhxacJqdxQbZMxWliQxqE7oANIJuKqumg4DkUsY
-	rcpsVna643JvdGBQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 3BFEF139B0;
-	Tue, 14 Oct 2025 17:37:08 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 5/kaDkSK7mgpMwAAD6G6ig
-	(envelope-from <dsterba@suse.cz>); Tue, 14 Oct 2025 17:37:08 +0000
-Date: Tue, 14 Oct 2025 19:37:06 +0200
-From: David Sterba <dsterba@suse.cz>
-To: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
-Cc: hch <hch@lst.de>, David Sterba <dsterba@suse.com>,
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
-	Eric Van Hensbergen <ericvh@kernel.org>,
-	Latchesar Ionkov <lucho@ionkov.net>,
-	Dominique Martinet <asmadeus@codewreck.org>,
-	Christian Schoenebeck <linux_oss@crudebyte.com>,
-	Chris Mason <clm@fb.com>, Mark Fasheh <mark@fasheh.com>,
-	Joel Becker <jlbec@evilplan.org>,
-	Joseph Qi <joseph.qi@linux.alibaba.com>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>,
-	Josef Bacik <josef@toxicpanda.com>, Jan Kara <jack@suse.cz>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"v9fs@lists.linux.dev" <v9fs@lists.linux.dev>,
-	"linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
-	"linux-ext4@vger.kernel.org" <linux-ext4@vger.kernel.org>,
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-	"jfs-discussion@lists.sourceforge.net" <jfs-discussion@lists.sourceforge.net>,
-	"ocfs2-devel@lists.linux.dev" <ocfs2-devel@lists.linux.dev>,
-	"linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
-	"linux-mm@kvack.org" <linux-mm@kvack.org>
-Subject: Re: [PATCH 04/10] btrfs: use the local tmp_inode variable in
- start_delalloc_inodes
-Message-ID: <20251014173706.GB13776@suse.cz>
-Reply-To: dsterba@suse.cz
-References: <20251013025808.4111128-1-hch@lst.de>
- <20251013025808.4111128-5-hch@lst.de>
- <aae79ea0-f056-4da7-8a87-4d4fd6aea85f@wdc.com>
- <20251014044421.GA30920@lst.de>
- <57d7136c-b209-4f8f-bb6f-8ced354d205a@wdc.com>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ZMy1RhxA"
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 59EFPXTt002742;
+	Tue, 14 Oct 2025 17:57:37 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=dNH21r
+	EZx6JOTlipPd6T46YbAmkSlhH4ntfrh3pAkOU=; b=ZMy1RhxAXE86AquNrSv0Op
+	djSZvwddSV/1Zw0jGuB0b+zO+DpX38WT3bOmDG0mi43V4SQBUGkUhKyQrJ8A/E+H
+	X+LqUyClkFfphVEdL6tRhr3Mn5vvwQlilsIpra471b2X5623fKO3KZa+SIQxgnXP
+	7WTSAAS/D3hrZ5Efx+yL0WfNhtQGG5oqtYgjhGZwrO7secN75fIO4Ri6wOCdZXgb
+	KeRdM54xqiQ/3GY0XgaSaXTw1sfJR0mCzdh7jMIOf05O/bHYOG7wo6Gvr1Zol92F
+	IqE8TWkTgQPaodBPgTX8J6BrNCHhc8HJbq2EAtXP1zIvaBppAkII6JHjBhZpNf8g
+	==
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 49qdnpftc2-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 14 Oct 2025 17:57:36 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 59EEbg2L003626;
+	Tue, 14 Oct 2025 17:57:36 GMT
+Received: from smtprelay05.dal12v.mail.ibm.com ([172.16.1.7])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 49r1xxvdqd-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 14 Oct 2025 17:57:36 +0000
+Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
+	by smtprelay05.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 59EHvZna24248978
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 14 Oct 2025 17:57:35 GMT
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 5AFD258062;
+	Tue, 14 Oct 2025 17:57:35 +0000 (GMT)
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 07C2158059;
+	Tue, 14 Oct 2025 17:57:31 +0000 (GMT)
+Received: from [9.61.43.11] (unknown [9.61.43.11])
+	by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 14 Oct 2025 17:57:30 +0000 (GMT)
+Message-ID: <7de6c29f-9058-41ca-af95-f3aaf67a64d3@linux.ibm.com>
+Date: Tue, 14 Oct 2025 23:27:29 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <57d7136c-b209-4f8f-bb6f-8ced354d205a@wdc.com>
-User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
-X-Spam-Level: 
-X-Spam-Flag: NO
-X-Rspamd-Queue-Id: 76C2C203BB
-X-Rspamd-Action: no action
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Spamd-Result: default: False [-4.21 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	HAS_REPLYTO(0.30)[dsterba@suse.cz];
-	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	TO_DN_SOME(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RCPT_COUNT_TWELVE(0.00)[25];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	ARC_NA(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	REPLYTO_ADDR_EQ_FROM(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	R_RATELIMIT(0.00)[to_ip_from(RL9qow8fch3pfgh43469ius4rs)];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DKIM_TRACE(0.00)[suse.cz:+];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo]
-X-Spam-Score: -4.21
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/4] blk-rq-qos: fix possible deadlock
+To: Yu Kuai <hailan@yukuai.org.cn>, Yu Kuai <yukuai3@huawei.com>,
+        ming.lei@redhat.com, tj@kernel.org, josef@toxicpanda.com,
+        axboe@kernel.dk
+Cc: cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yukuai1@huaweicloud.com,
+        yi.zhang@huawei.com, yangerkun@huawei.com, johnny.chenyi@huawei.com
+References: <20251014022149.947800-1-yukuai3@huawei.com>
+ <d4fe218b-9fc5-4466-ac56-0d4c5a8ccd96@linux.ibm.com>
+ <e5e7ac3f-2063-473a-aafb-4d8d43e5576e@yukuai.org.cn>
+Content-Language: en-US
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <e5e7ac3f-2063-473a-aafb-4d8d43e5576e@yukuai.org.cn>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDExMDAwNSBTYWx0ZWRfXxdfnsoQCoYM4
+ aagdqXSWe9ndl3HWZNnn5ICNRDVFAJlU/NaFjc0dr87WOPEB7ibvadSxXdmm2U3ZJL12aqeEtS2
+ dPReH7QlYoRUKe4zvfLx4oBQl0YmCTWu0TfbNH7c3tE4GWPZ7NJx9LVLung9CjJrtsfk8mzDjH4
+ va8DqoxyKZn5UBF9AhyF5x0I/rf87sMgHihZBHn61JeYEjRKutYLfki/MvXnIledbQKIYTogGHE
+ 2RYNMuk0ibp1bjD2dMT2b2NAlsjBCVVkA5wr35XYt5IyuuZpQymxy3ckzXRQnejZ/FLasBhOo/n
+ 7l+bFwxykftBOn46iPHKSQ/4L6tol8szTv9zipqBHgjhO9SGi4aul6BjQr3D809wieg62JtXzc+
+ fdSUezsQrFF7VgvfwpgELXtAPhu4Ow==
+X-Proofpoint-ORIG-GUID: hJIHf5vsHoUWbdcm379-SdDUzo1-GAOj
+X-Proofpoint-GUID: hJIHf5vsHoUWbdcm379-SdDUzo1-GAOj
+X-Authority-Analysis: v=2.4 cv=MoxfKmae c=1 sm=1 tr=0 ts=68ee8f10 cx=c_pps
+ a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
+ a=IkcTkHD0fZMA:10 a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=VwQbUJbxAAAA:8 a=H31F4hS0uZKSM2tskcAA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+ a=cPQSjfK2_nFv0Q5t_7PE:22 a=HhbK4dLum7pmb74im6QT:22 a=pHzHmUro8NiASowvMSCR:22
+ a=Ew2E2A-JSTLzCXPT_086:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-10-14_03,2025-10-13_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ impostorscore=0 spamscore=0 lowpriorityscore=0 suspectscore=0 phishscore=0
+ bulkscore=0 priorityscore=1501 malwarescore=0 clxscore=1015 adultscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2510020000 definitions=main-2510110005
 
-On Tue, Oct 14, 2025 at 07:02:11AM +0000, Johannes Thumshirn wrote:
-> On 10/14/25 6:44 AM, hch wrote:
-> > On Mon, Oct 13, 2025 at 08:11:35AM +0000, Johannes Thumshirn wrote:
-> >> If you have to repost this for some reason, can you rename tmp_inode to
-> >> vfs_inode or sth like that?
-> >>
-> >> The name is really confusing and the commit introducing it doesn't
-> >> describe it really either.
-> > It is.  vfs_inode is kinda weird, too.  The problem is that inode
-> > is used for the btrfs_inode.  But if there's consensus on a name
-> > I'll happily change it.
-> >
-> I unfortunately don't have one :( David?
 
-For this series it's fine to use tmp_inode as it's already there, we can
-rename it later.
+
+On 10/14/25 4:44 PM, Yu Kuai wrote:
+> Hi,
+> 
+> 在 2025/10/14 18:58, Nilay Shroff 写道:
+>>
+>> On 10/14/25 7:51 AM, Yu Kuai wrote:
+>>> Currently rq-qos debugfs entries is created from rq_qos_add(), while
+>>> rq_qos_add() requires queue to be freezed. This can deadlock because
+>>>
+>>> creating new entries can trigger fs reclaim.
+>>>
+>>> Fix this problem by delaying creating rq-qos debugfs entries until
+>>> it's initialization is complete.
+>>>
+>>> - For wbt, it can be initialized by default of by blk-sysfs, fix it by
+>>>    delaying after wbt_init();
+>>> - For other policies, they can only be initialized by blkg configuration,
+>>>    fix it by delaying to blkg_conf_end();
+>>>
+>>> Noted this set is cooked on the top of my other thread:
+>>> https://lore.kernel.org/all/20251010091446.3048529-1-yukuai@kernel.org/
+>>>
+>>> And the deadlock can be reporduced with above thead, by running blktests
+>>> throtl/001 with wbt enabled by default. While the deadlock is really a
+>>> long term problem.
+>>>
+>> While freezing the queue we also mark GFP_NOIO scope, so doesn't that
+>> help avoid fs-reclaim? Or maybe if you can share the lockdep splat
+>> encountered running throtl/001?
+> 
+> Yes, we can avoid fs-reclaim if queue is freezing, however,
+> because debugfs is a generic file system, and we can't avoid fs reclaim from
+> all context. There is still
+> 
+> Following is the log with above set and wbt enabled by default, the set acquire
+> lock order by:
+> 
+> freeze queue -> elevator lock -> rq_qos_mutex -> blkcg_mutex
+> 
+> However, fs-reclaim from other context cause the deadlock report.
+> 
+> 
+> [   45.632372][  T531] ======================================================
+> [   45.633734][  T531] WARNING: possible circular locking dependency detected
+> [   45.635062][  T531] 6.17.0-gfd4a560a0864-dirty #30 Not tainted
+> [   45.636220][  T531] ------------------------------------------------------
+> [   45.637587][  T531] check/531 is trying to acquire lock:
+> [   45.638626][  T531] ffff9473884382b0 (&q->rq_qos_mutex){+.+.}-{4:4}, at: blkg_
+> conf_start+0x116/0x190
+> [   45.640416][  T531]
+> [   45.640416][  T531] but task is already holding lock:
+> [   45.641828][  T531] ffff9473884385d8 (&q->elevator_lock){+.+.}-{4:4}, at: blkg
+> _conf_start+0x108/0x190
+> [   45.643322][  T531]
+> [   45.643322][  T531] which lock already depends on the new lock.
+> [   45.643322][  T531]
+> [   45.644862][  T531]
+> [   45.644862][  T531] the existing dependency chain (in reverse order) is:
+> [   45.646046][  T531]
+> [   45.646046][  T531] -> #5 (&q->elevator_lock){+.+.}-{4:4}:
+> [   45.647052][  T531]        __mutex_lock+0xd3/0x8d0
+> [   45.647716][  T531]        blkg_conf_start+0x108/0x190
+> [   45.648395][  T531]        tg_set_limit+0x74/0x300
+> [   45.649046][  T531]        kernfs_fop_write_iter+0x14a/0x210
+> [   45.649813][  T531]        vfs_write+0x29e/0x550
+> [   45.650413][  T531]        ksys_write+0x74/0xf0
+> [   45.651032][  T531]        do_syscall_64+0xbb/0x380
+> [   45.651730][  T531] entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> [   45.652533][  T531]
+> [   45.652533][  T531] -> #4 (&q->q_usage_counter(io)#3){++++}-{0:0}:
+> [   45.653297][  T531]        blk_alloc_queue+0x30b/0x350
+> [   45.653807][  T531]        blk_mq_alloc_queue+0x5d/0xd0
+> [   45.654300][  T531]        __blk_mq_alloc_disk+0x13/0x60
+> [   45.654810][  T531]        null_add_dev+0x2f8/0x660 [null_blk]
+> [   45.655374][  T531] nullb_device_power_store+0x88/0x130 [null_blk]
+> [   45.656009][  T531]        configfs_write_iter+0xcb/0x130 [configfs]
+> [   45.656614][  T531]        vfs_write+0x29e/0x550
+> [   45.657045][  T531]        ksys_write+0x74/0xf0
+> [   45.657497][  T531]        do_syscall_64+0xbb/0x380
+> [   45.657958][  T531] entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> [   45.658595][  T531]
+> [   45.658595][  T531] -> #3 (fs_reclaim){+.+.}-{0:0}:
+> [   45.659266][  T531]        fs_reclaim_acquire+0xa4/0xe0
+> [   45.659783][  T531] kmem_cache_alloc_lru_noprof+0x3b/0x2a0
+> [   45.660369][  T531]        alloc_inode+0x1a/0x60
+> [   45.660873][  T531]        new_inode+0xd/0x90
+> [   45.661291][  T531]        debugfs_create_dir+0x38/0x160
+> [   45.661806][  T531]        component_debug_init+0x12/0x20
+> [   45.662316][  T531]        do_one_initcall+0x68/0x2b0
+> [   45.662807][  T531]        kernel_init_freeable+0x238/0x290
+> [   45.663241][  T531]        kernel_init+0x15/0x130
+> [   45.663659][  T531]        ret_from_fork+0x182/0x1d0
+> [   45.664054][  T531]        ret_from_fork_asm+0x1a/0x30
+> [   45.664601][  T531]
+> [   45.664601][  T531] -> #2 (&sb->s_type->i_mutex_key#2){+.+.15:25:59 [194/1936]
+> [   45.665274][  T531]        down_write+0x3a/0xb0
+> [   45.665669][  T531]        simple_start_creating+0x51/0x110
+> [   45.666097][  T531]        debugfs_start_creating+0x68/0xd0
+> [   45.666561][  T531]        debugfs_create_dir+0x10/0x160
+> [   45.666970][  T531]        blk_register_queue+0x8b/0x1e0
+> [   45.667386][  T531]        __add_disk+0x253/0x3f0
+> [   45.667804][  T531]        add_disk_fwnode+0x71/0x180
+> [   45.668205][  T531]        virtblk_probe+0x9c2/0xb50
+> [   45.668603][  T531]        virtio_dev_probe+0x223/0x380
+> [   45.669004][  T531]        really_probe+0xc2/0x260
+> [   45.669369][  T531]        __driver_probe_device+0x6e/0x100
+> [   45.669856][  T531]        driver_probe_device+0x1a/0xd0
+> [   45.670263][  T531]        __driver_attach+0x93/0x1a0
+> [   45.670672][  T531]        bus_for_each_dev+0x87/0xe0
+> [   45.671063][  T531]        bus_add_driver+0xe0/0x1d0
+> [   45.671469][  T531]        driver_register+0x70/0xe0
+> [   45.671856][  T531]        virtio_blk_init+0x53/0x80
+> [   45.672258][  T531]        do_one_initcall+0x68/0x2b0
+> [   45.672661][  T531]        kernel_init_freeable+0x238/0x290
+> [   45.673097][  T531]        kernel_init+0x15/0x130
+> [   45.673510][  T531]        ret_from_fork+0x182/0x1d0
+> [   45.673907][  T531]        ret_from_fork_asm+0x1a/0x30
+> [   45.674319][  T531]
+> [   45.674319][  T531] -> #1 (&q->debugfs_mutex){+.+.}-{4:4}:
+> [   45.674929][  T531]        __mutex_lock+0xd3/0x8d0
+> [   45.675315][  T531]        rq_qos_add+0xe0/0x130
+> [   45.675717][  T531]        wbt_init+0x183/0x210
+> [   45.676062][  T531]        blk_register_queue+0xdf/0x1e0
+> [   45.676490][  T531]        __add_disk+0x253/0x3f0
+> [   45.676844][  T531]        add_disk_fwnode+0x71/0x180
+> [   45.677247][  T531]        virtblk_probe+0x9c2/0xb50
+> [   45.677648][  T531]        virtio_dev_probe+0x223/0x380
+> [   45.678044][  T531]        really_probe+0xc2/0x260
+> [   45.678411][  T531]        __driver_probe_device+0x6e/0x100
+> [   45.678875][  T531]        driver_probe_device+0x1a/0xd0
+> [   45.679282][  T531]        __driver_attach+0x93/0x1a0
+> [   45.679678][  T531]        bus_for_each_dev+0x87/0xe0
+> [   45.680053][  T531]        bus_add_driver+0xe0/0x1d0
+> [   45.680458][  T531]        driver_register+0x70/0xe0
+> [   45.680823][  T531]        virtio_blk_init+0x53/0x80
+> [   45.681208][  T531]        do_one_initcall+0x68/0x2b0
+> [   45.681611][  T531]        kernel_init_freeable+0x238/0x290
+> [   45.682027][  T531]        kernel_init+0x15/0x130
+> [   45.682392][  T531]        ret_from_fork+0x182/0x1d0
+> [   45.682829][  T531]        ret_from_fork_asm+0x1a/0x30
+> [   45.683240][  T531]
+> [   45.683240][  T531] -> #0 (&q->rq_qos_mutex){+.+.}-{4:4}:
+> [   45.683867][  T531]        __lock_acquire+0x103d/0x1650
+> [   45.684411][  T531]        lock_acquire+0xbc/0x2c0
+> [   45.684798][  T531]        __mutex_lock+0xd3/0x8d0
+> [   45.685172][  T531]        blkg_conf_start+0x116/0x190
+> [   45.685623][  T531]        tg_set_limit+0x74/0x300
+> [   45.685986][  T531]        kernfs_fop_write_iter+0x14a/0x210
+> [   45.686405][  T531]        vfs_write+0x29e/0x550
+> [   45.686771][  T531]        ksys_write+0x74/0xf0
+> [   45.687112][  T531]        do_syscall_64+0xbb/0x380
+> [   45.687514][  T531] entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> [   45.687983][  T531]
+> [   45.687983][  T531] other info that might help us debug this:
+> [   45.687983][  T531]
+> [   45.688760][  T531] Chain exists of:
+> [   45.688760][  T531]   &q->rq_qos_mutex --> &q->q_usage_counter(io)#3 --> &q->e
+> levator_lock
+> [   45.688760][  T531]
+> [   45.689817][  T531]  Possible unsafe locking scenario:
+> [   45.689817][  T531]
+> [   45.690359][  T531]        CPU0                    CPU1
+> [   45.690764][  T531]        ----                    ----
+> [   45.691172][  T531]   lock(&q->elevator_lock);
+> [   45.691544][  T531] lock(&q->q_usage_counter(io
+> )#3);
+> [   45.692108][  T531] lock(&q->elevator_lock);
+> [   45.692659][  T531]   lock(&q->rq_qos_mutex);
+> [   45.692994][  T531]
+> [   45.692994][  T531]  *** DEADLOCK ***
+> 
+
+From the above trace, I see that thread #1 (virtblk device) is
+unable to acquire &q->debugfs_mutex and it's pending on thread #2
+(another virtblk device) because thread #2 has already acquired
+the same &q->debugfs_mutex. And this sequence of events appears
+to be a false-positive. The reasoning is as follows:
+
+Each virtio block device (e.g., virtblk0, virtblk1, etc.) has its own
+struct request_queue, and therefore its own instance of q->debugfs_mutex.
+These mutexes are distinct objects at different memory addresses. Hence,
+thread #1 cannot physically block on thread #2’s q->debugfs_mutex, since
+the mutex wait queue is per-lock address.
+
+However, lockdep does not track individual mutex addresses. Instead, it
+operates at the level of lock classes, identified by a lock class key. 
+Because all q->debugfs_mutex instances share the same lock class key,
+lockdep treats them as equivalent and reports a potential circular
+dependency across devices, even though such dependency cannot actually
+occur at runtime. So IMO, to eliminate this false-positive warning, we
+should assign a separate lockdep class/key for each queue’s q->debugfs_mutex.
+This will ensure lockdep distinguishes mutex instances belonging to
+different queues.
+
+Thanks,
+--Nilay
+
