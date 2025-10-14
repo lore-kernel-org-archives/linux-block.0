@@ -1,211 +1,214 @@
-Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E83F221B9F5
-	for <linux-block@vger.kernel.org>; Tue, 14 Oct 2025 08:58:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 274F12E718F;
+	Tue, 14 Oct 2025 09:03:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760432302; cv=none; b=lEkBpBhMRabLPKvi8g0JO+/9dJt1Vt63NBvkEtGD62MqOmCwlyKw7ZWgWCdS0sI58O7zUbxCZlxZJUS7uQp5W4QdvgqEYCKiBnlT19sXp1Wf63fj6txV96Pey+aMUvGU6GJMimupz7fMNHSPHM8iRzAIjcBVzAdGe4cIJpt0Tdw=
+	t=1760432618; cv=none; b=oCjlrPy+JAKGWqRD5RDUjiVH7OEjN6F9KVWjMKpvb7LAul4XieTykpj3iRA1mEfXbf1nRBc4ZtJF8ozYeHZrcPlQVr0rbVRf2T2IaP0wVPhckkygK6lJzJdFN/79n76Ret5lVyk4oVYikZbqLjamaa6O/78YvgmYVodI5BFUHV8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760432302; c=relaxed/simple;
-	bh=6oPnpgrKG8UiMHh/FzSLJ2xzUVT86Yhro7PkrcRBTnU=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:MIME-Version:
-	 Content-Type:References; b=LVyeS5px60kCTOfVN2sn5rrnpENVFVj5vA45R6r1c1jVQk+aPW68BlES0LBL2j0hG1gP6536pH/W3bsfktcbXZ8HfaA1DsIsgbF2sscUgAbuii+cSsDo+wYDBg9D6iPjYJAr5XmKmpdfAY4nWz9A/y9AR/dx6CC2pbIrPU5pDyg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=hHPDjJQW; arc=none smtp.client-ip=203.254.224.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="hHPDjJQW"
-Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
-	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20251014085817epoutp024224afcc49810040b1412e0b53a62328~uT9kGE-nd0423704237epoutp02R
-	for <linux-block@vger.kernel.org>; Tue, 14 Oct 2025 08:58:17 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20251014085817epoutp024224afcc49810040b1412e0b53a62328~uT9kGE-nd0423704237epoutp02R
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1760432297;
-	bh=PsLQpFRzivs5D19kZtchId/dRRY+s/ejkx6URIvSCWM=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=hHPDjJQW2FQB7d3ibwWPAXScqaIUwXkHLzCaKpFwAfBVEOkqz0m8VXBzgQxJZUDtR
-	 yJvOUzn2LRJmBdcNUjml16iritBg0EIrLDvlBD6hU8+/bWTmWFjdayKKqXRvxoVl+l
-	 Zh1DGqBwtW+BwD9zLD8q0GVWqWWB9FLUlnJQIFvQ=
-Received: from epsnrtp04.localdomain (unknown [182.195.42.156]) by
-	epcas5p3.samsung.com (KnoxPortal) with ESMTPS id
-	20251014085817epcas5p3f81037cdad34db97959b19d5ff5c6aa4~uT9j3Nk9W1998119981epcas5p3R;
-	Tue, 14 Oct 2025 08:58:17 +0000 (GMT)
-Received: from epcas5p4.samsung.com (unknown [182.195.38.91]) by
-	epsnrtp04.localdomain (Postfix) with ESMTP id 4cm7RD4N5Dz6B9m6; Tue, 14 Oct
-	2025 08:58:16 +0000 (GMT)
-Received: from epsmtip1.samsung.com (unknown [182.195.34.30]) by
-	epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
-	20251014083611epcas5p1c198e2ad844eb0ac08f0a9cafdeedb46~uTqRF8TUH1959419594epcas5p1W;
-	Tue, 14 Oct 2025 08:36:11 +0000 (GMT)
-Received: from node122.. (unknown [109.105.118.122]) by epsmtip1.samsung.com
-	(KnoxPortal) with ESMTPA id
-	20251014083610epsmtip1c571f196f52a7699afe671caa1718c9c~uTqQRqfvh0838708387epsmtip1f;
-	Tue, 14 Oct 2025 08:36:10 +0000 (GMT)
-From: Xue He <xue01.he@samsung.com>
-To: yukuai1@huaweicloud.com
-Cc: akpm@linux-foundation.org, axboe@kernel.dk, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, xue01.he@samsung.com, yukuai3@huawei.com
-Subject: Re:[PATCH v4] block: plug attempts to batch allocate tags multiple
- times
-Date: Tue, 14 Oct 2025 08:31:44 +0000
-Message-Id: <20251014083144.5479-1-xue01.he@samsung.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <979713cc-b2f6-00fa-7021-17d0e74a6913@huaweicloud.com>
+	s=arc-20240116; t=1760432618; c=relaxed/simple;
+	bh=qzpSQytulsfACI87Oo+DwR/UtZR57CtnwM47JSBMiz4=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=CVwM+6hjh/pAyZtbvsww/Phj+02/73MzlNx1yOl/FluR3gmfYX/Vl6cyhLwi8MXbmdowqPhJNkJbk9Z3/k2VhhS8JldXWYD9ToETW5NXp3gg72iotYbwELmmNJWY91LUo3vJ/9wqg8hOB50h52z9sBJUsO4wZvVdDdIP4yr+b2w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4cm7Xb6BWrzKHMhK;
+	Tue, 14 Oct 2025 17:02:55 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.75])
+	by mail.maildlp.com (Postfix) with ESMTP id D6FED1A1491;
+	Tue, 14 Oct 2025 17:03:31 +0800 (CST)
+Received: from [10.174.179.143] (unknown [10.174.179.143])
+	by APP2 (Coremail) with SMTP id Syh0CgCH3UXhEe5oH8xPAQ--.28714S3;
+	Tue, 14 Oct 2025 17:03:31 +0800 (CST)
+Subject: Re: [PATCH 3/4] blk-rq-qos: fix possible deadlock
+To: Ming Lei <ming.lei@redhat.com>, Yu Kuai <yukuai1@huaweicloud.com>
+Cc: nilay@linux.ibm.com, tj@kernel.org, josef@toxicpanda.com,
+ axboe@kernel.dk, cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, yi.zhang@huawei.com, yangerkun@huawei.com,
+ johnny.chenyi@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
+References: <20251014022149.947800-1-yukuai3@huawei.com>
+ <20251014022149.947800-4-yukuai3@huawei.com> <aO4GPKKpLbj7kMoz@fedora>
+ <f0ab9c95-990b-a41d-477e-c1b20b392985@huaweicloud.com>
+ <aO4L2THnLFM-_Fb8@fedora>
+ <0351f07e-4ac4-a1e2-b4ee-08e49e7d0b6e@huaweicloud.com>
+ <aO4P08Sw2YYjOYtu@fedora>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <d216f913-d484-ed6c-78f8-5d53a4b1301d@huaweicloud.com>
+Date: Tue, 14 Oct 2025 17:03:29 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+In-Reply-To: <aO4P08Sw2YYjOYtu@fedora>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CMS-MailID: 20251014083611epcas5p1c198e2ad844eb0ac08f0a9cafdeedb46
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-cpgsPolicy: CPGSC10-505,Y
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20251014083611epcas5p1c198e2ad844eb0ac08f0a9cafdeedb46
-References: <979713cc-b2f6-00fa-7021-17d0e74a6913@huaweicloud.com>
-	<CGME20251014083611epcas5p1c198e2ad844eb0ac08f0a9cafdeedb46@epcas5p1.samsung.com>
+X-CM-TRANSID:Syh0CgCH3UXhEe5oH8xPAQ--.28714S3
+X-Coremail-Antispam: 1UD129KBjvJXoW3Ww4DJFWDZFy8GF43AFW5Wrg_yoW7Aw4kpa
+	y8KF45Aw4qqr1DX34j9w43Wrn7t3yFgr4UZrWrGr1avryqkF1IvF1UtFWUGFy0vry7Cr40
+	qr1UXr4SkFy5KrJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUBF14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
+	0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x
+	0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E
+	7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcV
+	C0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF
+	04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7
+	CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUd-B_UUUUU=
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-Hi Yu Kuai,
+Hi,
 
-On 2025/10/14 15:28, Yu Kuai wrote:
->On 2025/10/10 14:35, Xue He wrote:
->>   static unsigned int __map_depth_with_shallow(const struct sbitmap *sb,
->>   					     int index,
->>   					     unsigned int shallow_depth)
->> @@ -534,26 +560,22 @@ unsigned long __sbitmap_queue_get_batch(struct sbitmap_queue *sbq, int nr_tags,
->>   		unsigned int map_depth = __map_depth(sb, index);
->>   		unsigned long val;
->>   
->> -		sbitmap_deferred_clear(map, 0, 0, 0);
->> -		val = READ_ONCE(map->word);
->> -		if (val == (1UL << (map_depth - 1)) - 1)
->> +		nr = sbitmap_find_bits_in_word(map, 0, 0, 0, &val, nr_tags, map_depth);
->> +		if (nr == -1UL)
->>   			goto next;
->>   
->> -		nr = find_first_zero_bit(&val, map_depth);
->> -		if (nr + nr_tags <= map_depth) {
->> -			atomic_long_t *ptr = (atomic_long_t *) &map->word;
->> -
->> -			get_mask = ((1UL << nr_tags) - 1) << nr;
->> -			while (!atomic_long_try_cmpxchg(ptr, &val,
->> -							  get_mask | val))
->> -				;
->> -			get_mask = (get_mask & ~val) >> nr;
->> -			if (get_mask) {
->> -				*offset = nr + (index << sb->shift);
->> -				update_alloc_hint_after_get(sb, depth, hint,
->> -							*offset + nr_tags - 1);
->> -				return get_mask;
->> -			}
->> +		atomic_long_t *ptr = (atomic_long_t *) &map->word;
->> +
->> +		get_mask = ((1UL << nr_tags) - 1) << nr;
->> +		while (!atomic_long_try_cmpxchg(ptr, &val,
->> +						  get_mask | val))
->> +			;
->> +		get_mask = (get_mask & ~val) >> nr;
->> +		if (get_mask) {
->> +			*offset = nr + (index << sb->shift);
->> +			update_alloc_hint_after_get(sb, depth, hint,
->> +						*offset + nr_tags - 1);
->> +			return get_mask;
->
->I feel it's better to fold in above into the helper and return get_mask
->directly.
-Hi Yukuai, sorry I'm not sure that my understanding is correct, does it
-mean modifying it in a way similar to the following? If so, I will repackage
-the patch accordingly.
+在 2025/10/14 16:55, Ming Lei 写道:
+> On Tue, Oct 14, 2025 at 04:42:30PM +0800, Yu Kuai wrote:
+>> Hi,
+>>
+>> 在 2025/10/14 16:37, Ming Lei 写道:
+>>> On Tue, Oct 14, 2025 at 04:24:23PM +0800, Yu Kuai wrote:
+>>>> Hi,
+>>>>
+>>>> 在 2025/10/14 16:13, Ming Lei 写道:
+>>>>> On Tue, Oct 14, 2025 at 10:21:48AM +0800, Yu Kuai wrote:
+>>>>>> Currently rq-qos debugfs entries is created from rq_qos_add(), while
+>>>>>> rq_qos_add() requires queue to be freezed. This can deadlock because
+>>>>>> creating new entries can trigger fs reclaim.
+>>>>>>
+>>>>>> Fix this problem by delaying creating rq-qos debugfs entries until
+>>>>>> it's initialization is complete.
+>>>>>>
+>>>>>> - For wbt, it can be initialized by default of by blk-sysfs, fix it by
+>>>>>>      calling blk_mq_debugfs_register_rq_qos() after wbt_init;
+>>>>>> - For other policies, they can only be initialized by blkg configuration,
+>>>>>>      fix it by calling blk_mq_debugfs_register_rq_qos() from
+>>>>>>      blkg_conf_end();
+>>>>>>
+>>>>>> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+>>>>>> ---
+>>>>>>     block/blk-cgroup.c | 6 ++++++
+>>>>>>     block/blk-rq-qos.c | 7 -------
+>>>>>>     block/blk-sysfs.c  | 4 ++++
+>>>>>>     block/blk-wbt.c    | 7 ++++++-
+>>>>>>     4 files changed, 16 insertions(+), 8 deletions(-)
+>>>>>>
+>>>>>> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+>>>>>> index d93654334854..e4ccabf132c0 100644
+>>>>>> --- a/block/blk-cgroup.c
+>>>>>> +++ b/block/blk-cgroup.c
+>>>>>> @@ -33,6 +33,7 @@
+>>>>>>     #include "blk-cgroup.h"
+>>>>>>     #include "blk-ioprio.h"
+>>>>>>     #include "blk-throttle.h"
+>>>>>> +#include "blk-mq-debugfs.h"
+>>>>>>     static void __blkcg_rstat_flush(struct blkcg *blkcg, int cpu);
+>>>>>> @@ -746,6 +747,11 @@ void blkg_conf_end(struct blkg_conf_ctx *ctx)
+>>>>>>     	mutex_unlock(&q->elevator_lock);
+>>>>>>     	blk_mq_unfreeze_queue(q, ctx->memflags);
+>>>>>>     	blkdev_put_no_open(ctx->bdev);
+>>>>>> +
+>>>>>> +	mutex_lock(&q->debugfs_mutex);
+>>>>>> +	blk_mq_debugfs_register_rq_qos(q);
+>>>>>> +	mutex_unlock(&q->debugfs_mutex);
+>>>>>> +
+>>>>>>     }
+>>>>>>     EXPORT_SYMBOL_GPL(blkg_conf_end);
+>>>>>> diff --git a/block/blk-rq-qos.c b/block/blk-rq-qos.c
+>>>>>> index 654478dfbc20..d7ce99ce2e80 100644
+>>>>>> --- a/block/blk-rq-qos.c
+>>>>>> +++ b/block/blk-rq-qos.c
+>>>>>> @@ -347,13 +347,6 @@ int rq_qos_add(struct rq_qos *rqos, struct gendisk *disk, enum rq_qos_id id,
+>>>>>>     	blk_queue_flag_set(QUEUE_FLAG_QOS_ENABLED, q);
+>>>>>>     	blk_mq_unfreeze_queue(q, memflags);
+>>>>>> -
+>>>>>> -	if (rqos->ops->debugfs_attrs) {
+>>>>>> -		mutex_lock(&q->debugfs_mutex);
+>>>>>> -		blk_mq_debugfs_register_rqos(rqos);
+>>>>>> -		mutex_unlock(&q->debugfs_mutex);
+>>>>>> -	}
+>>>>>> -
+>>>>>>     	return 0;
+>>>>>>     ebusy:
+>>>>>>     	blk_mq_unfreeze_queue(q, memflags);
+>>>>>> diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+>>>>>> index 76c47fe9b8d6..52bb4db25cf5 100644
+>>>>>> --- a/block/blk-sysfs.c
+>>>>>> +++ b/block/blk-sysfs.c
+>>>>>> @@ -688,6 +688,10 @@ static ssize_t queue_wb_lat_store(struct gendisk *disk, const char *page,
+>>>>>>     	mutex_unlock(&disk->rqos_state_mutex);
+>>>>>>     	blk_mq_unquiesce_queue(q);
+>>>>>> +
+>>>>>> +	mutex_lock(&q->debugfs_mutex);
+>>>>>> +	blk_mq_debugfs_register_rq_qos(q);
+>>>>>> +	mutex_unlock(&q->debugfs_mutex);
+>>>>>>     out:
+>>>>>>     	blk_mq_unfreeze_queue(q, memflags);
+>>>>>> diff --git a/block/blk-wbt.c b/block/blk-wbt.c
+>>>>>> index eb8037bae0bd..a120b5ba54db 100644
+>>>>>> --- a/block/blk-wbt.c
+>>>>>> +++ b/block/blk-wbt.c
+>>>>>> @@ -724,8 +724,13 @@ void wbt_enable_default(struct gendisk *disk)
+>>>>>>     	if (!blk_queue_registered(q))
+>>>>>>     		return;
+>>>>>> -	if (queue_is_mq(q) && enable)
+>>>>>> +	if (queue_is_mq(q) && enable) {
+>>>>>>     		wbt_init(disk);
+>>>>>> +
+>>>>>> +		mutex_lock(&q->debugfs_mutex);
+>>>>>> +		blk_mq_debugfs_register_rq_qos(q);
+>>>>>> +		mutex_unlock(&q->debugfs_mutex);
+>>>>>> +	}
+>>>>>
+>>>>> ->debugfs_mutex only may be not enough, because blk_mq_debugfs_register_rq_qos()
+>>>>> has to traverse rq_qos single list list, you may have to grab q->rq_qos_mutex
+>>>>> for protect the list.
+>>>>>
+>>>>
+>>>> I think we can't grab rq_qos_mutex to create debugfs entries, right?
+>>>
+>>> It depends on the finalized order between rq_qos_mutex and freezing queue.
+>>>
+>>>> With the respect of this, perhaps we can grab debugfs_mutex to protect
+>>>> insering rq_qos list instead?
+>>>
+>>> No, debugfs_mutex shouldn't protect rq_qos list, and rq_qos_mutex is
+>>> supposed to do the job at least from naming viewpoint.
+>>
+>> Ok, then we'll have to make sure the order is rq_qos_mutex before
+>> freezing queue, I was thinking the inverse order because of the helper
+>> blkg_conf_open_bdev_frozen().
+>>
+>> I'll check first if this is possible.
+> 
+> You may misunderstand my point, I meant `debugfs_mutex` can't be used for
+> protecting rq_qos list because of its name. But order between rq_qos_mutex
+> and freeze queue might be fine in either way, just it has to be fixed.
+> Not look into it yet.
 
-static unsigned long sbitmap_find_bits_in_word(unsigned long index, 
-					struct sbitmap *sb, unsigned int *offset,
-					unsigned int hint, unsigned int depth, int nr_tags)
-{
-	unsigned long val, nr, get_mask;
-	struct sbitmap_word *map = &sb->map[index];
-	unsigned int map_depth = __map_depth(sb, index);
+No misunderstood :) I mean if we want to fix this by delaying creating
+debugfs entries after queue is unfreezed, and we have to hold
+rq_qos_mutex for ierating rqos, then rq_qos_mutex have to be hold before
+freeing queue.
 
-	while (1) {
-		val = READ_ONCE(map->word);
-		if (val == (1UL << (map_depth - 1)) - 1) {
-			if (!sbitmap_deferred_clear(map, 0, 0, 0))
-				return 0;
-			continue;
-		}
-
-		nr = find_first_zero_bit(&val, map_depth);
-		if (nr != map_depth)
-			break;
-
-		if (!sbitmap_deferred_clear(map, 0, 0, 0))
-			return 0;
-	};
-
-	atomic_long_t *ptr = (atomic_long_t *) &map->word;
-	
-	get_mask = ((1UL << nr_tags) - 1) << nr;
-	while (!atomic_long_try_cmpxchg(ptr, &val,
-					  get_mask | val))
-		;
-	get_mask = (get_mask & ~val) >> nr;
-	if (get_mask){
-		*offset = nr + (index << sb->shift);
-		update_alloc_hint_after_get(sb, depth, hint,
-					*offset + nr_tags - 1);
-	}
-	return get_mask;
-}
-
-and upper like
-
-unsigned long __sbitmap_queue_get_batch(struct sbitmap_queue *sbq, int nr_tags,
-						unsigned int *offset)
-{
-	struct sbitmap *sb = &sbq->sb;
-	unsigned int hint, depth;
-	unsigned long get_mask, index;
-	int i;
-
-	if (unlikely(sb->round_robin))
-		return 0;
-
-	depth = READ_ONCE(sb->depth);
-	hint = update_alloc_hint_before_get(sb, depth);
-
-	index = SB_NR_TO_INDEX(sb, hint);
-
-	for (i = 0; i < sb->map_nr; i++) {
-		get_mask = sbitmap_find_bits_in_word(index, sb, offset, hint,
-							depth, nr_tags);
-		if (get_mask) {
-			return get_mask;
-		}
-
-		/* Jump to next index. */
-		if (++index >= sb->map_nr)
-			index = 0;
-	}
-
-	return 0;
-}
-
-Am I missing something? 
+A quick look I feel it's ok, I'll try a new version.
 
 Thanks,
-Xue
->
->BTW, the sbitmap and blk-mq changes are not quite related, and you can
->split them into seperate patches.
->
->Thanks,
->Kuai
->
->>   		}
->>   next:
->>   		/* Jump to next index. */
->> 
+Kuai
+
+> 
+> Thanks,
+> Ming
+> 
+> 
+> .
+> 
+
