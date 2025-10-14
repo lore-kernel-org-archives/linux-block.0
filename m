@@ -1,105 +1,141 @@
-Received: from mail-io1-f46.google.com (mail-io1-f46.google.com [209.85.166.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C0A531AF37
-	for <linux-block@vger.kernel.org>; Tue, 14 Oct 2025 13:12:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FFBF313E2D;
+	Tue, 14 Oct 2025 13:29:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760447560; cv=none; b=jbs/SwHKZpTMYIB8BAq/SV8ZKhFJZibKv/DWqmW5zZmZnEBlxM7vPXs8rCxRfks+qKwqncTy3Cw3kf6c42g6+jLg3wLLejg2Aa80V+7KxZeKFYFdGslmqEvWodwxZ1QukGTMnTb/8BjvoK+mWUaDZl0kdPBWJOiP7YELrN7kWlk=
+	t=1760448574; cv=none; b=fxHpKTkCu4txXp3bgB2b0G/2xP1zBiCV/Z0ZZLOb47WOCLdDhMNA632S6uVc6b+E6VN+3lcxALvDp5SODP1KdjMqDb/Cd+yeQGWxTLCkeUTthrhXpZ+SDTvs4P3HMpjm/n8U1QRVFFxaAhw6zsPeglfzm3KQRbh4cQ1825E+nvs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760447560; c=relaxed/simple;
-	bh=wPVpg0XuqdKGcb3Jc2tIdMZ8FpNDQWGxENFEVQ2G2UU=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=i2tYolU2OFv0hcjqtNptfjXmOTielgy8kN89pvbZux90Ybdowy2iVm/eqnQ4sFTV1CjCRnoK/lSVMrNAZKrWlUPcbygn9GOi7cgHcb2JJB79EGy888XQvmlVCAKK0LaoKQxFvU9+XkdExwOdA7cY4p5sp0YDYnweRL1+66iMcls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=vkv8Z3yF; arc=none smtp.client-ip=209.85.166.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="vkv8Z3yF"
-Received: by mail-io1-f46.google.com with SMTP id ca18e2360f4ac-92c4adc8bfeso474805439f.0
-        for <linux-block@vger.kernel.org>; Tue, 14 Oct 2025 06:12:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1760447557; x=1761052357; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VS5Be9yPc+7WU6uXFWGGZsRUoddSQqWhILzZ+pltJMc=;
-        b=vkv8Z3yFU3UXnJpIXEP69Iq3W0jCOaG5zxh3jiXRsZAqqmo4RxmJ2D6Kffi54APoEC
-         QAjZMuAc7UOKPAH4OWhmoJC5egR+SbvuHTOMjPnmu+RI7pbgHi5AFbhhp3F4ZrWxIuvW
-         XR+PYVkZlprMuSa03zZ2GY3GFCg3ijQ96TISjBWIkKLP1Ql0h4UxJEJs+FiLLqa3PvnG
-         k96TiKfTnLu62wlN/1+vUch0xNPShkL6M3O+bk2bzIidjajjEzP3TbS0Ins9Mnc2F6LH
-         lTE9Rtakqgnk9RGBFd/I6rP09t7oP0N8UC2rA9oOGM/gER+926n1LPi+5IvjUk7ude+Q
-         kGuw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760447557; x=1761052357;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=VS5Be9yPc+7WU6uXFWGGZsRUoddSQqWhILzZ+pltJMc=;
-        b=a5tRUwQ+ye6VKGwp/xiygFnjl5m2K3UQGYLhUb1/WArYOYc6h3boNyaLqbhxwKdmYd
-         fn7T3BrZmFM2/43kStK974vKwS7NPT10pdirenVP3D2OQ2iR1ZOaTuPhiSq92FN6d8Af
-         F7CDKU4GVKHkRmXQo4DST7kjqW1OAi/9hMaj73qtb81A056U/XxNYDnvxe9JaJx7GuOR
-         u/RId6nmwPsrfQeHYLovsqWY0C79xrwGVk3xitVbM2/FovHyHY1zopiwhtspLKoy2qCB
-         NPnHzxxQ41QycsfIvoxr+pZtzZpa6Gs7LB/UxKOLLIo2/3k2FEPk5/9WCSz6+3G0WYd7
-         clZQ==
-X-Gm-Message-State: AOJu0Yw0u4xEzrm1aXKntewt6E+tqckcKBd+7bkyI2shhibKQuar1nTI
-	Tv2TcQCPWJaspjDhyDV+6A9ttxJNyS1VtVs/hs7jUz6PoYT506CFDIfwz/zdmdop+7xJ0fyFkua
-	OyTwAXYg=
-X-Gm-Gg: ASbGncs5M9nCToW7mBGzsPAO37z7HPqZOBo6reUdJTkz4YCQXyThJ4L6jAjcj++JEmr
-	rYrmcj5Ej/NUOgqVkKbpV9AitaJTHZJh2+8BF0RuvNLFUKx0HT+Eyb+IytbtWolZz+awj5NR6mu
-	9ytSGQVPObT7Rp8j4aKYmgU3WZI0dvGtUUwjqbp0+veS+FhSknDtM92K66GTqzeHSk7MWNFdHFn
-	uaHCLxI5lVmzVfS+Zv7S6DdqCrv6zg69etFw6Lj5MZ2e7xtbYAtdr1WFYIdN9D+DeupHgtF8Ige
-	xxpzQ5G2O+YMs1MPknpP9AvLe5AkndLxsivgJ1/GGrOES2tZi/G1wOYg3ksI9BkifC9FPsFA3uC
-	qkGzxYQu6VUDkPP8/VYgVqYPpVmXxw0PZH0StWEI7+lKP
-X-Google-Smtp-Source: AGHT+IEzfAq1f6vaItvXUtyUwlw+jUWrtjFtxvQsG/dBK8zM27vR+ylO8U/SZzNQfFkCmBy5xOW0Pw==
-X-Received: by 2002:a05:6602:2cc4:b0:93e:32ca:850b with SMTP id ca18e2360f4ac-93e32ca862emr1257992339f.7.1760447556867;
-        Tue, 14 Oct 2025 06:12:36 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-93e25a39134sm484423939f.12.2025.10.14.06.12.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Oct 2025 06:12:36 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
-In-Reply-To: <20251013192803.4168772-1-bvanassche@acm.org>
-References: <20251013192803.4168772-1-bvanassche@acm.org>
-Subject: Re: [PATCH 0/2] block/mq-deadline: Fix BLK_MQ_INSERT_AT_HEAD
- support
-Message-Id: <176044755550.107826.7770170204307889174.b4-ty@kernel.dk>
-Date: Tue, 14 Oct 2025 07:12:35 -0600
+	s=arc-20240116; t=1760448574; c=relaxed/simple;
+	bh=7HV8DsFk4LJDeobEMJ2ek8/UQi2Yz+tHf6C1svO2rHw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JPupmJy4ISYEZBsXuXppmPD+6LULDXjQSJ8h/ZtUPr6e6z7UKGEaFzmenQpnNVrimwtoEbfoQc0tFgq7aW9rQFzstiPhSC119PDpYI0RyZ7YSXD2H5Qy9TSM0DE1mNqppUPTc1HpzjjnyoARztHnoN/AK+7KYoMmG0r1ZpXFx+w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4cmFRM5NZGzYQtpy;
+	Tue, 14 Oct 2025 21:28:47 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.75])
+	by mail.maildlp.com (Postfix) with ESMTP id C64611A093A;
+	Tue, 14 Oct 2025 21:29:28 +0800 (CST)
+Received: from [10.67.111.176] (unknown [10.67.111.176])
+	by APP2 (Coremail) with SMTP id Syh0CgBnCUI3UO5o6+FkAQ--.29891S2;
+	Tue, 14 Oct 2025 21:29:28 +0800 (CST)
+Message-ID: <b94f6159-a280-4890-a02a-f19ff808de5b@huaweicloud.com>
+Date: Tue, 14 Oct 2025 21:29:25 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 11/33] cpuset: Provide lockdep check for cpuset lock held
+To: Frederic Weisbecker <frederic@kernel.org>,
+ LKML <linux-kernel@vger.kernel.org>
+Cc: =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Bjorn Helgaas <bhelgaas@google.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Danilo Krummrich
+ <dakr@kernel.org>, "David S . Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Gabriele Monaco <gmonaco@redhat.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+ Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
+ Lai Jiangshan <jiangshanlai@gmail.com>,
+ Marco Crivellari <marco.crivellari@suse.com>, Michal Hocko
+ <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
+ Paolo Abeni <pabeni@redhat.com>, Peter Zijlstra <peterz@infradead.org>,
+ Phil Auld <pauld@redhat.com>, "Rafael J . Wysocki" <rafael@kernel.org>,
+ Roman Gushchin <roman.gushchin@linux.dev>,
+ Shakeel Butt <shakeel.butt@linux.dev>, Simon Horman <horms@kernel.org>,
+ Tejun Heo <tj@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
+ Vlastimil Babka <vbabka@suse.cz>, Waiman Long <longman@redhat.com>,
+ Will Deacon <will@kernel.org>, cgroups@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
+ linux-mm@kvack.org, linux-pci@vger.kernel.org, netdev@vger.kernel.org
+References: <20251013203146.10162-1-frederic@kernel.org>
+ <20251013203146.10162-12-frederic@kernel.org>
+Content-Language: en-US
+From: Chen Ridong <chenridong@huaweicloud.com>
+In-Reply-To: <20251013203146.10162-12-frederic@kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3
+X-CM-TRANSID:Syh0CgBnCUI3UO5o6+FkAQ--.29891S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7WFW3Jw18tw15JFWUWw1fXrb_yoW8XFyxpF
+	90krWrG3yFvr4Uua9rGw17ur1vgw4kWF1UKFn8Kr1rXa42vFn2vr1q9FnIqr10q397Gw40
+	qF9xWa1Y9rWDArDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvYb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0En4kS
+	14v26rWY6Fy7MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I
+	8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWrXVW8
+	Jr1lIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7
+	CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v2
+	6r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07
+	j6a0PUUUUU=
+X-CM-SenderInfo: hfkh02xlgr0w46kxt4xhlfz01xgou0bp/
 
 
-On Mon, 13 Oct 2025 12:28:01 -0700, Bart Van Assche wrote:
-> Commit c807ab520fc3 ("block/mq-deadline: Add I/O priority support")
-> modified the behavior of request flag BLK_MQ_INSERT_AT_HEAD from
-> dispatching a request before other requests into dispatching a request
-> before other requests with the same I/O priority. This is not correct since
-> BLK_MQ_INSERT_AT_HEAD is used when requeuing requests and also when a flush
-> request is inserted. Both types of requests should be dispatched as soon
-> as possible. Hence this patch series that makes the mq-deadline I/O scheduler
-> again ignore the I/O priority for BLK_MQ_INSERT_AT_HEAD requests.
+
+On 2025/10/14 4:31, Frederic Weisbecker wrote:
+> cpuset modifies partitions, including isolated, while holding the cpuset
+> mutex.
 > 
-> [...]
+> This means that holding the cpuset mutex is safe to synchronize against
+> housekeeping cpumask changes.
+> 
+> Provide a lockdep check to validate that.
+> 
+> Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
+> ---
+>  include/linux/cpuset.h | 2 ++
+>  kernel/cgroup/cpuset.c | 7 +++++++
+>  2 files changed, 9 insertions(+)
+> 
+> diff --git a/include/linux/cpuset.h b/include/linux/cpuset.h
+> index 2ddb256187b5..051d36fec578 100644
+> --- a/include/linux/cpuset.h
+> +++ b/include/linux/cpuset.h
+> @@ -18,6 +18,8 @@
+>  #include <linux/mmu_context.h>
+>  #include <linux/jump_label.h>
+>  
+> +extern bool lockdep_is_cpuset_held(void);
+> +
+>  #ifdef CONFIG_CPUSETS
+>  
+>  /*
+> diff --git a/kernel/cgroup/cpuset.c b/kernel/cgroup/cpuset.c
+> index 8595f1eadf23..aa1ac7bcf2ea 100644
+> --- a/kernel/cgroup/cpuset.c
+> +++ b/kernel/cgroup/cpuset.c
+> @@ -279,6 +279,13 @@ void cpuset_full_unlock(void)
+>  	cpus_read_unlock();
+>  }
+>  
+> +#ifdef CONFIG_LOCKDEP
+> +bool lockdep_is_cpuset_held(void)
+> +{
+> +	return lockdep_is_held(&cpuset_mutex);
+> +}
+> +#endif
+> +
+>  static DEFINE_SPINLOCK(callback_lock);
+>  
+>  void cpuset_callback_lock_irq(void)
 
-Applied, thanks!
+Is the lockdep_is_cpuset_held function actually being used?
+If CONFIG_LOCKDEP is disabled, compilation would fail with an "undefined reference to
+lockdep_is_cpuset_held" error.
 
-[1/2] block/mq-deadline: Introduce dd_start_request()
-      commit: 667312e1c0c091bd6d62cabd3d6e03e0a757d87c
-[2/2] block/mq-deadline: Switch back to a single dispatch list
-      commit: 2f52aa87a0b7da80f50aff13904b82d24171d1a7
-
-Best regards,
 -- 
-Jens Axboe
-
-
+Best regards,
+Ridong
 
