@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 372AD27510B;
-	Wed, 15 Oct 2025 19:45:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47EF0306D54;
+	Wed, 15 Oct 2025 19:46:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760557520; cv=none; b=MZ+iKuOH3JVz8pe7FlFufBYjqD4z8NR4nSr+8GUecevoIMudZfeOaNQiG2FMSsyTVOOrw/1cYvYJpMcTxWBDI4RiTH6DYtQ33rBhOrW/wvapl7DZgS+ab6sPJSdk0hCg3E20lNnRTCfN4cL2QU5r7YpOfPATAnMvoysxLDOv2HU=
+	t=1760557605; cv=none; b=iYs9nSyupPZUo+OmcFcVYISuVT4UPP/vGe+hl3DDRulneFMN8uGMc93ZIXjNAqnE01jXK7eogi5oD7Qc4VxDJyx97a0UEae54r641DNwUgQ8M5PiTLk/5o2N7b4tc6LNwYZh0SFzDVu+PgPnC7x3umXyAFhy3/5hvbMGZF4Fxus=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760557520; c=relaxed/simple;
-	bh=IWDvgHrNRXsJC6ijNTXcpCrTPLdLcwSZQO75DuUtld4=;
+	s=arc-20240116; t=1760557605; c=relaxed/simple;
+	bh=trNVlACVEPgu/xTitsGyA6WROkVMAJ73k0f72uIbq9I=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QQQo+i4p+TYSmFbGGMkSYPJAIHQD1ZAsiAOg/0ZoNqfWdXxwnAThB+BCzIm3cPhOhmtDFSIcQYNEc2bAdWpPEW4n6rospcz7xkHKQIPJu1yT99YNjU0DnbRmGZVsQJv2ZVKlEs9mXCCMVlJ4kMBk8+OMZluyjs9rLNOqLBP3d0M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fAY0f2Ja; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:Content-Type; b=awfNPF2MzRQDvqjAT0Pe0ykKGJ1OWk0XpQubUCwcYrP/hHCSfEr3ahm1ho4nZZo7K6ZOHycrW/2/itDbItaQTctzfMMxrvtL6jKkLAvM9qnEAoB7flIPyzW+f6PYXz/2YPRY96CK7q4DJxvJ5aMuXtJHtKdlwEqd5vehN4ZszSU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PmObyqqr; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fAY0f2Ja"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55264C4CEF8;
-	Wed, 15 Oct 2025 19:45:11 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PmObyqqr"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC874C4CEF8;
+	Wed, 15 Oct 2025 19:46:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760557519;
-	bh=IWDvgHrNRXsJC6ijNTXcpCrTPLdLcwSZQO75DuUtld4=;
+	s=k20201202; t=1760557602;
+	bh=trNVlACVEPgu/xTitsGyA6WROkVMAJ73k0f72uIbq9I=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=fAY0f2JaiK+L78/flAUN8QiA5PLdaoco58+74U03xlfzkq7U/ceNc/ryrYaS/ShbG
-	 U2sWY6LTCXaRyPKSzJaOTD5r1+T8tX8j8AEheIroLYNCmhfWcWFFR8DxVuWVFzCExC
-	 kAKWHgyFVND72AlJBnalQty5cj8/LJZy+bwkG+K1r6L+SiChRTrsODC7FE5qQsnvVW
-	 fFst4rhw9wTAALS2Y+w9mqzXtmkBxQZh/5QW36NZjxh8ucfILsXZ8IochlHBEcNhe1
-	 gF80a3Gen9Y9T0e/PhiiPQNuzq2GzakAezxFK3ZGLUkk2gqzf9M3qV5Z4/OMKv8r9d
-	 sdjlTwLMcku2Q==
-Message-ID: <8274ea26-b08c-466e-a323-f8ddc7fdaa8a@kernel.org>
-Date: Wed, 15 Oct 2025 21:45:09 +0200
+	b=PmObyqqrrXdgPiR6pShRrB6vaHUSCGHOOCIIRlke82WNd1memIa+huxaOAudBJjar
+	 G7rrlBkbwN+IS97TIGrepcpGkJzWvXTy27x/oJIfdKaNkJy8ClErmR+4IYD4Jve7Pr
+	 Iz+tycZOrgcK1lU1Zzqt1uzgcrR8usTt1syL1oDl166B645Ez/uPrioHc520aFWAe0
+	 N5AKIzvQZEkRHlUiwx1V3+AykIk9EIFaTpLiyjiraj5F3ZEW6Ht7pleK357zCcdsO5
+	 /tGXPc65kk523Y5v4HNCtMaYdBwmtF6pUCQZyQdFOxHRIp7xw1W+lJm39sLiulSJUS
+	 ecg3YsxQVF40Q==
+Message-ID: <4c1f4cf1-a00e-4145-80eb-a1dbc86258f6@kernel.org>
+Date: Wed, 15 Oct 2025 21:46:33 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -35,7 +35,7 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v17 07/11] rust: debugfs: use `kernel::fmt`
+Subject: Re: [PATCH v17 08/11] rust: pci: use `kernel::fmt`
 To: Tamir Duberstein <tamird@gmail.com>
 Cc: Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>,
  Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>,
@@ -65,10 +65,10 @@ Cc: Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>,
  llvm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
  linux-block@vger.kernel.org, linux-pci@vger.kernel.org
 References: <20251015-cstr-core-v17-0-dc5e7aec870d@gmail.com>
- <20251015-cstr-core-v17-7-dc5e7aec870d@gmail.com>
+ <20251015-cstr-core-v17-8-dc5e7aec870d@gmail.com>
 From: Danilo Krummrich <dakr@kernel.org>
 Content-Language: en-US
-In-Reply-To: <20251015-cstr-core-v17-7-dc5e7aec870d@gmail.com>
+In-Reply-To: <20251015-cstr-core-v17-8-dc5e7aec870d@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
@@ -76,9 +76,8 @@ On 10/15/25 9:24 PM, Tamir Duberstein wrote:
 > Reduce coupling to implementation details of the formatting machinery by
 > avoiding direct use for `core`'s formatting traits and macros.
 > 
-> This backslid in commit 40ecc49466c8 ("rust: debugfs: Add support for
-> callback-based files") and commit 5e40b591cb46 ("rust: debugfs: Add
-> support for read-only files").
+> This backslid in commit ed78a01887e2 ("rust: pci: provide access to PCI
+> Class and Class-related items").
 > 
 > Signed-off-by: Tamir Duberstein <tamird@gmail.com>
 
