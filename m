@@ -1,162 +1,131 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from canpmsgout05.his.huawei.com (canpmsgout05.his.huawei.com [113.46.200.220])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A48627B4EB
-	for <linux-block@vger.kernel.org>; Wed, 15 Oct 2025 01:43:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0299D1E51EC;
+	Wed, 15 Oct 2025 01:55:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.220
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760492585; cv=none; b=NmStJwVbw9SKp24Lsk7oFMPrETEv4HgWUSVfGsCkkorVoIBKdreVLd5BVvfecapyG7c52aqdcj0+9z/tD1TW4AAYZ060pRiu1fD9vsq6fMwVf7FJQ19wrTDiPgAOPGPxonLSQ5Q/6ztiyGzh1aGVKNYRW/sF3M4PdkDkfPUkgsM=
+	t=1760493340; cv=none; b=LPv2+N48WLPOdWn98DiePtVs+JoUHIpmOkAQ/5f3juMIGJFTnV99boEkvG3+o7W2YjlI9/5LDF0Vxiz/g2iJOgo30GBZHd7FqO8Mj+acb+buPv/7hjf+ZHwAiTSpfGyG+JpCtqLvSU/QW1kzWP0SulceyHKY+F8/l9lcytv1SXo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760492585; c=relaxed/simple;
-	bh=tBXK6fGWeHXi5aXqSeF7tZ0jsUnK/jtkq1Vngbc+nVw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FJHyCEYihftsM7mLMEWM+X1xFfor5Nn3KQ3iwuRGuOMO+4zYBsM7ATlOl8bIdqSW50QSyUTz7EqHf/WuqayTMWZyK2u+ZYg/Jw4ok7WOXEgxhNzm00YxMTNeZcYx6qchhFM/FkxAPoou8Kb0uZKGGcIN8KbWKfhVp9FkTx+vluk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UELuM5tl; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1760493340; c=relaxed/simple;
+	bh=QywEXJQDwzIBsIoMC48r7hsSuVI4Yke3YOfvtOdpS1s=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=UHzbXxY3yc8avIAOSHDAROQn4+dLNirFWHTyFYP7TsTCUo3kag+ElXZhuffOz/SFYiO+dQipjaQUjkvEm/om9VOZSju+hgI7brmVlDIRng06m0hdPUTjtEyur2A4qIyHn47NsdSguHjuVsCPPaA5MA8CWCq8r0gFPUpB1vV9lmg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=PSf34zEJ; arc=none smtp.client-ip=113.46.200.220
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UELuM5tl"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1760492581;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0eEQrY4re1h6qdVirHmmH/RKJ0TU8/Alpc97VBSqBIg=;
-	b=UELuM5tl4jY2t0pD+3idZpRItojVliyFjV1zuCSCEXPiAWhZDH4bIGsoe4thHEYc2r4+Ld
-	b/0iKP6ikxDaHEqE/lhpKDOz/zYsLfygRAI34dfFWfJzTmZWwCVjlyGOvO8fDjGNDhH7Ae
-	PbftfmCqm2CESEtxRZ86FXN2GAbu5FY=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-121-CXnLwrmwPZWt5uI_XH2HlA-1; Tue,
- 14 Oct 2025 21:42:57 -0400
-X-MC-Unique: CXnLwrmwPZWt5uI_XH2HlA-1
-X-Mimecast-MFC-AGG-ID: CXnLwrmwPZWt5uI_XH2HlA_1760492576
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2222E1800451;
-	Wed, 15 Oct 2025 01:42:55 +0000 (UTC)
-Received: from fedora (unknown [10.72.120.29])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8688A19560B4;
-	Wed, 15 Oct 2025 01:42:45 +0000 (UTC)
-Date: Wed, 15 Oct 2025 09:42:40 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Yu Kuai <hailan@yukuai.org.cn>
-Cc: Nilay Shroff <nilay@linux.ibm.com>, Yu Kuai <yukuai3@huawei.com>,
-	tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk,
-	cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, yukuai1@huaweicloud.com,
-	yi.zhang@huawei.com, yangerkun@huawei.com, johnny.chenyi@huawei.com
-Subject: Re: [PATCH 0/4] blk-rq-qos: fix possible deadlock
-Message-ID: <aO78EFfuT_o5Gcng@fedora>
-References: <20251014022149.947800-1-yukuai3@huawei.com>
- <d4fe218b-9fc5-4466-ac56-0d4c5a8ccd96@linux.ibm.com>
- <e5e7ac3f-2063-473a-aafb-4d8d43e5576e@yukuai.org.cn>
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="PSf34zEJ"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=rISyZZohDOA48rYR7QnxUvmI0kDql7L2L+cpbICOFNA=;
+	b=PSf34zEJFi/ru4qEC55lGXW0MgHcgIu29OFSoePMljv8dRDymUDbPFi/GdEOrHmbyHCU4IMMK
+	WaT4N8QaQ+G8AAh9FKwJF/bSdNAYGIdRvYYxut7FSh34zUWw2bl52vQXFWGkr59dVY+xRXvNNUs
+	Oiu/hPknyCgBKtzye99EsKQ=
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by canpmsgout05.his.huawei.com (SkyGuard) with ESMTPS id 4cmZ0456pfz12LFc;
+	Wed, 15 Oct 2025 09:54:44 +0800 (CST)
+Received: from kwepemk500007.china.huawei.com (unknown [7.202.194.92])
+	by mail.maildlp.com (Postfix) with ESMTPS id 02C521800EB;
+	Wed, 15 Oct 2025 09:55:30 +0800 (CST)
+Received: from huawei.com (10.50.87.129) by kwepemk500007.china.huawei.com
+ (7.202.194.92) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Wed, 15 Oct
+ 2025 09:55:29 +0800
+From: Yu Kuai <yukuai3@huawei.com>
+To: <axboe@kernel.dk>, <clm@meta.com>, <nilay@linux.ibm.com>
+CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<yukuai3@huawei.com>, <yukuai1@huaweicloud.com>, <yi.zhang@huawei.com>,
+	<yangerkun@huawei.com>, <johnny.chenyi@huawei.com>
+Subject: [PATCH] blk-mq: fix stale tag depth for shared sched tags in blk_mq_update_nr_requests()
+Date: Wed, 15 Oct 2025 09:48:27 +0800
+Message-ID: <20251015014827.2997591-1-yukuai3@huawei.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <e5e7ac3f-2063-473a-aafb-4d8d43e5576e@yukuai.org.cn>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
+ kwepemk500007.china.huawei.com (7.202.194.92)
 
-On Tue, Oct 14, 2025 at 07:14:16PM +0800, Yu Kuai wrote:
-> Hi,
-> 
-> 在 2025/10/14 18:58, Nilay Shroff 写道:
-> > 
-> > On 10/14/25 7:51 AM, Yu Kuai wrote:
-> > > Currently rq-qos debugfs entries is created from rq_qos_add(), while
-> > > rq_qos_add() requires queue to be freezed. This can deadlock because
-> > > 
-> > > creating new entries can trigger fs reclaim.
-> > > 
-> > > Fix this problem by delaying creating rq-qos debugfs entries until
-> > > it's initialization is complete.
-> > > 
-> > > - For wbt, it can be initialized by default of by blk-sysfs, fix it by
-> > >    delaying after wbt_init();
-> > > - For other policies, they can only be initialized by blkg configuration,
-> > >    fix it by delaying to blkg_conf_end();
-> > > 
-> > > Noted this set is cooked on the top of my other thread:
-> > > https://lore.kernel.org/all/20251010091446.3048529-1-yukuai@kernel.org/
-> > > 
-> > > And the deadlock can be reporduced with above thead, by running blktests
-> > > throtl/001 with wbt enabled by default. While the deadlock is really a
-> > > long term problem.
-> > > 
-> > While freezing the queue we also mark GFP_NOIO scope, so doesn't that
-> > help avoid fs-reclaim? Or maybe if you can share the lockdep splat
-> > encountered running throtl/001?
-> 
-> Yes, we can avoid fs-reclaim if queue is freezing, however,
-> because debugfs is a generic file system, and we can't avoid fs reclaim from
-> all context. There is still
-> 
-> Following is the log with above set and wbt enabled by default, the set acquire
-> lock order by:
-> 
-> freeze queue -> elevator lock -> rq_qos_mutex -> blkcg_mutex
-> 
-> However, fs-reclaim from other context cause the deadlock report.
-> 
-> 
-> [   45.632372][  T531] ======================================================
-> [   45.633734][  T531] WARNING: possible circular locking dependency detected
-> [   45.635062][  T531] 6.17.0-gfd4a560a0864-dirty #30 Not tainted
-> [   45.636220][  T531] ------------------------------------------------------
-> [   45.637587][  T531] check/531 is trying to acquire lock:
-> [   45.638626][  T531] ffff9473884382b0 (&q->rq_qos_mutex){+.+.}-{4:4}, at: blkg_
-> conf_start+0x116/0x190
-> [   45.640416][  T531]
-> [   45.640416][  T531] but task is already holding lock:
-> [   45.641828][  T531] ffff9473884385d8 (&q->elevator_lock){+.+.}-{4:4}, at: blkg
-> _conf_start+0x108/0x190
-> [   45.643322][  T531]
-> [   45.643322][  T531] which lock already depends on the new lock.
-> [   45.643322][  T531]
-> [   45.644862][  T531]
-> [   45.644862][  T531] the existing dependency chain (in reverse order) is:
-> [   45.646046][  T531]
-> [   45.646046][  T531] -> #5 (&q->elevator_lock){+.+.}-{4:4}:
-> [   45.647052][  T531]        __mutex_lock+0xd3/0x8d0
-> [   45.647716][  T531]        blkg_conf_start+0x108/0x190
-> [   45.648395][  T531]        tg_set_limit+0x74/0x300
-> [   45.649046][  T531]        kernfs_fop_write_iter+0x14a/0x210
-> [   45.649813][  T531]        vfs_write+0x29e/0x550
-> [   45.650413][  T531]        ksys_write+0x74/0xf0
-> [   45.651032][  T531]        do_syscall_64+0xbb/0x380
-> [   45.651730][  T531] entry_SYSCALL_64_after_hwframe+0x77/0x7f
+Commit 7f2799c546db ("blk-mq: cleanup shared tags case in
+blk_mq_update_nr_requests()") moves blk_mq_tag_update_sched_shared_tags()
+before q->nr_requests is updated, however, it's still using the old
+q->nr_requests to resize tag depth.
 
-Not sure why elevator lock is grabbed in throttle code, which looks a elevator lock
-misuse, what does the elevator try to protect here?
+Fix this problem by passing in expected new tag depth.
 
-The comment log doesn't explain the usage too:
+Fixes: 7f2799c546db ("blk-mq: cleanup shared tags case in blk_mq_update_nr_requests()")
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+---
+ block/blk-mq-sched.c | 2 +-
+ block/blk-mq-tag.c   | 5 +++--
+ block/blk-mq.c       | 2 +-
+ block/blk-mq.h       | 3 ++-
+ 4 files changed, 7 insertions(+), 5 deletions(-)
 
-```
-  /*
-   * Similar to blkg_conf_open_bdev, but additionally freezes the queue,
-   * acquires q->elevator_lock, and ensures the correct locking order
-   * between q->elevator_lock and q->rq_qos_mutex.
-   *
-   * This function returns negative error on failure. On success it returns
-   * memflags which must be saved and later passed to blkg_conf_exit_frozen
-   * for restoring the memalloc scope.
-   */
-```
-
-I think it is still order issue between queue freeze and q->rq_qos_mutex
-first, which need to be solved first.
-
-
-Thanks, 
-Ming
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index d06bb137a743..e0bed16485c3 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -557,7 +557,7 @@ int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e,
+ 	if (blk_mq_is_shared_tags(flags)) {
+ 		/* Shared tags are stored at index 0 in @et->tags. */
+ 		q->sched_shared_tags = et->tags[0];
+-		blk_mq_tag_update_sched_shared_tags(q);
++		blk_mq_tag_update_sched_shared_tags(q, et->nr_requests);
+ 	}
+ 
+ 	queue_for_each_hw_ctx(q, hctx, i) {
+diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+index c7a4d4b9cc87..5b664dbdf655 100644
+--- a/block/blk-mq-tag.c
++++ b/block/blk-mq-tag.c
+@@ -622,10 +622,11 @@ void blk_mq_tag_resize_shared_tags(struct blk_mq_tag_set *set, unsigned int size
+ 	sbitmap_queue_resize(&tags->bitmap_tags, size - set->reserved_tags);
+ }
+ 
+-void blk_mq_tag_update_sched_shared_tags(struct request_queue *q)
++void blk_mq_tag_update_sched_shared_tags(struct request_queue *q,
++					 unsigned int nr)
+ {
+ 	sbitmap_queue_resize(&q->sched_shared_tags->bitmap_tags,
+-			     q->nr_requests - q->tag_set->reserved_tags);
++			     nr - q->tag_set->reserved_tags);
+ }
+ 
+ /**
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 09f579414161..d626d32f6e57 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -4941,7 +4941,7 @@ struct elevator_tags *blk_mq_update_nr_requests(struct request_queue *q,
+ 		 * tags can't grow, see blk_mq_alloc_sched_tags().
+ 		 */
+ 		if (q->elevator)
+-			blk_mq_tag_update_sched_shared_tags(q);
++			blk_mq_tag_update_sched_shared_tags(q, nr);
+ 		else
+ 			blk_mq_tag_resize_shared_tags(set, nr);
+ 	} else if (!q->elevator) {
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index af42dc018808..c4fccdeb5441 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -186,7 +186,8 @@ void blk_mq_put_tag(struct blk_mq_tags *tags, struct blk_mq_ctx *ctx,
+ void blk_mq_put_tags(struct blk_mq_tags *tags, int *tag_array, int nr_tags);
+ void blk_mq_tag_resize_shared_tags(struct blk_mq_tag_set *set,
+ 		unsigned int size);
+-void blk_mq_tag_update_sched_shared_tags(struct request_queue *q);
++void blk_mq_tag_update_sched_shared_tags(struct request_queue *q,
++					 unsigned int nr);
+ 
+ void blk_mq_tag_wakeup_all(struct blk_mq_tags *tags, bool);
+ void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_tag_iter_fn *fn,
+-- 
+2.39.2
 
