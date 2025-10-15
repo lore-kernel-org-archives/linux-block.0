@@ -1,71 +1,61 @@
-Received: from esa6.hgst.iphmx.com (esa6.hgst.iphmx.com [216.71.154.45])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E17DD3233E8;
-	Wed, 15 Oct 2025 10:58:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.71.154.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E809731B126
+	for <linux-block@vger.kernel.org>; Wed, 15 Oct 2025 11:07:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760525919; cv=none; b=Xf5qSdcaHRUsl3NrmbMGZG1Vyu8Sq9hZOX/ExQ2LPNi+LuWIh+PvUvcVWuB4Gdu36M00rRDpFdYk9CGJba9QlaMed2cOIsHtI7z2oJNGMiGkGTfVU32H9L9z0qap6dGshLKD57/KKsfRKXCM1CU6n29BFSTRMkpjGoYQNc+Mlno=
+	t=1760526475; cv=none; b=ZDA2jMDGVyQZucTb5o1IDU7HB4g0X9FNtRJaFfA6O5UNIZBYNHiN44xAA1VyFZ29UNh/oIgKqMci1ho/3zJWwe8+llh1FI+J8n6X3OWDwFAr+3VbXbbqufCCgFLEhsBCa07BvYC6HmKTNI136UorxouU1GwHMHG55+xYYEtkzf4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760525919; c=relaxed/simple;
-	bh=2H5LFMNPaYyglNMEHb+f7AgkaPYbc1RUaom07P26U+A=;
+	s=arc-20240116; t=1760526475; c=relaxed/simple;
+	bh=WFQy7Mc6x2CvbixLnZF28ReifYRSw3+8WX5aDrTwlcE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=EP50M9vqCNOPIJQOnUlJKjwdyulw87DwUPP2qZ1DMGnQJ/s96t+8lfaxNNbHoU4ZqL7mO/2Kg4wVjFWezuMCQdV25XDif3hMhygef6CMqX5icJqYFRmQgO1xeSJN6CXkwWkgGX5wIGlKz0sCKq0BIrSSoEiZ3CKvHJ0tedzsN88=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=rCG6bhFc; arc=none smtp.client-ip=216.71.154.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
+	 MIME-Version; b=Nmp6RwXLhwI1LMQcB04Kf2YkDmweoPNHbyqLW4kbJxDgUmQoYqPhbdcuNJ5CqdN61wNnx8Oyr7O0VoomX0pnF036/ya3NPZQAE+tovnldmlVln90T9sn57FQMP/C7QdK/auP0+L5G14TtdW7xdboS+dztlvkeVLNnxKRH1dTsKk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hfTNwIrV; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="rCG6bhFc"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1760525917; x=1792061917;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=2H5LFMNPaYyglNMEHb+f7AgkaPYbc1RUaom07P26U+A=;
-  b=rCG6bhFcA7DW2cU/gAFQy7+iMMLBlaSrpcOzE4l3pVWb/ATVP1szFxXP
-   DmJh+OQRz/xNNoOgmjh7E0B6D7JlmGEwXBePUS7aMGwdJo8TLHgDVwzGu
-   Z/to9Adf7gnGQ3K4PeXY32dZ/5J+siy5PIowW+vPXXx/VeCUtfTNGcH9S
-   HtXeCmnyek4VErsHisfnauVyWROZf+NdKQ9W8R1NNrDqHkuEhx3TH+g8S
-   gU2ujxWOHo5OTITF7bG7ara70dUjX/FdEGuTwMy1Jy87EKyEWXYsjMHJm
-   PvR6s7uq6fBqu721yI5RWGp2i3VaaEwYru6kncadyL11DWTbLgc0qHAev
-   g==;
-X-CSE-ConnectionGUID: FAeD6Hi4Rae0JDcgS6++AQ==
-X-CSE-MsgGUID: OKXP52c2RkqiqSkjqx2xkA==
-X-IronPort-AV: E=Sophos;i="6.19,231,1754928000"; 
-   d="scan'208";a="132935428"
-Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 15 Oct 2025 18:58:37 +0800
-IronPort-SDR: 68ef7e5d_v4mgOAv+euj3JcQIQsuWloXTgmJUG2dtPDUj8kf4Co1Madu
- 9FujGPt8xkSR1Mv5pe6+YIfyO8Zo8HA2S9WQY/g==
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 15 Oct 2025 03:58:37 -0700
-WDCIronportException: Internal
-Received: from unknown (HELO neo.fritz.box) ([10.224.28.35])
-  by uls-op-cesaip02.wdc.com with ESMTP; 15 Oct 2025 03:58:34 -0700
-From: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-To: axboe@kernel.dk
-Cc: chaitanyak@nvidia.com,
-	dlemoal@kernel.org,
-	hare@suse.de,
-	hch@lst.de,
-	john.g.garry@oracle.com,
-	linux-block@vger.kernel.org,
-	linux-btrace@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org,
-	martin.petersen@oracle.com,
-	mathieu.desnoyers@efficios.com,
-	mhiramat@kernel.org,
-	naohiro.aota@wdc.com,
-	rostedt@goodmis.org,
-	shinichiro.kawasaki@wdc.com,
-	Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Subject: [PATCH blktrace v3 20/20] blktrace: call BLKTRACESETUP2 ioctl per default to setup a trace
-Date: Wed, 15 Oct 2025 12:56:58 +0200
-Message-ID: <20251015105658.527262-21-johannes.thumshirn@wdc.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20251015105658.527262-1-johannes.thumshirn@wdc.com>
-References: <20251015105658.527262-1-johannes.thumshirn@wdc.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hfTNwIrV"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1760526472;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=k8pAXgWyE9GjvTf/aoS6e1A6VsLWuClIIEsEZgzQGcw=;
+	b=hfTNwIrV3aj80mJ6tX3XdneT86H3/K5Zom5V3LNi0iGC6MGpYeEk0e1a+OoGvW7cQbrTk1
+	/82w3FEijcHqHLwURakD0rPWOtr/V8vPGTjNpDAZ75hNDYz2WyG6jbtlwBxvfIrX9UE8um
+	nRAQMHlTUZYXTFZdUrfbR7Ss1otWjJ8=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-453-zRYexjqbMcSD-HnLJMSisg-1; Wed,
+ 15 Oct 2025 07:07:51 -0400
+X-MC-Unique: zRYexjqbMcSD-HnLJMSisg-1
+X-Mimecast-MFC-AGG-ID: zRYexjqbMcSD-HnLJMSisg_1760526470
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C0A031808997;
+	Wed, 15 Oct 2025 11:07:50 +0000 (UTC)
+Received: from localhost (unknown [10.72.120.29])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id A71DD30001A1;
+	Wed, 15 Oct 2025 11:07:48 +0000 (UTC)
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: Mikulas Patocka <mpatocka@redhat.com>,
+	Zhaoyang Huang <zhaoyang.huang@unisoc.com>,
+	Dave Chinner <dchinner@redhat.com>,
+	linux-fsdevel@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V5 1/6] loop: add helper lo_cmd_nr_bvec()
+Date: Wed, 15 Oct 2025 19:07:26 +0800
+Message-ID: <20251015110735.1361261-2-ming.lei@redhat.com>
+In-Reply-To: <20251015110735.1361261-1-ming.lei@redhat.com>
+References: <20251015110735.1361261-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -73,80 +63,54 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-Call BLKTRACESETUP2 ioctl per default and if the kernel does not support
-this ioctl because it is too old, fall back to calling BLKTRACESETUP.
+Add lo_cmd_nr_bvec() and prepare for refactoring lo_rw_aio().
 
-Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- blktrace.c | 40 ++++++++++++++++++++++++++++++++++++----
- 1 file changed, 36 insertions(+), 4 deletions(-)
+ drivers/block/loop.c | 18 ++++++++++++++----
+ 1 file changed, 14 insertions(+), 4 deletions(-)
 
-diff --git a/blktrace.c b/blktrace.c
-index 038b2cb..72562fd 100644
---- a/blktrace.c
-+++ b/blktrace.c
-@@ -279,7 +279,7 @@ static int max_cpus;
- static int ncpus;
- static cpu_set_t *online_cpus;
- static int pagesize;
--static int act_mask = ~0U;
-+static unsigned long long act_mask = ~0U;
- static int kill_running_trace;
- static int stop_watch;
- static int piped_output;
-@@ -1067,6 +1067,36 @@ static void close_client_connections(void)
- 	}
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 053a086d547e..af443651dff5 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -337,6 +337,19 @@ static void lo_rw_aio_complete(struct kiocb *iocb, long ret)
+ 	lo_rw_aio_do_completion(cmd);
  }
  
-+static int setup_buts2(void)
++static inline unsigned lo_cmd_nr_bvec(struct loop_cmd *cmd)
 +{
-+	struct list_head *p;
-+	int ret = 0;
++	struct request *rq = blk_mq_rq_from_pdu(cmd);
++	struct req_iterator rq_iter;
++	struct bio_vec tmp;
++	int nr_bvec = 0;
 +
-+	__list_for_each(p, &devpaths) {
-+		struct blk_user_trace_setup2 buts2;
-+		struct devpath *dpp = list_entry(p, struct devpath, head);
++	rq_for_each_bvec(tmp, rq, rq_iter)
++		nr_bvec++;
 +
-+		memset(&buts2, 0, sizeof(buts2));
-+		buts2.buf_size = buf_size;
-+		buts2.buf_nr = buf_nr;
-+		buts2.act_mask = act_mask;
-+
-+		if (ioctl(dpp->fd, BLKTRACESETUP2, &buts2) >= 0) {
-+			dpp->ncpus = max_cpus;
-+			dpp->buts_name = strdup(buts2.name);
-+			dpp->setup_done = 1;
-+			if (dpp->stats)
-+				free(dpp->stats);
-+			dpp->stats = calloc(dpp->ncpus, sizeof(*dpp->stats));
-+			memset(dpp->stats, 0, dpp->ncpus * sizeof(*dpp->stats));
-+		} else {
-+			ret++;
-+		}
-+	}
-+
-+	return ret;
++	return nr_bvec;
 +}
 +
- static int setup_buts(void)
+ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
+ 		     loff_t pos, int rw)
  {
- 	struct list_head *p;
-@@ -2684,9 +2714,11 @@ static int run_tracers(void)
- 	if (net_mode == Net_client)
- 		printf("blktrace: connecting to %s\n", hostname);
+@@ -348,12 +361,9 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
+ 	struct file *file = lo->lo_backing_file;
+ 	struct bio_vec tmp;
+ 	unsigned int offset;
+-	int nr_bvec = 0;
++	int nr_bvec = lo_cmd_nr_bvec(cmd);
+ 	int ret;
  
--	if (setup_buts()) {
--		done = 1;
--		return 1;
-+	if (setup_buts2()) {
-+		if (setup_buts()) {
-+			done = 1;
-+			return 1;
-+		}
- 	}
+-	rq_for_each_bvec(tmp, rq, rq_iter)
+-		nr_bvec++;
+-
+ 	if (rq->bio != rq->biotail) {
  
- 	if (use_tracer_devpaths()) {
+ 		bvec = kmalloc_array(nr_bvec, sizeof(struct bio_vec),
 -- 
-2.51.0
+2.47.0
 
