@@ -1,81 +1,79 @@
-Received: from 004.mia.mailroute.net (004.mia.mailroute.net [199.89.3.7])
+Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F184733769D;
-	Wed, 15 Oct 2025 16:35:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E212305042
+	for <linux-block@vger.kernel.org>; Wed, 15 Oct 2025 19:15:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.71.153.141
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760546138; cv=none; b=qHJnZ82R0pLJDY9HVIj3mfiCDpxR9ASeSfaOlJ5GmlWdM2lU65AIps32cYwb5iEY8sMrYZCXxW2U/fZuyW8yWcJ+Q9tPKh27fbI1pVbGBV0yij4xRaZqWtXquXZlkSqwUZwCALYBshC4KRB3lPXcI1ZPlPaD6iRQco3vWVoT2rM=
+	t=1760555708; cv=none; b=SqEXMO79qGB3V8uH4CKgqtHU+1CAXsW3xiz3ePbmaHHfJt/vzMUI+jRkg8ZFKtkIUpLhttVYpPln8AG/8OYcdNgdLzTj8Gj1c3ITddFKI3z5QeP6ZsIC1RHLDVL7MHb0mRkoXi34QZw7uqb9QIArVjf1whuQLvy/BYQ/e0VUcr0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760546138; c=relaxed/simple;
-	bh=gMDpsY0OBW+a4KAJ9ztSaalh4BBCF9av0aRhHcEskBE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QbwLCcvDJ91n+BFYSweWlhiRvtg9fx2IDWMsdktTPO1mHdlobmaQzMGM1Igxapy1Ro2MgsSZv2+6VAvjuq2nyIfLHvFBiXGtaQNmj77gVvQnFK/5aVtWms7I7xcSEBCKyD5YFGQi+yKmPmXjYtfuZoJVfQTixkynYmDQ8B0/yYM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=P6/W0tRQ; arc=none smtp.client-ip=199.89.3.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1760555708; c=relaxed/simple;
+	bh=4g+VrAgjmyuRBWOxx4agSFjkPAiOci6QHvAGDqCcK4E=;
+	h=Date:Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
+	 Subject:From:To:Cc; b=ZcTSbsorPPnhgxOtagHY0/nUAB5rvPfEuHty1sKvuKvO+yvh85ZVZ/Am78Pzrzv9t9q5GUHXojl+xl9lwG5k9jZnlO8QFMZ+TBkdTvOtw9QuOh/WzmEpQXStNy0DUx1hKREAH8fnS39MwMr959wMA7OsJg6QixwwZ8hovd/1RGU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=H13rEzYh; arc=none smtp.client-ip=216.71.153.141
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="P6/W0tRQ"
-Received: from localhost (localhost [127.0.0.1])
-	by 004.mia.mailroute.net (Postfix) with ESMTP id 4cmxXR5NVRzm16kl;
-	Wed, 15 Oct 2025 16:35:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1760546134; x=1763138135; bh=DEWkkSgYJfoQoJCaidm/v0Mk
-	55du1F31xNxRsQ6YuNQ=; b=P6/W0tRQ1npbpph7pyDKVg4R8hk0VrltBLnNoKVo
-	+Vs7xh24vAr6ZDTYdIBNz0VYYx7KX/Fn5pyRbfkeE7xS169daw5MxDmr6c75/FTF
-	hrNqJfGFFCOnZ+4jZm2s12eApnrHpD67Qs99abfkxcIXkNYHibqJS2jdvoj+dN6c
-	S4mKNllTFzeU1KncBwodrxnSxY9j1anIBKY64NsMtpP6lAOYatrlwbPMAkmw+o9e
-	kMp3dGNS584aL1Q3zdhiBFk9QSZblmeJyJ/zH67CEQTGcwZhMhAoDpyTT8O8UrT3
-	iiACfP+rKTMsayR1kwsRE9nkW2TKELUSYgWFoGotKsE/2Q==
-X-Virus-Scanned: by MailRoute
-Received: from 004.mia.mailroute.net ([127.0.0.1])
- by localhost (004.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id n-zgqd0Hcsq0; Wed, 15 Oct 2025 16:35:34 +0000 (UTC)
-Received: from [100.119.48.131] (unknown [104.135.180.219])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 004.mia.mailroute.net (Postfix) with ESMTPSA id 4cmxXM2pM8zm16kk;
-	Wed, 15 Oct 2025 16:35:29 +0000 (UTC)
-Message-ID: <c2c9b136-fe21-432f-9ec9-42382e6f0a69@acm.org>
-Date: Wed, 15 Oct 2025 09:35:29 -0700
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="H13rEzYh"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1760555707; x=1792091707;
+  h=date:mime-version:message-id:in-reply-to:references:
+   subject:from:to:cc;
+  bh=4g+VrAgjmyuRBWOxx4agSFjkPAiOci6QHvAGDqCcK4E=;
+  b=H13rEzYhj/Il5dS7k6j4jBFbRyPCI8EdDO4LfG8+qwnFK50TgqEVJK72
+   SyiciV8Ci+Qu+mLzFHkxojm4jjGgDJ9We9UB1/m+5CVlZtxjAy+mYKj/v
+   d4ujd6BYGZzUMxNoF4yQoSuCrdFwnIucmMj+OXxdiGdu7BLx/ZSxkf+/U
+   S1Jdv1jsds39lm8lYbIzFNM0cD/OK0nNZE6ogtkQ7VegmfBtkU5gSkneh
+   iI5v6S/cU+J/P+Qoeb56QZHUeyWIEbX+lEoCXn3Nak4k5CN8VYG1iSu7H
+   0PMamhRfqp8+BO5XcLYXAdP0exbj1WLwK+CzNvnLMrKEQFGkUhuSyqVTr
+   w==;
+X-CSE-ConnectionGUID: 28uulbmYRcWSAgm7UWzAOg==
+X-CSE-MsgGUID: s2lAMEVhTceMBLJAEU0Wwg==
+X-IronPort-AV: E=Sophos;i="6.19,232,1754928000"; 
+   d="scan'208";a="134231035"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 16 Oct 2025 03:15:04 +0800
+IronPort-SDR: 68eff2b8_TTbXKdimszXSzRmV9CPh7dhbQcY0up9NKkgcOL5vaxEn8IU
+ g8KAxns2XjolfnVm5tlD6h2XNlHCaXnqEUmSeHw==
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 15 Oct 2025 12:15:04 -0700
+Date: 15 Oct 2025 12:15:03 -0700
+WDCIronportException: Internal
+Received: from unknown (HELO redsun45) ([10.149.66.6])
+  by uls-op-cesaip02.wdc.com with ESMTP; 15 Oct 2025 12:15:03 -0700
+Content-Type: multipart/mixed; boundary="===============4188629793210510028=="
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v25 05/20] blk-mq: Run all hwqs for sq scheds if write
- pipelining is enabled
-To: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
- Christoph Hellwig <hch@lst.de>
-References: <20251014215428.3686084-1-bvanassche@acm.org>
- <20251014215428.3686084-6-bvanassche@acm.org>
- <9c8923cb-2c1b-4d04-b1ba-796472ce8c53@kernel.org>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <9c8923cb-2c1b-4d04-b1ba-796472ce8c53@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Message-Id: <5c13a5e3f257ceccb70e3d63869d8a9b6d963f6242b23690cff9d9ca7b9dbdf8@mailrelay.wdc.com>
+In-Reply-To: <20251015014827.2997591-1-yukuai3@huawei.com>
+References: <20251015014827.2997591-1-yukuai3@huawei.com>
+Subject: Re: [PATCH] blk-mq: fix stale tag depth for shared sched tags in blk_mq_update_nr_requests()
+From: shinichiro.kawasaki@wdc.com
+To: linux-block@vger.kernel.org
+Cc: shinichiro.kawasaki@wdc.com,dennis.maisenbacher@wdc.com
+
+--===============4188629793210510028==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 
-On 10/15/25 12:25 AM, Damien Le Moal wrote:
-> On 2025/10/15 6:54, Bart Van Assche wrote:
->> @@ -2412,6 +2411,11 @@ static struct blk_mq_hw_ctx *blk_mq_get_sq_hctx(struct request_queue *q)
->>   	if (!blk_queue_sq_sched(q))
->>   		return NULL;
->>   
->> +	if (blk_queue_is_zoned(q) && blk_pipeline_zwr(q) &&
->> +	    test_bit(ELEVATOR_FLAG_SUPPORTS_ZONED_WRITE_PIPELINING,
->> +		     &q->elevator->flags))
-> 
-> The above test_bit() is already done in blk_pipeline_zwr().
+Dear patch submitter,
 
-Thanks for the feedback. I will drop this test_bit() call.
+Blktests CI has tested the following submission:
+Status:     FAILURE
+Name:       blk-mq: fix stale tag depth for shared sched tags in blk_mq_update_nr_requests()
+Patchwork:  https://patchwork.kernel.org/project/linux-block/list/?series=1011590&state=*
+Run record: https://github.com/linux-blktests/linux-block/actions/runs/18524669753
 
-Bart.
+
+Failed test cases: nvme/057
+
+
+
+--===============4188629793210510028==--
