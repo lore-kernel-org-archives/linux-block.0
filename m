@@ -1,47 +1,45 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E809731B126
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF61831A560
 	for <linux-block@vger.kernel.org>; Wed, 15 Oct 2025 11:07:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760526475; cv=none; b=ZDA2jMDGVyQZucTb5o1IDU7HB4g0X9FNtRJaFfA6O5UNIZBYNHiN44xAA1VyFZ29UNh/oIgKqMci1ho/3zJWwe8+llh1FI+J8n6X3OWDwFAr+3VbXbbqufCCgFLEhsBCa07BvYC6HmKTNI136UorxouU1GwHMHG55+xYYEtkzf4=
+	t=1760526476; cv=none; b=ZgVvdn3qFtye8c4Tz4+UQlGtIkwwK1oG3JIE691IMNDgfF9ffnOC1SXhewmFZ5s+3rwwmJjB8v3ojqk1i9zP1A3w1I6kz9t+GJvTGoEI1+3hNzRl7khEQEiXMxdQu2Uc4+cZC3XTQusYacL7DArBfTZNxhw7KTUnru2Wz9UtLxo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760526475; c=relaxed/simple;
-	bh=WFQy7Mc6x2CvbixLnZF28ReifYRSw3+8WX5aDrTwlcE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Nmp6RwXLhwI1LMQcB04Kf2YkDmweoPNHbyqLW4kbJxDgUmQoYqPhbdcuNJ5CqdN61wNnx8Oyr7O0VoomX0pnF036/ya3NPZQAE+tovnldmlVln90T9sn57FQMP/C7QdK/auP0+L5G14TtdW7xdboS+dztlvkeVLNnxKRH1dTsKk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hfTNwIrV; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1760526476; c=relaxed/simple;
+	bh=T+VNlnck5F7X5yaKW6OrUk2vghLT0TALE4TLmSh0Eu4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qbGAIT49QaBqGheR+0P1iNKi+izdjd58XRBq7tX/I6CmSS19eaY2wFhW/RByfTeapJG1GjEV/1ASZlbFf5EPpksnq74JW2r7GHIBZQXIXkwqxQ//i/MoNLjHAOUn1ke+3hntU09mBg7tC+wa45/DtKQ3UhnAoBhzMmlj+iK2g8M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dbgrB6fJ; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hfTNwIrV"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dbgrB6fJ"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1760526472;
+	s=mimecast20190719; t=1760526471;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=k8pAXgWyE9GjvTf/aoS6e1A6VsLWuClIIEsEZgzQGcw=;
-	b=hfTNwIrV3aj80mJ6tX3XdneT86H3/K5Zom5V3LNi0iGC6MGpYeEk0e1a+OoGvW7cQbrTk1
-	/82w3FEijcHqHLwURakD0rPWOtr/V8vPGTjNpDAZ75hNDYz2WyG6jbtlwBxvfIrX9UE8um
-	nRAQMHlTUZYXTFZdUrfbR7Ss1otWjJ8=
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=G7tb8jol5niMEwylV1QaVwlR13998kvgQeJ5R3Qpej4=;
+	b=dbgrB6fJ5HT89uv3PfAu3OqJ59SJ6VZsUsrLGWapqkoQFbrVJlP0faReleJ2GSCa+RhIWB
+	C8Lzoy51geEkTG7ItaRcKYEKaHRAjt8faf+5WyjrLGjLa6mKWeacro+65UUgjbmsD1vMbZ
+	JxoliednYlteQPf1lfWGLNVkIcfEY6Y=
 Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-453-zRYexjqbMcSD-HnLJMSisg-1; Wed,
- 15 Oct 2025 07:07:51 -0400
-X-MC-Unique: zRYexjqbMcSD-HnLJMSisg-1
-X-Mimecast-MFC-AGG-ID: zRYexjqbMcSD-HnLJMSisg_1760526470
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-44-twHOLN-EMmK_SFNEFcKG0w-1; Wed,
+ 15 Oct 2025 07:07:48 -0400
+X-MC-Unique: twHOLN-EMmK_SFNEFcKG0w-1
+X-Mimecast-MFC-AGG-ID: twHOLN-EMmK_SFNEFcKG0w_1760526466
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C0A031808997;
-	Wed, 15 Oct 2025 11:07:50 +0000 (UTC)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B4025180120B;
+	Wed, 15 Oct 2025 11:07:45 +0000 (UTC)
 Received: from localhost (unknown [10.72.120.29])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id A71DD30001A1;
-	Wed, 15 Oct 2025 11:07:48 +0000 (UTC)
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 8717919560AD;
+	Wed, 15 Oct 2025 11:07:43 +0000 (UTC)
 From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org
@@ -51,11 +49,9 @@ Cc: Mikulas Patocka <mpatocka@redhat.com>,
 	linux-fsdevel@vger.kernel.org,
 	Christoph Hellwig <hch@lst.de>,
 	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V5 1/6] loop: add helper lo_cmd_nr_bvec()
-Date: Wed, 15 Oct 2025 19:07:26 +0800
-Message-ID: <20251015110735.1361261-2-ming.lei@redhat.com>
-In-Reply-To: <20251015110735.1361261-1-ming.lei@redhat.com>
-References: <20251015110735.1361261-1-ming.lei@redhat.com>
+Subject: [PATCH V5 0/6] loop: improve loop aio perf by IOCB_NOWAIT
+Date: Wed, 15 Oct 2025 19:07:25 +0800
+Message-ID: <20251015110735.1361261-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -63,54 +59,56 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-Add lo_cmd_nr_bvec() and prepare for refactoring lo_rw_aio().
+Hello Jens,
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/block/loop.c | 18 ++++++++++++++----
- 1 file changed, 14 insertions(+), 4 deletions(-)
+This patchset improves loop aio perf by using IOCB_NOWAIT for avoiding to queue aio
+command to workqueue context, meantime refactor lo_rw_aio() a bit.
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 053a086d547e..af443651dff5 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -337,6 +337,19 @@ static void lo_rw_aio_complete(struct kiocb *iocb, long ret)
- 	lo_rw_aio_do_completion(cmd);
- }
- 
-+static inline unsigned lo_cmd_nr_bvec(struct loop_cmd *cmd)
-+{
-+	struct request *rq = blk_mq_rq_from_pdu(cmd);
-+	struct req_iterator rq_iter;
-+	struct bio_vec tmp;
-+	int nr_bvec = 0;
-+
-+	rq_for_each_bvec(tmp, rq, rq_iter)
-+		nr_bvec++;
-+
-+	return nr_bvec;
-+}
-+
- static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
- 		     loff_t pos, int rw)
- {
-@@ -348,12 +361,9 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
- 	struct file *file = lo->lo_backing_file;
- 	struct bio_vec tmp;
- 	unsigned int offset;
--	int nr_bvec = 0;
-+	int nr_bvec = lo_cmd_nr_bvec(cmd);
- 	int ret;
- 
--	rq_for_each_bvec(tmp, rq, rq_iter)
--		nr_bvec++;
--
- 	if (rq->bio != rq->biotail) {
- 
- 		bvec = kmalloc_array(nr_bvec, sizeof(struct bio_vec),
+In my test VM, loop disk perf becomes very close to perf of the backing block
+device(nvme/mq virtio-scsi).
+
+And Mikulas verified that this way can improve 12jobs sequential readwrite io by
+~5X, and basically solve the reported problem together with loop MQ change.
+
+https://lore.kernel.org/linux-block/a8e5c76a-231f-07d1-a394-847de930f638@redhat.com/
+
+Zhaoyang Huang also mentioned it may fix their performance issue on Android
+use case.
+
+The loop MQ change will be posted as standalone patch, because it needs
+UAPI change.
+
+V5:
+	- only try nowait in case that backing file supports it (Yu Kuai)
+	- fix one lockdep assert (syzbot) 
+	- improve comment log (Christoph)
+
+V4:
+	- rebase
+	- re-organize and make it more readable 
+
+V3:
+	- add reviewed-by tag
+	- rename variable & improve commit log & comment on 5/5(Christoph)
+
+V2:
+	- patch style fix & cleanup (Christoph)
+	- fix randwrite perf regression on sparse backing file
+	- drop MQ change
+
+Ming Lei (6):
+  loop: add helper lo_cmd_nr_bvec()
+  loop: add helper lo_rw_aio_prep()
+  loop: add lo_submit_rw_aio()
+  loop: move command blkcg/memcg initialization into loop_queue_work
+  loop: try to handle loop aio command via NOWAIT IO first
+  loop: add hint for handling aio via IOCB_NOWAIT
+
+ drivers/block/loop.c | 233 +++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 194 insertions(+), 39 deletions(-)
+
 -- 
 2.47.0
 
