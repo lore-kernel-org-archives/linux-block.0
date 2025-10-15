@@ -1,48 +1,43 @@
-Received: from 004.mia.mailroute.net (004.mia.mailroute.net [199.89.3.7])
+Received: from sender4-op-o12.zoho.com (sender4-op-o12.zoho.com [136.143.188.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50415338F45;
-	Wed, 15 Oct 2025 16:32:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.7
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760545954; cv=none; b=l6dLdXGUUZsD0vzHw2nkJ6Mmw231ztli6Y//v2cQwNQuVSVnwDJQhcH/zc+xO505lwo/8EAIkpWqJpXVpEaWBCz0OwZqjUtfcwclmwEN8ID01J9ygWAKT9ckSW1hJAYLiQuOOYSlg5niOciyi6+tpUwliDORBKTfHFEMhOLvXPw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760545954; c=relaxed/simple;
-	bh=n4bfpfWUkuIt96T+6ivvpwEYLypBYO7q8X0vD17mV7w=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=od3Jon2kfu64haG6chUUwxPwltK2qerRSS+0cc8qGWKctkXsfHyxhk5ERaVd9Cf5OJPTqXJSr2QiE+308FOoKW9VNC+TXBXs7lp8VzLWIbCaXqpr9UpXLC7wl2apTRCkMA8MlYYLdwMX5VoHM6x9DfbDmWdHr4JS92Pcbqgq2Ng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=HDJSUVcX; arc=none smtp.client-ip=199.89.3.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 601212FB0A0;
+	Wed, 15 Oct 2025 16:33:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1760545994; cv=pass; b=W8xzMggDsYklI9X+Lq+/eKrM69p/Fqx8aGH1pJXMyhsqvWTN80aVSXvkNg5Y6/Sze5N7Nqz8DIAcRr7xgtFVru8sS6kUMPAMnWcG23yYZQ0WZlwrmw4A42mHGMxinUmYiEo2SaNG2WiOXq8JyHFs7G3NopwsI32Hhj/XU510vkg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1760545994; c=relaxed/simple;
+	bh=Qka5rRhiNu7gh1nkT/r1uncAJ4L+oiWYE0y+7wUupjE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KBask8wghLUHE7ijHVoiRKF0ZmRLu1hi04HKI9kN5e4BL97Cbc9XDXX62m3crU9pH+XMX+vCx2osIM2crgVG2yKCjNkRb40o9YJl+xmg2Gr5os2CPfipuAQf1O2B9Yr4h4uhJAeZd5Y3uWTlYNzMFBmGw9CEXP5L/FXtHNei0C4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yukuai.org.cn; spf=pass smtp.mailfrom=yukuai.org.cn; dkim=pass (1024-bit key) header.d=yukuai.org.cn header.i=hailan@yukuai.org.cn header.b=VTzxjGh4; arc=pass smtp.client-ip=136.143.188.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yukuai.org.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yukuai.org.cn
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="HDJSUVcX"
-Received: from localhost (localhost [127.0.0.1])
-	by 004.mia.mailroute.net (Postfix) with ESMTP id 4cmxSv2n3Bzm0ytk;
-	Wed, 15 Oct 2025 16:32:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:content-language:references:subject:subject:from:from
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1760545949; x=1763137950; bh=2XbnKFbDrgZnuQ0fkto9x+nh
-	ZLH0G410ifr9/LR49GI=; b=HDJSUVcXGC7yHz5W+ZCG2wXQmENqy9symio6u4yc
-	dWsPp7R5ZTCZPa3TgThM+ppyaIRV/h1bnVmm2cIw9EnVFQBS1Ew3yp1Pe6+oNXvg
-	RTk1A8oyj3QqnhAghfq3/Vjg4GEQq9ZMFGg04mgCiqooloOLqL7lVAOabuRsix0U
-	/ln+4rGESYVWxv+MwEapdYdCKSoSmiM/tqDLSd2/uhF2En2xeTjIrDAJKs+qeKSP
-	Ibzo1PE7XvyHNMc5jvgCfxND2gLsO12VdfV4elT6gUnZCCEklQdMMxIJeQ68Gp/Q
-	W1Yz8UzX6fcaSqiGdhaO4j7GnC6U2r9zV5P4R4XBd6ke8Q==
-X-Virus-Scanned: by MailRoute
-Received: from 004.mia.mailroute.net ([127.0.0.1])
- by localhost (004.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id iALI4LsrElHW; Wed, 15 Oct 2025 16:32:29 +0000 (UTC)
-Received: from [100.119.48.131] (unknown [104.135.180.219])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 004.mia.mailroute.net (Postfix) with ESMTPSA id 4cmxSp5ZFQzm16kk;
-	Wed, 15 Oct 2025 16:32:25 +0000 (UTC)
-Message-ID: <ff29e7f3-71bb-4fd0-afe2-59daac21f92a@acm.org>
-Date: Wed, 15 Oct 2025 09:32:24 -0700
+	dkim=pass (1024-bit key) header.d=yukuai.org.cn header.i=hailan@yukuai.org.cn header.b="VTzxjGh4"
+ARC-Seal: i=1; a=rsa-sha256; t=1760545977; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=Sk5NK4I5qjCiaEtdSwMzYM8S5i2snkN1RU3ln5hzeumEQEdN0KJKbimOrBoi+fGvIkCliC3uv/7AS6vx/Db7vckFwcAi+fMWEqyYvScvUZBgmGXF9t5VHbIEvSzZndJ8XZqSYbOgmRbVoYhC2QWxrh3ZVTWKzRsgmWW4iIOWy40=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1760545977; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=Qka5rRhiNu7gh1nkT/r1uncAJ4L+oiWYE0y+7wUupjE=; 
+	b=OdJJlmVX8do9fqFs5A/747Iu8XTrjH0BurY4v0H5n6bDIYuzKmJ1oifoTvswXIZix1rCtF/8XktFsIEBI6O90GLJlJ4PjJeAhAJx0hKw4JbAfvhi6Vtt0xGxr9M4XmmANVhlPmj3Jo9pEoBtTJa5dXm9l1h24Z8maCXFlFA4HYM=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=yukuai.org.cn;
+	spf=pass  smtp.mailfrom=hailan@yukuai.org.cn;
+	dmarc=pass header.from=<hailan@yukuai.org.cn>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1760545977;
+	s=zmail; d=yukuai.org.cn; i=hailan@yukuai.org.cn;
+	h=Message-ID:Date:Date:MIME-Version:Subject:Subject:To:To:Cc:Cc:References:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=Qka5rRhiNu7gh1nkT/r1uncAJ4L+oiWYE0y+7wUupjE=;
+	b=VTzxjGh4dRchFFbhi9R4YCyjByTFHdUoiy4UVOG65xJOTdk+Xj8j8omFvx/GUsYj
+	fKXql4m0xk/NNE2irntYXUnLT0S3A/VjlaQBCVeElWPWFH839r19nhbI9xpvu0RHvas
+	MUIASdyTfwo6hhUmPiR3Cc3R0X1zAqG3T1OtMd5s=
+Received: by mx.zohomail.com with SMTPS id 1760545972179630.4411747898575;
+	Wed, 15 Oct 2025 09:32:52 -0700 (PDT)
+Message-ID: <ccf8a93f-2948-4774-87e5-acf7c03b9941@yukuai.org.cn>
+Date: Thu, 16 Oct 2025 00:32:40 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -50,92 +45,34 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-From: Bart Van Assche <bvanassche@acm.org>
-Subject: Re: [PATCH v25 07/20] block/mq-deadline: Enable zoned write
- pipelining
-To: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
- Christoph Hellwig <hch@lst.de>
-References: <20251014215428.3686084-1-bvanassche@acm.org>
- <20251014215428.3686084-8-bvanassche@acm.org>
- <08ce89bb-756a-4ce8-9980-ddea8baab1d1@kernel.org>
-Content-Language: en-US
-In-Reply-To: <08ce89bb-756a-4ce8-9980-ddea8baab1d1@kernel.org>
+Subject: Re: [PATCH] blk-mq: fix stale tag depth for shared sched tags in
+ blk_mq_update_nr_requests()
+To: Jens Axboe <axboe@kernel.dk>, Yu Kuai <yukuai3@huawei.com>, clm@meta.com,
+ nilay@linux.ibm.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ yukuai1@huaweicloud.com, yi.zhang@huawei.com, yangerkun@huawei.com,
+ johnny.chenyi@huawei.com
+References: <20251015014827.2997591-1-yukuai3@huawei.com>
+ <9e775775-940f-477b-879f-dd7389f0be31@kernel.dk>
+From: Yu Kuai <hailan@yukuai.org.cn>
+In-Reply-To: <9e775775-940f-477b-879f-dd7389f0be31@kernel.dk>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-ZohoMailClient: External
 
-On 10/15/25 12:31 AM, Damien Le Moal wrote:
-> On 2025/10/15 6:54, Bart Van Assche wrote:
->> The hwq selected by blk_mq_run_hw_queues() for single-queue I/O schedulers
->> depends on the CPU core that function has been called from. This may lead
->> to concurrent dispatching of I/O requests on different CPU cores and hence
->> may cause I/O reordering. Prevent as follows that zoned writes are
->> reordered:
->> - Set the ELEVATOR_FLAG_SUPPORTS_ZONED_WRITE_PIPELINING flag. This disables
->>    the single hwq optimization in the block layer core.
->> - Modify dd_has_work() such that it only reports that any work is pending
->>    for zoned writes if the zoned writes have been submitted to the hwq that
->>    has been passed as argument to dd_has_work().
->> - Modify dd_dispatch_request() such that it only dispatches zoned writes
->>    if the hwq argument passed to this function matches the hwq of the
->>    pending zoned writes.
-> 
-> One of the goals of zone write plugging was to remove the dependence on IO
-> schedulers to control the ordering of write commands to zoned block devices.
-> Such change are going backward and I do not like that. What if the user sets
-> Kyber or bfq with your zone write pipelining ? Does it break ?
+Hi,
 
-Hi Damien,
+在 2025/10/15 21:48, Jens Axboe 写道:
+> On 10/14/25 7:48 PM, Yu Kuai wrote:
+>> Commit 7f2799c546db ("blk-mq: cleanup shared tags case in
+>> blk_mq_update_nr_requests()") moves blk_mq_tag_update_sched_shared_tags()
+>> before q->nr_requests is updated, however, it's still using the old
+>> q->nr_requests to resize tag depth.
+>>
+>> Fix this problem by passing in expected new tag depth.
+> Fix looks fine, but you really should add a Link to the bug report, and
+> also a Reported-by tag. I'll add those.
 
-As you know the Kyber I/O scheduler dispatch callback only returns requests
-for the hardware queue that has been passed as an argument to the dispatch
-callback. So it's probably safe to set the
-ELEVATOR_FLAG_SUPPORTS_ZONED_WRITE_PIPELINING for the Kyber I/O scheduler.
-However, that hasn't been done yet.
+Thanks! Sorry that I do forget about this.
+Kuai
 
-Since neither Kyber nor BFQ set the flag
-ELEVATOR_FLAG_SUPPORTS_ZONED_WRITE_PIPELINING, zoned write pipelining will
-be left disabled for these I/O schedulers. See also the following code from
-a previous patch:
-
-+bool blk_pipeline_zwr(struct request_queue *q)
-+{
-+	return q->limits.features & BLK_FEAT_ORDERED_HWQ &&
-+	       (!q->elevator ||
-+		test_bit(ELEVATOR_FLAG_SUPPORTS_ZONED_WRITE_PIPELINING,
-+			 &q->elevator->flags));
-+}
-
-> From the very light explanation above, it seems to me that what you are trying
-> to do can be generic in the block layer and leave mq-deadline untouched.
-
-I don't think that the race described above can be solved in the block layer.
-More in detail, the race condition that I observed several times while running
-tests with mq-deadline and zoned write pipelining enabled and without the
-mq-deadline patches from this series is as follows:
-
-CPU core a                                  CPU core b
-------------------------------------------  ------------------------------------------
-blk_mq_run_hw_queue(hctx c)                 blk_mq_run_hw_queue(hctx c)
-   blk_mq_sched_dispatch_requests(hctx c)      blk_mq_sched_dispatch_requests(hctx c)
-     blk_mq_do_dispatch_sched(hctx c)            blk_mq_do_dispatch_sched(hctx c)
-       dd_dispatch_request(hctx c) -> rq e
-                                                   dd_dispatch_request(hctx c) -> rq f
-       blk_mq_dispatch_rq_list(hctx c)             blk_mq_dispatch_rq_list(hctx c)
-                                                     q->mq_ops->queue_rq(hctx c, rq f)
-         q->mq_ops->queue_rq(hctx c, rq e)
-
-If requests (e) and (f) refer to the same zone, with write pipelining enabled,
-the above sequence causes request reordering. If both requests are regular
-writes (not write appends), this will trigger an UNALIGNED WRITE COMMAND error.
-I think this can only be solved by modifying an I/O scheduler such that its
-dispatch callback only dispatches requests for the hctx that has been passed as
-an argument to the dispatch function.
-
-Please note that for my use cases I'm fine with not using any I/O scheduler at
-all and hence that I'm fine with dropping the mq-deadline patches from this
-series. Is this perhaps what you prefer?
-
-Thanks,
-
-Bart.
