@@ -1,85 +1,99 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3449621A447;
-	Wed, 15 Oct 2025 06:44:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D57443148AD;
+	Wed, 15 Oct 2025 07:25:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760510656; cv=none; b=PAWpH3cOZZVRJn4qz21QnKMZne1a1twDPy5K5+K2UC4yeG+kjF70YWYBisAM7AJdEvL+auSthnwZt5zBATm2p74gJ9WJ7I9w3QDjBIgIBfVDfNywYWriRIgyURdp0jQi0R2eGBO9pSYeJFyVvBNct9k+J7vlC3BL+4YARsfxhPQ=
+	t=1760513155; cv=none; b=bPLIwCOTRDm7cbyFC+fMaUpHWrHKTvXtyPEEnKBvmFBTYtfcIcN6XrP/Uk1Uo6mb/JQc0smRHD1HX7kivliDlV2W6gvLnJVMsTiycrCwWAyZKaFblZGdqTcDLp7/Q0bpG9GmYgL7dzjbnM5Atuqt1vQndLOli6F6I8UNw7UsYzE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760510656; c=relaxed/simple;
-	bh=Ng/TpONxqJIcYfHCXWiNhUnJ8g9KU2/KbXEEA1wmwyw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jnkTRj0ufxxT511rvoefE21b9wUmpXPdn+TzJNSKZUgZ4XOFt5Cv5w6ghVodn1f9yZ2XdjrFwqmAAZIAjGogpbGmYnK5ZC5xjei5Z8JKhUmOehzLtP+SSx55sOtsMjdFQ9rtzQTows4gIICiIFg38KDTJv615iaJQyDRKlL2Q84=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a0xFHOo/; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1760513155; c=relaxed/simple;
+	bh=9SN27HepAKD9IdeWSnnll6V9jDS7tjS+jDxtPqyRdOU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CX8ZnrLwxnA8e7jw26bMrGIioLXQeabeW5W/uvvl8lrlSuyH+7o5GPWfvD7c//WRHblopd3orDPdIg5kP+9GOli0nV0uGcSMfQU1U2/PyMGXt5IMr4bB8/ulNGTmPUfpIzzvKq5GEUk26Q/xLOLrjG9hGkdjqma95JqFIiDVUak=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cz5mlpOt; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a0xFHOo/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A47FC4CEF8;
-	Wed, 15 Oct 2025 06:44:15 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cz5mlpOt"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9603EC4CEF8;
+	Wed, 15 Oct 2025 07:25:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760510655;
-	bh=Ng/TpONxqJIcYfHCXWiNhUnJ8g9KU2/KbXEEA1wmwyw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=a0xFHOo/AodCLJYuRhRDGNzyP0paUpB7BlbhboayGDkqaPpBf2LUvibc9K3xiWAsg
-	 nZU8URiUNXMeQpHnVJ+BIygtX0nOCdJcZHhOSYHXr1vrLYkvM+/ZAF9qVHpsK/Ty7+
-	 cV331e+Xpi92a4efrSS3XoxTq5XD8shJWnm1cQRl/hyUIgQCfV4QDsZKVB36cO60U4
-	 r1GZFJjGj2E90EF36n3p+J2zO+oATDtSXGIeLCyc8Tl846NMAawQ0j1WHBzQeOoQM6
-	 zAS8LLHydG0A2Xp0dqQA9TlmBmd/ZNoj3o994bLTsx8M0Y5tNneBcJmpSgnPKMjieE
-	 OOl6e2KdPSqKg==
-Date: Wed, 15 Oct 2025 09:44:11 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, Jason Gunthorpe <jgg@nvidia.com>,
-	Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-	Sagi Grimberg <sagi@grimberg.me>
-Subject: Re: [PATCH 4/4] nvme-pci: unmap MMIO pages with appropriate interface
-Message-ID: <20251015064411.GA6393@unreal>
-References: <cover.1760369219.git.leon@kernel.org>
- <6522567376d50f71425ccc4950552fca48e4f57f.1760369219.git.leon@kernel.org>
- <20251015042053.GC7073@lst.de>
+	s=k20201202; t=1760513155;
+	bh=9SN27HepAKD9IdeWSnnll6V9jDS7tjS+jDxtPqyRdOU=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=cz5mlpOtjpQLIZDaOr2GJij59u+wE0Q1FNXPZfaO0Nns4B3d9djIVOb9GIvgZId5f
+	 ay6vPv2fBtPVxCekP6GerCmMSGyeQ+9hitzS22duCICu/l4ev9nBa8VVjXuZebbmw8
+	 m0YQvzU9YHdpqY2B+Qhht2tO4Z+U/b3MdiqYOG6bFJREbd/fwppzp9KorJMPeQfDSr
+	 M8F82P49LW6O+FHI+8KwZYjSIyw+4sfXXnH91ovWnvvXB5JFZpcTz41qpH37yznCjl
+	 SO26KyJmFrcY/yDOe2wbGo5eGXWCRgKlUEgxc/nHDh2cHqFnRAALATZzWp1a/i1np8
+	 xQd7H+3GbVUGQ==
+Message-ID: <9c8923cb-2c1b-4d04-b1ba-796472ce8c53@kernel.org>
+Date: Wed, 15 Oct 2025 16:25:53 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251015042053.GC7073@lst.de>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v25 05/20] blk-mq: Run all hwqs for sq scheds if write
+ pipelining is enabled
+To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+ Christoph Hellwig <hch@lst.de>
+References: <20251014215428.3686084-1-bvanassche@acm.org>
+ <20251014215428.3686084-6-bvanassche@acm.org>
+From: Damien Le Moal <dlemoal@kernel.org>
+Content-Language: en-US
+Organization: Western Digital Research
+In-Reply-To: <20251014215428.3686084-6-bvanassche@acm.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Oct 15, 2025 at 06:20:53AM +0200, Christoph Hellwig wrote:
-> On Mon, Oct 13, 2025 at 06:34:12PM +0300, Leon Romanovsky wrote:
-> > From: Leon Romanovsky <leonro@nvidia.com>
-> > 
-> > Block layer maps MMIO memory through dma_map_phys() interface
-> > with help of DMA_ATTR_MMIO attribute. There is a need to unmap
-> > that memory with the appropriate unmap function, something which
-> > wasn't possible before adding new REQ attribute to block layer in
-> > previous patch.
+On 2025/10/15 6:54, Bart Van Assche wrote:
+> One of the optimizations in the block layer is that blk_mq_run_hw_queues()
+> only calls blk_mq_run_hw_queue() for a single hardware queue for single
+> queue I/O schedulers. Since this optimization may cause I/O reordering,
+> disable this optimization if ELEVATOR_FLAG_SUPPORTS_ZONED_WRITE_PIPELINING
+> has been set. This patch prepares for adding write pipelining support in
+> the mq-deadline I/O scheduler.
 > 
-> This should go into the same patch that switches to dma_map_phys.
-
-I don't think so, dma_map_phys() patch [1] doesn't change any behavior
-and dma_map_page() is equal to dma_map_phys(... , attr = 0),
-
-> Unless I'm missing something it also misses passing the flag for
-> the metadata mapping.
-
-Yes, I didn't realize that same request can have both metadata and data
-payloads.
-
+> Cc: Damien Le Moal <dlemoal@kernel.org>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+> ---
+>  block/blk-mq.c | 8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
 > 
-> Btw, where is all this going?  Are you trying to remove the auto
-> detection of P2P in the low-level dma mapping routines?  If so that
-> should probably go into at very least the cover lttter, but probably also
-> the commit logs.
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 81952d0ae544..5f07483960f8 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -2401,8 +2401,7 @@ void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
+>  EXPORT_SYMBOL(blk_mq_run_hw_queue);
+>  
+>  /*
+> - * Return prefered queue to dispatch from (if any) for non-mq aware IO
+> - * scheduler.
+> + * Return preferred queue to dispatch from for single-queue IO schedulers.
+>   */
+>  static struct blk_mq_hw_ctx *blk_mq_get_sq_hctx(struct request_queue *q)
+>  {
+> @@ -2412,6 +2411,11 @@ static struct blk_mq_hw_ctx *blk_mq_get_sq_hctx(struct request_queue *q)
+>  	if (!blk_queue_sq_sched(q))
+>  		return NULL;
+>  
+> +	if (blk_queue_is_zoned(q) && blk_pipeline_zwr(q) &&
+> +	    test_bit(ELEVATOR_FLAG_SUPPORTS_ZONED_WRITE_PIPELINING,
+> +		     &q->elevator->flags))
 
-It is an outcome of multiple things:
-1. We missed setting of IOMMU_MMIO flag in dma-iommu.c flow for p2p pages
-and for that we need some external indication as memory type is already
-known to the callers.
-2. Robin expressed concerns about overloading DMA_ATTR_SKIP_CPU_SYNC.
+The above test_bit() is already done in blk_pipeline_zwr().
+> +		return NULL;
+> +
+>  	ctx = blk_mq_get_ctx(q);
+>  	/*
+>  	 * If the IO scheduler does not respect hardware queues when
 
-[1] https://lore.kernel.org/all/a40705f38a9f3c757f30228b9b848ce0a87cbcdd.1760369219.git.leon@kernel.org/
-[2] https://lore.kernel.org/all/751e7ece-8640-4653-b308-96da6731b8e7@arm.com/
+
+-- 
+Damien Le Moal
+Western Digital Research
