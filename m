@@ -1,190 +1,203 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from esa4.hgst.iphmx.com (esa4.hgst.iphmx.com [216.71.154.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A18F31985C
-	for <linux-block@vger.kernel.org>; Wed, 15 Oct 2025 09:27:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760520480; cv=none; b=hLJmFEmVQ8TDqg+SVdy9xHNbjds38/LEa1cnFGb8C68Ie+aYyniBN0DbSTHqcqzDrMktUfTwImjx37994q06RMvtA3C1h/YvK810itXwo7PFFKJCCU3+O5XK/RyfCrWTAxcdW6xaudVGrnBJ93sc5yEJOSbddz3ywNesIftpnJA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760520480; c=relaxed/simple;
-	bh=sPEg7pbtP1zrTtIJbq5Abj7JdtBqRqEL/3AmT/ihs9E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=URjwqRVefA5/oqYWy1kFkLk+Eq/7YMCSEqld9PvmaUyHwcSwuEnun9pOU3I2R/a0sBYAZ0JlOUHsItx3vGglvQM75KAb4XvMcezS1ranxWIVWUaXvho0X3gQG/WxQZqrp/RyHlxNFEKt8Vi/WIQa1B5tiQffIogblGTsJ852Yp4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QsvUljDs; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08702319865
+	for <linux-block@vger.kernel.org>; Wed, 15 Oct 2025 09:43:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=216.71.154.42
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1760521418; cv=fail; b=GcKh/WSbr5OC3DVhYATUSqpyoae78XVt9aqsr7UFLhgUxVm3tj50Ndhw1aTjoGK1eKWkCqZUBQEyATAm6x/5Z4Gn/VVMiBFIzoC/3kyMEZn2fRBY4+FnYq7Geu8djsW3LT82lFVifh0OHNQ8NMKy1tzMkq/S272KMBuSBylfO2g=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1760521418; c=relaxed/simple;
+	bh=nUtymLyskKikdDBHZ0m0EjKeai5+0EhxWNV+1sWtAEU=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=RbAi6cQoJHTNDMuex9Gu+Qt/UVgJeDM0S4tWg3+GrOC6N9ng9Et4vurSRN4eH4c+mUH6Y++q9sKU4jKTqKraRwz75RgM5TBuATybFyktsB5lt2NBuNZvwaJ77vmL6I01DGD5IC4z6ZkNlW3iyyBcUfldHdnxrvR0lpLYKurDcC0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=FWVJ/3Ba; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=EkL7mOpP; arc=fail smtp.client-ip=216.71.154.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QsvUljDs"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1760520477;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8FvuC0nI11pMcake8zb9ZQ7cv8pD2b0TiH26/DUH8Ho=;
-	b=QsvUljDseVEkZm+Cs1Wc42GLisee5i/MNyjA+2DO+yw4lDq/C7oWOUp/0piCbJh4UenuAw
-	8ftilas3/eA4SgQ3pidd/nTaWwUcHXa9378zLMXrDzMG2JZVnYwyjbV1nLLAs/XQQyrfCi
-	VdKlZSGAj5iygm309nOz9cOdf3NT4SA=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-73-jFU6B8r8NgieqhpcBtUZ-Q-1; Wed,
- 15 Oct 2025 05:27:53 -0400
-X-MC-Unique: jFU6B8r8NgieqhpcBtUZ-Q-1
-X-Mimecast-MFC-AGG-ID: jFU6B8r8NgieqhpcBtUZ-Q_1760520471
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 154F41800245;
-	Wed, 15 Oct 2025 09:27:50 +0000 (UTC)
-Received: from fedora (unknown [10.72.120.29])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 47DA618003FC;
-	Wed, 15 Oct 2025 09:27:40 +0000 (UTC)
-Date: Wed, 15 Oct 2025 17:27:35 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Nilay Shroff <nilay@linux.ibm.com>
-Cc: Yu Kuai <hailan@yukuai.org.cn>, Yu Kuai <yukuai3@huawei.com>,
-	tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk,
-	cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, yukuai1@huaweicloud.com,
-	yi.zhang@huawei.com, yangerkun@huawei.com, johnny.chenyi@huawei.com
-Subject: Re: [PATCH 0/4] blk-rq-qos: fix possible deadlock
-Message-ID: <aO9pB8DEDFYcvbz7@fedora>
-References: <20251014022149.947800-1-yukuai3@huawei.com>
- <d4fe218b-9fc5-4466-ac56-0d4c5a8ccd96@linux.ibm.com>
- <e5e7ac3f-2063-473a-aafb-4d8d43e5576e@yukuai.org.cn>
- <aO78EFfuT_o5Gcng@fedora>
- <4b8aab6f-f341-49af-9ccb-d592e1a40fe5@linux.ibm.com>
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="FWVJ/3Ba";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="EkL7mOpP"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1760521415; x=1792057415;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=nUtymLyskKikdDBHZ0m0EjKeai5+0EhxWNV+1sWtAEU=;
+  b=FWVJ/3Baive8zSXYyCzjMYoGkJUnPWiTWxZ2Vih8bCrZhO4q69dDRVz0
+   +z54lDgwRcDWRj6tVktb/BNOpwEke65NlOrEgJcEJwtZHB6EBsqrPmKcA
+   DW+E83giErYwibpmqlLcgr5d/oQKJSDvpCt1ZYw6yjJgQ4COf/QeEE31d
+   EntSRssOwly6UQFiVKc29l/RF5HvWOCN9EvAROfeVlP70SxlmVtjod1v8
+   Ngw71LRbSlA0tryAaAt1STldyXH3z7czjfbuXXIJFBUljUG+SleN+p3YW
+   xc6hz5M9fTFcfnyG7Keim/8/qUlMdYuqBZXkkHzFcNEyLMDnppsXh6EBT
+   Q==;
+X-CSE-ConnectionGUID: uRFM/GSFQqWcUdTyuD7Sig==
+X-CSE-MsgGUID: QH9qRwFtR9CPYRyxr/ZIcg==
+X-IronPort-AV: E=Sophos;i="6.19,230,1754928000"; 
+   d="scan'208";a="130262236"
+Received: from mail-southcentralusazon11011033.outbound.protection.outlook.com (HELO SN4PR0501CU005.outbound.protection.outlook.com) ([40.93.194.33])
+  by ob1.hgst.iphmx.com with ESMTP; 15 Oct 2025 17:43:27 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=vnfBkUNtvxUsjxfLBgUkPwEdKfaTHkvgmsQxVZEoyW4PjP9uFcyBtOKZ3U2IXQz/Lqk6QsI+w6der9i3ZSZJWavUGrqC7kzhpyXsAsmJJFlTM6W3FrRJ2cltY18E+xiQS3pwGGievYa0N17Ra7Xi4WVggdNduSiyVpkUpx901kX4YXuLYlD3GvV2EoLO0bHDH7hAxkOIblJ9ORsRCcFCSO/mp0YJmYVAZQvjqeTEkx/pWOrIqzbvzE9BSsze8uxXqpsLZGanQ6e4Cm/p9zDeEzptLtECjzDqCMIYUGyDNPMVhDg8m5S79+3EGgILbcgz4eyhtB22Jb21pFc1rTtuEQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=WFCBZv47+xU/NKwHob+gy07jQcGDpmWf9Hj7EY58YqA=;
+ b=QjjkXgqQAK+hALLEt8l9hpXqfHAfMcaqPqeORWJ4jSdgvEQDh8dDreNjp1QZMXWP+I+pHxAG64Pzq6wCQ00uZmJNe6WAFk+DDqDCGkLSucfk8/64HN047xaxxLbOvxDps2/uQm5HNmZsamz/NYYV3DAFdXeyow9THHKtwZxOigpPy1WD0VQc8oQYWS8/B2OF99CRUtEyWdKMesnm9OnzGoE1Tenzm+E36SVq0JOsVndw/hbAuKc1+MA9uFy8Pg+wQ1Rq5UtUeerI6XDxs/0a1VGeOFTNRMC5zq1CugBzSnpR/Ded+x/craoF56F4JPMREQNzIiCwF+amjFVDxCs+dQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=WFCBZv47+xU/NKwHob+gy07jQcGDpmWf9Hj7EY58YqA=;
+ b=EkL7mOpPEmup38tsOb69W+n+Dn6awLxL/t+eiKbUod+V8agZ1Zztt86wLAxLDV3aWVVB6cQbGGSDSsA+sQMqeqnT7Y6oY9A+5EjohYZx26Zt35MfIezIXgIUVrBikJy0bDe/Ph8LUCmIFwxDD21vRC0vJTbQh2TjL1yxX+cpPWM=
+Received: from SN7PR04MB8532.namprd04.prod.outlook.com (2603:10b6:806:350::6)
+ by BL3PR04MB7978.namprd04.prod.outlook.com (2603:10b6:208:341::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9228.10; Wed, 15 Oct
+ 2025 09:43:25 +0000
+Received: from SN7PR04MB8532.namprd04.prod.outlook.com
+ ([fe80::4e14:94e7:a9b3:a4d4]) by SN7PR04MB8532.namprd04.prod.outlook.com
+ ([fe80::4e14:94e7:a9b3:a4d4%7]) with mapi id 15.20.9203.009; Wed, 15 Oct 2025
+ 09:43:25 +0000
+From: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Dennis
+ Maisenbacher <dennis.maisenbacher@wdc.com>
+Subject: Re: [PATCH 00/33 v3] cpuset/isolation: Honour kthreads preferred
+ affinity
+Thread-Topic: [PATCH 00/33 v3] cpuset/isolation: Honour kthreads preferred
+ affinity
+Thread-Index: AQHcPP2FYW/K6d9blkyjRKmwP66/S7TBjvuAgAFnVgA=
+Date: Wed, 15 Oct 2025 09:43:25 +0000
+Message-ID: <pcsxpsr7q3wylc2dagr2y7aupiljkz5yut6dnnpxjy5ildem2y@baavojpszuwa>
+References: <20251013203146.10162-1-frederic@kernel.org>
+ <720e46cccdc88a111ba7e93c9de457ed20d7a8fedef8852db292adb63d114d4b@mailrelay.wdc.com>
+ <408ef850-e0ff-43db-8827-7c756cc7490a@wdc.com>
+In-Reply-To: <408ef850-e0ff-43db-8827-7c756cc7490a@wdc.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SN7PR04MB8532:EE_|BL3PR04MB7978:EE_
+x-ms-office365-filtering-correlation-id: 62f796c3-f430-4e6e-c183-08de0bcf4999
+wdcipoutbound: EOP-TRUE
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|376014|19092799006|366016|1800799024|38070700021|27256017;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?N+f3Ys/DB3NbYALp4A8IqJP3whlKlIhegWyviXWIZvhCLQidMrYDluQ9jg7e?=
+ =?us-ascii?Q?7N9ov6oB6+ym0MgEMAdi79II+UYElGmcYzb7zRvSOjzWLz4/FS1Kmzc2mOrB?=
+ =?us-ascii?Q?lYI0JqYwyhWghkm/4n38A5jBy655qBmbVD3WnRB7udf9Lwytsxz0SaqZL2QX?=
+ =?us-ascii?Q?mDL2BejNl1Nk1g52asf7esStf2yTh1XH91jdqFFF1yPRREkdmusAKZrHNrUm?=
+ =?us-ascii?Q?UyLtavGe6gV5Wxso4lPFCw8xSrj5+TilV9h2c1QDs1tb5ZuSfZtH6RHXGNhl?=
+ =?us-ascii?Q?dI8XkmHj26sSg/bIi8iTlgoJEQbT41VskQTaFrnNh7nRiDPZgq7qZsMTbx94?=
+ =?us-ascii?Q?CrPPqPzu4uYY/eEEiral2bFZTopUqfPAYHEOhGv01bQbJPk4rClqs2ozrWO7?=
+ =?us-ascii?Q?reIEKOzZOybQeXOzoABWjgrNVqU3c394/DsJ4LFy/L1uaIR8Z+61YRsJyrek?=
+ =?us-ascii?Q?NJDP5L7gnOC8cUiNijqLaGaRlm5xsCUQ/A8y5h9JSSxGGngtGQgGBB53EMkA?=
+ =?us-ascii?Q?b3ErQA7kP+javpoUFOZVzqKsVr5egpnwKs2/IRsxosH5PYvPi4aAmti/pND5?=
+ =?us-ascii?Q?6t3VEdiRAxlNNXeIuOHWpaloYFbjNkfIwF5FIOccm013Re6in/Yz1n8IRcgK?=
+ =?us-ascii?Q?ywi0yZotywDymh1cyoJNHI9iE6UgUXx0qFdJs91jL/W7brnjtVFXdaVbAyN+?=
+ =?us-ascii?Q?Njvar+xX8/kABu+bxIQEVDEN8eaRNAv+dEM42nOTw1cHmzbWjRHaMv2ENc66?=
+ =?us-ascii?Q?0gtL2faZe+A1qrIZ3KjRGFF+TnuLqkcbF0BtETY5hfVvMI0uwoIdR2QCsbJg?=
+ =?us-ascii?Q?XPXm0a0k6F8GbVBUDD+7jHjwGPlpnPAiZBF8gnIm/uNtXfGEy2k6UmGH52Ni?=
+ =?us-ascii?Q?sy6B2nj3kY8rGJ7decZ482L22hkFZnfU7sh4ZlwopEwQ/e2zxJZAQNB5TS5/?=
+ =?us-ascii?Q?uf8xbCb3rVvOel1sJsv/YqyWITVKFcp3N52N0rvHQqe/gXv/q0JoKjjkfwSZ?=
+ =?us-ascii?Q?OSDEOHfoe1siwF2xaWWszlcXH4iu94RGOpP07PzK8tch9smogpXfnSUDjA/M?=
+ =?us-ascii?Q?nZKs+aOSt5ZdZnzpRLLq4lPfCJ0XFnRrM9IQiw3YWpN35xwFJSMDM4YhHFyK?=
+ =?us-ascii?Q?ifixRl/8FLLMiATO8ymWY6rmYJafTSCtmOP77upfb4yWi3W06Wfqkx6gNURs?=
+ =?us-ascii?Q?fxDlEjGAKeBVrbI23vWIlMoXZg0GuHQ3H/u3rPOfOvRWxJrPXIFB6mdbZrq7?=
+ =?us-ascii?Q?Q+B3nZvwKVDJiHJWCD6Jn0x/xc4R69esYIaBBXOnQOiRi9C3fC1sN0sdWfcA?=
+ =?us-ascii?Q?q7KwkJ2d3SPNBEE1GHkUtNjns6XJyklSiIoZOP4U7+WPicUTdlwc3XCTHDF2?=
+ =?us-ascii?Q?hkKsa3Y3SfM6Z1O+25PlTFwP6/xBMAO5eaRcIE1O5rZ8m8TtNEmNNZ73shg0?=
+ =?us-ascii?Q?UdUzRo/4d+7+hIryiH0pfQFcsBD6fs1HK/p9XcSk3DUq1z+SI8/CzktPCZmH?=
+ =?us-ascii?Q?veOlEIQwSouiefbpdkm8RTK4qaz3aYMQSpaqy7omSpakSsUdmAed0aCdZbxU?=
+ =?us-ascii?Q?2S/5lzY0O7CS+CNmkKI=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR04MB8532.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(19092799006)(366016)(1800799024)(38070700021)(27256017);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?9XgLpwdD0d2V7RGThofZXUBPDIDJIiIOnQWWLI05E+VIp2XW0uHAiU1rS0Rf?=
+ =?us-ascii?Q?rHLfRgMaIdC/sKO4/ONHebVteeiOBEDwO+r+09GOTiZb8Q1kBEeHpgJoJyFx?=
+ =?us-ascii?Q?OIEiTfmx2+v2Z91FqbYYK+dm/oUk6Nw10PhJtEPEJd5Utn4Nk9ol6jJc0WA2?=
+ =?us-ascii?Q?WU7noZOpiLpc4M20AtbgGfv4uWO32L5PPKPeYl1S62QmtkwqbtXWoKUMXyZ9?=
+ =?us-ascii?Q?t7Ee9Hku5iaO5rpUy57ERYFaa0m+6uKaOzkV7kPmgAZMWh545NimCoBHU5Yy?=
+ =?us-ascii?Q?FB5+DI32ecmtH5jqJlEyREGkdjGI8iv0VoNItMSE+xLV02TX+ZWHaTHGnBxt?=
+ =?us-ascii?Q?oHYPBgJvW5A0SGEi8PW0tmLxyJzEfbnizKsdan4lCoxBB3ib+8zPvt2jS7rO?=
+ =?us-ascii?Q?xCWSCcCOwr7oDXz0syot7kjK8vHWRESbKH4ym3Rzej6wJ2ihmYIrCtawtt/1?=
+ =?us-ascii?Q?Ytbu0jn78G+naOP3FOijRlwW520lJUIeplIWs7/DWOBAJaEMW/AMhhi5Yogz?=
+ =?us-ascii?Q?u+TOdzHwFpYcQwqrbP9FEgRrOdCOZpR8F6KlxkSqqKBjBYsvHZTxe1z/qyiy?=
+ =?us-ascii?Q?opKuj+uFM1F0lfHYb0Hl/GQKgDIvNkIVAjc75/HGGVD/JFKw4iM87SANLTnZ?=
+ =?us-ascii?Q?fAmdqinqeLbOviuT3k1bK6Xf0D3pEGPw9q664ygOurQyOwc1zOYrOWuhcMDs?=
+ =?us-ascii?Q?tqskXwOGQ5yoBIDjS14QSUILBOyr7VzwynLwCjLgGVBo7ELASUofxGHm4IQn?=
+ =?us-ascii?Q?KSLb982Xlkbo5uN+5PYKIeM73Y9Zr3c5zHV0hqyw5VmjMy4K7rirddOSGB+s?=
+ =?us-ascii?Q?N1ORVPYQzHvZlps2udj5x5Wscyh7pcT3YRGLOVEtZWqhhB2c8MpVM+3Fk04H?=
+ =?us-ascii?Q?sBUiieE1h2vn1QXQwVbrBShdce2vAeX5FJxMIuFX9DuCjIc/8di95fq/LyAB?=
+ =?us-ascii?Q?+9Q44zeaOT9u2+1vknbNImdx+YYRXODwX2f1e9jpqzl5NTBYV+dKKimTYmzj?=
+ =?us-ascii?Q?keEnCxFTKLetzHQ8EJ1cdLMdZsNNAdBVN12KbWBF4rUWvCu4/TYIUSq+PCuo?=
+ =?us-ascii?Q?/uNZ/eaYcMPQ/cXrkCNC2G1opsYfi/Zgjj0NL0sVrh3dy4KBy4F9d5BJHvnp?=
+ =?us-ascii?Q?MaYgO8Y5itd7VLnm2E17myxkUGYpcXQudrsRfNmJtxRW/Ls+nvTHK22ns2Pb?=
+ =?us-ascii?Q?KFy3J/EvNpe+POu9jED5LE3MNEhof8Y+1RlV3NSmeJj7cvarnrzpHwjnD2PS?=
+ =?us-ascii?Q?QfRy80m4uELWGORXh/iJp7rWAakGYlie2IEhdk7ERSzvbR7tYt/cBARQl7Uh?=
+ =?us-ascii?Q?gJLw45d7nVrGTYZ5c0JT3nDzEhF3hk7cdHBG6xasWSAfouyE8JKy1dlnHh94?=
+ =?us-ascii?Q?eg0tKQWcld/bYpBa7wmyKnSNCxV8Bg4W+agOvQdmVLXL7xEVTFoxwUdItE17?=
+ =?us-ascii?Q?xWBVAwf9QWrBcE9EKrahlZhD6SbCw2opZoSMuIekmxHh/Ql+q95ezBnLMsGx?=
+ =?us-ascii?Q?2thJf58UnysYr0ZPD+2CuaS9VTpV/GG87yipHysj0xFTvVzMaC2M+9WGpe4g?=
+ =?us-ascii?Q?M159Zk8Aa/xfe9Lm8acSdRubjkGqreoNxFh5fv4t43luI0hIZDfl3hiJZzvw?=
+ =?us-ascii?Q?wQ1ER8OsUvkwIgLYLWStwKM=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <8D11602B8F71E140B99EC9773AEAE4AD@namprd04.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <4b8aab6f-f341-49af-9ccb-d592e1a40fe5@linux.ibm.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	QV2mGOGjtjnXdnGqX0tPbrzCgYowbLNbEACKbV4KwHN3Mwfy5fiHUQZ3vvNolOvDVYqWbF6RCL//PdiDI+OYfLe+vTxhEd3ACoGtJqGojCZX6O7X0JqgtuuUAWdZ8VjoVdJzVgHPE7viPTovqAHrNGLSb4ud3cVm3+jyN7m7Q7Vu0KBNpQVrUWqmZB3PCPFfmmWMRBIvphV6WOSOEAWaiYKb6jqo1VhyJ3PGQ/o5qM9re9s8MIWkfudjuq6zULW5uIb1/BFlNOcETQhg8+zyhUufHLrTB7HucdRn2lLKNl58WkPLFke4xZ8PWM2Mi+WN53d368RI8SRGZe2vqjdI8oNozp6OoQyUWZXoX91vT2I1BF4R1hYLU0itPqzXBxG7dw21BKm7R12+1r3tKxZJuvrmAKVuy36IqfGfXg+zMK7/df+1ePmcHnXZVQE9wM6HMe3zOB8XNLR/aCD81NLhY/1/UsIdd+nWnA2KGUjBNZGBrJ22jtoEuvsZAhr81uTzviQ0dLRox/8sHm88YPA7CWclSI4YhlzIFZ9+KFFawW/yzSWqaKOgjJKF2ir0P+zwZNb15hh5VZfqQQOz4O3m53tvVnMsQha8ONbB17w6P6vJJu38z/nQjYgUuyxkA8QD
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SN7PR04MB8532.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 62f796c3-f430-4e6e-c183-08de0bcf4999
+X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Oct 2025 09:43:25.3837
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: QMG5pN4miVfi7uAUTgl582iwzmUsamftLqV5yTZFM+LHcSWqwupD7z5aA10oekAo24k5GS72YqY7Ozo9IJ/DQH5ZqX09HI71K4arENStPb4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR04MB7978
 
-On Wed, Oct 15, 2025 at 10:46:51AM +0530, Nilay Shroff wrote:
-> 
-> 
-> On 10/15/25 7:12 AM, Ming Lei wrote:
-> > On Tue, Oct 14, 2025 at 07:14:16PM +0800, Yu Kuai wrote:
-> >> Hi,
-> >>
-> >> 在 2025/10/14 18:58, Nilay Shroff 写道:
-> >>>
-> >>> On 10/14/25 7:51 AM, Yu Kuai wrote:
-> >>>> Currently rq-qos debugfs entries is created from rq_qos_add(), while
-> >>>> rq_qos_add() requires queue to be freezed. This can deadlock because
-> >>>>
-> >>>> creating new entries can trigger fs reclaim.
-> >>>>
-> >>>> Fix this problem by delaying creating rq-qos debugfs entries until
-> >>>> it's initialization is complete.
-> >>>>
-> >>>> - For wbt, it can be initialized by default of by blk-sysfs, fix it by
-> >>>>    delaying after wbt_init();
-> >>>> - For other policies, they can only be initialized by blkg configuration,
-> >>>>    fix it by delaying to blkg_conf_end();
-> >>>>
-> >>>> Noted this set is cooked on the top of my other thread:
-> >>>> https://lore.kernel.org/all/20251010091446.3048529-1-yukuai@kernel.org/
-> >>>>
-> >>>> And the deadlock can be reporduced with above thead, by running blktests
-> >>>> throtl/001 with wbt enabled by default. While the deadlock is really a
-> >>>> long term problem.
-> >>>>
-> >>> While freezing the queue we also mark GFP_NOIO scope, so doesn't that
-> >>> help avoid fs-reclaim? Or maybe if you can share the lockdep splat
-> >>> encountered running throtl/001?
-> >>
-> >> Yes, we can avoid fs-reclaim if queue is freezing, however,
-> >> because debugfs is a generic file system, and we can't avoid fs reclaim from
-> >> all context. There is still
-> >>
-> >> Following is the log with above set and wbt enabled by default, the set acquire
-> >> lock order by:
-> >>
-> >> freeze queue -> elevator lock -> rq_qos_mutex -> blkcg_mutex
-> >>
-> >> However, fs-reclaim from other context cause the deadlock report.
-> >>
-> >>
-> >> [   45.632372][  T531] ======================================================
-> >> [   45.633734][  T531] WARNING: possible circular locking dependency detected
-> >> [   45.635062][  T531] 6.17.0-gfd4a560a0864-dirty #30 Not tainted
-> >> [   45.636220][  T531] ------------------------------------------------------
-> >> [   45.637587][  T531] check/531 is trying to acquire lock:
-> >> [   45.638626][  T531] ffff9473884382b0 (&q->rq_qos_mutex){+.+.}-{4:4}, at: blkg_
-> >> conf_start+0x116/0x190
-> >> [   45.640416][  T531]
-> >> [   45.640416][  T531] but task is already holding lock:
-> >> [   45.641828][  T531] ffff9473884385d8 (&q->elevator_lock){+.+.}-{4:4}, at: blkg
-> >> _conf_start+0x108/0x190
-> >> [   45.643322][  T531]
-> >> [   45.643322][  T531] which lock already depends on the new lock.
-> >> [   45.643322][  T531]
-> >> [   45.644862][  T531]
-> >> [   45.644862][  T531] the existing dependency chain (in reverse order) is:
-> >> [   45.646046][  T531]
-> >> [   45.646046][  T531] -> #5 (&q->elevator_lock){+.+.}-{4:4}:
-> >> [   45.647052][  T531]        __mutex_lock+0xd3/0x8d0
-> >> [   45.647716][  T531]        blkg_conf_start+0x108/0x190
-> >> [   45.648395][  T531]        tg_set_limit+0x74/0x300
-> >> [   45.649046][  T531]        kernfs_fop_write_iter+0x14a/0x210
-> >> [   45.649813][  T531]        vfs_write+0x29e/0x550
-> >> [   45.650413][  T531]        ksys_write+0x74/0xf0
-> >> [   45.651032][  T531]        do_syscall_64+0xbb/0x380
-> >> [   45.651730][  T531] entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> > 
-> > Not sure why elevator lock is grabbed in throttle code, which looks a elevator lock
-> > misuse, what does the elevator try to protect here?
-> > 
-> > The comment log doesn't explain the usage too:
-> > 
-> Lets go back to the history:
-> The ->elevator_lock was first added in the wbt code path under this commit 
-> 245618f8e45f ("block: protect wbt_lat_usec using q->elevator_lock"). It was
-> introduced to protect the wbt latency and state updates which could be 
-> simultaneously accessed from elevator switch path and from sysfs write method
-> (queue_wb_lat_store()) as well as from cgroup (ioc_qos_write()).
-> 
-> Later above change caused a lockdep splat and then we updated the code 
-> to fix locking order between ->freeze_lock, ->elevator_lock and ->rq_qos_mutex
-> and that was implemented in this commit 9730763f4756 ("block: correct locking
-> order for protecting blk-wbt parameters"). With this change we set the 
-> locking order as follows: 
-> ->freeze_lock ->elevator_lock ->rq_qos_mutex
-> 
-> Then later on under this commit 78c271344b6f ("block: move wbt_enable_default()
-> out of queue freezing from sched ->exit()") we moved the wbt latency/stat
-> update code out of the ->freeze_lock and ->elevator_lock from elevator switch
-> path. So essentially with this commit now in theory we don't need to acquire
-> ->elevator_lock while updating wbt latency/stat values. In fact, we also removed
-> ->elevator_lock  from queue_wb_lat_store() in this commit but I think we missed
-> to remove ->elevator_lock from cgroup (ioc_qos_write()). 
+On Oct 14, 2025 / 12:17, Johannes Thumshirn wrote:
+> On 10/14/25 1:29 PM, shinichiro.kawasaki@wdc.com wrote:
+> > Dear patch submitter,
+> >
+> > Blktests CI has tested the following submission:
+> > Status:     FAILURE
+> > Name:       [00/33,v3] cpuset/isolation: Honour kthreads preferred affi=
+nity
+> > Patchwork:  https://patchwork.kernel.org/project/linux-block/list/?seri=
+es=3D1010948&state=3D*
+> > Run record: https://github.com/linux-blktests/linux-block/actions/runs/=
+18488587693
+> >
+> >
+> > Failed test cases: nvme/005
+> >
+> >
+> >
+> The testcase failure looks unrelated to me:
 
-Nice looking back!
+Yes, the failure at nvme/005 is already known, and should not be related to=
+ the
+series. Sorry for this noise.
 
-I will cook one patch to remove it from ioc_qos_write().
-
-> 
-> > 
-> > I think it is still order issue between queue freeze and q->rq_qos_mutex
-> > first, which need to be solved first.
-> > 
-> So yes we should first target to get rid off the use of ->elevator_lock
-> from ioc_qos_write(). Later we can decide on locking order between
-> ->freeze_lock, ->rq_qos_mutex and ->debugfs_mutex. 
-
-Yu Kuai is working on ordering queue freeze and ->rq_qos_mutex.
-
-
-Thanks,
-Ming
-
+The failure happens with tcp transport condition. I will disable tcp transp=
+ort
+for the blktests CI test runs until the failure gets fixed.
