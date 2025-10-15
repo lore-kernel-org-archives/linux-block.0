@@ -1,107 +1,132 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B37F2836B5;
-	Wed, 15 Oct 2025 09:48:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33A70318129
+	for <linux-block@vger.kernel.org>; Wed, 15 Oct 2025 10:31:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760521716; cv=none; b=N3kcOPGsgGQgcrGkCwEuzNZxE7HXXs7A2EPhVdORPWI+bJjtdh4wL3/uS+g1pMqYgSPFjy2hkTKGUmXidzNUmdcGxcw5y3wle5UbAOweZI/7GiVTaDlh6VA16rlQqQ10TUs1stx5UqcMryaENsTkqfIdG63ABFqUn4QwHT2U7XY=
+	t=1760524272; cv=none; b=WZi2zJNp3Ygi/jEkdgupSa/i3FPUhnSjd2oZvjaroLMR7o8Tm085N/Yc/CRJHs0b26EetI1Wr4BXfiYxcKn/7QwbG/X4t503s6/OPRze3ObEE4gmFQ0lkqDY7fd49B72djLCo4/jqR5QtEWafiT2TugnnVVUgEfUiYd9viA6zBc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760521716; c=relaxed/simple;
-	bh=ci2GAK96GpSlDOtokEvI17IcFg1bYDVpieRXum3v43o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TUcXMcXgvPMpoelyg7UOsruivrPpKxJT7VK+je1Y2xCxoAlPhJ2LOW1ehAYmDa7fjVH0h2Ea25pEOF5alIcCTgXWFSe2RaWjw/bhbr+QQ8Ip8HodJ1uzgvDJD0ZLyPUuFXsVvsiqz2gLV4l6EiVjCSVxH7uJJqBz56l71FxeHtk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0B69C4CEF8;
-	Wed, 15 Oct 2025 09:48:24 +0000 (UTC)
-Date: Wed, 15 Oct 2025 10:48:21 +0100
-From: Mark Brown <broonie@debian.org>
-To: Tamir Duberstein <tamird@gmail.com>
-Cc: "Rafael J. Wysocki" <rafael@kernel.org>,
-	Viresh Kumar <viresh.kumar@linaro.org>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Alex Gaynor <alex.gaynor@gmail.com>,
-	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>,
-	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
-	Benno Lossin <lossin@kernel.org>,
-	Andreas Hindborg <a.hindborg@kernel.org>,
-	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>,
-	Danilo Krummrich <dakr@kernel.org>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-	FUJITA Tomonori <fujita.tomonori@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>, Breno Leitao <leitao@debian.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Russ Weight <russ.weight@linux.dev>,
-	Dave Ertman <david.m.ertman@intel.com>,
-	Ira Weiny <ira.weiny@intel.com>, Leon Romanovsky <leon@kernel.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Brendan Higgins <brendan.higgins@linux.dev>,
-	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Alexandre Courbot <acourbot@nvidia.com>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
-	Liam Girdwood <lgirdwood@gmail.com>, linux-pm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org,
-	nouveau@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-	netdev@vger.kernel.org, linux-clk@vger.kernel.org,
-	linux-pci@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	kunit-dev@googlegroups.com, linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH v2 19/19] rust: regulator: replace `kernel::c_str!` with
- C-Strings
-Message-ID: <a6d606c0-716f-49b5-81cf-362b325b7872@sirena.org.uk>
-References: <20250925-core-cstr-cstrings-v2-0-78e0aaace1cd@gmail.com>
- <20250925-core-cstr-cstrings-v2-19-78e0aaace1cd@gmail.com>
+	s=arc-20240116; t=1760524272; c=relaxed/simple;
+	bh=pwWXGIejlgiRRcl7cVuLUQd3HXh/UzFwqtQEajDt3TU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=fWmKVZiJcQHy0M+UeG027BycvReAi6d4xoQSvVrghURELcg76oVJAhFKglN34Vx9HM1pBHWRN6ON7ocStCUFmRD+lmOO7Ph4rtQX2mh+Cy9ekTEikq/e5fOIcAypbXkhr/8HqVHXLe9eRSOmJZRQq34hCekJFbM7KLQt0W0wr1w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=O/aPmThv; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O/aPmThv"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1760524268;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=UGKq9guDXFjWy4i1YZYNjQbqbv1+4qmTfLDa3T406A4=;
+	b=O/aPmThv60yWCfntAbZimlkMAoxwquC/CkcbqXoMGlqMdCGfySLWsdZMCoWCxhEKHYYJwf
+	7fbdoOEdbiUyM77Modh5ouof40LRvHhblUsYQV3cHMB84Z8J0xiqCJ0gCr9LFnOrHIifEO
+	xehSWgXvVITZznGZYwCirCeapJwcPns=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-596-csudgkOzPI26tfoPiUdGJQ-1; Wed,
+ 15 Oct 2025 06:31:06 -0400
+X-MC-Unique: csudgkOzPI26tfoPiUdGJQ-1
+X-Mimecast-MFC-AGG-ID: csudgkOzPI26tfoPiUdGJQ_1760524265
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 317221956089;
+	Wed, 15 Oct 2025 10:31:05 +0000 (UTC)
+Received: from localhost (unknown [10.72.120.29])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id CAAD619560B5;
+	Wed, 15 Oct 2025 10:31:03 +0000 (UTC)
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: Nilay Shroff <nilay@linux.ibm.com>,
+	Yu Kuai <yukuai3@huawei.com>,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH] block: Remove elevator_lock usage from blkg_conf frozen operations
+Date: Wed, 15 Oct 2025 18:30:39 +0800
+Message-ID: <20251015103055.1357105-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="qu2IBVFvaIEaH/yu"
-Content-Disposition: inline
-In-Reply-To: <20250925-core-cstr-cstrings-v2-19-78e0aaace1cd@gmail.com>
-X-Cookie: Sentient plasmoids are a gas.
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
+Remove the acquisition and release of q->elevator_lock in the
+blkg_conf_open_bdev_frozen() and blkg_conf_exit_frozen() functions. The
+elevator lock is no longer needed in these code paths since commit
+78c271344b6f ("block: move wbt_enable_default() out of queue freezing
+from sched ->exit()") which introduces `disk->rqos_state_mutex` for
+protecting wbt state change, and not necessary to abuse elevator_lock
+for this purpose.
 
---qu2IBVFvaIEaH/yu
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+This change helps to solve the lockdep warning reported from Yu Kuai[1].
 
-On Thu, Sep 25, 2025 at 09:54:07AM -0400, Tamir Duberstein wrote:
-> C-String literals were added in Rust 1.77. Replace instances of
-> `kernel::c_str!` with C-String literals where possible.
+Pass blktests/throtl with lockdep enabled.
 
-This doesn't apply against current code, please check and resend.
+Links: https://lore.kernel.org/linux-block/e5e7ac3f-2063-473a-aafb-4d8d43e5576e@yukuai.org.cn/ [1]
+Fixes: commit 78c271344b6f ("block: move wbt_enable_default() out of queue freezing from sched ->exit()")
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-cgroup.c | 13 ++++---------
+ 1 file changed, 4 insertions(+), 9 deletions(-)
 
---qu2IBVFvaIEaH/yu
-Content-Type: application/pgp-signature; name="signature.asc"
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index f93de34fe87d..3cffb68ba5d8 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -812,8 +812,7 @@ int blkg_conf_open_bdev(struct blkg_conf_ctx *ctx)
+ }
+ /*
+  * Similar to blkg_conf_open_bdev, but additionally freezes the queue,
+- * acquires q->elevator_lock, and ensures the correct locking order
+- * between q->elevator_lock and q->rq_qos_mutex.
++ * ensures the correct locking order between freeze queue and q->rq_qos_mutex.
+  *
+  * This function returns negative error on failure. On success it returns
+  * memflags which must be saved and later passed to blkg_conf_exit_frozen
+@@ -834,13 +833,11 @@ unsigned long __must_check blkg_conf_open_bdev_frozen(struct blkg_conf_ctx *ctx)
+ 	 * At this point, we haven’t started protecting anything related to QoS,
+ 	 * so we release q->rq_qos_mutex here, which was first acquired in blkg_
+ 	 * conf_open_bdev. Later, we re-acquire q->rq_qos_mutex after freezing
+-	 * the queue and acquiring q->elevator_lock to maintain the correct
+-	 * locking order.
++	 * the queue to maintain the correct locking order.
+ 	 */
+ 	mutex_unlock(&ctx->bdev->bd_queue->rq_qos_mutex);
+ 
+ 	memflags = blk_mq_freeze_queue(ctx->bdev->bd_queue);
+-	mutex_lock(&ctx->bdev->bd_queue->elevator_lock);
+ 	mutex_lock(&ctx->bdev->bd_queue->rq_qos_mutex);
+ 
+ 	return memflags;
+@@ -995,9 +992,8 @@ void blkg_conf_exit(struct blkg_conf_ctx *ctx)
+ EXPORT_SYMBOL_GPL(blkg_conf_exit);
+ 
+ /*
+- * Similar to blkg_conf_exit, but also unfreezes the queue and releases
+- * q->elevator_lock. Should be used when blkg_conf_open_bdev_frozen
+- * is used to open the bdev.
++ * Similar to blkg_conf_exit, but also unfreezes the queue. Should be used
++ * when blkg_conf_open_bdev_frozen is used to open the bdev.
+  */
+ void blkg_conf_exit_frozen(struct blkg_conf_ctx *ctx, unsigned long memflags)
+ {
+@@ -1005,7 +1001,6 @@ void blkg_conf_exit_frozen(struct blkg_conf_ctx *ctx, unsigned long memflags)
+ 		struct request_queue *q = ctx->bdev->bd_queue;
+ 
+ 		blkg_conf_exit(ctx);
+-		mutex_unlock(&q->elevator_lock);
+ 		blk_mq_unfreeze_queue(q, memflags);
+ 	}
+ }
+-- 
+2.50.1
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmjvbeQACgkQJNaLcl1U
-h9Dt8Af/TLwPaPEPyJKhHTg8cZeHf70d+vVL0moyk8tdCcvNggPRPd8mXg0NT9mO
-qmJvoWmet4bQC3McxDEI2hDArwrV6orbVM8LsRyd78hdChnLNP1058/WMu4IMsm9
-2BDs6OT5Nma+7YMa+KS6S7fkuUmt9AG/CkBR9NAGDX0K6kGd/GQ1E9I11cf8Cdqs
-YFLT67SrYyxGv3ZGtK5IkUOmqn8vSKPTtrQiuzfeSkwR6iBWmy5jq1VR/Qh2Kycq
-c/7pMyRZK1HaRL+RnAGvZaPuru3c9bRia03t2TS0BaJJYl8QMaNG2TqmOxxHBHNP
-0Dagzm72apYtzPFYbdE9flnTkc2o/Q==
-=ofuh
------END PGP SIGNATURE-----
-
---qu2IBVFvaIEaH/yu--
