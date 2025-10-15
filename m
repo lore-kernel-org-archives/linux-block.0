@@ -1,79 +1,71 @@
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F34A7305948
-	for <linux-block@vger.kernel.org>; Wed, 15 Oct 2025 19:29:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A03930E0EF
+	for <linux-block@vger.kernel.org>; Wed, 15 Oct 2025 19:30:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760556585; cv=none; b=D4MmLWhKRRuDNuWR1oMFS8E3f8afUxcrs+w4Una4r7FW3HXYDBNdZDjOp3ZoNXMsH8Xtgtk9JnB7gGvmDpz+eW+UPVLp88fwSJGOW74a1ijKVYsadxMByEjwc/KNB4QUyXaHRLSyb7nDT8kn9KaKGcQXVjMk+fM0Hf0cnyyI1Cw=
+	t=1760556647; cv=none; b=mx9tBz8pMKRr7OPdbKbxfls/eXToAmJdOQVgOJBLoEnX5M8q6t85pfiJ1kdgEzALJ8dBJNrqYhA6RsQ83e6a673tMXIYED+F/ggSm4at0avdZqgtIDlmT54TuGq7+7kSNbDGFi5/zHwYoDOmw2zhRdE016B0rLTy5g7CoWCkIZY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760556585; c=relaxed/simple;
-	bh=PIriNEl1QINcRygfPV3g4fvxTFN2kEqSnPbk62zLE6Q=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=InwHAGIhNG55Ucf9uNEd8ciPLwtKHjqDDaR1nXghTMwktsGJ0AXOm6SBnMWBqzQwvzofgepADLrl6jc4dkaoxbTpnWQPsRHmubBlr4r0Pl9jwXNGbluSnwmjfD2jOHti784YU3X8Qb9TMFZ4DxHDbkqkmQJ09kYE5NR2QABhpJE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TKhj5fJt; arc=none smtp.client-ip=209.85.218.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1760556647; c=relaxed/simple;
+	bh=jzqQsin1H3Ss/7Kc6VHndGMJg2kFmuyjGGetq8PWm18=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=g4+NzOq+ggXSW/WjVTSJU9pNgICbPDdLcGZVYXrfOlaDf/78SPmfLruxiZZJKGwskCxm03kaiwObkUw5OYT0QZNDEaqG+LBVxUmwI0oG+9aVg2nvKDvUtMvkLzjWCZCyXuJqXSx0CPkh64pDSpoZZGswrLiuVf+x2PXyBnTJZ5Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CZuJ6Izq; arc=none smtp.client-ip=209.85.128.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TKhj5fJt"
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-b3c2db014easo466691966b.0
-        for <linux-block@vger.kernel.org>; Wed, 15 Oct 2025 12:29:43 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CZuJ6Izq"
+Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-471005f28d2so4229165e9.0
+        for <linux-block@vger.kernel.org>; Wed, 15 Oct 2025 12:30:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760556582; x=1761161382; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9ksEMbgKeIvUZBJjpo4N52YV+1hwQuAsDSMHWnzo/ss=;
-        b=TKhj5fJtrNz4feapeW+0BK2MENorh0xfEIf4HeOhca9C4ugfPEesr5Rvj/9LJKP265
-         +Fv94g6YH9ge6yTTOEBaxpfjboKa6lVggSOP8GyE15m0yJZ7w72JCAdlw+kcfVkZQRfE
-         aD/g0AbzPQYM6a8be7MQ/q6yuPiort3pyrIOg9kHtQ3lRxu/wzwhKLcpyHYxjWf66tcA
-         5D1GiEJuydLItL24D53kl+Gg50c6LjqVM6l0E2++vjF+tcaF68PkusKomjrlZOBAViWq
-         AoVA7IOpVVj8B/rBZ34p8sV8lcA7+Nxw6yW4GPF188pfJTNfmXkCXhDcuY1lOI2Frn5G
-         2b5g==
+        d=google.com; s=20230601; t=1760556643; x=1761161443; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=s6/JJYv7dgEKiR8HpLccBjLYoTBaUxd3JMQEKy0kiqw=;
+        b=CZuJ6Izqoafy+Z3c8IcwuWNDkEvISuUZMjmZWYfvEplp2xJvHbSCSV/XI3TahKzlnn
+         2/VSUAuEuifQEPL1yVM0KfUh0k9C9iAWsB4lbp9C+CKgPZiVLIVAk7TfS923BP7qvcM4
+         L9P24234xUEN1wYunFdup7vBislGABuirlydlrly/c6v8V/FPefcaD8jRSCERGEyL0i2
+         wF/us8aq3okXfYjesPuwlnNAkTU2LsE/MoUvPx6vcCIDR72T6hK/7aIhHH1xyGo5omFI
+         u3rWpT8RrLx6jM8VaLgKaersh9nkzIDtc82OCKLSc8wIVbTZsmlQPCLQQV73nu4LEniF
+         BOwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760556582; x=1761161382;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9ksEMbgKeIvUZBJjpo4N52YV+1hwQuAsDSMHWnzo/ss=;
-        b=d5/v2k1nxeD1Gc37yk2vK4V3Ocpkibi6mtNi5zrcj3j5Oy/7cYgGg3d+2zmQuFwmkk
-         wmxQfI7XRgyXQbx1E6j+RT0cQoJXb6hqc6xfmQlms58ElGlkx9fkRXIjjPd4q4exriQZ
-         itmeLjqbZS/H3wSdz81y1b/xThgOWHtk6O9CAVe9ZX7GjEc2WWIxirl9+IwywpTs+g+k
-         6tJBKHdHpbEoIlq/oDQQ33p5EznyiAN7zrw0EzgBRjPrBrmyUrp/9rkxzCAmTfZGI3eM
-         SEddAYlPLpVA6w8b+daMR0FFzbHjmRRCnDhlFmE5eOpC2+74KfllKRWmX9t1SCvBVxlW
-         vfsQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUkIwVhBjjbkfPQQD/zq8LBy9Ou86FT/LHSbJxRBs1+NYNnadZ4xUxqWbc/zS4i63wHpLK7gCNLw3fbkw==@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywu4OXJDXIoTiwhDRC2J64D2D6irg+vY1yK5Fb5fm41rT6MaeJx
-	uBhWOhgTkFUvNVxVWujg4kxoX/9cfWETE/Nv00gVuoRSmkGojazsEZwthCN/qM5cePyOCIw2aXl
-	i1UdMbdgAOZQfRElifKNhMH7AsuVg5v8=
-X-Gm-Gg: ASbGncuQEeI0BUNNOLnFq8JRaIPWkyiwNKAu6DkIWEwTFGoloALlsJkcPQb7GkWahPc
-	rLnYf+WaO7AdDg3WJizp/ww2GlxTniNU5Tbc9lq4fed9AflKd0nbWav6tY2VhdiNrkOcgruwhHq
-	QqjnoZAIsQkuiGn9GkSYepDXznwgSdsDoSzlV4lKiY3ioI63cUK0zkg6zl9dxsImwIizjR7UFUu
-	ziG6iO7I9Hw9uyRAgyuCv+gCUDSdm8rtQknnL6bzpIuS/Y9ceX1YdRmffUQZh1djzi4ifoetbOL
-	Pe+ZS/PIniNDLaV+/yYp0UbUTYfo2HnTiViCGroZcHZmLG81YTI05DJScEtAwQP2doszI0z6T7u
-	NLcwpnn8eq2tKNc1WN5Qz7iFBiA9NUXazgzdi8NtVP2hY6e93kbUo
-X-Google-Smtp-Source: AGHT+IGtfw5s80CNJkem4TNXL/X5g30lTuJ5LAlCBEIiiOXle0xqvtrIM2mLDYUfLHDwkWL5hMYZfB33sxDVPZ7wk+M=
-X-Received: by 2002:a17:907:5c8:b0:b40:b6a9:f70f with SMTP id
- a640c23a62f3a-b50a9c5b352mr3117730966b.4.1760556581571; Wed, 15 Oct 2025
- 12:29:41 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1760556643; x=1761161443;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=s6/JJYv7dgEKiR8HpLccBjLYoTBaUxd3JMQEKy0kiqw=;
+        b=KjuQD7BwdOeKE+IPT/JRINJvY36XZLx+6pEsnIdDawIOg6GRCZTj3Pdp33TIC8qop3
+         Dc1WQeYFbiZxV2PDm/SqtpuRXMgaBBUTZ3pLZAvu9SA7yrWvOCzViDq6RdLFdwgCUPcq
+         e7X3Rc/w0Hcu3QovCm2g3V5r05Jc/X2g5MQ77CFpR9hah8t8muLovMeX4X14KTmc5lDc
+         k3Yo5aZvtQg6a8tffo8m3/iwgvHY3GaRB5gCxhk2QUCcr8bLKuDCC9wEIZBQraCe68HW
+         ETGc4J6QyhWRb5Cnp7P6qUsQNrGlLfNSySMJysXQaOgRHyYEsL3NeZQFAm933xFGm76z
+         F2Zw==
+X-Forwarded-Encrypted: i=1; AJvYcCXnfFhykC2iqBGv4MW24+llSrAmXPMYR1amPy1YhxwbIW1ATcLCrSw01SD9tv/17LnwGfxzfb3NSP6jyQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxMRUv5kXxGPzDXYFqM3pwnYQWj64+R7SuWx8yrA0AUJUMaT43t
+	CwwilHBuNUTsXWQR0zw5T8nXi1LIJ9Ha3vB/wcpbmVLAs0bPaTnMNtw70anOe8ZDsI895orEYDb
+	ITQs8+4NFgBqxvpzW6Q==
+X-Google-Smtp-Source: AGHT+IHUcYtq/jysGTUkDJKvl3MbWL3/M7dZBn/ijA0kzgEJ9Y8E6oSL5awGSBYgdY4Z4z9XH540xUv0k/TvBZo=
+X-Received: from wmwn16.prod.google.com ([2002:a05:600d:4350:b0:46e:5611:ee71])
+ (user=aliceryhl job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:600c:46d1:b0:46e:45fd:946e with SMTP id 5b1f17b1804b1-46fa9b078e2mr221043115e9.31.1760556642790;
+ Wed, 15 Oct 2025 12:30:42 -0700 (PDT)
+Date: Wed, 15 Oct 2025 19:30:41 +0000
+In-Reply-To: <20251015-cstr-core-v17-2-dc5e7aec870d@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20251015-cstr-core-v17-0-dc5e7aec870d@gmail.com> <20251015-cstr-core-v17-6-dc5e7aec870d@gmail.com>
-In-Reply-To: <20251015-cstr-core-v17-6-dc5e7aec870d@gmail.com>
-From: Tamir Duberstein <tamird@gmail.com>
-Date: Wed, 15 Oct 2025 15:29:05 -0400
-X-Gm-Features: AS18NWAV3lBjrdoX5xVPTxh-gkxtXMZeTFZJaDEZjzjbFJTQq56Dz3hw5BWoKLo
-Message-ID: <CAJ-ks9myBRqJJEErMU3Zt5-nx-AJ=D=gMNf07e3jFFj=SH_QGg@mail.gmail.com>
-Subject: Re: [PATCH v17 06/11] rust: alloc: use `kernel::fmt`
-To: Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
+Mime-Version: 1.0
+References: <20251015-cstr-core-v17-0-dc5e7aec870d@gmail.com> <20251015-cstr-core-v17-2-dc5e7aec870d@gmail.com>
+Message-ID: <aO_2YXO7C6Jk3EW-@google.com>
+Subject: Re: [PATCH v17 02/11] rust_binder: remove trailing comma
+From: Alice Ryhl <aliceryhl@google.com>
+To: Tamir Duberstein <tamird@gmail.com>
+Cc: Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
 	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
-	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
-	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
+	"=?utf-8?B?QmrDtnJu?= Roy Baron" <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>, 
+	Andreas Hindborg <a.hindborg@kernel.org>, Trevor Gross <tmgross@umich.edu>, 
 	Danilo Krummrich <dakr@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
 	"Rafael J. Wysocki" <rafael@kernel.org>, Luis Chamberlain <mcgrof@kernel.org>, 
 	Russ Weight <russ.weight@linux.dev>, Peter Zijlstra <peterz@infradead.org>, 
@@ -81,44 +73,23 @@ To: Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>,
 	Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, 
 	Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
 	Christian Brauner <brauner@kernel.org>, Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, 
-	=?UTF-8?B?QXJ2ZSBIasO4bm5ldsOlZw==?= <arve@android.com>, 
-	Todd Kjos <tkjos@android.com>, Martijn Coenen <maco@android.com>, 
+	"Arve =?utf-8?B?SGrDuG5uZXbDpWc=?=" <arve@android.com>, Todd Kjos <tkjos@android.com>, Martijn Coenen <maco@android.com>, 
 	Joel Fernandes <joelagnelf@nvidia.com>, Carlos Llamas <cmllamas@google.com>, 
 	Suren Baghdasaryan <surenb@google.com>, Jens Axboe <axboe@kernel.dk>, 
 	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, Vlastimil Babka <vbabka@suse.cz>, 
 	"Liam R. Howlett" <Liam.Howlett@oracle.com>, Uladzislau Rezki <urezki@gmail.com>, 
-	Bjorn Helgaas <bhelgaas@google.com>, =?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>
-Cc: rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	llvm@lists.linux.dev, linux-fsdevel@vger.kernel.org, 
-	linux-block@vger.kernel.org, linux-pci@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+	Bjorn Helgaas <bhelgaas@google.com>, 
+	"Krzysztof =?utf-8?Q?Wilczy=C5=84ski?=" <kwilczynski@kernel.org>, rust-for-linux@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, llvm@lists.linux.dev, 
+	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org, 
+	linux-pci@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
 
-On Wed, Oct 15, 2025 at 3:25=E2=80=AFPM Tamir Duberstein <tamird@gmail.com>=
- wrote:
->
-> Reduce coupling to implementation details of the formatting machinery by
-> avoiding direct use for `core`'s formatting traits and macros.
->
-> This backslid in commit 9def0d0a2a1c ("rust: alloc: add
-> Vec::push_within_capacity").
->
+On Wed, Oct 15, 2025 at 03:24:32PM -0400, Tamir Duberstein wrote:
+> This prepares for a later commit in which we introduce a custom
+> formatting macro; that macro doesn't handle trailing commas so just
+> remove this one.
+> 
 > Signed-off-by: Tamir Duberstein <tamird@gmail.com>
-> ---
->  rust/kernel/alloc/kvec/errors.rs | 14 +++++++-------
->  1 file changed, 7 insertions(+), 7 deletions(-)
->
-> diff --git a/rust/kernel/alloc/kvec/errors.rs b/rust/kernel/alloc/kvec/er=
-rors.rs
-> index 21a920a4b09b..e7de5049ee47 100644
-> --- a/rust/kernel/alloc/kvec/errors.rs
-> +++ b/rust/kernel/alloc/kvec/errors.rs
-> @@ -2,14 +2,14 @@
->
->  //! Errors for the [`Vec`] type.
->
-> -use kernel::fmt::{self, Debug, Formatter};
-> +use kernel::fmt;
->  use kernel::prelude::*;
 
-Oops, this one is not necessary. Just a style change here.
+Reviewed-by: Alice Ryhl <aliceryhl@google.com>
