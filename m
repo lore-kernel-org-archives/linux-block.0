@@ -1,91 +1,87 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D02B23081C3;
-	Thu, 16 Oct 2025 08:43:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22510251793
+	for <linux-block@vger.kernel.org>; Thu, 16 Oct 2025 09:47:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.24
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760604216; cv=none; b=rAvakXPKd/rx4+JrOw/GgjNh9wvhNuYicESeIRp6sBoerUiC+ShRDuuorsIxeIvzbmiES67wC+aye7n6l7lM8loTmnam9Hif1zEqkx+y+R67QGSeTufjaIDPqdMNVQAsBHbHRjbrMcxZxRItE46caP3RORJ+bi1Pu2asEWdSPSI=
+	t=1760608081; cv=none; b=jRPYpIKrlMzD2S8FS6y2bF3osDpTAkpEV59OPhjvr7e5Vv3SA3ChxCTzyBBf/txa7EDCO+Er3EQrv5OanqywdhiN3d0ly9LN5pVVb0/K/sF2V/YHQSwtQeSQ7m9PReV2D9re0ZLRAFgZnG9CRBAoGCMnad2YXszyK+gl6U12bJY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760604216; c=relaxed/simple;
-	bh=dG2kopHePGlGHIQgkzE2Ot+qQKYP9mZ35kDCrbYxLcg=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=UoqiDh1itcMTsvXj/H7/2YMVM/sJGJ8Hbc6WMCST+YJGI2arTFkJWqvIHEI4VUA74SMpckOKGUp7bFeDYzATdSdC7gXnGIW0pOCkmb2Vw2bMVMFNw/pNSrWEazlsfBthwHPtzayB+7ECy2sjYXMYHSHRSLXukI/7nolyrKTrzik=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U3TUiDsI; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1760608081; c=relaxed/simple;
+	bh=r5zW8p2/gtwEWnmFZIGgblAkeLsxf4w2Cx17U/3XFJI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
+	 Content-Type:References; b=g9E8J59pyI7+3ufcuFp5Z/DdMmkxcOkTQpJn9G2elDsndeOQcKPK9v1rw+KNXcfKdAt7R0S4K7ozEjizwqmRtjvafohvedjb4Tb6y7BLc/TkDmYp5WNQVsT5NPKJ2SSZLNKLU/OK2AOy1fUdcQ5vasidH3GhsCfhhSRZKHzgNy4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=O/wYBWsf; arc=none smtp.client-ip=203.254.224.24
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U3TUiDsI"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC9FAC113D0;
-	Thu, 16 Oct 2025 08:43:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760604215;
-	bh=dG2kopHePGlGHIQgkzE2Ot+qQKYP9mZ35kDCrbYxLcg=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=U3TUiDsIVhBP++dTMJkmI7FsKT3vHUGp0J0Xh/tef61JROZxCQP6IZsjdDtbYhI5u
-	 HoR4SDRmOrRiWj8z2V+I4SFhqkB4M0szqv2n8/9rnqhniAeuDphe4pXI6Z0xp6CJ3H
-	 8IeP/L79oLo70fBltRjDea8D22uJE943rBo+nNCg4BN0G/b5a9aqPOSSp/5YPDF+/r
-	 FmYB95TeCFOB2L04OW58Ztu4lryL6AkGr/gMacC0MnZWcNXO8nYYuMqLuzDQiFpF7t
-	 lVc8tbvCZwSsO6ItaN57Dq9eC+DHD3JWPArU16lOZWosmB2WH6IwNXwbBF7WzD5MZj
-	 8dAANUsgKjkPQ==
-From: Andreas Hindborg <a.hindborg@kernel.org>
-To: Tamir Duberstein <tamird@gmail.com>, Miguel Ojeda <ojeda@kernel.org>,
- Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>,
- Gary Guo <gary@garyguo.net>, =?utf-8?Q?Bj=C3=B6rn?= Roy Baron
- <bjorn3_gh@protonmail.com>,
- Benno Lossin <lossin@kernel.org>, Alice Ryhl <aliceryhl@google.com>,
- Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, Greg
- Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki"
- <rafael@kernel.org>, Luis Chamberlain <mcgrof@kernel.org>, Russ Weight
- <russ.weight@linux.dev>, Peter Zijlstra <peterz@infradead.org>, Ingo
- Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>, Waiman Long
- <longman@redhat.com>, Nathan Chancellor <nathan@kernel.org>, Nick
- Desaulniers <nick.desaulniers+lkml@gmail.com>, Bill Wendling
- <morbo@google.com>, Justin Stitt <justinstitt@google.com>, Christian
- Brauner <brauner@kernel.org>, Alexander Viro <viro@zeniv.linux.org.uk>, Jan
- Kara <jack@suse.cz>, Arve =?utf-8?B?SGrDuG5uZXbDpWc=?= <arve@android.com>,
- Todd Kjos
- <tkjos@android.com>, Martijn Coenen <maco@android.com>, Joel Fernandes
- <joelagnelf@nvidia.com>, Carlos
- Llamas <cmllamas@google.com>, Suren Baghdasaryan <surenb@google.com>, Jens
- Axboe <axboe@kernel.dk>, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
- Vlastimil Babka <vbabka@suse.cz>, "Liam R.
- Howlett" <Liam.Howlett@oracle.com>, Uladzislau Rezki <urezki@gmail.com>,
- Bjorn Helgaas <bhelgaas@google.com>, Krzysztof =?utf-8?Q?Wilczy=C5=84ski?=
- <kwilczynski@kernel.org>
-Cc: rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org,
- llvm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
- linux-block@vger.kernel.org, linux-pci@vger.kernel.org, Tamir
- Duberstein <tamird@gmail.com>
-Subject: Re: [PATCH v17 05/11] rnull: use `kernel::fmt`
-In-Reply-To: <20251015-cstr-core-v17-5-dc5e7aec870d@gmail.com>
-References: <20251015-cstr-core-v17-0-dc5e7aec870d@gmail.com>
- <RKKuz-9d_SQ5OAoqfvdJBB9gl56enjKQXKLnKjp1A5Vuoj0ub5KkAT6VSmni4sA0uCb70U-Sj7QO3Q8NqI9imA==@protonmail.internalid>
- <20251015-cstr-core-v17-5-dc5e7aec870d@gmail.com>
-Date: Thu, 16 Oct 2025 10:42:52 +0200
-Message-ID: <87h5vznsoj.fsf@t14s.mail-host-address-is-not-set>
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="O/wYBWsf"
+Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
+	by mailout1.samsung.com (KnoxPortal) with ESMTP id 20251016094756epoutp0102f5eb0c73f684ffc10820b0369c7a1f~u77fIkjD81006610066epoutp01E
+	for <linux-block@vger.kernel.org>; Thu, 16 Oct 2025 09:47:56 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20251016094756epoutp0102f5eb0c73f684ffc10820b0369c7a1f~u77fIkjD81006610066epoutp01E
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1760608077;
+	bh=FdnjNgdjCzHvat6P4B2OHjvq6mtqbABYBpymUlWcR74=;
+	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
+	b=O/wYBWsfCV8M7qzUOpO8xsS02ozbzaZBrzmEinVochWkR1b3yBmGoSmd2EBY6L3oC
+	 QP3MkmPF2m2GhL8IfPM1Ybe1DZsOFS6YPyGiN33LUJyE1vUWEyLaH8VeN2XzRjFyvT
+	 JKU90iCKQAUXnXdausK5h1cZrSQB9dVW9M2ON1Hc=
+Received: from epsnrtp01.localdomain (unknown [182.195.42.153]) by
+	epcas5p1.samsung.com (KnoxPortal) with ESMTPS id
+	20251016094756epcas5p169092388b1a89e9d653c87d2e433c617~u77el4Huz1743217432epcas5p1N;
+	Thu, 16 Oct 2025 09:47:56 +0000 (GMT)
+Received: from epcas5p3.samsung.com (unknown [182.195.38.87]) by
+	epsnrtp01.localdomain (Postfix) with ESMTP id 4cnNRb4nRWz6B9m5; Thu, 16 Oct
+	2025 09:47:55 +0000 (GMT)
+Received: from epsmtip1.samsung.com (unknown [182.195.34.30]) by
+	epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
+	20251016094755epcas5p3c9384b2342d1be98f572bf2c97f0e363~u77dcONG80525205252epcas5p3H;
+	Thu, 16 Oct 2025 09:47:55 +0000 (GMT)
+Received: from [107.122.11.51] (unknown [107.122.11.51]) by
+	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20251016094752epsmtip1ebeb57d27dffe43e2ae75ce3aedfd0d5~u77bA-O3y1091410914epsmtip1x;
+	Thu, 16 Oct 2025 09:47:52 +0000 (GMT)
+Message-ID: <78e760ed-1ba3-4a06-ac51-45b4cd2c05e0@samsung.com>
+Date: Thu, 16 Oct 2025 15:17:50 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 4/5] fs: propagate write stream
+To: Christoph Hellwig <hch@lst.de>
+Cc: kbusch@kernel.org, axboe@kernel.dk, brauner@kernel.org,
+	josef@toxicpanda.com, jack@suse.cz, jlayton@kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+	gost.dev@samsung.com
+Content-Language: en-US
+From: Kanchan Joshi <joshi.k@samsung.com>
+In-Reply-To: <20250812082404.GD22212@lst.de>
+Content-Transfer-Encoding: 7bit
+X-CMS-MailID: 20251016094755epcas5p3c9384b2342d1be98f572bf2c97f0e363
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+CMS-TYPE: 105P
+cpgsPolicy: CPGSC10-542,Y
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20250729145338epcas5p4da42906a341577997f39aa8453252ea3
+References: <20250729145135.12463-1-joshi.k@samsung.com>
+	<CGME20250729145338epcas5p4da42906a341577997f39aa8453252ea3@epcas5p4.samsung.com>
+	<20250729145135.12463-5-joshi.k@samsung.com> <20250812082404.GD22212@lst.de>
 
-"Tamir Duberstein" <tamird@gmail.com> writes:
+On 8/12/2025 1:54 PM, Christoph Hellwig wrote:
+> On Tue, Jul 29, 2025 at 08:21:34PM +0530, Kanchan Joshi wrote:
+>> bio->bi_write_stream is not set by the filesystem code.
+>> Use inode's write stream value to do that.
+> Just passing it through is going to create problems.  i.e. when
+> the file system does it's own placement or reserves ids.  We'll need
+> an explicit intercept point between the user write stream and what
+> does into the bio.
+> 
 
-> Reduce coupling to implementation details of the formatting machinery by
-> avoiding direct use for `core`'s formatting traits and macros.
->
-> This backslid in commit d969d504bc13 ("rnull: enable configuration via
-> `configfs`") and commit 34585dc649fb ("rnull: add soft-irq completion
-> support").
->
-> Signed-off-by: Tamir Duberstein <tamird@gmail.com>
-
-
-Acked-by: Andreas Hindborg <a.hindborg@kernel.org>
-
-
-Best regards,
-Andreas Hindborg
-
-
+For that intercept point - will you prefer a generic helper, say 
+fs_resolve_write_stream(), that will call a new inode operation that 
+filesystem will implement?
