@@ -1,291 +1,167 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from SJ2PR03CU001.outbound.protection.outlook.com (mail-westusazon11012001.outbound.protection.outlook.com [52.101.43.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E149318E1F
-	for <linux-block@vger.kernel.org>; Thu, 16 Oct 2025 03:18:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760584700; cv=none; b=SW6bJ+w+Up6l7jf7cRzh3B+sG2E9vlxuJkowG+NqNeXh/zglnQZzwbii31uHqTrCo7Bbk6GDp2F8Lo7zzQF/W15q7N7AO6UJe1e1rKKFNdUPqBI0pIvLblxmHAt5zezoR4hJ/JKSKXWkfUQY2q0aiHj28/oU4XnlJSLH6Ei8GTs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760584700; c=relaxed/simple;
-	bh=h7nV2zyc4PJ21sNzbN+qMVxjJs31WVPwiVNu5PnGtyo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Wg3ySVvdvZFOwGRWObBGRsetXv9hnWcuuVJlW/Y0al1HDspnXqQzBv2zm3vAcld+NsrBaYHfJ5oMdG+nKXRKBk7oo3HLnFc/K80Y/pR+ygk5nskXDAQI1XbB/Bra9emAYA4VAZDGKT+3QtXJjeunF/usbgbK32Y0yoTJkdxIZPQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Dw9dlqnB; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6B07187346;
+	Thu, 16 Oct 2025 04:10:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.43.1
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1760587816; cv=fail; b=hGeMyxz6pTTHOkpTcDxDWhDIjEfUZo7h2gGrFydmi3nCKdPSDRF7/TbfYzcQPah+hMs8y6Oz7FqvRo1u1EleYv3YvF8tghiFq35TW0i/kShrOdRiBKcwfD8E1GXccTfI8qrAzv3R0VhssfZuLqr3k7rjTQcMve/BkdT1cIQ1Vcg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1760587816; c=relaxed/simple;
+	bh=ou+YJUcSqfaPgPrH8X/DlhslvlxTjIdqnCYwoeDCWX4=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=I59Z4WaPAiGgyK+23qt8FKXJs/NknIS3U+oPFzRZSEacPYzQZd8bCXxquBOt46lJ/Z1Zy2wa1HhQRP1ljW7iBkJr+icOpoO2z036wxcrf3D2c6aHjZf0w7H2+vDtBmzubH3SnzXYl4SkGca79Ou60BhwHQZY0n3feJLo8nnoY/0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=PMipPDug; arc=fail smtp.client-ip=52.101.43.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Dw9dlqnB"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1760584697;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kyF+oheONqeIl4B6gEjw6GjFoHceuQtsr2EqrRZU+P8=;
-	b=Dw9dlqnBj9KonDLT4EdE+gJZQ8Y7Z5xFJAdXPUxEm/OkUOENeDbwjE3MoHQ+liiS9ckCoq
-	F/V0MITE7HTjJMC4vrhB5CQzDe77SomA0z2NZcZEZjdDdyESe0IU+0SYCaU1lru3lv3VaT
-	VIQUokz3V9vwdqc0ODWnS/EPx5tlYsg=
-Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
- [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-287-cktAsdB9ORyR4qN24988mA-1; Wed, 15 Oct 2025 23:18:16 -0400
-X-MC-Unique: cktAsdB9ORyR4qN24988mA-1
-X-Mimecast-MFC-AGG-ID: cktAsdB9ORyR4qN24988mA_1760584695
-Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-35f62a3c170so994041fa.0
-        for <linux-block@vger.kernel.org>; Wed, 15 Oct 2025 20:18:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760584694; x=1761189494;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=kyF+oheONqeIl4B6gEjw6GjFoHceuQtsr2EqrRZU+P8=;
-        b=Dj3o5BNt5QbRKzRfYIhpBSNEZWeO/CHMJkNXdsz8WNABDOIUOJ4knXRj167qH2b75M
-         DRu/YZIn2xXO2un01xCd9tHO7hnDUJLd4tQFaE6hvFKF2CBJrsiIYCknRGWfrJNKrP6H
-         TQvuRbRcUq/vxdWoB1WcLJ3zDMHMzC/eXA22LSC2LaJs1yt3q+Coz65520vrHSqjuyPc
-         ctLBdCWYh6GPhV11Qrj6af94zzjJaS0OfEwGuJ7J9sBQYp3UqPbCTMhWLgRlmpEmuwQ3
-         8PRj/MY4D7ghitxxuqjPxlhhgWvnBU2Q8ixJu8uh3nTz2zBLK7TleI8LEytsfmk2Suou
-         PnAg==
-X-Gm-Message-State: AOJu0YwQRC7GaLY7ZtTTiD8g5C5F3dIJO855HqSqK83BZT3xEV0vuk4q
-	Pd/yJuxiveU2X6YA5kJYg1bV1uKzeIKxfXD3uWrCRcEoRO0ktClfbznVXcrHrI4ynrDYDFcG/zD
-	hYYynV53ujl3fnF+B3s6IwbvbEhsxdBihY+lPt2wO7DH+g3QW0ezRJZQVGrIBA3ExqaY+V1NThE
-	4AAMgJv4hCbLgepGZV1d9PE9JuRYQ/TcdlKIQNbJ9I99koijluvj9FI58=
-X-Gm-Gg: ASbGnctknaCFtvNs3AdlF0lnSeUvJQhWDMvNVhqvUgiSR1obvBldSSq6ynVbNyVgtPC
-	oTpcJ4GNxZzA3jSxolTXJmp7HLBdTjNgvXkOijkq91M9/0v1iUtxKQRHaPrqyXkrpmrOdxNn3zz
-	SG2ULS/wKEVT+L7OIMKHGUkK5l/lyGocFj1BXGcF3zLaP8LAso4wucTdbh
-X-Received: by 2002:a2e:bd14:0:b0:367:8b63:3364 with SMTP id 38308e7fff4ca-37609e934ccmr80937511fa.36.1760584693961;
-        Wed, 15 Oct 2025 20:18:13 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEy8Zro1YKF2ZNjOfG/+7gZ+WY5dJmvPckzjSPcMXG5IkMa6hs5z/uW69eJeM5/wso36OwYoBTRRGyNjQad9Zk=
-X-Received: by 2002:a2e:bd14:0:b0:367:8b63:3364 with SMTP id
- 38308e7fff4ca-37609e934ccmr80937481fa.36.1760584693466; Wed, 15 Oct 2025
- 20:18:13 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="PMipPDug"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=X9M/liqiJwoZk5d00vmFdvfSU7hbjTCmMLDgxS+AVn44GPNGODF9UNVg3dRGSdIAxV2GY2VqJ13jv402AHqapH132mMs5BZ1E/fvy07LUkpPDPPMtpUdVjAoqY6vg4AO2ruawIlltsZhXQDErkUyZW/y41flK6ait44esut/gfEcJeKXNWA6KVDxHd0bGfbPFXarVFSx0SNaqm72VMGvIzcfwgtIvyozDCwM/KUv4Ki/Vw1Spu+tm5vLQ7/n9NxvbSCbQWlxAY3c1ec2jkAR2Ej2W3MpRPXy7ndfG0xPxUr/gQqFdnCEY5fmhBACH3NJR9mK9+gw7nAYHQNJ6ibr4w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=tzQ4tnfmli0RcUF7968vYelvjg1xf5gzjtt5FmtxTN0=;
+ b=sGks4lc2bbPlylbNLQ+fumZ64dLAVLo8RT50HJ6hmCjWQSsEBYP7f7yyQmMS1DMoPTe+yiIDqI8qAqP0q2gqftgUA6xYeZ4xx6KkSb8OWDGvfaJmtkCUrcaXYUbhyajBhtZaao1kyXKE6kE/u9rXYvdcbRpF588gQMSpFTYt1uxMAklunL5QNGhJVtmvxFK1C2xW0pb2x9TMj+JtLSxqKyB0PSrlvVIHHEZ6t5GaXrrQoUTHqKldZxdN2HwzfIxr3X41XYflnT/rHr9+k9y8B3KOZcia6gYbiMNs496Lto2u3+r/WYhCTb+nlH3OpYS7lBkJXqlE1V6SXpas2748Eg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=tzQ4tnfmli0RcUF7968vYelvjg1xf5gzjtt5FmtxTN0=;
+ b=PMipPDugQKjH9U6e7JuO/pSKNbrtB238aHm5C8LQrrsk+aTmzTRBh2Ox7qaI98tCvyK+DYqt5OxcEvsTx2AGlJyOI9MrrHEz7rdEfb7eHbHTEQLosUr4vKPxO11ZthBWoSgLsu7TVa9/LIpbYpPiH3b/6kGGsG27m9wFmR+o6TTQulq/MZvUm6X7aNNzvKtkZpz4HCmu06hUpgK7IadPA23exlnDLNRPZL+BWEgTnB8SKzwDiQHEtO0ab0PSJveno5kflAg+QPfCK7CRj0z5pyjLkmja11c4uXjsncs61SYaim3FqDDCyz7+AC4ha5uNv5YbOFtlcYKA8GYSx4SyZQ==
+Received: from PH8PR20CA0014.namprd20.prod.outlook.com (2603:10b6:510:23c::24)
+ by MN0PR12MB5906.namprd12.prod.outlook.com (2603:10b6:208:37a::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9228.10; Thu, 16 Oct
+ 2025 04:10:09 +0000
+Received: from SN1PEPF000397AF.namprd05.prod.outlook.com
+ (2603:10b6:510:23c:cafe::d0) by PH8PR20CA0014.outlook.office365.com
+ (2603:10b6:510:23c::24) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9228.11 via Frontend Transport; Thu,
+ 16 Oct 2025 04:10:09 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ SN1PEPF000397AF.mail.protection.outlook.com (10.167.248.53) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9228.7 via Frontend Transport; Thu, 16 Oct 2025 04:10:08 +0000
+Received: from rnnvmail205.nvidia.com (10.129.68.10) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Wed, 15 Oct
+ 2025 21:09:57 -0700
+Received: from rnnvmail204.nvidia.com (10.129.68.6) by rnnvmail205.nvidia.com
+ (10.129.68.10) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 15 Oct
+ 2025 21:09:56 -0700
+Received: from Asurada-Nvidia (10.127.8.12) by mail.nvidia.com (10.129.68.6)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
+ Transport; Wed, 15 Oct 2025 21:09:55 -0700
+Date: Wed, 15 Oct 2025 21:09:53 -0700
+From: Nicolin Chen <nicolinc@nvidia.com>
+To: Leon Romanovsky <leon@kernel.org>
+CC: Alex Williamson <alex.williamson@redhat.com>, Leon Romanovsky
+	<leonro@nvidia.com>, Jason Gunthorpe <jgg@nvidia.com>, Andrew Morton
+	<akpm@linux-foundation.org>, Bjorn Helgaas <bhelgaas@google.com>, Christian
+ =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	<dri-devel@lists.freedesktop.org>, <iommu@lists.linux.dev>, Jens Axboe
+	<axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>, <kvm@vger.kernel.org>,
+	<linaro-mm-sig@lists.linaro.org>, <linux-block@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-media@vger.kernel.org>,
+	<linux-mm@kvack.org>, <linux-pci@vger.kernel.org>, Logan Gunthorpe
+	<logang@deltatee.com>, Marek Szyprowski <m.szyprowski@samsung.com>, "Robin
+ Murphy" <robin.murphy@arm.com>, Sumit Semwal <sumit.semwal@linaro.org>,
+	"Vivek Kasireddy" <vivek.kasireddy@intel.com>, Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v5 8/9] vfio/pci: Enable peer-to-peer DMA transactions by
+ default
+Message-ID: <aPBwEVJSzezdii1V@Asurada-Nvidia>
+References: <cover.1760368250.git.leon@kernel.org>
+ <a04c44aa4625a6edfadaf9c9e2c2afb460ad1857.1760368250.git.leon@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251015014827.2997591-1-yukuai3@huawei.com> <5c13a5e3f257ceccb70e3d63869d8a9b6d963f6242b23690cff9d9ca7b9dbdf8@mailrelay.wdc.com>
- <oeyzci6ffshpukpfqgztsdeke5ost5hzsuz4rrsjfmvpqcevax@5nhnwbkzbrpa>
-In-Reply-To: <oeyzci6ffshpukpfqgztsdeke5ost5hzsuz4rrsjfmvpqcevax@5nhnwbkzbrpa>
-From: Yi Zhang <yi.zhang@redhat.com>
-Date: Thu, 16 Oct 2025 11:18:01 +0800
-X-Gm-Features: AS18NWAPOA47tTHJL7c0PLVyHB0zCN_kwT0D2NuDM2tN0JwoB72kjqoT1iQXd1o
-Message-ID: <CAHj4cs-yh_k==QjqDDkW4XViUGhRo3oJVpqQGdb28tr_kUbcpA@mail.gmail.com>
-Subject: Re: [PATCH] blk-mq: fix stale tag depth for shared sched tags in blk_mq_update_nr_requests()
-To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, 
-	Dennis Maisenbacher <dennis.maisenbacher@wdc.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <a04c44aa4625a6edfadaf9c9e2c2afb460ad1857.1760368250.git.leon@kernel.org>
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN1PEPF000397AF:EE_|MN0PR12MB5906:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0dc8bf67-cbb6-4b73-e83d-08de0c69e53f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|7416014|1800799024|82310400026|36860700013;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?aOPCMNXt69vGompbXz9hLA4vo9aZ8TdLP4131mGwisgZM9JQ0s7SfGcop+Km?=
+ =?us-ascii?Q?Tg5BJ3EwtevNrg5gDIu9jC3/iS7Ld/qr9XoNMoVGt5dEW9UNnPTVP1labE0k?=
+ =?us-ascii?Q?eQy0QHU3dsWh9ettL8EUXUIYJ+nnqrdjoAvJGJQN11ZsmsuNhVpsMEx7C6ez?=
+ =?us-ascii?Q?lKVro4LjLvnvoQyrJv8Wrx2KIY8KgJwZv03KcSnbxBGr22vVrRg1rcT7swKC?=
+ =?us-ascii?Q?dEJ+W1nP9PeZNd9/gblFUhuNCvpp7otniTdh2s7q6zwciioi1aDPljx1kl4n?=
+ =?us-ascii?Q?S2Fs26i8xXvlUd8iVI+OUGdnRwNyQL4bMAydGMoaem3oXjyzu2jw/dDdTJmw?=
+ =?us-ascii?Q?kdx9/HWjWY7KMLUNGEoCyLc1DC1T7n3XgcfXZZeRBnZ5/SFOXvumpe+nf2PH?=
+ =?us-ascii?Q?+EBTL7CKRsXt4GsWP9AFlUGnTFC+t1DyHQdOn1cIFSJzhQyvm24Tj8OsR+tC?=
+ =?us-ascii?Q?zHrynP6axdGREtF/9pmapYYflLZGOi+AajS0BlCWVCpsYtxYjcOdRHi/Qadj?=
+ =?us-ascii?Q?/VmB2zZPprh6Eb+1GOUbjx/qfYABOIJq4ybamo7+U+WSkchwkCeHFqi4+H6/?=
+ =?us-ascii?Q?Xs/PyagljB8zBTx/z+F73a4k+y/3kfGX9OppNeCDLyatuYNss/LyyLjKNKRN?=
+ =?us-ascii?Q?AQzwoh4+E2v7yPhdm6nGmCBCL4kug108xRi/byv03GPj3Se27ZNf6WTbPeST?=
+ =?us-ascii?Q?M3Y95nlWhlicY1WA84dXzDAAFZOoP56V3T2UrxakQa1E81QOBGyYTkUaWpbB?=
+ =?us-ascii?Q?5c7J6vARdGNuZ95MGK65zgVXTngNr3/L5JO6SqNwrIMFfS3Lv7pGYVbkfFNQ?=
+ =?us-ascii?Q?sdwXQ7AarYkmmD7ZwoFyDg6E6raeXLMZBBishTIMg54CIoI+w5p0oOESHQa3?=
+ =?us-ascii?Q?3Euz+9uTqBG9WYTcUxmughI1yjWebiVUiFz07BgEc+1wlvZroFbtW7OS7pLi?=
+ =?us-ascii?Q?54OunjQUKVCFn5x8G19okZeCP4Iwrz4lQ9asPV0M0YOVkzB5KxL6OtC8T+P3?=
+ =?us-ascii?Q?DEDkuIPIQC+fHmp+5+cf5o13XM3/YWYPUUnnOuKTaJibHZ1+oiSCXxoGZRXQ?=
+ =?us-ascii?Q?dEr14GYEr/mc6sTD8e2UK8ZHPnZvclhz2lTtcD7S2Si2uP58teIOc/M12UIL?=
+ =?us-ascii?Q?NOfNBy5wVav7SJYS6VbJrKfNoDRl1Ec/u2WtXjyCoSf7LPMvWzuXE8EFIf/N?=
+ =?us-ascii?Q?Q0Pp7KML1SNADmnH0o+6DG44ktax5X2hOwSlCfCxd4jETQn1M1C8vGGPoZC/?=
+ =?us-ascii?Q?62Bsb2txx+aoSr0FNjQo9nSqUdzYDUgLfzZ6JtM6aJ0pmhSf/bZc6o8Kl6Wy?=
+ =?us-ascii?Q?/8LfQfy/oGAEJDzKkHDKKA9UW8/dFcQQc7GIdyEg9XddEfXr7Z30iL+8Z6GW?=
+ =?us-ascii?Q?zsIr4TpHJEO++okrgar0EmUx6DQFL99CLIBeUs9Xv43n6Wu1bmnRLhdi3XOc?=
+ =?us-ascii?Q?S9hM0eF3Xt+ujsKctSZVGQ6F/aEEzZ2R9lmQtlUZ+3IEaZ1tzHVLiK6QXMWR?=
+ =?us-ascii?Q?747Ni/xiClJcO8q0XeKXjpGGiDnf52zhtfuxu66bBvsvik3z8DhuPZGVcxqF?=
+ =?us-ascii?Q?hAI03rVVLexi0Ff3nTI=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(82310400026)(36860700013);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Oct 2025 04:10:08.8892
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0dc8bf67-cbb6-4b73-e83d-08de0c69e53f
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SN1PEPF000397AF.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB5906
 
-On Thu, Oct 16, 2025 at 9:11=E2=80=AFAM Shinichiro Kawasaki
-<shinichiro.kawasaki@wdc.com> wrote:
->
-> On Oct 15, 2025 / 12:15, shinichiro.kawasaki@wdc.com wrote:
-> > Dear patch submitter,
-> >
-> > Blktests CI has tested the following submission:
-> > Status:     FAILURE
-> > Name:       blk-mq: fix stale tag depth for shared sched tags in blk_mq=
-_update_nr_requests()
-> > Patchwork:  https://patchwork.kernel.org/project/linux-block/list/?seri=
-es=3D1011590&state=3D*
-> > Run record: https://github.com/linux-blktests/linux-block/actions/runs/=
-18524669753
-> >
-> >
-> > Failed test cases: nvme/057
->
-> Blktests CI tested this patch and observed that the test case nvme/057 fa=
-iled
-> with the loop transport due to the lockdep WARN below. However, the failu=
-re
-> symptom does not look releated to the patch.
->
-> This failure looks new to me. Actions for fix will be appreciated. I will
-> disable the test case for blktests CI.
+Hi Leon,
 
-From the log, it seems it was similar to this one:
-https://lore.kernel.org/linux-block/CAHj4cs8mJ+R_GmQm9R8ebResKAWUE8kF5+_WVg=
-0v8zndmqd6BQ@mail.gmail.com/
+On Mon, Oct 13, 2025 at 06:26:10PM +0300, Leon Romanovsky wrote:
+> @@ -2090,6 +2092,9 @@ int vfio_pci_core_init_dev(struct vfio_device *core_vdev)
+>  	INIT_LIST_HEAD(&vdev->dummy_resources_list);
+>  	INIT_LIST_HEAD(&vdev->ioeventfds_list);
+>  	INIT_LIST_HEAD(&vdev->sriov_pfs_item);
+> +	ret = pcim_p2pdma_init(vdev->pdev);
+> +	if (ret != -EOPNOTSUPP)
+> +		return ret;
+>  	init_rwsem(&vdev->memory_lock);
+>  	xa_init(&vdev->ctx);
 
+I think this should be:
+	if (ret && ret != -EOPNOTSUPP)
+		return ret;
 
->
-> [11280.536805] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> [11280.537957] WARNING: possible circular locking dependency detected
-> [11280.538987] 6.18.0-rc1 #1 Tainted: G            E
-> [11280.539846] ------------------------------------------------------
-> [11280.540751] (udev-worker)/45976 is trying to acquire lock:
-> [11280.541614] ffff888100cc2148 ((wq_completion)kblockd){+.+.}-{0:0}, at:=
- touch_wq_lockdep_map+0x7a/0x180
-> [11280.542862]
->                but task is already holding lock:
-> [11280.544086] ffff88812bc63358 (&disk->open_mutex){+.+.}-{4:4}, at: bdev=
-_release+0x133/0x610
-> [11280.545176]
->                which lock already depends on the new lock.
->
-> [11280.546881]
->                the existing dependency chain (in reverse order) is:
-> [11280.548140]
->                -> #2 (&disk->open_mutex){+.+.}-{4:4}:
-> [11280.549314]        __lock_acquire+0x56d/0xc20
-> [11280.550023]        lock_acquire.part.0+0xb7/0x220
-> [11280.550746]        __mutex_lock+0x1a6/0x2110
-> [11280.551469]        nvme_partition_scan_work+0x8a/0x120 [nvme_core]
-> [11280.552362]        process_one_work+0x854/0x1460
-> [11280.553087]        worker_thread+0x5f3/0xfe0
-> [11280.553785]        kthread+0x3a5/0x760
-> [11280.554463]        ret_from_fork+0x2d3/0x3d0
-> [11280.555191]        ret_from_fork_asm+0x1a/0x30
-> [11280.555918]
->                -> #1 ((work_completion)(&head->partition_scan_work)){+.+.=
-}-{0:0}:
-> [11280.557334]        __lock_acquire+0x56d/0xc20
-> [11280.558061]        lock_acquire.part.0+0xb7/0x220
-> [11280.558818]        process_one_work+0x7ed/0x1460
-> [11280.559600]        worker_thread+0x5f3/0xfe0
-> [11280.560339]        kthread+0x3a5/0x760
-> [11280.561024]        ret_from_fork+0x2d3/0x3d0
-> [11280.561753]        ret_from_fork_asm+0x1a/0x30
-> [11280.562504]
->                -> #0 ((wq_completion)kblockd){+.+.}-{0:0}:
-> [11280.563805]        check_prev_add+0xeb/0xca0
-> [11280.564547]        validate_chain+0x46e/0x560
-> [11280.565302]        __lock_acquire+0x56d/0xc20
-> [11280.566084]        lock_acquire.part.0+0xb7/0x220
-> [11280.566885]        touch_wq_lockdep_map+0x93/0x180
-> [11280.567674]        start_flush_work+0x67d/0xc10
-> [11280.568446]        __flush_work+0xc6/0x1a0
-> [11280.569175]        nvme_mpath_put_disk+0x4f/0xa0 [nvme_core]
-> [11280.570040]        nvme_free_ns_head+0x23/0x160 [nvme_core]
-> [11280.570907]        bdev_release+0x3be/0x610
-> [11280.571652]        blkdev_release+0x11/0x20
-> [11280.572397]        __fput+0x372/0xaa0
-> [11280.573118]        fput_close_sync+0xe5/0x190
-> [11280.573869]        __x64_sys_close+0x7d/0xd0
-> [11280.574617]        do_syscall_64+0x97/0x800
-> [11280.575355]        entry_SYSCALL_64_after_hwframe+0x76/0x7e
-> [11280.576194]
->                other info that might help us debug this:
->
-> [11280.577944] Chain exists of:
->                  (wq_completion)kblockd --> (work_completion)(&head->part=
-ition_scan_work) --> &disk->open_mutex
->
-> [11280.580191]  Possible unsafe locking scenario:
->
-> [11280.581402]        CPU0                    CPU1
-> [11280.582143]        ----                    ----
-> [11280.582892]   lock(&disk->open_mutex);
-> [11280.583583]                                lock((work_completion)(&hea=
-d->partition_scan_work));
-> [11280.584656]                                lock(&disk->open_mutex);
-> [11280.585537]   lock((wq_completion)kblockd);
-> [11280.586260]
->                 *** DEADLOCK ***
->
-> [11280.587885] 2 locks held by (udev-worker)/45976:
-> [11280.588645]  #0: ffff88812bc63358 (&disk->open_mutex){+.+.}-{4:4}, at:=
- bdev_release+0x133/0x610
-> [11280.589732]  #1: ffffffff9f31f100 (rcu_read_lock){....}-{1:3}, at: sta=
-rt_flush_work+0x34/0xc10
-> [11280.590827]
->                stack backtrace:
-> [11280.591935] CPU: 3 UID: 0 PID: 45976 Comm: (udev-worker) Tainted: G   =
-         E       6.18.0-rc1 #1 PREEMPT(lazy)
-> [11280.591943] Tainted: [E]=3DUNSIGNED_MODULE
-> [11280.591946] Hardware name: KubeVirt None/RHEL, BIOS 1.16.3-2.el9 04/01=
-/2014
-> [11280.591955] Call Trace:
-> [11280.591968]  <TASK>
-> [11280.591973]  dump_stack_lvl+0x6e/0xa0
-> [11280.591982]  print_circular_bug.cold+0x38/0x45
-> [11280.591994]  check_noncircular+0x146/0x160
-> [11280.592005]  check_prev_add+0xeb/0xca0
-> [11280.592013]  validate_chain+0x46e/0x560
-> [11280.592022]  __lock_acquire+0x56d/0xc20
-> [11280.592030]  lock_acquire.part.0+0xb7/0x220
-> [11280.592035]  ? touch_wq_lockdep_map+0x7a/0x180
-> [11280.592042]  ? srso_alias_return_thunk+0x5/0xfbef5
-> [11280.592046]  ? find_held_lock+0x2b/0x80
-> [11280.592050]  ? srso_alias_return_thunk+0x5/0xfbef5
-> [11280.592054]  ? lock_acquire+0xee/0x130
-> [11280.592060]  ? touch_wq_lockdep_map+0x7a/0x180
-> [11280.592064]  touch_wq_lockdep_map+0x93/0x180
-> [11280.592069]  ? touch_wq_lockdep_map+0x7a/0x180
-> [11280.592072]  ? start_flush_work+0x5ae/0xc10
-> [11280.592078]  start_flush_work+0x67d/0xc10
-> [11280.592087]  __flush_work+0xc6/0x1a0
-> [11280.592091]  ? __pfx___flush_work+0x10/0x10
-> [11280.592096]  ? srso_alias_return_thunk+0x5/0xfbef5
-> [11280.592099]  ? find_held_lock+0x2b/0x80
-> [11280.592104]  ? __pfx_wq_barrier_func+0x10/0x10
-> [11280.592118]  ? __pfx___might_resched+0x10/0x10
-> [11280.592126]  ? queue_work_on+0x8e/0xc0
-> [11280.592130]  ? srso_alias_return_thunk+0x5/0xfbef5
-> [11280.592134]  ? lockdep_hardirqs_on_prepare.part.0+0x9b/0x150
-> [11280.592138]  ? srso_alias_return_thunk+0x5/0xfbef5
-> [11280.592147]  nvme_mpath_put_disk+0x4f/0xa0 [nvme_core]
-> [11280.592166]  nvme_free_ns_head+0x23/0x160 [nvme_core]
-> [11280.592183]  ? srso_alias_return_thunk+0x5/0xfbef5
-> [11280.592188]  bdev_release+0x3be/0x610
-> [11280.592197]  blkdev_release+0x11/0x20
-> [11280.592202]  __fput+0x372/0xaa0
-> [11280.592211]  fput_close_sync+0xe5/0x190
-> [11280.592217]  ? __pfx_fput_close_sync+0x10/0x10
-> [11280.592227]  __x64_sys_close+0x7d/0xd0
-> [11280.592233]  do_syscall_64+0x97/0x800
-> [11280.592237]  ? __fput+0x504/0xaa0
-> [11280.592242]  ? fput_close_sync+0xe5/0x190
-> [11280.592250]  ? srso_alias_return_thunk+0x5/0xfbef5
-> [11280.592254]  ? fput_close_sync+0xe5/0x190
-> [11280.592259]  ? __pfx_fput_close_sync+0x10/0x10
-> [11280.592264]  ? srso_alias_return_thunk+0x5/0xfbef5
-> [11280.592268]  ? do_raw_spin_unlock+0x14a/0x1f0
-> [11280.592275]  ? do_syscall_64+0x11b/0x800
-> [11280.592278]  ? srso_alias_return_thunk+0x5/0xfbef5
-> [11280.592282]  ? srso_alias_return_thunk+0x5/0xfbef5
-> [11280.592286]  ? do_syscall_64+0x139/0x800
-> [11280.592290]  ? srso_alias_return_thunk+0x5/0xfbef5
-> [11280.592294]  ? do_syscall_64+0x11b/0x800
-> [11280.592297]  ? srso_alias_return_thunk+0x5/0xfbef5
-> [11280.592302]  ? srso_alias_return_thunk+0x5/0xfbef5
-> [11280.592306]  ? do_syscall_64+0x139/0x800
-> [11280.592310]  ? srso_alias_return_thunk+0x5/0xfbef5
-> [11280.592313]  ? __x64_sys_symlinkat+0x165/0x1f0
-> [11280.592322]  ? do_syscall_64+0x11b/0x800
-> [11280.592325]  ? srso_alias_return_thunk+0x5/0xfbef5
-> [11280.592330]  ? srso_alias_return_thunk+0x5/0xfbef5
-> [11280.592333]  ? do_syscall_64+0x139/0x800
-> [11280.592338]  ? srso_alias_return_thunk+0x5/0xfbef5
-> [11280.592341]  ? do_syscall_64+0x139/0x800
-> [11280.592345]  ? lockdep_hardirqs_on_prepare.part.0+0x9b/0x150
-> [11280.592351]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-> [11280.592355] RIP: 0033:0x7fe0e347aae6
-> [11280.592361] Code: 5d e8 41 8b 93 08 03 00 00 59 5e 48 83 f8 fc 75 19 8=
-3 e2 39 83 fa 08 75 11 e8 26 ff ff ff 66 0f 1f 44 00 00 48 8b 45 10 0f 05 <=
-48> 8b 5d f8 c9 c3 0f 1f 40 00 f3 0f 1e fa 55 48 89 e5 48 83 ec 08
-> [11280.592365] RSP: 002b:00007ffe6ca41920 EFLAGS: 00000202 ORIG_RAX: 0000=
-000000000003
-> [11280.592378] RAX: ffffffffffffffda RBX: 00005640c8945570 RCX: 00007fe0e=
-347aae6
-> [11280.592382] RDX: 0000000000000000 RSI: 0000000000000000 RDI: 000000000=
-0000012
-> [11280.592387] RBP: 00007ffe6ca41940 R08: 0000000000000000 R09: 000000000=
-0000000
-> [11280.592389] R10: 0000000000000000 R11: 0000000000000202 R12: 00005640c=
-8f5f920
-> [11280.592392] R13: 00007ffe6ca41ca0 R14: 0000000000000000 R15: 000000000=
-0000011
-> [11280.592405]  </TASK>
->
+Otherwise, init_rwsem() and xa_init() would be missed if ret==0.
 
-
---=20
-Best Regards,
-  Yi Zhang
-
+Thanks
+Nicolin
