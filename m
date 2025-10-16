@@ -1,150 +1,186 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A28AF3314D5
-	for <linux-block@vger.kernel.org>; Thu, 16 Oct 2025 10:43:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7324A2367CF
+	for <linux-block@vger.kernel.org>; Thu, 16 Oct 2025 11:02:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760611436; cv=none; b=tbG1twSEIodoxNdoepXGAKIBu9r0PyOAB8o6Q7xBZJmtn5YR7wT4e2tQ096Dj5w4Ro2nUhboKR2domZhS27C8g4Ac15wQutbBCARf17o8/2FERsmeCZUeVU6ntV5fW7Hx3k1ypUdvbJl7a30g42qplZkORlLSYbWBbb69QWTicY=
+	t=1760612557; cv=none; b=qBR0Dj+dR/Oq63Lce6BtgB1WeAGJG4+xj+tw9Q4rM7jFIbOIdXzLoTZLx37357sIP1B93t49kBXOBgCowp1czy7mcU17612nODSzH3Vi7jhRCWkBon+q3gIgi9Jwpk0tQTgWNTjCLWddVffGV7Frs97ENysssz8MdgFEyhGLLQ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760611436; c=relaxed/simple;
-	bh=VWLEG9IZXo4c8E27XasFM385i7XxlR/EYb4wks1MHjs=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=Ot+hWkW9EXt2mKHAMbPFsLI1a70vr98EljJwIO/7ha1YgQ2oMLxxBMzb29/p8ioNLQ1fXRkFs5fSetcLKE6jB8uMCkDAWXrJHc0npgXhgYaBmR2BHuMQlYZRzEaiMgfTQSpH+ZeiTqMoGvNv1hyqs7OCzsDPCQTU3zaRPB2CGwE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Wx9iFIJr; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1760612557; c=relaxed/simple;
+	bh=QfApUCjeA54oY/UI0rlOTppWTpEejp4a9h6j6gyUFlI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=coKiox3jL323sVp6aF8WwNWt1RUm0JPTslS8NPp0c7A1jq9MCVGIquf5xWSgSBv0VjOkm0EQSZQDDJA66YjI1QnRYvTcvC+DR7xG8ae9k4C0EgddeeeG8WgTuzqydHIpI7ArEKwzwmz1NP7+PcmmgKAVyKddHEXiq0BbS01hvxA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eAWylTVf; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Wx9iFIJr"
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 59G15Nxw021718;
-	Thu, 16 Oct 2025 10:43:39 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=hvx28a
-	GWz4TqMzy8zyRLDRxJmFzT9SHDZqhmTboqtoM=; b=Wx9iFIJrUbjC7MecWwJz21
-	xOHn9hKmzfuZ7Cf4ua+gTbDJFssumgYu8FGfyN5dY14BM27Ife83CjFcvEKoVf/7
-	X/rXXhEBln38YGXXHqWXZ+p28H3W4K5SEtS7B5glYuO5ZCc1R7zzp2BTH18tkEEI
-	M2cpjl671K7gttq0o84VO1e+KuEFySHFvrCUTk2curZlbmiZeO6jFVqBCxSJSadn
-	YIoPycYFTQ409iucNfVkoeSBnxi96KjM9Qs9TTdXozsti1FW58MVTQDRcl1ARaxF
-	jm6YmyIS8ss1RkXVxJLsJwwP9Je82rH3xxnMTfd4jzoC0BqVld4KhNOKcnRpNU/w
-	==
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 49qew08wfr-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 16 Oct 2025 10:43:38 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 59G9PFxT015207;
-	Thu, 16 Oct 2025 10:43:38 GMT
-Received: from smtprelay02.dal12v.mail.ibm.com ([172.16.1.4])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 49r1jsdfre-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 16 Oct 2025 10:43:38 +0000
-Received: from smtpav05.wdc07v.mail.ibm.com (smtpav05.wdc07v.mail.ibm.com [10.39.53.232])
-	by smtprelay02.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 59GAhbDv16057074
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 16 Oct 2025 10:43:37 GMT
-Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 585BD5805D;
-	Thu, 16 Oct 2025 10:43:37 +0000 (GMT)
-Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3A68758059;
-	Thu, 16 Oct 2025 10:43:34 +0000 (GMT)
-Received: from [9.109.198.148] (unknown [9.109.198.148])
-	by smtpav05.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 16 Oct 2025 10:43:33 +0000 (GMT)
-Message-ID: <bfc714df-5425-48a6-963f-86d250eeb4b4@linux.ibm.com>
-Date: Thu, 16 Oct 2025 16:13:32 +0530
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eAWylTVf"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1760612553;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=EV67XLAliAWteGnv6LeupYn1YMdBJhusGkJrVtgTyoY=;
+	b=eAWylTVfVJg0q6AgnS47DxKr9W2rjt305FRsXY8Gmh8gSxKDDH1hLKhA+gmmEs4QQVMl4A
+	5URfh1a7ycIVaDGDTAI7PFCV3taAkfDfQNaxpUhDA149FJeXwYCoElTK8a0+tbsFlWQCAA
+	kkt5SLekA4Te4RVo7MtvDlNDLsLU3B8=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-97-i6akanTxO56IkvV9FiVnTA-1; Thu,
+ 16 Oct 2025 07:02:30 -0400
+X-MC-Unique: i6akanTxO56IkvV9FiVnTA-1
+X-Mimecast-MFC-AGG-ID: i6akanTxO56IkvV9FiVnTA_1760612549
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 71F9D1956095;
+	Thu, 16 Oct 2025 11:02:28 +0000 (UTC)
+Received: from fedora (unknown [10.72.120.7])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 825CE19560AD;
+	Thu, 16 Oct 2025 11:02:22 +0000 (UTC)
+Date: Thu, 16 Oct 2025 19:02:17 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Ondrej Mosnacek <omosnace@redhat.com>
+Cc: Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org, nbd@other.debian.org,
+	linux-security-module@vger.kernel.org, selinux@vger.kernel.org
+Subject: Re: [PATCH v2] nbd: override creds to kernel when calling
+ sock_{send,recv}msg()
+Message-ID: <aPDQuZzIHHzYq7vt@fedora>
+References: <20251010080900.1680512-1-omosnace@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv3 0/2] fix sbitmap initialization and null_blk shared
- tagset behavior
-From: Nilay Shroff <nilay@linux.ibm.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: hch@lst.de, dlemoal@kernel.org, yukuai1@huaweicloud.com, hare@suse.de,
-        ming.lei@redhat.com, johannes.thumshirn@wdc.com, gjoyce@ibm.com,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <20250723134442.1283664-1-nilay@linux.ibm.com>
-Content-Language: en-US
-In-Reply-To: <20250723134442.1283664-1-nilay@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 0dhGdqGwqEwmENfHUj89IW5dR6I_PPfP
-X-Authority-Analysis: v=2.4 cv=eJkeTXp1 c=1 sm=1 tr=0 ts=68f0cc5a cx=c_pps
- a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
- a=IkcTkHD0fZMA:10 a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=xM27ssRcYHfMtaMJAbgA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
- a=HhbK4dLum7pmb74im6QT:22 a=cPQSjfK2_nFv0Q5t_7PE:22 a=pHzHmUro8NiASowvMSCR:22
- a=Ew2E2A-JSTLzCXPT_086:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDExMDAxNCBTYWx0ZWRfXwOJm9iWEqBN7
- nXomeGa8aPc7oUcG6swMBeVoyzbWRURnkoxubi80Rzr1SO8bnDZvKoMhdZvWW1YyWxf0hyThvNw
- P15BhoY2934Ul1ExEQho1TTZ2J1BspRTDeJqbvEZiXzFBfOfoH7xAHRFNghdPJoJq0jT1lHGkpv
- GSkgPpNG07fVsh+6RL7OSD3674LPGOKF+gtsmjAgswqxD/7iRQwhNLEM+A0+8xblbyiKBBKPd/p
- CyzVMp1t760NAuJiowrQPDVi9BQ3JhoeJHyJ5s22uApjYYn6iKmxlrHAw4F7gty4xQN2PMk0uMA
- hnzr2d1fV0vv/szbW3n/b3XeNo+i+eu90vHfLOAoeLQyKbFqTQuA9IZ/3UMQ+XwcAUN6rlNVVo5
- 3yy4Xtz6BANtIwhfxXRzousJF02Wvw==
-X-Proofpoint-GUID: 0dhGdqGwqEwmENfHUj89IW5dR6I_PPfP
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-10-16_01,2025-10-13_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0 lowpriorityscore=0 spamscore=0 clxscore=1015 impostorscore=0
- phishscore=0 malwarescore=0 adultscore=0 priorityscore=1501 bulkscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2510020000 definitions=main-2510110014
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251010080900.1680512-1-omosnace@redhat.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-Hi Jens,
+On Fri, Oct 10, 2025 at 10:09:00AM +0200, Ondrej Mosnacek wrote:
+> sock_{send,recv}msg() internally calls security_socket_{send,recv}msg(),
+> which does security checks (e.g. SELinux) for socket access against the
+> current task. However, _sock_xmit() in drivers/block/nbd.c may be called
+> indirectly from a userspace syscall, where the NBD socket access would
+> be incorrectly checked against the calling userspace task (which simply
+> tries to read/write a file that happens to reside on an NBD device).
+> 
+> To fix this, temporarily override creds to kernel ones before calling
+> the sock_*() functions. This allows the security modules to recognize
+> this as internal access by the kernel, which will normally be allowed.
+> 
+> A way to trigger the issue is to do the following (on a system with
+> SELinux set to enforcing):
+> 
+>     ### Create nbd device:
+>     truncate -s 256M /tmp/testfile
+>     nbd-server localhost:10809 /tmp/testfile
+> 
+>     ### Connect to the nbd server:
+>     nbd-client localhost
+> 
+>     ### Create mdraid array
+>     mdadm --create -l 1 -n 2 /dev/md/testarray /dev/nbd0 missing
+> 
+> After these steps, assuming the SELinux policy doesn't allow the
+> unexpected access pattern, errors will be visible on the kernel console:
+> 
+> [  142.204243] nbd0: detected capacity change from 0 to 524288
+> [  165.189967] md: async del_gendisk mode will be removed in future, please upgrade to mdadm-4.5+
+> [  165.252299] md/raid1:md127: active with 1 out of 2 mirrors
+> [  165.252725] md127: detected capacity change from 0 to 522240
+> [  165.255434] block nbd0: Send control failed (result -13)
+> [  165.255718] block nbd0: Request send failed, requeueing
+> [  165.256006] block nbd0: Dead connection, failed to find a fallback
+> [  165.256041] block nbd0: Receive control failed (result -32)
+> [  165.256423] block nbd0: shutting down sockets
+> [  165.257196] I/O error, dev nbd0, sector 2048 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 2
+> [  165.257736] Buffer I/O error on dev md127, logical block 0, async page read
+> [  165.258263] I/O error, dev nbd0, sector 2048 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 2
+> [  165.259376] Buffer I/O error on dev md127, logical block 0, async page read
+> [  165.259920] I/O error, dev nbd0, sector 2048 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 2
+> [  165.260628] Buffer I/O error on dev md127, logical block 0, async page read
+> [  165.261661] ldm_validate_partition_table(): Disk read failed.
+> [  165.262108] I/O error, dev nbd0, sector 2048 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 2
+> [  165.262769] Buffer I/O error on dev md127, logical block 0, async page read
+> [  165.263697] I/O error, dev nbd0, sector 2048 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 2
+> [  165.264412] Buffer I/O error on dev md127, logical block 0, async page read
+> [  165.265412] I/O error, dev nbd0, sector 2048 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 2
+> [  165.265872] Buffer I/O error on dev md127, logical block 0, async page read
+> [  165.266378] I/O error, dev nbd0, sector 2048 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 2
+> [  165.267168] Buffer I/O error on dev md127, logical block 0, async page read
+> [  165.267564]  md127: unable to read partition table
+> [  165.269581] I/O error, dev nbd0, sector 0 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 2
+> [  165.269960] Buffer I/O error on dev nbd0, logical block 0, async page read
+> [  165.270316] I/O error, dev nbd0, sector 0 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 2
+> [  165.270913] Buffer I/O error on dev nbd0, logical block 0, async page read
+> [  165.271253] I/O error, dev nbd0, sector 0 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 2
+> [  165.271809] Buffer I/O error on dev nbd0, logical block 0, async page read
+> [  165.272074] ldm_validate_partition_table(): Disk read failed.
+> [  165.272360]  nbd0: unable to read partition table
+> [  165.289004] ldm_validate_partition_table(): Disk read failed.
+> [  165.289614]  nbd0: unable to read partition table
+> 
+> The corresponding SELinux denial on Fedora/RHEL will look like this
+> (assuming it's not silenced):
+> type=AVC msg=audit(1758104872.510:116): avc:  denied  { write } for  pid=1908 comm="mdadm" laddr=::1 lport=32772 faddr=::1 fport=10809 scontext=system_u:system_r:mdadm_t:s0-s0:c0.c1023 tcontext=unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023 tclass=tcp_socket permissive=0
+> 
+> The respective backtrace looks like this:
+> @security[mdadm, -13,
+>         handshake_exit+221615650
+>         handshake_exit+221615650
+>         handshake_exit+221616465
+>         security_socket_sendmsg+5
+>         sock_sendmsg+106
+>         handshake_exit+221616150
+>         sock_sendmsg+5
+>         __sock_xmit+162
+>         nbd_send_cmd+597
+>         nbd_handle_cmd+377
+>         nbd_queue_rq+63
+>         blk_mq_dispatch_rq_list+653
+>         __blk_mq_do_dispatch_sched+184
+>         __blk_mq_sched_dispatch_requests+333
+>         blk_mq_sched_dispatch_requests+38
+>         blk_mq_run_hw_queue+239
+>         blk_mq_dispatch_plug_list+382
+>         blk_mq_flush_plug_list.part.0+55
+>         __blk_flush_plug+241
+>         __submit_bio+353
+>         submit_bio_noacct_nocheck+364
+>         submit_bio_wait+84
+>         __blkdev_direct_IO_simple+232
+>         blkdev_read_iter+162
+>         vfs_read+591
+>         ksys_read+95
+>         do_syscall_64+92
+>         entry_SYSCALL_64_after_hwframe+120
+> ]: 1
+> 
+> The issue has started to appear since commit 060406c61c7c ("block: add
+> plug while submitting IO").
+> 
+> Cc: Ming Lei <ming.lei@redhat.com>
+> Link: https://bugzilla.redhat.com/show_bug.cgi?id=2348878
+> Fixes: 060406c61c7c ("block: add plug while submitting IO")
+> Signed-off-by: Ondrej Mosnacek <omosnace@redhat.com>
+> ---
+> 
+> Changes in v2:
+>  * Move put_cred() after destroy_workqueue() in nbd_cleanup() to avoid a UAF
+>  * Add some more details into the commit message
+>  * Add a Fixes: tag
 
-It seems this patchset may have fallen through the cracks. 
-It still applies cleanly on the latest mainline code. Could
-you please consider pulling it for the 6.18 cycle?
+Hello Jens,
+
+Any chance to pull this patch into v6.18 if you are fine?
+
 
 Thanks,
---Nilay
-
-On 7/23/25 7:13 PM, Nilay Shroff wrote:
-> Hi,
-> 
-> This patchset fixes two subtle issues discovered while unit testing
-> nr_hw_queue update code using null_blk driver.
-> 
-> The first patch in the series, fixes an issue in the sbitmap initialization
-> code, where sb->alloc_hint is not explicitly set to NULL when the sbitmap
-> depth is zero. This can lead to a kernel crash in sbitmap_free(), which
-> unconditionally calls free_percpu() on sb->alloc_hint — even if it was
-> never allocated. The crash is caused by dereferencing an invalid pointer
-> or stale garbage value.
-> 
-> The second patch in the series, prevents runtime updates to submit_queues
-> or poll_queues when using a shared tagset. Currently, such updates lead 
-> to the allocation of new hardware queues (hctx) that are never mapped to
-> any software queues (ctx), rendering them unusable for I/O. This patch
-> rejects these changes and ensures more consistent behavior. Interestingly,
-> this unnecessary queue update path helped uncover the issue fixed in first
-> patch.
-> 
-> As usual, review and feedback are most welcome!
-> 
-> Changes from v2:
->     - Updated the second patch to prevent the user from modifying submit
->       or poll queues when tagset is shared (Damien Le Moal, Yu Kuai)
-> Changes from v1:
->     - The set->driver_data field should be initialized separately for the
->       shared tagset to ensure it is correctly set for both shared and
->       non-shared tagset cases. (Damien Le Moal)
-> 
-> Nilay Shroff (2):
->   lib/sbitmap: fix kernel crash observed when sbitmap depth is zero
->   null_blk: prevent submit and poll queues update for shared tagset
-> 
->  drivers/block/null_blk/main.c | 32 ++++++++++++++++++++++----------
->  lib/sbitmap.c                 |  1 +
->  2 files changed, 23 insertions(+), 10 deletions(-)
-> 
+Ming
 
