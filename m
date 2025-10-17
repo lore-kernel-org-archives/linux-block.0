@@ -1,166 +1,273 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A42FD334686;
-	Fri, 17 Oct 2025 05:40:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51E6C334689
+	for <linux-block@vger.kernel.org>; Fri, 17 Oct 2025 06:10:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760679611; cv=none; b=TSFib6nVuopUos3fObkGv+so6wxj9Ro+jRM6gHu/efW2nvH5arAt9ybkskQvRk1yrqmwtKMM86JYBl2F5eD40z8nCgWq0z0fDWOlqclbKwjP3ZIf2C357Jq+BVhsyuDIr/nPhZcuEsBtPQJjdW3QNkUJnRMlNJ5d27s9zMXWbzU=
+	t=1760681409; cv=none; b=TeH36lX6c0bm+URjTt+0FruWVaQn1Tceh5BFgk79bEWOd4YfogAj6Hl5EEVNeoSJSalNFsyDZT8/TaW4rOevTRoXtbEwX3inj5M64xGnOohwgZLdVk6vEyjsG/rIaC2u4KVw0PfPNt+sX2q/dNljX41Pkstd9WQ4s9iPcAXW17k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760679611; c=relaxed/simple;
-	bh=QatSK3vs5GP8c8e8mP/n3Zh7cEbbQ3Zbp2cyGT+36CI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VZ6tBGhiFWtdM1tZBil9+syboxUnuId4I7rr+jrOawfIyc+FProdN09n3QUImXu+kNjKCq7nIAEN+zYhjt6Dy6kvwc+96FaTMCFHGMSlZzkGlfR+wW4fol6Fe5Gg64e4KxXmZsqv34qBJiDn0YIFCih/JCh7ezAwF5cB0iuwsGI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JpP2Mu5B; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1760681409; c=relaxed/simple;
+	bh=PTeCjpmyIduQtL+k+FvKXkT5QKPZ5hJEEZjKkNV8bTE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dMS7ps7nZdz5wW94R4ojDnAsK4sD3VjR/CSwsgxCPtFBipTpuZkAo1N0ozxYsOkmeOg0Top5ErEBIYsyGfB3H3C4n8I5vBsmMTKBnHnfaTbpNgFceIbRn225UHhvHNzYBbCA4tOiyG3cFAbyOAKEUiLSqxy8KnyS2V2qpNh/csw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IFPChHaB; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JpP2Mu5B"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD16DC4CEE7;
-	Fri, 17 Oct 2025 05:40:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760679611;
-	bh=QatSK3vs5GP8c8e8mP/n3Zh7cEbbQ3Zbp2cyGT+36CI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=JpP2Mu5B3aLEq2tithF2l4ekoWI7PQCF+VFS8MQGgHf4eBvOc+yXOj+6j3SF1JJGp
-	 pEWPTs1ub7jCDFoztpJusE1SvuXOPIOS3EDzNJKolsvP7ynn443SDWb6+4ru7KM3Ik
-	 4j+XYNWMaoFpTvU03u3ve6ByEq+Ss1Fm2ijL//zmgS/KjrczzYtQkY9DonD8sLZBjR
-	 wAsx5V7EeXmlXZROMgB5Yk8A5L2w8KdUAli094vKeMAxXL3wpcyYeEh7KW2U9dbVP1
-	 B/DzVQ/2C+MLErckpLFiu2Jq3uo28qrca2pT6QzZpBpkxmTwNhHCgEXgkTF1WRW82g
-	 apdepzvlnSlOA==
-Date: Fri, 17 Oct 2025 08:40:07 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>,
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IFPChHaB"
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-421851bca51so1179957f8f.1
+        for <linux-block@vger.kernel.org>; Thu, 16 Oct 2025 23:10:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1760681405; x=1761286205; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=YKOBkkWD4hkodywyrqPuA/TDPu23QJtZxY6LZ9yXiLM=;
+        b=IFPChHaBoxYdHIzKSr61wiEEQUSUBTOGJJkuFk/9m8BjL4DVxUJ/fTN/X2bVsDWDrp
+         xFwM5Eggu1G5yzj7pnXGJtva4Lm5wozABWA7+drjTBnmR+6DpV18HJfL9NBFrwwtZjDE
+         5hd4PxNSx3kRNRQ5AlpfL1aGnzeInrPfp+ng7PMrE/GCFbaHW56OKdDwsLW+wXJKBHuQ
+         MesI0+PTcg6opFOLurA9gNqhJF9hEUh5EES4KZVJ47i9UpY66PYel5p5gc01i67u8ivI
+         DYY7Ah/26/ZWjJyEhIGZZqgBueq7JKmWZME/UlpQke9WMnc8QRjBYbR+IcUEobVyD5cD
+         aBsQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760681405; x=1761286205;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=YKOBkkWD4hkodywyrqPuA/TDPu23QJtZxY6LZ9yXiLM=;
+        b=sSDmUAH+yXIw6B75NNcklV5EASiRvvYMWWNEwnRR03cuSxyFdTzgmpB/2izgThH3Wx
+         DAzE3Ny83QFfcmDmfsFSoCQiCmZcp4GexCj8cV37Pac5/N8NFE2kiL+80chhHKrgSSNB
+         4uqaKfuDF/bm3VysNuEJdK3erbSgJ7WIed3nh52NIYNTI7wWIT8HPHhFKTjzxtOuxElY
+         QyRKemS4TRIoQLwrNkiKE/IixuZlSHfVP7wkwgi091/G4yDfPZNMLDVo6kQm0VjHuUK0
+         Ej+6GnYikFkxS/u5ieKFwVs/RFWUpnU23ekrC5AMAi8mCdyILiufWxzWjseRZ9P+oTsy
+         ixmw==
+X-Forwarded-Encrypted: i=1; AJvYcCWYW6ktvkvYl9EetEN5quJTnRB3h1TQvK0hxVJq4ZvhDBlxp5TPVb0XRzx3L/PIU0x/RR1Ec+C1/3gzyg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwJP1byry4+/rWRwf3+UeSglawOdq76ROZd6mm9+zZPaHViIYlc
+	D1FLsNj3Sc28xMYWDVlze1umPHzGzdBYm2toZzFibxb9i8xc7jXy1SS7
+X-Gm-Gg: ASbGncvgOOmffBpUVK+gTqdIPTrvIBWNoRwQ9MZ0xFR6da9af+i/SlkvWtkozGbJPY+
+	aLNvU8M4VfLTYr1hbOPujXq591c2XPVHMKh4VniLlJ9m7f4cP/2gZ97D1fIXC8MaaGtrhMOdScx
+	5mmfsyKKC0BoCNGYM7wbrm7uIuVnq/eRgDFxGbMsbR0pw2v9IDo+RmVS92SEPG9whmymcymFhDT
+	0gUNSUtjV2GhLlTRTJRj/ZWpJ8vasQKJV5naR9bbX7mHyKzbvXIcGml4p0w2xIfApb6esJp0Wzw
+	NJsVCwChf59ncy6m1VuCMS/fadxi9VXyYopSRtDGY8/akgizOaoMeNMJPtpWkynPPgHXsF/mdKp
+	3Z7tZosJ2LDZFlByXIyp+u+JWYEBIequZ5PVU0vpLUsXcwNlZYHXAUWFtIkOYOhi8MicIZREMIc
+	lYX0iG9SnBF4A=
+X-Google-Smtp-Source: AGHT+IGZ4ambk8T3o48xvPm40t3Ay+iXThL+hr7h4NpNwxZaAMKHno3K1osHDhvr/3GCz1pzwYtqQQ==
+X-Received: by 2002:a05:6000:178f:b0:3ee:1521:95fc with SMTP id ffacd0b85a97d-42704d8812bmr1885897f8f.14.1760681405257;
+        Thu, 16 Oct 2025 23:10:05 -0700 (PDT)
+Received: from localhost ([212.73.77.104])
+        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-426ce5e1284sm38327970f8f.45.2025.10.16.23.10.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 16 Oct 2025 23:10:04 -0700 (PDT)
+From: Askar Safin <safinaskar@gmail.com>
+To: linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Linus Torvalds <torvalds@linux-foundation.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Christian Brauner <brauner@kernel.org>,
+	Al Viro <viro@zeniv.linux.org.uk>,
+	Jan Kara <jack@suse.cz>,
+	Christoph Hellwig <hch@lst.de>,
+	Jens Axboe <axboe@kernel.dk>,
+	Andy Shevchenko <andy.shevchenko@gmail.com>,
+	Aleksa Sarai <cyphar@cyphar.com>,
+	=?UTF-8?q?Thomas=20Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>,
+	Julian Stecklina <julian.stecklina@cyberus-technology.de>,
+	Gao Xiang <hsiangkao@linux.alibaba.com>,
+	Art Nikpal <email2tema@gmail.com>,
 	Andrew Morton <akpm@linux-foundation.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
-	Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>,
-	kvm@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-media@vger.kernel.org, linux-mm@kvack.org,
-	linux-pci@vger.kernel.org, Logan Gunthorpe <logang@deltatee.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Vivek Kasireddy <vivek.kasireddy@intel.com>,
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v5 9/9] vfio/pci: Add dma-buf export support for MMIO
- regions
-Message-ID: <20251017054007.GB6199@unreal>
-References: <cover.1760368250.git.leon@kernel.org>
- <72ecaa13864ca346797e342d23a7929562788148.1760368250.git.leon@kernel.org>
- <20251016235332.GA265079@nvidia.com>
+	Alexander Graf <graf@amazon.com>,
+	Rob Landley <rob@landley.net>,
+	Lennart Poettering <mzxreary@0pointer.de>,
+	linux-arch@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	initramfs@vger.kernel.org,
+	linux-api@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	Michal Simek <monstr@monstr.eu>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Kees Cook <kees@kernel.org>,
+	Thorsten Blum <thorsten.blum@linux.dev>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Dave Young <dyoung@redhat.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Borislav Petkov <bp@alien8.de>,
+	Jessica Clarke <jrtc27@jrtc27.com>,
+	Nicolas Schichan <nschichan@freebox.fr>,
+	David Disseldorp <ddiss@suse.de>,
+	patches@lists.linux.dev
+Subject: [PATCH v3 0/3] initrd: remove half of classic initrd support
+Date: Fri, 17 Oct 2025 06:09:53 +0000
+Message-ID: <20251017060956.1151347-1-safinaskar@gmail.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251016235332.GA265079@nvidia.com>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Oct 16, 2025 at 08:53:32PM -0300, Jason Gunthorpe wrote:
-> On Mon, Oct 13, 2025 at 06:26:11PM +0300, Leon Romanovsky wrote:
-> > +
-> > +static int vfio_pci_dma_buf_attach(struct dma_buf *dmabuf,
-> > +				   struct dma_buf_attachment *attachment)
-> > +{
-> > +	struct vfio_pci_dma_buf *priv = dmabuf->priv;
-> > +
-> > +	if (!attachment->peer2peer)
-> > +		return -EOPNOTSUPP;
-> > +
-> > +	if (priv->revoked)
-> > +		return -ENODEV;
-> > +
-> > +	switch (pci_p2pdma_map_type(priv->provider, attachment->dev)) {
-> > +	case PCI_P2PDMA_MAP_THRU_HOST_BRIDGE:
-> > +		break;
-> > +	case PCI_P2PDMA_MAP_BUS_ADDR:
-> > +		/*
-> > +		 * There is no need in IOVA at all for this flow.
-> > +		 * We rely on attachment->priv == NULL as a marker
-> > +		 * for this mode.
-> > +		 */
-> > +		return 0;
-> > +	default:
-> > +		return -EINVAL;
-> > +	}
-> > +
-> > +	attachment->priv = kzalloc(sizeof(struct dma_iova_state), GFP_KERNEL);
-> > +	if (!attachment->priv)
-> > +		return -ENOMEM;
-> > +
-> > +	dma_iova_try_alloc(attachment->dev, attachment->priv, 0, priv->size);
-> 
-> The lifetime of this isn't good..
-> 
-> > +	return 0;
-> > +}
-> > +
-> > +static void vfio_pci_dma_buf_detach(struct dma_buf *dmabuf,
-> > +				    struct dma_buf_attachment *attachment)
-> > +{
-> > +	kfree(attachment->priv);
-> > +}
-> 
-> If the caller fails to call map then it leaks the iova.
+Intro
+====
+This patchset removes half of classic initrd (initial RAM disk) support,
+i. e. linuxrc code path, which was deprecated in 2020.
+Initramfs still stays, RAM disk itself (brd) still stays.
+And other half of initrd stays, too.
+init/do_mounts* are listed in VFS entry in
+MAINTAINERS, so I think this patchset should go through VFS tree.
+I tested the patchset on 8 (!!!) archs in Qemu (see details below).
+If you still use initrd, see below for workaround.
 
-I'm relying on dmabuf code and documentation:
+In 2020 deprecation notice was put to linuxrc initrd code path.
+In v1 I tried to remove initrd
+fully, but Nicolas Schichan reported that he still uses
+other code path (root=/dev/ram0 one) on million devices [4].
+root=/dev/ram0 code path did not contain deprecation notice.
 
-   926 /**
-   927  * dma_buf_dynamic_attach - Add the device to dma_buf's attachments list
-...   
-   932  *
-   933  * Returns struct dma_buf_attachment pointer for this attachment. Attachments
-   934  * must be cleaned up by calling dma_buf_detach().
+So, in this version of patchset I remove deprecated code path,
+i. e. linuxrc one, while keeping other, i. e. root=/dev/ram0 one.
 
-Successful call to vfio_pci_dma_buf_attach() MUST be accompanied by call
-to vfio_pci_dma_buf_detach(), so as far as dmabuf implementation follows
-it, there is no leak.
+Also I put deprecation notice to remaining code path, i. e. to
+root=/dev/ram0 one. I plan to send patches for full removal
+of initrd after one year, i. e. in September 2026 (of course,
+initramfs will still work).
 
-> 
-> > +static struct sg_table *
-> > +vfio_pci_dma_buf_map(struct dma_buf_attachment *attachment,
-> > +		     enum dma_data_direction dir)
-> > +{
-> [..]
-> 
-> 
-> > +err_unmap_dma:
-> > +	if (!i || !state)
-> > +		; /* Do nothing */
-> > +	else if (dma_use_iova(state))
-> > +		dma_iova_destroy(attachment->dev, state, mapped_len, dir,
-> > +				 attrs);
-> 
-> If we hit this error path then it is freed..
-> 
-> > +static void vfio_pci_dma_buf_unmap(struct dma_buf_attachment *attachment,
-> > +				   struct sg_table *sgt,
-> > +				   enum dma_data_direction dir)
-> > +{
-> > +	struct vfio_pci_dma_buf *priv = attachment->dmabuf->priv;
-> > +	struct dma_iova_state *state = attachment->priv;
-> > +	unsigned long attrs = DMA_ATTR_MMIO;
-> > +	struct scatterlist *sgl;
-> > +	int i;
-> > +
-> > +	if (!state)
-> > +		; /* Do nothing */
-> > +	else if (dma_use_iova(state))
-> > +		dma_iova_destroy(attachment->dev, state, priv->size, dir,
-> > +				 attrs);
-> 
-> It is freed here too, but we can call map multiple times. Every time a
-> move_notify happens can trigger another call to map.
-> 
-> I think just call unlink in those two and put dma_iova_free in detach
+Also, I tried to make this patchset small to make sure it
+can be reverted easily. I plan to send cleanups later.
 
-Yes, it can work.
+Details
+====
+Other user-visible changes:
 
-Thanks
+- Removed kernel command line parameters "load_ramdisk" and
+"prompt_ramdisk", which did nothing and were deprecated
+- Removed /proc/sys/kernel/real-root-dev . It was used
+for initrd only
+- Command line parameters "noinitrd" and "ramdisk_start=" are deprecated
 
-> 
-> Jason
+This patchset is based on v6.18-rc1.
+
+Testing
+====
+I tested my patchset on many architectures in Qemu using my Rust
+program, heavily based on mkroot [1].
+
+I used the following cross-compilers:
+
+aarch64-linux-musleabi
+armv4l-linux-musleabihf
+armv5l-linux-musleabihf
+armv7l-linux-musleabihf
+i486-linux-musl
+i686-linux-musl
+mips-linux-musl
+mips64-linux-musl
+mipsel-linux-musl
+powerpc-linux-musl
+powerpc64-linux-musl
+powerpc64le-linux-musl
+riscv32-linux-musl
+riscv64-linux-musl
+s390x-linux-musl
+sh4-linux-musl
+sh4eb-linux-musl
+x86_64-linux-musl
+
+taken from this directory [2].
+
+So, as you can see, there are 18 triplets, which correspond to 8 subdirs in arch/.
+
+For every triplet I tested that:
+- Initramfs still works (both builtin and external)
+- Direct boot from disk still works
+- Remaining initrd code path (root=/dev/ram0) still works
+
+Workaround
+====
+If "retain_initrd" is passed to kernel, then initramfs/initrd,
+passed by bootloader, is retained and becomes available after boot
+as read-only magic file /sys/firmware/initrd [3].
+
+No copies are involved. I. e. /sys/firmware/initrd is simply
+a reference to original blob passed by bootloader.
+
+This works even if initrd/initramfs is not recognized by kernel
+in any way, i. e. even if it is not valid cpio archive, nor
+a fs image supported by classic initrd.
+
+This works both with my patchset and without it.
+
+This means that you can emulate classic initrd so:
+link builtin initramfs to kernel; in /init in this initramfs
+copy /sys/firmware/initrd to some file in / and loop-mount it.
+
+This is even better than classic initrd, because:
+- You can use fs not supported by classic initrd, for example erofs
+- One copy is involved (from /sys/firmware/initrd to some file in /)
+as opposed to two when using classic initrd
+
+Still, I don't recommend using this workaround, because
+I want everyone to migrate to proper modern initramfs.
+But still you can use this workaround if you want.
+
+Also: it is not possible to directly loop-mount
+/sys/firmware/initrd . Theoretically kernel can be changed
+to allow this (and/or to make it writable), but I think nobody needs this.
+And I don't want to implement this.
+
+On Qemu's -initrd and GRUB's initrd
+====
+Don't panic, this patchset doesn't remove initramfs
+(which is used by nearly all Linux distros). And I don't
+have plans to remove it.
+
+Qemu's -initrd option and GRUB's initrd command refer
+to initrd bootloader mechanism, which is used to
+load both initrd and (external) initramfs.
+
+So, if you use Qemu's -initrd or GRUB's initrd,
+then you likely use them to pass initramfs, and thus
+you are safe.
+
+v1: https://lore.kernel.org/lkml/20250913003842.41944-1-safinaskar@gmail.com/
+
+v1 -> v2 changes:
+- A lot. I removed most patches, see cover letter for details
+
+v2: https://lore.kernel.org/lkml/20251010094047.3111495-1-safinaskar@gmail.com/
+
+v2 -> v3 changes:
+- Commit messages
+- Expanded docs for "noinitrd"
+- Added link to /sys/firmware/initrd workaround to pr_warn
+
+[1] https://github.com/landley/toybox/tree/master/mkroot
+[2] https://landley.net/toybox/downloads/binaries/toolchains/latest
+[3] https://lore.kernel.org/all/20231207235654.16622-1-graf@amazon.com/
+[4] https://lore.kernel.org/lkml/20250918152830.438554-1-nschichan@freebox.fr/
+
+Askar Safin (3):
+  init: remove deprecated "load_ramdisk" and "prompt_ramdisk" command
+    line parameters
+  initrd: remove deprecated code path (linuxrc)
+  init: remove /proc/sys/kernel/real-root-dev
+
+ .../admin-guide/kernel-parameters.txt         |  12 +-
+ Documentation/admin-guide/sysctl/kernel.rst   |   6 -
+ arch/arm/configs/neponset_defconfig           |   2 +-
+ fs/init.c                                     |  14 ---
+ include/linux/init_syscalls.h                 |   1 -
+ include/linux/initrd.h                        |   2 -
+ include/uapi/linux/sysctl.h                   |   1 -
+ init/do_mounts.c                              |  11 +-
+ init/do_mounts.h                              |  18 +--
+ init/do_mounts_initrd.c                       | 107 ++----------------
+ init/do_mounts_rd.c                           |  24 +---
+ 11 files changed, 23 insertions(+), 175 deletions(-)
+
+
+base-commit: 3a8660878839faadb4f1a6dd72c3179c1df56787
+-- 
+2.47.3
+
