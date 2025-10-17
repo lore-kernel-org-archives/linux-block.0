@@ -1,37 +1,37 @@
 Received: from pegase2.c-s.fr (pegase2.c-s.fr [93.17.235.10])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD62031D73F;
-	Fri, 17 Oct 2025 10:50:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4A5E31AF18;
+	Fri, 17 Oct 2025 10:50:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.235.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760698211; cv=none; b=E14bBN5Mx/S2xqnCACcaVFRyQpGkFfzufHEUPlRqywfeopvscfFqato146MsRXzjumuA3lNi04ONFzazvSCof2NTf/JxW9EHkcjMO3SodIQGZWEJDNgPWfojAFWMxewqIWLWfrnujb2U7UX3L24m7sAV40UWWsFPwtAoFSnzt2o=
+	t=1760698215; cv=none; b=SMpmzRzqz9rbEWAuIAAFIsf9ToXmY3xI54QjxpsElErZwpVTkXQGfIaSBTuvsVe8AFDWPkCaKP8H2cRdFcomiveREzi3D8gJe7db7IgJjau3Ks+Lq25nqfFN8XaW2p0pzlfBpcmBf6OlUznSsRRvv0tCEyQeOTknYpzB4bTDlsw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760698211; c=relaxed/simple;
-	bh=CInTZPEi9ILbXu4UpfN2lm4dHyQfqcOZ4rC45zzBAr0=;
+	s=arc-20240116; t=1760698215; c=relaxed/simple;
+	bh=UvRe1comr2eR9AXgYZtq85YOzdzM9AabV0Yw9dB03zE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=u/E7cOXIlvBavSDMfA2KDZDgjhSQJFdSDPmo69pdzBWIdtmUYay+bJCq8xUk90DUCAUMgGNp6vzm7kzZePRb3TXXA7942+KfHxC32TmVC0pr5RTQP63ZDwBs40689nXFOUgw3P+JlS6Vm3Jg/e5d2FC7O7VAYABL/0Uil2r9u3Q=
+	 MIME-Version; b=lY9YWW4bKQodjsTOvZiUaM/MDhzYmGaVIgUI/41c7AOgK08/uH0oXEQTIJKM0RCpwkZsEi1/TJqea7QqjGz4+IqoLV5hMh6kWp1m338tTx31yDSU4pwPUIS5TB84/SYbQbvuNmM13WW7rJSJv25igZLdZxZUnpMUdjDYjtXCbrI=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.235.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
 Received: from localhost (mailhub4.si.c-s.fr [172.26.127.67])
-	by localhost (Postfix) with ESMTP id 4cp17n17Mlz9sSK;
-	Fri, 17 Oct 2025 12:21:25 +0200 (CEST)
+	by localhost (Postfix) with ESMTP id 4cp17w0N06z9sSn;
+	Fri, 17 Oct 2025 12:21:32 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at c-s.fr
 Received: from pegase2.c-s.fr ([172.26.127.65])
 	by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id kRVCKsionrA6; Fri, 17 Oct 2025 12:21:25 +0200 (CEST)
+	with ESMTP id mFW7-YaYrFBX; Fri, 17 Oct 2025 12:21:31 +0200 (CEST)
 Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
-	by pegase2.c-s.fr (Postfix) with ESMTP id 4cp17n0Pcsz9sSH;
-	Fri, 17 Oct 2025 12:21:25 +0200 (CEST)
+	by pegase2.c-s.fr (Postfix) with ESMTP id 4cp17v6MQLz9sSm;
+	Fri, 17 Oct 2025 12:21:31 +0200 (CEST)
 Received: from localhost (localhost [127.0.0.1])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id E3A848B776;
-	Fri, 17 Oct 2025 12:21:24 +0200 (CEST)
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id C62308B786;
+	Fri, 17 Oct 2025 12:21:31 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at c-s.fr
 Received: from messagerie.si.c-s.fr ([127.0.0.1])
 	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
-	with ESMTP id Jnja7wOONEjS; Fri, 17 Oct 2025 12:21:24 +0200 (CEST)
+	with ESMTP id RGRc2vgVmK50; Fri, 17 Oct 2025 12:21:31 +0200 (CEST)
 Received: from PO20335.idsi0.si.c-s.fr (unknown [192.168.235.99])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id C5C1F8B780;
-	Fri, 17 Oct 2025 12:21:23 +0200 (CEST)
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id A01AE8B780;
+	Fri, 17 Oct 2025 12:21:30 +0200 (CEST)
 From: Christophe Leroy <christophe.leroy@csgroup.eu>
 To: Alexander Viro <viro@zeniv.linux.org.uk>,
 	Christian Brauner <brauner@kernel.org>,
@@ -61,9 +61,9 @@ Cc: Christophe Leroy <christophe.leroy@csgroup.eu>,
 	linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org,
 	linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH v3 01/10] iter: Avoid barrier_nospec() in copy_from_user_iter()
-Date: Fri, 17 Oct 2025 12:20:57 +0200
-Message-ID: <09c7c1c9515a2c0b2e1a059a4a5e32a9afe31704.1760529207.git.christophe.leroy@csgroup.eu>
+Subject: [PATCH v3 07/10] powerpc/uaccess: Refactor user_{read/write/}_access_begin()
+Date: Fri, 17 Oct 2025 12:21:03 +0200
+Message-ID: <bc416b7e34fbf6ed9cbdac4566f23ce30c0a0008.1760529207.git.christophe.leroy@csgroup.eu>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <cover.1760529207.git.christophe.leroy@csgroup.eu>
 References: <cover.1760529207.git.christophe.leroy@csgroup.eu>
@@ -73,52 +73,107 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1326; i=christophe.leroy@csgroup.eu; h=from:subject:message-id; bh=CInTZPEi9ILbXu4UpfN2lm4dHyQfqcOZ4rC45zzBAr0=; b=owGbwMvMwCV2d0KB2p7V54MZT6slMWR8kpjkJLj5Jud2ppKEBQcSri1LDDpe3F0ocnlh7mMLJ pMQjqk7OkpZGMS4GGTFFFmO/+feNaPrS2r+1F36MHNYmUCGMHBxCsBEulYz/OHjur5ulURd7NlJ Zhtvq0ZmLne5e+yarr2/0I3kMzKOzh8Y/ucIVFowKD2e8P3YR+XNpks2pjIfUDy1dN/PWbYNG1W 3P+UGAA==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3535; i=christophe.leroy@csgroup.eu; h=from:subject:message-id; bh=UvRe1comr2eR9AXgYZtq85YOzdzM9AabV0Yw9dB03zE=; b=owGbwMvMwCV2d0KB2p7V54MZT6slMWR8kphikPjQIlVxtt1uu8/8/Bt13125Kectqvz6vQxv6 L7pj/rOd5SyMIhxMciKKbIc/8+9a0bXl9T8qbv0YeawMoEMYeDiFICJJCxkZLiXzfjswjqPzfkN 3h/vb63Ou6Q9Y/7mF0qpM/7vCXW+dJ+d4X+gzoGGUukPsj2FAYwpE6fkLLrsxO8y9+aU71yftBv f7WAEAA==
 X-Developer-Key: i=christophe.leroy@csgroup.eu; a=openpgp; fpr=10FFE6F8B390DE17ACC2632368A92FEB01B8DD78
 Content-Transfer-Encoding: 8bit
 
-Following patch will add missing barrier_nospec() to
-copy_from_user_iter().
+user_read_access_begin() and user_write_access_begin() and
+user_access_begin() are now very similar. Create a common
+__user_access_begin() that take direction as parameter.
 
-Avoid it for architectures supporting masked user
-accesses, the same way as done for copy_from_user() by
-commit 0fc810ae3ae1 ("x86/uaccess: Avoid barrier_nospec()
-in 64-bit copy_from_user()")
+In order to avoid a warning with the conditional call of
+barrier_nospec() which is sometimes an empty macro, change it to a
+do {} while (0).
 
 Signed-off-by: Christophe Leroy <christophe.leroy@csgroup.eu>
 ---
-v2: New in v2
+v2: New
 ---
- lib/iov_iter.c | 16 ++++++++++------
- 1 file changed, 10 insertions(+), 6 deletions(-)
+ arch/powerpc/include/asm/barrier.h |  2 +-
+ arch/powerpc/include/asm/uaccess.h | 46 +++++++++---------------------
+ 2 files changed, 14 insertions(+), 34 deletions(-)
 
-diff --git a/lib/iov_iter.c b/lib/iov_iter.c
-index 2fe66a6b8789e..a589935bf3025 100644
---- a/lib/iov_iter.c
-+++ b/lib/iov_iter.c
-@@ -49,12 +49,16 @@ size_t copy_from_user_iter(void __user *iter_from, size_t progress,
+diff --git a/arch/powerpc/include/asm/barrier.h b/arch/powerpc/include/asm/barrier.h
+index 9e9833faa4af8..9d2f612cfb1d7 100644
+--- a/arch/powerpc/include/asm/barrier.h
++++ b/arch/powerpc/include/asm/barrier.h
+@@ -102,7 +102,7 @@ do {									\
  
- 	if (should_fail_usercopy())
- 		return len;
--	if (access_ok(iter_from, len)) {
--		to += progress;
--		instrument_copy_from_user_before(to, iter_from, len);
--		res = raw_copy_from_user(to, iter_from, len);
--		instrument_copy_from_user_after(to, iter_from, len, res);
--	}
-+	if (can_do_masked_user_access())
-+		iter_from = mask_user_address(iter_from);
-+	else if (!access_ok(iter_from, len))
-+		return res;
-+
-+	to += progress;
-+	instrument_copy_from_user_before(to, iter_from, len);
-+	res = raw_copy_from_user(to, iter_from, len);
-+	instrument_copy_from_user_after(to, iter_from, len, res);
-+
- 	return res;
+ #else /* !CONFIG_PPC_BARRIER_NOSPEC */
+ #define barrier_nospec_asm
+-#define barrier_nospec()
++#define barrier_nospec()	do {} while (0)
+ #endif /* CONFIG_PPC_BARRIER_NOSPEC */
+ 
+ /*
+diff --git a/arch/powerpc/include/asm/uaccess.h b/arch/powerpc/include/asm/uaccess.h
+index 698996f348914..49254f7d90691 100644
+--- a/arch/powerpc/include/asm/uaccess.h
++++ b/arch/powerpc/include/asm/uaccess.h
+@@ -410,50 +410,30 @@ copy_mc_to_user(void __user *to, const void *from, unsigned long n)
+ extern long __copy_from_user_flushcache(void *dst, const void __user *src,
+ 		unsigned size);
+ 
+-static __must_check __always_inline bool user_access_begin(const void __user *ptr, size_t len)
++static __must_check __always_inline bool __user_access_begin(const void __user *ptr, size_t len,
++							     unsigned long dir)
+ {
+ 	if (unlikely(!access_ok(ptr, len)))
+ 		return false;
+ 
+ 	might_fault();
+ 
+-	barrier_nospec();
+-	allow_read_write_user((void __user *)ptr, ptr, len);
++	if (dir & KUAP_READ)
++		barrier_nospec();
++	allow_user_access((void __user *)ptr, dir);
+ 	return true;
  }
+-#define user_access_begin	user_access_begin
+-#define user_access_end		prevent_current_access_user
+-#define user_access_save	prevent_user_access_return
+-#define user_access_restore	restore_user_access
  
+-static __must_check __always_inline bool
+-user_read_access_begin(const void __user *ptr, size_t len)
+-{
+-	if (unlikely(!access_ok(ptr, len)))
+-		return false;
++#define user_access_begin(p, l)		__user_access_begin(p, l, KUAP_READ_WRITE)
++#define user_read_access_begin(p, l)	__user_access_begin(p, l, KUAP_READ)
++#define user_write_access_begin(p, l)	__user_access_begin(p, l, KUAP_WRITE)
+ 
+-	might_fault();
+-
+-	barrier_nospec();
+-	allow_read_from_user(ptr, len);
+-	return true;
+-}
+-#define user_read_access_begin	user_read_access_begin
+-#define user_read_access_end		prevent_current_read_from_user
++#define user_access_end()		prevent_user_access(KUAP_READ_WRITE)
++#define user_read_access_end()		prevent_user_access(KUAP_READ)
++#define user_write_access_end()		prevent_user_access(KUAP_WRITE)
+ 
+-static __must_check __always_inline bool
+-user_write_access_begin(const void __user *ptr, size_t len)
+-{
+-	if (unlikely(!access_ok(ptr, len)))
+-		return false;
+-
+-	might_fault();
+-
+-	allow_write_to_user((void __user *)ptr, len);
+-	return true;
+-}
+-#define user_write_access_begin	user_write_access_begin
+-#define user_write_access_end		prevent_current_write_to_user
++#define user_access_save	prevent_user_access_return
++#define user_access_restore	restore_user_access
+ 
+ #define unsafe_get_user(x, p, e) do {					\
+ 	__long_type(*(p)) __gu_val;				\
 -- 
 2.49.0
 
