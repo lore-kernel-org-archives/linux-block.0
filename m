@@ -1,62 +1,63 @@
-Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D28F9332EC2
-	for <linux-block@vger.kernel.org>; Fri, 17 Oct 2025 13:32:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB130330B0F
+	for <linux-block@vger.kernel.org>; Fri, 17 Oct 2025 15:54:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760707939; cv=none; b=jZRlBxjySrFqgxoPkLpECJj1avUC2SMqyeCdqyTuWgvZIXJQn7N2FQr6ra1vW264fFQs0DcjUCFB3eC1/3TQRDePrwk2M1PB7bIz49a2Qo/gD7P8VPmcD3RxdcR3Ab8tbDisD+evcMeDWD3uMRAxcUHkQ1ABCZ8W5n0nsGmQDOs=
+	t=1760716490; cv=none; b=fdUl6k63YCozB5mtziQzs0x6ImoD3id6kWhLx17Cyf61a5ETRHTbZ4lAlbrbxiJS6z31rmTJoUYB2MAsw1+NM9Z7yOXiPqLKm4AIlAWvJ3CzTAIYY/7nZzHFAZR2IyAnjErkyxUw1BACj0nR2G2e/356sEnrv9qIuYYDfX4IBnw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760707939; c=relaxed/simple;
-	bh=fEqOZHENW101nyGGVFWjFzdvuWu8N9VFgKe0ZBvX8uE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kO5i0Q3+WM9U93CXuXqertBdNv5URJhpm5Ezoc8bnT3OodpICMZaWg5jk2oFwWH0nwyjLej4tp5KH/hFl3wMygOxo3cl4nGp7tQF1azMJabMewcYEPihcyEPGNT0txGVi0nyfYZ3AmVJHWxkhZwEi0BRvJmR5BzT9wd54OE00LI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Q9Vup/W8; arc=none smtp.client-ip=91.218.175.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1760716490; c=relaxed/simple;
+	bh=IL1vCwP7SivDOPpl12UMsTaWSKnAvnWydUYw+d4vtJY=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=C6YVGD16V8EHHnDYY+L6SJmkNq0eC7tkiXzeB4RQhOPgN9kkM01W33FNbHePRMbtM85ZD3mkP1xbX3TvDKUPxvqRNYyZm2asxsuAGlsqzQ45vyKaq7mMQR/0MCpB3A186Mgzn7RfwY6G4zdwNyKBHY+2Uv3W80FFpRyG87UNnLU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eQ7jLG71; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Q9Vup/W8"
-Date: Fri, 17 Oct 2025 09:31:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1760707923;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=f71h8Ye7tXtrUALo58XOTWsmozwAwRWfYyh/tabgjOs=;
-	b=Q9Vup/W8a9cmOFck47SPsREgIvYAYt7cHBTLPtr8ym96HlcL0QzoMMSjlUuMJTGLxA4rUl
-	il1wzkp4YmtDah+1LZBlY+k3BNVD8ZwovZadjXQD3bOSxYK6B6HO4TLmZ1g6DjurCCF5ef
-	LBbC0vbMDe2RZr0X+hivKOItG1fy9JI=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Kent Overstreet <kent.overstreet@linux.dev>
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, 
-	linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, linux-block@vger.kernel.org
-Subject: Re: [GIT PULL] block-bio_iov_iter_export
-Message-ID: <6strysb6whhovk4rlaujravntyt2umocsjfsaxtl4jnuvjjbsp@sqf6ncn3yrlm>
-References: <ov54jszhism7mbeu74vtyoysxnx3y3tsjbj5esszlrx3edq77s@j2vtyy45gsna>
- <aPHemg-xpVLkiEt9@infradead.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eQ7jLG71"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC1FCC116B1;
+	Fri, 17 Oct 2025 15:54:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1760716490;
+	bh=IL1vCwP7SivDOPpl12UMsTaWSKnAvnWydUYw+d4vtJY=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=eQ7jLG712RL+kgK/RZL/PnZ/xG4NxVUKxOyy3SA8SsnN3ndj0Sd2sxx1ppZWQttMj
+	 MFLm5cbdQ4hU67sJR9hnT5D2P/Q8DR5l00JN5WXnDfhQYQdbJBtDNebnUqvEoJcMsZ
+	 +CUttBaGttN2uu5MtAKZ+bqlJ0+xcKHBJm6jBktcROTrprswGGBpB9xdIrxowW1Ix7
+	 fQalTV8Fas5iX+poQ0qEaUSronvPhTmNa/iyCQtQHqxBLRnr5rzL7TzKu6etITjzNM
+	 6b0CjVP9DPxjUaabOc3k4cu3o9fiuSNkkiZHkC2TKX1b1/OlUdUr+jCe1E6TDmkPE4
+	 p2zJkipS90g6g==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADF8339EF97A;
+	Fri, 17 Oct 2025 15:54:35 +0000 (UTC)
+Subject: Re: [GIT PULL] Block fixes for 6.18-rc2
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <f771a6b5-c524-4b69-ad07-bcb77cb3e334@kernel.dk>
+References: <f771a6b5-c524-4b69-ad07-bcb77cb3e334@kernel.dk>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <f771a6b5-c524-4b69-ad07-bcb77cb3e334@kernel.dk>
+X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git tags/block-6.18-20251016
+X-PR-Tracked-Commit-Id: f0624c6646435c1b56652193cce3e34062d50e3f
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 0c8df15f758a69a7bf88ecf9b7f95dc7db2c463c
+Message-Id: <176071647421.2681700.18002448492740315562.pr-tracker-bot@kernel.org>
+Date: Fri, 17 Oct 2025 15:54:34 +0000
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aPHemg-xpVLkiEt9@infradead.org>
-X-Migadu-Flow: FLOW_OUT
 
-On Thu, Oct 16, 2025 at 11:13:46PM -0700, Christoph Hellwig wrote:
-> Umm,
-> 
-> besides adding exports without in-tree users, this is a patch that's
-> never seen any relevant mailing list, in a pull request that the
-> maintainer hasn't seen.  That's now exactly how Linux development works,
-> does it?
+The pull request you sent on Fri, 17 Oct 2025 04:26:24 -0600:
 
-Christoph, I wrote that code /for bcachefs/; the rest of you decided it
-was nice and started using it too.
+> https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git tags/block-6.18-20251016
 
-Then you removed the export talking about the "abuse" of bcachefs using
-it. WTF?
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/0c8df15f758a69a7bf88ecf9b7f95dc7db2c463c
+
+Thank you!
+
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
