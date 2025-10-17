@@ -1,37 +1,37 @@
 Received: from pegase2.c-s.fr (pegase2.c-s.fr [93.17.235.10])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4DAA31691F;
-	Fri, 17 Oct 2025 10:50:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A40CD328B6D;
+	Fri, 17 Oct 2025 10:50:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.235.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760698243; cv=none; b=KfTOCsLwm27nGPHrJyVrzSds61fmH/QuX0c0W352JyBcUR8koo2nT4iXSGzRPlCODQFmXh3NwjvCIkqu1IXXzpBG51ykzghCNCRzCuJqjw2AbSP971rylQwDsZQFcmsx9ZrgCzsXjYwcO+in+/zGih8LKx0V+HgQahg7Wj8azy8=
+	t=1760698248; cv=none; b=SwY3mQSC0rJaIAGKecaI5e/g2GYSDncFnlMFkOoCTwHjp15jtPwG7osRCmTebjuhRSBYd9lB6ZKJbHhxLm0yhQHcx1EDwINQhZi7+81CWBsbYQ6cQrn8ca1YeQr/7ntiDC6FwR1Pt6C1J721vEkVrMWDmax8Gf129lPr5ptTxAQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760698243; c=relaxed/simple;
-	bh=y3f64tKhN7ET5qx1JK+lbghEU+YrDp/rltVLgFdTK8s=;
+	s=arc-20240116; t=1760698248; c=relaxed/simple;
+	bh=LUaYsPfBDAifxBCt3YcfvFtnZBPfaSxbCGY+1bgSYgY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=iyfggiZuuvgU9w8MeJ4bC6j7G+DVak2yOhgskEKpS1uoWL0QRFDZUHGR1K+t/+qs32alJZsaOyaV6EnXE1BXlVU+KVnpGNV38sKlyHG/nihMxC9ns/xD6Dodw4AY0yzTAGjD7ZrozLY1qdj+eW9V5EfMqLCcizhR11fqP+G05OM=
+	 MIME-Version; b=UtSfn1U3dFiwXp6jLxWYpRo6TPfLHeWgQC7vvsXYZgJh/0n3P/4aP8oI/e9RkQYE3q1rs+g2fJFNNeH5ZeinWkymLQcouhnH6Va+BEy55pbR4milx1HI5qnDbfEdKMBdR058eL22AiTwg+Y2xKhexa9Y/xl7Jg+9nRbg6CCQTAk=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.235.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
 Received: from localhost (mailhub4.si.c-s.fr [172.26.127.67])
-	by localhost (Postfix) with ESMTP id 4cp17t6Wdvz9sSh;
-	Fri, 17 Oct 2025 12:21:30 +0200 (CEST)
+	by localhost (Postfix) with ESMTP id 4cp17q3TdNz9sSW;
+	Fri, 17 Oct 2025 12:21:27 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at c-s.fr
 Received: from pegase2.c-s.fr ([172.26.127.65])
 	by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id XWBO7AuKPMGU; Fri, 17 Oct 2025 12:21:30 +0200 (CEST)
+	with ESMTP id MUd0DI8w8h4X; Fri, 17 Oct 2025 12:21:27 +0200 (CEST)
 Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
-	by pegase2.c-s.fr (Postfix) with ESMTP id 4cp17t5YRjz9sSg;
-	Fri, 17 Oct 2025 12:21:30 +0200 (CEST)
+	by pegase2.c-s.fr (Postfix) with ESMTP id 4cp17q2C4rz9sSV;
+	Fri, 17 Oct 2025 12:21:27 +0200 (CEST)
 Received: from localhost (localhost [127.0.0.1])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id A8CC18B786;
-	Fri, 17 Oct 2025 12:21:30 +0200 (CEST)
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id 351218B786;
+	Fri, 17 Oct 2025 12:21:27 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at c-s.fr
 Received: from messagerie.si.c-s.fr ([127.0.0.1])
 	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
-	with ESMTP id 5Sd_UtXEJfxn; Fri, 17 Oct 2025 12:21:30 +0200 (CEST)
+	with ESMTP id PrL50SiMsfQc; Fri, 17 Oct 2025 12:21:27 +0200 (CEST)
 Received: from PO20335.idsi0.si.c-s.fr (unknown [192.168.235.99])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id 7D0DA8B776;
-	Fri, 17 Oct 2025 12:21:29 +0200 (CEST)
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id 0CB558B780;
+	Fri, 17 Oct 2025 12:21:26 +0200 (CEST)
 From: Christophe Leroy <christophe.leroy@csgroup.eu>
 To: Alexander Viro <viro@zeniv.linux.org.uk>,
 	Christian Brauner <brauner@kernel.org>,
@@ -61,9 +61,9 @@ Cc: Christophe Leroy <christophe.leroy@csgroup.eu>,
 	linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org,
 	linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH v3 06/10] powerpc/uaccess: Remove {allow/prevent}_{read/write/read_write}_{from/to/}_user()
-Date: Fri, 17 Oct 2025 12:21:02 +0200
-Message-ID: <17a008d24903f50a2ae55df795d1c51c684f5183.1760529207.git.christophe.leroy@csgroup.eu>
+Subject: [PATCH v3 03/10] uaccess: Add masked_user_{read/write}_access_begin
+Date: Fri, 17 Oct 2025 12:20:59 +0200
+Message-ID: <a4ef0a8e1659805c60fafc8d3b073ecd08117241.1760529207.git.christophe.leroy@csgroup.eu>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <cover.1760529207.git.christophe.leroy@csgroup.eu>
 References: <cover.1760529207.git.christophe.leroy@csgroup.eu>
@@ -73,181 +73,131 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=5385; i=christophe.leroy@csgroup.eu; h=from:subject:message-id; bh=y3f64tKhN7ET5qx1JK+lbghEU+YrDp/rltVLgFdTK8s=; b=owGbwMvMwCV2d0KB2p7V54MZT6slMWR8kpj86PdGjql6NumX9O8vYD6j3V247N7WC7qpSss09 mXxrk5a2lHKwiDGxSArpshy/D/3rhldX1Lzp+7Sh5nDygQyhIGLUwAmsmsKwx+u+tgFOa471AyZ G1/U2XzimNz+yyZlj1Lb5PzbRce4FFQZGWaqa6q68lh9ecXJtbF1ik1C58Hds04knZSMXNURV66 cxAQA
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4825; i=christophe.leroy@csgroup.eu; h=from:subject:message-id; bh=LUaYsPfBDAifxBCt3YcfvFtnZBPfaSxbCGY+1bgSYgY=; b=owGbwMvMwCV2d0KB2p7V54MZT6slMWR8kpjMrdxgqHHhJa+5y5dc/303H/NN3Lr9qOCUqV5nf 616vDt2aUcpC4MYF4OsmCLL8f/cu2Z0fUnNn7pLH2YOKxPIEAYuTgGYSG4hI8PugxP0XD6+P++d tLxF6urFura8RdaX1zJtUZoQsmR3WYwow1+pk7tD5bt6dou+nsl7waZn/fqVSZp/NS8Vn1N76Xp zWxsbAA==
 X-Developer-Key: i=christophe.leroy@csgroup.eu; a=openpgp; fpr=10FFE6F8B390DE17ACC2632368A92FEB01B8DD78
 Content-Transfer-Encoding: 8bit
 
-The six following functions have become simple single-line fonctions
-that do not have much added value anymore:
-- allow_read_from_user()
-- allow_write_to_user()
-- allow_read_write_user()
-- prevent_read_from_user()
-- prevent_write_to_user()
-- prevent_read_write_user()
+Allthough masked_user_access_begin() is to only be used when reading
+data from user at the moment, introduce masked_user_read_access_begin()
+and masked_user_write_access_begin() in order to match
+user_read_access_begin() and user_write_access_begin().
 
-Directly call allow_user_access() and prevent_user_access(), it doesn't
-reduce the readability and it removes unnecessary middle functions.
+That means masked_user_read_access_begin() is used when user memory is
+exclusively read during the window, masked_user_write_access_begin()
+is used when user memory is exclusively writen during the window,
+masked_user_access_begin() remains and is used when both reads and
+writes are performed during the open window. Each of them is expected
+to be terminated by the matching user_read_access_end(),
+user_write_access_end() and user_access_end().
+
+Have them default to masked_user_access_begin() when they are
+not defined.
 
 Signed-off-by: Christophe Leroy <christophe.leroy@csgroup.eu>
 ---
-v2: New
----
- arch/powerpc/include/asm/kup.h     | 47 ------------------------------
- arch/powerpc/include/asm/uaccess.h | 30 +++++++++----------
- 2 files changed, 15 insertions(+), 62 deletions(-)
+v3: Rebased on top of v6.18-rc1 ==> change in net/core/scm.c
 
-diff --git a/arch/powerpc/include/asm/kup.h b/arch/powerpc/include/asm/kup.h
-index 3963584ac1cf1..4a4145a244f29 100644
---- a/arch/powerpc/include/asm/kup.h
-+++ b/arch/powerpc/include/asm/kup.h
-@@ -131,53 +131,6 @@ static __always_inline void kuap_assert_locked(void)
- 		kuap_get_and_assert_locked();
- }
+v2: Added more explanations in the commit message following comments received.
+---
+ fs/select.c             | 2 +-
+ include/linux/uaccess.h | 7 +++++++
+ kernel/futex/futex.h    | 4 ++--
+ lib/strncpy_from_user.c | 2 +-
+ lib/strnlen_user.c      | 2 +-
+ net/core/scm.c          | 2 +-
+ 6 files changed, 13 insertions(+), 6 deletions(-)
+
+diff --git a/fs/select.c b/fs/select.c
+index 082cf60c7e235..36db0359388c8 100644
+--- a/fs/select.c
++++ b/fs/select.c
+@@ -777,7 +777,7 @@ static inline int get_sigset_argpack(struct sigset_argpack *to,
+ 	// the path is hot enough for overhead of copy_from_user() to matter
+ 	if (from) {
+ 		if (can_do_masked_user_access())
+-			from = masked_user_access_begin(from);
++			from = masked_user_read_access_begin(from);
+ 		else if (!user_read_access_begin(from, sizeof(*from)))
+ 			return -EFAULT;
+ 		unsafe_get_user(to->p, &from->p, Efault);
+diff --git a/include/linux/uaccess.h b/include/linux/uaccess.h
+index 1beb5b395d81d..aa48d5415d32f 100644
+--- a/include/linux/uaccess.h
++++ b/include/linux/uaccess.h
+@@ -41,6 +41,13 @@
+  #define mask_user_address(src) (src)
+ #endif
  
--static __always_inline void allow_read_from_user(const void __user *from, unsigned long size)
--{
--	allow_user_access(NULL, KUAP_READ);
--}
--
--static __always_inline void allow_write_to_user(void __user *to, unsigned long size)
--{
--	allow_user_access(to, KUAP_WRITE);
--}
--
--static __always_inline void allow_read_write_user(void __user *to, const void __user *from,
--						  unsigned long size)
--{
--	allow_user_access(to, KUAP_READ_WRITE);
--}
--
--static __always_inline void prevent_read_from_user(const void __user *from, unsigned long size)
--{
--	prevent_user_access(KUAP_READ);
--}
--
--static __always_inline void prevent_write_to_user(void __user *to, unsigned long size)
--{
--	prevent_user_access(KUAP_WRITE);
--}
--
--static __always_inline void prevent_read_write_user(void __user *to, const void __user *from,
--						    unsigned long size)
--{
--	prevent_user_access(KUAP_READ_WRITE);
--}
--
--static __always_inline void prevent_current_access_user(void)
--{
--	prevent_user_access(KUAP_READ_WRITE);
--}
--
--static __always_inline void prevent_current_read_from_user(void)
--{
--	prevent_user_access(KUAP_READ);
--}
--
--static __always_inline void prevent_current_write_to_user(void)
--{
--	prevent_user_access(KUAP_WRITE);
--}
--
- #endif /* !__ASSEMBLER__ */
++#ifndef masked_user_write_access_begin
++#define masked_user_write_access_begin masked_user_access_begin
++#endif
++#ifndef masked_user_read_access_begin
++#define masked_user_read_access_begin masked_user_access_begin
++#endif
++
+ /*
+  * Architectures should provide two primitives (raw_copy_{to,from}_user())
+  * and get rid of their private instances of copy_{to,from}_user() and
+diff --git a/kernel/futex/futex.h b/kernel/futex/futex.h
+index 2cd57096c38e1..a1120a318c186 100644
+--- a/kernel/futex/futex.h
++++ b/kernel/futex/futex.h
+@@ -303,7 +303,7 @@ static __always_inline int futex_get_value(u32 *dest, u32 __user *from)
+ 	u32 val;
  
- #endif /* _ASM_POWERPC_KUAP_H_ */
-diff --git a/arch/powerpc/include/asm/uaccess.h b/arch/powerpc/include/asm/uaccess.h
-index 3987a5c33558b..698996f348914 100644
---- a/arch/powerpc/include/asm/uaccess.h
-+++ b/arch/powerpc/include/asm/uaccess.h
-@@ -45,14 +45,14 @@
- 	do {							\
- 		__label__ __pu_failed;				\
- 								\
--		allow_write_to_user(__pu_addr, __pu_size);	\
-+		allow_user_access(__pu_addr, KUAP_WRITE);	\
- 		__put_user_size_goto(__pu_val, __pu_addr, __pu_size, __pu_failed);	\
--		prevent_write_to_user(__pu_addr, __pu_size);	\
-+		prevent_user_access(KUAP_WRITE);		\
- 		__pu_err = 0;					\
- 		break;						\
- 								\
- __pu_failed:							\
--		prevent_write_to_user(__pu_addr, __pu_size);	\
-+		prevent_user_access(KUAP_WRITE);		\
- 		__pu_err = -EFAULT;				\
- 	} while (0);						\
- 								\
-@@ -302,9 +302,9 @@ do {								\
- 								\
- 	might_fault();					\
- 	barrier_nospec();					\
--	allow_read_from_user(__gu_addr, __gu_size);		\
-+	allow_user_access(NULL, KUAP_READ);		\
- 	__get_user_size_allowed(__gu_val, __gu_addr, __gu_size, __gu_err);	\
--	prevent_read_from_user(__gu_addr, __gu_size);		\
-+	prevent_user_access(KUAP_READ);				\
- 	(x) = (__typeof__(*(ptr)))__gu_val;			\
- 								\
- 	__gu_err;						\
-@@ -331,9 +331,9 @@ raw_copy_in_user(void __user *to, const void __user *from, unsigned long n)
- 	unsigned long ret;
- 
- 	barrier_nospec();
--	allow_read_write_user(to, from, n);
-+	allow_user_access(to, KUAP_READ_WRITE);
- 	ret = __copy_tofrom_user(to, from, n);
--	prevent_read_write_user(to, from, n);
-+	prevent_user_access(KUAP_READ_WRITE);
- 	return ret;
- }
- #endif /* __powerpc64__ */
-@@ -343,9 +343,9 @@ static inline unsigned long raw_copy_from_user(void *to,
+ 	if (can_do_masked_user_access())
+-		from = masked_user_access_begin(from);
++		from = masked_user_read_access_begin(from);
+ 	else if (!user_read_access_begin(from, sizeof(*from)))
+ 		return -EFAULT;
+ 	unsafe_get_user(val, from, Efault);
+@@ -318,7 +318,7 @@ static __always_inline int futex_get_value(u32 *dest, u32 __user *from)
+ static __always_inline int futex_put_value(u32 val, u32 __user *to)
  {
- 	unsigned long ret;
+ 	if (can_do_masked_user_access())
+-		to = masked_user_access_begin(to);
++		to = masked_user_write_access_begin(to);
+ 	else if (!user_write_access_begin(to, sizeof(*to)))
+ 		return -EFAULT;
+ 	unsafe_put_user(val, to, Efault);
+diff --git a/lib/strncpy_from_user.c b/lib/strncpy_from_user.c
+index 6dc234913dd58..5bb752ff7c61b 100644
+--- a/lib/strncpy_from_user.c
++++ b/lib/strncpy_from_user.c
+@@ -126,7 +126,7 @@ long strncpy_from_user(char *dst, const char __user *src, long count)
+ 	if (can_do_masked_user_access()) {
+ 		long retval;
  
--	allow_read_from_user(from, n);
-+	allow_user_access(NULL, KUAP_READ);
- 	ret = __copy_tofrom_user((__force void __user *)to, from, n);
--	prevent_read_from_user(from, n);
-+	prevent_user_access(KUAP_READ);
- 	return ret;
- }
+-		src = masked_user_access_begin(src);
++		src = masked_user_read_access_begin(src);
+ 		retval = do_strncpy_from_user(dst, src, count, count);
+ 		user_read_access_end();
+ 		return retval;
+diff --git a/lib/strnlen_user.c b/lib/strnlen_user.c
+index 6e489f9e90f15..4a6574b67f824 100644
+--- a/lib/strnlen_user.c
++++ b/lib/strnlen_user.c
+@@ -99,7 +99,7 @@ long strnlen_user(const char __user *str, long count)
+ 	if (can_do_masked_user_access()) {
+ 		long retval;
  
-@@ -354,9 +354,9 @@ raw_copy_to_user(void __user *to, const void *from, unsigned long n)
- {
- 	unsigned long ret;
+-		str = masked_user_access_begin(str);
++		str = masked_user_read_access_begin(str);
+ 		retval = do_strnlen_user(str, count, count);
+ 		user_read_access_end();
+ 		return retval;
+diff --git a/net/core/scm.c b/net/core/scm.c
+index 66eaee783e8be..4a65f9baa87e7 100644
+--- a/net/core/scm.c
++++ b/net/core/scm.c
+@@ -274,7 +274,7 @@ int put_cmsg(struct msghdr * msg, int level, int type, int len, void *data)
+ 		check_object_size(data, cmlen - sizeof(*cm), true);
  
--	allow_write_to_user(to, n);
-+	allow_user_access(to, KUAP_WRITE);
- 	ret = __copy_tofrom_user(to, (__force const void __user *)from, n);
--	prevent_write_to_user(to, n);
-+	prevent_user_access(KUAP_WRITE);
- 	return ret;
- }
- 
-@@ -367,9 +367,9 @@ static inline unsigned long __clear_user(void __user *addr, unsigned long size)
- 	unsigned long ret;
- 
- 	might_fault();
--	allow_write_to_user(addr, size);
-+	allow_user_access(addr, KUAP_WRITE);
- 	ret = __arch_clear_user(addr, size);
--	prevent_write_to_user(addr, size);
-+	prevent_user_access(KUAP_WRITE);
- 	return ret;
- }
- 
-@@ -397,9 +397,9 @@ copy_mc_to_user(void __user *to, const void *from, unsigned long n)
- {
- 	if (check_copy_size(from, n, true)) {
- 		if (access_ok(to, n)) {
--			allow_write_to_user(to, n);
-+			allow_user_access(to, KUAP_WRITE);
- 			n = copy_mc_generic((void __force *)to, from, n);
--			prevent_write_to_user(to, n);
-+			prevent_user_access(KUAP_WRITE);
- 		}
- 	}
+ 		if (can_do_masked_user_access())
+-			cm = masked_user_access_begin(cm);
++			cm = masked_user_write_access_begin(cm);
+ 		else if (!user_write_access_begin(cm, cmlen))
+ 			goto efault;
  
 -- 
 2.49.0
