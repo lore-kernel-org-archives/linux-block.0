@@ -1,162 +1,80 @@
-Received: from pegase2.c-s.fr (pegase2.c-s.fr [93.17.235.10])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65EC5320A3B;
-	Fri, 17 Oct 2025 10:50:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.235.10
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25966340D9C
+	for <linux-block@vger.kernel.org>; Fri, 17 Oct 2025 11:13:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760698253; cv=none; b=QF0pjfCMfsMJMQtwFjKhklzhB4/Kcad8a9PjY5FjuDD9waARCheqedRSdTQsVa08KcX1X2TdpkxBpinrCtR1AXVD0qI+CR4q6+4Kyv0i43Ude0qPcj3ef+wlEatczqoWFkyE+o98aARnfC2qQ0G47I4gJaOzFxssALM2qeA4a+s=
+	t=1760699616; cv=none; b=T5zszaZwGU1/kjys7X6VA4KgNwddTXkDvG7kDaS1glYXVqH9++AsOsDFk7h4dEmLsaF1teT5g8NiK+zHqnQbu4jZ4FSh/H2/accX7M9JVFMmM4R1GijpSN9Sj1jv0bpmOsulnmqqeYVgr6oKttblaELsjrgBbZFxone3Zg2LZ2M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760698253; c=relaxed/simple;
-	bh=NGpRihvRGLmZxaUb7q6Kyg1zoqkKk067tACLVGmS4Z0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SZm2LbVRh57nyjRXmeQd7cFy10GtVgB3IOwuvirXxexTxOp8uwQHuThu6niuM+WJDFAOZkiKgBW51EAm9Zg8puBbXMaKKNWahvjD7xA+hACF3XsBukPVgzEbgSkhjmHJVFJe+LgpKMygRlaiM56FiNOFgdtc31td37AXW8KCckk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.235.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
-Received: from localhost (mailhub4.si.c-s.fr [172.26.127.67])
-	by localhost (Postfix) with ESMTP id 4cp17m0sBZz9sSC;
-	Fri, 17 Oct 2025 12:21:24 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from pegase2.c-s.fr ([172.26.127.65])
-	by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Ma1A-_kW4Zjq; Fri, 17 Oct 2025 12:21:24 +0200 (CEST)
-Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
-	by pegase2.c-s.fr (Postfix) with ESMTP id 4cp17l6vfqz9sS7;
-	Fri, 17 Oct 2025 12:21:23 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id D03878B786;
-	Fri, 17 Oct 2025 12:21:23 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from messagerie.si.c-s.fr ([127.0.0.1])
-	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
-	with ESMTP id UGiDsfLHLJ0I; Fri, 17 Oct 2025 12:21:23 +0200 (CEST)
-Received: from PO20335.idsi0.si.c-s.fr (unknown [192.168.235.99])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id A28178B776;
-	Fri, 17 Oct 2025 12:21:22 +0200 (CEST)
-From: Christophe Leroy <christophe.leroy@csgroup.eu>
-To: Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>,
-	Jan Kara <jack@suse.cz>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Darren Hart <dvhart@infradead.org>,
-	Davidlohr Bueso <dave@stgolabs.net>,
-	"Andre Almeida" <andrealmeid@igalia.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Willem de Bruijn <willemb@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Simon Horman <horms@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>
-Cc: Christophe Leroy <christophe.leroy@csgroup.eu>,
-	linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH v3 00/10] powerpc: Implement masked user access
-Date: Fri, 17 Oct 2025 12:20:56 +0200
-Message-ID: <cover.1760529207.git.christophe.leroy@csgroup.eu>
-X-Mailer: git-send-email 2.49.0
+	s=arc-20240116; t=1760699616; c=relaxed/simple;
+	bh=+WJ/9OJPmc+hPEHm8wSsTYnPF3JXQKHX+ZFF9M2Xe1w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nOuLHJdm5vGla5T+uAEoJPuLXD0YvlJmexaOH5d8BIgnzhkDbJXJw3HPQAhCc996fp1AXaMfOYU/ZNx1Pb4PXWBLhVoBgln+rC98Fd5PU/zlEr81fyugFAWOvhWGZUnDFwj/vUNmeCNXDK2jsUQi0+MhaAqqZaPxKh2Ek//t1nM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=eQ3K2gKB; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="eQ3K2gKB"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=22VuUOveu5Gg+2TfY24/26ZiEUCfRQ0vbQQnEdzRkQE=; b=eQ3K2gKBQeqP2cU6xvK8KTXXcC
+	nxL+xswCC5KeVmMvE6GTTC0gi0iKVBtHd8RZufI+LcGptue6KifRcJc9HH0YAiV+zUyiDzqLhNTdU
+	xJbZPO94nh3jKrnRE1FqBuH3Tr8HBHpf6iDXODGls++R9vP1NWNJ2PmObiJrHu3b1EW+pmqk2uNwg
+	1LOuP3ssnaTrQeft7g92Gsi3r/xbLWwtmKfRBljc9KB0jWf0SEVi6WJTOFMxL2QmEANBG63fWwooB
+	B0xmeDYMWr/dl84A/HckvR3ORME5EQzPyYMJ32Ri17B4sNsKXlxIFK3IqVENVh4JyTPCJwcmifxIs
+	nvICtvlg==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1v9iOq-00000007dqc-1VEj;
+	Fri, 17 Oct 2025 11:13:32 +0000
+Date: Fri, 17 Oct 2025 04:13:32 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Keith Busch <kbusch@meta.com>
+Cc: linux-block@vger.kernel.org, shinichiro.kawasaki@wdc.com,
+	Keith Busch <kbusch@kernel.org>
+Subject: Re: [PATCH blktests] create a test for direct io offsets
+Message-ID: <aPIk3Ng8JXs-3Pye@infradead.org>
+References: <20251014205420.941424-1-kbusch@meta.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4010; i=christophe.leroy@csgroup.eu; h=from:subject:message-id; bh=NGpRihvRGLmZxaUb7q6Kyg1zoqkKk067tACLVGmS4Z0=; b=owGbwMvMwCV2d0KB2p7V54MZT6slMWR8kuhat/+o4e3tgp5tNjx394ivT+xa9eDbmm+PUyqZn IUta/dYdpSyMIhxMciKKbIc/8+9a0bXl9T8qbv0YeawMoEMYeDiFICJaM5lZJjpeWpinm69h/uD SOaEmFJVg/NP3//+LLx0a+I3V8WXt18xMsxzqhEpyjOV21GwfsPh5xfF7zzLP22mMnXRZv2nxeu azDkB
-X-Developer-Key: i=christophe.leroy@csgroup.eu; a=openpgp; fpr=10FFE6F8B390DE17ACC2632368A92FEB01B8DD78
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251014205420.941424-1-kbusch@meta.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-Masked user access avoids the address/size verification by access_ok().
-Allthough its main purpose is to skip the speculation in the
-verification of user address and size hence avoid the need of spec
-mitigation, it also has the advantage to reduce the amount of
-instructions needed so it also benefits to platforms that don't
-need speculation mitigation, especially when the size of the copy is
-not know at build time.
+> +static void init_kernel_version()
+> +{
+> +	struct utsname buffer;
+> +	char *major_version_str;
+> +	char *minor_version_str;
+> +	if (uname(&buffer) != 0)
+> +		err(errno, "uname");
+> +
+> +	major_version_str = strtok(buffer.release, ".");
+> +	minor_version_str = strtok(NULL, ".");
+> +
+> +	kernel_major = strtol(major_version_str, NULL, 0);
+> +	kernel_minor = strtol(minor_version_str, NULL, 0);
+> +}
 
-Patches 1,2,4 are cleaning up some redundant barrier_nospec()
-introduced by commit 74e19ef0ff80 ("uaccess: Add speculation barrier
-to copy_from_user()"). To do that, a speculation barrier is added to
-copy_from_user_iter() so that the barrier in powerpc raw_copy_from_user()
-which is redundant with the one in copy_from_user() can be removed. To
-avoid impacting x86, copy_from_user_iter() is first converted to using
-masked user access.
+Testing for specific kernel versions is probably going to fall
+flat when this stuff gets backported..  I just realize that maybe
+we just need a statx / fsxattr flag to report that this is supported
+to make everyones life easier?  statx probably won't make Christian
+happy, but now that the fsxattr stuff is in common code that seems
+like an easy enough option to rush into 6.18 still.
 
-Patch 3 adds masked_user_read_access_begin() and
-masked_user_write_access_begin() to match with user_read_access_end()
-and user_write_access_end().
-
-Patches 5,6,7 are cleaning up powerpc uaccess functions.
-
-Patches 8 and 9 prepare powerpc/32 for the necessary gap at the top
-of userspace.
-
-Last patch implements masked user access.
-
-Changes in v3:
-- Rebased on top of v6.18-rc1
-- Patch 3: Impact on recently modified net/core/scm.c
-- Patch 10: Rewrite mask_user_address_simple() for a smaller result on powerpc64, suggested by Gabriel
-
-Changes in v2:
-- Converted copy_from_user_iter() to using masked user access.
-- Cleaned up powerpc uaccess function to minimise code duplication
-when adding masked user access
-- Automated TASK_SIZE calculation to minimise use of BUILD_BUG_ON()
-- Tried to make some commit messages more clean based on feedback from
-version 1 of the series.
-
-Christophe Leroy (10):
-  iter: Avoid barrier_nospec() in copy_from_user_iter()
-  uaccess: Add speculation barrier to copy_from_user_iter()
-  uaccess: Add masked_user_{read/write}_access_begin
-  powerpc/uaccess: Move barrier_nospec() out of
-    allow_read_{from/write}_user()
-  powerpc/uaccess: Remove unused size and from parameters from
-    allow_access_user()
-  powerpc/uaccess: Remove
-    {allow/prevent}_{read/write/read_write}_{from/to/}_user()
-  powerpc/uaccess: Refactor user_{read/write/}_access_begin()
-  powerpc/32s: Fix segments setup when TASK_SIZE is not a multiple of
-    256M
-  powerpc/32: Automatically adapt TASK_SIZE based on constraints
-  powerpc/uaccess: Implement masked user access
-
- arch/powerpc/Kconfig                          |   3 +-
- arch/powerpc/include/asm/barrier.h            |   2 +-
- arch/powerpc/include/asm/book3s/32/kup.h      |   3 +-
- arch/powerpc/include/asm/book3s/32/mmu-hash.h |   5 +-
- arch/powerpc/include/asm/book3s/32/pgtable.h  |   4 -
- arch/powerpc/include/asm/book3s/64/kup.h      |   6 +-
- arch/powerpc/include/asm/kup.h                |  52 +------
- arch/powerpc/include/asm/nohash/32/kup-8xx.h  |   3 +-
- arch/powerpc/include/asm/nohash/32/mmu-8xx.h  |   4 -
- arch/powerpc/include/asm/nohash/kup-booke.h   |   3 +-
- arch/powerpc/include/asm/task_size_32.h       |  28 +++-
- arch/powerpc/include/asm/uaccess.h            | 135 +++++++++++++-----
- arch/powerpc/kernel/asm-offsets.c             |   2 +-
- arch/powerpc/kernel/head_book3s_32.S          |   6 +-
- arch/powerpc/mm/book3s32/mmu.c                |   4 +-
- arch/powerpc/mm/mem.c                         |   2 -
- arch/powerpc/mm/nohash/8xx.c                  |   2 -
- arch/powerpc/mm/ptdump/segment_regs.c         |   2 +-
- fs/select.c                                   |   2 +-
- include/linux/uaccess.h                       |   7 +
- kernel/futex/futex.h                          |   4 +-
- lib/iov_iter.c                                |  22 ++-
- lib/strncpy_from_user.c                       |   2 +-
- lib/strnlen_user.c                            |   2 +-
- net/core/scm.c                                |   2 +-
- 25 files changed, 174 insertions(+), 133 deletions(-)
-
--- 
-2.49.0
+I.e., we should find a way to remove all the need to find the kernel
+version, mount point and bdev from mountpoint.  Especially as the
+latter won't work for multi-device configurations like btrfs or
+the XFS rtdev.  My rule of thumb for new I/O path features is that
+the application should be able to discover everything it needs just
+using the FD used for I/O as that is a huge differenciator for
+usability.
 
