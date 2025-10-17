@@ -1,144 +1,242 @@
-Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C46572D6E71
-	for <linux-block@vger.kernel.org>; Fri, 17 Oct 2025 10:26:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.53
+Received: from pegase2.c-s.fr (pegase2.c-s.fr [93.17.235.10])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F4233195E5;
+	Fri, 17 Oct 2025 10:50:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.235.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760696789; cv=none; b=bVoe8H4Jy8ys1X8ykDY8gGi08J6jMZ2outqsylRvc9WDU8FzTnqzDq10bUaDVc+Jj4pl9BrqXXD8j9kMBzfbaxNfmDhqXVPfFzBHyGy4faM+ZLF9d3rzUoYoKJp5zBtzCF2TgtNzWz11YVAnwh5nvGNevzqSKDQy/saIYO0inAY=
+	t=1760698206; cv=none; b=ApHp5tMkdhTlCEyU6MfiS9kjsbs8EUg5raTzu4VRZGilZH8KYA5kMhbs+JGojCAlJSn+yG5MrioIgZD77M5GmLicXToRx+SMVEwmzaDHReRWtVvXN2NALRWX1YQzSQZ9GZMkpTj07mdtDf783we1h9ZMdrVAdBo5fFVjDAtCQto=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760696789; c=relaxed/simple;
-	bh=qOjqUlcWXkeuTXUcJJoKz+DAqhADXdI8AExdrTIoxh4=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=OdUkYaJxyNSVjvno2lJ5HwFiyEgLxOUER62fwsus1kO0+ZuI8DUpBFfvx9mF5+oJ+mdqct317AS5Fns9w0IeuHRC9e59zo/ThQAzO0V9ZLNCSzuQdXG14HGZGy+L4q0R8b47DLoTSXABS0rRpzTtS8KXzFk4kRgqfWGFsDj5ks8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=BmbRbiKl; arc=none smtp.client-ip=209.85.219.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="BmbRbiKl"
-Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-87c1a760df5so32322016d6.1
-        for <linux-block@vger.kernel.org>; Fri, 17 Oct 2025 03:26:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1760696785; x=1761301585; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-language:cc:to:subject:from
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6TgMafxjRq0oy0uUU6fp3ywn8H1fr7KuB4B6zdZk4M0=;
-        b=BmbRbiKlMUo3Ay4hkR7QYK7Nc03UjzIIVstLiazU1Si7YBTqCnx3eyUFFzeWSUISzC
-         ghMZxbjlVeaJN1vHcYxvvv7Scw/RmM7yUvcmudeSxiAMvq1JNyIX29SJQIIjig+0cBGv
-         oVdeXgBu58sndDs17y1vE+Ys5JDyJgL/3LyjRx5i9uwyH3c8NYRvEZ6nr04eOiJaO+o/
-         ox00p4o2psA6aKbL/kfpKOFnQ4EXj/j0h5SQl/ubiv9mceKSJdt+hFwCTPwCqhI96l7E
-         MORh3JBxJ0F/3j+JdJyfcn5m1BtJoCQrK4ltrGCiklkyJ9aczTBRcbdKi/Me50UrtPqM
-         02Pg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760696785; x=1761301585;
-        h=content-transfer-encoding:content-language:cc:to:subject:from
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=6TgMafxjRq0oy0uUU6fp3ywn8H1fr7KuB4B6zdZk4M0=;
-        b=Tmu9R6R5NCfHOokJWMklM3c5gHyTIG9efAbxskt2SM8buBHl/cGAxgvilM+pMkbuSY
-         bTVZ0NwFW6vZ82sftyyguHuuDUeXO5JKf4VpP40Hh0WOCDTwW9qC6zNHGB8ZEmJ+qVLQ
-         xTsmlv+DT9ty2ixe2YTM+GNw2PwSxXcn3a3e7Ov66RWAJDwkbHkA3X3h+1zG8nXR8e+q
-         mKU2lrI9XYjETux9oRZ5jufcfo0s+qa9mDLLQ50wd+bWcZWf5reREZcHg+YyKQdQs9kY
-         l8UdzZpINAJjm3EDyRp6MkOWCjf0mV0E2+fYNJx2grLRkYSaKl8tJQHbEPu2SXisx1Dq
-         dYYQ==
-X-Gm-Message-State: AOJu0YxUutM+V4+GiTuefYpjsFmex7JROkVL02P1M/BdZIxpKD3prUXO
-	4lGi/6ZZ8v1PwPL/HrEdsHZUct1NOHUqRh0/rheXeSZJr9v30x0RMSCX3w8hgUHdtfjXf7vu95d
-	7JV1cASc=
-X-Gm-Gg: ASbGncte4YphdD4UgEJKJ51Bvl57NTghXoBGhKoCN7M5RSxujlPr9KCaJExyuud8TPO
-	2vGVzy1bH5Sw16F3wICKKQTbwagOBNRw3E93UKAQQHOIBJ8YW+nDDUYT966+ebdNF0pWgb6BLlG
-	5nvkak65FW/vstkFbaWTaBLH0eY2qweREUeNY/Rh2v/xCijHzQTpAXpcfEmyHy5gL7JJutZsCDC
-	KFg3YG/4tUbezHrz5LnqO3wQ9gVtCMgYuEidoNKSdRW+sw3n53gtI+bgc42Od8iygkcumbnxkO4
-	Y0Obao2gWoc1Wwktnz8Z+decs85HuTclFIHeFY6s0S1AgovifUtTVYno78aKqijtNXYDSAxKOyw
-	NKRq4j1ReXnsx8nkaBSmADT61CcYxaygB+aVQb5cCJ4S+ikjzd2vy+xVmHi3zK+tUMYEYcduNlR
-	VRxxFO+rkyrV0b2LRJ+3B61UxCeB/Rq4IyuswaC40=
-X-Google-Smtp-Source: AGHT+IHA9kQHmr8gJBb2GLqlPQFDpIDA1LLoN7mYIThsRF6DphvfH2JelROn1knvhdIIVeFY3qHIvg==
-X-Received: by 2002:a05:6214:8006:b0:87c:20f5:84db with SMTP id 6a1803df08f44-87c20f586d4mr34748296d6.15.1760696785543;
-        Fri, 17 Oct 2025 03:26:25 -0700 (PDT)
-Received: from [192.168.158.66] (syn-024-169-078-030.biz.spectrum.com. [24.169.78.30])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-87c0121c0adsm61037626d6.18.2025.10.17.03.26.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 17 Oct 2025 03:26:24 -0700 (PDT)
-Message-ID: <f771a6b5-c524-4b69-ad07-bcb77cb3e334@kernel.dk>
-Date: Fri, 17 Oct 2025 04:26:24 -0600
+	s=arc-20240116; t=1760698206; c=relaxed/simple;
+	bh=Im9UZffnD6V0KfkjwdG+DCiJql6cfGfj6sEhY/Erl40=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=tN/r4NJjvTtXVnxEtUOO/fI7p/1/OF2b7hDmGTJoZc6/vQcWvRyjBGMwNz0QQNnooxLmnMIJj/zzXe67BC9czK7S915h8w4/qFmcOoclTRQnZDdfHyJf6TKNjZd7DNgiCPH837anZ6pb4l4kx8SFXSHIQwkbXgHyO1+qiBvYXHk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.235.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
+Received: from localhost (mailhub4.si.c-s.fr [172.26.127.67])
+	by localhost (Postfix) with ESMTP id 4cp17y2Lvmz9sSs;
+	Fri, 17 Oct 2025 12:21:34 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from pegase2.c-s.fr ([172.26.127.65])
+	by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id 0D7ea81fU72c; Fri, 17 Oct 2025 12:21:34 +0200 (CEST)
+Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
+	by pegase2.c-s.fr (Postfix) with ESMTP id 4cp17y1QHqz9sSr;
+	Fri, 17 Oct 2025 12:21:34 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id 1A9798B786;
+	Fri, 17 Oct 2025 12:21:34 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from messagerie.si.c-s.fr ([127.0.0.1])
+	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
+	with ESMTP id CQQoDsn3Q25M; Fri, 17 Oct 2025 12:21:33 +0200 (CEST)
+Received: from PO20335.idsi0.si.c-s.fr (unknown [192.168.235.99])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id E4FAB8B780;
+	Fri, 17 Oct 2025 12:21:32 +0200 (CEST)
+From: Christophe Leroy <christophe.leroy@csgroup.eu>
+To: Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>,
+	Jan Kara <jack@suse.cz>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Darren Hart <dvhart@infradead.org>,
+	Davidlohr Bueso <dave@stgolabs.net>,
+	"Andre Almeida" <andrealmeid@igalia.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Willem de Bruijn <willemb@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>
+Cc: Christophe Leroy <christophe.leroy@csgroup.eu>,
+	linux-block@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org
+Subject: [PATCH v3 09/10] powerpc/32: Automatically adapt TASK_SIZE based on constraints
+Date: Fri, 17 Oct 2025 12:21:05 +0200
+Message-ID: <d77b2e263c7f5eaa3828c8a64e0d0e623e387102.1760529207.git.christophe.leroy@csgroup.eu>
+X-Mailer: git-send-email 2.49.0
+In-Reply-To: <cover.1760529207.git.christophe.leroy@csgroup.eu>
+References: <cover.1760529207.git.christophe.leroy@csgroup.eu>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 6.18-rc2
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-Developer-Signature: v=1; a=openpgp-sha256; l=6170; i=christophe.leroy@csgroup.eu; h=from:subject:message-id; bh=Im9UZffnD6V0KfkjwdG+DCiJql6cfGfj6sEhY/Erl40=; b=owGbwMvMwCV2d0KB2p7V54MZT6slMWR8kpiSordoxcnw7sKJe379vmp2pkBIe2vow6RdiZq9y Q59P+0vd5SyMIhxMciKKbIc/8+9a0bXl9T8qbv0YeawMoEMYeDiFICJXNnMyHDKrezVhC0ebi9+ nbQ6ZLvkdPgZab76IyJO9R6nJ9Qk8HMy/FNr+yKb1c9SrVbAsWbeova7NU8EJv/3OylotfDci/r W89wA
+X-Developer-Key: i=christophe.leroy@csgroup.eu; a=openpgp; fpr=10FFE6F8B390DE17ACC2632368A92FEB01B8DD78
+Content-Transfer-Encoding: 8bit
 
-Hi Linus,
+At the time being, TASK_SIZE can be customized by the user via Kconfig
+but it is not possible to check all constraints in Kconfig. Impossible
+setups are detected at compile time with BUILD_BUG() but that leads
+to build failure when setting crazy values. It is not a problem on its
+own because the user will usually either use the default value or set
+a well thought value. However build robots generate crazy random
+configs that lead to build failures, and build robots see it as a
+regression every time a patch adds such a constraint.
 
-Set of fixes for block that should go into the 6.18 kernel release. This
-pull request contains:
+So instead of failing the build when the custom TASK_SIZE is too
+big, just adjust it to the maximum possible value matching the setup.
 
-- NVMe pull request via Keith
-	- iostats accounting fixed on multipath retries (Amit)
-	- secure concatenation response fixup (Martin)
-	- tls partial record fixup (Wilfred)
+Several architectures already calculate TASK_SIZE based on other
+parameters and options.
 
-- Fix for a lockdep reported issue with the elevator lock and blk group
-  frozen operations.
+In order to do so, move MODULES_VADDR calculation into task_size_32.h
+and ensure that:
+- On book3s/32, userspace and module area have their own segments (256M)
+- On 8xx, userspace has its own full PGDIR entries (4M)
 
-- Fix for a regression in this merge window, where updating
-  'nr_requests' would not do the right thing for queues with shared
-  tags.
+Then TASK_SIZE is guaranteed to be correct so remove related
+BUILD_BUG()s.
 
-Please pull!
+Signed-off-by: Christophe Leroy <christophe.leroy@csgroup.eu>
+---
+ arch/powerpc/Kconfig                         |  3 +--
+ arch/powerpc/include/asm/book3s/32/pgtable.h |  4 ---
+ arch/powerpc/include/asm/nohash/32/mmu-8xx.h |  4 ---
+ arch/powerpc/include/asm/task_size_32.h      | 26 ++++++++++++++++++++
+ arch/powerpc/mm/book3s32/mmu.c               |  2 --
+ arch/powerpc/mm/mem.c                        |  2 --
+ arch/powerpc/mm/nohash/8xx.c                 |  2 --
+ 7 files changed, 27 insertions(+), 16 deletions(-)
 
-
-The following changes since commit 455281c0ef4e2cabdfe2e8b83fa6010d5210811c:
-
-  loop: remove redundant __GFP_NOWARN flag (2025-10-08 06:27:53 -0600)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git tags/block-6.18-20251016
-
-for you to fetch changes up to f0624c6646435c1b56652193cce3e34062d50e3f:
-
-  Merge tag 'nvme-6.18-2025-10-16' of git://git.infradead.org/nvme into block-6.18 (2025-10-16 13:25:40 -0600)
-
-----------------------------------------------------------------
-block-6.18-20251016
-
-----------------------------------------------------------------
-Amit Chaudhary (1):
-      nvme-multipath: Skip nr_active increments in RETRY disposition
-
-Jens Axboe (1):
-      Merge tag 'nvme-6.18-2025-10-16' of git://git.infradead.org/nvme into block-6.18
-
-Martin George (1):
-      nvme-auth: update sc_c in host response
-
-Ming Lei (1):
-      block: Remove elevator_lock usage from blkg_conf frozen operations
-
-Wilfred Mallawa (1):
-      nvme/tcp: handle tls partially sent records in write_space()
-
-Yu Kuai (1):
-      blk-mq: fix stale tag depth for shared sched tags in blk_mq_update_nr_requests()
-
- block/blk-cgroup.c            | 13 ++++---------
- block/blk-mq-sched.c          |  2 +-
- block/blk-mq-tag.c            |  5 +++--
- block/blk-mq.c                |  2 +-
- block/blk-mq.h                |  3 ++-
- drivers/nvme/host/auth.c      |  6 +++++-
- drivers/nvme/host/multipath.c |  6 ++++--
- drivers/nvme/host/tcp.c       |  3 +++
- 8 files changed, 23 insertions(+), 17 deletions(-)
-
+diff --git a/arch/powerpc/Kconfig b/arch/powerpc/Kconfig
+index e24f4d88885ae..10a8d4a5fea1f 100644
+--- a/arch/powerpc/Kconfig
++++ b/arch/powerpc/Kconfig
+@@ -1292,9 +1292,8 @@ config TASK_SIZE_BOOL
+ 	  Say N here unless you know what you are doing.
+ 
+ config TASK_SIZE
+-	hex "Size of user task space" if TASK_SIZE_BOOL
++	hex "Size of maximum user task space" if TASK_SIZE_BOOL
+ 	default "0x80000000" if PPC_8xx
+-	default "0xb0000000" if PPC_BOOK3S_32 && EXECMEM
+ 	default "0xc0000000"
+ 
+ config MODULES_SIZE_BOOL
+diff --git a/arch/powerpc/include/asm/book3s/32/pgtable.h b/arch/powerpc/include/asm/book3s/32/pgtable.h
+index 87dcca962be78..41ae404d0b7a6 100644
+--- a/arch/powerpc/include/asm/book3s/32/pgtable.h
++++ b/arch/powerpc/include/asm/book3s/32/pgtable.h
+@@ -195,10 +195,6 @@ void unmap_kernel_page(unsigned long va);
+ #define VMALLOC_END	ioremap_bot
+ #endif
+ 
+-#define MODULES_END	ALIGN_DOWN(PAGE_OFFSET, SZ_256M)
+-#define MODULES_SIZE	(CONFIG_MODULES_SIZE * SZ_1M)
+-#define MODULES_VADDR	(MODULES_END - MODULES_SIZE)
+-
+ #ifndef __ASSEMBLER__
+ #include <linux/sched.h>
+ #include <linux/threads.h>
+diff --git a/arch/powerpc/include/asm/nohash/32/mmu-8xx.h b/arch/powerpc/include/asm/nohash/32/mmu-8xx.h
+index f19115db8072f..74ad32e1588cf 100644
+--- a/arch/powerpc/include/asm/nohash/32/mmu-8xx.h
++++ b/arch/powerpc/include/asm/nohash/32/mmu-8xx.h
+@@ -170,10 +170,6 @@
+ 
+ #define mmu_linear_psize	MMU_PAGE_8M
+ 
+-#define MODULES_END	PAGE_OFFSET
+-#define MODULES_SIZE	(CONFIG_MODULES_SIZE * SZ_1M)
+-#define MODULES_VADDR	(MODULES_END - MODULES_SIZE)
+-
+ #ifndef __ASSEMBLER__
+ 
+ #include <linux/mmdebug.h>
+diff --git a/arch/powerpc/include/asm/task_size_32.h b/arch/powerpc/include/asm/task_size_32.h
+index 30edc21f71fbd..42a64bbd1964f 100644
+--- a/arch/powerpc/include/asm/task_size_32.h
++++ b/arch/powerpc/include/asm/task_size_32.h
+@@ -2,11 +2,37 @@
+ #ifndef _ASM_POWERPC_TASK_SIZE_32_H
+ #define _ASM_POWERPC_TASK_SIZE_32_H
+ 
++#include <linux/sizes.h>
++
+ #if CONFIG_TASK_SIZE > CONFIG_KERNEL_START
+ #error User TASK_SIZE overlaps with KERNEL_START address
+ #endif
+ 
++#ifdef CONFIG_PPC_8xx
++#define MODULES_END	ASM_CONST(CONFIG_PAGE_OFFSET)
++#define MODULES_SIZE	(CONFIG_MODULES_SIZE * SZ_1M)
++#define MODULES_VADDR	(MODULES_END - MODULES_SIZE)
++#define MODULES_BASE	(MODULES_VADDR & ~(UL(SZ_4M) - 1))
++#define USER_TOP	MODULES_BASE
++#endif
++
++#ifdef CONFIG_PPC_BOOK3S_32
++#define MODULES_END	(ASM_CONST(CONFIG_PAGE_OFFSET) & ~(UL(SZ_256M) - 1))
++#define MODULES_SIZE	(CONFIG_MODULES_SIZE * SZ_1M)
++#define MODULES_VADDR	(MODULES_END - MODULES_SIZE)
++#define MODULES_BASE	(MODULES_VADDR & ~(UL(SZ_256M) - 1))
++#define USER_TOP	MODULES_BASE
++#endif
++
++#ifndef USER_TOP
++#define USER_TOP	ASM_CONST(CONFIG_PAGE_OFFSET)
++#endif
++
++#if CONFIG_TASK_SIZE < USER_TOP
+ #define TASK_SIZE ASM_CONST(CONFIG_TASK_SIZE)
++#else
++#define TASK_SIZE USER_TOP
++#endif
+ 
+ /*
+  * This decides where the kernel will search for a free chunk of vm space during
+diff --git a/arch/powerpc/mm/book3s32/mmu.c b/arch/powerpc/mm/book3s32/mmu.c
+index 37eefc6786a72..07660e8badbda 100644
+--- a/arch/powerpc/mm/book3s32/mmu.c
++++ b/arch/powerpc/mm/book3s32/mmu.c
+@@ -223,8 +223,6 @@ int mmu_mark_initmem_nx(void)
+ 
+ 	update_bats();
+ 
+-	BUILD_BUG_ON(ALIGN_DOWN(MODULES_VADDR, SZ_256M) < TASK_SIZE);
+-
+ 	for (i = ALIGN(TASK_SIZE, SZ_256M) >> 28; i < 16; i++) {
+ 		/* Do not set NX on VM space for modules */
+ 		if (is_module_segment(i << 28))
+diff --git a/arch/powerpc/mm/mem.c b/arch/powerpc/mm/mem.c
+index 3ddbfdbfa9413..bc0f1a9eb0bc0 100644
+--- a/arch/powerpc/mm/mem.c
++++ b/arch/powerpc/mm/mem.c
+@@ -401,8 +401,6 @@ struct execmem_info __init *execmem_arch_setup(void)
+ #ifdef MODULES_VADDR
+ 	unsigned long limit = (unsigned long)_etext - SZ_32M;
+ 
+-	BUILD_BUG_ON(TASK_SIZE > MODULES_VADDR);
+-
+ 	/* First try within 32M limit from _etext to avoid branch trampolines */
+ 	if (MODULES_VADDR < PAGE_OFFSET && MODULES_END > limit) {
+ 		start = limit;
+diff --git a/arch/powerpc/mm/nohash/8xx.c b/arch/powerpc/mm/nohash/8xx.c
+index ab1505cf42bf5..a9d3f4729eada 100644
+--- a/arch/powerpc/mm/nohash/8xx.c
++++ b/arch/powerpc/mm/nohash/8xx.c
+@@ -209,8 +209,6 @@ void __init setup_initial_memory_limit(phys_addr_t first_memblock_base,
+ 
+ 	/* 8xx can only access 32MB at the moment */
+ 	memblock_set_current_limit(min_t(u64, first_memblock_size, SZ_32M));
+-
+-	BUILD_BUG_ON(ALIGN_DOWN(MODULES_VADDR, PGDIR_SIZE) < TASK_SIZE);
+ }
+ 
+ int pud_clear_huge(pud_t *pud)
 -- 
-Jens Axboe
+2.49.0
 
