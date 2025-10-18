@@ -1,68 +1,68 @@
-Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
+Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70DD1286402
-	for <linux-block@vger.kernel.org>; Sat, 18 Oct 2025 17:45:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F6632857F0
+	for <linux-block@vger.kernel.org>; Sat, 18 Oct 2025 17:45:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760809554; cv=none; b=ewjqSCQXwxkvezitU3iIckGd/ZNiR72ruD6/qvPUbOo73hvJ1e2MATRctsLUT5Hplte1umfKpo3iz1MQmvgkzhhYVc7A99ae9gC3B6kDS4mtYBni5PDoeMpvuOQtltAAYiyXrFeIQGxDvSlS+0Sz6+N946lYO42BPfXgpFKYKcw=
+	t=1760809557; cv=none; b=YDolsyV1atWjBDhLfiq2UQtMkjw5P8XzG5kI0HbB0ow5NQvFJz7EBIyy0INUl3rtLRT+VA+E5MPzDvZ0u6g97yfEY80nhga9gEL8uJ8Y9NX96SfaPboydsT/aqdILShdrdMOPdgx2ynLed+iw3yp/TuxZV9M/vjkpEthh9vCRx0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760809554; c=relaxed/simple;
-	bh=/cgHz1cX/7pqPCiwokdGYY23t2YMKDX7WgaCRbImZEk=;
+	s=arc-20240116; t=1760809557; c=relaxed/simple;
+	bh=VZx3xyzuE8sdJWwvMWeYLSbsWBC7U7VUNVHO5x1zs/Y=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=EPVxkOQBrZIU5D75awO246nTZ1YpYU9IfmKHoTYkEOuMwLSwACuLfnqwK9FFuQTlJtKsY4+qGqrsVMjAfCops5Y42PVAEOUkHPPqcTXJL/CUIGXrTkK6yMazkUCBz9vSniWFXOfzZlydoXN03VLKIJRjzNwRhIjl/y88Vu2k9fg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aw7kVOzU; arc=none smtp.client-ip=209.85.222.181
+	 In-Reply-To:To:Cc; b=EHaAEepYoGBY6BT0Q1ttuWzL79yaHDolRyWUsREtqIyWQegvfrtu0uK8VsrQvy6haAAVpRTWbs75O+XBDvuluDpZrqosqigIS+dD306/BPlQwJVFQwyMjj2er3YuY+fE1pnAgSYnxKVo+ALgRVbqpEavi8O0s5lQovhWWIMyug4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ee/C91C5; arc=none smtp.client-ip=209.85.219.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aw7kVOzU"
-Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-816ac9f9507so586601785a.1
-        for <linux-block@vger.kernel.org>; Sat, 18 Oct 2025 10:45:51 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ee/C91C5"
+Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-87c217f4aaaso32419946d6.0
+        for <linux-block@vger.kernel.org>; Sat, 18 Oct 2025 10:45:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760809550; x=1761414350; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1760809553; x=1761414353; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=g6x4i2Nx/KcrVad3Kw/MMDkaM+hSW8mJw3uIz+XsVU4=;
-        b=aw7kVOzUSupMQBgDrjBE7QuJ7LuSFqr+NhJsKQ7LCquYg/kvtDTTFLRs6nBILlaamN
-         inkYr+EVR6qY1CAyYVXZm1jjA6ScXcauQxnBH8OXODNmN1vpZuaMmYS86NmfrRk44JYJ
-         hyFNp35WF4ZNz8i6w5zk8QSXWQXAHs4Vk33n8AuuADWpCxny7VMEskeb5PaVP4qz610q
-         5Z68eeMf8WA7r+swC/7wvBICNrkN1mlH5Jpo9CuvGZ/pdlxfj5hFxUurO0EH1FSgjTzx
-         zuCZ5epmWqGbRlk0lex1rsXOnLOFy9tHJwphVJIRJl3lMhNhBzwrfyMSZPRhVyCDCO45
-         TTOw==
+        bh=rhXSu5jvbOALYGh18N5SGleu51uu827FBi1PfdDv9uw=;
+        b=Ee/C91C5ZEhh8jLb3zo2XMwP99BhgrNtp+YaYXxaDKNCdTGMxNX7K9o4GOwIvEJQOn
+         VPYJxGP9amVyvDXMcXa7QG/gVv2xjsWuDQc4SAcAV1UoosJxBQ+mD10T2+raWIFkryWQ
+         DBkRdCXnMIXqSnHTrE2TOLMDVmXT03J1IHmZsON9STI6iJomwUctRDGmsPtDPMeklUmQ
+         epikSbEVtz8xB61QSeluzDShCvZ04knfJVX0TWeCnPukUu+LVad0ITlzRppvZDA/A1m/
+         CsmqaCemw4ZTA8kVrPWZiSROyL0AtGlLY9B/h4AczgSl/PezRYEjgJ7q1/+sNyqkS7/7
+         0s/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760809550; x=1761414350;
+        d=1e100.net; s=20230601; t=1760809553; x=1761414353;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=g6x4i2Nx/KcrVad3Kw/MMDkaM+hSW8mJw3uIz+XsVU4=;
-        b=HsZlerU0lsWFbvpKRUZPwOF4Ls5q/KgGXMSTwP6gIPArWLLy0xFTqCYxDbCliEiOzY
-         BeiSNB6djyX+1zUVQbDVuB2ngjqs9daw5glMeIoBN6GuMAVZa2HKFJPup2Opi8JjIp0z
-         usqzcvSAdicA3cHU1ZQPG2YWAmBOQkUkOmW8yGymn2qDTdrknb+jU0f/G1m0zN6oYp4l
-         H404oQgO+qixnm8M+cHyOV4qsiXJ6XTiSmMh8r7B8jmLjk/cdikIEdRJNCXr0ISI/q2p
-         ussv31iTnAo7owoKbIIvYhpIgyArfupvhOJlXXkYqksH1DT0Hl85BSnJbUwxjLaFZXTi
-         rZyA==
-X-Forwarded-Encrypted: i=1; AJvYcCWSCt0bq27DB5eNETTRTutQ9suxtRitLqKHWrNsXGE8eF5CgOYvgwSLWM2aXohd1a1SBxFBRWYRPQ5+mw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzvkosIDZMDk48YS9QBC1A+bivJLGnLe/6CrQtfIyFpaEK3mjfB
-	QMB0V/bq/V8HJMIY11BFbAkLoosJKTgtqk9khpCAcIUHepzxXwIp1kYr
-X-Gm-Gg: ASbGncvcHiUSiKATNqJb/xuVMNVXA3hD9laTK1jjD9Z4Sp4oadm0LUKbigEm6r7rOXB
-	eL4lmrAGCpH56diXxJfUV4/k5o9KMV3J8gNJ5C/UZQhbTw6ccLTLAX57OSmAX+GvUFMcMJzfRtO
-	rUtjR3EOmsCo6oVWBr4hALnOTH73A1KaM3//IL1I/JqjdduQ2VFeXrs7ceyrGMJ3o9Rq7bCy8Ff
-	6A++EYjEsG9vmSUEbZ0a7NhKHPE9P78YPXtLHB1BcpTafHAhvLrmU6vfFS7ZMesM+ZP5bU9PjDB
-	9rxzSS4Obu/WlR7RRR918c9n2IXZ81q1byTjPGcNHq3JhoE7yINm7WdZ2Gr9MD93/S+Y99x4pZO
-	s0WGTJzm8j19yvITN2MaYU5HAAuLwi+TQ5GYhkpb/gjs+PB8kzpGiH3Dog1AdqCnAR+VH01UAWI
-	VnU8iAqEnI7QefCH3H4qMBoiIvoBcsARYuCU7z5/rJinu4nPOlWYfGaOd4quimb58qg3a+d4gFt
-	gTPergvqGPd/TFufQaphLk+/YxAP3JNFydURdX0tWc2CeSJT/cx
-X-Google-Smtp-Source: AGHT+IFp9Vyr6DTgU7wMi5TzpEwlGd9IqV/k5vFAlka/PSHuVo2bkmg6CmRBEzK7leqOE/jg7Hax7Q==
-X-Received: by 2002:a05:622a:609:b0:4d1:c31e:1cc8 with SMTP id d75a77b69052e-4e89cf24499mr98131111cf.22.1760809550121;
-        Sat, 18 Oct 2025 10:45:50 -0700 (PDT)
+        bh=rhXSu5jvbOALYGh18N5SGleu51uu827FBi1PfdDv9uw=;
+        b=Ww8Z5n+VtwqTZ4NRTiG+vDJbNgnYaXjfjaHkPQOzaEb7ByUVynoceYgAYGjU0XD7PY
+         ANJq+bC79ZJuB5iWv1/wzlE4pNP41Y0rf07+8/VM3ESCSC5Db3mA/ZpF7dLPl0CdcdGa
+         RK1VqSAqqi+2juUB3tLoI3o5lDIdeaJCARik4sj9IkxGesnooQo8iiBB7YEPtybYYMdK
+         5DAZPcC90e7lHdeoJnzR8ixAJVha31TAQj8cGghhVD0tNNpvJKJDmskF+LYyIYbXLVO6
+         fdb3BAF1yhEj0ihphWVNMPVQDHr0soTDXwRoXP1KdvSNrzbu1fWw86i0J5N/ks/dyJyQ
+         2cwg==
+X-Forwarded-Encrypted: i=1; AJvYcCXpnNHgxQfS0xOpMJ7GJKlbdU2UYwjLYTNxzeXlA+tZnmgcpx3AIwdwusu4C8D5CrTCsdlVNv2YKO9EjQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyFoaKUIQvvx2+9uwWLok2CXkhatTo+7r+svv+0PayV6fOQzLrT
+	x8gvp7IljIPUn7tyKsmCeWA724CRCog3b8m25pIVI1EZTWbH+CejjXwT
+X-Gm-Gg: ASbGncuwU77KD9k+FtKjoNKUcERO0vkH0PJR/ppgyhQLRyN8ozTg18t4g/yWsBFfSXx
+	ZNF5iQIsCJhxaeassnUhfXm/MqsTXiST4miGzd2KAK5VULMYQySSKIIF4WZgTcNWdHFTAMF4eMg
+	k8HrW1SG5vluvJ/rSOsHdWj05qrdp58CNODJEvA0fI/PcsCDh2Sv9Mpodweaitd2e6m4Uq4V2la
+	pjll85Y3Cjy3sLKKP9wK+yfk6wcPW4lD7JfFCJT9pZne4taNTKfjjh6tvJ4IL4WrG1FdAXY5GqJ
+	ywH0sPTyDNProDg8OE2LYXNkogfLc5Td2xcGwiqfp0kHx5WdcR+wjUXuYjcNgP89tnrF4bBIjCS
+	loOhhYUuNnjcVXe7u5XnIUBg6KumKysIJElm0EXLw3LUxd2b4CFDUNAxrmlb9c0hBakfDJqzGF1
+	5+xyfDZKg7J7bcJqy8EqYcb65c4yQ4LZlFgCCwsahP2clAw6zjuCBOEGF2RS4UebJ2Zg1EfX4dO
+	Y4ZxwaVzUL/GykguMcgk2hUMy91OTnx0AEefghXUbODaMGY7qAT
+X-Google-Smtp-Source: AGHT+IHwmbCilEbE3X/epDbrG5LC82vpTK8X6AnN2QSsDBY9zv0L0DqM69lN1FMFmljkUNXxkq4AOQ==
+X-Received: by 2002:ac8:7dd4:0:b0:4e8:96ab:da8b with SMTP id d75a77b69052e-4e89d283014mr129620021cf.23.1760809553435;
+        Sat, 18 Oct 2025 10:45:53 -0700 (PDT)
 Received: from 117.1.168.192.in-addr.arpa ([2600:4808:6353:5c00:1948:1052:f1e9:e23a])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4e8ab114132sm20445161cf.40.2025.10.18.10.45.46
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4e8ab114132sm20445161cf.40.2025.10.18.10.45.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 18 Oct 2025 10:45:49 -0700 (PDT)
+        Sat, 18 Oct 2025 10:45:52 -0700 (PDT)
 From: Tamir Duberstein <tamird@gmail.com>
-Date: Sat, 18 Oct 2025 13:45:16 -0400
-Subject: [PATCH v18 05/16] rnull: use `kernel::fmt`
+Date: Sat, 18 Oct 2025 13:45:17 -0400
+Subject: [PATCH v18 06/16] rust: alloc: use `kernel::fmt`
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -71,7 +71,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20251018-cstr-core-v18-5-ef3d02760804@gmail.com>
+Message-Id: <20251018-cstr-core-v18-6-ef3d02760804@gmail.com>
 References: <20251018-cstr-core-v18-0-ef3d02760804@gmail.com>
 In-Reply-To: <20251018-cstr-core-v18-0-ef3d02760804@gmail.com>
 To: Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
@@ -110,60 +110,73 @@ Cc: rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org,
  linux-pm@vger.kernel.org, linux-clk@vger.kernel.org, 
  dri-devel@lists.freedesktop.org, Tamir Duberstein <tamird@gmail.com>
 X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openssh-sha256; t=1760809527; l=1568;
+X-Developer-Signature: v=1; a=openssh-sha256; t=1760809527; l=2039;
  i=tamird@gmail.com; h=from:subject:message-id;
- bh=/cgHz1cX/7pqPCiwokdGYY23t2YMKDX7WgaCRbImZEk=;
+ bh=VZx3xyzuE8sdJWwvMWeYLSbsWBC7U7VUNVHO5x1zs/Y=;
  b=U1NIU0lHAAAAAQAAADMAAAALc3NoLWVkMjU1MTkAAAAgtYz36g7iDMSkY5K7Ab51ksGX7hJgs
  MRt+XVZTrIzMVIAAAAGcGF0YXR0AAAAAAAAAAZzaGE1MTIAAABTAAAAC3NzaC1lZDI1NTE5AAAA
- QFUyC4lRe8XY0+2gwbmqCYLMq7haRexJVvoEh9TOXoK7TJHzmAqN9kHMrHdHUQpbaYKcy+kW0rr
- jQd4qaEURmQ0=
+ QPuKAuVf9GfET2NKL0q4bp4Tc3Ay6O1rJo/qozL6xioRoXG7kz7tkE7k1hDE/ytV5U50M81wQNc
+ BkpwRYc3KSAs=
 X-Developer-Key: i=tamird@gmail.com; a=openssh;
  fpr=SHA256:264rPmnnrb+ERkS7DDS3tuwqcJss/zevJRzoylqMsbc
 
 Reduce coupling to implementation details of the formatting machinery by
 avoiding direct use for `core`'s formatting traits and macros.
 
-This backslid in commit d969d504bc13 ("rnull: enable configuration via
-`configfs`") and commit 34585dc649fb ("rnull: add soft-irq completion
-support").
+This backslid in commit 9def0d0a2a1c ("rust: alloc: add
+Vec::push_within_capacity").
 
-Acked-by: Andreas Hindborg <a.hindborg@kernel.org>
+Reviewed-by: Alice Ryhl <aliceryhl@google.com>
+Acked-by: Danilo Krummrich <dakr@kernel.org>
 Signed-off-by: Tamir Duberstein <tamird@gmail.com>
 ---
- drivers/block/rnull/configfs.rs | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+ rust/kernel/alloc/kvec/errors.rs | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/block/rnull/configfs.rs b/drivers/block/rnull/configfs.rs
-index 8498e9bae6fd..6713a6d92391 100644
---- a/drivers/block/rnull/configfs.rs
-+++ b/drivers/block/rnull/configfs.rs
-@@ -1,12 +1,13 @@
- // SPDX-License-Identifier: GPL-2.0
+diff --git a/rust/kernel/alloc/kvec/errors.rs b/rust/kernel/alloc/kvec/errors.rs
+index 21a920a4b09b..e7de5049ee47 100644
+--- a/rust/kernel/alloc/kvec/errors.rs
++++ b/rust/kernel/alloc/kvec/errors.rs
+@@ -2,14 +2,14 @@
  
- use super::{NullBlkDevice, THIS_MODULE};
--use core::fmt::{Display, Write};
- use kernel::{
-     block::mq::gen_disk::{GenDisk, GenDiskBuilder},
-     c_str,
-     configfs::{self, AttributeOperations},
--    configfs_attrs, new_mutex,
-+    configfs_attrs,
-+    fmt::{self, Write as _},
-+    new_mutex,
-     page::PAGE_SIZE,
-     prelude::*,
-     str::{kstrtobool_bytes, CString},
-@@ -99,8 +100,8 @@ fn try_from(value: u8) -> Result<Self> {
+ //! Errors for the [`Vec`] type.
+ 
+-use kernel::fmt::{self, Debug, Formatter};
++use kernel::fmt;
+ use kernel::prelude::*;
+ 
+ /// Error type for [`Vec::push_within_capacity`].
+ pub struct PushError<T>(pub T);
+ 
+-impl<T> Debug for PushError<T> {
+-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
++impl<T> fmt::Debug for PushError<T> {
++    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+         write!(f, "Not enough capacity")
      }
  }
+@@ -25,8 +25,8 @@ fn from(_: PushError<T>) -> Error {
+ /// Error type for [`Vec::remove`].
+ pub struct RemoveError;
  
--impl Display for IRQMode {
--    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-+impl fmt::Display for IRQMode {
+-impl Debug for RemoveError {
+-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
++impl fmt::Debug for RemoveError {
++    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+         write!(f, "Index out of bounds")
+     }
+ }
+@@ -45,8 +45,8 @@ pub enum InsertError<T> {
+     OutOfCapacity(T),
+ }
+ 
+-impl<T> Debug for InsertError<T> {
+-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
++impl<T> fmt::Debug for InsertError<T> {
 +    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
          match self {
-             Self::None => f.write_str("0")?,
-             Self::Soft => f.write_str("1")?,
+             InsertError::IndexOutOfBounds(_) => write!(f, "Index out of bounds"),
+             InsertError::OutOfCapacity(_) => write!(f, "Not enough capacity"),
 
 -- 
 2.51.1
