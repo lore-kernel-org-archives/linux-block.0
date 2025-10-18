@@ -1,68 +1,68 @@
-Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
+Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F6632857F0
-	for <linux-block@vger.kernel.org>; Sat, 18 Oct 2025 17:45:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2183A2DC794
+	for <linux-block@vger.kernel.org>; Sat, 18 Oct 2025 17:45:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760809557; cv=none; b=YDolsyV1atWjBDhLfiq2UQtMkjw5P8XzG5kI0HbB0ow5NQvFJz7EBIyy0INUl3rtLRT+VA+E5MPzDvZ0u6g97yfEY80nhga9gEL8uJ8Y9NX96SfaPboydsT/aqdILShdrdMOPdgx2ynLed+iw3yp/TuxZV9M/vjkpEthh9vCRx0=
+	t=1760809560; cv=none; b=AjNFyxXoMJ5BLkPZMbDkJdSeJb35dKH4mdn3E4rL4sDN7tJR+qCXNoBROOFSfr9GHMKWWMivISTEYbrTY/xqT5q2ldR2R9psgjGheYMUUX6zWRJlCMVSXwuHkl61U8avLvkK8wP/KsayNWyrBBR/iR/W3IzK4SKJflAuSCSb074=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760809557; c=relaxed/simple;
-	bh=VZx3xyzuE8sdJWwvMWeYLSbsWBC7U7VUNVHO5x1zs/Y=;
+	s=arc-20240116; t=1760809560; c=relaxed/simple;
+	bh=2RO1O8x8vlwhifkhfd816jOQiIu5L43+GQ3qhkZvCCc=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=EHaAEepYoGBY6BT0Q1ttuWzL79yaHDolRyWUsREtqIyWQegvfrtu0uK8VsrQvy6haAAVpRTWbs75O+XBDvuluDpZrqosqigIS+dD306/BPlQwJVFQwyMjj2er3YuY+fE1pnAgSYnxKVo+ALgRVbqpEavi8O0s5lQovhWWIMyug4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ee/C91C5; arc=none smtp.client-ip=209.85.219.53
+	 In-Reply-To:To:Cc; b=MmkBxeE9x/HjSgxI8bfRdrZRGYdwoK11HCOUAJ7but3IxOQG6qEG7NJCNdUJqaGh5y23kf3vEw3vyGCceWWH3pUkzXAIe2Gy7xqrrRZjJxlIYdsZc1eKU3n0aOBRfczRJpj6KS3mH2ScRSjS6SHGzJxTwqZMVVhyKklN/jdowB8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GL7XNcaR; arc=none smtp.client-ip=209.85.222.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ee/C91C5"
-Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-87c217f4aaaso32419946d6.0
-        for <linux-block@vger.kernel.org>; Sat, 18 Oct 2025 10:45:54 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GL7XNcaR"
+Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-89048f76ec2so381108985a.1
+        for <linux-block@vger.kernel.org>; Sat, 18 Oct 2025 10:45:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760809553; x=1761414353; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1760809557; x=1761414357; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=rhXSu5jvbOALYGh18N5SGleu51uu827FBi1PfdDv9uw=;
-        b=Ee/C91C5ZEhh8jLb3zo2XMwP99BhgrNtp+YaYXxaDKNCdTGMxNX7K9o4GOwIvEJQOn
-         VPYJxGP9amVyvDXMcXa7QG/gVv2xjsWuDQc4SAcAV1UoosJxBQ+mD10T2+raWIFkryWQ
-         DBkRdCXnMIXqSnHTrE2TOLMDVmXT03J1IHmZsON9STI6iJomwUctRDGmsPtDPMeklUmQ
-         epikSbEVtz8xB61QSeluzDShCvZ04knfJVX0TWeCnPukUu+LVad0ITlzRppvZDA/A1m/
-         CsmqaCemw4ZTA8kVrPWZiSROyL0AtGlLY9B/h4AczgSl/PezRYEjgJ7q1/+sNyqkS7/7
-         0s/Q==
+        bh=a15d5fAvykxuJ32X4GoFun7W4EexMfG4QkmOfbTlvaA=;
+        b=GL7XNcaRisIQRpvNANKfLsPUjWi9UKTcVHFQt3rKxT9e6k6Z7Mq4yV0sQYC4gO1Hcj
+         sJyg/79Klvel4XnE0xuudtNs0raQqIomw/EIVxnvdo31WaO+XZDR8estB4jBg5M+8DNg
+         URsz2s28FaId/vbAeX53DFBXSGYMLHiveLI683yf3JutpfZ5O+XRJc++HP8IxECwm4yF
+         8sEzTLFwSqcIbkp2aiMS4Uz39mbuLXRrWx3q5+MShmY6MLypWnyT/l5akGk1mcXye4OV
+         c4/9KfD+bGDJBWvS8XUAuaF170gODiUmD4ZCYEr4uNoR8GZj3ycLBqJwQ4imwcR9Sx2C
+         r0ug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760809553; x=1761414353;
+        d=1e100.net; s=20230601; t=1760809557; x=1761414357;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=rhXSu5jvbOALYGh18N5SGleu51uu827FBi1PfdDv9uw=;
-        b=Ww8Z5n+VtwqTZ4NRTiG+vDJbNgnYaXjfjaHkPQOzaEb7ByUVynoceYgAYGjU0XD7PY
-         ANJq+bC79ZJuB5iWv1/wzlE4pNP41Y0rf07+8/VM3ESCSC5Db3mA/ZpF7dLPl0CdcdGa
-         RK1VqSAqqi+2juUB3tLoI3o5lDIdeaJCARik4sj9IkxGesnooQo8iiBB7YEPtybYYMdK
-         5DAZPcC90e7lHdeoJnzR8ixAJVha31TAQj8cGghhVD0tNNpvJKJDmskF+LYyIYbXLVO6
-         fdb3BAF1yhEj0ihphWVNMPVQDHr0soTDXwRoXP1KdvSNrzbu1fWw86i0J5N/ks/dyJyQ
-         2cwg==
-X-Forwarded-Encrypted: i=1; AJvYcCXpnNHgxQfS0xOpMJ7GJKlbdU2UYwjLYTNxzeXlA+tZnmgcpx3AIwdwusu4C8D5CrTCsdlVNv2YKO9EjQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyFoaKUIQvvx2+9uwWLok2CXkhatTo+7r+svv+0PayV6fOQzLrT
-	x8gvp7IljIPUn7tyKsmCeWA724CRCog3b8m25pIVI1EZTWbH+CejjXwT
-X-Gm-Gg: ASbGncuwU77KD9k+FtKjoNKUcERO0vkH0PJR/ppgyhQLRyN8ozTg18t4g/yWsBFfSXx
-	ZNF5iQIsCJhxaeassnUhfXm/MqsTXiST4miGzd2KAK5VULMYQySSKIIF4WZgTcNWdHFTAMF4eMg
-	k8HrW1SG5vluvJ/rSOsHdWj05qrdp58CNODJEvA0fI/PcsCDh2Sv9Mpodweaitd2e6m4Uq4V2la
-	pjll85Y3Cjy3sLKKP9wK+yfk6wcPW4lD7JfFCJT9pZne4taNTKfjjh6tvJ4IL4WrG1FdAXY5GqJ
-	ywH0sPTyDNProDg8OE2LYXNkogfLc5Td2xcGwiqfp0kHx5WdcR+wjUXuYjcNgP89tnrF4bBIjCS
-	loOhhYUuNnjcVXe7u5XnIUBg6KumKysIJElm0EXLw3LUxd2b4CFDUNAxrmlb9c0hBakfDJqzGF1
-	5+xyfDZKg7J7bcJqy8EqYcb65c4yQ4LZlFgCCwsahP2clAw6zjuCBOEGF2RS4UebJ2Zg1EfX4dO
-	Y4ZxwaVzUL/GykguMcgk2hUMy91OTnx0AEefghXUbODaMGY7qAT
-X-Google-Smtp-Source: AGHT+IHwmbCilEbE3X/epDbrG5LC82vpTK8X6AnN2QSsDBY9zv0L0DqM69lN1FMFmljkUNXxkq4AOQ==
-X-Received: by 2002:ac8:7dd4:0:b0:4e8:96ab:da8b with SMTP id d75a77b69052e-4e89d283014mr129620021cf.23.1760809553435;
-        Sat, 18 Oct 2025 10:45:53 -0700 (PDT)
+        bh=a15d5fAvykxuJ32X4GoFun7W4EexMfG4QkmOfbTlvaA=;
+        b=eZJ2krB3JOtdG5ZJvv8nEn0qh/tq21omma6LVhN3yjru0IqF6fnpTTZTlWc+I54uLa
+         EWeM7Es3CmiZIFFP0n3vK0WoOtODr2jB9NPxG+97RLSdQTIYbXE8fXQWFVe9T/kx47rP
+         jZ7NwjoSsEVXhjRSr1F9kg4tqSUeZU92MfevobAou5oMKp69vXC1AQtiJUM3CDTPjJ44
+         djUBl5wxiSLKU4Uz6kQ7iJLfeRVAxP0Z9/MM2kYMid+WwBvh1Z8trEzoWoOb/gq07zKO
+         PKbwWeUUI6DBES1pRKax9v3bw8AyquIjFWvPObRuNoBzDoYit2fuLihkqtx212NXsLVA
+         W+sQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVPJDes64knNnMXiCIOR4VDo0NKUMy8MdK0VdFHG9y0bk1xk14DjA5/aKs+pyX5kj7K9GR2ntVDETgBwQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxJIPBgYcIlUlF4Wv7p1EohthFMurXnYIqvHg0gd+2SYWjh0Sci
+	RqgS4ix/z4o1th5ZFqTtOFtkDbY3jkNObgV85+hYiKJF3hM5H2MRXaJP
+X-Gm-Gg: ASbGncvor/LXya5TNo1MIKh48tIYC5uuA2HJ5jLu2gTkZJtJq/qGNqVKLUkSeVi0HMv
+	miabhOEk1V4vPFUHbuTHyCG87bdR5zsIOVivhsvMKcMMRP5g56UrqKsUV8/aj5QOadXi21gJQI0
+	9/wYOrMm1GV9gVs8AdEsnDibIJTJu+pneP2nBCbndy9DGby2kG3vAZvfM7m7X77YArGy9I6As3X
+	9xBqg+vSDrXQkcWbTT53s+HMJY0l8lZElr9p+Ygry1MCE0XkT4aPgNjkUWdIXttZo03nMK0Q+mk
+	H2oQXdUG8IzE7/3Euc8dxDUMe2YYwvPOtjVdW51hD175qHTkPzIiL5188XaabK9DxHaVnhjOkoI
+	/5KU8tVRFVNtxFE29EHClzyqmaftNVNNXaOkhDSI85WdmGm+cukOeMDGEXmC+OiensaASn7/TBj
+	cRj0mawJILW3FXo53UOHi20+7XwdD8UfsGTBDQ3UhfxZ1LCXbyTnYDku6teHeCAzUhk/D++l6j0
+	Hc17UkGoeE78kpJg4VCWYqxlXyz8gO4tL8Dfy5xGbwsb1YreXneiYWNU+qj2p/KNO1JKDwVog==
+X-Google-Smtp-Source: AGHT+IF0jDSr4+x2H9ezxo4E3+k6pmF019NwUbAdiwnAzhTA8DToLrkpZSznJQWz124+QD1Dm24uLg==
+X-Received: by 2002:a05:622a:1102:b0:4e8:b17d:916b with SMTP id d75a77b69052e-4e8b17d949fmr28810291cf.51.1760809556972;
+        Sat, 18 Oct 2025 10:45:56 -0700 (PDT)
 Received: from 117.1.168.192.in-addr.arpa ([2600:4808:6353:5c00:1948:1052:f1e9:e23a])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4e8ab114132sm20445161cf.40.2025.10.18.10.45.50
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4e8ab114132sm20445161cf.40.2025.10.18.10.45.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 18 Oct 2025 10:45:52 -0700 (PDT)
+        Sat, 18 Oct 2025 10:45:55 -0700 (PDT)
 From: Tamir Duberstein <tamird@gmail.com>
-Date: Sat, 18 Oct 2025 13:45:17 -0400
-Subject: [PATCH v18 06/16] rust: alloc: use `kernel::fmt`
+Date: Sat, 18 Oct 2025 13:45:18 -0400
+Subject: [PATCH v18 07/16] rust: debugfs: use `kernel::fmt`
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -71,7 +71,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20251018-cstr-core-v18-6-ef3d02760804@gmail.com>
+Message-Id: <20251018-cstr-core-v18-7-ef3d02760804@gmail.com>
 References: <20251018-cstr-core-v18-0-ef3d02760804@gmail.com>
 In-Reply-To: <20251018-cstr-core-v18-0-ef3d02760804@gmail.com>
 To: Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
@@ -108,75 +108,148 @@ Cc: rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org,
  llvm@lists.linux.dev, linux-fsdevel@vger.kernel.org, 
  linux-block@vger.kernel.org, linux-pci@vger.kernel.org, 
  linux-pm@vger.kernel.org, linux-clk@vger.kernel.org, 
- dri-devel@lists.freedesktop.org, Tamir Duberstein <tamird@gmail.com>
+ dri-devel@lists.freedesktop.org, Tamir Duberstein <tamird@gmail.com>, 
+ Matthew Maurer <mmaurer@google.com>
 X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openssh-sha256; t=1760809527; l=2039;
+X-Developer-Signature: v=1; a=openssh-sha256; t=1760809527; l=4664;
  i=tamird@gmail.com; h=from:subject:message-id;
- bh=VZx3xyzuE8sdJWwvMWeYLSbsWBC7U7VUNVHO5x1zs/Y=;
+ bh=2RO1O8x8vlwhifkhfd816jOQiIu5L43+GQ3qhkZvCCc=;
  b=U1NIU0lHAAAAAQAAADMAAAALc3NoLWVkMjU1MTkAAAAgtYz36g7iDMSkY5K7Ab51ksGX7hJgs
  MRt+XVZTrIzMVIAAAAGcGF0YXR0AAAAAAAAAAZzaGE1MTIAAABTAAAAC3NzaC1lZDI1NTE5AAAA
- QPuKAuVf9GfET2NKL0q4bp4Tc3Ay6O1rJo/qozL6xioRoXG7kz7tkE7k1hDE/ytV5U50M81wQNc
- BkpwRYc3KSAs=
+ QMATZCii+4KTdwmO4cL/e3cZ7fEhaFxHdhr1qxcBeKLRmamGNwC2RJ/lvy+nkubg5+s2N1SC1jy
+ AY70o32pQ0gI=
 X-Developer-Key: i=tamird@gmail.com; a=openssh;
  fpr=SHA256:264rPmnnrb+ERkS7DDS3tuwqcJss/zevJRzoylqMsbc
 
 Reduce coupling to implementation details of the formatting machinery by
 avoiding direct use for `core`'s formatting traits and macros.
 
-This backslid in commit 9def0d0a2a1c ("rust: alloc: add
-Vec::push_within_capacity").
+This backslid in commit 40ecc49466c8 ("rust: debugfs: Add support for
+callback-based files") and commit 5e40b591cb46 ("rust: debugfs: Add
+support for read-only files").
 
-Reviewed-by: Alice Ryhl <aliceryhl@google.com>
 Acked-by: Danilo Krummrich <dakr@kernel.org>
+Reviewed-by: Matthew Maurer <mmaurer@google.com>
 Signed-off-by: Tamir Duberstein <tamird@gmail.com>
 ---
- rust/kernel/alloc/kvec/errors.rs | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+ rust/kernel/debugfs.rs                   |  2 +-
+ rust/kernel/debugfs/callback_adapters.rs |  7 +++----
+ rust/kernel/debugfs/file_ops.rs          |  6 +++---
+ rust/kernel/debugfs/traits.rs            | 10 +++++-----
+ 4 files changed, 12 insertions(+), 13 deletions(-)
 
-diff --git a/rust/kernel/alloc/kvec/errors.rs b/rust/kernel/alloc/kvec/errors.rs
-index 21a920a4b09b..e7de5049ee47 100644
---- a/rust/kernel/alloc/kvec/errors.rs
-+++ b/rust/kernel/alloc/kvec/errors.rs
-@@ -2,14 +2,14 @@
+diff --git a/rust/kernel/debugfs.rs b/rust/kernel/debugfs.rs
+index 381c23b3dd83..8c35d032acfe 100644
+--- a/rust/kernel/debugfs.rs
++++ b/rust/kernel/debugfs.rs
+@@ -8,12 +8,12 @@
+ // When DebugFS is disabled, many parameters are dead. Linting for this isn't helpful.
+ #![cfg_attr(not(CONFIG_DEBUG_FS), allow(unused_variables))]
  
- //! Errors for the [`Vec`] type.
++use crate::fmt;
+ use crate::prelude::*;
+ use crate::str::CStr;
+ #[cfg(CONFIG_DEBUG_FS)]
+ use crate::sync::Arc;
+ use crate::uaccess::UserSliceReader;
+-use core::fmt;
+ use core::marker::PhantomData;
+ use core::marker::PhantomPinned;
+ #[cfg(CONFIG_DEBUG_FS)]
+diff --git a/rust/kernel/debugfs/callback_adapters.rs b/rust/kernel/debugfs/callback_adapters.rs
+index 6c024230f676..a260d8dee051 100644
+--- a/rust/kernel/debugfs/callback_adapters.rs
++++ b/rust/kernel/debugfs/callback_adapters.rs
+@@ -5,10 +5,9 @@
+ //! than a trait implementation. If provided, it will override the trait implementation.
  
--use kernel::fmt::{self, Debug, Formatter};
-+use kernel::fmt;
- use kernel::prelude::*;
+ use super::{Reader, Writer};
++use crate::fmt;
+ use crate::prelude::*;
+ use crate::uaccess::UserSliceReader;
+-use core::fmt;
+-use core::fmt::Formatter;
+ use core::marker::PhantomData;
+ use core::ops::Deref;
  
- /// Error type for [`Vec::push_within_capacity`].
- pub struct PushError<T>(pub T);
+@@ -76,9 +75,9 @@ fn deref(&self) -> &D {
  
--impl<T> Debug for PushError<T> {
--    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-+impl<T> fmt::Debug for PushError<T> {
+ impl<D, F> Writer for FormatAdapter<D, F>
+ where
+-    F: Fn(&D, &mut Formatter<'_>) -> fmt::Result + 'static,
++    F: Fn(&D, &mut fmt::Formatter<'_>) -> fmt::Result + 'static,
+ {
+-    fn write(&self, fmt: &mut Formatter<'_>) -> fmt::Result {
++    fn write(&self, fmt: &mut fmt::Formatter<'_>) -> fmt::Result {
+         // SAFETY: FormatAdapter<_, F> can only be constructed if F is inhabited
+         let f: &F = unsafe { materialize_zst() };
+         f(&self.inner, fmt)
+diff --git a/rust/kernel/debugfs/file_ops.rs b/rust/kernel/debugfs/file_ops.rs
+index 50fead17b6f3..9ad5e3fa6f69 100644
+--- a/rust/kernel/debugfs/file_ops.rs
++++ b/rust/kernel/debugfs/file_ops.rs
+@@ -3,11 +3,11 @@
+ 
+ use super::{Reader, Writer};
+ use crate::debugfs::callback_adapters::Adapter;
++use crate::fmt;
+ use crate::prelude::*;
+ use crate::seq_file::SeqFile;
+ use crate::seq_print;
+ use crate::uaccess::UserSlice;
+-use core::fmt::{Display, Formatter, Result};
+ use core::marker::PhantomData;
+ 
+ #[cfg(CONFIG_DEBUG_FS)]
+@@ -65,8 +65,8 @@ fn deref(&self) -> &Self::Target {
+ 
+ struct WriterAdapter<T>(T);
+ 
+-impl<'a, T: Writer> Display for WriterAdapter<&'a T> {
+-    fn fmt(&self, f: &mut Formatter<'_>) -> Result {
++impl<'a, T: Writer> fmt::Display for WriterAdapter<&'a T> {
 +    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-         write!(f, "Not enough capacity")
+         self.0.write(f)
      }
  }
-@@ -25,8 +25,8 @@ fn from(_: PushError<T>) -> Error {
- /// Error type for [`Vec::remove`].
- pub struct RemoveError;
+diff --git a/rust/kernel/debugfs/traits.rs b/rust/kernel/debugfs/traits.rs
+index ab009eb254b3..ad33bfbc7669 100644
+--- a/rust/kernel/debugfs/traits.rs
++++ b/rust/kernel/debugfs/traits.rs
+@@ -3,10 +3,10 @@
  
--impl Debug for RemoveError {
--    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-+impl fmt::Debug for RemoveError {
-+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-         write!(f, "Index out of bounds")
+ //! Traits for rendering or updating values exported to DebugFS.
+ 
++use crate::fmt;
+ use crate::prelude::*;
+ use crate::sync::Mutex;
+ use crate::uaccess::UserSliceReader;
+-use core::fmt::{self, Debug, Formatter};
+ use core::str::FromStr;
+ use core::sync::atomic::{
+     AtomicI16, AtomicI32, AtomicI64, AtomicI8, AtomicIsize, AtomicU16, AtomicU32, AtomicU64,
+@@ -24,17 +24,17 @@
+ /// explicitly instead.
+ pub trait Writer {
+     /// Formats the value using the given formatter.
+-    fn write(&self, f: &mut Formatter<'_>) -> fmt::Result;
++    fn write(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result;
+ }
+ 
+ impl<T: Writer> Writer for Mutex<T> {
+-    fn write(&self, f: &mut Formatter<'_>) -> fmt::Result {
++    fn write(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+         self.lock().write(f)
      }
  }
-@@ -45,8 +45,8 @@ pub enum InsertError<T> {
-     OutOfCapacity(T),
- }
  
--impl<T> Debug for InsertError<T> {
--    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-+impl<T> fmt::Debug for InsertError<T> {
-+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-         match self {
-             InsertError::IndexOutOfBounds(_) => write!(f, "Index out of bounds"),
-             InsertError::OutOfCapacity(_) => write!(f, "Not enough capacity"),
+-impl<T: Debug> Writer for T {
+-    fn write(&self, f: &mut Formatter<'_>) -> fmt::Result {
++impl<T: fmt::Debug> Writer for T {
++    fn write(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+         writeln!(f, "{self:?}")
+     }
+ }
 
 -- 
 2.51.1
