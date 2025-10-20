@@ -1,147 +1,297 @@
-Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fra-out-008.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-008.esa.eu-central-1.outbound.mail-perimeter.amazon.com [35.158.23.94])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A48D13019D8
-	for <linux-block@vger.kernel.org>; Mon, 20 Oct 2025 12:01:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC5902F83DF;
+	Mon, 20 Oct 2025 12:26:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=35.158.23.94
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760961692; cv=none; b=JfDv/ELbEhpnDvfn3j0dEAW2oDM0v2mGd1xvLJLRAlONSa0QA7GE2OXFoR3Vv/Xq2GBBVRHbE05VvtkhqbbCigrIRxY5U3JWATtQ3rjappROS5gHc7ferDEwDNm/CHUIa91+g6Nyg79h/DuSp7HfZzBMl3E3EmZ8Vg+GbQYGCg8=
+	t=1760963179; cv=none; b=QiB6hhTHqvhKXQ/lrZ/PUHWA07CoggZ8zevKjGhodF27fORztSn4HRvlPicNEJG7DVUSTynhwHRlAcXGCjWXFrJJTxtkaK1jpVIGjlbfLUGs73ltH8UI/lxt6BtcgQSGIAmv6/57f+bcve4BuzmNzpudr+xFGAlopOOrJmuh50g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760961692; c=relaxed/simple;
-	bh=nswVLSlbYyIVmMcPMj0v3iW0yfGwDL9+Y9cKMGs77Q4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Vlzr7wMXt1/qdNg1B70Wz93mGryH2Xy5f30lIqgKd+l1C9YbdW1omLczsqGw2NqMFhu0cJomyKsvnQfNsVE/sAaucT6o5qadu+F610EnS1scvGQExXOxFUeto0zcDhlvLNRCtSpb6RaSZE/q6fY8kNpsAyikafdIszgvEyT43Aw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D8fTq294; arc=none smtp.client-ip=209.85.208.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1760963179; c=relaxed/simple;
+	bh=iFtNqAALTnaGMyjG4E8hOCEExNpCalehkWAxAsxgxcE=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Id4J3PkUD2+/SR/Tp3PLEk5bbUEhED8I6Fko/Qh+wOdyaiZBwI1L5B8X32Jj2/prqiI1qMp+m39KM4sqExuNWVuKJ4IAPmYAYK/mwCo9EX4ujfz0pGGO6/z3XNSK+bF6HDxZBMo0yQFW/oaLp+A+0SmjEs01OJlQaaJsby4KfOk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de; spf=pass smtp.mailfrom=amazon.de; dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b=fOC+eo+2; arc=none smtp.client-ip=35.158.23.94
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D8fTq294"
-Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-371e4858f74so52027331fa.1
-        for <linux-block@vger.kernel.org>; Mon, 20 Oct 2025 05:01:30 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b="fOC+eo+2"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760961688; x=1761566488; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vDBqBQPK3W845ufeKNd3TWXFM3Y5p/GSoX4pSkk8Wtg=;
-        b=D8fTq294Dh24k4ynoJkyXE2IwNSfRPp5jH050rOR4/Lo9tgzRzr6MB9skBn3bowW2u
-         +OCVJlVlqGJRVMvnSjDXeFRaLi5elmN+itRIdvdBP3VuIYQ+bcOwukMRd5OiM969Lvmk
-         q31RYPpQL72wGMlGHn/kdBH8dKjQ8CrF4clNwVLlVXR7wLbTsOPIIJk1vJH16q+xMdhB
-         btYIB8UHTYYCYTtkJ8MP92rzBT6jbXNIf+HtHFhqNt9Xy33ES7nGzmmVliUJYTAB/i2b
-         QeiJl++hSCDft3MQ4/C6i4DATH2xp8IMhSyyKaGWHj6NTMvUyCnus4mAdPgEYuO3ZfJv
-         HyRQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760961688; x=1761566488;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vDBqBQPK3W845ufeKNd3TWXFM3Y5p/GSoX4pSkk8Wtg=;
-        b=jQSVazQ8MD4NXu6JHshSeAXXv8oeXfeRovzepTGhe9QYvsAWNbjwwJIruglXW/hGZ7
-         ItWPRz86SXaZcCAA6FeMZnkotGs5PLAAccwCsINH9vt5+muLbfsGpyRQqdKdm+FyVhgZ
-         TkuWK6sKQy4/gdJdL6u6VwxWRiPInPAGGsfSfsp8541IiKr8CYEQFROTmsTHftWtTvZu
-         Ucb/nsWbidNNi0uHl0HrLljoChb1aEMN2v/ZNNCST6EQlZOl0Rd28swMwipn35BZqxOO
-         ylSfAsXRWP4yTvAkxRovNJVHbOGOVRAW6IuSjCcASbFxbf28xiLyptHgavWXXidn7e0b
-         aGpw==
-X-Forwarded-Encrypted: i=1; AJvYcCXZNr1M9MbCGmK6He5Vef8UFJU8ug5I0QinNeUKiNGi3xue9FKHutTzlKwypnKFn+RhZZ/hb8/ah8orxA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwqRUu2cLnpmcmg63WUXzj6TeeyY6MZoixTKmFA282ViT2Kogk4
-	XRtr5oPDLmbJ6hi6hN975RnTOPj04hKQ1BsF4W7zVYsEtESbegQvfOm+hBOlJNuSSjCJI49Q8nK
-	i5ef8WC2jFZFM1H5nzk1nRWZvrRwDWPE=
-X-Gm-Gg: ASbGncvuQ6ASI1i2IDmXo2FDuD3NrV9yoNgOp/V8E+oQhPMHygvL99tY03isqQh4yN8
-	ujFAkv7HApkyL9GFaznIeu5WQ+aNBkSl6nF2FjAbNfpL/LkvsKAunJ9SEgMN6Un+/uJAzSrPEI+
-	q/WHxiennizOEwZUnI29QK26g09hZAIerDbd/R2lOn+vkEIRd/Wa7jLaukJIOk+pv88LW8sDVBn
-	Sow9ukU2hO4+cLCjjwgovQLrl7sxNSprzLgOZCuhnxcCLmGRz/Tsq4j3WinIpLOjwmPpQuzkLG/
-	OSZGGx8LrlgPAP178BxXxk/6AAthCko5WXm++njlzKeLtNVzsKiY9K0XXd69OM4RhoV3ENmIF/r
-	4A+GWHJNhWvyNDoqocw50Rdz0gpPjfyY=
-X-Google-Smtp-Source: AGHT+IEhCuohkwKfudrL4ecEpqT4Pm0eEKlOvtKN3vUBgHr7QNfd5MrUBwC1sgCPBzz/Uy3S9ZB2EUGsXRcV/xV/m8c=
-X-Received: by 2002:a2e:9a14:0:b0:36c:b120:37b6 with SMTP id
- 38308e7fff4ca-377979418femr48975661fa.19.1760961688121; Mon, 20 Oct 2025
- 05:01:28 -0700 (PDT)
+  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazoncorp2;
+  t=1760963173; x=1792499173;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=pLrkDc9uOZVP5QDcEFJpTtan3stKZzUb4ru8DIN6Jio=;
+  b=fOC+eo+2cjyx3LnwMEYK83XHVLMzOaD7namg5jVCriv4p4qe1wfjFiYV
+   oShjZYudTuvuZg7ERUo0jN/ZkFAOhdQXbMynxpG7KXUKwMpbn/PFOwPxG
+   RxfKUEaVdHY9L/NgC5L5WXYTwW2gb3vPJZhBopKFjMcTmo0ViOsyo7t29
+   novvirFPicueTsKXc7xeqvUul1INisuG0/s31p9iM3hwAqjjFLhoaqqRk
+   qZurTGMsEwfXDKKObDQ+2GoYAFGXWIFtT2bQ3BeGhM4Umi0Qz4xV6ixC3
+   pPoVWAtjnmX2/sSgiFKLVXHuARMjMb1YtSMNA6pjCZiVy9q3bOKr2J1yf
+   g==;
+X-CSE-ConnectionGUID: XMphiMhvTgeNxgLfSTa9kg==
+X-CSE-MsgGUID: 5gVlu9EYQo6obBnfNFlH0Q==
+X-IronPort-AV: E=Sophos;i="6.19,242,1754956800"; 
+   d="scan'208";a="3882177"
+Received: from ip-10-6-6-97.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.6.97])
+  by internal-fra-out-008.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Oct 2025 12:25:59 +0000
+Received: from EX19MTAEUC001.ant.amazon.com [54.240.197.225:4783]
+ by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.33.169:2525] with esmtp (Farcaster)
+ id 71ef932b-06b0-4cee-8a75-9885cd1ac552; Mon, 20 Oct 2025 12:25:59 +0000 (UTC)
+X-Farcaster-Flow-ID: 71ef932b-06b0-4cee-8a75-9885cd1ac552
+Received: from EX19D013EUB004.ant.amazon.com (10.252.51.92) by
+ EX19MTAEUC001.ant.amazon.com (10.252.51.193) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
+ Mon, 20 Oct 2025 12:25:56 +0000
+Received: from dev-dsk-mngyadam-1c-cb3f7548.eu-west-1.amazon.com
+ (10.253.107.175) by EX19D013EUB004.ant.amazon.com (10.252.51.92) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20; Mon, 20 Oct 2025
+ 12:25:49 +0000
+From: Mahmoud Adam <mngyadam@amazon.de>
+To: <stable@vger.kernel.org>
+CC: <gregkh@linuxfoundation.org>, <nagy@khwaternagy.com>, "Darrick J. Wong"
+	<djwong@kernel.org>, Christoph Hellwig <hch@lst.de>, Luis Chamberlain
+	<mcgrof@kernel.org>, Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+	"Jens Axboe" <axboe@kernel.dk>, Ryusuke Konishi <konishi.ryusuke@gmail.com>,
+	<linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-nilfs@vger.kernel.org>
+Subject: [PATCH 6.6 1/2] block: fix race between set_blocksize and read paths
+Date: Mon, 20 Oct 2025 14:25:38 +0200
+Message-ID: <20251020122541.7227-1-mngyadam@amazon.de>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251015-cstr-core-v17-0-dc5e7aec870d@gmail.com>
- <aPPIL6dl8aYHZr8B@google.com> <aPPJ2qDhxXNh8360@google.com>
-In-Reply-To: <aPPJ2qDhxXNh8360@google.com>
-From: Tamir Duberstein <tamird@gmail.com>
-Date: Mon, 20 Oct 2025 08:00:00 -0400
-X-Gm-Features: AS18NWAW7Di7K5boBLr0jIlvVCdIJykxaOqzRMhRONzgEFu_niaDAXaU_M-718U
-Message-ID: <CAJ-ks9=VJCwKxZRyDHOb7Lun-BJ3tPrvbscpo0XkykmnF_zfCg@mail.gmail.com>
-Subject: Re: [PATCH v17 00/11] rust: replace kernel::str::CStr w/ core::ffi::CStr
-To: Alice Ryhl <aliceryhl@google.com>
-Cc: Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
-	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
-	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
-	Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
-	Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, 
-	Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>, 
-	Waiman Long <longman@redhat.com>, Nathan Chancellor <nathan@kernel.org>, 
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, Bill Wendling <morbo@google.com>, 
-	Justin Stitt <justinstitt@google.com>, Christian Brauner <brauner@kernel.org>, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, 
-	=?UTF-8?B?QXJ2ZSBIasO4bm5ldsOlZw==?= <arve@android.com>, 
-	Todd Kjos <tkjos@android.com>, Martijn Coenen <maco@android.com>, 
-	Joel Fernandes <joelagnelf@nvidia.com>, Carlos Llamas <cmllamas@google.com>, 
-	Suren Baghdasaryan <surenb@google.com>, Jens Axboe <axboe@kernel.dk>, 
-	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, Vlastimil Babka <vbabka@suse.cz>, 
-	"Liam R. Howlett" <Liam.Howlett@oracle.com>, Uladzislau Rezki <urezki@gmail.com>, 
-	Bjorn Helgaas <bhelgaas@google.com>, =?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, 
-	rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	llvm@lists.linux.dev, linux-fsdevel@vger.kernel.org, 
-	linux-block@vger.kernel.org, linux-pci@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-ClientProxiedBy: EX19D044UWB002.ant.amazon.com (10.13.139.188) To
+ EX19D013EUB004.ant.amazon.com (10.252.51.92)
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 
-On Sat, Oct 18, 2025 at 1:09=E2=80=AFPM Alice Ryhl <aliceryhl@google.com> w=
-rote:
->
-> On Sat, Oct 18, 2025 at 05:02:39PM +0000, Alice Ryhl wrote:
-> > On Wed, Oct 15, 2025 at 03:24:30PM -0400, Tamir Duberstein wrote:
-> > > This picks up from Michal Rostecki's work[0]. Per Michal's guidance I
-> > > have omitted Co-authored tags, as the end result is quite different.
-> > >
-> > > This series is intended to be taken through rust-next. The final patc=
-h
-> > > in the series requires some other subsystems' `Acked-by`s:
-> > > - drivers/android/binder/stats.rs: rust_binder. Alice, could you take=
- a
-> > >   look?
-> > > - rust/kernel/device.rs: driver-core. Already acked by gregkh.
-> > > - rust/kernel/firmware.rs: driver-core. Danilo, could you take a look=
-?
-> > > - rust/kernel/seq_file.rs: vfs. Christian, could you take a look?
-> > > - rust/kernel/sync/*: locking-core. Boqun, could you take a look?
-> > >
-> > > Link: https://lore.kernel.org/rust-for-linux/20240819153656.28807-2-v=
-adorovsky@protonmail.com/t/#u [0]
-> > > Closes: https://github.com/Rust-for-Linux/linux/issues/1075
-> > >
-> > > Signed-off-by: Tamir Duberstein <tamird@gmail.com>
-> >
-> > You need a few more changes:
->
-> One more:
->
-> diff --git a/rust/kernel/drm/ioctl.rs b/rust/kernel/drm/ioctl.rs
-> index 69efbdb4c85a..5489961a62ca 100644
-> --- a/rust/kernel/drm/ioctl.rs
-> +++ b/rust/kernel/drm/ioctl.rs
-> @@ -156,7 +156,7 @@ macro_rules! declare_drm_ioctls {
->                          Some($cmd)
->                      },
->                      flags: $flags,
-> -                    name: $crate::c_str!(::core::stringify!($cmd)).as_ch=
-ar_ptr(),
-> +                    name: $crate::str::as_char_ptr_in_const_context($cra=
-te::c_str!(::core::stringify!($cmd))),
->                  }
->              ),*];
->              ioctls
+From: "Darrick J. Wong" <djwong@kernel.org>
 
-Thanks! Sent v18 on Saturday. Those `as_ptr()` -> `as_char_ptr()` were tric=
-ky
-because they relied on deref to `&[u8]`.
+commit c0e473a0d226479e8e925d5ba93f751d8df628e9 upstream.
+
+With the new large sector size support, it's now the case that
+set_blocksize can change i_blksize and the folio order in a manner that
+conflicts with a concurrent reader and causes a kernel crash.
+
+Specifically, let's say that udev-worker calls libblkid to detect the
+labels on a block device.  The read call can create an order-0 folio to
+read the first 4096 bytes from the disk.  But then udev is preempted.
+
+Next, someone tries to mount an 8k-sectorsize filesystem from the same
+block device.  The filesystem calls set_blksize, which sets i_blksize to
+8192 and the minimum folio order to 1.
+
+Now udev resumes, still holding the order-0 folio it allocated.  It then
+tries to schedule a read bio and do_mpage_readahead tries to create
+bufferheads for the folio.  Unfortunately, blocks_per_folio == 0 because
+the page size is 4096 but the blocksize is 8192 so no bufferheads are
+attached and the bh walk never sets bdev.  We then submit the bio with a
+NULL block device and crash.
+
+Therefore, truncate the page cache after flushing but before updating
+i_blksize.  However, that's not enough -- we also need to lock out file
+IO and page faults during the update.  Take both the i_rwsem and the
+invalidate_lock in exclusive mode for invalidations, and in shared mode
+for read/write operations.
+
+I don't know if this is the correct fix, but xfs/259 found it.
+
+Signed-off-by: Darrick J. Wong <djwong@kernel.org>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Luis Chamberlain <mcgrof@kernel.org>
+Tested-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Link: https://lore.kernel.org/r/174543795699.4139148.2086129139322431423.stgit@frogsfrogsfrogs
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+[use bdev->bd_inode instead]
+Signed-off-by: Mahmoud Adam <mngyadam@amazon.de>
+---
+    Fixes CVE-2025-38073.
+
+ block/bdev.c      | 17 +++++++++++++++++
+ block/blk-zoned.c |  5 ++++-
+ block/fops.c      | 16 ++++++++++++++++
+ block/ioctl.c     |  6 ++++++
+ 4 files changed, 43 insertions(+), 1 deletion(-)
+
+diff --git a/block/bdev.c b/block/bdev.c
+index 5a54977518eeae..a8357b72a27b86 100644
+--- a/block/bdev.c
++++ b/block/bdev.c
+@@ -147,9 +147,26 @@ int set_blocksize(struct block_device *bdev, int size)
+ 
+ 	/* Don't change the size if it is same as current */
+ 	if (bdev->bd_inode->i_blkbits != blksize_bits(size)) {
++		/*
++		 * Flush and truncate the pagecache before we reconfigure the
++		 * mapping geometry because folio sizes are variable now.  If a
++		 * reader has already allocated a folio whose size is smaller
++		 * than the new min_order but invokes readahead after the new
++		 * min_order becomes visible, readahead will think there are
++		 * "zero" blocks per folio and crash.  Take the inode and
++		 * invalidation locks to avoid racing with
++		 * read/write/fallocate.
++		 */
++		inode_lock(bdev->bd_inode);
++		filemap_invalidate_lock(bdev->bd_inode->i_mapping);
++
+ 		sync_blockdev(bdev);
++		kill_bdev(bdev);
++
+ 		bdev->bd_inode->i_blkbits = blksize_bits(size);
+ 		kill_bdev(bdev);
++		filemap_invalidate_unlock(bdev->bd_inode->i_mapping);
++		inode_unlock(bdev->bd_inode);
+ 	}
+ 	return 0;
+ }
+diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+index 619ee41a51cc8c..644bfa1f6753ea 100644
+--- a/block/blk-zoned.c
++++ b/block/blk-zoned.c
+@@ -401,6 +401,7 @@ int blkdev_zone_mgmt_ioctl(struct block_device *bdev, blk_mode_t mode,
+ 		op = REQ_OP_ZONE_RESET;
+ 
+ 		/* Invalidate the page cache, including dirty pages. */
++		inode_lock(bdev->bd_inode);
+ 		filemap_invalidate_lock(bdev->bd_inode->i_mapping);
+ 		ret = blkdev_truncate_zone_range(bdev, mode, &zrange);
+ 		if (ret)
+@@ -423,8 +424,10 @@ int blkdev_zone_mgmt_ioctl(struct block_device *bdev, blk_mode_t mode,
+ 			       GFP_KERNEL);
+ 
+ fail:
+-	if (cmd == BLKRESETZONE)
++	if (cmd == BLKRESETZONE) {
+ 		filemap_invalidate_unlock(bdev->bd_inode->i_mapping);
++		inode_unlock(bdev->bd_inode);
++	}
+ 
+ 	return ret;
+ }
+diff --git a/block/fops.c b/block/fops.c
+index 7c257eb3564d0c..088143fa9ac9e1 100644
+--- a/block/fops.c
++++ b/block/fops.c
+@@ -681,7 +681,14 @@ static ssize_t blkdev_write_iter(struct kiocb *iocb, struct iov_iter *from)
+ 			ret = direct_write_fallback(iocb, from, ret,
+ 					blkdev_buffered_write(iocb, from));
+ 	} else {
++		/*
++		 * Take i_rwsem and invalidate_lock to avoid racing with
++		 * set_blocksize changing i_blkbits/folio order and punching
++		 * out the pagecache.
++		 */
++		inode_lock_shared(bd_inode);
+ 		ret = blkdev_buffered_write(iocb, from);
++		inode_unlock_shared(bd_inode);
+ 	}
+ 
+ 	if (ret > 0)
+@@ -693,6 +700,7 @@ static ssize_t blkdev_write_iter(struct kiocb *iocb, struct iov_iter *from)
+ static ssize_t blkdev_read_iter(struct kiocb *iocb, struct iov_iter *to)
+ {
+ 	struct block_device *bdev = I_BDEV(iocb->ki_filp->f_mapping->host);
++	struct inode *bd_inode = bdev->bd_inode;
+ 	loff_t size = bdev_nr_bytes(bdev);
+ 	loff_t pos = iocb->ki_pos;
+ 	size_t shorted = 0;
+@@ -728,7 +736,13 @@ static ssize_t blkdev_read_iter(struct kiocb *iocb, struct iov_iter *to)
+ 			goto reexpand;
+ 	}
+ 
++	/*
++	 * Take i_rwsem and invalidate_lock to avoid racing with set_blocksize
++	 * changing i_blkbits/folio order and punching out the pagecache.
++	 */
++	inode_lock_shared(bd_inode);
+ 	ret = filemap_read(iocb, to, ret);
++	inode_unlock_shared(bd_inode);
+ 
+ reexpand:
+ 	if (unlikely(shorted))
+@@ -771,6 +785,7 @@ static long blkdev_fallocate(struct file *file, int mode, loff_t start,
+ 	if ((start | len) & (bdev_logical_block_size(bdev) - 1))
+ 		return -EINVAL;
+ 
++	inode_lock(inode);
+ 	filemap_invalidate_lock(inode->i_mapping);
+ 
+ 	/*
+@@ -811,6 +826,7 @@ static long blkdev_fallocate(struct file *file, int mode, loff_t start,
+ 
+  fail:
+ 	filemap_invalidate_unlock(inode->i_mapping);
++	inode_unlock(inode);
+ 	return error;
+ }
+ 
+diff --git a/block/ioctl.c b/block/ioctl.c
+index 231537f79a8cb4..024767fa1e52d5 100644
+--- a/block/ioctl.c
++++ b/block/ioctl.c
+@@ -114,6 +114,7 @@ static int blk_ioctl_discard(struct block_device *bdev, blk_mode_t mode,
+ 	    end > bdev_nr_bytes(bdev))
+ 		return -EINVAL;
+ 
++	inode_lock(inode);
+ 	filemap_invalidate_lock(inode->i_mapping);
+ 	err = truncate_bdev_range(bdev, mode, start, end - 1);
+ 	if (err)
+@@ -121,6 +122,7 @@ static int blk_ioctl_discard(struct block_device *bdev, blk_mode_t mode,
+ 	err = blkdev_issue_discard(bdev, start >> 9, len >> 9, GFP_KERNEL);
+ fail:
+ 	filemap_invalidate_unlock(inode->i_mapping);
++	inode_unlock(inode);
+ 	return err;
+ }
+ 
+@@ -146,12 +148,14 @@ static int blk_ioctl_secure_erase(struct block_device *bdev, blk_mode_t mode,
+ 	    end > bdev_nr_bytes(bdev))
+ 		return -EINVAL;
+ 
++	inode_lock(bdev->bd_inode);
+ 	filemap_invalidate_lock(bdev->bd_inode->i_mapping);
+ 	err = truncate_bdev_range(bdev, mode, start, end - 1);
+ 	if (!err)
+ 		err = blkdev_issue_secure_erase(bdev, start >> 9, len >> 9,
+ 						GFP_KERNEL);
+ 	filemap_invalidate_unlock(bdev->bd_inode->i_mapping);
++	inode_unlock(bdev->bd_inode);
+ 	return err;
+ }
+ 
+@@ -184,6 +188,7 @@ static int blk_ioctl_zeroout(struct block_device *bdev, blk_mode_t mode,
+ 		return -EINVAL;
+ 
+ 	/* Invalidate the page cache, including dirty pages */
++	inode_lock(inode);
+ 	filemap_invalidate_lock(inode->i_mapping);
+ 	err = truncate_bdev_range(bdev, mode, start, end);
+ 	if (err)
+@@ -194,6 +199,7 @@ static int blk_ioctl_zeroout(struct block_device *bdev, blk_mode_t mode,
+ 
+ fail:
+ 	filemap_invalidate_unlock(inode->i_mapping);
++	inode_unlock(inode);
+ 	return err;
+ }
+ 
+-- 
+2.47.3
+
+
+
+
+Amazon Web Services Development Center Germany GmbH
+Tamara-Danz-Str. 13
+10243 Berlin
+Geschaeftsfuehrung: Christian Schlaeger
+Eingetragen am Amtsgericht Charlottenburg unter HRB 257764 B
+Sitz: Berlin
+Ust-ID: DE 365 538 597
+
