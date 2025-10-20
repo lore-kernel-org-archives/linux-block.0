@@ -1,47 +1,44 @@
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62B7B2A1CF;
-	Mon, 20 Oct 2025 09:35:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79263A930;
+	Mon, 20 Oct 2025 10:00:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760952946; cv=none; b=hepvYelpjPu7By11zmBq74K9Ua9OdGqTEsnH4J86H06MD1JalrmYuuMTcILdIY6jA0kVSe7GK+AiiaTQqDHgtiUCZ56FWjNMGntVVm3dgKxYjizsrwvG4AO8eeLUAbXVwLrkDlA9bYYbSJzHN368FDMmxaac0d3kS5/i9yzQ6/Q=
+	t=1760954444; cv=none; b=bBpVvxZ/ioc6XOaYGHCNDxdBjI0wyIk43qcXL/9QvIL/rcaqutvNS6DH9ii3MUF/arA8cRjs2DKalCpCY7Oq38xKICOuj591QIi4i7U0ccn5Nl9Cus58t589iELAXJ73oK2vSavL/8SzSYukOnOtzl2NxZFT5XNOHIeg0DeatR0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760952946; c=relaxed/simple;
-	bh=2IAIt2SUCUhxcb807Lyj3JXjSDC9/iTXJyvqnAzZGRs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UJfK9DTViKgGnnyMvd1T2HYQttRldiWaI6JxLzN0NFGhltHER4ZjJ1OM1nHC5hPCMiwLaTqRdQ0YQX6MPpPVYa6riMg/rLNo3hLPIPTveWHw9OJIorth6WmomlyVV87iX/bwY2U0Is4TUj0fy57K9X3idb1PO3RFqICk4vdc04A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=kvWulCzv; arc=none smtp.client-ip=198.137.202.133
+	s=arc-20240116; t=1760954444; c=relaxed/simple;
+	bh=IrIP5sR8h20sh5eamOa17g5Ykn369L19kLt2nSQqlcU=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=WohgS2gS4mBKzXoPOw7/IeMQsZiyQdAjhhsTJsSsCgz6xcHFpnBSPvQ1e2yt0SpB7o29ZigbHJ+iDAzIUAzSBq/2EvSeWykl2sIYIRV925NcJG4whxa9cJoFMgcVRs0HTutliSzDNuU2Rku+lJKzVvDv4QJdYRaSs506gD4JJ0w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=g5ssFmka; arc=none smtp.client-ip=198.137.202.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="kvWulCzv"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="g5ssFmka"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=ln38FfARN4Gj/ksc4kfm6PLlv2NAm9fTW6k7Agq3IS0=; b=kvWulCzvyx0Ps/sMfHZZj+byCC
-	cu0YRjydzqAiw6m00rt624KHTY1G8Lf/3giE3ms7WHwf8cUKA3qpGjPX6LEKAtq5JqQXaA42Sxtae
-	QcyHUkg/2+hlM9a+bpai/Irs4UPGHnpP+hwIwKdD2Qds+IR4bgQXNdB4GV5DrDT0kMHnMCMtzT9VK
-	wSDpUUuYFB6ZGerWWRvGu9rioEi05/ZAeK7IhEKVu1Gvwai2qySksbq3Y5sGLmi58mFg1H29x3tvQ
-	Qu7Yp6laPe/AFlBhh8qJQCpRHiVziqXEnh3ykjKUSCMwrWb1ewV/v61Tcd9VL5KURr6K8XI2v0MFQ
-	SfuQRsoQ==;
+	:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding
+	:Content-ID:Content-Description:References;
+	bh=6vPGsipqewFH0An8fbqPgnRT3TdYk8QOTnwKOAIuU2w=; b=g5ssFmkaJ1VQXeJw/jurNQB9hF
+	NmA72962DCoxCCFbk7cJHkSN8364lgsT3N+hE1YOCM+UQHysCTs3oy4M1RY7HpT3xQJW4TirD3v5j
+	Ckd46sg/3xxBJ9rFAyf2HU9/ZWQE+gIxn3T6D37gJstgLfXXoDeWidqtaV5FHFnMNGqhMwNJPkOR0
+	pXaEAeAnzwmswGB68QSou16iHjnLFBmv0zc1gHclJ7I0p2JfQUM/8CWlgx09HNHHZplH5O+J7EJ7G
+	ou/fQrD3j5eVqwZnxeVLfJS4tY3FJ7mCT6HsOEAPC6NRuwa70CTC9O9RIIM5wepN7xypSWGoy4NSe
+	6DFBFEyA==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vAmIm-0000000Cbrq-2iTO;
-	Mon, 20 Oct 2025 09:35:40 +0000
-Date: Mon, 20 Oct 2025 02:35:40 -0700
+	id 1vAmh1-0000000ChTZ-0C3R;
+	Mon, 20 Oct 2025 10:00:43 +0000
+Date: Mon, 20 Oct 2025 03:00:43 -0700
 From: Christoph Hellwig <hch@infradead.org>
-To: Kent Overstreet <kent.overstreet@linux.dev>
-Cc: Christoph Hellwig <hch@infradead.org>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	linux-block@vger.kernel.org
-Subject: Re: [GIT PULL] block-bio_iov_iter_export
-Message-ID: <aPYCbIrvAkOf5L3g@infradead.org>
-References: <ov54jszhism7mbeu74vtyoysxnx3y3tsjbj5esszlrx3edq77s@j2vtyy45gsna>
- <aPHemg-xpVLkiEt9@infradead.org>
- <6strysb6whhovk4rlaujravntyt2umocsjfsaxtl4jnuvjjbsp@sqf6ncn3yrlm>
+To: Qu Wenruo <wqu@suse.com>
+Cc: linux-btrfs@vger.kernel.org, djwong@kernel.org,
+	linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-mm@kvack.org,
+	martin.petersen@oracle.com, jack@suse.com
+Subject: O_DIRECT vs BLK_FEAT_STABLE_WRITES, was Re: [PATCH] btrfs: never
+ trust the bio from direct IO
+Message-ID: <aPYIS5rDfXhNNDHP@infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -50,31 +47,63 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <6strysb6whhovk4rlaujravntyt2umocsjfsaxtl4jnuvjjbsp@sqf6ncn3yrlm>
+In-Reply-To: <1ee861df6fbd8bf45ab42154f429a31819294352.1760951886.git.wqu@suse.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Fri, Oct 17, 2025 at 09:31:59AM -0400, Kent Overstreet wrote:
-> On Thu, Oct 16, 2025 at 11:13:46PM -0700, Christoph Hellwig wrote:
-> > Umm,
-> > 
-> > besides adding exports without in-tree users, this is a patch that's
-> > never seen any relevant mailing list, in a pull request that the
-> > maintainer hasn't seen.  That's now exactly how Linux development works,
-> > does it?
+On Mon, Oct 20, 2025 at 07:49:50PM +1030, Qu Wenruo wrote:
+> There is a bug report about that direct IO (and even concurrent buffered
+> IO) can lead to different contents of md-raid.
+
+What concurrent buffered I/O?
+
+> It's exactly the situation we fixed for direct IO in commit 968f19c5b1b7
+> ("btrfs: always fallback to buffered write if the inode requires
+> checksum"), however we still leave a hole for nodatasum cases.
 > 
-> Christoph, I wrote that code /for bcachefs/; the rest of you decided it
-> was nice and started using it too.
+> For nodatasum cases we still reuse the bio from direct IO, making it to
+> cause the same problem for RAID1*/5/6 profiles, and results
+> unreliable data contents read from disk, depending on the load balance.
+> 
+> Just do not trust any bio from direct IO, and never reuse those bios even
+> for nodatasum cases. Instead alloc our own bio with newly allocated
+> pages.
+> 
+> For direct read, submit that new bio, and at end io time copy the
+> contents to the dio bio.
+> For direct write, copy the contents from the dio bio, then submit the
+> new one.
 
-In fact this version was written by me, giving you the attribution
-because I stole a cool idea from you.  But none of this actually
-matters, there's not magic exception just because someone wrote the
-code.
+This basically reinvents IOCB_DONTCACHE I/O with duplicate code?
 
-> Then you removed the export talking about the "abuse" of bcachefs using
-> it. WTF?
+> Considering the zero-copy direct IO (and the fact XFS/EXT4 even allows
+> modifying the page cache when it's still under writeback) can lead to
+> raid mirror contents mismatch, the 23% performance drop should still be
+> acceptable, and bcachefs is already doing this bouncing behavior.
 
-The random NULL bdev check that breaks the proper splitting.  We told
-told you that's not the way to go, but you just sent it directly to Linus
-instead of reworking it.  And this then got into the way of the rework
-Keith did to support arbitrarily small memory alignments.  Fortunately
-we could clean this up properly now.
+XFS (and EXT4 as well, but I've not tested it) wait for I/O to
+finish before allowing modifications when mapping_stable_writes returns
+true, i.e., when the block device sets BLK_FEAT_STABLE_WRITES, so that
+is fine.  Direct I/O is broken, and at least for XFS I have patches
+to force DONTCACHE instead of DIRECT I/O by default in that case, but
+allowing for an opt-out for known applications (e.g. file or storage
+servers).
+
+I'll need to rebase them, but I plan to send them out soon together
+with other T10 PI enabling patches.  Sorry, juggling a few too many
+things at the moment.
+
+> But still, such performance drop can be very obvious, and performance
+> oriented users (who are very happy running various benchmark tools) are
+> going to notice or even complain.
+
+I've unfortunately seen much bigger performance drops with direct I/O and
+PI on fast SSDs, but we still should be safe by default.
+
+> Another question is, should we push this behavior to iomap layer so that other
+> fses can also benefit from it?
+
+The right place is above iomap to pick the buffered I/O path instead.
+
+The real question is if we can finally get a version of pin_user_pages
+that prevents user modifications entirely.
+
