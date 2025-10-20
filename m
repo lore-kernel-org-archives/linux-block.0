@@ -1,50 +1,59 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3166230274;
-	Mon, 20 Oct 2025 14:59:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE373223DD0;
+	Mon, 20 Oct 2025 15:04:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760972352; cv=none; b=Q8nEbOAnFcdPMLrgw1M4vvNnRGJF1e8cy4BIOVwClwMyA92oIn2ZBCOI3p1kJ2xm2W4ULwMbonSWf8CR3xdBot+vnFmqb1uohuQ14BI4ErDe8quOPtu+P7sDBq18jAwTsUTjH0y2CRBrvRrfpw/iX6T5fvXdEOJ+E3+BbvABLiU=
+	t=1760972658; cv=none; b=Gx7PzqaJlwjAo6x2Ee3Y5cGH3KwKdkqAs8qZSaX57pwOzeSPoP09S9esXZgUDd0P813C/U8fA4q36oyv2EAVglR1wwHBKym9Iqje/fGExzvGh2t5n+rW7FsAymnvMVPlxNfkanI5r5zamq2ucfQErtRPhCRWQIuq/McBH00zUiY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760972352; c=relaxed/simple;
-	bh=iUXQuriDyZRT8WBoI7eXj7hrTtTGVdywTUS4oyOBBN8=;
+	s=arc-20240116; t=1760972658; c=relaxed/simple;
+	bh=opgDUacvsAEAblCjRwc/cnZnXjDHKNzApka9lSwmFm0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pD9NZqY3erRaSrmdkYPZ4jPYAvqQthOg6Bgml8c75dibEPrs+UkpWoIJSa2Ij8ceUeJ+lb+zfuDXKBs5k7ItNZic9JPqOfP5IG0lZ3OXVyTcOI8dcvhIN0qec6iaShQe68p/mos9e5JQGV6qR3azS36DC5BlhRUTKqZWmD5LXfQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=gp41J2Nl; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=gUCJGq7oLBs8iufG/N1KxDq0gGHNH9SR+TTAeUkJGfE5YSwtMbUWq6KJPrfRIjW1NSw/tdHctm8QhTpoDVBOup/2HNbKnruv6F0GZ3drD2CLhhuJfrvZEIUt/+Hi6jClqCpzurrAuZHne95O+Ir7sKxAT58K7LOvr2JTMHv/XWI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iRT5USF1; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="gp41J2Nl"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=docrPGLeWwfEDBF/7JprhY10nMkkvgXOdF2vgxv0F28=; b=gp41J2Nl+5HhU+fdHp9Yi14Y10
-	O+WveHEJqqkdtliUeqgcfJlNF9GA6kcB4bP6KiSqF0eVVTz0r9MKVqzJ5nDn8Vu5EhNP8NBvynYIh
-	YJuqpPuI6Nm94OsbkraF6eQMRMrK2+7gXazXperZn+Tu1ZauOlrYnuf5mpUZxviHFKueyb8bUpjeQ
-	s1J+EUNuWGPcRi3g30hlygtR2hrsetRCJOGV/2B1PbxadPiIYqcs3p3YjLSmIhpvE4vjATnh5ErcT
-	ijmIPZNipvE6DO/3hM3czpQpRmdinq2h1pcKGcx/2zvaMZD0SHd3z8kIS70GvoHQ7Nbk/h3gPDhqT
-	ljKHEkIA==;
-Received: from willy by casper.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vArLn-0000000AW7d-3SBA;
-	Mon, 20 Oct 2025 14:59:07 +0000
-Date: Mon, 20 Oct 2025 15:59:07 +0100
-From: Matthew Wilcox <willy@infradead.org>
-To: Jan Kara <jack@suse.cz>
-Cc: Christoph Hellwig <hch@infradead.org>, Qu Wenruo <wqu@suse.com>,
-	linux-btrfs@vger.kernel.org, djwong@kernel.org,
-	linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-mm@kvack.org,
-	martin.petersen@oracle.com, jack@suse.com
-Subject: Re: O_DIRECT vs BLK_FEAT_STABLE_WRITES, was Re: [PATCH] btrfs: never
- trust the bio from direct IO
-Message-ID: <aPZOO3dFv61blHBz@casper.infradead.org>
-References: <1ee861df6fbd8bf45ab42154f429a31819294352.1760951886.git.wqu@suse.com>
- <aPYIS5rDfXhNNDHP@infradead.org>
- <56o3re2wspflt32t6mrfg66dec4hneuixheroax2lmo2ilcgay@zehhm5yaupav>
- <aPYgm3ey4eiFB4_o@infradead.org>
- <mciqzktudhier5d2wvjmh4odwqdszvbtcixbthiuuwrufrw3cj@5s2ffnffu4gc>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iRT5USF1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6DD1C4CEF9;
+	Mon, 20 Oct 2025 15:04:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1760972657;
+	bh=opgDUacvsAEAblCjRwc/cnZnXjDHKNzApka9lSwmFm0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=iRT5USF1c9hlxYuIAOhCLi5vAK5WR7rom9xRkIU3R7gF7myd/1e5DMMfNCS0kUZkY
+	 3iRkzX0tjSk5Oi94wjBXhi3wnlTtnIwsAvgfAKJFuquBcdXjW7d9WDWrPNIf5J0bU5
+	 zVOo4RRrxdwbFsBukm+Rj6kIqO8vqJWtwlc9Wep5HFp36crF5d7piD0ABkB0lYukcY
+	 occ87bgOGiq4SFUOt5aNiFNgE39VrrMYCKAhg7FXj21tnyeBL4evlgZwZyr9LIYUQF
+	 TbY2GnPoLUsXHvGaif5VObAw2oxejIFZ08On78dvTXugRYsJ65uWf5lD//iEs7lnk9
+	 fxqi91aJMPONw==
+Date: Mon, 20 Oct 2025 18:04:12 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Christoph Hellwig <hch@infradead.org>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
+	Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>,
+	kvm@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-media@vger.kernel.org, linux-mm@kvack.org,
+	linux-pci@vger.kernel.org, Logan Gunthorpe <logang@deltatee.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Vivek Kasireddy <vivek.kasireddy@intel.com>,
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v5 1/9] PCI/P2PDMA: Separate the mmap() support from the
+ core logic
+Message-ID: <20251020150412.GP6199@unreal>
+References: <cover.1760368250.git.leon@kernel.org>
+ <1044f7aa09836d63de964d4eb6e646b3071c1fdb.1760368250.git.leon@kernel.org>
+ <aPHibioUFZV8Wnd1@infradead.org>
+ <20251017115320.GF3901471@nvidia.com>
+ <aPYqliGwJTcZznSX@infradead.org>
+ <20251020125854.GL316284@nvidia.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -53,22 +62,130 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <mciqzktudhier5d2wvjmh4odwqdszvbtcixbthiuuwrufrw3cj@5s2ffnffu4gc>
+In-Reply-To: <20251020125854.GL316284@nvidia.com>
 
-On Mon, Oct 20, 2025 at 03:59:33PM +0200, Jan Kara wrote:
-> The idea was to bounce buffer the page we are writing back in case we spot
-> a long-term pin we cannot just wait for - hence bouncing should be rare.
-> But in this more general setting it is challenging to not bounce buffer for
-> every IO (in which case you'd be basically at performance of RWF_DONTCACHE
-> IO or perhaps worse so why bother?). Essentially if you hand out the real
-> page underlying the buffer for the IO, all other attemps to do IO to that
-> page have to block - bouncing is no longer an option because even with
-> bouncing the second IO we could still corrupt data of the first IO once we
-> copy to the final buffer. And if we'd block waiting for the first IO to
-> complete, userspace could construct deadlock cycles - like racing IO to
-> pages A, B with IO to pages B, A. So far I'm not sure about a sane way out
-> of this...
+On Mon, Oct 20, 2025 at 09:58:54AM -0300, Jason Gunthorpe wrote:
+> On Mon, Oct 20, 2025 at 05:27:02AM -0700, Christoph Hellwig wrote:
+> > On Fri, Oct 17, 2025 at 08:53:20AM -0300, Jason Gunthorpe wrote:
+> > > On Thu, Oct 16, 2025 at 11:30:06PM -0700, Christoph Hellwig wrote:
+> > > > On Mon, Oct 13, 2025 at 06:26:03PM +0300, Leon Romanovsky wrote:
+> > > > > The DMA API now has a new flow, and has gained phys_addr_t support, so
+> > > > > it no longer needs struct pages to perform P2P mapping.
+> > > > 
+> > > > That's news to me.  All the pci_p2pdma_map_state machinery is still
+> > > > based on pgmaps and thus pages.
+> > > 
+> > > We had this discussion already three months ago:
+> > > 
+> > > https://lore.kernel.org/all/20250729131502.GJ36037@nvidia.com/
+> > > 
+> > > These couple patches make the core pci_p2pdma_map_state machinery work
+> > > on struct p2pdma_provider, and pgmap is just one way to get a
+> > > p2pdma_provider *
+> > > 
+> > > The struct page paths through pgmap go page->pgmap->mem to get
+> > > p2pdma_provider.
+> > > 
+> > > The non-struct page paths just have a p2pdma_provider * without a
+> > > pgmap. In this series VFIO uses
+> > > 
+> > > +	*provider = pcim_p2pdma_provider(pdev, bar);
+> > > 
+> > > To get the provider for a specific BAR.
+> > 
+> > And what protects that life time?  I've not seen anyone actually
+> > building the proper lifetime management.  And if someone did the patches
+> > need to clearly point to that.
+> 
+> It is this series!
+> 
+> The above API gives a lifetime that is driver bound. The calling
+> driver must ensure it stops using provider and stops doing DMA with it
+> before remove() completes.
+> 
+> This VFIO series does that through the move_notify callchain I showed
+> in the previous email. This callchain is always triggered before
+> remove() of the VFIO PCI driver is completed.
+> 
+> > > I think I've answered this three times now - for DMABUF the DMABUF
+> > > invalidation scheme is used to control the lifetime and no DMA mapping
+> > > outlives the provider, and the provider doesn't outlive the driver.
+> > 
+> > How?
+> 
+> I explained it in detail in the message you are repling to. If
+> something is not clear can you please be more specific??
+> 
+> Is it the mmap in VFIO perhaps that is causing these questions?
+> 
+> VFIO uses a PFNMAP VMA, so you can't pin_user_page() it. It uses
+> unmap_mapping_range() during its remove() path to get rid of the VMA
+> PTEs.
+> 
+> The DMA activity doesn't use the mmap *at all*. It isn't like NVMe
+> which relies on the ZONE_DEVICE pages and VMAs to link drivers
+> togther.
+> 
+> Instead the DMABUF FD is used to pass the MMIO pages between VFIO and
+> another driver. DMABUF has a built in invalidation mechanism that VFIO
+> triggers before remove(). The invalidation removes access from the
+> other driver.
+> 
+> This is different than NVMe which has no invalidation. NVMe does
+> unmap_mapping_range() on the VMA and waits for all the short lived
+> pgmap references to clear. We don't need anything like that because
+> DMABUF invalidation is synchronous.
+> 
+> The full picture for VFIO is something like:
+> 
+> [startup]
+>   MMIO is acquired from the pci_resource
+>   p2p_providers are setup
+> 
+> [runtime]
+>   MMIO is mapped into PFNMAP VMAs
+>   MMIO is linked to a DMABUF FD
+>   DMABUF FD gets DMA mapped using the p2p_provider
+> 
+> [unplug]
+>   unmap_mapping_range() is called so all VMAs are emptied out and the
+>   fault handler prevents new PTEs 
+>     ** No access to the MMIO through VMAs is possible**
+> 
+>   vfio_pci_dma_buf_cleanup() is called which prevents new DMABUF
+>   mappings from starting, and does dma_buf_move_notify() on all the
+>   open DMABUF FDs to invalidate other drivers. Other drivers stop
+>   doing DMA and we need to free the IOVA from the IOMMU/etc.
+>     ** No DMA access from other drivers is possible now**
+> 
+>   Any still open DMABUF FD will fail inside VFIO immediately due to
+>   the priv->revoked checks.
+>     **No code touches the p2p_provider anymore**
+> 
+>   The p2p_provider is destroyed by devm.
+> 
+> > > Obviously you cannot use the new p2provider mechanism without some
+> > > kind of protection against use after hot unplug, but it doesn't have
+> > > to be struct page based.
+> > 
+> > And how does this interact with everyone else expecting pgmap based
+> > lifetime management.
+> 
+> They continue to use pgmap and nothing changes for them.
+> 
+> The pgmap path always waited until nothing was using the pgmap and
+> thus provider before allowing device driver remove() to complete.
+> 
+> The refactoring doesn't change the lifecycle model, it just provides
+> entry points to access the driver bound lifetime model directly
+> instead of being forced to use pgmap.
+> 
+> Leon, can you add some remarks to the comments about what the rules
+> are to call pcim_p2pdma_provider() ?
 
-There isn't one.  We might have DMA-mapped this page earlier, and so a
-device could write to it at any time.  Even if we remove PTE write
-permissions ...
+Yes, sure.
+
+Thanks
+
+> 
+> Jason
