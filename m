@@ -1,91 +1,45 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F91224677C
-	for <linux-block@vger.kernel.org>; Mon, 20 Oct 2025 13:59:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88BCF1D6187
+	for <linux-block@vger.kernel.org>; Mon, 20 Oct 2025 14:50:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760968785; cv=none; b=MvR6+r403FiumjzN9a5Xe9jHwVSBw0MAEdEJ/fEcLEr7tBOrjocvtFq8336gVHBh6Wifil9YM1gCfwnvAci2jYUzmxTr98gAmluicNQGkzHFdnPM/ayxYz3HkQEfP5nfGAOhrVpFNkKfVZycJH8whzyBgcrhqT+7eLqKNVA35Vo=
+	t=1760971809; cv=none; b=Ew4IHqOAPaaQjBGTrVMvGwPi31Eega+/JR6B5nSxY3q1FIH/pZIMKF2csRu/REnx5odD8ApQ297zBb9uZaTF/vEzgh3HEHjnJWb03LIafT1VZVmopV5hir6Xin8tprZjyKiSUeLT3/r0Q7NKVPQHciHsEEs2dKyU/neQ3C4TgdQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760968785; c=relaxed/simple;
-	bh=OyUd+BMhitFA3vyxMLfkuyDolf+rPnLgDAdSj+/uIBQ=;
+	s=arc-20240116; t=1760971809; c=relaxed/simple;
+	bh=RWFKsywEpSud+qRUcHNQb5+B3pin/IiJfu78fXrVZwg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kcn7ZOE33gheT0WwV2tRJwD8dYSsGoHiOvo5ccRuFUORqh5DxMI3r8CAJ03SPt0H8GOsbc1FTTyaCEsJ0EgdDMVPcjrjWpblBVpbR0a62u8WbyrCsEeF/IL9sYE9md+LsPZ95Y24+ga6Ia7VNY2KBrzy1GQguBBNn0Tkemjq0go=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=FQdkhRh4; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=sZ3Z4url; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=DqBWEElY; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=Am1N2qnK; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	 Content-Type:Content-Disposition:In-Reply-To; b=QZ5O26i8XX24W9QfGPBXOZkZK6wcbYx8K73Fy5IFd1ISg74Hf5KhO/SZqLgEkiZW70pALEOmntphkQaXLUEyV5uYy7WE1vJMCJUuggcZ14NULEeBUjBuHhfYHea/tTULUIUwh7BDTyqX12dztxsslA7nkhFTkaeuzkjGMAgtDXk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=gjJsgzcv; arc=none smtp.client-ip=91.218.175.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="FQdkhRh4";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="sZ3Z4url";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="DqBWEElY";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="Am1N2qnK"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id B2F121F449;
-	Mon, 20 Oct 2025 13:59:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1760968777; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="gjJsgzcv"
+Date: Mon, 20 Oct 2025 10:49:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1760971801;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=HmmBnH8SaXShmttGIVhlHzTTaFEYyrDdxlkZ0RuRQR4=;
-	b=FQdkhRh4QvgfVUJRt2B9T8dfeTOjFnSMfLpX94GdcEEMr2Pvt4TJ2y8HCZ3xLW8SlCo5J3
-	GGdSnOJ8RLS6oHbR6MdLHCPpsaBu4jBwOsGYxAxPXuFKrlfrBlR7cHbQnzEBdwoOO8fP3C
-	MIKh99K0Z5lRvSG/LKlGiGvsWjP4KCc=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1760968777;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HmmBnH8SaXShmttGIVhlHzTTaFEYyrDdxlkZ0RuRQR4=;
-	b=sZ3Z4urltaAQy3/wzDpnB159pgqUwC5GVizivDfXDuXJF4CrEWLGwfWmPEU+7fWalaRII7
-	tFE6dVZIFACeKBAw==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=DqBWEElY;
-	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=Am1N2qnK
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1760968773; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HmmBnH8SaXShmttGIVhlHzTTaFEYyrDdxlkZ0RuRQR4=;
-	b=DqBWEElYvnvcjpRcxmCvkOjO4x2GNuawgcCE2nygLkKUwtzwl4GjMR5xfBzodD4ZccKM/r
-	Tcd99bLtPNSiqM40emp5lHeKUNa7n1CIdDfxC3kmzInHh3JndZqXzvkX78ZQ6r5RZM29wS
-	ImNUJl9ugPXh8VvCf4xxqAnwkzKbifY=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1760968773;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HmmBnH8SaXShmttGIVhlHzTTaFEYyrDdxlkZ0RuRQR4=;
-	b=Am1N2qnK4Exp2HlXaXMXTh7+exhfTCHEBPIXXqW07kb92eLCghLQc30zY0Uof7h5rSk7dQ
-	/7as+glrXJ2xScAw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 9B42913AAC;
-	Mon, 20 Oct 2025 13:59:33 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id G7viJUVA9mhjBwAAD6G6ig
-	(envelope-from <jack@suse.cz>); Mon, 20 Oct 2025 13:59:33 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id 16CBAA088E; Mon, 20 Oct 2025 15:59:33 +0200 (CEST)
-Date: Mon, 20 Oct 2025 15:59:33 +0200
-From: Jan Kara <jack@suse.cz>
+	bh=9Zeg/dM55COfEhiKccXsh3omWVQ8ClpYXf2/Teku+Sw=;
+	b=gjJsgzcvyQbpg+W903bhkBLVmb6KKGRsxmTzZWA6HLnQmayj3NxMe7AKvx0x/IopgQggx3
+	IeRjJ4up/BEly7lD1z3l6y6Kbh75qgQvcq1Rc5nyCZFLL/glKW/TXfUoWjNYxedqh4n9ON
+	sjPrNrnyePPeDngbQ9KoFjrCM6/bmeU=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Kent Overstreet <kent.overstreet@linux.dev>
 To: Christoph Hellwig <hch@infradead.org>
-Cc: Jan Kara <jack@suse.cz>, Qu Wenruo <wqu@suse.com>, 
-	linux-btrfs@vger.kernel.org, djwong@kernel.org, linux-xfs@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org, linux-mm@kvack.org, 
-	martin.petersen@oracle.com, jack@suse.com
-Subject: Re: O_DIRECT vs BLK_FEAT_STABLE_WRITES, was Re: [PATCH] btrfs: never
- trust the bio from direct IO
-Message-ID: <mciqzktudhier5d2wvjmh4odwqdszvbtcixbthiuuwrufrw3cj@5s2ffnffu4gc>
-References: <1ee861df6fbd8bf45ab42154f429a31819294352.1760951886.git.wqu@suse.com>
- <aPYIS5rDfXhNNDHP@infradead.org>
- <56o3re2wspflt32t6mrfg66dec4hneuixheroax2lmo2ilcgay@zehhm5yaupav>
- <aPYgm3ey4eiFB4_o@infradead.org>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, 
+	linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, linux-block@vger.kernel.org
+Subject: Re: [GIT PULL] block-bio_iov_iter_export
+Message-ID: <wrcaluw3pxx65tgznv5z3td3xb2tdf6rwucze5sy7bqrutj4jp@srde54eo3iyz>
+References: <ov54jszhism7mbeu74vtyoysxnx3y3tsjbj5esszlrx3edq77s@j2vtyy45gsna>
+ <aPHemg-xpVLkiEt9@infradead.org>
+ <6strysb6whhovk4rlaujravntyt2umocsjfsaxtl4jnuvjjbsp@sqf6ncn3yrlm>
+ <aPYCbIrvAkOf5L3g@infradead.org>
+ <lyqal3mcvjwmzoxltydw2aoyhjllwcvv5ix2axpw24kh2iotkx@lygocjo66enh>
+ <aPY3YKzGbIKxFbl-@infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -94,76 +48,59 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aPYgm3ey4eiFB4_o@infradead.org>
-X-Spam-Level: 
-X-Spam-Flag: NO
-X-Rspamd-Queue-Id: B2F121F449
-X-Rspamd-Action: no action
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Spamd-Result: default: False [-4.01 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	ARC_NA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	TO_DN_SOME(0.00)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.cz:dkim,imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,suse.com:email];
-	RCVD_COUNT_THREE(0.00)[3];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	RCVD_TLS_LAST(0.00)[];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	DKIM_TRACE(0.00)[suse.cz:+]
-X-Spam-Score: -4.01
+In-Reply-To: <aPY3YKzGbIKxFbl-@infradead.org>
+X-Migadu-Flow: FLOW_OUT
 
-On Mon 20-10-25 04:44:27, Christoph Hellwig wrote:
-> On Mon, Oct 20, 2025 at 01:16:39PM +0200, Jan Kara wrote:
-> > Hmm, this is an interesting twist in the problems with pinned pages - so
-> > far I was thinking about problems where pinned page cache page gets
-> > modified (e.g. through DIO or RDMA) and this causes checksum failures if
-> > it races with writeback. If I understand you right, now you are concerned
-> > about a situation where some page is used as a buffer for direct IO write
-> > / RDMA and it gets modified while the DMA is running which causes checksum
-> > mismatch?
+On Mon, Oct 20, 2025 at 06:21:36AM -0700, Christoph Hellwig wrote:
+> On Mon, Oct 20, 2025 at 08:56:59AM -0400, Kent Overstreet wrote:
+> > The implementation has morphed given multipage bvecs and iov_iters, but
+> > otherwise it looks structurally much the same as the version I
+> > originally introduced.
 > 
-> Really all of the above.  Even worse this can also happen for reads,
-> e.g. when the parity or checksum is calculated in the user buffer.
+> Not a pissing context, but I introduced it.  I attributed the git
+> authorship you because it fundamentally it based on your idea but with a
+> lot of tweaks.  I and many others do this to give proper credit.
 
-OK.
+Christoph, I don't know what you're claiming here. I see no tweaks in
+the original patch, that's all code I wrote.
 
-> > Writeprotecting the buffer before the DIO starts isn't that hard
-> > to do (although it has a non-trivial cost) but we don't have a mechanism to
-> > make sure the page cannot be writeably mapped while it is pinned (and
-> > avoiding that without introducing deadlocks would be *fun*).
+> > Please attribute correctly, and that would've included CCing me on the
+> > patch that dropped the EXPORT_SYMBOL().
 > 
-> Well, this goes back to the old idea of maybe bounce buffering in that
-> case?
+> No, we don't Cc the author of each line of code or even function.  The
+> relevant maintainer here is Jens.
 
-The idea was to bounce buffer the page we are writing back in case we spot
-a long-term pin we cannot just wait for - hence bouncing should be rare.
-But in this more general setting it is challenging to not bounce buffer for
-every IO (in which case you'd be basically at performance of RWF_DONTCACHE
-IO or perhaps worse so why bother?). Essentially if you hand out the real
-page underlying the buffer for the IO, all other attemps to do IO to that
-page have to block - bouncing is no longer an option because even with
-bouncing the second IO we could still corrupt data of the first IO once we
-copy to the final buffer. And if we'd block waiting for the first IO to
-complete, userspace could construct deadlock cycles - like racing IO to
-pages A, B with IO to pages B, A. So far I'm not sure about a sane way out
-of this...
+I always try to CC people with relevant expertise, and that _definitely_
+includes the person who authored the code being changed.
 
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+And considering the multiple times I've had to track down bugs you and
+Jens introduced into code I wrote without CCing me...
+
+> > The way you're doing it with bdev_logical_block_size() is just wrong -
+> > even for single device filesystems! - because it's the filesystem
+> > blocksize that's relevant here and that isn't necessarily going to match
+> > (even if it matched when the filesystem was formatted, filesystems can
+> > be moved to different block devices).
+> 
+> I'm not sure what you are talking about, but the changes you seem to
+> be complaining about are making the alignment boundary a caller provided
+> argument.  Which seems to be what you're arguing for here?
+
+You brought up the bdev NULL check.
+
+> Either way this is the wrong venue.  If you want to change something
+> sent patches following the usual guidelines to the maintainer.
+
+There was no need for you to drop the EXPORT_SYMBOL.
+
+What I want to know is, is this going to become a pattern?
+
+I can vendorize this one function, but If you're going to make a habit
+of ripping out exports and functionality bcachefs depends on, I can't
+expect I'll always be able to. There's open bug on the bcachefs bug
+tracker for 6.18 support, and people are just patching the kernel to
+deal with this. I'll just pass the bcachefs enablement patches to the
+distros if it looks like that's going to be less of a hassle.
+
+With the lib/Kconfig patch to make library code user selectable that you
+also nacked, perhaps that's the safer route here.
