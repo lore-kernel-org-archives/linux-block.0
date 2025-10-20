@@ -1,139 +1,99 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9A852F83DE
-	for <linux-block@vger.kernel.org>; Mon, 20 Oct 2025 12:47:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A89AC248883
+	for <linux-block@vger.kernel.org>; Mon, 20 Oct 2025 12:57:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760964426; cv=none; b=DD8JrQxWeZ+sRDG9SFlX3+oqv//jyEg+BwRLEEs+Fgv/2dyUkbS0sy4vg8SJCsKs4QCCirMB0g40xAO0YeGcpvCsNKQFJpN3t4ZRRaIRV40PbgmfCIpvXuum7NEeOU+yBK4cjpOjvTcLJpwWWf2BAkOKTneqp7YiMc4XC/0G4wk=
+	t=1760965045; cv=none; b=ZI6OZmRVy0RLmOAAGNjE5+6ndWLHeEp3MybkSCpEOuCv+Px7Hd6J4YuUoHhqC/WVVawNVajG0AUgWBssrcmaH3Nele2EXMIlcldnv8xn1alkhnYM9k3gxTahKXRfZe+jLDpRL8/z0eBHonlSdnhGn5pwq4vgopn7yBqcKREQvP4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760964426; c=relaxed/simple;
-	bh=XFLQOToBNY+7nOz2f+tpolrIaa0xU7qt4tC6KNATsLU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Sn+xliymwcchrDus+AllCQ7KTcI2vp3hboDrYHLWL8k214hV0k0qZxwzm9UHKoh15ICizyuGF1w9tPtM/2Q+XwW41bgsv1itQOubPNWSNPXa0t/dZQlHdvvdb7j5mzOVk1Iv13vmhobenqHFRZvQuwjYKkAEEjOJCJ3MDHYKCuU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ExbZJEUQ; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1760965045; c=relaxed/simple;
+	bh=jS4F/EQCuVfoDvcgyi6Dkh/JAq8dbkKj0ab0uRstZFo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tAMMq73r9rbqky9RipMGmtdkdIAD1ukv1V5zwlYjU4bjibHobCkk5jiIPkA5FTxXvgJtMaWw+2pR49BYQM+YFmqGMkHZKlcOcG/pFDvOYn0oUmKhS09I1p0Mpo3Il4DLq8TvFSqM2sKSY3wufv1F9CoVdtWrm5F3ZbuaQYr0VCw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=hzdOHXg8; arc=none smtp.client-ip=91.218.175.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ExbZJEUQ"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1760964422;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="hzdOHXg8"
+Date: Mon, 20 Oct 2025 08:56:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1760965031;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=lUF+i4AHorT+VALl8fcSqL8T041fxKcuGdTyj83io1o=;
-	b=ExbZJEUQRO9ZOLIBMJJU15ODIUWcBDoQFfsYfiXZMjmM5OI0zuIp32NwsQl7WDFwK8UH9e
-	K4Cp4oCTS1Bbdwu7wS/sPycDuEQGJD6w4d+Jx62VSyk+3BxZ1QO0Hl95HJEOS7sCTfyt6C
-	3P7P1pCcvuvy++MFI0P0SIDnOWZcz/k=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-144-X9wRUfuyNyWNOxG67wleYw-1; Mon,
- 20 Oct 2025 08:46:58 -0400
-X-MC-Unique: X9wRUfuyNyWNOxG67wleYw-1
-X-Mimecast-MFC-AGG-ID: X9wRUfuyNyWNOxG67wleYw_1760964417
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B96D818015FA;
-	Mon, 20 Oct 2025 12:46:56 +0000 (UTC)
-Received: from localhost (unknown [10.72.120.7])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 53DEC180044F;
-	Mon, 20 Oct 2025 12:46:54 +0000 (UTC)
-From: Ming Lei <ming.lei@redhat.com>
-To: Thomas Gleixner <tglx@linutronix.de>
-Cc: linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH] lib/group_cpus: fix cross-NUMA CPU assignment in group_cpus_evenly
-Date: Mon, 20 Oct 2025 20:46:46 +0800
-Message-ID: <20251020124646.2050459-1-ming.lei@redhat.com>
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=T6EXoZIASMGNH9SpdtinReibztnVfzgrx2zwj3rN8u0=;
+	b=hzdOHXg8xFdwGyNbNdSCuiy++/gESzwKoRryl+FOMsZ2BwH/uqMZMDL6TrVjpFMXT4ftB4
+	CNqlKPMzmbs5clw2WPmjSPPBdFM5ucnZL2XUpxL/NGDS8JLj8sMXMecJjbSIEXJA2EummO
+	Yn6J+9LcUDlhLAdU9pGXkwDAMJWHlZg=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Kent Overstreet <kent.overstreet@linux.dev>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, 
+	linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, linux-block@vger.kernel.org
+Subject: Re: [GIT PULL] block-bio_iov_iter_export
+Message-ID: <lyqal3mcvjwmzoxltydw2aoyhjllwcvv5ix2axpw24kh2iotkx@lygocjo66enh>
+References: <ov54jszhism7mbeu74vtyoysxnx3y3tsjbj5esszlrx3edq77s@j2vtyy45gsna>
+ <aPHemg-xpVLkiEt9@infradead.org>
+ <6strysb6whhovk4rlaujravntyt2umocsjfsaxtl4jnuvjjbsp@sqf6ncn3yrlm>
+ <aPYCbIrvAkOf5L3g@infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aPYCbIrvAkOf5L3g@infradead.org>
+X-Migadu-Flow: FLOW_OUT
 
-When numgrps > nodes, group_cpus_evenly() can incorrectly assign CPUs
-from different NUMA nodes to the same group due to the wrapping logic.
-Then poor block IO performance is caused because of remote IO completion.
-And it can be avoided completely in case of `numgrps > nodes` because
-each numa node may includes more CPUs than group's.
+On Mon, Oct 20, 2025 at 02:35:40AM -0700, Christoph Hellwig wrote:
+> On Fri, Oct 17, 2025 at 09:31:59AM -0400, Kent Overstreet wrote:
+> > On Thu, Oct 16, 2025 at 11:13:46PM -0700, Christoph Hellwig wrote:
+> > > Umm,
+> > > 
+> > > besides adding exports without in-tree users, this is a patch that's
+> > > never seen any relevant mailing list, in a pull request that the
+> > > maintainer hasn't seen.  That's now exactly how Linux development works,
+> > > does it?
+> > 
+> > Christoph, I wrote that code /for bcachefs/; the rest of you decided it
+> > was nice and started using it too.
+> 
+> In fact this version was written by me, giving you the attribution
+> because I stole a cool idea from you.  But none of this actually
+> matters, there's not magic exception just because someone wrote the
+> code.
 
-The issue occurs when curgrp reaches last_grp and wraps to 0. This causes
-CPUs from later-processed nodes to be added to groups that already contain
-CPUs from earlier-processed nodes, violating NUMA locality.
+The implementation has morphed given multipage bvecs and iov_iters, but
+otherwise it looks structurally much the same as the version I
+originally introduced.
 
-Example with 8 NUMA nodes, 16 groups:
-- Each node gets 2 groups allocated
-- After processing nodes, curgrp reaches 16
-- Wrapping to 0 causes CPUs from node N to be added to group 0 which
-  already has CPUs from node 0
+Please attribute correctly, and that would've included CCing me on the
+patch that dropped the EXPORT_SYMBOL().
 
-Fix this by adding find_next_node_group() helper that searches for the
-next group (starting from 0) that already contains CPUs from the same
-NUMA node. When wrapping is needed, use this helper instead of blindly
-wrapping to 0, ensuring CPUs are only added to groups within the same
-NUMA node.
+> > Then you removed the export talking about the "abuse" of bcachefs using
+> > it. WTF?
+> 
+> The random NULL bdev check that breaks the proper splitting.  We told
+> told you that's not the way to go, but you just sent it directly to Linus
+> instead of reworking it.  And this then got into the way of the rework
+> Keith did to support arbitrarily small memory alignments.  Fortunately
+> we could clean this up properly now.
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- lib/group_cpus.c | 28 +++++++++++++++++++++++++---
- 1 file changed, 25 insertions(+), 3 deletions(-)
+So, you "told" the person that originally authored not only this code
+but all our modern bio splitting infastructure that this isn't the way
+to go?
 
-diff --git a/lib/group_cpus.c b/lib/group_cpus.c
-index 6d08ac05f371..54d70271e2dd 100644
---- a/lib/group_cpus.c
-+++ b/lib/group_cpus.c
-@@ -246,6 +246,24 @@ static void alloc_nodes_groups(unsigned int numgrps,
- 	}
- }
- 
-+/*
-+ * Find next group in round-robin fashion that contains CPUs from the
-+ * specified NUMA node. Used for wrapping to avoid cross-NUMA assignment.
-+ */
-+static unsigned int find_next_node_group(struct cpumask *masks,
-+					 unsigned int numgrps,
-+					 const struct cpumask *node_cpus)
-+{
-+	unsigned int i;
-+
-+	for (i = 0; i < numgrps; i++) {
-+		if (cpumask_intersects(&masks[i], node_cpus))
-+			return i;
-+	}
-+
-+	return 0;
-+}
-+
- static int __group_cpus_evenly(unsigned int startgrp, unsigned int numgrps,
- 			       cpumask_var_t *node_to_cpumask,
- 			       const struct cpumask *cpu_mask,
-@@ -315,11 +333,15 @@ static int __group_cpus_evenly(unsigned int startgrp, unsigned int numgrps,
- 			}
- 
- 			/*
--			 * wrapping has to be considered given 'startgrp'
--			 * may start anywhere
-+			 * Wrapping has to be considered given 'startgrp'
-+			 * may start anywhere. When wrapping, find the next
-+			 * group (in round-robin fashion) that already contains
-+			 * CPUs from the same NUMA node to avoid mixing CPUs
-+			 * from different NUMA nodes in the same group.
- 			 */
- 			if (curgrp >= last_grp)
--				curgrp = 0;
-+				curgrp = find_next_node_group(masks, numgrps,
-+							      node_to_cpumask[nv->id]);
- 			grp_spread_init_one(&masks[curgrp], nmsk,
- 						cpus_per_grp);
- 		}
--- 
-2.51.0
+That's quite the way of framing it.
 
+The way you're doing it with bdev_logical_block_size() is just wrong -
+even for single device filesystems! - because it's the filesystem
+blocksize that's relevant here and that isn't necessarily going to match
+(even if it matched when the filesystem was formatted, filesystems can
+be moved to different block devices).
+
+You'll figure this out sooner or later as bs > ps becomes more
+prevalent...
