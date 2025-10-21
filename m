@@ -1,74 +1,74 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 939CE2DBF69
-	for <linux-block@vger.kernel.org>; Tue, 21 Oct 2025 09:38:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6F7F2EA158
+	for <linux-block@vger.kernel.org>; Tue, 21 Oct 2025 09:43:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761039484; cv=none; b=mJUVylsBk5onDHO3jF+etJnV4zXGzfudtu5M2F9wYVSataeeZRtQGlyAT22bmHpa9Ac6QGWHlgebF/ZabnRfISCImk8bkPcn4DZGR9V0e3v8rNkhhUmqk72T1dKULLkVx8HOioAWleMsF7JrHBEFS18EAlFiYjYfFrfAAJ4CIk8=
+	t=1761039793; cv=none; b=bwx00PPHpErYR85zRNSG2fqOsdIw0ptR+axl1ejkrd579VB/WeYIBa8kJAPgpelKex7QW2l0YT87aE/rxR/WzRoWMNnUK60WUZxGUYgqZgIsbOIognm3xZTW3fMbaD8yH2Sdfdll44ZyxCsG1IzlaxgYFWWFPocoNXTAK/3rNnc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761039484; c=relaxed/simple;
-	bh=zUZDzYUzg+3AsTA8LAr9g0v2trX8HOm/b8KrBIdgeds=;
+	s=arc-20240116; t=1761039793; c=relaxed/simple;
+	bh=nOwp8cKz8Deql2IcFUsEhRS68D3CEK4S8UMwL5e4MMs=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZmEjR8CG5OCCJdbYbQIq8HgRKTsK2kWDrDh5ig17c6iPOL4qLlrJULj5snjO4tuJ/nc3/ryudEUIQllBT5j1aedYtcxNdd2sMreDYGO6g2SH/kuW/uPEykUSvMJyVugLa5AZmsFXJAWgyLMYqfQpoumy0qQfpL6+S3J1c8XgIh8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bD0uwyYa; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=U80Bs3fAPhOkEGNGID24/272nslKLUx8TyQylNzJb9kc2kcrwGtFYYcC3HDXhSXcdhxDy+4SakDE7KznKSxF3UcbUUO6FxFbxGxedKZYkvCD22/YYqjtwfJtzPVMcMPJ9QMYMhTVhfhsTMvOvjPTojpDydl2NSvHBo2d11XCIsA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ChjFVR2y; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bD0uwyYa"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ChjFVR2y"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1761039481;
+	s=mimecast20190719; t=1761039790;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=Q29DhQwTAK6dd4ZAsLxjzERt3jbFaX1obxxBjr33yAU=;
-	b=bD0uwyYa9X12VpBIa5vwW+1yeG91d6u0AOcWe4oFW8w007s8Wm9dwiFqIolKLEVSXnQLsN
-	YX6KLABT2u8oEZfCNGlqPUF4RRaDuMPS9fSLb+ENANjvbkW5Cm9gChzoESN+YmJuJoJW4T
-	dgEuu75S+6Eurj7uiczmvO1mhZNJJnM=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=7N+UUsWkh/PxB+UVb+bOzD97AQ3e4XfF6EAoBhVIUg4=;
+	b=ChjFVR2y9HZ9cHQajqBPGoG7qlv7tjnOGqM88aPRZzkwAJvMimLz7Ul3/BOUmdNmD/PieR
+	wjEFPU8yXqZL6qU1cHJPmpGKceZbGXE6lDQJwAfjuhGpGW/oGassF6PK7MFoJZPXVMgHnl
+	3Hi1PB++DfdgGSc2IP3Vt1nNcyHL97Y=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-517-mbeqXhNiMCmUszowzWP2CQ-1; Tue, 21 Oct 2025 05:38:00 -0400
-X-MC-Unique: mbeqXhNiMCmUszowzWP2CQ-1
-X-Mimecast-MFC-AGG-ID: mbeqXhNiMCmUszowzWP2CQ_1761039479
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-426ce339084so4757434f8f.0
-        for <linux-block@vger.kernel.org>; Tue, 21 Oct 2025 02:38:00 -0700 (PDT)
+ us-mta-319-zoG1Ayg2OCKp3e3g4wNkFQ-1; Tue, 21 Oct 2025 05:43:09 -0400
+X-MC-Unique: zoG1Ayg2OCKp3e3g4wNkFQ-1
+X-Mimecast-MFC-AGG-ID: zoG1Ayg2OCKp3e3g4wNkFQ_1761039788
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-40fd1b17d2bso3094371f8f.1
+        for <linux-block@vger.kernel.org>; Tue, 21 Oct 2025 02:43:08 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761039479; x=1761644279;
+        d=1e100.net; s=20230601; t=1761039788; x=1761644588;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=Q29DhQwTAK6dd4ZAsLxjzERt3jbFaX1obxxBjr33yAU=;
-        b=dhPRZayc0Dxs9h3N3A+9izbkDX90ppMeqqOCA7zWpcFKuZDK1qHGF7n162AMldPCWf
-         eK/Z95PXKlRDvclhLWm/s18cp9lJHVXWbeqdaM7RAvj8mFWRoHDJRtoRGVPme1oU8dFl
-         nrWtpR4XITzGeKepAf/iBguHGPKq9FZaWLHKfMt5wEWSAACd//NCiqAlfuGwhWJUlIgF
-         OAZk1LcJ8gZlkJ2wmEzBoX5GrD7efbUfDXtTOEWRcb1QypGPT2DKDJ2DILGtyNdiIsiH
-         4ulKTU/YxRZTZpCOKCJ+2EnqFHZGP4F9a+bgbcSAN1jTTk59Wf6wta107BTMse3LIQr3
-         okVA==
-X-Forwarded-Encrypted: i=1; AJvYcCWxhjPZaXX8oXhNV/x629Jn7ZaVb2iRzXdDMuOuBcENVl468lJKw5p7lE6QpX7HhlmwVcyDFv2L5vUpSQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzdwleqvbLh20/qIcdg1D9KuTWhHKpaSRM4IvgwlxHf+MG8ZgrO
-	1pZ5+zO2zJ0/6nrrNmO5bzrXvYiYF+obUOo9dZXW5XW+/EH5gmBfQwrKDddYoMeX2hc65d7nUxE
-	wVy2OaPipFVnqJaCTEydBZ0FmkncD0+/+i3zTh9jzFUL3mwwxy4AUhPRLyxREekoq
-X-Gm-Gg: ASbGncuRQycBRlqFLnMIBv4Demm4GnlWqqfFFEn5o9607HAFztXMBdni7pTWA2TPWdV
-	0R8Za4uOsjO8QQ/5N++MPTAfaGUcET+k1n+dHzFLVoPLEjNwcKv+eQ0SSiMi0lg3lT4EHI9MvgK
-	H0QoqYayNPo4l34dXI9jqwDQTupneuSJiHdK9bw6sCzoXP1cb1U2MoFP7hymFtmrDvrknqdmrbG
-	EZ58Jz33LF9MPTBDmoDgcAdqDg+zxQbk8NM3tqJDCgElz9eIyXcWpQ9fOMCb92udziR/ShSr78b
-	uRxzjoXTtn6bk73I7c7Uat8rtO0fcGp5xTUmH+jCZO3UhxPcUFpSqYGYNNZBJiDy3K3qJclS1ae
-	StZgydju6727tkDHY2YshDykhkxefAFXNpM8Cbdg+7vXm/AbR5RAJlboHdkoReXDm6zfP7/GVT+
-	6gti7/YW0abUqGFWYj2lpmC6ubszc=
-X-Received: by 2002:a5d:64c4:0:b0:40f:5eb7:f234 with SMTP id ffacd0b85a97d-42704d442f9mr12220845f8f.5.1761039479088;
-        Tue, 21 Oct 2025 02:37:59 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFKruvi/TAKluPv6cz2boZrb3dbhZ+r79GGju1INC+ReltJyDrEtS+cBV3xo2qL/hT92CNu2g==
-X-Received: by 2002:a5d:64c4:0:b0:40f:5eb7:f234 with SMTP id ffacd0b85a97d-42704d442f9mr12220818f8f.5.1761039478657;
-        Tue, 21 Oct 2025 02:37:58 -0700 (PDT)
+        bh=7N+UUsWkh/PxB+UVb+bOzD97AQ3e4XfF6EAoBhVIUg4=;
+        b=E/SLRqn5ndSpaLTTosPyJTpjdfjRDCUJhQvCJsKzOiplX+zscQ0b2MoJelP9S2kyT9
+         bmTEyxqrvUs7Exfp6qDq5huJbGSfUljQRbgKlV1XnzHCCDIgZ+/WEoo1C+EljOtqcBcM
+         q6fhgpzCSG2b+LAp4lPpKOCDL/dM9T2Ck+MJ6DIhhNHdy61XLr/VyX9mLh96cJvzptyc
+         8Z52tvJVAx4Yoh2Q4lgu6zO4oTXUui3nRtKD1CYf5TkywYQ5iD41X+zH36vw9aYA/Jx+
+         7mGQxBKAr8Ud2f2tqQxJgldtjvR5ymz6H5eKQxYNOHU+kRdyH3pqg5mYQ4dA7eMjnkZb
+         vdWw==
+X-Forwarded-Encrypted: i=1; AJvYcCUAMPj2WbGFf57J2H2M1H2/uYxK5JlJDLp/RZUIdI+6Spm1mEV02lrXuAnu4b6TPmOKtRu9FzO51l6qiQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyJfJUMPPijvwGn4m06q4fq5JvQA7A2tLUNSr8F00ZraOTyZSK2
+	Y3UYw/rQOz2NYNRPCBMF5SGjOgPNbs8QPLRj7g12R5+NIRgwS9ko9DpaOr+sDb7F6uWGmvlG9P+
+	hVl5LrRz9L8rIrDgQUazu5/gIbA57oQ6N22Uz5a9qwD7o/vqahj7EkOESQYW4FAZg
+X-Gm-Gg: ASbGncuh9rmtK0wOBiT6drrgi2DxgWVCQ5DnFc83nHdozYH0rPBY/b+kHoxnk6pkBAa
+	flVPEum7Zy7NM+Zd980DTetBnAMM2BmX8T9DI8QNTPdqUXzvOYS796uHD2DBZtC8a8W/gPfijoG
+	WMCYPZM0HthYiU2hbvhcJLvWfVRFzO0CAN0Gcytr1cNbZPervtQKkK3i0nLaYQBx+oTan3ajZqy
+	2+QIUiec/GfANeOpwgtGPpA5gfq1yNlmsQP9Z7y4q4XxZhEqOzeGa/jp1rfBoV1PA1rsy5qgIiZ
+	0BkCKzSYG2msJ4U3/FWkFJbNR6jsTIWGPsrc2VeUuKnLMGEQ0WpbXNEyqA9UX8PYK+707UzJrNc
+	mNye/oFN96qS+pNb42/rGLlBdsKlXU/NdKz6qRnJFlaWra93K+wBw33lPvlkhrDW9jrJ0wFSa48
+	WofemJMNGFTsu95gzu+EesAzVmYFM=
+X-Received: by 2002:a05:6000:4024:b0:405:3028:1bf2 with SMTP id ffacd0b85a97d-42704e0eeb3mr10685015f8f.62.1761039787938;
+        Tue, 21 Oct 2025 02:43:07 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGKdZ707i2yTNafAh3yeT5ocRi/+Z46tBstB8jxkIB6KoBbNLz4cy9huv2TFyZ6jk4HqWigdQ==
+X-Received: by 2002:a05:6000:4024:b0:405:3028:1bf2 with SMTP id ffacd0b85a97d-42704e0eeb3mr10684990f8f.62.1761039787436;
+        Tue, 21 Oct 2025 02:43:07 -0700 (PDT)
 Received: from ?IPV6:2003:d8:2f4e:3200:c99d:a38b:3f3a:d4b3? (p200300d82f4e3200c99da38b3f3ad4b3.dip0.t-ipconnect.de. [2003:d8:2f4e:3200:c99d:a38b:3f3a:d4b3])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-427ea5a0f19sm19610031f8f.9.2025.10.21.02.37.57
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-427f00ce3aesm19874869f8f.48.2025.10.21.02.43.06
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 21 Oct 2025 02:37:58 -0700 (PDT)
-Message-ID: <750cfcac-e048-4fee-bba9-6e84edb7bbe0@redhat.com>
-Date: Tue, 21 Oct 2025 11:37:57 +0200
+        Tue, 21 Oct 2025 02:43:06 -0700 (PDT)
+Message-ID: <b31b7abc-69a2-44cc-9e30-0baf03f45a29@redhat.com>
+Date: Tue, 21 Oct 2025 11:43:05 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -78,8 +78,9 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: O_DIRECT vs BLK_FEAT_STABLE_WRITES, was Re: [PATCH] btrfs: never
  trust the bio from direct IO
-To: Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@infradead.org>
-Cc: Matthew Wilcox <willy@infradead.org>, Qu Wenruo <wqu@suse.com>,
+To: Jan Kara <jack@suse.cz>
+Cc: Christoph Hellwig <hch@infradead.org>,
+ Matthew Wilcox <willy@infradead.org>, Qu Wenruo <wqu@suse.com>,
  linux-btrfs@vger.kernel.org, djwong@kernel.org, linux-xfs@vger.kernel.org,
  linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
  linux-mm@kvack.org, martin.petersen@oracle.com, jack@suse.com
@@ -92,7 +93,8 @@ References: <1ee861df6fbd8bf45ab42154f429a31819294352.1760951886.git.wqu@suse.co
  <xc2orfhavfqaxrmxtsbf4kepglfujjodvhfzhzfawwaxlyrhlb@gammchkzoh2m>
  <5bd1d360-bee0-4fa2-80c8-476519e98b00@redhat.com>
  <aPc7HVRJYXA1hT8h@infradead.org>
- <rlu3rbmpktq5f3vgex3zlfjhivyohkhr5whpdmv3lscsgcjs7r@4zqutcey7kib>
+ <32a9b501-742d-4954-9207-bb7d0c08fccb@redhat.com>
+ <rizci7wwm7ncrc6uf7ibtiap52rqghe7rt6ecrcoyp22otqwu4@bqksgiaxlc5v>
 From: David Hildenbrand <david@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=david@redhat.com; keydata=
@@ -139,47 +141,52 @@ Autocrypt: addr=david@redhat.com; keydata=
  3iyY2Nsd7JxfKu1PRhCGwXzRw5TlfEsoRI7V9A8isUCoqE2Dzh3FvYHVeX4Us+bRL/oqareJ
  CIFqgYMyvHj7Q06kTKmauOe4Nf0l0qEkIuIzfoLJ3qr5UyXc2hLtWyT9Ir+lYlX9efqh7mOY
  qIws/H2t
-In-Reply-To: <rlu3rbmpktq5f3vgex3zlfjhivyohkhr5whpdmv3lscsgcjs7r@4zqutcey7kib>
+In-Reply-To: <rizci7wwm7ncrc6uf7ibtiap52rqghe7rt6ecrcoyp22otqwu4@bqksgiaxlc5v>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 21.10.25 11:22, Jan Kara wrote:
-> On Tue 21-10-25 00:49:49, Christoph Hellwig wrote:
->> On Mon, Oct 20, 2025 at 09:00:50PM +0200, David Hildenbrand wrote:
->>> Just FYI, because it might be interesting in this context.
+On 21.10.25 11:33, Jan Kara wrote:
+> On Tue 21-10-25 09:57:08, David Hildenbrand wrote:
+>> On 21.10.25 09:49, Christoph Hellwig wrote:
+>>> On Mon, Oct 20, 2025 at 09:00:50PM +0200, David Hildenbrand wrote:
+>>>> Just FYI, because it might be interesting in this context.
+>>>>
+>>>> For anonymous memory we have this working by only writing the folio out if
+>>>> it is completely unmapped and there are no unexpected folio references/pins
+>>>> (see pageout()), and only allowing to write to such a folio ("reuse") if
+>>>> SWP_STABLE_WRITES is not set (see do_swap_page()).
+>>>>
+>>>> So once we start writeback the folio has no writable page table mappings
+>>>> (unmapped) and no GUP pins. Consequently, when trying to write to it we can
+>>>> just fallback to creating a page copy without causing trouble with GUP pins.
 >>>
->>> For anonymous memory we have this working by only writing the folio out if
->>> it is completely unmapped and there are no unexpected folio references/pins
->>> (see pageout()), and only allowing to write to such a folio ("reuse") if
->>> SWP_STABLE_WRITES is not set (see do_swap_page()).
->>>
->>> So once we start writeback the folio has no writable page table mappings
->>> (unmapped) and no GUP pins. Consequently, when trying to write to it we can
->>> just fallback to creating a page copy without causing trouble with GUP pins.
+>>> Yeah.  But anonymous is the easy case, the pain is direct I/O to file
+>>> mappings.  Mapping the right answer is to just fail pinning them and fall
+>>> back to (dontcache) buffered I/O.
 >>
->> Yeah.  But anonymous is the easy case, the pain is direct I/O to file
->> mappings.  Mapping the right answer is to just fail pinning them and fall
->> back to (dontcache) buffered I/O.
+>> Right, I think the rules could likely be
+>>
+>> a) Don't start writeback to such devices if there may be GUP pins (o
+>> writeble PTEs)
+>>
+>> b) Don't allow FOLL_WRITE GUP pins if there is writeback to such a device
+>>
+>> Regarding b), I would have thought that GUP would find the PTE to not be
+>> writable and consequently trigger a page fault first to make it writable?
+>> And I'd have thought that we cannot make such a PTE writable while there is
+>> writeback to such a device going on (otherwise the CPU could just cause
+>> trouble).
 > 
-> I agree file mappings are more painful but we can also have interesting
-> cases with anon pages:
+> See some of the cases in my reply to Christoph. It is also stuff like:
 > 
-> P - anon page
+> c) Don't allow FOLL_WRITE GUP pins or writeable mapping if there are *any*
+> pins to the page.
 > 
-> Thread 1				Thread 2
-> setup DIO read to P			setup DIO write from P
+> And we'd have to write-protect the page in the page tables at the moment we
+> obtain the FOLL_WRITE GUP pin to make sure the pin owner is the only thread
+> able to modify that page contents while the DIO is running.
 
-Ah, I was talking about the interaction between GUP and having 
-BLK_FEAT_STABLE_WRITES set on the swap backend.
-
-I guess what you mean here is: GUP from/to anon pages to/from a device 
-that has BLK_FEAT_STABLE_WRITES?
-
-So while we are writing to the device using the anon page as a source, 
-the anon page will get modified.
-
-I did not expect that to trigger checksum failures, but I can see the 
-problem now.
+Oh that's nasty, but yeah I understood the problem now, thanks.
 
 -- 
 Cheers
