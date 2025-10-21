@@ -1,188 +1,153 @@
-Received: from mx07-006a4e02.pphosted.com (mx07-006a4e02.pphosted.com [143.55.146.78])
+Received: from fra-out-004.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-004.esa.eu-central-1.outbound.mail-perimeter.amazon.com [3.74.81.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB942224245;
-	Tue, 21 Oct 2025 06:55:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.55.146.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A18CC25A623;
+	Tue, 21 Oct 2025 07:09:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=3.74.81.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761029728; cv=none; b=LoaORVwXEiIWmDRcwdCLQvBTfkV5M5Z9g24NmgjPEK2Zty+gjH8uhpDDwxDdmJu30rsB02cLwuqV9Yv8wyf8zNSTRQJIB3WlIJKLHpJB8DxrZDEJVIKulnL1Dl8rTGh0M84VLTQhEI2WajVPra76MvzrB2rYRrhmDvpgb5EmcZo=
+	t=1761030554; cv=none; b=StjrkF2+zizVPYASEiz7WaDfXVYhDVhYOe5v38c1HIub5nemvq8iW+Xc9H0D8tSM5swpPxlV304AEn7jOgvYe4sD8FKFHmlCZvw2sUghB7pZ8B0mhxlA5ndmBNeL5hFCSO8H7cX8ZDzKEwFySKPzuWva56QNNh4aUSll7XnGZbM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761029728; c=relaxed/simple;
-	bh=HMGdk3I075bK5E/gp9SATIQq1qBXSq91Oir+DGivIiE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=E4fJ1vz/dMDfZ6fSERaYY86VUJyd1zbs/JlufaBjMqwZtOCBcMuvtWZXNH/wU8npIikjJYARc+G0CaXmV8B4BtBYYWPV0+SpcepLT4PU/9Tosrw2JyTPv4fTAJAcr7PVwylij9e1uUFKDwQT7wKou/qhGJCkHtTv96Olwi13Jkw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=iram.es; spf=pass smtp.mailfrom=iram.es; dkim=pass (2048-bit key) header.d=iram.es header.i=@iram.es header.b=YpYVuGBx; arc=none smtp.client-ip=143.55.146.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=iram.es
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iram.es
+	s=arc-20240116; t=1761030554; c=relaxed/simple;
+	bh=hV+SdjKKzEi70TyGpPZCe2pK7qZK2WxjRRL1B1KcNTM=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=GieyvBiGRqXfJyvizVr3dcB54JKhpnnuNkk8OiGfPa1Z1cQh0If02pE4kAkRP8YF7M95PuJ8KJOWS9wSczzoQ6rEu0gyruQ9pHQtHMGm2ju6vCT/PMtwYJZSUHdupmZTdGFLYZGEQ5/ko80HPGBgruO4G9tq5XunfR43lKSw4j8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de; spf=pass smtp.mailfrom=amazon.de; dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b=HVC87p1a; arc=none smtp.client-ip=3.74.81.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iram.es header.i=@iram.es header.b="YpYVuGBx"
-Received: from pps.filterd (m0316690.ppops.net [127.0.0.1])
-	by mx07-006a4e02.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 59L63AQs1248592;
-	Tue, 21 Oct 2025 08:34:48 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iram.es; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=dkim3; bh=F164kmUr5EMZ6e+BTntGiD39zV8R
-	xXZwoRaGnCHEUKE=; b=YpYVuGBxuCwNJOQ3pBoy4A9ND5k7mRQOc+KGKrd42ih8
-	OAXsKtgh51RKxIBPRqYFZZhxoqsJDsHSjdT+uBjxoUEETInGL/mkVbpDNQSh0jTi
-	AINogUjyNJYUKHNOvirHoJmCRTw0E0AGyG1mEh2hfTH9ypTfEajsFBmTzWEW6AcI
-	3cDOIJXKeNn4+YDr1ZUiqzADvthene2bFu72cXBErZFkYhcAwTd24ZD9nwGwRTu/
-	6/0YkK7nru8rVpz30c/b25h17gRRIVulAV1foZlV1gIXNsVELI9YAVooBm+XaTJL
-	kaMRQ+ZSe2o1We13qnamNjH/qaU+Hcfl/guzkqy5Wg==
-Received: from mta-out02.sim.rediris.es (mta-out02.sim.rediris.es [130.206.24.44])
-	by mx07-006a4e02.pphosted.com (PPS) with ESMTPS id 49wrkpfknq-1
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Tue, 21 Oct 2025 08:34:47 +0200 (MEST)
-Received: from mta-out02.sim.rediris.es (localhost.localdomain [127.0.0.1])
-	by mta-out02.sim.rediris.es (Postfix) with ESMTPS id 15B3914009E;
-	Tue, 21 Oct 2025 08:34:47 +0200 (CEST)
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mta-out02.sim.rediris.es (Postfix) with ESMTP id DF9E7140FAD;
-	Tue, 21 Oct 2025 08:34:46 +0200 (CEST)
-X-Amavis-Modified: Mail body modified (using disclaimer) -
- mta-out02.sim.rediris.es
-Received: from mta-out02.sim.rediris.es ([127.0.0.1])
- by localhost (mta-out02.sim.rediris.es [127.0.0.1]) (amavis, port 10026)
- with ESMTP id 9cGW7RgyfRah; Tue, 21 Oct 2025 08:34:46 +0200 (CEST)
-Received: from lt-gp.iram.es (haproxy01.sim.rediris.es [130.206.24.69])
-	by mta-out02.sim.rediris.es (Postfix) with ESMTPA id 2DFB114009E;
-	Tue, 21 Oct 2025 08:34:45 +0200 (CEST)
-Date: Tue, 21 Oct 2025 08:34:43 +0200
-From: Gabriel Paubert <paubert@iram.es>
-To: Christophe Leroy <christophe.leroy@csgroup.eu>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
-        Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Darren Hart <dvhart@infradead.org>,
-        Davidlohr Bueso <dave@stgolabs.net>,
-        Andre Almeida <andrealmeid@igalia.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Eric Dumazet <edumazet@google.com>,
-        Kuniyuki Iwashima <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>,
-        Willem de Bruijn <willemb@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Madhavan Srinivasan <maddy@linux.ibm.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Nicholas Piggin <npiggin@gmail.com>, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
-Subject: Re: [PATCH v3 10/10] powerpc/uaccess: Implement masked user access
-Message-ID: <aPcpg0lQUk0IhHvL@lt-gp.iram.es>
-References: <cover.1760529207.git.christophe.leroy@csgroup.eu>
- <179dbcda9eb3bdc5d314c949047db6ef8fd8a2ee.1760529207.git.christophe.leroy@csgroup.eu>
+	dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b="HVC87p1a"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazoncorp2;
+  t=1761030552; x=1792566552;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=4aKg8jaea9UUgjVGAZ9pvPl/2rw7Jg81FmzroUsdh8U=;
+  b=HVC87p1aBmQ4gE7O4jCj6ingqjU5/wx1ks+x6YUQxcnxcz7KPdkYbbS6
+   y0y6AgAOA1l0fSqRJzp6YLtPL3bBk+w2Lauh57SSZGBd4rfmq3XL9a9l2
+   mFPvdsmpoAARb7rBeD2K7SGt0N8t7twqpPQMCFdWr2zC86pHJ5FQtHbhT
+   cEvYGqIkY4hpeWaNIdDHpZmEx5kjzNOz4v69Hl6YtS2Gr8IoznIFZLB8J
+   Y5OZZ85SUSbuOufHNLsB7dlJ/vL+9c+mdNMYY1Ck5vPn3hCxfE3r3vAAT
+   84Dtrj753DUrD6Gc307KTN0K1q49/fN/PeWCTu3gGxIqN8yJCoNUNDtaE
+   A==;
+X-CSE-ConnectionGUID: xhZ9wZyxSpmrCzcqqePl8A==
+X-CSE-MsgGUID: 8WykqeV0SPuRFwAH0TlCVw==
+X-IronPort-AV: E=Sophos;i="6.19,244,1754956800"; 
+   d="scan'208";a="3934174"
+Received: from ip-10-6-3-216.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.3.216])
+  by internal-fra-out-004.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Oct 2025 07:08:59 +0000
+Received: from EX19MTAEUA002.ant.amazon.com [54.240.197.232:10631]
+ by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.15.22:2525] with esmtp (Farcaster)
+ id 3750a0e3-50a3-4ee5-985b-1ddb7d86a82d; Tue, 21 Oct 2025 07:08:59 +0000 (UTC)
+X-Farcaster-Flow-ID: 3750a0e3-50a3-4ee5-985b-1ddb7d86a82d
+Received: from EX19D013EUB004.ant.amazon.com (10.252.51.92) by
+ EX19MTAEUA002.ant.amazon.com (10.252.50.124) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
+ Tue, 21 Oct 2025 07:08:58 +0000
+Received: from dev-dsk-mngyadam-1c-cb3f7548.eu-west-1.amazon.com
+ (10.253.107.175) by EX19D013EUB004.ant.amazon.com (10.252.51.92) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20; Tue, 21 Oct 2025
+ 07:08:50 +0000
+From: Mahmoud Adam <mngyadam@amazon.de>
+To: <stable@vger.kernel.org>
+CC: <gregkh@linuxfoundation.org>, <nagy@khwaternagy.com>, Jens Axboe
+	<axboe@kernel.dk>, Xiubo Li <xiubli@redhat.com>, Ilya Dryomov
+	<idryomov@gmail.com>, Jeff Layton <jlayton@kernel.org>, Alexander Viro
+	<viro@zeniv.linux.org.uk>, Theodore Ts'o <tytso@mit.edu>, Andreas Dilger
+	<adilger.kernel@dilger.ca>, Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu
+	<chao@kernel.org>, Christoph Hellwig <hch@infradead.org>, "Darrick J. Wong"
+	<djwong@kernel.org>, Trond Myklebust <trond.myklebust@hammerspace.com>, "Anna
+ Schumaker" <anna@kernel.org>, Ryusuke Konishi <konishi.ryusuke@gmail.com>,
+	"Matthew Wilcox (Oracle)" <willy@infradead.org>, Andrew Morton
+	<akpm@linux-foundation.org>, Hannes Reinecke <hare@suse.de>, Damien Le Moal
+	<dlemoal@kernel.org>, Luis Chamberlain <mcgrof@kernel.org>,
+	<linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<ceph-devel@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
+	<linux-ext4@vger.kernel.org>, <linux-f2fs-devel@lists.sourceforge.net>,
+	<linux-xfs@vger.kernel.org>, <linux-nfs@vger.kernel.org>,
+	<linux-nilfs@vger.kernel.org>, <linux-mm@kvack.org>
+Subject: [PATCH 6.1 0/8] Backporting CVE-2025-38073 fix patch
+Date: Tue, 21 Oct 2025 09:03:35 +0200
+Message-ID: <20251021070353.96705-2-mngyadam@amazon.de>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <179dbcda9eb3bdc5d314c949047db6ef8fd8a2ee.1760529207.git.christophe.leroy@csgroup.eu>
-X-Authority-Analysis: v=2.4 cv=QvxTHFyd c=1 sm=1 tr=0 ts=68f72988 cx=c_pps
- a=N+btqqeLiyZkBSWNmht35Q==:117 a=N+btqqeLiyZkBSWNmht35Q==:17
- a=kj9zAlcOel0A:10 a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=pbnP-CYKNpT2arfVchsA:9 a=CjuIK1q_8ugA:10 a=nl4s5V0KI7Kw-pW0DWrs:22
- a=pHzHmUro8NiASowvMSCR:22 a=xoEH_sTeL_Rfw54TyV31:22
-X-Proofpoint-ORIG-GUID: fPY5OWlvYhbiva90HCVVCXenrvtnOCXX
-X-Proofpoint-GUID: fPY5OWlvYhbiva90HCVVCXenrvtnOCXX
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDIxMDA1MCBTYWx0ZWRfX2lPxlPelhpYO
- fKzNMXsOb4ELb/Gi1Q5qBO8bWlp8UOoMX00pFGk6ILvZghWaahLfwNY1BC8iutNisGPxbYKcfK5
- 4MhDp3/ncePuRlR/rquIly1v6w2VvpjCqmMBBRwbC86Ke4g/JPasy6W84eYdQkoWsP1JdD0GNE4
- 4w8bDukcBTT9KRN2Hwq+ouDLYqLo+b4eLMTzAvpwKaoTlBLi8+9N4ZR0+oAC0aiImf/KfuErwi2
- llnHe09xbNiWeHl8ok/ZcciYVmj2p82Vu/bg1rMmjKvAs9nmCQ94pQWKiv/nqhnpm5gTjuu9ch9
- 08WPk+WA9Fx7B6JEMFzL2tsZJrphM8OT8ykb1U3ruJrsbXfnXvrJZqyBKRtX/wBu7SkUYv7uUd1
- T8qu9FfLEfoIX5vM8kLOIPLSRBhb7Q==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-10-20_07,2025-10-13_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=salida_notspam policy=salida score=0
- spamscore=0 phishscore=0 lowpriorityscore=0 adultscore=0 impostorscore=0
- bulkscore=0 clxscore=1011 priorityscore=1501 suspectscore=0 malwarescore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2510020000 definitions=main-2510210050
+X-ClientProxiedBy: EX19D037UWC004.ant.amazon.com (10.13.139.254) To
+ EX19D013EUB004.ant.amazon.com (10.252.51.92)
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+
+This series aims to fix the CVE-2025-38073 for 6.1 LTS. Which is fixed
+by c0e473a0d226 ("block: fix race between set_blocksize and read
+paths"). This patch is built on top multiple refactors that where
+merged on 6.6. The needed dependecies are:
+
+  - e003f74afbd2 ("filemap: add a kiocb_invalidate_pages helper")
+  - c402a9a9430b ("filemap: add a kiocb_invalidate_post_direct_write
+    helper")
+  - 182c25e9c157 ("filemap: update ki_pos in generic_perform_write")
+  - 44fff0fa08ec ("fs: factor out a direct_write_fallback helper")
+  - 727cfe976758 ("block: open code __generic_file_write_iter for
+    blkdev writes")
+
+Also backport follow up fixes:
+- fb881cd76045 ("nilfs2: fix deadlock warnings caused by lock
+  dependency in init_nilfs()").
+- 8287474aa5ff ("direct_write_fallback(): on error revert the ->ki_pos
+  update from buffered write")
+
+Thanks,
+MNAdam
+
+Al Viro (1):
+  direct_write_fallback(): on error revert the ->ki_pos update from
+    buffered write
+
+Christoph Hellwig (5):
+  filemap: add a kiocb_invalidate_pages helper
+  filemap: add a kiocb_invalidate_post_direct_write helper
+  filemap: update ki_pos in generic_perform_write
+  fs: factor out a direct_write_fallback helper
+  block: open code __generic_file_write_iter for blkdev writes
+
+Darrick J. Wong (1):
+  block: fix race between set_blocksize and read paths
+
+Ryusuke Konishi (1):
+  nilfs2: fix deadlock warnings caused by lock dependency in
+    init_nilfs()
+
+ block/bdev.c            |  17 +++++
+ block/blk-zoned.c       |   5 +-
+ block/fops.c            |  61 +++++++++++++++-
+ block/ioctl.c           |   6 ++
+ fs/ceph/file.c          |   2 -
+ fs/direct-io.c          |  10 +--
+ fs/ext4/file.c          |   9 +--
+ fs/f2fs/file.c          |   1 -
+ fs/iomap/direct-io.c    |  12 +---
+ fs/libfs.c              |  42 +++++++++++
+ fs/nfs/file.c           |   1 -
+ fs/nilfs2/the_nilfs.c   |   3 -
+ include/linux/fs.h      |   7 +-
+ include/linux/pagemap.h |   2 +
+ mm/filemap.c            | 154 +++++++++++++++++-----------------------
+ 15 files changed, 205 insertions(+), 127 deletions(-)
+
+-- 
+2.47.3
 
 
-Hi Christophe,
 
-On Fri, Oct 17, 2025 at 12:21:06PM +0200, Christophe Leroy wrote:
-> Masked user access avoids the address/size verification by access_ok().
-> Allthough its main purpose is to skip the speculation in the
-> verification of user address and size hence avoid the need of spec
-> mitigation, it also has the advantage of reducing the amount of
-> instructions required so it even benefits to platforms that don't
-> need speculation mitigation, especially when the size of the copy is
-> not know at build time.
-> 
-> So implement masked user access on powerpc. The only requirement is
-> to have memory gap that faults between the top user space and the
-> real start of kernel area.
-> 
-> On 64 bits platforms the address space is divided that way:
-> 
-> 	0xffffffffffffffff	+------------------+
-> 				|                  |
-> 				|   kernel space   |
->  		 		|                  |
-> 	0xc000000000000000	+------------------+  <== PAGE_OFFSET
-> 				|//////////////////|
-> 				|//////////////////|
-> 	0x8000000000000000	|//////////////////|
-> 				|//////////////////|
-> 				|//////////////////|
-> 	0x0010000000000000	+------------------+  <== TASK_SIZE_MAX
-> 				|                  |
-> 				|    user space    |
-> 				|                  |
-> 	0x0000000000000000	+------------------+
-> 
-> Kernel is always above 0x8000000000000000 and user always
-> below, with a gap in-between. It leads to a 3 instructions sequence:
-> 
->   20:	7c 69 fe 76 	sradi   r9,r3,63
->   24:	7c 69 48 78 	andc    r9,r3,r9
->   28:	79 23 00 4c 	rldimi  r3,r9,0,1
-> 
 
-Actually there is an even simpler (more obvious) sequence:
-
-sradi r9,r3,63
-srdi r9,r9,1  
-andc r3,r3,r9
-
-(the second instruction could also be clrldi r9,r9,1)
-
-which translates back to C as:
-
-[snipped]
-> +static inline void __user *mask_user_address_simple(const void __user *ptr)
-> +{
-> +	unsigned long addr = (unsigned long)ptr;
-> +	unsigned long sh = BITS_PER_LONG - 1;
-> +	unsigned long mask = (unsigned long)((long)addr >> sh);
-> +
-> +	addr = ((addr & ~mask) & ((1UL << sh) - 1)) | ((mask & 1UL) << sh);
-> +
-> +	return (void __user *)addr;
-> +}
-> +
-
-either (srdi):
-	unsigned long mask = ((unsigned long)((long)addr >> sh)) >> 1;
-or (clrldi):
-	unsigned long mask = (unsigned long)(((long)addr >> sh) & LONG_MAX);
-
-followed by:
-	return (void __user *)(addr & ~ mask);
-
-the result is the same but I find it easier to read, and it may be
-easier for the compiler than to recognize an rl?imi insruction.
-
-Cheers,
-Gabriel
-
- 
+Amazon Web Services Development Center Germany GmbH
+Tamara-Danz-Str. 13
+10243 Berlin
+Geschaeftsfuehrung: Christian Schlaeger
+Eingetragen am Amtsgericht Charlottenburg unter HRB 257764 B
+Sitz: Berlin
+Ust-ID: DE 365 538 597
 
