@@ -1,214 +1,357 @@
-Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazon11010029.outbound.protection.outlook.com [52.101.85.29])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0100346E6B;
-	Tue, 21 Oct 2025 16:56:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.85.29
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761065796; cv=fail; b=cfYk6tMQD7FDRun7cZl9BePJbcqdMxQKra2HYVOigrY3WgYWUteZCjI2xm24KCs88pWJuDvoEZR7op0+RI3TPkY/MpV20lkiDU8chEJKPNyzE8m/jrWXhq1f8LI3zZL18dz/8fJKWEROxyeyyJyVVz5iXF1lbNZ/5DwkgndOAXo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761065796; c=relaxed/simple;
-	bh=9WxzczWAorr3eV7Blh+x+j6bMqlSuRp33bzos0LMQZU=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=PWmQsovG9+Y/QyU5bWKG+3Fe4Ke50yjw/M4HO2HlfpyonhWvx7TLw1OVw6fHlqEzJmVHY8JG/b7UduQ71hCj+HQQ8jfHm2o0iZXhO6pHRxTJ0gj0TiyzrDrxVTiufr1B8ClWf6OXt1eioPN+tp2GUN8cLG49MBn8R1mlMQqQTjc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=dbv3aZJq; arc=fail smtp.client-ip=52.101.85.29
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AED6345CC7
+	for <linux-block@vger.kernel.org>; Tue, 21 Oct 2025 19:16:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1761074191; cv=none; b=OjTgWSIRfAhcAbAT9nuBWxp0dX/sGqZvJrdDHJ+mxYlq2ESrK4KTbTzPK30fTfj3jiRlxiZf38z/5pn27xxAd1MTydokSOYkbgSOFmbY0QeW/v3+ApoFo4uO0wIUJyjHWbtMFFIQW7nfiREiVHUGgmm3sbLF1FHXDd+asSWkUSQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1761074191; c=relaxed/simple;
+	bh=AmReOZCD1x8Sk/N6D5ZiKjTaLrZxSusaJgyBMpGb2Gk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=N6iCBaMRgVLjVU5k0RkoBu9RA7ZikqAE2+bjnaMpHU4xOW/Im0k8jD1WljwmHG6w2qzkwaLlscska6xWB4LocfGT1FLBOb0QCu6Hf7hd01HULd1koAyGaGXcdEvH9YvobjvoZ6OSwWFr5PA/W6PMmrN8esSF3Uff51iPbO6OAmg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ci+QO5QP; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="dbv3aZJq"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=reu1C2uy6kIyKVc4heu9vrqR2u9yFdquwruHHLqIa5x6Fl8EGpIDMNuahXFa8W/MRhFWKaZ70yZhcxmax1jhBcqYp4yoWoZSa7rD3rC9pLyMi6zCf5mLYuhSP6dDwCc5SjTEHrka56Ysc0aNLelD6RqWy/RkMkJ9JN3nFkze3bnjbUgU/UGnv89BZFcmpHYc5NTCI7272cnbhv6S9qTt/Y/MBdvcK/4pcagXeJ+QErjJBVoWLYUbwkxtKWAZ+hHDJFqp7uMz/+wbYttwlGVGWd08e6qS2T7oqv4L2ChJ8pyR6pXQkU4przki1aatKlFxgQ0C7wN2upA23ZEky4ge3g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=rfSQ3KYN9Svf1LKsvKaupMe2fIDEPd1NzoMitly2NLo=;
- b=vrFe2qpNNE7yFmItc8XpZ23TOrxPRKut0P10DYsWU8S9Td8JMUfh+JHIkR0GkN91zJheykRKmBLxG+ZMugRCMWVBPEpMyp4gBkf7l9O34+Xk32THU3ZHeVqywH/9VQb7llVlQHrPcSltMzEkAcqUqFdwOYgnXgyYDQiP9kR6zi1NKNupdiphjBpB/yso630u7srx4z7g7tyn++8VWizL3dpcv76XE20ha5P2Xf9qfRxV2H2vV7nBw5zOijFFD9VbIBE3JCzuvAYvmyUrj/FNRvpd6gzEa3gae2wmdVekQ5nIv84gLKrXljOeUXDPGgurVprRFXFvh1T/1jY+YPvXIA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rfSQ3KYN9Svf1LKsvKaupMe2fIDEPd1NzoMitly2NLo=;
- b=dbv3aZJqGoeDC6dVhryGHf5VMFhMC/bZ1SnnfnKAkV4rzc62rT5jh9L6vjs4IOgbntfCb3sxfm7Hnv6r9cvohOI+LARkjaTu/RXjcXGAt5SwmvohG2Z1ijdkNXPnh5FiYszLItFZtU+eiXAn3k/ikRi3k8aJDGW+l9S5rG5gZ5SYyycjIjM4+dGRgvfFErRRuyEv1fSeLh0YCObmVmHfxrAiXbtEP075O9x6hq1cmRiGFMjTTBlbDJsEzfyUQGgNTh4qmCLGKLWlDMp1UCNgdn5M+xqIt537PIb5rA+k3RVjVxl1wvx4Cet4nCT+vs34ZTM+gH0IZGinqa32PBKPPw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from BY5PR12MB4116.namprd12.prod.outlook.com (2603:10b6:a03:210::13)
- by DS0PR12MB8269.namprd12.prod.outlook.com (2603:10b6:8:fd::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9253.12; Tue, 21 Oct
- 2025 16:56:32 +0000
-Received: from BY5PR12MB4116.namprd12.prod.outlook.com
- ([fe80::81b6:1af8:921b:3fb4]) by BY5PR12MB4116.namprd12.prod.outlook.com
- ([fe80::81b6:1af8:921b:3fb4%4]) with mapi id 15.20.9253.011; Tue, 21 Oct 2025
- 16:56:32 +0000
-Message-ID: <b4ee24a3-0706-47aa-b2ad-0f60f90793ee@nvidia.com>
-Date: Tue, 21 Oct 2025 09:56:21 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: O_DIRECT vs BLK_FEAT_STABLE_WRITES, was Re: [PATCH] btrfs: never
- trust the bio from direct IO
-To: Jan Kara <jack@suse.cz>
-Cc: Matthew Wilcox <willy@infradead.org>,
- Christoph Hellwig <hch@infradead.org>, Qu Wenruo <wqu@suse.com>,
- linux-btrfs@vger.kernel.org, djwong@kernel.org, linux-xfs@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
- linux-mm@kvack.org, martin.petersen@oracle.com, jack@suse.com
-References: <1ee861df6fbd8bf45ab42154f429a31819294352.1760951886.git.wqu@suse.com>
- <aPYIS5rDfXhNNDHP@infradead.org>
- <56o3re2wspflt32t6mrfg66dec4hneuixheroax2lmo2ilcgay@zehhm5yaupav>
- <aPYgm3ey4eiFB4_o@infradead.org>
- <mciqzktudhier5d2wvjmh4odwqdszvbtcixbthiuuwrufrw3cj@5s2ffnffu4gc>
- <aPZOO3dFv61blHBz@casper.infradead.org>
- <xc2orfhavfqaxrmxtsbf4kepglfujjodvhfzhzfawwaxlyrhlb@gammchkzoh2m>
- <a1cffdbd-ba98-4e24-bbb6-298eba40a11e@nvidia.com>
- <6hedspdzoxjtdim7nruoeh5m4mx3xecubf7einzl67jzjmi3er@o54b7v5njwk5>
-Content-Language: en-US
-From: John Hubbard <jhubbard@nvidia.com>
-In-Reply-To: <6hedspdzoxjtdim7nruoeh5m4mx3xecubf7einzl67jzjmi3er@o54b7v5njwk5>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SJ0PR03CA0001.namprd03.prod.outlook.com
- (2603:10b6:a03:33a::6) To BY5PR12MB4116.namprd12.prod.outlook.com
- (2603:10b6:a03:210::13)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ci+QO5QP"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1761074188;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=v0Oe/5HuoWDLpJoIPd3oyR/J28Ecq7NQwP7IC26zECo=;
+	b=Ci+QO5QPd8Qo+xK2fd6MV0f6DE0jcIcWzaymSEq1GFC3txWJ7G0LUsn3DWsKjV2Wy2I2Xr
+	s32CIiDCH3NgU9MgaCU+tyjSoWMYOBbA2VLMEnleupglfp1y4SoFJwtkg0RYCK19SyxlNx
+	9PloNh2x38Q4vLWTKlP95vh+yYQdTSo=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-542-HRIPV6LgPDCbeRjYFokaFA-1; Tue,
+ 21 Oct 2025 15:16:22 -0400
+X-MC-Unique: HRIPV6LgPDCbeRjYFokaFA-1
+X-Mimecast-MFC-AGG-ID: HRIPV6LgPDCbeRjYFokaFA_1761074180
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B79321954224;
+	Tue, 21 Oct 2025 19:16:20 +0000 (UTC)
+Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (unknown [10.6.23.247])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4073330001A7;
+	Tue, 21 Oct 2025 19:16:20 +0000 (UTC)
+Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (localhost [127.0.0.1])
+	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.17.1) with ESMTPS id 59LJGIEH3453173
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Tue, 21 Oct 2025 15:16:18 -0400
+Received: (from bmarzins@localhost)
+	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.18.1/Submit) id 59LJGHSQ3453172;
+	Tue, 21 Oct 2025 15:16:17 -0400
+Date: Tue, 21 Oct 2025 15:16:17 -0400
+From: Benjamin Marzinski <bmarzins@redhat.com>
+To: Martin Wilck <mwilck@suse.com>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Mikulas Patocka <mpatocka@redhat.com>,
+        Mike Snitzer <snitzer@kernel.org>, dm-devel@lists.linux.dev,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH] dm: Fix deadlock when reloading a multipath table
+Message-ID: <aPfcAfn6gsgNLwC7@redhat.com>
+References: <20251009030431.2895495-1-bmarzins@redhat.com>
+ <ed792d72a1ca47937631af6e12098d9a20626bcf.camel@suse.com>
+ <aOg2Yul2Di4Ymom-@redhat.com>
+ <e407b683dceb9516b54cede5624baa399f8fa638.camel@suse.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BY5PR12MB4116:EE_|DS0PR12MB8269:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6b08a5f0-b3ab-4acc-dfce-08de10c2c959
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?aUo0d1hUOHRWbmJNR2ZQM1F0OTZseUVNV016MVRtZkFlME03bkhiNlhxYUxM?=
- =?utf-8?B?TnptQ1c3dGVLNE52U1RJd01kTVBNMW0wWHdDK0lRWVdjcmw1OUpqS0NlRm1i?=
- =?utf-8?B?WmI4aFMxRmV1cUlRekN2OElsdnJQNTFpTUlMM2FzaDB1TjErMk5uS1ptYVB3?=
- =?utf-8?B?elc3dmhacHlMV1RVTDJxU0tRd1MvbStvVmkxdGNCVUFJekd0RWVKenlIdDdm?=
- =?utf-8?B?T3BpTWpPajF4VllRaGw1eDRNRWYrbjJxUnllVEpycHhXY3NtY0Y5ajJ6UUho?=
- =?utf-8?B?dHliVW9CTUh0RnZEcXI1bGphbGsxZy9BMW5lN0MveVEzK05STDZnTlh0UVVx?=
- =?utf-8?B?R29ERDhpRzhIR1VxbHByRTNjRDNSZE1INVJuaWZGY2pFYVFXaGU5M2lhejha?=
- =?utf-8?B?MTgrd3FrV00xRmoyZVlLQ3JMa2ZCbExGVTlHMkRmeU1CTGVDbFpLM2dYSjZa?=
- =?utf-8?B?dFRqcUdnU1RBaTY4dmhlbEJMelVlN2JRSGZBenBXZGRCQmhnbC9tYWgxbHkr?=
- =?utf-8?B?MVJSdTdNRHJVVUkzQ2VzSFh3NWtFRHk0dWREd2JiSjVnSmg0eEFpblZ5ZzJv?=
- =?utf-8?B?M1dMMUFXaDZZa2JUMlRGRDN2UmpKeityK2hXQnFwK095enlxYmIrb2pWYkt3?=
- =?utf-8?B?eEU4dWRZaXpnZ2xoUHhNQ0t2Vmh0SjFob0xCOUpsL28xQ1JsaCtSU2tTbjJV?=
- =?utf-8?B?ZGY0cmVmNHpORFFSVHgxY0hPZHJOSFFqNG52dXg5Y1puVVFJTFVybVV5ZzRt?=
- =?utf-8?B?VVlla0JJMlZMbWo2T1J4M1IydXlMUUx5bUhXdHZtbE1tbmxsR09zbytBSkJM?=
- =?utf-8?B?YUVmZ2l3MGVDT3h3UTBWbHVGaFBieDFMRE1yMEErNlFQZFN3QzEyYnN3RDA2?=
- =?utf-8?B?K2xTY2gyNzRqc2ZudnE4eEpJYVhxREtRU3NLc0E0UzV0QnBwMXllMTY0Z2tM?=
- =?utf-8?B?YS8xQmJaQ2lVUlZjc3FvYUJaNUNKRVlCUFhieGhlNG0xNzRvSWpNTHFTdmtu?=
- =?utf-8?B?OUZGR0x4QjNpKzZWV21rWFBBK2hyNE9EQnMrWk14U3lHWndKSWJOT0ozMEFH?=
- =?utf-8?B?d2l2OVhwTitqVmtxUTUxZmZFY1Q0bCtvbCtzTnFhbWtkTXFYcnFacnYwVjVi?=
- =?utf-8?B?ZlZyQ2ZhWnVVTDQxYU11U1ZrR0ZqK0ZFK2hWZWIwN29GZm5OSGZIL0tEQmxl?=
- =?utf-8?B?SmJaSS9ucVAwNFUyeERuWUpDUzhGZmZJYlFOWHNkRzFuVCt2aUFVbDA3TjZN?=
- =?utf-8?B?TTBoQUM5WGpPSFJ5SlBBM2VMSWtHak04em5ZekpQblI4WGl5VDREYlNHVjVM?=
- =?utf-8?B?NkNEaVFCdzdlQTFJMGtKc1NtQVZSbGd3RHN0aUhPZlJ5T1BmVGp6Z2pIc2s0?=
- =?utf-8?B?WTNvMWovVEZYbGxtUUlXVmhqRmpXT2V1M2lJVXo4WVo5TXRXZDR6R0sydjNB?=
- =?utf-8?B?V0RrRHhBRnlKemtXTHYwaEVzSElkQ3hhSEhtVUNJdzkyVmVEOWw2Z2dTZ29P?=
- =?utf-8?B?WW5zVkg3NjYvZkVwcmM0dGlPdE9nQllUMFhwTDBndk5Wd05ESmtJMmZXVzFY?=
- =?utf-8?B?eGQ2SFlBeEhaUFBxOFhtb2VNbEpnNlkzMTBJUW9rUStyZVJnZVM3UWNDZWhJ?=
- =?utf-8?B?Zk5BMitQSzZKNUhrM3NZVkthZGlRQTQ5ZUVFeEpaZFVBc1JTejB2OWFwYmdn?=
- =?utf-8?B?L3dyZTV6b1F3eVZNbnJlTG40bFRkUlplN1JaV2lCdmxZaDlBeXovWTAyeVBD?=
- =?utf-8?B?NkFWZUoyeHc3c1Q2bXZBNTJQRlVDOGh3N2hsSFA5YXprbTNZcnFRVDlLWkc1?=
- =?utf-8?B?NlMzNVJVUWhZZjFxbDFEd0wwRWt6aFkxbTc0d3hXbVhaY2krQWR2WVdvc1NE?=
- =?utf-8?B?b1VEQVBKNDJaVkRzSFc3WkFtdmVVaDRZN2ZGdkhnZjJiSjBuV1VlUDY4aXhx?=
- =?utf-8?Q?UTkZ57GqhLeDGXgAysbguHFPcFyl8AFP?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY5PR12MB4116.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?RXI1cFVLTVpqQmRtbmVLYmdxbFZJRHFOd2lidCs3Mm5BelRvT3c0bndMczNB?=
- =?utf-8?B?L3dDNjlwakZYUGdzUmFQeVluTUw2clFyOXdOTUlsQ3VWSTZVNFEyeFZDcnYw?=
- =?utf-8?B?YVNva2RQVE5PaTJ5LzE1QXVUcEhFMWVNdU5WYVV5Y253T2VmMVA3ZzJPUDRx?=
- =?utf-8?B?Q1RpbVVqR2ZvbFRRZ1RzcWdPMTFCdlFuSkJ5TDlvamFiZnNjNTRwSHo4SndK?=
- =?utf-8?B?N1gxS2owTHM0anhGVngwQStTcUxwTWoxUUI5V3dIMDVPdE03c0Ftc2QzdnE5?=
- =?utf-8?B?MUtWaXlSVFFySTdwdXhaemlGdGdzbVUxTzREWmd3WGlzaE5oVlZDODVPaFg3?=
- =?utf-8?B?SHhiUmF2aktJR2FreGJHNzI3ZmJOOXJYSnF0Q2N3QnRxK2I5djNuR3o3eW9F?=
- =?utf-8?B?NkJYNXhHUC9TV3RIbFRwU1p4WHUzKy9FS3pVek9jTDZmb2Y5OE5wNmp1TlhQ?=
- =?utf-8?B?djdBQmdaOVpLbDVObW5MOGpBZnlrZWE5UWRkWVFCZlcxbWJva3RxUFJSNGQw?=
- =?utf-8?B?aENaUWZhMEhpQlpZRU5IWTZseHFpZGdTYTMycGo1WEQvVDFDaXh1b0ZibVFT?=
- =?utf-8?B?ZnBoeUhIMEg2czE1ZkFtZ1BlZjZHQU9JeUVQTnZmNm5mblpKR1RFQW9rcm9G?=
- =?utf-8?B?RnhOdlpFTzBJVmZkd1VUL2RMc2dZR3k5ZTZSN3gydHhLbXdxSXRIL0JqL1lz?=
- =?utf-8?B?YVRLSXZnWlhGa3RZZTlvaXhZNE10aTRCOVpBQTIvdzQvZnVET0w0S3hSbzJQ?=
- =?utf-8?B?T2ttZTNuSThTYkxhbGIwRnl1Q25JUThYOU9EcEQ1cm1odmc2N0pmLzVUbVRu?=
- =?utf-8?B?Q3ZMbTVGY1ZiZHhSWCtWSnI4dVdIMUl4MjZPcDlXanJyUUtpaXdZcTVIaWsv?=
- =?utf-8?B?Y0dUcHcrQjZvRHFESXJiOElOK2Z4QVRqNzlkVVJFTHpCVURWcUJNV3dXQjZy?=
- =?utf-8?B?cWFIcVVZa0lxV2lZbjVoajkwV2hzZmdJcFFZTTU5S09lejM2T2QvMzV2cWhB?=
- =?utf-8?B?VlNuOFlCT2lYa05rKzhVVitJbHF3dGo2KzdweU8yRW1yMEZ4Ujk2NWw4MUxQ?=
- =?utf-8?B?bmlrSGRQem9jdjZQZ2oxdTdReVo5QmdkdXM2SmI5czU3SEZkc2swUWlkZGFa?=
- =?utf-8?B?WElDeE5FQzJOUnhDa1dSaTVtOUlBdU9oWW9PYTVOUk9DK01haGVLc0xNd1h5?=
- =?utf-8?B?ZXJ5aWVadEFkV0VBWEY4aEM2NkNWOXNNMk1xZ0sxTTkvaGFPejR3bDRpZFRE?=
- =?utf-8?B?NlFKM0MwdHcydmlFL1ZIYlcrYW5wWmdDRGQ2SXduR3JpcWZJUU1SWmNWbUEz?=
- =?utf-8?B?K3JNREUzY2p6SGszOVkvRlU4WVVqeUdkclRpTUV3Nm1VaUVoN2RhNWcwVG1h?=
- =?utf-8?B?MHVnY2dsNDNoeTZERG9veU82N3JacDlDWE1OZThacThHQVZIWC9yTUFHOTVF?=
- =?utf-8?B?TmI0Znc0c0xzc2gwbkEzU1RDTU5OWXZOWExjZHF1Qmo4WmplR2dXeWZUa2tM?=
- =?utf-8?B?VDNpck9HenFxZ1l6Zk43SFRkTnc3a1E1YWE1TWVYL0Ixa1Rna09qaHBTMUFv?=
- =?utf-8?B?Sm5TczNrem1oeXlkTDdvV0QzVVpTaWtZc3BHN3pacW41T1Y0U2t0bGJJbEx4?=
- =?utf-8?B?TkI4NytlR2dKbmhGMktETjcwaVV2ZEZ4M0J6YjhyN2xCRlovNjIwSjF6S0hY?=
- =?utf-8?B?TDR0NjNwdDBEOVJjTE9aRmx2NXNaa2Zzb2lRV2srTlNvQU44elJ4S1dVYkg5?=
- =?utf-8?B?UWtHZ0pDbEdVL3NmSUY2d0xYTk5iaE5TQWd0c0wyYzRKKzJGSnUyQW5HM0s1?=
- =?utf-8?B?L3c1MHlWb0t5NzE4SG4wM2pTUzZ6aWxpWXJQRDhPc25MSDJuVzBab0JkUzlL?=
- =?utf-8?B?UlFaQkoxQk1uUmNicXpSZzJVRlkxRGpscVBlbmFGMDhkVVFtT0xTMjYxS3h0?=
- =?utf-8?B?cXZJanlrUWZzNzBHWjVSRDVZYlk4VlBzR1VtYW10ZWQzRjZtUmJWVnZBazlP?=
- =?utf-8?B?dXExZkRabC8zUTdLYUVaSHNleW9mcHV3T2NGYlRnTDNMak5tTlVwZllOYUJj?=
- =?utf-8?B?L05GcXEzMWdvYkZlVEYvZHRmYlNlV0hTdmo5c24xTTZmcTEva3lGMktCMmx2?=
- =?utf-8?Q?GnC5mC3zrtmN9CRWeiDR2VTLh?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6b08a5f0-b3ab-4acc-dfce-08de10c2c959
-X-MS-Exchange-CrossTenant-AuthSource: BY5PR12MB4116.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Oct 2025 16:56:32.2490
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: zArwNjirOciO0eme4YIyrrByAyT06FwRoqTpfINiW3KQR2jUwUuVtf0DWd9irBxQrGqSdlmP+Bh8jtmfekKGmQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8269
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <e407b683dceb9516b54cede5624baa399f8fa638.camel@suse.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On 10/21/25 1:27 AM, Jan Kara wrote:
-> On Mon 20-10-25 10:55:06, John Hubbard wrote:
->> On 10/20/25 8:58 AM, Jan Kara wrote:
->>> On Mon 20-10-25 15:59:07, Matthew Wilcox wrote:
->>>> On Mon, Oct 20, 2025 at 03:59:33PM +0200, Jan Kara wrote:
->>>>> The idea was to bounce buffer the page we are writing back in case we spot
->>>>> a long-term pin we cannot just wait for - hence bouncing should be rare.
->>>>> But in this more general setting it is challenging to not bounce buffer for
->>>>> every IO (in which case you'd be basically at performance of RWF_DONTCACHE
->>>>> IO or perhaps worse so why bother?). Essentially if you hand out the real
->>>>> page underlying the buffer for the IO, all other attemps to do IO to that
->>>>> page have to block - bouncing is no longer an option because even with
->>>>> bouncing the second IO we could still corrupt data of the first IO once we
->>>>> copy to the final buffer. And if we'd block waiting for the first IO to
->>>>> complete, userspace could construct deadlock cycles - like racing IO to
->>>>> pages A, B with IO to pages B, A. So far I'm not sure about a sane way out
->>>>> of this...
->>>>
->>>> There isn't one.  We might have DMA-mapped this page earlier, and so a
->>>> device could write to it at any time.  Even if we remove PTE write
->>>> permissions ...
->>>
->>> True but writes through DMA to the page are guarded by holding a page pin
->>> these days so we could in theory block getting another page pin or mapping
->>
->> Do you mean, "setting up to do DMA is guarded by holding a FOLL_LONGTERM
->> page pin"? Or something else (that's new to me)?
+On Fri, Oct 10, 2025 at 12:19:51PM +0200, Martin Wilck wrote:
+> On Thu, 2025-10-09 at 18:25 -0400, Benjamin Marzinski wrote:
+> > On Thu, Oct 09, 2025 at 11:57:08AM +0200, Martin Wilck wrote:
+> > > On Wed, 2025-10-08 at 23:04 -0400, Benjamin Marzinski wrote:
+> > > > Request-based devices (dm-multipath) queue I/O in blk-mq on
+> > > > noflush
+> > > > suspends. Any queued IO will make it impossible to freeze the
+> > > > queue.
+> > > > If
+> > > > a process attempts to update the queue limits while there is
+> > > > queued
+> > > > IO,
+> > > > it can be get stuck holding the limits lock, while unable to
+> > > > freeze
+> > > > the
+> > > > queue. If device-mapper then attempts to update the limits during
+> > > > a
+> > > > table swap, it will deadlock trying to grab the limits lock while
+> > > > making
+> > > > it impossible to flush the IO.
+> > > > 
+> > > > Disallow updating the queue limits during a table swap, when
+> > > > updating
+> > > > an
+> > > > immutable request-based dm device (dm-multipath) during a noflush
+> > > > suspend. It is userspace's responsibility to make sure that the
+> > > > new
+> > > > table uses the same limits as the existing table if it asks for a
+> > > > noflush suspend.
+> > > > 
+> > > > Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
+> > > > ---
+> > > >  drivers/md/dm-table.c |  4 ++++
+> > > >  drivers/md/dm-thin.c  |  7 ++-----
+> > > >  drivers/md/dm.c       | 35 +++++++++++++++++++++++------------
+> > > >  3 files changed, 29 insertions(+), 17 deletions(-)
+> > > > 
+> > > > diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
+> > > > index ad0a60a07b93..0522cd700e0e 100644
+> > > > --- a/drivers/md/dm-table.c
+> > > > +++ b/drivers/md/dm-table.c
+> > > > @@ -2043,6 +2043,10 @@ bool dm_table_supports_size_change(struct
+> > > > dm_table *t, sector_t old_size,
+> > > >  	return true;
+> > > >  }
+> > > >  
+> > > > +/*
+> > > > + * This function will be skipped by noflush reloads of immutable
+> > > > request
+> > > > + * based devices (dm-mpath).
+> > > > + */
+> > > >  int dm_table_set_restrictions(struct dm_table *t, struct
+> > > > request_queue *q,
+> > > >  			      struct queue_limits *limits)
+> > > >  {
+> > > > diff --git a/drivers/md/dm-thin.c b/drivers/md/dm-thin.c
+> > > > index c84149ba4e38..6f98936f0e05 100644
+> > > > --- a/drivers/md/dm-thin.c
+> > > > +++ b/drivers/md/dm-thin.c
+> > > > @@ -4383,11 +4383,8 @@ static void thin_postsuspend(struct
+> > > > dm_target
+> > > > *ti)
+> > > >  {
+> > > >  	struct thin_c *tc = ti->private;
+> > > >  
+> > > > -	/*
+> > > > -	 * The dm_noflush_suspending flag has been cleared by
+> > > > now,
+> > > > so
+> > > > -	 * unfortunately we must always run this.
+> > > > -	 */
+> > > > -	noflush_work(tc, do_noflush_stop);
+> > > > +	if (dm_noflush_suspending(ti))
+> > > > +		noflush_work(tc, do_noflush_stop);
+> > > >  }
+> > > >  
+> > > >  static int thin_preresume(struct dm_target *ti)
+> > > > diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+> > > > index 3ede5ba4cf7e..87e65c48dd04 100644
+> > > > --- a/drivers/md/dm.c
+> > > > +++ b/drivers/md/dm.c
+> > > > @@ -2439,7 +2439,6 @@ static struct dm_table *__bind(struct
+> > > > mapped_device *md, struct dm_table *t,
+> > > >  {
+> > > >  	struct dm_table *old_map;
+> > > >  	sector_t size, old_size;
+> > > > -	int ret;
+> > > >  
+> > > >  	lockdep_assert_held(&md->suspend_lock);
+> > > >  
+> > > > @@ -2454,11 +2453,13 @@ static struct dm_table *__bind(struct
+> > > > mapped_device *md, struct dm_table *t,
+> > > >  
+> > > >  	set_capacity(md->disk, size);
+> > > >  
+> > > > -	ret = dm_table_set_restrictions(t, md->queue, limits);
+> > > > -	if (ret) {
+> > > > -		set_capacity(md->disk, old_size);
+> > > > -		old_map = ERR_PTR(ret);
+> > > > -		goto out;
+> > > > +	if (limits) {
+> > > > +		int ret = dm_table_set_restrictions(t, md-
+> > > > >queue,
+> > > > limits);
+> > > > +		if (ret) {
+> > > > +			set_capacity(md->disk, old_size);
+> > > > +			old_map = ERR_PTR(ret);
+> > > > +			goto out;
+> > > > +		}
+> > > >  	}
+> > > >  
+> > > >  	/*
+> > > > @@ -2836,6 +2837,7 @@ static void dm_wq_work(struct work_struct
+> > > > *work)
+> > > >  
+> > > >  static void dm_queue_flush(struct mapped_device *md)
+> > > >  {
+> > > > +	clear_bit(DMF_NOFLUSH_SUSPENDING, &md->flags);
+> > > >  	clear_bit(DMF_BLOCK_IO_FOR_SUSPEND, &md->flags);
+> > > >  	smp_mb__after_atomic();
+> > > >  	queue_work(md->wq, &md->work);
+> > > > @@ -2848,6 +2850,7 @@ struct dm_table *dm_swap_table(struct
+> > > > mapped_device *md, struct dm_table *table)
+> > > >  {
+> > > >  	struct dm_table *live_map = NULL, *map = ERR_PTR(-
+> > > > EINVAL);
+> > > >  	struct queue_limits limits;
+> > > > +	bool update_limits = true;
+> > > >  	int r;
+> > > >  
+> > > >  	mutex_lock(&md->suspend_lock);
+> > > > @@ -2856,20 +2859,31 @@ struct dm_table *dm_swap_table(struct
+> > > > mapped_device *md, struct dm_table *table)
+> > > >  	if (!dm_suspended_md(md))
+> > > >  		goto out;
+> > > >  
+> > > > +	/*
+> > > > +	 * To avoid a potential deadlock locking the queue
+> > > > limits,
+> > > > disallow
+> > > > +	 * updating the queue limits during a table swap, when
+> > > > updating an
+> > > > +	 * immutable request-based dm device (dm-multipath)
+> > > > during a
+> > > > noflush
+> > > > +	 * suspend. It is userspace's responsibility to make
+> > > > sure
+> > > > that the new
+> > > > +	 * table uses the same limits as the existing table, if
+> > > > it
+> > > > asks for a
+> > > > +	 * noflush suspend.
+> > > > +	 */
+> > > > +	if (dm_request_based(md) && md->immutable_target &&
+> > > > +	    __noflush_suspending(md))
+> > > > +		update_limits = false;
+> > > >  	/*
+> > > >  	 * If the new table has no data devices, retain the
+> > > > existing
+> > > > limits.
+> > > >  	 * This helps multipath with queue_if_no_path if all
+> > > > paths
+> > > > disappear,
+> > > >  	 * then new I/O is queued based on these limits, and
+> > > > then
+> > > > some paths
+> > > >  	 * reappear.
+> > > >  	 */
+> > > > -	if (dm_table_has_no_data_devices(table)) {
+> > > > +	else if (dm_table_has_no_data_devices(table)) {
+> > > >  		live_map = dm_get_live_table_fast(md);
+> > > >  		if (live_map)
+> > > >  			limits = md->queue->limits;
+> > > >  		dm_put_live_table_fast(md);
+> > > >  	}
+> > > >  
+> > > > -	if (!live_map) {
+> > > > +	if (update_limits && !live_map) {
+> > > >  		r = dm_calculate_queue_limits(table, &limits);
+> > > >  		if (r) {
+> > > >  			map = ERR_PTR(r);
+> > > > @@ -2877,7 +2891,7 @@ struct dm_table *dm_swap_table(struct
+> > > > mapped_device *md, struct dm_table *table)
+> > > >  		}
+> > > >  	}
+> > > >  
+> > > > -	map = __bind(md, table, &limits);
+> > > > +	map = __bind(md, table, update_limits ? &limits : NULL);
+> > > >  	dm_issue_global_event();
+> > > >  
+> > > >  out:
+> > > > @@ -2930,7 +2944,6 @@ static int __dm_suspend(struct
+> > > > mapped_device
+> > > > *md, struct dm_table *map,
+> > > >  
+> > > >  	/*
+> > > >  	 * DMF_NOFLUSH_SUSPENDING must be set before presuspend.
+> > > > -	 * This flag is cleared before dm_suspend returns.
+> > > >  	 */
+> > > >  	if (noflush)
+> > > >  		set_bit(DMF_NOFLUSH_SUSPENDING, &md->flags);
+> > > > @@ -2993,8 +3006,6 @@ static int __dm_suspend(struct
+> > > > mapped_device
+> > > > *md, struct dm_table *map,
+> > > >  	if (!r)
+> > > >  		set_bit(dmf_suspended_flag, &md->flags);
+> > > >  
+> > > > -	if (noflush)
+> > > > -		clear_bit(DMF_NOFLUSH_SUSPENDING, &md->flags);
+> > > >  	if (map)
+> > > >  		synchronize_srcu(&md->io_barrier);
+> > > 
+> > > This moves the clear_bit() behind synchronize_rcu(). Is that safe?
+> > 
+> > It's not just moved behind the synchronize_rcu().
+> > DMF_NOFLUSH_SUSPENDING
+> > is now set for the entire time the device is suspended. If people
+> > would
+> > like, I'll update the patch to rename it to DMF_NOFLUSH_SUSPEND.
 > 
-> I meant to say that users that end up setting up DMA to a page also hold a
-> page pin (either longterm for RDMA and similar users or shortterm for
-> direct IO). Do you disagree?
+> Right. I realize now that there's a smp_mb__after_atomic() in
+> dm_queue_flush().
 > 
-> 								Honza
+> > I did check to see if holding it for the entire suspend would cause
+> > issues, but I didn't see any case where it would. If I missed a 
+> > case where __noflush_suspending() should only return true if we are
+> > actually in the process of suspending, I can easily update that
+> > function to do that.
+> 
+> If this is necessary, I agree that the flag an related function should
+> be renamed. But there are already generic DM flags to indicate that a
+> queue is suspend*ed*. Perhaps, instead of changing the semantics of
+> DMF_NOFLUSH_SUSPENDING, it would make more sense to test 
+> 
+>   (__noflush_suspending || test_bit(DMF_BLOCK_IO_FOR_SUSPEND)
+> 
+> in dm_swap_table()?
 
-Completely agree. I see what you have in mind now. I was hung up on
-the "page pins won't prevent DMA from happening, once it is set up"
-point, but your idea is to detect that that is already set up, and
-make decisions from there...that part I get now.
+Won't we ALWAYS be suspended when we are in dm_swap_table()? We do need
+to refresh the limits in some cases (the cases where multipath-tools
+currently reloads the table without setting noflush). What we need to
+know is "is this table swap happening in a noflush suspend, where
+userspace understands that it can't modify the device table in a way
+that would change the limits". For multipath, this is almost always the
+case. 
 
+> 
+> Anyway, I am still not convinced that we want to have this specific
+> exception for multipath only.
 
-thanks,
--- 
-John Hubbard
+I agree that Bart's solution looks better to me, if it can get in.
+ 
+> > > In general, I'm wondering whether we need a more generic solution
+> > > to
+> > > this problem. Therefore I've added linux-block to cc.
+> > > 
+> > > The way I see it, if a device has queued IO without any means to
+> > > perform the IO, it can't be frozen. We'd either need to fail all
+> > > queued
+> > > IO in this case, or refuse attempts to freeze the queue.
+> > 
+> > In general, it's perfectly normal to start freezing the queue while
+> > there are still outstanding requests.
+> 
+> Sure, but my point was "without any means to perform the IO". As you
+> pointed out yourself, a freeze attempt in this situation would get
+> stuck.
+> 
+> I find Bart's approach very attractive; freezing might not be necessary
+> at all in that case. We'dd just need to avoid a race where paths get
+> reinstated while the operation that would normally have required a
+> freeze is ongoing.
+
+I agree. Even just the timing out of freezes, his
+"[PATCH 2/3] block: Restrict the duration of sysfs attribute changes"
+would be enough to keep this from deadlocking the system.
+
+-Ben
+
+> Martin
 
