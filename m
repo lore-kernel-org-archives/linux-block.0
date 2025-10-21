@@ -1,141 +1,188 @@
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx07-006a4e02.pphosted.com (mx07-006a4e02.pphosted.com [143.55.146.78])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3413E1DD9AD
-	for <linux-block@vger.kernel.org>; Tue, 21 Oct 2025 06:21:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB942224245;
+	Tue, 21 Oct 2025 06:55:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.55.146.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761027711; cv=none; b=ojcjDluwPOFXkHG0Bphb5SuNdJFZd9haAd3vgcOVT4lg/g0Oi72JlqQMrhtS9RvQcV7VA+XtDT803lxXXPUR72C+dR93/FH/qGILKaQCfIqUQtcKFaGmBJj2Mbv3RLWGHSW940SMtPsFDaZjrZzcUwjU8fwSjQnh/yNVIrCKYyA=
+	t=1761029728; cv=none; b=LoaORVwXEiIWmDRcwdCLQvBTfkV5M5Z9g24NmgjPEK2Zty+gjH8uhpDDwxDdmJu30rsB02cLwuqV9Yv8wyf8zNSTRQJIB3WlIJKLHpJB8DxrZDEJVIKulnL1Dl8rTGh0M84VLTQhEI2WajVPra76MvzrB2rYRrhmDvpgb5EmcZo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761027711; c=relaxed/simple;
-	bh=dZkozO8XQpdvjUFyuS+7gnOquHi4UayCDzsqXQhtNTM=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=YBUR/wY+CrbHPziNDM8EjQIrDdInHCflVaMnNziUnSc/lnjjfVqddFP2vb1QPef2odg0gTtdJORJJLg2vDDVymt3bSDq+ROqRtOsbAl59ti/xk9ir0e6dc9mBHug3nCClYmZyewfHPK9cY9Jkr6PuCzzTu9uUvEaYKnWQ+fbAb4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bkkJsVvK; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1761029728; c=relaxed/simple;
+	bh=HMGdk3I075bK5E/gp9SATIQq1qBXSq91Oir+DGivIiE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=E4fJ1vz/dMDfZ6fSERaYY86VUJyd1zbs/JlufaBjMqwZtOCBcMuvtWZXNH/wU8npIikjJYARc+G0CaXmV8B4BtBYYWPV0+SpcepLT4PU/9Tosrw2JyTPv4fTAJAcr7PVwylij9e1uUFKDwQT7wKou/qhGJCkHtTv96Olwi13Jkw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=iram.es; spf=pass smtp.mailfrom=iram.es; dkim=pass (2048-bit key) header.d=iram.es header.i=@iram.es header.b=YpYVuGBx; arc=none smtp.client-ip=143.55.146.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=iram.es
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iram.es
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bkkJsVvK"
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2699ef1b4e3so9122845ad.0
-        for <linux-block@vger.kernel.org>; Mon, 20 Oct 2025 23:21:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761027709; x=1761632509; darn=vger.kernel.org;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=HQlJPMwH7nXKBtlf8BayDPI5AZLW0pym1gUfIZRSMBg=;
-        b=bkkJsVvKdR/rIwtEKElyk4tkPoGo6sqyo/cl1+TmwRdmg5kwkL6//oFq6uznK7+yyM
-         9LDctKkgekmjmlSds0JW0GVT4LffEQfdDUHxpb03nFrZ2gAHp+CH7EKEZhQnq94ZnFTC
-         PJbN+trSGn03bx8yXTFWdB33FcQzKEQAeER/SFiEv510kMP2FoBc2BbGrEb9E/UThcI8
-         wdA8f5+3wy4f2F6l37LZvoHISrW01RXi90MPTz1Ii62cxv4oAIb85WMnxEMO3yvFjyi4
-         BIVzGmnMeBqwalFj8O5VEC/4SzlXZvLdsuP2TW4tNTvjDNfKdpPdUHwZPiz5UvrMx4sW
-         H4jg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761027709; x=1761632509;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=HQlJPMwH7nXKBtlf8BayDPI5AZLW0pym1gUfIZRSMBg=;
-        b=K1VoDsFIy9M6V69hkiX03S2jfsYJmWYKso84SYzKQ3olqoE1rLhDuDiDOHX60B8Xqr
-         w1nqbAj558nmIa1w5yRAqHmcCW1sqrbGmeughjLQBEsSe+qWnEWWzUzbkefPqN8HhsT3
-         bgQdF36LoTEASk3JNkRISa0FViSOZGt1BZyuuMnKu0hQJW3s2BujplpUf+pVsvnzvvXw
-         U748JkiLYvUx7GULaxZbkgmT+p20rD9X+a+W1636MaXcDlSd9fA+rz+UMHygjLf0aRa0
-         jjeokbO0j0ovwONpVIfzEMXCpBDh1Qp4Q2keb5XAK7RBCYpOh6kAngAKxKgm+LTqgq1Q
-         DumA==
-X-Gm-Message-State: AOJu0YxwuvhLW5gm1OZnjpKrO5kao0zDuk2mVspRmTMlMn9Xts3apgQk
-	HIBE3wStFupVlBk/yQXbif1zqTSFOfhosV/fHzttXwz5IRSbfayuPhqg
-X-Gm-Gg: ASbGncswvkSrijZ25+vql3gEGaxXP/OCjKGET9U/x5OqNPcneaAVXv7iBZy73Qf3eW8
-	EZCcgEhQHCZrh4Pxl8Z9QlVnWqOo0N4/+p1lmeMu9MZs1jN+PncnnHxjYB+LRC7Hl7dqk4e8p/z
-	3dNrcUmQcI+n6XOHhxhclVcnxp9nz6+UBVn+ukG1LYa1gpUVsJTWioWehzT4+5BU14tHX+CU+CX
-	CNq1MHvM7endVvqLK170NiPUILSwA23DRUkXZrqr0gEZPiljzoCB88IKxHD0v38c0p2kiOXMIp3
-	C5KB2wfxWYpEQfWyUoQ5rROCw2yoAm5ZL5Evd5AO/t21pTarRwpKgVexBX9ZDIcaEqAKBSEVcZR
-	OH0foesYA9QlULNEvhJhFUfOcI8vhLO7h1S7TjOFvM+0qegCcACuG8y1adUuYFGEM8Ijpx6Osk/
-	51AVFlpVAgD0V7cxWhrm2uj/zqUDW6Bon9CZTEsU5PRzw/pK5IDBDm
-X-Google-Smtp-Source: AGHT+IFnYKU1IWC3pFF4gig1+6sBxnYeOxYc6mKh5U5SUBS7wKSrjBE45ao1Z4z/gFoNYWrq+4Y5Ag==
-X-Received: by 2002:a17:902:cecb:b0:258:a3a1:9aa5 with SMTP id d9443c01a7336-290c9ae1a2emr116032215ad.0.1761027709371;
-        Mon, 20 Oct 2025 23:21:49 -0700 (PDT)
-Received: from [127.0.1.1] ([2401:4900:c8fb:fb07:ee78:675f:132b:f68f])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29246fd7675sm99312855ad.26.2025.10.20.23.21.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Oct 2025 23:21:48 -0700 (PDT)
-From: Ranganath V N <vnranganath.20@gmail.com>
-Date: Tue, 21 Oct 2025 11:51:42 +0530
-Subject: [PATCH] drivers: block: rnbd: Handle generic ERR_PTR returns
- safely in find_and_get_or_create_sess()
+	dkim=pass (2048-bit key) header.d=iram.es header.i=@iram.es header.b="YpYVuGBx"
+Received: from pps.filterd (m0316690.ppops.net [127.0.0.1])
+	by mx07-006a4e02.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 59L63AQs1248592;
+	Tue, 21 Oct 2025 08:34:48 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iram.es; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=dkim3; bh=F164kmUr5EMZ6e+BTntGiD39zV8R
+	xXZwoRaGnCHEUKE=; b=YpYVuGBxuCwNJOQ3pBoy4A9ND5k7mRQOc+KGKrd42ih8
+	OAXsKtgh51RKxIBPRqYFZZhxoqsJDsHSjdT+uBjxoUEETInGL/mkVbpDNQSh0jTi
+	AINogUjyNJYUKHNOvirHoJmCRTw0E0AGyG1mEh2hfTH9ypTfEajsFBmTzWEW6AcI
+	3cDOIJXKeNn4+YDr1ZUiqzADvthene2bFu72cXBErZFkYhcAwTd24ZD9nwGwRTu/
+	6/0YkK7nru8rVpz30c/b25h17gRRIVulAV1foZlV1gIXNsVELI9YAVooBm+XaTJL
+	kaMRQ+ZSe2o1We13qnamNjH/qaU+Hcfl/guzkqy5Wg==
+Received: from mta-out02.sim.rediris.es (mta-out02.sim.rediris.es [130.206.24.44])
+	by mx07-006a4e02.pphosted.com (PPS) with ESMTPS id 49wrkpfknq-1
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Tue, 21 Oct 2025 08:34:47 +0200 (MEST)
+Received: from mta-out02.sim.rediris.es (localhost.localdomain [127.0.0.1])
+	by mta-out02.sim.rediris.es (Postfix) with ESMTPS id 15B3914009E;
+	Tue, 21 Oct 2025 08:34:47 +0200 (CEST)
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mta-out02.sim.rediris.es (Postfix) with ESMTP id DF9E7140FAD;
+	Tue, 21 Oct 2025 08:34:46 +0200 (CEST)
+X-Amavis-Modified: Mail body modified (using disclaimer) -
+ mta-out02.sim.rediris.es
+Received: from mta-out02.sim.rediris.es ([127.0.0.1])
+ by localhost (mta-out02.sim.rediris.es [127.0.0.1]) (amavis, port 10026)
+ with ESMTP id 9cGW7RgyfRah; Tue, 21 Oct 2025 08:34:46 +0200 (CEST)
+Received: from lt-gp.iram.es (haproxy01.sim.rediris.es [130.206.24.69])
+	by mta-out02.sim.rediris.es (Postfix) with ESMTPA id 2DFB114009E;
+	Tue, 21 Oct 2025 08:34:45 +0200 (CEST)
+Date: Tue, 21 Oct 2025 08:34:43 +0200
+From: Gabriel Paubert <paubert@iram.es>
+To: Christophe Leroy <christophe.leroy@csgroup.eu>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+        Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Darren Hart <dvhart@infradead.org>,
+        Davidlohr Bueso <dave@stgolabs.net>,
+        Andre Almeida <andrealmeid@igalia.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Eric Dumazet <edumazet@google.com>,
+        Kuniyuki Iwashima <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>,
+        Willem de Bruijn <willemb@google.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Madhavan Srinivasan <maddy@linux.ibm.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Nicholas Piggin <npiggin@gmail.com>, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+Subject: Re: [PATCH v3 10/10] powerpc/uaccess: Implement masked user access
+Message-ID: <aPcpg0lQUk0IhHvL@lt-gp.iram.es>
+References: <cover.1760529207.git.christophe.leroy@csgroup.eu>
+ <179dbcda9eb3bdc5d314c949047db6ef8fd8a2ee.1760529207.git.christophe.leroy@csgroup.eu>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20251021-rnbd_fix-v1-1-71559ee26e2b@gmail.com>
-X-B4-Tracking: v=1; b=H4sIAHUm92gC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
- vPSU3UzU4B8JSMDI1NDAyND3aK8pJT4tMwKXcskE3OLtCRTIxMDYyWg8oKiVKAw2Kjo2NpaAAu
- FoCdaAAAA
-To: "Md. Haris Iqbal" <haris.iqbal@ionos.com>, 
- Jack Wang <jinpu.wang@ionos.com>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
- skhan@linuxfoundation.org, david.hunter.linux@gmail.com, khalid@kernel.org, 
- linux-kernel-mentees@lists.linuxfoundation.org, 
- Ranganath V N <vnranganath.20@gmail.com>
-X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1761027705; l=1897;
- i=vnranganath.20@gmail.com; s=20250816; h=from:subject:message-id;
- bh=dZkozO8XQpdvjUFyuS+7gnOquHi4UayCDzsqXQhtNTM=;
- b=8QUpn5dec1JVYKDwU5Xa1XxbcjpL/7KR847ZaE/4RWlNjTTdoPSifgcOluNBdI7zuQwTPonq4
- Lg9bICQrhrcCzpXhzvyxmrDrJeId3eud/lrfZjDvtA7HsqesYfvmus+
-X-Developer-Key: i=vnranganath.20@gmail.com; a=ed25519;
- pk=7mxHFYWOcIJ5Ls8etzgLkcB0M8/hxmOh8pH6Mce5Z1A=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <179dbcda9eb3bdc5d314c949047db6ef8fd8a2ee.1760529207.git.christophe.leroy@csgroup.eu>
+X-Authority-Analysis: v=2.4 cv=QvxTHFyd c=1 sm=1 tr=0 ts=68f72988 cx=c_pps
+ a=N+btqqeLiyZkBSWNmht35Q==:117 a=N+btqqeLiyZkBSWNmht35Q==:17
+ a=kj9zAlcOel0A:10 a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=pbnP-CYKNpT2arfVchsA:9 a=CjuIK1q_8ugA:10 a=nl4s5V0KI7Kw-pW0DWrs:22
+ a=pHzHmUro8NiASowvMSCR:22 a=xoEH_sTeL_Rfw54TyV31:22
+X-Proofpoint-ORIG-GUID: fPY5OWlvYhbiva90HCVVCXenrvtnOCXX
+X-Proofpoint-GUID: fPY5OWlvYhbiva90HCVVCXenrvtnOCXX
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDIxMDA1MCBTYWx0ZWRfX2lPxlPelhpYO
+ fKzNMXsOb4ELb/Gi1Q5qBO8bWlp8UOoMX00pFGk6ILvZghWaahLfwNY1BC8iutNisGPxbYKcfK5
+ 4MhDp3/ncePuRlR/rquIly1v6w2VvpjCqmMBBRwbC86Ke4g/JPasy6W84eYdQkoWsP1JdD0GNE4
+ 4w8bDukcBTT9KRN2Hwq+ouDLYqLo+b4eLMTzAvpwKaoTlBLi8+9N4ZR0+oAC0aiImf/KfuErwi2
+ llnHe09xbNiWeHl8ok/ZcciYVmj2p82Vu/bg1rMmjKvAs9nmCQ94pQWKiv/nqhnpm5gTjuu9ch9
+ 08WPk+WA9Fx7B6JEMFzL2tsZJrphM8OT8ykb1U3ruJrsbXfnXvrJZqyBKRtX/wBu7SkUYv7uUd1
+ T8qu9FfLEfoIX5vM8kLOIPLSRBhb7Q==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-10-20_07,2025-10-13_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=salida_notspam policy=salida score=0
+ spamscore=0 phishscore=0 lowpriorityscore=0 adultscore=0 impostorscore=0
+ bulkscore=0 clxscore=1011 priorityscore=1501 suspectscore=0 malwarescore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2510020000 definitions=main-2510210050
 
-Fix the issue detected by the smatch tool.
-drivers/block/rnbd/rnbd-clt.c:1241 find_and_get_or_create_sess()
-error: 'sess' dereferencing possible ERR_PTR()
 
-find_and_get_or_create_sess() only checks for ERR_PTR(-ENOMEM) after
-calling find_or_create_sess(). In other encoded failures, the code
-may dereference the error pointer when accessing sess->nr_poll_queues,
-resulting ina kernel oops.
+Hi Christophe,
 
-By preserving the existing -ENOMEM behaviour and log unexpected
-errors to assist in debugging. This change eliminates a potential
-invalid pointer dereference without altering the function's logic
-or intenet.
+On Fri, Oct 17, 2025 at 12:21:06PM +0200, Christophe Leroy wrote:
+> Masked user access avoids the address/size verification by access_ok().
+> Allthough its main purpose is to skip the speculation in the
+> verification of user address and size hence avoid the need of spec
+> mitigation, it also has the advantage of reducing the amount of
+> instructions required so it even benefits to platforms that don't
+> need speculation mitigation, especially when the size of the copy is
+> not know at build time.
+> 
+> So implement masked user access on powerpc. The only requirement is
+> to have memory gap that faults between the top user space and the
+> real start of kernel area.
+> 
+> On 64 bits platforms the address space is divided that way:
+> 
+> 	0xffffffffffffffff	+------------------+
+> 				|                  |
+> 				|   kernel space   |
+>  		 		|                  |
+> 	0xc000000000000000	+------------------+  <== PAGE_OFFSET
+> 				|//////////////////|
+> 				|//////////////////|
+> 	0x8000000000000000	|//////////////////|
+> 				|//////////////////|
+> 				|//////////////////|
+> 	0x0010000000000000	+------------------+  <== TASK_SIZE_MAX
+> 				|                  |
+> 				|    user space    |
+> 				|                  |
+> 	0x0000000000000000	+------------------+
+> 
+> Kernel is always above 0x8000000000000000 and user always
+> below, with a gap in-between. It leads to a 3 instructions sequence:
+> 
+>   20:	7c 69 fe 76 	sradi   r9,r3,63
+>   24:	7c 69 48 78 	andc    r9,r3,r9
+>   28:	79 23 00 4c 	rldimi  r3,r9,0,1
+> 
 
-Tested by compiling using smatch tool.
+Actually there is an even simpler (more obvious) sequence:
 
-Signed-off-by: Ranganath V N <vnranganath.20@gmail.com>
----
- drivers/block/rnbd/rnbd-clt.c | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
+sradi r9,r3,63
+srdi r9,r9,1  
+andc r3,r3,r9
 
-diff --git a/drivers/block/rnbd/rnbd-clt.c b/drivers/block/rnbd/rnbd-clt.c
-index f1409e54010a..57ca694210b9 100644
---- a/drivers/block/rnbd/rnbd-clt.c
-+++ b/drivers/block/rnbd/rnbd-clt.c
-@@ -1236,9 +1236,14 @@ find_and_get_or_create_sess(const char *sessname,
- 	struct rtrs_clt_ops rtrs_ops;
+(the second instruction could also be clrldi r9,r9,1)
+
+which translates back to C as:
+
+[snipped]
+> +static inline void __user *mask_user_address_simple(const void __user *ptr)
+> +{
+> +	unsigned long addr = (unsigned long)ptr;
+> +	unsigned long sh = BITS_PER_LONG - 1;
+> +	unsigned long mask = (unsigned long)((long)addr >> sh);
+> +
+> +	addr = ((addr & ~mask) & ((1UL << sh) - 1)) | ((mask & 1UL) << sh);
+> +
+> +	return (void __user *)addr;
+> +}
+> +
+
+either (srdi):
+	unsigned long mask = ((unsigned long)((long)addr >> sh)) >> 1;
+or (clrldi):
+	unsigned long mask = (unsigned long)(((long)addr >> sh) & LONG_MAX);
+
+followed by:
+	return (void __user *)(addr & ~ mask);
+
+the result is the same but I find it easier to read, and it may be
+easier for the compiler than to recognize an rl?imi insruction.
+
+Cheers,
+Gabriel
+
  
- 	sess = find_or_create_sess(sessname, &first);
--	if (sess == ERR_PTR(-ENOMEM)) {
--		return ERR_PTR(-ENOMEM);
--	} else if ((nr_poll_queues && !first) ||  (!nr_poll_queues && sess->nr_poll_queues)) {
-+	if (IS_ERR(sess)) {
-+		err = PTR_ERR(sess);
-+		if (err != -ENOMEM)
-+			pr_warn("rndb: find_or_create_sess(%s) failed with %d\n",
-+				sessname, err);
-+		return ERR_PTR(err);
-+	}
-+	if ((nr_poll_queues && !first) ||  (!nr_poll_queues && sess->nr_poll_queues)) {
- 		/*
- 		 * A device MUST have its own session to use the polling-mode.
- 		 * It must fail to map new device with the same session.
-
----
-base-commit: 211ddde0823f1442e4ad052a2f30f050145ccada
-change-id: 20251021-rnbd_fix-9b478fb52403
-
-Best regards,
--- 
-Ranganath V N <vnranganath.20@gmail.com>
 
