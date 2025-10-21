@@ -1,155 +1,233 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6832E2C0282
-	for <linux-block@vger.kernel.org>; Tue, 21 Oct 2025 12:58:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CAE82F49E3;
+	Tue, 21 Oct 2025 13:05:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761051482; cv=none; b=lx6ezil5+/O+eaHEMT8Aj54D2j/OoNjqe58R/TL4/k4eNCSTxnjmE7bvZ0oJZsOeLMvNJg+sJ/adDqSZfvJrAbqBlN0oCWaNJdJUv/sZXh/T4uJdVjLASIDm5t170IzHVfTSWhsiLJp0qUrEOnlZG361ZkIOCvVNbgh+3/b5MjE=
+	t=1761051946; cv=none; b=f88tqZV8ZzDQATP139FGexUBFz4mdzWYL+YvnzHhspRfzwhxLiSl+syqI7y6QbLKlMeVPHAU43UQRvS9Unuts2iDCjQ2bgvxwliuuX2xhMv6JBHpnQeJmiOj2vF7d0L/vmkBljKm7Pn79uYh7k4sTE4hApFdbR+NSDrZZvfHqhs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761051482; c=relaxed/simple;
-	bh=FfcoUUoPUpOsa0VkWk/Dk1Pdl70TqifwXFfjdZWH8QE=;
+	s=arc-20240116; t=1761051946; c=relaxed/simple;
+	bh=2j2nO3EgyZKblgDRpc+2rhG8AcAKEEabgVHZG2MOf3o=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SOU3UVaWXFwGKBFZnIkQX2+1P/0VZguk/nb9gMqe8AydJe7AGnnFpAowJ9Vu30lQEC/oRKOvN6F9DgFglLa6Gw2Jn0aqC9vZAyRox26UTDSUbv7H0tnugOWhViVC55FHPVuKroJsW3gKCqahBBmP585rURahKOEsQIJrgTz6npo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KvUfadTO; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=Q7dpufJTOk4UOWTY2JF2WS2za+Mh87kBTMnXb/ng9fcTVz81Tuyxt6hPfywLLIOKAtbjg8y9hqZXGO4Whqhnos70l2YXJgK68cuLvEjwFsjySwkHgzFbwuvIVvw66Je8S2fStuBjdqGEM3lB8gjZS9wGxgC/gZGsVxzsesHTveo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TmVm6iiF; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KvUfadTO"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1761051479;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DvdJq2dPLugSFjjKOvXm1LBOxtEu3BmwSDlhR75aYWo=;
-	b=KvUfadTOtYd4YATO2qf/JDmnvJJrevXEbpk+CFSbWOhR7RckZ/3ODtaY7/IIu4+6r1Sy7L
-	BcBiUYktOxQ43SVpj4S5LlRy363zrykdXmukbdx3gCk2Vx6HgAveg0093Yuq5XupkCEPUt
-	7PXGSjjWpqpn9olEfwaroxKKHrLc4Zc=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-295-QoHSj95_OY6ujWV7VXcg-A-1; Tue, 21 Oct 2025 08:57:58 -0400
-X-MC-Unique: QoHSj95_OY6ujWV7VXcg-A-1
-X-Mimecast-MFC-AGG-ID: QoHSj95_OY6ujWV7VXcg-A_1761051477
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-47105bfcf15so30482785e9.2
-        for <linux-block@vger.kernel.org>; Tue, 21 Oct 2025 05:57:57 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761051477; x=1761656277;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DvdJq2dPLugSFjjKOvXm1LBOxtEu3BmwSDlhR75aYWo=;
-        b=o04aXbQaSJVTG5BbUJ0eNOgGKeMo8TxhEEuu/Z/J63+G6sy803BgNM41THYcgI3nIX
-         FUMDxeXV26eQRxdSsw3wCkJvSSTAI8Z95d7ygGBG91iHMAcvU7PKvqypHmZMjAwfdTF2
-         WvrWomhV8+hUBTh6pzoJ3OL+nmFcFOl0yj4UVvi8F+ufvO24d1+4nCF82VgWesFb+VJb
-         FPigmywkGXWTZMZeLJXZ8NMh/1FkO1a8lqEYn2mkIDUCRTNsTJeziYEzkFoL2H2UHI7O
-         Dl/522sc36edVhDLZ/AxpCU8d3C9ACazR0IHgZbTwhojuVBLjtNz/481QE/sAcvxuvE4
-         rcKw==
-X-Forwarded-Encrypted: i=1; AJvYcCUfrBE24KPyANDNBqjdT5FdFFU59i/e757IOdG2fnHSXtr2BKgBi1VL2yRvVCdsNPrydJ0K1QGr5Hk7Mg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YytcHYwHACUZoEyCcRBl3/TdkmxTfLCNYVGK9B7nu2Wc+zypj5Y
-	qUy46ykT8ZePvr0tspZOKikRRX2gYeR0JKhEo8hjfZx7mPTr+FDkxmm/yVUUlOW+fJ2ZLKwv+/O
-	tzD1zfruA2PbL9MQbk71B8IsBKF75/U9KzWK0clRSzOx26IwYXao15BQT28jdmRw3
-X-Gm-Gg: ASbGncuBZQSBSTm1MY6w/SgmtS+o2PsUHP09ZO8KS7ZcDoxciSN6nTAqvqkaGd0LwUt
-	7ntV9OK07SxmwJx0aoWBId62WMlTcAnfl8io75NKVckPM5HB0hwlasbWoHyJ4SL4gnqNEDpjbja
-	2rYW5NTylJzlr44XEoi0AAzUjalVvPUAKWBFutEZsHVtIpWHLQsV/Lo+3w0o+aOC7k+CoESwNn5
-	4Sb7AupFBiWk6RUBHJTRW3EyQpYzAdF4Je0gTjsu7C4gn+Rdp5Ef/M8IZroajBaLI8tvypPxEBj
-	OU0hmCZ6AeWWnVNGTvbsV4r+4euPBZ2fFStEWkecaLUfS6DXzhqGvks9D2d1R9/e6dWQ
-X-Received: by 2002:a05:600c:198d:b0:46e:3c29:ce9d with SMTP id 5b1f17b1804b1-4711791c57bmr139775085e9.32.1761051476909;
-        Tue, 21 Oct 2025 05:57:56 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGMQOVxMDKEqgOB4aV0YZaSaGuRZMfduYN5i5pIKMunnPmVy9cLSdbbEF1RTdTSlw3qu+1DNA==
-X-Received: by 2002:a05:600c:198d:b0:46e:3c29:ce9d with SMTP id 5b1f17b1804b1-4711791c57bmr139774785e9.32.1761051476400;
-        Tue, 21 Oct 2025 05:57:56 -0700 (PDT)
-Received: from redhat.com ([2a0d:6fc0:152d:b200:2a90:8f13:7c1e:f479])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47154d3843csm195088345e9.11.2025.10.21.05.57.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Oct 2025 05:57:55 -0700 (PDT)
-Date: Tue, 21 Oct 2025 08:57:53 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Cong Zhang <cong.zhang@oss.qualcomm.com>
-Cc: Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-	linux-arm-msm@vger.kernel.org, virtualization@lists.linux.dev,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	pavan.kondeti@oss.qualcomm.com
-Subject: Re: [PATCH] virtio_blk: NULL out vqs to avoid double free on failed
- resume
-Message-ID: <20251021085030-mutt-send-email-mst@kernel.org>
-References: <20251021-virtio_double_free-v1-1-4dd0cfd258f1@oss.qualcomm.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TmVm6iiF"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7FDC7C4CEF1;
+	Tue, 21 Oct 2025 13:05:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761051945;
+	bh=2j2nO3EgyZKblgDRpc+2rhG8AcAKEEabgVHZG2MOf3o=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=TmVm6iiFaz6anEm3kd0My8ZIfUCldrigV+ZcegItWYdxZrA9XcebcFYT1MscZ+Bfk
+	 VEdyNailQh9YtaHUbFy98sCS778OwbHwgxhCuVIyUlL+RnCqrZV+wlUXkxus8vkmmH
+	 wTfZRmnd8ZoxO8NFhXD2KkWxbPWgLkHE43O/4dn2DzKF/G6XO5nLBrRIOLmsOs063A
+	 aVdE8UKPA/mxr3ZwMDkZNOeVf35jw4VyuWcbrzlcnDe5R/JkHHiQSUHe90cjFoE6KX
+	 A+IPfDmrVlX+aH3+RJDyQNAHVobVFUrcgzbB98Z/822kUNM/+WUfAraNn3ZSsrvcz2
+	 tJXHoYFb+417g==
+Date: Tue, 21 Oct 2025 15:05:35 +0200
+From: Christian Brauner <brauner@kernel.org>
+To: Askar Safin <safinaskar@gmail.com>, 
+	Christoph Hellwig <hch@infradead.org>
+Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Linus Torvalds <torvalds@linux-foundation.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	Al Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@lst.de>, 
+	Jens Axboe <axboe@kernel.dk>, Andy Shevchenko <andy.shevchenko@gmail.com>, 
+	Aleksa Sarai <cyphar@cyphar.com>, 
+	Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>, Julian Stecklina <julian.stecklina@cyberus-technology.de>, 
+	Gao Xiang <hsiangkao@linux.alibaba.com>, Art Nikpal <email2tema@gmail.com>, 
+	Andrew Morton <akpm@linux-foundation.org>, Alexander Graf <graf@amazon.com>, Rob Landley <rob@landley.net>, 
+	Lennart Poettering <mzxreary@0pointer.de>, linux-arch@vger.kernel.org, linux-block@vger.kernel.org, 
+	initramfs@vger.kernel.org, linux-api@vger.kernel.org, linux-doc@vger.kernel.org, 
+	Michal Simek <monstr@monstr.eu>, Luis Chamberlain <mcgrof@kernel.org>, 
+	Kees Cook <kees@kernel.org>, Thorsten Blum <thorsten.blum@linux.dev>, 
+	Heiko Carstens <hca@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>, Dave Young <dyoung@redhat.com>, 
+	Christophe Leroy <christophe.leroy@csgroup.eu>, Krzysztof Kozlowski <krzk@kernel.org>, 
+	Borislav Petkov <bp@alien8.de>, Jessica Clarke <jrtc27@jrtc27.com>, 
+	Nicolas Schichan <nschichan@freebox.fr>, David Disseldorp <ddiss@suse.de>, patches@lists.linux.dev
+Subject: Re: [PATCH v3 0/3] initrd: remove half of classic initrd support
+Message-ID: <20251021-bannmeile-arkaden-ae2ea9264b85@brauner>
+References: <20251017060956.1151347-1-safinaskar@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20251021-virtio_double_free-v1-1-4dd0cfd258f1@oss.qualcomm.com>
+In-Reply-To: <20251017060956.1151347-1-safinaskar@gmail.com>
 
-On Tue, Oct 21, 2025 at 07:07:56PM +0800, Cong Zhang wrote:
-> The vblk->vqs releases during freeze. If resume fails before vblk->vqs
-> is allocated, later freeze/remove may attempt to free vqs again.
-> Set vblk->vqs to NULL after freeing to avoid double free.
+On Fri, Oct 17, 2025 at 06:09:53AM +0000, Askar Safin wrote:
+> Intro
+> ====
+> This patchset removes half of classic initrd (initial RAM disk) support,
+> i. e. linuxrc code path, which was deprecated in 2020.
+> Initramfs still stays, RAM disk itself (brd) still stays.
+> And other half of initrd stays, too.
+> init/do_mounts* are listed in VFS entry in
+> MAINTAINERS, so I think this patchset should go through VFS tree.
+> I tested the patchset on 8 (!!!) archs in Qemu (see details below).
+> If you still use initrd, see below for workaround.
 > 
-> Signed-off-by: Cong Zhang <cong.zhang@oss.qualcomm.com>
-> ---
-> The patch fixes a double free issue that occurs in virtio_blk during
-> freeze/resume.
-> The issue is caused by:
-> 1. During the first freeze, vblk->vqs is freed but pointer is not set to
->    NULL.
-> 2. Virtio block device fails before vblk->vqs is allocated during resume.
-> 3. During the next freeze, vblk->vqs gets freed again, causing the
->    double free crash.
+> In 2020 deprecation notice was put to linuxrc initrd code path.
+> In v1 I tried to remove initrd
+> fully, but Nicolas Schichan reported that he still uses
+> other code path (root=/dev/ram0 one) on million devices [4].
+> root=/dev/ram0 code path did not contain deprecation notice.
 
-this part I don't get. if restore fails, how can freeze be called
-again?
+Without Acks or buy-in from other maintainers this is not a change we
+can just do given that a few people already piped up and expressed
+reservations that this would be doable for them.
 
-> ---
->  drivers/block/virtio_blk.c | 13 ++++++++++++-
->  1 file changed, 12 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-> index f061420dfb10c40b21765b173fab7046aa447506..746795066d7f56a01c9a9c0344d24f9fa06841eb 100644
-> --- a/drivers/block/virtio_blk.c
-> +++ b/drivers/block/virtio_blk.c
-> @@ -1026,8 +1026,13 @@ static int init_vq(struct virtio_blk *vblk)
->  out:
->  	kfree(vqs);
->  	kfree(vqs_info);
-> -	if (err)
-> +	if (err) {
->  		kfree(vblk->vqs);
-> +		/*
-> +		 * Set to NULL to prevent freeing vqs again during freezing.
-> +		 */
-> +		vblk->vqs = NULL;
-> +	}
->  	return err;
->  }
->  
+@Christoph, you marked this as deprecated years ago.
+What's your take on this?
 
-> @@ -1598,6 +1603,12 @@ static int virtblk_freeze_priv(struct virtio_device *vdev)
->  
->  	vdev->config->del_vqs(vdev);
->  	kfree(vblk->vqs);
-> +	/*
-> +	 * Set to NULL to prevent freeing vqs again after a failed vqs
-> +	 * allocation during resume. Note that kfree() already handles NULL
-> +	 * pointers safely.
-> +	 */
-> +	vblk->vqs = NULL;
->  
->  	return 0;
->  }
 > 
-> ---
-> base-commit: 8e2755d7779a95dd61d8997ebce33ff8b1efd3fb
-> change-id: 20250926-virtio_double_free-7ab880d82a17
+> So, in this version of patchset I remove deprecated code path,
+> i. e. linuxrc one, while keeping other, i. e. root=/dev/ram0 one.
 > 
-> Best regards,
+> Also I put deprecation notice to remaining code path, i. e. to
+> root=/dev/ram0 one. I plan to send patches for full removal
+> of initrd after one year, i. e. in September 2026 (of course,
+> initramfs will still work).
+> 
+> Also, I tried to make this patchset small to make sure it
+> can be reverted easily. I plan to send cleanups later.
+> 
+> Details
+> ====
+> Other user-visible changes:
+> 
+> - Removed kernel command line parameters "load_ramdisk" and
+> "prompt_ramdisk", which did nothing and were deprecated
+> - Removed /proc/sys/kernel/real-root-dev . It was used
+> for initrd only
+> - Command line parameters "noinitrd" and "ramdisk_start=" are deprecated
+> 
+> This patchset is based on v6.18-rc1.
+> 
+> Testing
+> ====
+> I tested my patchset on many architectures in Qemu using my Rust
+> program, heavily based on mkroot [1].
+> 
+> I used the following cross-compilers:
+> 
+> aarch64-linux-musleabi
+> armv4l-linux-musleabihf
+> armv5l-linux-musleabihf
+> armv7l-linux-musleabihf
+> i486-linux-musl
+> i686-linux-musl
+> mips-linux-musl
+> mips64-linux-musl
+> mipsel-linux-musl
+> powerpc-linux-musl
+> powerpc64-linux-musl
+> powerpc64le-linux-musl
+> riscv32-linux-musl
+> riscv64-linux-musl
+> s390x-linux-musl
+> sh4-linux-musl
+> sh4eb-linux-musl
+> x86_64-linux-musl
+> 
+> taken from this directory [2].
+> 
+> So, as you can see, there are 18 triplets, which correspond to 8 subdirs in arch/.
+> 
+> For every triplet I tested that:
+> - Initramfs still works (both builtin and external)
+> - Direct boot from disk still works
+> - Remaining initrd code path (root=/dev/ram0) still works
+> 
+> Workaround
+> ====
+> If "retain_initrd" is passed to kernel, then initramfs/initrd,
+> passed by bootloader, is retained and becomes available after boot
+> as read-only magic file /sys/firmware/initrd [3].
+> 
+> No copies are involved. I. e. /sys/firmware/initrd is simply
+> a reference to original blob passed by bootloader.
+> 
+> This works even if initrd/initramfs is not recognized by kernel
+> in any way, i. e. even if it is not valid cpio archive, nor
+> a fs image supported by classic initrd.
+> 
+> This works both with my patchset and without it.
+> 
+> This means that you can emulate classic initrd so:
+> link builtin initramfs to kernel; in /init in this initramfs
+> copy /sys/firmware/initrd to some file in / and loop-mount it.
+> 
+> This is even better than classic initrd, because:
+> - You can use fs not supported by classic initrd, for example erofs
+> - One copy is involved (from /sys/firmware/initrd to some file in /)
+> as opposed to two when using classic initrd
+> 
+> Still, I don't recommend using this workaround, because
+> I want everyone to migrate to proper modern initramfs.
+> But still you can use this workaround if you want.
+> 
+> Also: it is not possible to directly loop-mount
+> /sys/firmware/initrd . Theoretically kernel can be changed
+> to allow this (and/or to make it writable), but I think nobody needs this.
+> And I don't want to implement this.
+> 
+> On Qemu's -initrd and GRUB's initrd
+> ====
+> Don't panic, this patchset doesn't remove initramfs
+> (which is used by nearly all Linux distros). And I don't
+> have plans to remove it.
+> 
+> Qemu's -initrd option and GRUB's initrd command refer
+> to initrd bootloader mechanism, which is used to
+> load both initrd and (external) initramfs.
+> 
+> So, if you use Qemu's -initrd or GRUB's initrd,
+> then you likely use them to pass initramfs, and thus
+> you are safe.
+> 
+> v1: https://lore.kernel.org/lkml/20250913003842.41944-1-safinaskar@gmail.com/
+> 
+> v1 -> v2 changes:
+> - A lot. I removed most patches, see cover letter for details
+> 
+> v2: https://lore.kernel.org/lkml/20251010094047.3111495-1-safinaskar@gmail.com/
+> 
+> v2 -> v3 changes:
+> - Commit messages
+> - Expanded docs for "noinitrd"
+> - Added link to /sys/firmware/initrd workaround to pr_warn
+> 
+> [1] https://github.com/landley/toybox/tree/master/mkroot
+> [2] https://landley.net/toybox/downloads/binaries/toolchains/latest
+> [3] https://lore.kernel.org/all/20231207235654.16622-1-graf@amazon.com/
+> [4] https://lore.kernel.org/lkml/20250918152830.438554-1-nschichan@freebox.fr/
+> 
+> Askar Safin (3):
+>   init: remove deprecated "load_ramdisk" and "prompt_ramdisk" command
+>     line parameters
+>   initrd: remove deprecated code path (linuxrc)
+>   init: remove /proc/sys/kernel/real-root-dev
+> 
+>  .../admin-guide/kernel-parameters.txt         |  12 +-
+>  Documentation/admin-guide/sysctl/kernel.rst   |   6 -
+>  arch/arm/configs/neponset_defconfig           |   2 +-
+>  fs/init.c                                     |  14 ---
+>  include/linux/init_syscalls.h                 |   1 -
+>  include/linux/initrd.h                        |   2 -
+>  include/uapi/linux/sysctl.h                   |   1 -
+>  init/do_mounts.c                              |  11 +-
+>  init/do_mounts.h                              |  18 +--
+>  init/do_mounts_initrd.c                       | 107 ++----------------
+>  init/do_mounts_rd.c                           |  24 +---
+>  11 files changed, 23 insertions(+), 175 deletions(-)
+> 
+> 
+> base-commit: 3a8660878839faadb4f1a6dd72c3179c1df56787
 > -- 
-> Cong Zhang <cong.zhang@oss.qualcomm.com>
-
+> 2.47.3
+> 
