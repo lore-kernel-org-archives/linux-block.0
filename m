@@ -1,74 +1,60 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E90322F693C
-	for <linux-block@vger.kernel.org>; Tue, 21 Oct 2025 13:39:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC76334215A
+	for <linux-block@vger.kernel.org>; Tue, 21 Oct 2025 15:02:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761053960; cv=none; b=OXIK9GaPD2Hh/jlupBjELYgI3V8suO30ObsubVO4kcnSMe1NrJM97QKFDZBLygkfv24eNZxkyL3uPyr9tBc8f5IUXrC+6hRor5bpjPD/oISyASZ7J2V7YHTSA4ygnhwuHnYWKrWbYhJkFL2/4FMgWo5/RYnwhgUD14dBky8ucI0=
+	t=1761058977; cv=none; b=HZr96LZKoofNMD4kVl4JQjSk1qzQiMFRkiC/2FnXhufd2STzIXwloTsjFRAlt9IG7U43T7syVzDGDx+MCtYEk6UetEqOuPW8+RL4YZlvQzWNMB4yJAfSuNCQQGIH173IBZ1ZdZon5X10u4PoItxuxeL0PpN8VLoMVlar1wUpdHQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761053960; c=relaxed/simple;
-	bh=A2vdq3fjCx6AIl2BDZIfxhOwGIe9UlrZ+Owl/fdNpyU=;
-	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=XOXs/jn16SCXQCtDhwjqet+up+k95nlFqbuAiX8Y2fFvRu+DG8+OqVdu/SlFUzUMR79R9MYl/2+K1VwWKs+m6VF05j/oSboX5UJ43HVpntvzlkGFFWS+ES9THt+f71P6XtUgGmehMMYIlv0jZCBite4YGdtT3xD4GBMnc7Xkv70=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SG2zq2MF; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1761058977; c=relaxed/simple;
+	bh=4vc3eUVdl8D00p4m5GILHMDRoWYrQ7sf5PNenE9uo64=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=l0OlJxVJL71egNUl5klSS18qlPlcBar/pbiJlwXSerACSAJKLLh+6fOoBRikRe64FvAuXjzwpDi0odNuLZ6C4MHst5o1ejzHdGnz3+woMLns9vN7peiNVIgmP1EA+6SNJmNJCOvk+C+Q0X6t+YC7PrFjPDHeBjcNQm4teV7UAPc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=bCF/0Wa/; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SG2zq2MF"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1761053957;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=j3KJELQ+1zBaV6zsfBpuZG8t84lL3xkiKid35BQ9x2E=;
-	b=SG2zq2MFO/c/UsWw/U6WiCzx7HXsmA0d4S7xKDNHiQmg2V9yXIcOfAUVs2GaS96v/vBN6B
-	sWr2CPJiLCfBWFASyiQDpYEPYmia9xSvo/BnqISmqeFzk6AJANazx0qpYOCQ8ZBYqGgIxv
-	u2jLRCvjvbYJs0lN6iBjr2ppYNmfY78=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-536-MrZXKfr2PeuEqfDGCA2IBQ-1; Tue, 21 Oct 2025 09:39:16 -0400
-X-MC-Unique: MrZXKfr2PeuEqfDGCA2IBQ-1
-X-Mimecast-MFC-AGG-ID: MrZXKfr2PeuEqfDGCA2IBQ_1761053956
-Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-827061b4ca9so1755168485a.3
-        for <linux-block@vger.kernel.org>; Tue, 21 Oct 2025 06:39:16 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761053956; x=1761658756;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:user-agent:mime-version:date:message-id:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=j3KJELQ+1zBaV6zsfBpuZG8t84lL3xkiKid35BQ9x2E=;
-        b=OovIeCrXxXJs1F1EONdo1nvIDsyT52lOXvfGOqthTO2eYb2Zh1pLeGr1DmWIuu2j1m
-         +bzEDNMf1d8JZzTJauFfw8hkm5FkPqH9qN/0H1nbBIqOOaxtRqKlsu0g33OyogfuPDsA
-         CNvW6N5jkR7hcZ4xiQa5mMKe6Q3Rg6AmvA/WQybc/OWhiKRmNfSp+IvFWV6FcqrQMkWR
-         qfyDlIeT2evyhZeekKhRLKgwiqXT+TudyYvMENLQeJD8x0ftvxbGPWsAqEEwwBoeTmwY
-         T2sTwPaoJht1Jf1fowPX5zJ/+0mFKEgNLdEKyLaBp4cqQj99T+Qtp/WFSQbi2VT6my0i
-         4Lsw==
-X-Forwarded-Encrypted: i=1; AJvYcCXUJ1F4cyxSfqkS8KF2bSX02Pfjci1lQMrmzAX+j1R1AiuEvlUEUQUy4F21bIguC8hc65d02BA9N6oF4w==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwYVmGoMY0DjG3exa7WsYzUs5xIZuYUJInXFnoCH1ktpuaS501g
-	od7vPyUPxMM7FKAZxEec0I/TNhffHv50tVwfNZMJ4oj5Icm2FcI8Fg5hEAXoMpIYMnToLI6jqZz
-	MNoboK1vRPiAzTtqOVM/hByb0udv6IYRqFbAHCJEw6RLpmcNLgg438EIvO6jHhnSS
-X-Gm-Gg: ASbGncvFeFyMZFx1VqFj7bs2P6uozeqG6gfnCIbF2x77kr/p0v0z4V4zUZpGyrvfGr7
-	10rHRKutrefBZ+HYwdLyi+4fsganpbu3ExrFPx73Ke5IZ+lQB6N4mKRDUmGDENHh8zB+IpHaS2d
-	Grf+FxfVjOEomzoCj7C2XLdqB43SWnKGX/jwt7vmd6tEn+PKXAWiI+Yd+fjYY42jLIde7kkUFJS
-	rzl+PjkM3gGhvnyFkXOj5Lnpq8+pbSXjSrloslG1m2TszGz0r5SWh5GHwaYO1vZbNguR1u5Vz0Z
-	a54gjuUlnBOe1t9RVVJ+y52h6ZVNR9qvUr174vUcJro1ChXBIj1lI6zJNKPWgpRkEaz48PW/Pyk
-	5yiwxRi50/7hgn54hIrGfecX8IM/eSoaQyfBXiyqO9u7XoA==
-X-Received: by 2002:ac8:7d8a:0:b0:4e8:a6c3:4322 with SMTP id d75a77b69052e-4e8a6c343dbmr147838571cf.68.1761053955834;
-        Tue, 21 Oct 2025 06:39:15 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFz7AKLLzN2UNU/guKrJvkpbFnggCrMTTSh4yWUy38aXqbwBFVcdBvCw2i1DLngSoeAJ3ah8Q==
-X-Received: by 2002:ac8:7d8a:0:b0:4e8:a6c3:4322 with SMTP id d75a77b69052e-4e8a6c343dbmr147838031cf.68.1761053955419;
-        Tue, 21 Oct 2025 06:39:15 -0700 (PDT)
-Received: from ?IPV6:2601:600:947f:f020:85dc:d2b2:c5ee:e3c4? ([2601:600:947f:f020:85dc:d2b2:c5ee:e3c4])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4e8aaf3370fsm74330521cf.3.2025.10.21.06.39.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 21 Oct 2025 06:39:14 -0700 (PDT)
-From: Waiman Long <llong@redhat.com>
-X-Google-Original-From: Waiman Long <longman@redhat.com>
-Message-ID: <ea2d3e0e-b1ee-4b58-a93a-b9d127258e75@redhat.com>
-Date: Tue, 21 Oct 2025 09:39:10 -0400
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="bCF/0Wa/"
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 59LBv7nT006824;
+	Tue, 21 Oct 2025 15:02:31 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=1b69gD
+	T8LvJVtiHS4ua5Tn6SRWH4Fsf1vL9xpsxKQeE=; b=bCF/0Wa/KvKu6mQrXbsl9S
+	IuI12RC4yilHAEQ8igAzzYa+6hR1osQ2yr76PsAHX3P22upm6LdX5AEibz+EsAc4
+	lPjhFxAyp/n9PTO0X/8dAUWgOiq0uZm2AY6NL/nYzbyBBZdVrfnPhH6JOuaihVTM
+	8YP4AWqBlnw3KWNb2wK1CASSxYokK8XFnkIejP3AjVt/itLGoqpCAqdAPiUas1Im
+	xKuDNZZRybiL9zQ3MA9chXEP6DaTzSPO4jgBUpSJ53HQihGVkVuKg/5xMVRtgC03
+	YIJszN5E+NsH2pBXcy0wKoFkKtRMRcX9nAn8MzPqsr8rQUohKLwQuegkzH/y8tvQ
+	==
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 49v326qp30-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 21 Oct 2025 15:02:30 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 59LCAD24032099;
+	Tue, 21 Oct 2025 15:02:29 GMT
+Received: from smtprelay02.wdc07v.mail.ibm.com ([172.16.1.69])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 49vp7mua18-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 21 Oct 2025 15:02:29 +0000
+Received: from smtpav06.wdc07v.mail.ibm.com (smtpav06.wdc07v.mail.ibm.com [10.39.53.233])
+	by smtprelay02.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 59LF2SMN28705344
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 21 Oct 2025 15:02:28 GMT
+Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id B0DBA58060;
+	Tue, 21 Oct 2025 15:02:28 +0000 (GMT)
+Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id EF5CB58066;
+	Tue, 21 Oct 2025 15:02:25 +0000 (GMT)
+Received: from [9.61.103.108] (unknown [9.61.103.108])
+	by smtpav06.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 21 Oct 2025 15:02:25 +0000 (GMT)
+Message-ID: <501169ee-37e9-4b15-89ae-8f2b57da270f@linux.ibm.com>
+Date: Tue, 21 Oct 2025 20:32:24 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -76,91 +62,80 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 13/33] cpuset: Update HK_TYPE_DOMAIN cpumask from cpuset
-To: Frederic Weisbecker <frederic@kernel.org>,
- LKML <linux-kernel@vger.kernel.org>
-Cc: =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- Bjorn Helgaas <bhelgaas@google.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Danilo Krummrich
- <dakr@kernel.org>, "David S . Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Gabriele Monaco <gmonaco@redhat.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
- Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
- Lai Jiangshan <jiangshanlai@gmail.com>,
- Marco Crivellari <marco.crivellari@suse.com>, Michal Hocko
- <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
- Paolo Abeni <pabeni@redhat.com>, Peter Zijlstra <peterz@infradead.org>,
- Phil Auld <pauld@redhat.com>, "Rafael J . Wysocki" <rafael@kernel.org>,
- Roman Gushchin <roman.gushchin@linux.dev>,
- Shakeel Butt <shakeel.butt@linux.dev>, Simon Horman <horms@kernel.org>,
- Tejun Heo <tj@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
- Vlastimil Babka <vbabka@suse.cz>, Will Deacon <will@kernel.org>,
- cgroups@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-block@vger.kernel.org, linux-mm@kvack.org, linux-pci@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20251013203146.10162-1-frederic@kernel.org>
- <20251013203146.10162-14-frederic@kernel.org>
+Subject: Re: What should we do about the nvme atomics mess?
+To: John Garry <john.g.garry@oracle.com>, Keith Busch <kbusch@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>, Alan Adamson <alan.adamson@oracle.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Jens Axboe <axboe@kernel.dk>, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org
+References: <20250707141834.GA30198@lst.de>
+ <ee663f87-0dbd-4685-a462-27da217dd259@linux.ibm.com>
+ <aG7fArgdSWIjXcp9@kbusch-mbp>
+ <27a01d31-0432-4340-9f45-1595f66f0500@linux.ibm.com>
+ <a454f040-327c-46d1-8d0a-7745eb8a7aaf@oracle.com>
 Content-Language: en-US
-In-Reply-To: <20251013203146.10162-14-frederic@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <a454f040-327c-46d1-8d0a-7745eb8a7aaf@oracle.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Authority-Analysis: v=2.4 cv=EJELElZC c=1 sm=1 tr=0 ts=68f7a086 cx=c_pps
+ a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
+ a=I5r0CxplrSDLCy34:21 a=IkcTkHD0fZMA:10 a=x6icFKpwvdMA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=VwQbUJbxAAAA:8 a=yPCof4ZbAAAA:8
+ a=TakWwMvn3hYBPWLwZwUA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+ a=cPQSjfK2_nFv0Q5t_7PE:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDE4MDAyMiBTYWx0ZWRfX9kyN3yeIF1VP
+ lFJJrlwUuBVhHNK3FogKnywjZqb3LY/SqgUeMZY0/GgT5hsULn2RVI8gcCUOSvEG3xhWKbRoh3B
+ K8U1Yt/qSuiZhj8rOEJTnZMJfb5qZhzg/V/1nu9BRf/XsZhoXuiTTKmK9+UL/j82Y5AfwiDLmGV
+ NXEKCcPmzxoY3H5ug/5yj8vlV+//ihBAt/9xxdHBNxCpPREdZA60JkhlkL57cRFLNkhNi6yVgaN
+ 1oRYgcIUdNf7YoZx1xFSVjdLQwodkslZAq7NkoIF3ytW8NN7IzPGwMS8X8gRQzeMLAG5hpJOBLN
+ hlQSH0v1Qy7CCriubiqEqzFFJq6NIHZOEvyU9zkgA2IHg+Lx1IHHp4hTS3E5Vi36W/v1YGaSOT6
+ iXAW1S5uqKurxre3Pgrcawa2ZK+J5g==
+X-Proofpoint-GUID: xIWKchR_gvnhykSQPwUL9AvJTejebeoA
+X-Proofpoint-ORIG-GUID: xIWKchR_gvnhykSQPwUL9AvJTejebeoA
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-10-21_02,2025-10-13_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ impostorscore=0 priorityscore=1501 suspectscore=0 bulkscore=0 spamscore=0
+ malwarescore=0 phishscore=0 adultscore=0 lowpriorityscore=0 clxscore=1015
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2510020000 definitions=main-2510180022
 
-On 10/13/25 4:31 PM, Frederic Weisbecker wrote:
-> @@ -80,12 +110,45 @@ EXPORT_SYMBOL_GPL(housekeeping_affine);
->   
->   bool housekeeping_test_cpu(int cpu, enum hk_type type)
->   {
-> -	if (housekeeping.flags & BIT(type))
-> +	if (READ_ONCE(housekeeping.flags) & BIT(type))
->   		return cpumask_test_cpu(cpu, housekeeping_cpumask(type));
->   	return true;
->   }
->   EXPORT_SYMBOL_GPL(housekeeping_test_cpu);
->   
-> +int housekeeping_update(struct cpumask *mask, enum hk_type type)
-> +{
-> +	struct cpumask *trial, *old = NULL;
-> +
-> +	if (type != HK_TYPE_DOMAIN)
-> +		return -ENOTSUPP;
-> +
-> +	trial = kmalloc(sizeof(*trial), GFP_KERNEL);
-Should you use cpumask_size() instead of sizeof(*trial) as the latter 
-can be much bigger?
-> +	if (!trial)
-> +		return -ENOMEM;
-> +
-> +	cpumask_andnot(trial, housekeeping_cpumask(HK_TYPE_DOMAIN_BOOT), mask);
-> +	if (!cpumask_intersects(trial, cpu_online_mask)) {
-> +		kfree(trial);
-> +		return -EINVAL;
-> +	}
-> +
-> +	if (!housekeeping.flags)
-> +		static_branch_enable(&housekeeping_overridden);
-> +
-> +	if (!(housekeeping.flags & BIT(type)))
-> +		old = housekeeping_cpumask_dereference(type);
-> +	else
-> +		WRITE_ONCE(housekeeping.flags, housekeeping.flags | BIT(type));
-> +	rcu_assign_pointer(housekeeping.cpumasks[type], trial);
-> +
-> +	synchronize_rcu();
-> +
-> +	kfree(old);
 
-If "isolcpus" boot command line option is set, old can be a pointer to 
-the boot time memblock area which isn't a pointer that can be handled by 
-the slab allocator AFAIU. I don't know the exact consequence, but it may 
-not be good. One possible solution I can think of is to make 
-HK_TYPE_DOMAIN and HK_TYPE_DOMAIN_ROOT point to the same memblock 
-pointer and don't pass the old HK_TYPE_DOMAIN pointer to kfree() if it 
-matches HK_TYPE_DOMAIN_BOOT one. Alternatively, we can just set the 
-HK_TYPE_DOMAIN_BOOT pointer at boot and make HK_TYPE_DOMAIN falls back 
-to HK_TYPE_DOMAIN_BOOT if not set.
 
-Cheers,
-Longman
+On 10/20/25 7:12 PM, John Garry wrote:
+> On 10/07/2025 06:07, Nilay Shroff wrote:
+>>> Considering multi-controller subsystems, some controllers might have
+>>> namespaces with only 512b formats attached, and other controllers might
+>>> have some 4k mixed in, so then they can't all consistently report the
+>>> desired AWUPF value. They'd have to just scale AWUPF based on the
+>>> largest sector size supported. Which I guess is what the current wording
+>>> is guiding toward, but that just suggests host drivers disregard the
+>>> value and use NAWUPF instead. So still option III.
+>> Yes, I agree — option III seems to be the best possible way forward.
+>> However, does this mean we would disregard atomic write support for any
+>> multi-controller NVMe vendor that consistently reports a valid AWUPF value
+>> across all controllers and namespace formats, but sets NAWUPF to zero?
+> 
+> Hi Nilay,
+> 
+> Does the drive which you are using report NAWUPF as zero (as hinted)?
+> 
+> If so, have you tried the following https://lore.kernel.org/linux-nvme/20250820150220.1923826-1-john.g.garry@oracle.com/
+> 
+> We were considering changing the NVMe driver to not use AWUPF at all...
 
+Yes, I just tested your patch with the latest upstream kernel on my drive, 
+which reports a non-zero AWUPF but a zero NAWUPF.
+
+And your opt-in change works well on my disk. So we may consider 
+merging this change if everyone agrees.
+
+Thanks,
+--Nilay
+
+
+
+ 
