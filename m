@@ -1,180 +1,142 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 667A629405
-	for <linux-block@vger.kernel.org>; Tue, 21 Oct 2025 07:57:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C2C1287272
+	for <linux-block@vger.kernel.org>; Tue, 21 Oct 2025 08:02:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761033437; cv=none; b=iYrEdEjK3einEZmAK7lxvnqtdliYBqjTXJtoVTOepxh4ZcOVICRTCQugDoxdCkhFimwgeCF+ftV1h2upDjJM0oGuhsZVipc9dNElQWOCq9+BB27GtRryf5jBha84NoqyJXvqxeLbjYGO6ohG/K+7wuf1JEaaBGyTgBUgH2P0v+U=
+	t=1761033732; cv=none; b=W5LoT++9M32F9GfR0xOB6YzvZgfvF6RzcXkW09MkpC9XmUAUgPTVeT+F92JBjUm15FhNHmiD54F7B0Hiy7QYj88QZykxYHsvDjSG02tF6HJTY77Sbo4oFAixw0lz+vXhD6Tkl/s9csZd0oxsBpCrn/RsGJvXksl7dKzOOXcLqz8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761033437; c=relaxed/simple;
-	bh=kzUnodnESQPZ3hjQ+4hWlqNv0TA/x4jgslgFtQDH52Y=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cTFzVtGCGxLwLlr4LsbT37sn2FqA+qmh/PVDgPC6GiT6eG4vnmp90ILYoNuJStNbFkd2UCnaBLCKh+sAEugpIeSzLjXSt8dxN5+EU/3QkkeuvTuhYb73TDUiRrLdfWGy25i3FFeFlLx6JpmPP83iz/gXnptZtFJtqUbiBD7VHnA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dPWNP3yu; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1761033732; c=relaxed/simple;
+	bh=i+m3PusaxM6Zgin3C3En/lGk4W/S63Hvd6XwDnbd7Ug=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=V14rBKsZ3z1EzT5BRBg48HX1QkWEMNdOrVbm7jN4nEev3qn+ZjNzXN9td70SQRfeEQdVADdoA3Nd4RBF0ObhEFEbnYJSI5eZeZU9NAh9hsovGX8SLXtUh0mZedP08rxxTvfeFwePHBjCqpZcLwaFs1h1n5um/4oFkWd96ivKlFE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ionos.com; spf=pass smtp.mailfrom=ionos.com; dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b=DRrWZumJ; arc=none smtp.client-ip=209.85.208.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ionos.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ionos.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dPWNP3yu"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1761033434;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=fUep2F5lenxxRi6fdUvVCk4rNKrfMBfN9N3PQW5oVLs=;
-	b=dPWNP3yuapa4u22fQtOzW7lAojucK8lLyTZZlAA93uFeAl8+F9TfP1MNQzjZBNlEjY8zdb
-	nUXW0FxBCtad8XKC5Cng8wIMjj1+hA/FKI1sCNPyDG2UkLo9tuRt9EfO4lCJVir5PBB8Mo
-	UVmdms5ag0OkjfRPo88fbICGhfyaWpw=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-642-yN76wFqsOPiIAG9y_5aV_w-1; Tue, 21 Oct 2025 03:57:12 -0400
-X-MC-Unique: yN76wFqsOPiIAG9y_5aV_w-1
-X-Mimecast-MFC-AGG-ID: yN76wFqsOPiIAG9y_5aV_w_1761033431
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-427091cd689so1837384f8f.2
-        for <linux-block@vger.kernel.org>; Tue, 21 Oct 2025 00:57:11 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b="DRrWZumJ"
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-63c4b3a6f71so382338a12.2
+        for <linux-block@vger.kernel.org>; Tue, 21 Oct 2025 01:02:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ionos.com; s=google; t=1761033729; x=1761638529; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=k0VWPqCHv6+ZQuDCTFQQ2tUl50NtMLOJ2aVBSBufBxc=;
+        b=DRrWZumJLWlQQYVAwwdZ9UjK/OX3tFtqQIygVaobmULxIhz8TsmMGwWjugbCyJG/TT
+         n1DisF41E2n7SCCu5Ow4O85jzTnWfSXt8lKZihDJo8KVtRsMVaD2hKDmMuIhBsbaYTxE
+         rEO04c4IOVa60P52jb5mBgRIvD3zpJn6BePYm34wJNSrHC9n/jM5CtHEih+v5cF8Vk0w
+         UMgg7XcMxykPPAcbgYAfFVy+kn5kUR0tXv5Bmys+Bw4+gt9Os5YLpsLf+6i0/GutnOxM
+         1gvVIP5sj2M1i3gRJOmmgiQ6dgBYKdI4BRFe3e5P8g8lEyZF2VfN2cR1LesjLs8Dd/vy
+         MW9A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761033431; x=1761638231;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=fUep2F5lenxxRi6fdUvVCk4rNKrfMBfN9N3PQW5oVLs=;
-        b=q26gxuzu6OK83YXfLEGmGRfHERRx1Srg7jWPzag0ibMc34cAInJGFaFzbH3K5UzRYi
-         2acRxqsj4TZPGu1hXGxpBar+KVsbheTKMUQCUBT77xysNt+59IseZjXfsT6zJRgsgjfq
-         6jPcKsts2J/lP0GAE7aTSNrCWemQziAqL21Kn4aiWhh9QXhNDudHh9jS3wNH1cy1Ra/E
-         Zn1nJz3Nogf/vY0u/samMmYFu18STS/vOxQOjUniS5hLhPj15GxaR8TKwqIZhfu1d9mw
-         77VxqkcQ41SZnuY/ZR3DJ90M716loQHfX1Ypovui9uFzGyzzb+SUb8VqRC6Zn09p9KC7
-         rvlQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVTQ/Ho+1lCTxXdSQkDKEIcIN5cF9hvuDsoRiHsPvT4xAqTNHzDUSFVpsPXQ12JwenJMd5cKrlI5dtMlw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxiJp/uSQdeby+ruPEs72Gu1ixCcRce1x+O+MtefdgryIRMrnaX
-	4rSTmT/x2M6L1yi6d/D27DUpg6Oy5/8DqiUZoZHhQ+4ag8HfoyGO2NtN893bMYZsUvOCSwpJLq2
-	2RcHQDf1Zu9GfxbwAaFJNlOaIkL+0UY/7dtb5pz5lLK17/AIWsZdygrCs/MX6r5tD
-X-Gm-Gg: ASbGncvW+AtYDnVVraIQ0OPaXE0RH3JfY11/+6VT+IDi2BZnr98FB7MydkDPnIANZQB
-	EhwHZeTh/k7S6JKVN++/h75pIU8SuyMuldcc72l1tAhoXWOYgpz0fKHoF3SwN0r4wjNNI5mejQx
-	E/xEtoxIFhmsn9YxRtNrIFNM/B9jZDlLpPiz0MfEGq/9v4D2UaKxUbIIXRfiNCbr8ki/IJ7JeHr
-	xH95vvWQCh0LWhnwP5yIvYlMV0wynIApks32vFV2q5PBhihC1g/OV6NeMq5LWlgLytcRM+ZxvnW
-	/mbg2wwMvScYvBtLW6CRnGN1PUd2tAWLDIzsFJnwpYynYL8tuBgIxBlxXCZq8RrFhvlY+sXcLhk
-	LywP1N1c7aJMO+bWpoRyAor/JGqwYZRH4xlxeGHvaWznWNdDZQSrz0dbOlM7+Js7bCVgHzc1kNX
-	fpOdPy65/Vr8dHDs9JpVlIj2nt8y4=
-X-Received: by 2002:a05:6000:2507:b0:414:6fe6:8fa1 with SMTP id ffacd0b85a97d-42704d95645mr11202341f8f.38.1761033430887;
-        Tue, 21 Oct 2025 00:57:10 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGBqz1uZsEY1jCmnK5iipnnYUKFUGDAKuTU7UXJ/g7OrVHjIjgtlWv7fVh/TELjD+hkmZZH6Q==
-X-Received: by 2002:a05:6000:2507:b0:414:6fe6:8fa1 with SMTP id ffacd0b85a97d-42704d95645mr11202325f8f.38.1761033430520;
-        Tue, 21 Oct 2025 00:57:10 -0700 (PDT)
-Received: from ?IPV6:2003:d8:2f4e:3200:c99d:a38b:3f3a:d4b3? (p200300d82f4e3200c99da38b3f3ad4b3.dip0.t-ipconnect.de. [2003:d8:2f4e:3200:c99d:a38b:3f3a:d4b3])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-427ea5a0f7dsm18728294f8f.4.2025.10.21.00.57.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 21 Oct 2025 00:57:10 -0700 (PDT)
-Message-ID: <32a9b501-742d-4954-9207-bb7d0c08fccb@redhat.com>
-Date: Tue, 21 Oct 2025 09:57:08 +0200
+        d=1e100.net; s=20230601; t=1761033729; x=1761638529;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=k0VWPqCHv6+ZQuDCTFQQ2tUl50NtMLOJ2aVBSBufBxc=;
+        b=hEU+CARJ6Aja70b3OFoEBRmftBaSyglByoKFTReFtOckYRVpmb6WV1x1im6jeF4qd9
+         2+uAuOpf3Bcc+YZHTXqiWA341PrJfLQ+tno7FC2v1CPaQRJcuK5RcvCVqmbEe8atfHcK
+         HhBxFIzq22/4lb2o008SY/T3umv/h9gDz8ELBSEqueEE59KTaE1QXvSHGJqzQvumsbMM
+         7zetOe5+pcfkwATzKQGzwbw+cCnNuE7SgXROZeXlitJGM36hxZbgBqbYY3zX9BieNkjH
+         yF1l4U2as22xj8gpNk6atkMh4Y2ywoGmhGIp05IfKutnMwjTblKawtW0G3n71GgC7UbI
+         RojA==
+X-Forwarded-Encrypted: i=1; AJvYcCUKTfH1+ehp5t6oyL4ByaV1vwhUBEyOtUwtip+D+Id/gOX4ZTagLZeU8wIbYU29mwBT9DWK60XVE0fuHA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzcB12XXNA8W/z34tgY6BPCJbcscrn24jcyGY+ZdyhYoPqs425W
+	A0Rc7F6eukIfEIIhgCL3MGU8V593CFd+xkTVyMKte9eie3p8NifZAQZrg6ekLP8W0oJ0ASuBwTP
+	CwWn2Z4JZJ3NSguFHeElPCSGgYGjqIwzZ/hpK+ouicQ==
+X-Gm-Gg: ASbGncvnU0e3aujCxdw8A5nFuWYXNMaCXW26WYN+OlqBkqRuSqAZyHVBexn0aj0MdOj
+	IsFb9IgBlfSGosqS2Y37rvxsCX0LuV49K83k8zuJVwuhnt2h6h1fLxFCFVP59X4h8JtGhEFy9Ta
+	UW9dRPqB/tPEJ6SgppcUeqpbirqCcQyxYNxBe97NyOrtPRQ8fDfcTD/6PfQ6AyEhrhyuYxbb5K2
+	mwL7w9trH73fAmIR4iCfQaGe37anYUy5bhgOS8JhCCrxloJNIBCvNCyud8W
+X-Google-Smtp-Source: AGHT+IEQfgvHZuihlbBSJlVb+dcEnjFV14dIS2e3QeU28hCgVySmEX3k7+tkYGmNfEgLKxBR2Hkp3zdbZ2HHX0oRDVA=
+X-Received: by 2002:a05:6402:2115:b0:638:e8af:35c7 with SMTP id
+ 4fb4d7f45d1cf-63d16af7935mr1354397a12.2.1761033728661; Tue, 21 Oct 2025
+ 01:02:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: O_DIRECT vs BLK_FEAT_STABLE_WRITES, was Re: [PATCH] btrfs: never
- trust the bio from direct IO
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Jan Kara <jack@suse.cz>, Matthew Wilcox <willy@infradead.org>,
- Qu Wenruo <wqu@suse.com>, linux-btrfs@vger.kernel.org, djwong@kernel.org,
- linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
- linux-block@vger.kernel.org, linux-mm@kvack.org, martin.petersen@oracle.com,
- jack@suse.com
-References: <1ee861df6fbd8bf45ab42154f429a31819294352.1760951886.git.wqu@suse.com>
- <aPYIS5rDfXhNNDHP@infradead.org>
- <56o3re2wspflt32t6mrfg66dec4hneuixheroax2lmo2ilcgay@zehhm5yaupav>
- <aPYgm3ey4eiFB4_o@infradead.org>
- <mciqzktudhier5d2wvjmh4odwqdszvbtcixbthiuuwrufrw3cj@5s2ffnffu4gc>
- <aPZOO3dFv61blHBz@casper.infradead.org>
- <xc2orfhavfqaxrmxtsbf4kepglfujjodvhfzhzfawwaxlyrhlb@gammchkzoh2m>
- <5bd1d360-bee0-4fa2-80c8-476519e98b00@redhat.com>
- <aPc7HVRJYXA1hT8h@infradead.org>
-From: David Hildenbrand <david@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- qIws/H2t
-In-Reply-To: <aPc7HVRJYXA1hT8h@infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20251021-rnbd_fix-v1-1-71559ee26e2b@gmail.com>
+In-Reply-To: <20251021-rnbd_fix-v1-1-71559ee26e2b@gmail.com>
+From: Jinpu Wang <jinpu.wang@ionos.com>
+Date: Tue, 21 Oct 2025 10:01:57 +0200
+X-Gm-Features: AS18NWAjr1vMpIROYlrNqm-3ej7s5Tkh074kVV9erysvDSTuNEiz5Pc19hwQJzo
+Message-ID: <CAMGffEmsJjeqW8DGnKapVyM0Gporn_UuDB2xNosRmD2GduGgzg@mail.gmail.com>
+Subject: Re: [PATCH] drivers: block: rnbd: Handle generic ERR_PTR returns
+ safely in find_and_get_or_create_sess()
+To: Ranganath V N <vnranganath.20@gmail.com>
+Cc: "Md. Haris Iqbal" <haris.iqbal@ionos.com>, Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, skhan@linuxfoundation.org, 
+	david.hunter.linux@gmail.com, khalid@kernel.org, 
+	linux-kernel-mentees@lists.linuxfoundation.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 21.10.25 09:49, Christoph Hellwig wrote:
-> On Mon, Oct 20, 2025 at 09:00:50PM +0200, David Hildenbrand wrote:
->> Just FYI, because it might be interesting in this context.
->>
->> For anonymous memory we have this working by only writing the folio out if
->> it is completely unmapped and there are no unexpected folio references/pins
->> (see pageout()), and only allowing to write to such a folio ("reuse") if
->> SWP_STABLE_WRITES is not set (see do_swap_page()).
->>
->> So once we start writeback the folio has no writable page table mappings
->> (unmapped) and no GUP pins. Consequently, when trying to write to it we can
->> just fallback to creating a page copy without causing trouble with GUP pins.
-> 
-> Yeah.  But anonymous is the easy case, the pain is direct I/O to file
-> mappings.  Mapping the right answer is to just fail pinning them and fall
-> back to (dontcache) buffered I/O.
-
-Right, I think the rules could likely be
-
-a) Don't start writeback to such devices if there may be GUP pins (o 
-writeble PTEs)
-
-b) Don't allow FOLL_WRITE GUP pins if there is writeback to such a device
-
-Regarding b), I would have thought that GUP would find the PTE to not be 
-writable and consequently trigger a page fault first to make it 
-writable? And I'd have thought that we cannot make such a PTE writable 
-while there is writeback to such a device going on (otherwise the CPU 
-could just cause trouble).
-
--- 
-Cheers
-
-David / dhildenb
-
+On Tue, Oct 21, 2025 at 8:21=E2=80=AFAM Ranganath V N <vnranganath.20@gmail=
+.com> wrote:
+>
+> Fix the issue detected by the smatch tool.
+> drivers/block/rnbd/rnbd-clt.c:1241 find_and_get_or_create_sess()
+> error: 'sess' dereferencing possible ERR_PTR()
+>
+> find_and_get_or_create_sess() only checks for ERR_PTR(-ENOMEM) after
+> calling find_or_create_sess(). In other encoded failures, the code
+> may dereference the error pointer when accessing sess->nr_poll_queues,
+> resulting ina kernel oops.
+>
+> By preserving the existing -ENOMEM behaviour and log unexpected
+> errors to assist in debugging. This change eliminates a potential
+> invalid pointer dereference without altering the function's logic
+> or intenet.
+>
+> Tested by compiling using smatch tool.
+Thx for the patch.
+But I read the code again, find_or_create_sess -> alloc_sess, which
+only return ERR_PTR(-ENOMEM) or a valid pointer.
+I think this is just a false positive.
+>
+> Signed-off-by: Ranganath V N <vnranganath.20@gmail.com>
+> ---
+>  drivers/block/rnbd/rnbd-clt.c | 11 ++++++++---
+>  1 file changed, 8 insertions(+), 3 deletions(-)
+>
+> diff --git a/drivers/block/rnbd/rnbd-clt.c b/drivers/block/rnbd/rnbd-clt.=
+c
+> index f1409e54010a..57ca694210b9 100644
+> --- a/drivers/block/rnbd/rnbd-clt.c
+> +++ b/drivers/block/rnbd/rnbd-clt.c
+> @@ -1236,9 +1236,14 @@ find_and_get_or_create_sess(const char *sessname,
+>         struct rtrs_clt_ops rtrs_ops;
+>
+>         sess =3D find_or_create_sess(sessname, &first);
+> -       if (sess =3D=3D ERR_PTR(-ENOMEM)) {
+> -               return ERR_PTR(-ENOMEM);
+> -       } else if ((nr_poll_queues && !first) ||  (!nr_poll_queues && ses=
+s->nr_poll_queues)) {
+> +       if (IS_ERR(sess)) {
+> +               err =3D PTR_ERR(sess);
+> +               if (err !=3D -ENOMEM)
+> +                       pr_warn("rndb: find_or_create_sess(%s) failed wit=
+h %d\n",
+> +                               sessname, err);
+> +               return ERR_PTR(err);
+> +       }
+> +       if ((nr_poll_queues && !first) ||  (!nr_poll_queues && sess->nr_p=
+oll_queues)) {
+>                 /*
+>                  * A device MUST have its own session to use the polling-=
+mode.
+>                  * It must fail to map new device with the same session.
+>
+> ---
+> base-commit: 211ddde0823f1442e4ad052a2f30f050145ccada
+> change-id: 20251021-rnbd_fix-9b478fb52403
+>
+> Best regards,
+> --
+> Ranganath V N <vnranganath.20@gmail.com>
+>
