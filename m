@@ -1,106 +1,97 @@
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C0C82DCC05
-	for <linux-block@vger.kernel.org>; Wed, 22 Oct 2025 16:41:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6EF525A341;
+	Wed, 22 Oct 2025 17:05:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761151315; cv=none; b=SaqfoWJ6IAV2AK7VxYqBM00gIiKmEjgajEC1V3T6bqX9peiwQ92M0B+/ch4RoV0GWWNhQIQ0nQOqG9DmDpQz/BJXd5c69bszFqjKJDG3MzQXivDU7+JO3vIni9syyG9lDdieyBYXfqvntAdYceH7p2xOW8I2MhYhEDUSbeJmpDY=
+	t=1761152713; cv=none; b=hAs+W6x9aIpWIJO5ewwgPdQ/ybcxZ8DbCs8XRCWXynw0PUaJ/DdAU+zg3ghTlnC2EJlgCIjrh6fil9rS0qEskYcwfEPt9DaZUvQiiQ+6WkyhnMLMsVe8KGp7B2yPz9uvshzhIFRXRRK5NVeyV4Y1/aer8LOq60gN7l8tzrq2zHU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761151315; c=relaxed/simple;
-	bh=EcYgA1Dp2f8fgnuyFgD78VApES3CVJQ6ODo7jPzfgGI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=U46eKiSVVEWpyQFRYXGtK2W564c35M3ubmfgVNAQGgnwWzw/7Kccb6Bby1tE5Gqplrah4m21749TJwAC7nXXRoHY+jBIVkTihnfh43F64ewBFlu4W+ZLb0iAdJklGjb/uaKPm+DgYkrxxI+0Lpb+9bR8MfscOsyMmxZ9qOVwrFU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TcCo87Yq; arc=none smtp.client-ip=209.85.218.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1761152713; c=relaxed/simple;
+	bh=UiPn/GnL997VS+8t5o8a29N6aQcfn2fNK+YW5w5pdRY=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=s/aXo+F675BwWlpAFsjEGDZARl0LyC69zRk/AecgJcDX4Ipzylk7fkP3UnNlZpxND3RFJzR6vmajw2D+KLukl4PDEcx8Dh9D0C5ew79puag5N2Ll5iPSOfSGqTlK165pOgpaz+SgbXNRs4DAIe9P32RATF5x7M37tmR9o0FVhFU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=pbJR9jVQ; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=sCG7m/Gr; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TcCo87Yq"
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-b3f5e0e2bf7so1469745166b.3
-        for <linux-block@vger.kernel.org>; Wed, 22 Oct 2025 09:41:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761151312; x=1761756112; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EcYgA1Dp2f8fgnuyFgD78VApES3CVJQ6ODo7jPzfgGI=;
-        b=TcCo87Yq/iqTvWnBnXr1s/sb405+ysTLf/84TAuBDnKBBDUXPhVcnrRzwWKSmvJPHM
-         sHvLDJy4H+au5p0MkDVRxE9dBRvvR5TXtEajr8oGykSgG9bDfoNc0SlJdAn0+tOvZfUF
-         nDkYKnfeNYvxMDaPVIu7RTFhe+JFog3XitWtISUFtnLJq8yv/Ie79MJmif4ot1haGFCd
-         eahrAgwlG3DgFuB8g1YM9qlrtpgocKryspGEc8RduAwwVtt+k5wKIBMXCj03ujxrfucx
-         vvNSnbdMyBfFKGJkyK/ZXqMenwgzukXmQnWfk2h2YtnVuv+LJSuNRCoU/aN8C5Nys+E1
-         YxWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761151312; x=1761756112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=EcYgA1Dp2f8fgnuyFgD78VApES3CVJQ6ODo7jPzfgGI=;
-        b=rTGpjH75qy0HIFegsD9NPvzgZCyfBM89YHkUClW4nuH1AwQ1iuLMW+a1LqsLhQgSd8
-         fbkLuA2Pq0jFKYpuRcb8uiT0Y7FVgaPnGQuIjYXjvodV8xNo6+h6Db9kuxKMK4ecpnBD
-         Kg8jgw1wNDOgBq2b1Ra1OFJ6NQXF7nJHcWKlZl/zsGA5UxmLytusmtGSLAbqEl8N/H7X
-         EWZpZVyYEix2O40nQVb7N8oAtiFcM7nqH12+oYuBJkiL51Zs72t058fe0t4fLy45o0Ce
-         k50s1FXOUgaR7oU0dgDLAQqnwhB91Tn+SylgF5MxO9Pr1RAfoTpGARmACeHwanF0az+2
-         knvg==
-X-Forwarded-Encrypted: i=1; AJvYcCXfw6U9vf5UWYYq8BCVkjNIs3g8Hxga1OyJY5Is5f3xvsNAvXLLZUtCCTd2TbFQIC1yhJm71URHt8ySZQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz2xPfNVXq6XHS3f2hLvw6sZA1CpiuBTt4A4JIqcg5FadOgaXrV
-	0ch3vwsZircFkL06pXhP15YxFOvODr/phTc7vTOocQQmgBLH2AMTZHYApI/QbGDUUq1sJiDK0tl
-	I6B7hze1OTJEKlSd0xAIs/tX8MSmsv5M=
-X-Gm-Gg: ASbGncuOz82f8p4zXhci61RgSWUbTufaijLYGXdCmAEEurNsSqT6HoOXNuRq4eKszNx
-	Gm1KxZSUZUWGX3CglkPD7NBBbA8EyZaEQb5TIoTOUwzQluhz9+oeu1CKemx2E9XxzXRb1Hf9Mfi
-	lDmRlgHnNF/8oaGz8zMe4JHWqSSY68gyXS94lSamlD4+bcFgnKWyMj9MTLrObh2h7AxFozTE4dE
-	9hoyPc2Sdpg6q2gVrpRJ1JB0Q7M9sZhZmgAWKQUw+r7c+RIlcOfut8z2WwtUYKnkEz7XYos
-X-Google-Smtp-Source: AGHT+IHkWGnG06JOtYFwx6WKEecUCCr1fs/y3xfoAi4lziINz4JBVkxPbzc5Y9qrcmqbPId7dzqQXzuYY7OGWY5xDrg=
-X-Received: by 2002:a17:907:c11:b0:b32:8943:7884 with SMTP id
- a640c23a62f3a-b647500ee9amr2300275766b.45.1761151311555; Wed, 22 Oct 2025
- 09:41:51 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="pbJR9jVQ";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="sCG7m/Gr"
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1761152709;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=oQ2RBVYKWQ5VGf96MS/2zH2TN/ADfNL38D/U5RR3xQM=;
+	b=pbJR9jVQB5nr+G8FFj8RmvDtwsOIWSvd8E6t+m3j3n+0H3B0jqNrjeiEi2dk1Plj3VirQN
+	yA/1V7sUF8faAQfZfcsGicIAzo3BuCrCtp9sM1r+CCFvRumcubP0BTQjKsmmkHkqsU4SB6
+	P4FKQ4SXRCBNVgzpu7rNh5bRZmUxbM5wYzbEVt4q3BfiT2pVRWQKtJjAhC7QXvUch9Wc5g
+	1ykJvAtC37H+CceUcCldztlAX1LwExlWrqz+ncLjsiQfm/fPFU+/nr5IWQvZalrCr+kiBY
+	+AAFXvOu5w0HuDFiuQYd4GUcnBqs1oot36h5XkZZ06TOGao+ogzZSCsP6vRpTw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1761152709;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=oQ2RBVYKWQ5VGf96MS/2zH2TN/ADfNL38D/U5RR3xQM=;
+	b=sCG7m/GraXt0ezpnYBgZ/Npnx8XVxrxQ5s9GmVsZF5pgEe3UYpCM3NR8gSrtBKmgBh+DVK
+	EdE+sr9Ir7P4SxDw==
+To: Christophe Leroy <christophe.leroy@csgroup.eu>, Alexander Viro
+ <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, Jan
+ Kara <jack@suse.cz>, Ingo Molnar <mingo@redhat.com>, Peter Zijlstra
+ <peterz@infradead.org>, Darren Hart <dvhart@infradead.org>, Davidlohr
+ Bueso <dave@stgolabs.net>, Andre Almeida <andrealmeid@igalia.com>, Andrew
+ Morton <akpm@linux-foundation.org>, Eric Dumazet <edumazet@google.com>,
+ Kuniyuki Iwashima <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Willem de Bruijn <willemb@google.com>, "David S. Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Simon Horman
+ <horms@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Dave Hansen
+ <dave.hansen@linux.intel.com>, Madhavan Srinivasan <maddy@linux.ibm.com>,
+ Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>
+Cc: Christophe Leroy <christophe.leroy@csgroup.eu>,
+ linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org
+Subject: Re: [PATCH v3 03/10] uaccess: Add
+ masked_user_{read/write}_access_begin
+In-Reply-To: <a4ef0a8e1659805c60fafc8d3b073ecd08117241.1760529207.git.christophe.leroy@csgroup.eu>
+References: <cover.1760529207.git.christophe.leroy@csgroup.eu>
+ <a4ef0a8e1659805c60fafc8d3b073ecd08117241.1760529207.git.christophe.leroy@csgroup.eu>
+Date: Wed, 22 Oct 2025 19:05:09 +0200
+Message-ID: <87bjlyyiii.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <aPg-YF2pcyI-HusN@archie.me> <20251022080626.24446-1-safinaskar@gmail.com>
-In-Reply-To: <20251022080626.24446-1-safinaskar@gmail.com>
-From: Andy Shevchenko <andy.shevchenko@gmail.com>
-Date: Wed, 22 Oct 2025 19:41:15 +0300
-X-Gm-Features: AS18NWAouNqJg7toJrl3zFJYl4AxgHZN6-E0xEGlNVrmOGgNKVxnzpVBWI-jPi8
-Message-ID: <CAHp75Vfb5J9P1vhSWkGy_j+ter_774ThBJHZuSp=r583xGP8Cw@mail.gmail.com>
-Subject: Re: [PATCH v3 2/3] initrd: remove deprecated code path (linuxrc)
-To: Askar Safin <safinaskar@gmail.com>
-Cc: bagasdotme@gmail.com, akpm@linux-foundation.org, arnd@arndb.de, 
-	axboe@kernel.dk, bp@alien8.de, brauner@kernel.org, 
-	christophe.leroy@csgroup.eu, cyphar@cyphar.com, ddiss@suse.de, 
-	dyoung@redhat.com, email2tema@gmail.com, graf@amazon.com, 
-	gregkh@linuxfoundation.org, hca@linux.ibm.com, hch@lst.de, 
-	hsiangkao@linux.alibaba.com, initramfs@vger.kernel.org, jack@suse.cz, 
-	jrtc27@jrtc27.com, julian.stecklina@cyberus-technology.de, kees@kernel.org, 
-	krzk@kernel.org, linux-api@vger.kernel.org, linux-arch@vger.kernel.org, 
-	linux-block@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	mcgrof@kernel.org, monstr@monstr.eu, mzxreary@0pointer.de, 
-	nschichan@freebox.fr, patches@lists.linux.dev, rob@landley.net, 
-	thomas.weissschuh@linutronix.de, thorsten.blum@linux.dev, 
-	torvalds@linux-foundation.org, viro@zeniv.linux.org.uk
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 
-On Wed, Oct 22, 2025 at 11:06=E2=80=AFAM Askar Safin <safinaskar@gmail.com>=
- wrote:
-> Bagas Sanjaya <bagasdotme@gmail.com>:
-
-...
-
-> > Do you mean that initrd support will be removed in LTS kernel release o=
-f 2026?
+On Fri, Oct 17 2025 at 12:20, Christophe Leroy wrote:
+> Allthough masked_user_access_begin() is to only be used when reading
+> data from user at the moment, introduce masked_user_read_access_begin()
+> and masked_user_write_access_begin() in order to match
+> user_read_access_begin() and user_write_access_begin().
 >
-> I meant September 2026. But okay, if there is v4, then I will change this=
- to
-> "after LTS release in the end of 2026".
+> That means masked_user_read_access_begin() is used when user memory is
+> exclusively read during the window, masked_user_write_access_begin()
+> is used when user memory is exclusively writen during the window,
+> masked_user_access_begin() remains and is used when both reads and
+> writes are performed during the open window. Each of them is expected
+> to be terminated by the matching user_read_access_end(),
+> user_write_access_end() and user_access_end().
+>
+> Have them default to masked_user_access_begin() when they are
+> not defined.
+>
+> Signed-off-by: Christophe Leroy <christophe.leroy@csgroup.eu>
 
-No need to mention "ater LTS release", we all know that this is the
-last release that made the year in question.
+Can we please coordinate on that vs. the scoped_access() work as this
+nicely collides all over the place?
 
---=20
-With Best Regards,
-Andy Shevchenko
+Thanks,
+
+        tglx
+
+
