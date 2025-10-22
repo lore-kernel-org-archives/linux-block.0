@@ -1,31 +1,64 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 431DB15E5DC;
-	Wed, 22 Oct 2025 07:07:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADBBE2F3C12;
+	Wed, 22 Oct 2025 07:08:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761116858; cv=none; b=kp/maAdfI7RGK37NGrwv0d4ipHn4G+pig/WRlLS0BlqO3G/9gdEwE+DP+qfy2vfYPPl6ETKAiLQoXhb1gvxtL9ENRFNaJykQrvIY66Mr6Unx8DPGBvHS3FC3RpubeZTyOQZUls9o+HdtHoef5ozpMbbfg3shnncIASrH48ut88s=
+	t=1761116936; cv=none; b=m1O7ktc+1gG2h8ASsaGSDMHWrX75XnErUtZJU6dos2NGnUs5R10VklwSg9QjYe5Awxp5IvoVElmFPwM/6MjRm15/rI9ca2gHaD6R2BXrracGIjDR0ZYgo8RjbW8TZt75+cmXPlP3QlzY9/WOFfHRlt34z5Nr4GNHsRV0PB5QYEM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761116858; c=relaxed/simple;
-	bh=n0nrFgOm1f3njGiO+6cUro2XyE/DFYT2r3vIVZx7XTg=;
+	s=arc-20240116; t=1761116936; c=relaxed/simple;
+	bh=RZfNn8b8mW0sEmuXaQMaNf0XrCYG7zBzjmxoWD6SwPE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Vxy16pZdH+FoSfuths9fidvFo0ZhbpuzAeLJE+M0Ls93nIetiSIKur48ysbnTk1qREO5WHXthm45aaix9qW/jb7ePlOa9suqZ4UGoQ85euBUUGPM7M0/YiEiGkp/wlZaC3OhgoJAox0iFIFlawTFI7eNs/+XbLGphVxBiT3ftWw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id B1CDF227A88; Wed, 22 Oct 2025 09:07:32 +0200 (CEST)
-Date: Wed, 22 Oct 2025 09:07:32 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH v25 07/20] block/mq-deadline: Enable zoned write
- pipelining
-Message-ID: <20251022070732.GA5874@lst.de>
-References: <20251014215428.3686084-1-bvanassche@acm.org> <20251014215428.3686084-8-bvanassche@acm.org> <08ce89bb-756a-4ce8-9980-ddea8baab1d1@kernel.org> <a1850fbc-a699-4e73-9fb7-48d4734c6dd3@acm.org> <136efbd2-babc-4f07-871f-f1464a2ec546@kernel.org> <f8c1581f-5337-4473-b2a0-b1e1a9ee206e@acm.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=MF26B+JEdLWP1fv0+5joatSGnv4hv12qOd57u54UfVLjslgRzCvTPLAEFcrDeKnvXDOOEq7y7YMnT5HjJyadx2fJw8xpfuHdTtl9aid9LYT7IOq1kNgwq4XqOde0AptGuPrq7ItwwCKd+N9wF8TxdOzpPKXRvTI+kbwFf5f4v9I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=SdNtRvN9; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="SdNtRvN9"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=v9tFlJ2fSBgWVG5dQp+BqV6oOUweYHcntX3sRf6YFKM=; b=SdNtRvN9ECbH+6Wq5VOUBng1tV
+	rbcoTW7YrrfUGP/4J4whwouG1kDyvf3Lmdfi7LbnRPq89BMYv58xbUTBmXgSPXZVYRb6mJhJAPQU1
+	ZIA0/wC+S1RJMhiGYJjhCAdfm4FEwCrzY3g3l4cgwQjuPypeTpyBjpkFiGnJ3/MzMXNCCwCjSZrzm
+	n6BBFOL61exQBTv/xlQB1DwMELcEAU2ArzUgD/NYvkI2kZUkmNNPseZu9Lnk8f+brxHeHjW+o2OQa
+	50dWmbeHSHNr0vGLwBLSjUlfEwJXoZAmppaRqh0WNeM+hhzaF/nXElPtxtD2OmafhI0Tejkvpb775
+	0PevGOYA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1vBSxk-00000001oCQ-0f7W;
+	Wed, 22 Oct 2025 07:08:48 +0000
+Date: Wed, 22 Oct 2025 00:08:48 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Christoph Hellwig <hch@infradead.org>,
+	Leon Romanovsky <leon@kernel.org>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Leon Romanovsky <leonro@nvidia.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
+	Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>,
+	kvm@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-media@vger.kernel.org, linux-mm@kvack.org,
+	linux-pci@vger.kernel.org, Logan Gunthorpe <logang@deltatee.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Vivek Kasireddy <vivek.kasireddy@intel.com>,
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v5 8/9] vfio/pci: Enable peer-to-peer DMA transactions by
+ default
+Message-ID: <aPiDACJHZY7Gu4y1@infradead.org>
+References: <cover.1760368250.git.leon@kernel.org>
+ <a04c44aa4625a6edfadaf9c9e2c2afb460ad1857.1760368250.git.leon@kernel.org>
+ <aPHjG2PS5DVgcG93@infradead.org>
+ <20251017115524.GG3901471@nvidia.com>
+ <aPYq0jQZOrn-lUJW@infradead.org>
+ <20251020130855.GM316284@nvidia.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -34,12 +67,18 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <f8c1581f-5337-4473-b2a0-b1e1a9ee206e@acm.org>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20251020130855.GM316284@nvidia.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Mon, Oct 20, 2025 at 11:28:36AM -0700, Bart Van Assche wrote:
-> The block layer changes that I'm proposing are small, easy to maintain
-> and not invasive.
+On Mon, Oct 20, 2025 at 10:08:55AM -0300, Jason Gunthorpe wrote:
+> Sure, but this should be handled by the P2P subsystem and PCI quirks,
+> IMHO. It isn't VFIOs job.. If people complain about broken HW then it
+> is easy to add those things.
 
-No, they are absolutely not.
+I think it is.  You now open up behavior generally that previously
+had specific drivers in charge.
+
+> IDK where Intel GPU lands on this, but VFIO has always supported P2P
+
+How?
 
