@@ -1,31 +1,59 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E35102EA17D;
-	Wed, 22 Oct 2025 06:21:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4D922ECD3A;
+	Wed, 22 Oct 2025 06:24:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761114102; cv=none; b=Ha9RnnEeY1hq1z+F8cY/+xeFl2FGkD5yi5ToiwoqyYOiH7BTTZjtsbXgM5AP/SjgeyBzx2ngQ4HxuGQ/A/Ph/ekoTKOpbY7HT72XWZYjCTDBGEKXMYEzNqwmQUJ0mLGfyNo0r2kboVO2XNYihltSsJ/W2tX67cFcRknvOAn4yt8=
+	t=1761114292; cv=none; b=dutoeRbKC+wYGaTgAcp5AHyutyIJVTgeHE/c7EbCTlEODxqkNGmmbbA/0QVrmBClctCwAtzLP88jAyNqC4/rOttF9sIRgX/jKg0Wf14yMSP4Tf2vihu0YLDKGx4wMX6pcOaNaMkkgMyfzQm85jZNqw1pbceYhrOYQibHl1vbu4w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761114102; c=relaxed/simple;
-	bh=/rbjkxMQ8pz0+YOUj+1n2Nn/55zboinmjczNiZTonmc=;
+	s=arc-20240116; t=1761114292; c=relaxed/simple;
+	bh=vHas3sy8prCVLo71319oRvMTTc/fK2RlrePiiW26olw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aGs2LwJcHhLOtxl1OJCYJd1J8fB+1C+M0WCUZrLuoGSod8a4I6UGWyzUK8Olxje5Z+6V5MVJOUCJsoueQdO5wzKFTtTn3257dT0PQyWObypHZ6KOfgK7KxCePTX0uc3FtN0wXmMLiMGHmXDee/DtHx1Wu02vtIxK5s2wjiapxxI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id E62DB227A88; Wed, 22 Oct 2025 08:21:35 +0200 (CEST)
-Date: Wed, 22 Oct 2025 08:21:35 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
-	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-nvme@lists.infradead.org
-Subject: Re: [PATCH v2 2/2] block-dma: properly take MMIO path
-Message-ID: <20251022062135.GD4317@lst.de>
-References: <20251020-block-with-mmio-v2-0-147e9f93d8d4@nvidia.com> <20251020-block-with-mmio-v2-2-147e9f93d8d4@nvidia.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZDo03chbPnaT7nqcNVtzKSjgx6BeNmo8SsgWU8qTXQT3ggupo3nUjBHsGvDQF6EuXZNETrxVscpMNE4LGfEXQ1Oxsr4cZDXgbu0Jew8QcGjasLBytHU6EpRuaPuw59cIjADLfGnri338vhnQQI8nchvAZlhW1Bl5cOfSsUianLI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=RX7a1AXW; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="RX7a1AXW"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=1XhDE1BELRWX5YDOcVl25kQ97WNQSKEMx7NE0+Z0zfs=; b=RX7a1AXWTILfx/vttsD6ASD5QM
+	nm39/Tj4XmpGD53ez9zf4QpAZwF67Zia4CQzhS9732EWS8EPh2m8ojSGgnoJs+ttrmJRmrRTMPhRi
+	jt9Me0ujkGJNrMfLgoTCR5PgmzW3b8SlrnGxZ4pz/+jVDasdZsUWCAqzQ0ae3gmPoSxHkqQ/q19xI
+	RYkBGdEhA6XkBkYrGAoXPT+y9kz1RXrhJ3UCNIW1WFCR3np8xaonuIeoPL7+Mp6mH+7Pnppq8Qvxt
+	gfbhjptNvEJ0BDuMiJWCcyQYvs5SNAKh9t7u6juA0NeJcsmSSGnr1ZY9pemg6FZaqGbLYAb1E/y07
+	Yqg5E91w==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1vBSHA-00000001eTW-3aoM;
+	Wed, 22 Oct 2025 06:24:48 +0000
+Date: Tue, 21 Oct 2025 23:24:48 -0700
+From: "hch@infradead.org" <hch@infradead.org>
+To: Qu Wenruo <quwenruo.btrfs@gmx.com>
+Cc: "hch@infradead.org" <hch@infradead.org>,
+	Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+	WenRuo Qu <wqu@suse.com>,
+	"linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
+	"djwong@kernel.org" <djwong@kernel.org>,
+	"linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+	"jack@suse.com" <jack@suse.com>
+Subject: Re: O_DIRECT vs BLK_FEAT_STABLE_WRITES, was Re: [PATCH] btrfs: never
+ trust the bio from direct IO
+Message-ID: <aPh4sJ8eFJeMCAHx@infradead.org>
+References: <aPYIS5rDfXhNNDHP@infradead.org>
+ <b91eb17a-71ce-422c-99a1-c2970a015666@gmx.com>
+ <aPc6uLKJkavZ_SkM@infradead.org>
+ <4f4c468a-ac87-4f54-bc5a-d35058e42dd2@suse.com>
+ <25742d91-f82e-482e-8978-6ab2288569da@wdc.com>
+ <f13c9393-1733-4f52-a879-94cdc7a724f2@gmx.com>
+ <aPhl7wvyZ8b7cnLw@infradead.org>
+ <3677cfe8-00cd-466d-b9e3-680c6d6d8c73@gmx.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -34,61 +62,24 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251020-block-with-mmio-v2-2-147e9f93d8d4@nvidia.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <3677cfe8-00cd-466d-b9e3-680c6d6d8c73@gmx.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Mon, Oct 20, 2025 at 08:00:21PM +0300, Leon Romanovsky wrote:
-> From: Leon Romanovsky <leonro@nvidia.com>
-> 
-> In commit eadaa8b255f3 ("dma-mapping: introduce new DMA attribute to
-> indicate MMIO memory"), DMA_ATTR_MMIO attribute was added to describe
-> MMIO addresses, which require to avoid any memory cache flushing, as
-> an outcome of the discussion pointed in Link tag below.
-> 
-> In case of PCI_P2PDMA_MAP_THRU_HOST_BRIDGE transfer, blk-mq-dm logic
-> treated this as regular page and relied on "struct page" DMA flow.
-> That flow performs CPU cache flushing, which shouldn't be done here,
-> and doesn't set IOMMU_MMIO flag in DMA-IOMMU case.
-> 
-> Link: https://lore.kernel.org/all/f912c446-1ae9-4390-9c11-00dce7bf0fd3@arm.com/
-> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-> ---
->  block/blk-mq-dma.c            |  6 ++++--
->  drivers/nvme/host/pci.c       | 23 +++++++++++++++++++++--
->  include/linux/blk-integrity.h |  7 ++++---
->  include/linux/blk-mq-dma.h    | 11 +++++++----
->  4 files changed, 36 insertions(+), 11 deletions(-)
-> 
-> diff --git a/block/blk-mq-dma.c b/block/blk-mq-dma.c
-> index 4ba7b0323da4..3ede8022b41c 100644
-> --- a/block/blk-mq-dma.c
-> +++ b/block/blk-mq-dma.c
-> @@ -94,7 +94,7 @@ static bool blk_dma_map_direct(struct request *req, struct device *dma_dev,
->  		struct blk_dma_iter *iter, struct phys_vec *vec)
->  {
->  	iter->addr = dma_map_phys(dma_dev, vec->paddr, vec->len,
-> -			rq_dma_dir(req), 0);
-> +			rq_dma_dir(req), iter->attrs);
->  	if (dma_mapping_error(dma_dev, iter->addr)) {
->  		iter->status = BLK_STS_RESOURCE;
->  		return false;
-> @@ -116,7 +116,7 @@ static bool blk_rq_dma_map_iova(struct request *req, struct device *dma_dev,
->  
->  	do {
->  		error = dma_iova_link(dma_dev, state, vec->paddr, mapped,
-> -				vec->len, dir, 0);
-> +				vec->len, dir, iter->attrs);
->  		if (error)
->  			break;
->  		mapped += vec->len;
-> @@ -184,6 +184,8 @@ static bool blk_dma_map_iter_start(struct request *req, struct device *dma_dev,
->  		 * P2P transfers through the host bridge are treated the
->  		 * same as non-P2P transfers below and during unmap.
->  		 */
-> +		iter->attrs |= DMA_ATTR_MMIO;
+On Wed, Oct 22, 2025 at 04:47:56PM +1030, Qu Wenruo wrote:
+> So far it looks like the bounce pages solution is wasting a lot of code for
+> almost nothing, it's not any better than falling back.
 
-DMA_ATTR_MMIO is the only flags in iter->attrs, and I can't see any other
-DMA mapping flag that would fit here.  So I'd rather store the
-enum pci_p2pdma_map_type here, which also removes the need for REQ_P2PDMA 
-and BIP_P2P_DMA when propagating that to nvme.
+That was my expectation, but I wasn't entirely sure from your wording
+if that's what you measured.
+
+> Since we always fallback to buffered IO for checksums, the content should
+> not change and we can do the submission and checksum calculation in
+> parallel.
+
+Yes.
+
+> Already got a prototype, results around 10% improvement inside my VM.
+> Will fix the bugs related to compression and send an RFC for it.
+
+Nice.  I've also started looking at my PI backlog for the XFS version.
 
