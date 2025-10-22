@@ -1,364 +1,403 @@
-Received: from mail-lf1-f98.google.com (mail-lf1-f98.google.com [209.85.167.98])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FFC8308F1E
-	for <linux-block@vger.kernel.org>; Wed, 22 Oct 2025 23:13:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.98
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B94B322A7E9
+	for <linux-block@vger.kernel.org>; Wed, 22 Oct 2025 23:52:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761174829; cv=none; b=Du5GK9pbiDUQ84BeUmQrYU1L/7NndLAfIvThmlbeoz1wG+Os19l3TMVuJLXv2cYYGyuzRWNbeE9XEoAyTDGgerrrB4+dGqK7hzYbeXZ8pkmDac/p2t0NNJhj2Lwb/0bQzcQ5sv+AFsjv/OUqU8ZOV1ns/s7cKFZd0GxKqWexDNs=
+	t=1761177174; cv=none; b=TAEZK7TLRPB2C9I+f62lJnjuJTkrtu/zG6+bjRWQ0moKOrUCVAKvJhJWKk6w/+K7BR+DBb6ihmtVCnrYGzsifwykQ03zpzrOIdl7Ux3wJ+LZnTkXQ0cBDB2caqtoWm7872ICyLLqesDyzOcB2M9HH7FfpfUtwET2EVV8QNaFdio=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761174829; c=relaxed/simple;
-	bh=Npt8CIamNyEuH3sVd1A1KqiVJoYsn6LwQFxIQ9NJE+E=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Ph6FfiLy6mJ8DpwKWEYoZfK5lsQokK7bqGBgQjUx8Ye7GAO7cxUlceJ4s+FmYreENBlnUM5Eqh74EWdd2PkPcGFu1C5NKQw2AdTChI3xtJ/jWurlA1JDv7Ns0+IvI64dFAsr3VLTWggXcFuo0coF8e0zxtt9UEwvbji5tOMNkWI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=FKG+sKvH; arc=none smtp.client-ip=209.85.167.98
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	s=arc-20240116; t=1761177174; c=relaxed/simple;
+	bh=TWGrCGbWqvePwSSLM4yLYtl3YsAGjrvkfX5qasXciII=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=RwxFhKGJLo5CtjQfEdG/CMJBZ/Lz1jVFhiCBR/tRsRVVjXi8Diepp4HX2Ic72AGF2ZXvrQonrdv0LHu1zx4uXPV1/g/7a7tQXnN6wDPucu+F8N1IXg77vqHjzTkji6NyRx60aDUGzdlsaKvzoyNHZ4LasrRyD+I8bMFPjsovvIM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=ADzvNJxw; arc=none smtp.client-ip=67.231.145.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="FKG+sKvH"
-Received: by mail-lf1-f98.google.com with SMTP id 2adb3069b0e04-592f40b1a40so27882e87.1
-        for <linux-block@vger.kernel.org>; Wed, 22 Oct 2025 16:13:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1761174823; x=1761779623; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NE/3amh4M7tNgNnZVfHQb2pFOExzJd/f5eLPCJymwKM=;
-        b=FKG+sKvHTvGcglwczO8wfj2/qFsvKpmkan7Z2dvNuGaNMH4b6mohpLKvaBPjCLdnVj
-         m5d2P3GEmi82guV2rsVe5LJn6XJLAEWJwS3tj4mBbwI+8u0emVR6vXHVpjkKp2WHmFmi
-         HeFKKgIWd+aYDGxqxRp+ciZZFg63dHTIUFxlmIYZe/fAJbVEUX0F6/spr8ZBztFsqN7R
-         iLYjL7LzOd9bJ//8mJZAtTMEcuM5ir/jOAFbON4z5eTfVfFJDO8qqisIFxJmIH7KXY4x
-         145zSd3Bjk+qmQj9S7CMJHIdPMjqqynkemZkaGRIw6kuBCws2IulbKUN7X+GN3TVbdi/
-         sncw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761174823; x=1761779623;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NE/3amh4M7tNgNnZVfHQb2pFOExzJd/f5eLPCJymwKM=;
-        b=J0Uq8BHqNfcdD0F99u4Iyzpe9J/qThZ3yCLfno3k6OP+Az+IllwFiNA564PlOXofGu
-         bzoBNYTjMXZfz92BDWCSVAuuQUXckcLL53IivYAnajCob2ya7VFjLxvxFPcvglSArsnD
-         9ZV9eAIcMZbWRZ0OJA4VoIVD9s1fUpEdgA19Y6V7xYZwJExuQD75UjE2MerLsBnkrq/H
-         GTJBRlKExpp3B1Njghz0+EEHp3x8RhnDEcbE8ciIXwDzizW8PWsfYgjqywXiDxBm0TLm
-         UAAA4X17NN/fiL67LDErbn7Xt0jBQ6qZNuZkeMi3NK7fl3FWR1FBVNVR8cb761qW3rIt
-         I/Qw==
-X-Forwarded-Encrypted: i=1; AJvYcCW8txL/FpQDXQaoj1vR2XyHmknnpR64MJxLd7Z/uPdKcZcN53A+UN2spY1Hi+5E1yynHsHMFAvIOafL2A==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyyBxThiaW1IiyXkSGc7Pk8RVONL0/Eg3AN6FJ7ykSbuwj/OHhz
-	GwqaAeKfeDtdUGxCN4MAU8t5woHa9tM+RKp4I81XECmvBBfGm7mEpZN8s3+tRkhhgG/s4af/vXa
-	EcS+tncfaUFU47hHcKJZzhkMR/Vkxd+EVyozBduD70zBFfTz8R546
-X-Gm-Gg: ASbGncuIGZqqvxbnGYxfmlL5TC5sBKwl0m45+pyDAOD4M2ya/CxTR4+cNXW6a5nXj0S
-	SpfVLaIUkNqVCoQVI9dHuIA+mFKhXS4yta0ZCcUY7NDQMEo4dOyyFCIBQ2rMPEhkmWyq6qaR+FG
-	I/7BXiWJtB2Ff+k/HZSzD8NhkvFuwwwIZ9nY5dZd7w9fUzvcJh9kCgfqGVAyLeSwFaQfo7X/HqB
-	TojWlt87+26eWkNvC4WDd0PUcHIdjluNrpd7SS08fMDLjAtCZQUfyRoyYI2+qO5/rNr7z9yo2qR
-	UWWFHh3pABKkMj/Qc51T7UOP/Mk+rbKqT2df2C1asAZVWMdF+xXIkOOiC66dm4oZMNC7sMr8MiS
-	ONtGFVt1ruw3P4tVe
-X-Google-Smtp-Source: AGHT+IEu6qVydvgz5FX5gNAmjAkNmVg8S3aqqXExnZUf61/Sip3v+pDczaTy7pMfPzfVmQFRBGfoB1U3Opib
-X-Received: by 2002:a05:6512:401b:b0:58b:212:b0b5 with SMTP id 2adb3069b0e04-591ea30a314mr1687437e87.7.1761174823283;
-        Wed, 22 Oct 2025 16:13:43 -0700 (PDT)
-Received: from c7-smtp-2023.dev.purestorage.com ([2620:125:9017:12:36:3:5:0])
-        by smtp-relay.gmail.com with ESMTPS id 2adb3069b0e04-592f4e502d3sm34119e87.55.2025.10.22.16.13.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Oct 2025 16:13:43 -0700 (PDT)
-X-Relaying-Domain: purestorage.com
-Received: from dev-csander.dev.purestorage.com (dev-csander.dev.purestorage.com [10.7.70.37])
-	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 2290F3407D1;
-	Wed, 22 Oct 2025 17:13:39 -0600 (MDT)
-Received: by dev-csander.dev.purestorage.com (Postfix, from userid 1557716354)
-	id 20207E4181C; Wed, 22 Oct 2025 17:13:39 -0600 (MDT)
-From: Caleb Sander Mateos <csander@purestorage.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	Miklos Szeredi <miklos@szeredi.hu>,
-	Ming Lei <ming.lei@redhat.com>,
-	Keith Busch <kbusch@kernel.org>,
-	Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Chris Mason <clm@fb.com>,
-	David Sterba <dsterba@suse.com>
-Cc: io-uring@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-btrfs@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Caleb Sander Mateos <csander@purestorage.com>
-Subject: [PATCH 3/3] io_uring/uring_cmd: avoid double indirect call in task work dispatch
-Date: Wed, 22 Oct 2025 17:13:26 -0600
-Message-ID: <20251022231326.2527838-4-csander@purestorage.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20251022231326.2527838-1-csander@purestorage.com>
-References: <20251022231326.2527838-1-csander@purestorage.com>
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="ADzvNJxw"
+Received: from pps.filterd (m0109334.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 59MLG13j2949383
+	for <linux-block@vger.kernel.org>; Wed, 22 Oct 2025 16:52:52 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=s2048-2025-q2; bh=YlV9Kc0ddgt92aqsXD
+	KMZtmLa9pTcjKpcUhxywPnYFo=; b=ADzvNJxwsgoVOS2qOFYzCa+ncZBq++YcHZ
+	Y4VPwYX9H5oTZmkz+fAaXqNUvV9clqhQ0AWyRzEIry1bqc3Kthj5E1MayIiBwikW
+	jcJLgsnPX/j75TOHPehIJPqbE/qbq4kuK5z8XxZeZlYWeQOknLP042yUhJq+HTvk
+	htXj4su2r8jWUeYBt+QVORD/QI/KOpc4G8+2Ju3x/tkvWr1qVePYABrNIRfXzxBT
+	CzLAgwB+VHG3qEVIWm54apS4YUMB7JwgY9+/MCfz/gwy5cHP1lj/9eTYxgG4CZCy
+	COnWFyuuUQRYxmhNrNYUHYQdpDG1B4Ji2cFhvHlvAOMH/qUKI4dQ==
+Received: from mail.thefacebook.com ([163.114.134.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 49y1b1v8dm-5
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <linux-block@vger.kernel.org>; Wed, 22 Oct 2025 16:52:51 -0700 (PDT)
+Received: from twshared17671.07.ash8.facebook.com (2620:10d:c085:108::4) by
+ mail.thefacebook.com (2620:10d:c08b:78::2ac9) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.20; Wed, 22 Oct 2025 23:52:44 +0000
+Received: by devbig197.nha3.facebook.com (Postfix, from userid 544533)
+	id 285C52FC1E3B; Wed, 22 Oct 2025 16:52:32 -0700 (PDT)
+From: Keith Busch <kbusch@meta.com>
+To: <hch@lst.de>, <martin.petersen@oracle.com>, <linux-block@vger.kernel.org>
+CC: <axboe@devbig197.nha3.facebook.com>, Keith Busch <kbusch@kernel.org>
+Subject: [PATCH] blk-integrity: support bvec straddling block data
+Date: Wed, 22 Oct 2025 16:52:31 -0700
+Message-ID: <20251022235231.1334134-1-kbusch@meta.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+Content-Type: text/plain
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDIyMDE5OSBTYWx0ZWRfX/8HcmTmaL6hP
+ axrJwYfd09K7a8vJgzvD4ci5HKZQe/DpUBbHXtyj5hIOj8GzzpBpK4lYYinpuIlNea2jU4FTOKS
+ W7ONYogVzi66M1CPh7cVS29GAqyXHFyLKXOHdcjE4nxtwmr/X5KAb/B49maxcMgRq1fkU7ySWcE
+ c8vH9GLmmCzJIzounJJR32fosHpMGMzy9cr5W36l8SkjFCjvbn2PV0hhoPR0nQYmpg6H0r2Gj6a
+ zt2bWPOGKmfQK/ApxMqoOFvDNumV5wy9cJHxOsj/7rt8H0ED0Ur6RtBOi2GbU1YU1Ea56A57m+o
+ /onznuHvIaUF8nBuTljWtz21e0nP2cYXKcla5O3SHBlk/oVmqpn3zEkvvco7Q62EGy6fHeCUdu7
+ aBC1CxHb02I/Pe7WoSoSa6bNHf9dUw==
+X-Proofpoint-ORIG-GUID: 3E7ToXfhd_9jC9Jz6xVT0tHOp464LYwH
+X-Authority-Analysis: v=2.4 cv=Xc2EDY55 c=1 sm=1 tr=0 ts=68f96e53 cx=c_pps
+ a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17
+ a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=VwQbUJbxAAAA:8
+ a=sHoX4Zs7NGcbYNiplGUA:9
+X-Proofpoint-GUID: 3E7ToXfhd_9jC9Jz6xVT0tHOp464LYwH
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-10-22_08,2025-10-22_01,2025-03-28_01
 
-io_uring task work dispatch makes an indirect call to struct io_kiocb's
-io_task_work.func field to allow running arbitrary task work functions.
-In the uring_cmd case, this calls io_uring_cmd_work(), which immediately
-makes another indirect call to struct io_uring_cmd's task_work_cb field.
-Introduce a macro DEFINE_IO_URING_CMD_TASK_WORK() to define a
-io_req_tw_func_t function wrapping an io_uring_cmd_tw_t. Convert the
-io_uring_cmd_tw_t function to the io_req_tw_func_t function in
-io_uring_cmd_complete_in_task() and io_uring_cmd_do_in_task_lazy().
-Use DEFINE_IO_URING_CMD_TASK_WORK() to define a io_req_tw_func_t
-function for each existing io_uring_cmd_tw_t function. Now uring_cmd
-task work dispatch makes a single indirect call to the io_req_tw_func_t
-wrapper function, which can inline the io_uring_cmd_tw_t function. This
-also allows removing the task_work_cb field from struct io_uring_cmd,
-freeing up some additional storage space.
+From: Keith Busch <kbusch@kernel.org>
 
-Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
+A bio segment might have only partial block data that continues into the
+next segment. User the integrity iterator to store the current checksum
+state until we've accumulated a full interval worth of data.
+
+Signed-off-by: Keith Busch <kbusch@kernel.org>
 ---
- block/ioctl.c                |  1 +
- drivers/block/ublk_drv.c     |  3 +++
- drivers/nvme/host/ioctl.c    |  1 +
- fs/btrfs/ioctl.c             |  1 +
- fs/fuse/dev_uring.c          |  1 +
- include/linux/io_uring/cmd.h | 45 +++++++++++++++++++++---------------
- io_uring/uring_cmd.c         | 13 ++---------
- 7 files changed, 36 insertions(+), 29 deletions(-)
+ block/t10-pi.c | 190 ++++++++++++++++++++++++++++++++-----------------
+ 1 file changed, 123 insertions(+), 67 deletions(-)
 
-diff --git a/block/ioctl.c b/block/ioctl.c
-index d7489a56b33c..7a3756863c9b 100644
---- a/block/ioctl.c
-+++ b/block/ioctl.c
-@@ -776,10 +776,11 @@ static void blk_cmd_complete(struct io_uring_cmd *cmd, unsigned int issue_flags)
- 	if (bic->res == -EAGAIN && bic->nowait)
- 		io_uring_cmd_issue_blocking(cmd);
- 	else
- 		io_uring_cmd_done(cmd, bic->res, issue_flags);
- }
-+static DEFINE_IO_URING_CMD_TASK_WORK(blk_cmd_complete)
- 
- static void bio_cmd_bio_end_io(struct bio *bio)
- {
- 	struct io_uring_cmd *cmd = bio->bi_private;
- 	struct blk_iou_cmd *bic = io_uring_cmd_to_pdu(cmd, struct blk_iou_cmd);
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 0c74a41a6753..829b049c7c75 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -1354,10 +1354,11 @@ static void ublk_cmd_tw_cb(struct io_uring_cmd *cmd,
- 	struct ublk_uring_cmd_pdu *pdu = ublk_get_uring_cmd_pdu(cmd);
- 	struct ublk_queue *ubq = pdu->ubq;
- 
- 	ublk_dispatch_req(ubq, pdu->req, issue_flags);
- }
-+static DEFINE_IO_URING_CMD_TASK_WORK(ublk_cmd_tw_cb)
- 
- static void ublk_queue_cmd(struct ublk_queue *ubq, struct request *rq)
- {
- 	struct io_uring_cmd *cmd = ubq->ios[rq->tag].cmd;
- 	struct ublk_uring_cmd_pdu *pdu = ublk_get_uring_cmd_pdu(cmd);
-@@ -1378,10 +1379,11 @@ static void ublk_cmd_list_tw_cb(struct io_uring_cmd *cmd,
- 		rq->rq_next = NULL;
- 		ublk_dispatch_req(rq->mq_hctx->driver_data, rq, issue_flags);
- 		rq = next;
- 	} while (rq);
- }
-+static DEFINE_IO_URING_CMD_TASK_WORK(ublk_cmd_list_tw_cb)
- 
- static void ublk_queue_cmd_list(struct ublk_io *io, struct rq_list *l)
- {
- 	struct io_uring_cmd *cmd = io->cmd;
- 	struct ublk_uring_cmd_pdu *pdu = ublk_get_uring_cmd_pdu(cmd);
-@@ -2529,10 +2531,11 @@ static void ublk_ch_uring_cmd_cb(struct io_uring_cmd *cmd,
- 	int ret = ublk_ch_uring_cmd_local(cmd, issue_flags);
- 
- 	if (ret != -EIOCBQUEUED)
- 		io_uring_cmd_done(cmd, ret, issue_flags);
- }
-+static DEFINE_IO_URING_CMD_TASK_WORK(ublk_ch_uring_cmd_cb)
- 
- static int ublk_ch_uring_cmd(struct io_uring_cmd *cmd, unsigned int issue_flags)
- {
- 	if (unlikely(issue_flags & IO_URING_F_CANCEL)) {
- 		ublk_uring_cmd_cancel_fn(cmd, issue_flags);
-diff --git a/drivers/nvme/host/ioctl.c b/drivers/nvme/host/ioctl.c
-index c212fa952c0f..d4ca46b3abc7 100644
---- a/drivers/nvme/host/ioctl.c
-+++ b/drivers/nvme/host/ioctl.c
-@@ -405,10 +405,11 @@ static void nvme_uring_task_cb(struct io_uring_cmd *ioucmd,
- 
- 	if (pdu->bio)
- 		blk_rq_unmap_user(pdu->bio);
- 	io_uring_cmd_done32(ioucmd, pdu->status, pdu->result, issue_flags);
- }
-+static DEFINE_IO_URING_CMD_TASK_WORK(nvme_uring_task_cb)
- 
- static enum rq_end_io_ret nvme_uring_cmd_end_io(struct request *req,
- 						blk_status_t err)
- {
- 	struct io_uring_cmd *ioucmd = req->end_io_data;
-diff --git a/fs/btrfs/ioctl.c b/fs/btrfs/ioctl.c
-index 185bef0df1c2..9d395f034403 100644
---- a/fs/btrfs/ioctl.c
-+++ b/fs/btrfs/ioctl.c
-@@ -4704,10 +4704,11 @@ static void btrfs_uring_read_finished(struct io_uring_cmd *cmd, unsigned int iss
- 	kfree(priv->pages);
- 	kfree(priv->iov);
- 	kfree(priv);
- 	kfree(bc->data);
- }
-+static DEFINE_IO_URING_CMD_TASK_WORK(btrfs_uring_read_finished)
- 
- void btrfs_uring_read_extent_endio(void *ctx, int err)
- {
- 	struct btrfs_uring_priv *priv = ctx;
- 	struct io_btrfs_cmd *bc = io_uring_cmd_to_pdu(priv->cmd, struct io_btrfs_cmd);
-diff --git a/fs/fuse/dev_uring.c b/fs/fuse/dev_uring.c
-index 71b0c9662716..e2c87c01e021 100644
---- a/fs/fuse/dev_uring.c
-+++ b/fs/fuse/dev_uring.c
-@@ -1226,10 +1226,11 @@ static void fuse_uring_send_in_task(struct io_uring_cmd *cmd,
- 		err = -ECANCELED;
- 	}
- 
- 	fuse_uring_send(ent, cmd, err, issue_flags);
- }
-+static DEFINE_IO_URING_CMD_TASK_WORK(fuse_uring_send_in_task)
- 
- static struct fuse_ring_queue *fuse_uring_task_to_queue(struct fuse_ring *ring)
- {
- 	unsigned int qid;
- 	struct fuse_ring_queue *queue;
-diff --git a/include/linux/io_uring/cmd.h b/include/linux/io_uring/cmd.h
-index b84b97c21b43..5d6e30cc9b0b 100644
---- a/include/linux/io_uring/cmd.h
-+++ b/include/linux/io_uring/cmd.h
-@@ -9,18 +9,13 @@
- /* only top 8 bits of sqe->uring_cmd_flags for kernel internal use */
- #define IORING_URING_CMD_CANCELABLE	(1U << 30)
- /* io_uring_cmd is being issued again */
- #define IORING_URING_CMD_REISSUE	(1U << 31)
- 
--typedef void (*io_uring_cmd_tw_t)(struct io_uring_cmd *cmd,
--				  unsigned issue_flags);
--
- struct io_uring_cmd {
- 	struct file	*file;
- 	const struct io_uring_sqe *sqe;
--	/* callback to defer completions to task context */
--	io_uring_cmd_tw_t task_work_cb;
- 	u32		cmd_op;
- 	u32		flags;
- 	u8		pdu[32]; /* available inline for free use */
+diff --git a/block/t10-pi.c b/block/t10-pi.c
+index 0c4ed97021460..63ac3298df8de 100644
+--- a/block/t10-pi.c
++++ b/block/t10-pi.c
+@@ -17,6 +17,11 @@ struct blk_integrity_iter {
+ 	void			*data_buf;
+ 	sector_t		seed;
+ 	unsigned int		data_size;
++	unsigned int		remaining;
++	union {
++		u64		crc64;
++		__be16		t10pi;
++	};
+ 	unsigned short		interval;
+ 	const char		*disk_name;
  };
- 
-@@ -58,13 +53,29 @@ int io_uring_cmd_import_fixed_vec(struct io_uring_cmd *ioucmd,
-  */
- void __io_uring_cmd_done(struct io_uring_cmd *cmd, s32 ret, u64 res2,
- 			 unsigned issue_flags, bool is_cqe32);
- 
- void __io_uring_cmd_do_in_task(struct io_uring_cmd *ioucmd,
--			    io_uring_cmd_tw_t task_work_cb,
-+			    io_req_tw_func_t task_work_cb,
- 			    unsigned flags);
- 
-+/*
-+ * uring_cmd_cb should be a function with the signature
-+ * void (struct io_uring_cmd *cmd, unsigned issue_flags)
-+ */
-+#define IO_URING_CMD_TASK_WORK(uring_cmd_cb) uring_cmd_cb##_tw
+@@ -38,25 +43,34 @@ static void t10_pi_generate(struct blk_integrity_iter=
+ *iter,
+ 		struct blk_integrity *bi)
+ {
+ 	u8 offset =3D bi->pi_offset;
+-	unsigned int i;
++	unsigned int len, i;
+=20
+-	for (i =3D 0 ; i < iter->data_size ; i +=3D iter->interval) {
++	for (i =3D 0 ; i < iter->data_size ; i +=3D len) {
+ 		struct t10_pi_tuple *pi =3D iter->prot_buf + offset;
+=20
+-		pi->guard_tag =3D t10_pi_csum(0, iter->data_buf, iter->interval,
+-				bi->csum_type);
++		len =3D min(iter->remaining, iter->data_size - i);
++		iter->t10pi =3D t10_pi_csum(iter->t10pi, iter->data_buf, len,
++					  bi->csum_type);
++		iter->remaining -=3D len;
++		iter->data_buf +=3D len;
 +
-+#define DEFINE_IO_URING_CMD_TASK_WORK(uring_cmd_cb)				\
-+void										\
-+IO_URING_CMD_TASK_WORK(uring_cmd_cb)(struct io_kiocb *req, io_tw_token_t tw)	\
-+{										\
-+	struct io_uring_cmd *ioucmd = io_kiocb_to_cmd(req, struct io_uring_cmd);\
-+										\
-+	/* task_work executor checks the deferred list completion */		\
-+	uring_cmd_cb(ioucmd, IO_URING_F_COMPLETE_DEFER);			\
-+}
++		if (iter->remaining)
++			continue;
 +
- /*
-  * Note: the caller should never hard code @issue_flags and only use the
-  * mask provided by the core io_uring code.
-  */
- void io_uring_cmd_mark_cancelable(struct io_uring_cmd *cmd,
-@@ -107,11 +118,11 @@ static inline int io_uring_cmd_import_fixed_vec(struct io_uring_cmd *ioucmd,
- static inline void __io_uring_cmd_done(struct io_uring_cmd *cmd, s32 ret,
- 		u64 ret2, unsigned issue_flags, bool is_cqe32)
- {
- }
- static inline void __io_uring_cmd_do_in_task(struct io_uring_cmd *ioucmd,
--			    io_uring_cmd_tw_t task_work_cb, unsigned flags)
-+			    io_req_tw_func_t task_work_cb, unsigned flags)
- {
- }
- static inline void io_uring_cmd_mark_cancelable(struct io_uring_cmd *cmd,
- 		unsigned int issue_flags)
- {
-@@ -131,21 +142,19 @@ static inline bool io_uring_mshot_cmd_post_cqe(struct io_uring_cmd *ioucmd,
- 	return true;
- }
- #endif
- 
- /* users must follow the IOU_F_TWQ_LAZY_WAKE semantics */
--static inline void io_uring_cmd_do_in_task_lazy(struct io_uring_cmd *ioucmd,
--			io_uring_cmd_tw_t task_work_cb)
--{
--	__io_uring_cmd_do_in_task(ioucmd, task_work_cb, IOU_F_TWQ_LAZY_WAKE);
--}
--
--static inline void io_uring_cmd_complete_in_task(struct io_uring_cmd *ioucmd,
--			io_uring_cmd_tw_t task_work_cb)
--{
--	__io_uring_cmd_do_in_task(ioucmd, task_work_cb, 0);
--}
-+#define io_uring_cmd_do_in_task_lazy(ioucmd, uring_cmd_cb)			\
-+	__io_uring_cmd_do_in_task((ioucmd),					\
-+				  IO_URING_CMD_TASK_WORK(uring_cmd_cb),		\
-+				  IOU_F_TWQ_LAZY_WAKE)
-+
-+#define io_uring_cmd_complete_in_task(ioucmd, uring_cmd_cb)			\
-+	__io_uring_cmd_do_in_task((ioucmd),					\
-+				  IO_URING_CMD_TASK_WORK(uring_cmd_cb),		\
-+				  0)
- 
- static inline bool io_uring_cmd_should_terminate_tw(struct io_uring_cmd *cmd)
- {
- 	return io_should_terminate_tw(cmd_to_io_kiocb(cmd)->ctx);
- }
-diff --git a/io_uring/uring_cmd.c b/io_uring/uring_cmd.c
-index 35bdac35cf4d..5a80d35658dc 100644
---- a/io_uring/uring_cmd.c
-+++ b/io_uring/uring_cmd.c
-@@ -111,29 +111,20 @@ void io_uring_cmd_mark_cancelable(struct io_uring_cmd *cmd,
- 		io_ring_submit_unlock(ctx, issue_flags);
+ 		if (offset)
+-			pi->guard_tag =3D t10_pi_csum(pi->guard_tag,
+-					iter->prot_buf, offset, bi->csum_type);
+-		pi->app_tag =3D 0;
++			iter->t10pi =3D t10_pi_csum(iter->t10pi, iter->prot_buf,
++						  offset, bi->csum_type);
+=20
++		pi->guard_tag =3D iter->t10pi;
++		pi->app_tag =3D 0;
+ 		if (bi->flags & BLK_INTEGRITY_REF_TAG)
+ 			pi->ref_tag =3D cpu_to_be32(lower_32_bits(iter->seed));
+ 		else
+ 			pi->ref_tag =3D 0;
+=20
+-		iter->data_buf +=3D iter->interval;
+ 		iter->prot_buf +=3D bi->metadata_size;
++		iter->remaining =3D iter->interval;
++		iter->t10pi =3D 0;
+ 		iter->seed++;
  	}
  }
- EXPORT_SYMBOL_GPL(io_uring_cmd_mark_cancelable);
- 
--static void io_uring_cmd_work(struct io_kiocb *req, io_tw_token_t tw)
--{
--	struct io_uring_cmd *ioucmd = io_kiocb_to_cmd(req, struct io_uring_cmd);
--
--	/* task_work executor checks the deffered list completion */
--	ioucmd->task_work_cb(ioucmd, IO_URING_F_COMPLETE_DEFER);
--}
--
- void __io_uring_cmd_do_in_task(struct io_uring_cmd *ioucmd,
--			io_uring_cmd_tw_t task_work_cb,
-+			io_req_tw_func_t task_work_cb,
- 			unsigned flags)
+@@ -65,48 +79,61 @@ static blk_status_t t10_pi_verify(struct blk_integrit=
+y_iter *iter,
+ 		struct blk_integrity *bi)
  {
- 	struct io_kiocb *req = cmd_to_io_kiocb(ioucmd);
- 
- 	if (WARN_ON_ONCE(req->flags & REQ_F_APOLL_MULTISHOT))
- 		return;
- 
--	ioucmd->task_work_cb = task_work_cb;
--	req->io_task_work.func = io_uring_cmd_work;
-+	req->io_task_work.func = task_work_cb;
- 	__io_req_task_work_add(req, flags);
+ 	u8 offset =3D bi->pi_offset;
+-	unsigned int i;
++	unsigned int len, i;
++	bool skip =3D false;
+=20
+ 	for (i =3D 0 ; i < iter->data_size ; i +=3D iter->interval) {
+ 		struct t10_pi_tuple *pi =3D iter->prot_buf + offset;
+-		__be16 csum;
+-
+-		if (bi->flags & BLK_INTEGRITY_REF_TAG) {
+-			if (pi->app_tag =3D=3D T10_PI_APP_ESCAPE)
+-				goto next;
+-
+-			if (be32_to_cpu(pi->ref_tag) !=3D
+-			    lower_32_bits(iter->seed)) {
+-				pr_err("%s: ref tag error at location %llu " \
+-				       "(rcvd %u)\n", iter->disk_name,
+-				       (unsigned long long)
+-				       iter->seed, be32_to_cpu(pi->ref_tag));
+-				return BLK_STS_PROTECTION;
++
++		if (iter->remaining =3D=3D iter->interval) {
++			if (bi->flags & BLK_INTEGRITY_REF_TAG) {
++				if (pi->app_tag =3D=3D T10_PI_APP_ESCAPE) {
++					skip =3D true;
++				} else if (be32_to_cpu(pi->ref_tag) !=3D
++				    lower_32_bits(iter->seed)) {
++					pr_err("%s: ref tag error at location %llu " \
++					       "(rcvd %u)\n", iter->disk_name,
++					       (unsigned long long)
++					       iter->seed, be32_to_cpu(pi->ref_tag));
++					return BLK_STS_PROTECTION;
++				}
++			} else {
++				if (pi->app_tag =3D=3D T10_PI_APP_ESCAPE &&
++				    pi->ref_tag =3D=3D T10_PI_REF_ESCAPE)
++					skip =3D true;
+ 			}
+-		} else {
+-			if (pi->app_tag =3D=3D T10_PI_APP_ESCAPE &&
+-			    pi->ref_tag =3D=3D T10_PI_REF_ESCAPE)
+-				goto next;
+ 		}
+=20
+-		csum =3D t10_pi_csum(0, iter->data_buf, iter->interval,
++		len =3D min(iter->remaining, iter->data_size - i);
++		if (!skip)
++			iter->t10pi =3D t10_pi_csum(iter->t10pi, iter->data_buf, len,
+ 				bi->csum_type);
++		iter->remaining -=3D len;
++		iter->data_buf +=3D len;
++
++		if (iter->remaining)
++			continue;
++
++		if (skip)
++			goto next;
++
+ 		if (offset)
+-			csum =3D t10_pi_csum(csum, iter->prot_buf, offset,
++			iter->t10pi =3D t10_pi_csum(iter->t10pi, iter->prot_buf, offset,
+ 					bi->csum_type);
+=20
+-		if (pi->guard_tag !=3D csum) {
++		if (pi->guard_tag !=3D iter->t10pi) {
+ 			pr_err("%s: guard tag error at sector %llu " \
+ 			       "(rcvd %04x, want %04x)\n", iter->disk_name,
+ 			       (unsigned long long)iter->seed,
+-			       be16_to_cpu(pi->guard_tag), be16_to_cpu(csum));
++			       be16_to_cpu(pi->guard_tag), be16_to_cpu(iter->t10pi));
+ 			return BLK_STS_PROTECTION;
+ 		}
+-
+ next:
+-		iter->data_buf +=3D iter->interval;
+ 		iter->prot_buf +=3D bi->metadata_size;
++		iter->remaining =3D iter->interval;
++		iter->t10pi =3D 0;
+ 		iter->seed++;
++		skip =3D false;
+ 	}
+=20
+ 	return BLK_STS_OK;
+@@ -208,24 +235,33 @@ static void t10_pi_type1_complete(struct request *r=
+q, unsigned int nr_bytes)
+ 	}
  }
- EXPORT_SYMBOL_GPL(__io_uring_cmd_do_in_task);
- 
- static inline void io_req_set_cqe32_extra(struct io_kiocb *req,
--- 
-2.45.2
+=20
+-static __be64 ext_pi_crc64(u64 crc, void *data, unsigned int len)
++static u64 ext_pi_crc64(u64 crc, void *data, unsigned int len)
+ {
+-	return cpu_to_be64(crc64_nvme(crc, data, len));
++	return crc64_nvme(crc, data, len);
+ }
+=20
+ static void ext_pi_crc64_generate(struct blk_integrity_iter *iter,
+ 		struct blk_integrity *bi)
+ {
+ 	u8 offset =3D bi->pi_offset;
+-	unsigned int i;
++	unsigned int len, i;
+=20
+-	for (i =3D 0 ; i < iter->data_size ; i +=3D iter->interval) {
++	for (i =3D 0 ; i < iter->data_size ; i +=3D len) {
+ 		struct crc64_pi_tuple *pi =3D iter->prot_buf + offset;
+=20
+-		pi->guard_tag =3D ext_pi_crc64(0, iter->data_buf, iter->interval);
++		len =3D min(iter->remaining, iter->data_size - i);
++		iter->crc64 =3D ext_pi_crc64(iter->crc64, iter->data_buf, len);
++		iter->remaining -=3D len;
++		iter->data_buf +=3D len;
++
++		if (iter->remaining)
++			continue;
++
+ 		if (offset)
+-			pi->guard_tag =3D ext_pi_crc64(be64_to_cpu(pi->guard_tag),
+-					iter->prot_buf, offset);
++			iter->crc64 =3D ext_pi_crc64(iter->crc64, iter->prot_buf,
++						offset);
++
++		pi->guard_tag =3D cpu_to_be64(iter->crc64);
+ 		pi->app_tag =3D 0;
+=20
+ 		if (bi->flags & BLK_INTEGRITY_REF_TAG)
+@@ -233,8 +269,9 @@ static void ext_pi_crc64_generate(struct blk_integrit=
+y_iter *iter,
+ 		else
+ 			put_unaligned_be48(0ULL, pi->ref_tag);
+=20
+-		iter->data_buf +=3D iter->interval;
+ 		iter->prot_buf +=3D bi->metadata_size;
++		iter->remaining =3D iter->interval;
++		iter->crc64 =3D 0;
+ 		iter->seed++;
+ 	}
+ }
+@@ -250,47 +287,64 @@ static blk_status_t ext_pi_crc64_verify(struct blk_=
+integrity_iter *iter,
+ 		struct blk_integrity *bi)
+ {
+ 	u8 offset =3D bi->pi_offset;
+-	unsigned int i;
++	unsigned int len, i;
++	bool skip =3D false;
+=20
+-	for (i =3D 0; i < iter->data_size; i +=3D iter->interval) {
++	for (i =3D 0; i < iter->data_size; i +=3D len) {
+ 		struct crc64_pi_tuple *pi =3D iter->prot_buf + offset;
+-		u64 ref, seed;
+-		__be64 csum;
+-
+-		if (bi->flags & BLK_INTEGRITY_REF_TAG) {
+-			if (pi->app_tag =3D=3D T10_PI_APP_ESCAPE)
+-				goto next;
+-
+-			ref =3D get_unaligned_be48(pi->ref_tag);
+-			seed =3D lower_48_bits(iter->seed);
+-			if (ref !=3D seed) {
+-				pr_err("%s: ref tag error at location %llu (rcvd %llu)\n",
+-					iter->disk_name, seed, ref);
+-				return BLK_STS_PROTECTION;
++
++		if (iter->remaining =3D=3D iter->interval) {
++			if (bi->flags & BLK_INTEGRITY_REF_TAG) {
++				if (pi->app_tag =3D=3D T10_PI_APP_ESCAPE) {
++					skip =3D true;
++				} else {
++					u64 ref, seed;
++
++					ref =3D get_unaligned_be48(pi->ref_tag);
++					seed =3D lower_48_bits(iter->seed);
++					if (ref !=3D seed) {
++						pr_err("%s: ref tag error at location %llu (rcvd %llu)\n",
++							iter->disk_name, seed, ref);
++						return BLK_STS_PROTECTION;
++					}
++				}
++			} else {
++				if (pi->app_tag =3D=3D T10_PI_APP_ESCAPE &&
++				    ext_pi_ref_escape(pi->ref_tag))
++					skip =3D true;
+ 			}
+-		} else {
+-			if (pi->app_tag =3D=3D T10_PI_APP_ESCAPE &&
+-			    ext_pi_ref_escape(pi->ref_tag))
+-				goto next;
+ 		}
+=20
+-		csum =3D ext_pi_crc64(0, iter->data_buf, iter->interval);
++		len =3D min(iter->remaining, iter->data_size - i);
++		if (!skip)
++			iter->crc64 =3D ext_pi_crc64(iter->crc64, iter->data_buf, len);
++		iter->remaining -=3D len;
++		iter->data_buf +=3D len;
++
++		if (iter->remaining)
++			continue;
++
++		if (skip)
++			goto next;
++
+ 		if (offset)
+-			csum =3D ext_pi_crc64(be64_to_cpu(csum), iter->prot_buf,
+-					    offset);
++			iter->crc64 =3D ext_pi_crc64(iter->crc64, iter->prot_buf,
++						   offset);
+=20
+-		if (pi->guard_tag !=3D csum) {
++		if (be64_to_cpu(pi->guard_tag) !=3D iter->crc64) {
+ 			pr_err("%s: guard tag error at sector %llu " \
+ 			       "(rcvd %016llx, want %016llx)\n",
+ 				iter->disk_name, (unsigned long long)iter->seed,
+-				be64_to_cpu(pi->guard_tag), be64_to_cpu(csum));
++				be64_to_cpu(pi->guard_tag), iter->crc64);
+ 			return BLK_STS_PROTECTION;
+ 		}
+=20
+ next:
+-		iter->data_buf +=3D iter->interval;
+ 		iter->prot_buf +=3D bi->metadata_size;
++		iter->remaining =3D iter->interval;
++		iter->crc64 =3D 0;
+ 		iter->seed++;
++		skip =3D false;
+ 	}
+=20
+ 	return BLK_STS_OK;
+@@ -381,9 +435,10 @@ void blk_integrity_generate(struct bio *bio)
+ 	struct bio_vec bv;
+=20
+ 	iter.disk_name =3D bio->bi_bdev->bd_disk->disk_name;
+-	iter.interval =3D 1 << bi->interval_exp;
++	iter.remaining =3D iter.interval =3D 1 << bi->interval_exp;
+ 	iter.seed =3D bio->bi_iter.bi_sector;
+ 	iter.prot_buf =3D bvec_virt(bip->bip_vec);
++	iter.crc64 =3D 0;
+ 	bio_for_each_segment(bv, bio, bviter) {
+ 		void *kaddr =3D bvec_kmap_local(&bv);
+=20
+@@ -417,9 +472,10 @@ void blk_integrity_verify_iter(struct bio *bio, stru=
+ct bvec_iter *saved_iter)
+ 	 * and completion, so use the copy created during submission here.
+ 	 */
+ 	iter.disk_name =3D bio->bi_bdev->bd_disk->disk_name;
+-	iter.interval =3D 1 << bi->interval_exp;
++	iter.remaining =3D iter.interval =3D 1 << bi->interval_exp;
+ 	iter.seed =3D saved_iter->bi_sector;
+ 	iter.prot_buf =3D bvec_virt(bip->bip_vec);
++	iter.crc64 =3D 0;
+ 	__bio_for_each_segment(bv, bio, bviter, *saved_iter) {
+ 		void *kaddr =3D bvec_kmap_local(&bv);
+ 		blk_status_t ret =3D BLK_STS_OK;
+--=20
+2.47.3
 
