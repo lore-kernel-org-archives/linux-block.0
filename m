@@ -1,70 +1,68 @@
-Received: from mail-lf1-f98.google.com (mail-lf1-f98.google.com [209.85.167.98])
+Received: from mail-lf1-f99.google.com (mail-lf1-f99.google.com [209.85.167.99])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECEB0307ADA
-	for <linux-block@vger.kernel.org>; Wed, 22 Oct 2025 23:13:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.98
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CABB3081AF
+	for <linux-block@vger.kernel.org>; Wed, 22 Oct 2025 23:13:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.99
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761174824; cv=none; b=C8oCkU8BFRVEtqlBWh7mecOjMxsWafBbYN2AaH9AdC540SnhBU7JdT9d7iICvm9OwwB5xllFrYeYlir/Ps3+AEm6yGh1lTSkJqnQ8dN13FAuMn2XzYiAvyC79Ag3wdTfPWn8V+pCdJmf0Ya+gKs5Odm63smvDMjLLYlh4evjtuY=
+	t=1761174825; cv=none; b=aKQGdN8doo39LwDGntoKsY6aNwrVoSYX35nZ6osz0nXaAwaX7CQid2P7WvHKiJ08h2V0m29CeGsonI6HUt3RWP/+i7p6w7ZYTFh0pLg6IxRjjqa6gWle0n3ZNHln8TdS5yIhKY7m3lZmXMa8tnz6U05L7WQJAuf738LWhmguWfk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761174824; c=relaxed/simple;
-	bh=5e89GXt6DhKyASePnDrD7cthV1505P8u/yKg4DMfB4Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=oQwS0bDdGBoLbG6rEphNyzLXZnuyicOleCnnz79DeKbWrOJ2c0vuN8uYOvrAQJbEEHj64+dhqqzWBYHfgC6xgWjOpdFwP+km4r0fOOWgirJsYrXMr0PP45RjUWSG/XkpJTiDSWhtSPJYnf+S+GZ/9F58MpRSLeyOucUSAg17Qpg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=FiKXf9Fa; arc=none smtp.client-ip=209.85.167.98
+	s=arc-20240116; t=1761174825; c=relaxed/simple;
+	bh=+8TQGyg0ZV97+kPFYJBnRauC5Q+QxqG5BEUv/mu4y9A=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ebC7TohJQrU3OXGTjXqP8c5CvddaZgQ/QgPjor9JE8pPkdux0CfPhs2ZKIsHfWv9ei5Nw7ExBvzCak9+9eSqIQS8M7Z0V1SXOFBZuYIIIcXpWgxWzNyT0U16gTH79yPccYlIfHifNXtnQU5omKclqq7KjTRU9vfCaZzRCZa/03k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=BZWmGKO9; arc=none smtp.client-ip=209.85.167.99
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="FiKXf9Fa"
-Received: by mail-lf1-f98.google.com with SMTP id 2adb3069b0e04-592f07e03f8so21021e87.2
-        for <linux-block@vger.kernel.org>; Wed, 22 Oct 2025 16:13:41 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="BZWmGKO9"
+Received: by mail-lf1-f99.google.com with SMTP id 2adb3069b0e04-591b99cb0c4so18944e87.2
+        for <linux-block@vger.kernel.org>; Wed, 22 Oct 2025 16:13:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1761174820; x=1761779620; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=96BiLrpc0TjSBBUxSZ5BCVjSp2BMxOcWJzQbIZwxLNw=;
-        b=FiKXf9FaU3BYrYwrRbv4OE29zmFm+UpmIvBYgzLofZvqaAxBVf6rq8d76ApJ/8nrrj
-         dKOQjVnupxM/9ZAhxhDiouvB0IbrDSgQt2UJZXfTW05Nb+c7c6LmXG9YGQyNHUy7/tso
-         Ag3RKol94LTq0KdLEKq7xptTBBKYtcylXgYz4By/KlJOml+8h0PTohxKK4cgmNyPFj0k
-         7Hsq1gi1Y4viEOslDbTtvtDr1d2vNbdsoehrXc81loS6llfaruWLdukonzPVGFZG/s5V
-         JAfW1C6lBxT7GmLFJjX5mK6NMMeb7Ns+OqJCZ/hR8e7qf20C1U8Jf7sWWugZkAVuS8ZE
-         Whbg==
+        d=purestorage.com; s=google2022; t=1761174821; x=1761779621; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=NEb7Tz++jPbBE/mHfoATYrwfDk87qKz0eD7ACfLRyGs=;
+        b=BZWmGKO95mD2clfYM/PYqVpX7rGOPzXaBNdIxo6ldORmYIU9uBypqtCxh4clf8sg7p
+         bbPfaMsN7iLQ3zmHfVqgp0KZOJTmocZJh605cfVR6RZ4eyuZEiryrUz3UjN6sJcbRuLw
+         8B+Fd7EYoRGQnTx1q4yLgQoa/iMRapBsKvpc+cu8J5u96XjxcKdReTAR0i3usD+gUIre
+         5xBkmT5LrdNzzrK7Ea0M1dpI+W25Hwuhn1oeXWrTL6cRWN18YvIfFRWWY2/QkX2n22G1
+         iAWc4OQMve7TJLXWQbXzftDQIj1GtrxTS5Zw+8nVeEACw2dcTAO60Gd6UwnK9A8E7KtU
+         3Kyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761174820; x=1761779620;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=96BiLrpc0TjSBBUxSZ5BCVjSp2BMxOcWJzQbIZwxLNw=;
-        b=Ai6CE9gsPYJXPzOa+mA4k4gCPtUT6pByF5DTKhbWl9D/6qXDk4yBHkRW38L5/jtNe7
-         22I25VfU6U7I3J08SXkwJYfiWlu1s5u3SAyDEyKjKbAO55cvowsNxIizGSSNwq6wKDAZ
-         qfF0RTTfV4FybNbhjbv3cpIIcSMiQDctHlBnYRhPlhpSdBrO7Eq3aiMmAN9+Nt8rbt10
-         XgTNNxoPaD/msknGFPu2zkTLoaWuF4PcoRSZAT3kgrRgcY3/lhVcIEPzHVQh9o2WNQCC
-         rYQFNcr1s4iA4Ma3yfrT2HEBVZpkV+6DGZGq55e9F/4jvpS22fadooib9GtLITIN0avl
-         BdkQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWRk5+OtDoYOUCRr7kbqZPpTrgXWZ6vFimAZQ4PbJgutubGFcs3ciRM0x4p4JRwCRmiVorYAyCeKaE7aQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywmqgna8Lj1gr90+RYqJgL0yDYiAlZgzgZrcHoww6SExE2gMknK
-	9exAjsIGVTFO/kA+0nzMriLxGnZLdnqXRSLfJ+adZTR594sm3gXREvTWJiCJxvRQFx6fjTSHXqk
-	XmqgDy7l5UHCXn+3UqJudiST/WB7X/xk6bceA
-X-Gm-Gg: ASbGnctwMn66N32aJ0GDsvHak4zTJWs8xhRmBXJ3oGyIixe9fd+t3lOY9A7VZzySFHX
-	KCz0PVP3Wtz4u3yuUWc2HYhA5/obwR5mM3sEuCgf3fAIzoNXx/NpfrtRyEeDrM4pKf1RxbdbP0A
-	qftVpaEg0NaM6oxsDbLcYxS77lyDBfaUkuoJAIU1B1ILIi+G9/yF2pnRudd+yZ+Juwd9jBXB0z4
-	Tfmviy3cAeUjMfBP7ke3pl6+Livbg628II0Ow5wDxIhY3tk0Zk8oI/6upXPc+u6+kq3o2vYRiM/
-	BD3/IHyEb6RpkBCAKtqtx7wsNM/D3utVQ2JR3uuxbSr6Q16nF/q4Qvrc1ZWdX67T79HIn6EPliG
-	+BtB+wiSNioHxyp7rjIqbGeKDGS8oFnQ=
-X-Google-Smtp-Source: AGHT+IFL+l6RiiF9NVqqr9YCIdVCyARHhrDoK0DxchCYTCey03a/1xzZtxLnzmVhVLR9bTz6N+i4aHRAWF2/
-X-Received: by 2002:a05:6512:308d:b0:55f:6637:78f with SMTP id 2adb3069b0e04-591ea31cd1cmr1457181e87.9.1761174819856;
-        Wed, 22 Oct 2025 16:13:39 -0700 (PDT)
-Received: from c7-smtp-2023.dev.purestorage.com ([208.88.159.129])
-        by smtp-relay.gmail.com with ESMTPS id 2adb3069b0e04-592f4e44e32sm33929e87.46.2025.10.22.16.13.39
+        d=1e100.net; s=20230601; t=1761174821; x=1761779621;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=NEb7Tz++jPbBE/mHfoATYrwfDk87qKz0eD7ACfLRyGs=;
+        b=nBYBoQpU7icUFRyUihSIspxBOgSR1dUf3LNjXyQpBlr4DhODQyT2D1qQZ5/2NTbqCL
+         mnllf2pVFPj7unfnlIlamnIUfqaPRAAPFN9nTwQ0nFf8oCK1317cRiwQXFFTbLN29/kw
+         WCUhY3oHRlLmH0Z9PTRcqjtPKhtauMttsnJ5qRqMGbxH9ezjdPpt3Lg+w+GElZdBmQ3v
+         UC0oBG4kUNn/EBjyUIHMUQFAK9Ca0c4zObqalUwAi1XRbhP7/H3aIJ3Ak778AAyk1M5W
+         QjspOKTn42hBAUFE57AVAGKJKo3SjpYG8qB+EXdOVyCmwljZagh0NzmOqYN6rOrayYH/
+         Vy1A==
+X-Forwarded-Encrypted: i=1; AJvYcCVsZ/VhErgWy6saqD0C6bx2f0qpk+wg/wNoJS534DCzZypcx76t5WIH5nqbj2rZiHswAkAcnpn0QSef7w==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyO5Yqu/UYdEezHuT55Owbq9MNbNUibR7J9/yu2oQ2zI2DkXrSe
+	YdRKpoYMiha15QxtuLR9Y3bUwOiQxed7a+QYfhK/er22GFUaF5OCNf5BLNj+9dN1mmqKBFpzg07
+	dbB+L+JB22QTfufo26j3hldPIiTThjMOQrJnFsb5r8ydrqn0S7zjk
+X-Gm-Gg: ASbGncvE2WZkoJR7bIbMURYVLh2eiVp1yYlVIol1t3/gtI02OmVAC1eKznCNtQDenqT
+	w4ocxw7A7pGRIcWDcR3+dFpIvT3l4PqfgNkhm9eczVZrD8tP9KNweuUJ4R1uz8moqr6lSYRyI08
+	zkFqYF/fiWfmhGPlZD0UaYGYViBXJ2Ava5iBKvVsziGniz+61km+RXuo/bm0je80Dlg/kX0ukTy
+	rYebCvAgSwiqwPvNY/qQbiBYeTvF57/q6PM6/NDftzMlCpER6DgkZ0c6Nwh4Lsv5BS++uCIKtPN
+	CJIwGO3/tpVp0YBo4UvQrJgSuvM9H5IS8PLUqw1obgTv68vU9oUYHgiNTV+hiVhqPZqCmvDIvrk
+	ngBakmKkQfjGL8C9C
+X-Google-Smtp-Source: AGHT+IE8YXW1bqh82Pv83CqBL++4EorD9wKI8kSNSxyaHaZobY7QUQj2BR1bXjAEiGky/6dYa+2+odrIWp7W
+X-Received: by 2002:a05:6512:131a:b0:57e:ed2d:190f with SMTP id 2adb3069b0e04-591d8598d06mr3612400e87.7.1761174820409;
+        Wed, 22 Oct 2025 16:13:40 -0700 (PDT)
+Received: from c7-smtp-2023.dev.purestorage.com ([2620:125:9017:12:36:3:5:0])
+        by smtp-relay.gmail.com with ESMTPS id 2adb3069b0e04-592f4aa2259sm40463e87.0.2025.10.22.16.13.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Oct 2025 16:13:39 -0700 (PDT)
+        Wed, 22 Oct 2025 16:13:40 -0700 (PDT)
 X-Relaying-Domain: purestorage.com
 Received: from dev-csander.dev.purestorage.com (unknown [IPv6:2620:125:9007:640:ffff::1199])
-	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 372123404B4;
-	Wed, 22 Oct 2025 17:13:38 -0600 (MDT)
+	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 86E1B340283;
+	Wed, 22 Oct 2025 17:13:37 -0600 (MDT)
 Received: by dev-csander.dev.purestorage.com (Postfix, from userid 1557716354)
-	id 307C1E4181C; Wed, 22 Oct 2025 17:13:38 -0600 (MDT)
+	id 7A5DAE4181C; Wed, 22 Oct 2025 17:13:37 -0600 (MDT)
 From: Caleb Sander Mateos <csander@purestorage.com>
 To: Jens Axboe <axboe@kernel.dk>,
 	Miklos Szeredi <miklos@szeredi.hu>,
@@ -81,12 +79,10 @@ Cc: io-uring@vger.kernel.org,
 	linux-btrfs@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Caleb Sander Mateos <csander@purestorage.com>
-Subject: [PATCH 1/3] io_uring: expose io_should_terminate_tw()
-Date: Wed, 22 Oct 2025 17:13:24 -0600
-Message-ID: <20251022231326.2527838-2-csander@purestorage.com>
+Subject: [PATCH 0/3] io_uring/uring_cmd: avoid double indirect call in task work dispatch
+Date: Wed, 22 Oct 2025 17:13:23 -0600
+Message-ID: <20251022231326.2527838-1-csander@purestorage.com>
 X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20251022231326.2527838-1-csander@purestorage.com>
-References: <20251022231326.2527838-1-csander@purestorage.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -95,77 +91,28 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-A subsequent commit will call io_should_terminate_tw() from an inline
-function in include/linux/io_uring/cmd.h, so move it from an io_uring
-internal header to include/linux/io_uring.h. Callers outside io_uring
-should not call it directly.
+Define a io_req_tw_func_t wrapper function around each io_uring_cmd_tw_t
+function to avoid the additional indirect call and save 8 bytes in
+struct io_uring_cmd. Additionally avoid the io_should_terminate_tw()
+computation in uring_cmd task work callbacks that don't need it.
 
-Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
----
- include/linux/io_uring.h | 14 ++++++++++++++
- io_uring/io_uring.h      | 13 -------------
- 2 files changed, 14 insertions(+), 13 deletions(-)
+Caleb Sander Mateos (3):
+  io_uring: expose io_should_terminate_tw()
+  io_uring/uring_cmd: call io_should_terminate_tw() when needed
+  io_uring/uring_cmd: avoid double indirect call in task work dispatch
 
-diff --git a/include/linux/io_uring.h b/include/linux/io_uring.h
-index 85fe4e6b275c..c2a12287b821 100644
---- a/include/linux/io_uring.h
-+++ b/include/linux/io_uring.h
-@@ -1,13 +1,27 @@
- /* SPDX-License-Identifier: GPL-2.0-or-later */
- #ifndef _LINUX_IO_URING_H
- #define _LINUX_IO_URING_H
- 
-+#include <linux/io_uring_types.h>
- #include <linux/sched.h>
- #include <linux/xarray.h>
- #include <uapi/linux/io_uring.h>
- 
-+/*
-+ * Terminate the request if either of these conditions are true:
-+ *
-+ * 1) It's being executed by the original task, but that task is marked
-+ *    with PF_EXITING as it's exiting.
-+ * 2) PF_KTHREAD is set, in which case the invoker of the task_work is
-+ *    our fallback task_work.
-+ */
-+static inline bool io_should_terminate_tw(struct io_ring_ctx *ctx)
-+{
-+	return (current->flags & (PF_KTHREAD | PF_EXITING)) || percpu_ref_is_dying(&ctx->refs);
-+}
-+
- #if defined(CONFIG_IO_URING)
- void __io_uring_cancel(bool cancel_all);
- void __io_uring_free(struct task_struct *tsk);
- void io_uring_unreg_ringfd(void);
- const char *io_uring_get_opcode(u8 opcode);
-diff --git a/io_uring/io_uring.h b/io_uring/io_uring.h
-index 46d9141d772a..78777bf1ea4b 100644
---- a/io_uring/io_uring.h
-+++ b/io_uring/io_uring.h
-@@ -556,23 +556,10 @@ static inline bool io_allowed_run_tw(struct io_ring_ctx *ctx)
- {
- 	return likely(!(ctx->flags & IORING_SETUP_DEFER_TASKRUN) ||
- 		      ctx->submitter_task == current);
- }
- 
--/*
-- * Terminate the request if either of these conditions are true:
-- *
-- * 1) It's being executed by the original task, but that task is marked
-- *    with PF_EXITING as it's exiting.
-- * 2) PF_KTHREAD is set, in which case the invoker of the task_work is
-- *    our fallback task_work.
-- */
--static inline bool io_should_terminate_tw(struct io_ring_ctx *ctx)
--{
--	return (current->flags & (PF_KTHREAD | PF_EXITING)) || percpu_ref_is_dying(&ctx->refs);
--}
--
- static inline void io_req_queue_tw_complete(struct io_kiocb *req, s32 res)
- {
- 	io_req_set_res(req, res, 0);
- 	req->io_task_work.func = io_req_task_complete;
- 	io_req_task_work_add(req);
+ block/ioctl.c                  |  1 +
+ drivers/block/ublk_drv.c       |  3 +++
+ drivers/nvme/host/ioctl.c      |  1 +
+ fs/btrfs/ioctl.c               |  1 +
+ fs/fuse/dev_uring.c            |  3 ++-
+ include/linux/io_uring.h       | 14 +++++++++++
+ include/linux/io_uring/cmd.h   | 46 ++++++++++++++++++++++------------
+ include/linux/io_uring_types.h |  1 -
+ io_uring/io_uring.h            | 13 ----------
+ io_uring/uring_cmd.c           | 17 ++-----------
+ 10 files changed, 54 insertions(+), 46 deletions(-)
+
 -- 
 2.45.2
 
