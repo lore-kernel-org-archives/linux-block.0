@@ -1,57 +1,46 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DA102D5A07
-	for <linux-block@vger.kernel.org>; Wed, 22 Oct 2025 04:39:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0893D1AC88A
+	for <linux-block@vger.kernel.org>; Wed, 22 Oct 2025 04:46:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761107989; cv=none; b=eztp9Z/QTAenbGM9RK3IecRWT7BWqYbvwkYB4Wj/MhgkwKIIHW1A9ivTnpFDq5AsSxrht5nyJPSZqxpEBW+aZRiIQq2q01/rE3KeWXUI7ab54U2wTk3pfx6RxZrGGSO8LomFeM1YuPdyRuKnzAUBTMN8FRbqbIoDVmyKWQ25mbk=
+	t=1761108394; cv=none; b=izkHyX3trY7cVZwYlAcTvKd9jEDJvUxtMSQkB+lmwE8Qqxkvo4zMvaPoSkIZh1XfeodUQayAh4PRT2MKyo6pACRa07pehB+jNYLyCjRdEIKQAJQSFqjt+jW+rMAip+72cbsP7pNbvhTwHQCuYVGmgxspKY+L4GqTjDQWd2eaWlA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761107989; c=relaxed/simple;
-	bh=bG6thHpq2WyRRM6jnS9D62tm6CEECRES+O6oXVeOqfI=;
+	s=arc-20240116; t=1761108394; c=relaxed/simple;
+	bh=QQdiwRiIwDMGy3DHVtQk3eKRB9KC1XO7PYGiIllHLKo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qymFqw7DWFCOLVTr91Fwvge1QR4FlDdgtCeU7A2hviQ3+VOMGfLQzIHb2vaiXLOHORKg3ZHKKP5NXBpkXkH4reMxSYZiHl+2UZ3anACPm+Hf3C5uf1MIdkNJ1Esy//N+Scx25kS5dpBH26fXrLAtPiyJWBrAL4xC0VxbN2BUipE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GCvE+xGY; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=PjM814Szfsa0WCY6OowKfrfXoNQUBs3Axn7KOo26QvZpNo7Q3dSr+0o5KSfTecv13AF8TD7lgQlkvYaxoUKietZ59x9vxEbyq+xQbcXTxPBZtlvEwQWswQqNufVVhRlKfcuyyibfoYzDqZ05KBLppFtIMGuihmfc0235B5ydjLc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=tSbpcj1c; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GCvE+xGY"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1761107986;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=yeXzwMoyfofdSQMYwUEKBfUcheBoIBLSjF+1lfTbWos=;
-	b=GCvE+xGY28w5QMkfeDH95nI+pbE98jgx2Vq658QV0flzCkmI+HIQSToXRxpy1bX5jrNZA5
-	IAHStr/gL9w4R1nFNcBA1biWUxzRmzTo2iriNFuakORRtu3R0ot18z7WvPqJmbkkfa6R1N
-	jxRoCKcUvhJP64/EavwKN/SLyGsRLVg=
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-329-TA6IzPjuONeAMQtzovjsdA-1; Wed,
- 22 Oct 2025 00:39:42 -0400
-X-MC-Unique: TA6IzPjuONeAMQtzovjsdA-1
-X-Mimecast-MFC-AGG-ID: TA6IzPjuONeAMQtzovjsdA_1761107981
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2324D1956089;
-	Wed, 22 Oct 2025 04:39:41 +0000 (UTC)
-Received: from fedora (unknown [10.72.120.12])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9E711180057C;
-	Wed, 22 Oct 2025 04:39:34 +0000 (UTC)
-Date: Wed, 22 Oct 2025 12:39:28 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Nilay Shroff <nilay@linux.ibm.com>
-Cc: linux-block@vger.kernel.org, hch@lst.de, yukuai1@huaweicloud.com,
-	axboe@kernel.dk, yi.zhang@redhat.com, czhong@redhat.com,
-	gjoyce@ibm.com
-Subject: Re: [PATCH 2/3] block: introduce alloc_sched_data and
- free_sched_data elevator methods
-Message-ID: <aPhgAMxgG2q0DKcv@fedora>
-References: <20251016053057.3457663-1-nilay@linux.ibm.com>
- <20251016053057.3457663-3-nilay@linux.ibm.com>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="tSbpcj1c"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=IHUeLNroghw3/fxK2QjdS8bHXtrT/TpYzcUC3yBxoy4=; b=tSbpcj1cjpsJkEf/SIDET9RVOh
+	tqhAm054rIbBiygb2QR/iLPojeZ4f0o3biNZt43E5P0Y8RlnZYgm/UJcDLYq4bofmyXszskQsUcQ9
+	cDWVeT04L0GOryJi4fQqP0FvAznCntevcIuvBXUmNXvE5btB5nZVkLYUAVFqBUK7Le7d7nRIXE2k3
+	lhgL44wJaSD2pOzf6gbmOdEk+qDPGbtsYScQNYwxQLA6hp5xpkQN9R3iaoHoKK+fW6LJRuoXWABFM
+	Ask+79/7GLxWuOgDBhCBaW/JAodN0BcjNA5eZNBV9GFIH/cZTQrteDyTmR0C72UsZM/Ja4S2H0PPW
+	GqiVzlIA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1vBQk2-00000001T6Z-0qhG;
+	Wed, 22 Oct 2025 04:46:30 +0000
+Date: Tue, 21 Oct 2025 21:46:30 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Keith Busch <kbusch@kernel.org>
+Cc: Christoph Hellwig <hch@infradead.org>, Keith Busch <kbusch@meta.com>,
+	linux-block@vger.kernel.org, shinichiro.kawasaki@wdc.com
+Subject: Re: [PATCH blktests] create a test for direct io offsets
+Message-ID: <aPhhpohu8mc95oLp@infradead.org>
+References: <20251014205420.941424-1-kbusch@meta.com>
+ <aPIk3Ng8JXs-3Pye@infradead.org>
+ <aPZhWIokZf0K-Ma9@kbusch-mbp>
+ <aPcZ6ZnAGVwgK1DO@infradead.org>
+ <aPf5gAOlnJtVUV6E@kbusch-mbp>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -60,37 +49,63 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251016053057.3457663-3-nilay@linux.ibm.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+In-Reply-To: <aPf5gAOlnJtVUV6E@kbusch-mbp>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Thu, Oct 16, 2025 at 11:00:48AM +0530, Nilay Shroff wrote:
-> The recent lockdep splat [1] highlights a potential deadlock risk
-> involving ->elevator_lock and ->freeze_lock dependencies on -pcpu_alloc_
-> mutex. The trace shows that the issue occurs when the Kyber scheduler
-> allocates dynamic memory for its elevator data during initialization.
+On Tue, Oct 21, 2025 at 03:22:08PM -0600, Keith Busch wrote:
+> On Mon, Oct 20, 2025 at 10:28:09PM -0700, Christoph Hellwig wrote:
+> > seems like a huge win.  Any chance you could try to get this done ASAP
+> > so that we could make the interface fully discoverable before 6.18 is
+> > released?
 > 
-> To address this, introduce two new elevator operation callbacks:
-> ->alloc_sched_data and ->free_sched_data.
+> I just want to make sure I am aligned to what you have in mind. Is this
+> something like this what you're looking for? This reports the kernel's
+> ability to handle a dio with memory that is discontiguous for a single
+> device "sector", and reports the virtual gap requirements.
 
-This way looks good.
+So, I think Christian really did not want more random stuff in statx,
+which would lead to using fsxattr instead.
 
-> 
-> When an elevator implements these methods, they are invoked during
-> scheduler switch before acquiring ->freeze_lock and ->elevator_lock.
-> This allows safe allocation and deallocation of per-elevator data
+Question:  Should we event advertize virt_boundary based unaligned
+segment support?  It is almost impossible to use correctly unless I'm
+missing something, so the better idea might be to just not offer the
+value when using PRPs?
 
-This per-elevator data should be very similar with `struct elevator_tags`
-from block layer viewpoint: both have same lifetime, and follow same
-allocation constraint(per-cpu lock).
+> +	if (request_mask & STATX_DIO_VIRT_SPLIT) {
+> +		stat->dio_virt_boundary_mask = queue_virt_boundary(
+> +								bdev->bd_queue);
 
-Can we abstract elevator data structure to cover both? Then I guess the
-code should be more readable & maintainable, what do you think of this way?
+Consumer code like file systems, or the bdev fake file system should
+never see the queue (and yes, I realize the atomic code just below got
+this wrong as well).  Please either add a bdev_virt_boundary wrapper,
+or use bdev_limit and just access the limits directly.
 
-One easiest way could be to add 'void *data' into `struct elevator_tags`,
-just the naming of `elevator_tags` is not generic enough, but might not
-a big deal.
+> +	if (bdev_max_segments(bdev) > 1)
+> +		stat->attributes |= STATX_ATTR_DIO_VEC_SPLIT;
+> +	stat->attributes_mask |= STATX_ATTR_DIO_VEC_SPLIT;
 
+> +	if (request_mask & STATX_DIO_VIRT_SPLIT) {
+> +		struct block_device *bdev = inode->i_sb->s_bdev;
+> +
+> +		stat->dio_virt_boundary_mask = queue_virt_boundary(bdev->bd_queue);
+> +		stat->result_mask |= STATX_DIO_VIRT_SPLIT;
+> +	}
 
-Thanks,
-Ming
+> +static void
+> +xfs_report_dio_split(
+> +	struct xfs_inode	*ip,
+> +	struct kstat		*stat)
+> +{
+> +	struct xfs_buftarg	*target = xfs_inode_buftarg(ip);
+> +	struct block_device	*bdev = target->bt_bdev;
+> +
+> +	stat->dio_virt_boundary_mask = queue_virt_boundary(bdev->bd_queue);
+> +	stat->result_mask |= STATX_DIO_VIRT_SPLIT;
+> +}
+> +
+
+Why does the bdev set different flags from the file system?  Shouldn't
+the capabilities be the same?  And we'll probably want a little helper
+to set these based on the bdev instead of opencoding the logic in
+multiple places.
 
