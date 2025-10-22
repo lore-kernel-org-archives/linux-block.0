@@ -1,59 +1,68 @@
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4D922ECD3A;
-	Wed, 22 Oct 2025 06:24:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83F77258CD7;
+	Wed, 22 Oct 2025 06:44:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761114292; cv=none; b=dutoeRbKC+wYGaTgAcp5AHyutyIJVTgeHE/c7EbCTlEODxqkNGmmbbA/0QVrmBClctCwAtzLP88jAyNqC4/rOttF9sIRgX/jKg0Wf14yMSP4Tf2vihu0YLDKGx4wMX6pcOaNaMkkgMyfzQm85jZNqw1pbceYhrOYQibHl1vbu4w=
+	t=1761115482; cv=none; b=VOTT/2n4PP2w7Kkqg/l8adZBSZs8Z0vR/4pqWgCBSEd+p5trO3YaXGyrD0ROtL8XUqH3KstBRCqK7OFVWM/pswXIkVfofCSCr84ac42wRiVEf9dhli7tAloq/wWYu1SqcQzG+0h8Di0v6qSN62PnXiMslrj5muQQCpRZQfmncUs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761114292; c=relaxed/simple;
-	bh=vHas3sy8prCVLo71319oRvMTTc/fK2RlrePiiW26olw=;
+	s=arc-20240116; t=1761115482; c=relaxed/simple;
+	bh=Z5AWUZgXIxpUHQV1fNHHxpTVV6Oicr9t+TxDvGlw+6k=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZDo03chbPnaT7nqcNVtzKSjgx6BeNmo8SsgWU8qTXQT3ggupo3nUjBHsGvDQF6EuXZNETrxVscpMNE4LGfEXQ1Oxsr4cZDXgbu0Jew8QcGjasLBytHU6EpRuaPuw59cIjADLfGnri338vhnQQI8nchvAZlhW1Bl5cOfSsUianLI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=RX7a1AXW; arc=none smtp.client-ip=198.137.202.133
+	 Content-Type:Content-Disposition:In-Reply-To; b=G4Bu901eQTK4W0Z92tB3bK/hjksBjCg8UmW01+pTCrng4RxM+d7KkIe4N9Zke8bp3WXUGdTQiHXF9szL1T+lVXu31CuBKOpms2UInMgYfkiXdLuC95pUVoNpMfVwQG910s1Tv/kDnag0rt18pzsN4859BOQcTcercYpCHecSdNY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=OiRdl3zf; arc=none smtp.client-ip=198.137.202.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="RX7a1AXW"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="OiRdl3zf"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
 	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=1XhDE1BELRWX5YDOcVl25kQ97WNQSKEMx7NE0+Z0zfs=; b=RX7a1AXWTILfx/vttsD6ASD5QM
-	nm39/Tj4XmpGD53ez9zf4QpAZwF67Zia4CQzhS9732EWS8EPh2m8ojSGgnoJs+ttrmJRmrRTMPhRi
-	jt9Me0ujkGJNrMfLgoTCR5PgmzW3b8SlrnGxZ4pz/+jVDasdZsUWCAqzQ0ae3gmPoSxHkqQ/q19xI
-	RYkBGdEhA6XkBkYrGAoXPT+y9kz1RXrhJ3UCNIW1WFCR3np8xaonuIeoPL7+Mp6mH+7Pnppq8Qvxt
-	gfbhjptNvEJ0BDuMiJWCcyQYvs5SNAKh9t7u6juA0NeJcsmSSGnr1ZY9pemg6FZaqGbLYAb1E/y07
-	Yqg5E91w==;
+	bh=kyOfDxXn3l+NgMiyysxqYTdckOUTzb689OEE6eFFTKI=; b=OiRdl3zfcabVHV+WVH9hzNGVFQ
+	0i+ZfByOM4atbb8kHfDy6gQeI7Re38es6JsN5tmh13zxnW9jwICCGbJgvDp18LQsqgV32ieYElvCm
+	mSBTJnTW/OXvoFYW4TatNGmCSiNh9RgVzKHW5wJuRqq/IUeM92y0x5jyeqeqIr6GTr/6dghygJRPh
+	d4VYJqGqBgAKkkR+e7xS8F2Toh0nVymoE0a0kKaDeDrYb06k8cKRISjNVtrAj4JSHGkkdX6fFhWtl
+	C6HlapxNk6t418RIa0UnOCJVeSaJffeaYQkk5jOWvHH2QPTwsfV/zORvRd8vM0nGGyOvOlgVNd4qI
+	Uu3E0uGg==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vBSHA-00000001eTW-3aoM;
-	Wed, 22 Oct 2025 06:24:48 +0000
-Date: Tue, 21 Oct 2025 23:24:48 -0700
-From: "hch@infradead.org" <hch@infradead.org>
-To: Qu Wenruo <quwenruo.btrfs@gmx.com>
-Cc: "hch@infradead.org" <hch@infradead.org>,
-	Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-	WenRuo Qu <wqu@suse.com>,
-	"linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
-	"djwong@kernel.org" <djwong@kernel.org>,
-	"linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-mm@kvack.org" <linux-mm@kvack.org>,
-	"martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-	"jack@suse.com" <jack@suse.com>
-Subject: Re: O_DIRECT vs BLK_FEAT_STABLE_WRITES, was Re: [PATCH] btrfs: never
- trust the bio from direct IO
-Message-ID: <aPh4sJ8eFJeMCAHx@infradead.org>
-References: <aPYIS5rDfXhNNDHP@infradead.org>
- <b91eb17a-71ce-422c-99a1-c2970a015666@gmx.com>
- <aPc6uLKJkavZ_SkM@infradead.org>
- <4f4c468a-ac87-4f54-bc5a-d35058e42dd2@suse.com>
- <25742d91-f82e-482e-8978-6ab2288569da@wdc.com>
- <f13c9393-1733-4f52-a879-94cdc7a724f2@gmx.com>
- <aPhl7wvyZ8b7cnLw@infradead.org>
- <3677cfe8-00cd-466d-b9e3-680c6d6d8c73@gmx.com>
+	id 1vBSaF-00000001hpk-2d9E;
+	Wed, 22 Oct 2025 06:44:31 +0000
+Date: Tue, 21 Oct 2025 23:44:31 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Christian Brauner <brauner@kernel.org>
+Cc: Askar Safin <safinaskar@gmail.com>, linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Al Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>,
+	Jens Axboe <axboe@kernel.dk>,
+	Andy Shevchenko <andy.shevchenko@gmail.com>,
+	Aleksa Sarai <cyphar@cyphar.com>,
+	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <thomas.weissschuh@linutronix.de>,
+	Julian Stecklina <julian.stecklina@cyberus-technology.de>,
+	Gao Xiang <hsiangkao@linux.alibaba.com>,
+	Art Nikpal <email2tema@gmail.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Alexander Graf <graf@amazon.com>, Rob Landley <rob@landley.net>,
+	Lennart Poettering <mzxreary@0pointer.de>,
+	linux-arch@vger.kernel.org, linux-block@vger.kernel.org,
+	initramfs@vger.kernel.org, linux-api@vger.kernel.org,
+	linux-doc@vger.kernel.org, Michal Simek <monstr@monstr.eu>,
+	Luis Chamberlain <mcgrof@kernel.org>, Kees Cook <kees@kernel.org>,
+	Thorsten Blum <thorsten.blum@linux.dev>,
+	Heiko Carstens <hca@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>,
+	Dave Young <dyoung@redhat.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Borislav Petkov <bp@alien8.de>, Jessica Clarke <jrtc27@jrtc27.com>,
+	Nicolas Schichan <nschichan@freebox.fr>,
+	David Disseldorp <ddiss@suse.de>, patches@lists.linux.dev
+Subject: Re: [PATCH v3 0/3] initrd: remove half of classic initrd support
+Message-ID: <aPh9Tx95Yhm_EkLN@infradead.org>
+References: <20251017060956.1151347-1-safinaskar@gmail.com>
+ <20251021-bannmeile-arkaden-ae2ea9264b85@brauner>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -62,24 +71,18 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <3677cfe8-00cd-466d-b9e3-680c6d6d8c73@gmx.com>
+In-Reply-To: <20251021-bannmeile-arkaden-ae2ea9264b85@brauner>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Wed, Oct 22, 2025 at 04:47:56PM +1030, Qu Wenruo wrote:
-> So far it looks like the bounce pages solution is wasting a lot of code for
-> almost nothing, it's not any better than falling back.
+On Tue, Oct 21, 2025 at 03:05:35PM +0200, Christian Brauner wrote:
+> Without Acks or buy-in from other maintainers this is not a change we
+> can just do given that a few people already piped up and expressed
+> reservations that this would be doable for them.
+> 
+> @Christoph, you marked this as deprecated years ago.
+> What's your take on this?
 
-That was my expectation, but I wasn't entirely sure from your wording
-if that's what you measured.
-
-> Since we always fallback to buffered IO for checksums, the content should
-> not change and we can do the submission and checksum calculation in
-> parallel.
-
-Yes.
-
-> Already got a prototype, results around 10% improvement inside my VM.
-> Will fix the bugs related to compression and send an RFC for it.
-
-Nice.  I've also started looking at my PI backlog for the XFS version.
+I'd love to see it go obviously.  But IIRC we had various users show
+up, which speaks against removing it.  Maybe the first step would be
+a separate config option just for block-based initrd?
 
