@@ -1,101 +1,157 @@
-Received: from mail-io1-f41.google.com (mail-io1-f41.google.com [209.85.166.41])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32BF0348468
-	for <linux-block@vger.kernel.org>; Wed, 22 Oct 2025 13:39:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADB0634B437
+	for <linux-block@vger.kernel.org>; Wed, 22 Oct 2025 14:12:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761140397; cv=none; b=Moo0XO1MFV/AmDPJRY3Xx1SqPh1ZMfNhoalwA/wqMuym721NyWZC0AhNCIaV3exlN3+IPjykBjB0bI3GkP6Y32hWFro6FOEqJT3eHxBIWNqJYhjbwF+EivoxOwYl3eTj1/9jKQJms+0AV7v7BpfSfh0a5vLQzgivKJHuofqO2og=
+	t=1761142331; cv=none; b=JFz5pste0BniIwTrbmeObfovim80ffowHLAnq8RW3D2cGdqI6Dg4c0FoBvlzZQZuOeWSuPikaolRDOhTZ+48Yhbo95AIlkaXhS/ALApHvS7IPlKnREDa/bw7yf8rilaanz1f+cTpKTe4SdjKs6h3Mt+xkaDWQ3sj/FfeXNBJgI4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761140397; c=relaxed/simple;
-	bh=tMTLlB2WNxj5abhVUPUVLHOZ8Sm3yINEJmcNvr78Sso=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=hnHDQvfw4aCJHNAcJQ06PRSuZDTrpFDJ9Tsafa0cXH8VBB02Z2rI+0yVW0SzyY50k/DoioIHJEQ0udnLgvM6PufaI1uG2hObbZvrwNb4MgZivYcCVByfjspr0qFtQgsk1Z2Iz+iiI30A69QYHik665IYuiZeRKPvnX3bANyoOWA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=a9J0uPIh; arc=none smtp.client-ip=209.85.166.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1761142331; c=relaxed/simple;
+	bh=Sc9A960i0gy6IrMjcasg2sOYXZ+mEfp8kz1Jsm+nUPA=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=DJci1VpCmTj4Zuy/yrprtX/V/bq01b7z3s8IWNrBgkLAruB7n7HdvXyUe0+YbATSus3kgoyGGZhzmas2NrljDRyvrSjV1QfUWfEf3/T72HykarUIKiogrTQIMjvMRk5/hhl6NM8E0ccryT57YFEuUb/wBZuYYh1X+DrhM5lTF6Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=SOCjXIZA; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=VEHD8W9H; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="a9J0uPIh"
-Received: by mail-io1-f41.google.com with SMTP id ca18e2360f4ac-930cfdfabb3so51164239f.1
-        for <linux-block@vger.kernel.org>; Wed, 22 Oct 2025 06:39:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1761140394; x=1761745194; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3Qdff1QQWTfCeG5VLrXmgGFz3QYopNzjLMHM5Al4uYw=;
-        b=a9J0uPIhear6JnBGcsyuvYL6Cm15JNr7dDmIO8JluNgepdNSAwc0fedLeDQ5DcYNcX
-         YSxCtSIVE+b0a4tm5SqIfKKwRZae8MbSNn98rvnMJu/oltowz+KzcjQw1HARWbAGSXZ5
-         mWQ3OXb6I3D/pTI6myFcgl3JCwr3yRhWy6ytqW5Pwujy+LIOrUICceWH2JL10fIrIADF
-         k2x9lVi9GS7NrSIAIl3R9byxbOSQWUf35ZPjSDQlsBCKrYKspqx+BLaAqBFdg2GSKmE/
-         LY8wqto0jiofLgj3ox9JQ62kBUOP0m875wpIpYx/9tgR5oCw2/pcZRtGNJih0ILKr7Dh
-         lKvQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761140394; x=1761745194;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3Qdff1QQWTfCeG5VLrXmgGFz3QYopNzjLMHM5Al4uYw=;
-        b=ij687Vw3n+nh59mIqC75p1vVaOygZqLVmuRCitFZsATShtqAGDzZCeQ4ZVCveNEbLM
-         RPXtJqlQdznotB0IcU4zME8k/LNqMmC7UqIYFLsJ0f9OBEGcsjs+broQLLW//T9BrMaa
-         jmuX1J5ZnT48vZ/zv5iAVHMxwmZmy9FZGjCe3GwuTH9UQjPEmP1F7625JaZqiYFnyj86
-         xKn2x5FjOI3HampJv6d3U7FohYScm0DoGzPmEem2jz/OLk7NzojvfqUwkFrq8vSDTmEC
-         6s8AA4m5uGCAwF8j6HFrbdji/5TyhX/Q9vOAp0R4JI7t8kZX5uHkRbLSqwRq4epcxlP9
-         4Uyw==
-X-Gm-Message-State: AOJu0YxZlUzmXu6GHj9kbPNasfkrFOiuMAf+t9TlAGlTp9+abCTiSB/4
-	RwVaN8LZU/7BwoKi6jI8Fm+hJJ6gJ7G0IsPW1tLxj2b8gSrT7BD/NqPmj3oUdnkoxGhEcSIEeT/
-	G9HfFAXM=
-X-Gm-Gg: ASbGncv8Q9ia4dfDHkFfzABCDyfANPdpPUQ/iUbyX1wFsWbuJBcNTB28UTENWoLp8zg
-	+MofRl+K8A8vIQAVDc/MpWYsrMv2TqArXm2uVObXsz6y62fCaKoYbfEaBpa3/FPhAJNQC3aYVPN
-	R+MnsOWh1gtxmiXiu8lP/JvO2JNpfz1K6BuwMh3RitwPGpziDGwHSc/ideQBvb6RCU2GCtnjWMC
-	WYtoRu8wv9FPOffdtmZekUEH9whdUvt8z037Qwon+YO6g0p6l8qpvGdydG1TCAjkYd4BSUygzHP
-	hOtf1dy3Ns77LoPVPN/88gV6/HG5KKqT9WNbKPP7bMDOew5qr9ZKsKUGWdPCQF0pj8Hyi6An9Xb
-	pLx1DbFPElLBbG6scNhzbwjVrlNFVJ/2+LP6BtZdL/tD7L0k+Az45NLJX2EU4ArMonDw=
-X-Google-Smtp-Source: AGHT+IGajUKn5EvyfumXRaySHEjRIMqPmCXmVmG7Bdm9th/rjELKMFQrwFTY/NSoZnS0FaCJqH9/9A==
-X-Received: by 2002:a05:6e02:160e:b0:422:a9aa:7ff4 with SMTP id e9e14a558f8ab-431d32be9c4mr41827295ab.11.1761140393878;
-        Wed, 22 Oct 2025 06:39:53 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-430d07ccc89sm54455965ab.40.2025.10.22.06.39.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Oct 2025 06:39:53 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, Keith Busch <kbusch@meta.com>
-Cc: hch@lst.de, ming.lei@redhat.com, martin.petersen@oracle.com, 
- Keith Busch <kbusch@kernel.org>
-In-Reply-To: <20251020204715.3664483-1-kbusch@meta.com>
-References: <20251020204715.3664483-1-kbusch@meta.com>
-Subject: Re: [PATCHv2] block: rename min_segment_size
-Message-Id: <176114039313.6778.10145705323225537448.b4-ty@kernel.dk>
-Date: Wed, 22 Oct 2025 07:39:53 -0600
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="SOCjXIZA";
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="VEHD8W9H"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 75B3A21211;
+	Wed, 22 Oct 2025 14:11:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+	t=1761142323; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Sc9A960i0gy6IrMjcasg2sOYXZ+mEfp8kz1Jsm+nUPA=;
+	b=SOCjXIZAyzzoogP7X+MJJdIPr3pVbwjJS3KVdZDUVjRK1HuKmsKrNDne5tLwSm39GA3/WK
+	lwJlVkaXdaouv74l81sIcBqhcbfb7b1cQ3ylTWbP+suv5I9gUj15/tsDYMgKOG3Acc0QWj
+	tLTN92shABcAaWCI/tqW5Myw/RKlQiA=
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+	t=1761142319; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Sc9A960i0gy6IrMjcasg2sOYXZ+mEfp8kz1Jsm+nUPA=;
+	b=VEHD8W9HzpEMZx+CmHK5pgb38W2j3O3cJovtpVxFDMR5kXDlOkOOMNu92zoTPxeJs92VVC
+	rTBfvUWIHjI4e2UqlTF8tzd/1CzCxpCPWn4TZK6reuT5fKeOt7YYkgghQKVGqYpmxVPdpq
+	48CKfX2+qfTG9LKkJsXYO/RYl7dTVP8=
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 48A4E13A29;
+	Wed, 22 Oct 2025 14:11:59 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id R9WtEC/m+Gh/EwAAD6G6ig
+	(envelope-from <mwilck@suse.com>); Wed, 22 Oct 2025 14:11:59 +0000
+Message-ID: <a186416aa03bb995b2f04fdb47315c1d12a87cab.camel@suse.com>
+Subject: Re: [PATCH] dm: Fix deadlock when reloading a multipath table
+From: Martin Wilck <mwilck@suse.com>
+To: Benjamin Marzinski <bmarzins@redhat.com>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>, Mikulas Patocka
+	 <mpatocka@redhat.com>, Mike Snitzer <snitzer@kernel.org>, 
+	dm-devel@lists.linux.dev, linux-block@vger.kernel.org
+Date: Wed, 22 Oct 2025 16:11:58 +0200
+In-Reply-To: <aPfcAfn6gsgNLwC7@redhat.com>
+References: <20251009030431.2895495-1-bmarzins@redhat.com>
+	 <ed792d72a1ca47937631af6e12098d9a20626bcf.camel@suse.com>
+	 <aOg2Yul2Di4Ymom-@redhat.com>
+	 <e407b683dceb9516b54cede5624baa399f8fa638.camel@suse.com>
+	 <aPfcAfn6gsgNLwC7@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.58.1 
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3
+X-Spamd-Result: default: False [-4.30 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.com:s=susede1];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.com:mid]
+X-Spam-Flag: NO
+X-Spam-Score: -4.30
+X-Spam-Level: 
 
+On Tue, 2025-10-21 at 15:16 -0400, Benjamin Marzinski wrote:
+> On Fri, Oct 10, 2025 at 12:19:51PM +0200, Martin Wilck wrote:
+> > On Thu, 2025-10-09 at 18:25 -0400, Benjamin Marzinski wrote:
+> >=20
+> >=20
+> > > I did check to see if holding it for the entire suspend would
+> > > cause
+> > > issues, but I didn't see any case where it would. If I missed a=20
+> > > case where __noflush_suspending() should only return true if we
+> > > are
+> > > actually in the process of suspending, I can easily update that
+> > > function to do that.
+> >=20
+> > If this is necessary, I agree that the flag an related function
+> > should
+> > be renamed. But there are already generic DM flags to indicate that
+> > a
+> > queue is suspend*ed*. Perhaps, instead of changing the semantics of
+> > DMF_NOFLUSH_SUSPENDING, it would make more sense to test=C2=A0
+> >=20
+> > =C2=A0 (__noflush_suspending || test_bit(DMF_BLOCK_IO_FOR_SUSPEND)
+> >=20
+> > in dm_swap_table()?
+>=20
+> Won't we ALWAYS be suspended when we are in dm_swap_table()? We do
+> need
+> to refresh the limits in some cases (the cases where multipath-tools
+> currently reloads the table without setting noflush). What we need to
+> know is "is this table swap happening in a noflush suspend, where
+> userspace understands that it can't modify the device table in a way
+> that would change the limits". For multipath, this is almost always
+> the
+> case.=20
 
-On Mon, 20 Oct 2025 13:47:15 -0700, Keith Busch wrote:
-> Despite its name, the block layer is fine with segments smaller that the
-> "min_segment_size" limit. The value is an optimization limit indicating
-> the largest segment that can be used without considering boundary
-> limits. Smaller segments can take a fast path, so give it a name that
-> reflects that: max_fast_segment_size.
-> 
-> 
-> [...]
+Ok, getting it now. The semantics of the flag are changed from "device
+is noflush-suspending" to "device is either noflush-suspending or
+noflush-suspended". It isn't easy to express this in a simple flag
+name. I'm fine with not renaming the flag, if a comment is added that
+explains the semantics clearly.
 
-Applied, thanks!
+> >=20
+> > I find Bart's approach very attractive; freezing might not be
+> > necessary
+> > at all in that case. We'dd just need to avoid a race where paths
+> > get
+> > reinstated while the operation that would normally have required a
+> > freeze is ongoing.
+>=20
+> I agree. Even just the timing out of freezes, his
+> "[PATCH 2/3] block: Restrict the duration of sysfs attribute changes"
+> would be enough to keep this from deadlocking the system.
+>=20
 
-[1/1] block: rename min_segment_size
-      commit: 5c5028ee594ce5f907ca6ad1c32cca6a15098464
+OK, let's see how it goes. Given your explanations, I'm ok with your
+patch, too.
 
-Best regards,
--- 
-Jens Axboe
-
-
-
+Martin
